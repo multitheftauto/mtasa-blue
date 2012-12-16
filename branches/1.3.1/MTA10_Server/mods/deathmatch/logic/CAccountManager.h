@@ -62,6 +62,11 @@ public:
         Super::clear ();
     }
 
+    size_t size ( void ) const
+    {
+        return Super::size ();
+    }
+
     // Account functions
     void FindAccountMatches ( std::vector < CAccount* >* pOutResults, const SString& strName )
     {
@@ -107,7 +112,7 @@ public:
     bool                        LoadSetting                 ( CXMLNode* pNode );
     bool                        Save                        ( void );
     bool                        Save                        ( CXMLNode* pParent );
-    void                        Save                        ( CAccount* pParent );
+    void                        Save                        ( CAccount* pParent, bool bCheckForErrors = true );
 
     bool                        SaveSettings                ( void );
     bool                        IntegrityCheck              ( void );

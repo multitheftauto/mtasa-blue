@@ -129,6 +129,10 @@ void* CIdArray::FindEntry ( SArrayId id, EIdClassType idClass )
 
 void CIdArray::ExpandBy ( uint uiAmount )
 {
+    // Don't expand if more than 150000 unused items
+    if ( m_IDStack.GetUnusedAmount () > 150000 )
+        return;
+
     m_IDStack.ExpandBy ( uiAmount );
     SIdEntry blankEntry = { NULL, EIdClass::NONE };
     m_Elements.resize ( m_uiCapacity + uiAmount + 1, blankEntry );

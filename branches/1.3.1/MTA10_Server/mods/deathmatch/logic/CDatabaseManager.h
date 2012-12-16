@@ -114,6 +114,7 @@ public:
         CRegistryResult     registryResult;
         CTickCount          timeReady;
         bool                bLoggedWarning;
+        bool                bIgnoreResult;
     } result;
 
     struct
