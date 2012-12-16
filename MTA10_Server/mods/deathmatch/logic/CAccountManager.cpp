@@ -349,6 +349,8 @@ bool CAccountManager::Load( void )
     m_iAccounts = 0;
     bool bNeedsVacuum = false;
     CAccount* pAccount = NULL;
+    CElapsedTime activityTimer;
+    bool bOutputFeedback = false;
     for ( int i = 0 ; i < iResults ; i++ )
     {
         //Fill User ID, Name & Password (Required data)
@@ -404,9 +406,57 @@ bool CAccountManager::Load( void )
         if ( bChanged )
             pAccount->SetChanged ( bChanged );
         m_iAccounts = Max ( m_iAccounts, iUserID );
+
+        // Feedback for the user
+        if ( activityTimer.Get() > 5000 )
+        {
+            activityTimer.Reset();
+            bOutputFeedback = true;
+            CLogger::LogPrintf ( "Reading accounts %d/%d\n", m_List.size(), iResults );
+        }
     }
+    if ( bOutputFeedback )
+        CLogger::LogPrintf ( "Reading accounts done.\n");
     if ( bNeedsVacuum )
         m_pDatabaseManager->Execf ( m_hDbConnection, "VACUUM" );
+
+    // Save any upgraded accounts
+    {
+        CElapsedTime activityTimer;
+        bool bOutputFeedback = false;
+        uint uiSaveCount = 0;
+        for ( CMappedAccountList::const_iterator iter = m_List.begin () ; iter != m_List.end () ; iter++ )
+        {
+            CAccount* pAccount = *iter;
+            if ( pAccount->IsRegistered () && pAccount->HasChanged() )
+            {
+                uiSaveCount++;
+                Save ( pAccount, false );
+                // Feedback for the user
+                if ( activityTimer.Get() > 5000 )
+                {
+                    activityTimer.Reset();
+                    bOutputFeedback = true;
+                    CLogger::LogPrintf ( "Saving upgraded accounts %d\n", uiSaveCount );
+                }
+            }
+        }
+
+        if ( uiSaveCount > 100 )
+        {
+            bOutputFeedback = true;
+            CLogger::LogPrintf ( "Finishing accounts upgrade...\n" );
+            for ( uint i = 0 ; i < 10 ; i++ )
+            {
+                Sleep( 10 );
+                m_pDatabaseManager->DoPulse ();
+            }
+        }
+
+        if ( bOutputFeedback )
+            CLogger::LogPrintf ( "Completed accounts upgrade.\n");
+    }
+
     return true;
 }
 
@@ -429,7 +479,7 @@ bool CAccountManager::LoadSetting ( CXMLNode* pNode )
 }
 
 
-void CAccountManager::Save ( CAccount* pAccount )
+void CAccountManager::Save ( CAccount* pAccount, bool bCheckForErrors )
 {
     SString strName = pAccount->GetName();
     SString strPassword = pAccount->GetPasswordHash();
@@ -438,11 +488,22 @@ void CAccountManager::Save ( CAccount* pAccount )
 
     m_pDatabaseManager->Execf ( m_hDbConnection, "INSERT OR IGNORE INTO accounts (name, ip, serial, password) VALUES(?,?,?,?)", SQLITE_TEXT, strName.c_str (), SQLITE_TEXT, strIP.c_str (), SQLITE_TEXT, strSerial.c_str (), SQLITE_TEXT, strPassword.c_str () );
 
-    if ( strSerial != "" )
-        m_pDatabaseManager->QueryWithCallbackf ( m_hDbConnection, StaticDbCallback, this, "UPDATE accounts SET ip=?, serial=?, password=? WHERE name=?", SQLITE_TEXT, strIP.c_str (), SQLITE_TEXT, strSerial.c_str (), SQLITE_TEXT, strPassword.c_str (), SQLITE_TEXT, strName.c_str () );
+    if ( bCheckForErrors )
+    {
+        if ( strSerial != "" )
+            m_pDatabaseManager->QueryWithCallbackf ( m_hDbConnection, StaticDbCallback, this, "UPDATE accounts SET ip=?, serial=?, password=? WHERE name=?", SQLITE_TEXT, strIP.c_str (), SQLITE_TEXT, strSerial.c_str (), SQLITE_TEXT, strPassword.c_str (), SQLITE_TEXT, strName.c_str () );
+        else
+            //If we don't have a serial then IP and password will suffice
+            m_pDatabaseManager->QueryWithCallbackf ( m_hDbConnection, StaticDbCallback, this, "UPDATE accounts SET ip=?, password=? WHERE name=?", SQLITE_TEXT, strIP.c_str (), SQLITE_TEXT, strPassword.c_str (), SQLITE_TEXT, strName.c_str () );
+    }
     else
-        //If we don't have a serial then IP and password will suffice
-        m_pDatabaseManager->QueryWithCallbackf ( m_hDbConnection, StaticDbCallback, this, "UPDATE accounts SET ip=?, password=? WHERE name=?", SQLITE_TEXT, strIP.c_str (), SQLITE_TEXT, strPassword.c_str (), SQLITE_TEXT, strName.c_str () );
+    {
+        if ( strSerial != "" )
+            m_pDatabaseManager->Execf ( m_hDbConnection, "UPDATE accounts SET ip=?, serial=?, password=? WHERE name=?", SQLITE_TEXT, strIP.c_str (), SQLITE_TEXT, strSerial.c_str (), SQLITE_TEXT, strPassword.c_str (), SQLITE_TEXT, strName.c_str () );
+        else
+            //If we don't have a serial then IP and password will suffice
+            m_pDatabaseManager->Execf ( m_hDbConnection, "UPDATE accounts SET ip=?, password=? WHERE name=?", SQLITE_TEXT, strIP.c_str (), SQLITE_TEXT, strPassword.c_str (), SQLITE_TEXT, strName.c_str () );
+    }
 
     //Set changed since saved to false
     pAccount->SetChanged( false );

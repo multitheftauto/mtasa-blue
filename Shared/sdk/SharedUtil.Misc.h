@@ -1556,7 +1556,17 @@ namespace SharedUtil
             return *pData;
         }
 
+        const T& operator* () const
+        {
+            return *pData;
+        }
+
         T* operator-> ()
+        {
+            return pData;
+        }
+
+        const T* operator-> () const
         {
             return pData;
         }
