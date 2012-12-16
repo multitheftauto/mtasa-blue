@@ -53,6 +53,22 @@ public:
         ptr = NULL;
     }
 
+    T& front( void )
+    {
+        return orderedMap.begin()->second;
+    }
+
+    const T& front( void ) const
+    {
+        return *orderedMap.begin()->second;
+    }
+
+    void pop_front( void )
+    {
+        T item = front();
+        remove( item );
+    }
+
     void push_front ( const T& item )
     {
         // Check if indexing will wrap (and so destroy map order)

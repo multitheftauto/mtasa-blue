@@ -328,7 +328,7 @@ void CDatabaseConnectionSqlite::BeginAutomaticTransaction ( void )
     if ( m_bInAutomaticTransaction )
     {
         // If it's been a little while since this transaction was started, consider renewing it
-        if ( ( CTickCount::Now () - m_AutomaticTransactionStartTime ).ToLongLong () > 500 )
+        if ( ( CTickCount::Now () - m_AutomaticTransactionStartTime ).ToLongLong () > 1500 )
             EndAutomaticTransaction ();
     }
     if ( !m_bInAutomaticTransaction && m_bAutomaticTransactionsEnabled )

@@ -16,6 +16,8 @@
 
 uint g_uiDatabaseThreadProcessorNumber = -1;
 
+typedef CFastList < CDbJobData* > CJobQueueType;
+
 ///////////////////////////////////////////////////////////////
 //
 // CDatabaseJobQueueImpl
@@ -41,7 +43,6 @@ protected:
     void                        StopThread                  ( void );
     CDbJobData*                 GetNewJobData               ( void );
     void                        UpdateDebugData             ( void );
-    void                        RemoveUnwantedResults       ( void );
     void                        IgnoreJobResults            ( CDbJobData* pJobData );
 
     // Other thread functions
@@ -63,7 +64,6 @@ protected:
     // Main thread variables
     CThreadHandle*                      m_pServiceThreadHandle;
     std::map < SDbJobId, CDbJobData* >  m_ActiveJobHandles;
-    std::set < CDbJobData* >            m_IgnoreResultList;
     std::set < CDbJobData* >            m_FinishedList;         // Result has been used, will be deleted next pulse
     uint                                m_uiJobCountWarnThresh;
     uint                                m_uiJobCount10sMin;
@@ -83,8 +83,8 @@ protected:
     {
         bool                                        m_bTerminateThread;
         bool                                        m_bThreadTerminated;
-        std::list < CDbJobData* >                   m_CommandQueue;
-        std::list < CDbJobData* >                   m_ResultQueue;
+        CJobQueueType                               m_CommandQueue;
+        CJobQueueType                               m_ResultQueue;
         CComboMutex                                 m_Mutex;
     } shared;
 };
@@ -107,7 +107,7 @@ CDatabaseJobQueue* NewDatabaseJobQueue ( void )
 //
 ///////////////////////////////////////////////////////////////
 CDatabaseJobQueueImpl::CDatabaseJobQueueImpl ( void )
-    : m_uiJobCountWarnThresh ( 10 )
+    : m_uiJobCountWarnThresh ( 30 )
     , m_uiConnectionCountWarnThresh ( 10 )
 {
     // Add known database types
@@ -247,25 +247,32 @@ again:
         CDbJobData* pJobData = *iter;
         m_FinishedList.erase ( iter++ );
         // Check not refed
-        assert ( !ListContains ( shared.m_CommandQueue, pJobData ) );
-        assert ( !ListContains ( shared.m_ResultQueue, pJobData ) );
-        assert ( !MapContains ( m_IgnoreResultList, pJobData ) );
-        assert ( !MapContains ( m_FinishedList, pJobData ) );
+        dassert ( !ListContains ( shared.m_CommandQueue, pJobData ) );
+        dassert ( !ListContains ( shared.m_ResultQueue, pJobData ) );
+        dassert ( !MapContains ( m_FinishedList, pJobData ) );
 
-        assert ( MapContains ( m_ActiveJobHandles, pJobData->GetId () ) );
+        dassert ( MapContains ( m_ActiveJobHandles, pJobData->GetId () ) );
         MapRemove ( m_ActiveJobHandles, pJobData->GetId () );
-        assert ( !pJobData->HasCallback () );
+        dassert ( !pJobData->HasCallback () );
         SAFE_DELETE( pJobData );
         g_pStats->iDbJobDataCount--;
     }
 
-    // Remove ignored
-    RemoveUnwantedResults ();
-
     // Do pending callbacks
-    for ( std::list < CDbJobData* >::iterator iter = shared.m_ResultQueue.begin () ; iter != shared.m_ResultQueue.end () ; ++iter )
+    for ( CJobQueueType::iterator iter = shared.m_ResultQueue.begin () ; iter != shared.m_ResultQueue.end () ; )
     {
         CDbJobData* pJobData = *iter;
+
+        if ( pJobData->result.bIgnoreResult )
+        {
+            // Ignored results won't be collected, so move to finished list here
+            iter = shared.m_ResultQueue.erase ( iter );
+            pJobData->stage = EJobStage::FINISHED;
+            MapInsert ( m_FinishedList, pJobData );
+            // Still allow callback incase any cleanup is needed
+        }
+        else
+            ++iter;
 
         if ( pJobData->HasCallback () )
         {
@@ -311,7 +318,7 @@ void CDatabaseJobQueueImpl::UpdateDebugData ( void )
     CTickCount timeNow = CTickCount::Now ( true );
 
     // Log old uncollected queries
-    for ( std::list < CDbJobData* >::iterator iter = shared.m_ResultQueue.begin () ; iter != shared.m_ResultQueue.end () ; iter++ )
+    for ( CJobQueueType::iterator iter = shared.m_ResultQueue.begin () ; iter != shared.m_ResultQueue.end () ; iter++ )
     {
         CDbJobData* pJobData = *iter;
         if ( !pJobData->result.bLoggedWarning )
@@ -332,46 +339,6 @@ void CDatabaseJobQueueImpl::UpdateDebugData ( void )
 
 ///////////////////////////////////////////////////////////////
 //
-// CDatabaseJobQueueImpl::RemoveUnwantedResults
-//
-// Check result queue items for match with ignore list items.
-// * Must be called from inside a locked section *
-//
-///////////////////////////////////////////////////////////////
-void CDatabaseJobQueueImpl::RemoveUnwantedResults ( void )
-{
-    if ( m_IgnoreResultList.empty () )
-        return;
-
-again:
-    for ( std::list < CDbJobData* >::iterator iter = shared.m_ResultQueue.begin () ; iter != shared.m_ResultQueue.end () ; )
-    {
-        CDbJobData* pJobData = *iter;
-        if ( MapContains ( m_IgnoreResultList, pJobData ) )
-        {
-            // Found result to ignore, remove from result and ignore lists, add to finished list
-            iter = shared.m_ResultQueue.erase ( iter );
-            MapRemove ( m_IgnoreResultList, pJobData );
-            pJobData->stage = EJobStage::FINISHED;
-            MapInsert ( m_FinishedList, pJobData );
-
-            // Do callback incase any cleanup is needed
-            if ( pJobData->HasCallback () )
-            {
-                shared.m_Mutex.Unlock ();                 
-                pJobData->ProcessCallback ();              
-                shared.m_Mutex.Lock ();
-                goto again;
-            }
-        }
-        else
-            ++iter;
-    }
-}
-
-
-///////////////////////////////////////////////////////////////
-//
 // CDatabaseJobQueueImpl::PollCommand
 //
 // Find result for previous command
@@ -386,15 +353,13 @@ bool CDatabaseJobQueueImpl::PollCommand ( CDbJobData* pJobData, uint uiTimeout )
     while ( true )
     {
         // Remove ignored before checking
-        RemoveUnwantedResults ();
 
-        // Find result with the required job handle
-        for ( std::list < CDbJobData* >::iterator iter = shared.m_ResultQueue.begin () ; iter != shared.m_ResultQueue.end () ; ++iter )
+        if ( !pJobData->result.bIgnoreResult )
         {
-            if ( pJobData == *iter )
+            if ( ListContains( shared.m_ResultQueue, pJobData ) )
             {
-                // Found result. Remove from the result queue and flag return value
-                shared.m_ResultQueue.erase ( iter );
+                ListRemove( shared.m_ResultQueue, pJobData );
+
                 pJobData->stage = EJobStage::FINISHED;
                 MapInsert ( m_FinishedList, pJobData );
 
@@ -407,7 +372,6 @@ bool CDatabaseJobQueueImpl::PollCommand ( CDbJobData* pJobData, uint uiTimeout )
                 }
 
                 bFound = true;
-                break;
             }
         }
 
@@ -447,7 +411,7 @@ bool CDatabaseJobQueueImpl::FreeCommand ( CDbJobData* pJobData )
         return false;
     }
 
-    if ( MapContains ( m_IgnoreResultList, pJobData ) )
+    if ( pJobData->result.bIgnoreResult )
         return false;       // Already ignoring query handle
 
     // if in command or result queue, then put in ignore result list
@@ -496,11 +460,11 @@ void CDatabaseJobQueueImpl::IgnoreConnectionResults ( SConnectionHandle connecti
     shared.m_Mutex.Lock ();
 
     // All active jobhandles will either be in m_CommandQueue or m_ResultQueue or m_FinishedList
-    for ( std::list < CDbJobData* >::iterator iter = shared.m_CommandQueue.begin () ; iter != shared.m_CommandQueue.end () ; ++iter )
+    for ( CJobQueueType::iterator iter = shared.m_CommandQueue.begin () ; iter != shared.m_CommandQueue.end () ; ++iter )
         if ( (*iter)->command.connectionHandle == connectionHandle )
             IgnoreJobResults ( *iter );
 
-    for ( std::list < CDbJobData* >::iterator iter = shared.m_ResultQueue.begin () ; iter != shared.m_ResultQueue.end () ; ++iter )
+    for ( CJobQueueType::iterator iter = shared.m_ResultQueue.begin () ; iter != shared.m_ResultQueue.end () ; ++iter )
         if ( (*iter)->command.connectionHandle == connectionHandle )
             IgnoreJobResults ( *iter );
 
@@ -520,7 +484,7 @@ void CDatabaseJobQueueImpl::IgnoreJobResults ( CDbJobData* pJobData )
 {
     dassert ( pJobData->stage <= EJobStage::RESULT );
     dassert ( !MapContains ( m_FinishedList, pJobData ) );
-    MapInsert ( m_IgnoreResultList, pJobData );
+    pJobData->result.bIgnoreResult = true;
 }
 
 
