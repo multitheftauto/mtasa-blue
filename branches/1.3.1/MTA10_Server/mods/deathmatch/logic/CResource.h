@@ -167,11 +167,10 @@ private:
     list<CIncludedResources *>  m_includedResources; // we store them here temporarily, then read them once all the resources are loaded
     list<CResourceFile *>   m_resourceFiles;
     list<CResource *>       m_dependents; // resources that have "included" or loaded this one
-    list<CElementGroup *>   m_elementGroups; // stores elements created by scripts in this resource
     list<CExportedFunction> m_exportedFunctions;
     list<CResource *>       m_temporaryIncludes; // started by startResource script command
     
-    CElementGroup *         m_pDefaultElementGroup;
+    CElementGroup *         m_pDefaultElementGroup; // stores elements created by scripts in this resource
     
     std::string             m_strCircularInclude;
     bool                    m_bLoaded; // its been loaded successfully (i.e. meta parsed ok), included resources loaded ok

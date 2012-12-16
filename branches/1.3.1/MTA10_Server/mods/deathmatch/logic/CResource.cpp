@@ -797,8 +797,7 @@ bool CResource::Start ( list<CResource *> * dependents, bool bStartedManually, b
         m_bIsPersistent = false;
 
         // Create an element group for us
-        m_pDefaultElementGroup = new CElementGroup ( this );
-        m_elementGroups.push_back ( m_pDefaultElementGroup ); // for use by scripts
+        m_pDefaultElementGroup = new CElementGroup ();    // for use by scripts
 
         // Grab the root element
         m_pRootElement = g_pGame->GetMapManager()->GetRootElement();
@@ -861,13 +860,9 @@ bool CResource::Start ( list<CResource *> * dependents, bool bStartedManually, b
                         m_pNodeStorage = NULL;
                     }
 
-                    // Destroy all the element groups attached directly to this resource
-                    list < CElementGroup* > ::iterator itere = m_elementGroups.begin ();
-                    for ( ; itere != m_elementGroups.end (); itere++ )
-                    {
-                        delete (*itere);
-                    }
-                    m_elementGroups.clear();
+                    // Destroy the element group attached directly to this resource
+                    if ( m_pDefaultElementGroup )
+                        delete m_pDefaultElementGroup;
                     m_pDefaultElementGroup = NULL;
 
                     // Make sure we remove the resource elements from the players that have joined
@@ -965,7 +960,7 @@ bool CResource::Start ( list<CResource *> * dependents, bool bStartedManually, b
         m_resourceManager->ApplyMinClientRequirement ( this, m_strMinClientReqFromMetaXml );
 
         // Broadcast new resourceelement that is loaded and tell the players that a new resource was started
-        g_pGame->GetMapManager()->BroadcastElements ( m_pResourceElement, true );
+        g_pGame->GetMapManager()->BroadcastResourceElements ( m_pResourceElement, m_pDefaultElementGroup );
         g_pGame->GetPlayerManager ()->BroadcastOnlyJoined ( CResourceStartPacket ( m_strResourceName.c_str (), this ) );
         SendProtectedScripts ();
 
@@ -1063,13 +1058,9 @@ bool CResource::Stop ( bool bStopManually )
             m_pNodeStorage = NULL;
         }
 
-        // Destroy all the element groups attached directly to this resource
-        list < CElementGroup* > ::iterator itere = m_elementGroups.begin ();
-        for ( ; itere != m_elementGroups.end (); itere++ )
-        {
-            delete (*itere);
-        }
-        m_elementGroups.clear();
+        // Destroy the element group attached directly to this resource
+        if ( m_pDefaultElementGroup )
+            delete m_pDefaultElementGroup;
         m_pDefaultElementGroup = NULL;
 
         // Destroy the virtual machine for this resource
@@ -1151,11 +1142,8 @@ void CResource::DisplayInfo ( void ) // duplicated for HTML
         // count the number of elements
         unsigned int uiMapElementCount = 0;
         unsigned int uiScriptElementCount = 0;
-        list < CElementGroup* > ::iterator itere = m_elementGroups.begin ();
-        for ( ; itere != m_elementGroups.end (); itere++ )
-        {
-            uiScriptElementCount += (*itere)->GetCount();
-        }
+        if ( m_pDefaultElementGroup )
+            uiScriptElementCount += m_pDefaultElementGroup->GetCount();
 
         list < CResourceFile* > ::iterator iterf = m_resourceFiles.begin ();
         for ( ; iterf != m_resourceFiles.end (); iterf++ )
@@ -1233,11 +1221,8 @@ char * CResource::DisplayInfoHTML ( char * info, size_t length )
         // count the number of elements
         unsigned int uiMapElementCount = 0;
         unsigned int uiScriptElementCount = 0;
-        list < CElementGroup* > ::iterator itere = m_elementGroups.begin ();
-        for ( ; itere != m_elementGroups.end (); itere++ )
-        {
-            uiScriptElementCount += (*itere)->GetCount();
-        }
+        if ( m_pDefaultElementGroup )
+            uiScriptElementCount += m_pDefaultElementGroup->GetCount();
 
         list < CResourceFile* > ::iterator iterf = m_resourceFiles.begin ();
         for ( ; iterf != m_resourceFiles.end (); iterf++ )

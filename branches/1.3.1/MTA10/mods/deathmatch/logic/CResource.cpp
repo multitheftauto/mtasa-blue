@@ -40,8 +40,7 @@ CResource::CResource ( unsigned short usNetID, const char* szResourceName, CClie
 
     m_pLuaManager = g_pClientGame->GetLuaManager();
     m_pRootEntity = g_pClientGame->GetRootEntity ();
-    m_pDefaultElementGroup = new CElementGroup ( this );
-    m_elementGroups.push_back ( m_pDefaultElementGroup ); // for use by scripts
+    m_pDefaultElementGroup = new CElementGroup (); // for use by scripts
     m_pResourceEntity = pResourceEntity;
     m_pResourceDynamicEntity = pResourceDynamicEntity;
 
@@ -122,14 +121,9 @@ CResource::~CResource ( void )
     // Undo all changes to water
     g_pGame->GetWaterManager ()->UndoChanges ( this );
 
-    // TODO: remove them from the core too!!
-    // Destroy all the element groups attached directly to this resource
-    list < CElementGroup* > ::iterator itere = m_elementGroups.begin ();
-    for ( ; itere != m_elementGroups.end (); itere++ )
-    {
-        delete (*itere);
-    }
-    m_elementGroups.clear();
+    // Destroy the element group attached directly to this resource
+    if ( m_pDefaultElementGroup )
+        delete m_pDefaultElementGroup;
     m_pDefaultElementGroup = NULL;
 
     m_pRootEntity = NULL;

@@ -67,9 +67,9 @@ public:
     void                        SendBlips                   ( CPlayer& Player );
     void                        SendPerPlayerEntities       ( CPlayer& Player );
 
-    void                        BroadcastElements           ( CElement* pElement );
-    void                        BroadcastElements           ( CElement* pElement, bool bBroadcastAll );
-    void                        BroadcastElementChildren    ( CElement* pElement, class CEntityAddPacket &Packet, list < CPerPlayerEntity* > &pPerPlayerList, bool bBroadcastAll );
+    void                        BroadcastResourceElements   ( CElement* pResourceElement, CElementGroup* pElementGroup );
+    void                        BroadcastElementChildren    ( CElement* pElement, class CEntityAddPacket &Packet, std::vector < CPerPlayerEntity* > &pPerPlayerList, std::set < CElement* >& outDoneElements );
+    void                        BroadcastElement            ( CElement* pElement, class CEntityAddPacket &Packet, std::vector < CPerPlayerEntity* > &pPerPlayerList );
 
     void                        OnPlayerJoin                ( CPlayer& Player );
     void                        OnPlayerQuit                ( CPlayer& Player );

@@ -24,8 +24,6 @@ extern CGame * g_pGame;
 
 CElementGroup::~CElementGroup()
 {
-    list < CElement* > ::iterator iter;
-
     // Delete all the elements
     if ( !m_elements.empty () )
     {
@@ -33,7 +31,7 @@ CElementGroup::~CElementGroup()
         {
             CEntityRemovePacket removePacket;
 
-            for ( iter = m_elements.begin (); iter != m_elements.end (); iter++ )
+            for ( CFastList < CElement* > ::iterator iter = m_elements.begin (); iter != m_elements.end (); iter++ )
             {
                 CElement * pElement = (*iter);
 
@@ -65,7 +63,7 @@ CElementGroup::~CElementGroup()
 
         CElementDeleter * deleter = g_pGame->GetElementDeleter();
         CElement * pElement = NULL;
-        for ( iter = m_elements.begin (); iter != m_elements.end (); iter++ )
+        for ( CFastList < CElement* > ::iterator iter = m_elements.begin (); iter != m_elements.end (); iter++ )
         {
             pElement = *iter;
             pElement->SetElementGroup ( NULL );
@@ -86,7 +84,7 @@ void CElementGroup::Add ( class CElement * element )
 
 void CElementGroup::Remove ( class CElement * element )
 {
-    m_elements.remove ( element );
+    m_elements.remove( element );
 }
 
 unsigned int CElementGroup::GetCount ( void )
