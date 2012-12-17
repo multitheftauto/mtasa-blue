@@ -28,8 +28,7 @@ int WINAPI DllMain(HINSTANCE hModule, DWORD dwReason, PVOID pvNothing)
     {
         if ( IsRealDeal () )
         {
-            FileTranslator.SetCurrentWorkingDirectory ( "mta" );
-            FileTranslator.GetCurrentWorkingDirectory ( WorkingDirectory );
+            FileTranslator.GetGTARootDirectory ( WorkingDirectory );
             SetCurrentDirectory ( WorkingDirectory.c_str ( ) );
 
             // For dll searches, this call replaces the current directory entry and turns off 'SafeDllSearchMode'
@@ -67,14 +66,10 @@ int WINAPI DllMain(HINSTANCE hModule, DWORD dwReason, PVOID pvNothing)
 //
 bool IsRealDeal ( void )
 {
-    static bool bResult = false;
-    static bool bDone = false;
-    if ( !bDone )
-    {
-        MEMORY_BASIC_INFORMATION info;
-        VirtualQuery( (void*)0x0401000, &info, sizeof(MEMORY_BASIC_INFORMATION) );
-        bResult = info.RegionSize > 0x0401000;
-        bDone = true;
-    }
-    return bResult;
+    // Get current module full path
+    char szBuffer[64000];
+    GetModuleFileName ( NULL, szBuffer, sizeof(szBuffer) - 1 );
+    if ( SStringX( szBuffer ).EndsWithI( "gta_sa.exe" ) )
+        return true;
+    return false;
 }

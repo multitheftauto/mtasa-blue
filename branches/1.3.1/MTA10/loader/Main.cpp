@@ -461,7 +461,7 @@ int DoLaunchGame ( LPSTR lpCmdLine )
                               FALSE,
                               CREATE_SUSPENDED,
                               NULL,
-                              strDir,
+                              strDir,     //    strMTASAPath\mta is used so pthreadVC2.dll can be found
                               &siLoadee,
                               &piLoadee ) )
     {
