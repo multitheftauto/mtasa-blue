@@ -892,6 +892,7 @@ public:
 
     // Utility
     LUA_DECLARE ( Md5 );
+    LUA_DECLARE ( Sha256 );
     LUA_DECLARE ( GetNetworkUsageData );
     LUA_DECLARE ( GetNetworkStats );
     LUA_DECLARE ( GetPerformanceStats );

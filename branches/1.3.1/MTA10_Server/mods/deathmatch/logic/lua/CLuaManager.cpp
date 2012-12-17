@@ -743,6 +743,7 @@ void CLuaManager::LoadCFunctions ( void )
 
     // Utility
     CLuaCFunctions::AddFunction ( "md5", CLuaFunctionDefinitions::Md5 );
+    CLuaCFunctions::AddFunction ( "sha256", CLuaFunctionDefinitions::Sha256 );
     CLuaCFunctions::AddFunction ( "getVersion", CLuaFunctionDefinitions::GetVersion );
     CLuaCFunctions::AddFunction ( "getNetworkUsageData", CLuaFunctionDefinitions::GetNetworkUsageData );
     CLuaCFunctions::AddFunction ( "getNetworkStats", CLuaFunctionDefinitions::GetNetworkStats );
