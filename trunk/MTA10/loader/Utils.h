@@ -33,6 +33,9 @@ enum
 // Loads the given dll into hProcess. Returns 0 on failure or the handle to the
 // remote dll module on success.
 HMODULE         RemoteLoadLibrary                   ( HANDLE hProcess, const char* szLibPath );
+void            InsertWinMainBlock                  ( HANDLE hProcess );
+void            RemoveWinMainBlock                  ( HANDLE hProcess );
+void            ApplyLoadingCrashPatch              ( HANDLE hProcess );
 
 void            TerminateGTAIfRunning               ( void );
 bool            IsGTARunning                        ( void );

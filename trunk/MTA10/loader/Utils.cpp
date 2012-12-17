@@ -38,25 +38,9 @@ HMODULE RemoteLoadLibrary(HANDLE hProcess, const char* szLibPath)
         return 0;
     }
 
-    // Get location of WinMain function
-    uchar* pWinMainUS = (uchar*)0x748710;
-    uchar* pWinMainEuro = (uchar*)0x748760;
-    uchar buffer[1] = { 0 };
-    _ReadProcessMemory ( hProcess, pWinMainEuro + 2, &buffer, sizeof( buffer ), NULL );
-    bool bIsEuro = ( buffer[0] == 0x84 );
-    uchar* pWinMain = bIsEuro ? pWinMainEuro : pWinMainUS;
-
-    // Put an infinite loop at WinMain to stop GTA from running before we are ready
-    {
-        DWORD oldProt1;
-        _VirtualProtectEx ( hProcess, pWinMain - 2, 4, PAGE_EXECUTE_READWRITE, &oldProt1 );
-
-        const unsigned char blockCode[] = { 0xEB, 0xFE, 0xEB, 0xFC };
-        _WriteProcessMemory ( hProcess, pWinMain - 2, blockCode, sizeof( blockCode ), NULL );
-
-        DWORD oldProt2;
-        _VirtualProtectEx ( hProcess, pWinMain - 2, 4, oldProt1, &oldProt2 );
-    }
+    // Stop GTA from starting prematurely (Some driver dlls can inadvertently resume the thread before we are ready)
+    InsertWinMainBlock( hProcess );
+    ApplyLoadingCrashPatch( hProcess );
 
     /* Allocate memory in the remote process for the library path */
     HANDLE hThread = 0;
@@ -119,29 +103,119 @@ HMODULE RemoteLoadLibrary(HANDLE hProcess, const char* szLibPath)
     /* Clean up the resources we used to inject the DLL */
     _VirtualFreeEx (hProcess, pLibPathRemote, strlen ( szLibPath ) + 1, MEM_RELEASE );
 
-    // Remove infinite loop at WinMain which stopped GTA from running before we were ready
-    {
-        DWORD oldProt1;
-        _VirtualProtectEx ( hProcess, pWinMain - 2, 4, PAGE_EXECUTE_READWRITE, &oldProt1 );
-
-        // Order is important in case the code is being executed (CPU cache may cause issues?)
-        const unsigned char unblockCode1[] = { 0x81, 0xEC };
-        _WriteProcessMemory ( hProcess, pWinMain - 0, unblockCode1, sizeof( unblockCode1 ), NULL );
-
-        const unsigned char unblockCode2[] = { 0x00 };
-        _WriteProcessMemory ( hProcess, pWinMain - 1, unblockCode2, sizeof( unblockCode2 ), NULL );
-
-        Sleep ( 1 );
-
-        const unsigned char unblockCode3[] = { 0x90, 0x90 };
-        _WriteProcessMemory ( hProcess, pWinMain - 2, unblockCode3, sizeof( unblockCode3 ), NULL );
-
-        DWORD oldProt2;
-        _VirtualProtectEx ( hProcess, pWinMain - 2, 4, oldProt1, &oldProt2 );
-    }
+    // Allow GTA to continue
+    RemoveWinMainBlock( hProcess );
 
     /* Success */
     return ( HINSTANCE )( 1 );
+}
+
+
+///////////////////////////////////////////////////////////////////////////
+//
+// GetWinMainAddress
+//
+// Return address of GTA WinMain function
+//
+///////////////////////////////////////////////////////////////////////////
+uchar* GetWinMainAddress( HANDLE hProcess )
+{
+    #define WINMAIN_US  0x0748710
+    #define WINMAIN_EU  0x0748760
+
+    ushort buffer[1] = { 0 };
+    _ReadProcessMemory ( hProcess, (void*)(WINMAIN_EU + 0x24), &buffer, sizeof( buffer ), NULL );
+    if ( buffer[0] == 0x0F75 )     // jnz     short loc_748745
+        return (uchar*)WINMAIN_EU;
+    if ( buffer[0] == 0xEF3B )     // cmp     ebp, edi
+        return (uchar*)WINMAIN_US;
+    return NULL;
+}
+
+
+///////////////////////////////////////////////////////////////////////////
+//
+// InsertWinMainBlock
+//
+// Put an infinite loop at WinMain to stop GTA from running before we are ready
+//
+///////////////////////////////////////////////////////////////////////////
+void InsertWinMainBlock( HANDLE hProcess )
+{
+    // Get location of WinMain function
+    uchar* pWinMain = GetWinMainAddress( hProcess );
+    if ( !pWinMain )
+        return;
+
+    DWORD oldProt1;
+    _VirtualProtectEx ( hProcess, pWinMain - 2, 4, PAGE_EXECUTE_READWRITE, &oldProt1 );
+
+    const uchar blockCode[] = { 0xEB, 0xFE, 0xEB, 0xFC };
+    _WriteProcessMemory ( hProcess, pWinMain - 2, blockCode, sizeof( blockCode ), NULL );
+
+    DWORD oldProt2;
+    _VirtualProtectEx ( hProcess, pWinMain - 2, 4, oldProt1, &oldProt2 );
+}
+
+
+///////////////////////////////////////////////////////////////////////////
+//
+// RemoveWinMainBlock
+//
+// Remove infinite loop at WinMain which stopped GTA from running before we were ready
+//
+///////////////////////////////////////////////////////////////////////////
+void RemoveWinMainBlock( HANDLE hProcess )
+{
+    // Get location of WinMain function
+    uchar* pWinMain = GetWinMainAddress( hProcess );
+    if ( !pWinMain )
+        return;
+
+    DWORD oldProt1;
+    _VirtualProtectEx ( hProcess, pWinMain - 2, 4, PAGE_EXECUTE_READWRITE, &oldProt1 );
+
+    // Order is important in case the code is being executed (CPU cache may cause issues?)
+    const uchar unblockCode1[] = { 0x81, 0xEC };
+    _WriteProcessMemory ( hProcess, pWinMain - 0, unblockCode1, sizeof( unblockCode1 ), NULL );
+
+    const uchar unblockCode2[] = { 0x00 };
+    _WriteProcessMemory ( hProcess, pWinMain - 1, unblockCode2, sizeof( unblockCode2 ), NULL );
+
+    Sleep ( 1 );
+
+    const uchar unblockCode3[] = { 0x90, 0x90 };
+    _WriteProcessMemory ( hProcess, pWinMain - 2, unblockCode3, sizeof( unblockCode3 ), NULL );
+
+    DWORD oldProt2;
+    _VirtualProtectEx ( hProcess, pWinMain - 2, 4, oldProt1, &oldProt2 );
+}
+
+
+///////////////////////////////////////////////////////////////////////////
+//
+// ApplyLoadingCrashPatch
+//
+// Modify GTA function IsAppAlreadyRunning() to avoid startup crash
+//
+///////////////////////////////////////////////////////////////////////////
+void ApplyLoadingCrashPatch( HANDLE hProcess )
+{
+    // Get location of code to modify
+    uchar* pAddress = GetWinMainAddress( hProcess );
+    if ( !pAddress )
+        return;
+
+    pAddress -= 0x1E17; // Offset from WinMain function
+
+    DWORD oldProt1;
+    _VirtualProtectEx ( hProcess, pAddress, 1, PAGE_EXECUTE_READWRITE, &oldProt1 );
+
+    const uchar blockCode[] = { 0x37 };
+    _WriteProcessMemory ( hProcess, pAddress, blockCode, sizeof( blockCode ), NULL );
+
+    DWORD oldProt2;
+    _VirtualProtectEx ( hProcess, pAddress, 1, oldProt1, &oldProt2 );
 }
 
 
