@@ -1914,7 +1914,6 @@ int CLuaFunctionDefs::GetWeaponProperty ( lua_State* luaVM )
     eWeaponType eWep = eWeaponType::WEAPONTYPE_UNARMED;
     eWeaponProperty eProp = eWeaponProperty::WEAPON_INVALID_PROPERTY;
     CClientWeapon * pWeapon;
-    short sDamage = 0;
     CScriptArgReader argStream ( luaVM );
     
     
@@ -1925,10 +1924,23 @@ int CLuaFunctionDefs::GetWeaponProperty ( lua_State* luaVM )
 
         if ( !argStream.HasErrors () )
         {
-            if ( CStaticFunctionDefinitions::GetWeaponProperty ( pWeapon, eProp, sDamage ) )
+            if ( eProp == WEAPON_DAMAGE )
             {
-                lua_pushnumber ( luaVM, sDamage );
-                return 1;
+                short sData = 0;
+                if ( CStaticFunctionDefinitions::GetWeaponProperty ( pWeapon, eProp, sData ) )
+                {
+                    lua_pushnumber ( luaVM, sData );
+                    return 1;
+                }
+            }
+            else
+            {
+                float fData = 0;
+                if ( CStaticFunctionDefinitions::GetWeaponProperty ( pWeapon, eProp, fData ) )
+                {
+                    lua_pushnumber ( luaVM, fData );
+                    return 1;
+                }
             }
         }
         else
