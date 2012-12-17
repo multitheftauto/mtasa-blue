@@ -719,7 +719,6 @@ void CCore::ShowServerInfo ( unsigned int WindowType )
 void CCore::ApplyHooks ( )
 { 
     WriteDebugEvent ( "CCore::ApplyHooks" );
-    ApplyLoadingCrashPatch ();
 
     // Create our hooks.
     m_pDirectInputHookManager->ApplyHook ( );
@@ -769,9 +768,8 @@ void LoadModule ( CModuleLoader& m_Loader, const SString& strName, const SString
         SetDllDirectory( CalcMTASAPath ( "mta" ) );
     }
 
-    // Switch to MTA dir
+    // Save current directory (shouldn't change anyway)
     SString strSavedCwd = SharedUtil::GetCurrentDirectory ();
-    SetCurrentDirectory ( CalcMTASAPath ( "mta" ) );
 
     // Load approrpiate compilation-specific library.
 #ifdef MTA_DEBUG
@@ -804,9 +802,8 @@ void LoadModule ( CModuleLoader& m_Loader, const SString& strName, const SString
 template < class T, class U >
 T* InitModule ( CModuleLoader& m_Loader, const SString& strName, const SString& strInitializer, U* pObj )
 {
-    // Switch to MTA dir
+    // Save current directory (shouldn't change anyway)
     SString strSavedCwd = SharedUtil::GetCurrentDirectory ();
-    SetCurrentDirectory ( CalcMTASAPath ( "mta" ) );
 
     // Get initializer function from DLL.
     typedef T* (*PFNINITIALIZER) ( U* );
@@ -1687,40 +1684,6 @@ void CCore::SetXfireData ( std::string strServerName, std::string strVersion, bo
         szValue[6] = strPlayerCount.c_str();
         
         XfireSetCustomGameData ( 7, szKey, szValue );
-    }
-}
-
-
-//
-// Patch to fix loading crash.
-// Has to be done before the main window is created.
-//
-void CCore::ApplyLoadingCrashPatch ( void )
-{
-    uchar* pAddress;
-
-    if ( *(WORD *)0x748ADD == 0x53FF )
-        pAddress = (uchar*)0x7468F9;    // US
-    else
-        pAddress = (uchar*)0x746949;    // EU
-
-    uchar ucOldValue = 0xB7;
-    uchar ucNewValue = 0x39;
-
-    MEMORY_BASIC_INFORMATION info;
-    VirtualQuery( pAddress, &info, sizeof(MEMORY_BASIC_INFORMATION) );
-
-    if ( info.State == MEM_COMMIT && info.Protect & ( PAGE_EXECUTE_READ | PAGE_EXECUTE_READWRITE | PAGE_READONLY | PAGE_READWRITE ) )
-    {
-        if ( pAddress[0] == ucOldValue )
-        {
-            DWORD dwOldProtect;
-            if ( VirtualProtect( pAddress, 1, PAGE_READWRITE, &dwOldProtect ) )
-            {
-                pAddress[0] = ucNewValue;
-                VirtualProtect( pAddress, 1, dwOldProtect, &dwOldProtect );
-            }
-        }
     }
 }
 
