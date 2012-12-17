@@ -150,19 +150,46 @@ int CLuaFunctionDefs::FireWeapon ( lua_State* luaVM )
 int CLuaFunctionDefs::SetWeaponProperty ( lua_State* luaVM )
 {
     CClientWeapon * pWeapon;
-    short sDamage = 0;
     eWeaponProperty weaponProperty;
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pWeapon );
     argStream.ReadEnumString ( weaponProperty );
-    argStream.ReadNumber ( sDamage );
 
     if ( !argStream.HasErrors () )
     {
-        if ( CStaticFunctionDefinitions::SetWeaponProperty ( pWeapon, weaponProperty, sDamage ) )
+        if ( weaponProperty == WEAPON_DAMAGE )
         {
-            lua_pushboolean ( luaVM, true );
-            return 1;
+            short sData = 0;
+            argStream.ReadNumber( sData );
+            if ( !argStream.HasErrors( ) )
+            {
+                if ( CStaticFunctionDefinitions::SetWeaponProperty ( pWeapon, weaponProperty, sData ) )
+                {
+                    lua_pushboolean ( luaVM, true );
+                    return 1;
+                }
+            }
+            else
+            {
+                m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "setWeaponProperty", *argStream.GetErrorMessage () ) );
+            }
+        }
+        else
+        {
+            float fData = 0.0f;
+            argStream.ReadNumber( fData );
+            if ( !argStream.HasErrors( ) )
+            {
+                if ( CStaticFunctionDefinitions::SetWeaponProperty ( pWeapon, weaponProperty, fData ) )
+                {
+                    lua_pushboolean ( luaVM, true );
+                    return 1;
+                }
+            }
+            else
+            {
+                m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "setWeaponProperty", *argStream.GetErrorMessage () ) );
+            }
         }
     }
     else

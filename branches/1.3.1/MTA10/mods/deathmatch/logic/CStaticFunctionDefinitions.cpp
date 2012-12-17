@@ -6358,6 +6358,28 @@ bool CStaticFunctionDefinitions::GetWeaponProperty ( CClientWeapon * pWeapon, eW
     return false;
 }
 
+bool CStaticFunctionDefinitions::GetWeaponProperty ( CClientWeapon * pWeapon, eWeaponProperty eProperty, float &fData )
+{
+    if ( pWeapon )
+    {
+        if ( eProperty == WEAPON_ACCURACY )
+        {
+            fData = pWeapon->GetWeaponStat ( )->GetAccuracy ( );
+            return true;
+        }
+        if ( eProperty == WEAPON_TARGET_RANGE )
+        {
+            fData = pWeapon->GetWeaponStat ( )->GetTargetRange ( );
+            return true;
+        }
+        if ( eProperty == WEAPON_WEAPON_RANGE )
+        {
+            fData = pWeapon->GetWeaponStat ( )->GetWeaponRange ( );
+            return true;
+        }
+    }
+    return false;
+}
 
 bool CStaticFunctionDefinitions::SetWeaponProperty ( CClientWeapon * pWeapon, eWeaponProperty eProperty, short sData )
 {
@@ -6379,6 +6401,16 @@ bool CStaticFunctionDefinitions::SetWeaponProperty ( CClientWeapon * pWeapon, eW
         if ( eProperty == WEAPON_ACCURACY )
         {
             pWeapon->GetWeaponStat ( )->SetAccuracy ( fData );
+            return true;
+        }
+        if ( eProperty == WEAPON_TARGET_RANGE )
+        {
+            pWeapon->GetWeaponStat ( )->SetTargetRange ( fData );
+            return true;
+        }
+        if ( eProperty == WEAPON_WEAPON_RANGE )
+        {
+            pWeapon->GetWeaponStat ( )->SetWeaponRange ( fData );
             return true;
         }
     }
