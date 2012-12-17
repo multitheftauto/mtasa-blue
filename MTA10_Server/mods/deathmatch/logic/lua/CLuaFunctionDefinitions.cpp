@@ -12875,6 +12875,27 @@ int CLuaFunctionDefinitions::Md5 ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaFunctionDefinitions::Sha256 ( lua_State* luaVM )
+{
+//  string sha256 ( string str )
+    SString strSourceData;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadString ( strSourceData );
+
+    if ( !argStream.HasErrors () )
+    {
+        SString strResult = GenerateSha256HexString ( strSourceData );
+        lua_pushstring ( luaVM, strResult );
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
 int CLuaFunctionDefinitions::GetNetworkUsageData ( lua_State* luaVM )
 {
     SPacketStat m_PacketStats [ 2 ] [ 256 ];

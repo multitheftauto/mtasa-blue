@@ -114,6 +114,7 @@ namespace
                                          { "setPlayerHudComponentVisible",  "1.3.1-9.04690" },
                                          { "isPlayerHudComponentVisible",   "1.3.1-9.04690" },
                                          { "engineGetModelLODDistance",     "1.3.1-9.04779" },
+                                         { "sha256",                        "1.3.1-9.04835" },
                                         };
 
     SVersionItem serverFunctionInitList[] = {
@@ -160,6 +161,7 @@ namespace
                                          { "setVehicleSirens",          "1.3.0-9.03968" },
                                          { "setJetpackWeaponEnabled",   "1.3.0-9.04351" },
                                          { "getJetpackWeaponEnabled",   "1.3.0-9.04351" },
+                                         { "sha256",                    "1.3.1-9.04835" },
                                         };
 
 
