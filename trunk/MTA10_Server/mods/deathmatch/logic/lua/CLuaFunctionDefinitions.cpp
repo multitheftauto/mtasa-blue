@@ -11009,21 +11009,22 @@ int CLuaFunctionDefinitions::GetGameType ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::SetGameType ( lua_State* luaVM )
 {
-    // Grab the gametype if specified
-    const char * szGameType = NULL;
-    if ( lua_type ( luaVM, 1 ) == LUA_TSTRING )
-    {
-        // Grab the game type string.
-        szGameType = lua_tostring ( luaVM, 1 );
-    }
+//  bool setGameType ( string gameType )
+    SString strGameType;
 
-    // Set the game type.
-    if ( CStaticFunctionDefinitions::SetGameType ( szGameType ) )
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadString ( strGameType, "" );    // Default to empty for backward compat with previous implementation
+
+    if ( !argStream.HasErrors () )
     {
-        // Return true.
-        lua_pushboolean ( luaVM, true );
-        return 1;
+        if ( CStaticFunctionDefinitions::SetGameType ( strGameType ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
     }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -11033,30 +11034,39 @@ int CLuaFunctionDefinitions::SetGameType ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::SetMapName ( lua_State* luaVM )
 {
-    // Grab the mapname if specified
-    const char * szMapName = NULL;
-    if ( lua_type ( luaVM, 1 ) == LUA_TSTRING )
+//  bool setMapName ( string mapName )
+    SString strMapName;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadString ( strMapName, "" );    // Default to empty for backward compat with previous implementation
+
+    if ( !argStream.HasErrors () )
     {
-        // Grab the game type string.
-        szMapName = lua_tostring ( luaVM, 1 );
+        if ( CStaticFunctionDefinitions::SetMapName ( strMapName ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
     }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
-    // Set the game type.
-    CStaticFunctionDefinitions::SetMapName ( szMapName );
-
-    // Return true.
-    lua_pushboolean ( luaVM, true );
+    lua_pushboolean ( luaVM, false );
     return 1;
 }
 
 
 int CLuaFunctionDefinitions::GetRuleValue ( lua_State* luaVM )
 {
-    if ( lua_type ( luaVM, 1 ) == LUA_TSTRING )
-    {
-        const char* szKey = lua_tostring ( luaVM, 1 );
+//  string getRuleValue ( string key )
+    SString strKey;
 
-        const char* szRule = CStaticFunctionDefinitions::GetRuleValue ( szKey );
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadString ( strKey );
+
+    if ( !argStream.HasErrors () )
+    {
+        const char* szRule = CStaticFunctionDefinitions::GetRuleValue ( strKey );
         if ( szRule )
         {
             lua_pushstring ( luaVM, szRule );
@@ -11064,7 +11074,7 @@ int CLuaFunctionDefinitions::GetRuleValue ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -11098,18 +11108,22 @@ int CLuaFunctionDefinitions::SetRuleValue ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::RemoveRuleValue ( lua_State* luaVM )
 {
-    if ( lua_type ( luaVM, 1 ) == LUA_TSTRING )
-    {
-        const char* szKey = lua_tostring ( luaVM, 1 );
+//  bool removeRuleValue ( string key )
+    SString strKey;
 
-        if ( CStaticFunctionDefinitions::RemoveRuleValue ( szKey ) )
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadString ( strKey );
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( CStaticFunctionDefinitions::RemoveRuleValue ( strKey ) )
         {
             lua_pushboolean ( luaVM, true );
             return 1;
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
