@@ -11073,22 +11073,23 @@ int CLuaFunctionDefinitions::GetRuleValue ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::SetRuleValue ( lua_State* luaVM )
 {
-    if ( lua_type ( luaVM, 1 ) == LUA_TSTRING )
+//  bool setRuleValue ( string key, string value )
+    SString strKey; SString strValue;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadString ( strKey );
+    argStream.ReadString ( strValue );
+
+    if ( !argStream.HasErrors () )
     {
-        const char* szKey = lua_tostring ( luaVM, 1 );
-        const char* szValue = NULL;
-
-        if ( lua_type ( luaVM, 2 ) == LUA_TSTRING )
-            szValue = lua_tostring ( luaVM, 2 );
-
-        if ( CStaticFunctionDefinitions::SetRuleValue ( szKey, szValue ) )
+        if ( CStaticFunctionDefinitions::SetRuleValue ( strKey, strValue ) )
         {
             lua_pushboolean ( luaVM, true );
             return 1;
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
