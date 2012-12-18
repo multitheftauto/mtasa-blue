@@ -135,7 +135,7 @@ int CLuaFileDefs::fileExists ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
 
     // Failed
@@ -195,13 +195,13 @@ int CLuaFileDefs::fileOpen ( lua_State* luaVM )
                     delete pFile;
 
                     // Output error
-                    m_pScriptDebugging->LogWarning ( luaVM, "%s; unable to load file", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ) );
+                    argStream.SetCustomError( SString( "unable to load file '%s'", *filePath ) );
                 }
             }
         }
     }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+    if ( argStream.HasErrors () )
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -513,13 +513,13 @@ int CLuaFileDefs::fileDelete ( lua_State* luaVM )
                 else
                 {
                     // Output error
-                    m_pScriptDebugging->LogWarning ( luaVM, "%s; unable to delete file", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ) );
+                    argStream.SetCustomError( SString( "unable to delete file '%s'", *filePath ) );
                 }
             }
         }
     }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+    if ( argStream.HasErrors () )
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
