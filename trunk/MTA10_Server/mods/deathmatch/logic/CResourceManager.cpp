@@ -864,6 +864,8 @@ bool CResourceManager::Install ( char * szURL, char * szName )
 //
 // CreateResource
 //
+// Sets error message in strOutStatus when returning NULL
+//
 /////////////////////////////////
 CResource* CResourceManager::CreateResource ( const SString& strNewResourceName, const SString& strNewOrganizationalPath, SString& strOutStatus )
 {
@@ -874,7 +876,7 @@ CResource* CResourceManager::CreateResource ( const SString& strNewResourceName,
     // Does the resource name already exist?
     if ( GetResource ( strNewResourceName ) != NULL )
     {
-        CLogger::LogPrintf ( "CreateResource - Could not create '%s' as the resource already exists\n", *strNewResourceName );
+        strOutStatus = SString ( "CreateResource - Could not create '%s' as the resource already exists\n", *strNewResourceName );
         return NULL;
     }
 
@@ -886,7 +888,7 @@ CResource* CResourceManager::CreateResource ( const SString& strNewResourceName,
     CXMLFile* pXML = g_pServerInterface->GetXML ()->CreateXML ( strMetaPath );
     if ( !pXML )
     {
-        CLogger::LogPrintf ( "CreateResource - Could not create '%s'\n", *strMetaPath );
+        strOutStatus = SString ( "CreateResource - Could not create '%s'\n", *strMetaPath );
         return NULL;
     }
     else
@@ -896,7 +898,7 @@ CResource* CResourceManager::CreateResource ( const SString& strNewResourceName,
         if ( !pXML->Write () )
         {
             delete pXML;
-            CLogger::LogPrintf ( "CreateResource - Could not save '%s'\n", *strMetaPath );
+            strOutStatus = SString( "CreateResource - Could not save '%s'\n", *strMetaPath );
             return NULL;
         }
 
@@ -915,6 +917,8 @@ CResource* CResourceManager::CreateResource ( const SString& strNewResourceName,
 /////////////////////////////////
 //
 // CopyResource
+//
+// Sets error message in strOutStatus when returning NULL
 //
 /////////////////////////////////
 CResource* CResourceManager::CopyResource ( CResource* pSourceResource, const SString& strNewResourceName, const SString& strNewOrganizationalPath, SString& strOutStatus )
@@ -1010,6 +1014,8 @@ CResource* CResourceManager::CopyResource ( CResource* pSourceResource, const SS
 /////////////////////////////////
 //
 // RenameResource
+//
+// Sets error message in strOutStatus if could not rename
 //
 /////////////////////////////////
 CResource* CResourceManager::RenameResource ( CResource* pSourceResource, const SString& strNewResourceName, const SString& strNewOrganizationalPath, SString& strOutStatus )

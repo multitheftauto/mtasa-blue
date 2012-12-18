@@ -36,7 +36,7 @@ int CLuaFunctionDefs::GetWeaponNameFromID ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "getWeaponNameFromID", *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -80,7 +80,7 @@ int CLuaFunctionDefs::GetWeaponIDFromName ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "getWeaponIDFromName", *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -121,7 +121,7 @@ int CLuaFunctionDefs::CreateWeapon ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "createWeapon", *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -141,7 +141,7 @@ int CLuaFunctionDefs::FireWeapon ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "fireWeapon", *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -169,10 +169,6 @@ int CLuaFunctionDefs::SetWeaponProperty ( lua_State* luaVM )
                     return 1;
                 }
             }
-            else
-            {
-                m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "setWeaponProperty", *argStream.GetErrorMessage () ) );
-            }
         }
         else
         {
@@ -186,14 +182,10 @@ int CLuaFunctionDefs::SetWeaponProperty ( lua_State* luaVM )
                     return 1;
                 }
             }
-            else
-            {
-                m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "setWeaponProperty", *argStream.GetErrorMessage () ) );
-            }
         }
     }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "setWeaponProperty", *argStream.GetErrorMessage () ) );
+    if ( argStream.HasErrors () )
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -216,7 +208,7 @@ int CLuaFunctionDefs::SetWeaponState ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "setWeaponState", *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -237,7 +229,7 @@ int CLuaFunctionDefs::GetWeaponState ( lua_State* luaVM )
         return 1;
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "getWeaponState", *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -262,8 +254,6 @@ int CLuaFunctionDefs::SetWeaponTarget ( lua_State* luaVM )
                 return 1;
             }
         }
-        else
-            m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "setWeaponTarget", *argStream.GetErrorMessage () ) );
     }
     else if ( argStream.NextIsNumber() )
     {
@@ -279,8 +269,6 @@ int CLuaFunctionDefs::SetWeaponTarget ( lua_State* luaVM )
                 return 1;
             }
         }
-        else
-            m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "setWeaponTarget", *argStream.GetErrorMessage () ) );
     }
     else if ( argStream.NextIsNil() )
     {
@@ -292,9 +280,12 @@ int CLuaFunctionDefs::SetWeaponTarget ( lua_State* luaVM )
                 return 1;
             }
         }
-        else
-            m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "setWeaponTarget", *argStream.GetErrorMessage () ) );
     }
+    else
+        argStream.SetCustomError( "Expected element, number or nil at argument 2" );
+
+    if ( argStream.HasErrors () )
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -327,7 +318,7 @@ int CLuaFunctionDefs::GetWeaponTarget ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "getWeaponTarget", *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
     
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -348,7 +339,7 @@ int CLuaFunctionDefs::GetWeaponOwner ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "getWeaponOwner", *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -381,8 +372,8 @@ int CLuaFunctionDefs::SetWeaponOwner ( lua_State* luaVM )
             return 1;
         }
     }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "setWeaponOwner", *argStream.GetErrorMessage () ) );
+    if ( argStream.HasErrors() )
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushnil ( luaVM );
     return 1;
@@ -425,13 +416,10 @@ int CLuaFunctionDefs::SetWeaponFlags ( lua_State* luaVM )
                     lua_pushboolean( luaVM, true );
                 }
             }
-            else
-                m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "setWeaponFlags", *argStream.GetErrorMessage () ) );
-
         }
     }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "setWeaponFlags", *argStream.GetErrorMessage () ) );
+    if ( argStream.HasErrors() )
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean( luaVM, false );
     return 1;
@@ -473,7 +461,7 @@ int CLuaFunctionDefs::GetWeaponFlags ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "getWeaponFlags", *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean( luaVM, false );
     return 1;
@@ -496,7 +484,7 @@ int CLuaFunctionDefs::SetWeaponFiringRate ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "setWeaponFiringRate", *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -518,7 +506,7 @@ int CLuaFunctionDefs::GetWeaponFiringRate ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "getWeaponFiringRate", *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -539,7 +527,7 @@ int CLuaFunctionDefs::ResetWeaponFiringRate ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "resetWeaponFiringRate", *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -561,7 +549,7 @@ int CLuaFunctionDefs::GetWeaponClipAmmo ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "getWeaponClipAmmo", *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -583,7 +571,7 @@ int CLuaFunctionDefs::GetWeaponAmmo ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "getWeaponAmmo", *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -606,7 +594,7 @@ int CLuaFunctionDefs::SetWeaponAmmo ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "setWeaponAmmo", *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -629,7 +617,7 @@ int CLuaFunctionDefs::SetWeaponClipAmmo ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "setWeaponClipAmmo", *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;

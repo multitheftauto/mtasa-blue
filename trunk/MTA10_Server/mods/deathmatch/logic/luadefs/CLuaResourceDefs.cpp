@@ -80,16 +80,16 @@ int CLuaResourceDefs::createResource ( lua_State* luaVM )
         CResource* pNewResource = m_pResourceManager->CreateResource ( strNewResourceName, strNewOrganizationalPath, strStatus );
 
         if ( !strStatus.empty () )
-            m_pScriptDebugging->LogCustom ( luaVM, SString ( "%s: %s", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *strStatus ) );
-
+            argStream.SetCustomError( strStatus );
+        else
         if ( pNewResource )
         {
             lua_pushresource ( luaVM, pNewResource );
             return 1;
         }
     }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+    if ( argStream.HasErrors () )
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -112,16 +112,16 @@ int CLuaResourceDefs::copyResource ( lua_State* luaVM )
         CResource* pNewResource = m_pResourceManager->CopyResource ( pResource, strNewResourceName, strNewOrganizationalPath, strStatus );
 
         if ( !strStatus.empty () )
-            m_pScriptDebugging->LogCustom ( luaVM, SString ( "%s: %s", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *strStatus ) );
-
+            argStream.SetCustomError( strStatus );
+        else
         if ( pNewResource )
         {
             lua_pushresource ( luaVM, pNewResource );
             return 1;
         }
     }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+    if ( argStream.HasErrors () )
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -144,16 +144,16 @@ int CLuaResourceDefs::renameResource ( lua_State* luaVM )
         CResource* pNewResource = m_pResourceManager->RenameResource ( pResource, strNewResourceName, strNewOrganizationalPath, strStatus );
 
         if ( !strStatus.empty () )
-            m_pScriptDebugging->LogCustom ( luaVM, SString ( "%s: %s", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *strStatus ) );
-
+            argStream.SetCustomError( strStatus );
+        else
         if ( pNewResource )
         {
             lua_pushresource ( luaVM, pNewResource );
             return 1;
         }
     }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+    if ( argStream.HasErrors () )
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -174,13 +174,15 @@ int CLuaResourceDefs::deleteResource ( lua_State* luaVM )
         bool bResult = m_pResourceManager->DeleteResource ( strResourceName, strStatus );
 
         if ( !strStatus.empty () )
-            m_pScriptDebugging->LogCustom ( luaVM, SString ( "%s: %s", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *strStatus ) );
-
-        lua_pushboolean ( luaVM, bResult );
-        return 1;
+            argStream.SetCustomError( strStatus );
+        else
+        {
+            lua_pushboolean ( luaVM, bResult );
+            return 1;
+        }
     }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+    if ( argStream.HasErrors () )
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -1229,7 +1231,7 @@ int CLuaResourceDefs::getResourceACLRequests  ( lua_State* luaVM )
         return 1;
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -1260,7 +1262,7 @@ int CLuaResourceDefs::updateResourceACLRequest ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
