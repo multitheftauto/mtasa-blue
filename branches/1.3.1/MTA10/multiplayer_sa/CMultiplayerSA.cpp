@@ -5586,11 +5586,13 @@ void CMultiplayerSA::SetSuspensionEnabled ( bool bEnabled )
 SIPLInst* pEntityWorldAdd = NULL;
 CEntitySAInterface * pLODInterface = NULL; 
 bool bNextHookSetModel = false;
+bool bCodePathCheck = false;
 
 bool CheckRemovedModelNoSet ( )
 {
     // Init our variables
     bNextHookSetModel = false;
+    bCodePathCheck = bNextHookSetModel;
     pLODInterface = NULL;
     CWorld* pWorld = pGameInterface->GetWorld();
     // You never know.
@@ -5610,13 +5612,17 @@ bool CheckRemovedModelNoSet ( )
     }
     return false;
 }
+// Binary
 bool CheckRemovedModel ( )
 {
     TIMING_CHECKPOINT( "+CheckRemovedModel" );
     bNextHookSetModel = CheckRemovedModelNoSet ( );
     TIMING_CHECKPOINT( "-CheckRemovedModel" );
+    bCodePathCheck = true;
     return bNextHookSetModel;
 }
+
+// Binary
 // Hook 1
 void _declspec(naked) HOOK_LoadIPLInstance ()
 {
@@ -5636,7 +5642,8 @@ void _declspec(naked) HOOK_LoadIPLInstance ()
         jmp RETURN_LoadIPLInstance
     }
 }
-
+static bool bTest = false;
+// Binary
 void HideEntitySomehow ( )
 {
     TIMING_CHECKPOINT( "+HideEntitySomehow" );
@@ -5658,10 +5665,21 @@ void HideEntitySomehow ( )
             //pInterface = pInterface->m_pLod;
         }
     }
+    else if ( bCodePathCheck && pLODInterface )
+    {
+        // Init pInterface with the Initial model
+        CEntitySAInterface * pInterface = pLODInterface;
+        if ( pInterface && pInterface != NULL && pInterface->bIsProcObject == 0 && ( pInterface->nType == ENTITY_TYPE_BUILDING || pInterface->nType == ENTITY_TYPE_DUMMY ) )
+        {
+            pGameInterface->GetWorld()->AddBinaryBuilding ( pInterface );
+        }
+    }
     // Reset our next hook variable
     bNextHookSetModel = false;
+    bCodePathCheck = bNextHookSetModel;
     TIMING_CHECKPOINT( "-HideEntitySomehow" );
 }
+// Binary
 // Hook 2
 void _declspec(naked) HOOK_CWorld_LOD_SETUP ()
 {

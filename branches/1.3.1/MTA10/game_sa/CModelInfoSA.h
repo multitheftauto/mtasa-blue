@@ -212,7 +212,7 @@ public:
     // +82 = Vehicle freq (short)
     // +84 = Component rules mask (long)
     // +88 = Steer angle
-    // +92 = Pointer to some class containing back seat position @ +60
+    // +92 = Pointer to some class containing back seat position @ +60 probably dummy storage.
     // +180 = Vehicle upgrade position descriptors array (32 bytes each)
     // +720 = Number of possible colors
     // +726 = Word array as referenced in CVehicleModelInfo::GetVehicleUpgrade(int)

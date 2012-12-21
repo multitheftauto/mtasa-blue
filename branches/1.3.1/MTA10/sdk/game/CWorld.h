@@ -98,9 +98,27 @@ struct SIPLInst
     BYTE        m_bLOD;
 };
 
-struct sDataBuildingRemoval
+struct sDataBuildingRemovalItem
 {
-    sDataBuildingRemoval ( CEntitySAInterface * pInterface, bool bData )
+    sDataBuildingRemovalItem ( CEntitySAInterface * pInterface, bool bData )
+    {
+        m_pInterface = pInterface;
+        m_iCount = 0;
+    }
+    void AddCount ( )
+    {
+        m_iCount++;
+    }
+    void RemoveCount ( )
+    {
+        m_iCount--;
+    }
+    CEntitySAInterface * m_pInterface;
+    int m_iCount;
+};
+struct sBuildingRemovalItem
+{
+    sBuildingRemovalItem ( CEntitySAInterface * pInterface, bool bData )
     {
         m_pInterface = pInterface;
         m_iCount = 0;
@@ -175,6 +193,7 @@ public:
     virtual bool        RestoreBuilding             ( unsigned short usModelToRestore, float fDistance, float fX, float fY, float fZ, char cInterior ) = 0;
     virtual SBuildingRemoval*   GetBuildingRemoval  ( CEntitySAInterface * pInterface ) = 0;
     virtual void        AddDataBuilding             ( CEntitySAInterface * pInterface ) = 0;
+    virtual void        AddBinaryBuilding           ( CEntitySAInterface * pInterface ) = 0;
     virtual void        RemoveWorldBuildingFromLists( CEntitySAInterface * pInterface ) = 0;
     virtual bool        IsObjectRemoved             ( CEntitySAInterface * pInterface ) = 0;
     virtual bool        IsDataModelRemoved          ( unsigned short usModelID ) = 0;
