@@ -279,6 +279,60 @@ void _declspec(naked) HOOK_WinLoop ()
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
+// Photograph screen grab in windowed mode
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+void OnMY_psGrabScreen_GetRect( HWND hWnd, LPRECT pRect )
+{
+    // Get the window client area
+    GetClientRect( hWnd, pRect );
+    LPPOINT pPoints = (LPPOINT)pRect;
+    ClientToScreen( hWnd, pPoints );
+    ClientToScreen( hWnd, pPoints + 1 );
+}
+
+bool OnMY_psGrabScreen_ShouldUseRect( void )
+{
+    bool bWindowed;
+    g_pCore->GetCVars()->Get( "display_windowed", bWindowed );
+    return bWindowed;
+}
+
+
+// Hook info
+#define HOOKPOS_psGrabScreen                        0x7452FC
+#define HOOKSIZE_psGrabScreen                       5
+DWORD RETURN_psGrabScreen_YesChange =               0x745311;
+DWORD RETURN_psGrabScreen_NoChange =                0x745336;
+void _declspec(naked) HOOK_psGrabScreen ()
+{
+    _asm
+    {
+        pushad
+        call    OnMY_psGrabScreen_ShouldUseRect
+        test    al, al
+        jnz     use_rect
+        popad
+        jmp     RETURN_psGrabScreen_NoChange
+
+use_rect:
+        popad
+        mov     edx, [eax]      // hwnd
+        lea     ecx, [esp+24h]  // pRect result
+        pushad
+        push    ecx
+        push    edx
+        call    OnMY_psGrabScreen_GetRect
+        add     esp, 4*2
+        popad
+
+        jmp     RETURN_psGrabScreen_YesChange
+    }
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
 // CMultiplayerSA::SetGameEntityRenderHandler
 //
 //
@@ -316,4 +370,5 @@ void CMultiplayerSA::InitHooks_Rendering ( void )
     EZHookInstall ( Check_NoOfVisibleLods );
     EZHookInstall ( Check_NoOfVisibleEntities );
     EZHookInstall ( WinLoop );
+    EZHookInstall ( psGrabScreen );
 }

@@ -1915,8 +1915,7 @@ int CLuaFunctionDefs::GetWeaponProperty ( lua_State* luaVM )
     eWeaponProperty eProp = eWeaponProperty::WEAPON_INVALID_PROPERTY;
     CClientWeapon * pWeapon;
     CScriptArgReader argStream ( luaVM );
-    
-    
+
     if ( argStream.NextIsUserData () )
     {
         argStream.ReadUserData ( pWeapon );
@@ -1944,52 +1943,14 @@ int CLuaFunctionDefs::GetWeaponProperty ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "getWeaponProperty", *argStream.GetErrorMessage () ) );
+            m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
 
         lua_pushboolean ( luaVM, false );
         return 1;
     }
 
-    
-    if ( argStream.NextIsEnumString ( eWep ) )
-    {
-        argStream.ReadEnumString ( eWep );
-    }
-    else
-    {
-        int iTemp = 0;
-        argStream.ReadNumber ( iTemp );
-        if ( iTemp >= WEAPONTYPE_MIN && iTemp <= WEAPONTYPE_MAX )
-        {
-            eWep = (eWeaponType) iTemp;
-        }
-        else
-        {
-            // Failed
-            m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "getWeaponProperty", "invalid weapon type at argument 1" ) );
-            lua_pushboolean ( luaVM, false );
-            return 1;
-        }
-    }
-    if ( argStream.NextIsEnumString ( eWepSkill ) )
-    {
-        argStream.ReadEnumString ( eWepSkill );
-    }
-    else
-    {
-        int iTemp = 0;
-        argStream.ReadNumber ( iTemp );
-        if ( iTemp >= WEAPONSKILL_POOR && iTemp <= WEAPONSKILL_PRO )
-        {
-            eWepSkill = (eWeaponSkill) iTemp;
-        }
-        else
-        {
-            m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "getWeaponProperty", "invalid skill type at argument 2" ) );
-            lua_pushboolean ( luaVM, false );
-            return 1;
-        }
-    }
+    argStream.ReadEnumStringOrNumber ( eWep );
+    argStream.ReadEnumStringOrNumber ( eWepSkill );
     argStream.ReadEnumString ( eProp );
     if ( !argStream.HasErrors () )
     {
@@ -2059,12 +2020,13 @@ int CLuaFunctionDefs::GetWeaponProperty ( lua_State* luaVM )
             }
             default:
             {
+                argStream.SetCustomError( "unsupported weapon property at argument 3" );
                 break;
             }
         }
     }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "getWeaponProperty", *argStream.GetErrorMessage () ) );
+    if ( argStream.HasErrors () )
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
 
     // Failed
@@ -2079,45 +2041,8 @@ int CLuaFunctionDefs::GetOriginalWeaponProperty ( lua_State* luaVM )
     eWeaponProperty eProp = eWeaponProperty::WEAPON_INVALID_PROPERTY;
 
     CScriptArgReader argStream ( luaVM );
-    if ( argStream.NextIsEnumString ( eWep ) )
-    {
-        argStream.ReadEnumString ( eWep );
-    }
-    else
-    {
-        int iTemp = 0;
-        argStream.ReadNumber ( iTemp );
-        if ( iTemp >= WEAPONTYPE_MIN && iTemp <= WEAPONTYPE_MAX )
-        {
-            eWep = (eWeaponType) iTemp;
-        }
-        else
-        {
-            // Failed
-            m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "getOriginalWeaponProperty", "invalid weapon type at argument 1" ) );
-            lua_pushboolean ( luaVM, false );
-            return 1;
-        }
-    }
-    if ( argStream.NextIsEnumString ( eWepSkill ) )
-    {
-        argStream.ReadEnumString ( eWepSkill );
-    }
-    else
-    {
-        int iTemp = 0;
-        argStream.ReadNumber ( iTemp );
-        if ( iTemp >= WEAPONSKILL_POOR && iTemp <= WEAPONSKILL_PRO )
-        {
-            eWepSkill = (eWeaponSkill) iTemp;
-        }
-        else
-        {
-            m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "getOriginalWeaponProperty", "invalid skill type at argument 2" ) );
-            lua_pushboolean ( luaVM, false );
-            return 1;
-        }
-    }
+    argStream.ReadEnumStringOrNumber ( eWep );
+    argStream.ReadEnumStringOrNumber ( eWepSkill );
     argStream.ReadEnumString ( eProp );
     if ( !argStream.HasErrors () )
     {
@@ -2187,12 +2112,13 @@ int CLuaFunctionDefs::GetOriginalWeaponProperty ( lua_State* luaVM )
             }
         default:
             {
+                argStream.SetCustomError( "unsupported weapon property at argument 3" );
                 break;
             }
         }
     }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "getOriginalWeaponProperty", *argStream.GetErrorMessage () ) );
+    if ( argStream.HasErrors () )
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
 
     // Failed
