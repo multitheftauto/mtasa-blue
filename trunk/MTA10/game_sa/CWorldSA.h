@@ -111,8 +111,9 @@ public:
     bool                IsObjectRemoved                 ( CEntitySAInterface * pInterface );
     bool                IsDataModelRemoved              ( unsigned short usModelID );
 private:
-    std::multimap< unsigned short, SBuildingRemoval* >          *m_pBinaryBuildings;
-    std::multimap < unsigned short, sDataBuildingRemoval* >     *m_pDataBuildings;
+    std::multimap< unsigned short, SBuildingRemoval* >          *m_pBuildingRemovals;
+    std::multimap < unsigned short, sDataBuildingRemovalItem* > *m_pDataBuildings;
+    std::multimap < unsigned short, sBuildingRemovalItem* >     *m_pBinaryBuildings;
     std::map < unsigned short, unsigned short >                 *m_pRemovedObjects;
     float                                                       m_fAircraftMaxHeight;
 };
