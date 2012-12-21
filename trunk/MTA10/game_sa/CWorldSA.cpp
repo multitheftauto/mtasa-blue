@@ -584,13 +584,12 @@ bool CWorldSA::RestoreBuilding ( unsigned short usModelToRestore, float fRange, 
 {        
     bool bSuccess = false;
     // Init some variables
-    SBuildingRemoval * pFind = NULL;
     std::pair < std::multimap < unsigned short, SBuildingRemoval* >::iterator, std::multimap < unsigned short, SBuildingRemoval* >::iterator> iterators = m_pBinaryBuildings->equal_range ( usModelToRestore );
     std::multimap < unsigned short, SBuildingRemoval* > ::const_iterator iter = iterators.first;
     // Loop through the buildings list
     for ( ; iter != iterators.second;  )
     {
-        pFind = (*iter).second;
+        SBuildingRemoval * pFind = (*iter).second;
         // if pFind is valid and the model is the same
         if ( pFind )
         {
@@ -672,12 +671,11 @@ bool CWorldSA::RestoreBuilding ( unsigned short usModelToRestore, float fRange, 
         else
             iter++;
     }
-    sDataBuildingRemoval * pFound = NULL;
     std::pair < std::multimap < unsigned short, sDataBuildingRemoval*>::iterator, std::multimap < unsigned short, sDataBuildingRemoval* >::iterator> dataBuildingIterators = m_pDataBuildings->equal_range ( usModelToRestore );
     std::multimap < unsigned short, sDataBuildingRemoval* > ::const_iterator iterator = dataBuildingIterators.first;
     for ( ; iterator != dataBuildingIterators.second; ++iterator )
     {
-        pFound = (*iterator).second;
+        sDataBuildingRemoval * pFound = (*iterator).second;
         if ( pFound )
         {
             // Grab distances across each axis
@@ -687,7 +685,7 @@ bool CWorldSA::RestoreBuilding ( unsigned short usModelToRestore, float fRange, 
 
             // Square root 'em
             float fDistance = sqrt ( fDistanceX * fDistanceX + fDistanceY * fDistanceY + fDistanceZ * fDistanceZ );
-            if ( fDistance <= fRange && ( cInterior == -1 || pFind->m_cInterior == cInterior ) )
+            if ( fDistance <= fRange && ( cInterior == -1 || pFound->m_pInterface->m_areaCode == cInterior ) )
             {
                 // Fix the removed count.
                 pFound->m_iCount--;
