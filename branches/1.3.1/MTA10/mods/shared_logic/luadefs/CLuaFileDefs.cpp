@@ -222,7 +222,7 @@ int CLuaFileDefs::fileIsEOF ( lua_State* luaVM )
         return 1;
     }
     else
-        m_pScriptDebugging->LogBadPointer ( luaVM, "fileIsEOF", "file", 1 );
+        m_pScriptDebugging->LogBadPointer ( luaVM, "file", 1 );
 
     // Error
     lua_pushnil ( luaVM );
@@ -246,13 +246,13 @@ int CLuaFileDefs::fileGetPos ( lua_State* luaVM )
         }
         else
         {
-            m_pScriptDebugging->LogBadPointer ( luaVM, "fileGetPos", "file", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "file", 1 );
             lua_pushnil ( luaVM );
         }
         return 1;
     }
     else
-        m_pScriptDebugging->LogBadPointer ( luaVM, "fileGetPos", "file", 1 );
+        m_pScriptDebugging->LogBadPointer ( luaVM, "file", 1 );
 
     // Error
     lua_pushnil ( luaVM );
@@ -283,19 +283,19 @@ int CLuaFileDefs::fileSetPos ( lua_State* luaVM )
                 }
                 else
                 {
-                    m_pScriptDebugging->LogBadPointer ( luaVM, "fileSetPos", "file", 1 );
+                    m_pScriptDebugging->LogBadPointer ( luaVM, "file", 1 );
                     lua_pushnil ( luaVM );
                 }
                 return 1;
             }
             else
-                m_pScriptDebugging->LogBadPointer ( luaVM, "fileSetPos", "number", 2 );
+                m_pScriptDebugging->LogBadPointer ( luaVM, "number", 2 );
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "fileSetPos", "number", 2 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "number", 2 );
     }
     else
-        m_pScriptDebugging->LogBadPointer ( luaVM, "fileSetPos", "file", 1 );
+        m_pScriptDebugging->LogBadPointer ( luaVM, "file", 1 );
 
     // Error
     lua_pushnil ( luaVM );
@@ -319,13 +319,13 @@ int CLuaFileDefs::fileGetSize ( lua_State* luaVM )
         }
         else
         {
-            m_pScriptDebugging->LogBadPointer ( luaVM, "fileGetSize", "file", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "file", 1 );
             lua_pushnil ( luaVM );
         }
         return 1;
     }
     else
-        m_pScriptDebugging->LogBadPointer ( luaVM, "fileGetSize", "file", 1 );
+        m_pScriptDebugging->LogBadPointer ( luaVM, "file", 1 );
 
     // Error
     lua_pushnil ( luaVM );
@@ -361,7 +361,7 @@ int CLuaFileDefs::fileRead ( lua_State* luaVM )
                 }
                 else
                 {
-                    m_pScriptDebugging->LogBadPointer ( luaVM, "fileRead", "file", 1 );
+                    m_pScriptDebugging->LogBadPointer ( luaVM, "file", 1 );
                     lua_pushnil ( luaVM );
                 }
 
@@ -372,13 +372,13 @@ int CLuaFileDefs::fileRead ( lua_State* luaVM )
                 return 1;
             }
             else
-                m_pScriptDebugging->LogBadPointer ( luaVM, "fileRead", "number", 2 );
+                m_pScriptDebugging->LogBadPointer ( luaVM, "number", 2 );
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "fileRead", "number", 2 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "number", 2 );
     }
     else
-        m_pScriptDebugging->LogBadPointer ( luaVM, "fileRead", "file", 1 );
+        m_pScriptDebugging->LogBadPointer ( luaVM, "file", 1 );
 
     // Error
     lua_pushnil ( luaVM );
@@ -411,7 +411,7 @@ int CLuaFileDefs::fileWrite ( lua_State* luaVM )
                 lArgBytesWritten = pFile->Write ( ulDataLen, pData );
                 if ( lArgBytesWritten == -1 )
                 {
-                    m_pScriptDebugging->LogBadPointer ( luaVM, "fileWrite", "file", 1 );
+                    m_pScriptDebugging->LogBadPointer ( luaVM, "file", 1 );
                     lua_pushnil ( luaVM );
                     return 1;
                 }
@@ -427,10 +427,10 @@ int CLuaFileDefs::fileWrite ( lua_State* luaVM )
             return 1;
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "fileWrite", "string", 2 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "string", 2 );
     }
     else
-        m_pScriptDebugging->LogBadPointer ( luaVM, "fileWrite", "file", 1 );
+        m_pScriptDebugging->LogBadPointer ( luaVM, "file", 1 );
 
     // Error
     lua_pushnil ( luaVM );
@@ -454,7 +454,7 @@ int CLuaFileDefs::fileFlush ( lua_State* luaVM )
         return 1;
     }
     else
-        m_pScriptDebugging->LogBadPointer ( luaVM, "fileFlush", "file", 1 );
+        m_pScriptDebugging->LogBadPointer ( luaVM, "file", 1 );
 
     // Error
     lua_pushnil ( luaVM );
@@ -479,7 +479,7 @@ int CLuaFileDefs::fileClose ( lua_State* luaVM )
         return 1;
     }
     else
-        m_pScriptDebugging->LogBadPointer ( luaVM, "fileClose", "file", 1 );
+        m_pScriptDebugging->LogBadPointer ( luaVM, "file", 1 );
 
     // Error
     lua_pushnil ( luaVM );

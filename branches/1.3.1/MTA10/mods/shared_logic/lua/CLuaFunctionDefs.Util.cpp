@@ -23,7 +23,7 @@ int CLuaFunctionDefs::GetTok ( lua_State* luaVM )
 {
     if ( ( lua_type ( luaVM, 1 ) != LUA_TSTRING ) || ( lua_type ( luaVM, 2 ) != LUA_TNUMBER ) || ( lua_type ( luaVM, 3 ) != LUA_TNUMBER ) && ( lua_type ( luaVM, 3 ) != LUA_TSTRING ) )
     {
-        m_pScriptDebugging->LogBadType ( luaVM, "gettok" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
         lua_pushboolean ( luaVM, false );
         return 1;
@@ -88,7 +88,7 @@ int CLuaFunctionDefs::Split ( lua_State* luaVM )
 {
     if ( ( lua_type ( luaVM, 1 ) != LUA_TSTRING ) || ( lua_type ( luaVM, 2 ) != LUA_TNUMBER && ( lua_type ( luaVM, 2 ) != LUA_TSTRING ) ) )
     {
-        m_pScriptDebugging->LogBadType ( luaVM, "split" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
         lua_pushboolean ( luaVM, false );
         return 1;
@@ -597,7 +597,7 @@ int CLuaFunctionDefs::Md5 ( lua_State* luaVM )
     }
     else
     {
-        m_pScriptDebugging->LogBadType ( luaVM, "md5" );
+        m_pScriptDebugging->LogBadType ( luaVM );
     }
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -789,7 +789,7 @@ int CLuaFunctionDefs::UtfLen ( lua_State* luaVM )
 {
     if ( ( lua_type ( luaVM, 1 ) != LUA_TSTRING ) )
     {
-        m_pScriptDebugging->LogBadType ( luaVM, "utfLen" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
         lua_pushboolean ( luaVM, false );
         return 1;
@@ -804,7 +804,7 @@ int CLuaFunctionDefs::UtfSeek ( lua_State* luaVM )
 {
     if ( ( lua_type ( luaVM, 1 ) != LUA_TSTRING ) || ( lua_type ( luaVM, 2 ) != LUA_TNUMBER ) )
     {
-        m_pScriptDebugging->LogBadType ( luaVM, "utfSeek" );
+        m_pScriptDebugging->LogBadType ( luaVM );
         lua_pushnil ( luaVM );
         return 1;
     }
@@ -826,7 +826,7 @@ int CLuaFunctionDefs::UtfSub ( lua_State* L )
 {
     if ( ( lua_type ( L, 1 ) != LUA_TSTRING ) || ( lua_type ( L, 2 ) != LUA_TNUMBER ) )
     {
-        m_pScriptDebugging->LogBadType ( L, "utfSub" );
+        m_pScriptDebugging->LogBadType ( L );
         lua_pushnil ( L );
         return 1;
     }
@@ -861,14 +861,14 @@ int CLuaFunctionDefs::UtfChar ( lua_State* luaVM )
 {
     if ( ( lua_type ( luaVM, 1 ) != LUA_TNUMBER ) )
     {
-        m_pScriptDebugging->LogBadType ( luaVM, "utfChar" );
+        m_pScriptDebugging->LogBadType ( luaVM );
         lua_pushnil ( luaVM );
         return 1;
     }
     int iChar = static_cast < int > ( lua_tonumber ( luaVM, 1 ) );
     if ( iChar > 65534 || iChar < 32 )
     {
-        m_pScriptDebugging->LogBadType ( luaVM, "utfChar" );
+        m_pScriptDebugging->LogBadType ( luaVM );
         lua_pushnil ( luaVM );
         return 1;
     }
@@ -887,7 +887,7 @@ int CLuaFunctionDefs::UtfCode ( lua_State* luaVM )
 {
     if ( ( lua_type ( luaVM, 1 ) != LUA_TSTRING ) )
     {
-        m_pScriptDebugging->LogBadType ( luaVM, "utfCode" );
+        m_pScriptDebugging->LogBadType ( luaVM );
         lua_pushnil ( luaVM );
         return 1;
     }

@@ -126,7 +126,7 @@ int CLuaFunctionDefs::CreateMarker ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "createMarker" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -156,10 +156,10 @@ int CLuaFunctionDefs::GetMarkerType ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "getMarkerType", "marker", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "marker", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "getMarkerType" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -178,10 +178,10 @@ int CLuaFunctionDefs::GetMarkerSize ( lua_State* luaVM )
             return 1;
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "getMarkerSize", "marker", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "marker", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "getMarkerSize" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -203,10 +203,10 @@ int CLuaFunctionDefs::GetMarkerColor ( lua_State* luaVM )
             return 4;
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "getMarkerColor", "marker", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "marker", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "getMarkerColor" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -230,10 +230,10 @@ int CLuaFunctionDefs::GetMarkerTarget ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "getMarkerTarget", "marker", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "marker", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "getMarkerTarget" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -257,10 +257,10 @@ int CLuaFunctionDefs::GetMarkerIcon ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "getMarkerIcon", "marker", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "marker", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "getMarkerIcon" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -283,10 +283,10 @@ int CLuaFunctionDefs::SetMarkerType ( lua_State* luaVM )
             return 1;
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "setMarkerType", "element", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "setMarkerType" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -309,10 +309,10 @@ int CLuaFunctionDefs::SetMarkerSize ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "setMarkerSize", "element", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "setMarkerSize" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -364,10 +364,10 @@ int CLuaFunctionDefs::SetMarkerColor ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "setMarkerColor", "element", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "setMarkerColor" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -404,7 +404,7 @@ int CLuaFunctionDefs::SetMarkerTarget ( lua_State* luaVM )
             }
             else if ( iArgument2 != LUA_TNONE )
             {
-                m_pScriptDebugging->LogBadType ( luaVM, "setMarkerTarget" );
+                m_pScriptDebugging->LogBadType ( luaVM );
 
                 lua_pushboolean ( luaVM, false );
                 return 1;
@@ -418,10 +418,10 @@ int CLuaFunctionDefs::SetMarkerTarget ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "setMarkerTarget", "element", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "setMarkerTarget" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -446,10 +446,10 @@ int CLuaFunctionDefs::SetMarkerIcon ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "setMarkerIcon", "element", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "setMarkerIcon" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;

@@ -1011,6 +1011,31 @@ int CLuaWorldDefs::RemoveWorldModel ( lua_State* luaVM )
     argStream.ReadNumber ( cInterior, -1 );
     if ( !argStream.HasErrors ( ) )
     {
+        if ( CStaticFunctionDefinitions::RemoveWorldModel ( usModel, fRadius, fX, fY, fZ, cInterior ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaWorldDefs::RestoreWorldModel ( lua_State* luaVM )
+{
+    CScriptArgReader argStream ( luaVM );
+
+    unsigned short usModel = 0;
+    float fRadius = 0.0f, fX = 0.0f, fY = 0.0f, fZ = 0.0f;
+    char cInterior = -1;
+    argStream.ReadNumber ( usModel );
+    argStream.ReadNumber ( fRadius );
+    argStream.ReadNumber ( fX );
+    argStream.ReadNumber ( fY );
+    argStream.ReadNumber ( fZ );
+    argStream.ReadNumber ( cInterior, -1 );
+    if ( !argStream.HasErrors ( ) )
+    {
         if ( CStaticFunctionDefinitions::RestoreWorldModel ( usModel, fRadius, fX, fY, fZ, cInterior ) )
         {
             lua_pushboolean ( luaVM, true );
@@ -1045,7 +1070,7 @@ int CLuaWorldDefs::setFPSLimit ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "setFPSLimit" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -1081,10 +1106,10 @@ int CLuaWorldDefs::setGarageOpen ( lua_State* luaVM )
             return 1;
         }
         else
-            m_pScriptDebugging->LogBadType ( luaVM, "setGarageOpen" );
+            m_pScriptDebugging->LogBadType ( luaVM );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "setGarageOpen" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -1108,11 +1133,11 @@ int CLuaWorldDefs::setGlitchEnabled ( lua_State* luaVM )
         }
         else
         {
-            m_pScriptDebugging->LogBadType ( luaVM, "setGlitchEnabled" );
+            m_pScriptDebugging->LogBadType ( luaVM );
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "setGlitchEnabled" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -1132,7 +1157,7 @@ int CLuaWorldDefs::isGlitchEnabled ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "isGlitchEnabled" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushnil ( luaVM );
     return 1;

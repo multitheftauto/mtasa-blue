@@ -812,7 +812,7 @@ int CLuaFunctionDefs::PlayMissionAudio ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "playMissionAudio" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -837,7 +837,7 @@ int CLuaFunctionDefs::PlaySoundFrontEnd ( lua_State* luaVM )
             m_pScriptDebugging->LogError ( luaVM, "Invalid sound ID specified. Valid sound IDs are 0 - 101." );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "playSoundFrontEnd" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -862,7 +862,7 @@ int CLuaFunctionDefs::PreloadMissionAudio ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "preloadMissionAudio" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -925,7 +925,7 @@ int CLuaFunctionDefs::ResetAmbientSounds ( lua_State* luaVM )
         return 1;
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "resetAmbientSounds" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -993,7 +993,7 @@ int CLuaFunctionDefs::ResetWorldSounds ( lua_State* luaVM )
         return 1;
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "resetWorldSounds" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;

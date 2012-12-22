@@ -88,7 +88,7 @@ int CLuaFunctionDefs::IsObjectStatic ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "isObjectStatic" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;

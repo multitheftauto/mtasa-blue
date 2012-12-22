@@ -398,7 +398,7 @@ int CLuaElementDefs::getElementData ( lua_State* luaVM )
             if ( strKey.length () > MAX_CUSTOMDATA_NAME_LENGTH )
             {
                 // Warn and truncate if key is too long
-                m_pScriptDebugging->LogCustom ( luaVM, SString ( "Truncated argument @ '%s' [%s]", "getElementData", *SString ( "string length reduced to %d characters at argument 2", MAX_CUSTOMDATA_NAME_LENGTH ) ) );
+                m_pScriptDebugging->LogCustom ( luaVM, SString ( "Truncated argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *SString ( "string length reduced to %d characters at argument 2", MAX_CUSTOMDATA_NAME_LENGTH ) ) );
                 strKey = strKey.Left ( MAX_CUSTOMDATA_NAME_LENGTH );
             }
 
@@ -1240,7 +1240,7 @@ int CLuaElementDefs::setElementData ( lua_State* luaVM )
             if ( strKey.length () > MAX_CUSTOMDATA_NAME_LENGTH )
             {
                 // Warn and truncate if key is too long
-                m_pScriptDebugging->LogCustom ( luaVM, SString ( "Truncated argument @ '%s' [%s]", "setElementData", *SString ( "string length reduced to %d characters at argument 2", MAX_CUSTOMDATA_NAME_LENGTH ) ) );
+                m_pScriptDebugging->LogCustom ( luaVM, SString ( "Truncated argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *SString ( "string length reduced to %d characters at argument 2", MAX_CUSTOMDATA_NAME_LENGTH ) ) );
                 strKey = strKey.Left ( MAX_CUSTOMDATA_NAME_LENGTH );
             }
 
@@ -1276,7 +1276,7 @@ int CLuaElementDefs::removeElementData ( lua_State* luaVM )
             if ( strKey.length () > MAX_CUSTOMDATA_NAME_LENGTH )
             {
                 // Warn and truncate if key is too long
-                m_pScriptDebugging->LogCustom ( luaVM, SString ( "Truncated argument @ '%s' [%s]", "removeElementData", *SString ( "string length reduced to %d characters at argument 2", MAX_CUSTOMDATA_NAME_LENGTH ) ) );
+                m_pScriptDebugging->LogCustom ( luaVM, SString ( "Truncated argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *SString ( "string length reduced to %d characters at argument 2", MAX_CUSTOMDATA_NAME_LENGTH ) ) );
                 strKey = strKey.Left ( MAX_CUSTOMDATA_NAME_LENGTH );
             }
 

@@ -1849,10 +1849,13 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
         else
         {
             // Tell the console
-            CLogger::LogPrintf ( "CONNECT: %s failed to connect (Player Element Could not be created.)\n", szNick );
+            CLogger::LogPrintf ( "CONNECT: %s failed to connect (Player Element Could not be created.)\n", pPlayer->GetSourceIP () );
 
             // Tell the console
             CLogger::LogPrint ( "URGENT: Report this error on bugs.mtasa.com error code: 6930-2\n" );
+
+            // Tell the player the problem
+            DisconnectPlayer ( this, *pPlayer, "Disconnected: Player Element Could not be created." );
         }
     }
 }

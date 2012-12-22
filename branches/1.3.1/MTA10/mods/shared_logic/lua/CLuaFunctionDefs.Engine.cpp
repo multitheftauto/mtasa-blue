@@ -56,11 +56,11 @@ int CLuaFunctionDefs::EngineLoadCOL ( lua_State* luaVM )
                 {
                     // Delete it again. We failed
                     delete pCol;
-                    m_pScriptDebugging->LogCustom ( luaVM, SString ( "Load error @ '%s' [Unable to load '%s']", "engineLoadCOL", *strFile ) );
+                    m_pScriptDebugging->LogCustom ( luaVM, SString ( "Load error @ '%s' [Unable to load '%s']", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *strFile ) );
                 }
             }
             else
-                m_pScriptDebugging->LogBadType ( luaVM, "engineLoadCOL" );
+                m_pScriptDebugging->LogBadType ( luaVM );
         }
     }
 
@@ -107,11 +107,11 @@ int CLuaFunctionDefs::EngineLoadDFF ( lua_State* luaVM )
                 {
                     // Delete it again
                     delete pDFF;
-                    m_pScriptDebugging->LogCustom ( luaVM, SString ( "Load error @ '%s' [Unable to load '%s']", "engineLoadDFF", *strFile ) );
+                    m_pScriptDebugging->LogCustom ( luaVM, SString ( "Load error @ '%s' [Unable to load '%s']", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *strFile ) );
                 }
             }
             else
-                m_pScriptDebugging->LogBadPointer ( luaVM, "engineLoadDFF", "string", 1 );
+                m_pScriptDebugging->LogBadPointer ( luaVM, "string", 1 );
         }
     }
 
@@ -167,7 +167,7 @@ int CLuaFunctionDefs::EngineLoadTXD ( lua_State* luaVM )
                 }
             }
             else
-                m_pScriptDebugging->LogBadPointer ( luaVM, "engineLoadTXD", "string", 1 );
+                m_pScriptDebugging->LogBadPointer ( luaVM, "string", 1 );
         }
     }
 
@@ -197,10 +197,10 @@ int CLuaFunctionDefs::EngineReplaceCOL ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "engineReplaceCOL", "number", 2 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "number", 2 );
     }
     else
-        m_pScriptDebugging->LogBadPointer ( luaVM, "engineReplaceCOL", "col", 1 );
+        m_pScriptDebugging->LogBadPointer ( luaVM, "col", 1 );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -224,7 +224,7 @@ int CLuaFunctionDefs::EngineRestoreCOL ( lua_State* luaVM )
         }  
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "engineRestoreCOL" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     // Failed.
     lua_pushboolean ( luaVM, false );
@@ -253,10 +253,10 @@ int CLuaFunctionDefs::EngineImportTXD ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "engineImportTXD", "number", 2 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "number", 2 );
     }
     else
-        m_pScriptDebugging->LogBadPointer ( luaVM, "engineImportTXD", "txd", 1 );
+        m_pScriptDebugging->LogBadPointer ( luaVM, "txd", 1 );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -284,10 +284,10 @@ int CLuaFunctionDefs::EngineReplaceModel ( lua_State* luaVM )
             return true;
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "engineReplaceModel", "number", 2 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "number", 2 );
     }
     else
-        m_pScriptDebugging->LogBadPointer ( luaVM, "engineReplaceModel", "dff", 1 );
+        m_pScriptDebugging->LogBadPointer ( luaVM, "dff", 1 );
 
     // Failure
     lua_pushboolean ( luaVM, false );
@@ -313,7 +313,7 @@ int CLuaFunctionDefs::EngineRestoreModel ( lua_State* luaVM )
     }
     else
     {
-        m_pScriptDebugging->LogBadType ( luaVM, "engineRestoreModel" );
+        m_pScriptDebugging->LogBadType ( luaVM );
     }
 
     // Failure
@@ -409,7 +409,7 @@ int CLuaFunctionDefs::EngineReplaceMatchingAtomics ( lua_State* luaVM )
     pEntityClump = static_cast < CClientObject* > ( pEntity ) -> GetGameObject () -> GetRpClump ();
     else {
     m_pScriptDebugging->LogWarning ( luaVM, "engineReplaceMatchingAtomics only supports vehicles and objects." );
-    m_pScriptDebugging->LogBadType ( luaVM, "engineReplaceMatchingAtomics" );
+    m_pScriptDebugging->LogBadType ( luaVM );
     }
     }
 
@@ -419,7 +419,7 @@ int CLuaFunctionDefs::EngineReplaceMatchingAtomics ( lua_State* luaVM )
 
     lua_pushboolean ( luaVM, true );
     } else {
-    m_pScriptDebugging->LogBadType ( luaVM, "engineReplaceMatchingAtomics" );
+    m_pScriptDebugging->LogBadType ( luaVM );
     lua_pushboolean ( luaVM, false );
     }
     */
@@ -461,7 +461,7 @@ int CLuaFunctionDefs::EngineReplaceWheelAtomics ( lua_State* luaVM )
 
     lua_pushboolean ( luaVM, true );
     } else {
-    m_pScriptDebugging->LogBadType ( luaVM, "engineReplaceWheelAtomics" );
+    m_pScriptDebugging->LogBadType ( luaVM );
     lua_pushboolean ( luaVM, false );
     }
     */
