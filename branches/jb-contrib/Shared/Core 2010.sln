@@ -1,12 +1,18 @@
 Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+# Visual C++ Express 2010
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CEGUI", "CEGUI", "{4C0157CE-9DD9-4729-8CDF-F5B9D2D71D2B}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Dependencies", "Dependencies", "{F99764D6-7D93-4557-8474-EA06D4BD3801}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Client - Core", "..\MTA10\core\_Core 2008.vcxproj", "{4C71249E-EA08-4A3D-9AEF-28707ACC6531}"
+	ProjectSection(ProjectDependencies) = postProject
+		{AF2AF376-1ACD-4F3B-B399-2A30D8BE950E} = {AF2AF376-1ACD-4F3B-B399-2A30D8BE950E}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Client - Game SA", "..\MTA10\game_sa\_game_sa 2008.vcxproj", "{E13D1441-438B-4A03-AB79-5E8EF08EE414}"
+	ProjectSection(ProjectDependencies) = postProject
+		{AF2AF376-1ACD-4F3B-B399-2A30D8BE950E} = {AF2AF376-1ACD-4F3B-B399-2A30D8BE950E}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Client - Loader", "..\MTA10\loader\_Loader 2008.vcxproj", "{AF2AF376-1ACD-4F3B-B399-2A30D8BE950E}"
 EndProject
@@ -17,6 +23,9 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Client - GUI", "..\MTA10\gui\gui 2008.vcxproj", "{485149E1-799C-4925-AA17-0FEA77C85418}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Client - Deathmatch", "..\MTA10\mods\deathmatch\_Deathmatch 2008.vcxproj", "{F661CA1A-A296-4505-9583-3BEC58FB79C5}"
+	ProjectSection(ProjectDependencies) = postProject
+		{AF2AF376-1ACD-4F3B-B399-2A30D8BE950E} = {AF2AF376-1ACD-4F3B-B399-2A30D8BE950E}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Server - Deathmatch", "..\MTA10_Server\mods\deathmatch\_ServerDeathmatch 2008.vcxproj", "{DC99F9D4-7C17-4A36-9F21-CEE075E42292}"
 EndProject
@@ -54,7 +63,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Server - Dbconmy", "..\MTA1
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "jpeg", "..\vendor\jpeg\win32\jpeg_2008.vcxproj", "{5997CB54-C80C-4422-89AA-81B6ADFA7F86}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UnRARDll", "..\vendor\unrar\UnRARDll.vcxproj", "{C952D361-74DA-78FD-E5B1-C45CB773C304}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UnRARDll", "..\vendor\unrar\UnRARDll.vcxproj", "{C78CE61F-3DCA-E8D1-DB23-093576BBD82F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -213,12 +222,12 @@ Global
 		{5997CB54-C80C-4422-89AA-81B6ADFA7F86}.Nightly|Win32.Build.0 = Nightly|Win32
 		{5997CB54-C80C-4422-89AA-81B6ADFA7F86}.Release|Win32.ActiveCfg = Release|Win32
 		{5997CB54-C80C-4422-89AA-81B6ADFA7F86}.Release|Win32.Build.0 = Release|Win32
-		{C952D361-74DA-78FD-E5B1-C45CB773C304}.Debug|Win32.ActiveCfg = Debug|Win32
-		{C952D361-74DA-78FD-E5B1-C45CB773C304}.Debug|Win32.Build.0 = Debug|Win32
-		{C952D361-74DA-78FD-E5B1-C45CB773C304}.Nightly|Win32.ActiveCfg = Nightly|Win32
-		{C952D361-74DA-78FD-E5B1-C45CB773C304}.Nightly|Win32.Build.0 = Nightly|Win32
-		{C952D361-74DA-78FD-E5B1-C45CB773C304}.Release|Win32.ActiveCfg = Release|Win32
-		{C952D361-74DA-78FD-E5B1-C45CB773C304}.Release|Win32.Build.0 = Release|Win32
+		{C78CE61F-3DCA-E8D1-DB23-093576BBD82F}.Debug|Win32.ActiveCfg = Debug|Win32
+		{C78CE61F-3DCA-E8D1-DB23-093576BBD82F}.Debug|Win32.Build.0 = Debug|Win32
+		{C78CE61F-3DCA-E8D1-DB23-093576BBD82F}.Nightly|Win32.ActiveCfg = Nightly|Win32
+		{C78CE61F-3DCA-E8D1-DB23-093576BBD82F}.Nightly|Win32.Build.0 = Nightly|Win32
+		{C78CE61F-3DCA-E8D1-DB23-093576BBD82F}.Release|Win32.ActiveCfg = Release|Win32
+		{C78CE61F-3DCA-E8D1-DB23-093576BBD82F}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
