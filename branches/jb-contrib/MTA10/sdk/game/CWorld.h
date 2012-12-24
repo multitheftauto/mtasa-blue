@@ -61,6 +61,7 @@ struct SBuildingRemoval
         m_usModel = 0;
         m_vecPos = CVector( 0, 0, 0);
         m_fRadius = 0.0f;
+        m_cInterior = -1;
     }
 
     ~SBuildingRemoval ( )
@@ -83,6 +84,7 @@ struct SBuildingRemoval
     unsigned short m_usModel;
     CVector m_vecPos;
     float m_fRadius;
+    char m_cInterior;
     std::list < CEntitySAInterface * > * m_pBinaryRemoveList;
     std::list < CEntitySAInterface * > * m_pDataRemoveList;
 };
@@ -96,9 +98,27 @@ struct SIPLInst
     BYTE        m_bLOD;
 };
 
-struct sDataBuildingRemoval
+struct sDataBuildingRemovalItem
 {
-    sDataBuildingRemoval ( CEntitySAInterface * pInterface, bool bData )
+    sDataBuildingRemovalItem ( CEntitySAInterface * pInterface, bool bData )
+    {
+        m_pInterface = pInterface;
+        m_iCount = 0;
+    }
+    void AddCount ( )
+    {
+        m_iCount++;
+    }
+    void RemoveCount ( )
+    {
+        m_iCount--;
+    }
+    CEntitySAInterface * m_pInterface;
+    int m_iCount;
+};
+struct sBuildingRemovalItem
+{
+    sBuildingRemovalItem ( CEntitySAInterface * pInterface, bool bData )
     {
         m_pInterface = pInterface;
         m_iCount = 0;
@@ -166,13 +186,14 @@ public:
     virtual float       GetAircraftMaxHeight        ( void ) = 0;
     virtual void        SetOcclusionsEnabled        ( bool bEnabled ) = 0;
     virtual bool        GetOcclusionsEnabled        ( void ) = 0;
-    virtual void        RemoveBuilding              ( unsigned short usModelToRemove, float fDistance, float fX, float fY, float fZ) = 0;
+    virtual void        RemoveBuilding              ( unsigned short usModelToRemove, float fDistance, float fX, float fY, float fZ, char cInterior) = 0;
     virtual bool        IsRemovedModelInRadius      ( SIPLInst* pInst ) = 0;
     virtual bool        IsModelRemoved              ( unsigned short usModelID ) = 0;
     virtual void        ClearRemovedBuildingLists   ( void ) = 0;
-    virtual bool        RestoreBuilding             ( unsigned short usModelToRestore, float fDistance, float fX, float fY, float fZ ) = 0;
+    virtual bool        RestoreBuilding             ( unsigned short usModelToRestore, float fDistance, float fX, float fY, float fZ, char cInterior ) = 0;
     virtual SBuildingRemoval*   GetBuildingRemoval  ( CEntitySAInterface * pInterface ) = 0;
     virtual void        AddDataBuilding             ( CEntitySAInterface * pInterface ) = 0;
+    virtual void        AddBinaryBuilding           ( CEntitySAInterface * pInterface ) = 0;
     virtual void        RemoveWorldBuildingFromLists( CEntitySAInterface * pInterface ) = 0;
     virtual bool        IsObjectRemoved             ( CEntitySAInterface * pInterface ) = 0;
     virtual bool        IsDataModelRemoved          ( unsigned short usModelID ) = 0;

@@ -423,7 +423,7 @@ void CPacketHandler::Packet_ServerJoined ( NetBitStreamInterface& bitStream )
     if ( g_pCore->GetCVars ()->Get ( "single_download", iSingleDownload ) && iSingleDownload == 1 )
         iHTTPMaxConnectionsPerClient = 1;
 
-    g_pCore->GetNetwork ()->GetHTTPDownloadManager ()->SetMaxConnections( iHTTPMaxConnectionsPerClient );
+    g_pCore->GetNetwork ()->GetHTTPDownloadManager ( EDownloadMode::RESOURCE_INITIAL_FILES )->SetMaxConnections( iHTTPMaxConnectionsPerClient );
 
     // Make the camera black until we spawn
     // Anyone want to document wtf these values are?  Why are we putting seemingly "random"
@@ -506,6 +506,7 @@ void CPacketHandler::Packet_PlayerList ( NetBitStreamInterface& bitStream )
     // bool                  - has a jetpack?
     // unsigned short (2)    - dimension
     // unsigned char  (1)    - fighting style
+    // Dear God, please fix issue #7376
 
     // The game must be loaded or the game will crash
     if ( g_pClientGame->m_Status != CClientGame::STATUS_JOINED )
@@ -1189,7 +1190,7 @@ void CPacketHandler::Packet_ChatEcho ( NetBitStreamInterface& bitStream )
             char* szMessage = new char[iNumberOfBytesUsed + 1];
             bitStream.Read ( szMessage, iNumberOfBytesUsed );
             szMessage [iNumberOfBytesUsed] = 0;
-            if ( MbUTF8ToUTF16(szMessage).size() <= MAX_CHATECHO_LENGTH )
+            if ( MbUTF8ToUTF16(szMessage).size() <= MAX_CHATECHO_LENGTH + 6 )   // Extra 6 characters to fix #7125 (Teamsay + long name + long message = too long message)
             {
                 // Strip it for bad characters
                 StripControlCodes ( szMessage, ' ' );
@@ -1200,10 +1201,12 @@ void CPacketHandler::Packet_ChatEcho ( NetBitStreamInterface& bitStream )
                 Arguments.PushNumber ( ucRed );
                 Arguments.PushNumber ( ucGreen );
                 Arguments.PushNumber ( ucBlue );
-                g_pClientGame->GetRootEntity()->CallEvent ( "onClientChatMessage", Arguments, false );
-
-                // Echo it
-                g_pCore->ChatEchoColor ( szMessage, ucRed, ucGreen, ucBlue, ucColorCoded );
+                bool bCancelled = !g_pClientGame->GetRootEntity()->CallEvent ( "onClientChatMessage", Arguments, false );
+                if ( !bCancelled )
+                {
+                    // Echo it
+                    g_pCore->ChatEchoColor ( szMessage, ucRed, ucGreen, ucBlue, ucColorCoded );
+                }
             }
             delete[] szMessage;
         }
@@ -1364,8 +1367,8 @@ void CPacketHandler::Packet_VehicleSpawn ( NetBitStreamInterface& bitStream )
         pVehicle->SetPosition ( vecPosition );
         pVehicle->SetRotationDegrees ( vecRotationDegrees );
 
-        // Make sure its stationary
-        pVehicle->SetMoveSpeed ( CVector ( 0.0f, 0.0f, 0.0f ) );
+        // Make sure its stationary. (Little bit of fall velocity to prevent floaters)
+        pVehicle->SetMoveSpeed ( CVector ( 0.0f, 0.0f, -0.01f ) );
         pVehicle->SetTurnSpeed ( CVector ( 0.0f, 0.0f, 0.0f ) );
 
         // Read out the color
@@ -2310,6 +2313,12 @@ void CPacketHandler::Packet_MapInfo ( NetBitStreamInterface& bitStream )
                 pWeaponInfo->SetAnimBreakoutTime            ( weaponProperty.data.anim_breakout_time );
             }
         }
+        if ( bitStream.Version () >= 0x36 )
+        {
+            bool bEnabled;
+            bitStream.ReadBit ( bEnabled );
+            g_pGame->SetJetpackWeaponEnabled ( (eWeaponType) weaponProperty.data.weaponType, bEnabled );
+        }
     }
     if ( bitStream.Version () >= 0x30 )
     {
@@ -2323,6 +2332,7 @@ void CPacketHandler::Packet_MapInfo ( NetBitStreamInterface& bitStream )
 
     unsigned short usModel = 0;
     float fRadius = 0.0f, fX = 0.0f, fY = 0.0f, fZ = 0.0f;
+    char cInterior = -1;
     while ( bitStream.ReadBit ( ) == true )
     {
         bitStream.Read( usModel );
@@ -2330,7 +2340,11 @@ void CPacketHandler::Packet_MapInfo ( NetBitStreamInterface& bitStream )
         bitStream.Read( fX );
         bitStream.Read( fY );
         bitStream.Read( fZ );
-        g_pGame->GetWorld ( )->RemoveBuilding( usModel, fRadius, fX, fY, fZ );
+        if ( bitStream.Version() >= 0x039 )
+        {
+            bitStream.Read ( cInterior );
+        }
+        g_pGame->GetWorld ( )->RemoveBuilding( usModel, fRadius, fX, fY, fZ, cInterior );
     }
 
     bool bOcclusionsEnabled = true;
@@ -2928,7 +2942,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                             * --slush
                             */
                             if (pUpgrades)
-                                pUpgrades->AddUpgrade ( ucUpgrade + 1000 );
+                                pUpgrades->AddUpgrade ( ucUpgrade + 1000, false );
                         }
                     }
 
@@ -3750,7 +3764,7 @@ void CPacketHandler::Packet_PickupHitConfirm ( NetBitStreamInterface& bitStream 
         if ( bPlaySound )
         {
             // Play the pick up sound
-            g_pGame->GetAudio ()->PlayFrontEndSound ( 40 );
+            g_pGame->GetAudioEngine ()->PlayFrontEndSound ( 40 );
         }
     }
 }
@@ -4333,10 +4347,7 @@ void CPacketHandler::Packet_ResourceStart ( NetBitStreamInterface& bitStream )
     * * unsigned char (x)    - function name
     */
 
-    CNetHTTPDownloadManagerInterface* pHTTP = g_pCore->GetNetwork ()->GetHTTPDownloadManager ();
-
-    // Number of Resources to be Downloaded
-    unsigned short usResourcesToBeDownloaded = 0;
+    CNetHTTPDownloadManagerInterface* pHTTP = g_pCore->GetNetwork ()->GetHTTPDownloadManager ( EDownloadMode::RESOURCE_INITIAL_FILES );
 
     // Number of protected scripts
     unsigned short usProtectedScriptCount = 0;
@@ -4483,10 +4494,10 @@ void CPacketHandler::Packet_ResourceStart ( NetBitStreamInterface& bitStream )
                                 unlink ( pDownloadableResource->GetName () );
 
                                 // Queue the file to be downloaded
-                                bool bAddedFile = pHTTP->QueueFile ( strHTTPDownloadURLFull, pDownloadableResource->GetName (), dChunkDataSize, NULL, 0, false, NULL, NULL, g_pClientGame->IsLocalGame () );
+                                bool bAddedFile = pHTTP->QueueFile ( strHTTPDownloadURLFull, pDownloadableResource->GetName (), dChunkDataSize, NULL, 0, false, NULL, NULL, g_pClientGame->IsLocalGame (), 10, true );
 
                                 // If the file was successfully queued, increment the resources to be downloaded
-                                usResourcesToBeDownloaded++;
+                                g_pClientGame->SetTransferringInitialFiles ( true );
                                 if ( bAddedFile )
                                     g_pClientGame->m_pTransferBox->AddToTotalSize ( dChunkDataSize );
                             }                       
@@ -4506,20 +4517,8 @@ void CPacketHandler::Packet_ResourceStart ( NetBitStreamInterface& bitStream )
             }
         }
 
-        // Are there any resources to be downloaded? Does it not transfer?
-        if ( usResourcesToBeDownloaded > 0 ||
-             g_pClientGame->m_bTransferResource )
-        {
-            if ( !pHTTP->IsDownloading () )
-            {
-                g_pClientGame->m_pTransferBox->Show ();
-
-                pHTTP->StartDownloadingQueuedFiles ();
-
-                g_pClientGame->m_bTransferResource = true;
-            }
-        }
-        else
+        // Are there any resources to being downloaded?
+        if ( !g_pClientGame->IsTransferringInitialFiles () )
         {
             // Load the resource now
             if ( !pResource->GetActive() )

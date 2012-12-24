@@ -36,7 +36,7 @@ CTextDisplay::~CTextDisplay ( void )
     list < CPlayerTextManager* > ::iterator iter2 = m_observers.begin ();
     for ( ; iter2 != m_observers.end (); iter2++ )
     {
-        if ( !(*iter2)->m_displays.empty() ) (*iter2)->m_displays.remove ( this );
+        (*iter2)->m_displays.remove ( this );
     }
 }
 
@@ -81,8 +81,8 @@ void CTextDisplay::GetObservers ( lua_State* pLua )
 void CTextDisplay::AddObserver ( CPlayerTextManager* pTextManager )
 {
     // Remove them first if they're already added (easier than checking if they are and only marginally slower)
-    if ( !m_observers.empty() ) m_observers.remove ( pTextManager );
-    if ( !pTextManager->m_displays.empty() ) pTextManager->m_displays.remove ( this );
+    m_observers.remove ( pTextManager );
+    pTextManager->m_displays.remove ( this );
 
     // Add them
     m_observers.push_back ( pTextManager );
@@ -100,8 +100,8 @@ void CTextDisplay::AddObserver ( CPlayerTextManager* pTextManager )
 void CTextDisplay::RemoveObserver ( CPlayerTextManager* pTextManager )
 {
     // Remove the text manager from our list and us from the text manager's list
-    if ( !m_observers.empty() ) m_observers.remove ( pTextManager );
-    if ( !pTextManager->m_displays.empty() ) pTextManager->m_displays.remove ( this );
+    m_observers.remove ( pTextManager );
+    pTextManager->m_displays.remove ( this );
 
     // Inform the observer that all the items in this display have been deleted
     list < CTextItem* > ::iterator iter = m_contents.begin ();
@@ -116,7 +116,7 @@ void CTextDisplay::RemoveObserver ( CPlayerTextManager* pTextManager )
 void CTextDisplay::Update ( CTextItem* pTextItem, bool bRemovedFromDisplay )
 {
     // Remove it from our contents if it's getting removed from display
-    if ( pTextItem->IsBeingDeleted () && !m_contents.empty() )
+    if ( pTextItem->IsBeingDeleted () )
     {
         m_contents.remove ( pTextItem );
     }
@@ -133,7 +133,7 @@ void CTextDisplay::Update ( CTextItem* pTextItem, bool bRemovedFromDisplay )
 void CTextDisplay::Add ( CTextItem* pTextItem )
 {
     // Push the new item onto the content list
-    if ( !m_contents.empty() ) m_contents.remove ( pTextItem );
+    m_contents.remove ( pTextItem );
     m_contents.push_back ( pTextItem );
 
     // Tell the text display to add us as a text display
@@ -147,7 +147,7 @@ void CTextDisplay::Add ( CTextItem* pTextItem )
 void CTextDisplay::Remove ( CTextItem* pTextItem, bool bRemoveFromList )
 {
     // Remove it from our list and us from the text item's
-    if ( bRemoveFromList && !m_contents.empty() )
+    if ( bRemoveFromList )
     {
         m_contents.remove ( pTextItem );
     }

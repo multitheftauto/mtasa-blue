@@ -212,6 +212,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\shared_logic\CClientWeapon.cpp" />
+    <ClCompile Include="..\shared_logic\CClientWeaponManager.cpp" />
+    <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Voice.cpp" />
     <ClCompile Include="CClient.cpp" />
     <ClCompile Include="Client.cpp" />
     <ClCompile Include="ClientCommands.cpp" />
@@ -587,6 +590,8 @@
     <ClCompile Include="..\..\..\Shared\animation\CPositionRotationAnimation.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\shared_logic\CClientWeapon.h" />
+    <ClInclude Include="..\shared_logic\CClientWeaponManager.h" />
     <ClInclude Include="CClient.h" />
     <ClInclude Include="Client.h" />
     <ClInclude Include="ClientCommands.h" />

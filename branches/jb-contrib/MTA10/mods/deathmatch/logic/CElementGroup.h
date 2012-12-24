@@ -16,24 +16,16 @@ class CElementGroup;
 #ifndef CELEMENTGROUP_H
 #define CELEMENTGROUP_H
 
-#include <list>
 #include "../../shared_logic/CClientEntity.h"
 
 class CElementGroup
 {
 private:
-    std::list < CClientEntity* >    m_elements;
-    class CResource *               m_pResource;
+    CFastList < CClientEntity* >    m_elements;
 public:
-                                    CElementGroup ( CResource * resource )
-                                    {
-                                        m_pResource = resource;
-                                    }
                                     ~CElementGroup();
-
     void                            Add ( CClientEntity * element );
     void                            Remove ( CClientEntity * element );
-    inline CResource *              GetResource ( void ) { return m_pResource; }
     unsigned int                    GetCount ( void );
 };
 

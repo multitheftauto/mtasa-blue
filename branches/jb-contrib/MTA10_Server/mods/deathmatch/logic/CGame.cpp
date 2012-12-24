@@ -32,8 +32,6 @@
 #define BULLET_SYNC_MIN_CLIENT_VERSION          "1.3.0-9.04311"
 #define VEH_EXTRAPOLATION_MIN_CLIENT_VERSION    "1.3.0-9.04460"
 
-#define RUN_CHILDREN CChildListType::const_iterator iter=pElement->IterBegin();for(;iter!=pElement->IterEnd();iter++)
-
 CGame* g_pGame = NULL;
 
 char szProgress[4] = {'-','\\','|','/'};
@@ -134,7 +132,6 @@ CGame::CGame ( void )
     m_pGroups = NULL;
     m_pSettings = NULL;
     m_pRemoteCalls = NULL;
-    m_pResourceDownloader = NULL;
     m_pRPCFunctions = NULL;
     m_pLanBroadcast = NULL;
     m_pPedSync = NULL;
@@ -183,7 +180,8 @@ CGame::CGame ( void )
 
     m_bCloudsEnabled = true;
 
-    m_llLastAnnouceTime = 0;
+    m_llLastLongAnnouceTime = 0;
+    m_llLastShortAnnouceTime = 0;
     m_pOpenPortsTester = NULL;
 
     m_bTrafficLightsLocked = false;
@@ -294,7 +292,6 @@ CGame::~CGame ( void )
     SAFE_DELETE ( m_pASE );
     SAFE_DELETE ( m_pSettings );
     SAFE_DELETE ( m_pRemoteCalls );
-    SAFE_DELETE ( m_pResourceDownloader );
     SAFE_DELETE ( m_pRPCFunctions );
     SAFE_DELETE ( m_pWaterManager );
     SAFE_DELETE ( m_pWeaponStatsManager );
@@ -386,7 +383,10 @@ void CGame::DoPulse ( void )
     CNetBufferWatchDog::DoPulse ();
 
     CLOCK_SET_SECTION( "CGame::DoPulse" );
-    CLOCK_CALL1( g_pNetServer->GetHTTPDownloadManager()->ProcessQueuedFiles(); );
+    CLOCK1( "HTTPDownloadManager" );
+    g_pNetServer->GetHTTPDownloadManager ( EDownloadMode::CALL_REMOTE )->ProcessQueuedFiles ();
+    g_pNetServer->GetHTTPDownloadManager ( EDownloadMode::ASE )->ProcessQueuedFiles ();
+    UNCLOCK1( "HTTPDownloadManager" );
 
     CLOCK_CALL1( m_pPlayerManager->DoPulse (); );
 
@@ -511,8 +511,6 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
         strBuffer = g_pServerInterface->GetModManager ()->GetAbsolutePath ( "mtaserver.conf" );
     }
     m_pMainConfig->SetFileName ( strBuffer );
-
-    m_pResourceDownloader = new CResourceDownloader();
 
     // Load the main config base
     if ( !m_pMainConfig->Load () )
@@ -815,23 +813,12 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     }
 
     // If ASE is enabled
-    if ( m_pMainConfig->GetASEEnabled () || !m_pMainConfig->GetDontBroadcastLan() )
-    {
-        m_pASE = new ASE ( m_pMainConfig, m_pPlayerManager, static_cast < int > ( usServerPort ), strServerIP, !m_pMainConfig->GetDontBroadcastLan() && !m_pMainConfig->GetASEEnabled () );
+    m_pASE = new ASE ( m_pMainConfig, m_pPlayerManager, static_cast < int > ( usServerPort ), strServerIP );
+    if ( m_pMainConfig->GetSerialVerificationEnabled () )
+        m_pASE->SetRuleValue ( "SerialVerification", "yes" );
+    ApplyAseSetting ();
+    PulseMasterServerAnnounce ();
 
-        if ( m_pMainConfig->GetSerialVerificationEnabled () )
-            m_pASE->SetRuleValue ( "SerialVerification", "yes" );
-
-        if ( m_pMainConfig->GetASEEnabled () )
-        {
-            PulseMasterServerAnnounce ();
-        }
-
-        if ( !m_pMainConfig->GetDontBroadcastLan() )
-        {
-            m_pLanBroadcast = m_pASE->InitLan();
-        }
-    }
 
     // Now load the rest of the config
     if ( !m_pMainConfig->LoadExtended () )
@@ -899,71 +886,109 @@ void CGame::StartOpenPortsTest ( void )
 // Remind master server once every 24 hrs
 void CGame::PulseMasterServerAnnounce ( void )
 {
-    if ( m_llLastAnnouceTime == 0 || GetTickCount64_ () - m_llLastAnnouceTime > 24 * 60 * 60 * 1000 )
+    if ( !m_pMainConfig->GetAseAnnounceEnabled () )
+        return;
+
+    long long llTickCountNow = GetTickCount64_ ();
+    bool bDoAnnounce = false;
+    bool bIsLongAnnouce = false;
+    bool bFirstPass = false;
+
+    if ( m_llLastLongAnnouceTime == 0 || llTickCountNow - m_llLastLongAnnouceTime > 1000 * 60 * 60 * 24 )   // 24 hrs
     {
-        bool bFirstPass = m_llLastAnnouceTime == 0;
-        m_llLastAnnouceTime = GetTickCount64_ ();
+        bFirstPass = m_llLastLongAnnouceTime == 0;
+        bIsLongAnnouce = true;
+        bDoAnnounce = true;
+        m_llLastLongAnnouceTime = llTickCountNow;
+    }
 
-        // If ASE is enabled
-        if ( m_pMainConfig->GetASEEnabled () )
+    if ( m_llLastShortAnnouceTime == 0 || llTickCountNow - m_llLastShortAnnouceTime > 1000 * 60 * 10 ) // 10 mins
+    {
+        bDoAnnounce = true;
+        m_llLastShortAnnouceTime = llTickCountNow;
+    }
+
+    // Time yet?
+    if ( !bDoAnnounce )
+        return;
+
+    // Only do short annouce if ase port is disabled
+    if ( !bIsLongAnnouce && m_pMainConfig->GetAsePortEnabled () )
+        return;
+
+    const SString strServerIP = m_pMainConfig->GetServerIP ();
+    unsigned short usServerPort = m_pMainConfig->GetServerPort ();
+    unsigned short usHTTPPort = m_pMainConfig->GetHTTPPort ();
+    uint uiPlayerCount = 0;
+    uint uiMaxPlayerCount = 32;
+    bool bPassworded = m_pMainConfig->HasPassword ();
+    bool bAsePortEnabled = m_pMainConfig->GetAsePortEnabled ();
+
+    SString strVersion ( "%d.%d.%d-%d.%05d", MTASA_VERSION_MAJOR, MTASA_VERSION_MINOR, MTASA_VERSION_MAINTENANCE, MTASA_VERSION_TYPE, MTASA_VERSION_BUILD );
+    SString strExtra ( "%d_%d_%d_%d", uiPlayerCount, uiMaxPlayerCount, bPassworded, bAsePortEnabled );
+
+    struct {
+        SString strDesc;
+        SString strURL;
+        bool bRepeat;
+    } masterServerList[] = {
+                             { "Querying game-monitor.com master server... ", SString ( QUERY_URL_GAME_MONITOR, usServerPort + 123 ), false },
+                             { "Querying backup master server... ", SString ( "http://master.mtasa.com/ase/add.php?g=%u&a=%u&h=%u&v=%s&x=%s", usServerPort, usServerPort + 123, usHTTPPort, *strVersion, *strExtra ), true },
+                           };
+
+    for ( uint i = 0 ; i < NUMELMS( masterServerList ) ; i++ )
+    {
+        const SString& strDesc = masterServerList[i].strDesc;
+        const SString& strURL = masterServerList[i].strURL;
+        bool bRepeat = masterServerList[i].bRepeat;
+
+        // Don't repeat request for some servers
+        if ( !bFirstPass && !bRepeat )
+            continue;
+
+        // Only log on first pass
+        if ( bFirstPass )
+            CLogger::LogPrint ( strDesc );
+
+        if ( bIsLongAnnouce )
         {
-            const SString strServerIP = m_pMainConfig->GetServerIP ();
-            unsigned short usServerPort = m_pMainConfig->GetServerPort ();
-            unsigned short usHTTPPort = m_pMainConfig->GetHTTPPort ();
+            // Send request
+            CTCPImpl * pTCP = new CTCPImpl ();
+            pTCP->Initialize ();
+            CHTTPRequest * request = new CHTTPRequest ( strURL );
+            request->SetLocalIP ( strServerIP );
+            CHTTPResponse * response = request->Send ( pTCP );
 
-            SString strVersion ( "%d.%d.%d-%d.%05d", MTASA_VERSION_MAJOR, MTASA_VERSION_MINOR, MTASA_VERSION_MAINTENANCE, MTASA_VERSION_TYPE, MTASA_VERSION_BUILD );
-
-            struct {
-                SString strDesc;
-                SString strURL;
-                bool bRepeat;
-            } masterServerList[] = {
-                                     { "Querying game-monitor.com master server... ", SString ( QUERY_URL_GAME_MONITOR, usServerPort + 123 ), false },
-                                     { "Querying backup master server... ", SString ( "http://master.mtasa.com/ase/add.php?g=%u&a=%u&h=%u&v=%s", usServerPort, usServerPort + 123, usHTTPPort, *strVersion ), true },
-                                   };
-
-            for ( uint i = 0 ; i < NUMELMS( masterServerList ) ; i++ )
+            // Only log on first pass
+            if ( bFirstPass )
             {
-                const SString& strDesc = masterServerList[i].strDesc;
-                const SString& strURL = masterServerList[i].strURL;
-                bool bRepeat = masterServerList[i].bRepeat;
-
-                // Don't repeat request for some servers
-                if ( !bFirstPass && !bRepeat )
-                    continue;
-
-                // Only log on first pass
-                if ( bFirstPass )
-                    CLogger::LogPrint ( strDesc );
-
-                // Send request
-                CTCPImpl * pTCP = new CTCPImpl ();
-                pTCP->Initialize ();
-                CHTTPRequest * request = new CHTTPRequest ( strURL );
-                request->SetLocalIP ( strServerIP );
-                CHTTPResponse * response = request->Send ( pTCP );
-
-                // Only log on first pass
-                if ( bFirstPass )
+                if ( !response )
+                    CLogger::LogPrintfNoStamp ( "failed! (Not available)\n" );
+                else if ( response->GetErrorCode () != 200 )
                 {
-                    if ( !response )
-                        CLogger::LogPrintfNoStamp ( "failed! (Not available)\n" );
-                    else if ( response->GetErrorCode () != 200 )
-                    {
-                        if ( response->GetErrorCode () == 500 && strDesc.ContainsI ( "game-monitor" ) )
-                            CLogger::LogPrintfNoStamp ( "unavailable!\n" );
-                        else
-                            CLogger::LogPrintfNoStamp ( "failed! (%u: %s)\n", response->GetErrorCode (), response->GetErrorDescription () );
-                    }
+                    if ( response->GetErrorCode () == 500 && strDesc.ContainsI ( "game-monitor" ) )
+                        CLogger::LogPrintfNoStamp ( "maybe!\n" );
                     else
-                        CLogger::LogPrintfNoStamp ( "success!\n");
+                        CLogger::LogPrintfNoStamp ( "failed! (%u: %s)\n", response->GetErrorCode (), response->GetErrorDescription () );
                 }
-
-                if ( response )
-                    delete response;
-                delete pTCP;
-                delete request;
+                else
+                    CLogger::LogPrintfNoStamp ( "success!\n");
             }
+
+            if ( response )
+                delete response;
+            delete pTCP;
+            delete request;
+        }
+
+        // Send extra data if ase port disabled
+        if ( !m_pMainConfig->GetAsePortEnabled () && bRepeat )
+        {
+            SString strPostContent = m_pASE->QueryLight ();
+            bool bPostContentBinary = true;
+
+            CNetHTTPDownloadManagerInterface * downloadManager = g_pNetServer->GetHTTPDownloadManager ( EDownloadMode::ASE );
+            downloadManager->QueueFile ( strURL, NULL, 0, &strPostContent.at ( 0 ), strPostContent.length (), bPostContentBinary, NULL, NULL, false, 1 );
         }
     }
 }
@@ -1361,10 +1386,6 @@ void CGame::QuitPlayer ( CPlayer& Player, CClient::eQuitReasons Reason, bool bSa
         case CClient::QUIT_TIMEOUT: szReason = "Timed out"; break;
     }
 
-    // Remove the player from the serial manager
-    if ( m_pMainConfig->GetSerialVerificationEnabled () )
-        m_SerialManager.Remove ( &Player );
-
     // Output
     const char* szNick = Player.GetNick ();
     if ( bSayInConsole && szNick && szNick [0] )
@@ -1761,13 +1782,9 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
                             #endif
 
                                 // Add him to the whowas list
-                                m_WhoWas.Add ( szNick, Packet.GetSourceIP (), pPlayer->GetSerial (), pPlayer->GetPlayerVersion () );
+                                m_WhoWas.Add ( szNick, Packet.GetSourceIP (), pPlayer->GetSerial (), pPlayer->GetPlayerVersion (), pPlayer->GetAccount ()->GetName () );
 
-                                // Verify the player's serial if necessary
-                                if ( m_pMainConfig->GetSerialVerificationEnabled () )
-                                    m_SerialManager.Verify ( pPlayer, PlayerCompleteConnect );
-                                else
-                                    PlayerCompleteConnect ( pPlayer, true, NULL );
+                                PlayerCompleteConnect ( pPlayer, true, NULL );
                             }
                             else
                             {
@@ -2129,7 +2146,7 @@ void CGame::Packet_PlayerPuresync ( CPlayerPuresyncPacket& Packet )
 
             CLOCK( "PlayerPuresync", "DoHitDetection" );
             // Run colpoint checks
-            m_pColManager->DoHitDetection ( pPlayer->GetLastPosition (), pPlayer->GetPosition (), 0.0f, pPlayer );
+            m_pColManager->DoHitDetection ( pPlayer->GetPosition (), pPlayer );
             UNCLOCK( "PlayerPuresync", "DoHitDetection" );
         }
     }
@@ -2216,8 +2233,8 @@ void CGame::Packet_VehiclePuresync ( CVehiclePuresyncPacket& Packet )
 
             // Run colpoint checks
             CLOCK( "VehiclePuresync", "DoHitDetection" );
-            m_pColManager->DoHitDetection ( pPlayer->GetLastPosition (), pPlayer->GetPosition (), 0.0f, pPlayer );
-            m_pColManager->DoHitDetection ( pVehicle->GetLastPosition (), pVehicle->GetPosition (), 0.0f, pVehicle );
+            m_pColManager->DoHitDetection ( pPlayer->GetPosition (), pPlayer );
+            m_pColManager->DoHitDetection ( pVehicle->GetPosition (), pVehicle );
             UNCLOCK( "VehiclePuresync", "DoHitDetection" );
         }
     }
@@ -2372,7 +2389,7 @@ void CGame::Packet_LuaEvent ( CLuaEventPacket& Packet )
     CPlayer* pCaller = Packet.GetSourcePlayer ();
     const char* szName = Packet.GetName ();
     ElementID ElementID = Packet.GetElementID ();
-    CLuaArguments Arguments = Packet.GetArguments ();
+    CLuaArguments* pArguments = Packet.GetArguments ();
 
     // Grab the element
     CElement* pElement = CElementIDs::GetElement ( ElementID );
@@ -2384,7 +2401,7 @@ void CGame::Packet_LuaEvent ( CLuaEventPacket& Packet )
         {
             if ( pEvent->bAllowRemoteTrigger )
             {
-                pElement->CallEvent ( szName, Arguments, pCaller );
+                pElement->CallEvent ( szName, *pArguments, pCaller );
             }
             else
                 m_pScriptDebugging->LogError ( NULL, "Client triggered serverside event %s, but event is not marked as remotly triggerable", szName );
@@ -2508,9 +2525,9 @@ void CGame::Packet_ExplosionSync ( CExplosionSyncPacket& Packet )
                             {
                                 CVehicle * pVehicle = static_cast < CVehicle * > ( pOrigin );
                                 // Is this vehicle not already blown?
-                                if ( pVehicle->GetBlowTime () == 0 )
+                                if ( pVehicle->GetIsBlown () == false )
                                 {
-                                    pVehicle->SetBlowTime ( GetTime () );
+                                    pVehicle->SetIsBlown ( true );
 
                                     // Call the onVehicleExplode event
                                     CLuaArguments Arguments;
@@ -2884,9 +2901,6 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
                                     // Mark him as successfully entered
                                     pPlayer->SetVehicleAction ( CPlayer::VEHICLEACTION_NONE );
 
-                                    // The vehicle is no longer idle
-                                    pVehicle->SetIdleTime ( 0 );
-
                                     //Update our engine State
                                     pVehicle->SetEngineOn( true );
 
@@ -3019,12 +3033,6 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
                                     // Force the player that just left the vehicle as the syncer
                                     m_pUnoccupiedVehicleSync->OverrideSyncer ( pVehicle, pPlayer );
 
-                                    // If it's empty, set the idle time
-                                    if ( pVehicle->GetFirstOccupant () == NULL )
-                                    {
-                                        pVehicle->SetIdleTime ( GetTime () );
-                                    }
-
                                     // Tell everyone he can start exiting the vehicle
                                     CVehicleInOutPacket Reply ( ID, ucOccupiedSeat, VEHICLE_NOTIFY_OUT_RETURN );
                                     Reply.SetSourceElement ( pPlayer );
@@ -3085,11 +3093,6 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
                                 // Force the player that just left the vehicle as the syncer
                                 m_pUnoccupiedVehicleSync->OverrideSyncer ( pVehicle, pPlayer );
 
-                                // If it's empty, set the idle time
-                                if ( pVehicle->GetFirstOccupant () == NULL )
-                                {
-                                    pVehicle->SetIdleTime ( GetTime () );
-                                }
                                 pPlayer->SetVehicleAction( CPlayer::VEHICLEACTION_NONE );
                                 // Tell the other players about it
                                 CVehicleInOutPacket Reply ( ID, ucOccupiedSeat, VEHICLE_NOTIFY_FELL_OFF_RETURN );
@@ -3244,12 +3247,6 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
                                         m_pPlayerManager->BroadcastOnlyJoined ( JackedReply );
                                     }
                                     pJacked->SetVehicleAction ( CPlayer::VEHICLEACTION_NONE );
-                                }
-
-                                // If it's empty, set the idle time
-                                if ( pVehicle->GetFirstOccupant () == NULL )
-                                {
-                                    pVehicle->SetIdleTime ( GetTime () );
                                 }
                             }
 
@@ -3449,7 +3446,7 @@ void CGame::Packet_Voice_Data ( CVoiceDataPacket& Packet )
                         {
                             // Add element decendants
                             std::vector < CPlayer* > descendantList;
-                            pBroadcastElement->GetDescendantsByType ( descendantList, false, CElement::PLAYER );
+                            pBroadcastElement->GetDescendantsByType ( descendantList, CElement::PLAYER );
                             for ( std::vector < CPlayer* >::const_iterator iter = descendantList.begin() ; iter != descendantList.end() ; ++iter )
                             {
                                 playerSendMap.insert ( *iter );
@@ -3514,7 +3511,7 @@ void CGame::Packet_Voice_End ( CVoiceEndPacket& Packet )
                 {
                     // Add element decendants
                     std::vector < CPlayer* > descendantList;
-                    pBroadcastElement->GetDescendantsByType ( descendantList, false, CElement::PLAYER );
+                    pBroadcastElement->GetDescendantsByType ( descendantList, CElement::PLAYER );
                     for ( std::vector < CPlayer* >::const_iterator iter = descendantList.begin() ; iter != descendantList.end() ; ++iter )
                     {
                         playerSendMap.insert ( *iter );
@@ -4115,6 +4112,8 @@ SString CGame::CalculateMinClientRequirement ( void )
         m_strPrevMinClientConnectRequirement = strNewMin;
         if ( !strNewMin.empty () )
             CLogger::LogPrintf ( SString ( "Server minclientversion is now %s\n", *strNewMin ) );
+        else
+            CLogger::LogPrintf ( "Server minclientversion is now cleared\n" );
     }
 
     // Do kick check as well

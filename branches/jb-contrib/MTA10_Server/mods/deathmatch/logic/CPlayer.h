@@ -156,9 +156,6 @@ public:
     void                                        SetPing                     ( uint uiPing )                 { m_uiPing = uiPing; }
     unsigned int                                GetPing                     ( void )                        { return m_uiPing; }
 
-    inline unsigned char                        GetLoginAttempts            ( void )                        { return m_ucLoginAttempts; };
-    inline void                                 SetLoginAttempts            ( unsigned char ucLoginAttempts )   { m_ucLoginAttempts = ucLoginAttempts; };
-
     inline time_t                               GetNickChangeTime           ( void )                        { return m_tNickChange; };
     inline void                                 SetNickChangeTime           ( time_t tNickChange )          { m_tNickChange = tNickChange; };
 
@@ -257,8 +254,8 @@ public:
     inline void                                 IncrementPuresync           ( void )                        { m_uiPuresyncPackets++; }
     inline unsigned int                         GetPuresyncCount            ( void ) const                  { return m_uiPuresyncPackets; }
 
-    void                                        NotifyReceivedSync          ( void )                        { m_lastReceivedSyncTime = CTickCount::Now (); }
-    bool                                        UhOhNetworkTrouble          ( void )                        { return ( CTickCount::Now () - m_lastReceivedSyncTime ).ToLongLong () > 5000; }
+    void                                        NotifyReceivedSync          ( void )                        { m_lastReceivedSyncTime = CTickCount::Now ( true ); }
+    bool                                        UhOhNetworkTrouble          ( void )                        { return ( CTickCount::Now ( true ) - m_lastReceivedSyncTime ).ToLongLong () > 5000; }
 
     const std::string&                          GetAnnounceValue            ( const std::string& strKey ) const;
     void                                        SetAnnounceValue            ( const std::string& strKey, const std::string& strValue );
@@ -282,6 +279,9 @@ public:
 
     CPlayerStatsPacket*                         GetPlayerStatsPacket        ( void )                        { return m_pPlayerStatsPacket; }
     void                                        SetPlayerStat               ( unsigned short usID, float fValue );
+
+    CVehicle *                                  GetJackingVehicle           ( void )                        { return m_pJackingVehicle; }
+    void                                        SetJackingVehicle           ( CVehicle * pVehicle );
 public:
 
     //
@@ -390,8 +390,6 @@ private:
 
     time_t                                      m_tNickChange;
 
-    unsigned char                               m_ucLoginAttempts;
-
     std::list < CVehicle* >                     m_SyncingVehicles;
     std::list < CPed* >                         m_SyncingPeds;
     std::list < CObject* >                      m_SyncingObjects;
@@ -463,6 +461,7 @@ private:
     SScreenShotInfo                             m_ScreenShotInfo;
 
     CPlayerStatsPacket*                         m_pPlayerStatsPacket;
+    CVehicle*                                   m_pJackingVehicle;
 };
 
 #endif

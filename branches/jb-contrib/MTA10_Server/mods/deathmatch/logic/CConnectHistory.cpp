@@ -35,6 +35,7 @@ bool CConnectHistory::AddConnect ( const string& strIP )
     return false;
 }
 
+
 // Check if IP is currently flooding
 bool CConnectHistory::IsFlooding ( const string& strIP )
 {
@@ -63,7 +64,7 @@ bool CConnectHistory::IsFlooding ( const string& strIP )
 CConnectHistoryItem& CConnectHistory::GetHistoryItem ( const string& strIP )
 {
     // Find existing
-    map < string, CConnectHistoryItem >::iterator iter = m_HistoryItemMap.find ( strIP );
+    HistoryItemMap::iterator iter = m_HistoryItemMap.find ( strIP );
 
     if ( iter == m_HistoryItemMap.end () )
     {
@@ -97,7 +98,7 @@ void CConnectHistory::RemoveExpired ( void )
 {
     long long llCurrentTime = GetModuleTickCount64 ();
 
-    if ( llCurrentTime - m_llTimeLastRemoveExpired < 1000 )
+    if ( llCurrentTime - m_llTimeLastRemoveExpired < 1000LL )
         return;
 
     m_llTimeLastRemoveExpired = llCurrentTime;
@@ -141,4 +142,13 @@ void CConnectHistory::RemoveExpired ( void )
         else
             ++mapIt;
     }
+}
+
+
+uint CConnectHistory::GetTotalFloodingCount ( void )
+{
+    // Delete the expired entries
+    RemoveExpired ();
+
+    return m_HistoryItemMap.size ();
 }

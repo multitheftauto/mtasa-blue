@@ -18,7 +18,6 @@
 CAccountManager::CAccountManager ( const char* szFileName, SString strBuffer ): CXMLConfig ( szFileName )
     , m_AccountProtect( 6, 30000, 60000 * 1 )     // Max of 6 attempts per 30 seconds, then 1 minute ignore
 {
-    m_bRemoveFromList = true;
     m_bAutoLogin = false;
     m_llLastTimeSaved = GetTickCount64_ ();
     m_bChangedSinceSaved = false;
@@ -308,7 +307,7 @@ bool CAccountManager::LoadXML ( CXMLNode* pParent )
                         }
                         else
                         {
-                            if ( strName == "Console" )
+                            if ( strName == CONSOLE_ACCOUNT_NAME )
                             {
                                 //Add Console to the SQL Database (You don't need to create an account since the server takes care of that
                                 m_pDatabaseManager->Execf ( m_hDbConnection, "INSERT INTO accounts (name, password) VALUES(?,?)", SQLITE_TEXT, "Console", SQLITE_TEXT, "" );
@@ -350,6 +349,8 @@ bool CAccountManager::Load( void )
     m_iAccounts = 0;
     bool bNeedsVacuum = false;
     CAccount* pAccount = NULL;
+    CElapsedTime activityTimer;
+    bool bOutputFeedback = false;
     for ( int i = 0 ; i < iResults ; i++ )
     {
         //Fill User ID, Name & Password (Required data)
@@ -402,11 +403,60 @@ bool CAccountManager::Load( void )
             //Create a new account with the specified information
             pAccount = new CAccount ( this, true, strName, strPassword, "", iUserID );
         }
-        pAccount->SetChanged ( bChanged );
+        if ( bChanged )
+            pAccount->SetChanged ( bChanged );
         m_iAccounts = Max ( m_iAccounts, iUserID );
+
+        // Feedback for the user
+        if ( activityTimer.Get() > 5000 )
+        {
+            activityTimer.Reset();
+            bOutputFeedback = true;
+            CLogger::LogPrintf ( "Reading accounts %d/%d\n", m_List.size(), iResults );
+        }
     }
+    if ( bOutputFeedback )
+        CLogger::LogPrintf ( "Reading accounts done.\n");
     if ( bNeedsVacuum )
         m_pDatabaseManager->Execf ( m_hDbConnection, "VACUUM" );
+
+    // Save any upgraded accounts
+    {
+        CElapsedTime activityTimer;
+        bool bOutputFeedback = false;
+        uint uiSaveCount = 0;
+        for ( CMappedAccountList::const_iterator iter = m_List.begin () ; iter != m_List.end () ; iter++ )
+        {
+            CAccount* pAccount = *iter;
+            if ( pAccount->IsRegistered () && pAccount->HasChanged() )
+            {
+                uiSaveCount++;
+                Save ( pAccount, false );
+                // Feedback for the user
+                if ( activityTimer.Get() > 5000 )
+                {
+                    activityTimer.Reset();
+                    bOutputFeedback = true;
+                    CLogger::LogPrintf ( "Saving upgraded accounts %d\n", uiSaveCount );
+                }
+            }
+        }
+
+        if ( uiSaveCount > 100 )
+        {
+            bOutputFeedback = true;
+            CLogger::LogPrintf ( "Finishing accounts upgrade...\n" );
+            for ( uint i = 0 ; i < 10 ; i++ )
+            {
+                Sleep( 10 );
+                m_pDatabaseManager->DoPulse ();
+            }
+        }
+
+        if ( bOutputFeedback )
+            CLogger::LogPrintf ( "Completed accounts upgrade.\n");
+    }
+
     return true;
 }
 
@@ -429,20 +479,31 @@ bool CAccountManager::LoadSetting ( CXMLNode* pNode )
 }
 
 
-void CAccountManager::Save ( CAccount* pAccount )
+void CAccountManager::Save ( CAccount* pAccount, bool bCheckForErrors )
 {
     SString strName = pAccount->GetName();
-    SString strPassword = pAccount->GetPassword();
+    SString strPassword = pAccount->GetPasswordHash();
     SString strIP = pAccount->GetIP();
     SString strSerial = pAccount->GetSerial();
 
     m_pDatabaseManager->Execf ( m_hDbConnection, "INSERT OR IGNORE INTO accounts (name, ip, serial, password) VALUES(?,?,?,?)", SQLITE_TEXT, strName.c_str (), SQLITE_TEXT, strIP.c_str (), SQLITE_TEXT, strSerial.c_str (), SQLITE_TEXT, strPassword.c_str () );
 
-    if ( strSerial != "" )
-        m_pDatabaseManager->QueryWithCallbackf ( m_hDbConnection, StaticDbCallback, this, "UPDATE accounts SET ip=?, serial=?, password=? WHERE name=?", SQLITE_TEXT, strIP.c_str (), SQLITE_TEXT, strSerial.c_str (), SQLITE_TEXT, strPassword.c_str (), SQLITE_TEXT, strName.c_str () );
+    if ( bCheckForErrors )
+    {
+        if ( strSerial != "" )
+            m_pDatabaseManager->QueryWithCallbackf ( m_hDbConnection, StaticDbCallback, this, "UPDATE accounts SET ip=?, serial=?, password=? WHERE name=?", SQLITE_TEXT, strIP.c_str (), SQLITE_TEXT, strSerial.c_str (), SQLITE_TEXT, strPassword.c_str (), SQLITE_TEXT, strName.c_str () );
+        else
+            //If we don't have a serial then IP and password will suffice
+            m_pDatabaseManager->QueryWithCallbackf ( m_hDbConnection, StaticDbCallback, this, "UPDATE accounts SET ip=?, password=? WHERE name=?", SQLITE_TEXT, strIP.c_str (), SQLITE_TEXT, strPassword.c_str (), SQLITE_TEXT, strName.c_str () );
+    }
     else
-        //If we don't have a serial then IP and password will suffice
-        m_pDatabaseManager->QueryWithCallbackf ( m_hDbConnection, StaticDbCallback, this, "UPDATE accounts SET ip=?, password=? WHERE name=?", SQLITE_TEXT, strIP.c_str (), SQLITE_TEXT, strPassword.c_str (), SQLITE_TEXT, strName.c_str () );
+    {
+        if ( strSerial != "" )
+            m_pDatabaseManager->Execf ( m_hDbConnection, "UPDATE accounts SET ip=?, serial=?, password=? WHERE name=?", SQLITE_TEXT, strIP.c_str (), SQLITE_TEXT, strSerial.c_str (), SQLITE_TEXT, strPassword.c_str (), SQLITE_TEXT, strName.c_str () );
+        else
+            //If we don't have a serial then IP and password will suffice
+            m_pDatabaseManager->Execf ( m_hDbConnection, "UPDATE accounts SET ip=?, password=? WHERE name=?", SQLITE_TEXT, strIP.c_str (), SQLITE_TEXT, strPassword.c_str (), SQLITE_TEXT, strName.c_str () );
+    }
 
     //Set changed since saved to false
     pAccount->SetChanged( false );
@@ -475,7 +536,7 @@ bool CAccountManager::IntegrityCheck ()
 {
     CRegistryResult result;
     //Select all our required information from the accounts database
-    bool bOk = m_pDatabaseManager->QueryWithResultf ( m_hDbConnection, &result, "PRAGMA integrity_check(3)" );
+    bool bOk = m_pDatabaseManager->QueryWithResultf ( m_hDbConnection, &result, "PRAGMA integrity_check" );
 
     // Get result as a string
     SString strResult;
@@ -552,10 +613,7 @@ CAccount* CAccountManager::GetAccountFromScriptID ( uint uiScriptID )
 
 void CAccountManager::RemoveFromList ( CAccount* pAccount )
 {
-    if ( m_bRemoveFromList )
-    {
-        m_List.remove ( pAccount );
-    }
+    m_List.remove ( pAccount );
 }
 
 void CAccountManager::ChangingName ( CAccount* pAccount, const SString& strOldName, const SString& strNewName )
@@ -570,19 +628,11 @@ void CAccountManager::MarkAsChanged ( CAccount* pAccount )
         m_bChangedSinceSaved = true;
         pAccount->SetChanged ( true );
     }
-
 }
 
 void CAccountManager::RemoveAll ( void )
 {
-    m_bRemoveFromList = false;
-    CMappedAccountList::const_iterator iter = m_List.begin ();
-    for ( ; iter != m_List.end () ; iter++ )
-    {
-        delete *iter;
-    }
-    m_List.clear ();
-    m_bRemoveFromList = true;
+    DeletePointersAndClearList ( m_List );
 }
 
 bool CAccountManager::LogIn ( CClient* pClient, CClient* pEchoClient, const char* szNick, const char* szPassword )
@@ -708,6 +758,10 @@ bool CAccountManager::LogIn ( CClient* pClient, CClient* pEchoClient, CAccount* 
             pEchoClient->SendEcho ( "login: You successfully logged in" );
     }
 
+    // Update who was info
+    if ( pClient->GetClientType () == CClient::CLIENT_PLAYER )
+        g_pGame->GetConsole ()->GetWhoWas ()->OnPlayerLogin ( static_cast < CPlayer* > ( pClient ) );
+
     // Delete the old account if it was a guest account
     if ( !pCurrentAccount->IsRegistered () )
         delete pCurrentAccount;
@@ -735,7 +789,7 @@ bool CAccountManager::LogOut ( CClient* pClient, CClient* pEchoClient )
     CAccount* pCurrentAccount = pClient->GetAccount ();
     pCurrentAccount->SetClient ( NULL );
 
-    CAccount* pAccount = new CAccount ( g_pGame->GetAccountManager (), false, "guest" );
+    CAccount* pAccount = new CAccount ( g_pGame->GetAccountManager (), false, GUEST_ACCOUNT_NAME );
     pClient->SetAccount ( pAccount );
 
     // Call the onClientLogout event

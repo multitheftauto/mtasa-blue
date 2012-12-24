@@ -91,7 +91,22 @@ struct SLastSyncedVehData
     bool                bDerailed;
     bool                bIsInWater;
 };
-
+struct SVehicleComponentData
+{
+    SVehicleComponentData ()
+    {
+        m_bPositionChanged = false;
+        m_bRotationChanged = false;
+        m_bVisible = true;
+    }
+    CVector m_vecComponentPosition;
+    CVector m_vecComponentRotation;
+    CVector m_vecOriginalComponentPosition;
+    CVector m_vecOriginalComponentRotation;
+    bool m_bPositionChanged;
+    bool m_bRotationChanged;
+    bool m_bVisible;
+};
 class CClientProjectile;
 
 class CClientVehicle : public CClientStreamElement
@@ -175,7 +190,7 @@ public:
     void                        SetTurretRotation       ( float fHorizontal, float fVertical );
 
     inline unsigned short       GetModel                ( void )                            { return m_usModel; };
-    void                        SetModelBlocking        ( unsigned short usModel, bool bLoadImmediately = false );
+    void                        SetModelBlocking        ( unsigned short usModel, unsigned char ucVariant, unsigned char ucVariant2 );
 
     inline unsigned char        GetVariant              ( void )                        { return m_ucVariation; };
     inline unsigned char        GetVariant2             ( void )                        { return m_ucVariation2; };
@@ -348,18 +363,18 @@ public:
 
     // Time dependent interpolation
     inline void                 GetTargetPosition       ( CVector& vecPosition )            { vecPosition = m_interp.pos.vecTarget; }
-    void                        SetTargetPosition       ( CVector& vecPosition, unsigned long ulDelay, bool bValidVelocityZ = false, float fVelocityZ = 0.f );
+    void                        SetTargetPosition       ( const CVector& vecPosition, unsigned long ulDelay, bool bValidVelocityZ = false, float fVelocityZ = 0.f );
     void                        RemoveTargetPosition    ( void );
     inline bool                 HasTargetPosition       ( void )                            { return ( m_interp.pos.ulFinishTime != 0 ); }
 
     inline void                 GetTargetRotation       ( CVector& vecRotation )            { vecRotation = m_interp.rot.vecTarget; }
-    void                        SetTargetRotation       ( CVector& vecRotation, unsigned long ulDelay );
+    void                        SetTargetRotation       ( const CVector& vecRotation, unsigned long ulDelay );
     void                        RemoveTargetRotation    ( void );
     inline bool                 HasTargetRotation       ( void )                            { return ( m_interp.rot.ulFinishTime != 0 ); }
 
     void                        UpdateTargetPosition    ( void );
     void                        UpdateTargetRotation    ( void );
-
+    void                        UpdateUnderFloorFix     ( const CVector& vecTargetPosition, bool bValidVelocityZ, float fVelocityZ );
 
     inline unsigned long        GetIllegalTowBreakTime  ( void )                            { return m_ulIllegalTowBreakTime; }
     inline void                 SetIllegalTowBreakTime  ( unsigned long ulTime )            { m_ulIllegalTowBreakTime = ulTime; }
@@ -417,6 +432,19 @@ public:
     void                        SetVehicleFlags             ( bool bEnable360, bool bEnableRandomiser, bool bEnableLOSCheck, bool bEnableSilent );
     void                        RemoveVehicleSirens         ( void );
 
+    bool                        ResetComponentPosition  ( SString vehicleComponent );
+    bool                        SetComponentPosition    ( SString vehicleComponent, CVector vecPosition );
+    bool                        GetComponentPosition    ( SString vehicleComponent, CVector &vecPosition );
+    
+    bool                        ResetComponentRotation  ( SString vehicleComponent );
+    bool                        SetComponentRotation    ( SString vehicleComponent, CVector vecRotation );
+    bool                        GetComponentRotation    ( SString vehicleComponent, CVector &vecRotation );
+
+    bool                        SetComponentVisible     ( SString vehicleComponent, bool bVisible );
+    bool                        GetComponentVisible     ( SString vehicleComponent, bool &bVisible );
+    std::map < SString, SVehicleComponentData > ::iterator ComponentsBegin ( void )                               { return m_ComponentData.begin (); }
+    std::map < SString, SVehicleComponentData > ::iterator ComponentsEnd   ( void )                               { return m_ComponentData.end (); }
+
 protected:
     void                        StreamIn                ( bool bInstantly );
     void                        StreamOut               ( void );
@@ -429,6 +457,8 @@ protected:
 
     void                        StreamedInPulse         ( void );
     void                        Dump                    ( FILE* pFile, bool bDumpDetails, unsigned int uiIndex );
+    eVehicleComponent           ConvertStringToEnum     ( SString strInput );
+    SString                     ConvertEnumToString     ( eVehicleComponent strInput );
 
     class CClientObjectManager* m_pObjectManager;
     CClientVehicleManager*      m_pVehicleManager;
@@ -571,6 +601,7 @@ protected:
     unsigned char               m_ucVariation2;
 
     CTickCount                  m_LastPushedTime;
+    uint                        m_uiForceLocalZCounter;
 
 public:
 #ifdef MTA_DEBUG
@@ -580,7 +611,7 @@ public:
 #endif
     SLastSyncedVehData*         m_LastSyncedData;
     SSirenInfo                  m_tSirenBeaconInfo;
-
+    std::map<SString, SVehicleComponentData>  m_ComponentData;
     bool                        m_bInWater;
 };
 

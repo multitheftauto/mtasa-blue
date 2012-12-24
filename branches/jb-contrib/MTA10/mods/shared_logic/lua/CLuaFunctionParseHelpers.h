@@ -32,6 +32,9 @@ DECLARE_ENUM( ETextureAddress );
 DECLARE_ENUM( EPixelsFormatType );
 DECLARE_ENUM( EBlendModeType )
 DECLARE_ENUM( EEntityTypeMask );
+DECLARE_ENUM( eWeaponState );
+DECLARE_ENUM( eWeaponFlags );
+DECLARE_ENUM( eVehicleComponent );
 
 enum eDXHorizontalAlign
 {
@@ -49,23 +52,6 @@ enum eDXVerticalAlign
 };
 DECLARE_ENUM( eDXVerticalAlign );
 
-enum eHudComponent
-{
-    HUD_AMMO,
-    HUD_WEAPON,
-    HUD_HEALTH,
-    HUD_BREATH,
-    HUD_ARMOUR,
-    HUD_MONEY,
-    HUD_VEHICLE_NAME,
-    HUD_AREA_NAME,
-    HUD_RADAR,
-    HUD_CLOCK,
-    HUD_RADIO,
-    HUD_WANTED,
-    HUD_CROSSHAIR,
-    HUD_ALL,
-};
 DECLARE_ENUM( eHudComponent );
 
 
@@ -115,6 +101,7 @@ inline SString GetClassTypeName ( CClientDxFont* )          { return "dx-font"; 
 inline SString GetClassTypeName ( CClientGuiFont* )         { return "gui-font"; }
 inline SString GetClassTypeName ( CClientMaterial* )        { return "material"; }
 inline SString GetClassTypeName ( CClientTexture* )         { return "texture"; }
+inline SString GetClassTypeName ( CClientWeapon* )          { return "weapon"; }
 
 inline SString GetClassTypeName ( CGUIButton* )      { return "gui-button"; }
 inline SString GetClassTypeName ( CGUICheckBox* )    { return "gui-checkbox"; }
@@ -243,4 +230,4 @@ bool MixedReadDxFontString ( CScriptArgReader& argStream, SString& strFontName, 
 bool MixedReadGuiFontString ( CScriptArgReader& argStream, SString& strFontName, const char* szDefaultFontName, CClientGuiFont*& pFontElement );
 bool MixedReadMaterialString ( CScriptArgReader& argStream, CClientMaterial*& pMaterialElement );
 bool ReadMatrix ( lua_State* luaVM, uint uiArgIndex, CMatrix& outMatrix );
-void MinClientCheck ( CScriptArgReader& argStream, const char* szVersionReq, const char* szReason );
+void MinClientReqCheck ( CScriptArgReader& argStream, const char* szVersionReq, const char* szReason );

@@ -106,7 +106,7 @@ unsigned char CSettingsSA::GetRadioVolume ( void )
 void CSettingsSA::SetRadioVolume ( unsigned char ucVolume )
 {
     m_pInterface->ucRadioVolume = ucVolume;
-    pGame->GetAudio ()->SetMusicMasterVolume ( ucVolume );
+    pGame->GetAudioEngine ()->SetMusicMasterVolume ( ucVolume );
 }
 
 unsigned char CSettingsSA::GetSFXVolume ( void )
@@ -117,7 +117,7 @@ unsigned char CSettingsSA::GetSFXVolume ( void )
 void CSettingsSA::SetSFXVolume ( unsigned char ucVolume )
 {
     m_pInterface->ucSfxVolume = ucVolume;
-    pGame->GetAudio ()->SetEffectsMasterVolume ( ucVolume );
+    pGame->GetAudioEngine ()->SetEffectsMasterVolume ( ucVolume );
 }
 
 unsigned int CSettingsSA::GetUsertrackMode ( void )

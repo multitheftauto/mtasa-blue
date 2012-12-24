@@ -796,10 +796,160 @@ void _declspec(naked) HOOK_CrashFix_Misc25 ()
         jmp     RETURN_CrashFix_Misc25
 
     fix:
+        CRASH_AVERTED( 25 )
         // Do special thing
         pop     esi
         pop     ecx
         retn
+    }
+}
+
+
+////////////////////////////////////////////////////////////////////////
+// Handle CShotInfo::Update having invalid item
+#define HOOKPOS_CrashFix_Misc26                             0x739FA0
+#define HOOKSIZE_CrashFix_Misc26                            6
+DWORD RETURN_CrashFix_Misc26 =                              0x739FA6;
+void _declspec(naked) HOOK_CrashFix_Misc26 ()
+{
+#if TEST_CRASH_FIXES
+    SIMULATE_ERROR_BEGIN( 10 )
+        _asm
+        {
+            mov     ebx, 130h
+        }
+    SIMULATE_ERROR_END
+#endif
+
+    _asm
+    {
+        // Check for incorrect pointer
+        cmp     ebx, 130h
+        jz      fix
+
+        // Continue standard path
+        mov     edi,dword ptr [ebx+ebp*4] 
+        dec     ebp  
+        test    edi,edi 
+        jmp     RETURN_CrashFix_Misc26
+
+    fix:
+        CRASH_AVERTED( 26 )
+        // Do special thing
+        mov     edi, 0 
+        dec     ebp  
+        test    edi,edi 
+        jmp     RETURN_CrashFix_Misc26
+    }
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+// CClumpModelInfo::GetFrameFromId
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+RwFrame* OnMY_CClumpModelInfo_GetFrameFromId_Post ( RwFrame* pFrameResult, DWORD _ebx, DWORD _esi, DWORD _edi, DWORD calledFrom, RpClump* pClump, int id )
+{
+    if ( pFrameResult )
+        return pFrameResult;
+
+    // Don't check frame if call can legitimately return NULL
+    if ( calledFrom == 0x6D308F       // CVehicle::SetWindowOpenFlag
+        || calledFrom == 0x6D30BF     // CVehicle::ClearWindowOpenFlag
+        || calledFrom == 0x4C7DDE     // CVehicleModelInfo::GetOriginalCompPosition
+        || calledFrom == 0x4C96BD )   // CVehicleModelInfo::CreateInstance
+        return NULL;
+
+    // Ignore external calls
+    if ( calledFrom < 0x401000 || calledFrom > 0x801000 )
+        return NULL;
+
+    // Now we have a NULL frame which will cause a crash
+    // (Probably due to a custom vehicle with missing frames)
+
+    // See if we can get the model id for reporting
+    int iModelId = 0;
+    DWORD pVehicle = NULL;
+
+    if ( calledFrom == 0x6D3847 )       // CVehicle::AddReplacementUpgrade
+        pVehicle = _ebx;
+    else
+    if ( calledFrom == 0x6DFA61         // CVehicle::AddUpgrade
+        || calledFrom == 0x6D3A62 )     // CVehicle::GetReplacementUpgrade
+        pVehicle = _edi;
+    else
+    if ( calledFrom == 0x06AC740        // CAutomobile::PreRender (Forklift)
+        || calledFrom == 0x6D39F3       // CVehicle::RemoveReplacementUpgrade
+        || calledFrom == 0x6D3A32 )     // CVehicle::RemoveReplacementUpgrade2
+        pVehicle = _esi;
+
+    if ( pVehicle > 0x1000 )
+        iModelId = ((CVehicleSAInterface*)pVehicle)->m_nModelIndex;
+
+    // Need a valid frame to replace the missing one - Find nearest other id     
+    for ( uint i = 2 ; i < 40 ; i++ )
+    {
+        RwFrame* pNewFrameResult = NULL;
+        uint uiNewId = id + ( i / 2 ) * ( ( i & 1 ) ? -1 : 1 );
+        DWORD dwFunc = 0x4C53C0;    // CClumpModelInfo::GetFrameFromId
+        _asm
+        {
+            push    uiNewId
+            push    pClump
+            call    dwFunc
+            add     esp, 8
+            mov     pNewFrameResult,eax
+        }
+
+        if ( pNewFrameResult )
+        {
+            SString strMsg ( "No frame for vehicle:%d  frameId:%d  (replaced with:%d  calledfrom:%08x)", iModelId, id, uiNewId, calledFrom );
+            AddReportLog ( 5412, SString ( "GetFrameFromId - %s", *strMsg ) );
+            LogEvent ( 5412, "Model frame warning", "GetFrameFromId", strMsg );
+            return pNewFrameResult;
+        }
+    }
+
+    // Couldn't find a replacement frame id
+    SString strMsg ( "No frame for vehicle:%d  frameId:%d  (calledfrom:%08x)", iModelId, id, calledFrom );
+    LogEvent ( 5413, "Model frame error", "GetFrameFromId", strMsg );
+
+    return NULL;
+}
+
+// Hook info
+#define HOOKPOS_CClumpModelInfo_GetFrameFromId                      0x4C53C0
+#define HOOKSIZE_CClumpModelInfo_GetFrameFromId                     7
+DWORD RETURN_CClumpModelInfo_GetFrameFromId =                       0x4C53C7;
+void _declspec(naked) HOOK_CClumpModelInfo_GetFrameFromId ()
+{
+    _asm
+    {
+        push    [esp+4*2]
+        push    [esp+4*2]
+        call    inner
+        add     esp, 4*2
+
+        pushad
+        push    [esp+32+4*2]
+        push    [esp+32+4*2]
+        push    [esp+32+4*2]
+        push    edi
+        push    esi
+        push    ebx
+        push    eax
+        call    OnMY_CClumpModelInfo_GetFrameFromId_Post
+        mov     [esp+0],eax
+        add     esp, 4*7
+        popad
+        mov     eax,[esp-32-4*7]
+        retn
+
+inner:
+        sub     esp,8 
+        mov     eax,dword ptr [esp+10h] 
+        jmp     RETURN_CClumpModelInfo_GetFrameFromId
     }
 }
 
@@ -829,11 +979,13 @@ void CMultiplayerSA::InitHooks_CrashFixHacks ( void )
     EZHookInstall ( CrashFix_Misc16 );
     //EZHookInstall ( CrashFix_Misc17 );
     EZHookInstall ( CrashFix_Misc18 );
-    EZHookInstall ( CrashFix_Misc19 );
+    //EZHookInstall ( CrashFix_Misc19 );
     EZHookInstall ( CrashFix_Misc20 );
     EZHookInstall ( CrashFix_Misc21 );
     EZHookInstall ( CrashFix_Misc22 );
     EZHookInstall ( CrashFix_Misc23 );
     EZHookInstall ( CrashFix_Misc24 );
     EZHookInstall ( CrashFix_Misc25 );
+    EZHookInstall ( CrashFix_Misc26 );
+    EZHookInstall ( CClumpModelInfo_GetFrameFromId );
 }

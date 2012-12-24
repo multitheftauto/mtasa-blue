@@ -592,7 +592,7 @@ void CClientPed::SetRotationDegrees ( const CVector& vecRotation )
     // HACK: set again the z rotation to work on ground
     SetCurrentRotation ( vecTemp.fZ );
     if ( !IS_PLAYER ( this ) )
-        SetCameraRotation ( vecTemp.fZ );
+        SetCameraRotation ( vecTemp.fZ );   // This is incorrect and kept for backward compatibility
 }
 
 
@@ -601,8 +601,63 @@ void CClientPed::SetRotationRadians ( const CVector& vecRotation )
     // Grab the matrix, apply the rotation to it and set it again
     CMatrix matTemp;
     GetMatrix ( matTemp );
-    g_pMultiplayer->ConvertEulerAnglesToMatrix ( matTemp, vecRotation.fX, vecRotation.fY, vecRotation.fZ );
+    g_pMultiplayer->ConvertEulerAnglesToMatrix ( matTemp, vecRotation.fX, vecRotation.fY, vecRotation.fZ );   // This is incorrect and kept for backward compatibility
     SetMatrix ( matTemp );
+}
+
+
+//
+//
+// New rotation functions which fixes inv rotate when in air
+// Also fixes camera rotation for peds
+//
+//
+void CClientPed::GetRotationDegreesNew ( CVector& vecRotation ) const
+{
+    // Grab our rotations in radians and convert it to degrees
+    GetRotationRadiansNew ( vecRotation );
+    ConvertRadiansToDegreesNoWrap ( vecRotation );
+}
+
+
+void CClientPed::GetRotationRadiansNew ( CVector& vecRotation ) const
+{
+    CMatrix matTemp;
+    GetMatrix ( matTemp );
+    g_pMultiplayer->ConvertMatrixToEulerAngles ( matTemp, vecRotation.fX, vecRotation.fY, vecRotation.fZ );
+    vecRotation.fZ = -vecRotation.fZ;
+}
+
+
+void CClientPed::SetRotationDegreesNew ( const CVector& vecRotation )
+{
+    // Convert from degrees to radians and set the rotation
+    CVector vecTemp = vecRotation;
+    ConvertDegreesToRadiansNoWrap ( vecTemp );
+    SetRotationRadiansNew ( vecTemp );
+}
+
+
+void CClientPed::SetRotationRadiansNew ( const CVector& vecRotation )
+{
+    // Grab the matrix, apply the rotation to it and set it again
+
+    // For in air
+    CMatrix matTemp;
+    GetMatrix ( matTemp );
+    g_pMultiplayer->ConvertEulerAnglesToMatrix ( matTemp, vecRotation.fX, vecRotation.fY, -vecRotation.fZ );
+    SetMatrix ( matTemp );
+
+    // For on ground
+    SetCurrentRotation ( vecRotation.fZ );
+    if ( !IS_PLAYER ( this ) )
+        SetCameraRotation ( -vecRotation.fZ );
+}
+
+
+void CClientPed::SetCurrentRotationNew ( float fRotation )
+{
+    SetRotationRadiansNew ( CVector ( 0, 0, fRotation ) );
 }
 
 
@@ -1605,24 +1660,6 @@ void CClientPed::SetArmor ( float fArmor )
     m_fArmor = fArmor;
 }
 
-float CClientPed::GetOxygenLevel ( void )
-{
-    if ( m_pPlayerPed )
-    {
-        return m_pPlayerPed->GetOxygenLevel (); 
-    }
-    return m_fOxygenLevel;
-}
-
-void CClientPed::SetOxygenLevel ( float fOxygenLevel )
-{
-    if ( m_pPlayerPed )
-    {
-        m_pPlayerPed->SetOxygenLevel ( fOxygenLevel );
-    }
-    m_fOxygenLevel = fOxygenLevel;
-}
-
 void CClientPed::LockHealth ( float fHealth )
 {
     m_bHealthLocked = true;
@@ -1634,6 +1671,25 @@ void CClientPed::LockArmor ( float fArmor )
 {
     m_bArmorLocked = true;
     m_fArmor = fArmor;
+}
+
+
+float CClientPed::GetOxygenLevel ( void )
+{
+    if ( m_pPlayerPed )
+    {
+        return m_pPlayerPed->GetOxygenLevel ( );
+    }
+    return -1.0f;
+}
+
+
+void CClientPed::SetOxygenLevel ( float fOxygen )
+{
+    if ( m_pPlayerPed )
+    {
+        m_pPlayerPed->SetOxygenLevel ( fOxygen );
+    }
 }
 
 
@@ -2527,7 +2583,10 @@ void CClientPed::StreamedInPulse ( void )
                 if ( m_ulLastTimeBeganCrouch >= ulNow - 400.0f*fSpeedRatio )
                 {
                     //Disable double crouching (another anim cut)
-                    Current.ShockButtonL = 0;
+                    if ( g_pClientGame->IsUsingAlternatePulseOrder() )
+                        Current.ShockButtonL = 255;     // Do this differently if we have changed the pulse order
+                    else
+                        Current.ShockButtonL = 0;
                 }
             }
         }
@@ -2710,7 +2769,9 @@ void CClientPed::StreamedInPulse ( void )
         // Are we frozen and not in a vehicle
         if ( IsFrozen () && !pVehicle )
         {
+            CVector vecTemp;
             m_pPlayerPed->SetMatrix ( &m_matFrozen );
+            m_pPlayerPed->SetMoveSpeed ( &vecTemp );
         }
 
         // Is our health locked?
@@ -3517,7 +3578,12 @@ void CClientPed::_ChangeModel ( void )
             {
                 // When the local player changes to another (non CJ) model, the geometry gets an extra ref from somewhere, causing a memory leak.
                 // So decrement the extra ref here
+            #ifdef NO_CRASH_FIX_TEST
                 m_pPlayerPed->RemoveGeometryRef ();
+            #endif
+                // As we will have problem removing the geometry later, we might as well keep the model cached until exit
+                g_pCore->AddModelToPersistentCache ( (ushort)m_ulModel );
+
             }
 
 
@@ -3823,7 +3889,7 @@ void CClientPed::StartRadio ( void )
     {
         // Turn it on if we're not on channel none
         if ( m_ucRadioChannel != 0 )
-            g_pGame->GetAudio ()->StartRadio ( m_ucRadioChannel );
+            g_pGame->GetAudioEngine ()->StartRadio ( m_ucRadioChannel );
 
         m_bRadioOn = true;
     }
@@ -3836,7 +3902,7 @@ void CClientPed::StopRadio ( void )
     if ( !m_bDontChangeRadio )
     {
         // Stop the radio and mark it as off
-        g_pGame->GetAudio ()->StopRadio ();
+        g_pGame->GetAudioEngine ()->StopRadio ();
         m_bRadioOn = false;
     }
 }
@@ -4262,9 +4328,9 @@ bool CClientPed::SetCurrentRadioChannel ( unsigned char ucChannel )
 
         m_ucRadioChannel = ucChannel;
 
-        g_pGame->GetAudio ()->StartRadio ( m_ucRadioChannel );
+        g_pGame->GetAudioEngine ()->StartRadio ( m_ucRadioChannel );
         if ( m_ucRadioChannel == 0 )
-            g_pGame->GetAudio ()->StopRadio ();
+            g_pGame->GetAudioEngine ()->StopRadio ();
 
         return true;
     }

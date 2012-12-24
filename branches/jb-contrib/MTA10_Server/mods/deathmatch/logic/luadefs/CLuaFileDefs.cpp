@@ -32,6 +32,7 @@ void CLuaFileDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "fileClose", CLuaFileDefs::fileClose );
     CLuaCFunctions::AddFunction ( "fileDelete", CLuaFileDefs::fileDelete );
     CLuaCFunctions::AddFunction ( "fileRename", CLuaFileDefs::fileRename );
+    CLuaCFunctions::AddFunction ( "fileCopy", CLuaFileDefs::fileCopy );
 }
 
 
@@ -644,3 +645,101 @@ int CLuaFileDefs::fileRename ( lua_State* luaVM )
     lua_pushboolean ( luaVM, false );
     return 1;
 }
+
+
+int CLuaFileDefs::fileCopy ( lua_State* luaVM )
+{
+//  bool fileCopy ( string filePath, string newFilePath, bool overwrite = false )
+    SString filePath; SString newFilePath; bool bOverwrite;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadString ( filePath );
+    argStream.ReadString ( newFilePath );
+    argStream.ReadBool ( bOverwrite, false );
+
+    if ( !argStream.HasErrors () )
+    {
+        // Grab our lua VM
+        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+        if ( pLuaMain )
+        {
+            std::string strCurAbsPath;
+            std::string strNewAbsPath;
+            std::string strCurMetaPath;
+            std::string strNewMetaPath;
+
+            // We have a resource arguments?
+            CResource* pThisResource = pLuaMain->GetResource ();
+            CResource* pCurResource = pThisResource;
+            CResource* pNewResource = pThisResource;
+            if ( CResourceManager::ParseResourcePathInput ( filePath, pCurResource, &strCurAbsPath, &strCurMetaPath ) &&
+                 CResourceManager::ParseResourcePathInput ( newFilePath, pNewResource, &strNewAbsPath, &strNewMetaPath ) )
+            {
+                // Do we have permissions?
+                if ( ( pCurResource == pThisResource && 
+                       pNewResource == pThisResource ) ||
+                     m_pACLManager->CanObjectUseRight ( pThisResource->GetName ().c_str (),
+                                                        CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE,
+                                                        "ModifyOtherObjects",
+                                                        CAccessControlListRight::RIGHT_TYPE_GENERAL,
+                                                        false ) )
+                {
+                    std::string strCurFilePath;     // Same as strCurAbsPath
+                    std::string strNewFilePath;     // Same as strNewAbsPath
+
+                     // Does source file exist?
+                    if ( pCurResource->GetFilePath ( strCurMetaPath.c_str(), strCurFilePath ) )
+                    {
+                        // Does destination file exist?
+                        if ( !bOverwrite && pNewResource->GetFilePath ( strNewMetaPath.c_str(), strNewFilePath ) )
+                        {
+                            argStream.SetCustomError ( SString ( "Destination file already exists (%s)", *newFilePath ), "File error" );
+                        }
+                        else
+                        {
+                            // Make sure the destination folder exists so we can copy the file
+                            MakeSureDirExists ( strNewAbsPath );
+
+                            if ( FileCopy ( strCurAbsPath, strNewAbsPath ) )
+                            {
+                                // If file copied return success
+                                lua_pushboolean ( luaVM, true );
+                                return 1;
+                            }
+                            else
+                            {
+                                argStream.SetCustomError ( SString ( "Unable to copy %s to %s", *filePath, *newFilePath ), "File error" );
+                            }
+                        }
+                    }
+                    else
+                    {
+                        argStream.SetCustomError ( SString ( "Source file doesn't exist (%s)", *filePath ), "File error" );
+                    }
+                }
+                else
+                {
+                    // Make permissions error message
+                    SString strWho;
+                    if ( pThisResource != pCurResource )
+                        strWho += pCurResource->GetName ();
+                    if ( pThisResource != pNewResource )
+                    {
+                        if ( !strWho.empty () )
+                            strWho += " and ";
+                        strWho += pNewResource->GetName ();
+                    }
+                    argStream.SetCustomError ( SString ( "ModifyOtherObjects in ACL denied resource %s to access %s", pThisResource->GetName ().c_str (), *strWho ), "ACL issue" );
+                }
+            }
+        }
+    }
+
+    if ( argStream.HasErrors () )
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    // Failed
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+

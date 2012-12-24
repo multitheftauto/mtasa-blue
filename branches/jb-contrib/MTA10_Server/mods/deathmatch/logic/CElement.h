@@ -36,7 +36,6 @@
 #define IS_FILE(element)     ((element)->GetType()==CElement::SCRIPTFILE)
 #define IS_MARKER(element)   ((element)->GetType()==CElement::MARKER)
 #define IS_OBJECT(element)   ((element)->GetType()==CElement::OBJECT)
-#define IS_PATHNODE(element) ((element)->GetType()==CElement::PATH_NODE)
 #define IS_PERPLAYER_ENTITY(element) ((element)->IsPerPlayerEntity())
 #define IS_PICKUP(element)   ((element)->GetType()==CElement::PICKUP)
 #define IS_PED(element)      ((element)->GetType()==CElement::PLAYER||(element)->GetType()==CElement::PED)
@@ -47,8 +46,8 @@
 #define IS_TEAM(element)     ((element)->GetType()==CElement::TEAM)
 #define IS_WATER(element)    ((element)->GetType()==CElement::WATER)
 
-typedef CFastList < class CElement > CChildListType;
-typedef CFastList < class CElement > CElementListType;
+typedef CFastList < CElement* > CChildListType;
+typedef CFastList < CElement* > CElementListType;
 
 class CElement
 {
@@ -58,7 +57,7 @@ class CElement
     friend class CPlayerCamera;
 
 public:
-    enum
+    enum EElementType
     {
         DUMMY,
         PLAYER,
@@ -71,14 +70,16 @@ public:
         SPAWNPOINT_DEPRECATED,
         REMOTECLIENT_DEPRECATED,
         CONSOLE,
-        PATH_NODE,
-        WORLD_MESH,
+        PATH_NODE_UNUSED,
+        WORLD_MESH_UNUSED,
         TEAM,
         PED,
         COLSHAPE,
         SCRIPTFILE,
         WATER,
         DATABASE_CONNECTION,
+        ROOT,
+        WEAPON,
         UNKNOWN,
     };
 
@@ -93,7 +94,6 @@ public:
     inline ElementID                            GetID                       ( void )                        { return m_ID; };
 
     virtual const CVector&                      GetPosition                 ( void );
-    virtual const CVector&                      GetLastPosition             ( void )                        { return m_vecLastPosition; };
     virtual void                                SetPosition                 ( const CVector& vecPosition );
 
     virtual void                                GetRotation                 ( CVector & vecRotation )       { vecRotation = CVector (); }
@@ -108,9 +108,9 @@ public:
     bool                                        IsMyChild                   ( CElement* pElement, bool bRecursive );
     bool                                        IsMyParent                  ( CElement* pElement, bool bRecursive );
     void                                        ClearChildren               ( void );
-    void                                        GetDescendants              ( std::vector < CElement* >& outResult, bool bIncludeThis  );
-    void                                        GetDescendantsByType        ( std::vector < CElement* >& outResult, bool bIncludeThis, int type );
-    template < class T > void                   GetDescendantsByType        ( std::vector < T >& outResult, bool bIncludeThis, int type ) { GetDescendantsByType ( ( std::vector < CElement* >& ) outResult, bIncludeThis, type ); }
+    void                                        GetDescendantsByType        ( std::vector < CElement* >& outResult, EElementType elementType );
+    void                                        GetDescendantsByTypeSlow    ( std::vector < CElement* >& outResult, uint uiTypeHash );
+    template < class T > void                   GetDescendantsByType        ( std::vector < T >& outResult, EElementType elementType ) { GetDescendantsByType ( ( std::vector < CElement* >& ) outResult, elementType ); }
 
     inline CMapEventManager*                    GetEventManager             ( void )                        { return m_pEventManager; };
     inline CElement*                            GetParentEntity             ( void )                        { return m_pParent; };
@@ -148,7 +148,8 @@ public:
     CChildListType ::const_reverse_iterator     IterReverseBegin            ( void )                        { return m_Children.rbegin (); };
     CChildListType ::const_reverse_iterator     IterReverseEnd              ( void )                        { return m_Children.rend (); };
 
-    inline int                                  GetType                     ( void )                        { return m_iType; };
+    static uint                                 GetTypeHashFromString       ( const SString& strTypeName );
+    EElementType                                GetType                     ( void )                        { return m_iType; };
     virtual bool                                IsEntity                    ( void )                        { return false; };
     inline unsigned int                         GetTypeHash                 ( void )                        { return m_uiTypeHash; };
     inline const std::string&                   GetTypeName                 ( void )                        { return m_strTypeName; };
@@ -165,10 +166,8 @@ public:
     virtual void                                UpdatePerPlayer             ( void ) {};
     void                                        UpdatePerPlayerEntities     ( void );
 
-    static unsigned int                         GetTypeID                   ( const char * szTypeName );
-
     void                                        AddCollision                ( class CColShape* pShape )     { m_Collisions.push_back ( pShape ); }
-    void                                        RemoveCollision             ( class CColShape* pShape )     { if ( !m_Collisions.empty() ) m_Collisions.remove ( pShape ); }
+    void                                        RemoveCollision             ( class CColShape* pShape )     { m_Collisions.remove ( pShape ); }
     bool                                        CollisionExists             ( class CColShape* pShape );
     void                                        RemoveAllCollisions         ( bool bNotify = false );
     std::list < class CColShape* > ::iterator   CollisionsBegin             ( void )                        { return m_Collisions.begin (); }
@@ -183,10 +182,10 @@ public:
     virtual void                                AttachTo                    ( CElement* pElement );
     virtual void                                GetAttachedOffsets          ( CVector & vecPosition, CVector & vecRotation );
     virtual void                                SetAttachedOffsets          ( CVector & vecPosition, CVector & vecRotation );
-    inline void                                 AddAttachedElement          ( CElement* pElement )          { m_AttachedElements.push_back ( pElement ); }
-    inline void                                 RemoveAttachedElement       ( CElement* pElement )          { if ( !m_AttachedElements.empty() ) m_AttachedElements.remove ( pElement ); }
-    std::list < CElement* > ::iterator          AttachedElementsBegin       ( void )                        { return m_AttachedElements.begin (); }
-    std::list < CElement* > ::iterator          AttachedElementsEnd         ( void )                        { return m_AttachedElements.end (); }
+    void                                        AddAttachedElement          ( CElement* pElement );
+    void                                        RemoveAttachedElement       ( CElement* pElement );
+    std::list < CElement* > ::const_iterator    AttachedElementsBegin       ( void )                        { return m_AttachedElements.begin (); }
+    std::list < CElement* > ::const_iterator    AttachedElementsEnd         ( void )                        { return m_AttachedElements.end (); }
     const char*                                 GetAttachToID               ( void )                        { return m_strAttachToID; }
     bool                                        IsElementAttached           ( CElement* pElement );
     virtual bool                                IsAttachable                ( void );
@@ -216,8 +215,6 @@ public:
     bool                                        IsDoubleSided               ( void )                        { return m_bDoubleSided; }
     void                                        SetDoubleSided              ( bool bDoubleSided )           { m_bDoubleSided = bDoubleSided; }
 
-    inline bool                                 IsMapCreated                ( void )                        { return m_bMapCreated; }
-
     // Spatial database
     virtual CSphere                             GetWorldBoundingSphere      ( void );
     virtual void                                UpdateSpatialData           ( void );
@@ -237,7 +234,7 @@ protected:
     CMapEventManager*                           m_pEventManager;
     CCustomData*                                m_pCustomData;
 
-    int                                         m_iType;
+    EElementType                                m_iType;
     ElementID                                   m_ID;
     CElement*                                   m_pParent;
     CXMLNode*                                   m_pXMLNode;
@@ -245,7 +242,6 @@ protected:
     bool                                        m_bIsBeingDeleted;
 
     CVector                                     m_vecPosition;
-    CVector                                     m_vecLastPosition;
 
     unsigned int                                m_uiTypeHash;
     std::string                                 m_strTypeName;
@@ -270,7 +266,6 @@ protected:
     std::list < class CPed * >                  m_OriginSourceUsers;
     unsigned char                               m_ucInterior;
     bool                                        m_bDoubleSided;
-    bool                                        m_bMapCreated;
     bool                                        m_bUpdatingSpatialData;
 
     // Optimization for getElementsByType starting at root
@@ -281,6 +276,7 @@ private:
     static void                     AddEntityFromRoot       ( unsigned int uiTypeHash, CElement* pEntity, bool bDebugCheck = true );
     static void                     RemoveEntityFromRoot    ( unsigned int uiTypeHash, CElement* pEntity );
     static void                     GetEntitiesFromRoot     ( unsigned int uiTypeHash, lua_State* pLua );
+    static void                     GetEntitiesFromRoot     ( unsigned int uiTypeHash, std::vector < CElement* >& outResult );
 
 #if CHECK_ENTITIES_FROM_ROOT
     static void                     _CheckEntitiesFromRoot      ( unsigned int uiTypeHash );
@@ -288,6 +284,8 @@ private:
     static void                     _GetEntitiesFromRoot        ( unsigned int uiTypeHash, std::map < CElement*, int >& mapResults );
 #endif
 };
+
+typedef CElement::EElementType EElementType;
 
 #endif
 

@@ -67,7 +67,6 @@ public:
     void                        DisablePadHandler           ( bool bDisabled );
     void                        DisableEnterExitVehicleKey  ( bool bDisabled );
     void                        DisableAllVehicleWeapons    ( bool bDisable );
-    void                        DisableZoneNames            ( bool bDisabled );
     void                        DisableBirds                ( bool bDisabled );
     void                        DisableQuickReload          ( bool bDisable );
     void                        DisableCloseRangeDamage     ( bool bDisable );
@@ -107,6 +106,8 @@ public:
     void                        SetHeatHaze                 ( const SHeatHazeSettings& settings );
     void                        GetHeatHaze                 ( SHeatHazeSettings& settings );
     void                        ResetHeatHaze               ( void );
+    void                        SetHeatHazeEnabled          ( bool bEnabled );
+    void                        ApplyHeatHazeEnabled        ( void );
     void                        ResetSky                    ();
     bool                        HasWaterColor               ();
     void                        GetWaterColor               ( float& fWaterRed, float& fWaterGreen, float& fWaterBlue, float& fWaterAlpha );
@@ -204,9 +205,11 @@ public:
 
     void                        SetPedTargetingMarkerEnabled ( bool bEnable );
     bool                        IsPedTargetingMarkerEnabled ( void );
+    bool                        IsConnected                 ( void );
 
     virtual void                GetRwResourceStats          ( SRwResourceStats& outStats );
     virtual void                GetClothesCacheStats        ( SClothesCacheStats& outStats );
+    virtual void                SetIsMinimizedAndNotConnected ( bool bIsMinimizedAndNotConnected );
 
     CVector                     m_vecAkimboTarget;
     bool                        m_bAkimboTargetUp;
@@ -220,6 +223,8 @@ private:
     bool                        m_bEnabledAltWaterOrder;
     bool                        m_bEnabledClothesMemFix;
     float                       m_fAircraftMaxHeight;
+    bool                        m_bHeatHazeEnabled;
+    bool                        m_bHeatHazeCustomized;
 
 /*  VOID                        SetPlayerShotVectors(CPlayerPed* player, Vector3D * vecTarget, Vector3D * vecStart);
     VOID                        SetPlayerCameraVectors(CPlayerPed* player, Vector3D * vecSource, Vector3D * vecFront);

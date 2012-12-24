@@ -246,6 +246,7 @@
   <ItemGroup>
     <ClCompile Include="CServer.cpp" />
     <ClCompile Include="..\..\sdk\MTAPlatform.cpp" />
+    <ClCompile Include="logic\CAccountPassword.cpp" />
     <ClCompile Include="logic\luadefs\CLuaClassDefs.cpp" />
     <ClCompile Include="logic\packets\CSyncSettingsPacket.cpp" />
     <ClCompile Include="Server.cpp" />
@@ -364,7 +365,6 @@
     <ClCompile Include="logic\CResourceClientFileItem.cpp" />
     <ClCompile Include="logic\CResourceClientScriptItem.cpp" />
     <ClCompile Include="logic\CResourceConfigItem.cpp" />
-    <ClCompile Include="logic\CResourceDownloader.cpp" />
     <ClCompile Include="logic\CResourceFile.cpp" />
     <ClCompile Include="logic\CResourceHTMLItem.cpp" />
     <ClCompile Include="logic\CResourceManager.cpp" />
@@ -373,7 +373,6 @@
     <ClCompile Include="logic\CRPCFunctions.cpp" />
     <ClCompile Include="logic\CScriptDebugging.cpp" />
     <ClCompile Include="logic\CScriptFile.cpp" />
-    <ClCompile Include="logic\CSerialManager.cpp" />
     <ClCompile Include="logic\CSettings.cpp" />
     <ClCompile Include="logic\CSpatialDatabase.cpp" />
     <ClCompile Include="logic\CStaticFunctionDefinitions.cpp" />

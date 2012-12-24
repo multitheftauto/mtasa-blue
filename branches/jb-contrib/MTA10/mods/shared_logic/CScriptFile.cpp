@@ -35,23 +35,30 @@ bool CScriptFile::Load ( eMode Mode )
     // If we haven't already got a file
     if ( !m_pFile )
     {
+        m_pFile = g_pNet->AllocateBinaryFile ();
+        bool bOk = false;
         switch ( Mode )
         {
             // Open file in read only binary mode
             case MODE_READ:
-                m_pFile = fopen ( m_strFilename.c_str (), "rb" );
+                bOk = m_pFile->FOpen ( m_strFilename.c_str (), "rb", true );
                 break;
 
             // Open file in read write binary mode.
             case MODE_READWRITE:
                 // Try to load the file in rw mode. Use existing content.
-                m_pFile = fopen ( m_strFilename.c_str (), "rb+" );
+                bOk = m_pFile->FOpen ( m_strFilename.c_str (), "rb+", true );
                 break;
 
             // Open file in read write binary mode. Truncate size to 0.
             case MODE_CREATE:
-                m_pFile = fopen ( m_strFilename.c_str (), "wb+" );
+                bOk = m_pFile->FOpen ( m_strFilename.c_str (), "wb+", true );
                 break;
+        }
+
+        if ( !bOk )
+        {
+            SAFE_DELETE( m_pFile );
         }
 
         // Return whether we successfully opened it or not
@@ -65,13 +72,8 @@ bool CScriptFile::Load ( eMode Mode )
 
 void CScriptFile::Unload ( void )
 {
-    // Loaded?
-    if ( m_pFile )
-    {
-        // Close the file
-        fclose ( m_pFile );
-        m_pFile = NULL;
-    }
+    // Close the file if required
+    SAFE_DELETE( m_pFile );
 }
 
 
@@ -81,7 +83,7 @@ bool CScriptFile::IsEOF ( void )
         return true;
 
     // Reached end of file?
-    return feof ( m_pFile ) != 0;
+    return m_pFile->FEof ();
 }
 
 
@@ -90,7 +92,7 @@ long CScriptFile::GetPointer ( void )
     if ( !m_pFile )
         return -1;
 
-    return ftell ( m_pFile );
+    return m_pFile->FTell ();
 }
 
 
@@ -100,14 +102,14 @@ long CScriptFile::GetSize ( void )
         return -1;
 
     // Remember current position and seek to the end
-    long lCurrentPos = ftell ( m_pFile );
-    fseek ( m_pFile, 0, SEEK_END );
+    long lCurrentPos = m_pFile->FTell ();
+    m_pFile->FSeek ( 0, SEEK_END );
 
     // Retrieve size of file
-    long lSize = ftell ( m_pFile );
+    long lSize = m_pFile->FTell ();
 
     // Seek back to where the pointer was
-    fseek ( m_pFile, lCurrentPos, SEEK_SET );
+    m_pFile->FSeek ( lCurrentPos, SEEK_SET );
 
     // Return the size
     return lSize;
@@ -130,7 +132,7 @@ long CScriptFile::SetPointer ( unsigned long ulPosition )
     }
 
     // Move the pointer
-    fseek ( m_pFile, ulPosition, SEEK_SET );
+    m_pFile->FSeek ( ulPosition, SEEK_SET );
 
     // Bigger than file size? Tell the script how far we were able to move it
     long lSize = GetSize ();
@@ -144,21 +146,12 @@ long CScriptFile::SetPointer ( unsigned long ulPosition )
 }
 
 
-void CScriptFile::SetSize ( unsigned long ulNewSize )
-{
-    // TODO: A way to truncate a file
-    if ( !m_pFile )
-        return;
-
-}
-
-
 void CScriptFile::Flush ( void )
 {
     if ( !m_pFile )
         return;
 
-    fflush ( m_pFile );
+    m_pFile->FFlush ();
 }
 
 
@@ -168,7 +161,7 @@ long CScriptFile::Read ( unsigned long ulSize, char* pData )
         return -1;
 
     // Try to read data into the given block. Return number of bytes we read.
-    return fread ( pData, 1, ulSize, m_pFile );
+    return m_pFile->FRead ( pData, ulSize );
 }
 
 
@@ -178,5 +171,5 @@ long CScriptFile::Write ( unsigned long ulSize, const char* pData )
         return -1;
 
     // Write the data into the given block. Return number of bytes we wrote.
-    return fwrite ( pData, 1, ulSize, m_pFile );
+    return m_pFile->FWrite ( pData, ulSize );
 }

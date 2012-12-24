@@ -220,9 +220,31 @@ HRESULT CProxyDirect3DDevice9::Reset                          ( D3DPRESENT_PARAM
 
     if ( FAILED ( hResult ) )
     {
-        assert ( 0 && "Direct3DDevice::Reset - Failed to reset the device. Check all device dependent resources have been released.");
+        // Try sleep before retry
+        g_pCore->LogEvent( 7124, "Direct3D", "Direct3DDevice9::Reset", "Fail" );
+        Sleep ( 1000 );
+        hResult = m_pDevice->Reset ( pPresentationParameters );
+
+        if ( FAILED ( hResult ) )
+        {
+            // Still failed, report and dump
+            SetApplicationSetting ( "diagnostics", "last-crash-reason", "direct3ddevice-reset" );
+            SString strAdapterName = g_pDeviceState->AdapterState.Name;
+            AddReportLog ( 7124, SString ( "Direct3D - Direct3DDevice9::Reset - Fail - %s", *strAdapterName ) );
+            assert ( 0 && "Direct3DDevice::Reset - Failed to reset the device. Check all device dependent resources have been released.");
+        }
     }
 
+    // Store actual present parameters used
+    IDirect3DSwapChain9* pSwapChain;
+    m_pDevice->GetSwapChain( 0, &pSwapChain );
+    pSwapChain->GetPresentParameters( &g_pDeviceState->CreationState.PresentationParameters );
+    SAFE_RELEASE( pSwapChain );
+
+    // Store device creation parameters as well
+    m_pDevice->GetCreationParameters ( &g_pDeviceState->CreationState.CreationParameters );
+
+    g_pCore->LogEvent( 7123, "Direct3D", "Direct3DDevice9::Reset", "Success" );
     GetVideoModeManager ()->PostReset ( pPresentationParameters );
 
     // Update our data.
@@ -260,8 +282,7 @@ HRESULT CProxyDirect3DDevice9::Reset                          ( D3DPRESENT_PARAM
                                 ,pPresentationParameters->PresentationInterval
                            ) );
 
-    D3DDEVICE_CREATION_PARAMETERS parameters;
-    m_pDevice->GetCreationParameters ( &parameters );
+    const D3DDEVICE_CREATION_PARAMETERS& parameters = g_pDeviceState->CreationState.CreationParameters;
 
     WriteDebugEvent ( SString ( "    Adapter:%d  DeviceType:%d  BehaviorFlags:0x%x"
                                 ,parameters.AdapterOrdinal
@@ -366,7 +387,8 @@ HRESULT CProxyDirect3DDevice9::GetFrontBufferData             ( UINT iSwapChain,
 
 HRESULT CProxyDirect3DDevice9::StretchRect                    ( IDirect3DSurface9* pSourceSurface,CONST RECT* pSourceRect,IDirect3DSurface9* pDestSurface,CONST RECT* pDestRect,D3DTEXTUREFILTERTYPE Filter )
 {
-    return m_pDevice->StretchRect ( pSourceSurface, pSourceRect, pDestSurface, pDestRect, Filter );
+    CGraphics::GetSingleton ().GetRenderItemManager ()->HandleStretchRect( pSourceSurface, pSourceRect, pDestSurface, pDestRect, Filter );
+    return D3D_OK;
 }
 
 HRESULT CProxyDirect3DDevice9::ColorFill                      ( IDirect3DSurface9* pSurface,CONST RECT* pRect,D3DCOLOR color )
@@ -406,6 +428,8 @@ HRESULT CProxyDirect3DDevice9::BeginScene                     ( VOID )
     // Call the real routine.
     hResult = m_pDevice->BeginScene ( );
 
+    CGraphics::GetSingleton ().GetRenderItemManager ()->PreDrawWorld ();
+
     // Call our event handler.
     CDirect3DEvents9::OnBeginScene ( m_pDevice );
 
@@ -430,6 +454,8 @@ HRESULT CProxyDirect3DDevice9::EndScene                       ( VOID )
     {
         // Call real routine.
         HRESULT hResult = m_pDevice->EndScene ();
+
+        CGraphics::GetSingleton ().GetRenderItemManager ()->SaveReadableDepthBuffer ();
         return hResult;
     }
 
@@ -438,6 +464,10 @@ HRESULT CProxyDirect3DDevice9::EndScene                       ( VOID )
 
 HRESULT CProxyDirect3DDevice9::Clear                          ( DWORD Count,CONST D3DRECT* pRects,DWORD Flags,D3DCOLOR Color,float Z,DWORD Stencil )
 {
+    // If clearing z buffer, make sure we save it first
+    if ( Flags | D3DCLEAR_ZBUFFER )
+        CGraphics::GetSingleton ().GetRenderItemManager ()->SaveReadableDepthBuffer ();
+
     return m_pDevice->Clear ( Count, pRects, Flags, Color, Z, Stencil );
 }
 
@@ -446,8 +476,7 @@ HRESULT CProxyDirect3DDevice9::SetTransform                   ( D3DTRANSFORMSTAT
     // Store the matrix
     m_pData->StoreTransform ( State, pMatrix );
 
-    if ( State < NUMELMS( DeviceState.TransformState.Raw ) )
-        DeviceState.TransformState.Raw[State] = *pMatrix;
+    DeviceState.TransformState.Raw(State) = *pMatrix;
 
     // Call original
     return m_pDevice->SetTransform ( State, pMatrix );
@@ -524,7 +553,7 @@ HRESULT CProxyDirect3DDevice9::GetClipPlane                   ( DWORD Index,floa
 
 HRESULT CProxyDirect3DDevice9::SetRenderState                 ( D3DRENDERSTATETYPE State,DWORD Value )
 {
-    if ( State< NUMELMS( DeviceState.RenderState.Raw ) )
+    if ( State < NUMELMS( DeviceState.RenderState.Raw ) )
         DeviceState.RenderState.Raw[State] = Value;
     return m_pDevice->SetRenderState ( State, Value );
 }

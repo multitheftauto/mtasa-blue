@@ -14,7 +14,6 @@
 
 CRadarAreaManager::CRadarAreaManager ( void )
 {
-    m_bDontRemoveFromList = false;
 }
 
 
@@ -63,40 +62,17 @@ CRadarArea* CRadarAreaManager::CreateFromXML ( CElement* pParent, CXMLNode& Node
 void CRadarAreaManager::DeleteAll ( void )
 {
     // Delete all the radar areas
-    m_bDontRemoveFromList = true;
-    list < CRadarArea* > ::const_iterator iter = m_List.begin ();
-    for ( ; iter != m_List.end (); iter++ )
-    {
-        delete *iter;
-    }
-    m_bDontRemoveFromList = false;
-
-    // Clear the list
-    m_List.clear ();
+    DeletePointersAndClearList ( m_List );
 }
 
 
 bool CRadarAreaManager::Exists ( CRadarArea* pArea )
 {
-    // See if it exists. If, return true
-    list < CRadarArea* > ::const_iterator iter = m_List.begin ();
-    for ( ; iter != m_List.end (); iter++ )
-    {
-        if ( *iter == pArea )
-        {
-            return true;
-        }
-    }
-
-    // Doesn't exist
-    return false;
+    return ListContains ( m_List, pArea );
 }
 
 
 void CRadarAreaManager::RemoveFromList ( CRadarArea* pArea )
 {
-    if ( !m_bDontRemoveFromList && !m_List.empty() )
-    {
-        m_List.remove ( pArea );
-    }
+    m_List.remove ( pArea );
 }

@@ -30,11 +30,10 @@
 //    4. ITEMS CAN ONLY APPEAR IN THE LIST ONCE
 //
 ////////////////////////////////////////////////////////////////
-template < class U >
+template < class T >
 class CFastList
 {
 public:
-    typedef U* T;
     typedef typename std::map < uint, T >   MapType;
     typedef typename std::pair < uint, T >  MapTypePair;
     typedef typename std::map < T, uint >   InfoType;
@@ -49,6 +48,25 @@ public:
         : uiNextFrontIndex ( UINT_MAX / 2 - 1 )
         , uiNextBackIndex ( UINT_MAX / 2 )
     {
+        // T must be a pointer
+        void* ptr = (T)NULL;
+        ptr = NULL;
+    }
+
+    T& front( void )
+    {
+        return orderedMap.begin()->second;
+    }
+
+    const T& front( void ) const
+    {
+        return *orderedMap.begin()->second;
+    }
+
+    void pop_front( void )
+    {
+        T item = front();
+        remove( item );
     }
 
     void push_front ( const T& item )
@@ -165,7 +183,7 @@ public:
         ConstIterator ( typename MapType::const_iterator initer ) : iter ( initer ) {}
         bool operator== ( const ConstIterator& other ) const        { return iter == other.iter; }
         bool operator!= ( const ConstIterator& other ) const        { return iter != other.iter; }
-        void operator++ ( void )                                    { iter++; }
+        void operator++ ( void )                                    { ++iter; }
         void operator++ ( int )                                     { iter++; }
         const T& operator* ( void ) const                           { return iter->second; }
     };
@@ -178,7 +196,7 @@ public:
         Iterator ( typename MapType::iterator initer ) : iter ( initer ) {}
         bool operator== ( const Iterator& other ) const             { return iter == other.iter; }
         bool operator!= ( const Iterator& other ) const             { return iter != other.iter; }
-        void operator++ ( void )                                    { iter++; }
+        void operator++ ( void )                                    { ++iter; }
         void operator++ ( int )                                     { iter++; }
         T& operator* ( void ) const                                 { return iter->second; }
         operator ConstIterator ( void ) const                       { return ConstIterator( iter ); }
@@ -195,7 +213,7 @@ public:
         ConstReverseIterator ( typename MapType::const_reverse_iterator initer ) : iter ( initer ) {}
         bool operator== ( const ConstReverseIterator& other ) const { return iter == other.iter; }
         bool operator!= ( const ConstReverseIterator& other ) const { return iter != other.iter; }
-        void operator++ ( void )                                    { iter++; }
+        void operator++ ( void )                                    { ++iter; }
         void operator++ ( int )                                     { iter++; }
         const T& operator* ( void ) const                           { return iter->second; }
     };
@@ -208,7 +226,7 @@ public:
         ReverseIterator ( typename MapType::reverse_iterator initer ) : iter ( initer ) {}
         bool operator== ( const ReverseIterator& other ) const      { return iter == other.iter; }
         bool operator!= ( const ReverseIterator& other ) const      { return iter != other.iter; }
-        void operator++ ( void )                                    { iter++; }
+        void operator++ ( void )                                    { ++iter; }
         void operator++ ( int )                                     { iter++; }
         T& operator* ( void ) const                                 { return iter->second; }
         operator ConstReverseIterator ( void ) const                { return ConstReverseIterator( iter ); }
@@ -229,19 +247,26 @@ public:
     typedef ConstIterator           const_iterator;
     typedef ReverseIterator         reverse_iterator;
     typedef ConstReverseIterator    const_reverse_iterator;
+
+    Iterator erase ( Iterator iter )
+    {
+        RemoveItemIndex ( *iter );
+        orderedMap.erase ( iter.iter++ );
+        return iter;
+    }
 };
 
 
 
 // Returns true if the item is in the itemList
-template < class U, class T >
-bool ListContains ( const CFastList < U >& itemList, const T& item )
+template < class T, class U >
+bool ListContains ( const CFastList < T* >& itemList, const U& item )
 {
     return itemList.contains ( item );
 }
 
-template < class U, class T >
-void ListRemove ( CFastList < U >& itemList, const T& item )
+template < class T, class U >
+void ListRemove ( CFastList < T* >& itemList, const U& item )
 {
     itemList.remove ( item );
 }

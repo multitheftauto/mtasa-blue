@@ -211,16 +211,22 @@ HRESULT    CProxyDirect3D9::CreateDevice                ( UINT Adapter, D3DDEVTY
                                                         pPresentationParameters->BackBufferWidth,
                                                         pPresentationParameters->BackBufferHeight );
         
+        // Calc and store readable depth format for shader use
+        ERenderFormat ReadableDepthFormat = CDirect3DEvents9::DiscoverReadableDepthFormat ( *ppReturnedDeviceInterface, pPresentationParameters->MultiSampleType, pPresentationParameters->Windowed != 0 );
+        CGraphics::GetSingleton ().GetRenderItemManager ()->SetDepthBufferFormat ( ReadableDepthFormat );
+
         // Now create the proxy device.
         *ppReturnedDeviceInterface = new CProxyDirect3DDevice9 ( *ppReturnedDeviceInterface );
 
+        // Debug output
         D3DDEVICE_CREATION_PARAMETERS parameters;
         (*ppReturnedDeviceInterface)->GetCreationParameters ( &parameters );
 
-        WriteDebugEvent ( SString ( "    Adapter:%d  DeviceType:%d  BehaviorFlags:0x%x"
+        WriteDebugEvent ( SString ( "    Adapter:%d  DeviceType:%d  BehaviorFlags:0x%x  ReadableDepth:%s"
                                     ,parameters.AdapterOrdinal
                                     ,parameters.DeviceType
                                     ,parameters.BehaviorFlags
+                                    ,ReadableDepthFormat ? std::string ( (char*)&ReadableDepthFormat, 4 ).c_str () : "None"
                                 ) );
     }
 

@@ -110,6 +110,18 @@ BOOL GetFontProperties(LPCTSTR lpszFilePath, FONT_PROPERTIES * lpFontPropsX)
 						 NULL);
 
 	if (hFile == INVALID_HANDLE_VALUE)
+    {
+        // Windows 8 fix
+	    hFile = ::CreateFile(lpszFilePath,
+						     GENERIC_READ,// | GENERIC_WRITE,
+						     FILE_SHARE_READ,
+						     NULL,
+						     OPEN_ALWAYS,
+						     FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN,
+						     NULL);
+    }
+
+	if (hFile == INVALID_HANDLE_VALUE)
 	{
 		//TRACE(_T("ERROR:  failed to open '%s'\n"), lpszFilePath);
 		//TRACE(_T("ERROR: %s failed\n"), _T("CreateFile"));

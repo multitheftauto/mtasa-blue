@@ -16,7 +16,11 @@ Var GTA_DIR
 Var Install_Dir
 Var CreateSMShortcuts
 Var CreateDesktopIcon
+Var RegisterProtocol
+Var AddToGameExplorer
 Var RedistInstalled
+Var ExeMD5
+Var PatchInstalled
 
 ; Games explorer: With each new X.X, update this GUID and the file at MTA10\launch\NEU\GDFImp.gdf.xml
 !define GUID "{DF780162-2450-4665-9BA2-EAB14ED640A3}"
@@ -144,6 +148,10 @@ Page custom CustomDirectoryPage DirectoryLeaveProc
 
 ; Language files
 !insertmacro MUI_LANGUAGE							"English"
+LangString DESC_Section10 ${LANG_ENGLISH}			"Create a Start Menu group for installed applications"
+LangString DESC_Section11 ${LANG_ENGLISH}			"Create a Desktop Shortcut for the MTA:SA Client."
+LangString DESC_Section12 ${LANG_ENGLISH}			"Register mtasa:// protocol for browser clickable-ness."
+LangString DESC_Section13 ${LANG_ENGLISH}			"Add to Windows Games Explorer (if present)."
 LangString DESC_Section1 ${LANG_ENGLISH}			"The core components required to run Multi Theft Auto."
 LangString DESC_Section2 ${LANG_ENGLISH}			"The MTA:SA modification, allowing you to play online."
 ;LangString DESC_Section3 ${LANG_ENGLISH}			"The Multi Theft Auto:Editor for MTA:SA, allowing you to create and edit maps."
@@ -155,8 +163,6 @@ LangString DESC_Section6 ${LANG_ENGLISH}			"This is a set of required resources 
 LangString DESC_Section7 ${LANG_ENGLISH}			"This is an optional set of gamemodes and maps for your server."
 LangString DESC_Section8 ${LANG_ENGLISH}			"The MTA:SA 1.0 Map Editor.  This can be used to create your very own maps for use in gamemodes for MTA."
 LangString DESC_Section9 ${LANG_ENGLISH}			"This is the SDK for creating binary modules for the MTA server. Only install if you have a good understanding of C++!"
-LangString DESC_Section10 ${LANG_ENGLISH}			"Create a Start Menu group for installed applications"
-LangString DESC_Section11 ${LANG_ENGLISH}			"Create a Desktop Shortcut for the MTA:SA Client."
 ;LangString DESC_Blank ${LANG_ENGLISH}			""
 LangString DESC_SectionGroupDev ${LANG_ENGLISH}		"Development code and tools that aid in the creation of mods for Multi Theft Auto"
 LangString DESC_SectionGroupClient ${LANG_ENGLISH}  "The client is the program you run to play on a Multi Theft Auto server"
@@ -262,12 +268,6 @@ Function .onInstSuccess
 	!ifdef CLIENT_SETUP
 		WriteRegStr HKLM "SOFTWARE\Multi Theft Auto: San Andreas All\Common" "GTA:SA Path" $GTA_DIR
 		WriteRegStr HKLM "SOFTWARE\Multi Theft Auto: San Andreas All\${0.0}" "Last Install Location" $INSTDIR
-
-		; Add the protocol handler
-		WriteRegStr HKCR "mtasa" "" "URL:MTA San Andreas Protocol"
-		WriteRegStr HKCR "mtasa" "URL Protocol" ""
-		WriteRegStr HKCR "mtasa\DefaultIcon" "" "$INSTDIR\Multi Theft Auto.exe"
-		WriteRegStr HKCR "mtasa\shell\open\command" "" '"$INSTDIR\Multi Theft Auto.exe"%1'
 	!endif
 	
 	; Start menu items
@@ -321,6 +321,16 @@ Function .onInstSuccess
 		!endif
 	${EndIf}
 
+    ${If} $RegisterProtocol == 1
+		!ifdef CLIENT_SETUP
+            ; Add the protocol handler
+            WriteRegStr HKCR "mtasa" "" "URL:MTA San Andreas Protocol"
+            WriteRegStr HKCR "mtasa" "URL Protocol" ""
+            WriteRegStr HKCR "mtasa\DefaultIcon" "" "$INSTDIR\Multi Theft Auto.exe"
+            WriteRegStr HKCR "mtasa\shell\open\command" "" '"$INSTDIR\Multi Theft Auto.exe"%1'
+		!endif
+	${EndIf}
+
 	;UAC::Unload ;Must call unload!
 FunctionEnd
 
@@ -347,6 +357,27 @@ Name "${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION}"
 InstallDirRegKey HKLM "SOFTWARE\Multi Theft Auto: San Andreas All\${0.0}" "Last Install Location"
 ShowInstDetails show
 ShowUnInstDetails show
+
+Section "Start menu group" SEC10
+	SectionIn 1 2
+	StrCpy $CreateSMShortcuts 1
+SectionEnd
+
+Section "Desktop icon" SEC11
+	SectionIn 1 2
+	StrCpy $CreateDesktopIcon 1
+SectionEnd
+
+Section "Register mtasa:// protocol" SEC12
+	SectionIn 1 2
+	StrCpy $RegisterProtocol 1
+SectionEnd
+
+Section "Add to Games Explorer" SEC13
+	SectionIn 1 2
+	StrCpy $AddToGameExplorer 1
+SectionEnd
+
 
 !ifdef CLIENT_SETUP
 	SectionGroup /e "Game client" SECGCLIENT
@@ -379,6 +410,7 @@ DontInstallRedist:
 			CreateDirectory "$APPDATA\MTA San Andreas All\Common"
 			CreateDirectory "$APPDATA\MTA San Andreas All\${0.0}"
 
+			# Ensure install dir exists so the permissions can be set
 			SetOutPath "$INSTDIR\MTA"
 			SetOverwrite on
 
@@ -400,7 +432,8 @@ DontInstallRedist:
                 StrCpy $0 $INSTDIR
                 Call RemoveVirtualStore
 
-                IfFileExists $GTA_DIR\gta_sa.exe 0 PathBad
+                IfFileExists $GTA_DIR\gta_sa.exe +1 0
+				IfFileExists $GTA_DIR\gta-sa.exe 0 PathBad
                     # Fix permissions for GTA install directory
                     FastPerms::FullAccessPlox "$GTA_DIR"
 
@@ -412,6 +445,63 @@ DontInstallRedist:
                 PathBad:
             ${EndIf}
 			#############################################################
+			
+			#############################################################
+			# Patch our San Andreas .exe if it is required
+				
+			IfFileExists $GTA_DIR\gta_sa.exe 0 TrySteamExe
+				!insertmacro GetMD5 $GTA_DIR\gta_sa.exe $ExeMD5
+				DetailPrint "gta_sa.exe successfully detected ($ExeMD5)"
+				${Switch} $ExeMD5
+					${Case} "bf25c28e9f6c13bd2d9e28f151899373" #US 2.00
+					${Case} "7fd5f9436bd66af716ac584ff32eb483" #US 1.01
+					${Case} "d84326ba0e0ace89f87288ffe7504da4" #EU 3.00 Steam Mac
+					${Case} "4e99d762f44b1d5e7652dfa7e73d6b6f" #EU 2.00
+					${Case} "2ac4b81b3e85c8d0f9846591df9597d3" #EU 1.01
+					${Case} "d0ad36071f0e9bead7bddea4fbda583f" #EU 1.01 GamersGate
+					${Case} "25405921d1c47747fd01fd0bfe0a05ae" #EU 1.01 DEViANCE
+					${Case} "9effcaf66b59b9f8fb8dff920b3f6e63" #DE 2.00
+					${Case} "fa490564cd9811978085a7a8f8ed7b2a" #DE 1.01
+					${Case} "49dd417760484a18017805df46b308b8" #DE 1.00
+						#Create a backup of the GTA exe before patching
+						CopyFiles "$GTA_DIR\gta_sa.exe" "$GTA_DIR\gta_sa.exe.bak"
+						Call InstallPatch
+						${If} $PatchInstalled == "1"
+							Goto CompletePatchProc
+						${EndIf}
+						Goto NoExeFound
+						${Break}
+					${Default}
+						Goto CompletePatchProc #This gta_sa.exe doesn't need patching, let's continue
+						${Break}
+				${EndSwitch}
+			TrySteamExe:
+				IfFileExists $GTA_DIR\gta-sa.exe 0 NoExeFound
+				!insertmacro GetMD5 $GTA_DIR\gta-sa.exe $ExeMD5
+				DetailPrint "gta-sa.exe successfully detected ($ExeMD5)"
+				${Switch} $ExeMD5
+					${Case} "0fd315d1af41e26e536a78b4d4556488" #EU 3.00 Steam
+						#Copy gta-sa.exe to gta_sa.exe and commence patching process
+						CopyFiles "$GTA_DIR\gta-sa.exe" "$GTA_DIR\gta_sa.exe.bak"
+						Call InstallPatch
+						${If} $PatchInstalled == "1"
+							Goto CompletePatchProc
+						${EndIf}
+						Goto NoExeFound
+						${Break}
+					${Default}
+						Goto NoExeFound
+						${Break}
+				${EndSwitch}					
+				
+			NoExeFound:
+				MessageBox MB_ICONSTOP "A valid Windows® version of Grand Theft Auto: San Andreas was not detected.\
+				$\r$\nHowever installation will continue.\
+				$\r$\nPlease reinstall if there are problems later."
+			CompletePatchProc:
+			
+			SetOutPath "$INSTDIR\MTA"
+			SetOverwrite on
 
 			# Make some keys in HKLM read write accessible by all users
 			AccessControl::GrantOnRegKey HKLM "SOFTWARE\Multi Theft Auto: San Andreas All" "(BU)" "FullAccess"
@@ -427,6 +517,7 @@ DontInstallRedist:
 			File "${FILES_ROOT}\MTA San Andreas\mta\loader.dll"
             File "${FILES_ROOT}\MTA San Andreas\mta\bass_fx.dll"
             File "${FILES_ROOT}\MTA San Andreas\mta\tags.dll"
+			File "${FILES_ROOT}\MTA San Andreas\mta\pthreadVC2.dll"
 
             !ifndef LIGHTBUILD
 
@@ -441,7 +532,6 @@ DontInstallRedist:
 				File "${FILES_ROOT}\MTA San Andreas\mta\bassmix.dll"
 				File "${FILES_ROOT}\MTA San Andreas\mta\chatboxpresets.xml"
 				File "${FILES_ROOT}\MTA San Andreas\mta\sa.dat"
-				File "${FILES_ROOT}\MTA San Andreas\mta\pthreadVC2.dll"
 
                 SetOutPath "$INSTDIR\skins\Classic"
                 File "${FILES_ROOT}\MTA San Andreas\skins\Classic\CGUI.is.xml"
@@ -494,12 +584,14 @@ DontInstallRedist:
                 File "${FILES_ROOT}\MTA San Andreas\Multi Theft Auto.exe.dat"
 			!endif
 			
-			${GameExplorer_UpdateGame} ${GUID}
-			${If} ${Errors}
-				${GameExplorer_AddGame} all "$INSTDIR\Multi Theft Auto.exe" "$INSTDIR" "$INSTDIR\Multi Theft Auto.exe" ${GUID}
-				CreateDirectory $APPDATA\Microsoft\Windows\GameExplorer\${GUID}\SupportTasks\0
-				CreateShortcut "$APPDATA\Microsoft\Windows\GameExplorer\$0\SupportTasks\0\Client Manual.lnk" \ "http://wiki.multitheftauto.com/wiki/Client_Manual"
-			${EndIf}
+            ${If} $AddToGameExplorer == 1
+                ${GameExplorer_UpdateGame} ${GUID}
+                ${If} ${Errors}
+                    ${GameExplorer_AddGame} all "$INSTDIR\Multi Theft Auto.exe" "$INSTDIR" "$INSTDIR\Multi Theft Auto.exe" ${GUID}
+                    CreateDirectory $APPDATA\Microsoft\Windows\GameExplorer\${GUID}\SupportTasks\0
+                    CreateShortcut "$APPDATA\Microsoft\Windows\GameExplorer\$0\SupportTasks\0\Client Manual.lnk" \ "http://wiki.multitheftauto.com/wiki/Client_Manual"
+                ${EndIf}
+            ${EndIf}
 		SectionEnd
 
 		Section "Game module" SEC02
@@ -532,6 +624,7 @@ DontInstallRedist:
 		File "${SERVER_FILES_ROOT}\MTA Server.exe"
 		File "${SERVER_FILES_ROOT}\net.dll"
 		File "${SERVER_FILES_ROOT}\libcurl.dll"
+		File "${SERVER_FILES_ROOT}\pthreadVC2.dll"
 	SectionEnd
 
 	Section "Game module" SEC05
@@ -542,7 +635,6 @@ DontInstallRedist:
 		File "${SERVER_FILES_ROOT}\mods\deathmatch\deathmatch.dll"
 		File "${SERVER_FILES_ROOT}\mods\deathmatch\lua5.1.dll"
 		File "${SERVER_FILES_ROOT}\mods\deathmatch\pcre3.dll"
-		File "${SERVER_FILES_ROOT}\mods\deathmatch\pthreadVC2.dll"
 		File "${SERVER_FILES_ROOT}\mods\deathmatch\sqlite3.dll"
 		File "${SERVER_FILES_ROOT}\mods\deathmatch\dbconmy.dll"
 		!ifndef LIGHTBUILD
@@ -695,17 +787,11 @@ DontInstallRedist:
 	SectionGroupEnd
 !endif
 
-Section "Start menu group" SEC10
-	SectionIn 1 2
-	StrCpy $CreateSMShortcuts 1
-SectionEnd
-
-Section "Desktop icon" SEC11
-	SectionIn 1 2
-	StrCpy $CreateDesktopIcon 1
-SectionEnd
-
 !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
+	!insertmacro MUI_DESCRIPTION_TEXT ${SEC10} $(DESC_Section10)
+	!insertmacro MUI_DESCRIPTION_TEXT ${SEC11} $(DESC_Section11)
+	!insertmacro MUI_DESCRIPTION_TEXT ${SEC12} $(DESC_Section12)
+	!insertmacro MUI_DESCRIPTION_TEXT ${SEC13} $(DESC_Section13)
 	!insertmacro MUI_DESCRIPTION_TEXT ${SEC01} $(DESC_Section1)
 	!insertmacro MUI_DESCRIPTION_TEXT ${SEC02} $(DESC_Section2)
 	;!insertmacro MUI_DESCRIPTION_TEXT ${SEC03} $(DESC_Section3)
@@ -716,8 +802,6 @@ SectionEnd
 	!insertmacro MUI_DESCRIPTION_TEXT ${SEC07} $(DESC_Section7)
 	!insertmacro MUI_DESCRIPTION_TEXT ${SEC08} $(DESC_Section8)
 	!insertmacro MUI_DESCRIPTION_TEXT ${SEC09} $(DESC_Section9)
-	!insertmacro MUI_DESCRIPTION_TEXT ${SEC10} $(DESC_Section10)
-	!insertmacro MUI_DESCRIPTION_TEXT ${SEC11} $(DESC_Section11)
 	;!insertmacro MUI_DESCRIPTION_TEXT ${SECBLANK} $(DESC_Blank)
 	!insertmacro MUI_DESCRIPTION_TEXT ${SECGSERVER} $(DESC_SectionGroupServer)
 	!insertmacro MUI_DESCRIPTION_TEXT ${SECGDEV} $(DESC_SectionGroupDev)
@@ -728,10 +812,10 @@ SectionEnd
 Section -Post
 	!ifdef CLIENT_SETUP
 		WriteUninstaller "$INSTDIR\Uninstall.exe"
-		WriteRegStr HKLM "${PRODUCT_DIR_REGKEY}" "" "$INSTDIR\Multi Theft Auto.exe"
+		;WriteRegStr HKLM "${PRODUCT_DIR_REGKEY}" "" "$INSTDIR\Multi Theft Auto.exe"
 	!else
 		WriteUninstaller "$INSTDIR\server\Uninstall.exe"
-		WriteRegStr HKLM "${PRODUCT_DIR_REGKEY}" "" "$INSTDIR\Server\MTA Server.exe"
+		;WriteRegStr HKLM "${PRODUCT_DIR_REGKEY}" "" "$INSTDIR\Server\MTA Server.exe"
 	!endif
 
 	WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "DisplayName" "$(^Name)"
@@ -904,6 +988,47 @@ InstallEnd:
 InstallEnd2:
 FunctionEnd
 
+;====================================================================================
+; Patcher related functions
+;====================================================================================
+Var PATCHFILE
+
+Function InstallPatch
+	DetailPrint "Incompatible version of San Andreas detected.  Patching executable..."
+	StrCpy $PATCHFILE "$TEMP\$ExeMD5.GTASAPatch"
+	NSISdl::download "http://mirror.multitheftauto.com/gdata/$ExeMD5.GTASAPatch" $PATCHFILE
+	Pop $0
+	StrCmp "$0" "success" PatchDownloadSuccessful
+	
+	DetailPrint "* Download of patch file failed:"
+	DetailPrint "* $0"
+	DetailPrint "* Installation continuing anyway"
+	MessageBox MB_ICONSTOP "Unable to download the patch file for your version of Grand Theft Auto: San Andreas"
+	StrCpy $PatchInstalled "0"
+	Goto FinishPatch
+	
+PatchDownloadSuccessful:
+	DetailPrint "Patch download successful.  Installing patch..."
+	vpatch::vpatchfile "$PATCHFILE" "$GTA_DIR\gta_sa.exe.bak" "$GTA_DIR\gta_sa.exe"
+	Pop $R0
+	
+	${If} $R0 == "OK"
+		StrCpy $PatchInstalled "1"
+		Goto FinishPatch
+	${ElseIf} $R0 == "OK, new version already installed"
+		StrCpy $PatchInstalled "1"
+		Goto FinishPatch
+	${EndIf}
+	
+	DetailPrint "* Some error occured installing the patch for Grand Theft Auto: San Andreas:"
+	DetailPrint "* $R0"
+	DetailPrint "* It is required in order to run Multi Theft Auto : San Andreas"
+	DetailPrint "* Installation continuing anyway"
+	MessageBox MB_ICONSTOP "Unable to install the patch file for your version of Grand Theft Auto: San Andreas"
+	StrCpy $PatchInstalled "0"
+	
+	FinishPatch:
+FunctionEnd
 
 ;====================================================================================
 ; UAC related functions

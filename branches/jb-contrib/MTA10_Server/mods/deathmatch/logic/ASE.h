@@ -49,19 +49,15 @@ class CASERule;
 class ASE
 {
 public:
-                            ASE                      ( CMainConfig* pMainConfig, CPlayerManager* pPlayerManager, unsigned short usPort, const char* szServerIP = NULL, bool bLan = false );
+    ZERO_ON_NEW
+                            ASE                      ( CMainConfig* pMainConfig, CPlayerManager* pPlayerManager, unsigned short usPort, const char* szServerIP = NULL );
                             ~ASE                     ( void );
 
     void                    DoPulse                  ( void );
+    bool                    SetPortEnabled           ( bool bInternetEnabled, bool bLanEnabled );
 
     static ASE*             GetInstance              ( void )                { return _instance; }
 
-    const std::string&      QueryFullCached          ( void );
-    std::string             QueryFull                ( void );
-    const std::string&      QueryLightCached         ( void );
-    std::string             QueryLight               ( void );
-    const std::string&      QueryXfireLightCached    ( void );
-    std::string             QueryXfireLight          ( void );
     unsigned long           GetMasterServerQueryCount ( void )          { return m_ulMasterServerQueryCount; }
     uint                    GetTotalQueryCount      ( void )            { return m_uiNumQueriesTotal; }
     uint                    GetQueriesPerMinute     ( void )            { return m_uiNumQueriesPerMinute; }
@@ -84,7 +80,16 @@ public:
     list < CASERule* > ::iterator IterBegin     ( void )                { return m_Rules.begin (); }
     list < CASERule* > ::iterator IterEnd       ( void )                { return m_Rules.end (); }
 
+    std::string             QueryLight               ( void );
 private:
+    const std::string*      QueryFullCached          ( void );
+    std::string             QueryFull                ( void );
+    const std::string*      QueryLightCached         ( void );
+    const std::string*      QueryXfireLightCached    ( void );
+    std::string             QueryXfireLight          ( void );
+
+    long long               m_llCurrentTime;
+    uint                    m_uiCurrentPlayerCount;
 
     CMainConfig*            m_pMainConfig;
     CPlayerManager*         m_pPlayerManager;
@@ -101,7 +106,7 @@ private:
     unsigned int            m_Socket;
     sockaddr_in             m_SockAddr;
 
-    bool                    m_bLan;
+    unsigned short          m_usPortBase;
     unsigned short          m_usPort;
 
     // Full query cache
@@ -121,6 +126,8 @@ private:
     long long               m_llXfireLightLastTime;
     long                    m_lXfireLightMinInterval;
     std::string             m_strXfireLightCached;
+
+    std::string             m_strMtaAseVersion;
 
     // Stats
     unsigned long           m_ulMasterServerQueryCount;

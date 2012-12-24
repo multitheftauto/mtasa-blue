@@ -145,7 +145,6 @@ public:
     virtual void                        SetCenterOfWorld            ( class CEntity * entity, class CVector * vecPosition, FLOAT fHeading ) = 0;
     virtual void                        DisablePadHandler           ( bool bDisabled ) = 0;
     virtual void                        DisableAllVehicleWeapons    ( bool bDisable ) = 0;
-    virtual void                        DisableZoneNames            ( bool bDisabled ) = 0; // move to CHud
     virtual void                        DisableBirds                ( bool bDisabled ) = 0;
     virtual void                        DisableQuickReload          ( bool bDisable ) = 0;
     virtual void                        DisableCloseRangeDamage     ( bool bDisable ) = 0;
@@ -186,6 +185,7 @@ public:
     virtual void                        SetHeatHaze                 ( const SHeatHazeSettings& settings ) = 0;
     virtual void                        GetHeatHaze                 ( SHeatHazeSettings& settings ) = 0;
     virtual void                        ResetHeatHaze               ( void ) = 0;
+    virtual void                        SetHeatHazeEnabled          ( bool bEnabled ) = 0;
     virtual bool                        HasWaterColor               () = 0;
     virtual void                        GetWaterColor               ( float& fWaterRed, float& fWaterGreen, float& fWaterBlue, float& fWaterAlpha ) = 0;
     virtual void                        SetWaterColor               ( float fWaterRed, float fWaterGreen, float fWaterBlue, float fWaterAlpha ) = 0;
@@ -288,6 +288,7 @@ public:
 
     virtual void                        GetRwResourceStats          ( SRwResourceStats& outStats ) = 0;
     virtual void                        GetClothesCacheStats        ( SClothesCacheStats& outStats ) = 0;
+    virtual void                        SetIsMinimizedAndNotConnected ( bool bIsMinimizedAndNotConnected ) = 0;
 };
 
 #endif

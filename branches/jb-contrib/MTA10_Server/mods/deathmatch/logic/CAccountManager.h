@@ -20,16 +20,20 @@ class CAccountManager;
 #include "CXMLConfig.h"
 typedef uint SDbConnectionId;
 
+#define GUEST_ACCOUNT_NAME          "guest"
+#define HTTP_GUEST_ACCOUNT_NAME     "http_guest"
+#define CONSOLE_ACCOUNT_NAME        "Console"
+#define CONSOLE_NICK_NAME           "Console"
 
 //
 // CFastList with additional name->account mapping
 //
-class CMappedAccountList : protected CFastList < CAccount >
+class CMappedAccountList : protected CFastList < CAccount* >
 {
 public:
-    typedef CFastList < CAccount > Super;
-    typedef CFastList < CAccount >::iterator        iterator;
-    typedef CFastList < CAccount >::const_iterator  const_iterator;
+    typedef CFastList < CAccount* > Super;
+    typedef CFastList < CAccount* >::iterator        iterator;
+    typedef CFastList < CAccount* >::const_iterator  const_iterator;
 
     // CMappedList functions
     bool        contains ( CAccount* item ) const   { return Super::contains ( item ); }
@@ -56,6 +60,11 @@ public:
         assert ( m_NameAccountMap.size () == size () );
         m_NameAccountMap.clear ();
         Super::clear ();
+    }
+
+    size_t size ( void ) const
+    {
+        return Super::size ();
     }
 
     // Account functions
@@ -103,7 +112,7 @@ public:
     bool                        LoadSetting                 ( CXMLNode* pNode );
     bool                        Save                        ( void );
     bool                        Save                        ( CXMLNode* pParent );
-    void                        Save                        ( CAccount* pParent );
+    void                        Save                        ( CAccount* pParent, bool bCheckForErrors = true );
 
     bool                        SaveSettings                ( void );
     bool                        IntegrityCheck              ( void );
@@ -146,7 +155,6 @@ public:
 
 protected:
     CMappedAccountList          m_List;
-    bool                        m_bRemoveFromList;
 
     bool                        m_bAutoLogin;
 

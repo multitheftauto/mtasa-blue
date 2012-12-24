@@ -579,8 +579,8 @@ bool CResource::GenerateChecksums ( void )
                 case CResourceFile::RESOURCE_FILE_TYPE_CLIENT_FILE:
                 {
                     SString strCachedFilePath = pResourceFile->GetCachedPathFilename ();
-                    unsigned long ulCachedFileCRC = CRCGenerator::GetCRCFromFile ( strCachedFilePath );
-                    if ( checksum.ulCRC != ulCachedFileCRC )
+                    CChecksum cachedChecksum = CChecksum::GenerateChecksumFromFile ( strCachedFilePath );
+                    if ( checksum != cachedChecksum )
                     {
                         if ( !FileSave ( strCachedFilePath, pFileContents, uiFileSize ) )
                         {
@@ -674,11 +674,22 @@ void CResource::LogUpgradeWarnings ( void )
         SString strReason = SString ( "WARNING: %s will not start as %s\n", m_strResourceName.c_str (), *strStatus );
         CLogger::LogPrint ( strReason );
     }
+    else
+    if ( !strStatus.empty () )
+    {
+        SString strReason = SString ( "WARNING: %s requires upgrade as %s\n", m_strResourceName.c_str (), *strStatus );
+        CLogger::LogPrint ( strReason );
+        CLogger::LogPrintf ( "Use the 'upgrade' command to perform a basic upgrade of resources.\n" );
+    }
 }
 
 
 //
 // Determine outcome of version rules
+//
+// Fatal error: Returns false with error message in strOutStatus 
+// Warning:     Returns true with warning message in strOutStatus 
+// Ok:          Returns true with no message in strOutStatus
 //
 bool CResource::GetCompatibilityStatus ( SString& strOutStatus )
 {
@@ -705,14 +716,17 @@ bool CResource::GetCompatibilityStatus ( SString& strOutStatus )
     }
 
     // Check if calculated version is higher than declared version
-    if ( m_strMinClientReqFromSource > m_strMinClientReqFromMetaXml || m_strMinServerReqFromSource > m_strMinServerReqFromMetaXml )
+    if ( m_strMinClientReqFromSource > m_strMinClientReqFromMetaXml )
     {
         strOutStatus = "<min_mta_version> section in the meta.xml is incorrect or missing (expected at least ";
-        if ( !m_strMinClientReqFromSource.empty () )
-            strOutStatus += SString ( "client %s because of '%s')", *m_strMinClientReqFromSource, *m_strMinClientReason );
-        else
-            strOutStatus += SString ( "server %s because of '%s')", *m_strMinServerReqFromSource, *m_strMinServerReason );
-        return false;
+        strOutStatus += SString ( "client %s because of '%s')", *m_strMinClientReqFromSource, *m_strMinClientReason );
+        m_strMinClientReqFromMetaXml = m_strMinClientReqFromSource;         // Apply higher version requirement
+    }
+    else
+    if ( m_strMinServerReqFromSource > m_strMinServerReqFromMetaXml )
+    {
+        strOutStatus = "<min_mta_version> section in the meta.xml is incorrect or missing (expected at least ";
+        strOutStatus += SString ( "server %s because of '%s')", *m_strMinServerReqFromSource, *m_strMinServerReason );
     }
 
     // See if any connected client are below min requirements
@@ -724,7 +738,7 @@ bool CResource::GetCompatibilityStatus ( SString& strOutStatus )
 
         if ( uiNumIncompatiblePlayers > 0 )
         {
-            strOutStatus += SString ( "%d connected player(s) below required client version %s", uiNumIncompatiblePlayers, *m_strMinClientReqFromMetaXml );
+            strOutStatus = SString ( "%d connected player(s) below required client version %s", uiNumIncompatiblePlayers, *m_strMinClientReqFromMetaXml );
             return false;
         }
     }
@@ -760,6 +774,14 @@ bool CResource::Start ( list<CResource *> * dependents, bool bStartedManually, b
             CLogger::LogPrint ( m_strFailureReason );
             return false;
         }
+        else
+        if ( !strStatus.empty () )
+        {
+            SString strReason = SString ( "WARNING: %s requires upgrade as %s\n", m_strResourceName.c_str (), *strStatus );
+            CLogger::LogPrint ( strReason );
+            CLogger::LogPrintf ( "Use the 'upgrade' command to perform a basic upgrade of resources.\n" );
+        }
+
 
         m_bStarting = true;
 
@@ -775,8 +797,7 @@ bool CResource::Start ( list<CResource *> * dependents, bool bStartedManually, b
         m_bIsPersistent = false;
 
         // Create an element group for us
-        m_pDefaultElementGroup = new CElementGroup ( this );
-        m_elementGroups.push_back ( m_pDefaultElementGroup ); // for use by scripts
+        m_pDefaultElementGroup = new CElementGroup ();    // for use by scripts
 
         // Grab the root element
         m_pRootElement = g_pGame->GetMapManager()->GetRootElement();
@@ -839,13 +860,9 @@ bool CResource::Start ( list<CResource *> * dependents, bool bStartedManually, b
                         m_pNodeStorage = NULL;
                     }
 
-                    // Destroy all the element groups attached directly to this resource
-                    list < CElementGroup* > ::iterator itere = m_elementGroups.begin ();
-                    for ( ; itere != m_elementGroups.end (); itere++ )
-                    {
-                        delete (*itere);
-                    }
-                    m_elementGroups.clear();
+                    // Destroy the element group attached directly to this resource
+                    if ( m_pDefaultElementGroup )
+                        delete m_pDefaultElementGroup;
                     m_pDefaultElementGroup = NULL;
 
                     // Make sure we remove the resource elements from the players that have joined
@@ -943,7 +960,7 @@ bool CResource::Start ( list<CResource *> * dependents, bool bStartedManually, b
         m_resourceManager->ApplyMinClientRequirement ( this, m_strMinClientReqFromMetaXml );
 
         // Broadcast new resourceelement that is loaded and tell the players that a new resource was started
-        g_pGame->GetMapManager()->BroadcastElements ( m_pResourceElement, true );
+        g_pGame->GetMapManager()->BroadcastResourceElements ( m_pResourceElement, m_pDefaultElementGroup );
         g_pGame->GetPlayerManager ()->BroadcastOnlyJoined ( CResourceStartPacket ( m_strResourceName.c_str (), this ) );
         SendProtectedScripts ();
 
@@ -1041,13 +1058,9 @@ bool CResource::Stop ( bool bStopManually )
             m_pNodeStorage = NULL;
         }
 
-        // Destroy all the element groups attached directly to this resource
-        list < CElementGroup* > ::iterator itere = m_elementGroups.begin ();
-        for ( ; itere != m_elementGroups.end (); itere++ )
-        {
-            delete (*itere);
-        }
-        m_elementGroups.clear();
+        // Destroy the element group attached directly to this resource
+        if ( m_pDefaultElementGroup )
+            delete m_pDefaultElementGroup;
         m_pDefaultElementGroup = NULL;
 
         // Destroy the virtual machine for this resource
@@ -1112,6 +1125,7 @@ bool CResource::DestroyVM ( void )
 
     // Delete the events on this VM
     m_pRootElement->DeleteEvents ( m_pVM, true );
+    g_pGame->GetElementDeleter()->CleanUpForVM ( m_pVM );
 
     // Delete the virtual machine
     m_resourceManager->NotifyResourceVMClose ( this, m_pVM );
@@ -1128,11 +1142,8 @@ void CResource::DisplayInfo ( void ) // duplicated for HTML
         // count the number of elements
         unsigned int uiMapElementCount = 0;
         unsigned int uiScriptElementCount = 0;
-        list < CElementGroup* > ::iterator itere = m_elementGroups.begin ();
-        for ( ; itere != m_elementGroups.end (); itere++ )
-        {
-            uiScriptElementCount += (*itere)->GetCount();
-        }
+        if ( m_pDefaultElementGroup )
+            uiScriptElementCount += m_pDefaultElementGroup->GetCount();
 
         list < CResourceFile* > ::iterator iterf = m_resourceFiles.begin ();
         for ( ; iterf != m_resourceFiles.end (); iterf++ )
@@ -1210,11 +1221,8 @@ char * CResource::DisplayInfoHTML ( char * info, size_t length )
         // count the number of elements
         unsigned int uiMapElementCount = 0;
         unsigned int uiScriptElementCount = 0;
-        list < CElementGroup* > ::iterator itere = m_elementGroups.begin ();
-        for ( ; itere != m_elementGroups.end (); itere++ )
-        {
-            uiScriptElementCount += (*itere)->GetCount();
-        }
+        if ( m_pDefaultElementGroup )
+            uiScriptElementCount += m_pDefaultElementGroup->GetCount();
 
         list < CResourceFile* > ::iterator iterf = m_resourceFiles.begin ();
         for ( ; iterf != m_resourceFiles.end (); iterf++ )

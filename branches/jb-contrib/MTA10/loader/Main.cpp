@@ -14,7 +14,9 @@
 
 #include "StdInc.h"
 #include "direct.h"
-#include "SharedUtil.Tests.hpp"
+#if defined(_DEBUG) 
+    #include "SharedUtil.Tests.hpp"
+#endif
 int DoLaunchGame ( LPSTR lpCmdLine );
 int LaunchGame ( LPSTR lpCmdLine );
 
@@ -32,6 +34,16 @@ int WINAPI WinMain ( HINSTANCE _hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
 #if defined(_DEBUG) 
     SharedUtil_Tests ();
 #endif
+
+    //////////////////////////////////////////////////////////
+    // Handle service uninstall request from the installer
+    if ( strcmp( lpCmdLine, "/kduninstall" ) == 0 )
+    {
+        UpdateMTAVersionApplicationSetting( true );
+        if ( CheckService( CHECK_SERVICE_PRE_UNINSTALL ) )
+            return 0;
+        return 1;
+    }
 
     //////////////////////////////////////////////////////////
     //
@@ -74,7 +86,7 @@ int WINAPI WinMain ( HINSTANCE _hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
                 strMessage += "If the problem persists, open Task Manager and\n";
                 strMessage += "stop the 'gta_sa.exe' and 'Multi Theft Auto.exe' processes\n\n\n";
                 strMessage += "Try to launch MTA:SA again?";
-                if ( MessageBox( 0, strMessage, "Error", MB_ICONERROR | MB_YESNO ) == IDYES )
+                if ( MessageBox( 0, strMessage, "Error", MB_ICONERROR | MB_YESNO | MB_TOPMOST  ) == IDYES )
                 {
                     TerminateGTAIfRunning ();
                     TerminateOtherMTAIfRunning ();
@@ -87,10 +99,10 @@ int WINAPI WinMain ( HINSTANCE _hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
         {
             if ( !IsGTARunning () && !IsOtherMTARunning () )
             {
-                MessageBox ( 0, "Another instance of MTA is already running.\n\nIf this problem persists, please restart your computer", "Error", MB_ICONERROR );
+                MessageBox ( 0, "Another instance of MTA is already running.\n\nIf this problem persists, please restart your computer", "Error", MB_ICONERROR | MB_TOPMOST  );
             }
             else
-            if ( MessageBox( 0, "Another instance of MTA is already running.\n\nDo you want to terminate it?", "Error", MB_ICONERROR | MB_YESNO ) == IDYES )
+            if ( MessageBox( 0, "Another instance of MTA is already running.\n\nDo you want to terminate it?", "Error", MB_ICONERROR | MB_YESNO | MB_TOPMOST  ) == IDYES )
             {
                 TerminateGTAIfRunning ();
                 TerminateOtherMTAIfRunning ();
@@ -127,11 +139,10 @@ void HandleTrouble ( void )
     if ( CheckAndShowFileOpenFailureMessage () )
         return;
 
-    int iResponse = MessageBox ( NULL, "Are you having problems running MTA:SA?.\n\nDo you want to revert to an earlier version?", "MTA: San Andreas", MB_YESNO | MB_ICONERROR );
+    int iResponse = MessageBox ( NULL, "Are you having problems running MTA:SA?.\n\nDo you want to revert to an earlier version?", "MTA: San Andreas", MB_YESNO | MB_ICONERROR | MB_TOPMOST );
     if ( iResponse == IDYES )
     {
-        MessageBox ( NULL, "Your browser will now display a web page with some help infomation.\n\nIf the page fails to load, please goto www.mtasa.com", "MTA: San Andreas", MB_OK | MB_ICONINFORMATION );
-        BrowseToSolution ( "crashing-before-gtagame", false, true );
+        BrowseToSolution ( "crashing-before-gtagame", TERMINATE_PROCESS );
     }
 }
 
@@ -155,7 +166,7 @@ void HandleResetSettings ( void )
 
     if ( FileExists ( strSettingsFilename ) )
     {
-        int iResponse = MessageBox ( NULL, "There seems to be a problem launching MTA:SA.\nResetting GTA settings can sometimes fix this problem.\n\nDo you want to reset GTA settings now?", "MTA: San Andreas", MB_YESNO | MB_ICONERROR );
+        int iResponse = MessageBox ( NULL, "There seems to be a problem launching MTA:SA.\nResetting GTA settings can sometimes fix this problem.\n\nDo you want to reset GTA settings now?", "MTA: San Andreas", MB_YESNO | MB_ICONERROR | MB_TOPMOST );
         if ( iResponse == IDYES )
         {
             FileDelete ( strSettingsFilenameBak );
@@ -164,24 +175,52 @@ void HandleResetSettings ( void )
             if ( !FileExists ( strSettingsFilename ) )
             {
                 AddReportLog ( 4053, "Deleted gta_sa.set" );
-                MessageBox ( NULL, "GTA settings have been reset.\n\nPress OK to continue.", "MTA: San Andreas", MB_OK | MB_ICONINFORMATION );
+                MessageBox ( NULL, "GTA settings have been reset.\n\nPress OK to continue.", "MTA: San Andreas", MB_OK | MB_ICONINFORMATION | MB_TOPMOST );
             }
             else
             {
                 AddReportLog ( 5054, SString ( "Delete gta_sa.set failed with '%s'", *strSettingsFilename ) );
-                MessageBox ( NULL, SString ( "File could not be deleted: '%s'", *strSettingsFilename ), "Error", MB_OK | MB_ICONERROR );
+                MessageBox ( NULL, SString ( "File could not be deleted: '%s'", *strSettingsFilename ), "Error", MB_OK | MB_ICONERROR | MB_TOPMOST );
             }
         }
     }
     else
     {
         // No settings to delete, or can't find them
-        int iResponse = MessageBox ( NULL, "Are you having problems running MTA:SA?.\n\nDo you want to see some online help?", "MTA: San Andreas", MB_YESNO | MB_ICONERROR );
+        int iResponse = MessageBox ( NULL, "Are you having problems running MTA:SA?.\n\nDo you want to see some online help?", "MTA: San Andreas", MB_YESNO | MB_ICONERROR | MB_TOPMOST );
         if ( iResponse == IDYES )
         {
-            MessageBox ( NULL, "Your browser will now display a web page with some help infomation.\n\nIf the page fails to load, please goto www.mtasa.com", "MTA: San Andreas", MB_OK | MB_ICONINFORMATION );
-            BrowseToSolution ( "crashing-before-gtalaunch", false, true );
+            BrowseToSolution ( "crashing-before-gtalaunch", TERMINATE_PROCESS );
         }
+    }
+}
+
+
+//////////////////////////////////////////////////////////
+//
+// HandleCustomStartMessage
+//
+//
+//
+//////////////////////////////////////////////////////////
+void HandleCustomStartMessage ( void )
+{
+    SString strStartMessage = GetApplicationSetting( "diagnostics", "start-message" );
+    SString strTrouble = GetApplicationSetting( "diagnostics", "start-message-trouble" );
+
+    if ( strStartMessage.empty() )
+        return;
+
+    SetApplicationSetting( "diagnostics", "start-message", "" );
+    SetApplicationSetting( "diagnostics", "start-message-trouble", "" );
+
+    if ( strTrouble.empty() )
+    {
+        MessageBox ( NULL, strStartMessage, "MTA: San Andreas", MB_OK | MB_ICONINFORMATION | MB_TOPMOST );
+    }
+    else
+    {
+        BrowseToSolution ( strTrouble, ASK_GO_ONLINE | TERMINATE_IF_YES, strStartMessage );
     }
 }
 
@@ -240,6 +279,8 @@ int LaunchGame ( LPSTR lpCmdLine )
     WatchDogBeginSection ( "L0" );      // Gets closed if MTA exits with a return code of 0
     WatchDogBeginSection ( "L1" );      // Gets closed when online game has started
     SetApplicationSetting ( "diagnostics", "gta-fopen-fail", "" );
+    SetApplicationSetting ( "diagnostics", "last-crash-reason", "" );
+    HandleCustomStartMessage();
 
     int iReturnCode = DoLaunchGame ( lpCmdLine );
 
@@ -270,12 +311,12 @@ int DoLaunchGame ( LPSTR lpCmdLine )
     //
     if ( IsGTARunning () )
     {
-        if ( MessageBox ( 0, "An instance of GTA: San Andreas is already running. It needs to be terminated before MTA:SA can be started. Do you want to do that now?", "Information", MB_YESNO | MB_ICONQUESTION ) == IDNO )
+        if ( MessageBox ( 0, "An instance of GTA: San Andreas is already running. It needs to be terminated before MTA:SA can be started. Do you want to do that now?", "Information", MB_YESNO | MB_ICONQUESTION | MB_TOPMOST ) == IDYES )
         {
             TerminateGTAIfRunning ();
             if ( IsGTARunning () )
             {
-                MessageBox ( 0, "Unable to terminate GTA: San Andreas. If the problem persists, please restart your computer.", "Information", MB_OK | MB_ICONQUESTION );
+                MessageBox ( 0, "Unable to terminate GTA: San Andreas. If the problem persists, please restart your computer.", "Information", MB_OK | MB_ICONQUESTION | MB_TOPMOST );
                 return 1;
             }       
         }
@@ -334,7 +375,7 @@ int DoLaunchGame ( LPSTR lpCmdLine )
                                      ,"\\MTA\\bass_fx.dll"
                                      ,"\\MTA\\sa.dat"
                                      ,"\\MTA\\pthreadVC2.dll"
-                                     ,"\\server\\mods\\deathmatch\\pthreadVC2.dll"
+                                     ,"\\server\\pthreadVC2.dll"
                                      ,"\\server\\mods\\deathmatch\\libmysql.dll"};
 
     for ( uint i = 0 ; i < NUMELMS( dataFilesFiles ) ; i++ )
@@ -397,6 +438,7 @@ int DoLaunchGame ( LPSTR lpCmdLine )
 
     MaybeShowCopySettingsDialog ();
     SetDllDirectory( SString ( strMTASAPath + "\\mta" ) );
+    CheckService ( CHECK_SERVICE_PRE_CREATE );
 
     //////////////////////////////////////////////////////////
     //
@@ -412,14 +454,14 @@ int DoLaunchGame ( LPSTR lpCmdLine )
     WatchDogBeginSection ( "L2" );      // Gets closed when loading screen is shown
 
     // Start GTA
-    if ( 0 == CreateProcess ( strGTAEXEPath,
+    if ( 0 == _CreateProcessA( strGTAEXEPath,
                               (LPSTR)*strCmdLine,
                               NULL,
                               NULL,
                               FALSE,
                               CREATE_SUSPENDED,
                               NULL,
-                              strDir,
+                              strDir,     //    strMTASAPath\mta is used so pthreadVC2.dll can be found
                               &siLoadee,
                               &piLoadee ) )
     {
@@ -472,24 +514,38 @@ int DoLaunchGame ( LPSTR lpCmdLine )
     }
     FreeLibrary ( hCoreModule );
 
-    // Wait until the splash has been displayed the required amount of time
-    HideSplash ( true );
-
     // Inject the core into GTA
     RemoteLoadLibrary ( piLoadee.hProcess, strCoreDLL );
-
-    // Actually hide the splash
-    HideSplash ();
     
     // Clear previous on quit commands
     SetOnQuitCommand ( "" );
 
+    ShowSplash( g_hInstance );  // Bring splash to the front
+
     // Resume execution for the game.
     ResumeThread ( piLoadee.hThread );
 
-    // Wait for game to exit
     if ( piLoadee.hThread)
-        WaitForObject ( piLoadee.hProcess, NULL, INFINITE, g_hMutex );
+    {
+        // Show splash until game window is displayed (or max 20 seconds)
+        DWORD status;
+        for ( uint i = 0 ; i < 20 ; i++ )
+        {
+            status = WaitForSingleObject ( piLoadee.hProcess, 1000 );
+            if ( status != WAIT_TIMEOUT )
+                break;
+
+            if ( !WatchDogIsSectionOpen( "L2" ) )     // Gets closed when loading screen is shown
+                break;
+        }
+
+        // Actually hide the splash
+        HideSplash ();
+
+        // Wait for game to exit
+        if ( status == WAIT_TIMEOUT )
+            WaitForSingleObject ( piLoadee.hProcess, INFINITE );
+    }
 
     // Get its exit code
     DWORD dwExitCode = -1;
@@ -531,6 +587,8 @@ int DoLaunchGame ( LPSTR lpCmdLine )
                 strOperation = "open";
                 strFile = strMTASAPath + "\\" + MTA_EXE_NAME;
             }
+            else
+                CheckService ( CHECK_SERVICE_POST_GAME );     // Stop service here if quit command is not 'restart'
 
             LPCTSTR lpOperation     = strOperation == "" ? NULL : strOperation.c_str ();
             LPCTSTR lpFile          = strFile.c_str ();
@@ -543,6 +601,8 @@ int DoLaunchGame ( LPSTR lpCmdLine )
                 ShellExecuteNonBlocking( lpOperation, lpFile, lpParameters, lpDirectory, nShowCmd );            
             }
         }
+        else
+            CheckService ( CHECK_SERVICE_POST_GAME );     // Stop service here if quit command is empty
     }
 
     // Maybe show help if trouble was encountered

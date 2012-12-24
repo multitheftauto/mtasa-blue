@@ -70,7 +70,7 @@ CMainConfig::CMainConfig ( CConsole* pConsole, CLuaManager* pLuaMain ): CXMLConf
     m_usServerPort = 0;
     m_uiMaxPlayers = 0;
     m_bHTTPEnabled = true;
-    m_bAseEnabled = false;
+    m_iAseMode = 0;
     m_usHTTPPort = 0;
     m_ucHTTPDownloadType = HTTP_DOWNLOAD_DISABLED;
     m_iHTTPMaxConnectionsPerClient = 4;
@@ -81,7 +81,6 @@ CMainConfig::CMainConfig ( CConsole* pConsole, CLuaManager* pLuaMain ): CXMLConf
     m_bJoinFloodProtectionEnabled = true;
     m_bScriptDebugLogEnabled = false;
     m_uiScriptDebugLogLevel = 0;
-    m_bAutoUpdateIncludedResources = false;
     m_bDontBroadcastLan = false;
     m_usFPSLimit = 36;
     m_bAutoLogin = false;
@@ -299,8 +298,10 @@ bool CMainConfig::Load ( void )
                 }
         }
 
-        // Add support for SD #12 (defaults to disabled)
+        // Add support for SD #12, #14 and #15 (defaults to disabled)
         MapInsert ( m_DisableComboACMap, SStringX("12") );
+        MapInsert ( m_DisableComboACMap, SStringX("14") );
+        MapInsert ( m_DisableComboACMap, SStringX("15") );
 
         {
             SString strEnableSD;
@@ -342,36 +343,6 @@ bool CMainConfig::Load ( void )
             if ( (*it).length () )
                 MapInsert ( m_EnableDiagnosticMap, *it );
     }
-
-    // ASE
-    iResult = GetBoolean ( m_pRootNode, "ase", m_bAseEnabled );
-    if ( iResult == INVALID_VALUE )
-    {
-        CLogger::LogPrint ( "WARNING: Invalid value specified in \"ase\" tag; defaulting to 0\n" );
-        m_bAseEnabled = false;
-    }
-    else if ( iResult == DOESNT_EXIST )
-    {
-        m_bAseEnabled = false;
-    }
-
-    // Update sites
-    int i =0;
-    for ( CXMLNode * updateURL = m_pRootNode->FindSubNode("update", i);
-        updateURL != NULL; updateURL = m_pRootNode->FindSubNode("update", ++i ) )
-    {
-        g_pGame->GetResourceDownloader()->AddUpdateSite ( updateURL->GetTagContent ().c_str () );
-    }
-    
-    // Auto update included resources
-    iResult = GetBoolean ( m_pRootNode, "autoupdateincludedresources", m_bAutoUpdateIncludedResources );
-    if ( iResult == INVALID_VALUE  || iResult == DOESNT_EXIST )
-        m_bAutoUpdateIncludedResources = false;
-
-    // Lan server broadcast
-    iResult = GetBoolean ( m_pRootNode, "donotbroadcastlan", m_bDontBroadcastLan );
-    if ( iResult == INVALID_VALUE  || iResult == DOESNT_EXIST )
-        m_bDontBroadcastLan = false;
 
     // Grab the server password
     iResult = GetString ( m_pRootNode, "password", m_strPassword, 1, 32 );
@@ -571,6 +542,8 @@ void CMainConfig::SetFakeLag ( int iPacketLoss, int iExtraPing, int iExtraPingVa
 
 void CMainConfig::ApplyNetOptions ( void )
 {
+    m_NetOptions.netFilter.bValid = true;
+    m_NetOptions.netFilter.bAutoFilter = m_bNetAutoFilter != 0;
     g_pNetServer->SetNetOptions ( m_NetOptions );
 }
 
@@ -765,7 +738,6 @@ bool CMainConfig::LoadExtended ( void )
     CLogger::SetMinLogLevel ( LOGLEVEL_LOW );
 
     // Register the commands
-    RegisterCommand ( "update", CConsoleCommands::Update, false );          // Nearly working - Part of (unmaintained) resource download system
     RegisterCommand ( "start", CConsoleCommands::StartResource, false );
     RegisterCommand ( "stop", CConsoleCommands::StopResource, false );
     RegisterCommand ( "stopall", CConsoleCommands::StopAllResources, false );
@@ -776,7 +748,7 @@ bool CMainConfig::LoadExtended ( void )
     RegisterCommand ( "info", CConsoleCommands::ResourceInfo, false );
     RegisterCommand ( "install", CConsoleCommands::InstallResource, false );
     RegisterCommand ( "upgrade", CConsoleCommands::UpgradeResources, false );
-    RegisterCommand ( "checkall", CConsoleCommands::CheckAllResources, false );
+    RegisterCommand ( "check", CConsoleCommands::CheckResources, false );
 
     RegisterCommand ( "say", CConsoleCommands::Say, false );
     RegisterCommand ( "teamsay", CConsoleCommands::TeamSay, false );
@@ -1247,7 +1219,7 @@ bool CMainConfig::SetSetting ( const SString& strName, const SString& strValue, 
                 }
 
                 if ( item.changeCallback )
-                    item.changeCallback ();
+                    (this->*item.changeCallback) ();
 
                 return true;
             }
@@ -1271,17 +1243,21 @@ const std::vector < SIntSetting >& CMainConfig::GetIntSettingList ( void )
     static const SIntSetting settings[] =
         {
             //Set,  save,   min,    def,    max,    name,                                   variable,                                   callback
-            { true, true,   50,     100,    4000,   "player_sync_interval",                 &g_TickRateSettings.iPureSync,              &OnTickRateChange },
-            { true, true,   50,     1500,   4000,   "lightweight_sync_interval",            &g_TickRateSettings.iLightSync,             &OnTickRateChange },
-            { true, true,   50,     500,    4000,   "camera_sync_interval",                 &g_TickRateSettings.iCamSync,               &OnTickRateChange },
-            { true, true,   50,     400,    4000,   "ped_sync_interval",                    &g_TickRateSettings.iPedSync,               &OnTickRateChange },
-            { true, true,   50,     400,    4000,   "unoccupied_vehicle_sync_interval",     &g_TickRateSettings.iUnoccupiedVehicle,     &OnTickRateChange },
-            { true, true,   50,     100,    4000,   "keysync_mouse_sync_interval",          &g_TickRateSettings.iKeySyncRotation,       &OnTickRateChange },
-            { true, true,   50,     100,    4000,   "keysync_analog_sync_interval",         &g_TickRateSettings.iKeySyncAnalogMove,     &OnTickRateChange },
-            { true, true,   50,     100,    4000,   "donkey_work_interval",                 &g_TickRateSettings.iNearListUpdate,        &OnTickRateChange },
-            { true, true,   0,      0,      1,      "bullet_sync",                          &m_bBulletSyncEnabled,                      &OnTickRateChange },
-            { true, true,   0,      0,      120,    "vehext_percent",                       &m_iVehExtrapolatePercent,                  &OnTickRateChange },
-            { true, true,   0,      150,    500,    "vehext_ping_limit",                    &m_iVehExtrapolatePingLimit,                &OnTickRateChange },
+            { true, true,   50,     100,    4000,   "player_sync_interval",                 &g_TickRateSettings.iPureSync,              &CMainConfig::OnTickRateChange },
+            { true, true,   50,     1500,   4000,   "lightweight_sync_interval",            &g_TickRateSettings.iLightSync,             &CMainConfig::OnTickRateChange },
+            { true, true,   50,     500,    4000,   "camera_sync_interval",                 &g_TickRateSettings.iCamSync,               &CMainConfig::OnTickRateChange },
+            { true, true,   50,     400,    4000,   "ped_sync_interval",                    &g_TickRateSettings.iPedSync,               &CMainConfig::OnTickRateChange },
+            { true, true,   50,     400,    4000,   "unoccupied_vehicle_sync_interval",     &g_TickRateSettings.iUnoccupiedVehicle,     &CMainConfig::OnTickRateChange },
+            { true, true,   50,     100,    4000,   "keysync_mouse_sync_interval",          &g_TickRateSettings.iKeySyncRotation,       &CMainConfig::OnTickRateChange },
+            { true, true,   50,     100,    4000,   "keysync_analog_sync_interval",         &g_TickRateSettings.iKeySyncAnalogMove,     &CMainConfig::OnTickRateChange },
+            { true, true,   50,     100,    4000,   "donkey_work_interval",                 &g_TickRateSettings.iNearListUpdate,        &CMainConfig::OnTickRateChange },
+            { true, true,   0,      0,      1,      "bullet_sync",                          &m_bBulletSyncEnabled,                      &CMainConfig::OnTickRateChange },
+            { true, true,   0,      0,      120,    "vehext_percent",                       &m_iVehExtrapolatePercent,                  &CMainConfig::OnTickRateChange },
+            { true, true,   0,      150,    500,    "vehext_ping_limit",                    &m_iVehExtrapolatePingLimit,                &CMainConfig::OnTickRateChange },
+            { true, true,   0,      1,      2,      "ase",                                  &m_iAseMode,                                &CMainConfig::OnAseSettingChange },
+            { true, true,   0,      1,      1,      "donotbroadcastlan",                    &m_bDontBroadcastLan,                       &CMainConfig::OnAseSettingChange },
+            { true, true,   0,      1,      1,      "net_auto_filter",                      &m_bNetAutoFilter,                          &CMainConfig::ApplyNetOptions },
+            { true, true,   0,      0,      1,      "verify_memory",                        &m_bVerifyMemory,                           NULL },
         };
 
     static std::vector < SIntSetting > settingsList;
@@ -1304,4 +1280,25 @@ void CMainConfig::OnTickRateChange ( void )
     CStaticFunctionDefinitions::SendSyncIntervals ();
     g_pGame->SendSyncSettings ();
     g_pGame->CalculateMinClientRequirement ();
+}
+
+void CMainConfig::OnAseSettingChange ( void )
+{
+    g_pGame->ApplyAseSetting ();
+}
+
+void CGame::ApplyAseSetting ( void )
+{
+    if ( m_pMainConfig->GetDontBroadcastLan() )
+        SAFE_DELETE( m_pLanBroadcast );
+
+    bool bInternetEnabled = m_pMainConfig->GetAsePortEnabled () == 1;
+    bool bLanEnabled = !m_pMainConfig->GetDontBroadcastLan();
+    m_pASE->SetPortEnabled ( bInternetEnabled, bLanEnabled );
+
+    if ( !m_pMainConfig->GetDontBroadcastLan() )
+    {
+        if ( !m_pLanBroadcast )
+            m_pLanBroadcast = m_pASE->InitLan();
+    }
 }

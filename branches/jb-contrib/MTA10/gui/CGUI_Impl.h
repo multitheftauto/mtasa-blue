@@ -164,8 +164,10 @@ public:
     CGUIFont*                       GetSansFont                 ( void );
     bool                            IsFontPresent               ( const char* szFont ) { return m_pFontManager->isFontPresent(szFont); }
 
-    void                            SetWorkingDirectory         ( const char * szDir );
-    inline const char*              GetWorkingDirectory         ( void )    { return const_cast < const char* > ( m_szWorkingDirectory ); }
+    const SString&                  GetGuiWorkingDirectory         ( void ) const;
+    void                            SetDefaultGuiWorkingDirectory  ( const SString& strDir );
+    void                            PushGuiWorkingDirectory        ( const SString& strDir );
+    void                            PopGuiWorkingDirectory         ( const SString& strDirCheck = "" );
 
     void                            SetCharacterKeyHandler       ( eInputChannel channel, const GUI_CALLBACK_KEY & Callback )    { CHECK_CHANNEL ( channel ); m_CharacterKeyHandlers[ channel ] = Callback; }
     void                            SetKeyDownHandler            ( eInputChannel channel, const GUI_CALLBACK_KEY & Callback )    { CHECK_CHANNEL ( channel ); m_KeyDownHandlers[ channel ] = Callback; }
@@ -229,6 +231,7 @@ private:
 	
     void                            SubscribeToMouseEvents();
     CGUIFont*                       CreateFntFromWinFont        ( const char* szFontName, const char* szFontWinReg, const char* szFontWinFile, unsigned int uSize = 8, unsigned int uFlags = 0, bool bAutoScale = false );
+    void                            ApplyGuiWorkingDirectory       ( void );
 
     IDirect3DDevice9*               m_pDevice;
 
@@ -273,7 +276,7 @@ private:
 
     eInputChannel                   m_Channel;
 
-    char                            m_szWorkingDirectory [ MAX_PATH + 1 ];
+    std::list < SString >           m_GuiWorkingDirectoryStack;
 
     bool                            m_bTransferBoxVisible;
 

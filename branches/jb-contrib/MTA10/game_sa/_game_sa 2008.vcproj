@@ -381,7 +381,7 @@
 				>
 			</File>
 			<File
-				RelativePath="CAudioSA.cpp"
+				RelativePath=".\CAudioEngineSA.cpp"
 				>
 			</File>
 			<File
@@ -701,6 +701,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CPointLightsSA.cpp"
+				>
+			</File>
+			<File
 				RelativePath="CPoolsSA.cpp"
 				>
 			</File>
@@ -1006,7 +1010,7 @@
 				>
 			</File>
 			<File
-				RelativePath="CAudioSA.h"
+				RelativePath=".\CAudioEngineSA.h"
 				>
 			</File>
 			<File
@@ -1355,6 +1359,10 @@
 			</File>
 			<File
 				RelativePath="CPlayerPedSA.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CPointLightsSA.h"
 				>
 			</File>
 			<File

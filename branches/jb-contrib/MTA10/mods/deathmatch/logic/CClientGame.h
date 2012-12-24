@@ -78,8 +78,6 @@ public:
         STATUS_CONNECTING,
         STATUS_JOINING,
         STATUS_JOINED,
-        STATUS_TRANSFER,
-        STATUS_OFFLINE
     };
 
     enum
@@ -229,8 +227,6 @@ public:
 
     bool                                IsNickValid                     ( const char* szNick );
     bool                                IsNametagValid                  ( const char* szNick );
-
-    bool                                IsOfflineGame                   ( void ) { return m_Status == STATUS_OFFLINE; };
 
     inline bool                         IsGettingIntoVehicle            ( void ) { return m_bIsGettingIntoVehicle; };
     
@@ -405,6 +401,7 @@ public:
     bool                                GetWeaponTypeUsesBulletSync     ( eWeaponType weaponType );
 
     SString                             GetHTTPURL                      ( void ) { return m_strHTTPDownloadURL; };
+    void                                ProjectileInitiateHandler       ( CClientProjectile * pProjectile );
 
 private:
 
@@ -450,21 +447,19 @@ private:
     void                                DrawWeaponsyncData              ( CClientPlayer* pPlayer );
     #endif
 
-
-    void                                DownloadFiles                   ( bool bBackgroundDownload = false );
+    void                                DownloadInitialResourceFiles    ( void );
+    void                                DownloadSingularResourceFiles   ( void );
 
     void                                QuitPlayer                      ( CClientPlayer* pPlayer, eQuitReason Reason );
 
     void                                Event_OnIngame                  ( void );
     void                                Event_OnIngameAndReady          ( void );
     void                                Event_OnIngameAndConnected      ( void );
-    void                                Event_OnTransferComplete        ( void );
 
     static bool                         StaticDamageHandler             ( CPed* pDamagePed, CEventDamage * pEvent );
     static void                         StaticFireHandler               ( CFire* pFire );
     static bool                         StaticBreakTowLinkHandler       ( CVehicle* pTowedVehicle );
     static void                         StaticDrawRadarAreasHandler     ( void );
-    static void                         StaticProjectileInitiateHandler ( CClientProjectile * pProjectile );
     static void                         StaticRender3DStuffHandler      ( void );
     static bool                         StaticChokingHandler            ( unsigned char ucWeaponType );
     static void                         StaticPreWorldProcessHandler    ( void );
@@ -489,7 +484,6 @@ private:
     void                                FireHandler                     ( CFire* pFire );
     bool                                BreakTowLinkHandler             ( CVehicle* pTowedVehicle );
     void                                DrawRadarAreasHandler           ( void );
-    void                                ProjectileInitiateHandler       ( CClientProjectile * pProjectile );
     void                                Render3DStuffHandler            ( void );
     bool                                ChokingHandler                  ( unsigned char ucWeaponType );
     void                                PreWorldProcessHandler          ( void );
@@ -527,10 +521,17 @@ public:
     void                                SetServerVersionSortable        ( const SString& strVersion )   { m_strServerVersionSortable = strVersion; }
     const SString&                      GetServerVersionSortable        ( void )                        { return m_strServerVersionSortable; }
 
-    void                                SetSingularTransfers            ( bool bTransfer )  { m_bSingularTransfer = bTransfer; };
-    void                                ShowTransferBox                 ( void )            { m_pTransferBox->Show (); };
+    void                                SetTransferringInitialFiles     ( bool bTransfer );
+    bool                                IsTransferringInitialFiles      ( void )            { return m_bTransferringInitialFiles; }
+    void                                SetTransferringSingularFiles    ( bool bTransfer )  { m_bTransferringSingularFiles = bTransfer; }
+    bool                                IsTransferringSingularFiles     ( void )            { return m_bTransferringSingularFiles; }
+
     void                                SetVehExtrapolateSettings       ( const SVehExtrapolateSettings& settings ) { m_VehExtrapolateSettings = settings; }
     const SVehExtrapolateSettings&      GetVehExtrapolateSettings       ( void )                                    { return m_VehExtrapolateSettings; }
+
+    void                                SetVehicleOnlyGameMode          ( bool bOn );
+    bool                                IsVehicleOnlyGameMode           ( void );
+    bool                                IsUsingAlternatePulseOrder      ( bool bAdvanceDelayCounter = false );
 
 private:
     eStatus                             m_Status;
@@ -638,9 +639,6 @@ private:
     unsigned long                       m_ulDamageTime;
     bool                                m_bDamageSent;
 
-    DWORD                               m_dwTransferStarted;
-    bool                                m_bTransferReset;
-
     eWeaponSlot                         m_lastWeaponSlot;
     SFixedArray < DWORD, WEAPONSLOT_MAX + 1 >   m_wasWeaponAmmoInClip;
 
@@ -650,8 +648,8 @@ private:
     bool                                m_bShowNetstat;
     bool                                m_bShowFPS;
 
-    bool                                m_bTransferResource;
-    bool                                m_bTransferInitiated;
+    bool                                m_bTransferringInitialFiles;
+    bool                                m_bTransferringSingularFiles;
 
     float                               m_fGameSpeed;
     long                                m_lMoney;
@@ -687,8 +685,6 @@ private:
     bool                                m_bBeingDeleted;        // To enable speedy disconnect
 
     bool                                m_bWasMinimized;
-
-    bool                                m_bSingularTransfer;
 
     // Cache for speeding up collision processing
 public:
@@ -735,6 +731,8 @@ private:
     GUI_CALLBACK                        m_OnCancelLocalGameClick;
 
     SVehExtrapolateSettings             m_VehExtrapolateSettings;
+    bool                                m_bVehicleOnlyGameMode;
+    uint                                m_uiAltPulseOrderCounter;
 };
 
 extern CClientGame* g_pClientGame;

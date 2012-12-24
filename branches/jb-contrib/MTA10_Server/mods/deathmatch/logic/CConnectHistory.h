@@ -13,7 +13,7 @@
 #ifndef __CCONNECTHISTORY_H
 #define __CCONNECTHISTORY_H
 
-typedef std::map < std::string, struct CConnectHistoryItem > HistoryItemMap;
+typedef CFastHashMap < SString, struct CConnectHistoryItem > HistoryItemMap;
 typedef std::vector < long long > JoinTimesMap;
 
 struct CConnectHistoryItem
@@ -32,6 +32,7 @@ public:
     bool                                AddConnect              ( const std::string& strIP );
     bool                                IsFlooding              ( const std::string& strIP );
     CConnectHistoryItem&                GetHistoryItem          ( const std::string& strIP );
+    uint                                GetTotalFloodingCount   ( void );
 
 private:
     void                                RemoveExpired           ( void );

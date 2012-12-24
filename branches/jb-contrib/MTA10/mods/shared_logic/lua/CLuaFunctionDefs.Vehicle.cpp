@@ -2853,7 +2853,7 @@ int CLuaFunctionDefs::SetVehicleSirens ( lua_State* luaVM )
 
     argStream.ReadUserData ( pVehicle );
     argStream.ReadNumber ( ucSirenID );
-    if ( ucSirenID > 0 )
+    if ( ucSirenID > 0 && ucSirenID < 9 )
     {
         // Array indicies start at 0 so compensate here. This way all code works properly and we get nice 1-8 numbers for API
         ucSirenID--;
@@ -2908,6 +2908,255 @@ int CLuaFunctionDefs::GetVehicleDoorOpenRatio ( lua_State* luaVM )
     }
     else
         m_pScriptDebugging->LogBadType ( luaVM );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::SetVehicleComponentPosition ( lua_State* luaVM )
+{
+    CScriptArgReader argStream ( luaVM );
+
+    SString strComponent;
+    CClientVehicle * pVehicle = NULL;
+    CVector vecPosition;
+    argStream.ReadUserData ( pVehicle );
+    argStream.ReadString ( strComponent );
+    argStream.ReadNumber ( vecPosition.fX );
+    argStream.ReadNumber ( vecPosition.fY );
+    argStream.ReadNumber ( vecPosition.fZ );
+    if ( !argStream.HasErrors() )
+    {
+        if ( pVehicle )
+        { 
+            if ( pVehicle->SetComponentPosition ( strComponent, vecPosition ) )
+            {
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::GetVehicleComponentPosition ( lua_State* luaVM )
+{
+    CScriptArgReader argStream ( luaVM );
+    SString strComponent;
+    CClientVehicle * pVehicle = NULL;
+    CVector vecPosition;
+    argStream.ReadUserData ( pVehicle );
+    argStream.ReadString ( strComponent );
+    if ( !argStream.HasErrors() )
+    {
+        if ( pVehicle )
+        {
+            if ( pVehicle->GetComponentPosition ( strComponent, vecPosition ) )
+            {
+                lua_pushnumber ( luaVM, vecPosition.fX );
+                lua_pushnumber ( luaVM, vecPosition.fY );
+                lua_pushnumber ( luaVM, vecPosition.fZ );
+                return 3;
+            }
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefs::SetVehicleComponentRotation ( lua_State* luaVM )
+{
+    CScriptArgReader argStream ( luaVM );
+    SString strComponent;
+    CClientVehicle * pVehicle = NULL;
+    CVector vecRotation;
+    argStream.ReadUserData ( pVehicle );
+    argStream.ReadString ( strComponent );
+    argStream.ReadNumber ( vecRotation.fX );
+    argStream.ReadNumber ( vecRotation.fY );
+    argStream.ReadNumber ( vecRotation.fZ );
+    if ( !argStream.HasErrors() )
+    {
+        if ( pVehicle )
+        {
+            pVehicle->SetComponentRotation ( strComponent, vecRotation );
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefs::GetVehicleComponentRotation ( lua_State* luaVM )
+{
+    CScriptArgReader argStream ( luaVM );
+    SString strComponent;
+    CClientVehicle * pVehicle = NULL;
+    CVector vecRotation;
+    argStream.ReadUserData ( pVehicle );
+    argStream.ReadString ( strComponent );
+    if ( !argStream.HasErrors() )
+    {
+        if ( pVehicle )
+        {
+            if ( pVehicle->GetComponentRotation ( strComponent, vecRotation ) )
+            {
+                lua_pushnumber ( luaVM, vecRotation.fX );
+                lua_pushnumber ( luaVM, vecRotation.fY );
+                lua_pushnumber ( luaVM, vecRotation.fZ );
+                return 3;
+            }
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefs::ResetVehicleComponentPosition ( lua_State* luaVM )
+{
+    CScriptArgReader argStream ( luaVM );
+    SString strComponent;
+    CClientVehicle * pVehicle = NULL;
+    argStream.ReadUserData ( pVehicle );
+    argStream.ReadString ( strComponent );
+    if ( !argStream.HasErrors() )
+    {
+        if ( pVehicle )
+        {
+            if ( pVehicle->ResetComponentPosition ( strComponent ) )
+            {
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefs::ResetVehicleComponentRotation ( lua_State* luaVM )
+{
+    CScriptArgReader argStream ( luaVM );
+    SString strComponent;
+    CClientVehicle * pVehicle = NULL;
+    argStream.ReadUserData ( pVehicle );
+    argStream.ReadString ( strComponent );
+    if ( !argStream.HasErrors() )
+    {
+        if ( pVehicle )
+        {
+            if ( pVehicle->ResetComponentRotation ( strComponent ) )
+            {
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefs::SetVehicleComponentVisible ( lua_State* luaVM )
+{
+    CScriptArgReader argStream ( luaVM );
+    SString strComponent;
+    CClientVehicle * pVehicle = NULL;
+    bool bVisible = false;
+    argStream.ReadUserData ( pVehicle );
+    argStream.ReadString ( strComponent );
+    argStream.ReadBool ( bVisible );
+    if ( !argStream.HasErrors() )
+    {
+        if ( pVehicle )
+        {
+            if ( pVehicle->SetComponentVisible ( strComponent, bVisible ) )
+            {
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefs::GetVehicleComponentVisible ( lua_State* luaVM )
+{
+    CScriptArgReader argStream ( luaVM );
+    SString strComponent;
+    CClientVehicle * pVehicle = NULL;
+    bool bVisible = false;
+    argStream.ReadUserData ( pVehicle );
+    argStream.ReadString ( strComponent );
+    if ( !argStream.HasErrors() )
+    {
+        if ( pVehicle )
+        {
+            if ( pVehicle->GetComponentVisible ( strComponent, bVisible ) )
+            {
+                lua_pushboolean ( luaVM, bVisible );
+                return 1;
+            }
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::GetVehicleComponents ( lua_State* luaVM )
+{
+    CScriptArgReader argStream ( luaVM );
+    SString strComponent;
+    CClientVehicle * pVehicle = NULL;
+
+    argStream.ReadUserData ( pVehicle );
+
+    if ( !argStream.HasErrors() )
+    {
+        if ( pVehicle )
+        {
+            std::map < SString, SVehicleComponentData > ::iterator iter = pVehicle->ComponentsBegin ( );
+            lua_newtable ( luaVM );
+            for ( ;iter != pVehicle->ComponentsEnd ( ); iter++ )
+            {
+                lua_pushstring( luaVM, (*iter).first );
+                lua_pushboolean( luaVM, (*iter).second.m_bVisible );
+                lua_settable ( luaVM, -3 ); // End of Table
+            }
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;

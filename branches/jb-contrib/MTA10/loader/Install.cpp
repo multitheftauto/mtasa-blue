@@ -183,6 +183,7 @@ bool DoInstallFiles ( void )
 // InstallFiles
 //
 // Handle progress bar if required
+// Returns false on fail
 //
 ///////////////////////////////////////////////////////////////
 bool InstallFiles ( bool bSilent )
@@ -192,6 +193,10 @@ bool InstallFiles ( bool bSilent )
        StartPseudoProgress( g_hInstance, "MTA: San Andreas", "Installing update..." );
 
     bool bResult = DoInstallFiles ();
+
+    // make sure correct service is created and started
+    if ( bResult )
+        bResult = CheckService ( CHECK_SERVICE_POST_UPDATE );
 
     // Stop progress bar
     StopPseudoProgress();

@@ -7,8 +7,8 @@ if [ ! -f "Makefile" ]; then
   exit
 fi
 
-make -C MTA10_Server install
-make -C Shared/XML install
+make -j4 -C MTA10_Server install
+make -j4 -C Shared/XML install
 
 data_files="acl.xml banlist.xml mtaserver.conf vehiclecolors.conf"
 for i in $data_files ; do

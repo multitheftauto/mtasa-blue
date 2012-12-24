@@ -129,7 +129,8 @@ public:
     inline CPad                     * GetPad()                  { DEBUG_TRACE("CPad     * GetPad()");return m_pPad; };
     inline CTheCarGenerators        * GetTheCarGenerators()     { DEBUG_TRACE("CTheCarGenerators  * GetTheCarGenerators()");return m_pTheCarGenerators; };
     inline CAERadioTrackManager     * GetAERadioTrackManager()  { DEBUG_TRACE("CAERadioTrackManager * GetAERadioTrackManager()");return m_pCAERadioTrackManager; };
-    inline CAudio                   * GetAudio()                { DEBUG_TRACE("CAudio     * GetAudio()");return m_pAudio; };
+    inline CAudioEngine             * GetAudioEngine()          { DEBUG_TRACE("CAudio     * GetAudioEngine()");return m_pAudioEngine; };
+    inline CAudioEngine             * GetAudio()                { DEBUG_TRACE("CAudio     * GetAudioEngine()");return m_pAudioEngine; };
     inline CMenuManager             * GetMenuManager()          { DEBUG_TRACE("CMenuManager         * GetMenuManager()");return m_pMenuManager; };
     inline CText                    * GetText()                 { DEBUG_TRACE("CText                    * GetText()");return m_pText; };
     inline CStats                   * GetStats()                { DEBUG_TRACE("CStats                   * GetStats()");return m_pStats; };
@@ -152,6 +153,7 @@ public:
     inline class CFxManager         * GetFxManager ()            { return m_pFxManager; }
     inline CWaterManager            * GetWaterManager ()         { return m_pWaterManager; }
     inline CWeaponStatManager       * GetWeaponStatManager()     { return m_pWeaponStatsManager; }
+    inline CPointLights             * GetPointLights ()          { return m_pPointLights; }
 
     CWeaponInfo             * GetWeaponInfo(eWeaponType weapon,eWeaponSkill skill=WEAPONSKILL_STD);
     CModelInfo              * GetModelInfo( DWORD dwModelID );
@@ -219,8 +221,9 @@ public:
 
     bool                    HasCreditScreenFadedOut         ( void );
 
-    void                    SetupSpecialCharacters  ( void );
-
+    void                    SetupSpecialCharacters          ( void );
+    CWeapon *               CreateWeapon                    ( void );
+    CWeaponStat *           CreateWeaponStat                ( eWeaponType weaponType, eWeaponSkill weaponSkill );
     void                    FlushPendingRestreamIPL         ( void );
     void                    ResetModelLodDistances          ( void );
     void                    DisableVSync                    ( void );
@@ -269,11 +272,12 @@ private:
     CFxManager              * m_pFxManager;
     CWaterManager           * m_pWaterManager;
     CWeaponStatManager      * m_pWeaponStatsManager;
+    CPointLights            * m_pPointLights;
 
     CPad                        * m_pPad;
     CTheCarGenerators           * m_pTheCarGenerators;
     CAERadioTrackManager        * m_pCAERadioTrackManager;
-    CAudio                      * m_pAudio;
+    CAudioEngine                * m_pAudioEngine;
     CMenuManager                * m_pMenuManager;
     CText                       * m_pText;
     CStats                      * m_pStats;

@@ -70,6 +70,8 @@ public:
     int                 Run                 ( int iArgumentCount, char* szArguments [] );
 #ifndef WIN32
     void                Daemonize           () const;
+#else
+    bool                HasConsole          ( void )                { return m_hConsole != NULL; }
 #endif
 
 private:

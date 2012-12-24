@@ -1068,6 +1068,9 @@ int CPoolsSA::GetPoolDefaultCapacity ( ePools pool )
         case POINT_ROUTE_POOL:          return 64;
         case POINTER_DOUBLE_LINK_POOL:  return 3200;         // Modded to 8000   @ CMultiplayerSA.cpp
         case POINTER_SINGLE_LINK_POOL:  return 70000;
+        case ENV_MAP_MATERIAL_POOL:     return 4096;         // Modded to 16000   @ CGameSA.cpp
+        case ENV_MAP_ATOMIC_POOL:       return 1024;         // Modded to 8000    @ CGameSA.cpp
+        case SPEC_MAP_MATERIAL_POOL:    return 4096;         // Modded to 16000   @ CGameSA.cpp
     }
     return 0;
 }
@@ -1096,6 +1099,9 @@ int CPoolsSA::GetPoolCapacity ( ePools pool )
         case POINT_ROUTE_POOL:          cPtr = 0x5511AF; break;
         case POINTER_DOUBLE_LINK_POOL:  iPtr = 0x550F82; break;
         case POINTER_SINGLE_LINK_POOL:  iPtr = 0x550F46; break;
+        case ENV_MAP_MATERIAL_POOL:     iPtr = 0x5DA08E; break;
+        case ENV_MAP_ATOMIC_POOL:       iPtr = 0x5DA0CA; break;
+        case SPEC_MAP_MATERIAL_POOL:    iPtr = 0x5DA106; break;
     }
     if ( iPtr )
         return *(int*)iPtr;
@@ -1131,6 +1137,9 @@ void CPoolsSA::SetPoolCapacity ( ePools pool, int iValue )
         case POINT_ROUTE_POOL:          cPtr = 0x5511AF; break;     // 0 - 127
         case POINTER_DOUBLE_LINK_POOL:  iPtr = 0x550F82; break;
         case POINTER_SINGLE_LINK_POOL:  iPtr = 0x550F46; break;
+        case ENV_MAP_MATERIAL_POOL:     iPtr = 0x5DA08E; break;
+        case ENV_MAP_ATOMIC_POOL:       iPtr = 0x5DA0CA; break;
+        case SPEC_MAP_MATERIAL_POOL:    iPtr = 0x5DA106; break;
     }
     if ( iPtr )
         MemPut < int > ( iPtr, iValue );

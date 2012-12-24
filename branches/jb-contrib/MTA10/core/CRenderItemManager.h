@@ -46,6 +46,12 @@ public:
     virtual void                SetTestMode                         ( eDxTestMode testMode );
     virtual void                GetDxStatus                         ( SDxStatus& outStatus );
     virtual CEffectCloner*      GetEffectCloner                     ( void )                    { return m_pEffectCloner; }
+    virtual void                PreDrawWorld                        ( void );
+    virtual void                SetDepthBufferFormat                ( ERenderFormat depthBufferFormat )     { m_depthBufferFormat = depthBufferFormat; }
+    virtual ERenderFormat       GetDepthBufferFormat                ( void )                                { return m_depthBufferFormat; }
+    virtual void                SaveReadableDepthBuffer             ( void );
+    virtual void                FlushNonAARenderTarget              ( void );
+    virtual void                HandleStretchRect                   ( IDirect3DSurface9* pSourceSurface,CONST RECT* pSourceRect,IDirect3DSurface9* pDestSurface,CONST RECT* pDestRect,int Filter );
 
     // CRenderItemManager
     void                        NotifyContructRenderItem            ( CRenderItem* pItem );
@@ -59,6 +65,7 @@ public:
     void                        RemoveShaderItemFromWatchLists      ( CShaderItem* pShaderItem );
     void                        UpdateMemoryUsage                   ( void );
     bool                        CanCreateRenderItem                 ( ClassId classId );
+    void                        NotifyShaderItemUsesDepthBuffer     ( CShaderItem* pShaderItem, bool bUsesDepthBuffer );
 
     static int                  GetBitsPerPixel                     ( D3DFORMAT Format );
     static int                  CalcD3DResourceMemoryKBUsage        ( IDirect3DResource9* pD3DResource );
@@ -91,4 +98,11 @@ protected:
     int                                         m_iFontMemoryKBUsed;
     int                                         m_iMemoryKBFreeForMTA;
     bool                                        m_bSetRenderTargetEnabledOldVer;
+    bool                                        m_bUsingReadableDepthBuffer;
+    ERenderFormat                               m_depthBufferFormat;
+    std::set < CShaderItem* >                   m_ShadersUsingDepthBuffer;
+    IDirect3DSurface9*                          m_pSavedSceneDepthSurface;
+    IDirect3DSurface9*                          m_pSavedSceneRenderTargetAA;
+    IDirect3DSurface9*                          m_pNonAADepthSurface2;
+    IDirect3DSurface9*                          m_pNonAARenderTarget;
 };

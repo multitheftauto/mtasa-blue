@@ -16,14 +16,15 @@
 CLuaEventPacket::CLuaEventPacket ( void )
 {
     m_ElementID = INVALID_ELEMENT_ID;
+    m_pArguments = &m_ArgumentsStore;
 }
 
 
-CLuaEventPacket::CLuaEventPacket ( const char* szName, ElementID ID, CLuaArguments& Arguments )
+CLuaEventPacket::CLuaEventPacket ( const char* szName, ElementID ID, CLuaArguments* pArguments )
 {
     m_strName.AssignLeft ( szName, MAX_EVENT_NAME_LENGTH );
     m_ElementID = ID;
-    m_Arguments = Arguments;
+    m_pArguments = pArguments;  // Use a pointer to save copying the arguments
 }
 
 
@@ -34,7 +35,10 @@ bool CLuaEventPacket::Read ( NetBitStreamInterface& BitStream )
     {
         if ( usNameLength < (MAX_EVENT_NAME_LENGTH - 1) && BitStream.ReadStringCharacters ( m_strName, usNameLength ) && BitStream.Read ( m_ElementID ) )
         {
-            m_Arguments = CLuaArguments ( BitStream );
+            // Faster than using a constructor
+            m_ArgumentsStore.DeleteArguments ();
+            m_ArgumentsStore.ReadFromBitStream ( BitStream );
+            m_pArguments = &m_ArgumentsStore;
 
             return true;
         }
@@ -50,7 +54,7 @@ bool CLuaEventPacket::Write ( NetBitStreamInterface& BitStream ) const
     BitStream.WriteCompressed ( usNameLength );
     BitStream.WriteStringCharacters ( m_strName, usNameLength );
     BitStream.Write ( m_ElementID );
-    m_Arguments.WriteToBitStream ( BitStream );
+    m_pArguments->WriteToBitStream ( BitStream );
 
     return true;
 }

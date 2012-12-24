@@ -117,6 +117,55 @@ SString SharedUtil::GetLocalTimeString ( bool bDate, bool bMilliseconds )
 }
 
 
+//
+// Transfer a value from one thread to another without locks
+//
+template < class T, int BUFFER_SIZE = 4 >
+class CThreadResultValue
+{
+public:
+    CThreadResultValue ( void ) : m_ucLastWrittenIndex ( 0 ) {}
+
+    void Initialize ( const T& initialValue )
+    {
+        m_ucLastWrittenIndex = 0;
+        for ( uint i = 0 ; i < BUFFER_SIZE ; i++ )
+        {
+            m_OutputBuffersA[ i ] = initialValue;
+            m_OutputBuffersB[ i ] = initialValue;
+        }
+    }
+
+    void SetValue ( const T& value )
+    {
+        if ( value != m_OutputBuffersA[m_ucLastWrittenIndex] )
+        {
+            uchar ucIndex = m_ucLastWrittenIndex;
+            ucIndex = ( ucIndex + 1 ) % BUFFER_SIZE;
+            m_OutputBuffersA[ ucIndex ] = value;
+            m_OutputBuffersB[ ucIndex ] = value;
+            m_ucLastWrittenIndex = ucIndex;
+        }
+    }
+
+    T GetValue ( void )
+    {
+        while ( true )
+        {
+            T resultA = m_OutputBuffersA[ m_ucLastWrittenIndex ];
+            T resultB = m_OutputBuffersB[ m_ucLastWrittenIndex ];
+            if ( resultA == resultB )
+                return resultA;
+        }
+    }
+
+protected:
+    volatile uchar   m_ucLastWrittenIndex;
+    volatile T       m_OutputBuffersA[ BUFFER_SIZE ];
+    volatile T       m_OutputBuffersB[ BUFFER_SIZE ];
+};
+
+
 namespace SharedUtil
 {
     //
@@ -127,36 +176,36 @@ namespace SharedUtil
     public:
         CPerModuleTickCount ( void )
         {
-            m_llCurrentTickCount = GetTickCount64_ ();
+    #ifdef _DEBUG
+            m_TimeSinceUpdated.SetMaxIncrement ( 500 );
+    #endif
+            m_ResultValue.Initialize ( GetTickCount64_ () );
         }
-    
+
         long long Get ( void )
         {
-            m_ModuleTickCountCS.Lock ();
     #ifdef _DEBUG
             if ( m_TimeSinceUpdated.Get () > 10000 )
-                OutputDebugLine ( "WARNING: UpdateModuleTickCount64 not being called for the current module" );
+            {
+                m_TimeSinceUpdated.Reset ();
+                OutputDebugLine ( "WARNING: UpdateModuleTickCount64 might not be called for the current module" );
+            }
     #endif
-            long long result = m_llCurrentTickCount;
-            m_ModuleTickCountCS.Unlock ();
-            return result;
+            return m_ResultValue.GetValue ();
         }
-    
+
         void Update ( void )
         {
-            m_ModuleTickCountCS.Lock ();
     #ifdef _DEBUG
             m_TimeSinceUpdated.Reset ();
     #endif
-            m_llCurrentTickCount = GetTickCount64_ ();
-            m_ModuleTickCountCS.Unlock ();
+            m_ResultValue.SetValue ( GetTickCount64_ () );
         }
     
     protected:
-        CCriticalSection m_ModuleTickCountCS;
-        long long        m_llCurrentTickCount;
+        CThreadResultValue < long long > m_ResultValue;
     #ifdef _DEBUG
-        CElapsedTime     m_TimeSinceUpdated;
+        CElapsedTime    m_TimeSinceUpdated;
     #endif
     };
 

@@ -17,11 +17,38 @@
 #include "net/bitstream.h"
 #include "CNetHTTPDownloadManagerInterface.h"
 
+namespace EDownloadMode
+{
+    enum EDownloadModeType
+    {
+        NONE,
+        CORE_UPDATER,
+        RESOURCE_INITIAL_FILES,
+        RESOURCE_SINGULAR_FILES,
+    };
+}
+using EDownloadMode::EDownloadModeType;
+
+
 struct SPacketStat
 {
     int iCount;
     int iTotalBytes;
     TIMEUS totalTime;
+};
+
+class CBinaryFileInterface
+{
+public:
+    virtual             ~CBinaryFileInterface   ( void ) {}
+    virtual bool        FOpen                   ( const char* szFilename, const char* szMode, bool bValidate ) = 0;
+    virtual void        FClose                  ( void ) = 0;
+    virtual bool        FEof                    ( void ) = 0;
+    virtual void        FFlush                  ( void ) = 0;
+    virtual int         FTell                   ( void ) = 0;
+    virtual void        FSeek                   ( int iOffset, int iOrigin ) = 0;
+    virtual int         FRead                   ( void* pData, uint uiSize ) = 0;
+    virtual int         FWrite                  ( const void* pData, uint uiSize ) = 0;
 };
 
 class CNet
@@ -50,7 +77,7 @@ public:
     virtual bool                        SendPacket                  ( unsigned char ucPacketID, NetBitStreamInterface* bitStream, NetPacketPriority packetPriority, NetPacketReliability packetReliability, ePacketOrdering packetOrdering = PACKET_ORDERING_DEFAULT ) = 0;
 
     virtual void                        SetClientPort               ( unsigned short usClientPort ) = 0;
-    virtual const char *                GetConnectedServer          ( void )=0;
+    virtual const char *                GetConnectedServer          ( bool bIncludePort = false )=0;
 
     virtual bool                        GetNetworkStatistics        ( NetStatistics* pDest ) = 0;
     virtual const SPacketStat*          GetPacketStats              ( void ) = 0;
@@ -69,7 +96,7 @@ public:
 
     virtual void                        Reset                       ( void ) = 0;
 
-    virtual CNetHTTPDownloadManagerInterface*   GetHTTPDownloadManager          ( void ) = 0;
+    virtual CNetHTTPDownloadManagerInterface*   GetHTTPDownloadManager          ( EDownloadModeType iMode ) = 0;
 
     virtual void                        SetServerBitStreamVersion   ( unsigned short usServerBitStreamVersion ) = 0;
     virtual unsigned short              GetServerBitStreamVersion   ( void ) = 0;
@@ -87,11 +114,14 @@ public:
     virtual void                        ResetStub                   ( DWORD dwType, ... ) = 0;
     virtual void                        ResetStub                   ( DWORD dwType, va_list ) = 0;
 
-    virtual const char*                 GetCurrentServerId          ( void ) = 0;
+    virtual const char*                 GetCurrentServerId          ( bool bPreviousVer ) = 0;
     virtual bool                        CheckFile                   ( const char* szType, const char* szFilename ) = 0;
 
     virtual uint                        GetExtendedErrorCode        ( void ) = 0;
     virtual void                        SetTimeoutTime              ( uint uiTimeoutTime ) = 0;
+
+    virtual bool                        ValidateBinaryFileName      ( const char* szFilename ) = 0;
+    virtual CBinaryFileInterface*       AllocateBinaryFile          ( void ) = 0;
 };
 
 #endif

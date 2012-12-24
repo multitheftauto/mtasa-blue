@@ -57,6 +57,7 @@ CMasterServerManagerInterface* NewMasterServerManager ( void )
 ///////////////////////////////////////////////////////////////
 CMasterServerManager::CMasterServerManager ( void )
 {
+    m_ElapsedTime.SetMaxIncrement ( 500 );
 }
 
 
@@ -100,7 +101,7 @@ void CMasterServerManager::Refresh ( void )
     for ( uint i = 0 ; i < m_MasterServerList.size () && i < m_iActiveAmount ; i++ )
         m_MasterServerList[i]->Refresh ();
 
-    m_ElapsedTime = CElapsedTime ();
+    m_ElapsedTime.Reset ();
 }
 
 

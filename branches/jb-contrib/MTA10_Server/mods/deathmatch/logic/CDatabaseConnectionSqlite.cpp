@@ -328,7 +328,7 @@ void CDatabaseConnectionSqlite::BeginAutomaticTransaction ( void )
     if ( m_bInAutomaticTransaction )
     {
         // If it's been a little while since this transaction was started, consider renewing it
-        if ( ( CTickCount::Now () - m_AutomaticTransactionStartTime ).ToLongLong () > 500 )
+        if ( ( CTickCount::Now () - m_AutomaticTransactionStartTime ).ToLongLong () > 1500 )
             EndAutomaticTransaction ();
     }
     if ( !m_bInAutomaticTransaction && m_bAutomaticTransactionsEnabled )
@@ -431,7 +431,11 @@ SString InsertQueryArgumentsSqlite ( const SString& strQuery, CLuaArguments* pAr
             else
             if ( type == LUA_TNUMBER )
             {
-                strParsedQuery += SString ( "%f", pArgument->GetNumber () );
+                double dNumber = pArgument->GetNumber ();
+                if ( dNumber == floor ( dNumber ) )
+                    strParsedQuery += SString ( "%" PRId64, (long long)dNumber );
+                else
+                    strParsedQuery += SString ( "%f", dNumber );
             }
             else
             if ( type == LUA_TSTRING )

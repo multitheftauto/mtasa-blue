@@ -44,7 +44,7 @@ CLuaArgument::CLuaArgument ( void )
 }
 
 
-CLuaArgument::CLuaArgument ( const CLuaArgument& Argument, std::map < CLuaArguments*, CLuaArguments* > * pKnownTables )
+CLuaArgument::CLuaArgument ( const CLuaArgument& Argument, CFastHashMap < CLuaArguments*, CLuaArguments* > * pKnownTables )
 {
     // Initialize and call our = on the argument
     m_pTableData = NULL;
@@ -59,7 +59,7 @@ CLuaArgument::CLuaArgument ( NetBitStreamInterface& bitStream, std::vector < CLu
 }
 
 
-CLuaArgument::CLuaArgument ( lua_State* luaVM, int iArgument, std::map < const void*, CLuaArguments* > * pKnownTables )
+CLuaArgument::CLuaArgument ( lua_State* luaVM, int iArgument, CFastHashMap < const void*, CLuaArguments* > * pKnownTables )
 {
     // Read the argument out of the lua VM
     m_pTableData = NULL;
@@ -73,7 +73,7 @@ CLuaArgument::~CLuaArgument ( void )
     DeleteTableData ();
 }
 
-void CLuaArgument::CopyRecursive ( const CLuaArgument& Argument, std::map < CLuaArguments*, CLuaArguments* > * pKnownTables )
+void CLuaArgument::CopyRecursive ( const CLuaArgument& Argument, CFastHashMap < CLuaArguments*, CLuaArguments* > * pKnownTables )
 {
     // Clear the string
     m_strString = "";
@@ -109,9 +109,8 @@ void CLuaArgument::CopyRecursive ( const CLuaArgument& Argument, std::map < CLua
 
         case LUA_TTABLE:
         {
-            if ( pKnownTables && pKnownTables->find ( Argument.m_pTableData ) != pKnownTables->end () )
+            if ( pKnownTables && ( m_pTableData = MapFindRef ( *pKnownTables, Argument.m_pTableData ) ) )
             {
-                m_pTableData = pKnownTables->find ( Argument.m_pTableData )->second;
                 m_bWeakTableRef = true;
             }
             else
@@ -139,6 +138,7 @@ const CLuaArgument& CLuaArgument::operator = ( const CLuaArgument& Argument )
     // Return the given class allowing for chaining
     return Argument;
 }
+
 
 bool CLuaArgument::operator == ( const CLuaArgument& Argument )
 {
@@ -208,7 +208,7 @@ bool CLuaArgument::CompareRecursive ( const CLuaArgument& Argument, std::set < C
 }
 
 
-void CLuaArgument::Read ( lua_State* luaVM, int iArgument, std::map < const void*, CLuaArguments* > * pKnownTables )
+void CLuaArgument::Read ( lua_State* luaVM, int iArgument, CFastHashMap < const void*, CLuaArguments* > * pKnownTables )
 {
     // Store debug data for later retrieval
     m_iLine = 0;
@@ -245,10 +245,8 @@ void CLuaArgument::Read ( lua_State* luaVM, int iArgument, std::map < const void
 
             case LUA_TTABLE:
             {
-                const void* pTable = lua_topointer ( luaVM, iArgument );
-                if ( pKnownTables && pKnownTables->find ( pTable ) != pKnownTables->end () )
+                if ( pKnownTables && ( m_pTableData = MapFindRef ( *pKnownTables, lua_topointer ( luaVM, iArgument ) ) ) )
                 {
-                    m_pTableData = pKnownTables->find ( pTable )->second;
                     m_bWeakTableRef = true;
                 }
                 else
@@ -365,7 +363,7 @@ CClientEntity* CLuaArgument::GetElement ( void ) const
 }
 
 
-void CLuaArgument::Push ( lua_State* luaVM, std::map < CLuaArguments*, int > * pKnownTables ) const
+void CLuaArgument::Push ( lua_State* luaVM, CFastHashMap < CLuaArguments*, int > * pKnownTables ) const
 {
     // Got any type?
     if ( m_iType != LUA_TNONE )
@@ -402,10 +400,11 @@ void CLuaArgument::Push ( lua_State* luaVM, std::map < CLuaArguments*, int > * p
 
             case LUA_TTABLE:
             {
-                if ( pKnownTables && pKnownTables->find ( m_pTableData ) != pKnownTables->end () )
+                int* pTableId;
+                if ( pKnownTables && ( pTableId = MapFind ( *pKnownTables, m_pTableData ) ) )
                 {
-                    lua_getfield ( luaVM, LUA_REGISTRYINDEX, "cache" );
-					lua_pushnumber ( luaVM, pKnownTables->find ( m_pTableData )->second );
+					lua_getfield ( luaVM, LUA_REGISTRYINDEX, "cache" );
+					lua_pushnumber ( luaVM, *pTableId );
 					lua_gettable ( luaVM, -2 );
 					lua_remove ( luaVM, -2 );
                 }
@@ -566,7 +565,7 @@ bool CLuaArgument::ReadFromBitStream ( NetBitStreamInterface& bitStream, std::ve
 }
 
 
-bool CLuaArgument::WriteToBitStream ( NetBitStreamInterface& bitStream, std::map < CLuaArguments*, unsigned long > * pKnownTables ) const
+bool CLuaArgument::WriteToBitStream ( NetBitStreamInterface& bitStream, CFastHashMap < CLuaArguments*, unsigned long > * pKnownTables ) const
 {
     SLuaTypeSync type;
 
@@ -594,12 +593,13 @@ bool CLuaArgument::WriteToBitStream ( NetBitStreamInterface& bitStream, std::map
         // Table argument
         case LUA_TTABLE:
         {
-            if ( pKnownTables && pKnownTables->find ( m_pTableData ) != pKnownTables->end () )
+            ulong* pTableId;
+            if ( pKnownTables && ( pTableId = MapFind ( *pKnownTables, m_pTableData ) ) )
             {
                 // Self-referencing table
                 type.data.ucType = LUA_TTABLEREF;
                 bitStream.Write ( &type );
-                bitStream.WriteCompressed ( pKnownTables->find ( m_pTableData )->second );
+                bitStream.WriteCompressed ( *pTableId );
             }
             else
             {
@@ -751,7 +751,7 @@ void CLuaArgument::DeleteTableData ( )
 }
 
 
-json_object * CLuaArgument::WriteToJSONObject ( bool bSerialize, std::map < CLuaArguments*, unsigned long > * pKnownTables )
+json_object * CLuaArgument::WriteToJSONObject ( bool bSerialize, CFastHashMap < CLuaArguments*, unsigned long > * pKnownTables )
 {
     switch ( GetType () )
     {
@@ -765,10 +765,12 @@ json_object * CLuaArgument::WriteToJSONObject ( bool bSerialize, std::map < CLua
         }
         case LUA_TTABLE:
         {
-            if ( pKnownTables && pKnownTables->find ( m_pTableData ) != pKnownTables->end () )
+            ulong* pTableId;
+            if ( pKnownTables && ( pTableId = MapFind ( *pKnownTables, m_pTableData ) ) )
             {
+                // Self-referencing table
                 char szTableID[10];
-                snprintf ( szTableID, sizeof(szTableID), "^T^%lu", pKnownTables->find ( m_pTableData )->second );
+                snprintf ( szTableID, sizeof(szTableID), "^T^%lu", *pTableId );
                 return json_object_new_string ( szTableID );
             }
             else
@@ -1035,4 +1037,3 @@ bool CLuaArgument::ReadFromJSONObject ( json_object* object, std::vector < CLuaA
     }
     return false;
 }
-

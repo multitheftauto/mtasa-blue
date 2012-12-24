@@ -83,6 +83,12 @@ void CRenderItemManager::OnLostDevice ( void )
 {
     for ( std::set < CRenderItem* >::iterator iter = m_CreatedItemList.begin () ; iter != m_CreatedItemList.end () ; iter++ )
         (*iter)->OnLostDevice ();
+
+    SAFE_RELEASE( m_pSavedSceneDepthSurface );
+    SAFE_RELEASE( m_pSavedSceneRenderTargetAA );
+    SAFE_RELEASE( g_pDeviceState->MainSceneState.DepthBuffer );
+    SAFE_RELEASE( m_pNonAARenderTarget );
+    SAFE_RELEASE( m_pNonAADepthSurface2 );
 }
 
 
@@ -344,7 +350,7 @@ void CRenderItemManager::UpdateBackBufferCopy ( void )
 
     // Try to get the back buffer
 	IDirect3DSurface9* pD3DBackBufferSurface = NULL;
-    m_pDevice->GetBackBuffer ( 0, 0, D3DBACKBUFFER_TYPE_MONO, &pD3DBackBufferSurface );
+    m_pDevice->GetRenderTarget( 0, &pD3DBackBufferSurface );
     if ( !pD3DBackBufferSurface )
         return;
 
@@ -376,7 +382,7 @@ void CRenderItemManager::UpdateScreenSource ( CScreenSourceItem* pScreenSourceIt
 
         // Try to get the back buffer
 	    IDirect3DSurface9* pD3DBackBufferSurface = NULL;
-        m_pDevice->GetBackBuffer ( 0, 0, D3DBACKBUFFER_TYPE_MONO, &pD3DBackBufferSurface );
+        m_pDevice->GetRenderTarget( 0, &pD3DBackBufferSurface );
         if ( !pD3DBackBufferSurface )
             return;
 
@@ -435,7 +441,7 @@ void CRenderItemManager::UpdateBackBufferCopySize ( void )
 
         // Try to create new one if needed
         if ( uiSizeX > 0 )
-            m_pBackBufferCopy = CreateRenderTarget ( uiSizeX, uiSizeY, false );
+            m_pBackBufferCopy = CreateRenderTarget ( uiSizeX, uiSizeY, false, true );
     }
 }
 
@@ -496,6 +502,9 @@ void CRenderItemManager::EnableSetRenderTargetOldVer ( bool bEnable )
 ////////////////////////////////////////////////////////////////
 bool CRenderItemManager::SaveDefaultRenderTarget ( void )
 {
+    // Make sure any special depth buffer has been removed
+    SaveReadableDepthBuffer ();
+
     // Update our info about what rendertarget is active
     IDirect3DSurface9* pActiveD3DRenderTarget;
     IDirect3DSurface9* pActiveD3DZStencilSurface;
@@ -542,6 +551,9 @@ bool CRenderItemManager::RestoreDefaultRenderTarget ( void )
 ////////////////////////////////////////////////////////////////
 void CRenderItemManager::ChangeRenderTarget ( uint uiSizeX, uint uiSizeY, IDirect3DSurface9* pD3DRenderTarget, IDirect3DSurface9* pD3DZStencilSurface )
 {
+    // Make sure any special depth buffer has been removed
+    SaveReadableDepthBuffer ();
+
     // Check if we need to change
     IDirect3DSurface9* pCurrentRenderTarget;
     IDirect3DSurface9* pCurrentZStencilSurface;
@@ -676,6 +688,8 @@ void CRenderItemManager::GetDxStatus ( SDxStatus& outStatus )
     outStatus.videoCard.strName = m_strVideoCardName;
     outStatus.videoCard.iInstalledMemoryKB = m_iVideoCardMemoryKBTotal;
     outStatus.videoCard.strPSVersion = m_strVideoCardPSVersion;
+    outStatus.videoCard.depthBufferFormat = m_depthBufferFormat;
+    outStatus.videoCard.iMaxAnisotropy = g_pDeviceState->AdapterState.MaxAnisotropicSetting;
 
     // Memory usage
     outStatus.videoMemoryKB.iFreeForMTA = m_iMemoryKBFreeForMTA;
@@ -688,14 +702,35 @@ void CRenderItemManager::GetDxStatus ( SDxStatus& outStatus )
     outStatus.settings.bWindowed = false;
     outStatus.settings.iFXQuality = gameSettings->GetFXQuality(); ;
     outStatus.settings.iDrawDistance = ( gameSettings->GetDrawDistance () - 0.925f ) / 0.8749f * 100;
+    outStatus.settings.iAntiAliasing = gameSettings->GetAntiAliasing() - 1;
     outStatus.settings.bVolumetricShadows = false;
     outStatus.settings.bAllowScreenUpload = true;
     outStatus.settings.iStreamingMemory = 0;
+    outStatus.settings.bGrassEffect = false;
+    outStatus.settings.bHeatHaze = false;
+    outStatus.settings.iAnisotropicFiltering = 0;
 
     CVARS_GET ( "streaming_memory",     outStatus.settings.iStreamingMemory );
     CVARS_GET ( "display_windowed",     outStatus.settings.bWindowed );
     CVARS_GET ( "volumetric_shadows",   outStatus.settings.bVolumetricShadows );
     CVARS_GET ( "allow_screen_upload",  outStatus.settings.bAllowScreenUpload );
+    CVARS_GET ( "grass",                outStatus.settings.bGrassEffect );
+    CVARS_GET ( "heat_haze",            outStatus.settings.bHeatHaze );
+    CVARS_GET ( "anisotropic",          outStatus.settings.iAnisotropicFiltering );
+
+    if ( outStatus.settings.iFXQuality == 0 )
+    {
+        // These are always off with low fx quality
+        outStatus.settings.bVolumetricShadows = false;
+        outStatus.settings.bGrassEffect = false;
+    }
+
+    // Display color depth
+    D3DFORMAT BackBufferFormat = g_pDeviceState->CreationState.PresentationParameters.BackBufferFormat;
+    if ( BackBufferFormat >= D3DFMT_R5G6B5 && BackBufferFormat < D3DFMT_A8R3G3B2 )
+        outStatus.settings.b32BitColor = 0;
+    else
+        outStatus.settings.b32BitColor = 1;
 
     // Modify if using test mode
     if ( m_TestMode == DX_TEST_MODE_NO_MEM )
@@ -892,4 +927,179 @@ int CRenderItemManager::CalcD3DCubeTextureMemoryKBUsage ( IDirect3DCubeTexture9*
     }
 
     return iMemoryUsed * 6 / 1024;
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// CRenderItemManager::NotifyShaderItemUsesDepthBuffer
+//
+//
+//
+////////////////////////////////////////////////////////////////
+void CRenderItemManager::NotifyShaderItemUsesDepthBuffer ( CShaderItem* pShaderItem, bool bUsesDepthBuffer )
+{
+    if ( bUsesDepthBuffer )
+        MapInsert ( m_ShadersUsingDepthBuffer, pShaderItem );
+    else
+        MapRemove ( m_ShadersUsingDepthBuffer, pShaderItem );
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// CRenderItemManager::PreDrawWorld
+//
+//
+//
+////////////////////////////////////////////////////////////////
+void CRenderItemManager::PreDrawWorld ( void )
+{
+    // Save scene matrices
+    g_pDeviceState->MainSceneState.TransformState = g_pDeviceState->TransformState;
+    IDirect3DTexture9*& pReadableDepthBuffer = g_pDeviceState->MainSceneState.DepthBuffer;
+
+    // Create/destroy readable depth buffer depending on what is needed
+    bool bRequireDepthBuffer = !m_ShadersUsingDepthBuffer.empty ();
+
+    if ( !bRequireDepthBuffer )
+    {
+        SAFE_RELEASE( pReadableDepthBuffer );
+        SAFE_RELEASE( m_pNonAARenderTarget );
+        SAFE_RELEASE( m_pNonAADepthSurface2 );
+    }
+
+    if ( bRequireDepthBuffer && !pReadableDepthBuffer && m_depthBufferFormat != RFORMAT_UNKNOWN )
+    {
+        // Create readable depth buffer
+        m_pDevice->CreateTexture ( m_uiDefaultViewportSizeX, m_uiDefaultViewportSizeY, 1, D3DUSAGE_DEPTHSTENCIL, (D3DFORMAT)m_depthBufferFormat, D3DPOOL_DEFAULT, &pReadableDepthBuffer, NULL );
+
+        if ( pReadableDepthBuffer )
+        {
+            assert( !m_pNonAARenderTarget );
+            assert( !m_pNonAADepthSurface2 );
+
+            const D3DPRESENT_PARAMETERS& pp = g_pDeviceState->CreationState.PresentationParameters;
+            if ( pp.MultiSampleType != D3DMULTISAMPLE_NONE )
+            {
+                // If device is using an AA swapchain, then:
+                //      1. Create a non-AA render target to pair with our readable depth buffer
+                //      2. Create second depth buffer for pairing with non-AA render target when readable depth buffer needs to be preserved
+                m_pDevice->CreateRenderTarget( m_uiDefaultViewportSizeX, m_uiDefaultViewportSizeY, pp.BackBufferFormat, D3DMULTISAMPLE_NONE, 0, false, &m_pNonAARenderTarget, NULL );
+                m_pDevice->CreateDepthStencilSurface( m_uiDefaultViewportSizeX, m_uiDefaultViewportSizeY, (D3DFORMAT)m_depthBufferFormat, D3DMULTISAMPLE_NONE, 0, true, &m_pNonAADepthSurface2, NULL );
+            }
+        }
+    }
+
+    // Set readable depth buffer if needed
+    if ( pReadableDepthBuffer != NULL && m_pSavedSceneDepthSurface == NULL )
+    {
+        if ( m_pDevice->GetDepthStencilSurface ( &m_pSavedSceneDepthSurface ) == D3D_OK )
+        {
+            IDirect3DSurface9* pSurf = NULL;
+            if ( pReadableDepthBuffer->GetSurfaceLevel ( 0, &pSurf ) == D3D_OK )
+            {
+                m_pDevice->SetDepthStencilSurface ( pSurf );
+                m_bUsingReadableDepthBuffer = true;
+                pSurf->Release ();
+
+                // Also switch to non-AA render target if created
+                if ( m_pNonAARenderTarget )
+                {
+                    if ( m_pDevice->GetRenderTarget( 0, &m_pSavedSceneRenderTargetAA ) == D3D_OK )
+                    {
+                        m_pDevice->SetRenderTarget( 0, m_pNonAARenderTarget );
+                    }
+                }
+                m_pDevice->Clear ( 0, NULL, D3DCLEAR_ZBUFFER | D3DCLEAR_STENCIL, D3DCOLOR_ARGB(0,0,0,0), 1, 0 );
+            }
+        }
+    }
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// CRenderItemManager::SaveReadableDepthBuffer
+//
+// Ensure our readable depth buffer is no longer being used
+//
+////////////////////////////////////////////////////////////////
+void CRenderItemManager::SaveReadableDepthBuffer( void )
+{
+    if ( m_bUsingReadableDepthBuffer )
+    {
+        m_bUsingReadableDepthBuffer = false;
+
+        if ( m_pNonAADepthSurface2 )
+        {
+            // If using AA hacks, change to the other depth buffer we created
+            m_pDevice->SetDepthStencilSurface ( m_pNonAADepthSurface2 );
+        }
+        else
+        {
+            // If not using AA hacks, just change back to the GTA depth buffer
+            if ( m_pSavedSceneDepthSurface )
+            {
+                m_pDevice->SetDepthStencilSurface ( m_pSavedSceneDepthSurface );
+                SAFE_RELEASE( m_pSavedSceneDepthSurface );
+            }
+        }
+    }
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// CRenderItemManager::FlushNonAARenderTarget
+//
+// If using AA hacks, change everything back
+//
+////////////////////////////////////////////////////////////////
+void CRenderItemManager::FlushNonAARenderTarget( void )
+{
+    if ( m_pSavedSceneDepthSurface )
+    {
+        m_pDevice->SetDepthStencilSurface ( m_pSavedSceneDepthSurface );
+        SAFE_RELEASE( m_pSavedSceneDepthSurface );
+    }
+
+    if ( m_pSavedSceneRenderTargetAA )
+    {
+        // Restore GTA AA render target, and copy our non-AA data to it
+        m_pDevice->SetRenderTarget( 0, m_pSavedSceneRenderTargetAA );
+
+        if ( m_pNonAARenderTarget )
+        {
+            m_pDevice->StretchRect( m_pNonAARenderTarget, NULL, m_pSavedSceneRenderTargetAA, NULL, D3DTEXF_POINT );
+        }
+        SAFE_RELEASE( m_pSavedSceneRenderTargetAA );
+    }
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// CRenderItemManager::HandleStretchRect
+//
+// Maybe replace source surface with our non-AA rt, depending on things
+//
+////////////////////////////////////////////////////////////////
+void CRenderItemManager::HandleStretchRect( IDirect3DSurface9* pSourceSurface,CONST RECT* pSourceRect,IDirect3DSurface9* pDestSurface,CONST RECT* pDestRect,int Filter )
+{
+    SaveReadableDepthBuffer();
+
+    if ( pSourceSurface == m_pSavedSceneRenderTargetAA )
+    {
+        // If trying to copy from the saved render target, use the active render target instead
+        if ( m_pDevice->GetRenderTarget( 0, &pSourceSurface ) == D3D_OK )
+        {
+            m_pDevice->StretchRect( pSourceSurface, pSourceRect, pDestSurface, pDestRect, (D3DTEXTUREFILTERTYPE)Filter );
+            SAFE_RELEASE( pSourceSurface );
+        }
+    }
+    else
+    {
+        m_pDevice->StretchRect( pSourceSurface, pSourceRect, pDestSurface, pDestRect, (D3DTEXTUREFILTERTYPE)Filter );  
+    }
 }

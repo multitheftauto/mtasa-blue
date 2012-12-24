@@ -58,7 +58,7 @@ public:
     virtual void                    SetTotalDamage ( bool bUnknown ) = 0;
     virtual void                    SetTowLink ( CVehicle* pVehicle, bool bRemoveAdd ) = 0;
     virtual CPhysical*              SpawnFlyingComponent ( int iCarNodeIndex, int iUnknown ) = 0;
-
+    virtual CVector                 GetWheelPosition ( eWheels wheel ) = 0;
     virtual CDoor                   * GetDoor(eDoors doorID) = 0;
 };
 

@@ -479,9 +479,9 @@ void CNetServerBuffer::SetMaximumIncomingConnections ( unsigned short numberAllo
 // Thread safe
 //
 ///////////////////////////////////////////////////////////////////////////
-CNetHTTPDownloadManagerInterface* CNetServerBuffer::GetHTTPDownloadManager ( void )
+CNetHTTPDownloadManagerInterface* CNetServerBuffer::GetHTTPDownloadManager ( EDownloadModeType iMode )
 {
-    return m_pRealNetServer->GetHTTPDownloadManager ();
+    return m_pRealNetServer->GetHTTPDownloadManager ( iMode );
 }
 
 
@@ -659,6 +659,19 @@ void CNetServerBuffer::SetNetOptions ( const SNetOptions& options )
 {
     SSetNetOptionsArgs* pArgs = new SSetNetOptionsArgs ( options );
     AddCommandAndWait ( pArgs );
+}
+
+
+///////////////////////////////////////////////////////////////////////////
+//
+// CNetServerBuffer::GenerateRandomData
+//
+// Thread safe
+//
+///////////////////////////////////////////////////////////////////////////
+void CNetServerBuffer::GenerateRandomData ( void* pOutData, uint uiLength )
+{
+    m_pRealNetServer->GenerateRandomData ( pOutData, uiLength );
 }
 
 
@@ -1057,6 +1070,7 @@ void CNetServerBuffer::ProcessCommand ( CNetJobData* pJobData )
         CALLREALNET1 (                      ResendModPackets                , const NetServerPlayerID&, playerID )
         CALLREALNET3 (                      GetClientSerialAndVersion       , const NetServerPlayerID&, playerID, SFixedString < 32 >&, strSerial, SFixedString < 32 >&, strVersion )
         CALLREALNET1 (                      SetNetOptions                   , const SNetOptions&, options )
+        CALLREALNET2 (                      GenerateRandomData              , void*, pOutData, uint, uiLength )
 
         default:
             // no args type match

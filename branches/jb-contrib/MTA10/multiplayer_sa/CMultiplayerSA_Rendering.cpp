@@ -16,6 +16,7 @@ namespace
     CEntitySAInterface* ms_Rendering = NULL;
     CEntitySAInterface* ms_RenderingOneNonRoad = NULL;
     GameEntityRenderHandler* pGameEntityRenderHandler = NULL;
+    bool ms_bIsMinimizedAndNotConnected = false;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -195,6 +196,143 @@ inner:
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
+// Check_NoOfVisibleLods
+//
+// Apply render limits
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+// Hook info
+#define HOOKPOS_Check_NoOfVisibleLods                         0x5534F9
+#define HOOKSIZE_Check_NoOfVisibleLods                        6
+DWORD RETURN_Check_NoOfVisibleLods =                          0x5534FF;
+void _declspec(naked) HOOK_Check_NoOfVisibleLods()
+{
+    _asm
+    {
+        cmp     eax, 999            // Array limit is 1000
+        jge     limit
+        inc     eax
+limit:
+        mov     dword ptr ds:[00B76840h],eax        // NoOfVisibleLods
+        jmp     RETURN_Check_NoOfVisibleLods
+    }
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+// Check_NoOfVisibleEntities
+//
+// Apply render limits
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+// Hook info
+#define HOOKPOS_Check_NoOfVisibleEntities                         0x55352D
+#define HOOKSIZE_Check_NoOfVisibleEntities                        6
+DWORD RETURN_Check_NoOfVisibleEntities =                          0x553533;
+void _declspec(naked) HOOK_Check_NoOfVisibleEntities()
+{
+    _asm
+    {
+        cmp     eax, 999        // Array limit is 1000
+        jge     limit
+        inc     eax
+limit:
+        mov     dword ptr ds:[00B76844h],eax        // NoOfVisibleEntities
+        jmp     RETURN_Check_NoOfVisibleEntities
+    }
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+// WinLoop
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+void OnMY_WinLoop( void )
+{
+    if ( ms_bIsMinimizedAndNotConnected )
+        Sleep ( 10 );
+}
+
+// Hook info
+#define HOOKPOS_WinLoop_US                         0x748A93
+#define HOOKPOS_WinLoop_EU                         0x748AE3
+#define HOOKSIZE_WinLoop_US                        5
+#define HOOKSIZE_WinLoop_EU                        5
+DWORD RETURN_WinLoop_US =                          0x748A98;
+DWORD RETURN_WinLoop_EU =                          0x748AE8;
+DWORD RETURN_WinLoop_BOTH =                        0;
+void _declspec(naked) HOOK_WinLoop ()
+{
+    _asm
+    {
+        pushad
+        call    OnMY_WinLoop
+        popad
+
+        mov     eax, ds:0x0C8D4C0
+        jmp     RETURN_WinLoop_BOTH
+    }
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+// Photograph screen grab in windowed mode
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+void OnMY_psGrabScreen_GetRect( HWND hWnd, LPRECT pRect )
+{
+    // Get the window client area
+    GetClientRect( hWnd, pRect );
+    LPPOINT pPoints = (LPPOINT)pRect;
+    ClientToScreen( hWnd, pPoints );
+    ClientToScreen( hWnd, pPoints + 1 );
+}
+
+bool OnMY_psGrabScreen_ShouldUseRect( void )
+{
+    bool bWindowed;
+    g_pCore->GetCVars()->Get( "display_windowed", bWindowed );
+    return bWindowed;
+}
+
+
+// Hook info
+#define HOOKPOS_psGrabScreen                        0x7452FC
+#define HOOKSIZE_psGrabScreen                       5
+DWORD RETURN_psGrabScreen_YesChange =               0x745311;
+DWORD RETURN_psGrabScreen_NoChange =                0x745336;
+void _declspec(naked) HOOK_psGrabScreen ()
+{
+    _asm
+    {
+        pushad
+        call    OnMY_psGrabScreen_ShouldUseRect
+        test    al, al
+        jnz     use_rect
+        popad
+        jmp     RETURN_psGrabScreen_NoChange
+
+use_rect:
+        popad
+        mov     edx, [eax]      // hwnd
+        lea     ecx, [esp+24h]  // pRect result
+        pushad
+        push    ecx
+        push    edx
+        call    OnMY_psGrabScreen_GetRect
+        add     esp, 4*2
+        popad
+
+        jmp     RETURN_psGrabScreen_YesChange
+    }
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
 // CMultiplayerSA::SetGameEntityRenderHandler
 //
 //
@@ -202,6 +340,18 @@ inner:
 void CMultiplayerSA::SetGameEntityRenderHandler ( GameEntityRenderHandler * pHandler )
 {
     pGameEntityRenderHandler = pHandler;
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+// CMultiplayerSA::SetIsMinimizedAndNotConnected
+//
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+void CMultiplayerSA::SetIsMinimizedAndNotConnected ( bool bIsMinimizedAndNotConnected )
+{
+    ms_bIsMinimizedAndNotConnected = bIsMinimizedAndNotConnected;
 }
 
 
@@ -217,4 +367,8 @@ void CMultiplayerSA::InitHooks_Rendering ( void )
     EZHookInstall ( CallIdle );
     EZHookInstall ( CEntity_Render );
     EZHookInstall ( CEntity_RenderOneNonRoad );
+    EZHookInstall ( Check_NoOfVisibleLods );
+    EZHookInstall ( Check_NoOfVisibleEntities );
+    EZHookInstall ( WinLoop );
+    EZHookInstall ( psGrabScreen );
 }

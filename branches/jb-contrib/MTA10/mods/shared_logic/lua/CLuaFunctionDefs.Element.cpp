@@ -173,7 +173,7 @@ int CLuaFunctionDefs::GetElementData ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -253,7 +253,7 @@ int CLuaFunctionDefs::GetElementMatrix ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -711,7 +711,7 @@ int CLuaFunctionDefs::GetElementsWithinColShape ( lua_State* luaVM )
 
                 // Add all the elements within the shape to it
                 unsigned int uiIndex = 0;
-                list < CClientEntity* > ::iterator iter = pColShape->CollidersBegin ();
+                CFastList < CClientEntity* > ::iterator iter = pColShape->CollidersBegin ();
                 for ( ; iter != pColShape->CollidersEnd (); iter++ )
                 {
                     if ( szType == NULL || strcmp ( (*iter)->GetTypeName (), szType ) == 0 )
@@ -1536,7 +1536,7 @@ int CLuaFunctionDefs::SetElementData ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -1573,7 +1573,7 @@ int CLuaFunctionDefs::RemoveElementData ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -1655,44 +1655,29 @@ int CLuaFunctionDefs::SetElementPosition ( lua_State* luaVM )
 
 int CLuaFunctionDefs::SetElementRotation ( lua_State* luaVM )
 {
-    // Correct types?
-    int iArgument2 = lua_type ( luaVM, 2 );
-    int iArgument3 = lua_type ( luaVM, 3 );
-    int iArgument4 = lua_type ( luaVM, 4 );
-    if ( ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) ) &&
-        ( iArgument2 == LUA_TNUMBER || iArgument2 == LUA_TSTRING ) &&
-        ( iArgument3 == LUA_TNUMBER || iArgument3 == LUA_TSTRING ) &&
-        ( iArgument4 == LUA_TNUMBER || iArgument4 == LUA_TSTRING ) )
+//  bool setElementRotation ( element theElement, float rotX, float rotY, float rotZ [, string rotOrder = "default", bool fixPedRotation = false ] )
+    CClientEntity* pEntity; CVector vecRotation; SString strRotationOrder; bool bNewWay;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pEntity );
+    argStream.ReadNumber ( vecRotation.fX );
+    argStream.ReadNumber ( vecRotation.fY );
+    argStream.ReadNumber ( vecRotation.fZ );
+    argStream.ReadString ( strRotationOrder, "default" );
+    argStream.ReadBool ( bNewWay, false );
+
+    if ( !argStream.HasErrors () )
     {
-        const char* szRotationOrder = "default";
-        if ( lua_type ( luaVM, 5 ) == LUA_TSTRING ) 
+        if ( CStaticFunctionDefinitions::SetElementRotation ( *pEntity, vecRotation, strRotationOrder, bNewWay ) )
         {
-            szRotationOrder = lua_tostring ( luaVM, 5 );
+            lua_pushboolean ( luaVM, true );
+            return 1;
         }
-
-        // Grab the element and the position to change to
-        CClientEntity* pEntity = lua_toelement ( luaVM, 1 );
-        CVector vecRotation ( static_cast < float > ( lua_tonumber ( luaVM, 2 ) ),
-            static_cast < float > ( lua_tonumber ( luaVM, 3 ) ),
-            static_cast < float > ( lua_tonumber ( luaVM, 4 ) ) );
-
-        // Valid?
-        if ( pEntity )
-        {
-            // Try to set the position
-            if ( CStaticFunctionDefinitions::SetElementRotation ( *pEntity, vecRotation, szRotationOrder ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
-        }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
 
-    // Error
+    // Failed
     lua_pushboolean ( luaVM, false );
     return 1;
 }
@@ -2313,7 +2298,7 @@ int CLuaFunctionDefs::GetLowLodElement ( lua_State* luaVM )
         }        
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -2337,7 +2322,7 @@ int CLuaFunctionDefs::SetLowLodElement ( lua_State* luaVM )
         }        
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -2362,7 +2347,7 @@ int CLuaFunctionDefs::IsElementLowLod ( lua_State* luaVM )
         }        
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;

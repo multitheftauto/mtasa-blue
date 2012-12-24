@@ -33,7 +33,6 @@ class CGame;
 #include "CConnectHistory.h"
 #include "CElementDeleter.h"
 #include "CWhoWas.h"
-#include "CSerialManager.h"
 
 #include "packets/CCommandPacket.h"
 #include "packets/CExplosionSyncPacket.h"
@@ -102,7 +101,6 @@ class CLuaCallbackManager;
 class CRegistryManager;
 class CRegistry;
 class CRemoteCalls;
-class CResourceDownloader;
 class CResourceManager;
 class CScriptDebugging;
 class CSettings;
@@ -233,10 +231,8 @@ public:
     inline CAccessControlListManager* GetACLManager             ( void )        { return m_pACLManager; }
     inline CBanManager*             GetBanManager               ( void )        { return m_pBanManager; }
     inline CRemoteCalls*            GetRemoteCalls              ( void )        { return m_pRemoteCalls; }
-    inline CResourceDownloader*     GetResourceDownloader       ( void )        { return m_pResourceDownloader; }
     inline CZoneNames*              GetZoneNames                ( void )        { return m_pZoneNames; }
     inline CClock*                  GetClock                    ( void )        { return m_pClock; }
-    inline CSerialManager*          GetSerialManager            ( void )        { return &m_SerialManager; }
     inline CWaterManager*           GetWaterManager             ( void )        { return m_pWaterManager; }
     inline CLightsyncManager*       GetLightSyncManager         ( void )        { return &m_lightsyncManager; }
     inline CWeaponStatManager*      GetWeaponStatManager        ( void )        { return m_pWeaponStatsManager; }
@@ -367,6 +363,7 @@ public:
     SString                     CalculateMinClientRequirement   ( void );
     bool                        IsBelowMinimumClient            ( const SString& strVersion );
     bool                        IsBelowRecommendedClient        ( const SString& strVersion );
+    void                        ApplyAseSetting             ( void );
 
 private:
     void                        AddBuiltInEvents            ( void );
@@ -411,7 +408,6 @@ private:
 
     CEvents                         m_Events;
     CRemoteCalls*                   m_pRemoteCalls;
-    CResourceDownloader*            m_pResourceDownloader;
     CHTTPD*                         m_pHTTPD;
     CMainConfig*                    m_pMainConfig;
     CBlipManager*                   m_pBlipManager;
@@ -460,9 +456,6 @@ private:
 
     CWeaponStatManager*             m_pWeaponStatsManager;
     CBuildingRemovalManager*        m_pBuildingRemovalManager;
-
-    CSerialManager                  m_SerialManager;
-
 
     char*                       m_szCurrentFileName;
 
@@ -527,7 +520,8 @@ private:
     //Clouds Enabled
     bool                        m_bCloudsEnabled;
 
-    long long                   m_llLastAnnouceTime;
+    long long                   m_llLastLongAnnouceTime;
+    long long                   m_llLastShortAnnouceTime;
     class COpenPortsTester*     m_pOpenPortsTester;
 
     CLightsyncManager           m_lightsyncManager;

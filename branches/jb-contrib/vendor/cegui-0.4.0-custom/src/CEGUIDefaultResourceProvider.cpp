@@ -56,22 +56,31 @@ namespace CEGUI
                 "DefaultResourceProvider::load - Filename supplied for data loading must be valid");
         }
 
-        SString strFilename = filename.c_str();
-        if ( !FileExists( strFilename ) )
+
+        std::wstring strFilename1 = filename.c_wstring ();
+        std::wstring strFilename2 = System::getSingleton ().GetGuiWorkingDirectory().c_wstring () + strFilename1;
+
+        // If supplied filename looks like it is absolute, try that first
+        bool bIsAbsolutePath = false;
         {
-            // If filename does not exist, try preserving original 128-255 characters
-            strFilename = "";
-            for ( uint i = 0 ; i < filename.length () ; i++ )
-            {
-                strFilename += filename[i];
-            }
+            SString strTemp = PathConform ( filename.c_str () );
+            if ( strTemp.Contains ( ":" ) || strTemp.BeginsWith ( "\\" ) )
+                std::swap ( strFilename1, strFilename2 );
         }
 
-        std::ifstream dataFile(strFilename, std::ios::binary|std::ios::ate);
+
+        std::ifstream dataFile;
+        dataFile.open(strFilename2.c_str (), std::ios::binary|std::ios::ate);
+
         if( dataFile.fail())
         {
-            throw InvalidRequestException((utf8*)
-                "DefaultResourceProvider::load - " + filename + " does not exist");
+            dataFile.clear();
+            dataFile.open(strFilename1.c_str (), std::ios::binary|std::ios::ate);
+            if( dataFile.fail())
+            {
+                throw InvalidRequestException((utf8*)
+                    "DefaultResourceProvider::load - " + filename + " does not exist");
+            }
         }
         std::streampos size = dataFile.tellg();
         dataFile.seekg (0, std::ios::beg);

@@ -32,6 +32,7 @@ void CLuaFileDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "fileClose", CLuaFileDefs::fileClose );
     CLuaCFunctions::AddFunction ( "fileDelete", CLuaFileDefs::fileDelete );
     CLuaCFunctions::AddFunction ( "fileRename", CLuaFileDefs::fileRename );
+    CLuaCFunctions::AddFunction ( "fileCopy", CLuaFileDefs::fileCopy );
 }
 
 
@@ -47,6 +48,12 @@ int CLuaFileDefs::fileCreate ( lua_State* luaVM )
     {
         // Grab our lua VM
         CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+
+        if ( !g_pNet->ValidateBinaryFileName ( filePath ) )
+        {
+            argStream.SetCustomError ( SString ( "Filename not allowed %s", *filePath ), "File error" );
+        }
+        else
         if ( pLuaMain )
         {
             std::string strAbsPath;
@@ -88,13 +95,14 @@ int CLuaFileDefs::fileCreate ( lua_State* luaVM )
                     delete pFile;
 
                     // Output error
-                    m_pScriptDebugging->LogWarning ( luaVM, "%s; unable to load file", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ) );
+                    argStream.SetCustomError ( SString ( "Unable to create %s", *filePath ), "File error" );
                 }
             }
         }
     }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+
+    if ( argStream.HasErrors () )
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -127,7 +135,7 @@ int CLuaFileDefs::fileExists ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
 
     // Failed
@@ -187,13 +195,13 @@ int CLuaFileDefs::fileOpen ( lua_State* luaVM )
                     delete pFile;
 
                     // Output error
-                    m_pScriptDebugging->LogWarning ( luaVM, "%s; unable to load file", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ) );
+                    argStream.SetCustomError( SString( "unable to load file '%s'", *filePath ) );
                 }
             }
         }
     }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+    if ( argStream.HasErrors () )
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -505,13 +513,13 @@ int CLuaFileDefs::fileDelete ( lua_State* luaVM )
                 else
                 {
                     // Output error
-                    m_pScriptDebugging->LogWarning ( luaVM, "%s; unable to delete file", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ) );
+                    argStream.SetCustomError( SString( "unable to delete file '%s'", *filePath ) );
                 }
             }
         }
     }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+    if ( argStream.HasErrors () )
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -530,6 +538,12 @@ int CLuaFileDefs::fileRename ( lua_State* luaVM )
     {
         // Grab our lua VM
         CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+
+        if ( !g_pNet->ValidateBinaryFileName ( newFilePath ) )
+        {
+            argStream.SetCustomError ( SString ( "Filename not allowed %s", *newFilePath ), "File error" );
+        }
+        else
         if ( pLuaMain )
         {
             std::string strCurAbsPath;
@@ -548,7 +562,7 @@ int CLuaFileDefs::fileRename ( lua_State* luaVM )
                     // Does destination file exist?
                     if ( FileExists ( strNewAbsPath.c_str() ) )
                     {
-                        m_pScriptDebugging->LogWarning ( luaVM, "%s failed; destination file already exists", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ) );
+                        argStream.SetCustomError ( SString ( "Destination file already exists (%s)", *newFilePath ), "File error" );
                     }
                     else
                     {
@@ -563,19 +577,94 @@ int CLuaFileDefs::fileRename ( lua_State* luaVM )
                         }
                         else
                         {
-                            m_pScriptDebugging->LogWarning ( luaVM, "%s; unable to rename/move file", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ) );
+                            argStream.SetCustomError ( SString ( "Unable to rename/move %s to %s", *filePath, *newFilePath ), "File error" );
                         }
                     }
                 }
                 else
                 {
-                    m_pScriptDebugging->LogWarning ( luaVM, "%s failed; source file doesn't exist", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ) );
+                    argStream.SetCustomError ( SString ( "Source file doesn't exist (%s)", *filePath ), "File error" );
                 }
             }
         }
     }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+
+    if ( argStream.HasErrors () )
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    // Failed
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFileDefs::fileCopy ( lua_State* luaVM )
+{
+//  bool fileCopy ( string filePath, string newFilePath, bool overwrite = false )
+    SString filePath; SString newFilePath; bool bOverwrite;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadString ( filePath );
+    argStream.ReadString ( newFilePath );
+    argStream.ReadBool ( bOverwrite, false );
+
+    if ( !argStream.HasErrors () )
+    {
+        // Grab our lua VM
+        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+
+        if ( !g_pNet->ValidateBinaryFileName ( newFilePath ) )
+        {
+            argStream.SetCustomError ( SString ( "Filename not allowed %s", *newFilePath ), "File error" );
+        }
+        else
+        if ( pLuaMain )
+        {
+            std::string strCurAbsPath;
+            std::string strNewAbsPath;
+
+            // We have a resource arguments?
+            CResource* pThisResource = pLuaMain->GetResource ();
+            CResource* pCurResource = pThisResource;
+            CResource* pNewResource = pThisResource;
+            if ( CResourceManager::ParseResourcePathInput ( filePath, pCurResource, strCurAbsPath ) &&
+                 CResourceManager::ParseResourcePathInput ( newFilePath, pNewResource, strNewAbsPath ) )
+            {
+                 // Does source file exist?
+                if ( FileExists ( strCurAbsPath ) )
+                {
+                    // Does destination file exist?
+                    if ( !bOverwrite && FileExists ( strNewAbsPath ) )
+                    {
+                        argStream.SetCustomError ( SString ( "Destination file already exists (%s)", *newFilePath ), "File error" );
+                    }
+                    else
+                    {
+                        // Make sure the destination folder exists so we can copy the file
+                        MakeSureDirExists ( strNewAbsPath );
+
+                        if ( FileCopy ( strCurAbsPath, strNewAbsPath ) )
+                        {
+                            // If file copied return success
+                            lua_pushboolean ( luaVM, true );
+                            return 1;
+                        }
+                        else
+                        {
+                            argStream.SetCustomError ( SString ( "Unable to copy %s to %s", *filePath, *newFilePath ), "File error" );
+                        }
+                    }
+                }
+                else
+                {
+                    argStream.SetCustomError ( SString ( "Source file doesn't exist (%s)", *filePath ), "File error" );
+                }
+            }
+        }
+    }
+
+    if ( argStream.HasErrors () )
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
 
     // Failed
     lua_pushboolean ( luaVM, false );

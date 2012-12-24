@@ -39,11 +39,11 @@ public:
 
     void                        ResetTimer                      ( CLuaTimer* pLuaTimer );
 
-    CFastList < CLuaTimer > ::const_iterator   IterBegin       ( void )                    { return m_TimerList.begin (); }
-    CFastList < CLuaTimer > ::const_iterator   IterEnd         ( void )                    { return m_TimerList.end (); }
+    CFastList < CLuaTimer* > ::const_iterator   IterBegin       ( void )                    { return m_TimerList.begin (); }
+    CFastList < CLuaTimer* > ::const_iterator   IterEnd         ( void )                    { return m_TimerList.end (); }
 
 private:
-    CFastList < CLuaTimer >     m_TimerList;
+    CFastList < CLuaTimer* >    m_TimerList;
     std::deque < CLuaTimer* >   m_ProcessQueue;
     CLuaTimer*                  m_pPendingDelete;
     CLuaTimer*                  m_pProcessingTimer;

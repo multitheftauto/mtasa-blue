@@ -39,8 +39,8 @@ public:
     static bool                 AddEventHandler                     ( CLuaMain* pLuaMain, const char* szName, CElement* pElement, const CLuaFunctionRef& iLuaFunction, bool bPropagated, EEventPriorityType eventPriority, float fPriorityMod );
     static bool                 RemoveEventHandler                  ( CLuaMain* pLuaMain, const char* szName, CElement* pElement, const CLuaFunctionRef& iLuaFunction );
     static bool                 TriggerEvent                        ( const char* szName, CElement* pElement, const CLuaArguments& Arguments, bool & bWasCancelled );
-    static bool                 TriggerClientEvent                  ( CElement* pElement, const char* szName, CElement* pCallWithElement, CLuaArguments& Arguments );
-    static bool                 TriggerLatentClientEvent            ( CElement* pElement, const char* szName, CElement* pCallWithElement, CLuaArguments& Arguments, int iBandwidth, CLuaMain* pLuaMain, ushort usResourceNetId );
+    static bool                 TriggerClientEvent                  ( const std::vector < CPlayer* >& sendList, const char* szName, CElement* pCallWithElement, CLuaArguments& Arguments );
+    static bool                 TriggerLatentClientEvent            ( const std::vector < CPlayer* >& sendList, const char* szName, CElement* pCallWithElement, CLuaArguments& Arguments, int iBandwidth, CLuaMain* pLuaMain, ushort usResourceNetId );
 
     static bool                 CancelEvent                         ( bool bCancel, const char* szReason );
     static const char*          GetCancelReason                     ( );
@@ -89,7 +89,7 @@ public:
     static bool                 RemoveElementData                   ( CElement* pElement, const char* szName );
     static bool                 SetElementParent                    ( CElement* pElement, CElement* pParent );
     static bool                 SetElementPosition                  ( CElement* pElement, const CVector& vecPosition, bool bWarp = true );
-    static bool                 SetElementRotation                  ( CElement* pElement, const CVector& vecRotation, const char* szRotationOrder );
+    static bool                 SetElementRotation                  ( CElement* pElement, const CVector& vecRotation, const char* szRotationOrder, bool bNewWay );
     static bool                 SetElementVelocity                  ( CElement* pElement, const CVector& vecVelocity );
     static bool                 SetElementVisibleTo                 ( CElement* pElement, CElement* pReference, bool bVisible );
     static bool                 SetElementInterior                  ( CElement* pElement, unsigned char ucInterior, bool bSetPosition, CVector& vecPosition );
@@ -188,7 +188,7 @@ public:
     // Ped set funcs
     static bool                 SetPedArmor                         ( CElement* pElement, float fArmor );
     static bool                 KillPed                             ( CElement* pElement, CElement* pKiller = NULL, unsigned char ucKillerWeapon = 0xFF, unsigned char ucBodyPart = 0xFF, bool bStealth = false );
-    static bool                 SetPedRotation                      ( CElement* pElement, float fRotation );
+    static bool                 SetPedRotation                      ( CElement* pElement, float fRotation, bool bNewWay );
     static bool                 SetPedStat                          ( CElement* pElement, unsigned short usStat, float fValue );
     static bool                 AddPedClothes                       ( CElement* pElement, const char* szTexture, const char* szModel, unsigned char ucType );
     static bool                 RemovePedClothes                    ( CElement* pElement, unsigned char ucType, const char* szTexture = NULL, const char* szModel = NULL );
@@ -570,8 +570,8 @@ public:
     static bool                 ResetWindVelocity                   ( void );
     static bool                 ResetFarClipDistance                ( void );
     static bool                 ResetFogDistance                    ( void );
-    static bool                 RemoveWorldModel                    ( unsigned short usModel, float fRadius, float fX, float fY, float fZ );
-    static bool                 RestoreWorldModel                   ( unsigned short usModel, float fRadius, float fX, float fY, float fZ );
+    static bool                 RemoveWorldModel                    ( unsigned short usModel, float fRadius, float fX, float fY, float fZ, char cInterior );
+    static bool                 RestoreWorldModel                   ( unsigned short usModel, float fRadius, float fX, float fY, float fZ, char cInterior );
     static bool                 RestoreAllWorldModels               ( void );
     static bool                 SendSyncIntervals                   ( CPlayer* pPlayer = NULL );
     static bool                 SetPedTargetingMarkerEnabled        ( bool bEnabled );

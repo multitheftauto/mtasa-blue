@@ -1632,11 +1632,14 @@ struct SVehicleSirenAddSync : public ISyncStructure
         {
             if ( bitStream.Read ( data.m_ucSirenType ) && bitStream.Read ( data.m_ucSirenCount ) )
             {
-                bitStream.ReadBit ( data.m_b360Flag );
-                bitStream.ReadBit ( data.m_bDoLOSCheck );
-                bitStream.ReadBit ( data.m_bUseRandomiser );
-                bitStream.ReadBit ( data.m_bEnableSilent );
-                return true;
+                if ( data.m_ucSirenType >= SIREN_TYPE_FIRST && data.m_ucSirenType <= SIREN_TYPE_LAST && data.m_ucSirenCount <= SIREN_COUNT_MAX )
+                {
+                    bitStream.ReadBit ( data.m_b360Flag );
+                    bitStream.ReadBit ( data.m_bDoLOSCheck );
+                    bitStream.ReadBit ( data.m_bUseRandomiser );
+                    bitStream.ReadBit ( data.m_bEnableSilent );
+                    return true;
+                }
             }
         }
 

@@ -75,6 +75,7 @@ enum eClientEntityType
     CCLIENTGUIFONT,
     CCLIENTTEXTURE,
     CCLIENTSHADER,
+    CCLIENTWEAPON,
     CCLIENTUNKNOWN,
 };
 
@@ -86,7 +87,7 @@ class CLuaArgument;
 class CLuaArguments;
 class CLuaMain;
 class CMapEventManager;
-typedef CFastList < class CClientEntity > CChildListType;
+typedef CFastList < CClientEntity* > CChildListType;
 
 enum eCClientEntityClassTypes
 {
@@ -130,6 +131,7 @@ enum eCClientEntityClassTypes
     CLASS_CClientShader,
     CLASS_CClientRenderTarget,
     CLASS_CClientScreenSource,
+    CLASS_CClientWeapon,
 };
 
 
@@ -202,6 +204,11 @@ public:
     virtual void                                SetPosition             ( const CVector& vecPosition ) = 0;
     void                                        SetPositionRelative     ( CClientEntity * pOrigin, const CVector& vecPosition );
     virtual void                                Teleport                ( const CVector& vecPosition ) { SetPosition(vecPosition); }
+
+    virtual void                                GetRotationRadians      ( CVector& vecOutRadians ) const;
+    virtual void                                GetRotationDegrees      ( CVector& vecOutDegrees ) const;
+    virtual void                                SetRotationRadians      ( const CVector& vecRadians );
+    virtual void                                SetRotationDegrees      ( const CVector& vecDegrees );
 
     virtual inline unsigned short               GetDimension            ( void )                        { return m_usDimension; }
     virtual void                                SetDimension            ( unsigned short usDimension ) { m_usDimension = usDimension; }
@@ -290,6 +297,7 @@ public:
     virtual void                                SetInterior                 ( unsigned char ucInterior );
     bool                                        IsOnScreen                  ( void );
     virtual RpClump *                           GetClump                    ( void );
+    void                                        WorldIgnore                 ( bool bIgnore );
 
     // Spatial database
     virtual CSphere                             GetWorldBoundingSphere      ( void );
@@ -338,6 +346,7 @@ protected:
     std::map < CClientEntity *, bool >          m_DisabledCollisions;
     bool                                        m_bDoubleSided;
     bool                                        m_bDoubleSidedInit;
+    bool                                        m_bWorldIgnored;
 
 public:
     // Optimization for getElementsByType starting at root

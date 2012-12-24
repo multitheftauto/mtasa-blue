@@ -71,6 +71,7 @@ CLuaMain::CLuaMain ( CLuaManager* pLuaManager, CResource* pResourceOwner )
     m_luaVM = NULL;
     m_bBeingDeleted = false;
     m_pLuaTimerManager = new CLuaTimerManager;
+    m_FunctionEnterTimer.SetMaxIncrement ( 500 );
 
     // Set up the name of our script
     m_iOwner = OWNER_SERVER;

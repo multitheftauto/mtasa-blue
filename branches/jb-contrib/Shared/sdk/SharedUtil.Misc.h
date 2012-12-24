@@ -96,11 +96,22 @@ namespace SharedUtil
     bool            WatchDogWasUncleanStop          ( void );
     void            WatchDogSetUncleanStop          ( bool bOn );
 
-    void            BrowseToSolution                ( const SString& strType, bool bAskQuestion = false, bool bTerminateProcess = false, bool bDoOnExit = false, const SString& strMessageBoxMessage = "" );
-    void            ProcessPendingBrowseToSolution  ( void );
+    // BrowseToSolution flags
+    enum
+    {
+        EXIT_GAME_FIRST         = 1,        // Exit from game before showing message - Useful only if game has started and has control of the screen
+        ASK_GO_ONLINE           = 2,        // Ask user if he wants to go online (otherwise, always go online)
+        TERMINATE_IF_YES        = 4,        // What to do at the end. Only relevant if EXIT_GAME_FIRST is not used
+        TERMINATE_IF_NO         = 8,        //    ''
+        TERMINATE_IF_YES_OR_NO  = TERMINATE_IF_YES | TERMINATE_IF_NO,
+        TERMINATE_PROCESS       = TERMINATE_IF_YES_OR_NO
+    };
+    void            BrowseToSolution                ( const SString& strType, int uiFlags = 0, const SString& strMessageBoxMessage = "", int iTerminateExitCode = 1 );
+    bool            ProcessPendingBrowseToSolution  ( void );
     void            ClearPendingBrowseToSolution    ( void );
 
     SString         GetSystemErrorMessage           ( uint uiErrorCode, bool bRemoveNewlines = true, bool bPrependCode = true );
+    void            SetClipboardText                ( const SString& strText );
 
 #endif
 
@@ -114,8 +125,9 @@ namespace SharedUtil
 
     DWORD           _GetCurrentProcessorNumber      ( void );
 
-    SString         EscapeString                    ( const SString& strText, const SString& strDisallowedChars, char cSpecialChar = '#' );
+    SString         EscapeString                    ( const SString& strText, const SString& strDisallowedChars, char cSpecialChar = '#', uchar ucLowerLimit = 0, uchar ucUpperLimit = 255 );
     SString         UnescapeString                  ( const SString& strText, char cSpecialChar = '#' );
+    SString         EscapeURLArgument               ( const SString& strText );
 
     SString         ExpandEnvString                 ( const SString& strInput );
 
@@ -1182,6 +1194,11 @@ namespace SharedUtil
             }
         }
 
+        bool ValueValid ( eDummy value ) const
+        {
+            return MapContains ( m_NameMap, value );
+        }
+
         const SString& FindName ( eDummy value ) const
         {
             if ( const SString* pName = MapFind ( m_NameMap, value ) )
@@ -1191,7 +1208,8 @@ namespace SharedUtil
 
         bool FindValue ( const SString& strName, eDummy& outResult ) const
         {
-            if ( const eDummy* pValue = MapFind ( m_ValueMap, strName ) )
+            const eDummy* pValue;
+            if ( ( pValue = MapFind ( m_ValueMap, strName ) ) || ( pValue = MapFind ( m_ValueMap, strName.ToLower () ) ) )
             {
                 outResult = *pValue;
                 return true;
@@ -1218,6 +1236,7 @@ namespace SharedUtil
         inline const SString&  EnumToString    ( const T& value )                           { return GetEnumInfo ( *(T*)0 )->FindName    ( (eDummy)value ); }\
         inline bool            StringToEnum    ( const SString& strName, T& outResult )     { return GetEnumInfo ( *(T*)0 )->FindValue   ( strName, (eDummy&)outResult ); }\
         inline const SString&  GetEnumTypeName ( const T& )                                 { return GetEnumInfo ( *(T*)0 )->GetTypeName (); }\
+        inline bool            EnumValueValid  ( const T& value )                           { return GetEnumInfo ( *(T*)0 )->ValueValid  ( (eDummy)value ); }\
 
     #define IMPLEMENT_ENUM_BEGIN(cls) \
         CEnumInfo* GetEnumInfo( const cls& ) \
@@ -1403,20 +1422,20 @@ namespace SharedUtil
     // Fixed size array
     //
     // Replacement for e.g.  int var[100]
-    // Checks bounds during debug
+    // Checks bounds
     //
     template < class T, int SIZE >
     struct SFixedArray
     {
         T& operator[] ( uint uiIndex )
         {
-            dassert ( uiIndex < SIZE );
+            assert ( uiIndex < SIZE );
             return data [ uiIndex ];
         }
 
         const T& operator[] ( uint uiIndex ) const
         {
-            dassert ( uiIndex < SIZE );
+            assert ( uiIndex < SIZE );
             return data [ uiIndex ];
         }
 
@@ -1537,7 +1556,17 @@ namespace SharedUtil
             return *pData;
         }
 
+        const T& operator* () const
+        {
+            return *pData;
+        }
+
         T* operator-> ()
+        {
+            return pData;
+        }
+
+        const T* operator-> () const
         {
             return pData;
         }

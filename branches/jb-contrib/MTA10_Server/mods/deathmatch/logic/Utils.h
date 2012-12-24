@@ -41,7 +41,6 @@ void            stripControlCodes           ( char* szString );
 bool            StringBeginsWith            ( const char* szText, const char* szBegins );
 bool            IsNumericString             ( const char* szString );
 bool            IsNumericString             ( const char* szString, size_t sizeString );
-unsigned int    HashString                  ( const char* szString );
 
 void            DisconnectPlayer            ( class CGame* pGame, class CPlayer& Player, const char* szMessage );
 void            DisconnectConnectionDesync  ( class CGame* pGame, class CPlayer& Player, unsigned int uiCode );
@@ -204,5 +203,19 @@ enum eEulerRotationOrder
 
 eEulerRotationOrder EulerRotationOrderFromString( const char* szString );
 CVector             ConvertEulerRotationOrder   ( const CVector& a_vRotation, eEulerRotationOrder a_eSrcOrder, eEulerRotationOrder a_eDstOrder );
+
+// Clear list of object pointers
+template < class T >
+void DeletePointersAndClearList ( T& elementList )
+{
+    T cloneList = elementList;
+    elementList.clear ();
+
+    typename T::const_iterator iter = cloneList.begin ();
+    for ( ; iter != cloneList.end () ; iter++ )
+    {
+        delete *iter;
+    }
+}
 
 #endif

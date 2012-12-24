@@ -18,8 +18,8 @@
 *****************************************************************************/
 
 #include "StdInc.h"
-#define REMOVEPEDFROMVEHICLE_CLIENTSIDE_MIN_CLIENT_VERSION  "1.3.0-9.04482"
-#define WARPPEDINTOVEHICLE_CLIENTSIDE_MIN_CLIENT_VERSION    "1.3.0-9.04482"
+#define MIN_CLIENT_REQ_REMOVEPEDFROMVEHICLE_CLIENTSIDE  "1.3.0-9.04482"
+#define MIN_CLIENT_REQ_WARPPEDINTOVEHICLE_CLIENTSIDE    "1.3.0-9.04482"
 
 int CLuaFunctionDefs::GetPedVoice ( lua_State* luaVM )
 {
@@ -967,58 +967,6 @@ int CLuaFunctionDefs::GetPedAnalogControlState ( lua_State* luaVM )
     return 1;
 }
 
-int CLuaFunctionDefs::GetPedOxygenLevel ( lua_State* luaVM)
-{
-//  float getPedOxgenLevel ( element ped )
-    CClientPed* pPed = NULL;
-
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pPed );
-
-    if ( !argStream.HasErrors ( ) )
-    {
-        if ( pPed )
-        {
-            lua_pushnumber ( luaVM, pPed->GetOxygenLevel() );
-            return 1;
-        }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "ped", 1 );
-    }
-    else
-        m_pScriptDebugging->LogBadType ( luaVM );
-
-    lua_pushnumber ( luaVM, 0.0 );
-    return 1;
-}
-
-int CLuaFunctionDefs::SetPedOxygenLevel ( lua_State* luaVM )
-{
-//  bool setPedOxygenLevel ( element ped, float oxygenLevel )
-    CClientPed* pPed = NULL; float fOxygenLevel;
-
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pPed );
-    argStream.ReadNumber ( fOxygenLevel );
-
-    if ( !argStream.HasErrors ( ) )
-    {
-        if ( pPed )
-        {
-            pPed->SetOxygenLevel ( fOxygenLevel );
-            lua_pushboolean ( luaVM, true );
-            return 1;
-        }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "ped", 1 );
-    }
-    else
-        m_pScriptDebugging->LogBadType ( luaVM );
-
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
 int CLuaFunctionDefs::IsPedDoingGangDriveby ( lua_State* luaVM )
 {
     if ( ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA ) )
@@ -1308,7 +1256,7 @@ int CLuaFunctionDefs::WarpPedIntoVehicle ( lua_State* luaVM )
     argStream.ReadUserData ( pVehicle );
     argStream.ReadNumber ( uiSeat, 0 );
 
-    MinClientCheck ( argStream, WARPPEDINTOVEHICLE_CLIENTSIDE_MIN_CLIENT_VERSION, "function is being called client side" );
+    MinClientReqCheck ( argStream, MIN_CLIENT_REQ_REMOVEPEDFROMVEHICLE_CLIENTSIDE, "function is being called client side" );
 
     if ( !argStream.HasErrors () )
     {
@@ -1340,7 +1288,7 @@ int CLuaFunctionDefs::RemovePedFromVehicle ( lua_State* luaVM )
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pPed );
 
-    MinClientCheck ( argStream, REMOVEPEDFROMVEHICLE_CLIENTSIDE_MIN_CLIENT_VERSION, "function is being called client side" );
+    MinClientReqCheck ( argStream, MIN_CLIENT_REQ_WARPPEDINTOVEHICLE_CLIENTSIDE, "function is being called client side" );
 
     if ( !argStream.HasErrors () )
     {
@@ -1358,6 +1306,31 @@ int CLuaFunctionDefs::RemovePedFromVehicle ( lua_State* luaVM )
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::GetPedOxygenLevel ( lua_State* luaVM )
+{
+    if ( ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA ) )
+    {
+        CClientPed * pPed = lua_toped ( luaVM, 1 );
+        if ( pPed )
+        {
+            float fOxygen;
+            if ( CStaticFunctionDefinitions::GetPedOxygenLevel ( *pPed, fOxygen ) )
+            {
+                lua_pushnumber ( luaVM, fOxygen );
+                return 1;
+            }
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "ped", 1 );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -1674,29 +1647,24 @@ int CLuaFunctionDefs::SetPedAimTarget ( lua_State* luaVM )
 
 int CLuaFunctionDefs::SetPedRotation ( lua_State* luaVM )
 {
-    // Check types
-    if ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) &&
-        lua_istype ( luaVM, 2, LUA_TNUMBER ) )
-    {
-        // Grab the entity
-        CClientEntity* pEntity = lua_toelement ( luaVM, 1 );
-        float fRotation = static_cast < float > ( lua_tonumber ( luaVM, 2 ) );
+//  setPedRotation ( element ped, float rotation [, bool fixPedRotation = false ] )
+    CClientEntity* pEntity; float fRotation; bool bNewWay;
 
-        // Valid element?
-        if ( pEntity )
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pEntity );
+    argStream.ReadNumber ( fRotation );
+    argStream.ReadBool ( bNewWay, false );
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( CStaticFunctionDefinitions::SetPedRotation ( *pEntity, fRotation, bNewWay ) )
         {
-            // Set the new rotation
-            if ( CStaticFunctionDefinitions::SetPedRotation ( *pEntity, fRotation ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
+            lua_pushboolean ( luaVM, true );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "ped", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -1858,6 +1826,32 @@ int CLuaFunctionDefs::SetPedMoveAnim ( lua_State* luaVM )
 }
 
 
+int CLuaFunctionDefs::SetPedOxygenLevel ( lua_State* luaVM )
+{
+    if ( ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA ) &&
+        ( lua_type ( luaVM, 2 ) == LUA_TNUMBER ) )
+    {
+        CClientEntity * pEntity = lua_toelement ( luaVM, 1 );
+        float fOxygen = static_cast < float > ( lua_tonumber( luaVM, 2 ) );
+        if ( pEntity )
+        {
+            if ( CStaticFunctionDefinitions::SetPedOxygenLevel ( *pEntity, fOxygen ) )
+            {
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "ped", 1 );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
 int CLuaFunctionDefs::CreatePed ( lua_State* luaVM )
 {
     // Valid types?
@@ -1919,47 +1913,44 @@ int CLuaFunctionDefs::GetWeaponProperty ( lua_State* luaVM )
     eWeaponSkill eWepSkill = eWeaponSkill::WEAPONSKILL_STD;
     eWeaponType eWep = eWeaponType::WEAPONTYPE_UNARMED;
     eWeaponProperty eProp = eWeaponProperty::WEAPON_INVALID_PROPERTY;
-    
+    CClientWeapon * pWeapon;
     CScriptArgReader argStream ( luaVM );
-    if ( argStream.NextIsEnumString ( eWep ) )
+
+    if ( argStream.NextIsUserData () )
     {
-        argStream.ReadEnumString ( eWep );
-    }
-    else
-    {
-        int iTemp = 0;
-        argStream.ReadNumber ( iTemp );
-        if ( iTemp >= WEAPONTYPE_MIN && iTemp <= WEAPONTYPE_MAX )
+        argStream.ReadUserData ( pWeapon );
+        argStream.ReadEnumString ( eProp );
+
+        if ( !argStream.HasErrors () )
         {
-            eWep = (eWeaponType) iTemp;
+            if ( eProp == WEAPON_DAMAGE )
+            {
+                short sData = 0;
+                if ( CStaticFunctionDefinitions::GetWeaponProperty ( pWeapon, eProp, sData ) )
+                {
+                    lua_pushnumber ( luaVM, sData );
+                    return 1;
+                }
+            }
+            else
+            {
+                float fData = 0;
+                if ( CStaticFunctionDefinitions::GetWeaponProperty ( pWeapon, eProp, fData ) )
+                {
+                    lua_pushnumber ( luaVM, fData );
+                    return 1;
+                }
+            }
         }
         else
-        {
-            // Failed
-            m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), "invalid weapon type at argument 1" ) );
-            lua_pushboolean ( luaVM, false );
-            return 1;
-        }
+            m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+        lua_pushboolean ( luaVM, false );
+        return 1;
     }
-    if ( argStream.NextIsEnumString ( eWepSkill ) )
-    {
-        argStream.ReadEnumString ( eWepSkill );
-    }
-    else
-    {
-        int iTemp = 0;
-        argStream.ReadNumber ( iTemp );
-        if ( iTemp >= WEAPONSKILL_POOR && iTemp <= WEAPONSKILL_PRO )
-        {
-            eWepSkill = (eWeaponSkill) iTemp;
-        }
-        else
-        {
-            m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), "invalid skill type at argument 2" ) );
-            lua_pushboolean ( luaVM, false );
-            return 1;
-        }
-    }
+
+    argStream.ReadEnumStringOrNumber ( eWep );
+    argStream.ReadEnumStringOrNumber ( eWepSkill );
     argStream.ReadEnumString ( eProp );
     if ( !argStream.HasErrors () )
     {
@@ -2029,12 +2020,13 @@ int CLuaFunctionDefs::GetWeaponProperty ( lua_State* luaVM )
             }
             default:
             {
+                argStream.SetCustomError( "unsupported weapon property at argument 3" );
                 break;
             }
         }
     }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+    if ( argStream.HasErrors () )
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
 
     // Failed
@@ -2049,45 +2041,8 @@ int CLuaFunctionDefs::GetOriginalWeaponProperty ( lua_State* luaVM )
     eWeaponProperty eProp = eWeaponProperty::WEAPON_INVALID_PROPERTY;
 
     CScriptArgReader argStream ( luaVM );
-    if ( argStream.NextIsEnumString ( eWep ) )
-    {
-        argStream.ReadEnumString ( eWep );
-    }
-    else
-    {
-        int iTemp = 0;
-        argStream.ReadNumber ( iTemp );
-        if ( iTemp >= WEAPONTYPE_MIN && iTemp <= WEAPONTYPE_MAX )
-        {
-            eWep = (eWeaponType) iTemp;
-        }
-        else
-        {
-            // Failed
-            m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), "invalid weapon type at argument 1" ) );
-            lua_pushboolean ( luaVM, false );
-            return 1;
-        }
-    }
-    if ( argStream.NextIsEnumString ( eWepSkill ) )
-    {
-        argStream.ReadEnumString ( eWepSkill );
-    }
-    else
-    {
-        int iTemp = 0;
-        argStream.ReadNumber ( iTemp );
-        if ( iTemp >= WEAPONSKILL_POOR && iTemp <= WEAPONSKILL_PRO )
-        {
-            eWepSkill = (eWeaponSkill) iTemp;
-        }
-        else
-        {
-            m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), "invalid skill type at argument 2" ) );
-            lua_pushboolean ( luaVM, false );
-            return 1;
-        }
-    }
+    argStream.ReadEnumStringOrNumber ( eWep );
+    argStream.ReadEnumStringOrNumber ( eWepSkill );
     argStream.ReadEnumString ( eProp );
     if ( !argStream.HasErrors () )
     {
@@ -2157,12 +2112,13 @@ int CLuaFunctionDefs::GetOriginalWeaponProperty ( lua_State* luaVM )
             }
         default:
             {
+                argStream.SetCustomError( "unsupported weapon property at argument 3" );
                 break;
             }
         }
     }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+    if ( argStream.HasErrors () )
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
 
     // Failed

@@ -36,6 +36,11 @@ class CPed;
 class CObject;
 class CColModel;
 
+#define SIREN_TYPE_FIRST 1
+#define SIREN_TYPE_LAST 6
+#define SIREN_ID_MAX 7
+#define SIREN_COUNT_MAX 8
+
 struct SSirenBeaconInfo
 {
     CVector                     m_vecSirenPositions;
@@ -55,7 +60,7 @@ struct SSirenInfo
     unsigned char               m_ucSirenCount;
     unsigned char               m_ucCurrentSirenID;
     unsigned char               m_ucCurrentSirenRandomiser;
-    SSirenBeaconInfo            m_tSirenInfo [8];
+    SFixedArray < SSirenBeaconInfo, 8 > m_tSirenInfo;
     SColor                      m_tPointLightColour;
 };
 class CVehicle : public virtual CPhysical
@@ -234,6 +239,7 @@ public:
 
     virtual CObject *            SpawnFlyingComponent                   ( int i_1, unsigned int ui_2 ) = 0;
     virtual void                 SetWheelVisibility                     ( eWheels wheel, bool bVisible ) = 0;
+    virtual CVector              GetWheelPosition                       ( eWheels wheel ) = 0;
 
     virtual bool                 IsHeliSearchLightVisible               ( void ) = 0;
     virtual void                 SetHeliSearchLightVisible              ( bool bVisible ) = 0;
@@ -270,6 +276,17 @@ public:
     virtual bool                 IsSirenRandomiserEnabled               ( void ) = 0;
     virtual bool                 IsSirenSilentEffectEnabled             ( void ) = 0;
     virtual void                 SetVehicleFlags                        ( bool bEnable360, bool bEnableRandomiser, bool bEnableLOSCheck, bool bEnableSilent ) = 0;
+    virtual bool                 SetComponentRotation                   ( SString vehicleComponent, CVector vecRotation ) = 0;
+    virtual bool                 GetComponentRotation                   ( SString vehicleComponent, CVector &vecRotation ) = 0;
+    virtual bool                 SetComponentPosition                   ( SString vehicleComponent, CVector vecPosition ) = 0;
+    virtual bool                 GetComponentPosition                   ( SString vehicleComponent, CVector &vecPositionModelling ) = 0;
+    virtual bool                 IsComponentPresent                     ( SString vehicleComponent ) = 0;
+    virtual bool                 GetComponentMatrix                     ( SString vehicleComponent, RwMatrix &ltm, RwMatrix &modelling ) = 0;
+    virtual bool                 SetComponentMatrix                     ( SString vehicleComponent, RwMatrix &ltm, RwMatrix &modelling ) = 0;
+    virtual bool                 SetComponentVisible                    ( SString vehicleComponent, bool bVisible ) = 0;
+    virtual bool                 GetComponentVisible                    ( SString vehicleComponent, bool &bVisible ) = 0;
+    virtual std::map < SString, RwFrame * > & GetComponentMap       ( void ) = 0;
+
 };
 
 #endif

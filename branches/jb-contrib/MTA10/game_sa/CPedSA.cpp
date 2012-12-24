@@ -60,7 +60,10 @@ CPedSA::~CPedSA ( void )
     for ( uint i = 0 ; i < MAX_FLAME_SHOT_INFOS ; i++ )
     {
         if ( pInfo->pInstigator == m_pInterface )
+        {
             pInfo->pInstigator = NULL;
+            pInfo->ucFlag1 = 0;
+        }
         pInfo++;
     }
 }
@@ -333,13 +336,12 @@ void CPedSA::SetArmor ( float fArmor )
 
 float CPedSA::GetOxygenLevel ( void )
 {
-    return *reinterpret_cast<float*>(GetPedInterface ()->pPlayerData + 0x44);
+    return GetPedInterface ()->pPlayerData->m_fBreath;
 }
 
-void CPedSA::SetOxygenLevel ( float fOxygenLevel )
+void CPedSA::SetOxygenLevel ( float fOxygen )
 {
-    float* pBreath = reinterpret_cast<float*>(GetPedInterface ()->pPlayerData + 0x44);
-    *pBreath = fOxygenLevel;
+    GetPedInterface ()->pPlayerData->m_fBreath = fOxygen;
 }
 
 void CPedSA::SetIsStanding( bool bStanding )

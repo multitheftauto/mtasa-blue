@@ -77,8 +77,8 @@ CPerfStatDebugTable* CPerfStatDebugTable::GetSingleton ()
 //
 ///////////////////////////////////////////////////////////////
 CPerfStatDebugTableImpl::CPerfStatDebugTableImpl ( void )
-    : m_TimeSinceRemoveOld ( 500, true )
 {
+    m_TimeSinceRemoveOld.SetMaxIncrement ( 500, true );
     m_strCategoryName = "Debug table";
 }
 

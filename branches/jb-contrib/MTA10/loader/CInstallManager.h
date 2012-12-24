@@ -38,9 +38,12 @@ protected:
     SString         _ShowCopyFailDialog             ( void );
     SString         _ProcessLayoutChecks            ( void );
     SString         _ProcessAeroChecks              ( void );
+    SString         _ProcessServiceChecks           ( void );
     SString         _ChangeFromAdmin                ( void );
     SString         _InstallNewsItems               ( void );
     SString         _Quit                           ( void );
+    SString         _HandlePostNsisInstall          ( void );
+    SString         _HandlePreNsisUninstall         ( void );
 
     CSequencerType*     m_pSequencer;
     SString             m_strAdminReason;

@@ -99,32 +99,38 @@ namespace SharedUtil
     //
     class CElapsedTime
     {
-        long long   m_llUpdateTime;
-        long long   m_llElapsedTime;
-        long long   m_llMaxIncrement;
-        bool        m_bUseModuleTickCount;
     public:
-
         // MaxIncrement should be set higher than the expected tick interval between Get() calls
-        CElapsedTime ( long lMaxIncrement = 500, bool bUseModuleTickCount = false )
-            : m_llMaxIncrement ( lMaxIncrement )
-            , m_bUseModuleTickCount ( bUseModuleTickCount )
+        CElapsedTime ( void )
         {
+            m_llMaxIncrement = INT_MAX;
+            m_bUseModuleTickCount = false;
             Reset ();
+        }
+
+        void SetMaxIncrement ( long lMaxIncrement, bool bUseModuleTickCount = false )
+        {
+            m_llMaxIncrement = lMaxIncrement;
+            m_bUseModuleTickCount = bUseModuleTickCount;
+        }
+
+        void SetUseModuleTickCount ( bool bUseModuleTickCount )
+        {
+            m_bUseModuleTickCount = bUseModuleTickCount;
         }
 
         void Reset ( void )
         {
             m_llUpdateTime = DoGetTickCount ();
-            m_llElapsedTime = 0;
+            m_ullElapsedTime = 0;
         }
 
-        long long Get ( void )
+        unsigned long long Get ( void )
         {
             long long llTime = DoGetTickCount ();
-            m_llElapsedTime += Min ( m_llMaxIncrement, llTime - m_llUpdateTime );
+            m_ullElapsedTime += Clamp ( 0LL, llTime - m_llUpdateTime, m_llMaxIncrement );
             m_llUpdateTime = llTime;
-            return m_llElapsedTime;
+            return m_ullElapsedTime;
         }
 
     protected:
@@ -134,6 +140,11 @@ namespace SharedUtil
         {
             return m_bUseModuleTickCount ? GetModuleTickCount64 () : GetTickCount64_ ();
         }
+
+        long long           m_llUpdateTime;
+        unsigned long long  m_ullElapsedTime;
+        long long           m_llMaxIncrement;
+        bool                m_bUseModuleTickCount;
     };
 
 
@@ -163,6 +174,12 @@ namespace SharedUtil
             item.szDesc = szDesc;
         }
 
+        void SetAndStoreString ( const SString& strDesc )
+        {
+            stringStoreList.push_back ( strDesc );
+            Set ( stringStoreList.back () );
+        }
+
         SString GetString ( void ) const
         {
             SString strStatus;
@@ -176,6 +193,7 @@ namespace SharedUtil
         }
 
      protected:
+        std::list < SString > stringStoreList;
         std::vector < SItem > itemList;
     };
 

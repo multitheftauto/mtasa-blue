@@ -205,6 +205,7 @@ void CServerList::Refresh ( void )
 
 CServerListInternet::CServerListInternet ( void )
 {
+    m_ElapsedTime.SetMaxIncrement ( 500 );
     m_pMasterServerManager = NewMasterServerManager ();
 }
 
@@ -398,6 +399,9 @@ std::string CServerListItem::Pulse ( bool bCanSendQuery, bool bRemoveNonRespondi
 
         if ( m_ElapsedTime.Get () > SERVER_LIST_ITEM_TIMEOUT )
         {
+            if ( bKeepFlag )
+                bRemoveNonResponding = false;
+
             if ( bRemoveNonResponding )
             {
                 bMaybeOffline = true;       // Flag to help 'Include offline' browser option
@@ -557,16 +561,20 @@ bool CServerListItem::ParseQuery ( const char * szBuffer, unsigned int nLength )
     }
 
     if ( ( uiMasterServerSaysRestrictions & ASE_FLAG_PASSWORDED ) == false )
-        bPassworded = ( szBuffer[i++] == 1 );
+        bPassworded = ( szBuffer[i] == 1 );
+    i++;
 
     if ( ( uiMasterServerSaysRestrictions & ASE_FLAG_SERIALS ) == false )
-        bSerials = ( szBuffer[i++] == 1 );
+        bSerials = ( szBuffer[i] == 1 );
+    i++;
 
     if ( ( uiMasterServerSaysRestrictions & ASE_FLAG_PLAYER_COUNT ) == false )
-        nPlayers = (unsigned char)szBuffer[i++];
+        nPlayers = (unsigned char)szBuffer[i];
+    i++;
 
     if ( ( uiMasterServerSaysRestrictions & ASE_FLAG_MAX_PLAYER_COUNT ) == false )
-        nMaxPlayers = (unsigned char)szBuffer[i++];
+        nMaxPlayers = (unsigned char)szBuffer[i];
+    i++;
 
     // Recover large player count if present
     const SString strPlayerCount = strMapTemp.Right ( strMapTemp.length () - strlen ( strMapTemp ) - 1 );

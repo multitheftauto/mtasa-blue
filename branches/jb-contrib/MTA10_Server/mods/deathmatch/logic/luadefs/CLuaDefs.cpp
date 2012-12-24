@@ -136,7 +136,7 @@ int CLuaDefs::CanUseFunction ( lua_CFunction f, lua_State* luaVM )
             {
                 OutputDebugLine ( "[Lua] Registering PostCallHook" );
                 ms_bRegisterdPostCallHook = true;
-                lua_registerPostCallHook ( CLuaDefs::DidUseFunction );                
+                lua_registerPostCallHook ( CLuaDefs::DidUseFunction );
             }
             // Start to time the function
             ms_TimingFunctionStack.push_back ( STimingFunction( f, pFunction, GetTimeUs() ) );
@@ -171,11 +171,12 @@ void CLuaDefs::DidUseFunction ( lua_CFunction f, lua_State* luaVM )
     }
 
     // Check if we should remove the hook
-    if ( !g_pStats->bFunctionTimingActive && ms_TimingFunctionStack.empty () )
+    if ( !g_pStats->bFunctionTimingActive )
     {
+        ms_TimingFunctionStack.clear ();
         OutputDebugLine ( "[Lua] Removing PostCallHook" );
         assert ( ms_bRegisterdPostCallHook );
         ms_bRegisterdPostCallHook = false;
-        lua_registerPostCallHook ( NULL );                
+        lua_registerPostCallHook ( NULL );
     }
 }

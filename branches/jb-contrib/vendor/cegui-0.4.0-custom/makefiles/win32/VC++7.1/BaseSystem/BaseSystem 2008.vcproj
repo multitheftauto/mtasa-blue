@@ -407,6 +407,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\..\src\CEGUITinyXMLParser.hpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\..\src\CEGUIVector.cpp"
 				>
 			</File>
@@ -432,6 +436,10 @@
 			</File>
 			<File
 				RelativePath="..\..\..\..\src\CEGUIWindowProperties.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\CEGUIXercesParser.hpp"
 				>
 			</File>
 			<File
@@ -1806,6 +1814,10 @@
 					>
 				</File>
 			</Filter>
+		</Filter>
+		<Filter
+			Name="NewFilter1"
+			>
 		</Filter>
 	</Files>
 	<Globals>

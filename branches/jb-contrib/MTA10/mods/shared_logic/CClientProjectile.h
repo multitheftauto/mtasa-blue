@@ -77,18 +77,19 @@ public:
     void                                Destroy                 ( void );
 
     bool                                IsActive                ( void );
-    bool                                GetMatrix               ( CMatrix & matrix );
+    bool                                GetMatrix               ( CMatrix & matrix ) const;
     bool                                SetMatrix               ( const CMatrix & matrix );
     void                                GetPosition             ( CVector & vecPosition ) const;
     void                                SetPosition             ( const CVector & vecPosition );
-    void                                GetRotation             ( CVector & vecRotation );
-    void                                GetRotationDegrees      ( CVector & vecRotation );
-    void                                SetRotation             ( CVector & vecRotation );
-    void                                SetRotationDegrees      ( CVector & vecRotation );
+    void                                GetRotationRadians      ( CVector & vecRotation ) const;
+    void                                GetRotationDegrees      ( CVector & vecRotation ) const;
+    void                                SetRotationRadians      ( const CVector & vecRotation );
+    void                                SetRotationDegrees      ( const CVector & vecRotation );
     void                                GetVelocity             ( CVector & vecVelocity );
     void                                SetVelocity             ( CVector & vecVelocity );
     void                                SetModel                ( unsigned short usModel );
-
+    void                                SetCounter              ( DWORD dwCounter );
+    DWORD                               GetCounter              ( void );
     inline CClientEntity *              GetCreator              ( void )        { return m_pCreator; }
     inline CClientEntity *              GetTargetEntity         ( void )        { return m_pTarget; }
     inline eWeaponType                  GetWeaponType           ( void )        { return m_weaponType; }

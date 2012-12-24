@@ -20,7 +20,7 @@
 using std::list;
 
 class CObject;
-typedef CFastList < CObject >   CObjectListType;
+typedef CFastList < CObject* >   CObjectListType;
 
 class CObjectManager
 {
@@ -46,9 +46,7 @@ private:
     inline void                 AddToList                       ( CObject* pObject )                { m_List.push_back ( pObject ); };
     void                        RemoveFromList                  ( CObject* pObject );
 
-    bool                        m_bRemoveFromList;
     CObjectListType             m_List;
-    list < CObject* >           m_Attached;
 };
 
 #endif

@@ -250,7 +250,7 @@
     <ClCompile Include="CAnimBlendStaticAssociationSA.cpp" />
     <ClCompile Include="CAnimBlockSA.cpp" />
     <ClCompile Include="CAnimManagerSA.cpp" />
-    <ClCompile Include="CAudioSA.cpp" />
+    <ClCompile Include="CAudioEngineSA.cpp" />
     <ClCompile Include="CAutomobileSA.cpp" />
     <ClCompile Include="CBikeSA.cpp" />
     <ClCompile Include="CBirdsSA.cpp" />
@@ -330,6 +330,7 @@
     <ClCompile Include="CPlantSA.cpp" />
     <ClCompile Include="CPlayerInfoSA.cpp" />
     <ClCompile Include="CPlayerPedSA.cpp" />
+    <ClCompile Include="CPointLightsSA.cpp" />
     <ClCompile Include="CPoolsSA.cpp" />
     <ClCompile Include="CPopulationSA.cpp" />
     <ClCompile Include="CProceduralObjectSA.cpp" />
@@ -405,7 +406,7 @@
     <ClInclude Include="CAnimBlendStaticAssociationSA.h" />
     <ClInclude Include="CAnimBlockSA.h" />
     <ClInclude Include="CAnimManagerSA.h" />
-    <ClInclude Include="CAudioSA.h" />
+    <ClInclude Include="CAudioEngineSA.h" />
     <ClInclude Include="CAutomobileSA.h" />
     <ClInclude Include="CBikeSA.h" />
     <ClInclude Include="CBirdsSA.h" />
@@ -493,6 +494,7 @@
     <ClInclude Include="CPlantSA.h" />
     <ClInclude Include="CPlayerInfoSA.h" />
     <ClInclude Include="CPlayerPedSA.h" />
+    <ClInclude Include="CPointLightsSA.h" />
     <ClInclude Include="CPoolsSA.h" />
     <ClInclude Include="CPopulationSA.h" />
     <ClInclude Include="CProceduralObjectSA.h" />

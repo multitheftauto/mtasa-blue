@@ -36,7 +36,7 @@ public:
 
     void                        Unlink              ( void );
 
-    virtual bool                DoHitDetection      ( const CVector& vecLastPosition, const CVector& vecNowPosition, float fRadius ) = 0;
+    virtual bool                DoHitDetection      ( const CVector& vecNowPosition ) = 0;
 
     inline bool                 IsEnabled           ( void )                            { return m_bIsEnabled; };
     inline void                 SetEnabled          ( bool bEnabled )                   { m_bIsEnabled = bEnabled; };
@@ -52,7 +52,7 @@ public:
     inline void                 SetAutoCallEvent    ( bool bAutoCallEvent )             { m_bAutoCallEvent = bAutoCallEvent; };
 
     void                        AddCollider         ( CElement* pElement )              { m_Colliders.push_back ( pElement ); }
-    void                        RemoveCollider      ( CElement* pElement )              { if ( !m_Colliders.empty() ) m_Colliders.remove ( pElement ); }
+    void                        RemoveCollider      ( CElement* pElement )              { m_Colliders.remove ( pElement ); }
     bool                        ColliderExists      ( CElement* pElement );
     void                        RemoveAllColliders  ( bool bNotify );
     list < CElement* > ::iterator  CollidersBegin   ( void )                            { return m_Colliders.begin (); }

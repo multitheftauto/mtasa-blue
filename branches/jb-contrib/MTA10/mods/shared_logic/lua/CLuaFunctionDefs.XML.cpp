@@ -421,7 +421,7 @@ int CLuaFunctionDefs::XMLLoadFile ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -440,18 +440,10 @@ int CLuaFunctionDefs::XMLCreateFile ( lua_State* luaVM )
     // Safety check: Don't allow the rootNodeName "private" incase user forget to declare a node name
     if ( rootNodeName == EnumToString ( ACCESS_PRIVATE ) )
     {
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), "Expected string at argument 2, got access-type" ) );
-        lua_pushboolean ( luaVM, false );
-        return 1;
+        argStream.SetCustomError( "Expected string at argument 2, got access-type" );
     }
 
-    if ( argStream.HasErrors () )
-    {
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
-        lua_pushboolean ( luaVM, false );
-        return 1;
-    }
-    else
+    if ( !argStream.HasErrors () )
     {
         CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
         if ( pLuaMain )
@@ -481,6 +473,8 @@ int CLuaFunctionDefs::XMLCreateFile ( lua_State* luaVM )
             }
         }
     }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -675,7 +669,7 @@ int CLuaFunctionDefs::XMLCopyFile ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     // Error
     lua_pushboolean ( luaVM, false );

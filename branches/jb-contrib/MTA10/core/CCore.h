@@ -184,10 +184,10 @@ public:
     void                    SetClientMessageProcessor       ( pfnProcessMessage pfnMessageProcessor ) { m_pfnMessageProcessor = pfnMessageProcessor; };
     pfnProcessMessage       GetClientMessageProcessor       ( void ) { return m_pfnMessageProcessor; }
     void                    ChangeResolution                ( long width, long height, long depth );
-    void                    ApplyLoadingCrashPatch          ( void );
 
     bool                    IsFocused                       ( void )                        { return ( GetForegroundWindow ( ) == GetHookedWindow ( ) ); };
     bool                    IsWindowMinimized               ( void );
+    void                    UpdateIsWindowMinimized         ( void );
 
     // Pulse
     void                    DoPreFramePulse                 ( void );
@@ -243,6 +243,8 @@ public:
     bool                    GetDebugIdEnabled               ( uint uiDebugId );
     EDiagnosticDebugType    GetDiagnosticDebug              ( void );
     void                    SetDiagnosticDebug              ( EDiagnosticDebugType value );
+    CModelCacheManager*     GetModelCacheManager            ( void );
+    void                    AddModelToPersistentCache       ( ushort usModelId );
 
 private:
     // Core devices.
@@ -252,6 +254,7 @@ private:
     CCommands *                 m_pCommands;
     CDirect3DData *             m_pDirect3DData;
     CConnectManager*            m_pConnectManager;
+    CModelCacheManager*         m_pModelCacheManager;
 
     // Instances (put new classes here!)
     CXMLFile*                   m_pConfigFile;
@@ -269,6 +272,7 @@ private:
     bool                        m_bLastFocused;
     int                         m_iUnminimizeFrameCounter;
     bool                        m_bDidRecreateRenderTargets;
+    bool                        m_bIsWindowMinimized;
 
     // Module loader objects.
     CModuleLoader               m_GameModule;

@@ -53,9 +53,6 @@ CServerImpl::CServerImpl ( void )
         m_wndInput = NULL;
     #endif
 
-    // Init our crashhandler
-    CCrashHandler::Init ();
-
     // Init
     m_pNetwork = NULL;
     m_bRequestedQuit = false;
@@ -176,6 +173,14 @@ int CServerImpl::Run ( int iArgumentCount, char* szArguments [] )
     {
         return 1;
     }
+
+#ifdef WIN32
+    if ( !m_fClientFeedback )
+    {
+        // Init our crashhandler if not being run within the client
+        CCrashHandler::Init ();
+    }
+#endif
 
 #ifndef WIN32
     // Daemonize?

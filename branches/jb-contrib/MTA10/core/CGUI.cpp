@@ -29,7 +29,6 @@ CLocalGUI::CLocalGUI ( void )
 {
     m_pConsole = NULL;
     m_pMainMenu = NULL;
-    //m_pChatBox = NULL;
     m_pChat = NULL;
     m_pDebugView = NULL;
 
@@ -85,7 +84,7 @@ void CLocalGUI::SetSkin( const char* szName )
         catch(...)
         {
             // Even the default skin doesn't work, so give up
-            MessageBox ( 0, "The skin you selected could not be loaded, and the default skin also could not be loaded, please reinstall MTA.", "Error", MB_OK );
+            MessageBox ( 0, "The skin you selected could not be loaded, and the default skin also could not be loaded, please reinstall MTA.", "Error", MB_OK | MB_TOPMOST );
             TerminateProcess ( GetCurrentProcess (), 9 );
         }
     }
@@ -103,16 +102,6 @@ void CLocalGUI::SetSkin( const char* szName )
 
 void CLocalGUI::CreateWindows ( bool bGameIsAlreadyLoaded )
 {
-    CFilePathTranslator     FileTranslator;
-    string                  WorkingDirectory;
-    char                    szCurDir [ 1024 ];
-
-    // Set the current directory.
-    FileTranslator.SetCurrentWorkingDirectory ( "MTA" );
-    FileTranslator.GetCurrentWorkingDirectory ( WorkingDirectory );
-    GetCurrentDirectory ( sizeof ( szCurDir ), szCurDir );
-    SetCurrentDirectory ( WorkingDirectory.c_str ( ) );
-
     CGUI* pGUI = CCore::GetSingleton ().GetGUI ();
 
     // Create chatbox
@@ -146,9 +135,6 @@ void CLocalGUI::CreateWindows ( bool bGameIsAlreadyLoaded )
     m_CommunityRegistration.CreateWindows ();
     m_CommunityRegistration.SetVisible ( false );
 
-    // Return the old current dir.
-    SetCurrentDirectory ( szCurDir );
-
     // Create our news headlines if we're already ingame
     if ( bGameIsAlreadyLoaded )
         m_pMainMenu->GetNewsBrowser()->CreateHeadlines();
@@ -157,11 +143,6 @@ void CLocalGUI::CreateWindows ( bool bGameIsAlreadyLoaded )
 
 void CLocalGUI::CreateObjects ( IUnknown* pDevice )
 {
-    //Temps
-    CFilePathTranslator     FileTranslator;
-    string                  WorkingDirectory;
-    char                    szCurDir [ 1024 ];
-
     // Store the GUI manager pointer and create the GUI classes
     CGUI* pGUI = CCore::GetSingleton ().GetGUI ();
 
@@ -177,16 +158,7 @@ void CLocalGUI::CreateObjects ( IUnknown* pDevice )
 
     SetSkin(currentSkinName);
 
-    // Set the current directory.
-    FileTranslator.SetCurrentWorkingDirectory ( "MTA" );
-    FileTranslator.GetCurrentWorkingDirectory ( WorkingDirectory );
-    GetCurrentDirectory ( sizeof ( szCurDir ), szCurDir );
-    SetCurrentDirectory ( WorkingDirectory.c_str ( ) );
-
     CreateWindows ( false );
-
-    // Return the old current dir.
-    SetCurrentDirectory ( szCurDir );
 }
 
 
@@ -322,25 +294,8 @@ void CLocalGUI::Restore ( void )
 
     if ( pGUI )
     {
-        CFilePathTranslator     FileTranslator;
-        string                  WorkingDirectory;
-        char                    szCurDir [ 1024 ];
-
-        // We must change the current directory here!
-        // This is necessary because if we don't, CLocalGUI will try to load
-        // files from the wrong path!
-
-        // Set the current directory.
-        FileTranslator.SetCurrentWorkingDirectory ( "MTA" );
-        FileTranslator.GetCurrentWorkingDirectory ( WorkingDirectory );
-        GetCurrentDirectory ( sizeof ( szCurDir ), szCurDir );
-        SetCurrentDirectory ( WorkingDirectory.c_str ( ) );
-
         // Restore the GUI
         pGUI->Restore ();
-
-        // Restore the current directory to default.
-        SetCurrentDirectory ( szCurDir );
     }
     else
     {
@@ -417,11 +372,9 @@ void CLocalGUI::SetMainMenuVisible ( bool bVisible )
 {
     if ( m_pMainMenu )
     {
-        // This code installs the original CCore mouseclick handlers when the ingame menu
-        // is shown, and restores the mod mouseclick handlers when the menu is hidden again.
-        // This is needed to prevent a crash when double clicking a server in the server browser
-        // while already ingame: the mod module gets unloaded while its doubleclick handler is
-        // still running.
+        // This code installs the original CCore input handlers when the ingame menu
+        // is shown, and restores the mod input handlers when the menu is hidden again.
+        // This is needed for things like pressing escape when changing a key bind
 
         m_pMainMenu->SetVisible ( bVisible );
 
@@ -454,11 +407,6 @@ bool CLocalGUI::IsMainMenuVisible ( void )
         return false;
     }
 }
-
-/*CChatBox* CLocalGUI::GetChatBox ( void )
-{
-    return m_pChatBox;
-}*/
 
 CChat* CLocalGUI::GetChat ( void )
 {
@@ -555,13 +503,9 @@ bool CLocalGUI::IsChatBoxInputEnabled ( void )
 
 void CLocalGUI::EchoChat ( const char* szText, bool bColorCoded )
 {
-    /*if ( m_pChatBox )
-    {
-        m_pChatBox->EchoChat ( szText );
-    }*/
     if ( m_pChat )
     {
-        m_pChat->Output ( const_cast < char* > ( szText ), bColorCoded );
+        m_pChat->Output ( szText, bColorCoded );
     }
     else
     {
@@ -573,7 +517,7 @@ void CLocalGUI::EchoDebug ( const char* szText )
 {
     if ( m_pDebugView )
     {
-        m_pDebugView->Output ( const_cast < char * > ( szText ), false );
+        m_pDebugView->Output ( szText, false );
     }
     else
     {

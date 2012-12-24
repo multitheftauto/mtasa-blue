@@ -65,7 +65,8 @@ public:
     inline std::list < class CResourceConfigItem* >::iterator    ConfigIterBegin     ( void )        { return m_ConfigFiles.begin(); }
     inline std::list < class CResourceConfigItem* >::iterator    ConfigIterEnd       ( void )        { return m_ConfigFiles.end(); }
 
-    CElementGroup *         GetElementGroup ( void )                { return m_pDefaultElementGroup; }
+    CElementGroup *         GetElementGroup                 ( void )                        { return m_pDefaultElementGroup; }
+    void                    AddToElementGroup               ( CClientEntity* pElement );
 
     void                    AddExportedFunction ( const char * szFunctionName );
     bool                    CallExportedFunction ( const char * szFunctionName, CLuaArguments& args, CLuaArguments& returns, CResource& caller );
@@ -74,7 +75,7 @@ public:
     void                    SetResourceEntity ( CClientEntity* pEntity )    { m_pResourceEntity = pEntity; }
     class CClientEntity*    GetResourceDynamicEntity ( void )                       { return m_pResourceDynamicEntity; }
     void                    SetResourceDynamicEntity ( CClientEntity* pEntity )     { m_pResourceDynamicEntity = pEntity; }
-    SString                 GetResourceDirectoryPath ( eAccessType accessType );
+    SString                 GetResourceDirectoryPath ( eAccessType accessType, const SString& strMetaPath );
     class CClientEntity*    GetResourceGUIEntity ( void )                   { return m_pResourceGUIEntity; }
     void                    SetResourceGUIEntity      ( CClientEntity* pEntity )    { m_pResourceGUIEntity = pEntity; }
     inline CClientEntity*   GetResourceCOLModelRoot ( void )                           { return m_pResourceCOLRoot; };
@@ -122,14 +123,14 @@ private:
     static int              m_iShowingCursor;
     bool                    m_bShowingCursor;
 
-    SString                 m_strResourceDirectoryPath;         // stores the path to /mods/deathmatch/resources/resource_name
-    SString                 m_strResourcePrivateDirectoryPath;  // stores the path to /mods/deathmatch/priv/server-id/resource_name
+    SString                 m_strResourceDirectoryPath;             // stores the path to /mods/deathmatch/resources/resource_name
+    SString                 m_strResourcePrivateDirectoryPath;      // stores the path to /mods/deathmatch/priv/server-id/resource_name
+    SString                 m_strResourcePrivateDirectoryPathOld;   // stores the path to /mods/deathmatch/priv/old-server-id/resource_name
 
     std::list < class CResourceFile* >          m_ResourceFiles;
     std::list < class CResourceConfigItem* >    m_ConfigFiles;
-    std::list<CElementGroup *>                  m_elementGroups; // stores elements created by scripts in this resource
     std::list<CExportedFunction *>              m_exportedFunctions;
-    CElementGroup *                             m_pDefaultElementGroup;
+    CElementGroup *                             m_pDefaultElementGroup;     // stores elements created by scripts in this resource
 };
 
 #endif

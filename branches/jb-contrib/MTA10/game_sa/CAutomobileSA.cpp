@@ -624,6 +624,23 @@ CPhysical* CAutomobileSA::SpawnFlyingComponent ( int iCarNodeIndex, int iUnknown
     return pReturn;
 }
 
+CVector CAutomobileSA::GetWheelPosition(eWheels wheel)
+{
+    CAutomobileSAInterface
+        *pInterface = static_cast < CAutomobileSAInterface* > ( GetVehicleInterface ( ) ); 
+	switch (wheel)
+	{
+		case FRONT_LEFT_WHEEL:
+            return pInterface->WheelFrontLeftColPoint.Position;
+		case FRONT_RIGHT_WHEEL:
+			return pInterface->WheelFrontRightColPoint.Position;
+		case REAR_LEFT_WHEEL:
+			return pInterface->WheelRearLeftColPoint.Position;
+		case REAR_RIGHT_WHEEL:
+			return pInterface->WheelRearRightColPoint.Position;
+	}
+}
+
 CDoor * CAutomobileSA::GetDoor(eDoors doorID)
 {
     DEBUG_TRACE("CDoor * CAutomobileSA::GetDoor(eDoors doorID)");

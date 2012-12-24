@@ -25,8 +25,7 @@
 #include <stdexcept>
 
 // Variables used for screen shot saving
-static IDirect3DSurface9*  ms_pSaveLockSurface  = NULL;
-static int                 ms_bSaveStarted      = 0;
+static CBuffer             ms_ScreenShotBuffer;
 static long long           ms_LastSaveTime      = 0;
 // Other variables
 static uint                ms_RequiredAnisotropicLevel = 1;
@@ -179,111 +178,69 @@ void CDirect3DEvents9::OnPresent ( IDirect3DDevice9 *pDevice )
     ms_DiagnosticDebug = CCore::GetSingleton ().GetDiagnosticDebug ();
     CCore::GetSingleton().GetGUI ()->SetBidiEnabled ( ms_DiagnosticDebug != EDiagnosticDebug::BIDI_6778 );
     
-    // Tidyup after last screenshot
-    if ( ms_bSaveStarted )
-    {
-        // Done yet?
-        if ( !CScreenShot::IsSaving () )
-        {
-            ms_pSaveLockSurface->UnlockRect ();
-            ms_pSaveLockSurface->Release ();
-            ms_pSaveLockSurface = NULL;
-            ms_bSaveStarted = false;
-        }
-    }
-
     // Make a screenshot if needed
-    if ( CCore::GetSingleton().bScreenShot && ms_bSaveStarted == false ) {
+    CheckForScreenShot ();
 
+    TIMING_CHECKPOINT( "-OnPresent2" );
+
+    CGraphics::GetSingleton ().GetRenderItemManager ()->FlushNonAARenderTarget();
+}
+
+
+/////////////////////////////////////////////////////////////
+//
+// CDirect3DEvents9::CheckForScreenShot
+//
+// Take a screenshot if required and able
+//
+/////////////////////////////////////////////////////////////
+void CDirect3DEvents9::CheckForScreenShot ( void )
+{
+    // Make a screenshot if needed
+    if ( CCore::GetSingleton().bScreenShot && !CScreenShot::IsSaving () )
+    {
         // Max one screenshot per second
         if ( GetTickCount64_ () - ms_LastSaveTime < 1000 )
             return;
         ms_LastSaveTime = GetTickCount64_ ();
 
-        RECT ScreenSize;
+        uint uiWidth = CDirect3DData::GetSingleton ().GetViewportWidth ();
+        uint uiHeight = CDirect3DData::GetSingleton ().GetViewportHeight ();
 
-        IDirect3DSurface9 *pSurface = NULL;
+        // Call the pre-screenshot function 
+        SString strFileName = CScreenShot::PreScreenShot ();
 
-        // Define a screen rectangle
-        ScreenSize.top = ScreenSize.left = 0;
-        ScreenSize.right = CDirect3DData::GetSingleton ().GetViewportWidth ();
-        ScreenSize.bottom = CDirect3DData::GetSingleton ().GetViewportHeight ();
-
-        do
+        // Try to get the screen data
+        if ( CGraphics::GetSingleton ().GetScreenGrabber ()->GetBackBufferPixels ( uiWidth, uiHeight, ms_ScreenShotBuffer ) )
         {
-            HRESULT hr = pDevice->GetRenderTarget ( 0, &pSurface );
-            if ( FAILED( hr ) )
+            // Validate data size
+            uint uiDataSize = ms_ScreenShotBuffer.GetSize ();
+            uint uiReqDataSize = uiWidth * uiHeight * 4;
+
+            if ( uiDataSize == uiReqDataSize )
             {
-                CCore::GetSingleton ().GetConsole ()->Printf ( "GetRenderTarget failed: %08x", hr );
-                break;
+                // Start the save thread
+                CScreenShot::BeginSave ( strFileName, ms_ScreenShotBuffer.GetData (), uiDataSize, uiWidth, uiHeight );
             }
-
-            // Create a new render target
-            for ( uint i = 0 ; i < 3 ; i++ )
+            else
             {
-                // 1st try -  i == 0  - 32 bit target
-                //            i == 0  - EvictManagedResources
-                // 2nd try -  i == 1  - 32 bit target
-                // 3rd try -  i == 2  - 16 bit target
-	            D3DFORMAT Format = i == 2 ? D3DFMT_R5G6B5 : D3DFMT_X8R8G8B8;
-
-                hr = pDevice->CreateRenderTarget ( ScreenSize.right, ScreenSize.bottom, Format, D3DMULTISAMPLE_NONE, 0, TRUE, &ms_pSaveLockSurface, NULL );
-                if( SUCCEEDED( hr ) )
-                    break;
-
-                // c'mon
-                if ( i == 0 )
-                    pDevice->EvictManagedResources ();
+                g_pCore->GetConsole()->Printf ( "Screenshot got %d bytes, but expected %d", uiDataSize, uiReqDataSize );
+                strFileName = "";
             }
-
-            if ( FAILED( hr ) )
-            {
-                CCore::GetSingleton ().GetConsole ()->Printf ( "Couldn't create a new render target: %08x", hr );
-                break;
-            }
-
-            // Copy data from surface to surface
-            hr = pDevice->StretchRect ( pSurface, &ScreenSize, ms_pSaveLockSurface, &ScreenSize, D3DTEXF_NONE );
-            if ( FAILED( hr ) )
-            {
-                CCore::GetSingleton ().GetConsole ()->Printf ( "Couldn't copy the surface: %08x", hr );
-                SAFE_RELEASE( ms_pSaveLockSurface );
-                break;
-            }
-
-            // Lock the surface
-            D3DLOCKED_RECT LockedRect;
-            hr = ms_pSaveLockSurface->LockRect ( &LockedRect, NULL, D3DLOCK_READONLY | D3DLOCK_NOSYSLOCK );
-            if ( FAILED( hr ) )
-            {
-                CCore::GetSingleton ().GetConsole ()->Printf ( "Couldn't lock the surface: %08x", hr );
-                SAFE_RELEASE( ms_pSaveLockSurface );
-                break;
-            }
-
-            // Call the pre-screenshot function 
-            SString strFileName = CScreenShot::PreScreenShot ();
-
-            // Start the save thread
-            CScreenShot::BeginSave ( strFileName, LockedRect.pBits, LockedRect.Pitch, ScreenSize );
-            ms_bSaveStarted = true;
-
-            // Call the post-screenshot function
-            CScreenShot::PostScreenShot ( strFileName );
         }
-        while ( false );
+        else
+        {
+            g_pCore->GetConsole()->Print ( "Screenshot failed" );
+            strFileName = "";
+        }
+
+        // Call the post-screenshot function
+        CScreenShot::PostScreenShot ( strFileName );
 
         CCore::GetSingleton().bScreenShot = false;
-
-        if ( pSurface )
-        {
-            if ( FAILED ( pSurface->Release () ) )
-                assert ( 0 && "Failed to release the ScreenShot rendertaget surface" );
-            pSurface = NULL;
-        }
     }
-    TIMING_CHECKPOINT( "-OnPresent2" );
 }
+
 
 #define SAVE_RENDERSTATE_AND_SET( reg, value ) \
     const DWORD dwSaved_##reg = g_pDeviceState->RenderState.reg; \
@@ -394,7 +351,8 @@ HRESULT CDirect3DEvents9::DrawPrimitiveShader ( IDirect3DDevice9 *pDevice, D3DPR
         pShaderInstance->m_pEffectWrap->ApplyMappedHandles ();
 
         // Remember vertex shader if original draw was using it
-        IDirect3DVertexShader9* pOriginalVertexShader = g_pDeviceState->VertexShader;
+        IDirect3DVertexShader9* pOriginalVertexShader = NULL;
+        pDevice->GetVertexShader ( &pOriginalVertexShader );
 
         // Do shader passes
         ID3DXEffect* pD3DEffect = pShaderInstance->m_pEffectWrap->m_pD3DEffect;
@@ -555,7 +513,8 @@ HRESULT CDirect3DEvents9::DrawIndexedPrimitiveShader ( IDirect3DDevice9 *pDevice
         pShaderInstance->m_pEffectWrap->ApplyMappedHandles ();
 
         // Remember vertex shader if original draw was using it
-        IDirect3DVertexShader9* pOriginalVertexShader = g_pDeviceState->VertexShader;
+        IDirect3DVertexShader9* pOriginalVertexShader = NULL;
+        pDevice->GetVertexShader ( &pOriginalVertexShader );
 
         // Do shader passes
         ID3DXEffect* pD3DEffect = pShaderInstance->m_pEffectWrap->m_pD3DEffect;
@@ -928,4 +887,44 @@ HRESULT CDirect3DEvents9::SetVertexDeclaration ( IDirect3DDevice9 *pDevice, IDir
     }
 
     return pDevice->SetVertexDeclaration ( pDecl );
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// CDirect3DEvents9::DiscoverReadableDepthFormat
+//
+// Check the best available readable depth buffer format
+//
+////////////////////////////////////////////////////////////////
+ERenderFormat CDirect3DEvents9::DiscoverReadableDepthFormat ( IDirect3DDevice9 *pDevice, D3DMULTISAMPLE_TYPE multisampleType, bool bWindowed )
+{
+    IDirect3D9* pD3D = NULL;
+    pDevice->GetDirect3D ( &pD3D );
+
+    // Formats to check for
+    ERenderFormat checkList[] = { RFORMAT_INTZ, RFORMAT_DF24, RFORMAT_DF16, RFORMAT_RAWZ };
+
+    D3DDISPLAYMODE displayMode;
+    if ( pD3D->GetAdapterDisplayMode(D3DADAPTER_DEFAULT, &displayMode ) == D3D_OK )
+    {
+        for ( uint i = 0; i < NUMELMS( checkList ) ; i++ )
+        {
+            D3DFORMAT DepthFormat = (D3DFORMAT)checkList[i];
+
+            // Can use this format?
+            if ( D3D_OK != pD3D->CheckDeviceFormat ( D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, displayMode.Format, D3DUSAGE_DEPTHSTENCIL, D3DRTYPE_SURFACE, DepthFormat ) )
+                continue;
+
+            // Also check if multisampled
+            if ( multisampleType != D3DMULTISAMPLE_NONE )
+                if ( D3D_OK != pD3D->CheckDeviceMultiSampleType ( D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, DepthFormat, bWindowed, multisampleType, NULL ) )
+                    continue;
+
+            // Found a working format
+            return checkList[i];
+        }
+    }
+
+    return RFORMAT_UNKNOWN;
 }

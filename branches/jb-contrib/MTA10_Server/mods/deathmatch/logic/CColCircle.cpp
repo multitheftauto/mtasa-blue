@@ -23,10 +23,10 @@ CColCircle::CColCircle ( CColManager* pManager, CElement* pParent, const CVector
 }
 
 
-bool CColCircle::DoHitDetection ( const CVector& vecLastPosition, const CVector& vecNowPosition, float fRadius )
+bool CColCircle::DoHitDetection ( const CVector& vecNowPosition )
 {
     // Do a simple distance check between now position and our position 
-    return IsPointNearPoint2D ( vecNowPosition, m_vecPosition, fRadius + m_fRadius );
+    return IsPointNearPoint2D ( vecNowPosition, m_vecPosition, m_fRadius );
 }
 
 

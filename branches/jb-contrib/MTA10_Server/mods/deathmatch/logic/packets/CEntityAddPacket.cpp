@@ -123,6 +123,8 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
                     bCollisionsEnabled = pPed->GetCollisionEnabled ( );
                     break;
                 }
+                default:
+                    break;
             }
 
             BitStream.WriteBit ( bCollisionsEnabled );
@@ -610,7 +612,7 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
                     break;
                 }
 
-                case CElement::WORLD_MESH:
+                case CElement::WORLD_MESH_UNUSED:
                 {
                     /*
                     CWorldMesh* pMesh = static_cast < CWorldMesh* > ( pElement );

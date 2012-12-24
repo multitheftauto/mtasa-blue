@@ -45,7 +45,7 @@ public:
 
     void                    DoPulse             ( void );
 
-    bool                    HashString          ( const char* szString, std::string &strHashString );
+    bool                    Md5HashString       ( const char* szString, std::string &strHashString );
 
 protected:
     void                    CreateWindows       ( void );

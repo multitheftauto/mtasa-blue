@@ -237,7 +237,7 @@ public:
     template < class T >
     bool ReadEnumStringList ( std::vector < T >& outValueList, const SString& strDefaultValue )
     {
-        outValueList.empty ();
+        outValueList.clear ();
         int iArgument = lua_type ( m_luaVM, m_iIndex );
         SString strValue;
         if ( iArgument == LUA_TSTRING )
@@ -285,6 +285,44 @@ public:
         if ( iArgument == LUA_TSTRING )
             m_iIndex++;
         return true;
+    }
+
+
+    //
+    // Read next string or number as an enum
+    //
+    template < class T >
+    bool ReadEnumStringOrNumber ( T& outValue )
+    {
+        int iArgument = lua_type ( m_luaVM, m_iIndex );
+        if ( iArgument == LUA_TSTRING )
+        {
+            SString strValue = lua_tostring ( m_luaVM, m_iIndex );
+            if ( StringToEnum ( strValue, outValue ) )
+            {
+                m_iIndex++;
+                return true;
+            }
+
+            // If will be coercing a string to an enum, make sure string contains only digits
+            uint uiPos = strValue.find_first_not_of ( "0123456789" );
+            if ( uiPos != SString::npos || strValue.empty () )
+                iArgument = LUA_TNONE;  //  Force error
+        }
+        if ( iArgument == LUA_TNUMBER || iArgument == LUA_TSTRING )
+        {
+            outValue = static_cast < T > ( (int)lua_tonumber ( m_luaVM, m_iIndex ) );
+            if ( EnumValueValid ( outValue ) )
+            {
+                m_iIndex++;
+                return true;
+            }
+        }
+
+        outValue = (T)0;
+        SetTypeError ( GetEnumTypeName ( outValue ) );
+        m_iIndex++;
+        return false;
     }
 
 
@@ -393,7 +431,43 @@ public:
 
 
     //
-    // Read a function, but don't do it yet due to Lua statck issues
+    // Read a table of userdatas
+    //
+    template < class T >
+    bool ReadUserDataTable ( std::vector < T* >& outList )
+    {
+        if ( lua_type ( m_luaVM, m_iIndex ) != LUA_TTABLE )
+        {
+            SetTypeError ( "table" );
+            m_iIndex++;
+            return false;
+        }
+
+        for ( lua_pushnil ( m_luaVM ) ; lua_next ( m_luaVM, m_iIndex ) != 0 ; lua_pop ( m_luaVM, 1 ) )
+        {
+            //int idx = lua_tonumber ( m_luaVM, -2 );
+            int iArgumentType = lua_type ( m_luaVM, -1 );
+
+            T* value = NULL;
+            if ( iArgumentType == LUA_TLIGHTUSERDATA )
+            {
+                value = (T*)UserDataCast < T > ( (T*)0, lua_touserdata ( m_luaVM, -1 ), m_luaVM );
+            }
+            else if ( iArgumentType == LUA_TUSERDATA )
+            {
+                value = (T*)UserDataCast < T > ( (T*)0, * ( ( void** ) lua_touserdata ( m_luaVM, -1 ) ), m_luaVM );
+            }
+
+            if ( value != NULL )
+                outList.push_back ( value );
+        }
+        m_iIndex++;
+        return true;
+    }
+
+
+    //
+    // Read a function, but don't do it yet due to Lua stack issues
     //
     bool ReadFunction ( CLuaFunctionRef& outValue, int defaultValue = -2 )
     {
@@ -607,8 +681,12 @@ public:
             return;
 
         m_bResolvedErrorGotArgumentTypeAndValue = true;
-        m_iErrorGotArgumentType = lua_type ( m_luaVM, m_iErrorIndex );
-        m_strErrorGotArgumentValue = lua_tostring ( m_luaVM, m_iErrorIndex );
+
+        if ( m_strErrorMessageOverride.empty () )
+        {
+            m_iErrorGotArgumentType = lua_type ( m_luaVM, m_iErrorIndex );
+            m_strErrorGotArgumentValue = lua_tostring ( m_luaVM, m_iErrorIndex );
+        }
     }
 
     //

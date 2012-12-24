@@ -42,6 +42,7 @@ class CClientTeam;
 class CClientTXD;
 class CClientVehicle;
 class CClientWater;
+class CClientWeapon;
 class CClientRadarArea;
 class CLuaTimer;
 class CResource;
@@ -69,6 +70,7 @@ CClientTeam*            lua_toteam          ( lua_State* luaVM, int iArgument );
 CClientTXD*             lua_totxd           ( lua_State* luaVM, int iArgument );
 CClientVehicle*         lua_tovehicle       ( lua_State* luaVM, int iArgument );
 CClientWater*           lua_towater         ( lua_State* luaVM, int iArgument );
+CClientWeapon*          lua_toweapon        ( lua_State* luaVM, int iArgument );
 CXMLNode*               lua_toxmlnode       ( lua_State* luaVM, int iArgument );
 CClientRadarArea*       lua_toradararea     ( lua_State* luaVM, int iArgument );
 

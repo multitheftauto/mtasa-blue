@@ -78,7 +78,7 @@ private:
                                                 // all clients have been informed
 
     void                    AddObserver             ( CTextDisplay* pObserver );
-    inline void             RemoveObserver          ( CTextDisplay* pObserver )   { if ( !m_Observers.empty() ) m_Observers.remove ( pObserver ); };
+    inline void             RemoveObserver          ( CTextDisplay* pObserver )   { m_Observers.remove ( pObserver ); };
     void                    NotifyObservers         ( void );
 
 };

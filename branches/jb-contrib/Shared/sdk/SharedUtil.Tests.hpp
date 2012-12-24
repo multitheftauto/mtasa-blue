@@ -13,14 +13,13 @@
 *
 *****************************************************************************/
 
-#ifdef MTA_DEBUG
-
 // Fwd decl
 void    SString_Tests                   ( void );
 void    SharedUtil_File_Tests           ( void );
 void    SharedUtil_ClassIdent_Tests     ( void );
 void 	SharedUtil_WildcardMatch_Tests  ( void );
 void    SharedUtil_Collection_Tests     ( void );
+void    SharedUtil_String_Tests         ( void );
 
 ///////////////////////////////////////////////////////////////
 //
@@ -36,6 +35,7 @@ void SharedUtil_Tests ( void )
     SharedUtil_ClassIdent_Tests ();
     SharedUtil_WildcardMatch_Tests ();
     SharedUtil_Collection_Tests ();
+    SharedUtil_String_Tests ();
 }
 
 
@@ -84,8 +84,8 @@ void SString_Tests ( void )
             int c;
             const char* result;
         TEST_DATA
-            "XX%sAA%dBB", "la",     0,      "XXlaAA0BB",
-            "XX%sAA%dBB", "laQWE",  2000,   "XXlaQWEAA2000BB",
+            { "XX%sAA%dBB", "la",     0,      "XXlaAA0BB" },
+            { "XX%sAA%dBB", "laQWE",  2000,   "XXlaQWEAA2000BB" },
         TEST_END
     }
 
@@ -104,9 +104,9 @@ void SString_Tests ( void )
             const char* resultLeft;
             const char* resultRight;
         TEST_DATA
-            "a.b.c.d.e",  ".",    1,    true,   "a",        "b.c.d.e",
-            "a.b.c.d.e",  ".",    2,    true,   "a.b",      "c.d.e",
-            "a.b.c.d.e",  ".",    -2,   true,   "a.b.c",    "d.e",
+            { "a.b.c.d.e",  ".",    1,    true,   "a",        "b.c.d.e" },
+            { "a.b.c.d.e",  ".",    2,    true,   "a.b",      "c.d.e" },
+            { "a.b.c.d.e",  ".",    -2,   true,   "a.b.c",    "d.e" },
         TEST_END
     }
 
@@ -127,8 +127,8 @@ void SString_Tests ( void )
             const char* resultLast;
             uint resultCount;
         TEST_DATA
-            "hello",            ".",    0,  0,  "hello",    "hello",    1,
-            "a.#b.#c.#d.#e",    ".#",   0,  0,  "a",        "e",        5,
+            { "hello",            ".",    0,  0,  "hello",    "hello",    1 },
+            { "a.#b.#c.#d.#e",    ".#",   0,  0,  "a",        "e",        5 },
         TEST_END
     }
 
@@ -145,14 +145,14 @@ void SString_Tests ( void )
             const char* newneedle;
             const char* result;
         TEST_DATA
-            "blah1234blah", "la",   "QwE",  "bQwEh1234bQwEh",
-            "blah1234blah", "blah", "",     "1234",
-            "blahblah1234", "blah", "",     "1234",
-            "1234blahblah", "blah", "",     "1234",
-            "1234blAhblaH", "BLah", "",     "1234blAhblaH",
-            "blah1234blah", "LA",   "QwE",  "blah1234blah",
-            "blah1234blah", "blAh", "",     "blah1234blah",
-            "blah////blah", "//",   "/",    "blah//blah",
+            { "blah1234blah", "la",   "QwE",  "bQwEh1234bQwEh" },
+            { "blah1234blah", "blah", "",     "1234" },
+            { "blahblah1234", "blah", "",     "1234" },
+            { "1234blahblah", "blah", "",     "1234" },
+            { "1234blAhblaH", "BLah", "",     "1234blAhblaH" },
+            { "blah1234blah", "LA",   "QwE",  "blah1234blah" },
+            { "blah1234blah", "blAh", "",     "blah1234blah" },
+            { "blah////blah", "//",   "/",    "blah//blah" },
         TEST_END
     }
 
@@ -168,8 +168,8 @@ void SString_Tests ( void )
             bool bSearchJustReplaced;
             const char* result;
         TEST_DATA
-            "blah////blah", "//",   "/",  false,    "blah//blah",
-            "blah////blah", "//",   "/",  true,     "blah/blah",
+            { "blah////blah", "//",   "/",  false,    "blah//blah" },
+            { "blah////blah", "//",   "/",  true,     "blah/blah" },
         TEST_END
     }
 
@@ -184,12 +184,12 @@ void SString_Tests ( void )
             const char* newneedle;
             const char* result;
         TEST_DATA
-            "blah1234blah", "la",   "QwE",  "bQwEh1234bQwEh",
-            "blah1234blah", "blah", "",     "1234",
-            "blahblah1234", "blAh", "",     "1234",
-            "1234blAhblaH", "BLah", "",     "1234",
-            "blah1234blah", "LA",   "QwE",  "bQwEh1234bQwEh",
-            "blah1234blah", "blAh", "",     "1234",
+            { "blah1234blah", "la",   "QwE",  "bQwEh1234bQwEh" },
+            { "blah1234blah", "blah", "",     "1234" },
+            { "blahblah1234", "blAh", "",     "1234" },
+            { "1234blAhblaH", "BLah", "",     "1234" },
+            { "blah1234blah", "LA",   "QwE",  "bQwEh1234bQwEh" },
+            { "blah1234blah", "blAh", "",     "1234" },
         TEST_END
     }
 
@@ -221,29 +221,29 @@ void SString_Tests ( void )
             int count;
             SString result;
         TEST_DATA
-            "",             "/",    0, 999, "",
-            "A",            "/",    0, 999, "A",
-            "A,B",          "/",    0, 999, "A/B",
-            "A,B,C,D,E",    "/",    0, 999, "A/B/C/D/E",
-            "A,B,C,D,E",    "/",   -5, 7,   "A/B",
-            "",             "/",    0, 0,   "",
-            "A",            "/",    0, 0,   "",
-            "A,B",          "/",    0, 0,   "",
-            "A,B,C,D,E",    "/",    0, 0,   "",
-            "",             "/",    0, 1,   "",
-            "A",            "/",    0, 1,   "A",
-            "A,B",          "/",    0, 1,   "A",
-            "A,B,C,D,E",    "/",    0, 1,   "A",
-            "",             "/",    0, 2,   "",
-            "A",            "/",    0, 2,   "A",
-            "A,B",          "/",    0, 2,   "A/B",
-            "A,B,C,D,E",    "/",    0, 2,   "A/B",
-            "",             "/",    1, 2,   "",
-            "A",            "/",    1, 2,   "",
-            "A,B",          "/",    1, 2,   "B",
-            "A,B,C,D,E",    "/",    1, 2,   "B/C",
-            "A,B,C,D,E",    "/",    1, 4,   "B/C/D/E",
-            "A,B,C,D,E",    "/",    1, 5,   "B/C/D/E",
+            { "",             "/",    0, 999, "" },
+            { "A",            "/",    0, 999, "A" },
+            { "A,B",          "/",    0, 999, "A/B" },
+            { "A,B,C,D,E",    "/",    0, 999, "A/B/C/D/E" },
+            { "A,B,C,D,E",    "/",   -5, 7,   "A/B" },
+            { "",             "/",    0, 0,   "" },
+            { "A",            "/",    0, 0,   "" },
+            { "A,B",          "/",    0, 0,   "" },
+            { "A,B,C,D,E",    "/",    0, 0,   "" },
+            { "",             "/",    0, 1,   "" },
+            { "A",            "/",    0, 1,   "A" },
+            { "A,B",          "/",    0, 1,   "A" },
+            { "A,B,C,D,E",    "/",    0, 1,   "A" },
+            { "",             "/",    0, 2,   "" },
+            { "A",            "/",    0, 2,   "A" },
+            { "A,B",          "/",    0, 2,   "A/B" },
+            { "A,B,C,D,E",    "/",    0, 2,   "A/B" },
+            { "",             "/",    1, 2,   "" },
+            { "A",            "/",    1, 2,   "" },
+            { "A,B",          "/",    1, 2,   "B" },
+            { "A,B,C,D,E",    "/",    1, 2,   "B/C" },
+            { "A,B,C,D,E",    "/",    1, 4,   "B/C/D/E" },
+            { "A,B,C,D,E",    "/",    1, 5,   "B/C/D/E" },
         TEST_END
     }
 
@@ -272,9 +272,9 @@ void SharedUtil_File_Tests ( void )
             const char* b;
             const char* result;
         TEST_DATA
-            "///\\\\\\/\\/\\/\\/blah/\\/\\/\\", "////\\\\/////\\/fleeb///\\\\///\\/\\",    "\\\\blah\\fleeb\\",
-            "blah/\\/\\/\\",                    "////\\\\/////\\/fleeb",                   "blah\\fleeb",
-            "blah",                             "fleeb",                                    "blah\\fleeb",
+            { "///\\\\\\/\\/\\/\\/blah/\\/\\/\\", "////\\\\/////\\/fleeb///\\\\///\\/\\",    "\\\\blah\\fleeb\\" },
+            { "blah/\\/\\/\\",                    "////\\\\/////\\/fleeb",                   "blah\\fleeb" },
+            { "blah",                             "fleeb",                                    "blah\\fleeb" },
         TEST_END
     }
 
@@ -288,9 +288,9 @@ void SharedUtil_File_Tests ( void )
             const char* c;
             const char* result;
         TEST_DATA
-            "/blah/",   "/\\fl\\eeb/",  "//fleeeb/",    "\\blah\\fl\\eeb\\fleeeb\\",
-            "blah/",    "/fl//eeb",     "\\fleeeb",     "blah\\fl\\eeb\\fleeeb",
-            "blah",     "fleeb",        "fleeb",        "blah\\fleeb\\fleeb",
+            { "/blah/",   "/\\fl\\eeb/",  "//fleeeb/",    "\\blah\\fl\\eeb\\fleeeb\\" },
+            { "blah/",    "/fl//eeb",     "\\fleeeb",     "blah\\fl\\eeb\\fleeeb" },
+            { "blah",     "fleeb",        "fleeb",        "blah\\fleeb\\fleeb" },
         TEST_END
     }
 
@@ -303,14 +303,14 @@ void SharedUtil_File_Tests ( void )
             const char* b;
             const char* result;
         TEST_DATA
-            "//blah/",          "//fleeeb/",    "\\\\blah\\fleeeb\\",
-            "//?/blah/",        "//fleeeb/",    "\\\\?\\blah\\fleeeb\\",
-            "//?/C:\blah/",     "//fleeeb/",    "\\\\?\\C:\blah\\fleeeb\\",
-            "///?/C:\blah/",    "//fleeeb/",    "\\\\?\\C:\blah\\fleeeb\\",
-            "file://blah/",     "//fleeeb/",    "file:\\\\blah\\fleeeb\\",
-            "file:///blah\\/",  "//fleeeb/",    "file:\\\\blah\\fleeeb\\",
-            "fil:e///blah\\/",  "//fleeeb/",    "fil:e\\blah\\fleeeb\\",
-            "fi/le:///blah\\/",  "//fleeeb/",    "fi\\le:\\blah\\fleeeb\\",
+            { "//blah/",          "//fleeeb/",    "\\\\blah\\fleeeb\\" },
+            { "//?/blah/",        "//fleeeb/",    "\\\\?\\blah\\fleeeb\\" },
+            { "//?/C:\blah/",     "//fleeeb/",    "\\\\?\\C:\blah\\fleeeb\\" },
+            { "///?/C:\blah/",    "//fleeeb/",    "\\\\?\\C:\blah\\fleeeb\\" },
+            { "file://blah/",     "//fleeeb/",    "file:\\\\blah\\fleeeb\\" },
+            { "file:///blah\\/",  "//fleeeb/",    "file:\\\\blah\\fleeeb\\" },
+            { "fil:e///blah\\/",  "//fleeeb/",    "fil:e\\blah\\fleeeb\\" },
+            { "fi/le:///blah\\/",  "//fleeeb/",    "fi\\le:\\blah\\fleeeb\\" },
         TEST_END
     }
 
@@ -328,6 +328,7 @@ void SharedUtil_File_Tests ( void )
 ///////////////////////////////////////////////////////////////
 void SharedUtil_ClassIdent_Tests ( void )
 {
+#if WIN32
     // Setup
     enum eTestClassTypes
     {
@@ -449,6 +450,7 @@ void SharedUtil_ClassIdent_Tests ( void )
     delete pFlower;
     delete pBlueBell;
     delete pDaffodil;
+#endif
 }
 
 
@@ -470,47 +472,47 @@ void SharedUtil_WildcardMatch_Tests ( void )
             const char* b;
             bool result;
         TEST_DATA
-            "*bd*",         "abcbde",               true,
-            "*bd?f*",       "abcbdef_bdgh",         true,
-            "*bd?h*",       "abcbdef_bdgh",         true,
-            "*bd?g*",       "abcbdef_bdgh",         false,
-            "scr*w?d",      "screeeewywxd",         true,
-            "A*B",          "A_B_B",                true,
-            "",             "",                     true,
-            "*",            "",                     true,
-            "*",            "A",                    true,
-            "",             "A",                    false,
-            "A*",           "",                     false,
-            "A*",           "AAB",                  true,
-            "A*",           "BAA",                  false,
-            "A*",           "A",                    true,
-            "A*B",          "",                     false,
-            "A*B",          "AAB",                  true,
-            "A*B",          "AB",                   true,
-            "A*B",          "AABA",                 false,
-            "A*B",          "ABAB",                 true,
-            "A*B",          "ABBBB",                true,
-            "A*B*C",        "",                     false,
-            "A*B*C",        "ABC",                  true,
-            "A*B*C",        "ABCC",                 true,
-            "A*B*C",        "ABBBC",                true,
-            "A*B*C",        "ABBBBCCCC",            true,
-            "A*B*C",        "ABCBBBCBCCCBCBCCCC",   true,
-            "A*B*",         "AB",                   true,
-            "A*B*",         "AABA",                 true,
-            "A*B*",         "ABAB",                 true,
-            "A*B*",         "ABBBB",                true,
-            "A*B*C*",       "",                     false,
-            "A*B*C*",       "ABC",                  true,
-            "A*B*C*",       "ABCC",                 true,
-            "A*B*C*",       "ABBBC",                true,
-            "A*B*C*",       "ABBBBCCCC",            true,
-            "A*B*C*",       "ABCBBBCBCCCBCBCCCC",   true,
-            "A?",           "AAB",                  false,
-            "A?B",          "AAB",                  true,
-            "A?*",          "A",                    false,
-            "A?*",          "ABBCC",                true,
-            "A?*",          "BAA",                  false,
+            { "*bd*",         "abcbde",               true },
+            { "*bd?f*",       "abcbdef_bdgh",         true },
+            { "*bd?h*",       "abcbdef_bdgh",         true },
+            { "*bd?g*",       "abcbdef_bdgh",         false },
+            { "scr*w?d",      "screeeewywxd",         true },
+            { "A*B",          "A_B_B",                true },
+            { "",             "",                     true },
+            { "*",            "",                     true },
+            { "*",            "A",                    true },
+            { "",             "A",                    false },
+            { "A*",           "",                     false },
+            { "A*",           "AAB",                  true },
+            { "A*",           "BAA",                  false },
+            { "A*",           "A",                    true },
+            { "A*B",          "",                     false },
+            { "A*B",          "AAB",                  true },
+            { "A*B",          "AB",                   true },
+            { "A*B",          "AABA",                 false },
+            { "A*B",          "ABAB",                 true },
+            { "A*B",          "ABBBB",                true },
+            { "A*B*C",        "",                     false },
+            { "A*B*C",        "ABC",                  true },
+            { "A*B*C",        "ABCC",                 true },
+            { "A*B*C",        "ABBBC",                true },
+            { "A*B*C",        "ABBBBCCCC",            true },
+            { "A*B*C",        "ABCBBBCBCCCBCBCCCC",   true },
+            { "A*B*",         "AB",                   true },
+            { "A*B*",         "AABA",                 true },
+            { "A*B*",         "ABAB",                 true },
+            { "A*B*",         "ABBBB",                true },
+            { "A*B*C*",       "",                     false },
+            { "A*B*C*",       "ABC",                  true },
+            { "A*B*C*",       "ABCC",                 true },
+            { "A*B*C*",       "ABBBC",                true },
+            { "A*B*C*",       "ABBBBCCCC",            true },
+            { "A*B*C*",       "ABCBBBCBCCCBCBCCCC",   true },
+            { "A?",           "AAB",                  false },
+            { "A?B",          "AAB",                  true },
+            { "A?*",          "A",                    false },
+            { "A?*",          "ABBCC",                true },
+            { "A?*",          "BAA",                  false },
         TEST_END
     }
 }
@@ -603,4 +605,79 @@ void SharedUtil_Collection_Tests ( void )
 
 }
 
-#endif  // MTA_DEBUG
+
+///////////////////////////////////////////////////////////////
+//
+// SharedUtil_String_Tests
+//
+// Test behaviour of strings
+//
+///////////////////////////////////////////////////////////////
+void SharedUtil_String_Tests ( void )
+{
+    // Formatting
+    {
+        SString strTemp1 ( "name:" PRSinS, "dave" );
+        SString strTemp2 ( "name:" PRWinS, L"dave" );
+        WString wstrTemp3 ( L"name:" PRSinW, "dave" );
+        WString wstrTemp4 ( L"name:" PRWinW, L"dave" );
+
+        assert ( strTemp1 == "name:dave" );
+        assert ( strTemp2 == "name:dave" );
+        assert ( wstrTemp3 == L"name:dave" );
+        assert ( wstrTemp4 == L"name:dave" );
+    }
+
+    // To/From Ansi
+    {
+        SString strTemp1 = "abcABC 123";
+        WString wstrTemp2 = "defDEF 456";
+        WString wstrTemp3 = L"ghiGHI 789";
+
+        assert ( wstrTemp2 == L"defDEF 456" );
+
+        SString strTemp2 = wstrTemp2.ToAnsi ();
+        SString strTemp3 = wstrTemp3.ToAnsi ();
+
+        assert ( strTemp2 == "defDEF 456" );
+        assert ( strTemp3 == "ghiGHI 789" );
+    }
+
+    // Escaping URL arguments
+    {
+        TEST_FUNCTION
+            SStringX strInputA( (const char*)a, sizeof( a ) );
+            SString strEscaped = EscapeURLArgument( strInputA );
+            SString strUnescaped = UnescapeString ( strEscaped, '%' );
+            //OutputDebugLine( aa );
+            assert ( strEscaped == result );
+            assert ( strInputA == strUnescaped );
+        TEST_VARS
+            const uchar a[5];
+            const char* result;
+        TEST_DATA
+            { {0x00, 0x10, 0x20, 0x21, 0x22},       "%00%10%20%21%22" },
+            { {0x7F, 0x80, 0x81, 0xFE, 0xFF},       "%7F%80%81%FE%FF" },
+        TEST_END
+    }
+
+    {
+        TEST_FUNCTION
+            SStringX strInputA( a );
+            SString strEscaped = EscapeURLArgument( strInputA );
+            SString strUnescaped = UnescapeString ( strEscaped, '%' );
+            //OutputDebugLine( aa );
+            assert ( strEscaped == result );
+            assert ( strInputA == strUnescaped );
+        TEST_VARS
+            const char* a;
+            const char* result;
+        TEST_DATA
+            { "!*'();:@",           "%21%2A%27%28%29%3B%3A%40" },
+            { "&=+$,/?#",           "%26%3D%2B%24%2C%2F%3F%23" },
+            { "[] \"%<>\\",         "%5B%5D%20%22%25%3C%3E%5C" },
+            { "^`{|}",              "%5E%60%7B%7C%7D" },
+            { "AZaz09-_.~",         "AZaz09-_.~" },
+        TEST_END
+    }
+}

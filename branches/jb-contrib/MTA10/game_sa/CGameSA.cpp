@@ -66,7 +66,7 @@ CGameSA::CGameSA()
     }
 
     DEBUG_TRACE("CGameSA::CGameSA()");
-    this->m_pAudio                  = new CAudioSA();
+    this->m_pAudioEngine            = new CAudioEngineSA((CAudioEngineSAInterface*)CLASS_CAudioEngine);
     this->m_pWorld                  = new CWorldSA();
     this->m_pPools                  = new CPoolsSA();
     this->m_pClock                  = new CClockSA();
@@ -108,6 +108,7 @@ CGameSA::CGameSA()
     this->m_pFxManager              = new CFxManagerSA ( (CFxManagerSAInterface *)CLASS_CFxManager );
     this->m_pWaterManager           = new CWaterManagerSA ();
     this->m_pWeaponStatsManager     = new CWeaponStatManagerSA ();
+    this->m_pPointLights            = new CPointLightsSA ();
 
 
     // Normal weapon types (WEAPONSKILL_STD)
@@ -170,10 +171,17 @@ CGameSA::CGameSA()
     m_Cheats [ CHEAT_HEALTARMORMONEY  ] = new SCheatSA((BYTE *)VAR_HealthArmorMoney, false);
 
     // Change pool sizes here
-    m_pPools->SetPoolCapacity ( TASK_POOL, 5000 );  // Default is 500
-    m_pPools->SetPoolCapacity ( OBJECT_POOL, 700 );  // Default is 350
-    m_pPools->SetPoolCapacity ( EVENT_POOL, 5000 );
-    m_pPools->SetPoolCapacity ( COL_MODEL_POOL, 12000 );  // Default is 10150
+    m_pPools->SetPoolCapacity ( TASK_POOL, 5000 );                  // Default is 500
+    m_pPools->SetPoolCapacity ( OBJECT_POOL, 700 );                 // Default is 350
+    m_pPools->SetPoolCapacity ( EVENT_POOL, 5000 );                 // Default is 200
+    m_pPools->SetPoolCapacity ( COL_MODEL_POOL, 12000 );            // Default is 10150
+    m_pPools->SetPoolCapacity ( ENV_MAP_MATERIAL_POOL, 16000 );     // Default is 4096
+    m_pPools->SetPoolCapacity ( ENV_MAP_ATOMIC_POOL, 4000 );        // Default is 1024
+    m_pPools->SetPoolCapacity ( SPEC_MAP_MATERIAL_POOL, 16000 );    // Default is 4096
+
+    // Increase streaming object instances list size
+    MemPut < WORD > ( 0x05B8E55, 30000 );         // Default is 12000
+    MemPut < WORD > ( 0x05B8EB0, 30000 );         // Default is 12000
 
     CModelInfoSA::StaticSetHooks ();
 }
@@ -219,7 +227,8 @@ CGameSA::~CGameSA ( void )
     delete reinterpret_cast < CClockSA* > ( m_pClock );
     delete reinterpret_cast < CPoolsSA* > ( m_pPools );
     delete reinterpret_cast < CWorldSA* > ( m_pWorld );
-    delete reinterpret_cast < CAudioSA* > ( m_pAudio );  
+    delete reinterpret_cast < CAudioEngineSA* > ( m_pAudioEngine );
+    delete reinterpret_cast < CPointLightsSA * > ( m_pPointLights );
 }
 
 CWeaponInfo * CGameSA::GetWeaponInfo(eWeaponType weapon, eWeaponSkill skill)
@@ -442,7 +451,7 @@ void CGameSA::Reset ( void )
 
         // Restore the HUD
         m_pHud->Disable ( false );
-        m_pHud->DisableAll ( false );
+        m_pHud->SetComponentVisible ( HUD_ALL, true );
     }
 }
 
@@ -727,6 +736,15 @@ void CGameSA::ResetModelLodDistances ( void )
 void CGameSA::DisableVSync ( void )
 {
     MemPutFast < BYTE > ( 0xBAB318, 0 );
+}
+CWeapon * CGameSA::CreateWeapon ( void )
+{
+    return new CWeaponSA ( new CWeaponSAInterface, NULL, WEAPONSLOT_MAX );
+}
+
+CWeaponStat * CGameSA::CreateWeaponStat ( eWeaponType weaponType, eWeaponSkill weaponSkill )
+{
+    return m_pWeaponStatsManager->CreateWeaponStatUnlisted ( weaponType, weaponSkill );
 }
 
 void CGameSA::OnPedContextChange ( CPed* pPedContext )

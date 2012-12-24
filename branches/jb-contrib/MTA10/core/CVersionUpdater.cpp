@@ -797,10 +797,11 @@ std::vector < SString > CVersionUpdater::MakeServerList ( const CDataInfoSet& da
     if ( int iSize = dataInfoSet.size () )
     {
         // randomize list
-        for ( int i = 0 ; i < iSize ; i++ )
+        for ( int i = 0 ; i < iSize * 10 ; i++ )
         {
-            int iOther = rand () % iSize;
-            std::swap ( dataInfoSet[i], dataInfoSet[iOther] );
+            int iThis = i % iSize;
+            int iOther = ( rand () + 1 ) % iSize;
+            std::swap ( dataInfoSet[iThis], dataInfoSet[iOther] );
         }
 
         // bubble sort based on the priority attribute
@@ -3034,10 +3035,8 @@ int CVersionUpdater::DoSendPostToNextServer ( void )
     //
     // Send data. Doesn't check if it was received.
     //
-    CNetHTTPDownloadManagerInterface * downloadManager = CCore::GetSingleton ().GetNetwork ()->GetHTTPDownloadManager ();
+    CNetHTTPDownloadManagerInterface * downloadManager = CCore::GetSingleton ().GetNetwork ()->GetHTTPDownloadManager ( EDownloadMode::CORE_UPDATER );
     downloadManager->QueueFile ( strQueryURL, NULL, 0, &m_JobInfo.postContent.at ( 0 ), m_JobInfo.postContent.size (), m_JobInfo.bPostContentBinary );
-    if ( !downloadManager->IsDownloading () )
-        downloadManager->StartDownloadingQueuedFiles ();
 
     return RES_OK;
 }
@@ -3054,13 +3053,10 @@ int CVersionUpdater::DoSendPostToNextServer ( void )
 ///////////////////////////////////////////////////////////////
 int CVersionUpdater::DoPollPost ( void )
 {
-    CNetHTTPDownloadManagerInterface* pHTTP = CCore::GetSingleton ().GetNetwork ()->GetHTTPDownloadManager ();
-    if ( pHTTP )
+    CNetHTTPDownloadManagerInterface* pHTTP = CCore::GetSingleton ().GetNetwork ()->GetHTTPDownloadManager ( EDownloadMode::CORE_UPDATER );
+    if ( !pHTTP->ProcessQueuedFiles () )
     {
-        if ( !pHTTP->ProcessQueuedFiles () )
-        {
-            return RES_POLL;
-        }
+        return RES_POLL;
     }
     return RES_OK;
 }

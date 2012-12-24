@@ -510,19 +510,6 @@ void CChat::Output ( const char* szText, bool bColorCoded )
 }
 
 
-void CChat::Outputf ( bool bColorCoded, const char* szFormat, ... )
-{
-    SString str;
-    
-    va_list ap;
-    va_start ( ap, szFormat );
-    str.vFormat ( szFormat, ap );
-    va_end ( ap );
-
-    Output ( str.c_str (), bColorCoded );
-}
-
-
 void CChat::Clear ( void )
 {
     for ( int i = 0; i < CHAT_MAX_LINES; i++ )

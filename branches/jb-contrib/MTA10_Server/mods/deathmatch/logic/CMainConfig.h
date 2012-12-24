@@ -29,8 +29,9 @@ class CMainConfig;
 #include <list>
 
 #define MAX_MAP_NAME_LENGTH 64
+class CMainConfig;
 
-typedef void (*PFN_SettingChangeCallback) ( void );
+typedef void (CMainConfig::*PFN_SettingChangeCallback)(void);
 
 struct SIntSetting
 {
@@ -73,7 +74,8 @@ public:
     unsigned int                    GetVoiceQuality                 ( void )        { return m_ucVoiceQuality; };
     unsigned int                    GetVoiceBitrate                 ( void )        { return m_uiVoiceBitrate; };
 
-    inline bool                     GetASEEnabled                   ( void )        { return m_bAseEnabled; };
+    bool                            GetAsePortEnabled               ( void )        { return m_iAseMode == 1; }
+    bool                            GetAseAnnounceEnabled           ( void )        { return m_iAseMode > 0; }
     unsigned short                  GetHTTPPort                     ( void );
     inline eHTTPDownloadType        GetHTTPDownloadType             ( void )        { return m_ucHTTPDownloadType; };
     inline const std::string&       GetHTTPDownloadURL              ( void )        { return m_strHTTPDownloadURL; };
@@ -89,8 +91,7 @@ public:
     inline const std::string&       GetScriptDebugLogFile           ( void )        { return m_strScriptDebugLogFile; };
     inline unsigned int             GetScriptDebugLogLevel          ( void )        { return m_uiScriptDebugLogLevel; };
     inline const std::string&       GetAccessControlListFile        ( void )        { return m_strAccessControlListFile; };
-    inline bool                     GetAutoUpdateIncludedResourcesEnabled   ( void )        { return m_bAutoUpdateIncludedResources; };
-    inline bool                     GetDontBroadcastLan             ( void )        { return m_bDontBroadcastLan; };
+    inline bool                     GetDontBroadcastLan             ( void )        { return m_bDontBroadcastLan ? true : false; };
     inline bool                     GetSerialVerificationEnabled    ( void )        { return m_bVerifySerials; };
     bool                            IsDisableAC                     ( const char* szTagAC )     { return MapContains ( m_DisableComboACMap, szTagAC ); };
     bool                            IsEnableDiagnostic              ( const char* szTag )       { return MapContains ( m_EnableDiagnosticMap, szTag ); };
@@ -115,6 +116,7 @@ public:
     bool                            GetBulletSyncEnabled            ( void ) const              { return m_bBulletSyncEnabled != 0; }
     int                             GetVehExtrapolatePercent        ( void ) const              { return m_iVehExtrapolatePercent; }
     int                             GetVehExtrapolatePingLimit      ( void ) const              { return m_iVehExtrapolatePingLimit; }
+    bool                            GetVerifyMemory                 ( void ) const              { return m_bVerifyMemory != 0; }
 
     SString                         GetSetting                      ( const SString& configSetting );
     bool                            GetSetting                      ( const SString& configSetting, SString& strValue );
@@ -128,7 +130,8 @@ public:
     const SNetOptions&              GetNetOptions                   ( void )                    { return m_NetOptions; }
 
     const std::vector < SIntSetting >& GetIntSettingList            ( void );
-    static void                     OnTickRateChange                ( void );
+    void                            OnTickRateChange                ( void );
+    void                            OnAseSettingChange              ( void );
 
 private:
     void                            RegisterCommand                 ( const char* szName, FCommandHandler* pFunction, bool bRestricted );
@@ -150,7 +153,7 @@ private:
     unsigned int                    m_uiSoftMaxPlayers;
     bool                            m_bHTTPEnabled;
     std::string                     m_strPassword;
-    bool                            m_bAseEnabled;
+    int                             m_iAseMode;
     unsigned short                  m_usHTTPPort;
     eHTTPDownloadType               m_ucHTTPDownloadType;
     std::string                     m_strHTTPDownloadURL;
@@ -166,10 +169,9 @@ private:
     std::string                     m_strScriptDebugLogFile;
     unsigned int                    m_uiScriptDebugLogLevel;
     std::string                     m_strAccessControlListFile;
-    bool                            m_bAutoUpdateIncludedResources;
     bool                            m_bVerifySerials;
     unsigned short                  m_usFPSLimit;
-    bool                            m_bDontBroadcastLan;
+    int                             m_bDontBroadcastLan;
     std::set < SString >            m_DisableComboACMap;
     std::set < SString >            m_EnableDiagnosticMap;
     SString                         m_strMinClientVersion;
@@ -193,6 +195,8 @@ private:
     SNetOptions                     m_NetOptions;
     int                             m_iVehExtrapolatePercent;
     int                             m_iVehExtrapolatePingLimit;
+    int                             m_bNetAutoFilter;
+    int                             m_bVerifyMemory;
 };
 
 #endif

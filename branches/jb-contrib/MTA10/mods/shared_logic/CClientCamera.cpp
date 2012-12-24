@@ -158,7 +158,7 @@ void CClientCamera::SetPosition ( const CVector& vecPosition )
 }
 
 
-void CClientCamera::GetRotation ( CVector& vecRotation ) const
+void CClientCamera::GetRotationDegrees ( CVector& vecRotation ) const
 {
     CCam* pCam = m_pCamera->GetCam ( m_pCamera->GetActiveCam () );
     CMatrix matrix;
@@ -172,7 +172,7 @@ void CClientCamera::GetRotation ( CVector& vecRotation ) const
 }
 
 
-void CClientCamera::SetRotation ( const CVector& vecRotation )
+void CClientCamera::SetRotationRadians ( const CVector& vecRotation )
 {
     // Rotate a 1000,0,0 vector with the given rotation vector
     CVector vecRotationCopy = vecRotation;
@@ -187,17 +187,6 @@ void CClientCamera::SetRotation ( const CVector& vecRotation )
 
     // Set the calculated vector as the target
     SetTarget ( vecPosition );
-}
-
-
-void CClientCamera::GetRotation( float &fX, float &fY )
-{
-	m_pCamera->GetRotation( fX, fY );
-}
-
-void CClientCamera::SetRotation( float fX, float fY )
-{
-	m_pCamera->SetRotation( fX, fY );
 }
 
 

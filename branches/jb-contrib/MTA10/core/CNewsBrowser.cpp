@@ -249,8 +249,7 @@ void CNewsBrowser::AddNewsTab ( const SNewsItem& newsItem )
     m_pScrollPane->SetVerticalScrollBar ( true );
 
     // Switch cwd
-    SString cwd = GetCurrentWorkingDirectory ();
-    SetCurrentDirectory ( newsItem.strContentFullDir );
+    pManager->PushGuiWorkingDirectory ( newsItem.strContentFullDir );
 
     // Load files
     CGUIWindow* pWindow = LoadLayoutAndImages ( m_pScrollPane, newsItem );
@@ -265,7 +264,7 @@ void CNewsBrowser::AddNewsTab ( const SNewsItem& newsItem )
     }
 
     // Restore cwd
-    SetCurrentDirectory ( cwd );
+    pManager->PopGuiWorkingDirectory ( newsItem.strContentFullDir );
 }
 
 

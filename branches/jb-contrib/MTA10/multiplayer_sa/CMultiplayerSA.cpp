@@ -499,6 +499,9 @@ CMultiplayerSA::CMultiplayerSA()
     m_bSuspensionEnabled = true;
 
     m_fAircraftMaxHeight = 800.0f;
+
+    m_bHeatHazeEnabled = true;
+    m_bHeatHazeCustomized = false;
 }
 
 void CMultiplayerSA::InitHooks()
@@ -1498,6 +1501,9 @@ void CMultiplayerSA::SetHeatHaze ( const SHeatHazeSettings& settings )
         DoSetHeatHazePokes ( settings, 0, 24, 1.0f, 1.0f, false );    // 24 hrs
     else
         DoSetHeatHazePokes ( settings, 38, 39, 1.0f, 1.0f, false );   // 0 hrs
+
+    m_bHeatHazeCustomized = true;
+    ApplyHeatHazeEnabled ();
 }
 
 
@@ -1515,6 +1521,26 @@ void CMultiplayerSA::ResetHeatHaze ( void )
     settings.bInsideBuilding = false;
 
     DoSetHeatHazePokes ( settings, 10, 19, 0.05f, 1.0f, true );   // defaults
+
+    m_bHeatHazeCustomized = false;
+    ApplyHeatHazeEnabled ();
+}
+
+
+void CMultiplayerSA::SetHeatHazeEnabled ( bool bEnabled )
+{
+    m_bHeatHazeEnabled = bEnabled;
+    ApplyHeatHazeEnabled ();
+}
+
+
+void CMultiplayerSA::ApplyHeatHazeEnabled ( void )
+{
+    // Enable heat haze if user allows it or scripts have customized it
+    if ( m_bHeatHazeEnabled || m_bHeatHazeCustomized )
+        MemPut < BYTE > ( 0x701780, 0x83 );
+    else
+        MemPut < BYTE > ( 0x701780, 0xC3 );
 }
 
 
@@ -1524,12 +1550,6 @@ void CMultiplayerSA::DisableAllVehicleWeapons ( bool bDisable )
         MemPut < BYTE > ( 0x6E3950, 0xC3 );
     else
         MemPut < BYTE > ( 0x6E3950, 0x83 );
-}
-
-void CMultiplayerSA::DisableZoneNames ( bool bDisabled )
-{
-    // Please use CHud::DisableAreaName instead
-    pGameInterface->GetHud()->DisableAreaName ( bDisabled );
 }
 
 void CMultiplayerSA::DisableBirds ( bool bDisabled )
@@ -1655,17 +1675,16 @@ float CMultiplayerSA::GetFarClipDistance ( )
 
 void CMultiplayerSA::SetFarClipDistance ( float fDistance )
 {
-    MemPut < BYTE > ( 0x55FCC8, 0xDD );
-    MemPut < BYTE > ( 0x55FCC9, 0xD8 );
-    MemPut < BYTE > ( 0x55FCCA, 0x90 );
-
-    MemPut < BYTE > ( 0x5613A3, 0xDD );
-    MemPut < BYTE > ( 0x5613A4, 0xD8 );
-    MemPut < BYTE > ( 0x5613A5, 0x90 );
-
-    MemPut < BYTE > ( 0x560A23, 0xDD );
-    MemPut < BYTE > ( 0x560A24, 0xD8 );
-    MemPut < BYTE > ( 0x560A25, 0x90 );
+    BYTE newFstp[3] = {0xDD, 0xD8, 0x90};
+    if ( *(BYTE*)0x55FCC8 != newFstp[0] )
+    {
+        MemCpy ( (LPVOID)0x55FCC8, &newFstp, 3 );
+        MemCpy ( (LPVOID)0x5613A3, &newFstp, 3 );
+        MemCpy ( (LPVOID)0x560A23, &newFstp, 3 );
+        MemCpy ( (LPVOID)0x560D3B, &newFstp, 3 );
+        MemCpy ( (LPVOID)0x560EDD, &newFstp, 3 );
+        MemCpy ( (LPVOID)0x560F18, &newFstp, 3 );
+    }
 
     MemPutFast < float > ( 0xB7C4F0, fDistance );
 }
@@ -1673,10 +1692,15 @@ void CMultiplayerSA::SetFarClipDistance ( float fDistance )
 void CMultiplayerSA::RestoreFarClipDistance ( )
 {
     BYTE originalFstp[3] = {0xD9, 0x5E, 0x50};
-
-    MemCpy ( (LPVOID)0x55FCC8, &originalFstp, 3 );
-    MemCpy ( (LPVOID)0x5613A3, &originalFstp, 3 );
-    MemCpy ( (LPVOID)0x560A23, &originalFstp, 3 );
+    if ( *(BYTE*)0x55FCC8 != originalFstp[0] )
+    {
+        MemCpy ( (LPVOID)0x55FCC8, &originalFstp, 3 );
+        MemCpy ( (LPVOID)0x5613A3, &originalFstp, 3 );
+        MemCpy ( (LPVOID)0x560A23, &originalFstp, 3 );
+        MemCpy ( (LPVOID)0x560D3B, &originalFstp, 3 );
+        MemCpy ( (LPVOID)0x560EDD, &originalFstp, 3 );
+        MemCpy ( (LPVOID)0x560F18, &originalFstp, 3 );
+    }
 }
 
 float CMultiplayerSA::GetFogDistance ( )
@@ -1686,9 +1710,12 @@ float CMultiplayerSA::GetFogDistance ( )
 
 void CMultiplayerSA::SetFogDistance ( float fDistance )
 {
-    MemPut < BYTE > ( 0x55FCDB, 0xDD );
-    MemPut < BYTE > ( 0x55FCDC, 0xD8 );
-    MemPut < BYTE > ( 0x55FCDD, 0x90 );
+    BYTE newFstp[3] = {0xDD, 0xD8, 0x90};
+    if ( *(BYTE*)0x55FCDB != newFstp[0] )
+    {
+        MemCpy ( (LPVOID)0x55FCDB, &newFstp, 3 );
+        MemCpy ( (LPVOID)0x560D60, &newFstp, 3 );
+    }
 
     MemPutFast < float > ( 0xB7C4F4, fDistance );
 }
@@ -1696,8 +1723,11 @@ void CMultiplayerSA::SetFogDistance ( float fDistance )
 void CMultiplayerSA::RestoreFogDistance ( )
 {
     BYTE originalFstp[3] = {0xD9, 0x5E, 0x54};
-
-    MemCpy ( (LPVOID)0x55FCDB, &originalFstp, 3 );
+    if ( *(BYTE*)0x55FCDB != originalFstp[0] )
+    {
+        MemCpy ( (LPVOID)0x55FCDB, &originalFstp, 3 );
+        MemCpy ( (LPVOID)0x560D60, &originalFstp, 3 );
+    }
 }
 
 void CMultiplayerSA::GetSunColor ( unsigned char& ucCoreRed, unsigned char& ucCoreGreen, unsigned char& ucCoreBlue, unsigned char& ucCoronaRed, unsigned char& ucCoronaGreen, unsigned char& ucCoronaBlue)
@@ -2007,6 +2037,13 @@ void CMultiplayerSA::SetHeliKillHandler ( HeliKillHandler * pHandler )
 {
     m_pHeliKillHandler = pHandler;
 }
+
+// What we do here is check if the idle handler has been set
+bool CMultiplayerSA::IsConnected ( void )
+{
+    return m_pIdleHandler != NULL;
+}
+
 void CMultiplayerSA::HideRadar ( bool bHide )
 {
     bHideRadar = bHide;
@@ -4207,6 +4244,7 @@ void _cdecl VehicleCamUp ( DWORD dwCam )
     *pvecUp = *pvecLookDir;
     pvecUp->CrossProduct ( &gravcam_matGravity.vUp );
     pvecUp->CrossProduct ( pvecLookDir );
+    pvecUp->Normalize ();
 }
 
 void _declspec(naked) HOOK_VehicleCamUp ()
@@ -5551,11 +5589,13 @@ void CMultiplayerSA::SetSuspensionEnabled ( bool bEnabled )
 SIPLInst* pEntityWorldAdd = NULL;
 CEntitySAInterface * pLODInterface = NULL; 
 bool bNextHookSetModel = false;
+bool bCodePathCheck = false;
 
 bool CheckRemovedModelNoSet ( )
 {
     // Init our variables
     bNextHookSetModel = false;
+    bCodePathCheck = bNextHookSetModel;
     pLODInterface = NULL;
     CWorld* pWorld = pGameInterface->GetWorld();
     // You never know.
@@ -5575,13 +5615,17 @@ bool CheckRemovedModelNoSet ( )
     }
     return false;
 }
+// Binary
 bool CheckRemovedModel ( )
 {
     TIMING_CHECKPOINT( "+CheckRemovedModel" );
     bNextHookSetModel = CheckRemovedModelNoSet ( );
     TIMING_CHECKPOINT( "-CheckRemovedModel" );
+    bCodePathCheck = true;
     return bNextHookSetModel;
 }
+
+// Binary
 // Hook 1
 void _declspec(naked) HOOK_LoadIPLInstance ()
 {
@@ -5601,7 +5645,8 @@ void _declspec(naked) HOOK_LoadIPLInstance ()
         jmp RETURN_LoadIPLInstance
     }
 }
-
+static bool bTest = false;
+// Binary
 void HideEntitySomehow ( )
 {
     TIMING_CHECKPOINT( "+HideEntitySomehow" );
@@ -5623,10 +5668,21 @@ void HideEntitySomehow ( )
             //pInterface = pInterface->m_pLod;
         }
     }
+    else if ( bCodePathCheck && pLODInterface )
+    {
+        // Init pInterface with the Initial model
+        CEntitySAInterface * pInterface = pLODInterface;
+        if ( pInterface && pInterface != NULL && pInterface->bIsProcObject == 0 && ( pInterface->nType == ENTITY_TYPE_BUILDING || pInterface->nType == ENTITY_TYPE_DUMMY ) )
+        {
+            pGameInterface->GetWorld()->AddBinaryBuilding ( pInterface );
+        }
+    }
     // Reset our next hook variable
     bNextHookSetModel = false;
+    bCodePathCheck = bNextHookSetModel;
     TIMING_CHECKPOINT( "-HideEntitySomehow" );
 }
+// Binary
 // Hook 2
 void _declspec(naked) HOOK_CWorld_LOD_SETUP ()
 {

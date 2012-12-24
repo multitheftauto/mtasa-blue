@@ -21,8 +21,12 @@
 *****************************************************************************/
 
 #include "StdInc.h"
+#define MIN_SERVER_REQ_CALLREMOTE_CONNECTION_ATTEMPTS       "1.3.0-9.04563"
+#define MIN_SERVER_REQ_TRIGGERCLIENTEVENT_SENDLIST          "1.3.0-9.04570"
 
 extern CGame* g_pGame;
+
+CTimeUsMarker < 20 > markerLatentEvent; // For timing triggerLatentClientEvent
 
 static CBlipManager*                                    m_pBlipManager = NULL;
 static CLuaManager*                                     m_pLuaManager = NULL;
@@ -153,13 +157,16 @@ int CLuaFunctionDefinitions::DisabledFunction ( lua_State* luaVM )
 int CLuaFunctionDefinitions::CallRemote ( lua_State* luaVM )
 {
     CScriptArgReader argStream ( luaVM );
-    if ( !argStream.NextIsFunction ( 1 ) )
+    if ( !argStream.NextIsFunction ( 1 ) && !argStream.NextIsFunction ( 2 ) )
     {
         // Call type 1
-        //  bool callRemote ( string host, string resourceName, string functionName, callback callbackFunction, [ arguments... ] )
-        SString strHost; SString strResourceName; SString strFunctionName; CLuaFunctionRef iLuaFunction; CLuaArguments args;
+        //  bool callRemote ( string host [, int connectionAttempts = 10 ], string resourceName, string functionName, callback callbackFunction, [ arguments... ] )
+        SString strHost; uint uiConnectionAttempts; SString strResourceName; SString strFunctionName; CLuaFunctionRef iLuaFunction; CLuaArguments args;
 
         argStream.ReadString ( strHost );
+        if ( argStream.NextIsNumber () )
+            MinServerReqCheck ( argStream, MIN_SERVER_REQ_CALLREMOTE_CONNECTION_ATTEMPTS, "'connection attempts' is being used" );
+        argStream.ReadIfNextIsNumber ( uiConnectionAttempts, 10 );
         argStream.ReadString ( strResourceName );
         argStream.ReadString ( strFunctionName );
         argStream.ReadFunction ( iLuaFunction );
@@ -171,7 +178,7 @@ int CLuaFunctionDefinitions::CallRemote ( lua_State* luaVM )
             CLuaMain * luaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
             if ( luaMain )
             {
-                g_pGame->GetRemoteCalls()->Call ( strHost, strResourceName, strFunctionName, &args, luaMain, iLuaFunction );
+                g_pGame->GetRemoteCalls()->Call ( strHost, strResourceName, strFunctionName, &args, luaMain, iLuaFunction, uiConnectionAttempts );
                 lua_pushboolean ( luaVM, true );
                 return 1;
             }
@@ -180,10 +187,13 @@ int CLuaFunctionDefinitions::CallRemote ( lua_State* luaVM )
     else
     {
         // Call type 2
-        //  bool callRemote ( string URL, callback callbackFunction, [ arguments... ] )
-        SString strURL; CLuaFunctionRef iLuaFunction; CLuaArguments args;
+        //  bool callRemote ( string URL [, int connectionAttempts = 10 ], callback callbackFunction, [ arguments... ] )
+        SString strURL; uint uiConnectionAttempts; CLuaFunctionRef iLuaFunction; CLuaArguments args;
 
         argStream.ReadString ( strURL );
+        if ( argStream.NextIsNumber () )
+            MinServerReqCheck ( argStream, MIN_SERVER_REQ_CALLREMOTE_CONNECTION_ATTEMPTS, "'connection attempts' is being used" );
+        argStream.ReadIfNextIsNumber ( uiConnectionAttempts, 10 );
         argStream.ReadFunction ( iLuaFunction );
         argStream.ReadLuaArguments ( args );
         argStream.ReadFunctionComplete ();
@@ -193,7 +203,7 @@ int CLuaFunctionDefinitions::CallRemote ( lua_State* luaVM )
             CLuaMain * luaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
             if ( luaMain )
             {
-                g_pGame->GetRemoteCalls()->Call ( strURL, &args, luaMain, iLuaFunction );
+                g_pGame->GetRemoteCalls()->Call ( strURL, &args, luaMain, iLuaFunction, uiConnectionAttempts );
                 lua_pushboolean ( luaVM, true );
                 return 1;
             }
@@ -201,7 +211,7 @@ int CLuaFunctionDefinitions::CallRemote ( lua_State* luaVM )
     }
 
     if ( argStream.HasErrors () )
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -211,11 +221,14 @@ int CLuaFunctionDefinitions::CallRemote ( lua_State* luaVM )
 // Call a function on a remote server
 int CLuaFunctionDefinitions::FetchRemote ( lua_State* luaVM )
 {
-//  bool fetchRemote ( string URL, callback callbackFunction, [ string postData, bool bPostBinary, arguments... ] )
+//  bool fetchRemote ( string URL [, int connectionAttempts = 10 ], callback callbackFunction, [ string postData, bool bPostBinary, arguments... ] )
     CScriptArgReader argStream ( luaVM );
-    SString strURL; CLuaFunctionRef iLuaFunction; SString strPostData; bool bPostBinary; CLuaArguments args;
+    SString strURL; CLuaFunctionRef iLuaFunction; SString strPostData; bool bPostBinary; CLuaArguments args; uint uiConnectionAttempts;
 
     argStream.ReadString ( strURL );
+    if ( argStream.NextIsNumber () )
+        MinServerReqCheck ( argStream, MIN_SERVER_REQ_CALLREMOTE_CONNECTION_ATTEMPTS, "'connection attempts' is being used" );
+    argStream.ReadIfNextIsNumber ( uiConnectionAttempts, 10 );
     argStream.ReadFunction ( iLuaFunction );
     argStream.ReadString ( strPostData, "" );
     argStream.ReadBool ( bPostBinary, false );
@@ -227,13 +240,13 @@ int CLuaFunctionDefinitions::FetchRemote ( lua_State* luaVM )
         CLuaMain * luaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
         if ( luaMain )
         {
-            g_pGame->GetRemoteCalls()->Call ( strURL, &args, strPostData, bPostBinary, luaMain, iLuaFunction );
+            g_pGame->GetRemoteCalls()->Call ( strURL, &args, strPostData, bPostBinary, luaMain, iLuaFunction, uiConnectionAttempts );
             lua_pushboolean ( luaVM, true );
             return 1;
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -293,10 +306,10 @@ int CLuaFunctionDefinitions::SetServerPassword ( lua_State* luaVM )
             return 1;
         }
         else
-            m_pScriptDebugging->LogError ( luaVM, "%s; password must be shorter than 32 chars and just contain visible characters", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ) );
+            argStream.SetCustomError( "password must be shorter than 32 chars and just contain visible characters" );
     }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+    if ( argStream.HasErrors () )
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -321,7 +334,7 @@ int CLuaFunctionDefinitions::GetServerConfigSetting ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -347,7 +360,7 @@ int CLuaFunctionDefinitions::SetServerConfigSetting ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -414,7 +427,7 @@ int CLuaFunctionDefinitions::AddEvent ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -458,16 +471,14 @@ int CLuaFunctionDefinitions::AddEventHandler ( lua_State* luaVM )
             CResourceFile * file = pLuaMain->GetResourceFile();
             if ( file && file->GetType() == CResourceFile::RESOURCE_FILE_TYPE_HTML )
             {
-                m_pScriptDebugging->LogError ( luaVM, "You cannot have event handlers in HTML scripts" );
+                argStream.SetCustomError( "You cannot have event handlers in HTML scripts" );
             }
             else
             {
                 // check if the handle is in use
                 if ( pElement->GetEventManager()->HandleExists ( pLuaMain, strName, iLuaFunction ) )
                 {
-                    m_pScriptDebugging->LogCustom ( luaVM, 255, 0, 0, "%s: '%s' with this function is already handled", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *strName );
-                    lua_pushboolean ( luaVM, false );
-                    return 1;
+                    argStream.SetCustomError( SString( "'%s' with this function is already handled", *strName ) );
                 }
                 // Do it
                 if ( CStaticFunctionDefinitions::AddEventHandler ( pLuaMain, strName, pElement, iLuaFunction, bPropagated, eventPriority, fPriorityMod ) )
@@ -478,8 +489,8 @@ int CLuaFunctionDefinitions::AddEventHandler ( lua_State* luaVM )
             }
         }
     }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+    if ( argStream.HasErrors () )
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -511,7 +522,7 @@ int CLuaFunctionDefinitions::RemoveEventHandler ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -539,7 +550,7 @@ int CLuaFunctionDefinitions::TriggerEvent ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushnil ( luaVM );
     return 1;
@@ -548,51 +559,36 @@ int CLuaFunctionDefinitions::TriggerEvent ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::TriggerClientEvent ( lua_State* luaVM )
 {
+//  int triggerClientEvent ( [element/table triggerFor,] string name, element theElement, [arguments...] )
+    std::vector < CPlayer* > sendList; SString strName; CElement* pCallWithElement; CLuaArguments Arguments;
+
     CScriptArgReader argStream ( luaVM );
-    if ( !argStream.NextIsUserData () )
+    if ( argStream.NextIsTable () )
     {
-        // Call type 1
-        //  bool triggerClientEvent ( string name, element theElement, [arguments...] )
-        SString strName; CElement* pCallWithElement; CLuaArguments Arguments;
-
-        CScriptArgReader argStream ( luaVM );
-        argStream.ReadString ( strName );
-        argStream.ReadUserData ( pCallWithElement );
-        argStream.ReadLuaArguments ( Arguments );
-
-        if ( !argStream.HasErrors () )
-        {
-            if ( CStaticFunctionDefinitions::TriggerClientEvent ( CStaticFunctionDefinitions::GetRootElement (), strName, pCallWithElement, Arguments ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
-        }
+        MinServerReqCheck ( argStream, MIN_SERVER_REQ_TRIGGERCLIENTEVENT_SENDLIST, "a send list is being used" );
+        argStream.ReadUserDataTable ( sendList );
     }
     else
     {
-        // Call type 2
-        //  bool triggerClientEvent ( element triggerFor, string name, element theElement, [arguments...] )
-        CElement* pElement; SString strName; CElement* pCallWithElement; CLuaArguments Arguments;
-
-        CScriptArgReader argStream ( luaVM );
-        argStream.ReadUserData ( pElement );
-        argStream.ReadString ( strName );
-        argStream.ReadUserData ( pCallWithElement );
-        argStream.ReadLuaArguments ( Arguments );
-
+        CElement* pElement;
+        argStream.ReadIfNextIsUserData ( pElement, CStaticFunctionDefinitions::GetRootElement () );
         if ( !argStream.HasErrors () )
+            pElement->GetDescendantsByType ( sendList, CElement::PLAYER );
+    }
+    argStream.ReadString ( strName );
+    argStream.ReadUserData ( pCallWithElement );
+    argStream.ReadLuaArguments ( Arguments );
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( CStaticFunctionDefinitions::TriggerClientEvent ( sendList, strName, pCallWithElement, Arguments ) )
         {
-            if ( CStaticFunctionDefinitions::TriggerClientEvent ( pElement, strName, pCallWithElement, Arguments ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
+            lua_pushboolean ( luaVM, true );
+            return 1;
         }
     }
-
-    if ( argStream.HasErrors () )
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -601,11 +597,26 @@ int CLuaFunctionDefinitions::TriggerClientEvent ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::TriggerLatentClientEvent ( lua_State* luaVM )
 {
-//  int triggerLatentClientEvent ( [element triggerFor,] string event, [int bandwidth=50000,] [bool persist=false,] element theElement, [arguments...] )
-    CElement* pElement; SString strName; int iBandwidth; bool bPersist; CElement* pCallWithElement; CLuaArguments Arguments;
+    markerLatentEvent = CTimeUsMarker < 20 > ();
+    markerLatentEvent.Set ( "Start" );
+
+//  int triggerLatentClientEvent ( [element/table triggerFor,] string name, [int bandwidth=50000,] [bool persist=false,] element theElement, [arguments...] )
+    std::vector < CPlayer* > sendList; SString strName; int iBandwidth; bool bPersist; CElement* pCallWithElement; CLuaArguments Arguments;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadIfNextIsUserData ( pElement, CStaticFunctionDefinitions::GetRootElement () );
+    if ( argStream.NextIsTable () )
+    {
+        MinServerReqCheck ( argStream, MIN_SERVER_REQ_TRIGGERCLIENTEVENT_SENDLIST, "a send list is being used" );
+        argStream.ReadUserDataTable ( sendList );
+    }
+    else
+    {
+        CElement* pElement;
+        argStream.ReadIfNextIsUserData ( pElement, CStaticFunctionDefinitions::GetRootElement () );
+        if ( !argStream.HasErrors () )
+            pElement->GetDescendantsByType ( sendList, CElement::PLAYER );
+        markerLatentEvent.Set ( "GetDescendantsByType" );
+    }
     argStream.ReadString ( strName );
     argStream.ReadIfNextCouldBeNumber ( iBandwidth, 50000 );
     argStream.ReadIfNextIsBool ( bPersist, false );
@@ -630,15 +641,23 @@ int CLuaFunctionDefinitions::TriggerLatentClientEvent ( lua_State* luaVM )
             }
         }
 
+        markerLatentEvent.SetAndStoreString ( SString ( "Get args (%d,%s)", sendList.size (), *strName ) );
+
         // Trigger it
-        if ( CStaticFunctionDefinitions::TriggerLatentClientEvent ( pElement, strName, pCallWithElement, Arguments, iBandwidth, pLuaMain, usResourceNetId ) )
+        if ( CStaticFunctionDefinitions::TriggerLatentClientEvent ( sendList, strName, pCallWithElement, Arguments, iBandwidth, pLuaMain, usResourceNetId ) )
         {
+            markerLatentEvent.Set ( "End" );
+
+            // Add debug info if wanted
+            if ( CPerfStatDebugInfo::GetSingleton ()->IsActive ( "TriggerLatentClientEvent" ) )
+                CPerfStatDebugInfo::GetSingleton ()->AddLine ( "TriggerLatentClientEvent", markerLatentEvent.GetString () );
+
             lua_pushboolean ( luaVM, true );
             return 1;
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -670,7 +689,7 @@ int CLuaFunctionDefinitions::GetLatentEventHandles ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -713,7 +732,7 @@ int CLuaFunctionDefinitions::GetLatentEventStatus ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -739,7 +758,7 @@ int CLuaFunctionDefinitions::CancelLatentEvent ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -765,7 +784,7 @@ int CLuaFunctionDefinitions::GetPlayerName ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -790,7 +809,7 @@ int CLuaFunctionDefinitions::GetPlayerIP ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -812,7 +831,7 @@ int CLuaFunctionDefinitions::GetPlayerVersion ( lua_State* luaVM )
             return 1;
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -837,7 +856,7 @@ int CLuaFunctionDefinitions::GetPlayerAccount ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -862,7 +881,7 @@ int CLuaFunctionDefinitions::SetPlayerName ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -885,7 +904,7 @@ int CLuaFunctionDefinitions::DetonateSatchels ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -893,52 +912,16 @@ int CLuaFunctionDefinitions::DetonateSatchels ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::SetWeaponProperty ( lua_State* luaVM )
 {
+//  bool setWeaponProperty ( int weaponID/string weaponName, string weaponSkill, string property/int property, int/float theValue )
+
     eWeaponSkill eWepSkill = WEAPONSKILL_STD;
     eWeaponType eWep = WEAPONTYPE_BRASSKNUCKLE;
     eWeaponProperty eProp = WEAPON_ACCURACY;
 
     CScriptArgReader argStream ( luaVM );
-    if ( argStream.NextIsEnumString ( eWep ) )
-    {
-        argStream.ReadEnumString ( eWep );
-    }
-    else
-    {
-        int iTemp = 0;
-        argStream.ReadNumber ( iTemp );
-        if ( iTemp >= WEAPONTYPE_MIN && iTemp <= WEAPONTYPE_MAX )
-        {
-            eWep = (eWeaponType) iTemp;
-        }
-        else
-        {
-            m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), "invalid weapon type at argument 1" ) );
-            lua_pushboolean ( luaVM, false );
-            return 1;
-        }
-    }
-
-    if ( argStream.NextIsEnumString ( eWepSkill ) )
-    {
-        argStream.ReadEnumString ( eWepSkill );
-    }
-    else
-    {
-        int iTemp = 0;
-        argStream.ReadNumber ( iTemp );
-        if ( iTemp >= WEAPONSKILL_POOR && iTemp <= WEAPONSKILL_PRO )
-        {
-            eWepSkill = (eWeaponSkill) iTemp;
-        }
-        else
-        {
-            m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), "invalid skill type at argument 2" ) );
-            lua_pushboolean ( luaVM, false );
-            return 1;
-        }
-    }
+    argStream.ReadEnumStringOrNumber ( eWep );
+    argStream.ReadEnumStringOrNumber ( eWepSkill );
     argStream.ReadEnumString ( eProp );
-
     if ( !argStream.HasErrors () )
     {
         switch ( eProp )
@@ -965,8 +948,6 @@ int CLuaFunctionDefinitions::SetWeaponProperty ( lua_State* luaVM )
                         return 1;
                     }
                 }
-                else
-                    m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
                 break;
             }
         case WEAPON_DAMAGE:
@@ -983,21 +964,18 @@ int CLuaFunctionDefinitions::SetWeaponProperty ( lua_State* luaVM )
                         return 1;
                     }
                 }
-                else
-                    m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
-
                 break;
             }
         default:
             {
-                m_pScriptDebugging->LogBadType ( luaVM );
+                argStream.SetCustomError( "unsupported weapon property at argument 3" );
                 break;
             }
 
         }
     }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+    if ( argStream.HasErrors () )
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -1006,50 +984,15 @@ int CLuaFunctionDefinitions::SetWeaponProperty ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::GetWeaponProperty ( lua_State* luaVM )
 {
+//  int getWeaponProperty ( int weaponID/string weaponName, string weaponSkill, string property )
+
     eWeaponSkill eWepSkill = WEAPONSKILL_STD;
     eWeaponType eWep = WEAPONTYPE_UNARMED;
     eWeaponProperty eProp = WEAPON_INVALID_PROPERTY;
 
     CScriptArgReader argStream ( luaVM );
-    if ( argStream.NextIsEnumString ( eWep ) )
-    {
-        argStream.ReadEnumString ( eWep );
-    }
-    else
-    {
-        int iTemp = 0;
-        argStream.ReadNumber ( iTemp );
-        if ( iTemp >= WEAPONTYPE_MIN && iTemp <= WEAPONTYPE_MAX )
-        {
-            eWep = (eWeaponType) iTemp;
-        }
-        else
-        {
-            // Failed
-            m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), "invalid weapon type at argument 1" ) );
-            lua_pushboolean ( luaVM, false );
-            return 1;
-        }
-    }
-    if ( argStream.NextIsEnumString ( eWepSkill ) )
-    {
-        argStream.ReadEnumString ( eWepSkill );
-    }
-    else
-    {
-        int iTemp = 0;
-        argStream.ReadNumber ( iTemp );
-        if ( iTemp >= WEAPONSKILL_POOR && iTemp <= WEAPONSKILL_PRO )
-        {
-            eWepSkill = (eWeaponSkill) iTemp;
-        }
-        else
-        {
-            m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), "invalid skill type at argument 2" ) );
-            lua_pushboolean ( luaVM, false );
-            return 1;
-        }
-    }
+    argStream.ReadEnumStringOrNumber ( eWep );
+    argStream.ReadEnumStringOrNumber ( eWepSkill );
     argStream.ReadEnumString ( eProp );
     if ( !argStream.HasErrors () )
     {
@@ -1119,12 +1062,13 @@ int CLuaFunctionDefinitions::GetWeaponProperty ( lua_State* luaVM )
             }
         default:
             {
+                argStream.SetCustomError( "invalid weapon property at argument 3" );
                 break;
             }
         }
     }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+    if ( argStream.HasErrors () )
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
 
     // Failed
@@ -1139,45 +1083,8 @@ int CLuaFunctionDefinitions::GetOriginalWeaponProperty ( lua_State* luaVM )
     eWeaponProperty eProp = WEAPON_INVALID_PROPERTY;
 
     CScriptArgReader argStream ( luaVM );
-    if ( argStream.NextIsEnumString ( eWep ) )
-    {
-        argStream.ReadEnumString ( eWep );
-    }
-    else
-    {
-        int iTemp = 0;
-        argStream.ReadNumber ( iTemp );
-        if ( iTemp >= WEAPONTYPE_MIN && iTemp <= WEAPONTYPE_MAX )
-        {
-            eWep = (eWeaponType) iTemp;
-        }
-        else
-        {
-            // Failed
-            m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), "invalid weapon type at argument 1" ) );
-            lua_pushboolean ( luaVM, false );
-            return 1;
-        }
-    }
-    if ( argStream.NextIsEnumString ( eWepSkill ) )
-    {
-        argStream.ReadEnumString ( eWepSkill );
-    }
-    else
-    {
-        int iTemp = 0;
-        argStream.ReadNumber ( iTemp );
-        if ( iTemp >= WEAPONSKILL_POOR && iTemp <= WEAPONSKILL_PRO )
-        {
-            eWepSkill = (eWeaponSkill) iTemp;
-        }
-        else
-        {
-            m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), "invalid skill type at argument 2" ) );
-            lua_pushboolean ( luaVM, false );
-            return 1;
-        }
-    }
+    argStream.ReadEnumStringOrNumber ( eWep );
+    argStream.ReadEnumStringOrNumber ( eWepSkill );
     argStream.ReadEnumString ( eProp );
     if ( !argStream.HasErrors () )
     {
@@ -1247,12 +1154,13 @@ int CLuaFunctionDefinitions::GetOriginalWeaponProperty ( lua_State* luaVM )
             }
         default:
             {
+                argStream.SetCustomError( "unsupported weapon property at argument 3" );
                 break;
             }
         }
     }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+    if ( argStream.HasErrors () )
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
 
     // Failed
@@ -2967,30 +2875,26 @@ int CLuaFunctionDefinitions::KillPed ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::SetPedRotation ( lua_State* luaVM )
 {
-    // Arguments are valid?
-    int iArgument1 = lua_type ( luaVM, 1 );
-    int iArgument2 = lua_type ( luaVM, 2 );
-    if ( ( iArgument1 == LUA_TLIGHTUSERDATA ) &&
-         ( iArgument2 == LUA_TNUMBER || iArgument2 == LUA_TSTRING ) )
-    {
-        CElement* pElement = lua_toelement ( luaVM, 1 );
-        float fRotation = static_cast < float > ( lua_tonumber ( luaVM, 2 ) );
+//  setPedRotation ( element ped, float rotation [, bool fixPedRotation = false ] )
+    CElement* pElement; float fRotation; bool bNewWay;
 
-        if ( pElement )
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pElement );
+    argStream.ReadNumber ( fRotation );
+    argStream.ReadBool ( bNewWay, false );
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( CStaticFunctionDefinitions::SetPedRotation ( pElement, fRotation, bNewWay ) )
         {
-            // Set the rotation
-            if ( CStaticFunctionDefinitions::SetPedRotation ( pElement, fRotation ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
+            lua_pushboolean ( luaVM, true );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
 
+    // Failed
     lua_pushboolean ( luaVM, false );
     return 1;
 }
@@ -3239,7 +3143,7 @@ int CLuaFunctionDefinitions::ShowPlayerHudComponent ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -3274,7 +3178,7 @@ int CLuaFunctionDefinitions::TakePlayerScreenShot ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -3751,37 +3655,25 @@ int CLuaFunctionDefinitions::SetPedDoingGangDriveby ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::GiveWeapon ( lua_State* luaVM )
 {
-    // Verify the arguments
-    int iArgument1 = lua_type ( luaVM, 1 );
-    int iArgument2 = lua_type ( luaVM, 2 );
-    int iArgument3 = lua_type ( luaVM, 3 );
-    if ( ( iArgument1 == LUA_TLIGHTUSERDATA ) &&
-         ( iArgument2 == LUA_TNUMBER || iArgument2 == LUA_TSTRING ) &&
-         ( iArgument3 == LUA_TNUMBER || iArgument3 == LUA_TSTRING || iArgument3 == LUA_TNONE ) )
+// bool giveWeapon ( ped thePlayer, int weapon [, int ammo=30, bool setAsCurrent=false ] )
+    CElement* pElement; eWeaponType weaponType; ushort usAmmo; bool bSetAsCurrent;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pElement );
+    argStream.ReadEnumStringOrNumber ( weaponType );
+    argStream.ReadNumber ( usAmmo, 30 );
+    argStream.ReadBool ( bSetAsCurrent, false );
+
+    if ( !argStream.HasErrors ( ) )
     {
-        CElement* pElement = lua_toelement ( luaVM, 1 );
-        unsigned char ucWeaponID = static_cast < unsigned char > ( lua_tonumber ( luaVM, 2 ) );
-        unsigned short usAmmo = 30;
-        if ( iArgument3 != LUA_TNONE )
-            usAmmo = static_cast < unsigned short > ( lua_tonumber ( luaVM, 3 ) );
-
-        bool bSetAsCurrent = false;
-        if ( lua_type ( luaVM, 4 ) == LUA_TBOOLEAN )
-            bSetAsCurrent = ( lua_toboolean ( luaVM, 4 ) ) ? true:false;
-
-        if ( pElement )
+        if ( CStaticFunctionDefinitions::GiveWeapon ( pElement, weaponType, usAmmo, bSetAsCurrent ) )
         {
-            if ( CStaticFunctionDefinitions::GiveWeapon ( pElement, ucWeaponID, usAmmo, bSetAsCurrent ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
+            lua_pushboolean ( luaVM, true );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -3790,35 +3682,24 @@ int CLuaFunctionDefinitions::GiveWeapon ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::TakeWeapon ( lua_State* luaVM )
 {
-    // Verify the arguments
-    int iArgument1 = lua_type ( luaVM, 1 );
-    int iArgument2 = lua_type ( luaVM, 2 );
-    int iArgument3 = lua_type ( luaVM, 3 );
-    if ( ( iArgument1 == LUA_TLIGHTUSERDATA ) &&
-         ( iArgument2 == LUA_TNUMBER || iArgument2 == LUA_TSTRING ) &&
-         ( iArgument3 == LUA_TNUMBER || iArgument3 == LUA_TSTRING || iArgument3 == LUA_TNONE ) )
-    {
-        // Grab the arguments
-        CElement* pElement = lua_toelement ( luaVM, 1 );
-        unsigned char ucWeaponID = static_cast < unsigned char > ( lua_tonumber ( luaVM, 2 ) );
-        unsigned short usAmmo = 9999;
-        if ( iArgument3 != LUA_TNONE )
-            usAmmo = static_cast < unsigned short > ( lua_tonumber ( luaVM, 3 ) );    
+// bool takeWeapon ( player thePlayer, int weaponId [, int ammo ] )
+    CElement* pElement; eWeaponType weaponType; ushort usAmmo;
 
-        if ( pElement )
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pElement );
+    argStream.ReadEnumStringOrNumber ( weaponType );
+    argStream.ReadNumber ( usAmmo, 9999 );
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( CStaticFunctionDefinitions::TakeWeapon ( pElement, weaponType, usAmmo ) )
         {
-            // Do it
-            if ( CStaticFunctionDefinitions::TakeWeapon ( pElement, ucWeaponID, usAmmo ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
+            lua_pushboolean ( luaVM, true );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -3854,36 +3735,25 @@ int CLuaFunctionDefinitions::TakeAllWeapons ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::SetWeaponAmmo ( lua_State* luaVM )
 {
-    // Verify the arguments
-    int iArgument1 = lua_type ( luaVM, 1 );
-    int iArgument2 = lua_type ( luaVM, 2 );
-    int iArgument3 = lua_type ( luaVM, 3 );
-    int iArgument4 = lua_type ( luaVM, 4 );
-    if ( ( iArgument1 == LUA_TLIGHTUSERDATA ) &&
-         ( iArgument2 == LUA_TNUMBER || iArgument2 == LUA_TSTRING ) &&
-         ( iArgument3 == LUA_TNUMBER || iArgument3 == LUA_TSTRING ) )
+// bool setWeaponAmmo ( player thePlayer, int weapon, int totalAmmo, [int ammoInClip = 0] )
+    CElement* pElement; eWeaponType weaponType; ushort usAmmo; ushort usAmmoInClip;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pElement );
+    argStream.ReadEnumStringOrNumber ( weaponType );
+    argStream.ReadNumber ( usAmmo );
+    argStream.ReadNumber ( usAmmoInClip, 0 );
+
+    if ( !argStream.HasErrors () )
     {
-        CElement* pElement = lua_toelement ( luaVM, 1 );
-        unsigned char ucWeaponID = static_cast < unsigned char > ( lua_tonumber ( luaVM, 2 ) );
-        unsigned short usAmmo = static_cast < unsigned short > ( lua_tonumber ( luaVM, 3 ) );
-        unsigned short usAmmoInClip = 0;
-        if ( iArgument4 == LUA_TNUMBER || iArgument4 == LUA_TSTRING )
+        if ( CStaticFunctionDefinitions::SetWeaponAmmo ( pElement, weaponType, usAmmo, usAmmoInClip ) )
         {
-            usAmmoInClip = static_cast < unsigned short > ( lua_tonumber ( luaVM, 4 ) );
+            lua_pushboolean ( luaVM, true );
+            return 1;
         }
-        if ( pElement )
-        {
-            if ( CStaticFunctionDefinitions::SetWeaponAmmo ( pElement, ucWeaponID, usAmmo, usAmmoInClip ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
-        }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -3892,19 +3762,21 @@ int CLuaFunctionDefinitions::SetWeaponAmmo ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::GetSlotFromWeapon ( lua_State* luaVM )
 {
-    if ( lua_type ( luaVM, 1 ) == LUA_TNUMBER || lua_type ( luaVM, 1 ) == LUA_TSTRING )
+    eWeaponType weaponType;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadEnumStringOrNumber( weaponType );
+
+    if ( !argStream.HasErrors ( ) )
     {
-        unsigned char ucWeaponID = static_cast < unsigned char > ( lua_tonumber ( luaVM, 1 ) );
-        char cSlot = CWeaponNames::GetSlotFromWeapon ( ucWeaponID );
+        char cSlot = CWeaponNames::GetSlotFromWeapon ( weaponType );
         if ( cSlot >= 0 )
             lua_pushnumber ( luaVM, cSlot );
         else
             lua_pushboolean ( luaVM, false );
-        //lua_pushnumber ( luaVM, CWeaponNames::GetSlotFromWeapon ( ucWeaponID ) );
         return 1;
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -3957,7 +3829,7 @@ int CLuaFunctionDefinitions::CreateVehicle ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -4228,7 +4100,7 @@ int CLuaFunctionDefinitions::SetVehicleSirens( lua_State* luaVM )
 
     argStream.ReadUserData ( pVehicle );
     argStream.ReadNumber ( ucSirenID );
-    if ( ucSirenID > 0 )
+    if ( ucSirenID > 0 && ucSirenID < 9 )
     {
         // Array indicies start at 0 so compensate here. This way all code works properly and we get nice 1-8 numbers for API
         ucSirenID--;
@@ -4396,8 +4268,6 @@ int CLuaFunctionDefinitions::GiveVehicleSirens ( lua_State* luaVM )
     argStream.ReadNumber ( ucSirenType );
     if ( ucSirenCount > 0)
     {
-        // Array indicies start at 0 so compensate here. This way all code works properly and we get nice 1-8 numbers for API
-        ucSirenCount--;
         argStream.ReadBool ( tSirenInfo.m_b360Flag, false );
         argStream.ReadBool ( tSirenInfo.m_bDoLOSCheck, true );
         argStream.ReadBool ( tSirenInfo.m_bUseRandomiser, true );
@@ -4658,7 +4528,7 @@ int CLuaFunctionDefinitions::GetVehicleSirensOn ( lua_State* luaVM )
         if ( pVehicle )
         {
             // Does the vehicle have Sirens?
-            if ( CVehicleManager::HasSirens ( pVehicle->GetModel () ) )
+            if ( CVehicleManager::HasSirens ( pVehicle->GetModel () ) || pVehicle->DoesVehicleHaveSirens () )
             {
                 // Return whether it has its Sirens on or not
                 bool bSirensOn = pVehicle->IsSirenActive ();
@@ -7745,10 +7615,10 @@ int CLuaFunctionDefinitions::CreateObject ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), "Invalid model id" ) );
+            argStream.SetCustomError( "Invalid model id" );
     }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+    if ( argStream.HasErrors () )
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -7906,7 +7776,7 @@ int CLuaFunctionDefinitions::MoveObject ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -7976,7 +7846,7 @@ int CLuaFunctionDefinitions::CreateRadarArea ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -8002,7 +7872,7 @@ int CLuaFunctionDefinitions::GetRadarAreaSize ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -8030,7 +7900,7 @@ int CLuaFunctionDefinitions::GetRadarAreaColor ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -8051,7 +7921,7 @@ int CLuaFunctionDefinitions::IsRadarAreaFlashing ( lua_State* luaVM )
         return 1;
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -8078,7 +7948,7 @@ int CLuaFunctionDefinitions::IsInsideRadarArea ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -8104,7 +7974,7 @@ int CLuaFunctionDefinitions::SetRadarAreaSize ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -8133,7 +8003,7 @@ int CLuaFunctionDefinitions::SetRadarAreaColor ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -8158,7 +8028,7 @@ int CLuaFunctionDefinitions::SetRadarAreaFlashing ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -9247,7 +9117,7 @@ int CLuaFunctionDefinitions::SetWaterLevel ( lua_State* luaVM )
     }
 
     if ( argStream.HasErrors () )
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -9847,7 +9717,7 @@ int CLuaFunctionDefinitions::AddCommandHandler ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -9879,7 +9749,7 @@ int CLuaFunctionDefinitions::RemoveCommandHandler ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -9920,7 +9790,7 @@ int CLuaFunctionDefinitions::ExecuteCommandHandler ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -10286,7 +10156,7 @@ int CLuaFunctionDefinitions::GetEasingValue ( lua_State* luaVM )
 
     if ( argStream.HasErrors () )
     {
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
         lua_pushboolean ( luaVM, false );
         return 1;
     }
@@ -10322,7 +10192,7 @@ int CLuaFunctionDefinitions::InterpolateBetween ( lua_State* luaVM )
 
     if ( argStream.HasErrors () )
     {
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
         lua_pushboolean ( luaVM, false );
         return 1;
     }
@@ -10522,43 +10392,44 @@ int CLuaFunctionDefinitions::SetTimer ( lua_State* luaVM )
             // Check for the minimum interval
             if ( dTimeInterval < LUA_TIMER_MIN_INTERVAL )
             {
-                m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), "Interval is below 50" ) );
-                lua_pushboolean ( luaVM, false );
-                return 1;
+                argStream.SetCustomError( "Interval is below 50" );
             }
-            lua_Debug debugInfo;
-            SString strDebugOutput = "";
-            // Check our luaVM and get a debug info from the stack
-            if ( luaVM && lua_getstack ( luaVM, 1, &debugInfo ) )
+            else
             {
-                // Get name line and... no idea. for debug
-                lua_getinfo ( luaVM, "nlS", &debugInfo );
-                if ( debugInfo.source[0] == '@' )
+                lua_Debug debugInfo;
+                SString strDebugOutput = "";
+                // Check our luaVM and get a debug info from the stack
+                if ( luaVM && lua_getstack ( luaVM, 1, &debugInfo ) )
                 {
-                    SString strFile = ConformResourcePath ( debugInfo.source );
-                    // Get and store the location of the setTimer call in case the contents error
-                    strDebugOutput = SString ( "%s:%i ", strFile.c_str ( ), debugInfo.currentline );
+                    // Get name line and... no idea. for debug
+                    lua_getinfo ( luaVM, "nlS", &debugInfo );
+                    if ( debugInfo.source[0] == '@' )
+                    {
+                        SString strFile = ConformResourcePath ( debugInfo.source );
+                        // Get and store the location of the setTimer call in case the contents error
+                        strDebugOutput = SString ( "%s:%i ", strFile.c_str ( ), debugInfo.currentline );
+                    }
+                    else
+                    {
+                        // Get and store the location of the setTimer call in case the contents error
+                        strDebugOutput = SString ( "%s ", debugInfo.short_src );
+                    }
                 }
-                else
+                CLuaTimer* pLuaTimer = luaMain->GetTimerManager ()->AddTimer ( iLuaFunction, CTickCount ( dTimeInterval ), uiTimesToExecute, Arguments );
+
+                if ( pLuaTimer )
                 {
-                    // Get and store the location of the setTimer call in case the contents error
-                    strDebugOutput = SString ( "%s ", debugInfo.short_src );
+                    // Set our timer debug info (in case we don't have any debug info which is usually when you do setTimer(destroyElement, 50, 1) or such)
+                    pLuaTimer->SetDebugInfo ( strDebugOutput );
+
+                    lua_pushtimer ( luaVM, pLuaTimer );
+                    return 1;
                 }
-            }
-            CLuaTimer* pLuaTimer = luaMain->GetTimerManager ()->AddTimer ( iLuaFunction, CTickCount ( dTimeInterval ), uiTimesToExecute, Arguments );
-
-            if ( pLuaTimer )
-            {
-                // Set our timer debug info (in case we don't have any debug info which is usually when you do setTimer(destroyElement, 50, 1) or such)
-                pLuaTimer->SetDebugInfo ( strDebugOutput );
-
-                lua_pushtimer ( luaVM, pLuaTimer );
-                return 1;
             }
         }
     }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+    if ( argStream.HasErrors () )
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -10585,7 +10456,7 @@ int CLuaFunctionDefinitions::KillTimer ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -10612,7 +10483,7 @@ int CLuaFunctionDefinitions::ResetTimer ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -10659,7 +10530,7 @@ int CLuaFunctionDefinitions::GetTimers ( lua_State* luaVM )
             CLuaTimerManager* pLuaTimerManager = pLuaMain->GetTimerManager ();
             CTickCount llCurrentTime = CTickCount::Now ();
             unsigned int uiIndex = 0;
-            CFastList < CLuaTimer > ::const_iterator iter = pLuaTimerManager->IterBegin ();
+            CFastList < CLuaTimer* > ::const_iterator iter = pLuaTimerManager->IterBegin ();
             for ( ; iter != pLuaTimerManager->IterEnd () ; iter++ )
             {
                 CLuaTimer* pLuaTimer = *iter;
@@ -10678,7 +10549,7 @@ int CLuaFunctionDefinitions::GetTimers ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -10701,7 +10572,7 @@ int CLuaFunctionDefinitions::GetTimerDetails ( lua_State* luaVM )
         return 3;
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -11026,21 +10897,22 @@ int CLuaFunctionDefinitions::GetGameType ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::SetGameType ( lua_State* luaVM )
 {
-    // Grab the gametype if specified
-    const char * szGameType = NULL;
-    if ( lua_type ( luaVM, 1 ) == LUA_TSTRING )
-    {
-        // Grab the game type string.
-        szGameType = lua_tostring ( luaVM, 1 );
-    }
+//  bool setGameType ( string gameType )
+    SString strGameType;
 
-    // Set the game type.
-    if ( CStaticFunctionDefinitions::SetGameType ( szGameType ) )
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadString ( strGameType, "" );    // Default to empty for backward compat with previous implementation
+
+    if ( !argStream.HasErrors () )
     {
-        // Return true.
-        lua_pushboolean ( luaVM, true );
-        return 1;
+        if ( CStaticFunctionDefinitions::SetGameType ( strGameType ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
     }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -11050,30 +10922,39 @@ int CLuaFunctionDefinitions::SetGameType ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::SetMapName ( lua_State* luaVM )
 {
-    // Grab the mapname if specified
-    const char * szMapName = NULL;
-    if ( lua_type ( luaVM, 1 ) == LUA_TSTRING )
+//  bool setMapName ( string mapName )
+    SString strMapName;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadString ( strMapName, "" );    // Default to empty for backward compat with previous implementation
+
+    if ( !argStream.HasErrors () )
     {
-        // Grab the game type string.
-        szMapName = lua_tostring ( luaVM, 1 );
+        if ( CStaticFunctionDefinitions::SetMapName ( strMapName ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
     }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
-    // Set the game type.
-    CStaticFunctionDefinitions::SetMapName ( szMapName );
-
-    // Return true.
-    lua_pushboolean ( luaVM, true );
+    lua_pushboolean ( luaVM, false );
     return 1;
 }
 
 
 int CLuaFunctionDefinitions::GetRuleValue ( lua_State* luaVM )
 {
-    if ( lua_type ( luaVM, 1 ) == LUA_TSTRING )
-    {
-        const char* szKey = lua_tostring ( luaVM, 1 );
+//  string getRuleValue ( string key )
+    SString strKey;
 
-        const char* szRule = CStaticFunctionDefinitions::GetRuleValue ( szKey );
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadString ( strKey );
+
+    if ( !argStream.HasErrors () )
+    {
+        const char* szRule = CStaticFunctionDefinitions::GetRuleValue ( strKey );
         if ( szRule )
         {
             lua_pushstring ( luaVM, szRule );
@@ -11081,7 +10962,7 @@ int CLuaFunctionDefinitions::GetRuleValue ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -11090,22 +10971,23 @@ int CLuaFunctionDefinitions::GetRuleValue ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::SetRuleValue ( lua_State* luaVM )
 {
-    if ( lua_type ( luaVM, 1 ) == LUA_TSTRING )
+//  bool setRuleValue ( string key, string value )
+    SString strKey; SString strValue;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadString ( strKey );
+    argStream.ReadString ( strValue );
+
+    if ( !argStream.HasErrors () )
     {
-        const char* szKey = lua_tostring ( luaVM, 1 );
-        const char* szValue = NULL;
-
-        if ( lua_type ( luaVM, 2 ) == LUA_TSTRING )
-            szValue = lua_tostring ( luaVM, 2 );
-
-        if ( CStaticFunctionDefinitions::SetRuleValue ( szKey, szValue ) )
+        if ( CStaticFunctionDefinitions::SetRuleValue ( strKey, strValue ) )
         {
             lua_pushboolean ( luaVM, true );
             return 1;
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -11114,18 +10996,22 @@ int CLuaFunctionDefinitions::SetRuleValue ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::RemoveRuleValue ( lua_State* luaVM )
 {
-    if ( lua_type ( luaVM, 1 ) == LUA_TSTRING )
-    {
-        const char* szKey = lua_tostring ( luaVM, 1 );
+//  bool removeRuleValue ( string key )
+    SString strKey;
 
-        if ( CStaticFunctionDefinitions::RemoveRuleValue ( szKey ) )
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadString ( strKey );
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( CStaticFunctionDefinitions::RemoveRuleValue ( strKey ) )
         {
             lua_pushboolean ( luaVM, true );
             return 1;
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -11151,7 +11037,7 @@ int CLuaFunctionDefinitions::GetPlayerAnnounceValue ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -11177,7 +11063,7 @@ int CLuaFunctionDefinitions::SetPlayerAnnounceValue ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
 
     lua_pushboolean ( luaVM, false );
@@ -11200,7 +11086,7 @@ int CLuaFunctionDefinitions::ResendPlayerModInfo ( lua_State* luaVM )
         return 1;
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -11320,7 +11206,8 @@ static void DbExecCallback ( CDbJobData* pJobData, void* pContext )
     assert ( pContext == NULL );
     if ( pJobData->stage >= EJobStage::RESULT && pJobData->result.status == EJobResult::FAIL )
     {
-        m_pScriptDebugging->LogWarning ( NULL, "%s: dbExec failed; %s", *pJobData->m_strDebugInfo, *pJobData->result.strReason );
+        if ( !pJobData->result.bErrorSuppressed )
+            m_pScriptDebugging->LogWarning ( NULL, "%s: dbExec failed; (%d) %s", *pJobData->m_strDebugInfo, pJobData->result.uiErrorCode, *pJobData->result.strReason );
     }
 }
 
@@ -11330,7 +11217,8 @@ static void DbFreeCallback ( CDbJobData* pJobData, void* pContext )
     assert ( pContext == NULL );
     if ( pJobData->stage >= EJobStage::RESULT && pJobData->result.status == EJobResult::FAIL )
     {
-        m_pScriptDebugging->LogWarning ( NULL, "%s: dbFree failed; %s", *pJobData->m_strDebugInfo, *pJobData->result.strReason );
+        if ( !pJobData->result.bErrorSuppressed )
+            m_pScriptDebugging->LogWarning ( NULL, "%s: dbFree failed; (%d) %s", *pJobData->m_strDebugInfo, pJobData->result.uiErrorCode, *pJobData->result.strReason );
     }
 }
 
@@ -11401,8 +11289,13 @@ int CLuaFunctionDefinitions::DbConnect ( lua_State* luaVM )
                 }
             }
             // Add logging options
-            SetOption < CDbOptionsMap > ( strOptions, "log", 1 );
-            SetOption < CDbOptionsMap > ( strOptions, "tag", "script" );
+            bool bLoggingEnabled;
+            SString strLogTag;
+            // Read value of 'log' and 'tag' if already set, otherwise use default
+            GetOption < CDbOptionsMap > ( strOptions, "log", bLoggingEnabled, 1 );
+            GetOption < CDbOptionsMap > ( strOptions, "tag", strLogTag, "script" );
+            SetOption < CDbOptionsMap > ( strOptions, "log", bLoggingEnabled );
+            SetOption < CDbOptionsMap > ( strOptions, "tag", strLogTag );
             // Do connect
             SConnectionHandle connection = g_pGame->GetDatabaseManager ()->Connect ( strType, strHost, strUsername, strPassword, strOptions );
             if ( connection == INVALID_DB_HANDLE )
@@ -11425,7 +11318,7 @@ int CLuaFunctionDefinitions::DbConnect ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -11486,7 +11379,7 @@ int CLuaFunctionDefinitions::DbQuery ( lua_State* luaVM )
         return 1;
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -11522,7 +11415,7 @@ int CLuaFunctionDefinitions::DbExec ( lua_State* luaVM )
         return 1;
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -11548,7 +11441,7 @@ int CLuaFunctionDefinitions::DbFree ( lua_State* luaVM )
         return 1;
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -11623,7 +11516,7 @@ int CLuaFunctionDefinitions::DbPoll ( lua_State* luaVM )
         return 2;
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -11815,7 +11708,7 @@ int CLuaFunctionDefinitions::GetAccountName ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -11840,7 +11733,7 @@ int CLuaFunctionDefinitions::GetAccountPlayer ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -11865,7 +11758,7 @@ int CLuaFunctionDefinitions::IsGuestAccount ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -11891,7 +11784,7 @@ int CLuaFunctionDefinitions::GetAccountData ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -11911,7 +11804,7 @@ int CLuaFunctionDefinitions::GetAllAccountData ( lua_State* luaVM )
         return 1;
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -11937,7 +11830,7 @@ int CLuaFunctionDefinitions::GetAccount ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -11979,7 +11872,7 @@ int CLuaFunctionDefinitions::AddAccount ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -12004,10 +11897,10 @@ int CLuaFunctionDefinitions::RemoveAccount ( lua_State* luaVM )
 
         CClient* pClient = pAccount->GetClient ();
         if ( pClient )
-            m_pScriptDebugging->LogCustom ( luaVM, SString ( "Problem @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), "Unable to remove account as unable to log out client. (Maybe onPlayerLogout is cancelled)" ) );
+            argStream.SetCustomError( "Unable to remove account as unable to log out client. (Maybe onPlayerLogout is cancelled)" );
     }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+    if ( argStream.HasErrors () )
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -12032,7 +11925,7 @@ int CLuaFunctionDefinitions::SetAccountPassword ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -12058,7 +11951,7 @@ int CLuaFunctionDefinitions::SetAccountData ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -12083,7 +11976,7 @@ int CLuaFunctionDefinitions::CopyAccountData ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -12111,7 +12004,7 @@ int CLuaFunctionDefinitions::LogIn ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -12138,7 +12031,7 @@ int CLuaFunctionDefinitions::LogOut ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -12163,7 +12056,7 @@ int CLuaFunctionDefinitions::CancelEvent ( lua_State* luaVM )
         return 1;
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -12885,6 +12778,27 @@ int CLuaFunctionDefinitions::Md5 ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaFunctionDefinitions::Sha256 ( lua_State* luaVM )
+{
+//  string sha256 ( string str )
+    SString strSourceData;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadString ( strSourceData );
+
+    if ( !argStream.HasErrors () )
+    {
+        SString strResult = GenerateSha256HexString ( strSourceData );
+        lua_pushstring ( luaVM, strResult );
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
 int CLuaFunctionDefinitions::GetNetworkUsageData ( lua_State* luaVM )
 {
     SPacketStat m_PacketStats [ 2 ] [ 256 ];
@@ -13010,7 +12924,7 @@ int CLuaFunctionDefinitions::GetNetworkStats ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;

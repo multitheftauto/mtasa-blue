@@ -290,6 +290,7 @@
     <ClCompile Include="CMaterialLine3DBatcher.cpp" />
     <ClCompile Include="CMemStats.cpp" />
     <ClCompile Include="CMessageLoopHook.cpp" />
+    <ClCompile Include="CModelCacheManager.cpp" />
     <ClCompile Include="CModManager.cpp" />
     <ClCompile Include="CModuleLoader.cpp" />
     <ClCompile Include="CMouseControl.cpp" />
@@ -404,6 +405,7 @@
     <ClInclude Include="CMemStats.h" />
     <ClInclude Include="CMessageBox.h" />
     <ClInclude Include="CMessageLoopHook.h" />
+    <ClInclude Include="CModelCacheManager.h" />
     <ClInclude Include="CModManager.h" />
     <ClInclude Include="CModuleLoader.h" />
     <ClInclude Include="CMouseControl.h" />

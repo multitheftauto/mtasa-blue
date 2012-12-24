@@ -50,159 +50,6 @@ static void EndConsoleOutputCapture ( CClient* pClient, const SString& strIfNoOu
     }
 }
 
-
-bool CConsoleCommands::Update ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
-{
-    // To work on remote clients, 'update' needs ACL entry
-    if ( pClient->GetClientType () != CClient::CLIENT_CONSOLE )
-        return false;
-
-    COPY_CSTR_TO_TEMP_BUFFER( szBuffer, szArguments, 256 );
-
-    char* szResourceName = strtok ( szBuffer, " " );
-    char* szVersion = strtok ( NULL, "\0" );
-
-    if ( szResourceName == NULL && szVersion == NULL )
-    {
-        std::list<CUpdateResource*> resourcelist;
-        g_pGame->GetResourceDownloader()->GetAvailableResources ( &resourcelist );
-        list < CUpdateResource* > ::iterator iter = resourcelist.begin ();
-        for ( ; iter != resourcelist.end (); iter++ )
-        {
-            list<CUpdateResourceVersion*> resourcelist;
-            g_pGame->GetResourceDownloader()->FindUpdates ( szResourceName, 0, 0, 0, 0, &resourcelist );
-            char szText[512];
-            if ( resourcelist.size() == 1 )
-                snprintf ( szText, 511, "    %s (1 version)", (*iter)->GetName().c_str () );
-            else
-                snprintf ( szText, 511, "    %s (%d versions)", (*iter)->GetName().c_str (), resourcelist.size() );
-            szText[511] = '\0';
-            pEchoClient->SendConsole ( szText );
-        }
-    }
-    else if ( szResourceName != NULL && szVersion == NULL )
-    {
-        CResource * existingResource = g_pGame->GetResourceManager()->GetResource ( szResourceName );
-        unsigned int currentVersionMajor = 0, currentVersionMinor = 0, currentVersionRevision = 0, currentVersionState = 0;
-        if ( existingResource )
-        {
-            currentVersionMajor = existingResource->GetVersionMajor();
-            currentVersionMinor = existingResource->GetVersionMinor();
-            currentVersionRevision = existingResource->GetVersionRevision();
-            currentVersionState = existingResource->GetVersionState();
-        }
-
-        list<CUpdateResourceVersion*> resourcelist;
-        g_pGame->GetResourceDownloader()->FindUpdates ( szResourceName, 0, 0, 0, 0, &resourcelist );
-        if ( resourcelist.size() != 0 )
-        {
-            list < CUpdateResourceVersion* > ::iterator iter = resourcelist.begin ();
-            char szText[512];
-            snprintf ( szText, 511, "Updates for %s", szResourceName );
-            szText[511] = '\0';
-            pEchoClient->SendConsole ( szText );
-            for ( ; iter != resourcelist.end (); iter++ )
-            {
-                char szStateName[10];
-                if ( (*iter)->GetState() == 0 )
-                    strcpy ( szStateName, "alpha" );
-                else if ( (*iter)->GetState() == 1 )
-                    strcpy ( szStateName, "beta" );
-                else
-                    strcpy ( szStateName, "release" );
-                std::string strDomain = (*iter)->GetUpdateResource()->GetUpdateSite()->GetDomain ();
-
-                char szVersion[20];
-                snprintf ( szVersion, 19, "%d.%d.%d", (*iter)->GetMajor(), (*iter)->GetMinor(), (*iter)->GetRevision() );
-
-                char szIsCurrent[2] = " ";
-                if ( existingResource && currentVersionMajor == (*iter)->GetMajor() && currentVersionMinor == (*iter)->GetMinor() &&
-                    currentVersionRevision == (*iter)->GetRevision() && currentVersionState == (*iter)->GetState()  )
-                {
-                    if ( existingResource->GetLastMetaChecksum() == (*iter)->GetChecksum() )
-                        szIsCurrent[0] = '>';
-                    else
-                        szIsCurrent[0] = '?';
-                }
-
-                snprintf ( szText, 511, "%s  %-10.10s  %-10.10s %-30.30s", szIsCurrent, szVersion, szStateName, strDomain.c_str () );
-
-                szText[511] = '\0';
-                pEchoClient->SendConsole ( szText );
-            }
-            snprintf ( szText, 511, "To install, run: update %s X.Y.Z [release state]", szResourceName );
-
-            szText[511] = '\0';
-            pEchoClient->SendConsole ( szText );
-        }
-        else
-        {
-            char szText[512];
-            snprintf ( szText, 511, "No updates available for %s", szResourceName );
-            szText[511] = '\0';
-            pEchoClient->SendConsole ( szText );
-        }
-    }
-    else if ( szResourceName != NULL && szVersion != NULL )
-    {
-        char * szMajorVersion = strtok ( szVersion, "." );
-        char * szMinorVersion = strtok ( NULL, "." );
-        char * szRevisionVersion = strtok ( NULL, " " );
-        char * szVersionState = strtok ( NULL, "\0" );
-
-        if ( szMajorVersion && szMinorVersion && szRevisionVersion )
-        {
-//            _asm int 3
-            unsigned int uiMajorVersion = atoi(szMajorVersion);
-            unsigned int uiMinorVersion = atoi(szMinorVersion);
-            unsigned int uiRevisionVersion = atoi(szRevisionVersion);
-            unsigned int uiVersionState = 2;
-            if ( szVersionState && stricmp ( szVersionState, "alpha" ) == 0 )
-                uiVersionState = 0;
-            else if ( szVersionState && stricmp ( szVersionState, "beta" ) == 0 )
-                uiVersionState = 1;
-
-            CUpdateResourceVersion * update = g_pGame->GetResourceDownloader()->Get ( szResourceName, uiMajorVersion, uiMinorVersion, uiRevisionVersion, uiVersionState );
-            if ( update )
-            {
-                CResource * resource = g_pGame->GetResourceManager()->GetResource ( szResourceName );
-                if ( resource )
-                    g_pGame->GetResourceManager()->Unload ( resource );
-
-                if ( update->Download ( true ) )
-                {
-                    char szText[512];
-                    snprintf ( szText, 511, "Downloading resource '%s'", szResourceName );
-                    szText[511] = '\0';
-                    pEchoClient->SendConsole ( szText );
-                }
-                else
-                {
-                    char szText[512];
-                    snprintf ( szText, 511, "Download of resource '%s' is already in progress", szResourceName );
-                    szText[511] = '\0';
-                    pEchoClient->SendConsole ( szText );
-                }
-            }
-            else
-            {
-                char szText[512];
-                snprintf ( szText, 511, "Could not find update site for requested version of '%s'", szResourceName );
-                szText[511] = '\0';
-                pEchoClient->SendConsole ( szText );
-            }
-        }
-        else
-        {
-            char szText[512];
-            snprintf ( szText, 511, "Syntax: update <resource> <major version>.<minor version>.<revision version> [state]" );
-            szText[511] = '\0';
-            pEchoClient->SendConsole ( szText );
-        }
-    }
-    return true;
-}
-
 bool CConsoleCommands::StartResource ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
 {
     SString strResponse;
@@ -433,19 +280,66 @@ bool CConsoleCommands::UpgradeResources ( CConsole* pConsole, const char* szArgu
     // To work on remote clients, 'upgrade' needs ACL entry + console capture
     if ( pClient->GetClientType () != CClient::CLIENT_CONSOLE )
         return false;
-    g_pGame->GetResourceManager ()->UpgradeAll ();
-    pEchoClient->SendEcho ( "Upgrade completed. Refreshing all resources..." );
-    g_pGame->GetResourceManager ()->Refresh ( true );
+
+    if ( szArguments && szArguments[0] )
+    {
+        if ( SStringX ( "all" ) == szArguments )
+        {
+            pEchoClient->SendConsole ( "Upgrading all resources..." );
+            g_pGame->GetResourceManager ()->UpgradeResources ();
+            pEchoClient->SendEcho ( "Upgrade completed. Refreshing all resources..." );
+            g_pGame->GetResourceManager ()->Refresh ( true );
+        }
+        else
+        {
+            CResource * resource = g_pGame->GetResourceManager()->GetResource ( szArguments );
+            if ( resource )
+            {
+                g_pGame->GetResourceManager ()->UpgradeResources ( resource );
+                g_pGame->GetResourceManager ()->Refresh ( true, resource->GetName () );
+                pEchoClient->SendEcho ( "Upgrade completed." );
+            }
+            else
+                pEchoClient->SendConsole ( SString ( "upgrade: Resource '%s' could not be found", szArguments ) );
+        }
+    }
+    else
+    {
+        pEchoClient->SendConsole ( "* Syntax: upgrade <resource-name> | all" );
+    }
     return true;
 }
 
-bool CConsoleCommands::CheckAllResources ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
+bool CConsoleCommands::CheckResources ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
 {
-    // To work on remote clients, 'checkall' needs ACL entry + console capture
+    // To work on remote clients, 'check' needs ACL entry + console capture
     if ( pClient->GetClientType () != CClient::CLIENT_CONSOLE )
         return false;
-    g_pGame->GetResourceManager ()->CheckAll ();
-    pEchoClient->SendEcho ( "Check completed" );
+
+    if ( szArguments && szArguments[0] )
+    {
+        if ( SStringX ( "all" ) == szArguments )
+        {
+            pEchoClient->SendConsole ( "Checking all resources..." );
+            g_pGame->GetResourceManager ()->CheckResources ();
+            pEchoClient->SendEcho ( "Check completed" );
+        }
+        else
+        {
+            CResource * resource = g_pGame->GetResourceManager()->GetResource ( szArguments );
+            if ( resource )
+            {
+                g_pGame->GetResourceManager ()->CheckResources ( resource );
+                pEchoClient->SendEcho ( "Check completed" );
+            }
+            else
+                pEchoClient->SendConsole ( SString ( "check: Resource '%s' could not be found", szArguments ) );
+        }
+    }
+    else
+    {
+        pEchoClient->SendConsole ( "* Syntax: check <resource-name> | all" );
+    }
     return true;
 }
 
@@ -1228,34 +1122,16 @@ bool CConsoleCommands::ChgMyPass ( CConsole* pConsole, const char* szArguments, 
                 CAccount* pAccount = pClient->GetAccount ();
                 if ( pAccount )
                 {
-                    CMD5Hasher Hasher;
-                    MD5 oldPasswordHash;
-                    char szOldPasswordHash[128];
-                    Hasher.Calculate ( szOldPassword, strlen ( szOldPassword ), oldPasswordHash );
-                    Hasher.ConvertToHex ( oldPasswordHash, szOldPasswordHash );
-                    // Compare the hash of the given oldPassword to the current password hash
-                    if ( stricmp ( pAccount->GetPassword ().c_str (), szOldPasswordHash ) == 0 )
+                    // Check old password is correct
+                    if ( pAccount->IsPassword( szOldPassword ) )
                     {
-                        // Old and new password are equal?
-                        if ( strcmp ( szOldPassword, szNewPassword ) != 0 )
-                        {
-                            MD5 newPasswordHash;
-                            char szNewPasswordHash[128];
-                            Hasher.Calculate ( szNewPassword, strlen ( szNewPassword ), newPasswordHash );
-                            Hasher.ConvertToHex ( newPasswordHash, szNewPasswordHash );
-                            
-                            // Set the new password
-                            pAccount->SetPassword ( szNewPassword );
+                        // Set the new password
+                        pAccount->SetPassword( szNewPassword );
 
-                            // Tell the client
-                            pEchoClient->SendEcho ( SString ( "chgmypass: Your password was changed to '%s'", szNewPassword ) );
-                            CLogger::LogPrintf ( "ACCOUNTS: %s changed their account password", GetAdminNameForLog ( pClient ).c_str () );
-                            return true;
-                        }
-                        else
-                        {
-                            pEchoClient->SendEcho ( "chgmypass: Your password is already that" );
-                        }
+                        // Tell the client
+                        pEchoClient->SendEcho ( SString ( "chgmypass: Your password was changed to '%s'", szNewPassword ) );
+                        CLogger::LogPrintf ( "ACCOUNTS: %s changed their account password", GetAdminNameForLog ( pClient ).c_str () );
+                        return true;
                     }
                     else
                     {
@@ -1608,7 +1484,10 @@ bool CConsoleCommands::WhoWas ( CConsole* pConsole, const char* szArguments, CCl
                         LongToDottedIP ( iter->ulIP, szIP );
 
                         // Populate a line about him
-                        pClient->SendEcho ( SString ( "%s  -  IP:%s  serial:%s  version:%s", *iter->strNick, szIP, iter->strSerial.c_str (), iter->strPlayerVersion.c_str () ) );
+                        SString strName = iter->strNick;
+                        if ( iter->strAccountName != GUEST_ACCOUNT_NAME )
+                            strName += SString ( " (%s)", *iter->strAccountName );
+                        pClient->SendEcho ( SString ( "%s  -  IP:%s  serial:%s  version:%s", *strName, szIP, iter->strSerial.c_str (), iter->strPlayerVersion.c_str () ) );
                     }
                     else
                     {

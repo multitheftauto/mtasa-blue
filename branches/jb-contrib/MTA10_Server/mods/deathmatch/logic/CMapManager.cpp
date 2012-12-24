@@ -17,8 +17,6 @@
 
 extern CGame* g_pGame;
 
-#define RUN_CHILDREN list<CElement*>::const_iterator iter=pElement->IterBegin();for(;iter!=pElement->IterEnd();iter++)
-
 CMapManager::CMapManager ( CBlipManager* pBlipManager,
                            CObjectManager* pObjectManager,
                            CPickupManager* pPickupManager, 
@@ -382,27 +380,26 @@ void CMapManager::SendPerPlayerEntities ( CPlayer& Player )
 }
 
 
-void CMapManager::BroadcastElements ( CElement* pElement )
-{
-    BroadcastElements ( pElement, false );
-}
-
-
-void CMapManager::BroadcastElements ( CElement* pElement, bool bBroadcastAll )
+void CMapManager::BroadcastResourceElements ( CElement* pResourceElement, CElementGroup* pElementGroup )
 {
     CEntityAddPacket Packet;
-    Packet.Add ( pElement );
+    Packet.Add ( pResourceElement );
 
-    //a list of per player elements we will process the last
-    list < CPerPlayerEntity* > pPerPlayerList;
+    std::set < CElement* > doneElements;                // Lookup map of elements already processed
+    std::vector < CPerPlayerEntity* > pPerPlayerList;   // A list of per player elements we will process the last
 
-    if ( pElement->CountChildren() > 0 )
-        BroadcastElementChildren ( pElement, Packet, pPerPlayerList, bBroadcastAll );
+    if ( pResourceElement->CountChildren() > 0 )
+        BroadcastElementChildren ( pResourceElement, Packet, pPerPlayerList, doneElements );
+
+    // Also send elements that are in the element group but have not been processed yet (i.e. are not parented by the resource)
+    for ( CFastList < CElement* > ::const_iterator iter = pElementGroup->IterBegin() ; iter != pElementGroup->IterEnd() ; iter++ )
+        if ( !MapContains( doneElements, *iter ) )
+            BroadcastElement( *iter, Packet, pPerPlayerList );
 
     //send to all players
     g_pGame->GetPlayerManager()->BroadcastOnlyJoined ( Packet );
 
-    list < CPerPlayerEntity* > ::const_iterator iter = pPerPlayerList.begin();
+    std::vector < CPerPlayerEntity* > ::const_iterator iter = pPerPlayerList.begin();
     for ( ; iter != pPerPlayerList.end(); iter++ )
     {
         (*iter)->Sync ( true );
@@ -410,27 +407,40 @@ void CMapManager::BroadcastElements ( CElement* pElement, bool bBroadcastAll )
 }
 
 
-void CMapManager::BroadcastElementChildren ( CElement* pElement, CEntityAddPacket &Packet, list < CPerPlayerEntity* > &pPerPlayerList, bool bBroadcastAll )
+void CMapManager::BroadcastElementChildren ( CElement* pParentElement, CEntityAddPacket &Packet, std::vector < CPerPlayerEntity* > &pPerPlayerList, std::set < CElement* >& outDoneElements )
 {
-    CElement * pTemp;
-    CChildListType ::const_iterator iter = pElement->IterBegin ();
-    for ( ; iter != pElement->IterEnd(); iter++ )
+    CChildListType ::const_iterator iter = pParentElement->IterBegin ();
+    for ( ; iter != pParentElement->IterEnd(); iter++ )
     {
-        pTemp = *iter;
-        // Is this a map created entity or our resource's root element
-        if ( bBroadcastAll || ( pTemp->IsMapCreated () || ( pTemp->GetType () == CElement::DUMMY && !strcmp ( pTemp->GetTypeName ().c_str (), "map" ) ) ) )
+        CElement* pChildElement = *iter;
+        MapInsert( outDoneElements, pChildElement );
+
+        // Is it a per-player entity
+        if ( pChildElement->IsPerPlayerEntity () )
         {
-            // Is it a per-player entity
-            if ( pTemp->IsPerPlayerEntity () )
-            {
-                pPerPlayerList.push_back ( static_cast < CPerPlayerEntity* > ( pTemp ) );
-            }
-            else
-            {
-                Packet.Add ( pTemp );
-            }
+            pPerPlayerList.push_back ( static_cast < CPerPlayerEntity* > ( pChildElement ) );
         }
-        if ( pTemp->CountChildren() > 0 ) BroadcastElementChildren ( pTemp, Packet, pPerPlayerList, bBroadcastAll );
+        else
+        {
+            Packet.Add ( pChildElement );
+        }
+
+        if ( pChildElement->CountChildren() > 0 )
+            BroadcastElementChildren ( pChildElement, Packet, pPerPlayerList, outDoneElements );
+    }
+}
+
+
+void CMapManager::BroadcastElement ( CElement* pElement, CEntityAddPacket &Packet, std::vector < CPerPlayerEntity* > &pPerPlayerList )
+{
+    // Is it a per-player entity
+    if ( pElement->IsPerPlayerEntity () )
+    {
+        pPerPlayerList.push_back ( static_cast < CPerPlayerEntity* > ( pElement ) );
+    }
+    else
+    {
+        Packet.Add ( pElement );
     }
 }
 
@@ -800,56 +810,64 @@ void CMapManager::DoVehicleRespawning ( void )
     // TODO: needs speeding up (no good looping through thousands of vehicles each frame)
 
     CVehicleSpawnPacket VehicleSpawnPacket;
-    CVehicle* pVehicle = NULL;
 
-    // Grab the current time
-    unsigned long ulTime = GetTime ();
-
-    bool bRespawn, bExploded;
-    unsigned long ulBlowTime, ulIdleTime;
     // Loop through all the vehicles
     list < CVehicle* > ::const_iterator iter = m_pVehicleManager->IterBegin ();
     for ( ; iter != m_pVehicleManager->IterEnd (); iter++ )
     {
-        pVehicle = *iter;
-        bRespawn = false, bExploded = false;
+        CVehicle* pVehicle = *iter;
 
         // It's been set to respawn
         if ( pVehicle->GetRespawnEnabled () )
         {
             // Did we get deserted?
             bool bDeserted = ( !pVehicle->GetFirstOccupant () );
+            bool bRespawn = false;
+            bool bExploded = false;
 
-            // Grab when it blew and when it was last not touched
-            ulBlowTime = pVehicle->GetBlowTime ();
-            ulIdleTime = pVehicle->GetIdleTime ();
+            if ( bDeserted )
+            {
+                // If moved, or idle timer not running, restart idle timer
+                if ( !pVehicle->IsStationary () || !pVehicle->IsIdleTimerRunning () )
+                    pVehicle->RestartIdleTimer ();
+            }
+            else
+            {
+                // Stop idle timer if car is occupied
+                pVehicle->StopIdleTimer ();
+            }
+
 
             // Been blown long enough?
-            if ( ulBlowTime != 0 && ulTime >= ( ulBlowTime + pVehicle->GetRespawnTime () ) )
+            if ( pVehicle->IsBlowTimerFinished () )
             {
                 bRespawn = true;
                 bExploded = true;
             }
 
             // Been deserted long enough?
-            else if ( bDeserted && ulIdleTime != 0 &&
-                      ulTime >= ( ulIdleTime + pVehicle->GetIdleRespawnTime () ) )
+            else if ( bDeserted && pVehicle->IsIdleTimerFinished () )
             {
-                bRespawn = true;
+                // Check is far enough away from respawn point (Ignore first 20 units on z)
+                CVector vecDif = pVehicle->GetRespawnPosition () - pVehicle->GetPosition ();
+                vecDif.fZ = Max ( 0.f, fabsf ( vecDif.fZ ) - 20.f );
+                if ( vecDif.LengthSquared () > 2 * 2 )
+                    bRespawn = true;
+                pVehicle->StopIdleTimer ();
             }
-        }
 
-        // Need to respawn?
-        if ( bRespawn )
-        {
-            // Respawn it and add it to the packet
-            pVehicle->Respawn ();
-            VehicleSpawnPacket.Add ( pVehicle );
-
-            // Call the respawn event
-            CLuaArguments Arguments;
-            Arguments.PushBoolean ( bExploded );
-            pVehicle->CallEvent ( "onVehicleRespawn", Arguments );
+            // Need to respawn?
+            if ( bRespawn )
+            {
+                // Respawn it and add it to the packet
+                pVehicle->Respawn ();
+                VehicleSpawnPacket.Add ( pVehicle );
+    
+                // Call the respawn event
+                CLuaArguments Arguments;
+                Arguments.PushBoolean ( bExploded );
+                pVehicle->CallEvent ( "onVehicleRespawn", Arguments );
+            }
         }
     }
 
@@ -896,18 +914,21 @@ bool CMapManager::HandleNode ( CResource& Loader, CXMLNode& Node, CElement* pPar
     // Grab the name
     std::string strBuffer = Node.GetTagName ();
 
+    EElementType elementType;
+    StringToEnum ( strBuffer, elementType );
+
     // Handle it based on the tag name
     CElement* pNode = NULL;
-    if ( strBuffer.compare ( "vehicle" ) == 0 )
+    if ( elementType == CElement::VEHICLE )
     {
         pNode = m_pVehicleManager->CreateFromXML ( pParent, Node, Loader.GetVirtualMachine (), m_pEvents );
     }
-    else if ( strBuffer.compare ( "object" ) == 0 )
+    else if ( elementType == CElement::OBJECT )
     {
         bool bIsLowLod = false;
         pNode = m_pObjectManager->CreateFromXML ( pParent, Node, Loader.GetVirtualMachine (), m_pEvents, bIsLowLod );
     }
-    else if ( strBuffer.compare ( "blip" ) == 0 )
+    else if ( elementType == CElement::BLIP )
     {
         CBlip* pBlip = m_pBlipManager->CreateFromXML ( pParent, Node, Loader.GetVirtualMachine (), m_pEvents );
         pNode = pBlip;
@@ -916,11 +937,11 @@ bool CMapManager::HandleNode ( CResource& Loader, CXMLNode& Node, CElement* pPar
             pBlip->SetIsSynced ( bIsDuringStart );
         }*/
     }
-    else if ( strBuffer.compare ( "pickup" ) == 0 )
+    else if ( elementType == CElement::PICKUP )
     {
         pNode = m_pPickupManager->CreateFromXML ( pParent, Node, Loader.GetVirtualMachine (), m_pEvents );
     }
-    else if ( strBuffer.compare ( "marker" ) == 0 )
+    else if ( elementType == CElement::MARKER )
     {
         CMarker* pMarker = m_pMarkerManager->CreateFromXML ( pParent, Node, Loader.GetVirtualMachine (), m_pEvents );
         pNode = pMarker;
@@ -929,7 +950,7 @@ bool CMapManager::HandleNode ( CResource& Loader, CXMLNode& Node, CElement* pPar
             pMarker->SetIsSynced ( bIsDuringStart );
         }
     }
-    else if ( strBuffer.compare ( "radararea" ) == 0 )
+    else if ( elementType == CElement::RADAR_AREA )
     {
         CRadarArea* pRadarArea = m_pRadarAreaManager->CreateFromXML ( pParent, Node, Loader.GetVirtualMachine (), m_pEvents );
         pNode = pRadarArea;
@@ -938,15 +959,15 @@ bool CMapManager::HandleNode ( CResource& Loader, CXMLNode& Node, CElement* pPar
             pRadarArea->SetIsSynced ( bIsDuringStart );
         }
     }
-    else if ( strBuffer.compare ( "team" ) == 0 )
+    else if ( elementType == CElement::TEAM )
     {
         pNode = m_pTeamManager->CreateFromXML ( pParent, Node, Loader.GetVirtualMachine (), m_pEvents );
     }
-    else if ( strBuffer.compare ( "ped" ) == 0 )
+    else if ( elementType == CElement::PED )
     {
         pNode = m_pPedManager->CreateFromXML ( pParent, Node, Loader.GetVirtualMachine (), m_pEvents );
     }
-    else if ( strBuffer.compare ( "water" ) == 0 )
+    else if ( elementType == CElement::WATER )
     {
         pNode = m_pWaterManager->CreateFromXML ( pParent, Node, Loader.GetVirtualMachine (), m_pEvents );
     }

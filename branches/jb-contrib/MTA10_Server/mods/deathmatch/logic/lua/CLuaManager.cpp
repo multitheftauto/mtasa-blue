@@ -112,7 +112,7 @@ bool CLuaManager::RemoveVirtualMachine ( CLuaMain * vm )
         }
 
         // Remove it from our list
-        if ( !m_virtualMachines.empty() ) m_virtualMachines.remove ( vm );
+        m_virtualMachines.remove ( vm );
 
         return true;
     }
@@ -263,6 +263,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "takePlayerMoney", CLuaFunctionDefinitions::TakePlayerMoney );
     CLuaCFunctions::AddFunction ( "spawnPlayer", CLuaFunctionDefinitions::SpawnPlayer );
     CLuaCFunctions::AddFunction ( "showPlayerHudComponent", CLuaFunctionDefinitions::ShowPlayerHudComponent );
+    CLuaCFunctions::AddFunction ( "setPlayerHudComponentVisible", CLuaFunctionDefinitions::ShowPlayerHudComponent );
     CLuaCFunctions::AddFunction ( "setPlayerWantedLevel", CLuaFunctionDefinitions::SetPlayerWantedLevel );
     CLuaCFunctions::AddFunction ( "forcePlayerMap", CLuaFunctionDefinitions::ForcePlayerMap );
     CLuaCFunctions::AddFunction ( "setPlayerNametagText", CLuaFunctionDefinitions::SetPlayerNametagText );
@@ -742,6 +743,7 @@ void CLuaManager::LoadCFunctions ( void )
 
     // Utility
     CLuaCFunctions::AddFunction ( "md5", CLuaFunctionDefinitions::Md5 );
+    CLuaCFunctions::AddFunction ( "sha256", CLuaFunctionDefinitions::Sha256 );
     CLuaCFunctions::AddFunction ( "getVersion", CLuaFunctionDefinitions::GetVersion );
     CLuaCFunctions::AddFunction ( "getNetworkUsageData", CLuaFunctionDefinitions::GetNetworkUsageData );
     CLuaCFunctions::AddFunction ( "getNetworkStats", CLuaFunctionDefinitions::GetNetworkStats );

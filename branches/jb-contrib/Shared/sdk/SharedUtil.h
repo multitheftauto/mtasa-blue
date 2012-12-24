@@ -64,6 +64,7 @@ char (&ArraySizeHelper(T (&array)[N]))[N];
 #include <string>
 #include <stdarg.h>
 #include "SString.h"
+#include "WString.h"
 #include "SharedUtil.Map.h"
 #if defined(SHARED_UTIL_WITH_HASH_MAP) || defined(SHARED_UTIL_WITH_FAST_HASH_MAP)
     #include "SharedUtil.HashMap.h"

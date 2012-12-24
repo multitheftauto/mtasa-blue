@@ -123,6 +123,9 @@ public:
     SStringX ( const char* szText )
         : SString ( std::string ( szText ? szText : "" ) )
     { }
+    SStringX ( const char* szText, uint uiLength )
+        : SString ( std::string ( szText ? szText : "", uiLength ) )
+    { }
 };
 
 

@@ -57,7 +57,11 @@ CElement* CElementIDs::GetElement ( ElementID ID )
 {
     // Return the element with the given ID
     if ( ID != INVALID_ELEMENT_ID && ID < MAX_SERVER_ELEMENTS )
-        return m_Elements [ID.Value()];
+    {
+        CElement* pElement = m_Elements [ID.Value()];
+        if ( pElement && !pElement->IsBeingDeleted () )
+            return pElement;
+    }
 
     return NULL;
 }

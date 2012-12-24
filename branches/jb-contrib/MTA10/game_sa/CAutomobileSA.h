@@ -169,7 +169,7 @@ public:
     void                    SetTaxiLight ( bool bState );
     void                    SetTotalDamage ( bool bUnknown );
     CPhysical*              SpawnFlyingComponent ( int iCarNodeIndex, int iUnknown );
-
+	CVector                 GetWheelPosition ( eWheels wheel );
     CDoor                   * GetDoor(eDoors doorID);
 };
 

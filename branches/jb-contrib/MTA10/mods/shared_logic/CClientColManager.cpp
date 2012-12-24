@@ -23,8 +23,9 @@ CClientColManager::~CClientColManager ( void )
 
 void CClientColManager::DoPulse ( void )
 {
-    vector < CClientColShape* > ::const_iterator iter = m_List.begin ();
-    for ( ; iter != m_List.end (); ++iter ) (*iter)->DoPulse ();
+    // Don't use iterators here as the list may get modified
+    for ( uint i = 0 ; i < m_List.size () ; i++ )
+        m_List[i]->DoPulse ();
 }
 
 
@@ -82,7 +83,7 @@ void CClientColManager::DoHitDetectionForColShape ( CClientColShape* pShape )
     }
 
     // Add existing colliders, so they can be disconnected if required
-    for ( list < CClientEntity* > ::const_iterator it = pShape->CollidersBegin () ; it != pShape->CollidersEnd (); ++it )
+    for ( CFastList < CClientEntity* > ::const_iterator it = pShape->CollidersBegin () ; it != pShape->CollidersEnd (); ++it )
     {
        entityList[ *it ] = 1;
     }

@@ -89,7 +89,7 @@ void CInstallManager::InitSequencer ( void )
 {
     #define CR "\n"
     SString strSource =
-                CR "initial: "
+                CR "initial: "                                      // *** Starts here  by default
                 CR "            CALL CheckOnRestartCommand "
                 CR "            IF LastResult != ok GOTO update_end: "
                 CR " "                                              ////// Start of 'update game' //////
@@ -130,13 +130,31 @@ void CInstallManager::InitSequencer ( void )
                 CR "            IF LastResult == ok GOTO aero_check: "
                 CR " "
                 CR "aero_end: "                                     ////// End of 'Windows 7 aero desktop fix' //////
+                CR " "        
+                CR "service_check: "                                ////// Start of 'Service checks' //////
+                CR "            CALL ProcessServiceChecks "         // Make changes to comply with service requirements
+                CR "            IF LastResult == ok GOTO service_end: "
+                CR " "
+                CR "            CALL ChangeToAdmin "                // If changes failed, try as admin
+                CR "            IF LastResult == ok GOTO service_check: "
+                CR "            CALL Quit "
+                CR " "
+                CR "service_end: "                                  ////// End of 'Driver checks' //////
                 CR "            CALL ChangeFromAdmin "              
                 CR "            CALL InstallNewsItems "             // Install pending news
                 CR "            GOTO launch: "
                 CR " "
-                CR "crashed: "
+                CR "crashed: "                                      // *** Starts here when restarting after crash
                 CR "            CALL ShowCrashFailDialog "
                 CR "            IF LastResult == ok GOTO initial: "
+                CR "            CALL Quit "
+                CR " "
+                CR "post_install: "                                 // *** Starts here when NSIS installer is nearly complete
+                CR "            CALL HandlePostNsisInstall "
+                CR "            CALL Quit "
+                CR " "
+                CR "pre_uninstall: "                                // *** Starts here when NSIS uninstaller is starting
+                CR "            CALL HandlePreNsisUninstall "
                 CR "            CALL Quit "
                 CR " "
                 CR "launch: ";
@@ -153,9 +171,12 @@ void CInstallManager::InitSequencer ( void )
     m_pSequencer->AddFunction ( "ShowCopyFailDialog",      &CInstallManager::_ShowCopyFailDialog );
     m_pSequencer->AddFunction ( "ProcessLayoutChecks",     &CInstallManager::_ProcessLayoutChecks );
     m_pSequencer->AddFunction ( "ProcessAeroChecks",       &CInstallManager::_ProcessAeroChecks );
+    m_pSequencer->AddFunction ( "ProcessServiceChecks",    &CInstallManager::_ProcessServiceChecks );
     m_pSequencer->AddFunction ( "ChangeFromAdmin",         &CInstallManager::_ChangeFromAdmin );
     m_pSequencer->AddFunction ( "InstallNewsItems",        &CInstallManager::_InstallNewsItems );
     m_pSequencer->AddFunction ( "Quit",                    &CInstallManager::_Quit );
+    m_pSequencer->AddFunction ( "HandlePostNsisInstall",   &CInstallManager::_HandlePostNsisInstall );
+    m_pSequencer->AddFunction ( "HandlePreNsisUninstall",  &CInstallManager::_HandlePreNsisUninstall );
 }
 
 
@@ -291,7 +312,7 @@ SString CInstallManager::_ChangeToAdmin ( void )
 {
     if ( !IsUserAdmin () )
     {
-        MessageBox( NULL, SString ( "MTA:SA needs Administrator access for the following task:\n\n  '%s'\n\nPlease confirm in the next window.", *m_strAdminReason ), "Multi Theft Auto: San Andreas", MB_OK );
+        MessageBox( NULL, SString ( "MTA:SA needs Administrator access for the following task:\n\n  '%s'\n\nPlease confirm in the next window.", *m_strAdminReason ), "Multi Theft Auto: San Andreas", MB_OK | MB_TOPMOST  );
         SetIsBlockingUserProcess ();
         ReleaseSingleInstanceMutex ();
         if ( ShellExecuteBlocking ( "runas", GetLauncherPathFilename (), GetSequencerSnapshot () ) )
@@ -305,7 +326,7 @@ SString CInstallManager::_ChangeToAdmin ( void )
         }
         CreateSingleInstanceMutex ();
         ClearIsBlockingUserProcess ();
-        MessageBox( NULL, SString ( "MTA:SA could not complete the following task:\n\n  '%s'\n", *m_strAdminReason ), "Multi Theft Auto: San Andreas", MB_OK );
+        MessageBox( NULL, SString ( "MTA:SA could not complete the following task:\n\n  '%s'\n", *m_strAdminReason ), "Multi Theft Auto: San Andreas", MB_OK | MB_TOPMOST  );
     }
     return "fail";
 }
@@ -347,8 +368,14 @@ SString CInstallManager::_ShowCrashFailDialog ( void )
     HideSplash ();
 
     SString strMessage = GetApplicationSetting ( "diagnostics", "last-crash-info" );
-    strMessage = strMessage.Replace ( "\r", "" ).Replace ( "\n", "\r\n" );
+    SString strReason = GetApplicationSetting ( "diagnostics", "last-crash-reason" );
+    SetApplicationSetting ( "diagnostics", "last-crash-reason", "" );
+    if ( strReason == "direct3ddevice-reset" )
+    {
+        strMessage += "** The crash was caused by a graphics driver error **\n\n** Please update your graphics drivers **";
+    }
 
+    strMessage = strMessage.Replace ( "\r", "" ).Replace ( "\n", "\r\n" );
     SString strResult = ShowCrashedDialog ( g_hInstance, strMessage );
     HideCrashedDialog ();
 
@@ -443,6 +470,7 @@ SString CInstallManager::_SwitchBackFromTempExe ( void )
 SString CInstallManager::_InstallFiles ( void )
 {
     WatchDogReset ();
+
     // Install new files
     if ( !InstallFiles ( m_pSequencer->GetVariable ( SILENT_OPT ) != "no" ) )
     {
@@ -472,7 +500,7 @@ SString CInstallManager::_InstallFiles ( void )
 //////////////////////////////////////////////////////////
 SString CInstallManager::_ShowCopyFailDialog ( void )
 {
-    int iResponse = MessageBox ( NULL, "Could not update due to file conflicts. Please close other applications and retry", "Error", MB_RETRYCANCEL | MB_ICONERROR );
+    int iResponse = MessageBox ( NULL, "Could not update due to file conflicts. Please close other applications and retry", "Error", MB_RETRYCANCEL | MB_ICONERROR | MB_TOPMOST  );
     if ( iResponse == IDRETRY )
         return "retry";
     return "ok";
@@ -481,7 +509,7 @@ SString CInstallManager::_ShowCopyFailDialog ( void )
 
 void ShowLayoutError ( const SString& strExtraInfo )
 {
-    MessageBox ( 0, SString ( "Multi Theft Auto has not been installed properly, please reinstall. %s", *strExtraInfo ), "Error", MB_OK );
+    MessageBox ( 0, SString ( "Multi Theft Auto has not been installed properly, please reinstall. %s", *strExtraInfo ), "Error", MB_OK | MB_TOPMOST  );
     TerminateProcess ( GetCurrentProcess (), 9 );
 }
 
@@ -644,6 +672,26 @@ SString CInstallManager::_ProcessAeroChecks ( void )
 }
 
 
+//////////////////////////////////////////////////////////
+//
+// CInstallManager::_ProcessServiceChecks
+//
+//
+//
+//////////////////////////////////////////////////////////
+SString CInstallManager::_ProcessServiceChecks ( void )
+{
+    if ( !CheckService ( CHECK_SERVICE_PRE_GAME ) )
+    {
+        if ( !IsUserAdmin() )
+        {
+            m_strAdminReason = "Update install settings";
+            return "fail";
+        }
+    }
+    return "ok";
+}
+
 
 //////////////////////////////////////////////////////////
 //
@@ -714,4 +762,35 @@ SString CInstallManager::_Quit ( void )
 {
     ExitProcess ( 0 );
     //return "ok";
+}
+
+
+//////////////////////////////////////////////////////////
+//
+// CInstallManager::_HandlePostNsisInstall
+//
+//
+//
+//////////////////////////////////////////////////////////
+SString CInstallManager::_HandlePostNsisInstall ( void )
+{
+    if ( !CheckService ( CHECK_SERVICE_POST_INSTALL ) )
+        return "fail";
+    return "ok";
+}
+
+
+//////////////////////////////////////////////////////////
+//
+// CInstallManager::_HandlePreNsisUninstall
+//
+//
+//
+//////////////////////////////////////////////////////////
+SString CInstallManager::_HandlePreNsisUninstall ( void )
+{
+    // stop & delete service
+    if ( !CheckService ( CHECK_SERVICE_PRE_UNINSTALL ) )
+        return "fail";
+    return "ok";
 }

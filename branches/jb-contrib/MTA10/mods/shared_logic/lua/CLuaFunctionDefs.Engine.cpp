@@ -322,6 +322,34 @@ int CLuaFunctionDefs::EngineRestoreModel ( lua_State* luaVM )
 }
 
 
+int CLuaFunctionDefs::EngineGetModelLODDistance ( lua_State* luaVM )
+{
+// float engineGetModelLODDistance ( int/string modelID )
+    SString strModelId;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadString ( strModelId );
+
+    if ( !argStream.HasErrors () )
+    {
+        ushort usModelID = CModelNames::ResolveModelID ( strModelId );
+        CModelInfo* pModelInfo = g_pGame->GetModelInfo ( usModelID );
+        if ( pModelInfo )
+        {
+            float fDistance = pModelInfo->GetLODDistance ();
+            lua_pushnumber ( luaVM, fDistance );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    // Failed
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
 int CLuaFunctionDefs::EngineSetModelLODDistance ( lua_State* luaVM )
 {
     int iArgument1 = lua_type ( luaVM, 1 );
@@ -501,7 +529,7 @@ int CLuaFunctionDefs::EngineApplyShaderToWorldTexture ( lua_State* luaVM )
         return 1;
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     // We failed
     lua_pushboolean ( luaVM, false );
@@ -526,7 +554,7 @@ int CLuaFunctionDefs::EngineRemoveShaderFromWorldTexture ( lua_State* luaVM )
         return 1;
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     // We failed
     lua_pushboolean ( luaVM, false );
@@ -550,10 +578,10 @@ int CLuaFunctionDefs::EngineGetModelNameFromID ( lua_State* luaVM )
             lua_pushstring ( luaVM, strModelName );
             return 1;
         }
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), "Expected valid model ID at argument 1" ) );
+        argStream.SetCustomError( "Expected valid model ID at argument 1" );
     }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+    if ( argStream.HasErrors () )
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     // We failed
     lua_pushboolean ( luaVM, false );
@@ -577,10 +605,10 @@ int CLuaFunctionDefs::EngineGetModelIDFromName ( lua_State* luaVM )
             lua_pushnumber ( luaVM, iModelID );
             return 1;
         }
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), "Expected valid model name at argument 1" ) );
+        argStream.SetCustomError( "Expected valid model name at argument 1" );
     }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+    if ( argStream.HasErrors () )
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     // We failed
     lua_pushboolean ( luaVM, false );
@@ -613,10 +641,10 @@ int CLuaFunctionDefs::EngineGetModelTextureNames ( lua_State* luaVM )
             }
             return 1;
         }
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), "Expected valid model ID or name at argument 1" ) );
+        argStream.SetCustomError( "Expected valid model ID or name at argument 1" );
     }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+    if ( argStream.HasErrors () )
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     // We failed
     lua_pushboolean ( luaVM, false );
@@ -650,10 +678,10 @@ int CLuaFunctionDefs::EngineGetVisibleTextureNames ( lua_State* luaVM )
             }
             return 1;
         }
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), "Expected valid model ID or name at argument 1" ) );
+        argStream.SetCustomError( "Expected valid model ID or name at argument 1" );
     }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+    if ( argStream.HasErrors () )
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     // We failed
     lua_pushboolean ( luaVM, false );

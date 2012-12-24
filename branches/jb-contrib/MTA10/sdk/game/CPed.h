@@ -170,6 +170,8 @@ public:
     virtual void            SetHealth ( float fHealth )=0;
     virtual float           GetArmor () = 0;
     virtual void            SetArmor ( float fArmor ) = 0;
+    virtual float           GetOxygenLevel () = 0;
+    virtual void            SetOxygenLevel ( float fOxygen ) = 0;
     virtual bool            AddProjectile ( eWeaponType eWeapon, CVector vecOrigin, float fForce, CVector * target, CEntity * targetEntity )=0;
     virtual CWeapon *       GiveWeapon ( eWeaponType weaponType, unsigned int uiAmmo, eWeaponSkill weaponSkill )=0;
     virtual CWeapon *       GetWeapon ( eWeaponSlot weaponSlot )=0;
@@ -247,8 +249,6 @@ public:
     virtual float           GetCurrentWeaponRange   ( void ) = 0;
 
     virtual void            AddWeaponAudioEvent     ( EPedWeaponAudioEventType audioEventType ) = 0;
-    virtual float           GetOxygenLevel          ( void ) = 0;
-    virtual void            SetOxygenLevel      ( float fOxygenLevel ) = 0;
 };
 
 #endif

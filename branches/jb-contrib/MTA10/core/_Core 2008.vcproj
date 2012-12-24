@@ -517,6 +517,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CModelCacheManager.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\CModManager.cpp"
 				>
 			</File>
@@ -975,6 +979,10 @@
 			</File>
 			<File
 				RelativePath=".\CMessageLoopHook.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CModelCacheManager.h"
 				>
 			</File>
 			<File
@@ -1817,6 +1825,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\Shared\sdk\SharedUtil.FastHashSet.h"
+					>
+				</File>
+				<File
 					RelativePath="..\..\Shared\sdk\SharedUtil.File.h"
 					>
 				</File>
@@ -1922,6 +1934,14 @@
 				</File>
 				<File
 					RelativePath="..\..\Shared\sdk\UTF8.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Shared\sdk\WString.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Shared\sdk\WString.hpp"
 					>
 				</File>
 			</Filter>

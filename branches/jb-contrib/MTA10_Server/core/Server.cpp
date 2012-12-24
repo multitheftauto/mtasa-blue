@@ -15,6 +15,7 @@
 #define ALLOC_STATS_MODULE_NAME "core"
 #define ALLOC_STATS_PRE_COUNT 0     // Increase if crashing at startup
 #include "SharedUtil.hpp"
+#include "SharedUtil.Tests.hpp"
 
 #if WIN32
     #define MTAEXPORT extern "C" __declspec(dllexport)
@@ -28,6 +29,8 @@ CThreadCommandQueue g_CommandQueue;
 
 MTAEXPORT int Run ( int iArgumentCount, char* szArguments [] )
 {
+    SharedUtil_Tests ();
+
     #ifdef WIN32
         // Disable critical error message boxes
         SetErrorMode ( SEM_FAILCRITICALERRORS );

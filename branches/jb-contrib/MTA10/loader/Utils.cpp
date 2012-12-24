@@ -22,7 +22,6 @@ static bool bOkPressed = false;
 static bool bOtherPressed = false;
 static int iOtherCode = 0;
 static HWND hwndSplash = NULL;
-static unsigned long ulSplashStartTime = 0;
 static HWND hwndProgressDialog = NULL;
 static unsigned long ulProgressStartTime = 0;
 static SString g_strMTASAPath;
@@ -39,11 +38,15 @@ HMODULE RemoteLoadLibrary(HANDLE hProcess, const char* szLibPath)
         return 0;
     }
 
+    // Stop GTA from starting prematurely (Some driver dlls can inadvertently resume the thread before we are ready)
+    InsertWinMainBlock( hProcess );
+    ApplyLoadingCrashPatch( hProcess );
+
     /* Allocate memory in the remote process for the library path */
     HANDLE hThread = 0;
     void* pLibPathRemote = NULL;
     HMODULE hKernel32 = GetModuleHandle( "Kernel32" );
-    pLibPathRemote = VirtualAllocEx( hProcess, NULL, strlen ( szLibPath ) + 1, MEM_COMMIT, PAGE_READWRITE );
+    pLibPathRemote = _VirtualAllocEx( hProcess, NULL, strlen ( szLibPath ) + 1, MEM_COMMIT, PAGE_READWRITE );
     
     if ( pLibPathRemote == NULL )
     {
@@ -55,7 +58,7 @@ HMODULE RemoteLoadLibrary(HANDLE hProcess, const char* szLibPath)
 
         /* Write the DLL library path to the remote allocation */
         DWORD byteswritten = 0;
-        WriteProcessMemory ( hProcess, pLibPathRemote, (void*)szLibPath, strlen ( szLibPath ) + 1, &byteswritten );
+        _WriteProcessMemory ( hProcess, pLibPathRemote, (void*)szLibPath, strlen ( szLibPath ) + 1, &byteswritten );
 
         if ( byteswritten != strlen ( szLibPath ) + 1 )
         {
@@ -66,7 +69,7 @@ HMODULE RemoteLoadLibrary(HANDLE hProcess, const char* szLibPath)
            remotly allocated path buffer as an argument to that thread (and also to LoadLibraryA)
            will make the remote process load the DLL into it's userspace (giving the DLL full
            access to the game executable).*/
-        hThread = CreateRemoteThread(   hProcess,
+        hThread = _CreateRemoteThread(   hProcess,
                                         NULL,
                                         0,
                                         reinterpret_cast < LPTHREAD_START_ROUTINE > ( GetProcAddress ( hKernel32, "LoadLibraryA" ) ),
@@ -81,7 +84,7 @@ HMODULE RemoteLoadLibrary(HANDLE hProcess, const char* szLibPath)
 
 
     } __finally {
-        VirtualFreeEx( hProcess, pLibPathRemote, strlen ( szLibPath ) + 1, MEM_RELEASE );
+        _VirtualFreeEx( hProcess, pLibPathRemote, strlen ( szLibPath ) + 1, MEM_RELEASE );
     }
 
     /*  We wait for the created remote thread to finish executing. When it's done, the DLL
@@ -98,10 +101,121 @@ HMODULE RemoteLoadLibrary(HANDLE hProcess, const char* szLibPath)
 
 
     /* Clean up the resources we used to inject the DLL */
-    VirtualFreeEx (hProcess, pLibPathRemote, strlen ( szLibPath ) + 1, MEM_RELEASE );
+    _VirtualFreeEx (hProcess, pLibPathRemote, strlen ( szLibPath ) + 1, MEM_RELEASE );
+
+    // Allow GTA to continue
+    RemoveWinMainBlock( hProcess );
 
     /* Success */
     return ( HINSTANCE )( 1 );
+}
+
+
+///////////////////////////////////////////////////////////////////////////
+//
+// GetWinMainAddress
+//
+// Return address of GTA WinMain function
+//
+///////////////////////////////////////////////////////////////////////////
+uchar* GetWinMainAddress( HANDLE hProcess )
+{
+    #define WINMAIN_US  0x0748710
+    #define WINMAIN_EU  0x0748760
+
+    ushort buffer[1] = { 0 };
+    _ReadProcessMemory ( hProcess, (void*)(WINMAIN_EU + 0x24), &buffer, sizeof( buffer ), NULL );
+    if ( buffer[0] == 0x0F75 )     // jnz     short loc_748745
+        return (uchar*)WINMAIN_EU;
+    if ( buffer[0] == 0xEF3B )     // cmp     ebp, edi
+        return (uchar*)WINMAIN_US;
+    return NULL;
+}
+
+
+///////////////////////////////////////////////////////////////////////////
+//
+// InsertWinMainBlock
+//
+// Put an infinite loop at WinMain to stop GTA from running before we are ready
+//
+///////////////////////////////////////////////////////////////////////////
+void InsertWinMainBlock( HANDLE hProcess )
+{
+    // Get location of WinMain function
+    uchar* pWinMain = GetWinMainAddress( hProcess );
+    if ( !pWinMain )
+        return;
+
+    DWORD oldProt1;
+    _VirtualProtectEx ( hProcess, pWinMain - 2, 4, PAGE_EXECUTE_READWRITE, &oldProt1 );
+
+    const uchar blockCode[] = { 0xEB, 0xFE, 0xEB, 0xFC };
+    _WriteProcessMemory ( hProcess, pWinMain - 2, blockCode, sizeof( blockCode ), NULL );
+
+    DWORD oldProt2;
+    _VirtualProtectEx ( hProcess, pWinMain - 2, 4, oldProt1, &oldProt2 );
+}
+
+
+///////////////////////////////////////////////////////////////////////////
+//
+// RemoveWinMainBlock
+//
+// Remove infinite loop at WinMain which stopped GTA from running before we were ready
+//
+///////////////////////////////////////////////////////////////////////////
+void RemoveWinMainBlock( HANDLE hProcess )
+{
+    // Get location of WinMain function
+    uchar* pWinMain = GetWinMainAddress( hProcess );
+    if ( !pWinMain )
+        return;
+
+    DWORD oldProt1;
+    _VirtualProtectEx ( hProcess, pWinMain - 2, 4, PAGE_EXECUTE_READWRITE, &oldProt1 );
+
+    // Order is important in case the code is being executed (CPU cache may cause issues?)
+    const uchar unblockCode1[] = { 0x81, 0xEC };
+    _WriteProcessMemory ( hProcess, pWinMain - 0, unblockCode1, sizeof( unblockCode1 ), NULL );
+
+    const uchar unblockCode2[] = { 0x00 };
+    _WriteProcessMemory ( hProcess, pWinMain - 1, unblockCode2, sizeof( unblockCode2 ), NULL );
+
+    Sleep ( 1 );
+
+    const uchar unblockCode3[] = { 0x90, 0x90 };
+    _WriteProcessMemory ( hProcess, pWinMain - 2, unblockCode3, sizeof( unblockCode3 ), NULL );
+
+    DWORD oldProt2;
+    _VirtualProtectEx ( hProcess, pWinMain - 2, 4, oldProt1, &oldProt2 );
+}
+
+
+///////////////////////////////////////////////////////////////////////////
+//
+// ApplyLoadingCrashPatch
+//
+// Modify GTA function IsAppAlreadyRunning() to avoid startup crash
+//
+///////////////////////////////////////////////////////////////////////////
+void ApplyLoadingCrashPatch( HANDLE hProcess )
+{
+    // Get location of code to modify
+    uchar* pAddress = GetWinMainAddress( hProcess );
+    if ( !pAddress )
+        return;
+
+    pAddress -= 0x1E17; // Offset from WinMain function
+
+    DWORD oldProt1;
+    _VirtualProtectEx ( hProcess, pAddress, 1, PAGE_EXECUTE_READWRITE, &oldProt1 );
+
+    const uchar blockCode[] = { 0x37 };
+    _WriteProcessMemory ( hProcess, pAddress, blockCode, sizeof( blockCode ), NULL );
+
+    DWORD oldProt2;
+    _VirtualProtectEx ( hProcess, pAddress, 1, oldProt1, &oldProt2 );
 }
 
 
@@ -500,7 +614,6 @@ void ShowSplash ( HINSTANCE hInstance )
     if ( !hwndSplash )
     {
         hwndSplash = CreateDialog ( hInstance, MAKEINTRESOURCE(IDD_DIALOG1), 0, DialogProc );
-        ulSplashStartTime = GetTickCount32 ();
     }
     SetForegroundWindow ( hwndSplash );
     SetWindowPos ( hwndSplash, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE );
@@ -511,20 +624,12 @@ void ShowSplash ( HINSTANCE hInstance )
 //
 // Hide splash dialog
 //
-void HideSplash ( bool bOnlyDelay  )
+void HideSplash ( void )
 {
     if ( hwndSplash )
     {
-        // Show splash for at least two seconds
-        unsigned long ulTimeElapsed = GetTickCount32 () - ulSplashStartTime;
-        if ( ulTimeElapsed < 2000 )
-            Sleep ( 2000 - ulTimeElapsed );
-
-        if ( !bOnlyDelay )
-        {
-            DestroyWindow ( hwndSplash );
-            hwndSplash = NULL;
-        }
+        DestroyWindow ( hwndSplash );
+        hwndSplash = NULL;
     }
 }
 
@@ -535,10 +640,10 @@ void HideSplash ( bool bOnlyDelay  )
 long DisplayErrorMessageBox ( const SString& strMessage, const SString& strTroubleType )
 {
     HideSplash ();
-    MessageBox( 0, strMessage, "Error! (CTRL+C to copy)", MB_ICONEXCLAMATION|MB_OK );
+    MessageBox( 0, strMessage, "Error! (CTRL+C to copy)", MB_ICONEXCLAMATION|MB_OK | MB_TOPMOST );
 
     if ( strTroubleType != "" )
-        BrowseToSolution ( strTroubleType, true );
+        BrowseToSolution ( strTroubleType, ASK_GO_ONLINE );
     return 1;
 }
 
@@ -1179,7 +1284,64 @@ SString GetRealOSVersion ( void )
     strVersionAndBuild.Split ( ".", parts );
     uint uiMajor = parts.size () > 0 ? atoi ( parts[0] ) : 0;
     uint uiMinor = parts.size () > 1 ? atoi ( parts[1] ) : 0;
+
+    if ( uiMajor == 0 )
+    {
+        VS_FIXEDFILEINFO fileInfo;
+        if ( GetLibVersionInfo ( "ntdll.dll", &fileInfo ) )
+        {
+            uiMajor = HIWORD( fileInfo.dwFileVersionMS );
+            uiMinor = LOWORD( fileInfo.dwFileVersionMS );
+        }
+    }
+
     return SString ( "%u.%u", uiMajor, uiMinor );
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// GetLibVersionInfo
+//
+// Get version info of a file
+//
+///////////////////////////////////////////////////////////////
+bool GetLibVersionInfo( const char *szLibName, VS_FIXEDFILEINFO* pOutFileInfo )
+{
+    DWORD dwHandle, dwLen;
+    dwLen = GetFileVersionInfoSize ( szLibName, &dwHandle );
+    if (!dwLen) 
+        return FALSE;
+
+    LPTSTR lpData = (LPTSTR) malloc (dwLen);
+    if (!lpData) 
+        return FALSE;
+
+    SetLastError ( 0 );
+    if( !GetFileVersionInfo ( szLibName, dwHandle, dwLen, lpData ) )
+    {
+        free (lpData);
+        return FALSE;
+    }
+
+    DWORD dwError = GetLastError ();
+    if ( dwError )
+    {
+        free (lpData);
+        return FALSE;
+    }
+
+    UINT BufLen;
+    VS_FIXEDFILEINFO *pFileInfo;
+    if( VerQueryValueA ( lpData, "\\", (LPVOID *) &pFileInfo, (PUINT)&BufLen ) ) 
+    {
+        *pOutFileInfo = *pFileInfo;
+        free (lpData);
+        return true;
+    }
+
+    free (lpData);
+    return FALSE;
 }
 
 
@@ -1307,7 +1469,7 @@ void FreeLibraryHandle ( void )
 // Make sure "mta-version-ext" is correct. eg "1.0.4-9.01234.2.000"
 //
 /////////////////////////////////////////////////////////////////////
-void UpdateMTAVersionApplicationSetting ( void )
+void UpdateMTAVersionApplicationSetting ( bool bQuiet )
 {
 #ifdef MTA_DEBUG
     SString strFilename = "netc_d.dll";
@@ -1342,13 +1504,15 @@ void UpdateMTAVersionApplicationSetting ( void )
             usNetRel = pfnGetNetRel ();
     }
     else
+    if ( !bQuiet )
     {
         SString strError = GetSystemErrorMessage ( GetLastError () );            
-        MessageBox ( 0, SString ( "Error loading %s module! (%s)", *strFilename.ToLower (), *strError ), "Error", MB_OK|MB_ICONEXCLAMATION );
-        BrowseToSolution ( strFilename + "-not-loadable", true, true );
+        SString strMessage( "Error loading %s module! (%s)", *strFilename.ToLower (), *strError );
+        BrowseToSolution ( strFilename + "-not-loadable", ASK_GO_ONLINE | TERMINATE_PROCESS, strMessage );
     }
 
-    SetApplicationSetting ( "mta-version-ext", SString ( "%d.%d.%d-%d.%05d.%c.%03d"
+    if ( !bQuiet )
+        SetApplicationSetting ( "mta-version-ext", SString ( "%d.%d.%d-%d.%05d.%c.%03d"
                                 ,MTASA_VERSION_MAJOR
                                 ,MTASA_VERSION_MINOR
                                 ,MTASA_VERSION_MAINTENANCE
@@ -1497,6 +1661,35 @@ uint WaitForObject ( HANDLE hProcess, HANDLE hThread, DWORD dwMilliseconds, HAND
     }
 
     return uiResult;
+}
+
+
+///////////////////////////////////////////////////////////////////////////
+//
+// CheckService
+//
+// Check service status
+// Returns false on fail
+//
+///////////////////////////////////////////////////////////////////////////
+bool CheckService ( uint uiStage )
+{
+    HMODULE hModule = GetLibraryHandle ( "kernel32.dll" );
+
+    if ( hModule )
+    {
+        typedef bool (*PFNCheckService) ( uint );
+        PFNCheckService pfnCheckService = static_cast< PFNCheckService > ( static_cast < PVOID > ( GetProcAddress ( hModule, "CheckService" ) ) );
+
+        if ( pfnCheckService )
+        {
+            bool bResult = pfnCheckService ( uiStage );
+            AddReportLog ( 8070, SString ( "CheckService %d result: %d", uiStage, bResult ) );
+            return bResult;
+        }
+    }
+
+    return false;
 }
 
 
@@ -1732,7 +1925,7 @@ void MaybeShowCopySettingsDialog ( void )
     strMessage += "New installation of " + strCurrentVersion + " detected.\n";
     strMessage += "\n";
     strMessage += "Do you want to copy your settings from " + strPreviousVersion + " ?";
-    int iResponse = MessageBox ( NULL, strMessage, "MTA: San Andreas", MB_YESNO | MB_ICONQUESTION );
+    int iResponse = MessageBox ( NULL, strMessage, "MTA: San Andreas", MB_YESNO | MB_ICONQUESTION | MB_TOPMOST );
     if ( iResponse != IDYES )
         return;
 
@@ -1779,8 +1972,23 @@ bool CheckAndShowFileOpenFailureMessage ( void )
     {
         //SetApplicationSetting ( "diagnostics", "gta-fopen-fail", "" );
         SString strMsg ( "GTA:SA had trouble opening the file '%s'\n\nTry reinstalling GTA:SA to fix it", *strFilename );
-        MessageBox ( NULL, strMsg, "MTA: San Andreas", MB_OK | MB_ICONERROR );
+        MessageBox ( NULL, strMsg, "MTA: San Andreas", MB_OK | MB_ICONERROR | MB_TOPMOST );
         return true;
     }
     return false;
+}
+
+
+//////////////////////////////////////////////////////////
+//
+// LoadFunction
+//
+// Load a library function
+//
+//////////////////////////////////////////////////////////
+void* LoadFunction( const char* c, const char* a, const char* b )
+{
+    static HMODULE hModule = LoadLibrary( "kernel32" );
+    SString strFunctionName( "%s%s%s", a, b, c );
+    return static_cast < PVOID >( GetProcAddress( hModule, strFunctionName ) );
 }

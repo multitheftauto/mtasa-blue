@@ -368,7 +368,7 @@ int CLuaWorldDefs::setTrafficLightState ( lua_State* luaVM )
     }
 
     if ( argStream.HasErrors () )
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -1002,14 +1002,16 @@ int CLuaWorldDefs::RemoveWorldModel ( lua_State* luaVM )
 
     unsigned short usModel = 0;
     float fRadius = 0.0f, fX = 0.0f, fY = 0.0f, fZ = 0.0f;
+    char cInterior = -1;
     argStream.ReadNumber ( usModel );
     argStream.ReadNumber ( fRadius );
     argStream.ReadNumber ( fX );
     argStream.ReadNumber ( fY );
     argStream.ReadNumber ( fZ );
+    argStream.ReadNumber ( cInterior, -1 );
     if ( !argStream.HasErrors ( ) )
     {
-        if ( CStaticFunctionDefinitions::RemoveWorldModel ( usModel, fRadius, fX, fY, fZ ) )
+        if ( CStaticFunctionDefinitions::RemoveWorldModel ( usModel, fRadius, fX, fY, fZ, cInterior ) )
         {
             lua_pushboolean ( luaVM, true );
             return 1;
@@ -1025,14 +1027,16 @@ int CLuaWorldDefs::RestoreWorldModel ( lua_State* luaVM )
 
     unsigned short usModel = 0;
     float fRadius = 0.0f, fX = 0.0f, fY = 0.0f, fZ = 0.0f;
+    char cInterior = -1;
     argStream.ReadNumber ( usModel );
     argStream.ReadNumber ( fRadius );
     argStream.ReadNumber ( fX );
     argStream.ReadNumber ( fY );
     argStream.ReadNumber ( fZ );
+    argStream.ReadNumber ( cInterior, -1 );
     if ( !argStream.HasErrors ( ) )
     {
-        if ( CStaticFunctionDefinitions::RestoreWorldModel ( usModel, fRadius, fX, fY, fZ ) )
+        if ( CStaticFunctionDefinitions::RestoreWorldModel ( usModel, fRadius, fX, fY, fZ, cInterior ) )
         {
             lua_pushboolean ( luaVM, true );
             return 1;
@@ -1165,7 +1169,7 @@ int CLuaWorldDefs::setJetpackWeaponEnabled ( lua_State* luaVM )
     eWeaponType weaponType;
     bool bEnabled;
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadEnumString ( weaponType );
+    argStream.ReadEnumStringOrNumber ( weaponType );
     argStream.ReadBool ( bEnabled );
 
     if ( !argStream.HasErrors() )
@@ -1177,7 +1181,7 @@ int CLuaWorldDefs::setJetpackWeaponEnabled ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -1189,7 +1193,7 @@ int CLuaWorldDefs::getJetpackWeaponEnabled ( lua_State* luaVM )
     eWeaponType weaponType;
     bool bEnabled;
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadEnumString ( weaponType );
+    argStream.ReadEnumStringOrNumber ( weaponType );
 
     if ( !argStream.HasErrors() )
     {
@@ -1200,7 +1204,7 @@ int CLuaWorldDefs::getJetpackWeaponEnabled ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -1294,7 +1298,7 @@ int CLuaWorldDefs::setOcclusionsEnabled ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;

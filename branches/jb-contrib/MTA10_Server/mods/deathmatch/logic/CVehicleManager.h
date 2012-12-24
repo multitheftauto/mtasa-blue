@@ -71,7 +71,6 @@ private:
     CVehicleColorManager                m_ColorManager;
 
     list < CVehicle* >                  m_List;
-    bool                                m_bDontRemoveFromList;
 };
 
 #endif

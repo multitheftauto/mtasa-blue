@@ -378,15 +378,16 @@ VOID CModelInfoSA::Request( EModelRequestType requestType, const char* szTag )
         {
             // Try 3 more times, final time without high priority flag
             int iCount = 0;
-            while ( iCount++ < 3 && !IsLoaded() )
+            while ( iCount++ < 10 && !IsLoaded() )
             {
-                bool bOnlyPriorityModels = ( iCount < 3 );
+                bool bOnlyPriorityModels = ( iCount < 3 || iCount & 1 );
                 pGame->GetStreaming()->LoadAllRequestedModels ( bOnlyPriorityModels, szTag );
             }
             if ( !IsLoaded() )
             {
                 AddReportLog ( 6641, SString ( "Blocking load fail: %d (%s)", m_dwModelID, szTag ) );
                 LogEvent ( 641, "Blocking load fail", "", SString ( "%d (%s)", m_dwModelID, szTag ) );
+                dassert ( 0 );
             }
             else
             {
@@ -1139,7 +1140,7 @@ bool OnMY_CFileLoader_LoadCollisionFile_Mid ( int iModelId )
 #define HOOKPOS_CFileLoader_LoadCollisionFile_Mid                         0x5384EE
 #define HOOKSIZE_CFileLoader_LoadCollisionFile_Mid                        6
 DWORD RETURN_CFileLoader_LoadCollisionFile_Mid =                          0x5384F4;
-DWORD RETURN_CFileLoader_LoadCollisionFile_Mid_Quit =                     0x53865D;
+DWORD RETURN_CFileLoader_LoadCollisionFile_Mid_Skip =                     0x53863B;
 void _declspec(naked) HOOK_CFileLoader_LoadCollisionFile_Mid()
 {
     _asm
@@ -1150,16 +1151,19 @@ void _declspec(naked) HOOK_CFileLoader_LoadCollisionFile_Mid()
         add     esp, 4*1
 
         cmp     al,0
-        jz      quit
+        jz      skip
 
         popad
         sub     edx,18h 
         add     ebp,2 
         jmp     RETURN_CFileLoader_LoadCollisionFile_Mid
 
-quit:
+skip:
         popad
-        jmp     RETURN_CFileLoader_LoadCollisionFile_Mid_Quit
+        sub     edx,18h 
+        add     ebp,2 
+        mov     dword ptr [esp+4Ch],edx 
+        jmp     RETURN_CFileLoader_LoadCollisionFile_Mid_Skip
     }
 }
 

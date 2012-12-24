@@ -23,13 +23,12 @@ extern "C"
 
 ASE* ASE::_instance = NULL;
 
-ASE::ASE ( CMainConfig* pMainConfig, CPlayerManager* pPlayerManager, unsigned short usPort, const char* szServerIP, bool bLan )
+ASE::ASE ( CMainConfig* pMainConfig, CPlayerManager* pPlayerManager, unsigned short usPort, const char* szServerIP/*, bool bLan*/ )
     : m_QueryDosProtect( 5, 6000, 7000 )        // Max of 5 queries per 6 seconds, then 7 second ignore
 {
     _instance = this;
 
-    m_bLan = bLan;
-    m_usPort = usPort + ( ( m_bLan ) ? SERVER_LIST_QUERY_PORT_OFFSET_LAN : SERVER_LIST_QUERY_PORT_OFFSET );
+    m_usPortBase = usPort;
 
     m_pMainConfig = pMainConfig;
     m_pPlayerManager = pPlayerManager;
@@ -58,8 +57,40 @@ ASE::ASE ( CMainConfig* pMainConfig, CPlayerManager* pPlayerManager, unsigned sh
     std::stringstream ss;
     ss << usPort;
     m_strPort = ss.str();
+    m_Socket = INVALID_SOCKET;
 
-    // Set the sock addr
+    m_strMtaAseVersion = MTA_DM_ASE_VERSION;
+}
+
+
+ASE::~ASE ( void )
+{
+    _instance = NULL;
+    ClearRules ();
+}
+
+
+bool ASE::SetPortEnabled ( bool bInternetEnabled, bool bLanEnabled )
+{
+    // Calc requirements
+    bool bPortEnableReq = bInternetEnabled || bLanEnabled;
+    bool bLanOnly = !bInternetEnabled && bLanEnabled;
+    ushort usPortReq = m_usPortBase + ( ( bLanOnly ) ? SERVER_LIST_QUERY_PORT_OFFSET_LAN : SERVER_LIST_QUERY_PORT_OFFSET );
+
+    // Any change?
+    if ( ( m_Socket != INVALID_SOCKET ) == bPortEnableReq && m_usPort == usPortReq )
+        return true;
+
+    m_usPort = usPortReq;
+
+    // Remove current thingmy
+    if ( m_Socket != INVALID_SOCKET )
+    {
+        closesocket( m_Socket );
+        m_Socket = INVALID_SOCKET;
+    }
+
+    // Start new thingmy
     m_SockAddr.sin_family = AF_INET;         
     m_SockAddr.sin_port = htons ( m_usPort );
     // If a local IP has been specified, ensure it is used for sending
@@ -72,7 +103,7 @@ ASE::ASE ( CMainConfig* pMainConfig, CPlayerManager* pPlayerManager, unsigned sh
     m_Socket = socket ( AF_INET, SOCK_DGRAM, 0 );
 
     // If we are in lan only mode, reuse addr to avoid possible conflicts
-    if ( m_bLan )
+    if ( bLanOnly )
     {
         const int Flags = 1;
         setsockopt ( m_Socket, SOL_SOCKET, SO_REUSEADDR, (const char *)&Flags, sizeof ( Flags ) );
@@ -82,8 +113,8 @@ ASE::ASE ( CMainConfig* pMainConfig, CPlayerManager* pPlayerManager, unsigned sh
     if ( ::bind ( m_Socket, ( sockaddr* ) &m_SockAddr, sizeof ( m_SockAddr ) ) != 0 )
     {
         sockclose ( m_Socket );
-        m_Socket = 0;
-        return;
+        m_Socket = INVALID_SOCKET;
+        return false;
     }
 
     // Set it to non blocking, so we dont have to wait for a packet
@@ -93,13 +124,8 @@ ASE::ASE ( CMainConfig* pMainConfig, CPlayerManager* pPlayerManager, unsigned sh
     #else
     fcntl ( m_Socket, F_SETFL, fcntl( m_Socket, F_GETFL ) | O_NONBLOCK ); 
     #endif
-}
 
-
-ASE::~ASE ( void )
-{
-    _instance = NULL;
-    ClearRules ();
+    return true;
 }
 
 
@@ -112,6 +138,9 @@ void ASE::DoPulse ( void )
     int nLen = sizeof ( sockaddr );
 #endif
 
+    m_llCurrentTime = GetTickCount64_ ();
+    m_uiCurrentPlayerCount = m_pPlayerManager->Count ();
+
     for ( uint i = 0 ; i < 100 ; i++ )
     {
         char szBuffer[2];
@@ -123,10 +152,11 @@ void ASE::DoPulse ( void )
 
         m_uiNumQueriesTotal++;
 
-        if ( m_QueryDosProtect.AddConnect ( inet_ntoa ( SockAddr.sin_addr ) ) )
-            continue;
+        if ( m_QueryDosProtect.GetTotalFloodingCount () < 100 )
+            if ( m_QueryDosProtect.AddConnect ( inet_ntoa ( SockAddr.sin_addr ) ) )
+                continue;
 
-        std::string strReply;
+        const std::string* strReply = NULL;
 
         switch ( szBuffer[0] )
         {
@@ -153,17 +183,17 @@ void ASE::DoPulse ( void )
             }
             case 'v':
             { // MTA Version (For further possibilities to quick ping, in case we do multiply master servers)
-                strReply = MTA_DM_ASE_VERSION;
+                strReply = &m_strMtaAseVersion;
                 break;
             }
         }
 
         // If our reply buffer isn't empty, send it
-        if ( !strReply.empty() )
+        if ( strReply && !strReply->empty() )
         {
             /*int sent =*/ sendto ( m_Socket,
-                                strReply.c_str(),
-                                strReply.length(),
+                                strReply->c_str(),
+                                strReply->length(),
                                 0,
                                 (sockaddr*)&SockAddr,
                                 nLen );
@@ -182,17 +212,15 @@ void ASE::DoPulse ( void )
 
 // Protect against a flood of server queries.
 // Send cached version unless player count has changed, or last re-cache is older than m_lFullMinInterval
-const std::string& ASE::QueryFullCached ( void )
+const std::string* ASE::QueryFullCached ( void )
 {
-    long long llTime = GetTickCount64_ ();
-    unsigned int uiPlayerCount = m_pPlayerManager->Count ();
-    if ( uiPlayerCount != m_uiFullLastPlayerCount || llTime - m_llFullLastTime > m_lFullMinInterval || m_strFullCached == "" )
+    if ( m_uiCurrentPlayerCount != m_uiFullLastPlayerCount || m_llCurrentTime - m_llFullLastTime > m_lFullMinInterval || m_strFullCached == "" )
     {
         m_strFullCached = QueryFull ();
-        m_llFullLastTime = llTime;
-        m_uiFullLastPlayerCount = uiPlayerCount;
+        m_llFullLastTime = m_llCurrentTime;
+        m_uiFullLastPlayerCount = m_uiCurrentPlayerCount;
     }
-    return m_strFullCached;
+    return &m_strFullCached;
 }
 
 
@@ -297,17 +325,15 @@ std::string ASE::QueryFull ( void )
 
 // Protect against a flood of server queries.
 // Send cached version unless player count has changed, or last re-cache is older than m_lLightMinInterval
-const std::string& ASE::QueryXfireLightCached ( void )
+const std::string* ASE::QueryXfireLightCached ( void )
 {
-    long long llTime = GetTickCount64_ ();
-    unsigned int uiPlayerCount = m_pPlayerManager->Count ();
-    if ( uiPlayerCount != m_uiXfireLightLastPlayerCount || llTime - m_llXfireLightLastTime > m_lLightMinInterval || m_strXfireLightCached == "" )
+    if ( m_uiCurrentPlayerCount != m_uiXfireLightLastPlayerCount || m_llCurrentTime - m_llXfireLightLastTime > m_lXfireLightMinInterval || m_strXfireLightCached == "" )
     {
         m_strXfireLightCached = QueryXfireLight ();
-        m_llXfireLightLastTime = llTime;
-        m_uiXfireLightLastPlayerCount = uiPlayerCount;
+        m_llXfireLightLastTime = m_llCurrentTime;
+        m_uiXfireLightLastPlayerCount = m_uiCurrentPlayerCount;
     }
-    return m_strXfireLightCached;
+    return &m_strXfireLightCached;
 }
 
 
@@ -351,17 +377,15 @@ std::string ASE::QueryXfireLight ( void )
 
 // Protect against a flood of server queries.
 // Send cached version unless player count has changed, or last re-cache is older than m_lLightMinInterval
-const std::string& ASE::QueryLightCached ( void )
+const std::string* ASE::QueryLightCached ( void )
 {
-    long long llTime = GetTickCount64_ ();
-    unsigned int uiPlayerCount = m_pPlayerManager->Count ();
-    if ( uiPlayerCount != m_uiLightLastPlayerCount || llTime - m_llLightLastTime > m_lLightMinInterval || m_strLightCached == "" )
+    if ( m_uiCurrentPlayerCount != m_uiLightLastPlayerCount || m_llCurrentTime - m_llLightLastTime > m_lLightMinInterval || m_strLightCached == "" )
     {
         m_strLightCached = QueryLight ();
-        m_llLightLastTime = llTime;
-        m_uiLightLastPlayerCount = uiPlayerCount;
+        m_llLightLastTime = m_llCurrentTime;
+        m_uiLightLastPlayerCount = m_uiCurrentPlayerCount;
     }
-    return m_strLightCached;
+    return &m_strLightCached;
 }
 
 

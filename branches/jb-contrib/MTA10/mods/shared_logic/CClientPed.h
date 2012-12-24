@@ -150,6 +150,12 @@ public:
     void                        SetRotationDegrees          ( const CVector& vecRotation );
     void                        SetRotationRadians          ( const CVector& vecRotation );
 
+    void                        GetRotationDegreesNew       ( CVector& vecRotation ) const;
+    void                        GetRotationRadiansNew       ( CVector& vecRotation ) const;
+    void                        SetRotationDegreesNew       ( const CVector& vecRotation );
+    void                        SetRotationRadiansNew       ( const CVector& vecRotation );
+    void                        SetCurrentRotationNew       ( float fRotation );
+
     void                        Teleport                    ( const CVector& vecPosition );
 
     // This function spawns/respawns this ped in any location. This will force a recreation
@@ -223,7 +229,7 @@ public:
     float                       GetArmor                    ( void );
     void                        SetArmor                    ( float fArmor );
     float                       GetOxygenLevel              ( void );
-    void                        SetOxygenLevel              ( float fOxygenLevel );
+    void                        SetOxygenLevel              ( float fOxygen );
 
     void                        LockHealth                  ( float fHealth );
     void                        LockArmor                   ( float fArmor );

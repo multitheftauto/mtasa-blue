@@ -15,6 +15,7 @@
     #include "shlobj.h"
 #else
     #include <dirent.h>
+    #include <sys/stat.h>
 #endif
 
 //
@@ -288,7 +289,6 @@ SString SharedUtil::GetSystemLocalAppDataPath ( void )
     return szResult;
 }
 
-
 SString SharedUtil::GetSystemCommonAppDataPath ( void )
 {
     char szResult[MAX_PATH] = "";
@@ -296,6 +296,19 @@ SString SharedUtil::GetSystemCommonAppDataPath ( void )
     return szResult;
 }
 
+SString SharedUtil::GetSystemWindowsPath ( void )
+{
+    char szResult[MAX_PATH] = "";
+    SHGetFolderPath( NULL, CSIDL_WINDOWS, NULL, 0, szResult );
+    return szResult;
+}
+
+SString SharedUtil::GetSystemSystemPath ( void )
+{
+    char szResult[MAX_PATH] = "";
+    SHGetFolderPath( NULL, CSIDL_SYSTEM, NULL, 0, szResult );
+    return szResult;
+}
 
 SString SharedUtil::GetSystemTempPath ( void )
 {

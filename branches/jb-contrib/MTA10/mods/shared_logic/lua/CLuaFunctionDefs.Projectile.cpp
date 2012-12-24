@@ -228,3 +228,49 @@ int CLuaFunctionDefs::GetProjectileForce ( lua_State* luaVM )
     lua_pushboolean ( luaVM, false );
     return 1;
 }
+
+
+int CLuaFunctionDefs::SetProjectileCounter ( lua_State* luaVM )
+{
+    CClientProjectile* pProjectile = NULL;
+    DWORD dwCounter = 0;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pProjectile );
+    argStream.ReadNumber ( dwCounter );
+
+    // Verify the argument
+    if ( !argStream.HasErrors( ) )
+    {
+        pProjectile->SetCounter( dwCounter );
+        lua_pushboolean ( luaVM, true );
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+
+int CLuaFunctionDefs::GetProjectileCounter ( lua_State* luaVM )
+{
+    CClientProjectile* pProjectile = NULL;
+    DWORD dwCounter = 0;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pProjectile );
+
+    // Verify the argument
+    if ( !argStream.HasErrors( ) )
+    {
+        dwCounter = pProjectile->GetCounter( );
+        lua_pushnumber ( luaVM, dwCounter );
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}

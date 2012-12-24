@@ -91,7 +91,7 @@ public:
     static bool                         RemoveElementData                   ( CClientEntity& Entity, const char* szName );
     static bool                         SetElementMatrix                    ( CClientEntity& Entity, const CMatrix& matrix );
     static bool                         SetElementPosition                  ( CClientEntity& Entity, const CVector& vecPosition, bool bWarp = true );
-    static bool                         SetElementRotation                  ( CClientEntity& Entity, const CVector& vecRotation, const char* szRotationOrder );
+    static bool                         SetElementRotation                  ( CClientEntity& Entity, const CVector& vecRotation, const char* szRotationOrder, bool bNewWay );
     static bool                         SetElementVelocity                  ( CClientEntity& Element, const CVector& vecVelocity );
     static bool                         SetElementParent                    ( CClientEntity& Element, CClientEntity& Parent, CLuaMain* pLuaMain );
     static bool                         SetElementInterior                  ( CClientEntity& Entity, unsigned char ucInterior, bool bSetPosition, CVector& vecPosition );
@@ -121,6 +121,7 @@ public:
 
     // Player set funcs
     static bool                         ShowPlayerHudComponent              ( eHudComponent component, bool bShow );
+    static bool                         IsPlayerHudComponentVisible         ( eHudComponent component, bool& bOutIsVisible );
     static bool                         SetPlayerMoney                      ( long lMoney );
     static bool                         GivePlayerMoney                     ( long lMoney );
     static bool                         TakePlayerMoney                     ( long lMoney );
@@ -157,9 +158,10 @@ public:
     static bool                         GetOriginalWeaponProperty           ( eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, float & fData );
     static bool                         GetOriginalWeaponProperty           ( eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, short & sData );
     static bool                         GetOriginalWeaponProperty           ( eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, CVector & vecData );
-
+    static bool                         GetPedOxygenLevel                   ( CClientPed& Ped, float& fOxygen );
+    
     static bool                         SetPedWeaponSlot                    ( CClientEntity& Entity, int iSlot );
-    static bool                         SetPedRotation                      ( CClientEntity& Entity, float fRotation );
+    static bool                         SetPedRotation                      ( CClientEntity& Entity, float fRotation, bool bNewWay );
     static bool                         SetPedCanBeKnockedOffBike           ( CClientEntity& Entity, bool bCanBeKnockedOffBike );
     static bool                         SetPedAnimation                     ( CClientEntity& Entity, const char * szBlockName, const char * szAnimName, int iTime, bool bLoop, bool bUpdatePosition, bool bInterruptable, bool bFreezeLastFrame );
     static bool                         SetPedAnimationProgress             ( CClientEntity& Entity, const char * szAnimName, float fProgress );
@@ -178,6 +180,7 @@ public:
     static bool                         SetPedOnFire                        ( CClientEntity& Entity, bool bOnFire );
     static bool                         RemovePedFromVehicle                ( CClientPed* pPed );
     static bool                         WarpPedIntoVehicle                  ( CClientPed* pPed, CClientVehicle* pVehicle, unsigned int uiSeat );
+    static bool                         SetPedOxygenLevel                   ( CClientEntity& Entity, float fOxygen );
 
     // Extra Clothes functions
     static bool                         GetBodyPartName                     ( unsigned char ucID, SString& strOutName );
@@ -318,10 +321,8 @@ public:
     static bool                         GetCameraMatrix                     ( CVector& vecPosition, CVector& vecLookAt, float& fRoll, float& fFOV );
     static CClientEntity *              GetCameraTarget                     ( void );
     static bool                         GetCameraInterior                   ( unsigned char & ucInterior );
-    static bool                         GetCameraRotation                   ( float &fX, float &fY );
 
     // Camera set funcs
-    static bool                         SetCameraRotation                   ( float fX, float fY );
     static bool                         SetCameraMatrix                     ( CVector& vecPosition, CVector* pvecLookAt, float fRoll, float fFOV );
     static bool                         SetCameraTarget                     ( CClientEntity * pEntity);
     static bool                         SetCameraInterior                   ( unsigned char ucInterior );
@@ -447,6 +448,8 @@ public:
     static bool                         SetAllElementWaterLevel             ( float fLevel, void* pChangeSource );
     static bool                         ResetWorldWaterLevel                ( void );
     static bool                         SetWaterVertexPosition              ( CClientWater* pWater, int iVertexIndex, CVector& vecPosition );
+    static bool                         SetWaterDrawnLast                   ( bool bEnabled );
+    static bool                         IsWaterDrawnLast                    ( bool& bOutEnabled );
     static bool                         GetWorldFromScreenPosition          ( CVector& vecScreen, CVector& vecWorld );
     static bool                         GetScreenFromWorldPosition          ( CVector& vecWorld, CVector& vecScreen, float fEdgeTolerance, bool bRelative );
     static bool                         GetWeather                          ( unsigned char& ucWeather, unsigned char& ucWeatherBlendingTo );
@@ -464,9 +467,9 @@ public:
     static bool                         GetCloudsEnabled                    ( void );
     static bool                         GetTrafficLightState                ( unsigned char& ucState );
     static bool                         AreTrafficLightsLocked              ( bool& bLocked );
-    static bool                         RemoveWorldBuilding                 ( unsigned short usModelToRemove, float fDistance, float fX, float fY, float fZ );
+    static bool                         RemoveWorldBuilding                 ( unsigned short usModelToRemove, float fDistance, float fX, float fY, float fZ, char cInterior );
     static bool                         RestoreWorldBuildings               ( void );
-    static bool                         RestoreWorldBuilding                ( unsigned short usModelToRestore, float fDistance, float fX, float fY, float fZ );
+    static bool                         RestoreWorldBuilding                ( unsigned short usModelToRestore, float fDistance, float fX, float fY, float fZ, char cInterior );
  
     static bool                         SetTime                             ( unsigned char ucHour, unsigned char ucMin );
     static bool                         GetSkyGradient                      ( unsigned char& ucTopRed, unsigned char& ucTopGreen, unsigned char& ucTopBlue, unsigned char& ucBottomRed, unsigned char& ucBottomGreen, unsigned char& ucBottomBlue );
@@ -529,6 +532,29 @@ public:
     // Weapon funcs
     static bool                         GetWeaponNameFromID                 ( unsigned char ucID, SString& strOutName );
     static bool                         GetWeaponIDFromName                 ( const char* szName, unsigned char& ucID );
+    static CClientWeapon*               CreateWeapon                        ( CResource &Resource, eWeaponType weaponType, CVector vecPosition );
+    static bool                         FireWeapon                          ( CClientWeapon * pWeapon );
+    static bool                         SetWeaponProperty                   ( CClientWeapon * pWeapon, eWeaponProperty eProperty, short sData );
+    static bool                         GetWeaponProperty                   ( CClientWeapon * pWeapon, eWeaponProperty eProperty, short &sData );
+    static bool                         GetWeaponProperty                   ( CClientWeapon * pWeapon, eWeaponProperty eProperty, float &fData );
+    static bool                         SetWeaponProperty                   ( CClientWeapon * pWeapon, eWeaponProperty eProperty, float fData );
+    static bool                         SetWeaponState                      ( CClientWeapon * pWeapon, eWeaponState weaponState );
+    static bool                         SetWeaponTarget                     ( CClientWeapon * pWeapon, CClientEntity * pTarget, int boneTarget );
+    static bool                         SetWeaponTarget                     ( CClientWeapon * pWeapon, CVector vecTarget );
+    static bool                         ClearWeaponTarget                   ( CClientWeapon * pWeapon );
+    
+    static bool                         SetWeaponFlags                      ( CClientWeapon * pWeapon, eWeaponFlags flag, bool bData );
+    static bool                         SetWeaponFlags                      ( CClientWeapon * pWeapon, const SLineOfSightFlags &flags );
+    static bool                         GetWeaponFlags                      ( CClientWeapon * pWeapon, SLineOfSightFlags& flags );
+    static bool                         GetWeaponFlags                      ( CClientWeapon * pWeapon, eWeaponFlags flag, bool &bData );
+    
+    static bool                         SetWeaponFiringRate                 ( CClientWeapon * pWeapon, int iFiringRate );
+    static bool                         ResetWeaponFiringRate               ( CClientWeapon * pWeapon );
+    static bool                         GetWeaponFiringRate                 ( CClientWeapon * pWeapon, int &iFiringRate );
+    static bool                         GetWeaponClipAmmo                   ( CClientWeapon * pWeapon, int &iClipAmmo );
+    static bool                         GetWeaponAmmo                       ( CClientWeapon * pWeapon, int &iAmmo );
+    static bool                         SetWeaponAmmo                       ( CClientWeapon * pWeapon, int iAmmo );
+    static bool                         SetWeaponClipAmmo                   ( CClientWeapon * pWeapon, int iAmmo );
 
     // Util funcs
     static bool                         GetTickCount_                       ( double& dCount );

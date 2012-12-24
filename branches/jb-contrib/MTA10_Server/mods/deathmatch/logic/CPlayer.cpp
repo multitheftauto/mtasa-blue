@@ -19,7 +19,6 @@
 extern CGame * g_pGame;
 
 CPlayer::CPlayer ( CPlayerManager* pPlayerManager, class CScriptDebugging* pScriptDebugging, const NetServerPlayerID& PlayerSocket ) : CPed ( NULL, NULL, NULL, 0 )
-    , m_UpdateNearListTimer ( 500, true )
 {
     CElementRefManager::AddElementRefs ( ELEMENT_REF_DEBUG ( this, "CPlayer" ), &m_pTeam, NULL );
     CElementRefManager::AddElementListRef ( ELEMENT_REF_DEBUG ( this, "CPlayer m_lstBroadcastList" ), &m_lstBroadcastList );
@@ -29,6 +28,7 @@ CPlayer::CPlayer ( CPlayerManager* pPlayerManager, class CScriptDebugging* pScri
     m_pPlayerManager = pPlayerManager;
     m_pScriptDebugging = pScriptDebugging;
     m_PlayerSocket = PlayerSocket;
+    m_UpdateNearListTimer.SetMaxIncrement ( 500, true );
 
     m_iType = CElement::PLAYER;
     SetTypeName ( "player" );
@@ -56,8 +56,6 @@ CPlayer::CPlayer ( CPlayerManager* pPlayerManager, class CScriptDebugging* pScri
     m_ulTimeConnected = GetTime ();
 
     m_tNickChange = 0;
-
-    m_ucLoginAttempts = 0;
 
     m_pPlayerTextManager = new CPlayerTextManager ( this ); 
 
@@ -145,19 +143,44 @@ CPlayer::~CPlayer ( void )
 
     delete m_pKeyBinds;
 
-    // Unlink from manager
-    Unlink ();
     CSimControl::RemoveSimPlayer ( this );
 
     // Unparent us (CElement's unparenting will crash because of the incomplete vtable at that point)
     m_bDoNotSendEntities = true;
     SetParentObject ( NULL );
 
+    // Do this
+    if ( m_pJackingVehicle )
+    {
+        if ( m_uiVehicleAction == VEHICLEACTION_JACKING )
+        {
+            CPed * pOccupant = m_pJackingVehicle->GetOccupant ( 0 );
+            if ( pOccupant )
+            {
+                m_pJackingVehicle->SetOccupant ( NULL, 0 );
+                pOccupant->SetOccupiedVehicle ( NULL, 0 );
+                pOccupant->SetVehicleAction ( VEHICLEACTION_NONE );
+            }
+        }
+        if ( m_pJackingVehicle->GetJackingPlayer () == this )
+            m_pJackingVehicle->SetJackingPlayer ( NULL );
+    }
+
     CElementRefManager::RemoveElementRefs ( ELEMENT_REF_DEBUG ( this, "CPlayer" ), &m_pTeam, NULL );
     CElementRefManager::RemoveElementListRef ( ELEMENT_REF_DEBUG ( this, "CPlayer m_lstBroadcastList" ), &m_lstBroadcastList );
     CElementRefManager::RemoveElementListRef ( ELEMENT_REF_DEBUG ( this, "CPlayer m_lstIgnoredList" ), &m_lstIgnoredList );
     
     delete m_pPlayerStatsPacket;
+
+    // Unlink from manager
+    Unlink ();
+}
+
+
+void CPlayer::Unlink ( void )
+{
+    // Remove us from the player manager
+    m_pPlayerManager->RemoveFromList ( this );
 }
 
 
@@ -174,19 +197,12 @@ void CPlayer::DoPulse ( void )
 }
 
 
-void CPlayer::Unlink ( void )
-{
-    // Remove us from the player manager
-    m_pPlayerManager->RemoveFromList ( this );
-}
-
-
 void CPlayer::SetNick ( const char* szNick )
 {
     if ( !m_strNick.empty () && m_strNick != szNick  )
     {
         // If changing, add the new name to the whowas list
-        g_pGame->GetConsole ()->GetWhoWas ()->Add ( szNick, inet_addr ( GetSourceIP() ), GetSerial (), GetPlayerVersion () );
+        g_pGame->GetConsole ()->GetWhoWas ()->Add ( szNick, inet_addr ( GetSourceIP() ), GetSerial (), GetPlayerVersion (), GetAccount ()->GetName () );
     }
 
     m_strNick.AssignLeft ( szNick, MAX_NICK_LENGTH );
@@ -304,7 +320,7 @@ void CPlayer::RemoveSyncingVehicle ( CVehicle* pVehicle )
         bAlreadyIn = false;
 
         // Remove it from our list
-        if ( !m_SyncingVehicles.empty() ) m_SyncingVehicles.remove ( pVehicle );
+        m_SyncingVehicles.remove ( pVehicle );
     }
 }
 
@@ -349,7 +365,7 @@ void CPlayer::RemoveSyncingPed ( CPed* pPed )
         bAlreadyIn = false;
 
         // Remove it from our list
-        if ( !m_SyncingPeds.empty() ) m_SyncingPeds.remove ( pPed );
+        m_SyncingPeds.remove ( pPed );
     }
 }
 
@@ -394,7 +410,7 @@ void CPlayer::RemoveSyncingObject ( CObject* pObject )
         bAlreadyIn = false;
 
         // Remove it from our list
-        if ( !m_SyncingObjects.empty() ) m_SyncingObjects.remove ( pObject );
+        m_SyncingObjects.remove ( pObject );
     }
 }
 
@@ -1089,6 +1105,25 @@ void CPlayer::SetPlayerStat ( unsigned short usStat, float fValue )
     CPed::SetPlayerStat( usStat, fValue );
 }
 
+void CPlayer::SetJackingVehicle ( CVehicle* pVehicle )
+{
+    if ( pVehicle == m_pJackingVehicle )
+        return;
+
+    // Remove old
+    if ( m_pJackingVehicle )
+    {
+        CVehicle* pPrev = m_pJackingVehicle;
+        m_pJackingVehicle = NULL;
+        pPrev->SetJackingPlayer ( NULL );
+    }
+
+    // Set new
+    m_pJackingVehicle = pVehicle;
+
+    if ( m_pJackingVehicle )
+        m_pJackingVehicle->SetJackingPlayer ( this );
+}
 
 #ifdef WIN32
 

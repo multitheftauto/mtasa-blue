@@ -41,7 +41,6 @@ CElement::CElement ( CElement* pParent, CXMLNode* pNode )
     m_ucSyncTimeContext = 1;
     m_ucInterior = 0;
     m_bDoubleSided = false;
-    m_bMapCreated = false;
     m_bUpdatingSpatialData = false;
 
     // Store the line
@@ -60,7 +59,7 @@ CElement::CElement ( CElement* pParent, CXMLNode* pNode )
         pParent->m_Children.push_back ( this );
     }
 
-    m_uiTypeHash = HashString ( m_strTypeName.c_str () );
+    m_uiTypeHash = GetTypeHashFromString ( m_strTypeName.c_str () );
     if ( m_pParent )
         CElement::AddEntityFromRoot ( m_uiTypeHash, this );
 
@@ -90,7 +89,7 @@ CElement::~CElement ( void )
     list < CPerPlayerEntity* > ::const_iterator iter = m_ElementReferenced.begin ();
     for ( ; iter != m_ElementReferenced.end (); iter++ )
     {
-        if ( !(*iter)->m_ElementReferences.empty() ) (*iter)->m_ElementReferences.remove ( this );
+        (*iter)->m_ElementReferences.remove ( this );
     }
 
     RemoveAllCollisions ( true );
@@ -149,10 +148,25 @@ const CVector & CElement::GetPosition ( void )
 }
 
 
+// Static function
+uint CElement::GetTypeHashFromString ( const SString& strTypeName )
+{
+    // Standard types use unique index upto EElementType::UNKNOWN
+    EElementType elementType;
+    if ( StringToEnum ( strTypeName, elementType ) )
+        return elementType;
+
+    // Custom types use name hash.  TODO: Make it use a unique index instead
+    uint uiTypeHash = HashString ( strTypeName );
+    uiTypeHash = ( uiTypeHash % 0xFFFFFF00 ) + CElement::UNKNOWN + 1;
+    return uiTypeHash;
+}
+
+
 void CElement::SetTypeName ( const std::string& strTypeName )
 {
     CElement::RemoveEntityFromRoot ( m_uiTypeHash, this );
-    m_uiTypeHash = HashString ( strTypeName.c_str () );
+    m_uiTypeHash = GetTypeHashFromString ( strTypeName.c_str () );
     m_strTypeName = strTypeName;
     if ( m_pParent )
         CElement::AddEntityFromRoot ( m_uiTypeHash, this );
@@ -201,7 +215,7 @@ CElement* CElement::FindChildByType ( const char* szType, unsigned int uiIndex, 
     }
 
     // Find it among our children
-    unsigned int uiTypeHash = HashString ( szType );
+    unsigned int uiTypeHash = GetTypeHashFromString ( szType );
     return FindChildByTypeIndex ( uiTypeHash, uiIndex, uiCurrentIndex, bRecursive );
 }
 
@@ -213,7 +227,7 @@ void CElement::FindAllChildrenByType ( const char* szType, lua_State* pLua )
 
     // Add all children of the given type to the table
     unsigned int uiIndex = 0;
-    unsigned int uiTypeHash = HashString ( szType );
+    unsigned int uiTypeHash = GetTypeHashFromString ( szType );
 
     if ( this == g_pGame->GetMapManager ()->GetRootElement () )
     {
@@ -225,32 +239,34 @@ void CElement::FindAllChildrenByType ( const char* szType, lua_State* pLua )
     }
 }
 
-// TODO - Make this use GetEntitiesFromRoot
-void CElement::GetDescendants ( std::vector < CElement* >& outResult, bool bIncludeThis )
-{
-    if ( bIncludeThis )
-        outResult.push_back ( this );
 
-    for ( CChildListType::const_iterator iter = m_Children.begin () ; iter != m_Children.end () ; ++iter )
+// Includes this (if the type matches), unless it is the root element.
+// - Fast if called on root or an end node.
+void CElement::GetDescendantsByType ( std::vector < CElement* >& outResult, EElementType elementType )
+{
+    // Type hash is the same as element type up to EElementType::UNKNOWN
+    unsigned int uiTypeHash = elementType;
+    if ( this == g_pGame->GetMapManager ()->GetRootElement () )
     {
-        CElement* pChild = *iter;
-        outResult.push_back ( pChild );
-        pChild->GetDescendants ( outResult, false );
+        GetEntitiesFromRoot ( uiTypeHash, outResult );
+    }
+    else
+    {
+        outResult.push_back ( this );
+        GetDescendantsByTypeSlow ( outResult, uiTypeHash );
     }
 }
 
-// TODO - Make this use GetEntitiesFromRoot
-void CElement::GetDescendantsByType ( std::vector < CElement* >& outResult, bool bIncludeThis, int type )
-{
-    if ( bIncludeThis && GetType () == type )
-        outResult.push_back ( this );
 
+void CElement::GetDescendantsByTypeSlow ( std::vector < CElement* >& outResult, uint uiTypeHash )
+{
     for ( CChildListType::const_iterator iter = m_Children.begin () ; iter != m_Children.end () ; ++iter )
     {
         CElement* pChild = *iter;
-        if ( pChild->GetType () == type )
+        if ( pChild->GetTypeHash () == uiTypeHash )
             outResult.push_back ( pChild );
-        pChild->GetDescendantsByType ( outResult, false, type );
+        if ( !pChild->m_Children.empty () )
+            pChild->GetDescendantsByTypeSlow ( outResult, uiTypeHash );
     }
 }
 
@@ -279,7 +295,7 @@ void CElement::GetChildrenByType ( const char* szType, lua_State* pLua )
 
     // Add all our children to the table on top of the given lua main's stack
     unsigned int uiIndex = 0;
-    unsigned int uiTypeHash = HashString ( szType );
+    unsigned int uiTypeHash = GetTypeHashFromString ( szType );
     CChildListType ::const_iterator iter = m_Children.begin ();
     for ( ; iter != m_Children.end (); iter++ )
     {
@@ -832,9 +848,6 @@ bool CElement::LoadFromCustomData ( CLuaMain* pLuaMain, CEvents* pEvents )
     assert ( pLuaMain );
     assert ( pEvents );
 
-    // Mark this as an MAP created element
-    m_bMapCreated = true;
-
     // Read out all the attributes into our custom data records
     ReadCustomData ( pLuaMain, pEvents );
 
@@ -907,31 +920,6 @@ void CElement::UpdatePerPlayerEntities ( void )
     {
         (*iter)->UpdatePerPlayerEntities ();
     }
-}
-
-
-unsigned int CElement::GetTypeID ( const char* szTypeName )
-{
-    if ( strcmp ( szTypeName, "dummy" ) == 0 )
-        return CElement::DUMMY;
-    else if ( strcmp ( szTypeName, "player" ) == 0 )
-        return CElement::PLAYER;
-    else if ( strcmp ( szTypeName, "vehicle" ) == 0 )
-        return CElement::VEHICLE;
-    else if ( strcmp ( szTypeName, "object" ) == 0 )
-        return CElement::OBJECT;
-    else if ( strcmp ( szTypeName, "marker" ) == 0 )
-        return CElement::MARKER;
-    else if ( strcmp ( szTypeName, "blip" ) == 0 )
-        return CElement::BLIP;
-    else if ( strcmp ( szTypeName, "pickup" ) == 0 )
-        return CElement::PICKUP;
-    else if ( strcmp ( szTypeName, "radararea" ) == 0 )
-        return CElement::RADAR_AREA;
-    else if ( strcmp ( szTypeName, "console" ) == 0 )
-        return CElement::CONSOLE;
-    else
-        return CElement::UNKNOWN;
 }
 
 
@@ -1127,6 +1115,8 @@ CClient* CElement::GetClient ( void )
             pClient = static_cast < CClient* > ( pConsoleClient );   
             break;
         }
+        default:
+            break;
     }
     return pClient;
 }
@@ -1141,6 +1131,18 @@ void CElement::AttachTo ( CElement* pElement )
 
     if ( m_pAttachedTo )
         m_pAttachedTo->AddAttachedElement ( this );
+}
+
+
+void CElement::AddAttachedElement ( CElement* pElement )
+{
+    m_AttachedElements.push_back ( pElement );
+}
+
+
+void CElement::RemoveAttachedElement ( CElement* pElement )
+{
+    m_AttachedElements.remove ( pElement );
 }
 
 
@@ -1266,7 +1268,7 @@ bool CElement::CanUpdateSync ( unsigned char ucRemote )
 
 
 // Entities from root optimization for getElementsByType
-typedef CFastList < CElement > CFromRootListType;
+typedef CFastList < CElement* > CFromRootListType;
 typedef google::dense_hash_map < unsigned int, CFromRootListType > t_mapEntitiesFromRoot;
 static t_mapEntitiesFromRoot    ms_mapEntitiesFromRoot;
 static bool                     ms_bEntitiesFromRootInitialized = false;
@@ -1276,7 +1278,7 @@ void CElement::StartupEntitiesFromRoot ()
 {
     if ( !ms_bEntitiesFromRootInitialized )
     {
-        ms_mapEntitiesFromRoot.set_deleted_key ( (unsigned int)0x00000000 );
+        ms_mapEntitiesFromRoot.set_deleted_key ( (unsigned int)0xFFFFFFFE );
         ms_mapEntitiesFromRoot.set_empty_key ( (unsigned int)0xFFFFFFFF );
         ms_bEntitiesFromRootInitialized = true;
     }
@@ -1294,7 +1296,7 @@ bool CElement::IsFromRoot ( CElement* pEntity )
     }
     else
     {
-        if ( pEntity->GetTypeName () == "root" )
+        if ( pEntity->GetType () == CElement::ROOT )
             return true;
     }
     return CElement::IsFromRoot ( pEntity->GetParentEntity () );
@@ -1329,7 +1331,7 @@ void CElement::RemoveEntityFromRoot ( unsigned int uiTypeHash, CElement* pEntity
     {
         CFromRootListType& listEntities = find->second;
         listEntities.remove ( pEntity );
-        if ( listEntities.size () == 0 )
+        if ( uiTypeHash > CElement::UNKNOWN && listEntities.size () == 0 )
             ms_mapEntitiesFromRoot.erase ( find );
     }
 
@@ -1362,6 +1364,30 @@ void CElement::GetEntitiesFromRoot ( unsigned int uiTypeHash, lua_State* pLua )
             lua_pushnumber ( pLua, ++uiIndex );
             lua_pushelement ( pLua, pEntity );
             lua_settable ( pLua, -3 );
+        }
+    }    
+}
+
+void CElement::GetEntitiesFromRoot ( unsigned int uiTypeHash, std::vector < CElement* >& outResult )
+{
+#if CHECK_ENTITIES_FROM_ROOT
+    _CheckEntitiesFromRoot ( uiTypeHash );
+#endif
+
+    t_mapEntitiesFromRoot::iterator find = ms_mapEntitiesFromRoot.find ( uiTypeHash );
+    if ( find != ms_mapEntitiesFromRoot.end () )
+    {
+        CFromRootListType& listEntities = find->second;
+        CElement* pEntity;
+
+        for ( CChildListType::const_reverse_iterator i = listEntities.rbegin ();
+              i != listEntities.rend ();
+              ++i )
+        {
+            pEntity = *i;
+
+            // Add it to the result
+            outResult.push_back ( pEntity );
         }
     }    
 }
@@ -1467,7 +1493,6 @@ void CElement::_GetEntitiesFromRoot ( unsigned int uiTypeHash, std::map < CEleme
 
 void CElement::SetPosition ( const CVector& vecPosition )
 {
-    m_vecLastPosition = m_vecPosition;
     m_vecPosition = vecPosition;
     UpdateSpatialData ();
 };

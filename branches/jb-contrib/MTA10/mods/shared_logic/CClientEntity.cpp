@@ -62,6 +62,9 @@ CClientEntity::CClientEntity ( ElementID ID )
     m_pModelInfo = NULL;
 
     g_pClientGame->GetGameEntityXRefManager ()->OnClientEntityCreate ( this );
+
+    m_bWorldIgnored = false;
+
 }
 
 
@@ -555,10 +558,16 @@ bool CClientEntity::GetMatrix ( CMatrix& matrix ) const
     CEntity* pEntity = const_cast < CEntity* > ( GetGameEntity () );
     if ( pEntity )
     {
-        if ( pEntity->GetMatrix ( &matrix ) ) return true;
+        if ( pEntity->GetMatrix ( &matrix ) )
+            return true;
     }
 
-    return false;
+    // When streamed out
+    CVector vecRotation;
+    GetRotationRadians ( vecRotation );
+    g_pMultiplayer->ConvertEulerAnglesToMatrix ( matrix, vecRotation.fX, vecRotation.fY, vecRotation.fZ );
+    GetPosition ( matrix.vPos );
+    return true;
 }
 
 
@@ -571,7 +580,12 @@ bool CClientEntity::SetMatrix ( const CMatrix& matrix )
         return true;
     }
 
-    return false;
+    // When streamed out
+    SetPosition ( matrix.vPos );
+    CVector vecRotation;
+    g_pMultiplayer->ConvertMatrixToEulerAngles ( matrix, vecRotation.fX, vecRotation.fY, vecRotation.fZ );
+    SetRotationRadians ( vecRotation );
+    return true;
 }
 
 
@@ -589,6 +603,29 @@ void CClientEntity::SetPositionRelative ( CClientEntity * pOrigin, const CVector
     pOrigin->GetPosition ( vecOrigin );
     SetPosition ( vecOrigin + vecPosition );
 }
+
+void CClientEntity::GetRotationRadians ( CVector& vecOutRadians ) const
+{
+    vecOutRadians = CVector ();
+}
+
+void CClientEntity::GetRotationDegrees ( CVector& vecOutDegrees ) const
+{
+    GetRotationRadians ( vecOutDegrees );
+    ConvertRadiansToDegrees ( vecOutDegrees );
+}
+
+void CClientEntity::SetRotationRadians ( const CVector& vecRadians )
+{
+}
+
+void CClientEntity::SetRotationDegrees ( const CVector& vecDegrees )
+{
+    CVector vecTemp = vecDegrees;
+    ConvertDegreesToRadians ( vecTemp );
+    SetRotationRadians ( vecTemp );
+}
+
 
 bool CClientEntity::IsOutOfBounds ( void )
 {
@@ -1104,6 +1141,7 @@ bool CClientEntity::IsAttachable ( void )
         case CCLIENTPICKUP:
         case CCLIENTSOUND:
         case CCLIENTCOLSHAPE:
+        case CCLIENTWEAPON:
         {
             return true;
             break;
@@ -1123,6 +1161,7 @@ bool CClientEntity::IsAttachToable ( void )
         case CCLIENTRADARMARKER:
         case CCLIENTVEHICLE:
         case CCLIENTOBJECT:
+        case CCLIENTWEAPON:
         case CCLIENTMARKER:
         case CCLIENTPICKUP:
         case CCLIENTSOUND:
@@ -1298,9 +1337,25 @@ RpClump * CClientEntity::GetClump ( void )
     return NULL;
 }
 
+void CClientEntity::WorldIgnore ( bool bIgnore )
+{
+    CEntity * pEntity = GetGameEntity ();
+    if ( bIgnore )
+    {
+        if ( pEntity )
+        {
+            g_pGame->GetWorld ()->IgnoreEntity ( pEntity );
+        }
+    }
+    else
+    {
+        g_pGame->GetWorld ()->IgnoreEntity ( NULL );
+    }
+    m_bWorldIgnored = bIgnore;
+}
 
 // Entities from root optimization for getElementsByType
-typedef CFastList < CClientEntity > CFromRootListType;
+typedef CFastList < CClientEntity* > CFromRootListType;
 typedef google::dense_hash_map < unsigned int, CFromRootListType > t_mapEntitiesFromRoot;
 static t_mapEntitiesFromRoot    ms_mapEntitiesFromRoot;
 static bool                     ms_bEntitiesFromRootInitialized = false;

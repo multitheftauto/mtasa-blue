@@ -62,6 +62,8 @@ CGUI_Impl::CGUI_Impl ( IDirect3DDevice9* pDevice )
     m_pSchemeManager = CEGUI::SchemeManager::getSingletonPtr ();
     m_pWindowManager = CEGUI::WindowManager::getSingletonPtr ();
 
+    SetDefaultGuiWorkingDirectory ( CalcMTASAPath ( "MTA" ) );
+
     // Set logging to Informative for debug and Standard for release
 #if _DEBUG
     CEGUI::Logger::getSingleton().setLoggingLevel ( CEGUI::Informative );
@@ -90,7 +92,7 @@ CGUI_Impl::CGUI_Impl ( IDirect3DDevice9* pDevice )
 	catch ( CEGUI::InvalidRequestException e )
 	{
         SString strMessage = e.getMessage ().c_str ();
-        BrowseToSolution ( "create-fonts", true, true, true, SString ( "Error loading fonts!\n\n%s", *strMessage ) );
+        BrowseToSolution ( "create-fonts", EXIT_GAME_FIRST | ASK_GO_ONLINE, SString ( "Error loading fonts!\n\n%s", *strMessage ) );
 	}
 }
 
@@ -108,18 +110,13 @@ void CGUI_Impl::SetSkin ( const char* szName )
         CEGUI::SchemeManager::getSingleton().unloadScheme(m_CurrentSchemeName);
     }
 
-    // Load the GUI scheme
-    SString savedWorkingDirectory = GetCurrentWorkingDirectory();
-    SString skinDirectory = PathJoin ( m_szWorkingDirectory, "..", "skins", szName );
-    CEGUI::Logger::getSingleton().logEvent("Set skin directory to:");
-    CEGUI::Logger::getSingleton().logEvent(skinDirectory.c_str());
-    SetCurrentDirectory(skinDirectory);
+    PushGuiWorkingDirectory ( CalcMTASAPath ( PathJoin ( "skins", szName ) ) );
 
-    CEGUI::Scheme* scheme = CEGUI::SchemeManager::getSingleton().loadScheme("CGUI.xml");
+    CEGUI::Scheme* scheme = CEGUI::SchemeManager::getSingleton().loadScheme( "CGUI.xml" );
     m_CurrentSchemeName = scheme->getName().c_str();
     m_HasSchemeLoaded = true;
 
-    SetCurrentDirectory(savedWorkingDirectory);
+    PopGuiWorkingDirectory ();
 
     CEGUI::System::getSingleton().setDefaultMouseCursor("CGUI-Images", "MouseArrow");
 
@@ -146,9 +143,6 @@ void CGUI_Impl::SetSkin ( const char* szName )
 
     // Disallow input routing to the GUI
     m_eInputMode = INPUTMODE_ALLOW_BINDS;
-
-    // Reset the working directory
-    m_szWorkingDirectory[MAX_PATH] = 0;
 
     // The transfer box is not visible by default
     m_bTransferBoxVisible = false;
@@ -226,7 +220,7 @@ void CGUI_Impl::Restore ( void )
     }
     catch ( CEGUI::RendererException& exception )
     {
-        MessageBox ( 0, exception.getMessage().c_str (), "CEGUI Exception", MB_OK|MB_ICONERROR );
+        MessageBox ( 0, exception.getMessage().c_str (), "CEGUI Exception", MB_OK|MB_ICONERROR | MB_TOPMOST );
         TerminateProcess ( GetCurrentProcess (), 1 );
     }
 }
@@ -397,7 +391,7 @@ CGUIFont* CGUI_Impl::CreateFntFromWinFont ( const char* szFontName, const char* 
 	        {
                 pResult = (CGUIFont_Impl*) CreateFnt ( szFontName, lookList[i], uSize, uFlags, bAutoScale );
 	        }
-	        catch ( CEGUI::InvalidRequestException e ) {}
+	        catch ( CEGUI::Exception e ) {}
         }
 
         if ( pResult )
@@ -405,7 +399,7 @@ CGUIFont* CGUI_Impl::CreateFntFromWinFont ( const char* szFontName, const char* 
     }
     if ( !pResult )
     {
-        BrowseToSolution ( "create-fonts", true, true, true, SString ( "Error loading font!\n\n(%s)", szFontWinFile ) );
+        BrowseToSolution ( "create-fonts", EXIT_GAME_FIRST | ASK_GO_ONLINE, SString ( "Error loading font!\n\n(%s)", szFontWinFile ) );
     }
 
     return pResult;
@@ -932,21 +926,49 @@ bool CGUI_Impl::Event_KeyDown ( const CEGUI::EventArgs& Args )
     return true;
 }
 
-
-void CGUI_Impl::SetWorkingDirectory ( const char * szDir )
+void CGUI_Impl::SetDefaultGuiWorkingDirectory ( const SString& strDir )
 {
-    unsigned int uiDirLen = ( unsigned int ) strlen ( szDir );
+    assert ( m_GuiWorkingDirectoryStack.empty () );
+    m_GuiWorkingDirectoryStack.push_back ( PathConform ( strDir + "\\" ) );
+    ApplyGuiWorkingDirectory ();
+}
 
-    // Check if the worst possible size fits in the buffer
-    if ( ( uiDirLen + 1 ) > MAX_PATH ) return;
+void CGUI_Impl::PushGuiWorkingDirectory ( const SString& strDir )
+{
+    m_GuiWorkingDirectoryStack.push_back ( PathConform ( strDir + "\\" ) );
+    ApplyGuiWorkingDirectory ();
+}
 
-    strncpy ( m_szWorkingDirectory, szDir, MAX_PATH );
-
-    // We need a trailing slash, so check for one
-    if ( szDir [ uiDirLen - 1 ] != '/' && szDir [ uiDirLen - 1 ] != '\\' ) {
-        m_szWorkingDirectory [ uiDirLen ] = '/';
-        m_szWorkingDirectory [ uiDirLen + 1 ] = NULL;
+void CGUI_Impl::PopGuiWorkingDirectory ( const SString& strDirCheck )
+{
+    if ( m_GuiWorkingDirectoryStack.size () < 2 )
+    {
+        OutputDebugLine ( SString ( "CGUI_Impl::PopWorkingDirectory - Stack empty. Expected '%s'", *strDirCheck ) );
     }
+    else
+    {
+        if ( !strDirCheck.empty () )
+        {
+            const SString& strWas = m_GuiWorkingDirectoryStack.back ();
+            if ( strDirCheck != strWas )
+            {
+                OutputDebugLine ( SString ( "CGUI_Impl::PopWorkingDirectory - Mismatch. Got '%s', expected '%s'", *strWas, *strDirCheck ) );
+            }
+        }
+        m_GuiWorkingDirectoryStack.pop_back ();
+    }
+    ApplyGuiWorkingDirectory ();
+}
+
+void CGUI_Impl::ApplyGuiWorkingDirectory ( void )
+{
+    CEGUI::System::getSingleton().SetGuiWorkingDirectory ( m_GuiWorkingDirectoryStack.back () );
+}
+
+const SString& CGUI_Impl::GetGuiWorkingDirectory ( void ) const
+{
+    dassert ( !m_GuiWorkingDirectoryStack.empty () );
+    return m_GuiWorkingDirectoryStack.back ();
 }
 
 
@@ -976,7 +998,18 @@ bool CGUI_Impl::Event_MouseClick ( const CEGUI::EventArgs& Args )
         CGUIElement * pElement = reinterpret_cast < CGUIElement* > ( wnd->getUserData () );
         NewArgs.pWindow = pElement;
         
-        m_MouseClickHandlers[ m_Channel ] ( NewArgs );
+        // If called for client.dll, hack in call to core handler (Note: client.dll could unload if click causes reconnect)
+        if ( m_Channel == INPUT_MOD )
+        {
+            if ( m_MouseClickHandlers[ INPUT_CORE ] )
+            {
+                if ( m_MouseClickHandlers[ INPUT_CORE ] ( NewArgs ) )
+                    return true;    // Return if click was handled
+            }
+        }
+
+        if ( m_MouseClickHandlers[ m_Channel ] )
+            m_MouseClickHandlers[ m_Channel ] ( NewArgs );
     }
     return true;
 }
@@ -1008,7 +1041,18 @@ bool CGUI_Impl::Event_MouseDoubleClick ( const CEGUI::EventArgs& Args )
         CGUIElement * pElement = reinterpret_cast < CGUIElement* > ( wnd->getUserData () );
         NewArgs.pWindow = pElement;
         
-        m_MouseDoubleClickHandlers[ m_Channel ] ( NewArgs );
+        // If called for client.dll, hack in call to core handler (Note: client.dll could unload if click causes reconnect)
+        if ( m_Channel == INPUT_MOD )
+        {
+            if ( m_MouseDoubleClickHandlers[ INPUT_CORE ] )
+            {
+                if ( m_MouseDoubleClickHandlers[ INPUT_CORE ] ( NewArgs ) )
+                    return true;    // Return if click was handled
+            }
+        }
+
+        if ( m_MouseDoubleClickHandlers[ m_Channel ] )
+            m_MouseDoubleClickHandlers[ m_Channel ] ( NewArgs );
     }
     return true;
 }

@@ -226,7 +226,59 @@ void CGameEntityXRefManagerImpl::OnClientEntityDelete ( CClientEntity* pEntity )
 ///////////////////////////////////////////////////////////////
 void CGameEntityXRefManagerImpl::OnGameEntityDestruct ( CEntitySAInterface* pEntitySAInterface )
 {
-    assert ( !MapContains ( m_InterfaceToClientMap, pEntitySAInterface ) );
+    if ( MapContains ( m_InterfaceToClientMap, pEntitySAInterface ) )
+    {
+        BYTE* pInterface = (BYTE*)pEntitySAInterface;
+        DWORD InterfaceVtbl = *(DWORD*)pInterface;
+        ushort InterfaceModelId = *(ushort*)(pInterface + 34);
+        CClientEntity* pClientEntity = MapFindRef ( m_InterfaceToClientMap, pEntitySAInterface );
+        bool bClientEntityValid = MapContains ( m_ValidClientEntityMap, pClientEntity );
+
+        SString strClientEntityInfo;
+        if ( bClientEntityValid )
+        {
+            CEntity* pGameEntity = NULL;
+
+            if ( CClientPed* pPed = DynamicCast < CClientPed > ( pClientEntity ) )
+                pGameEntity = pPed->GetGameEntity ();
+
+            if ( CClientVehicle* pVehicle = DynamicCast < CClientVehicle > ( pClientEntity ) )
+                pGameEntity = pVehicle->GetGameEntity ();
+
+            if ( CClientObject* pObject = DynamicCast < CClientObject > ( pClientEntity ) )
+                pGameEntity = pObject->GetGameEntity ();
+
+            if ( CClientProjectile* pProjectile = DynamicCast < CClientProjectile > ( pClientEntity ) )
+                pGameEntity = pProjectile->GetGameEntity ();
+
+            if ( CClientPickup* pPickup = DynamicCast < CClientPickup > ( pClientEntity ) )
+                pGameEntity = pPickup->GetGameObject ();
+
+            CEntity* pMappedGameEntity = MapFindRef ( m_ClientToGameMap, pClientEntity );
+            CClientEntity* pMappedClientEntity = MapFindRef ( m_GameToClientMap, pGameEntity );
+
+
+            strClientEntityInfo = SString ( "%s Id:%x GameEntity:%08x MappedGameEntity:%08x MappedClientEntity:%08x"
+                                            , pClientEntity->GetClassName ()
+                                            , pClientEntity->GetID ()
+                                            , (int)pGameEntity
+                                            , (int)pMappedGameEntity
+                                            , (int)pMappedClientEntity
+                                        );
+        }
+
+        SString strMessage ( "EntitySAInterface:%08x  Vtbl:%08x  ModelId:%d   ClientEntity:%08x  [%s]"
+                                , (int)pEntitySAInterface
+                                , InterfaceVtbl
+                                , InterfaceModelId
+                                , (int)pClientEntity
+                                , *strClientEntityInfo
+                                );
+
+        g_pCore->LogEvent ( 8542, "XRefManager", "GameEntity Mismatch", strMessage );
+        AddReportLog ( 8542, strMessage );
+        dassert ( 0 );
+    }
 }
 
 

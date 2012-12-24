@@ -39,10 +39,7 @@ CBlip::~CBlip ( void )
 void CBlip::Unlink ( void )
 {
     // Remove us from the manager's list
-    if ( m_pBlipManager->m_bRemoveFromList && !m_pBlipManager->m_List.empty() )
-    {
-        m_pBlipManager->m_List.remove ( this );
-    }
+    m_pBlipManager->m_List.remove ( this );
 }
 
 
@@ -146,7 +143,6 @@ void CBlip::SetPosition ( const CVector& vecPosition )
     if ( m_vecPosition != vecPosition )
     {
         // Remember our position vectors
-        m_vecLastPosition = m_vecPosition;
         m_vecPosition = vecPosition;
     }
 }

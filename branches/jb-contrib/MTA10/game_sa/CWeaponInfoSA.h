@@ -23,7 +23,7 @@
 
 // Flame shot array for flamethrower flames and maybe molotovs
 #define ARRAY_CFlameShotInfo                0xC89690
-#define MAX_FLAME_SHOT_INFOS                64
+#define MAX_FLAME_SHOT_INFOS                100
 
 class CFlameShotInfo
 {
@@ -38,6 +38,7 @@ public:
     uint8               ucFlag2;
     uint16              usPad;
 };
+C_ASSERT(sizeof(CFlameShotInfo) == 0x2c );
 
 class CWeaponInfoSAInterface // 112 byte long class
 {

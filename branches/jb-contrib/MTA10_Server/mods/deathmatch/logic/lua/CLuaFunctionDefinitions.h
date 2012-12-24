@@ -30,6 +30,8 @@ class CLuaFunctionDefinitions;
 
 #define LUA_ERROR() lua_pushboolean ( luaVM, false ); return 0;
 
+extern CTimeUsMarker < 20 > markerLatentEvent;  // For timing triggerLatentClientEvent
+
 class CLuaFunctionDefinitions
 {
 public:
@@ -559,6 +561,7 @@ public:
 
     // Utility
     static int      Md5                                 ( lua_State* luaVM );
+    static int      Sha256                              ( lua_State* luaVM );
     static int      GetNetworkUsageData                 ( lua_State* luaVM );
     static int      GetNetworkStats                     ( lua_State* luaVM );
     static int      GetVersion                          ( lua_State* luaVM );

@@ -26,7 +26,7 @@ public:
     bool                        Write                       ( NetBitStreamInterface& BitStream ) const;
 
     inline void                 AddPlayer                   ( CPlayer* pPlayer )        { m_List.push_back ( pPlayer ); };
-    inline void                 RemovePlayer                ( CPlayer* pPlayer )        { if ( !m_List.empty() ) m_List.remove ( pPlayer ); };
+    inline void                 RemovePlayer                ( CPlayer* pPlayer )        { m_List.remove ( pPlayer ); };
     inline void                 RemoveAllPlayers            ( void )                    { m_List.clear (); };
 
     inline bool                 GetShowInChat               ( void )                    { return m_bShowInChat; };

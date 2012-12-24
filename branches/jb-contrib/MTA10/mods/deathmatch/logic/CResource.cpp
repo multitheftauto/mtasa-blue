@@ -40,8 +40,7 @@ CResource::CResource ( unsigned short usNetID, const char* szResourceName, CClie
 
     m_pLuaManager = g_pClientGame->GetLuaManager();
     m_pRootEntity = g_pClientGame->GetRootEntity ();
-    m_pDefaultElementGroup = new CElementGroup ( this );
-    m_elementGroups.push_back ( m_pDefaultElementGroup ); // for use by scripts
+    m_pDefaultElementGroup = new CElementGroup (); // for use by scripts
     m_pResourceEntity = pResourceEntity;
     m_pResourceDynamicEntity = pResourceDynamicEntity;
 
@@ -68,11 +67,19 @@ CResource::CResource ( unsigned short usNetID, const char* szResourceName, CClie
     m_strResourceDirectoryPath = SString ( "%s/resources/%s", g_pClientGame->GetModRoot (), *m_strResourceName );
     m_strResourcePrivateDirectoryPath = PathJoin ( CServerIdManager::GetSingleton ()->GetConnectionPrivateDirectory (), m_strResourceName );
 
+    m_strResourcePrivateDirectoryPathOld = CServerIdManager::GetSingleton ()->GetConnectionPrivateDirectory ( true );
+    if ( !m_strResourcePrivateDirectoryPathOld.empty () )
+        m_strResourcePrivateDirectoryPathOld = PathJoin ( m_strResourcePrivateDirectoryPathOld, m_strResourceName );
+
     m_pLuaVM = m_pLuaManager->CreateVirtualMachine ( this );
     if ( m_pLuaVM )
     {
         m_pLuaVM->SetScriptName ( szResourceName );
     }
+
+    // Slight hack until we have a fix for the side effects (on peds) caused by pulse order change
+    if ( m_strResourceName == "race" )
+        g_pClientGame->SetVehicleOnlyGameMode( true );
 }
 
 
@@ -82,8 +89,13 @@ CResource::~CResource ( void )
     // Make sure we don't force the cursor on
     ShowCursor ( false );
 
+    // Slight hack until we have a fix for the side effects (on peds) caused by pulse order change
+    if ( m_strResourceName == "race" )
+        g_pClientGame->SetVehicleOnlyGameMode( false );
+
     // Do this before we delete our elements.
     m_pRootEntity->CleanUpForVM ( m_pLuaVM, true );
+    g_pClientGame->GetElementDeleter ()->CleanUpForVM ( m_pLuaVM );
     m_pLuaManager->RemoveVirtualMachine ( m_pLuaVM );
 
     // Remove all keybinds on this VM
@@ -109,14 +121,9 @@ CResource::~CResource ( void )
     // Undo all changes to water
     g_pGame->GetWaterManager ()->UndoChanges ( this );
 
-    // TODO: remove them from the core too!!
-    // Destroy all the element groups attached directly to this resource
-    list < CElementGroup* > ::iterator itere = m_elementGroups.begin ();
-    for ( ; itere != m_elementGroups.end (); itere++ )
-    {
-        delete (*itere);
-    }
-    m_elementGroups.clear();
+    // Destroy the element group attached directly to this resource
+    if ( m_pDefaultElementGroup )
+        delete m_pDefaultElementGroup;
     m_pDefaultElementGroup = NULL;
 
     m_pRootEntity = NULL;
@@ -383,12 +390,40 @@ void CResource::ShowCursor ( bool bShow, bool bToggleControls )
 }
 
 
-SString CResource::GetResourceDirectoryPath ( eAccessType accessType )
+SString CResource::GetResourceDirectoryPath ( eAccessType accessType, const SString& strMetaPath )
 {
+    // See if private files should be moved to a new directory
     if ( accessType == ACCESS_PRIVATE )
-        return m_strResourcePrivateDirectoryPath;
-    return m_strResourceDirectoryPath;
+    {
+        if ( !m_strResourcePrivateDirectoryPathOld.empty () )
+        {
+            SString strNewFilePath = PathJoin ( m_strResourcePrivateDirectoryPath, strMetaPath );
+            SString strOldFilePath = PathJoin ( m_strResourcePrivateDirectoryPathOld, strMetaPath );
+
+            if ( FileExists ( strOldFilePath ) )
+            {
+                if ( FileExists ( strNewFilePath ) )
+                {
+                    // If file exists in old and new, delete from old
+                    OutputDebugLine ( SString ( "Deleting %s", *strOldFilePath ) );
+                    FileDelete ( strOldFilePath );
+                }
+                else
+                {
+                    // If file exists in old only, move from old to new
+                    OutputDebugLine ( SString ( "Moving %s to %s", *strOldFilePath, *strNewFilePath ) );
+                    MakeSureDirExists ( strNewFilePath );
+                    FileRename ( strOldFilePath, strNewFilePath );
+                }
+            }
+        }
+    }
+
+    if ( accessType == ACCESS_PRIVATE )
+        return PathJoin ( m_strResourcePrivateDirectoryPath, strMetaPath );
+    return PathJoin ( m_strResourceDirectoryPath, strMetaPath );
 }
+
 
 void CResource::LoadProtectedScript ( const char* chunk, unsigned int len )
 {
@@ -402,5 +437,17 @@ void CResource::LoadProtectedScript ( const char* chunk, unsigned int len )
             m_bLoadAfterReceivingProtectedScripts = false;
             Load ( m_pRootEntity );
         }
+    }
+}
+
+
+//
+// Add element to the default element group 
+//
+void CResource::AddToElementGroup ( CClientEntity* pElement )
+{
+    if ( m_pDefaultElementGroup )
+    {
+        m_pDefaultElementGroup->Add ( pElement );
     }
 }

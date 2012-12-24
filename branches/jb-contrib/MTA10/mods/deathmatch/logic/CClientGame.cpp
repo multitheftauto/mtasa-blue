@@ -43,7 +43,6 @@ using std::vector;
 // Used within this file by the packet handler to grab the this pointer of CClientGame
 extern CClientGame* g_pClientGame;
 extern int g_iDamageEventLimit;
-int iTestCounter = 0;
 
 #define DEFAULT_GRAVITY            0.008f
 #define DEFAULT_GAME_SPEED         1.0f
@@ -105,13 +104,6 @@ CClientGame::CClientGame ( bool bLocalPlay )
 
     m_bNoNewVehicleTask = false;
     m_NoNewVehicleTaskReasonID = INVALID_ELEMENT_ID;
-    m_bTransferResource = false;            // flag controls whether a resource is being transferred or not
-    m_bTransferInitiated = false;           // flag controls whether a transfer has been initiated (to prevent PacketResource, AUTOPATCHER_REQUEST_FILES priority issues)
-
-    m_bSingularTransfer = false;            // flag controls whether a singular file is being transferred or not
-
-    m_dwTransferStarted = 0;                // timestamp for transfer start
-    m_bTransferReset = false;               // flag controls whether we have to reset the transfer counter
 
     m_bCursorEventsEnabled = false;
     m_bInitiallyFadedOut = true;
@@ -268,7 +260,6 @@ CClientGame::CClientGame ( bool bLocalPlay )
     g_pMultiplayer->SetGameEntityRenderHandler( CClientGame::StaticGameEntityRenderHandler );
     g_pGame->SetPreWeaponFireHandler ( CClientGame::PreWeaponFire );
     g_pGame->SetPostWeaponFireHandler ( CClientGame::PostWeaponFire );
-    m_pProjectileManager->SetInitiateHandler ( CClientGame::StaticProjectileInitiateHandler );
     g_pCore->SetMessageProcessor ( CClientGame::StaticProcessMessage );
     g_pCore->GetKeyBinds ()->SetKeyStrokeHandler ( CClientGame::StaticKeyStrokeHandler );
     g_pCore->GetKeyBinds ()->SetCharacterKeyHandler ( CClientGame::StaticCharacterKeyHandler );
@@ -416,7 +407,6 @@ CClientGame::~CClientGame ( void )
     g_pGame->SetPreWeaponFireHandler ( NULL );
     g_pGame->SetPostWeaponFireHandler ( NULL );
     g_pGame->GetAudio ()->SetWorldSoundHandler ( NULL );
-    m_pProjectileManager->SetInitiateHandler ( NULL );
     g_pCore->SetMessageProcessor ( NULL );
     g_pCore->GetKeyBinds ()->SetKeyStrokeHandler ( NULL );
     g_pCore->GetKeyBinds ()->SetCharacterKeyHandler ( NULL );
@@ -904,8 +894,6 @@ void CClientGame::DoPulsePostFrame ( void )
             m_LastClearTime.Reset ( );
         }
 
-        GetModelCacheManager ()->DrawStats ();
-
         CClientPerfStatManager::GetSingleton ()->DoPulse ();
     }
 
@@ -1025,16 +1013,8 @@ void CClientGame::DoPulses ( void )
 
     // Pulse the network interface
 
-    // Extrapolation test
-    if ( m_VehExtrapolateSettings.bEnabled )
-    {
-        if ( iTestCounter < 100 )
-        {
-            iTestCounter++;
-            DoPulses2 ();
-        }
-    }
-    else
+    // Extrapolation test - Change the pulse order to reduce latency (Has side effects for peds)
+    if ( !IsUsingAlternatePulseOrder( true ) )
         DoPulses2 ();
 
     m_pUnoccupiedVehicleSync->DoPulse ();
@@ -1171,23 +1151,8 @@ void CClientGame::DoPulses ( void )
     else if ( m_Status == CClientGame::STATUS_JOINED )
     {
         // Pulse DownloadFiles if we're transferring stuff
-        if ( m_bTransferResource ) 
-        {
-            DownloadFiles ();
-        }
-        else if ( m_bSingularTransfer )
-        {
-            DownloadFiles ( true );
-        }
-
-    }
-    else if ( m_Status == CClientGame::STATUS_TRANSFER )
-    {
-        DownloadFiles ();
-    }
-    else if ( m_Status == CClientGame::STATUS_OFFLINE )
-    {
-
+        DownloadInitialResourceFiles ();
+        DownloadSingularResourceFiles ();
     }
 
     // Not waiting for local connect?
@@ -1273,7 +1238,7 @@ void CClientGame::DoPulses ( void )
     // Fire the engine ready event 10 frames after we're ingame
     static int iFrameCount = 0;
 
-    if ( iFrameCount <= 10 && m_Status == CClientGame::STATUS_JOINED || (m_pManager->IsGameLoaded () && m_Status == CClientGame::STATUS_OFFLINE) )
+    if ( iFrameCount <= 10 && m_Status == CClientGame::STATUS_JOINED )
     {
         ++iFrameCount;
 
@@ -2308,13 +2273,17 @@ bool CClientGame::CharacterKeyHandler ( WPARAM wChar )
     if ( m_pRootEntity )
     {
         // Safe character?
-        if ( wChar >= 32 && wChar <= 126 )
+        if ( wChar >= 32 )
         {
-            char szCharacter [ 2 ] = { wChar, 0 };
+            // Generate a null-terminating string for our character
+            wchar_t wUNICODE[2] = { wChar, '\0' };
+
+            // Convert our UTF character into an ANSI string
+            SString strANSI = UTF16ToMbUTF8 ( wUNICODE );
 
             // Call our character event
             CLuaArguments Arguments;
-            Arguments.PushString ( szCharacter );
+            Arguments.PushString ( strANSI );
             m_pRootEntity->CallEvent ( "onClientCharacter", Arguments, false );
         }
     }
@@ -2790,9 +2759,12 @@ void CClientGame::AddBuiltInEvents ( void )
     m_Events.AddEvent ( "onClientSoundChangedMeta", "streamTitle", NULL, false );
     m_Events.AddEvent ( "onClientSoundStarted", "reason", NULL, false );
     m_Events.AddEvent ( "onClientSoundStopped", "reason", NULL, false );
+    m_Events.AddEvent ( "onClientSoundBeat", "time", NULL, false );
 
     // Misc events
     m_Events.AddEvent ( "onClientFileDownloadComplete", "fileName, success", NULL, false );
+    
+    m_Events.AddEvent ( "onClientWeaponFire", "ped, x, y, z", NULL, false );
 }
 
 
@@ -3255,7 +3227,7 @@ void CClientGame::UpdateMimics ( void )
                         {
                             if ( usUpgrades [ uc ] )
                             {
-                                pMimicVehicle->GetUpgrades ()->AddUpgrade ( usUpgrades [ uc ] );
+                                pMimicVehicle->GetUpgrades ()->AddUpgrade ( usUpgrades [ uc ], true );
                             }
                         }
 
@@ -3425,9 +3397,9 @@ void CClientGame::Event_OnIngame ( void )
 
     // Disable parts of the Hud
     CHud* pHud = g_pGame->GetHud ();
-    pHud->DisableHelpText ( true );
-    pHud->DisableVitalStats ( true );
-    pHud->DisableAreaName ( true );
+    pHud->SetComponentVisible ( HUD_HELP_TEXT, false );
+    pHud->SetComponentVisible ( HUD_VITAL_STATS, false );
+    pHud->SetComponentVisible ( HUD_AREA_NAME, false );
 
     g_pMultiplayer->DeleteAndDisableGangTags ();
 
@@ -3462,6 +3434,7 @@ void CClientGame::Event_OnIngame ( void )
     // Reset anything from last game
     ResetMapInfo ();
     g_pGame->GetWaterManager ()->Reset ();      // Deletes all custom water elements, ResetMapInfo only reverts changes to water level
+    g_pGame->GetWaterManager ()->SetWaterDrawnLast ( true );
 
     // Create a local player for us
     m_pLocalPlayer = new CClientPlayer ( m_pManager, m_LocalID, true );
@@ -3537,11 +3510,6 @@ bool CClientGame::StaticDamageHandler ( CPed* pDamagePed, CEventDamage * pEvent 
 void CClientGame::StaticFireHandler ( CFire* pFire )
 {
     g_pClientGame->FireHandler ( pFire );
-}
-
-void CClientGame::StaticProjectileInitiateHandler ( CClientProjectile * pProjectile )
-{
-    g_pClientGame->ProjectileInitiateHandler ( pProjectile );
 }
 
 void CClientGame::StaticRender3DStuffHandler ( void )
@@ -3778,10 +3746,9 @@ void CClientGame::IdleHandler ( void )
         DoPulses ();
     }
 
-    // Extrapolation test
-    if ( m_VehExtrapolateSettings.bEnabled )
-        if ( iTestCounter >= 100 )
-            DoPulses2 ();
+    // Extrapolation test - Change the pulse order to reduce latency (Has side effects for peds)
+    if ( IsUsingAlternatePulseOrder() )
+        DoPulses2 ();
 }
 
 
@@ -3862,63 +3829,78 @@ bool CClientGame::ProcessCollisionHandler ( CEntitySAInterface* pThisInterface, 
     return true;
 }
 
-void CClientGame::DownloadFiles ( bool bBackgroundDownload )
+
+// Set flag and transfer box visibility
+void CClientGame::SetTransferringInitialFiles ( bool bTransfer )
 {
-    if ( !bBackgroundDownload )
-        m_pTransferBox->DoPulse (); // should increase FPS while downloading singular files
+    m_bTransferringInitialFiles = bTransfer;
+    if ( bTransfer )
+        m_pTransferBox->Show ();
+    else
+        m_pTransferBox->Hide ();
+}
 
-    CNetHTTPDownloadManagerInterface* pHTTP = g_pNet->GetHTTPDownloadManager ();
-    if ( pHTTP )
+
+//
+// Downloading initial resource files
+//
+void CClientGame::DownloadInitialResourceFiles ( void )
+{
+    if ( !IsTransferringInitialFiles () )
+        return;
+
+    CNetHTTPDownloadManagerInterface* pHTTP = g_pNet->GetHTTPDownloadManager ( EDownloadMode::RESOURCE_INITIAL_FILES );
+    if ( !pHTTP->ProcessQueuedFiles () )
     {
-        if ( !pHTTP->ProcessQueuedFiles () )
+        // Downloading
+        m_pTransferBox->SetInfo ( pHTTP->GetDownloadSizeNow () );
+        m_pTransferBox->DoPulse ();
+    }
+    else
+    {
+        SetTransferringInitialFiles ( false );
+
+        // Get the last error to occur in the HTTP Manager
+        const char* szHTTPError = pHTTP->GetError ();
+
+        // Was an error found?
+        if ( strlen (szHTTPError) == 0 )
         {
-            if ( m_dwTransferStarted == 0 || m_bTransferReset )
-            {
-                m_dwTransferStarted = GetTickCount32 ();
-
-                m_bTransferReset = false;
-            }
-            if ( !bBackgroundDownload && !m_bTransferResource )
-                m_pTransferBox->SetInfo ( pHTTP->GetDownloadSizeNow () ); // no need to set this if it's a singular file
-
-            if ( bBackgroundDownload && m_pTransferBox->IsVisible() )
-            {
-                if ( pHTTP->GetDownloadSizeNow () > m_pTransferBox->GetTotalSize () )
-                {
-                    m_pTransferBox->Hide(); // singular files don't add to total size so if current size > total size then just hide, should increase FPS a little as well
-                }
-            }
+            // Load our ("unavailable"-flagged) resources, and make them available
+            m_pResourceManager->LoadUnavailableResources ( m_pRootEntity );
+            m_pTransferBox->Hide ();
         }
         else
         {
-            // Get the last error to occur in the HTTP Manager
-            const char* szHTTPError = pHTTP->GetError ();
+            // Throw the error and disconnect
+            g_pCore->GetModManager ()->RequestUnload ();
+            g_pCore->ShowMessageBox ( "Error", szHTTPError, MB_BUTTON_OK | MB_ICON_ERROR );
+            g_pCore->GetConsole ()->Printf ( "Download error: %s", szHTTPError );
+        }
+    }
+}
 
-            // Was an error found?
-            if ( strlen (szHTTPError) == 0 )
-            {
-                m_bTransferReset = true;
 
-                Event_OnTransferComplete ();
-                m_dwTransferStarted = 0;
-            }
-            else
-            {
-                // Resource transfers can't deal with errors but singular transfers can
-                if ( m_bTransferResource )
-                {
-                    // Throw the error and disconnect
-                    g_pCore->GetModManager ()->RequestUnload ();
-                    g_pCore->ShowMessageBox ( "Error", szHTTPError, MB_BUTTON_OK | MB_ICON_ERROR );
-                    g_pCore->GetConsole ()->Printf ( "Download error: %s", szHTTPError );
-                }
-                else
-                {
-                    m_bTransferReset = true;
-                    Event_OnTransferComplete ();
-                    m_dwTransferStarted = 0;
-                }
-            }
+//
+// On demand files
+//
+void CClientGame::DownloadSingularResourceFiles ( void )
+{
+    if ( !IsTransferringSingularFiles () )
+        return;
+
+    CNetHTTPDownloadManagerInterface* pHTTP = g_pNet->GetHTTPDownloadManager ( EDownloadMode::RESOURCE_SINGULAR_FILES );
+    if ( !pHTTP->ProcessQueuedFiles () )
+    {
+        // Downloading
+    }
+    else
+    {
+        // Can't clear list until all files have been processed
+        if ( m_pSingularFileDownloadManager->AllComplete () )
+        {
+            SetTransferringSingularFiles ( false );
+            m_pSingularFileDownloadManager->ClearList ();
         }
     }
 }
@@ -4832,54 +4814,6 @@ bool CClientGame::StaticProcessPacket ( unsigned char ucPacketID, NetBitStreamIn
 }
 
 
-void CClientGame::Event_OnTransferComplete ( void )
-{
-    if ( m_bTransferResource )  /*** in-game transfer ***/
-    {
-        // Load our ("unavailable"-flagged) resources, and make them available
-        m_pResourceManager->LoadUnavailableResources ( m_pRootEntity );
-
-        // Disable m_bTransferResource (and hide the transfer box), if there are no more files in the autopatch query (to prevent "simulatenous" transfer fuck-ups)
-        if ( !g_pNet->GetHTTPDownloadManager ()->IsDownloading () )
-        {
-            m_bTransferResource = false;
-            m_pTransferBox->Hide ();
-        }
-    }
-    else if ( m_bSingularTransfer )  /*** singular file transfer (lua downloadFile) ***/
-    {
-        // Disable m_bSingularTransfer, if there are no more files in the autopatch query (to prevent "simulatenous" transfer fuck-ups)
-        if ( !g_pNet->GetHTTPDownloadManager ()->IsDownloading () )
-        {
-            // Can't clear list until all files have been processed
-            if ( m_pSingularFileDownloadManager->AllComplete () )
-            {
-                m_bSingularTransfer = false;
-                m_pSingularFileDownloadManager->ClearList ();
-            }
-        }
-    }
-    else                        /*** on-join transfer ***/
-    {
-        // Hide the transfer box
-        m_pTransferBox->Hide ();
-
-        // Tell the core we're finished
-        g_pCore->SetConnected ( true );
-        g_pCore->HideMainMenu ();
-
-        // We're now "Joining"
-        m_Status = CClientGame::STATUS_JOINING;
-
-        // If the game isn't started, start it
-        if ( g_pGame->GetSystemState () == 7 )
-        {
-            g_pGame->StartGame ();
-        }
-    }
-}
-
-
 void CClientGame::SendExplosionSync ( const CVector& vecPosition, eExplosionType Type, CClientEntity * pOrigin )
 {
     SPositionSync position ( false );
@@ -4999,7 +4933,7 @@ void CClientGame::SendProjectileSync ( CClientProjectile * pProjectile )
                 pBitStream->Write ( &velocity );
 
                 SRotationRadiansSync rotation ( true );
-                pProjectile->GetRotation ( rotation.data.vecRotation );
+                pProjectile->GetRotationRadians ( rotation.data.vecRotation );
                 pBitStream->Write ( &rotation );
 
                 break;
@@ -5040,10 +4974,10 @@ void CClientGame::ResetMapInfo ( void )
     SetAllDimensions ( 0 );
 
     // Hud
-    g_pGame->GetHud ()->DisableAll ( false );
+    g_pGame->GetHud ()->SetComponentVisible ( HUD_ALL, true );
     // Disable area names as they are on load until camera unfades
-    g_pGame->GetHud ()->DisableAreaName ( true );
-    g_pGame->GetHud ()->DisableVitalStats ( true );
+    g_pGame->GetHud ()->SetComponentVisible ( HUD_AREA_NAME, false );
+    g_pGame->GetHud ()->SetComponentVisible ( HUD_VITAL_STATS, false );
 
     m_bHudAreaNameDisabled = false;       
 
@@ -5302,11 +5236,7 @@ bool CClientGame::OnMouseClick ( CGUIMouseEventArgs Args )
         break;
     }
 
-    // Call the event handler in CCore
-    bool bHandled = g_pCore->OnMouseClick ( Args );
-
-    // Only pass on to lua if we haven't handled it yet
-    if ( !bHandled && szButton ) {
+    if ( szButton ) {
         CLuaArguments Arguments;
         Arguments.PushString ( szButton );
         Arguments.PushString ( szState );
@@ -5346,11 +5276,7 @@ bool CClientGame::OnMouseDoubleClick ( CGUIMouseEventArgs Args )
         break;
     }
 
-    // Call the event handler in CCore
-    bool bHandled = g_pCore->OnMouseDoubleClick ( Args );
-
-    // Only pass on to lua if we haven't handled it yet
-    if ( !bHandled && szButton ) {
+    if ( szButton ) {
         CLuaArguments Arguments;
         Arguments.PushString ( szButton );
         Arguments.PushString ( szState );
@@ -5926,3 +5852,52 @@ void CClientGame::WorldSoundHandler ( uint uiGroup, uint uiIndex )
     if ( m_bShowSound )
         m_pScriptDebugging->LogInformation ( NULL, "%s - World sound group:%d index:%d", *GetLocalTimeString ( false, true ), uiGroup, uiIndex );
 } 
+
+
+//////////////////////////////////////////////////////////////////
+//
+// CClientGame::SetVehicleOnlyGameMode
+//
+//
+//
+//////////////////////////////////////////////////////////////////
+void CClientGame::SetVehicleOnlyGameMode( bool bOn )
+{
+    m_bVehicleOnlyGameMode = bOn;
+}
+
+
+//////////////////////////////////////////////////////////////////
+//
+// CClientGame::IsVehicleOnlyGameMode
+//
+// Check if game mode is vehicle only, so we can do some pulse order hacks to reduce latency
+//
+//////////////////////////////////////////////////////////////////
+bool CClientGame::IsVehicleOnlyGameMode( void )
+{
+    return m_bVehicleOnlyGameMode;
+}
+
+
+//////////////////////////////////////////////////////////////////
+//
+// CClientGame::IsUsingAlternatePulseOrder
+//
+// Returns true if should be using alternate pulse order
+//
+//////////////////////////////////////////////////////////////////
+bool CClientGame::IsUsingAlternatePulseOrder( bool bAdvanceDelayCounter )
+{
+    if ( m_VehExtrapolateSettings.bEnabled && m_bVehicleOnlyGameMode )
+    {
+        // Only actually start using alternate pulse order after 100 frames
+        if ( m_uiAltPulseOrderCounter >= 100 )
+            return true;
+        else
+        if ( bAdvanceDelayCounter )
+            m_uiAltPulseOrderCounter++;
+    }
+
+    return false;
+}

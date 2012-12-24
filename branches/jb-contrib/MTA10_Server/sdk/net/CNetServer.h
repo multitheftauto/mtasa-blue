@@ -17,11 +17,37 @@
 #include "ns_playerid.h"
 #include "CNetHTTPDownloadManagerInterface.h"
 
+namespace EDownloadMode
+{
+    enum EDownloadModeType
+    {
+        NONE,
+        CALL_REMOTE,
+        ASE,
+    };
+}
+using EDownloadMode::EDownloadModeType;
+
+
 struct SPacketStat
 {
     int iCount;
     int iTotalBytes;
     TIMEUS totalTime;
+};
+
+class CBinaryFileInterface
+{
+public:
+    virtual             ~CBinaryFileInterface   ( void ) {}
+    virtual bool        FOpen                   ( const char* szFilename, const char* szMode, bool bValidate ) = 0;
+    virtual void        FClose                  ( void ) = 0;
+    virtual bool        FEof                    ( void ) = 0;
+    virtual void        FFlush                  ( void ) = 0;
+    virtual int         FTell                   ( void ) = 0;
+    virtual void        FSeek                   ( int iOffset, int iOrigin ) = 0;
+    virtual int         FRead                   ( void* pData, uint uiSize ) = 0;
+    virtual int         FWrite                  ( const void* pData, uint uiSize ) = 0;
 };
 
 struct SNetOptions
@@ -35,6 +61,11 @@ struct SNetOptions
         int iExtraPingVariance;
         int iKBPSLimit;
     } netSim;
+
+    struct {
+        bool bValid;
+        bool bAutoFilter;
+    } netFilter;
 };
 
 class CNetServer
@@ -72,7 +103,7 @@ public:
 
     virtual void                            SetMaximumIncomingConnections   ( unsigned short numberAllowed ) = 0;
 
-    virtual CNetHTTPDownloadManagerInterface*   GetHTTPDownloadManager      ( void ) = 0;
+    virtual CNetHTTPDownloadManagerInterface*   GetHTTPDownloadManager      ( EDownloadModeType iMode ) = 0;
 
     virtual void                            SetClientBitStreamVersion       ( const NetServerPlayerID &PlayerID, unsigned short usBitStreamVersion ) = 0;
     virtual void                            ClearClientBitStreamVersion     ( const NetServerPlayerID &PlayerID ) = 0;
@@ -88,6 +119,7 @@ public:
 
     virtual void                            GetClientSerialAndVersion       ( const NetServerPlayerID& playerID, SFixedString < 32 >& strSerial, SFixedString < 32 >& strVersion ) = 0;
     virtual void                            SetNetOptions                   ( const SNetOptions& options ) = 0;
+    virtual void                            GenerateRandomData              ( void* pOutData, uint uiLength ) = 0;
 };
 
 #endif

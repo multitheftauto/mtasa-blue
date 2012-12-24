@@ -60,6 +60,9 @@ public:
  *      1. m_nStandStillTimer is actually at 32, not 30.
  *      2. there is 8 bytes + 3 bits padding after 2nd bitfield
  */
+// Note: Information below may be incorrect. Please check before using.
+#pragma pack(push)
+#pragma pack(1)
 class CPlayerPedDataSAInterface
 {
 public:
@@ -74,36 +77,40 @@ public:
     //FLOAT m_fSprintControlCounter; // Removed arbitatrily to aligned next byte, should be here really
     BYTE    m_nChosenWeapon;        // 28
     BYTE    m_nCarDangerCounter;        // 29
-    long    m_nStandStillTimer;        // 30
-    DWORD   m_nHitAnimDelayTimer;        // 34
-    FLOAT   m_fAttackButtonCounter;        // 38
-    CAutomobile *m_pDangerCar;        // 42
+    BYTE    m_pad0;                     // 30
+    BYTE    m_pad1;                     // 31
+    long    m_nStandStillTimer;         // 32
+    DWORD   m_nHitAnimDelayTimer;       // 36
+    FLOAT   m_fAttackButtonCounter;     // 40
+    CAutomobile *m_pDangerCar;          // 44
 
-    DWORD   m_bStoppedMoving : 1;        // 46
+    DWORD   m_bStoppedMoving : 1;        // 48
     DWORD   m_bAdrenaline : 1;
     DWORD   m_bHaveTargetSelected : 1;  // Needed to work out whether we lost target this frame
     DWORD   m_bFreeAiming : 1;
     DWORD   bCanBeDamaged : 1;
     DWORD   bAllMeleeAttackPtsBlocked : 1;  // if all of m_pMeleeAttackers[] is blocked by collision, just attack straight ahead
     DWORD   m_JustBeenSnacking : 1;     // If this bit is true we have just bought something from a vending machine
-    DWORD   m_bRequireHandleBreath : 1; //
-
-    // The player runs a group. Player is the leader. Player can go up to gang-members and make them join his group.
-    DWORD   m_GroupStuffDisabled : 1;   // if this is true the player can't recrout or give his group commands.
+    DWORD   m_bRequireHandleBreath : 1; // 
+    
+    // The player runs a group. Player is the leader. Player can go up to gang-members and make them join his group.  // 50
+    DWORD   m_GroupStuffDisabled : 1;   // 49 // if this is true the player can't recrout or give his group commands.
     DWORD   m_GroupAlwaysFollow : 1;    // The group is told to always follow the player (used for girlfriend missions)
     DWORD   m_GroupNeverFollow : 1; // The group is told to always follow the player (used for girlfriend missions)
     DWORD   m_bInVehicleDontAllowWeaponChange : 1; // stop weapon change once driveby weapon has been given
     DWORD   m_bRenderWeapon : 1;    //  set to false during cutscenes so that knuckledusters are not rendered
 
-    long    m_PlayerGroup;        // 48?
+    DWORD   m_pad2;                 // 52
 
-    DWORD   m_AdrenalineEndTime;        // 52
-    BYTE    m_nDrunkenness;
-    bool    m_bFadeDrunkenness;
-    BYTE    m_nDrugLevel;
-    BYTE    m_nScriptLimitToGangSize;
+    long    m_PlayerGroup;          // 56
 
-    FLOAT   m_fBreath;  // for holding breath (ie underwater)
+    DWORD   m_AdrenalineEndTime;    // 60
+    BYTE    m_nDrunkenness;         // 64
+    bool    m_bFadeDrunkenness;     // 65
+    BYTE    m_nDrugLevel;           // 66
+    BYTE    m_nScriptLimitToGangSize; // 67
+
+    FLOAT   m_fBreath;  // for holding breath (ie underwater) // 68
 
     // once a set of melee weapon anims have been loaded and referenced for the player
     // we need to remember what we've referenced
@@ -128,12 +135,14 @@ public:
     bool    m_bPlayerSprintDisabled;
     bool    m_bDontAllowWeaponChange;
     bool    m_bForceInteriorLighting;
+    BYTE    m_pad3;
     WORD    m_DPadDownPressedInMilliseconds;
     WORD    m_DPadUpPressedInMilliseconds;
 
     BYTE    m_wetness;
     BYTE    m_playersGangActive;
     BYTE    m_waterCoverPerc;
+    BYTE    m_pad4;
     FLOAT   m_waterHeight;
 
     // used for doing lock-on with HS missiles
@@ -147,9 +156,9 @@ public:
 
     CPedSAInterface * m_pCurrentProstitutePed;
     CPedSAInterface * m_pLastProstituteShagged;
-
-    DWORD padding; // we're missing something here - fixes a crash (ugly hack #4432525) - eAi
 };
+C_ASSERT(sizeof(CPlayerPedDataSAInterface) == 172 );
+#pragma pack(pop)
 
 class CPlayerInfoSAInterface
 {

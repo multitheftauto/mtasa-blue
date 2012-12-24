@@ -588,7 +588,7 @@ void CEffectWrapImpl::CreateUnderlyingData ( const SString& strFilename, const S
     m_uiSaveStateFlags = D3DXFX_DONOTSAVESHADERSTATE;     // D3DXFX_DONOTSAVE(SHADER|SAMPLER)STATE
 
     // Fetch compiled D3DEffect
-    m_pD3DEffect = m_pManager->GetEffectCloner ()->CreateD3DEffect ( strFilename, strRootPath, strOutStatus, m_bUsesVertexShader, bDebug );
+    m_pD3DEffect = m_pManager->GetEffectCloner ()->CreateD3DEffect ( strFilename, strRootPath, strOutStatus, m_bUsesVertexShader, m_bUsesDepthBuffer, bDebug );
 
     if ( !m_pD3DEffect )
         return;
@@ -799,6 +799,18 @@ void CEffectWrapImpl::ApplyCommonHandles ( void )
         if ( m_CommonHandles.hLightDirection )
             m_pD3DEffect->SetFloatArray ( m_CommonHandles.hLightDirection, (float*)&strongestDirection, 4 );
     }
+
+    if ( m_CommonHandles.hDepthBuffer )
+        m_pD3DEffect->SetTexture ( m_CommonHandles.hDepthBuffer, g_pDeviceState->MainSceneState.DepthBuffer );
+
+    if ( m_CommonHandles.hViewMainScene )
+        m_pD3DEffect->SetMatrix ( m_CommonHandles.hViewMainScene, (D3DXMATRIX*)&g_pDeviceState->MainSceneState.TransformState.VIEW );
+
+    if ( m_CommonHandles.hWorldMainScene )
+        m_pD3DEffect->SetMatrix ( m_CommonHandles.hWorldMainScene, (D3DXMATRIX*)&g_pDeviceState->MainSceneState.TransformState.WORLD );
+
+    if ( m_CommonHandles.hProjectionMainScene )
+        m_pD3DEffect->SetMatrix ( m_CommonHandles.hProjectionMainScene, (D3DXMATRIX*)&g_pDeviceState->MainSceneState.TransformState.PROJECTION );
 };
 
 
@@ -1100,7 +1112,7 @@ void CEffectWrapImpl::ReadParameterHandles ( void )
 
         // Check if parameter is used
         if ( m_bSkipUnusedParameters && !MapContains ( m_ReferencedParameterMap, hParameter ) )
-            continue;
+                continue;
 
         // See if this parameter wants to be mapped to a D3D register
         if ( TryMappingParameterToRegister ( hParameter, ParameterDesc ) )

@@ -23,6 +23,7 @@
 #include "SharedUtil.hpp"
 #include <clocale>
 #include "CTimingCheckpoints.hpp"
+#include "CModelCacheManager.h"
 
 using SharedUtil::CalcMTASAPath;
 using namespace std;
@@ -606,6 +607,7 @@ void CCore::ApplyGameSettings ( void )
     CVARS_GET ( "volumetric_shadows", bval ); m_pGame->GetSettings ()->SetVolumetricShadowsEnabled ( bval );
     CVARS_GET ( "aspect_ratio",     iVal ); m_pGame->GetSettings ()->SetAspectRatio ( (eAspectRatio)iVal );
     CVARS_GET ( "grass",            bval ); m_pGame->GetSettings ()->SetGrassEnabled ( bval );
+    CVARS_GET ( "heat_haze",        bval ); m_pMultiplayer->SetHeatHazeEnabled ( bval );
     CVARS_GET ( "fast_clothes_loading", iVal ); m_pMultiplayer->SetFastClothesLoading ( (CMultiplayer::EFastClothesLoading)iVal );
 }
 
@@ -619,6 +621,7 @@ void CCore::ApplyCommunityState ( void )
 void CCore::SetConnected ( bool bConnected )
 {
     m_pLocalGUI->GetMainMenu ( )->SetIsIngame ( bConnected );
+    UpdateIsWindowMinimized ();  // Force update of stuff
 }
 
 
@@ -662,26 +665,12 @@ void CCore::SetMessageProcessor ( pfnProcessMessage pfnMessageProcessor )
 
 void CCore::ShowMessageBox ( const char* szTitle, const char* szText, unsigned int uiFlags, GUI_CALLBACK * ResponseHandler )
 {
-    CFilePathTranslator     FileTranslator;
-    string                  WorkingDirectory;
-    char                    szCurDir [ 1024 ];
-
     if ( m_pMessageBox )
         delete m_pMessageBox;
-
-
-    // Set the current directory to the MTA dir so we can load files using a relative path
-    FileTranslator.SetCurrentWorkingDirectory ( "MTA" );
-    FileTranslator.GetCurrentWorkingDirectory ( WorkingDirectory );
-    GetCurrentDirectory ( sizeof ( szCurDir ), szCurDir );
-    SetCurrentDirectory ( WorkingDirectory.c_str ( ) );
 
     // Create the message box
     m_pMessageBox = m_pGUI->CreateMessageBox ( szTitle, szText, uiFlags );
     if ( ResponseHandler ) m_pMessageBox->SetClickHandler ( *ResponseHandler );
-
-    // Restore current directory
-    SetCurrentDirectory ( szCurDir );
 
     // Make sure it doesn't auto-destroy, or we'll crash if the msgbox had buttons and the user clicks OK
     m_pMessageBox->SetAutoDestroy ( false );
@@ -730,7 +719,6 @@ void CCore::ShowServerInfo ( unsigned int WindowType )
 void CCore::ApplyHooks ( )
 { 
     WriteDebugEvent ( "CCore::ApplyHooks" );
-    ApplyLoadingCrashPatch ();
 
     // Create our hooks.
     m_pDirectInputHookManager->ApplyHook ( );
@@ -780,9 +768,8 @@ void LoadModule ( CModuleLoader& m_Loader, const SString& strName, const SString
         SetDllDirectory( CalcMTASAPath ( "mta" ) );
     }
 
-    // Switch to MTA dir
+    // Save current directory (shouldn't change anyway)
     SString strSavedCwd = SharedUtil::GetCurrentDirectory ();
-    SetCurrentDirectory ( CalcMTASAPath ( "mta" ) );
 
     // Load approrpiate compilation-specific library.
 #ifdef MTA_DEBUG
@@ -794,10 +781,9 @@ void LoadModule ( CModuleLoader& m_Loader, const SString& strName, const SString
 
     if ( m_Loader.IsOk () == false )
     {
-        MessageBox ( 0, SString ( "Error loading %s module! (%s)", *strName.ToLower (), *m_Loader.GetLastErrorMessage () ), "Error", MB_OK|MB_ICONEXCLAMATION );
-        BrowseToSolution ( strModuleName + "-not-loadable", true, true );
+        SString strMessage( "Error loading %s module! (%s)", *strName.ToLower (), *m_Loader.GetLastErrorMessage () );
+        BrowseToSolution ( strModuleName + "-not-loadable", ASK_GO_ONLINE | TERMINATE_PROCESS, strMessage );
     }
-
     // Restore current directory
     SetCurrentDirectory ( strSavedCwd );
 
@@ -816,9 +802,8 @@ void LoadModule ( CModuleLoader& m_Loader, const SString& strName, const SString
 template < class T, class U >
 T* InitModule ( CModuleLoader& m_Loader, const SString& strName, const SString& strInitializer, U* pObj )
 {
-    // Switch to MTA dir
+    // Save current directory (shouldn't change anyway)
     SString strSavedCwd = SharedUtil::GetCurrentDirectory ();
-    SetCurrentDirectory ( CalcMTASAPath ( "mta" ) );
 
     // Get initializer function from DLL.
     typedef T* (*PFNINITIALIZER) ( U* );
@@ -826,7 +811,7 @@ T* InitModule ( CModuleLoader& m_Loader, const SString& strName, const SString& 
 
     if ( pfnInit == NULL )
     {
-        MessageBox ( 0, SString("%s module is incorrect!", strName.c_str()) , "Error", MB_OK | MB_ICONEXCLAMATION );
+        MessageBox ( 0, SString("%s module is incorrect!", strName.data()), "Error", MB_OK | MB_ICONEXCLAMATION | MB_TOPMOST  );
         TerminateProcess ( GetCurrentProcess (), 1 );
     }
 
@@ -862,9 +847,7 @@ void CCore::CreateGame ( )
     m_pGame = CreateModule < CGame > ( m_GameModule, "Game", "game_sa", "GetGameInterface", this );
     if ( m_pGame->GetGameVersion () >= VERSION_11 )
     {
-        MessageBox ( 0, "Only GTA:SA version 1.0 is supported!  You are now being redirected to a page where you can patch your version.", "Error", MB_OK|MB_ICONEXCLAMATION );
-        BrowseToSolution ( "downgrade" );
-        TerminateProcess ( GetCurrentProcess (), 1 );
+        BrowseToSolution ( "downgrade", TERMINATE_PROCESS, "Only GTA:SA version 1.0 is supported!\n\nYou are now being redirected to a page where you can patch your version." );
     }
 
     // Apply hiding device selection dialog
@@ -889,9 +872,6 @@ void CCore::InitGUI ( IUnknown* pDevice )
 {
     IDirect3DDevice9 *dev = reinterpret_cast < IDirect3DDevice9* > ( pDevice );
     m_pGUI = InitModule < CGUI > ( m_GUIModule, "GUI", "InitGUIInterface", dev );
-
-    // Set the working directory for CGUI
-    m_pGUI->SetWorkingDirectory ( CalcMTASAPath ( "MTA" ) );
 
     // and set the screenshot path to this default library (screenshots shouldnt really be made outside mods)
     std::string strScreenShotPath = CalcMTASAPath ( "screenshots" );
@@ -926,9 +906,7 @@ void CCore::CreateNetwork ( )
     if ( !pfnCheckCompatibility || !pfnCheckCompatibility ( MTA_DM_CLIENT_NET_MODULE_VERSION ) )
     {
         // net.dll doesn't like our version number
-        MessageBox ( 0, "Network module not compatible!", "Error", MB_OK|MB_ICONEXCLAMATION );
-        BrowseToSolution ( "netc-not-compatible", true );
-        TerminateProcess ( GetCurrentProcess (), 1 );
+        BrowseToSolution ( "netc-not-compatible", ASK_GO_ONLINE | TERMINATE_PROCESS, "Network module not compatible!" );
     }
 
     // Set mta version for report log here
@@ -1030,9 +1008,17 @@ void CCore::DestroyNetwork ( )
 }
 
 
+void CCore::UpdateIsWindowMinimized ( void )
+{
+    m_bIsWindowMinimized = IsIconic ( GetHookedWindow () ) ? true : false;
+    // Update CPU saver for when minimized and not connected
+    g_pCore->GetMultiplayer ()->SetIsMinimizedAndNotConnected ( m_bIsWindowMinimized && !IsConnected () );
+}
+
+
 bool CCore::IsWindowMinimized ( void )
 {
-    return IsIconic ( GetHookedWindow () ) ? true : false;
+    return m_bIsWindowMinimized;
 }
 
 
@@ -1703,40 +1689,6 @@ void CCore::SetXfireData ( std::string strServerName, std::string strVersion, bo
 
 
 //
-// Patch to fix loading crash.
-// Has to be done before the main window is created.
-//
-void CCore::ApplyLoadingCrashPatch ( void )
-{
-    uchar* pAddress;
-
-    if ( *(WORD *)0x748ADD == 0x53FF )
-        pAddress = (uchar*)0x7468F9;    // US
-    else
-        pAddress = (uchar*)0x746949;    // EU
-
-    uchar ucOldValue = 0xB7;
-    uchar ucNewValue = 0x39;
-
-    MEMORY_BASIC_INFORMATION info;
-    VirtualQuery( pAddress, &info, sizeof(MEMORY_BASIC_INFORMATION) );
-
-    if ( info.State == MEM_COMMIT && info.Protect & ( PAGE_EXECUTE_READ | PAGE_EXECUTE_READWRITE | PAGE_READONLY | PAGE_READWRITE ) )
-    {
-        if ( pAddress[0] == ucOldValue )
-        {
-            DWORD dwOldProtect;
-            if ( VirtualProtect( pAddress, 1, PAGE_READWRITE, &dwOldProtect ) )
-            {
-                pAddress[0] = ucNewValue;
-                VirtualProtect( pAddress, 1, dwOldProtect, &dwOldProtect );
-            }
-        }
-    }
-}
-
-
-//
 // Recalculate FPS limit to use
 //
 // Uses client rate from config
@@ -1843,11 +1795,14 @@ void CCore::ApplyFrameRateLimit ( uint uiOverrideRate )
 // DoReliablePulse
 //
 // This is called once a frame even if minimized
+// (Except when minimized and never connected)
 //
 void CCore::DoReliablePulse ( void )
 {
     ms_TimingCheckpoints.BeginTimingCheckpoints ();
     TIMING_CHECKPOINT( "+CallIdle2" );
+
+    UpdateIsWindowMinimized ();
 
     // Non frame rate limit stuff
     if ( IsWindowMinimized () )
@@ -1930,6 +1885,9 @@ void CCore::OnPreHUDRender ( void )
 {
     IDirect3DDevice9* pDevice = CGraphics::GetSingleton ().GetDevice ();
 
+    // Handle saving depth buffer
+    CGraphics::GetSingleton ().GetRenderItemManager ()->SaveReadableDepthBuffer();
+
     // Create a state block.
     IDirect3DStateBlock9 * pDeviceState = NULL;
     pDevice->CreateStateBlock ( D3DSBT_ALL, &pDeviceState );
@@ -1948,7 +1906,7 @@ void CCore::OnPreHUDRender ( void )
     CGraphics::GetSingleton ().GetRenderItemManager ()->DoPulse ();
 
     // Handle script stuffs
-    if ( m_iUnminimizeFrameCounter-- && !m_iUnminimizeFrameCounter )
+    if ( m_iUnminimizeFrameCounter && --m_iUnminimizeFrameCounter == 0 )
     {
         m_pModManager->DoPulsePreHUDRender ( true, m_bDidRecreateRenderTargets );
         m_bDidRecreateRenderTargets = false;
@@ -2083,4 +2041,18 @@ EDiagnosticDebugType CCore::GetDiagnosticDebug ( void )
 void CCore::SetDiagnosticDebug ( EDiagnosticDebugType value )
 {
     m_DiagnosticDebug = value;
+}
+
+
+CModelCacheManager* CCore::GetModelCacheManager ( void )
+{
+    if ( !m_pModelCacheManager )
+        m_pModelCacheManager = NewModelCacheManager ();
+    return m_pModelCacheManager;
+}
+
+
+void CCore::AddModelToPersistentCache ( ushort usModelId )
+{
+    return GetModelCacheManager ()->AddModelToPersistentCache ( usModelId );
 }

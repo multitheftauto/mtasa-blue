@@ -46,8 +46,9 @@ static CPedManager*                                 m_pPedManager;
 static CWaterManager*                               m_pWaterManager;
 
 // Used to run a function on all the children of the elements too
-#define RUN_CHILDREN CChildListType::const_iterator iter=pElement->IterBegin();for(;iter!=pElement->IterEnd();iter++)
-#define RUN_CHILDREN_BACKWARDS CChildListType::const_reverse_iterator iter=pElement->IterReverseBegin();for(;iter!=pElement->IterReverseEnd();iter++)
+#define RUN_CHILDREN \
+    if ( pElement->CountChildren () ) \
+        for ( CChildListType::const_iterator iter = pElement->IterBegin () ; iter != pElement->IterEnd () ; iter++ )
 
 CStaticFunctionDefinitions::CStaticFunctionDefinitions ( CGame * pGame )
 {
@@ -148,20 +149,13 @@ bool CStaticFunctionDefinitions::TriggerEvent ( const char* szName, CElement* pE
 }
 
 
-bool CStaticFunctionDefinitions::TriggerClientEvent ( CElement* pElement, const char* szName, CElement* pCallWithElement, CLuaArguments& Arguments )
+bool CStaticFunctionDefinitions::TriggerClientEvent ( const std::vector < CPlayer* >& sendList, const char* szName, CElement* pCallWithElement, CLuaArguments& Arguments )
 {
-    assert ( pElement );
     assert ( szName );
     assert ( pCallWithElement );
 
     // Make packet
-    CLuaEventPacket Packet ( szName, pCallWithElement->GetID (), Arguments );
-
-    // Make send list
-    std::vector < CPlayer* > sendList;
-
-    // Get descendants (incl. pElement if a player)
-    pElement->GetDescendantsByType ( sendList, true, CElement::PLAYER );
+    CLuaEventPacket Packet ( szName, pCallWithElement->GetID (), &Arguments );
 
     // Send packet to players
     CPlayerManager::Broadcast ( Packet, sendList );
@@ -170,20 +164,15 @@ bool CStaticFunctionDefinitions::TriggerClientEvent ( CElement* pElement, const 
 }
 
 
-bool CStaticFunctionDefinitions::TriggerLatentClientEvent ( CElement* pElement, const char* szName, CElement* pCallWithElement, CLuaArguments& Arguments, int iBandwidth, CLuaMain* pLuaMain, ushort usResourceNetId )
+bool CStaticFunctionDefinitions::TriggerLatentClientEvent ( const std::vector < CPlayer* >& sendList, const char* szName, CElement* pCallWithElement, CLuaArguments& Arguments, int iBandwidth, CLuaMain* pLuaMain, ushort usResourceNetId )
 {
-    assert ( pElement );
     assert ( szName );
     assert ( pCallWithElement );
 
     // Make packet
-    CLuaEventPacket Packet ( szName, pCallWithElement->GetID (), Arguments );
+    CLuaEventPacket Packet ( szName, pCallWithElement->GetID (), &Arguments );
 
-    // Make send list
-    std::vector < CPlayer* > sendList;
-
-    // Get descendants (incl. pElement if a player)
-    pElement->GetDescendantsByType ( sendList, true, CElement::PLAYER );
+    markerLatentEvent.Set ( "Make packet" );
 
     // Send packet to players
     g_pGame->EnableLatentSends ( true, iBandwidth, pLuaMain, usResourceNetId );
@@ -218,8 +207,27 @@ CDummy* CStaticFunctionDefinitions::CreateElement ( CResource* pResource, const 
     assert ( szTypeName );
     assert ( szID );
 
+    EElementType elementType;
+    bool bIsInternalType = StringToEnum ( szTypeName, elementType );
+
+    // Allow use of some internal types for backwards compatibility
+    if ( bIsInternalType )
+    {
+        bool bOldDissallowed = false;
+        static const char* szOldDissallowedTypes[] = { "dummy", "player", "vehicle", "object", "marker", "blip", "pickup", "radararea", "console" };
+        for ( uint i = 0 ; i < NUMELMS( szOldDissallowedTypes ) ; i++ )
+            if ( strcmp ( szTypeName, szOldDissallowedTypes[i] ) == 0 )
+                bOldDissallowed = true;
+
+        if ( !bOldDissallowed )
+        {
+            // Maybe issue a warning about this one day 
+            bIsInternalType = false;
+        }
+    }
+
     // Long enough typename and not an internal one?
-    if ( strlen ( szTypeName ) > 0 && CElement::GetTypeID ( szTypeName ) == CElement::UNKNOWN )
+    if ( strlen ( szTypeName ) > 0 && !bIsInternalType )
     {
         // Create the element.
         CDummy* pDummy = new CDummy ( g_pGame->GetGroups (), pResource->GetDynamicElementRoot() );
@@ -327,7 +335,7 @@ CElement* CStaticFunctionDefinitions::CloneElement ( CResource* pResource, CElem
             case CElement::BLIP:
             case CElement::PICKUP:
             case CElement::RADAR_AREA:
-            case CElement::PATH_NODE:
+            case CElement::PATH_NODE_UNUSED:
                 break;
             default:
                 return NULL;
@@ -690,6 +698,8 @@ CColShape* CStaticFunctionDefinitions::GetElementColShape ( CElement* pElement )
         case CElement::PICKUP:
             pColShape = static_cast < CPickup* > ( pElement )->GetColShape ();
             break;
+        default:
+            break;
     }
     return pColShape;
 }
@@ -837,6 +847,8 @@ CElement* CStaticFunctionDefinitions::GetElementSyncer ( CElement* pElement )
             return pObject->IsSyncable () ? static_cast < CElement* > ( pObject->GetSyncer () ) : NULL;
             break;
         }
+        default:
+            break;
     }
 
     return NULL;
@@ -1212,9 +1224,9 @@ bool CStaticFunctionDefinitions::SetElementPosition ( CElement* pElement, const 
     if ( pElement->GetType () != CElement::COLSHAPE )
     {
         // Run colpoint checks
-        m_pColManager->DoHitDetection ( pElement->GetLastPosition (), pElement->GetPosition (), 0.0f, pElement );
+        m_pColManager->DoHitDetection ( pElement->GetPosition (), pElement );
     }
-   
+
     // Construct the set position packet
     CBitStream BitStream;
     BitStream.pBitStream->Write ( vecPosition.fX );
@@ -1239,7 +1251,7 @@ bool CStaticFunctionDefinitions::SetElementPosition ( CElement* pElement, const 
 }
 
 
-bool CStaticFunctionDefinitions::SetElementRotation ( CElement* pElement, const CVector& vecRotation, const char* szRotationOrder )
+bool CStaticFunctionDefinitions::SetElementRotation ( CElement* pElement, const CVector& vecRotation, const char* szRotationOrder, bool bNewWay )
 {
     assert ( pElement );
 
@@ -1256,7 +1268,7 @@ bool CStaticFunctionDefinitions::SetElementRotation ( CElement* pElement, const 
         case CElement::PLAYER:
         {
             CPed* pPed = static_cast < CPed* > ( pElement );
-            SetPedRotation( pPed, vecRotation.fZ ); //No rotation order conversion required since only Z is used
+            SetPedRotation( pPed, vecRotation.fZ, bNewWay ); //No rotation order conversion required since only Z is used
 
             break;
         }
@@ -1428,7 +1440,7 @@ bool CStaticFunctionDefinitions::SetElementDimension ( CElement* pElement, unsig
         case CElement::BLIP:
         case CElement::PICKUP:
         case CElement::RADAR_AREA:
-        case CElement::WORLD_MESH:
+        case CElement::WORLD_MESH_UNUSED:
         {
             pElement->SetDimension ( usDimension );
             CBitStream bitStream;
@@ -1436,6 +1448,8 @@ bool CStaticFunctionDefinitions::SetElementDimension ( CElement* pElement, unsig
             m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pElement, SET_ELEMENT_DIMENSION, *bitStream.pBitStream ) );
             return true;
         }
+        default:
+            break;
     }
 
     return false;
@@ -1690,6 +1704,12 @@ bool CStaticFunctionDefinitions::SetElementModel ( CElement* pElement, unsigned 
 
     CBitStream BitStream;
     BitStream.pBitStream->Write ( usModel );
+    if ( pElement->GetType () == CElement::VEHICLE )
+    {
+        CVehicle* pVehicle = static_cast < CVehicle* > ( pElement );
+        BitStream.pBitStream->Write ( pVehicle->GetVariant () );
+        BitStream.pBitStream->Write ( pVehicle->GetVariant2 () );
+    }
     m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pElement, SET_ELEMENT_MODEL, *BitStream.pBitStream ) );
 
     return true;
@@ -3617,10 +3637,10 @@ bool CStaticFunctionDefinitions::KillPed ( CElement* pElement, CElement* pKiller
 }
 
 
-bool CStaticFunctionDefinitions::SetPedRotation ( CElement* pElement, float fRotation )
+bool CStaticFunctionDefinitions::SetPedRotation ( CElement* pElement, float fRotation, bool bNewWay )
 {
     assert ( pElement );
-    RUN_CHILDREN SetPedRotation ( *iter, fRotation );
+    RUN_CHILDREN SetPedRotation ( *iter, fRotation, bNewWay );
 
     if ( IS_PED ( pElement ) )
     {
@@ -3653,8 +3673,10 @@ bool CStaticFunctionDefinitions::SetPedRotation ( CElement* pElement, float fRot
             SPedRotationSync rotation;
             rotation.data.fRotation = fRadians;
             BitStream.pBitStream->Write ( &rotation );
-
             BitStream.pBitStream->Write ( pPed->GenerateSyncTimeContext () );
+            uchar ucNewWay = bNewWay ? 1 : 0;
+            BitStream.pBitStream->Write ( ucNewWay );
+
             m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pPed, SET_PED_ROTATION, *BitStream.pBitStream ) );
         }
     }
@@ -4704,11 +4726,11 @@ bool CStaticFunctionDefinitions::GiveVehicleSirens( CVehicle* pVehicle, unsigned
     {
         if ( ucSirenType >= 1 && ucSirenType <= 6 )
         {
-            if ( ucSirenCount >= 0 && ucSirenCount <= 7 )
+            if ( ucSirenCount <= SIREN_COUNT_MAX )
             {
                 pVehicle->m_tSirenBeaconInfo.m_bOverrideSirens = true;
 
-                pVehicle->m_tSirenBeaconInfo.m_ucSirenCount = ++ucSirenCount;
+                pVehicle->m_tSirenBeaconInfo.m_ucSirenCount = ucSirenCount;
                 pVehicle->m_tSirenBeaconInfo.m_ucSirenType = ucSirenType;
 
                 pVehicle->m_tSirenBeaconInfo.m_b360Flag = tSirenInfo.m_b360Flag;
@@ -4743,7 +4765,7 @@ bool CStaticFunctionDefinitions::SetVehicleSirens ( CVehicle* pVehicle, unsigned
     // Won't work with below.
     if ( vehicleType != VEHICLE_PLANE && vehicleType != VEHICLE_BOAT && vehicleType != VEHICLE_TRAILER && vehicleType != VEHICLE_HELI && vehicleType != VEHICLE_BIKE && vehicleType != VEHICLE_BMX )
     {
-        if ( ucSirenID >= 0 && ucSirenID <= 7 )
+        if ( ucSirenID <= SIREN_ID_MAX )
         {
             pVehicle->m_tSirenBeaconInfo.m_tSirenInfo[ ucSirenID ] = tSirenInfo.m_tSirenInfo[ ucSirenID ];
 
@@ -5105,12 +5127,8 @@ bool CStaticFunctionDefinitions::FixVehicle ( CElement* pElement )
 
         // Repair it
         pVehicle->SetHealth ( DEFAULT_VEHICLE_HEALTH );
-        pVehicle->GetInitialDoorStates ( pVehicle->m_ucDoorStates );
-        memset ( &pVehicle->m_ucWheelStates[0], 0, sizeof ( pVehicle->m_ucWheelStates ) );
-        memset ( &pVehicle->m_ucPanelStates[0], 0, sizeof ( pVehicle->m_ucPanelStates ) );
-        memset ( &pVehicle->m_ucLightStates[0], 0, sizeof ( pVehicle->m_ucLightStates ) );
-
-        pVehicle->SetBlowTime ( 0 );
+        pVehicle->ResetDoorsWheelsPanelsLights ();
+        pVehicle->SetIsBlown ( false );
 
         // Tell everyone
         CBitStream BitStream;
@@ -5143,7 +5161,7 @@ bool CStaticFunctionDefinitions::BlowVehicle ( CElement* pElement, bool bExplode
         }
         pVehicle->SetHealth ( 0.0f );
         if ( !bExplode )
-            pVehicle->SetBlowTime ( ::GetTime () );
+            pVehicle->SetIsBlown ( true );
 
         //Update our engine State
         pVehicle->SetEngineOn( false );
@@ -5159,7 +5177,7 @@ bool CStaticFunctionDefinitions::BlowVehicle ( CElement* pElement, bool bExplode
 bool CStaticFunctionDefinitions::IsVehicleBlown ( CVehicle* pVehicle )
 {
     assert ( pVehicle );
-    return pVehicle->GetBlowTime() != 0;
+    return pVehicle->GetIsBlown ();
 }
 
 
@@ -6545,7 +6563,7 @@ bool CStaticFunctionDefinitions::SetVehicleRespawnDelay ( CElement* pElement, un
     if ( IS_VEHICLE ( pElement ) )
     {
         CVehicle* pVehicle = static_cast < CVehicle* > ( pElement );
-        pVehicle->SetRespawnTime ( ulTime );
+        pVehicle->SetBlowRespawnInterval ( ulTime );
 
         return true;
     }
@@ -6562,7 +6580,7 @@ bool CStaticFunctionDefinitions::SetVehicleIdleRespawnDelay ( CElement* pElement
     if ( IS_VEHICLE ( pElement ) )
     {
         CVehicle* pVehicle = static_cast < CVehicle* > ( pElement );
-        pVehicle->SetIdleRespawnTime ( ulTime );
+        pVehicle->SetIdleRespawnInterval ( ulTime );
 
         return true;
     }
@@ -6598,7 +6616,7 @@ bool CStaticFunctionDefinitions::ResetVehicleExplosionTime ( CElement* pElement 
     if ( IS_VEHICLE ( pElement ) )
     {
         CVehicle* pVehicle = static_cast < CVehicle* > ( pElement );
-        pVehicle->SetBlowTime ( 0 );
+        pVehicle->SetIsBlown ( false );
 
         return true;
     }
@@ -6615,7 +6633,7 @@ bool CStaticFunctionDefinitions::ResetVehicleIdleTime ( CElement* pElement )
     if ( IS_VEHICLE ( pElement ) )
     {
         CVehicle* pVehicle = static_cast < CVehicle* > ( pElement );
-        pVehicle->SetIdleTime ( 0 );
+        pVehicle->StopIdleTimer ();
 
         return true;
     }
@@ -7273,6 +7291,9 @@ bool CStaticFunctionDefinitions::ResetModelHandlingProperty ( eVehicleTypes eMod
     float fValue = 0.0f;
     CVector vecValue = CVector ( 0.0f, 0.0f, 0.0f );
     SString strValue = "";
+    uint uiValue = 0;
+    uchar ucValue = 0;
+
     if ( GetModelHandling( eModel, eProperty, fValue, true) )
     {
         SetEntryHandling ( pEntry, eProperty, fValue );
@@ -7284,6 +7305,14 @@ bool CStaticFunctionDefinitions::ResetModelHandlingProperty ( eVehicleTypes eMod
     else if ( GetModelHandling( eModel, eProperty, vecValue, true) )
     {
         SetEntryHandling ( pEntry, eProperty, vecValue );
+    }
+    else if ( GetModelHandling( eModel, eProperty, uiValue, true) )
+    {
+        SetEntryHandling ( pEntry, eProperty, uiValue );
+    }
+    else if ( GetModelHandling( eModel, eProperty, ucValue, true) )
+    {
+        SetEntryHandling ( pEntry, eProperty, ucValue );
     }
     else
     {
@@ -9053,7 +9082,7 @@ CColCircle* CStaticFunctionDefinitions::CreateColCircle ( CResource* pResource, 
 
     // Run collision detection
     CElement* pRoot = m_pMapManager->GetRootElement ();
-    m_pColManager->DoHitDetection ( pRoot->GetLastPosition (), pRoot->GetPosition (), 0.0f, pRoot, pColShape, true );
+    m_pColManager->DoHitDetection ( pRoot->GetPosition (), pRoot, pColShape, true );
 
     if ( pResource->HasStarted() )
     {
@@ -9073,7 +9102,7 @@ CColCuboid* CStaticFunctionDefinitions::CreateColCuboid ( CResource* pResource, 
 
     // Run collision detection
     CElement* pRoot = m_pMapManager->GetRootElement ();
-    m_pColManager->DoHitDetection ( pRoot->GetLastPosition (), pRoot->GetPosition (), 0.0f, pRoot, pColShape, true );
+    m_pColManager->DoHitDetection ( pRoot->GetPosition (), pRoot, pColShape, true );
 
     if ( pResource->HasStarted() )
     {
@@ -9093,7 +9122,7 @@ CColSphere* CStaticFunctionDefinitions::CreateColSphere ( CResource* pResource, 
 
     // Run collision detection
     CElement* pRoot = m_pMapManager->GetRootElement ();
-    m_pColManager->DoHitDetection ( pRoot->GetLastPosition (), pRoot->GetPosition (), 0.0f, pRoot, pColShape, true );
+    m_pColManager->DoHitDetection ( pRoot->GetPosition (), pRoot, pColShape, true );
 
     if ( pResource->HasStarted() )
     {
@@ -9113,7 +9142,7 @@ CColRectangle* CStaticFunctionDefinitions::CreateColRectangle ( CResource* pReso
 
     // Run collision detection
     CElement* pRoot = m_pMapManager->GetRootElement ();
-    m_pColManager->DoHitDetection ( pRoot->GetLastPosition (), pRoot->GetPosition (), 0.0f, pRoot, pColShape, true );
+    m_pColManager->DoHitDetection ( pRoot->GetPosition (), pRoot, pColShape, true );
 
     if ( pResource->HasStarted() )
     {
@@ -9132,7 +9161,7 @@ CColPolygon* CStaticFunctionDefinitions::CreateColPolygon ( CResource* pResource
 
     // Run collision detection
     CElement* pRoot = m_pMapManager->GetRootElement ();
-    m_pColManager->DoHitDetection ( pRoot->GetLastPosition (), pRoot->GetPosition (), 0.0f, pRoot, pColShape, true );
+    m_pColManager->DoHitDetection ( pRoot->GetPosition (), pRoot, pColShape, true );
 
     if ( pResource->HasStarted() )
     {
@@ -9152,7 +9181,7 @@ CColTube* CStaticFunctionDefinitions::CreateColTube ( CResource* pResource, cons
 
     // Run collision detection
     CElement* pRoot = m_pMapManager->GetRootElement ();
-    m_pColManager->DoHitDetection ( pRoot->GetLastPosition (), pRoot->GetPosition (), 0.0f, pRoot, pColShape, true );
+    m_pColManager->DoHitDetection ( pRoot->GetPosition (), pRoot, pColShape, true );
 
     if ( pResource->HasStarted() )
     {
@@ -9169,7 +9198,7 @@ CColTube* CStaticFunctionDefinitions::CreateColTube ( CResource* pResource, cons
 void CStaticFunctionDefinitions::RefreshColShapeColliders ( CColShape * pColShape )
 {
     CElement* pRoot = m_pMapManager->GetRootElement ();
-    m_pColManager->DoHitDetection ( pRoot->GetLastPosition (), pRoot->GetPosition (), 0.0f, pRoot, pColShape, true );
+    m_pColManager->DoHitDetection ( pRoot->GetPosition (), pRoot, pColShape, true );
 }
 
 
@@ -9770,9 +9799,9 @@ bool CStaticFunctionDefinitions::ResetFogDistance ( )
     return true;
 }
 
-bool CStaticFunctionDefinitions::RemoveWorldModel ( unsigned short usModel, float fRadius, float fX, float fY, float fZ )
+bool CStaticFunctionDefinitions::RemoveWorldModel ( unsigned short usModel, float fRadius, float fX, float fY, float fZ, char cInterior )
 {
-    g_pGame->GetBuildingRemovalManager ( )->CreateBuildingRemoval( usModel, fRadius, CVector ( fX, fY, fZ ) );
+    g_pGame->GetBuildingRemovalManager ( )->CreateBuildingRemoval( usModel, fRadius, CVector ( fX, fY, fZ ), cInterior );
 
     CBitStream BitStream;
     BitStream.pBitStream->Write ( usModel );
@@ -9780,14 +9809,18 @@ bool CStaticFunctionDefinitions::RemoveWorldModel ( unsigned short usModel, floa
     BitStream.pBitStream->Write ( fX );
     BitStream.pBitStream->Write ( fY );
     BitStream.pBitStream->Write ( fZ );
+    if ( BitStream.pBitStream->Version() >= 0x039 )
+    {
+        BitStream.pBitStream->Write ( cInterior );
+    }
     m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( REMOVE_WORLD_MODEL, *BitStream.pBitStream ) );
 
     return true;
 }
 
-bool CStaticFunctionDefinitions::RestoreWorldModel ( unsigned short usModel, float fRadius, float fX, float fY, float fZ )
+bool CStaticFunctionDefinitions::RestoreWorldModel ( unsigned short usModel, float fRadius, float fX, float fY, float fZ, char cInterior )
 {
-    g_pGame->GetBuildingRemovalManager ( )->CreateBuildingRemoval( usModel, fRadius, CVector ( fX, fY, fZ ) );
+    g_pGame->GetBuildingRemovalManager ( )->RestoreWorldModel( usModel, fRadius, CVector ( fX, fY, fZ ), cInterior );
 
     CBitStream BitStream;
     BitStream.pBitStream->Write ( usModel );
@@ -9795,6 +9828,11 @@ bool CStaticFunctionDefinitions::RestoreWorldModel ( unsigned short usModel, flo
     BitStream.pBitStream->Write ( fX );
     BitStream.pBitStream->Write ( fY );
     BitStream.pBitStream->Write ( fZ );
+    if ( BitStream.pBitStream->Version() >= 0x039 )
+    {
+        BitStream.pBitStream->Write ( cInterior );
+    }
+
     m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( RESTORE_WORLD_MODEL, *BitStream.pBitStream ) );
 
     return true;
@@ -10392,9 +10430,9 @@ bool CStaticFunctionDefinitions::GetAccounts ( CLuaMain* pLuaMain )
     lua_State* pLua = pLuaMain->GetVM();
     CMappedAccountList::const_iterator iter = m_pAccountManager->IterBegin();
     unsigned int uiIndex = 0;
-    const char* szGuest =  "guest";
-    const char* szHTTPGuest = "http_guest";
-    const char* szConsole = "Console";
+    const char* szGuest =  GUEST_ACCOUNT_NAME;
+    const char* szHTTPGuest = HTTP_GUEST_ACCOUNT_NAME;
+    const char* szConsole = CONSOLE_ACCOUNT_NAME;
     unsigned int uiGuest = HashString ( szGuest );
     unsigned int uiHTTPGuest = HashString ( szHTTPGuest );
     unsigned int uiConsole = HashString ( szConsole );
@@ -10442,7 +10480,7 @@ bool CStaticFunctionDefinitions::SetAccountPassword ( CAccount* pAccount, const 
 
     if ( pAccount->IsRegistered () )
     {
-        if ( strcmp ( pAccount->GetPassword ().c_str (), szPassword ) && strlen ( szPassword ) > MIN_PASSWORD_LENGTH && strlen ( szPassword ) <= MAX_PASSWORD_LENGTH )
+        if ( strlen ( szPassword ) > MIN_PASSWORD_LENGTH && strlen ( szPassword ) <= MAX_PASSWORD_LENGTH )
         {
             pAccount->SetPassword ( szPassword );
             return true;
@@ -10633,18 +10671,26 @@ CBan* CStaticFunctionDefinitions::AddBan ( SString strIP, SString strUsername, S
     // Check if the IP, username or serial are specified
     bool bIPSpecified       = strIP.length      ( ) > 0;
     bool bUsernameSpecified = strUsername.length( ) > 0;
-    bool bSerialSpecified   = strSerial.length  ( ) > 0;
+    bool bSerialSpecified   = strSerial.length  ( ) == 32;
 
     // Crop the responsible string if too long
     if ( strResponsible.length ( ) > MAX_BAN_RESPONSIBLE_LENGTH )
         strResponsible = strResponsible.substr ( 0, MAX_BAN_RESPONSIBLE_LENGTH - 3 ) + "...";
 
     // Got an IP?
-    if ( bIPSpecified )
+    if ( bIPSpecified && !m_pBanManager->IsSpecificallyBanned ( strIP ) )
+    {
         pBan = m_pBanManager->AddBan ( strIP, strResponsible, strReason, tUnban );
+    }
     // If not IP provided make sure a username or serial are there
-    else if ( bUsernameSpecified || bSerialSpecified )
+    else if ( bSerialSpecified && !m_pBanManager->IsSerialBanned ( strSerial ) )
+    {
         pBan = m_pBanManager->AddBan ( strResponsible, strReason, tUnban );
+    }
+    else if ( bUsernameSpecified && !m_pBanManager->IsAccountBanned ( strUsername ) )
+    {
+        pBan = m_pBanManager->AddBan ( strResponsible, strReason, tUnban );
+    }
 
     // If the ban was added
     if ( pBan )

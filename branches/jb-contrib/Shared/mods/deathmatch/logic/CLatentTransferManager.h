@@ -202,6 +202,7 @@ protected:
 
     CTickCount          m_LastTimeMs;
     int                 m_iTimeMsBetweenCalls;
+    uint                m_uiNumSends;
 
     // Send variables
     std::vector < CLatentSendQueue* >               m_SendQueueList;

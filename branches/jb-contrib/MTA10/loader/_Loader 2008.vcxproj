@@ -117,7 +117,7 @@
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>shlwapi.lib;psapi.lib;UnRAR.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Version.lib;shlwapi.lib;psapi.lib;UnRAR.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>C:\Program Files\MTA San Andreas 1.4\mta\loader_d.dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>..\..\vendor\unrar\build\unrardll32\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>

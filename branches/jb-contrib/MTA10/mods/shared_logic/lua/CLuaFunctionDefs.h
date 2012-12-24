@@ -198,6 +198,7 @@ public:
     
     // Player set funcs
     LUA_DECLARE ( ShowPlayerHudComponent );
+    LUA_DECLARE ( IsPlayerHudComponentVisible );
     LUA_DECLARE ( SetPlayerMoney );
     LUA_DECLARE ( GivePlayerMoney );
     LUA_DECLARE ( TakePlayerMoney );
@@ -252,6 +253,7 @@ public:
     LUA_DECLARE ( IsPedOnFire );
     LUA_DECLARE ( GetWeaponProperty );
     LUA_DECLARE ( GetOriginalWeaponProperty );
+    LUA_DECLARE ( GetPedOxygenLevel );
 
     LUA_DECLARE ( SetPedRotation );
     LUA_DECLARE ( SetPedCanBeKnockedOffBike );
@@ -274,9 +276,7 @@ public:
     LUA_DECLARE ( SetPedOnFire );
     LUA_DECLARE ( WarpPedIntoVehicle );
     LUA_DECLARE ( RemovePedFromVehicle );
-    LUA_DECLARE ( SetWeaponProperty );
     LUA_DECLARE ( SetPedOxygenLevel );
-    LUA_DECLARE ( GetPedOxygenLevel );
 
     // Clothes and body functions
     LUA_DECLARE ( GetBodyPartName );
@@ -483,10 +483,8 @@ public:
     LUA_DECLARE ( GetCameraTarget );
     LUA_DECLARE ( GetCameraInterior );
     LUA_DECLARE ( GetCameraGoggleEffect );
-    LUA_DECLARE ( GetCameraRotation );
 
     // Cam set funcs
-    LUA_DECLARE ( SetCameraRotation );
     LUA_DECLARE ( SetCameraMatrix );
     LUA_DECLARE ( SetCameraTarget );
     LUA_DECLARE ( SetCameraInterior );
@@ -517,6 +515,7 @@ public:
     LUA_DECLARE ( EnginePositionSeats );
     LUA_DECLARE ( EngineAddAllAtomics );
     LUA_DECLARE ( EngineReplaceVehiclePart );
+    LUA_DECLARE ( EngineGetModelLODDistance );
     LUA_DECLARE ( EngineSetModelLODDistance );
     LUA_DECLARE ( EngineSetAsynchronousLoading );
     LUA_DECLARE ( EngineApplyShaderToWorldTexture );
@@ -525,6 +524,15 @@ public:
     LUA_DECLARE ( EngineGetModelIDFromName );
     LUA_DECLARE ( EngineGetModelTextureNames );
     LUA_DECLARE ( EngineGetVisibleTextureNames );
+    LUA_DECLARE ( SetVehicleComponentPosition );
+    LUA_DECLARE ( GetVehicleComponentPosition );
+    LUA_DECLARE ( SetVehicleComponentRotation );
+    LUA_DECLARE ( GetVehicleComponentRotation );
+    LUA_DECLARE ( ResetVehicleComponentPosition );
+    LUA_DECLARE ( ResetVehicleComponentRotation );
+    LUA_DECLARE ( SetVehicleComponentVisible );
+    LUA_DECLARE ( GetVehicleComponentVisible );
+    LUA_DECLARE ( GetVehicleComponents );
 
     // Drawing funcs (low-level)
     LUA_DECLARE ( dxDrawLine );
@@ -680,6 +688,7 @@ public:
     LUA_DECLARE ( GUIWindowGetCloseButtonEnabled );
     LUA_DECLARE ( GUIWindowGetTitleBarEnabled );
     LUA_DECLARE ( GUILabelSetColor );
+    LUA_DECLARE ( GUILabelGetColor );
     LUA_DECLARE ( GUILabelSetVerticalAlign );
     LUA_DECLARE ( GUILabelSetHorizontalAlign );
     LUA_DECLARE ( GUILabelGetTextExtent );
@@ -740,6 +749,8 @@ public:
     LUA_DECLARE ( SetMinuteDuration );
     LUA_DECLARE ( SetWaterLevel );
     LUA_DECLARE ( ResetWaterLevel );
+    LUA_DECLARE ( IsWaterDrawnLast );
+    LUA_DECLARE ( SetWaterDrawnLast );
     LUA_DECLARE ( SetWaterVertexPosition );
     LUA_DECLARE ( SetWaveHeight );
     LUA_DECLARE ( SetGarageOpen );
@@ -823,7 +834,9 @@ public:
     LUA_DECLARE ( GetProjectileType );
 	LUA_DECLARE ( GetProjectileTarget );
 	LUA_DECLARE ( GetProjectileCreator );
-	LUA_DECLARE ( GetProjectileForce );
+    LUA_DECLARE ( GetProjectileForce );
+    LUA_DECLARE ( GetProjectileCounter );
+    LUA_DECLARE ( SetProjectileCounter );
 
     // Shape create funcs
     LUA_DECLARE ( CreateColCircle );
@@ -845,6 +858,24 @@ public:
     LUA_DECLARE ( GetWeaponNameFromID );
     LUA_DECLARE ( GetWeaponIDFromName );
     LUA_DECLARE ( GetSlotFromWeapon );
+    LUA_DECLARE ( CreateWeapon );
+    LUA_DECLARE ( FireWeapon );
+    LUA_DECLARE ( SetWeaponProperty );
+    LUA_DECLARE ( SetWeaponState );
+    LUA_DECLARE ( GetWeaponState );
+    LUA_DECLARE ( SetWeaponTarget );
+    LUA_DECLARE ( GetWeaponTarget );
+    LUA_DECLARE ( SetWeaponOwner );
+    LUA_DECLARE ( GetWeaponOwner );
+    LUA_DECLARE ( SetWeaponFlags );
+    LUA_DECLARE ( GetWeaponFlags );
+    LUA_DECLARE ( SetWeaponFiringRate );
+    LUA_DECLARE ( GetWeaponFiringRate );
+    LUA_DECLARE ( ResetWeaponFiringRate );
+    LUA_DECLARE ( GetWeaponAmmo );
+    LUA_DECLARE ( GetWeaponClipAmmo );
+    LUA_DECLARE ( SetWeaponAmmo );
+    LUA_DECLARE ( SetWeaponClipAmmo );
 
     // Command funcs
     LUA_DECLARE ( AddCommandHandler );
@@ -868,6 +899,7 @@ public:
 
     // Utility
     LUA_DECLARE ( Md5 );
+    LUA_DECLARE ( Sha256 );
     LUA_DECLARE ( GetNetworkUsageData );
     LUA_DECLARE ( GetNetworkStats );
     LUA_DECLARE ( GetPerformanceStats );
@@ -884,6 +916,9 @@ public:
     LUA_DECLARE ( UtfSub );
     LUA_DECLARE ( UtfChar );
     LUA_DECLARE ( UtfCode );
+
+    // Voice functions
+    LUA_DECLARE ( IsVoiceEnabled );
 
 private:
     // Static references to objects

@@ -20,22 +20,22 @@ i.e. the http client has downloaded all the data returned
 class CRemoteCall
 {
 private:
-    class CResource *   m_resource;
     std::string         m_strData;
     bool                m_bPostBinary;
     bool                m_bIsFetch;
     class CLuaMain *    m_VM;
     CLuaFunctionRef     m_iFunction;
     SString             m_strURL;
+    uint                m_uiConnectionAttempts;
     CLuaArguments       m_FetchArguments;
 
 public:
-                        CRemoteCall ( const char * szServerHost, const char * szResourceName, const char * szFunctionName, CLuaArguments * arguments, CLuaMain * luaMain, const CLuaFunctionRef& iFunction );
-                        CRemoteCall ( const char * szURL, CLuaArguments * arguments, CLuaMain * luaMain, const CLuaFunctionRef& iFunction );
-                        CRemoteCall ( const char * szURL, CLuaArguments * fetchArguments, const SString& strPostData, bool bPostBinary, CLuaMain * luaMain, const CLuaFunctionRef& iFunction );
+                        CRemoteCall ( const char * szServerHost, const char * szResourceName, const char * szFunctionName, CLuaArguments * arguments, CLuaMain * luaMain, const CLuaFunctionRef& iFunction, uint uiConnectionAttempts );
+                        CRemoteCall ( const char * szURL, CLuaArguments * arguments, CLuaMain * luaMain, const CLuaFunctionRef& iFunction, uint uiConnectionAttempts );
+                        CRemoteCall ( const char * szURL, CLuaArguments * fetchArguments, const SString& strPostData, bool bPostBinary, CLuaMain * luaMain, const CLuaFunctionRef& iFunction, uint uiConnectionAttempts );
                         ~CRemoteCall ();
     void                MakeCall();
-    static void         ProgressCallback(double sizeJustDownloaded, double totalDownloaded, char * data, size_t dataLength, void * obj, bool complete, int error);
+    static bool         ProgressCallback(double sizeJustDownloaded, double totalDownloaded, char * data, size_t dataLength, void * obj, bool complete, int error);
     CLuaMain *          GetVM() {return m_VM;};
     bool                IsFetch() {return m_bIsFetch;}
     CLuaArguments&      GetFetchArguments() {return m_FetchArguments;}
@@ -54,9 +54,9 @@ public:
                         CRemoteCalls();
                         ~CRemoteCalls();
 
-    void                Call ( const char * szServerHost, const char * szResourceName, const char * szFunctionName, CLuaArguments * arguments, CLuaMain * luaMain, const CLuaFunctionRef& iFunction );
-    void                Call ( const char * szURL, CLuaArguments * arguments, CLuaMain * luaMain, const CLuaFunctionRef& iFunction );
-    void                Call ( const char * szURL, CLuaArguments * fetchArguments, const SString& strPostData, bool bPostBinary, CLuaMain * luaMain, const CLuaFunctionRef& iFunction );
+    void                Call ( const char * szServerHost, const char * szResourceName, const char * szFunctionName, CLuaArguments * arguments, CLuaMain * luaMain, const CLuaFunctionRef& iFunction, uint uiConnectionAttempts );
+    void                Call ( const char * szURL, CLuaArguments * arguments, CLuaMain * luaMain, const CLuaFunctionRef& iFunction, uint uiConnectionAttempts );
+    void                Call ( const char * szURL, CLuaArguments * fetchArguments, const SString& strPostData, bool bPostBinary, CLuaMain * luaMain, const CLuaFunctionRef& iFunction, uint uiConnectionAttempts );
     void                Remove ( CLuaMain * luaMain );
     void                Remove ( CRemoteCall * call );
     bool                CallExists ( CRemoteCall * call );

@@ -38,8 +38,10 @@ void CElementRPCs::LoadFunctions ( void )
     AddHandler ( SET_LOW_LOD_ELEMENT,            SetLowLodElement,            "SetLowLodElement" );
 }
 
-#define RUN_CHILDREN_SERVER CChildListType::const_iterator iter=pSource->IterBegin();for(;iter!=pSource->IterEnd();iter++) if (!(*iter)->IsLocalEntity())
-
+#define RUN_CHILDREN_SERVER \
+    if ( pSource->CountChildren() ) \
+        for ( CChildListType::const_iterator iter = pSource->IterBegin () ; iter != pSource->IterEnd () ; iter++ ) \
+            if ( !(*iter)->IsLocalEntity () )
 
 void CElementRPCs::SetElementParent ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
 {
@@ -193,6 +195,7 @@ void CElementRPCs::SetElementVelocity ( CClientEntity* pSource, NetBitStreamInte
                 break;
             }
             case CCLIENTOBJECT:
+            case CCLIENTWEAPON:
             {
                 CClientObject * pObject = static_cast < CClientObject * > ( pSource );
                 pObject->SetMoveSpeed ( vecVelocity );
@@ -329,6 +332,7 @@ void CElementRPCs::SetElementAlpha ( CClientEntity* pSource, NetBitStreamInterfa
                 break;
             }
             case CCLIENTOBJECT:
+            case CCLIENTWEAPON:
             {
                 CClientObject * pObject = static_cast < CClientObject* > ( pSource );
                 pObject->SetAlpha ( ucAlpha );
@@ -387,6 +391,7 @@ void CElementRPCs::SetElementHealth ( CClientEntity* pSource, NetBitStreamInterf
             }
 
             case CCLIENTOBJECT:
+            case CCLIENTWEAPON:
             {
                 CClientObject* pObject = static_cast < CClientObject * > ( pSource );
                 pObject->SetHealth ( fHealth );
@@ -415,12 +420,19 @@ void CElementRPCs::SetElementModel ( CClientEntity* pSource, NetBitStreamInterfa
 
             case CCLIENTVEHICLE:
             {
+                uchar ucVariant = 255, ucVariant2 = 255;
+                if ( bitStream.GetNumberOfUnreadBits () >= sizeof ( ucVariant ) + sizeof ( ucVariant2 ) )
+                {
+                    bitStream.Read ( ucVariant );
+                    bitStream.Read ( ucVariant2 );
+                }
                 CClientVehicle* pVehicle = static_cast < CClientVehicle * > ( pSource );
-                pVehicle->SetModelBlocking ( usModel );
+                pVehicle->SetModelBlocking ( usModel, ucVariant, ucVariant2 );
                 break;
             }
 
             case CCLIENTOBJECT:
+            case CCLIENTWEAPON:
             {
                 CClientObject* pObject = static_cast < CClientObject * > ( pSource );
                 pObject->SetModel ( usModel );
