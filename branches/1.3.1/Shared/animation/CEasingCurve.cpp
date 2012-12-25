@@ -137,6 +137,7 @@ public: //All public since it's only an internal class
 };
 
 CEasingCurve_Impl::CEasingCurve_Impl ( CEasingCurve::eType a_eType ):
+    m_eType ( CEasingCurve::EASING_INVALID ),
     m_pSimpleFunction ( NULL ),
     m_pComplexFunction ( NULL )
 {
