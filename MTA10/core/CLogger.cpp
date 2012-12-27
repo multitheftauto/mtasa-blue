@@ -20,7 +20,7 @@ template<> CLogger * CSingleton< CLogger >::m_pSingleton = NULL;
 CLogger::CLogger ( )
 {
     // Create the log file.
-    File.open ( "logfile.txt", ios::out );
+    File.open( CalcMTASAPath( PathJoin( "MTA", "logfile.txt" ) ), ios::out );
 }
 
 CLogger::~CLogger ( )
