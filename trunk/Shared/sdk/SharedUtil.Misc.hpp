@@ -885,11 +885,12 @@ bool SharedUtil::IsMainThread ( void )
 #endif
 #endif
 
-
-// Copied from CChatLine::RemoveColorCode()
-std::string SharedUtil::RemoveColorCode ( const char* szString )
+//
+// Return version of the string with color codes removed
+//
+SString SharedUtil::RemoveColorCodes( const char* szString )
 {
-    std::string strOut;
+    SString strOut;
     const char* szStart = szString;
     const char* szEnd = szString;
 
@@ -901,36 +902,82 @@ std::string SharedUtil::RemoveColorCode ( const char* szString )
             break;
         }
         else
+        if ( IsColorCode ( szEnd ) )
         {
-            bool bIsColorCode = false;
-            if ( *szEnd == '#' )
-            {
-                bIsColorCode = true;
-                for ( int i = 0; i < 6; i++ )
-                {
-                    char c = szEnd [ 1 + i ];
-                    if ( !isdigit ( (unsigned char)c ) && (c < 'A' || c > 'F') && (c < 'a' || c > 'f') )
-                    {
-                        bIsColorCode = false;
-                        break;
-                    }
-                }
-            }
-
-            if ( bIsColorCode )
-            {
-                strOut.append ( szStart, szEnd - szStart );
-                szStart = szEnd + 7;
-                szEnd = szStart;
-            }
-            else
-            {
-                szEnd++;
-            }
+            strOut.append ( szStart, szEnd - szStart );
+            szStart = szEnd + 7;
+            szEnd = szStart;
+        }
+        else
+        {
+            szEnd++;
         }
     }
 
     return strOut;
+}
+
+//
+// Replace color codes in supplied wide string
+//
+void SharedUtil::RemoveColorCodesInPlaceW( WString& strText )
+{
+    int iSearchPos = 0;
+    while( true )
+    {
+        int iFoundPos = strText.find( L'#', iSearchPos );
+        if ( iFoundPos == std::wstring::npos )
+            break;
+
+        if ( IsColorCodeW( strText.c_str() + iFoundPos ) )
+        {
+            strText = strText.SubStr( 0, iFoundPos - 0 ) + strText.SubStr( iFoundPos + 7 );
+        }
+        else
+        {
+            iSearchPos = iFoundPos + 1;
+        }
+    }
+}
+
+//
+// Returns true if string is a color code
+//
+bool SharedUtil::IsColorCode ( const char* szColorCode )
+{
+    if ( *szColorCode != '#' )
+        return false;
+
+    bool bValid = true;
+    for ( int i = 0; i < 6; i++ )
+    {
+        char c = szColorCode [ 1 + i ];
+        if ( !isdigit ( (unsigned char)c ) && (c < 'A' || c > 'F') && (c < 'a' || c > 'f') )
+        {
+            bValid = false;
+            break;
+        }
+    }
+    return bValid;
+}
+
+//
+// Returns true if wide string is a color code
+//
+bool SharedUtil::IsColorCodeW ( const wchar_t* wszColorCode )
+{
+    if ( *wszColorCode != L'#' )
+        return false;
+
+    for ( uint i = 0 ; i < 6 ; i++ )
+    {
+        wchar_t c = wszColorCode [ i + 1 ];
+        if ( !iswdigit ( c ) && (c < 'A' || c > 'F') && (c < 'a' || c > 'f') )
+        {
+            return false;
+        }
+    }
+    return true;
 }
 
 
