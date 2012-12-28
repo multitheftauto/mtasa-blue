@@ -66,7 +66,10 @@ bool CResourceClientScriptItem::Start ( void )
             return false;
         }
         char lengthData [ 4 ];
-        snprintf ( lengthData, 4, "%c%c%c%c", (originalLength >> 24) & 0xFF, (originalLength >> 16) & 0xFF, (originalLength >> 8) & 0xFF, originalLength & 0xFF );
+        lengthData[0] = ( originalLength >> 24 ) & 0xFF;
+        lengthData[1] = ( originalLength >> 16 ) & 0xFF;
+        lengthData[2] = ( originalLength >> 8  ) & 0xFF;
+        lengthData[3] =   originalLength         & 0xFF;
         m_chunkCode.assign ( lengthData, 4 );
         m_chunkCode.append ( compressedBuffer, bufferLength );
         delete [] compressedBuffer;
