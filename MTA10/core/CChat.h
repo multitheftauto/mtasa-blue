@@ -101,16 +101,11 @@ class CChatLine
 public:
                                 CChatLine               ( void );
 
-    static bool                 IsColorCode             ( const char* szColorCode );
-    static bool                 IsColorCodeW            ( const wchar_t* wszColorCode );
-
     virtual const char*         Format                  ( const char* szText, float fWidth, CColor& color, bool bColorCoded );
     virtual void                Draw                    ( const CVector2D& vecPosition, unsigned char ucAlpha, bool bShadow, const CRect2D& RenderBounds );    
     virtual float               GetWidth                ( void );
     bool                        IsActive                ( void )    { return m_bActive; }
     void                        SetActive               ( bool bActive )    { m_bActive = bActive; }
-    
-    static void                 RemoveColorCode         ( const char* szText, std::string& strOut );
 
     inline unsigned long        GetCreationTime         ( void )    { return m_ulCreationTime; }
     inline void                 UpdateCreationTime      ( void );

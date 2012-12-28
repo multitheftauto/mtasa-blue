@@ -649,7 +649,6 @@ void SharedUtil_String_Tests ( void )
             SStringX strInputA( (const char*)a, sizeof( a ) );
             SString strEscaped = EscapeURLArgument( strInputA );
             SString strUnescaped = UnescapeString ( strEscaped, '%' );
-            //OutputDebugLine( aa );
             assert ( strEscaped == result );
             assert ( strInputA == strUnescaped );
         TEST_VARS
@@ -666,7 +665,6 @@ void SharedUtil_String_Tests ( void )
             SStringX strInputA( a );
             SString strEscaped = EscapeURLArgument( strInputA );
             SString strUnescaped = UnescapeString ( strEscaped, '%' );
-            //OutputDebugLine( aa );
             assert ( strEscaped == result );
             assert ( strInputA == strUnescaped );
         TEST_VARS
@@ -680,4 +678,50 @@ void SharedUtil_String_Tests ( void )
             { "AZaz09-_.~",         "AZaz09-_.~" },
         TEST_END
     }
+
+    // RemoveColorCodes
+    {
+        TEST_FUNCTION
+            SString strRemoved = RemoveColorCodes( a );
+            assert ( strRemoved == result );
+        TEST_VARS
+            const char* a;
+            const char* result;
+        TEST_DATA
+            { "aa #0f0F34 bb",                          "aa  bb" },
+            { "aa #0f0F34#AABBBB bb",                   "aa  bb" },
+            { "aa #0f0F3G#AABBBB bb",                   "aa #0f0F3G bb" },
+            { "aa #0f0F34#AABBB bb",                    "aa #AABBB bb" },
+            { "#0f0F34#AABBB1",                         "" },
+            { "#0f0F34 x #AABBB1",                      " x " },
+            { "#0f0F34#0f0F34 x #AABBB1#AABBB1",        " x " },
+            { "#123456#12345G#123456#12345G",           "#12345G#12345G" },
+            { "#123456#12345#123456#125G",              "#12345#125G" },
+            { "##123456#125G##123456#12345",            "##125G##12345" },
+        TEST_END
+    }
+
+    // RemoveColorCodesInPlaceW
+    {
+        TEST_FUNCTION
+            WString wstrString = a;
+            RemoveColorCodesInPlaceW( wstrString );
+            assert ( wstrString == result );
+        TEST_VARS
+            const wchar_t* a;
+            const wchar_t* result;
+        TEST_DATA
+            { L"aa #0f0F34 bb",                          L"aa  bb" },
+            { L"aa #0f0F34#AABBBB bb",                   L"aa  bb" },
+            { L"aa #0f0F3G#AABBBB bb",                   L"aa #0f0F3G bb" },
+            { L"aa #0f0F34#AABBB bb",                    L"aa #AABBB bb" },
+            { L"#0f0F34#AABBB1",                         L"" },
+            { L"#0f0F34 x #AABBB1",                      L" x " },
+            { L"#0f0F34#0f0F34 x #AABBB1#AABBB1",        L" x " },
+            { L"#123456#12345G#123456#12345G",           L"#12345G#12345G" },
+            { L"#123456#12345#123456#125G",              L"#12345#125G" },
+            { L"##123456#125G##123456#12345",            L"##125G##12345" },
+        TEST_END
+    }
+
 }

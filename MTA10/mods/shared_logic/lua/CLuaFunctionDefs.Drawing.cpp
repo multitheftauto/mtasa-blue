@@ -330,13 +330,14 @@ int CLuaFunctionDefs::dxDrawImageSection ( lua_State* luaVM )
 
 int CLuaFunctionDefs::dxGetTextWidth ( lua_State* luaVM )
 {
-//  float dxGetTextWidth ( string text, [float scale=1, mixed font="default"] )
-    SString strText; float fScale; SString strFontName; CClientDxFont* pDxFontElement;
+//  float dxGetTextWidth ( string text, [float scale=1, mixed font="default", bool colorCoded=false] )
+    SString strText; float fScale; SString strFontName; CClientDxFont* pDxFontElement; bool bColorCoded;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadString ( strText );
     argStream.ReadNumber ( fScale, 1 );
     MixedReadDxFontString ( argStream, strFontName, "default", pDxFontElement );
+    argStream.ReadBool ( bColorCoded, false );
 
     if ( !argStream.HasErrors () )
     {
@@ -349,7 +350,7 @@ int CLuaFunctionDefs::dxGetTextWidth ( lua_State* luaVM )
 
         while( std::getline ( ssText, sLineText ) )
         {
-            fLineExtent = g_pCore->GetGraphics ()->GetDXTextExtent ( sLineText.c_str ( ), fScale, pD3DXFont );
+            fLineExtent = g_pCore->GetGraphics ()->GetDXTextExtent ( sLineText.c_str ( ), fScale, pD3DXFont, bColorCoded );
             if ( fLineExtent > fWidth )
                 fWidth = fLineExtent;
         }

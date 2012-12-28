@@ -297,7 +297,7 @@ std::string ASE::QueryFull ( void )
         {
             reply << ucFlags;
             // nick
-            std::string strPlayerName = RemoveColorCode ( pPlayer->GetNick () );
+            std::string strPlayerName = RemoveColorCodes ( pPlayer->GetNick () );
             if ( strPlayerName.length () == 0 )
                 strPlayerName = pPlayer->GetNick ();
             reply << ( unsigned char ) ( strPlayerName.length () + 1 );
@@ -458,7 +458,7 @@ std::string ASE::QueryLight ( void )
         if ( pPlayer->IsJoined () )
         {
             // nick
-            std::string strPlayerName = RemoveColorCode ( pPlayer->GetNick () );
+            std::string strPlayerName = RemoveColorCodes ( pPlayer->GetNick () );
             if ( strPlayerName.length () == 0 )
                 strPlayerName = pPlayer->GetNick ();
 

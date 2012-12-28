@@ -470,7 +470,7 @@ float CGraphics::GetDXCharacterWidth ( char c, float fScale, LPD3DXFONT pDXFont 
 }
 
 
-float CGraphics::GetDXTextExtent ( const char * szText, float fScale, LPD3DXFONT pDXFont )
+float CGraphics::GetDXTextExtent ( const char * szText, float fScale, LPD3DXFONT pDXFont, bool bColorCoded )
 {
     if ( !pDXFont )
         pDXFont = GetFont ();
@@ -482,7 +482,10 @@ float CGraphics::GetDXTextExtent ( const char * szText, float fScale, LPD3DXFONT
         HDC dc = pDXFont->GetDC ();
         SIZE size;
 
-        std::wstring strText = MbUTF8ToUTF16(szText);
+        WString strText = MbUTF8ToUTF16(szText);
+
+        if ( bColorCoded )
+            RemoveColorCodesInPlaceW( strText );
 
         GetTextExtentPoint32W ( dc, strText.c_str(), strText.length(), &size );
 
@@ -813,7 +816,7 @@ void CGraphics::DrawColorCodedTextLine ( float fLeft, float fRight, float fY, SC
         SColor nextColor = currentColor;
         while ( *wszSectionPos != '\0' )      // find end of this section
         {
-            if ( CChatLine::IsColorCodeW ( wszSectionPos ) )
+            if ( IsColorCodeW ( wszSectionPos ) )
             {
                 unsigned long ulColor = 0;
                 swscanf ( wszSectionPos + 1, L"%06x", &ulColor );
