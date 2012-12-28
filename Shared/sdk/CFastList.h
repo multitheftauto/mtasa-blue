@@ -49,8 +49,7 @@ public:
         , uiNextBackIndex ( UINT_MAX / 2 )
     {
         // T must be a pointer
-        void* ptr = (T)NULL;
-        ptr = NULL;
+	assert ( (T)NULL == 0 );
     }
 
     T& front( void )

@@ -319,4 +319,4 @@ deathmatch_la_LIBADD = \
 	$(SQLITE3_LIBS)
 
 deathmatch_la_LDFLAGS = \
-	-module -avoid-version
+	-module -avoid-version -lz
