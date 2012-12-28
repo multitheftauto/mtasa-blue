@@ -18,6 +18,8 @@
 #ifdef WIN32
     #include <direct.h>
     #include <shellapi.h>
+#else
+    #include <wctype.h>
 #endif
 
 CCriticalSection CRefCountable::ms_CS;
