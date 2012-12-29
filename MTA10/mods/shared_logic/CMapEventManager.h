@@ -42,7 +42,6 @@ private:
     bool                                    m_bIteratingList;
     std::multimap < SString, CMapEvent* >   m_EventsMap;
     std::list < CMapEvent* >                m_TrashCan;
-    std::list < CMapEvent* >                m_PendingAddList;
 
     // Types for m_EventsMap access
     typedef std::multimap < SString, CMapEvent* > ::const_iterator  EventsConstIter;
