@@ -2451,7 +2451,7 @@ void CClientVehicle::Create ( void )
                 SVehicleComponentData vehicleComponentData;
                 // Grab our start position
                 GetComponentPosition ( (*iter).first, vehicleComponentData.m_vecComponentPosition );
-                GetComponentPosition ( (*iter).first, vehicleComponentData.m_vecComponentRotation );
+                GetComponentRotation ( (*iter).first, vehicleComponentData.m_vecComponentRotation );
                 
                 // copy it into our original positions
                 vehicleComponentData.m_vecComponentPosition = vehicleComponentData.m_vecOriginalComponentPosition;
