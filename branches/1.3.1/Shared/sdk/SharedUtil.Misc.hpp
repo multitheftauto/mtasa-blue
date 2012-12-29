@@ -18,6 +18,8 @@
 #ifdef WIN32
     #include <direct.h>
     #include <shellapi.h>
+#else
+    #include <wctype.h>
 #endif
 
 CCriticalSection CRefCountable::ms_CS;
@@ -922,20 +924,20 @@ SString SharedUtil::RemoveColorCodes( const char* szString )
 //
 void SharedUtil::RemoveColorCodesInPlaceW( WString& strText )
 {
-    int iSearchPos = 0;
+    uint uiSearchPos = 0;
     while( true )
     {
-        int iFoundPos = strText.find( L'#', iSearchPos );
-        if ( iFoundPos == std::wstring::npos )
+        uint uiFoundPos = strText.find( L'#', uiSearchPos );
+        if ( uiFoundPos == std::wstring::npos )
             break;
 
-        if ( IsColorCodeW( strText.c_str() + iFoundPos ) )
+        if ( IsColorCodeW( strText.c_str() + uiFoundPos ) )
         {
-            strText = strText.SubStr( 0, iFoundPos - 0 ) + strText.SubStr( iFoundPos + 7 );
+            strText = strText.SubStr( 0, uiFoundPos ) + strText.SubStr( uiFoundPos + 7 );
         }
         else
         {
-            iSearchPos = iFoundPos + 1;
+            uiSearchPos = uiFoundPos + 1;
         }
     }
 }
