@@ -191,7 +191,7 @@ void CPlayer::DoPulse ( void )
         m_pPlayerTextManager->Process ();
 
         // Do dist update if too long since last one
-        if ( m_UpdateNearListTimer.Get () > g_TickRateSettings.iNearListUpdate + 300 )
+        if ( m_UpdateNearListTimer.Get () > (uint)g_TickRateSettings.iNearListUpdate + 300 )
             MaybeUpdateOthersNearList ();
     }
 }
@@ -693,7 +693,7 @@ bool CPlayer::ShouldPlayerBeInNearList ( CPlayer* pOther )
 void CPlayer::MaybeUpdateOthersNearList ( void )
 {
     // If too long since last update
-    if ( m_UpdateNearListTimer.Get () > g_TickRateSettings.iNearListUpdate * 9 / 10 )
+    if ( m_UpdateNearListTimer.Get () > (uint)g_TickRateSettings.iNearListUpdate * 9 / 10 )
     {
         CLOCK( "RelayPlayerPuresync", "UpdateNearList_Timer" );
         UpdateOthersNearList ();
