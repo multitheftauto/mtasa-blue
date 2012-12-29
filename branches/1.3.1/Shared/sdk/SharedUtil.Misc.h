@@ -484,8 +484,10 @@ namespace SharedUtil
     //
     // string stuff
     //
-    std::string RemoveColorCode ( const char* szString );
-
+    SString RemoveColorCodes            ( const char* szString );
+    void    RemoveColorCodesInPlaceW    ( WString& strText );
+    bool    IsColorCode                 ( const char* szColorCode );
+    bool    IsColorCodeW                ( const wchar_t* wszColorCode );
 
     //
     // ID 'stack'

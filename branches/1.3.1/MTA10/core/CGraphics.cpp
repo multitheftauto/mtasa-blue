@@ -470,7 +470,7 @@ float CGraphics::GetDXCharacterWidth ( char c, float fScale, LPD3DXFONT pDXFont 
 }
 
 
-float CGraphics::GetDXTextExtent ( const char * szText, float fScale, LPD3DXFONT pDXFont )
+float CGraphics::GetDXTextExtent ( const char * szText, float fScale, LPD3DXFONT pDXFont, bool bColorCoded )
 {
     if ( !pDXFont )
         pDXFont = GetFont ();
@@ -482,7 +482,10 @@ float CGraphics::GetDXTextExtent ( const char * szText, float fScale, LPD3DXFONT
         HDC dc = pDXFont->GetDC ();
         SIZE size;
 
-        std::wstring strText = MbUTF8ToUTF16(szText);
+        WString strText = MbUTF8ToUTF16(szText);
+
+        if ( bColorCoded )
+            RemoveColorCodesInPlaceW( strText );
 
         GetTextExtentPoint32W ( dc, strText.c_str(), strText.length(), &size );
 
@@ -518,22 +521,6 @@ ID3DXFont * CGraphics::GetFont ( eFontType fontType )
         return m_pDXFonts [ FONT_DEFAULT ];
 
     return m_pDXFonts [ fontType ];
-}
-
-
-eFontType CGraphics::GetFontType ( const char* szFontName )
-{
-    assert ( szFontName );
-    if ( !stricmp ( szFontName, "default" ) )       return FONT_DEFAULT;
-    if ( !stricmp ( szFontName, "default-bold" ) )  return FONT_DEFAULT_BOLD;
-    if ( !stricmp ( szFontName, "clear" ) )         return FONT_CLEAR;
-    if ( !stricmp ( szFontName, "arial" ) )         return FONT_ARIAL;
-    if ( !stricmp ( szFontName, "sans" ) )          return FONT_SANS;
-    if ( !stricmp ( szFontName, "pricedown" ) )     return FONT_PRICEDOWN;
-    if ( !stricmp ( szFontName, "bankgothic" ) )    return FONT_BANKGOTHIC;
-    if ( !stricmp ( szFontName, "diploma" ) )       return FONT_DIPLOMA;
-    if ( !stricmp ( szFontName, "beckett" ) )       return FONT_BECKETT;
-    return FONT_DEFAULT;
 }
 
 
@@ -813,7 +800,7 @@ void CGraphics::DrawColorCodedTextLine ( float fLeft, float fRight, float fY, SC
         SColor nextColor = currentColor;
         while ( *wszSectionPos != '\0' )      // find end of this section
         {
-            if ( CChatLine::IsColorCodeW ( wszSectionPos ) )
+            if ( IsColorCodeW ( wszSectionPos ) )
             {
                 unsigned long ulColor = 0;
                 swscanf ( wszSectionPos + 1, L"%06x", &ulColor );

@@ -76,7 +76,6 @@ public:
 
     // DirectX font functions
     ID3DXFont *         GetFont                 ( eFontType fontType = FONT_DEFAULT );
-    eFontType           GetFontType             ( const char* szFontName );
 
     bool                LoadStandardDXFonts     ( void );
     bool                DestroyStandardDXFonts  ( void );
@@ -86,7 +85,7 @@ public:
 
     float               GetDXFontHeight         ( float fScale = 1.0f, ID3DXFont * pDXFont = NULL );
     float               GetDXCharacterWidth     ( char c, float fScale = 1.0f, ID3DXFont * pDXFont = NULL );
-    float               GetDXTextExtent         ( const char * szText, float fScale = 1.0f, ID3DXFont * pDXFont = NULL );
+    float               GetDXTextExtent         ( const char * szText, float fScale = 1.0f, ID3DXFont * pDXFont = NULL, bool bColorCoded = false );
     float               GetDXTextExtentW        ( const wchar_t* wszText, float fScale = 1.0f, LPD3DXFONT pDXFont = NULL );
 
     // Textures

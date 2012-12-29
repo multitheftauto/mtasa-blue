@@ -884,40 +884,6 @@ void CChatLine::UpdateCreationTime ()
     m_ulCreationTime = GetTickCount32 ();
 }
 
-bool CChatLine::IsColorCode ( const char* szColorCode )
-{
-    if ( *szColorCode != '#' )
-        return false;
-
-    bool bValid = true;
-    for ( int i = 0; i < 6; i++ )
-    {
-        char c = szColorCode [ 1 + i ];
-        if ( !isdigit ( (unsigned char)c ) && (c < 'A' || c > 'F') && (c < 'a' || c > 'f') )
-        {
-            bValid = false;
-            break;
-        }
-    }
-    return bValid;
-}
-
-bool CChatLine::IsColorCodeW ( const wchar_t* wszColorCode )
-{
-    if ( *wszColorCode != L'#' )
-        return false;
-
-    for ( uint i = 0 ; i < 6 ; i++ )
-    {
-        wchar_t c = wszColorCode [ i + 1 ];
-        if ( !iswdigit ( c ) && (c < 'A' || c > 'F') && (c < 'a' || c > 'f') )
-        {
-            return false;
-        }
-    }
-    return true;
-}
-
 
 //
 // Calculate the equivalent ansi string pointer of szPosition.
@@ -1046,31 +1012,6 @@ float CChatLine::GetWidth ()
     return fWidth;
 }
 
-void CChatLine::RemoveColorCode ( const char* szString, std::string& strOut )
-{
-    strOut.clear ();
-    const char* szStart = szString;
-    const char* szEnd = szString;
-
-    while ( true )
-    {
-        if ( *szEnd == '\0' )
-        {
-            strOut.append ( szStart, szEnd - szStart );
-            break;
-        }
-        else if ( IsColorCode ( szEnd ) )
-        {
-            strOut.append ( szStart, szEnd - szStart );
-            szStart = szEnd + 7;
-            szEnd = szStart;
-        }
-        else
-        {
-            szEnd++;
-        }
-    }
-}
 
 void CChatInputLine::Draw ( CVector2D& vecPosition, unsigned char ucAlpha, bool bShadow )
 {

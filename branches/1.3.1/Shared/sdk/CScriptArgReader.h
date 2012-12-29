@@ -33,6 +33,7 @@ public:
         m_pPendingFunctionIndex = -1;
         m_bResolvedErrorGotArgumentTypeAndValue = false;
         m_iErrorGotArgumentType = 0;
+        m_bHasCustomMessage = false;
     }
 
     ~CScriptArgReader ( void )
@@ -633,8 +634,8 @@ public:
         if ( !m_bError )
             return "No error";
 
-        if ( !m_strErrorMessageOverride.empty () )
-            return m_strErrorMessageOverride;
+        if ( m_bHasCustomMessage )
+            return m_strCustomMessage;
 
         ResolveErrorGotArgumentTypeAndValue ();
         SString strGotArgumentType  = EnumToString ( (eLuaType)m_iErrorGotArgumentType );
@@ -672,7 +673,7 @@ public:
 
         m_bResolvedErrorGotArgumentTypeAndValue = true;
 
-        if ( m_strErrorMessageOverride.empty () )
+        if ( !m_bHasCustomMessage )
         {
             m_iErrorGotArgumentType = lua_type ( m_luaVM, m_iErrorIndex );
             m_strErrorGotArgumentValue = lua_tostring ( m_luaVM, m_iErrorIndex );
@@ -704,7 +705,8 @@ public:
         {
             m_bError = true;
             m_strErrorCategory = szCategory;
-            m_strErrorMessageOverride = szReason;
+            m_bHasCustomMessage = true;
+            m_strCustomMessage = szReason;
         }
     }
 
@@ -728,6 +730,7 @@ public:
     int                     m_iErrorGotArgumentType;
     SString                 m_strErrorGotArgumentValue;
     SString                 m_strErrorCategory;
-    SString                 m_strErrorMessageOverride;
+    bool                    m_bHasCustomMessage;
+    SString                 m_strCustomMessage;
 
 };
