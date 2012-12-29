@@ -360,6 +360,19 @@ IMPLEMENT_ENUM_BEGIN( eVehicleComponent )
     ADD_ENUM ( VEHICLE_COMPONENT_EXTRA_2,                       "extra_2" )
 IMPLEMENT_ENUM_END( "vehicle-component" )
 
+IMPLEMENT_ENUM_BEGIN( eFontType )
+    ADD_ENUM( FONT_DEFAULT,         "default" )
+    ADD_ENUM( FONT_DEFAULT_BOLD,    "default-bold" )
+    ADD_ENUM( FONT_CLEAR,           "clear" )
+    ADD_ENUM( FONT_ARIAL,           "arial" )
+    ADD_ENUM( FONT_SANS,            "sans" )
+    ADD_ENUM( FONT_PRICEDOWN,       "pricedown" )
+    ADD_ENUM( FONT_BANKGOTHIC,      "bankgothic" )
+    ADD_ENUM( FONT_DIPLOMA,         "diploma" )
+    ADD_ENUM( FONT_BECKETT,         "beckett" )
+IMPLEMENT_ENUM_END_DEFAULTS( "font-type", FONT_DEFAULT, "" )
+
+
 //
 // Get best guess at name of userdata type
 //
@@ -405,26 +418,35 @@ SString GetUserDataClassName ( void* ptr, lua_State* luaVM )
 //
 // DxFont/string
 //
-bool MixedReadDxFontString ( CScriptArgReader& argStream, SString& strFontName, const char* szDefaultFontName, CClientDxFont*& pDxFontElement )
+bool MixedReadDxFontString ( CScriptArgReader& argStream, eFontType& outFontType, eFontType defaultFontType, CClientDxFont*& poutDxFontElement )
 {
-    pDxFontElement = NULL;
-    if ( argStream.NextIsString () || argStream.NextIsNone () )
-        return argStream.ReadString ( strFontName, szDefaultFontName );
+    outFontType = FONT_DEFAULT;
+    poutDxFontElement = NULL;
+    if ( argStream.NextIsNone () )
+        return true;
     else
-        return argStream.ReadUserData ( pDxFontElement );
+    if ( argStream.NextIsString () )
+    {
+        SString strFontName;
+        argStream.ReadString ( strFontName );
+        StringToEnum( strFontName, outFontType );
+        return true;
+    }
+    else
+        return argStream.ReadUserData ( poutDxFontElement );
 }
 
 
 //
 // GuiFont/string
 //
-bool MixedReadGuiFontString ( CScriptArgReader& argStream, SString& strFontName, const char* szDefaultFontName, CClientGuiFont*& pGuiFontElement )
+bool MixedReadGuiFontString ( CScriptArgReader& argStream, SString& strOutFontName, const char* szDefaultFontName, CClientGuiFont*& poutGuiFontElement )
 {
-    pGuiFontElement = NULL;
+    poutGuiFontElement = NULL;
     if ( argStream.NextIsString () || argStream.NextIsNone () )
-        return argStream.ReadString ( strFontName, szDefaultFontName );
+        return argStream.ReadString ( strOutFontName, szDefaultFontName );
     else
-        return argStream.ReadUserData ( pGuiFontElement );
+        return argStream.ReadUserData ( poutGuiFontElement );
 }
 
 

@@ -74,7 +74,6 @@ public:
     virtual bool                    DestroyAdditionalDXFont ( std::string strFontPath, ID3DXFont* pD3DXFont ) = 0;
 
     virtual ID3DXFont *             GetFont             ( eFontType fontType = FONT_DEFAULT ) = 0;
-    virtual eFontType               GetFontType         ( const char* szFontName ) = 0;
 
     virtual void                    DrawTexture         ( CTextureItem* texture, float fX, float fY, float fScaleX = 1.0f, float fScaleY = 1.0f, float fRotation = 0.0f, float fCenterX = 0.0f, float fCenterY = 0.0f, DWORD dwColor = 0xFFFFFFFF ) = 0;
 

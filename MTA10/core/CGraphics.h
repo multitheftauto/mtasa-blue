@@ -76,7 +76,6 @@ public:
 
     // DirectX font functions
     ID3DXFont *         GetFont                 ( eFontType fontType = FONT_DEFAULT );
-    eFontType           GetFontType             ( const char* szFontName );
 
     bool                LoadStandardDXFonts     ( void );
     bool                DestroyStandardDXFonts  ( void );
