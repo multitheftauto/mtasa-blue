@@ -4190,14 +4190,12 @@ void CStaticFunctionDefinitions::DrawText ( float fLeft, float fTop,
 
 
 // Find custom font from an element, or a standard font from a name.
-ID3DXFont* CStaticFunctionDefinitions::ResolveD3DXFont ( const SString& strFontName, CClientDxFont* pDxFontElement )
+ID3DXFont* CStaticFunctionDefinitions::ResolveD3DXFont ( eFontType fontType, CClientDxFont* pDxFontElement )
 {
     if ( pDxFontElement )
         return pDxFontElement->GetD3DXFont ();
 
-    CGraphicsInterface* pGraphics = g_pCore->GetGraphics ();
-    eFontType fontType = pGraphics->GetFontType ( strFontName );
-    return pGraphics->GetFont ( fontType );
+    return g_pCore->GetGraphics ()->GetFont ( fontType );
 }
 
 

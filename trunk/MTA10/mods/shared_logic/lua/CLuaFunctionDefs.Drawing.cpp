@@ -168,7 +168,7 @@ int CLuaFunctionDefs::dxDrawText ( lua_State* luaVM )
 {
 //  bool dxDrawText ( string text, float left, float top [, float right=left, float bottom=top, int color=white, float scale=1, mixed font="default", 
 //      string alignX="left", string alignY="top", bool clip=false, bool wordBreak=false, bool postGUI=false, bool colorCoded=false, bool subPixelPositioning=false] )
-    SString strText; float fLeft; float fTop; float fRight; float fBottom; ulong ulColor; float fScaleX; float fScaleY; SString strFontName; CClientDxFont* pDxFontElement;
+    SString strText; float fLeft; float fTop; float fRight; float fBottom; ulong ulColor; float fScaleX; float fScaleY; eFontType fontType; CClientDxFont* pDxFontElement;
     eDXHorizontalAlign alignX; eDXVerticalAlign alignY; bool bClip; bool bWordBreak; bool bPostGUI; bool bColorCoded; bool bSubPixelPositioning;
 
     CScriptArgReader argStream ( luaVM );
@@ -183,7 +183,7 @@ int CLuaFunctionDefs::dxDrawText ( lua_State* luaVM )
         argStream.ReadNumber ( fScaleY );
     else
         fScaleY = fScaleX;
-    MixedReadDxFontString ( argStream, strFontName, "default", pDxFontElement );
+    MixedReadDxFontString ( argStream, fontType, FONT_DEFAULT, pDxFontElement );
     argStream.ReadEnumString ( alignX, DX_ALIGN_LEFT );
     argStream.ReadEnumString ( alignY, DX_ALIGN_TOP );
     argStream.ReadBool ( bClip, false );
@@ -195,7 +195,7 @@ int CLuaFunctionDefs::dxDrawText ( lua_State* luaVM )
     if ( !argStream.HasErrors () )
     {
         // Get DX font
-        ID3DXFont* pD3DXFont = CStaticFunctionDefinitions::ResolveD3DXFont ( strFontName, pDxFontElement );
+        ID3DXFont* pD3DXFont = CStaticFunctionDefinitions::ResolveD3DXFont ( fontType, pDxFontElement );
 
         // Make format flag
         ulong ulFormat = alignX | alignY;
@@ -331,17 +331,17 @@ int CLuaFunctionDefs::dxDrawImageSection ( lua_State* luaVM )
 int CLuaFunctionDefs::dxGetTextWidth ( lua_State* luaVM )
 {
 //  float dxGetTextWidth ( string text, [float scale=1, mixed font="default", bool colorCoded=false] )
-    SString strText; float fScale; SString strFontName; CClientDxFont* pDxFontElement; bool bColorCoded;
+    SString strText; float fScale; eFontType fontType; CClientDxFont* pDxFontElement; bool bColorCoded;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadString ( strText );
     argStream.ReadNumber ( fScale, 1 );
-    MixedReadDxFontString ( argStream, strFontName, "default", pDxFontElement );
+    MixedReadDxFontString ( argStream, fontType, FONT_DEFAULT, pDxFontElement );
     argStream.ReadBool ( bColorCoded, false );
 
     if ( !argStream.HasErrors () )
     {
-        ID3DXFont* pD3DXFont = CStaticFunctionDefinitions::ResolveD3DXFont ( strFontName, pDxFontElement );
+        ID3DXFont* pD3DXFont = CStaticFunctionDefinitions::ResolveD3DXFont ( fontType, pDxFontElement );
 
         // Retrieve the longest line's extent
         std::stringstream ssText ( strText );
@@ -371,15 +371,15 @@ int CLuaFunctionDefs::dxGetTextWidth ( lua_State* luaVM )
 int CLuaFunctionDefs::dxGetFontHeight ( lua_State* luaVM )
 {
 //  int dxGetFontHeight ( [float scale=1, mixed font="default"] )
-    float fScale; SString strFontName; CClientDxFont* pDxFontElement;
+    float fScale; eFontType fontType; CClientDxFont* pDxFontElement;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadNumber ( fScale, 1 );
-    MixedReadDxFontString ( argStream, strFontName, "default", pDxFontElement );
+    MixedReadDxFontString ( argStream, fontType, FONT_DEFAULT, pDxFontElement );
 
     if ( !argStream.HasErrors () )
     {
-        ID3DXFont* pD3DXFont = CStaticFunctionDefinitions::ResolveD3DXFont ( strFontName, pDxFontElement );
+        ID3DXFont* pD3DXFont = CStaticFunctionDefinitions::ResolveD3DXFont ( fontType, pDxFontElement );
 
         float fHeight = g_pCore->GetGraphics ()->GetDXFontHeight ( fScale, pD3DXFont );
         // Success

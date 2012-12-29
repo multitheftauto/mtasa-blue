@@ -524,22 +524,6 @@ ID3DXFont * CGraphics::GetFont ( eFontType fontType )
 }
 
 
-eFontType CGraphics::GetFontType ( const char* szFontName )
-{
-    assert ( szFontName );
-    if ( !stricmp ( szFontName, "default" ) )       return FONT_DEFAULT;
-    if ( !stricmp ( szFontName, "default-bold" ) )  return FONT_DEFAULT_BOLD;
-    if ( !stricmp ( szFontName, "clear" ) )         return FONT_CLEAR;
-    if ( !stricmp ( szFontName, "arial" ) )         return FONT_ARIAL;
-    if ( !stricmp ( szFontName, "sans" ) )          return FONT_SANS;
-    if ( !stricmp ( szFontName, "pricedown" ) )     return FONT_PRICEDOWN;
-    if ( !stricmp ( szFontName, "bankgothic" ) )    return FONT_BANKGOTHIC;
-    if ( !stricmp ( szFontName, "diploma" ) )       return FONT_DIPLOMA;
-    if ( !stricmp ( szFontName, "beckett" ) )       return FONT_BECKETT;
-    return FONT_DEFAULT;
-}
-
-
 void CGraphics::SetCursorPosition ( int iX, int iY, DWORD Flags )
 {
     m_pDevice->SetCursorPosition ( iX, iY, Flags );
