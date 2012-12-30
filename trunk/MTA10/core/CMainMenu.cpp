@@ -761,13 +761,26 @@ bool CMainMenu::OnMenuClick ( CGUIElement* pElement )
     // Handle all our clicks to the menu from here
     if ( m_pHoveredItem )
     {
+        // Possible disconnect question for user
+        if ( g_pCore->IsConnected() )
+        {
+            switch (m_pHoveredItem->menuType)
+            {
+                case MENU_ITEM_HOST_GAME:
+                case MENU_ITEM_MAP_EDITOR:
+                    AskUserIfHeWantsToDisconnect( m_pHoveredItem->menuType );
+                    return true;
+                default: break;
+            }
+        }
+
         switch (m_pHoveredItem->menuType)
         {
             case MENU_ITEM_DISCONNECT:      OnDisconnectButtonClick   (pElement);    break;
             case MENU_ITEM_QUICK_CONNECT:   OnQuickConnectButtonClick (pElement);    break;
             case MENU_ITEM_BROWSE_SERVERS:  OnBrowseServersButtonClick(pElement);    break;
-            case MENU_ITEM_HOST_GAME:       OnHostGameButtonClick     (pElement);    break;
-            case MENU_ITEM_MAP_EDITOR:      OnEditorButtonClick       (pElement);    break;
+            case MENU_ITEM_HOST_GAME:       OnHostGameButtonClick     ();            break;
+            case MENU_ITEM_MAP_EDITOR:      OnEditorButtonClick       ();            break;
             case MENU_ITEM_SETTINGS:        OnSettingsButtonClick     (pElement);    break;
             case MENU_ITEM_ABOUT:           OnAboutButtonClick        (pElement);    break;
             case MENU_ITEM_QUIT:            OnQuitButtonClick         (pElement);    break;
@@ -837,7 +850,7 @@ bool CMainMenu::OnDisconnectButtonClick ( CGUIElement* pElement )
 }
 
 
-bool CMainMenu::OnHostGameButtonClick ( CGUIElement* pElement )
+bool CMainMenu::OnHostGameButtonClick ( void )
 {
     // Return if we haven't faded in yet
     if ( m_ucFade != FADE_VISIBLE ) return false;
@@ -849,7 +862,7 @@ bool CMainMenu::OnHostGameButtonClick ( CGUIElement* pElement )
 }
 
 
-bool CMainMenu::OnEditorButtonClick ( CGUIElement* pElement )
+bool CMainMenu::OnEditorButtonClick ( void )
 {
     // Return if we haven't faded in yet
     if ( m_ucFade != FADE_VISIBLE ) return false;
@@ -1045,4 +1058,64 @@ void CMainMenu::SetNewsHeadline ( int iIndex, const SString& strHeadline, const 
     CGUILabel* pNewLabel = m_pNewsItemNEWLabels[ iIndex ];
     pNewLabel->SetVisible ( bIsNew );
     pNewLabel->SetPosition ( CVector2D ( pItem->GetPosition ().fX + 4, pItem->GetPosition ().fY - 4 ) );
+}
+
+
+/////////////////////////////////////////////////////////////
+//
+// CMainMenu::AskUserIfHeWantsToDisconnect
+//
+// Ask user if he wants to disconnect
+//
+/////////////////////////////////////////////////////////////
+void CMainMenu::AskUserIfHeWantsToDisconnect ( uchar menuType )
+{
+    SStringX strMessage ( "This will disconnect you from the current server." );
+    strMessage += "\n\nAre you sure you want to disconnect?";
+    CQuestionBox* pQuestionBox = CCore::GetSingleton ().GetLocalGUI ()->GetMainMenu ()->GetQuestionWindow ();
+    pQuestionBox->Reset ();
+    pQuestionBox->SetTitle ( "DISCONNECT WARNING" );
+    pQuestionBox->SetMessage ( strMessage );
+    pQuestionBox->SetButton ( 0, "No" );
+    pQuestionBox->SetButton ( 1, "Yes" );
+    pQuestionBox->SetCallback ( StaticWantsToDisconnectCallBack, (void*)menuType );
+    pQuestionBox->Show ();
+}
+
+
+/////////////////////////////////////////////////////////////
+//
+// CMainMenu::StaticWantsToDisconnectCallBack
+//
+// Callback from disconnect question
+//
+/////////////////////////////////////////////////////////////
+void CMainMenu::StaticWantsToDisconnectCallBack( void* pData, uint uiButton )
+{
+    CLocalGUI::GetSingleton ().GetMainMenu ()->WantsToDisconnectCallBack( pData, uiButton );
+}
+
+
+/////////////////////////////////////////////////////////////
+//
+// CMainMenu::WantsToDisconnectCallBack
+//
+// Callback from disconnect question.
+// If user says it's ok, continue with menu item selection
+//
+/////////////////////////////////////////////////////////////
+void CMainMenu::WantsToDisconnectCallBack( void* pData, uint uiButton )
+{
+    CCore::GetSingleton ().GetLocalGUI ()->GetMainMenu ()->GetQuestionWindow ()->Reset ();
+
+    if ( uiButton == 1 )
+    {
+        uchar menuType = (uchar)pData;
+        switch( menuType )
+        {
+            case MENU_ITEM_HOST_GAME:       OnHostGameButtonClick ();    break;
+            case MENU_ITEM_MAP_EDITOR:      OnEditorButtonClick   ();    break;
+            default: break;
+        }
+    }
 }
