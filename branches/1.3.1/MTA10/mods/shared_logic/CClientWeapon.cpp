@@ -642,8 +642,10 @@ void CClientWeapon::DoGunShells ( CVector vecOrigin, CVector vecDirection )
 
     if(fShellSize > 0.0f)
     {
-        g_pGame->GetPointLights ()->AddLight ( PLTYPE_POINTLIGHT, vecOrigin, CVector (), 3.0f, 0.22f, 0.25f, 0, 0, 0, 0 );
-
+        if ( !m_weaponConfig.bDisableWeaponModel )
+        {
+            g_pGame->GetPointLights ()->AddLight ( PLTYPE_POINTLIGHT, vecOrigin, CVector (), 3.0f, 0.22f, 0.25f, 0, 0, 0, 0 );
+        }
         if ( GetAttachedTo () ) g_pGame->GetFx ()->TriggerGunshot ( NULL, vecOrigin, vecDirection, true );
         else g_pGame->GetFx ()->TriggerGunshot ( NULL, vecOrigin, vecDirection, true );
 
