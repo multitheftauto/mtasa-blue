@@ -36,6 +36,17 @@ void CElementRPCs::LoadFunctions ( void )
     AddHandler ( SET_ELEMENT_COLLISIONS_ENABLED, SetElementCollisionsEnabled, "SetElementCollisionsEnabled" );
     AddHandler ( SET_ELEMENT_FROZEN,             SetElementFrozen,            "SetElementFrozen" );
     AddHandler ( SET_LOW_LOD_ELEMENT,            SetLowLodElement,            "SetLowLodElement" );
+    AddHandler ( FIRE_CUSTOM_WEAPON,             FireCustomWeapon,            "fireWeapon" );
+    AddHandler ( SET_CUSTOM_WEAPON_STATE,        SetCustomWeaponState,        "setWeaponState" );
+    AddHandler ( SET_CUSTOM_WEAPON_CLIP_AMMO,    SetCustomWeaponClipAmmo,     "setWeaponClipAmmo" );
+    AddHandler ( SET_CUSTOM_WEAPON_AMMO,         SetCustomWeaponAmmo,         "setWeaponAmmo" );
+    AddHandler ( SET_CUSTOM_WEAPON_TARGET,       SetCustomWeaponTarget,       "setWeaponTarget" );
+    AddHandler ( RESET_CUSTOM_WEAPON_TARGET,     ResetCustomWeaponTarget,     "resetWeaponTarget" );
+    AddHandler ( SET_CUSTOM_WEAPON_FLAGS,        SetCustomWeaponFlags,        "setWeaponFlags" );
+    AddHandler ( SET_CUSTOM_WEAPON_FIRING_RATE,  SetCustomWeaponFiringRate,   "setWeaponFiringRate" );
+    AddHandler ( RESET_CUSTOM_WEAPON_FIRING_RATE,ResetCustomWeaponFiringRate, "resetWeaponFiringRate" );
+    AddHandler ( SET_WEAPON_OWNER,               SetWeaponOwner,              "setWeaponOwner" );
+    AddHandler ( SET_CUSTOM_WEAPON_FLAGS,        SetWeaponConfig,             "setWeaponFlags" );
 }
 
 #define RUN_CHILDREN_SERVER \
@@ -535,6 +546,162 @@ void CElementRPCs::SetLowLodElement ( CClientEntity* pSource, NetBitStreamInterf
                 pObject->SetLowLodObject ( pLowLodObject );
                 break;
             }
+        }
+    }
+}
+
+void CElementRPCs::FireCustomWeapon ( CClientEntity * pSource, NetBitStreamInterface& bitStream )
+{
+    if ( pSource->GetType() == CCLIENTWEAPON )
+    {
+        CClientWeapon * pWeapon = static_cast < CClientWeapon * > ( pSource );
+        pWeapon->Fire ( true );
+    }
+}
+
+void CElementRPCs::SetCustomWeaponState ( CClientEntity * pSource, NetBitStreamInterface& bitStream )
+{
+    char cWeaponState = 0;
+    if ( bitStream.Read ( cWeaponState ) &&
+        pSource->GetType() == CCLIENTWEAPON )
+    {
+        CClientWeapon * pWeapon = static_cast < CClientWeapon * > ( pSource );
+        pWeapon->SetWeaponState ( (eWeaponState) cWeaponState );
+    }
+}
+
+void CElementRPCs::SetCustomWeaponClipAmmo ( CClientEntity * pSource, NetBitStreamInterface& bitStream )
+{
+    int iAmmo = 0;
+    if ( bitStream.Read ( iAmmo ) &&
+        pSource->GetType() == CCLIENTWEAPON )
+    {
+        CClientWeapon * pWeapon = static_cast < CClientWeapon * > ( pSource );
+        pWeapon->SetClipAmmo ( iAmmo );
+    }
+}
+
+void CElementRPCs::SetCustomWeaponAmmo ( CClientEntity * pSource, NetBitStreamInterface& bitStream )
+{
+    int iAmmo = 0;
+    if ( bitStream.Read ( iAmmo ) &&
+        pSource->GetType() == CCLIENTWEAPON )
+    {
+        CClientWeapon * pWeapon = static_cast < CClientWeapon * > ( pSource );
+        pWeapon->SetAmmo ( iAmmo );
+    }
+}
+
+void CElementRPCs::SetCustomWeaponTarget ( CClientEntity * pSource, NetBitStreamInterface& bitStream )
+{
+    ElementID elementID = INVALID_ELEMENT_ID;
+    char cTargetBone = 0;
+    bool bVector = false;
+    CVector vecTarget;
+
+    if ( bitStream.ReadBit ( bVector ) &&
+        pSource->GetType() == CCLIENTWEAPON )
+    {
+        CClientWeapon * pWeapon = static_cast < CClientWeapon * > ( pSource );
+        if ( bVector )
+        {
+            if ( bitStream.ReadVector ( vecTarget.fX, vecTarget.fY, vecTarget.fZ ) )
+            {
+                pWeapon->SetWeaponTarget ( vecTarget );
+            }
+        }
+        else
+        {
+            if ( bitStream.Read ( elementID ) && 
+                bitStream.Read ( cTargetBone ) )
+            {
+                pWeapon->SetWeaponTarget ( CElementIDs::GetElement( elementID ), cTargetBone );
+            }
+        }
+    }
+}
+
+void CElementRPCs::ResetCustomWeaponTarget ( CClientEntity * pSource, NetBitStreamInterface& bitStream )
+{
+    if ( pSource->GetType() == CCLIENTWEAPON )
+    {
+        CClientWeapon * pWeapon = static_cast < CClientWeapon * > ( pSource );
+        pWeapon->ResetWeaponTarget ( );
+    }
+}
+
+void CElementRPCs::SetCustomWeaponFlags ( CClientEntity * pSource, NetBitStreamInterface& bitStream )
+{
+    if ( pSource->GetType() == CCLIENTWEAPON )
+    {
+        CClientWeapon * pWeapon = static_cast < CClientWeapon * > ( pSource );
+        pWeapon->Fire ( );
+    }
+}
+
+void CElementRPCs::SetCustomWeaponFiringRate ( CClientEntity * pSource, NetBitStreamInterface& bitStream )
+{
+    int iFiringRate = 0;
+    if ( bitStream.Read ( iFiringRate ) &&
+        pSource->GetType() == CCLIENTWEAPON )
+    {
+        CClientWeapon * pWeapon = static_cast < CClientWeapon * > ( pSource );
+        pWeapon->SetWeaponFireTime ( iFiringRate );
+    }
+}
+
+void CElementRPCs::ResetCustomWeaponFiringRate ( CClientEntity * pSource, NetBitStreamInterface& bitStream )
+{
+    if ( pSource->GetType() == CCLIENTWEAPON )
+    {
+        CClientWeapon * pWeapon = static_cast < CClientWeapon * > ( pSource );
+        pWeapon->ResetWeaponFireTime ( );
+    }
+}
+
+void CElementRPCs::SetWeaponOwner ( CClientEntity * pSource, NetBitStreamInterface& bitStream )
+{
+    if ( pSource->GetType() == CCLIENTWEAPON )
+    {
+        ElementID PlayerID;
+        if ( bitStream.Read ( PlayerID ) )
+        {
+            CClientWeapon * pWeapon = static_cast < CClientWeapon * > ( pSource );
+            CClientPlayer * pPlayer = NULL;
+            if ( PlayerID != INVALID_ELEMENT_ID )
+            {
+                pPlayer = static_cast < CClientPlayer * > ( CElementIDs::GetElement ( PlayerID ) );
+            }
+            else
+                pPlayer = NULL;
+
+            pWeapon->SetOwner ( pPlayer );
+        }
+    }
+}
+
+void CElementRPCs::SetWeaponConfig ( CClientEntity * pSource, NetBitStreamInterface& bitStream )
+{
+    if ( pSource->GetType() == CCLIENTWEAPON )
+    {
+        CClientWeapon * pWeapon = static_cast < CClientWeapon * > ( pSource );
+        SWeaponConfiguration weaponConfig;
+
+        if ( bitStream.ReadBit ( weaponConfig.bDisableWeaponModel ) &&
+            bitStream.ReadBit ( weaponConfig.bInstantReload ) &&
+            bitStream.ReadBit ( weaponConfig.bShootIfTargetBlocked ) &&
+            bitStream.ReadBit ( weaponConfig.bShootIfTargetOutOfRange ) &&
+            bitStream.ReadBit ( weaponConfig.flags.bCheckBuildings ) &&
+            bitStream.ReadBit ( weaponConfig.flags.bCheckCarTires ) &&
+            bitStream.ReadBit ( weaponConfig.flags.bCheckDummies ) &&
+            bitStream.ReadBit ( weaponConfig.flags.bCheckObjects ) &&
+            bitStream.ReadBit ( weaponConfig.flags.bCheckPeds ) &&
+            bitStream.ReadBit ( weaponConfig.flags.bCheckVehicles ) &&
+            bitStream.ReadBit ( weaponConfig.flags.bIgnoreSomeObjectsForCamera ) &&
+            bitStream.ReadBit ( weaponConfig.flags.bSeeThroughStuff ) &&
+            bitStream.ReadBit ( weaponConfig.flags.bShootThroughStuff ) )
+        {
+            pWeapon->SetFlags ( weaponConfig );
         }
     }
 }

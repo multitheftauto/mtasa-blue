@@ -66,12 +66,12 @@ public:
     void                    Create                  ( void );
     void                    Destroy                 ( void );
 
-    void                    Fire                    ( void );
+    void                    Fire                    ( bool bServerFire = false );
 
 #ifdef SHOTGUN_TEST
-    void                    FireInstantHit          ( CVector & vecOrigin, CVector & vecTarget, CVector & vecRotation );
+    void                    FireInstantHit          ( CVector & vecOrigin, CVector & vecTarget, CVector & vecRotation, bool bRemote = false );
 #else
-    void                    FireInstantHit          ( CVector & vecOrigin, CVector & vecTarget );
+    void                    FireInstantHit          ( CVector & vecOrigin, CVector & vecTarget, bool bServerFire = false, bool bRemote = false );
 #endif
     void                    FireShotgun             ( CEntity* pFiringEntity, const CVector& vecOrigin, const CVector& vecTarget, CVector & vecRotation );
 
@@ -85,9 +85,11 @@ public:
 
     bool                    SetFlags                ( eWeaponFlags flags, bool bData );
     bool                    SetFlags                ( const SLineOfSightFlags flags );
+    void                    SetFlags                ( const SWeaponConfiguration weaponConfig )     { m_weaponConfig = weaponConfig; }
 
     bool                    GetFlags                ( eWeaponFlags flags, bool &bData );
     bool                    GetFlags                ( SLineOfSightFlags& flags );
+    SWeaponConfiguration    GetFlags                ( void )                                        { return m_weaponConfig; }
 
     void                    DoGunShells             ( CVector vecOrigin, CVector vecDirection );
     static int              GetWeaponFireTime       ( CWeaponStat * pWeaponStat );
@@ -96,10 +98,10 @@ public:
     void                    ResetWeaponFireTime     ( void );
 
     void                    SetClipAmmo             ( int iAmmo )                                 { m_nAmmoInClip = iAmmo; }
-    int                     GetClipAmmo             ( int iAmmo )                                 { return m_nAmmoInClip; }
+    int                     GetClipAmmo             ( void )                                      { return m_nAmmoInClip; }
 
     void                    SetAmmo                 ( int iAmmo )                                 { m_nAmmoTotal = iAmmo; }
-    int                     GetAmmo                 ( int iAmmo )                                 { return m_nAmmoTotal; }
+    int                     GetAmmo                 ( void )                                      { return m_nAmmoTotal; }
 
 private:
     CClientManager *        m_pManager;

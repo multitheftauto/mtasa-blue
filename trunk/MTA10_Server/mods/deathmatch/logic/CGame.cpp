@@ -138,6 +138,7 @@ CGame::CGame ( void )
     m_pWaterManager = NULL;
     m_pWeaponStatsManager = NULL;
     m_pBuildingRemovalManager = NULL;
+    m_pCustomWeaponManager = NULL;
 #ifdef WITH_OBJECT_SYNC
     m_pObjectSync = NULL;
 #endif
@@ -296,6 +297,7 @@ CGame::~CGame ( void )
     SAFE_DELETE ( m_pWaterManager );
     SAFE_DELETE ( m_pWeaponStatsManager );
     SAFE_DELETE ( m_pBuildingRemovalManager );
+    SAFE_DELETE ( m_pCustomWeaponManager );
     SAFE_DELETE ( m_pOpenPortsTester );
     CSimControl::Shutdown ();
 
@@ -492,6 +494,7 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
 
     m_pBuildingRemovalManager = new CBuildingRemovalManager;
 
+    m_pCustomWeaponManager = new CCustomWeaponManager ( );
 
     // Parse the commandline
     if ( !m_CommandLineParser.Parse ( iArgumentCount, szArguments ) )
@@ -1094,12 +1097,17 @@ bool CGame::ProcessPacket ( CPacket& Packet )
             return true;
         }
 
+        case PACKET_ID_WEAPON_BULLETSYNC:
+        {
+            Packet_WeaponBulletsync ( static_cast < CCustomWeaponBulletSyncPacket& > ( Packet ) );
+            return true;
+        }
+
         case PACKET_ID_DETONATE_SATCHELS:
         {
             Packet_DetonateSatchels ( static_cast < CDetonateSatchelsPacket& > ( Packet ) );
             return true;
         }
-
 
         case PACKET_ID_DESTROY_SATCHELS:
         {
@@ -2323,6 +2331,16 @@ void CGame::Packet_Bulletsync ( CBulletsyncPacket& Packet )
     }
 }
 
+void CGame::Packet_WeaponBulletsync ( CCustomWeaponBulletSyncPacket& Packet )
+{
+    // Grab the source player
+    CPlayer* pPlayer = Packet.GetSourcePlayer ();
+    if ( pPlayer && pPlayer->IsJoined () && pPlayer == Packet.GetWeaponOwner ( ) )
+    {
+        // Relay to other players
+        m_pPlayerManager->BroadcastOnlyJoined ( Packet, pPlayer );
+    }
+}
 
 // Relay this (bullet sync) packet to other players using distance rules
 void CGame::RelayBulletsync ( CPacket& Packet )

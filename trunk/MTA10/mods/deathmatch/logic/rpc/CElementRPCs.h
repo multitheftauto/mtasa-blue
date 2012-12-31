@@ -38,6 +38,17 @@ public:
     DECLARE_ELEMENT_RPC ( SetElementCollisionsEnabled );
     DECLARE_ELEMENT_RPC ( SetElementFrozen );
     DECLARE_ELEMENT_RPC ( SetLowLodElement );
+    DECLARE_ELEMENT_RPC ( FireCustomWeapon );
+    DECLARE_ELEMENT_RPC ( SetCustomWeaponState );
+    DECLARE_ELEMENT_RPC ( SetCustomWeaponClipAmmo );
+    DECLARE_ELEMENT_RPC ( SetCustomWeaponAmmo );
+    DECLARE_ELEMENT_RPC ( SetCustomWeaponTarget );
+    DECLARE_ELEMENT_RPC ( ResetCustomWeaponTarget );
+    DECLARE_ELEMENT_RPC ( SetCustomWeaponFlags );
+    DECLARE_ELEMENT_RPC ( SetCustomWeaponFiringRate );
+    DECLARE_ELEMENT_RPC ( ResetCustomWeaponFiringRate );
+    DECLARE_ELEMENT_RPC ( SetWeaponOwner );
+    DECLARE_ELEMENT_RPC ( SetWeaponConfig );
 };
 
 #endif

@@ -107,6 +107,7 @@ public:
         COLSHAPE,
         SCRIPTFILE,
         WATER,
+        WEAPON,
         UNKNOWN,
     };
 

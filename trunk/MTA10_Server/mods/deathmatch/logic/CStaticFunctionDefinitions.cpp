@@ -44,6 +44,7 @@ static CAccountManager*                             m_pAccountManager;
 static CBanManager*                                 m_pBanManager;
 static CPedManager*                                 m_pPedManager;
 static CWaterManager*                               m_pWaterManager;
+static CCustomWeaponManager *                       m_pCustomWeaponManager;
 
 // Used to run a function on all the children of the elements too
 #define RUN_CHILDREN \
@@ -72,6 +73,7 @@ CStaticFunctionDefinitions::CStaticFunctionDefinitions ( CGame * pGame )
     m_pBanManager = pGame->GetBanManager ();
     m_pPedManager = pGame->GetPedManager ();
     m_pWaterManager = pGame->GetWaterManager ();
+    m_pCustomWeaponManager = pGame->GetCustomWeaponManager ();
 }
 
 
@@ -9226,6 +9228,354 @@ bool CStaticFunctionDefinitions::GetWeaponIDFromName ( const char* szName, unsig
     return ucID != 0xFF;
 }
 
+CCustomWeapon* CStaticFunctionDefinitions::CreateWeapon ( CResource* pResource, eWeaponType weaponType, CVector vecPosition )
+{
+    CCustomWeapon * pWeapon = new CCustomWeapon ( pResource->GetDynamicElementRoot(), NULL, m_pObjectManager, m_pCustomWeaponManager, weaponType );
+    pWeapon->SetPosition ( vecPosition );
+    
+    if ( pResource->HasStarted() )
+    {
+        CEntityAddPacket Packet;
+        Packet.Add ( pWeapon );
+        m_pPlayerManager->BroadcastOnlyJoined ( Packet );
+    }
+    return pWeapon;
+}
+
+bool CStaticFunctionDefinitions::FireWeapon ( CCustomWeapon * pWeapon )
+{
+    if ( pWeapon )
+    {
+        CBitStream BitStream;
+
+        m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pWeapon, FIRE_CUSTOM_WEAPON, *BitStream.pBitStream ) );
+        return true;
+    }
+    return false;
+}
+
+
+bool CStaticFunctionDefinitions::GetWeaponProperty ( CCustomWeapon * pWeapon, eWeaponProperty eProperty, short &sData )
+{
+    if ( pWeapon )
+    {
+        if ( eProperty == WEAPON_DAMAGE )
+        {
+            sData = pWeapon->GetWeaponStat ( )->GetDamagePerHit ( );
+            return true;
+        }
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::GetWeaponProperty ( CCustomWeapon * pWeapon, eWeaponProperty eProperty, float &fData )
+{
+    if ( pWeapon )
+    {
+        if ( eProperty == WEAPON_ACCURACY )
+        {
+            fData = pWeapon->GetWeaponStat ( )->GetAccuracy ( );
+            return true;
+        }
+        if ( eProperty == WEAPON_TARGET_RANGE )
+        {
+            fData = pWeapon->GetWeaponStat ( )->GetTargetRange ( );
+            return true;
+        }
+        if ( eProperty == WEAPON_WEAPON_RANGE )
+        {
+            fData = pWeapon->GetWeaponStat ( )->GetWeaponRange ( );
+            return true;
+        }
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::SetWeaponProperty ( CCustomWeapon * pWeapon, eWeaponProperty eProperty, short sData )
+{
+    if ( pWeapon )
+    {
+        if ( eProperty == WEAPON_DAMAGE )
+        {
+            pWeapon->GetWeaponStat ( )->SetDamagePerHit ( sData );
+            return true;
+        }
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::SetWeaponProperty ( CCustomWeapon * pWeapon, eWeaponProperty eProperty, float fData )
+{
+    if ( pWeapon )
+    {
+        if ( eProperty == WEAPON_ACCURACY )
+        {
+            pWeapon->GetWeaponStat ( )->SetAccuracy ( fData );
+            return true;
+        }
+        if ( eProperty == WEAPON_TARGET_RANGE )
+        {
+            pWeapon->GetWeaponStat ( )->SetTargetRange ( fData );
+            return true;
+        }
+        if ( eProperty == WEAPON_WEAPON_RANGE )
+        {
+            pWeapon->GetWeaponStat ( )->SetWeaponRange ( fData );
+            return true;
+        }
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::SetWeaponState ( CCustomWeapon * pWeapon, eWeaponState weaponState )
+{
+    if ( pWeapon )
+    {
+        pWeapon->SetWeaponState ( weaponState );
+
+        CBitStream BitStream;
+        BitStream.pBitStream->Write ( (char) weaponState );
+
+        m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pWeapon, SET_CUSTOM_WEAPON_STATE, *BitStream.pBitStream ) );
+        return true;
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::SetWeaponTarget ( CCustomWeapon * pWeapon, CElement * pTarget, int targetBone )
+{
+    if ( pWeapon )
+    {
+        pWeapon->SetWeaponTarget ( pTarget, targetBone );
+        CBitStream BitStream;
+
+        BitStream.pBitStream->WriteBit ( false );
+        BitStream.pBitStream->Write ( pTarget->GetID ( ) );
+        BitStream.pBitStream->Write ( (char) targetBone );
+
+        m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pWeapon, SET_CUSTOM_WEAPON_TARGET, *BitStream.pBitStream ) );
+        return true;
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::SetWeaponTarget ( CCustomWeapon * pWeapon, CVector vecTarget )
+{
+    if ( pWeapon )
+    {
+        pWeapon->SetWeaponTarget ( vecTarget );
+        CBitStream BitStream;
+
+        BitStream.pBitStream->WriteBit ( true );
+        BitStream.pBitStream->WriteVector ( vecTarget.fX, vecTarget.fY, vecTarget.fZ );
+
+        m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pWeapon, SET_CUSTOM_WEAPON_TARGET, *BitStream.pBitStream ) );
+        return true;
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::ClearWeaponTarget ( CCustomWeapon * pWeapon )
+{
+    if ( pWeapon )
+    {
+        pWeapon->ResetWeaponTarget ( );
+        CBitStream BitStream;
+
+        m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pWeapon, RESET_CUSTOM_WEAPON_TARGET, *BitStream.pBitStream ) );
+        return true;
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::SetWeaponFlags ( CCustomWeapon * pWeapon, eWeaponFlags flags, bool bData )
+{
+    if ( pWeapon )
+    {
+        if ( pWeapon->SetFlags ( flags, bData ) )
+        {
+            CBitStream BitStream;
+            SWeaponConfiguration weaponConfig = pWeapon->GetFlags ( );
+
+            BitStream.pBitStream->WriteBit ( weaponConfig.bDisableWeaponModel );
+            BitStream.pBitStream->WriteBit ( weaponConfig.bInstantReload );
+            BitStream.pBitStream->WriteBit ( weaponConfig.bShootIfTargetBlocked );
+            BitStream.pBitStream->WriteBit ( weaponConfig.bShootIfTargetOutOfRange );
+            BitStream.pBitStream->WriteBit ( weaponConfig.flags.bCheckBuildings );
+            BitStream.pBitStream->WriteBit ( weaponConfig.flags.bCheckCarTires );
+            BitStream.pBitStream->WriteBit ( weaponConfig.flags.bCheckDummies );
+            BitStream.pBitStream->WriteBit ( weaponConfig.flags.bCheckObjects );
+            BitStream.pBitStream->WriteBit ( weaponConfig.flags.bCheckPeds );
+            BitStream.pBitStream->WriteBit ( weaponConfig.flags.bCheckVehicles );
+            BitStream.pBitStream->WriteBit ( weaponConfig.flags.bIgnoreSomeObjectsForCamera );
+            BitStream.pBitStream->WriteBit ( weaponConfig.flags.bSeeThroughStuff );
+            BitStream.pBitStream->WriteBit ( weaponConfig.flags.bShootThroughStuff );
+
+            m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pWeapon, SET_CUSTOM_WEAPON_FLAGS, *BitStream.pBitStream ) );
+            return true;
+        }
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::SetWeaponFlags ( CCustomWeapon * pWeapon, const SLineOfSightFlags& flags )
+{
+    if ( pWeapon )
+    {
+        if ( pWeapon->SetFlags ( flags ) )
+        {
+            CBitStream BitStream;
+            SWeaponConfiguration weaponConfig = pWeapon->GetFlags ( );
+
+            BitStream.pBitStream->WriteBit ( weaponConfig.bDisableWeaponModel );
+            BitStream.pBitStream->WriteBit ( weaponConfig.bInstantReload );
+            BitStream.pBitStream->WriteBit ( weaponConfig.bShootIfTargetBlocked );
+            BitStream.pBitStream->WriteBit ( weaponConfig.bShootIfTargetOutOfRange );
+            BitStream.pBitStream->WriteBit ( weaponConfig.flags.bCheckBuildings );
+            BitStream.pBitStream->WriteBit ( weaponConfig.flags.bCheckCarTires );
+            BitStream.pBitStream->WriteBit ( weaponConfig.flags.bCheckDummies );
+            BitStream.pBitStream->WriteBit ( weaponConfig.flags.bCheckObjects );
+            BitStream.pBitStream->WriteBit ( weaponConfig.flags.bCheckPeds );
+            BitStream.pBitStream->WriteBit ( weaponConfig.flags.bCheckVehicles );
+            BitStream.pBitStream->WriteBit ( weaponConfig.flags.bIgnoreSomeObjectsForCamera );
+            BitStream.pBitStream->WriteBit ( weaponConfig.flags.bSeeThroughStuff );
+            BitStream.pBitStream->WriteBit ( weaponConfig.flags.bShootThroughStuff );
+
+            m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pWeapon, SET_CUSTOM_WEAPON_FIRING_RATE, *BitStream.pBitStream ) );
+            return true;
+        }
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::GetWeaponFlags ( CCustomWeapon * pWeapon, eWeaponFlags flags, bool &bData )
+{
+    if ( pWeapon )
+    {
+        return pWeapon->GetFlags ( flags, bData );
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::GetWeaponFlags ( CCustomWeapon * pWeapon, SLineOfSightFlags& flags )
+{
+    if ( pWeapon )
+    {
+        return pWeapon->GetFlags ( flags );
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::SetWeaponFiringRate ( CCustomWeapon * pWeapon, int iFiringRate )
+{
+    if ( pWeapon )
+    {
+        pWeapon->SetWeaponFireTime( iFiringRate );
+        CBitStream BitStream;
+        BitStream.pBitStream->Write ( iFiringRate );
+
+        m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pWeapon, SET_CUSTOM_WEAPON_FIRING_RATE, *BitStream.pBitStream ) );
+        return true;
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::ResetWeaponFiringRate ( CCustomWeapon * pWeapon )
+{
+    if ( pWeapon )
+    {
+        pWeapon->ResetWeaponFireTime( );
+        CBitStream BitStream;
+
+        m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pWeapon, RESET_CUSTOM_WEAPON_FIRING_RATE, *BitStream.pBitStream ) );
+        return true;
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::GetWeaponFiringRate ( CCustomWeapon * pWeapon, int &iFiringRate )
+{
+    if ( pWeapon )
+    {
+        iFiringRate = pWeapon->GetWeaponFireTime( );
+        return true;
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::GetWeaponAmmo ( CCustomWeapon * pWeapon, int &iAmmo )
+{
+    if ( pWeapon )
+    {
+        iAmmo = pWeapon->GetAmmo( );
+        return true;
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::GetWeaponClipAmmo ( CCustomWeapon * pWeapon, int &iAmmo )
+{
+    if ( pWeapon )
+    {
+        iAmmo = pWeapon->GetClipAmmo( );
+        CBitStream BitStream;
+        BitStream.pBitStream->Write ( iAmmo );
+
+        m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pWeapon, SET_CUSTOM_WEAPON_CLIP_AMMO, *BitStream.pBitStream ) );
+        return true;
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::SetWeaponAmmo ( CCustomWeapon * pWeapon, int iAmmo )
+{
+    if ( pWeapon )
+    {
+        pWeapon->SetAmmo( iAmmo );
+        CBitStream BitStream;
+        BitStream.pBitStream->Write ( iAmmo );
+
+        m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pWeapon, SET_CUSTOM_WEAPON_AMMO, *BitStream.pBitStream ) );
+        return true;
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::SetWeaponClipAmmo ( CCustomWeapon * pWeapon, int iAmmo )
+{
+    if ( pWeapon )
+    {
+        pWeapon->SetClipAmmo( iAmmo );
+        return true;
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::SetWeaponOwner ( CCustomWeapon * pWeapon, CPlayer * pPlayer )
+{
+    if ( pWeapon )
+    {
+        
+        pWeapon->SetOwner ( pPlayer );
+        if ( pPlayer )
+        {
+            CBitStream BitStream;
+
+            BitStream.pBitStream->Write ( pPlayer->GetID ( ) );
+            m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pWeapon, SET_WEAPON_OWNER, *BitStream.pBitStream ) );
+            return true;
+        }
+        else
+        {
+            CBitStream BitStream;
+
+            BitStream.pBitStream->Write ( INVALID_ELEMENT_ID );
+            m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pWeapon, SET_WEAPON_OWNER, *BitStream.pBitStream ) );
+            return true;
+        }
+    }
+    return false;
+}
 
 bool CStaticFunctionDefinitions::GetBodyPartName ( unsigned char ucID, char* szName )
 {

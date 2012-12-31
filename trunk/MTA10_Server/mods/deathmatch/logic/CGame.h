@@ -47,6 +47,7 @@ class CGame;
 #include "packets/CVehicleResyncPacket.h"
 #include "packets/CKeysyncPacket.h"
 #include "packets/CBulletsyncPacket.h"
+#include "packets/CCustomWeaponBulletSyncPacket.h"
 #include "packets/CSyncSettingsPacket.h"
 #include "packets/CVehicleInOutPacket.h"
 #include "packets/CVehicleDamageSyncPacket.h"
@@ -115,6 +116,7 @@ class CWaterManager;
 class CWeaponStatManager;
 class CBuildingRemovalManager;
 
+class CCustomWeaponManager;
 
 // Packet forward declarations
 class CCommandPacket;
@@ -236,6 +238,7 @@ public:
     inline CLightsyncManager*       GetLightSyncManager         ( void )        { return &m_lightsyncManager; }
     inline CWeaponStatManager*      GetWeaponStatManager        ( void )        { return m_pWeaponStatsManager; }
     inline CBuildingRemovalManager* GetBuildingRemovalManager   ( void )        { return m_pBuildingRemovalManager; }
+    inline CCustomWeaponManager*    GetCustomWeaponManager      ( void )        { return m_pCustomWeaponManager; }
 
     void                        JoinPlayer                  ( CPlayer& Player );
     void                        InitialDataStream           ( CPlayer& Player );
@@ -388,6 +391,7 @@ private:
     void                        Packet_VehiclePuresync      ( class CVehiclePuresyncPacket& Packet );
     void                        Packet_Keysync              ( class CKeysyncPacket& Packet );
     void                        Packet_Bulletsync           ( class CBulletsyncPacket& Packet );
+    void                        Packet_WeaponBulletsync     ( class CCustomWeaponBulletSyncPacket& Packet );
     void                        Packet_Vehicle_InOut        ( class CVehicleInOutPacket& Packet );
     void                        Packet_VehicleTrailer       ( class CVehicleTrailerPacket& Packet );
     void                        Packet_LuaEvent             ( class CLuaEventPacket& Packet );
@@ -455,6 +459,8 @@ private:
 
     CWeaponStatManager*             m_pWeaponStatsManager;
     CBuildingRemovalManager*        m_pBuildingRemovalManager;
+
+    CCustomWeaponManager*           m_pCustomWeaponManager;
 
     char*                       m_szCurrentFileName;
 

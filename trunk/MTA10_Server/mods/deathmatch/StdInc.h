@@ -267,6 +267,8 @@ struct SAclRequest;
 #include "TaskNames.h"
 #include "Utils.h"
 #include "logic/CWeaponStat.h"
+#include "logic/CCustomWeapon.h"
+#include "logic/CCustomWeaponManager.h"
 #include "logic/CWeaponStatManager.h"
 #include "logic/CBuildingRemoval.h"
 #include "logic/CBuildingRemovalManager.h"
