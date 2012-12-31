@@ -440,9 +440,33 @@ public:
     static CColTube*            CreateColTube                       ( CResource* pResource, const CVector& vecPosition, float fRadius, float fHeight );
     static void                 RefreshColShapeColliders            ( CColShape *pColShape );
 
-    // Weapon funcs
+    // Weapon funcs 
+    static CCustomWeapon*       CreateWeapon                        ( CResource* pResource, eWeaponType weaponType, CVector vecPosition );
     static bool                 GetWeaponNameFromID                 ( unsigned char ucID, char* szName );
     static bool                 GetWeaponIDFromName                 ( const char* szName, unsigned char& ucID );
+    static bool                 FireWeapon                          ( CCustomWeapon * pWeapon );
+    static bool                 SetWeaponProperty                   ( CCustomWeapon * pWeapon, eWeaponProperty eProperty, short sData );
+    static bool                 GetWeaponProperty                   ( CCustomWeapon * pWeapon, eWeaponProperty eProperty, short &sData );
+    static bool                 GetWeaponProperty                   ( CCustomWeapon * pWeapon, eWeaponProperty eProperty, float &fData );
+    static bool                 SetWeaponProperty                   ( CCustomWeapon * pWeapon, eWeaponProperty eProperty, float fData );
+    static bool                 SetWeaponState                      ( CCustomWeapon * pWeapon, eWeaponState weaponState );
+    static bool                 SetWeaponTarget                     ( CCustomWeapon * pWeapon, CElement * pTarget, int boneTarget );
+    static bool                 SetWeaponTarget                     ( CCustomWeapon * pWeapon, CVector vecTarget );
+    static bool                 ClearWeaponTarget                   ( CCustomWeapon * pWeapon );
+    static bool                 SetWeaponOwner                      ( CCustomWeapon * pWeapon, CPlayer * pPlayer );
+
+    static bool                 SetWeaponFlags                      ( CCustomWeapon * pWeapon, eWeaponFlags flag, bool bData );
+    static bool                 SetWeaponFlags                      ( CCustomWeapon * pWeapon, const SLineOfSightFlags &flags );
+    static bool                 GetWeaponFlags                      ( CCustomWeapon * pWeapon, SLineOfSightFlags& flags );
+    static bool                 GetWeaponFlags                      ( CCustomWeapon * pWeapon, eWeaponFlags flag, bool &bData );
+
+    static bool                 SetWeaponFiringRate                 ( CCustomWeapon * pWeapon, int iFiringRate );
+    static bool                 ResetWeaponFiringRate               ( CCustomWeapon * pWeapon );
+    static bool                 GetWeaponFiringRate                 ( CCustomWeapon * pWeapon, int &iFiringRate );
+    static bool                 GetWeaponClipAmmo                   ( CCustomWeapon * pWeapon, int &iClipAmmo );
+    static bool                 GetWeaponAmmo                       ( CCustomWeapon * pWeapon, int &iAmmo );
+    static bool                 SetWeaponAmmo                       ( CCustomWeapon * pWeapon, int iAmmo );
+    static bool                 SetWeaponClipAmmo                   ( CCustomWeapon * pWeapon, int iAmmo );
 
     // Explosion funcs
     static bool                 CreateExplosion                     ( const CVector& vecPosition, unsigned char ucType, CElement* pElement );

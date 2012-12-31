@@ -525,6 +525,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\logic\CCustomWeapon.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\logic\CCustomWeaponManager.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\logic\CDatabaseConnectionSqlite.cpp"
 					>
 				</File>
@@ -957,6 +965,10 @@
 					</File>
 					<File
 						RelativePath=".\logic\packets\CCustomDataPacket.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\logic\packets\CCustomWeaponBulletSyncPacket.cpp"
 						>
 					</File>
 					<File
@@ -1806,6 +1818,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\logic\CCustomWeapon.h"
+					>
+				</File>
+				<File
+					RelativePath=".\logic\CCustomWeaponManager.h"
+					>
+				</File>
+				<File
 					RelativePath=".\logic\CDatabaseJobQueue.h"
 					>
 				</File>
@@ -2198,6 +2218,10 @@
 					</File>
 					<File
 						RelativePath=".\logic\packets\CCustomDataPacket.h"
+						>
+					</File>
+					<File
+						RelativePath=".\logic\packets\CCustomWeaponBulletSyncPacket.h"
 						>
 					</File>
 					<File

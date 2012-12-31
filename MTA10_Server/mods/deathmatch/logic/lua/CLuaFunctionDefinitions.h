@@ -409,8 +409,24 @@ public:
     static int      ResetWaterColor                     ( lua_State* luaVM );
 
     // Weapon funcs
+    static int      CreateWeapon                        ( lua_State* luaVM );
     static int      GetWeaponNameFromID                 ( lua_State* luaVM );
     static int      GetWeaponIDFromName                 ( lua_State* luaVM );
+    static int      FireWeapon                          ( lua_State* luaVM );
+    static int      SetWeaponState                      ( lua_State* luaVM );
+    static int      GetWeaponState                      ( lua_State* luaVM );
+    static int      SetWeaponTarget                     ( lua_State* luaVM );
+    static int      GetWeaponTarget                     ( lua_State* luaVM );
+    static int      SetWeaponOwner                      ( lua_State* luaVM );
+    static int      GetWeaponOwner                      ( lua_State* luaVM );
+    static int      SetWeaponFlags                      ( lua_State* luaVM );
+    static int      GetWeaponFlags                      ( lua_State* luaVM );
+    static int      SetWeaponFiringRate                 ( lua_State* luaVM );
+    static int      GetWeaponFiringRate                 ( lua_State* luaVM );
+    static int      ResetWeaponFiringRate               ( lua_State* luaVM );
+    static int      GetWeaponAmmo                       ( lua_State* luaVM );
+    static int      GetWeaponClipAmmo                   ( lua_State* luaVM );
+    static int      SetWeaponClipAmmo                   ( lua_State* luaVM );
 
     // Console functions
     static int      AddCommandHandler                   ( lua_State* luaVM );

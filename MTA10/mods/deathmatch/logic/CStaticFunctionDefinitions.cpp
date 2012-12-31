@@ -6537,7 +6537,7 @@ bool CStaticFunctionDefinitions::GetWeaponAmmo ( CClientWeapon * pWeapon, int &i
 {
     if ( pWeapon )
     {
-        pWeapon->GetAmmo( iAmmo );
+        iAmmo = pWeapon->GetAmmo( );
         return true;
     }
     return false;
@@ -6547,7 +6547,7 @@ bool CStaticFunctionDefinitions::GetWeaponClipAmmo ( CClientWeapon * pWeapon, in
 {
     if ( pWeapon )
     {
-        pWeapon->GetClipAmmo( iAmmo );
+        iAmmo = pWeapon->GetClipAmmo( );
         return true;
     }
     return false;

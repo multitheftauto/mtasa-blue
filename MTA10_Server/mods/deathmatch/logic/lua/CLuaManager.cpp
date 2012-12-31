@@ -567,6 +567,24 @@ void CLuaManager::LoadCFunctions ( void )
     // Weapon funcs
     CLuaCFunctions::AddFunction ( "getWeaponNameFromID", CLuaFunctionDefinitions::GetWeaponNameFromID );
     CLuaCFunctions::AddFunction ( "getWeaponIDFromName", CLuaFunctionDefinitions::GetWeaponIDFromName );
+    CLuaCFunctions::AddFunction ( "createWeapon", CLuaFunctionDefinitions::CreateWeapon );
+    CLuaCFunctions::AddFunction ( "setWeaponProperty", CLuaFunctionDefinitions::SetWeaponProperty );
+    CLuaCFunctions::AddFunction ( "fireWeapon", CLuaFunctionDefinitions::FireWeapon );
+    CLuaCFunctions::AddFunction ( "setWeaponState", CLuaFunctionDefinitions::SetWeaponState );
+    CLuaCFunctions::AddFunction ( "getWeaponState", CLuaFunctionDefinitions::GetWeaponState );
+    CLuaCFunctions::AddFunction ( "setWeaponTarget", CLuaFunctionDefinitions::SetWeaponTarget );
+    CLuaCFunctions::AddFunction ( "getWeaponTarget", CLuaFunctionDefinitions::GetWeaponTarget );
+    CLuaCFunctions::AddFunction ( "setWeaponOwner", CLuaFunctionDefinitions::SetWeaponOwner );
+    CLuaCFunctions::AddFunction ( "getWeaponOwner", CLuaFunctionDefinitions::GetWeaponOwner );
+    CLuaCFunctions::AddFunction ( "setWeaponFlags", CLuaFunctionDefinitions::SetWeaponFlags );
+    CLuaCFunctions::AddFunction ( "getWeaponFlags", CLuaFunctionDefinitions::GetWeaponFlags );
+    CLuaCFunctions::AddFunction ( "setWeaponFiringRate", CLuaFunctionDefinitions::SetWeaponFiringRate );
+    CLuaCFunctions::AddFunction ( "getWeaponFiringRate", CLuaFunctionDefinitions::GetWeaponFiringRate );
+    CLuaCFunctions::AddFunction ( "resetWeaponFiringRate", CLuaFunctionDefinitions::ResetWeaponFiringRate );
+    CLuaCFunctions::AddFunction ( "getWeaponAmmo", CLuaFunctionDefinitions::GetWeaponAmmo );
+    CLuaCFunctions::AddFunction ( "getWeaponClipAmmo", CLuaFunctionDefinitions::GetWeaponClipAmmo );
+    CLuaCFunctions::AddFunction ( "setWeaponAmmo", CLuaFunctionDefinitions::SetWeaponAmmo );
+    CLuaCFunctions::AddFunction ( "setWeaponClipAmmo", CLuaFunctionDefinitions::SetWeaponClipAmmo );
 
     // Console funcs
     CLuaCFunctions::AddFunction ( "addCommandHandler", CLuaFunctionDefinitions::AddCommandHandler );

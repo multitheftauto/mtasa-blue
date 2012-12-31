@@ -45,6 +45,7 @@
 #define IS_CONSOLE(element)  ((element)->GetType()==CElement::CONSOLE)
 #define IS_TEAM(element)     ((element)->GetType()==CElement::TEAM)
 #define IS_WATER(element)    ((element)->GetType()==CElement::WATER)
+#define IS_WEAPON(element)    ((element)->GetType()==CElement::WEAPON)
 
 typedef CFastList < CElement* > CChildListType;
 typedef CFastList < CElement* > CElementListType;
@@ -77,9 +78,9 @@ public:
         COLSHAPE,
         SCRIPTFILE,
         WATER,
+        WEAPON,
         DATABASE_CONNECTION,
         ROOT,
-        WEAPON,
         UNKNOWN,
     };
 

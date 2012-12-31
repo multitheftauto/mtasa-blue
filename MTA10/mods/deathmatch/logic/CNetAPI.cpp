@@ -157,6 +157,24 @@ bool CNetAPI::ProcessPacket ( unsigned char bytePacketID, NetBitStreamInterface&
 
             return true;
         }
+
+        case PACKET_ID_WEAPON_BULLETSYNC:
+        {
+            // Read out the player ID
+            ElementID PlayerID;
+            if ( BitStream.Read ( PlayerID ) )
+            {
+                // Grab the player
+                CClientPlayer* pPlayer = m_pPlayerManager->Get ( PlayerID );
+                if ( pPlayer )
+                {
+                    // Read out the bulletsync data
+                    ReadWeaponBulletsync ( pPlayer, BitStream );
+                }
+            }
+
+            return true;
+        }
         
         case PACKET_ID_RETURN_SYNC:
         {
@@ -2209,6 +2227,33 @@ void CNetAPI::ReadBulletsync ( CClientPlayer* pPlayer, NetBitStreamInterface& Bi
 
 
 //
+// Read bulletsync packet for a remote player
+//
+void CNetAPI::ReadWeaponBulletsync ( CClientPlayer* pPlayer, NetBitStreamInterface& BitStream )
+{
+    // Ignore old bullet sync stuff
+
+    if ( BitStream.Version () < 0x03C )
+        return;
+
+    // Read the bulletsync data
+    ElementID elementID;
+    BitStream.Read ( elementID );
+    CClientWeapon * pWeapon = static_cast < CClientWeapon * > ( CElementIDs::GetElement ( elementID ) );
+
+    CVector vecStart, vecEnd;
+    BitStream.Read ( (char*)&vecStart, sizeof ( CVector ) );
+    BitStream.Read ( (char*)&vecEnd, sizeof ( CVector ) );
+
+    uchar ucOrderCounter = 0;
+    BitStream.Read ( ucOrderCounter );
+
+    pWeapon->FireInstantHit ( vecStart, vecEnd, false, true );
+
+}
+
+
+//
 // Send bulletsync fire button press packet to remote players
 //
 void CNetAPI::SendBulletSyncFire ( eWeaponType weaponType, const CVector& vecStart, const CVector& vecEnd )
@@ -2236,6 +2281,31 @@ void CNetAPI::SendBulletSyncFire ( eWeaponType weaponType, const CVector& vecSta
     g_pNet->DeallocateNetBitStream ( pBitStream );
 }
 
+
+//
+// Send bulletsync fire button press packet to remote players
+//
+void CNetAPI::SendBulletSyncCustomWeaponFire ( CClientWeapon * pWeapon, const CVector& vecStart, const CVector& vecEnd )
+{
+    // Ignore old bullet sync stuff
+    if ( g_pNet->GetServerBitStreamVersion () < 0x03C || pWeapon->IsLocalEntity ( ) )
+        return;
+
+    // Send a bulletsync packet
+    NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream ();
+
+    // Write the bulletsync data
+    pBitStream->Write ( pWeapon->GetID ( ) );
+
+    pBitStream->Write ( (const char*)&vecStart, sizeof ( CVector ) );
+    pBitStream->Write ( (const char*)&vecEnd, sizeof ( CVector ) );
+
+    pBitStream->Write ( m_ucCustomWeaponBulletSyncOrderCounter++ );
+
+    // Send the packet
+    g_pNet->SendPacket ( PACKET_ID_WEAPON_BULLETSYNC, pBitStream, PACKET_PRIORITY_MEDIUM, PACKET_RELIABILITY_RELIABLE );
+    g_pNet->DeallocateNetBitStream ( pBitStream );
+}
 
 //
 // Used to detect changes for keysync

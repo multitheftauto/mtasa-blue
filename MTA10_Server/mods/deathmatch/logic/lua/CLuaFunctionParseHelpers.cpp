@@ -196,6 +196,21 @@ IMPLEMENT_ENUM_BEGIN( eWeaponSkill )
     ADD_ENUM ( WEAPONSKILL_PRO,                             "pro" )
 IMPLEMENT_ENUM_END( "weapon-skill" )
 
+IMPLEMENT_ENUM_BEGIN( eWeaponState )
+    ADD_ENUM ( WEAPONSTATE_READY,                           "ready" )
+    ADD_ENUM ( WEAPONSTATE_FIRING,                          "firing" )
+    ADD_ENUM ( WEAPONSTATE_RELOADING,                       "reloading" )
+IMPLEMENT_ENUM_END( "weapon-state" )
+
+
+IMPLEMENT_ENUM_BEGIN ( eWeaponFlags )
+    ADD_ENUM ( WEAPONFLAGS_DISABLE_MODEL,          "disable_model")
+    ADD_ENUM ( WEAPONFLAGS_FLAGS,                  "flags" )
+    ADD_ENUM ( WEAPONFLAGS_INSTANT_RELOAD,         "instant_reload")
+    ADD_ENUM ( WEAPONFLAGS_SHOOT_IF_OUT_OF_RANGE,  "shoot_if_out_of_range")
+    ADD_ENUM ( WEAPONFLAGS_SHOOT_IF_TARGET_BOCKED, "shoot_if_blocked")
+IMPLEMENT_ENUM_END( "weapon-flags" )
+
 IMPLEMENT_ENUM_BEGIN( CAccessControlListRight::ERightType )
     ADD_ENUM ( CAccessControlListRight::RIGHT_TYPE_COMMAND,      "command" )
     ADD_ENUM ( CAccessControlListRight::RIGHT_TYPE_FUNCTION,     "function" )

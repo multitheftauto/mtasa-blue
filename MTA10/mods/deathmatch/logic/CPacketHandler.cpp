@@ -2653,6 +2653,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                     break;
                 }
                 case CClientGame::OBJECT:
+                case CClientGame::WEAPON:
                 {
                     unsigned short usObjectID;
                     SEntityAlphaSync alpha;
@@ -2674,13 +2675,20 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                         bool bIsLowLod;
                         bitStream.ReadBit ( bIsLowLod );
                         bitStream.Read ( LowLodObjectID );
-
-                        // Create the object and put it at its position
+                        CClientObject * pObject = NULL;
+                        if ( ucEntityTypeID == CClientGame::OBJECT )
+                        {
+                            // Create the object and put it at its position
 #ifdef WITH_OBJECT_SYNC
-                        CDeathmatchObject* pObject = new CDeathmatchObject ( g_pClientGame->m_pManager, g_pClientGame->m_pMovingObjectsManager, g_pClientGame->m_pObjectSync, EntityID, usObjectID );
+                            CDeathmatchObject* pObject = new CDeathmatchObject ( g_pClientGame->m_pManager, g_pClientGame->m_pMovingObjectsManager, g_pClientGame->m_pObjectSync, EntityID, usObjectID );
 #else
-                        CDeathmatchObject* pObject = new CDeathmatchObject ( g_pClientGame->m_pManager, g_pClientGame->m_pMovingObjectsManager, EntityID, usObjectID, bIsLowLod );
+                            CDeathmatchObject* pObject = new CDeathmatchObject ( g_pClientGame->m_pManager, g_pClientGame->m_pMovingObjectsManager, EntityID, usObjectID, bIsLowLod );
 #endif
+                        }
+                        else if ( ucEntityTypeID == CClientGame::WEAPON )
+                        {
+                            pObject = new CClientWeapon ( g_pClientGame->m_pManager, EntityID, eWeaponType::WEAPONTYPE_AK47 );
+                        }
                         pEntity = pObject;
                         if ( pObject )
                         {
@@ -2702,7 +2710,11 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                             CPositionRotationAnimation* pAnimation = CPositionRotationAnimation::FromBitStream ( bitStream );
                             if ( pAnimation != NULL )
                             {
-                                pObject->StartMovement ( *pAnimation );
+                                CDeathmatchObject * pDeathmatchObject = ((CDeathmatchObject *) pObject);
+                                if ( pDeathmatchObject ) 
+                                {
+                                    pDeathmatchObject->StartMovement ( *pAnimation );
+                                }
                                 delete pAnimation;
                             }
                         }
@@ -2720,6 +2732,100 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                             pObject->SetHealth ( health.data.fValue );
 
                         pObject->SetCollisionEnabled ( bCollisonsEnabled );
+                        if ( ucEntityTypeID == CClientGame::WEAPON )
+                        {
+                            CClientWeapon* pWeapon = (CClientWeapon *) pObject;
+                            unsigned char ucTargetType = eTargetType::TARGET_TYPE_FIXED;
+                            bitStream.ReadBits ( &ucTargetType, 3 ); // 3 bits = 4 possible values.
+                            switch ( ucTargetType )
+                            {
+                                case TARGET_TYPE_FIXED:
+                                {
+                                    break;
+                                }
+                                case TARGET_TYPE_ENTITY:
+                                {
+                                    CClientEntity * pTarget = NULL;
+                                    ElementID targetID = 0;
+                                    unsigned char ucSubTarget = 0;
+
+                                    bitStream.Read ( targetID );
+                                    pTarget = CElementIDs::GetElement ( targetID );
+                                    if ( pTarget )
+                                    {
+                                        if ( IS_PED ( pTarget ) )
+                                        {
+                                            bitStream.Read ( ucSubTarget ); // Send the entire unsigned char as there are a lot of bones.
+                                        }
+                                        else if ( IS_VEHICLE ( pTarget ) )
+                                        {
+                                            bitStream.ReadBits ( &ucSubTarget, 4 );
+                                        }
+                                        pWeapon->SetWeaponTarget ( pTarget, ucSubTarget ); // 4 bits = 8 possible values.
+                                    }
+                                    break;
+                                }
+                                case TARGET_TYPE_VECTOR:
+                                {
+                                    CVector vecTarget;
+                                    bitStream.ReadVector ( vecTarget.fX, vecTarget.fY, vecTarget.fZ );
+                                    pWeapon->SetWeaponTarget ( vecTarget );
+                                    break;
+                                }
+                            }
+                            bool bChanged = false;
+                            bitStream.ReadBit ( bChanged );
+                            if ( bChanged )
+                            {
+                                float fAccuracy, fTargetRange, fWeaponRange;
+                                unsigned short usDamagePerHit;
+                                bitStream.ReadBits ( &usDamagePerHit, 12 ); // 12 bits = 2048 values... plenty.
+                                bitStream.Read ( fAccuracy );
+                                bitStream.Read ( fTargetRange );
+                                bitStream.Read ( fWeaponRange );
+                                pWeapon->GetWeaponStat ( )->SetDamagePerHit ( usDamagePerHit );
+                                pWeapon->GetWeaponStat ( )->SetAccuracy ( fAccuracy );
+                                pWeapon->GetWeaponStat ( )->SetTargetRange ( fTargetRange );
+                                pWeapon->GetWeaponStat ( )->SetWeaponRange ( fWeaponRange );
+                            }
+                            SWeaponConfiguration weaponConfig;
+
+                            bitStream.ReadBit ( weaponConfig.bDisableWeaponModel );
+                            bitStream.ReadBit ( weaponConfig.bInstantReload );
+                            bitStream.ReadBit ( weaponConfig.bShootIfTargetBlocked );
+                            bitStream.ReadBit ( weaponConfig.bShootIfTargetOutOfRange );
+                            bitStream.ReadBit ( weaponConfig.flags.bCheckBuildings );
+                            bitStream.ReadBit ( weaponConfig.flags.bCheckCarTires );
+                            bitStream.ReadBit ( weaponConfig.flags.bCheckDummies );
+                            bitStream.ReadBit ( weaponConfig.flags.bCheckObjects );
+                            bitStream.ReadBit ( weaponConfig.flags.bCheckPeds );
+                            bitStream.ReadBit ( weaponConfig.flags.bCheckVehicles );
+                            bitStream.ReadBit ( weaponConfig.flags.bIgnoreSomeObjectsForCamera );
+                            bitStream.ReadBit ( weaponConfig.flags.bSeeThroughStuff );
+                            bitStream.ReadBit ( weaponConfig.flags.bShootThroughStuff );
+
+                            
+                            unsigned short usAmmo, usClipAmmo;
+                            unsigned char ucWeaponState;
+                            bitStream.ReadBits ( &ucWeaponState, 4 ); // 4 bits = 8 possible values for weapon state
+                            bitStream.Read ( usAmmo );
+                            bitStream.Read ( usClipAmmo );
+                            pWeapon->SetClipAmmo ( usClipAmmo );
+                            pWeapon->SetAmmo ( usAmmo );
+                            pWeapon->SetWeaponState ( (eWeaponState) ucWeaponState );
+
+                            ElementID PlayerID;
+                            bitStream.Read ( PlayerID );
+                            if ( PlayerID != INVALID_ELEMENT_ID )
+                            {
+                                CClientPlayer * pOwner = static_cast < CClientPlayer * > ( CElementIDs::GetElement ( PlayerID ) );
+                                pWeapon->SetOwner ( pOwner );
+                            }
+                            else
+                            {
+                                pWeapon->SetOwner ( NULL );
+                            }
+                        }
                     }
 
                     break;
