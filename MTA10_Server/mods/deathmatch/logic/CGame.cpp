@@ -1553,6 +1553,9 @@ void CGame::AddBuiltInEvents ( void )
     // Other events
     m_Events.AddEvent ( "onSettingChange", "setting, oldValue, newValue", NULL, false );
     m_Events.AddEvent ( "onChatMessage", "message, element", NULL, false );
+
+    // Weapon events
+    m_Events.AddEvent ( "onWeaponFire", "", NULL, false );
 }
 
 void CGame::ProcessTrafficLights ( unsigned long ulCurrentTime )
@@ -2335,10 +2338,18 @@ void CGame::Packet_WeaponBulletsync ( CCustomWeaponBulletSyncPacket& Packet )
 {
     // Grab the source player
     CPlayer* pPlayer = Packet.GetSourcePlayer ();
+    CCustomWeapon * pWeapon = Packet.GetWeapon ( );
     if ( pPlayer && pPlayer->IsJoined () && pPlayer == Packet.GetWeaponOwner ( ) )
     {
-        // Relay to other players
-        m_pPlayerManager->BroadcastOnlyJoined ( Packet, pPlayer );
+        // Tell our scripts the player has fired
+        CLuaArguments Arguments;
+        Arguments.PushElement ( pPlayer );
+
+        if ( pWeapon->CallEvent ( "onWeaponFire", Arguments ) )
+        {
+            // Relay to other players
+            m_pPlayerManager->BroadcastOnlyJoined ( Packet, pPlayer );
+        }
     }
 }
 

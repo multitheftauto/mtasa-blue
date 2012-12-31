@@ -23,6 +23,9 @@ public:
     bool                                    Write                       ( NetBitStreamInterface& BitStream ) const;
 
     CPlayer *                               GetWeaponOwner              ( void )                        { return m_pWeapon != NULL ? m_pWeapon->GetOwner ( ) : NULL; };
+    CCustomWeapon *                         GetWeapon                   ( void )                        { return m_pWeapon; };
+    CVector                                 GetStart                    ( void )                        { return m_vecStart; };
+    CVector                                 GetEnd                      ( void )                        { return m_vecEnd; };
 
     CCustomWeapon *         m_pWeapon;
     CVector                 m_vecStart;

@@ -9246,10 +9246,17 @@ bool CStaticFunctionDefinitions::FireWeapon ( CCustomWeapon * pWeapon )
 {
     if ( pWeapon )
     {
-        CBitStream BitStream;
+        // Tell our scripts the server has fired
+        CLuaArguments Arguments;
+        Arguments.PushElement ( NULL );
 
-        m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pWeapon, FIRE_CUSTOM_WEAPON, *BitStream.pBitStream ) );
-        return true;
+        if ( pWeapon->CallEvent ( "onWeaponFire", Arguments ) )
+        {
+            CBitStream BitStream;
+
+            m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pWeapon, FIRE_CUSTOM_WEAPON, *BitStream.pBitStream ) );
+            return true;
+        }
     }
     return false;
 }
