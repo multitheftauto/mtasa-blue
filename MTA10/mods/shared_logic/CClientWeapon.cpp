@@ -587,25 +587,25 @@ bool CClientWeapon::SetFlags ( eWeaponFlags flag, bool bData )
 {
     switch ( flag )
     {
-    case WEAPONFLAGS_SHOOT_IF_OUT_OF_RANGE:
-        m_weaponConfig.bShootIfTargetOutOfRange = bData;
+        case WEAPONFLAGS_SHOOT_IF_OUT_OF_RANGE:
+            m_weaponConfig.bShootIfTargetOutOfRange = bData;
         return true;
-    case WEAPONFLAGS_SHOOT_IF_TARGET_BOCKED:
-        m_weaponConfig.bShootIfTargetBlocked = bData;
+        case WEAPONFLAGS_SHOOT_IF_TARGET_BOCKED:
+            m_weaponConfig.bShootIfTargetBlocked = bData;
         return true;
-    case WEAPONFLAGS_DISABLE_MODEL:
-        m_weaponConfig.bDisableWeaponModel = bData;
-        if ( m_weaponConfig.bDisableWeaponModel )
-        {
-            SetVisible( false );
-        }
-        else
-        {
-            SetVisible( true );
-        }
+        case WEAPONFLAGS_DISABLE_MODEL:
+            m_weaponConfig.bDisableWeaponModel = bData;
+            if ( m_weaponConfig.bDisableWeaponModel )
+            {
+                SetVisible( false );
+            }
+            else
+            {
+                SetVisible( true );
+            }
         return true;
-    case WEAPONFLAGS_INSTANT_RELOAD:
-        m_weaponConfig.bInstantReload = bData;
+        case WEAPONFLAGS_INSTANT_RELOAD:
+            m_weaponConfig.bInstantReload = bData;
         return true;
     }
     return false;
@@ -622,17 +622,17 @@ bool CClientWeapon::GetFlags ( eWeaponFlags flag, bool &bData )
 
     switch ( flag )
     {
-    case WEAPONFLAGS_SHOOT_IF_OUT_OF_RANGE:
-        bData = m_weaponConfig.bShootIfTargetOutOfRange;
+        case WEAPONFLAGS_SHOOT_IF_OUT_OF_RANGE:
+            bData = m_weaponConfig.bShootIfTargetOutOfRange;
         return true;
-    case WEAPONFLAGS_SHOOT_IF_TARGET_BOCKED:
-        bData = m_weaponConfig.bShootIfTargetBlocked;
+        case WEAPONFLAGS_SHOOT_IF_TARGET_BOCKED:
+            bData = m_weaponConfig.bShootIfTargetBlocked;
         return true;
-    case WEAPONFLAGS_DISABLE_MODEL:
-        bData = m_weaponConfig.bDisableWeaponModel;
+        case WEAPONFLAGS_DISABLE_MODEL:
+            bData = m_weaponConfig.bDisableWeaponModel;
         return true;
-    case WEAPONFLAGS_INSTANT_RELOAD:
-        bData = m_weaponConfig.bInstantReload;
+        case WEAPONFLAGS_INSTANT_RELOAD:
+            bData = m_weaponConfig.bInstantReload;
         return true;
     }
     return false;
@@ -692,11 +692,11 @@ void CClientWeapon::DoGunShells ( CVector vecOrigin, CVector vecDirection )
         if ( !m_weaponConfig.bDisableWeaponModel )
         {
             g_pGame->GetPointLights ()->AddLight ( PLTYPE_POINTLIGHT, vecOrigin, CVector (), 3.0f, 0.22f, 0.25f, 0, 0, 0, 0 );
-        }
-        if ( GetAttachedTo () ) g_pGame->GetFx ()->TriggerGunshot ( NULL, vecOrigin, vecDirection, true );
-        else g_pGame->GetFx ()->TriggerGunshot ( NULL, vecOrigin, vecDirection, true );
+            if ( GetAttachedTo () ) g_pGame->GetFx ()->TriggerGunshot ( NULL, vecOrigin, vecDirection, true );
+            else g_pGame->GetFx ()->TriggerGunshot ( NULL, vecOrigin, vecDirection, true );
 
-        m_pWeapon->AddGunshell ( m_pObject, &vecOrigin, &CVector2D ( 0, -1 ), fShellSize );
+            m_pWeapon->AddGunshell ( m_pObject, &vecOrigin, &CVector2D ( 0, -1 ), fShellSize );
+        }
         if ( m_Type != WEAPONTYPE_MINIGUN )
         {
             g_pGame->GetAudioEngine ()->ReportWeaponEvent ( WEAPON_EVENT_FIRE, m_Type, m_pObject );
