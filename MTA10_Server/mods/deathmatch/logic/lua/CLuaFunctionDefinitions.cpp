@@ -13342,6 +13342,55 @@ int CLuaFunctionDefinitions::Sha256 ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaFunctionDefinitions::TeaEncode ( lua_State* luaVM )
+{
+    SString str;
+    SString key;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadString ( str );
+    argStream.ReadString ( key );
+
+    if ( !argStream.HasErrors() )
+    {
+        SString result;
+        SString humanReadableResult;
+        SharedUtil::TeaEncode ( str, key, &result );
+        humanReadableResult = Base64::encode ( result );
+        lua_pushstring ( luaVM, humanReadableResult );
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefinitions::TeaDecode ( lua_State* luaVM )
+{
+    SString str;
+    SString key;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadString ( str );
+    argStream.ReadString ( key );
+
+    if ( !argStream.HasErrors() )
+    {
+        SString result;
+        Base64::decode ( str, result );
+        SharedUtil::TeaDecode ( result, key, &str );
+        lua_pushstring ( luaVM, str );
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
 int CLuaFunctionDefinitions::Base64encode ( lua_State* luaVM )
 {
     SString str;
