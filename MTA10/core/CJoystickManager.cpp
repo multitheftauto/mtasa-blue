@@ -122,6 +122,7 @@ struct SJoystickState
     BYTE    rgbButtons[32];         /* 32 buttons                           */
     BYTE    rgbButtonsWas[32];
     BYTE    povButtonsWas[4];
+    BYTE    axisButtonsWas[14];     // Axis as buttons
 };
 
 
@@ -484,6 +485,37 @@ void CJoystickManager::DoPulse ( void )
                     SendMessage ( hWnd, WM_KEYDOWN, VK_POV(i+1), 0x00000001 );
                 else
                     SendMessage ( hWnd, WM_KEYUP, VK_POV(i+1), 0xC0000001 );
+            }
+        }
+    }
+
+    // Turn axis movement into button style messages
+    {
+        for ( uint i = 0; i < NUMELMS ( m_JoystickState.axisButtonsWas ) ; i++ )
+        {
+            uint uiAxisIndex = i >> 1;
+            uint uiAxisDir = i & 1;
+
+            if ( uiAxisIndex >= NUMELMS( m_JoystickState.rgfAxis ) )
+                break;
+
+            BYTE NowPress;
+            if ( uiAxisDir )
+                NowPress = m_JoystickState.rgfAxis[uiAxisIndex] > 0.75f;
+            else
+                NowPress = m_JoystickState.rgfAxis[uiAxisIndex] < -0.75f;
+
+            BYTE& WasPress = m_JoystickState.axisButtonsWas[i];
+
+            // Edge detection
+            if ( NowPress != WasPress )
+            {
+                WasPress = NowPress;
+
+                if ( NowPress )
+                    SendMessage ( hWnd, WM_KEYDOWN, VK_AXIS(i+1), 0x00000001 );
+                else
+                    SendMessage ( hWnd, WM_KEYUP, VK_AXIS(i+1), 0xC0000001 );
             }
         }
     }
