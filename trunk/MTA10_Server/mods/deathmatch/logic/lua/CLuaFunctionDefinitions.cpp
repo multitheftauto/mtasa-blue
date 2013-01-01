@@ -13342,6 +13342,47 @@ int CLuaFunctionDefinitions::Sha256 ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaFunctionDefinitions::Base64encode ( lua_State* luaVM )
+{
+    SString str;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadString ( str );
+
+    if ( !argStream.HasErrors() )
+    {
+        SString result = Base64::encode ( str );
+        lua_pushstring ( luaVM, result );
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefinitions::Base64decode ( lua_State* luaVM )
+{
+    SString str;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadString ( str );
+
+    if ( !argStream.HasErrors() )
+    {
+        SString result;
+        Base64::decode ( str, result );
+        lua_pushstring ( luaVM, result );
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
 int CLuaFunctionDefinitions::GetNetworkUsageData ( lua_State* luaVM )
 {
     SPacketStat m_PacketStats [ 2 ] [ 256 ];
