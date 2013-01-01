@@ -164,6 +164,21 @@ SBindableKey g_bkKeys[] =
     { "pov_down",   VK_POV(3),          NO_KEY_DEFINED,            DATA_NONE,              0 },
     { "pov_left",   VK_POV(4),          NO_KEY_DEFINED,            DATA_NONE,              0 },
 
+    { "axis_1",     VK_AXIS(1),         NO_KEY_DEFINED,            DATA_NONE,              0 },
+    { "axis_2",     VK_AXIS(2),         NO_KEY_DEFINED,            DATA_NONE,              0 },
+    { "axis_3",     VK_AXIS(3),         NO_KEY_DEFINED,            DATA_NONE,              0 },
+    { "axis_4",     VK_AXIS(4),         NO_KEY_DEFINED,            DATA_NONE,              0 },
+    { "axis_5",     VK_AXIS(5),         NO_KEY_DEFINED,            DATA_NONE,              0 },
+    { "axis_6",     VK_AXIS(6),         NO_KEY_DEFINED,            DATA_NONE,              0 },
+    { "axis_7",     VK_AXIS(7),         NO_KEY_DEFINED,            DATA_NONE,              0 },
+    { "axis_8",     VK_AXIS(8),         NO_KEY_DEFINED,            DATA_NONE,              0 },
+    { "axis_9",     VK_AXIS(9),         NO_KEY_DEFINED,            DATA_NONE,              0 },
+    { "axis_10",    VK_AXIS(10),        NO_KEY_DEFINED,            DATA_NONE,              0 },
+    { "axis_11",    VK_AXIS(11),        NO_KEY_DEFINED,            DATA_NONE,              0 },
+    { "axis_12",    VK_AXIS(12),        NO_KEY_DEFINED,            DATA_NONE,              0 },
+    { "axis_13",    VK_AXIS(13),        NO_KEY_DEFINED,            DATA_NONE,              0 },
+    { "axis_14",    VK_AXIS(14),        NO_KEY_DEFINED,            DATA_NONE,              0 },
+
     { "",           0,          NO_KEY_DEFINED,         DATA_NONE }
 };
 
