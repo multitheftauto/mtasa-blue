@@ -578,6 +578,8 @@ public:
     // Utility
     static int      Md5                                 ( lua_State* luaVM );
     static int      Sha256                              ( lua_State* luaVM );
+    static int      Base64encode                        ( lua_State* luaVM );
+    static int      Base64decode                        ( lua_State* luaVM );
     static int      GetNetworkUsageData                 ( lua_State* luaVM );
     static int      GetNetworkStats                     ( lua_State* luaVM );
     static int      GetVersion                          ( lua_State* luaVM );

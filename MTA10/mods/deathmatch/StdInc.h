@@ -18,6 +18,7 @@
 #include <cstdio>
 #include <cstring>
 
+#include <base64.h>
 #include <zlib.h>
 
 // SDK includes
@@ -120,3 +121,5 @@
 #include "logic/CResource.h"
 #include "logic/CStaticFunctionDefinitions.h"
 #include "../../version.h"
+
+
