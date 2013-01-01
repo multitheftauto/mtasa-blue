@@ -598,7 +598,7 @@ namespace SharedUtil
         int numBlocks = str.length() / 4;
         int numPasses = numBlocks - 1;
 
-        if ( numPasses == 0 )
+        if ( numPasses <= 0 )
             return;
 
         // Process the key
