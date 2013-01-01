@@ -49,12 +49,14 @@ void _cdecl CrashAverted ( DWORD id )
 
 #define CRASH_AVERTED(id) \
     } \
+    _asm pushfd \
     _asm pushad \
     _asm mov eax, id \
     _asm push eax \
     _asm call CrashAverted \
     _asm add esp, 4 \
     _asm popad \
+    _asm popfd \
     _asm \
     {
 
@@ -844,6 +846,32 @@ void _declspec(naked) HOOK_CrashFix_Misc26 ()
 }
 
 
+////////////////////////////////////////////////////////////////////////
+// Handle CTaskComplexDieInCar::ControlSubTask ped with no vehicle
+#define HOOKPOS_CrashFix_Misc27                             0x6377FB
+#define HOOKSIZE_CrashFix_Misc27                            7
+DWORD RETURN_CrashFix_Misc27 =                              0x637802;
+void _declspec(naked) HOOK_CrashFix_Misc27 ()
+{
+    _asm
+    {
+        // Execute replaced code
+        cmp     byte ptr [edi+484h], 2
+        je      cont
+
+        // Check if veh pointer is zero
+        mov     ecx, [edi+58Ch]
+        test    ecx, ecx
+        jne     cont
+        CRASH_AVERTED( 27 )
+
+cont:
+        // Continue standard path
+        jmp     RETURN_CrashFix_Misc27
+    }
+}
+
+
 //////////////////////////////////////////////////////////////////////////////////////////
 //
 // CClumpModelInfo::GetFrameFromId
@@ -987,5 +1015,6 @@ void CMultiplayerSA::InitHooks_CrashFixHacks ( void )
     EZHookInstall ( CrashFix_Misc24 );
     EZHookInstall ( CrashFix_Misc25 );
     EZHookInstall ( CrashFix_Misc26 );
+    EZHookInstall ( CrashFix_Misc27 );
     EZHookInstall ( CClumpModelInfo_GetFrameFromId );
 }
