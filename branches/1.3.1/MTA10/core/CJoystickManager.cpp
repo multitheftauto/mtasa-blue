@@ -12,6 +12,7 @@
 
 #include "StdInc.h"
 #include <game/CPad.h>
+#include "XInput.h"
 
 using std::string;
 
@@ -121,6 +122,7 @@ struct SJoystickState
     BYTE    rgbButtons[32];         /* 32 buttons                           */
     BYTE    rgbButtonsWas[32];
     BYTE    povButtonsWas[4];
+    BYTE    axisButtonsWas[14];     // Axis as buttons
 };
 
 
@@ -167,6 +169,9 @@ public:
     // CJoystickManager methods
     BOOL                DoEnumObjectsCallback       ( const DIDEVICEOBJECTINSTANCE* pdidoi );
 private:
+    bool                ReadInputSubsystem          ( DIJOYSTATE2& js );
+    bool                HandleXInputGetState        ( XINPUT_STATE& XInputState );
+    bool                IsXInputDeviceAttached      ( void );
     bool                IsJoypadValid               ( void );
     void                EnumAxes                    ( void );
     void                ReadCurrentState            ( void );
@@ -177,6 +182,10 @@ private:
     SInputDeviceInfo        m_DevInfo;
     SJoystickState          m_JoystickState;
     SMappingLine            m_currentMapping[10];
+    bool                    m_bUseXInput;
+    bool                    m_bXInputDeviceAttached;
+    uint                    m_uiXInputReattachDelay;
+    CElapsedTime            m_XInputReattachTimer;
 
     // Used during axis binding
     bool                    m_bCaptureAxis;
@@ -213,6 +222,14 @@ CJoystickManagerInterface* GetJoystickManager ( void )
 ///////////////////////////////////////////////////////////////
 CJoystickManager::CJoystickManager ( void )
 {
+    // See if we have a XInput compatible device
+    XINPUT_CAPABILITIES Capabilities;
+    DWORD dwStatus = XInputGetCapabilities( 0, XINPUT_FLAG_GAMEPAD, &Capabilities );
+    if ( dwStatus == ERROR_SUCCESS )
+    {
+        m_bUseXInput = true;
+    }
+
     SetDefaults();
 }
 
@@ -232,6 +249,9 @@ CJoystickManager::~CJoystickManager ( void )
 ///////////////////////////////////////////////////////////////
 void CJoystickManager::OnSetDataFormat ( IDirectInputDevice8A* pDevice, LPCDIDATAFORMAT a )
 {
+    if ( m_bUseXInput )
+        return;
+
     if ( a->dwNumObjs == c_dfDIJoystick2.dwNumObjs )
     {
         if ( !m_DevInfo.pDevice )
@@ -469,6 +489,37 @@ void CJoystickManager::DoPulse ( void )
         }
     }
 
+    // Turn axis movement into button style messages
+    {
+        for ( uint i = 0; i < NUMELMS ( m_JoystickState.axisButtonsWas ) ; i++ )
+        {
+            uint uiAxisIndex = i >> 1;
+            uint uiAxisDir = i & 1;
+
+            if ( uiAxisIndex >= NUMELMS( m_JoystickState.rgfAxis ) )
+                break;
+
+            BYTE NowPress;
+            if ( uiAxisDir )
+                NowPress = m_JoystickState.rgfAxis[uiAxisIndex] > 0.75f;
+            else
+                NowPress = m_JoystickState.rgfAxis[uiAxisIndex] < -0.75f;
+
+            BYTE& WasPress = m_JoystickState.axisButtonsWas[i];
+
+            // Edge detection
+            if ( NowPress != WasPress )
+            {
+                WasPress = NowPress;
+
+                if ( NowPress )
+                    SendMessage ( hWnd, WM_KEYDOWN, VK_AXIS(i+1), 0x00000001 );
+                else
+                    SendMessage ( hWnd, WM_KEYUP, VK_AXIS(i+1), 0xC0000001 );
+            }
+        }
+    }
+
 
     // Handle capture and binding
     if ( m_bCaptureAxis )
@@ -509,28 +560,9 @@ void CJoystickManager::ReadCurrentState ( void )
     for ( int i = 0; i < 32 ; i++ )
         m_JoystickState.rgbButtons[i] = 0;
 
-    if ( !m_DevInfo.pDevice )
-        return;
-
-    // Enumerate axes if not done yet
-    if ( !m_DevInfo.bDoneEnumAxes )
-    {
-        EnumAxes ();
-    }
-
-    // Try to poll
-    if ( FAILED ( m_DevInfo.pDevice->Poll() ) )
-    {
-        //HRESULT hr =
-        m_DevInfo.pDevice->Acquire ();
-        //CCore::GetSingleton ().GetConsole ()->Printf( "Joystick Poll failed, Acquire result:%d", hr );
-        return;
-    }
-
-
     DIJOYSTATE2 js;           // DInput joystick state 
 
-    if ( SUCCEEDED ( m_DevInfo.pDevice->GetDeviceState ( sizeof( DIJOYSTATE2 ), &js ) ) )
+    if ( ReadInputSubsystem ( js ) )
     {
         // Read axes
         for ( int a = 0 ; a < NUMELMS ( m_DevInfo.axis )  &&  a < NUMELMS ( m_JoystickState.rgfAxis ); a++ )
@@ -577,6 +609,204 @@ void CJoystickManager::ReadCurrentState ( void )
             m_JoystickState.rgbButtons[i] = js.rgbButtons[i];
 
     }
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CJoystickManager::ReadInputSubsystem
+//
+//
+//
+///////////////////////////////////////////////////////////////
+bool CJoystickManager::ReadInputSubsystem ( DIJOYSTATE2& js )
+{
+    if ( !m_bUseXInput )
+    {
+        //
+        // DirectInput
+        //
+
+        if ( !m_DevInfo.pDevice )
+            return false;
+
+        // Enumerate axes if not done yet
+        if ( !m_DevInfo.bDoneEnumAxes )
+        {
+            EnumAxes ();
+        }
+
+        // Try to poll
+        if ( FAILED ( m_DevInfo.pDevice->Poll() ) )
+        {
+            m_DevInfo.pDevice->Acquire ();
+            return false;
+        }
+
+        if ( FAILED ( m_DevInfo.pDevice->GetDeviceState ( sizeof( DIJOYSTATE2 ), &js ) ) )
+            return false;
+    }
+    else
+    {
+        //
+        // XInput
+        //
+
+        XINPUT_STATE XInputState;
+        if ( !HandleXInputGetState( XInputState ) )
+            return false;
+
+        memset( &js, 0, sizeof( DIJOYSTATE2 ) );
+        LONG* pAxes = (&js.lX);
+        pAxes[0] = XInputState.Gamepad.sThumbLX;
+        pAxes[1] = XInputState.Gamepad.sThumbLY;
+        pAxes[2] = XInputState.Gamepad.bLeftTrigger;
+        pAxes[3] = XInputState.Gamepad.sThumbRX;
+        pAxes[4] = XInputState.Gamepad.sThumbRY;
+        pAxes[5] = XInputState.Gamepad.bRightTrigger;
+
+        js.rgbButtons[0] = XInputState.Gamepad.wButtons & XINPUT_GAMEPAD_A ? 1 : 0;
+        js.rgbButtons[1] = XInputState.Gamepad.wButtons & XINPUT_GAMEPAD_B ? 1 : 0;
+        js.rgbButtons[2] = XInputState.Gamepad.wButtons & XINPUT_GAMEPAD_X ? 1 : 0;
+        js.rgbButtons[3] = XInputState.Gamepad.wButtons & XINPUT_GAMEPAD_Y ? 1 : 0;
+        js.rgbButtons[4] = XInputState.Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER ? 1 : 0;
+        js.rgbButtons[5] = XInputState.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER ? 1 : 0;
+        js.rgbButtons[6] = XInputState.Gamepad.wButtons & XINPUT_GAMEPAD_BACK ? 1 : 0;
+        js.rgbButtons[7] = XInputState.Gamepad.wButtons & XINPUT_GAMEPAD_START ? 1 : 0;
+        js.rgbButtons[8] = XInputState.Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_THUMB ? 1 : 0;
+        js.rgbButtons[9] = XInputState.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_THUMB ? 1 : 0;
+
+        bool bPovUp    = XInputState.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_UP ? 1 : 0;
+        bool bPovRight = XInputState.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_RIGHT ? 1 : 0;
+        bool bPovDown  = XInputState.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_DOWN ? 1 : 0;
+        bool bPovLeft  = XInputState.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_LEFT ? 1 : 0;
+
+        if ( bPovUp )
+        {
+            if ( bPovRight )        js.rgdwPOV[0] = 0     + 4500; 
+            else if ( bPovLeft )    js.rgdwPOV[0] = 36000 - 4500; 
+            else                    js.rgdwPOV[0] = 0; 
+        }
+        else
+        if ( bPovDown )
+        {
+            if ( bPovRight )        js.rgdwPOV[0] = 18000 - 4500; 
+            else if ( bPovLeft )    js.rgdwPOV[0] = 18000 + 4500; 
+            else                    js.rgdwPOV[0] = 18000; 
+        }
+        else
+        {
+            if ( bPovRight )        js.rgdwPOV[0] = 9000; 
+            else if ( bPovLeft )    js.rgdwPOV[0] = 27000; 
+            else                    js.rgdwPOV[0] = -1; 
+        }
+    }
+
+    return true;
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CJoystickManager::HandleXInputGetState
+//
+//
+//
+///////////////////////////////////////////////////////////////
+bool CJoystickManager::HandleXInputGetState ( XINPUT_STATE& XInputState )
+{
+    if ( !IsXInputDeviceAttached() )
+        return false;
+
+    DWORD dwStatus = XInputGetState( 0, &XInputState );
+
+    if ( dwStatus == ERROR_DEVICE_NOT_CONNECTED )
+    {
+        m_bXInputDeviceAttached = false;
+        return false;
+    }
+
+    if ( dwStatus != ERROR_SUCCESS )
+        return false;
+
+    return true;
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CJoystickManager::IsXInputDeviceAttached
+//
+// Also attempts reattach if required
+//
+///////////////////////////////////////////////////////////////
+bool CJoystickManager::IsXInputDeviceAttached ( void )
+{
+    if ( !m_bXInputDeviceAttached )
+    {
+        // Delay before reattached for performance
+        if ( m_XInputReattachTimer.Get() < m_uiXInputReattachDelay )
+            return false;
+        m_XInputReattachTimer.Reset();
+        m_uiXInputReattachDelay = 3000;
+
+        XINPUT_CAPABILITIES Capabilities;
+        DWORD dwStatus = XInputGetCapabilities( 0, XINPUT_FLAG_GAMEPAD, &Capabilities );
+        if ( dwStatus != ERROR_SUCCESS )
+            return false;
+
+        m_bXInputDeviceAttached = true;
+
+        // Axis ranges for XInput devices
+        m_DevInfo.axis[0].bEnabled = 1;
+        m_DevInfo.axis[0].lMin = -32767;
+        m_DevInfo.axis[0].lMax = 32767;
+
+        m_DevInfo.axis[1].bEnabled = 1;
+        m_DevInfo.axis[1].lMin = -32767;
+        m_DevInfo.axis[1].lMax = 32767;
+
+        m_DevInfo.axis[2].bEnabled = 1;
+        m_DevInfo.axis[2].lMin = -127;
+        m_DevInfo.axis[2].lMax = 127;
+
+        m_DevInfo.axis[3].bEnabled = 1;
+        m_DevInfo.axis[3].lMin = -32767;
+        m_DevInfo.axis[3].lMax = 32767;
+
+        m_DevInfo.axis[4].bEnabled = 1;
+        m_DevInfo.axis[4].lMin = -32767;
+        m_DevInfo.axis[4].lMax = 32767;
+
+        m_DevInfo.axis[5].bEnabled = 1;
+        m_DevInfo.axis[5].lMin = -127;
+        m_DevInfo.axis[5].lMax = 127;
+
+        m_DevInfo.axis[6].bEnabled = 0;
+        m_DevInfo.axis[7].bEnabled = 0;
+
+        // Compose a guid for saving config
+        m_DevInfo.guidProduct.Data1 = 0x12345678;
+        m_DevInfo.guidProduct.Data2 = Capabilities.Type;
+        m_DevInfo.guidProduct.Data3 = Capabilities.SubType;
+
+        // Compose a product name
+        const char* subTypeNames[] = { "Unknown", "Gamepad", "Wheel", "Arcade stick", "Flight stick", "Dance pad", "Guitar", "Drum kit" };
+        if ( Capabilities.SubType < NUMELMS( subTypeNames ) )
+            m_DevInfo.strProductName = subTypeNames[ Capabilities.SubType ];
+        else
+            m_DevInfo.strProductName = SString ( "Subtype %d", Capabilities.SubType );
+
+        m_DevInfo.strGuid = GUIDToString ( m_DevInfo.guidProduct );
+
+        // Load config for this guid, or set defaults
+        if ( !LoadFromXML () )
+        {
+            SetDefaults();
+        }
+    }
+
+    return m_bXInputDeviceAttached;
 }
 
 
@@ -719,6 +949,8 @@ void CJoystickManager::ApplyAxes ( CControllerState& cs, bool bInVehicle )
 
 bool CJoystickManager::IsJoypadConnected ( void )
 {
+    if ( m_bUseXInput )
+        return IsXInputDeviceAttached();
     return m_DevInfo.pDevice != NULL;
 }
 
@@ -764,6 +996,8 @@ int CJoystickManager::GetSettingsRevision ( void )
 
 bool CJoystickManager::IsJoypadValid ( void )
 {
+    if ( m_bUseXInput )
+        return IsXInputDeviceAttached();
     return m_DevInfo.pDevice != NULL  &&  m_DevInfo.bDoneEnumAxes  &&  m_DevInfo.strGuid.size () > 0;
 }
 
@@ -877,11 +1111,33 @@ void CJoystickManager::SetDefaults ( void )
                                 eJoyZ,  eDirPos,    eBrake,         eDirPos,  true,  255, 
                             };
 
-    memset( m_currentMapping, 0, sizeof(m_currentMapping) );
+    const SMappingLine defaultMappingXInput[] = {
+                                eJoyX,  eDirNeg,    eLeftStickX,    eDirNeg,  true,  128,
+                                eJoyX,  eDirPos,    eLeftStickX,    eDirPos,  true,  128, 
+                                eJoyY,  eDirPos,    eLeftStickY,    eDirNeg,  true,  128, 
+                                eJoyY,  eDirNeg,    eLeftStickY,    eDirPos,  true,  128, 
+                                eJoyRx, eDirNeg,    eRightStickX,   eDirNeg,  true,  128, 
+                                eJoyRx, eDirPos,    eRightStickX,   eDirPos,  true,  128, 
+                                eJoyRy, eDirPos,    eRightStickY,   eDirNeg,  true,  128, 
+                                eJoyRy, eDirNeg,    eRightStickY,   eDirPos,  true,  128, 
+                                eJoyRz, eDirPos,    eAccelerate,    eDirPos,  true,  255, 
+                                eJoyZ,  eDirPos,    eBrake,         eDirPos,  true,  255, 
+                            };
 
+    memset( m_currentMapping, 0, sizeof(m_currentMapping) );
 
     // Select defaultMapping to use
 
+    if ( m_bUseXInput )
+    {
+        // If XInput device, then use default XInput mapping
+        for ( int i = 0 ; i < NUMELMS(m_currentMapping) ; i++ )
+            m_currentMapping[i] = defaultMappingXInput[i];
+
+        m_DevInfo.iDeadZone = 20;
+        m_DevInfo.iSaturation = 99;
+    }
+    else
     if ( m_DevInfo.pDevice && m_DevInfo.iAxisCount == 5 && m_DevInfo.guidProduct == GUID_Xbox360Controller )
     {
         // If GUID matches published 360 controller GUID and device has 5 axes, then use 360 mapping
