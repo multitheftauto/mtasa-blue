@@ -532,6 +532,7 @@ DontInstallRedist:
 				File "${FILES_ROOT}\MTA San Andreas\mta\bassmix.dll"
 				File "${FILES_ROOT}\MTA San Andreas\mta\chatboxpresets.xml"
 				File "${FILES_ROOT}\MTA San Andreas\mta\sa.dat"
+                File "${FILES_ROOT}\MTA San Andreas\mta\XInput9_1_0_mta.dll"
 
                 SetOutPath "$INSTDIR\skins\Classic"
                 File "${FILES_ROOT}\MTA San Andreas\skins\Classic\CGUI.is.xml"
