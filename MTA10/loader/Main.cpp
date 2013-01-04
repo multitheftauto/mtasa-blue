@@ -375,6 +375,7 @@ int DoLaunchGame ( LPSTR lpCmdLine )
                                      ,"\\MTA\\bass_fx.dll"
                                      ,"\\MTA\\sa.dat"
                                      ,"\\MTA\\pthreadVC2.dll"
+                                     ,"\\MTA\\XInput9_1_0_mta.dll"
                                      ,"\\server\\pthreadVC2.dll"
                                      ,"\\server\\mods\\deathmatch\\libmysql.dll"};
 
@@ -499,13 +500,28 @@ int DoLaunchGame ( LPSTR lpCmdLine )
         return 1;
     }
 
+    // See if xinput is loadable
+    HMODULE hXInputModule = LoadLibrary( "XInput9_1_0.dll" );
+    if ( hXInputModule )
+        FreeLibrary( hXInputModule );
+    else
+    {
+        // If not, do hack to use dll supplied with MTA
+        SString strDest = PathJoin( strMTASAPath, "mta", "XInput9_1_0.dll" );
+        if ( !FileExists( strDest ) )
+        {
+            SString strSrc = PathJoin( strMTASAPath, "mta", "XInput9_1_0_mta.dll" );       
+            FileCopy( strSrc, strDest );
+        }
+    }
+    
     SetDllDirectory( SString ( strMTASAPath + "\\mta" ) );
 
     // Check if the core can be loaded - failure may mean msvcr90.dll or d3dx9_40.dll etc is not installed
     HMODULE hCoreModule = LoadLibrary( strCoreDLL );
     if ( hCoreModule == NULL )
     {
-        DisplayErrorMessageBox ( "Load failed.  Please ensure that \n"
+        DisplayErrorMessageBox ( "Loading core failed.  Please ensure that \n"
                             "Microsoft Visual C++ 2008 SP1 Redistributable Package (x86) \n"
                             "and the latest DirectX is correctly installed.", "vc-redist-missing" );
         // Kill GTA and return errorcode
