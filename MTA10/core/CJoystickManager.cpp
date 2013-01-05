@@ -227,6 +227,26 @@ CJoystickManager::CJoystickManager ( void )
     DWORD dwStatus = XInputGetCapabilities( 0, XINPUT_FLAG_GAMEPAD, &Capabilities );
     if ( dwStatus == ERROR_SUCCESS )
     {
+        WriteDebugEvent( SString( "XInput device detected. Type:%d SubType:%d Flags:0x%04x"
+                                    ,Capabilities.Type
+                                    ,Capabilities.SubType
+                                    ,Capabilities.Flags
+                               ));
+        WriteDebugEvent( SString( "XInput - wButtons:0x%04x  bLeftTrigger:0x%02x  bRightTrigger:0x%02x"
+                                    ,Capabilities.Gamepad.wButtons
+                                    ,Capabilities.Gamepad.bLeftTrigger
+                                    ,Capabilities.Gamepad.bRightTrigger
+                               ));
+        WriteDebugEvent( SString( "XInput - sThumbLX:0x%04x  sThumbLY:0x%04x  sThumbRX:0x%04x  sThumbRY:0x%04x"
+                                    ,Capabilities.Gamepad.sThumbLX
+                                    ,Capabilities.Gamepad.sThumbLY
+                                    ,Capabilities.Gamepad.sThumbRX
+                                    ,Capabilities.Gamepad.sThumbRY
+                               ));
+        WriteDebugEvent( SString( "XInput - wLeftMotorSpeed:0x%04x  wRightMotorSpeed:0x%04x"
+                                    ,Capabilities.Vibration.wLeftMotorSpeed
+                                    ,Capabilities.Vibration.wRightMotorSpeed
+                               ));
         m_bUseXInput = true;
     }
 
@@ -251,6 +271,28 @@ void CJoystickManager::OnSetDataFormat ( IDirectInputDevice8A* pDevice, LPCDIDAT
 {
     if ( m_bUseXInput )
         return;
+
+    WriteDebugEvent( SString( "DInput - OnSetDataFormat. dwSize:%d  dwObjSize:%d  dwFlags:0x%08x  dwDataSize:%d  dwNumObjs:%d"
+                                ,a->dwSize
+                                ,a->dwObjSize
+                                ,a->dwFlags
+                                ,a->dwDataSize
+                                ,a->dwNumObjs
+                           ));
+
+    if ( a->rgodf )
+    {
+        SString strGuid;
+        if ( a->rgodf->pguid )
+            strGuid = GUIDToString( *a->rgodf->pguid );
+
+        WriteDebugEvent( SString( "                          pguid:%s  dwOfs:%d  dwType:0x%08x  dwFlags:0x%08x"
+                                    ,*strGuid
+                                    ,a->rgodf->dwOfs
+                                    ,a->rgodf->dwType
+                                    ,a->rgodf->dwFlags
+                               ));
+    }
 
     if ( a->dwNumObjs == c_dfDIJoystick2.dwNumObjs )
     {
@@ -293,6 +335,17 @@ BOOL CALLBACK EnumObjectsCallback ( const DIDEVICEOBJECTINSTANCE* pdidoi, VOID* 
 
 BOOL CJoystickManager::DoEnumObjectsCallback ( const DIDEVICEOBJECTINSTANCE* pdidoi )
 {
+    SString strGuid = GUIDToString( pdidoi->guidType );
+    SString strName = pdidoi->tszName;
+    WriteDebugEvent( SString( "DInput - EnumObjectsCallback. dwSize:%d  strGuid:%s  dwOfs:%d  dwType:%d  dwFlags:0x%08x strName:%s"
+                                ,pdidoi->dwSize
+                                ,*strGuid
+                                ,pdidoi->dwOfs
+                                ,pdidoi->dwType
+                                ,pdidoi->dwFlags
+                                ,*strName
+                           ));
+
     // For axes that are found, do things
     if ( pdidoi->dwType & DIDFT_AXIS )
     {
@@ -306,8 +359,10 @@ BOOL CJoystickManager::DoEnumObjectsCallback ( const DIDEVICEOBJECTINSTANCE* pdi
         range.lMax = +2000;
 
         if ( FAILED ( m_DevInfo.pDevice->SetProperty ( DIPROP_RANGE, &range.diph ) ) )
-            return DIENUM_STOP;
-
+        {
+            WriteDebugEvent( SStringX( "                    Failed to set DIPROP_RANGE" ));
+            return DIENUM_CONTINUE;
+        }
 
         // Remove Deadzone and Saturation
         DIPROPDWORD dead,
@@ -345,7 +400,12 @@ BOOL CJoystickManager::DoEnumObjectsCallback ( const DIDEVICEOBJECTINSTANCE* pdi
             m_DevInfo.axis[axisIndex].bEnabled  = true;
 
             m_DevInfo.iAxisCount++;
-       }
+            WriteDebugEvent( SString( "                    Added axis index %d. (iAxisCount:%d)", axisIndex, m_DevInfo.iAxisCount ));
+        }
+        else
+        {
+            WriteDebugEvent( SStringX( "                 Failed to recognise axis" ));
+        }
 
 #ifdef MTA_DEBUG
 #if 0
