@@ -406,7 +406,7 @@ int DoLaunchGame ( LPSTR lpCmdLine )
 
     // Grab the MTA folder
     SString strGTAEXEPath = strGTAPath + "\\" + MTA_GTAEXE_NAME;
-    SString strDir = strMTASAPath + "\\mta";
+    SString strMtaDir = strMTASAPath + "\\mta";
 
     // Make sure the gta executable exists
     SetCurrentDirectory ( strGTAPath );
@@ -430,7 +430,15 @@ int DoLaunchGame ( LPSTR lpCmdLine )
     {
         ShowD3dDllDialog ( g_hInstance, PathJoin ( strGTAPath, "d3d9.dll" ) );
         HideD3dDllDialog ();
-    }    
+    }
+
+    // Remove old log files saved in the wrong place
+    if ( strGTAPath.CompareI( strMtaDir ) == false )
+    {
+        FileDelete( PathJoin( strGTAPath, "CEGUI.log" ) );
+        FileDelete( PathJoin( strGTAPath, "logfile.txt" ) );
+        FileDelete( PathJoin( strGTAPath, "shutdown.log" ) );
+    }
 
     // Strip out flag from command line
     SString strCmdLine = lpCmdLine;
@@ -462,7 +470,7 @@ int DoLaunchGame ( LPSTR lpCmdLine )
                               FALSE,
                               CREATE_SUSPENDED,
                               NULL,
-                              strDir,     //    strMTASAPath\mta is used so pthreadVC2.dll can be found
+                              strMtaDir,    //    strMTASAPath\mta is used so pthreadVC2.dll can be found
                               &siLoadee,
                               &piLoadee ) )
     {
