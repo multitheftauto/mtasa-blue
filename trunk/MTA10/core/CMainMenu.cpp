@@ -393,6 +393,14 @@ void CMainMenu::SetMenuUnhovered () //Dehighlight all our items
 
 void CMainMenu::Update ( void )
 {
+    if ( g_pCore->GetDiagnosticDebug () == EDiagnosticDebug::JOYSTICK_0000 )
+    {
+        m_pFiller->SetVisible(false);
+        m_pFiller2->SetVisible(false);
+        m_pBackground->SetVisible(false);
+        m_bHideGame = false;
+    }
+
     if ( m_bFrameDelay )
     {
         m_bFrameDelay = false;

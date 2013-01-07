@@ -294,12 +294,35 @@ void CJoystickManager::OnSetDataFormat ( IDirectInputDevice8A* pDevice, LPCDIDAT
                                ));
     }
 
+    DIDEVICEINSTANCE didi;
+    didi.dwSize = sizeof didi;
+    if ( SUCCEEDED( pDevice->GetDeviceInfo ( &didi ) ) )
+    {
+        WriteDebugEvent( SString( "                          guidProduct:%s  ProductName:%s"
+                                    ,*GUIDToString( didi.guidProduct )
+                                    ,didi.tszProductName
+                               ));
+    }
+
     if ( a->dwNumObjs == c_dfDIJoystick2.dwNumObjs )
     {
         if ( !m_DevInfo.pDevice )
         {
             // This is the first Joystick2 device
             m_DevInfo.pDevice = pDevice;
+
+            // Set the axis mode to absolute
+            DIPROPDWORD  dipdw; 
+            dipdw.diph.dwSize = sizeof( DIPROPDWORD ); 
+            dipdw.diph.dwHeaderSize = sizeof( DIPROPHEADER ); 
+            dipdw.diph.dwObj = 0; 
+            dipdw.diph.dwHow = DIPH_DEVICE; 
+            dipdw.dwData = DIPROPAXISMODE_ABS ; 
+
+            if ( FAILED( m_DevInfo.pDevice->SetProperty( DIPROP_AXISMODE, &dipdw.diph ) ) )
+            {
+                WriteDebugEvent( SStringX( "                    Failed to set DIPROP_AXISMODE" ));
+            }
         }
     }
 }
@@ -337,7 +360,7 @@ BOOL CJoystickManager::DoEnumObjectsCallback ( const DIDEVICEOBJECTINSTANCE* pdi
 {
     SString strGuid = GUIDToString( pdidoi->guidType );
     SString strName = pdidoi->tszName;
-    WriteDebugEvent( SString( "DInput - EnumObjectsCallback. dwSize:%d  strGuid:%s  dwOfs:%d  dwType:%d  dwFlags:0x%08x strName:%s"
+    WriteDebugEvent( SString( "DInput - EnumObjectsCallback. dwSize:%d  strGuid:%s  dwOfs:%d  dwType:0x%08x  dwFlags:0x%08x strName:%s"
                                 ,pdidoi->dwSize
                                 ,*strGuid
                                 ,pdidoi->dwOfs
@@ -361,6 +384,12 @@ BOOL CJoystickManager::DoEnumObjectsCallback ( const DIDEVICEOBJECTINSTANCE* pdi
         if ( FAILED ( m_DevInfo.pDevice->SetProperty ( DIPROP_RANGE, &range.diph ) ) )
         {
             WriteDebugEvent( SStringX( "                    Failed to set DIPROP_RANGE" ));
+            return DIENUM_CONTINUE;
+        }
+
+        if ( FAILED ( m_DevInfo.pDevice->GetProperty ( DIPROP_RANGE, &range.diph ) ) )
+        {
+            WriteDebugEvent( SStringX( "                    Failed to get DIPROP_RANGE" ));
             return DIENUM_CONTINUE;
         }
 
@@ -400,7 +429,7 @@ BOOL CJoystickManager::DoEnumObjectsCallback ( const DIDEVICEOBJECTINSTANCE* pdi
             m_DevInfo.axis[axisIndex].bEnabled  = true;
 
             m_DevInfo.iAxisCount++;
-            WriteDebugEvent( SString( "                    Added axis index %d. (iAxisCount:%d)", axisIndex, m_DevInfo.iAxisCount ));
+            WriteDebugEvent( SString( "                    Added axis index %d. lMin:%d lMax:%d (iAxisCount:%d)", axisIndex, range.lMin, range.lMax, m_DevInfo.iAxisCount ));
         }
         else
         {
@@ -624,6 +653,16 @@ void CJoystickManager::ReadCurrentState ( void )
 
     if ( ReadInputSubsystem ( js ) )
     {
+        SString strStatus;
+        bool bOutputStatus = ( g_pCore->GetDiagnosticDebug () == EDiagnosticDebug::JOYSTICK_0000 ) && !g_pCore->IsConnected();
+        if ( bOutputStatus )
+        {
+            strStatus += SString( "iSaturation:%d iDeadZone:%d\n"
+                                ,m_DevInfo.iSaturation
+                                ,m_DevInfo.iDeadZone
+                            );
+        }
+
         // Read axes
         for ( int a = 0 ; a < NUMELMS ( m_DevInfo.axis )  &&  a < NUMELMS ( m_JoystickState.rgfAxis ); a++ )
         {
@@ -657,6 +696,17 @@ void CJoystickManager::ReadCurrentState ( void )
 
                 // Clamp range: -1.f to 1.f
                 m_JoystickState.rgfAxis[a] = Clamp ( -1.f, fResult, 1.f );
+
+                if ( bOutputStatus )
+                {
+                    strStatus += SString( "Axis:%d lMin:%d lMax:%d raw:%d result:%1.4f\n"
+                                        ,a
+                                        ,m_DevInfo.axis[a].lMin
+                                        ,m_DevInfo.axis[a].lMax
+                                        ,(&js.lX)[a]
+                                        ,fResult
+                                    );
+                }
             }
         }
 
@@ -668,6 +718,15 @@ void CJoystickManager::ReadCurrentState ( void )
         for ( int i = 0; i < 32 ; i++ )
             m_JoystickState.rgbButtons[i] = js.rgbButtons[i];
 
+
+        if ( bOutputStatus )
+        {
+            CGraphicsInterface* pGraphics = CCore::GetSingleton().GetGraphics();
+            int x = 20;
+            int y = 20;//pGraphics->GetViewportHeight() / 2;
+            pGraphics->DrawRectQueued( x, y, 350, 150, 0xaf000000, true );
+            pGraphics->DrawTextQueued( x+10, y+10, 0, 0, 0xFFFFFFFF, strStatus, 1, 1, DT_NOCLIP, NULL, true );
+        }
     }
 }
 
