@@ -54,7 +54,7 @@ CGUI_Impl::CGUI_Impl ( IDirect3DDevice9* pDevice )
 
     // Create a GUI system and get the windowmanager
     m_pRenderer = new CEGUI::DirectX9Renderer ( pDevice, 0 );
-    m_pSystem = new CEGUI::System ( m_pRenderer );
+    m_pSystem = new CEGUI::System ( m_pRenderer, CEGUI::String( CalcMTASAPath( PathJoin( "MTA", "CEGUI.log" ) ) ).data() );
 
     // Get pointers to various stuff from CEGUI singletons
     m_pFontManager = CEGUI::FontManager::getSingletonPtr ();
@@ -70,7 +70,6 @@ CGUI_Impl::CGUI_Impl ( IDirect3DDevice9* pDevice )
 #else
     CEGUI::Logger::getSingleton().setLoggingLevel ( CEGUI::Standard );
 #endif
-    CEGUI::Logger::getSingleton().setLogFilename ( "CEGUI.log" );
 
     // Load our fonts
     SString strFontsPath = PathJoin ( SharedUtil::GetWindowsDirectory (), "fonts" );
