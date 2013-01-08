@@ -14,6 +14,7 @@
 #include "detours/include/detours.h"
 
 template<> CDirectInputHook8 * CSingleton< CDirectInputHook8 >::m_pSingleton = NULL;
+IDirectInput8* g_pDirectInput8 = NULL;
 
 CDirectInputHook8::CDirectInputHook8 ( )
 {
@@ -63,6 +64,8 @@ HRESULT CDirectInputHook8::API_DirectInput8Create  ( HINSTANCE  hinst,
 
     // Give the caller a proxy interface.
     *ppvOut = new CProxyDirectInput8 ( static_cast < IDirectInput8 * > ( pThis->m_pDevice ) );
+
+    g_pDirectInput8 = static_cast < IDirectInput8 * > ( pThis->m_pDevice );
 
     return hResult;
 }
