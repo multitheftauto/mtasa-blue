@@ -13,8 +13,11 @@
 #include "StdInc.h"
 #include <game/CPad.h>
 #include "XInput.h"
+#include <dinputd.h>
 
 using std::string;
+
+extern IDirectInput8* g_pDirectInput8;
 
 //////////////////////////////////////////////////////////
 //
@@ -110,6 +113,7 @@ struct SInputDeviceInfo
         bool    bEnabled;
         long    lMax;
         long    lMin;
+        DWORD   dwType;
     } axis[7];
 };
 
@@ -139,7 +143,7 @@ public:
                         ~CJoystickManager           ( void );
 
     // CJoystickManagerInterface methods
-    virtual void        OnSetDataFormat             ( IDirectInputDevice8A* pDevice, LPCDIDATAFORMAT a );
+    virtual void        OnSetDataFormat             ( IDirectInputDevice8A* pDevice, LPCDIDATAFORMAT a ) {}
     virtual void        RemoveDevice                ( IDirectInputDevice8A* pDevice );
     virtual void        DoPulse                     ( void );
     virtual void        ApplyAxes                   ( CControllerState& cs, bool bInVehicle );
@@ -167,6 +171,7 @@ public:
     virtual void        CancelCaptureAxis           ( bool bClearBinding );
 
     // CJoystickManager methods
+    BOOL                DoEnumJoysticksCallback     ( const DIDEVICEINSTANCE* pdidInstance );
     BOOL                DoEnumObjectsCallback       ( const DIDEVICEOBJECTINSTANCE* pdidoi );
 private:
     bool                ReadInputSubsystem          ( DIJOYSTATE2& js );
@@ -174,10 +179,12 @@ private:
     bool                IsXInputDeviceAttached      ( void );
     bool                IsJoypadValid               ( void );
     void                EnumAxes                    ( void );
+    void                InitDirectInput             ( void );
     void                ReadCurrentState            ( void );
     CXMLNode*           GetConfigNode               ( bool bCreateIfRequired );
     bool                LoadFromXML                 ( void );
 
+    bool                    m_bDoneInit;
     int                     m_SettingsRevision;
     SInputDeviceInfo        m_DevInfo;
     SJoystickState          m_JoystickState;
@@ -191,6 +198,9 @@ private:
     bool                    m_bCaptureAxis;
     int                     m_iCaptureOutputIndex;
     SJoystickState          m_PreBindJoystickState;
+
+    DIJOYCONFIG*            m_pPreferredJoyCfg;
+    bool                    m_bPreferredJoyCfgValid;
 };
 
 
@@ -261,70 +271,43 @@ CJoystickManager::~CJoystickManager ( void )
 
 ///////////////////////////////////////////////////////////////
 //
-// CJoystickManager::OnSetDataFormat
+// CJoystickManager EnumJoysticksCallback
 //
-// Figure out device type by intercepting and looking at the SetDataFormat parameter.
-// Comparing dwNumObjs seems to work. Could do with a more bullet proof way of determining the device type.
+// Called once for each enumerated Joystick. If we find one, create a
+//       device interface on it so we can play with it.
 //
 ///////////////////////////////////////////////////////////////
-void CJoystickManager::OnSetDataFormat ( IDirectInputDevice8A* pDevice, LPCDIDATAFORMAT a )
+BOOL CALLBACK EnumJoysticksCallback( const DIDEVICEINSTANCE* pdidInstance, VOID* pContext )
 {
-    if ( m_bUseXInput )
-        return;
+    // Redir to instance
+    return (( CJoystickManager* ) pContext )->DoEnumJoysticksCallback ( pdidInstance );
+}
 
-    WriteDebugEvent( SString( "DInput - OnSetDataFormat. dwSize:%d  dwObjSize:%d  dwFlags:0x%08x  dwDataSize:%d  dwNumObjs:%d"
-                                ,a->dwSize
-                                ,a->dwObjSize
-                                ,a->dwFlags
-                                ,a->dwDataSize
-                                ,a->dwNumObjs
+BOOL CJoystickManager::DoEnumJoysticksCallback ( const DIDEVICEINSTANCE* pdidInstance )
+{
+
+    WriteDebugEvent( SString( "DInput EnumJoysticksCallback - guidProduct:%s  ProductName:%s"
+                                ,*GUIDToString( pdidInstance->guidProduct )
+                                ,pdidInstance->tszProductName
                            ));
 
-    if ( a->rgodf )
-    {
-        SString strGuid;
-        if ( a->rgodf->pguid )
-            strGuid = GUIDToString( *a->rgodf->pguid );
+    // Skip anything other than the perferred Joystick device as defined by the control panel.  
+    // Instead you could store all the enumerated Joysticks and let the user pick.
+    if( m_bPreferredJoyCfgValid &&
+        !IsEqualGUID( pdidInstance->guidInstance, m_pPreferredJoyCfg->guidInstance ) )
+        return DIENUM_CONTINUE;
 
-        WriteDebugEvent( SString( "                          pguid:%s  dwOfs:%d  dwType:0x%08x  dwFlags:0x%08x"
-                                    ,*strGuid
-                                    ,a->rgodf->dwOfs
-                                    ,a->rgodf->dwType
-                                    ,a->rgodf->dwFlags
-                               ));
-    }
+    // Obtain an interface to the enumerated Joystick.
+    HRESULT hr = g_pDirectInput8->CreateDevice( pdidInstance->guidInstance, &m_DevInfo.pDevice, NULL );
 
-    DIDEVICEINSTANCE didi;
-    didi.dwSize = sizeof didi;
-    if ( SUCCEEDED( pDevice->GetDeviceInfo ( &didi ) ) )
-    {
-        WriteDebugEvent( SString( "                          guidProduct:%s  ProductName:%s"
-                                    ,*GUIDToString( didi.guidProduct )
-                                    ,didi.tszProductName
-                               ));
-    }
+    // If it failed, then we can't use this Joystick. (Maybe the user unplugged
+    // it while we were in the middle of enumerating it.)
+    if( FAILED( hr ) )
+        return DIENUM_CONTINUE;
 
-    if ( a->dwNumObjs == c_dfDIJoystick2.dwNumObjs )
-    {
-        if ( !m_DevInfo.pDevice )
-        {
-            // This is the first Joystick2 device
-            m_DevInfo.pDevice = pDevice;
-
-            // Set the axis mode to absolute
-            DIPROPDWORD  dipdw; 
-            dipdw.diph.dwSize = sizeof( DIPROPDWORD ); 
-            dipdw.diph.dwHeaderSize = sizeof( DIPROPHEADER ); 
-            dipdw.diph.dwObj = 0; 
-            dipdw.diph.dwHow = DIPH_DEVICE; 
-            dipdw.dwData = DIPROPAXISMODE_ABS ; 
-
-            if ( FAILED( m_DevInfo.pDevice->SetProperty( DIPROP_AXISMODE, &dipdw.diph ) ) )
-            {
-                WriteDebugEvent( SStringX( "                    Failed to set DIPROP_AXISMODE" ));
-            }
-        }
-    }
+    // Stop enumeration. Note: we're just taking the first Joystick we get. You
+    // could store all the enumerated Joysticks and let the user pick.
+    return DIENUM_STOP;
 }
 
 
@@ -378,8 +361,8 @@ BOOL CJoystickManager::DoEnumObjectsCallback ( const DIDEVICEOBJECTINSTANCE* pdi
         range.diph.dwHeaderSize = sizeof ( DIPROPHEADER );
         range.diph.dwHow = DIPH_BYID;
         range.diph.dwObj = pdidoi->dwType; // Specify the enumerated axis
-        range.lMin = -2000;
-        range.lMax = +2000;
+        range.lMin = -1000;
+        range.lMax = +1000;
 
         if ( FAILED ( m_DevInfo.pDevice->SetProperty ( DIPROP_RANGE, &range.diph ) ) )
         {
@@ -427,6 +410,7 @@ BOOL CJoystickManager::DoEnumObjectsCallback ( const DIDEVICEOBJECTINSTANCE* pdi
             m_DevInfo.axis[axisIndex].lMin      = range.lMin;
             m_DevInfo.axis[axisIndex].lMax      = range.lMax;
             m_DevInfo.axis[axisIndex].bEnabled  = true;
+            m_DevInfo.axis[axisIndex].dwType    = pdidoi->dwType;
 
             m_DevInfo.iAxisCount++;
             WriteDebugEvent( SString( "                    Added axis index %d. lMin:%d lMax:%d (iAxisCount:%d)", axisIndex, range.lMin, range.lMax, m_DevInfo.iAxisCount ));
@@ -498,6 +482,66 @@ void CJoystickManager::EnumAxes ( void )
 
 ///////////////////////////////////////////////////////////////
 //
+// CJoystickManager::InitDirectInput
+//
+// Create a joystick device if possible
+//
+///////////////////////////////////////////////////////////////
+void CJoystickManager::InitDirectInput( void )
+{
+    if ( m_bUseXInput )
+        return;
+
+    DIJOYCONFIG PreferredJoyCfg = {0};
+    m_pPreferredJoyCfg = &PreferredJoyCfg;
+    m_bPreferredJoyCfgValid = false;
+
+    IDirectInputJoyConfig8* pJoyConfig = NULL;
+    if( FAILED( g_pDirectInput8->QueryInterface( IID_IDirectInputJoyConfig8, ( void** )&pJoyConfig ) ) )
+    {
+        WriteDebugEvent ( "InitDirectInput - QueryInterface IDirectInputJoyConfig8 failed" );
+        return;
+    }
+
+    PreferredJoyCfg.dwSize = sizeof( PreferredJoyCfg );
+    if( SUCCEEDED( pJoyConfig->GetConfig( 0, &PreferredJoyCfg, DIJC_GUIDINSTANCE ) ) ) // This function is expected to fail if no Joystick is attached
+        m_bPreferredJoyCfgValid = true;
+    SAFE_RELEASE( pJoyConfig );
+
+    // Look for a simple Joystick we can use for this sample program.
+    if( FAILED( g_pDirectInput8->EnumDevices( DI8DEVCLASS_GAMECTRL, EnumJoysticksCallback, this, DIEDFL_ATTACHEDONLY ) ) )
+    {
+        WriteDebugEvent ( "InitDirectInput - EnumDevices failed" );
+    }
+
+    // Make sure we got a Joystick
+    if( NULL == m_DevInfo.pDevice )
+    {
+        WriteDebugEvent ( "InitDirectInput - No Joystick found" );
+        return;
+    }
+
+    // Set the data format to "simple Joystick" - a predefined data format 
+    //
+    // A data format specifies which controls on a device we are interested in,
+    // and how they should be reported. This tells DInput that we will be
+    // passing a DIJOYSTATE2 structure to IDirectInputDevice::GetDeviceState().
+    if( FAILED( m_DevInfo.pDevice->SetDataFormat( &c_dfDIJoystick2 ) ) )
+    {
+        WriteDebugEvent ( "InitDirectInput - SetDataFormat failed" );
+    }
+
+    // Set the cooperative level to let DInput know how this device should
+    // interact with the system and with other DInput applications.
+    if( FAILED( m_DevInfo.pDevice->SetCooperativeLevel( g_pCore->GetHookedWindow(), DISCL_NONEXCLUSIVE | DISCL_BACKGROUND ) ) )
+    {
+        WriteDebugEvent ( "InitDirectInput - SetCooperativeLevel failed" );
+    }
+}
+
+
+///////////////////////////////////////////////////////////////
+//
 // CJoystickManager::DoPulse
 //
 // Updates the joystick state and sends keydown/up messages for any
@@ -506,6 +550,14 @@ void CJoystickManager::EnumAxes ( void )
 ///////////////////////////////////////////////////////////////
 void CJoystickManager::DoPulse ( void )
 {
+    if ( !m_bDoneInit )
+    {
+        // Init DInput if not done yet
+        InitDirectInput();
+        m_bDoneInit = true;
+    }
+
+
     // Stop if no joystick
     if ( !IsJoypadConnected () )
         return;
@@ -699,12 +751,51 @@ void CJoystickManager::ReadCurrentState ( void )
 
                 if ( bOutputStatus )
                 {
-                    strStatus += SString( "Axis:%d lMin:%d lMax:%d raw:%d result:%1.4f\n"
+
+                    DIPROPRANGE range;
+                    range.diph.dwSize = sizeof ( DIPROPRANGE );
+                    range.diph.dwHeaderSize = sizeof ( DIPROPHEADER );
+                    range.diph.dwHow = DIPH_BYID;
+                    range.diph.dwObj = m_DevInfo.axis[a].dwType; // Specify the enumerated axis
+                    range.lMin = -2001;
+                    range.lMax = +2001;
+
+                    m_DevInfo.pDevice->GetProperty ( DIPROP_RANGE, &range.diph );
+
+                    // Remove Deadzone and Saturation
+                    DIPROPDWORD dead,
+                                sat;
+
+                    dead.diph.dwSize = sizeof dead;
+                    dead.diph.dwHeaderSize = sizeof dead.diph;
+                    dead.diph.dwHow = DIPH_BYID;
+                    dead.diph.dwObj = m_DevInfo.axis[a].dwType;
+                    dead.dwData = 1;
+
+                    sat = dead;
+                    sat.dwData = 9999;
+
+                    m_DevInfo.pDevice->GetProperty ( DIPROP_DEADZONE, &dead.diph );
+                    m_DevInfo.pDevice->GetProperty ( DIPROP_SATURATION, &sat.diph );
+
+                    strStatus += SString( "Axis:%d lMin:%d lMax:%d dead:%d sat:%d raw:%d result:%1.4f\n"
                                         ,a
-                                        ,m_DevInfo.axis[a].lMin
-                                        ,m_DevInfo.axis[a].lMax
+                                        ,range.lMin
+                                        ,range.lMax
+                                        ,dead.dwData
+                                        ,sat.dwData
                                         ,(&js.lX)[a]
                                         ,fResult
+                                    );
+                }
+            }
+            else
+            {
+                if ( bOutputStatus )
+                {
+                    strStatus += SString( "Axis:%d raw:%d\n"
+                                        ,a
+                                        ,(&js.lX)[a]
                                     );
                 }
             }
