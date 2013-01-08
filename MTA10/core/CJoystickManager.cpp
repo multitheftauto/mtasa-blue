@@ -760,7 +760,8 @@ void CJoystickManager::ReadCurrentState ( void )
                     range.lMin = -2001;
                     range.lMax = +2001;
 
-                    m_DevInfo.pDevice->GetProperty ( DIPROP_RANGE, &range.diph );
+                    if ( m_DevInfo.pDevice )
+                        m_DevInfo.pDevice->GetProperty ( DIPROP_RANGE, &range.diph );
 
                     // Remove Deadzone and Saturation
                     DIPROPDWORD dead,
@@ -775,8 +776,11 @@ void CJoystickManager::ReadCurrentState ( void )
                     sat = dead;
                     sat.dwData = 9999;
 
-                    m_DevInfo.pDevice->GetProperty ( DIPROP_DEADZONE, &dead.diph );
-                    m_DevInfo.pDevice->GetProperty ( DIPROP_SATURATION, &sat.diph );
+                    if ( m_DevInfo.pDevice )
+                    {
+                        m_DevInfo.pDevice->GetProperty ( DIPROP_DEADZONE, &dead.diph );
+                        m_DevInfo.pDevice->GetProperty ( DIPROP_SATURATION, &sat.diph );
+                    }
 
                     strStatus += SString( "Axis:%d lMin:%d lMax:%d dead:%d sat:%d raw:%d result:%1.4f\n"
                                         ,a
@@ -977,8 +981,8 @@ bool CJoystickManager::IsXInputDeviceAttached ( void )
         m_DevInfo.axis[1].lMax = 32767;
 
         m_DevInfo.axis[2].bEnabled = 1;
-        m_DevInfo.axis[2].lMin = -127;
-        m_DevInfo.axis[2].lMax = 127;
+        m_DevInfo.axis[2].lMin = -255;
+        m_DevInfo.axis[2].lMax = 255;
 
         m_DevInfo.axis[3].bEnabled = 1;
         m_DevInfo.axis[3].lMin = -32767;
@@ -989,8 +993,8 @@ bool CJoystickManager::IsXInputDeviceAttached ( void )
         m_DevInfo.axis[4].lMax = 32767;
 
         m_DevInfo.axis[5].bEnabled = 1;
-        m_DevInfo.axis[5].lMin = -127;
-        m_DevInfo.axis[5].lMax = 127;
+        m_DevInfo.axis[5].lMin = -255;
+        m_DevInfo.axis[5].lMax = 255;
 
         m_DevInfo.axis[6].bEnabled = 0;
         m_DevInfo.axis[7].bEnabled = 0;
