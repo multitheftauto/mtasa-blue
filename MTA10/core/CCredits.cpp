@@ -48,6 +48,7 @@ const char* g_szCredits = "== Multi Theft Auto: San Andreas v" MTA_DM_BUILDTAG_S
                           "MX_Master\n"
                           "Iztas\n"
                           "impulze\n"
+                          "JoeBullet\n"
                           "\n"
                           "\n"
 
@@ -76,6 +77,7 @@ const char* g_szCredits = "== Multi Theft Auto: San Andreas v" MTA_DM_BUILDTAG_S
                           "Robin \"robhol\" Holm\n"
                           "Adam \"50p\" Telega\n"
                           "Callum \"Callum\" Dawson\n"
+                          "Ilya \"Kenix\" Volkov\n"
                           "Gothem\n"
                           "rafalh\n"
                           "Totto8492\n"
