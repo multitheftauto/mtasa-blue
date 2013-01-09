@@ -224,8 +224,60 @@ eMoveAnim CPlayerPedSA::GetMoveAnim ( void )
     return (eMoveAnim)pedInterface->iMoveAnimGroup;
 }
 
+
+// Helper for SetMoveAnim
+bool IsBlendAssocGroupValid( int iGroup )
+{
+    CAnimBlendAssocGroupSAInterface* pBlendAssocGroup = *(CAnimBlendAssocGroupSAInterface**)0xB4EA34;
+    pBlendAssocGroup += iGroup;
+    return pBlendAssocGroup->pAnimBlock != NULL;
+}
+
+
 void CPlayerPedSA::SetMoveAnim ( eMoveAnim iAnimGroup )
 {
+    // Range check
+    if ( ( iAnimGroup < 54 || iAnimGroup > 70 ) &&
+         ( iAnimGroup < 118 || iAnimGroup > 138 ) )
+        return;
+
+    // Need to load ?
+    if ( !IsBlendAssocGroupValid( iAnimGroup ) )
+    {
+        // Find which anim block to load
+        SString strBlockName;
+        switch ( iAnimGroup )
+        {
+            case 55: case 58: case 61: case 64: case 67:
+                strBlockName = "fat";
+                break;
+
+            case 56: case 59: case 62: case 65: case 68:
+                strBlockName = "muscular";
+                break;
+
+            case 138:
+                strBlockName = "skate";
+                break;
+
+            default:
+                strBlockName = "ped";
+                break;
+        }
+            
+        CAnimBlock* pAnimBlock = pGame->GetAnimManager()->GetAnimationBlock ( strBlockName );
+
+        // Try load
+        if ( pAnimBlock && !pAnimBlock->IsLoaded() )
+        {
+            pAnimBlock->Request( BLOCKING, true );
+        }
+
+        // Load fail?
+        if ( !IsBlendAssocGroupValid( iAnimGroup ) )
+            return;
+    }
+
     // Set the the new move animation group
     CPedSAInterface *pedInterface = ( CPedSAInterface * ) this->GetInterface();
     pedInterface->iMoveAnimGroup = (int)iAnimGroup;
