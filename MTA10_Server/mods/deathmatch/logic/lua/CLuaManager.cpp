@@ -315,7 +315,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "givePedJetPack", CLuaFunctionDefinitions::GivePedJetPack );
     CLuaCFunctions::AddFunction ( "removePedJetPack", CLuaFunctionDefinitions::RemovePedJetPack );
     CLuaCFunctions::AddFunction ( "setPedFightingStyle", CLuaFunctionDefinitions::SetPedFightingStyle );
-    //CLuaCFunctions::AddFunction ( "setPedWalkingStyle", CLuaFunctionDefinitions::SetPedMoveAnim );
+    CLuaCFunctions::AddFunction ( "setPedWalkingStyle", CLuaFunctionDefinitions::SetPedMoveAnim );
     CLuaCFunctions::AddFunction ( "setPedGravity", CLuaFunctionDefinitions::SetPedGravity );
     CLuaCFunctions::AddFunction ( "setPedChoking", CLuaFunctionDefinitions::SetPedChoking );
     CLuaCFunctions::AddFunction ( "warpPedIntoVehicle", CLuaFunctionDefinitions::WarpPedIntoVehicle );
