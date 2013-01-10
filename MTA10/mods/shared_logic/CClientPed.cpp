@@ -144,7 +144,7 @@ void CClientPed::Init ( CClientManager* pManager, unsigned long ulModelID, bool 
     RemoveAllWeapons ();        // Set all our weapon values to unarmed
     m_bHasJetPack = false;
     m_FightingStyle = STYLE_GRAB_KICK;
-    m_MoveAnim = MOVE_PLAYER;
+    m_MoveAnim = MOVE_DEFAULT;
     m_ucAlpha = 255;
     m_fTargetRotation = 0.0f;
     m_bTargetAkimboUp = false;
