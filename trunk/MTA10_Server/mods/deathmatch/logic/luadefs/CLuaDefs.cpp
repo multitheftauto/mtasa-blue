@@ -12,16 +12,19 @@
 *****************************************************************************/
 
 #include "StdInc.h"
+extern uint g_uiNetSentByteCounter;
 
 namespace
 {
     // For timing C function calls from Lua
     struct STimingFunction
     {
-        STimingFunction ( lua_CFunction f, CLuaCFunction* pFunction, TIMEUS startTime ) : f ( f ), pFunction ( pFunction ), startTime ( startTime ) {}
+        STimingFunction ( lua_State* luaVM, lua_CFunction f, CLuaCFunction* pFunction, TIMEUS startTime, uint uiStartByteCount ) : luaVM ( luaVM ), f ( f ), pFunction ( pFunction ), startTime ( startTime ), uiStartByteCount ( uiStartByteCount ) {}
+        lua_State* luaVM;
         lua_CFunction f;
         CLuaCFunction* pFunction;
         TIMEUS startTime;
+        uint uiStartByteCount;
     };
     std::list < STimingFunction >   ms_TimingFunctionStack;
     bool                            ms_bRegisterdPostCallHook = false;
@@ -139,7 +142,7 @@ int CLuaDefs::CanUseFunction ( lua_CFunction f, lua_State* luaVM )
                 lua_registerPostCallHook ( CLuaDefs::DidUseFunction );
             }
             // Start to time the function
-            ms_TimingFunctionStack.push_back ( STimingFunction( f, pFunction, GetTimeUs() ) );
+            ms_TimingFunctionStack.push_back ( STimingFunction( luaVM, f, pFunction, GetTimeUs(), g_uiNetSentByteCounter ) );
         }
         return true;
     }
@@ -162,9 +165,14 @@ void CLuaDefs::DidUseFunction ( lua_CFunction f, lua_State* luaVM )
         {
             // Finish the timing
             TIMEUS elapsedTime = GetTimeUs() - info.startTime;
+            uint uiDeltaBytes = g_uiNetSentByteCounter - info.uiStartByteCount;
             // Record timing over a threshold
-            if ( elapsedTime > 1000 )
-                CPerfStatFunctionTiming::GetSingleton ()->UpdateTiming ( info.pFunction->GetName ().c_str (), elapsedTime );
+            if ( elapsedTime > 1000 || uiDeltaBytes > 1000 )
+            {
+                CResource* pResource = g_pGame->GetResourceManager ()->GetResourceFromLuaState ( info.luaVM );
+                SString strResourceName = pResource ? pResource->GetName() : "unknown";
+                CPerfStatFunctionTiming::GetSingleton ()->UpdateTiming ( strResourceName, info.pFunction->GetName ().c_str (), elapsedTime, uiDeltaBytes );
+            }
 
             ms_TimingFunctionStack.pop_back ();
         }

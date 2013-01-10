@@ -133,8 +133,9 @@ public:
     virtual void                GetStats                ( CPerfStatResult* pOutResult, const std::map < SString, int >& optionMap, const SString& strFilter );
 
     // CPerfStatPacketUsageImpl
-    void                        RecordStats             ( void );
+    void                        MaybeRecordStats        ( void );
 
+    int                         m_iStatsCleared;
     CElapsedTime                m_TimeSinceGetStats;
     long long                   m_llNextRecordTime;
     SString                     m_strCategoryName;
@@ -207,37 +208,52 @@ const SString& CPerfStatPacketUsageImpl::GetCategoryName ( void )
 ///////////////////////////////////////////////////////////////
 void CPerfStatPacketUsageImpl::DoPulse ( void )
 {
-    // Copy and clear once every 5 seconds
-    long long llTime = GetTickCount64_ ();
-
-    if ( llTime >= m_llNextRecordTime )
-    {
-        m_llNextRecordTime = Max ( m_llNextRecordTime + 5000, llTime + 5000 / 10 * 9 );
-        RecordStats ();
-    }
+    MaybeRecordStats();
 }
 
 
 ///////////////////////////////////////////////////////////////
 //
-// CPerfStatPacketUsageImpl::RecordStats
+// CPerfStatPacketUsageImpl::MaybeRecordStats
 //
 //
 //
 ///////////////////////////////////////////////////////////////
-void CPerfStatPacketUsageImpl::RecordStats ( void )
+void CPerfStatPacketUsageImpl::MaybeRecordStats ( void )
 {
+    // Someone watching?
     if ( m_TimeSinceGetStats.Get () < 10000 )
     {
-        // Save previous sample so we can calc the delta values
-        memcpy ( m_PrevPacketStats, m_PacketStats, sizeof ( m_PacketStats ) );
-        memcpy ( m_PacketStats, g_pNetServer->GetPacketStats (), sizeof ( m_PacketStats ) );
+        // Time for record update?    // Copy and clear once every 5 seconds
+        long long llTime = GetTickCount64_ ();
+        if ( llTime >= m_llNextRecordTime )
+        {
+            m_llNextRecordTime = Max ( m_llNextRecordTime + 5000, llTime + 5000 / 10 * 9 );
+
+            // Save previous sample so we can calc the delta values
+            memcpy ( m_PrevPacketStats, m_PacketStats, sizeof ( m_PacketStats ) );
+            memcpy ( m_PacketStats, g_pNetServer->GetPacketStats (), sizeof ( m_PacketStats ) );
+
+            if ( m_iStatsCleared == 1 )
+            {
+                // Prime if was zeroed
+                memcpy ( m_PrevPacketStats, m_PacketStats, sizeof ( m_PacketStats ) );
+                m_iStatsCleared = 2;
+            }
+            else
+            if ( m_iStatsCleared == 2 )
+                m_iStatsCleared = 0;
+        }
     }
     else
     {
         // No one watching
-        memset ( m_PrevPacketStats, 0, sizeof ( m_PacketStats ) );
-        memset ( m_PacketStats, 0, sizeof ( m_PacketStats ) );
+        if ( !m_iStatsCleared )
+        {
+            memset ( m_PrevPacketStats, 0, sizeof ( m_PacketStats ) );
+            memset ( m_PacketStats, 0, sizeof ( m_PacketStats ) );
+            m_iStatsCleared = 1;
+        }
     }
 }
 
@@ -252,6 +268,7 @@ void CPerfStatPacketUsageImpl::RecordStats ( void )
 void CPerfStatPacketUsageImpl::GetStats ( CPerfStatResult* pResult, const std::map < SString, int >& strOptionMap, const SString& strFilter )
 {
     m_TimeSinceGetStats.Reset ();
+    MaybeRecordStats();
 
     //
     // Set option flags
@@ -276,6 +293,11 @@ void CPerfStatPacketUsageImpl::GetStats ( CPerfStatResult* pResult, const std::m
     pResult->AddColumn ( "Outgoing.pkt/sec" );
     pResult->AddColumn ( "Outgoing.bytes/sec" );
     pResult->AddColumn ( "Outgoing.cpu" );
+
+    if ( m_iStatsCleared )
+    {
+        pResult->AddRow ()[0] ="Sampling... Please wait";
+    }
 
     long long llTickCountNow = CTickCount::Now ().ToLongLong ();
     // Fill rows
