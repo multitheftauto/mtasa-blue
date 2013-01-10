@@ -173,7 +173,8 @@ protected:
     CGUILabel*          m_pMapAlphaValueLabel;
     CGUILabel*          m_pStreamingMemoryLabel;
     CGUIScrollBar*      m_pStreamingMemory;
-    CGUILabel*          m_pStreamingMemoryValueLabel;
+    CGUILabel*          m_pStreamingMemoryMinLabel;
+    CGUILabel*          m_pStreamingMemoryMaxLabel;
     CGUILabel*          m_pStreamingMemoryLabelInfo;
     CGUIButton*         m_pVideoDefButton;
 
@@ -297,7 +298,6 @@ protected:
     bool                OnDrawDistanceChanged   ( CGUIElement* pElement );
     bool                OnBrightnessChanged     ( CGUIElement* pElement );
     bool                OnAnisotropicChanged     ( CGUIElement* pElement );
-    bool                OnStreamingMemoryChanged( CGUIElement* pElement );
     bool                OnMapAlphaChanged       ( CGUIElement* pElement );
     bool                OnRadioVolumeChanged    ( CGUIElement* pElement );
     bool                OnSFXVolumeChanged      ( CGUIElement* pElement );
