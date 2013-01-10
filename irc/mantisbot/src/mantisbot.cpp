@@ -409,7 +409,7 @@ bool MantisBot::CheckForGoogleCodeChanges(const __ConfigProject& conf)
 {
     char tmp[HTTP_BUFFER_SIZE];
     std::string buffer;
-    size_t len;
+    ssize_t len;
 
     // Download the feed from the specified Google Code URL
     HTTPClient http(m_config.data.googlecode.address, m_httpGoogleCodeAddr, m_httpGoogleCodeBindAddr, false);
@@ -432,7 +432,8 @@ bool MantisBot::CheckForGoogleCodeChanges(const __ConfigProject& conf)
     while (stream.Eof() == false)
     {
         len = stream.Read(tmp, HTTP_BUFFER_SIZE);
-        buffer.append(tmp, len);
+        if ( len > 0 )
+            buffer.append(tmp, len);
     }
     
     // We got the feed, now start processing it's XML contents
@@ -523,7 +524,7 @@ bool MantisBot::CheckForMantisChanges()
 {
   char tmp[HTTP_BUFFER_SIZE];
   std::string buffer;
-  size_t len;
+  ssize_t len;
 
   HTTPClient http(m_config.data.mantis.address, m_httpMantisAddr, m_httpMantisBindAddr, m_config.data.mantis.ssl);
   http.Connect(m_config.data.mantis.path);
@@ -544,7 +545,8 @@ bool MantisBot::CheckForMantisChanges()
   while (stream.Eof() == false)
   {
     len = stream.Read(tmp, HTTP_BUFFER_SIZE);
-    buffer.append(tmp, len);
+    if ( len > 0 )
+        buffer.append(tmp, len);
   }
 
   int p;
