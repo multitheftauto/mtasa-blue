@@ -331,6 +331,8 @@ private:
 
     DWORD               m_dwType;
     unsigned char       m_ucOccupiedSeat;
+protected:
+    int                 m_iCustomMoveAnim;
 public:
                         CPedSA(  );
                         CPedSA( CPedSAInterface * pedInterface );
@@ -440,6 +442,8 @@ public:
     CWeaponStat*        GetCurrentWeaponStat    ( void );
     float               GetCurrentWeaponRange   ( void );
     void                AddWeaponAudioEvent     ( EPedWeaponAudioEventType audioEventType );
+
+    virtual int         GetCustomMoveAnim       ( void );
 };
 
 #endif

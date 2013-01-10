@@ -98,6 +98,7 @@ enum eFightingStyle
 
 enum eMoveAnim
 {
+    MOVE_DEFAULT = 0,
     MOVE_PLAYER = 54,
     MOVE_PLAYER_F,
     MOVE_PLAYER_M,
@@ -137,6 +138,13 @@ enum eMoveAnim
     MOVE_OLDFATWOMAN,
     MOVE_SKATE,
 };
+
+inline bool IsValidMoveAnim( uint iMoveAnim )
+{
+    return ( iMoveAnim == MOVE_DEFAULT ) ||
+           ( iMoveAnim >= MOVE_PLAYER && iMoveAnim <= MOVE_JETPACK ) ||
+           ( iMoveAnim >= MOVE_MAN    && iMoveAnim <= MOVE_SKATE );
+}
 
 enum { PLAYER_PED, CIVILIAN_PED };
 
@@ -248,6 +256,8 @@ public:
     virtual CWeaponStat*    GetCurrentWeaponStat    ( void ) = 0;
     virtual float           GetCurrentWeaponRange   ( void ) = 0;
     virtual void            AddWeaponAudioEvent     ( EPedWeaponAudioEventType audioEventType ) = 0;
+
+    virtual int             GetCustomMoveAnim       ( void ) = 0;
 };
 
 #endif

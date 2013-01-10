@@ -62,7 +62,7 @@ CPed::CPed ( CPedManager* pPedManager, CElement* pParent, CXMLNode* pNode, unsig
     m_fRotation = 0.0f;
     m_pTargetedEntity = NULL;
     m_ucFightingStyle = 15; // STYLE_GRAB_KICK
-    m_iMoveAnim = 54; // MOVE_PLAYER
+    m_iMoveAnim = MOVE_DEFAULT;
     m_fGravity = 0.008f;
     m_bDoingGangDriveby = false;
     m_bStealthAiming = false;

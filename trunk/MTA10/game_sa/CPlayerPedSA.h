@@ -72,6 +72,8 @@ public:
     VOID                ClearWeaponTarget           ( void );*/
 
     inline CPlayerPedSAInterface*   GetPlayerPedInterface   ( void )    { return static_cast < CPlayerPedSAInterface* > ( m_pInterface ); };
+
+    static void         StaticSetHooks              ( void );
 };
 
 #endif
