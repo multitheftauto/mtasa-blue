@@ -295,7 +295,7 @@ public:
     virtual void                GetStats            ( CPerfStatResult* pOutResult, const std::map < SString, int >& optionMap, const SString& strFilter ) = 0;
 
     // CPerfStatFunctionTiming
-    virtual void                UpdateTiming        ( const char* szFunctionName, TIMEUS timeUs ) = 0;
+    virtual void                UpdateTiming        ( const SString& strResourceName, const char* szFunctionName, TIMEUS timeUs, uint uiDeltaBytes ) = 0;
 
     static CPerfStatFunctionTiming*  GetSingleton        ( void );
 };

@@ -945,13 +945,17 @@ void CSettings::CreateGUI ( void )
     unsigned int uiMaxMemory = g_pCore->GetMaxStreamingMemory ();
 
     m_pStreamingMemory = reinterpret_cast < CGUIScrollBar* > ( pManager->CreateScrollBar ( true, pTabAdvanced ) );
-    m_pStreamingMemory->SetPosition ( CVector2D ( vecTemp.fX + 140.0f, vecTemp.fY - 0.f ) );
+    m_pStreamingMemory->SetPosition ( CVector2D ( vecTemp.fX + 164.0f, vecTemp.fY - 0.f ) );
     m_pStreamingMemory->SetSize ( CVector2D ( 130.0f, 20.0f ) );
     m_pStreamingMemory->SetProperty ( "StepSize", SString("%.07lf", 1.0 / (uiMaxMemory - uiMinMemory)) );
 
-    m_pStreamingMemoryValueLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "0 MB") );
-    m_pStreamingMemoryValueLabel->SetPosition ( CVector2D ( vecTemp.fX + 280.0f, vecTemp.fY ) );
-    m_pStreamingMemoryValueLabel->AutoSize ( "999 MB" );
+    m_pStreamingMemoryMinLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Min") );
+    m_pStreamingMemoryMinLabel->SetPosition ( CVector2D ( vecTemp.fX + 141.0f, vecTemp.fY ) );
+    m_pStreamingMemoryMinLabel->AutoSize ( m_pStreamingMemoryMinLabel->GetText ().c_str () );
+
+    m_pStreamingMemoryMaxLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Max") );
+    m_pStreamingMemoryMaxLabel->SetPosition ( CVector2D ( vecTemp.fX + 300.0f, vecTemp.fY ) );
+    m_pStreamingMemoryMaxLabel->AutoSize ( m_pStreamingMemoryMaxLabel->GetText ().c_str () );
 
     m_pStreamingMemoryLabelInfo = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Maximum is usually best" ) );
     m_pStreamingMemoryLabelInfo->SetPosition ( CVector2D ( vecTemp.fX + 342.f, vecTemp.fY - 0.f ) );
@@ -1012,7 +1016,6 @@ void CSettings::CreateGUI ( void )
     m_pMouseSensitivity->SetOnScrollHandler ( GUI_CALLBACK ( &CSettings::OnMouseSensitivityChanged, this ) );
     m_pComboFxQuality->SetSelectionHandler ( GUI_CALLBACK( &CSettings::OnFxQualityChanged, this ) );
     m_pCheckBoxVolumetricShadows->SetClickHandler ( GUI_CALLBACK( &CSettings::OnVolumetricShadowsClick, this ) );
-    m_pStreamingMemory->SetOnScrollHandler ( GUI_CALLBACK ( &CSettings::OnStreamingMemoryChanged, this ) );
     m_pCheckBoxAllowScreenUpload->SetClickHandler ( GUI_CALLBACK( &CSettings::OnAllowScreenUploadClick, this ) );
     m_pCheckBoxCustomizedSAFiles->SetClickHandler ( GUI_CALLBACK( &CSettings::OnCustomizedSAFilesClick, this ) );
     /*
@@ -1249,7 +1252,6 @@ void CSettings::UpdateVideoTab ( bool bIsVideoModeChanged )
     uiStreamingMemory = SharedUtil::Clamp ( g_pCore->GetMinStreamingMemory (), uiStreamingMemory, g_pCore->GetMaxStreamingMemory () );
     float fPos = SharedUtil::Unlerp ( g_pCore->GetMinStreamingMemory (), uiStreamingMemory, g_pCore->GetMaxStreamingMemory () );
     m_pStreamingMemory->SetScrollPosition ( fPos );
-    m_pStreamingMemoryValueLabel->SetText ( SString ( "%u MB", uiStreamingMemory ) );
 
     int iVar = 0;
     CVARS_GET ( "mapalpha", iVar );
@@ -2382,7 +2384,6 @@ void CSettings::LoadData ( void )
     uiStreamingMemory = SharedUtil::Clamp ( g_pCore->GetMinStreamingMemory (), uiStreamingMemory, g_pCore->GetMaxStreamingMemory () );
     float fPos = SharedUtil::Unlerp ( g_pCore->GetMinStreamingMemory (), uiStreamingMemory, g_pCore->GetMaxStreamingMemory () );
     m_pStreamingMemory->SetScrollPosition ( fPos );
-    m_pStreamingMemoryValueLabel->SetText ( SString ( "%u MB", uiStreamingMemory ) );
 }
 
 void CSettings::SaveData ( void )
@@ -3018,17 +3019,6 @@ bool CSettings::OnAnisotropicChanged ( CGUIElement* pElement )
         strLabel = "Off";
 
     m_pAnisotropicValueLabel->SetText ( strLabel );
-    return true;
-}
-
-bool CSettings::OnStreamingMemoryChanged ( CGUIElement* pElement )
-{
-    float fPos = m_pStreamingMemory->GetScrollPosition ();
-    int min = g_pCore->GetMinStreamingMemory ();
-    int max = g_pCore->GetMaxStreamingMemory ();
-    int value = SharedUtil::Lerp ( min, fPos, max );
-    m_pStreamingMemoryValueLabel->SetText ( SString("%i MB", value) );
-
     return true;
 }
 

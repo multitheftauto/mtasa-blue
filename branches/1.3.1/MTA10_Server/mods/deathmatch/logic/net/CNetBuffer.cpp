@@ -11,6 +11,7 @@
 #include "SimHeaders.h"
 
 uint g_uiThreadnetProcessorNumber = -1;
+uint g_uiNetSentByteCounter = 0;
 
 namespace
 {
@@ -838,6 +839,7 @@ void CNetServerBuffer::AddPacketStat ( CNetServer::ENetworkUsageDirection eDirec
     stat.iCount++;
     stat.iTotalBytes += iPacketSize;
     stat.totalTime += elapsedTime;
+    g_uiNetSentByteCounter += iPacketSize;
 }
 
 
