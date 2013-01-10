@@ -66,8 +66,9 @@ void FixIssue ( const std::string& author, int issueNumber, const std::string& l
     HTTPStream& stream = httpToken.GetStream (); 
     while ( stream.Eof() == false )
     {
-        size_t s = stream.Read ( tmp, sizeof(tmp) );
-        contents.append ( tmp, s );
+        ssize_t s = stream.Read ( tmp, sizeof(tmp) );
+        if ( s > 0 )
+            contents.append ( tmp, s );
     }
 
     // Look for the security token
