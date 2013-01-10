@@ -23,7 +23,8 @@ CResourceClientScriptItem::CResourceClientScriptItem ( CResource * resource, con
     m_type = RESOURCE_FILE_TYPE_CLIENT_SCRIPT;
 
     // Check if this file should be protected
-    if ( MapGet(m_attributeMap, "protected") == "true" )
+    if ( MapGet(m_attributeMap, "protected") == "true" ||
+         MapGet(m_attributeMap, "cache") == "false" )
         m_bIsProtected = true;
     else
         m_bIsProtected = false;
