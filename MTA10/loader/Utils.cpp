@@ -635,6 +635,15 @@ void HideSplash ( void )
 
 
 //
+// Return true if command line contains the string
+//
+bool CommandLineContains( const SString& strText )
+{
+    return SStringX( GetCommandLine() ).Contains( strText );
+}
+
+
+//
 // General error message box
 //
 long DisplayErrorMessageBox ( const SString& strMessage, const SString& strTroubleType )
