@@ -31,6 +31,7 @@
 #define RELEASE_MIN_CLIENT_VERSION              "1.4.0-0.00000"
 #define BULLET_SYNC_MIN_CLIENT_VERSION          "1.3.0-9.04311"
 #define VEH_EXTRAPOLATION_MIN_CLIENT_VERSION    "1.3.0-9.04460"
+#define ALT_PULSE_ORDER_MIN_CLIENT_VERSION      "1.3.1-9.04913"
 
 CGame* g_pGame = NULL;
 
@@ -4136,6 +4137,11 @@ SString CGame::CalculateMinClientRequirement ( void )
         if ( strNewMin < VEH_EXTRAPOLATION_MIN_CLIENT_VERSION )
             strNewMin = VEH_EXTRAPOLATION_MIN_CLIENT_VERSION;
     }
+    if ( m_pMainConfig->GetUseAltPulseOrder () )
+    {
+        if ( strNewMin < ALT_PULSE_ORDER_MIN_CLIENT_VERSION )
+            strNewMin = ALT_PULSE_ORDER_MIN_CLIENT_VERSION;
+    }
 
     if ( strNewMin != m_strPrevMinClientConnectRequirement )
     {
@@ -4159,6 +4165,11 @@ SString CGame::CalculateMinClientRequirement ( void )
         {
             if ( strKickMin < VEH_EXTRAPOLATION_MIN_CLIENT_VERSION )
                 strKickMin = VEH_EXTRAPOLATION_MIN_CLIENT_VERSION;
+        }
+        if ( m_pMainConfig->GetUseAltPulseOrder () )
+        {
+            if ( strKickMin < ALT_PULSE_ORDER_MIN_CLIENT_VERSION )
+                strKickMin = ALT_PULSE_ORDER_MIN_CLIENT_VERSION;
         }
 
         if ( strKickMin != m_strPrevMinClientKickRequirement )
