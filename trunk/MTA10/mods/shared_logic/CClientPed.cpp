@@ -5345,8 +5345,15 @@ void CClientPed::PostWeaponFire ( void )
 
 void CClientPed::SetBulletImpactData ( CClientEntity* pEntity, const CVector& vecHitPosition )
 {
+    // Clear old entity if new impact info
+    if ( !m_bBulletImpactData )
+        m_pBulletImpactEntity = NULL;
+
     m_bBulletImpactData = true;
-    m_pBulletImpactEntity = pEntity;
+
+    // Only update entity if not NULL to prevent losing previous value. (Shotguns cause multiple calls per shot)
+    if ( pEntity )
+        m_pBulletImpactEntity = pEntity;
     m_vecBulletImpactHit = vecHitPosition;
 }
 
