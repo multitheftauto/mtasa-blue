@@ -117,6 +117,7 @@ public:
     int                             GetVehExtrapolatePercent        ( void ) const              { return m_iVehExtrapolatePercent; }
     int                             GetVehExtrapolatePingLimit      ( void ) const              { return m_iVehExtrapolatePingLimit; }
     bool                            GetVerifyMemory                 ( void ) const              { return m_bVerifyMemory != 0; }
+    bool                            GetUseAltPulseOrder             ( void ) const              { return m_bUseAltPulseOrder != 0; }
 
     SString                         GetSetting                      ( const SString& configSetting );
     bool                            GetSetting                      ( const SString& configSetting, SString& strValue );
@@ -195,6 +196,7 @@ private:
     SNetOptions                     m_NetOptions;
     int                             m_iVehExtrapolatePercent;
     int                             m_iVehExtrapolatePingLimit;
+    int                             m_bUseAltPulseOrder;
     int                             m_bNetAutoFilter;
     int                             m_bVerifyMemory;
 };

@@ -1254,6 +1254,7 @@ const std::vector < SIntSetting >& CMainConfig::GetIntSettingList ( void )
             { true, true,   0,      0,      1,      "bullet_sync",                          &m_bBulletSyncEnabled,                      &CMainConfig::OnTickRateChange },
             { true, true,   0,      0,      120,    "vehext_percent",                       &m_iVehExtrapolatePercent,                  &CMainConfig::OnTickRateChange },
             { true, true,   0,      150,    500,    "vehext_ping_limit",                    &m_iVehExtrapolatePingLimit,                &CMainConfig::OnTickRateChange },
+            { true, true,   0,      0,      1,      "latency_reduction",                    &m_bUseAltPulseOrder,                       &CMainConfig::OnTickRateChange },
             { true, true,   0,      1,      2,      "ase",                                  &m_iAseMode,                                &CMainConfig::OnAseSettingChange },
             { true, true,   0,      1,      1,      "donotbroadcastlan",                    &m_bDontBroadcastLan,                       &CMainConfig::OnAseSettingChange },
             { true, true,   0,      1,      1,      "net_auto_filter",                      &m_bNetAutoFilter,                          &CMainConfig::ApplyNetOptions },

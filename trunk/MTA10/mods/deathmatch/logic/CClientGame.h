@@ -66,6 +66,7 @@ struct SVehExtrapolateSettings
     int iBaseMs;
     int iScalePercent;
     int iMaxMs;
+    bool bAlwaysUseAltPulseOrder;
 };
 
 class CClientGame
