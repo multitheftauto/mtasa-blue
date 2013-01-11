@@ -593,6 +593,8 @@ DontInstallRedist:
                     CreateShortcut "$APPDATA\Microsoft\Windows\GameExplorer\$0\SupportTasks\0\Client Manual.lnk" \ "http://wiki.multitheftauto.com/wiki/Client_Manual"
                 ${EndIf}
             ${EndIf}
+
+            Call DoServiceInstall
 		SectionEnd
 
 		Section "Game module" SEC02
@@ -861,6 +863,7 @@ Section Uninstall
 		MessageBox MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2 "Would you like to keep your data files (such as resources, screenshots and server configuration)? If you click no, any resources, configurations or screenshots you have created will be lost." IDYES preservemapsfolder
 
 		deleteall:
+        Call un.DoServiceUninstall
 		RmDir /r "$INSTDIR\mods"
 		RmDir /r "$INSTDIR\MTA"
 
@@ -875,6 +878,7 @@ Section Uninstall
 		!endif ; end of fix for #3889
 
 		preservemapsfolder:
+        Call un.DoServiceUninstall
 		; server CORE FILES
 		!ifdef INCLUDE_SERVER
 			Delete "$INSTDIR\server\core.dll"
@@ -1803,4 +1807,36 @@ Function DoesDirExist
     IfFileExists "$0\*.*" alreadyexists
         StrCpy $1 0
     alreadyexists:
+FunctionEnd
+
+
+;****************************************************************
+;
+; Service maintenance
+;
+;****************************************************************
+Var ServiceModified
+
+Function DoServiceInstall
+    ${If} $ServiceModified != 1
+        ; Check loader can do command
+        GetDLLVersion "$INSTDIR\mta\loader.dll" $R0 $R1
+        IntOp $R5 $R1 & 0x0000FFFF ; $R5 now contains build
+        ${If} $R5 > 4909
+            Exec '"$INSTDIR\Multi Theft Auto.exe" /nolaunch /kdinstall'
+            StrCpy $ServiceModified 1
+        ${EndIf}
+    ${EndIf}
+FunctionEnd
+
+Function un.DoServiceUninstall
+    ${If} $ServiceModified != 2
+        ; Check loader can do command
+        GetDLLVersion "$INSTDIR\mta\loader.dll" $R0 $R1
+        IntOp $R5 $R1 & 0x0000FFFF ; $R5 now contains build
+        ${If} $R5 > 4909
+            Exec '"$INSTDIR\Multi Theft Auto.exe" /nolaunch /kduninstall'
+            StrCpy $ServiceModified 2
+        ${EndIf}
+    ${EndIf}
 FunctionEnd

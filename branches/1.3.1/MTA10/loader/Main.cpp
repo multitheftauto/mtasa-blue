@@ -36,13 +36,30 @@ int WINAPI WinMain ( HINSTANCE _hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
 #endif
 
     //////////////////////////////////////////////////////////
+    // Handle service install request from the installer
+    if ( CommandLineContains( "/kdinstall" ) )
+    {
+        UpdateMTAVersionApplicationSetting( true );
+        if ( CheckService( CHECK_SERVICE_POST_INSTALL ) )
+            return 0;
+        return 1;
+    }
+
+    //////////////////////////////////////////////////////////
     // Handle service uninstall request from the installer
-    if ( strcmp( lpCmdLine, "/kduninstall" ) == 0 )
+    if ( CommandLineContains( "/kduninstall" ) )
     {
         UpdateMTAVersionApplicationSetting( true );
         if ( CheckService( CHECK_SERVICE_PRE_UNINSTALL ) )
             return 0;
         return 1;
+    }
+
+    //////////////////////////////////////////////////////////
+    // No run 4 sure check
+    if ( CommandLineContains( "/nolaunch" ) )
+    {
+        return 0;
     }
 
     //////////////////////////////////////////////////////////

@@ -45,6 +45,7 @@ bool            IsOtherMTARunning                   ( void );
 void            ShowSplash                          ( HINSTANCE hInstance );
 void            HideSplash                          ( void );
 
+bool            CommandLineContains                 ( const SString& strText );
 long            DisplayErrorMessageBox              ( const SString& strMessage, const SString& strTroubleType = "" );
 
 void            SetMTASAPathSource                  ( bool bReadFromRegistry );

@@ -5844,7 +5844,7 @@ bool CClientGame::IsVehicleOnlyGameMode( void )
 //////////////////////////////////////////////////////////////////
 bool CClientGame::IsUsingAlternatePulseOrder( bool bAdvanceDelayCounter )
 {
-    if ( m_VehExtrapolateSettings.bEnabled && m_bVehicleOnlyGameMode )
+    if ( m_VehExtrapolateSettings.bAlwaysUseAltPulseOrder || ( m_VehExtrapolateSettings.bEnabled && m_bVehicleOnlyGameMode ) )
     {
         // Only actually start using alternate pulse order after 100 frames
         if ( m_uiAltPulseOrderCounter >= 100 )

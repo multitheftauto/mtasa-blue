@@ -4020,8 +4020,9 @@ void CGame::SendSyncSettings ( CPlayer* pPlayer )
     short sVehExtrapolatePercent = m_pMainConfig->GetVehExtrapolatePercent ();
     short sVehExtrapolateMaxMs = m_pMainConfig->GetVehExtrapolatePingLimit ();
     uchar ucVehExtrapolateEnabled = sVehExtrapolatePercent != 0;
+    uchar ucUseAltPulseOrder = m_pMainConfig->GetUseAltPulseOrder () != 0;
 
-    CSyncSettingsPacket packet ( weaponTypesUsingBulletSync, ucVehExtrapolateEnabled, sVehExtrapolateBaseMs, sVehExtrapolatePercent, sVehExtrapolateMaxMs );
+    CSyncSettingsPacket packet ( weaponTypesUsingBulletSync, ucVehExtrapolateEnabled, sVehExtrapolateBaseMs, sVehExtrapolatePercent, sVehExtrapolateMaxMs, ucUseAltPulseOrder );
     if ( pPlayer )
         pPlayer->Send ( packet );
     else
