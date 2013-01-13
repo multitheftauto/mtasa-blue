@@ -55,6 +55,7 @@
 #include "CLocalServer.h"
 #include "CVoiceRecorder.h"
 #include "CSingularFileDownloadManager.h"
+#include "CObjectRespawner.h"
 #define HeliKill_List_Clear_Rate 500
 #define MIN_PUSH_ANTISPAM_RATE 1500
 class CGameEntityXRefManager;
@@ -278,6 +279,7 @@ public:
     inline CClientModelCacheManager*    GetModelCacheManager            ( void )        { return m_pModelCacheManager; }
 
     inline CElementDeleter*             GetElementDeleter               ( void )        { return &m_ElementDeleter; }
+    inline CObjectRespawner*            GetObjectRespawner              ( void )        { return &m_ObjectRespawner; }
 
     // Status toggles
     void                                ShowNetstat                     ( int iCmd );
@@ -474,6 +476,8 @@ private:
     static bool                         StaticProcessCollisionHandler   ( CEntitySAInterface* pThisInterface, CEntitySAInterface* pOtherInterface );
     static bool                         StaticVehicleCollisionHandler   ( CVehicleSAInterface* pThisInterface, CEntitySAInterface* pOtherInterface, int iModelIndex, float fDamageImpulseMag, float fCollidingDamageImpulseMag, uint16 usPieceType, CVector vecCollisionPos, CVector vecCollisionVelocity  );
     static bool                         StaticHeliKillHandler           ( CVehicleSAInterface* pHeli, CPedSAInterface* pPed );
+    static bool                         StaticObjectDamageHandler       ( CObjectSAInterface* pObjectInterface, float fLoss );
+    static bool                         StaticObjectBreakHandler        ( CObjectSAInterface* pObjectInterface );
     static bool                         StaticWaterCannonHandler        ( CVehicleSAInterface* pCannonVehicle, CPedSAInterface* pHitPed );
     static void                         StaticGameObjectDestructHandler     ( CEntitySAInterface* pObject );
     static void                         StaticGameVehicleDestructHandler    ( CEntitySAInterface* pVehicle );
@@ -496,6 +500,8 @@ private:
     bool                                ProcessCollisionHandler         ( CEntitySAInterface* pThisInterface, CEntitySAInterface* pOtherInterface );
     bool                                VehicleCollisionHandler         ( CVehicleSAInterface* pCollidingVehicle, CEntitySAInterface* pCollidedVehicle, int iModelIndex, float fDamageImpulseMag, float fCollidingDamageImpulseMag, uint16 usPieceType, CVector vecCollisionPos, CVector vecCollisionVelocity  );
     bool                                HeliKillHandler                 ( CVehicleSAInterface* pHeli, CPedSAInterface* pPed );
+	bool                                ObjectDamageHandler             ( CObjectSAInterface* pObjectInterface, float fLoss );
+	bool                                ObjectBreakHandler              ( CObjectSAInterface* pObjectInterface );
     bool                                WaterCannonHitHandler           ( CVehicleSAInterface* pCannonVehicle, CPedSAInterface* pHitPed );
     void                                GameObjectDestructHandler       ( CEntitySAInterface* pObject );
     void                                GameVehicleDestructHandler      ( CEntitySAInterface* pVehicle );
@@ -580,6 +586,7 @@ private:
     CResourceManager*                   m_pResourceManager;
     CScriptKeyBinds*                    m_pScriptKeyBinds;
     CElementDeleter                     m_ElementDeleter;
+    CObjectRespawner                    m_ObjectRespawner;
     CZoneNames*                         m_pZoneNames;
     CPacketHandler*                     m_pPacketHandler;
     CLocalServer*                       m_pLocalServer;

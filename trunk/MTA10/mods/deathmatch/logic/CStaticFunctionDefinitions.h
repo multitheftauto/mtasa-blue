@@ -249,6 +249,7 @@ public:
     static bool                         IsObjectStatic                      ( CClientObject& Object, bool & bStatic );
     static bool                         GetObjectScale                      ( CClientObject& Object, float& fScale );
     static bool                         IsObjectBreakable                   ( CClientObject& Object, bool& bBreakable );
+    static bool                         IsObjectBlown                       ( CClientObject& Object, bool& bBlown );
 
     // Object set funcs
     static bool                         SetObjectRotation                   ( CClientEntity& Entity, const CVector& vecRotation );
@@ -257,6 +258,8 @@ public:
     static bool                         SetObjectScale                      ( CClientEntity& Entity, float fScale );
     static bool                         SetObjectStatic                     ( CClientEntity& Entity, bool bStatic );
     static bool                         SetObjectBreakable                  ( CClientEntity& Entity, bool bBreakable );
+    static bool                         BreakObject                         ( CClientEntity& Entity );
+    static bool                         RespawnObject                       ( CClientEntity& Entity );
     
     // Radar-area get funcs
     static CClientRadarArea*            CreateRadarArea                     ( CResource& Resource, const CVector2D& vecPosition2D, const CVector2D& vecSize, const SColor color );

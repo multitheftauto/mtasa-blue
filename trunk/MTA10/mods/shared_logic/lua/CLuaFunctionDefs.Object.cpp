@@ -143,6 +143,29 @@ int CLuaFunctionDefs::IsObjectBreakable ( lua_State* luaVM )
 }
 
 
+int CLuaFunctionDefs::IsObjectBlown ( lua_State* luaVM )
+{
+//  bool isObjectBlown ( object theObject )
+    CClientObject* pObject;
+    bool bBlown;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pObject );
+    if ( !argStream.HasErrors () )
+    {
+        if ( CStaticFunctionDefinitions::IsObjectBlown ( *pObject, bBlown ) )
+        {
+            lua_pushboolean ( luaVM, bBlown );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
 int CLuaFunctionDefs::MoveObject ( lua_State* luaVM )
 {
 //  bool moveObject ( object theObject, int time, float targetx, float targety, float targetz,
@@ -253,6 +276,7 @@ int CLuaFunctionDefs::SetObjectStatic ( lua_State* luaVM )
     return 1;
 }
 
+
 int CLuaFunctionDefs::SetObjectBreakable ( lua_State* luaVM )
 {
     //  bool setObjectBreakable ( object theObject, bool bBreakable )
@@ -273,6 +297,52 @@ int CLuaFunctionDefs::SetObjectBreakable ( lua_State* luaVM )
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::BreakObject ( lua_State* luaVM )
+{
+//  bool breakObject( object theObject )
+    CClientEntity* pEntity;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pEntity );
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( CStaticFunctionDefinitions::BreakObject ( *pEntity ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefs::RespawnObject ( lua_State* luaVM )
+{
+//	bool respawnObject ( object theObject )
+    CClientEntity* pEntity;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pEntity );
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( CStaticFunctionDefinitions::RespawnObject ( *pEntity ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
 
     lua_pushboolean ( luaVM, false );
     return 1;

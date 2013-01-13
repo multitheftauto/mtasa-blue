@@ -505,6 +505,10 @@
 					</FileConfiguration>
 				</File>
 				<File
+					RelativePath=".\CObjectRespawner.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\logic\CObjectSync.cpp"
 					>
 				</File>
@@ -1932,6 +1936,10 @@
 				</File>
 				<File
 					RelativePath=".\logic\CNetworkStats.h"
+					>
+				</File>
+				<File
+					RelativePath=".\CObjectRespawner.h"
 					>
 				</File>
 				<File

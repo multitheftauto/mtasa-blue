@@ -28,32 +28,33 @@
 class CObjectInfo
 {
 public:
-	float fMass;
-	float fTurnMass;
-	float fAirResistance;
-	float fElasticity;
-	float fBuoyancy;
-	float fUprootLimit;
-	float fColDamageMultiplier;
-	uint8 ucColDamageEffect;
-	uint8 ucSpecialColResponseCase;
-	uint8 ucCameraAvoidObject;
-	uint8 ucCausesExplosion;
-	uint8 ucFxType;
-	uint8 pad1[3];
-	CVector vecFxOffset;
-	void* pFxSystem; // ret from CParticleData::GetDataFromName
-	float fSmashMultiplier;
-	CVector vecBreakVelocity;
-	float fBreakVelocityRand;
-	uint32 uiGunBreakMode;
-	uint32 uiSparksOnImpact;
+	float fMass; // 0
+	float fTurnMass; // 4
+	float fAirResistance; // 8
+	float fElasticity; // 12
+	float fBuoyancy; // 16
+	float fUprootLimit; // 20
+	float fColDamageMultiplier; // 24
+	uint8 ucColDamageEffect; // 28
+	uint8 ucSpecialColResponseCase; // 29
+	uint8 ucCameraAvoidObject; // 30
+	uint8 ucCausesExplosion; // 31
+	uint8 ucFxType; // 32
+	uint8 pad1[3]; // 33
+	CVector vecFxOffset; // 36
+	void* pFxSystem; // ret from CParticleData::GetDataFromName // 48
+	float fSmashMultiplier; // 52
+	CVector vecBreakVelocity; // 56
+	float fBreakVelocityRand; // 68
+	uint32 uiGunBreakMode; // 72
+	uint32 uiSparksOnImpact; // 76
 };
 // TODO: Find out correct size
 //C_ASSERT(sizeof(CObjectInfo) == 0x50);
 
 class CObjectSAInterface : public CPhysicalSAInterface
 {
+public:
 	void* pObjectList; // 312
 	uint8 pad1; // 316
 	uint8 pad2; // 317
@@ -66,7 +67,7 @@ class CObjectSAInterface : public CPhysicalSAInterface
 	uint32 b0x08 : 1;
 	uint32 b0x10 : 1;
 	uint32 b0x20 : 1;
-	uint32 b0x40 : 1;
+	uint32 bExploded : 1;
 	uint32 b0x80 : 1;
 
 	uint32 b0x100 : 1; // 321
@@ -108,7 +109,7 @@ class CObjectSAInterface : public CPhysicalSAInterface
 	uint8 pad12; // 334
 	uint8 pad13; // 335
 	uint32 uiObjectRemovalTime; // 336
-	uint32 pad14; // 340
+	float fHealth; // 340
 	uint32 pad15; // 344
 	float fScale; // 348
 	CObjectInfo* pObjectInfo; // 352
@@ -137,6 +138,7 @@ public:
 
     void                        Explode             ( void );
     void                        Break               ( void );
+    bool                        IsBlown             ( void );
     void                        SetScale            ( float fScale );
     void                        SetHealth           ( float fHealth );
     float                       GetHealth           ( void );

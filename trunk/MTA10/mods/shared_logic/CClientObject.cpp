@@ -441,7 +441,7 @@ void CClientObject::StreamOut ( void )
     m_pModelRequester->Cancel ( this, true );
 }
 
-
+// Don't call this function directly by lua functions
 void CClientObject::ReCreate ( void )
 {
     if ( m_pObject )
@@ -659,9 +659,29 @@ bool CClientObject::SetBreakable ( bool bBreakable )
     if ( CClientObjectManager::IsBreakableModel ( m_usModel ) && m_bBreakable != bBreakable )
     {
         m_bBreakable = bBreakable;
-        // Re-create us
-        ReCreate ( );
+        // We can't use ReCreate directly (otherwise the game will crash)
+        g_pClientGame->GetObjectRespawner ()->Respawn ( this );
         return true;
+    }
+    return false;
+}
+
+bool CClientObject::Break ( void )
+{
+    // Are we breakable?
+    if ( m_pObject && m_bBreakable )
+    {
+        m_pObject->Break ();
+        return true;
+    }
+    return false;
+}
+
+bool CClientObject::IsBlown ( void )
+{
+    if ( m_pObject )
+    {
+        return m_pObject->IsBlown ();
     }
     return false;
 }
