@@ -625,12 +625,15 @@ void DirectX9Renderer::renderQuadDirect(const Rect& dest_rect, float z, const Te
 void DirectX9Renderer::preD3DReset(void)
 {
 	// release the buffer prior to the reset call (will be re-created later)
-	if (FAILED(d_buffer->Release()))
-	{
-		throw RendererException("DirectX9Renderer::preD3DReset - Failed to release the VertexBuffer used by the DirectX9Renderer object.");
-	}
+    if ( d_buffer )
+    {
+        if (FAILED(d_buffer->Release()))
+        {
+            throw RendererException("DirectX9Renderer::preD3DReset - Failed to release the VertexBuffer used by the DirectX9Renderer object.");
+        }
 
-	d_buffer = 0;
+        d_buffer = 0;
+    }
 
 	// perform pre-reset operations on all textures
 	std::list<DirectX9Texture*>::iterator ctex = d_texturelist.begin();
