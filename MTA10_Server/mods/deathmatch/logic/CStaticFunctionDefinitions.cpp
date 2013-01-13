@@ -5728,10 +5728,12 @@ bool CStaticFunctionDefinitions::SetEntryHandling ( CHandlingEntry* pEntry, eHan
             }
             case HANDLING_ANIMGROUP:
             {
-                if ( ucValue >= 0 && ucValue <= 29 
-                    && ucValue != 3 && ucValue != 8 
-                    && ucValue != 17 && ucValue != 23 ) 
+                if ( ucValue >= 0 && ucValue <= 29 )
                 {
+                    if ( ucValue != 3 && ucValue != 8 
+                        && ucValue != 17 && ucValue != 23 ) 
+                        return true;    // Pretend it worked to avoid script warnings
+
                     pEntry->SetAnimGroup ( ucValue );
                     return true;
                 }
@@ -5889,7 +5891,7 @@ bool CStaticFunctionDefinitions::SetEntryHandling ( CHandlingEntry* pEntry, eHan
             }
             case HANDLING_SUSPENSION_UPPER_LIMIT:
             {
-                if ( fValue >= -50.0 && fValue <= 50 && ( fValue <= pEntry->GetSuspensionLowerLimit() - 0.1 || fValue >= pEntry->GetSuspensionLowerLimit() + 0.1 ) ) // Lower and Upper limits cannot match or LSOD
+                if ( fValue >= -50.0 && fValue <= 50 )
                 {
                     pEntry->SetSuspensionUpperLimit ( fValue );
                     return true;
@@ -5898,7 +5900,7 @@ bool CStaticFunctionDefinitions::SetEntryHandling ( CHandlingEntry* pEntry, eHan
             }
             case HANDLING_SUSPENSION_LOWER_LIMIT:
             {
-                if ( fValue >= -50.0 && fValue <= 50 && ( fValue <= pEntry->GetSuspensionUpperLimit() - 0.1 || fValue >= pEntry->GetSuspensionUpperLimit() ) ) // Lower and Upper limits cannot match or LSOD
+                if ( fValue >= -50.0 && fValue <= 50 )
                 {
                     pEntry->SetSuspensionLowerLimit ( fValue );
                     return true;
@@ -7196,6 +7198,19 @@ bool CStaticFunctionDefinitions::ResetVehicleHandling ( CVehicle* pVehicle, bool
         //handling.data.ucHeadLight                 = pNewEntry->GetHeadLight ();
         //handling.data.ucTailLight                 = pNewEntry->GetTailLight ();
         handling.data.ucAnimGroup                   = pNewEntry->GetAnimGroup ();
+
+        // Lower and Upper limits cannot match or LSOD (unless boat)
+        //if ( eModel != VEHICLE_BOAT )     // Commented until fully tested
+        {
+            float fSuspensionLimitSize = handling.data.fSuspensionUpperLimit - handling.data.fSuspensionLowerLimit;
+            if ( fSuspensionLimitSize > -0.1f && fSuspensionLimitSize < 0.1f )
+            {
+                if ( fSuspensionLimitSize >= 0.f )
+                    handling.data.fSuspensionUpperLimit = handling.data.fSuspensionLowerLimit + 0.1f;
+                else
+                    handling.data.fSuspensionUpperLimit = handling.data.fSuspensionLowerLimit - 0.1f;
+            }
+        }
 
         BitStream.pBitStream->Write ( &handling );
         m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pVehicle, SET_VEHICLE_HANDLING, *BitStream.pBitStream ) );
