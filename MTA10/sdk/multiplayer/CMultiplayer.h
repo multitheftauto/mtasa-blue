@@ -171,8 +171,8 @@ public:
     virtual void                        SetProcessCollisionHandler  ( ProcessCollisionHandler * pHandler ) = 0;
     virtual void                        SetVehicleCollisionHandler  ( VehicleCollisionHandler * pHandler ) = 0;
     virtual void                        SetHeliKillHandler          ( HeliKillHandler * pHandler ) = 0;
-	virtual void                        SetObjectDamageHandler      ( ObjectDamageHandler * pHandler ) = 0;
-	virtual void                        SetObjectBreakHandler       ( ObjectBreakHandler * pHandler ) = 0;
+    virtual void                        SetObjectDamageHandler      ( ObjectDamageHandler * pHandler ) = 0;
+    virtual void                        SetObjectBreakHandler       ( ObjectBreakHandler * pHandler ) = 0;
     virtual void                        SetWaterCannonHitHandler    ( WaterCannonHitHandler * pHandler ) = 0;
     virtual void                        SetGameObjectDestructHandler    ( GameObjectDestructHandler * pHandler ) = 0;
     virtual void                        SetGameVehicleDestructHandler   ( GameVehicleDestructHandler * pHandler ) = 0;

@@ -328,7 +328,7 @@ int CLuaFunctionDefs::BreakObject ( lua_State* luaVM )
 
 int CLuaFunctionDefs::RespawnObject ( lua_State* luaVM )
 {
-//	bool respawnObject ( object theObject )
+//  bool respawnObject ( object theObject )
     CClientEntity* pEntity;
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pEntity );

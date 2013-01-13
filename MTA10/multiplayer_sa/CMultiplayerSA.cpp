@@ -671,7 +671,7 @@ void CMultiplayerSA::InitHooks()
 
     HookInstall( (DWORD)HOOKPOS_CHeli_ProcessHeliKill, (DWORD)HOOK_CHeli_ProcessHeliKill, 6);
 
-	// Hooks for object break events
+    // Hooks for object break events
     HookInstall ( HOOKPOS_CObject_ProcessDamage, (DWORD)HOOK_CObject_ProcessDamage, 6 );
     HookInstall ( HOOKPOS_CObject_ProcessBreak, (DWORD)HOOK_CObject_ProcessBreak, 5 );
     HookInstall ( HOOKPOS_CObject_ProcessCollision, (DWORD)HOOK_CObject_ProcessCollision, 10 );
