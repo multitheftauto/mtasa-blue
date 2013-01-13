@@ -65,6 +65,8 @@ typedef void ( BlendAnimationHandler ) ( RpClump * pClump, AssocGroupId animGrou
 typedef bool ( ProcessCollisionHandler ) ( class CEntitySAInterface* pThisInterface, class CEntitySAInterface* pOtherInterface );
 typedef bool ( VehicleCollisionHandler ) ( class CVehicleSAInterface* pCollidingVehicle, class CEntitySAInterface* pCollidedVehicle, int iModelIndex, float fDamageImpulseMag, float fCollidingDamageImpulseMag, uint16 usPieceType, CVector vecCollisionPos, CVector vecCollisionVelocity );
 typedef bool ( HeliKillHandler ) ( class CVehicleSAInterface* pVehicle, class CPedSAInterface* pPed );
+typedef bool ( ObjectDamageHandler ) ( class CObjectSAInterface* pObject, float fLoss );
+typedef bool ( ObjectBreakHandler ) ( class CObjectSAInterface* pObject );
 typedef bool ( WaterCannonHitHandler ) ( class CVehicleSAInterface* pCannonVehicle, class CPedSAInterface* pHitPed );
 typedef void ( GameObjectDestructHandler ) ( CEntitySAInterface* pObject );
 typedef void ( GameVehicleDestructHandler ) ( CEntitySAInterface* pVehicle );
@@ -169,6 +171,8 @@ public:
     virtual void                        SetProcessCollisionHandler  ( ProcessCollisionHandler * pHandler ) = 0;
     virtual void                        SetVehicleCollisionHandler  ( VehicleCollisionHandler * pHandler ) = 0;
     virtual void                        SetHeliKillHandler          ( HeliKillHandler * pHandler ) = 0;
+	virtual void                        SetObjectDamageHandler      ( ObjectDamageHandler * pHandler ) = 0;
+	virtual void                        SetObjectBreakHandler       ( ObjectBreakHandler * pHandler ) = 0;
     virtual void                        SetWaterCannonHitHandler    ( WaterCannonHitHandler * pHandler ) = 0;
     virtual void                        SetGameObjectDestructHandler    ( GameObjectDestructHandler * pHandler ) = 0;
     virtual void                        SetGameVehicleDestructHandler   ( GameVehicleDestructHandler * pHandler ) = 0;

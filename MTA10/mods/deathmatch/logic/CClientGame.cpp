@@ -252,6 +252,8 @@ CClientGame::CClientGame ( bool bLocalPlay )
     g_pMultiplayer->SetProcessCollisionHandler ( CClientGame::StaticProcessCollisionHandler );
     g_pMultiplayer->SetVehicleCollisionHandler( CClientGame::StaticVehicleCollisionHandler );
     g_pMultiplayer->SetHeliKillHandler ( CClientGame::StaticHeliKillHandler );
+    g_pMultiplayer->SetObjectDamageHandler ( CClientGame::StaticObjectDamageHandler );
+    g_pMultiplayer->SetObjectBreakHandler ( CClientGame::StaticObjectBreakHandler );
     g_pMultiplayer->SetWaterCannonHitHandler ( CClientGame::StaticWaterCannonHandler );
     g_pMultiplayer->SetGameObjectDestructHandler( CClientGame::StaticGameObjectDestructHandler );
     g_pMultiplayer->SetGameVehicleDestructHandler( CClientGame::StaticGameVehicleDestructHandler );
@@ -1129,6 +1131,9 @@ void CClientGame::DoPulses ( void )
 
         // Ensure replaced/restored textures for models in the GTA map are correct
         g_pGame->FlushPendingRestreamIPL ();
+
+        // Respawn objects in respawn pool
+        m_ObjectRespawner.DoRespawnAll ();
     }
 
     // Are we connecting?
@@ -2760,6 +2765,10 @@ void CClientGame::AddBuiltInEvents ( void )
     m_Events.AddEvent ( "onClientSoundStopped", "reason", NULL, false );
     m_Events.AddEvent ( "onClientSoundBeat", "time", NULL, false );
 
+    // Object events
+    m_Events.AddEvent ( "onClientObjectDamage", "loss", NULL, false );
+    m_Events.AddEvent ( "onClientObjectBreak", "", NULL, false );
+
     // Misc events
     m_Events.AddEvent ( "onClientFileDownloadComplete", "fileName, success", NULL, false );
     
@@ -3572,6 +3581,16 @@ bool CClientGame::StaticHeliKillHandler ( CVehicleSAInterface* pHeliInterface, C
     return g_pClientGame->HeliKillHandler ( pHeliInterface, pPed );
 }
 
+bool CClientGame::StaticObjectDamageHandler ( CObjectSAInterface* pObjectInterface, float fLoss )
+{
+    return g_pClientGame->ObjectDamageHandler ( pObjectInterface, fLoss );
+}
+
+bool CClientGame::StaticObjectBreakHandler ( CObjectSAInterface* pObjectInterface )
+{
+    return g_pClientGame->ObjectBreakHandler ( pObjectInterface );
+}
+
 bool CClientGame::StaticWaterCannonHandler ( CVehicleSAInterface* pCannonVehicle, CPedSAInterface* pHitPed )
 {
     return g_pClientGame->WaterCannonHitHandler ( pCannonVehicle, pHitPed );
@@ -4349,6 +4368,42 @@ bool CClientGame::HeliKillHandler ( CVehicleSAInterface* pHeliInterface, CPedSAI
             }
             // Return if it was cancelled
             return bContinue;
+        }
+    }
+    return true;
+}
+
+bool CClientGame::ObjectDamageHandler ( CObjectSAInterface* pObjectInterface, float fLoss )
+{
+    if ( pObjectInterface )
+    {
+        // Get our object and client object
+        CObject * pObject = g_pGame->GetPools ( )->GetObjectA( (DWORD *)pObjectInterface );
+        CClientObject * pClientObject = m_pManager->GetObjectManager ( )->GetSafe( pObject );
+
+        // Is our client vehicle valid?
+        if ( pClientObject )
+        {
+            CLuaArguments Arguments;
+            Arguments.PushNumber( fLoss );
+            return pClientObject->CallEvent ( "onClientObjectDamage", Arguments, true );
+        }
+    }
+    return true;
+}
+
+bool CClientGame::ObjectBreakHandler ( CObjectSAInterface* pObjectInterface )
+{
+    if ( pObjectInterface )
+    {
+        // Get our object and client object
+        CObject * pObject = g_pGame->GetPools ( )->GetObjectA( (DWORD *)pObjectInterface );
+        CClientObject * pClientObject = m_pManager->GetObjectManager ( )->GetSafe( pObject );
+        // Is our client vehicle valid?
+        if ( pClientObject )
+        {
+            CLuaArguments Arguments;
+            return pClientObject->CallEvent ( "onClientObjectBreak", Arguments, true );
         }
     }
     return true;

@@ -3307,6 +3307,12 @@ bool CStaticFunctionDefinitions::IsObjectBreakable ( CClientObject& Object, bool
     return true;
 }
 
+bool CStaticFunctionDefinitions::IsObjectBlown ( CClientObject& Object, bool& bBlown )
+{
+    bBlown = Object.IsBlown ();
+    return true;
+}
+
 bool CStaticFunctionDefinitions::SetObjectRotation ( CClientEntity& Entity, const CVector& vecRotation )
 {
     RUN_CHILDREN SetObjectRotation ( **iter, vecRotation );
@@ -3414,6 +3420,36 @@ bool CStaticFunctionDefinitions::SetObjectBreakable ( CClientEntity& Entity, boo
     {
         CDeathmatchObject& Object = static_cast < CDeathmatchObject& > ( Entity );
         Object.SetBreakable ( bBreakable );
+        return true;
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::BreakObject ( CClientEntity& Entity )
+{
+    RUN_CHILDREN BreakObject ( **iter );
+
+    if ( IS_OBJECT ( &Entity ) )
+    {
+        CDeathmatchObject& Object = static_cast < CDeathmatchObject& > ( Entity );
+        return Object.Break ();
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::RespawnObject ( CClientEntity& Entity )
+{
+    RUN_CHILDREN RespawnObject ( **iter );
+
+    if ( IS_OBJECT ( &Entity ) )
+    {
+        CDeathmatchObject& Object = static_cast < CDeathmatchObject& > ( Entity );
+
+        // Are we already being respawned?
+        if ( Object.IsBeingRespawned () )
+            return false;
+
+        m_pClientGame->GetObjectRespawner ()->Respawn ( &Object );
         return true;
     }
     return false;

@@ -392,6 +392,7 @@ public:
     LUA_DECLARE ( IsObjectStatic );
     LUA_DECLARE ( GetObjectScale );
     LUA_DECLARE ( IsObjectBreakable );
+    LUA_DECLARE ( IsObjectBlown );
 
     // Object set funcs
     LUA_DECLARE ( SetObjectRotation );
@@ -400,6 +401,8 @@ public:
     LUA_DECLARE ( SetObjectScale );
     LUA_DECLARE ( SetObjectStatic );
     LUA_DECLARE ( SetObjectBreakable );
+    LUA_DECLARE ( BreakObject );
+    LUA_DECLARE ( RespawnObject );
 
     // Explosion functions
     LUA_DECLARE ( CreateExplosion );

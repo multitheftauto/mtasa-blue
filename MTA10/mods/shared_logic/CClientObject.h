@@ -91,11 +91,17 @@ public:
     float                           GetHealth               ( void );
     void                            SetHealth               ( float fHealth );
 
-    inline bool                     IsBreakable             ( void )                            { return m_pObjectManager->IsBreakableModel ( m_usModel ) && m_bBreakable; };
+    inline bool                     IsBreakable             ( void )                            { return m_bBreakable; };
     bool                            SetBreakable            ( bool bBreakable );
+	bool                            Break                   ( void );
+    bool                            IsBlown                 ( void );
 
     void                            ReCreate                ( void );
     void                            UpdateVisibility        ( void );
+
+	inline bool                     IsBeingRespawned        ( void )                            { return m_bBeingRespawned; };
+	inline void	                    SetBeingRespawned       ( bool bBeingRespawned )            { m_bBeingRespawned = bBeingRespawned; };
+
 
 protected:
     void                            StreamIn                ( bool bInstantly );
@@ -123,6 +129,7 @@ protected:
     float                               m_fScale;
     float                               m_fHealth;
     bool                                m_bBreakable;
+	bool                                m_bBeingRespawned;
 
     CVector                             m_vecMoveSpeed;
 
