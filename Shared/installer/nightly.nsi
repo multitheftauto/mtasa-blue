@@ -171,7 +171,10 @@ LangString DESC_SectionGroupClient ${LANG_ENGLISH}  "The client is the program y
 Function LaunchLink
 	!ifdef CLIENT_SETUP
 		SetOutPath "$INSTDIR"
-		!insertmacro UAC_AsUser_ExecShell "open" "Multi Theft Auto ${0.0}.exe" "" "" ""
+		# Problem: 'non-admin nsis' and 'admin nsis' run at the same time and can have different values for $INSTDIR
+		# Fix: Copy to temp variable
+		StrCpy $1 "$INSTDIR\Multi Theft Auto.exe"
+		!insertmacro UAC_AsUser_ExecShell "" "$1" "" "" ""
 	!else
 		SetOutPath "$INSTDIR\Server"
 		!insertmacro UAC_AsUser_ExecShell "open" "MTA Server ${0.0}.exe" "" "" ""
