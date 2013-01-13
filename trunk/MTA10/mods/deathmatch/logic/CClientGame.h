@@ -500,8 +500,8 @@ private:
     bool                                ProcessCollisionHandler         ( CEntitySAInterface* pThisInterface, CEntitySAInterface* pOtherInterface );
     bool                                VehicleCollisionHandler         ( CVehicleSAInterface* pCollidingVehicle, CEntitySAInterface* pCollidedVehicle, int iModelIndex, float fDamageImpulseMag, float fCollidingDamageImpulseMag, uint16 usPieceType, CVector vecCollisionPos, CVector vecCollisionVelocity  );
     bool                                HeliKillHandler                 ( CVehicleSAInterface* pHeli, CPedSAInterface* pPed );
-	bool                                ObjectDamageHandler             ( CObjectSAInterface* pObjectInterface, float fLoss );
-	bool                                ObjectBreakHandler              ( CObjectSAInterface* pObjectInterface );
+    bool                                ObjectDamageHandler             ( CObjectSAInterface* pObjectInterface, float fLoss );
+    bool                                ObjectBreakHandler              ( CObjectSAInterface* pObjectInterface );
     bool                                WaterCannonHitHandler           ( CVehicleSAInterface* pCannonVehicle, CPedSAInterface* pHitPed );
     void                                GameObjectDestructHandler       ( CEntitySAInterface* pObject );
     void                                GameVehicleDestructHandler      ( CEntitySAInterface* pVehicle );

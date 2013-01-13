@@ -505,10 +505,6 @@
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath=".\CObjectRespawner.cpp"
-					>
-				</File>
-				<File
 					RelativePath=".\logic\CObjectSync.cpp"
 					>
 				</File>
@@ -998,6 +994,10 @@
 				</File>
 				<File
 					RelativePath="..\shared_logic\CModelNames.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\shared_logic\CObjectRespawner.cpp"
 					>
 				</File>
 				<File
@@ -1939,10 +1939,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\CObjectRespawner.h"
-					>
-				</File>
-				<File
 					RelativePath=".\logic\CObjectSync.h"
 					>
 				</File>
@@ -2588,6 +2584,10 @@
 				</File>
 				<File
 					RelativePath="..\shared_logic\CModelNames.h"
+					>
+				</File>
+				<File
+					RelativePath="..\shared_logic\CObjectRespawner.h"
 					>
 				</File>
 				<File
