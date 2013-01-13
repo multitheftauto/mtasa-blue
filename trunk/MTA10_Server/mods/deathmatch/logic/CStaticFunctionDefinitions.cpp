@@ -4504,12 +4504,19 @@ bool CStaticFunctionDefinitions::GiveWeapon ( CElement* pElement, unsigned char 
                 if ( bSetAsCurrent )
                     pPed->SetWeaponSlot ( ucWeaponSlot );
 
-                unsigned short usTotalAmmo = pPed->GetWeaponTotalAmmo ( ucWeaponSlot );
-                if ( (unsigned int)usTotalAmmo + usAmmo > 0xFFFF )
-                    usTotalAmmo = 0xFFFF;
+                unsigned int uiTotalAmmo = pPed->GetWeaponTotalAmmo ( ucWeaponSlot );
+
+                // Client ammo emulation mode - Try to ensure that the ammo we set on the server will be the same as the client)
+                if ( ucWeaponSlot <= 1 || ucWeaponSlot >= 10 )
+                    uiTotalAmmo = Min( 1U, uiTotalAmmo + usAmmo );  // If slot 0,1,10,11,12 - Ammo is max 1
                 else
-                    usTotalAmmo += usAmmo;
-                pPed->SetWeaponTotalAmmo ( usTotalAmmo, ucWeaponSlot );
+                if ( ( ucWeaponSlot >= 3 && ucWeaponSlot <= 5 ) || ucCurrentWeapon == ucWeaponID )
+                    uiTotalAmmo += usAmmo;                          // If slot 3,4,5 or weapon the same, ammo is shared, so add
+                else
+                    uiTotalAmmo = usAmmo;                           // Otherwise ammo is not shared, so replace
+
+                uiTotalAmmo = Min( 0xFFFFU, uiTotalAmmo );
+                pPed->SetWeaponTotalAmmo ( uiTotalAmmo, ucWeaponSlot );
 
                 CBitStream BitStream;
 
