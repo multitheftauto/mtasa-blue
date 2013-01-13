@@ -41,7 +41,7 @@ public:
     uint32 b0x10 : 1;
     uint32 bDisableMovement : 1;
     uint32 b0x40 : 1;
-    uint32 b0x80 : 1;
+    uint32 bPoolBalCollision : 1;
 
     uint32 bSubmergedInWater : 1; // 65
     uint32 bOnSolidSurface : 1;

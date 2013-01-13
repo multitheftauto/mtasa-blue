@@ -66,26 +66,26 @@ class CObjectSAInterface : public CPhysicalSAInterface
 	uint32 b0x08 : 1;
 	uint32 b0x10 : 1;
 	uint32 b0x20 : 1;
-	uint32 b0x40 : 1;
+	uint32 bExploded : 1;
 	uint32 b0x80 : 1;
 
 	uint32 b0x100 : 1; // 321
-	uint32 b0x200 : 1;
-	uint32 b0x400 : 1;
+	uint32 bTargetable : 1;
+	uint32 bDontEmitAudio : 1;
 	uint32 b0x800 : 1;
 	uint32 b0x1000 : 1;
 	uint32 b0x2000 : 1;
 	uint32 b0x4000 : 1;
-	uint32 b0x8000 : 1;
+	uint32 bFreeRotation : 1;
 
 	uint32 b0x10000 : 1; // 322
-	uint32 b0x20000 : 1;
+	uint32 bForceScale : 1;
 	uint32 b0x40000 : 1;
 	uint32 b0x80000 : 1;
 	uint32 b0x100000 : 1;
 	uint32 b0x200000 : 1;
 	uint32 b0x400000 : 1;
-	uint32 b0x800000 : 1;
+	uint32 bIsCheckedAgainstLOS : 1;
 
 	uint32 b0x1000000 : 1; // 323
 	uint32 b0x2000000 : 1;
@@ -101,15 +101,15 @@ class CObjectSAInterface : public CPhysicalSAInterface
 	uint8 pad5; // 326
 	uint8 pad6; // 327
 	uint8 pad7; // 328
-	uint8 pad8; // 329
-	uint16 pad9; // 330
-	uint8 pad10; // 332
-	uint8 pad11; // 333
-	uint8 pad12; // 334
-	uint8 pad13; // 335
+	uint8 bHitByLOSCheck; // 329
+	uint16 m_nModelIndex_Ref; // 330
+	uint8 colour1; // 332
+	uint8 colour2; // 333
+	uint8 colour3; // 334
+	uint8 colour4; // 335
 	uint32 uiObjectRemovalTime; // 336
-	uint32 pad14; // 340
-	uint32 pad15; // 344
+	float fHealth; // 340
+	float fLockedRotationAngle; // 344
 	float fScale; // 348
 	CObjectInfo* pObjectInfo; // 352
 	uint32 pad16; // 356
