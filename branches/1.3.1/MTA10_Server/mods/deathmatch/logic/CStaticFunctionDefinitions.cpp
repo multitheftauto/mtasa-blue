@@ -4504,12 +4504,19 @@ bool CStaticFunctionDefinitions::GiveWeapon ( CElement* pElement, unsigned char 
                 if ( bSetAsCurrent )
                     pPed->SetWeaponSlot ( ucWeaponSlot );
 
-                unsigned short usTotalAmmo = pPed->GetWeaponTotalAmmo ( ucWeaponSlot );
-                if ( (unsigned int)usTotalAmmo + usAmmo > 0xFFFF )
-                    usTotalAmmo = 0xFFFF;
+                unsigned int uiTotalAmmo = pPed->GetWeaponTotalAmmo ( ucWeaponSlot );
+
+                // Client ammo emulation mode - Try to ensure that the ammo we set on the server will be the same as the client)
+                if ( ucWeaponSlot <= 1 || ucWeaponSlot >= 10 )
+                    uiTotalAmmo = Min( 1U, uiTotalAmmo + usAmmo );  // If slot 0,1,10,11,12 - Ammo is max 1
                 else
-                    usTotalAmmo += usAmmo;
-                pPed->SetWeaponTotalAmmo ( usTotalAmmo, ucWeaponSlot );
+                if ( ( ucWeaponSlot >= 3 && ucWeaponSlot <= 5 ) || ucCurrentWeapon == ucWeaponID )
+                    uiTotalAmmo += usAmmo;                          // If slot 3,4,5 or weapon the same, ammo is shared, so add
+                else
+                    uiTotalAmmo = usAmmo;                           // Otherwise ammo is not shared, so replace
+
+                uiTotalAmmo = Min( 0xFFFFU, uiTotalAmmo );
+                pPed->SetWeaponTotalAmmo ( uiTotalAmmo, ucWeaponSlot );
 
                 CBitStream BitStream;
 
@@ -5721,10 +5728,12 @@ bool CStaticFunctionDefinitions::SetEntryHandling ( CHandlingEntry* pEntry, eHan
             }
             case HANDLING_ANIMGROUP:
             {
-                if ( ucValue >= 0 && ucValue <= 29 
-                    && ucValue != 3 && ucValue != 8 
-                    && ucValue != 17 && ucValue != 23 ) 
+                if ( ucValue >= 0 && ucValue <= 29 )
                 {
+                    if ( ucValue != 3 && ucValue != 8 
+                        && ucValue != 17 && ucValue != 23 ) 
+                        return true;    // Pretend it worked to avoid script warnings
+
                     pEntry->SetAnimGroup ( ucValue );
                     return true;
                 }
@@ -5882,7 +5891,7 @@ bool CStaticFunctionDefinitions::SetEntryHandling ( CHandlingEntry* pEntry, eHan
             }
             case HANDLING_SUSPENSION_UPPER_LIMIT:
             {
-                if ( fValue >= -50.0 && fValue <= 50 && ( fValue <= pEntry->GetSuspensionLowerLimit() - 0.1 || fValue >= pEntry->GetSuspensionLowerLimit() + 0.1 ) ) // Lower and Upper limits cannot match or LSOD
+                if ( fValue >= -50.0 && fValue <= 50 )
                 {
                     pEntry->SetSuspensionUpperLimit ( fValue );
                     return true;
@@ -5891,7 +5900,7 @@ bool CStaticFunctionDefinitions::SetEntryHandling ( CHandlingEntry* pEntry, eHan
             }
             case HANDLING_SUSPENSION_LOWER_LIMIT:
             {
-                if ( fValue >= -50.0 && fValue <= 50 && ( fValue <= pEntry->GetSuspensionUpperLimit() - 0.1 || fValue >= pEntry->GetSuspensionUpperLimit() ) ) // Lower and Upper limits cannot match or LSOD
+                if ( fValue >= -50.0 && fValue <= 50 )
                 {
                     pEntry->SetSuspensionLowerLimit ( fValue );
                     return true;
@@ -7189,6 +7198,19 @@ bool CStaticFunctionDefinitions::ResetVehicleHandling ( CVehicle* pVehicle, bool
         //handling.data.ucHeadLight                 = pNewEntry->GetHeadLight ();
         //handling.data.ucTailLight                 = pNewEntry->GetTailLight ();
         handling.data.ucAnimGroup                   = pNewEntry->GetAnimGroup ();
+
+        // Lower and Upper limits cannot match or LSOD (unless boat)
+        //if ( eModel != VEHICLE_BOAT )     // Commented until fully tested
+        {
+            float fSuspensionLimitSize = handling.data.fSuspensionUpperLimit - handling.data.fSuspensionLowerLimit;
+            if ( fSuspensionLimitSize > -0.1f && fSuspensionLimitSize < 0.1f )
+            {
+                if ( fSuspensionLimitSize >= 0.f )
+                    handling.data.fSuspensionUpperLimit = handling.data.fSuspensionLowerLimit + 0.1f;
+                else
+                    handling.data.fSuspensionUpperLimit = handling.data.fSuspensionLowerLimit - 0.1f;
+            }
+        }
 
         BitStream.pBitStream->Write ( &handling );
         m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pVehicle, SET_VEHICLE_HANDLING, *BitStream.pBitStream ) );

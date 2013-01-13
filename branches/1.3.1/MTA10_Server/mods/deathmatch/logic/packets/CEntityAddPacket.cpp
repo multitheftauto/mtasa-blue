@@ -477,6 +477,19 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
                         //handling.data.ucHeadLight                   = pEntry->GetHeadLight ();
                         //handling.data.ucTailLight                   = pEntry->GetTailLight ();
                         handling.data.ucAnimGroup                   = pEntry->GetAnimGroup ();
+
+                        // Lower and Upper limits cannot match or LSOD (unless boat)
+                        //if ( pVehicle->GetModel() != VEHICLE_BOAT )     // Commented until fully tested
+                        {
+                            float fSuspensionLimitSize = handling.data.fSuspensionUpperLimit - handling.data.fSuspensionLowerLimit;
+                            if ( fSuspensionLimitSize > -0.1f && fSuspensionLimitSize < 0.1f )
+                            {
+                                if ( fSuspensionLimitSize >= 0.f )
+                                    handling.data.fSuspensionUpperLimit = handling.data.fSuspensionLowerLimit + 0.1f;
+                                else
+                                    handling.data.fSuspensionUpperLimit = handling.data.fSuspensionLowerLimit - 0.1f;
+                            }
+                        }
                         BitStream.Write ( &handling );
                     }
                     else
