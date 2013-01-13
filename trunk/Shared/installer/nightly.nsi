@@ -40,8 +40,6 @@ Var PatchInstalled
 	!define FILES_ROOT "Install files builder/output"
 	!define SERVER_FILES_ROOT "Install files builder/output/server"
 	!define FILES_MODULE_SDK "Install files builder/output/development/publicsdk"
-	!define CLIENT_SETUP
-	!define INCLUDE_SERVER
 	!define INSTALL_OUTPUT "mtasa-${0.0.0}-unstable-00000-0-000-nsis.exe"
 	!define PRODUCT_VERSION "v${0.0.0}-unstable-00000-0-000"
 	!define REVISION "0000"
@@ -64,23 +62,13 @@ Var PatchInstalled
 	!define REVISION_TAG ""
 !endif
 
-!ifdef CLIENT_SETUP
-	!define PRODUCT_NAME "MTA:SA ${0.0}"
-	!define PRODUCT_NAME_NO_VER "MTA:SA"
-!else
-	!define PRODUCT_NAME "MTA:SA Server ${0.0}"
-	!define PRODUCT_NAME_NO_VER "MTA:SA Server"
-!endif
+!define PRODUCT_NAME "MTA:SA ${0.0}"
+!define PRODUCT_NAME_NO_VER "MTA:SA"
 
 !define PRODUCT_PUBLISHER "Multi Theft Auto"
 !define PRODUCT_WEB_SITE "http://www.multitheftauto.com"
-!ifdef CLIENT_SETUP
-	!define PRODUCT_DIR_REGKEY "Software\Microsoft\Windows\CurrentVersion\App Paths\Multi Theft Auto ${0.0}.exe"
-	!define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
-!else
-	!define PRODUCT_DIR_REGKEY "Software\Microsoft\Windows\CurrentVersion\App Paths\MTA Server ${0.0}.exe"
-	!define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME} Server"
-!endif
+!define PRODUCT_DIR_REGKEY "Software\Microsoft\Windows\CurrentVersion\App Paths\Multi Theft Auto ${0.0}.exe"
+!define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
 !define PRODUCT_UNINST_ROOT_KEY "HKLM"
 
 ; MUI 1.67 compatible ------
@@ -122,16 +110,14 @@ Click Next to continue."
 #!insertmacro MUI_PAGE_DIRECTORY
 Page custom CustomDirectoryPage DirectoryLeaveProc
 
-!ifdef CLIENT_SETUP
-	!define MUI_PAGE_CUSTOMFUNCTION_PRE				SkipDirectoryPage
-	!define MUI_PAGE_HEADER_TEXT					"Grand Theft Auto: San Andreas location"
-	!define MUI_PAGE_HEADER_SUBTEXT					""
-	!define MUI_DIRECTORYPAGE_TEXT_DESTINATION		"Grand Theft Auto: San Andreas folder"
-	!define MUI_DIRECTORYPAGE_TEXT_TOP				"Please select your Grand Theft Auto: San Andreas folder.$\n$\nYou MUST have Grand Theft Auto: San Andreas 1.0 installed to use MTA:SA, it does not support any other versions.$\n$\nClick Install to begin installing."
-	!define MUI_DIRECTORYPAGE_VARIABLE				$GTA_DIR
-    !define MUI_PAGE_CUSTOMFUNCTION_LEAVE           "GTADirectoryLeaveProc"
-	!insertmacro MUI_PAGE_DIRECTORY
-!endif
+!define MUI_PAGE_CUSTOMFUNCTION_PRE				SkipDirectoryPage
+!define MUI_PAGE_HEADER_TEXT					"Grand Theft Auto: San Andreas location"
+!define MUI_PAGE_HEADER_SUBTEXT					""
+!define MUI_DIRECTORYPAGE_TEXT_DESTINATION		"Grand Theft Auto: San Andreas folder"
+!define MUI_DIRECTORYPAGE_TEXT_TOP				"Please select your Grand Theft Auto: San Andreas folder.$\n$\nYou MUST have Grand Theft Auto: San Andreas 1.0 installed to use MTA:SA, it does not support any other versions.$\n$\nClick Install to begin installing."
+!define MUI_DIRECTORYPAGE_VARIABLE				$GTA_DIR
+!define MUI_PAGE_CUSTOMFUNCTION_LEAVE           "GTADirectoryLeaveProc"
+!insertmacro MUI_PAGE_DIRECTORY
 
 ; Instfiles page
 !insertmacro MUI_PAGE_INSTFILES
@@ -169,16 +155,11 @@ LangString DESC_SectionGroupClient ${LANG_ENGLISH}  "The client is the program y
 
 
 Function LaunchLink
-	!ifdef CLIENT_SETUP
-		SetOutPath "$INSTDIR"
-		# Problem: 'non-admin nsis' and 'admin nsis' run at the same time and can have different values for $INSTDIR
-		# Fix: Copy to temp variable
-		StrCpy $1 "$INSTDIR\Multi Theft Auto.exe"
-		!insertmacro UAC_AsUser_ExecShell "" "$1" "" "" ""
-	!else
-		SetOutPath "$INSTDIR\Server"
-		!insertmacro UAC_AsUser_ExecShell "open" "MTA Server ${0.0}.exe" "" "" ""
-	!endif
+	SetOutPath "$INSTDIR"
+	# Problem: 'non-admin nsis' and 'admin nsis' run at the same time and can have different values for $INSTDIR
+	# Fix: Copy to temp variable
+	StrCpy $1 "$INSTDIR\Multi Theft Auto.exe"
+	!insertmacro UAC_AsUser_ExecShell "" "$1" "" "" ""
 FunctionEnd
 
 Function .onInstFailed
@@ -221,40 +202,38 @@ PostVC90Check:
 	${EndIf}
 	strcpy $INSTDIR $Install_Dir
 
-	!ifdef CLIENT_SETUP
-		; Try to find previously saved GTA:SA install path
-		ReadRegStr $2 HKLM "SOFTWARE\Multi Theft Auto: San Andreas All\Common" "GTA:SA Path"
-		${If} $2 == "" 
-			ReadRegStr $2 HKCU "SOFTWARE\Multi Theft Auto: San Andreas" "GTA:SA Path"
+	; Try to find previously saved GTA:SA install path
+	ReadRegStr $2 HKLM "SOFTWARE\Multi Theft Auto: San Andreas All\Common" "GTA:SA Path"
+	${If} $2 == "" 
+		ReadRegStr $2 HKCU "SOFTWARE\Multi Theft Auto: San Andreas" "GTA:SA Path"
+	${EndIf}
+	${If} $2 == "" 
+		ReadRegStr $2 HKLM "SOFTWARE\Rockstar Games\GTA San Andreas\Installation" "ExePath"
+	${EndIf}
+	${If} $2 == "" 
+		ReadRegStr $2 HKLM "SOFTWARE\Multi Theft Auto: San Andreas" "GTA:SA Path"
+	${EndIf}
+	${If} $2 == "" 
+		ReadRegStr $3 HKCU "Software\Valve\Steam\Apps\12120" "Installed"
+		StrCpy $3 $3 1
+		${If} $3 == "1"
+			ReadRegStr $3 HKCU "Software\Valve\Steam" "SteamPath"
+			StrCpy $2 "$3\steamapps\common\grand theft auto san andreas"
 		${EndIf}
-		${If} $2 == "" 
-			ReadRegStr $2 HKLM "SOFTWARE\Rockstar Games\GTA San Andreas\Installation" "ExePath"
-		${EndIf}
-		${If} $2 == "" 
-			ReadRegStr $2 HKLM "SOFTWARE\Multi Theft Auto: San Andreas" "GTA:SA Path"
-		${EndIf}
-		${If} $2 == "" 
-			ReadRegStr $3 HKCU "Software\Valve\Steam\Apps\12120" "Installed"
-			StrCpy $3 $3 1
-			${If} $3 == "1"
-				ReadRegStr $3 HKCU "Software\Valve\Steam" "SteamPath"
-				StrCpy $2 "$3\steamapps\common\grand theft auto san andreas"
-			${EndIf}
-		${EndIf}
-		${If} $2 == "" 
-			ReadRegStr $2 HKCU "SOFTWARE\Multi Theft Auto: San Andreas ${0.0}" "GTA:SA Path Backup"
-		${EndIf}
+	${EndIf}
+	${If} $2 == "" 
+		ReadRegStr $2 HKCU "SOFTWARE\Multi Theft Auto: San Andreas ${0.0}" "GTA:SA Path Backup"
+	${EndIf}
 
-		; Remove exe name from path
-		!insertmacro ReplaceSubStr $2 "gta_sa.exe" ""
-		; Conform slash types
-		!insertmacro ReplaceSubStr $MODIFIED_STR "/" "\"
-		; Remove quotes
-		strcpy $3 '"'
-		!insertmacro ReplaceSubStr $MODIFIED_STR $3 ""
-		; Store result 
-		strcpy $GTA_DIR $MODIFIED_STR
-	!endif
+	; Remove exe name from path
+	!insertmacro ReplaceSubStr $2 "gta_sa.exe" ""
+	; Conform slash types
+	!insertmacro ReplaceSubStr $MODIFIED_STR "/" "\"
+	; Remove quotes
+	strcpy $3 '"'
+	!insertmacro ReplaceSubStr $MODIFIED_STR $3 ""
+	; Store result 
+	strcpy $GTA_DIR $MODIFIED_STR
 
     ; Default to standard path if nothing defined
 	${If} $GTA_DIR == "" 
@@ -268,24 +247,20 @@ FunctionEnd
 Function .onInstSuccess
 	SetShellVarContext all
 
-	!ifdef CLIENT_SETUP
-		WriteRegStr HKLM "SOFTWARE\Multi Theft Auto: San Andreas All\Common" "GTA:SA Path" $GTA_DIR
-		WriteRegStr HKLM "SOFTWARE\Multi Theft Auto: San Andreas All\${0.0}" "Last Install Location" $INSTDIR
-	!endif
+	WriteRegStr HKLM "SOFTWARE\Multi Theft Auto: San Andreas All\Common" "GTA:SA Path" $GTA_DIR
+	WriteRegStr HKLM "SOFTWARE\Multi Theft Auto: San Andreas All\${0.0}" "Last Install Location" $INSTDIR
 	
 	; Start menu items
 	${If} $CreateSMShortcuts == 1
 		CreateDirectory "$SMPROGRAMS\MTA San Andreas ${0.0}"
 
-		!ifdef CLIENT_SETUP
-			IfFileExists "$INSTDIR\Multi Theft Auto.exe" 0 skip1
-			SetOutPath "$INSTDIR"
-			Delete "$SMPROGRAMS\\MTA San Andreas ${0.0}\Play MTA San Andreas.lnk"
-			CreateShortCut "$SMPROGRAMS\\MTA San Andreas ${0.0}\MTA San Andreas.lnk" "$INSTDIR\Multi Theft Auto.exe" \
-				"" "$INSTDIR\Multi Theft Auto.exe" 0 SW_SHOWNORMAL \
-				"" "Play Multi Theft Auto: San Andreas ${0.0}"
-			skip1:
-		!endif
+		IfFileExists "$INSTDIR\Multi Theft Auto.exe" 0 skip1
+		SetOutPath "$INSTDIR"
+		Delete "$SMPROGRAMS\\MTA San Andreas ${0.0}\Play MTA San Andreas.lnk"
+		CreateShortCut "$SMPROGRAMS\\MTA San Andreas ${0.0}\MTA San Andreas.lnk" "$INSTDIR\Multi Theft Auto.exe" \
+			"" "$INSTDIR\Multi Theft Auto.exe" 0 SW_SHOWNORMAL \
+			"" "Play Multi Theft Auto: San Andreas ${0.0}"
+		skip1:
 		
 		IfFileExists "$INSTDIR\Server\MTA Server.exe" 0 skip2
 		SetOutPath "$INSTDIR\Server"
@@ -294,67 +269,43 @@ Function .onInstSuccess
 			"" "Run the Multi Theft Auto: San Andreas ${0.0} Server"
 		skip2:
 		
-		!ifdef CLIENT_SETUP
-			IfFileExists "$INSTDIR\Uninstall.exe" 0 skip3
-			SetOutPath "$INSTDIR"
-			CreateShortCut "$SMPROGRAMS\\MTA San Andreas ${0.0}\Uninstall MTA San Andreas.lnk" "$INSTDIR\Uninstall.exe" \
-				"" "$INSTDIR\Uninstall.exe" 0 SW_SHOWNORMAL \
-				"" "Uninstall Multi Theft Auto: San Andreas ${0.0}"
-		!else
-			IfFileExists "$INSTDIR\server\Uninstall.exe" 0 skip3
-			SetOutPath "$INSTDIR"
-			CreateShortCut "$SMPROGRAMS\\MTA San Andreas ${0.0}\Uninstall MTA San Andreas Server.lnk" "$INSTDIR\server\Uninstall.exe" \
-				"" "$INSTDIR\Server\Uninstall.exe" 0 SW_SHOWNORMAL \
-				"" "Uninstall Multi Theft Auto: San Andreas ${0.0}"
-		!endif
+		IfFileExists "$INSTDIR\Uninstall.exe" 0 skip3
+		SetOutPath "$INSTDIR"
+		CreateShortCut "$SMPROGRAMS\\MTA San Andreas ${0.0}\Uninstall MTA San Andreas.lnk" "$INSTDIR\Uninstall.exe" \
+			"" "$INSTDIR\Uninstall.exe" 0 SW_SHOWNORMAL \
+			"" "Uninstall Multi Theft Auto: San Andreas ${0.0}"
 		skip3:
 	${EndIf}
     
     ${If} $CreateDesktopIcon == 1
-		!ifdef CLIENT_SETUP
-			IfFileExists "$INSTDIR\Multi Theft Auto.exe" 0 skip4
-			SetOutPath "$INSTDIR"
-			Delete "$DESKTOP\Play MTA San Andreas ${0.0}.lnk"
-			CreateShortCut "$DESKTOP\MTA San Andreas ${0.0}.lnk" "$INSTDIR\Multi Theft Auto.exe" \
-				"" "$INSTDIR\Multi Theft Auto.exe" 0 SW_SHOWNORMAL \
-				"" "Play Multi Theft Auto: San Andreas ${0.0}"
-			AccessControl::GrantOnFile "$DESKTOP\MTA San Andreas ${0.0}.lnk" "(BU)" "FullAccess"
+		IfFileExists "$INSTDIR\Multi Theft Auto.exe" 0 skip4
+		SetOutPath "$INSTDIR"
+		Delete "$DESKTOP\Play MTA San Andreas ${0.0}.lnk"
+		CreateShortCut "$DESKTOP\MTA San Andreas ${0.0}.lnk" "$INSTDIR\Multi Theft Auto.exe" \
+			"" "$INSTDIR\Multi Theft Auto.exe" 0 SW_SHOWNORMAL \
+			"" "Play Multi Theft Auto: San Andreas ${0.0}"
+		AccessControl::GrantOnFile "$DESKTOP\MTA San Andreas ${0.0}.lnk" "(BU)" "FullAccess"
 
-			skip4:
-		!endif
+		skip4:
 	${EndIf}
 
     ${If} $RegisterProtocol == 1
-		!ifdef CLIENT_SETUP
-            ; Add the protocol handler
-            WriteRegStr HKCR "mtasa" "" "URL:MTA San Andreas Protocol"
-            WriteRegStr HKCR "mtasa" "URL Protocol" ""
-            WriteRegStr HKCR "mtasa\DefaultIcon" "" "$INSTDIR\Multi Theft Auto.exe"
-            WriteRegStr HKCR "mtasa\shell\open\command" "" '"$INSTDIR\Multi Theft Auto.exe"%1'
-		!endif
+        ; Add the protocol handler
+        WriteRegStr HKCR "mtasa" "" "URL:MTA San Andreas Protocol"
+        WriteRegStr HKCR "mtasa" "URL Protocol" ""
+        WriteRegStr HKCR "mtasa\DefaultIcon" "" "$INSTDIR\Multi Theft Auto.exe"
+        WriteRegStr HKCR "mtasa\shell\open\command" "" '"$INSTDIR\Multi Theft Auto.exe"%1'
 	${EndIf}
 
 	;UAC::Unload ;Must call unload!
 FunctionEnd
 
 
-!ifdef CLIENT_SETUP
-	!ifdef INCLUDE_SERVER
-		InstType "Client and Server"
-	!else
-		InstType "Client only"
-	!endif
-!endif
-!ifdef INCLUDE_SERVER
-	InstType "Server only"
-!endif
+InstType "Client and Server"
+InstType "Server only"
 
 Name "${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION}"
-!ifdef CLIENT_SETUP
-	OutFile "${INSTALL_OUTPUT}"
-!else
-	OutFile "MTA Server ${0.0} Setup.exe"
-!endif
+OutFile "${INSTALL_OUTPUT}"
 
 ;InstallDir "$PROGRAMfiles San Andreas"
 InstallDirRegKey HKLM "SOFTWARE\Multi Theft Auto: San Andreas All\${0.0}" "Last Install Location"
@@ -382,246 +333,241 @@ Section "Add to Games Explorer" SEC13
 SectionEnd
 
 
-!ifdef CLIENT_SETUP
-	SectionGroup /e "Game client" SECGCLIENT
-		Section "Core components" SEC01
-			SectionIn 1 RO ; section is required
-			
-			StrCmp "$RedistInstalled" "1" DontInstallRedist
-			Call InstallVC90Redistributable
-			StrCmp "$RedistInstalled" "1" DontInstallRedist
-			Abort
+SectionGroup /e "Game client" SECGCLIENT
+	Section "Core components" SEC01
+		SectionIn 1 RO ; section is required
+		
+		StrCmp "$RedistInstalled" "1" DontInstallRedist
+		Call InstallVC90Redistributable
+		StrCmp "$RedistInstalled" "1" DontInstallRedist
+		Abort
 DontInstallRedist:
-			SetShellVarContext all
+		SetShellVarContext all
 
-			#############################################################
-			# Show that upgrade is catered for
-            Push $INSTDIR 
-            Call GetInstallType
-            Pop $0
-            Pop $1
-            ${If} $0 == "upgrade"
-                DetailPrint "Performing in-place upgrade..."
-                Sleep 1000
-            ${EndIf}
-			#############################################################
+		#############################################################
+		# Show that upgrade is catered for
+        Push $INSTDIR 
+        Call GetInstallType
+        Pop $0
+        Pop $1
+        ${If} $0 == "upgrade"
+            DetailPrint "Performing in-place upgrade..."
+            Sleep 1000
+        ${EndIf}
+		#############################################################
 
-			WriteRegStr HKLM "SOFTWARE\Multi Theft Auto: San Andreas All\Common" "GTA:SA Path" $GTA_DIR
-			WriteRegStr HKLM "SOFTWARE\Multi Theft Auto: San Andreas All\${0.0}" "Last Install Location" $INSTDIR
+		WriteRegStr HKLM "SOFTWARE\Multi Theft Auto: San Andreas All\Common" "GTA:SA Path" $GTA_DIR
+		WriteRegStr HKLM "SOFTWARE\Multi Theft Auto: San Andreas All\${0.0}" "Last Install Location" $INSTDIR
 
-			# Create fixed path data directories
-			CreateDirectory "$APPDATA\MTA San Andreas All\Common"
-			CreateDirectory "$APPDATA\MTA San Andreas All\${0.0}"
+		# Create fixed path data directories
+		CreateDirectory "$APPDATA\MTA San Andreas All\Common"
+		CreateDirectory "$APPDATA\MTA San Andreas All\${0.0}"
 
-			# Ensure install dir exists so the permissions can be set
-			SetOutPath "$INSTDIR\MTA"
-			SetOverwrite on
+		# Ensure install dir exists so the permissions can be set
+		SetOutPath "$INSTDIR\MTA"
+		SetOverwrite on
 
-			#############################################################
-			# Make the directory "$INSTDIR" read write accessible by all users
-			# Make the directory "$APPDATA\MTA San Andreas All" read write accessible by all users
-            # Make the directory "$GTA_DIR" read write accessible by all users
+		#############################################################
+		# Make the directory "$INSTDIR" read write accessible by all users
+		# Make the directory "$APPDATA\MTA San Andreas All" read write accessible by all users
+        # Make the directory "$GTA_DIR" read write accessible by all users
 
-            ${If} ${AtLeastWinVista}
-                DetailPrint "Updating permissions. This could take a few minutes..."
+        ${If} ${AtLeastWinVista}
+            DetailPrint "Updating permissions. This could take a few minutes..."
 
-                # Fix permissions for MTA install directory
-                FastPerms::FullAccessPlox "$INSTDIR"
-                FastPerms::FullAccessPlox "$APPDATA\MTA San Andreas All"
+            # Fix permissions for MTA install directory
+            FastPerms::FullAccessPlox "$INSTDIR"
+            FastPerms::FullAccessPlox "$APPDATA\MTA San Andreas All"
 
-                # Remove MTA virtual store
-                StrCpy $0 $INSTDIR
+            # Remove MTA virtual store
+            StrCpy $0 $INSTDIR
+            !insertmacro UAC_AsUser_Call Function RemoveVirtualStore ${UAC_SYNCREGISTERS}
+            StrCpy $0 $INSTDIR
+            Call RemoveVirtualStore
+
+            IfFileExists $GTA_DIR\gta_sa.exe +1 0
+			IfFileExists $GTA_DIR\gta-sa.exe 0 PathBad
+                # Fix permissions for GTA install directory
+                FastPerms::FullAccessPlox "$GTA_DIR"
+
+                # Remove GTA virtual store
+                StrCpy $0 $GTA_DIR
                 !insertmacro UAC_AsUser_Call Function RemoveVirtualStore ${UAC_SYNCREGISTERS}
-                StrCpy $0 $INSTDIR
+                StrCpy $0 $GTA_DIR
                 Call RemoveVirtualStore
+            PathBad:
+        ${EndIf}
+		#############################################################
+		
+		#############################################################
+		# Patch our San Andreas .exe if it is required
+			
+		IfFileExists $GTA_DIR\gta_sa.exe 0 TrySteamExe
+			!insertmacro GetMD5 $GTA_DIR\gta_sa.exe $ExeMD5
+			DetailPrint "gta_sa.exe successfully detected ($ExeMD5)"
+			${Switch} $ExeMD5
+				${Case} "bf25c28e9f6c13bd2d9e28f151899373" #US 2.00
+				${Case} "7fd5f9436bd66af716ac584ff32eb483" #US 1.01
+				${Case} "d84326ba0e0ace89f87288ffe7504da4" #EU 3.00 Steam Mac
+				${Case} "4e99d762f44b1d5e7652dfa7e73d6b6f" #EU 2.00
+				${Case} "2ac4b81b3e85c8d0f9846591df9597d3" #EU 1.01
+				${Case} "d0ad36071f0e9bead7bddea4fbda583f" #EU 1.01 GamersGate
+				${Case} "25405921d1c47747fd01fd0bfe0a05ae" #EU 1.01 DEViANCE
+				${Case} "9effcaf66b59b9f8fb8dff920b3f6e63" #DE 2.00
+				${Case} "fa490564cd9811978085a7a8f8ed7b2a" #DE 1.01
+				${Case} "49dd417760484a18017805df46b308b8" #DE 1.00
+					#Create a backup of the GTA exe before patching
+					CopyFiles "$GTA_DIR\gta_sa.exe" "$GTA_DIR\gta_sa.exe.bak"
+					Call InstallPatch
+					${If} $PatchInstalled == "1"
+						Goto CompletePatchProc
+					${EndIf}
+					Goto NoExeFound
+					${Break}
+				${Default}
+					Goto CompletePatchProc #This gta_sa.exe doesn't need patching, let's continue
+					${Break}
+			${EndSwitch}
+		TrySteamExe:
+			IfFileExists $GTA_DIR\gta-sa.exe 0 NoExeFound
+			!insertmacro GetMD5 $GTA_DIR\gta-sa.exe $ExeMD5
+			DetailPrint "gta-sa.exe successfully detected ($ExeMD5)"
+			${Switch} $ExeMD5
+				${Case} "0fd315d1af41e26e536a78b4d4556488" #EU 3.00 Steam
+					#Copy gta-sa.exe to gta_sa.exe and commence patching process
+					CopyFiles "$GTA_DIR\gta-sa.exe" "$GTA_DIR\gta_sa.exe.bak"
+					Call InstallPatch
+					${If} $PatchInstalled == "1"
+						Goto CompletePatchProc
+					${EndIf}
+					Goto NoExeFound
+					${Break}
+				${Default}
+					Goto NoExeFound
+					${Break}
+			${EndSwitch}					
+			
+		NoExeFound:
+			MessageBox MB_ICONSTOP "A valid Windows® version of Grand Theft Auto: San Andreas was not detected.\
+			$\r$\nHowever installation will continue.\
+			$\r$\nPlease reinstall if there are problems later."
+		CompletePatchProc:
+		
+		SetOutPath "$INSTDIR\MTA"
+		SetOverwrite on
 
-                IfFileExists $GTA_DIR\gta_sa.exe +1 0
-				IfFileExists $GTA_DIR\gta-sa.exe 0 PathBad
-                    # Fix permissions for GTA install directory
-                    FastPerms::FullAccessPlox "$GTA_DIR"
+		# Make some keys in HKLM read write accessible by all users
+		AccessControl::GrantOnRegKey HKLM "SOFTWARE\Multi Theft Auto: San Andreas All" "(BU)" "FullAccess"
 
-                    # Remove GTA virtual store
-                    StrCpy $0 $GTA_DIR
-                    !insertmacro UAC_AsUser_Call Function RemoveVirtualStore ${UAC_SYNCREGISTERS}
-                    StrCpy $0 $GTA_DIR
-                    Call RemoveVirtualStore
-                PathBad:
+		SetOutPath "$INSTDIR\MTA"
+		File "${FILES_ROOT}\MTA San Andreas\mta\cgui.dll"
+		File "${FILES_ROOT}\MTA San Andreas\mta\core.dll"
+		File "${FILES_ROOT}\MTA San Andreas\mta\xmll.dll"
+		File "${FILES_ROOT}\MTA San Andreas\mta\game_sa.dll"
+		File "${FILES_ROOT}\MTA San Andreas\mta\multiplayer_sa.dll"
+		File "${FILES_ROOT}\MTA San Andreas\mta\netc.dll"
+		File "${FILES_ROOT}\MTA San Andreas\mta\libcurl.dll"
+		File "${FILES_ROOT}\MTA San Andreas\mta\loader.dll"
+        File "${FILES_ROOT}\MTA San Andreas\mta\bass_fx.dll"
+        File "${FILES_ROOT}\MTA San Andreas\mta\tags.dll"
+		File "${FILES_ROOT}\MTA San Andreas\mta\pthreadVC2.dll"
+
+        !ifndef LIGHTBUILD
+
+			File "${FILES_ROOT}\MTA San Andreas\mta\d3dx9_42.dll"
+			File "${FILES_ROOT}\MTA San Andreas\mta\D3DCompiler_42.dll"
+			File "${FILES_ROOT}\MTA San Andreas\mta\bass.dll"
+			File "${FILES_ROOT}\MTA San Andreas\mta\basswma.dll"
+			File "${FILES_ROOT}\MTA San Andreas\mta\bassmidi.dll"
+			File "${FILES_ROOT}\MTA San Andreas\mta\bassflac.dll"
+			File "${FILES_ROOT}\MTA San Andreas\mta\bass_aac.dll"
+			File "${FILES_ROOT}\MTA San Andreas\mta\bass_ac3.dll"
+			File "${FILES_ROOT}\MTA San Andreas\mta\bassmix.dll"
+			File "${FILES_ROOT}\MTA San Andreas\mta\chatboxpresets.xml"
+			File "${FILES_ROOT}\MTA San Andreas\mta\sa.dat"
+            File "${FILES_ROOT}\MTA San Andreas\mta\XInput9_1_0_mta.dll"
+
+            SetOutPath "$INSTDIR\skins\Classic"
+            File "${FILES_ROOT}\MTA San Andreas\skins\Classic\CGUI.is.xml"
+            File "${FILES_ROOT}\MTA San Andreas\skins\Classic\CGUI.lnf.xml"
+            File "${FILES_ROOT}\MTA San Andreas\skins\Classic\CGUI.png"
+            File "${FILES_ROOT}\MTA San Andreas\skins\Classic\CGUI.xml"
+            
+            SetOutPath "$INSTDIR\skins\Default"
+            File "${FILES_ROOT}\MTA San Andreas\skins\Default\CGUI.is.xml"
+            File "${FILES_ROOT}\MTA San Andreas\skins\Default\CGUI.lnf.xml"
+            File "${FILES_ROOT}\MTA San Andreas\skins\Default\CGUI.png"
+            File "${FILES_ROOT}\MTA San Andreas\skins\Default\CGUI.xml"
+            
+            SetOutPath "$INSTDIR\skins\Lighter black"
+            File "${FILES_ROOT}\MTA San Andreas\skins\Lighter black\CGUI.is.xml"
+            File "${FILES_ROOT}\MTA San Andreas\skins\Lighter black\CGUI.lnf.xml"
+            File "${FILES_ROOT}\MTA San Andreas\skins\Lighter black\CGUI.png"
+            File "${FILES_ROOT}\MTA San Andreas\skins\Lighter black\CGUI.xml"
+
+			SetOutPath "$INSTDIR\MTA\cgui"
+			File "${FILES_ROOT}\MTA San Andreas\mta\cgui\Falagard.xsd"
+			File "${FILES_ROOT}\MTA San Andreas\mta\cgui\Font.xsd"
+			File "${FILES_ROOT}\MTA San Andreas\mta\cgui\GUIScheme.xsd"
+			File "${FILES_ROOT}\MTA San Andreas\mta\cgui\Imageset.xsd"
+			File "${FILES_ROOT}\MTA San Andreas\mta\cgui\pricedown.ttf"
+			File "${FILES_ROOT}\MTA San Andreas\mta\cgui\sabankgothic.ttf"
+			File "${FILES_ROOT}\MTA San Andreas\mta\cgui\sagothic.ttf"
+			File "${FILES_ROOT}\MTA San Andreas\mta\cgui\saheader.ttf"
+			File "${FILES_ROOT}\MTA San Andreas\mta\cgui\sans.ttf"
+            File "${FILES_ROOT}\MTA San Andreas\mta\cgui\unifont-5.1.20080907.ttf"
+
+			SetOutPath "$INSTDIR\MTA\cgui\images"
+			File "${FILES_ROOT}\MTA San Andreas\mta\cgui\images\*.png"
+			File "${FILES_ROOT}\MTA San Andreas\mta\cgui\images\*.jpg"
+
+			SetOutPath "$INSTDIR\MTA\cgui\images\radarset"
+			File "${FILES_ROOT}\MTA San Andreas\mta\cgui\images\radarset\*.png"
+
+			SetOutPath "$INSTDIR\MTA\cgui\images\transferset"
+			File "${FILES_ROOT}\MTA San Andreas\mta\cgui\images\transferset\*.png"
+
+            SetOutPath "$INSTDIR\MTA\cgui\images\serverbrowser"
+            File "${FILES_ROOT}\MTA San Andreas\mta\cgui\images\serverbrowser\*.png"
+
+		!endif
+
+		SetOutPath "$INSTDIR"
+        File "${FILES_ROOT}\MTA San Andreas\Multi Theft Auto.exe"
+		!ifndef LIGHTBUILD
+            File "${FILES_ROOT}\MTA San Andreas\Multi Theft Auto.exe.dat"
+		!endif
+		
+        ${If} $AddToGameExplorer == 1
+            ${GameExplorer_UpdateGame} ${GUID}
+            ${If} ${Errors}
+                ${GameExplorer_AddGame} all "$INSTDIR\Multi Theft Auto.exe" "$INSTDIR" "$INSTDIR\Multi Theft Auto.exe" ${GUID}
+                CreateDirectory $APPDATA\Microsoft\Windows\GameExplorer\${GUID}\SupportTasks\0
+                CreateShortcut "$APPDATA\Microsoft\Windows\GameExplorer\$0\SupportTasks\0\Client Manual.lnk" \ "http://wiki.multitheftauto.com/wiki/Client_Manual"
             ${EndIf}
-			#############################################################
-			
-			#############################################################
-			# Patch our San Andreas .exe if it is required
-				
-			IfFileExists $GTA_DIR\gta_sa.exe 0 TrySteamExe
-				!insertmacro GetMD5 $GTA_DIR\gta_sa.exe $ExeMD5
-				DetailPrint "gta_sa.exe successfully detected ($ExeMD5)"
-				${Switch} $ExeMD5
-					${Case} "bf25c28e9f6c13bd2d9e28f151899373" #US 2.00
-					${Case} "7fd5f9436bd66af716ac584ff32eb483" #US 1.01
-					${Case} "d84326ba0e0ace89f87288ffe7504da4" #EU 3.00 Steam Mac
-					${Case} "4e99d762f44b1d5e7652dfa7e73d6b6f" #EU 2.00
-					${Case} "2ac4b81b3e85c8d0f9846591df9597d3" #EU 1.01
-					${Case} "d0ad36071f0e9bead7bddea4fbda583f" #EU 1.01 GamersGate
-					${Case} "25405921d1c47747fd01fd0bfe0a05ae" #EU 1.01 DEViANCE
-					${Case} "9effcaf66b59b9f8fb8dff920b3f6e63" #DE 2.00
-					${Case} "fa490564cd9811978085a7a8f8ed7b2a" #DE 1.01
-					${Case} "49dd417760484a18017805df46b308b8" #DE 1.00
-						#Create a backup of the GTA exe before patching
-						CopyFiles "$GTA_DIR\gta_sa.exe" "$GTA_DIR\gta_sa.exe.bak"
-						Call InstallPatch
-						${If} $PatchInstalled == "1"
-							Goto CompletePatchProc
-						${EndIf}
-						Goto NoExeFound
-						${Break}
-					${Default}
-						Goto CompletePatchProc #This gta_sa.exe doesn't need patching, let's continue
-						${Break}
-				${EndSwitch}
-			TrySteamExe:
-				IfFileExists $GTA_DIR\gta-sa.exe 0 NoExeFound
-				!insertmacro GetMD5 $GTA_DIR\gta-sa.exe $ExeMD5
-				DetailPrint "gta-sa.exe successfully detected ($ExeMD5)"
-				${Switch} $ExeMD5
-					${Case} "0fd315d1af41e26e536a78b4d4556488" #EU 3.00 Steam
-						#Copy gta-sa.exe to gta_sa.exe and commence patching process
-						CopyFiles "$GTA_DIR\gta-sa.exe" "$GTA_DIR\gta_sa.exe.bak"
-						Call InstallPatch
-						${If} $PatchInstalled == "1"
-							Goto CompletePatchProc
-						${EndIf}
-						Goto NoExeFound
-						${Break}
-					${Default}
-						Goto NoExeFound
-						${Break}
-				${EndSwitch}					
-				
-			NoExeFound:
-				MessageBox MB_ICONSTOP "A valid Windows® version of Grand Theft Auto: San Andreas was not detected.\
-				$\r$\nHowever installation will continue.\
-				$\r$\nPlease reinstall if there are problems later."
-			CompletePatchProc:
-			
-			SetOutPath "$INSTDIR\MTA"
-			SetOverwrite on
+        ${EndIf}
 
-			# Make some keys in HKLM read write accessible by all users
-			AccessControl::GrantOnRegKey HKLM "SOFTWARE\Multi Theft Auto: San Andreas All" "(BU)" "FullAccess"
+        Call DoServiceInstall
+	SectionEnd
 
-			SetOutPath "$INSTDIR\MTA"
-			File "${FILES_ROOT}\MTA San Andreas\mta\cgui.dll"
-			File "${FILES_ROOT}\MTA San Andreas\mta\core.dll"
-			File "${FILES_ROOT}\MTA San Andreas\mta\xmll.dll"
-			File "${FILES_ROOT}\MTA San Andreas\mta\game_sa.dll"
-			File "${FILES_ROOT}\MTA San Andreas\mta\multiplayer_sa.dll"
-			File "${FILES_ROOT}\MTA San Andreas\mta\netc.dll"
-			File "${FILES_ROOT}\MTA San Andreas\mta\libcurl.dll"
-			File "${FILES_ROOT}\MTA San Andreas\mta\loader.dll"
-            File "${FILES_ROOT}\MTA San Andreas\mta\bass_fx.dll"
-            File "${FILES_ROOT}\MTA San Andreas\mta\tags.dll"
-			File "${FILES_ROOT}\MTA San Andreas\mta\pthreadVC2.dll"
+	Section "Game module" SEC02
+		SectionIn 1 RO
+		SetOutPath "$INSTDIR\mods\deathmatch"
+		File "${FILES_ROOT}\MTA San Andreas\mods\deathmatch\Client.dll"
+		File "${SERVER_FILES_ROOT}\mods\deathmatch\lua5.1.dll"
+		SetOutPath "$INSTDIR\mods\deathmatch\resources"
+	SectionEnd
+SectionGroupEnd
 
-            !ifndef LIGHTBUILD
-
-				File "${FILES_ROOT}\MTA San Andreas\mta\d3dx9_42.dll"
-				File "${FILES_ROOT}\MTA San Andreas\mta\D3DCompiler_42.dll"
-				File "${FILES_ROOT}\MTA San Andreas\mta\bass.dll"
-				File "${FILES_ROOT}\MTA San Andreas\mta\basswma.dll"
-				File "${FILES_ROOT}\MTA San Andreas\mta\bassmidi.dll"
-				File "${FILES_ROOT}\MTA San Andreas\mta\bassflac.dll"
-				File "${FILES_ROOT}\MTA San Andreas\mta\bass_aac.dll"
-				File "${FILES_ROOT}\MTA San Andreas\mta\bass_ac3.dll"
-				File "${FILES_ROOT}\MTA San Andreas\mta\bassmix.dll"
-				File "${FILES_ROOT}\MTA San Andreas\mta\chatboxpresets.xml"
-				File "${FILES_ROOT}\MTA San Andreas\mta\sa.dat"
-                File "${FILES_ROOT}\MTA San Andreas\mta\XInput9_1_0_mta.dll"
-
-                SetOutPath "$INSTDIR\skins\Classic"
-                File "${FILES_ROOT}\MTA San Andreas\skins\Classic\CGUI.is.xml"
-                File "${FILES_ROOT}\MTA San Andreas\skins\Classic\CGUI.lnf.xml"
-                File "${FILES_ROOT}\MTA San Andreas\skins\Classic\CGUI.png"
-                File "${FILES_ROOT}\MTA San Andreas\skins\Classic\CGUI.xml"
-                
-                SetOutPath "$INSTDIR\skins\Default"
-                File "${FILES_ROOT}\MTA San Andreas\skins\Default\CGUI.is.xml"
-                File "${FILES_ROOT}\MTA San Andreas\skins\Default\CGUI.lnf.xml"
-                File "${FILES_ROOT}\MTA San Andreas\skins\Default\CGUI.png"
-                File "${FILES_ROOT}\MTA San Andreas\skins\Default\CGUI.xml"
-                
-                SetOutPath "$INSTDIR\skins\Lighter black"
-                File "${FILES_ROOT}\MTA San Andreas\skins\Lighter black\CGUI.is.xml"
-                File "${FILES_ROOT}\MTA San Andreas\skins\Lighter black\CGUI.lnf.xml"
-                File "${FILES_ROOT}\MTA San Andreas\skins\Lighter black\CGUI.png"
-                File "${FILES_ROOT}\MTA San Andreas\skins\Lighter black\CGUI.xml"
-
-				SetOutPath "$INSTDIR\MTA\cgui"
-				File "${FILES_ROOT}\MTA San Andreas\mta\cgui\Falagard.xsd"
-				File "${FILES_ROOT}\MTA San Andreas\mta\cgui\Font.xsd"
-				File "${FILES_ROOT}\MTA San Andreas\mta\cgui\GUIScheme.xsd"
-				File "${FILES_ROOT}\MTA San Andreas\mta\cgui\Imageset.xsd"
-				File "${FILES_ROOT}\MTA San Andreas\mta\cgui\pricedown.ttf"
-				File "${FILES_ROOT}\MTA San Andreas\mta\cgui\sabankgothic.ttf"
-				File "${FILES_ROOT}\MTA San Andreas\mta\cgui\sagothic.ttf"
-				File "${FILES_ROOT}\MTA San Andreas\mta\cgui\saheader.ttf"
-				File "${FILES_ROOT}\MTA San Andreas\mta\cgui\sans.ttf"
-                File "${FILES_ROOT}\MTA San Andreas\mta\cgui\unifont-5.1.20080907.ttf"
-
-				SetOutPath "$INSTDIR\MTA\cgui\images"
-				File "${FILES_ROOT}\MTA San Andreas\mta\cgui\images\*.png"
-				File "${FILES_ROOT}\MTA San Andreas\mta\cgui\images\*.jpg"
-
-				SetOutPath "$INSTDIR\MTA\cgui\images\radarset"
-				File "${FILES_ROOT}\MTA San Andreas\mta\cgui\images\radarset\*.png"
-
-				SetOutPath "$INSTDIR\MTA\cgui\images\transferset"
-				File "${FILES_ROOT}\MTA San Andreas\mta\cgui\images\transferset\*.png"
-	
-                SetOutPath "$INSTDIR\MTA\cgui\images\serverbrowser"
-                File "${FILES_ROOT}\MTA San Andreas\mta\cgui\images\serverbrowser\*.png"
-
-			!endif
-
-			SetOutPath "$INSTDIR"
-            File "${FILES_ROOT}\MTA San Andreas\Multi Theft Auto.exe"
-			!ifndef LIGHTBUILD
-                File "${FILES_ROOT}\MTA San Andreas\Multi Theft Auto.exe.dat"
-			!endif
-			
-            ${If} $AddToGameExplorer == 1
-                ${GameExplorer_UpdateGame} ${GUID}
-                ${If} ${Errors}
-                    ${GameExplorer_AddGame} all "$INSTDIR\Multi Theft Auto.exe" "$INSTDIR" "$INSTDIR\Multi Theft Auto.exe" ${GUID}
-                    CreateDirectory $APPDATA\Microsoft\Windows\GameExplorer\${GUID}\SupportTasks\0
-                    CreateShortcut "$APPDATA\Microsoft\Windows\GameExplorer\$0\SupportTasks\0\Client Manual.lnk" \ "http://wiki.multitheftauto.com/wiki/Client_Manual"
-                ${EndIf}
-            ${EndIf}
-
-            Call DoServiceInstall
-		SectionEnd
-
-		Section "Game module" SEC02
-			SectionIn 1 RO
-			SetOutPath "$INSTDIR\mods\deathmatch"
-			File "${FILES_ROOT}\MTA San Andreas\mods\deathmatch\Client.dll"
-			File "${SERVER_FILES_ROOT}\mods\deathmatch\lua5.1.dll"
-			SetOutPath "$INSTDIR\mods\deathmatch\resources"
-		SectionEnd
-	SectionGroupEnd
-!endif
-
-!ifdef INCLUDE_SERVER
-	!ifdef CLIENT_SETUP
-		SectionGroup /e "Dedicated server" SECGSERVER
-	!endif
+SectionGroup /e "Dedicated server" SECGSERVER
 	Section "Core components" SEC04
-	SectionIn 1 2 RO ; section is required
-	
-	StrCmp "$RedistInstalled" "1" DontInstallRedist
-	Call InstallVC90Redistributable
-	StrCmp "$RedistInstalled" "1" DontInstallRedist
-	Abort
-DontInstallRedist:
+		SectionIn 1 2 RO ; section is required
+		
+		StrCmp "$RedistInstalled" "1" DontInstallRedist
+		Call InstallVC90Redistributable
+		StrCmp "$RedistInstalled" "1" DontInstallRedist
+		Abort
+	DontInstallRedist:
 
 		SetOutPath "$INSTDIR\server"
 		SetOverwrite on
@@ -661,9 +607,7 @@ DontInstallRedist:
 		File "${SERVER_FILES_ROOT}\mods\deathmatch\vehiclecolors.conf"
 
 		!ifndef LIGHTBUILD
-			!ifdef CLIENT_SETUP
-				File "${SERVER_FILES_ROOT}\mods\deathmatch\local.conf"
-			!endif
+			File "${SERVER_FILES_ROOT}\mods\deathmatch\local.conf"
 			
 			SetOutPath "$INSTDIR\server\mods\deathmatch\resources"
 			SetOutPath "$INSTDIR\server\mods\deathmatch\resource-cache"
@@ -778,10 +722,7 @@ DontInstallRedist:
 		SectionEnd
 	!endif
 
-	!ifdef CLIENT_SETUP
-		SectionGroupEnd
-	!endif
-!endif
+SectionGroupEnd
 
 !ifdef INCLUDE_DEVELOPMENT
 	SectionGroup /e "Development" SECGDEV
@@ -816,21 +757,12 @@ DontInstallRedist:
 
 
 Section -Post
-	!ifdef CLIENT_SETUP
-		WriteUninstaller "$INSTDIR\Uninstall.exe"
-		;WriteRegStr HKLM "${PRODUCT_DIR_REGKEY}" "" "$INSTDIR\Multi Theft Auto.exe"
-	!else
-		WriteUninstaller "$INSTDIR\server\Uninstall.exe"
-		;WriteRegStr HKLM "${PRODUCT_DIR_REGKEY}" "" "$INSTDIR\Server\MTA Server.exe"
-	!endif
+	WriteUninstaller "$INSTDIR\Uninstall.exe"
+	;WriteRegStr HKLM "${PRODUCT_DIR_REGKEY}" "" "$INSTDIR\Multi Theft Auto.exe"
 
 	WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "DisplayName" "$(^Name)"
-	!ifdef CLIENT_SETUP
-		WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "UninstallString" "$INSTDIR\Uninstall.exe"
-		WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "DisplayIcon" "$INSTDIR\Multi Theft Auto.exe"
-	!else
-		WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "UninstallString" "$INSTDIR\Server\Uninstall.exe"
-	!endif
+	WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "UninstallString" "$INSTDIR\Uninstall.exe"
+	WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "DisplayIcon" "$INSTDIR\Multi Theft Auto.exe"
 	WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "DisplayVersion" "${PRODUCT_VERSION}"
 	WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "URLInfoAbout" "${PRODUCT_WEB_SITE}"
 	WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "Publisher" "${PRODUCT_PUBLISHER}"
@@ -858,83 +790,74 @@ Function un.onInit
 FunctionEnd
 
 Section Uninstall
-	!ifdef CLIENT_SETUP
-		IfFileExists "$INSTDIR\server\mods\deathmatch\resources\*.*" ask 0 ;no maps folder, so delete everything
-		IfFileExists "$INSTDIR\screenshots\*.*" ask 0 ;no maps folder, so delete everything
-		IfFileExists "$INSTDIR\mods\deathmatch\resources\*.*" ask deleteall ;no maps folder, so delete everything
-		ask:
-		MessageBox MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2 "Would you like to keep your data files (such as resources, screenshots and server configuration)? If you click no, any resources, configurations or screenshots you have created will be lost." IDYES preservemapsfolder
+	IfFileExists "$INSTDIR\server\mods\deathmatch\resources\*.*" ask 0 ;no maps folder, so delete everything
+	IfFileExists "$INSTDIR\screenshots\*.*" ask 0 ;no maps folder, so delete everything
+	IfFileExists "$INSTDIR\mods\deathmatch\resources\*.*" ask deleteall ;no maps folder, so delete everything
+	ask:
+	MessageBox MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2 "Would you like to keep your data files (such as resources, screenshots and server configuration)? If you click no, any resources, configurations or screenshots you have created will be lost." IDYES preservemapsfolder
 
-		deleteall:
-        Call un.DoServiceUninstall
-		RmDir /r "$INSTDIR\mods"
-		RmDir /r "$INSTDIR\MTA"
+	deleteall:
+    Call un.DoServiceUninstall
+	RmDir /r "$INSTDIR\mods"
+	RmDir /r "$INSTDIR\MTA"
 
-		!ifdef INCLUDE_SERVER
-			RmDir /r "$INSTDIR\server"
-		!endif
+	RmDir /r "$INSTDIR\server"
 
-		!ifdef INCLUDE_DEVELOPMENT ; start of fix for #3889
-			RmDir /r "$INSTDIR\development\module sdk\publicsdk"
-			RmDir "$INSTDIR\development\module sdk"
-			RmDir "$INSTDIR\development"
-		!endif ; end of fix for #3889
+	!ifdef INCLUDE_DEVELOPMENT ; start of fix for #3889
+		RmDir /r "$INSTDIR\development\module sdk\publicsdk"
+		RmDir "$INSTDIR\development\module sdk"
+		RmDir "$INSTDIR\development"
+	!endif ; end of fix for #3889
 
-		preservemapsfolder:
-        Call un.DoServiceUninstall
-		; server CORE FILES
-		!ifdef INCLUDE_SERVER
-			Delete "$INSTDIR\server\core.dll"
-			Delete "$INSTDIR\server\xmll.dll"
-			Delete "$INSTDIR\server\MTA Server.exe"
-			Delete "$INSTDIR\server\net.dll"
-			Delete "$INSTDIR\server\msvcp71.dll"
-			Delete "$INSTDIR\server\msvcr71.dll"
-			Delete "$INSTDIR\server\libcurl.dll"
+	preservemapsfolder:
+    Call un.DoServiceUninstall
+	; server CORE FILES
+	Delete "$INSTDIR\server\core.dll"
+	Delete "$INSTDIR\server\xmll.dll"
+	Delete "$INSTDIR\server\MTA Server.exe"
+	Delete "$INSTDIR\server\net.dll"
+	Delete "$INSTDIR\server\msvcp71.dll"
+	Delete "$INSTDIR\server\msvcr71.dll"
+	Delete "$INSTDIR\server\libcurl.dll"
 
-			; server files
-			Delete "$INSTDIR\server\mods\deathmatch\deathmatch.dll"
-			Delete "$INSTDIR\server\mods\deathmatch\lua5.1.dll"
-			Delete "$INSTDIR\server\mods\deathmatch\pcre3.dll"
-			Delete "$INSTDIR\server\mods\deathmatch\pthreadVC2.dll"
-			Delete "$INSTDIR\server\mods\deathmatch\sqlite3.dll"
-			Delete "$INSTDIR\server\mods\deathmatch\dbconmy.dll"
-			Delete "$INSTDIR\server\mods\deathmatch\libmysql.dll"
-		!endif
+	; server files
+	Delete "$INSTDIR\server\mods\deathmatch\deathmatch.dll"
+	Delete "$INSTDIR\server\mods\deathmatch\lua5.1.dll"
+	Delete "$INSTDIR\server\mods\deathmatch\pcre3.dll"
+	Delete "$INSTDIR\server\mods\deathmatch\pthreadVC2.dll"
+	Delete "$INSTDIR\server\mods\deathmatch\sqlite3.dll"
+	Delete "$INSTDIR\server\mods\deathmatch\dbconmy.dll"
+	Delete "$INSTDIR\server\mods\deathmatch\libmysql.dll"
 
-		Delete "$INSTDIR\Multi Theft Auto.exe"
-		Delete "$INSTDIR\Multi Theft Auto.exe.dat"
-		Delete "$INSTDIR\Uninstall.exe"
+	Delete "$INSTDIR\Multi Theft Auto.exe"
+	Delete "$INSTDIR\Multi Theft Auto.exe.dat"
+	Delete "$INSTDIR\Uninstall.exe"
 
-		Delete "$INSTDIR\mods\deathmatch\Client.dll"
+	Delete "$INSTDIR\mods\deathmatch\Client.dll"
 
-		RmDir /r "$INSTDIR\MTA\cgui"
-		RmDir /r "$INSTDIR\MTA\data"
-		Delete "$INSTDIR\MTA\*.dll"
-		Delete "$INSTDIR\MTA\*.ax"
-		Delete "$INSTDIR\MTA\*.txt"
-		Delete "$INSTDIR\MTA\*.dat"
+	RmDir /r "$INSTDIR\MTA\cgui"
+	RmDir /r "$INSTDIR\MTA\data"
+	Delete "$INSTDIR\MTA\*.dll"
+	Delete "$INSTDIR\MTA\*.ax"
+	Delete "$INSTDIR\MTA\*.txt"
+	Delete "$INSTDIR\MTA\*.dat"
 
-		RmDir /r "$APPDATA\MTA San Andreas All\${0.0}"
-		; TODO if $APPDATA\MTA San Andreas All\Common is the only one left, delete it
+	RmDir /r "$APPDATA\MTA San Andreas All\${0.0}"
+	; TODO if $APPDATA\MTA San Andreas All\Common is the only one left, delete it
 
-		DeleteRegKey ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}"
-		DeleteRegKey HKLM "${PRODUCT_DIR_REGKEY}"
-		DeleteRegKey HKLM "SOFTWARE\Multi Theft Auto: San Andreas ${0.0}"
-		DeleteRegKey HKCU "SOFTWARE\Multi Theft Auto: San Andreas ${0.0}"
-		DeleteRegKey HKLM "SOFTWARE\Multi Theft Auto: San Andreas All\${0.0}"
-		; TODO if HKLM "SOFTWARE\Multi Theft Auto: San Andreas All\Common is the only one left, delete it
-		
-		${GameExplorer_RemoveGame} ${GUID}
-		
-		; Delete client shortcuts
-		Delete "$SMPROGRAMS\\MTA San Andreas ${0.0}\MTA San Andreas.lnk"
-		Delete "$SMPROGRAMS\\MTA San Andreas ${0.0}\Uninstall MTA San Andreas.lnk"
-        Delete "$DESKTOP\MTA San Andreas ${0.0}.lnk"
-
-	!else
-		RmDir /r "$INSTDIR\server" ; for server only install
-	!endif
+	DeleteRegKey ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}"
+	DeleteRegKey HKLM "${PRODUCT_DIR_REGKEY}"
+	DeleteRegKey HKLM "SOFTWARE\Multi Theft Auto: San Andreas ${0.0}"
+	DeleteRegKey HKCU "SOFTWARE\Multi Theft Auto: San Andreas ${0.0}"
+	DeleteRegKey HKLM "SOFTWARE\Multi Theft Auto: San Andreas All\${0.0}"
+	; TODO if HKLM "SOFTWARE\Multi Theft Auto: San Andreas All\Common is the only one left, delete it
+	
+	${GameExplorer_RemoveGame} ${GUID}
+	
+	; Delete client shortcuts
+	Delete "$SMPROGRAMS\\MTA San Andreas ${0.0}\MTA San Andreas.lnk"
+	Delete "$SMPROGRAMS\\MTA San Andreas ${0.0}\Uninstall MTA San Andreas.lnk"
+    Delete "$DESKTOP\MTA San Andreas ${0.0}.lnk"
 
 	RmDir "$INSTDIR" ; fix for #3898
 
