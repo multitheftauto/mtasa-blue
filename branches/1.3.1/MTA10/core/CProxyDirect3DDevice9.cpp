@@ -208,6 +208,9 @@ HRESULT CProxyDirect3DDevice9::Reset                          ( D3DPRESENT_PARAM
 {
     WriteDebugEvent ( "CProxyDirect3DDevice9::Reset" );
 
+    // Save presentation parameters
+    D3DPRESENT_PARAMETERS presentationParametersOrig = *pPresentationParameters;
+
     GetVideoModeManager ()->PreReset ( pPresentationParameters );
 
     HRESULT hResult;
@@ -220,18 +223,22 @@ HRESULT CProxyDirect3DDevice9::Reset                          ( D3DPRESENT_PARAM
 
     if ( FAILED ( hResult ) )
     {
-        // Try sleep before retry
-        g_pCore->LogEvent( 7124, "Direct3D", "Direct3DDevice9::Reset", "Fail" );
-        Sleep ( 1000 );
+        // Record problem
+        g_pCore->LogEvent( 7124, "Direct3D", "Direct3DDevice9::Reset", SString( "Fail1:%08x", hResult ) );
+        WriteDebugEvent( SString( "Direct3DDevice9::Reset  Fail1:%08x", hResult ) );
+
+        // Try with original presentation parameters
+        *pPresentationParameters = presentationParametersOrig;
         hResult = m_pDevice->Reset ( pPresentationParameters );
 
         if ( FAILED ( hResult ) )
         {
-            // Still failed, report and dump
-            SetApplicationSetting ( "diagnostics", "last-crash-reason", "direct3ddevice-reset" );
-            SString strAdapterName = g_pDeviceState->AdapterState.Name;
-            AddReportLog ( 7124, SString ( "Direct3D - Direct3DDevice9::Reset - Fail - %s", *strAdapterName ) );
-            assert ( 0 && "Direct3DDevice::Reset - Failed to reset the device. Check all device dependent resources have been released.");
+            // Record problem
+            g_pCore->LogEvent( 7124, "Direct3D", "Direct3DDevice9::Reset", SString( "Fail2:%08x", hResult ) );
+            WriteDebugEvent( SString( "Direct3DDevice9::Reset  Fail2:%08x", hResult ) );
+
+            // Let caller handle what to do
+            return hResult;
         }
     }
 
