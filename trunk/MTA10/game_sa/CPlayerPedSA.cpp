@@ -502,8 +502,6 @@ void _declspec(naked) HOOK_CPlayerPed_ProcessAnimGroups_Mid()
 {
     _asm
     {
-        cmp     [esi+4D4h], eax     // pPed->iMoveAnim
-        jz      cont        // No change
         pushad
         push    eax
         push    esi
