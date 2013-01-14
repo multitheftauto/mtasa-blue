@@ -1391,6 +1391,7 @@ bool CStaticFunctionDefinitions::SetElementInterior ( CElement* pElement, unsign
 bool CStaticFunctionDefinitions::SetElementDimension ( CElement* pElement, unsigned short usDimension )
 {
     assert ( pElement );
+    RUN_CHILDREN ( *iter, usDimension );
 
     if ( pElement->GetType () == CElement::TEAM )
     {
