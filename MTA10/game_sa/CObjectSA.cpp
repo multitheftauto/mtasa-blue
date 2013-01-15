@@ -238,9 +238,9 @@ void CObjectSA::Break ()
     _asm
     {
         push    32h // most cases: between 30 and 37
-        push    0B73720h // global var
-        push    0B73710h // glovar var: @next push
-        push    0 // <- has something to do with particle effects, to disable it, we can set it to 0
+        push    0 // colliding entity. To ignore it, we can set it to 0
+        push    0B73710h // vecCollisionImpactVelocity
+        push    0 // vecCollisionLastPos
         push    fHitVelocity
         mov     ecx, dwThis
         call    dwFunc

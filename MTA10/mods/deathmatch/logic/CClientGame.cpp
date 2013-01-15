@@ -2766,8 +2766,8 @@ void CClientGame::AddBuiltInEvents ( void )
     m_Events.AddEvent ( "onClientSoundBeat", "time", NULL, false );
 
     // Object events
-    m_Events.AddEvent ( "onClientObjectDamage", "loss", NULL, false );
-    m_Events.AddEvent ( "onClientObjectBreak", "", NULL, false );
+    m_Events.AddEvent ( "onClientObjectDamage", "loss, attacker", NULL, false );
+    m_Events.AddEvent ( "onClientObjectBreak", "attacker", NULL, false );
 
     // Misc events
     m_Events.AddEvent ( "onClientFileDownloadComplete", "fileName, success", NULL, false );
@@ -3581,14 +3581,14 @@ bool CClientGame::StaticHeliKillHandler ( CVehicleSAInterface* pHeliInterface, C
     return g_pClientGame->HeliKillHandler ( pHeliInterface, pPed );
 }
 
-bool CClientGame::StaticObjectDamageHandler ( CObjectSAInterface* pObjectInterface, float fLoss )
+bool CClientGame::StaticObjectDamageHandler ( CObjectSAInterface* pObjectInterface, float fLoss, CEntitySAInterface* pAttackerInterface )
 {
-    return g_pClientGame->ObjectDamageHandler ( pObjectInterface, fLoss );
+    return g_pClientGame->ObjectDamageHandler ( pObjectInterface, fLoss, pAttackerInterface );
 }
 
-bool CClientGame::StaticObjectBreakHandler ( CObjectSAInterface* pObjectInterface )
+bool CClientGame::StaticObjectBreakHandler ( CObjectSAInterface* pObjectInterface, CEntitySAInterface* pAttackerInterface )
 {
-    return g_pClientGame->ObjectBreakHandler ( pObjectInterface );
+    return g_pClientGame->ObjectBreakHandler ( pObjectInterface, pAttackerInterface );
 }
 
 bool CClientGame::StaticWaterCannonHandler ( CVehicleSAInterface* pCannonVehicle, CPedSAInterface* pHitPed )
@@ -4373,7 +4373,7 @@ bool CClientGame::HeliKillHandler ( CVehicleSAInterface* pHeliInterface, CPedSAI
     return true;
 }
 
-bool CClientGame::ObjectDamageHandler ( CObjectSAInterface* pObjectInterface, float fLoss )
+bool CClientGame::ObjectDamageHandler ( CObjectSAInterface* pObjectInterface, float fLoss, CEntitySAInterface* pAttackerInterface )
 {
     if ( pObjectInterface )
     {
@@ -4384,15 +4384,37 @@ bool CClientGame::ObjectDamageHandler ( CObjectSAInterface* pObjectInterface, fl
         // Is our client vehicle valid?
         if ( pClientObject )
         {
+            CEntity * pAttacker = g_pGame->GetPools ( )->GetEntity ( (DWORD *)pAttackerInterface );
+            CClientEntity * pClientAttacker = NULL;
+            if ( pAttacker )
+            {
+                if ( pAttacker->GetEntityType ( ) == ENTITY_TYPE_VEHICLE )
+                {
+                    CVehicle * pAttackerVehicle = g_pGame->GetPools ( )->GetVehicle ( (DWORD *)pAttackerInterface );
+                    pClientAttacker = m_pManager->FindEntity ( pAttackerVehicle );
+                }
+                else if ( pAttacker->GetEntityType ( ) == ENTITY_TYPE_PED )
+                {
+                    CPed * pAttackerPed = g_pGame->GetPools ( )->GetPed ( (DWORD *)pAttackerInterface );
+                    pClientAttacker = m_pManager->FindEntity ( pAttackerPed );
+                }
+            }
+
             CLuaArguments Arguments;
             Arguments.PushNumber( fLoss );
+
+            if ( pClientAttacker )
+                Arguments.PushElement ( pClientAttacker );
+            else
+                Arguments.PushNil ( );
+            
             return pClientObject->CallEvent ( "onClientObjectDamage", Arguments, true );
         }
     }
     return true;
 }
 
-bool CClientGame::ObjectBreakHandler ( CObjectSAInterface* pObjectInterface )
+bool CClientGame::ObjectBreakHandler ( CObjectSAInterface* pObjectInterface, CEntitySAInterface* pAttackerInterface )
 {
     if ( pObjectInterface )
     {
@@ -4402,7 +4424,29 @@ bool CClientGame::ObjectBreakHandler ( CObjectSAInterface* pObjectInterface )
         // Is our client vehicle valid?
         if ( pClientObject )
         {
+            CEntity * pAttacker = g_pGame->GetPools ( )->GetEntity ( (DWORD *)pAttackerInterface );
+            CClientEntity * pClientAttacker = NULL;
+            if ( pAttacker )
+            {
+                if ( pAttacker->GetEntityType ( ) == ENTITY_TYPE_VEHICLE )
+                {
+                    CVehicle * pAttackerVehicle = g_pGame->GetPools ( )->GetVehicle ( (DWORD *)pAttackerInterface );
+                    pClientAttacker = m_pManager->FindEntity ( pAttackerVehicle );
+                }
+                else if ( pAttacker->GetEntityType ( ) == ENTITY_TYPE_PED )
+                {
+                    CPed * pAttackerPed = g_pGame->GetPools ( )->GetPed ( (DWORD *)pAttackerInterface );
+                    pClientAttacker = m_pManager->FindEntity ( pAttackerPed );
+                }
+            }
+
             CLuaArguments Arguments;
+
+            if ( pClientAttacker )
+                Arguments.PushElement ( pClientAttacker );
+            else
+                Arguments.PushNil ( );
+
             return pClientObject->CallEvent ( "onClientObjectBreak", Arguments, true );
         }
     }

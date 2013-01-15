@@ -65,8 +65,8 @@ typedef void ( BlendAnimationHandler ) ( RpClump * pClump, AssocGroupId animGrou
 typedef bool ( ProcessCollisionHandler ) ( class CEntitySAInterface* pThisInterface, class CEntitySAInterface* pOtherInterface );
 typedef bool ( VehicleCollisionHandler ) ( class CVehicleSAInterface* pCollidingVehicle, class CEntitySAInterface* pCollidedVehicle, int iModelIndex, float fDamageImpulseMag, float fCollidingDamageImpulseMag, uint16 usPieceType, CVector vecCollisionPos, CVector vecCollisionVelocity );
 typedef bool ( HeliKillHandler ) ( class CVehicleSAInterface* pVehicle, class CPedSAInterface* pPed );
-typedef bool ( ObjectDamageHandler ) ( class CObjectSAInterface* pObject, float fLoss );
-typedef bool ( ObjectBreakHandler ) ( class CObjectSAInterface* pObject );
+typedef bool ( ObjectDamageHandler ) ( class CObjectSAInterface* pObject, float fLoss, class CEntitySAInterface* pAttacker );
+typedef bool ( ObjectBreakHandler ) ( class CObjectSAInterface* pObject, class CEntitySAInterface* pAttacker );
 typedef bool ( WaterCannonHitHandler ) ( class CVehicleSAInterface* pCannonVehicle, class CPedSAInterface* pHitPed );
 typedef void ( GameObjectDestructHandler ) ( CEntitySAInterface* pObject );
 typedef void ( GameVehicleDestructHandler ) ( CEntitySAInterface* pVehicle );
