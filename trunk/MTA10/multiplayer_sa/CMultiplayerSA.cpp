@@ -6200,6 +6200,7 @@ lp1:        jmp RETURN_CHeli_ProcessHeliKill_6DB437h
 
 
 CObjectSAInterface * pDamagedObject = NULL;
+CEntitySAInterface * pObjectAttacker = NULL;
 float fNewObjectHealth = NULL;
 bool bObjectDamaged = true;
 
@@ -6210,7 +6211,7 @@ bool TriggerObjectDamageEvent ( )
         float fHealth = *(float *)( (DWORD)pDamagedObject + 340 );
         float fLoss = fHealth - fNewObjectHealth;
 
-        return m_pObjectDamageHandler ( pDamagedObject, fLoss );
+        return m_pObjectDamageHandler ( pDamagedObject, fLoss, pObjectAttacker );
     }
     return true;
 }
@@ -6225,9 +6226,10 @@ void _declspec(naked) HOOK_CObject_ProcessDamage ( )
 
     _asm
     {
-        mov     pDamagedObject, esi
-        fst     dword ptr fNewObjectHealth
         pushad
+        mov     pDamagedObject, esi
+        mov     pObjectAttacker, edi
+        fst     dword ptr fNewObjectHealth
     }
     if ( TriggerObjectDamageEvent ( ) )
     {
@@ -6255,7 +6257,7 @@ bool TriggerObjectBreakEvent ( )
 {
     if ( m_pObjectBreakHandler && pDamagedObject )
     {
-        return m_pObjectBreakHandler ( pDamagedObject );
+        return m_pObjectBreakHandler ( pDamagedObject, pObjectAttacker );
     }
     return true;
 }
