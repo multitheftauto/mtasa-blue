@@ -470,6 +470,7 @@ void CGameSA::Initialize ( void )
     // Initialize garages
     m_pGarages->Initialize();
     SetupSpecialCharacters ();
+    m_pRenderWare->Initialize();
 
     // *Sebas* Hide the GTA:SA Main menu.
     MemPutFast < BYTE > ( CLASS_CMenuManager+0x5C, 0 );

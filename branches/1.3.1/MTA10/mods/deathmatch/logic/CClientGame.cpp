@@ -3594,11 +3594,13 @@ void CClientGame::StaticGameEntityRenderHandler ( CEntitySAInterface* pGameEntit
         if ( pClientEntity )
         {
             int iTypeMask;
+            ushort usModelId = 0xFFFF;
             switch ( pClientEntity->GetType () )
             {
                 case CCLIENTPED:
                 case CCLIENTPLAYER:
                     iTypeMask = TYPE_MASK_PED;
+                    usModelId = (ushort)static_cast< CClientPed* >( pClientEntity )->GetModel();
                     break;
                 case CCLIENTVEHICLE:
                     iTypeMask = TYPE_MASK_VEHICLE;
@@ -3610,12 +3612,12 @@ void CClientGame::StaticGameEntityRenderHandler ( CEntitySAInterface* pGameEntit
                     iTypeMask = TYPE_MASK_OTHER;
                     break;
             }
-            g_pGame->GetRenderWare ()->SetRenderingClientEntity ( pClientEntity, iTypeMask );
+            g_pGame->GetRenderWare ()->SetRenderingClientEntity ( pClientEntity, usModelId, iTypeMask );
             return;
         }
     }
 
-    g_pGame->GetRenderWare ()->SetRenderingClientEntity ( NULL, TYPE_MASK_WORLD );
+    g_pGame->GetRenderWare ()->SetRenderingClientEntity ( NULL, 0xFFFF, TYPE_MASK_WORLD );
 }
 
 void CClientGame::DrawRadarAreasHandler ( void )

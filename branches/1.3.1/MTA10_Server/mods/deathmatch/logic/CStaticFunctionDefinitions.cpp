@@ -1752,9 +1752,10 @@ bool CStaticFunctionDefinitions::ClearElementVisibleTo ( CElement* pElement )
     {
         CPerPlayerEntity* pEntity = static_cast < CPerPlayerEntity* > ( pElement );
         pEntity->ClearVisibleToReferences ();
+        return true;
     }
 
-    return true;
+    return false;
 }
 
 bool CStaticFunctionDefinitions::SetElementSyncer ( CElement* pElement, CPlayer* pPlayer, bool bEnable )
@@ -1991,13 +1992,16 @@ bool CStaticFunctionDefinitions::DetonateSatchels ( CElement* pElement )
     RUN_CHILDREN DetonateSatchels ( *iter );
 
     // Tell everyone
-    CPlayer* pPlayer = static_cast<CPlayer *>( pElement );
-    CDetonateSatchelsPacket Packet;
-    if ( pPlayer && pPlayer->IsJoined () )
+    if ( IS_PLAYER( pElement ) )
     {
-        Packet.SetSourceElement ( pPlayer );
-        m_pPlayerManager->BroadcastOnlyJoined ( Packet );
-        return true;
+        CPlayer* pPlayer = static_cast<CPlayer *>( pElement );
+        if ( pPlayer->IsJoined () )
+        {
+            CDetonateSatchelsPacket Packet;
+            Packet.SetSourceElement ( pPlayer );
+            m_pPlayerManager->BroadcastOnlyJoined ( Packet );
+            return true;
+        }
     }
     return false;
 }
@@ -2956,9 +2960,10 @@ bool CStaticFunctionDefinitions::SetPlayerMoney ( CElement* pElement, long lMone
 
         // Set the money and return true
         pPlayer->SetMoney ( lMoney );
+        return true;
     }
 
-    return true;
+    return false;
 }
 
 
@@ -2988,9 +2993,10 @@ bool CStaticFunctionDefinitions::GivePlayerMoney ( CElement* pElement, long lMon
 
         // Set the money and return true
         pPlayer->SetMoney ( lNewMoney );
+        return true;
     }
 
-    return true;
+    return false;
 }
 
 
@@ -3013,9 +3019,10 @@ bool CStaticFunctionDefinitions::TakePlayerMoney ( CElement* pElement, long lMon
 
         // Set the money and return true
         pPlayer->SetMoney ( lNewMoney );
+        return true;
     }
 
-    return true;
+    return false;
 }
 
 
@@ -3556,10 +3563,10 @@ bool CStaticFunctionDefinitions::SetPedArmor ( CElement* pElement, float fArmor 
                 BitStream.pBitStream->Write ( ucArmor );
                 BitStream.pBitStream->Write ( pPed->GenerateSyncTimeContext () );
                 m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pPed, SET_PED_ARMOR, *BitStream.pBitStream ) );
+                return true;
             }
         }
 
-        return true;
     }
 
     return false;
@@ -3680,10 +3687,11 @@ bool CStaticFunctionDefinitions::SetPedRotation ( CElement* pElement, float fRot
             BitStream.pBitStream->Write ( ucNewWay );
 
             m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pPed, SET_PED_ROTATION, *BitStream.pBitStream ) );
+            return true;
         }
     }
 
-    return true;
+    return false;
 }
 
 
@@ -3714,8 +3722,8 @@ bool CStaticFunctionDefinitions::SetPedStat ( CElement* pElement, unsigned short
 
                 return true;
             }
-            return false;
         }
+        else
         if ( IS_PED ( pElement ) )
         {
             CPed* pPed = static_cast < CPed* > ( pElement );
@@ -3928,9 +3936,8 @@ bool CStaticFunctionDefinitions::SetPedGravity ( CElement* pElement, float fGrav
                 CBitStream BitStream;
                 BitStream.pBitStream->Write ( fGravity );
                 m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pPed, SET_PED_GRAVITY, *BitStream.pBitStream ) );
+                return true;
             }
-
-            return true;
         }
     }
     return false;
@@ -4105,10 +4112,11 @@ bool CStaticFunctionDefinitions::RemovePedFromVehicle ( CElement* pElement )
             CBitStream BitStream;
             BitStream.pBitStream->Write ( pPed->GenerateSyncTimeContext () );
             m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pPed, REMOVE_PED_FROM_VEHICLE, *BitStream.pBitStream ) );
+            return true;
         }
     }
 
-    return true;
+    return false;
 }
 
 
@@ -6119,9 +6127,10 @@ bool CStaticFunctionDefinitions::SetVehicleColor ( CElement* pElement, const CVe
             BitStream.pBitStream->Write ( RGBColor.B );
         }
         m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pVehicle, SET_VEHICLE_COLOR, *BitStream.pBitStream ) );
+        return true;
     }
 
-    return true;
+    return false;
 }
 
 
@@ -6149,10 +6158,11 @@ bool CStaticFunctionDefinitions::SetVehicleLandingGearDown ( CElement* pElement,
             CBitStream BitStream;
             BitStream.pBitStream->Write ( ucLandingGearDown );
             m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pVehicle, SET_VEHICLE_LANDING_GEAR_DOWN, *BitStream.pBitStream ) );
+            return true;
         }
     }
 
-    return true;
+    return false;
 }
 
 
@@ -6228,9 +6238,10 @@ bool CStaticFunctionDefinitions::SetVehicleRotation ( CElement* pElement, const 
         BitStream.pBitStream->Write ( vecRotation.fZ );
         BitStream.pBitStream->Write ( pVehicle->GenerateSyncTimeContext () );
         m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pVehicle, SET_VEHICLE_ROTATION, *BitStream.pBitStream ) );
+        return true;
     }
 
-    return true;
+    return false;
 }
 
 
@@ -6301,9 +6312,10 @@ bool CStaticFunctionDefinitions::SetVehicleTurnVelocity ( CElement* pElement, co
         BitStream.pBitStream->Write ( vecTurnVelocity.fY );
         BitStream.pBitStream->Write ( vecTurnVelocity.fZ );
         m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pVehicle, SET_VEHICLE_TURNSPEED, *BitStream.pBitStream ) );
+        return true;
     }
 
-    return true;
+    return false;
 }
 
 
@@ -7517,9 +7529,10 @@ bool CStaticFunctionDefinitions::SetMarkerSize ( CElement* pElement, float fSize
         // Set the new size
         CMarker* pMarker = static_cast < CMarker* > ( pElement );
         pMarker->SetSize ( fSize );
+        return true;
     }
 
-    return true;
+    return false;
 }
 
 
@@ -7534,9 +7547,10 @@ bool CStaticFunctionDefinitions::SetMarkerColor ( CElement* pElement, const SCol
         // Set the new color
         CMarker* pMarker = static_cast < CMarker* > ( pElement );
         pMarker->SetColor ( color );
+        return true;
     }
 
-    return true;
+    return false;
 }
 
 
@@ -7758,8 +7772,6 @@ bool CStaticFunctionDefinitions::SetBlipSize ( CElement* pElement, unsigned char
                 return true;
             }
         }
-
-        return true;
     }
 
     return false;
@@ -7898,9 +7910,10 @@ bool CStaticFunctionDefinitions::SetObjectRotation ( CElement* pElement, const C
         BitStream.pBitStream->Write ( vecRadians.fY );
         BitStream.pBitStream->Write ( vecRadians.fZ );
         m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pObject, SET_OBJECT_ROTATION, *BitStream.pBitStream ) );
+        return true;
     }
 
-    return true;
+    return false;
 }
 
 
@@ -7917,9 +7930,10 @@ bool CStaticFunctionDefinitions::SetObjectScale ( CElement* pElement, float fSca
         CBitStream BitStream;
         BitStream.pBitStream->Write ( fScale );
         m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pObject, SET_OBJECT_SCALE, *BitStream.pBitStream ) );
+        return true;
     }
 
-    return true;
+    return false;
 }
 
 
@@ -7964,9 +7978,10 @@ bool CStaticFunctionDefinitions::MoveObject ( CResource * pResource, CElement* p
 
             m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pObject, MOVE_OBJECT, *BitStream.pBitStream ) );
         }        
+        return true;
     }
 
-    return true;
+    return false;
 }
 
 
@@ -8100,9 +8115,10 @@ bool CStaticFunctionDefinitions::SetRadarAreaColor ( CElement* pElement, const S
     {
         CRadarArea* pRadarArea = static_cast < CRadarArea* > ( pElement );
         pRadarArea->SetColor ( color );
+        return true;
     }
 
-    return true;
+    return false;
 }
 
 
@@ -8115,9 +8131,10 @@ bool CStaticFunctionDefinitions::SetRadarAreaFlashing ( CElement* pElement, bool
     {
         CRadarArea* pRadarArea = static_cast < CRadarArea* > ( pElement );
         pRadarArea->SetFlashing ( bFlashing );
+        return true;
     }
 
-    return true;
+    return false;
 }
 
 
@@ -8325,11 +8342,9 @@ bool CStaticFunctionDefinitions::SetPickupType ( CElement* pElement, unsigned ch
                 return true;
             }
         }
-
-        return false;
     }
 
-    return true;
+    return false;
 }
 
 
@@ -8372,17 +8387,25 @@ bool CStaticFunctionDefinitions::CreateExplosion ( const CVector& vecPosition, u
     if ( pElement )
     {
         RUN_CHILDREN CreateExplosion ( vecPosition, ucType, *iter );
+
+        // Tell everyone
+        if ( IS_PLAYER ( pElement ) )
+        {
+            CPlayer* pPlayer = static_cast < CPlayer* > ( pElement );
+            CExplosionSyncPacket Packet ( vecPosition, ucType );
+            Packet.SetSourceElement ( pPlayer );
+            m_pPlayerManager->BroadcastOnlyJoined ( Packet );
+            return true;
+        }
+    }
+    else
+    {
+        CExplosionSyncPacket Packet ( vecPosition, ucType );
+        m_pPlayerManager->BroadcastOnlyJoined ( Packet );
+        return true;
     }
 
-    // Tell everyone
-    CExplosionSyncPacket Packet ( vecPosition, ucType );
-    if ( pElement && IS_PLAYER ( pElement ) )
-    {
-        CPlayer* pPlayer = static_cast < CPlayer* > ( pElement );
-        Packet.SetSourceElement ( pPlayer );
-    }
-    m_pPlayerManager->BroadcastOnlyJoined ( Packet );
-    return true;
+    return false;
 }
 
 bool CStaticFunctionDefinitions::CreateFire ( const CVector& vecPosition, float fSize, CElement* pElement )
@@ -8390,17 +8413,25 @@ bool CStaticFunctionDefinitions::CreateFire ( const CVector& vecPosition, float 
     if ( pElement )
     {
         RUN_CHILDREN CreateFire ( vecPosition, fSize, *iter );
+
+        // Tell everyone
+        if ( IS_PLAYER ( pElement ) )
+        {
+            CPlayer* pPlayer = static_cast < CPlayer* > ( pElement );
+            CFireSyncPacket Packet ( vecPosition, fSize );
+            Packet.SetSourceElement ( pPlayer );
+            m_pPlayerManager->BroadcastOnlyJoined ( Packet );
+            return true;
+        }
+    }
+    else
+    {
+        CFireSyncPacket Packet ( vecPosition, fSize );
+        m_pPlayerManager->BroadcastOnlyJoined ( Packet );
+        return true;
     }
 
-    // Tell everyone
-    CFireSyncPacket Packet ( vecPosition, fSize );
-    if ( pElement && IS_PLAYER ( pElement ) )
-    {
-        CPlayer* pPlayer = static_cast < CPlayer* > ( pElement );
-        Packet.SetSourceElement ( pPlayer );
-    }
-    m_pPlayerManager->BroadcastOnlyJoined ( Packet );
-    return true;
+    return false;
 }
 
 
@@ -8421,9 +8452,10 @@ bool CStaticFunctionDefinitions::PlaySoundFrontEnd ( CElement* pElement, unsigne
         BitStream.pBitStream->Write ( &sound );
 
         pPlayer->Send ( CLuaPacket ( PLAY_SOUND, *BitStream.pBitStream ) );
+        return true;
     }
 
-    return true;
+    return false;
 }
 
 
@@ -8443,9 +8475,10 @@ bool CStaticFunctionDefinitions::PlayMissionAudio ( CElement* pElement, CVector*
         BitStream.pBitStream->Write ( usSlot );
 
         pPlayer->Send ( CLuaPacket ( PLAY_SOUND, *BitStream.pBitStream ) );
+        return true;
     }
 
-    return true;
+    return false;
 }
 
 
@@ -8466,9 +8499,10 @@ bool CStaticFunctionDefinitions::PreloadMissionAudio ( CElement* pElement, unsig
         BitStream.pBitStream->Write ( usSlot );
 
         pPlayer->Send ( CLuaPacket ( PLAY_SOUND, *BitStream.pBitStream ) );
+        return true;
     }
 
-    return true;
+    return false;
 }
 
 
@@ -9357,6 +9391,7 @@ bool CStaticFunctionDefinitions::OutputChatBox ( const char* szText, CElement* p
     {
         CPlayer* pPlayer = static_cast < CPlayer* > ( pElement );
         pPlayer->Send ( CChatEchoPacket ( szText, ucRed, ucGreen, ucBlue, bColorCoded ) );
+        return true;
     }
     
     if ( pElement == m_pMapManager->GetRootElement() )
@@ -9369,7 +9404,7 @@ bool CStaticFunctionDefinitions::OutputChatBox ( const char* szText, CElement* p
         m_pMapManager->GetRootElement()->CallEvent ( "onChatMessage", Arguments );
     }
     
-    return true;
+    return false;
 }
 
 
@@ -9384,9 +9419,10 @@ bool CStaticFunctionDefinitions::OutputConsole ( const char* szText, CElement* p
     {
         CPlayer* pPlayer = static_cast < CPlayer* > ( pElement );
         pPlayer->Send ( CConsoleEchoPacket ( szText ) );
+        return true;
     }
 
-    return true;
+    return false;
 }
 
 

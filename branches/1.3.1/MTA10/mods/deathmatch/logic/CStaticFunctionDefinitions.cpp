@@ -3309,9 +3309,10 @@ bool CStaticFunctionDefinitions::SetObjectRotation ( CClientEntity& Entity, cons
 
         // Kayl: removed setTargetRotation, if we want consistency target WAS a delta not an absolute value and serverside doesn't allow rotation
         // change while moving so in theory it shouldn't have been used
+        return true;
     }
 
-    return true;
+    return false;
 }
 
 
@@ -3344,9 +3345,10 @@ bool CStaticFunctionDefinitions::MoveObject ( CClientEntity& Entity, unsigned lo
         animation.SetDuration ( ulTime );
 
         Object.StartMovement ( animation );
+        return true;
     }
 
-    return true;
+    return false;
 }
 
 
@@ -3931,9 +3933,10 @@ bool CStaticFunctionDefinitions::SetMarkerSize ( CClientEntity& Entity, float fS
         // Set the new size
         CClientMarker& Marker = static_cast < CClientMarker& > ( Entity );
         Marker.SetSize ( fSize );
+        return true;
     }
 
-    return true;
+    return false;
 }
 
 
@@ -3947,9 +3950,10 @@ bool CStaticFunctionDefinitions::SetMarkerColor ( CClientEntity& Entity, const S
         // Set the new color
         CClientMarker& Marker = static_cast < CClientMarker& > ( Entity );
         Marker.SetColor ( color );
+        return true;
     }
 
-    return true;
+    return false;
 }
 
 

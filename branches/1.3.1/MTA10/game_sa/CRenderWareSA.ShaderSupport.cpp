@@ -150,6 +150,9 @@ void CRenderWareSA::InitTextureWatchHooks ( void )
 ////////////////////////////////////////////////////////////////
 void CRenderWareSA::PulseWorldTextureWatch ( void )
 {
+    UpdateModuleTickCount64();
+    UpdateDisableGTAVertexShadersTimer();
+
     TIMING_CHECKPOINT( "+TextureWatch" );
 
     // Go through ms_txdStreamEventList
@@ -348,9 +351,10 @@ void CRenderWareSA::DestroyTexInfo ( STexInfo* pTexInfo )
 //
 //
 ////////////////////////////////////////////////////////////////
-void CRenderWareSA::SetRenderingClientEntity ( CClientEntityBase* pClientEntity, int iTypeMask )
+void CRenderWareSA::SetRenderingClientEntity ( CClientEntityBase* pClientEntity, ushort usModelId, int iTypeMask )
 {
     m_pRenderingClientEntity = pClientEntity;
+    m_usRenderingEntityModelId = usModelId;
     m_iRenderingEntityType = iTypeMask;
 }
 
@@ -366,6 +370,10 @@ SShaderItemLayers* CRenderWareSA::GetAppliedShaderForD3DData ( CD3DDUMMY* pD3DDa
 {
     m_uiReplacementRequestCounter++;
 
+    // If rendering cj, use one special texinfo for all the textures
+    if ( m_iRenderingEntityType == TYPE_MASK_PED && m_usRenderingEntityModelId == 0 )
+        pD3DData = FAKE_D3DTEXTURE_CJ;
+
     STexInfo* pTexInfo = MapFindRef ( m_D3DDataTexInfoMap, pD3DData );
 
     if ( !pTexInfo )
@@ -376,8 +384,11 @@ SShaderItemLayers* CRenderWareSA::GetAppliedShaderForD3DData ( CD3DDUMMY* pD3DDa
     if ( !pInfoLayers->output.pBase && pInfoLayers->output.layerList.empty () )
         return NULL;
 
-    // Check for vertex shader rule violation
-    dassert ( m_iRenderingEntityType != TYPE_MASK_PED || !pInfoLayers->output.bUsesVertexShader );
+    if ( m_iRenderingEntityType == TYPE_MASK_PED && pInfoLayers->output.bUsesVertexShader )
+    {
+        // If a possible conflict is detected, make sure GTA vertex shaders are disabled (effective from the next ped rendered)
+        DisableGTAVertexShadersForAWhile();
+    }
 
     m_uiReplacementMatchCounter++;
 
@@ -500,4 +511,95 @@ void CRenderWareSA::GetShaderReplacementStats ( SShaderReplacementStats& outStat
     outStats.uiNumReplacementRequests = m_uiNumReplacementRequests;
     outStats.uiNumReplacementMatches = m_uiNumReplacementMatches;
     m_pMatchChannelManager->GetShaderReplacementStats ( outStats );
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// CRenderWareSA::Initialize
+//
+//
+////////////////////////////////////////////////////////////////
+void CRenderWareSA::Initialize ( void )
+{
+    if ( !MapContains( m_D3DDataTexInfoMap, FAKE_D3DTEXTURE_CJ ) )
+    {
+        // Make a fake texinfo to handle all CJ textures
+        STexInfo* pTexInfo = CreateTexInfo( FAKE_RWTEXTURE_CJ, "CJ", FAKE_D3DTEXTURE_CJ );
+        OnTextureStreamIn( pTexInfo );
+    }
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// CRenderWareSA::DisableGTAVertexShadersForAWhile
+//
+// Disable GTA vertex shaders for the next 10 seconds
+//
+////////////////////////////////////////////////////////////////
+void CRenderWareSA::DisableGTAVertexShadersForAWhile( void )
+{
+    m_GTAVertexShadersDisabledTimer.Reset();
+    SetGTAVertexShadersEnabled( false );
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// CRenderWareSA::UpdateDisableGTAVertexShadersTimer
+//
+// Update countdown before automatically re enabling GTA vertex shaders
+//
+////////////////////////////////////////////////////////////////
+void CRenderWareSA::UpdateDisableGTAVertexShadersTimer( void )
+{
+#if MTA_DEBUG
+    if ( m_GTAVertexShadersDisabledTimer.Get() > 1 * 1000 )
+#else
+    if ( m_GTAVertexShadersDisabledTimer.Get() > 10 * 1000 )
+#endif
+    {
+        SetGTAVertexShadersEnabled( true );
+    }
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// CRenderWareSA::SetGTAVertexShadersEnabled
+//
+// Set to false to disable GTA vertex shaders, so we can use our own ones
+//
+////////////////////////////////////////////////////////////////
+void CRenderWareSA::SetGTAVertexShadersEnabled( bool bEnable )
+{
+    if ( m_bGTAVertexShadersEnabled == bEnable )
+        return;
+
+    m_bGTAVertexShadersEnabled = bEnable;
+ 
+    DWORD pSkinAtomic = 0x07C7CD0;
+    if ( pGame->GetGameVersion () != VERSION_US_10 )
+        pSkinAtomic = 0x07C7D10;
+
+    if ( bEnable )
+    {
+        // Allow GTA vertex shaders (default)
+        MemPut < BYTE > ( pSkinAtomic + 0, 0x8B );  // mov  eax, [edi+20h]
+        MemPut < BYTE > ( pSkinAtomic + 1, 0x47 );
+        MemPut < BYTE > ( pSkinAtomic + 2, 0x20 );
+        MemPut < BYTE > ( pSkinAtomic + 3, 0x85 );  // test eax, eax
+        MemPut < BYTE > ( pSkinAtomic + 4, 0xC0 );
+    }
+    else
+    {
+        // Disallow GTA vertex shaders
+        // This forces the current skin buffer to use software blending from now on
+        MemPut < BYTE > ( pSkinAtomic + 0, 0x33 );  // xor  eax, eax
+        MemPut < BYTE > ( pSkinAtomic + 1, 0xC0 );
+        MemPut < BYTE > ( pSkinAtomic + 2, 0x89 );  // mov  dword ptr [edi+20h], eax 
+        MemPut < BYTE > ( pSkinAtomic + 3, 0x47 );
+        MemPut < BYTE > ( pSkinAtomic + 4, 0x20 );
+    }
 }
