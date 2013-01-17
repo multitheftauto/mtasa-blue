@@ -345,6 +345,8 @@ CRenderWareSA::CRenderWareSA ( eGameVersion version )
     InitTextureWatchHooks ();
     m_pMatchChannelManager = new CMatchChannelManager ();
     m_iRenderingEntityType = TYPE_MASK_WORLD;
+    m_GTAVertexShadersDisabledTimer.SetMaxIncrement( 1000, true );
+    m_bGTAVertexShadersEnabled = true;
 }
 
 
@@ -926,12 +928,12 @@ const SString& CRenderWareSA::GetTextureName ( CD3DDUMMY* pD3DData )
 //
 CD3DDUMMY* GetEmptyMapKey ( CD3DDUMMY** )
 {
-    return (CD3DDUMMY*)-1;
+    return FAKE_D3DTEXTURE_EMPTY_KEY;
 }
 
 CD3DDUMMY* GetDeletedMapKey ( CD3DDUMMY** )
 {
-    return (CD3DDUMMY*)-2;
+    return FAKE_D3DTEXTURE_DELETED_KEY;
 }
 
 RwFrame * CRenderWareSA::GetFrameFromName ( RpClump * pRoot, SString strName )

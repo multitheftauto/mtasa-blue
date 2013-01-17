@@ -267,6 +267,10 @@ HRESULT CDirect3DEvents9::OnDrawPrimitive ( IDirect3DDevice9 *pDevice, D3DPRIMIT
     // Any shader for this texture ?
     SShaderItemLayers* pLayers = CGraphics::GetSingleton ().GetRenderItemManager ()->GetAppliedShaderForD3DData ( (CD3DDUMMY*)g_pDeviceState->TextureState[0].Texture );
 
+    // Skip draw if there is a vertex shader conflict
+    if ( pLayers && pLayers->bUsesVertexShader && g_pDeviceState->VertexShader )
+        return D3D_OK;
+
     if ( !pLayers )
     {
         // No shaders for this texture
@@ -281,7 +285,7 @@ HRESULT CDirect3DEvents9::OnDrawPrimitive ( IDirect3DDevice9 *pDevice, D3DPRIMIT
         if ( !pLayers->layerList.empty () )
         {
             float fSlopeDepthBias = -0.02f;
-            float fDepthBias = -0.00001f;
+            float fDepthBias = -0.00002f;
             SAVE_RENDERSTATE_AND_SET( SLOPESCALEDEPTHBIAS,  *(DWORD*)&fSlopeDepthBias );
             SAVE_RENDERSTATE_AND_SET( DEPTHBIAS,            *(DWORD*)&fDepthBias );
             SAVE_RENDERSTATE_AND_SET( ALPHABLENDENABLE, TRUE );
@@ -324,10 +328,6 @@ HRESULT CDirect3DEvents9::OnDrawPrimitive ( IDirect3DDevice9 *pDevice, D3DPRIMIT
 /////////////////////////////////////////////////////////////
 HRESULT CDirect3DEvents9::DrawPrimitiveShader ( IDirect3DDevice9 *pDevice, D3DPRIMITIVETYPE PrimitiveType,UINT StartVertex,UINT PrimitiveCount, CShaderItem* pShaderItem, bool bIsLayer )
 {
-    // Don't apply if both the shader and render state both use a vertex shader
-    if ( pShaderItem && g_pDeviceState->VertexShader && pShaderItem->GetUsesVertexShader () )
-        pShaderItem = NULL;
-
     if ( !pShaderItem )
     {
         // No shader for this texture
@@ -412,6 +412,10 @@ HRESULT CDirect3DEvents9::OnDrawIndexedPrimitive ( IDirect3DDevice9 *pDevice, D3
     // Any shader for this texture ?
     SShaderItemLayers* pLayers = CGraphics::GetSingleton ().GetRenderItemManager ()->GetAppliedShaderForD3DData ( (CD3DDUMMY*)g_pDeviceState->TextureState[0].Texture );
 
+    // Skip draw if there is a vertex shader conflict
+    if ( pLayers && pLayers->bUsesVertexShader && g_pDeviceState->VertexShader )
+        return D3D_OK;
+
     if ( !pLayers )
     {
         // No shaders for this texture
@@ -426,7 +430,7 @@ HRESULT CDirect3DEvents9::OnDrawIndexedPrimitive ( IDirect3DDevice9 *pDevice, D3
         if ( !pLayers->layerList.empty () )
         {
             float fSlopeDepthBias = -0.02f;
-            float fDepthBias = -0.00001f;
+            float fDepthBias = -0.00002f;
             SAVE_RENDERSTATE_AND_SET( SLOPESCALEDEPTHBIAS,  *(DWORD*)&fSlopeDepthBias );
             SAVE_RENDERSTATE_AND_SET( DEPTHBIAS,            *(DWORD*)&fDepthBias );
             SAVE_RENDERSTATE_AND_SET( ALPHABLENDENABLE, TRUE );
@@ -469,10 +473,6 @@ HRESULT CDirect3DEvents9::OnDrawIndexedPrimitive ( IDirect3DDevice9 *pDevice, D3
 /////////////////////////////////////////////////////////////
 HRESULT CDirect3DEvents9::DrawIndexedPrimitiveShader ( IDirect3DDevice9 *pDevice, D3DPRIMITIVETYPE PrimitiveType,INT BaseVertexIndex,UINT MinVertexIndex,UINT NumVertices,UINT startIndex,UINT primCount, CShaderItem* pShaderItem, bool bIsLayer )
 {
-    // Don't apply if both the shader and render state both use a vertex shader
-    if ( pShaderItem && g_pDeviceState->VertexShader && pShaderItem->GetUsesVertexShader () )
-        pShaderItem = NULL;
-
     if ( pShaderItem && pShaderItem->m_fMaxDistanceSq > 0 )
     {
         // If shader has a max distance, check this vertex range bounding box
