@@ -516,14 +516,6 @@ int CLuaFunctionDefs::EngineApplyShaderToWorldTexture ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        // Check for use of a vertex shader on peds
-        if ( DynamicCast < CClientPed > ( pElement ) )
-        {
-            if ( pShader->GetShaderItem ()->GetUsesVertexShader () )
-            {
-                m_pScriptDebugging->LogWarning ( luaVM, SString ( "%s; Shader contains a vertex shader which will not work with ped models", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ) ) );
-            }
-        }
         bool bResult = g_pCore->GetGraphics ()->GetRenderItemManager ()->ApplyShaderItemToWorldTexture ( pShader->GetShaderItem (), strTextureNameMatch, pElement, bAppendLayers );
         lua_pushboolean ( luaVM, bResult );
         return 1;

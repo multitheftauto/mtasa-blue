@@ -135,6 +135,50 @@ uchar* GetWinMainAddress( HANDLE hProcess )
 
 ///////////////////////////////////////////////////////////////////////////
 //
+// WriteProcessMemoryChecked
+//
+// Poke bytes and do some checks as well
+//
+///////////////////////////////////////////////////////////////////////////
+void WriteProcessMemoryChecked( HANDLE hProcess, void* dest, const void* src, uint size, const void* oldvalues, bool bStopIfOldIncorrect )
+{
+    DWORD oldProt1;
+    _VirtualProtectEx ( hProcess, dest, size, PAGE_EXECUTE_READWRITE, &oldProt1 );
+
+    // Verify previous value was expected were written ok
+    if ( oldvalues )
+    {
+        char temp[30];
+        uint numBytesToCheck = Min( sizeof( temp ), size );
+        SIZE_T numBytesRead = 0;
+        _ReadProcessMemory ( hProcess, dest, temp, numBytesToCheck, &numBytesRead );
+        if ( memcmp( temp, oldvalues, numBytesToCheck ) )
+        {
+            WriteDebugEvent( SString( "Failed to verify %d old bytes in process", size ) );
+            if ( bStopIfOldIncorrect )
+                return;
+        }
+    }
+
+    _WriteProcessMemory ( hProcess, dest, src, size, NULL );
+
+    // Verify bytes were written ok
+    {
+        char temp[30];
+        uint numBytesToCheck = Min( sizeof( temp ), size );
+        SIZE_T numBytesRead = 0;
+        _ReadProcessMemory ( hProcess, dest, temp, numBytesToCheck, &numBytesRead );
+        if ( memcmp( temp, src, numBytesToCheck ) || numBytesRead != numBytesToCheck )
+            WriteDebugEvent( SString( "Failed to write %d bytes to process", size ) );
+    }
+
+    DWORD oldProt2;
+    _VirtualProtectEx ( hProcess, dest, size, oldProt1, &oldProt2 );
+}
+
+
+///////////////////////////////////////////////////////////////////////////
+//
 // InsertWinMainBlock
 //
 // Put an infinite loop at WinMain to stop GTA from running before we are ready
@@ -147,14 +191,41 @@ void InsertWinMainBlock( HANDLE hProcess )
     if ( !pWinMain )
         return;
 
-    DWORD oldProt1;
-    _VirtualProtectEx ( hProcess, pWinMain - 2, 4, PAGE_EXECUTE_READWRITE, &oldProt1 );
+    WriteDebugEvent( "Loader - InsertWinMainBlock" );
 
-    const uchar blockCode[] = { 0xEB, 0xFE, 0xEB, 0xFC };
-    _WriteProcessMemory ( hProcess, pWinMain - 2, blockCode, sizeof( blockCode ), NULL );
+    {
+        const uchar oldCode[] = {
+                                    0x90, 0x90, 0x90, 0x90, 0x90, 0x90,
+                                    0x90,
+                                    0x90, 0x90,
+                                    0x90, 0x90,
+                                    0x90, 0x90,
+                                    0x81, 0xEC, 0x84, 0x00, 0x00, 0x00, // WinMain  sub         esp,84h
+                                    0x53,                               //          push        ebx
+                                    0x6A, 0x02,                         //          push        2
+                                };
 
-    DWORD oldProt2;
-    _VirtualProtectEx ( hProcess, pWinMain - 2, 4, oldProt1, &oldProt2 );
+        const uchar newCode[] = {
+                                    0x3E, 0xA1, 0x7C, 0x71, 0x74, 0x00, //      lp: mov         eax,dword ptr ds:[0074717Ch] 
+                                    0x48,                               //          dec         eax 
+                                    0x74, 0xF7,                         //          je          lp
+                                    0x6A, 0x02,                         //          push        2                           orig
+                                    0xEB, 0x09,                         //          jmp         cont
+                                    0x81, 0xEC, 0x84, 0x00, 0x00, 0x00, // WinMain  sub         esp,84h                     orig
+                                    0x53,                               //          push        ebx                         orig
+                                    0xEB, 0xEA,                         //          jmp         lp
+                                };                                      //    cont:
+
+
+        WriteProcessMemoryChecked( hProcess, pWinMain - sizeof( newCode ) + 9, newCode, sizeof( newCode ), oldCode, true );
+    }
+
+    uchar* pFlag = (uchar*)0x74717C;
+    {
+        const uchar oldCode[] = { 0x90, 0x90, 0x90, 0x90 };
+        const uchar newCode[] = { 1, 0, 0, 0 };
+        WriteProcessMemoryChecked( hProcess, pFlag, newCode, sizeof( newCode ), oldCode, false );
+    }
 }
 
 
@@ -172,23 +243,14 @@ void RemoveWinMainBlock( HANDLE hProcess )
     if ( !pWinMain )
         return;
 
-    DWORD oldProt1;
-    _VirtualProtectEx ( hProcess, pWinMain - 2, 4, PAGE_EXECUTE_READWRITE, &oldProt1 );
+    WriteDebugEvent( "Loader - RemoveWinMainBlock" );
 
-    // Order is important in case the code is being executed (CPU cache may cause issues?)
-    const uchar unblockCode1[] = { 0x81, 0xEC };
-    _WriteProcessMemory ( hProcess, pWinMain - 0, unblockCode1, sizeof( unblockCode1 ), NULL );
-
-    const uchar unblockCode2[] = { 0x00 };
-    _WriteProcessMemory ( hProcess, pWinMain - 1, unblockCode2, sizeof( unblockCode2 ), NULL );
-
-    Sleep ( 1 );
-
-    const uchar unblockCode3[] = { 0x90, 0x90 };
-    _WriteProcessMemory ( hProcess, pWinMain - 2, unblockCode3, sizeof( unblockCode3 ), NULL );
-
-    DWORD oldProt2;
-    _VirtualProtectEx ( hProcess, pWinMain - 2, 4, oldProt1, &oldProt2 );
+    uchar* pFlag = (uchar*)0x74717C;
+    {
+        const uchar oldCode[] = { 1, 0, 0, 0 };
+        const uchar newCode[] = { 0, 0, 0, 0 };
+        WriteProcessMemoryChecked( hProcess, pFlag, newCode, sizeof( newCode ), oldCode, false );
+    }
 }
 
 
@@ -206,16 +268,13 @@ void ApplyLoadingCrashPatch( HANDLE hProcess )
     if ( !pAddress )
         return;
 
+    WriteDebugEvent( "Loader - ApplyLoadingCrashPatch" );
+
     pAddress -= 0x1E17; // Offset from WinMain function
 
-    DWORD oldProt1;
-    _VirtualProtectEx ( hProcess, pAddress, 1, PAGE_EXECUTE_READWRITE, &oldProt1 );
-
-    const uchar blockCode[] = { 0x37 };
-    _WriteProcessMemory ( hProcess, pAddress, blockCode, sizeof( blockCode ), NULL );
-
-    DWORD oldProt2;
-    _VirtualProtectEx ( hProcess, pAddress, 1, oldProt1, &oldProt2 );
+    const uchar oldCode[] = { 0xB7 };
+    const uchar newCode[] = { 0x37 };
+    WriteProcessMemoryChecked( hProcess, pAddress, newCode, sizeof( newCode ), oldCode, true );
 }
 
 
@@ -497,6 +556,26 @@ void TerminateGTAIfRunning ( void )
             processIdList = GetGTAProcessList ();
         }
     }
+}
+
+
+///////////////////////////////////////////////////////////////////////////
+//
+// IsGTAProcessStuck
+//
+//
+//
+///////////////////////////////////////////////////////////////////////////
+bool IsGTAProcessStuck( HANDLE hProcess )
+{
+    PROCESS_MEMORY_COUNTERS psmemCounter;
+    BOOL bResult = GetProcessMemoryInfo( hProcess, &psmemCounter, sizeof( PROCESS_MEMORY_COUNTERS ) );
+
+    WriteDebugEvent( SString( "Loader - Process PeakWorkingSetSize:%d", psmemCounter.PeakWorkingSetSize ) );
+
+    if ( bResult && psmemCounter.PeakWorkingSetSize < 50 * 1024 * 1024 )
+        return true;
+    return false;
 }
 
 

@@ -395,7 +395,7 @@ void CModManager::VerifyAndAddEntry ( const char* szModFolderPath, const char* s
             }
             else
             {
-                CLogger::GetSingleton ().ErrorPrintf ( "Unknown mod DLL: %s", szName );
+                WriteErrorEvent( SString( "Unknown mod DLL: %s", szName ) );
             }
 
             // Free the DLL
@@ -403,7 +403,7 @@ void CModManager::VerifyAndAddEntry ( const char* szModFolderPath, const char* s
         }
         else
         {
-            CLogger::GetSingleton ().ErrorPrintf ( "Invalid mod DLL: %s (reason: %d)", szName, GetLastError() );
+            WriteErrorEvent( SString( "Invalid mod DLL: %s (reason: %d)", szName, GetLastError() ) );
         }
     }
 }

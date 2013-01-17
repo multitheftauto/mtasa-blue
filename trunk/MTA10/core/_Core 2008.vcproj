@@ -493,10 +493,6 @@
 				>
 			</File>
 			<File
-				RelativePath="CLogger.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\CMainMenu.cpp"
 				>
 			</File>
@@ -947,10 +943,6 @@
 			</File>
 			<File
 				RelativePath=".\CLine3DBatcher.h"
-				>
-			</File>
-			<File
-				RelativePath=".\CLogger.h"
 				>
 			</File>
 			<File
