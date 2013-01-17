@@ -34,7 +34,6 @@ class CCore;
 #include "CGraphics.h"
 #include "CSetCursorPosHook.h"
 #include "CMessageLoopHook.h"
-#include "CLogger.h"
 #include "CConsoleLogger.h"
 #include "CModManager.h"
 #include <core/CClientBase.h>
@@ -291,7 +290,6 @@ private:
     CGUI*                       m_pGUI;
 
     // Logger utility interface.
-    CLogger *                   m_pLogger;
     CConsoleLogger *            m_pConsoleLogger;
 
     CKeyBinds*                  m_pKeyBinds;

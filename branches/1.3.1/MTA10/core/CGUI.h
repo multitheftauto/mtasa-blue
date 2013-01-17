@@ -28,7 +28,6 @@ class CLocalGUI;
 
 #include "CConsole.h"
 #include "CFilePathTranslator.h"
-#include "CLogger.h"
 #include "CMainMenu.h"
 #include "CSetCursorPosHook.h"
 #include "CSingleton.h"

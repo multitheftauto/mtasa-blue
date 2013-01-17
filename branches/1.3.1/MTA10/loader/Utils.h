@@ -41,6 +41,7 @@ void            TerminateGTAIfRunning               ( void );
 bool            IsGTARunning                        ( void );
 void            TerminateOtherMTAIfRunning          ( void );
 bool            IsOtherMTARunning                   ( void );
+bool            IsGTAProcessStuck                   ( HANDLE hProcess );
 
 void            ShowSplash                          ( HINSTANCE hInstance );
 void            HideSplash                          ( void );
