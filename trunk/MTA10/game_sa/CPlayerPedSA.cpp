@@ -512,7 +512,7 @@ void _declspec(naked) HOOK_CPlayerPed_ProcessAnimGroups_Mid()
 
         mov     eax,[esp-32-4*2]    // Get temp
         cmp     [esi+4D4h], eax     // pPed->iMoveAnim
-cont:
+
         jmp     RETURN_CPlayerPed_ProcessAnimGroups_Mid
     }
 }

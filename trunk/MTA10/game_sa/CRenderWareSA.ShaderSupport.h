@@ -16,6 +16,12 @@
     //#define SHADER_DEBUG_OUTPUT         // Output lots of debug strings
 #endif
 
+// Various dodgy pointer values
+#define FAKE_D3DTEXTURE_EMPTY_KEY   ( (CD3DDUMMY*)-1 )
+#define FAKE_D3DTEXTURE_DELETED_KEY ( (CD3DDUMMY*)-2 )
+#define FAKE_D3DTEXTURE_CJ          ( (CD3DDUMMY*)-7 )
+#define FAKE_RWTEXTURE_CJ           ( (RwTexture*)-8 )
+
 class CMatchChannel;
 class CMatchChannelManager;
 struct STexNameInfo;
