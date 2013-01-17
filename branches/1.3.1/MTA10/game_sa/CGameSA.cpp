@@ -182,6 +182,7 @@ CGameSA::CGameSA()
     MemPut < WORD > ( 0x05B8EB0, 30000 );         // Default is 12000
 
     CModelInfoSA::StaticSetHooks ();
+    CPlayerPedSA::StaticSetHooks ();
 }
 
 CGameSA::~CGameSA ( void )

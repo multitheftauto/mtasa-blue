@@ -224,9 +224,68 @@ eMoveAnim CPlayerPedSA::GetMoveAnim ( void )
     return (eMoveAnim)pedInterface->iMoveAnimGroup;
 }
 
+
+// Helper for SetMoveAnim
+bool IsBlendAssocGroupValid( int iGroup )
+{
+    CAnimBlendAssocGroupSAInterface* pBlendAssocGroup = *(CAnimBlendAssocGroupSAInterface**)0xB4EA34;
+    pBlendAssocGroup += iGroup;
+    return pBlendAssocGroup->pAnimBlock != NULL;
+}
+
+
 void CPlayerPedSA::SetMoveAnim ( eMoveAnim iAnimGroup )
 {
-    // Set the the new move animation group
+    // Range check
+    if ( !IsValidMoveAnim( iAnimGroup ) )
+        return;
+
+    if ( iAnimGroup == MOVE_DEFAULT )
+    {
+        m_iCustomMoveAnim = 0;
+        return;
+    }
+
+    // Need to load ?
+    if ( !IsBlendAssocGroupValid( iAnimGroup ) )
+    {
+        // Find which anim block to load
+        SString strBlockName;
+        switch ( iAnimGroup )
+        {
+            case 55: case 58: case 61: case 64: case 67:
+                strBlockName = "fat";
+                break;
+
+            case 56: case 59: case 62: case 65: case 68:
+                strBlockName = "muscular";
+                break;
+
+            case 138:
+                strBlockName = "skate";
+                break;
+
+            default:
+                strBlockName = "ped";
+                break;
+        }
+            
+        CAnimBlock* pAnimBlock = pGame->GetAnimManager()->GetAnimationBlock ( strBlockName );
+
+        // Try load
+        if ( pAnimBlock && !pAnimBlock->IsLoaded() )
+        {
+            pAnimBlock->Request( BLOCKING, true );
+        }
+
+        // Load fail?
+        if ( !IsBlendAssocGroupValid( iAnimGroup ) )
+            return;
+    }
+
+    m_iCustomMoveAnim = iAnimGroup;
+
+    // Set the the new move animation group now, although it does get updated through the hooks as well
     CPedSAInterface *pedInterface = ( CPedSAInterface * ) this->GetInterface();
     pedInterface->iMoveAnimGroup = (int)iAnimGroup;
 
@@ -308,3 +367,219 @@ VOID CPlayerPedSA::ClearWeaponTarget (  )
         call    dwFunction
     }
 }*/
+
+
+////////////////////////////////////////////////////////////////
+//
+// Hooks for CPlayerPedSA
+//
+////////////////////////////////////////////////////////////////
+
+/*
+    Summary of move anim types
+    --------------------------
+
+    Physique based anims with plain pose:
+        MOVE_PLAYER = 54,
+        MOVE_PLAYER_F,
+        MOVE_PLAYER_M,
+
+    Physique based anims with special pose:
+        MOVE_ROCKET,
+        MOVE_ROCKET_F,
+        MOVE_ROCKET_M,
+        MOVE_ARMED,
+        MOVE_ARMED_F,
+        MOVE_ARMED_M,
+        MOVE_BBBAT,
+        MOVE_BBBAT_F,
+        MOVE_BBBAT_M,
+        MOVE_CSAW,
+        MOVE_CSAW_F,
+        MOVE_CSAW_M,
+
+    Non physique based pose:
+        MOVE_JETPACK,
+
+    Non physique based anims:
+        MOVE_SNEAK,
+        MOVE_MAN = 118,
+        MOVE_SHUFFLE,
+        MOVE_OLDMAN,
+        MOVE_GANG1,
+        MOVE_GANG2,
+        MOVE_OLDFATMAN,
+        MOVE_FATMAN,
+        MOVE_JOGGER,
+        MOVE_DRUNKMAN,
+        MOVE_BLINDMAN,
+        MOVE_SWAT,
+        MOVE_WOMAN,
+        MOVE_SHOPPING,
+        MOVE_BUSYWOMAN,
+        MOVE_SEXYWOMAN,
+        MOVE_PRO,
+        MOVE_OLDWOMAN,
+        MOVE_FATWOMAN,
+        MOVE_JOGWOMAN,
+        MOVE_OLDFATWOMAN,
+        MOVE_SKATE,
+*/
+
+bool IsAnimJetPack( int iAnim )
+{
+    return iAnim == MOVE_JETPACK;
+}
+
+// True if anim has Std/Fat/Muscular variants
+bool IsAnimPhysiqueBased( int iAnim )
+{
+    return ( iAnim >= MOVE_PLAYER ) && ( iAnim <= MOVE_CSAW_M );
+}
+
+// Special pose is MOVE_ROCKET, MOVE_ARMED, MOVE_BBBAT or MOVE_CSAW
+bool IsAnimSpecialPose( int iAnim )
+{
+    return ( iAnim >= MOVE_ROCKET ) && ( iAnim <= MOVE_CSAW_M );
+}
+
+// 0-Std  1-Fat  2-Muscular
+int GetAnimPhysiqueIndex( int iAnim )
+{
+    return ( iAnim - MOVE_PLAYER ) % 3;
+}
+
+// Pose is MOVE_PLAYER, MOVE_ROCKET, MOVE_ARMED, MOVE_BBBAT or MOVE_CSAW
+int GetAnimPose( int iAnim )
+{
+    return iAnim - GetAnimPhysiqueIndex( iAnim );
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// CPlayerPed_ProcessAnimGroups_Mid
+//
+// Stop GTA overriding our custom move anim
+// Returns anim to use
+//
+////////////////////////////////////////////////////////////////
+int _cdecl OnCPlayerPed_ProcessAnimGroups_Mid( CPlayerPedSAInterface* pPlayerPedSAInterface, int iReqMoveAnim )
+{
+    CPed* pPed = pGame->GetPools ()->GetPed( (DWORD *)pPlayerPedSAInterface );
+
+    if ( pPed )
+    {
+        int iCustomAnim = pPed->GetCustomMoveAnim();
+        if ( iCustomAnim )
+        {
+            // If iReqMoveAnim is jetpack, use iReqMoveAnim
+            if ( IsAnimJetPack( iReqMoveAnim ) )
+                return iReqMoveAnim;
+
+            // If iCustomAnim is physique based without special pose, and iReqMoveAnim is physique based, then use pose from iReqMoveAnim and physique from iCustomAnim
+            if ( IsAnimPhysiqueBased( iCustomAnim ) && !IsAnimSpecialPose( iCustomAnim ) && IsAnimPhysiqueBased( iReqMoveAnim ) )
+            {
+                int iPhysique = GetAnimPhysiqueIndex( iCustomAnim );
+                int iPose = GetAnimPose( iReqMoveAnim );
+                return iPose + iPhysique;
+            }
+
+            // Everything else, use iCustomAnim
+            return iCustomAnim;
+        }
+    }
+
+    return iReqMoveAnim;
+}
+
+
+// Hook info
+#define HOOKPOS_CPlayerPed_ProcessAnimGroups_Mid        0x0609A44
+#define HOOKSIZE_CPlayerPed_ProcessAnimGroups_Mid       6
+DWORD RETURN_CPlayerPed_ProcessAnimGroups_Mid =         0x0609A4A;
+void _declspec(naked) HOOK_CPlayerPed_ProcessAnimGroups_Mid()
+{
+    _asm
+    {
+        pushad
+        push    eax
+        push    esi
+        call    OnCPlayerPed_ProcessAnimGroups_Mid
+        mov     [esp+0],eax         // Put temp
+        add     esp, 4*2
+        popad
+
+        mov     eax,[esp-32-4*2]    // Get temp
+        cmp     [esi+4D4h], eax     // pPed->iMoveAnim
+cont:
+        jmp     RETURN_CPlayerPed_ProcessAnimGroups_Mid
+    }
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// CClothes_GetDefaultPlayerMotionGroup
+//
+// Stop GTA overriding the physique of our custom move anim
+// Returns MOVE_PLAYER, MOVE_PLAYER_F or MOVE_PLAYER_M
+//
+////////////////////////////////////////////////////////////////
+int _cdecl OnCClothes_GetDefaultPlayerMotionGroup( int iReqMoveAnim )
+{
+    CPed* pPed = g_pCore->GetMultiplayer()->GetContextSwitchedPed();
+
+    if ( pPed )
+    {
+        int iCustomAnim = pPed->GetCustomMoveAnim();
+        if ( iCustomAnim )
+        {
+            if ( IsAnimPhysiqueBased( iCustomAnim ) )
+            {
+                int iPhysique = GetAnimPhysiqueIndex( iCustomAnim );
+                int iBaseAnim = MOVE_PLAYER + iPhysique;
+                return iBaseAnim;
+            }
+        }
+    }
+
+    return iReqMoveAnim;
+}
+
+
+// Hook info
+#define HOOKPOS_CClothes_GetDefaultPlayerMotionGroup        0x05A81B0
+#define HOOKSIZE_CClothes_GetDefaultPlayerMotionGroup       5
+DWORD RETURN_CClothes_GetDefaultPlayerMotionGroup =         0x05A81B5;
+void _declspec(naked) HOOK_CClothes_GetDefaultPlayerMotionGroup()
+{
+    _asm
+    {
+        mov     eax, 0x05A7FB0      // CClothes::GetPlayerMotionGroupToLoad
+        call    eax
+
+        pushad
+        push    eax
+        call    OnCClothes_GetDefaultPlayerMotionGroup
+        mov     [esp+0],eax         // Put temp
+        add     esp, 4*1
+        popad
+
+        mov     eax,[esp-32-4*1]    // Get temp
+        jmp     RETURN_CClothes_GetDefaultPlayerMotionGroup
+    }
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+// Setup hooks
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+void CPlayerPedSA::StaticSetHooks( void )
+{
+   EZHookInstall( CPlayerPed_ProcessAnimGroups_Mid );
+   EZHookInstall( CClothes_GetDefaultPlayerMotionGroup );
+}
+

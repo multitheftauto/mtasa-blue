@@ -28,6 +28,7 @@
 
 enum ePedMoveAnim
 {
+    MOVE_DEFAULT = 0,
     MOVE_PLAYER = 54,
     MOVE_PLAYER_F,
     MOVE_PLAYER_M,
@@ -67,6 +68,13 @@ enum ePedMoveAnim
     MOVE_OLDFATWOMAN,
     MOVE_SKATE,
 };
+
+inline bool IsValidMoveAnim( uint iMoveAnim )
+{
+    return ( iMoveAnim == MOVE_DEFAULT ) ||
+           ( iMoveAnim >= MOVE_PLAYER && iMoveAnim <= MOVE_JETPACK ) ||
+           ( iMoveAnim >= MOVE_MAN    && iMoveAnim <= MOVE_SKATE );
+}
 
 class CWeapon
 {

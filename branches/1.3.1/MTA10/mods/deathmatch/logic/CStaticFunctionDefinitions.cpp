@@ -2018,8 +2018,7 @@ bool CStaticFunctionDefinitions::SetPedMoveAnim ( CClientEntity& Entity, unsigne
     if ( IS_PED ( &Entity ) )
     {
         CClientPed& Ped = static_cast < CClientPed& > ( Entity );
-        if ( ( iMoveAnim >= 54 && iMoveAnim <= 70 ) ||
-             ( iMoveAnim >= 118 && iMoveAnim <= 138 ) )
+        if ( IsValidMoveAnim( iMoveAnim ) )
         {
             Ped.SetMoveAnim ( (eMoveAnim)iMoveAnim );
             return true;

@@ -22,7 +22,8 @@ extern CGameSA* pGame;
 CPedSA::CPedSA (  ) :
     m_pPedIntelligence ( NULL ),
     m_pPedInterface ( NULL ),
-    m_pPedSound ( NULL )
+    m_pPedSound ( NULL ),
+    m_iCustomMoveAnim( 0 )
 {
     DEBUG_TRACE("CPedSA::CPedSA(  )");
 
@@ -32,7 +33,8 @@ CPedSA::CPedSA (  ) :
 CPedSA::CPedSA( CPedSAInterface * pPedInterface ) :
     m_pPedIntelligence ( NULL ),
     m_pPedInterface ( pPedInterface ),
-    m_pPedSound ( NULL )
+    m_pPedSound ( NULL ),
+    m_iCustomMoveAnim( 0 )
 {
     DEBUG_TRACE("CPedSA::CPedSA( CPedSAInterface * pedInterface )");
 
@@ -1015,6 +1017,11 @@ void CPedSA::AddWeaponAudioEvent ( EPedWeaponAudioEventType audioEventType )
         push    audioEventType
         call    dwFunc
     }
+}
+
+int CPedSA::GetCustomMoveAnim( void )
+{
+    return m_iCustomMoveAnim;
 }
 
 /*

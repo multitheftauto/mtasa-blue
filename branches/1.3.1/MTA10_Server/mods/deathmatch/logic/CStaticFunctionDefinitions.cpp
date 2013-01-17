@@ -3889,8 +3889,7 @@ bool CStaticFunctionDefinitions::SetPedMoveAnim ( CElement* pElement, unsigned i
 
     if ( IS_PED ( pElement ) )
     {
-        if ( ( iMoveAnim >= 54 && iMoveAnim <= 70 ) ||
-             ( iMoveAnim >= 118 && iMoveAnim <= 138 ) )
+        if ( IsValidMoveAnim( iMoveAnim ) )
         {
             CPed* pPed = static_cast < CPed* > ( pElement );
             if ( pPed->GetMoveAnim () != iMoveAnim )
