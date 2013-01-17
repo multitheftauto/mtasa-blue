@@ -115,6 +115,7 @@ namespace
                                          { "isPlayerHudComponentVisible",   "1.3.1-9.04690" },
                                          { "engineGetModelLODDistance",     "1.3.1-9.04779" },
                                          { "sha256",                        "1.3.1-9.04835" },
+                                         { "setPedWalkingStyle",            "1.3.1-9.04935" },
                                         };
 
     SVersionItem serverFunctionInitList[] = {
@@ -162,6 +163,7 @@ namespace
                                          { "setJetpackWeaponEnabled",   "1.3.0-9.04351" },
                                          { "getJetpackWeaponEnabled",   "1.3.0-9.04351" },
                                          { "sha256",                    "1.3.1-9.04835" },
+                                         { "setPedWalkingStyle",        "1.3.1-9.04935" },
                                         };
 
 
