@@ -26,6 +26,7 @@ int WINAPI DllMain(HINSTANCE hModule, DWORD dwReason, PVOID pvNothing)
 
     if ( dwReason == DLL_PROCESS_ATTACH )
     {
+        WriteDebugEvent( "DLL_PROCESS_ATTACH" );
         if ( IsRealDeal () )
         {
             FileTranslator.GetGTARootDirectory ( WorkingDirectory );
@@ -44,6 +45,7 @@ int WINAPI DllMain(HINSTANCE hModule, DWORD dwReason, PVOID pvNothing)
     } 
     else if (dwReason == DLL_PROCESS_DETACH)
     {
+        WriteDebugEvent( "DLL_PROCESS_DETACH" );
         if ( IsRealDeal () )
         {
             // For now, TerminateProcess if any destruction is attempted (or we'll crash)
@@ -69,6 +71,7 @@ bool IsRealDeal ( void )
     // Get current module full path
     char szBuffer[64000];
     GetModuleFileName ( NULL, szBuffer, sizeof(szBuffer) - 1 );
+    WriteDebugEvent( SString( "ModuleFileName: %s", szBuffer ) );
     if ( SStringX( szBuffer ).EndsWithI( "gta_sa.exe" ) )
         return true;
     return false;

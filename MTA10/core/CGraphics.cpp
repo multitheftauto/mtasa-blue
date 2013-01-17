@@ -956,7 +956,7 @@ bool CGraphics::LoadStandardDXFonts ( void )
         }
 
         SString strMessage ( "Could not create Direct3D font '%s'", fontInfos[i].szName );
-        CLogger::GetSingleton ().ErrorPrintf( "%s", *strMessage );
+        WriteErrorEvent( strMessage );
         BrowseToSolution ( "create-fonts", EXIT_GAME_FIRST | ASK_GO_ONLINE, strMessage );
     }
 
@@ -981,7 +981,7 @@ bool CGraphics::LoadAdditionalDXFont ( std::string strFontPath, std::string strF
         FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, strFontName.c_str(),
         ppD3DXFont ) ) )
     {
-        CLogger::GetSingleton ().ErrorPrintf( "Could not create Direct3D font '%s'", strFontName.c_str() );
+        WriteErrorEvent( SString( "Could not create Direct3D font '%s'", strFontName.c_str() ) );
         bSuccess = false;
     }
 

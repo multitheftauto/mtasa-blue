@@ -322,6 +322,8 @@ int DoLaunchGame ( LPSTR lpCmdLine )
 {
     assert ( !CreateSingleInstanceMutex () );
 
+    CycleEventLog();
+
     //////////////////////////////////////////////////////////
     //
     // Handle GTA already running
@@ -492,6 +494,7 @@ int DoLaunchGame ( LPSTR lpCmdLine )
                               &piLoadee ) )
     {
         DWORD dwError = GetLastError ();
+        WriteDebugEvent( SString( "Loader - Process not created[%d]: %s", dwError, *strGTAEXEPath ) );
 
         if ( dwError == ERROR_ELEVATION_REQUIRED && !bDoneAdmin )
         {
@@ -510,6 +513,8 @@ int DoLaunchGame ( LPSTR lpCmdLine )
             return 5;
         }
     }
+
+    WriteDebugEvent( SString( "Loader - Process created: %s", *strGTAEXEPath ) );
 
     SString strCoreDLL = strMTASAPath + "\\mta\\" + MTA_DLL_NAME;
 
@@ -557,6 +562,7 @@ int DoLaunchGame ( LPSTR lpCmdLine )
 
     // Inject the core into GTA
     RemoteLoadLibrary ( piLoadee.hProcess, strCoreDLL );
+    WriteDebugEvent( SString( "Loader - Core injected: %s", *strCoreDLL ) );
     
     // Clear previous on quit commands
     SetOnQuitCommand ( "" );
@@ -568,6 +574,8 @@ int DoLaunchGame ( LPSTR lpCmdLine )
 
     if ( piLoadee.hThread)
     {
+        WriteDebugEvent( "Loader - Waiting for L2 to close" );
+
         // Show splash until game window is displayed (or max 20 seconds)
         DWORD status;
         for ( uint i = 0 ; i < 20 ; i++ )
@@ -577,16 +585,37 @@ int DoLaunchGame ( LPSTR lpCmdLine )
                 break;
 
             if ( !WatchDogIsSectionOpen( "L2" ) )     // Gets closed when loading screen is shown
+            {
+                WriteDebugEvent( "Loader - L2 closed" );
                 break;
+            }
         }
 
         // Actually hide the splash
         HideSplash ();
 
+        // If hasn't shown the loading screen and gta_sa.exe process is small, give user option to terminate
+        if ( status == WAIT_TIMEOUT )
+        {
+            if ( WatchDogIsSectionOpen( "L2" ) )     // Gets closed when loading screen is shown
+            {
+                if ( IsGTAProcessStuck( piLoadee.hProcess ) )
+                {
+                    if ( MessageBox ( 0, "GTA: San Andreas may not have launched correctly. Do you want to terminate it?", "Information", MB_YESNO | MB_ICONQUESTION | MB_TOPMOST ) == IDYES )
+                    {
+                        TerminateProcess ( piLoadee.hProcess, 1 );
+                    }
+                }
+            }
+        }
+
         // Wait for game to exit
+        WriteDebugEvent( "Loader - Wait for game to exit" );
         if ( status == WAIT_TIMEOUT )
             WaitForSingleObject ( piLoadee.hProcess, INFINITE );
     }
+
+    WriteDebugEvent( "Loader - Finishing" );
 
     // Get its exit code
     DWORD dwExitCode = -1;

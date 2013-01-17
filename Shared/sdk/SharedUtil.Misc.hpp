@@ -574,6 +574,35 @@ SString SharedUtil::GetReportLogContents ( void )
     return &buffer[0];
 }
 
+// Client logfile.txt
+void WriteEvent( const char* szType, const SString& strText )
+{
+    SString strPathFilename = CalcMTASAPath( PathJoin( "mta", "logfile.txt" ) );
+    SString strMessage( "%s - %s %s", *GetLocalTimeString(), szType, *strText );
+    FileAppend( strPathFilename, strMessage + "\n" );
+#ifdef MTA_DEBUG
+    OutputDebugLine ( strMessage );
+#endif
+}
+
+void SharedUtil::WriteDebugEvent( const SString& strText )
+{
+    WriteEvent( "[DEBUG]", strText );
+}
+
+void SharedUtil::WriteErrorEvent( const SString& strText )
+{
+    WriteEvent( "[Error]", strText );
+}
+
+void SharedUtil::CycleEventLog( void )
+{
+    SString strPathFilename = CalcMTASAPath( PathJoin( "mta", "logfile.txt" ) );
+    SString strPathFilenamePrev = CalcMTASAPath( PathJoin( "mta", "logfile_old.txt" ) );
+    FileDelete( strPathFilenamePrev );
+    FileRename( strPathFilename, strPathFilenamePrev );
+    FileDelete( strPathFilename );
+}
 
 ///////////////////////////////////////////////////////////////////////////
 //

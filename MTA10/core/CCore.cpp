@@ -111,7 +111,6 @@ CCore::CCore ( void )
     ParseCommandLine ( m_CommandLineOptions, m_szCommandLineArgs, pszNoValOptions );
 
     // Create a logger instance.
-    m_pLogger                   = new CLogger ( );
     m_pConsoleLogger            = new CConsoleLogger ( );
 
     // Create interaction objects.
@@ -231,7 +230,6 @@ CCore::~CCore ( void )
     delete m_pMouseControl;
 
     // Delete the logger
-    delete m_pLogger;
     delete m_pConsoleLogger;
 
     //Delete the Current Server
