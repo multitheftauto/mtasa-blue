@@ -138,7 +138,6 @@ public:
 
     void                        Explode             ( void );
     void                        Break               ( void );
-    bool                        IsBlown             ( void );
     void                        SetScale            ( float fScale );
     void                        SetHealth           ( float fHealth );
     float                       GetHealth           ( void );

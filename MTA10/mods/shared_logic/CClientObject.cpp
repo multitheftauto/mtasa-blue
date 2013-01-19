@@ -44,6 +44,7 @@ CClientObject::CClientObject ( CClientManager* pManager, ElementID ID, unsigned 
     m_fScale = 1.0f;
     m_fHealth = 1000.0f;
     m_bBreakable = true;
+    m_bRespawnEnabled = true;
 
     m_pModelInfo = g_pGame->GetModelInfo ( usModel );
 
@@ -402,6 +403,10 @@ void CClientObject::SetHealth ( float fHealth )
 
 void CClientObject::StreamIn ( bool bInstantly )
 {
+    // Don't stream the object in, if respawn is disabled and the object is broken
+    if ( !m_bRespawnEnabled && m_fHealth == 0.0f )
+        return;
+
     // We need to load now?
     if ( bInstantly )
     {
@@ -431,7 +436,11 @@ void CClientObject::StreamOut ( void )
     // Save the health
     if ( m_pObject )
     {
-        m_fHealth = m_pObject->GetHealth ();
+        // If respawn is enabled, reset the health
+        if ( m_bRespawnEnabled && m_fHealth == 0.0f )
+            m_fHealth = 1000.0f;
+        else
+            m_fHealth = m_pObject->GetHealth ();
     }
 
     // Destroy the object.
@@ -444,11 +453,12 @@ void CClientObject::StreamOut ( void )
 // Don't call this function directly by lua functions
 void CClientObject::ReCreate ( void )
 {
+    m_fHealth = 1000.0f;
+    
     if ( m_pObject )
-    {
         Destroy ();
-        Create ();
-    }
+    
+    Create ();
 }
 
 
@@ -673,15 +683,6 @@ bool CClientObject::Break ( void )
     {
         m_pObject->Break ();
         return true;
-    }
-    return false;
-}
-
-bool CClientObject::IsBlown ( void )
-{
-    if ( m_pObject )
-    {
-        return m_pObject->IsBlown ();
     }
     return false;
 }

@@ -27,7 +27,6 @@ public:
 
     virtual void                    Explode             ( void ) = 0;
     virtual void                    Break               ( void ) = 0;
-    virtual bool                    IsBlown             ( void ) = 0;
     virtual void                    SetScale            ( float fScale ) = 0;
     virtual void                    SetHealth           ( float fHealth ) = 0;
     virtual float                   GetHealth           ( void ) = 0;

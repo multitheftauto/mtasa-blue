@@ -4426,6 +4426,9 @@ bool CClientGame::ObjectBreakHandler ( CObjectSAInterface* pObjectInterface, CEn
         // Is our client vehicle valid?
         if ( pClientObject )
         {
+            // Apply to MTA's "internal storage", too
+            pClientObject->SetHealth ( 0.0f );
+
             CEntity * pAttacker = g_pGame->GetPools ( )->GetEntity ( (DWORD *)pAttackerInterface );
             CClientEntity * pClientAttacker = NULL;
             if ( pAttacker )

@@ -143,29 +143,6 @@ int CLuaFunctionDefs::IsObjectBreakable ( lua_State* luaVM )
 }
 
 
-int CLuaFunctionDefs::IsObjectBlown ( lua_State* luaVM )
-{
-//  bool isObjectBlown ( object theObject )
-    CClientObject* pObject;
-    bool bBlown;
-
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pObject );
-    if ( !argStream.HasErrors () )
-    {
-        if ( CStaticFunctionDefinitions::IsObjectBlown ( *pObject, bBlown ) )
-        {
-            lua_pushboolean ( luaVM, bBlown );
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
-
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
 int CLuaFunctionDefs::MoveObject ( lua_State* luaVM )
 {
 //  bool moveObject ( object theObject, int time, float targetx, float targety, float targetz,
@@ -326,6 +303,7 @@ int CLuaFunctionDefs::BreakObject ( lua_State* luaVM )
     return 1;
 }
 
+
 int CLuaFunctionDefs::RespawnObject ( lua_State* luaVM )
 {
 //  bool respawnObject ( object theObject )
@@ -336,6 +314,31 @@ int CLuaFunctionDefs::RespawnObject ( lua_State* luaVM )
     if ( !argStream.HasErrors () )
     {
         if ( CStaticFunctionDefinitions::RespawnObject ( *pEntity ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::ToggleObjectRespawn ( lua_State* luaVM )
+{
+//  bool toggleObjectRespawn ( object theObject, bool respawn )
+    CClientEntity* pEntity; bool bRespawn;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pEntity );
+    argStream.ReadBool ( bRespawn );
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( CStaticFunctionDefinitions::ToggleObjectRespawn ( *pEntity, bRespawn ) )
         {
             lua_pushboolean ( luaVM, true );
             return 1;

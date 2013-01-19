@@ -3307,12 +3307,6 @@ bool CStaticFunctionDefinitions::IsObjectBreakable ( CClientObject& Object, bool
     return true;
 }
 
-bool CStaticFunctionDefinitions::IsObjectBlown ( CClientObject& Object, bool& bBlown )
-{
-    bBlown = Object.IsBlown ();
-    return true;
-}
-
 bool CStaticFunctionDefinitions::SetObjectRotation ( CClientEntity& Entity, const CVector& vecRotation )
 {
     RUN_CHILDREN SetObjectRotation ( **iter, vecRotation );
@@ -3452,6 +3446,19 @@ bool CStaticFunctionDefinitions::RespawnObject ( CClientEntity& Entity )
             return false;
 
         m_pClientGame->GetObjectRespawner ()->Respawn ( &Object );
+        return true;
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::ToggleObjectRespawn ( CClientEntity& Entity, bool bRespawn )
+{
+    RUN_CHILDREN ToggleObjectRespawn ( **iter, bRespawn );
+
+    if ( IS_OBJECT ( &Entity ) )
+    {
+        CDeathmatchObject& Object = static_cast < CDeathmatchObject& > ( Entity );
+        Object.SetRespawnEnabled ( bRespawn );
         return true;
     }
     return false;
