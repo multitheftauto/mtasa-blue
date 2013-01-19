@@ -94,7 +94,8 @@ public:
     inline bool                     IsBreakable             ( void )                            { return m_bBreakable; };
     bool                            SetBreakable            ( bool bBreakable );
     bool                            Break                   ( void );
-    bool                            IsBlown                 ( void );
+    inline bool                     IsRespawnEnabled        ( void )                            { return m_bRespawnEnabled; };
+    inline void                     SetRespawnEnabled       ( bool bRespawnEnabled )            { m_bRespawnEnabled = bRespawnEnabled; };
 
     void                            ReCreate                ( void );
     void                            UpdateVisibility        ( void );
@@ -130,6 +131,7 @@ protected:
     float                               m_fHealth;
     bool                                m_bBreakable;
     bool                                m_bBeingRespawned;
+    bool                                m_bRespawnEnabled;
 
     CVector                             m_vecMoveSpeed;
 

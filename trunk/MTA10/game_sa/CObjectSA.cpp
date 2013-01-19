@@ -247,11 +247,6 @@ void CObjectSA::Break ()
     }
 }
 
-bool CObjectSA::IsBlown ()
-{
-    return static_cast < CObjectSAInterface* > ( this->GetInterface () )->bExploded;
-}
-
 void CObjectSA::SetScale( float faScale )
 {
     DWORD dwFunc = 0x4745E0;
