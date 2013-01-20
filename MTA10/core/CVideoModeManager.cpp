@@ -141,6 +141,9 @@ void CVideoModeManager::PreCreateDevice ( D3DPRESENT_PARAMETERS* pp )
     else
         m_bBetterAltTabStability = true;
 
+    // Turn this off now as might be causing start up issues for some graphic card drivers
+    m_bBetterAltTabStability = false;
+
     // This block helps alt-tab stability in fullscreen mode
     if ( m_bCurrentWindowed || m_bBetterAltTabStability )
     {
