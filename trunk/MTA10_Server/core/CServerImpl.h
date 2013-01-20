@@ -78,13 +78,10 @@ private:
     void                MainLoop            ( void );
 
     bool                ParseArguments      ( int iArgumentCount, char* szArguments [] );
-    bool                IsKeyPressed        ( int iKey );
-    void                WaitForKey          ( int iKey );
 
     void                ShowInfoTag         ( char *szTag );
     void                HandleInput         ( void );
 
-    void                SleepMs             ( unsigned long ulMs );
     void                DestroyWindow       ( void );
 
     CDynamicLibrary     m_NetworkLibrary;
