@@ -141,7 +141,7 @@ HMONITOR   CProxyDirect3D9::GetAdapterMonitor           ( UINT Adapter )
 
 HRESULT    CProxyDirect3D9::CreateDevice                ( UINT Adapter, D3DDEVTYPE DeviceType, HWND hFocusWindow, DWORD BehaviorFlags, D3DPRESENT_PARAMETERS* pPresentationParameters, IDirect3DDevice9** ppReturnedDeviceInterface )
 {
-    HRESULT hResult;
+    D3DPRESENT_PARAMETERS presentationParametersOrig = *pPresentationParameters;
 
     WriteDebugEvent ( "CProxyDirect3D9::CreateDevice" );
 
@@ -193,13 +193,34 @@ HRESULT    CProxyDirect3D9::CreateDevice                ( UINT Adapter, D3DDEVTY
     GetVideoModeManager ()->PreCreateDevice ( pPresentationParameters );
 
     // Create our object.
-    hResult = m_pDevice->CreateDevice ( Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters, ppReturnedDeviceInterface );
+    HRESULT hResult = m_pDevice->CreateDevice ( Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters, ppReturnedDeviceInterface );
 
     // Store the rendering window in the direct 3d data
     CDirect3DData::GetSingleton ().StoreDeviceWindow ( pPresentationParameters->hDeviceWindow );
 
     // Apply input hook
     CMessageLoopHook::GetSingleton ( ).ApplyHook ( hFocusWindow );
+
+    if ( FAILED ( hResult ) )
+    {
+        // Record problem
+        g_pCore->LogEvent( 7125, "Direct3D", "Direct3D9::CreateDevice", SString( "Fail1:%08x", hResult ) );
+        WriteDebugEvent( SString( "Direct3D9::CreateDevice  Fail1:%08x", hResult ) );
+
+        // Try with original presentation parameters ** Note: This will mean windowed mode is ignored **
+        *pPresentationParameters = presentationParametersOrig;
+        hResult = m_pDevice->CreateDevice ( Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters, ppReturnedDeviceInterface );
+
+        if ( FAILED ( hResult ) )
+        {
+            // Record problem
+            g_pCore->LogEvent( 7125, "Direct3D", "Direct3DDevice9::Reset", SString( "Fail2:%08x", hResult ) );
+            WriteDebugEvent( SString( "Direct3DDevice9::Reset  Fail2:%08x", hResult ) );
+
+            // Let caller handle what to do
+            return hResult;
+        }
+    }
 
     // Make sure the object was created successfully.
     if ( hResult == D3D_OK )
