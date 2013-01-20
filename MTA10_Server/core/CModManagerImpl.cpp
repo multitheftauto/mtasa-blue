@@ -112,7 +112,7 @@ bool CModManagerImpl::Load ( const char* szModName, int iArgumentCount, char* sz
     if ( !m_pBase->ServerStartup ( iArgumentCount, szArguments ) )
     {
         // Unload the mod again
-        Unload ();
+        Unload ( true );
         return false;
     }
 
@@ -121,7 +121,7 @@ bool CModManagerImpl::Load ( const char* szModName, int iArgumentCount, char* sz
 }
 
 
-void CModManagerImpl::Unload ( void )
+void CModManagerImpl::Unload ( bool bKeyPressBeforeTerm )
 {
     // Got a mod loaded?
     if ( m_pBase )
@@ -133,7 +133,14 @@ void CModManagerImpl::Unload ( void )
 #ifdef WIN32
         // Exit crash test
         if ( m_pServer->HasConsole() )
+        {
+            if ( bKeyPressBeforeTerm )
+            {
+                Print ( "Press Q to shut down the server!\n" );
+                WaitForKey ( 'q' );
+            }
             TerminateProcess( GetCurrentProcess(), 0 );
+        }
 #endif
         // Unload the library
         m_Library.Unload ();
