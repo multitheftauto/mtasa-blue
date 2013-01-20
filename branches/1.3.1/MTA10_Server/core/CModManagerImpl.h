@@ -42,7 +42,7 @@ public:
     CServerBase*        GetCurrentMod           ( void );
 
     bool                Load                    ( const char* szModName, int iArgumentCount, char* szArguments [] );
-    void                Unload                  ( void );
+    void                Unload                  ( bool bKeyPressBeforeTerm = false );
 
     void                HandleInput             ( const char* szCommand );
     void                GetTag                  ( char* szInfoTag, int iInfoTag );

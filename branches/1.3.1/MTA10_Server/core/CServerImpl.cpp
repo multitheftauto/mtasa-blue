@@ -833,7 +833,7 @@ bool CServerImpl::ParseArguments ( int iArgumentCount, char* szArguments [] )
 }
 
 
-bool CServerImpl::IsKeyPressed ( int iKey )
+bool IsKeyPressed ( int iKey )
 {
     // Is the key pressed?
 #ifdef WIN32
@@ -863,7 +863,7 @@ void CServerImpl::DestroyWindow ( void )
 #endif
 }
 
-void CServerImpl::WaitForKey ( int iKey )
+void WaitForKey ( int iKey )
 {
     if ( !g_bSilent )
     {
@@ -876,13 +876,7 @@ void CServerImpl::WaitForKey ( int iKey )
             }
 
             // Limit the looping a little to prevent heavy CPU usage
-            SleepMs ( 10 );
+            Sleep ( 10 );
         }
     }
-}
-
-
-void CServerImpl::SleepMs ( unsigned long ulMs )
-{
-    Sleep ( ulMs );
 }
