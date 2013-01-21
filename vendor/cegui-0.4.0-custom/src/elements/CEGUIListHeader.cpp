@@ -686,6 +686,30 @@ void ListHeader::setColumnPixelWidth(uint column, float width)
 
 
 /*************************************************************************
+	Set the title of the specified column.	
+*************************************************************************/
+void ListHeader::setColumnTitle(uint column, const char* szText)
+{
+	if (column >= getColumnCount())
+	{
+		throw InvalidRequestException((utf8*)"ListHeader::setColumnTitle - specified column index is out of range for this ListHeader.");
+	}
+	else
+	{
+		d_segments[column]->setText((utf8*)szText);
+	}
+}
+
+
+/*************************************************************************
+	Get the title of the specified column.	
+*************************************************************************/
+const char* ListHeader::getColumnTitle(uint column)
+{
+	return d_segments[column]->getText().c_str();
+}
+
+/*************************************************************************
 	Create initialise and return a ListHeaderSegment object, with all
 	events subscribed and ready to use.
 *************************************************************************/

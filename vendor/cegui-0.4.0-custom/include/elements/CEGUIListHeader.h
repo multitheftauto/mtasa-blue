@@ -623,6 +623,36 @@ public:
 	void	setColumnPixelWidth(uint column, float width);
 
 
+	/*!
+	\brief
+		Set the column title of the specified column.
+
+	\param column
+		Column index for set title with in.
+
+	\param title
+		const char specifying the new title to set for the ListHeaderSegment at the zero based column
+		index specified by \a column.
+
+	\return
+		Nothing
+	*/
+	void    setColumnTitle(uint column, const char *title);
+
+
+	/*!
+	\brief
+		Get the column title of the specified column.
+
+	\param column
+		Column index for get title with in.
+
+	\return
+		String with column title
+	*/
+	const char*    getColumnTitle(uint column);
+
+
 	/*************************************************************************
 		Construction and Destruction
 	*************************************************************************/

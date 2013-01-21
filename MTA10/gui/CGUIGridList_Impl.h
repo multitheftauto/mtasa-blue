@@ -31,6 +31,8 @@ public:
     void                                RemoveColumn            ( unsigned int uiColumn );
     void                                AutoSizeColumn          ( unsigned int hColumn );
     void                                SetColumnWidth          ( int hColumn, float fWidth, bool bRelative = true );
+    void                                SetColumnTitle          ( int hColumn, const char* szTitle );
+    const char*                         GetColumnTitle          ( int hColumn );
 
     void                                SetSelectionMode        ( SelectionMode mode );
 
