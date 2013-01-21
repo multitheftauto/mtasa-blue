@@ -1583,6 +1583,63 @@ int CLuaFunctionDefs::GUIGridListSetColumnWidth ( lua_State* luaVM )
 }
 
 
+int CLuaFunctionDefs::GUIGridListSetColumnTitle ( lua_State* luaVM )
+{
+//  bool guiGridListSetColumnTitle ( element guiGridlist, int columnIndex, string title )
+    CClientGUIElement* guiGridlist; int iColumnIndex; SString sTitle;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData < CGUIGridList > ( guiGridlist );
+    argStream.ReadNumber ( iColumnIndex );
+    argStream.ReadString ( sTitle );
+       
+    if ( !argStream.HasErrors () )
+    {
+        int iColumnCount = static_cast < CGUIGridList* > ( guiGridlist->GetCGUIElement () ) ->GetColumnCount ();
+        if ( iColumnIndex > 0 && iColumnCount >= iColumnIndex )
+        {
+            CStaticFunctionDefinitions::GUIGridListSetColumnTitle ( *guiGridlist, iColumnIndex, sTitle );
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+
+    // error: bad arguments
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::GUIGridListGetColumnTitle ( lua_State* luaVM )
+{
+//  bool guiGridListGetColumnTitle ( element guiGridlist, int columnIndex )
+    CClientGUIElement* guiGridlist; int iColumnIndex;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData < CGUIGridList > ( guiGridlist );
+    argStream.ReadNumber ( iColumnIndex );
+       
+    if ( !argStream.HasErrors () )
+    {
+        int iColumnCount = static_cast < CGUIGridList* > ( guiGridlist->GetCGUIElement () ) ->GetColumnCount ();
+        if ( iColumnIndex > 0 && iColumnCount >= iColumnIndex )
+        {
+            const char* szTitle = static_cast < CGUIGridList* > ( guiGridlist->GetCGUIElement () ) ->GetColumnTitle ( iColumnIndex );
+            lua_pushstring ( luaVM, szTitle );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+
+    // error: bad arguments
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
 int CLuaFunctionDefs::GUIGridListAddRow ( lua_State* luaVM )
 {
 //  int guiGridListAddRow ( element gridList )

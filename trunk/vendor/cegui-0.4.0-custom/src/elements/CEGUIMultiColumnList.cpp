@@ -1318,6 +1318,25 @@ void MultiColumnList::setColumnHeaderWidth(uint col_idx, float width, bool relat
 
 
 /*************************************************************************
+	Set the title of the specified column header (and therefore the
+	column itself).	
+*************************************************************************/
+void MultiColumnList::setColumnHeaderTitle(uint col_idx, const char* szTitle)
+{
+    d_header->setColumnTitle(col_idx, szTitle);
+}
+
+
+/*************************************************************************
+	Get the title of the specified column header (and therefore the
+	column itself).	
+*************************************************************************/
+const char* MultiColumnList::getColumnHeaderTitle(uint col_idx)
+{
+	return d_header->getColumnTitle(col_idx);
+}
+
+/*************************************************************************
 	Add multi column list box specific events	
 *************************************************************************/
 void MultiColumnList::addMultiColumnListboxEvents(bool bCommon)
