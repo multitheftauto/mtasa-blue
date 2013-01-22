@@ -5231,6 +5231,42 @@ void CStaticFunctionDefinitions::GUIGridListSetSelectionMode ( CClientEntity& En
 }
 
 
+void CStaticFunctionDefinitions::GUIGridListSetHorizontalScrollPosition ( CClientEntity& Entity, float fPosition )
+{
+    RUN_CHILDREN GUIGridListSetHorizontalScrollPosition ( **iter, fPosition );
+
+    // Are we a GUI element?
+    if ( IS_GUI ( &Entity ) )
+    {
+        CClientGUIElement& GUIElement = static_cast < CClientGUIElement& > ( Entity );
+
+        // Are we a gridlist?
+        if ( IS_CGUIELEMENT_GRIDLIST ( &GUIElement ) )
+        {
+            static_cast < CGUIGridList* > ( GUIElement.GetCGUIElement () ) -> SetHorizontalScrollPosition ( fPosition / 100.0f );
+        }
+    }
+}
+
+
+void CStaticFunctionDefinitions::GUIGridListSetVerticalScrollPosition ( CClientEntity& Entity, float fPosition )
+{
+    RUN_CHILDREN GUIGridListSetHorizontalScrollPosition ( **iter, fPosition );
+
+    // Are we a GUI element?
+    if ( IS_GUI ( &Entity ) )
+    {
+        CClientGUIElement& GUIElement = static_cast < CClientGUIElement& > ( Entity );
+
+        // Are we a gridlist?
+        if ( IS_CGUIELEMENT_GRIDLIST ( &GUIElement ) )
+        {
+            static_cast < CGUIGridList* > ( GUIElement.GetCGUIElement () ) -> SetVerticalScrollPosition ( fPosition / 100.0f );
+        }
+    }
+}
+
+
 void CStaticFunctionDefinitions::GUIWindowSetMovable ( CClientEntity& Entity, bool bFlag )
 {
     RUN_CHILDREN GUIWindowSetMovable ( **iter, bFlag );

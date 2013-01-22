@@ -79,6 +79,11 @@ public:
     virtual void                    SetSorting              ( bool bEnabled ) = 0;
     virtual void                    SetItemImage            ( int iRow, int hColumn, CGUIStaticImage* pImage ) = 0;
 
+    virtual float                   GetHorizontalScrollPosition ( void ) = 0;
+    virtual float                   GetVerticalScrollPosition   ( void ) = 0;
+    virtual void                    SetHorizontalScrollPosition ( float fPosition ) = 0;
+    virtual void                    SetVerticalScrollPosition   ( float fPosition ) = 0;
+
     virtual int                     GetColumnIndex          ( int hColumn ) = 0;
     virtual int                     GetItemColumnIndex      ( CGUIListItem* pItem ) = 0;
     virtual int                     GetItemRowIndex         ( CGUIListItem* pItem ) = 0;
@@ -102,7 +107,6 @@ public:
     virtual void                    SetSortColumnHandler    ( GUI_CALLBACK Callback ) = 0;
 
     virtual void                    SetIgnoreTextSpacer     ( bool bIgnoreTextSpacer ) = 0;
-    virtual void                    SetVerticalScrollPosition ( float fPosition ) = 0;
 };
 
 #endif

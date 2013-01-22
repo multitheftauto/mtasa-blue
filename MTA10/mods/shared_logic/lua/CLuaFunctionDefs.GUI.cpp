@@ -1994,6 +1994,51 @@ int CLuaFunctionDefs::GUIGridListGetItemColor ( lua_State* luaVM )
 }
 
 
+
+int CLuaFunctionDefs::GUIGridListGetHorizontalScrollPosition ( lua_State *luaVM )
+{
+//  float guiGridListGetHorizontalScrollPosition ( element guiGridlist )
+    CClientGUIElement* guiGridlist;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData < CGUIGridList > ( guiGridlist );
+
+    if ( !argStream.HasErrors () )
+    {
+        float fPosition = static_cast < CGUIGridList* > ( guiGridlist->GetCGUIElement () ) -> GetHorizontalScrollPosition () * 100.0f;
+        lua_pushnumber ( luaVM, fPosition );
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::GUIGridListGetVerticalScrollPosition ( lua_State *luaVM )
+{
+//  float guiGridListGetVerticalScrollPosition ( element guiGridlist )
+    CClientGUIElement* guiGridlist;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData < CGUIGridList > ( guiGridlist );
+
+    if ( !argStream.HasErrors () )
+    {
+        float fPosition = static_cast < CGUIGridList* > ( guiGridlist->GetCGUIElement () ) -> GetVerticalScrollPosition () * 100.0f;
+        lua_pushnumber ( luaVM, fPosition );
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
 int CLuaFunctionDefs::GUIGridListSetItemText ( lua_State* luaVM )
 {
 //  bool guiGridListSetItemText ( element gridList, int rowIndex, int columnIndex, string text, bool section, bool number )
@@ -2099,6 +2144,52 @@ int CLuaFunctionDefs::GUIGridListSetScrollBars ( lua_State* luaVM )
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     // error: bad arguments
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::GUIGridListSetHorizontalScrollPosition ( lua_State *luaVM )
+{
+//  bool guiGridListSetHorizontalScrollPosition ( element guiGridlist, float fPosition )
+    CClientGUIElement* guiGridlist; float fPosition;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData < CGUIGridList > ( guiGridlist );
+    argStream.ReadNumber ( fPosition );
+
+    if ( !argStream.HasErrors () )
+    {
+        CStaticFunctionDefinitions::GUIGridListSetHorizontalScrollPosition ( *guiGridlist, fPosition );
+        lua_pushboolean ( luaVM, true );
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::GUIGridListSetVerticalScrollPosition ( lua_State *luaVM )
+{
+//  bool guiGridListSetVerticalScrollPosition ( element guiGridlist, float fPosition )
+    CClientGUIElement* guiGridlist; float fPosition;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData < CGUIGridList > ( guiGridlist );
+    argStream.ReadNumber ( fPosition );
+
+    if ( !argStream.HasErrors () )
+    {
+        CStaticFunctionDefinitions::GUIGridListSetVerticalScrollPosition ( *guiGridlist, fPosition );
+        lua_pushboolean ( luaVM, true );
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
     lua_pushboolean ( luaVM, false );
     return 1;
 }
