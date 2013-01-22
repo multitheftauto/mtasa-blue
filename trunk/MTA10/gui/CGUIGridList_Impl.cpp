@@ -502,6 +502,57 @@ void CGUIGridList_Impl::SetItemImage ( int iRow, int hColumn, CGUIStaticImage* p
 }
 
 
+float CGUIGridList_Impl::GetHorizontalScrollPosition ( void )
+{
+    try
+    {
+        CEGUI::Scrollbar* pScrollbar = reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow )->d_horzScrollbar;
+        if ( pScrollbar )
+            return ( pScrollbar->getScrollPosition () / ( pScrollbar->getDocumentSize () - pScrollbar->getPageSize () ) );
+            
+    }
+    catch ( CEGUI::Exception ) {}
+    return 0.0f;
+}
+
+
+float CGUIGridList_Impl::GetVerticalScrollPosition ( void )
+{
+    try
+    {
+        CEGUI::Scrollbar* pScrollbar = reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow )->d_vertScrollbar;
+        if ( pScrollbar )
+            return ( pScrollbar->getScrollPosition () / ( pScrollbar->getDocumentSize () - pScrollbar->getPageSize () ) );
+    }
+    catch ( CEGUI::Exception ) {}
+    return 0.0f;
+}
+
+
+void CGUIGridList_Impl::SetHorizontalScrollPosition ( float fPosition )
+{
+    try
+    {
+        CEGUI::Scrollbar* pScrollbar = reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow )->d_horzScrollbar;
+        if ( pScrollbar )
+            pScrollbar->setScrollPosition ( fPosition * ( pScrollbar->getDocumentSize () - pScrollbar->getPageSize () ) );
+    }
+    catch ( CEGUI::Exception ) {}
+}
+
+
+void CGUIGridList_Impl::SetVerticalScrollPosition ( float fPosition )
+{
+    try
+    {
+        CEGUI::Scrollbar* pScrollbar = reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow )->d_vertScrollbar;
+        if ( pScrollbar )
+            pScrollbar->setScrollPosition ( fPosition * ( pScrollbar->getDocumentSize () - pScrollbar->getPageSize () ) );
+    }
+    catch ( CEGUI::Exception ) {}
+}
+
+
 int CGUIGridList_Impl::GetColumnIndex ( int hColumn )
 {
     /*
@@ -710,14 +761,4 @@ CGUIListItem_Impl* CGUIGridList_Impl::GetListItem ( CEGUI::ListboxItem* pItem )
         return NULL;
 
     return it->second;
-}
-
-
-void CGUIGridList_Impl::SetVerticalScrollPosition ( float fPosition )
-{
-    CEGUI::Scrollbar* pScrollbar = reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow )->d_vertScrollbar;
-    if ( pScrollbar )
-    {
-        pScrollbar->setScrollPosition ( fPosition );
-    }
 }

@@ -55,6 +55,11 @@ public:
     void                                SetSorting              ( bool bEnabled );
     void                                SetItemImage            ( int iRow, int hColumn, CGUIStaticImage* pImage );
 
+    float                               GetHorizontalScrollPosition ( void );
+    float                               GetVerticalScrollPosition   ( void );
+    void                                SetHorizontalScrollPosition ( float fPosition );
+    void                                SetVerticalScrollPosition   ( float fPosition );
+
     int                                 GetColumnIndex          ( int hColumn );
     int                                 GetItemColumnIndex      ( CGUIListItem* pItem );
     int                                 GetItemRowIndex         ( CGUIListItem* pItem );
@@ -78,7 +83,6 @@ public:
     void                                SetSortColumnHandler    ( GUI_CALLBACK Callback );
 
     void                                SetIgnoreTextSpacer     ( bool bIgnoreTextSpacer ) { m_bIgnoreTextSpacer = bIgnoreTextSpacer; };
-    void                                SetVerticalScrollPosition ( float fPosition );
     eCGUIType                           GetType                 ( void ) { return CGUI_GRIDLIST; };
 
     #include "CGUIElement_Inc.h"
