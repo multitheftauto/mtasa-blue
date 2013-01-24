@@ -33,10 +33,6 @@ public:
     void            RegisterPlayer          ( CPlayer* pPlayer );
     void            UnregisterPlayer        ( CPlayer* pPlayer );
     CPlayer*        FindPlayer              ( const char* szArguments );
-    void            LockQueue               ( void );
-    void            UnlockQueue             ( void );
-    uint            GenerateQueueChecksum   ( void );
-    bool            CheckPlayer             ( CPlayer* pPlayer );
 
 private:
     enum EEntryType
@@ -54,7 +50,5 @@ private:
         unsigned int        uiContext;
     };
 
-    std::list < SEntry >    m_Queue;
-    uint                    m_uiQueueChecksum;
-    bool                    m_bQueueLocked;
+    std::list < SEntry >     m_Queue;
 };
