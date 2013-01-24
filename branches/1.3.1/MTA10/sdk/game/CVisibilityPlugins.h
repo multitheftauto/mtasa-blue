@@ -12,12 +12,16 @@
 #ifndef __CVisibilityPlugins_H
 #define __CVisibilityPlugins_H
 
+#define ATOMIC_ID_FLAG_TWO_VERSIONS_UNDAMAGED   1
+#define ATOMIC_ID_FLAG_TWO_VERSIONS_DAMAGED     2
+
 struct RpClump;
 
 class CVisibilityPlugins
 {
 public:
     virtual void                SetClumpAlpha       ( RpClump * pClump, int iAlpha ) = 0;
+    virtual int                 GetAtomicId         ( RwObject * pAtomic ) = 0;
 };
 
 #endif

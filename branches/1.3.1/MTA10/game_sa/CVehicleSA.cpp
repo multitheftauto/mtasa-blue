@@ -49,6 +49,19 @@ namespace
         //OutputDebugLine ( SString ( "Interface:%08x", pVehicleSA->GetVehicleInterface() ) );
         ClumpDump( pVehicleSA->GetInterface()->m_pRwObject, pVehicleSA );
     }
+
+    RwObject * __cdecl GetAllAtomicObjectCB(struct RwObject * object, void * data)
+    {
+        std::vector< RwObject* >& result = *((std::vector< RwObject* >*)data);
+        result.push_back( object );
+        return object;
+    }
+
+    // Get all atomics for this frame (even if they are invisible)
+    void GetAllAtomicObjects( RwFrame * frame, std::vector< RwObject* >& result )
+    {
+        RwFrameForAllObjects( frame, ( void * ) GetAllAtomicObjectCB, &result );
+    }
 }
 
 
@@ -1921,8 +1934,6 @@ CObject * CVehicleSA::SpawnFlyingComponent ( int i_1, unsigned int ui_2 )
 }
 
 
-typedef RwFrame * (__cdecl *RwFrameForAllObjects_t) (RwFrame * frame, void * callback, void * data);
-extern RwFrameForAllObjects_t RwFrameForAllObjects;
 void CVehicleSA::SetWheelVisibility ( eWheels wheel, bool bVisible )
 {    
     CVehicleSAInterface * vehicle = (CVehicleSAInterface *)this->GetInterface();
@@ -1951,6 +1962,8 @@ void CVehicleSA::SetWheelVisibility ( eWheels wheel, bool bVisible )
         if ( pObject ) pObject->flags = ( bVisible ) ? 4 : 0;
     }
 }
+
+
 CVector CVehicleSA::GetWheelPosition ( eWheels wheel )
 {
     switch (wheel)
@@ -2343,50 +2356,71 @@ void CVehicleSA::AddComponent ( RwFrame * pFrame )
     m_ExtraFrames.insert ( pair < SString, RwFrame * > ( strName, pFrame ) );
 }
 
-bool CVehicleSA::SetComponentVisible ( SString vehicleComponent, bool bVisible )  
+
+bool CVehicleSA::SetComponentVisible ( SString vehicleComponent, bool bRequestVisible )  
 { 
     // get our component
     RwFrame * pComponent = GetVehicleComponent ( vehicleComponent );
     // check validity
     if ( pComponent )
     {
-        // get the atomic for the frame
-        DWORD dw_GetCurrentAtomicObjectCB = 0x6a0750;
+        // Get all atomics for this component - Usually one, or two if there is a damaged version
+        std::vector< RwObject* > atomicList;
+        GetAllAtomicObjects( pComponent, atomicList );
 
-        RwObject * pObject = NULL;
-        
-        RwFrameForAllObjects ( pComponent, ( void * ) dw_GetCurrentAtomicObjectCB, &pObject );
+        // Count number currently visible
+        uint uiNumAtomicsCurrentlyVisible = 0;
+        for ( uint i = 0 ; i < atomicList.size() ; i++ )
+            if ( atomicList[i]->flags & 0x04 )
+                uiNumAtomicsCurrentlyVisible++;
 
-        // get our visibility
-        if ( pObject ) 
+        if ( bRequestVisible && uiNumAtomicsCurrentlyVisible == 0 )
         {
-            // set our visibility flag
-            pObject->flags = ( bVisible ) ? 4 : 0;
+            // Make atomic (undamaged version) visible. TODO - Check if damaged version should be made visible instead
+            for ( uint i = 0 ; i < atomicList.size() ; i++ )
+            {
+                RwObject* pAtomic = atomicList[i];
+                int AtomicId = pGame->GetVisibilityPlugins()->GetAtomicId( pAtomic );
+
+                if ( !( AtomicId & ATOMIC_ID_FLAG_TWO_VERSIONS_DAMAGED ) )
+                {
+                    // Either only one version, or two versions and this is the undamaged one
+                    pAtomic->flags |= 0x04;
+                }
+            }
+        }
+        else
+        if ( !bRequestVisible && uiNumAtomicsCurrentlyVisible > 0 )
+        {
+            // Make all atomics invisible
+            for ( uint i = 0 ; i < atomicList.size() ; i++ )
+                atomicList[i]->flags &= ~0x05;  // Mimic what GTA seems to do - Not sure what the bottom bit is for
         }
         return true;
     }
     return false;
 }
 
-bool CVehicleSA::GetComponentVisible ( SString vehicleComponent, bool &bVisible )  
+bool CVehicleSA::GetComponentVisible ( SString vehicleComponent, bool &bOutVisible )  
 { 
     // get our component
     RwFrame * pComponent = GetVehicleComponent ( vehicleComponent );
     // check validity
     if ( pComponent )
     {
-        // get the atomic for the frame
-        DWORD dw_GetCurrentAtomicObjectCB = 0x6a0750;
+        // Get all atomics for this component - Usually one, or two if there is a damaged version
+        std::vector< RwObject* > atomicList;
+        GetAllAtomicObjects( pComponent, atomicList );
 
-        RwObject * pObject = NULL;
-        RwFrameForAllObjects ( pComponent, ( void * ) dw_GetCurrentAtomicObjectCB, &pObject );
-        // if we found an object
-        if ( pObject )
-        {
-            // get our visibility
-            bVisible = pObject->flags || 4;
-            return true;
-        }
+        // Count number currently visible
+        uint uiNumAtomicsCurrentlyVisible = 0;
+        for ( uint i = 0 ; i < atomicList.size() ; i++ )
+            if ( atomicList[i]->flags & 0x04 )
+                uiNumAtomicsCurrentlyVisible++;
+
+        // Set result
+        bOutVisible = ( uiNumAtomicsCurrentlyVisible > 0 );
+        return true;
     }
     return false;
 }

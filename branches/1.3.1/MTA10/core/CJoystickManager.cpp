@@ -533,7 +533,7 @@ void CJoystickManager::InitDirectInput( void )
 
     // Set the cooperative level to let DInput know how this device should
     // interact with the system and with other DInput applications.
-    if( FAILED( m_DevInfo.pDevice->SetCooperativeLevel( g_pCore->GetHookedWindow(), DISCL_NONEXCLUSIVE | DISCL_BACKGROUND ) ) )
+    if( FAILED( m_DevInfo.pDevice->SetCooperativeLevel( g_pCore->GetHookedWindow(), DISCL_NONEXCLUSIVE | DISCL_FOREGROUND ) ) )
     {
         WriteDebugEvent ( "InitDirectInput - SetCooperativeLevel failed" );
     }

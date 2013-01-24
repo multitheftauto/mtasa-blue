@@ -523,6 +523,9 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     // Do basic backup
     HandleBackup ();
 
+    // Encrypt crash dumps for uploading
+    HandleCrashDumpEncryption();
+
     // Read some settings
     m_pACLManager->SetFileName ( m_pMainConfig->GetAccessControlListFile ().c_str () );
     const SString strServerIP = m_pMainConfig->GetServerIP ();
@@ -4151,4 +4154,50 @@ SString CGame::CalculateMinClientRequirement ( void )
 #endif
 
     return strNewMin;
+}
+
+
+//
+// Handle encryption of Windows crash dump files
+//
+void CGame::HandleCrashDumpEncryption( void )
+{
+#ifdef WIN32
+    SString strDumpDirPath = g_pServerInterface->GetAbsolutePath( "dumps" );
+    SString strDumpDirPrivatePath = PathJoin( strDumpDirPath, "private" );
+    SString strDumpDirPublicPath = PathJoin( strDumpDirPath, "public" );
+    MakeSureDirExists( strDumpDirPrivatePath + "/" );
+    MakeSureDirExists( strDumpDirPublicPath + "/" );
+
+    SString strMessage = "Dump files in this directory are encrypted and copied to 'dumps\\public' during server startup\n\n";
+    FileSave( PathJoin( strDumpDirPrivatePath, "README.txt" ), strMessage );
+
+    // Move old dumps to the private folder
+    {
+        std::vector < SString > legacyList = FindFiles( PathJoin( strDumpDirPath, "*.dmp" ), true, false );
+        for ( uint i = 0 ; i < legacyList.size() ; i++ )
+        {
+            const SString& strFilename = legacyList[i];
+            SString strSrcPathFilename = PathJoin( strDumpDirPath, strFilename );
+            SString strDestPathFilename = PathJoin( strDumpDirPrivatePath, strFilename );
+            FileRename( strSrcPathFilename, strDestPathFilename );
+        }
+    }
+
+    // Copy and encrypt private files to public if they don't already exist
+    {
+        std::vector < SString > privateList = FindFiles( PathJoin( strDumpDirPrivatePath, "*.dmp" ), true, false );
+        for ( uint i = 0 ; i < privateList.size() ; i++ )
+        {
+            const SString& strPrivateFilename = privateList[i];
+            SString strPublicFilename = ExtractBeforeExtension( strPrivateFilename ) + ".rsa." + ExtractExtension( strPrivateFilename );
+            SString strPrivatePathFilename = PathJoin( strDumpDirPrivatePath, strPrivateFilename );
+            SString strPublicPathFilename = PathJoin( strDumpDirPublicPath, strPublicFilename );
+            if ( !FileExists( strPublicPathFilename ) )
+            {
+                g_pRealNetServer->EncryptDumpfile( strPrivatePathFilename, strPublicPathFilename );
+            }
+        }
+    }
+#endif
 }

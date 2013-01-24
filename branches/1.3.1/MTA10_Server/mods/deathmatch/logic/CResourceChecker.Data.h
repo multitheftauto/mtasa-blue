@@ -116,6 +116,8 @@ namespace
                                          { "engineGetModelLODDistance",     "1.3.1-9.04779" },
                                          { "sha256",                        "1.3.1-9.04835" },
                                          { "setPedWalkingStyle",            "1.3.1-9.04935" },
+                                         { "guiGridListSetColumnTitle",     "1.3.1-9.04945" },
+                                         { "guiGridListGetColumnTitle",     "1.3.1-9.04945" },
                                         };
 
     SVersionItem serverFunctionInitList[] = {

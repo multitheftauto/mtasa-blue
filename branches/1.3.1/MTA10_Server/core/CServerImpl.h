@@ -61,8 +61,8 @@ public:
     CTCP*               GetTCP              ( void );
     CXML*               GetXML              ( void );
 
-    inline const char*  GetServerModPath   ( void )                { return m_strServerModPath; };
-    const char*         GetAbsolutePath     ( const char* szRelative, char* szBuffer, unsigned int uiBufferSize );
+    const char*         GetServerModPath    ( void )                { return m_strServerModPath; };
+    SString             GetAbsolutePath     ( const char* szRelative );
 
     void                Printf              ( const char* szText, ... );
     bool                IsRequestingExit    ( void );

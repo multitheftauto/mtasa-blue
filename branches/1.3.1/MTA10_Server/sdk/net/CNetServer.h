@@ -120,6 +120,7 @@ public:
     virtual void                            GetClientSerialAndVersion       ( const NetServerPlayerID& playerID, SFixedString < 32 >& strSerial, SFixedString < 32 >& strVersion ) = 0;
     virtual void                            SetNetOptions                   ( const SNetOptions& options ) = 0;
     virtual void                            GenerateRandomData              ( void* pOutData, uint uiLength ) = 0;
+    virtual bool                            EncryptDumpfile                 ( const char* szClearPathFilename, const char* szEncryptedPathFilename ) { return false; }
 };
 
 #endif

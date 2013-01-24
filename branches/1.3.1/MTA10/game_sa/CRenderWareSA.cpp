@@ -824,6 +824,13 @@ void CRenderWareSA::GetModelTextureNames ( std::vector < SString >& outNameList,
 {
     outNameList.clear ();
 
+    // Special case for CJ
+    if ( usModelId == 0 )
+    {
+        outNameList.push_back( "CJ" );
+        return;
+    }
+
     ushort usTxdId = GetTXDIDForModelID ( usModelId );
 
     if ( usTxdId == 0 )

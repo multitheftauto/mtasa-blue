@@ -120,6 +120,16 @@ void CGUIGridList_Impl::SetColumnWidth ( int hColumn, float fWidth, bool bRelati
     {}
 }
 
+void CGUIGridList_Impl::SetColumnTitle ( int hColumn, const char *szTitle )
+{
+    reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> setColumnHeaderTitle ( GetColumnIndex ( hColumn ), szTitle );
+}
+
+const char* CGUIGridList_Impl::GetColumnTitle ( int hColumn )
+{
+    return reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> getColumnHeaderTitle ( GetColumnIndex ( hColumn ) );
+}
+
 void CGUIGridList_Impl::SetHorizontalScrollBar ( bool bEnabled )
 {
     reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> setShowHorzScrollbar ( bEnabled );

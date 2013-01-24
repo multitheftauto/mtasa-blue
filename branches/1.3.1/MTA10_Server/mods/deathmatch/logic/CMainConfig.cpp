@@ -1258,7 +1258,6 @@ const std::vector < SIntSetting >& CMainConfig::GetIntSettingList ( void )
             { true, true,   0,      1,      2,      "ase",                                  &m_iAseMode,                                &CMainConfig::OnAseSettingChange },
             { true, true,   0,      1,      1,      "donotbroadcastlan",                    &m_bDontBroadcastLan,                       &CMainConfig::OnAseSettingChange },
             { true, true,   0,      1,      1,      "net_auto_filter",                      &m_bNetAutoFilter,                          &CMainConfig::ApplyNetOptions },
-            { true, true,   0,      0,      1,      "verify_memory",                        &m_bVerifyMemory,                           NULL },
         };
 
     static std::vector < SIntSetting > settingsList;

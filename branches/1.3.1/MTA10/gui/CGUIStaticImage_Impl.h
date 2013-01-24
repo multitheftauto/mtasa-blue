@@ -27,7 +27,7 @@ public:
                                 CGUIStaticImage_Impl    ( class CGUI_Impl* pGUI, CGUIElement* pParent = NULL );
                                 ~CGUIStaticImage_Impl   ( void );
 
-    bool                        LoadFromFile            ( const char* szFilename, const char* szDirectory = NULL );
+    bool                        LoadFromFile            ( const char* szFilename );
     bool                        LoadFromTexture         ( CGUITexture* pTexture );
     void                        Clear                   ( void );
 

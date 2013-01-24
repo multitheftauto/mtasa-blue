@@ -241,11 +241,10 @@ void CPerfStatLibMemoryImpl::GetLibMemoryStats ( CPerfStatResult* pResult, const
                 info.pLibrary = new CDynamicLibrary();
 
                 SString strPathFilename;
-                char szBuffer [MAX_PATH];
                 if ( bModDir )
                     strPathFilename = g_pServerInterface->GetModManager ()->GetAbsolutePath ( info.strName );
                 else
-                    strPathFilename = g_pServerInterface->GetAbsolutePath ( info.strName, szBuffer, MAX_PATH );
+                    strPathFilename = g_pServerInterface->GetAbsolutePath ( info.strName );
 
                 if ( info.pLibrary->Load ( strPathFilename ) )
                 {

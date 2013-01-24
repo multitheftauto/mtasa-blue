@@ -4247,7 +4247,7 @@ CClientGUIElement* CStaticFunctionDefinitions::GUICreateStaticImage ( CLuaMain& 
     if ( strPath )
     {
         // Load the image
-        if ( !static_cast < CGUIStaticImage* > ( pElement ) -> LoadFromFile ( "", strPath ) ) {
+        if ( !static_cast < CGUIStaticImage* > ( pElement ) -> LoadFromFile ( strPath ) ) {
             // If this fails, there's no reason to keep the widget (we don't have any IE-style "not found" icons yet)
             // So delete it and reset the pointer, so we return NULL
             delete pGUIElement;
@@ -4276,7 +4276,7 @@ bool CStaticFunctionDefinitions::GUIStaticImageLoadImage ( CClientEntity& Entity
             if ( strDir )
             {
                 // load the image, if any
-                return static_cast < CGUIStaticImage* > ( pCGUIElement ) -> LoadFromFile ( "", strDir );
+                return static_cast < CGUIStaticImage* > ( pCGUIElement ) -> LoadFromFile ( strDir );
             }
         }
     }
