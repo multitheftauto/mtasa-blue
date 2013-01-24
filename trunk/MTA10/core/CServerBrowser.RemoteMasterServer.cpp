@@ -129,6 +129,7 @@ bool CRemoteMasterServer::HasData ( void )
         {
             m_strStage = "hasdata";
             m_Data = CBuffer ( buffer.GetData (), buffer.GetSize () );
+            m_HTTP.Reset();
         }
     }
 

@@ -26,7 +26,7 @@ public:
     virtual CXML*           GetXML              ( void ) = 0;
 
     virtual const char*     GetServerModPath    ( void ) = 0;
-    virtual const char*     GetAbsolutePath     ( const char* szRelative, char* szBuffer, unsigned int uiBufferSize ) = 0;
+    virtual SString         GetAbsolutePath     ( const char* szRelative ) = 0;
 
     virtual void            Printf              ( const char* szFormat, ... ) = 0;
     virtual bool            IsRequestingExit    ( void ) = 0;

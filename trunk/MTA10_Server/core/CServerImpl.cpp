@@ -105,11 +105,9 @@ CXML* CServerImpl::GetXML ( void )
 }
 
 
-const char* CServerImpl::GetAbsolutePath ( const char* szRelative, char* szBuffer, unsigned int uiBufferSize )
+SString CServerImpl::GetAbsolutePath ( const char* szRelative )
 {
-    szBuffer [uiBufferSize-1] = 0;
-    snprintf ( szBuffer, uiBufferSize - 1, "%s/%s", m_strServerPath.c_str (), szRelative );
-    return szBuffer;
+    return PathJoin( m_strServerPath, szRelative );
 }
 
 
@@ -292,8 +290,7 @@ int CServerImpl::Run ( int iArgumentCount, char* szArguments [] )
         Print ( "MTA:BLUE Server for MTA:SA\r\n\r\n" );
 
     // Load the network DLL
-    char szBuffer [MAX_PATH];
-    if ( m_NetworkLibrary.Load ( GetAbsolutePath ( szNetworkLibName, szBuffer, MAX_PATH ) ) )
+    if ( m_NetworkLibrary.Load ( GetAbsolutePath ( szNetworkLibName ) ) )
     {
         // Network module compatibility check
         typedef unsigned long (*PFNCHECKCOMPATIBILITY) ( unsigned long );
@@ -310,7 +307,7 @@ int CServerImpl::Run ( int iArgumentCount, char* szArguments [] )
             return ERROR_NETWORK_LIBRARY_FAILED;
         }
 
-        if ( m_XMLLibrary.Load ( GetAbsolutePath ( szXMLLibName, szBuffer, MAX_PATH ) ) )
+        if ( m_XMLLibrary.Load ( GetAbsolutePath ( szXMLLibName ) ) )
         {
             // Grab the network interface
             InitNetServerInterface pfnInitNetServerInterface = (InitNetServerInterface) ( m_NetworkLibrary.GetProcedureAddress ( "InitNetServerInterface" ) );

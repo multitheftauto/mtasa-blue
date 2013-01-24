@@ -354,6 +354,7 @@ public:
     void                        SetSyncFPS                  ( int iSyncFPS ) { m_iSyncFPS = iSyncFPS; }
 
     void                        HandleBackup                ( void );
+    void                        HandleCrashDumpEncryption   ( void );
     void                        EnableLatentSends           ( bool bEnabled, int iBandwidth = 0, CLuaMain* pLuaMain = NULL, ushort usResourceNetId = 0xFFFF );
     void                        SendPacketBatchBegin        ( unsigned char ucPacketId, NetBitStreamInterface* pBitStream );
     bool                        SendPacket                  ( unsigned char ucPacketID, const NetServerPlayerID& playerID, NetBitStreamInterface* pBitStream, bool bBroadcast, NetServerPacketPriority packetPriority, NetServerPacketReliability packetReliability, ePacketOrdering packetOrdering = PACKET_ORDERING_DEFAULT );
