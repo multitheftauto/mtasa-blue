@@ -85,13 +85,14 @@ void CCrashHandler::DumpMiniDump ( _EXCEPTION_POINTERS* pException, CExceptionIn
 
             // Create the dump directory
             CreateDirectory ( "dumps", 0 );
+            CreateDirectory ( "dumps/private", 0 );
 
             SString strModuleName = pExceptionInformation->GetModuleBaseName ();
             strModuleName = strModuleName.ReplaceI ( ".dll", "" ).Replace ( ".exe", "" ).Replace ( "_", "" ).Replace ( ".", "" ).Replace ( "-", "" );
             if ( strModuleName.length () == 0 )
                 strModuleName = "unknown";
 
-            SString strFilename ( "dumps/server_%s_%s_%08x_%x_%04d%02d%02d_%02d%02d.dmp",
+            SString strFilename ( "dumps/private/server_%s_%s_%08x_%x_%04d%02d%02d_%02d%02d.dmp",
                                          MTA_DM_BUILDTAG_LONG,
                                          strModuleName.c_str (),
                                          pExceptionInformation->GetAddressModuleOffset (),

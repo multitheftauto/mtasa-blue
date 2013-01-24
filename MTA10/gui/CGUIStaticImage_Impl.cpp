@@ -64,11 +64,8 @@ CGUIStaticImage_Impl::~CGUIStaticImage_Impl ( void )
 }
 
 
-bool CGUIStaticImage_Impl::LoadFromFile ( const char* szFilename, const char* szDirectory )
+bool CGUIStaticImage_Impl::LoadFromFile ( const char* szFilename )
 {
-    std::string strPath = szDirectory ? szDirectory : "";   //m_pGUI->GetGuiWorkingDirectory ();
-    strPath += szFilename;
-
     // Load texture
     if ( !m_pTexture )
     {
@@ -76,7 +73,7 @@ bool CGUIStaticImage_Impl::LoadFromFile ( const char* szFilename, const char* sz
         m_bCreatedTexture = true;
     }
 
-    if ( !m_pTexture->LoadFromFile ( strPath.c_str () ) )
+    if ( !m_pTexture->LoadFromFile ( szFilename ) )
         return false;
 
     // Load image
