@@ -687,6 +687,9 @@ bool CWorldSA::RestoreBuilding ( unsigned short usModelToRestore, float fRange, 
                             }
                             // Remove it from the binary list
                             pFind->m_pBinaryRemoveList->erase ( entityIter++ );
+
+                            // If the building isn't streamed in, we won't find the building in the list (because the hook wasn't called) -> removeWorldModel doesn't work next time
+                            AddBinaryBuilding ( pEntity );
                         }
                         else
                             ++entityIter;
