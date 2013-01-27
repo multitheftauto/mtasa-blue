@@ -175,7 +175,7 @@ float CGUILabel_Impl::GetTextExtent ( void )
 
             while( std::getline ( ssText, sLineText ) )
             {
-                fLineExtent = pFont->getTextExtent ( sLineText );
+                fLineExtent = pFont->getTextExtent ( CGUI_Impl::GetUTFString( sLineText ) );
                 if ( fLineExtent > fMax )
                     fMax = fLineExtent;
             }
