@@ -1779,6 +1779,10 @@ void CServerBrowser::LoadOptions ( CXMLNode* pNode )
                             m_pIncludeOffline[ i ]->SetSelected ( pIncludeOffline->GetValue ( ).compare ( "1" ) == 0 );
                     }
 
+                    CXMLAttribute* pDisabled = pSubNode->GetAttributes ( ).Find ( "disabled" );
+                    if ( pDisabled )
+                        m_pTab [ i ]->SetEnabled( false );
+
                     // restore the active tab
                     CXMLAttribute* pActiveTab = pSubNode->GetAttributes ( ).Find ( "active" );
                     if ( pActiveTab && pActiveTab->GetValue ( ).compare ( "1" ) == 0 )
@@ -1843,6 +1847,12 @@ void CServerBrowser::SaveOptions ( )
             {
                 CXMLAttribute* pIncludeOffline = pSubNode->GetAttributes ( ).Create ( "include_offline" );
                 pIncludeOffline->SetValue ( m_pIncludeOffline [ ui ]->GetSelected ( ) );
+            }
+
+            if ( !m_pTab[ ui ]->IsEnabled() )
+            {
+                CXMLAttribute* pIncludeOffline = pSubNode->GetAttributes().Create( "disabled" );
+                pIncludeOffline->SetValue( !m_pTab[ ui ]->IsEnabled() );
             }
 
             // Save the active Tab
