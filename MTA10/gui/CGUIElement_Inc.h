@@ -23,13 +23,13 @@ std::string GetFont ( void )                                { return CGUIElement
 
 #ifndef SETVISIBLE_HACK
 void SetVisible ( bool bVisible )                           { CGUIElement_Impl::SetVisible ( bVisible ); };
-#endif
 bool IsVisible ( void )                                     { return CGUIElement_Impl::IsVisible (); };
+#endif
 
 #ifndef SETENABLED_HACK
 void SetEnabled ( bool bEnabled )                           { CGUIElement_Impl::SetEnabled ( bEnabled ); };
-#endif
 bool IsEnabled ( void )                                     { return CGUIElement_Impl::IsEnabled (); };
+#endif
 void SetZOrderingEnabled ( bool bZOrderingEnabled )         { CGUIElement_Impl::SetZOrderingEnabled ( bZOrderingEnabled ); };
 bool IsZOrderingEnabled ( void )                            { return CGUIElement_Impl::IsZOrderingEnabled (); };
 
