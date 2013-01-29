@@ -577,6 +577,15 @@ SString SharedUtil::GetReportLogContents ( void )
 // Client logfile.txt
 void WriteEvent( const char* szType, const SString& strText )
 {
+    // Split into lines if required
+    if ( strText.Contains( "\n" ) )
+    {
+        std::vector< SString > lineList;
+        strText.Split( "\n", lineList );
+        for ( uint i = 0 ; i < lineList.size() ; i++ )
+            WriteEvent( szType, lineList[i] );
+        return;
+    }
     SString strPathFilename = CalcMTASAPath( PathJoin( "mta", "logfile.txt" ) );
     SString strMessage( "%s - %s %s", *GetLocalTimeString(), szType, *strText );
     FileAppend( strPathFilename, strMessage + "\n" );
