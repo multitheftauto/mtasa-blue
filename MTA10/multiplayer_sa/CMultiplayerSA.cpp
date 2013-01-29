@@ -277,7 +277,7 @@ DWORD RETURN_CObject_ProcessDamage = 0x5A0E13;
 DWORD RETURN_CObject_ProcessDamage_Cancel = 0x5A1241;
 #define HOOKPOS_CObject_ProcessCollision                    0x548DC7
 DWORD RETURN_CObject_ProcessCollision = 0x548DD1;
-DWORD CALL_CObject_ProcessBreak = 0x59E9B0;
+DWORD JMP_DynamicObject_Cond_Zero = 0x548E98;
 
 CPed* pContextSwitchedPed = 0;
 CVector vecCenterOfWorld;
@@ -6298,8 +6298,11 @@ void _declspec(naked) HOOK_CObject_ProcessCollision ( )
         _asm
         {
             test    byte ptr [esi+1Ch], 1
-            jnz     548E98h
+            jnz     checkfordynamic
             jmp     RETURN_CObject_ProcessCollision
+
+        checkfordynamic:
+            jmp     JMP_DynamicObject_Cond_Zero
         }
     }
     else
