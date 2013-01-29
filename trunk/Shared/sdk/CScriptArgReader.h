@@ -360,7 +360,10 @@ public:
             {
                 outValue = defaultValue;
                 if ( outValue || bDefaultCanBeNil )
-                    return false;
+                {
+                    m_iIndex++;
+                    return true;
+                }
             }
         }
 
