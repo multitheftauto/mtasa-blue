@@ -18,12 +18,6 @@ CEvents::CEvents ( void )
 {
     m_bWasEventCancelled = false;
     m_bEventCancelled = false;
-
-    for ( int i = 0; i <= 5000; i++ )
-    {
-        SString str = SString ( "%i", i );
-        AddEvent ( str, "", NULL, false );
-    }
 }
 
 
