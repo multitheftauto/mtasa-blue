@@ -10414,61 +10414,42 @@ int CLuaFunctionDefinitions::SetMaxPlayers ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::OutputChatBox ( lua_State* luaVM )
 {
-    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
-    // Read out optional element and color arguments
-    CElement* pElement = m_pRootElement;
-    unsigned char ucRed = 235;
-    unsigned char ucGreen = 221;
-    unsigned char ucBlue = 178;
-    bool bColorCoded = false;
-            
-    int iArgument2 = lua_type ( luaVM, 2 );
-    if ( iArgument2 == LUA_TLIGHTUSERDATA )
+    // bool outputChatBox ( string text [, element visibleTo=getRootElement(), int r=231, int g=217, int b=176, bool colorCoded=false ] )
+    SString ssChat;
+    CElement* pElement;
+    bool bColorCoded;
+    // Default
+    unsigned char ucRed = 231;
+    unsigned char ucGreen = 217;
+    unsigned char ucBlue = 176;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadString ( ssChat );
+
+    // Optional arguments
+    argStream.ReadUserData ( pElement, m_pRootElement, true, false );
+
+    if ( argStream.NextIsNumber() && argStream.NextIsNumber( 1 ) && argStream.NextIsNumber( 2 ) )
     {
-        // Grab the element. Return false if it's invalid
-        pElement = lua_toelement ( luaVM, 2 );
-        if ( !pElement )
-        {
-            lua_pushboolean ( luaVM, false );
-            return 1;
-        }
-
-        int iArgument3 = lua_type ( luaVM, 3 );
-        if ( iArgument3 == LUA_TSTRING || iArgument3 == LUA_TNUMBER )
-        {
-            ucRed = static_cast < unsigned char > ( lua_tonumber ( luaVM, 3 ) );
-            int iArgument4 = lua_type ( luaVM, 4 );
-            if ( iArgument4 == LUA_TSTRING || iArgument4 == LUA_TNUMBER )
-            {
-                ucGreen = static_cast < unsigned char > ( lua_tonumber ( luaVM, 4 ) );
-                int iArgument5 = lua_type ( luaVM, 5 );
-                if ( iArgument5 == LUA_TSTRING || iArgument5 == LUA_TNUMBER )
-                {
-                    ucBlue = static_cast < unsigned char > ( lua_tonumber ( luaVM, 5 ) );
-
-                    if ( lua_type ( luaVM, 6 ) == LUA_TBOOLEAN )
-                        bColorCoded = ( lua_toboolean ( luaVM, 6 ) ) ? true:false;
-                }
-            }
-        }
-    }
-
-    // Verify argument
-    if ( lua_type ( luaVM, 1 ) != LUA_TNONE )
-    {
-        // Grab it
-        const char* szChat = lua_makestring ( luaVM, 1 );
-
-        // Do it
-        if ( CStaticFunctionDefinitions::OutputChatBox ( szChat, pElement, ucRed, ucGreen, ucBlue, bColorCoded, pLuaMain ) )
-        {
-            lua_pushboolean ( luaVM, true );
-            return 1;
-        }
+        argStream.ReadNumber ( ucRed );
+        argStream.ReadNumber ( ucGreen );
+        argStream.ReadNumber ( ucBlue );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
-    
+        argStream.m_iIndex = argStream.m_iIndex + 3;
+
+    argStream.ReadBool ( bColorCoded, false );
+
+    if ( !argStream.HasErrors ( true ) )
+    {
+        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+        CStaticFunctionDefinitions::OutputChatBox ( (const char*)ssChat, pElement, ucRed, ucGreen, ucBlue, bColorCoded, pLuaMain );
+        lua_pushboolean ( luaVM, true );
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
     lua_pushboolean ( luaVM, false );
     return 1;
 }
