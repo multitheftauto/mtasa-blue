@@ -41,8 +41,8 @@ public:
     inline bool                 Exists              ( const char* szName )  { return Get ( szName ) != NULL; };
     SEvent*                     Get                 ( const char* szName );
 
-    std::list < SEvent* > ::const_iterator   IterBegin   ( void )                { return m_Events.begin (); };
-    std::list < SEvent* > ::const_iterator   IterEnd     ( void )                { return m_Events.end (); };
+    CFastHashMap < SString, SEvent * > ::const_iterator   IterBegin   ( void )                { return m_EventHashMap.begin (); };
+    CFastHashMap < SString, SEvent * > ::const_iterator   IterEnd     ( void )                { return m_EventHashMap.end (); };
 
     void                        PreEventPulse       ( void );
     void                        PostEventPulse      ( void );
@@ -55,7 +55,7 @@ public:
 private:
     void                        RemoveAllEvents     ( void );
 
-    std::list < SEvent* >       m_Events;
+    CFastHashMap < SString, SEvent * >      m_EventHashMap;
 
     std::vector < int >         m_CancelledList;
     bool                        m_bEventCancelled;
