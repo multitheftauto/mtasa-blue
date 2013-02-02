@@ -11,7 +11,7 @@
 *****************************************************************************/
 
 #include "StdInc.h"
-#include "../../vendor/unrar/dll.hpp"
+#include "../../vendor/unrar/src/dll.hpp"
 
 
 bool TerminateProcessFromPathFilename ( const SString& strPathFilename )

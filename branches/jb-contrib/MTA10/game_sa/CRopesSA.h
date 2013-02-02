@@ -29,11 +29,9 @@ extern CGameSA* g_pGame;
 class CRopesSAInterface
 {
 public:
-    void Draw();
-
     CVector m_vecSegments[32];
     CVector m_vecSegmentsReleased[32];
-    CEntitySAInterface * m_pRopeEntity;
+    CEntitySAInterface * m_pRopeAttachToEntity; /* The entity rope is attached to */
     float m_pad4;
     float m_fMass;
     float m_fSegmentLength;
