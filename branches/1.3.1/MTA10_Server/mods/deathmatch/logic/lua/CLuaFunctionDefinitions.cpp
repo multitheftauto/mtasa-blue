@@ -9882,6 +9882,17 @@ int CLuaFunctionDefinitions::OutputChatBox ( lua_State* luaVM )
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadString ( ssChat );
+    
+    if ( argStream.NextIsUserData() )
+    {
+        // Check if element is existed.
+        if ( !lua_toelement ( luaVM, 2 ) )
+        {
+            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 2 );
+            lua_pushboolean ( luaVM, false );
+            return 1;
+        }
+    }
 
     // Optional arguments
     argStream.ReadUserData ( pElement, m_pRootElement, true, false );
@@ -9897,7 +9908,7 @@ int CLuaFunctionDefinitions::OutputChatBox ( lua_State* luaVM )
 
     argStream.ReadBool ( bColorCoded, false );
 
-    if ( !argStream.HasErrors ( true ) )
+    if ( !argStream.HasErrors () )
     {
         CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
         CStaticFunctionDefinitions::OutputChatBox ( (const char*)ssChat, pElement, ucRed, ucGreen, ucBlue, bColorCoded, pLuaMain );
