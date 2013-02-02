@@ -18,6 +18,8 @@ extern CGame * g_pGame;
 
 CVehicle::CVehicle ( CVehicleManager* pVehicleManager, CElement* pParent, CXMLNode* pNode, unsigned short usModel, unsigned char ucVariant, unsigned char ucVariant2 ) : CElement ( pParent, pNode )
 {
+    CElementRefManager::AddElementRefs ( ELEMENT_REF_DEBUG ( this, "CVehicle" ), &m_pTowedVehicle, &m_pTowedByVehicle, &m_pSyncer, &m_pJackingPlayer, NULL );
+
     // Init
     m_pVehicleManager = pVehicleManager;
     m_usModel = usModel;
@@ -130,6 +132,8 @@ CVehicle::~CVehicle ( void )
     }
     delete m_pUpgrades;
     delete m_pHandlingEntry;
+
+    CElementRefManager::RemoveElementRefs ( ELEMENT_REF_DEBUG ( this, "CVehicle" ), &m_pTowedVehicle, &m_pTowedByVehicle, &m_pSyncer, &m_pJackingPlayer, NULL );
 
     // Remove us from the vehicle manager
     Unlink ();
