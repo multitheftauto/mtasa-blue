@@ -1614,7 +1614,7 @@ int CLuaFunctionDefs::GUIGridListSetColumnTitle ( lua_State* luaVM )
 
 int CLuaFunctionDefs::GUIGridListGetColumnTitle ( lua_State* luaVM )
 {
-//  bool guiGridListGetColumnTitle ( element guiGridlist, int columnIndex )
+//  string guiGridListGetColumnTitle ( element guiGridlist, int columnIndex )
     CClientGUIElement* guiGridlist; int iColumnIndex;
 
     CScriptArgReader argStream ( luaVM );
