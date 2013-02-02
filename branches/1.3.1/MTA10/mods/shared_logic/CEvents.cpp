@@ -41,7 +41,8 @@ bool CEvents::AddEvent ( const char* szName, const char* szArguments, CLuaMain* 
     pEvent->strArguments = szArguments;
     pEvent->pLuaMain = pLuaMain;
     pEvent->bAllowRemoteTrigger = bAllowRemoteTrigger;
-    m_Events.push_back ( pEvent );
+
+    m_EventHashMap [ szName ] = pEvent;
 
     return true;
 }
@@ -52,7 +53,10 @@ void CEvents::RemoveEvent ( SEvent* pEvent )
     assert ( pEvent );
 
     // Remove it and delete it
-    if ( !m_Events.empty() ) m_Events.remove ( pEvent );
+    if ( !m_EventHashMap.empty() ) 
+    {
+        MapRemove ( m_EventHashMap, pEvent->strName );
+    }
     delete pEvent;
 }
 
@@ -66,7 +70,10 @@ void CEvents::RemoveEvent ( const char* szName )
     if ( pEvent )
     {
         // Delete it
-        if ( !m_Events.empty() ) m_Events.remove ( pEvent );
+        if ( !m_EventHashMap.empty() )
+        {
+            MapRemove ( m_EventHashMap, pEvent->strName );
+        }
         delete pEvent;
     }
 }
@@ -75,17 +82,18 @@ void CEvents::RemoveEvent ( const char* szName )
 void CEvents::RemoveAllEvents ( class CLuaMain* pMain )
 {
     // Delete all items
-    list < SEvent* > ::iterator iter = m_Events.begin ();
-    while ( iter != m_Events.end () )
+    CFastHashMap < SString, SEvent* > ::iterator iter = m_EventHashMap.begin ();
+    while ( iter != m_EventHashMap.end () )
     {
+        SEvent * pEvent = (*iter).second;
         // If they match, delete it null it and set the bool
-        if ( (*iter)->pLuaMain == pMain )
-        {
+        if ( pEvent != NULL && pEvent->pLuaMain == pMain )
+        {          
             // Delete the object
-            delete *iter;
+            delete pEvent;
 
             // Remove from list
-            iter = m_Events.erase(iter);
+            m_EventHashMap.erase ( iter++ );
         }
         else
             ++iter;
@@ -97,17 +105,11 @@ SEvent* CEvents::Get ( const char* szName )
 {
     assert ( szName );
 
-    // Find a matching name
-    list < SEvent* > ::const_iterator iter = m_Events.begin ();
-    for ( ; iter != m_Events.end (); iter++ )
+    SEvent ** pEvent = MapFind ( m_EventHashMap, szName );
+    if ( pEvent != NULL )
     {
-        if ( (*iter)->strName == szName )
-        {
-            return *iter;
-        }
+        return *pEvent;
     }
-
-    // None matches
     return NULL;
 }
 
@@ -115,14 +117,14 @@ SEvent* CEvents::Get ( const char* szName )
 void CEvents::RemoveAllEvents ( void )
 {
     // Delete all items
-    list < SEvent* > ::const_iterator iter = m_Events.begin ();
-    for ( ; iter != m_Events.end (); iter++ )
+    CFastHashMap < SString, SEvent* > ::const_iterator iter = m_EventHashMap.begin ();
+    for ( ; iter != m_EventHashMap.end (); iter++ )
     {
-        delete *iter;
+        SEvent * pEvent = (*iter).second;
+        delete pEvent;
     }
 
-    // Clear the list
-    m_Events.clear ();
+    m_EventHashMap.clear ( );
 }
 
 void CEvents::PreEventPulse ( void )

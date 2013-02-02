@@ -1758,19 +1758,24 @@ bool CResource::ReadIncludedScripts ( CXMLNode * root )
         if ( attributes )
         {
             // Grab the type attribute (server / client)
-            int iType = CResourceScriptItem::RESOURCE_FILE_TYPE_SCRIPT;
+            bool bServer = true;
+            bool bClient = false;
             CXMLAttribute * type = attributes->Find("type");
             if ( type )
             {
                 // Grab the text
                 const char *szType = type->GetValue ().c_str ();
 
-                // Check its content (server or client) and set the type accordingly
-                if ( stricmp ( szType, "server" ) == 0 )
-                    iType = CResourceScriptItem::RESOURCE_FILE_TYPE_SCRIPT;
-                else if ( stricmp ( szType, "client" ) == 0 )
-                    iType = CResourceScriptItem::RESOURCE_FILE_TYPE_CLIENT_SCRIPT;
+                // Check its content (server or client or shared) and set the type accordingly
+                if ( stricmp ( szType, "client" ) == 0 )
+                {
+                    bServer = false;
+                    bClient = true;
+                }
+                else if ( stricmp ( szType, "shared" ) == 0 )
+                    bClient = true;
                 else
+                if ( stricmp ( szType, "server" ) != 0 )
                     CLogger::LogPrintf ( "Unknown script type specified in %s. Assuming 'server'\n", m_strResourceName.c_str () );
             }
 
@@ -1786,10 +1791,10 @@ bool CResource::ReadIncludedScripts ( CXMLNode * root )
                 // Extract / get the filepath of the file
                 if ( IsValidFilePath ( strFilename.c_str () ) && GetFilePath ( strFilename.c_str (), strFullFilename ) )
                 {
-                    // Create it depending on the type (clietn or server) and add it to the list over resource files
-                    if ( iType == CResourceScriptItem::RESOURCE_FILE_TYPE_SCRIPT )
+                    // Create it depending on the type (client or server or shared) and add it to the list of resource files
+                    if ( bServer )
                         m_resourceFiles.push_back ( new CResourceScriptItem ( this, strFilename.c_str (), strFullFilename.c_str (), attributes ) );
-                    else if ( iType == CResourceScriptItem::RESOURCE_FILE_TYPE_CLIENT_SCRIPT )
+                    if ( bClient )
                         m_resourceFiles.push_back ( new CResourceClientScriptItem ( this, strFilename.c_str (), strFullFilename.c_str (), attributes ) );
                 }
                 else
