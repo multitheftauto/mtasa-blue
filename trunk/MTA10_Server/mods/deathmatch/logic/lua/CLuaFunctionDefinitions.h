@@ -63,6 +63,7 @@ public:
     static int      AddEvent                            ( lua_State* luaVM );
     static int      AddEventHandler                     ( lua_State* luaVM );
     static int      RemoveEventHandler                  ( lua_State* luaVM );
+    static int      GetEventHandlers                    ( lua_State* luaVM );
     static int      TriggerEvent                        ( lua_State* luaVM );
     static int      TriggerClientEvent                  ( lua_State* luaVM );
     static int      CancelEvent                         ( lua_State* luaVM );
