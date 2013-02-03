@@ -199,24 +199,27 @@ HRESULT    CProxyDirect3D9::CreateDevice                ( UINT Adapter, D3DDEVTY
 {
     WriteDebugEvent ( "CProxyDirect3D9::CreateDevice" );
 
+    Sleep(1000);
+
     D3DPRESENT_PARAMETERS presentationParametersOrig = *pPresentationParameters;
     DWORD BehaviorFlagsOrig = BehaviorFlags;
 
-    D3DADAPTER_IDENTIFIER9 AdapterIdent;
-    m_pDevice->GetAdapterIdentifier ( Adapter, 0, &AdapterIdent );
-    WriteDebugEvent ( ToString( AdapterIdent ) );
-
-    WriteDebugEvent ( "  Original parameters:" );
-    WriteDebugEvent ( ToString( Adapter, DeviceType, hFocusWindow, BehaviorFlags, *pPresentationParameters ) );
+    //WriteDebugEvent ( "  Original parameters:" );
+    //WriteDebugEvent ( ToString( Adapter, DeviceType, hFocusWindow, BehaviorFlags, *pPresentationParameters ) );
 
     // If 'Intel(R) HD Graphics', do create test first of all
-    if ( SStringX( AdapterIdent.Description ).ContainsI( "Intel(R) HD Graphics" ) )
+    //if ( SStringX( AdapterIdent.Description ).ContainsI( "Intel(R) HD Graphics" ) )
     {
         HRESULT hResult = m_pDevice->CreateDevice ( Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters, ppReturnedDeviceInterface );
         SAFE_RELEASE( *ppReturnedDeviceInterface );
-        WriteDebugEvent ( SString( "  Test with following parameters was:%08x", hResult ) );
+        WriteDebugEvent ( SString( "  Test with following (original) parameters was:%08x", hResult ) );
         WriteDebugEvent ( ToString( Adapter, DeviceType, hFocusWindow, BehaviorFlags, *pPresentationParameters ) );
     }
+
+    WriteDebugEvent ( "AdapterIdent:" );
+    D3DADAPTER_IDENTIFIER9 AdapterIdent;
+    m_pDevice->GetAdapterIdentifier ( Adapter, 0, &AdapterIdent );
+    WriteDebugEvent ( ToString( AdapterIdent ) );
 
     // Make sure DirectX Get calls will work
     BehaviorFlags &= ~D3DCREATE_PUREDEVICE;
@@ -234,9 +237,9 @@ HRESULT    CProxyDirect3D9::CreateDevice                ( UINT Adapter, D3DDEVTY
     GetVideoModeManager ()->PreCreateDevice ( pPresentationParameters );
 
     // Create our object.
-    WriteDebugEvent ( "  Trying with parameters:" );
-    WriteDebugEvent ( ToString( Adapter, DeviceType, hFocusWindow, BehaviorFlags, *pPresentationParameters ) );
     HRESULT hResult = m_pDevice->CreateDevice ( Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters, ppReturnedDeviceInterface );
+    WriteDebugEvent ( SString( "  Result with following (modified) parameters was:%08x", hResult ) );
+    WriteDebugEvent ( ToString( Adapter, DeviceType, hFocusWindow, BehaviorFlags, *pPresentationParameters ) );
 
     // Store the rendering window in the direct 3d data
     CDirect3DData::GetSingleton ().StoreDeviceWindow ( pPresentationParameters->hDeviceWindow );
@@ -255,24 +258,52 @@ HRESULT    CProxyDirect3D9::CreateDevice                ( UINT Adapter, D3DDEVTY
         // Try with original BehaviorFlags
         hResult = m_pDevice->CreateDevice ( Adapter, DeviceType, hFocusWindow, BehaviorFlagsOrig, pPresentationParameters, ppReturnedDeviceInterface );
         SAFE_RELEASE( *ppReturnedDeviceInterface );
-        WriteDebugEvent ( SString( "  Result with following parameters was:%08x", hResult ) );
+        WriteDebugEvent ( SString( "  Result with following (behavior orig) parameters was:%08x", hResult ) );
         WriteDebugEvent ( ToString( Adapter, DeviceType, hFocusWindow, BehaviorFlagsOrig, *pPresentationParameters ) );
 
         // Try with original presentation parameters
         hResult = m_pDevice->CreateDevice ( Adapter, DeviceType, hFocusWindow, BehaviorFlagsOrig, &presentationParametersOrig, ppReturnedDeviceInterface );
         SAFE_RELEASE( *ppReturnedDeviceInterface );
-        WriteDebugEvent ( SString( "  Result with following parameters was:%08x", hResult ) );
+        WriteDebugEvent ( SString( "  Result with following (behavior & param orig) parameters was:%08x", hResult ) );
         WriteDebugEvent ( ToString( Adapter, DeviceType, hFocusWindow, BehaviorFlagsOrig, presentationParametersOrig ) );
 
         // Try without hardware vertex processing 
         BehaviorFlagsOrig = D3DCREATE_SOFTWARE_VERTEXPROCESSING;
         hResult = m_pDevice->CreateDevice ( Adapter, DeviceType, hFocusWindow, BehaviorFlagsOrig, &presentationParametersOrig, ppReturnedDeviceInterface );
         SAFE_RELEASE( *ppReturnedDeviceInterface );
-        WriteDebugEvent ( SString( "  Result with following parameters was:%08x", hResult ) );
+        WriteDebugEvent ( SString( "  Result with following (sw processing) parameters was:%08x", hResult ) );
         WriteDebugEvent ( ToString( Adapter, DeviceType, hFocusWindow, BehaviorFlagsOrig, presentationParametersOrig ) );
 
-        return -1;
+        //
+        // Do sequence again, but continue on success this time
+        //
+
+        // Try with original BehaviorFlags
+        hResult = m_pDevice->CreateDevice ( Adapter, DeviceType, hFocusWindow, BehaviorFlagsOrig, pPresentationParameters, ppReturnedDeviceInterface );
+        WriteDebugEvent ( SString( "  Result#2 with following (behavior orig) parameters was:%08x", hResult ) );
+        WriteDebugEvent ( ToString( Adapter, DeviceType, hFocusWindow, BehaviorFlagsOrig, *pPresentationParameters ) );
+
+        if ( FAILED ( hResult ) )
+        {
+            // Try with original presentation parameters
+            hResult = m_pDevice->CreateDevice ( Adapter, DeviceType, hFocusWindow, BehaviorFlagsOrig, &presentationParametersOrig, ppReturnedDeviceInterface );
+            WriteDebugEvent ( SString( "  Result#2 with following (behavior & param orig) parameters was:%08x", hResult ) );
+            WriteDebugEvent ( ToString( Adapter, DeviceType, hFocusWindow, BehaviorFlagsOrig, presentationParametersOrig ) );
+
+            if ( FAILED ( hResult ) )
+            {
+                // Try without hardware vertex processing 
+                BehaviorFlagsOrig = D3DCREATE_SOFTWARE_VERTEXPROCESSING;
+                hResult = m_pDevice->CreateDevice ( Adapter, DeviceType, hFocusWindow, BehaviorFlagsOrig, &presentationParametersOrig, ppReturnedDeviceInterface );
+                WriteDebugEvent ( SString( "  Result#2 with following (sw processing) parameters was:%08x", hResult ) );
+                WriteDebugEvent ( ToString( Adapter, DeviceType, hFocusWindow, BehaviorFlagsOrig, presentationParametersOrig ) );
+
+                if ( FAILED ( hResult ) )
+                    return -1;
+            }
+        }
     }
+
 
     WriteDebugEvent( "  Success" );
 
