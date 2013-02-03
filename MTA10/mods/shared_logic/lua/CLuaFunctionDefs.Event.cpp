@@ -144,50 +144,6 @@ int CLuaFunctionDefs::RemoveEventHandler ( lua_State* luaVM )
 }
 
 
-int CLuaFunctionDefs::GetEventHandlers ( lua_State* luaVM )
-{
-//  table getEventHandlers ( string eventName, element attachedTo )
-    SString strName; CClientEntity* pElement;
-
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadString ( strName );
-
-    if ( argStream.NextIsUserData () )
-    {
-         // Check if element is existed.
-        if ( !lua_toelement ( luaVM, 2 ) )
-        {
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 2 );
-            lua_pushboolean ( luaVM, false );
-            return 1;
-        }
-    }    
-
-    argStream.ReadUserData ( pElement );
-
-    if ( !argStream.HasErrors () )
-    {
-        // Grab our virtual machine
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
-        if ( pLuaMain )
-        {
-            // Create a new table
-            lua_newtable ( luaVM );
-
-            pElement->GetEventManager ()->GetHandles ( pLuaMain, (const char*)strName, luaVM );
-
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
-
-    // Failed
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-
 int CLuaFunctionDefs::TriggerEvent ( lua_State* luaVM )
 {
 //  bool triggerEvent ( string eventName, element baseElement, [ var argument1, ... ] )
