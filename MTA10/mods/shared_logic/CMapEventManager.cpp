@@ -349,3 +349,30 @@ void CMapEventManager::AddInternal ( CMapEvent* pEvent )
     // Do insert
     m_EventsMap.insert ( iter, std::pair < SString, CMapEvent* > ( pEvent->GetName (), pEvent ) );
 }
+
+
+void CMapEventManager::GetHandles ( CLuaMain* pLuaMain, const char* szName, lua_State* luaVM )
+{
+    unsigned int uiIndex = 0;
+    EventsIterPair itPair = m_EventsMap.equal_range ( szName );
+    for ( EventsIter iter = itPair.first ; iter != itPair.second ; ++iter )
+    {
+        CMapEvent* pMapEvent = iter->second;
+
+        // Is it not being destroyed?
+        if ( !pMapEvent->IsBeingDestroyed () )
+        {
+            // Same lua main?
+            if ( pMapEvent->GetVM () == pLuaMain )
+            {
+                // Same name?
+                dassert ( strcmp ( pMapEvent->GetName (), szName ) == 0 );
+                {
+                    lua_pushnumber ( luaVM, ++uiIndex );
+                    lua_getref ( luaVM, pMapEvent->GetLuaFunction ().ToInt() );
+                    lua_settable ( luaVM, -3 );
+                }
+            }
+        }
+    }
+}
