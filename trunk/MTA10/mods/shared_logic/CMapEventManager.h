@@ -31,7 +31,6 @@ public:
     void                    DeleteAll                       ( void );
     bool                    HandleExists                    ( CLuaMain* pLuaMain, const char* szName, const CLuaFunctionRef& iLuaFunction );
     bool                    HasEvents                       ( void ) const          { return m_bHasEvents; }
-    void                    GetHandles                      ( CLuaMain* pLuaMain, const char* szName, lua_State* luaVM );
 
     bool                    Call                            ( const char* szName, const CLuaArguments& Arguments, class CClientEntity* pSource, class CClientEntity* pThis );
 

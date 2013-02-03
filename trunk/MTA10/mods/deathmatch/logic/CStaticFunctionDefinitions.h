@@ -39,7 +39,6 @@ public:
     static bool                         AddEvent                            ( CLuaMain& LuaMain, const char* szName, bool bAllowRemoteTrigger );
     static bool                         AddEventHandler                     ( CLuaMain& LuaMain, const char* szName, CClientEntity& Entity, const CLuaFunctionRef& iLuaFunction, bool bPropagated, EEventPriorityType eventPriority, float fPriorityMod );
     static bool                         RemoveEventHandler                  ( CLuaMain& LuaMain, const char* szName, CClientEntity& Entity, const CLuaFunctionRef& iLuaFunction );
-    static bool                         GetEventHandlers                    ( CLuaMain& LuaMain, const char* szName );
     static bool                         TriggerEvent                        ( const char* szName, CClientEntity& Entity, const CLuaArguments& Arguments, bool& bWasCancelled );
     static bool                         TriggerServerEvent                  ( const char* szName, CClientEntity& CallWithEntity, CLuaArguments& Arguments );
     static bool                         TriggerLatentServerEvent            ( const char* szName, CClientEntity& CallWithEntity, CLuaArguments& Arguments, int bandwidth, CLuaMain* pLuaMain, ushort usResourceNetId );
