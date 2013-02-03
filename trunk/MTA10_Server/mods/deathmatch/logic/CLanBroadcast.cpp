@@ -26,7 +26,7 @@ CLanBroadcast::CLanBroadcast ( unsigned short usServerPort )
     setsockopt ( m_Socket, SOL_SOCKET, SO_REUSEADDR, (const char *)&Flags, sizeof ( Flags ) );
 
     // Bind the socket
-    if ( bind ( m_Socket, ( sockaddr* )&m_SockAddr, sizeof ( m_SockAddr ) ) != 0 )
+    if ( ::bind ( m_Socket, ( sockaddr* )&m_SockAddr, sizeof ( m_SockAddr ) ) != 0 )
     {
         closesocket ( m_Socket );
         return;

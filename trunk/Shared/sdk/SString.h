@@ -32,11 +32,7 @@ public:
         : std::string ()
     { }
 
-    SString ( const char* szText )
-        : std::string ( szText ? szText : "" )
-    { }
-
-    explicit SString ( const char* szFormat, ... )
+	SString ( const char* szFormat, ... )
         : std::string ()
     {
         if ( szFormat )
@@ -79,6 +75,10 @@ public:
         return std::string ( *this ) + other;
     }
     SString operator+( const std::string& other ) const
+    {
+        return std::string ( *this ) + other;
+    }
+	SString operator+( const SString& other ) const
     {
         return std::string ( *this ) + other;
     }

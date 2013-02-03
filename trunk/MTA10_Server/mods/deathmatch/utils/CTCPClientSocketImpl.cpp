@@ -65,7 +65,7 @@ bool CTCPClientSocketImpl::Connect ( const char* szHost, unsigned short usPort, 
         m_SockAddr.sin_port = 0;   
 
         // Bind the socket
-        if ( bind ( m_Socket, ( sockaddr* ) &m_SockAddr, sizeof ( m_SockAddr ) ) == -1 )
+		if ( ::bind ( m_Socket, ( sockaddr* ) &m_SockAddr, sizeof ( m_SockAddr ) ) == -1 )
         {
             strcpy ( m_szLastError, "Unable to bind socket" );
             return false;
