@@ -144,115 +144,114 @@ bool CMapEventManager::Call ( const char* szName, const CLuaArguments& Arguments
     bool bIsAlreadyIterating = m_bIteratingList;
     m_bIteratingList = true;
 
-    // Copy the results into a array in case m_EventsMap is modified during the call
+    // Copy the results into a array in case m_EventsMap is modified during the call while filtering out any unwanted events to save the possibility of multiple useless iterations.
     std::vector< CMapEvent* > matchingEvents;
     for ( EventsIter iter = itPair.first ; iter != itPair.second ; ++iter )
-        matchingEvents.push_back(iter->second);
-
-    for ( std::vector< CMapEvent* >::iterator iter = matchingEvents.begin() ; iter != matchingEvents.end() ; ++iter )
     {
-        CMapEvent* pMapEvent = *iter;
-
+        CMapEvent* pMapEvent = iter->second;
         // If it's not being destroyed
         if ( !pMapEvent->IsBeingDestroyed () )
         {
-            // Compare the names
-            dassert ( strcmp ( pMapEvent->GetName (), szName ) == 0 );
+            // Call if propagated?
+            if ( pSource == pThis || pMapEvent->IsPropagated () )
             {
-                // Call if propagated?
-                if ( pSource == pThis || pMapEvent->IsPropagated () )
-                {
-                    // Grab the current VM
-                    lua_State* pState = pMapEvent->GetVM ()->GetVM ();
-                    #if MTA_DEBUG
-                        int luaStackPointer = lua_gettop ( pState );
-                    #endif
-
-                    TIMEUS startTime = GetTimeUs();
-
-                    // Store the current values of the globals
-                    lua_getglobal ( pState, "source" );
-                    CLuaArgument OldSource ( pState, -1 );
-                    lua_pop( pState, 1 );
-
-                    lua_getglobal ( pState, "this" );
-                    CLuaArgument OldThis ( pState, -1 );
-                    lua_pop( pState, 1 );
-
-                    lua_getglobal ( pState, "sourceResource" );
-                    CLuaArgument OldResource ( pState, -1 );
-                    lua_pop( pState, 1 );
-
-                    lua_getglobal ( pState, "sourceResourceRoot" );
-                    CLuaArgument OldResourceRoot ( pState, -1 );
-                    lua_pop( pState, 1 );
-
-                    lua_getglobal ( pState, "eventName" );
-                    CLuaArgument OldEventName ( pState, -1 );
-                    lua_pop( pState, 1 );
-
-                    lua_getglobal ( pState, "client" );
-                    CLuaArgument OldClient ( pState, -1 );
-                    lua_pop( pState, 1 );
-
-                    // Set the "source", "this", "sourceResource" and "sourceResourceRoot" globals on that VM
-                    lua_pushelement ( pState, pSource );
-                    lua_setglobal ( pState, "source" );
-
-                    lua_pushelement ( pState, pThis );
-                    lua_setglobal ( pState, "this" );
-
-                    lua_pushresource ( pState, pMapEvent->GetVM()->GetResource() );     // This is not correct
-                    lua_setglobal ( pState, "sourceResource" );
-
-                    lua_pushelement ( pState, pMapEvent->GetVM()->GetResource()->GetResourceRootElement() );     // This is not correct
-                    lua_setglobal ( pState, "sourceResourceRoot" );
-
-                    lua_pushstring ( pState, szName );
-                    lua_setglobal ( pState, "eventName" );
-
-                    if ( pCaller )
-                    {
-                        lua_pushelement ( pState, pCaller );
-                        lua_setglobal ( pState, "client" );
-                    }
-                    else
-                    {
-                        lua_pushnil ( pState );
-                        lua_setglobal ( pState, "client" );
-                    }
-
-                    // Call it
-                    pMapEvent->Call ( Arguments );
-                    bCalled = true;
-
-                    // Reset the globals on that VM
-                    OldSource.Push ( pState );
-                    lua_setglobal ( pState, "source" );
-
-                    OldThis.Push ( pState );
-                    lua_setglobal ( pState, "this" );                
-
-                    OldResource.Push ( pState );
-                    lua_setglobal ( pState, "sourceResource" );
-
-                    OldResourceRoot.Push ( pState );
-                    lua_setglobal ( pState, "sourceResourceRoot" );
-
-                    OldEventName.Push ( pState );
-                    lua_setglobal ( pState, "eventName" );
-
-                    OldClient.Push ( pState );
-                    lua_setglobal ( pState, "client" );
-
-                    #if MTA_DEBUG
-                        assert ( lua_gettop ( pState ) == luaStackPointer );
-                    #endif
-
-                    CPerfStatLuaTiming::GetSingleton ()->UpdateLuaTiming ( pMapEvent->GetVM (), szName, GetTimeUs() - startTime );
-                }
+                matchingEvents.push_back(iter->second);
             }
         }
+    }
+    for ( std::vector< CMapEvent* >::iterator iter = matchingEvents.begin() ; iter != matchingEvents.end() ; ++iter )
+    {
+        CMapEvent* pMapEvent = *iter;
+        // Compare the names
+        dassert ( strcmp ( pMapEvent->GetName (), szName ) == 0 );
+        // Grab the current VM
+        lua_State* pState = pMapEvent->GetVM ()->GetVM ();
+        #if MTA_DEBUG
+            int luaStackPointer = lua_gettop ( pState );
+        #endif
+
+        TIMEUS startTime = GetTimeUs();
+
+        // Store the current values of the globals
+        lua_getglobal ( pState, "source" );
+        CLuaArgument OldSource ( pState, -1 );
+        lua_pop( pState, 1 );
+
+        lua_getglobal ( pState, "this" );
+        CLuaArgument OldThis ( pState, -1 );
+        lua_pop( pState, 1 );
+
+        lua_getglobal ( pState, "sourceResource" );
+        CLuaArgument OldResource ( pState, -1 );
+        lua_pop( pState, 1 );
+
+        lua_getglobal ( pState, "sourceResourceRoot" );
+        CLuaArgument OldResourceRoot ( pState, -1 );
+        lua_pop( pState, 1 );
+
+        lua_getglobal ( pState, "eventName" );
+        CLuaArgument OldEventName ( pState, -1 );
+        lua_pop( pState, 1 );
+
+        lua_getglobal ( pState, "client" );
+        CLuaArgument OldClient ( pState, -1 );
+        lua_pop( pState, 1 );
+
+        // Set the "source", "this", "sourceResource" and "sourceResourceRoot" globals on that VM
+        lua_pushelement ( pState, pSource );
+        lua_setglobal ( pState, "source" );
+
+        lua_pushelement ( pState, pThis );
+        lua_setglobal ( pState, "this" );
+
+        lua_pushresource ( pState, pMapEvent->GetVM()->GetResource() );     // This is not correct
+        lua_setglobal ( pState, "sourceResource" );
+
+        lua_pushelement ( pState, pMapEvent->GetVM()->GetResource()->GetResourceRootElement() );     // This is not correct
+        lua_setglobal ( pState, "sourceResourceRoot" );
+
+        lua_pushstring ( pState, szName );
+        lua_setglobal ( pState, "eventName" );
+
+        if ( pCaller )
+        {
+            lua_pushelement ( pState, pCaller );
+            lua_setglobal ( pState, "client" );
+        }
+        else
+        {
+            lua_pushnil ( pState );
+            lua_setglobal ( pState, "client" );
+        }
+
+        // Call it
+        pMapEvent->Call ( Arguments );
+        bCalled = true;
+
+        // Reset the globals on that VM
+        OldSource.Push ( pState );
+        lua_setglobal ( pState, "source" );
+
+        OldThis.Push ( pState );
+        lua_setglobal ( pState, "this" );                
+
+        OldResource.Push ( pState );
+        lua_setglobal ( pState, "sourceResource" );
+
+        OldResourceRoot.Push ( pState );
+        lua_setglobal ( pState, "sourceResourceRoot" );
+
+        OldEventName.Push ( pState );
+        lua_setglobal ( pState, "eventName" );
+
+        OldClient.Push ( pState );
+        lua_setglobal ( pState, "client" );
+
+        #if MTA_DEBUG
+            assert ( lua_gettop ( pState ) == luaStackPointer );
+        #endif
+
+        CPerfStatLuaTiming::GetSingleton ()->UpdateLuaTiming ( pMapEvent->GetVM (), szName, GetTimeUs() - startTime );
     }
 
     // Clean out the trash if we're no longer calling events.
