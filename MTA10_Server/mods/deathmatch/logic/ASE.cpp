@@ -110,7 +110,7 @@ bool ASE::SetPortEnabled ( bool bInternetEnabled, bool bLanEnabled )
     }
 
     // Bind the socket
-    if ( bind ( m_Socket, ( sockaddr* ) &m_SockAddr, sizeof ( m_SockAddr ) ) != 0 )
+    if ( ::bind ( m_Socket, ( sockaddr* ) &m_SockAddr, sizeof ( m_SockAddr ) ) != 0 )
     {
         sockclose ( m_Socket );
         m_Socket = INVALID_SOCKET;

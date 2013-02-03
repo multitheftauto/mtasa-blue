@@ -363,6 +363,7 @@ typedef int sig_atomic_t;
  * Portable error number symbolic names defined to Winsock error codes.
  */
 
+#pragma warning ( disable: 4005 )
 #ifdef USE_WINSOCK
 #undef  EBADF            /* override definition in errno.h */
 #define EBADF            WSAEBADF
@@ -412,7 +413,7 @@ typedef int sig_atomic_t;
 #define ESTALE           WSAESTALE
 #define EREMOTE          WSAEREMOTE
 #endif
-
+#pragma warning ( default: 4005 )
 
 /*
  *  Actually use __32_getpwuid() on 64-bit VMS builds for getpwuid()

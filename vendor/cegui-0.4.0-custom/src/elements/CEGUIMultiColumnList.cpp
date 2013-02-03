@@ -706,7 +706,7 @@ void MultiColumnList::insertColumn(const String& text, uint col_id, float width,
 	// Insert a blank entry at the appropriate position in each row.
 	for (uint i = 0; i < getRowCount(); ++i)
 	{
-		d_grid[i].d_items.insert(d_grid[i].d_items.begin() + position, NULL);
+		d_grid[i].d_items.insert(d_grid[i].d_items.begin() + position, reinterpret_cast < CEGUI::ListboxItem * > ( NULL ) );
 	}
 
 	// update stored nominated selection column if that has changed.
