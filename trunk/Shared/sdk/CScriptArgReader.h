@@ -76,6 +76,7 @@ public:
         if ( iArgument == LUA_TNONE || iArgument == LUA_TNIL || m_bIgnoreMismatchMatch )
         {
             outValue = static_cast < T > ( defaultValue );
+            m_iIndex++;
             return false;
         }
 
