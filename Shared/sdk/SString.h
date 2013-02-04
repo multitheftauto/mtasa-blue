@@ -32,7 +32,11 @@ public:
         : std::string ()
     { }
 
-	SString ( const char* szFormat, ... )
+    SString ( const char* szText )
+        : std::string ( szText ? szText : "" )
+    { }
+
+    explicit SString ( const char* szFormat, ... )
         : std::string ()
     {
         if ( szFormat )
