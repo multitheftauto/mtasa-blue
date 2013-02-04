@@ -10893,7 +10893,7 @@ int CLuaFunctionDefinitions::SetGameType ( lua_State* luaVM )
     SString strGameType;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadString ( strGameType, "" );    // Default to empty for backward compat with previous implementation
+    argStream.ReadIfNextIsString ( strGameType, "" );    // Default to empty for backward compat with previous implementation
 
     if ( !argStream.HasErrors () )
     {
@@ -10918,7 +10918,7 @@ int CLuaFunctionDefinitions::SetMapName ( lua_State* luaVM )
     SString strMapName;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadString ( strMapName, "" );    // Default to empty for backward compat with previous implementation
+    argStream.ReadIfNextIsString ( strMapName, "" );    // Default to empty for backward compat with previous implementation
 
     if ( !argStream.HasErrors () )
     {
