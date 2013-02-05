@@ -194,21 +194,22 @@ SString ToString( const D3DADAPTER_IDENTIFIER9& a )
 }
 
 
-
-HRESULT    CProxyDirect3D9::CreateDevice                ( UINT Adapter, D3DDEVTYPE DeviceType, HWND hFocusWindow, DWORD BehaviorFlags, D3DPRESENT_PARAMETERS* pPresentationParameters, IDirect3DDevice9** ppReturnedDeviceInterface )
+HRESULT DoCreateDevice( IDirect3D9* m_pDevice, UINT Adapter, D3DDEVTYPE DeviceType, HWND hFocusWindow, DWORD BehaviorFlags, D3DPRESENT_PARAMETERS* pPresentationParameters, IDirect3DDevice9** ppReturnedDeviceInterface )
 {
     WriteDebugEvent ( "CProxyDirect3D9::CreateDevice" );
-
-    Sleep(1000);
 
     D3DPRESENT_PARAMETERS presentationParametersOrig = *pPresentationParameters;
     DWORD BehaviorFlagsOrig = BehaviorFlags;
 
-    //WriteDebugEvent ( "  Original parameters:" );
-    //WriteDebugEvent ( ToString( Adapter, DeviceType, hFocusWindow, BehaviorFlags, *pPresentationParameters ) );
+    D3DADAPTER_IDENTIFIER9 AdapterIdent;
+    m_pDevice->GetAdapterIdentifier ( Adapter, 0, &AdapterIdent );
+    WriteDebugEvent ( ToString( AdapterIdent ) );
 
-    // If 'Intel(R) HD Graphics', do create test first of all
-    //if ( SStringX( AdapterIdent.Description ).ContainsI( "Intel(R) HD Graphics" ) )
+    WriteDebugEvent ( "  Original parameters:" );
+    WriteDebugEvent ( ToString( Adapter, DeviceType, hFocusWindow, BehaviorFlags, *pPresentationParameters ) );
+
+    // If 'NVIDIA GeForce 310M', do create test first of all
+    if ( SStringX( AdapterIdent.Description ).ContainsI( "NVIDIA GeForce 310M" ) )
     {
         HRESULT hResult = m_pDevice->CreateDevice ( Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters, ppReturnedDeviceInterface );
         SAFE_RELEASE( *ppReturnedDeviceInterface );
@@ -216,10 +217,6 @@ HRESULT    CProxyDirect3D9::CreateDevice                ( UINT Adapter, D3DDEVTY
         WriteDebugEvent ( ToString( Adapter, DeviceType, hFocusWindow, BehaviorFlags, *pPresentationParameters ) );
     }
 
-    WriteDebugEvent ( "AdapterIdent:" );
-    D3DADAPTER_IDENTIFIER9 AdapterIdent;
-    m_pDevice->GetAdapterIdentifier ( Adapter, 0, &AdapterIdent );
-    WriteDebugEvent ( ToString( AdapterIdent ) );
 
     // Make sure DirectX Get calls will work
     BehaviorFlags &= ~D3DCREATE_PUREDEVICE;
@@ -337,6 +334,28 @@ HRESULT    CProxyDirect3D9::CreateDevice                ( UINT Adapter, D3DDEVTY
                                 ) );
     }
 
+    return hResult;
+}
+
+
+HRESULT CProxyDirect3D9::CreateDevice( UINT Adapter, D3DDEVTYPE DeviceType, HWND hFocusWindow, DWORD BehaviorFlags, D3DPRESENT_PARAMETERS* pPresentationParameters, IDirect3DDevice9** ppReturnedDeviceInterface )
+{
+    HRESULT hResult = DoCreateDevice( m_pDevice, Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters, ppReturnedDeviceInterface );
+
+    if ( FAILED( hResult ) )
+    {
+        // Prevent other warnings
+        WatchDogCompletedSection ( "L2" );
+
+        // Run diagnostic
+        CCore::GetSingleton().GetNetwork()->ResetStub( 'diag' );
+
+        // Inform user
+        SString strMessage;
+        strMessage += "There was a problem starting MTA:SA\n\n";
+        strMessage += SString( "Direct3D CreateDevice error: %08x", hResult );
+        BrowseToSolution( "create-device", EXIT_GAME_FIRST | SHOW_MESSAGE_ONLY, strMessage );
+    }
 
     return hResult;
 }
