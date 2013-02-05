@@ -19,7 +19,7 @@
 #include <game/CGame.h>
 #include <Accctrl.h>
 #include <Aclapi.h>
-#include "Userenv.h"        // This will enable SharedUtil::ExpandEnvString
+#include "Userenv.h"        // This will enable SharedUtil::ExpandEnvString 
 #include "SharedUtil.hpp"
 #include <clocale>
 #include "CTimingCheckpoints.hpp"
