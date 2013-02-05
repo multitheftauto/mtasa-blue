@@ -492,6 +492,8 @@ bool SharedUtil::ProcessPendingBrowseToSolution ( void )
     {
         if ( !strMessageBoxMessage.empty() )
             MessageBox ( NULL, strMessageBoxMessage, "MTA: San Andreas", MB_OK | MB_ICONEXCLAMATION | MB_TOPMOST );
+        if ( iFlags & SHOW_MESSAGE_ONLY )
+            return true;
     }
 
     MessageBox ( NULL, "Your browser will now display a web page with some help infomation.\n\n(If the page fails to load, paste (CTRL-V) the URL into your web browser)"
