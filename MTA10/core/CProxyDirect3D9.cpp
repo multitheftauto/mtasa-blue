@@ -193,9 +193,21 @@ SString ToString( const D3DADAPTER_IDENTIFIER9& a )
                 );
 }
 
+//
+// Hacky log interception
+//
+SString ms_strExtraLogBuffer;
+void WriteDebugEventTest( const SString& strText )
+{
+    ms_strExtraLogBuffer += strText.Replace( "\n", " " ) + "\n";
+    WriteDebugEvent ( strText );
+}
+#define WriteDebugEvent WriteDebugEventTest
+
 
 HRESULT DoCreateDevice( IDirect3D9* m_pDevice, UINT Adapter, D3DDEVTYPE DeviceType, HWND hFocusWindow, DWORD BehaviorFlags, D3DPRESENT_PARAMETERS* pPresentationParameters, IDirect3DDevice9** ppReturnedDeviceInterface )
 {
+    Sleep( 1 );
     WriteDebugEvent ( "CProxyDirect3D9::CreateDevice" );
 
     D3DPRESENT_PARAMETERS presentationParametersOrig = *pPresentationParameters;
@@ -211,6 +223,7 @@ HRESULT DoCreateDevice( IDirect3D9* m_pDevice, UINT Adapter, D3DDEVTYPE DeviceTy
     // If 'NVIDIA GeForce 310M', do create test first of all
     if ( SStringX( AdapterIdent.Description ).ContainsI( "NVIDIA GeForce 310M" ) )
     {
+        Sleep( 2000 );
         HRESULT hResult = m_pDevice->CreateDevice ( Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters, ppReturnedDeviceInterface );
         SAFE_RELEASE( *ppReturnedDeviceInterface );
         WriteDebugEvent ( SString( "  Test with following (original) parameters was:%08x", hResult ) );
@@ -296,7 +309,7 @@ HRESULT DoCreateDevice( IDirect3D9* m_pDevice, UINT Adapter, D3DDEVTYPE DeviceTy
                 WriteDebugEvent ( ToString( Adapter, DeviceType, hFocusWindow, BehaviorFlagsOrig, presentationParametersOrig ) );
 
                 if ( FAILED ( hResult ) )
-                    return -1;
+                    return hResult;
             }
         }
     }
@@ -348,7 +361,7 @@ HRESULT CProxyDirect3D9::CreateDevice( UINT Adapter, D3DDEVTYPE DeviceType, HWND
         WatchDogCompletedSection ( "L2" );
 
         // Run diagnostic
-        CCore::GetSingleton().GetNetwork()->ResetStub( 'diag' );
+        CCore::GetSingleton().GetNetwork()->ResetStub( 'dia2', *ms_strExtraLogBuffer );
 
         // Inform user
         SString strMessage;
@@ -357,5 +370,6 @@ HRESULT CProxyDirect3D9::CreateDevice( UINT Adapter, D3DDEVTYPE DeviceType, HWND
         BrowseToSolution( "create-device", EXIT_GAME_FIRST | SHOW_MESSAGE_ONLY, strMessage );
     }
 
+    ms_strExtraLogBuffer.clear();
     return hResult;
 }
