@@ -29,7 +29,6 @@ class CCore;
 #include "CSingleton.h"
 #include "CGUI.h"
 #include "CConnectManager.h"
-#include "CDirect3DHookManager.h"
 #include "CDirectInputHookManager.h"
 #include "CGraphics.h"
 #include "CSetCursorPosHook.h"
@@ -245,6 +244,9 @@ public:
     CModelCacheManager*     GetModelCacheManager            ( void );
     void                    AddModelToPersistentCache       ( ushort usModelId );
 
+    void                    OnPreCreateDevice               ( IDirect3D9* pDirect3D, UINT Adapter, D3DDEVTYPE DeviceType, HWND hFocusWindow, DWORD& BehaviorFlags, D3DPRESENT_PARAMETERS* pPresentationParameters );
+    void                    OnPostCreateDevice              ( HRESULT hResult, IDirect3D9* pDirect3D, UINT Adapter, HWND hFocusWindow, D3DPRESENT_PARAMETERS* pPresentationParameters, IDirect3DDevice9** ppReturnedDeviceInterface );
+
 private:
     // Core devices.
     CXML*                       m_pXML;
@@ -263,7 +265,6 @@ private:
     // Hook interfaces.
     CMessageLoopHook *          m_pMessageLoopHook;
     CDirectInputHookManager *   m_pDirectInputHookManager;
-    CDirect3DHookManager *      m_pDirect3DHookManager;
     //CFileSystemHook *           m_pFileSystemHook;
     CSetCursorPosHook *         m_pSetCursorPosHook;
     CTCPManager *               m_pTCPManager;
