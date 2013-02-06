@@ -360,6 +360,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CMultiplayerSA_Direct3D.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\CMultiplayerSA_Files.cpp"
 				>
 			</File>
