@@ -120,6 +120,13 @@ namespace
                                          { "guiGridListGetColumnTitle",     "1.3.1-9.04945" },
                                          { "setAircraftMaxVelocity",        "1.3.1-9.04997" },
                                          { "getAircraftMaxVelocity",        "1.3.1-9.04997" },
+                                         { "setVehicleNitroActivated",      "1.3.1-9.04993" },
+                                         { "setVehicleNitroCount",          "1.3.1-9.04993" },
+                                         { "setVehicleNitroLevel",          "1.3.1-9.04993" },
+                                         { "isVehicleNitroRecharging",      "1.3.1-9.04993" },
+                                         { "isVehicleNitroActivated",       "1.3.1-9.04993" },
+                                         { "getVehicleNitroCount",          "1.3.1-9.04993" },
+                                         { "getVehicleNitroLevel",          "1.3.1-9.04993" },
                                         };
 
     SVersionItem serverFunctionInitList[] = {
