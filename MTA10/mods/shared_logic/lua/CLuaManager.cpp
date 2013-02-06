@@ -956,6 +956,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getSunColor", CLuaFunctionDefs::GetSunColor );
     CLuaCFunctions::AddFunction ( "getSunSize", CLuaFunctionDefs::GetSunSize );
     CLuaCFunctions::AddFunction ( "getAircraftMaxHeight", CLuaFunctionDefs::GetAircraftMaxHeight );
+    CLuaCFunctions::AddFunction ( "getAircraftMaxVelocity", CLuaFunctionDefs::GetAircraftMaxVelocity );
     CLuaCFunctions::AddFunction ( "getOcclusionsEnabled", CLuaFunctionDefs::GetOcclusionsEnabled );
     CLuaCFunctions::AddFunction ( "getCloudsEnabled", CLuaFunctionDefs::GetCloudsEnabled );
     CLuaCFunctions::AddFunction ( "getRainLevel", CLuaFunctionDefs::GetRainLevel );
@@ -1004,6 +1005,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "restoreAllWorldModels", CLuaFunctionDefs::RestoreWorldBuildings );
     CLuaCFunctions::AddFunction ( "restoreWorldModel", CLuaFunctionDefs::RestoreWorldBuilding );
     CLuaCFunctions::AddFunction ( "setAircraftMaxHeight", CLuaFunctionDefs::SetAircraftMaxHeight );
+    CLuaCFunctions::AddFunction ( "setAircraftMaxVelocity", CLuaFunctionDefs::SetAircraftMaxVelocity );
     CLuaCFunctions::AddFunction ( "setOcclusionsEnabled", CLuaFunctionDefs::SetOcclusionsEnabled );
     CLuaCFunctions::AddFunction ( "createSWATRope", CLuaFunctionDefs::CreateSWATRope );
     CLuaCFunctions::AddFunction ( "setBirdsEnabled", CLuaFunctionDefs::SetBirdsEnabled );

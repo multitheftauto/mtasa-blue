@@ -285,6 +285,9 @@ public:
     virtual float                       GetAircraftMaxHeight        ( void ) = 0;
     virtual void                        SetAircraftMaxHeight        ( float fHeight ) = 0;
 
+    virtual float                       GetAircraftMaxVelocity      ( void ) = 0;
+    virtual void                        SetAircraftMaxVelocity      ( float fVelocity ) = 0;
+
     virtual void                        SetAutomaticVehicleStartupOnPedEnter    ( bool bSet ) = 0;
 
     virtual void                        SetPedTargetingMarkerEnabled ( bool bEnabled ) = 0;

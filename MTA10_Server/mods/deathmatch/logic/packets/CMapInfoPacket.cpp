@@ -66,7 +66,8 @@ CMapInfoPacket::CMapInfoPacket ( unsigned char ucWeather,
                                  float fFarClip,
                                  bool bOverrideFogDistance,
                                  float fFogDistance,
-                                 float fAircraftMaxHeight )
+                                 float fAircraftMaxHeight,
+                                 float fAircraftMaxVelocity )
 {
     m_ucWeather = ucWeather;
     m_ucWeatherBlendingTo = ucWeatherBlendingTo;
@@ -119,6 +120,7 @@ CMapInfoPacket::CMapInfoPacket ( unsigned char ucWeather,
     m_bOverrideFogDistance = bOverrideFogDistance;
     m_fFogDistance = fFogDistance;
     m_fAircraftMaxHeight = fAircraftMaxHeight;
+    m_fAircraftMaxVelocity = fAircraftMaxVelocity;
 }
 
 
@@ -260,6 +262,8 @@ bool CMapInfoPacket::Write ( NetBitStreamInterface& BitStream ) const
 
     BitStream.Write ( m_fAircraftMaxHeight );
 
+    BitStream.Write ( m_fAircraftMaxVelocity );
+    
     if ( BitStream.Version () >= 0x30 )
     {
         for (int i = WEAPONTYPE_BRASSKNUCKLE; i < WEAPONTYPE_PISTOL; i++)

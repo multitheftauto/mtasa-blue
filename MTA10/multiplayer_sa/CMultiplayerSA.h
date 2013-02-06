@@ -204,6 +204,9 @@ public:
     float                       GetAircraftMaxHeight        ( void )                    { return m_fAircraftMaxHeight; };
     void                        SetAircraftMaxHeight        ( float fHeight )           { m_fAircraftMaxHeight = fHeight; };
 
+    float                       GetAircraftMaxVelocity      ( void )                    { return m_fAircraftMaxVelocity; };
+    void                        SetAircraftMaxVelocity      ( float fVelocity )         { m_fAircraftMaxVelocity = fVelocity; m_fAircraftMaxVelocity_Sq = fVelocity * fVelocity; };
+
     void                        SetAutomaticVehicleStartupOnPedEnter    ( bool bSet );
 
     void                        SetPedTargetingMarkerEnabled ( bool bEnable );
@@ -226,6 +229,8 @@ private:
     bool                        m_bEnabledAltWaterOrder;
     bool                        m_bEnabledClothesMemFix;
     float                       m_fAircraftMaxHeight;
+    float                       m_fAircraftMaxVelocity;
+    float                       m_fAircraftMaxVelocity_Sq;
     bool                        m_bHeatHazeEnabled;
     bool                        m_bHeatHazeCustomized;
 
