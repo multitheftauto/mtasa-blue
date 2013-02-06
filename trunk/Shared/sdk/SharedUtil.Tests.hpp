@@ -724,4 +724,18 @@ void SharedUtil_String_Tests ( void )
         TEST_END
     }
 
+    // Formatting
+    {
+        TEST_FUNCTION
+            assert ( a == result );
+        TEST_VARS
+            const SString a;
+            const char* result;
+        TEST_DATA
+            { SString( "a%d b%d c%d", 1,2,3 ),          "a1 b2 c3" },
+            { SString( "a%s b%d c%d", "QWE",2,3 ),      "aQWE b2 c3" },
+            { SString( "a%d b%s c%d", 1,"QWE",3 ),      "a1 bQWE c3" },
+        TEST_END
+    }
+
 }
