@@ -684,13 +684,12 @@ int CLuaFunctionDefs::dxSetShaderValue ( lua_State* luaVM )
     if ( !argStream.HasErrors () )
     {
         // Try each mixed type in turn
-        int iArgument = lua_type ( argStream.m_luaVM, argStream.m_iIndex );
-
-        if ( iArgument == LUA_TLIGHTUSERDATA )
+        if ( argStream.NextIsUserData () )
         {
             // Texture
             CClientTexture* pTexture;
-            if ( argStream.ReadUserData ( pTexture ) )
+            argStream.ReadUserData ( pTexture );
+            if ( pTexture )
             {
                 bool bResult = pShader->GetShaderItem ()->SetValue ( strName, pTexture->GetTextureItem () );
                 lua_pushboolean ( luaVM, bResult );
@@ -698,28 +697,25 @@ int CLuaFunctionDefs::dxSetShaderValue ( lua_State* luaVM )
             }
         }
         else
-        if ( iArgument == LUA_TBOOLEAN )
+        if ( argStream.NextIsBool () )
         {
             // bool
             bool bValue;
-            if ( argStream.ReadBool ( bValue ) )
-            {
-                bool bResult = pShader->GetShaderItem ()->SetValue ( strName, bValue );
-                lua_pushboolean ( luaVM, bResult );
-                return 1;
-            }
+            argStream.ReadBool ( bValue );
+            bool bResult = pShader->GetShaderItem ()->SetValue ( strName, bValue );
+            lua_pushboolean ( luaVM, bResult );
+            return 1;
         }
         else
-        if ( iArgument == LUA_TNUMBER || iArgument == LUA_TSTRING )
+        if ( argStream.NextCouldBeNumber() )
         {
             // float(s)
             float fBuffer[16];
             uint i;
             for ( i = 0 ; i < NUMELMS(fBuffer); )
             {
-                fBuffer[i++] = static_cast < float > ( lua_tonumber ( argStream.m_luaVM, argStream.m_iIndex++ ) );
-                iArgument = lua_type ( argStream.m_luaVM, argStream.m_iIndex );
-                if ( iArgument != LUA_TNUMBER && iArgument != LUA_TSTRING )
+                argStream.ReadNumber( fBuffer[i++] );
+                if ( !argStream.NextCouldBeNumber() )
                     break;
             }
             bool bResult = pShader->GetShaderItem ()->SetValue ( strName, fBuffer, i );
@@ -727,7 +723,7 @@ int CLuaFunctionDefs::dxSetShaderValue ( lua_State* luaVM )
             return 1;
         }
         else
-        if ( iArgument == LUA_TTABLE )
+        if ( argStream.NextIsTable() )
         {
             // table (of floats)
             float fBuffer[16];

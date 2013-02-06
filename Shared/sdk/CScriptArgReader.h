@@ -28,7 +28,6 @@ public:
         m_iIndex = 1;
         m_iErrorIndex = 0;
         m_bError = false;
-        m_bIgnoreMismatchMatch = false;
         m_pPendingFunctionOutValue = NULL;
         m_pPendingFunctionIndex = -1;
         m_bResolvedErrorGotArgumentTypeAndValue = false;
@@ -45,136 +44,132 @@ public:
     // Read next number
     //
     template < class T >
-    bool ReadNumber ( T& outValue )
+    void ReadNumber ( T& outValue )
     {
         int iArgument = lua_type ( m_luaVM, m_iIndex );
         if ( iArgument == LUA_TNUMBER || iArgument == LUA_TSTRING )
         {
             outValue = static_cast < T > ( lua_tonumber ( m_luaVM, m_iIndex++ ) );
-            return true;
+            return;
         }
 
         outValue = 0;
         SetTypeError ( "number" );
         m_iIndex++;
-        return false;
     }
 
     //
     // Read next number, using default if needed
     //
     template < class T, class U >
-    bool ReadNumber ( T& outValue, const U& defaultValue )
+    void ReadNumber ( T& outValue, const U& defaultValue )
     {
         int iArgument = lua_type ( m_luaVM, m_iIndex );
         if ( iArgument == LUA_TNUMBER || iArgument == LUA_TSTRING )
         {
             outValue = static_cast < T > ( lua_tonumber ( m_luaVM, m_iIndex++ ) );
-            return true;
+            return;
         }
         else
-        if ( iArgument == LUA_TNONE || iArgument == LUA_TNIL || m_bIgnoreMismatchMatch )
+        if ( iArgument == LUA_TNONE || iArgument == LUA_TNIL )
         {
             outValue = static_cast < T > ( defaultValue );
             m_iIndex++;
-            return false;
+            return;
         }
 
         outValue = 0;
         SetTypeError ( "number" );
         m_iIndex++;
-        return false;
     }
 
 
     //
     // Read next bool
     //
-    bool ReadBool ( bool& bOutValue )
+    void ReadBool ( bool& bOutValue )
     {
         int iArgument = lua_type ( m_luaVM, m_iIndex );
         if ( iArgument == LUA_TBOOLEAN )
         {
             bOutValue = lua_toboolean ( m_luaVM, m_iIndex++ ) ? true : false;
-            return true;
+            return;
         }
 
         bOutValue = false;
         SetTypeError ( "bool" );
         m_iIndex++;
-        return false;
     }
 
     //
     // Read next bool, using default if needed
     //
-    bool ReadBool ( bool& bOutValue, const bool bDefaultValue )
+    void ReadBool ( bool& bOutValue, const bool bDefaultValue )
     {
         int iArgument = lua_type ( m_luaVM, m_iIndex );
         if ( iArgument == LUA_TBOOLEAN )
         {
             bOutValue = lua_toboolean ( m_luaVM, m_iIndex++ ) ? true : false;
-            return true;
+            return;
         }
         else
-        if ( iArgument == LUA_TNONE || iArgument == LUA_TNIL || m_bIgnoreMismatchMatch )
+        if ( iArgument == LUA_TNONE || iArgument == LUA_TNIL )
         {
             bOutValue = bDefaultValue;
-            return false;
+            m_iIndex++;
+            return;
         }
 
         bOutValue = false;
         SetTypeError ( "bool" );
         m_iIndex++;
-        return false;
     }
 
 
     //
     // Read next string, using default if needed
     //
-    bool ReadString ( SString& outValue, const char* defaultValue = NULL )
+    void ReadString ( SString& outValue, const char* defaultValue = NULL )
     {
         int iArgument = lua_type ( m_luaVM, m_iIndex );
         if ( iArgument == LUA_TSTRING || iArgument == LUA_TNUMBER )
         {
             outValue = lua_tostring ( m_luaVM, m_iIndex++ );
-            return true;
+            return;
         }
         else
-        if ( iArgument == LUA_TNONE || iArgument == LUA_TNIL || m_bIgnoreMismatchMatch )
+        if ( iArgument == LUA_TNONE || iArgument == LUA_TNIL )
         {
             if ( defaultValue )
             {
                 outValue = defaultValue;              
-                return false;
+                m_iIndex++;
+                return;
             }
         }
 
         outValue = "";
         SetTypeError ( "string" );
         m_iIndex++;
-        return false;
     }
 
 
     //
     // Read next string as a string reference
     //
-    bool ReadCharStringRef ( SCharStringRef& outValue )
+    void ReadCharStringRef ( SCharStringRef& outValue )
     {
         int iArgument = lua_type ( m_luaVM, m_iIndex );
         if ( iArgument == LUA_TSTRING )
         {
             outValue.pData = (char*)lua_tolstring ( m_luaVM, m_iIndex++, &outValue.uiSize );
-            return true;
+            return;
         }
 
         outValue.pData = NULL;
         outValue.uiSize = 0;
         SetTypeError ( "string" );
         m_iIndex++;
-        return false;
     }
 
 
@@ -182,7 +177,7 @@ public:
     // Read next string as an enum
     //
     template < class T >
-    bool ReadEnumString ( T& outValue )
+    void ReadEnumString ( T& outValue )
     {
         int iArgument = lua_type ( m_luaVM, m_iIndex );
         if ( iArgument == LUA_TSTRING )
@@ -191,14 +186,13 @@ public:
             if ( StringToEnum ( strValue, outValue ) )
             {
                 m_iIndex++;
-                return true;
+                return;
             }
         }
 
         outValue = (T)0;
         SetTypeError ( GetEnumTypeName ( outValue ) );
         m_iIndex++;
-        return false;
     }
 
 
@@ -206,7 +200,7 @@ public:
     // Read next string as an enum, using default if needed
     //
     template < class T >
-    bool ReadEnumString ( T& outValue, const T& defaultValue )
+    void ReadEnumString ( T& outValue, const T& defaultValue )
     {
         int iArgument = lua_type ( m_luaVM, m_iIndex );
         if ( iArgument == LUA_TSTRING )
@@ -215,20 +209,20 @@ public:
             if ( StringToEnum ( strValue, outValue ) )
             {
                 m_iIndex++;
-                return true;
+                return;
             }
         }
         else
-        if ( iArgument == LUA_TNONE || iArgument == LUA_TNIL || m_bIgnoreMismatchMatch )
+        if ( iArgument == LUA_TNONE || iArgument == LUA_TNIL )
         {
             outValue = defaultValue;
-            return false;
+            m_iIndex++;
+            return;
         }
 
         outValue = (T)0;
         SetTypeError ( GetEnumTypeName ( outValue ) );
         m_iIndex++;
-        return false;
     }
 
 
@@ -236,7 +230,7 @@ public:
     // Read next string as a comma separated list of enums, using default if needed
     //
     template < class T >
-    bool ReadEnumStringList ( std::vector < T >& outValueList, const SString& strDefaultValue )
+    void ReadEnumStringList ( std::vector < T >& outValueList, const SString& strDefaultValue )
     {
         outValueList.clear ();
         int iArgument = lua_type ( m_luaVM, m_iIndex );
@@ -246,7 +240,7 @@ public:
             strValue = lua_tostring ( m_luaVM, m_iIndex );
         }
         else
-        if ( iArgument == LUA_TNONE || iArgument == LUA_TNIL || m_bIgnoreMismatchMatch )
+        if ( iArgument == LUA_TNONE || iArgument == LUA_TNIL )
         {
             strValue = strDefaultValue;
         }
@@ -255,7 +249,7 @@ public:
             T outValue;
             SetTypeError ( GetEnumTypeName ( outValue ) );
             m_iIndex++;
-            return false;
+            return;
         }
 
         // Parse each part of the string
@@ -278,14 +272,13 @@ public:
 
                 if ( iArgument == LUA_TSTRING )
                     m_iIndex++;
-                return false;
+                return;
             }
         }
 
         // Success
         if ( iArgument == LUA_TSTRING )
             m_iIndex++;
-        return true;
     }
 
 
@@ -293,7 +286,7 @@ public:
     // Read next string or number as an enum
     //
     template < class T >
-    bool ReadEnumStringOrNumber ( T& outValue )
+    void ReadEnumStringOrNumber ( T& outValue )
     {
         int iArgument = lua_type ( m_luaVM, m_iIndex );
         if ( iArgument == LUA_TSTRING )
@@ -302,7 +295,7 @@ public:
             if ( StringToEnum ( strValue, outValue ) )
             {
                 m_iIndex++;
-                return true;
+                return;
             }
 
             // If will be coercing a string to an enum, make sure string contains only digits
@@ -310,78 +303,118 @@ public:
             if ( uiPos != SString::npos || strValue.empty () )
                 iArgument = LUA_TNONE;  //  Force error
         }
-        if ( iArgument == LUA_TNUMBER || iArgument == LUA_TSTRING )
+
+        if ( iArgument == LUA_TSTRING || iArgument == LUA_TNUMBER )
         {
             outValue = static_cast < T > ( (int)lua_tonumber ( m_luaVM, m_iIndex ) );
             if ( EnumValueValid ( outValue ) )
             {
                 m_iIndex++;
-                return true;
+                return;
             }
         }
 
         outValue = (T)0;
         SetTypeError ( GetEnumTypeName ( outValue ) );
         m_iIndex++;
-        return false;
     }
 
 
+protected:
     //
-    // Read next userdata, using default if needed
+    // Read next userdata, using rules and stuff
     //
     template < class T >
-    bool ReadUserData ( T*& outValue, T* defaultValue, bool bArgCanBeNil = false, bool bDefaultCanBeNil = false )
+    void InternalReadUserData ( bool bAllowNilResult, T*& outValue, bool bHasDefaultValue, T* defaultValue = (T*)-2 )
     {
+        outValue = NULL;
         int iArgument = lua_type ( m_luaVM, m_iIndex );
 
         if ( iArgument == LUA_TLIGHTUSERDATA )
         {
-            outValue = (T*)UserDataCast < T > ( (T*)0, lua_touserdata ( m_luaVM, m_iIndex++ ), m_luaVM );
-            if ( outValue || bArgCanBeNil )
-                return true;
+            outValue = (T*)UserDataCast < T > ( (T*)0, lua_touserdata ( m_luaVM, m_iIndex ), m_luaVM );
+            if ( outValue )
+            {
+                m_iIndex++;
+                return;
+            }
 
-            outValue = NULL;
-            SetTypeError ( GetClassTypeName ( (T*)0 ), m_iIndex - 1 );
-            return false;
+            // Cast failed, so continue as nil type
+            iArgument = LUA_TNIL;
         }
         else if ( iArgument == LUA_TUSERDATA )
         {
-            outValue = (T*)UserDataCast < T > ( (T*)0, * ( ( void** ) lua_touserdata ( m_luaVM, m_iIndex++ ) ), m_luaVM );
-            if ( outValue || bArgCanBeNil )
-                return true;
-
-            outValue = NULL;
-            SetTypeError ( GetClassTypeName ( (T*)0 ), m_iIndex - 1 );
-            return false;
-        }
-        else if ( iArgument == LUA_TNONE || m_bIgnoreMismatchMatch || ( iArgument == LUA_TNIL && bArgCanBeNil ) )
-        {
-            if ( defaultValue != (T*)-1 )
+            outValue = (T*)UserDataCast < T > ( (T*)0, * ( ( void** ) lua_touserdata ( m_luaVM, m_iIndex ) ), m_luaVM );
+            if ( outValue )
             {
+                m_iIndex++;
+                return;
+            }
+
+            // Cast failed, so continue as nil type
+            iArgument = LUA_TNIL;
+        }
+
+        if ( iArgument == LUA_TNONE || iArgument == LUA_TNIL )
+        {
+            if ( bHasDefaultValue )
                 outValue = defaultValue;
-                if ( outValue || bDefaultCanBeNil )
-                {
-                    m_iIndex++;
-                    return true;
-                }
+            else
+                outValue = NULL;
+
+            if ( outValue || bAllowNilResult )
+            {
+                m_iIndex++;
+                return;
             }
         }
 
         outValue = NULL;
         SetTypeError ( GetClassTypeName ( (T*)0 ) );
         m_iIndex++;
-        return false;
     }
-
+public:
 
     //
-    // Read next userdata, using NULL default or no default
+    // Read next userdata
+    // Userdata always valid if no error
+    //  * value not userdata - error
+    //  * nil value          - error
+    //  * no arguments left  - error
+    //  * result is NULL     - error
     //
     template < class T >
-    bool ReadUserData ( T*& outValue, int defaultValue = -1 )
+    void ReadUserData ( T*& outValue )
     {
-        return ReadUserData ( outValue, (T*)defaultValue, defaultValue == 0, true );
+        InternalReadUserData ( false, outValue, false );
+    }
+
+    //
+    // Read next userdata, using default if needed
+    // Userdata always valid if no error
+    //  * value not userdata - error
+    //  * nil value          - use defaultValue
+    //  * no arguments left  - use defaultValue
+    //  * result is NULL     - error
+    //
+    template < class T >
+    void ReadUserData ( T*& outValue, T* defaultValue )
+    {
+        InternalReadUserData ( false, outValue, true, defaultValue );
+    }
+
+    //
+    // Read next userdata, using NULL default if needed, allowing NULL result
+    // Userdata might be NULL even when no error
+    //  * value not userdata - error
+    //  * nil value          - use NULL
+    //  * no arguments left  - use NULL
+    //
+    template < class T >
+    void ReadUserData ( T*& outValue, int*** defaultValue )
+    {
+        assert( defaultValue == NULL );
+        InternalReadUserData ( true, outValue, true, (T*)NULL );
     }
 
 
@@ -389,48 +422,46 @@ public:
     // Read next wrapped userdata
     //
     template < class T, class U >
-    bool ReadUserData ( U*& outValue )
+    void ReadUserData ( U*& outValue )
     {
-        if ( ReadUserData ( outValue ) )
+        ReadUserData ( outValue );
+        if ( outValue )
         {
             SString strErrorExpectedType;
             if ( CheckWrappedUserDataType < T > ( outValue, strErrorExpectedType ) )
-                return true;
+                return;
             SetTypeError ( strErrorExpectedType, m_iIndex - 1 );
         }
-        return false;
     }
 
 
     //
     // Read CLuaArguments
     //
-    bool ReadLuaArguments ( CLuaArguments& outValue )
+    void ReadLuaArguments ( CLuaArguments& outValue )
     {
         outValue.ReadArguments ( m_luaVM, m_iIndex );
         for ( int i = outValue.Count () ; i > 0 ; i-- )
         {
             m_iIndex++;
         }
-        return true;
     }
 
 
     //
     // Read one CLuaArgument
     //
-    bool ReadLuaArgument ( CLuaArgument& outValue )
+    void ReadLuaArgument ( CLuaArgument& outValue )
     {
         int iArgument = lua_type ( m_luaVM, m_iIndex );
         if ( iArgument != LUA_TNONE )
         {
             outValue.Read ( m_luaVM, m_iIndex++ );
-            return true;
+            return;
         }
 
         SetTypeError ( "argument" );
         m_iIndex++;
-        return false;
     }
 
 
@@ -438,13 +469,13 @@ public:
     // Read a table of userdatas
     //
     template < class T >
-    bool ReadUserDataTable ( std::vector < T* >& outList )
+    void ReadUserDataTable ( std::vector < T* >& outList )
     {
         if ( lua_type ( m_luaVM, m_iIndex ) != LUA_TTABLE )
         {
             SetTypeError ( "table" );
             m_iIndex++;
-            return false;
+            return;
         }
 
         for ( lua_pushnil ( m_luaVM ) ; lua_next ( m_luaVM, m_iIndex ) != 0 ; lua_pop ( m_luaVM, 1 ) )
@@ -466,14 +497,13 @@ public:
                 outList.push_back ( value );
         }
         m_iIndex++;
-        return true;
     }
 
 
     //
     // Read a function, but don't do it yet due to Lua stack issues
     //
-    bool ReadFunction ( CLuaFunctionRef& outValue, int defaultValue = -2 )
+    void ReadFunction ( CLuaFunctionRef& outValue, int defaultValue = -2 )
     {
         assert ( !m_pPendingFunctionOutValue );
 
@@ -482,27 +512,30 @@ public:
         {
             m_pPendingFunctionOutValue = &outValue;
             m_pPendingFunctionIndex = m_iIndex++;
-            return true;
+            return;
         }
-        else
-        if ( defaultValue == LUA_REFNIL )
+        else if ( iArgument == LUA_TNONE || iArgument == LUA_TNIL )
         {
-            outValue = CLuaFunctionRef ();
-            return true;
+            // Only valid default value for function is nil
+            if ( defaultValue == LUA_REFNIL )
+            {
+                outValue = CLuaFunctionRef ();
+                m_iIndex++;
+                return;
+            }
         }
 
         SetTypeError ( "function", m_iIndex );
         m_iIndex++;
-        return false;
     }
 
     //
     // Call after other arguments have been read
     //
-    bool ReadFunctionComplete ( void )
+    void ReadFunctionComplete ( void )
     {
         if ( !m_pPendingFunctionOutValue )
-            return true;
+            return;
 
         // As we are going to change the stack, save any error info already gotten
         ResolveErrorGotArgumentTypeAndValue ();
@@ -512,12 +545,11 @@ public:
         if ( VERIFY_FUNCTION( *m_pPendingFunctionOutValue ) )
         {
             m_pPendingFunctionIndex = -1;
-            return true;
+            return;
         }
 
         SetTypeError ( "function", m_pPendingFunctionIndex );
         m_pPendingFunctionIndex = -1;
-        return false;
     }
 
     // Debug check
@@ -559,55 +591,55 @@ public:
     //
     // Conditional reads. Default required in case condition is not met.
     //
-    bool ReadIfNextIsBool ( bool& bOutValue, const bool bDefaultValue )
+    void ReadIfNextIsBool ( bool& bOutValue, const bool bDefaultValue )
     {
         if ( NextIsBool () )
-            return ReadBool ( bOutValue, bDefaultValue );
-        bOutValue = bDefaultValue;
-        return false;
+            ReadBool ( bOutValue, bDefaultValue );
+        else
+            bOutValue = bDefaultValue;
     }
 
     template < class T >
-    bool ReadIfNextIsUserData ( T*& outValue, T* defaultValue  )
+    void ReadIfNextIsUserData ( T*& outValue, T* defaultValue )
     {
         if ( NextIsUserData () )
-            return ReadUserData ( outValue, defaultValue );
-        outValue = defaultValue;
-        return false;
+            ReadUserData ( outValue, defaultValue );
+        else
+            outValue = defaultValue;
     }
 
     template < class T, class U >
-    bool ReadIfNextIsNumber ( T& outValue, const U& defaultValue )
+    void ReadIfNextIsNumber ( T& outValue, const U& defaultValue )
     {
         if ( NextIsNumber () )
-            return ReadNumber ( outValue, defaultValue );
-        outValue = defaultValue;
-        return false;
+            ReadNumber ( outValue, defaultValue );
+        else
+            outValue = defaultValue;
     }
 
-    bool ReadIfNextIsString ( SString& outValue, const char* defaultValue )
+    void ReadIfNextIsString ( SString& outValue, const char* defaultValue )
     {
         if ( NextIsString () )
-            return ReadString ( outValue, defaultValue );
-        outValue = defaultValue;
-        return false;
+            ReadString ( outValue, defaultValue );
+        else
+            outValue = defaultValue;
     }
 
     template < class T, class U >
-    bool ReadIfNextCouldBeNumber ( T& outValue, const U& defaultValue )
+    void ReadIfNextCouldBeNumber ( T& outValue, const U& defaultValue )
     {
         if ( NextCouldBeNumber () )
-            return ReadNumber ( outValue, defaultValue );
-        outValue = defaultValue;
-        return false;
+            ReadNumber ( outValue, defaultValue );
+        else
+            outValue = defaultValue;
     }
 
-    bool ReadIfNextCouldBeString ( SString& outValue, const char* defaultValue )
+    void ReadIfNextCouldBeString ( SString& outValue, const char* defaultValue )
     {
         if ( NextCouldBeString () )
-            return ReadString ( outValue, defaultValue );
-        outValue = defaultValue;
-        return false;
+            ReadString ( outValue, defaultValue );
+        else
+            outValue = defaultValue;
     }
 
 
@@ -694,14 +726,6 @@ public:
     }
 
     //
-    // Strict off means mismatches are ignored if they have a default value
-    //
-    void SetStrict ( bool bStrictMode )
-    {
-        m_bIgnoreMismatchMatch = !bStrictMode;
-    }
-
-    //
     // Set version error message
     //
     void SetVersionError ( const char* szMinReq, const char* szSide, const char* szReason )
@@ -731,7 +755,6 @@ public:
         return SString ( "%s @ '%s' [%s]", *m_strErrorCategory, lua_tostring ( m_luaVM, lua_upvalueindex ( 1 ) ), *GetErrorMessage () );
     }
 
-    bool                    m_bIgnoreMismatchMatch;
     bool                    m_bError;
     int                     m_iErrorIndex;
     SString                 m_strErrorExpectedType;
