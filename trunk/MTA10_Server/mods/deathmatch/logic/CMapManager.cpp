@@ -468,6 +468,7 @@ void CMapManager::OnPlayerJoin ( CPlayer& Player )
     const SWorldWaterLevelInfo& worldWaterLevelInfo = g_pGame->GetWaterManager ()->GetWorldWaterLevelInfo ();
     float fJetpackMaxHeight = g_pGame->GetJetpackMaxHeight ();
     float fAircraftMaxHeight = g_pGame->GetAircraftMaxHeight ();
+    float fAircraftMaxVelocity = g_pGame->GetAircraftMaxVelocity ();
 
     // Get the sky gradient
     bool bHasSkyGradient = g_pGame->HasSkyGradient ();
@@ -576,7 +577,8 @@ void CMapManager::OnPlayerJoin ( CPlayer& Player )
                                    fFarClip,
                                    bOverrideFogDistance,
                                    fFogDistance,
-                                   fAircraftMaxHeight ) );
+                                   fAircraftMaxHeight,
+                                   fAircraftMaxVelocity ) );
 
     marker.Set ( "SendMapInfoPacket" );
 

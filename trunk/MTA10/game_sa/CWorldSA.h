@@ -76,6 +76,8 @@ public:
     float       GetJetpackMaxHeight       ( void );
     void        SetAircraftMaxHeight      ( float fHeight );
     float       GetAircraftMaxHeight      ( void );
+    void        SetAircraftMaxVelocity    ( float fVelocity );
+    float       GetAircraftMaxVelocity    ( void );
     void        SetOcclusionsEnabled      ( bool bEnabled );
     bool        GetOcclusionsEnabled      ( void );
 

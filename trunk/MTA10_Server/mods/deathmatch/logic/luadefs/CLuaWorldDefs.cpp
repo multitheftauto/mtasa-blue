@@ -44,6 +44,7 @@ void CLuaWorldDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "getFarClipDistance", CLuaWorldDefs::getFarClipDistance );
     CLuaCFunctions::AddFunction ( "getFogDistance", CLuaWorldDefs::getFogDistance );
     CLuaCFunctions::AddFunction ( "getAircraftMaxHeight", CLuaWorldDefs::getAircraftMaxHeight );
+    CLuaCFunctions::AddFunction ( "getAircraftMaxVelocity", CLuaWorldDefs::getAircraftMaxVelocity );
     CLuaCFunctions::AddFunction ( "getOcclusionsEnabled", CLuaWorldDefs::getOcclusionsEnabled );
 
     // Set
@@ -71,6 +72,7 @@ void CLuaWorldDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "setFarClipDistance", CLuaWorldDefs::setFarClipDistance );
     CLuaCFunctions::AddFunction ( "setFogDistance", CLuaWorldDefs::setFogDistance );
     CLuaCFunctions::AddFunction ( "setAircraftMaxHeight", CLuaWorldDefs::setAircraftMaxHeight );
+    CLuaCFunctions::AddFunction ( "setAircraftMaxVelocity", CLuaWorldDefs::setAircraftMaxVelocity );
     CLuaCFunctions::AddFunction ( "setOcclusionsEnabled", CLuaWorldDefs::setOcclusionsEnabled );
 
     // Reset
@@ -1274,6 +1276,41 @@ int CLuaWorldDefs::getAircraftMaxHeight ( lua_State* luaVM )
     if ( CStaticFunctionDefinitions::GetAircraftMaxHeight ( fMaxHeight ) )
     {
         lua_pushnumber ( luaVM, fMaxHeight );
+        return 1;
+    }
+    
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaWorldDefs::setAircraftMaxVelocity ( lua_State* luaVM )
+{
+//  bool setAircraftMaxVelocity ( float fVelocity )
+    float fVelocity;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadNumber ( fVelocity );
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( CStaticFunctionDefinitions::SetAircraftMaxVelocity ( fVelocity ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+        
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaWorldDefs::getAircraftMaxVelocity ( lua_State* luaVM )
+{
+    float fVelocity;
+    if ( CStaticFunctionDefinitions::GetAircraftMaxVelocity ( fVelocity ) )
+    {
+        lua_pushnumber ( luaVM, fVelocity );
         return 1;
     }
     

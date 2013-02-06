@@ -544,6 +544,7 @@ public:
     static bool                 GetTrafficLightState                ( unsigned char& ucState );
     static bool                 GetTrafficLightsLocked              ( bool& bLocked );
     static bool                 GetJetpackMaxHeight                 ( float& fMaxHeight );
+    static bool                 GetAircraftMaxVelocity              ( float& fVelocity );
     static bool                 GetInteriorSoundsEnabled            ( bool& bEnabled );
     static bool                 GetRainLevel                        ( float& fRainLevel );
     static bool                 GetSunSize                          ( float& fSunSize );
@@ -587,6 +588,7 @@ public:
     static bool                 SetFarClipDistance                  ( float fFarClip );
     static bool                 SetFogDistance                      ( float fFogDist );
     static bool                 SetAircraftMaxHeight                ( float fMaxHeight );
+    static bool                 SetAircraftMaxVelocity              ( float fVelocity );
     static bool                 SetOcclusionsEnabled                ( bool bEnabled );
     static bool                 ResetRainLevel                      ( void );
     static bool                 ResetSunSize                        ( void );
