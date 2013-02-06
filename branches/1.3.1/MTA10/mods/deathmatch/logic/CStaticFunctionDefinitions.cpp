@@ -3106,6 +3106,103 @@ bool CStaticFunctionDefinitions::SetVehicleSirens ( CClientVehicle& Vehicle, uns
     return false;
 }
 
+bool CStaticFunctionDefinitions::IsVehicleNitroRecharging ( CClientVehicle& Vehicle, bool& bRecharging )
+{
+    float fNitroLevel = Vehicle.GetNitroLevel ( );
+    
+    // If nitro level > 0 and < 1, Nitro is recharging and can't be activated by the player
+    bRecharging = ( fNitroLevel > 0 && fNitroLevel < 1 );
+    return true;
+}
+
+bool CStaticFunctionDefinitions::IsVehicleNitroActivated ( CClientVehicle& Vehicle, bool& bActivated )
+{
+    // If nitro level < 0, nitro is activated. (until nitro level reaches -1, at that point it will become 0 and increase instead of decrease)
+    bActivated = ( Vehicle.GetNitroLevel () < 0 );
+    return true;
+}
+
+bool CStaticFunctionDefinitions::SetVehicleNitroActivated ( CClientEntity& Entity, bool bActivated )
+{
+    RUN_CHILDREN SetVehicleNitroActivated ( **iter, bActivated );
+
+    if ( IS_VEHICLE ( &Entity ) )
+    {
+        CClientVehicle& pVehicle = static_cast < CClientVehicle& > ( Entity );
+        
+        bool bAlreadyActivated;
+        IsVehicleNitroActivated ( pVehicle, bAlreadyActivated );
+
+        if ( bAlreadyActivated != bActivated )
+        {
+            if ( bActivated )
+                pVehicle.SetNitroLevel ( pVehicle.GetNitroLevel () - 1.0001f );
+            else
+                pVehicle.SetNitroLevel ( pVehicle.GetNitroLevel () + 1.0001f );
+        }
+
+        return true;
+    }
+
+    return false;
+}
+
+bool CStaticFunctionDefinitions::GetVehicleNitroCount ( CClientVehicle& Vehicle, char& cCount)
+{
+    cCount = Vehicle.GetNitroCount ();
+    return true;
+}
+
+bool CStaticFunctionDefinitions::SetVehicleNitroCount ( CClientEntity& Entity, char cCount )
+{
+    if ( cCount >= 0 )
+    {
+        RUN_CHILDREN SetVehicleNitroCount ( **iter, cCount );
+
+        if ( IS_VEHICLE ( &Entity ) )
+        {
+            CClientVehicle& pVehicle = static_cast < CClientVehicle& > ( Entity );
+            pVehicle.SetNitroCount ( cCount );
+            return true;
+        }
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::GetVehicleNitroLevel ( CClientVehicle& Vehicle, float& fLevel )
+{
+    fLevel = Vehicle.GetNitroLevel ( );
+
+    if ( fLevel < 0 )
+        fLevel = 1 + fLevel;
+
+    return true;
+}
+
+bool CStaticFunctionDefinitions::SetVehicleNitroLevel ( CClientEntity& Entity, float fLevel )
+{
+    if ( fLevel > 0 && fLevel <= 1 )
+    {
+        RUN_CHILDREN SetVehicleNitroLevel ( **iter, fLevel );
+
+        if ( IS_VEHICLE ( &Entity ) )
+        {
+            CClientVehicle& pVehicle = static_cast < CClientVehicle& > ( Entity );
+            bool bActivated;
+            IsVehicleNitroActivated ( pVehicle, bActivated );
+            if ( bActivated )
+                pVehicle.SetNitroLevel ( fLevel - 1.0001f );
+            else
+                pVehicle.SetNitroLevel ( fLevel );
+
+            return true;
+        }
+    }
+
+    return false;
+}
+
+
 bool CStaticFunctionDefinitions::SetElementCollisionsEnabled ( CClientEntity& Entity, bool bEnabled )
 {
     switch ( Entity.GetType () )

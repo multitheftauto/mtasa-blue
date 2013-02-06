@@ -3161,3 +3161,196 @@ int CLuaFunctionDefs::GetVehicleComponents ( lua_State* luaVM )
     lua_pushboolean ( luaVM, false );
     return 1;
 }
+
+int CLuaFunctionDefs::IsVehicleNitroRecharging ( lua_State* luaVM )
+{
+//  bool isVehicleNitroRecharging ( vehicle theVehicle )
+    CClientVehicle * pVehicle = NULL;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pVehicle );
+
+    if ( !argStream.HasErrors() )
+    {
+        if ( pVehicle )
+        {
+            bool bRecharging;
+
+            if ( CStaticFunctionDefinitions::IsVehicleNitroRecharging ( *pVehicle, bRecharging ) )
+            {
+                lua_pushboolean ( luaVM, bRecharging );
+                return 1;
+            }
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+    
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefs::IsVehicleNitroActivated ( lua_State* luaVM )
+{
+//  bool isVehicleNitroActivated ( vehicle theVehicle )
+    CClientVehicle * pVehicle = NULL;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pVehicle );
+
+    if ( !argStream.HasErrors() )
+    {
+        if ( pVehicle )
+        {
+            bool bActivated;
+
+            if ( CStaticFunctionDefinitions::IsVehicleNitroActivated ( *pVehicle, bActivated ) )
+            {
+                lua_pushboolean ( luaVM, bActivated );
+                return 1;
+            }
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+    
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefs::GetVehicleNitroCount ( lua_State* luaVM )
+{
+//  int getVehicleNitroCount ( vehicle theVehicle )
+    CClientVehicle * pVehicle = NULL;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pVehicle );
+
+    if ( !argStream.HasErrors() )
+    {
+        if ( pVehicle )
+        {
+            char cNitroCount;
+
+            if ( CStaticFunctionDefinitions::GetVehicleNitroCount ( *pVehicle, cNitroCount ) )
+            {
+                lua_pushnumber ( luaVM, cNitroCount );
+                return 1;
+            }
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+    
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefs::GetVehicleNitroLevel ( lua_State* luaVM )
+{
+//  float getVehicleNitroLevel ( vehicle theVehicle )
+    CClientVehicle * pVehicle = NULL;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pVehicle );
+
+    if ( !argStream.HasErrors() )
+    {
+        if ( pVehicle )
+        {
+            float fNitroLevel;
+
+            if ( CStaticFunctionDefinitions::GetVehicleNitroLevel ( *pVehicle, fNitroLevel ) )
+            {
+                lua_pushnumber ( luaVM, fNitroLevel );
+                return 1;
+            }
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefs::SetVehicleNitroActivated ( lua_State* luaVM )
+{
+//  bool setVehicleNitroActivated ( vehicle theVehicle, bool bActivated )
+    CClientEntity * pEntity = NULL; bool bActivated;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pEntity );
+    argStream.ReadBool ( bActivated );
+
+    if ( !argStream.HasErrors() )
+    {
+        if ( pEntity )
+        {
+            if ( CStaticFunctionDefinitions::SetVehicleNitroActivated ( *pEntity, bActivated ) )
+            {
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefs::SetVehicleNitroCount ( lua_State* luaVM )
+{
+//  bool setVehicleNitroCount ( vehicle theVehicle, int iCount )
+    CClientEntity * pEntity = NULL; char cCount;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pEntity );
+    argStream.ReadNumber ( cCount );
+
+    if ( !argStream.HasErrors() )
+    {
+        if ( pEntity )
+        {
+            if ( CStaticFunctionDefinitions::SetVehicleNitroCount ( *pEntity, cCount ) )
+            {
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefs::SetVehicleNitroLevel ( lua_State* luaVM )
+{
+//  bool setVehicleNitroLevel ( vehicle theVehicle, float fLevel )
+    CClientEntity * pEntity = NULL; float fLevel;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pEntity );
+    argStream.ReadNumber ( fLevel );
+
+    if ( !argStream.HasErrors() )
+    {
+        if ( pEntity )
+        {
+            if ( CStaticFunctionDefinitions::SetVehicleNitroLevel ( *pEntity, fLevel ) )
+            {
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}

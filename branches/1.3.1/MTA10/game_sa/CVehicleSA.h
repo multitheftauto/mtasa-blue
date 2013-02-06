@@ -375,7 +375,8 @@ public:
     unsigned char m_nGettingOutFlags;
     unsigned char m_nMaxPassengers;
     unsigned char m_windowsOpenFlags;
-    char m_nNitroBoosts;
+    char m_nNitroBoosts; // +1162
+    //float m_fNitroTimer; // +2212
 
     unsigned char m_nSpecialColModel;
     CEntity *pEntityWeAreOnForVisibilityCheck;
@@ -481,6 +482,7 @@ public:
     RwFrame * pBoot;
     RwFrame * pWindscreen;
     RwFrame * pExhaust;
+
 
     // Hacked in from jb-contribs branch
     RwFrame * pSpecialParts[5]; // 1688
@@ -657,7 +659,10 @@ public:
     unsigned short              GetAdjustablePropertyValue              () { return *reinterpret_cast < unsigned short* > ( reinterpret_cast < unsigned long > ( m_pInterface ) + 2156 ); };
     float                       GetHeliRotorSpeed                       () { return *reinterpret_cast < float* > ( reinterpret_cast < unsigned int > ( m_pInterface ) + 2124 ); };
     unsigned long               GetExplodeTime                          () { return *reinterpret_cast < unsigned long* > ( reinterpret_cast < unsigned int > ( m_pInterface ) + 1240 ); };
-    
+
+    char                        GetNitroCount                           () { return GetVehicleInterface ()->m_nNitroBoosts; }
+    float                       GetNitroLevel                           ();
+
     void                        SetAlwaysLeaveSkidMarks                 ( bool bAlwaysLeaveSkidMarks )      { GetVehicleInterface ()->m_nVehicleFlags.bAlwaysSkidMarks = bAlwaysLeaveSkidMarks; };
     void                        SetCanBeDamaged                         ( bool bCanBeDamaged )              { GetVehicleInterface ()->m_nVehicleFlags.bCanBeDamaged = bCanBeDamaged; };
     void                        SetCanBeTargettedByHeatSeekingMissiles  ( bool bEnabled )                   { GetVehicleInterface ()->m_nVehicleFlags.bVehicleCanBeTargettedByHS = bEnabled; };
@@ -676,6 +681,9 @@ public:
     void                        SetHeliRotorSpeed                       ( float fSpeed )                        { *reinterpret_cast < float* > ( reinterpret_cast < unsigned int > ( m_pInterface ) + 2124 ) = fSpeed; };
     void                        SetExplodeTime                          ( unsigned long ulTime )                { *reinterpret_cast < unsigned long* > ( reinterpret_cast < unsigned int > ( m_pInterface ) + 1240 ) = ulTime; };
     
+    void                        SetNitroCount                           ( char cNitroCount )                { GetVehicleInterface ()->m_nNitroBoosts = cNitroCount; }
+    void                        SetNitroLevel                           ( float fLevel );
+
     float                       GetHealth                       ();
     void                        SetHealth                       ( float fHealth );
 

@@ -332,6 +332,10 @@ public:
     LUA_DECLARE ( GetVehicleHandling );
     LUA_DECLARE ( GetOriginalHandling )
     LUA_DECLARE ( GetVehicleDoorOpenRatio );
+    LUA_DECLARE ( IsVehicleNitroRecharging );
+    LUA_DECLARE ( IsVehicleNitroActivated );
+    LUA_DECLARE ( GetVehicleNitroCount );
+    LUA_DECLARE ( GetVehicleNitroLevel );
 
     // Vehicle set functions
     LUA_DECLARE ( FixVehicle );
@@ -381,6 +385,9 @@ public:
     LUA_DECLARE ( SetVehicleSirens );
     LUA_DECLARE ( GetVehicleSirens );
     LUA_DECLARE ( GetVehicleSirenParams );
+    LUA_DECLARE ( SetVehicleNitroActivated );
+    LUA_DECLARE ( SetVehicleNitroCount );
+    LUA_DECLARE ( SetVehicleNitroLevel );
 
     // Object create funcs
     LUA_DECLARE ( CreateObject );
