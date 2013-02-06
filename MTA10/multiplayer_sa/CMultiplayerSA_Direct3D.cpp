@@ -13,11 +13,13 @@ extern CCoreInterface* g_pCore;
 
 namespace
 {
-    IDirect3D9* ms_pDirect3D = NULL;
-    UINT ms_Adapter = 0;
-    IDirect3DDevice9** ms_ppReturnedDeviceInterface = NULL;
-    D3DPRESENT_PARAMETERS* ms_pPresentationParameters = NULL;
-    HWND ms_hFocusWindow = NULL;
+    IDirect3D9* ms_pDirect3D    = NULL;
+    UINT ms_Adapter             = 0;
+    D3DDEVTYPE ms_DeviceType    = D3DDEVTYPE_HAL;
+    HWND ms_hFocusWindow        = NULL;
+    DWORD ms_BehaviorFlags      = 0;
+    D3DPRESENT_PARAMETERS* ms_pPresentationParameters   = NULL;
+    IDirect3DDevice9** ms_ppReturnedDeviceInterface     = NULL;
 }
 
 ////////////////////////////////////////////////////////////////
@@ -29,12 +31,14 @@ namespace
 ////////////////////////////////////////////////////////////////
 void _cdecl OnPreCreateDevice( IDirect3D9* pDirect3D, UINT Adapter, D3DDEVTYPE DeviceType, HWND hFocusWindow, DWORD* BehaviorFlags, D3DPRESENT_PARAMETERS* pPresentationParameters, IDirect3DDevice9** ppReturnedDeviceInterface )
 {
+    g_pCore->OnPreCreateDevice( pDirect3D, Adapter, DeviceType, hFocusWindow, *BehaviorFlags, pPresentationParameters );
     ms_pDirect3D                 = pDirect3D;
     ms_Adapter                   = Adapter;
-    ms_ppReturnedDeviceInterface = ppReturnedDeviceInterface;
-    ms_pPresentationParameters   = pPresentationParameters;
+    ms_DeviceType                = DeviceType;
     ms_hFocusWindow              = hFocusWindow;
-    g_pCore->OnPreCreateDevice( pDirect3D, Adapter, DeviceType, hFocusWindow, *BehaviorFlags, pPresentationParameters );
+    ms_BehaviorFlags             = *BehaviorFlags;
+    ms_pPresentationParameters   = pPresentationParameters;
+    ms_ppReturnedDeviceInterface = ppReturnedDeviceInterface;
 }
 
 // Hook info
@@ -82,7 +86,7 @@ void _declspec(naked) HOOK_PreCreateDevice()
 ////////////////////////////////////////////////////////////////
 void _cdecl OnPostCreateDevice( HRESULT hResult )
 {
-    g_pCore->OnPostCreateDevice( hResult, ms_pDirect3D, ms_Adapter, ms_hFocusWindow, ms_pPresentationParameters, ms_ppReturnedDeviceInterface );
+    g_pCore->OnPostCreateDevice( hResult, ms_pDirect3D, ms_Adapter, ms_DeviceType, ms_hFocusWindow, ms_BehaviorFlags, ms_pPresentationParameters, ms_ppReturnedDeviceInterface );
 }
 
 // Hook info
