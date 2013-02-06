@@ -413,18 +413,6 @@
 				>
 			</File>
 			<File
-				RelativePath="CDirect3DHook.cpp"
-				>
-			</File>
-			<File
-				RelativePath="CDirect3DHook9.cpp"
-				>
-			</File>
-			<File
-				RelativePath="CDirect3DHookManager.cpp"
-				>
-			</File>
-			<File
 				RelativePath="CDirectInputEvents8.cpp"
 				>
 			</File>
@@ -547,34 +535,6 @@
 			<File
 				RelativePath=".\CPixelsManager_VolumeTexture.cpp"
 				>
-			</File>
-			<File
-				RelativePath="CProxyDirect3D8.cpp"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="0"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="0"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Nightly|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="0"
-					/>
-				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="CProxyDirect3D9.cpp"
@@ -866,18 +826,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\CDirect3DHook.h"
-				>
-			</File>
-			<File
-				RelativePath=".\CDirect3DHook9.h"
-				>
-			</File>
-			<File
-				RelativePath=".\CDirect3DHookManager.h"
-				>
-			</File>
-			<File
 				RelativePath=".\CDirectInputEvents8.h"
 				>
 			</File>
@@ -1003,14 +951,6 @@
 			</File>
 			<File
 				RelativePath=".\CPixelsManager.h"
-				>
-			</File>
-			<File
-				RelativePath=".\CProxyDirect3D9.h"
-				>
-			</File>
-			<File
-				RelativePath=".\CProxyDirect3DDevice8.h"
 				>
 			</File>
 			<File

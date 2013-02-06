@@ -149,7 +149,6 @@ CCore::CCore ( void )
 
     // Create our hook objects.
     //m_pFileSystemHook           = new CFileSystemHook ( );
-    m_pDirect3DHookManager      = new CDirect3DHookManager ( );
     m_pDirectInputHookManager   = new CDirectInputHookManager ( );
     m_pMessageLoopHook          = new CMessageLoopHook ( );
     m_pSetCursorPosHook         = new CSetCursorPosHook ( );
@@ -210,7 +209,6 @@ CCore::~CCore ( void )
     // Delete hooks.
     delete m_pSetCursorPosHook;
     //delete m_pFileSystemHook;
-    delete m_pDirect3DHookManager;
     delete m_pDirectInputHookManager;
     delete m_pMessageLoopHook;
     delete m_pTCPManager;
@@ -716,7 +714,6 @@ void CCore::ApplyHooks ( )
 
     // Create our hooks.
     m_pDirectInputHookManager->ApplyHook ( );
-    //m_pDirect3DHookManager->ApplyHook ( );
     //m_pFileSystemHook->ApplyHook ( );
     m_pSetCursorPosHook->ApplyHook ( );
 
@@ -727,8 +724,18 @@ void CCore::ApplyHooks ( )
 void CCore::ApplyHooks2 ( )
 { 
     WriteDebugEvent ( "CCore::ApplyHooks2" );
-    // Try this one a little later
-    m_pDirect3DHookManager->ApplyHook ( );
+    // Done a little later to get past the loading time required to decrypt the gta 
+    // executable into memory...
+    static bool bLoadedModules = false;
+    if ( !bLoadedModules )
+    {
+        CCore::GetSingleton ( ).CreateNetwork ( );
+        CCore::GetSingleton ( ).CreateGame ( );
+        CCore::GetSingleton ( ).CreateMultiplayer ( );
+        CCore::GetSingleton ( ).CreateXML ( );
+        CCore::GetSingleton ( ).CreateGUI ( );
+        bLoadedModules = true;
+    }
 }
 
 
