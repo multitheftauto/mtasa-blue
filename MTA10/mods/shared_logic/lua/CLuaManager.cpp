@@ -537,6 +537,10 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getVehicleDoorOpenRatio", CLuaFunctionDefs::GetVehicleDoorOpenRatio );
     CLuaCFunctions::AddFunction ( "getVehicleSirens", CLuaFunctionDefs::GetVehicleSirens );
     CLuaCFunctions::AddFunction ( "getVehicleSirenParams", CLuaFunctionDefs::GetVehicleSirenParams );
+    CLuaCFunctions::AddFunction ( "isVehicleNitroRecharging", CLuaFunctionDefs::IsVehicleNitroRecharging );
+    CLuaCFunctions::AddFunction ( "isVehicleNitroActivated", CLuaFunctionDefs::IsVehicleNitroActivated );
+    CLuaCFunctions::AddFunction ( "getVehicleNitroCount", CLuaFunctionDefs::GetVehicleNitroCount );
+    CLuaCFunctions::AddFunction ( "getVehicleNitroLevel", CLuaFunctionDefs::GetVehicleNitroLevel );
 
     // Vehicle set funcs
     CLuaCFunctions::AddFunction ( "createVehicle", CLuaFunctionDefs::CreateVehicle );
@@ -584,6 +588,9 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "setVehicleComponentVisible", CLuaFunctionDefs::SetVehicleComponentVisible );
     CLuaCFunctions::AddFunction ( "getVehicleComponentVisible", CLuaFunctionDefs::GetVehicleComponentVisible );
     CLuaCFunctions::AddFunction ( "getVehicleComponents", CLuaFunctionDefs::GetVehicleComponents );
+    CLuaCFunctions::AddFunction ( "setVehicleNitroActivated", CLuaFunctionDefs::SetVehicleNitroActivated );
+    CLuaCFunctions::AddFunction ( "setVehicleNitroCount", CLuaFunctionDefs::SetVehicleNitroCount );
+    CLuaCFunctions::AddFunction ( "setVehicleNitroLevel", CLuaFunctionDefs::SetVehicleNitroLevel );
 
     // Object create/destroy funcs
     CLuaCFunctions::AddFunction ( "createObject", CLuaFunctionDefs::CreateObject );
