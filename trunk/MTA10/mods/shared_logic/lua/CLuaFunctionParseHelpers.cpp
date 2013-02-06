@@ -418,46 +418,46 @@ SString GetUserDataClassName ( void* ptr, lua_State* luaVM )
 //
 // DxFont/string
 //
-bool MixedReadDxFontString ( CScriptArgReader& argStream, eFontType& outFontType, eFontType defaultFontType, CClientDxFont*& poutDxFontElement )
+void MixedReadDxFontString ( CScriptArgReader& argStream, eFontType& outFontType, eFontType defaultFontType, CClientDxFont*& poutDxFontElement )
 {
     outFontType = FONT_DEFAULT;
     poutDxFontElement = NULL;
     if ( argStream.NextIsNone () )
-        return true;
+        return;
     else
     if ( argStream.NextIsString () )
     {
         SString strFontName;
         argStream.ReadString ( strFontName );
         StringToEnum( strFontName, outFontType );
-        return true;
+        return;
     }
     else
-        return argStream.ReadUserData ( poutDxFontElement );
+        argStream.ReadUserData ( poutDxFontElement );
 }
 
 
 //
 // GuiFont/string
 //
-bool MixedReadGuiFontString ( CScriptArgReader& argStream, SString& strOutFontName, const char* szDefaultFontName, CClientGuiFont*& poutGuiFontElement )
+void MixedReadGuiFontString ( CScriptArgReader& argStream, SString& strOutFontName, const char* szDefaultFontName, CClientGuiFont*& poutGuiFontElement )
 {
     poutGuiFontElement = NULL;
     if ( argStream.NextIsString () || argStream.NextIsNone () )
-        return argStream.ReadString ( strOutFontName, szDefaultFontName );
+        argStream.ReadString ( strOutFontName, szDefaultFontName );
     else
-        return argStream.ReadUserData ( poutGuiFontElement );
+        argStream.ReadUserData ( poutGuiFontElement );
 }
 
 
 //
 // Material/string
 //
-bool MixedReadMaterialString ( CScriptArgReader& argStream, CClientMaterial*& pMaterialElement )
+void MixedReadMaterialString ( CScriptArgReader& argStream, CClientMaterial*& pMaterialElement )
 {
     pMaterialElement = NULL;
     if ( !argStream.NextIsString () )
-        return argStream.ReadUserData ( pMaterialElement );
+        argStream.ReadUserData ( pMaterialElement );
     else
     {
         SString strFilePath;
@@ -483,7 +483,6 @@ bool MixedReadMaterialString ( CScriptArgReader& argStream, CClientMaterial*& pM
                 }
             }
         }
-        return pMaterialElement != NULL;
     }
 }
 
