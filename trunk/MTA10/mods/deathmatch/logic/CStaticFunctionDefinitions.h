@@ -208,6 +208,10 @@ public:
     static bool                         GetVehicleHeadLightColor            ( CClientVehicle& Vehicle, SColor& outColor );
     static bool                         GetVehicleCurrentGear               ( CClientVehicle& Vehicle, unsigned short& currentGear );
     static bool                         GetVehicleVariant                   ( CClientVehicle* pVehicle, unsigned char& ucVariant, unsigned char& ucVariant2 );
+    static bool                         IsVehicleNitroRecharging            ( CClientVehicle& Vehicle, bool& bRecharging );
+    static bool                         IsVehicleNitroActivated             ( CClientVehicle& Vehicle, bool& bActivated );
+    static bool                         GetVehicleNitroCount                ( CClientVehicle& Vehicle, char& cCount );
+    static bool                         GetVehicleNitroLevel                ( CClientVehicle& Vehicle, float& fLevel );
 
     // Vehicle set functions
     static bool                         FixVehicle                          ( CClientEntity& Entity );
@@ -244,6 +248,10 @@ public:
     static bool                         SetVehicleHeadLightColor            ( CClientEntity& Vehicle, const SColor color );
     static bool                         SetVehicleDoorOpenRatio             ( CClientEntity& Vehicle, unsigned char ucDoor, float fRatio, unsigned long ulTime = 0 );
     static bool                         SetVehicleSirens                    ( CClientVehicle& pVehicle, unsigned char ucSirenID, SSirenInfo tSirenInfo );
+    static bool                         SetVehicleNitroActivated            ( CClientEntity& Entity, bool bActivated );
+    static bool                         SetVehicleNitroCount                ( CClientEntity& Entity, char cCount );
+    static bool                         SetVehicleNitroLevel                ( CClientEntity& Entity, float fLevel );
+
 
     // Object get funcs
     static CClientObject*               CreateObject                        ( CResource& Resource, unsigned short usModelID, const CVector& vecPosition, const CVector& vecRotation, bool bLowLod );

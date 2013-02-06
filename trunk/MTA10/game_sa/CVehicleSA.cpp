@@ -2424,3 +2424,16 @@ bool CVehicleSA::GetComponentVisible ( SString vehicleComponent, bool &bOutVisib
     }
     return false;
 }
+
+void CVehicleSA::SetNitroLevel ( float fLevel )
+{
+    DWORD dwThis = ( DWORD ) GetInterface ();
+    MemPutFast < FLOAT > ( dwThis + 0x8A4, fLevel );
+}
+
+float CVehicleSA::GetNitroLevel ()
+{
+    DWORD dwThis = ( DWORD ) GetInterface ();
+    float fLevel = *( FLOAT *)( dwThis + 0x8A4 );
+    return fLevel;
+}

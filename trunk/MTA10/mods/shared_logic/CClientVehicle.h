@@ -338,6 +338,11 @@ public:
     
     float                       GetDirtLevel            ( void );
     void                        SetDirtLevel            ( float fDirtLevel );
+	
+    inline char                 GetNitroCount           ( void )                            { return m_pVehicle->GetNitroCount (); }
+    inline float                GetNitroLevel           ( void )                            { return m_pVehicle->GetNitroLevel (); }
+    inline void                 SetNitroCount           ( char cCount )                     { m_pVehicle->SetNitroCount ( cCount ); }
+    inline void                 SetNitroLevel           ( float fLevel )                    { m_pVehicle->SetNitroLevel ( fLevel ); }
 
     float                       GetDistanceFromGround   ( void );
 
