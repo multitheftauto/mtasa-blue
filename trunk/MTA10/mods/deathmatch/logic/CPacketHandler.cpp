@@ -2238,10 +2238,13 @@ void CPacketHandler::Packet_MapInfo ( NetBitStreamInterface& bitStream )
 
     // Aircraft max velocity
     float fAircraftMaxVelocity = 1.5f;
-    if ( !bitStream.Read ( fAircraftMaxVelocity ) )
-        return;
-    
-    g_pGame->GetWorld ()->SetAircraftMaxVelocity ( fAircraftMaxVelocity );
+    if ( bitStream.Version () >= 0x3E )
+    {
+        if ( !bitStream.Read ( fAircraftMaxVelocity ) )
+            return;
+
+        g_pGame->GetWorld ()->SetAircraftMaxVelocity ( fAircraftMaxVelocity );
+    }
 
     g_pGame->SetJetpackWeaponEnabled( WEAPONTYPE_TEC9, true );
     g_pGame->SetJetpackWeaponEnabled( WEAPONTYPE_MICRO_UZI, true );

@@ -262,7 +262,8 @@ bool CMapInfoPacket::Write ( NetBitStreamInterface& BitStream ) const
 
     BitStream.Write ( m_fAircraftMaxHeight );
 
-    BitStream.Write ( m_fAircraftMaxVelocity );
+    if ( BitStream.Version () >= 0x3E ) 
+        BitStream.Write ( m_fAircraftMaxVelocity );
     
     if ( BitStream.Version () >= 0x30 )
     {

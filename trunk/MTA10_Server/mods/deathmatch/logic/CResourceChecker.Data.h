@@ -118,6 +118,8 @@ namespace
                                          { "setPedWalkingStyle",            "1.3.1-9.04935" },
                                          { "guiGridListSetColumnTitle",     "1.3.1-9.04945" },
                                          { "guiGridListGetColumnTitle",     "1.3.1-9.04945" },
+                                         { "setAircraftMaxVelocity",        "1.3.1-9.04997" },
+                                         { "getAircraftMaxVelocity",        "1.3.1-9.04997" },
                                         };
 
     SVersionItem serverFunctionInitList[] = {
@@ -166,6 +168,8 @@ namespace
                                          { "getJetpackWeaponEnabled",   "1.3.0-9.04351" },
                                          { "sha256",                    "1.3.1-9.04835" },
                                          { "setPedWalkingStyle",        "1.3.1-9.04935" },
+                                         { "setAircraftMaxVelocity",    "1.3.1-9.04997" },
+                                         { "getAircraftMaxVelocity",    "1.3.1-9.04997" },
                                         };
 
 

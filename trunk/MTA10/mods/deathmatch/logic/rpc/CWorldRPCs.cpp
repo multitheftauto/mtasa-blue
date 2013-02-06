@@ -374,9 +374,12 @@ void CWorldRPCs::SetAircraftMaxVelocity ( NetBitStreamInterface& bitStream )
 {
     float fVelocity;
 
-    if ( bitStream.Read ( fVelocity ) )
+    if ( bitStream.Version () >= 0x3E )
     {
-        g_pGame->GetWorld ()->SetAircraftMaxVelocity ( fVelocity );
+        if ( bitStream.Read ( fVelocity ) )
+        {
+            g_pGame->GetWorld ()->SetAircraftMaxVelocity ( fVelocity );
+        }
     }
 }
 
