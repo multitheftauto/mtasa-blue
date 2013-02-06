@@ -10150,13 +10150,17 @@ bool CStaticFunctionDefinitions::SetAircraftMaxHeight ( float fMaxHeight )
 
 bool CStaticFunctionDefinitions::SetAircraftMaxVelocity ( float fVelocity )
 {
-    g_pGame->SetAircraftMaxVelocity ( fVelocity );
-
     CBitStream BitStream;
-    BitStream.pBitStream->Write ( fVelocity );
-    m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_AIRCRAFT_MAXVELOCITY, *BitStream.pBitStream ) );
+    if ( BitStream.Version () >= 0x3E )
+    {
+        g_pGame->SetAircraftMaxVelocity ( fVelocity );
 
-    return true;
+        BitStream.pBitStream->Write ( fVelocity );
+        m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_AIRCRAFT_MAXVELOCITY, *BitStream.pBitStream ) );
+        return true;
+    }
+
+    return false;
 }
 
 bool CStaticFunctionDefinitions::SetOcclusionsEnabled ( bool bEnabled )
