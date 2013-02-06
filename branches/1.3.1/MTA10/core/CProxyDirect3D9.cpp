@@ -75,6 +75,9 @@ namespace
         WriteDebugEvent ( strText );
     }
     #define WriteDebugEvent WriteDebugEventTest
+
+    DWORD BehaviorFlagsOrig = 0;
+    D3DPRESENT_PARAMETERS presentationParametersOrig;
 }
 
 
@@ -87,6 +90,10 @@ namespace
 ////////////////////////////////////////////////
 void CCore::OnPreCreateDevice( IDirect3D9* pDirect3D, UINT Adapter, D3DDEVTYPE DeviceType, HWND hFocusWindow, DWORD& BehaviorFlags, D3DPRESENT_PARAMETERS* pPresentationParameters )
 {
+    // Save original values for later
+    BehaviorFlagsOrig = BehaviorFlags;
+    presentationParametersOrig = *pPresentationParameters;
+
     WriteDebugEvent ( "CCore::OnPreCreateDevice" );
     WriteDebugEvent ( "  Original paramters:" );
     WriteDebugEvent ( ToString( Adapter, DeviceType, hFocusWindow, BehaviorFlags, *pPresentationParameters ) );
@@ -118,8 +125,34 @@ void CCore::OnPreCreateDevice( IDirect3D9* pDirect3D, UINT Adapter, D3DDEVTYPE D
 // Wrap device or log failure
 //
 ////////////////////////////////////////////////
-void CCore::OnPostCreateDevice( HRESULT hResult, IDirect3D9* pDirect3D, UINT Adapter, HWND hFocusWindow, D3DPRESENT_PARAMETERS* pPresentationParameters, IDirect3DDevice9** ppReturnedDeviceInterface )
+void CCore::OnPostCreateDevice( HRESULT hResult, IDirect3D9* pDirect3D, UINT Adapter, D3DDEVTYPE DeviceType, HWND hFocusWindow, DWORD BehaviorFlags, D3DPRESENT_PARAMETERS* pPresentationParameters, IDirect3DDevice9** ppReturnedDeviceInterface )
 {
+    if ( hResult != D3D_OK )
+    {
+        // Handle retry on failure
+        WriteDebugEvent ( SString( "CreateDevice failed #1: %08x", hResult ) );
+
+        // If create failed, try using original presentationParameters
+        WriteDebugEvent ( "  Attempt #2 with orig pp:" );
+        WriteDebugEvent ( ToString( Adapter, DeviceType, hFocusWindow, BehaviorFlags, presentationParametersOrig ) );
+        hResult = pDirect3D->CreateDevice( Adapter, DeviceType, hFocusWindow, BehaviorFlags, &presentationParametersOrig, ppReturnedDeviceInterface );
+
+        if ( hResult != D3D_OK )
+        {
+            WriteDebugEvent ( SString( "CreateDevice failed #2: %08x", hResult ) );
+
+            // If create failed, try using original BehaviorFlags as well
+            WriteDebugEvent ( "  Attempt #3 with orig bf+pp:" );
+            WriteDebugEvent ( ToString( Adapter, DeviceType, hFocusWindow, BehaviorFlagsOrig, presentationParametersOrig ) );
+            hResult = pDirect3D->CreateDevice( Adapter, DeviceType, hFocusWindow, BehaviorFlagsOrig, &presentationParametersOrig, ppReturnedDeviceInterface );
+
+            if ( hResult != D3D_OK )
+            {
+                WriteDebugEvent ( SString( "CreateDevice failed #3: %08x", hResult ) );
+            }
+        }
+    }
+
     // Log graphic card name
     D3DADAPTER_IDENTIFIER9 AdapterIdent;
     pDirect3D->GetAdapterIdentifier ( Adapter, 0, &AdapterIdent );
@@ -163,9 +196,6 @@ void CCore::OnPostCreateDevice( HRESULT hResult, IDirect3D9* pDirect3D, UINT Ada
     }
     else
     {
-        // Handle failure logging
-        WriteDebugEvent ( SString( "CreateDevice failed: %08x", hResult ) );
-
         // Prevent other warnings
         WatchDogCompletedSection ( "L2" );
 

@@ -245,7 +245,7 @@ public:
     void                    AddModelToPersistentCache       ( ushort usModelId );
 
     void                    OnPreCreateDevice               ( IDirect3D9* pDirect3D, UINT Adapter, D3DDEVTYPE DeviceType, HWND hFocusWindow, DWORD& BehaviorFlags, D3DPRESENT_PARAMETERS* pPresentationParameters );
-    void                    OnPostCreateDevice              ( HRESULT hResult, IDirect3D9* pDirect3D, UINT Adapter, HWND hFocusWindow, D3DPRESENT_PARAMETERS* pPresentationParameters, IDirect3DDevice9** ppReturnedDeviceInterface );
+    void                    OnPostCreateDevice              ( HRESULT hResult, IDirect3D9* pDirect3D, UINT Adapter, D3DDEVTYPE DeviceType, HWND hFocusWindow, DWORD BehaviorFlags, D3DPRESENT_PARAMETERS* pPresentationParameters, IDirect3DDevice9** ppReturnedDeviceInterface );
 
 private:
     // Core devices.
