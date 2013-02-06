@@ -1416,6 +1416,29 @@ int CLuaFunctionDefs::SetAircraftMaxHeight ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaFunctionDefs::SetAircraftMaxVelocity ( lua_State* luaVM )
+{
+//  bool setAircraftMaxVelocity ( float fVelocity )
+    float fVelocity;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadNumber ( fVelocity );
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( CStaticFunctionDefinitions::SetAircraftMaxVelocity ( fVelocity ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
 int CLuaFunctionDefs::SetOcclusionsEnabled ( lua_State* luaVM )
 {
 //  bool setOcclusionsEnabled ( bool enabled )
@@ -1517,6 +1540,12 @@ int CLuaFunctionDefs::GetJetpackMaxHeight ( lua_State* luaVM )
 int CLuaFunctionDefs::GetAircraftMaxHeight ( lua_State* luaVM )
 {
     lua_pushnumber ( luaVM, g_pGame->GetWorld ()->GetAircraftMaxHeight ( ) );
+    return 1;
+}
+
+int CLuaFunctionDefs::GetAircraftMaxVelocity ( lua_State* luaVM )
+{
+    lua_pushnumber ( luaVM, g_pGame->GetWorld ()->GetAircraftMaxVelocity ( ) );
     return 1;
 }
 

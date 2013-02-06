@@ -492,6 +492,16 @@ float CWorldSA::GetAircraftMaxHeight ( void )
     return g_pCore->GetMultiplayer ( )->GetAircraftMaxHeight ( );
 }
 
+void CWorldSA::SetAircraftMaxVelocity ( float fVelocity )
+{
+    g_pCore->GetMultiplayer ( )->SetAircraftMaxVelocity ( fVelocity );
+}
+
+float CWorldSA::GetAircraftMaxVelocity ( void )
+{
+    return g_pCore->GetMultiplayer ( )->GetAircraftMaxVelocity ( );
+}
+
 void CWorldSA::SetOcclusionsEnabled ( bool bEnabled )
 {
     if ( !bEnabled )

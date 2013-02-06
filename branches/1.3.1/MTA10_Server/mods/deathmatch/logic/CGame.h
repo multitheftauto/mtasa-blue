@@ -317,6 +317,9 @@ public:
     inline float                GetAircraftMaxHeight        ( void ) { return m_fAircraftMaxHeight; }
     inline void                 SetAircraftMaxHeight        ( float fMaxHeight ) { m_fAircraftMaxHeight = fMaxHeight; }
 
+    inline float                GetAircraftMaxVelocity      ( void ) { return m_fAircraftMaxVelocity; }
+    inline void                 SetAircraftMaxVelocity      ( float fVelocity ) { m_fAircraftMaxVelocity = fVelocity; m_fAircraftMaxVelocity_Sq = fVelocity * fVelocity; }
+
     inline bool                 GetOcclusionsEnabled        ( void ) { return m_bOcclusionsEnabled ; }
     inline void                 SetOcclusionsEnabled        ( bool bOcclusionsEnabled ) { m_bOcclusionsEnabled = bOcclusionsEnabled; }
 
@@ -464,6 +467,8 @@ private:
     float                       m_fGameSpeed;
     float                       m_fJetpackMaxHeight;
     float                       m_fAircraftMaxHeight;
+    float                       m_fAircraftMaxVelocity;
+    float                       m_fAircraftMaxVelocity_Sq;
     bool                        m_bOcclusionsEnabled;
 
     unsigned char               m_ucTrafficLightState;

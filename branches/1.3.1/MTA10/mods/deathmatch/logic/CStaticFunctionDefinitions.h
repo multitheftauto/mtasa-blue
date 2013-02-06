@@ -504,6 +504,7 @@ public:
     static bool                         RestoreWindVelocity                 ( void );
     static bool                         GetWindVelocity                     ( float& fX, float& fY, float& fZ );
     static bool                         SetAircraftMaxHeight                ( float fHeight );
+    static bool                         SetAircraftMaxVelocity              ( float fVelocity );
     static bool                         SetOcclusionsEnabled                ( bool bEnabled );
     static bool                         CreateSWATRope                      ( CVector vecPosition, DWORD dwDuration );
     static bool                         SetBirdsEnabled                     ( bool bEnabled );

@@ -44,14 +44,15 @@ using std::vector;
 extern CClientGame* g_pClientGame;
 extern int g_iDamageEventLimit;
 
-#define DEFAULT_GRAVITY            0.008f
-#define DEFAULT_GAME_SPEED         1.0f
-#define DEFAULT_BLUR_LEVEL         36
-#define DEFAULT_JETPACK_MAXHEIGHT  100
-#define DEFAULT_AIRCRAFT_MAXHEIGHT 800
-#define DEFAULT_MINUTE_DURATION    1000
-#define DOUBLECLICK_TIMEOUT        330
-#define DOUBLECLICK_MOVE_THRESHOLD 10.0f
+#define DEFAULT_GRAVITY              0.008f
+#define DEFAULT_GAME_SPEED           1.0f
+#define DEFAULT_BLUR_LEVEL           36
+#define DEFAULT_JETPACK_MAXHEIGHT    100
+#define DEFAULT_AIRCRAFT_MAXHEIGHT   800
+#define DEFAULT_AIRCRAFT_MAXVELOCITY 1.5f
+#define DEFAULT_MINUTE_DURATION      1000
+#define DOUBLECLICK_TIMEOUT          330
+#define DOUBLECLICK_MOVE_THRESHOLD   10.0f
 
 CClientGame::CClientGame ( bool bLocalPlay )
 {
@@ -5024,6 +5025,9 @@ void CClientGame::ResetMapInfo ( void )
 
     // Aircraft max height
     g_pGame->GetWorld ()->SetAircraftMaxHeight ( DEFAULT_AIRCRAFT_MAXHEIGHT );
+
+    // Aircraft max velocity
+    g_pGame->GetWorld ()->SetAircraftMaxVelocity ( DEFAULT_AIRCRAFT_MAXVELOCITY );
 
     // Disable the change of any player stats
     g_pMultiplayer->SetLocalStatsStatic ( true );

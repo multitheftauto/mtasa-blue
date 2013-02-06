@@ -5675,6 +5675,17 @@ bool CStaticFunctionDefinitions::SetAircraftMaxHeight ( float fHeight )
     return false;
 }
 
+bool CStaticFunctionDefinitions::SetAircraftMaxVelocity ( float fVelocity )
+{
+    if ( fVelocity >= 0 )
+    {
+        g_pGame->GetWorld ()->SetAircraftMaxVelocity ( fVelocity );
+        return true;
+    }
+
+    return false;
+}
+
 bool CStaticFunctionDefinitions::SetOcclusionsEnabled ( bool bEnabled )
 {
     g_pGame->GetWorld ()->SetOcclusionsEnabled ( bEnabled );

@@ -9620,6 +9620,12 @@ bool CStaticFunctionDefinitions::GetAircraftMaxHeight ( float& fMaxHeight )
     return true;
 }
 
+bool CStaticFunctionDefinitions::GetAircraftMaxVelocity ( float& fVelocity )
+{
+    fVelocity = g_pGame->GetAircraftMaxVelocity ( );
+    return true;
+}
+
 bool CStaticFunctionDefinitions::GetOcclusionsEnabled ( bool& bEnabled )
 {
     bEnabled = g_pGame->GetOcclusionsEnabled ( );
@@ -9785,6 +9791,21 @@ bool CStaticFunctionDefinitions::SetAircraftMaxHeight ( float fMaxHeight )
     m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_AIRCRAFT_MAXHEIGHT, *BitStream.pBitStream ) );
 
     return true;
+}
+
+bool CStaticFunctionDefinitions::SetAircraftMaxVelocity ( float fVelocity )
+{
+    CBitStream BitStream;
+    if ( BitStream.pBitStream->Version () >= 0x3E )
+    {
+        g_pGame->SetAircraftMaxVelocity ( fVelocity );
+
+        BitStream.pBitStream->Write ( fVelocity );
+        m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_AIRCRAFT_MAXVELOCITY, *BitStream.pBitStream ) );
+        return true;
+    }
+
+    return false;
 }
 
 bool CStaticFunctionDefinitions::SetOcclusionsEnabled ( bool bEnabled )

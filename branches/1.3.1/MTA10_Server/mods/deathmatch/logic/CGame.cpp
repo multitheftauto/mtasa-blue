@@ -204,6 +204,7 @@ void CGame::ResetMapInfo ( void )
     m_fGameSpeed = 1.0f;
     m_fJetpackMaxHeight = 100;
     m_fAircraftMaxHeight = 800;
+    m_fAircraftMaxVelocity = 1.5f;
 
     if ( m_pWaterManager )
     {

@@ -500,6 +500,9 @@ CMultiplayerSA::CMultiplayerSA()
 
     m_fAircraftMaxHeight = 800.0f;
 
+    m_fAircraftMaxVelocity = 1.5f;
+    m_fAircraftMaxVelocity_Sq = m_fAircraftMaxVelocity * m_fAircraftMaxVelocity;
+
     m_bHeatHazeEnabled = true;
     m_bHeatHazeCustomized = false;
 }
@@ -1350,6 +1353,12 @@ void CMultiplayerSA::InitHooks()
     // Aircraft Max Height checks are at 0x6D2614 and 0x6D2625 edit the check to use our own float.
     MemPut ( 0x6D2614, &m_fAircraftMaxHeight );
     MemPut ( 0x6D2625, &m_fAircraftMaxHeight );
+
+    // Aircraft Max Velocity
+    MemPut( 0x6DADDF, &m_fAircraftMaxVelocity_Sq );
+    MemPut( 0x6DADEF, &m_fAircraftMaxVelocity );
+    MemPut( 0x6DADF8, &m_fAircraftMaxVelocity );
+    MemPut( 0x6DAE01, &m_fAircraftMaxVelocity );
 
     InitHooks_CrashFixHacks ();
 
