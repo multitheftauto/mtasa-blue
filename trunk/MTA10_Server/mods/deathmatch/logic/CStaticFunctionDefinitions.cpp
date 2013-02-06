@@ -10151,7 +10151,7 @@ bool CStaticFunctionDefinitions::SetAircraftMaxHeight ( float fMaxHeight )
 bool CStaticFunctionDefinitions::SetAircraftMaxVelocity ( float fVelocity )
 {
     CBitStream BitStream;
-    if ( BitStream.Version () >= 0x3E )
+    if ( BitStream.pBitStream->Version () >= 0x3E )
     {
         g_pGame->SetAircraftMaxVelocity ( fVelocity );
 
