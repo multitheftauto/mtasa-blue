@@ -36,7 +36,8 @@ public:
         : std::string ( szText ? szText : "" )
     { }
 
-    explicit SString ( const char* szFormat, ... )
+    template < class T >
+    SString ( const char* szFormat, T, ... )
         : std::string ()
     {
         if ( szFormat )
