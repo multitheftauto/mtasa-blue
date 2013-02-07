@@ -344,6 +344,8 @@ public:
     inline void                 SetNitroCount           ( char cCount )                     { m_pVehicle->SetNitroCount ( cCount ); }
     inline void                 SetNitroLevel           ( float fLevel )                    { m_pVehicle->SetNitroLevel ( fLevel ); }
 
+    bool                        IsNitroInstalled        ( void );
+
     float                       GetDistanceFromGround   ( void );
 
     void                        SetInWater              ( bool bState )                     { m_bIsInWater = bState; }
@@ -596,6 +598,8 @@ protected:
     std::list < CClientProjectile* > m_Projectiles;
 
     bool                        m_bIsInWater;
+
+    bool                        m_bNitroActivated;
 
     CVector                     m_vecGravity;
     SColor                      m_HeadLightColor;

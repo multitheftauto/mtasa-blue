@@ -2309,7 +2309,7 @@ bool CKeyBinds::SaveToXML ( CXMLNode* pMainNode )
 
 void CKeyBinds::LoadDefaultBinds ( void )
 {
-    Clear ();
+    ClearCommandsAndControls ();
     
     LoadControlsFromGTA ();
     LoadDefaultCommands ( true );

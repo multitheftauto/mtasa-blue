@@ -80,6 +80,13 @@ bool CVehicleNames::IsValidModel ( unsigned long ulModel )
 }
 
 
+bool CVehicleNames::IsModelTrailer ( unsigned long ulModel )
+{
+    // IsValidModel excludes trailers, so we need the ability to check separately if it is a trailer
+    return ( ulModel == 435 || ulModel == 450 || ulModel == 591 || ulModel == 606 || ulModel == 607 || ulModel == 584 || ulModel == 608 || ulModel == 610 || ulModel == 611 );
+}
+
+
 const char* CVehicleNames::GetVehicleName ( unsigned long ulModel )
 {
     // Valid?
@@ -114,7 +121,7 @@ unsigned int CVehicleNames::GetVehicleModel ( const char* szName )
 const char* CVehicleNames::GetVehicleTypeName ( unsigned long ulModel )
 {
     // Check whether the model is valid
-    if ( IsValidModel ( ulModel ) && ( ( ulModel - 400 ) < NUMELMS( ucVehicleTypes ) ) )
+    if ( ( IsValidModel ( ulModel ) || IsModelTrailer ( ulModel ) ) && ( ( ulModel - 400 ) < NUMELMS( ucVehicleTypes ) ) )
     {
         int iVehicleType = ucVehicleTypes [ulModel - 400];
         return VehicleTypes [iVehicleType].szName;
