@@ -19,6 +19,7 @@ class CVehicleNames
 {
 public:
     static bool                     IsValidModel            ( unsigned long ulModel );
+    static bool                     IsModelTrailer          ( unsigned long ulModel );
 
     static const char*              GetVehicleName          ( unsigned long ulModel );
     static unsigned int             GetVehicleModel         ( const char* szName );

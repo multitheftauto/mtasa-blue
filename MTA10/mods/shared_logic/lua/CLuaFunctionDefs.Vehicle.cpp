@@ -35,7 +35,7 @@ int CLuaFunctionDefs::GetVehicleType ( lua_State* luaVM )
     else
         m_pScriptDebugging->LogBadType ( luaVM );
 
-    if ( ucModel >= 400 && ucModel < 610 )
+    if ( ucModel >= 400 && ucModel <= 611 )
         lua_pushstring ( luaVM, CVehicleNames::GetVehicleTypeName ( ucModel ) );
     else
         lua_pushboolean ( luaVM, false );
