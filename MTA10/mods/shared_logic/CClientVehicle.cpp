@@ -1972,7 +1972,7 @@ void CClientVehicle::SetOverrideLights ( unsigned char ucOverrideLights )
 }
 
 
-bool CClientVehicle::HasNitroInstalled ( void )
+bool CClientVehicle::IsNitroInstalled ( void )
 {
     CVehicleUpgrades* pUpgrades = this->GetUpgrades ();
     if ( pUpgrades )
