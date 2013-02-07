@@ -1972,6 +1972,26 @@ void CClientVehicle::SetOverrideLights ( unsigned char ucOverrideLights )
 }
 
 
+bool CClientVehicle::HasNitroInstalled ( void )
+{
+    CVehicleUpgrades* pUpgrades = this->GetUpgrades ();
+    if ( pUpgrades )
+    {
+        for ( int i = 1008; i <= 1010; i++ )
+        {
+            if ( pUpgrades->HasUpgrade ( i ) )
+                return true;
+
+        }
+
+        return false;
+    }
+
+    return false;
+}
+
+
+
 void CClientVehicle::StreamedInPulse ( void )
 {
     // Make sure the vehicle doesn't go too far down
@@ -2112,6 +2132,25 @@ void CClientVehicle::StreamedInPulse ( void )
 
             // Update our streaming position
             UpdateStreamPosition ( vecPosition );
+        }
+
+        // Check installed nitro
+        if ( IsNitroInstalled () )
+        {
+            char iNitroCount = m_pVehicle->GetNitroCount ();
+            if ( iNitroCount > 0 )
+            {
+                // Nitro state changed?
+                bool bActivated = ( m_pVehicle->GetNitroLevel () < 0 );
+                if ( m_bNitroActivated != bActivated )
+                {
+                    CLuaArguments Arguments;
+                    Arguments.PushBoolean ( bActivated );
+	                this->CallEvent ( "onClientVehicleNitroStateChange", Arguments, false );
+                }
+
+                m_bNitroActivated = bActivated;
+            }
         }
 
         // Update doors
