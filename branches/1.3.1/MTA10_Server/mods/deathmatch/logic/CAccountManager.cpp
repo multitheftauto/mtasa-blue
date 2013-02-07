@@ -485,8 +485,9 @@ void CAccountManager::Save ( CAccount* pAccount, bool bCheckForErrors )
     SString strPassword = pAccount->GetPasswordHash();
     SString strIP = pAccount->GetIP();
     SString strSerial = pAccount->GetSerial();
+    unsigned int iID = pAccount->GetID();
 
-    m_pDatabaseManager->Execf ( m_hDbConnection, "INSERT OR IGNORE INTO accounts (name, ip, serial, password) VALUES(?,?,?,?)", SQLITE_TEXT, strName.c_str (), SQLITE_TEXT, strIP.c_str (), SQLITE_TEXT, strSerial.c_str (), SQLITE_TEXT, strPassword.c_str () );
+    m_pDatabaseManager->Execf ( m_hDbConnection, "INSERT OR IGNORE INTO accounts (id, name, ip, serial, password) VALUES(?,?,?,?,?)", SQLITE_INTEGER, iID, SQLITE_TEXT, strName.c_str (), SQLITE_TEXT, strIP.c_str (), SQLITE_TEXT, strSerial.c_str (), SQLITE_TEXT, strPassword.c_str () );
 
     if ( bCheckForErrors )
     {
