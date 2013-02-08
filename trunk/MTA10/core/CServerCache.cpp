@@ -35,6 +35,7 @@ namespace
         CValueInt       nMaxPlayers;    // Maximum players
         CValueInt       nPing;          // Ping time
         CValueInt       bPassworded;    // Password protected
+        CValueInt       bKeepFlag;
         CValueInt       uiCacheNoReplyCount;
         SString         strName;        // Server name
         SString         strGameMode;    // Game mode
@@ -165,6 +166,7 @@ bool CServerCache::LoadServerCache ( void )
         if ( const SString* pString = MapFind ( item.attributeMap, "nMaxPlayers" ) )    info.nMaxPlayers.SetFromString ( *pString );
         if ( const SString* pString = MapFind ( item.attributeMap, "nPing" ) )          info.nPing.SetFromString ( *pString );
         if ( const SString* pString = MapFind ( item.attributeMap, "bPassworded" ) )    info.bPassworded.SetFromString ( *pString );
+        if ( const SString* pString = MapFind ( item.attributeMap, "bKeepFlag" ) )      info.bKeepFlag.SetFromString ( *pString );
         if ( const SString* pString = MapFind ( item.attributeMap, "uiNoReplyCount" ) ) info.uiCacheNoReplyCount.SetFromString ( *pString );
         if ( const SString* pString = MapFind ( item.attributeMap, "strName" ) )        info.strName    = *pString;
         if ( const SString* pString = MapFind ( item.attributeMap, "strGameMode" ) )    info.strGameMode = *pString;
@@ -277,6 +279,7 @@ void CServerCache::StaticSaveServerCache ( void )
         MapSet ( item.attributeMap, "nMaxPlayers",      info.nMaxPlayers.ToString () );
         MapSet ( item.attributeMap, "nPing",            info.nPing.ToString () );
         MapSet ( item.attributeMap, "bPassworded",      info.bPassworded.ToString () );
+        MapSet ( item.attributeMap, "bKeepFlag",        info.bKeepFlag.ToString () );
         MapSet ( item.attributeMap, "uiNoReplyCount",   info.uiCacheNoReplyCount.ToString () );
         MapSet ( item.attributeMap, "strName",          info.strName );
         MapSet ( item.attributeMap, "strGameMode",      info.strGameMode );
@@ -315,6 +318,7 @@ void CServerCache::GetServerCachedInfo ( CServerListItem* pItem )
             pItem->nMaxPlayers      = pInfo->nMaxPlayers;
             pItem->nPing            = pInfo->nPing;
             pItem->bPassworded      = ( pInfo->bPassworded != 0 );
+            pItem->bKeepFlag        = ( pInfo->bKeepFlag != 0 );
             pItem->strName          = pInfo->strName;
             pItem->strGameMode      = pInfo->strGameMode;
             pItem->strMap           = pInfo->strMap;
@@ -359,6 +363,7 @@ void CServerCache::SetServerCachedInfo ( const CServerListItem* pItem )
          && pInfo->nMaxPlayers          == pItem->nMaxPlayers
          //&& pInfo->nPing                == pItem->nPing
          && ( pInfo->bPassworded != 0 ) == pItem->bPassworded
+         && ( pInfo->bKeepFlag != 0 )   == pItem->bKeepFlag
          && pInfo->strName              == pItem->strName
          && pInfo->strGameMode          == pItem->strGameMode
          //&& pInfo->strMap               == pItem->strMap
@@ -373,6 +378,7 @@ void CServerCache::SetServerCachedInfo ( const CServerListItem* pItem )
     pInfo->nMaxPlayers      = pItem->nMaxPlayers;
     pInfo->nPing            = pItem->nPing;
     pInfo->bPassworded      = pItem->bPassworded;
+    pInfo->bKeepFlag        = pItem->bKeepFlag;
     pInfo->strName          = pItem->strName;
     pInfo->strGameMode      = pItem->strGameMode;
     pInfo->strMap           = pItem->strMap;
