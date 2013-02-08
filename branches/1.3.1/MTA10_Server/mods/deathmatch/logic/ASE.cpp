@@ -90,6 +90,9 @@ bool ASE::SetPortEnabled ( bool bInternetEnabled, bool bLanEnabled )
         m_Socket = INVALID_SOCKET;
     }
 
+    if ( !bPortEnableReq )
+        return true;
+
     // Start new thingmy
     m_SockAddr.sin_family = AF_INET;         
     m_SockAddr.sin_port = htons ( m_usPort );
@@ -131,6 +134,9 @@ bool ASE::SetPortEnabled ( bool bInternetEnabled, bool bLanEnabled )
 
 void ASE::DoPulse ( void )
 {
+    if ( m_Socket == INVALID_SOCKET )
+        return;
+
     sockaddr_in SockAddr;
 #ifndef WIN32
     socklen_t nLen = sizeof ( sockaddr );

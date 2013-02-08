@@ -181,8 +181,8 @@ CGame::CGame ( void )
 
     m_bCloudsEnabled = true;
 
-    m_llLastLongAnnouceTime = 0;
-    m_llLastShortAnnouceTime = 0;
+    m_llLastAnnounceTime = 0;
+    m_llLastPushTime = 0;
     m_pOpenPortsTester = NULL;
 
     m_bTrafficLightsLocked = false;
@@ -822,7 +822,7 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     if ( m_pMainConfig->GetSerialVerificationEnabled () )
         m_pASE->SetRuleValue ( "SerialVerification", "yes" );
     ApplyAseSetting ();
-    PulseMasterServerAnnounce ();
+    PulseMasterServerAnnounce ( true );
 
 
     // Now load the rest of the config
@@ -889,74 +889,68 @@ void CGame::StartOpenPortsTest ( void )
 
 
 // Remind master server once every 24 hrs
-void CGame::PulseMasterServerAnnounce ( void )
+void CGame::PulseMasterServerAnnounce ( bool bIsInitialAnnounce )
 {
-    if ( !m_pMainConfig->GetAseAnnounceEnabled () )
-        return;
-
     long long llTickCountNow = GetTickCount64_ ();
-    bool bDoAnnounce = false;
-    bool bIsLongAnnouce = false;
-    bool bFirstPass = false;
+    bool bIsTimeForAnnounce = false;
+    bool bIsTimeForPush = false;
 
-    if ( m_llLastLongAnnouceTime == 0 || llTickCountNow - m_llLastLongAnnouceTime > 1000 * 60 * 60 * 24 )   // 24 hrs
+    if ( m_pMainConfig->GetAseInternetListenEnabled() &&
+        ( bIsInitialAnnounce || m_llLastAnnounceTime == 0 || llTickCountNow - m_llLastAnnounceTime > 1000 * 60 * 60 * 24 ) )   // 24 hrs
     {
-        bFirstPass = m_llLastLongAnnouceTime == 0;
-        bIsLongAnnouce = true;
-        bDoAnnounce = true;
-        m_llLastLongAnnouceTime = llTickCountNow;
+        bIsTimeForAnnounce = true;
+        m_llLastAnnounceTime = llTickCountNow;
     }
-
-    if ( m_llLastShortAnnouceTime == 0 || llTickCountNow - m_llLastShortAnnouceTime > 1000 * 60 * 10 ) // 10 mins
+    else
+    if ( m_pMainConfig->GetAseInternetPushEnabled() &&
+        ( m_llLastPushTime == 0 || llTickCountNow - m_llLastPushTime > 1000 * 60 * 10 ) ) // 10 mins
     {
-        bDoAnnounce = true;
-        m_llLastShortAnnouceTime = llTickCountNow;
+        bIsTimeForPush = true;
+        m_llLastPushTime = llTickCountNow;
     }
-
-    // Time yet?
-    if ( !bDoAnnounce )
+    else
         return;
 
-    // Only do short annouce if ase port is disabled
-    if ( !bIsLongAnnouce && m_pMainConfig->GetAsePortEnabled () )
-        return;
 
     const SString strServerIP = m_pMainConfig->GetServerIP ();
     unsigned short usServerPort = m_pMainConfig->GetServerPort ();
     unsigned short usHTTPPort = m_pMainConfig->GetHTTPPort ();
-    uint uiPlayerCount = 0;
-    uint uiMaxPlayerCount = 32;
+    uint uiPlayerCount = m_pPlayerManager->Count ();
+    uint uiMaxPlayerCount = m_pMainConfig->GetMaxPlayers();
     bool bPassworded = m_pMainConfig->HasPassword ();
-    bool bAsePortEnabled = m_pMainConfig->GetAsePortEnabled ();
+    SString strAseMode = m_pMainConfig->GetSetting( "ase" );
+    bool bAseLanListen = m_pMainConfig->GetAseLanListenEnabled();
 
     SString strVersion ( "%d.%d.%d-%d.%05d", MTASA_VERSION_MAJOR, MTASA_VERSION_MINOR, MTASA_VERSION_MAINTENANCE, MTASA_VERSION_TYPE, MTASA_VERSION_BUILD );
-    SString strExtra ( "%d_%d_%d_%d", uiPlayerCount, uiMaxPlayerCount, bPassworded, bAsePortEnabled );
+    SString strExtra ( "%d_%d_%d_%s_%d", uiPlayerCount, uiMaxPlayerCount, bPassworded, *strAseMode, bAseLanListen );
 
     struct {
         SString strDesc;
         SString strURL;
-        bool bRepeat;
+        bool bAcceptsPush;
+        bool bDoReminders;
     } masterServerList[] = {
-                             { "Querying game-monitor.com master server... ", SString ( QUERY_URL_GAME_MONITOR, usServerPort + 123 ), false },
-                             { "Querying backup master server... ", SString ( "http://master.mtasa.com/ase/add.php?g=%u&a=%u&h=%u&v=%s&x=%s", usServerPort, usServerPort + 123, usHTTPPort, *strVersion, *strExtra ), true },
+                             { "Querying game-monitor.com master server... ", SString ( QUERY_URL_GAME_MONITOR, usServerPort + 123 ), false, false },
+                             { "Querying backup master server... ", SString ( "h" "ttp://master.mtasa.com/ase/add.php?g=%u&a=%u&h=%u&v=%s&x=%s&ip=%s", usServerPort, usServerPort + 123, usHTTPPort, *strVersion, *strExtra, *strServerIP ), true, true },
                            };
 
     for ( uint i = 0 ; i < NUMELMS( masterServerList ) ; i++ )
     {
         const SString& strDesc = masterServerList[i].strDesc;
         const SString& strURL = masterServerList[i].strURL;
-        bool bRepeat = masterServerList[i].bRepeat;
+        bool bServerAcceptsPush = masterServerList[i].bAcceptsPush;
+        bool bServerAcceptsReminders = masterServerList[i].bDoReminders;
 
-        // Don't repeat request for some servers
-        if ( !bFirstPass && !bRepeat )
-            continue;
-
-        // Only log on first pass
-        if ( bFirstPass )
-            CLogger::LogPrint ( strDesc );
-
-        if ( bIsLongAnnouce )
+        if ( bIsTimeForAnnounce )
         {
+            // Only log on first pass
+            if ( bIsInitialAnnounce )
+                CLogger::LogPrint ( strDesc );
+
+            // Don't repeat announce for some servers
+            if ( !bIsInitialAnnounce && !bServerAcceptsReminders )
+                continue;
+
             // Send request
             CTCPImpl * pTCP = new CTCPImpl ();
             pTCP->Initialize ();
@@ -965,7 +959,7 @@ void CGame::PulseMasterServerAnnounce ( void )
             CHTTPResponse * response = request->Send ( pTCP );
 
             // Only log on first pass
-            if ( bFirstPass )
+            if ( bIsInitialAnnounce )
             {
                 if ( !response )
                     CLogger::LogPrintfNoStamp ( "failed! (Not available)\n" );
@@ -986,8 +980,8 @@ void CGame::PulseMasterServerAnnounce ( void )
             delete request;
         }
 
-        // Send extra data if ase port disabled
-        if ( !m_pMainConfig->GetAsePortEnabled () && bRepeat )
+        // Send extra data if required
+        if ( bIsTimeForPush && bServerAcceptsPush )
         {
             SString strPostContent = m_pASE->QueryLight ();
             bool bPostContentBinary = true;
