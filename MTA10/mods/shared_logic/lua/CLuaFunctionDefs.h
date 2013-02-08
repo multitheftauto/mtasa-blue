@@ -97,6 +97,8 @@ public:
     LUA_DECLARE ( GetSoundMetaTags );
     LUA_DECLARE ( SetSoundEffectEnabled );
     LUA_DECLARE ( GetSoundEffects );
+    LUA_DECLARE ( SetSoundPan );
+    LUA_DECLARE ( GetSoundPan );
 
     // Output functions
     LUA_DECLARE ( OutputConsole );

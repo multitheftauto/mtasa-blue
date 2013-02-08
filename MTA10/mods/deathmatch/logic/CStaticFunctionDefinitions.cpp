@@ -8004,3 +8004,15 @@ bool CStaticFunctionDefinitions::RemovePedFromVehicle ( CClientPed* pPed )
 
     return false;
 }
+
+
+void CStaticFunctionDefinitions::SetSoundPan ( CClientSound& pSound, float fPan )
+{
+    pSound.SetPan ( fPan );
+}
+
+
+void CStaticFunctionDefinitions::GetSoundPan ( CClientSound& pSound, float& fPan )
+{
+    fPan = pSound.GetPan ();
+}

@@ -76,6 +76,9 @@ public:
 
     SString                 GetMetaTags             ( const SString& strFormat );
 
+    void                    SetPan                  ( float fPan );
+    float                   GetPan                  ( void );
+
     bool                    SetFxEffect             ( uint uiFxEffect, bool bEnable );
     bool                    IsFxEffectEnabled       ( uint uiFxEffect );
 
@@ -119,6 +122,7 @@ private:
     float       m_fSampleRate;
     bool        m_bReversed;
     bool        m_bPan;
+    float       m_fPan;
 
     // Saved state
     bool        m_bPaused;

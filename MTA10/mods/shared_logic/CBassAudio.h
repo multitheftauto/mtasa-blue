@@ -69,10 +69,12 @@ public:
     void                    GetTempoValues          ( float &fSampleRate, float &fTempo, float &fPitch, bool &bReverse )        { fSampleRate = m_fSampleRate; fTempo = m_fTempo; fPitch = m_fPitch; bReverse = m_bReversed; };
     void                    SetReversed             ( bool bReversed )                                          { m_bReversed = bReversed; };
     bool                    GetPanEnabled           ( void )                                                    { return m_bPan; };
-    void                    SetPanEnabled           ( bool bPan )                                               { m_bPan = bPan; };
+    void                    SetPanEnabled           ( bool bPan )                                               { m_bPan = bPan; m_fPan = 0.0f; };
     void                    SetFxEffects            ( int* pEnabledEffects, uint iNumElements );
     SString                 GetMetaTags             ( const SString& strFormat );
     bool                    IsFinished              ( void );
+    float                   GetPan                  ( void );
+    void                    SetPan                  ( float fPan );
 
     void                    DoPulse                 ( const CVector& vecPlayerPosition, const CVector& vecCameraPosition, const CVector& vecLookAt );
     void                    AddQueuedEvent          ( eSoundEventType type, const SString& strString, double dNumber = 0.0, bool bBool = false );
@@ -114,6 +116,7 @@ private:
     bool                    m_bPaused;
     bool                    m_bReversed;
     bool                    m_bPan;
+    float                   m_fPan;
     float                   m_fDefaultFrequency;
     float                   m_fVolume;
     float                   m_fMinDistance;
