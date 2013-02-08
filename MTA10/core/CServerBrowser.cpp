@@ -831,6 +831,10 @@ void CServerBrowser::UpdateServerList ( ServerBrowserType Type, bool bClearServe
     {
         CServerListItem * pServer = *it;
 
+        // Find info from server cache for favourites and recent
+        if ( Type == ServerBrowserType::FAVOURITES || Type == ServerBrowserType::RECENTLY_PLAYED )
+            GetServerCache ()->GetServerCachedInfo ( pServer );
+
         // Add/update/remove the item to the list
         if ( pServer->revisionInList[ Type ] != pServer->uiRevision || bClearServerList )
         {
