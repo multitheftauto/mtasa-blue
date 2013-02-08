@@ -1008,3 +1008,49 @@ int CLuaFunctionDefs::ResetWorldSounds ( lua_State* luaVM )
     lua_pushboolean ( luaVM, false );
     return 1;
 }
+
+
+int CLuaFunctionDefs::SetSoundPan ( lua_State* luaVM )
+{
+//  setSoundPan ( element theSound, float pan )
+    CClientSound* pSound; float fPan;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pSound );
+    argStream.ReadNumber ( fPan );
+
+    if ( !argStream.HasErrors () )
+    {
+        CStaticFunctionDefinitions::SetSoundPan ( *pSound, fPan );
+        lua_pushboolean ( luaVM, true );
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::GetSoundPan ( lua_State* luaVM )
+{
+//  getSoundPan ( element theSound )
+    CClientSound* pSound;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pSound );
+
+    if ( !argStream.HasErrors () )
+    {
+        float fPan = 0.0;
+        CStaticFunctionDefinitions::GetSoundPan ( *pSound, fPan );
+        lua_pushnumber ( luaVM, fPan );
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}

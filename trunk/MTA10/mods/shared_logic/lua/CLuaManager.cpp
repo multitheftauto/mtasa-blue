@@ -382,6 +382,8 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getSoundMetaTags", CLuaFunctionDefs::GetSoundMetaTags );
     CLuaCFunctions::AddFunction ( "setSoundEffectEnabled", CLuaFunctionDefs::SetSoundEffectEnabled );
     CLuaCFunctions::AddFunction ( "getSoundEffects", CLuaFunctionDefs::GetSoundEffects );
+    CLuaCFunctions::AddFunction ( "setSoundPan", CLuaFunctionDefs::SetSoundPan );
+    CLuaCFunctions::AddFunction ( "getSoundPan", CLuaFunctionDefs::GetSoundPan );
 
     // Radio funcs
     CLuaCFunctions::AddFunction ( "setRadioChannel", CLuaFunctionDefs::SetRadioChannel );

@@ -28,6 +28,7 @@ CClientSound::CClientSound ( CClientManager* pManager, ElementID ID ) : ClassIni
     m_fMaxDistance = 20.0f;
     m_fPlaybackSpeed = 1.0f;
     m_bPan = true;
+    m_fPan = 0.0f;
 }
 
 CClientSound::~CClientSound ( void )
@@ -134,6 +135,7 @@ bool CClientSound::Create ( void )
     m_pAudio->SetFxEffects ( &m_EnabledEffects[0], NUMELMS( m_EnabledEffects ) );
     m_pAudio->SetTempoValues ( m_fSampleRate, m_fTempo, m_fPitch, m_bReversed );
     m_pAudio->SetPanEnabled ( m_bPan );
+    m_pAudio->SetPan ( m_fPan );
 
     // Transfer play position if it was being simulated
     EndSimulationOfPlayPositionAndApply ();
@@ -222,6 +224,7 @@ bool CClientSound::Play ( const SString& strPath, bool bLoop )
     m_b3D = false;
     m_strPath = strPath;
     m_bLoop = bLoop;
+    m_bPan = false;
 
     // Instant distance-stream in
     return Create ();
@@ -678,4 +681,23 @@ bool CClientSound::IsFinished ( void )
     }
 
     return false;
+}
+
+
+float CClientSound::GetPan ( void )
+{
+    if ( m_pAudio )
+        return m_pAudio->GetPan();
+    else
+        return 0.0f;
+}
+
+
+void CClientSound::SetPan ( float fPan )
+{
+    if ( m_pAudio )
+    {
+        m_pAudio->SetPan ( fPan );
+        m_fPan = fPan;
+    }
 }
