@@ -1289,14 +1289,14 @@ void CMainConfig::OnAseSettingChange ( void )
 
 void CGame::ApplyAseSetting ( void )
 {
-    if ( m_pMainConfig->GetDontBroadcastLan() )
+    if ( !m_pMainConfig->GetAseLanListenEnabled() )
         SAFE_DELETE( m_pLanBroadcast );
 
-    bool bInternetEnabled = m_pMainConfig->GetAsePortEnabled () == 1;
-    bool bLanEnabled = !m_pMainConfig->GetDontBroadcastLan();
+    bool bInternetEnabled = m_pMainConfig->GetAseInternetListenEnabled ();
+    bool bLanEnabled = m_pMainConfig->GetAseLanListenEnabled();
     m_pASE->SetPortEnabled ( bInternetEnabled, bLanEnabled );
 
-    if ( !m_pMainConfig->GetDontBroadcastLan() )
+    if ( m_pMainConfig->GetAseLanListenEnabled() )
     {
         if ( !m_pLanBroadcast )
             m_pLanBroadcast = m_pASE->InitLan();
