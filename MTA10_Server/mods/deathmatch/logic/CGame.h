@@ -347,7 +347,7 @@ public:
     void                        SetJetpackWeaponEnabled     ( eWeaponType weaponType, bool bEnabled );
     bool                        GetJetpackWeaponEnabled     ( eWeaponType weaponType );
 
-    void                        PulseMasterServerAnnounce   ( void );
+    void                        PulseMasterServerAnnounce   ( bool bIsInitialAnnounce = false );
     void                        StartOpenPortsTest          ( void );
 
     bool                        IsServerFullyUp             ( void )        { return m_bServerFullyUp; }
@@ -531,8 +531,8 @@ private:
     //Clouds Enabled
     bool                        m_bCloudsEnabled;
 
-    long long                   m_llLastLongAnnouceTime;
-    long long                   m_llLastShortAnnouceTime;
+    long long                   m_llLastAnnounceTime;
+    long long                   m_llLastPushTime;
     class COpenPortsTester*     m_pOpenPortsTester;
 
     CLightsyncManager           m_lightsyncManager;

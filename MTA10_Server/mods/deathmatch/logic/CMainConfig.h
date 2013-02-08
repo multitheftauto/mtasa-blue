@@ -74,8 +74,9 @@ public:
     unsigned int                    GetVoiceQuality                 ( void )        { return m_ucVoiceQuality; };
     unsigned int                    GetVoiceBitrate                 ( void )        { return m_uiVoiceBitrate; };
 
-    bool                            GetAsePortEnabled               ( void )        { return m_iAseMode == 1; }
-    bool                            GetAseAnnounceEnabled           ( void )        { return m_iAseMode > 0; }
+    bool                            GetAseInternetPushEnabled       ( void )        { return m_iAseMode == 2; }
+    bool                            GetAseInternetListenEnabled     ( void )        { return m_iAseMode == 1; }
+    bool                            GetAseLanListenEnabled          ( void )        { return m_bDontBroadcastLan ? false : true; }
     unsigned short                  GetHTTPPort                     ( void );
     inline eHTTPDownloadType        GetHTTPDownloadType             ( void )        { return m_ucHTTPDownloadType; };
     inline const std::string&       GetHTTPDownloadURL              ( void )        { return m_strHTTPDownloadURL; };
@@ -91,7 +92,6 @@ public:
     inline const std::string&       GetScriptDebugLogFile           ( void )        { return m_strScriptDebugLogFile; };
     inline unsigned int             GetScriptDebugLogLevel          ( void )        { return m_uiScriptDebugLogLevel; };
     inline const std::string&       GetAccessControlListFile        ( void )        { return m_strAccessControlListFile; };
-    inline bool                     GetDontBroadcastLan             ( void )        { return m_bDontBroadcastLan ? true : false; };
     inline bool                     GetSerialVerificationEnabled    ( void )        { return m_bVerifySerials; };
     bool                            IsDisableAC                     ( const char* szTagAC )     { return MapContains ( m_DisableComboACMap, szTagAC ); };
     bool                            IsEnableDiagnostic              ( const char* szTag )       { return MapContains ( m_EnableDiagnosticMap, szTag ); };
