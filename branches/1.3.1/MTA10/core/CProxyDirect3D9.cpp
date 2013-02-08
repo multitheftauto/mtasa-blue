@@ -206,7 +206,7 @@ void CCore::OnPostCreateDevice( HRESULT hResult, IDirect3D9* pDirect3D, UINT Ada
         SString strMessage;
         strMessage += "There was a problem starting MTA:SA\n\n";
         strMessage += SString( "Direct3D CreateDevice error: %08x", hResult );
-        BrowseToSolution( "create-device", EXIT_GAME_FIRST | SHOW_MESSAGE_ONLY, strMessage );
+        BrowseToSolution( "d3dcreatedevice-fail", EXIT_GAME_FIRST | ASK_GO_ONLINE, strMessage );
     }
 
     ms_strExtraLogBuffer.clear();
