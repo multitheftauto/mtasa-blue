@@ -31,10 +31,55 @@ void CCrashHandler::Init ( void )
     // Set a global filter
     #ifdef WIN32
     SetCrashHandlerFilter ( HandleExceptionGlobal );
+    #else
+    signal ( SIGSEGV, HandleExceptionGlobal );
     #endif
 }
 
-#ifdef WIN32
+#ifndef WIN32
+
+void CCrashHandler::HandleExceptionGlobal ( int iSig )
+{
+    MakeSureDirExists ( "dumps/" );
+
+    // Collect backtrace information
+    void * buffer [ 100 ];
+    int iAmount = backtrace ( buffer, sizeof buffer );
+    char ** symbols = backtrace_symbols ( buffer, iAmount );
+
+    // Generate a .log file
+    time_t pTime = time ( NULL );
+    struct tm * tm = localtime ( &pTime );
+
+    SString sFileName;
+    sFileName.Format ( "dumps/server_%s_%04d%02d%02d_%02d%02d.log", MTA_DM_BUILDTYPE, tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday, tm->tm_hour, tm->tm_min );
+    FILE * pFile = fopen ( sFileName.c_str ( ), "w" );
+
+    if ( pFile )
+    {
+        SString sContent;
+        sContent += SString ( "MTA:SA Server v%s-r%d-%s crash report.\n", MTA_DM_VERSIONSTRING, MTASA_VERSION_BUILD, MTA_DM_BUILDTYPE );
+        sContent += SString ( "Caught %d addresses ...\n\n", iAmount );
+        sContent += "Backtrace:\n";
+
+        for ( int i = 0; i < iAmount; i++ )
+        {
+            if ( symbols [ i ] )
+            {
+                sContent += SString ( "#%d - %s\n", i, symbols [ i ] );
+            }
+        }
+
+        // Write the content to the file and close
+        fprintf ( pFile, sContent.c_str ( ) );
+        fclose ( pFile );
+    }
+
+    free ( symbols );
+    exit ( EXIT_FAILURE );
+}
+
+#else
 
 long WINAPI CCrashHandler::HandleExceptionGlobal ( _EXCEPTION_POINTERS* pException )
 {

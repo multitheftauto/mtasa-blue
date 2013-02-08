@@ -174,11 +174,11 @@ int CServerImpl::Run ( int iArgumentCount, char* szArguments [] )
 
 #ifdef WIN32
     if ( !m_fClientFeedback )
+#endif
     {
         // Init our crashhandler if not being run within the client
         CCrashHandler::Init ();
     }
-#endif
 
 #ifndef WIN32
     // Daemonize?

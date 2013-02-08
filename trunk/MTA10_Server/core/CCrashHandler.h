@@ -16,8 +16,9 @@
 #include "CCrashHandlerAPI.h"
 
 #ifdef WIN32
-
-#include <windows.h>
+    #include <windows.h>
+#else
+    #include <signal.h>
 #endif
 
 class CCrashHandler
@@ -32,6 +33,10 @@ private:
     static void                 DumpMiniDump            ( _EXCEPTION_POINTERS* pException, CExceptionInformation* pExceptionInformation );
 
     static void                 RunErrorTool            ( void );
+
+    #else
+
+    static void                 HandleExceptionGlobal   ( int iSig );
 
     #endif
 };
