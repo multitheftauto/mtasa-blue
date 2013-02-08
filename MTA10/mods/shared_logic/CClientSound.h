@@ -76,8 +76,8 @@ public:
 
     SString                 GetMetaTags             ( const SString& strFormat );
 
-    void                    SetPan                  ( float fPan );
-    float                   GetPan                  ( void );
+    bool                    SetPan                  ( float fPan );
+    bool                    GetPan                   ( float& fPan );
 
     bool                    SetFxEffect             ( uint uiFxEffect, bool bEnable );
     bool                    IsFxEffectEnabled       ( uint uiFxEffect );

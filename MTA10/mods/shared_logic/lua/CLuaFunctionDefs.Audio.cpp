@@ -1021,9 +1021,11 @@ int CLuaFunctionDefs::SetSoundPan ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        CStaticFunctionDefinitions::SetSoundPan ( *pSound, fPan );
-        lua_pushboolean ( luaVM, true );
-        return 1;
+        if ( CStaticFunctionDefinitions::SetSoundPan ( *pSound, fPan ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
@@ -1044,9 +1046,11 @@ int CLuaFunctionDefs::GetSoundPan ( lua_State* luaVM )
     if ( !argStream.HasErrors () )
     {
         float fPan = 0.0;
-        CStaticFunctionDefinitions::GetSoundPan ( *pSound, fPan );
-        lua_pushnumber ( luaVM, fPan );
-        return 1;
+        if ( CStaticFunctionDefinitions::GetSoundPan ( *pSound, fPan ) )
+        {
+            lua_pushnumber ( luaVM, fPan );
+            return 1;
+        }
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
