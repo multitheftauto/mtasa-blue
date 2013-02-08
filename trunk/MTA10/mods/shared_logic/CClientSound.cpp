@@ -684,20 +684,27 @@ bool CClientSound::IsFinished ( void )
 }
 
 
-float CClientSound::GetPan ( void )
+bool CClientSound::GetPan ( float& fPan )
 {
-    if ( m_pAudio )
-        return m_pAudio->GetPan();
-    else
-        return 0.0f;
+    if ( m_pAudio && !m_b3D )
+    {
+        fPan = m_pAudio->GetPan();
+        return true;
+    }
+    
+    return false;
 }
 
 
-void CClientSound::SetPan ( float fPan )
+bool CClientSound::SetPan ( float fPan )
 {
-    if ( m_pAudio )
+    if ( m_pAudio && !m_b3D )
     {
         m_pAudio->SetPan ( fPan );
         m_fPan = fPan;
+
+        return true;
     }
+
+    return false;
 }

@@ -8006,13 +8006,13 @@ bool CStaticFunctionDefinitions::RemovePedFromVehicle ( CClientPed* pPed )
 }
 
 
-void CStaticFunctionDefinitions::SetSoundPan ( CClientSound& pSound, float fPan )
+bool CStaticFunctionDefinitions::SetSoundPan ( CClientSound& pSound, float fPan )
 {
-    pSound.SetPan ( fPan );
+    return pSound.SetPan ( fPan );
 }
 
 
-void CStaticFunctionDefinitions::GetSoundPan ( CClientSound& pSound, float& fPan )
+bool CStaticFunctionDefinitions::GetSoundPan ( CClientSound& pSound, float& fPan )
 {
-    fPan = pSound.GetPan ();
+    return pSound.GetPan ( fPan );
 }
