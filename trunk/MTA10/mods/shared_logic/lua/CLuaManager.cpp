@@ -543,7 +543,6 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "isVehicleNitroActivated", CLuaFunctionDefs::IsVehicleNitroActivated );
     CLuaCFunctions::AddFunction ( "getVehicleNitroCount", CLuaFunctionDefs::GetVehicleNitroCount );
     CLuaCFunctions::AddFunction ( "getVehicleNitroLevel", CLuaFunctionDefs::GetVehicleNitroLevel );
-    CLuaCFunctions::AddFunction ( "isVehicleNitroInstalled", CLuaFunctionDefs::IsVehicleNitroInstalled );
 
     // Vehicle set funcs
     CLuaCFunctions::AddFunction ( "createVehicle", CLuaFunctionDefs::CreateVehicle );

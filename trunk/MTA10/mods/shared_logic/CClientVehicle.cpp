@@ -1974,20 +1974,7 @@ void CClientVehicle::SetOverrideLights ( unsigned char ucOverrideLights )
 
 bool CClientVehicle::IsNitroInstalled ( void )
 {
-    CVehicleUpgrades* pUpgrades = this->GetUpgrades ();
-    if ( pUpgrades )
-    {
-        for ( int i = 1008; i <= 1010; i++ )
-        {
-            if ( pUpgrades->HasUpgrade ( i ) )
-                return true;
-
-        }
-
-        return false;
-    }
-
-    return false;
+    return this->GetUpgrades ()->GetSlotState ( 8 );
 }
 
 
