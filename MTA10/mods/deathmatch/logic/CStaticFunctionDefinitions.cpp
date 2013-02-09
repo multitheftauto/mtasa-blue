@@ -3118,18 +3118,28 @@ bool CStaticFunctionDefinitions::SetVehicleSirens ( CClientVehicle& Vehicle, uns
 
 bool CStaticFunctionDefinitions::IsVehicleNitroRecharging ( CClientVehicle& Vehicle, bool& bRecharging )
 {
-    float fNitroLevel = Vehicle.GetNitroLevel ( );
+    if ( Vehicle.IsNitroInstalled () )
+    {
+        float fNitroLevel = Vehicle.GetNitroLevel ( );
     
-    // If nitro level > 0 and < 1, Nitro is recharging and can't be activated by the player
-    bRecharging = ( fNitroLevel > 0 && fNitroLevel < 1 );
-    return true;
+        // If nitro level > 0 and < 1, Nitro is recharging and can't be activated by the player
+        bRecharging = ( fNitroLevel > 0 && fNitroLevel < 1 );
+        return true;
+    }
+
+    return false;
 }
 
 bool CStaticFunctionDefinitions::IsVehicleNitroActivated ( CClientVehicle& Vehicle, bool& bActivated )
 {
-    // If nitro level < 0, nitro is activated. (until nitro level reaches -1, at that point it will become 0 and increase instead of decrease)
-    bActivated = ( Vehicle.GetNitroLevel () < 0 );
-    return true;
+    if ( Vehicle.IsNitroInstalled () )
+    {
+        // If nitro level < 0, nitro is activated. (until nitro level reaches -1, at that point it will become 0 and increase instead of decrease)
+        bActivated = ( Vehicle.GetNitroLevel () < 0 );
+        return true;
+    }
+
+    return false;
 }
 
 bool CStaticFunctionDefinitions::SetVehicleNitroActivated ( CClientEntity& Entity, bool bActivated )
@@ -3139,19 +3149,21 @@ bool CStaticFunctionDefinitions::SetVehicleNitroActivated ( CClientEntity& Entit
     if ( IS_VEHICLE ( &Entity ) )
     {
         CClientVehicle& pVehicle = static_cast < CClientVehicle& > ( Entity );
-        
-        bool bAlreadyActivated;
-        IsVehicleNitroActivated ( pVehicle, bAlreadyActivated );
-
-        if ( bAlreadyActivated != bActivated )
+        if ( pVehicle.IsNitroInstalled () )
         {
-            if ( bActivated )
-                pVehicle.SetNitroLevel ( pVehicle.GetNitroLevel () - 1.0001f );
-            else
-                pVehicle.SetNitroLevel ( pVehicle.GetNitroLevel () + 1.0001f );
-        }
+            bool bAlreadyActivated;
+            IsVehicleNitroActivated ( pVehicle, bAlreadyActivated );
 
-        return true;
+            if ( bAlreadyActivated != bActivated )
+            {
+                if ( bActivated )
+                    pVehicle.SetNitroLevel ( pVehicle.GetNitroLevel () - 1.0001f );
+                else
+                    pVehicle.SetNitroLevel ( pVehicle.GetNitroLevel () + 1.0001f );
+            }
+
+            return true;
+        }
     }
 
     return false;
@@ -3159,8 +3171,13 @@ bool CStaticFunctionDefinitions::SetVehicleNitroActivated ( CClientEntity& Entit
 
 bool CStaticFunctionDefinitions::GetVehicleNitroCount ( CClientVehicle& Vehicle, char& cCount)
 {
-    cCount = Vehicle.GetNitroCount ();
-    return true;
+    if ( Vehicle.IsNitroInstalled () )
+    {
+        cCount = Vehicle.GetNitroCount ();
+        return true;
+    }
+
+    return false;
 }
 
 bool CStaticFunctionDefinitions::SetVehicleNitroCount ( CClientEntity& Entity, char cCount )
@@ -3172,21 +3189,30 @@ bool CStaticFunctionDefinitions::SetVehicleNitroCount ( CClientEntity& Entity, c
         if ( IS_VEHICLE ( &Entity ) )
         {
             CClientVehicle& pVehicle = static_cast < CClientVehicle& > ( Entity );
-            pVehicle.SetNitroCount ( cCount );
-            return true;
+            if ( pVehicle.IsNitroInstalled () )
+            {
+                pVehicle.SetNitroCount ( cCount );
+                return true;
+            }
         }
     }
-    return false;
+
+   return false;
 }
 
 bool CStaticFunctionDefinitions::GetVehicleNitroLevel ( CClientVehicle& Vehicle, float& fLevel )
 {
-    fLevel = Vehicle.GetNitroLevel ( );
+    if ( Vehicle.IsNitroInstalled () )
+    {
+        fLevel = Vehicle.GetNitroLevel ( );
 
-    if ( fLevel < 0 )
-        fLevel = 1 + fLevel;
+        if ( fLevel < 0 )
+            fLevel = 1 + fLevel;
 
-    return true;
+        return true;
+    }
+
+    return false;
 }
 
 bool CStaticFunctionDefinitions::SetVehicleNitroLevel ( CClientEntity& Entity, float fLevel )
@@ -3198,14 +3224,17 @@ bool CStaticFunctionDefinitions::SetVehicleNitroLevel ( CClientEntity& Entity, f
         if ( IS_VEHICLE ( &Entity ) )
         {
             CClientVehicle& pVehicle = static_cast < CClientVehicle& > ( Entity );
-            bool bActivated;
-            IsVehicleNitroActivated ( pVehicle, bActivated );
-            if ( bActivated )
-                pVehicle.SetNitroLevel ( fLevel - 1.0001f );
-            else
-                pVehicle.SetNitroLevel ( fLevel );
+            if ( pVehicle.IsNitroInstalled () )
+            {
+                bool bActivated;
+                IsVehicleNitroActivated ( pVehicle, bActivated );
+                if ( bActivated )
+                    pVehicle.SetNitroLevel ( fLevel - 1.0001f );
+                else
+                    pVehicle.SetNitroLevel ( fLevel );
 
-            return true;
+                return true;
+            }
         }
     }
 

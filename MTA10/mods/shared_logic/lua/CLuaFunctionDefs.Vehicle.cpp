@@ -3162,6 +3162,30 @@ int CLuaFunctionDefs::GetVehicleComponents ( lua_State* luaVM )
     return 1;
 }
 
+
+int CLuaFunctionDefs::IsVehicleNitroInstalled ( lua_State* luaVM )
+{
+//  bool isVehicleNitroInstalled ( vehicle theVehicle )
+    CClientVehicle * pVehicle = NULL;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pVehicle );
+
+    if ( !argStream.HasErrors() )
+    {
+        if ( pVehicle )
+        {
+            lua_pushboolean ( luaVM, pVehicle->IsNitroInstalled () );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
 int CLuaFunctionDefs::IsVehicleNitroRecharging ( lua_State* luaVM )
 {
 //  bool isVehicleNitroRecharging ( vehicle theVehicle )
