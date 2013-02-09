@@ -35,7 +35,6 @@ CBassAudio::CBassAudio ( bool bStream, const SString& strPath, bool bLoop, bool 
     m_fPlaybackSpeed = 1.0f;
     m_bPaused = false;
     m_bPan = true;
-    m_fPan = 0.0f;
 }
 
 
@@ -480,18 +479,21 @@ SString CBassAudio::GetMetaTags( const SString& strFormat )
 
 float CBassAudio::GetPan ( void )
 {
-    float fPan = 0.0;
-    BASS_ChannelGetAttribute( m_pSound, BASS_ATTRIB_PAN, &fPan );
-    
-    return fPan;
+    if ( m_pSound )
+    {
+        float fPan = 0.0f;
+        BASS_ChannelGetAttribute( m_pSound, BASS_ATTRIB_PAN, &fPan );
+        
+        return fPan;
+    }
+
+    return 0.0f;
 }
 
 void CBassAudio::SetPan ( float fPan )
 {
-    m_fPan = fPan;
-
     if ( m_pSound )
-        BASS_ChannelSetAttribute( m_pSound, BASS_ATTRIB_PAN, m_fPan );
+        BASS_ChannelSetAttribute( m_pSound, BASS_ATTRIB_PAN, fPan );
 }
 
 void CBassAudio::SetVolume ( float fVolume, bool bStore )
@@ -500,7 +502,6 @@ void CBassAudio::SetVolume ( float fVolume, bool bStore )
 
     if ( m_pSound && !m_b3D )
         BASS_ChannelSetAttribute( m_pSound, BASS_ATTRIB_VOL, fVolume );
-        BASS_ChannelSetAttribute( m_pSound, BASS_ATTRIB_PAN, m_fPan );
 }
 
 void CBassAudio::SetPlaybackSpeed ( float fSpeed )
