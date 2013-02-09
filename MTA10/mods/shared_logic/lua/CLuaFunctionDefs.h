@@ -342,7 +342,6 @@ public:
     LUA_DECLARE ( IsVehicleNitroActivated );
     LUA_DECLARE ( GetVehicleNitroCount );
     LUA_DECLARE ( GetVehicleNitroLevel );
-    LUA_DECLARE ( IsVehicleNitroInstalled );
 
     // Vehicle set functions
     LUA_DECLARE ( FixVehicle );
