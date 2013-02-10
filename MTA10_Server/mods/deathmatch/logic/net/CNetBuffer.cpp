@@ -329,6 +329,19 @@ bool CNetServerBuffer::GetBandwidthStatistics ( SBandwidthStatistics* pDest )
 
 ///////////////////////////////////////////////////////////////////////////
 //
+// CNetServerBuffer::GetNetPerformanceStatistics
+//
+// Thread safe, but numbers could be wrong
+//
+///////////////////////////////////////////////////////////////////////////
+bool CNetServerBuffer::GetNetPerformanceStatistics ( SNetPerformanceStatistics* pDest, bool bResetCounters )
+{
+    return m_pRealNetServer->GetNetPerformanceStatistics ( pDest, bResetCounters );
+}
+
+
+///////////////////////////////////////////////////////////////////////////
+//
 // CNetServerBuffer::GetPingStatus
 //
 // Blocking on first call.
@@ -1056,6 +1069,7 @@ void CNetServerBuffer::ProcessCommand ( CNetJobData* pJobData )
         CALLREALNET2R( bool,                GetNetworkStatistics            , NetStatistics*, pDest, NetServerPlayerID&, PlayerID )
         CALLREALNET0R( const SPacketStat*,  GetPacketStats                  )
         CALLREALNET1R( bool,                GetBandwidthStatistics          , SBandwidthStatistics*, pDest )
+        CALLREALNET2R( bool,                GetNetPerformanceStatistics     , SNetPerformanceStatistics*, pDest, bool, bResetCounters )
         CALLREALNET1 (                      GetPingStatus                   , SFixedString < 32 >*, pstrStatus )
         CALLREALNET7R( bool,                SendPacket                      , unsigned char, ucPacketID, const NetServerPlayerID&, playerID, NetBitStreamInterface*, bitStream, bool, bBroadcast, NetServerPacketPriority, packetPriority, NetServerPacketReliability, packetReliability, ePacketOrdering, packetOrdering )
         CALLREALNET3 (                      GetPlayerIP                     , const NetServerPlayerID&, playerID, char*, strIP, unsigned short*, usPort )

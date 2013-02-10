@@ -315,12 +315,14 @@ void CPerfStatServerInfoImpl::GetStats ( CPerfStatResult* pResult, const std::ma
         m_OptionsList.push_back ( StringPair ( "Raknet thread core #",      SString ( "%d", m_PrevLiveStats.uiNetworkUpdateLoopProcessorNumber ) ) );
         m_OptionsList.push_back ( StringPair ( "DB thread core #",          SString ( "%d", g_uiDatabaseThreadProcessorNumber ) ) );
 
-        m_OptionsList.push_back ( StringPair ( "Update cycle prep time",        SString ( "%d ms", m_PrevLiveStats.uiUpdateCyclePrepTimeMs ) ) );
-        m_OptionsList.push_back ( StringPair ( "Update cycle process time",     SString ( "%d ms", m_PrevLiveStats.uiUpdateCycleProcessTimeMs ) ) );
-        m_OptionsList.push_back ( StringPair ( "Update cycle datagrams avg",    SString ( "%d", m_PrevLiveStats.uiUpdateCycleDatagramsAvg ) ) );
-        m_OptionsList.push_back ( StringPair ( "Update cycle datagrams max",    SString ( "%d", m_PrevLiveStats.uiUpdateCycleDatagramsMax ) ) );
-        m_OptionsList.push_back ( StringPair ( "Update cycle datagrams limit",  SString ( "%d", m_PrevLiveStats.uiUpdateCycleDatagramsLimit ) ) );
-    }    
+        // Get net performance stats
+        SNetPerformanceStatistics netPerformanceStats;
+        g_pNetServer->GetNetPerformanceStatistics ( &netPerformanceStats, true );
+        m_OptionsList.push_back ( StringPair ( "Update cycle prep time max",    SString ( "%d ms (Avg %d ms)", netPerformanceStats.uiUpdateCyclePrepTimeMaxMs, netPerformanceStats.uiUpdateCyclePrepTimeAvgMs ) ) );
+        m_OptionsList.push_back ( StringPair ( "Update cycle process time max", SString ( "%d ms (Avg %d ms)", netPerformanceStats.uiUpdateCycleProcessTimeMaxMs, netPerformanceStats.uiUpdateCycleProcessTimeAvgMs ) ) );
+        m_OptionsList.push_back ( StringPair ( "Update cycle datagrams max",    SString ( "%d (Avg %d)", netPerformanceStats.uiUpdateCycleDatagramsMax, netPerformanceStats.uiUpdateCycleDatagramsAvg ) ) );
+        m_OptionsList.push_back ( StringPair ( "Update cycle datagrams limit",  SString ( "%d", netPerformanceStats.uiUpdateCycleDatagramsLimit ) ) );
+    }
 
     // Add columns
     pResult->AddColumn ( "Info.Name" );
