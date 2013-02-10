@@ -87,7 +87,6 @@ void CNetworkStats::Draw ( void )
                 "Current wep bullet sync: %s\n"
                 "Veh. Extrapolate amount: %d%%\n"
                 "Veh. Extrapolate max: %dms\n"
-                "Veh. only gamemode: %s\n"
                 "Alternate pulse order: %s\n"
                 "Client: %s\n"
                 "Server: %s\n",
@@ -110,7 +109,6 @@ void CNetworkStats::Draw ( void )
                 bBulletSync ? "On" : "Off",
                 vehExtrapolateSettings.iScalePercent,
                 vehExtrapolateSettings.iMaxMs,
-                g_pClientGame->IsVehicleOnlyGameMode() ? "Yes" : "No",
                 g_pClientGame->IsUsingAlternatePulseOrder() ? "Yes" : "No",
                 *CStaticFunctionDefinitions::GetVersionSortable(),
                 *g_pClientGame->GetServerVersionSortable ()

@@ -5964,32 +5964,6 @@ void CClientGame::WorldSoundHandler ( uint uiGroup, uint uiIndex )
 
 //////////////////////////////////////////////////////////////////
 //
-// CClientGame::SetVehicleOnlyGameMode
-//
-//
-//
-//////////////////////////////////////////////////////////////////
-void CClientGame::SetVehicleOnlyGameMode( bool bOn )
-{
-    m_bVehicleOnlyGameMode = bOn;
-}
-
-
-//////////////////////////////////////////////////////////////////
-//
-// CClientGame::IsVehicleOnlyGameMode
-//
-// Check if game mode is vehicle only, so we can do some pulse order hacks to reduce latency
-//
-//////////////////////////////////////////////////////////////////
-bool CClientGame::IsVehicleOnlyGameMode( void )
-{
-    return m_bVehicleOnlyGameMode;
-}
-
-
-//////////////////////////////////////////////////////////////////
-//
 // CClientGame::IsUsingAlternatePulseOrder
 //
 // Returns true if should be using alternate pulse order
@@ -5997,7 +5971,7 @@ bool CClientGame::IsVehicleOnlyGameMode( void )
 //////////////////////////////////////////////////////////////////
 bool CClientGame::IsUsingAlternatePulseOrder( bool bAdvanceDelayCounter )
 {
-    if ( m_VehExtrapolateSettings.bAlwaysUseAltPulseOrder || ( m_VehExtrapolateSettings.bEnabled && m_bVehicleOnlyGameMode ) )
+    if ( m_VehExtrapolateSettings.bUseAltPulseOrder )
     {
         // Only actually start using alternate pulse order after 100 frames
         if ( m_uiAltPulseOrderCounter >= 100 )
