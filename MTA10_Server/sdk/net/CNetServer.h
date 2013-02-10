@@ -66,6 +66,11 @@ struct SNetOptions
         bool bValid;
         bool bAutoFilter;
     } netFilter;
+
+    struct {
+        bool bValid;
+        int iUpdateCycleDatagramsLimit;
+    } netOptimize;
 };
 
 class CNetServer
