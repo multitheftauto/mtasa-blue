@@ -76,10 +76,6 @@ CResource::CResource ( unsigned short usNetID, const char* szResourceName, CClie
     {
         m_pLuaVM->SetScriptName ( szResourceName );
     }
-
-    // Slight hack until we have a fix for the side effects (on peds) caused by pulse order change
-    if ( m_strResourceName == "race" )
-        g_pClientGame->SetVehicleOnlyGameMode( true );
 }
 
 
@@ -88,10 +84,6 @@ CResource::~CResource ( void )
     CIdArray::PushUniqueId ( this, EIdClass::RESOURCE, m_uiScriptID );
     // Make sure we don't force the cursor on
     ShowCursor ( false );
-
-    // Slight hack until we have a fix for the side effects (on peds) caused by pulse order change
-    if ( m_strResourceName == "race" )
-        g_pClientGame->SetVehicleOnlyGameMode( false );
 
     // Do this before we delete our elements.
     m_pRootEntity->CleanUpForVM ( m_pLuaVM, true );

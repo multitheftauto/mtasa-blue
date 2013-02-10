@@ -67,7 +67,7 @@ struct SVehExtrapolateSettings
     int iBaseMs;
     int iScalePercent;
     int iMaxMs;
-    bool bAlwaysUseAltPulseOrder;
+    bool bUseAltPulseOrder;
 };
 
 class CClientGame
@@ -536,9 +536,6 @@ public:
 
     void                                SetVehExtrapolateSettings       ( const SVehExtrapolateSettings& settings ) { m_VehExtrapolateSettings = settings; }
     const SVehExtrapolateSettings&      GetVehExtrapolateSettings       ( void )                                    { return m_VehExtrapolateSettings; }
-
-    void                                SetVehicleOnlyGameMode          ( bool bOn );
-    bool                                IsVehicleOnlyGameMode           ( void );
     bool                                IsUsingAlternatePulseOrder      ( bool bAdvanceDelayCounter = false );
 
 private:
@@ -740,7 +737,6 @@ private:
     GUI_CALLBACK                        m_OnCancelLocalGameClick;
 
     SVehExtrapolateSettings             m_VehExtrapolateSettings;
-    bool                                m_bVehicleOnlyGameMode;
     uint                                m_uiAltPulseOrderCounter;
 };
 
