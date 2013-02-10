@@ -314,6 +314,12 @@ void CPerfStatServerInfoImpl::GetStats ( CPerfStatResult* pResult, const std::ma
         m_OptionsList.push_back ( StringPair ( "Threadnet (Sync) core #",   SString ( "%d", g_uiThreadnetProcessorNumber ) ) );
         m_OptionsList.push_back ( StringPair ( "Raknet thread core #",      SString ( "%d", m_PrevLiveStats.uiNetworkUpdateLoopProcessorNumber ) ) );
         m_OptionsList.push_back ( StringPair ( "DB thread core #",          SString ( "%d", g_uiDatabaseThreadProcessorNumber ) ) );
+
+        m_OptionsList.push_back ( StringPair ( "Update cycle prep time",        SString ( "%d ms", m_PrevLiveStats.uiUpdateCyclePrepTimeMs ) ) );
+        m_OptionsList.push_back ( StringPair ( "Update cycle process time",     SString ( "%d ms", m_PrevLiveStats.uiUpdateCycleProcessTimeMs ) ) );
+        m_OptionsList.push_back ( StringPair ( "Update cycle datagrams avg",    SString ( "%d", m_PrevLiveStats.uiUpdateCycleDatagramsAvg ) ) );
+        m_OptionsList.push_back ( StringPair ( "Update cycle datagrams max",    SString ( "%d", m_PrevLiveStats.uiUpdateCycleDatagramsMax ) ) );
+        m_OptionsList.push_back ( StringPair ( "Update cycle datagrams limit",  SString ( "%d", m_PrevLiveStats.uiUpdateCycleDatagramsLimit ) ) );
     }    
 
     // Add columns
