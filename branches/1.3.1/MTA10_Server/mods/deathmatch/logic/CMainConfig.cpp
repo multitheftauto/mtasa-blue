@@ -71,6 +71,7 @@ CMainConfig::CMainConfig ( CConsole* pConsole, CLuaManager* pLuaMain ): CXMLConf
     m_uiMaxPlayers = 0;
     m_bHTTPEnabled = true;
     m_iAseMode = 0;
+    m_iUpdateCycleDatagramsLimit = 10000;
     m_usHTTPPort = 0;
     m_ucHTTPDownloadType = HTTP_DOWNLOAD_DISABLED;
     m_iHTTPMaxConnectionsPerClient = 4;
@@ -544,6 +545,10 @@ void CMainConfig::ApplyNetOptions ( void )
 {
     m_NetOptions.netFilter.bValid = true;
     m_NetOptions.netFilter.bAutoFilter = m_bNetAutoFilter != 0;
+
+    m_NetOptions.netOptimize.bValid = true;
+    m_NetOptions.netOptimize.iUpdateCycleDatagramsLimit = m_iUpdateCycleDatagramsLimit;
+
     g_pNetServer->SetNetOptions ( m_NetOptions );
 }
 
@@ -1258,6 +1263,7 @@ const std::vector < SIntSetting >& CMainConfig::GetIntSettingList ( void )
             { true, true,   0,      1,      2,      "ase",                                  &m_iAseMode,                                &CMainConfig::OnAseSettingChange },
             { true, true,   0,      1,      1,      "donotbroadcastlan",                    &m_bDontBroadcastLan,                       &CMainConfig::OnAseSettingChange },
             { true, true,   0,      1,      1,      "net_auto_filter",                      &m_bNetAutoFilter,                          &CMainConfig::ApplyNetOptions },
+            { true, true,   1,      10000,  10000,  "update_cycle_datagrams_limit",         &m_iUpdateCycleDatagramsLimit,              &CMainConfig::ApplyNetOptions },
         };
 
     static std::vector < SIntSetting > settingsList;

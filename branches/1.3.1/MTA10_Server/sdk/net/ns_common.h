@@ -124,6 +124,11 @@ struct SBandwidthStatistics
     long long llOutgoingUDPByteResentCount;
     long long llOutgoingUDPMessageResentCount;
     uint uiNetworkUpdateLoopProcessorNumber;
+    uint uiUpdateCyclePrepTimeMs;
+    uint uiUpdateCycleProcessTimeMs;
+    uint uiUpdateCycleDatagramsAvg;
+    uint uiUpdateCycleDatagramsMax;
+    uint uiUpdateCycleDatagramsLimit;
 };
 
 enum ePacketOrdering

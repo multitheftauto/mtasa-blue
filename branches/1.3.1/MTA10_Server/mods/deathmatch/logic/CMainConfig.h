@@ -154,6 +154,7 @@ private:
     bool                            m_bHTTPEnabled;
     std::string                     m_strPassword;
     int                             m_iAseMode;
+    int                             m_iUpdateCycleDatagramsLimit;
     unsigned short                  m_usHTTPPort;
     eHTTPDownloadType               m_ucHTTPDownloadType;
     std::string                     m_strHTTPDownloadURL;

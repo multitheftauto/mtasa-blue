@@ -50,7 +50,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				InlineFunctionExpansion="1"
-				AdditionalIncludeDirectories=".,..\include"
+				AdditionalIncludeDirectories=".,..\include;..\..\zlib"
 				PreprocessorDefinitions="WIN32;NDEBUG;BUILDING_LIBCURL;"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -73,10 +73,11 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="ws2_32.lib wldap32.lib"
+				AdditionalDependencies="ws2_32.lib wldap32.lib zlib_2008.lib"
 				OutputFile="../../libcurl.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
+				AdditionalLibraryDirectories="../../zlib/lib"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="../../../symbols/$(ConfigurationName)_$(SafeParentName).pdb"
 				GenerateMapFile="true"
@@ -147,7 +148,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				InlineFunctionExpansion="1"
-				AdditionalIncludeDirectories=".,..\include"
+				AdditionalIncludeDirectories=".,..\include;..\..\zlib"
 				PreprocessorDefinitions="WIN32;NDEBUG;BUILDING_LIBCURL;"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -174,10 +175,11 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="ws2_32.lib wldap32.lib"
+				AdditionalDependencies="ws2_32.lib wldap32.lib zlib_2008.lib"
 				OutputFile="../../libcurl.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
+				AdditionalLibraryDirectories="../../zlib/lib"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="../../../symbols/$(ConfigurationName)_$(SafeParentName).pdb"
 				GenerateMapFile="true"
@@ -247,7 +249,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=".,..\include"
+				AdditionalIncludeDirectories=".;..\include;..\..\zlib"
 				PreprocessorDefinitions="WIN32;_DEBUG;BUILDING_LIBCURL;"
 				StringPooling="true"
 				MinimalRebuild="true"
@@ -275,10 +277,11 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="ws2_32.lib wldap32.lib"
+				AdditionalDependencies="ws2_32.lib wldap32.lib zlibd_2008.lib"
 				OutputFile="../../libcurld.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
+				AdditionalLibraryDirectories="../../zlib/lib"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\DLL-Debug/libcurld.pdb"
 				GenerateMapFile="true"
