@@ -4696,12 +4696,12 @@ void CPacketHandler::Packet_SyncSettings ( NetBitStreamInterface& bitStream )
             vehExtrapolateSettings.iBaseMs = sBaseMs;
             vehExtrapolateSettings.iScalePercent = sScalePercent;
             vehExtrapolateSettings.iMaxMs = sMaxMs;
-            vehExtrapolateSettings.bAlwaysUseAltPulseOrder = false;
+            vehExtrapolateSettings.bUseAltPulseOrder = false;
             if ( bitStream.Version () >= 0x3D )
             {
                 uchar ucUseAltPulseOrder;
                 if ( bitStream.Read ( ucUseAltPulseOrder ) )
-                    vehExtrapolateSettings.bAlwaysUseAltPulseOrder = ucUseAltPulseOrder != 0;
+                    vehExtrapolateSettings.bUseAltPulseOrder = ucUseAltPulseOrder != 0;
             }
             g_pClientGame->SetVehExtrapolateSettings ( vehExtrapolateSettings );
         }

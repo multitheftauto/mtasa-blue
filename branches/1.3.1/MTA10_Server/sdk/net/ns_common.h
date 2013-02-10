@@ -124,8 +124,14 @@ struct SBandwidthStatistics
     long long llOutgoingUDPByteResentCount;
     long long llOutgoingUDPMessageResentCount;
     uint uiNetworkUpdateLoopProcessorNumber;
-    uint uiUpdateCyclePrepTimeMs;
-    uint uiUpdateCycleProcessTimeMs;
+};
+
+struct SNetPerformanceStatistics
+{
+    uint uiUpdateCyclePrepTimeAvgMs;
+    uint uiUpdateCycleProcessTimeAvgMs;
+    uint uiUpdateCyclePrepTimeMaxMs;
+    uint uiUpdateCycleProcessTimeMaxMs;
     uint uiUpdateCycleDatagramsAvg;
     uint uiUpdateCycleDatagramsMax;
     uint uiUpdateCycleDatagramsLimit;
