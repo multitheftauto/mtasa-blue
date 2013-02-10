@@ -70,6 +70,9 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pcre", "..\vendor\pcre\pcre 2008.vcproj", "{39452ACC-FF12-488D-94B6-301B4EFBB606}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libcurl", "..\vendor\curl\lib\libcurl 2008.vcproj", "{2B98A079-89D3-4970-B0C2-39996636BAE6}"
+	ProjectSection(ProjectDependencies) = postProject
+		{CCABBC2E-172D-46FD-BC43-5A9FCD295112} = {CCABBC2E-172D-46FD-BC43-5A9FCD295112}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ehs", "..\vendor\ehs\vs2008\ehs 2008.vcproj", "{ECC4BA90-6AA5-4630-AEA9-F923FB633C7D}"
 EndProject
