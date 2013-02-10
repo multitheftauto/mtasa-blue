@@ -94,6 +94,7 @@ public:
     virtual bool                            GetNetworkStatistics            ( NetStatistics* pDest, const NetServerPlayerID& PlayerID ) = 0;
     virtual const SPacketStat*              GetPacketStats                  ( void ) = 0;
     virtual bool                            GetBandwidthStatistics          ( SBandwidthStatistics* pDest ) = 0;
+    virtual bool                            GetNetPerformanceStatistics     ( SNetPerformanceStatistics* pDest, bool bResetCounters ) = 0;
     virtual void                            GetPingStatus                   ( SFixedString < 32 >* pstrStatus ) = 0;
 
     virtual NetBitStreamInterface*          AllocateNetServerBitStream      ( unsigned short usBitStreamVersion ) = 0;
