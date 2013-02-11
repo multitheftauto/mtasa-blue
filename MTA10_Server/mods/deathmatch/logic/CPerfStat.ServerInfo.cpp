@@ -63,6 +63,7 @@ public:
     time_t                      m_tStartTime;
     long long                   m_llNextRecordTime;
     SBandwidthStatistics        m_PrevLiveStats;
+    SNetPerformanceStatistics   m_NetPerformanceStats;
     CTickCount                  m_PrevTickCount;
     CTickCount                  m_DeltaTickCount;
     long long                   m_llDeltaGameBytesSent;
@@ -76,6 +77,7 @@ public:
     std::vector < StringPair >  m_InfoList;
     std::vector < StringPair >  m_StatusList;
     std::vector < StringPair >  m_OptionsList;
+    CElapsedTime                m_NetPerformanceStatsUpdateTimer;
 };
 
 
@@ -316,12 +318,16 @@ void CPerfStatServerInfoImpl::GetStats ( CPerfStatResult* pResult, const std::ma
         m_OptionsList.push_back ( StringPair ( "DB thread core #",          SString ( "%d", g_uiDatabaseThreadProcessorNumber ) ) );
 
         // Get net performance stats
-        SNetPerformanceStatistics netPerformanceStats;
-        g_pNetServer->GetNetPerformanceStatistics ( &netPerformanceStats, true );
-        m_OptionsList.push_back ( StringPair ( "Update cycle prep time max",    SString ( "%d ms (Avg %d ms)", netPerformanceStats.uiUpdateCyclePrepTimeMaxMs, netPerformanceStats.uiUpdateCyclePrepTimeAvgMs ) ) );
-        m_OptionsList.push_back ( StringPair ( "Update cycle process time max", SString ( "%d ms (Avg %d ms)", netPerformanceStats.uiUpdateCycleProcessTimeMaxMs, netPerformanceStats.uiUpdateCycleProcessTimeAvgMs ) ) );
-        m_OptionsList.push_back ( StringPair ( "Update cycle datagrams max",    SString ( "%d (Avg %d)", netPerformanceStats.uiUpdateCycleDatagramsMax, netPerformanceStats.uiUpdateCycleDatagramsAvg ) ) );
-        m_OptionsList.push_back ( StringPair ( "Update cycle datagrams limit",  SString ( "%d", netPerformanceStats.uiUpdateCycleDatagramsLimit ) ) );
+        if ( m_NetPerformanceStatsUpdateTimer.Get() > 5000 )
+        {
+            m_NetPerformanceStatsUpdateTimer.Reset();
+            g_pNetServer->GetNetPerformanceStatistics ( &m_NetPerformanceStats, true );
+        }
+        m_OptionsList.push_back ( StringPair ( "Update cycle prep time max",        SString ( "%s (Avg %s)", *CPerfStatManager::GetScaledMsString( m_NetPerformanceStats.uiUpdateCyclePrepTimeMaxUs / 1000.f ), *CPerfStatManager::GetScaledMsString( m_NetPerformanceStats.uiUpdateCyclePrepTimeAvgUs / 1000.f ) ) ) );
+        m_OptionsList.push_back ( StringPair ( "Update cycle process time max",     SString ( "%s (Avg %s)", *CPerfStatManager::GetScaledMsString( m_NetPerformanceStats.uiUpdateCycleProcessTimeMaxUs / 1000.f ), *CPerfStatManager::GetScaledMsString( m_NetPerformanceStats.uiUpdateCycleProcessTimeAvgUs / 1000.f ) ) ) );
+        m_OptionsList.push_back ( StringPair ( "Update cycle datagrams max",        SString ( "%d (Avg %d)", m_NetPerformanceStats.uiUpdateCycleDatagramsMax, m_NetPerformanceStats.uiUpdateCycleDatagramsAvg ) ) );
+        m_OptionsList.push_back ( StringPair ( "Update cycle connections limited",  SString ( "%d", m_NetPerformanceStats.uiUpdateCycleConnectionsLimited ) ) );
+        m_OptionsList.push_back ( StringPair ( "Update cycle datagrams limit",      SString ( "%d", m_NetPerformanceStats.uiUpdateCycleDatagramsLimit ) ) );
     }
 
     // Add columns
