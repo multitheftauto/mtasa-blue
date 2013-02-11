@@ -128,13 +128,14 @@ struct SBandwidthStatistics
 
 struct SNetPerformanceStatistics
 {
-    uint uiUpdateCyclePrepTimeAvgMs;
-    uint uiUpdateCycleProcessTimeAvgMs;
-    uint uiUpdateCyclePrepTimeMaxMs;
-    uint uiUpdateCycleProcessTimeMaxMs;
+    uint uiUpdateCyclePrepTimeAvgUs;
+    uint uiUpdateCycleProcessTimeAvgUs;
+    uint uiUpdateCyclePrepTimeMaxUs;
+    uint uiUpdateCycleProcessTimeMaxUs;
     uint uiUpdateCycleDatagramsAvg;
     uint uiUpdateCycleDatagramsMax;
     uint uiUpdateCycleDatagramsLimit;
+    uint uiUpdateCycleConnectionsLimited;
 };
 
 enum ePacketOrdering

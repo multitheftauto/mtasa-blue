@@ -295,6 +295,31 @@ SString CPerfStatManager::GetScaledBitString ( long long Amount )
 
 ///////////////////////////////////////////////////////////////
 //
+// CPerfStatManager::GetScaledMsString
+//
+//
+//
+///////////////////////////////////////////////////////////////
+SString CPerfStatManager::GetScaledMsString ( float fMs )
+{
+    if ( fMs < 1 )
+        return SString ( "%.2f ms", fMs );
+
+    if ( fMs < 5 )
+        return SString ( "%.1f ms", fMs );
+
+    if ( fMs < 1000 )
+        return SString ( "%.0f ms", fMs );
+
+    if ( fMs < 5000 )
+        return SString ( "%.1f s", fMs * ( 1 / 1000.f ) );
+
+    return SString ( "%.0f s", fMs * ( 1 / 1000.f ) );
+}
+
+
+///////////////////////////////////////////////////////////////
+//
 // CPerfStatManager::GetPerSecond
 //
 // Calculate per second rate

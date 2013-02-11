@@ -1263,7 +1263,7 @@ const std::vector < SIntSetting >& CMainConfig::GetIntSettingList ( void )
             { true, true,   0,      1,      2,      "ase",                                  &m_iAseMode,                                &CMainConfig::OnAseSettingChange },
             { true, true,   0,      1,      1,      "donotbroadcastlan",                    &m_bDontBroadcastLan,                       &CMainConfig::OnAseSettingChange },
             { true, true,   0,      1,      1,      "net_auto_filter",                      &m_bNetAutoFilter,                          &CMainConfig::ApplyNetOptions },
-            { true, true,   1,      10000,  10000,  "update_cycle_datagrams_limit",         &m_iUpdateCycleDatagramsLimit,              &CMainConfig::ApplyNetOptions },
+            { true, true,   1,      10,     100,    "update_cycle_datagrams_limit",         &m_iUpdateCycleDatagramsLimit,              &CMainConfig::ApplyNetOptions },
         };
 
     static std::vector < SIntSetting > settingsList;
