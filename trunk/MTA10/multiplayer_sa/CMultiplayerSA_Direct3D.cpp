@@ -84,9 +84,9 @@ void _declspec(naked) HOOK_PreCreateDevice()
 // Called after GTA creates the D3D device
 //
 ////////////////////////////////////////////////////////////////
-void _cdecl OnPostCreateDevice( HRESULT hResult )
+HRESULT _cdecl OnPostCreateDevice( HRESULT hResult )
 {
-    g_pCore->OnPostCreateDevice( hResult, ms_pDirect3D, ms_Adapter, ms_DeviceType, ms_hFocusWindow, ms_BehaviorFlags, ms_pPresentationParameters, ms_ppReturnedDeviceInterface );
+    return g_pCore->OnPostCreateDevice( hResult, ms_pDirect3D, ms_Adapter, ms_DeviceType, ms_hFocusWindow, ms_BehaviorFlags, ms_pPresentationParameters, ms_ppReturnedDeviceInterface );
 }
 
 // Hook info
@@ -108,8 +108,10 @@ void _declspec(naked) HOOK_PostCreateDevice()
         pushad
         push    eax
         call    OnPostCreateDevice
+        mov     [esp+0],eax
         add     esp, 4*1
         popad
+        mov     eax,[esp-32-4*1]
 
         // Continue
         test    eax, eax
