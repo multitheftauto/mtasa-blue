@@ -132,10 +132,11 @@ struct SNetPerformanceStatistics
     uint uiUpdateCycleProcessTimeAvgUs;
     uint uiUpdateCyclePrepTimeMaxUs;
     uint uiUpdateCycleProcessTimeMaxUs;
-    uint uiUpdateCycleDatagramsAvg;
+    float fUpdateCycleDatagramsAvg;
     uint uiUpdateCycleDatagramsMax;
     uint uiUpdateCycleDatagramsLimit;
-    uint uiUpdateCycleConnectionsLimited;
+    uint uiUpdateCycleSendsLimitedTotal;
+    float fUpdateCycleSendsLimitedPercent;
 };
 
 enum ePacketOrdering

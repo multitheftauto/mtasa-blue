@@ -20,6 +20,10 @@
     #include <shellapi.h>
 #else
     #include <wctype.h>
+    #ifndef _GNU_SOURCE
+    # define _GNU_SOURCE    /* See feature_test_macros(7) */
+    #endif
+    #include <sched.h>
 #endif
 
 CCriticalSection CRefCountable::ms_CS;
@@ -1347,21 +1351,7 @@ namespace SharedUtil
                     _asm {mov eax, ebx}
 #else
                     // This should work on Linux
-                    int result = -2;
-                    __asm__ __volatile__ (
-                            "pushfl;"           "\n\t"
-                            "pushal;"           "\n\t"
-                            "movl $1, %%eax;"   "\n\t"
-                            "cpuid;"            "\n\t"
-                            "shr $24, %%ebx;"   "\n\t"
-                            "movl %%ebx, %0;"   "\n\t"
-                            "popal;"            "\n\t"
-                            "popfl;"            "\n\t"
-                         : "=a"(result)
-                         :
-                         : "cc", "memory"
-                         );
-                    return result;
+                    return sched_getcpu();
 #endif
                 }
             LOCAL_FUNCTION_END
