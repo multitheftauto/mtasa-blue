@@ -77,6 +77,8 @@ LOGIC = \
 ./logic/CConsoleCommand.cpp \
 ./logic/CConsoleCommands.cpp \
 ./logic/CCustomData.cpp \
+./logic/CCustomWeapon.cpp \
+./logic/CCustomWeaponManager.cpp \
 ./logic/CDummy.cpp \
 ./logic/CDatabaseConnectionSqlite.cpp \
 ./logic/CDatabaseJobQueue.cpp \
@@ -213,6 +215,7 @@ LOGIC = \
 ./logic/packets/CCommandPacket.cpp \
 ./logic/packets/CConsoleEchoPacket.cpp \
 ./logic/packets/CCustomDataPacket.cpp \
+./logic/packets/CCustomWeaponBulletSyncPacket.cpp \
 ./logic/packets/CDebugEchoPacket.cpp \
 ./logic/packets/CDestroySatchelsPacket.cpp \
 ./logic/packets/CDetonateSatchelsPacket.cpp \
