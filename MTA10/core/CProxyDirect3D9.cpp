@@ -83,6 +83,34 @@ namespace
 
 ////////////////////////////////////////////////
 //
+// CreateDeviceInsist
+//
+// Keep trying create device for a little bit
+//
+////////////////////////////////////////////////
+HRESULT CreateDeviceInsist( uint uiMinTries, uint uiTimeout, IDirect3D9* pDirect3D, UINT Adapter, D3DDEVTYPE DeviceType, HWND hFocusWindow, DWORD BehaviorFlags, D3DPRESENT_PARAMETERS* pPresentationParameters, IDirect3DDevice9** ppReturnedDeviceInterface )
+{
+    HRESULT hResult;
+    CElapsedTime retryTimer;
+    uint uiRetryCount = 0;
+    do
+    {
+        hResult = pDirect3D->CreateDevice( Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters, ppReturnedDeviceInterface );
+        if ( hResult == D3D_OK )
+        {
+            WriteDebugEvent( SString( "  CreateDeviceInsist succeeded on retry #%d", uiRetryCount + 1 ) );
+            break;
+        }
+        Sleep( 1 );
+    }
+    while( ++uiRetryCount < uiMinTries || retryTimer.Get() < uiTimeout );
+
+    return hResult;
+}
+
+
+////////////////////////////////////////////////
+//
 // Hook CCore::OnPreCreateDevice
 //
 // Modify paramters
@@ -134,8 +162,14 @@ void CCore::OnPreCreateDevice( IDirect3D9* pDirect3D, UINT Adapter, D3DDEVTYPE D
 ////////////////////////////////////////////////
 HRESULT CCore::OnPostCreateDevice( HRESULT hResult, IDirect3D9* pDirect3D, UINT Adapter, D3DDEVTYPE DeviceType, HWND hFocusWindow, DWORD BehaviorFlags, D3DPRESENT_PARAMETERS* pPresentationParameters, IDirect3DDevice9** ppReturnedDeviceInterface )
 {
+    WriteDebugEvent ( "CCore::OnPostCreateDevice" );
+
     // Do diagnostic log if initial attempt failed or previous run failed
     bool bDiagnosticLog = ( hResult != D3D_OK ) || GetApplicationSettingInt( "diagnostics", "last-create-device-result" );
+
+    // If failed, try again a few more times over the next second
+    if ( hResult != D3D_OK )
+        hResult = CreateDeviceInsist( 2, 1000, pDirect3D, Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters, ppReturnedDeviceInterface );
 
     // Save result so we can do something different next time if needed
     SetApplicationSettingInt( "diagnostics", "last-create-device-result", hResult );
@@ -149,7 +183,7 @@ HRESULT CCore::OnPostCreateDevice( HRESULT hResult, IDirect3D9* pDirect3D, UINT 
         *pPresentationParameters = presentationParametersOrig;
         WriteDebugEvent ( "  Attempt #2 with orig pp:" );
         WriteDebugEvent ( ToString( Adapter, DeviceType, hFocusWindow, BehaviorFlags, *pPresentationParameters ) );
-        hResult = pDirect3D->CreateDevice( Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters, ppReturnedDeviceInterface );
+        hResult = CreateDeviceInsist( 2, 1000, pDirect3D, Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters, ppReturnedDeviceInterface );
 
         if ( hResult != D3D_OK )
         {
@@ -158,7 +192,7 @@ HRESULT CCore::OnPostCreateDevice( HRESULT hResult, IDirect3D9* pDirect3D, UINT 
             // If create failed, try using original BehaviorFlags as well
             WriteDebugEvent ( "  Attempt #3 with orig bf+pp:" );
             WriteDebugEvent ( ToString( Adapter, DeviceType, hFocusWindow, BehaviorFlagsOrig, *pPresentationParameters ) );
-            hResult = pDirect3D->CreateDevice( Adapter, DeviceType, hFocusWindow, BehaviorFlagsOrig, pPresentationParameters, ppReturnedDeviceInterface );
+            hResult = CreateDeviceInsist( 2, 1000, pDirect3D, Adapter, DeviceType, hFocusWindow, BehaviorFlagsOrig, pPresentationParameters, ppReturnedDeviceInterface );
 
             if ( hResult != D3D_OK )
             {
@@ -219,8 +253,8 @@ HRESULT CCore::OnPostCreateDevice( HRESULT hResult, IDirect3D9* pDirect3D, UINT 
     // Do diagnostic log now if needed
     if ( bDiagnosticLog )
     {
-        // Prevent other warnings
-        WatchDogCompletedSection ( "L2" );
+        // Prevent statup warning in loader
+        WatchDogCompletedSection ( "L3" );
 
         // Run diagnostic
         CCore::GetSingleton().GetNetwork()->ResetStub( 'dia2', *ms_strExtraLogBuffer );

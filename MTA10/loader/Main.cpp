@@ -259,6 +259,8 @@ int LaunchGame ( LPSTR lpCmdLine )
     // "L2" is opened before the launch sequence and is closed if the GTA loading screen is shown
     // "CR2" is a counter which is incremented at startup, if the previous run didn't make it to the loading screen
     //
+    // "L3" is opened before the launch sequence and is closed if the GTA loading screen is shown, or a startup problem is handled elsewhere
+    //
 
     // Check for unclean stop on previous run
     if ( WatchDogIsSectionOpen ( "L0" ) )
@@ -480,6 +482,7 @@ int DoLaunchGame ( LPSTR lpCmdLine )
     siLoadee.cb = sizeof ( STARTUPINFO );
 
     WatchDogBeginSection ( "L2" );      // Gets closed when loading screen is shown
+    WatchDogBeginSection ( "L3" );      // Gets closed when loading screen is shown, or a startup problem is handled elsewhere
 
     // Start GTA
     if ( 0 == _CreateProcessA( strGTAEXEPath,
@@ -574,7 +577,7 @@ int DoLaunchGame ( LPSTR lpCmdLine )
 
     if ( piLoadee.hThread)
     {
-        WriteDebugEvent( "Loader - Waiting for L2 to close" );
+        WriteDebugEvent( "Loader - Waiting for L3 to close" );
 
         // Show splash until game window is displayed (or max 20 seconds)
         DWORD status;
@@ -584,9 +587,9 @@ int DoLaunchGame ( LPSTR lpCmdLine )
             if ( status != WAIT_TIMEOUT )
                 break;
 
-            if ( !WatchDogIsSectionOpen( "L2" ) )     // Gets closed when loading screen is shown
+            if ( !WatchDogIsSectionOpen( "L3" ) )     // Gets closed when loading screen is shown
             {
-                WriteDebugEvent( "Loader - L2 closed" );
+                WriteDebugEvent( "Loader - L3 closed" );
                 break;
             }
         }
@@ -597,7 +600,7 @@ int DoLaunchGame ( LPSTR lpCmdLine )
         // If hasn't shown the loading screen and gta_sa.exe process is small, give user option to terminate
         if ( status == WAIT_TIMEOUT )
         {
-            if ( WatchDogIsSectionOpen( "L2" ) )     // Gets closed when loading screen is shown
+            if ( WatchDogIsSectionOpen( "L3" ) )     // Gets closed when loading screen is shown
             {
                 if ( IsGTAProcessStuck( piLoadee.hProcess ) )
                 {
