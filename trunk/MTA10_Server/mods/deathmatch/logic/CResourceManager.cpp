@@ -439,23 +439,38 @@ CResource* CResourceManager::GetResourceFromScriptID ( uint uiScriptID )
 // Get net id for resource. (0xFFFF is never used)
 unsigned short CResourceManager::GenerateID ( void )
 {
-    // Create a map of all used IDs
-    map < unsigned short, bool > idMap;
-    list < CResource* > ::const_iterator iter = m_resources.begin ();
-    for ( ; iter != m_resources.end (); iter++ )
+    static bool bHasWrapped = false;
+
+    m_usNextNetId++;
+    if ( m_usNextNetId == 0xFFFF )
     {
-        idMap[ ( *iter )->GetNetID () ] = true;
+        m_usNextNetId++;
+        bHasWrapped = true;
     }
+
+    // If id has not wrapped round yet, we don't have to check for clashes
+    if ( !bHasWrapped )
+        return m_usNextNetId;
 
     // Find an unused ID
     for ( unsigned short i = 0 ; i < 0xFFFE ; i++ )
     {
+        bool bFound = false;
+        for ( list < CResource* > ::const_iterator iter = m_resources.begin () ; iter != m_resources.end (); iter++ )
+        {
+            if ( ( *iter )->GetNetID () == m_usNextNetId )
+            {
+                bFound = true;
+                break;
+            }
+        }
+
+        if ( !bFound )
+            return m_usNextNetId;
+
         m_usNextNetId++;
         if ( m_usNextNetId == 0xFFFF )
             m_usNextNetId++;
-
-        if ( idMap.find ( m_usNextNetId ) == idMap.end () )
-            return m_usNextNetId;
     }
 
     assert ( 0 && "End of world" );
