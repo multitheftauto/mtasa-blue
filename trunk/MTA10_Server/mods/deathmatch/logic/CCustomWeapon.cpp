@@ -63,7 +63,7 @@ void CCustomWeapon::SetWeaponTarget ( CElement * pTarget, int subTarget )
     if ( IS_PED ( pTarget ) )
     {
         if ( subTarget == 255 )
-            m_targetBone = eBone::BONE_PELVIS;
+            m_targetBone = BONE_PELVIS;
         else
             m_targetBone = (eBone)subTarget; 
     }
@@ -111,6 +111,8 @@ bool CCustomWeapon::SetFlags ( eWeaponFlags flag, bool bData )
         case WEAPONFLAGS_INSTANT_RELOAD:
             m_weaponConfig.bInstantReload = bData;
         return true;
+        default:
+            break;
     }
     return false;
 }
@@ -138,6 +140,8 @@ bool CCustomWeapon::GetFlags ( eWeaponFlags flag, bool &bData )
         case WEAPONFLAGS_INSTANT_RELOAD:
             bData = m_weaponConfig.bInstantReload;
         return true;
+        default:
+            break;
     }
     return false;
 }
