@@ -295,26 +295,20 @@ SString CPerfStatManager::GetScaledBitString ( long long Amount )
 
 ///////////////////////////////////////////////////////////////
 //
-// CPerfStatManager::GetScaledMsString
+// CPerfStatManager::GetScaledFloatString
 //
 //
 //
 ///////////////////////////////////////////////////////////////
-SString CPerfStatManager::GetScaledMsString ( float fMs )
+SString CPerfStatManager::GetScaledFloatString ( float fValue )
 {
-    if ( fMs < 1 )
-        return SString ( "%.2f ms", fMs );
+    if ( fValue < 1 )
+        return SString ( "%.2f", fValue );      // 0.00 to 0.99
 
-    if ( fMs < 5 )
-        return SString ( "%.1f ms", fMs );
+    if ( fValue < 5 )
+        return SString ( "%.1f", fValue );      // 1.0 to 4.9
 
-    if ( fMs < 1000 )
-        return SString ( "%.0f ms", fMs );
-
-    if ( fMs < 5000 )
-        return SString ( "%.1f s", fMs * ( 1 / 1000.f ) );
-
-    return SString ( "%.0f s", fMs * ( 1 / 1000.f ) );
+    return SString ( "%.0f", fValue );          // 5 to inf. and beyond
 }
 
 
