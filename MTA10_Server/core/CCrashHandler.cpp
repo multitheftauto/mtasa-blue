@@ -13,6 +13,9 @@
 #include "StdInc.h"
 #include "CCrashHandler.h"
 #include <string>
+#ifndef WIN32
+    #include <execinfo.h>
+#endif
 
 #ifdef WIN32
 #include <tchar.h>
