@@ -90,23 +90,30 @@ namespace
 ////////////////////////////////////////////////
 void CCore::OnPreCreateDevice( IDirect3D9* pDirect3D, UINT Adapter, D3DDEVTYPE DeviceType, HWND hFocusWindow, DWORD& BehaviorFlags, D3DPRESENT_PARAMETERS* pPresentationParameters )
 {
+    WriteDebugEvent ( "CCore::OnPreCreateDevice" );
+
+    uint uiPrevResult = GetApplicationSettingInt( "diagnostics", "last-create-device-result" );
+    if ( uiPrevResult )
+    {
+        // Failed last time, so as a test for logging, try a create device with no modifications
+        WriteDebugEvent ( SString( "Previous CreateDevice failed with: %08x", uiPrevResult ) );
+        WriteDebugEvent ( "  Test unmodified:" );
+        WriteDebugEvent ( ToString( Adapter, DeviceType, hFocusWindow, BehaviorFlags, *pPresentationParameters ) );
+        IDirect3DDevice9* pReturnedDeviceInterface = NULL;
+        HRESULT hResult = pDirect3D->CreateDevice( Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters, &pReturnedDeviceInterface );
+        SAFE_RELEASE( pReturnedDeviceInterface );
+        WriteDebugEvent ( SString( "  Unmodified result is: %08x", hResult ) );
+    }
+
     // Save original values for later
     BehaviorFlagsOrig = BehaviorFlags;
     presentationParametersOrig = *pPresentationParameters;
 
-    WriteDebugEvent ( "CCore::OnPreCreateDevice" );
     WriteDebugEvent ( "  Original paramters:" );
     WriteDebugEvent ( ToString( Adapter, DeviceType, hFocusWindow, BehaviorFlags, *pPresentationParameters ) );
 
     // Make sure DirectX Get...() calls will work
     BehaviorFlags &= ~D3DCREATE_PUREDEVICE;
-
-    // Change the window title to MTA: San Andreas
-    #ifdef MTA_DEBUG
-        SetWindowTextW ( hFocusWindow, MbUTF8ToUTF16("MTA: San Andreas [DEBUG]").c_str() );
-    #else
-        SetWindowTextW ( hFocusWindow, MbUTF8ToUTF16("MTA: San Andreas").c_str() );
-    #endif
 
     // Enable the auto depth stencil parameter
     pPresentationParameters->EnableAutoDepthStencil = true;
@@ -125,17 +132,24 @@ void CCore::OnPreCreateDevice( IDirect3D9* pDirect3D, UINT Adapter, D3DDEVTYPE D
 // Wrap device or log failure
 //
 ////////////////////////////////////////////////
-void CCore::OnPostCreateDevice( HRESULT hResult, IDirect3D9* pDirect3D, UINT Adapter, D3DDEVTYPE DeviceType, HWND hFocusWindow, DWORD BehaviorFlags, D3DPRESENT_PARAMETERS* pPresentationParameters, IDirect3DDevice9** ppReturnedDeviceInterface )
+HRESULT CCore::OnPostCreateDevice( HRESULT hResult, IDirect3D9* pDirect3D, UINT Adapter, D3DDEVTYPE DeviceType, HWND hFocusWindow, DWORD BehaviorFlags, D3DPRESENT_PARAMETERS* pPresentationParameters, IDirect3DDevice9** ppReturnedDeviceInterface )
 {
+    // Do diagnostic log if initial attempt failed or previous run failed
+    bool bDiagnosticLog = ( hResult != D3D_OK ) || GetApplicationSettingInt( "diagnostics", "last-create-device-result" );
+
+    // Save result so we can do something different next time if needed
+    SetApplicationSettingInt( "diagnostics", "last-create-device-result", hResult );
+
     if ( hResult != D3D_OK )
     {
         // Handle retry on failure
         WriteDebugEvent ( SString( "CreateDevice failed #1: %08x", hResult ) );
 
         // If create failed, try using original presentationParameters
+        *pPresentationParameters = presentationParametersOrig;
         WriteDebugEvent ( "  Attempt #2 with orig pp:" );
-        WriteDebugEvent ( ToString( Adapter, DeviceType, hFocusWindow, BehaviorFlags, presentationParametersOrig ) );
-        hResult = pDirect3D->CreateDevice( Adapter, DeviceType, hFocusWindow, BehaviorFlags, &presentationParametersOrig, ppReturnedDeviceInterface );
+        WriteDebugEvent ( ToString( Adapter, DeviceType, hFocusWindow, BehaviorFlags, *pPresentationParameters ) );
+        hResult = pDirect3D->CreateDevice( Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters, ppReturnedDeviceInterface );
 
         if ( hResult != D3D_OK )
         {
@@ -143,8 +157,8 @@ void CCore::OnPostCreateDevice( HRESULT hResult, IDirect3D9* pDirect3D, UINT Ada
 
             // If create failed, try using original BehaviorFlags as well
             WriteDebugEvent ( "  Attempt #3 with orig bf+pp:" );
-            WriteDebugEvent ( ToString( Adapter, DeviceType, hFocusWindow, BehaviorFlagsOrig, presentationParametersOrig ) );
-            hResult = pDirect3D->CreateDevice( Adapter, DeviceType, hFocusWindow, BehaviorFlagsOrig, &presentationParametersOrig, ppReturnedDeviceInterface );
+            WriteDebugEvent ( ToString( Adapter, DeviceType, hFocusWindow, BehaviorFlagsOrig, *pPresentationParameters ) );
+            hResult = pDirect3D->CreateDevice( Adapter, DeviceType, hFocusWindow, BehaviorFlagsOrig, pPresentationParameters, ppReturnedDeviceInterface );
 
             if ( hResult != D3D_OK )
             {
@@ -152,6 +166,13 @@ void CCore::OnPostCreateDevice( HRESULT hResult, IDirect3D9* pDirect3D, UINT Ada
             }
         }
     }
+
+    // Change the window title to MTA: San Andreas
+    #ifdef MTA_DEBUG
+        SetWindowTextW ( hFocusWindow, MbUTF8ToUTF16("MTA: San Andreas [DEBUG]").c_str() );
+    #else
+        SetWindowTextW ( hFocusWindow, MbUTF8ToUTF16("MTA: San Andreas").c_str() );
+    #endif
 
     // Log graphic card name
     D3DADAPTER_IDENTIFIER9 AdapterIdent;
@@ -194,14 +215,21 @@ void CCore::OnPostCreateDevice( HRESULT hResult, IDirect3D9* pDirect3D, UINT Ada
                                     ,ReadableDepthFormat ? std::string ( (char*)&ReadableDepthFormat, 4 ).c_str () : "None"
                                 ) );
     }
-    else
+
+    // Do diagnostic log now if needed
+    if ( bDiagnosticLog )
     {
         // Prevent other warnings
         WatchDogCompletedSection ( "L2" );
 
         // Run diagnostic
         CCore::GetSingleton().GetNetwork()->ResetStub( 'dia2', *ms_strExtraLogBuffer );
+    }
+    ms_strExtraLogBuffer.clear();
 
+    // Handle fatal error
+    if ( hResult != D3D_OK )
+    {
         // Inform user
         SString strMessage;
         strMessage += "There was a problem starting MTA:SA\n\n";
@@ -209,5 +237,5 @@ void CCore::OnPostCreateDevice( HRESULT hResult, IDirect3D9* pDirect3D, UINT Ada
         BrowseToSolution( "d3dcreatedevice-fail", EXIT_GAME_FIRST | ASK_GO_ONLINE, strMessage );
     }
 
-    ms_strExtraLogBuffer.clear();
+    return hResult;
 }
