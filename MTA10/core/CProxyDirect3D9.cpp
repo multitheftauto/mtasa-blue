@@ -4,202 +4,181 @@
 *  LICENSE:     See LICENSE in the top level directory
 *  FILE:        core/CProxyDirect3D9.cpp
 *  PURPOSE:     Direct3D 9 function hooking proxy
+*  DEVELOPERS:  Cecill Etheredge <ijsf@gmx.net>
+*               Christian Myhre Lundheim <>
+*               Derek Abdine <>
+*               Ed Lyons <eai@opencoding.net>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
 *****************************************************************************/
 
 #include "StdInc.h"
-SString GUIDToString ( const GUID& g );
 
-namespace
+extern CCore* g_pCore;
+
+CProxyDirect3D9::CProxyDirect3D9 ( IDirect3D9* pInterface )
 {
-    // Debugging helpers
-    SString ToString( UINT Adapter, D3DDEVTYPE DeviceType, HWND hFocusWindow, DWORD BehaviorFlags, const D3DPRESENT_PARAMETERS& pp )
-    {
-        return SString(
-                        "    Adapter:%d  DeviceType:%d  BehaviorFlags:0x%x\n"
-                        "    BackBufferWidth:%d  Height:%d  Format:%d  Count:%d\n"
-                        "    MultiSampleType:%d  Quality:%d\n"
-                        "    SwapEffect:%d  Windowed:%d  EnableAutoDepthStencil:%d  AutoDepthStencilFormat:%d  Flags:0x%x\n"
-                        "    FullScreen_RefreshRateInHz:%d  PresentationInterval:0x%08x"
-                        , Adapter
-                        , DeviceType
-                        , BehaviorFlags
-                        , pp.BackBufferWidth
-                        , pp.BackBufferHeight
-                        , pp.BackBufferFormat
-                        , pp.BackBufferCount
-                        , pp.MultiSampleType
-                        , pp.MultiSampleQuality
-                        , pp.SwapEffect
-                        , pp.Windowed
-                        , pp.EnableAutoDepthStencil
-                        , pp.AutoDepthStencilFormat
-                        , pp.Flags
-                        , pp.FullScreen_RefreshRateInHz
-                        , pp.PresentationInterval
-                    );
-    }
+    WriteDebugEvent ( "CProxyDirect3D9::CProxyDirect3D9" );
+    m_pDevice       = pInterface;
 
-    SString ToString( const D3DADAPTER_IDENTIFIER9& a )
-    {
-        return SString(
-                        "    Driver:%s\n"
-                        "    Description:%s\n"
-                        "    DeviceName:%s\n"
-                        "    DriverVersion:0x%08x 0x%08x\n"
-                        "    VendorId:0x%08x  DeviceId:0x%08x  SubSysId:0x%08x  Revision:0x%08x  WHQLLevel:0x%08x\n"
-                        "    DeviceIdentifier:%s"
-                        , a.Driver
-                        , a.Description
-                        , a.DeviceName
-                        , a.DriverVersion.HighPart
-                        , a.DriverVersion.LowPart
-                        , a.VendorId
-                        , a.DeviceId
-                        , a.SubSysId
-                        , a.Revision
-                        , a.WHQLLevel
-                        , *GUIDToString( a.DeviceIdentifier )
-                    );
-    }
-
-    //
-    // Hacky log interception
-    //
-    SString ms_strExtraLogBuffer;
-    void WriteDebugEventTest( const SString& strText )
-    {
-        ms_strExtraLogBuffer += strText.Replace( "\n", " " ) + "\n";
-        WriteDebugEvent ( strText );
-    }
-    #define WriteDebugEvent WriteDebugEventTest
-
-    DWORD BehaviorFlagsOrig = 0;
-    D3DPRESENT_PARAMETERS presentationParametersOrig;
+    // Give ourself a matching refcount.
+    pInterface->AddRef ( );
+    m_dwRefCount = pInterface->Release ( );
 }
 
-
-////////////////////////////////////////////////
-//
-// CreateDeviceInsist
-//
-// Keep trying create device for a little bit
-//
-////////////////////////////////////////////////
-HRESULT CreateDeviceInsist( uint uiMinTries, uint uiTimeout, IDirect3D9* pDirect3D, UINT Adapter, D3DDEVTYPE DeviceType, HWND hFocusWindow, DWORD BehaviorFlags, D3DPRESENT_PARAMETERS* pPresentationParameters, IDirect3DDevice9** ppReturnedDeviceInterface )
+CProxyDirect3D9::~CProxyDirect3D9             ( )
 {
-    HRESULT hResult;
-    CElapsedTime retryTimer;
-    uint uiRetryCount = 0;
-    do
-    {
-        hResult = pDirect3D->CreateDevice( Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters, ppReturnedDeviceInterface );
-        if ( hResult == D3D_OK )
-        {
-            WriteDebugEvent( SString( "  CreateDeviceInsist succeeded on retry #%d", uiRetryCount + 1 ) );
-            break;
-        }
-        Sleep( 1 );
-    }
-    while( ++uiRetryCount < uiMinTries || retryTimer.Get() < uiTimeout );
-
-    return hResult;
+    WriteDebugEvent ( "CProxyDirect3D9::~CProxyDirect3D9" );
+    m_pDevice       = NULL;
+    m_dwRefCount    = 0;
 }
 
-
-////////////////////////////////////////////////
-//
-// Hook CCore::OnPreCreateDevice
-//
-// Modify paramters
-//
-////////////////////////////////////////////////
-void CCore::OnPreCreateDevice( IDirect3D9* pDirect3D, UINT Adapter, D3DDEVTYPE DeviceType, HWND hFocusWindow, DWORD& BehaviorFlags, D3DPRESENT_PARAMETERS* pPresentationParameters )
+/*** IUnknown methods ***/
+HRESULT    CProxyDirect3D9::QueryInterface              ( REFIID riid, void** ppvObj )
 {
-    WriteDebugEvent ( "CCore::OnPreCreateDevice" );
+    return m_pDevice->QueryInterface ( riid, ppvObj );
+}
 
-    uint uiPrevResult = GetApplicationSettingInt( "diagnostics", "last-create-device-result" );
-    if ( uiPrevResult )
+ULONG      CProxyDirect3D9::AddRef                      ( VOID )
+{
+    // Increment our refcount.
+    m_dwRefCount++;
+
+    return m_pDevice->AddRef ( );
+}
+
+ULONG      CProxyDirect3D9::Release                     ( VOID )
+{
+    ULONG       ulRefCount;
+    IUnknown *  pDestroyedDevice;
+
+    // Check to see if we should self-destruct
+    if ( --m_dwRefCount == 0 )
     {
-        // Failed last time, so as a test for logging, try a create device with no modifications
-        WriteDebugEvent ( SString( "Previous CreateDevice failed with: %08x", uiPrevResult ) );
-        WriteDebugEvent ( "  Test unmodified:" );
-        WriteDebugEvent ( ToString( Adapter, DeviceType, hFocusWindow, BehaviorFlags, *pPresentationParameters ) );
-        IDirect3DDevice9* pReturnedDeviceInterface = NULL;
-        HRESULT hResult = pDirect3D->CreateDevice( Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters, &pReturnedDeviceInterface );
-        SAFE_RELEASE( pReturnedDeviceInterface );
-        WriteDebugEvent ( SString( "  Unmodified result is: %08x", hResult ) );
+        // Save device so we can destroy it after.
+        pDestroyedDevice = m_pDevice;
+
+        delete this;  
+
+        // Call device's AddRef routine and get the current refcount.
+        ulRefCount = pDestroyedDevice->Release( );
+
+        return ulRefCount;
     }
 
-    // Save original values for later
-    BehaviorFlagsOrig = BehaviorFlags;
-    presentationParametersOrig = *pPresentationParameters;
+    // Call device's AddRef routine and get the current refcount.
+    ulRefCount = m_pDevice->Release( );
 
-    WriteDebugEvent ( "  Original paramters:" );
-    WriteDebugEvent ( ToString( Adapter, DeviceType, hFocusWindow, BehaviorFlags, *pPresentationParameters ) );
+    return ulRefCount;          
+}
 
-    // Make sure DirectX Get...() calls will work
+/*** IDirect3D9 methods ***/
+HRESULT    CProxyDirect3D9::RegisterSoftwareDevice      ( void* pInitializeFunction )
+{
+    return m_pDevice->RegisterSoftwareDevice ( pInitializeFunction );
+}
+
+UINT       CProxyDirect3D9::GetAdapterCount             ( VOID )
+{
+    return m_pDevice->GetAdapterCount ( );
+}
+
+HRESULT    CProxyDirect3D9::GetAdapterIdentifier        ( UINT Adapter, DWORD Flags, D3DADAPTER_IDENTIFIER9* pIdentifier )
+{
+    return m_pDevice->GetAdapterIdentifier ( Adapter, Flags, pIdentifier );
+}
+
+UINT       CProxyDirect3D9::GetAdapterModeCount         ( UINT Adapter, D3DFORMAT Format )
+{
+    return m_pDevice->GetAdapterModeCount ( Adapter, Format );
+}
+
+HRESULT    CProxyDirect3D9::EnumAdapterModes            ( UINT Adapter, D3DFORMAT Format, UINT Mode, D3DDISPLAYMODE* pMode )
+{
+    return m_pDevice->EnumAdapterModes ( Adapter, Format, Mode, pMode );
+}
+
+HRESULT    CProxyDirect3D9::GetAdapterDisplayMode       ( UINT Adapter, D3DDISPLAYMODE* pMode )
+{
+    return m_pDevice->GetAdapterDisplayMode ( Adapter, pMode );
+}
+
+HRESULT    CProxyDirect3D9::CheckDeviceType             ( UINT Adapter, D3DDEVTYPE DevType, D3DFORMAT AdapterFormat, D3DFORMAT BackBufferFormat, BOOL bWindowed )
+{
+    return m_pDevice->CheckDeviceType ( Adapter, DevType, AdapterFormat, BackBufferFormat, bWindowed );
+}
+
+HRESULT    CProxyDirect3D9::CheckDeviceFormat           ( UINT Adapter, D3DDEVTYPE DeviceType, D3DFORMAT AdapterFormat, DWORD Usage, D3DRESOURCETYPE RType, D3DFORMAT CheckFormat )
+{
+    return m_pDevice->CheckDeviceFormat ( Adapter, DeviceType, AdapterFormat, Usage, RType, CheckFormat );
+}
+
+HRESULT    CProxyDirect3D9::CheckDeviceMultiSampleType  ( UINT Adapter, D3DDEVTYPE DeviceType, D3DFORMAT SurfaceFormat, BOOL Windowed, D3DMULTISAMPLE_TYPE MultiSampleType, DWORD* pQualityLevels )
+{
+    return m_pDevice->CheckDeviceMultiSampleType ( Adapter, DeviceType, SurfaceFormat, Windowed, MultiSampleType, pQualityLevels );
+}
+
+HRESULT    CProxyDirect3D9::CheckDepthStencilMatch      ( UINT Adapter, D3DDEVTYPE DeviceType, D3DFORMAT AdapterFormat, D3DFORMAT RenderTargetFormat, D3DFORMAT DepthStencilFormat )
+{
+    return m_pDevice->CheckDepthStencilMatch ( Adapter, DeviceType, AdapterFormat, RenderTargetFormat, DepthStencilFormat );
+}
+
+HRESULT    CProxyDirect3D9::CheckDeviceFormatConversion ( UINT Adapter, D3DDEVTYPE DeviceType, D3DFORMAT SourceFormat, D3DFORMAT TargetFormat )
+{
+    return m_pDevice->CheckDeviceFormatConversion ( Adapter, DeviceType, SourceFormat, TargetFormat );
+}
+
+HRESULT    CProxyDirect3D9::GetDeviceCaps               ( UINT Adapter, D3DDEVTYPE DeviceType, D3DCAPS9* pCaps )
+{   
+    return m_pDevice->GetDeviceCaps ( Adapter, DeviceType, pCaps );
+}
+
+HMONITOR   CProxyDirect3D9::GetAdapterMonitor           ( UINT Adapter )
+{
+    return m_pDevice->GetAdapterMonitor ( Adapter );
+}
+
+HRESULT    CProxyDirect3D9::CreateDevice                ( UINT Adapter, D3DDEVTYPE DeviceType, HWND hFocusWindow, DWORD BehaviorFlags, D3DPRESENT_PARAMETERS* pPresentationParameters, IDirect3DDevice9** ppReturnedDeviceInterface )
+{
+    D3DPRESENT_PARAMETERS presentationParametersOrig = *pPresentationParameters;
+
+    WriteDebugEvent ( "CProxyDirect3D9::CreateDevice" );
+
+    WriteDebugEvent ( SString ( "    Adapter:%d  DeviceType:%d  BehaviorFlags:0x%x"
+                                ,Adapter
+                                ,DeviceType
+                                ,BehaviorFlags
+                            ) );
+
+    // Make sure DirectX Get calls will work
     BehaviorFlags &= ~D3DCREATE_PUREDEVICE;
 
-    // Enable the auto depth stencil parameter
-    pPresentationParameters->EnableAutoDepthStencil = true;
+    WriteDebugEvent ( SString ( "    BackBufferWidth:%d  Height:%d  Format:%d  Count:%d"
+                                ,pPresentationParameters->BackBufferWidth
+                                ,pPresentationParameters->BackBufferHeight
+                                ,pPresentationParameters->BackBufferFormat
+                                ,pPresentationParameters->BackBufferCount
+                           ) );
 
-    GetVideoModeManager ()->PreCreateDevice ( pPresentationParameters );
+    WriteDebugEvent ( SString ( "    MultiSampleType:%d  Quality:%d"
+                                ,pPresentationParameters->MultiSampleType
+                                ,pPresentationParameters->MultiSampleQuality
+                           ) );
 
-    WriteDebugEvent ( "  Modified paramters:" );
-    WriteDebugEvent ( ToString( Adapter, DeviceType, hFocusWindow, BehaviorFlags, *pPresentationParameters ) );
-}
+    WriteDebugEvent ( SString ( "    SwapEffect:%d  Windowed:%d  EnableAutoDepthStencil:%d  AutoDepthStencilFormat:%d  Flags:0x%x"
+                                ,pPresentationParameters->SwapEffect
+                                ,pPresentationParameters->Windowed
+                                ,pPresentationParameters->EnableAutoDepthStencil
+                                ,pPresentationParameters->AutoDepthStencilFormat
+                                ,pPresentationParameters->Flags
+                           ) );
 
+    WriteDebugEvent ( SString ( "    FullScreen_RefreshRateInHz:%d  PresentationInterval:0x%08x"
+                                ,pPresentationParameters->FullScreen_RefreshRateInHz
+                                ,pPresentationParameters->PresentationInterval
+                           ) );
 
-////////////////////////////////////////////////
-//
-// Hook CCore::OnPostCreateDevice
-//
-// Wrap device or log failure
-//
-////////////////////////////////////////////////
-HRESULT CCore::OnPostCreateDevice( HRESULT hResult, IDirect3D9* pDirect3D, UINT Adapter, D3DDEVTYPE DeviceType, HWND hFocusWindow, DWORD BehaviorFlags, D3DPRESENT_PARAMETERS* pPresentationParameters, IDirect3DDevice9** ppReturnedDeviceInterface )
-{
-    WriteDebugEvent ( "CCore::OnPostCreateDevice" );
-
-    // Do diagnostic log if initial attempt failed or previous run failed
-    bool bDiagnosticLog = ( hResult != D3D_OK ) || GetApplicationSettingInt( "diagnostics", "last-create-device-result" );
-
-    // If failed, try again a few more times over the next second
-    if ( hResult != D3D_OK )
-        hResult = CreateDeviceInsist( 2, 1000, pDirect3D, Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters, ppReturnedDeviceInterface );
-
-    // Save result so we can do something different next time if needed
-    SetApplicationSettingInt( "diagnostics", "last-create-device-result", hResult );
-
-    if ( hResult != D3D_OK )
-    {
-        // Handle retry on failure
-        WriteDebugEvent ( SString( "CreateDevice failed #1: %08x", hResult ) );
-
-        // If create failed, try using original presentationParameters
-        *pPresentationParameters = presentationParametersOrig;
-        WriteDebugEvent ( "  Attempt #2 with orig pp:" );
-        WriteDebugEvent ( ToString( Adapter, DeviceType, hFocusWindow, BehaviorFlags, *pPresentationParameters ) );
-        hResult = CreateDeviceInsist( 2, 1000, pDirect3D, Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters, ppReturnedDeviceInterface );
-
-        if ( hResult != D3D_OK )
-        {
-            WriteDebugEvent ( SString( "CreateDevice failed #2: %08x", hResult ) );
-
-            // If create failed, try using original BehaviorFlags as well
-            WriteDebugEvent ( "  Attempt #3 with orig bf+pp:" );
-            WriteDebugEvent ( ToString( Adapter, DeviceType, hFocusWindow, BehaviorFlagsOrig, *pPresentationParameters ) );
-            hResult = CreateDeviceInsist( 2, 1000, pDirect3D, Adapter, DeviceType, hFocusWindow, BehaviorFlagsOrig, pPresentationParameters, ppReturnedDeviceInterface );
-
-            if ( hResult != D3D_OK )
-            {
-                WriteDebugEvent ( SString( "CreateDevice failed #3: %08x", hResult ) );
-            }
-        }
-    }
 
     // Change the window title to MTA: San Andreas
     #ifdef MTA_DEBUG
@@ -208,10 +187,13 @@ HRESULT CCore::OnPostCreateDevice( HRESULT hResult, IDirect3D9* pDirect3D, UINT 
         SetWindowTextW ( hFocusWindow, MbUTF8ToUTF16("MTA: San Andreas").c_str() );
     #endif
 
-    // Log graphic card name
-    D3DADAPTER_IDENTIFIER9 AdapterIdent;
-    pDirect3D->GetAdapterIdentifier ( Adapter, 0, &AdapterIdent );
-    WriteDebugEvent ( ToString( AdapterIdent ) );
+    // Enable the auto depth stencil parameter
+    pPresentationParameters->EnableAutoDepthStencil = true;
+    
+    GetVideoModeManager ()->PreCreateDevice ( pPresentationParameters );
+
+    // Create our object.
+    HRESULT hResult = m_pDevice->CreateDevice ( Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters, ppReturnedDeviceInterface );
 
     // Store the rendering window in the direct 3d data
     CDirect3DData::GetSingleton ().StoreDeviceWindow ( pPresentationParameters->hDeviceWindow );
@@ -219,10 +201,30 @@ HRESULT CCore::OnPostCreateDevice( HRESULT hResult, IDirect3D9* pDirect3D, UINT 
     // Apply input hook
     CMessageLoopHook::GetSingleton ( ).ApplyHook ( hFocusWindow );
 
+    if ( FAILED ( hResult ) )
+    {
+        // Record problem
+        g_pCore->LogEvent( 7125, "Direct3D", "Direct3D9::CreateDevice", SString( "Fail1:%08x", hResult ) );
+        WriteDebugEvent( SString( "Direct3D9::CreateDevice  Fail1:%08x", hResult ) );
+
+        // Try with original presentation parameters ** Note: This will mean windowed mode is ignored **
+        *pPresentationParameters = presentationParametersOrig;
+        hResult = m_pDevice->CreateDevice ( Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters, ppReturnedDeviceInterface );
+
+        if ( FAILED ( hResult ) )
+        {
+            // Record problem
+            g_pCore->LogEvent( 7125, "Direct3D", "Direct3DDevice9::Reset", SString( "Fail2:%08x", hResult ) );
+            WriteDebugEvent( SString( "Direct3DDevice9::Reset  Fail2:%08x", hResult ) );
+
+            // Let caller handle what to do
+            return hResult;
+        }
+    }
+
     // Make sure the object was created successfully.
     if ( hResult == D3D_OK )
     {
-        WriteDebugEvent ( "CreateDevice succeeded" );
         GetVideoModeManager ()->PostCreateDevice ( *ppReturnedDeviceInterface, pPresentationParameters );
 
         // We must first store the presentation values.
@@ -241,7 +243,6 @@ HRESULT CCore::OnPostCreateDevice( HRESULT hResult, IDirect3D9* pDirect3D, UINT 
         D3DDEVICE_CREATION_PARAMETERS parameters;
         (*ppReturnedDeviceInterface)->GetCreationParameters ( &parameters );
 
-        WriteDebugEvent( "   Used creation parameters:" );
         WriteDebugEvent ( SString ( "    Adapter:%d  DeviceType:%d  BehaviorFlags:0x%x  ReadableDepth:%s"
                                     ,parameters.AdapterOrdinal
                                     ,parameters.DeviceType
@@ -250,26 +251,6 @@ HRESULT CCore::OnPostCreateDevice( HRESULT hResult, IDirect3D9* pDirect3D, UINT 
                                 ) );
     }
 
-    // Do diagnostic log now if needed
-    if ( bDiagnosticLog )
-    {
-        // Prevent statup warning in loader
-        WatchDogCompletedSection ( "L3" );
-
-        // Run diagnostic
-        CCore::GetSingleton().GetNetwork()->ResetStub( 'dia2', *ms_strExtraLogBuffer );
-    }
-    ms_strExtraLogBuffer.clear();
-
-    // Handle fatal error
-    if ( hResult != D3D_OK )
-    {
-        // Inform user
-        SString strMessage;
-        strMessage += "There was a problem starting MTA:SA\n\n";
-        strMessage += SString( "Direct3D CreateDevice error: %08x", hResult );
-        BrowseToSolution( "d3dcreatedevice-fail", EXIT_GAME_FIRST | ASK_GO_ONLINE, strMessage );
-    }
 
     return hResult;
 }

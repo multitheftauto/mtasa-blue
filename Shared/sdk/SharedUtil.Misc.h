@@ -107,8 +107,7 @@ namespace SharedUtil
         TERMINATE_IF_YES        = 4,        // What to do at the end. Only relevant if EXIT_GAME_FIRST is not used
         TERMINATE_IF_NO         = 8,        //    ''
         TERMINATE_IF_YES_OR_NO  = TERMINATE_IF_YES | TERMINATE_IF_NO,
-        TERMINATE_PROCESS       = TERMINATE_IF_YES_OR_NO,
-        SHOW_MESSAGE_ONLY       = 16,        // Just show message without going online
+        TERMINATE_PROCESS       = TERMINATE_IF_YES_OR_NO
     };
     void            BrowseToSolution                ( const SString& strType, int uiFlags = 0, const SString& strMessageBoxMessage = "", int iTerminateExitCode = 1 );
     bool            ProcessPendingBrowseToSolution  ( void );

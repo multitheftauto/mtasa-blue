@@ -51,7 +51,6 @@ public:
     void                        InitHooks_Files ( void );
     void                        InitHooks_Weapons ( void );
     void                        InitHooks_Rendering ( void );
-    void                        InitHooks_Direct3D ( void );
     CRemoteDataStorage *        CreateRemoteDataStorage     ();
     void                        DestroyRemoteDataStorage    ( CRemoteDataStorage* pData );
     void                        AddRemoteDataStorage        ( CPlayerPed* pPed, CRemoteDataStorage* pData );
