@@ -36,7 +36,7 @@ extern IDirectInput8* g_pDirectInput8;
     void* operator new ( size_t size, void* where ) { memset(where,0,size); return where; }
 
 
-SString GUIDToString ( const GUID& g )
+static SString GUIDToString ( const GUID& g )
 {
     return SString (
                     "%08x-%04x-%04x-%02x%02x-%02x%02x%02x%02x%02x%02x",

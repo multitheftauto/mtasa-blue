@@ -15,11 +15,20 @@
 
 #include <windows.h>
 
+enum D3DHOOKTYPE
+{
+    D3DHOOK_D3D9,
+    D3DHOOK_D3D8,
+    D3DHOOK_UNKNOWN
+};
+
 enum DINPUTHOOKTYPE
 {
     DINPUTHOOK_DINPUT8,
     DINPUTHOOK_UNKNOWN
 };
+
+typedef IUnknown * ( __stdcall * pDirect3DCreate )    ( int SDKVersion );
 
 typedef HRESULT    ( __stdcall * pDirectInputCreate ) ( HINSTANCE   hinst, 
                                                         DWORD       dwVersion,
