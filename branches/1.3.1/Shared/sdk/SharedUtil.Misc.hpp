@@ -496,8 +496,6 @@ bool SharedUtil::ProcessPendingBrowseToSolution ( void )
     {
         if ( !strMessageBoxMessage.empty() )
             MessageBox ( NULL, strMessageBoxMessage, "MTA: San Andreas", MB_OK | MB_ICONEXCLAMATION | MB_TOPMOST );
-        if ( iFlags & SHOW_MESSAGE_ONLY )
-            return true;
     }
 
     MessageBox ( NULL, "Your browser will now display a web page with some help infomation.\n\n(If the page fails to load, paste (CTRL-V) the URL into your web browser)"
@@ -583,15 +581,6 @@ SString SharedUtil::GetReportLogContents ( void )
 // Client logfile.txt
 void WriteEvent( const char* szType, const SString& strText )
 {
-    // Split into lines if required
-    if ( strText.Contains( "\n" ) )
-    {
-        std::vector< SString > lineList;
-        strText.Split( "\n", lineList );
-        for ( uint i = 0 ; i < lineList.size() ; i++ )
-            WriteEvent( szType, lineList[i] );
-        return;
-    }
     SString strPathFilename = CalcMTASAPath( PathJoin( "mta", "logfile.txt" ) );
     SString strMessage( "%s - %s %s", *GetLocalTimeString(), szType, *strText );
     FileAppend( strPathFilename, strMessage + "\n" );
