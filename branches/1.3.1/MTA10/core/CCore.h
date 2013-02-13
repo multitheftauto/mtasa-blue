@@ -176,6 +176,7 @@ public:
     // Hooks
     void                    ApplyHooks                      ( void );
     void                    ApplyHooks2                     ( void );
+    void                    InitHooks_Direct3D              ( void );
     HWND                    GetHookedWindow                 ( void );
     void                    SwitchRenderWindow              ( HWND hWnd, HWND hWndInput );
     void                    CallSetCursorPos                ( int X, int Y ) { m_pSetCursorPosHook->CallSetCursorPos(X,Y); }
