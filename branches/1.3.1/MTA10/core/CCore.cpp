@@ -733,7 +733,6 @@ void CCore::ApplyHooks2 ( )
         CCore::GetSingleton ( ).CreateGame ( );
         CCore::GetSingleton ( ).CreateMultiplayer ( );
         CCore::GetSingleton ( ).CreateXML ( );
-        CCore::GetSingleton ( ).CreateGUI ( );
         bLoadedModules = true;
     }
 }

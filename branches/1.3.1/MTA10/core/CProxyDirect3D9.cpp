@@ -98,7 +98,7 @@ HRESULT CreateDeviceInsist( uint uiMinTries, uint uiTimeout, IDirect3D9* pDirect
         hResult = pDirect3D->CreateDevice( Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters, ppReturnedDeviceInterface );
         if ( hResult == D3D_OK )
         {
-            WriteDebugEvent( SString( "  CreateDeviceInsist succeeded on retry #%d", uiRetryCount + 1 ) );
+            WriteDebugEvent( SString( "   -- CreateDeviceInsist succeeded on retry #%d", uiRetryCount + 1 ) );
             break;
         }
         Sleep( 1 );
@@ -106,6 +106,71 @@ HRESULT CreateDeviceInsist( uint uiMinTries, uint uiTimeout, IDirect3D9* pDirect
     while( ++uiRetryCount < uiMinTries || retryTimer.Get() < uiTimeout );
 
     return hResult;
+}
+
+
+
+////////////////////////////////////////////////
+//
+// InDepthMegaTestDirect3D9
+//
+// Do various things
+//
+////////////////////////////////////////////////
+void InDepthMegaTestDirect3D9( UINT SdkVersion, UINT Adapter, D3DDEVTYPE DeviceType, HWND hFocusWindow, DWORD BehaviorFlags, D3DPRESENT_PARAMETERS* pInPresentationParameters )
+{
+    WriteDebugEvent ( "InDepthMegaTest" );
+
+    HRESULT hResult = -2;
+    IDirect3DDevice9* pReturnedDeviceInterface = NULL;
+    IDirect3D9* pDirect3D9 = Direct3DCreate9( SdkVersion );
+
+    if ( !pDirect3D9 )
+        WriteDebugEvent( SString( "  Could not create Direct3DCreate9( %d )", SdkVersion ) );
+    else
+    {
+        WriteDebugEvent( SString( "  Created pDirect3D9:%08x from Direct3DCreate9( %d )", pDirect3D9, SdkVersion ) );
+
+        // First try to create with our new interface
+        hResult = CreateDeviceInsist( 2, 1000, pDirect3D9, Adapter, DeviceType, hFocusWindow, BehaviorFlags, pInPresentationParameters, &pReturnedDeviceInterface );
+        WriteDebugEvent( SString( "  (A) hResult:#08x  pReturnedDeviceInterface:%08x  ", hResult, pReturnedDeviceInterface ) );
+        SAFE_RELEASE( pReturnedDeviceInterface );
+
+        // Then try with some changes
+        D3DPRESENT_PARAMETERS pp = *pInPresentationParameters;
+        pp.MultiSampleQuality = 0;
+        pp.MultiSampleType = D3DMULTISAMPLE_NONE;
+        pp.BackBufferHeight = 640;
+        pp.BackBufferWidth = 480;
+
+        hResult = CreateDeviceInsist( 2, 1000, pDirect3D9, Adapter, DeviceType, hFocusWindow, BehaviorFlags, &pp, &pReturnedDeviceInterface );
+        WriteDebugEvent( SString( "  (B) hResult:#08x  pReturnedDeviceInterface:%08x  ", hResult, pReturnedDeviceInterface ) );
+        SAFE_RELEASE( pReturnedDeviceInterface );
+
+        // And some more changes
+        pp.Windowed = true;
+        pp.FullScreen_RefreshRateInHz = D3DPRESENT_RATE_DEFAULT;
+        hResult = CreateDeviceInsist( 2, 1000, pDirect3D9, Adapter, DeviceType, hFocusWindow, BehaviorFlags, &pp, &pReturnedDeviceInterface );
+        WriteDebugEvent( SString( "  (C) hResult:#08x  pReturnedDeviceInterface:%08x  ", hResult, pReturnedDeviceInterface ) );
+        SAFE_RELEASE( pReturnedDeviceInterface );
+
+        SAFE_RELEASE( pDirect3D9 );
+    }
+}
+
+
+////////////////////////////////////////////////
+//
+// InDepthMegaTest
+//
+// Do various things
+//
+////////////////////////////////////////////////
+void InDepthMegaTest( UINT Adapter, D3DDEVTYPE DeviceType, HWND hFocusWindow, DWORD BehaviorFlags, D3DPRESENT_PARAMETERS* pInPresentationParameters )
+{
+    WriteDebugEvent ( "InDepthMegaTest" );
+    InDepthMegaTestDirect3D9( D3D_SDK_VERSION, Adapter, DeviceType, hFocusWindow, BehaviorFlags, pInPresentationParameters );
+    InDepthMegaTestDirect3D9( D3D9b_SDK_VERSION, Adapter, DeviceType, hFocusWindow, BehaviorFlags, pInPresentationParameters );
 }
 
 
@@ -197,9 +262,12 @@ HRESULT CCore::OnPostCreateDevice( HRESULT hResult, IDirect3D9* pDirect3D, UINT 
             if ( hResult != D3D_OK )
             {
                 WriteDebugEvent ( SString( "CreateDevice failed #3: %08x", hResult ) );
+                InDepthMegaTest( Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters );
             }
         }
     }
+
+    CCore::GetSingleton ( ).CreateGUI ( );
 
     // Change the window title to MTA: San Andreas
     #ifdef MTA_DEBUG
