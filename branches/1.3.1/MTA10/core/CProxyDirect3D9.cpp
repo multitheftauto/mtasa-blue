@@ -10,8 +10,6 @@
 *****************************************************************************/
 
 #include "StdInc.h"
-#include "SharedUtil.Hooks.h"
-#include "SharedUtil.Hooks.hpp"
 SString GUIDToString ( const GUID& g );
 
 namespace
@@ -100,7 +98,7 @@ HRESULT CreateDeviceInsist( uint uiMinTries, uint uiTimeout, IDirect3D9* pDirect
         hResult = pDirect3D->CreateDevice( Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters, ppReturnedDeviceInterface );
         if ( hResult == D3D_OK )
         {
-            WriteDebugEvent( SString( "   -- CreateDeviceInsist succeeded on retry #%d", uiRetryCount + 1 ) );
+            WriteDebugEvent( SString( "  CreateDeviceInsist succeeded on retry #%d", uiRetryCount + 1 ) );
             break;
         }
         Sleep( 1 );
@@ -108,71 +106,6 @@ HRESULT CreateDeviceInsist( uint uiMinTries, uint uiTimeout, IDirect3D9* pDirect
     while( ++uiRetryCount < uiMinTries || retryTimer.Get() < uiTimeout );
 
     return hResult;
-}
-
-
-
-////////////////////////////////////////////////
-//
-// InDepthMegaTestDirect3D9
-//
-// Do various things
-//
-////////////////////////////////////////////////
-void InDepthMegaTestDirect3D9( UINT SdkVersion, UINT Adapter, D3DDEVTYPE DeviceType, HWND hFocusWindow, DWORD BehaviorFlags, D3DPRESENT_PARAMETERS* pInPresentationParameters )
-{
-    WriteDebugEvent ( "InDepthMegaTest" );
-
-    HRESULT hResult = -2;
-    IDirect3DDevice9* pReturnedDeviceInterface = NULL;
-    IDirect3D9* pDirect3D9 = Direct3DCreate9( SdkVersion );
-
-    if ( !pDirect3D9 )
-        WriteDebugEvent( SString( "  Could not create Direct3DCreate9( %d )", SdkVersion ) );
-    else
-    {
-        WriteDebugEvent( SString( "  Created pDirect3D9:%08x from Direct3DCreate9( %d )", pDirect3D9, SdkVersion ) );
-
-        // First try to create with our new interface
-        hResult = CreateDeviceInsist( 2, 1000, pDirect3D9, Adapter, DeviceType, hFocusWindow, BehaviorFlags, pInPresentationParameters, &pReturnedDeviceInterface );
-        WriteDebugEvent( SString( "  (A) hResult:#08x  pReturnedDeviceInterface:%08x  ", hResult, pReturnedDeviceInterface ) );
-        SAFE_RELEASE( pReturnedDeviceInterface );
-
-        // Then try with some changes
-        D3DPRESENT_PARAMETERS pp = *pInPresentationParameters;
-        pp.MultiSampleQuality = 0;
-        pp.MultiSampleType = D3DMULTISAMPLE_NONE;
-        pp.BackBufferHeight = 640;
-        pp.BackBufferWidth = 480;
-
-        hResult = CreateDeviceInsist( 2, 1000, pDirect3D9, Adapter, DeviceType, hFocusWindow, BehaviorFlags, &pp, &pReturnedDeviceInterface );
-        WriteDebugEvent( SString( "  (B) hResult:#08x  pReturnedDeviceInterface:%08x  ", hResult, pReturnedDeviceInterface ) );
-        SAFE_RELEASE( pReturnedDeviceInterface );
-
-        // And some more changes
-        pp.Windowed = true;
-        pp.FullScreen_RefreshRateInHz = D3DPRESENT_RATE_DEFAULT;
-        hResult = CreateDeviceInsist( 2, 1000, pDirect3D9, Adapter, DeviceType, hFocusWindow, BehaviorFlags, &pp, &pReturnedDeviceInterface );
-        WriteDebugEvent( SString( "  (C) hResult:#08x  pReturnedDeviceInterface:%08x  ", hResult, pReturnedDeviceInterface ) );
-        SAFE_RELEASE( pReturnedDeviceInterface );
-
-        SAFE_RELEASE( pDirect3D9 );
-    }
-}
-
-
-////////////////////////////////////////////////
-//
-// InDepthMegaTest
-//
-// Do various things
-//
-////////////////////////////////////////////////
-void InDepthMegaTest( UINT Adapter, D3DDEVTYPE DeviceType, HWND hFocusWindow, DWORD BehaviorFlags, D3DPRESENT_PARAMETERS* pInPresentationParameters )
-{
-    WriteDebugEvent ( "InDepthMegaTest" );
-    InDepthMegaTestDirect3D9( D3D_SDK_VERSION, Adapter, DeviceType, hFocusWindow, BehaviorFlags, pInPresentationParameters );
-    InDepthMegaTestDirect3D9( D3D9b_SDK_VERSION, Adapter, DeviceType, hFocusWindow, BehaviorFlags, pInPresentationParameters );
 }
 
 
@@ -264,16 +197,9 @@ HRESULT CCore::OnPostCreateDevice( HRESULT hResult, IDirect3D9* pDirect3D, UINT 
             if ( hResult != D3D_OK )
             {
                 WriteDebugEvent ( SString( "CreateDevice failed #3: %08x", hResult ) );
-                InDepthMegaTest( Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters );
             }
         }
     }
-
-    CCore::GetSingleton ( ).CreateNetwork ( );
-    CCore::GetSingleton ( ).CreateGame ( );
-    CCore::GetSingleton ( ).CreateMultiplayer ( );
-    CCore::GetSingleton ( ).CreateXML ( );
-    CCore::GetSingleton ( ).CreateGUI ( );
 
     // Change the window title to MTA: San Andreas
     #ifdef MTA_DEBUG
@@ -346,137 +272,4 @@ HRESULT CCore::OnPostCreateDevice( HRESULT hResult, IDirect3D9* pDirect3D, UINT 
     }
 
     return hResult;
-}
-
-
-
-
-
-namespace
-{
-    IDirect3D9* ms_pDirect3D    = NULL;
-    UINT ms_Adapter             = 0;
-    D3DDEVTYPE ms_DeviceType    = D3DDEVTYPE_HAL;
-    HWND ms_hFocusWindow        = NULL;
-    DWORD ms_BehaviorFlags      = 0;
-    D3DPRESENT_PARAMETERS* ms_pPresentationParameters   = NULL;
-    IDirect3DDevice9** ms_ppReturnedDeviceInterface     = NULL;
-}
-
-////////////////////////////////////////////////////////////////
-//
-// OnPreCreateDevice
-//
-// Called before GTA creates the D3D device
-//
-////////////////////////////////////////////////////////////////
-void _cdecl OnPreCreateDevice( IDirect3D9* pDirect3D, UINT Adapter, D3DDEVTYPE DeviceType, HWND hFocusWindow, DWORD* BehaviorFlags, D3DPRESENT_PARAMETERS* pPresentationParameters, IDirect3DDevice9** ppReturnedDeviceInterface )
-{
-    g_pCore->OnPreCreateDevice( pDirect3D, Adapter, DeviceType, hFocusWindow, *BehaviorFlags, pPresentationParameters );
-    ms_pDirect3D                 = pDirect3D;
-    ms_Adapter                   = Adapter;
-    ms_DeviceType                = DeviceType;
-    ms_hFocusWindow              = hFocusWindow;
-    ms_BehaviorFlags             = *BehaviorFlags;
-    ms_pPresentationParameters   = pPresentationParameters;
-    ms_ppReturnedDeviceInterface = ppReturnedDeviceInterface;
-}
-
-// Hook info
-#define HOOKPOS_PreCreateDevice_US          0x07F677A
-#define HOOKPOS_PreCreateDevice_EU          0x07F67BA
-#define HOOKSIZE_PreCreateDevice_US         6
-#define HOOKSIZE_PreCreateDevice_EU         6
-DWORD RETURN_PreCreateDevice_US =           0x07F6781;
-DWORD RETURN_PreCreateDevice_EU =           0x07F67C1;
-DWORD RETURN_PreCreateDevice_BOTH =         0;
-void _declspec(naked) HOOK_PreCreateDevice()
-{
-    _asm
-    {
-        // Replaced code
-        mov     eax, ds:0x0C97C24       // __RwD3DAdapterIndex
-        push    eax
-        push    ecx
-
-        pushad
-        push    [esp+32+4*6]
-        push    [esp+32+4*6]
-        lea     eax,[esp+32+4*6]    // Turn BehaviorFlags into a pointer so we can modify it
-        push    eax
-        push    [esp+32+4*6]
-        push    [esp+32+4*6]
-        push    [esp+32+4*6]
-        push    [esp+32+4*6]
-        call    OnPreCreateDevice
-        add     esp, 4*7
-        popad
-
-        // Continue
-        jmp     RETURN_PreCreateDevice_BOTH
-    }
-}
-
-
-////////////////////////////////////////////////////////////////
-//
-// OnPostCreateDevice
-//
-// Called after GTA creates the D3D device
-//
-////////////////////////////////////////////////////////////////
-HRESULT _cdecl OnPostCreateDevice( HRESULT hResult )
-{
-    return g_pCore->OnPostCreateDevice( hResult, ms_pDirect3D, ms_Adapter, ms_DeviceType, ms_hFocusWindow, ms_BehaviorFlags, ms_pPresentationParameters, ms_ppReturnedDeviceInterface );
-}
-
-// Hook info
-#define HOOKPOS_PostCreateDevice_US         0x07F6784
-#define HOOKPOS_PostCreateDevice_EU         0x07F67C4
-#define HOOKSIZE_PostCreateDevice_US        6
-#define HOOKSIZE_PostCreateDevice_EU        6
-DWORD RETURN_PostCreateDevice_US =          0x07F678A;
-DWORD RETURN_PostCreateDevice_EU =          0x07F67CA;
-DWORD RETURN_PostCreateDevice_BOTH =        0;
-DWORD RETURN_PostCreateDeviceB_US =         0x07F6799;
-DWORD RETURN_PostCreateDeviceB_EU =         0x07F67D9;
-DWORD RETURN_PostCreateDeviceB_BOTH =       0;
-void _declspec(naked) HOOK_PostCreateDevice()
-{
-    _asm
-    {
-        // Replaced code
-        pushad
-        push    eax
-        call    OnPostCreateDevice
-        mov     [esp+0],eax
-        add     esp, 4*1
-        popad
-        mov     eax,[esp-32-4*1]
-
-        // Continue
-        test    eax, eax
-        jge     ok
-        xor     eax, eax
-        jmp     RETURN_PostCreateDevice_BOTH
-
-ok:
-        jmp     RETURN_PostCreateDeviceB_BOTH
-    }
-}
-
-
-//////////////////////////////////////////////////////////////////////////////////////////
-//
-// CCore::InitHooks_Direct3D
-//
-// Setup hook
-//
-//////////////////////////////////////////////////////////////////////////////////////////
-void CCore::InitHooks_Direct3D ( void )
-{
-    DWORD oldProt;
-    VirtualProtect((LPVOID)0x401000, 0x4A3000, PAGE_EXECUTE_READWRITE, &oldProt);
-    EZHookInstall ( PreCreateDevice );
-    EZHookInstall ( PostCreateDevice );
 }

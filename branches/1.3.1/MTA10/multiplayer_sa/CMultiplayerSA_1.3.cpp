@@ -146,7 +146,7 @@ void CMultiplayerSA::InitHooks_13 ( void )
     InitHooks_Files ();
     InitHooks_Weapons ();
     InitHooks_Rendering ();
-    //InitHooks_Direct3D();
+    InitHooks_Direct3D();
 }
 
 void CMultiplayerSA::InitMemoryCopies_13 ( void )

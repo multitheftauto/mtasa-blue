@@ -100,7 +100,7 @@ CVideoModeManagerInterface* GetVideoModeManager ( void )
 ///////////////////////////////////////////////////////////////
 CVideoModeManager::CVideoModeManager ( void )
 {
-    //m_pGameSettings = CCore::GetSingleton ( ).GetGame ( )->GetSettings();
+    m_pGameSettings = CCore::GetSingleton ( ).GetGame ( )->GetSettings();
     m_iCurrentVideoMode = 1;
     m_bCurrentWindowed = false;
     m_iNextVideoMode = 1;
@@ -124,12 +124,6 @@ void CVideoModeManager::PreCreateDevice ( D3DPRESENT_PARAMETERS* pp )
 {
     m_hDeviceWindow = pp->hDeviceWindow;
 
-    // Temp hack for testing
-    SString strFileContent;
-    FileLoad( CalcMTASAPath( PathJoin( "mta", "coreconfig.xml" ) ), strFileContent );
-    SString strValue = strFileContent.SplitRight( "<display_windowed>" );
-    m_bCurrentWindowed = atoi( *strValue );
-/*
     // Load settings
     LoadCVars ();
 
@@ -137,7 +131,6 @@ void CVideoModeManager::PreCreateDevice ( D3DPRESENT_PARAMETERS* pp )
     m_iNextVideoMode = m_iCurrentVideoMode;
     m_bNextWindowed  = m_bCurrentWindowed;
     m_bNextFullScreenMinimize  = m_bCurrentFullScreenMinimize;
-*/
 
     // Remember this for later
     m_ulFullScreenRefreshRate = pp->FullScreen_RefreshRateInHz;
@@ -196,17 +189,6 @@ void CVideoModeManager::PreCreateDevice ( D3DPRESENT_PARAMETERS* pp )
 ///////////////////////////////////////////////////////////////
 void CVideoModeManager::PostCreateDevice ( IDirect3DDevice9* pD3DDevice, D3DPRESENT_PARAMETERS* pp )
 {
-    m_pGameSettings = CCore::GetSingleton ( ).GetGame ( )->GetSettings();
-
-    LoadCVars ();
-
-    // Prime save values
-    m_iNextVideoMode = m_iCurrentVideoMode;
-    m_bNextWindowed  = m_bCurrentWindowed;
-    m_bNextFullScreenMinimize  = m_bCurrentFullScreenMinimize;
-
-
-
     // This helps alt-tab stability in fullscreen mode
     if ( m_bCurrentWindowed || m_bBetterAltTabStability )
        pD3DDevice->Reset ( pp );

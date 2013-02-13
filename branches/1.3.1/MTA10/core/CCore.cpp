@@ -729,7 +729,11 @@ void CCore::ApplyHooks2 ( )
     static bool bLoadedModules = false;
     if ( !bLoadedModules )
     {
-        InitHooks_Direct3D();
+        CCore::GetSingleton ( ).CreateNetwork ( );
+        CCore::GetSingleton ( ).CreateGame ( );
+        CCore::GetSingleton ( ).CreateMultiplayer ( );
+        CCore::GetSingleton ( ).CreateXML ( );
+        CCore::GetSingleton ( ).CreateGUI ( );
         bLoadedModules = true;
     }
 }
