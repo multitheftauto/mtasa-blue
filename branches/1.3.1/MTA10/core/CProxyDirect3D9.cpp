@@ -199,12 +199,12 @@ HRESULT    CProxyDirect3D9::CreateDevice                ( UINT Adapter, D3DDEVTY
     // Store the rendering window in the direct 3d data
     CDirect3DData::GetSingleton ().StoreDeviceWindow ( pPresentationParameters->hDeviceWindow );
 
-    // Apply input hook
-    CMessageLoopHook::GetSingleton ( ).ApplyHook ( hFocusWindow );
-
     // Make sure the object was created successfully.
     if ( hResult == D3D_OK )
     {
+        // Apply input hook
+        CMessageLoopHook::GetSingleton ( ).ApplyHook ( hFocusWindow );
+
         GetVideoModeManager ()->PostCreateDevice ( *ppReturnedDeviceInterface, pPresentationParameters );
 
         // We must first store the presentation values.
@@ -230,10 +230,8 @@ HRESULT    CProxyDirect3D9::CreateDevice                ( UINT Adapter, D3DDEVTY
                                     ,ReadableDepthFormat ? std::string ( (char*)&ReadableDepthFormat, 4 ).c_str () : "None"
                                 ) );
     }
-    else
-    {
-        hResult = DoSomethingSpecialFarAway( hResult, m_pDevice, Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters, ppReturnedDeviceInterface );
-    }
+
+    hResult = DoSomethingSpecialFarAway( hResult, m_pDevice, Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters, ppReturnedDeviceInterface );
 
     return hResult;
 }
