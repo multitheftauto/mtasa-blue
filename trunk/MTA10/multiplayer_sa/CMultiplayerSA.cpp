@@ -1902,6 +1902,22 @@ void CMultiplayerSA::ResetSky ( void )
     bUsingCustomSkyGradient = false;
 }
 
+void CMultiplayerSA::SetMoonSize ( int iSize )
+{
+    MemPutFast < BYTE > ( 0x8D4B60, iSize );
+}
+
+int CMultiplayerSA::GetMoonSize ()
+{
+    return *(BYTE *)0x8D4B60;
+}
+
+void CMultiplayerSA::ResetMoonSize ()
+{
+    // Set default moon size 3
+    SetMoonSize ( 3 );
+}
+
 bool CMultiplayerSA::HasWaterColor ( )
 {
     return bUsingCustomWaterColor;

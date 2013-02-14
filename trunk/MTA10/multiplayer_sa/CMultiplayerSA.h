@@ -134,6 +134,9 @@ public:
     float                       GetSunSize                  ( );
     void                        SetSunSize                  ( float fSize );
     void                        ResetSunSize                ( );
+    void                        SetMoonSize                 ( int iSize );
+    int                         GetMoonSize                 ( );
+    void                        ResetMoonSize               ( );
 
     void                        SetNightVisionEnabled       ( bool bEnabled );
     void                        SetThermalVisionEnabled     ( bool bEnabled );

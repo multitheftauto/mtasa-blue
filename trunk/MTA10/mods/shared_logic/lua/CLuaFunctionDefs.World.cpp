@@ -2022,3 +2022,38 @@ int CLuaFunctionDefs::GetBirdsEnabled ( lua_State* luaVM )
     lua_pushboolean ( luaVM, false );
     return 1;
 }
+
+int CLuaFunctionDefs::SetMoonSize ( lua_State* luaVM )
+{
+    int iSize;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadNumber( iSize );
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( CStaticFunctionDefinitions::SetMoonSize ( iSize ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefs::GetMoonSize ( lua_State* luaVM )
+{
+    lua_pushnumber ( luaVM, g_pMultiplayer->GetMoonSize () );
+    return 1;
+}
+
+int CLuaFunctionDefs::ResetMoonSize ( lua_State* luaVM )
+{
+    g_pMultiplayer->ResetMoonSize ();
+    lua_pushboolean ( luaVM, true );
+    return 1;
+}
