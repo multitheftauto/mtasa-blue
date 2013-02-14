@@ -1062,7 +1062,10 @@ void CCore::DoPostFramePulse ( )
     }
 
     if ( m_pGame->GetSystemState () == 5 ) // GS_INIT_ONCE
+    {
         WatchDogCompletedSection ( "L2" );      // gta_sa.set seems ok
+        WatchDogCompletedSection ( "L3" );      // No hang on startup
+    }
 
     // This is the first frame in the menu?
     if ( m_pGame->GetSystemState () == 7 ) // GS_FRONTEND

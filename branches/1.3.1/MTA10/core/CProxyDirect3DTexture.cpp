@@ -218,7 +218,7 @@ HRESULT DoCreateDevice( IDirect3D9* pDirect3D, UINT Adapter, D3DDEVTYPE DeviceTy
     // If initial attempt failed, enable diagnostic log and try again a few more times over the next second
     WriteDebugEvent ( "  Attempt #2:" );
     WriteDebugEvent ( ToString( Adapter, DeviceType, hFocusWindow, BehaviorFlags, *pPresentationParameters ) );
-    HRESULT hResult = CreateDeviceInsist( 4, 1000, pDirect3D, Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters, ppReturnedDeviceInterface );
+    HRESULT hResult = CreateDeviceInsist( 2, 1000, pDirect3D, Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters, ppReturnedDeviceInterface );
     if ( hResult == D3D_OK )
         return hResult;
     WriteDebugEvent ( SString( "CreateDevice failed #2: %08x", hResult ) );
@@ -229,7 +229,7 @@ HRESULT DoCreateDevice( IDirect3D9* pDirect3D, UINT Adapter, D3DDEVTYPE DeviceTy
         pPresentationParameters->MultiSampleType = D3DMULTISAMPLE_NONE;
         WriteDebugEvent ( "  Attempt #3 with D3DMULTISAMPLE_NONE:" );
         WriteDebugEvent ( ToString( Adapter, DeviceType, hFocusWindow, BehaviorFlags, *pPresentationParameters ) );
-        hResult = CreateDeviceInsist( 4, 1000, pDirect3D, Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters, ppReturnedDeviceInterface );
+        hResult = CreateDeviceInsist( 2, 1000, pDirect3D, Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters, ppReturnedDeviceInterface );
         if ( hResult == D3D_OK )
             return hResult;
         WriteDebugEvent ( SString( "CreateDevice failed #3: %08x", hResult ) );
@@ -239,7 +239,7 @@ HRESULT DoCreateDevice( IDirect3D9* pDirect3D, UINT Adapter, D3DDEVTYPE DeviceTy
     WriteDebugEvent ( "  Attempt #4 with D3DCREATE_PUREDEVICE:" );
     BehaviorFlags |= D3DCREATE_PUREDEVICE;
     WriteDebugEvent ( ToString( Adapter, DeviceType, hFocusWindow, BehaviorFlags, *pPresentationParameters ) );
-    hResult = CreateDeviceInsist( 4, 1000, pDirect3D, Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters, ppReturnedDeviceInterface );
+    hResult = CreateDeviceInsist( 2, 1000, pDirect3D, Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters, ppReturnedDeviceInterface );
     if ( hResult == D3D_OK )
         return hResult;
     WriteDebugEvent ( SString( "CreateDevice failed #4: %08x", hResult ) );
@@ -252,7 +252,7 @@ HRESULT DoCreateDevice( IDirect3D9* pDirect3D, UINT Adapter, D3DDEVTYPE DeviceTy
         BehaviorFlags &= ~D3DCREATE_PUREDEVICE;
         WriteDebugEvent ( "  Test with 640x480" );
         WriteDebugEvent ( ToString( Adapter, DeviceType, hFocusWindow, BehaviorFlags, pp ) );
-        HRESULT hResult = CreateDeviceInsist( 4, 1000, pDirect3D, Adapter, DeviceType, hFocusWindow, BehaviorFlags, &pp, ppReturnedDeviceInterface );
+        HRESULT hResult = CreateDeviceInsist( 2, 1000, pDirect3D, Adapter, DeviceType, hFocusWindow, BehaviorFlags, &pp, ppReturnedDeviceInterface );
         WriteDebugEvent ( SString( "  Test result: %08x", hResult ) );
     }
 
@@ -269,72 +269,92 @@ HRESULT DoCreateDevice( IDirect3D9* pDirect3D, UINT Adapter, D3DDEVTYPE DeviceTy
 ////////////////////////////////////////////////
 HRESULT DoSomethingSpecialFarAway( HRESULT hResult, IDirect3D9* pDirect3D, UINT Adapter, D3DDEVTYPE DeviceType, HWND hFocusWindow, DWORD BehaviorFlags, D3DPRESENT_PARAMETERS* pPresentationParameters, IDirect3DDevice9** ppReturnedDeviceInterface )
 {
-    if ( hResult == D3D_OK )
-    {
-        // Just log success and card type
-        WriteDebugEvent ( "CreateDevice success" );
-
-        WriteDebugEvent ( ToString( Adapter, DeviceType, hFocusWindow, BehaviorFlags, *pPresentationParameters ) );
-
-        D3DADAPTER_IDENTIFIER9 AdapterIdent;
-        pDirect3D->GetAdapterIdentifier ( Adapter, 0, &AdapterIdent );
-        WriteDebugEvent ( ToString( AdapterIdent ) );
-
-        ms_strExtraLogBuffer.clear();
-        return hResult;
-    }
-
-    WriteDebugEvent ( SString( "CreateDevice failed #0: %08x", hResult ) );
+    uint uiDiagnosticLogLevel = 0;
 
     // Log graphic card name
     D3DADAPTER_IDENTIFIER9 AdapterIdent;
     pDirect3D->GetAdapterIdentifier ( Adapter, 0, &AdapterIdent );
     WriteDebugEvent ( ToString( AdapterIdent ) );
 
-    hResult = DoCreateDevice ( pDirect3D, Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters, ppReturnedDeviceInterface );
+    // Update success counter
+    int iSuccessChain = GetApplicationSettingInt( "diagnostics", "createdevice-success-chain" );
+    if ( hResult == D3D_OK )
+        iSuccessChain++;
+    else
+        iSuccessChain = 0;
+    SetApplicationSettingInt( "diagnostics", "createdevice-success-chain", iSuccessChain );
 
-    // Make sure the object was created successfully.
     if ( hResult == D3D_OK )
     {
-        WriteDebugEvent ( "CreateDevice2 succeeded" );
+        // Log success and creation parameters
+        WriteDebugEvent ( "CreateDevice success" );
+        WriteDebugEvent ( ToString( Adapter, DeviceType, hFocusWindow, BehaviorFlags, *pPresentationParameters ) );
 
-        // Apply input hook
-        CMessageLoopHook::GetSingleton ( ).ApplyHook ( hFocusWindow );
-
-        GetVideoModeManager ()->PostCreateDevice ( *ppReturnedDeviceInterface, pPresentationParameters );
-
-        // We must first store the presentation values.
-        CDirect3DData::GetSingleton ( ).StoreViewport ( 0, 0,
-                                                        pPresentationParameters->BackBufferWidth,
-                                                        pPresentationParameters->BackBufferHeight );
-        
-        // Calc and store readable depth format for shader use
-        ERenderFormat ReadableDepthFormat = CDirect3DEvents9::DiscoverReadableDepthFormat ( *ppReturnedDeviceInterface, pPresentationParameters->MultiSampleType, pPresentationParameters->Windowed != 0 );
-        CGraphics::GetSingleton ().GetRenderItemManager ()->SetDepthBufferFormat ( ReadableDepthFormat );
-
-        // Now create the proxy device.
-        *ppReturnedDeviceInterface = new CProxyDirect3DDevice9 ( *ppReturnedDeviceInterface );
-
-        // Debug output
-        D3DDEVICE_CREATION_PARAMETERS parameters;
-        (*ppReturnedDeviceInterface)->GetCreationParameters ( &parameters );
-
-        WriteDebugEvent ( SString ( "    Adapter:%d  DeviceType:%d  BehaviorFlags:0x%x  ReadableDepth:%s"
-                                    ,parameters.AdapterOrdinal
-                                    ,parameters.DeviceType
-                                    ,parameters.BehaviorFlags
-                                    ,ReadableDepthFormat ? std::string ( (char*)&ReadableDepthFormat, 4 ).c_str () : "None"
-                                ) );
+        // Output log if first success and NVidia M card
+        if ( iSuccessChain == 1 )
+        {
+            SString strAdapterDesc = AdapterIdent.Description;
+            if ( strAdapterDesc.ContainsI( "NVIDIA" ) && strAdapterDesc.Contains( "M" ) )
+            {
+                uiDiagnosticLogLevel = 1;   // Output log and continue
+            }
+        }
     }
 
+    if ( hResult != D3D_OK )
+    {
+        // Handle failure of initial create device call
+        WriteDebugEvent ( SString( "CreateDevice failed #0: %08x", hResult ) );
+
+        uiDiagnosticLogLevel = 2;   // Output log and wait
+
+        // Try create device again
+        hResult = DoCreateDevice ( pDirect3D, Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters, ppReturnedDeviceInterface );
+
+        // Make sure the object was created successfully.
+        if ( hResult == D3D_OK )
+        {
+            WriteDebugEvent ( "CreateDevice2 succeeded" );
+
+            // Apply input hook
+            CMessageLoopHook::GetSingleton ( ).ApplyHook ( hFocusWindow );
+
+            GetVideoModeManager ()->PostCreateDevice ( *ppReturnedDeviceInterface, pPresentationParameters );
+
+            // We must first store the presentation values.
+            CDirect3DData::GetSingleton ( ).StoreViewport ( 0, 0,
+                                                            pPresentationParameters->BackBufferWidth,
+                                                            pPresentationParameters->BackBufferHeight );
+            
+            // Calc and store readable depth format for shader use
+            ERenderFormat ReadableDepthFormat = CDirect3DEvents9::DiscoverReadableDepthFormat ( *ppReturnedDeviceInterface, pPresentationParameters->MultiSampleType, pPresentationParameters->Windowed != 0 );
+            CGraphics::GetSingleton ().GetRenderItemManager ()->SetDepthBufferFormat ( ReadableDepthFormat );
+
+            // Now create the proxy device.
+            *ppReturnedDeviceInterface = new CProxyDirect3DDevice9 ( *ppReturnedDeviceInterface );
+
+            // Debug output
+            D3DDEVICE_CREATION_PARAMETERS parameters;
+            (*ppReturnedDeviceInterface)->GetCreationParameters ( &parameters );
+
+            WriteDebugEvent ( SString ( "    Adapter:%d  DeviceType:%d  BehaviorFlags:0x%x  ReadableDepth:%s"
+                                        ,parameters.AdapterOrdinal
+                                        ,parameters.DeviceType
+                                        ,parameters.BehaviorFlags
+                                        ,ReadableDepthFormat ? std::string ( (char*)&ReadableDepthFormat, 4 ).c_str () : "None"
+                                    ) );
+        }
+    }
+
+
     // Do diagnostic log now if needed
-    if ( true )
+    if ( uiDiagnosticLogLevel )
     {
         // Prevent statup warning in loader
         WatchDogCompletedSection ( "L3" );
 
         // Run diagnostic
-        CCore::GetSingleton().GetNetwork()->ResetStub( 'dia2', *ms_strExtraLogBuffer );
+        CCore::GetSingleton().GetNetwork()->ResetStub( 'dia3', *ms_strExtraLogBuffer, uiDiagnosticLogLevel );
     }
     ms_strExtraLogBuffer.clear();
 
