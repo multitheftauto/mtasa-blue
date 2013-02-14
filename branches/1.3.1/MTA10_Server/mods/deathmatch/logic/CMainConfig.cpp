@@ -299,10 +299,11 @@ bool CMainConfig::Load ( void )
                 }
         }
 
-        // Add support for SD #12, #14 and #15 (defaults to disabled)
+        // Add support for SD #12, #14, #15 and #16 (defaults to disabled)
         MapInsert ( m_DisableComboACMap, "12" );
         MapInsert ( m_DisableComboACMap, "14" );
         MapInsert ( m_DisableComboACMap, "15" );
+        MapInsert ( m_DisableComboACMap, "16" );
 
         {
             SString strEnableSD;
@@ -1263,7 +1264,7 @@ const std::vector < SIntSetting >& CMainConfig::GetIntSettingList ( void )
             { true, true,   0,      1,      2,      "ase",                                  &m_iAseMode,                                &CMainConfig::OnAseSettingChange },
             { true, true,   0,      1,      1,      "donotbroadcastlan",                    &m_bDontBroadcastLan,                       &CMainConfig::OnAseSettingChange },
             { true, true,   0,      1,      1,      "net_auto_filter",                      &m_bNetAutoFilter,                          &CMainConfig::ApplyNetOptions },
-            { true, true,   1,      10,     100,    "update_cycle_datagrams_limit",         &m_iUpdateCycleDatagramsLimit,              &CMainConfig::ApplyNetOptions },
+            { true, true,   1,      5,      100,    "update_cycle_datagrams_limit",         &m_iUpdateCycleDatagramsLimit,              &CMainConfig::ApplyNetOptions },
         };
 
     static std::vector < SIntSetting > settingsList;
