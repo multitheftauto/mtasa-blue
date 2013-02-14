@@ -6078,6 +6078,16 @@ bool CStaticFunctionDefinitions::GetBirdsEnabled ( void )
     return g_pClientGame->GetBirdsEnabled();
 }
 
+bool CStaticFunctionDefinitions::SetMoonSize ( int iSize )
+{
+    if ( iSize >= 0 )
+    {
+        g_pMultiplayer->SetMoonSize ( iSize );
+        return true;
+    }
+    return false;
+}  
+
 bool CStaticFunctionDefinitions::BindKey ( const char* szKey, const char* szHitState, CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFunction, CLuaArguments& Arguments )
 {
     assert ( szKey );
