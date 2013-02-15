@@ -127,6 +127,9 @@ namespace
                                          { "isVehicleNitroActivated",       "1.3.1-9.04993" },
                                          { "getVehicleNitroCount",          "1.3.1-9.04993" },
                                          { "getVehicleNitroLevel",          "1.3.1-9.04993" },
+                                         { "setMoonSize",                   "1.3.1-9.05064" },
+                                         { "resetMoonSize",                 "1.3.1-9.05064" },
+                                         { "getMoonSize",                   "1.3.1-9.05064" },
                                         };
 
     SVersionItem serverFunctionInitList[] = {
@@ -177,6 +180,9 @@ namespace
                                          { "setPedWalkingStyle",        "1.3.1-9.04935" },
                                          { "setAircraftMaxVelocity",    "1.3.1-9.04997" },
                                          { "getAircraftMaxVelocity",    "1.3.1-9.04997" },
+                                         { "setMoonSize",               "1.3.1-9.05064" },
+                                         { "resetMoonSize",             "1.3.1-9.05064" },
+                                         { "getMoonSize",               "1.3.1-9.05064" },
                                         };
 
 
