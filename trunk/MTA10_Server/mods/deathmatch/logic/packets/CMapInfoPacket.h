@@ -80,7 +80,9 @@ public:
                                                       bool bOverrideFogDistance = false,
                                                       float fFogDistance = 0,
                                                       float fAircraftMaxHeight = 800,
-                                                      float fAircraftMaxVelocity = 1.5f );
+                                                      float fAircraftMaxVelocity = 1.5f,
+                                                      bool bOverrideMoonSize = false,
+                                                      int iMoonSize = 3 );
 
     inline ePacketID        GetPacketID             ( void ) const              { return PACKET_ID_MAP_INFO; };
     inline unsigned long    GetFlags                ( void ) const              { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
@@ -136,6 +138,8 @@ private:
     float                   m_fFogDistance;
     float                   m_fAircraftMaxHeight;
     float                   m_fAircraftMaxVelocity;
+    bool                    m_bOverrideMoonSize;
+    int                     m_iMoonSize;
 };
 
 #endif
