@@ -2160,6 +2160,23 @@ void CPacketHandler::Packet_MapInfo ( NetBitStreamInterface& bitStream )
         g_pGame->GetWeather ( )->SetAmountOfRain ( fRainLevel );
     }
 
+    // Moon size
+    bool bOverrideMoonSize = false;
+    int iMoonSize = 3;
+    if ( bitStream.Version () >= 0x40 )
+    {
+        if ( !bitStream.ReadBit ( bOverrideMoonSize ) )
+            return;
+        if ( bOverrideMoonSize )
+        {
+            if ( !bitStream.Read ( iMoonSize ) )
+                return;
+
+
+            g_pMultiplayer->SetMoonSize ( iMoonSize );
+        }
+    }
+	
     // Sun size
     bool bOverrideSunSize = false;
     float fSunSize;

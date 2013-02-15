@@ -5030,6 +5030,9 @@ void CClientGame::ResetMapInfo ( void )
     // Aircraft max velocity
     g_pGame->GetWorld ()->SetAircraftMaxVelocity ( DEFAULT_AIRCRAFT_MAXVELOCITY );
 
+    // Moon size
+    g_pMultiplayer->ResetMoonSize ();
+
     // Disable the change of any player stats
     g_pMultiplayer->SetLocalStatsStatic ( true );
 

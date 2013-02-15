@@ -509,6 +509,7 @@ public:
     static bool                         CreateSWATRope                      ( CVector vecPosition, DWORD dwDuration );
     static bool                         SetBirdsEnabled                     ( bool bEnabled );
     static bool                         GetBirdsEnabled                     ( void );
+    static bool                         SetMoonSize                         ( int iSize );
 
     // Input functions
     static bool                         BindKey                             ( const char* szKey, const char* szHitState, CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFunction, CLuaArguments& Arguments );

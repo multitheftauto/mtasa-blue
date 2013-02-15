@@ -795,6 +795,9 @@ public:
     LUA_DECLARE ( GetBirdsEnabled );
     LUA_DECLARE ( SetPedTargetingMarkerEnabled );
     LUA_DECLARE ( IsPedTargetingMarkerEnabled );
+    LUA_DECLARE ( SetMoonSize );
+    LUA_DECLARE ( GetMoonSize );
+    LUA_DECLARE ( ResetMoonSize );
 
     // Input functions
     LUA_DECLARE ( BindKey );

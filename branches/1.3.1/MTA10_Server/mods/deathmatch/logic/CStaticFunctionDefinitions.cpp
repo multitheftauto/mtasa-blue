@@ -9570,6 +9570,17 @@ bool CStaticFunctionDefinitions::GetSunSize ( float& fSunSize )
     return false;
 }
 
+bool CStaticFunctionDefinitions::GetMoonSize ( int& iSize )
+{
+    if ( g_pGame->HasMoonSize ( ) )
+    {
+        iSize = g_pGame->GetMoonSize ( );
+        return true;
+    }
+
+    return false;
+}
+
 bool CStaticFunctionDefinitions::GetSunColor ( unsigned char& ucCoreR, unsigned char& ucCoreG, unsigned char& ucCoreB, unsigned char& ucCoronaR, unsigned char& ucCoronaG, unsigned char& ucCoronaB )
 {
     if ( g_pGame->HasSunColor ( ) )
@@ -9727,6 +9738,22 @@ bool CStaticFunctionDefinitions::SetSunSize ( float fSunSize )
     return true;
 }
 
+bool CStaticFunctionDefinitions::SetMoonSize ( int iMoonSize )
+{    
+    if ( iMoonSize >= 0 )
+    {
+        g_pGame->SetMoonSize ( iMoonSize );
+        g_pGame->SetHasMoonSize ( true );
+        
+        CBitStream BitStream;
+        BitStream.pBitStream->Write ( iMoonSize );
+        m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_MOON_SIZE, *BitStream.pBitStream ) );
+        return true;
+    }
+    
+    return false;
+}
+
 bool CStaticFunctionDefinitions::SetSunColor ( unsigned char ucCoreR, unsigned char ucCoreG, unsigned char ucCoreB, unsigned char ucCoronaR, unsigned char ucCoronaG, unsigned char ucCoronaB )
 {
     g_pGame->SetSunColor ( ucCoreR, ucCoreG, ucCoreB, ucCoronaR, ucCoronaG, ucCoronaB );
@@ -9796,16 +9823,11 @@ bool CStaticFunctionDefinitions::SetAircraftMaxHeight ( float fMaxHeight )
 bool CStaticFunctionDefinitions::SetAircraftMaxVelocity ( float fVelocity )
 {
     CBitStream BitStream;
-    if ( BitStream.pBitStream->Version () >= 0x3E )
-    {
-        g_pGame->SetAircraftMaxVelocity ( fVelocity );
+    g_pGame->SetAircraftMaxVelocity ( fVelocity );
 
-        BitStream.pBitStream->Write ( fVelocity );
-        m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_AIRCRAFT_MAXVELOCITY, *BitStream.pBitStream ) );
-        return true;
-    }
-
-    return false;
+    BitStream.pBitStream->Write ( fVelocity );
+    m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_AIRCRAFT_MAXVELOCITY, *BitStream.pBitStream ) );
+    return true;
 }
 
 bool CStaticFunctionDefinitions::SetOcclusionsEnabled ( bool bEnabled )
@@ -9924,6 +9946,15 @@ bool CStaticFunctionDefinitions::RestoreAllWorldModels ( void )
     CBitStream BitStream;
     m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( RESTORE_ALL_WORLD_MODELS, *BitStream.pBitStream ) );
 
+    return true;
+}
+
+bool CStaticFunctionDefinitions::ResetMoonSize ( void )
+{    
+    CBitStream BitStream;
+    g_pGame->SetHasMoonSize ( false );
+
+    m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( RESET_MOON_SIZE, *BitStream.pBitStream ) );
     return true;
 }
 

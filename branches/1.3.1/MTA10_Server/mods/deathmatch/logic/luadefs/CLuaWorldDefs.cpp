@@ -46,6 +46,7 @@ void CLuaWorldDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "getAircraftMaxHeight", CLuaWorldDefs::getAircraftMaxHeight );
     CLuaCFunctions::AddFunction ( "getAircraftMaxVelocity", CLuaWorldDefs::getAircraftMaxVelocity );
     CLuaCFunctions::AddFunction ( "getOcclusionsEnabled", CLuaWorldDefs::getOcclusionsEnabled );
+    CLuaCFunctions::AddFunction ( "getMoonSize", CLuaWorldDefs::getMoonSize );
 
     // Set
     CLuaCFunctions::AddFunction ( "setTime", CLuaWorldDefs::setTime );
@@ -74,6 +75,7 @@ void CLuaWorldDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "setAircraftMaxHeight", CLuaWorldDefs::setAircraftMaxHeight );
     CLuaCFunctions::AddFunction ( "setAircraftMaxVelocity", CLuaWorldDefs::setAircraftMaxVelocity );
     CLuaCFunctions::AddFunction ( "setOcclusionsEnabled", CLuaWorldDefs::setOcclusionsEnabled );
+    CLuaCFunctions::AddFunction ( "setMoonSize", CLuaWorldDefs::setMoonSize );
 
     // Reset
     CLuaCFunctions::AddFunction ( "resetSkyGradient", CLuaWorldDefs::resetSkyGradient );
@@ -87,6 +89,7 @@ void CLuaWorldDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "removeWorldModel", CLuaWorldDefs::RemoveWorldModel );
     CLuaCFunctions::AddFunction ( "restoreWorldModel", CLuaWorldDefs::RestoreWorldModel );
     CLuaCFunctions::AddFunction ( "restoreAllWorldModels", CLuaWorldDefs::RestoreAllWorldModels );
+    CLuaCFunctions::AddFunction ( "resetMoonSize", CLuaWorldDefs::resetMoonSize );
 }
 
 
@@ -700,6 +703,19 @@ int CLuaWorldDefs::getSunSize ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaWorldDefs::getMoonSize ( lua_State* luaVM )
+{
+    int iMoonSize;
+    if ( CStaticFunctionDefinitions::GetMoonSize ( iMoonSize ) )
+    {
+        lua_pushnumber ( luaVM, iMoonSize );
+        return 1;
+    }
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
 int CLuaWorldDefs::getSunColor ( lua_State* luaVM )
 {
     unsigned char ucCoreR, ucCoreG, ucCoreB, ucCoronaR, ucCoronaG, ucCoronaB;
@@ -837,6 +853,28 @@ int CLuaWorldDefs::setSunSize ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaWorldDefs::setMoonSize ( lua_State* luaVM )
+{
+    CScriptArgReader argStream ( luaVM );
+
+    int iMoonSize;
+    argStream.ReadNumber ( iMoonSize );
+
+    if ( !argStream.HasErrors ( ) )
+    {
+        if ( CStaticFunctionDefinitions::SetMoonSize ( iMoonSize ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
 int CLuaWorldDefs::setSunColor ( lua_State* luaVM )
 {
     CScriptArgReader argStream ( luaVM );
@@ -957,6 +995,17 @@ int CLuaWorldDefs::resetSunSize ( lua_State* luaVM )
 int CLuaWorldDefs::resetSunColor ( lua_State* luaVM )
 {
     if ( CStaticFunctionDefinitions::ResetSunColor ( ) )
+    {
+        lua_pushboolean ( luaVM, true );
+        return 1;
+    }
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaWorldDefs::resetMoonSize ( lua_State* luaVM )
+{
+    if ( CStaticFunctionDefinitions::ResetMoonSize ( ) )
     {
         lua_pushboolean ( luaVM, true );
         return 1;

@@ -62,6 +62,9 @@ void CWorldRPCs::LoadFunctions ( void )
     AddHandler ( RESTORE_WORLD_MODEL, RestoreWorldModel, "RestoreWorldModel");
     AddHandler ( RESTORE_ALL_WORLD_MODELS, RestoreAllWorldModels, "RestoreAllWorldModels");
     AddHandler ( SET_SYNC_INTERVALS, SetSyncIntervals, "SetSyncIntervals" );
+
+    AddHandler ( SET_MOON_SIZE, SetMoonSize, "SetMoonSize" );
+    AddHandler ( RESET_MOON_SIZE, ResetMoonSize, "ResetMoonSize" );
 }
 
 
@@ -619,4 +622,20 @@ void CWorldRPCs::SetSyncIntervals ( NetBitStreamInterface& bitStream )
     bitStream.Read ( g_TickRateSettings.iObjectSync );
     bitStream.Read ( g_TickRateSettings.iKeySyncRotation );
     bitStream.Read ( g_TickRateSettings.iKeySyncAnalogMove );
+}
+
+
+void CWorldRPCs::SetMoonSize ( NetBitStreamInterface& bitStream )
+{
+    int iMoonSize;
+        
+    if ( bitStream.Read ( iMoonSize ) )
+    {
+        g_pMultiplayer->SetMoonSize ( iMoonSize );
+    }
+}
+
+void CWorldRPCs::ResetMoonSize ( NetBitStreamInterface& bitStream )
+{
+    g_pMultiplayer->ResetMoonSize ();
 }

@@ -67,7 +67,9 @@ CMapInfoPacket::CMapInfoPacket ( unsigned char ucWeather,
                                  bool bOverrideFogDistance,
                                  float fFogDistance,
                                  float fAircraftMaxHeight,
-                                 float fAircraftMaxVelocity )
+                                 float fAircraftMaxVelocity,
+                                 bool bOverrideMoonSize,
+                                 int iMoonSize )
 {
     m_ucWeather = ucWeather;
     m_ucWeatherBlendingTo = ucWeatherBlendingTo;
@@ -121,6 +123,8 @@ CMapInfoPacket::CMapInfoPacket ( unsigned char ucWeather,
     m_fFogDistance = fFogDistance;
     m_fAircraftMaxHeight = fAircraftMaxHeight;
     m_fAircraftMaxVelocity = fAircraftMaxVelocity;
+    m_bOverrideMoonSize = bOverrideMoonSize;
+    m_iMoonSize = iMoonSize;
 }
 
 
@@ -216,6 +220,16 @@ bool CMapInfoPacket::Write ( NetBitStreamInterface& BitStream ) const
     if ( m_bOverrideRainLevel )
     {
         BitStream.Write ( m_fRainLevel );
+    }
+
+    // Moon size
+    if ( BitStream.Version () >= 0x40 )
+    {
+        BitStream.WriteBit ( m_bOverrideMoonSize );
+        if ( m_bOverrideMoonSize )
+        {
+            BitStream.Write ( m_iMoonSize );
+        }
     }
 
     // Sun size

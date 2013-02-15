@@ -150,6 +150,7 @@ CGame::CGame ( void )
     m_bOverrideWindVelocity = false;
     m_bOverrideFarClip = false;
     m_bOverrideFogDistance = false;
+    m_bOverrideMoonSize = false;
 
     m_pASE = NULL;
     ResetMapInfo();
@@ -231,6 +232,7 @@ void CGame::ResetMapInfo ( void )
     g_pGame->SetHasSunColor ( false );
     g_pGame->SetHasSunSize ( false );
     g_pGame->SetHasWindVelocity ( false );
+    g_pGame->SetHasMoonSize ( false );
 }
 
 CGame::~CGame ( void )

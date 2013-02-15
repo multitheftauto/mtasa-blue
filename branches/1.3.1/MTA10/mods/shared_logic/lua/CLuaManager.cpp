@@ -951,6 +951,9 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getOcclusionsEnabled", CLuaFunctionDefs::GetOcclusionsEnabled );
     CLuaCFunctions::AddFunction ( "getCloudsEnabled", CLuaFunctionDefs::GetCloudsEnabled );
     CLuaCFunctions::AddFunction ( "getRainLevel", CLuaFunctionDefs::GetRainLevel );
+    CLuaCFunctions::AddFunction ( "setMoonSize", CLuaFunctionDefs::SetMoonSize );
+    CLuaCFunctions::AddFunction ( "getMoonSize", CLuaFunctionDefs::GetMoonSize );
+    CLuaCFunctions::AddFunction ( "resetMoonSize", CLuaFunctionDefs::ResetMoonSize );
 
     // World set funcs
     CLuaCFunctions::AddFunction ( "setTime", CLuaFunctionDefs::SetTime );

@@ -208,6 +208,9 @@ public:
     virtual float                       GetSunSize                  ( ) = 0;
     virtual void                        SetSunSize                  ( float fSize ) = 0;
     virtual void                        ResetSunSize                ( ) = 0;
+    virtual void                        SetMoonSize                 ( int iSize ) = 0;
+    virtual int                         GetMoonSize                 ( ) = 0;
+    virtual void                        ResetMoonSize               ( ) = 0;
 
     virtual void                        DisableEnterExitVehicleKey  ( bool bDisabled ) = 0;
 
