@@ -223,10 +223,13 @@ bool CMapInfoPacket::Write ( NetBitStreamInterface& BitStream ) const
     }
 
     // Moon size
-    BitStream.WriteBit ( m_bOverrideMoonSize );
-    if ( m_bOverrideMoonSize )
+    if ( BitStream.Version () >= 0x40 )
     {
-        BitStream.Write ( m_iMoonSize );
+        BitStream.WriteBit ( m_bOverrideMoonSize );
+        if ( m_bOverrideMoonSize )
+        {
+            BitStream.Write ( m_iMoonSize );
+        }
     }
 
     // Sun size
