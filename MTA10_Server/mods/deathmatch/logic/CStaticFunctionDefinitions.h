@@ -554,6 +554,7 @@ public:
     static bool                 GetFogDistance                      ( float& fFogDist );
     static bool                 GetAircraftMaxHeight                ( float& fMaxHeight );
     static bool                 GetOcclusionsEnabled                ( bool& bEnabled );
+    static bool                 GetMoonSize                         ( int& iSize );
 
     // General world set funcs
     static bool                 SetTime                             ( unsigned char ucHour, unsigned char ucMinute );
@@ -601,7 +602,9 @@ public:
     static bool                 RestoreAllWorldModels               ( void );
     static bool                 SendSyncIntervals                   ( CPlayer* pPlayer = NULL );
     static bool                 SetPedTargetingMarkerEnabled        ( bool bEnabled );
-    static bool                 IsPedTargetingMarkerEnabled        ( void );
+    static bool                 IsPedTargetingMarkerEnabled         ( void );
+    static bool                 SetMoonSize                         ( int iMoonSize );
+    static bool                 ResetMoonSize                       ( void );
 
     // Loaded Map Functions
     static CElement*            GetRootElement                      ( void );

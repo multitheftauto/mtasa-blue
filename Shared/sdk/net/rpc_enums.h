@@ -243,5 +243,9 @@ enum eRPCFunctions
     SET_WEAPON_OWNER,
 
     SET_AIRCRAFT_MAXVELOCITY,
-    NUM_RPC_FUNCS,
+    
+    RESET_MOON_SIZE,
+    SET_MOON_SIZE,
+
+    NUM_RPC_FUNCS
 };

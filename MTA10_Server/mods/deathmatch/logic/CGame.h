@@ -347,6 +347,12 @@ public:
     void                        SetJetpackWeaponEnabled     ( eWeaponType weaponType, bool bEnabled );
     bool                        GetJetpackWeaponEnabled     ( eWeaponType weaponType );
 
+    inline bool                 HasMoonSize                  ( void )        { return m_bOverrideMoonSize; }
+    inline void                 SetHasMoonSize               ( bool bOverrideMoonSize ) { m_bOverrideMoonSize = bOverrideMoonSize; }
+
+    inline int                  GetMoonSize                  ( void )        { return m_iMoonSize; }
+    inline void                 SetMoonSize                  ( int iMoonSize ) { m_iMoonSize = iMoonSize; }
+
     void                        PulseMasterServerAnnounce   ( bool bIsInitialAnnounce = false );
     void                        StartOpenPortsTest          ( void );
 
@@ -500,6 +506,9 @@ private:
 
     bool                        m_bOverrideSunSize;
     float                       m_fSunSize;
+
+    bool                        m_bOverrideMoonSize;
+    int                         m_iMoonSize;
 
     bool                        m_bOverrideSunColor;
     unsigned char               m_ucSunCoreR, m_ucSunCoreG, m_ucSunCoreB, m_ucSunCoronaR, m_ucSunCoronaG, m_ucSunCoronaB;

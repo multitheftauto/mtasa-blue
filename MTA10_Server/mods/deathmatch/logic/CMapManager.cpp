@@ -511,6 +511,10 @@ void CMapManager::OnPlayerJoin ( CPlayer& Player )
     bool bOverrideSunSize = g_pGame->HasSunSize ( );
     float fSunSize = g_pGame->GetSunSize ( );
 
+    // Moon size
+    bool bOverrideMoonSize = g_pGame->HasMoonSize ( );
+    int iMoonSize = g_pGame->GetMoonSize ( );
+
     // Sun color
     bool bOverrideSunColor = g_pGame->HasSunColor ( );
     unsigned char ucCoreR, ucCoreG, ucCoreB;
@@ -578,7 +582,9 @@ void CMapManager::OnPlayerJoin ( CPlayer& Player )
                                    bOverrideFogDistance,
                                    fFogDistance,
                                    fAircraftMaxHeight,
-                                   fAircraftMaxVelocity ) );
+                                   fAircraftMaxVelocity,
+                                   bOverrideMoonSize,
+                                   iMoonSize ) );
 
     marker.Set ( "SendMapInfoPacket" );
 
