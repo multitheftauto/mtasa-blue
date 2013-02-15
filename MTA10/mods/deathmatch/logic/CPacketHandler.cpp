@@ -2166,14 +2166,17 @@ void CPacketHandler::Packet_MapInfo ( NetBitStreamInterface& bitStream )
     // Moon size
     bool bOverrideMoonSize = false;
     int iMoonSize = 3;
-    if ( !bitStream.ReadBit ( bOverrideMoonSize ) )
-        return;
-    if ( bOverrideMoonSize )
+    if ( bitStream.Version () >= 0x40 )
     {
-        if ( !bitStream.Read ( iMoonSize ) )
+        if ( !bitStream.ReadBit ( bOverrideMoonSize ) )
             return;
+        if ( bOverrideMoonSize )
+        {
+            if ( !bitStream.Read ( iMoonSize ) )
+                return;
 
-        g_pMultiplayer->SetMoonSize ( iMoonSize );
+            g_pMultiplayer->SetMoonSize ( iMoonSize );
+        }
     }
 
     // Sun size
@@ -2251,10 +2254,13 @@ void CPacketHandler::Packet_MapInfo ( NetBitStreamInterface& bitStream )
 
     // Aircraft max velocity
     float fAircraftMaxVelocity = 1.5f;
-    if ( !bitStream.Read ( fAircraftMaxVelocity ) )
-        return;
+    if ( bitStream.Version () >= 0x3E )
+    {
+        if ( !bitStream.Read ( fAircraftMaxVelocity ) )
+            return;
 
-    g_pGame->GetWorld ()->SetAircraftMaxVelocity ( fAircraftMaxVelocity );
+        g_pGame->GetWorld ()->SetAircraftMaxVelocity ( fAircraftMaxVelocity );
+    }
 
     g_pGame->SetJetpackWeaponEnabled( WEAPONTYPE_TEC9, true );
     g_pGame->SetJetpackWeaponEnabled( WEAPONTYPE_MICRO_UZI, true );
