@@ -374,27 +374,92 @@ HRESULT DoCreateDevice( IDirect3D9* pDirect3D, UINT Adapter, D3DDEVTYPE DeviceTy
         WriteDebugEvent ( SString( "    CreateDevice failed #3: %08x", hResult ) );
     }
 
-    // If create failed, try using pure device
-    WriteDebugEvent ( "      Pass #4 with D3DCREATE_PUREDEVICE:" );
-    BehaviorFlags |= D3DCREATE_PUREDEVICE;
-    WriteDebugEvent ( ToString( Adapter, DeviceType, hFocusWindow, BehaviorFlags, *pPresentationParameters ) );
-    hResult = CreateDeviceInsist( 2, 1000, pDirect3D, Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters, ppReturnedDeviceInterface );
-    if ( hResult == D3D_OK )
-        return hResult;
-    WriteDebugEvent ( SString( "      CreateDevice failed #4: %08x", hResult ) );
-
-    // If create failed, do a test create for logging only
+    // Run through different combinations
+    uint presentIntervalList[] = { D3DPRESENT_INTERVAL_IMMEDIATE, D3DPRESENT_INTERVAL_DEFAULT, D3DPRESENT_INTERVAL_ONE };
+    D3DSWAPEFFECT swapEffectList[] = { D3DSWAPEFFECT_DISCARD, D3DSWAPEFFECT_FLIP, D3DSWAPEFFECT_COPY };
+    D3DFORMAT rtFormatList32[] = { D3DFMT_A8R8G8B8, D3DFMT_X8R8G8B8 };
+    D3DFORMAT depthFormatList32[] = { D3DFMT_D24S8, D3DFMT_D24X8 };
+    D3DFORMAT rtFormatList16[] = { D3DFMT_R5G6B5 };
+    D3DFORMAT depthFormatList16[] = { D3DFMT_D16 };
+    for ( uint iColor = 0 ; iColor < 2 ; iColor++ )
     {
-        D3DPRESENT_PARAMETERS pp = *pPresentationParameters;
-        pp.BackBufferWidth = 640;
-        pp.BackBufferHeight = 480;
-        BehaviorFlags &= ~D3DCREATE_PUREDEVICE;
-        WriteDebugEvent ( "        Test with 640x480" );
-        WriteDebugEvent ( ToString( Adapter, DeviceType, hFocusWindow, BehaviorFlags, pp ) );
-        HRESULT hResult = CreateDeviceInsist( 2, 1000, pDirect3D, Adapter, DeviceType, hFocusWindow, BehaviorFlags, &pp, ppReturnedDeviceInterface );
-        WriteDebugEvent ( SString( "        Test result: %08x", hResult ) );
-    }
+        for ( uint iBehavior = 0 ; iBehavior < 2 ; iBehavior++ )
+        {
+            if ( iBehavior == 0 )
+                BehaviorFlags &= ~D3DCREATE_PUREDEVICE;
+            else
+                BehaviorFlags |= D3DCREATE_PUREDEVICE;
 
+            for ( uint iRefresh = 0 ; iRefresh < 2 ; iRefresh++ )
+            {
+                if ( iRefresh == 1 )
+                {
+                    if ( pPresentationParameters->Windowed )
+                        continue;
+                    pPresentationParameters->FullScreen_RefreshRateInHz = 60;
+                }
+
+                for ( uint iPresent = 0 ; iPresent < NUMELMS( presentIntervalList ) ; iPresent++ )
+                {
+                    for ( uint iSwap = 0 ; iSwap < NUMELMS( swapEffectList ) ; iSwap++ )
+                    {
+                        if ( iColor == 0 )
+                        {
+                            for ( uint iRt = 0 ; iRt < NUMELMS( rtFormatList32 ) ; iRt++ )
+                            {
+                                for ( uint iDepth = 0 ; iDepth < NUMELMS( depthFormatList32 ) ; iDepth++ )
+                                {
+                                    pPresentationParameters->PresentationInterval = presentIntervalList[ iPresent ];
+                                    pPresentationParameters->SwapEffect = swapEffectList[ iSwap ];
+                                    pPresentationParameters->BackBufferFormat = rtFormatList32[ iRt ];
+                                    pPresentationParameters->AutoDepthStencilFormat = depthFormatList32[ iDepth ];
+                                    hResult = CreateDeviceInsist( 2, 0, pDirect3D, Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters, ppReturnedDeviceInterface );
+        #if MTA_DEBUG
+                                    WriteDebugEvent ( "--------------------------------");
+                                    WriteDebugEvent ( ToString( Adapter, DeviceType, hFocusWindow, BehaviorFlags, *pPresentationParameters ) );
+                                    WriteDebugEvent ( SString( "        32 result: %08x", hResult ) );
+        #else
+                                    if ( hResult == D3D_OK )
+                                    {
+                                        WriteDebugEvent ( "      Pass #4 SUCCESS with 32 bit cycle:" );
+                                        WriteDebugEvent ( ToString( Adapter, DeviceType, hFocusWindow, BehaviorFlags, *pPresentationParameters ) );
+                                        return hResult;
+                                    }
+        #endif
+                                }
+                            }
+                        }
+                        if ( iColor == 1 )
+                        {
+                            for ( uint iRt = 0 ; iRt < NUMELMS( rtFormatList16 ) ; iRt++ )
+                            {
+                                for ( uint iDepth = 0 ; iDepth < NUMELMS( depthFormatList16 ) ; iDepth++ )
+                                {
+                                    pPresentationParameters->PresentationInterval = presentIntervalList[ iPresent ];
+                                    pPresentationParameters->SwapEffect = swapEffectList[ iSwap ];
+                                    pPresentationParameters->BackBufferFormat = rtFormatList16[ iRt ];
+                                    pPresentationParameters->AutoDepthStencilFormat = depthFormatList16[ iDepth ];
+                                    hResult = CreateDeviceInsist( 2, 0, pDirect3D, Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters, ppReturnedDeviceInterface );
+        #if MTA_DEBUG
+                                    WriteDebugEvent ( "--------------------------------");
+                                    WriteDebugEvent ( ToString( Adapter, DeviceType, hFocusWindow, BehaviorFlags, *pPresentationParameters ) );
+                                    WriteDebugEvent ( SString( "        16 result: %08x", hResult ) );
+        #else
+                                    if ( hResult == D3D_OK )
+                                    {
+                                        WriteDebugEvent ( "      Pass #4 SUCCESS with 16 bit cycle:" );
+                                        WriteDebugEvent ( ToString( Adapter, DeviceType, hFocusWindow, BehaviorFlags, *pPresentationParameters ) );
+                                        return hResult;
+                                    }
+        #endif
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
     return hResult;
 }
 
