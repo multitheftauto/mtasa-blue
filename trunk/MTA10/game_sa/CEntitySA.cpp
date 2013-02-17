@@ -71,6 +71,10 @@ VOID CEntitySA::SetPosition(float fX, float fY, float fZ)
             call    dwFunc
         }
     }
+    if ( m_pInterface->nType == ENTITY_TYPE_OBJECT )
+    {
+        ((CObjectSAInterface*)m_pInterface)->bUpdateScale = true;
+    }
 }
 
 VOID CEntitySA::Teleport ( float fX, float fY, float fZ )
@@ -185,6 +189,11 @@ VOID CEntitySA::SetOrientation ( float fX, float fY, float fZ )
     {
         mov     ecx, dwThis
         call    dwFunc
+    }
+
+    if ( m_pInterface->nType == ENTITY_TYPE_OBJECT )
+    {
+        ((CObjectSAInterface*)m_pInterface)->bUpdateScale = true;
     }
 
     pGame->GetWorld()->Add ( this, CEntity_SetOrientation );
@@ -360,6 +369,12 @@ VOID CEntitySA::SetMatrix ( CMatrix * matrix )
             mov     ecx, dwThis
             call    dwFunc
         }
+
+        if ( m_pInterface->nType == ENTITY_TYPE_OBJECT )
+        {
+            ((CObjectSAInterface*)m_pInterface)->bUpdateScale = true;
+        }
+
         pGame->GetWorld()->Add ( this, CEntity_SetMatrix );
     }
 }

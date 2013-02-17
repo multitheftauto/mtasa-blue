@@ -29,7 +29,7 @@ CObject::CObject ( CElement* pParent, CXMLNode* pNode, CObjectManager* pObjectMa
     m_usModel = 0xFFFF;
     m_pMoveAnimation = NULL;
     m_ucAlpha = 255;
-    m_fScale  = 1;
+    m_vecScale  = CVector ( 1.0f, 1.0f, 1.0f );
     m_fHealth = 1000.0f;
     m_bSyncable = true;
     m_pSyncer = NULL;
@@ -155,8 +155,13 @@ bool CObject::ReadSpecialData ( void )
     if ( !GetCustomDataBool ( "doublesided", m_bDoubleSided, true ) )
         m_bDoubleSided = false;
 
-    if ( !GetCustomDataFloat ( "scale", m_fScale, true ) )
-        m_fScale = 1;
+    if ( !GetCustomDataFloat ( "scale", m_vecScale.fX, true ) )
+        m_vecScale.fX = 1.0f;
+    m_vecScale.fY = m_vecScale.fX;
+    m_vecScale.fZ = m_vecScale.fX;
+    GetCustomDataFloat ( "scaleX", m_vecScale.fX, true );
+    GetCustomDataFloat ( "scaleY", m_vecScale.fY, true );
+    GetCustomDataFloat ( "scaleZ", m_vecScale.fZ, true );
 
     if ( !GetCustomDataBool ( "collisions", m_bCollisionsEnabled, true ) )
         m_bCollisionsEnabled = true;

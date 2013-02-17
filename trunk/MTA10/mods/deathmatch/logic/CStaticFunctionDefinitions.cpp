@@ -3421,9 +3421,9 @@ bool CStaticFunctionDefinitions::IsObjectStatic ( CClientObject & Object, bool &
 }
 
 
-bool CStaticFunctionDefinitions::GetObjectScale ( CClientObject & Object, float& fScale )
+bool CStaticFunctionDefinitions::GetObjectScale ( CClientObject & Object, CVector& vecScale )
 {
-    fScale = Object.GetScale ();
+    Object.GetScale ( vecScale );
     return true;
 }
 
@@ -3505,14 +3505,14 @@ bool CStaticFunctionDefinitions::StopObject ( CClientEntity& Entity )
 }
 
 
-bool CStaticFunctionDefinitions::SetObjectScale ( CClientEntity& Entity, float fScale )
+bool CStaticFunctionDefinitions::SetObjectScale ( CClientEntity& Entity, const CVector& vecScale )
 {
-    RUN_CHILDREN SetObjectScale ( **iter, fScale );
+    RUN_CHILDREN SetObjectScale ( **iter, vecScale );
 
     if ( IS_OBJECT ( &Entity ) )
     {
         CDeathmatchObject& Object = static_cast < CDeathmatchObject& > ( Entity );
-        Object.SetScale ( fScale );
+        Object.SetScale ( vecScale );
         return true;
     }
 

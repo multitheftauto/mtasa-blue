@@ -256,14 +256,14 @@ public:
     // Object get funcs
     static CClientObject*               CreateObject                        ( CResource& Resource, unsigned short usModelID, const CVector& vecPosition, const CVector& vecRotation, bool bLowLod );
     static bool                         IsObjectStatic                      ( CClientObject& Object, bool & bStatic );
-    static bool                         GetObjectScale                      ( CClientObject& Object, float& fScale );
+    static bool                         GetObjectScale                      ( CClientObject& Object, CVector& vecScale );
     static bool                         IsObjectBreakable                   ( CClientObject& Object, bool& bBreakable );
 
     // Object set funcs
     static bool                         SetObjectRotation                   ( CClientEntity& Entity, const CVector& vecRotation );
     static bool                         MoveObject                          ( CClientEntity& Entity, unsigned long ulTime, const CVector& vecPosition, const CVector& vecDeltaRotation, CEasingCurve::eType a_eEasingType, double a_fEasingPeriod, double a_fEasingAmplitude, double a_fEasingOvershoot );
     static bool                         StopObject                          ( CClientEntity& Entity );
-    static bool                         SetObjectScale                      ( CClientEntity& Entity, float fScale );
+    static bool                         SetObjectScale                      ( CClientEntity& Entity, const CVector& vecScale  );
     static bool                         SetObjectStatic                     ( CClientEntity& Entity, bool bStatic );
     static bool                         SetObjectBreakable                  ( CClientEntity& Entity, bool bBreakable );
     static bool                         BreakObject                         ( CClientEntity& Entity );

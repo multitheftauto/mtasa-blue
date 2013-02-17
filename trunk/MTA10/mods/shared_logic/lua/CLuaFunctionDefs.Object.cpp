@@ -105,11 +105,13 @@ int CLuaFunctionDefs::GetObjectScale ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        float fScale;
-        if ( CStaticFunctionDefinitions::GetObjectScale ( *pObject, fScale ) )
+        CVector vecScale;
+        if ( CStaticFunctionDefinitions::GetObjectScale ( *pObject, vecScale ) )
         {
-            lua_pushnumber ( luaVM, fScale );
-            return 1;
+            lua_pushnumber ( luaVM, vecScale.fX );
+            lua_pushnumber ( luaVM, vecScale.fY );
+            lua_pushnumber ( luaVM, vecScale.fZ );
+            return 3;
         }
     }
     else
@@ -207,15 +209,18 @@ int CLuaFunctionDefs::StopObject ( lua_State* luaVM )
 int CLuaFunctionDefs::SetObjectScale ( lua_State* luaVM )
 {
 //  bool setObjectScale ( object theObject, float scale )
-    CClientEntity* pEntity; float fScale;
+    CClientEntity* pEntity;
+    CVector vecScale;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pEntity );
-    argStream.ReadNumber ( fScale );
+    argStream.ReadNumber ( vecScale.fX );
+    argStream.ReadNumber ( vecScale.fY, vecScale.fX );
+    argStream.ReadNumber ( vecScale.fZ, vecScale.fX );
 
     if ( !argStream.HasErrors () )
     {
-        if ( CStaticFunctionDefinitions::SetObjectScale ( *pEntity, fScale ) )
+        if ( CStaticFunctionDefinitions::SetObjectScale ( *pEntity, vecScale ) )
         {
             lua_pushboolean ( luaVM, true );
             return 1;
