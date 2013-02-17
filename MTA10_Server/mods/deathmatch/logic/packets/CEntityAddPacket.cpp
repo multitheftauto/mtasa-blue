@@ -218,8 +218,29 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
                     }
 
                     // Scale
-                    float fScale = pObject->GetScale ();
-                    BitStream.Write ( fScale );
+                    const CVector& vecScale = pObject->GetScale ();
+                    if ( BitStream.Version() >= 0x41 )
+                    {
+                        bool bIsUniform = ( vecScale.fX == vecScale.fY && vecScale.fX == vecScale.fZ );
+                        BitStream.WriteBit( bIsUniform );
+                        if ( bIsUniform )
+                        {
+                            bool bIsUnitSize = ( vecScale.fX == 1.0f );
+                            BitStream.WriteBit( bIsUnitSize );
+                            if ( !bIsUnitSize )
+                                BitStream.Write( vecScale.fX );
+                        }
+                        else
+                        {
+                            BitStream.Write( vecScale.fX );
+                            BitStream.Write( vecScale.fY );
+                            BitStream.Write( vecScale.fZ );
+                        }
+                    }
+                    else
+                    {
+                        BitStream.Write( vecScale.fX );
+                    }
 
                     // Static
                     bool bStatic = pObject->IsStatic ();

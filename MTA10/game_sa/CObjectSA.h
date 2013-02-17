@@ -80,7 +80,7 @@ public:
     uint32 b0x8000 : 1;
 
     uint32 b0x10000 : 1; // 322
-    uint32 b0x20000 : 1;
+    uint32 bUpdateScale : 1;
     uint32 b0x40000 : 1;
     uint32 b0x80000 : 1;
     uint32 b0x100000 : 1;
@@ -128,6 +128,7 @@ class CObjectSA : public virtual CObject, public virtual CPhysicalSA
 private:
     unsigned char               m_ucAlpha;
     bool                        m_bIsAGangTag;
+    CVector                     m_vecScale;
 
 public:
                                 CObjectSA           ( CObjectSAInterface * objectInterface );
@@ -138,7 +139,6 @@ public:
 
     void                        Explode             ( void );
     void                        Break               ( void );
-    void                        SetScale            ( float fScale );
     void                        SetHealth           ( float fHealth );
     float                       GetHealth           ( void );
     void                        SetModelIndex       ( unsigned long ulModel );
@@ -147,6 +147,11 @@ public:
     inline unsigned char        GetAlpha            ( ) { return m_ucAlpha; }
 
     bool                        IsAGangTag          ( ) const { return m_bIsAGangTag; }
+
+    void                        SetScale            ( float fX, float fY, float fZ );
+    CVector*                    GetScale            ( );
+    void                        ResetScale          ( );
+
 private:
     void                        CheckForGangTag     ( );
 };

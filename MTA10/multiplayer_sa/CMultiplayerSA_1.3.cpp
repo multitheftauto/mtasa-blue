@@ -81,6 +81,9 @@ DWORD RETN_CTaskSimpleJetpack_ProcessInputDisabled           =  0x67E821;
 DWORD RETN_CTaskSimplePlayerOnFoot_ProcessWeaponFire             =  0x685ABF;
 DWORD RETN_CTaskSimplePlayerOnFoot_ProcessWeaponFire_Call        =  0x540670;
 
+#define HOOKPOS_CObject_PreRender                   0x59FE69
+DWORD RETURN_CObject_PreRender =                    0x59FE6F;
+
 void HOOK_CVehicle_ProcessStuff_TestSirenTypeSingle ( );
 void HOOK_CVehicle_ProcessStuff_PostPushSirenPositionSingle ( );
 void HOOK_CVehicle_ProcessStuff_TestSirenTypeDual ( );
@@ -101,6 +104,7 @@ void HOOK_CVehicle_ProcessStuff_StartPointLightCode ( );
 void HOOK_CTaskSimpleJetpack_ProcessInput ( );
 void HOOK_CTaskSimplePlayerOnFoot_ProcessWeaponFire ( );
 void HOOK_CTaskSimpleJetpack_ProcessInputFixFPS2 ( );
+void HOOK_CObject_PreRender ( );
 
 void CMultiplayerSA::Init_13 ( void )
 {
@@ -136,6 +140,8 @@ void CMultiplayerSA::InitHooks_13 ( void )
 
     HookInstall ( HOOKPOS_CTaskSimpleJetpack_ProcessInput, (DWORD) HOOK_CTaskSimpleJetpack_ProcessInput, 5 );
     HookInstall ( HOOKPOS_CTaskSimplePlayerOnFoot_ProcessWeaponFire, (DWORD) HOOK_CTaskSimplePlayerOnFoot_ProcessWeaponFire, 5 );
+
+    HookInstall ( HOOKPOS_CObject_PreRender, (DWORD)HOOK_CObject_PreRender, 6 );
 
     InitHooks_ClothesSpeedUp ();
     EnableHooks_ClothesMemFix ( true );
@@ -1257,6 +1263,36 @@ void _declspec(naked) HOOK_CTaskSimplePlayerOnFoot_ProcessWeaponFire ( )
             call RETN_CTaskSimplePlayerOnFoot_ProcessWeaponFire_Call
             jmp RETN_CTaskSimplePlayerOnFoot_ProcessWeaponFire
         }
+    }
+}
+
+CVector vecObjectScale;
+CObjectSAInterface* pCurrentObject;
+void CObject_GetScale()
+{
+    CObject* pObject = pGameInterface->GetPools ()->GetObjectA ( (DWORD *)pCurrentObject );
+    vecObjectScale = *pObject->GetScale ();
+}
+
+
+void _declspec(naked) HOOK_CObject_PreRender ()
+{
+    _asm
+    {
+        pushad
+        mov pCurrentObject, esi
+    }
+    
+    CObject_GetScale();
+
+    _asm
+    {
+        popad
+
+        push 1
+        lea edx, vecObjectScale
+
+        jmp RETURN_CObject_PreRender
     }
 }
 

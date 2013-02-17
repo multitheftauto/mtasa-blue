@@ -27,7 +27,6 @@ public:
 
     virtual void                    Explode             ( void ) = 0;
     virtual void                    Break               ( void ) = 0;
-    virtual void                    SetScale            ( float fScale ) = 0;
     virtual void                    SetHealth           ( float fHealth ) = 0;
     virtual float                   GetHealth           ( void ) = 0;
     virtual void                    SetModelIndex       ( unsigned long ulModel ) = 0;
@@ -36,6 +35,10 @@ public:
     virtual unsigned char           GetAlpha            ( ) = 0;
 
     virtual bool                    IsAGangTag          ( ) const = 0;
+
+    virtual void                    SetScale            ( float fX, float fY, float fZ ) = 0;
+    virtual CVector*                GetScale            ( ) = 0;
+    virtual void                    ResetScale          ( ) = 0;
 };
 
 #endif

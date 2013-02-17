@@ -37,6 +37,8 @@ CObjectSA::CObjectSA(CObjectSAInterface * objectInterface)
     this->SetInterface(objectInterface);
     m_ucAlpha = 255;
 
+    ResetScale ();
+
     CheckForGangTag ();
 }
 
@@ -162,6 +164,8 @@ CObjectSA::CObjectSA( DWORD dwModel, bool bBreakable )
 
     m_ucAlpha = 255;
 
+    ResetScale ();
+
     if ( m_pInterface )
     {
         CheckForGangTag ();
@@ -247,20 +251,6 @@ void CObjectSA::Break ()
     }
 }
 
-void CObjectSA::SetScale( float faScale )
-{
-    DWORD dwFunc = 0x4745E0;
-    DWORD dwThis = (DWORD)this->GetInterface();
-    _asm
-    {
-        push    faScale
-        mov     ecx, dwThis
-        call    dwFunc
-    }
-
-//  *(FLOAT *)(this->GetInterface() + 348) = fScale;
-}
-
 void CObjectSA::SetHealth ( float fHealth )
 {
     static_cast < CObjectSAInterface* > ( this->GetInterface () )->fHealth = fHealth;
@@ -298,4 +288,20 @@ void CObjectSA::CheckForGangTag ( )
             m_bIsAGangTag = false; 
             break;
     }
+}
+
+void CObjectSA::SetScale ( float fX, float fY, float fZ )
+{
+    m_vecScale = CVector ( fX, fY, fZ );
+    GetObjectInterface ()->bUpdateScale = true;
+}
+
+CVector* CObjectSA::GetScale ( )
+{
+    return &m_vecScale;
+}
+
+void CObjectSA::ResetScale ( )
+{
+    SetScale ( 1.0f, 1.0f, 1.0f );
 }

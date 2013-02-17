@@ -54,8 +54,8 @@ public:
     inline unsigned short       GetModel                ( void )                        { return m_usModel; }
     inline void                 SetModel                ( unsigned short usModel )      { m_usModel = usModel; }
 
-    inline float                GetScale                ( void )                        { return m_fScale; }
-    inline void                 SetScale                ( float fScale )                { m_fScale = fScale; }
+    const CVector&              GetScale                ( void )                        { return m_vecScale; }
+    inline void                 SetScale                ( const CVector& vecScale )     { m_vecScale = vecScale; }
 
     inline bool                 GetCollisionEnabled     ( void )                        { return m_bCollisionsEnabled; }
     inline void                 SetCollisionEnabled     ( bool bCollisionEnabled )      { m_bCollisionsEnabled = bCollisionEnabled; }
@@ -81,7 +81,7 @@ private:
     CVector                     m_vecRotation;
     unsigned char               m_ucAlpha;
     unsigned short              m_usModel;
-    float                       m_fScale;
+    CVector                     m_vecScale;
     bool                        m_bIsStatic;
     float                       m_fHealth;
     bool                        m_bBreakable;

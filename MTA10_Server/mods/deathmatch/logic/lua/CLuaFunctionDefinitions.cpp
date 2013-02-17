@@ -7753,19 +7753,24 @@ int CLuaFunctionDefinitions::GetObjectRotation ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::GetObjectScale ( lua_State* luaVM )
 {
-    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
+    CObject* pObject;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pObject );
+    
+    if ( !argStream.HasErrors () )
     {
-        CObject* pObject = lua_toobject ( luaVM, 1 );
         if ( pObject )
         {
-            lua_pushnumber ( luaVM, pObject->GetScale ( ) );
-            return 1;
+            const CVector& vecScale = pObject->GetScale ();
+            lua_pushnumber ( luaVM, vecScale.fX );
+            lua_pushnumber ( luaVM, vecScale.fY );
+            lua_pushnumber ( luaVM, vecScale.fZ );
+            return 3;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "object", 1 );
     }
-    else
-        m_pScriptDebugging->LogBadType ( luaVM );
+    if ( argStream.HasErrors () )
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -7811,24 +7816,25 @@ int CLuaFunctionDefinitions::SetObjectRotation ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::SetObjectScale ( lua_State* luaVM )
 {
-    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA && lua_type ( luaVM, 2 ) == LUA_TNUMBER )
-    {
-        CObject* pObject = lua_toobject ( luaVM, 1 );
-        if ( pObject && IS_OBJECT ( pObject ) )
-        {
-            float fScale = (float) lua_tonumber ( luaVM, 2 );
+    CObject* pObject; CVector vecScale;
 
-            if ( CStaticFunctionDefinitions::SetObjectScale ( pObject, fScale ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pObject );
+    argStream.ReadNumber ( vecScale.fX );
+    argStream.ReadNumber ( vecScale.fY, vecScale.fX );
+    argStream.ReadNumber ( vecScale.fZ, vecScale.fX );
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( CStaticFunctionDefinitions::SetObjectScale ( pObject, vecScale ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "object", 1 );
+
     }
-    else
-        m_pScriptDebugging->LogBadType ( luaVM );
+    if ( argStream.HasErrors () )
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
