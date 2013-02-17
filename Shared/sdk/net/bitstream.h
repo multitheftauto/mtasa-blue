@@ -19,15 +19,13 @@
 #endif
 
 struct ISyncStructure;
+class NetBitStreamInterface;
 
-class NetBitStreamInterface : public CRefCountable
+class NetBitStreamInterfaceNoVersion : public CRefCountable
 {
-    NetBitStreamInterface      ( const NetBitStreamInterface& );
-    const NetBitStreamInterface& operator= ( const NetBitStreamInterface& );
-protected:
-                        NetBitStreamInterface       ( void ) { DEBUG_CREATE_COUNT( "NetBitStreamInterface" ); }
-    virtual             ~NetBitStreamInterface      ( void ) { DEBUG_DESTROY_COUNT( "NetBitStreamInterface" ); }
 public:
+    virtual operator NetBitStreamInterface&         ( void ) = 0;
+
     virtual int         GetReadOffsetAsBits         ( void ) = 0;
 
     virtual void        Reset                       ( void ) = 0;
@@ -244,7 +242,17 @@ public:
 
         return bResult;
     }
+};
 
+class NetBitStreamInterface : public NetBitStreamInterfaceNoVersion
+{
+    NetBitStreamInterface      ( const NetBitStreamInterface& );
+    const NetBitStreamInterface& operator= ( const NetBitStreamInterface& );
+protected:
+                        NetBitStreamInterface       ( void ) { DEBUG_CREATE_COUNT( "NetBitStreamInterface" ); }
+    virtual             ~NetBitStreamInterface      ( void ) { DEBUG_DESTROY_COUNT( "NetBitStreamInterface" ); }
+public:
+    virtual operator NetBitStreamInterface&         ( void ) { return *this; }
     virtual unsigned short Version                  ( void ) const = 0;
 };
 
