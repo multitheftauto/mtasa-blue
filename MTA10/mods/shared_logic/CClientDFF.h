@@ -38,7 +38,7 @@ public:
 
     bool                            LoadDFF                 ( const char* szFile );
 
-    bool                            ReplaceModel            ( unsigned short usModel );
+    bool                            ReplaceModel            ( unsigned short usModel, bool bAlphaTransparency );
 
     bool                            HasReplaced             ( unsigned short usModel );
 
@@ -54,10 +54,10 @@ protected:
     void                            UnloadDFF               ( void );
     void                            InternalRestoreModel    ( unsigned short usModel );
 
-    bool                            ReplaceObjectModel      ( RpClump* pClump, ushort usModel );
-    bool                            ReplaceVehicleModel     ( RpClump* pClump, ushort usModel );
-    bool                            ReplaceWeaponModel      ( RpClump* pClump, ushort usModel );
-    bool                            ReplacePedModel         ( RpClump* pClump, ushort usModel );
+    bool                            ReplaceObjectModel      ( RpClump* pClump, ushort usModel, bool bAlphaTransparency );
+    bool                            ReplaceVehicleModel     ( RpClump* pClump, ushort usModel, bool bAlphaTransparency );
+    bool                            ReplaceWeaponModel      ( RpClump* pClump, ushort usModel, bool bAlphaTransparency );
+    bool                            ReplacePedModel         ( RpClump* pClump, ushort usModel, bool bAlphaTransparency );
 
     RpClump*                        GetLoadedClump          ( ushort usModelId );
 

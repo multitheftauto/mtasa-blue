@@ -22,6 +22,7 @@ CBaseModelInfoSAInterface** ppModelInfo = (CBaseModelInfoSAInterface**) ARRAY_Mo
 std::map < unsigned short, int > CModelInfoSA::ms_RestreamTxdIDMap;
 std::map < DWORD, float > CModelInfoSA::ms_ModelDefaultLodDistanceMap;
 std::set < uint > CModelInfoSA::ms_ReplacedColModels;
+std::map < DWORD, BYTE > CModelInfoSA::ms_ModelDefaultAlphaTransparencyMap;
 
 CModelInfoSA::CModelInfoSA ( void )
 {
@@ -792,6 +793,54 @@ void CModelInfoSA::RemoveRef ( bool bRemoveExtraGTARef )
          IsLoaded () )
     {
         Remove ();
+    }
+}
+
+void CModelInfoSA::SetAlphaTransparencyEnabled ( BOOL bEnabled )
+{
+    m_pInterface = ppModelInfo [ m_dwModelID ];
+    if(m_pInterface)
+    {
+        if ( !MapContains ( ms_ModelDefaultAlphaTransparencyMap, m_dwModelID ) )
+        {
+            MapSet ( ms_ModelDefaultAlphaTransparencyMap, m_dwModelID, (BYTE)(m_pInterface->bAlphaTransparency) );
+        }
+        m_pInterface->bAlphaTransparency = bEnabled;
+    }
+}
+
+bool CModelInfoSA::IsAlphaTransparencyEnabled ()
+{
+    m_pInterface = ppModelInfo [ m_dwModelID ];
+    if(m_pInterface)
+    {
+        return m_pInterface->bAlphaTransparency;
+    }
+    return false;
+}
+
+void CModelInfoSA::StaticResetAlphaTransparencies ()
+{
+    for ( std::map < DWORD, BYTE >::const_iterator iter = ms_ModelDefaultAlphaTransparencyMap.begin (); iter != ms_ModelDefaultAlphaTransparencyMap.end (); iter++ )
+    {
+        CBaseModelInfoSAInterface* pInterface = ppModelInfo [ iter->first ];
+        if ( pInterface )
+        {
+            pInterface->bAlphaTransparency = iter->second;
+        }
+    }
+
+    ms_ModelDefaultAlphaTransparencyMap.clear ();
+}
+
+void CModelInfoSA::ResetAlphaTransparency ()
+{
+    m_pInterface = ppModelInfo [ m_dwModelID ];
+    if(m_pInterface)
+    {
+        BYTE bEnabled = *MapFind ( ms_ModelDefaultAlphaTransparencyMap, m_dwModelID );
+        m_pInterface->bAlphaTransparency = bEnabled;
+        MapRemove ( ms_ModelDefaultAlphaTransparencyMap, m_dwModelID );
     }
 }
 

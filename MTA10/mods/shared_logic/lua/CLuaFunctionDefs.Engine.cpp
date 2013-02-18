@@ -266,30 +266,31 @@ int CLuaFunctionDefs::EngineImportTXD ( lua_State* luaVM )
 
 int CLuaFunctionDefs::EngineReplaceModel ( lua_State* luaVM )
 {
-    // Grab the DFF and model ID
-    CClientDFF* pDFF = ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) ? lua_todff ( luaVM, 1 ) : NULL );
-    unsigned short usModelID = CModelNames::ResolveModelID ( lua_tostring ( luaVM, 2 ) );
+    CClientDFF* pDFF;
+    SString strModelName;
+    bool bAlphaTransparency;
 
-    // Valid client DFF?
-    if ( pDFF )
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pDFF );
+    argStream.ReadString ( strModelName );
+    argStream.ReadBool ( bAlphaTransparency, false );
+
+    if ( !argStream.HasErrors () )
     {
-        // Valid model?
-        if ( CClientDFFManager::IsReplacableModel ( usModelID ) )
+        ushort usModelID = CModelNames::ResolveModelID ( strModelName );
+        if ( usModelID != INVALID_MODEL_ID || strModelName == "" )
         {
-            // Replace the model
-            pDFF->ReplaceModel ( usModelID );
+            pDFF->ReplaceModel ( usModelID, bAlphaTransparency );
 
-            // Success
             lua_pushboolean ( luaVM, true );
-            return true;
+            return 1;
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "number", 2 );
+            argStream.SetCustomError( "Expected valid model ID or name at argument 2" );
     }
-    else
-        m_pScriptDebugging->LogBadPointer ( luaVM, "dff", 1 );
+    if ( argStream.HasErrors () )
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
 
-    // Failure
     lua_pushboolean ( luaVM, false );
     return 1;
 }
