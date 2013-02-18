@@ -3430,6 +3430,7 @@ void CClientGame::Event_OnIngame ( void )
     g_pGame->GetWorld ( )->SetOcclusionsEnabled ( true );
 
     g_pGame->ResetModelLodDistances ();
+    g_pGame->ResetAlphaTransparencies ();
 
     // Make sure we can access all areas
     g_pGame->GetStats()->ModifyStat ( CITIES_PASSED, 2.0 );

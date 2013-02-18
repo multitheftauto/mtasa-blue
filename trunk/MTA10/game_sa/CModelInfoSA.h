@@ -155,7 +155,7 @@ public:
 
     // Flags used by CBaseModelInfo
     unsigned char           bHasBeenPreRendered: 1;     // +18
-    unsigned char           bIsBackfaceCulled: 1;
+    unsigned char           bAlphaTransparency: 1;
     unsigned char           bIsLod: 1;
     unsigned char           bDontCastShadowsOn: 1;
     unsigned char           bDontWriteZBuffer: 1;
@@ -237,6 +237,7 @@ protected:
     RpClump*                        m_pCustomClump;
     static std::map < unsigned short, int > ms_RestreamTxdIDMap;
     static std::map < DWORD, float > ms_ModelDefaultLodDistanceMap;
+    static std::map < DWORD, BYTE > ms_ModelDefaultAlphaTransparencyMap;
     bool                            m_bAddedRefForCollision;
 public:
     static std::set < uint >        ms_ReplacedColModels;
@@ -285,6 +286,11 @@ public:
     void                            RestreamIPL             ( void );
     static void                     StaticFlushPendingRestreamIPL ( void );
     static void                     StaticSetHooks          ( void );
+
+    void                            SetAlphaTransparencyEnabled ( BOOL bEnabled );
+    bool                            IsAlphaTransparencyEnabled ();
+    void                            ResetAlphaTransparency  ( void );
+    static void                     StaticResetAlphaTransparencies ( void );
 
     void                            ModelAddRef             ( EModelRequestType requestType, const char* szTag );
     int                             GetRefCount             ( void );
