@@ -71,7 +71,7 @@ namespace SharedUtil
     //
     // For tracking results of new features
     //
-    void            AddReportLog                    ( uint uiId, const SString& strText );
+    void            AddReportLog                    ( uint uiId, const SString& strText, uint uiAmountLimit = UINT_MAX );
     void            SetReportLogContents            ( const SString& strText );
     SString         GetReportLogContents            ( void );
     void            WriteDebugEvent                 ( const SString& strText );
