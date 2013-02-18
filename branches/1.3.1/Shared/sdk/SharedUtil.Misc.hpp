@@ -27,6 +27,7 @@
 #endif
 
 CCriticalSection CRefCountable::ms_CS;
+std::map < uint, uint > ms_ReportAmountMap;
 
 #ifdef MTA_CLIENT
 #ifdef WIN32
@@ -551,16 +552,18 @@ static SString GetReportLogHeaderText ( void )
 }
 
 
-void SharedUtil::AddReportLog ( uint uiId, const SString& strText )
+void SharedUtil::AddReportLog ( uint uiId, const SString& strText, uint uiAmountLimit )
 {
+    uint& uiAmount = MapGet( ms_ReportAmountMap, uiId );
+    if ( uiAmount++ >= uiAmountLimit )
+        return;
+
     SString strPathFilename = PathJoin ( GetMTADataPath (), "report.log" );
     MakeSureDirExists ( strPathFilename );
 
     SString strMessage ( "%u: %s %s - %s\n", uiId, GetTimeString ( true, false ).c_str (), GetReportLogHeaderText ().c_str (), strText.c_str () );
     FileAppend ( strPathFilename, &strMessage.at ( 0 ), strMessage.length () );
-#if MTA_DEBUG
     OutputDebugLine ( SStringX ( "[ReportLog] " ) + strMessage );
-#endif
 }
 
 void SharedUtil::SetReportLogContents ( const SString& strText )

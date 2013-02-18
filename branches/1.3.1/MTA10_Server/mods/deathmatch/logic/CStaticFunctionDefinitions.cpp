@@ -9911,10 +9911,7 @@ bool CStaticFunctionDefinitions::RemoveWorldModel ( unsigned short usModel, floa
     BitStream.pBitStream->Write ( fX );
     BitStream.pBitStream->Write ( fY );
     BitStream.pBitStream->Write ( fZ );
-    if ( BitStream.pBitStream->Version() >= 0x039 )
-    {
-        BitStream.pBitStream->Write ( cInterior );
-    }
+    BitStream.pBitStream->Write ( cInterior );      // Only used by clients with bitstream version >= 0x039
     m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( REMOVE_WORLD_MODEL, *BitStream.pBitStream ) );
 
     return true;
@@ -9930,10 +9927,7 @@ bool CStaticFunctionDefinitions::RestoreWorldModel ( unsigned short usModel, flo
     BitStream.pBitStream->Write ( fX );
     BitStream.pBitStream->Write ( fY );
     BitStream.pBitStream->Write ( fZ );
-    if ( BitStream.pBitStream->Version() >= 0x039 )
-    {
-        BitStream.pBitStream->Write ( cInterior );
-    }
+    BitStream.pBitStream->Write ( cInterior );      // Only used by clients with bitstream version >= 0x039
 
     m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( RESTORE_WORLD_MODEL, *BitStream.pBitStream ) );
 
