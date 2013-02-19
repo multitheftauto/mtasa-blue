@@ -2124,20 +2124,16 @@ void CClientVehicle::StreamedInPulse ( void )
         // Check installed nitro
         if ( IsNitroInstalled () )
         {
-            char iNitroCount = m_pVehicle->GetNitroCount ();
-            if ( iNitroCount > 0 )
+            // Nitro state changed?
+            bool bActivated = ( m_pVehicle->GetNitroLevel () < 0 );
+            if ( m_bNitroActivated != bActivated )
             {
-                // Nitro state changed?
-                bool bActivated = ( m_pVehicle->GetNitroLevel () < 0 );
-                if ( m_bNitroActivated != bActivated )
-                {
-                    CLuaArguments Arguments;
-                    Arguments.PushBoolean ( bActivated );
-                    this->CallEvent ( "onClientVehicleNitroStateChange", Arguments, false );
-                }
-
-                m_bNitroActivated = bActivated;
+                CLuaArguments Arguments;
+                Arguments.PushBoolean ( bActivated );
+                this->CallEvent ( "onClientVehicleNitroStateChange", Arguments, false );
             }
+
+            m_bNitroActivated = bActivated;
         }
 
         // Update doors
