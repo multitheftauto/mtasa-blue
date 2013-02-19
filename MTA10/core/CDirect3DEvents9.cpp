@@ -916,10 +916,7 @@ ERenderFormat CDirect3DEvents9::DiscoverReadableDepthFormat ( IDirect3DDevice9 *
             if ( D3D_OK != pD3D->CheckDeviceFormat ( D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, displayMode.Format, D3DUSAGE_DEPTHSTENCIL, D3DRTYPE_SURFACE, DepthFormat ) )
                 continue;
 
-            // Also check if multisampled
-            if ( multisampleType != D3DMULTISAMPLE_NONE )
-                if ( D3D_OK != pD3D->CheckDeviceMultiSampleType ( D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, DepthFormat, bWindowed, multisampleType, NULL ) )
-                    continue;
+            // Don't check for compatibility with multisampling, as we turn AA off when using readable depth buffer
 
             // Found a working format
             return checkList[i];
