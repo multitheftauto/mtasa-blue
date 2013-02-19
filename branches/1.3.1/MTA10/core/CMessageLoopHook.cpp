@@ -78,6 +78,19 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage ( HWND hwnd,
     // Get a pointer to ourself.
     pThis = CMessageLoopHook::GetSingletonPtr ( );
 
+    // Alternate alt-tab system
+    if ( hwnd == pThis->GetHookedWindowHandle () )
+    {
+        if ( uMsg == WM_ACTIVATE && LOWORD(wParam) == WA_ACTIVE )
+        {
+            GetVideoModeManager()->OnGainFocus();
+        }
+        if ( uMsg == WM_ACTIVATE && LOWORD(wParam) == WA_INACTIVE )
+        {
+            GetVideoModeManager()->OnLoseFocus();
+        }
+    }
+
     // Log our state
     if ( uMsg == WM_KILLFOCUS || (uMsg == WM_ACTIVATE && LOWORD(wParam) == WA_INACTIVE) )
     {

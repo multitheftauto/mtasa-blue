@@ -911,6 +911,24 @@ void CSettings::CreateGUI ( void )
     m_pSingleDownloadLabelInfo->SetSize ( CVector2D ( 168.0f, 95.0f ) );
     vecTemp.fY += 40-4;
 
+    // AltTab test
+    m_pAltTabLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Alt-tab handling test:" ) );
+    m_pAltTabLabel->SetPosition ( CVector2D ( vecTemp.fX + 10.f, vecTemp.fY ) );
+    m_pAltTabLabel->AutoSize ( m_pAltTabLabel->GetText ().c_str () );
+
+    m_pAltTabCombo = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabAdvanced, "" ) );
+    m_pAltTabCombo->SetPosition ( CVector2D ( vecTemp.fX + 156.0f, vecTemp.fY - 1.0f ) );
+    m_pAltTabCombo->SetSize ( CVector2D ( 148.0f, 95.0f ) );
+    m_pAltTabCombo->AddItem ( "Off" )->SetData ( (void*)0 );
+    m_pAltTabCombo->AddItem ( "On" )->SetData ( (void*)1 );
+    m_pAltTabCombo->SetReadOnly ( true );
+
+    m_pAltTabLabelInfo = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Experimental feature." ) );
+    m_pAltTabLabelInfo->SetPosition ( CVector2D ( vecTemp.fX + 342.f, vecTemp.fY - 4.f ) );
+    m_pAltTabLabelInfo->SetFont ( "default-bold-small" );
+    m_pAltTabLabelInfo->SetSize ( CVector2D ( 168.0f, 95.0f ) );
+    vecTemp.fY += 40-4;
+
     // Debug setting
     m_pDebugSettingLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Debug setting:" ) );
     m_pDebugSettingLabel->SetPosition ( CVector2D ( vecTemp.fX + 10.f, vecTemp.fY ) );
@@ -2308,6 +2326,11 @@ void CSettings::LoadData ( void )
     else if ( iVar == 1 ) m_pAsyncCombo->SetText ( "Auto" );
     else if ( iVar == 2 ) m_pAsyncCombo->SetText ( "On" );
 
+    // AltTab test
+    CVARS_GET ( "display_alttab_handler", iVar );
+    if ( iVar == 0 ) m_pAltTabCombo->SetText ( "Off" );
+    else if ( iVar == 1 ) m_pAltTabCombo->SetText ( "On" );
+
     // Fast clothes loading
     CVARS_GET ( "fast_clothes_loading", iVar );
     if ( iVar == CMultiplayer::FAST_CLOTHES_OFF ) m_pFastClothesCombo->SetText ( "Off" );
@@ -2445,15 +2468,27 @@ void CSettings::SaveData ( void )
     bool bCustomizedSAFilesEnabled = m_pCheckBoxCustomizedSAFiles->GetSelected();
     bool bCustomizedSAFilesWasEnabled = GetApplicationSettingInt ( "customized-sa-files-request" ) != 0;
 
+    // AltTab handling
+    bool bAltTabHandlerWasEnabled = false;
+    bool bAltTabHandlerEnabled = false;
+    CVARS_GET ( "display_alttab_handler", bAltTabHandlerWasEnabled );
+    if ( CGUIListItem* pSelected = m_pAltTabCombo->GetSelectedItem () )
+    {
+        int iSelected = ( int ) pSelected->GetData();
+        CVARS_SET ( "display_alttab_handler", iSelected );
+        bAltTabHandlerEnabled = ( iSelected != 0 );
+    }
+
     // change
     bool bIsVideoModeChanged = GetVideoModeManager ()->SetVideoMode ( iNextVidMode, bNextWindowed, bNextFSMinimize );
     bool bIsAntiAliasingChanged = gameSettings->GetAntiAliasing () != iAntiAliasing;
     bool bIsAeroChanged = GetApplicationSettingInt ( "aero-enabled"  ) != iAeroEnabled;
     bool bIsCustomizedSAFilesChanged = bCustomizedSAFilesWasEnabled != bCustomizedSAFilesEnabled;
-    if ( bIsVideoModeChanged || bIsAntiAliasingChanged || bIsAeroChanged || bIsCustomizedSAFilesChanged )
+    bool bAltTabHandlerChanged = bAltTabHandlerWasEnabled != bAltTabHandlerEnabled;
+    if ( bIsVideoModeChanged || bIsAntiAliasingChanged || bIsAeroChanged || bIsCustomizedSAFilesChanged || bAltTabHandlerChanged )
     {
         SString strChangedOptions;
-        if ( bIsVideoModeChanged )
+        if ( bIsVideoModeChanged || bAltTabHandlerChanged )
         {
             strChangedOptions += "Resolution";
             if ( bNextFSMinimize != GetVideoModeManager ()->IsMinimizeEnabled () )
@@ -2480,6 +2515,9 @@ void CSettings::SaveData ( void )
                 strChangedOptions += " and ";
             strChangedOptions += "Customized GTA:SA files setting";
         }
+
+        if ( strChangedOptions.empty () )
+            strChangedOptions += "Some settings";
 
         SString strMessage ( "%s will be changed when you next start MTA", strChangedOptions.c_str () );
         strMessage += "\n\nDo you want to restart now?";
