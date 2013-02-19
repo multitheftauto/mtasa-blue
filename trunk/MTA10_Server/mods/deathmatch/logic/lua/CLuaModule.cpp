@@ -57,7 +57,7 @@ int CLuaModule::_LoadModule ( void )
     m_hModule = LoadLibrary ( m_szFileName );
     if ( m_hModule == NULL )
     {
-        CLogger::LogPrintf ( "MODULE: Unable to find modules/%s!\n", m_szShortFileName.c_str() );
+        CLogger::LogPrintf ( "MODULE: Unable to load modules/%s!\n", m_szShortFileName.c_str() );
         return 1;
     }
 #else
@@ -65,7 +65,7 @@ int CLuaModule::_LoadModule ( void )
 
     if ( m_hModule == NULL )
     {
-        CLogger::LogPrintf ( "MODULE: Unable to find modules/%s (%s)!\n", m_szShortFileName.c_str(), dlerror() );
+        CLogger::LogPrintf ( "MODULE: Unable to load modules/%s (%s)!\n", m_szShortFileName.c_str(), dlerror() );
         return 1;
     }
 #endif
@@ -75,14 +75,14 @@ int CLuaModule::_LoadModule ( void )
     pfnInitFunc = ( InitModuleFunc ) ( GetProcAddress ( m_hModule, "InitModule" ) );
     if ( pfnInitFunc == NULL )
     {
-        CLogger::LogPrintf ( "MODULE: Unable to load modules/%s!\n", m_szShortFileName.c_str() );
+        CLogger::LogPrintf ( "MODULE: Unable to initialize modules/%s!\n", m_szShortFileName.c_str() );
         return 2;
     }
 #else
     pfnInitFunc = ( InitModuleFunc ) ( dlsym ( m_hModule, "InitModule" ) );
     if ( dlerror () != NULL )
     {
-        CLogger::LogPrintf ( "MODULE: Unable to load modules/%s (%s)!\n", m_szShortFileName.c_str(), dlerror () );
+        CLogger::LogPrintf ( "MODULE: Unable to initialize modules/%s (%s)!\n", m_szShortFileName.c_str(), dlerror () );
         return 2;
     }
 #endif
