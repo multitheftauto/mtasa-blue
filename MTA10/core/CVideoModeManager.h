@@ -33,6 +33,8 @@ public:
     virtual bool        IsWindowed                  ( void ) = 0;
     virtual bool        IsMultiMonitor              ( void ) = 0;
     virtual bool        IsMinimizeEnabled           ( void ) = 0;
+    virtual void        OnGainFocus                 ( void ) = 0;
+    virtual void        OnLoseFocus                 ( void ) = 0;
 };
 
 CVideoModeManagerInterface* GetVideoModeManager ( void );

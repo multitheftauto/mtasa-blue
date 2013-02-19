@@ -178,6 +178,9 @@ protected:
     CGUILabel*          m_pStreamingMemoryLabelInfo;
     CGUIButton*         m_pVideoDefButton;
 
+    CGUILabel*          m_pAltTabLabelInfo;
+    CGUILabel*          m_pAltTabLabel;
+    CGUIComboBox*       m_pAltTabCombo;
     CGUILabel*          m_pAsyncLabelInfo;
     CGUILabel*          m_pAsyncLabel;
     CGUIComboBox*       m_pAsyncCombo;
