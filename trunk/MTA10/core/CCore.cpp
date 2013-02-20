@@ -33,6 +33,15 @@ static float fTest = 1;
 extern CCore* g_pCore;
 bool g_bBoundsChecker = false;
 
+// File access zones
+CFileTranslator *tempFileRoot;
+CFileTranslator *mtaFileRoot;
+CFileTranslator *screenFileRoot;
+CFileTranslator *dataFileRoot;
+CFileTranslator *modFileRoot;
+CFileTranslator *newsFileRoot;
+CFileTranslator *gameFileRoot;
+
 BOOL AC_RestrictAccess( VOID )
 {
     EXPLICIT_ACCESS NewAccess;
@@ -109,6 +118,47 @@ CCore::CCore ( void )
         NULL
     };
     ParseCommandLine ( m_CommandLineOptions, m_szCommandLineArgs, pszNoValOptions );
+
+    // Initiate the fileSystem first
+    m_fileSystem                = new CFileSystem();
+
+    char pathBuffer[1024];
+    GetModuleFileName( NULL, pathBuffer, 1024 );
+
+    SString mtaRoot = GetMTASABaseDir();
+    mtaRoot += '\\';
+
+    // Add important access zones here + extern them
+    filePath tempRoot = GetMTATempPath();
+    CreateDirectory( tempRoot.c_str(), NULL );
+
+    filePath newsRoot = GetMTADataPath() + "/news/";
+    CreateDirectory( newsRoot.c_str(), NULL );
+
+    filePath screenRoot = mtaRoot + "screenshots/";
+    CreateDirectory( screenRoot.c_str(), NULL );
+
+    tempFileRoot = m_fileSystem->CreateTranslator( tempRoot );
+    mtaFileRoot = m_fileSystem->CreateTranslator( mtaRoot + "mta/" );
+    screenFileRoot = m_fileSystem->CreateTranslator( screenRoot );
+    dataFileRoot = m_fileSystem->CreateTranslator( GetMTADataPath() + "\\" );
+    modFileRoot = m_fileSystem->CreateTranslator( mtaRoot + "mods/" );
+    newsFileRoot = m_fileSystem->CreateTranslator( newsRoot );
+    gameFileRoot = m_fileSystem->CreateTranslator( pathBuffer );
+
+    if ( !gameFileRoot )
+    {
+        MessageBox( NULL, "Could not bind GTA:SA root.", "Filesystem Error", MB_OK );
+
+        TerminateProcess( GetCurrentProcess(), EXIT_FAILURE );
+    }
+
+    if ( !tempFileRoot || !mtaFileRoot || !dataFileRoot || !modFileRoot || !newsFileRoot )
+    {
+        MessageBox( NULL, "Your MTA:SA installation appears to be corrupted. Please reinstall!", "Filesystem Error", MB_OK );
+
+        TerminateProcess( GetCurrentProcess(), EXIT_FAILURE );
+    }
 
     // Create a logger instance.
     m_pConsoleLogger            = new CConsoleLogger ( );
@@ -234,6 +284,18 @@ CCore::~CCore ( void )
 
     //Delete the Current Server
     delete m_pCurrentServer;
+
+    // Free the file access zones
+    delete tempFileRoot;
+    delete mtaFileRoot;
+    delete screenFileRoot;
+    delete dataFileRoot;
+    delete modFileRoot;
+    delete newsFileRoot;
+    delete gameFileRoot;
+
+    // Close the fileSystem activity
+    delete m_fileSystem;
 }
 
 
