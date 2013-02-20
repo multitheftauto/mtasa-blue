@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9.00"
+	Version="9,00"
 	Name="Client - Deathmatch"
 	ProjectGUID="{F661CA1A-A296-4505-9583-3BEC58FB79C5}"
 	RootNamespace="Client - Deathmatch"
@@ -42,7 +42,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../../../vendor/libv2;../../../vendor/libspeex;../../../vendor/portaudio;../../../vendor/bass;../../../Shared/publicsdk/include;../../Voice;./;../shared_logic;../../../Shared/XML/interface;../../../vendor;../../../vendor/lua/src;../../../vendor/zlib;&quot;../../../vendor/json-c&quot;;../../sdk/;../../../Shared/sdk;../../../vendor/sparsehash/current/src;../../../vendor/sparsehash/current/src/windows;../../../Shared/animation;../../../vendor/bochs;../../../vendor/bob_withers;../../../Shared/mods/deathmatch/logic"
+				AdditionalIncludeDirectories="../../../vendor/libv2;../../../vendor/libspeex;../../../vendor/portaudio;../../../vendor/bass;../../../Shared/publicsdk/include;../../Voice;./;../shared_logic;../../../Shared/XML/interface;../../../vendor;../../../vendor/lua/src;../../../vendor/zlib;&quot;../../../vendor/json-c&quot;;../../sdk/;../../../Shared/sdk;../../../vendor/sparsehash/current/src;../../../vendor/sparsehash/current/src/windows;../../../Shared/animation;../../../vendor/bochs;../../../vendor/bob_withers;../../../Shared/mods/deathmatch/logic;../../../Shared/"
 				PreprocessorDefinitions="WIN32;_DEBUG;MTA_DEBUG;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="true"
 				MinimalRebuild="false"
@@ -140,7 +140,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories="../../../vendor/libv2;../../../vendor/libspeex;../../../vendor/portaudio;../../../vendor/bass;../../../Shared/publicsdk/include;../../Voice;./;../shared_logic;../../../Shared/XML/interface;../../../vendor;../../../vendor/lua/src;../../../vendor/zlib;&quot;../../../vendor/json-c&quot;;../../sdk/;../../../Shared/sdk;../../../vendor/sparsehash/current/src;../../../vendor/sparsehash/current/src/windows;../../../Shared/animation;../../../vendor/bochs;../../../vendor/bob_withers;../../../Shared/mods/deathmatch/logic"
+				AdditionalIncludeDirectories="../../../vendor/libv2;../../../vendor/libspeex;../../../vendor/portaudio;../../../vendor/bass;../../../Shared/publicsdk/include;../../Voice;./;../shared_logic;../../../Shared/XML/interface;../../../vendor;../../../vendor/lua/src;../../../vendor/zlib;&quot;../../../vendor/json-c&quot;;../../sdk/;../../../Shared/sdk;../../../vendor/sparsehash/current/src;../../../vendor/sparsehash/current/src/windows;../../../Shared/animation;../../../vendor/bochs;../../../vendor/bob_withers;../../../Shared/mods/deathmatch/logic;../../../Shared/"
 				PreprocessorDefinitions="WIN32;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -238,7 +238,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories="../../../vendor/libv2;../../../vendor/libspeex;../../../vendor/portaudio;../../../vendor/bass;../../../Shared/publicsdk/include;../../Voice;./;../shared_logic;../../../Shared/XML/interface;../../../vendor;../../../vendor/lua/src;../../../vendor/zlib;&quot;../../../vendor/json-c&quot;;../../sdk/;../../../Shared/sdk;../../../vendor/sparsehash/current/src;../../../vendor/sparsehash/current/src/windows;../../../Shared/animation;../../../vendor/bochs;../../../vendor/bob_withers;../../../Shared/mods/deathmatch/logic"
+				AdditionalIncludeDirectories="../../../vendor/libv2;../../../vendor/libspeex;../../../vendor/portaudio;../../../vendor/bass;../../../Shared/publicsdk/include;../../Voice;./;../shared_logic;../../../Shared/XML/interface;../../../vendor;../../../vendor/lua/src;../../../vendor/zlib;&quot;../../../vendor/json-c&quot;;../../sdk/;../../../Shared/sdk;../../../vendor/sparsehash/current/src;../../../vendor/sparsehash/current/src/windows;../../../Shared/animation;../../../vendor/bochs;../../../vendor/bob_withers;../../../Shared/mods/deathmatch/logic;../../../Shared/"
 				PreprocessorDefinitions="WIN32;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="true"
 				RuntimeLibrary="2"

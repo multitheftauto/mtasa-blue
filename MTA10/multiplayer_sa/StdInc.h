@@ -17,6 +17,7 @@
 #define SHARED_UTIL_WITH_HASH_MAP
 #define SHARED_UTIL_WITH_FAST_HASH_MAP
 #include "SharedUtil.h"
+#include <core/interface.h>
 #include <core/CCoreInterface.h>
 #include <net/CNet.h>
 #include <game/CGame.h>
