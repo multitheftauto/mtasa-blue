@@ -320,8 +320,9 @@ public:
 
     CClientVehicle*             GetTowedVehicle         ( void );
     CClientVehicle*             GetRealTowedVehicle     ( void );
-    bool                        SetTowedVehicle         ( CClientVehicle* pVehicle );
+    bool                        SetTowedVehicle         ( CClientVehicle* pVehicle, const CVector* vecRotationDegrees = NULL );
     inline CClientVehicle *     GetTowedByVehicle       ( void )                            { return m_pTowedByVehicle; }
+    bool                        InternalSetTowLink      ( CClientVehicle* pTrailer );
 
     eWinchType                  GetWinchType            ( void )                            { return m_eWinchType; }
     bool                        SetWinchType            ( eWinchType winchType );

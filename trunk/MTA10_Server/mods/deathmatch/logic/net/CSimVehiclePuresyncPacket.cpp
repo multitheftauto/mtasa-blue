@@ -270,6 +270,27 @@ bool CSimVehiclePuresyncPacket::Write ( NetBitStreamInterface& BitStream ) const
             SVehicleHealthSync health;
             health.data.fValue = m_Cache.fVehHealth;
             BitStream.Write ( &health );
+
+            // Write trailer chain
+            if ( BitStream.Version () >= 0x42 )
+            {
+                for ( std::vector< STrailerInfo >::const_iterator it = m_Cache.TrailerList.begin (); it != m_Cache.TrailerList.end (); it++ )
+                {
+                    BitStream.WriteBit ( true );
+
+                    BitStream.Write ( it->m_TrailerID );
+
+                    SPositionSync trailerPosition ( false );
+                    trailerPosition.data.vecPosition = it->m_TrailerPosition;
+                    BitStream.Write ( &trailerPosition );
+
+                    SRotationDegreesSync trailerRotation;
+                    trailerRotation.data.vecRotation = it->m_TrailerRotationDeg;
+                    BitStream.Write ( &trailerRotation );
+                }
+
+                BitStream.WriteBit ( false );
+            }
         }
 
         // Player health and armor

@@ -581,7 +581,7 @@ public:
     //GetIsHandbrakeOn    Use CVehicleSAInterface value
     float                       GetHeightAboveRoad              ();
     float                       GetSteerAngle                   ();
-    bool                        GetTowBarPos                    ( CVector* pVector );
+    bool                        GetTowBarPos                    ( CVector* pVector, CVehicle* pTrailer = NULL);
     bool                        GetTowHitchPos                  ( CVector* pVector );
     bool                        IsOnItsSide                     ();
     bool                        IsLawEnforcementVehicle         ();
@@ -620,7 +620,7 @@ public:
 
     CDamageManager              * GetDamageManager              ();
 
-    bool                        SetTowLink                      ( CVehicle* pVehicle );
+    void                        SetTowLink                      ( CVehicle* pVehicle );
     bool                        BreakTowLink                    ();
     CVehicle *                  GetTowedVehicle                 ();
     CVehicle *                  GetTowedByVehicle               ();
