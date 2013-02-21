@@ -2242,11 +2242,17 @@ void CGame::Packet_VehiclePuresync ( CVehiclePuresyncPacket& Packet )
             RelayPlayerPuresync ( Packet );
             UNCLOCK( "VehiclePuresync", "RelayPlayerPuresync" );
 
+            CVehicle * pTrailer = pVehicle->GetTowedVehicle();
 
             // Run colpoint checks
             CLOCK( "VehiclePuresync", "DoHitDetection" );
             m_pColManager->DoHitDetection ( pPlayer->GetPosition (), pPlayer );
             m_pColManager->DoHitDetection ( pVehicle->GetPosition (), pVehicle );
+            while ( pTrailer )
+            {
+                m_pColManager->DoHitDetection ( pTrailer->GetPosition (), pTrailer );
+                pTrailer = pTrailer->GetTowedVehicle();
+            }
             UNCLOCK( "VehiclePuresync", "DoHitDetection" );
         }
     }
