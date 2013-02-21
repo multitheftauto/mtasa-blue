@@ -76,7 +76,7 @@ private:
 
         float           fVehHealth;
 
-        std::vector < STrailerInfo > TrailerList;     // Unused
+        std::vector < STrailerInfo > TrailerList;
 
         float           fPlrHealth;
         float           fArmor;

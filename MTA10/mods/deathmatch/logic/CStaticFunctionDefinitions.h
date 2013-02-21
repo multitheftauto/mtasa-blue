@@ -231,7 +231,7 @@ public:
     static bool                         SetVehicleLightState                ( CClientEntity& Entity, unsigned char ucLight, unsigned char ucState );
     static bool                         SetVehiclePanelState                ( CClientEntity& Entity, unsigned char ucPanel, unsigned char ucState );
     static bool                         SetVehicleOverrideLights            ( CClientEntity& Entity, unsigned char ucLights );
-    static bool                         AttachTrailerToVehicle              ( CClientVehicle& Vehicle, CClientVehicle& Trailer );
+    static bool                         AttachTrailerToVehicle              ( CClientVehicle& Vehicle, CClientVehicle& Trailer, const CVector& vecRotationOffsetDegrees );
     static bool                         DetachTrailerFromVehicle            ( CClientVehicle& Vehicle, CClientVehicle* pTrailer = NULL );
     static bool                         SetVehicleEngineState               ( CClientEntity& Entity, bool bState );
     static bool                         SetVehicleDirtLevel                 ( CClientEntity& Entity, float fDirtLevel );

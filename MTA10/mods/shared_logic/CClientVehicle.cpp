@@ -377,7 +377,7 @@ void CClientVehicle::SetRotationRadians ( const CVector& vecRotation, bool bRese
     g_pMultiplayer->ConvertEulerAnglesToMatrix ( matTemp, ( 2 * PI ) - vecRotation.fX, ( 2 * PI ) - vecRotation.fY, ( 2 * PI ) - vecRotation.fZ );
     SetMatrix ( matTemp );
 
-    // Reset target rotatin
+    // Reset target rotation
     if ( bResetInterpolation )
         RemoveTargetRotation ();
 }
@@ -1974,9 +1974,8 @@ void CClientVehicle::SetOverrideLights ( unsigned char ucOverrideLights )
 
 bool CClientVehicle::IsNitroInstalled ( void )
 {
-    return this->GetUpgrades ()->GetSlotState ( 8 );
+    return this->GetUpgrades ()->GetSlotState ( 8 ) != 0;
 }
-
 
 
 void CClientVehicle::StreamedInPulse ( void )
@@ -2404,23 +2403,23 @@ void CClientVehicle::Create ( void )
         // Reattach a towed vehicle?
         if ( m_pTowedVehicle )
         {
-            CVehicle* pGameVehicle = m_pTowedVehicle->GetGameVehicle ();
-            if ( pGameVehicle )
-                pGameVehicle->SetTowLink ( m_pVehicle );
+            // Make sure that the trailer is streamed in
+            if ( !m_pTowedVehicle->GetGameVehicle () )
+            {
+                m_pTowedVehicle->StreamIn ( true );
+            }
+
+            // Attach him
+            if ( m_pTowedVehicle->GetGameVehicle () )
+            {
+                InternalSetTowLink ( m_pTowedVehicle );
+            }
         }
 
         // Reattach if we're being towed
-        if ( m_pTowedByVehicle )
+        if ( m_pTowedByVehicle && m_pTowedByVehicle->GetGameVehicle () )
         {
-            CVector vecTowedByPos;
-            m_pTowedByVehicle->GetPosition ( vecTowedByPos );
-            SetPosition ( vecTowedByPos );
-
-            CVehicle* pGameVehicle = m_pTowedByVehicle->GetGameVehicle ();
-            if ( pGameVehicle )
-            {
-                m_pVehicle->SetTowLink ( pGameVehicle );
-            }
+            m_pTowedByVehicle->InternalSetTowLink ( this );
         }
 
         // Reattach to an entity + any entities attached to this
@@ -2614,6 +2613,12 @@ void CClientVehicle::Destroy ( void )
             }
         }
 
+        if ( GetTowedVehicle () )
+        {
+            // Force the trailer to stream out
+            GetTowedVehicle ()->StreamOut ();
+        }
+
         // Remove XRef
         g_pClientGame->GetGameEntityXRefManager ()->RemoveEntityXRef ( this, m_pVehicle );
 
@@ -2687,7 +2692,7 @@ CClientVehicle* CClientVehicle::GetRealTowedVehicle ( void )
 }
 
 
-bool CClientVehicle::SetTowedVehicle ( CClientVehicle* pVehicle )
+bool CClientVehicle::SetTowedVehicle ( CClientVehicle* pVehicle, const CVector* vecRotationDegrees )
 {
     if ( pVehicle == m_pTowedVehicle )
         return true;
@@ -2726,7 +2731,20 @@ bool CClientVehicle::SetTowedVehicle ( CClientVehicle* pVehicle )
             {
                 // Both vehicles are streamed in
                 if ( m_pVehicle->GetTowedVehicle () != pGameVehicle )
-                    pGameVehicle->SetTowLink ( m_pVehicle );
+                {
+                    if ( vecRotationDegrees )
+                    {
+                        pVehicle->SetRotationDegrees ( *vecRotationDegrees );
+                    }
+                    else
+                    {
+                        // Apply the vehicle's rotation to the trailer
+                        CVector vecRotationDegrees;
+                        GetRotationDegrees ( vecRotationDegrees );
+                        pVehicle->SetRotationDegrees ( vecRotationDegrees );
+                    }
+                    InternalSetTowLink ( pVehicle );
+                }
             }
             else
             {
@@ -2747,6 +2765,40 @@ bool CClientVehicle::SetTowedVehicle ( CClientVehicle* pVehicle )
         m_ulIllegalTowBreakTime = 0;
 
     m_pTowedVehicle = pVehicle;
+    return true;
+}
+
+
+bool CClientVehicle::InternalSetTowLink ( CClientVehicle* pTrailer )
+{
+    CVehicle* pGameVehicle = pTrailer->GetGameVehicle ();
+    if ( !pGameVehicle || !m_pVehicle )
+        return false;
+
+    // Get the position
+    CVector* pTrailerPosition = pGameVehicle->GetPosition ();
+    CVector* pVehiclePosition = m_pVehicle->GetPosition ();
+
+    // Get hitch and tow (world) position
+    CVector vecHitchPosition, vecTowBarPosition;
+    pGameVehicle->GetTowHitchPos ( &vecHitchPosition );
+    m_pVehicle->GetTowBarPos ( &vecTowBarPosition, pGameVehicle );
+
+    // Calculate the new position (rotation should be set already)
+    CVector vecOffset = vecHitchPosition - *pTrailerPosition;
+    CVector vecDest = vecTowBarPosition - vecOffset;
+    pTrailer->SetPosition ( vecDest );
+
+    // Apply the towed-by-vehicle's velocity to the trailer
+    CVector vecMoveSpeed;
+    this->GetMoveSpeed ( vecMoveSpeed );
+    pTrailer->SetMoveSpeed ( vecMoveSpeed );    
+
+    // SA can attach the trailer now
+    pGameVehicle->SetTowLink ( m_pVehicle );
+
+    pTrailer->PlaceProperlyOnGround (); // Probably not needed
+
     return true;
 }
 

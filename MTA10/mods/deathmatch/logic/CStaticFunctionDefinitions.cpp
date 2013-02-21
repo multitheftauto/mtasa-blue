@@ -2860,13 +2860,17 @@ bool CStaticFunctionDefinitions::SetVehicleOverrideLights ( CClientEntity& Entit
 }
 
 
-bool CStaticFunctionDefinitions::AttachTrailerToVehicle ( CClientVehicle& Vehicle, CClientVehicle& Trailer )
+bool CStaticFunctionDefinitions::AttachTrailerToVehicle ( CClientVehicle& Vehicle, CClientVehicle& Trailer, const CVector& vecRotationOffsetDegrees )
 {    
     // Are they both free to be attached?
     if ( !Vehicle.GetTowedVehicle () && !Trailer.GetTowedByVehicle () )
     {
+        CVector vecRotationDegrees;
+        Vehicle.GetRotationDegrees ( vecRotationDegrees );
+        vecRotationDegrees += vecRotationOffsetDegrees;
+
         // Attach them
-        return Vehicle.SetTowedVehicle ( &Trailer );
+        return Vehicle.SetTowedVehicle ( &Trailer, &vecRotationDegrees );
     }
 
     return false;

@@ -414,6 +414,38 @@ bool CVehiclePuresyncPacket::Write ( NetBitStreamInterface& BitStream ) const
                 SVehicleHealthSync health;
                 health.data.fValue = pVehicle->GetHealth ();
                 BitStream.Write ( &health );
+
+                // Write the trailer chain
+                if ( BitStream.Version () >= 0x42 )
+                {
+                    CVehicle* pTrailer = pVehicle->GetTowedVehicle ();
+                    while ( pTrailer )
+                    {
+                        BitStream.WriteBit ( true );
+                        BitStream.Write ( pTrailer->GetID () );
+
+                        // Write the position and rotation
+                        CVector vecTrailerPosition, vecTrailerRotationDegrees;
+
+                        // Write the matrix
+                        vecTrailerPosition = pTrailer->GetPosition ();
+                        pTrailer->GetRotationDegrees ( vecTrailerRotationDegrees );
+
+                        SPositionSync trailerPosition ( false );
+                        trailerPosition.data.vecPosition = vecTrailerPosition;
+                        BitStream.Write ( &trailerPosition );
+
+                        SRotationDegreesSync trailerRotation;
+                        trailerRotation.data.vecRotation = vecTrailerRotationDegrees;
+                        BitStream.Write ( &trailerRotation );
+
+                        // Get the next towed vehicle
+                        pTrailer = pTrailer->GetTowedVehicle ();
+                    }
+
+                    // End of our trailer chain
+                    BitStream.WriteBit ( false );
+                }
             }
 
             // Player health and armor
