@@ -317,7 +317,5 @@ private:
     CPed*                   m_pPedContext;
 };
 
-extern CFileTranslator *gameFileRoot;
-
 #endif
 

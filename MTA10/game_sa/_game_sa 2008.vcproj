@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9,00"
+	Version="9.00"
 	Name="Client - Game SA"
 	ProjectGUID="{E13D1441-438B-4A03-AB79-5E8EF08EE414}"
 	RootNamespace="Client - Game SA"
@@ -55,7 +55,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories="../sdk;../../Shared/sdk;../../vendor/sparsehash/current/src;../../vendor/sparsehash/current/src/windows;../../Shared/"
+				AdditionalIncludeDirectories="../sdk;../../Shared/sdk;../../vendor/sparsehash/current/src;../../vendor/sparsehash/current/src/windows"
 				PreprocessorDefinitions="WIN32;GAME_SA_EXPORTS;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -155,7 +155,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../sdk;../../Shared/sdk;../../vendor/sparsehash/current/src;../../vendor/sparsehash/current/src/windows;../../Shared/"
+				AdditionalIncludeDirectories="../sdk;../../Shared/sdk;../../vendor/sparsehash/current/src;../../vendor/sparsehash/current/src/windows"
 				PreprocessorDefinitions="WIN32;_DEBUG;MTA_DEBUG;GAME_SA_EXPORTS;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="true"
 				BasicRuntimeChecks="3"
@@ -258,7 +258,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories="../sdk;../../Shared/sdk;../../vendor/sparsehash/current/src;../../vendor/sparsehash/current/src/windows;../../Shared/"
+				AdditionalIncludeDirectories="../sdk;../../Shared/sdk;../../vendor/sparsehash/current/src;../../vendor/sparsehash/current/src/windows"
 				PreprocessorDefinitions="WIN32;GAME_SA_EXPORTS;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -694,10 +694,6 @@
 			</File>
 			<File
 				RelativePath=".\CStatsSA.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\CStreamerSA.cpp"
 				>
 			</File>
 			<File
@@ -1255,10 +1251,6 @@
 			</File>
 			<File
 				RelativePath=".\CStatsSA.h"
-				>
-			</File>
-			<File
-				RelativePath=".\CStreamerSA.h"
 				>
 			</File>
 			<File

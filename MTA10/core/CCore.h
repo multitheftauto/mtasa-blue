@@ -54,7 +54,7 @@ class CCore;
 #include <dinput.h>
 
 #define BLUE_VERSION_STRING     "Multi Theft Auto v" MTA_DM_BUILDTAG_LONG "\n" \
-                                "Copyright (C) 2003 - 2013 Multi Theft Auto" \
+                                "Copyright (C) 2003 - 2012 Multi Theft Auto" \
 
 // Configuration file path (relative to Grand Theft Auto directory)
 #define MTA_CONFIG_PATH             "mta/coreconfig.xml"
@@ -74,14 +74,6 @@ class CCore;
 #define CONFIG_FAVOURITE_LIST_TAG   "favourite_server"
 #define CONFIG_RECENT_LIST_TAG      "recently_played_server"
 #define CONFIG_HISTORY_LIST_TAG     "connected_server"
-
-extern CFileTranslator *tempFileRoot;
-extern CFileTranslator *mtaFileRoot;
-extern CFileTranslator *screenFileRoot;
-extern CFileTranslator *dataFileRoot;
-extern CFileTranslator *modFileRoot;
-extern CFileTranslator *newsFileRoot;
-extern CFileTranslator *gameFileRoot;
 
 extern class CCore* g_pCore;
 extern class CGraphics* g_pGraphics;
@@ -104,7 +96,6 @@ public:
     CModManagerInterface*   GetModManager                   ( void );
     CMultiplayer*           GetMultiplayer                  ( void );
     CNet*                   GetNetwork                      ( void );
-    CFileSystem*            GetFileSystem                   ( void )                { return m_fileSystem; }
     CXML*                   GetXML                          ( void )                { return m_pXML; };
     CXMLNode*               GetConfig                       ( void );
     CClientVariables*       GetCVars                        ( void )                { return &m_ClientVariables; };
@@ -263,7 +254,6 @@ private:
     CDirect3DData *             m_pDirect3DData;
     CConnectManager*            m_pConnectManager;
     CModelCacheManager*         m_pModelCacheManager;
-    CFileSystem*                m_fileSystem;
 
     // Instances (put new classes here!)
     CXMLFile*                   m_pConfigFile;

@@ -38,8 +38,6 @@ unsigned long* CGameSA::VAR_Framelimiter;
  */
 CGameSA::CGameSA()
 {
-    pGame = this;
-
     m_bAsyncSettingsDontUse = false;
     m_bAsyncSettingsEnabled = false;
     m_bAsyncScriptEnabled = false;
@@ -110,8 +108,6 @@ CGameSA::CGameSA()
     this->m_pWaterManager           = new CWaterManagerSA ();
     this->m_pWeaponStatsManager     = new CWeaponStatManagerSA ();
     this->m_pPointLights            = new CPointLightsSA ();
-
-    Streamer_Init();
 
     // Normal weapon types (WEAPONSKILL_STD)
     for ( int i = 0; i < NUM_WeaponInfosStdSkill; i++)
@@ -198,8 +194,6 @@ CGameSA::~CGameSA ( void )
     {
         delete reinterpret_cast < CWeaponInfoSA* > ( WeaponInfos [i] );
     }
-
-    Streamer_Shutdown();
 
     delete reinterpret_cast < CFxSA * > ( m_pFx );
     delete reinterpret_cast < CRopesSA * > ( m_pRopes );
