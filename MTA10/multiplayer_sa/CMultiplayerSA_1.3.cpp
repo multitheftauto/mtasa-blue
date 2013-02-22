@@ -1268,10 +1268,15 @@ void _declspec(naked) HOOK_CTaskSimplePlayerOnFoot_ProcessWeaponFire ( )
 
 CVector vecObjectScale;
 CObjectSAInterface* pCurrentObject;
-void CObject_GetScale()
+bool CObject_GetScale()
 {
     CObject* pObject = pGameInterface->GetPools ()->GetObjectA ( (DWORD *)pCurrentObject );
-    vecObjectScale = *pObject->GetScale ();
+    if ( pObject )
+    {
+        vecObjectScale = *pObject->GetScale ();
+        return true;
+    }
+    return false;
 }
 
 
@@ -1283,16 +1288,28 @@ void _declspec(naked) HOOK_CObject_PreRender ()
         mov pCurrentObject, esi
     }
     
-    CObject_GetScale();
-
-    _asm
+    if ( CObject_GetScale() )
     {
-        popad
+        _asm
+        {
+            popad
 
-        push 1
-        lea edx, vecObjectScale
+            push 1
+            lea edx, vecObjectScale
 
-        jmp RETURN_CObject_PreRender
+            jmp RETURN_CObject_PreRender
+        }
+    }
+    else
+    {
+        // Do unmodified method if we don't know about this object
+        _asm
+        {
+            popad
+            push 1
+            lea edx, [esp+14h]
+            jmp RETURN_CObject_PreRender
+        }
     }
 }
 
