@@ -82,8 +82,8 @@ public:
     
     inline unsigned char            GetAlpha                ( void )                            { return m_ucAlpha; }   
     void                            SetAlpha                ( unsigned char ucAlpha );
-    inline float                    GetScale                ( void )                            { return m_fScale; }
-    void                            SetScale                ( float fScale );
+    void                            GetScale                ( CVector& vecScale ) const;
+    void                            SetScale                ( const CVector& vecScale );
 
     inline bool                     IsCollisionEnabled      ( void )                            { return m_bUsesCollision; };
     void                            SetCollisionEnabled     ( bool bCollisionEnabled );
@@ -127,7 +127,7 @@ protected:
     bool                                m_bIsStatic;
     bool                                m_bUsesCollision;
     unsigned char                       m_ucAlpha;
-    float                               m_fScale;
+    CVector                             m_vecScale;
     float                               m_fHealth;
     bool                                m_bBreakable;
     bool                                m_bBeingRespawned;

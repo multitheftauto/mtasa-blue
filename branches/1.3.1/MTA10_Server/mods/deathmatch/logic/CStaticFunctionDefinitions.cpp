@@ -7917,18 +7917,20 @@ bool CStaticFunctionDefinitions::SetObjectRotation ( CElement* pElement, const C
 }
 
 
-bool CStaticFunctionDefinitions::SetObjectScale ( CElement* pElement, float fScale )
+bool CStaticFunctionDefinitions::SetObjectScale ( CElement* pElement, const CVector& vecScale )
 {
-    RUN_CHILDREN SetObjectScale ( *iter, fScale );
+    RUN_CHILDREN SetObjectScale ( *iter, vecScale );
 
     if ( IS_OBJECT ( pElement ) )
     {
         CObject* pObject = static_cast < CObject* > ( pElement );
 
-        pObject->SetScale ( fScale );
+        pObject->SetScale ( vecScale );
 
         CBitStream BitStream;
-        BitStream.pBitStream->Write ( fScale );
+        BitStream.pBitStream->Write ( vecScale.fX );
+        BitStream.pBitStream->Write ( vecScale.fY );    // Ignored by clients with bitstream version < 0x41
+        BitStream.pBitStream->Write ( vecScale.fZ );    // Ignored by clients with bitstream version < 0x41
         m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pObject, SET_OBJECT_SCALE, *BitStream.pBitStream ) );
         return true;
     }

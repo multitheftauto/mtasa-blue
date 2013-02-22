@@ -1258,7 +1258,7 @@ void CClientGame::DoPulses ( void )
         UpdateVehicleInOut ();
         UpdatePlayerTarget ();
         UpdatePlayerWeapons ();        
-        UpdateTrailers ();
+        //UpdateTrailers (); // Test: Does it always work without this check?
         UpdateStunts ();
         // Clear last damager if more than 2 seconds old
         if ( CClientTime::GetTime () - m_ulDamageTime > 2000 )
@@ -1950,7 +1950,11 @@ void CClientGame::UpdateTrailers ( void )
                     pGameTrailer = pVehicle->GetGameVehicle ();
                     if ( pGameVehicle && pGameTrailer )
                     {
-                        pGameTrailer->SetTowLink ( pGameVehicle );                        
+                        //pGameTrailer->SetTowLink ( pGameVehicle );
+                        CVector vecRotation;
+                        pTowedBy->GetRotationRadians ( vecRotation );
+                        pVehicle->SetRotationRadians ( vecRotation );
+                        pTowedBy->InternalSetTowLink ( pVehicle );
                     }
                 }
 
@@ -3418,6 +3422,7 @@ void CClientGame::Event_OnIngame ( void )
     g_pGame->GetWorld ( )->SetOcclusionsEnabled ( true );
 
     g_pGame->ResetModelLodDistances ();
+    g_pGame->ResetAlphaTransparencies ();
 
     // Make sure we can access all areas
     g_pGame->GetStats()->ModifyStat ( CITIES_PASSED, 2.0 );
@@ -4258,8 +4263,8 @@ bool CClientGame::VehicleCollisionHandler ( CVehicleSAInterface* pCollidingVehic
                         // is it below the anti spam threshold?
                         if ( pClientVehicle->GetTimeSinceLastPush ( ) >= MIN_PUSH_ANTISPAM_RATE )
                         {
-                            // if there is no occupant.
-                            if ( pClientVehicle->GetOccupant ( 0 ) == NULL )
+                            // if there is no controlling player
+                            if ( !pClientVehicle->GetControllingPlayer () )
                             {
                                 CDeathmatchVehicle* Vehicle = static_cast < CDeathmatchVehicle* > ( pVehicleClientEntity );
                                 // if We aren't already syncing the vehicle

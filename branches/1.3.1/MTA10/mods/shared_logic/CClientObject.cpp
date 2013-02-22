@@ -41,7 +41,7 @@ CClientObject::CClientObject ( CClientManager* pManager, ElementID ID, unsigned 
     m_bIsStatic = false;
     m_bUsesCollision = true;
     m_ucAlpha = 255;
-    m_fScale = 1.0f;
+    m_vecScale = CVector ( 1.0f, 1.0f, 1.0f );
     m_fHealth = 1000.0f;
     m_bBreakable = true;
     m_bRespawnEnabled = true;
@@ -357,14 +357,26 @@ void CClientObject::SetAlpha ( unsigned char ucAlpha )
 }
 
 
-void CClientObject::SetScale ( float fScale )
+void CClientObject::GetScale ( CVector& vecScale ) const
 {
     if ( m_pObject )
     {
-        m_pObject->SetScale ( fScale );
+        vecScale = *m_pObject->GetScale ();
     }
+    else
+    {
+        vecScale = m_vecScale;
+    }
+}
 
-    m_fScale = fScale;
+
+void CClientObject::SetScale ( const CVector& vecScale )
+{
+    if ( m_pObject )
+    {
+        m_pObject->SetScale ( vecScale.fX, vecScale.fY, vecScale.fZ );
+    }
+    m_vecScale = vecScale;
 }
 
 
@@ -504,7 +516,10 @@ void CClientObject::Create ( void )
 
                 UpdateVisibility ();
                 if ( !m_bUsesCollision ) SetCollisionEnabled ( false );
-                if ( m_fScale != 1.0f ) SetScale ( m_fScale );
+                if ( m_vecScale.fX != 1.0f &&
+                     m_vecScale.fY != 1.0f &&
+                     m_vecScale.fZ != 1.0f)
+                    SetScale ( m_vecScale );
                 m_pObject->SetAreaCode ( m_ucInterior );
                 SetAlpha ( m_ucAlpha );
                 m_pObject->SetHealth ( m_fHealth );

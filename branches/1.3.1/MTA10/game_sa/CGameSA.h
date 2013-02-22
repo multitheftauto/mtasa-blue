@@ -224,6 +224,7 @@ public:
     CWeaponStat *           CreateWeaponStat                ( eWeaponType weaponType, eWeaponSkill weaponSkill );
     void                    FlushPendingRestreamIPL         ( void );
     void                    ResetModelLodDistances          ( void );
+    void                    ResetAlphaTransparencies         ( void );
     void                    DisableVSync                    ( void );
 
     void                    OnPedContextChange              ( CPed* pPedContext );

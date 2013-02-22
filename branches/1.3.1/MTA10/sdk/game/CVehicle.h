@@ -117,7 +117,7 @@ public:
     virtual float               GetGasPedal                 () = 0;
     virtual float               GetHeightAboveRoad          () = 0;
     virtual float               GetSteerAngle               () = 0;
-    virtual bool                GetTowBarPos                ( CVector* pVector ) = 0;
+    virtual bool                GetTowBarPos                ( CVector* pVector, CVehicle* pTrailer ) = 0;
     virtual bool                GetTowHitchPos              ( CVector* pVector ) = 0;
     virtual bool                IsOnItsSide                 () = 0;
     virtual bool                IsLawEnforcementVehicle     () = 0;
@@ -149,7 +149,7 @@ public:
     virtual void                FadeOut                     ( bool bFadeOut ) = 0;
     virtual bool                IsFadingOut                 () = 0;
 
-    virtual bool                SetTowLink                  ( CVehicle* pVehicle ) = 0;
+    virtual void                SetTowLink                  ( CVehicle* pVehicle ) = 0;
     virtual bool                BreakTowLink                () = 0;
     virtual CVehicle *          GetTowedVehicle             () = 0;
     virtual CVehicle *          GetTowedByVehicle           () = 0;

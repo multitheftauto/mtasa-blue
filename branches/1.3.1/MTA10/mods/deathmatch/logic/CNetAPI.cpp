@@ -1414,6 +1414,32 @@ void CNetAPI::ReadVehiclePuresync ( CClientPlayer* pPlayer, CClientVehicle* pVeh
         // Apply the correct move and turnspeed
         pVehicle->SetMoveSpeed ( velocity.data.vecVelocity );
         pVehicle->SetTurnSpeed ( turnSpeed.data.vecVelocity );
+
+        if ( BitStream.Version () >= 0x42 )
+        {
+            while ( BitStream.ReadBit () )
+            {
+                ElementID TrailerID;
+                if ( BitStream.Read ( TrailerID ) )
+                {
+                    CClientVehicle* pTrailer = m_pVehicleManager->Get ( TrailerID );
+                    if ( pTrailer )
+                    {
+                        SPositionSync trailerPosition ( false );
+                        BitStream.Read ( &trailerPosition );
+
+                        SRotationDegreesSync trailerRotation;
+                        BitStream.Read ( &trailerRotation );
+
+                        if ( !pTrailer->GetGameVehicle () )
+                        {
+                            pTrailer->SetTargetPosition ( trailerPosition.data.vecPosition, TICK_RATE, true, velocity.data.vecVelocity.fZ );
+                            pTrailer->SetTargetRotation ( trailerRotation.data.vecRotation, TICK_RATE );
+                        }
+                    }
+                }
+            }
+        }
     }
 
     // Player health

@@ -92,6 +92,8 @@ DWORD RETURN_CollisionStreamRead =                          0x41B1D6;
 
 #define CALL_CTrafficLights_GetPrimaryLightState 			0x49DB5F
 #define CALL_CTrafficLights_GetSecondaryLightState 			0x49DB6D
+#define HOOKPOS_CTrafficLights_DisplayActualLight           0x49E1D9
+DWORD RETURN_CTrafficLights_DisplayActualLight =            0x49E1FF;
 
 #define HOOKPOS_CGame_Process                               0x53C095
 DWORD RETURN_CGame_Process =                                0x53C09F;
@@ -437,6 +439,7 @@ void HOOK_PreHUDRender ();
 
 void HOOK_CTrafficLights_GetPrimaryLightState ();
 void HOOK_CTrafficLights_GetSecondaryLightState ();
+void HOOK_CTrafficLights_DisplayActualLight ();
 
 void HOOK_CAutomobile__ProcessSwingingDoor ();
 
@@ -628,6 +631,7 @@ void CMultiplayerSA::InitHooks()
 
     HookInstallCall ( CALL_CTrafficLights_GetPrimaryLightState, (DWORD)HOOK_CTrafficLights_GetPrimaryLightState);
     HookInstallCall ( CALL_CTrafficLights_GetSecondaryLightState, (DWORD)HOOK_CTrafficLights_GetSecondaryLightState);
+    HookInstall ( HOOKPOS_CTrafficLights_DisplayActualLight, (DWORD)HOOK_CTrafficLights_DisplayActualLight, 36 );
 
     HookInstall(HOOKPOS_CEntity_IsOnScreen_FixObjectsScale, (DWORD)HOOK_CEntity_IsOnScreen_FixObjectScale, 7);
 
@@ -3936,6 +3940,31 @@ void _declspec(naked) HOOK_CTrafficLights_GetSecondaryLightState ()
         popad
         mov al, ucDesignatedLightState
         retn
+    }
+}
+
+void _declspec(naked) HOOK_CTrafficLights_DisplayActualLight ()
+{
+    _asm pushad
+
+    if ( ucTrafficLightState == 2 )
+    {
+        ucDesignatedLightState = 0;
+    }
+    else if ( ucTrafficLightState == 9 )
+    {
+        ucDesignatedLightState = 1;
+    }
+    else
+    {
+        ucDesignatedLightState = 2;
+    }
+
+    _asm
+    {
+        popad
+        movzx eax, ucDesignatedLightState
+        jmp RETURN_CTrafficLights_DisplayActualLight
     }
 }
 

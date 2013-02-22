@@ -2850,13 +2850,17 @@ bool CStaticFunctionDefinitions::SetVehicleOverrideLights ( CClientEntity& Entit
 }
 
 
-bool CStaticFunctionDefinitions::AttachTrailerToVehicle ( CClientVehicle& Vehicle, CClientVehicle& Trailer )
+bool CStaticFunctionDefinitions::AttachTrailerToVehicle ( CClientVehicle& Vehicle, CClientVehicle& Trailer, const CVector& vecRotationOffsetDegrees )
 {    
     // Are they both free to be attached?
     if ( !Vehicle.GetTowedVehicle () && !Trailer.GetTowedByVehicle () )
     {
+        CVector vecRotationDegrees;
+        Vehicle.GetRotationDegrees ( vecRotationDegrees );
+        vecRotationDegrees += vecRotationOffsetDegrees;
+
         // Attach them
-        return Vehicle.SetTowedVehicle ( &Trailer );
+        return Vehicle.SetTowedVehicle ( &Trailer, &vecRotationDegrees );
     }
 
     return false;
@@ -3411,9 +3415,9 @@ bool CStaticFunctionDefinitions::IsObjectStatic ( CClientObject & Object, bool &
 }
 
 
-bool CStaticFunctionDefinitions::GetObjectScale ( CClientObject & Object, float& fScale )
+bool CStaticFunctionDefinitions::GetObjectScale ( CClientObject & Object, CVector& vecScale )
 {
-    fScale = Object.GetScale ();
+    Object.GetScale ( vecScale );
     return true;
 }
 
@@ -3495,14 +3499,14 @@ bool CStaticFunctionDefinitions::StopObject ( CClientEntity& Entity )
 }
 
 
-bool CStaticFunctionDefinitions::SetObjectScale ( CClientEntity& Entity, float fScale )
+bool CStaticFunctionDefinitions::SetObjectScale ( CClientEntity& Entity, const CVector& vecScale )
 {
-    RUN_CHILDREN SetObjectScale ( **iter, fScale );
+    RUN_CHILDREN SetObjectScale ( **iter, vecScale );
 
     if ( IS_OBJECT ( &Entity ) )
     {
         CDeathmatchObject& Object = static_cast < CDeathmatchObject& > ( Entity );
-        Object.SetScale ( fScale );
+        Object.SetScale ( vecScale );
         return true;
     }
 
@@ -5342,6 +5346,42 @@ void CStaticFunctionDefinitions::GUIGridListSetSelectionMode ( CClientEntity& En
         {
             // Set the selection mode
             static_cast < CGUIGridList* > ( GUIElement.GetCGUIElement () ) -> SetSelectionMode ( (SelectionMode) uiMode );
+        }
+    }
+}
+
+
+void CStaticFunctionDefinitions::GUIGridListSetHorizontalScrollPosition ( CClientEntity& Entity, float fPosition )
+{
+    RUN_CHILDREN GUIGridListSetHorizontalScrollPosition ( **iter, fPosition );
+
+    // Are we a GUI element?
+    if ( IS_GUI ( &Entity ) )
+    {
+        CClientGUIElement& GUIElement = static_cast < CClientGUIElement& > ( Entity );
+
+        // Are we a gridlist?
+        if ( IS_CGUIELEMENT_GRIDLIST ( &GUIElement ) )
+        {
+            static_cast < CGUIGridList* > ( GUIElement.GetCGUIElement () ) -> SetHorizontalScrollPosition ( fPosition / 100.0f );
+        }
+    }
+}
+
+
+void CStaticFunctionDefinitions::GUIGridListSetVerticalScrollPosition ( CClientEntity& Entity, float fPosition )
+{
+    RUN_CHILDREN GUIGridListSetHorizontalScrollPosition ( **iter, fPosition );
+
+    // Are we a GUI element?
+    if ( IS_GUI ( &Entity ) )
+    {
+        CClientGUIElement& GUIElement = static_cast < CClientGUIElement& > ( Entity );
+
+        // Are we a gridlist?
+        if ( IS_CGUIELEMENT_GRIDLIST ( &GUIElement ) )
+        {
+            static_cast < CGUIGridList* > ( GUIElement.GetCGUIElement () ) -> SetVerticalScrollPosition ( fPosition / 100.0f );
         }
     }
 }

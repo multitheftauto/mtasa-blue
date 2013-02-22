@@ -850,7 +850,7 @@ float CVehicleSA::GetSteerAngle ( void )
 }
 
 
-bool CVehicleSA::GetTowBarPos ( CVector* pVector )
+bool CVehicleSA::GetTowBarPos ( CVector* pVector, CVehicle* pTrailer )
 {
     DEBUG_TRACE("bool CVehicleSA::GetTowBarPos ( CVector* pVector )");
     CVehicleSAInterfaceVTBL * vehicleVTBL = (CVehicleSAInterfaceVTBL *)(m_pInterface->vtbl);
@@ -858,10 +858,15 @@ bool CVehicleSA::GetTowBarPos ( CVector* pVector )
     DWORD dwFunc = vehicleVTBL->GetTowbarPos;
     bool bReturn = false;
 
+    DWORD dwTrailerInt = 0;
+    CVehicleSA* pTrailerSA = dynamic_cast < CVehicleSA* > ( pTrailer );
+    if ( pTrailerSA )
+        dwTrailerInt = (DWORD) pTrailerSA->GetInterface ();
+
     _asm
     {
         mov     ecx, dwThis
-        push    0
+        push    dwTrailerInt
         push    1
         push    pVector
         call    dwFunc
@@ -1527,32 +1532,24 @@ unsigned char CVehicleSA::GetMaxPassengerCount ( void )
     return GetVehicleInterface ()->m_nMaxPassengers;
 }
 
-bool CVehicleSA::SetTowLink ( CVehicle* pVehicle )
+void CVehicleSA::SetTowLink ( CVehicle* pVehicle )
 {
-    DEBUG_TRACE("bool CAutomobileSA::SetTowLink ( CVehicle* pVehicle )");
-
-    bool bReturn = false;
+    DEBUG_TRACE("void CVehicleSA::SetTowLink ( CVehicle* pVehicle )");
+    // We can't use the vtable func, because it teleports the trailer parallel to the vehicle => make our own one (see #1655)
 
     CVehicleSA* pVehicleSA = dynamic_cast < CVehicleSA* > ( pVehicle );
-
+    
     if ( pVehicleSA )
     {
         DWORD dwThis = (DWORD) GetInterface();
-        CVehicleSAInterface* pVehicleInt = pVehicleSA->GetVehicleInterface();
+        DWORD dwVehicleInt = (DWORD) pVehicleSA->GetVehicleInterface();
 
-        CVehicleSAInterfaceVTBL * vehicleVTBL = (CVehicleSAInterfaceVTBL *)(this->GetInterface()->vtbl);
-        DWORD dwFunc = vehicleVTBL->SetTowLink;
-        _asm
-        {
-            mov     ecx, dwThis
-            push    1
-            push    pVehicleInt
-            
-            call    dwFunc
-            mov     bReturn, al
-        }
+        *(DWORD*)(dwThis + 1220) = dwVehicleInt;
+        *(DWORD*)(dwVehicleInt + 1224) = dwThis;
+
+        // Set the trailer's status to "remote controlled"
+        SetEntityStatus ( eEntityStatus::STATUS_REMOTE_CONTROLLED );
     }
-    return bReturn;
 }
 
 bool CVehicleSA::BreakTowLink ( void )

@@ -227,7 +227,7 @@ public:
     static bool                         SetVehicleLightState                ( CClientEntity& Entity, unsigned char ucLight, unsigned char ucState );
     static bool                         SetVehiclePanelState                ( CClientEntity& Entity, unsigned char ucPanel, unsigned char ucState );
     static bool                         SetVehicleOverrideLights            ( CClientEntity& Entity, unsigned char ucLights );
-    static bool                         AttachTrailerToVehicle              ( CClientVehicle& Vehicle, CClientVehicle& Trailer );
+    static bool                         AttachTrailerToVehicle              ( CClientVehicle& Vehicle, CClientVehicle& Trailer, const CVector& vecRotationOffsetDegrees );
     static bool                         DetachTrailerFromVehicle            ( CClientVehicle& Vehicle, CClientVehicle* pTrailer = NULL );
     static bool                         SetVehicleEngineState               ( CClientEntity& Entity, bool bState );
     static bool                         SetVehicleDirtLevel                 ( CClientEntity& Entity, float fDirtLevel );
@@ -252,14 +252,14 @@ public:
     // Object get funcs
     static CClientObject*               CreateObject                        ( CResource& Resource, unsigned short usModelID, const CVector& vecPosition, const CVector& vecRotation, bool bLowLod );
     static bool                         IsObjectStatic                      ( CClientObject& Object, bool & bStatic );
-    static bool                         GetObjectScale                      ( CClientObject& Object, float& fScale );
+    static bool                         GetObjectScale                      ( CClientObject& Object, CVector& vecScale );
     static bool                         IsObjectBreakable                   ( CClientObject& Object, bool& bBreakable );
 
     // Object set funcs
     static bool                         SetObjectRotation                   ( CClientEntity& Entity, const CVector& vecRotation );
     static bool                         MoveObject                          ( CClientEntity& Entity, unsigned long ulTime, const CVector& vecPosition, const CVector& vecDeltaRotation, CEasingCurve::eType a_eEasingType, double a_fEasingPeriod, double a_fEasingAmplitude, double a_fEasingOvershoot );
     static bool                         StopObject                          ( CClientEntity& Entity );
-    static bool                         SetObjectScale                      ( CClientEntity& Entity, float fScale );
+    static bool                         SetObjectScale                      ( CClientEntity& Entity, const CVector& vecScale  );
     static bool                         SetObjectStatic                     ( CClientEntity& Entity, bool bStatic );
     static bool                         SetObjectBreakable                  ( CClientEntity& Entity, bool bBreakable );
     static bool                         BreakObject                         ( CClientEntity& Entity );
@@ -425,6 +425,8 @@ public:
     static void                         GUIGridListSetSelectionMode         ( CClientEntity& Element, unsigned int uiMode );
     static inline void                  GUIGridListSetSelectedItem          ( CClientGUIElement& GUIElement, int iRow, int iColumn, bool bReset )                       { static_cast < CGUIGridList* > ( GUIElement.GetCGUIElement () ) -> SetSelectedItem ( iRow, iColumn, bReset ); };
     static inline void                  GUIGridListSetItemColor             ( CClientGUIElement& GUIElement, int iRow, int iColumn, int iRed, int iGreen, int iBlue, int iAlpha )       { static_cast < CGUIGridList* > ( GUIElement.GetCGUIElement () ) -> SetItemColor ( iRow, iColumn, iRed, iGreen, iBlue, iAlpha ); };
+    static void                         GUIGridListSetHorizontalScrollPosition ( CClientEntity& Element, float fPosition );
+    static void                         GUIGridListSetVerticalScrollPosition   ( CClientEntity& Element, float fPosition );
 
 
     static void                         GUIWindowSetMovable                 ( CClientEntity& Element, bool bFlag );

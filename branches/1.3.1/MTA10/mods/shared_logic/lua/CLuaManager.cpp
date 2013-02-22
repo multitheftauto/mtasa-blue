@@ -823,6 +823,10 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "guiGridListGetSelectedItems", CLuaFunctionDefs::GUIGridListGetSelectedItems );
     CLuaCFunctions::AddFunction ( "guiGridListGetSelectedCount", CLuaFunctionDefs::GUIGridListGetSelectedCount );
     CLuaCFunctions::AddFunction ( "guiGridListSetSelectedItem", CLuaFunctionDefs::GUIGridListSetSelectedItem );
+    CLuaCFunctions::AddFunction ( "guiGridListSetHorizontalScrollPosition", CLuaFunctionDefs::GUIGridListSetHorizontalScrollPosition );
+    CLuaCFunctions::AddFunction ( "guiGridListGetHorizontalScrollPosition", CLuaFunctionDefs::GUIGridListGetHorizontalScrollPosition );
+    CLuaCFunctions::AddFunction ( "guiGridListSetVerticalScrollPosition", CLuaFunctionDefs::GUIGridListSetVerticalScrollPosition );
+    CLuaCFunctions::AddFunction ( "guiGridListGetVerticalScrollPosition", CLuaFunctionDefs::GUIGridListGetVerticalScrollPosition );
 
     CLuaCFunctions::AddFunction ( "guiScrollPaneSetScrollBars", CLuaFunctionDefs::GUIScrollPaneSetScrollBars );
     CLuaCFunctions::AddFunction ( "guiScrollPaneSetHorizontalScrollPosition", CLuaFunctionDefs::GUIScrollPaneSetHorizontalScrollPosition );

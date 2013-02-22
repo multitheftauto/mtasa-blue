@@ -648,6 +648,10 @@ public:
     LUA_DECLARE ( GUIGridListGetSelectedItems );
     LUA_DECLARE ( GUIGridListGetSelectedCount );
     LUA_DECLARE ( GUIGridListSetSelectedItem );
+    LUA_DECLARE ( GUIGridListSetHorizontalScrollPosition );
+    LUA_DECLARE ( GUIGridListGetHorizontalScrollPosition );
+    LUA_DECLARE ( GUIGridListSetVerticalScrollPosition );
+    LUA_DECLARE ( GUIGridListGetVerticalScrollPosition );
     LUA_DECLARE ( GUIScrollPaneSetScrollBars );
     LUA_DECLARE ( GUIScrollPaneSetHorizontalScrollPosition );
     LUA_DECLARE ( GUIScrollPaneGetHorizontalScrollPosition );

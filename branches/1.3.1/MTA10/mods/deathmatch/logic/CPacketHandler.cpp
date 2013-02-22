@@ -2429,7 +2429,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
     // CVector              (12)    - rotation
     // unsigned short       (2)     - object model id
     // unsigned char        (1)     - alpha
-    // float                (4)     - scale
+    // CVector              (12)    - scale
     // bool                 (1)     - static
     // SObjectHealthSync    (?)     - health
 
@@ -2731,9 +2731,36 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                             }
                         }
 
-                        float fScale;
-                        if ( bitStream.Read ( fScale ) )
-                            pObject->SetScale ( fScale );
+                        CVector vecScale;
+                        if ( bitStream.Version() >= 0x41 )
+                        {
+                            bool bIsUniform;
+                            bitStream.ReadBit( bIsUniform );
+                            if ( bIsUniform )
+                            {
+                                bool bIsUnitSize;
+                                bitStream.ReadBit( bIsUnitSize );
+                                if ( !bIsUnitSize )
+                                    bitStream.Read( vecScale.fX );
+                                else
+                                    vecScale.fX = 1.0f;
+                                vecScale.fY = vecScale.fX;
+                                vecScale.fZ = vecScale.fX;
+                            }
+                            else
+                            {
+                                 bitStream.Read( vecScale.fX );
+                                 bitStream.Read( vecScale.fY );
+                                 bitStream.Read( vecScale.fZ );
+                            }
+                        }
+                        else
+                        {
+                            bitStream.Read( vecScale.fX );
+                            vecScale.fY = vecScale.fX;
+                            vecScale.fZ = vecScale.fX;
+                        }
+                        pObject->SetScale ( vecScale );
 
                         bool bStatic;
                         if ( bitStream.ReadBit ( bStatic ) )

@@ -299,11 +299,12 @@ bool CMainConfig::Load ( void )
                 }
         }
 
-        // Add support for SD #12, #14, #15 and #16 (defaults to disabled)
+        // Add support for SD #12, #14, #15, #16 and #20 (defaults to disabled)
         MapInsert ( m_DisableComboACMap, "12" );
         MapInsert ( m_DisableComboACMap, "14" );
         MapInsert ( m_DisableComboACMap, "15" );
         MapInsert ( m_DisableComboACMap, "16" );
+        MapInsert ( m_DisableComboACMap, "20" );
 
         {
             SString strEnableSD;
@@ -316,6 +317,9 @@ bool CMainConfig::Load ( void )
                     MapInsert ( enableSDMap, *it );
                     MapRemove ( m_DisableComboACMap, *it );
                 }
+
+            // Also save initial value in transient settings, so we can update the config without anyone knowing
+            MapSet ( m_TransientSettings, "enablesd", strEnableSD );
         }
 
         CArgMap argMap;
@@ -1057,18 +1061,18 @@ bool CMainConfig::GetSetting ( const SString& strName, SString& strValue )
             }
         }
 
-        //
-        // Everything else is read only, so can be fetched directly from the XML data
-        //
-        if ( GetString ( m_pRootNode, strName, strValue ) )
-            return true;
-
-        // or transient settings
+        // Check transient settings
         if ( SString* pstrValue = MapFind ( m_TransientSettings, strName ) )
         {
             strValue = *pstrValue;
             return true;
         }
+
+        //
+        // Everything else is read only, so can be fetched directly from the XML data
+        //
+        if ( GetString ( m_pRootNode, strName, strValue ) )
+            return true;
 
     }
 
@@ -1205,6 +1209,46 @@ bool CMainConfig::SetSetting ( const SString& strName, const SString& strValue, 
             g_pBandwidthSettings->bLightSyncEnabled = atoi ( strValue ) ? true : false;
             return true;
         }
+    }
+    else
+    if ( strName == "enablesd" )
+    {
+        // 'enablesd' can only be added to, and then server has to be restarted
+
+        // Get current setting as list of ids
+        SString strCurSD;
+        GetSetting( "enablesd", strCurSD );
+        std::vector < SString > curSDList;
+        strCurSD.Split ( ",", curSDList );
+
+        // Get new setting as as list of ids
+        std::vector < SString > newSDList;
+        strValue.Split( ",", newSDList );
+
+        // Merge
+        std::set < uint > comboSDMap;
+        for ( std::vector < SString >::iterator it = curSDList.begin () ; it != curSDList.end () ; ++it )
+            MapInsert( comboSDMap, atoi( **it ) );
+        for ( std::vector < SString >::iterator it = newSDList.begin () ; it != newSDList.end () ; ++it )
+            MapInsert( comboSDMap, atoi( **it ) );
+
+        // Make a string
+        SString strComboResult;
+        for ( std::set < uint >::iterator it = comboSDMap.begin () ; it != comboSDMap.end () ; ++it )
+        {
+            uint uiId = *it;
+            if ( uiId )
+            {
+                if ( !strComboResult.empty() )
+                    strComboResult += ",";
+                strComboResult += SString( "%d", uiId );
+            }
+        }
+
+        // Save new setting
+        SetString ( m_pRootNode, "enablesd", strComboResult );
+        Save ();
+        return true;
     }
 
     // Check settings in this list here

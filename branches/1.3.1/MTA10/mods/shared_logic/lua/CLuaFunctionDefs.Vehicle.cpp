@@ -1843,17 +1843,22 @@ int CLuaFunctionDefs::SetVehicleOverrideLights ( lua_State* luaVM )
 
 int CLuaFunctionDefs::AttachTrailerToVehicle ( lua_State* luaVM )
 {
-    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA &&
-        lua_type ( luaVM, 2 ) == LUA_TLIGHTUSERDATA )
-    {
-        CClientVehicle* pVehicle = lua_tovehicle ( luaVM, 1 );
-        CClientVehicle* pTrailer = lua_tovehicle ( luaVM, 2 );
+    CClientVehicle* pVehicle = NULL; CClientVehicle* pTrailer = NULL; CVector vecRotationOffsetDegrees;
 
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pVehicle );
+    argStream.ReadUserData ( pTrailer );
+    argStream.ReadNumber ( vecRotationOffsetDegrees.fX, 0.0f );
+    argStream.ReadNumber ( vecRotationOffsetDegrees.fY, 0.0f );
+    argStream.ReadNumber ( vecRotationOffsetDegrees.fZ, 0.0f );
+    
+    if ( !argStream.HasErrors () )
+    {
         if ( pVehicle )
         {
             if ( pTrailer )
             {
-                if ( CStaticFunctionDefinitions::AttachTrailerToVehicle ( *pVehicle, *pTrailer ) )
+                if ( CStaticFunctionDefinitions::AttachTrailerToVehicle ( *pVehicle, *pTrailer, vecRotationOffsetDegrees ) )
                 {
                     lua_pushboolean ( luaVM, true );
                     return 1;
@@ -1866,7 +1871,7 @@ int CLuaFunctionDefs::AttachTrailerToVehicle ( lua_State* luaVM )
             m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
 
     lua_pushboolean ( luaVM, false );
     return 1;

@@ -88,6 +88,10 @@ public:
 
     virtual float           GetDistanceFromCentreOfMassToBaseOfModel () = 0;
 
+    virtual void            SetAlphaTransparencyEnabled ( BOOL bEnabled ) = 0;
+    virtual bool            IsAlphaTransparencyEnabled () = 0;
+    virtual void            ResetAlphaTransparency  () = 0;
+
     // ONLY use for CVehicleModelInfos
     virtual short           GetAvailableVehicleMod  ( unsigned short usSlot ) = 0;
     virtual bool            IsUpgradeAvailable      ( eVehicleUpgradePosn posn ) = 0;

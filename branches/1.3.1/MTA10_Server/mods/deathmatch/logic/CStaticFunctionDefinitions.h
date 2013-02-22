@@ -397,7 +397,7 @@ public:
 
     // Object set functions
     static bool                 SetObjectRotation                   ( CElement* pElement, const CVector& vecRotation );
-    static bool                 SetObjectScale                      ( CElement* pElement, float fScale );
+    static bool                 SetObjectScale                      ( CElement* pElement, const CVector& vecScale );
     static bool                 MoveObject                          ( CResource * pResource, CElement* pElement, unsigned long ulTime, const CVector& vecPosition, const CVector& vecRotation, CEasingCurve::eType a_easingType, double a_fEasingPeriod, double a_fEasingAmplitude, double a_fEasingOvershoot );
     static bool                 StopObject                          ( CElement* pElement );
 
