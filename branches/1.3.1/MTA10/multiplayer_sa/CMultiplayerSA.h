@@ -91,6 +91,8 @@ public:
     void                        SetProcessCollisionHandler  ( ProcessCollisionHandler * pHandler );
     void                        SetVehicleCollisionHandler  ( VehicleCollisionHandler * pHandler );
     void                        SetHeliKillHandler          ( HeliKillHandler * pHandler );
+    void                        SetObjectDamageHandler      ( ObjectDamageHandler * pHandler );
+    void                        SetObjectBreakHandler       ( ObjectBreakHandler * pHandler );
     void                        SetWaterCannonHitHandler    ( WaterCannonHitHandler * pHandler );
     void                        SetGameObjectDestructHandler    ( GameObjectDestructHandler * pHandler );
     void                        SetGameVehicleDestructHandler   ( GameVehicleDestructHandler * pHandler );

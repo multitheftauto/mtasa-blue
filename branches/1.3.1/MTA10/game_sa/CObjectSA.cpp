@@ -230,12 +230,18 @@ void CObjectSA::Explode()
 
 void CObjectSA::Break ()
 {
-    // Works only if health is 0
     DWORD dwFunc = 0x5A0D90;
     DWORD dwThis = (DWORD) GetInterface ();
 
+    float fHitVelocity = 1000.0f; // has no direct influence, but should be high enough to trigger the break (effect)
+
     _asm
     {
+        push    32h // most cases: between 30 and 37
+        push    0 // colliding entity. To ignore it, we can set it to 0
+        push    0B73710h // vecCollisionImpactVelocity
+        push    0 // vecCollisionLastPos
+        push    fHitVelocity
         mov     ecx, dwThis
         call    dwFunc
     }
@@ -257,12 +263,12 @@ void CObjectSA::SetScale( float faScale )
 
 void CObjectSA::SetHealth ( float fHealth )
 {
-    MemPutFast < float > ( (DWORD)this->GetInterface () + 340, fHealth );
+    static_cast < CObjectSAInterface* > ( this->GetInterface () )->fHealth = fHealth;
 }
 
 float CObjectSA::GetHealth ( void )
 {
-    return *(float *)( (DWORD)this->GetInterface () + 340 );
+    return static_cast < CObjectSAInterface* > ( this->GetInterface () )->fHealth;
 }
 
 void CObjectSA::SetModelIndex ( unsigned long ulModel )
