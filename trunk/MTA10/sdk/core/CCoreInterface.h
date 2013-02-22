@@ -73,7 +73,6 @@ public:
     virtual CModManagerInterface*       GetModManager                   ( void ) = 0;
     virtual CMultiplayer*               GetMultiplayer                  ( void ) = 0;
     virtual CNet*                       GetNetwork                      ( void ) = 0;
-    virtual CFileSystemInterface*       GetFileSystem                   ( void ) = 0;
     virtual CXML*                       GetXML                          ( void ) = 0;
     virtual CKeyBindsInterface*         GetKeyBinds                     ( void ) = 0;
     virtual CXMLNode*                   GetConfig                       ( void ) = 0;
