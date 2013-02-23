@@ -314,6 +314,7 @@ namespace
     }
     #define WriteDebugEvent WriteDebugEventTest
 
+    uint ms_uiCreationAttempts = 0;
 }
 
 
@@ -331,6 +332,7 @@ HRESULT CreateDeviceInsist( uint uiMinTries, uint uiTimeout, IDirect3D9* pDirect
     uint uiRetryCount = 0;
     do
     {
+        ms_uiCreationAttempts++;
         hResult = pDirect3D->CreateDevice( Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters, ppReturnedDeviceInterface );
         if ( hResult == D3D_OK )
         {
@@ -361,6 +363,7 @@ HRESULT DoCreateDevice( IDirect3D9* pDirect3D, UINT Adapter, D3DDEVTYPE DeviceTy
     if ( hResult == D3D_OK )
         return hResult;
     WriteDebugEvent ( SString( "  CreateDevice failed #2: %08x", hResult ) );
+    HRESULT hResultFail = hResult;
 
     // If create failed, try removing multisampling if enabled
     if ( pPresentationParameters->MultiSampleType )
@@ -381,77 +384,88 @@ HRESULT DoCreateDevice( IDirect3D9* pDirect3D, UINT Adapter, D3DDEVTYPE DeviceTy
     D3DFORMAT depthFormatList32[] = { D3DFMT_D24S8, D3DFMT_D24X8 };
     D3DFORMAT rtFormatList16[] = { D3DFMT_R5G6B5 };
     D3DFORMAT depthFormatList16[] = { D3DFMT_D16 };
-    for ( uint iColor = 0 ; iColor < 2 ; iColor++ )
+    struct SFormat
     {
-        for ( uint iBehavior = 0 ; iBehavior < 2 ; iBehavior++ )
+        D3DFORMAT* rtFormatList;
+        uint rtFormatListSize;
+        D3DFORMAT* depthFormatList;
+        uint depthFormatListSize;
+    } formatList[] = { { rtFormatList32, NUMELMS( rtFormatList32 ), depthFormatList32, NUMELMS( depthFormatList32 ), },
+                       { rtFormatList16, NUMELMS( rtFormatList16 ), depthFormatList16, NUMELMS( depthFormatList16 ), } };
+
+    for ( uint iRes = 0 ; iRes < 3 ; iRes++ )
+    {
+        if ( iRes == 1 )
         {
-            if ( iBehavior == 0 )
-                BehaviorFlags &= ~D3DCREATE_PUREDEVICE;
-            else
-                BehaviorFlags |= D3DCREATE_PUREDEVICE;
+            if ( pPresentationParameters->Windowed )
+                continue;
+            pPresentationParameters->Windowed = true;
+            pPresentationParameters->FullScreen_RefreshRateInHz = D3DPRESENT_RATE_DEFAULT;
+        }
+        if ( iRes == 2 )
+        {
+            pPresentationParameters->BackBufferWidth = 640;
+            pPresentationParameters->BackBufferHeight = 480;
+        }
 
-            for ( uint iRefresh = 0 ; iRefresh < 2 ; iRefresh++ )
+        for ( uint iColor = 0 ; iColor < 2 ; iColor++ )
+        {
+            for ( uint iBehavior = 0 ; iBehavior < 2 ; iBehavior++ )
             {
-                if ( iRefresh == 1 )
-                {
-                    if ( pPresentationParameters->Windowed )
-                        continue;
-                    pPresentationParameters->FullScreen_RefreshRateInHz = 60;
-                }
+                if ( iBehavior == 0 )
+                    BehaviorFlags &= ~D3DCREATE_PUREDEVICE;
+                else
+                    BehaviorFlags |= D3DCREATE_PUREDEVICE;
 
-                for ( uint iPresent = 0 ; iPresent < NUMELMS( presentIntervalList ) ; iPresent++ )
+                for ( uint iRefresh = 0 ; iRefresh < 2 ; iRefresh++ )
                 {
-                    for ( uint iSwap = 0 ; iSwap < NUMELMS( swapEffectList ) ; iSwap++ )
+                    if ( iRefresh == 1 )
                     {
-                        if ( iColor == 0 )
+                        if ( pPresentationParameters->Windowed )
+                            continue;
+                        pPresentationParameters->FullScreen_RefreshRateInHz = 60;
+                    }
+
+                    for ( uint iPresent = 0 ; iPresent < NUMELMS( presentIntervalList ) ; iPresent++ )
+                    {
+                        for ( uint iSwap = 0 ; iSwap < NUMELMS( swapEffectList ) ; iSwap++ )
                         {
-                            for ( uint iRt = 0 ; iRt < NUMELMS( rtFormatList32 ) ; iRt++ )
+                            SFormat format = formatList[iColor];
+
+                            for ( uint iRt = 0 ; iRt < format.rtFormatListSize ; iRt++ )
                             {
-                                for ( uint iDepth = 0 ; iDepth < NUMELMS( depthFormatList32 ) ; iDepth++ )
+                                for ( uint iDepth = 0 ; iDepth < format.depthFormatListSize ; iDepth++ )
                                 {
                                     pPresentationParameters->PresentationInterval = presentIntervalList[ iPresent ];
                                     pPresentationParameters->SwapEffect = swapEffectList[ iSwap ];
-                                    pPresentationParameters->BackBufferFormat = rtFormatList32[ iRt ];
-                                    pPresentationParameters->AutoDepthStencilFormat = depthFormatList32[ iDepth ];
+                                    pPresentationParameters->BackBufferFormat = format.rtFormatList[ iRt ];
+                                    pPresentationParameters->AutoDepthStencilFormat = format.depthFormatList[ iDepth ];
                                     hResult = CreateDeviceInsist( 2, 0, pDirect3D, Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters, ppReturnedDeviceInterface );
         #if MTA_DEBUG
                                     WriteDebugEvent ( "--------------------------------");
                                     WriteDebugEvent ( ToString( Adapter, DeviceType, hFocusWindow, BehaviorFlags, *pPresentationParameters ) );
                                     WriteDebugEvent ( SString( "        32 result: %08x", hResult ) );
-        #else
+                                    hResult = -1;
+        #endif
                                     if ( hResult == D3D_OK )
                                     {
-                                        WriteDebugEvent ( "      Pass #4 SUCCESS with 32 bit cycle:" );
+                                        WriteDebugEvent ( SString( "      Pass #4 SUCCESS with: {Res:%d, Color:%d, Refresh:%d}", iRes, iColor, iRefresh ) );
                                         WriteDebugEvent ( ToString( Adapter, DeviceType, hFocusWindow, BehaviorFlags, *pPresentationParameters ) );
+                                        if ( iRes == 1 )
+                                        {
+                                            // Switch to using alternate alt-tab mode
+                                            WriteDebugEvent ( "      Switching to alt tab handler" );
+                                            int iSelected = 1;
+                                            CVARS_SET ( "display_alttab_handler", iSelected );
+                                        }
+                                        if ( iRes == 2 )
+                                        {
+                                            // Only test, so return as fail
+                                            WriteDebugEvent ( "      Test success" );
+                                            goto failed;
+                                        }
                                         return hResult;
                                     }
-        #endif
-                                }
-                            }
-                        }
-                        if ( iColor == 1 )
-                        {
-                            for ( uint iRt = 0 ; iRt < NUMELMS( rtFormatList16 ) ; iRt++ )
-                            {
-                                for ( uint iDepth = 0 ; iDepth < NUMELMS( depthFormatList16 ) ; iDepth++ )
-                                {
-                                    pPresentationParameters->PresentationInterval = presentIntervalList[ iPresent ];
-                                    pPresentationParameters->SwapEffect = swapEffectList[ iSwap ];
-                                    pPresentationParameters->BackBufferFormat = rtFormatList16[ iRt ];
-                                    pPresentationParameters->AutoDepthStencilFormat = depthFormatList16[ iDepth ];
-                                    hResult = CreateDeviceInsist( 2, 0, pDirect3D, Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters, ppReturnedDeviceInterface );
-        #if MTA_DEBUG
-                                    WriteDebugEvent ( "--------------------------------");
-                                    WriteDebugEvent ( ToString( Adapter, DeviceType, hFocusWindow, BehaviorFlags, *pPresentationParameters ) );
-                                    WriteDebugEvent ( SString( "        16 result: %08x", hResult ) );
-        #else
-                                    if ( hResult == D3D_OK )
-                                    {
-                                        WriteDebugEvent ( "      Pass #4 SUCCESS with 16 bit cycle:" );
-                                        WriteDebugEvent ( ToString( Adapter, DeviceType, hFocusWindow, BehaviorFlags, *pPresentationParameters ) );
-                                        return hResult;
-                                    }
-        #endif
                                 }
                             }
                         }
@@ -460,7 +474,9 @@ HRESULT DoCreateDevice( IDirect3D9* pDirect3D, UINT Adapter, D3DDEVTYPE DeviceTy
             }
         }
     }
-    return hResult;
+failed:
+    WriteDebugEvent ( SString( "      Failed after %d creation attempts", ms_uiCreationAttempts ) );
+    return hResultFail;
 }
 
 
