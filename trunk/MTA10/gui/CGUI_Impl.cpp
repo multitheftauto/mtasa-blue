@@ -72,7 +72,7 @@ CGUI_Impl::CGUI_Impl ( IDirect3DDevice9* pDevice )
 #endif
 
     // Load our fonts
-    SString strFontsPath = PathJoin ( SharedUtil::GetWindowsDirectory (), "fonts" );
+    SString strFontsPath = PathJoin ( GetSystemWindowsPath (), "fonts" );
 
     m_pFontManager->setSubstituteFont ( CGUI_MTA_SUBSTITUTE_FONT, 9 );
 
@@ -372,7 +372,7 @@ CGUIFont* CGUI_Impl::CreateFnt ( const char* szFontName, const char* szFontFile,
 CGUIFont* CGUI_Impl::CreateFntFromWinFont ( const char* szFontName, const char* szFontWinReg, const char* szFontWinFile, unsigned int uSize, unsigned int uFlags, bool bAutoScale )
 {
     SString strFontWinRegName = GetSystemRegistryValue ( (uint)HKEY_LOCAL_MACHINE, "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Fonts", szFontWinReg );
-    SString strWinFontsPath = PathJoin ( SharedUtil::GetWindowsDirectory (), "fonts" );
+    SString strWinFontsPath = PathJoin ( GetSystemWindowsPath (), "fonts" );
 
     // Compile a list of places to look
     std::vector < SString > lookList;

@@ -282,6 +282,20 @@ SString SharedUtil::PathMakeRelative ( const SString& strInBasePath, const SStri
 #ifdef WIN32
 #ifdef MTA_CLIENT
 
+SString SharedUtil::GetSystemCurrentDirectory ( void )
+{
+    char szResult [ 1024 ] = "";
+    GetCurrentDirectory ( sizeof ( szResult ), szResult );
+    return szResult;
+}
+
+SString SharedUtil::GetSystemDllDirectory ( void )
+{
+    char szResult [ 1024 ] = "";
+    GetDllDirectory ( sizeof ( szResult ), szResult );
+    return szResult;
+}
+
 SString SharedUtil::GetSystemLocalAppDataPath ( void )
 {
     char szResult[MAX_PATH] = "";
@@ -425,51 +439,6 @@ bool SharedUtil::FileCopy ( const SString& strSrc, const SString& strDest, bool 
     fclose ( fhDst );
     return true;
 }
-
-
-#ifdef WIN32
-///////////////////////////////////////////////////////////////
-//
-// GetCurrentWorkingDirectory
-//
-//
-//
-///////////////////////////////////////////////////////////////
-SString SharedUtil::GetCurrentWorkingDirectory ( void )
-{
-    char szCurDir [ 1024 ] = "";
-    ::GetCurrentDirectory ( sizeof ( szCurDir ), szCurDir );
-    return szCurDir;
-}
-
-///////////////////////////////////////////////////////////////
-//
-// GetCurrentDirectory
-//
-//
-//
-///////////////////////////////////////////////////////////////
-SString SharedUtil::GetCurrentDirectory ( void )
-{
-    char szCurDir [ 1024 ] = "";
-    ::GetCurrentDirectory ( sizeof ( szCurDir ), szCurDir );
-    return szCurDir;
-}
-
-///////////////////////////////////////////////////////////////
-//
-// GetWindowsDirectory
-//
-//
-//
-///////////////////////////////////////////////////////////////
-SString SharedUtil::GetWindowsDirectory ( void )
-{
-    char szWinDir [ MAX_PATH ] = "";
-    ::GetWindowsDirectory ( szWinDir, sizeof ( szWinDir ) );
-    return szWinDir;
-}
-#endif
 
 
 #ifdef WIN32

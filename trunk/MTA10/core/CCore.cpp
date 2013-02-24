@@ -754,16 +754,15 @@ void LoadModule ( CModuleLoader& m_Loader, const SString& strName, const SString
     WriteDebugEvent ( "Loading " + strName.ToLower () );
 
     // Ensure DllDirectory has not been changed
-    char szDllDirectory[ MAX_PATH + 1 ] = {'\0'};
-    GetDllDirectory( sizeof ( szDllDirectory ), szDllDirectory );
-    if ( CalcMTASAPath ( "mta" ).CompareI ( szDllDirectory ) != true )
+    SString strDllDirectory = GetSystemDllDirectory();
+    if ( CalcMTASAPath ( "mta" ).CompareI ( strDllDirectory ) == false )
     {
-        AddReportLog ( 3119, SString ( "DllDirectory wrong:  DllDirectory:'%s'  Path:'%s'", szDllDirectory, *CalcMTASAPath ( "mta" ) ) );
+        AddReportLog ( 3119, SString ( "DllDirectory wrong:  DllDirectory:'%s'  Path:'%s'", *strDllDirectory, *CalcMTASAPath ( "mta" ) ) );
         SetDllDirectory( CalcMTASAPath ( "mta" ) );
     }
 
     // Save current directory (shouldn't change anyway)
-    SString strSavedCwd = SharedUtil::GetCurrentDirectory ();
+    SString strSavedCwd = GetSystemCurrentDirectory();
 
     // Load approrpiate compilation-specific library.
 #ifdef MTA_DEBUG
@@ -797,7 +796,7 @@ template < class T, class U >
 T* InitModule ( CModuleLoader& m_Loader, const SString& strName, const SString& strInitializer, U* pObj )
 {
     // Save current directory (shouldn't change anyway)
-    SString strSavedCwd = SharedUtil::GetCurrentDirectory ();
+    SString strSavedCwd = GetSystemCurrentDirectory();
 
     // Get initializer function from DLL.
     typedef T* (*PFNINITIALIZER) ( U* );

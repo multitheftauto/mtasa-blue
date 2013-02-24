@@ -1519,7 +1519,7 @@ HMODULE GetLibraryHandle ( const SString& strFilename )
         SString strLibPath = PathJoin ( GetLaunchPath (), "mta" );
         SString strLibPathFilename = PathJoin ( strLibPath, strFilename );
 
-        SString strPrevCurDir = GetCurrentWorkingDirectory ();
+        SString strPrevCurDir = GetSystemCurrentDirectory ();
         SetCurrentDirectory ( strLibPath );
         SetDllDirectory( strLibPath );
 
