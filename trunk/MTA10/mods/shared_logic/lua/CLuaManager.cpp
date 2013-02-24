@@ -797,6 +797,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "guiCreateFont", CLuaFunctionDefs::GUICreateFont );
 
     CLuaCFunctions::AddFunction ( "guiStaticImageLoadImage", CLuaFunctionDefs::GUIStaticImageLoadImage );
+	CLuaCFunctions::AddFunction ( "guiStaticImageGetNativeSize", CLuaFunctionDefs::GUIStaticImageGetNativeSize );
     CLuaCFunctions::AddFunction ( "guiGetSelectedTab", CLuaFunctionDefs::GUIGetSelectedTab );
     CLuaCFunctions::AddFunction ( "guiSetSelectedTab", CLuaFunctionDefs::GUISetSelectedTab );
     CLuaCFunctions::AddFunction ( "guiDeleteTab", CLuaFunctionDefs::GUIDeleteTab );

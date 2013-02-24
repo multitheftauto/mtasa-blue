@@ -624,6 +624,7 @@ public:
     LUA_DECLARE ( GUICreateStaticImage );
     LUA_DECLARE ( GUICreateFont );
     LUA_DECLARE ( GUIStaticImageLoadImage );
+    LUA_DECLARE ( GUIStaticImageGetNativeSize );
     LUA_DECLARE ( GUIGetSelectedTab );
     LUA_DECLARE ( GUISetSelectedTab );
     LUA_DECLARE ( GUIDeleteTab );

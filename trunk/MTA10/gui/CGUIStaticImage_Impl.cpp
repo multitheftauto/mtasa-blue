@@ -147,6 +147,19 @@ void CGUIStaticImage_Impl::Clear ( void )
     }
 }
 
+bool CGUIStaticImage_Impl::GetNativeSize ( CVector2D &vecSize )
+{
+	if ( m_pTexture )
+	{
+		if ( m_pTexture->GetTexture() )
+		{
+			vecSize.fX = m_pTexture->GetTexture()->getWidth();
+			vecSize.fY = m_pTexture->GetTexture()->getHeight();
+			return true;
+		}
+	}
+	return false;	
+}
 
 void CGUIStaticImage_Impl::SetFrameEnabled ( bool bFrameEnabled )
 {

@@ -75,7 +75,7 @@ CServerBrowser::CServerBrowser ( void )
     CVector2D resolution = CCore::GetSingleton().GetGUI()->GetResolution();
     bool bCreateFrame = true;
 
-	if ( resolution.fX <= 800 )  // Make our window bigger at small resolutions
+	if ( resolution.fY <= 600 )  // Make our window bigger at small resolutions
     {
         m_WidgetSize = CVector2D ( resolution.fX, resolution.fY );
         bCreateFrame = false;
