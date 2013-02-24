@@ -95,6 +95,9 @@ void CClientDFF::UnloadDFF ( void )
 
 bool CClientDFF::ReplaceModel ( unsigned short usModel, bool bAlphaTransparency )
 {
+    if ( !CClientDFFManager::IsReplacableModel( usModel ) )
+        return false;
+
     // Get clump loaded for this model id
     RpClump* pClump = GetLoadedClump ( usModel );
 
