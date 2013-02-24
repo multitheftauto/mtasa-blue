@@ -290,7 +290,7 @@ SString CInstallManager::GetSequencerSnapshot ( void )
 SString CInstallManager::GetLauncherPathFilename ( void )
 {
     SString strLocation = m_pSequencer->GetVariable ( INSTALL_LOCATION );
-    SString strResult = PathJoin ( strLocation == "far" ? GetCurrentWorkingDirectory () : GetMTASAPath (), MTA_EXE_NAME );
+    SString strResult = PathJoin ( strLocation == "far" ? GetSystemCurrentDirectory () : GetMTASAPath (), MTA_EXE_NAME );
     AddReportLog ( 1062, SString ( "GetLauncherPathFilename %s", *strResult ) );
     return strResult;
 }
@@ -716,7 +716,7 @@ SString CInstallManager::_InstallNewsItems ( void )
         SString strFileLocation = queue.Get ( strDate );
 
         // Save cwd
-        SString strSavedDir = GetCurrentWorkingDirectory ();
+        SString strSavedDir = GetSystemCurrentDirectory ();
 
         // Calc and make target dir
         SString strTargetDir = PathJoin ( GetMTADataPath (), "news", strDate );

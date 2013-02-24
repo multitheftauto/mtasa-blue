@@ -115,11 +115,10 @@ CClientBase* CModManager::Load ( const char* szName, const char* szArguments )
     }
 
     // Ensure DllDirectory has not been changed
-    char szDllDirectory[ MAX_PATH + 1 ] = {'\0'};
-    GetDllDirectory( sizeof ( szDllDirectory ), szDllDirectory );
-    if ( stricmp( CalcMTASAPath ( "mta" ), szDllDirectory ) != 0 )
+    SString strDllDirectory = GetSystemDllDirectory();
+    if ( CalcMTASAPath ( "mta" ).CompareI ( strDllDirectory ) == false )
     {
-        AddReportLog ( 3119, SString ( "DllDirectory wrong:  DllDirectory:'%s'  Path:'%s'", szDllDirectory, *CalcMTASAPath ( "mta" ) ) );
+        AddReportLog ( 3119, SString ( "DllDirectory wrong:  DllDirectory:'%s'  Path:'%s'", *strDllDirectory, *CalcMTASAPath ( "mta" ) ) );
         SetDllDirectory( CalcMTASAPath ( "mta" ) );
     }
     

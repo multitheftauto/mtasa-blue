@@ -76,7 +76,7 @@ struct SFileItem
 ///////////////////////////////////////////////////////////////
 bool DoInstallFiles ( void )
 {
-    SString strCurrentDir = PathConform ( GetCurrentWorkingDirectory () );
+    SString strCurrentDir = PathConform ( GetSystemCurrentDirectory () );
 
     const SString strMTASAPath = PathConform ( GetMTASAPath () );
 
