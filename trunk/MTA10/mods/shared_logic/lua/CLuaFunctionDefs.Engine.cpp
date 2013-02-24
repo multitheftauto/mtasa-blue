@@ -278,12 +278,15 @@ int CLuaFunctionDefs::EngineReplaceModel ( lua_State* luaVM )
     if ( !argStream.HasErrors () )
     {
         ushort usModelID = CModelNames::ResolveModelID ( strModelName );
-        if ( usModelID != INVALID_MODEL_ID || strModelName == "" )
+        if ( usModelID != INVALID_MODEL_ID )
         {
-            pDFF->ReplaceModel ( usModelID, bAlphaTransparency );
-
-            lua_pushboolean ( luaVM, true );
-            return 1;
+            if ( pDFF->ReplaceModel ( usModelID, bAlphaTransparency ) )
+            {
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }
+            else
+                argStream.SetCustomError( SString( "Model ID %d replace failed", usModelID ) );
         }
         else
             argStream.SetCustomError( "Expected valid model ID or name at argument 2" );
