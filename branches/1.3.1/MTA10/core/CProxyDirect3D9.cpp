@@ -393,10 +393,12 @@ HRESULT DoCreateDevice( IDirect3D9* pDirect3D, UINT Adapter, D3DDEVTYPE DeviceTy
     } formatList[] = { { rtFormatList32, NUMELMS( rtFormatList32 ), depthFormatList32, NUMELMS( depthFormatList32 ), },
                        { rtFormatList16, NUMELMS( rtFormatList16 ), depthFormatList16, NUMELMS( depthFormatList16 ), } };
 
-    for ( uint iRes = 0 ; iRes < 3 ; iRes++ )
+    D3DPRESENT_PARAMETERS savedPresentationParameters = *pPresentationParameters;
+    for ( uint iRes = 0 ; iRes < 4 ; iRes++ )
     {
-        if ( iRes == 1 )
+        if ( iRes == 1 || iRes == 3 )
         {
+            *pPresentationParameters = savedPresentationParameters;
             if ( pPresentationParameters->Windowed )
                 continue;
             pPresentationParameters->Windowed = true;
@@ -404,6 +406,7 @@ HRESULT DoCreateDevice( IDirect3D9* pDirect3D, UINT Adapter, D3DDEVTYPE DeviceTy
         }
         if ( iRes == 2 )
         {
+            *pPresentationParameters = savedPresentationParameters;
             pPresentationParameters->BackBufferWidth = 640;
             pPresentationParameters->BackBufferHeight = 480;
         }
@@ -458,7 +461,7 @@ HRESULT DoCreateDevice( IDirect3D9* pDirect3D, UINT Adapter, D3DDEVTYPE DeviceTy
                                             int iSelected = 1;
                                             CVARS_SET ( "display_alttab_handler", iSelected );
                                         }
-                                        if ( iRes == 2 )
+                                        if ( iRes >= 2 )
                                         {
                                             // Only test, so return as fail
                                             WriteDebugEvent ( "      Test success" );
