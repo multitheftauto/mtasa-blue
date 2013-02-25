@@ -102,10 +102,18 @@ void CClientRadarArea::DoPulse ( bool bRender )
         // Only render the radar area if we are told to
         if ( bRender )
         {
+            // Enforce X1 > X2 and Y2 > Y1
+            // Fix for #0005888
+            float fX1 = m_vecPosition.fX + m_vecSize.fX;
+            float fX2 = m_vecPosition.fX; 
+            float fY1 = m_vecPosition.fY;
+            float fY2 = m_vecPosition.fY + m_vecSize.fY; 
+
+            if ( m_vecSize.fX < 0 ) std::swap( fX1, fX2 );
+            if ( m_vecSize.fY < 0 ) std::swap( fY1, fY2 );
+
             // Draw it
-            g_pGame->GetRadar ()->DrawAreaOnRadar ( m_vecPosition.fX + m_vecSize.fX, m_vecPosition.fY,
-                                                    m_vecPosition.fX, m_vecPosition.fY + m_vecSize.fY,
-                                                    color );
+            g_pGame->GetRadar ()->DrawAreaOnRadar ( fX1, fY1, fX2, fY2, color );
         }
     }
 }
