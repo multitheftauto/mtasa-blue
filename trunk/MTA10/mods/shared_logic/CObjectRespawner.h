@@ -16,24 +16,19 @@
 #ifndef __COBJECTRESPAWNER_H
 #define __COBJECTRESPAWNER_H
 
-using std::list;
-
 class CObjectRespawner
 {
 public:
                                 CObjectRespawner        ( void );
     inline                      ~CObjectRespawner       ( void )        { DoRespawnAll (); };
 
-    void                        Respawn                 ( class CClientObject* pObject );
+    void                        Respawn                 ( CClientObject* pObject );
     void                        DoRespawnAll            ( void );
 
-    bool                        IsBeingRespawned        ( class CClientObject* pObject );
-
-    void                        Unreference             ( class CClientObject* pObject );
+    bool                        IsBeingRespawned        ( CClientObject* pObject );
 
 private:
-    CMappedList < class CClientObject* >    m_List;
-    bool                                    m_bAllowUnreference;
+    std::vector < CClientObject* >                      m_List;
 };
 
 #endif
