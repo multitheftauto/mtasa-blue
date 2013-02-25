@@ -54,6 +54,7 @@ public:
 
 class CObjectSAInterface : public CPhysicalSAInterface
 {
+public:
 	void* pObjectList; // 312
 	uint8 pad1; // 316
 	uint8 pad2; // 317
@@ -79,7 +80,7 @@ class CObjectSAInterface : public CPhysicalSAInterface
 	uint32 b0x8000 : 1;
 
 	uint32 b0x10000 : 1; // 322
-	uint32 b0x20000 : 1;
+	uint32 bUpdateScale : 1;
 	uint32 b0x40000 : 1;
 	uint32 b0x80000 : 1;
 	uint32 b0x100000 : 1;
