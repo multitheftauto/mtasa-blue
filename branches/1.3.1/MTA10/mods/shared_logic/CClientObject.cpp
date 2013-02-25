@@ -44,7 +44,6 @@ CClientObject::CClientObject ( CClientManager* pManager, ElementID ID, unsigned 
     m_vecScale = CVector ( 1.0f, 1.0f, 1.0f );
     m_fHealth = 1000.0f;
     m_bBreakable = true;
-    m_bRespawnEnabled = true;
 
     m_pModelInfo = g_pGame->GetModelInfo ( usModel );
 
@@ -415,10 +414,6 @@ void CClientObject::SetHealth ( float fHealth )
 
 void CClientObject::StreamIn ( bool bInstantly )
 {
-    // Don't stream the object in, if respawn is disabled and the object is broken
-    if ( !m_bRespawnEnabled && m_fHealth == 0.0f )
-        return;
-
     // We need to load now?
     if ( bInstantly )
     {
@@ -448,11 +443,7 @@ void CClientObject::StreamOut ( void )
     // Save the health
     if ( m_pObject )
     {
-        // If respawn is enabled, reset the health
-        if ( m_bRespawnEnabled && m_fHealth == 0.0f )
-            m_fHealth = 1000.0f;
-        else
-            m_fHealth = m_pObject->GetHealth ();
+        m_fHealth = m_pObject->GetHealth ();
     }
 
     // Destroy the object.
@@ -462,15 +453,14 @@ void CClientObject::StreamOut ( void )
     m_pModelRequester->Cancel ( this, true );
 }
 
-// Don't call this function directly by lua functions
+
 void CClientObject::ReCreate ( void )
 {
-    m_fHealth = 1000.0f;
-    
     if ( m_pObject )
+    {
         Destroy ();
-    
-    Create ();
+        Create ();
+    }
 }
 
 
@@ -684,19 +674,8 @@ bool CClientObject::SetBreakable ( bool bBreakable )
     if ( CClientObjectManager::IsBreakableModel ( m_usModel ) && m_bBreakable != bBreakable )
     {
         m_bBreakable = bBreakable;
-        // We can't use ReCreate directly (otherwise the game will crash)
-        g_pClientGame->GetObjectRespawner ()->Respawn ( this );
-        return true;
-    }
-    return false;
-}
-
-bool CClientObject::Break ( void )
-{
-    // Are we breakable?
-    if ( m_pObject && m_bBreakable )
-    {
-        m_pObject->Break ();
+        // Re-create us
+        ReCreate ( );
         return true;
     }
     return false;

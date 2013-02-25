@@ -404,9 +404,6 @@ public:
     LUA_DECLARE ( SetObjectScale );
     LUA_DECLARE ( SetObjectStatic );
     LUA_DECLARE ( SetObjectBreakable );
-    LUA_DECLARE ( BreakObject );
-    LUA_DECLARE ( RespawnObject );
-    LUA_DECLARE ( ToggleObjectRespawn );
 
     // Explosion functions
     LUA_DECLARE ( CreateExplosion );

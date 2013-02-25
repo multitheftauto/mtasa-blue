@@ -993,10 +993,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\shared_logic\CObjectRespawner.cpp"
-					>
-				</File>
-				<File
 					RelativePath="..\shared_logic\CRegisteredCommands.cpp"
 					>
 				</File>
@@ -2548,10 +2544,6 @@
 				</File>
 				<File
 					RelativePath="..\shared_logic\CModelNames.h"
-					>
-				</File>
-				<File
-					RelativePath="..\shared_logic\CObjectRespawner.h"
 					>
 				</File>
 				<File
