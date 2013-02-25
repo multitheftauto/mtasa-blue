@@ -41,6 +41,7 @@ struct SAclRequest;
 #include <bochs_internal/crc32.h>
 #include "CChecksum.h"
 #include "CIdArray.h"
+#include "pcrecpp.h"
 
 // Packet includes
 #include "net/Packets.h"

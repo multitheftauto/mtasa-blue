@@ -1115,3 +1115,94 @@ int CLuaFunctionDefs::DownloadFile ( lua_State* luaVM )
     lua_pushboolean ( luaVM, false );
     return 1;
 }
+
+
+int CLuaFunctionDefs::PregFind ( lua_State* luaVM )
+{
+//  bool pregFind ( string base, string pattern )
+    SString strBase, strPattern;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadString ( strBase );
+    argStream.ReadString ( strPattern );
+
+    if ( !argStream.HasErrors () )
+    {
+        pcrecpp::RE pPattern ( strPattern );
+
+        if ( pPattern.PartialMatch ( strBase ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::PregReplace ( lua_State* luaVM )
+{
+//  string pregReplace ( string base, string pattern, string replace )
+    SString strBase, strPattern, strReplace;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadString ( strBase );
+    argStream.ReadString ( strPattern );
+    argStream.ReadString ( strReplace );
+
+    if ( !argStream.HasErrors () )
+    {
+        pcrecpp::RE pPattern ( strPattern );
+
+        string strNew = strBase;
+        if ( pPattern.GlobalReplace ( strReplace, &strNew ) )
+        {
+            lua_pushstring ( luaVM, strNew.c_str () );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::PregMatch ( lua_State* luaVM )
+{
+//  table pregMatch ( string base, string pattern )
+    SString strBase, strPattern;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadString ( strBase );
+    argStream.ReadString ( strPattern );
+
+    if ( !argStream.HasErrors () )
+    {
+        lua_newtable ( luaVM );
+
+        pcrecpp::RE pPattern ( strPattern );
+        pcrecpp::StringPiece strInput ( strBase );
+
+        string strGet; int i = 1;
+        while ( pPattern.FindAndConsume ( &strInput, &strGet ) ) 
+        {
+            lua_pushnumber ( luaVM, i );
+            lua_pushstring ( luaVM, strGet.c_str () );
+            lua_settable ( luaVM, -3 );   
+            i++;
+        }
+        
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}

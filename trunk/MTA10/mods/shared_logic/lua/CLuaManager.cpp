@@ -1149,6 +1149,11 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "utfChar", CLuaFunctionDefs::UtfChar );
     CLuaCFunctions::AddFunction ( "utfCode", CLuaFunctionDefs::UtfCode );
 
+    // PCRE functions
+    CLuaCFunctions::AddFunction ( "pregFind", CLuaFunctionDefs::PregFind );
+    CLuaCFunctions::AddFunction ( "pregReplace", CLuaFunctionDefs::PregReplace );
+    CLuaCFunctions::AddFunction ( "pregMatch", CLuaFunctionDefs::PregMatch );
+
     // Voice functions
     CLuaCFunctions::AddFunction ( "isVoiceEnabled", CLuaFunctionDefs::IsVoiceEnabled );
 
