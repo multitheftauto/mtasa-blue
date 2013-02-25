@@ -86,20 +86,22 @@ bool CMarker::ReadSpecialData ( void )
 
     // Grab the "type" data
     char szBuffer [128];
+    unsigned char ucType;
     if ( GetCustomDataString ( "type", szBuffer, 128, true ) )
     {
         // Convert it to a type
-        m_ucType = static_cast < unsigned char > ( CMarkerManager::StringToType ( szBuffer ) );
-        if ( m_ucType == CMarker::TYPE_INVALID )
+        ucType = static_cast < unsigned char > ( CMarkerManager::StringToType ( szBuffer ) );
+        if ( ucType == CMarker::TYPE_INVALID )
         {
             CLogger::LogPrintf ( "WARNING: Unknown 'type' value specified in <marker>; defaulting to \"default\" (line %u)\n", m_uiLine );
-            m_ucType = CMarker::TYPE_CHECKPOINT;
+            ucType = CMarker::TYPE_CHECKPOINT;
         }
     }
     else
     {
-        m_ucType = CMarker::TYPE_CHECKPOINT;
+        ucType = CMarker::TYPE_CHECKPOINT;
     }
+    SetMarkerType(ucType);
 
     // Grab the "color" data
     if ( GetCustomDataString ( "color", szBuffer, 128, true ) )
