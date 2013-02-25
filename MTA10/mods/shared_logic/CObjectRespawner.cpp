@@ -18,12 +18,11 @@
 
 CObjectRespawner::CObjectRespawner ()
 {
-    // Allow unrefernces
-    m_bAllowUnreference = true;
+
 }
 
 
-void CObjectRespawner::Respawn ( class CClientObject* pObject )
+void CObjectRespawner::Respawn ( CClientObject* pObject )
 {
     // Make sure we don't try to delete it twice
     if ( pObject && !IsBeingRespawned ( pObject ) )
@@ -42,36 +41,18 @@ void CObjectRespawner::Respawn ( class CClientObject* pObject )
 
 void CObjectRespawner::DoRespawnAll ( void )
 {
-    // Make sure elements won't call us back and screw with our list (would crash)
-    m_bAllowUnreference = false;
-
-    // Delete all the elements
-    list < CClientObject* > ::iterator iter = m_List.begin ();
-    while ( iter != m_List.end () )
+    for ( uint i = 0; i < m_List.size (); i++ )
     {
-        CClientObject* pObject = *iter;
-
+        CClientObject* pObject = m_List[i];
         pObject->ReCreate ();
-        iter = m_List.erase ( iter );
         pObject->SetBeingRespawned ( false );
     }
 
-    // We can now allow unrefernecs again
-    m_bAllowUnreference = true;
+    m_List.clear ();
 }
 
 
 bool CObjectRespawner::IsBeingRespawned ( CClientObject* pObject )
 {
-    return m_List.Contains ( pObject );
-}
-
-
-void CObjectRespawner::Unreference ( class CClientObject* pObject )
-{
-    // If we allow unreferencing, remove this element from the to delete list.
-    if ( m_bAllowUnreference )
-    {
-        m_List.remove ( pObject );
-    }
+    return std::find ( m_List.begin (), m_List.end (), pObject ) != m_List.end ();
 }
