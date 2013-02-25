@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9.00"
+	Version="9,00"
 	Name="pcre"
 	ProjectGUID="{39452ACC-FF12-488D-94B6-301B4EFBB606}"
 	RootNamespace="pcre2008"
@@ -85,7 +85,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="xcopy /y ..\pcre3d.dll &quot;C:\Program Files\MTA San Andreas 1.4\server\mods\deathmatch\&quot;"
+				CommandLine="xcopy /y ..\pcre3d.dll &quot;C:\Program Files\MTA San Andreas 1.4\server\mods\deathmatch\&quot; &amp;&amp; xcopy /y ..\pcre3d.dll &quot;C:\Program Files\MTA San Andreas 1.4\mods\deathmatch\&quot; "
 			/>
 		</Configuration>
 		<Configuration
@@ -163,7 +163,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="xcopy /y ..\pcre3.dll &quot;C:\Program Files\MTA San Andreas 1.4\server\mods\deathmatch\&quot;"
+				CommandLine="xcopy /y ..\pcre3.dll &quot;C:\Program Files\MTA San Andreas 1.4\server\mods\deathmatch\&quot; &amp;&amp; xcopy /y ..\pcre3.dll &quot;C:\Program Files\MTA San Andreas 1.4\mods\deathmatch\&quot; "
 			/>
 		</Configuration>
 		<Configuration
@@ -240,7 +240,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="xcopy /y ..\pcre3.dll &quot;..\..\output\MTA San Andreas\server\mods\deathmatch\&quot;"
+				CommandLine="xcopy /y ..\pcre3.dll &quot;..\..\output\MTA San Andreas\server\mods\deathmatch\&quot; &amp;&amp; xcopy /y ..\pcre3.dll &quot;..\..\output\MTA San Andreas\mods\deathmatch\&quot;"
 			/>
 		</Configuration>
 	</Configurations>
