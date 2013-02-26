@@ -615,7 +615,7 @@ int CLuaFunctionDefs::GUIStaticImageGetNativeSize ( lua_State* luaVM )
 {
 //  bool guiStaticImageGetNativeSize ( element theElement, string filename )
     CClientGUIElement* theElement;
-	CVector2D vecSize;
+    CVector2D vecSize;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( theElement );
@@ -624,7 +624,7 @@ int CLuaFunctionDefs::GUIStaticImageGetNativeSize ( lua_State* luaVM )
          if ( CStaticFunctionDefinitions::GUIStaticImageGetNativeSize ( *theElement, vecSize ) )
         {
             lua_pushnumber ( luaVM, vecSize.fX );
-			lua_pushnumber ( luaVM, vecSize.fY );
+            lua_pushnumber ( luaVM, vecSize.fY );
             return 2;
         }
 
@@ -632,7 +632,7 @@ int CLuaFunctionDefs::GUIStaticImageGetNativeSize ( lua_State* luaVM )
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     // error: bad arguments
-	lua_pushboolean ( luaVM, false );
+    lua_pushboolean ( luaVM, false );
     return 1;
 }
 
