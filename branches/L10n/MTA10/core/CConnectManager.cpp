@@ -265,31 +265,31 @@ void CConnectManager::DoPulse ( void )
                 switch ( ucError )
                 {
                     case RID_RSA_PUBLIC_KEY_MISMATCH:
-                        strError = "Disconnected: unknown protocol error";  // encryption key mismatch
+                        strError = _("Disconnected: unknown protocol error");  // encryption key mismatch
                         break;
                     case RID_REMOTE_DISCONNECTION_NOTIFICATION:
-                        strError = "Disconnected: disconnected remotely";
+                        strError = _("Disconnected: disconnected remotely");
                         break;
                     case RID_REMOTE_CONNECTION_LOST:
-                        strError = "Disconnected: connection lost remotely";
+                        strError = _("Disconnected: connection lost remotely");
                         break;
                     case RID_CONNECTION_BANNED:
-                        strError = "Disconnected: you are banned from this server";
+                        strError = _("Disconnected: you are banned from this server");
                         break;
                     case RID_NO_FREE_INCOMING_CONNECTIONS:
                         CServerInfo::GetSingletonPtr()->Show ( eWindowTypes::SERVER_INFO_QUEUE, m_strHost.c_str(), m_usPort, m_strPassword.c_str() );
                         break;
                     case RID_DISCONNECTION_NOTIFICATION:
-                        strError = "Disconnected: disconnected";
+                        strError = _("Disconnected: disconnected");
                         break;
                     case RID_CONNECTION_LOST:
-                        strError = "Disconnected: connection lost";
+                        strError = _("Disconnected: connection lost");
                         break;
                     case RID_INVALID_PASSWORD:
                         CServerInfo::GetSingletonPtr()->Show ( eWindowTypes::SERVER_INFO_PASSWORD, m_strHost.c_str(), m_usPort, m_strPassword.c_str() );
                         break;
                     default:
-                        strError = "Disconnected: connection refused";
+                        strError = _("Disconnected: connection refused");
                         break;
                 }
 

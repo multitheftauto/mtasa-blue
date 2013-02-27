@@ -627,9 +627,9 @@ void CSettings::CreateGUI ( void )
     m_pComboAntiAliasing->SetPosition ( CVector2D ( vecTemp.fX + 86.0f, vecTemp.fY - 1.0f ) );
     m_pComboAntiAliasing->SetSize ( CVector2D ( 200.0f, 95.0f ) );
     m_pComboAntiAliasing->AddItem ( _("Off") )->SetData ( (void*)1 );
-    m_pComboAntiAliasing->AddItem ( "1x" )->SetData ( (void*)2 );
-    m_pComboAntiAliasing->AddItem ( "2x" )->SetData ( (void*)3 );
-    m_pComboAntiAliasing->AddItem ( "3x" )->SetData ( (void*)4 );
+    m_pComboAntiAliasing->AddItem ( _("1x") )->SetData ( (void*)2 );
+    m_pComboAntiAliasing->AddItem ( _("2x") )->SetData ( (void*)3 );
+    m_pComboAntiAliasing->AddItem ( _("3x") )->SetData ( (void*)4 );
     m_pComboAntiAliasing->SetReadOnly ( true );
 
 
@@ -642,9 +642,9 @@ void CSettings::CreateGUI ( void )
     m_pComboAspectRatio->SetPosition ( CVector2D ( vecTemp.fX + 86.0f, vecTemp.fY - 1.0f ) );
     m_pComboAspectRatio->SetSize ( CVector2D ( 200.0f, 95.0f ) );
     m_pComboAspectRatio->AddItem ( _("Auto") )->SetData ( (void*)ASPECT_RATIO_AUTO );
-    m_pComboAspectRatio->AddItem ( "4:3" )->SetData ( (void*)ASPECT_RATIO_4_3 );
-    m_pComboAspectRatio->AddItem ( "16:10" )->SetData ( (void*)ASPECT_RATIO_16_10 );
-    m_pComboAspectRatio->AddItem ( "16:9" )->SetData ( (void*)ASPECT_RATIO_16_9 );
+    m_pComboAspectRatio->AddItem ( _("4:3") )->SetData ( (void*)ASPECT_RATIO_4_3 );
+    m_pComboAspectRatio->AddItem ( _("16:10") )->SetData ( (void*)ASPECT_RATIO_16_10 );
+    m_pComboAspectRatio->AddItem ( _("16:9") )->SetData ( (void*)ASPECT_RATIO_16_9 );
     m_pComboAspectRatio->SetReadOnly ( true );
 
     m_pMapRenderingLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, _("Map rendering options") ) );
@@ -1203,9 +1203,9 @@ void CSettings::UpdateVideoTab ( bool bIsVideoModeChanged )
     int aspectRatio;
     CVARS_GET("aspect_ratio", aspectRatio);
     if ( aspectRatio == ASPECT_RATIO_AUTO ) m_pComboAspectRatio->SetText ( _("Auto") );
-    else if ( aspectRatio == ASPECT_RATIO_4_3 ) m_pComboAspectRatio->SetText ( "4:3" );
-    else if ( aspectRatio == ASPECT_RATIO_16_10 ) m_pComboAspectRatio->SetText ( "16:10" );
-    else if ( aspectRatio == ASPECT_RATIO_16_9 ) m_pComboAspectRatio->SetText ( "16:9" );
+    else if ( aspectRatio == ASPECT_RATIO_4_3 ) m_pComboAspectRatio->SetText ( _("4:3") );
+    else if ( aspectRatio == ASPECT_RATIO_16_10 ) m_pComboAspectRatio->SetText ( _("16:10") );
+    else if ( aspectRatio == ASPECT_RATIO_16_9 ) m_pComboAspectRatio->SetText ( _("16:9") );
 
     // Volumetric shadows
     bool bVolumetricShadowsEnabled;
@@ -2238,17 +2238,17 @@ void CSettings::LoadData ( void )
 
     char AntiAliasing = gameSettings->GetAntiAliasing();
     if ( AntiAliasing == 1 ) m_pComboAntiAliasing->SetText ( _("Off") );
-    else if ( AntiAliasing == 2 ) m_pComboAntiAliasing->SetText ( "1x" );
-    else if ( AntiAliasing == 3 ) m_pComboAntiAliasing->SetText ( "2x" );
-    else if ( AntiAliasing == 4 ) m_pComboAntiAliasing->SetText ( "3x" );
+    else if ( AntiAliasing == 2 ) m_pComboAntiAliasing->SetText ( _("1x") );
+    else if ( AntiAliasing == 3 ) m_pComboAntiAliasing->SetText ( _("2x") );
+    else if ( AntiAliasing == 4 ) m_pComboAntiAliasing->SetText ( _("3x") );
 
     // Aspect ratio
     int aspectRatio;
     CVARS_GET("aspect_ratio", aspectRatio);
     if ( aspectRatio == ASPECT_RATIO_AUTO ) m_pComboAspectRatio->SetText ( _("Auto") );
-    else if ( aspectRatio == ASPECT_RATIO_4_3 ) m_pComboAspectRatio->SetText ( "4:3" );
-    else if ( aspectRatio == ASPECT_RATIO_16_10 ) m_pComboAspectRatio->SetText ( "16:10" );
-    else if ( aspectRatio == ASPECT_RATIO_16_9 ) m_pComboAspectRatio->SetText ( "16:9" );
+    else if ( aspectRatio == ASPECT_RATIO_4_3 ) m_pComboAspectRatio->SetText ( _("4:3") );
+    else if ( aspectRatio == ASPECT_RATIO_16_10 ) m_pComboAspectRatio->SetText ( _("16:10") );
+    else if ( aspectRatio == ASPECT_RATIO_16_9 ) m_pComboAspectRatio->SetText ( _("16:9") );
 
     // Volumetric shadows
     bool bVolumetricShadowsEnabled;

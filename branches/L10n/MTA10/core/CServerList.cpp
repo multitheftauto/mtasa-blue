@@ -155,7 +155,7 @@ void CServerList::Pulse ( void )
     if ( uiTotalSlots > 0 )
     {
         const char * szPlayersString = ngettext ("player", "players", uiOccupiedSlots);
-        ss << uiOccupiedSlots << " " << szPlayersString;
+        ss << uiOccupiedSlots << " " << szPlayersString << " on ";
     }
 
     const char * szServersString = ngettext ("server", "servers", uiActiveServers);

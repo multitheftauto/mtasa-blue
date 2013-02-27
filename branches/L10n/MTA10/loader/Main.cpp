@@ -512,7 +512,7 @@ int DoLaunchGame ( LPSTR lpCmdLine )
             SString strError = GetSystemErrorMessage ( dwError );            
             DisplayErrorMessageBox ( SString(_("Could not start Grand Theft Auto: San Andreas.  "
                                 "Please try restarting, or if the problem persists,"
-                                "contact MTA at www.multitheftauto.com. \n\n[%s]"),strError), "createprocess-fail;" + strError );
+                                "contact MTA at www.multitheftauto.com. \n\n[%s]"),*strError), "createprocess-fail;" + strError );
             return 5;
         }
     }
