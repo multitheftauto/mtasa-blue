@@ -52,7 +52,7 @@ SString SharedUtil::GetMTASABaseDir ( void )
         strInstallRoot = GetRegistryValue ( "", "Last Run Location" );
         if ( strInstallRoot.empty () )
         {
-            MessageBox ( 0, "Multi Theft Auto has not been installed properly, please reinstall.", "Error", MB_OK | MB_TOPMOST );
+            MessageBox ( 0, _("Multi Theft Auto has not been installed properly, please reinstall."), "Error", MB_OK | MB_TOPMOST );
             TerminateProcess ( GetCurrentProcess (), 9 );
         }
     }
@@ -489,7 +489,7 @@ bool SharedUtil::ProcessPendingBrowseToSolution ( void )
     {
         if ( !strMessageBoxMessage.empty() )
             strMessageBoxMessage += "\n\n\n";
-        strMessageBoxMessage += "Do you want to see some on-line help about this problem ?";
+        strMessageBoxMessage += _("Do you want to see some on-line help about this problem ?");
         if ( IDYES != MessageBox( NULL, strMessageBoxMessage, "MTA: San Andreas", MB_YESNO | MB_ICONQUESTION | MB_TOPMOST ) )
             return false;
     }
@@ -501,7 +501,7 @@ bool SharedUtil::ProcessPendingBrowseToSolution ( void )
             return true;
     }
 
-    MessageBox ( NULL, "Your browser will now display a web page with some help infomation.\n\n(If the page fails to load, paste (CTRL-V) the URL into your web browser)"
+    MessageBox ( NULL, _("Your browser will now display a web page with some help infomation.\n\n(If the page fails to load, paste (CTRL-V) the URL into your web browser)")
                         , "MTA: San Andreas", MB_OK | MB_ICONINFORMATION | MB_TOPMOST );
 
     SString strQueryURL = GetApplicationSetting ( "trouble-url" );

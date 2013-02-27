@@ -804,7 +804,7 @@ T* InitModule ( CModuleLoader& m_Loader, const SString& strName, const SString& 
 
     if ( pfnInit == NULL )
     {
-        MessageBox ( 0, strName + " module is incorrect!", "Error", MB_OK | MB_ICONEXCLAMATION | MB_TOPMOST  );
+        MessageBox ( 0, SString(_("%s module is incorrect!"),strName), "Error", MB_OK | MB_ICONEXCLAMATION | MB_TOPMOST  );
         TerminateProcess ( GetCurrentProcess (), 1 );
     }
 
@@ -1093,7 +1093,7 @@ void CCore::DoPostFramePulse ( )
                     // Run the connect command
                     if ( strArguments.length () > 0 && !m_pCommands->Execute ( strArguments ) )
                     {
-                        ShowMessageBox ( "Error", "Error executing URL", MB_BUTTON_OK | MB_ICON_ERROR );
+                        ShowMessageBox ( _("Error"), _("Error executing URL"), MB_BUTTON_OK | MB_ICON_ERROR );
                     }
                 }
                 else
@@ -1105,8 +1105,8 @@ void CCore::DoPostFramePulse ( )
                         // Try to load the mod
                         if ( !m_pModManager->Load ( szOptionValue, m_szCommandLineArgs ) )
                         {
-                            SString strTemp ( "Error running mod specified in command line ('%s')", szOptionValue );
-                            ShowMessageBox ( "Error", strTemp, MB_BUTTON_OK | MB_ICON_ERROR );
+                            SString strTemp ( _("Error running mod specified in command line ('%s')"), szOptionValue );
+                            ShowMessageBox ( _("Error"), strTemp, MB_BUTTON_OK | MB_ICON_ERROR );
                         }
                     }
                     // We want to connect to a server?

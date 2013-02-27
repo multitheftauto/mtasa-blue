@@ -598,7 +598,7 @@ void CVersionUpdater::InitiateManualCheck ( void )
 
     if ( IsBusy () )
     {
-        CCore::GetSingleton ().ShowMessageBox ( "Busy", "Can't check for updates right now", MB_BUTTON_OK | MB_ICON_ERROR );
+        CCore::GetSingleton ().ShowMessageBox ( _("Busy"), _("Can't check for updates right now"), MB_BUTTON_OK | MB_ICON_ERROR );
         return;
     }
 

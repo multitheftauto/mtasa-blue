@@ -99,11 +99,11 @@ int WINAPI WinMain ( HINSTANCE _hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
                     continue;
                 }
                 SString strMessage;
-                strMessage += "Trouble restarting MTA:SA\n\n";
-                strMessage += "If the problem persists, open Task Manager and\n";
-                strMessage += "stop the 'gta_sa.exe' and 'Multi Theft Auto.exe' processes\n\n\n";
-                strMessage += "Try to launch MTA:SA again?";
-                if ( MessageBox( 0, strMessage, "Error", MB_ICONERROR | MB_YESNO | MB_TOPMOST  ) == IDYES )
+                strMessage += _(    "Trouble restarting MTA:SA\n\n"
+                                    "If the problem persists, open Task Manager and\n"
+                                    "stop the 'gta_sa.exe' and 'Multi Theft Auto.exe' processes\n\n\n"
+                                    "Try to launch MTA:SA again?" );
+                if ( MessageBox( 0, strMessage, _("Error"), MB_ICONERROR | MB_YESNO | MB_TOPMOST  ) == IDYES )
                 {
                     TerminateGTAIfRunning ();
                     TerminateOtherMTAIfRunning ();
@@ -116,10 +116,10 @@ int WINAPI WinMain ( HINSTANCE _hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
         {
             if ( !IsGTARunning () && !IsOtherMTARunning () )
             {
-                MessageBox ( 0, "Another instance of MTA is already running.\n\nIf this problem persists, please restart your computer", "Error", MB_ICONERROR | MB_TOPMOST  );
+                MessageBox ( 0, _("Another instance of MTA is already running.\n\nIf this problem persists, please restart your computer"), _("Error"), MB_ICONERROR | MB_TOPMOST  );
             }
             else
-            if ( MessageBox( 0, "Another instance of MTA is already running.\n\nDo you want to terminate it?", "Error", MB_ICONERROR | MB_YESNO | MB_TOPMOST  ) == IDYES )
+            if ( MessageBox( 0, _("Another instance of MTA is already running.\n\nDo you want to terminate it?"), _("Error"), MB_ICONERROR | MB_YESNO | MB_TOPMOST  ) == IDYES )
             {
                 TerminateGTAIfRunning ();
                 TerminateOtherMTAIfRunning ();
@@ -156,7 +156,7 @@ void HandleTrouble ( void )
     if ( CheckAndShowFileOpenFailureMessage () )
         return;
 
-    int iResponse = MessageBox ( NULL, "Are you having problems running MTA:SA?.\n\nDo you want to revert to an earlier version?", "MTA: San Andreas", MB_YESNO | MB_ICONERROR | MB_TOPMOST );
+    int iResponse = MessageBox ( NULL, _("Are you having problems running MTA:SA?.\n\nDo you want to revert to an earlier version?"), "MTA: San Andreas", MB_YESNO | MB_ICONERROR | MB_TOPMOST );
     if ( iResponse == IDYES )
     {
         BrowseToSolution ( "crashing-before-gtagame", TERMINATE_PROCESS );
@@ -183,7 +183,7 @@ void HandleResetSettings ( void )
 
     if ( FileExists ( strSettingsFilename ) )
     {
-        int iResponse = MessageBox ( NULL, "There seems to be a problem launching MTA:SA.\nResetting GTA settings can sometimes fix this problem.\n\nDo you want to reset GTA settings now?", "MTA: San Andreas", MB_YESNO | MB_ICONERROR | MB_TOPMOST );
+        int iResponse = MessageBox ( NULL, _("There seems to be a problem launching MTA:SA.\nResetting GTA settings can sometimes fix this problem.\n\nDo you want to reset GTA settings now?"), "MTA: San Andreas", MB_YESNO | MB_ICONERROR | MB_TOPMOST );
         if ( iResponse == IDYES )
         {
             FileDelete ( strSettingsFilenameBak );
@@ -192,19 +192,19 @@ void HandleResetSettings ( void )
             if ( !FileExists ( strSettingsFilename ) )
             {
                 AddReportLog ( 4053, "Deleted gta_sa.set" );
-                MessageBox ( NULL, "GTA settings have been reset.\n\nPress OK to continue.", "MTA: San Andreas", MB_OK | MB_ICONINFORMATION | MB_TOPMOST );
+                MessageBox ( NULL, _("GTA settings have been reset.\n\nPress OK to continue."), "MTA: San Andreas", MB_OK | MB_ICONINFORMATION | MB_TOPMOST );
             }
             else
             {
                 AddReportLog ( 5054, SString ( "Delete gta_sa.set failed with '%s'", *strSettingsFilename ) );
-                MessageBox ( NULL, SString ( "File could not be deleted: '%s'", *strSettingsFilename ), "Error", MB_OK | MB_ICONERROR | MB_TOPMOST );
+                MessageBox ( NULL, SString ( _("File could not be deleted: '%s'"), *strSettingsFilename ), "Error", MB_OK | MB_ICONERROR | MB_TOPMOST );
             }
         }
     }
     else
     {
         // No settings to delete, or can't find them
-        int iResponse = MessageBox ( NULL, "Are you having problems running MTA:SA?.\n\nDo you want to see some online help?", "MTA: San Andreas", MB_YESNO | MB_ICONERROR | MB_TOPMOST );
+        int iResponse = MessageBox ( NULL, _("Are you having problems running MTA:SA?.\n\nDo you want to see some online help?"), "MTA: San Andreas", MB_YESNO | MB_ICONERROR | MB_TOPMOST );
         if ( iResponse == IDYES )
         {
             BrowseToSolution ( "crashing-before-gtalaunch", TERMINATE_PROCESS );
@@ -233,11 +233,11 @@ void HandleCustomStartMessage ( void )
 
     if ( strTrouble.empty() )
     {
-        MessageBox ( NULL, strStartMessage, "MTA: San Andreas", MB_OK | MB_ICONINFORMATION | MB_TOPMOST );
+        MessageBox ( NULL, strStartMessage, "MTA: San Andreas", MB_OK | MB_ICONINFORMATION | MB_TOPMOST ); //!ACHTUNG: Where 2 localize?
     }
     else
     {
-        BrowseToSolution ( strTrouble, ASK_GO_ONLINE | TERMINATE_IF_YES, strStartMessage );
+        BrowseToSolution ( strTrouble, ASK_GO_ONLINE | TERMINATE_IF_YES, strStartMessage ); //!ACHTUNG: Where 2 localize?
     }
 }
 
@@ -332,12 +332,12 @@ int DoLaunchGame ( LPSTR lpCmdLine )
     //
     if ( IsGTARunning () )
     {
-        if ( MessageBox ( 0, "An instance of GTA: San Andreas is already running. It needs to be terminated before MTA:SA can be started. Do you want to do that now?", "Information", MB_YESNO | MB_ICONQUESTION | MB_TOPMOST ) == IDYES )
+        if ( MessageBox ( 0, _("An instance of GTA: San Andreas is already running. It needs to be terminated before MTA:SA can be started. Do you want to do that now?"), _("Information"), MB_YESNO | MB_ICONQUESTION | MB_TOPMOST ) == IDYES )
         {
             TerminateGTAIfRunning ();
             if ( IsGTARunning () )
             {
-                MessageBox ( 0, "Unable to terminate GTA: San Andreas. If the problem persists, please restart your computer.", "Information", MB_OK | MB_ICONQUESTION | MB_TOPMOST );
+                MessageBox ( 0, _("Unable to terminate GTA: San Andreas. If the problem persists, please restart your computer."), _("Information"), MB_OK | MB_ICONQUESTION | MB_TOPMOST );
                 return 1;
             }       
         }
@@ -352,15 +352,15 @@ int DoLaunchGame ( LPSTR lpCmdLine )
     SString strGTAPath;
     ePathResult iResult = GetGamePath ( strGTAPath, true );
     if ( iResult == GAME_PATH_MISSING ) {
-        DisplayErrorMessageBox ( "Registry entries are is missing. Please reinstall Multi Theft Auto: San Andreas.", "reg-entries-missing" );
+        DisplayErrorMessageBox ( _("Registry entries are is missing. Please reinstall Multi Theft Auto: San Andreas."), "reg-entries-missing" );
         return 5;
     }
     else if ( iResult == GAME_PATH_UNICODE_CHARS ) {
-        DisplayErrorMessageBox ( "The path to your installation of GTA: San Andreas contains unsupported (unicode) characters. Please move your Grand Theft Auto: San Andreas installation to a compatible path that contains only standard ASCII characters and reinstall Multi Theft Auto: San Andreas." );
+        DisplayErrorMessageBox ( _("The path to your installation of GTA: San Andreas contains unsupported (unicode) characters. Please move your Grand Theft Auto: San Andreas installation to a compatible path that contains only standard ASCII characters and reinstall Multi Theft Auto: San Andreas.") );
         return 5;
     }
     else if ( iResult == GAME_PATH_STEAM ) {
-        DisplayErrorMessageBox ( "It appears you have a Steam version of GTA:SA, which is currently incompatible with MTASA.  You are now being redirected to a page where you can find information to resolve this issue." );
+        DisplayErrorMessageBox ( _("It appears you have a Steam version of GTA:SA, which is currently incompatible with MTASA.  You are now being redirected to a page where you can find information to resolve this issue.") );
         BrowseToSolution ( "downgrade-steam" );
         return 5;
     }
@@ -369,10 +369,10 @@ int DoLaunchGame ( LPSTR lpCmdLine )
 
     if ( strGTAPath.Contains ( ";" ) || strMTASAPath.Contains ( ";" ) )
     {
-        DisplayErrorMessageBox ( "The path to your installation of 'MTA:SA' or 'GTA: San Andreas'\n"
-                                 "contains a ';' (semicolon).\n\n"
-                                 " If you experience problems when running MTA:SA,\n"
-                                 " move your installation(s) to a path that does not contain a semicolon." );
+        DisplayErrorMessageBox (_( "The path to your installation of 'MTA:SA' or 'GTA: San Andreas'\n"
+                                   "contains a ';' (semicolon).\n\n"
+                                   " If you experience problems when running MTA:SA,\n"
+                                   " move your installation(s) to a path that does not contain a semicolon." ) );
     }
 
     SetCurrentDirectory ( strMTASAPath );
@@ -404,25 +404,25 @@ int DoLaunchGame ( LPSTR lpCmdLine )
     {
         if ( !FileExists ( strMTASAPath + dataFilesFiles [ i ] ) )
         {
-            return DisplayErrorMessageBox ( "Load failed. Please ensure that the latest data files have been installed correctly.", "mta-datafiles-missing" );
+            return DisplayErrorMessageBox ( _("Load failed. Please ensure that the latest data files have been installed correctly."), "mta-datafiles-missing" );
         }
     }
 
     if ( FileSize ( strMTASAPath + "\\MTA\\bass.dll" ) != 0x00018838 )
     {
-        return DisplayErrorMessageBox ( "Load failed. Please ensure that the latest data files have been installed correctly.", "mta-datafiles-missing" );
+        return DisplayErrorMessageBox ( _("Load failed. Please ensure that the latest data files have been installed correctly."), "mta-datafiles-missing" );
     }
 
     // Check for client file
     if ( !FileExists ( strMTASAPath + "\\" +  CHECK_DM_CLIENT_NAME ) )
     {
-        return DisplayErrorMessageBox ( "Load failed. Please ensure that '" CHECK_DM_CLIENT_NAME "' is installed correctly.", "client-missing" );
+        return DisplayErrorMessageBox ( SString(_("Load failed. Please ensure that %s is installed correctly."),CHECK_DM_CLIENT_NAME), "client-missing" );
     }
 
     // Check for lua file
     if ( !FileExists ( strMTASAPath + "\\" + CHECK_DM_LUA_NAME ) )
     {
-        return DisplayErrorMessageBox ( "Load failed. Please ensure that '" CHECK_DM_LUA_NAME "' is installed correctly.", "lua-missing" );
+        return DisplayErrorMessageBox ( SString(_("Load failed. Please ensure that %s is installed correctly."),CHECK_DM_LUA_NAME), "lua-missing" );
     }
 
     // Grab the MTA folder
@@ -433,7 +433,7 @@ int DoLaunchGame ( LPSTR lpCmdLine )
     SetCurrentDirectory ( strGTAPath );
     if ( !FileExists( strGTAEXEPath ) )
     {
-        return DisplayErrorMessageBox ( SString ( "Load failed. Could not find gta_sa.exe in %s.", strGTAPath.c_str () ), "gta_sa-missing" );
+        return DisplayErrorMessageBox ( SString ( _("Load failed. Could not find gta_sa.exe in %s."), strGTAPath.c_str () ), "gta_sa-missing" );
     }
 
     // Make sure important dll's do not exist in the wrong place
@@ -442,7 +442,7 @@ int DoLaunchGame ( LPSTR lpCmdLine )
     {
         if ( FileExists( strGTAPath + "\\" + dllCheckList[i] ) )
         {
-            return DisplayErrorMessageBox ( SString ( "Load failed. %s exists in the GTA directory. Please delete before continuing.", dllCheckList[i] ), "file-clash" );
+            return DisplayErrorMessageBox ( SString ( _("Load failed. %s exists in the GTA directory. Please delete before continuing."), dllCheckList[i] ), "file-clash" );
         }    
     }
 
@@ -510,23 +510,23 @@ int DoLaunchGame ( LPSTR lpCmdLine )
         {
             // Otherwise, show error message
             SString strError = GetSystemErrorMessage ( dwError );            
-            DisplayErrorMessageBox ( "Could not start Grand Theft Auto: San Andreas.  "
+            DisplayErrorMessageBox ( SString(_("Could not start Grand Theft Auto: San Andreas.  "
                                 "Please try restarting, or if the problem persists,"
-                                "contact MTA at www.multitheftauto.com. \n\n[" + strError + "]", "createprocess-fail;" + strError );
+                                "contact MTA at www.multitheftauto.com. \n\n[%s]"),strError), "createprocess-fail;" + strError );
             return 5;
         }
     }
 
-    WriteDebugEvent( SString( "Loader - Process created: %s", *strGTAEXEPath ) );
+    WriteDebugEvent( SString( _("Loader - Process created: %s"), *strGTAEXEPath ) );
 
     SString strCoreDLL = strMTASAPath + "\\mta\\" + MTA_DLL_NAME;
 
     // Check if the core (mta_blue.dll or mta_blue_d.dll exists)
     if ( !FileExists ( strCoreDLL ) )
     {
-        DisplayErrorMessageBox ( "Load failed.  Please ensure that "
+        DisplayErrorMessageBox ( _("Load failed.  Please ensure that "
                             "the file core.dll is in the modules "
-                            "directory within the MTA root directory.", "core-missing" );
+                            "directory within the MTA root directory."), "core-missing" );
 
         // Kill GTA and return errorcode
         TerminateProcess ( piLoadee.hProcess, 1 );
@@ -554,9 +554,9 @@ int DoLaunchGame ( LPSTR lpCmdLine )
     HMODULE hCoreModule = LoadLibrary( strCoreDLL );
     if ( hCoreModule == NULL )
     {
-        DisplayErrorMessageBox ( "Loading core failed.  Please ensure that \n"
+        DisplayErrorMessageBox ( _("Loading core failed.  Please ensure that \n"
                             "Microsoft Visual C++ 2008 SP1 Redistributable Package (x86) \n"
-                            "and the latest DirectX is correctly installed.", "vc-redist-missing" );
+                            "and the latest DirectX is correctly installed."), "vc-redist-missing" );
         // Kill GTA and return errorcode
         TerminateProcess ( piLoadee.hProcess, 1 );
         return 1;
@@ -604,7 +604,7 @@ int DoLaunchGame ( LPSTR lpCmdLine )
             {
                 if ( IsGTAProcessStuck( piLoadee.hProcess ) )
                 {
-                    if ( MessageBox ( 0, "GTA: San Andreas may not have launched correctly. Do you want to terminate it?", "Information", MB_YESNO | MB_ICONQUESTION | MB_TOPMOST ) == IDYES )
+                    if ( MessageBox ( 0, _("GTA: San Andreas may not have launched correctly. Do you want to terminate it?"), _("Information"), MB_YESNO | MB_ICONQUESTION | MB_TOPMOST ) == IDYES )
                     {
                         TerminateProcess ( piLoadee.hProcess, 1 );
                     }

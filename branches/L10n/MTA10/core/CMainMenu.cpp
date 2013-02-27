@@ -190,6 +190,7 @@ CMainMenu::CMainMenu ( CGUI* pManager )
     // Create the menu items
     //Filepath, Relative position, absolute native size
     // And the font for the graphics is ?
+    //!ACHTUNG: Read native sizes, and load localized images
     m_menuItems.push_back ( CreateItem ( MENU_ITEM_QUICK_CONNECT,  "cgui\\images\\menu_quick_connect.png",    CVector2D ( 0.168f, fBase + fGap * 0 ),    CVector2D ( 358, 34 ) ) );
     m_menuItems.push_back ( CreateItem ( MENU_ITEM_BROWSE_SERVERS, "cgui\\images\\menu_browse_servers.png",   CVector2D ( 0.168f, fBase + fGap * 1 ),    CVector2D ( 390, 34 ) ) );
     m_menuItems.push_back ( CreateItem ( MENU_ITEM_HOST_GAME,      "cgui\\images\\menu_host_game.png",        CVector2D ( 0.168f, fBase + fGap * 2 ),    CVector2D ( 251, 34 ) ) );

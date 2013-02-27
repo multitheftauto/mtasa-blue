@@ -61,11 +61,11 @@ CGUIMessageBox_Impl::CGUIMessageBox_Impl ( CGUI_Impl* pGUI, const char* szTitle,
 
     // Create buttons
     if ( uiFlags & MB_BUTTON_OK ) {
-        m_pButton = pGUI->CreateButton ( m_pWindow, "OK" );
+        m_pButton = pGUI->CreateButton ( m_pWindow, _("OK") );
     } else if ( uiFlags & MB_BUTTON_CANCEL ) {
-        m_pButton = pGUI->CreateButton ( m_pWindow, "Cancel" );
+        m_pButton = pGUI->CreateButton ( m_pWindow, _("Cancel") );
     } else if ( uiFlags & MB_BUTTON_YES ) {
-        m_pButton = pGUI->CreateButton ( m_pWindow, "Yes" );
+        m_pButton = pGUI->CreateButton ( m_pWindow, _("Yes") );
     }
 
     if ( m_pButton ) {

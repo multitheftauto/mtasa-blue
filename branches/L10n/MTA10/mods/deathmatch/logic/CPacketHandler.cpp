@@ -469,10 +469,10 @@ void CPacketHandler::Packet_ServerDisconnected ( NetBitStreamInterface& bitStrea
         bitStream.Read ( szReason, iSize );
 
         // Display the error
-        if ( strcmp(szReason,"Disconnected: Incorrect password") == 0 ) // Slight hack - if invalid password reason show Info box instead.
+        if ( strcmp(szReason,_("Disconnected: Incorrect password")) == 0 ) // Slight hack - if invalid password reason show Info box instead.
             g_pCore->ShowServerInfo ( 2 );
         else
-            g_pCore->ShowMessageBox ( "Disconnected", szReason, MB_BUTTON_OK | MB_ICON_INFO );
+            g_pCore->ShowMessageBox ( _("Disconnected"), szReason, MB_BUTTON_OK | MB_ICON_INFO );
     }
 
     // Terminate the mod (disconnect first in case there were more packets after this one)

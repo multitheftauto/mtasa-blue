@@ -524,7 +524,7 @@ bool CClientGame::StartGame ( const char* szNick, const char* szPassword )
     // Verify that the nickname is valid
     if ( !IsNickValid ( szNick ) )
     {
-        g_pCore->ShowMessageBox ( "Error", "A valid nickname isn't set. Please go to Settings and set a new.", MB_BUTTON_OK | MB_ICON_ERROR );
+        g_pCore->ShowMessageBox ( _("Error"), _("A valid nickname isn't set. Please go to Settings and set a new."), MB_BUTTON_OK | MB_ICON_ERROR );
         g_pCore->GetModManager ()->RequestUnload ();
         return false;
     }
@@ -540,7 +540,7 @@ bool CClientGame::StartGame ( const char* szNick, const char* szPassword )
            g_pCore->GetConsole ()->SetVisible ( false );
 
         // Display the status box
-        g_pCore->ShowMessageBox ( "CONNECTING", "Entering the game ...", MB_ICON_INFO );
+        g_pCore->ShowMessageBox ( _("CONNECTING"), _("Entering the game ..."), MB_ICON_INFO );
 
         // Send the initial data to the server
         NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream ();
@@ -599,7 +599,7 @@ bool CClientGame::StartGame ( const char* szNick, const char* szPassword )
     }
     else
     {
-        g_pCore->ShowMessageBox ( "Error", "Not connected; please use Quick Connect or the 'connect' command to connect to a server.", MB_BUTTON_OK | MB_ICON_ERROR );
+        g_pCore->ShowMessageBox ( _("Error"), _("Not connected; please use Quick Connect or the 'connect' command to connect to a server."), MB_BUTTON_OK | MB_ICON_ERROR );
         g_pCore->GetModManager ()->RequestUnload ();
     }
 
@@ -623,7 +623,7 @@ bool CClientGame::StartLocalGame ( const char* szConfig, const char* szPassword 
 
     if ( !IsNickValid ( strNick.c_str() ) )
     {
-        g_pCore->ShowMessageBox ( "Error", "A valid nickname isn't set. Please go to Settings and set a new.", MB_BUTTON_OK | MB_ICON_ERROR );
+        g_pCore->ShowMessageBox ( _("Error"), _("A valid nickname isn't set. Please go to Settings and set a new."), MB_BUTTON_OK | MB_ICON_ERROR );
         g_pCore->GetModManager ()->RequestUnload ();
         return false;
     }
@@ -650,7 +650,7 @@ bool CClientGame::StartLocalGame ( const char* szConfig, const char* szPassword 
         {
             m_bWaitingForLocalConnect = true;
             m_bErrorStartingLocal = true;
-            g_pCore->ShowMessageBox ( "Error", "The server is not installed", MB_ICON_ERROR | MB_BUTTON_OK );
+            g_pCore->ShowMessageBox ( _("Error"), _("The server is not installed"), MB_ICON_ERROR | MB_BUTTON_OK );
             g_pCore->GetModManager ()->RequestUnload ();
             return false;
         }
@@ -660,7 +660,7 @@ bool CClientGame::StartLocalGame ( const char* szConfig, const char* szPassword 
 
         // Display the status box<<<<<
         m_OnCancelLocalGameClick = GUI_CALLBACK ( &CClientGame::OnCancelLocalGameClick, this );
-        g_pCore->ShowMessageBox ( "Local Server", "Starting local server ...", MB_BUTTON_CANCEL | MB_ICON_INFO, &m_OnCancelLocalGameClick );
+        g_pCore->ShowMessageBox ( _("Local Server"), _("Starting local server ..."), MB_BUTTON_CANCEL | MB_ICON_INFO, &m_OnCancelLocalGameClick );
     }
     else
     {
@@ -990,7 +990,7 @@ void CClientGame::DoPulses ( void )
             else
             {
                 // Otherwise, disconnect here
-                g_pCore->ShowMessageBox ( "Error", SString ( "You were kicked from the game (" + strMessageCombo + ")" ), MB_BUTTON_OK | MB_ICON_ERROR );
+                g_pCore->ShowMessageBox ( _("Error"), SString ( _("You were kicked from the game ( %s )"), *strMessageCombo ), MB_BUTTON_OK | MB_ICON_ERROR );
                 g_pCore->GetModManager ()->RequestUnload ();
                 return;
             }
@@ -1059,7 +1059,7 @@ void CClientGame::DoPulses ( void )
             if ( m_Server.IsReady () &&
                 m_iLocalConnectAttempts == 0 )
             {
-                g_pCore->ShowMessageBox ( "Local Server", "Connecting to local server...", MB_ICON_INFO );
+                g_pCore->ShowMessageBox ( _("Local Server"), _("Connecting to local server..."), MB_ICON_INFO );
 
                 // Connect
                 if ( g_pNet->StartNetwork ( "localhost", 22010 ) )
@@ -1070,7 +1070,7 @@ void CClientGame::DoPulses ( void )
                 }
                 else
                 {
-                    g_pCore->ShowMessageBox ( "Error", AppendNetErrorCode ( "Error connecting to server." ), MB_BUTTON_OK | MB_ICON_ERROR );
+                    g_pCore->ShowMessageBox ( _("Error"), AppendNetErrorCode ( _("Error connecting to server.") ), MB_BUTTON_OK | MB_ICON_ERROR );
                     g_pCore->GetModManager ()->RequestUnload ();
                     return;
                 }
@@ -1080,7 +1080,7 @@ void CClientGame::DoPulses ( void )
             if ( m_ulTimeStart != 0 && CClientTime::GetTime () >= m_ulTimeStart + 5000 )
             {
                 // Show timeout message and disconnect
-                g_pCore->ShowMessageBox ( "Error", AppendNetErrorCode ( "Connecting to local server timed out. See console for details." ), MB_BUTTON_OK | MB_ICON_ERROR );
+                g_pCore->ShowMessageBox ( _("Error"), AppendNetErrorCode ( _("Connecting to local server timed out. See console for details.") ), MB_BUTTON_OK | MB_ICON_ERROR );
                 g_pCore->GetModManager ()->RequestUnload ();
                 return;
             }
@@ -1149,7 +1149,7 @@ void CClientGame::DoPulses ( void )
         // Timed out?
         if ( !m_bWaitingForLocalConnect && ulCurrentTime >= m_ulTimeStart + NET_CONNECT_TIMEOUT )
         {
-            g_pCore->ShowMessageBox ( "Error", AppendNetErrorCode ( "Connection timed out" ), MB_BUTTON_OK | MB_ICON_ERROR );
+            g_pCore->ShowMessageBox ( _("Error"), AppendNetErrorCode ( _("Connection timed out") ), MB_BUTTON_OK | MB_ICON_ERROR );
             g_pCore->GetModManager ()->RequestUnload ();
             return;
         }
@@ -1182,7 +1182,7 @@ void CClientGame::DoPulses ( void )
             // See if we can figure out what specifically it was
             if ( ucError == 0 )
             {
-                g_pCore->ShowMessageBox ( "Error", AppendNetErrorCode ( "Connection with the server was lost" ), MB_BUTTON_OK | MB_ICON_ERROR );
+                g_pCore->ShowMessageBox ( _("Error"), AppendNetErrorCode ( _("Connection with the server was lost") ), MB_BUTTON_OK | MB_ICON_ERROR );
                 g_pNet->SetImmediateError ( 0 );
                 g_pCore->GetModManager ()->RequestUnload ();
                 return;
@@ -1193,36 +1193,36 @@ void CClientGame::DoPulses ( void )
                 switch ( ucError )
                 {
                     case RID_RSA_PUBLIC_KEY_MISMATCH:
-                        strError = "Disconnected: unknown protocol error.";  // encryption key mismatch
+                        strError = _("Disconnected: unknown protocol error.");  // encryption key mismatch
                         break;
                     case RID_REMOTE_DISCONNECTION_NOTIFICATION:
-                        strError = "Disconnected: disconnected remotely.";
+                        strError = _("Disconnected: disconnected remotely.");
                         break;
                     case RID_REMOTE_CONNECTION_LOST:
-                        strError = "Disconnected: connection lost remotely.";
+                        strError = _("Disconnected: connection lost remotely.");
                         break;
                     case RID_CONNECTION_BANNED:
-                        strError = "Disconnected: you are banned from this server.";
+                        strError = _("Disconnected: you are banned from this server.");
                         break;
                     case RID_NO_FREE_INCOMING_CONNECTIONS:
-                        strError = "Disconnected: the server is currently full.";
+                        strError = _("Disconnected: the server is currently full.");
                         break;
                     case RID_DISCONNECTION_NOTIFICATION:
-                        strError = "Disconnected: disconnected from the server.";
+                        strError = _("Disconnected: disconnected from the server.");
                         break;
                     case RID_CONNECTION_LOST:
-                        strError = "Disconnected: connection to the server was lost.";
+                        strError = _("Disconnected: connection to the server was lost.");
                         break;
                     case RID_INVALID_PASSWORD:
-                        strError = "Disconnected: invalid password specified.";
+                        strError = _("Disconnected: invalid password specified.");
                         break;
                     default:
-                        strError = "Disconnected: connection was refused.";
+                        strError = _("Disconnected: connection was refused.");
                         break;
                 }
 
                 // Display an error, reset the error status and exit
-                g_pCore->ShowMessageBox ( "Error", AppendNetErrorCode ( strError ), MB_BUTTON_OK | MB_ICON_ERROR );
+                g_pCore->ShowMessageBox ( _("Error"), AppendNetErrorCode ( strError ), MB_BUTTON_OK | MB_ICON_ERROR );
                 g_pNet->SetConnectionError ( 0 );
                 g_pNet->SetImmediateError ( 0 );
                 g_pCore->GetModManager ()->RequestUnload ();
@@ -1235,7 +1235,7 @@ void CClientGame::DoPulses ( void )
             // Time out the verification if it takes too long
             if ( m_ulVerifyTimeStart != 0 && ulCurrentTime >= m_ulVerifyTimeStart + CLIENT_VERIFICATION_TIMEOUT )
             {
-                g_pCore->ShowMessageBox ( "Error", AppendNetErrorCode ( "MTA Client verification failed!" ), MB_BUTTON_OK | MB_ICON_ERROR );
+                g_pCore->ShowMessageBox ( _("Error"), AppendNetErrorCode ( _("MTA Client verification failed!") ), MB_BUTTON_OK | MB_ICON_ERROR );
                 g_pCore->GetModManager ()->RequestUnload ();
             }
         }
@@ -3493,7 +3493,7 @@ void CClientGame::Event_OnIngameAndReady ( void )
 void CClientGame::Event_OnIngameAndConnected ( void )
 {
     // Create a messagebox saying that we're verifying the client
-    //g_pCore->ShowMessageBox ( "Connecting", "Verifying client ...", false );
+    //g_pCore->ShowMessageBox ( "Connecting", _("Verifying client ..."), false );
     m_ulVerifyTimeStart = CClientTime::GetTime ();
     
     /*
@@ -3901,8 +3901,8 @@ void CClientGame::DownloadInitialResourceFiles ( void )
         {
             // Throw the error and disconnect
             g_pCore->GetModManager ()->RequestUnload ();
-            g_pCore->ShowMessageBox ( "Error", szHTTPError, MB_BUTTON_OK | MB_ICON_ERROR );
-            g_pCore->GetConsole ()->Printf ( "Download error: %s", szHTTPError );
+            g_pCore->ShowMessageBox ( _("Error"), szHTTPError, MB_BUTTON_OK | MB_ICON_ERROR );
+            g_pCore->GetConsole ()->Printf ( _("Download error: %s"), szHTTPError );
         }
     }
 }

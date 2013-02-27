@@ -23,7 +23,7 @@ CServerList::CServerList ( void )
 {
     m_bUpdated = false;
     m_iPass = 0;
-    m_strStatus = "Idle";
+    m_strStatus = _("Idle");
     m_nScanned = 0;
     m_nSkipped = 0;
     m_iRevision = 1;
@@ -154,14 +154,13 @@ void CServerList::Pulse ( void )
     ss << "   ";
     if ( uiTotalSlots > 0 )
     {
-        ss << uiOccupiedSlots << " player";
-        if ( uiOccupiedSlots != 1 )
-            ss << "s";
-        ss << " on ";
+        const char * szPlayersString = ngettext ("player", "players", uiOccupiedSlots);
+        ss << uiOccupiedSlots << " " << szPlayersString;
     }
-    ss << uiActiveServers << " server";
-    if ( uiActiveServers != 1 )
-        ss << "s";
+
+    const char * szServersString = ngettext ("server", "servers", uiActiveServers);
+    ss << uiActiveServers << " " << szServersString;
+
     if ( m_iPass )
         ss << "...";
 
@@ -266,14 +265,14 @@ void CServerListInternet::Pulse ( void )
                 SortByASEVersion ();
             } else {
                 // Abort
-                m_strStatus = "Master server list could not be parsed.";
+                m_strStatus = _("Master server list could not be parsed.");
                 m_iPass = 0;
             }
         } else {
             // Take care of timeouts
             if ( ulTime > SERVER_LIST_MASTER_TIMEOUT ) {
                 // Abort
-                m_strStatus = "Master server list could not be retrieved.";
+                m_strStatus = _("Master server list could not be retrieved.");
                 m_iPass = 0;
             }
         }
@@ -283,7 +282,7 @@ void CServerListInternet::Pulse ( void )
             GetServerCache ()->GenerateServerList ( this );
             GetServerCache ()->GetServerListCachedInfo ( this );
             SortByASEVersion ();
-            m_strStatus2 = string ( "  (Backup server list)" );
+            m_strStatus2 = "  " + string ( _("(Backup server list)") );
             m_iPass = 2;
         }
     } else if ( m_iPass == 2 ) {

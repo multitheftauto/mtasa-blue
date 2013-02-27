@@ -728,7 +728,7 @@ bool CommandLineContains( const SString& strText )
 long DisplayErrorMessageBox ( const SString& strMessage, const SString& strTroubleType )
 {
     HideSplash ();
-    MessageBox( 0, strMessage, "Error! (CTRL+C to copy)", MB_ICONEXCLAMATION|MB_OK | MB_TOPMOST );
+    MessageBox( 0, strMessage, _("Error! (CTRL+C to copy)"), MB_ICONEXCLAMATION|MB_OK | MB_TOPMOST );
 
     if ( strTroubleType != "" )
         BrowseToSolution ( strTroubleType, ASK_GO_ONLINE );
@@ -2010,9 +2010,11 @@ void MaybeShowCopySettingsDialog ( void )
 
     // Show dialog
     SString strMessage;
-    strMessage += "New installation of " + strCurrentVersion + " detected.\n";
-    strMessage += "\n";
-    strMessage += "Do you want to copy your settings from " + strPreviousVersion + " ?";
+    strMessage += SString( _( "New installation of %s detected.\n"
+                              "\n"
+                              "Do you want to copy your settings from %s ?" ),
+                                *strCurrentVersion,
+                                *strPreviousVersion  );
     int iResponse = MessageBox ( NULL, strMessage, "MTA: San Andreas", MB_YESNO | MB_ICONQUESTION | MB_TOPMOST );
     if ( iResponse != IDYES )
         return;
@@ -2059,7 +2061,7 @@ bool CheckAndShowFileOpenFailureMessage ( void )
     if ( !strFilename.empty () )
     {
         //SetApplicationSetting ( "diagnostics", "gta-fopen-fail", "" );
-        SString strMsg ( "GTA:SA had trouble opening the file '%s'\n\nTry reinstalling GTA:SA to fix it", *strFilename );
+        SString strMsg ( _("GTA:SA had trouble opening the file '%s'\n\nTry reinstalling GTA:SA to fix it"), *strFilename );
         MessageBox ( NULL, strMsg, "MTA: San Andreas", MB_OK | MB_ICONERROR | MB_TOPMOST );
         return true;
     }

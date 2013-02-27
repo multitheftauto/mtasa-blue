@@ -71,7 +71,7 @@ void CSettings::CreateGUI ( void )
     CVector2D vecTemp;
 
     // Create the window
-    m_pWindow = reinterpret_cast < CGUIWindow* > ( pManager->CreateWnd ( NULL, "SETTINGS" ) );
+    m_pWindow = reinterpret_cast < CGUIWindow* > ( pManager->CreateWnd ( NULL, _("SETTINGS") ) );
     m_pWindow->SetCloseButtonEnabled ( true );
     m_pWindow->SetMovable ( true );
 
@@ -89,23 +89,23 @@ void CSettings::CreateGUI ( void )
     m_pTabs = reinterpret_cast < CGUITabPanel* > ( pManager->CreateTabPanel ( m_pWindow ) );
     m_pTabs->SetPosition ( CVector2D ( 0, 20.0f ) );
     m_pTabs->SetSize ( CVector2D ( 560.0f, 420.0f ) );
-    pTabMultiplayer = m_pTabs->CreateTab ( "Multiplayer" );
-    pTabVideo = m_pTabs->CreateTab ( "Video" );
-    pTabAudio = m_pTabs->CreateTab ( "Audio" );
-    pTabBinds = m_pTabs->CreateTab ( "Binds" );
-    pTabControls = m_pTabs->CreateTab ( "Controls" );
-    pTabCommunity = m_pTabs->CreateTab ( "Community" );
-    pTabInterface = m_pTabs->CreateTab ( "Interface" );
-    pTabAdvanced = m_pTabs->CreateTab ( "Advanced" );
+    pTabMultiplayer = m_pTabs->CreateTab ( _("Multiplayer") );
+    pTabVideo = m_pTabs->CreateTab ( _("Video") );
+    pTabAudio = m_pTabs->CreateTab ( _("Audio") );
+    pTabBinds = m_pTabs->CreateTab ( _("Binds") );
+    pTabControls = m_pTabs->CreateTab ( _("Controls") );
+    pTabCommunity = m_pTabs->CreateTab ( _("Community") );
+    pTabInterface = m_pTabs->CreateTab ( _("Interface") );
+    pTabAdvanced = m_pTabs->CreateTab ( _("Advanced") );
 
     // Create buttons
     //  OK button
-    m_pButtonOK = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( m_pWindow, "OK" ) );
+    m_pButtonOK = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( m_pWindow, _("OK") ) );
     m_pButtonOK->SetPosition ( CVector2D ( 0.5f, 0.94f ), true );
     m_pButtonOK->SetZOrderingEnabled ( false );
 
     //  Cancel button
-    m_pButtonCancel = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( m_pWindow, "Cancel" ) );
+    m_pButtonCancel = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( m_pWindow, _("Cancel") ) );
     m_pButtonCancel->SetPosition ( CVector2D ( 0.78f, 0.94f ), true );
     m_pButtonCancel->SetZOrderingEnabled ( false );
 
@@ -118,7 +118,7 @@ void CSettings::CreateGUI ( void )
     m_pBindsList->SetSorting ( false );
     m_pBindsList->SetSelectionMode ( SelectionModes::CellSingle );
 
-    m_pBindsDefButton = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( pTabBinds, "Load defaults" ) );
+    m_pBindsDefButton = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( pTabBinds, _("Load defaults") ) ); //!ACHTUNG: Dynamic sizing
     m_pBindsDefButton->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnBindsDefaultClick, this ) );
     m_pBindsDefButton->SetPosition ( CVector2D ( 402, 365 ) );
     m_pBindsDefButton->SetZOrderingEnabled ( false );
@@ -126,24 +126,34 @@ void CSettings::CreateGUI ( void )
     /**
      *  Controls tab
      **/
+    //!ACHTUNG: This entire section needs review.  Suggestions:
+    /* 
+        * Create GUI on the same line based upon the length of labels, rather than fixed positions
+        * Video: Move checkboxes as far right as possible, dynamically
+        * Audio: Same as above
+        * Controls: Left Stick and Right Stick - Do we need to dynamically move the buttons that surround them accordingly?  Seems like a pain in the ass
+        * Interface: Be more stingy with Lines, Scale and Width, after/for textboxes.  Give more room to two checkboxes
+        * Advanced: Move descriptive strings as a 'status bar' at the bottom of the window, which appears upon mouse-over
+        * Do we need to have an alternate, non-tab layout?  Not much room for longer tab names
+    */
     //Mouse Options
-    m_pControlsMouseLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabControls, "Mouse options" ) );
+    m_pControlsMouseLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabControls, _("Mouse options") ) );
     m_pControlsMouseLabel->SetPosition ( CVector2D ( 11, 13 ) );
-    m_pControlsMouseLabel->AutoSize ( "Mouse options  " );
+    m_pControlsMouseLabel->AutoSize ( _("Mouse options  ") );
     m_pControlsMouseLabel->SetFont ( "default-bold-small" );
 
-    m_pInvertMouse = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabControls, "Invert mouse vertically", true ) );
+    m_pInvertMouse = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabControls, _("Invert mouse vertically"), true ) ); 
     m_pInvertMouse->SetPosition ( CVector2D ( 11, 31 ) );
     m_pInvertMouse->GetPosition ( vecTemp, false );
     m_pInvertMouse->SetSize ( CVector2D ( 224.0f, 16.0f ) );
 
-    m_pSteerWithMouse = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabControls, "Steer with mouse", true ) );
+    m_pSteerWithMouse = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabControls, _("Steer with mouse"), true ) );
     m_pSteerWithMouse->SetPosition ( CVector2D ( vecTemp.fX + 320, vecTemp.fY ) );
 
-    m_pLabelMouseSensitivity = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabControls, "Mouse sensitivity:" ) );
+    m_pLabelMouseSensitivity = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabControls, _("Mouse sensitivity:") ) );
     m_pLabelMouseSensitivity->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 16.0f ) );
     m_pLabelMouseSensitivity->GetPosition ( vecTemp, false );
-    m_pLabelMouseSensitivity->AutoSize ( "Mouse sensitivity:" );
+    m_pLabelMouseSensitivity->AutoSize ( _("Mouse sensitivity:") );
 
     m_pMouseSensitivity = reinterpret_cast < CGUIScrollBar* > ( pManager->CreateScrollBar ( true, pTabControls ) );
     m_pMouseSensitivity->SetPosition ( CVector2D ( vecTemp.fX + 100.0f, vecTemp.fY ) );
@@ -154,14 +164,14 @@ void CSettings::CreateGUI ( void )
     m_pLabelMouseSensitivityValue->SetPosition ( CVector2D ( vecTemp.fX + 270.0f, vecTemp.fY ) );
     m_pLabelMouseSensitivityValue->AutoSize ( "100%" );
 
-    m_pFlyWithMouse = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabControls, "Fly with mouse", true ) );
+    m_pFlyWithMouse = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabControls, _("Fly with mouse"), true ) );
     m_pFlyWithMouse->SetPosition ( CVector2D ( vecTemp.fX + 320, vecTemp.fY ) );
     m_pFlyWithMouse->GetPosition ( vecTemp, false );
 
     //Joypad options
-    m_pControlsJoypadLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabControls, "Joypad options" ) );
+    m_pControlsJoypadLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabControls, _("Joypad options") ) );
     m_pControlsJoypadLabel->SetPosition ( CVector2D ( 11, 83 ) );
-    m_pControlsJoypadLabel->AutoSize ( "Joypad options  " );
+    m_pControlsJoypadLabel->AutoSize ( _("Joypad options  ") );
     m_pControlsJoypadLabel->SetFont ( "default-bold-small" );
 
     //Create a mini-scrollpane for the radio buttons (only way to group them together)
@@ -171,12 +181,12 @@ void CSettings::CreateGUI ( void )
     m_pControlsInputTypePane->SetSize ( CVector2D ( 1.0f, 0.27f ), true );
     m_pControlsInputTypePane->SetZOrderingEnabled ( false );
 
-    m_pStandardControls = reinterpret_cast < CGUIRadioButton* > ( pManager->CreateRadioButton ( m_pControlsInputTypePane, "Standard controls (Mouse + Keyboard)" ) ); 
+    m_pStandardControls = reinterpret_cast < CGUIRadioButton* > ( pManager->CreateRadioButton ( m_pControlsInputTypePane, _("Standard controls (Mouse + Keyboard)") ) ); 
     m_pStandardControls->SetSelected ( true );
     m_pStandardControls->SetPosition ( CVector2D ( 11, 0 ) );
     m_pStandardControls->SetSize ( CVector2D ( 240.0f, 15.0f ), false );
 
-    m_pClassicControls = reinterpret_cast < CGUIRadioButton* > ( pManager->CreateRadioButton ( m_pControlsInputTypePane, "Classic controls (Joypad)" ) ); 
+    m_pClassicControls = reinterpret_cast < CGUIRadioButton* > ( pManager->CreateRadioButton ( m_pControlsInputTypePane, _("Classic controls (Joypad)") ) ); 
     m_pClassicControls->SetPosition ( CVector2D ( 270, 0 ) );
     m_pClassicControls->SetSize ( CVector2D ( 270.0f, 15.0f ), false );
 
@@ -207,23 +217,23 @@ void CSettings::CreateGUI ( void )
         m_pEditSaturation->SetMaxLength ( 3 );
         m_pEditSaturation->SetTextChangedHandler ( GUI_CALLBACK ( &CSettings::OnJoypadTextChanged, this ) );
 
-        CGUILabel* pLabelDeadZone = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabControls, "Dead Zone" ) );
+        CGUILabel* pLabelDeadZone = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabControls, _("Dead Zone") ) );
         pLabelDeadZone->SetPosition ( m_pEditDeadzone->GetPosition () + CVector2D ( 52.f, -1.f ) );
         pLabelDeadZone->SetSize ( CVector2D ( 68.0f, 24.0f ) );
         pLabelDeadZone->SetVerticalAlign( CGUI_ALIGN_VERTICALCENTER );
 
-        CGUILabel* pLabelSaturation = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabControls, "Saturation" ) );
+        CGUILabel* pLabelSaturation = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabControls, _("Saturation") ) );
         pLabelSaturation->SetPosition ( m_pEditSaturation->GetPosition () + CVector2D ( 52.f, -1.f ) );
         pLabelSaturation->SetSize ( CVector2D ( 68.0f, 24.0f ) );
         pLabelSaturation->SetVerticalAlign( CGUI_ALIGN_VERTICALCENTER );
 
-        CGUIButton*  pJoyDefButton = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( pTabControls, "Load defaults" ) );
+        CGUIButton*  pJoyDefButton = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( pTabControls, _("Load defaults") ) );
         pJoyDefButton->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnJoypadDefaultClick, this ) );
         pJoyDefButton->SetPosition ( CVector2D ( 402, 365 ) );
 
         pJoyDefButton->SetZOrderingEnabled ( false );
 
-        CGUILabel* pLabelHelp = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabControls, "Use the 'Binds' tab for joypad buttons." ) );
+        CGUILabel* pLabelHelp = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabControls, _("Use the 'Binds' tab for joypad buttons.") ) );
         pLabelHelp->SetPosition ( CVector2D ( 10, 282 ) );
         pLabelHelp->SetSize ( CVector2D ( 250.0f, 24.0f ) );
         pLabelHelp->SetVerticalAlign( CGUI_ALIGN_VERTICALCENTER );
@@ -266,13 +276,13 @@ void CSettings::CreateGUI ( void )
             m_pJoypadButtons.push_back ( pButton );
         }
 
-        CGUILabel* pLabelLeft = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabControls, "Left Stick" ) );
+        CGUILabel* pLabelLeft = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabControls, _("Left Stick") ) );
         pLabelLeft->SetPosition ( CVector2D ( 221, 189 ) );
         pLabelLeft->SetSize ( CVector2D ( 68.0f, 24.0f ) );
         pLabelLeft->SetHorizontalAlign ( CGUI_ALIGN_HORIZONTALCENTER );
         pLabelLeft->SetVerticalAlign ( CGUI_ALIGN_VERTICALCENTER );
 
-        CGUILabel* pLabelRight = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabControls, "Right Stick" ) );
+        CGUILabel* pLabelRight = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabControls, _("Right Stick") ) );
         pLabelRight->SetPosition ( CVector2D ( 410, 189 ) );
         pLabelRight->SetSize ( CVector2D ( 68.0f, 24.0f ) );
         pLabelRight->SetHorizontalAlign ( CGUI_ALIGN_HORIZONTALCENTER );
@@ -280,11 +290,11 @@ void CSettings::CreateGUI ( void )
 
     }
 
-    
-    m_hBind = m_pBindsList->AddColumn ( "DESCRIPTION", 0.35f );
-    m_hPriKey = m_pBindsList->AddColumn ( "KEY", 0.24f );
+    //!ACHTUNG:  Are we going to translate the GTASA key names?
+    m_hBind = m_pBindsList->AddColumn ( _("DESCRIPTION"), 0.35f );
+    m_hPriKey = m_pBindsList->AddColumn ( _("KEY"), 0.24f );
     for ( int k = 0 ; k < SecKeyNum ; k++ )
-        m_hSecKeys[k] = m_pBindsList->AddColumn ( "ALT. KEY", 0.24f );
+        m_hSecKeys[k] = m_pBindsList->AddColumn ( _("ALT. KEY"), 0.24f );
 
     /**
      *  Community tab
@@ -297,12 +307,12 @@ void CSettings::CreateGUI ( void )
     m_pLabelCommunity->SetSize ( CVector2D ( 9.956f, 4.414f ), true );
     //m_pLabelCommunity->AutoSize ( CORE_SETTINGS_COMMUNITY_TEXT );
 
-    m_pLabelUser = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabCommunity, "Username:" ) );
+    m_pLabelUser = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabCommunity, _("Username:") ) );
     m_pLabelUser->SetPosition ( CVector2D ( 0.022f, 0.46f ), true );
     m_pLabelUser->GetPosition ( vecTemp, false );
     m_pLabelUser->AutoSize ( "Username:" );
 
-    m_pLabelPass = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabCommunity, "Password:" ) );
+    m_pLabelPass = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabCommunity, _("Password:") ) );
     m_pLabelPass->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32 ) );
     m_pLabelPass->AutoSize ( "Password:" );
 
@@ -321,13 +331,13 @@ void CSettings::CreateGUI ( void )
     m_pEditPass->SetMasked ( true );
     m_pEditPass->SetTextAcceptedHandler( GUI_CALLBACK( &CSettings::OnLoginButtonClick, this ) );
 
-    m_pButtonLogin = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( pTabCommunity, "Login" ) );
+    m_pButtonLogin = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( pTabCommunity, _("Login") ) );
     m_pButtonLogin->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32 ) );
     m_pButtonLogin->GetPosition ( vecTemp, false );
     m_pButtonLogin->SetSize ( CVector2D ( 168.0f, 24.0f ) );
     m_pButtonLogin->SetZOrderingEnabled ( false );
 
-    m_pButtonRegister = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( pTabCommunity, "Register" ) );
+    m_pButtonRegister = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( pTabCommunity, _("Register") ) );
     m_pButtonRegister->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32 ) );
     m_pButtonRegister->SetSize ( CVector2D ( 168.0f, 24.0f ) );
     m_pButtonRegister->SetZOrderingEnabled ( false );
@@ -335,10 +345,10 @@ void CSettings::CreateGUI ( void )
     /**
      *	Multiplayer tab
      **/
-    m_pLabelNick = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabMultiplayer, "Nick:" ) );
+    m_pLabelNick = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabMultiplayer, _("Nick:") ) );
     m_pLabelNick->SetPosition ( CVector2D ( 11, 13 ) );
     m_pLabelNick->GetPosition ( vecTemp, false );
-    m_pLabelNick->AutoSize ( "Nick:" );
+    m_pLabelNick->AutoSize ( _("Nick:") );
 
     // Nick edit
     m_pEditNick = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( pTabMultiplayer ) );
@@ -347,22 +357,22 @@ void CSettings::CreateGUI ( void )
     m_pEditNick->SetMaxLength ( MAX_PLAYER_NICK_LENGTH );
     m_pEditNick->SetTextAcceptedHandler( GUI_CALLBACK( &CSettings::OnOKButtonClick, this ) );
 
-    m_pSavePasswords = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabMultiplayer, "Save server passwords", true ) );
+    m_pSavePasswords = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabMultiplayer, _("Save server passwords"), true ) );
     m_pSavePasswords->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 50.0f ) );
     m_pSavePasswords->GetPosition ( vecTemp, false );
     m_pSavePasswords->SetSize ( CVector2D ( 224.0f, 16.0f ) );
 
-    m_pAutoRefreshBrowser = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabMultiplayer, "Auto-refresh server browser", true ) );
+    m_pAutoRefreshBrowser = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabMultiplayer, _("Auto-refresh server browser"), true ) );
     m_pAutoRefreshBrowser->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 20.0f ) );
     m_pAutoRefreshBrowser->GetPosition ( vecTemp, false );
     m_pAutoRefreshBrowser->SetSize ( CVector2D ( 224.0f, 16.0f ) );
 
-    m_pCheckBoxAllowScreenUpload = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabMultiplayer, "Allow screen upload", true ) );
+    m_pCheckBoxAllowScreenUpload = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabMultiplayer, _("Allow screen upload"), true ) );
     m_pCheckBoxAllowScreenUpload->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 20.0f ) );
     m_pCheckBoxAllowScreenUpload->GetPosition ( vecTemp, false );
     m_pCheckBoxAllowScreenUpload->SetSize ( CVector2D ( 224.0f, 16.0f ) );
 
-    m_pCheckBoxCustomizedSAFiles = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabMultiplayer, "Use customized GTA:SA files", true ) );
+    m_pCheckBoxCustomizedSAFiles = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabMultiplayer, _("Use customized GTA:SA files"), true ) );
     m_pCheckBoxCustomizedSAFiles->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 20.0f ) );
     m_pCheckBoxCustomizedSAFiles->GetPosition ( vecTemp, false );
     m_pCheckBoxCustomizedSAFiles->SetSize ( CVector2D ( 224.0f, 16.0f ) );
@@ -370,13 +380,13 @@ void CSettings::CreateGUI ( void )
     /**
      *  Audio tab
      **/
-    m_pAudioGeneralLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, "General" ) );
+    m_pAudioGeneralLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, _("General") ) );
     m_pAudioGeneralLabel->SetPosition ( CVector2D ( 11, 13 ) );
     m_pAudioGeneralLabel->GetPosition ( vecTemp, false );
-    m_pAudioGeneralLabel->AutoSize ( "General  " );
+    m_pAudioGeneralLabel->AutoSize ( _("General  ") );
     m_pAudioGeneralLabel->SetFont ( "default-bold-small" );
 
-    m_pLabelRadioVolume = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, "Radio volume:" ) );
+    m_pLabelRadioVolume = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, _("Radio volume:") ) );
     m_pLabelRadioVolume->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32.0f ), false );
     m_pLabelRadioVolume->GetPosition ( vecTemp, false );
     m_pLabelRadioVolume->AutoSize ( "Radio volume:" );
@@ -390,10 +400,10 @@ void CSettings::CreateGUI ( void )
     m_pLabelRadioVolumeValue->SetPosition ( CVector2D ( vecTemp.fX + 250.0f, vecTemp.fY ) );
     m_pLabelRadioVolumeValue->AutoSize ( "100%" );
 
-    m_pLabelSFXVolume = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, "SFX volume:" ) );
+    m_pLabelSFXVolume = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, _("SFX volume:") ) );
     m_pLabelSFXVolume->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32.0f ) );
     m_pLabelSFXVolume->GetPosition ( vecTemp, false );
-    m_pLabelSFXVolume->AutoSize ( "SFX volume:" );
+    m_pLabelSFXVolume->AutoSize ( _("SFX volume:") );
 
     m_pLabelSFXVolumeValue = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, "0%") );
     m_pLabelSFXVolumeValue->SetPosition ( CVector2D ( vecTemp.fX + 250.0f, vecTemp.fY ) );
@@ -404,18 +414,18 @@ void CSettings::CreateGUI ( void )
     m_pAudioSFXVolume->SetSize ( CVector2D ( 160.0f, 20.0f ) );
     m_pAudioSFXVolume->SetProperty ( "StepSize", "0.01" );
 
-    m_pCheckBoxAudioEqualizer = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabAudio, "Radio Equalizer", true ) );
+    m_pCheckBoxAudioEqualizer = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabAudio, _("Radio Equalizer"), true ) );
     m_pCheckBoxAudioEqualizer->SetPosition ( CVector2D ( vecTemp.fX + 300.0f, vecTemp.fY - 3.0f ) );
     m_pCheckBoxAudioEqualizer->SetSize ( CVector2D ( 224.0f, 16.0f ) );
 
-    m_pCheckBoxAudioAutotune = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabAudio, "Radio Auto-tune", true ) );
+    m_pCheckBoxAudioAutotune = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabAudio, _("Radio Auto-tune"), true ) );
     m_pCheckBoxAudioAutotune->SetPosition ( CVector2D ( vecTemp.fX + 300.0f, vecTemp.fY + 13.0f ) );
     m_pCheckBoxAudioAutotune->SetSize ( CVector2D ( 224.0f, 16.0f ) );
 
-    m_pLabelMTAVolume = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, "MTA volume:" ) );
+    m_pLabelMTAVolume = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, _("MTA volume:") ) );
     m_pLabelMTAVolume->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32.0f ) );
     m_pLabelMTAVolume->GetPosition ( vecTemp, false );
-    m_pLabelMTAVolume->AutoSize ( "MTA volume:" );
+    m_pLabelMTAVolume->AutoSize ( _("MTA volume:") );
 
     m_pLabelMTAVolumeValue = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, "0%") );
     m_pLabelMTAVolumeValue->SetPosition ( CVector2D ( vecTemp.fX + 250.0f, vecTemp.fY ) );
@@ -426,10 +436,10 @@ void CSettings::CreateGUI ( void )
     m_pAudioMTAVolume->SetSize ( CVector2D ( 160.0f, 20.0f ) );
     m_pAudioMTAVolume->SetProperty ( "StepSize", "0.01" );
 
-    m_pLabelVoiceVolume = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, "Voice volume:" ) );
+    m_pLabelVoiceVolume = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, _("Voice volume:") ) );
     m_pLabelVoiceVolume->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32.0f ) );
     m_pLabelVoiceVolume->GetPosition ( vecTemp, false );
-    m_pLabelVoiceVolume->AutoSize ( "Voice volume:" );
+    m_pLabelVoiceVolume->AutoSize ( _("Voice volume:") );
 
     m_pLabelVoiceVolumeValue = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, "0%") );
     m_pLabelVoiceVolumeValue->SetPosition ( CVector2D ( vecTemp.fX + 250.0f, vecTemp.fY ) );
@@ -440,31 +450,31 @@ void CSettings::CreateGUI ( void )
     m_pAudioVoiceVolume->SetSize ( CVector2D ( 160.0f, 20.0f ) );
     m_pAudioVoiceVolume->SetProperty ( "StepSize", "0.01" );
 
-    m_pAudioUsertrackLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, "Usertrack options" ) );
+    m_pAudioUsertrackLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, _("Usertrack options") ) );
     m_pAudioUsertrackLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 40.0f ), false );
     m_pAudioUsertrackLabel->GetPosition ( vecTemp, false );
-    m_pAudioUsertrackLabel->AutoSize ( "Usertrack options  " );
+    m_pAudioUsertrackLabel->AutoSize ( _("Usertrack options  ") );
     m_pAudioUsertrackLabel->SetFont ( "default-bold-small" );
 
-    m_pLabelUserTrackMode = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, "Play mode:" ) );
+    m_pLabelUserTrackMode = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, _("Play mode:") ) );
     m_pLabelUserTrackMode->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32.0f ) );
     m_pLabelUserTrackMode->GetPosition ( vecTemp, false );
-    m_pLabelUserTrackMode->AutoSize ( "Play mode:" );
+    m_pLabelUserTrackMode->AutoSize ( _("Play mode:") );
 
     m_pComboUsertrackMode = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabAudio, "" ) );
     m_pComboUsertrackMode->SetPosition ( CVector2D ( vecTemp.fX + 80.0f, vecTemp.fY ) );
     m_pComboUsertrackMode->SetSize ( CVector2D ( 160.0f, 80.0f ) );
-    m_pComboUsertrackMode->AddItem ( "Radio" )->SetData ( (void*)0 );
-    m_pComboUsertrackMode->AddItem ( "Random" )->SetData ( (void*)1 );
-    m_pComboUsertrackMode->AddItem ( "Sequential" )->SetData ( (void*)2 );
+    m_pComboUsertrackMode->AddItem ( _("Radio") )->SetData ( (void*)0 );
+    m_pComboUsertrackMode->AddItem ( _("Random") )->SetData ( (void*)1 );
+    m_pComboUsertrackMode->AddItem ( _("Sequential") )->SetData ( (void*)2 );
     m_pComboUsertrackMode->SetReadOnly ( true );
 
-    m_pCheckBoxUserAutoscan = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabAudio, "Automatic Media Scan", true ) );
+    m_pCheckBoxUserAutoscan = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabAudio, _("Automatic Media Scan"), true ) );
     m_pCheckBoxUserAutoscan->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32.0f ) );
     m_pCheckBoxUserAutoscan->SetSize ( CVector2D ( 224.0f, 16.0f ) );
     m_pCheckBoxUserAutoscan->GetPosition ( vecTemp, false );
 
-    m_pAudioDefButton = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( pTabAudio, "Load defaults" ) );
+    m_pAudioDefButton = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( pTabAudio, _("Load defaults") ) );
     m_pAudioDefButton->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnAudioDefaultClick, this ) );
     m_pAudioDefButton->SetPosition ( CVector2D ( 402, 365 ) );
     m_pAudioDefButton->SetZOrderingEnabled ( false );
@@ -473,28 +483,28 @@ void CSettings::CreateGUI ( void )
      *  Video tab
      **/
 
-    m_pVideoGeneralLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, "General" ) );
+    m_pVideoGeneralLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, _("General") ) );
     m_pVideoGeneralLabel->SetPosition ( CVector2D ( 11, 13 ) );
     m_pVideoGeneralLabel->GetPosition ( vecTemp, false );
-    m_pVideoGeneralLabel->AutoSize ( "General  " );
+    m_pVideoGeneralLabel->AutoSize ( _("General  ") );
     m_pVideoGeneralLabel->SetFont ( "default-bold-small" );
 
-    m_pVideoResolutionLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, "Resolution:" ) );
+    m_pVideoResolutionLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, _("Resolution:") ) );
     m_pVideoResolutionLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 28.0f ) );
     m_pVideoResolutionLabel->GetPosition ( vecTemp, false );
-    m_pVideoResolutionLabel->AutoSize ( "Resolution: " );
+    m_pVideoResolutionLabel->AutoSize ( _("Resolution: ") );
 
     m_pComboResolution = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabVideo, "" ) );
     m_pComboResolution->SetPosition ( CVector2D ( vecTemp.fX + 86.0f, vecTemp.fY - 5.0f ) );
     m_pComboResolution->SetSize ( CVector2D ( 200.0f, 160.0f ) );
     m_pComboResolution->SetReadOnly ( true );
 
-    m_pCheckBoxWindowed = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, "Windowed", true ) );
+    m_pCheckBoxWindowed = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, _("Windowed"), true ) );
     m_pCheckBoxWindowed->SetPosition ( CVector2D ( vecTemp.fX + 340.0f, vecTemp.fY - 3.0f ) );
     m_pCheckBoxWindowed->SetSize ( CVector2D ( 224.0f, 16.0f ) );
 
     float fPosY =  vecTemp.fY;
-    m_pCheckBoxMinimize = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, "Full Screen Minimize", true ) );
+    m_pCheckBoxMinimize = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, _("Full Screen Minimize"), true ) );
     m_pCheckBoxMinimize->SetPosition ( CVector2D ( vecTemp.fX + 340.0f, fPosY + 13.0f ) );
     m_pCheckBoxMinimize->SetSize ( CVector2D ( 224.0f, 16.0f ) );
     if ( !GetVideoModeManager ()->IsMultiMonitor () )
@@ -503,7 +513,7 @@ void CSettings::CreateGUI ( void )
         fPosY -= 16.0f;
     }
 
-    m_pCheckBoxDisableAero = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, "Disable Aero Desktop", true ) );
+    m_pCheckBoxDisableAero = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, _("Disable Aero Desktop"), true ) );
     m_pCheckBoxDisableAero->SetPosition ( CVector2D ( vecTemp.fX + 340.0f, vecTemp.fY + 29.0f ) );
     m_pCheckBoxDisableAero->SetSize ( CVector2D ( 224.0f, 16.0f ) );
     if ( GetApplicationSetting ( "os-version" ) < "6.1" || GetApplicationSettingInt ( "aero-changeable" ) == 0 )
@@ -512,7 +522,7 @@ void CSettings::CreateGUI ( void )
         fPosY -= 16.0f;
     }
 
-    m_pCheckBoxDeviceSelectionDialog = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, "Enable Device Selection Dialog", true ) );
+    m_pCheckBoxDeviceSelectionDialog = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, _("Enable Device Selection Dialog"), true ) );
     m_pCheckBoxDeviceSelectionDialog->SetPosition ( CVector2D ( vecTemp.fX + 340.0f, fPosY + 45.0f ) );
     m_pCheckBoxDeviceSelectionDialog->SetSize ( CVector2D ( 224.0f, 16.0f ) );
     if ( !GetVideoModeManager ()->IsMultiMonitor () )
@@ -521,7 +531,7 @@ void CSettings::CreateGUI ( void )
         fPosY -= 16.0f;
     }
 
-    m_pCheckBoxMipMapping = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, "Mip Mapping", true ) );
+    m_pCheckBoxMipMapping = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, _("Mip Mapping"), true ) );
     m_pCheckBoxMipMapping->SetPosition ( CVector2D ( vecTemp.fX + 340.0f, vecTemp.fY + 45.0f ) );
     m_pCheckBoxMipMapping->SetSize ( CVector2D ( 224.0f, 16.0f ) );
 #ifndef MIP_MAPPING_SETTING_APPEARS_TO_DO_SOMETHING
@@ -530,10 +540,10 @@ void CSettings::CreateGUI ( void )
 #endif
 
     vecTemp.fY -= 5;
-    m_pDrawDistanceLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, "Draw Distance:" ) );
+    m_pDrawDistanceLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, _("Draw Distance:") ) );
     m_pDrawDistanceLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 30.0f ) );
     m_pDrawDistanceLabel->GetPosition ( vecTemp, false );
-    m_pDrawDistanceLabel->AutoSize ( "Draw Distance: " );
+    m_pDrawDistanceLabel->AutoSize ( _("Draw Distance: ") );
 
     m_pDrawDistance = reinterpret_cast < CGUIScrollBar* > ( pManager->CreateScrollBar ( true, pTabVideo ) );
     m_pDrawDistance->SetPosition ( CVector2D ( vecTemp.fX + 86.0f, vecTemp.fY ) );
@@ -545,10 +555,10 @@ void CSettings::CreateGUI ( void )
     m_pDrawDistanceValueLabel->AutoSize ( "100% " );
 
 
-    m_pBrightnessLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, "Brightness:" ) );
+    m_pBrightnessLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, _("Brightness:") ) );
     m_pBrightnessLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 29.0f ) );
     m_pBrightnessLabel->GetPosition ( vecTemp, false );
-    m_pBrightnessLabel->AutoSize ( "Brightness: " );
+    m_pBrightnessLabel->AutoSize ( _("Brightness: ") );
 
     m_pBrightness = reinterpret_cast < CGUIScrollBar* > ( pManager->CreateScrollBar ( true, pTabVideo ) );
     m_pBrightness->SetPosition ( CVector2D ( vecTemp.fX + 86.0f, vecTemp.fY ) );
@@ -559,43 +569,43 @@ void CSettings::CreateGUI ( void )
     m_pBrightnessValueLabel->SetPosition ( CVector2D ( vecTemp.fX + 256.0f, vecTemp.fY ) );
     m_pBrightnessValueLabel->AutoSize ( "100% " );
 
-    m_pFXQualityLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, "FX Quality:" ) );
+    m_pFXQualityLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, _("FX Quality:") ) );
     m_pFXQualityLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 29.0f ) );
     m_pFXQualityLabel->GetPosition ( vecTemp, false );
-    m_pFXQualityLabel->AutoSize ( "FX Quality: " );
+    m_pFXQualityLabel->AutoSize ( _("FX Quality: ") );
 
     m_pComboFxQuality = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabVideo, "" ) );
     m_pComboFxQuality->SetPosition ( CVector2D ( vecTemp.fX + 86.0f, vecTemp.fY - 1.0f ) );
     m_pComboFxQuality->SetSize ( CVector2D ( 200.0f, 95.0f ) );
-    m_pComboFxQuality->AddItem ( "Low" )->SetData ( (void*)0 );
-    m_pComboFxQuality->AddItem ( "Medium" )->SetData ( (void*)1 );
-    m_pComboFxQuality->AddItem ( "High" )->SetData ( (void*)2 );
-    m_pComboFxQuality->AddItem ( "Very high" )->SetData ( (void*)3 );
+    m_pComboFxQuality->AddItem ( _("Low") )->SetData ( (void*)0 );
+    m_pComboFxQuality->AddItem ( _("Medium") )->SetData ( (void*)1 );
+    m_pComboFxQuality->AddItem ( _("High") )->SetData ( (void*)2 );
+    m_pComboFxQuality->AddItem ( _("Very high") )->SetData ( (void*)3 );
     m_pComboFxQuality->SetReadOnly ( true );
 
-    m_pCheckBoxVolumetricShadows = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, "Volumetric Shadows", true ) );
+    m_pCheckBoxVolumetricShadows = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, _("Volumetric Shadows"), true ) );
     m_pCheckBoxVolumetricShadows->SetPosition ( CVector2D ( vecTemp.fX + 340.0f, vecTemp.fY + 2.0f ) );
     m_pCheckBoxVolumetricShadows->SetSize ( CVector2D ( 224.0f, 16.0f ) );
 
-    m_pCheckBoxGrass = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, "Grass effect", true ) );
+    m_pCheckBoxGrass = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, _("Grass effect"), true ) );
     m_pCheckBoxGrass->SetPosition ( CVector2D ( vecTemp.fX + 340.0f, vecTemp.fY + 22.0f ) );
     m_pCheckBoxGrass->SetSize ( CVector2D ( 224.0f, 16.0f ) );
 
-    m_pCheckBoxHeatHaze = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, "Heat haze", true ) );
+    m_pCheckBoxHeatHaze = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, _("Heat haze"), true ) );
     m_pCheckBoxHeatHaze->SetPosition ( CVector2D ( vecTemp.fX + 340.0f, vecTemp.fY + 42.0f ) );
     m_pCheckBoxHeatHaze->SetSize ( CVector2D ( 224.0f, 16.0f ) );
 
-    m_pAnisotropicLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, "Anisotropic filtering:" ) );
+    m_pAnisotropicLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, _("Anisotropic filtering:") ) );
     m_pAnisotropicLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 29.0f ) );
     m_pAnisotropicLabel->GetPosition ( vecTemp, false );
-    m_pAnisotropicLabel->AutoSize ( "Anisotropic filtering:" );
+    m_pAnisotropicLabel->AutoSize ( _("Anisotropic filtering:") );
 
     m_pAnisotropic = reinterpret_cast < CGUIScrollBar* > ( pManager->CreateScrollBar ( true, pTabVideo ) );
     m_pAnisotropic->SetPosition ( CVector2D ( vecTemp.fX + 86 + 44, vecTemp.fY ) );
     m_pAnisotropic->SetSize ( CVector2D ( 160.0f, 20.0f ) );
     m_pAnisotropic->SetProperty ( "StepSize", SString ( "%1.2f", 1 / (float)m_iMaxAnisotropic ) );
 
-    m_pAnisotropicValueLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, "Off") );
+    m_pAnisotropicValueLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, _("Off")) );
     m_pAnisotropicValueLabel->SetPosition ( CVector2D ( vecTemp.fX + 256.0f + 44, vecTemp.fY ) );
     m_pAnisotropicValueLabel->AutoSize ( "100x" );
 
@@ -608,45 +618,45 @@ void CSettings::CreateGUI ( void )
         m_pAnisotropicValueLabel->SetVisible ( false );
     }
 
-    m_pAntiAliasingLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, "Anti-aliasing:" ) );
+    m_pAntiAliasingLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, _("Anti-aliasing:") ) );
     m_pAntiAliasingLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 30.0f ) );
     m_pAntiAliasingLabel->GetPosition ( vecTemp, false );
-    m_pAntiAliasingLabel->AutoSize ( "Anti-aliasing: " );
+    m_pAntiAliasingLabel->AutoSize ( _("Anti-aliasing: ") );
 
     m_pComboAntiAliasing = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabVideo, "" ) );
     m_pComboAntiAliasing->SetPosition ( CVector2D ( vecTemp.fX + 86.0f, vecTemp.fY - 1.0f ) );
     m_pComboAntiAliasing->SetSize ( CVector2D ( 200.0f, 95.0f ) );
-    m_pComboAntiAliasing->AddItem ( "Off" )->SetData ( (void*)1 );
+    m_pComboAntiAliasing->AddItem ( _("Off") )->SetData ( (void*)1 );
     m_pComboAntiAliasing->AddItem ( "1x" )->SetData ( (void*)2 );
     m_pComboAntiAliasing->AddItem ( "2x" )->SetData ( (void*)3 );
     m_pComboAntiAliasing->AddItem ( "3x" )->SetData ( (void*)4 );
     m_pComboAntiAliasing->SetReadOnly ( true );
 
 
-    m_pAspectRatioLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, "Aspect Ratio:" ) );
+    m_pAspectRatioLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, _("Aspect Ratio:") ) );
     m_pAspectRatioLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 30.0f ) );
     m_pAspectRatioLabel->GetPosition ( vecTemp, false );
-    m_pAspectRatioLabel->AutoSize ( "Aspect Ratio: " );
+    m_pAspectRatioLabel->AutoSize ( _("Aspect Ratio: ") );
 
     m_pComboAspectRatio = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabVideo, "" ) );
     m_pComboAspectRatio->SetPosition ( CVector2D ( vecTemp.fX + 86.0f, vecTemp.fY - 1.0f ) );
     m_pComboAspectRatio->SetSize ( CVector2D ( 200.0f, 95.0f ) );
-    m_pComboAspectRatio->AddItem ( "Auto" )->SetData ( (void*)ASPECT_RATIO_AUTO );
+    m_pComboAspectRatio->AddItem ( _("Auto") )->SetData ( (void*)ASPECT_RATIO_AUTO );
     m_pComboAspectRatio->AddItem ( "4:3" )->SetData ( (void*)ASPECT_RATIO_4_3 );
     m_pComboAspectRatio->AddItem ( "16:10" )->SetData ( (void*)ASPECT_RATIO_16_10 );
     m_pComboAspectRatio->AddItem ( "16:9" )->SetData ( (void*)ASPECT_RATIO_16_9 );
     m_pComboAspectRatio->SetReadOnly ( true );
 
-    m_pMapRenderingLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, "Map rendering options" ) );
+    m_pMapRenderingLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, _("Map rendering options") ) );
     m_pMapRenderingLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 38.0f ) );
     m_pMapRenderingLabel->GetPosition ( vecTemp, false );
-    m_pMapRenderingLabel->AutoSize ( "Map rendering options " );
+    m_pMapRenderingLabel->AutoSize ( _("Map rendering options ") );
     m_pMapRenderingLabel->SetFont ( "default-bold-small" );
 
-    m_pMapAlphaLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, "Opacity:" ) );
+    m_pMapAlphaLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, _("Opacity:") ) );
     m_pMapAlphaLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 24.0f ) );
     m_pMapAlphaLabel->GetPosition ( vecTemp, false );
-    m_pMapAlphaLabel->AutoSize ( "Opacity: " );
+    m_pMapAlphaLabel->AutoSize ( _("Opacity: ") );
 
     m_pMapAlpha = reinterpret_cast < CGUIScrollBar* > ( pManager->CreateScrollBar ( true, pTabVideo ) );
     m_pMapAlpha->SetPosition ( CVector2D ( vecTemp.fX + 86.0f, vecTemp.fY ) );
@@ -659,7 +669,7 @@ void CSettings::CreateGUI ( void )
     m_pMapAlphaValueLabel->GetPosition ( vecTemp, false );
     m_pMapAlphaValueLabel->AutoSize ( "100% " );
 
-    m_pVideoDefButton = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( pTabVideo, "Load defaults" ) );
+    m_pVideoDefButton = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( pTabVideo, _("Load defaults") ) );
     m_pVideoDefButton->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnVideoDefaultClick, this ) );
     m_pVideoDefButton->SetPosition ( CVector2D ( 402, 365 ) );
     m_pVideoDefButton->SetZOrderingEnabled ( false );
@@ -668,16 +678,16 @@ void CSettings::CreateGUI ( void )
      * Interface/chat Tab
      **/
     {
-        CGUILabel* pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabInterface, "General" ) );
+        CGUILabel* pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabInterface, _("General") ) );
         pLabel->SetPosition ( CVector2D ( 10.0f, 12.0f ) );
-        pLabel->AutoSize ( "General  " );
+        pLabel->AutoSize ( _("General  ") );
         pLabel->SetFont ( "default-bold-small" );
     }
 
     {
-        CGUILabel* pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabInterface, "Skin:" ) );
+        CGUILabel* pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabInterface, _("Skin:") ) );
         pLabel->SetPosition ( CVector2D ( 10.0f, 42.0f ) );
-        pLabel->AutoSize ( "Skin:" );
+        pLabel->AutoSize ( _("Skin:") );
     }
 
     m_pInterfaceSkinSelector = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabInterface ) );
@@ -686,9 +696,9 @@ void CSettings::CreateGUI ( void )
     m_pInterfaceSkinSelector->SetReadOnly ( true );
 
     {
-        CGUILabel* pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabInterface, "Chat" ) );
+        CGUILabel* pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabInterface, _("Chat") ) );
         pLabel->SetPosition ( CVector2D ( 10.0f, 80.0f ) );
-        pLabel->AutoSize ( "Chat  " );
+        pLabel->AutoSize ( _("Chat  ") );
         pLabel->SetFont ( "default-bold-small" );
     }
 
@@ -696,9 +706,9 @@ void CSettings::CreateGUI ( void )
     // Presets
 
     {
-        CGUILabel* pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabInterface, "Presets:" ) );
+        CGUILabel* pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabInterface, _("Presets:") ) );
         pLabel->SetPosition ( CVector2D ( 10.0f, 112.0f ) );
-        pLabel->AutoSize ( "Presets:" );
+        pLabel->AutoSize ( _("Presets:") );
     }
 
     m_pChatPresets = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabInterface ) );
@@ -706,7 +716,7 @@ void CSettings::CreateGUI ( void )
     m_pChatPresets->SetSize ( CVector2D ( 340.0f, 200.0f ) );
     m_pChatPresets->SetReadOnly ( true );
 
-    m_pChatLoadPreset = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( pTabInterface, "Load" ) );
+    m_pChatLoadPreset = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( pTabInterface, _("Load") ) );
     m_pChatLoadPreset->SetPosition ( CVector2D ( 410.0f, 110.0f ) );
     m_pChatLoadPreset->SetSize ( CVector2D ( 100.0f, 24.0f ) );
     m_pChatLoadPreset->SetZOrderingEnabled ( false );
@@ -716,10 +726,10 @@ void CSettings::CreateGUI ( void )
     pColorTabPanel->SetPosition ( CVector2D ( 10.0f, 150.0f ) );
     pColorTabPanel->SetSize ( CVector2D ( 320.0f, 150.0f ) );
 
-    CreateChatColorTab ( ChatColorTypes::CHAT_COLOR_BG, "Chat BG", pColorTabPanel );
-    CreateChatColorTab ( ChatColorTypes::CHAT_COLOR_TEXT, "Chat Text", pColorTabPanel );
-    CreateChatColorTab ( ChatColorTypes::CHAT_COLOR_INPUT_BG, "Input BG", pColorTabPanel );
-    CreateChatColorTab ( ChatColorTypes::CHAT_COLOR_INPUT_TEXT, "Input Text", pColorTabPanel );
+    CreateChatColorTab ( ChatColorTypes::CHAT_COLOR_BG, _("Chat BG"), pColorTabPanel );
+    CreateChatColorTab ( ChatColorTypes::CHAT_COLOR_TEXT, _("Chat Text"), pColorTabPanel );
+    CreateChatColorTab ( ChatColorTypes::CHAT_COLOR_INPUT_BG, _("Input BG"), pColorTabPanel );
+    CreateChatColorTab ( ChatColorTypes::CHAT_COLOR_INPUT_TEXT, _("Input Text"), pColorTabPanel );
 
     // Font Selection
     m_pPaneChatFont = reinterpret_cast < CGUIScrollPane* > ( pManager->CreateScrollPane ( pTabInterface ) ); 
@@ -727,9 +737,9 @@ void CSettings::CreateGUI ( void )
     m_pPaneChatFont->SetPosition ( CVector2D ( 50.0f, 320.0f ) );
     m_pPaneChatFont->SetSize ( CVector2D ( 250.0f, 33.0f ) );
 
-    CGUILabel* pFontLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pPaneChatFont, "Font:" ) );
+    CGUILabel* pFontLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pPaneChatFont, _("Font:") ) );
     pFontLabel->SetPosition ( CVector2D ( 0.0f, 8.0f ) );
-    pFontLabel->AutoSize ( "Font:" );
+    pFontLabel->AutoSize ( _("Font:") );
 
     m_pRadioChatFont [ ChatFonts::CHAT_FONT_DEFAULT ] = reinterpret_cast < CGUIRadioButton* > ( pManager->CreateRadioButton ( m_pPaneChatFont, "Tahoma" ) ); 
     m_pRadioChatFont [ ChatFonts::CHAT_FONT_DEFAULT ]->SetSelected ( true );
@@ -752,19 +762,19 @@ void CSettings::CreateGUI ( void )
     {
         CGUILabel* pLabel;
 
-        pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabInterface, "Lines:" ) );
+        pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabInterface, _("Lines:") ) );
         pLabel->SetPosition ( CVector2D ( 360.0f, 160.0f ) );
         pLabel->GetPosition ( vecTemp );
-        pLabel->AutoSize ( "Lines:" );
+        pLabel->AutoSize ( _("Lines:") );
 
         m_pChatLines = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( pTabInterface, "" ) );
         m_pChatLines->SetPosition ( CVector2D ( vecTemp.fX + 40.0f, vecTemp.fY - 2.0f ) );
         m_pChatLines->SetSize ( CVector2D ( 110.0f, 24.0f ) );
 
-        pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabInterface, "Scale:" ) );
+        pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabInterface, _("Scale:") ) );
         pLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 28.0f ) );
         pLabel->GetPosition ( vecTemp );
-        pLabel->AutoSize ( "Scale:" );
+        pLabel->AutoSize ( _("Scale:") );
 
         m_pChatScaleX = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( pTabInterface, "" ) );
         m_pChatScaleX->SetPosition ( CVector2D ( vecTemp.fX + 40.0f, vecTemp.fY - 2.0f ) );
@@ -778,50 +788,50 @@ void CSettings::CreateGUI ( void )
         m_pChatScaleY->SetPosition ( CVector2D ( vecTemp.fX + 100.0f, vecTemp.fY - 2.0f ) );
         m_pChatScaleY->SetSize ( CVector2D ( 50.0f, 24.0f ) );
 
-        pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabInterface, "Width:" ) );
+        pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabInterface, _("Width:") ) );
         pLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 28.0f ) );
         pLabel->GetPosition ( vecTemp );
-        pLabel->AutoSize ( "Width:" );
+        pLabel->AutoSize ( _("Width:") );
 
         m_pChatWidth = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( pTabInterface, "" ) );
         m_pChatWidth->SetPosition ( CVector2D ( vecTemp.fX + 40.0f, vecTemp.fY - 2.0f ) );
         m_pChatWidth->SetSize ( CVector2D ( 110.0f, 24.0f ) );
 
-        m_pChatCssBackground = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox( pTabInterface, "Hide background when\nnot typing" ) );
+        m_pChatCssBackground = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox( pTabInterface, _("Hide background when not typing") ) );  //!ACHTUNG: This is nasty.  Use a wrapped textbox
         m_pChatCssBackground->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 28.0f ) );
         m_pChatCssBackground->GetPosition ( vecTemp );
         m_pChatCssBackground->SetSize ( CVector2D ( 160.0f, 32.0f ) );
 
-        m_pChatCssText = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox( pTabInterface, "Fade out old lines" ) );
+        m_pChatCssText = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox( pTabInterface, _("Fade out old lines") ) );
         m_pChatCssText->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 34.0f ) );
         m_pChatCssText->GetPosition ( vecTemp );
         m_pChatCssText->SetSize ( CVector2D ( 160.0f, 16.0f ) );
 
-        pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabInterface, "after" ) );
+        pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabInterface, _("after") ) );
         pLabel->SetPosition ( CVector2D ( vecTemp.fX + 17.0f, vecTemp.fY + 22.0f ) );
         pLabel->GetPosition ( vecTemp );
-        pLabel->AutoSize ( "after " );
+        pLabel->AutoSize ( _("after ") );
 
         m_pChatLineLife = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( pTabInterface, "" ) );
         m_pChatLineLife->SetPosition ( CVector2D ( vecTemp.fX + 40.0f, vecTemp.fY - 2.0f ) );
         m_pChatLineLife->SetSize ( CVector2D ( 70.0f, 24.0f ) );
 
-        pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabInterface, "sec" ) );
+        pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabInterface, _("sec") ) );
         pLabel->SetPosition ( CVector2D ( vecTemp.fX + 115.0f, vecTemp.fY ) );
-        pLabel->AutoSize ( "sec" );
+        pLabel->AutoSize ( _("sec") );
 
-        pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabInterface, "for" ) );
+        pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabInterface, _("for") ) );
         pLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 28.0f ) );
         pLabel->GetPosition ( vecTemp );
-        pLabel->AutoSize ( "for" );
+        pLabel->AutoSize ( _("for") );
 
         m_pChatLineFadeout = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( pTabInterface, "" ) );
         m_pChatLineFadeout->SetPosition ( CVector2D ( vecTemp.fX + 40.0f, vecTemp.fY - 2.0f ) );
         m_pChatLineFadeout->SetSize ( CVector2D ( 70.0f, 24.0f ) );
 
-        pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabInterface, "sec" ) );
+        pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabInterface, _("sec") ) );
         pLabel->SetPosition ( CVector2D ( vecTemp.fX + 115.0f, vecTemp.fY ) );
-        pLabel->AutoSize ( "sec" );
+        pLabel->AutoSize ( _("sec") );
     }
 
     /**
@@ -830,114 +840,114 @@ void CSettings::CreateGUI ( void )
     vecTemp = CVector2D ( 12.f, 12.f );
 
     // Misc section label
-    m_pAdvancedMiscLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Misc" ) );
+    m_pAdvancedMiscLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, _("Misc") ) );
     m_pAdvancedMiscLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY ) );
     m_pAdvancedMiscLabel->SetFont ( "default-bold-small" );
-    m_pAdvancedMiscLabel->AutoSize ( "Misc" );
+    m_pAdvancedMiscLabel->AutoSize ( _("Misc") );
     vecTemp.fY += 20;
 
     // Asynchronous Loading
-    m_pAsyncLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Asynchronous Loading:" ) );
+    m_pAsyncLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, _("Asynchronous Loading:") ) );
     m_pAsyncLabel->SetPosition ( CVector2D ( vecTemp.fX + 10.f, vecTemp.fY ) );
     m_pAsyncLabel->AutoSize ( m_pAsyncLabel->GetText ().c_str () );
 
     m_pAsyncCombo = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabAdvanced, "" ) );
     m_pAsyncCombo->SetPosition ( CVector2D ( vecTemp.fX + 156.0f, vecTemp.fY - 1.0f ) );
     m_pAsyncCombo->SetSize ( CVector2D ( 148.0f, 95.0f ) );
-    m_pAsyncCombo->AddItem ( "Off" )->SetData ( (void*)0 );
-    m_pAsyncCombo->AddItem ( "On" )->SetData ( (void*)2 );
-    m_pAsyncCombo->AddItem ( "Auto" )->SetData ( (void*)1 );
+    m_pAsyncCombo->AddItem ( _("Off") )->SetData ( (void*)0 );
+    m_pAsyncCombo->AddItem ( _("On") )->SetData ( (void*)2 );
+    m_pAsyncCombo->AddItem ( _("Auto") )->SetData ( (void*)1 );
     m_pAsyncCombo->SetReadOnly ( true );
 
-    m_pAsyncLabelInfo = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Experimental feature which\nmay improve performance." ) );
+    m_pAsyncLabelInfo = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, _("Experimental feature which may improve performance.") ) );
     m_pAsyncLabelInfo->SetPosition ( CVector2D ( vecTemp.fX + 342.f, vecTemp.fY - 4.f ) );
     m_pAsyncLabelInfo->SetFont ( "default-bold-small" );
     m_pAsyncLabelInfo->SetSize ( CVector2D ( 168.0f, 95.0f ) );
     vecTemp.fY += 40-4;
 
     // Fast clothes loading
-    m_pFastClothesLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Fast CJ clothes loading:" ) );
+    m_pFastClothesLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, _("Fast CJ clothes loading:") ) );
     m_pFastClothesLabel->SetPosition ( CVector2D ( vecTemp.fX + 10.f, vecTemp.fY ) );
     m_pFastClothesLabel->AutoSize ( m_pFastClothesLabel->GetText ().c_str () );
 
     m_pFastClothesCombo = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabAdvanced, "" ) );
     m_pFastClothesCombo->SetPosition ( CVector2D ( vecTemp.fX + 156.0f, vecTemp.fY - 1.0f ) );
     m_pFastClothesCombo->SetSize ( CVector2D ( 148.0f, 95.0f ) );
-    m_pFastClothesCombo->AddItem ( "Off" )->SetData ( (void*)CMultiplayer::FAST_CLOTHES_OFF );
-    m_pFastClothesCombo->AddItem ( "On" )->SetData ( (void*)CMultiplayer::FAST_CLOTHES_ON );
-    m_pFastClothesCombo->AddItem ( "Auto" )->SetData ( (void*)CMultiplayer::FAST_CLOTHES_AUTO );
+    m_pFastClothesCombo->AddItem ( _("Off") )->SetData ( (void*)CMultiplayer::FAST_CLOTHES_OFF );
+    m_pFastClothesCombo->AddItem ( _("On") )->SetData ( (void*)CMultiplayer::FAST_CLOTHES_ON );
+    m_pFastClothesCombo->AddItem ( _("Auto") )->SetData ( (void*)CMultiplayer::FAST_CLOTHES_AUTO );
     m_pFastClothesCombo->SetReadOnly ( true );
 
-    m_pFastClothesLabelInfo = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Stops stalls with CJ variations\n(Uses 65MB more RAM)" ) );
+    m_pFastClothesLabelInfo = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, _("Stops stalls with CJ variations (Uses 65MB more RAM)") ) );
     m_pFastClothesLabelInfo->SetPosition ( CVector2D ( vecTemp.fX + 342.f, vecTemp.fY - 4.f ) );
     m_pFastClothesLabelInfo->SetFont ( "default-bold-small" );
     m_pFastClothesLabelInfo->SetSize ( CVector2D ( 168.0f, 95.0f ) );
     vecTemp.fY += 40-4;
 
     // Browser scan speed
-    m_pBrowserSpeedLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Browser speed:" ) );
+    m_pBrowserSpeedLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, _("Browser speed:") ) );
     m_pBrowserSpeedLabel->SetPosition ( CVector2D ( vecTemp.fX + 10.f, vecTemp.fY ) );
     m_pBrowserSpeedLabel->AutoSize ( m_pBrowserSpeedLabel->GetText ().c_str () );
 
     m_pBrowserSpeedCombo = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabAdvanced, "" ) );
     m_pBrowserSpeedCombo->SetPosition ( CVector2D ( vecTemp.fX + 156.0f, vecTemp.fY - 1.0f ) );
     m_pBrowserSpeedCombo->SetSize ( CVector2D ( 148.0f, 95.0f ) );
-    m_pBrowserSpeedCombo->AddItem ( "Very slow" )->SetData ( (void*)0 );
-    m_pBrowserSpeedCombo->AddItem ( "Slow" )->SetData ( (void*)1 );
-    m_pBrowserSpeedCombo->AddItem ( "Fast" )->SetData ( (void*)2 );
+    m_pBrowserSpeedCombo->AddItem ( _("Very slow") )->SetData ( (void*)0 );
+    m_pBrowserSpeedCombo->AddItem ( _("Slow") )->SetData ( (void*)1 );
+    m_pBrowserSpeedCombo->AddItem ( _("Fast") )->SetData ( (void*)2 );
     m_pBrowserSpeedCombo->SetReadOnly ( true );
 
-    m_pBrowserSpeedLabelInfo = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Older routers may require\na slower scan speed." ) );
+    m_pBrowserSpeedLabelInfo = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, _("Older routers may require a slower scan speed.") ) );
     m_pBrowserSpeedLabelInfo->SetPosition ( CVector2D ( vecTemp.fX + 342.f, vecTemp.fY - 4.f ) );
     m_pBrowserSpeedLabelInfo->SetFont ( "default-bold-small" );
     m_pBrowserSpeedLabelInfo->SetSize ( CVector2D ( 168.0f, 95.0f ) );
     vecTemp.fY += 40-4;
 
     // Single download
-    m_pSingleDownloadLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Single connection:" ) );
+    m_pSingleDownloadLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, _("Single connection:") ) );
     m_pSingleDownloadLabel->SetPosition ( CVector2D ( vecTemp.fX + 10.f, vecTemp.fY ) );
     m_pSingleDownloadLabel->AutoSize ( m_pSingleDownloadLabel->GetText ().c_str () );
 
     m_pSingleDownloadCombo = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabAdvanced, "" ) );
     m_pSingleDownloadCombo->SetPosition ( CVector2D ( vecTemp.fX + 156.0f, vecTemp.fY - 1.0f ) );
     m_pSingleDownloadCombo->SetSize ( CVector2D ( 148.0f, 95.0f ) );
-    m_pSingleDownloadCombo->AddItem ( "Default" )->SetData ( (void*)0 );
-    m_pSingleDownloadCombo->AddItem ( "On" )->SetData ( (void*)1 );
+    m_pSingleDownloadCombo->AddItem ( _("Default") )->SetData ( (void*)0 );
+    m_pSingleDownloadCombo->AddItem ( _("On") )->SetData ( (void*)1 );
     m_pSingleDownloadCombo->SetReadOnly ( true );
 
-    m_pSingleDownloadLabelInfo = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Switch on to use only one\nconnection when downloading." ) );
+    m_pSingleDownloadLabelInfo = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, _("Switch on to use only one connection when downloading.") ) );
     m_pSingleDownloadLabelInfo->SetPosition ( CVector2D ( vecTemp.fX + 342.f, vecTemp.fY - 4.f ) );
     m_pSingleDownloadLabelInfo->SetFont ( "default-bold-small" );
     m_pSingleDownloadLabelInfo->SetSize ( CVector2D ( 168.0f, 95.0f ) );
     vecTemp.fY += 40-4;
 
     // AltTab test
-    m_pAltTabLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Alt-tab handling test:" ) );
+    m_pAltTabLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, _("Alt-tab handling test:") ) );
     m_pAltTabLabel->SetPosition ( CVector2D ( vecTemp.fX + 10.f, vecTemp.fY ) );
     m_pAltTabLabel->AutoSize ( m_pAltTabLabel->GetText ().c_str () );
 
     m_pAltTabCombo = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabAdvanced, "" ) );
     m_pAltTabCombo->SetPosition ( CVector2D ( vecTemp.fX + 156.0f, vecTemp.fY - 1.0f ) );
     m_pAltTabCombo->SetSize ( CVector2D ( 148.0f, 95.0f ) );
-    m_pAltTabCombo->AddItem ( "Off" )->SetData ( (void*)0 );
-    m_pAltTabCombo->AddItem ( "On" )->SetData ( (void*)1 );
+    m_pAltTabCombo->AddItem ( _("Off") )->SetData ( (void*)0 );
+    m_pAltTabCombo->AddItem ( _("On") )->SetData ( (void*)1 );
     m_pAltTabCombo->SetReadOnly ( true );
 
-    m_pAltTabLabelInfo = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Experimental feature." ) );
+    m_pAltTabLabelInfo = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, _("Experimental feature.") ) );
     m_pAltTabLabelInfo->SetPosition ( CVector2D ( vecTemp.fX + 342.f, vecTemp.fY - 4.f ) );
     m_pAltTabLabelInfo->SetFont ( "default-bold-small" );
     m_pAltTabLabelInfo->SetSize ( CVector2D ( 168.0f, 95.0f ) );
     vecTemp.fY += 40-4;
 
     // Debug setting
-    m_pDebugSettingLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Debug setting:" ) );
+    m_pDebugSettingLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, _("Debug setting:") ) );
     m_pDebugSettingLabel->SetPosition ( CVector2D ( vecTemp.fX + 10.f, vecTemp.fY ) );
     m_pDebugSettingLabel->AutoSize ( m_pDebugSettingLabel->GetText ().c_str () );
 
     m_pDebugSettingCombo = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabAdvanced, "" ) );
     m_pDebugSettingCombo->SetPosition ( CVector2D ( vecTemp.fX + 156.0f, vecTemp.fY - 1.0f ) );
     m_pDebugSettingCombo->SetSize ( CVector2D ( 148.0f, 20.0f * ( EDiagnosticDebug::MAX + 1 ) ) );
-    m_pDebugSettingCombo->AddItem ( "Default" )->SetData ( (void*)0 );
+    m_pDebugSettingCombo->AddItem ( _("Default") )->SetData ( (void*)0 );
     m_pDebugSettingCombo->AddItem ( "#6734 Graphics" )->SetData ( (void*)EDiagnosticDebug::GRAPHICS_6734 );
     //m_pDebugSettingCombo->AddItem ( "#6778 BIDI" )->SetData ( (void*)EDiagnosticDebug::BIDI_6778 );
     m_pDebugSettingCombo->AddItem ( "#6732 D3D" )->SetData ( (void*)EDiagnosticDebug::D3D_6732 );
@@ -945,19 +955,19 @@ void CSettings::CreateGUI ( void )
     m_pDebugSettingCombo->AddItem ( "#0000 Joystick" )->SetData ( (void*)EDiagnosticDebug::JOYSTICK_0000 );
     m_pDebugSettingCombo->SetReadOnly ( true );
 
-    m_pDebugSettingLabelInfo = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Select default always.\n(This setting is not saved)" ) );
+    m_pDebugSettingLabelInfo = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, _("Select default always. (This setting is not saved)") ) );
     m_pDebugSettingLabelInfo->SetPosition ( CVector2D ( vecTemp.fX + 342.f, vecTemp.fY - 4.f ) );
     m_pDebugSettingLabelInfo->SetFont ( "default-bold-small" );
     m_pDebugSettingLabelInfo->SetSize ( CVector2D ( 168.0f, 95.0f ) );
     vecTemp.fY += 40-4;
 
-    m_pDebugSettingCombo->SetText ( "Default" );
+    m_pDebugSettingCombo->SetText ( _("Default") );
     SetApplicationSetting ( "diagnostics", "debug-setting", "none" );
 
     // Streaming memory
-    m_pStreamingMemoryLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Streaming memory:" ) );
+    m_pStreamingMemoryLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, _("Streaming memory:") ) );
     m_pStreamingMemoryLabel->SetPosition ( CVector2D ( vecTemp.fX + 10.f, vecTemp.fY + 0.0f ) );
-    m_pStreamingMemoryLabel->AutoSize ( "Streaming memory:" );
+    m_pStreamingMemoryLabel->AutoSize ( _("Streaming memory:") );
 
     unsigned int uiMinMemory = g_pCore->GetMinStreamingMemory ();
     unsigned int uiMaxMemory = g_pCore->GetMaxStreamingMemory ();
@@ -967,48 +977,48 @@ void CSettings::CreateGUI ( void )
     m_pStreamingMemory->SetSize ( CVector2D ( 130.0f, 20.0f ) );
     m_pStreamingMemory->SetProperty ( "StepSize", SString("%.07lf", 1.0 / (uiMaxMemory - uiMinMemory)) );
 
-    m_pStreamingMemoryMinLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Min") );
+    m_pStreamingMemoryMinLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, _("Min")) );
     m_pStreamingMemoryMinLabel->SetPosition ( CVector2D ( vecTemp.fX + 141.0f, vecTemp.fY ) );
     m_pStreamingMemoryMinLabel->AutoSize ( m_pStreamingMemoryMinLabel->GetText ().c_str () );
 
-    m_pStreamingMemoryMaxLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Max") );
+    m_pStreamingMemoryMaxLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, _("Max")) );
     m_pStreamingMemoryMaxLabel->SetPosition ( CVector2D ( vecTemp.fX + 300.0f, vecTemp.fY ) );
     m_pStreamingMemoryMaxLabel->AutoSize ( m_pStreamingMemoryMaxLabel->GetText ().c_str () );
 
-    m_pStreamingMemoryLabelInfo = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Maximum is usually best" ) );
+    m_pStreamingMemoryLabelInfo = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, _("Maximum is usually best") ) );
     m_pStreamingMemoryLabelInfo->SetPosition ( CVector2D ( vecTemp.fX + 342.f, vecTemp.fY - 0.f ) );
     m_pStreamingMemoryLabelInfo->SetFont ( "default-bold-small" );
     m_pStreamingMemoryLabelInfo->SetSize ( CVector2D ( 168.0f, 95.0f ) );
     vecTemp.fY += 40-4;
 
     // Auto updater section label
-    m_pAdvancedUpdaterLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Auto updater" ) );
+    m_pAdvancedUpdaterLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, _("Auto updater") ) );
     m_pAdvancedUpdaterLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY ) );
     m_pAdvancedUpdaterLabel->SetFont ( "default-bold-small" );
-    m_pAdvancedUpdaterLabel->AutoSize ( "Auto updater" );
+    m_pAdvancedUpdaterLabel->AutoSize ( ("Auto updater") );
     vecTemp.fY += 20;
 
     // Update build type
-    m_pUpdateBuildTypeLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Update build type:" ) );
+    m_pUpdateBuildTypeLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, _("Update build type:") ) );
     m_pUpdateBuildTypeLabel->SetPosition ( CVector2D ( vecTemp.fX + 10.f, vecTemp.fY ) );
     m_pUpdateBuildTypeLabel->AutoSize ( m_pUpdateBuildTypeLabel->GetText ().c_str () );
 
     m_pUpdateBuildTypeCombo = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabAdvanced, "" ) );
     m_pUpdateBuildTypeCombo->SetPosition ( CVector2D ( vecTemp.fX + 156.0f, vecTemp.fY - 1.0f ) );
     m_pUpdateBuildTypeCombo->SetSize ( CVector2D ( 148.0f, 95.0f ) );
-    m_pUpdateBuildTypeCombo->AddItem ( "Default" )->SetData ( (void*)0 );
+    m_pUpdateBuildTypeCombo->AddItem ( _("Default") )->SetData ( (void*)0 );
     m_pUpdateBuildTypeCombo->AddItem ( "Beta" )->SetData ( (void*)1 );
     m_pUpdateBuildTypeCombo->AddItem ( "Nightly" )->SetData ( (void*)2 );
     m_pUpdateBuildTypeCombo->SetReadOnly ( true );
 
-    m_pUpdateBuildTypeLabelInfo = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Select default unless you like\nfilling out bug reports." ) );
+    m_pUpdateBuildTypeLabelInfo = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, _("Select default unless you like filling out bug reports.") ) );
     m_pUpdateBuildTypeLabelInfo->SetPosition ( CVector2D ( vecTemp.fX + 342.f, vecTemp.fY - 4.f ) );
     m_pUpdateBuildTypeLabelInfo->SetFont ( "default-bold-small" );
     m_pUpdateBuildTypeLabelInfo->SetSize ( CVector2D ( 168.0f, 95.0f ) );
     vecTemp.fY += 35;
 
     // Check for updates
-    m_pButtonUpdate = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( pTabAdvanced, "Check for update now" ) );
+    m_pButtonUpdate = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( pTabAdvanced, _("Check for update now") ) );
     m_pButtonUpdate->SetPosition ( CVector2D ( vecTemp.fX + 10.f, vecTemp.fY ) );
     m_pButtonUpdate->SetSize ( CVector2D ( 168.0f, 24.0f ) );
     m_pButtonUpdate->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnUpdateButtonClick, this ) );
@@ -1038,7 +1048,7 @@ void CSettings::CreateGUI ( void )
     m_pCheckBoxCustomizedSAFiles->SetClickHandler ( GUI_CALLBACK( &CSettings::OnCustomizedSAFilesClick, this ) );
     /*
     // Give a warning if no community account settings were stored in config
-    CCore::GetSingleton ().ShowMessageBox ( CORE_SETTINGS_COMMUNITY_WARNING, "Multi Theft Auto: Community settings", MB_ICON_WARNING );
+    CCore::GetSingleton ().ShowMessageBox ( CORE_SETTINGS_COMMUNITY_WARNING, _("Multi Theft Auto: Community settings"), MB_ICON_WARNING );
     */
 
     // Load Chat presets
@@ -1132,36 +1142,36 @@ void CSettings::UpdateVideoTab ( bool bIsVideoModeChanged )
     bool bIsAeroChanged = GetApplicationSettingInt ( "aero-enabled"  ) ? false : true != m_pCheckBoxDisableAero->GetSelected ();
     if ( bIsVideoModeChanged || bIsAntiAliasingChanged || bIsAeroChanged )
     {
-        SString strChangedOptions;
+        SString strChangedOptions; //!ACHTUNG:  Need to consider something that applies universally to grammar rules
         if ( bIsVideoModeChanged )
         {
-            strChangedOptions += "Resolution";
+            strChangedOptions += _("Resolution");
             if ( bNextFSMinimize != GetVideoModeManager ()->IsMinimizeEnabled () )
-                strChangedOptions += "/Full Screen Minimize";
+                strChangedOptions += _("/Full Screen Minimize");
         }
 
         if ( bIsAntiAliasingChanged )
         {
             if ( !strChangedOptions.empty () )
-                strChangedOptions += " and ";
-            strChangedOptions += "Anti-aliasing";
+                strChangedOptions += _(" and ");
+            strChangedOptions += _("Anti-aliasing");
         }
 
         if ( bIsAeroChanged )
         {
             if ( !strChangedOptions.empty () )
-                strChangedOptions += " and ";
-            strChangedOptions += "Aero setting";
+                strChangedOptions += _(" and ");
+            strChangedOptions += _("Aero setting");
         }
 
-        SString strMessage ( "%s will be changed when you next start MTA", strChangedOptions.c_str () );
-        strMessage += "\n\nDo you want to restart now?";
+        SString strMessage ( _("%s will be changed when you next start MTA"), strChangedOptions.c_str () );
+        strMessage += _("\n\nDo you want to restart now?");
         CQuestionBox* pQuestionBox = CCore::GetSingleton ().GetLocalGUI ()->GetMainMenu ()->GetQuestionWindow ();
         pQuestionBox->Reset ();
-        pQuestionBox->SetTitle ( "RESTART REQUIRED" );
+        pQuestionBox->SetTitle ( _("RESTART REQUIRED") );
         pQuestionBox->SetMessage ( strMessage );
-        pQuestionBox->SetButton ( 0, "No" );
-        pQuestionBox->SetButton ( 1, "Yes" );
+        pQuestionBox->SetButton ( 0, _("No") );
+        pQuestionBox->SetButton ( 1, _("Yes") );
         pQuestionBox->SetCallback ( RestartCallBack );
         pQuestionBox->Show ();
     }
@@ -1178,21 +1188,21 @@ void CSettings::UpdateVideoTab ( bool bIsVideoModeChanged )
     m_pAnisotropic->SetScrollPosition ( iAnisotropic / ( float )m_iMaxAnisotropic );
 
     int FxQuality = gameSettings->GetFXQuality();
-    if ( FxQuality == 0 ) m_pComboFxQuality->SetText ( "Low" );
-    else if ( FxQuality == 1 ) m_pComboFxQuality->SetText ( "Medium" );
-    else if ( FxQuality == 2 ) m_pComboFxQuality->SetText ( "High" );
-    else if ( FxQuality == 3 ) m_pComboFxQuality->SetText ( "Very high" );
+    if ( FxQuality == 0 ) m_pComboFxQuality->SetText ( _("Low") );
+    else if ( FxQuality == 1 ) m_pComboFxQuality->SetText ( _("Medium") );
+    else if ( FxQuality == 2 ) m_pComboFxQuality->SetText ( _("High") );
+    else if ( FxQuality == 3 ) m_pComboFxQuality->SetText ( _("Very high") );
 
     char AntiAliasing = gameSettings->GetAntiAliasing();
-    if ( AntiAliasing == 1 ) m_pComboAntiAliasing->SetText ( "Off" );
-    else if ( AntiAliasing == 2 ) m_pComboAntiAliasing->SetText ( "1x" );
-    else if ( AntiAliasing == 3 ) m_pComboAntiAliasing->SetText ( "2x" );
-    else if ( AntiAliasing == 4 ) m_pComboAntiAliasing->SetText ( "3x" );
+    if ( AntiAliasing == 1 ) m_pComboAntiAliasing->SetText ( _("Off") );
+    else if ( AntiAliasing == 2 ) m_pComboAntiAliasing->SetText ( _("1x") );
+    else if ( AntiAliasing == 3 ) m_pComboAntiAliasing->SetText ( _("2x") );
+    else if ( AntiAliasing == 4 ) m_pComboAntiAliasing->SetText ( _("3x") );
 
     // Aspect ratio
     int aspectRatio;
     CVARS_GET("aspect_ratio", aspectRatio);
-    if ( aspectRatio == ASPECT_RATIO_AUTO ) m_pComboAspectRatio->SetText ( "Auto" );
+    if ( aspectRatio == ASPECT_RATIO_AUTO ) m_pComboAspectRatio->SetText ( _("Auto") );
     else if ( aspectRatio == ASPECT_RATIO_4_3 ) m_pComboAspectRatio->SetText ( "4:3" );
     else if ( aspectRatio == ASPECT_RATIO_16_10 ) m_pComboAspectRatio->SetText ( "16:10" );
     else if ( aspectRatio == ASPECT_RATIO_16_9 ) m_pComboAspectRatio->SetText ( "16:9" );
@@ -1456,7 +1466,7 @@ bool CSettings::OnAxisSelectClick ( CGUIElement* pElement )
     if ( GetJoystickManager ()->BindNextUsedAxisToOutput ( index ) )
     {
         m_bCaptureAxis = true;
-        CCore::GetSingleton ().ShowMessageBox ( "Binding axis", "Move an axis to bind, or escape to clear", MB_ICON_QUESTION );
+        CCore::GetSingleton ().ShowMessageBox ( _("Binding axis"), _("Move an axis to bind, or escape to clear"), MB_ICON_QUESTION );
     }
 
     return true;
@@ -1717,13 +1727,13 @@ bool CSettings::OnBindsListClick ( CGUIElement* pElement )
             if ( m_pBindsList->GetItemColumnIndex ( pItem ) == 1/*m_hPriKey  Note: handle is not the same as index */ ) {
                 // Create a messagebox to notify the user
                 //SString strText = SString::Printf ( "Press a key to bind to '%s'", pItemBind->GetText ().c_str () );
-                SString strText = "Press a key to bind, or escape to clear";
-                CCore::GetSingleton ().ShowMessageBox ( "Binding a primary key", strText, MB_ICON_QUESTION );
+                SString strText = _("Press a key to bind, or escape to clear");
+                CCore::GetSingleton ().ShowMessageBox ( _("Binding a primary key"), strText, MB_ICON_QUESTION );
             } else {
                 // Create a messagebox to notify the user
                 //sSString strText = SString::Printf ( "Press a key to bind to '%s'", pItemBind->GetText ().c_str () );
-                SString strText = "Press a key to bind, or escape to clear";
-                CCore::GetSingleton ().ShowMessageBox ( "Binding a secondary key", strText, MB_ICON_QUESTION );
+                SString strText = _("Press a key to bind, or escape to clear");
+                CCore::GetSingleton ().ShowMessageBox ( _("Binding a secondary key"), strText, MB_ICON_QUESTION );
             }
         }
     }
@@ -2030,7 +2040,7 @@ bool CSettings::OnOKButtonClick ( CGUIElement* pElement )
     // Invalid nickname?
     if ( !CCore::GetSingleton ().IsValidNick ( m_pEditNick->GetText ().c_str () ) )
     {
-        CCore::GetSingleton ().ShowMessageBox ( "Error", "Your nickname contains invalid characters!", MB_BUTTON_OK | MB_ICON_INFO );
+        CCore::GetSingleton ().ShowMessageBox ( _("Error"), _("Your nickname contains invalid characters!"), MB_BUTTON_OK | MB_ICON_INFO );
         return true;
     }
 
@@ -2070,7 +2080,7 @@ bool CSettings::OnLoginButtonClick ( CGUIElement* pElement )
         if ( m_pEditUser->GetText().empty() ||
             m_pEditPass->GetText().empty() )
         {
-            g_pCore->ShowMessageBox ( "Login Error", "Invalid username/password", MB_BUTTON_OK | MB_ICON_ERROR );
+            g_pCore->ShowMessageBox ( _("Login Error"), _("Invalid username/password"), MB_BUTTON_OK | MB_ICON_ERROR );
             return true;
         }
         else
@@ -2078,7 +2088,7 @@ bool CSettings::OnLoginButtonClick ( CGUIElement* pElement )
             m_pEditUser->SetEnabled ( false );
             m_pEditPass->SetEnabled ( false );
             m_pButtonLogin->SetEnabled ( false );
-            m_pButtonLogin->SetText ( "Logging in..." );
+            m_pButtonLogin->SetText ( _("Logging in...") );
 
             // Hash password
             char szPassword[33];
@@ -2125,7 +2135,7 @@ void CSettings::OnLoginCallback ( bool bResult, char* szError, void* obj )
 {   // This callback function is called by CCommunity whenever an error has occurred
     if ( !bResult )
     {
-        g_pCore->ShowMessageBox ( "Login Error", szError, MB_BUTTON_OK | MB_ICON_ERROR );
+        g_pCore->ShowMessageBox ( _("Login Error"), szError, MB_BUTTON_OK | MB_ICON_ERROR );
     }
 }
 
@@ -2134,7 +2144,7 @@ void CSettings::OnLoginStateChange ( bool bResult )
 {   // This function is called by CCommunity whenever the logged-in status changes
     m_pEditUser->SetEnabled ( !bResult );
     m_pEditPass->SetEnabled ( !bResult );
-    m_pButtonLogin->SetText ( ( bResult ) ? "Logout" : "Login" );
+    m_pButtonLogin->SetText ( ( bResult ) ? _("Logout") : _("Login") );
     m_pButtonLogin->SetEnabled ( true );
     m_pButtonRegister->SetVisible ( !bResult );
 }
@@ -2221,13 +2231,13 @@ void CSettings::LoadData ( void )
     m_pAnisotropic->SetScrollPosition ( iAnisotropic / ( float )m_iMaxAnisotropic );
 
     int FxQuality = gameSettings->GetFXQuality();
-    if ( FxQuality == 0 ) m_pComboFxQuality->SetText ( "Low" );
-    else if ( FxQuality == 1 ) m_pComboFxQuality->SetText ( "Medium" );
-    else if ( FxQuality == 2 ) m_pComboFxQuality->SetText ( "High" );
-    else if ( FxQuality == 3 ) m_pComboFxQuality->SetText ( "Very high" );
+    if ( FxQuality == 0 ) m_pComboFxQuality->SetText ( _("Low") );
+    else if ( FxQuality == 1 ) m_pComboFxQuality->SetText ( _("Medium") );
+    else if ( FxQuality == 2 ) m_pComboFxQuality->SetText ( _("High") );
+    else if ( FxQuality == 3 ) m_pComboFxQuality->SetText ( _("Very high") );
 
     char AntiAliasing = gameSettings->GetAntiAliasing();
-    if ( AntiAliasing == 1 ) m_pComboAntiAliasing->SetText ( "Off" );
+    if ( AntiAliasing == 1 ) m_pComboAntiAliasing->SetText ( _("Off") );
     else if ( AntiAliasing == 2 ) m_pComboAntiAliasing->SetText ( "1x" );
     else if ( AntiAliasing == 3 ) m_pComboAntiAliasing->SetText ( "2x" );
     else if ( AntiAliasing == 4 ) m_pComboAntiAliasing->SetText ( "3x" );
@@ -2235,7 +2245,7 @@ void CSettings::LoadData ( void )
     // Aspect ratio
     int aspectRatio;
     CVARS_GET("aspect_ratio", aspectRatio);
-    if ( aspectRatio == ASPECT_RATIO_AUTO ) m_pComboAspectRatio->SetText ( "Auto" );
+    if ( aspectRatio == ASPECT_RATIO_AUTO ) m_pComboAspectRatio->SetText ( _("Auto") );
     else if ( aspectRatio == ASPECT_RATIO_4_3 ) m_pComboAspectRatio->SetText ( "4:3" );
     else if ( aspectRatio == ASPECT_RATIO_16_10 ) m_pComboAspectRatio->SetText ( "16:10" );
     else if ( aspectRatio == ASPECT_RATIO_16_9 ) m_pComboAspectRatio->SetText ( "16:9" );
@@ -2322,35 +2332,35 @@ void CSettings::LoadData ( void )
     // Async loading
     int iVar;
     CVARS_GET ( "async_loading", iVar );
-    if ( iVar == 0 ) m_pAsyncCombo->SetText ( "Off" );
-    else if ( iVar == 1 ) m_pAsyncCombo->SetText ( "Auto" );
-    else if ( iVar == 2 ) m_pAsyncCombo->SetText ( "On" );
+    if ( iVar == 0 ) m_pAsyncCombo->SetText ( _("Off") );
+    else if ( iVar == 1 ) m_pAsyncCombo->SetText ( _("Auto") );
+    else if ( iVar == 2 ) m_pAsyncCombo->SetText ( _("On") );
 
     // AltTab test
     CVARS_GET ( "display_alttab_handler", iVar );
-    if ( iVar == 0 ) m_pAltTabCombo->SetText ( "Off" );
-    else if ( iVar == 1 ) m_pAltTabCombo->SetText ( "On" );
+    if ( iVar == 0 ) m_pAltTabCombo->SetText ( _("Off") );
+    else if ( iVar == 1 ) m_pAltTabCombo->SetText ( _("On") );
 
     // Fast clothes loading
     CVARS_GET ( "fast_clothes_loading", iVar );
-    if ( iVar == CMultiplayer::FAST_CLOTHES_OFF ) m_pFastClothesCombo->SetText ( "Off" );
-    else if ( iVar == CMultiplayer::FAST_CLOTHES_AUTO ) m_pFastClothesCombo->SetText ( "Auto" );
-    else if ( iVar == CMultiplayer::FAST_CLOTHES_ON ) m_pFastClothesCombo->SetText ( "On" );
+    if ( iVar == CMultiplayer::FAST_CLOTHES_OFF ) m_pFastClothesCombo->SetText ( _("Off") );
+    else if ( iVar == CMultiplayer::FAST_CLOTHES_AUTO ) m_pFastClothesCombo->SetText ( _("Auto") );
+    else if ( iVar == CMultiplayer::FAST_CLOTHES_ON ) m_pFastClothesCombo->SetText ( _("On") );
 
     // Browser speed
     CVARS_GET ( "browser_speed", iVar );
-    if ( iVar == 0 ) m_pBrowserSpeedCombo->SetText ( "Very slow" );
-    else if ( iVar == 1 ) m_pBrowserSpeedCombo->SetText ( "Slow" );
-    else if ( iVar == 2 ) m_pBrowserSpeedCombo->SetText ( "Fast" );
+    if ( iVar == 0 ) m_pBrowserSpeedCombo->SetText ( _("Very slow") );
+    else if ( iVar == 1 ) m_pBrowserSpeedCombo->SetText ( _("Slow") );
+    else if ( iVar == 2 ) m_pBrowserSpeedCombo->SetText ( _("Fast") );
 
     // Single download
     CVARS_GET ( "single_download", iVar );
-    if ( iVar == 0 ) m_pSingleDownloadCombo->SetText ( "Default" );
-    else if ( iVar == 1 ) m_pSingleDownloadCombo->SetText ( "On" );
+    if ( iVar == 0 ) m_pSingleDownloadCombo->SetText ( _("Default") );
+    else if ( iVar == 1 ) m_pSingleDownloadCombo->SetText ( _("On") );
 
     // Update build type
     CVARS_GET ( "update_build_type", iVar );
-    if ( iVar == 0 ) m_pUpdateBuildTypeCombo->SetText ( "Default" );
+    if ( iVar == 0 ) m_pUpdateBuildTypeCombo->SetText ( _("Default") );
     else if ( iVar == 1 ) m_pUpdateBuildTypeCombo->SetText ( "Beta" );
     else if ( iVar == 2 ) m_pUpdateBuildTypeCombo->SetText ( "Nightly" );
 
@@ -2487,46 +2497,46 @@ void CSettings::SaveData ( void )
     bool bAltTabHandlerChanged = bAltTabHandlerWasEnabled != bAltTabHandlerEnabled;
     if ( bIsVideoModeChanged || bIsAntiAliasingChanged || bIsAeroChanged || bIsCustomizedSAFilesChanged || bAltTabHandlerChanged )
     {
-        SString strChangedOptions;
+        SString strChangedOptions; //!ACHTUNG:  Need to consider something that applies universally to grammar rules
         if ( bIsVideoModeChanged || bAltTabHandlerChanged )
         {
-            strChangedOptions += "Resolution";
+            strChangedOptions += _("Resolution");
             if ( bNextFSMinimize != GetVideoModeManager ()->IsMinimizeEnabled () )
-                strChangedOptions += "/Full Screen Minimize";
+                strChangedOptions += _("/Full Screen Minimize");
         }
 
         if ( bIsAntiAliasingChanged )
         {
             if ( !strChangedOptions.empty () )
-                strChangedOptions += " and ";
-            strChangedOptions += "Anti-aliasing";
+                strChangedOptions += _(" and ");
+            strChangedOptions += _("Anti-aliasing");
         }
 
         if ( bIsAeroChanged )
         {
             if ( !strChangedOptions.empty () )
-                strChangedOptions += " and ";
-            strChangedOptions += "Aero setting";
+                strChangedOptions += _(" and ");
+            strChangedOptions += _("Aero setting");
         }
 
         if ( bIsCustomizedSAFilesChanged )
         {
             if ( !strChangedOptions.empty () )
-                strChangedOptions += " and ";
-            strChangedOptions += "Customized GTA:SA files setting";
+                strChangedOptions += _(" and ");
+            strChangedOptions += _("Customized GTA:SA files setting");
         }
 
         if ( strChangedOptions.empty () )
-            strChangedOptions += "Some settings";
+            strChangedOptions += _("Some settings");
 
         SString strMessage ( "%s will be changed when you next start MTA", strChangedOptions.c_str () );
         strMessage += "\n\nDo you want to restart now?";
         CQuestionBox* pQuestionBox = CCore::GetSingleton ().GetLocalGUI ()->GetMainMenu ()->GetQuestionWindow ();
         pQuestionBox->Reset ();
-        pQuestionBox->SetTitle ( "RESTART REQUIRED" );
+        pQuestionBox->SetTitle ( _("RESTART REQUIRED") );
         pQuestionBox->SetMessage ( strMessage );
-        pQuestionBox->SetButton ( 0, "No" );
-        pQuestionBox->SetButton ( 1, "Yes" );
+        pQuestionBox->SetButton ( 0, _("No") );
+        pQuestionBox->SetButton ( 1, _("Yes") );
         pQuestionBox->SetCallback ( RestartCallBack );
         pQuestionBox->Show ();
     }
@@ -2725,10 +2735,10 @@ void CSettings::CreateChatColorTab ( ChatColorType eType, const char* szName, CG
     CGUITab* pTab = pParent->CreateTab ( szName );
     CGUILabel* pLabel;
 
-    pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTab, "Red:" ) );
+    pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTab, _("Red:") ) );
     pLabel->SetPosition ( CVector2D ( 0.05f, 0.065f ), true );
     pLabel->GetPosition ( vecTemp, false );
-    pLabel->AutoSize ( "Red:" );
+    pLabel->AutoSize ( _("Red:") );
 
     m_pChatRedValue [ eType ] = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTab, "0" ) );
     m_pChatRedValue [ eType ]->SetPosition ( CVector2D ( vecTemp.fX + 270.0f, vecTemp.fY) );
@@ -2740,10 +2750,10 @@ void CSettings::CreateChatColorTab ( ChatColorType eType, const char* szName, CG
     m_pChatRed [ eType ]->SetOnScrollHandler ( GUI_CALLBACK( &CSettings::OnChatRedChanged, this ) );
     m_pChatRed [ eType ]->SetProperty ( "StepSize", "0.004" );
 
-    pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTab, "Green:" ) );
+    pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTab, _("Green:") ) );
     pLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 30.0f ) );
     pLabel->GetPosition ( vecTemp, false );
-    pLabel->AutoSize ( "Green:" );
+    pLabel->AutoSize ( _("Green:") );
 
     m_pChatGreenValue [ eType ] = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTab, "0" ) );
     m_pChatGreenValue [ eType ]->SetPosition ( CVector2D ( vecTemp.fX + 270.0f, vecTemp.fY) );
@@ -2755,10 +2765,10 @@ void CSettings::CreateChatColorTab ( ChatColorType eType, const char* szName, CG
     m_pChatGreen [ eType ]->SetOnScrollHandler ( GUI_CALLBACK( &CSettings::OnChatGreenChanged, this ) );
     m_pChatGreen [ eType ]->SetProperty ( "StepSize", "0.004" );
 
-    pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTab, "Blue:" ) );
+    pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTab, _("Blue:") ) );
     pLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 30.0f ) );
     pLabel->GetPosition ( vecTemp, false );
-    pLabel->AutoSize ( "Blue:" );
+    pLabel->AutoSize ( _("Blue:") );
 
     m_pChatBlueValue [ eType ] = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTab, "0" ) );
     m_pChatBlueValue [ eType ]->SetPosition ( CVector2D ( vecTemp.fX + 270.0f, vecTemp.fY) );
@@ -2770,10 +2780,10 @@ void CSettings::CreateChatColorTab ( ChatColorType eType, const char* szName, CG
     m_pChatBlue [ eType ]->SetOnScrollHandler ( GUI_CALLBACK( &CSettings::OnChatBlueChanged, this ) );
     m_pChatBlue [ eType ]->SetProperty ( "StepSize", "0.004" );
 
-    pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTab, "Transparency:" ) );
+    pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTab, _("Transparency:") ) );
     pLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 30.0f ) );
     pLabel->GetPosition ( vecTemp, false );
-    pLabel->AutoSize ( "Transparency:" );
+    pLabel->AutoSize ( _("Transparency:") );
 
     m_pChatAlphaValue [ eType ] = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTab, "0" ) );
     m_pChatAlphaValue [ eType ]->SetPosition ( CVector2D ( vecTemp.fX + 270.0f, vecTemp.fY) );
@@ -3022,7 +3032,7 @@ bool CSettings::OnSkinChanged ( CGUIElement* pElement )
             strItemText = m_pInterfaceSkinSelector->GetItemText( ++uiIndex );
         }
         m_pInterfaceSkinSelector->SetSelectedItemByIndex(uiIndex);
-        g_pCore->ShowMessageBox ( "Error", "Please disconnect before changing skin", MB_BUTTON_OK | MB_ICON_INFO );
+        g_pCore->ShowMessageBox ( _("Error"), _("Please disconnect before changing skin"), MB_BUTTON_OK | MB_ICON_INFO );
         m_pWindow->MoveToBack();
         return true;
     }
@@ -3054,7 +3064,7 @@ bool CSettings::OnAnisotropicChanged ( CGUIElement* pElement )
     if ( iAnisotropic > 0 )
         strLabel = SString ( "%ix", 1 << iAnisotropic );
     else
-        strLabel = "Off";
+        strLabel = _("Off");
 
     m_pAnisotropicValueLabel->SetText ( strLabel );
     return true;
@@ -3232,14 +3242,14 @@ bool CSettings::OnVolumetricShadowsClick ( CGUIElement* pElement )
     if ( m_pCheckBoxVolumetricShadows->GetSelected () && !m_bShownVolumetricShadowsWarning )
     {
         m_bShownVolumetricShadowsWarning = true;
-        SStringX strMessage ( "Volmetric shadows can cause some systems to slow down." );
-        strMessage += "\n\nAre you sure you want to enable them?";
+        SStringX strMessage ( _("Volmetric shadows can cause some systems to slow down."
+                                "\n\nAre you sure you want to enable them?") );
         CQuestionBox* pQuestionBox = CCore::GetSingleton ().GetLocalGUI ()->GetMainMenu ()->GetQuestionWindow ();
         pQuestionBox->Reset ();
-        pQuestionBox->SetTitle ( "PERFORMANCE WARNING" );
+        pQuestionBox->SetTitle ( _("PERFORMANCE WARNING") );
         pQuestionBox->SetMessage ( strMessage );
-        pQuestionBox->SetButton ( 0, "No" );
-        pQuestionBox->SetButton ( 1, "Yes" );
+        pQuestionBox->SetButton ( 0, _("No") );
+        pQuestionBox->SetButton ( 1, _("Yes") );
         pQuestionBox->SetCallback ( VolumetricShadowsCallBack, m_pCheckBoxVolumetricShadows );
         pQuestionBox->Show ();
     }
@@ -3255,9 +3265,9 @@ bool CSettings::OnAllowScreenUploadClick ( CGUIElement* pElement )
     {
         m_bShownAllowScreenUploadMessage = true;
         SString strMessage;
-        strMessage += "Screen upload is required by some servers for anti-cheat purposes.";
-        strMessage += "\n\n(The chat box and GUI is excluded from the upload)\n";
-        CCore::GetSingleton ().ShowMessageBox ( "SCREEN UPLOAD INFORMATION", strMessage, MB_BUTTON_OK | MB_ICON_INFO );
+        strMessage += _("Screen upload is required by some servers for anti-cheat purposes."
+                        "\n\n(The chat box and GUI is excluded from the upload)\n");
+        CCore::GetSingleton ().ShowMessageBox ( _("SCREEN UPLOAD INFORMATION"), strMessage, MB_BUTTON_OK | MB_ICON_INFO );
     }
     return true;
 }
@@ -3278,16 +3288,16 @@ bool CSettings::OnCustomizedSAFilesClick ( CGUIElement* pElement )
     if ( m_pCheckBoxCustomizedSAFiles->GetSelected () )
     {
         SString strMessage;
-        strMessage += "Some files in your GTA:SA data directory are customized.";
-        strMessage += "\nMTA will only use these modified files if this check box is ticked.";
-        strMessage += "\n\nHowever, CUSTOMIZED GTA:SA FILES ARE BLOCKED BY MANY SERVERS";
-        strMessage += "\n\nAre you sure you want to use them?";
+        strMessage += _(    "Some files in your GTA:SA data directory are customized."
+                            "\nMTA will only use these modified files if this check box is ticked."
+                            "\n\nHowever, CUSTOMIZED GTA:SA FILES ARE BLOCKED BY MANY SERVERS"
+                            "\n\nAre you sure you want to use them?" );
         CQuestionBox* pQuestionBox = CCore::GetSingleton ().GetLocalGUI ()->GetMainMenu ()->GetQuestionWindow ();
         pQuestionBox->Reset ();
-        pQuestionBox->SetTitle ( "CUSTOMIZED GTA:SA FILES" );
+        pQuestionBox->SetTitle ( _("CUSTOMIZED GTA:SA FILES") );
         pQuestionBox->SetMessage ( strMessage );
-        pQuestionBox->SetButton ( 0, "No" );
-        pQuestionBox->SetButton ( 1, "Yes" );
+        pQuestionBox->SetButton ( 0, _("No") );
+        pQuestionBox->SetButton ( 1, _("Yes") );
         pQuestionBox->SetCallback ( CustomizedSAFilesCallBack, m_pCheckBoxCustomizedSAFiles );
         pQuestionBox->Show ();
     }
@@ -3300,7 +3310,7 @@ void NewNicknameCallback ( void* ptr, unsigned int uiButton, std::string strNick
     if ( uiButton == 1 )  // We hit OK
     {
         if ( !CCore::GetSingleton ().IsValidNick ( strNick.c_str () ) )
-            CCore::GetSingleton ().ShowMessageBox ( "Error", "Your nickname contains invalid characters!", MB_BUTTON_OK | MB_ICON_INFO );
+            CCore::GetSingleton ().ShowMessageBox ( _("Error"), _("Your nickname contains invalid characters!"), MB_BUTTON_OK | MB_ICON_INFO );
         else
         {
             CVARS_SET ( "nick", strNick ) ;
@@ -3318,10 +3328,10 @@ void CSettings::RequestNewNickname ( void )
 
         CQuestionBox* pQuestionBox = CCore::GetSingleton ().GetLocalGUI ()->GetMainMenu ()->GetQuestionWindow ();
         pQuestionBox->Reset ();
-        pQuestionBox->SetTitle ( "Please enter a nickname" );
-        pQuestionBox->SetMessage ( "Please enter a nickname to be used ingame.  \nThis will be your name when you connect to and play in a server"  );
-        pQuestionBox->SetButton ( 0, "Cancel" );
-        pQuestionBox->SetButton ( 1, "OK" );
+        pQuestionBox->SetTitle ( _("Please enter a nickname") );
+        pQuestionBox->SetMessage ( _("Please enter a nickname to be used ingame.  \nThis will be your name when you connect to and play in a server")  );
+        pQuestionBox->SetButton ( 0, _("Cancel") );
+        pQuestionBox->SetButton ( 1, _("OK") );
         pQuestionBox->SetEditbox ( 0, strNick )->SetMaxLength ( MAX_PLAYER_NICK_LENGTH );
         pQuestionBox->SetCallbackEdit ( NewNicknameCallback );
         pQuestionBox->Show ();

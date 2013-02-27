@@ -35,6 +35,7 @@ private:
     CGUIWindow*             m_pWindow;
     CGUILabel*              m_pLabels [30];
     CGUIButton*             m_pButtonOK;
+    SString                 m_strCredits;
 
     clock_t                 m_clkStart;
 };
