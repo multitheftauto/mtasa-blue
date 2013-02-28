@@ -262,6 +262,9 @@ public:
     static bool                         SetObjectScale                      ( CClientEntity& Entity, const CVector& vecScale  );
     static bool                         SetObjectStatic                     ( CClientEntity& Entity, bool bStatic );
     static bool                         SetObjectBreakable                  ( CClientEntity& Entity, bool bBreakable );
+    static bool                         BreakObject                         ( CClientEntity& Entity );
+    static bool                         RespawnObject                       ( CClientEntity& Entity );
+    static bool                         ToggleObjectRespawn                 ( CClientEntity& Entity, bool bRespawn );
     
     // Radar-area get funcs
     static CClientRadarArea*            CreateRadarArea                     ( CResource& Resource, const CVector2D& vecPosition2D, const CVector2D& vecSize, const SColor color );

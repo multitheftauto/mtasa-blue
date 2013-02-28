@@ -3541,6 +3541,49 @@ bool CStaticFunctionDefinitions::SetObjectBreakable ( CClientEntity& Entity, boo
     return false;
 }
 
+bool CStaticFunctionDefinitions::BreakObject ( CClientEntity& Entity )
+{
+    RUN_CHILDREN BreakObject ( **iter );
+
+    if ( IS_OBJECT ( &Entity ) )
+    {
+        CDeathmatchObject& Object = static_cast < CDeathmatchObject& > ( Entity );
+        return Object.Break ();
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::RespawnObject ( CClientEntity& Entity )
+{
+    RUN_CHILDREN RespawnObject ( **iter );
+
+    if ( IS_OBJECT ( &Entity ) )
+    {
+        CDeathmatchObject& Object = static_cast < CDeathmatchObject& > ( Entity );
+
+        // Are we already being respawned?
+        if ( Object.IsBeingRespawned () )
+            return false;
+
+        m_pClientGame->GetObjectRespawner ()->Respawn ( &Object );
+        return true;
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::ToggleObjectRespawn ( CClientEntity& Entity, bool bRespawn )
+{
+    RUN_CHILDREN ToggleObjectRespawn ( **iter, bRespawn );
+
+    if ( IS_OBJECT ( &Entity ) )
+    {
+        CDeathmatchObject& Object = static_cast < CDeathmatchObject& > ( Entity );
+        Object.SetRespawnEnabled ( bRespawn );
+        return true;
+    }
+    return false;
+}
+
 CClientRadarArea* CStaticFunctionDefinitions::CreateRadarArea ( CResource& Resource, const CVector2D& vecPosition2D, const CVector2D& vecSize, const SColor color )
 {
     // Create it

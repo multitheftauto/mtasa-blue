@@ -272,6 +272,15 @@ DWORD RETURN_CHeli_ProcessHeliKill_RETN_Cancel = 0x6DB9E0;
 DWORD RETURN_CHeli_ProcessHeliKill_RETN_Cont_Zero = 0x6DB207;
 DWORD RETURN_CHeli_ProcessHeliKill_6DB437h = 0x6DB437;
 
+#define HOOKPOS_CObject_ProcessBreak                        0x5A0F0F
+DWORD RETURN_CObject_ProcessBreak = 0x5A0F14;
+#define HOOKPOS_CObject_ProcessDamage                       0x5A0E0D
+DWORD RETURN_CObject_ProcessDamage = 0x5A0E13;
+DWORD RETURN_CObject_ProcessDamage_Cancel = 0x5A1241;
+#define HOOKPOS_CObject_ProcessCollision                    0x548DC7
+DWORD RETURN_CObject_ProcessCollision = 0x548DD1;
+DWORD JMP_DynamicObject_Cond_Zero = 0x548E98;
+
 CPed* pContextSwitchedPed = 0;
 CVector vecCenterOfWorld;
 FLOAT fFalseHeading;
@@ -335,6 +344,8 @@ BlendAnimationHandler* m_pBlendAnimationHandler = NULL;
 ProcessCollisionHandler* m_pProcessCollisionHandler = NULL;
 VehicleCollisionHandler* m_pVehicleCollisionHandler = NULL;
 HeliKillHandler* m_pHeliKillHandler = NULL;
+ObjectDamageHandler* m_pObjectDamageHandler = NULL;
+ObjectBreakHandler* m_pObjectBreakHandler = NULL;
 CEntitySAInterface * dwSavedPlayerPointer = 0;
 CEntitySAInterface * activeEntityForStreaming = 0; // the entity that the streaming system considers active
 
@@ -467,6 +478,11 @@ void HOOK_CClothes_RebuildPlayer ();
 void HOOK_CProjectileInfo_Update_FindLocalPlayer_FindLocalPlayerVehicle ();
 
 void HOOK_CHeli_ProcessHeliKill ();
+
+void HOOK_CObject_ProcessDamage ();
+void HOOK_CObject_ProcessBreak ();
+void HOOK_CObject_ProcessCollision ();
+
 
 CMultiplayerSA::CMultiplayerSA()
 {
@@ -661,6 +677,11 @@ void CMultiplayerSA::InitHooks()
     HookInstallCall ( (DWORD)HOOKPOS_CProjectileInfo_FindPlayerVehicle, (DWORD)HOOK_CProjectileInfo_Update_FindLocalPlayer_FindLocalPlayerVehicle );
 
     HookInstall( (DWORD)HOOKPOS_CHeli_ProcessHeliKill, (DWORD)HOOK_CHeli_ProcessHeliKill, 6);
+
+    // Hooks for object break events
+    HookInstall ( HOOKPOS_CObject_ProcessDamage, (DWORD)HOOK_CObject_ProcessDamage, 6 );
+    HookInstall ( HOOKPOS_CObject_ProcessBreak, (DWORD)HOOK_CObject_ProcessBreak, 5 );
+    HookInstall ( HOOKPOS_CObject_ProcessCollision, (DWORD)HOOK_CObject_ProcessCollision, 10 );
 
     // Disable GTA setting g_bGotFocus to false when we minimize
     MemSet ( (void *)ADDR_GotFocus, 0x90, pGameInterface->GetGameVersion () == VERSION_EU_10 ? 6 : 10 );
@@ -2062,6 +2083,16 @@ void CMultiplayerSA::SetVehicleCollisionHandler ( VehicleCollisionHandler * pHan
 void CMultiplayerSA::SetHeliKillHandler ( HeliKillHandler * pHandler )
 {
     m_pHeliKillHandler = pHandler;
+}
+
+void CMultiplayerSA::SetObjectDamageHandler ( ObjectDamageHandler * pHandler )
+{
+    m_pObjectDamageHandler = pHandler;
+}
+
+void CMultiplayerSA::SetObjectBreakHandler ( ObjectBreakHandler * pHandler )
+{
+    m_pObjectBreakHandler = pHandler;
 }
 
 // What we do here is check if the idle handler has been set
@@ -6217,6 +6248,122 @@ void _declspec(naked) HOOK_CHeli_ProcessHeliKill ( )
             jmp RETURN_CHeli_ProcessHeliKill_RETN_Cont_Zero
 
 lp1:        jmp RETURN_CHeli_ProcessHeliKill_6DB437h
+        }
+    }
+}
+
+
+CObjectSAInterface * pDamagedObject = NULL;
+CEntitySAInterface * pObjectAttacker = NULL;
+float fNewObjectHealth = NULL;
+bool bObjectDamaged = true;
+
+bool TriggerObjectDamageEvent ( )
+{
+    if ( m_pObjectDamageHandler && pDamagedObject && fNewObjectHealth )
+    {
+        float fHealth = *(float *)( (DWORD)pDamagedObject + 340 );
+        float fLoss = fHealth - fNewObjectHealth;
+
+        return m_pObjectDamageHandler ( pDamagedObject, fLoss, pObjectAttacker );
+    }
+    return true;
+}
+
+void _declspec(naked) HOOK_CObject_ProcessDamage ( )
+{
+    // .text:005A0DF7                 mov     ecx, [esi+160h]
+    // .text:005A0DFD                 fld     [esp+0D4h+arg_0]
+    // .text:005A0E04                 fmul    dword ptr [ecx+18h]
+    // .text:005A0E07                 fsubr   dword ptr [esi+154h]
+    // .text:005A0E0D                 fst     dword ptr [esi+154h]
+
+    _asm
+    {
+        pushad
+        mov     pDamagedObject, esi
+        mov     pObjectAttacker, edi
+        fst     dword ptr fNewObjectHealth
+    }
+    if ( TriggerObjectDamageEvent ( ) )
+    {
+        bObjectDamaged = true;
+        _asm
+        {
+            popad
+            fst     dword ptr [esi+154h]
+            jmp     RETURN_CObject_ProcessDamage
+        }
+    }
+    else
+    {
+        bObjectDamaged = false;
+        _asm
+        {
+            popad
+            jmp     RETURN_CObject_ProcessDamage_Cancel
+        }
+    }
+}
+
+unsigned char ucColDamageEffect = NULL;
+bool TriggerObjectBreakEvent ( )
+{
+    if ( m_pObjectBreakHandler && pDamagedObject )
+    {
+        return m_pObjectBreakHandler ( pDamagedObject, pObjectAttacker );
+    }
+    return true;
+}
+
+void _declspec(naked) HOOK_CObject_ProcessBreak ( )
+{
+    _asm pushad
+    ucColDamageEffect = *(unsigned char*)((DWORD)pDamagedObject + 324);
+    
+    if ( ucColDamageEffect != NULL  )
+    {
+        if ( ucColDamageEffect == 0xC8 || ucColDamageEffect == 0xCA || ucColDamageEffect == 1 || ucColDamageEffect == 0x14 || ucColDamageEffect == 0x15 )
+        {
+            if ( !TriggerObjectBreakEvent ( ) )
+            {
+                bObjectDamaged = false;
+                _asm
+                {
+                    popad
+                    jmp     RETURN_CObject_ProcessDamage_Cancel
+                }
+            }
+        }
+    }
+    
+    _asm
+    {
+        popad
+        cmp     eax, 0C9h
+        jmp     RETURN_CObject_ProcessBreak
+    }
+}
+
+void _declspec(naked) HOOK_CObject_ProcessCollision ( )
+{
+    if ( bObjectDamaged )
+    {
+        _asm
+        {
+            test    byte ptr [esi+1Ch], 1
+            jnz     checkfordynamic
+            jmp     RETURN_CObject_ProcessCollision
+
+        checkfordynamic:
+            jmp     JMP_DynamicObject_Cond_Zero
+        }
+    }
+    else
+    {
+        _asm
+        {
+            jmp     RETURN_CObject_ProcessCollision
         }
     }
 }
