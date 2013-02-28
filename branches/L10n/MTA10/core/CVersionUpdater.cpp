@@ -1828,12 +1828,12 @@ void CVersionUpdater::_QUpdateResult ( void )
         }
 #if MTA_DEBUG
         else
-            MessageBox ( NULL, "_QUpdateResult m_JobInfo.strStatus != 'silent'", m_JobInfo.strStatus, MB_OK );
+            MessageBoxUTF8 ( NULL, "_QUpdateResult m_JobInfo.strStatus != 'silent'", m_JobInfo.strStatus, MB_OK );
 #endif
     }
 #if MTA_DEBUG
     else
-        MessageBox ( NULL, "_QUpdateResult Download.!Ok", "Error", MB_OK );
+        MessageBoxUTF8 ( NULL, "_QUpdateResult Download.!Ok", "Error", MB_OK );
 #endif
 }
 
@@ -1874,12 +1874,12 @@ void CVersionUpdater::_QUpdateNewsResult ( void )
         }
 #if MTA_DEBUG
         else
-            MessageBox ( NULL, "_QUpdateNewsResult m_JobInfo.strStatus != 'silent'", m_JobInfo.strStatus, MB_OK );
+            MessageBoxUTF8 ( NULL, "_QUpdateNewsResult m_JobInfo.strStatus != 'silent'", m_JobInfo.strStatus, MB_OK );
 #endif
     }
 #if MTA_DEBUG
     else
-        MessageBox ( NULL, "_QUpdateNewsResult Download.!Ok", "Error", MB_OK );
+        MessageBoxUTF8 ( NULL, "_QUpdateNewsResult Download.!Ok", "Error", MB_OK );
 #endif
 }
 

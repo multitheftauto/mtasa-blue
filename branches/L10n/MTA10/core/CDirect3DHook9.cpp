@@ -91,7 +91,7 @@ IUnknown * CDirect3DHook9::API_Direct3DCreate9 ( UINT SDKVersion )
 
     if ( !pThis->m_pDevice )
     {
-        MessageBox ( NULL, _("Could not initialize Direct3D9.\n\n"
+        MessageBoxUTF8 ( NULL, _("Could not initialize Direct3D9.\n\n"
                            "Please ensure the DirectX End-User Runtime and\n"
                            "latest Windows Service Packs are installed correctly.")
                            , _("Error"), MB_OK | MB_ICONEXCLAMATION | MB_TOPMOST  );

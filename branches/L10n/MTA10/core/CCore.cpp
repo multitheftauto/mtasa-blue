@@ -804,7 +804,7 @@ T* InitModule ( CModuleLoader& m_Loader, const SString& strName, const SString& 
 
     if ( pfnInit == NULL )
     {
-        MessageBox ( 0, SString(_("%s module is incorrect!"),*strName), "Error", MB_OK | MB_ICONEXCLAMATION | MB_TOPMOST  );
+        MessageBoxUTF8 ( 0, SString(_("%s module is incorrect!"),*strName), "Error", MB_OK | MB_ICONEXCLAMATION | MB_TOPMOST  );
         TerminateProcess ( GetCurrentProcess (), 1 );
     }
 

@@ -103,7 +103,7 @@ int WINAPI WinMain ( HINSTANCE _hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
                                     "If the problem persists, open Task Manager and\n"
                                     "stop the 'gta_sa.exe' and 'Multi Theft Auto.exe' processes\n\n\n"
                                     "Try to launch MTA:SA again?" );
-                if ( MessageBox( 0, strMessage, _("Error"), MB_ICONERROR | MB_YESNO | MB_TOPMOST  ) == IDYES )
+                if ( MessageBoxUTF8( 0, strMessage, _("Error"), MB_ICONERROR | MB_YESNO | MB_TOPMOST  ) == IDYES )
                 {
                     TerminateGTAIfRunning ();
                     TerminateOtherMTAIfRunning ();
@@ -116,10 +116,10 @@ int WINAPI WinMain ( HINSTANCE _hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
         {
             if ( !IsGTARunning () && !IsOtherMTARunning () )
             {
-                MessageBox ( 0, _("Another instance of MTA is already running.\n\nIf this problem persists, please restart your computer"), _("Error"), MB_ICONERROR | MB_TOPMOST  );
+                MessageBoxUTF8 ( 0, _("Another instance of MTA is already running.\n\nIf this problem persists, please restart your computer"), _("Error"), MB_ICONERROR | MB_TOPMOST  );
             }
             else
-            if ( MessageBox( 0, _("Another instance of MTA is already running.\n\nDo you want to terminate it?"), _("Error"), MB_ICONERROR | MB_YESNO | MB_TOPMOST  ) == IDYES )
+            if ( MessageBoxUTF8( 0, _("Another instance of MTA is already running.\n\nDo you want to terminate it?"), _("Error"), MB_ICONERROR | MB_YESNO | MB_TOPMOST  ) == IDYES )
             {
                 TerminateGTAIfRunning ();
                 TerminateOtherMTAIfRunning ();
@@ -156,7 +156,7 @@ void HandleTrouble ( void )
     if ( CheckAndShowFileOpenFailureMessage () )
         return;
 
-    int iResponse = MessageBox ( NULL, _("Are you having problems running MTA:SA?.\n\nDo you want to revert to an earlier version?"), "MTA: San Andreas", MB_YESNO | MB_ICONERROR | MB_TOPMOST );
+    int iResponse = MessageBoxUTF8 ( NULL, _("Are you having problems running MTA:SA?.\n\nDo you want to revert to an earlier version?"), "MTA: San Andreas", MB_YESNO | MB_ICONERROR | MB_TOPMOST );
     if ( iResponse == IDYES )
     {
         BrowseToSolution ( "crashing-before-gtagame", TERMINATE_PROCESS );
@@ -183,7 +183,7 @@ void HandleResetSettings ( void )
 
     if ( FileExists ( strSettingsFilename ) )
     {
-        int iResponse = MessageBox ( NULL, _("There seems to be a problem launching MTA:SA.\nResetting GTA settings can sometimes fix this problem.\n\nDo you want to reset GTA settings now?"), "MTA: San Andreas", MB_YESNO | MB_ICONERROR | MB_TOPMOST );
+        int iResponse = MessageBoxUTF8 ( NULL, _("There seems to be a problem launching MTA:SA.\nResetting GTA settings can sometimes fix this problem.\n\nDo you want to reset GTA settings now?"), "MTA: San Andreas", MB_YESNO | MB_ICONERROR | MB_TOPMOST );
         if ( iResponse == IDYES )
         {
             FileDelete ( strSettingsFilenameBak );
@@ -192,19 +192,19 @@ void HandleResetSettings ( void )
             if ( !FileExists ( strSettingsFilename ) )
             {
                 AddReportLog ( 4053, "Deleted gta_sa.set" );
-                MessageBox ( NULL, _("GTA settings have been reset.\n\nPress OK to continue."), "MTA: San Andreas", MB_OK | MB_ICONINFORMATION | MB_TOPMOST );
+                MessageBoxUTF8 ( NULL, _("GTA settings have been reset.\n\nPress OK to continue."), "MTA: San Andreas", MB_OK | MB_ICONINFORMATION | MB_TOPMOST );
             }
             else
             {
                 AddReportLog ( 5054, SString ( "Delete gta_sa.set failed with '%s'", *strSettingsFilename ) );
-                MessageBox ( NULL, SString ( _("File could not be deleted: '%s'"), *strSettingsFilename ), "Error", MB_OK | MB_ICONERROR | MB_TOPMOST );
+                MessageBoxUTF8 ( NULL, SString ( _("File could not be deleted: '%s'"), *strSettingsFilename ), "Error", MB_OK | MB_ICONERROR | MB_TOPMOST );
             }
         }
     }
     else
     {
         // No settings to delete, or can't find them
-        int iResponse = MessageBox ( NULL, _("Are you having problems running MTA:SA?.\n\nDo you want to see some online help?"), "MTA: San Andreas", MB_YESNO | MB_ICONERROR | MB_TOPMOST );
+        int iResponse = MessageBoxUTF8 ( NULL, _("Are you having problems running MTA:SA?.\n\nDo you want to see some online help?"), "MTA: San Andreas", MB_YESNO | MB_ICONERROR | MB_TOPMOST );
         if ( iResponse == IDYES )
         {
             BrowseToSolution ( "crashing-before-gtalaunch", TERMINATE_PROCESS );
@@ -233,7 +233,7 @@ void HandleCustomStartMessage ( void )
 
     if ( strTrouble.empty() )
     {
-        MessageBox ( NULL, strStartMessage, "MTA: San Andreas", MB_OK | MB_ICONINFORMATION | MB_TOPMOST ); //!ACHTUNG: Where 2 localize?
+        MessageBoxUTF8 ( NULL, strStartMessage, "MTA: San Andreas", MB_OK | MB_ICONINFORMATION | MB_TOPMOST ); //!ACHTUNG: Where 2 localize?
     }
     else
     {
@@ -332,12 +332,12 @@ int DoLaunchGame ( LPSTR lpCmdLine )
     //
     if ( IsGTARunning () )
     {
-        if ( MessageBox ( 0, _("An instance of GTA: San Andreas is already running. It needs to be terminated before MTA:SA can be started. Do you want to do that now?"), _("Information"), MB_YESNO | MB_ICONQUESTION | MB_TOPMOST ) == IDYES )
+        if ( MessageBoxUTF8 ( 0, _("An instance of GTA: San Andreas is already running. It needs to be terminated before MTA:SA can be started. Do you want to do that now?"), _("Information"), MB_YESNO | MB_ICONQUESTION | MB_TOPMOST ) == IDYES )
         {
             TerminateGTAIfRunning ();
             if ( IsGTARunning () )
             {
-                MessageBox ( 0, _("Unable to terminate GTA: San Andreas. If the problem persists, please restart your computer."), _("Information"), MB_OK | MB_ICONQUESTION | MB_TOPMOST );
+                MessageBoxUTF8 ( 0, _("Unable to terminate GTA: San Andreas. If the problem persists, please restart your computer."), _("Information"), MB_OK | MB_ICONQUESTION | MB_TOPMOST );
                 return 1;
             }       
         }
@@ -604,7 +604,7 @@ int DoLaunchGame ( LPSTR lpCmdLine )
             {
                 if ( IsGTAProcessStuck( piLoadee.hProcess ) )
                 {
-                    if ( MessageBox ( 0, _("GTA: San Andreas may not have launched correctly. Do you want to terminate it?"), _("Information"), MB_YESNO | MB_ICONQUESTION | MB_TOPMOST ) == IDYES )
+                    if ( MessageBoxUTF8 ( 0, _("GTA: San Andreas may not have launched correctly. Do you want to terminate it?"), _("Information"), MB_YESNO | MB_ICONQUESTION | MB_TOPMOST ) == IDYES )
                     {
                         TerminateProcess ( piLoadee.hProcess, 1 );
                     }
