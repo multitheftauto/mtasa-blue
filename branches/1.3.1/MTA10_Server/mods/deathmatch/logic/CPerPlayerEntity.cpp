@@ -255,11 +255,13 @@ void CPerPlayerEntity::DestroyEntity ( CPlayer* pPlayer )
             //CLogger::DebugPrintf ( "Destroyed %u (%s) for everyone (%u)\n", GetID (), GetName (), m_Players.size () );
 
             // Check m_Players for crash
-            std::multimap < ushort, CPlayer* > groupMap;
-            for ( std::list < CPlayer* > ::iterator iter = m_Players.begin () ; iter != m_Players.end () ; ++iter )
+            for ( std::list < CPlayer* > ::iterator iter = m_Players.begin () ; iter != m_Players.end () ; )
             {
                 CPlayer* pPlayer = *iter;
-                MapInsert ( groupMap, pPlayer->GetBitStreamVersion (), pPlayer );
+                if ( !g_pGame->GetPlayerManager()->IsValidPlayer( pPlayer ) )
+                    iter = m_Players.erase( iter );
+                else
+                    ++iter;
             }
 
             BroadcastOnlyVisible ( Packet );

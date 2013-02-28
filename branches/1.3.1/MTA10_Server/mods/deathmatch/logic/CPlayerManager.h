@@ -56,15 +56,26 @@ public:
     static bool                                 IsValidPlayerModel              ( unsigned short usPlayerModel );
 
     void                                        ResetAll                        ( void );
+    bool                                        IsValidPlayer                   ( CPlayer* pPlayer );
 
 private:
     void                                        AddToList                       ( CPlayer* pPlayer );
     void                                        RemoveFromList                  ( CPlayer* pPlayer );
+    void                                        NoteDisconnectingPlayer         ( CPlayer* pPlayer );
 
     class CScriptDebugging*                     m_pScriptDebugging;
 
     CMappedList < CPlayer* >                    m_Players;
     std::map < NetServerPlayerID, CPlayer* >    m_SocketPlayerMap;
+
+    struct SRecentPlayerInfo
+    {
+        CTickCount timeDisconnected;
+        CTickCount timeConnected;
+        SString    strName;
+        SString    strIP;
+    };
+    std::map < CPlayer*, SRecentPlayerInfo >    m_RecentDisconnectMap;
 };
 
 #endif
