@@ -413,19 +413,11 @@
 				>
 			</File>
 			<File
-				RelativePath="CDirect3DHook.cpp"
-				>
-			</File>
-			<File
 				RelativePath="CDirect3DHook9.cpp"
 				>
 			</File>
 			<File
 				RelativePath="CDirect3DHookManager.cpp"
-				>
-			</File>
-			<File
-				RelativePath="CDirectInputEvents8.cpp"
 				>
 			</File>
 			<File
@@ -866,10 +858,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\CDirect3DHook.h"
-				>
-			</File>
-			<File
 				RelativePath=".\CDirect3DHook9.h"
 				>
 			</File>
@@ -878,19 +866,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\CDirectInputEvents8.h"
-				>
-			</File>
-			<File
 				RelativePath=".\CDirectInputHook8.h"
 				>
 			</File>
 			<File
 				RelativePath=".\CDirectInputHookManager.h"
-				>
-			</File>
-			<File
-				RelativePath=".\CDirectXHook.h"
 				>
 			</File>
 			<File

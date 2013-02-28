@@ -51,7 +51,6 @@
 #include "CChat.h"
 #include "CDirect3DHookManager.h"
 #include "CDirectInputHookManager.h"
-#include "CDirectInputEvents8.h"
 #include "CDirect3DEvents9.h"
 #include "CProxyDirectInput8.h"
 #include "CProxyDirect3D9.h"
