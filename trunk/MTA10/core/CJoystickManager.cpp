@@ -552,6 +552,9 @@ void CJoystickManager::DoPulse ( void )
 {
     if ( !m_bDoneInit )
     {
+        if ( !g_pDirectInput8 )
+            return;
+
         // Init DInput if not done yet
         InitDirectInput();
         m_bDoneInit = true;
