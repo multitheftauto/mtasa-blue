@@ -611,6 +611,31 @@ int CLuaFunctionDefs::GUIStaticImageLoadImage ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaFunctionDefs::GUIStaticImageGetNativeSize ( lua_State* luaVM )
+{
+//  bool guiStaticImageGetNativeSize ( element theElement, string filename )
+    CClientGUIElement* theElement;
+    CVector2D vecSize;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( theElement );
+
+    if ( !argStream.HasErrors () )
+         if ( CStaticFunctionDefinitions::GUIStaticImageGetNativeSize ( *theElement, vecSize ) )
+        {
+            lua_pushnumber ( luaVM, vecSize.fX );
+            lua_pushnumber ( luaVM, vecSize.fY );
+            return 2;
+        }
+
+    if ( argStream.HasErrors () )
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+
+    // error: bad arguments
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
 
 int CLuaFunctionDefs::GUICreateTab ( lua_State* luaVM )
 {

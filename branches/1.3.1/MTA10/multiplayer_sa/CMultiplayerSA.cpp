@@ -3163,7 +3163,7 @@ train_would_derail:
 static DWORD dwAlphaEntity = 0;
 static bool bEntityHasAlpha = false;
 static unsigned char ucCurrentAlpha [ 1024 ];
-static unsigned char* pCurAlpha = ucCurrentAlpha;
+static uint uiAlphaIdx = 0;
 
 static void SetEntityAlphaHooked ( DWORD dwEntity, DWORD dwCallback, DWORD dwAlpha )
 {
@@ -3193,8 +3193,8 @@ static void SetEntityAlphaHooked ( DWORD dwEntity, DWORD dwCallback, DWORD dwAlp
 
 static RpMaterial* HOOK_GetAlphaValues ( RpMaterial* pMaterial, unsigned char ucAlpha )
 {
-    *pCurAlpha = pMaterial->color.a;
-    pCurAlpha++;
+    ucCurrentAlpha[ uiAlphaIdx ] = pMaterial->color.a;
+    uiAlphaIdx = Min( uiAlphaIdx + 1, NUMELMS( ucCurrentAlpha ) - 1 );
 
     return pMaterial;
 }
@@ -3206,8 +3206,8 @@ static RpMaterial* HOOK_SetAlphaValues ( RpMaterial* pMaterial, unsigned char uc
 }
 static RpMaterial* HOOK_RestoreAlphaValues ( RpMaterial* pMaterial, unsigned char ucAlpha )
 {
-    pMaterial->color.a = *pCurAlpha;
-    pCurAlpha++;
+    pMaterial->color.a = ucCurrentAlpha[ uiAlphaIdx ];
+    uiAlphaIdx = Min( uiAlphaIdx + 1, NUMELMS( ucCurrentAlpha ) - 1 );
 
     return pMaterial;
 }
@@ -3217,7 +3217,7 @@ static void GetAlphaAndSetNewValues ( unsigned char ucAlpha )
     if ( ucAlpha < 255 )
     {
         bEntityHasAlpha = true;
-        pCurAlpha = ucCurrentAlpha;
+        uiAlphaIdx = 0;
         SetEntityAlphaHooked ( dwAlphaEntity, (DWORD)HOOK_GetAlphaValues, 0 );
         SetEntityAlphaHooked ( dwAlphaEntity, (DWORD)HOOK_SetAlphaValues, ucAlpha );
     }
@@ -3228,7 +3228,7 @@ static void RestoreAlphaValues ()
 {
     if ( bEntityHasAlpha )
     {
-        pCurAlpha = ucCurrentAlpha;
+        uiAlphaIdx = 0;
         SetEntityAlphaHooked ( dwAlphaEntity, (DWORD)HOOK_RestoreAlphaValues, 0 );
     }
 }
@@ -3271,7 +3271,7 @@ static void SetVehicleAlpha ( )
     else if ( dwEAEG && pInterface->m_pVehicle->GetModelIndex() == 0x20A )
     {
         bEntityHasAlpha = true;
-        pCurAlpha = ucCurrentAlpha;
+        uiAlphaIdx = 0;
         SetEntityAlphaHooked ( dwAlphaEntity, (DWORD)HOOK_GetAlphaValues, 0 );
         MemPutFast < DWORD > ( 0x5332D6, (DWORD)CVehicle_EAEG );
         SetEntityAlphaHooked ( dwAlphaEntity, (DWORD)HOOK_SetAlphaValues, 0 );

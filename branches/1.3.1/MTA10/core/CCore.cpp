@@ -861,10 +861,9 @@ void CCore::DeinitGUI ( void )
 }
 
 
-void CCore::InitGUI ( IUnknown* pDevice )
+void CCore::InitGUI ( IDirect3DDevice9* pDevice )
 {
-    IDirect3DDevice9 *dev = reinterpret_cast < IDirect3DDevice9* > ( pDevice );
-    m_pGUI = InitModule < CGUI > ( m_GUIModule, "GUI", "InitGUIInterface", dev );
+    m_pGUI = InitModule < CGUI > ( m_GUIModule, "GUI", "InitGUIInterface", pDevice );
 
     // and set the screenshot path to this default library (screenshots shouldnt really be made outside mods)
     std::string strScreenShotPath = CalcMTASAPath ( "screenshots" );

@@ -17,15 +17,30 @@ CProxyDirectInputDevice8::CProxyDirectInputDevice8 ( IDirectInputDevice8A* pDevi
     WriteDebugEvent ( "CProxyDirectInputDevice8::CProxyDirectInputDevice8" );
     CCore::GetSingleton().ApplyHooks2 ( );
 
-    // Notify the event handler
-    CDirectInputEvents8::OnDirectInputDeviceCreate ( pDevice );
-
     // Initialize our device member variable.
     m_pDevice       = pDevice;
+    m_bDropDataIfInputGoesToGUI = true;
 
     // Get the current refcount.
     pDevice->AddRef ( );
     m_dwRefCount = pDevice->Release ( );
+
+    // Don't block joystick if GUI wants input (so same as XInput joystick)
+    DIDEVICEINSTANCE didi;
+    didi.dwSize = sizeof didi;
+    HRESULT hResult = GetDeviceInfo( &didi );
+    if ( SUCCEEDED( hResult ) )
+    {
+        uint uiType = didi.dwDevType & 0xff;
+        uint uiSubType = didi.dwDevType >> 8;
+
+        if ( uiType == DI8DEVTYPE_GAMEPAD || uiType == DI8DEVTYPE_JOYSTICK )
+            m_bDropDataIfInputGoesToGUI = false;
+
+        WriteDebugEvent ( SString( "   CProxyDirectInputDevice8 Device:%08x  Type:0x%x  SubType:0x%x  ProductName:%s", pDevice, uiType, uiSubType, didi.tszProductName ) );
+    }
+    else
+        WriteDebugEvent ( SString( "   CProxyDirectInputDevice8 GetDeviceInfo failed:%08x", hResult ) );
 }
 
 CProxyDirectInputDevice8::~CProxyDirectInputDevice8 ( )
@@ -57,9 +72,6 @@ ULONG   CProxyDirectInputDevice8::Release                    ( VOID )
     if ( --m_dwRefCount == 0 )
     {
         WriteDebugEvent ( "Releasing IDirectInputDevice8 Proxy..." );
-
-        // Notify the event handler
-        CDirectInputEvents8::OnDirectInputDeviceDestroy ( m_pDevice );
 
         // Save device so we can destroy it after.
         pDestroyedDevice = m_pDevice;
@@ -115,7 +127,7 @@ HRESULT CProxyDirectInputDevice8::GetDeviceState             ( DWORD a, LPVOID b
     DWORD   dwNumItems  = INFINITE;
 
     // If the GUI has focus, we don't let the game grab any input
-    if ( CLocalGUI::GetSingletonPtr () ) 
+    if ( m_bDropDataIfInputGoesToGUI && CLocalGUI::GetSingletonPtr () ) 
     {
         if ( CLocalGUI::GetSingleton().InputGoesToGUI () )
         {
@@ -141,7 +153,7 @@ HRESULT CProxyDirectInputDevice8::GetDeviceData              ( DWORD a, LPDIDEVI
     HRESULT hResult     = 0;
     DWORD   dwNumItems  = INFINITE;
     // If the GUI has focus, we don't let the game grab any input
-    if ( CLocalGUI::GetSingletonPtr () ) 
+    if ( m_bDropDataIfInputGoesToGUI && CLocalGUI::GetSingletonPtr () ) 
     {
         if ( CLocalGUI::GetSingleton().InputGoesToGUI () )
         {

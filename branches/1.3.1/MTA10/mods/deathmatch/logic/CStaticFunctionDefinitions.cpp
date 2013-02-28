@@ -4457,6 +4457,24 @@ bool CStaticFunctionDefinitions::GUIStaticImageLoadImage ( CClientEntity& Entity
     return false;
 }
 
+bool CStaticFunctionDefinitions::GUIStaticImageGetNativeSize ( CClientEntity& Entity, CVector2D &vecSize )
+{
+    // Is this a gui element?
+    if ( IS_GUI ( &Entity ) )
+    {
+        CClientGUIElement& GUIElement = static_cast < CClientGUIElement& > ( Entity );
+
+        // Are we a static image?
+        if ( IS_CGUIELEMENT_STATICIMAGE ( &GUIElement ) )
+        {
+            CGUIElement *pCGUIElement = GUIElement.GetCGUIElement ();
+            return static_cast < CGUIStaticImage* > ( pCGUIElement ) -> GetNativeSize ( vecSize );
+        }
+    }
+
+    return false;
+}
+
 
 CClientGUIElement* CStaticFunctionDefinitions::GUICreateLabel ( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, const char* szCaption, bool bRelative, CClientGUIElement* pParent )
 {
@@ -7932,7 +7950,7 @@ bool CStaticFunctionDefinitions::WarpPedIntoVehicle ( CClientPed* pPed, CClientV
 
         // Valid seat id for that vehicle?
         uchar ucMaxPassengers = CClientVehicleManager::GetMaxPassengerCount ( pVehicle->GetModel () );
-        if ( uiSeat > ucMaxPassengers || ucMaxPassengers == 255 )
+        if ( uiSeat >= ucMaxPassengers || ucMaxPassengers == 255 )
             return false;
 
         // Toss the previous player out of it if neccessary

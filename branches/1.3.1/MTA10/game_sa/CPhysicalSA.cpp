@@ -91,6 +91,7 @@ VOID CPhysicalSA::SetMoveSpeed(CVector * vecMoveSpeed)
     DWORD dwFunc = FUNC_GetMoveSpeed;
     DWORD dwThis = (DWORD)((CPhysicalSAInterface *)this->GetInterface());
     DWORD dwReturn = 0;
+
     _asm
     {
         mov     ecx, dwThis
@@ -98,6 +99,12 @@ VOID CPhysicalSA::SetMoveSpeed(CVector * vecMoveSpeed)
         mov     dwReturn, eax
     }
     MemCpyFast ((void *)dwReturn, vecMoveSpeed, sizeof(CVector));
+    
+    if ( GetInterface ()->nType == ENTITY_TYPE_OBJECT )
+    {
+        AddToControlProcessList ();
+        SetStatic ( false );
+    }
 }
 
 VOID CPhysicalSA::SetTurnSpeed(CVector * vecTurnSpeed)
@@ -168,6 +175,19 @@ VOID CPhysicalSA::ProcessCollision()
     DEBUG_TRACE("VOID CPhysicalSA::ProcessCollision()");
     DWORD dwFunc = FUNC_ProcessCollision;
     DWORD dwThis = (DWORD)this->GetInterface();
+
+    _asm
+    {
+        mov     ecx, dwThis
+        call    dwFunc
+    }
+}
+
+
+void CPhysicalSA::AddToControlProcessList ( void )
+{
+    DWORD dwFunc = FUNC_AddToControlProcessList;
+    DWORD dwThis = (DWORD)GetInterface ();
 
     _asm
     {

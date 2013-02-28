@@ -370,6 +370,7 @@ public:
     
     
     static bool                         GUIStaticImageLoadImage             ( CClientEntity& Element, const SString& strDir );
+    static bool                         GUIStaticImageGetNativeSize         ( CClientEntity& Entity, CVector2D &vecSize );
 
     static bool                         GUISetSelectedTab                   ( CClientEntity& Element, CClientEntity& Tab );
     static CClientGUIElement*           GUIGetSelectedTab                   ( CClientEntity& Element );

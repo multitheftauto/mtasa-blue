@@ -13,28 +13,23 @@
 #ifndef __CDIRECT3DHOOK9_H
 #define __CDIRECT3DHOOK9_H
 
-#include "CDirectXHook.h"
-#include "CSingleton.h"
+typedef IDirect3D9 * ( __stdcall * pDirect3DCreate )    ( int SDKVersion );
 
-class CDirect3DHook9 : public CDirectXHook, public CSingleton < CDirect3DHook9 >
+class CDirect3DHook9 : public CSingleton < CDirect3DHook9 >
 {
 public: 
 
                                     CDirect3DHook9      ( );
                                    ~CDirect3DHook9      ( );
     // Hook routines.
-    static  IUnknown *  __stdcall   API_Direct3DCreate9 ( UINT SDKVersion );
+    static IDirect3D9* __stdcall   API_Direct3DCreate9 ( UINT SDKVersion );
 
     // Hook utilities.
             bool                    ApplyHook           ( );
             bool                    RemoveHook          ( );
 
-            inline void             SetHookingEnabled   ( bool bEnabled ) { m_bHookingEnabled = bEnabled; }
 
     pDirect3DCreate     m_pfnDirect3DCreate9;
-
-private:
-    bool                m_bHookingEnabled;
 };
 
 #endif

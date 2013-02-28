@@ -20,7 +20,6 @@ CDirect3DHook9::CDirect3DHook9 (  )
     WriteDebugEvent ( "CDirect3DHook9::CDirect3DHook9" );
 
     m_pfnDirect3DCreate9 = NULL;
-    m_bHookingEnabled = true;
 }
 
 CDirect3DHook9::~CDirect3DHook9 ( )
@@ -59,23 +58,15 @@ bool CDirect3DHook9::RemoveHook ( )
     return true;
 }
 
-IUnknown * CDirect3DHook9::API_Direct3DCreate9 ( UINT SDKVersion )
+IDirect3D9* CDirect3DHook9::API_Direct3DCreate9 ( UINT SDKVersion )
 {
-    CDirect3DHook9 *    pThis;
-    CProxyDirect3D9 *   pNewProxy;
-    static bool         bLoadedModules;
-
     // Get our self instance.
-    pThis = CDirect3DHook9::GetSingletonPtr ( );
-
-    if ( pThis->m_bHookingEnabled == false ) {
-        // Use the original function
-        pThis->m_pDevice = pThis->m_pfnDirect3DCreate9 ( SDKVersion );
-        return pThis->m_pDevice;
-    }
+    CDirect3DHook9* pThis = CDirect3DHook9::GetSingletonPtr ( );
+    assert( pThis && "API_Direct3DCreate9: No CDirect3DHook9" );
 
     // A little hack to get past the loading time required to decrypt the gta 
     // executable into memory...
+    static bool bLoadedModules = false;
     if ( !bLoadedModules )
     {
         CCore::GetSingleton ( ).CreateNetwork ( );
@@ -87,10 +78,12 @@ IUnknown * CDirect3DHook9::API_Direct3DCreate9 ( UINT SDKVersion )
     }
 
     // Create our interface.
-    pThis->m_pDevice = pThis->m_pfnDirect3DCreate9 ( SDKVersion );
+    IDirect3D9* pDirect3D9 = pThis->m_pfnDirect3DCreate9 ( SDKVersion );
 
-    if ( !pThis->m_pDevice )
+    if ( !pDirect3D9 )
     {
+        WriteDebugEvent ( "Direct3DCreate9 failed" );
+
         MessageBox ( NULL, "Could not initialize Direct3D9.\n\n"
                            "Please ensure the DirectX End-User Runtime and\n"
                            "latest Windows Service Packs are installed correctly."
@@ -101,8 +94,8 @@ IUnknown * CDirect3DHook9::API_Direct3DCreate9 ( UINT SDKVersion )
     GetServerCache ();
 
     // Create a proxy device.
-    pNewProxy = new CProxyDirect3D9 ( static_cast < IDirect3D9 * > ( pThis->m_pDevice ) );
+    CProxyDirect3D9* pProxyDirect3D9 = new CProxyDirect3D9 ( pDirect3D9 );
 
-    return pNewProxy;
+    return pProxyDirect3D9;
 }
 

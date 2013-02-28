@@ -338,11 +338,8 @@ protected:
                 m_iIndex++;
                 return;
             }
-
-            // Cast failed, so continue as nil type
-            iArgument = LUA_TNIL;
         }
-
+        else
         if ( iArgument == LUA_TNONE || iArgument == LUA_TNIL )
         {
             if ( bHasDefaultValue )
