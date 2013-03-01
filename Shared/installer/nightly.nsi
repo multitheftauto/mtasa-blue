@@ -462,15 +462,15 @@ DontInstallRedist:
 		SetOutPath "$INSTDIR\MTA"
 		File "${FILES_ROOT}\MTA San Andreas\mta\cgui.dll"
 		File "${FILES_ROOT}\MTA San Andreas\mta\core.dll"
-		File "${FILES_ROOT}\MTA San Andreas\mta\xmll.dll"
+		File "${SERVER_FILES_ROOT}\xmll.dll"
 		File "${FILES_ROOT}\MTA San Andreas\mta\game_sa.dll"
 		File "${FILES_ROOT}\MTA San Andreas\mta\multiplayer_sa.dll"
 		File "${FILES_ROOT}\MTA San Andreas\mta\netc.dll"
-		File "${FILES_ROOT}\MTA San Andreas\mta\libcurl.dll"
+		File "${SERVER_FILES_ROOT}\libcurl.dll"
 		File "${FILES_ROOT}\MTA San Andreas\mta\loader.dll"
         File "${FILES_ROOT}\MTA San Andreas\mta\bass_fx.dll"
         File "${FILES_ROOT}\MTA San Andreas\mta\tags.dll"
-		File "${FILES_ROOT}\MTA San Andreas\mta\pthreadVC2.dll"
+		File "${SERVER_FILES_ROOT}\pthreadVC2.dll"
 
         !ifndef LIGHTBUILD
 
@@ -555,6 +555,7 @@ DontInstallRedist:
 		SetOutPath "$INSTDIR\mods\deathmatch"
 		File "${FILES_ROOT}\MTA San Andreas\mods\deathmatch\Client.dll"
 		File "${SERVER_FILES_ROOT}\mods\deathmatch\lua5.1.dll"
+		File "${SERVER_FILES_ROOT}\mods\deathmatch\pcre3.dll"
 		SetOutPath "$INSTDIR\mods\deathmatch\resources"
 	SectionEnd
 SectionGroupEnd
