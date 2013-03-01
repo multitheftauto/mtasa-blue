@@ -4007,7 +4007,7 @@ bool CStaticFunctionDefinitions::WarpPedIntoVehicle ( CPed* pPed, CVehicle* pVeh
     assert ( pVehicle );
 
     // Valid seat id for that vehicle?
-    if ( uiSeat < pVehicle->GetMaxPassengers () )
+    if ( uiSeat <= pVehicle->GetMaxPassengers () )
     {
         if ( !pPed->IsDead () )
         {

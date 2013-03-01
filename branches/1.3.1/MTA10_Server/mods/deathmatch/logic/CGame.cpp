@@ -2790,12 +2790,12 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
                                             else
                                             {
                                                 CPed* pCurrentOccupant = pVehicle->GetOccupant ( ucSeat );
-                                                if ( pCurrentOccupant || ucSeat >= pVehicle->GetMaxPassengers () )
+                                                if ( pCurrentOccupant || ucSeat > pVehicle->GetMaxPassengers () )
                                                 {
                                                     // Grab a free passenger spot in the vehicle
                                                     ucSeat = pVehicle->GetFreePassengerSeat ();
                                                 }
-                                                if ( ucSeat < 8 )
+                                                if ( ucSeat <= 8 )
                                                 {
                                                     // Mark him as entering the vehicle
                                                     pPlayer->SetOccupiedVehicle ( pVehicle, ucSeat );
