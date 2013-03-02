@@ -1307,11 +1307,15 @@ void CCore::Quit ( bool bInstantly )
         // Show that we are quiting (for the crash dump filename)
         SetApplicationSettingInt ( "last-server-ip", 1 );
 
+        WatchDogBeginSection( "Q0" );   // Allow loader to detect freeze on exit
+
         // Destroy the client
         CModManager::GetSingleton ().Unload ();
 
         // Destroy ourself
         delete CCore::GetSingletonPtr ();
+
+        WatchDogCompletedSection( "Q0" );
 
         // Use TerminateProcess for now as exiting the normal way crashes
         TerminateProcess ( GetCurrentProcess (), 0 );

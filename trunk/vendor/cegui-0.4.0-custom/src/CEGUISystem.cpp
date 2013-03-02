@@ -478,7 +478,7 @@ System::~System(void)
 /*************************************************************************
 	Render the GUI for this frame
 *************************************************************************/
-void System::renderGUI(void)
+bool System::renderGUI(void)
 {
 	//////////////////////////////////////////////////////////////////////////
 	// This makes use of some tricks the Renderer can do so that we do not
@@ -512,7 +512,7 @@ void System::renderGUI(void)
 		d_gui_redraw = false;
 	}
 
-	d_renderer->doRender();
+	bool bRenderOk = d_renderer->doRender();
 
 	// draw mouse
 	d_renderer->setQueueingEnabled(false);
@@ -525,6 +525,8 @@ void System::renderGUI(void)
     for ( FontManager::FontIterator fontIt = d_fontManager->getIterator() ; !fontIt.isAtEnd() ; ++fontIt )
         if ( (*fontIt)->needsClearRenderList () )
             d_gui_redraw = true;
+
+    return bRenderOk;
 }
 
 

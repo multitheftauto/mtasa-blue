@@ -295,6 +295,9 @@ int LaunchGame ( LPSTR lpCmdLine )
         HandleResetSettings ();
     }
 
+    // Clear down freeze on quit detection
+    WatchDogCompletedSection( "Q0" );
+
     WatchDogBeginSection ( "L0" );      // Gets closed if MTA exits with a return code of 0
     WatchDogBeginSection ( "L1" );      // Gets closed when online game has started
     SetApplicationSetting ( "diagnostics", "gta-fopen-fail", "" );
@@ -597,25 +600,46 @@ int DoLaunchGame ( LPSTR lpCmdLine )
         // Actually hide the splash
         HideSplash ();
 
-        // If hasn't shown the loading screen and gta_sa.exe process is small, give user option to terminate
+        // If hasn't shown the loading screen and gta_sa.exe process memory usage is not changing, give user option to terminate
         if ( status == WAIT_TIMEOUT )
         {
-            if ( WatchDogIsSectionOpen( "L3" ) )     // Gets closed when loading screen is shown
+            CStuckProcessDetector stuckProcessDetector( piLoadee.hProcess, 5000 );
+            while ( status == WAIT_TIMEOUT && WatchDogIsSectionOpen( "L3" ) )     // Gets closed when loading screen is shown
             {
-                if ( IsGTAProcessStuck( piLoadee.hProcess ) )
+                if ( stuckProcessDetector.UpdateIsStuck() )
                 {
+                    WriteDebugEvent( "Detected stuck process at startup" );
                     if ( MessageBox ( 0, "GTA: San Andreas may not have launched correctly. Do you want to terminate it?", "Information", MB_YESNO | MB_ICONQUESTION | MB_TOPMOST ) == IDYES )
                     {
+                        WriteDebugEvent( "User selected process termination" );
                         TerminateProcess ( piLoadee.hProcess, 1 );
                     }
+                    break;
                 }
+                status = WaitForSingleObject( piLoadee.hProcess, 1000 );
             }
         }
 
         // Wait for game to exit
         WriteDebugEvent( "Loader - Wait for game to exit" );
-        if ( status == WAIT_TIMEOUT )
-            WaitForSingleObject ( piLoadee.hProcess, INFINITE );
+        while ( status == WAIT_TIMEOUT )
+        {
+            status = WaitForSingleObject( piLoadee.hProcess, 1500 );
+
+            // If core is closing and gta_sa.exe process memory usage is not changing, terminate
+            CStuckProcessDetector stuckProcessDetector( piLoadee.hProcess, 5000 );
+            while ( status == WAIT_TIMEOUT && WatchDogIsSectionOpen( "Q0" ) )     // Gets closed when quit has completed
+            {
+                if ( stuckProcessDetector.UpdateIsStuck() )
+                {
+                    WriteDebugEvent( "Detected stuck process at quit" );
+                    TerminateProcess( piLoadee.hProcess, 1 );
+                    status = WAIT_FAILED;
+                    break;
+                }
+                status = WaitForSingleObject( piLoadee.hProcess, 1000 );
+            }
+        }
     }
 
     WriteDebugEvent( "Loader - Finishing" );
@@ -623,6 +647,9 @@ int DoLaunchGame ( LPSTR lpCmdLine )
     // Get its exit code
     DWORD dwExitCode = -1;
     GetExitCodeProcess( piLoadee.hProcess, &dwExitCode );
+
+    // Terminate to be sure
+    TerminateProcess ( piLoadee.hProcess, 1 );
 
     //////////////////////////////////////////////////////////
     //
