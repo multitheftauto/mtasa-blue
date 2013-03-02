@@ -330,9 +330,9 @@ public:
 		Depending upon the internal state, this may either re-use rendering from last time, or trigger a full re-draw from all elements.
 
 	\return
-		Nothing
+		False if render failed
 	*/
-	void	renderGUI(void);
+	bool	renderGUI(void);
 
 
 	/*!

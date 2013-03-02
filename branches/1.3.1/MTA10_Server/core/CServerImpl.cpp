@@ -442,11 +442,26 @@ void CServerImpl::MainLoop ( void )
         }
 
         // Limit the pulses to avoid heavy CPU usage
-        int iSleepMs;
-        if ( m_pModManager->PendingWorkToDo ( iSleepMs ) )
-            Sleep ( Clamp ( 0, iSleepMs, 50 ) );
-        else
-            Sleep ( 10 );
+        int iSleepBusyMs;
+        int iSleepIdleMs;
+        m_pModManager->GetSleepIntervals( iSleepBusyMs, iSleepIdleMs );
+
+        CTickCount sleepLimit = CTickCount::Now() + CTickCount( (long long)iSleepIdleMs );
+
+        // Initial sleep period
+        int iInitialMs = Min( iSleepIdleMs, iSleepBusyMs );
+        Sleep( Clamp ( 1, iInitialMs, 50 ) );
+
+        // Remaining idle sleep period
+        int iFinalMs = Clamp ( 1, iSleepIdleMs - iInitialMs, 50 );
+        for( int i = 0 ; i < iFinalMs ; i++ )
+        {
+            if ( m_pModManager->PendingWorkToDo() )
+                break;
+            Sleep( 1 );
+            if ( CTickCount::Now() >= sleepLimit )
+                break;
+        }
     }
 
 #ifdef WIN32

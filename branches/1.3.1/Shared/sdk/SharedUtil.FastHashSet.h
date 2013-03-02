@@ -10,6 +10,10 @@
 *
 *****************************************************************************/
 
+#if WITH_ALLOC_TRACKING
+    #define CFastHashSet std::CSet
+#else
+
 #ifdef WIN32
     #pragma push_macro("assert")
 #endif
@@ -63,3 +67,5 @@ namespace SharedUtil
     }
 
 }
+
+#endif  // WITH_ALLOC_TRACKING

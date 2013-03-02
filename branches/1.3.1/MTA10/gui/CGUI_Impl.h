@@ -282,6 +282,7 @@ private:
 
     bool                            m_HasSchemeLoaded;
     SString                         m_CurrentSchemeName;
+    CElapsedTime                    m_RenderOkTimer;
 };
 
 #endif

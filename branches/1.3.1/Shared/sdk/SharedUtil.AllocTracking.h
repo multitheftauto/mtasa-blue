@@ -67,6 +67,7 @@
     #include <list>
     #include <vector>
     #include <map>
+    #include <set>
     #include <deque>
     #include <algorithm>
     #include <limits>
@@ -158,6 +159,12 @@
         public:
         };
 
+        template < class _Kty, class _Pr = std::less<_Kty> >
+        class CSet : public std::set < _Kty, _Pr, Allocator < _Kty > >
+        {
+        public:
+        };
+
         template < class _Ty >
         class CDeque : public std::deque < _Ty, Allocator < _Ty > >
         {
@@ -170,6 +177,7 @@
     #define vector  CArray
     #define list    CList
     #define map     CMap
+    #define set     CSet
     #define deque   CDeque
 
 #else
@@ -180,3 +188,10 @@
     #define myFree              free
 
 #endif  // WITH_ALLOC_TRACKING
+
+struct SAllocTrackingTagInfo
+{
+    int countAllocs;
+    int size;
+    char tag[24];
+};
