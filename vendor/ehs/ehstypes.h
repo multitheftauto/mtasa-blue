@@ -7,7 +7,7 @@
 #include <list>
 
 #ifndef DEFINED_SHARED_UTIL
-    #include "..\..\..\Shared\sdk\SharedUtil.h"
+    #include "SharedUtil.h"
 #endif
 class EHSConnection;
 class EHS;
