@@ -12,6 +12,12 @@
 
 #include "StdInc.h"
 #include "net/SimHeaders.h"
+#ifdef WIN32
+    #include "Psapi.h"
+#else
+    #include <unistd.h>
+    #include <fstream>
+#endif
 
 extern uint g_uiDatabaseThreadProcessorNumber;
 extern uint g_uiThreadnetProcessorNumber;
@@ -58,6 +64,7 @@ public:
 
     // CPerfStatServerInfoImpl
     void                        RecordStats             ( void );
+    SString                     GetProcessMemoryUsage   ( void );
 
     SString                     m_strCategoryName;
     time_t                      m_tStartTime;
@@ -191,6 +198,53 @@ void CPerfStatServerInfoImpl::RecordStats ( void )
 
 ///////////////////////////////////////////////////////////////
 //
+// CPerfStatServerInfoImpl::GetProcessMemoryUsage
+//
+//
+//
+///////////////////////////////////////////////////////////////
+SString CPerfStatServerInfoImpl::GetProcessMemoryUsage( void )
+{
+#ifdef WIN32
+    PROCESS_MEMORY_COUNTERS psmemCounter;
+    BOOL bResult = GetProcessMemoryInfo( GetCurrentProcess(), &psmemCounter, sizeof( PROCESS_MEMORY_COUNTERS ) );
+    if ( !bResult )
+        return "";
+
+    uint uiMB = psmemCounter.WorkingSetSize / (long long)( 1024 * 1024 );
+    return SString( "%d MB", uiMB );
+#else
+    // 'file' stat seems to give the most reliable results
+    std::ifstream statStream( "/proc/self/stat", std::ios_base::in );
+
+    // dummy vars for leading entries in stat that we don't care about
+    std::string pid, comm, state, ppid, pgrp, session, tty_nr;
+    std::string tpgid, flags, minflt, cminflt, majflt, cmajflt;
+    std::string utime, stime, cutime, cstime, priority, nice;
+    std::string O, itrealvalue, starttime;
+
+    // the two fields we want
+    unsigned long vsize;
+    long rss;
+
+    statStream >> pid >> comm >> state >> ppid >> pgrp >> session >> tty_nr
+               >> tpgid >> flags >> minflt >> cminflt >> majflt >> cmajflt
+               >> utime >> stime >> cutime >> cstime >> priority >> nice
+               >> O >> itrealvalue >> starttime >> vsize >> rss; // don't care about the rest
+
+    statStream.close();
+
+    long page_size_kb = sysconf( _SC_PAGE_SIZE ) / 1024; // in case x86-64 is configured to use 2MB pages
+    uint vm_usage     = vsize / ( 1024 * 1024 );
+    uint resident_set = rss * page_size_kb;
+
+    return SString( "VM:%d MB  RSS:%d MB", vm_usage, resident_set );
+#endif
+}
+
+
+///////////////////////////////////////////////////////////////
+//
 // CPerfStatServerInfoImpl::GetStats
 //
 //
@@ -252,6 +306,7 @@ void CPerfStatServerInfoImpl::GetStats ( CPerfStatResult* pResult, const std::ma
     m_InfoList.push_back ( StringPair ( "Version",                      CStaticFunctionDefinitions::GetVersionSortable () ) );
     m_InfoList.push_back ( StringPair ( "Date",                         GetLocalTimeString ( true ) ) );
     m_InfoList.push_back ( StringPair ( "Uptime",                       SString ( "%d Days %d Hours %02d Mins", (int)tDays, (int)tHours, (int)tMinutes ) ) );
+    m_InfoList.push_back ( StringPair ( "Memory",                       GetProcessMemoryUsage() ) );
 
     if ( !pConfig->GetThreadNetEnabled () )
         m_StatusList.push_back ( StringPair ( "Server FPS",                 SString ( "%d", g_pGame->GetServerFPS () ) ) );

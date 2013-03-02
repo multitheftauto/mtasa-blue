@@ -303,7 +303,6 @@ public:
         {
             CAllocInfo* pInfo = xMapFind ( allocMap, pOrig );
             TotalMem -= pInfo->size;
-            RemoveTagAlloc( pInfo->tagId, pInfo->size );
 
             xMapRemove( allocMap, pOrig );
             RemoveTagAlloc( pInfo->tagId, pInfo->size );
