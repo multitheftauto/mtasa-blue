@@ -10,6 +10,10 @@
 *
 *****************************************************************************/
 
+#if WITH_ALLOC_TRACKING
+    #define CFastHashMap std::CMap
+#else
+
 #ifdef WIN32
     #pragma push_macro("assert")
 #endif
@@ -137,3 +141,5 @@ T* GetDeletedMapKey ( T** )
 {
     return (T*)-2;
 }
+
+#endif  // WITH_ALLOC_TRACKING

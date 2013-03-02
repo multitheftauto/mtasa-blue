@@ -1269,17 +1269,19 @@ bool CElement::CanUpdateSync ( unsigned char ucRemote )
 
 // Entities from root optimization for getElementsByType
 typedef CFastList < CElement* > CFromRootListType;
-typedef google::dense_hash_map < unsigned int, CFromRootListType > t_mapEntitiesFromRoot;
+typedef CFastHashMap < unsigned int, CFromRootListType > t_mapEntitiesFromRoot;
 static t_mapEntitiesFromRoot    ms_mapEntitiesFromRoot;
 static bool                     ms_bEntitiesFromRootInitialized = false;
+
+// CFastHashMap helpers
+static unsigned int GetEmptyMapKey ( unsigned int* )   { return (unsigned int)0xFFFFFFFF; }
+static unsigned int GetDeletedMapKey ( unsigned int* ) { return (unsigned int)0xFFFFFFFE ; }
 
 
 void CElement::StartupEntitiesFromRoot ()
 {
     if ( !ms_bEntitiesFromRootInitialized )
     {
-        ms_mapEntitiesFromRoot.set_deleted_key ( (unsigned int)0xFFFFFFFE );
-        ms_mapEntitiesFromRoot.set_empty_key ( (unsigned int)0xFFFFFFFF );
         ms_bEntitiesFromRootInitialized = true;
     }
 }
