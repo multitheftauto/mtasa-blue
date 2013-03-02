@@ -15,11 +15,13 @@
 
 #include "StdInc.h"
 
-using namespace google;
-
-dense_hash_map < lua_CFunction, CLuaCFunction* > CLuaCFunctions::ms_Functions;
-dense_hash_map < std::string, CLuaCFunction* > CLuaCFunctions::ms_FunctionsByName;
+CFastHashMap < lua_CFunction, CLuaCFunction* > CLuaCFunctions::ms_Functions;
+CFastHashMap < SString, CLuaCFunction* > CLuaCFunctions::ms_FunctionsByName;
 bool CLuaCFunctions::ms_bMapsInitialized = false;
+
+// CFastHashMap helpers
+static lua_CFunction GetEmptyMapKey ( lua_CFunction* )   { return (lua_CFunction)0x00000000; }
+static lua_CFunction GetDeletedMapKey ( lua_CFunction* ) { return (lua_CFunction)0xFFFFFFFF; }
 
 CLuaCFunction::CLuaCFunction ( const char* szName, lua_CFunction f, bool bRestricted )
 {
@@ -42,10 +44,6 @@ void CLuaCFunctions::InitializeHashMaps ( )
     if ( !ms_bMapsInitialized )
     {
         ms_bMapsInitialized = true;
-        ms_Functions.set_empty_key ( (lua_CFunction)0x00000000 );
-        ms_Functions.set_deleted_key ( (lua_CFunction)0xFFFFFFFF );
-        ms_FunctionsByName.set_empty_key ( std::string ( "" ) );
-        ms_FunctionsByName.set_deleted_key ( std::string ( "\xFF" ) );
     }
 }
 
@@ -70,7 +68,7 @@ CLuaCFunction* CLuaCFunctions::AddFunction ( const char* szName, lua_CFunction f
 
 CLuaCFunction* CLuaCFunctions::GetFunction ( lua_CFunction f )
 {
-    dense_hash_map < lua_CFunction, CLuaCFunction* >::iterator it;
+    CFastHashMap < lua_CFunction, CLuaCFunction* >::iterator it;
     it = ms_Functions.find ( f );
     if ( it == ms_Functions.end () )
         return NULL;
@@ -81,7 +79,7 @@ CLuaCFunction* CLuaCFunctions::GetFunction ( lua_CFunction f )
 
 CLuaCFunction* CLuaCFunctions::GetFunction ( const char* szName )
 {
-    dense_hash_map < std::string, CLuaCFunction* >::iterator it;
+    CFastHashMap < SString, CLuaCFunction* >::iterator it;
     it = ms_FunctionsByName.find ( szName );
     if ( it == ms_FunctionsByName.end () )
         return NULL;
@@ -93,7 +91,7 @@ CLuaCFunction* CLuaCFunctions::GetFunction ( const char* szName )
 void CLuaCFunctions::RegisterFunctionsWithVM ( lua_State* luaVM )
 {
     // Register all our functions to a lua VM
-    dense_hash_map < std::string, CLuaCFunction* >::iterator it;
+    CFastHashMap < SString, CLuaCFunction* >::iterator it;
     for ( it = ms_FunctionsByName.begin (); it != ms_FunctionsByName.end (); it++ )
     {
         lua_pushstring ( luaVM, it->first.c_str () );
@@ -106,7 +104,7 @@ void CLuaCFunctions::RegisterFunctionsWithVM ( lua_State* luaVM )
 void CLuaCFunctions::RemoveAllFunctions ( void )
 {
     // Delete all functions
-    dense_hash_map < lua_CFunction, CLuaCFunction* >::iterator it;
+    CFastHashMap < lua_CFunction, CLuaCFunction* >::iterator it;
     for ( it = ms_Functions.begin (); it != ms_Functions.end (); it++ )
     {
         delete it->second;

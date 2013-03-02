@@ -70,8 +70,8 @@ public:
     static void                 RemoveAllFunctions          ( void );
 
 private:
-    static google::dense_hash_map < lua_CFunction, CLuaCFunction* >     ms_Functions;
-    static google::dense_hash_map < std::string, CLuaCFunction* >       ms_FunctionsByName;
+    static CFastHashMap < lua_CFunction, CLuaCFunction* >               ms_Functions;
+    static CFastHashMap < SString, CLuaCFunction* >                     ms_FunctionsByName;
     static bool                                                         ms_bMapsInitialized;
 public:
     static void                 InitializeHashMaps          ( );

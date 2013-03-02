@@ -13,10 +13,16 @@
 //
 // System wide defines
 //
+#define DEFINED_SHARED_UTIL 1
 
 // Enable WITH_ALLOC_TRACKING to monitor server module memory usage. *Has a negative performance impact*
-// (Also only works for the server. Will give compile errors in the client projects.)
-#define WITH_ALLOC_TRACKING 0
+#ifndef WITH_ALLOC_TRACKING
+    #ifndef MTA_CLIENT
+        #define WITH_ALLOC_TRACKING 0       // Alloc track server - (Can also be defined in individual modules)
+    #else
+        #define WITH_ALLOC_TRACKING 0       // Alloc track client - Should always be zero as it don't work with the client
+    #endif
+#endif
 
 //
 // vsnprintf with buffer full check
