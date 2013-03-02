@@ -51,7 +51,8 @@ public:
 
     bool                IsFinished              ( void );
 
-    bool                PendingWorkToDo         ( int& iSleepMs );
+    bool                PendingWorkToDo         ( void );
+    bool                GetSleepIntervals       ( int& iSleepBusyMs, int& iSleepIdleMs );
 
 private:
     CServerImpl*        m_pServer;
