@@ -41,7 +41,6 @@ void            TerminateGTAIfRunning               ( void );
 bool            IsGTARunning                        ( void );
 void            TerminateOtherMTAIfRunning          ( void );
 bool            IsOtherMTARunning                   ( void );
-bool            IsGTAProcessStuck                   ( HANDLE hProcess );
 
 void            ShowSplash                          ( HINSTANCE hInstance );
 void            HideSplash                          ( void );
@@ -91,6 +90,42 @@ bool            CheckService                        ( uint uiStage );
 void            MaybeShowCopySettingsDialog         ( void );
 
 bool            CheckAndShowFileOpenFailureMessage  ( void );
+
+//
+// Determine if game process has gone wonky
+//
+class CStuckProcessDetector
+{
+public:
+    CStuckProcessDetector( HANDLE hProcess, uint uiThresholdMs )
+    {
+        m_hProcess = hProcess;
+        m_uiThresholdMs = uiThresholdMs;
+        m_PrevWorkingSetSize = 0;
+    }
+
+    // Returns true if process is active and hasn't changed mem usage for uiThresholdMs
+    bool UpdateIsStuck( void )
+    {
+        PROCESS_MEMORY_COUNTERS psmemCounter;
+        BOOL bResult = GetProcessMemoryInfo( m_hProcess, &psmemCounter, sizeof( PROCESS_MEMORY_COUNTERS ) );
+        if ( !bResult )
+            return false;
+
+        if ( m_PrevWorkingSetSize != psmemCounter.WorkingSetSize )
+        {
+            m_PrevWorkingSetSize = psmemCounter.WorkingSetSize;
+            m_StuckTimer.Reset();
+        }
+        return m_StuckTimer.Get() > m_uiThresholdMs;
+    }
+
+    uint            m_uiThresholdMs;
+    SIZE_T          m_PrevWorkingSetSize;
+    HANDLE          m_hProcess;
+    CElapsedTime    m_StuckTimer;
+};
+
 
 #undef CREATE_SUSPENDED
 #define CREATE_SUSPENDED 5

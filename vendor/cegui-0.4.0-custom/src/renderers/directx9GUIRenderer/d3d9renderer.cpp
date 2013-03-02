@@ -186,9 +186,12 @@ void DirectX9Renderer::NotifyImageInvalid ( Image* const image )
 /*************************************************************************
 	perform final rendering for all queued renderable quads.
 *************************************************************************/
-void DirectX9Renderer::doRender(void)
+bool DirectX9Renderer::doRender(void)
 {
 	d_currTexture = NULL;
+
+    if ( !d_buffer )
+        return false;
 
 	initPerFrameStates();
 
@@ -222,7 +225,7 @@ void DirectX9Renderer::doRender(void)
 		{
 			if (FAILED(d_buffer->Lock(0, 0, (void**)&buffmem, D3DLOCK_DISCARD)))
 			{
-				return;
+				return false;
 			}
 
 			locked = true;
@@ -357,6 +360,7 @@ void DirectX9Renderer::doRender(void)
 	}
 
 	renderVBuffer();
+    return true;
 }
 
 
@@ -507,6 +511,9 @@ void DirectX9Renderer::sortQuads(void)
 *************************************************************************/
 void DirectX9Renderer::renderQuadDirect(const Rect& dest_rect, float z, const Texture* tex, const Rect& texture_rect, const ColourRect& colours, QuadSplitMode quad_split_mode)
 {
+    if ( !d_buffer )
+        return;
+
 	// ensure offset destination to ensure proper texel to pixel mapping from D3D.
 	Rect final_rect(dest_rect);
 	final_rect.offset(Point(-0.5f, -0.5f));

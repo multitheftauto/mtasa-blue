@@ -36,6 +36,8 @@ using std::list;
 CGUI_Impl::CGUI_Impl ( IDirect3DDevice9* pDevice )
     : m_HasSchemeLoaded(false)
 {
+    m_RenderOkTimer.SetMaxIncrement( 100 );
+
     // Init
     m_pDevice = pDevice;
     /*
@@ -201,7 +203,16 @@ void CGUI_Impl::Draw ( void )
         m_RedrawQueue.clear ();
     }
 
-    m_pSystem->renderGUI ();
+    if ( !m_pSystem->renderGUI () )
+    {
+        if ( m_RenderOkTimer.Get() > 4000 )
+        {
+            // 4 seconds and over 40 failed calls means we have a problem
+            BrowseToSolution ( "gui-render", EXIT_GAME_FIRST, "Some sort of DirectX problem has occurred" );
+        }
+    }
+    else
+        m_RenderOkTimer.Reset();
 }
 
 
