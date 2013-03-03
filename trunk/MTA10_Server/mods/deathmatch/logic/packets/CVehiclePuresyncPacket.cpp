@@ -301,10 +301,12 @@ bool CVehiclePuresyncPacket::Read ( NetBitStreamInterface& BitStream )
                     float fWeaponRange = g_pGame->GetWeaponStatManager ( )->GetWeaponRangeFromSkillLevel ( eWeapon, fSkill );
 
                     // Read the ammo states
-                    SWeaponAmmoSync ammo ( pSourcePlayer->GetWeaponType (), false, true );
+                    SWeaponAmmoSync ammo ( pSourcePlayer->GetWeaponType (), pSourcePlayer->GetBitStreamVersion () >= 0x44, true );
                     if ( !BitStream.Read ( &ammo ) )
                         return false;
                     pSourcePlayer->SetWeaponAmmoInClip ( ammo.data.usAmmoInClip );
+                    if ( pSourcePlayer->GetBitStreamVersion () >= 0x44 )
+                        pSourcePlayer->SetWeaponTotalAmmo ( ammo.data.usTotalAmmo );
 
                     // Read aim data
                     SWeaponAimSync aim ( fWeaponRange, true );
@@ -487,8 +489,9 @@ bool CVehiclePuresyncPacket::Write ( NetBitStreamInterface& BitStream ) const
                 if ( flags.data.bIsDoingGangDriveby && CWeaponNames::DoesSlotHaveAmmo ( slot.data.uiSlot ) )
                 {
                     // Write the ammo states
-                    SWeaponAmmoSync ammo ( ucWeaponType, false, true );
+                    SWeaponAmmoSync ammo ( ucWeaponType, pSourcePlayer->GetBitStreamVersion () >= 0x44, true );
                     ammo.data.usAmmoInClip = pSourcePlayer->GetWeaponAmmoInClip ();
+                    ammo.data.usTotalAmmo = pSourcePlayer->GetWeaponTotalAmmo ();
                     BitStream.Write ( &ammo );
 
                     // Sync aim data
