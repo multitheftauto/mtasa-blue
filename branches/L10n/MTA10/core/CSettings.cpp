@@ -850,7 +850,7 @@ void CSettings::CreateGUI ( void )
     m_pAsyncLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, _("Asynchronous Loading:") ) );
     m_pAsyncLabel->SetPosition ( CVector2D ( vecTemp.fX + 10.f, vecTemp.fY ) );
     m_pAsyncLabel->AutoSize ( m_pAsyncLabel->GetText ().c_str () );
-
+    
     m_pAsyncCombo = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabAdvanced, "" ) );
     m_pAsyncCombo->SetPosition ( CVector2D ( vecTemp.fX + 156.0f, vecTemp.fY - 1.0f ) );
     m_pAsyncCombo->SetSize ( CVector2D ( 148.0f, 95.0f ) );
@@ -858,12 +858,15 @@ void CSettings::CreateGUI ( void )
     m_pAsyncCombo->AddItem ( _("On") )->SetData ( (void*)2 );
     m_pAsyncCombo->AddItem ( _("Auto") )->SetData ( (void*)1 );
     m_pAsyncCombo->SetReadOnly ( true );
+    vecTemp.fY += 40-4;
 
+    /*
     m_pAsyncLabelInfo = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, _("Experimental feature which may improve performance.") ) );
     m_pAsyncLabelInfo->SetPosition ( CVector2D ( vecTemp.fX + 342.f, vecTemp.fY - 4.f ) );
     m_pAsyncLabelInfo->SetFont ( "default-bold-small" );
     m_pAsyncLabelInfo->SetSize ( CVector2D ( 168.0f, 95.0f ) );
     vecTemp.fY += 40-4;
+    */
 
     // Fast clothes loading
     m_pFastClothesLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, _("Fast CJ clothes loading:") ) );
@@ -877,12 +880,15 @@ void CSettings::CreateGUI ( void )
     m_pFastClothesCombo->AddItem ( _("On") )->SetData ( (void*)CMultiplayer::FAST_CLOTHES_ON );
     m_pFastClothesCombo->AddItem ( _("Auto") )->SetData ( (void*)CMultiplayer::FAST_CLOTHES_AUTO );
     m_pFastClothesCombo->SetReadOnly ( true );
+    vecTemp.fY += 40-4;
 
+    /*
     m_pFastClothesLabelInfo = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, _("Stops stalls with CJ variations (Uses 65MB more RAM)") ) );
     m_pFastClothesLabelInfo->SetPosition ( CVector2D ( vecTemp.fX + 342.f, vecTemp.fY - 4.f ) );
     m_pFastClothesLabelInfo->SetFont ( "default-bold-small" );
     m_pFastClothesLabelInfo->SetSize ( CVector2D ( 168.0f, 95.0f ) );
     vecTemp.fY += 40-4;
+    */
 
     // Browser scan speed
     m_pBrowserSpeedLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, _("Browser speed:") ) );
@@ -896,12 +902,15 @@ void CSettings::CreateGUI ( void )
     m_pBrowserSpeedCombo->AddItem ( _("Slow") )->SetData ( (void*)1 );
     m_pBrowserSpeedCombo->AddItem ( _("Fast") )->SetData ( (void*)2 );
     m_pBrowserSpeedCombo->SetReadOnly ( true );
+    vecTemp.fY += 40-4;
 
+    /*
     m_pBrowserSpeedLabelInfo = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, _("Older routers may require a slower scan speed.") ) );
     m_pBrowserSpeedLabelInfo->SetPosition ( CVector2D ( vecTemp.fX + 342.f, vecTemp.fY - 4.f ) );
     m_pBrowserSpeedLabelInfo->SetFont ( "default-bold-small" );
     m_pBrowserSpeedLabelInfo->SetSize ( CVector2D ( 168.0f, 95.0f ) );
     vecTemp.fY += 40-4;
+    */
 
     // Single download
     m_pSingleDownloadLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, _("Single connection:") ) );
@@ -914,12 +923,15 @@ void CSettings::CreateGUI ( void )
     m_pSingleDownloadCombo->AddItem ( _("Default") )->SetData ( (void*)0 );
     m_pSingleDownloadCombo->AddItem ( _("On") )->SetData ( (void*)1 );
     m_pSingleDownloadCombo->SetReadOnly ( true );
+    vecTemp.fY += 40-4;
 
+    /*
     m_pSingleDownloadLabelInfo = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, _("Switch on to use only one connection when downloading.") ) );
     m_pSingleDownloadLabelInfo->SetPosition ( CVector2D ( vecTemp.fX + 342.f, vecTemp.fY - 4.f ) );
     m_pSingleDownloadLabelInfo->SetFont ( "default-bold-small" );
     m_pSingleDownloadLabelInfo->SetSize ( CVector2D ( 168.0f, 95.0f ) );
     vecTemp.fY += 40-4;
+    */
 
     // AltTab test
     m_pAltTabLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, _("Alt-tab handling test:") ) );
@@ -932,12 +944,15 @@ void CSettings::CreateGUI ( void )
     m_pAltTabCombo->AddItem ( _("Off") )->SetData ( (void*)0 );
     m_pAltTabCombo->AddItem ( _("On") )->SetData ( (void*)1 );
     m_pAltTabCombo->SetReadOnly ( true );
+    vecTemp.fY += 40-4;
 
+    /*
     m_pAltTabLabelInfo = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, _("Experimental feature.") ) );
     m_pAltTabLabelInfo->SetPosition ( CVector2D ( vecTemp.fX + 342.f, vecTemp.fY - 4.f ) );
     m_pAltTabLabelInfo->SetFont ( "default-bold-small" );
     m_pAltTabLabelInfo->SetSize ( CVector2D ( 168.0f, 95.0f ) );
     vecTemp.fY += 40-4;
+    */
 
     // Debug setting
     m_pDebugSettingLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, _("Debug setting:") ) );
@@ -954,12 +969,15 @@ void CSettings::CreateGUI ( void )
     m_pDebugSettingCombo->AddItem ( "#0000 Log timing" )->SetData ( (void*)EDiagnosticDebug::LOG_TIMING_0000 );
     m_pDebugSettingCombo->AddItem ( "#0000 Joystick" )->SetData ( (void*)EDiagnosticDebug::JOYSTICK_0000 );
     m_pDebugSettingCombo->SetReadOnly ( true );
+    vecTemp.fY += 40-4;
 
+    /*
     m_pDebugSettingLabelInfo = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, _("Select default always. (This setting is not saved)") ) );
     m_pDebugSettingLabelInfo->SetPosition ( CVector2D ( vecTemp.fX + 342.f, vecTemp.fY - 4.f ) );
     m_pDebugSettingLabelInfo->SetFont ( "default-bold-small" );
     m_pDebugSettingLabelInfo->SetSize ( CVector2D ( 168.0f, 95.0f ) );
     vecTemp.fY += 40-4;
+    */
 
     m_pDebugSettingCombo->SetText ( _("Default") );
     SetApplicationSetting ( "diagnostics", "debug-setting", "none" );
@@ -984,12 +1002,15 @@ void CSettings::CreateGUI ( void )
     m_pStreamingMemoryMaxLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, _("Max")) );
     m_pStreamingMemoryMaxLabel->SetPosition ( CVector2D ( vecTemp.fX + 300.0f, vecTemp.fY ) );
     m_pStreamingMemoryMaxLabel->AutoSize ( m_pStreamingMemoryMaxLabel->GetText ().c_str () );
+    vecTemp.fY += 40-4;
 
+    /*
     m_pStreamingMemoryLabelInfo = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, _("Maximum is usually best") ) );
     m_pStreamingMemoryLabelInfo->SetPosition ( CVector2D ( vecTemp.fX + 342.f, vecTemp.fY - 0.f ) );
     m_pStreamingMemoryLabelInfo->SetFont ( "default-bold-small" );
     m_pStreamingMemoryLabelInfo->SetSize ( CVector2D ( 168.0f, 95.0f ) );
     vecTemp.fY += 40-4;
+    */
 
     // Auto updater section label
     m_pAdvancedUpdaterLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, _("Auto updater") ) );
@@ -1010,12 +1031,15 @@ void CSettings::CreateGUI ( void )
     m_pUpdateBuildTypeCombo->AddItem ( "Beta" )->SetData ( (void*)1 );
     m_pUpdateBuildTypeCombo->AddItem ( "Nightly" )->SetData ( (void*)2 );
     m_pUpdateBuildTypeCombo->SetReadOnly ( true );
+    vecTemp.fY += 35;
 
+    /*
     m_pUpdateBuildTypeLabelInfo = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, _("Select default unless you like filling out bug reports.") ) );
     m_pUpdateBuildTypeLabelInfo->SetPosition ( CVector2D ( vecTemp.fX + 342.f, vecTemp.fY - 4.f ) );
     m_pUpdateBuildTypeLabelInfo->SetFont ( "default-bold-small" );
     m_pUpdateBuildTypeLabelInfo->SetSize ( CVector2D ( 168.0f, 95.0f ) );
     vecTemp.fY += 35;
+    */
 
     // Check for updates
     m_pButtonUpdate = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( pTabAdvanced, _("Check for update now") ) );
@@ -1024,6 +1048,15 @@ void CSettings::CreateGUI ( void )
     m_pButtonUpdate->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnUpdateButtonClick, this ) );
     m_pButtonUpdate->SetZOrderingEnabled ( false );
     vecTemp.fY += 30;
+
+    // Description label
+    m_pAdvancedSettingDescriptionLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "" ) );
+    m_pAdvancedSettingDescriptionLabel->SetPosition ( CVector2D ( vecTemp.fX + 10.f, vecTemp.fY ) );
+    m_pAdvancedSettingDescriptionLabel->SetFont ( "default-bold-small" );
+    m_pAdvancedSettingDescriptionLabel->SetSize ( CVector2D ( 500.0f, 95.0f ) );
+    m_pAdvancedSettingDescriptionLabel->SetHorizontalAlign ( CGUI_ALIGN_HORIZONTALCENTER );
+
+    vecTemp.fY += 35;
 
     // Set up the events
     m_pWindow->SetEnterKeyHandler ( GUI_CALLBACK ( &CSettings::OnOKButtonClick, this ) );
@@ -1050,6 +1083,56 @@ void CSettings::CreateGUI ( void )
     // Give a warning if no community account settings were stored in config
     CCore::GetSingleton ().ShowMessageBox ( CORE_SETTINGS_COMMUNITY_WARNING, _("Multi Theft Auto: Community settings"), MB_ICON_WARNING );
     */
+
+    // Set up the events for advanced description 
+    m_pAsyncLabel->SetMouseEnterHandler ( GUI_CALLBACK ( &CSettings::OnShowAdvancedSettingDescription, this ) );
+    m_pAsyncLabel->SetMouseLeaveHandler ( GUI_CALLBACK ( &CSettings::OnHideAdvancedSettingDescription, this ) );    
+
+    m_pAsyncCombo->SetMouseEnterHandler ( GUI_CALLBACK ( &CSettings::OnShowAdvancedSettingDescription, this ) );
+    m_pAsyncCombo->SetMouseLeaveHandler ( GUI_CALLBACK ( &CSettings::OnHideAdvancedSettingDescription, this ) );
+
+    m_pFastClothesLabel->SetMouseEnterHandler ( GUI_CALLBACK ( &CSettings::OnShowAdvancedSettingDescription, this ) );
+    m_pFastClothesLabel->SetMouseLeaveHandler ( GUI_CALLBACK ( &CSettings::OnHideAdvancedSettingDescription, this ) );
+
+    m_pFastClothesCombo->SetMouseEnterHandler ( GUI_CALLBACK ( &CSettings::OnShowAdvancedSettingDescription, this ) );
+    m_pFastClothesCombo->SetMouseLeaveHandler ( GUI_CALLBACK ( &CSettings::OnHideAdvancedSettingDescription, this ) );
+
+    m_pBrowserSpeedLabel->SetMouseEnterHandler ( GUI_CALLBACK ( &CSettings::OnShowAdvancedSettingDescription, this ) );
+    m_pBrowserSpeedLabel->SetMouseLeaveHandler ( GUI_CALLBACK ( &CSettings::OnHideAdvancedSettingDescription, this ) );
+
+    m_pBrowserSpeedCombo->SetMouseEnterHandler ( GUI_CALLBACK ( &CSettings::OnShowAdvancedSettingDescription, this ) );
+    m_pBrowserSpeedCombo->SetMouseLeaveHandler ( GUI_CALLBACK ( &CSettings::OnHideAdvancedSettingDescription, this ) );
+
+    m_pSingleDownloadLabel->SetMouseEnterHandler ( GUI_CALLBACK ( &CSettings::OnShowAdvancedSettingDescription, this ) );
+    m_pSingleDownloadLabel->SetMouseLeaveHandler ( GUI_CALLBACK ( &CSettings::OnHideAdvancedSettingDescription, this ) );
+
+    m_pSingleDownloadCombo->SetMouseEnterHandler ( GUI_CALLBACK ( &CSettings::OnShowAdvancedSettingDescription, this ) );
+    m_pSingleDownloadCombo->SetMouseLeaveHandler ( GUI_CALLBACK ( &CSettings::OnHideAdvancedSettingDescription, this ) );
+
+    m_pAltTabLabel->SetMouseEnterHandler ( GUI_CALLBACK ( &CSettings::OnShowAdvancedSettingDescription, this ) );
+    m_pAltTabLabel->SetMouseLeaveHandler ( GUI_CALLBACK ( &CSettings::OnHideAdvancedSettingDescription, this ) );
+
+    m_pAltTabCombo->SetMouseEnterHandler ( GUI_CALLBACK ( &CSettings::OnShowAdvancedSettingDescription, this ) );
+    m_pAltTabCombo->SetMouseLeaveHandler ( GUI_CALLBACK ( &CSettings::OnHideAdvancedSettingDescription, this ) );
+    
+    m_pDebugSettingLabel->SetMouseEnterHandler ( GUI_CALLBACK ( &CSettings::OnShowAdvancedSettingDescription, this ) );
+    m_pDebugSettingLabel->SetMouseLeaveHandler ( GUI_CALLBACK ( &CSettings::OnHideAdvancedSettingDescription, this ) );
+    
+    m_pDebugSettingCombo->SetMouseEnterHandler ( GUI_CALLBACK ( &CSettings::OnShowAdvancedSettingDescription, this ) );
+    m_pDebugSettingCombo->SetMouseLeaveHandler ( GUI_CALLBACK ( &CSettings::OnHideAdvancedSettingDescription, this ) );
+
+    m_pStreamingMemoryLabel->SetMouseEnterHandler ( GUI_CALLBACK ( &CSettings::OnShowAdvancedSettingDescription, this ) );
+    m_pStreamingMemoryLabel->SetMouseLeaveHandler ( GUI_CALLBACK ( &CSettings::OnHideAdvancedSettingDescription, this ) );
+
+    m_pStreamingMemory->SetMouseEnterHandler ( GUI_CALLBACK ( &CSettings::OnShowAdvancedSettingDescription, this ) );
+    m_pStreamingMemory->SetMouseLeaveHandler ( GUI_CALLBACK ( &CSettings::OnHideAdvancedSettingDescription, this ) );
+
+    m_pUpdateBuildTypeLabel->SetMouseEnterHandler ( GUI_CALLBACK ( &CSettings::OnShowAdvancedSettingDescription, this ) );
+    m_pUpdateBuildTypeLabel->SetMouseLeaveHandler ( GUI_CALLBACK ( &CSettings::OnHideAdvancedSettingDescription, this ) );
+
+    m_pUpdateBuildTypeCombo->SetMouseEnterHandler ( GUI_CALLBACK ( &CSettings::OnShowAdvancedSettingDescription, this ) );
+    m_pUpdateBuildTypeCombo->SetMouseLeaveHandler ( GUI_CALLBACK ( &CSettings::OnHideAdvancedSettingDescription, this ) );
+
 
     // Load Chat presets
     LoadChatPresets ();
@@ -3337,3 +3420,41 @@ void CSettings::RequestNewNickname ( void )
         pQuestionBox->Show ();
 }
 
+bool CSettings::OnShowAdvancedSettingDescription ( CGUIElement* pElement )
+{
+    CGUILabel* pLabel = dynamic_cast < CGUILabel* > ( pElement );
+    CGUIComboBox* pComboBox = dynamic_cast < CGUIComboBox* > ( pElement );
+    CGUIScrollBar* pScrollBar = dynamic_cast < CGUIScrollBar* > ( pElement );
+
+    std::string strText = "";
+
+    if ( pLabel && pLabel == m_pAsyncLabel || pComboBox && pComboBox == m_pAsyncCombo )
+        strText = std::string( _( "Asynchronous Loading:" ) ) + " " + std::string( _( "Experimental feature which may improve performance." ) );
+    else if ( pLabel && pLabel == m_pFastClothesLabel || pComboBox && pComboBox == m_pFastClothesCombo )
+        strText = std::string( _( "Fast CJ clothes loading:" ) ) + " " + std::string( _( "Stops stalls with CJ variations (Uses 65MB more RAM)" ) );
+    else if ( pLabel && pLabel == m_pBrowserSpeedLabel || pComboBox && pComboBox == m_pBrowserSpeedCombo )
+        strText = std::string( _( "Browser speed:" ) ) + " " + std::string( _( "Older routers may require a slower scan speed." ) );
+    else if ( pLabel && pLabel == m_pSingleDownloadLabel || pComboBox && pComboBox == m_pSingleDownloadCombo )
+        strText = std::string( _( "Single connection:" ) ) + " " + std::string( _( "Switch on to use only one connection when downloading." ) );
+    else if ( pLabel && pLabel == m_pAltTabLabel || pComboBox && pComboBox == m_pAltTabCombo )
+        strText = std::string( _( "Alt-tab handling test:" ) ) + " " + std::string( _( "Experimental feature." ) );
+    else if ( pLabel && pLabel == m_pDebugSettingLabel || pComboBox && pComboBox == m_pDebugSettingCombo )
+        strText = std::string( _( "Debug setting:" ) ) + " " + std::string( _( "Select default always. (This setting is not saved)" ) );
+    else if ( pLabel && pLabel == m_pStreamingMemoryLabel || pScrollBar && pScrollBar == m_pStreamingMemory )
+        strText = std::string( _( "Streaming memory:" ) ) + " " + std::string( _( "Maximum is usually best" ) );
+    else if ( pLabel && pLabel == m_pUpdateBuildTypeLabel || pComboBox && pComboBox == m_pUpdateBuildTypeCombo )
+        strText = std::string( _( "Auto updater:" ) ) + " " + std::string( _( "Select default unless you like filling out bug reports." ) );
+    
+
+    if ( strText != "" )
+        m_pAdvancedSettingDescriptionLabel->SetText ( strText.c_str () );
+
+    return true;
+}
+
+bool CSettings::OnHideAdvancedSettingDescription ( CGUIElement* pElement )
+{
+    m_pAdvancedSettingDescriptionLabel->SetText ( "" );
+
+    return true;
+}
