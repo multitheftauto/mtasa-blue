@@ -12,6 +12,9 @@
 #include <Psapi.h>
 #include <time.h>
 
+// Vendor
+#include "../../vendor/gettext-runtime/include/libintl.h"
+
 #define MTA_CLIENT
 #include "SharedUtil.h"
 #include "Main.h"

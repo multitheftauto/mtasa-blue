@@ -12,6 +12,9 @@
 #include <renderers/directx9GUIRenderer/d3d9renderer.h>
 #include <renderers/directx9GUIRenderer/d3d9texture.h>
 
+// Vendor
+#include "../../vendor/gettext-runtime/include/libintl.h"
+
 #define MTA_CLIENT
 #define SHARED_UTIL_WITH_FAST_HASH_MAP
 #include "SharedUtil.h"

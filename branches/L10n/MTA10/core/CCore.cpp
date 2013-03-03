@@ -102,6 +102,12 @@ CCore::CCore ( void )
     // check LC_COLLATE is the old-time raw ASCII sort order
     assert ( strcoll( "a", "B" ) > 0 );
 
+    // Set our translation directory
+    SString path = CalcMTASAPath ( "mta/locale/" );
+    bindtextdomain("messages", path ); // specifies the directory to look in
+    textdomain( "messages");
+    dcgettext ("messages", "Error", LC_MESSAGES );
+
     // Parse the command line
     const char* pszNoValOptions[] =
     {

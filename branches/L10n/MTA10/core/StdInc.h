@@ -29,6 +29,9 @@
 #include <cstdlib>
 #include <iomanip>
 
+// Vendor
+#include "../../vendor/gettext-runtime/include/libintl.h"
+
 #define MTA_CLIENT
 #define SHARED_UTIL_WITH_FAST_HASH_MAP
 #include "SharedUtil.h"

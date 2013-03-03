@@ -1,0 +1,6 @@
+This package contains Win32 binaries of GNU gettext-runtime 0.13.1.
+
+Together with these binaries, you also need the Win32 binaries of
+GNU libiconv (1.9.1 or newer). Unpack them in the same directory
+as this package.
+

@@ -21,6 +21,9 @@
 #include <base64.h>
 #include <zlib.h>
 
+// Vendor
+#include "../../vendor/gettext-runtime/include/libintl.h"
+
 // SDK includes
 #define MTA_CLIENT
 #define SHARED_UTIL_WITH_FAST_HASH_MAP
