@@ -313,7 +313,6 @@ void CPlayerManager::AddToList ( CPlayer* pPlayer )
 
 void CPlayerManager::RemoveFromList ( CPlayer* pPlayer )
 {
-    NoteDisconnectingPlayer( pPlayer );
     m_Players.remove ( pPlayer );
     MapRemove ( m_SocketPlayerMap, pPlayer->GetSocket () );
     assert ( m_Players.size () == m_SocketPlayerMap.size () );
@@ -323,65 +322,4 @@ void CPlayerManager::RemoveFromList ( CPlayer* pPlayer )
     {
         (*iter)->RemovePlayerFromDistLists ( pPlayer );
     }
-}
-
-
-//
-// Add player to m_RecentDisconnectMap (for debugging crash in PerPlayerEntity)
-//
-void CPlayerManager::NoteDisconnectingPlayer( CPlayer* pPlayer )
-{
-    SRecentPlayerInfo info;
-    info.timeDisconnected = CTickCount::Now();
-    info.timeConnected = CTickCount( (long long)pPlayer->GetTimeConnected() );
-    info.strName = pPlayer->GetNick();
-    info.strIP = pPlayer->GetSourceIP();
-
-    MapSet( m_RecentDisconnectMap, pPlayer, info );
-
-    // Remove oldest entry if map is too big
-#if MTA_DEBUG
-    if ( m_RecentDisconnectMap.size() > 1 )
-#else
-    if ( m_RecentDisconnectMap.size() > 1000 )
-#endif
-    {
-        CPlayer* pBestPlayer = NULL;
-        CTickCount bestTime;
-        for ( std::map < CPlayer*, SRecentPlayerInfo > ::const_iterator iter = m_RecentDisconnectMap.begin () ; iter != m_RecentDisconnectMap.end (); iter++ )
-        {
-            const SRecentPlayerInfo& info = iter->second;
-            if ( !pBestPlayer || info.timeDisconnected < bestTime )
-            {
-                pBestPlayer = iter->first;
-                bestTime = info.timeDisconnected;
-            }
-        }
-        MapRemove( m_RecentDisconnectMap, pBestPlayer );
-    }
-}
-
-
-//
-// Check if player is valid, and log if not (for debugging crash in PerPlayerEntity)
-//
-bool CPlayerManager::IsValidPlayer( CPlayer* pPlayer )
-{
-    if ( Exists( pPlayer ) )
-        return true;
-
-    uint uiTicksSinceDisconnect = 0;
-    uint uiConnectedDurationTicks = 0;
-    SString strName;
-    SString strIP;
-    if ( SRecentPlayerInfo* pInfo = MapFind( m_RecentDisconnectMap, pPlayer ) )
-    {
-        uiTicksSinceDisconnect = ( CTickCount::Now() - pInfo->timeDisconnected ).ToInt();
-        uiConnectedDurationTicks = ( pInfo->timeDisconnected - pInfo->timeConnected ).ToInt();
-        strName = pInfo->strName;
-        strIP = pInfo->strIP;
-    }
-
-    CLogger::LogPrintf ( "INVALID PLAYER: %08x  TicksSinceDisconnect:%d  ConnectedDurationTicks:%d  IP:'%s'  Name:'%s'\n", pPlayer, uiTicksSinceDisconnect, uiConnectedDurationTicks, *strIP, *strName );
-    return false;
 }
