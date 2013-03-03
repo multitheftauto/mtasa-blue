@@ -191,7 +191,7 @@ bool DirectX9Renderer::doRender(void)
 	d_currTexture = NULL;
 
     if ( !d_buffer )
-        return;
+        return false;
 
 	initPerFrameStates();
 
