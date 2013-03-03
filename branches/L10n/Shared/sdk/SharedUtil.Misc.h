@@ -50,7 +50,7 @@ namespace SharedUtil
     // Used in the Win32 Client only
     //
     #ifdef _WINDOWS_
-        int MessageBoxUTF8 ( HWND hWnd, LPCTSTR lpText, LPCTSTR lpCaption, UINT uType );
+        int MessageBoxUTF8 ( HWND hWnd, LPCSTR lpText, LPCSTR lpCaption, UINT uType );
     #endif 
 
     //

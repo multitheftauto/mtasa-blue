@@ -44,7 +44,7 @@ std::map < uint, uint > ms_ReportAmountMap;
 // Used in the Win32 Client only
 //
 #ifdef _WINDOWS_ //Only for modules that use windows.h
-    int SharedUtil::MessageBoxUTF8 ( HWND hWnd, LPCTSTR lpText, LPCTSTR lpCaption, UINT uType )
+    int SharedUtil::MessageBoxUTF8 ( HWND hWnd, LPCSTR lpText, LPCSTR lpCaption, UINT uType )
     {
         WString strText = MbUTF8ToUTF16 ( lpText );
         WString strCaption = MbUTF8ToUTF16 ( lpCaption );

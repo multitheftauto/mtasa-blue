@@ -184,20 +184,19 @@ CMainMenu::CMainMenu ( CGUI* pManager )
     float fBase = 0.613f;
     float fGap = 0.043f;
     // Our disconnect item is shown/hidden dynamically, so we store it seperately
-    m_pDisconnect = CreateItem ( MENU_ITEM_DISCONNECT, "cgui\\images\\menu_disconnect.png",    CVector2D ( 0.168f, fBase + fGap * 0 ),    CVector2D ( 278, 34 ) );
+    m_pDisconnect = CreateItem ( MENU_ITEM_DISCONNECT, "menu_disconnect.png",    CVector2D ( 0.168f, fBase + fGap * 0 ) );
     m_pDisconnect->image->SetVisible(false);
 
     // Create the menu items
     //Filepath, Relative position, absolute native size
     // And the font for the graphics is ?
-    //!ACHTUNG: Read native sizes, and load localized images
-    m_menuItems.push_back ( CreateItem ( MENU_ITEM_QUICK_CONNECT,  "cgui\\images\\menu_quick_connect.png",    CVector2D ( 0.168f, fBase + fGap * 0 ),    CVector2D ( 358, 34 ) ) );
-    m_menuItems.push_back ( CreateItem ( MENU_ITEM_BROWSE_SERVERS, "cgui\\images\\menu_browse_servers.png",   CVector2D ( 0.168f, fBase + fGap * 1 ),    CVector2D ( 390, 34 ) ) );
-    m_menuItems.push_back ( CreateItem ( MENU_ITEM_HOST_GAME,      "cgui\\images\\menu_host_game.png",        CVector2D ( 0.168f, fBase + fGap * 2 ),    CVector2D ( 251, 34 ) ) );
-    m_menuItems.push_back ( CreateItem ( MENU_ITEM_MAP_EDITOR,     "cgui\\images\\menu_map_editor.png",       CVector2D ( 0.168f, fBase + fGap * 3 ),    CVector2D ( 261, 34 ) ) );
-    m_menuItems.push_back ( CreateItem ( MENU_ITEM_SETTINGS,       "cgui\\images\\menu_settings.png",         CVector2D ( 0.168f, fBase + fGap * 4 ),    CVector2D ( 207, 34 ) ) );
-    m_menuItems.push_back ( CreateItem ( MENU_ITEM_ABOUT,          "cgui\\images\\menu_about.png",            CVector2D ( 0.168f, fBase + fGap * 5 ),    CVector2D ( 150, 34 ) ) );
-    m_menuItems.push_back ( CreateItem ( MENU_ITEM_QUIT,           "cgui\\images\\menu_quit.png",             CVector2D ( 0.168f, fBase + fGap * 6 ),    CVector2D ( 102, 34 ) ) );
+    m_menuItems.push_back ( CreateItem ( MENU_ITEM_QUICK_CONNECT,  "menu_quick_connect.png",    CVector2D ( 0.168f, fBase + fGap * 0 ) ) );
+    m_menuItems.push_back ( CreateItem ( MENU_ITEM_BROWSE_SERVERS, "menu_browse_servers.png",   CVector2D ( 0.168f, fBase + fGap * 1 ) ) );
+    m_menuItems.push_back ( CreateItem ( MENU_ITEM_HOST_GAME,      "menu_host_game.png",        CVector2D ( 0.168f, fBase + fGap * 2 ) ) );
+    m_menuItems.push_back ( CreateItem ( MENU_ITEM_MAP_EDITOR,     "menu_map_editor.png",       CVector2D ( 0.168f, fBase + fGap * 3 ) ) );
+    m_menuItems.push_back ( CreateItem ( MENU_ITEM_SETTINGS,       "menu_settings.png",         CVector2D ( 0.168f, fBase + fGap * 4 ) ) );
+    m_menuItems.push_back ( CreateItem ( MENU_ITEM_ABOUT,          "menu_about.png",            CVector2D ( 0.168f, fBase + fGap * 5 ) ) );
+    m_menuItems.push_back ( CreateItem ( MENU_ITEM_QUIT,           "menu_quit.png",             CVector2D ( 0.168f, fBase + fGap * 6 ) ) );
 
     // We store the position of the top item, and the second item.  These will be useful later
     float fFirstItemSize = m_menuItems.front()->image->GetSize(false).fY;
@@ -947,13 +946,22 @@ bool CMainMenu::OnNewsButtonClick ( CGUIElement* pElement )
 }
 
 
-sMenuItem* CMainMenu::CreateItem ( unsigned char menuType, const char* szFilePath, CVector2D vecRelPosition, CVector2D vecNativeSize )
+sMenuItem* CMainMenu::CreateItem ( unsigned char menuType, const char* szFilename, CVector2D vecRelPosition )
 { 
+    /* TRANSLATORS:  Set this directory to your appropriate assets directory for your language/dialect!
+    For example: locale/ru_RU/assets for Russian in Russia */
+    SString strFilePath = strcmp("locale/<cc_LL>/assets",_("locale/<cc_LL>/assets")) ? _("locale/<cc_LL>/assets") : "cgui/images";
+    CGUIStaticImage* pImage = reinterpret_cast < CGUIStaticImage* > ( m_pManager->CreateStaticImage () );
+    if ( !pImage->LoadFromFile ( PathJoin(strFilePath,szFilename) ) )
+        pImage->LoadFromFile ( PathJoin("cgui/images",szFilename) );
+
     // Make our positions absolute
 	int iPosX = vecRelPosition.fX*m_iMenuSizeX;
     int iPosY = vecRelPosition.fY*m_iMenuSizeY;
 
     // Make our sizes relative to the size of menu, but in absolute coordinates
+    CVector2D vecNativeSize;
+    pImage->GetNativeSize(vecNativeSize);
 	int iSizeX = (vecNativeSize.fX/NATIVE_RES_X)*m_iMenuSizeX;
     int iSizeY = (vecNativeSize.fY/NATIVE_RES_Y)*m_iMenuSizeY;
 	
@@ -967,8 +975,6 @@ sMenuItem* CMainMenu::CreateItem ( unsigned char menuType, const char* szFilePat
 	// Grab our draw position from which we enlarge from
     iPosY = iPosY - (iSizeY/2);
 
-    CGUIStaticImage* pImage = reinterpret_cast < CGUIStaticImage* > ( m_pManager->CreateStaticImage () );
-    pImage->LoadFromFile ( szFilePath );
     pImage->SetParent ( m_pCanvas );
     pImage->SetPosition ( CVector2D(iPosX,iPosY), false);
     pImage->SetSize ( CVector2D(iSizeX,iSizeY), false);
