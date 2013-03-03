@@ -223,7 +223,11 @@ int CLuaFunctionDefs::GetPedTotalAmmo ( lua_State* luaVM )
             CWeapon* pWeapon = pPed->GetWeapon ( (eWeaponSlot) ucSlot );
             if ( pWeapon )
             {
-                unsigned short usAmmo = static_cast < unsigned short > ( pWeapon->GetAmmoTotal () );
+                // Keep server and client synced
+                unsigned short usAmmo = 1;
+                if ( CWeaponNames::DoesSlotHaveAmmo ( ucSlot ) )
+                    usAmmo = static_cast < unsigned short > ( pWeapon->GetAmmoTotal () );
+                
                 lua_pushnumber ( luaVM, usAmmo );
                 return 1;
             }
