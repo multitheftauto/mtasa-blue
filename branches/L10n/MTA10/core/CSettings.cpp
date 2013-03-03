@@ -860,14 +860,6 @@ void CSettings::CreateGUI ( void )
     m_pAsyncCombo->SetReadOnly ( true );
     vecTemp.fY += 40-4;
 
-    /*
-    m_pAsyncLabelInfo = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, _("Experimental feature which may improve performance.") ) );
-    m_pAsyncLabelInfo->SetPosition ( CVector2D ( vecTemp.fX + 342.f, vecTemp.fY - 4.f ) );
-    m_pAsyncLabelInfo->SetFont ( "default-bold-small" );
-    m_pAsyncLabelInfo->SetSize ( CVector2D ( 168.0f, 95.0f ) );
-    vecTemp.fY += 40-4;
-    */
-
     // Fast clothes loading
     m_pFastClothesLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, _("Fast CJ clothes loading:") ) );
     m_pFastClothesLabel->SetPosition ( CVector2D ( vecTemp.fX + 10.f, vecTemp.fY ) );
@@ -881,14 +873,6 @@ void CSettings::CreateGUI ( void )
     m_pFastClothesCombo->AddItem ( _("Auto") )->SetData ( (void*)CMultiplayer::FAST_CLOTHES_AUTO );
     m_pFastClothesCombo->SetReadOnly ( true );
     vecTemp.fY += 40-4;
-
-    /*
-    m_pFastClothesLabelInfo = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, _("Stops stalls with CJ variations (Uses 65MB more RAM)") ) );
-    m_pFastClothesLabelInfo->SetPosition ( CVector2D ( vecTemp.fX + 342.f, vecTemp.fY - 4.f ) );
-    m_pFastClothesLabelInfo->SetFont ( "default-bold-small" );
-    m_pFastClothesLabelInfo->SetSize ( CVector2D ( 168.0f, 95.0f ) );
-    vecTemp.fY += 40-4;
-    */
 
     // Browser scan speed
     m_pBrowserSpeedLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, _("Browser speed:") ) );
@@ -904,14 +888,6 @@ void CSettings::CreateGUI ( void )
     m_pBrowserSpeedCombo->SetReadOnly ( true );
     vecTemp.fY += 40-4;
 
-    /*
-    m_pBrowserSpeedLabelInfo = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, _("Older routers may require a slower scan speed.") ) );
-    m_pBrowserSpeedLabelInfo->SetPosition ( CVector2D ( vecTemp.fX + 342.f, vecTemp.fY - 4.f ) );
-    m_pBrowserSpeedLabelInfo->SetFont ( "default-bold-small" );
-    m_pBrowserSpeedLabelInfo->SetSize ( CVector2D ( 168.0f, 95.0f ) );
-    vecTemp.fY += 40-4;
-    */
-
     // Single download
     m_pSingleDownloadLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, _("Single connection:") ) );
     m_pSingleDownloadLabel->SetPosition ( CVector2D ( vecTemp.fX + 10.f, vecTemp.fY ) );
@@ -925,14 +901,6 @@ void CSettings::CreateGUI ( void )
     m_pSingleDownloadCombo->SetReadOnly ( true );
     vecTemp.fY += 40-4;
 
-    /*
-    m_pSingleDownloadLabelInfo = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, _("Switch on to use only one connection when downloading.") ) );
-    m_pSingleDownloadLabelInfo->SetPosition ( CVector2D ( vecTemp.fX + 342.f, vecTemp.fY - 4.f ) );
-    m_pSingleDownloadLabelInfo->SetFont ( "default-bold-small" );
-    m_pSingleDownloadLabelInfo->SetSize ( CVector2D ( 168.0f, 95.0f ) );
-    vecTemp.fY += 40-4;
-    */
-
     // AltTab test
     m_pAltTabLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, _("Alt-tab handling test:") ) );
     m_pAltTabLabel->SetPosition ( CVector2D ( vecTemp.fX + 10.f, vecTemp.fY ) );
@@ -945,14 +913,6 @@ void CSettings::CreateGUI ( void )
     m_pAltTabCombo->AddItem ( _("On") )->SetData ( (void*)1 );
     m_pAltTabCombo->SetReadOnly ( true );
     vecTemp.fY += 40-4;
-
-    /*
-    m_pAltTabLabelInfo = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, _("Experimental feature.") ) );
-    m_pAltTabLabelInfo->SetPosition ( CVector2D ( vecTemp.fX + 342.f, vecTemp.fY - 4.f ) );
-    m_pAltTabLabelInfo->SetFont ( "default-bold-small" );
-    m_pAltTabLabelInfo->SetSize ( CVector2D ( 168.0f, 95.0f ) );
-    vecTemp.fY += 40-4;
-    */
 
     // Debug setting
     m_pDebugSettingLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, _("Debug setting:") ) );
@@ -970,14 +930,6 @@ void CSettings::CreateGUI ( void )
     m_pDebugSettingCombo->AddItem ( "#0000 Joystick" )->SetData ( (void*)EDiagnosticDebug::JOYSTICK_0000 );
     m_pDebugSettingCombo->SetReadOnly ( true );
     vecTemp.fY += 40-4;
-
-    /*
-    m_pDebugSettingLabelInfo = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, _("Select default always. (This setting is not saved)") ) );
-    m_pDebugSettingLabelInfo->SetPosition ( CVector2D ( vecTemp.fX + 342.f, vecTemp.fY - 4.f ) );
-    m_pDebugSettingLabelInfo->SetFont ( "default-bold-small" );
-    m_pDebugSettingLabelInfo->SetSize ( CVector2D ( 168.0f, 95.0f ) );
-    vecTemp.fY += 40-4;
-    */
 
     m_pDebugSettingCombo->SetText ( _("Default") );
     SetApplicationSetting ( "diagnostics", "debug-setting", "none" );
@@ -1004,14 +956,6 @@ void CSettings::CreateGUI ( void )
     m_pStreamingMemoryMaxLabel->AutoSize ( m_pStreamingMemoryMaxLabel->GetText ().c_str () );
     vecTemp.fY += 40-4;
 
-    /*
-    m_pStreamingMemoryLabelInfo = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, _("Maximum is usually best") ) );
-    m_pStreamingMemoryLabelInfo->SetPosition ( CVector2D ( vecTemp.fX + 342.f, vecTemp.fY - 0.f ) );
-    m_pStreamingMemoryLabelInfo->SetFont ( "default-bold-small" );
-    m_pStreamingMemoryLabelInfo->SetSize ( CVector2D ( 168.0f, 95.0f ) );
-    vecTemp.fY += 40-4;
-    */
-
     // Auto updater section label
     m_pAdvancedUpdaterLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, _("Auto updater") ) );
     m_pAdvancedUpdaterLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY ) );
@@ -1032,14 +976,6 @@ void CSettings::CreateGUI ( void )
     m_pUpdateBuildTypeCombo->AddItem ( "Nightly" )->SetData ( (void*)2 );
     m_pUpdateBuildTypeCombo->SetReadOnly ( true );
     vecTemp.fY += 35;
-
-    /*
-    m_pUpdateBuildTypeLabelInfo = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, _("Select default unless you like filling out bug reports.") ) );
-    m_pUpdateBuildTypeLabelInfo->SetPosition ( CVector2D ( vecTemp.fX + 342.f, vecTemp.fY - 4.f ) );
-    m_pUpdateBuildTypeLabelInfo->SetFont ( "default-bold-small" );
-    m_pUpdateBuildTypeLabelInfo->SetSize ( CVector2D ( 168.0f, 95.0f ) );
-    vecTemp.fY += 35;
-    */
 
     // Check for updates
     m_pButtonUpdate = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( pTabAdvanced, _("Check for update now") ) );
