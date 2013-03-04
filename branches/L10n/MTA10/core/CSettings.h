@@ -253,6 +253,7 @@ protected:
     CGUIRadioButton*    m_pStandardControls;
     CGUIRadioButton*    m_pClassicControls;
 
+    CGUIComboBox*       m_pInterfaceLanguageSelector;
     CGUIComboBox*       m_pInterfaceSkinSelector;
     CGUIButton*         m_pInterfaceLoadSkin;
 

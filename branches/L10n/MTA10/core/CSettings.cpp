@@ -685,19 +685,30 @@ void CSettings::CreateGUI ( void )
     }
 
     {
+        CGUILabel* pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabInterface, _("Language:") ) );
+        pLabel->SetPosition ( CVector2D ( 10.0f, 35.0f ) );
+        pLabel->AutoSize ( _("Language:") );
+    }
+
+    m_pInterfaceLanguageSelector = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabInterface, _("Portuguese (Portugal)") ) );
+    m_pInterfaceLanguageSelector->SetPosition ( CVector2D ( 80.0f, 33.0f ) );
+    m_pInterfaceLanguageSelector->SetSize ( CVector2D ( 320.0f, 200.0f ) );
+    m_pInterfaceLanguageSelector->SetReadOnly ( true );
+
+    {
         CGUILabel* pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabInterface, _("Skin:") ) );
-        pLabel->SetPosition ( CVector2D ( 10.0f, 42.0f ) );
+        pLabel->SetPosition ( CVector2D ( 10.0f, 65.0f ) );
         pLabel->AutoSize ( _("Skin:") );
     }
 
     m_pInterfaceSkinSelector = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabInterface ) );
-    m_pInterfaceSkinSelector->SetPosition ( CVector2D ( 60.0f, 40.0f ) );
-    m_pInterfaceSkinSelector->SetSize ( CVector2D ( 340.0f, 200.0f ) );
+    m_pInterfaceSkinSelector->SetPosition ( CVector2D ( 80.0f, 63.0f ) );
+    m_pInterfaceSkinSelector->SetSize ( CVector2D ( 320.0f, 200.0f ) );
     m_pInterfaceSkinSelector->SetReadOnly ( true );
 
     {
         CGUILabel* pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabInterface, _("Chat") ) );
-        pLabel->SetPosition ( CVector2D ( 10.0f, 80.0f ) );
+        pLabel->SetPosition ( CVector2D ( 10.0f, 90.0f ) );
         pLabel->AutoSize ( _("Chat  ") );
         pLabel->SetFont ( "default-bold-small" );
     }
@@ -712,8 +723,8 @@ void CSettings::CreateGUI ( void )
     }
 
     m_pChatPresets = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabInterface ) );
-    m_pChatPresets->SetPosition ( CVector2D ( 60.0f, 110.0f ) );
-    m_pChatPresets->SetSize ( CVector2D ( 340.0f, 200.0f ) );
+    m_pChatPresets->SetPosition ( CVector2D ( 80.0f, 110.0f ) );
+    m_pChatPresets->SetSize ( CVector2D ( 320.0f, 200.0f ) );
     m_pChatPresets->SetReadOnly ( true );
 
     m_pChatLoadPreset = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( pTabInterface, _("Load") ) );
