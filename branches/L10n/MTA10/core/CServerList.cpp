@@ -154,11 +154,11 @@ void CServerList::Pulse ( void )
     ss << "   ";
     if ( uiTotalSlots > 0 )
     {
-        const char * szPlayersString = ngettext ("player", "players", uiOccupiedSlots);
+        const char * szPlayersString = _n ("player", "players", uiOccupiedSlots);
         ss << uiOccupiedSlots << " " << szPlayersString << _(" on ");
     }
 
-    const char * szServersString = ngettext ("server", "servers", uiActiveServers);
+    const char * szServersString = _n ("server", "servers", uiActiveServers);
     ss << uiActiveServers << " " << szServersString;
 
     if ( m_iPass )

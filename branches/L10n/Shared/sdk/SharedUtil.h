@@ -60,11 +60,9 @@ typedef float               FLOAT;      //  32
 #include <stdarg.h>
 
 // Vendor
-#include "../../vendor/gettext-runtime/gnulib-lib/gettext.h"
-#if !defined(LC_MESSAGES) 
-    #define LC_MESSAGES 6
-#endif
-#define _ gettext
+#include "../../vendor/tinygettext/tinygettext.hpp"
+#define _ //TEMP
+#define _n(x,y,z) x //TEMP
 
 #include "SString.h"
 #include "WString.h"
