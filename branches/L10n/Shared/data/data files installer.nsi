@@ -138,8 +138,6 @@ Section "Data files" SEC01
 	File "${FILES_ROOT}\MTA San Andreas\mta\sa.dat"
 	File "${FILES_ROOT}\MTA San Andreas\mta\pthreadVC2.dll"
 	File "${FILES_ROOT}\MTA San Andreas\mta\XInput9_1_0_mta.dll"
-	File "${FILES_ROOT}\MTA San Andreas\mta\intl.dll"
-	File "${FILES_ROOT}\MTA San Andreas\mta\iconv.dll"
 
 	SetOutPath "$INSTDIR\skins\Classic"
     File "${FILES_ROOT}\MTA San Andreas\skins\Classic\CGUI.is.xml"

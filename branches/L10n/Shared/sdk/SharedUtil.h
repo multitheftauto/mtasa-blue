@@ -59,15 +59,12 @@ typedef float               FLOAT;      //  32
 #include <string>
 #include <stdarg.h>
 
+// Vendor
+#include "../../vendor/gettext-runtime/gnulib-lib/gettext.h"
 #if !defined(LC_MESSAGES) 
     #define LC_MESSAGES 6
 #endif
-
-#if defined(_LIBINTL_H)
-    #define _ gettext
-#else
-    #define _ 
-#endif
+#define _ gettext
 
 #include "SString.h"
 #include "WString.h"
