@@ -69,7 +69,11 @@ struct SViewerInfo
     bool bInBulletSyncSimSendList;
 };
 
-typedef CFastHashMap < CPlayer*, SViewerInfo > SViewerMapType;
+#ifdef WIN32
+    typedef CFastHashMap < CPlayer*, SViewerInfo > SViewerMapType;
+#else
+    typedef std::map < CPlayer*, SViewerInfo > SViewerMapType;
+#endif
 
 struct SScreenShotInfo
 {
