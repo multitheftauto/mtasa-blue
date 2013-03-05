@@ -121,7 +121,7 @@ private:
     template < class T, class I, unsigned long MAX >
     struct SPoolData
     {
-        typedef         google::dense_hash_map < I*, T* >  mapType;
+        typedef         CFastHashMap < I*, T* >  mapType;
         mapType         map;
         T*              array [ MAX ];
         unsigned long   ulCount;

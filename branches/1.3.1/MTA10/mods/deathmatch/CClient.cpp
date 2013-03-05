@@ -16,6 +16,7 @@
 *****************************************************************************/
 
 #include <StdInc.h>
+#define ALLOC_STATS_MODULE_NAME "client"
 #include "SharedUtil.hpp"
 
 CCoreInterface* g_pCore = NULL;

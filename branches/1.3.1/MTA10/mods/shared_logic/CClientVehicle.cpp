@@ -2479,7 +2479,7 @@ void CClientVehicle::Create ( void )
                 vehicleComponentData.m_vecOriginalComponentRotation = vehicleComponentData.m_vecComponentRotation;
                 
                 // insert it into our component data list
-                m_ComponentData.insert ( pair < SString, SVehicleComponentData > ( (*iter).first, vehicleComponentData ) );
+                m_ComponentData.insert ( std::pair < SString, SVehicleComponentData > ( (*iter).first, vehicleComponentData ) );
                 
                 // # prefix means hidden by default.
                 if ( (*iter).first[0] == '#' )

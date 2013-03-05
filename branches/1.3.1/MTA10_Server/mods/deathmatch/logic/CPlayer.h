@@ -75,7 +75,6 @@ struct SViewerInfo
     typedef std::map < CPlayer*, SViewerInfo > SViewerMapType;
 #endif
 
-
 struct SScreenShotInfo
 {
     bool        bInProgress;
