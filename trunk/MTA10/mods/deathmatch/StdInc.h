@@ -3,6 +3,10 @@
 #define WIN32_LEAN_AND_MEAN
 
 #include <windows.h>
+#define MTA_CLIENT
+#define SHARED_UTIL_WITH_FAST_HASH_MAP
+#include "SharedUtil.h"
+
 #include <string.h>
 #include <stdio.h>
 #include <mmsystem.h>
@@ -22,9 +26,6 @@
 #include <zlib.h>
 
 // SDK includes
-#define MTA_CLIENT
-#define SHARED_UTIL_WITH_FAST_HASH_MAP
-#include "SharedUtil.h"
 #include <core/CCoreInterface.h>
 #include <core/CExceptionInformation.h>
 #include <xml/CXML.h>

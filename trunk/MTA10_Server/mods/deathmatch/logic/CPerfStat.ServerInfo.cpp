@@ -236,7 +236,7 @@ SString CPerfStatServerInfoImpl::GetProcessMemoryUsage( void )
 
     long page_size_kb = sysconf( _SC_PAGE_SIZE ) / 1024; // in case x86-64 is configured to use 2MB pages
     uint vm_usage     = vsize / ( 1024 * 1024 );
-    uint resident_set = rss * page_size_kb;
+    uint resident_set = rss * page_size_kb / 1024;
 
     return SString( "VM:%d MB  RSS:%d MB", vm_usage, resident_set );
 #endif

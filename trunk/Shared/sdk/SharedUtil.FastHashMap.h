@@ -37,6 +37,12 @@ namespace SharedUtil
     class CFastHashMap : public google::dense_hash_map < K, V >
     {
     public:
+        CFastHashMap ( uint uiInitialSize )
+            : google::dense_hash_map < K, V > ( uiInitialSize )
+        {
+            set_empty_key ( GetEmptyMapKey ( (K*)NULL ) );
+            set_deleted_key ( GetDeletedMapKey ( (K*)NULL ) );
+        }
         CFastHashMap ( void )
         {
             set_empty_key ( GetEmptyMapKey ( (K*)NULL ) );
@@ -133,13 +139,13 @@ SString GetDeletedMapKey ( SString* )
 template < class T >
 T* GetEmptyMapKey ( T** )
 {
-    return (T*)-1;
+    return (T*)-3;
 }
 
 template < class T >
 T* GetDeletedMapKey ( T** )
 {
-    return (T*)-2;
+    return (T*)-4;
 }
 
 #endif  // WITH_ALLOC_TRACKING

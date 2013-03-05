@@ -5,6 +5,10 @@
 #pragma warning (disable:4250)
 
 #include <windows.h>
+#define MTA_CLIENT
+#define SHARED_UTIL_WITH_HASH_MAP
+#define SHARED_UTIL_WITH_FAST_HASH_MAP
+#include "SharedUtil.h"
 #include <stdio.h>
 
 #include <algorithm>
@@ -15,10 +19,6 @@
 #include <vector>
 
 // SDK includes
-#define MTA_CLIENT
-#define SHARED_UTIL_WITH_HASH_MAP
-#define SHARED_UTIL_WITH_FAST_HASH_MAP
-#include "SharedUtil.h"
 #include <core/CCoreInterface.h>
 #include <net/CNet.h>
 #include <game/CGame.h>

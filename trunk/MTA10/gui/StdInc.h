@@ -1,8 +1,10 @@
 #pragma message("Compiling precompiled header.\n")
 
 #include <CEGUI.h>
-
 #include <windows.h>
+#define MTA_CLIENT
+#define SHARED_UTIL_WITH_FAST_HASH_MAP
+#include "SharedUtil.h"
 #include <list>
 #include <map>
 #include <string>
@@ -12,9 +14,6 @@
 #include <renderers/directx9GUIRenderer/d3d9renderer.h>
 #include <renderers/directx9GUIRenderer/d3d9texture.h>
 
-#define MTA_CLIENT
-#define SHARED_UTIL_WITH_FAST_HASH_MAP
-#include "SharedUtil.h"
 #include "CGUITabListItem.h"
 #include "CGUITabList.h"
 #include "CGUI_Impl.h"

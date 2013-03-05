@@ -635,7 +635,7 @@ float CBassAudio::GetSoundBPM ( void )
             float fData = BASS_FX_BPM_DecodeGet ( BASS_FX_TempoGetSource ( m_pSound ) , dStart, dStart + 60, 0, BASS_FX_FREESOURCE | BASS_FX_BPM_MULT2, NULL );
             
             g_pCore->GetConsole()->Printf ( "BASS ERROR %d in BASS_FX_BPM_DecodeGet  path:%s  3d:%d  loop:%d", BASS_ErrorGetCode(), *m_strPath, m_b3D, m_bLoop );
-            m_fBPM = max( fData, m_fBPM );
+            m_fBPM = Max( fData, m_fBPM );
             dStart += 60;
         }
     }

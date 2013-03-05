@@ -13,7 +13,6 @@
 #include "StdInc.h"
 #include "CServerImpl.h"
 #define ALLOC_STATS_MODULE_NAME "core"
-#define ALLOC_STATS_PRE_COUNT 0     // Increase if crashing at startup
 #include "SharedUtil.hpp"
 #include "SharedUtil.Tests.hpp"
 
