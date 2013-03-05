@@ -320,7 +320,7 @@ void CServerBrowser::CreateTab ( ServerBrowserType type, const char* szName )
     float fSearchBarSizeX = SB_SEARCHBAR_SIZE_X;
 
 	//Make our playerlist smaller, if it's a small panel - either 15%, or a max of 200px in size.
-    fPlayerListSizeX = min(m_WidgetSize.fX*0.15, SB_PLAYERLIST_SIZE_X);
+    fPlayerListSizeX = Min < float >( m_WidgetSize.fX*0.15, SB_PLAYERLIST_SIZE_X );
 
     // Formulate our navigation bar
 

@@ -2350,7 +2350,7 @@ void CVehicleSA::AddComponent ( RwFrame * pFrame )
         m_ucVariantCount++;
     }
     // insert our new frame
-    m_ExtraFrames.insert ( pair < SString, RwFrame * > ( strName, pFrame ) );
+    m_ExtraFrames.insert ( std::pair < SString, RwFrame * > ( strName, pFrame ) );
 }
 
 

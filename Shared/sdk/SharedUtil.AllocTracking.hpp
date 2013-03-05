@@ -90,7 +90,7 @@ struct CAllocInfo
 static int stats_ready = 1;
 #ifdef ALLOC_STATS_MODULE_NAME
     #ifndef ALLOC_STATS_PRE_COUNT
-        #define ALLOC_STATS_PRE_COUNT 200     // Increase if crash at startup
+        #define ALLOC_STATS_PRE_COUNT 0     // Increase if crash at startup
     #endif
     static int pre_count = ALLOC_STATS_PRE_COUNT;
 #else
@@ -98,7 +98,8 @@ static int stats_ready = 1;
     static int pre_count = -1;
 #endif
 
-static int no_stuff = 0;
+static int no_stuff = 0;    // No tracking when tracker is allocating
+#define INVALID_THREAD_ID (-2)
 
 typedef unsigned char BYTE;
 
@@ -122,6 +123,7 @@ public:
     uint                            tagIdCounter;
     maptype < uint, STagInfo >      tagInfoMap;
     CCriticalSection                cs;
+    DWORD                           dwThreadUsing;
 
     #define SIZE_SORTED_TAG_THRESH 10000
     maptype < uint64, uint >      sizeSortedTagMap;
@@ -150,6 +152,7 @@ public:
         UnmatchedFrees = 0;
         DupeAllocs = 0;
         DupeMem = 0;
+        dwThreadUsing = INVALID_THREAD_ID;
     }
 
     uint GetTagId( const char* Tag )
@@ -233,8 +236,6 @@ public:
     void AddAllocInfo( BYTE* pData, size_t Count, const char* Tag, int ElementSize )
     {
         Tag = Tag ? Tag : "";
-        cs.Lock();
-        no_stuff++;
         if( !xMapContains( allocMap, pData ) )
         {
             CAllocInfo info;
@@ -258,15 +259,11 @@ public:
             DupeAllocs++;
             DupeMem += Count;
         }
-        no_stuff--;
-        cs.Unlock();
     }
 
     void MoveAllocInfo( BYTE* pOrig, BYTE* pNew, size_t Count, const char* Tag, int ElementSize )
     {
         Tag = Tag ? Tag : "";
-        cs.Lock();
-        no_stuff++;
         CAllocInfo info;
         int SizeDif = Count;
         if( xMapContains( allocMap, pOrig ) )
@@ -291,21 +288,17 @@ public:
 
         TotalMem += SizeDif;
         TotalMemMax = Max ( TotalMemMax, TotalMem );
-        no_stuff--;
-        cs.Unlock();
     }
 
     void RemoveAllocInfo( BYTE* pOrig )
     {
-        cs.Lock();
-        no_stuff++;
         if( xMapContains( allocMap, pOrig ) )
         {
             CAllocInfo* pInfo = xMapFind ( allocMap, pOrig );
             TotalMem -= pInfo->size;
+            RemoveTagAlloc( pInfo->tagId, pInfo->size );
 
             xMapRemove( allocMap, pOrig );
-            RemoveTagAlloc( pInfo->tagId, pInfo->size );
             ActiveAllocs--;
             Frees++;
         }
@@ -313,7 +306,22 @@ public:
         {
             UnmatchedFrees++;
         }
-        no_stuff--;
+    }
+
+    // Return false if should not use alloc tracking
+    bool Lock( void )
+    {
+        DWORD dwThreadWanting = GetCurrentThreadId();
+        if ( dwThreadWanting == dwThreadUsing )
+            return false;   // No tracking when tracker is allocating 
+        cs.Lock();
+        dwThreadUsing = dwThreadWanting;
+        return true;
+    }
+
+    void Unlock( void )
+    {
+        dwThreadUsing = INVALID_THREAD_ID;
         cs.Unlock();
     }
 };
@@ -339,17 +347,16 @@ void* myMalloc ( size_t Count, const char* Tag, int ElementSize )
     if ( pre_count > 0 )
         pre_count--;
 
-    if ( no_stuff || pre_count )
+    if ( pre_count || no_stuff )
+        return malloc ( Count );
+
+    CAllocStats* pAllocStats = GetAllocStats();
+    if ( !pAllocStats->Lock() )
         return malloc ( Count );
 
     BYTE* pData = (BYTE*)malloc ( Count );
-
-    if ( stats_ready )
-    {
-        CAllocStats* pAllocStats = GetAllocStats();
-        pAllocStats->AddAllocInfo( pData, Count, Tag, ElementSize );
-    }
-
+    pAllocStats->AddAllocInfo( pData, Count, Tag, ElementSize );
+    pAllocStats->Unlock();
     return pData;
 }
 
@@ -362,35 +369,34 @@ void* myCalloc ( size_t Count, size_t elsize, const char* Tag, int ElementSize )
 
 void* myRealloc ( void* Original, size_t Count, const char* Tag, int ElementSize )
 {
-    if ( no_stuff || pre_count )
+    if ( pre_count || no_stuff )
+        return realloc ( Original, Count );
+
+    CAllocStats* pAllocStats = GetAllocStats();
+    if ( !pAllocStats->Lock() )
         return realloc ( Original, Count );
 
     BYTE* pData = (BYTE*)realloc ( Original, Count );
-
-    if ( stats_ready )
-    {
-        CAllocStats* pAllocStats = GetAllocStats();
-        pAllocStats->MoveAllocInfo( (BYTE*)Original, pData, Count, Tag, ElementSize );
-    }
-
+    pAllocStats->MoveAllocInfo( (BYTE*)Original, pData, Count, Tag, ElementSize );
+    pAllocStats->Unlock();
     return pData;
 }
 
 void myFree ( void* Original )
 {
-    if ( no_stuff || pre_count )
+    if ( pre_count || no_stuff )
         return free ( Original );
 
     if ( !Original )
         return;
 
-    if ( stats_ready )
-    {
-        CAllocStats* pAllocStats = GetAllocStats();
-        pAllocStats->RemoveAllocInfo( (BYTE*)Original );
-    }
+    CAllocStats* pAllocStats = GetAllocStats();
+    if ( !pAllocStats->Lock() )
+        return free ( Original );
 
+    pAllocStats->RemoveAllocInfo( (BYTE*)Original );
     free ( Original );
+    pAllocStats->Unlock();
 }
 
 void* myNew ( std::size_t size, const char* Tag, int ElementSize )

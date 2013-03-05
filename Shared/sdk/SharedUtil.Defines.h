@@ -18,9 +18,9 @@
 // Enable WITH_ALLOC_TRACKING to monitor server module memory usage. *Has a negative performance impact*
 #ifndef WITH_ALLOC_TRACKING
     #ifndef MTA_CLIENT
-        #define WITH_ALLOC_TRACKING 0       // Alloc track server - (Can also be defined in individual modules)
+        #define WITH_ALLOC_TRACKING 0       // Alloc track server - (Can also be defined in individual modules, just above #include "SharedUtil.h")
     #else
-        #define WITH_ALLOC_TRACKING 0       // Alloc track client - Should always be zero as it don't work with the client
+        #define WITH_ALLOC_TRACKING 0       // Alloc track client - (Can also be defined in individual modules, just above #include "SharedUtil.h")
     #endif
 #endif
 

@@ -1125,8 +1125,6 @@ void CPlayer::SetJackingVehicle ( CVehicle* pVehicle )
         m_pJackingVehicle->SetJackingPlayer ( this );
 }
 
-#ifdef WIN32
-
 // For NearList/FarList hash maps
 CPlayer* GetEmptyMapKey ( CPlayer** )
 {
@@ -1137,5 +1135,3 @@ CPlayer* GetDeletedMapKey ( CPlayer** )
 {
     return (CPlayer*)2;
 }
-
-#endif

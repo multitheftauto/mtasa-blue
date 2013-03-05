@@ -466,6 +466,9 @@ CClientGame::~CClientGame ( void )
     // Packet handler
     delete m_pPacketHandler;
 
+    // Delete PerfStatManager
+    delete CClientPerfStatManager::GetSingleton ();
+
     // NULL the global CClientGame var
     g_pClientGame = NULL;
     m_bBeingDeleted = false;
