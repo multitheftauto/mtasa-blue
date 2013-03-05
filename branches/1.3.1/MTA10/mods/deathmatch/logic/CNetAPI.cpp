@@ -1521,7 +1521,7 @@ void CNetAPI::ReadVehiclePuresync ( CClientPlayer* pPlayer, CClientVehicle* pVeh
             }
 
             // Read out the weapon ammo
-            SWeaponAmmoSync ammo ( ucCurrentWeapon, false, true );
+            SWeaponAmmoSync ammo ( ucCurrentWeapon, BitStream.Version () >= 0x44, true );
             BitStream.Read ( &ammo );
             unsigned short usWeaponAmmo = ammo.data.usAmmoInClip;
 
@@ -1531,7 +1531,7 @@ void CNetAPI::ReadVehiclePuresync ( CClientPlayer* pPlayer, CClientVehicle* pVeh
                 if ( pPlayerWeapon )
                 {
                     pPlayerWeapon->SetAsCurrentWeapon ();
-                    pPlayerWeapon->SetAmmoTotal ( 9999 );
+                    pPlayerWeapon->SetAmmoTotal ( BitStream.Version () >= 0x44 ? ammo.data.usTotalAmmo : 9999 );
                     pPlayerWeapon->SetAmmoInClip ( usWeaponAmmo );
                 }
             }
@@ -1725,8 +1725,9 @@ void CNetAPI::WriteVehiclePuresync ( CClientPed* pPlayerModel, CClientVehicle* p
         if ( flags.data.bIsDoingGangDriveby && CWeaponNames::DoesSlotHaveAmmo ( uiSlot ) )
         {
             // Write the ammo states
-            SWeaponAmmoSync ammo ( pPlayerWeapon->GetType (), false, true );
+            SWeaponAmmoSync ammo ( pPlayerWeapon->GetType (), BitStream.Version () >= 0x44, true );
             ammo.data.usAmmoInClip = static_cast < unsigned short > ( pPlayerWeapon->GetAmmoInClip () );
+            ammo.data.usTotalAmmo = static_cast < unsigned short > ( pPlayerWeapon->GetAmmoTotal () );
             BitStream.Write ( &ammo );
 
             // Sync aim data

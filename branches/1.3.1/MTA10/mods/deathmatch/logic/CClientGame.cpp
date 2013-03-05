@@ -1890,6 +1890,15 @@ void CClientGame::UpdatePlayerWeapons ( void )
             NetBitStreamInterface& BitStream = *(bitStream.pBitStream);
             SWeaponSlotSync slot;
 
+            if ( BitStream.Version () >= 0x44 && m_lastWeaponSlot == WEAPONSLOT_TYPE_THROWN )
+            {
+                CWeapon* pLastWeapon = m_pLocalPlayer->GetWeapon ( m_lastWeaponSlot );
+                if ( pLastWeapon && pLastWeapon->GetAmmoTotal () == 0 )
+                    BitStream.WriteBit ( true );
+                else
+                    BitStream.WriteBit ( false );
+            }
+
             if ( pWeapon )
             {
                 /* Send a packet to the server with info about the new weapon,
