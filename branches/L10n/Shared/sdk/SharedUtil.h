@@ -60,9 +60,9 @@ typedef float               FLOAT;      //  32
 #include <stdarg.h>
 
 // Vendor
-#include "../../vendor/tinygettext/tinygettext.hpp"
-#define _ //TEMP
-#define _n(x,y,z) x //TEMP
+#ifndef _
+#define _ //Use a dummy localisation define for modules that don't need it
+#endif
 
 #include "SString.h"
 #include "WString.h"

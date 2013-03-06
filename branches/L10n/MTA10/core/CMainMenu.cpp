@@ -948,12 +948,16 @@ bool CMainMenu::OnNewsButtonClick ( CGUIElement* pElement )
 
 sMenuItem* CMainMenu::CreateItem ( unsigned char menuType, const char* szFilename, CVector2D vecRelPosition )
 { 
-    /* TRANSLATORS:  Set this directory to your appropriate assets directory for your language/dialect!
-    For example: locale/ru_RU/assets for Russian in Russia */
-    SString strFilePath = strcmp("locale/<cc_LL>/assets",_("locale/<cc_LL>/assets")) ? _("locale/<cc_LL>/assets") : "cgui/images";
     CGUIStaticImage* pImage = reinterpret_cast < CGUIStaticImage* > ( m_pManager->CreateStaticImage () );
-    if ( !pImage->LoadFromFile ( PathJoin(strFilePath,szFilename) ) )
+
+    if ( g_pCore->GetLocalization()->IsLocalized() )
+    {
+        if ( !pImage->LoadFromFile ( PathJoin(g_pCore->GetLocalization()->GetLanguageDirectory(),szFilename) ) )
+            pImage->LoadFromFile ( PathJoin("cgui/images",szFilename) );
+    }
+    else
         pImage->LoadFromFile ( PathJoin("cgui/images",szFilename) );
+        
 
     // Make our positions absolute
 	int iPosX = vecRelPosition.fX*m_iMenuSizeX;

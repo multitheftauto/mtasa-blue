@@ -308,6 +308,7 @@ void CClientVariables::LoadDefaults ( void )
     DEFAULT ( "display_alttab_handler",     0 );                            // 0-off 1-on
     DEFAULT ( "display_windowed",           0 );                            // 0-off 1-on
     DEFAULT ( "multimon_fullscreen_minimize", 1 );                          // 0-off 1-on
+    DEFAULT ( "locale",                     _S("en_US") );                  // string: ll_CC
 
     // We will default this one at CClientGame.cpp, because we need a valid direct3d device to give a proper default value.
 #if 0

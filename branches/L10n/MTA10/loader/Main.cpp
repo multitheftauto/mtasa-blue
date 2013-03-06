@@ -520,7 +520,7 @@ int DoLaunchGame ( LPSTR lpCmdLine )
         }
     }
 
-    WriteDebugEvent( SString( _("Loader - Process created: %s"), *strGTAEXEPath ) );
+    WriteDebugEvent( SString( "Loader - Process created: %s", *strGTAEXEPath ) );
 
     SString strCoreDLL = strMTASAPath + "\\mta\\" + MTA_DLL_NAME;
 

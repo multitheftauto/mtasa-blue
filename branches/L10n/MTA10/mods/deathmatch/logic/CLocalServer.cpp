@@ -62,7 +62,7 @@ CLocalServer::CLocalServer ( const char* szConfig )
     m_pEditName->SetSize ( CVector2D ( 0.57f, 0.06f ), true );
     m_pEditName->SetMaxLength ( 64 );
 
-    m_pLabelPass = reinterpret_cast < CGUILabel* > ( m_pGUI->CreateLabel ( m_pTabGeneral, "Password:" ) );
+    m_pLabelPass = reinterpret_cast < CGUILabel* > ( m_pGUI->CreateLabel ( m_pTabGeneral, _("Password:") ) );
     m_pLabelPass->SetPosition ( CVector2D ( 0.03f, 0.14f ), true );
     m_pLabelPass->AutoSize ( _("Password:") );
 
@@ -71,7 +71,7 @@ CLocalServer::CLocalServer ( const char* szConfig )
     m_pEditPass->SetSize ( CVector2D ( 0.57f, 0.06f ), true );
     m_pEditPass->SetMaxLength ( 8 );
 
-    m_pLabelPlayers = reinterpret_cast < CGUILabel* > ( m_pGUI->CreateLabel ( m_pTabGeneral, "Max players:" ) );
+    m_pLabelPlayers = reinterpret_cast < CGUILabel* > ( m_pGUI->CreateLabel ( m_pTabGeneral, _("Max players:") ) );
     m_pLabelPlayers->SetPosition ( CVector2D ( 0.03f, 0.21f ), true );
     m_pLabelPlayers->AutoSize ( _("Max players:") );
 

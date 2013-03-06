@@ -12,6 +12,7 @@
 #ifndef __CCOREINTERFACE_H
 #define __CCOREINTERFACE_H
 
+#include "CLocalizationInterface.h"
 #include "CConsoleInterface.h"
 #include "CCommandsInterface.h"
 #include "CCommunityInterface.h"
@@ -78,6 +79,7 @@ public:
     virtual CXMLNode*                   GetConfig                       ( void ) = 0;
     virtual CCVarsInterface*            GetCVars                        ( void ) = 0;
     virtual CCommunityInterface*        GetCommunity                    ( void ) = 0;
+    virtual CLocalizationInterface*     GetLocalization                 ( void ) = 0;
     
 
     // Temporary functions for r1
@@ -157,6 +159,10 @@ public:
     virtual CModelCacheManager*     GetModelCacheManager            ( void ) = 0;
     virtual void                    AddModelToPersistentCache       ( ushort usModelId ) = 0;
 };
+
+#ifndef __CCORE_H
+extern CCoreInterface* g_pCore;
+#endif
 
 class CClientTime
 {

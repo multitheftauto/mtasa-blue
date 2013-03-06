@@ -154,12 +154,12 @@ void CServerList::Pulse ( void )
     ss << "   ";
     if ( uiTotalSlots > 0 )
     {
-        const char * szPlayersString = _n ("player", "players", uiOccupiedSlots);
-        ss << uiOccupiedSlots << " " << szPlayersString << _(" on ");
+        SString strPlayersString = _n ("player", "players", uiOccupiedSlots);
+        ss << uiOccupiedSlots << " " << strPlayersString << _(" on ");
     }
 
-    const char * szServersString = _n ("server", "servers", uiActiveServers);
-    ss << uiActiveServers << " " << szServersString;
+    SString strServersString = _n ("server", "servers", uiActiveServers);
+    ss << uiActiveServers << " " << strServersString;
 
     if ( m_iPass )
         ss << "...";

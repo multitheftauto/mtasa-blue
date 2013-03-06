@@ -111,6 +111,10 @@ CCore::CCore ( void )
     };
     ParseCommandLine ( m_CommandLineOptions, m_szCommandLineArgs, pszNoValOptions );
 
+    // Load our settings and localization as early as possible
+    CreateXML ( );
+    m_pLocalization = new CLocalization;
+
     // Create a logger instance.
     m_pConsoleLogger            = new CConsoleLogger ( );
 
@@ -920,21 +924,27 @@ void CCore::CreateNetwork ( )
 
 void CCore::CreateXML ( )
 {
-    m_pXML = CreateModule < CXML > ( m_XMLModule, "XML", "xmll", "InitXMLInterface", this );
-   
-    // Load config XML file
-    m_pConfigFile = m_pXML->CreateXML ( CalcMTASAPath ( MTA_CONFIG_PATH ) );
-    if ( !m_pConfigFile ) {
-        assert ( false );
-        return;
+    if ( !m_pXML )
+        m_pXML = CreateModule < CXML > ( m_XMLModule, "XML", "xmll", "InitXMLInterface", this );
+
+    if ( !m_pConfigFile )
+    {
+        // Load config XML file
+        m_pConfigFile = m_pXML->CreateXML ( CalcMTASAPath ( MTA_CONFIG_PATH ) );
+        if ( !m_pConfigFile ) {
+            assert ( false );
+            return;
+        }
+
+        m_pConfigFile->Parse ();
     }
-    m_pConfigFile->Parse ();
 
     // Load the keybinds (loads defaults if the subnode doesn't exist)
-    GetKeyBinds ()->LoadFromXML ( GetConfig ()->FindSubNode ( CONFIG_NODE_KEYBINDS ) );
-
-    // Load the default commandbinds if not exist
-    GetKeyBinds ()->LoadDefaultCommands( false );
+    if ( m_pKeyBinds )
+    {
+        m_pKeyBinds->LoadFromXML ( GetConfig ()->FindSubNode ( CONFIG_NODE_KEYBINDS ) );
+        m_pKeyBinds->LoadDefaultCommands( false );
+    }
 
     // Load XML-dependant subsystems
     m_ClientVariables.Load ( );

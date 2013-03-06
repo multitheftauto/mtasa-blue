@@ -103,6 +103,7 @@ public:
     CMouseControl*          GetMouseControl                 ( void )                { return m_pMouseControl; };
     CLocalGUI*              GetLocalGUI                     ( void );
     CCommunityInterface*    GetCommunity                    ( void )                { return &m_Community; };
+    CLocalizationInterface* GetLocalization                 ( void )                { return m_pLocalization; };
 
     void                    SaveConfig                      ( void );
 
@@ -291,6 +292,8 @@ private:
 
     // Logger utility interface.
     CConsoleLogger *            m_pConsoleLogger;
+
+    CLocalization*              m_pLocalization;
 
     CKeyBinds*                  m_pKeyBinds;
     CMouseControl*              m_pMouseControl;

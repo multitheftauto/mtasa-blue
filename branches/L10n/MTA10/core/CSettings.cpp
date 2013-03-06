@@ -690,10 +690,20 @@ void CSettings::CreateGUI ( void )
         pLabel->AutoSize ( _("Language:") );
     }
 
-    m_pInterfaceLanguageSelector = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabInterface, _("Portuguese (Portugal)") ) );
+    m_pInterfaceLanguageSelector = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabInterface, _("English") ) );
     m_pInterfaceLanguageSelector->SetPosition ( CVector2D ( 80.0f, 33.0f ) );
     m_pInterfaceLanguageSelector->SetSize ( CVector2D ( 320.0f, 200.0f ) );
     m_pInterfaceLanguageSelector->SetReadOnly ( true );
+
+    // Grab languages and populate
+    std::map<SString,SString> m_LanguageMap = g_pCore->GetLocalization()->GetAvailableLanguages();
+    m_LanguageMap["English"] = "en_US";
+    std::map<SString,SString>::const_iterator itr;
+    for(itr = m_LanguageMap.begin(); itr != m_LanguageMap.end(); ++itr)
+    {
+        CGUIListItem* pItem = m_pInterfaceLanguageSelector->AddItem((*itr).first );
+        pItem->SetData ( (*itr).second );
+    }
 
     {
         CGUILabel* pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabInterface, _("Skin:") ) );
@@ -1346,7 +1356,7 @@ void CSettings::UpdateJoypadTab ()
         return;
 
     // Update the joystick name
-    string strJoystickName = JoyMan->IsJoypadConnected () ? JoyMan->GetControllerName () : "Joypad not detected  -  Check connections and restart game";
+    string strJoystickName = JoyMan->IsJoypadConnected () ? JoyMan->GetControllerName () : _("Joypad not detected  -  Check connections and restart game");
 
     m_pJoypadName->SetPosition ( CVector2D ( 270, 125 ) );
     m_pJoypadName->SetText ( strJoystickName.c_str () );
@@ -2348,10 +2358,25 @@ void CSettings::LoadData ( void )
             m_pComboResolution->SetText ( strMode );
     }
 
+    // Locale
+    SString strLocale;
+    CVARS_GET("locale",strLocale);
+    unsigned int uiIndex = 0;
+    while ( uiIndex != m_pInterfaceLanguageSelector->GetItemCount() )
+    {
+        CGUIListItem* pItem =  m_pInterfaceLanguageSelector->GetItemByIndex(uiIndex);
+        if ( ((const char*)pItem->GetData()) == strLocale )
+            break;
+
+        uiIndex++;
+    }
+    m_pInterfaceLanguageSelector->SetSelectedItemByIndex(uiIndex);
+
+
     // Skins
     std::string currentSkin;
     CVARS_GET("current_skin", currentSkin);
-    unsigned int uiIndex = 0;
+    uiIndex = 0;
     std::string strItemText = m_pInterfaceSkinSelector->GetItemText( uiIndex );
     while ( strItemText != currentSkin )
     {
@@ -2525,51 +2550,6 @@ void CSettings::SaveData ( void )
     bool bIsAeroChanged = GetApplicationSettingInt ( "aero-enabled"  ) != iAeroEnabled;
     bool bIsCustomizedSAFilesChanged = bCustomizedSAFilesWasEnabled != bCustomizedSAFilesEnabled;
     bool bAltTabHandlerChanged = bAltTabHandlerWasEnabled != bAltTabHandlerEnabled;
-    if ( bIsVideoModeChanged || bIsAntiAliasingChanged || bIsAeroChanged || bIsCustomizedSAFilesChanged || bAltTabHandlerChanged )
-    {
-        SString strChangedOptions; //!ACHTUNG:  Need to consider something that applies universally to grammar rules
-        if ( bIsVideoModeChanged || bAltTabHandlerChanged )
-        {
-            strChangedOptions += _("Resolution");
-            if ( bNextFSMinimize != GetVideoModeManager ()->IsMinimizeEnabled () )
-                strChangedOptions += _("/Full Screen Minimize");
-        }
-
-        if ( bIsAntiAliasingChanged )
-        {
-            if ( !strChangedOptions.empty () )
-                strChangedOptions += _(" and ");
-            strChangedOptions += _("Anti-aliasing");
-        }
-
-        if ( bIsAeroChanged )
-        {
-            if ( !strChangedOptions.empty () )
-                strChangedOptions += _(" and ");
-            strChangedOptions += _("Aero setting");
-        }
-
-        if ( bIsCustomizedSAFilesChanged )
-        {
-            if ( !strChangedOptions.empty () )
-                strChangedOptions += _(" and ");
-            strChangedOptions += _("Customized GTA:SA files setting");
-        }
-
-        if ( strChangedOptions.empty () )
-            strChangedOptions += _("Some settings");
-
-        SString strMessage ( "%s will be changed when you next start MTA", strChangedOptions.c_str () );
-        strMessage += "\n\nDo you want to restart now?";
-        CQuestionBox* pQuestionBox = CCore::GetSingleton ().GetLocalGUI ()->GetMainMenu ()->GetQuestionWindow ();
-        pQuestionBox->Reset ();
-        pQuestionBox->SetTitle ( _("RESTART REQUIRED") );
-        pQuestionBox->SetMessage ( strMessage );
-        pQuestionBox->SetButton ( 0, _("No") );
-        pQuestionBox->SetButton ( 1, _("Yes") );
-        pQuestionBox->SetCallback ( RestartCallBack );
-        pQuestionBox->Show ();
-    }
 
     gameSettings->SetAntiAliasing ( iAntiAliasing, true );
     gameSettings->SetDrawDistance ( ( m_pDrawDistance->GetScrollPosition () * 0.875f ) + 0.925f );
@@ -2682,6 +2662,20 @@ void CSettings::SaveData ( void )
     float fMapAlpha = ( ( atof(sText.substr(0, sText.length() - 1 ).c_str() )) / 100 ) * 255;
     CVARS_SET ( "mapalpha", fMapAlpha );
 
+    // Language
+    std::string strCurrentLocale;
+    CVARS_GET("locale", strCurrentLocale );
+    bool bIsLocaleChanged = false;
+
+    CGUIListItem* pItem = m_pInterfaceLanguageSelector->GetSelectedItem ();
+    if ( pItem )
+    {
+        const char* szItemText = (const char*)pItem->GetData();
+        CVARS_SET("locale", std::string(szItemText) );
+        if ( szItemText != strCurrentLocale )
+            bIsLocaleChanged = true;
+    }
+
     // Chat
     SaveChatColor ( ChatColorTypes::CHAT_COLOR_BG, "chat_color" );
     SaveChatColor ( ChatColorTypes::CHAT_COLOR_TEXT, "chat_text_color" );
@@ -2706,7 +2700,7 @@ void CSettings::SaveData ( void )
     CVARS_SET ( "chat_line_fade_out", GetMilliseconds ( m_pChatLineFadeout ) );
 
     // Set our new skin last, as it'll destroy all our GUI
-    CGUIListItem* pItem = m_pInterfaceSkinSelector->GetSelectedItem ();
+    pItem = m_pInterfaceSkinSelector->GetSelectedItem ();
     if ( pItem )
         CVARS_SET("current_skin", pItem->GetText());
 
@@ -2724,6 +2718,61 @@ void CSettings::SaveData ( void )
     CCore::GetSingleton ().SaveConfig ();
     // Save the single player settings (e.g. video mode, volume)
     gameSettings->Save ();
+
+    // Ask to restart?
+    if ( bIsVideoModeChanged || bIsAntiAliasingChanged || bIsAeroChanged || bIsCustomizedSAFilesChanged || bAltTabHandlerChanged || bIsLocaleChanged )
+    {
+        SString strChangedOptions; //!ACHTUNG:  Need to consider something that applies universally to grammar rules
+        if ( bIsVideoModeChanged || bAltTabHandlerChanged )
+        {
+            strChangedOptions += _("Resolution");
+            if ( bNextFSMinimize != GetVideoModeManager ()->IsMinimizeEnabled () )
+                strChangedOptions += _("/Full Screen Minimize");
+        }
+
+        if ( bIsAntiAliasingChanged )
+        {
+            if ( !strChangedOptions.empty () )
+                strChangedOptions += _(" and ");
+            strChangedOptions += _("Anti-aliasing");
+        }
+
+        if ( bIsAeroChanged )
+        {
+            if ( !strChangedOptions.empty () )
+                strChangedOptions += _(" and ");
+            strChangedOptions += _("Aero setting");
+        }
+
+        if ( bIsCustomizedSAFilesChanged )
+        {
+            if ( !strChangedOptions.empty () )
+                strChangedOptions += _(" and ");
+            strChangedOptions += _("Customized GTA:SA files setting");
+        }
+
+        if ( bIsLocaleChanged )
+        {
+            if ( !strChangedOptions.empty () )
+                strChangedOptions += _(" and ");
+            strChangedOptions += _("Language setting");
+        }
+
+
+        if ( strChangedOptions.empty () )
+            strChangedOptions += _("Some settings");
+
+        SString strMessage ( _("%s will be changed when you next start MTA"), strChangedOptions.c_str () );
+        strMessage += _("\n\nDo you want to restart now?");
+        CQuestionBox* pQuestionBox = CCore::GetSingleton ().GetLocalGUI ()->GetMainMenu ()->GetQuestionWindow ();
+        pQuestionBox->Reset ();
+        pQuestionBox->SetTitle ( _("RESTART REQUIRED") );
+        pQuestionBox->SetMessage ( strMessage );
+        pQuestionBox->SetButton ( 0, _("No") );
+        pQuestionBox->SetButton ( 1, _("Yes") );
+        pQuestionBox->SetCallback ( RestartCallBack );
+        pQuestionBox->Show ();
+    }
 }
 
 void CSettings::RemoveKeyBindSection ( char * szSectionName )
