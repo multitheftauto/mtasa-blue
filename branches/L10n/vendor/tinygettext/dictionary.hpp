@@ -38,6 +38,7 @@ private:
   CtxtEntries ctxt_entries;
 
   std::string charset;
+  std::string filepath;
   PluralForms plural_forms;
 
   std::string translate(const Entries& dict, const std::string& msgid);
@@ -45,11 +46,14 @@ private:
 
 public:
   /** Constructs a dictionary converting to the specified \a charset (default UTF-8) */
-  Dictionary(const std::string& charset = "UTF-8");
+  Dictionary(const std::string& charset = "UTF-8",const std::string& filepath = "");
   ~Dictionary();
 
   /** Return the charset used for this dictionary */
   std::string get_charset() const;
+  
+  /** Return the filepath that this dictionary is loaded from */
+  std::string get_filepath() const;
 
   void set_plural_forms(const PluralForms&);
   PluralForms get_plural_forms() const;

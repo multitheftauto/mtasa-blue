@@ -217,7 +217,7 @@ LanguageSpec languages[] = {
   { "ro", 0,    0, "Romanian"                    },
   { "ro", "RO", 0, "Romanian (Romania)"          },
   { "ru", 0,    0, "Russian"                     },
-  { "ru", "RU", 0, "Russian (Russia"             },
+  { "ru", "RU", 0, "Russian (Russia)"            },
   { "rw", 0,    0, "Kinyarwanda"                 },
   { "sa", 0,    0, "Sanskrit"                    },
   { "sd", 0,    0, "Sindhi"                      },

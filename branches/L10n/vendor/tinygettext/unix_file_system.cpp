@@ -19,9 +19,12 @@
 
 #include <sys/types.h>
 #include <fstream>
-#include <dirent.h>
+#ifdef WIN32
+  #include <dirent_win32.h>
+#else
+  #include <dirent.h>
+#endif
 #include <stdlib.h>
-#include <dirent.h>
 #include <string.h>
 
 namespace tinygettext {
@@ -30,34 +33,63 @@ UnixFileSystem::UnixFileSystem()
 {
 }
 
-std::vector<std::string>
-UnixFileSystem::open_directory(const std::string& pathname)
+bool
+UnixFileSystem::open_directory(const std::string& pathname, std::vector<std::string>& files, std::vector<std::string>& dirs)
 {
   DIR* dir = opendir(pathname.c_str());
   if (!dir)
   {
     // FIXME: error handling
-    return std::vector<std::string>();
+    return false;
   }
   else
   {
-    std::vector<std::string> files;
-
     struct dirent* dp;
     while((dp = readdir(dir)) != 0)
     {
-      files.push_back(dp->d_name);
+	  const char* path = dp->d_name;
+      switch (dp->d_type)
+      {
+        case DT_REG:
+          files.push_back(path);
+          break;
+        case DT_DIR:
+        {
+          if( !strcmp(path, ".")) continue;
+          if( !strcmp(path, "..")) continue;
+          dirs.push_back(path);
+          break;
+        }
+        default: 
+          break;
+      }
     }
     closedir(dir);
 
-    return files;
+    return true;
   }
 }
-  
+
 std::auto_ptr<std::istream>
 UnixFileSystem::open_file(const std::string& filename)
 {
   return std::auto_ptr<std::istream>(new std::ifstream(filename.c_str()));
+}
+
+bool
+UnixFileSystem::file_exists(const std::string& filename)
+{
+  std::ifstream file(filename.c_str());
+  if (file.good())
+  {
+    file.close();
+    return true;
+  }
+  else
+  {
+    file.close();
+	return false;
+  }
 }
 
 } // namespace tinygettext

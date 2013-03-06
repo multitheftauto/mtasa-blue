@@ -30,8 +30,9 @@ class FileSystem
 public:
   virtual ~FileSystem() {}
 
-  virtual std::vector<std::string>    open_directory(const std::string& pathname) =0;
+  virtual bool open_directory(const std::string& pathname, std::vector<std::string>& files, std::vector<std::string>& dirs) =0;
   virtual std::auto_ptr<std::istream> open_file(const std::string& filename)      =0;
+  virtual bool file_exists(const std::string& filename) =0;
 };
 
 } // namespace tinygettext

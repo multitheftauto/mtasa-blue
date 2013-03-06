@@ -21,10 +21,11 @@
 
 namespace tinygettext {
 
-Dictionary::Dictionary(const std::string& charset_) :
+Dictionary::Dictionary(const std::string& charset_,const std::string& filepath_) :
   entries(),
   ctxt_entries(),
   charset(charset_),
+  filepath(filepath_),
   plural_forms()
 {
 }
@@ -37,6 +38,12 @@ std::string
 Dictionary::get_charset() const
 {
   return charset;
+}
+
+std::string
+Dictionary::get_filepath() const
+{
+  return filepath;
 }
 
 void
@@ -61,21 +68,17 @@ std::string
 Dictionary::translate_plural(const Entries& dict, const std::string& msgid, const std::string& msgid_plural, int count)
 {
   Entries::const_iterator i = dict.find(msgid);
-  const std::vector<std::string>& msgstrs = i->second;
 
-  if (i != dict.end())
+  if (&i && i != dict.end())
   {
+    const std::vector<std::string>& msgstrs = i->second;
+
     unsigned int n = 0;
     n = plural_forms.get_plural(count);
-    assert(/*n >= 0 &&*/ n < msgstrs.size());
+    // assert(/*n >= 0 &&*/ n < msgstrs.size());
 
-    if (!msgstrs[n].empty())
+    if (n < msgstrs.size() && !msgstrs[n].empty())
       return msgstrs[n];
-    else
-      if (count == 1) // default to english rules
-        return msgid;
-      else
-        return msgid_plural;
   }
   else
   {
@@ -83,12 +86,12 @@ Dictionary::translate_plural(const Entries& dict, const std::string& msgid, cons
     log_info << "Candidates: " << std::endl;
     for (i = dict.begin(); i != dict.end(); ++i)
       log_info << "'" << i->first << "'" << std::endl;
-
-    if (count == 1) // default to english rules
-      return msgid;
-    else
-      return msgid_plural;
   }
+
+  if (count == 1) // default to english rules
+    return msgid;
+  else
+    return msgid_plural;
 }
 
 std::string

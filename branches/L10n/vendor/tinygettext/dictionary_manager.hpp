@@ -64,7 +64,7 @@ public:
   Dictionary& get_dictionary();
 
   /** Get dictionary for language */
-  Dictionary& get_dictionary(const Language& language);
+  Dictionary& get_dictionary(const Language& language, const std::string& textdomain = "" );
 
   /** Set a language based on a four? letter country code */
   void set_language(const Language& language);
@@ -83,7 +83,7 @@ public:
   void add_directory(const std::string& pathname);
 
   /** Return a set of the available languages in their country code */
-  std::set<Language> get_languages();
+  std::set<Language> get_languages(const std::string& textdomain = "");
 
   void set_filesystem(std::auto_ptr<FileSystem> filesystem);
 
