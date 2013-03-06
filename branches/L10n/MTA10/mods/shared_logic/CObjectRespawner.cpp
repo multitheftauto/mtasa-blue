@@ -44,8 +44,11 @@ void CObjectRespawner::DoRespawnAll ( void )
     for ( uint i = 0; i < m_List.size (); i++ )
     {
         CClientObject* pObject = m_List[i];
-        pObject->ReCreate ();
-        pObject->SetBeingRespawned ( false );
+        if ( pObject && !pObject->IsBeingDeleted () )
+        {
+            pObject->ReCreate ();
+            pObject->SetBeingRespawned ( false );
+        }
     }
 
     m_List.clear ();

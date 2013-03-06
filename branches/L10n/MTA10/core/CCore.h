@@ -165,7 +165,7 @@ public:
     void                    CreateMultiplayer               ( void );
     void                    CreateNetwork                   ( void );
     void                    CreateXML                       ( void );
-    void                    InitGUI                         ( IUnknown* pDevice );
+    void                    InitGUI                         ( IDirect3DDevice9* pDevice );
     void                    CreateGUI                       ( void );
     void                    DestroyGame                     ( void );
     void                    DestroyMultiplayer              ( void );

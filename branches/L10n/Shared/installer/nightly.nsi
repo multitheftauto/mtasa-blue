@@ -501,15 +501,15 @@ DontInstallRedist:
 		SetOutPath "$INSTDIR\MTA"
 		File "${FILES_ROOT}\MTA San Andreas\mta\cgui.dll"
 		File "${FILES_ROOT}\MTA San Andreas\mta\core.dll"
-		File "${FILES_ROOT}\MTA San Andreas\mta\xmll.dll"
+		File "${SERVER_FILES_ROOT}\xmll.dll"
 		File "${FILES_ROOT}\MTA San Andreas\mta\game_sa.dll"
 		File "${FILES_ROOT}\MTA San Andreas\mta\multiplayer_sa.dll"
 		File "${FILES_ROOT}\MTA San Andreas\mta\netc.dll"
-		File "${FILES_ROOT}\MTA San Andreas\mta\libcurl.dll"
+		File "${SERVER_FILES_ROOT}\libcurl.dll"
 		File "${FILES_ROOT}\MTA San Andreas\mta\loader.dll"
         File "${FILES_ROOT}\MTA San Andreas\mta\bass_fx.dll"
         File "${FILES_ROOT}\MTA San Andreas\mta\tags.dll"
-		File "${FILES_ROOT}\MTA San Andreas\mta\pthreadVC2.dll"
+		File "${SERVER_FILES_ROOT}\pthreadVC2.dll"
 
         !ifndef LIGHTBUILD
 
@@ -594,6 +594,7 @@ DontInstallRedist:
 		SetOutPath "$INSTDIR\mods\deathmatch"
 		File "${FILES_ROOT}\MTA San Andreas\mods\deathmatch\Client.dll"
 		File "${SERVER_FILES_ROOT}\mods\deathmatch\lua5.1.dll"
+		File "${SERVER_FILES_ROOT}\mods\deathmatch\pcre3.dll"
 		SetOutPath "$INSTDIR\mods\deathmatch\resources"
 	SectionEnd
 SectionGroupEnd
@@ -1563,6 +1564,7 @@ FunctionEnd
 Var Dialog
 Var UpgradeLabel
 Var BrowseButton
+Var SetDefaultButton
 Var DirRequest
 !define LT_GREY "0xf0f0f0"
 !define MID_GREY "0x808080"
@@ -1593,14 +1595,17 @@ Function CustomDirectoryPage
 	Pop $UpgradeLabel
     SetCtlColors $UpgradeLabel ${MID_GREY} ${LT_GREY}
     Call CustomDirectoryPageSetUpgradeMessage
-	
-	${NSD_CreateGroupBox} 0 115 100% 37u "$(INST_CHOOSE_LOC3)"
+
+	${NSD_CreateGroupBox} 0 115 100% 63u "$(INST_CHOOSE_LOC3)"
 	Pop $0
 	${NSD_CreateDirRequest} 15 139 72% 12u $INSTDIR
 	Pop $DirRequest
 	${NSD_CreateBrowseButton} 77% 135 20% 15u "$(INST_CHOOSE_LOC_BROWSE)"
 	Pop $BrowseButton
+	${NSD_CreateButton} 77% 165 20% 15u "Set default"
+	Pop $SetDefaultButton
     ${NSD_OnClick} $BrowseButton CustomDirectoryPageBrowseButtonClick
+    ${NSD_OnClick} $SetDefaultButton CustomDirectoryPageSetDefaultButtonClick
     ${NSD_OnChange} $DirRequest CustomDirectoryPageDirRequestChange
 
     Call DirectoryShowProc
@@ -1615,7 +1620,14 @@ Function CustomDirectoryPageDirRequestChange
 	${EndIf}
 FunctionEnd
 
+Function CustomDirectoryPageSetDefaultButtonClick
+    StrCpy $INSTDIR "$PROGRAMFILES\MTA San Andreas ${0.0}"
+    ${NSD_SetText} $DirRequest $INSTDIR
+    Call CustomDirectoryPageSetUpgradeMessage
+FunctionEnd
+
 LangString INST_CHOOSE_LOC4 ${LANG_ENGLISH}	"Select the folder to install ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} in:"
+
 Function CustomDirectoryPageBrowseButtonClick
     ${NSD_GetText} $DirRequest $0
 

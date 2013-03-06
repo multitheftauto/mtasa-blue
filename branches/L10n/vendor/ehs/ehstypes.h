@@ -6,6 +6,9 @@
 #include <map>
 #include <list>
 
+#ifndef DEFINED_SHARED_UTIL
+    #include "SharedUtil.h"
+#endif
 class EHSConnection;
 class EHS;
 class Datum;

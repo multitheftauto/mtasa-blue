@@ -466,6 +466,9 @@ CClientGame::~CClientGame ( void )
     // Packet handler
     delete m_pPacketHandler;
 
+    // Delete PerfStatManager
+    delete CClientPerfStatManager::GetSingleton ();
+
     // NULL the global CClientGame var
     g_pClientGame = NULL;
     m_bBeingDeleted = false;
@@ -1893,6 +1896,15 @@ void CClientGame::UpdatePlayerWeapons ( void )
             CWeapon* pWeapon = m_pLocalPlayer->GetWeapon ();
             NetBitStreamInterface& BitStream = *(bitStream.pBitStream);
             SWeaponSlotSync slot;
+
+            if ( BitStream.Version () >= 0x44 && m_lastWeaponSlot == WEAPONSLOT_TYPE_THROWN )
+            {
+                CWeapon* pLastWeapon = m_pLocalPlayer->GetWeapon ( m_lastWeaponSlot );
+                if ( pLastWeapon && pLastWeapon->GetAmmoTotal () == 0 )
+                    BitStream.WriteBit ( true );
+                else
+                    BitStream.WriteBit ( false );
+            }
 
             if ( pWeapon )
             {

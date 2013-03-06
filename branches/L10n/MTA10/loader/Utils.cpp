@@ -561,26 +561,6 @@ void TerminateGTAIfRunning ( void )
 
 ///////////////////////////////////////////////////////////////////////////
 //
-// IsGTAProcessStuck
-//
-//
-//
-///////////////////////////////////////////////////////////////////////////
-bool IsGTAProcessStuck( HANDLE hProcess )
-{
-    PROCESS_MEMORY_COUNTERS psmemCounter;
-    BOOL bResult = GetProcessMemoryInfo( hProcess, &psmemCounter, sizeof( PROCESS_MEMORY_COUNTERS ) );
-
-    WriteDebugEvent( SString( "Loader - Process PeakWorkingSetSize:%d", psmemCounter.PeakWorkingSetSize ) );
-
-    if ( bResult && psmemCounter.PeakWorkingSetSize < 50 * 1024 * 1024 )
-        return true;
-    return false;
-}
-
-
-///////////////////////////////////////////////////////////////////////////
-//
 // GetOtherMTAProcessList
 //
 // Get list of process id's with the image name ending with the same name as this process

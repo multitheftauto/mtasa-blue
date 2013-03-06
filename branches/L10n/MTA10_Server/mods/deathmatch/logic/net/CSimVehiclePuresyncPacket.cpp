@@ -175,10 +175,11 @@ bool CSimVehiclePuresyncPacket::Read ( NetBitStreamInterface& BitStream )
             if ( m_Cache.flags.data.bIsDoingGangDriveby && CWeaponNames::DoesSlotHaveAmmo ( slot.data.uiSlot ) )
             {
                 // Read the ammo states
-                SWeaponAmmoSync ammo ( m_ucPlayerGotWeaponType, false, true );
+                SWeaponAmmoSync ammo ( m_ucPlayerGotWeaponType, BitStream.Version () >= 0x44, true );
                 if ( !BitStream.Read ( &ammo ) )
                     return false;
                 m_Cache.usAmmoInClip = ammo.data.usAmmoInClip;
+                m_Cache.usTotalAmmo = ammo.data.usTotalAmmo;
 
                 // Read aim data
                 SWeaponAimSync aim ( m_fPlayerGotWeaponRange, true );
@@ -318,8 +319,9 @@ bool CSimVehiclePuresyncPacket::Write ( NetBitStreamInterface& BitStream ) const
             if ( m_Cache.flags.data.bIsDoingGangDriveby && CWeaponNames::DoesSlotHaveAmmo ( slot.data.uiSlot ) )
             {
                 // Write the ammo states
-                SWeaponAmmoSync ammo ( ucWeaponType, false, true );
+                SWeaponAmmoSync ammo ( ucWeaponType, BitStream.Version () >= 0x44, true );
                 ammo.data.usAmmoInClip = m_Cache.usAmmoInClip;
+                ammo.data.usTotalAmmo = m_Cache.usTotalAmmo;
                 BitStream.Write ( &ammo );
 
                 // Sync aim data

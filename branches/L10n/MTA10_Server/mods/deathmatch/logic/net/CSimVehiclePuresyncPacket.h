@@ -85,6 +85,7 @@ private:
         uchar           ucWeaponSlot;
 
         ushort          usAmmoInClip;
+        ushort          usTotalAmmo;
 
         float           fAimDirection;
         CVector         vecSniperSource;

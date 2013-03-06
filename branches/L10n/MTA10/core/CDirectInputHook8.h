@@ -13,10 +13,13 @@
 #ifndef __CDIRECTINPUTHOOK8_H
 #define __CDIRECTINPUTHOOK8_H
 
-#include "CDirectXHook.h"
-#include "CSingleton.h"
+typedef HRESULT ( __stdcall * pDirectInputCreate ) ( HINSTANCE   hinst, 
+                                                       DWORD       dwVersion,
+                                                       REFIID      riidltf,
+                                                       LPVOID*     ppvOut,
+                                                       LPUNKNOWN   punkOuter );
 
-class CDirectInputHook8 : public CDirectXHook, public CSingleton < CDirectInputHook8 >
+class CDirectInputHook8 : public CSingleton < CDirectInputHook8 >
 {
     public: 
                                     CDirectInputHook8  ( );

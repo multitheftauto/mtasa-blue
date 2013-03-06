@@ -20,6 +20,7 @@
 #include <Accctrl.h>
 #include <Aclapi.h>
 #include "Userenv.h"        // This will enable SharedUtil::ExpandEnvString
+#define ALLOC_STATS_MODULE_NAME "core"
 #include "SharedUtil.hpp"
 #include <clocale>
 #include "CTimingCheckpoints.hpp"
@@ -861,10 +862,9 @@ void CCore::DeinitGUI ( void )
 }
 
 
-void CCore::InitGUI ( IUnknown* pDevice )
+void CCore::InitGUI ( IDirect3DDevice9* pDevice )
 {
-    IDirect3DDevice9 *dev = reinterpret_cast < IDirect3DDevice9* > ( pDevice );
-    m_pGUI = InitModule < CGUI > ( m_GUIModule, "GUI", "InitGUIInterface", dev );
+    m_pGUI = InitModule < CGUI > ( m_GUIModule, "GUI", "InitGUIInterface", pDevice );
 
     // and set the screenshot path to this default library (screenshots shouldnt really be made outside mods)
     std::string strScreenShotPath = CalcMTASAPath ( "screenshots" );
@@ -1308,11 +1308,15 @@ void CCore::Quit ( bool bInstantly )
         // Show that we are quiting (for the crash dump filename)
         SetApplicationSettingInt ( "last-server-ip", 1 );
 
+        WatchDogBeginSection( "Q0" );   // Allow loader to detect freeze on exit
+
         // Destroy the client
         CModManager::GetSingleton ().Unload ();
 
         // Destroy ourself
         delete CCore::GetSingletonPtr ();
+
+        WatchDogCompletedSection( "Q0" );
 
         // Use TerminateProcess for now as exiting the normal way crashes
         TerminateProcess ( GetCurrentProcess (), 0 );

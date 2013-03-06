@@ -3,6 +3,7 @@
  * Borrowed from Bochs x86 PC emulator(bochs)
  */
 
+#include "StdInc.h"
 #include "crc32.h"
 #include <stdio.h>
 #include <cstring>
