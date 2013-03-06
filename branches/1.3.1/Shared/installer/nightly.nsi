@@ -1508,6 +1508,7 @@ FunctionEnd
 Var Dialog
 Var UpgradeLabel
 Var BrowseButton
+Var SetDefaultButton
 Var DirRequest
 !define LT_GREY "0xf0f0f0"
 !define MID_GREY "0x808080"
@@ -1534,13 +1535,16 @@ To install in a different folder, click Browse and select another folder.$\n$\n 
     SetCtlColors $UpgradeLabel ${MID_GREY} ${LT_GREY}
     Call CustomDirectoryPageSetUpgradeMessage
 
-	${NSD_CreateGroupBox} 0 115 100% 37u "Destination Folder"
+	${NSD_CreateGroupBox} 0 115 100% 63u "Destination Folder"
 	Pop $0
 	${NSD_CreateDirRequest} 15 139 72% 12u $INSTDIR
 	Pop $DirRequest
 	${NSD_CreateBrowseButton} 77% 135 20% 15u "Browse..."
 	Pop $BrowseButton
+	${NSD_CreateButton} 77% 165 20% 15u "Set default"
+	Pop $SetDefaultButton
     ${NSD_OnClick} $BrowseButton CustomDirectoryPageBrowseButtonClick
+    ${NSD_OnClick} $SetDefaultButton CustomDirectoryPageSetDefaultButtonClick
     ${NSD_OnChange} $DirRequest CustomDirectoryPageDirRequestChange
 
     Call DirectoryShowProc
@@ -1553,6 +1557,12 @@ Function CustomDirectoryPageDirRequestChange
 		StrCpy $INSTDIR $0
         Call CustomDirectoryPageSetUpgradeMessage
 	${EndIf}
+FunctionEnd
+
+Function CustomDirectoryPageSetDefaultButtonClick
+    StrCpy $INSTDIR "$PROGRAMFILES\MTA San Andreas ${0.0}"
+    ${NSD_SetText} $DirRequest $INSTDIR
+    Call CustomDirectoryPageSetUpgradeMessage
 FunctionEnd
 
 Function CustomDirectoryPageBrowseButtonClick
