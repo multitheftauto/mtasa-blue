@@ -136,6 +136,9 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage ( HWND hwnd,
 
     g_pCore->UpdateIsWindowMinimized ();  // Force update of stuff
 
+    if ( uMsg == WM_TIMER && wParam == IDT_TIMER1 )
+        g_pCore->WindowsTimerHandler();     // Used for 'minimized before first game' pulses
+
     // Handle IME if input is not for the GUI
     if ( !g_pCore->GetLocalGUI ()->InputGoesToGUI () )
     {
