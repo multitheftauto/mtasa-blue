@@ -73,6 +73,9 @@ CGraphics::~CGraphics ( void )
 
 void CGraphics::DrawText ( int uiLeft, int uiTop, int uiRight, int uiBottom, unsigned long ulColor, const char* szText, float fScaleX, float fScaleY, unsigned long ulFormat, LPD3DXFONT pDXFont )
 {   
+    if ( g_pCore->IsWindowMinimized () )
+        return;
+
     // Do not accept NULL text strings or invalid sprites
     if ( !szText || !m_pDXSprite )
         return;
@@ -133,7 +136,10 @@ void CGraphics::DrawLine3D ( const CVector& vecBegin, const CVector& vecEnd, uns
 
 
 void CGraphics::DrawRectangle ( float fX, float fY, float fWidth, float fHeight, unsigned long ulColor )
-{      
+{
+    if ( g_pCore->IsWindowMinimized () )
+        return;
+      
     BeginDrawBatch ();
     D3DXMATRIX matrix;
     D3DXVECTOR2 scalingCentre ( 0.5f, 0.5f );
@@ -1015,6 +1021,9 @@ bool CGraphics::DestroyStandardDXFonts ( void )
 
 void CGraphics::DrawTexture ( CTextureItem* pTexture, float fX, float fY, float fScaleX, float fScaleY, float fRotation, float fCenterX, float fCenterY, DWORD dwColor )
 {
+    if ( g_pCore->IsWindowMinimized () )
+        return;
+
     if ( !pTexture )
         return;
 
