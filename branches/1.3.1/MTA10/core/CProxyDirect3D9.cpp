@@ -484,6 +484,7 @@ HRESULT DoCreateDevice( IDirect3D9* pDirect3D, UINT Adapter, D3DDEVTYPE DeviceTy
                                             int iNewSelected = iOldSelected ? 0 : 1;
                                             WriteDebugEvent ( SString( "      Switching alt tab handler from %d to %d after success", iOldSelected, iNewSelected ) );
                                             CVARS_SET ( "display_alttab_handler", iNewSelected );
+                                            CCore::GetSingleton ().SaveConfig ();
                                         }
                                         if ( iRes >= 3 )
                                         {
@@ -510,6 +511,7 @@ failed:
     int iNewSelected = iOldSelected ? 0 : 1;
     WriteDebugEvent ( SString( "      Switching alt tab handler from %d to %d after fail", iOldSelected, iNewSelected ) );
     CVARS_SET ( "display_alttab_handler", iNewSelected );
+    CCore::GetSingleton ().SaveConfig ();
 
     return hResultFail;
 }
