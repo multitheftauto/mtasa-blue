@@ -178,6 +178,8 @@ CCore::CCore ( void )
     m_bDidRecreateRenderTargets = false;
     m_fMinStreamingMemory = 0;
     m_fMaxStreamingMemory = 0;
+    m_bGettingIdleCallsFromMultiplayer = false;
+    m_bWindowsTimerEnabled = false;
 }
 
 CCore::~CCore ( void )
@@ -853,6 +855,8 @@ void CCore::CreateGame ( )
 void CCore::CreateMultiplayer ( )
 {
     m_pMultiplayer = CreateModule < CMultiplayer > ( m_MultiplayerModule, "Multiplayer", "multiplayer_sa", "InitMultiplayerInterface", this );
+    if ( m_pMultiplayer )
+        m_pMultiplayer->SetIdleHandler ( CCore::StaticIdleHandler );
 }
 
 
@@ -1006,6 +1010,17 @@ void CCore::UpdateIsWindowMinimized ( void )
     m_bIsWindowMinimized = IsIconic ( GetHookedWindow () ) ? true : false;
     // Update CPU saver for when minimized and not connected
     g_pCore->GetMultiplayer ()->SetIsMinimizedAndNotConnected ( m_bIsWindowMinimized && !IsConnected () );
+
+    // Enable timer if not connected at least once
+    bool bEnableTimer = !m_bGettingIdleCallsFromMultiplayer;
+    if ( m_bWindowsTimerEnabled != bEnableTimer )
+    {
+        m_bWindowsTimerEnabled = bEnableTimer;
+        if ( bEnableTimer )
+            SetTimer( GetHookedWindow(), IDT_TIMER1, 50, (TIMERPROC) NULL );
+        else
+            KillTimer( GetHookedWindow(), IDT_TIMER1 );
+    }
 }
 
 
@@ -1795,7 +1810,6 @@ void CCore::ApplyFrameRateLimit ( uint uiOverrideRate )
 // DoReliablePulse
 //
 // This is called once a frame even if minimized
-// (Except when minimized and never connected)
 //
 void CCore::DoReliablePulse ( void )
 {
@@ -2055,4 +2069,41 @@ CModelCacheManager* CCore::GetModelCacheManager ( void )
 void CCore::AddModelToPersistentCache ( ushort usModelId )
 {
     return GetModelCacheManager ()->AddModelToPersistentCache ( usModelId );
+}
+
+
+void CCore::StaticIdleHandler ( void )
+{
+    g_pCore->IdleHandler ();
+}
+
+
+// Gets called every game loop, after GTA has been loaded for the first time
+void CCore::IdleHandler ( void )
+{
+    m_bGettingIdleCallsFromMultiplayer = true;
+    HandleIdlePulse();
+}
+
+
+// Gets called every 50ms, before GTA has been loaded for the first time
+void CCore::WindowsTimerHandler ( void )
+{
+    if ( !m_bGettingIdleCallsFromMultiplayer )
+        HandleIdlePulse();
+}
+
+
+// Always called, even if minimized
+void CCore::HandleIdlePulse ( void )
+{
+    UpdateIsWindowMinimized();
+
+    if ( IsWindowMinimized() )
+    {
+        DoPreFramePulse();
+        DoPostFramePulse();
+    }
+    if ( m_pModManager->GetCurrentMod() )
+        m_pModManager->GetCurrentMod()->IdleHandler();
 }

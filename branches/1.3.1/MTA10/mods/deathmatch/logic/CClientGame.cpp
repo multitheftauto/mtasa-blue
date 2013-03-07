@@ -242,7 +242,6 @@ CClientGame::CClientGame ( bool bLocalPlay )
     g_pMultiplayer->SetChokingHandler ( CClientGame::StaticChokingHandler );
     g_pMultiplayer->SetPreWorldProcessHandler ( CClientGame::StaticPreWorldProcessHandler );
     g_pMultiplayer->SetPostWorldProcessHandler ( CClientGame::StaticPostWorldProcessHandler );
-    g_pMultiplayer->SetIdleHandler ( CClientGame::StaticIdleHandler );
     g_pMultiplayer->SetPreFxRenderHandler ( CClientGame::StaticPreFxRenderHandler );
     g_pMultiplayer->SetPreHudRenderHandler ( CClientGame::StaticPreHudRenderHandler );
     g_pMultiplayer->SetAddAnimationHandler ( CClientGame::StaticAddAnimationHandler );
@@ -386,7 +385,6 @@ CClientGame::~CClientGame ( void )
     g_pMultiplayer->SetChokingHandler ( NULL );
     g_pMultiplayer->SetPreWorldProcessHandler (  NULL );
     g_pMultiplayer->SetPostWorldProcessHandler (  NULL );
-    g_pMultiplayer->SetIdleHandler ( NULL );
     g_pMultiplayer->SetPreFxRenderHandler ( NULL );
     g_pMultiplayer->SetPreHudRenderHandler ( NULL );
     g_pMultiplayer->SetAddAnimationHandler ( NULL );
@@ -896,13 +894,9 @@ void CClientGame::DoPulsePostFrame ( void )
         CClientPerfStatManager::GetSingleton ()->DoPulse ();
     }
 
-    // If we are not minimized we do the pulsing here
-    if ( !g_pCore->IsWindowMinimized () )
-    {
-        m_pRadarMap->DoRender ();
-        m_pManager->DoRender ();
-        DoPulses ();
-    }
+    m_pRadarMap->DoRender ();
+    m_pManager->DoRender ();
+    DoPulses ();
 
     // If we're supposed to show netstat, draw them infront of everything else
     if ( m_bShowNetstat )
@@ -3557,12 +3551,6 @@ void CClientGame::StaticPostWorldProcessHandler ( void )
     g_pClientGame->PostWorldProcessHandler ();
 }
 
-
-void CClientGame::StaticIdleHandler ( void )
-{
-    g_pClientGame->IdleHandler ();
-}
-
 void CClientGame::StaticPreFxRenderHandler ( void )
 {
     g_pCore->OnPreFxRender ();
@@ -3768,9 +3756,6 @@ void CClientGame::IdleHandler ( void )
             CLuaArguments Arguments;
             m_pRootEntity->CallEvent ( "onClientMinimize", Arguments, false );
         }
-        m_pRadarMap->DoRender ();
-        m_pManager->DoRender ();
-        DoPulses ();
     }
 
     // Extrapolation test - Change the pulse order to reduce latency (Has side effects for peds)

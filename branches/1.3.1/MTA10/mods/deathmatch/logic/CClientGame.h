@@ -402,6 +402,7 @@ public:
     bool                                GetWeaponTypeUsesBulletSync     ( eWeaponType weaponType );
 
     void                                ProjectileInitiateHandler       ( CClientProjectile * pProjectile );
+    void                                IdleHandler                     ( void );
 
 private:
 
@@ -463,7 +464,6 @@ private:
     static bool                         StaticChokingHandler            ( unsigned char ucWeaponType );
     static void                         StaticPreWorldProcessHandler    ( void );
     static void                         StaticPostWorldProcessHandler   ( void );
-    static void                         StaticIdleHandler               ( void );
     static void                         StaticPreFxRenderHandler        ( void );
     static void                         StaticPreHudRenderHandler       ( void );
     static void                         StaticAddAnimationHandler       ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID );
@@ -489,7 +489,6 @@ private:
     bool                                ChokingHandler                  ( unsigned char ucWeaponType );
     void                                PreWorldProcessHandler          ( void );
     void                                PostWorldProcessHandler         ( void );
-    void                                IdleHandler                     ( void );
     void                                AddAnimationHandler             ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID );
     void                                BlendAnimationHandler           ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID, float fBlendDelta );
     bool                                ProcessCollisionHandler         ( CEntitySAInterface* pThisInterface, CEntitySAInterface* pOtherInterface );
