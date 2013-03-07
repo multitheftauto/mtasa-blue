@@ -63,7 +63,7 @@ AC_ARG_ENABLE([system-pcre],
 AC_DEFUN([USE_BUNDLED_PCRE], [
 	HAVE_BUNDLED_PCRE=yes
 	PCRE_CFLAGS="-I\$(top_builddir)/vendor/pcre"
-	PCRE_LIBS="\$(top_builddir)/vendor/pcre/libpcre.la"
+	PCRE_LIBS="\$(top_builddir)/vendor/pcre/libpcrecpp.la"
 ])
 
 if test "x$enable_system_pcre" != "xno" ; then
