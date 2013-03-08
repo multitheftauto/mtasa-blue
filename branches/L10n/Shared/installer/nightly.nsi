@@ -115,25 +115,8 @@ Page custom CustomDirectoryPage DirectoryLeaveProc
 !define MUI_LANGDLL_REGISTRY_VALUENAME "Installer Language"
 !insertmacro MUI_RESERVEFILE_LANGDLL ;Solid compression optimization for multilang
 
-; Language Macro -----
-!insertmacro MUI_LANGUAGE "English"
-;@INSERT_TRANSLATIONS@
-
-
-LangString	WELCOME_TEXT  ${LANG_ENGLISH}	"This wizard will guide you through the installation or update of $(^Name) ${REVISION_TAG}\n\n\
-It is recommended that you close all other applications before starting Setup.\n\n\
-[Admin access may be requested for Vista and up]\n\n\
-Click Next to continue."
-LangString 	HEADER_Text			${LANG_ENGLISH}	"Grand Theft Auto: San Andreas location"
-LangString 	DIRECTORY_Text_Dest	${LANG_ENGLISH}	"Grand Theft Auto: San Andreas folder"
-LangString 	DIRECTORY_Text_Top	${LANG_ENGLISH}	"Please select your Grand Theft Auto: San Andreas folder.$\n$\nYou MUST have Grand Theft Auto: San Andreas 1.0 installed to use MTA:SA, it does not support any other versions.$\n$\nClick Install to begin installing."
-
-!define MUI_WELCOMEPAGE_TEXT "$(WELCOME_TEXT)"
+; INSERT OUR PAGES
 !define MUI_PAGE_CUSTOMFUNCTION_PRE				SkipDirectoryPage
-!define MUI_PAGE_HEADER_TEXT					"$(HEADER_Text)"
-!define MUI_PAGE_HEADER_SUBTEXT					""
-!define MUI_DIRECTORYPAGE_TEXT_DESTINATION		"$(DIRECTORY_Text_Dest)"
-!define MUI_DIRECTORYPAGE_TEXT_TOP				"$(DIRECTORY_Text_Top)"
 !define MUI_DIRECTORYPAGE_VARIABLE				$GTA_DIR
 !define MUI_PAGE_CUSTOMFUNCTION_LEAVE           "GTADirectoryLeaveProc"
 !insertmacro MUI_PAGE_DIRECTORY
@@ -150,6 +133,25 @@ LangString 	DIRECTORY_Text_Top	${LANG_ENGLISH}	"Please select your Grand Theft A
 
 ; Uninstaller pages
 !insertmacro MUI_UNPAGE_INSTFILES
+
+; INSERT OUR LANGUAGE STRINGS -----
+!insertmacro MUI_LANGUAGE "English"
+;@INSERT_TRANSLATIONS@
+
+LangString LANGUAGE_CODE ${LANG_ENGLISH} "en_US"
+LangString	WELCOME_TEXT  ${LANG_ENGLISH}	"This wizard will guide you through the installation or update of $(^Name) ${REVISION_TAG}\n\n\
+It is recommended that you close all other applications before starting Setup.\n\n\
+[Admin access may be requested for Vista and up]\n\n\
+Click Next to continue."
+LangString 	HEADER_Text			${LANG_ENGLISH}	"Grand Theft Auto: San Andreas location"
+LangString 	DIRECTORY_Text_Dest	${LANG_ENGLISH}	"Grand Theft Auto: San Andreas folder"
+LangString 	DIRECTORY_Text_Top	${LANG_ENGLISH}	"Please select your Grand Theft Auto: San Andreas folder.$\n$\nYou MUST have Grand Theft Auto: San Andreas 1.0 installed to use MTA:SA, it does not support any other versions.$\n$\nClick Install to begin installing."
+
+!define MUI_WELCOMEPAGE_TEXT "$(WELCOME_TEXT)"
+!define MUI_PAGE_HEADER_TEXT					"$(HEADER_Text)"
+!define MUI_PAGE_HEADER_SUBTEXT					""
+!define MUI_DIRECTORYPAGE_TEXT_DESTINATION		"$(DIRECTORY_Text_Dest)"
+!define MUI_DIRECTORYPAGE_TEXT_TOP				"$(DIRECTORY_Text_Top)"
 
 ; Language files
 LangString	DESC_Section10			${LANG_ENGLISH}	"Create a Start Menu group for installed applications"
@@ -510,6 +512,46 @@ DontInstallRedist:
         File "${FILES_ROOT}\MTA San Andreas\mta\bass_fx.dll"
         File "${FILES_ROOT}\MTA San Andreas\mta\tags.dll"
 		File "${SERVER_FILES_ROOT}\pthreadVC2.dll"
+		
+		# Write our language to coreconfig.xml
+		IfFileExists "coreconfig.xml" WriteLanguageToConfig 0
+		# If we don't have a coreconfig, create one with tags leading up to the locale tag
+		nsisXML::create
+		nsisXML::createElement "mainconfig"
+		nsisXML::appendChild
+		StrCpy $1 $2
+		nsisXML::createElement "settings"
+		nsisXML::appendChild
+		StrCpy $1 $2
+		nsisXML::createElement "locale"
+		nsisXML::appendChild
+		nsisXML::setText "$(LANGUAGE_CODE)"
+		nsisXML::save "coreconfig.xml"
+		Goto FinishedWithConfig
+		
+		# We have a file, let's write to it
+		WriteLanguageToConfig:
+		nsisXML::create
+		nsisXML::loadAndValidate "coreconfig.xml"
+		IntCmp $0 0 FinishedWithConfig # Something is up, abort mission
+		nsisXML::select "/mainconfig"
+		IntCmp $2 0 FinishedWithConfig
+		nsisXML::select "/mainconfig/settings"
+        ${If} $2 == 0
+            nsisXML::select "/mainconfig"
+			nsisXML::createElement "settings"
+			nsisXML::appendChild
+        ${EndIf}
+		nsisXML::select "/mainconfig/settings/locale"
+        ${If} $2 == 0 # Only create the locale tag - we never modify it
+            nsisXML::select "/mainconfig/settings"
+			nsisXML::createElement "locale"	
+			nsisXML::appendChild
+			nsisXML::setText "$(LANGUAGE_CODE)"
+			nsisXML::save "coreconfig.xml"
+        ${EndIf}
+		
+		FinishedWithConfig:
 
         !ifndef LIGHTBUILD
 
@@ -568,6 +610,10 @@ DontInstallRedist:
 
             SetOutPath "$INSTDIR\MTA\cgui\images\serverbrowser"
             File "${FILES_ROOT}\MTA San Andreas\mta\cgui\images\serverbrowser\*.png"
+			
+			SetOutPath "$INSTDIR\MTA\locale\"
+			File /r "${FILES_ROOT}\MTA San Andreas\mta\locale\*.png"
+			File /r "${FILES_ROOT}\MTA San Andreas\mta\locale\*.po"
 
 		!endif
 
@@ -940,7 +986,7 @@ Function InstallVC90Redistributable
 	DetailPrint "* Download of Microsoft Visual Studio 2008 SP1 redistributable failed:"
 	DetailPrint "* $0"
 	DetailPrint "* Installation continuing anyway"
-	MessageBox MB_ICONSTOP "$(MSGBOX_VSRED_ERROR)"
+	MessageBox MB_ICONSTOP "$(MSGBOX_VSRED_ERROR1)"
 	Goto InstallEnd
 	
 DownloadSuccessful:
@@ -1029,14 +1075,14 @@ LangString UAC_RIGHTS4 ${LANG_ENGLISH}	"Unable to elevate"
         ${IfThen} $1 = 1 ${|} Quit ${|} ;we are the outer process, the inner process has done its work, we are done
         ${IfThen} $3 <> 0 ${|} ${Break} ${|} ;we are admin, let the show go on
         ${If} $1 = 3 ;RunAs completed successfully, but with a non-admin user
-            MessageBox mb_IconExclamation|mb_TopMost|mb_SetForeground "$(UAC_RIGHTS)" /SD IDNO IDOK uac_tryagain IDNO 0
+            MessageBox mb_IconExclamation|mb_TopMost|mb_SetForeground "$(UAC_RIGHTS1)" /SD IDNO IDOK uac_tryagain IDNO 0
         ${EndIf}
         ;fall-through and die
     ${Case} 1223
         MessageBox mb_IconStop|mb_TopMost|mb_SetForeground "$(UAC_RIGHTS2)"
         Quit
     ${Case} 1062
-        MessageBox mb_IconStop|mb_TopMost|mb_SetForeground "${UAC_RIGHTS3}"
+        MessageBox mb_IconStop|mb_TopMost|mb_SetForeground "$(UAC_RIGHTS3)"
         Quit
     ${Default}
         MessageBox mb_IconStop|mb_TopMost|mb_SetForeground "$(UAC_RIGHTS4), error $0"
@@ -1575,6 +1621,7 @@ LangString INST_CHOOSE_LOC2 ${LANG_ENGLISH}	"${PRODUCT_NAME_NO_VER} ${PRODUCT_VE
 To install in a different folder, click Browse and select another folder.$\n$\n Click Next to continue."
 LangString INST_CHOOSE_LOC3 ${LANG_ENGLISH}	"Destination Folder"
 LangString INST_CHOOSE_LOC_BROWSE ${LANG_ENGLISH}	"Browse..."
+LangString INST_CHOOSE_LOC_DEFAULT ${LANG_ENGLISH} "Set default"
 Function CustomDirectoryPage
 
 	nsDialogs::Create 1018
@@ -1602,7 +1649,7 @@ Function CustomDirectoryPage
 	Pop $DirRequest
 	${NSD_CreateBrowseButton} 77% 135 20% 15u "$(INST_CHOOSE_LOC_BROWSE)"
 	Pop $BrowseButton
-	${NSD_CreateButton} 77% 165 20% 15u "Set default"
+	${NSD_CreateButton} 77% 165 20% 15u "$(INST_CHOOSE_LOC_DEFAULT)"
 	Pop $SetDefaultButton
     ${NSD_OnClick} $BrowseButton CustomDirectoryPageBrowseButtonClick
     ${NSD_OnClick} $SetDefaultButton CustomDirectoryPageSetDefaultButtonClick
