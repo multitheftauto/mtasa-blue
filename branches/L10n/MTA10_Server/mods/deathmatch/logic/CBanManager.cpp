@@ -244,7 +244,7 @@ CBan* CBanManager::GetBanFromAccount ( const char* szAccount )
         }
     }
 
-    return false;
+    return NULL;
 }
 
 
