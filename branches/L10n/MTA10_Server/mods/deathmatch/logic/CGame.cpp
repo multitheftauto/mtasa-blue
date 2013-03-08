@@ -1657,10 +1657,10 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
             if ( !CheckNickProvided ( szNick ) ) // check the nick is valid
             {
                 // Tell the console
-                CLogger::LogPrintf ( "CONNECT: %s failed to connect (Invalid Nick) (%s)\n", szNick, strIPAndSerial.c_str () );
+                CLogger::LogPrintf ( "CONNECT: %s failed to connect (Invalid nickname) (%s)\n", szNick, strIPAndSerial.c_str () );
 
                 // Tell the player the problem
-                DisconnectPlayer ( this, *pPlayer, "Disconnected: Invalid Nick" );
+                DisconnectPlayer ( this, *pPlayer, CPlayerDisconnectedPacket::ePlayerDisconnectType::INVALID_NICKNAME );
                 return;
             }
 
@@ -1713,7 +1713,7 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
 
                                     // Tell the player
                                     pPlayer->Send ( CUpdateInfoPacket ( "Mandatory", CalculateMinClientRequirement () ) );
-                                    DisconnectPlayer ( this, *pPlayer, "" );
+                                    DisconnectPlayer ( this, *pPlayer, CPlayerDisconnectedPacket::ePlayerDisconnectType::NO_REASON );
                                     return;
                                 }
 
@@ -1732,7 +1732,7 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
                                 // Check the serial for validity
                                 if ( CBan* pBan = m_pBanManager->GetBanFromSerial ( pPlayer->GetSerial ().c_str () ) )
                                 {
-                                    // Make a message including the ban duration
+                                    time_t Duration = pBan->GetTimeOfUnban() - time ( NULL );
                                     SString strBanMessage = "Serial is banned";
                                     SString strDurationDesc = pBan->GetDurationDesc ();
                                     if ( strDurationDesc.length () )
@@ -1741,18 +1741,15 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
                                     // Tell the console
                                     CLogger::LogPrintf ( "CONNECT: %s failed to connect (%s) (%s)\n", szNick, strBanMessage.c_str (), strIPAndSerial.c_str () );
 
-                                    // Make a message for the player
-                                    strBanMessage = std::string ( "Disconnected: " ) + strBanMessage;
-
                                     // Tell the player he's banned
-                                    DisconnectPlayer ( this, *pPlayer, strBanMessage );
+                                    DisconnectPlayer ( this, *pPlayer, CPlayerDisconnectedPacket::ePlayerDisconnectType::BANNED_SERIAL, Duration, pBan->GetReason().c_str() );
                                     return;
                                 }
 
                                 // Check the ip for banness
                                 if ( CBan* pBan = m_pBanManager->GetBanFromIP ( strIP ) )
                                 {
-                                    // Make a message including the ban duration
+                                    time_t Duration = pBan->GetTimeOfUnban() - time ( NULL );
                                     SString strBanMessage;// = "Serial is banned";
                                     SString strDurationDesc = pBan->GetDurationDesc ();
                                     if ( strDurationDesc.length () )
@@ -1761,11 +1758,8 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
                                     // Tell the console
                                     CLogger::LogPrintf ( "CONNECT: %s failed to connect (IP is banned%s) (%s)\n", szNick, strBanMessage.c_str (), strIPAndSerial.c_str () );
 
-                                    // Make a message for the player
-                                    strBanMessage = std::string ( "Disconnected: You are banned " ) + strBanMessage;
-
                                     // Tell the player he's banned
-                                    DisconnectPlayer ( this, *pPlayer, strBanMessage );
+                                    DisconnectPlayer ( this, *pPlayer, CPlayerDisconnectedPacket::ePlayerDisconnectType::BANNED_IP, Duration, pBan->GetReason().c_str() );
                                     return;
                                 }
 
@@ -1775,8 +1769,17 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
                                     // Tell the console
                                     CLogger::LogPrintf ( "CONNECT: %s failed to connect (Account is banned) (%s)\n", szNick, strIPAndSerial.c_str () );
 
+                                    CBan* pBan = m_pBanManager->GetBanFromAccount( pPlayer->GetSerialUser ().c_str () );
+                                    time_t Duration;
+                                    SString strReason;
+                                    if ( pBan )
+                                    {
+                                        strReason = pBan->GetReason();
+                                        Duration = pBan->GetTimeOfUnban() - time ( NULL );
+                                    }
+
                                     // Tell the player he's banned
-                                    DisconnectPlayer ( this, *pPlayer, "Disconnected: Account is banned" );
+                                    DisconnectPlayer ( this, *pPlayer, CPlayerDisconnectedPacket::ePlayerDisconnectType::BANNED_ACCOUNT, Duration, strReason.c_str() );
                                     return;
                                 }
 
@@ -1788,7 +1791,7 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
                                     CLogger::LogPrintf ( "CONNECT: %s failed to connect (Version mismatch) (%s)\n", szNick, strIPAndSerial.c_str () );
 
                                     // Tell the player
-                                    DisconnectPlayer ( this, *pPlayer, "Disconnected: Version mismatch" );
+                                    DisconnectPlayer ( this, *pPlayer, CPlayerDisconnectedPacket::ePlayerDisconnectType::VERSION_MISMATCH );
                                     return;
                                 }
                             #endif
@@ -1804,7 +1807,7 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
                                 CLogger::LogPrintf ( "CONNECT: %s failed to connect (Join flood) (%s)\n", szNick, strIPAndSerial.c_str () );
 
                                 // Tell the player the problem
-                                DisconnectPlayer ( this, *pPlayer, "Disconnected: Join flood. Please wait a minute, then reconnect." );
+                                DisconnectPlayer ( this, *pPlayer, CPlayerDisconnectedPacket::ePlayerDisconnectType::JOIN_FLOOD );
                             }
                         }
                         else
@@ -1813,7 +1816,7 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
                             CLogger::LogPrintf ( "CONNECT: %s failed to connect (Wrong password) (%s)\n", szNick, strIPAndSerial.c_str () );
 
                             // Tell the player the password was wrong
-                            DisconnectPlayer ( this, *pPlayer, "Disconnected: Incorrect password" );
+                            DisconnectPlayer ( this, *pPlayer, CPlayerDisconnectedPacket::ePlayerDisconnectType::INVALID_PASSWORD );
                         }
                     }
                     else
@@ -1828,23 +1831,33 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
                         ushort usClientBranchId = usClientNetVersion >> 12;
                         ushort usServerBranchId = usServerNetVersion >> 12;
 
+                        CPlayerDisconnectedPacket::ePlayerDisconnectType eType;
+
                         if ( usClientBranchId != usServerBranchId )
                         {
-                            strMessage = SString ( "Disconnected: Server from different branch (client: %X, server: %X)\n", usClientBranchId, usServerBranchId );
+                            eType = CPlayerDisconnectedPacket::ePlayerDisconnectType::DIFFERENT_BRANCH;
+                            strMessage = SString ( "(client: %X, server: %X)\n", usClientBranchId, usServerBranchId );
                         }
                         else
                         if ( MTASA_VERSION_BUILD == 0 )
                         {
-                            strMessage = SString ( "Disconnected: Bad version (client: %X, server: %X)\n", usClientNetVersion, usServerNetVersion );
+                            eType = CPlayerDisconnectedPacket::ePlayerDisconnectType::BAD_VERSION;
+                            strMessage = SString ( "(client: %X, server: %X)\n", usClientNetVersion, usServerNetVersion );
                         }
                         else
                         {
                             if ( usClientNetVersion < usServerNetVersion )
-                                strMessage = SString ( "Disconnected: Server is running a newer build (%d)\n", MTASA_VERSION_BUILD );
+                            {
+                                eType = CPlayerDisconnectedPacket::ePlayerDisconnectType::SERVER_NEWER;
+                                strMessage = SString ( "(%d)\n", MTASA_VERSION_BUILD );
+                            }
                             else
-                                strMessage = SString ( "Disconnected: Server is running an older build (%d)\n", MTASA_VERSION_BUILD );
+                            {
+                                eType = CPlayerDisconnectedPacket::ePlayerDisconnectType::SERVER_OLDER;
+                                strMessage = SString ( "(%d)\n", MTASA_VERSION_BUILD );
+                            }
                         }
-                        DisconnectPlayer ( this, *pPlayer, strMessage );
+                        DisconnectPlayer ( this, *pPlayer, eType, strMessage );
                     }
                 }
                 else
@@ -1853,7 +1866,7 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
                     CLogger::LogPrintf ( "CONNECT: %s failed to connect (Nick already in use) (%s)\n", szNick, strIPAndSerial.c_str () );
 
                     // Tell the player the problem
-                    DisconnectPlayer ( this, *pPlayer, "Disconnected: Nick already in use" );
+                    DisconnectPlayer ( this, *pPlayer, CPlayerDisconnectedPacket::ePlayerDisconnectType::NICK_CLASH );
                 }
             }
             else
@@ -1862,7 +1875,7 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
                 CLogger::LogPrintf ( "CONNECT: %s failed to connect (Invalid nickname)\n", pPlayer->GetSourceIP () );
 
                 // Tell the player the problem
-                DisconnectPlayer ( this, *pPlayer, "Disconnected: Invalid nickname" );
+                DisconnectPlayer ( this, *pPlayer, CPlayerDisconnectedPacket::ePlayerDisconnectType::INVALID_NICKNAME );
             }
         }
         else
@@ -1874,7 +1887,7 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
             CLogger::LogPrint ( "URGENT: Report this error on bugs.mtasa.com error code: 6930-2\n" );
 
             // Tell the player the problem
-            DisconnectPlayer ( this, *pPlayer, "Disconnected: Player Element Could not be created." );
+            DisconnectPlayer ( this, *pPlayer, CPlayerDisconnectedPacket::ePlayerDisconnectType::ELEMENT_FAILURE );
         }
     }
 }
@@ -3782,7 +3795,7 @@ void CGame::PlayerCompleteConnect ( CPlayer* pPlayer, bool bSuccess, const char*
                 DisconnectPlayer ( g_pGame, *pPlayer, szError );
                 return;
             }
-            DisconnectPlayer ( g_pGame, *pPlayer, "Disconnected: server refused the connection" );
+            DisconnectPlayer ( g_pGame, *pPlayer, CPlayerDisconnectedPacket::ePlayerDisconnectType::GENERAL_REFUSED );
             return;
         }
 
@@ -3801,7 +3814,7 @@ void CGame::PlayerCompleteConnect ( CPlayer* pPlayer, bool bSuccess, const char*
         if ( szError && strlen ( szError ) > 0 )
             DisconnectPlayer ( g_pGame, *pPlayer, szError );
         else
-            DisconnectPlayer ( g_pGame, *pPlayer, "Disconnected: Serial verification failed" );
+            DisconnectPlayer ( g_pGame, *pPlayer, CPlayerDisconnectedPacket::ePlayerDisconnectType::SERIAL_VERIFICATION );
         return;
     }
 }
