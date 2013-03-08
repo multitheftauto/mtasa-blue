@@ -85,7 +85,7 @@ while line != '':
                     NSIWorkingFile.readline()
                     lineNo += 1
                     while line != '':
-						line2 = removeEscapedNewLine(line2)
+                        line2 = removeEscapedNewLine(line2)
                         end = line2.find('"')
                         if end: #If we found the closing character, append
                             value += line2[:end]

@@ -62,7 +62,8 @@ for dir,output in directories.iteritems():
 
 	# Give xgettext our temporary file to produce our .po
     cmdArgs = [options.exe,"-f",os.path.abspath(scanDirsFile.name),"-d",output,
-               "--c++","--from-code=UTF-8","--add-comments","-k_",
+               "--c++","--from-code=UTF-8","--add-comments",
+			   "--keyword=_", "--keyword=_n:1,2", "--keyword=_c:1c,2", "--keyword=_cn:1c,2,3",
                "--package-name=MTA San Andreas","--package-version="+options.version]
 
     proc = subprocess.Popen(cmdArgs)
