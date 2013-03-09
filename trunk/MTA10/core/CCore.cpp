@@ -998,6 +998,7 @@ void CCore::DestroyNetwork ( )
 
     if ( m_pNet )
     {
+        m_pNet->Shutdown();
         m_pNet = NULL;
     }
 
