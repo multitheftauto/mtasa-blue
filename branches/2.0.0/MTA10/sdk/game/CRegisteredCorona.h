@@ -16,7 +16,6 @@
 #include <CVector.h>
 
 #include <windows.h>
-#include "RenderWare.h"
 
 class CRegisteredCorona
 {
@@ -30,7 +29,6 @@ public:
     virtual FLOAT           GetPullTowardsCamera()=0;
     virtual VOID            SetPullTowardsCamera(FLOAT fPullTowardsCamera)=0;
     virtual VOID            SetColor(BYTE Red, BYTE Green, BYTE Blue, BYTE Alpha)=0;
-    virtual VOID            SetTexture(RwTexture * texture)=0;
     virtual VOID            SetTexture(eCoronaType texture)=0;
     virtual BYTE            GetFlareType()=0;
     virtual VOID            SetFlareType(BYTE fFlareType)=0;

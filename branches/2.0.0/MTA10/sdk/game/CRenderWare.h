@@ -12,13 +12,17 @@
 #ifndef __CRENDERWARE
 #define __CRENDERWARE
 
-#include "RenderWare.h"
-#include <list>
+#include <RenderWare_shared.h>
 
 class CD3DDUMMY;
 class CClientEntityBase;
 class CShaderItem;
 typedef CShaderItem CSHADERDUMMY;
+struct RwTexture;
+struct RpClump;
+struct RwTexDictionary;
+class CColModel;
+struct RwFrame;
 
 // A list of custom textures to add to a model's txd
 struct SReplacementTextures
@@ -73,16 +77,12 @@ class CRenderWare {
     virtual void                DestroyTexture              ( RwTexture * pTex ) = 0;
     virtual void                ReplaceCollisions           ( CColModel * pColModel, unsigned short usModelID ) = 0;
     virtual bool                PositionFrontSeat           ( RpClump *pClump, unsigned short usModelID ) = 0;
-    virtual unsigned int        LoadAtomics                 ( RpClump * pClump, RpAtomicContainer * pAtomics ) = 0;
     virtual void                ReplaceAllAtomicsInModel    ( RpClump * pSrc, unsigned short usModelID ) = 0;
-    virtual void                ReplaceAllAtomicsInClump    ( RpClump * pDst, RpAtomicContainer * pAtomics, unsigned int uiAtomics ) = 0;
-    virtual void                ReplaceWheels               ( RpClump * pClump, RpAtomicContainer * pAtomics, unsigned int uiAtomics, const char * szWheel ) = 0;
     virtual void                RepositionAtomic            ( RpClump * pDst, RpClump * pSrc, const char * szName ) = 0;
     virtual void                AddAllAtomics               ( RpClump * pDst, RpClump * pSrc ) = 0;
     virtual void                ReplaceVehicleModel         ( RpClump * pNew, unsigned short usModelID ) = 0;
     virtual void                ReplaceWeaponModel          ( RpClump * pNew, unsigned short usModelID ) = 0;
     virtual void                ReplacePedModel             ( RpClump * pNew, unsigned short usModelID ) = 0;
-    virtual bool                ReplacePartModels           ( RpClump * pClump, RpAtomicContainer * pAtomics, unsigned int uiAtomics, const char * szName ) = 0;
     virtual void                PulseWorldTextureWatch      ( void ) = 0;
     virtual void                GetModelTextureNames        ( std::vector < SString >& outNameList, ushort usModelID ) = 0;
     virtual const SString&      GetTextureName              ( CD3DDUMMY* pD3DData ) = 0;

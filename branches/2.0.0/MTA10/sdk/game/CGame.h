@@ -19,6 +19,7 @@ typedef void ( InRenderer ) ( void );
 
 #include "Common.h"
 
+#include "CRenderWare.h"
 #include "C3DMarkers.h"
 #include "CAERadioTrackManager.h"
 #include "CAnimBlendAssociation.h"
@@ -57,7 +58,6 @@ typedef void ( InRenderer ) ( void );
 #include "CProjectile.h"
 #include "CProjectileInfo.h"
 #include "CRadar.h"
-#include "CRenderWare.h"
 #include "CRestart.h"
 #include "CRopes.h"
 #include "CSettings.h"

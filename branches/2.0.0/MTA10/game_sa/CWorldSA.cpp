@@ -154,28 +154,9 @@ bool CWorldSA::TestLineSphere(CVector * vecStart, CVector * vecEnd, CVector * ve
 }
 
 
-void ConvertMatrixToEulerAngles ( const CMatrix_Padded& matrixPadded, float& fX, float& fY, float& fZ )
+void ConvertMatrixToEulerAngles ( const RwMatrix& matrixPadded, float& fX, float& fY, float& fZ )
 {
-    // Convert the given matrix to a padded matrix
-    //CMatrix_Padded matrixPadded ( Matrix );
-
-    // Grab its pointer and call gta's func
-    const CMatrix_Padded* pMatrixPadded = &matrixPadded;
-    DWORD dwFunc = FUNC_CMatrix__ConvertToEulerAngles;
-
-    float* pfX = &fX;
-    float* pfY = &fY;
-    float* pfZ = &fZ;
-    int iUnknown = 21;
-    _asm
-    {
-        push    iUnknown
-            push    pfZ
-            push    pfY
-            push    pfX
-            mov     ecx, pMatrixPadded
-            call    dwFunc
-    }
+    matrixPadded.GetRotationRad( fX, fY, fZ );
 }
 
 
@@ -554,9 +535,9 @@ void CWorldSA::RemoveBuilding ( unsigned short usModelToRemove, float fRange, fl
 
                 if ( pFind->m_pInterface->Placeable.matrix != NULL )
                 {
-                    fDistanceX = fX - pFind->m_pInterface->Placeable.matrix->vPos.fX;
-                    fDistanceY = fY - pFind->m_pInterface->Placeable.matrix->vPos.fY;
-                    fDistanceZ = fZ - pFind->m_pInterface->Placeable.matrix->vPos.fZ;
+                    fDistanceX = fX - pFind->m_pInterface->Placeable.matrix->pos.fX;
+                    fDistanceY = fY - pFind->m_pInterface->Placeable.matrix->pos.fY;
+                    fDistanceZ = fZ - pFind->m_pInterface->Placeable.matrix->pos.fZ;
                 }
 
                 // Square root 'em
@@ -610,9 +591,9 @@ void CWorldSA::RemoveBuilding ( unsigned short usModelToRemove, float fRange, fl
 
                 if ( pFindBinary->m_pInterface->Placeable.matrix != NULL )
                 {
-                    fDistanceX = fX - pFindBinary->m_pInterface->Placeable.matrix->vPos.fX;
-                    fDistanceY = fY - pFindBinary->m_pInterface->Placeable.matrix->vPos.fY;
-                    fDistanceZ = fZ - pFindBinary->m_pInterface->Placeable.matrix->vPos.fZ;
+                    fDistanceX = fX - pFindBinary->m_pInterface->Placeable.matrix->pos.fX;
+                    fDistanceY = fY - pFindBinary->m_pInterface->Placeable.matrix->pos.fY;
+                    fDistanceZ = fZ - pFindBinary->m_pInterface->Placeable.matrix->pos.fZ;
                 }
 
                 // Square root 'em
@@ -759,9 +740,9 @@ bool CWorldSA::RestoreBuilding ( unsigned short usModelToRestore, float fRange, 
 
             if ( pFound->m_pInterface->Placeable.matrix != NULL )
             {
-                fDistanceX = fX - pFound->m_pInterface->Placeable.matrix->vPos.fX;
-                fDistanceY = fY - pFound->m_pInterface->Placeable.matrix->vPos.fY;
-                fDistanceZ = fZ - pFound->m_pInterface->Placeable.matrix->vPos.fZ;
+                fDistanceX = fX - pFound->m_pInterface->Placeable.matrix->pos.fX;
+                fDistanceY = fY - pFound->m_pInterface->Placeable.matrix->pos.fY;
+                fDistanceZ = fZ - pFound->m_pInterface->Placeable.matrix->pos.fZ;
             }
 
             // Square root 'em
@@ -790,9 +771,9 @@ bool CWorldSA::RestoreBuilding ( unsigned short usModelToRestore, float fRange, 
 
             if ( pFoundBinary->m_pInterface->Placeable.matrix != NULL )
             {
-                fDistanceX = fX - pFoundBinary->m_pInterface->Placeable.matrix->vPos.fX;
-                fDistanceY = fY - pFoundBinary->m_pInterface->Placeable.matrix->vPos.fY;
-                fDistanceZ = fZ - pFoundBinary->m_pInterface->Placeable.matrix->vPos.fZ;
+                fDistanceX = fX - pFoundBinary->m_pInterface->Placeable.matrix->pos.fX;
+                fDistanceY = fY - pFoundBinary->m_pInterface->Placeable.matrix->pos.fY;
+                fDistanceZ = fZ - pFoundBinary->m_pInterface->Placeable.matrix->pos.fZ;
             }
 
             // Square root 'em
@@ -861,9 +842,9 @@ bool CWorldSA::IsObjectRemoved ( CEntitySAInterface* pInterface )
 
                 if ( pInterface->Placeable.matrix != NULL )
                 {
-                    fDistanceX = pFind->m_vecPos.fX - pInterface->Placeable.matrix->vPos.fX;
-                    fDistanceY = pFind->m_vecPos.fY - pInterface->Placeable.matrix->vPos.fY;
-                    fDistanceZ = pFind->m_vecPos.fZ - pInterface->Placeable.matrix->vPos.fZ;
+                    fDistanceX = pFind->m_vecPos.fX - pInterface->Placeable.matrix->pos.fX;
+                    fDistanceY = pFind->m_vecPos.fY - pInterface->Placeable.matrix->pos.fY;
+                    fDistanceZ = pFind->m_vecPos.fZ - pInterface->Placeable.matrix->pos.fZ;
                 }
 
                 float fDistance = sqrt ( fDistanceX * fDistanceX + fDistanceY * fDistanceY + fDistanceZ * fDistanceZ );
@@ -1005,9 +986,9 @@ SBuildingRemoval* CWorldSA::GetBuildingRemoval ( CEntitySAInterface * pInterface
 
             if ( pInterface->Placeable.matrix != NULL )
             {
-                fDistanceX = pFind->m_vecPos.fX - pInterface->Placeable.matrix->vPos.fX;
-                fDistanceY = pFind->m_vecPos.fY - pInterface->Placeable.matrix->vPos.fY;
-                fDistanceZ = pFind->m_vecPos.fZ - pInterface->Placeable.matrix->vPos.fZ;
+                fDistanceX = pFind->m_vecPos.fX - pInterface->Placeable.matrix->pos.fX;
+                fDistanceY = pFind->m_vecPos.fY - pInterface->Placeable.matrix->pos.fY;
+                fDistanceZ = pFind->m_vecPos.fZ - pInterface->Placeable.matrix->pos.fZ;
             }
 
             float fDistance = sqrt ( fDistanceX * fDistanceX + fDistanceY * fDistanceY + fDistanceZ * fDistanceZ );

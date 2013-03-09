@@ -20,6 +20,8 @@
 #include "CPopulationMP.h"
 #include "CLimits.h"
 
+struct RpClump;
+
 struct SRwResourceStats
 {
     uint uiTextures;

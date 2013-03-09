@@ -35,6 +35,7 @@ enum eWinchType
 class CPed;
 class CObject;
 class CColModel;
+struct RwFrame;
 
 #define SIREN_TYPE_FIRST 1
 #define SIREN_TYPE_LAST 6

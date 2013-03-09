@@ -13,12 +13,12 @@
 #define __CGAME_MODELINFO
 
 #include "Common.h"
-#include "RenderWare.h"
 #include <CVector.h>
 
 #include <windows.h>
 #include "CColModel.h"
 class CPedModelInfo;
+struct RwObject;
 
 class CBoundingBox
 {

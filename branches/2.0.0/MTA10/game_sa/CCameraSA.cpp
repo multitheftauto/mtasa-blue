@@ -211,10 +211,10 @@ void CCameraSA::RestoreLastGoodState ( void )
     pCameraInterface->m_CameraSpeedSoFar = 0;
     pCameraInterface->m_PreviousCameraPosition = CVector ();
     pCameraInterface->m_vecGameCamPos = CVector ();
-    pCameraInterface->m_cameraMatrix.SetFromMatrixSkipPadding ( CMatrix () );
-    pCameraInterface->m_cameraMatrixOld.SetFromMatrixSkipPadding ( CMatrix () );
-    pCameraInterface->m_viewMatrix.SetFromMatrixSkipPadding ( CMatrix () );
-    pCameraInterface->m_matInverse.SetFromMatrixSkipPadding ( CMatrix () );
+    pCameraInterface->m_cameraMatrix = RwMatrix();
+    pCameraInterface->m_cameraMatrixOld = RwMatrix();
+    pCameraInterface->m_viewMatrix = RwMatrix();
+    pCameraInterface->m_matInverse = RwMatrix();
     pCameraInterface->m_vecBottomFrustumNormal = CVector ( 0, -1, -1 );
     pCameraInterface->m_vecTopFrustumNormal = CVector ( -1, -1, 0 );
 
@@ -253,18 +253,15 @@ CMatrix * CCameraSA::GetMatrix ( CMatrix * matrix )
     DEBUG_TRACE("CMatrix * CCameraSA::GetMatrix ( CMatrix * matrix )");
     //_asm int 3
     //CCameraSAInterface * pCamInterface = this->GetInterface();
-    CMatrix_Padded * pCamMatrix = &this->GetInterface()->m_cameraMatrix; // ->Placeable.matrix;
+    RwMatrix * pCamMatrix = &this->GetInterface()->m_cameraMatrix; // ->Placeable.matrix;
     if ( pCamMatrix )
     {
-        matrix->vFront = pCamMatrix->vFront;
-        matrix->vPos = pCamMatrix->vPos;
-        matrix->vUp = pCamMatrix->vUp;
-        matrix->vRight = pCamMatrix->vRight;
- 
+        *matrix = *pCamMatrix;
+
         if ( !IsValidMatrix ( *matrix ) )
         {
             RestoreLastGoodState ();
-            pCamMatrix->ConvertToMatrix ( *matrix );
+            *pCamMatrix = *matrix;
         }
     }
     else
@@ -277,14 +274,9 @@ CMatrix * CCameraSA::GetMatrix ( CMatrix * matrix )
 VOID CCameraSA::SetMatrix ( CMatrix * matrix )
 {
     DEBUG_TRACE("VOID CCameraSA::SetMatrix ( CMatrix * matrix )");
-    CMatrix_Padded * pCamMatrix = this->GetInterface()->Placeable.matrix;
+    RwMatrix * pCamMatrix = this->GetInterface()->Placeable.matrix;
     if ( pCamMatrix )
-    {
-        pCamMatrix->vFront = matrix->vFront;
-        pCamMatrix->vPos = matrix->vPos;
-        pCamMatrix->vUp = matrix->vUp;
-        pCamMatrix->vRight = matrix->vRight;
-    }   
+        *pCamMatrix = *matrix;
 }
 
 VOID CCameraSA::SetCamPositionForFixedMode ( CVector * vecPosition, CVector * vecUpOffset )

@@ -139,7 +139,7 @@ public:
         for ( std::vector < SSavedClumpInfo >::iterator iter = savedClumpList.begin () ; iter != savedClumpList.end () ; ++iter )
         {
             SSavedClumpInfo& info = *iter;
-            RpGeometry* pGeometry = ( ( RpAtomic* ) ( ( info.pClump->atomics.root.next ) - 0x8 ) )->geometry;
+            RpGeometry* pGeometry = LIST_GETITEM( RpAtomic, info.pClump->atomics.root.next, atomics )->geometry;
 #ifdef CLOTHES_REF_TEST
             if ( pGeometry->refs < 21 )
             {
@@ -188,7 +188,7 @@ public:
         SSavedClumpInfo info;
         info.pClump = pClumpCopy;
 #ifdef CLOTHES_REF_TEST
-        RpGeometry* pGeometry = ( ( RpAtomic* ) ( ( info.pClump->atomics.root.next ) - 0x8 ) )->geometry;
+        RpGeometry* pGeometry = LIST_GETITEM( RpAtomic, info.pClump->atomics.root.next, atomics )->geometry;
         pGeometry->refs += 20;
 #endif
 
@@ -253,7 +253,7 @@ public:
         const SSavedClumpInfo& info = *uiBestIndex;
 
 #ifdef CLOTHES_REF_TEST
-        RpGeometry* pGeometry = ( ( RpAtomic* ) ( ( info.pClump->atomics.root.next ) - 0x8 ) )->geometry;
+        RpGeometry* pGeometry = LIST_GETITEM( RpAtomic, info.pClump->atomics.root.next, atomics )->geometry;
         pGeometry->refs -= 20;
 #endif
         RpClumpDestroy ( info.pClump );

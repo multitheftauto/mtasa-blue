@@ -44,7 +44,7 @@ VOID CEntitySA::SetPosition(float fX, float fY, float fZ)
     if ( m_pInterface->Placeable.matrix )
     {
         OnChangingPosition ( CVector ( fX, fY, fZ ) );
-        vecPos = &m_pInterface->Placeable.matrix->vPos;
+        vecPos = &m_pInterface->Placeable.matrix->pos;
     }
     else
     {
@@ -276,7 +276,7 @@ CVector * CEntitySA::GetPositionInternal ( )
 {
     DEBUG_TRACE("CVector * CEntitySA::GetPosition( )");
     if ( m_pInterface->Placeable.matrix )
-        return &m_pInterface->Placeable.matrix->vPos;
+        return &m_pInterface->Placeable.matrix->pos;
     else
         return &m_pInterface->Placeable.m_transform.m_translate; 
 }
@@ -305,10 +305,7 @@ CMatrix * CEntitySA::GetMatrixInternal ( CMatrix * matrix )
     DEBUG_TRACE("CMatrix * CEntitySA::GetMatrix ( CMatrix * matrix )");
     if ( m_pInterface->Placeable.matrix && matrix )
     {
-        MemCpyFast (&matrix->vFront,     &m_pInterface->Placeable.matrix->vFront, sizeof(CVector));
-        MemCpyFast (&matrix->vPos,           &m_pInterface->Placeable.matrix->vPos, sizeof(CVector));
-        MemCpyFast (&matrix->vUp,            &m_pInterface->Placeable.matrix->vUp, sizeof(CVector));
-        MemCpyFast (&matrix->vRight,         &m_pInterface->Placeable.matrix->vRight, sizeof(CVector));
+        *matrix = *m_pInterface->Placeable.matrix;
         return matrix;
     }
     else
@@ -320,20 +317,12 @@ CMatrix * CEntitySA::GetMatrixInternal ( CMatrix * matrix )
 VOID CEntitySA::SetMatrix ( CMatrix * matrix )
 {
     DEBUG_TRACE("VOID CEntitySA::SetMatrix ( CMatrix * matrix )");
-    if ( (DWORD)m_pInterface->vtbl == VTBL_CPlaceable )
-    {
-        #pragma message(__LOC__ "(Cazomino05) Delete before release.")
-        CEntitySAInterface * pInterface = NULL;
-        pInterface->SetIsLowLodEntity();
-    }
+
     if ( m_pInterface->Placeable.matrix && matrix )
     {
         OnChangingPosition ( matrix->vPos );
 
-        MemCpyFast (&m_pInterface->Placeable.matrix->vFront,     &matrix->vFront, sizeof(CVector));
-        MemCpyFast (&m_pInterface->Placeable.matrix->vPos,           &matrix->vPos, sizeof(CVector));
-        MemCpyFast (&m_pInterface->Placeable.matrix->vUp,            &matrix->vUp, sizeof(CVector));
-        MemCpyFast (&m_pInterface->Placeable.matrix->vRight,         &matrix->vRight, sizeof(CVector));
+        *m_pInterface->Placeable.matrix = *matrix;
 
         m_pInterface->Placeable.m_transform.m_translate = matrix->vPos;
         m_LastGoodPosition = matrix->vPos;
@@ -513,8 +502,8 @@ void CEntitySA::SetVisible ( bool bVisible )
 
 VOID CEntitySA::MatrixConvertFromEulerAngles ( float fX, float fY, float fZ, int iUnknown )
 {
-    CMatrix_Padded * matrixPadded = m_pInterface->Placeable.matrix;
-    if ( matrixPadded )
+    RwMatrix * matrix = m_pInterface->Placeable.matrix;
+    if ( matrix )
     {
         DWORD dwFunc = FUNC_CMatrix__ConvertFromEulerAngles;
         _asm
@@ -523,7 +512,7 @@ VOID CEntitySA::MatrixConvertFromEulerAngles ( float fX, float fY, float fZ, int
             push    fZ
             push    fY
             push    fX
-            mov     ecx, matrixPadded
+            mov     ecx, matrix
             call    dwFunc
         }
     }
@@ -531,8 +520,8 @@ VOID CEntitySA::MatrixConvertFromEulerAngles ( float fX, float fY, float fZ, int
 
 VOID CEntitySA::MatrixConvertToEulerAngles ( float * fX, float * fY, float * fZ, int iUnknown )
 {
-    CMatrix_Padded * matrixPadded = m_pInterface->Placeable.matrix;
-    if ( matrixPadded )
+    RwMatrix * matrix = m_pInterface->Placeable.matrix;
+    if ( matrix )
     {
         DWORD dwFunc = FUNC_CMatrix__ConvertToEulerAngles;
         _asm
@@ -541,7 +530,7 @@ VOID CEntitySA::MatrixConvertToEulerAngles ( float * fX, float * fY, float * fZ,
             push    fZ
             push    fY
             push    fX
-            mov     ecx, matrixPadded
+            mov     ecx, matrix
             call    dwFunc
         }
     }

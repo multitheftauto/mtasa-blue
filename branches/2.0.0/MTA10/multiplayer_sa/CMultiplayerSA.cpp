@@ -2151,7 +2151,7 @@ void CMultiplayerSA::SetCenterOfWorld(CEntity * entity, CVector * vecPosition, F
             {
                 activeEntityForStreaming = new CPedSAInterface();
                 MemSet (activeEntityForStreaming, 0, sizeof(CPedSAInterface));
-                activeEntityForStreaming->Placeable.matrix = new CMatrix_Padded();
+                activeEntityForStreaming->Placeable.matrix = new RwMatrix();
             }
 
             bActiveEntityForStreamingIsFakePed = true;
@@ -2703,7 +2703,7 @@ bool processGrab () {
         //CObjectSA * object = (CObjectSA*)entity;
         //CModelInfo * info = pGameInterface->GetModelInfo(entity->m_nModelIndex);
         if ( entity->Placeable.matrix )
-            edgeHeight = *entityEdgeHeight + entity->Placeable.matrix->vPos.fZ;
+            edgeHeight = *entityEdgeHeight + entity->Placeable.matrix->pos.fZ;
         else
             edgeHeight = *entityEdgeHeight + entity->Placeable.m_transform.m_translate.fZ; 
     }
@@ -3239,7 +3239,7 @@ static void RestoreAlphaValues ()
  **/
 static RpAtomic* CVehicle_EAEG ( RpAtomic* pAtomic, void* )
 {
-    RwFrame* pFrame = ((RwFrame*)(((RwObject *)(pAtomic))->parent));
+    RwFrame* pFrame = pAtomic->parent;
     if ( pFrame )
     {
         switch ( pFrame->szName[0] )
@@ -3691,47 +3691,22 @@ void CMultiplayerSA::Reset ( void )
 
 void CMultiplayerSA::ConvertEulerAnglesToMatrix ( CMatrix& Matrix, float fX, float fY, float fZ )
 {
-    CMatrix_Padded matrixPadded ( Matrix );
-    CMatrix_Padded* pMatrixPadded = &matrixPadded;
-    DWORD dwFunc = FUNC_CMatrix__ConvertFromEulerAngles;
-    int iUnknown = 21;
-    _asm
-    {
-        push    iUnknown
-        push    fZ
-        push    fY
-        push    fX
-        mov     ecx, pMatrixPadded
-        call    dwFunc
-    }
+    RwMatrix matrix ( Matrix );
+
+    matrix.SetRotationRad( fX, fY, fZ );
 
     // Convert the result matrix to the CMatrix we know
-    matrixPadded.ConvertToMatrix ( Matrix );
+    Matrix = matrix;
 }
 
 
 void CMultiplayerSA::ConvertMatrixToEulerAngles ( const CMatrix& Matrix, float& fX, float& fY, float& fZ )
 {
     // Convert the given matrix to a padded matrix
-    CMatrix_Padded matrixPadded ( Matrix );
+    RwMatrix matrix( Matrix );
 
-    // Grab its pointer and call gta's func
-    CMatrix_Padded* pMatrixPadded = &matrixPadded;
-    DWORD dwFunc = FUNC_CMatrix__ConvertToEulerAngles;
-
-    float* pfX = &fX;
-    float* pfY = &fY;
-    float* pfZ = &fZ;
-    int iUnknown = 21;
-    _asm
-    {
-        push    iUnknown
-        push    pfZ
-        push    pfY
-        push    pfX
-        mov     ecx, pMatrixPadded
-        call    dwFunc
-    }
+    // Convert stuff
+    matrix.GetRotationRad( fX, fY, fZ );
 }
 
 void CMultiplayerSA::RebuildMultiplayerPlayer ( CPed * player )

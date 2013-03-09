@@ -7,6 +7,7 @@
 *               and miscellaneous rendering functions
 *  DEVELOPERS:  Cecill Etheredge <ijsf@gmx.net>
 *               arc_
+*               The_GTA <quiret@gmx.de>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *  RenderWare is © Criterion Software
@@ -20,6 +21,7 @@
 
 extern CGameSA * pGame;
 
+RwInterface **ppRwInterface = (RwInterface**)0x00C97B24;
 
 
 // RwFrameForAllObjects struct and callback used to replace dynamic vehicle parts
@@ -226,7 +228,6 @@ CRenderWareSA::CRenderWareSA ( eGameVersion version )
             RpWorldAddClump                     = (RpWorldAddClump_t)                       0x00751350;
             RwFrameScale                        = (RwFrameScale_t)                          0x007F0F10;
             RwV3dTransformVector                = (RwV3dTransformVector_t)                  0x007EDE00;
-            RpLightCreate                       = (RpLightCreate_t)                         0x00752160;
             RpClumpAddLight                     = (RpClumpAddLight_t)                       0x0074A540;
             _rwObjectHasFrameSetFrame           = (_rwObjectHasFrameSetFrame_t)             0x00804F30;
             RpLightSetRadius                    = (RpLightSetRadius_t)                      0x00751AC0;
@@ -240,6 +241,28 @@ CRenderWareSA::CRenderWareSA ( eGameVersion version )
             RwRasterLock                        = (RwRasterLock_t)                          0x007FB310; 
             RwRasterCreate                      = (RwRasterCreate_t)                        0x007FB270;
             RwTextureCreate                     = (RwTextureCreate_t)                       0x007F3800;
+
+            // Utility functions
+            RwAllocAligned                      = (RwAllocAligned_t)                        0x0072F4C0;
+            RwFreeAligned                       = (RwFreeAligned_t)                         0x0072F4F0;
+
+            // Object functions
+            RwObjectRegister                    = (RwObjectRegister_t)                      0x00808720;
+
+            // Frame functions
+            RwFrameCloneRecursive               = (RwFrameCloneRecursive_t)                 0x007F0090;
+            RwFrameGetLTM                       = (RwFrameGetLTM_t)                         0x007F09D0;
+
+            // Atomic functions
+            RpAtomicRender                      = (RpAtomicRender_t)                        0x00749210;
+            RpAtomicSetupObjectPipeline         = (RpAtomicSetupObjectPipeline_t)           0x005D7F00;
+            RpAtomicSetupVehiclePipeline        = (RpAtomicSetupVehiclePipeline_t)          0x005D5B20;
+
+            // Scene functions
+            RwSceneAddAtomic                    = (RwSceneAddAtomic_t)                      0x00750FE0;
+            RwSceneAddClump                     = (RwSceneAddClump_t)                       0x00751350;
+            RwSceneAddLight                     = (RwSceneAddLight_t)                       0x00751960;
+            RwSceneRemoveLight                  = (RwSceneRemoveLight_t)                    0x007519B0;
 
             SetTextureDict                      = (SetTextureDict_t)                        0x007319C0;
             LoadClumpFile                       = (LoadClumpFile_t)                         0x005371F0;
@@ -310,7 +333,6 @@ CRenderWareSA::CRenderWareSA ( eGameVersion version )
             RpWorldAddClump                     = (RpWorldAddClump_t)                       0x00751300;
             RwFrameScale                        = (RwFrameScale_t)                          0x007F0ED0;
             RwV3dTransformVector                = (RwV3dTransformVector_t)                  0x007EDDC0;
-            RpLightCreate                       = (RpLightCreate_t)                         0x00752110;
             RpClumpAddLight                     = (RpClumpAddLight_t)                       0x0074A4F0;
             _rwObjectHasFrameSetFrame           = (_rwObjectHasFrameSetFrame_t)             0x00804EF0;
             RpLightSetRadius                    = (RpLightSetRadius_t)                      0x00751A70;
@@ -324,6 +346,28 @@ CRenderWareSA::CRenderWareSA ( eGameVersion version )
             RwRasterLock                        = (RwRasterLock_t)                          0x007FB2D0;
             RwRasterCreate                      = (RwRasterCreate_t)                        0x007FB230;
             RwTextureCreate                     = (RwTextureCreate_t)                       0x007F37C0;
+
+            // Utility functions
+            RwAllocAligned                      = (RwAllocAligned_t)                        0x0072F4C0;
+            RwFreeAligned                       = (RwFreeAligned_t)                         0x0072F4F0;
+
+            // Object functions
+            RwObjectRegister                    = (RwObjectRegister_t)                      0x008086E0;
+
+            // Frame functions
+            RwFrameCloneRecursive               = (RwFrameCloneRecursive_t)                 0x007F0050;
+            RwFrameGetLTM                       = (RwFrameGetLTM_t)                         0x007F0990;
+
+            // Atomic functions
+            RpAtomicRender                      = (RpAtomicRender_t)                        0x007491C0;
+            RpAtomicSetupObjectPipeline         = (RpAtomicSetupObjectPipeline_t)           0x005D7F00;
+            RpAtomicSetupVehiclePipeline        = (RpAtomicSetupVehiclePipeline_t)          0x005D5B20;
+
+            // Scene functions
+            RwSceneAddClump                     = (RwSceneAddClump_t)                       0x00751300;
+            RwSceneAddLight                     = (RwSceneAddLight_t)                       0x00751910;
+            RwSceneAddAtomic                    = (RwSceneAddAtomic_t)                      0x00750F90;
+            RwSceneRemoveLight                  = (RwSceneRemoveLight_t)                    0x00751960;
 
             SetTextureDict                      = (SetTextureDict_t)                        0x007319C0;
             LoadClumpFile                       = (LoadClumpFile_t)                         0x005371F0;
@@ -600,9 +644,7 @@ bool CRenderWareSA::PositionFrontSeat ( RpClump *pClump, unsigned short usModelI
 
     // in the vehicle specific dummy data, +30h contains the front seat vector
     CVector *vecFrontSeat = ( CVector* ) ( pVehicleDummies + 0x30 );
-    vecFrontSeat->fX = pPedFrontSeat->modelling.pos.x;
-    vecFrontSeat->fY = pPedFrontSeat->modelling.pos.y;
-    vecFrontSeat->fZ = pPedFrontSeat->modelling.pos.z;
+    *vecFrontSeat = pPedFrontSeat->modelling.pos;
 
     return true;
 }

@@ -87,7 +87,7 @@ public:
 class CMatrixEx
 {
 public:
-    CMatrix_Padded matrix;
+    RwMatrix matrix;
     CMatrix * pMatrix; // usually not initialized
     void * haveRwMatrix; // unknown pointer
 };
@@ -127,7 +127,7 @@ class CPlaceableSAInterface // 20 bytes
 {
 public:
     CSimpleTransformSAInterface     m_transform;
-    CMatrix_Padded                  * matrix; // This is actually XYZ*, change later
+    RwMatrix                      * matrix; // This is actually XYZ*, change later
 };
 
 class CEntitySAInterface

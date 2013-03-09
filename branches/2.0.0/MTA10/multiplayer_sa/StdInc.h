@@ -19,6 +19,8 @@
 #include "SharedUtil.h"
 #include <core/CCoreInterface.h>
 #include <net/CNet.h>
+#include <game/Common.h>
+#include "../game_sa/RenderWare.h"
 #include <game/CGame.h>
 #include <CMatrix_Pad.h>
 #include <../version.h>

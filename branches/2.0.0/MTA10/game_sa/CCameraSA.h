@@ -340,21 +340,21 @@ public:
 //  protected:
 #if 0
     // Original
-    CMatrix_Padded m_cameraMatrix;
-    CMatrix_Padded m_cameraMatrixOld;
-    CMatrix_Padded m_viewMatrix;
-    CMatrix_Padded m_matInverse;
-    CMatrix_Padded m_matMirrorInverse;
-    CMatrix_Padded m_matMirror;
+    RwMatrix m_cameraMatrix;
+    RwMatrix m_cameraMatrixOld;
+    RwMatrix m_viewMatrix;
+    RwMatrix m_matInverse;
+    RwMatrix m_matMirrorInverse;
+    RwMatrix m_matMirror;
 #else
     // Looks more likely to be this
-    CMatrix_Padded m_cameraMatrix;
+    RwMatrix m_cameraMatrix;
     int unk1[2];
-    CMatrix_Padded m_cameraMatrixOld;
+    RwMatrix m_cameraMatrixOld;
     int unk2[2];
-    CMatrix_Padded m_viewMatrix;
+    RwMatrix m_viewMatrix;
     int unk3[2];
-    CMatrix_Padded m_matInverse;
+    RwMatrix m_matInverse;
     int unk4[26];
 #endif
 

@@ -1897,7 +1897,7 @@ void CVehicleSA::SetGravity ( const CVector* pvecGravity )
         GetMatrixForGravity ( m_vecGravity, matOld );
         GetMatrixForGravity ( *pvecGravity, matNew );
         
-        CVector* pvecPosition = &m_pInterface->Placeable.matrix->vPos;
+        CVector* pvecPosition = &m_pInterface->Placeable.matrix->pos;
 
         matOld.Invert ();
         pCam->GetTargetHistoryPos () [ 0 ] = matOld * (pCam->GetTargetHistoryPos () [ 0 ] - *pvecPosition);
@@ -2152,7 +2152,7 @@ void CVehicleSA::OnChangingPosition ( const CVector& vecNewPosition )
     // Only apply to CAutomobile and down
     if ( GetBaseVehicleType () == 0 )
     {
-        CVector vecDelta = vecNewPosition - m_pInterface->Placeable.matrix->vPos;
+        CVector vecDelta = vecNewPosition - m_pInterface->Placeable.matrix->pos;
         if ( vecDelta.LengthSquared () > 10 * 10 )
         {
             // Reposition colpoints for big moves to avoid random spinning
@@ -2167,10 +2167,10 @@ void CVehicleSA::OnChangingPosition ( const CVector& vecNewPosition )
 
 namespace
 {
-    VOID _MatrixConvertFromEulerAngles ( CMatrix_Padded* matrixPadded, float fX, float fY, float fZ )
+    VOID _MatrixConvertFromEulerAngles ( RwMatrix* matrix, float fX, float fY, float fZ )
     {
         int iUnknown = 0;
-        if ( matrixPadded )
+        if ( matrix )
         {
             DWORD dwFunc = FUNC_CMatrix__ConvertFromEulerAngles;
             _asm
@@ -2179,15 +2179,15 @@ namespace
                 push    fZ
                 push    fY
                 push    fX
-                mov     ecx, matrixPadded
+                mov     ecx, matrix
                 call    dwFunc
             }
         }
     }
-    VOID _MatrixConvertToEulerAngles ( CMatrix_Padded* matrixPadded, float &fX, float &fY, float &fZ )
+    VOID _MatrixConvertToEulerAngles ( RwMatrix* matrix, float &fX, float &fY, float &fZ )
     {
         int iUnknown = 0;
-        if ( matrixPadded )
+        if ( matrix )
         {
             DWORD dwFunc = FUNC_CMatrix__ConvertToEulerAngles;
             _asm
@@ -2196,7 +2196,7 @@ namespace
                 push    fZ
                 push    fY
                 push    fX
-                mov     ecx, matrixPadded
+                mov     ecx, matrix
                 call    dwFunc
             }
         }
@@ -2224,12 +2224,12 @@ bool CVehicleSA::SetComponentRotation ( SString vehicleComponent, CVector vecRot
     if ( pComponent )
     {
         // call our convert from euler angles function to get a valid matrix
-        CMatrix_Padded matrixPadded;
+        RwMatrix matrixPadded;
         _MatrixConvertFromEulerAngles ( &matrixPadded, vecRotation.fX, vecRotation.fY, vecRotation.fZ );
         // copy it into the rotation field
-        pComponent->modelling.right = (RwV3d&)matrixPadded.vRight;
-        pComponent->modelling.up = (RwV3d&)matrixPadded.vFront;
-        pComponent->modelling.at = (RwV3d&)matrixPadded.vUp;
+        pComponent->modelling.right = matrixPadded.right;
+        pComponent->modelling.up = matrixPadded.at;
+        pComponent->modelling.at = matrixPadded.up;
         return true;
     }
     return false;
@@ -2243,10 +2243,10 @@ bool CVehicleSA::GetComponentRotation ( SString vehicleComponent, CVector &vecRo
     if ( pComponent )
     {
         // call our convert to euler angles function to get a valid rotation
-        CMatrix_Padded matrixPadded;
-        (RwV3d&)matrixPadded.vRight = pComponent->modelling.right;
-        (RwV3d&)matrixPadded.vFront = pComponent->modelling.up;
-        (RwV3d&)matrixPadded.vUp = pComponent->modelling.at;
+        RwMatrix matrixPadded;
+        matrixPadded.right = pComponent->modelling.right;
+        matrixPadded.at = pComponent->modelling.up;
+        matrixPadded.up = pComponent->modelling.at;
         _MatrixConvertToEulerAngles ( &matrixPadded, vecRotation.fX, vecRotation.fY, vecRotation.fZ );
         return true;
     }
@@ -2261,9 +2261,9 @@ bool CVehicleSA::SetComponentPosition ( SString vehicleComponent, CVector vecPos
     if ( pComponent )
     {
         // set our position (modelling is relative positions and ltm is world pos)
-        pComponent->modelling.pos.x = vecPosition.fX;
-        pComponent->modelling.pos.y = vecPosition.fY;
-        pComponent->modelling.pos.z = vecPosition.fZ;
+        pComponent->modelling.pos[0] = vecPosition.fX;
+        pComponent->modelling.pos[1] = vecPosition.fY;
+        pComponent->modelling.pos[2] = vecPosition.fZ;
         return true;
     }
     return false;
@@ -2277,7 +2277,7 @@ bool CVehicleSA::GetComponentPosition ( SString vehicleComponent, CVector &vecPo
     if ( pComponent )
     {
         // get our position (modelling is relative positions and ltm is world pos)
-        vecPositionModelling = CVector ( pComponent->modelling.pos.x, pComponent->modelling.pos.y, pComponent->modelling.pos.z );
+        vecPositionModelling = pComponent->modelling.pos;
         return true;
     }
     return false;

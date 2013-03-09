@@ -12,8 +12,6 @@
 #ifndef __CFX
 #define __CFX
 
-#include "RenderWare.h"
-
 class CVector;
 class CEntity;
 class CVehicle;

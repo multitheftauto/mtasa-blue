@@ -1,5 +1,5 @@
 Microsoft Visual Studio Solution File, Format Version 10.00
-# Visual Studio 2008
+# Visual C++ Express 2008
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Client - Core", "..\MTA10\core\_Core 2008.vcproj", "{4C71249E-EA08-4A3D-9AEF-28707ACC6531}"
 	ProjectSection(ProjectDependencies) = postProject
 		{0008960E-E0DD-41A6-8265-00B31DDB4C21} = {0008960E-E0DD-41A6-8265-00B31DDB4C21}
@@ -8,9 +8,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Client - Core", "..\MTA10\c
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Client - Game SA", "..\MTA10\game_sa\_game_sa 2008.vcproj", "{E13D1441-438B-4A03-AB79-5E8EF08EE414}"
-	ProjectSection(ProjectDependencies) = postProject
-		{916D94E2-FB0B-4992-A52C-3698CCBB0A41} = {916D94E2-FB0B-4992-A52C-3698CCBB0A41}
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Client - Loader", "..\MTA10\loader\_Loader 2008.vcproj", "{AF2AF376-1ACD-4F3B-B399-2A30D8BE950E}"
 	ProjectSection(ProjectDependencies) = postProject

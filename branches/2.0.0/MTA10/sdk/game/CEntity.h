@@ -15,9 +15,10 @@
 #include "Common.h"
 #include <CMatrix.h>
 #include <CVector.h>
-#include "RenderWare.h"
 
 #include <windows.h>
+
+struct RpClump;
 
 enum eEntityType
 {
@@ -75,8 +76,6 @@ public:
     virtual bool                        IsFullyVisible ()=0;
     virtual void                        SetUnderwater ( bool bUnderwater )=0;
     virtual bool                        GetUnderwater ( void )=0;
-    virtual RwFrame *                   GetFrameFromId ( int id )=0;
-    virtual RwMatrix *                  GetLTMFromId ( int id )=0;
 
     virtual RpClump *                   GetRpClump () = 0;
 

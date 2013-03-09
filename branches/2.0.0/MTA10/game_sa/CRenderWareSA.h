@@ -151,4 +151,6 @@ private:
     bool                                    m_bGTAVertexShadersEnabled;
 };
 
+#include "CRenderWareSA.rwapi.h"
+
 #endif

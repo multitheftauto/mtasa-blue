@@ -12,7 +12,6 @@
 
 #include <StdInc.h>
 #include "CTileBatcher.h"
-#define DEG2RAD(deg) ( (deg) * (6.2832f/360.f) )
 
 ////////////////////////////////////////////////////////////////
 //

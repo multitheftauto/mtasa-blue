@@ -27,6 +27,7 @@
 #include <ijsify.h>
 
 // Game includes
+#include "RenderWare.h"
 #include "CEntitySA.h"
 #include "gamesa_init.h"
 #include "Common.h"
