@@ -68,6 +68,7 @@ public:
     virtual bool                        IsConnected                 ( void ) = 0;
 
     virtual void                        DoPulse                     ( void ) = 0;
+    virtual void                        Shutdown                    ( void ) = 0;
 
     virtual void                        RegisterPacketHandler       ( PPACKETHANDLER pfnPacketHandler ) = 0;
 
