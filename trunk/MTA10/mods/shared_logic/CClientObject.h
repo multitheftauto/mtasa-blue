@@ -97,6 +97,9 @@ public:
     inline bool                     IsRespawnEnabled        ( void )                            { return m_bRespawnEnabled; };
     inline void                     SetRespawnEnabled       ( bool bRespawnEnabled )            { m_bRespawnEnabled = bRespawnEnabled; };
 
+    float                           GetMass                 ( void );
+    void                            SetMass                 ( float fMass );
+
     void                            ReCreate                ( void );
     void                            UpdateVisibility        ( void );
 
@@ -132,6 +135,7 @@ protected:
     bool                                m_bBreakable;
     bool                                m_bBeingRespawned;
     bool                                m_bRespawnEnabled;
+    float                               m_fMass;
 
     CVector                             m_vecMoveSpeed;
 
