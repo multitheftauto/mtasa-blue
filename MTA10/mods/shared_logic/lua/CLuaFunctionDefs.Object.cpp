@@ -121,6 +121,7 @@ int CLuaFunctionDefs::GetObjectScale ( lua_State* luaVM )
     return 1;
 }
 
+
 int CLuaFunctionDefs::IsObjectBreakable ( lua_State* luaVM )
 {
     //  bool isObjectBreakable ( object theObject )
@@ -144,6 +145,28 @@ int CLuaFunctionDefs::IsObjectBreakable ( lua_State* luaVM )
     return 1;
 }
 
+
+int CLuaFunctionDefs::GetObjectMass ( lua_State* luaVM )
+{
+//  float getObjectMass ( object theObject )
+    CClientObject* pObject; float fMass;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pObject );
+    if ( !argStream.HasErrors () )
+    {
+        if ( CStaticFunctionDefinitions::GetObjectMass ( *pObject, fMass ) )
+        {
+            lua_pushnumber ( luaVM, fMass );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
 
 int CLuaFunctionDefs::MoveObject ( lua_State* luaVM )
 {
@@ -352,6 +375,31 @@ int CLuaFunctionDefs::ToggleObjectRespawn ( lua_State* luaVM )
     else
         m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
 
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::SetObjectMass ( lua_State* luaVM )
+{
+//  bool setObjectMass ( object theObject, float fMass )
+    CClientEntity* pEntity; float fMass;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pEntity );
+    argStream.ReadNumber ( fMass );
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( CStaticFunctionDefinitions::SetObjectMass ( *pEntity, fMass ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+    
     lua_pushboolean ( luaVM, false );
     return 1;
 }

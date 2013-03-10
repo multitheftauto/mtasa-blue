@@ -3437,6 +3437,12 @@ bool CStaticFunctionDefinitions::IsObjectBreakable ( CClientObject& Object, bool
     return true;
 }
 
+bool CStaticFunctionDefinitions::GetObjectMass ( CClientObject& Object, float& fMass )
+{
+    fMass = Object.GetMass ();
+    return true;
+}
+
 bool CStaticFunctionDefinitions::SetObjectRotation ( CClientEntity& Entity, const CVector& vecRotation )
 {
     RUN_CHILDREN SetObjectRotation ( **iter, vecRotation );
@@ -3590,6 +3596,22 @@ bool CStaticFunctionDefinitions::ToggleObjectRespawn ( CClientEntity& Entity, bo
         CDeathmatchObject& Object = static_cast < CDeathmatchObject& > ( Entity );
         Object.SetRespawnEnabled ( bRespawn );
         return true;
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::SetObjectMass ( CClientEntity& Entity, float fMass )
+{
+    if ( fMass >= 0.0f )
+    {
+        RUN_CHILDREN SetObjectMass ( **iter, fMass );
+
+        if ( IS_OBJECT ( &Entity ) )
+        {
+            CDeathmatchObject& Object = static_cast < CDeathmatchObject& > ( Entity );
+            Object.SetMass ( fMass );
+            return true;
+        }
     }
     return false;
 }
