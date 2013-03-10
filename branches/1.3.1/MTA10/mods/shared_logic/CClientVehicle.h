@@ -340,10 +340,10 @@ public:
     float                       GetDirtLevel            ( void );
     void                        SetDirtLevel            ( float fDirtLevel );
 	
-    inline char                 GetNitroCount           ( void )                            { return m_pVehicle->GetNitroCount (); }
-    inline float                GetNitroLevel           ( void )                            { return m_pVehicle->GetNitroLevel (); }
-    inline void                 SetNitroCount           ( char cCount )                     { m_pVehicle->SetNitroCount ( cCount ); }
-    inline void                 SetNitroLevel           ( float fLevel )                    { m_pVehicle->SetNitroLevel ( fLevel ); }
+    inline char                 GetNitroCount           ( void )                            { return m_pVehicle ? m_pVehicle->GetNitroCount () : 0; }
+    inline float                GetNitroLevel           ( void )                            { return m_pVehicle ? m_pVehicle->GetNitroLevel () : 0; }
+    inline void                 SetNitroCount           ( char cCount )                     { if ( m_pVehicle ) m_pVehicle->SetNitroCount ( cCount ); }
+    inline void                 SetNitroLevel           ( float fLevel )                    { if ( m_pVehicle ) m_pVehicle->SetNitroLevel ( fLevel ); }
 
     bool                        IsNitroInstalled        ( void );
 
