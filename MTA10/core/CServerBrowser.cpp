@@ -585,7 +585,11 @@ void CServerBrowser::DeleteTab ( ServerBrowserType type )
     delete m_pServerSearchIcon  [ type ];
     delete m_pButtonInfoIcon [ type ];
     delete m_pButtonConnectIcon [ type ];
+
+    // Remove handler to prevent unwanted events during delete
+    m_pComboAddressHistory [ type ]->SetDropListRemoveHandler ( NULL );
     delete m_pComboAddressHistory [ type ];
+
     delete m_pAddressFavoriteIcon [ type ];
     delete m_pEditSearch [ type ];
     delete m_pButtonRefreshIcon [ type ];

@@ -215,7 +215,6 @@ CCore::~CCore ( void )
     //delete m_pFileSystemHook;
     delete m_pDirect3DHookManager;
     delete m_pDirectInputHookManager;
-    delete m_pMessageLoopHook;
     delete m_pTCPManager;
 
     // Delete the GUI manager    
@@ -237,6 +236,9 @@ CCore::~CCore ( void )
 
     //Delete the Current Server
     delete m_pCurrentServer;
+
+    // Delete last so calls to GetHookedWindowHandle do not crash
+    delete m_pMessageLoopHook;
 }
 
 
