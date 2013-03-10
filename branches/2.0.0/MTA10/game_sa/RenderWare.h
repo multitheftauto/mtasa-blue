@@ -13,7 +13,7 @@
 #ifndef __RENDERWARE_COMPAT
 #define __RENDERWARE_COMPAT
 
-#include <RenderWare_shared.h>
+#include <game/RenderWare_shared.h>
 
 // We need direct3D 9
 #include <d3d9.h>
@@ -91,6 +91,25 @@ enum RwRasterType : unsigned int
     RASTER_TEXTURE = 4
 };
 
+/*==================================================================
+    RenderWare Structure Definitions
+
+    All interfaces which extend from RwObject are plugins. Plugins are
+    dynamically allocated in the RenderWare system after all extensions
+    have registered their data in the RenderWare plugin system. Every
+    plugin has got a structure information class pointer in RwInterface
+    (ex. m_clumpInfo).
+    
+    Through the RenderWare API you can extend these structures. Doing so 
+    might either append or insert new data chunks into each RwObject.
+    Be careful if you do so: RenderWare definitions here are a static
+    representation of what is handled through dynamic offsets in the
+    engine! Be sure to keep the definitions here up-to-date.
+
+    You may add as many static methods to the structures as you want.
+    Adding virtual methods is discouraged due to compatibility reasons.
+==================================================================*/
+
 #define RW_OBJ_REGISTERED           0x02
 #define RW_OBJ_VISIBLE              0x04
 #define RW_OBJ_HIERARCHY_CACHED     0x10
@@ -104,8 +123,8 @@ struct RwObject
     unsigned char   privateFlags;
     struct RwFrame* parent;
 
-    inline bool         IsVisible()                     { return IS_FLAG( flags, RW_OBJ_VISIBLE ); }
-    inline void         SetVisible( bool vis )          { BOOL_FLAG( flags, RW_OBJ_VISIBLE, vis ); }
+    inline bool         IsVisible           ( void ) const      { return IS_FLAG( flags, RW_OBJ_VISIBLE ); }
+    inline void         SetVisible          ( bool vis )        { BOOL_FLAG( flags, RW_OBJ_VISIBLE, vis ); }
 };
 struct RwVertex
 {
@@ -145,7 +164,7 @@ public:
 class RwRenderLink
 {
 public:
-    unsigned char           flags;        
+    unsigned char           flags;          // 0
     BYTE                    pad[3];         // 1
     CVector                 position;       // 4
     void*                   context;        // 16
@@ -154,10 +173,20 @@ public:
 
 #define BONE_ROOT           0x08
 
+/*=========================================================
+    RwStaticGeometry
+
+    This class has been found by analyzing the GTA:SA
+    CClumpModelInfoSAInterface. Models without animation would
+    receive this static geometry data.
+
+    The usage of this class is highly theoretical and open for
+    discussion!
+=========================================================*/
 class RwStaticGeometry
 {
 public:
-    RwStaticGeometry();
+    RwStaticGeometry                            ( void );
 
     RwObject*               unknown2;       // 0
     unsigned int            unknown;        // 4
@@ -165,7 +194,7 @@ public:
     unsigned int            unknown3;       // 12
     RwRenderLink*           link;           // 16
 
-    RwRenderLink*           AllocateLink( unsigned int count );
+    RwRenderLink*           AllocateLink        ( unsigned int count );
     template <class type>
     void                    ForAllLinks( void (*callback)( RwRenderLink *link, type data ), type data )
     {
@@ -237,8 +266,8 @@ struct RwObjectFrame : public RwObject
     RwListEntry <RwObjectFrame>     lFrame;
     void*                           callback;
 
-    void                    AddToFrame( RwFrame *frame );
-    void                    RemoveFromFrame();
+    void                    AddToFrame                  ( RwFrame *frame );
+    void                    RemoveFromFrame             ( void );
 };
 
 // Private flags
@@ -263,17 +292,17 @@ struct RwFrame : public RwObject
     BYTE                    pad3[8];            // 188
     unsigned int            hierarchyId;        // 196
 
-    void                    SetModelling( const RwMatrix& mat );
-    const RwMatrix&         GetModelling() const        { return modelling; }
-    void                    SetPosition( const CVector& pos );
-    const CVector&          GetPosition() const         { return modelling.pos; }
+    void                    SetModelling                ( const RwMatrix& mat );
+    const RwMatrix&         GetModelling                ( void ) const          { return modelling; }
+    void                    SetPosition                 ( const CVector& pos );
+    const CVector&          GetPosition                 ( void ) const          { return modelling.pos; }
 
-    const RwMatrix&         GetLTM() const;
+    const RwMatrix&         GetLTM                      ( void );
 
-    void                    Link( RwFrame *frame );
-    void                    Unlink();
-    void                    SetRootForHierarchy( RwFrame *root );
-    unsigned int            CountChildren();
+    void                    Link                        ( RwFrame *frame );
+    void                    Unlink                      ( void );
+    void                    SetRootForHierarchy         ( RwFrame *root );
+    unsigned int            CountChildren               ( void );
     template <class type>
     bool                    ForAllChildren( bool (*callback)( RwFrame *frame, type *data ), type *data )
     {
@@ -285,12 +314,12 @@ struct RwFrame : public RwObject
 
         return true;
     }
-    RwFrame*                GetFirstChild();
-    RwFrame*                FindFreeChildByName( const char *name );
-    RwFrame*                FindChildByName( const char *name );
-    RwFrame*                FindChildByHierarchy( unsigned int id );
+    RwFrame*                GetFirstChild               ( void );
+    RwFrame*                FindFreeChildByName         ( const char *name );
+    RwFrame*                FindChildByName             ( const char *name );
+    RwFrame*                FindChildByHierarchy        ( unsigned int id );
 
-    RwFrame*                CloneRecursive() const;
+    RwFrame*                CloneRecursive              ( void ) const;
 
     template <class type>
     bool                    ForAllObjects( bool (*callback)( RwObject *object, type data ), type data )
@@ -305,12 +334,12 @@ struct RwFrame : public RwObject
 
         return true;
     }
-    RwObject*               GetFirstObject();
-    RwObject*               GetFirstObject( unsigned char type );
-    RwObject*               GetObjectByIndex( unsigned char type, unsigned int idx );
-    unsigned int            CountObjectsByType( unsigned char type );
-    RwObject*               GetLastVisibleObject();
-    RwObject*               GetLastObject();
+    RwObject*               GetFirstObject              ( void );
+    RwObject*               GetFirstObject              ( unsigned char type );
+    RwObject*               GetObjectByIndex            ( unsigned char type, unsigned int idx );
+    unsigned int            CountObjectsByType          ( unsigned char type );
+    RwObject*               GetLastVisibleObject        ( void );
+    RwObject*               GetLastObject               ( void );
 
     template <class type>
     struct _rwObjectGetAtomic
@@ -339,13 +368,13 @@ struct RwFrame : public RwObject
 
         return ForAllObjects( RwObjectDoAtomic <type>, &info );
     }
-    RpAtomic*               GetFirstAtomic();
-    void                    SetAtomicVisibility( unsigned short flags );
-    void                    FindVisibilityAtomics( RpAtomic **primary, RpAtomic **secondary );
+    RpAtomic*               GetFirstAtomic              ( void );
+    void                    SetAtomicVisibility         ( unsigned short flags );
+    void                    FindVisibilityAtomics       ( RpAtomic **primary, RpAtomic **secondary );
 
-    RpAnimHierarchy*        GetAnimHierarchy();
-    void                    RegisterRoot();
-    void                    UnregisterRoot();
+    RpAnimHierarchy*        GetAnimHierarchy            ( void );
+    void                    RegisterRoot                ( void );
+    void                    UnregisterRoot              ( void );
 };
 struct RwTexDictionary : public RwObject
 {
@@ -360,7 +389,7 @@ struct RwTexDictionary : public RwObject
 
         for ( child = textures.root.next; child != &textures.root; child = child->next )
         {
-            if ( !callback( (RwTexture*)( (unsigned int)child - offsetof(RwTexture, TXDList) ), ud ) )
+            if ( !callback( LIST_GETITEM( RwTexture, child, TXDList ), ud ) )
                 return false;
         }
 
@@ -387,8 +416,8 @@ struct RwTexDictionary : public RwObject
         return true;
     }
 
-    RwTexture*              GetFirstTexture();
-    RwTexture*              FindNamedTexture( const char *name );
+    RwTexture*              GetFirstTexture             ( void );
+    RwTexture*              FindNamedTexture            ( const char *name );
 };
 struct RwRaster
 {
@@ -416,8 +445,8 @@ struct RwTexture
     unsigned int                flags;                          // 80
     unsigned int                refs;                           // 84
 
-    void                        AddToDictionary( RwTexDictionary *txd );
-    void                        RemoveFromDictionary();
+    void                        AddToDictionary         ( RwTexDictionary *txd );
+    void                        RemoveFromDictionary    ( void );
 };
 struct RwTextureCoordinates
 {
@@ -452,11 +481,11 @@ struct RwCamera : public RwObjectFrame   //size: 428
     RpClump*                clump;              // 416
     RwListEntry <RwCamera>  clumpCameras;       // 420
 
-    void                    BeginUpdate();
-    void                    EndUpdate();
+    void                    BeginUpdate                 ( void );
+    void                    EndUpdate                   ( void );
 
-    void                    AddToClump( RpClump *clump );
-    void                    RemoveFromClump();
+    void                    AddToClump                  ( RpClump *clump );
+    void                    RemoveFromClump             ( void );
 };
 class RwRender
 {
@@ -481,10 +510,10 @@ public:
 class RpMaterials
 {
 public:
-                    RpMaterials( unsigned int count );
-                    ~RpMaterials();
+                    RpMaterials         ( unsigned int count );
+                    ~RpMaterials        ( void );
 
-    bool            Add( RpMaterial *mat );
+    bool            Add                 ( RpMaterial *mat );
 
     RpMaterial**    m_data;
     unsigned int    m_entries;
@@ -522,8 +551,7 @@ struct RpAtomicPipelineInfo
 
 struct RpAtomic : public RwObjectFrame
 {
-public:
-    RpAtomicPipelineInfo*   info;               // 20
+    void*                   info;               // 20
 
     RpGeometry*             geometry;           // 24
     RwSphere                bsphereLocal;       // 28
@@ -550,25 +578,25 @@ public:
 
     unsigned short          modelId;            // 124
     unsigned short          structureId;        // 126, used for components (ok/dam)
-    unsigned char           matrixFlags;        // 128
-    unsigned char           renderFlags;        // 129
+    unsigned char           matrixFlags;        // 128, not sure about this, might be component flags
+    unsigned char           renderFlags;        // 129, ^
     BYTE                    pad3[6];            // 130
     unsigned int            pipeline;           // 136
 
-    bool                    IsNight();
+    bool                    IsNight                     ( void );
 
-    void                    AddToClump( RpClump *clump );
-    void                    RemoveFromClump();
+    void                    AddToClump                  ( RpClump *clump );
+    void                    RemoveFromClump             ( void );
 
-    void                    SetRenderCallback( RpAtomicCallback callback );
+    void                    SetRenderCallback           ( RpAtomicCallback callback );
 
-    void                    ApplyVisibilityFlags( unsigned short flags );
-    void                    RemoveVisibilityFlags( unsigned short flags );
-    unsigned short          GetVisibilityFlags();
+    void                    ApplyVisibilityFlags        ( unsigned short flags );
+    void                    RemoveVisibilityFlags       ( unsigned short flags );
+    unsigned short          GetVisibilityFlags          ( void );
 
-    void                    SetExtendedRenderFlags( unsigned short flags );
+    void                    SetExtendedRenderFlags      ( unsigned short flags );
 
-    void                    FetchMateria( RpMaterials& mats );
+    void                    FetchMateria                ( RpMaterials& mats );
 };
 class RwAtomicZBufferEntry
 {
@@ -591,12 +619,12 @@ public:
     RwAtomicRenderChain     m_renderStack;
     RwAtomicRenderChain     m_renderLast;
 
-    bool                    PushRender( RwAtomicZBufferEntry *level );
+    bool                    PushRender                  ( RwAtomicZBufferEntry *level );
 };
 
 extern RwAtomicRenderChainInterface *const rwRenderChains;
 
-class RpLight : public RwObjectFrame
+struct RpLight : public RwObjectFrame
 {
 public:
     float                   radius;             // 20
@@ -615,19 +643,19 @@ public:
     unsigned int            lightIndex;         // 84, may be 0-7
     CVector                 attenuation;        // 88
 
-    void                    SetLightIndex( unsigned int idx );
-    unsigned int            GetLightIndex() const           { return lightIndex; }
+    void                    SetLightIndex               ( unsigned int idx );
+    unsigned int            GetLightIndex               ( void ) const           { return lightIndex; }
 
-    void                    AddToClump( RpClump *clump );
-    void                    RemoveFromClump();
+    void                    AddToClump                  ( RpClump *clump );
+    void                    RemoveFromClump             ( void );
 
-    void                    AddToScene_Local( RwScene *scene );
-    void                    AddToScene_Global( RwScene *scene );
+    void                    AddToScene_Local            ( RwScene *scene );
+    void                    AddToScene_Global           ( RwScene *scene );
 
-    void                    AddToScene( RwScene *scene );
-    void                    RemoveFromScene();
+    void                    AddToScene                  ( RwScene *scene );
+    void                    RemoveFromScene             ( void );
 
-    void                    SetColor( const RwColorFloat& color );
+    void                    SetColor                    ( const RwColorFloat& color );
 };
 struct RpClump : public RwObject
 {   // RenderWare (plugin) Clump (used by GTA)
@@ -643,24 +671,24 @@ struct RpClump : public RwObject
 
     RwStaticGeometry*       m_static;           // 60
 
-    void                    Render();
+    void                    Render                      ( void );
 
-    void                    InitStaticSkeleton();
-    RwStaticGeometry*       CreateStaticGeometry();
+    void                    InitStaticSkeleton          ( void );
+    RwStaticGeometry*       CreateStaticGeometry        ( void );
 
-    RpAnimHierarchy*        GetAtomicAnimHierarchy();
-    RpAnimHierarchy*        GetAnimHierarchy();
+    RpAnimHierarchy*        GetAtomicAnimHierarchy      ( void );
+    RpAnimHierarchy*        GetAnimHierarchy            ( void );
 
-    void                    ScanAtomicHierarchy( RwFrame **atomics, size_t max );
+    void                    ScanFrameHierarchy          ( RwFrame **frames, size_t max );
 
-    RpAtomic*               GetFirstAtomic();
-    RpAtomic*               GetLastAtomic();
-    RpAtomic*               FindNamedAtomic( const char *name );
-    RpAtomic*               Find2dfx();
+    RpAtomic*               GetFirstAtomic              ( void );
+    RpAtomic*               GetLastAtomic               ( void );
+    RpAtomic*               FindNamedAtomic             ( const char *name );
+    RpAtomic*               Find2dfx                    ( void );
 
-    void                    SetupAtomicRender();
-    void                    RemoveAtomicVisibilityFlags( unsigned short flags );
-    void                    FetchMateria( RpMaterials& mats );
+    void                    SetupAtomicRender           ( void );
+    void                    RemoveAtomicVisibilityFlags ( unsigned short flags );
+    void                    FetchMateria                ( RpMaterials& mats );
 
     template <class type>
     bool                    ForAllAtomics( bool (*callback)( RpAtomic *child, type data ), type data )
@@ -676,7 +704,7 @@ struct RpClump : public RwObject
         return true;
     }
 
-    void                    GetBoneTransform( CVector *offset );
+    void                    GetBoneTransform            ( CVector *offset );
 };
 struct RpTriangle
 {
@@ -690,7 +718,7 @@ struct RwEffect //size: 64
     RwTexture*              m_secondary;            // 40
     BYTE                    m_pad2[20];             // 44
 };
-class Rw2dfx
+struct Rw2dfx
 {
 public:
     unsigned int            m_count;
@@ -713,14 +741,13 @@ public:
     CVector*                m_normals;                          // 24
 };
 class RwLinkedMaterial
-{
-    // Appended to RwLinkedMateria per m_count
+{   // Appended to RwLinkedMaterials per m_count
 public:
     void*                   m_unknown;
     unsigned int            m_pad;
     RpMaterial*             m_material;
 };
-class RwLinkedMateria
+class RwLinkedMaterials
 {
 public:
     unsigned int            m_unknown;
@@ -748,7 +775,6 @@ struct RpGeomStreamline
 
 struct RpGeometry : public RwObject
 {
-public:
     unsigned int            flags;                              // 8
     unsigned short          unknown1;                           // 12
     unsigned short          refs;                               // 14
@@ -762,7 +788,7 @@ public:
     RpTriangle*             triangles;                          // 44
     RwColor*                colors;                             // 48
     RwTextureCoordinates*   texcoords[RW_MAX_TEXTURE_COORDS];   // 52
-    RwLinkedMateria*        linkedMateria;                      // 84
+    RwLinkedMaterials*      linkedMaterials;                    // 84
     void*                   info;                               // 88
     RpGeomMesh*             meshes;                             // 92, allocated by count in array
     unsigned int            usageFlag;                          // 96
@@ -771,7 +797,7 @@ public:
     BYTE                    pad[12];                            // 108
     Rw2dfx*                 m_2dfx;                             // 120
 
-    // Our own extension
+    // Our own extension (not implemented in 2.0 yet)
     RpGeomStreamline        streamline;                         // 124
 
     template <class type>
@@ -787,12 +813,13 @@ public:
 
         return true;
     }
-    bool                    IsAlpha();
-    void                    UnlinkFX();
+    bool                    IsAlpha         ( void );
+    void                    UnlinkFX        ( void );
 };
 
 typedef RpGeometry RwGeometry;
 
+// RwStructInfo stores the plugin allocation information, such as size.
 class RwStructInfo
 {
 public:
@@ -800,7 +827,6 @@ public:
 };
 struct RwScene : public RwObject
 {
-public:
     BYTE                    m_pad[44];                          // 8
     RwList <RpLight>        m_localLights;                      // 52
     RwList <RpLight>        m_globalLights;                     // 60
@@ -808,14 +834,13 @@ public:
 
 typedef RwScene RpWorld;
 
-class RtDict
+// RtDictSchema is used in the custom UV animations. It's usage is part of the CStreamingSA class.
+struct RtDict
 {
-public:
 
 };
 struct RtDictSchema
 {
-public:
     const char*             m_name;                             // 0
     unsigned int            m_id;                               // 4
 
@@ -878,7 +903,7 @@ public:
     RwStructInfo*           m_sceneInfo;                                    // 112
 
     BYTE                    m_pad14[72];                                    // 116
-    RwList <RwFrame>        m_nodeRoot;                                     // 188
+    RwList <RwFrame>        m_nodeRoot;                                     // 188, list of all root frames
 
     BYTE                    m_pad6[24];                                     // 196
     

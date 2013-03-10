@@ -25,7 +25,7 @@ class CVector
 public:
     float fX, fY, fZ;
     
-    CVector ()
+    CVector ( void )
     {
         fX = 0;
         fY = 0;
@@ -39,14 +39,14 @@ public:
         fZ = z;
     }
 
-    inline void Reset ()
+    inline void Reset ( void )
     {
         fX = 0;
         fY = 0;
         fZ = 0;
     }
 
-    inline float Normalize () 
+    inline float Normalize ( void ) 
     { 
         double length = Length();
 
@@ -57,12 +57,12 @@ public:
         return (float)length;
     }
 
-    inline float Length () const
+    inline float Length ( void ) const
     {
         return sqrt ( (fX*fX) + (fY*fY) + (fZ*fZ) );
     }
 
-    inline float LengthSquared () const
+    inline float LengthSquared ( void ) const
     {
         return (fX*fX) + (fY*fY) + (fZ*fZ);
     }
@@ -133,7 +133,7 @@ public:
         return CVector ( fX / vecRight.fX, fY / vecRight.fY, fZ / vecRight.fZ );
     }
 
-    CVector operator - () const
+    CVector operator - ( void ) const
     {
         return CVector ( -fX, -fY, -fZ );
     }

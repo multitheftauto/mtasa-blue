@@ -4,7 +4,7 @@
 *  LICENSE:     See LICENSE in the top level directory
 *  FILE:        sdk/rwlist.hpp
 *  PURPOSE:     RenderWare list export for multiple usage
-*  DEVELOPERS:  The_GTA <quiret@gmx.de>
+*  DEVELOPERS:  Martin Turski <quiret@gmx.de>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *

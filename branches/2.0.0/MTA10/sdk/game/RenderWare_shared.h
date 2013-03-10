@@ -4,7 +4,7 @@
 *  LICENSE:     See LICENSE in the top level directory
 *  FILE:        sdk/RenderWare_shared.h
 *  PURPOSE:     Shared renderware definitions
-*  DEVELOPERS:  The_GTA <quiret@gmx.de>
+*  DEVELOPERS:  Martin Turski <quiret@gmx.de>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -18,20 +18,16 @@
 #include <rwlist.hpp>
 
 // TODO: Remove the internal RW definitions, DIF
+#include <CVector2D.h>
 #include <CVector.h>
 #include <CMatrix.h>
 
 struct RpAtomic;
 
 // RenderWare primitive types
-struct RwV2d
-{
-    float x,y;
-};
-struct RwV3d
-{
-    float x,y,z;
-};
+typedef CVector2D RwV2d;
+typedef CVector RwV3d;
+
 typedef float RwV4d[4];
 struct RwPlane
 {
@@ -59,7 +55,7 @@ struct RwColorFloat
 };
 struct RwColor
 {
-    RwColor()
+    RwColor( void )
     {
         r = g = b = a = 0;
     }
@@ -74,7 +70,8 @@ struct RwColor
 
     unsigned char r, g, b, a;
 
-    operator unsigned int () const
+    // Not sure if this is the correct order, need to investigate!
+    operator unsigned int ( void ) const
     {
         return ( a ) | ( (unsigned int)b << 8 ) | ( (unsigned int)g << 16 ) | ( (unsigned int)r << 24 );
     }
@@ -112,14 +109,14 @@ static const float negOne = -1.0f;
 class RwMatrix
 {   // 16-byte padded
 public:
-    inline void IdentityRotation()
+    inline void IdentityRotation( void )
     {
         right.fX = 1; right.fY = 0; right.fZ = 0;
         at.fX = 0; at.fY = 1; at.fZ = 0;
         up.fX = 0; up.fY = 0; up.fZ = 1;
     }
 
-    inline void Identity()
+    inline void Identity( void )
     {
         IdentityRotation();
 
@@ -128,7 +125,7 @@ public:
         pos.fZ = 0;
     }
 
-    RwMatrix()
+    RwMatrix( void )
     {
         Identity();
     }
@@ -141,7 +138,7 @@ public:
         pos = mat.vPos;
     }
 
-    operator CMatrix() const
+    operator CMatrix( void ) const
     {
         CMatrix mat;
         mat.vRight = right;
@@ -357,7 +354,7 @@ public:
         outPos[2] = offset[0] * right[2] + offset[1] * at[2] + offset[2] * up[2] + pos[2];
     }
 
-    // I hope this works :3
+    // Has been tested on multiple occasions.
     inline void Multiply( const RwMatrix& mat, RwMatrix& dst )
     {
 	    __asm
@@ -429,7 +426,7 @@ public:
 	    }
     }
 
-    inline void Invert()
+    inline void Invert( void )
     {
         // Optimization to use SSE registers instead of stack space
         __asm

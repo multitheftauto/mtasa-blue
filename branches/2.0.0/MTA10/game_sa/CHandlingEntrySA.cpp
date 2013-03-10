@@ -5,7 +5,7 @@
 *  FILE:        game_sa/CHandlingEntrySA.cpp
 *  PURPOSE:     Vehicle handling data entry
 *  DEVELOPERS:  Christian Myhre Lundheim <>
-*               The_GTA <>
+*               Martin Turski <quiret@gmx.de>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *

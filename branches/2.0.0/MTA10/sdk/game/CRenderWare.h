@@ -12,7 +12,7 @@
 #ifndef __CRENDERWARE
 #define __CRENDERWARE
 
-#include <RenderWare_shared.h>
+#include "RenderWare_shared.h"
 
 class CD3DDUMMY;
 class CClientEntityBase;

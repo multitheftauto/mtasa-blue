@@ -9,7 +9,7 @@
 *               Cecill Etheredge <ijsf@gmx.net>
 *               Jax <>
 *               Stanislav Bobrov <lil_toady@hotmail.com>
-*               The_GTA <>
+*               Martin Turski <quiret@gmx.de>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *

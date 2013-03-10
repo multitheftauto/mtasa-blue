@@ -5,7 +5,7 @@
 *  FILE:        game_sa/gamesa_renderware.h
 *  PURPOSE:     RenderWare interface mappings to Grand Theft Auto: San Andreas
 *  DEVELOPERS:  Cecill Etheredge <ijsf@gmx.net>
-*               The_GTA <quiret@gmx.de>
+*               Martin Turski <quiret@gmx.de>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *  RenderWare is © Criterion Software
@@ -106,7 +106,7 @@ typedef void                    (__cdecl *RwObjectRegister_t)                   
 
 // Frame functions
 typedef RwFrame*                (__cdecl *RwFrameCloneRecursive_t)              (const RwFrame *frame, const RwFrame *root);
-typedef const RwMatrix*         (__cdecl *RwFrameGetLTM_t)                      (const RwFrame *frame);
+typedef const RwMatrix*         (__cdecl *RwFrameGetLTM_t)                      (RwFrame *frame);
 
 // Atomic functions
 typedef bool                    (__cdecl *RpAtomicRender_t)                     (RpAtomic *atomic);
