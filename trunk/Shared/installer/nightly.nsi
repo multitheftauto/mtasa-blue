@@ -1535,7 +1535,7 @@ Var RadioCustom
 Var SizeY
 Var PosY
 !define LT_GREY "0xf0f0f0"
-!define MID_GREY "0x808080"
+!define MID_GREY "0xb0b0b0"
 !define BLACK "0x000000"
 !define WHITE "0xF0F0F0"
 
@@ -1573,6 +1573,7 @@ To install in a different folder, click Browse and select another folder.$\n$\n 
 	Pop $RadioDefault
 	${NSD_CreateText} 20% $PosY 79% 12u $DEFAULT_INSTDIR
 	Pop $LabelDefault
+    SendMessage $LabelDefault ${EM_SETREADONLY} 1 0
     IntOp $PosY $PosY + 30
 
     # Add last used option
@@ -1581,6 +1582,7 @@ To install in a different folder, click Browse and select another folder.$\n$\n 
         Pop $RadioLastUsed
         ${NSD_CreateText} 20% $PosY 79% 12u $LAST_INSTDIR
         Pop $LabelLastUsed
+        SendMessage $LabelLastUsed ${EM_SETREADONLY} 1 0
         IntOp $PosY $PosY + 30
 	${EndIf}
 
@@ -1634,6 +1636,7 @@ Function CustomDirectoryPageShowWhichRadio
     SetCtlColors $LabelDefault ${MID_GREY} ${LT_GREY}
     SetCtlColors $LabelLastUsed ${MID_GREY} ${LT_GREY}
     SetCtlColors $DirRequest ${MID_GREY} ${WHITE}
+    SendMessage $DirRequest ${EM_SETREADONLY} 1 0
     EnableWindow $BrowseButton 0
 
     # Highlight selected option
@@ -1652,6 +1655,7 @@ Function CustomDirectoryPageShowWhichRadio
             StrCpy $INSTDIR $CUSTOM_INSTDIR
             ${NSD_SetState} $RadioCustom ${BST_CHECKED}
             SetCtlColors $DirRequest ${WHITE}
+            SendMessage $DirRequest ${EM_SETREADONLY} 0 0
             EnableWindow $BrowseButton 1
             ${Break}
     ${EndSwitch}
