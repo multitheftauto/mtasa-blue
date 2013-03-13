@@ -25,6 +25,7 @@
 
 #define VAR_ucFxQuality         0xA9AE54
 #define VAR_fMouseSensitivity   0xB6EC1C
+#define VAR_fMouseVerticalSensitivity   0xB6EC18
 
 #define CLASS_CAudioEngine 0xB6BC90
 #define FUNC_CAudioEngine_SetEffectsMasterVolume 0x506E10
@@ -116,6 +117,10 @@ public:
 
     float                   GetMouseSensitivity         ( void );
     void                    SetMouseSensitivity         ( float fSensitivity );
+    float                   GetMouseVerticalSensitivity         ( void );
+    void                    SetMouseVerticalSensitivity         ( float fSensitivity );
+    float                   GetMouseVerticalSensitivityRawValue ( void );
+    void                    SetMouseVerticalSensitivityRawValue ( float fRawValue );
 
     unsigned int            GetAntiAliasing             ( void );
     void                    SetAntiAliasing             ( unsigned int uiAntiAliasing, bool bOnRestart );
