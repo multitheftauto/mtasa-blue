@@ -180,6 +180,10 @@ void CSettings::CreateGUI ( void )
     m_pClassicControls->SetPosition ( CVector2D ( 270, 0 ) );
     m_pClassicControls->SetSize ( CVector2D ( 270.0f, 15.0f ), false );
 
+    CGUIButton*  pControlsDefButton = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( pTabControls, "Load defaults" ) );
+    pControlsDefButton->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnControlsDefaultClick, this ) );
+    pControlsDefButton->SetPosition ( CVector2D ( 402, 365 ) );
+    pControlsDefButton->SetZOrderingEnabled ( false );
 
     //Advanced Joypad settings
     {
@@ -216,12 +220,6 @@ void CSettings::CreateGUI ( void )
         pLabelSaturation->SetPosition ( m_pEditSaturation->GetPosition () + CVector2D ( 52.f, -1.f ) );
         pLabelSaturation->SetSize ( CVector2D ( 68.0f, 24.0f ) );
         pLabelSaturation->SetVerticalAlign( CGUI_ALIGN_VERTICALCENTER );
-
-        CGUIButton*  pJoyDefButton = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( pTabControls, "Load defaults" ) );
-        pJoyDefButton->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnJoypadDefaultClick, this ) );
-        pJoyDefButton->SetPosition ( CVector2D ( 402, 365 ) );
-
-        pJoyDefButton->SetZOrderingEnabled ( false );
 
         CGUILabel* pLabelHelp = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabControls, "Use the 'Binds' tab for joypad buttons." ) );
         pLabelHelp->SetPosition ( CVector2D ( 10, 282 ) );
@@ -1464,22 +1462,34 @@ bool CSettings::OnAxisSelectClick ( CGUIElement* pElement )
 
 
 //
-// Called when the user clicks on the joypad 'Load Defaults' button.
+// Called when the user clicks on the controls tab 'Load Defaults' button.
 //
-bool CSettings::OnJoypadDefaultClick ( CGUIElement* pElement )
+bool CSettings::OnControlsDefaultClick ( CGUIElement* pElement )
 {
-    // Load the default binds
-    GetJoystickManager ()->SetDefaults ();
+    // Load the default settings
+    GetJoystickManager()->SetDefaults();
+    CVARS_SET( "invert_mouse",     false );
+    CVARS_SET( "fly_with_mouse",   false );
+    CVARS_SET( "steer_with_mouse", false );
+    CVARS_SET( "classic_controls", false );
+    CGameSettings* gameSettings = CCore::GetSingleton().GetGame()->GetSettings();
+    gameSettings->SetMouseSensitivity( 0.5f );
 
-    // Load the default mouse settings
-    CControllerConfigManager * pController = g_pCore->GetGame ()->GetControllerConfigManager ();   
-
-    m_pFlyWithMouse->SetSelected ( pController->GetFlyWithMouse ( true ) );
-    m_pSteerWithMouse->SetSelected ( pController->GetSteerWithMouse ( true ) );
-    m_pInvertMouse->SetSelected ( pController->IsMouseInverted () );
+    // Set game vars
+    CControllerConfigManager* pController = g_pCore->GetGame()->GetControllerConfigManager ();   
+    pController->SetMouseInverted( CVARS_GET_VALUE < bool > ( "invert_mouse" ) );
+    pController->SetFlyWithMouse( CVARS_GET_VALUE < bool > ( "fly_with_mouse" ) );
+    pController->SetSteerWithMouse( CVARS_GET_VALUE < bool > ( "steer_with_mouse" ) );
+    pController->SetClassicControls( CVARS_GET_VALUE < bool > ( "classic_controls" ) ); 
 
     // Update the GUI
-    UpdateJoypadTab ();
+    UpdateJoypadTab();
+    m_pInvertMouse->SetSelected( CVARS_GET_VALUE < bool > ( "invert_mouse" ) );
+    m_pFlyWithMouse->SetSelected( CVARS_GET_VALUE < bool > ( "fly_with_mouse" ) );
+    m_pSteerWithMouse->SetSelected( CVARS_GET_VALUE < bool > ( "steer_with_mouse" ) );
+    m_pStandardControls->SetSelected( !CVARS_GET_VALUE < bool > ( "classic_controls" ) );
+    m_pClassicControls->SetSelected( CVARS_GET_VALUE < bool > ( "classic_controls" ) );
+    m_pMouseSensitivity->SetScrollPosition( gameSettings->GetMouseSensitivity () );
 
     return true;
 }
@@ -2172,7 +2182,7 @@ void CSettings::LoadData ( void )
 
     CGameSettings * gameSettings = CCore::GetSingleton ( ).GetGame ( )->GetSettings();
 
-    m_pMouseSensitivity->SetScrollPosition ( ( gameSettings->GetMouseSensitivity () - 0.000312f ) / 0.004688f );
+    m_pMouseSensitivity->SetScrollPosition ( gameSettings->GetMouseSensitivity () );
 
     // Community
     CVARS_GET ( "community_username", strVar );
@@ -2444,10 +2454,8 @@ void CSettings::SaveData ( void )
     pController->SetSteerWithMouse ( m_pSteerWithMouse->GetSelected () );
     CVARS_SET ( "fly_with_mouse", m_pFlyWithMouse->GetSelected () );
     pController->SetFlyWithMouse ( m_pFlyWithMouse->GetSelected () );
-
-    bool bClassicControls = m_pClassicControls->GetSelected ();
-    CVARS_SET ( "classic_controls", bClassicControls );
-    bClassicControls ? pController->SetInputType ( NULL ) : pController->SetInputType ( 1 );
+    CVARS_SET ( "classic_controls", m_pClassicControls->GetSelected () );
+    pController->SetClassicControls ( m_pClassicControls->GetSelected () );
 
     // Video
     // get current
@@ -2534,7 +2542,7 @@ void CSettings::SaveData ( void )
     gameSettings->SetAntiAliasing ( iAntiAliasing, true );
     gameSettings->SetDrawDistance ( ( m_pDrawDistance->GetScrollPosition () * 0.875f ) + 0.925f );
     gameSettings->SetBrightness ( m_pBrightness->GetScrollPosition () * 384 );
-    gameSettings->SetMouseSensitivity ( ( m_pMouseSensitivity->GetScrollPosition () * 0.004688f ) + 0.000312f );
+    gameSettings->SetMouseSensitivity ( m_pMouseSensitivity->GetScrollPosition () );
 	gameSettings->SetMipMappingEnabled ( m_pCheckBoxMipMapping->GetSelected () );
     SetApplicationSettingInt ( "customized-sa-files-request", bCustomizedSAFilesEnabled ? 1 : 0 );
 

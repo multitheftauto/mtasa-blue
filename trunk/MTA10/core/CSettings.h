@@ -290,7 +290,7 @@ protected:
     bool                OnJoypadTextChanged     ( CGUIElement* pElement );
     bool                OnAxisSelectClick       ( CGUIElement* pElement );
     bool                OnAudioDefaultClick     ( CGUIElement* pElement );
-    bool                OnJoypadDefaultClick    ( CGUIElement* pElement );
+    bool                OnControlsDefaultClick  ( CGUIElement* pElement );
     bool                OnBindsDefaultClick     ( CGUIElement* pElement );
     bool                OnVideoDefaultClick     ( CGUIElement* pElement );
     bool                OnBindsListClick        ( CGUIElement* pElement );

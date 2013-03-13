@@ -13,6 +13,10 @@
 
 #include "StdInc.h"
 
+static const float MOUSE_SENSITIVITY_MIN     = 0.000312f;
+static const float MOUSE_SENSITIVITY_DEFAULT = 0.0025f;
+static const float MOUSE_SENSITIVITY_MAX     = MOUSE_SENSITIVITY_DEFAULT * 2 - MOUSE_SENSITIVITY_MIN;
+
 unsigned long CSettingsSA::FUNC_GetNumVideoModes;
 unsigned long CSettingsSA::FUNC_GetVideoModeInfo;
 unsigned long CSettingsSA::FUNC_GetCurrentVideoMode;
@@ -205,13 +209,14 @@ void CSettingsSA::SetFXQuality ( unsigned int fxQualityId )
 
 float CSettingsSA::GetMouseSensitivity ( )
 {
-    // 0.000312 (min) - 0.005000 (max)
-    return *(FLOAT *)VAR_fMouseSensitivity;
+    float fRawValue = *(FLOAT *)VAR_fMouseSensitivity;
+    return UnlerpClamped( MOUSE_SENSITIVITY_MIN, fRawValue, MOUSE_SENSITIVITY_MAX );    // Remap to 0-1
 }
 
 void CSettingsSA::SetMouseSensitivity ( float fSensitivity )
 {
-    MemPutFast < FLOAT > ( VAR_fMouseSensitivity, fSensitivity );
+    float fRawValue = Lerp( MOUSE_SENSITIVITY_MIN, fSensitivity, MOUSE_SENSITIVITY_MAX );
+    MemPutFast < FLOAT > ( VAR_fMouseSensitivity, fRawValue );
 }
 
 unsigned int CSettingsSA::GetAntiAliasing ( )
