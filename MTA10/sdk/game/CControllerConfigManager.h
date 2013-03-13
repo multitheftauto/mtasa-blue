@@ -198,14 +198,10 @@ class CControllerConfigManager
 public:
     virtual void                SetControllerKeyAssociatedWithAction ( eControllerAction action, int iKey, eControllerType controllerType )=0;
     virtual int                 GetControllerKeyAssociatedWithAction ( eControllerAction action, eControllerType controllerType )=0;
-    virtual unsigned char       GetInputType ( void ) = 0;
-    virtual void                SetInputType ( unsigned char ucInputType ) = 0;
-    virtual bool                IsMouseInverted ( void ) = 0;
+    virtual void                SetClassicControls ( bool bClassicControls ) = 0;
     virtual void                SetMouseInverted ( bool bInverted ) = 0;
-    virtual bool                GetFlyWithMouse ( bool bIgnoreSuspend ) = 0;
     virtual void                SetFlyWithMouse ( bool bFlyWithMouse ) = 0;
-    virtual bool                GetSteerWithMouse ( bool bIgnoreSuspend ) = 0;
-    virtual void                SetSteerWithMouse ( bool bFlyWithMouse ) = 0;
+    virtual void                SetSteerWithMouse ( bool bSteerWithMouse ) = 0;
     virtual void                SuspendSteerAndFlyWithMouse ( bool bSuspend ) = 0;
 };
 #endif
