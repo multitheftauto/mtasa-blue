@@ -2478,8 +2478,8 @@ void CSettings::SaveData ( void )
 
     // AltTab handling
     bool bAltTabHandlerWasEnabled = false;
-    bool bAltTabHandlerEnabled = false;
     CVARS_GET ( "display_alttab_handler", bAltTabHandlerWasEnabled );
+    bool bAltTabHandlerEnabled = bAltTabHandlerWasEnabled;
     if ( CGUIListItem* pSelected = m_pAltTabCombo->GetSelectedItem () )
     {
         int iSelected = ( int ) pSelected->GetData();
@@ -2496,7 +2496,7 @@ void CSettings::SaveData ( void )
     if ( bIsVideoModeChanged || bIsAntiAliasingChanged || bIsAeroChanged || bIsCustomizedSAFilesChanged || bAltTabHandlerChanged )
     {
         SString strChangedOptions;
-        if ( bIsVideoModeChanged || bAltTabHandlerChanged )
+        if ( bIsVideoModeChanged )
         {
             strChangedOptions += "Resolution";
             if ( bNextFSMinimize != GetVideoModeManager ()->IsMinimizeEnabled () )
