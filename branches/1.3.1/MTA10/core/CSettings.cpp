@@ -126,48 +126,69 @@ void CSettings::CreateGUI ( void )
     /**
      *  Controls tab
      **/
+    vecTemp = CVector2D( 0, 13 );
+
     //Mouse Options
     m_pControlsMouseLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabControls, "Mouse options" ) );
-    m_pControlsMouseLabel->SetPosition ( CVector2D ( 11, 13 ) );
+    m_pControlsMouseLabel->SetPosition ( CVector2D ( vecTemp.fX + 11, vecTemp.fY ) );
     m_pControlsMouseLabel->AutoSize ( "Mouse options  " );
     m_pControlsMouseLabel->SetFont ( "default-bold-small" );
+    vecTemp.fY += 18;
 
+    vecTemp.fX = 16;
     m_pInvertMouse = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabControls, "Invert mouse vertically", true ) );
-    m_pInvertMouse->SetPosition ( CVector2D ( 11, 31 ) );
-    m_pInvertMouse->GetPosition ( vecTemp, false );
-    m_pInvertMouse->SetSize ( CVector2D ( 224.0f, 16.0f ) );
+    m_pInvertMouse->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY ) );
+    m_pInvertMouse->SetSize ( CVector2D ( 160.0f, 16.0f ) );
 
     m_pSteerWithMouse = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabControls, "Steer with mouse", true ) );
-    m_pSteerWithMouse->SetPosition ( CVector2D ( vecTemp.fX + 320, vecTemp.fY ) );
+    m_pSteerWithMouse->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 16.0f ) );
 
+    m_pFlyWithMouse = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabControls, "Fly with mouse", true ) );
+    m_pFlyWithMouse->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32.0f ) );
+
+    vecTemp.fX = 180;
+    // MouseSensitivity
     m_pLabelMouseSensitivity = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabControls, "Mouse sensitivity:" ) );
-    m_pLabelMouseSensitivity->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 16.0f ) );
-    m_pLabelMouseSensitivity->GetPosition ( vecTemp, false );
+    m_pLabelMouseSensitivity->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY ) );
     m_pLabelMouseSensitivity->AutoSize ( "Mouse sensitivity:" );
 
     m_pMouseSensitivity = reinterpret_cast < CGUIScrollBar* > ( pManager->CreateScrollBar ( true, pTabControls ) );
-    m_pMouseSensitivity->SetPosition ( CVector2D ( vecTemp.fX + 100.0f, vecTemp.fY ) );
+    m_pMouseSensitivity->SetPosition ( CVector2D ( vecTemp.fX + 130.0f, vecTemp.fY ) );
     m_pMouseSensitivity->SetSize ( CVector2D ( 160.0f, 20.0f ) );
     m_pMouseSensitivity->SetProperty ( "StepSize", "0.01" );
 
     m_pLabelMouseSensitivityValue = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabControls, "0%") );
-    m_pLabelMouseSensitivityValue->SetPosition ( CVector2D ( vecTemp.fX + 270.0f, vecTemp.fY ) );
+    m_pLabelMouseSensitivityValue->SetPosition ( CVector2D ( vecTemp.fX + 300.0f, vecTemp.fY ) );
     m_pLabelMouseSensitivityValue->AutoSize ( "100%" );
+    vecTemp.fY += 26.f;
 
-    m_pFlyWithMouse = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabControls, "Fly with mouse", true ) );
-    m_pFlyWithMouse->SetPosition ( CVector2D ( vecTemp.fX + 320, vecTemp.fY ) );
-    m_pFlyWithMouse->GetPosition ( vecTemp, false );
+    // VerticalAimSensitivity
+    m_pLabelVerticalAimSensitivity = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabControls, "Vertical aim sensitivity:" ) );
+    m_pLabelVerticalAimSensitivity->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY ) );
+    m_pLabelVerticalAimSensitivity->AutoSize ( m_pLabelVerticalAimSensitivity->GetText().c_str() );
 
+    m_pVerticalAimSensitivity = reinterpret_cast < CGUIScrollBar* > ( pManager->CreateScrollBar ( true, pTabControls ) );
+    m_pVerticalAimSensitivity->SetPosition ( CVector2D ( vecTemp.fX + 130.0f, vecTemp.fY ) );
+    m_pVerticalAimSensitivity->SetSize ( CVector2D ( 160.0f, 20.0f ) );
+    m_pVerticalAimSensitivity->SetProperty ( "StepSize", "0.01" );
+
+    m_pLabelVerticalAimSensitivityValue = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabControls, "0%") );
+    m_pLabelVerticalAimSensitivityValue->SetPosition ( CVector2D ( vecTemp.fX + 300.0f, vecTemp.fY ) );
+    m_pLabelVerticalAimSensitivityValue->AutoSize ( "100%" );
+    vecTemp.fY += 30.f;
+
+    vecTemp.fX = 16;
     //Joypad options
     m_pControlsJoypadLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabControls, "Joypad options" ) );
-    m_pControlsJoypadLabel->SetPosition ( CVector2D ( 11, 83 ) );
+    m_pControlsJoypadLabel->SetPosition ( CVector2D ( 11, vecTemp.fY ) );
     m_pControlsJoypadLabel->AutoSize ( "Joypad options  " );
     m_pControlsJoypadLabel->SetFont ( "default-bold-small" );
+    vecTemp.fY += 18;
 
     //Create a mini-scrollpane for the radio buttons (only way to group them together)
     m_pControlsInputTypePane = reinterpret_cast < CGUIScrollPane* > ( pManager->CreateScrollPane ( pTabControls ) ); 
     m_pControlsInputTypePane->SetProperty ( "ContentPaneAutoSized", "False" );
-    m_pControlsInputTypePane->SetPosition ( CVector2D ( 0, 101 ) );
+    m_pControlsInputTypePane->SetPosition ( CVector2D ( 0, vecTemp.fY ) );
     m_pControlsInputTypePane->SetSize ( CVector2D ( 1.0f, 0.27f ), true );
     m_pControlsInputTypePane->SetZOrderingEnabled ( false );
 
@@ -179,7 +200,12 @@ void CSettings::CreateGUI ( void )
     m_pClassicControls = reinterpret_cast < CGUIRadioButton* > ( pManager->CreateRadioButton ( m_pControlsInputTypePane, "Classic controls (Joypad)" ) ); 
     m_pClassicControls->SetPosition ( CVector2D ( 270, 0 ) );
     m_pClassicControls->SetSize ( CVector2D ( 270.0f, 15.0f ), false );
+    vecTemp.fY += 24;
 
+    CGUIButton*  pControlsDefButton = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( pTabControls, "Load defaults" ) );
+    pControlsDefButton->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnControlsDefaultClick, this ) );
+    pControlsDefButton->SetPosition ( CVector2D ( 402, 365 ) );
+    pControlsDefButton->SetZOrderingEnabled ( false );
 
     //Advanced Joypad settings
     {
@@ -190,19 +216,23 @@ void CSettings::CreateGUI ( void )
         m_pJoypadName = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabControls ) );
         m_pJoypadName->SetHorizontalAlign ( CGUI_ALIGN_HORIZONTALCENTER );
         m_pJoypadName->SetVerticalAlign ( CGUI_ALIGN_VERTICALCENTER );
+        m_pJoypadName->SetPosition ( CVector2D ( 270, vecTemp.fY ) );
 
         m_pJoypadUnderline = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabControls ) );
         m_pJoypadUnderline->SetHorizontalAlign ( CGUI_ALIGN_HORIZONTALCENTER );
         m_pJoypadUnderline->SetVerticalAlign ( CGUI_ALIGN_VERTICALCENTER );
+        m_pJoypadUnderline->SetPosition ( CVector2D ( 270, vecTemp.fY + 2 ) );
+        vecTemp.fY += 50;
 
         m_pEditDeadzone = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( pTabControls ) );
-        m_pEditDeadzone->SetPosition ( CVector2D ( 10, 175 ) );
+        m_pEditDeadzone->SetPosition ( CVector2D ( 10, vecTemp.fY ) );
         m_pEditDeadzone->SetSize ( CVector2D ( 45.0f, 24.0f ) );
         m_pEditDeadzone->SetMaxLength ( 3 );
         m_pEditDeadzone->SetTextChangedHandler ( GUI_CALLBACK ( &CSettings::OnJoypadTextChanged, this ) );
+        vecTemp.fY += 31;
 
         m_pEditSaturation = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( pTabControls ) );
-        m_pEditSaturation->SetPosition ( CVector2D ( 10, 206 ) );
+        m_pEditSaturation->SetPosition ( CVector2D ( 10, vecTemp.fY ) );
         m_pEditSaturation->SetSize ( CVector2D ( 45.0f, 24.0f ) );
         m_pEditSaturation->SetMaxLength ( 3 );
         m_pEditSaturation->SetTextChangedHandler ( GUI_CALLBACK ( &CSettings::OnJoypadTextChanged, this ) );
@@ -216,17 +246,13 @@ void CSettings::CreateGUI ( void )
         pLabelSaturation->SetPosition ( m_pEditSaturation->GetPosition () + CVector2D ( 52.f, -1.f ) );
         pLabelSaturation->SetSize ( CVector2D ( 68.0f, 24.0f ) );
         pLabelSaturation->SetVerticalAlign( CGUI_ALIGN_VERTICALCENTER );
-
-        CGUIButton*  pJoyDefButton = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( pTabControls, "Load defaults" ) );
-        pJoyDefButton->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnJoypadDefaultClick, this ) );
-        pJoyDefButton->SetPosition ( CVector2D ( 402, 365 ) );
-
-        pJoyDefButton->SetZOrderingEnabled ( false );
+        vecTemp.fY += 76;
 
         CGUILabel* pLabelHelp = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabControls, "Use the 'Binds' tab for joypad buttons." ) );
-        pLabelHelp->SetPosition ( CVector2D ( 10, 282 ) );
+        pLabelHelp->SetPosition ( CVector2D ( 10, vecTemp.fY ) );
         pLabelHelp->SetSize ( CVector2D ( 250.0f, 24.0f ) );
         pLabelHelp->SetVerticalAlign( CGUI_ALIGN_VERTICALCENTER );
+        vecTemp.fY += -91;
 
         // Layout the mapping buttons like a dual axis joypad
         CVector2D vecPosList[] = {  CVector2D ( 162,  191 ),     // Left Stick
@@ -245,18 +271,16 @@ void CSettings::CreateGUI ( void )
         for ( int i = 0 ; i < JoyMan->GetOutputCount () && i < 10 ; i++ )
         {
             CVector2D vecPos = vecPosList[i];
-
+            vecPos.fY += vecTemp.fY - 191;
             CGUIButton* pButton = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( pTabControls ) );
-            pButton->SetPosition ( vecPos );
-            pButton->SetPosition ( pButton->GetPosition() + CVector2D ( 10, 0 ) );
+            pButton->SetPosition ( vecPos + CVector2D ( 10, 0 ) );
             pButton->SetSize ( CVector2D ( 48.0f, 24.0f ) );
             pButton->SetUserData ( (void*) i );
             pButton->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnAxisSelectClick, this ) );
             pButton->SetZOrderingEnabled ( false );
 
             CGUILabel* pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabControls ) );
-            pLabel->SetPosition ( vecPos + CVector2D ( 0, -26 ) );
-            pLabel->SetPosition ( pLabel->GetPosition() - CVector2D ( 10, 0 ));
+            pLabel->SetPosition ( vecPos + CVector2D ( -10, -26 ) );
             pLabel->SetSize ( CVector2D ( 88.0f, 24.0f ) );
             pLabel->SetHorizontalAlign( CGUI_ALIGN_HORIZONTALCENTER );
             pLabel->SetVerticalAlign( CGUI_ALIGN_VERTICALCENTER );
@@ -266,14 +290,15 @@ void CSettings::CreateGUI ( void )
             m_pJoypadButtons.push_back ( pButton );
         }
 
+        vecTemp.fY += -2;
         CGUILabel* pLabelLeft = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabControls, "Left Stick" ) );
-        pLabelLeft->SetPosition ( CVector2D ( 221, 189 ) );
+        pLabelLeft->SetPosition ( CVector2D ( 221, vecTemp.fY ) );
         pLabelLeft->SetSize ( CVector2D ( 68.0f, 24.0f ) );
         pLabelLeft->SetHorizontalAlign ( CGUI_ALIGN_HORIZONTALCENTER );
         pLabelLeft->SetVerticalAlign ( CGUI_ALIGN_VERTICALCENTER );
 
         CGUILabel* pLabelRight = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabControls, "Right Stick" ) );
-        pLabelRight->SetPosition ( CVector2D ( 410, 189 ) );
+        pLabelRight->SetPosition ( CVector2D ( 410, vecTemp.fY ) );
         pLabelRight->SetSize ( CVector2D ( 68.0f, 24.0f ) );
         pLabelRight->SetHorizontalAlign ( CGUI_ALIGN_HORIZONTALCENTER );
         pLabelRight->SetVerticalAlign ( CGUI_ALIGN_VERTICALCENTER );
@@ -1032,6 +1057,7 @@ void CSettings::CreateGUI ( void )
     m_pBrightness->SetOnScrollHandler ( GUI_CALLBACK ( &CSettings::OnBrightnessChanged, this ) );
     m_pAnisotropic->SetOnScrollHandler ( GUI_CALLBACK ( &CSettings::OnAnisotropicChanged, this ) );
     m_pMouseSensitivity->SetOnScrollHandler ( GUI_CALLBACK ( &CSettings::OnMouseSensitivityChanged, this ) );
+    m_pVerticalAimSensitivity->SetOnScrollHandler ( GUI_CALLBACK ( &CSettings::OnVerticalAimSensitivityChanged, this ) );
     m_pComboFxQuality->SetSelectionHandler ( GUI_CALLBACK( &CSettings::OnFxQualityChanged, this ) );
     m_pCheckBoxVolumetricShadows->SetClickHandler ( GUI_CALLBACK( &CSettings::OnVolumetricShadowsClick, this ) );
     m_pCheckBoxAllowScreenUpload->SetClickHandler ( GUI_CALLBACK( &CSettings::OnAllowScreenUploadClick, this ) );
@@ -1308,7 +1334,7 @@ void CSettings::UpdateJoypadTab ()
     // Update the joystick name
     string strJoystickName = JoyMan->IsJoypadConnected () ? JoyMan->GetControllerName () : "Joypad not detected  -  Check connections and restart game";
 
-    m_pJoypadName->SetPosition ( CVector2D ( 270, 125 ) );
+    m_pJoypadName->SetPosition ( CVector2D ( 270, m_pJoypadName->GetPosition().fY ) );
     m_pJoypadName->SetText ( strJoystickName.c_str () );
     m_pJoypadName->AutoSize ( strJoystickName.c_str () );
     m_pJoypadName->SetPosition ( m_pJoypadName->GetPosition () - CVector2D ( m_pJoypadName->GetSize ().fX * 0.5, 0.0f ) );
@@ -1320,10 +1346,10 @@ void CSettings::UpdateJoypadTab ()
     for ( int i = 0 ; i < inumChars ; i++ )
         strUnderline = strUnderline + "_";
 
-    m_pJoypadUnderline->SetPosition ( CVector2D ( 270, 125 ) );
+    m_pJoypadUnderline->SetPosition ( CVector2D ( 270, m_pJoypadUnderline->GetPosition().fY ) );
     m_pJoypadUnderline->SetText ( strUnderline.c_str () );
     m_pJoypadUnderline->AutoSize ( strUnderline.c_str () );
-    m_pJoypadUnderline->SetPosition ( m_pJoypadUnderline->GetPosition () - CVector2D ( m_pJoypadUnderline->GetSize ().fX * 0.5, -2.0f ) );
+    m_pJoypadUnderline->SetPosition ( m_pJoypadUnderline->GetPosition () - CVector2D ( m_pJoypadUnderline->GetSize ().fX * 0.5, 0.0f ) );
     m_pJoypadUnderline->SetVisible ( JoyMan->IsJoypadConnected () );
 
 
@@ -1464,22 +1490,39 @@ bool CSettings::OnAxisSelectClick ( CGUIElement* pElement )
 
 
 //
-// Called when the user clicks on the joypad 'Load Defaults' button.
+// Called when the user clicks on the controls tab 'Load Defaults' button.
 //
-bool CSettings::OnJoypadDefaultClick ( CGUIElement* pElement )
+bool CSettings::OnControlsDefaultClick ( CGUIElement* pElement )
 {
-    // Load the default binds
-    GetJoystickManager ()->SetDefaults ();
+    CGameSettings* gameSettings = CCore::GetSingleton().GetGame()->GetSettings();
+    CControllerConfigManager* pController = g_pCore->GetGame()->GetControllerConfigManager (); 
+  
+    // Load the default settings
+    GetJoystickManager()->SetDefaults();
+    CVARS_SET( "invert_mouse",     false );
+    CVARS_SET( "fly_with_mouse",   false );
+    CVARS_SET( "steer_with_mouse", false );
+    CVARS_SET( "classic_controls", false );
+    pController->SetVerticalAimSensitivity( 0.5f );
+    CVARS_SET( "vertical_aim_sensitivity", pController->GetVerticalAimSensitivityRawValue() );
+    gameSettings->SetMouseSensitivity( 0.5f );
 
-    // Load the default mouse settings
-    CControllerConfigManager * pController = g_pCore->GetGame ()->GetControllerConfigManager ();   
-
-    m_pFlyWithMouse->SetSelected ( pController->GetFlyWithMouse ( true ) );
-    m_pSteerWithMouse->SetSelected ( pController->GetSteerWithMouse ( true ) );
-    m_pInvertMouse->SetSelected ( pController->IsMouseInverted () );
+    // Set game vars
+    pController->SetMouseInverted( CVARS_GET_VALUE < bool > ( "invert_mouse" ) );
+    pController->SetFlyWithMouse( CVARS_GET_VALUE < bool > ( "fly_with_mouse" ) );
+    pController->SetSteerWithMouse( CVARS_GET_VALUE < bool > ( "steer_with_mouse" ) );
+    pController->SetClassicControls( CVARS_GET_VALUE < bool > ( "classic_controls" ) ); 
+    pController->SetVerticalAimSensitivityRawValue( CVARS_GET_VALUE < float > ( "vertical_aim_sensitivity" ) ); 
 
     // Update the GUI
-    UpdateJoypadTab ();
+    UpdateJoypadTab();
+    m_pInvertMouse->SetSelected( CVARS_GET_VALUE < bool > ( "invert_mouse" ) );
+    m_pFlyWithMouse->SetSelected( CVARS_GET_VALUE < bool > ( "fly_with_mouse" ) );
+    m_pSteerWithMouse->SetSelected( CVARS_GET_VALUE < bool > ( "steer_with_mouse" ) );
+    m_pStandardControls->SetSelected( !CVARS_GET_VALUE < bool > ( "classic_controls" ) );
+    m_pClassicControls->SetSelected( CVARS_GET_VALUE < bool > ( "classic_controls" ) );
+    m_pMouseSensitivity->SetScrollPosition( gameSettings->GetMouseSensitivity () );
+    m_pVerticalAimSensitivity->SetScrollPosition( pController->GetVerticalAimSensitivity () );
 
     return true;
 }
@@ -2171,8 +2214,11 @@ void CSettings::LoadData ( void )
     CVARS_GET ( "classic_controls", bVar ); m_pClassicControls->SetSelected ( bVar );
 
     CGameSettings * gameSettings = CCore::GetSingleton ( ).GetGame ( )->GetSettings();
+    CControllerConfigManager* pController = g_pCore->GetGame()->GetControllerConfigManager(); 
 
-    m_pMouseSensitivity->SetScrollPosition ( ( gameSettings->GetMouseSensitivity () - 0.000312f ) / 0.004688f );
+    m_pMouseSensitivity->SetScrollPosition ( gameSettings->GetMouseSensitivity () );
+    pController->SetVerticalAimSensitivityRawValue( CVARS_GET_VALUE < float > ( "vertical_aim_sensitivity" ) );
+    m_pVerticalAimSensitivity->SetScrollPosition( pController->GetVerticalAimSensitivity() );
 
     // Community
     CVARS_GET ( "community_username", strVar );
@@ -2444,10 +2490,10 @@ void CSettings::SaveData ( void )
     pController->SetSteerWithMouse ( m_pSteerWithMouse->GetSelected () );
     CVARS_SET ( "fly_with_mouse", m_pFlyWithMouse->GetSelected () );
     pController->SetFlyWithMouse ( m_pFlyWithMouse->GetSelected () );
-
-    bool bClassicControls = m_pClassicControls->GetSelected ();
-    CVARS_SET ( "classic_controls", bClassicControls );
-    bClassicControls ? pController->SetInputType ( NULL ) : pController->SetInputType ( 1 );
+    CVARS_SET ( "classic_controls", m_pClassicControls->GetSelected () );
+    pController->SetClassicControls ( m_pClassicControls->GetSelected () );
+    pController->SetVerticalAimSensitivity( m_pVerticalAimSensitivity->GetScrollPosition() );
+    CVARS_SET( "vertical_aim_sensitivity", pController->GetVerticalAimSensitivityRawValue() );
 
     // Video
     // get current
@@ -2534,7 +2580,7 @@ void CSettings::SaveData ( void )
     gameSettings->SetAntiAliasing ( iAntiAliasing, true );
     gameSettings->SetDrawDistance ( ( m_pDrawDistance->GetScrollPosition () * 0.875f ) + 0.925f );
     gameSettings->SetBrightness ( m_pBrightness->GetScrollPosition () * 384 );
-    gameSettings->SetMouseSensitivity ( ( m_pMouseSensitivity->GetScrollPosition () * 0.004688f ) + 0.000312f );
+    gameSettings->SetMouseSensitivity ( m_pMouseSensitivity->GetScrollPosition () );
 	gameSettings->SetMipMappingEnabled ( m_pCheckBoxMipMapping->GetSelected () );
     SetApplicationSettingInt ( "customized-sa-files-request", bCustomizedSAFilesEnabled ? 1 : 0 );
 
@@ -3065,6 +3111,13 @@ bool CSettings::OnMouseSensitivityChanged ( CGUIElement* pElement )
     int iMouseSensitivity = ( m_pMouseSensitivity->GetScrollPosition () ) * 100;
 
     m_pLabelMouseSensitivityValue->SetText ( SString("%i%%", iMouseSensitivity ).c_str () );
+    return true;
+}
+
+bool CSettings::OnVerticalAimSensitivityChanged ( CGUIElement* pElement )
+{
+    int iSensitivity = m_pVerticalAimSensitivity->GetScrollPosition() * 100;
+    m_pLabelVerticalAimSensitivityValue->SetText( SString("%i%%", iSensitivity ) );
     return true;
 }
 
