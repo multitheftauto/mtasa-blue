@@ -252,6 +252,9 @@ protected:
     CGUILabel*          m_pLabelMouseSensitivity;
     CGUIScrollBar*      m_pMouseSensitivity;
     CGUILabel*          m_pLabelMouseSensitivityValue;
+    CGUILabel*          m_pLabelVerticalAimSensitivity;
+    CGUIScrollBar*      m_pVerticalAimSensitivity;
+    CGUILabel*          m_pLabelVerticalAimSensitivityValue;
 
     CGUILabel*          m_pControlsJoypadLabel;
     CGUIScrollPane*     m_pControlsInputTypePane;
@@ -312,6 +315,7 @@ protected:
     bool                OnChatAlphaChanged      ( CGUIElement* pElement );
     bool                OnUpdateButtonClick     ( CGUIElement* pElement );
     bool                OnMouseSensitivityChanged ( CGUIElement* pElement );
+    bool                OnVerticalAimSensitivityChanged ( CGUIElement* pElement );
 
     bool                OnMouseDoubleClick      ( CGUIMouseEventArgs Args );
 
