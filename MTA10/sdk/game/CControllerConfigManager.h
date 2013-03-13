@@ -203,5 +203,9 @@ public:
     virtual void                SetFlyWithMouse ( bool bFlyWithMouse ) = 0;
     virtual void                SetSteerWithMouse ( bool bSteerWithMouse ) = 0;
     virtual void                SuspendSteerAndFlyWithMouse ( bool bSuspend ) = 0;
+    virtual float               GetVerticalAimSensitivity         ( void ) = 0;
+    virtual void                SetVerticalAimSensitivity         ( float fSensitivity ) = 0;
+    virtual float               GetVerticalAimSensitivityRawValue ( void ) = 0;
+    virtual void                SetVerticalAimSensitivityRawValue ( float fRawValue ) = 0;
 };
 #endif

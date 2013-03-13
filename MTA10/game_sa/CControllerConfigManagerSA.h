@@ -37,6 +37,10 @@ public:
         void                SetFlyWithMouse ( bool bFlyWithMouse );
         void                SetSteerWithMouse ( bool bSteerWithMouse );
         void                SuspendSteerAndFlyWithMouse ( bool bSuspend );
+        float               GetVerticalAimSensitivity         ( void );
+        void                SetVerticalAimSensitivity         ( float fSensitivity );
+        float               GetVerticalAimSensitivityRawValue ( void );
+        void                SetVerticalAimSensitivityRawValue ( float fRawValue );
 
         // CControllerConfigManagerSA
         void                ApplySteerAndFlyWithMouseSettings ( void );

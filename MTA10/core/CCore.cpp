@@ -608,6 +608,7 @@ void CCore::ApplyGameSettings ( void )
     CVARS_GET ( "grass",            bval ); m_pGame->GetSettings ()->SetGrassEnabled ( bval );
     CVARS_GET ( "heat_haze",        bval ); m_pMultiplayer->SetHeatHazeEnabled ( bval );
     CVARS_GET ( "fast_clothes_loading", iVal ); m_pMultiplayer->SetFastClothesLoading ( (CMultiplayer::EFastClothesLoading)iVal );
+    pController->SetVerticalAimSensitivityRawValue( CVARS_GET_VALUE < float > ( "vertical_aim_sensitivity" ) );
 }
 
 void CCore::ApplyCommunityState ( void )
