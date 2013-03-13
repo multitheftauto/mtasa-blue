@@ -13,6 +13,13 @@
 
 #include "StdInc.h"
 
+static const float MOUSE_SENSITIVITY_MIN     = 0.000312f;
+static const float MOUSE_SENSITIVITY_DEFAULT = 0.0025f;
+static const float MOUSE_SENSITIVITY_MAX     = MOUSE_SENSITIVITY_DEFAULT * 2 - MOUSE_SENSITIVITY_MIN;
+static const float VERTICAL_SENSITIVITY_MIN     = 0.000312f;
+static const float VERTICAL_SENSITIVITY_DEFAULT = 0.0015f;
+static const float VERTICAL_SENSITIVITY_MAX     = VERTICAL_SENSITIVITY_DEFAULT * 2 - VERTICAL_SENSITIVITY_MIN;
+
 unsigned long CSettingsSA::FUNC_GetNumVideoModes;
 unsigned long CSettingsSA::FUNC_GetVideoModeInfo;
 unsigned long CSettingsSA::FUNC_GetCurrentVideoMode;
@@ -36,6 +43,7 @@ CSettingsSA::CSettingsSA ( void )
     HookInstall ( HOOKPOS_StoreShadowForVehicle, (DWORD)HOOK_StoreShadowForVehicle, 9 );
 
     MemPut < BYTE > ( 0x6FF420, 0xC3 );     // Truncate CalculateAspectRatio
+    MemSet ( (void*)0x5BC7B4, 0x90, 10 );   // Stop setting of vertical sensitivity
 }
 
 bool CSettingsSA::IsWideScreenEnabled ( void )
@@ -205,13 +213,37 @@ void CSettingsSA::SetFXQuality ( unsigned int fxQualityId )
 
 float CSettingsSA::GetMouseSensitivity ( )
 {
-    // 0.000312 (min) - 0.005000 (max)
-    return *(FLOAT *)VAR_fMouseSensitivity;
+    float fRawValue = *(FLOAT *)VAR_fMouseSensitivity;
+    return UnlerpClamped( MOUSE_SENSITIVITY_MIN, fRawValue, MOUSE_SENSITIVITY_MAX );    // Remap to 0-1
 }
 
 void CSettingsSA::SetMouseSensitivity ( float fSensitivity )
 {
-    MemPutFast < FLOAT > ( VAR_fMouseSensitivity, fSensitivity );
+    float fRawValue = Lerp( MOUSE_SENSITIVITY_MIN, fSensitivity, MOUSE_SENSITIVITY_MAX );
+    MemPutFast < FLOAT > ( VAR_fMouseSensitivity, fRawValue );
+}
+
+float CSettingsSA::GetMouseVerticalSensitivity ( )
+{
+    float fRawValue = GetMouseVerticalSensitivityRawValue();
+    return UnlerpClamped( VERTICAL_SENSITIVITY_MIN, fRawValue, VERTICAL_SENSITIVITY_MAX );    // Remap to 0-1
+}
+
+void CSettingsSA::SetMouseVerticalSensitivity ( float fSensitivity )
+{
+    float fRawValue = Lerp( VERTICAL_SENSITIVITY_MIN, fSensitivity, VERTICAL_SENSITIVITY_MAX );
+    SetMouseVerticalSensitivityRawValue( fRawValue );
+}
+
+// Vertical sensitivity is not saved by GTA. So we need access to the raw value.
+float CSettingsSA::GetMouseVerticalSensitivityRawValue ( )
+{
+    return *(FLOAT *)VAR_fMouseVerticalSensitivity;
+}
+
+void CSettingsSA::SetMouseVerticalSensitivityRawValue ( float fRawValue )
+{
+    MemPutFast < FLOAT > ( VAR_fMouseVerticalSensitivity, fRawValue );
 }
 
 unsigned int CSettingsSA::GetAntiAliasing ( )

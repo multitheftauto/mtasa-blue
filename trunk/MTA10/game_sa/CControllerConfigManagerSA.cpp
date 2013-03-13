@@ -98,7 +98,7 @@ bool CControllerConfigManagerSA::IsMouseInverted ( void )
 
 void CControllerConfigManagerSA::SetMouseInverted ( bool bInverted )
 {
-    MemPutFast < BYTE > ( VAR_MouseInverted, ( bInverted ) ? 0 : 1 );
+    MemPutFast < BYTE > ( VAR_MouseInverted, ( bInverted ) ? 1 : 0 );
 }
 
 bool CControllerConfigManagerSA::GetFlyWithMouse ( bool bIgnoreSuspend )
