@@ -89,6 +89,7 @@ void SetUserData ( void* pData )                            { CGUIElement_Impl::
 void* GetUserData ( void )                                  { return CGUIElement_Impl::GetUserData (); };
 
 void SetClickHandler ( GUI_CALLBACK Callback )              { CGUIElement_Impl::SetClickHandler ( Callback ); };
+void SetDoubleClickHandler ( GUI_CALLBACK Callback )        { CGUIElement_Impl::SetDoubleClickHandler ( Callback ); };
 void SetMovedHandler ( GUI_CALLBACK Callback )              { CGUIElement_Impl::SetMovedHandler ( Callback ); };
 void SetSizedHandler ( GUI_CALLBACK Callback )              { CGUIElement_Impl::SetSizedHandler ( Callback ); };
 void SetMouseEnterHandler ( GUI_CALLBACK Callback )         { CGUIElement_Impl::SetMouseEnterHandler ( Callback ); };
@@ -99,3 +100,9 @@ void SetDeactivateHandler ( GUI_CALLBACK Callback )         { CGUIElement_Impl::
 void SetKeyDownHandler ( GUI_CALLBACK Callback )            { CGUIElement_Impl::SetKeyDownHandler ( Callback ); };
 void SetKeyDownHandler ( const GUI_CALLBACK_KEY & Callback ){ CGUIElement_Impl::SetKeyDownHandler ( Callback ); };
 void SetEnterKeyHandler ( GUI_CALLBACK Callback )           { CGUIElement_Impl::SetEnterKeyHandler ( Callback ); };
+
+bool Event_OnClick ( void )                                 { return CGUIElement_Impl::Event_OnClick ( ); };
+bool Event_OnDoubleClick ( void )                           { return CGUIElement_Impl::Event_OnDoubleClick ( ); };
+bool Event_OnMouseEnter ( void )                            { return CGUIElement_Impl::Event_OnMouseEnter ( ); };
+bool Event_OnMouseLeave ( void )                            { return CGUIElement_Impl::Event_OnMouseLeave ( ); };
+bool Event_OnMouseButtonDown ( void )                       { return CGUIElement_Impl::Event_OnMouseButtonDown ( ); };

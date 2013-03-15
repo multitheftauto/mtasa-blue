@@ -131,10 +131,6 @@ public:
     virtual void                    OnTimingCheckpoint              ( const char* szTag ) = 0;
     virtual void                    OnTimingDetail                  ( const char* szTag ) = 0;
 
-    // CGUI Callbacks
-    virtual bool                    OnMouseClick                    ( CGUIMouseEventArgs Args ) = 0;
-    virtual bool                    OnMouseDoubleClick              ( CGUIMouseEventArgs Args ) = 0;
-
     virtual void                    Quit                            ( bool bInstantly = true) = 0;
     virtual void                    InitiateUpdate                  ( const char* szType, const char* szData, const char* szHost ) = 0;
     virtual bool                    IsOptionalUpdateInfoRequired    ( const char* szHost ) = 0;
