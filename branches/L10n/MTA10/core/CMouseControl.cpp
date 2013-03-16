@@ -88,7 +88,7 @@ bool CMouseControl::ProcessMouseMove ( UINT uMsg, WPARAM wParam, LPARAM lParam )
 
     fX *= MOUSE_CONTROL_MULTIPLIER;
 
-    float fMouseSensitivity = ( g_pCore->GetGame ( )->GetSettings()->GetMouseSensitivity () - 0.000312f ) / 0.004688f;
+    float fMouseSensitivity = g_pCore->GetGame ( )->GetSettings()->GetMouseSensitivity ();
     fX *= fMouseSensitivity;
 
     m_usLeftStickX += fX*128;

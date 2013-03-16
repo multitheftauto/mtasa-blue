@@ -601,6 +601,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "isObjectStatic", CLuaFunctionDefs::IsObjectStatic );
     CLuaCFunctions::AddFunction ( "getObjectScale", CLuaFunctionDefs::GetObjectScale );
     CLuaCFunctions::AddFunction ( "isObjectBreakable", CLuaFunctionDefs::IsObjectBreakable );
+    CLuaCFunctions::AddFunction ( "getObjectMass", CLuaFunctionDefs::GetObjectMass );
 
     // Object set funcs
     CLuaCFunctions::AddFunction ( "moveObject", CLuaFunctionDefs::MoveObject );
@@ -611,6 +612,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "breakObject", CLuaFunctionDefs::BreakObject );
     CLuaCFunctions::AddFunction ( "respawnObject", CLuaFunctionDefs::RespawnObject );
     CLuaCFunctions::AddFunction ( "toggleObjectRespawn", CLuaFunctionDefs::ToggleObjectRespawn );
+    CLuaCFunctions::AddFunction ( "setObjectMass", CLuaFunctionDefs::SetObjectMass );
 
     // Explosion funcs
     CLuaCFunctions::AddFunction ( "createExplosion", CLuaFunctionDefs::CreateExplosion );

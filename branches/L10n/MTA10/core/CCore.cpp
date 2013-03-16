@@ -182,6 +182,8 @@ CCore::CCore ( void )
     m_bDidRecreateRenderTargets = false;
     m_fMinStreamingMemory = 0;
     m_fMaxStreamingMemory = 0;
+    m_bGettingIdleCallsFromMultiplayer = false;
+    m_bWindowsTimerEnabled = false;
 }
 
 CCore::~CCore ( void )
@@ -217,7 +219,6 @@ CCore::~CCore ( void )
     //delete m_pFileSystemHook;
     delete m_pDirect3DHookManager;
     delete m_pDirectInputHookManager;
-    delete m_pMessageLoopHook;
     delete m_pTCPManager;
 
     // Delete the GUI manager    
@@ -239,6 +240,9 @@ CCore::~CCore ( void )
 
     //Delete the Current Server
     delete m_pCurrentServer;
+
+    // Delete last so calls to GetHookedWindowHandle do not crash
+    delete m_pMessageLoopHook;
 }
 
 
@@ -601,13 +605,14 @@ void CCore::ApplyGameSettings ( void )
     CVARS_GET ( "invert_mouse",     bval ); pController->SetMouseInverted ( bval );
     CVARS_GET ( "fly_with_mouse",   bval ); pController->SetFlyWithMouse ( bval );
     CVARS_GET ( "steer_with_mouse", bval ); pController->SetSteerWithMouse ( bval );
-    CVARS_GET ( "classic_controls", bval ); bval ? pController->SetInputType ( NULL ) : pController->SetInputType ( 1 );
+    CVARS_GET ( "classic_controls", bval ); pController->SetClassicControls ( bval );
     CVARS_GET ( "async_loading",    iVal ); m_pGame->SetAsyncLoadingFromSettings ( iVal == 1, iVal == 2 );
     CVARS_GET ( "volumetric_shadows", bval ); m_pGame->GetSettings ()->SetVolumetricShadowsEnabled ( bval );
     CVARS_GET ( "aspect_ratio",     iVal ); m_pGame->GetSettings ()->SetAspectRatio ( (eAspectRatio)iVal );
     CVARS_GET ( "grass",            bval ); m_pGame->GetSettings ()->SetGrassEnabled ( bval );
     CVARS_GET ( "heat_haze",        bval ); m_pMultiplayer->SetHeatHazeEnabled ( bval );
     CVARS_GET ( "fast_clothes_loading", iVal ); m_pMultiplayer->SetFastClothesLoading ( (CMultiplayer::EFastClothesLoading)iVal );
+    pController->SetVerticalAimSensitivityRawValue( CVARS_GET_VALUE < float > ( "vertical_aim_sensitivity" ) );
 }
 
 void CCore::ApplyCommunityState ( void )
@@ -857,6 +862,8 @@ void CCore::CreateGame ( )
 void CCore::CreateMultiplayer ( )
 {
     m_pMultiplayer = CreateModule < CMultiplayer > ( m_MultiplayerModule, "Multiplayer", "multiplayer_sa", "InitMultiplayerInterface", this );
+    if ( m_pMultiplayer )
+        m_pMultiplayer->SetIdleHandler ( CCore::StaticIdleHandler );
 }
 
 
@@ -1004,6 +1011,7 @@ void CCore::DestroyNetwork ( )
 
     if ( m_pNet )
     {
+        m_pNet->Shutdown();
         m_pNet = NULL;
     }
 
@@ -1016,6 +1024,17 @@ void CCore::UpdateIsWindowMinimized ( void )
     m_bIsWindowMinimized = IsIconic ( GetHookedWindow () ) ? true : false;
     // Update CPU saver for when minimized and not connected
     g_pCore->GetMultiplayer ()->SetIsMinimizedAndNotConnected ( m_bIsWindowMinimized && !IsConnected () );
+
+    // Enable timer if not connected at least once
+    bool bEnableTimer = !m_bGettingIdleCallsFromMultiplayer;
+    if ( m_bWindowsTimerEnabled != bEnableTimer )
+    {
+        m_bWindowsTimerEnabled = bEnableTimer;
+        if ( bEnableTimer )
+            SetTimer( GetHookedWindow(), IDT_TIMER1, 50, (TIMERPROC) NULL );
+        else
+            KillTimer( GetHookedWindow(), IDT_TIMER1 );
+    }
 }
 
 
@@ -1063,8 +1082,6 @@ void CCore::DoPostFramePulse ( )
         ApplyConsoleSettings ();
         ApplyGameSettings ();
 
-        m_pGUI->SetMouseClickHandler ( INPUT_CORE, GUI_CALLBACK_MOUSE ( &CCore::OnMouseClick, this ) );
-        m_pGUI->SetMouseDoubleClickHandler ( INPUT_CORE, GUI_CALLBACK_MOUSE ( &CCore::OnMouseDoubleClick, this ) );
         m_pGUI->SelectInputHandlers( INPUT_CORE );
 
         m_Community.Initialize ();
@@ -1336,29 +1353,6 @@ void CCore::Quit ( bool bInstantly )
     {
         m_bQuitOnPulse = true;
     }
-}
-
-
-bool CCore::OnMouseClick ( CGUIMouseEventArgs Args )
-{
-    bool bHandled = false;
-
-    bHandled = m_pLocalGUI->GetMainMenu ()->GetServerBrowser ()->OnMouseClick ( Args );     // CServerBrowser
-
-    return bHandled;
-}
-
-
-bool CCore::OnMouseDoubleClick ( CGUIMouseEventArgs Args )
-{
-    bool bHandled = false;
-
-    // Call the event handlers, where necessary
-    bHandled =
-        m_pLocalGUI->GetMainMenu ()->GetSettingsWindow ()->OnMouseDoubleClick ( Args ) |    // CSettings
-        m_pLocalGUI->GetMainMenu ()->GetServerBrowser ()->OnMouseDoubleClick ( Args );      // CServerBrowser
-    
-    return bHandled;
 }
 
 
@@ -1805,7 +1799,6 @@ void CCore::ApplyFrameRateLimit ( uint uiOverrideRate )
 // DoReliablePulse
 //
 // This is called once a frame even if minimized
-// (Except when minimized and never connected)
 //
 void CCore::DoReliablePulse ( void )
 {
@@ -2065,4 +2058,41 @@ CModelCacheManager* CCore::GetModelCacheManager ( void )
 void CCore::AddModelToPersistentCache ( ushort usModelId )
 {
     return GetModelCacheManager ()->AddModelToPersistentCache ( usModelId );
+}
+
+
+void CCore::StaticIdleHandler ( void )
+{
+    g_pCore->IdleHandler ();
+}
+
+
+// Gets called every game loop, after GTA has been loaded for the first time
+void CCore::IdleHandler ( void )
+{
+    m_bGettingIdleCallsFromMultiplayer = true;
+    HandleIdlePulse();
+}
+
+
+// Gets called every 50ms, before GTA has been loaded for the first time
+void CCore::WindowsTimerHandler ( void )
+{
+    if ( !m_bGettingIdleCallsFromMultiplayer )
+        HandleIdlePulse();
+}
+
+
+// Always called, even if minimized
+void CCore::HandleIdlePulse ( void )
+{
+    UpdateIsWindowMinimized();
+
+    if ( IsWindowMinimized() )
+    {
+        DoPreFramePulse();
+        DoPostFramePulse();
+    }
+    if ( m_pModManager->GetCurrentMod() )
+        m_pModManager->GetCurrentMod()->IdleHandler();
 }

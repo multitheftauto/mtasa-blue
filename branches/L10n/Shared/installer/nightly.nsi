@@ -21,6 +21,11 @@ Var AddToGameExplorer
 Var RedistInstalled
 Var ExeMD5
 Var PatchInstalled
+Var DEFAULT_INSTDIR
+Var LAST_INSTDIR
+Var CUSTOM_INSTDIR
+Var WhichRadio
+Var ShowLastUsed
 
 ; Games explorer: With each new X.X, update this GUID and the file at MTA10\launch\NEU\GDFImp.gdf.xml
 !define GUID "{DF780162-2450-4665-9BA2-EAB14ED640A3}"
@@ -223,6 +228,18 @@ PostVC90Check:
 		strcpy $Install_Dir "$PROGRAMFILES\MTA San Andreas ${0.0}"
 	${EndIf}
 	strcpy $INSTDIR $Install_Dir
+
+    ; Setup for install dir dialog
+	strcpy $DEFAULT_INSTDIR "$PROGRAMFILES\MTA San Andreas ${0.0}"
+	strcpy $LAST_INSTDIR $Install_Dir
+	strcpy $CUSTOM_INSTDIR $DEFAULT_INSTDIR
+	${If} $DEFAULT_INSTDIR == $LAST_INSTDIR 
+        StrCpy $WhichRadio "default"
+        StrCpy $ShowLastUsed "0"
+	${Else}
+        StrCpy $WhichRadio "last"
+        StrCpy $ShowLastUsed "1"
+	${EndIf}
 
 	; Try to find previously saved GTA:SA install path
 	ReadRegStr $2 HKLM "SOFTWARE\Multi Theft Auto: San Andreas All\Common" "GTA:SA Path"
@@ -1565,6 +1582,7 @@ LangString INST_GTA_ERROR2 ${LANG_ENGLISH} "Could not find GTA:SA installed at $
             Are you sure you want to continue ?"
 			
 Function "DirectoryLeaveProc"
+    Call CustomDirectoryPageUpdateINSTDIR
 	Push $INSTDIR 
 	Call GetInstallType
 	Pop $0
@@ -1612,8 +1630,17 @@ Var UpgradeLabel
 Var BrowseButton
 Var SetDefaultButton
 Var DirRequest
+Var RadioDefault
+Var LabelDefault
+Var RadioLastUsed
+Var LabelLastUsed
+Var RadioCustom
+Var SizeY
+Var PosY
 !define LT_GREY "0xf0f0f0"
-!define MID_GREY "0x808080"
+!define MID_GREY "0xb0b0b0"
+!define BLACK "0x000000"
+!define WHITE "0xF0F0F0"
 
 LangString INST_CHOOSE_LOC_TOP ${LANG_ENGLISH}	"Choose Install Location"
 LangString INST_CHOOSE_LOC ${LANG_ENGLISH}	"Choose the folder in which to install ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION}"
@@ -1621,7 +1648,10 @@ LangString INST_CHOOSE_LOC2 ${LANG_ENGLISH}	"${PRODUCT_NAME_NO_VER} ${PRODUCT_VE
 To install in a different folder, click Browse and select another folder.$\n$\n Click Next to continue."
 LangString INST_CHOOSE_LOC3 ${LANG_ENGLISH}	"Destination Folder"
 LangString INST_CHOOSE_LOC_BROWSE ${LANG_ENGLISH}	"Browse..."
-LangString INST_CHOOSE_LOC_DEFAULT ${LANG_ENGLISH} "Set default"
+LangString INST_CHOOSE_LOC_SET_DEFAULT ${LANG_ENGLISH} "Set default"
+LangString INST_CHOOSE_LOC_DEFAULT "Default"
+LangString INST_CHOOSE_LOC_LAST_USED "Last used"
+LangString INST_CHOOSE_LOC_CUSTOM "Custom"
 Function CustomDirectoryPage
 
 	nsDialogs::Create 1018
@@ -1638,31 +1668,124 @@ Function CustomDirectoryPage
 	${NSD_CreateLabel} 0 0 100% 50u "$(INST_CHOOSE_LOC2)"
 	Pop $0
 
-	${NSD_CreateLabel} 20 190 100% 12u ""
-	Pop $UpgradeLabel
-    SetCtlColors $UpgradeLabel ${MID_GREY} ${LT_GREY}
-    Call CustomDirectoryPageSetUpgradeMessage
+    # Calculate size and position of install dir options
+    IntOp $SizeY 27 + 90    # 27 + 30 + 30 + 30
+	${If} $ShowLastUsed == "0"
+        IntOp $SizeY $SizeY - 30
+	${EndIf}
+    IntOp $PosY 187 - $SizeY
 
-	${NSD_CreateGroupBox} 0 115 100% 63u "$(INST_CHOOSE_LOC3)"
+    # Add group box
+	${NSD_CreateGroupBox} 0 $PosY 100% $SizeY "$(INST_CHOOSE_LOC3)"
 	Pop $0
-	${NSD_CreateDirRequest} 15 139 72% 12u $INSTDIR
+    IntOp $PosY $PosY + 24
+
+    # Add default option
+    ${NSD_CreateRadioButton} 10 $PosY 70 12u "$(INST_CHOOSE_LOC_DEFAULT)"
+	Pop $RadioDefault
+	${NSD_CreateText} 20% $PosY 79% 12u $DEFAULT_INSTDIR
+	Pop $LabelDefault
+    SendMessage $LabelDefault ${EM_SETREADONLY} 1 0
+    IntOp $PosY $PosY + 30
+
+    # Add last used option
+	${If} $ShowLastUsed != "0"
+        ${NSD_CreateRadioButton} 10 $PosY 70 12u "$(INST_CHOOSE_LOC_LAST_USED)"
+        Pop $RadioLastUsed
+        ${NSD_CreateText} 20% $PosY 79% 12u $LAST_INSTDIR
+        Pop $LabelLastUsed
+        SendMessage $LabelLastUsed ${EM_SETREADONLY} 1 0
+        IntOp $PosY $PosY + 30
+	${EndIf}
+
+    # Add custom option
+    ${NSD_CreateRadioButton} 10 $PosY 70 12u "$(INST_CHOOSE_LOC_CUSTOM)"
+	Pop $RadioCustom
+	${NSD_CreateDirRequest} 20% $PosY 63% 12u $CUSTOM_INSTDIR
 	Pop $DirRequest
-	${NSD_CreateBrowseButton} 77% 135 20% 15u "$(INST_CHOOSE_LOC_BROWSE)"
+    IntOp $PosY $PosY - 1
+	${NSD_CreateBrowseButton} 84% $PosY 15% 13u $(INST_CHOOSE_LOC_SET_DEFAULT)"
 	Pop $BrowseButton
-	${NSD_CreateButton} 77% 165 20% 15u "$(INST_CHOOSE_LOC_DEFAULT)"
-	Pop $SetDefaultButton
+    IntOp $PosY $PosY + 31
+
+    ${NSD_OnClick} $RadioDefault CustomDirectoryPageRadioClick
+    ${NSD_OnClick} $RadioLastUsed CustomDirectoryPageRadioClick
+    ${NSD_OnClick} $RadioCustom CustomDirectoryPageRadioClick
     ${NSD_OnClick} $BrowseButton CustomDirectoryPageBrowseButtonClick
     ${NSD_OnClick} $SetDefaultButton CustomDirectoryPageSetDefaultButtonClick
     ${NSD_OnChange} $DirRequest CustomDirectoryPageDirRequestChange
+
+    # Install type message
+	${NSD_CreateLabel} 0 203 100% 12u ""
+	Pop $UpgradeLabel
+    Call CustomDirectoryPageSetUpgradeMessage
+
+    Call CustomDirectoryPageShowWhichRadio
 
     Call DirectoryShowProc
     nsDialogs::Show
 FunctionEnd
 
+# Called when radion button is clicked
+Function CustomDirectoryPageRadioClick
+    Pop $0
+    ${Switch} $0
+        ${Case} $RadioDefault
+            StrCpy $WhichRadio "default"
+            ${Break}
+        ${Case} $RadioLastUsed
+            StrCpy $WhichRadio "last"
+            ${Break}
+        ${Case} $RadioCustom
+            StrCpy $WhichRadio "custom"
+            ${Break}
+    ${EndSwitch}
+    Call CustomDirectoryPageShowWhichRadio
+FunctionEnd
+
+# Ensure GUI reflects $WhichRadio
+Function CustomDirectoryPageShowWhichRadio
+    # Set all options as not selected
+    SetCtlColors $LabelDefault ${MID_GREY} ${LT_GREY}
+    SetCtlColors $LabelLastUsed ${MID_GREY} ${LT_GREY}
+    SetCtlColors $DirRequest ${MID_GREY} ${WHITE}
+    SendMessage $DirRequest ${EM_SETREADONLY} 1 0
+    EnableWindow $BrowseButton 0
+
+    # Highlight selected option
+    ${Switch} $WhichRadio
+        ${Case} "default"
+            StrCpy $INSTDIR $DEFAULT_INSTDIR
+            ${NSD_SetState} $RadioDefault ${BST_CHECKED}
+            SetCtlColors $LabelDefault ${BLACK} ${LT_GREY}
+            ${Break}
+        ${Case} "last"
+            StrCpy $INSTDIR $LAST_INSTDIR
+            ${NSD_SetState} $RadioLastUsed ${BST_CHECKED}
+            SetCtlColors $LabelLastUsed ${BLACK} ${LT_GREY}
+            ${Break}
+        ${Case} "custom"
+            StrCpy $INSTDIR $CUSTOM_INSTDIR
+            ${NSD_SetState} $RadioCustom ${BST_CHECKED}
+            SetCtlColors $DirRequest ${WHITE}
+            SendMessage $DirRequest ${EM_SETREADONLY} 0 0
+            EnableWindow $BrowseButton 1
+            ${Break}
+    ${EndSwitch}
+
+    # Redraw controls
+    ${NSD_GetText} $LabelDefault $0
+    ${NSD_SetText} $LabelDefault $0
+    ${NSD_GetText} $LabelLastUsed $0
+    ${NSD_SetText} $LabelLastUsed $0
+    ${NSD_GetText} $DirRequest $0
+    ${NSD_SetText} $DirRequest $0
+FunctionEnd
+
 Function CustomDirectoryPageDirRequestChange
     ${NSD_GetText} $DirRequest $0
 	${If} $0 != error
-		StrCpy $INSTDIR $0
+		StrCpy $CUSTOM_INSTDIR $0
         Call CustomDirectoryPageSetUpgradeMessage
 	${EndIf}
 FunctionEnd
@@ -1685,15 +1808,16 @@ Function CustomDirectoryPageBrowseButtonClick
     Call RemoveDirectoriesWhichWeDid
 
 	${If} $0 != error
-		StrCpy $INSTDIR $0
+		StrCpy $CUSTOM_INSTDIR $0
         ${NSD_SetText} $DirRequest $0
         Call CustomDirectoryPageSetUpgradeMessage
 	${EndIf}
 FunctionEnd
 
 LangString INST_LOC_OW ${LANG_ENGLISH}	"Warning: A different major version of MTA ($1) already exists at that path."
-LangString INST_LOC_UPGRADE ${LANG_ENGLISH}	"Existing installation detected. Will perform in-place upgrade."
+LangString INST_LOC_UPGRADE ${LANG_ENGLISH}	"Installation type:  Upgrade"
 Function CustomDirectoryPageSetUpgradeMessage
+    Call CustomDirectoryPageUpdateINSTDIR
 	Push $INSTDIR 
 	Call GetInstallType
 	Pop $0
@@ -1701,11 +1825,26 @@ Function CustomDirectoryPageSetUpgradeMessage
 
     ${NSD_SetText} $UpgradeLabel ""
 	${If} $0 == "overwrite"
-        ${NSD_SetText} $UpgradeLabel "$(INST_LOC_OW)"
+        ${NSD_SetText} $UpgradeLabel "Warning: A different major version of MTA ($1) already exists at that path."
 	${Endif}
 	${If} $0 == "upgrade"
-        ${NSD_SetText} $UpgradeLabel "$(INST_LOC_UPGRADE)"
+        ${NSD_SetText} $UpgradeLabel ""$(INST_LOC_UPGRADE)"
 	${Endif}
+FunctionEnd
+
+# Make absolutely sure $INSTDIR is correct
+Function CustomDirectoryPageUpdateINSTDIR
+    ${Switch} $WhichRadio
+        ${Case} "default"
+            StrCpy $INSTDIR $DEFAULT_INSTDIR
+            ${Break}
+        ${Case} "last"
+            StrCpy $INSTDIR $LAST_INSTDIR
+            ${Break}
+        ${Case} "custom"
+            StrCpy $INSTDIR $CUSTOM_INSTDIR
+            ${Break}
+    ${EndSwitch}
 FunctionEnd
 
 

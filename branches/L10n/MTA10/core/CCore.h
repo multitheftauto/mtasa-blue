@@ -74,6 +74,7 @@ class CCore;
 #define CONFIG_FAVOURITE_LIST_TAG   "favourite_server"
 #define CONFIG_RECENT_LIST_TAG      "recently_played_server"
 #define CONFIG_HISTORY_LIST_TAG     "connected_server"
+#define IDT_TIMER1 1234
 
 extern class CCore* g_pCore;
 extern class CGraphics* g_pGraphics;
@@ -194,8 +195,6 @@ public:
     void                    DoPostFramePulse                ( void );
 
     // Events
-    bool                    OnMouseClick                    ( CGUIMouseEventArgs Args );
-    bool                    OnMouseDoubleClick              ( CGUIMouseEventArgs Args );
     void                    OnModUnload                     ( void );
 
     // Misc
@@ -245,6 +244,11 @@ public:
     void                    SetDiagnosticDebug              ( EDiagnosticDebugType value );
     CModelCacheManager*     GetModelCacheManager            ( void );
     void                    AddModelToPersistentCache       ( ushort usModelId );
+
+    static void             StaticIdleHandler               ( void );
+    void                    IdleHandler                     ( void );
+    void                    WindowsTimerHandler             ( void );
+    void                    HandleIdlePulse                 ( void );
 
 private:
     // Core devices.
@@ -327,6 +331,8 @@ private:
     EDiagnosticDebugType        m_DiagnosticDebug;
     float                       m_fMinStreamingMemory;
     float                       m_fMaxStreamingMemory;
+    bool                        m_bGettingIdleCallsFromMultiplayer;
+    bool                        m_bWindowsTimerEnabled;
 
     // Command line
     static void                 ParseCommandLine                ( std::map < std::string, std::string > & options, const char*& szArgs, const char** pszNoValOptions = NULL );

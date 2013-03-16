@@ -24,8 +24,9 @@
 #include "CChat.h"
 
 // Macros
-#define CVARS_GET   CClientVariables::GetSingleton().Get
-#define CVARS_SET   CClientVariables::GetSingleton().Set
+#define CVARS_GET       CClientVariables::GetSingleton().Get
+#define CVARS_SET       CClientVariables::GetSingleton().Set
+#define CVARS_GET_VALUE CClientVariables::GetSingleton().GetValue
 
 class CClientVariables : public CCVarsInterface, public CSingleton < CClientVariables >
 {
@@ -68,6 +69,14 @@ public:
     bool            IsLoaded                ( void ) { return m_bLoaded; }
     int             GetRevision             ( void ) { return m_iRevision; }
     void            ValidateValues          ( void );
+
+    template < class T >
+    T GetValue( const std::string& strVariable, const T& defaultValue = 0 )
+    {
+        T value = defaultValue;
+        Get( strVariable, value );
+        return value;
+    }
 
 private:
     CXMLNode*       Node                    ( const std::string& strVariable );

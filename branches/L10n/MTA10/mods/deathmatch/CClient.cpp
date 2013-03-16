@@ -250,6 +250,15 @@ void CClient::PostFrameExecutionHandler ( void )
 }
 
 
+void CClient::IdleHandler ( void )
+{
+    if ( g_pClientGame )
+    {
+        g_pClientGame->IdleHandler ();
+    }
+}
+
+
 bool CClient::ProcessCommand ( const char* szCommandLine )
 {
     return false;
