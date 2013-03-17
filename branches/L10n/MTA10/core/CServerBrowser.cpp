@@ -1213,7 +1213,7 @@ bool CServerBrowser::OnConnectClick ( CGUIElement* pElement )
     // Ensure we have something entered
     if ( strURI.size() == 0 || strURI == "mtasa://" )
     {
-        CCore::GetSingleton ().ShowMessageBox ( _("Error"), _("No address specified!"), MB_BUTTON_OK | MB_ICON_INFO );
+        CCore::GetSingleton ().ShowMessageBox ( _("Error")+_E("CC70"), _("No address specified!"), MB_BUTTON_OK | MB_ICON_INFO );
         return true;
     }
 
@@ -1226,7 +1226,7 @@ bool CServerBrowser::OnConnectClick ( CGUIElement* pElement )
     }
     else if ( strURI.substr(0,iProtocolEnd) != "mtasa" )// Is it the mtasa:// protocol?  Don't want noobs trying http etc
     {
-        CCore::GetSingleton ().ShowMessageBox ( _("Unknown protocol"), _("Please use the mtasa:// protocol!"), MB_BUTTON_OK | MB_ICON_INFO );
+        CCore::GetSingleton ().ShowMessageBox ( _("Unknown protocol")+_E("CC71"), _("Please use the mtasa:// protocol!"), MB_BUTTON_OK | MB_ICON_INFO );
         return true;
     }
 
@@ -1235,7 +1235,7 @@ bool CServerBrowser::OnConnectClick ( CGUIElement* pElement )
     // Valid nick?
     if ( !CCore::GetSingleton ().IsValidNick ( strNick.c_str () ) )
     {
-        CCore::GetSingleton ().ShowMessageBox ( _("Error"), _("Invalid nickname! Please go to Settings and set a new one!"), MB_BUTTON_OK | MB_ICON_INFO );
+        CCore::GetSingleton ().ShowMessageBox ( _("Error")+_E("CC72"), _("Invalid nickname! Please go to Settings and set a new one!"), MB_BUTTON_OK | MB_ICON_INFO );
         return true;
     }
 
@@ -1293,7 +1293,7 @@ bool CServerBrowser::ConnectToSelectedServer ( void )
         // Valid nick?
         if ( !CCore::GetSingleton ().IsValidNick ( strNick.c_str () ) )
         {
-            CCore::GetSingleton ().ShowMessageBox ( _("Error"), _("Invalid nickname! Please go to Settings and set a new!"), MB_BUTTON_OK | MB_ICON_INFO );
+            CCore::GetSingleton ().ShowMessageBox ( _("Error")+_E("CC73"), _("Invalid nickname! Please go to Settings and set a new!"), MB_BUTTON_OK | MB_ICON_INFO );
             return true;
         }
 
@@ -1315,7 +1315,7 @@ bool CServerBrowser::ConnectToSelectedServer ( void )
     }
     else
     {
-        CCore::GetSingleton ().ShowMessageBox ( _("Information"), _("You have to select a server to connect to."), MB_BUTTON_OK | MB_ICON_INFO );
+        CCore::GetSingleton ().ShowMessageBox ( _("Information")+_E("CC74"), _("You have to select a server to connect to."), MB_BUTTON_OK | MB_ICON_INFO );
     }
     return false;
 }
@@ -1340,7 +1340,7 @@ bool CServerBrowser::OnInfoClick ( CGUIElement* pElement )
     // Ensure we have something entered
     if ( strURI.size() == 0 || strURI == "mtasa://" )
     {
-        CCore::GetSingleton ().ShowMessageBox ( _("Error"), _("No address specified!"), MB_BUTTON_OK | MB_ICON_INFO );
+        CCore::GetSingleton ().ShowMessageBox ( _("Error")+_E("CC75"), _("No address specified!"), MB_BUTTON_OK | MB_ICON_INFO );
         return true;
     }
 

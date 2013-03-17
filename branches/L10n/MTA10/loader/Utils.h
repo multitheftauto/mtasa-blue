@@ -46,7 +46,7 @@ void            ShowSplash                          ( HINSTANCE hInstance );
 void            HideSplash                          ( void );
 
 bool            CommandLineContains                 ( const SString& strText );
-long            DisplayErrorMessageBox              ( const SString& strMessage, const SString& strTroubleType = "" );
+long            DisplayErrorMessageBox              ( const SString& strMessage, const SString& strErrorCode = "", const SString& strTroubleType = "" );
 
 void            SetMTASAPathSource                  ( bool bReadFromRegistry );
 SString         GetMTASAPath                        ( bool bReadFromRegistry = true );

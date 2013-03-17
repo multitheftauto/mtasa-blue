@@ -143,7 +143,6 @@ Page custom CustomDirectoryPage DirectoryLeaveProc
 !insertmacro MUI_LANGUAGE "English"
 ;@INSERT_TRANSLATIONS@
 
-LangString LANGUAGE_CODE ${LANG_ENGLISH} "en_US"
 LangString	WELCOME_TEXT  ${LANG_ENGLISH}	"This wizard will guide you through the installation or update of $(^Name) ${REVISION_TAG}\n\n\
 It is recommended that you close all other applications before starting Setup.\n\n\
 [Admin access may be requested for Vista and up]\n\n\
@@ -191,7 +190,9 @@ Function .onInstFailed
 FunctionEnd
 
 Function .onInit
-	!insertmacro MUI_LANGDLL_DISPLAY
+	${IfNot} ${UAC_IsInnerInstance}
+		!insertmacro MUI_LANGDLL_DISPLAY
+	${EndIf}
 	
 	; #############################################
 	; Remove old shortcuts put in rand(user,admin) startmenu by previous installers (shortcuts now go in all users)
@@ -529,44 +530,46 @@ DontInstallRedist:
         File "${FILES_ROOT}\MTA San Andreas\mta\bass_fx.dll"
         File "${FILES_ROOT}\MTA San Andreas\mta\tags.dll"
 		File "${SERVER_FILES_ROOT}\pthreadVC2.dll"
-		
-		# Write our language to coreconfig.xml
-		IfFileExists "coreconfig.xml" WriteLanguageToConfig 0
-		# If we don't have a coreconfig, create one with tags leading up to the locale tag
-		nsisXML::create
-		nsisXML::createElement "mainconfig"
-		nsisXML::appendChild
-		StrCpy $1 $2
-		nsisXML::createElement "settings"
-		nsisXML::appendChild
-		StrCpy $1 $2
-		nsisXML::createElement "locale"
-		nsisXML::appendChild
-		nsisXML::setText "$(LANGUAGE_CODE)"
-		nsisXML::save "coreconfig.xml"
-		Goto FinishedWithConfig
-		
-		# We have a file, let's write to it
-		WriteLanguageToConfig:
-		nsisXML::create
-		nsisXML::loadAndValidate "coreconfig.xml"
-		IntCmp $0 0 FinishedWithConfig # Something is up, abort mission
-		nsisXML::select "/mainconfig"
-		IntCmp $2 0 FinishedWithConfig
-		nsisXML::select "/mainconfig/settings"
-        ${If} $2 == 0
-            nsisXML::select "/mainconfig"
+
+		${If} "$(LANGUAGE_CODE)" != ""
+			# Write our language to coreconfig.xml
+			IfFileExists "coreconfig.xml" WriteLanguageToConfig 0
+			# If we don't have a coreconfig, create one with tags leading up to the locale tag
+			nsisXML::create
+			nsisXML::createElement "mainconfig"
+			nsisXML::appendChild
+			StrCpy $1 $2
 			nsisXML::createElement "settings"
 			nsisXML::appendChild
-        ${EndIf}
-		nsisXML::select "/mainconfig/settings/locale"
-        ${If} $2 == 0 # Only create the locale tag - we never modify it
-            nsisXML::select "/mainconfig/settings"
-			nsisXML::createElement "locale"	
+			StrCpy $1 $2
+			nsisXML::createElement "locale"
 			nsisXML::appendChild
 			nsisXML::setText "$(LANGUAGE_CODE)"
 			nsisXML::save "coreconfig.xml"
-        ${EndIf}
+			Goto FinishedWithConfig
+			
+			# We have a file, let's write to it
+			WriteLanguageToConfig:
+			nsisXML::create
+			nsisXML::loadAndValidate "coreconfig.xml"
+			IntCmp $0 0 FinishedWithConfig # Something is up, abort mission
+			nsisXML::select "/mainconfig"
+			IntCmp $2 0 FinishedWithConfig
+			nsisXML::select "/mainconfig/settings"
+			${If} $2 == 0
+				nsisXML::select "/mainconfig"
+				nsisXML::createElement "settings"
+				nsisXML::appendChild
+			${EndIf}
+			nsisXML::select "/mainconfig/settings/locale"
+			${If} $2 == 0 # Only create the locale tag - we never modify it
+				nsisXML::select "/mainconfig/settings"
+				nsisXML::createElement "locale"	
+				nsisXML::appendChild
+				nsisXML::setText "$(LANGUAGE_CODE)"
+				nsisXML::save "coreconfig.xml"
+			${EndIf}
+		${EndIf}
 		
 		FinishedWithConfig:
 
@@ -1573,7 +1576,8 @@ Function GetVersionAtLocation
 FunctionEnd
 
 
-LangString INST_MTA_CONFLICT ${LANG_ENGLISH}	"A different major version of MTA ($1) already exists at that path.$\n$\n\ MTA is designed for major versions to be installed in different paths.$\n \
+LangString INST_MTA_CONFLICT ${LANG_ENGLISH}	"A different major version of MTA ($1) already exists at that path.$\n$\n\ 
+			MTA is designed for major versions to be installed in different paths.$\n \
             Are you sure you want to overwrite MTA $1 at \
             $INSTDIR ?"
 LangString INST_GTA_ERROR1 ${LANG_ENGLISH} "The selected directory does not exist.$\n$\n\

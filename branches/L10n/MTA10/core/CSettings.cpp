@@ -3157,7 +3157,7 @@ bool CSettings::OnSkinChanged ( CGUIElement* pElement )
             strItemText = m_pInterfaceSkinSelector->GetItemText( ++uiIndex );
         }
         m_pInterfaceSkinSelector->SetSelectedItemByIndex(uiIndex);
-        g_pCore->ShowMessageBox ( _("Error"), _("Please disconnect before changing skin"), MB_BUTTON_OK | MB_ICON_INFO );
+        g_pCore->ShowMessageBox ( _("Error")+_E("CC80"), _("Please disconnect before changing skin"), MB_BUTTON_OK | MB_ICON_INFO );
         m_pWindow->MoveToBack();
         return true;
     }
@@ -3442,7 +3442,7 @@ void NewNicknameCallback ( void* ptr, unsigned int uiButton, std::string strNick
     if ( uiButton == 1 )  // We hit OK
     {
         if ( !CCore::GetSingleton ().IsValidNick ( strNick.c_str () ) )
-            CCore::GetSingleton ().ShowMessageBox ( _("Error"), _("Your nickname contains invalid characters!"), MB_BUTTON_OK | MB_ICON_INFO );
+            CCore::GetSingleton ().ShowMessageBox ( _("Error")+_E("CC81"), _("Your nickname contains invalid characters!"), MB_BUTTON_OK | MB_ICON_INFO );
         else
         {
             CVARS_SET ( "nick", strNick ) ;

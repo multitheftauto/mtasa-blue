@@ -39,28 +39,28 @@ fd,temp_path = tempfile.mkstemp()
 # xgettext then reads this list, and produces our template .po file which is renamed to .pot
 for dir,output in directories.iteritems():
     scanDirsFile = open(temp_path, 'w')
-	# Scan for .cpp and .h files
+    # Scan for .cpp and .h files
     for root,dirs,files in os.walk(dir):
         for file in files:
             filename,ext = os.path.splitext(file)
-            if ext == ".cpp" or ext == ".h":
+            if ext == ".c" or ext == ".cpp" or ext == ".h" or ext == ".hpp":
                 filePath = os.path.abspath(os.path.join(root,file))
                 print ( filePath )
-				# Add each file to a list
+                # Add each file to a list
                 scanDirsList.append ( filePath + "\n" )
             
     print ( "Files found: " + str(len(scanDirsList)) )
 
-	# Write this to our temporary file
+    # Write this to our temporary file
     scanDirsFile.writelines(scanDirsList)
     scanDirsFile.close()
 
-	# If we have .pot in the destination, strip it (xgettext seems to append an extension regardless)
+    # If we have .pot in the destination, strip it (xgettext seems to append an extension regardless)
     path,ext = os.path.splitext(output)
     if ext == ".pot":
         output = path
 
-	# Give xgettext our temporary file to produce our .po
+    # Give xgettext our temporary file to produce our .po
     cmdArgs = [options.exe,"-f",os.path.abspath(scanDirsFile.name),"-d",output,
                "--c++","--from-code=UTF-8","--add-comments",
 			   "--keyword=_", "--keyword=_n:1,2", "--keyword=_c:1c,2", "--keyword=_cn:1c,2,3",

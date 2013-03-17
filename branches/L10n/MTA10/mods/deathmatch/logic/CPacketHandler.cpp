@@ -458,6 +458,7 @@ void CPacketHandler::Packet_ServerDisconnected ( NetBitStreamInterface& bitStrea
     // Adjust the size to our buffer size
     SString strDuration;
     SString strReason;
+    SString strErrorCode;
     bool bShowMessageBox = true;
 
     bitStream.ReadBits ( &ucType, 5 );
@@ -465,67 +466,67 @@ void CPacketHandler::Packet_ServerDisconnected ( NetBitStreamInterface& bitStrea
     switch ( ucType )
     {
         case ePlayerDisconnectType::INVALID_NICKNAME:
-            strReason = _("Disconnected: Invalid nickname");
+            strReason = _("Disconnected: Invalid nickname"); strErrorCode = _E("CD30");
             break;
         case ePlayerDisconnectType::NO_REASON:
-            strReason = _("Disconnect from server");
+            strReason = _("Disconnect from server"); strErrorCode = _E("CD31");
             break;
         case ePlayerDisconnectType::BANNED_SERIAL:
-            strReason = _("Disconnected: Serial is banned.\nReason:%s");
+            strReason = _("Disconnected: Serial is banned.\nReason:%s"); strErrorCode = _E("CD32");
             bitStream.ReadString ( strDuration );
             break;
         case ePlayerDisconnectType::BANNED_IP:
-            strReason = _("Disconnected: You are banned.\nReason: %s");
+            strReason = _("Disconnected: You are banned.\nReason: %s"); strErrorCode = _E("CD33");
             bitStream.ReadString ( strDuration );
         case ePlayerDisconnectType::BANNED_ACCOUNT:
-            strReason = _("Disconnected: Account is banned.\nReason: %s"); 
+            strReason = _("Disconnected: Account is banned.\nReason: %s"); strErrorCode = _E("CD34");
             break;
         case ePlayerDisconnectType::VERSION_MISMATCH:
-            strReason = _("Disconnected: Version mismatch");
+            strReason = _("Disconnected: Version mismatch"); strErrorCode = _E("CD35");
             break;
         case ePlayerDisconnectType::JOIN_FLOOD:
-            strReason = _("Disconnected: Join flood. Please wait a minute, then reconnect.");
+            strReason = _("Disconnected: Join flood. Please wait a minute, then reconnect."); strErrorCode = _E("CD36");
             break;
         case ePlayerDisconnectType::DIFFERENT_BRANCH:
-            strReason = _("Disconnected: Server from different branch.\nInformation: %s");
+            strReason = _("Disconnected: Server from different branch.\nInformation: %s"); strErrorCode = _E("CD37");
             break;
         case ePlayerDisconnectType::BAD_VERSION:
-            strReason = _("Disconnected: Bad version.\nInformation: ");
+            strReason = _("Disconnected: Bad version.\nInformation: "); strErrorCode = _E("CD38");
             break;
         case ePlayerDisconnectType::SERVER_NEWER:
-            strReason = _("Disconnected: Server is running a newer build.\nInformation: ");
+            strReason = _("Disconnected: Server is running a newer build.\nInformation: "); strErrorCode = _E("CD39");
             break;
         case ePlayerDisconnectType::SERVER_OLDER:
-            strReason = _("Disconnected: Server is running an older build.\nInformation: ");
+            strReason = _("Disconnected: Server is running an older build.\nInformation: "); strErrorCode = _E("CD40");
             break;
         case ePlayerDisconnectType::NICK_CLASH:
-            strReason = _("Disconnected: Nick already in use");
+            strReason = _("Disconnected: Nick already in use"); strErrorCode = _E("CD41");
             break;
         case ePlayerDisconnectType::ELEMENT_FAILURE:
-            strReason = _("Disconnected: Player Element Could not be created.");
+            strReason = _("Disconnected: Player Element Could not be created."); strErrorCode = _E("CD42");
             break;
         case ePlayerDisconnectType::GENERAL_REFUSED:
-            strReason = _("Disconnected: server refused the connection: %s");
+            strReason = _("Disconnected: server refused the connection: %s"); strErrorCode = _E("CD43");
             break;
         case ePlayerDisconnectType::SERIAL_VERIFICATION:
-            strReason = _("Disconnected: Serial verification failed");
+            strReason = _("Disconnected: Serial verification failed"); strErrorCode = _E("CD44");
             break;
         case ePlayerDisconnectType::CONNECTION_DESYNC:
-            strReason = _("Disconnected: Connection desync %s");
+            strReason = _("Disconnected: Connection desync %s"); strErrorCode = _E("CD45");
             break;
         case ePlayerDisconnectType::INVALID_PASSWORD:
             g_pCore->ShowServerInfo ( 2 );
             bShowMessageBox = false;
             break;
         case ePlayerDisconnectType::KICK:
-            strReason = _("Disconnected: You were kicked by %s");
+            strReason = _("Disconnected: You were kicked by %s"); strErrorCode = _E("CD46");
             break;
         case ePlayerDisconnectType::BAN:
-            strReason = _("Disconnected: You were banned by %s");
+            strReason = _("Disconnected: You were banned by %s"); strErrorCode = _E("CD47");
             bitStream.ReadString ( strDuration );
             break;
         case ePlayerDisconnectType::CUSTOM:
-            strReason = "%s";
+            strReason = "%s"; strErrorCode = _E("CD48"); // Custom disconnect reason
             break;
         default: break;
     }
@@ -560,7 +561,7 @@ void CPacketHandler::Packet_ServerDisconnected ( NetBitStreamInterface& bitStrea
         }
 
         // Display the error
-         g_pCore->ShowMessageBox ( _("Disconnected"), strReason, MB_BUTTON_OK | MB_ICON_INFO );
+         g_pCore->ShowMessageBox ( _("Disconnected")+strErrorCode, strReason, MB_BUTTON_OK | MB_ICON_INFO );
     }
 
     // Terminate the mod (disconnect first in case there were more packets after this one)

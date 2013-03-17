@@ -46,9 +46,12 @@ NSIFilePath = options.input
 
 # Removes trailing \ which marks a new line
 def removeEscapedNewLine(line):
-    escaped = line.rfind("\\")
-    if escaped+1 == len(line):
-        return line[0:escaped]
+    newline = line.rstrip("\n")
+    newline = line.rstrip()
+    newlen = len(newline);
+    if newline.rfind("\\")+1 == len(newline):
+        return newline[:newlen-1]
+    return line
 
 # Open our source file
 NSIWorkingFile = open(NSIFilePath,"r")
@@ -76,36 +79,36 @@ while line != '':
             start = line.find('"') + 1
             if start:
                 end = line.find('"',start)
-                if end:
+                if end != -1:
                     value = line[start:end]
                 else: # Nope, multiline
                     line = removeEscapedNewLine(line)
                     # Keep reading till we reach the end
                     value = line[start:]
-                    NSIWorkingFile.readline()
+                    line = NSIWorkingFile.readline()
                     lineNo += 1
                     while line != '':
-                        line2 = removeEscapedNewLine(line2)
-                        end = line2.find('"')
-                        if end: #If we found the closing character, append
-                            value += line2[:end]
+                        line = removeEscapedNewLine(line)
+                        end = line.find('"')
+                        if end != -1: #If we found the closing character, append
+                            value += line[:end].lstrip()
                             break
                         else: #If not, append and continue
-                            value += line2
+                            value += line.lstrip()
                         line=NSIWorkingFile.readline()
                         lineNo += 1
 
             # Remove whitespace and new lines
-            value = value.strip("   \n")
-            value = polib.escape(value)
+            value = value.strip("\t\n")
+            value = polib.unescape ( value )
             if not value in LangStringCache:
                 LangStringCache[value] = []
-			# Note down our file and line number
+            # Note down our file and line number
             LangStringCache[value].append([options.input,lineNo])
 
             if not value in LangStringLabels:
                 LangStringLabels[value] = []
-			# Note down our label
+            # Note down our label
             LangStringLabels[value].append(label)
             
     line=NSIWorkingFile.readline()

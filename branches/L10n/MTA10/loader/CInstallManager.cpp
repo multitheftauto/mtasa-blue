@@ -326,7 +326,7 @@ SString CInstallManager::_ChangeToAdmin ( void )
         }
         CreateSingleInstanceMutex ();
         ClearIsBlockingUserProcess ();
-        MessageBoxUTF8( NULL, SString ( _("MTA:SA could not complete the following task:\n\n  '%s'\n"), *m_strAdminReason ), "Multi Theft Auto: San Andreas", MB_OK | MB_TOPMOST  );
+        MessageBoxUTF8( NULL, SString ( _("MTA:SA could not complete the following task:\n\n  '%s'\n"), *m_strAdminReason ), "Multi Theft Auto: San Andreas"+_E("CL01"), MB_OK | MB_TOPMOST  );
     }
     return "fail";
 }
@@ -500,7 +500,7 @@ SString CInstallManager::_InstallFiles ( void )
 //////////////////////////////////////////////////////////
 SString CInstallManager::_ShowCopyFailDialog ( void )
 {
-    int iResponse = MessageBoxUTF8 ( NULL, _("Could not update due to file conflicts. Please close other applications and retry"), _("Error"), MB_RETRYCANCEL | MB_ICONERROR | MB_TOPMOST  );
+    int iResponse = MessageBoxUTF8 ( NULL, _("Could not update due to file conflicts. Please close other applications and retry"), _("Error")+_E("CL02"), MB_RETRYCANCEL | MB_ICONERROR | MB_TOPMOST  );
     if ( iResponse == IDRETRY )
         return "retry";
     return "ok";
@@ -509,7 +509,7 @@ SString CInstallManager::_ShowCopyFailDialog ( void )
 
 void ShowLayoutError ( const SString& strExtraInfo )
 {
-    MessageBoxUTF8 ( 0, SString ( _("Multi Theft Auto has not been installed properly, please reinstall. %s"), *strExtraInfo ), _("Error"), MB_OK | MB_TOPMOST  );
+    MessageBoxUTF8 ( 0, SString ( _("Multi Theft Auto has not been installed properly, please reinstall. %s"), *strExtraInfo ), _("Error")+_E("CL03"), MB_OK | MB_TOPMOST  );
     TerminateProcess ( GetCurrentProcess (), 9 );
 }
 

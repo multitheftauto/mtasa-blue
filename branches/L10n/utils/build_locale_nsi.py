@@ -29,67 +29,83 @@ parser.add_option("-l", "--lang", dest="lang",
 
 # Define a dict to convert locale names to language names
 localeToName = {
-  "af" :	"Afrikaans",
-#  "am" :	"Amharic", #Comment out those unsupported by NSIS
-  "ar" :	"Arabic",
-  "bg" :	"Bulgarian",
-  "br" :	"Breton",
-  "ca" :	"Catalan",
-  "cs" :	"Czech",
-  "da" :	"Danish",
-  "de" :	"German",
-#  "dz" :	"Dzongkha",
-  "el" :	"Greek",
-  "en" :	"English",
-  "es" :	"Spanish",
-  "eu" :	"Basque",
-#  "fa" :	"Persian",
-  "fi" :	"Finnish",
-  "fr" :	"French",
-  "ga" :	"Irish",
-#  "gu" :	"Gujarati",
-  "he" :	"Hebrew",
-#  "hi" :	"Hindi",
-  "hr" :	"Croatian",
-  "hu" :	"Hungarian",
-  "id" :	"Indonesian",
-  "it" :	"Italian",
-  "ja" :	"Japanese",
-#  "ka" :	"Georgian",
-  "ko" :	"Korean",
-  "lt" :	"Lithuanian",
-  "lv" :	"Latvian",
-  "mk" :	"Macedonian",
-#  "ml" :	"Malayalam",
-#  "mr" :	"Marathi",
-  "ms" :	"Malay",
-  "nb" :	"Norwegian",
-#  "ne" :	"Nepal",
-  "nl" :	"Dutch",
-  "nn" :	"NorwegianNynorsk",
-#  "oc" :	"Occitan",
-#  "pa" :	"Punjabi",
-  "pl" :	"Polish",
-  "pt" :	"Portuguese",
-  "pt_BR" :	"PortugueseBR",
-  "ro" :	"Romanian",
-  "ru" :	"Russian",
- # "rw" :	"Kinyarwanda",
-  "sk" :	"Slovak",
-  "sl" :	"Slovenian",
-#  "so" :	"Somali",
-  "sq" :	"Albanian",
-#  "sr" :	"Serbian",
-  "sv" :	"Swedish",
-#  "ta" :	"Tamil",
-  "th" :	"Thai",
-  "tr" :	"Turkish",
-  "uk" :	"Ukrainian",
-#  "ur" :	"Urdu",
-#  "vi" :	"Vietnamese",
-#  "wa" :	"Walloon",
-  "zh" :	"SimpChinese",
-  "zh" :	"TradChinese",
+    "af" : "Afrikaans",
+    "sq" : "Albanian",
+    "ar" : "Arabic",
+    "hy" : "Armenian",
+    "eu" : "Basque",
+    "be" : "Belarusian",
+    "bs" : "Bosnian",
+    "br" : "Breton",
+    "bg" : "Bulgarian",
+    "ca" : "Catalan",
+    "bem" : "Cibemba",
+    "hr" : "Croatian",
+    "cs" : "Czech",
+    "da" : "Danish",
+    "nl" : "Dutch",
+    "efi" : "Efik",
+    "en" : "English",
+    "eo" : "Esperanto",
+    "et" : "Estonian",
+    "fa" : "Farsi",
+    "fi" : "Finnish",
+    "fr" : "French",
+    "gl" : "Galician",
+    "ka" : "Georgian",
+    "de" : "German",
+    "el" : "Greek",
+    "he" : "Hebrew",
+    "hi" : "Hindi",
+    "hu" : "Hungarian",
+    "is" : "Icelandic",
+    "ig" : "Igbo",
+    "id" : "Indonesian",
+    "ga" : "Irish",
+    "it" : "Italian",
+    "ja" : "Japanese",
+    "km" : "Khmer",
+    "ko" : "Korean",
+    "ku" : "Kurdish",
+    "lv" : "Latvian",
+    "lt" : "Lithuanian",
+    "lb" : "Luxembourgish",
+    "mk" : "Macedonian",
+    "mg" : "Malagasy",
+    "ms" : "Malay",
+    "mn" : "Mongolian",
+    "nb" : "Norwegian",
+    "nn" : "NorwegianNynorsk",
+    "ps" : "Pashto",
+    "pl" : "Polish",
+    "pt" : "Portuguese",
+    "pt_BR" : "PortugueseBR",
+    "ro" : "Romanian",
+    "ru" : "Russian",
+    "sr" : "Serbian",
+    "sr_sp" : "SerbianLatin",
+    "st" : "Sesotho",
+    "sn" : "Shona",
+    "zh_CN" : "SimpChinese",
+    "sk" : "Slovak",
+    "sl" : "Slovenian",
+    "es" : "Spanish",
+    "es_AR" : "SpanishInternational",
+    "sw" : "Swahili",
+    "sv" : "Swedish",
+    "ta" : "Tamil",
+    "th" : "Thai",
+    "zh_HK" : "TradChinese",
+    "tr" : "Turkish",
+    "tw" : "Twi",
+    "uk" : "Ukrainian",
+    "ug" : "Uyghur",
+    "uz" : "Uzbek",
+    "ca@valencia" : "Valencian",
+    "vi" : "Vietnamese",
+    "cy" : "Welsh",
+    "yo" : "Yoruba",
+    "zu" : "Zulu",
 }
 
 translationCache = {}
@@ -106,22 +122,27 @@ for root,dirs,files in os.walk(options.podir):
             if filename in localeToName:
                 language = localeToName[filename]
                 translationCache[language] = collections.OrderedDict()
+                
+                # Let's add a default LANGUAGE_CODE LangString to be read
+                translationCache[language]["LANGUAGE_CODE"] = language
+
                 po = polib.pofile(os.path.join(root,file))
                 for entry in po.translated_entries():
                     # Loop through all our labels and add translation (each translation may have multiple labels)
                     for label in entry.comment.split():
-                        translationCache[language][label] = polib.unescape(entry.msgstr)
+                        translationCache[language][label] = polib.escape(entry.msgstr)
                 # For untranslated strings, let's add the English entry
                 for entry in po.untranslated_entries():
                     for label in entry.comment.split():
                         print("Warning: Label '%s' for language '%s' remains untranslated"%(label,language))
-                        translationCache[language][label] = polib.unescape(entry.msgid)               
+                        translationCache[language][label] = polib.escape(entry.msgid)
 
 
 # Open our source NSI, dump it to a list and close it
 NSISourceFile = open(options.input,"r")
 NSISourceLines = NSISourceFile.readlines()
 NSISourceFile.close()
+NSINewLines = []
 
 incr = 0
 def getlineincr(no):
@@ -129,27 +150,29 @@ def getlineincr(no):
     incr += 1
     return incr+no
 
+def tostr(obj):
+    if type(obj) == unicode:
+        return obj.encode("utf-8")
+    else:
+        return obj
+
 # Here we scan for ";@INSERT_TRANSLATIONS@" in the NSIS, and add MUI_LANGUAGE macros and LangString's for translation languages
 lineNo = 1
 for line in NSISourceLines:
     if line.find(";@INSERT_TRANSLATIONS@") == 0:      
         for language,translations in translationCache.iteritems():
-			# if the language isn't the default, we add our MUI_LANGUAGE macro
+            # if the language isn't the default, we add our MUI_LANGUAGE macro
             if language.upper() != options.lang.upper():
-                NSISourceLines.insert(getlineincr(lineNo),'!insertmacro MUI_LANGUAGE "%s"\n'%language)
-			# For every translation we grabbed from the .po, let's add our LangString
+                NSINewLines.append( tostr('!insertmacro MUI_LANGUAGE "%s"\n'%language) )
+            # For every translation we grabbed from the .po, let's add our LangString
             for label,value in translations.iteritems():
-                NSISourceLines.insert(getlineincr(lineNo),'LangString %s ${LANG_%s} "%s"\n' % (label,language,value) )
-
-		# Remove the redundant ";@INSERT_TRANSATIONS@" to prevent this script working again
-        del NSISourceLines[lineNo-1]
-        break
+                NSINewLines.append( tostr('LangString %s ${LANG_%s} "%s"\n' % (label,language,value)) )
+    else:
+        NSINewLines.append ( line )
     
-    lineNo += 1
-
 # Finally, let's write our new .nsi to the desired target file
 NSIWorkingFile = open(options.output,"w")
-NSIWorkingFile.writelines(NSISourceLines)
+NSIWorkingFile.writelines(NSINewLines)
 NSIWorkingFile.close()
     
 print ( "NSI Localization Operation Complete" )

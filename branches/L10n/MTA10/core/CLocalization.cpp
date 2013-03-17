@@ -12,7 +12,7 @@
 
 #include "StdInc.h"
 #define MTA_LOCALE_DIR              "MTA/locale/"
-#define MTA_LOCALE_TEXTDOMAIN       "messages"
+#define MTA_LOCALE_TEXTDOMAIN       "client"
 
 CLocalization::CLocalization ( SString strLocalePath )
 {

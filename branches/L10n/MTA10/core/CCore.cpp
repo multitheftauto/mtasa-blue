@@ -814,7 +814,7 @@ T* InitModule ( CModuleLoader& m_Loader, const SString& strName, const SString& 
 
     if ( pfnInit == NULL )
     {
-        MessageBoxUTF8 ( 0, SString(_("%s module is incorrect!"),*strName), "Error", MB_OK | MB_ICONEXCLAMATION | MB_TOPMOST  );
+        MessageBoxUTF8 ( 0, SString(_("%s module is incorrect!"),*strName), "Error"+_E("CC40"), MB_OK | MB_ICONEXCLAMATION | MB_TOPMOST  );
         TerminateProcess ( GetCurrentProcess (), 1 );
     }
 
@@ -1120,7 +1120,7 @@ void CCore::DoPostFramePulse ( )
                     // Run the connect command
                     if ( strArguments.length () > 0 && !m_pCommands->Execute ( strArguments ) )
                     {
-                        ShowMessageBox ( _("Error"), _("Error executing URL"), MB_BUTTON_OK | MB_ICON_ERROR );
+                        ShowMessageBox ( _("Error")+_E("CC41"), _("Error executing URL"), MB_BUTTON_OK | MB_ICON_ERROR );
                     }
                 }
                 else
@@ -1133,7 +1133,7 @@ void CCore::DoPostFramePulse ( )
                         if ( !m_pModManager->Load ( szOptionValue, m_szCommandLineArgs ) )
                         {
                             SString strTemp ( _("Error running mod specified in command line ('%s')"), szOptionValue );
-                            ShowMessageBox ( _("Error"), strTemp, MB_BUTTON_OK | MB_ICON_ERROR );
+                            ShowMessageBox ( _("Error")+_E("CC42"), strTemp, MB_BUTTON_OK | MB_ICON_ERROR ); // Command line Mod load failed
                         }
                     }
                     // We want to connect to a server?

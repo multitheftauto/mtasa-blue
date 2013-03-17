@@ -44,7 +44,7 @@ std::map < uint, uint > ms_ReportAmountMap;
 // Used in the Win32 Client only
 //
 #ifdef _WINDOWS_ //Only for modules that use windows.h
-    int SharedUtil::MessageBoxUTF8 ( HWND hWnd, LPCSTR lpText, LPCSTR lpCaption, UINT uType )
+    int SharedUtil::MessageBoxUTF8 ( HWND hWnd, SString lpText, SString lpCaption, UINT uType )
     {
         WString strText = MbUTF8ToUTF16 ( lpText );
         WString strCaption = MbUTF8ToUTF16 ( lpCaption );
@@ -65,7 +65,7 @@ SString SharedUtil::GetMTASABaseDir ( void )
         strInstallRoot = GetRegistryValue ( "", "Last Run Location" );
         if ( strInstallRoot.empty () )
         {
-            MessageBoxUTF8 ( 0, _("Multi Theft Auto has not been installed properly, please reinstall."), "Error", MB_OK | MB_TOPMOST );
+            MessageBoxUTF8 ( 0, _("Multi Theft Auto has not been installed properly, please reinstall."), _("Error")+_E("U01"), MB_OK | MB_TOPMOST );
             TerminateProcess ( GetCurrentProcess (), 9 );
         }
     }

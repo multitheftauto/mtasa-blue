@@ -705,10 +705,10 @@ bool CommandLineContains( const SString& strText )
 //
 // General error message box
 //
-long DisplayErrorMessageBox ( const SString& strMessage, const SString& strTroubleType )
+long DisplayErrorMessageBox ( const SString& strMessage, const SString& strErrorCode, const SString& strTroubleType )
 {
     HideSplash ();
-    MessageBoxUTF8( 0, strMessage, _("Error! (CTRL+C to copy)"), MB_ICONEXCLAMATION|MB_OK | MB_TOPMOST );
+    MessageBoxUTF8( 0, strMessage, _("Error! (CTRL+C to copy)")+strErrorCode, MB_ICONEXCLAMATION|MB_OK | MB_TOPMOST );
 
     if ( strTroubleType != "" )
         BrowseToSolution ( strTroubleType, ASK_GO_ONLINE );
@@ -2041,7 +2041,7 @@ bool CheckAndShowFileOpenFailureMessage ( void )
     if ( !strFilename.empty () )
     {
         //SetApplicationSetting ( "diagnostics", "gta-fopen-fail", "" );
-        SString strMsg ( _("GTA:SA had trouble opening the file '%s'\n\nTry reinstalling GTA:SA to fix it"), *strFilename );
+        SString strMsg ( _("GTA:SA had trouble opening the file '%s'\n\nTry reinstalling GTA:SA to fix it"), _E("CL26"), *strFilename );
         MessageBoxUTF8 ( NULL, strMsg, "MTA: San Andreas", MB_OK | MB_ICONERROR | MB_TOPMOST );
         return true;
     }
