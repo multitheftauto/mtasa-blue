@@ -1653,9 +1653,9 @@ To install in a different folder, click Browse and select another folder.$\n$\n 
 LangString INST_CHOOSE_LOC3 ${LANG_ENGLISH}	"Destination Folder"
 LangString INST_CHOOSE_LOC_BROWSE ${LANG_ENGLISH}	"Browse..."
 LangString INST_CHOOSE_LOC_SET_DEFAULT ${LANG_ENGLISH} "Set default"
-LangString INST_CHOOSE_LOC_DEFAULT "Default"
-LangString INST_CHOOSE_LOC_LAST_USED "Last used"
-LangString INST_CHOOSE_LOC_CUSTOM "Custom"
+LangString INST_CHOOSE_LOC_DEFAULT ${LANG_ENGLISH} "Default"
+LangString INST_CHOOSE_LOC_LAST_USED ${LANG_ENGLISH} "Last used"
+LangString INST_CHOOSE_LOC_CUSTOM ${LANG_ENGLISH} "Custom"
 Function CustomDirectoryPage
 
 	nsDialogs::Create 1018
@@ -1832,7 +1832,7 @@ Function CustomDirectoryPageSetUpgradeMessage
         ${NSD_SetText} $UpgradeLabel "Warning: A different major version of MTA ($1) already exists at that path."
 	${Endif}
 	${If} $0 == "upgrade"
-        ${NSD_SetText} $UpgradeLabel ""$(INST_LOC_UPGRADE)"
+        ${NSD_SetText} $UpgradeLabel "$(INST_LOC_UPGRADE)"
 	${Endif}
 FunctionEnd
 
