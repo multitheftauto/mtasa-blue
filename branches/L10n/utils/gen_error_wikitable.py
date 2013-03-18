@@ -12,6 +12,7 @@
 
 import os
 import re
+import sys
 from optparse import OptionParser
 
 parser = OptionParser()
@@ -70,7 +71,7 @@ for root,dirs,files in os.walk(options.dir):
 
 
 #### Put into media wiki format
-wikicode = """
+wikicode = "<!-- Automatically generated with %s -->"%(os.path.relpath(sys.argv[0],options.dir)) + """
 {| class="wikitable" style="width: auto; text-align: center; table-layout: fixed;"
 |-
 !Error Code
@@ -82,10 +83,8 @@ for code,data in sorted(ErrorCodes.items()):
         wikicode += "|'''%s'''\n"%(code)
         wikicode += "|"
         if len(data["information"]) > 0:
-                for info in data["information"]:
-                        wikicode += info + "\n"
-        else:
-                wikicode += "\n"
+                wikicode += ("\n\n").join(data["information"])
+        wikicode += "\n"
         wikicode += "|%s:%s\n"%(data["file"],data["line"])
         #print code, data["information"], "%s:%s"%(data["file"],data["line"])
 

@@ -116,7 +116,7 @@ Page custom CustomDirectoryPage DirectoryLeaveProc
 ;Note: Assumes NSIS Unicode edition compiler
 !define MUI_LANGDLL_ALLLANGUAGES
 !define MUI_LANGDLL_REGISTRY_ROOT "HKLM" 
-!define MUI_LANGDLL_REGISTRY_KEY "SOFTWARE\Multi Theft Auto: San Andreas" 
+!define MUI_LANGDLL_REGISTRY_KEY "SOFTWARE\Multi Theft Auto: San Andreas All\${0.0}" 
 !define MUI_LANGDLL_REGISTRY_VALUENAME "Installer Language"
 !insertmacro MUI_RESERVEFILE_LANGDLL ;Solid compression optimization for multilang
 
@@ -191,7 +191,9 @@ FunctionEnd
 
 Function .onInit
 	${IfNot} ${UAC_IsInnerInstance}
-		!insertmacro MUI_LANGDLL_DISPLAY
+		!insertmacro MUI_LANGDLL_DISPLAY  # Only display our language selection in the outer (non-admin) instance
+	${Else}
+		!insertmacro UAC_AsUser_GetGlobalVar $LANGUAGE # Copy our selected language from the outer to the inner instance
 	${EndIf}
 	
 	; #############################################
@@ -1082,11 +1084,11 @@ FunctionEnd
 ;====================================================================================
 ; UAC related functions
 ;====================================================================================
-LangString UAC_RIGHTS1 ${LANG_ENGLISH}	"This ${un}installer requires admin access, try again"
-LangString UAC_RIGHTS2 ${LANG_ENGLISH}	"This ${un}installer requires admin access, try again"
+LangString UAC_RIGHTS1 ${LANG_ENGLISH}	"This installer requires admin access, try again"
+LangString UAC_RIGHTS_UN ${LANG_ENGLISH}	"This uninstaller requires admin access, try again"
 LangString UAC_RIGHTS3 ${LANG_ENGLISH}	"Logon service not running, aborting!"
 LangString UAC_RIGHTS4 ${LANG_ENGLISH}	"Unable to elevate"
-!macro RightsElevation un
+!macro RightsElevation AdminError
     uac_tryagain:
     !insertmacro UAC_RunElevated
     #MessageBox mb_TopMost "0=$0 1=$1 2=$2 3=$3"
@@ -1095,11 +1097,11 @@ LangString UAC_RIGHTS4 ${LANG_ENGLISH}	"Unable to elevate"
         ${IfThen} $1 = 1 ${|} Quit ${|} ;we are the outer process, the inner process has done its work, we are done
         ${IfThen} $3 <> 0 ${|} ${Break} ${|} ;we are admin, let the show go on
         ${If} $1 = 3 ;RunAs completed successfully, but with a non-admin user
-            MessageBox mb_IconExclamation|mb_TopMost|mb_SetForeground "$(UAC_RIGHTS1)" /SD IDNO IDOK uac_tryagain IDNO 0
+            MessageBox mb_IconExclamation|mb_TopMost|mb_SetForeground "${AdminError}" /SD IDNO IDOK uac_tryagain IDNO 0
         ${EndIf}
         ;fall-through and die
     ${Case} 1223
-        MessageBox mb_IconStop|mb_TopMost|mb_SetForeground "$(UAC_RIGHTS2)"
+        MessageBox mb_IconStop|mb_TopMost|mb_SetForeground "${AdminError}"
         Quit
     ${Case} 1062
         MessageBox mb_IconStop|mb_TopMost|mb_SetForeground "$(UAC_RIGHTS3)"
@@ -1111,11 +1113,11 @@ LangString UAC_RIGHTS4 ${LANG_ENGLISH}	"Unable to elevate"
 !macroend
 
 Function DoRightsElevation
-    !insertmacro RightsElevation ""
+    !insertmacro RightsElevation "$(UAC_RIGHTS1)"
 FunctionEnd
 
 Function un.DoRightsElevation
-    !insertmacro RightsElevation "un"
+    !insertmacro RightsElevation "$(UAC_RIGHTS_UN)"
 FunctionEnd
 
 
@@ -1708,7 +1710,7 @@ Function CustomDirectoryPage
 	${NSD_CreateDirRequest} 20% $PosY 63% 12u $CUSTOM_INSTDIR
 	Pop $DirRequest
     IntOp $PosY $PosY - 1
-	${NSD_CreateBrowseButton} 84% $PosY 15% 13u $(INST_CHOOSE_LOC_SET_DEFAULT)"
+	${NSD_CreateBrowseButton} 84% $PosY 15% 13u "$(INST_CHOOSE_LOC_SET_DEFAULT)"
 	Pop $BrowseButton
     IntOp $PosY $PosY + 31
 
