@@ -96,7 +96,7 @@ BEGIN
             VALUE "CompanyName", "Multi Theft Auto"
             VALUE "FileDescription", "Multi Theft Auto Launcher"
             VALUE "FileVersion", "1.4.0.0"
-            VALUE "LegalCopyright", "(C) 2003 - 2012 Multi Theft Auto"
+            VALUE "LegalCopyright", "(C) 2003 - 2013 Multi Theft Auto"
             VALUE "ProductName", "MTA San Andreas"
             VALUE "ProductVersion", "1.4.0.0"
         END
