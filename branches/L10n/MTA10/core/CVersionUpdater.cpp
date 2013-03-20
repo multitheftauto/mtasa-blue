@@ -2524,7 +2524,7 @@ void CVersionUpdater::_PollDownload ( void )
                     return;
                 }
                 if ( m_JobInfo.bShowDownloadPercent )
-                    GetQuestionBox ().SetMessage ( SString ( "%3d %% completed", m_JobInfo.uiBytesDownloaded * 100 / Max < unsigned int > ( 1, m_JobInfo.iFilesize ) ) );
+                    GetQuestionBox ().SetMessage ( SString ( _("%3d %% completed"), m_JobInfo.uiBytesDownloaded * 100 / Max < unsigned int > ( 1, m_JobInfo.iFilesize ) ) );
                 if ( m_JobInfo.iIdleTime > 1000 && m_JobInfo.iIdleTimeLeft > 500 )
                     GetQuestionBox ().AppendMessage ( SString ( _("\n\nWaiting for response  -  %-3d"), m_JobInfo.iIdleTimeLeft / 1000 ) );
                 else
