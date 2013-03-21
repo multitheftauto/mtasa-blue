@@ -56,7 +56,7 @@ public:
                                         CClientManager              ( void );
                                         ~CClientManager             ( void );
 
-    void                                DoPulse                     ( void );
+    void                                DoPulse                     ( bool bDoStandardPulses, bool bDoVehicleManagerPulse );
     void                                DoRender                    ( void );
     void                                UpdateStreamers             ( void );
 
