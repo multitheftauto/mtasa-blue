@@ -1014,8 +1014,7 @@ void CClientGame::DoPulses ( void )
     // Pulse the network interface
 
     // Extrapolation test - Change the pulse order to reduce latency (Has side effects for peds)
-    if ( !IsUsingAlternatePulseOrder( true ) )
-        DoPulses2 ();
+    DoPulses2( false );
 
     m_pUnoccupiedVehicleSync->DoPulse ();
     m_pPedSync->DoPulse ();
@@ -1299,15 +1298,47 @@ void CClientGame::DoPulses ( void )
 }
 
 // Extrapolation test
-void CClientGame::DoPulses2 ( void )
+void CClientGame::DoPulses2 ( bool bCalledFromIdle )
 {
-    // Pulse the network interface
-    TIMING_CHECKPOINT( "+NetPulse" );
-    g_pNet->DoPulse ();
-    TIMING_CHECKPOINT( "-NetPulse" );
+    bool bIsUsingAlternatePulseOrder = IsUsingAlternatePulseOrder( !bCalledFromIdle );
 
-    m_pManager->DoPulse ();
-    m_pNetAPI->DoPulse ();
+    // Figure out which pulses to do
+    bool bDoStandardPulses;
+    bool bDoVehicleManagerPulse;
+
+    if ( !bIsUsingAlternatePulseOrder )
+    {
+        // With std pulse order, do pulses when not called from idle
+        bDoStandardPulses = !bCalledFromIdle;
+        bDoVehicleManagerPulse = !bCalledFromIdle;
+    }
+    else
+    {
+        // With alt pulse order, do pulses when called from idle
+        bDoStandardPulses = bCalledFromIdle;
+        bDoVehicleManagerPulse = bCalledFromIdle;
+
+        // Except when watching a remote synced vehicle
+        if ( CClientVehicle* pTargetVehicle = DynamicCast < CClientVehicle > ( m_pCamera->GetTargetEntity() ) )
+            if ( pTargetVehicle->GetControllingPlayer() != m_pPlayerManager->GetLocalPlayer() )
+                bDoVehicleManagerPulse = !bDoVehicleManagerPulse;
+    }
+
+
+    if ( bDoStandardPulses )
+    {
+        // Pulse the network interface
+        TIMING_CHECKPOINT( "+NetPulse" );
+        g_pNet->DoPulse ();
+        TIMING_CHECKPOINT( "-NetPulse" );
+    }
+
+    m_pManager->DoPulse( bDoStandardPulses, bDoVehicleManagerPulse );
+
+    if ( bDoStandardPulses )
+    {
+        m_pNetAPI->DoPulse();
+    }
 }
 
 
@@ -3771,8 +3802,7 @@ void CClientGame::IdleHandler ( void )
     }
 
     // Extrapolation test - Change the pulse order to reduce latency (Has side effects for peds)
-    if ( IsUsingAlternatePulseOrder() )
-        DoPulses2 ();
+    DoPulses2( true );
 }
 
 

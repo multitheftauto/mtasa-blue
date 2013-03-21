@@ -219,7 +219,7 @@ public:
     void                                DoPulsePreHUDRender             ( bool bDidUnminimize, bool bDidRecreateRenderTargets );
     void                                DoPulsePostFrame                ( void );
     void                                DoPulses                        ( void );
-    void                                DoPulses2                       ( void );
+    void                                DoPulses2                       ( bool bCalledFromIdle );
 
     uint                                GetFrameTimeSlice               ( void ) { return m_uiFrameTimeSlice; }
     uint                                GetFrameCount                   ( void ) { return m_uiFrameCount; }
