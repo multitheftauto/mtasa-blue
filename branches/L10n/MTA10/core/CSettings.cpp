@@ -1213,7 +1213,10 @@ void CSettings::UpdateVideoTab ( bool bIsVideoModeChanged )
         {
             strChangedOptions += _("Resolution");
             if ( bNextFSMinimize != GetVideoModeManager ()->IsMinimizeEnabled () )
-                strChangedOptions += "/" += _("Full Screen Minimize");
+            {
+                strChangedOptions += "/";
+                strChangedOptions += _("Full Screen Minimize");
+            }
         }
 
         if ( bIsAntiAliasingChanged )
