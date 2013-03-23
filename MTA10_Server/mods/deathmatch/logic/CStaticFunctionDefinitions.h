@@ -555,6 +555,7 @@ public:
     static bool                 GetAircraftMaxHeight                ( float& fMaxHeight );
     static bool                 GetOcclusionsEnabled                ( bool& bEnabled );
     static bool                 GetMoonSize                         ( int& iSize );
+    static bool                 GetNonHighwayLimiterEnabled         ( bool& bEnabled );
 
     // General world set funcs
     static bool                 SetTime                             ( unsigned char ucHour, unsigned char ucMinute );
@@ -605,6 +606,7 @@ public:
     static bool                 IsPedTargetingMarkerEnabled         ( void );
     static bool                 SetMoonSize                         ( int iMoonSize );
     static bool                 ResetMoonSize                       ( void );
+    static bool                 SetNonHighwayLimiterEnabled         ( bool bEnabled );
 
     // Loaded Map Functions
     static CElement*            GetRootElement                      ( void );

@@ -10000,6 +10000,12 @@ bool CStaticFunctionDefinitions::GetOcclusionsEnabled ( bool& bEnabled )
     return true;
 }
 
+bool CStaticFunctionDefinitions::GetNonHighwayLimiterEnabled ( bool& bEnabled )
+{
+    bEnabled = g_pGame->GetNonHighwayLimiterEnabled ( );
+    return true;
+}
+
 bool CStaticFunctionDefinitions::SetTime ( unsigned char ucHour, unsigned char ucMinute )
 {
     // Verify the range
@@ -10194,6 +10200,17 @@ bool CStaticFunctionDefinitions::SetOcclusionsEnabled ( bool bEnabled )
     CBitStream BitStream;
     BitStream.pBitStream->WriteBit ( bEnabled );
     m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_OCCLUSIONS_ENABLED, *BitStream.pBitStream ) );
+
+    return true;
+}
+
+bool CStaticFunctionDefinitions::SetNonHighwayLimiterEnabled ( bool bEnabled )
+{
+    g_pGame->SetNonHighwayLimiterEnabled ( bEnabled );
+
+    CBitStream BitStream;
+    BitStream.pBitStream->WriteBit ( bEnabled );
+    m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_NONHIGHWAY_LIMITER_ENABLED, *BitStream.pBitStream ) );
 
     return true;
 }

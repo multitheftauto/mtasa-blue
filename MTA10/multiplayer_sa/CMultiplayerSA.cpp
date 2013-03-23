@@ -1606,6 +1606,7 @@ void CMultiplayerSA::DisableQuickReload ( bool bDisabled )
     else
         MemPut < WORD > ( 0x60B4F6, 0x027C );
 }
+
 void CMultiplayerSA::DisableCloseRangeDamage ( bool bDisabled )
 {
     if ( bDisabled )
@@ -1622,6 +1623,21 @@ void CMultiplayerSA::DisableCloseRangeDamage ( bool bDisabled )
 
     }
 }
+
+void CMultiplayerSA::DisableNonHighwayLimiter ( bool bDisabled )
+{
+    BYTE originalCode[5] = {0xA3, 0xB8, 0x7A, 0xC8, 0x00};
+    if ( bDisabled )
+    {
+        MemSet ( (LPVOID)0x72DF08, 0x90, 5 );
+        MemPut < BYTE > ( 0xC87AB9, 0x00 );
+    }
+    else
+    {
+        MemCpy ( (LPVOID)0x72DF08, &originalCode, 5 );
+    }
+}
+
 bool CMultiplayerSA::GetInteriorSoundsEnabled ( )
 {
     return bInteriorSoundsEnabled;

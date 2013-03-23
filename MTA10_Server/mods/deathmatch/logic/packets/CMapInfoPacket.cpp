@@ -69,7 +69,8 @@ CMapInfoPacket::CMapInfoPacket ( unsigned char ucWeather,
                                  float fAircraftMaxHeight,
                                  float fAircraftMaxVelocity,
                                  bool bOverrideMoonSize,
-                                 int iMoonSize )
+                                 int iMoonSize,
+                                 bool bNonHighwayLimiterEnabled )
 {
     m_ucWeather = ucWeather;
     m_ucWeatherBlendingTo = ucWeatherBlendingTo;
@@ -125,6 +126,7 @@ CMapInfoPacket::CMapInfoPacket ( unsigned char ucWeather,
     m_fAircraftMaxVelocity = fAircraftMaxVelocity;
     m_bOverrideMoonSize = bOverrideMoonSize;
     m_iMoonSize = iMoonSize;
+    m_bNonHighwayLimiterEnabled = bNonHighwayLimiterEnabled;
 }
 
 
@@ -211,6 +213,10 @@ bool CMapInfoPacket::Write ( NetBitStreamInterface& BitStream ) const
         BitStream.Write ( m_ucWaterBlue );
         BitStream.Write ( m_ucWaterAlpha );
     }
+
+    // Non-Highway Speed Limiter
+    if ( BitStream.Version () >= 0x045 )
+        BitStream.WriteBit ( m_bNonHighwayLimiterEnabled );
 
     // Interior sounds
     BitStream.WriteBit ( m_bInteriorSoundsEnabled );
