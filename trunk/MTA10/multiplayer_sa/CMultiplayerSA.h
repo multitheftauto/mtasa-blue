@@ -70,6 +70,7 @@ public:
     void                        DisableBirds                ( bool bDisabled );
     void                        DisableQuickReload          ( bool bDisable );
     void                        DisableCloseRangeDamage     ( bool bDisable );
+    void                        DisableNonHighwayLimiter    ( bool bDisabled );
 
     bool                        GetExplosionsDisabled       ();
     void                        DisableExplosions           ( bool bDisabled );

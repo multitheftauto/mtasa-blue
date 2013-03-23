@@ -503,6 +503,9 @@ void CMapManager::OnPlayerJoin ( CPlayer& Player )
     // Interior sounds
     bool bInteriorSoundsEnabled = g_pGame->GetInteriorSoundsEnabled ( );
 
+    // Non-Highway Speed Limiter
+    bool bNonHighwayLimiterEnabled = g_pGame->GetNonHighwayLimiterEnabled ( );
+
     // Rain level
     bool bOverrideRainLevel = g_pGame->HasRainLevel ( );
     float fRainLevel = g_pGame->GetRainLevel ( );
@@ -584,7 +587,8 @@ void CMapManager::OnPlayerJoin ( CPlayer& Player )
                                    fAircraftMaxHeight,
                                    fAircraftMaxVelocity,
                                    bOverrideMoonSize,
-                                   iMoonSize ) );
+                                   iMoonSize,
+                                   bNonHighwayLimiterEnabled ) );
 
     marker.Set ( "SendMapInfoPacket" );
 

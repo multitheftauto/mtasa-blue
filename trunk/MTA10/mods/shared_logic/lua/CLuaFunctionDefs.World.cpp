@@ -2057,3 +2057,31 @@ int CLuaFunctionDefs::ResetMoonSize ( lua_State* luaVM )
     lua_pushboolean ( luaVM, true );
     return 1;
 }
+
+int CLuaFunctionDefs::SetNonHighwayLimiterEnabled ( lua_State* luaVM )
+{
+    bool bEnabled = false;
+    CScriptArgReader argStream ( luaVM );
+
+    argStream.ReadBool( bEnabled );
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( CStaticFunctionDefinitions::SetNonHighwayLimiterEnabled ( bEnabled ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefs::GetNonHighwayLimiterEnabled ( lua_State* luaVM )
+{
+    lua_pushboolean ( luaVM, CStaticFunctionDefinitions::GetNonHighwayLimiterEnabled () );
+    return 1;
+}

@@ -47,6 +47,7 @@ void CLuaWorldDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "getAircraftMaxVelocity", CLuaWorldDefs::getAircraftMaxVelocity );
     CLuaCFunctions::AddFunction ( "getOcclusionsEnabled", CLuaWorldDefs::getOcclusionsEnabled );
     CLuaCFunctions::AddFunction ( "getMoonSize", CLuaWorldDefs::getMoonSize );
+    CLuaCFunctions::AddFunction ( "getNonHighwayLimiterEnabled", CLuaWorldDefs::getNonHighwayLimiterEnabled );
 
     // Set
     CLuaCFunctions::AddFunction ( "setTime", CLuaWorldDefs::setTime );
@@ -76,6 +77,7 @@ void CLuaWorldDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "setAircraftMaxVelocity", CLuaWorldDefs::setAircraftMaxVelocity );
     CLuaCFunctions::AddFunction ( "setOcclusionsEnabled", CLuaWorldDefs::setOcclusionsEnabled );
     CLuaCFunctions::AddFunction ( "setMoonSize", CLuaWorldDefs::setMoonSize );
+    CLuaCFunctions::AddFunction ( "setNonHighwayLimiterEnabled", CLuaWorldDefs::setNonHighwayLimiterEnabled );
 
     // Reset
     CLuaCFunctions::AddFunction ( "resetSkyGradient", CLuaWorldDefs::resetSkyGradient );
@@ -1398,6 +1400,41 @@ int CLuaWorldDefs::getOcclusionsEnabled ( lua_State* luaVM )
         lua_pushboolean ( luaVM, bEnabled );
         return 1;
     }
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaWorldDefs::setNonHighwayLimiterEnabled ( lua_State* luaVM )
+{
+    bool bEnabled = false;
+    CScriptArgReader argStream ( luaVM );
+
+    argStream.ReadBool( bEnabled );
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( CStaticFunctionDefinitions::SetNonHighwayLimiterEnabled ( bEnabled ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaWorldDefs::getNonHighwayLimiterEnabled ( lua_State* luaVM )
+{
+    bool bEnabled = true;
+    if ( CStaticFunctionDefinitions::GetNonHighwayLimiterEnabled ( bEnabled ) )
+    {
+        lua_pushboolean ( luaVM, bEnabled );
+        return 1;
+    }
+
     lua_pushboolean ( luaVM, false );
     return 1;
 }
