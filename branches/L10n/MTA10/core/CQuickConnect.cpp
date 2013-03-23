@@ -169,7 +169,7 @@ bool CQuickConnect::OnConnectButtonClick ( CGUIElement* pElement )
     CVARS_GET ( "nick", strNick );
     if ( !CCore::GetSingleton ().IsValidNick ( strNick.c_str () ) )
     {
-        CCore::GetSingleton ().ShowMessageBox ( _("Error")+_E("CC63"), _("Invalid nickname! Please go to Settings and set a new!"), MB_BUTTON_OK | MB_ICON_INFO );
+        CCore::GetSingleton ().ShowMessageBox ( _("Error")+_E("CC63"), _("Invalid nickname! Please go to Settings and set a new one!"), MB_BUTTON_OK | MB_ICON_INFO );
         return true;
     }
 

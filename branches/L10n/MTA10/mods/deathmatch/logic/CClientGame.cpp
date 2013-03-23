@@ -1191,31 +1191,31 @@ void CClientGame::DoPulses ( void )
                 switch ( ucError )
                 {
                     case RID_RSA_PUBLIC_KEY_MISMATCH:
-                        strError = _("Disconnected: unknown protocol error."); strErrorCode = _E("CD10"); // encryption key mismatch
+                        strError = _("Disconnected: unknown protocol error"); strErrorCode = _E("CD10"); // encryption key mismatch
                         break;
                     case RID_REMOTE_DISCONNECTION_NOTIFICATION:
-                        strError = _("Disconnected: disconnected remotely."); strErrorCode = _E("CD11");
+                        strError = _("Disconnected: disconnected remotely"); strErrorCode = _E("CD11");
                         break;
                     case RID_REMOTE_CONNECTION_LOST:
-                        strError = _("Disconnected: connection lost remotely."); strErrorCode = _E("CD12");
+                        strError = _("Disconnected: connection lost remotely"); strErrorCode = _E("CD12");
                         break;
                     case RID_CONNECTION_BANNED:
-                        strError = _("Disconnected: you are banned from this server."); strErrorCode = _E("CD13");
+                        strError = _("Disconnected: you are banned from this server"); strErrorCode = _E("CD13");
                         break;
                     case RID_NO_FREE_INCOMING_CONNECTIONS:
-                        strError = _("Disconnected: the server is currently full."); strErrorCode = _E("CD14");
+                        strError = _("Disconnected: the server is currently full"); strErrorCode = _E("CD14");
                         break;
                     case RID_DISCONNECTION_NOTIFICATION:
-                        strError = _("Disconnected: disconnected from the server."); strErrorCode = _E("CD15");
+                        strError = _("Disconnected: disconnected from the server"); strErrorCode = _E("CD15");
                         break;
                     case RID_CONNECTION_LOST:
-                        strError = _("Disconnected: connection to the server was lost."); strErrorCode = _E("CD16");
+                        strError = _("Disconnected: connection to the server was lost"); strErrorCode = _E("CD16");
                         break;
                     case RID_INVALID_PASSWORD:
-                        strError = _("Disconnected: invalid password specified."); strErrorCode = _E("CD17");
+                        strError = _("Disconnected: invalid password specified"); strErrorCode = _E("CD17");
                         break;
                     default:
-                        strError = _("Disconnected: connection was refused."); strErrorCode = _E("CD18");
+                        strError = _("Disconnected: connection was refused"); strErrorCode = _E("CD18");
                         break;
                 }
 

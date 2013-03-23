@@ -108,6 +108,14 @@ localeToName = {
     "zu" : "Zulu",
 }
 
+def escapeNSIS(st):
+    return st.replace('\\', r'$\\')\
+             .replace('\t', r'$\t')\
+             .replace('\r', r'$\r')\
+             .replace('\n', r'$\n')\
+             .replace('\"', r'$\"')\
+             .replace('$$\\', '$\\')
+
 translationCache = {}
 
 # The purpose of this loop is to go to the podir scanning for PO files for each locale name
@@ -124,18 +132,18 @@ for root,dirs,files in os.walk(options.podir):
                 translationCache[language] = collections.OrderedDict()
                 
                 # Let's add a default LANGUAGE_CODE LangString to be read
-                translationCache[language]["LANGUAGE_CODE"] = language
+                translationCache[language]["LANGUAGE_CODE"] = filename
 
                 po = polib.pofile(os.path.join(root,file))
                 for entry in po.translated_entries():
                     # Loop through all our labels and add translation (each translation may have multiple labels)
                     for label in entry.comment.split():
-                        translationCache[language][label] = polib.escape(entry.msgstr)
+                        translationCache[language][label] = escapeNSIS(entry.msgstr)
                 # For untranslated strings, let's add the English entry
                 for entry in po.untranslated_entries():
                     for label in entry.comment.split():
                         print("Warning: Label '%s' for language '%s' remains untranslated"%(label,language))
-                        translationCache[language][label] = polib.escape(entry.msgid)
+                        translationCache[language][label] = escapeNSIS(entry.msgid)
 
 
 # Open our source NSI, dump it to a list and close it
@@ -159,14 +167,17 @@ def tostr(obj):
 # Here we scan for ";@INSERT_TRANSLATIONS@" in the NSIS, and add MUI_LANGUAGE macros and LangString's for translation languages
 lineNo = 1
 for line in NSISourceLines:
-    if line.find(";@INSERT_TRANSLATIONS@") == 0:      
+    if line.find(";@INSERT_TRANSLATIONS@") == 0:
         for language,translations in translationCache.iteritems():
+            count = 0
             # if the language isn't the default, we add our MUI_LANGUAGE macro
             if language.upper() != options.lang.upper():
                 NSINewLines.append( tostr('!insertmacro MUI_LANGUAGE "%s"\n'%language) )
             # For every translation we grabbed from the .po, let's add our LangString
             for label,value in translations.iteritems():
                 NSINewLines.append( tostr('LangString %s ${LANG_%s} "%s"\n' % (label,language,value)) )
+                count += 1
+            print ( "%i translations merged for language '%s'"%(count,language) )
     else:
         NSINewLines.append ( line )
     

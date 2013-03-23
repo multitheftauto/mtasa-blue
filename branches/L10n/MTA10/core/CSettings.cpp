@@ -141,7 +141,7 @@ void CSettings::CreateGUI ( void )
     //Mouse Options
     m_pControlsMouseLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabControls, _("Mouse options") ) );
     m_pControlsMouseLabel->SetPosition ( CVector2D ( vecTemp.fX + 11, vecTemp.fY ) );
-    m_pControlsMouseLabel->AutoSize ( _("Mouse options  ") );
+    m_pControlsMouseLabel->AutoSize ( _("Mouse options") );
     m_pControlsMouseLabel->SetFont ( "default-bold-small" );
     vecTemp.fY += 18;
 
@@ -191,7 +191,7 @@ void CSettings::CreateGUI ( void )
     //Joypad options
     m_pControlsJoypadLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabControls, _("Joypad options") ) );
     m_pControlsJoypadLabel->SetPosition ( CVector2D ( 11, vecTemp.fY ) );
-    m_pControlsJoypadLabel->AutoSize ( _("Joypad options  ") );
+    m_pControlsJoypadLabel->AutoSize ( _("Joypad options") );
     m_pControlsJoypadLabel->SetFont ( "default-bold-small" );
     vecTemp.fY += 18;
 
@@ -408,7 +408,7 @@ void CSettings::CreateGUI ( void )
     m_pAudioGeneralLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, _("General") ) );
     m_pAudioGeneralLabel->SetPosition ( CVector2D ( 11, 13 ) );
     m_pAudioGeneralLabel->GetPosition ( vecTemp, false );
-    m_pAudioGeneralLabel->AutoSize ( _("General  ") );
+    m_pAudioGeneralLabel->AutoSize ( _("General") );
     m_pAudioGeneralLabel->SetFont ( "default-bold-small" );
 
     m_pLabelRadioVolume = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, _("Radio volume:") ) );
@@ -478,7 +478,7 @@ void CSettings::CreateGUI ( void )
     m_pAudioUsertrackLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, _("Usertrack options") ) );
     m_pAudioUsertrackLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 40.0f ), false );
     m_pAudioUsertrackLabel->GetPosition ( vecTemp, false );
-    m_pAudioUsertrackLabel->AutoSize ( _("Usertrack options  ") );
+    m_pAudioUsertrackLabel->AutoSize ( _("Usertrack options") );
     m_pAudioUsertrackLabel->SetFont ( "default-bold-small" );
 
     m_pLabelUserTrackMode = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, _("Play mode:") ) );
@@ -511,13 +511,13 @@ void CSettings::CreateGUI ( void )
     m_pVideoGeneralLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, _("General") ) );
     m_pVideoGeneralLabel->SetPosition ( CVector2D ( 11, 13 ) );
     m_pVideoGeneralLabel->GetPosition ( vecTemp, false );
-    m_pVideoGeneralLabel->AutoSize ( _("General  ") );
+    m_pVideoGeneralLabel->AutoSize ( _("General") + "  " );
     m_pVideoGeneralLabel->SetFont ( "default-bold-small" );
 
     m_pVideoResolutionLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, _("Resolution:") ) );
     m_pVideoResolutionLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 28.0f ) );
     m_pVideoResolutionLabel->GetPosition ( vecTemp, false );
-    m_pVideoResolutionLabel->AutoSize ( _("Resolution: ") );
+    m_pVideoResolutionLabel->AutoSize ( _("Resolution:") );
 
     m_pComboResolution = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabVideo, "" ) );
     m_pComboResolution->SetPosition ( CVector2D ( vecTemp.fX + 86.0f, vecTemp.fY - 5.0f ) );
@@ -568,7 +568,7 @@ void CSettings::CreateGUI ( void )
     m_pDrawDistanceLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, _("Draw Distance:") ) );
     m_pDrawDistanceLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 30.0f ) );
     m_pDrawDistanceLabel->GetPosition ( vecTemp, false );
-    m_pDrawDistanceLabel->AutoSize ( _("Draw Distance: ") );
+    m_pDrawDistanceLabel->AutoSize ( _("Draw Distance:") );
 
     m_pDrawDistance = reinterpret_cast < CGUIScrollBar* > ( pManager->CreateScrollBar ( true, pTabVideo ) );
     m_pDrawDistance->SetPosition ( CVector2D ( vecTemp.fX + 86.0f, vecTemp.fY ) );
@@ -583,7 +583,7 @@ void CSettings::CreateGUI ( void )
     m_pBrightnessLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, _("Brightness:") ) );
     m_pBrightnessLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 29.0f ) );
     m_pBrightnessLabel->GetPosition ( vecTemp, false );
-    m_pBrightnessLabel->AutoSize ( _("Brightness: ") );
+    m_pBrightnessLabel->AutoSize ( _("Brightness:") );
 
     m_pBrightness = reinterpret_cast < CGUIScrollBar* > ( pManager->CreateScrollBar ( true, pTabVideo ) );
     m_pBrightness->SetPosition ( CVector2D ( vecTemp.fX + 86.0f, vecTemp.fY ) );
@@ -597,7 +597,7 @@ void CSettings::CreateGUI ( void )
     m_pFXQualityLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, _("FX Quality:") ) );
     m_pFXQualityLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 29.0f ) );
     m_pFXQualityLabel->GetPosition ( vecTemp, false );
-    m_pFXQualityLabel->AutoSize ( _("FX Quality: ") );
+    m_pFXQualityLabel->AutoSize ( _("FX Quality:") );
 
     m_pComboFxQuality = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabVideo, "" ) );
     m_pComboFxQuality->SetPosition ( CVector2D ( vecTemp.fX + 86.0f, vecTemp.fY - 1.0f ) );
@@ -646,7 +646,7 @@ void CSettings::CreateGUI ( void )
     m_pAntiAliasingLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, _("Anti-aliasing:") ) );
     m_pAntiAliasingLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 30.0f ) );
     m_pAntiAliasingLabel->GetPosition ( vecTemp, false );
-    m_pAntiAliasingLabel->AutoSize ( _("Anti-aliasing: ") );
+    m_pAntiAliasingLabel->AutoSize ( _("Anti-aliasing:") );
 
     m_pComboAntiAliasing = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabVideo, "" ) );
     m_pComboAntiAliasing->SetPosition ( CVector2D ( vecTemp.fX + 86.0f, vecTemp.fY - 1.0f ) );
@@ -661,7 +661,7 @@ void CSettings::CreateGUI ( void )
     m_pAspectRatioLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, _("Aspect Ratio:") ) );
     m_pAspectRatioLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 30.0f ) );
     m_pAspectRatioLabel->GetPosition ( vecTemp, false );
-    m_pAspectRatioLabel->AutoSize ( _("Aspect Ratio: ") );
+    m_pAspectRatioLabel->AutoSize ( _("Aspect Ratio:") );
 
     m_pComboAspectRatio = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabVideo, "" ) );
     m_pComboAspectRatio->SetPosition ( CVector2D ( vecTemp.fX + 86.0f, vecTemp.fY - 1.0f ) );
@@ -675,13 +675,13 @@ void CSettings::CreateGUI ( void )
     m_pMapRenderingLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, _("Map rendering options") ) );
     m_pMapRenderingLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 38.0f ) );
     m_pMapRenderingLabel->GetPosition ( vecTemp, false );
-    m_pMapRenderingLabel->AutoSize ( _("Map rendering options ") );
+    m_pMapRenderingLabel->AutoSize ( _("Map rendering options") );
     m_pMapRenderingLabel->SetFont ( "default-bold-small" );
 
     m_pMapAlphaLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, _("Opacity:") ) );
     m_pMapAlphaLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 24.0f ) );
     m_pMapAlphaLabel->GetPosition ( vecTemp, false );
-    m_pMapAlphaLabel->AutoSize ( _("Opacity: ") );
+    m_pMapAlphaLabel->AutoSize ( _("Opacity:") );
 
     m_pMapAlpha = reinterpret_cast < CGUIScrollBar* > ( pManager->CreateScrollBar ( true, pTabVideo ) );
     m_pMapAlpha->SetPosition ( CVector2D ( vecTemp.fX + 86.0f, vecTemp.fY ) );
@@ -744,7 +744,7 @@ void CSettings::CreateGUI ( void )
     {
         CGUILabel* pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabInterface, _("Chat") ) );
         pLabel->SetPosition ( CVector2D ( 10.0f, 90.0f ) );
-        pLabel->AutoSize ( _("Chat  ") );
+        pLabel->AutoSize ( _("Chat") );
         pLabel->SetFont ( "default-bold-small" );
     }
 
@@ -856,7 +856,7 @@ void CSettings::CreateGUI ( void )
         pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabInterface, _("after") ) );
         pLabel->SetPosition ( CVector2D ( vecTemp.fX + 17.0f, vecTemp.fY + 22.0f ) );
         pLabel->GetPosition ( vecTemp );
-        pLabel->AutoSize ( _("after ") );
+        pLabel->AutoSize ( _("after") );
 
         m_pChatLineLife = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( pTabInterface, "" ) );
         m_pChatLineLife->SetPosition ( CVector2D ( vecTemp.fX + 40.0f, vecTemp.fY - 2.0f ) );
@@ -1006,7 +1006,7 @@ void CSettings::CreateGUI ( void )
     m_pAdvancedUpdaterLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, _("Auto updater") ) );
     m_pAdvancedUpdaterLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY ) );
     m_pAdvancedUpdaterLabel->SetFont ( "default-bold-small" );
-    m_pAdvancedUpdaterLabel->AutoSize ( ("Auto updater") );
+    m_pAdvancedUpdaterLabel->AutoSize ( _("Auto updater") );
     vecTemp.fY += 20;
 
     // Update build type
@@ -1213,7 +1213,7 @@ void CSettings::UpdateVideoTab ( bool bIsVideoModeChanged )
         {
             strChangedOptions += _("Resolution");
             if ( bNextFSMinimize != GetVideoModeManager ()->IsMinimizeEnabled () )
-                strChangedOptions += _("/Full Screen Minimize");
+                strChangedOptions += "/" += _("Full Screen Minimize");
         }
 
         if ( bIsAntiAliasingChanged )

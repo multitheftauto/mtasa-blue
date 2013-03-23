@@ -7,6 +7,7 @@
 !include GameExplorer.nsh
 !include WinVer.nsh
 !include nsArray.nsh
+!include Utils.nsh
 
 XPStyle on
 RequestExecutionLevel user
@@ -42,9 +43,9 @@ Var ShowLastUsed
 ; ###########################################################################################################
 !ifndef FILES_ROOT
 	!define LIGHTBUILD    ; enable LIGHTBUILD for nightly
-	!define FILES_ROOT "Install files builder/output"
-	!define SERVER_FILES_ROOT "Install files builder/output/server"
-	!define FILES_MODULE_SDK "Install files builder/output/development/publicsdk"
+	!define FILES_ROOT "D:/DevelopmentWorkspace/mtasa-blue/output"
+	!define SERVER_FILES_ROOT "D:/DevelopmentWorkspace/mtasa-blue/output/MTA San Andreas/server"
+	!define FILES_MODULE_SDK "D:/DevelopmentWorkspace/mtasa-blue/output/MTA San Andreas/development/publicsdk"
 	!define INSTALL_OUTPUT "mtasa-${0.0.0}-unstable-00000-0-000-nsis.exe"
 	!define PRODUCT_VERSION "v${0.0.0}-unstable-00000-0-000"
 	!define REVISION "0000"
@@ -58,6 +59,7 @@ Var ShowLastUsed
 !endif
 !define EXPAND_DIALOG_X 134
 !define EXPAND_DIALOG_Y 60
+!define DIALOG_X 450
 ; ###########################################################################################################
 
 ;ReserveFile "${NSISDIR}\Plugins\InstallOptions.dll"
@@ -1641,7 +1643,10 @@ Var LabelDefault
 Var RadioLastUsed
 Var LabelLastUsed
 Var RadioCustom
+Var Length
+Var SizeX
 Var SizeY
+Var PosX
 Var PosY
 !define LT_GREY "0xf0f0f0"
 !define MID_GREY "0xb0b0b0"
@@ -1654,7 +1659,6 @@ LangString INST_CHOOSE_LOC2 ${LANG_ENGLISH}	"${PRODUCT_NAME_NO_VER} ${PRODUCT_VE
 To install in a different folder, click Browse and select another folder.$\n$\n Click Next to continue."
 LangString INST_CHOOSE_LOC3 ${LANG_ENGLISH}	"Destination Folder"
 LangString INST_CHOOSE_LOC_BROWSE ${LANG_ENGLISH}	"Browse..."
-LangString INST_CHOOSE_LOC_SET_DEFAULT ${LANG_ENGLISH} "Set default"
 LangString INST_CHOOSE_LOC_DEFAULT ${LANG_ENGLISH} "Default"
 LangString INST_CHOOSE_LOC_LAST_USED ${LANG_ENGLISH} "Last used"
 LangString INST_CHOOSE_LOC_CUSTOM ${LANG_ENGLISH} "Custom"
@@ -1685,32 +1689,49 @@ Function CustomDirectoryPage
 	${NSD_CreateGroupBox} 0 $PosY 100% $SizeY "$(INST_CHOOSE_LOC3)"
 	Pop $0
     IntOp $PosY $PosY + 24
-
+	
+	# Pick the longest string and use that as SizeX
+	!insertmacro GetTextExtent "$(INST_CHOOSE_LOC_DEFAULT)" $SizeX
+	!insertmacro GetTextExtent "$(INST_CHOOSE_LOC_LAST_USED)" $Length
+	!insertmacro Max $SizeX $Length
+	!insertmacro GetTextExtent "$(INST_CHOOSE_LOC_CUSTOM)" $Length
+	!insertmacro Max $SizeX $Length
+	
+	IntOp $SizeX $SizeX + 6 # Take into account the radio button itself
+    IntOp $PosX $SizeX + 20	# Take into account the x padding of 10, plus spacing of 15
+	IntOp $Length ${DIALOG_X} - $PosX # [Total width] - [radio button width]
+	IntOp $Length $Length - 10 # [Total width] - [radio button width] - [padding]
     # Add default option
-    ${NSD_CreateRadioButton} 10 $PosY 70 12u "$(INST_CHOOSE_LOC_DEFAULT)"
+    ${NSD_CreateRadioButton} 10 $PosY $SizeX 12u "$(INST_CHOOSE_LOC_DEFAULT)"
 	Pop $RadioDefault
-	${NSD_CreateText} 20% $PosY 79% 12u $DEFAULT_INSTDIR
+	${NSD_CreateText} $PosX $PosY $Length 12u $DEFAULT_INSTDIR
 	Pop $LabelDefault
     SendMessage $LabelDefault ${EM_SETREADONLY} 1 0
     IntOp $PosY $PosY + 30
 
     # Add last used option
 	${If} $ShowLastUsed != "0"
-        ${NSD_CreateRadioButton} 10 $PosY 70 12u "$(INST_CHOOSE_LOC_LAST_USED)"
+        ${NSD_CreateRadioButton} 10 $PosY $SizeX 12u "$(INST_CHOOSE_LOC_LAST_USED)"
         Pop $RadioLastUsed
-        ${NSD_CreateText} 20% $PosY 79% 12u $LAST_INSTDIR
+        ${NSD_CreateText} $PosX $PosY $Length 12u $LAST_INSTDIR
         Pop $LabelLastUsed
         SendMessage $LabelLastUsed ${EM_SETREADONLY} 1 0
         IntOp $PosY $PosY + 30
 	${EndIf}
 
     # Add custom option
-    ${NSD_CreateRadioButton} 10 $PosY 70 12u "$(INST_CHOOSE_LOC_CUSTOM)"
+    ${NSD_CreateRadioButton} 10 $PosY $SizeX 12u "$(INST_CHOOSE_LOC_CUSTOM)"
 	Pop $RadioCustom
-	${NSD_CreateDirRequest} 20% $PosY 63% 12u $CUSTOM_INSTDIR
+	
+	!insertmacro GetTextExtent "$(INST_CHOOSE_LOC_BROWSE)" $R9
+	IntOp $R9 $R9 + 5 # Add spacing for the button on top of text
+	IntOp $Length $Length - $R9
+	${NSD_CreateDirRequest} $PosX $PosY $Length 12u $CUSTOM_INSTDIR
 	Pop $DirRequest
     IntOp $PosY $PosY - 1
-	${NSD_CreateBrowseButton} 84% $PosY 15% 13u "$(INST_CHOOSE_LOC_SET_DEFAULT)"
+	IntOp $PosX ${DIALOG_X} - $R9
+	IntOp $PosX $PosX - 10
+	${NSD_CreateBrowseButton} $PosX $PosY $R9 13u "$(INST_CHOOSE_LOC_BROWSE)"
 	Pop $BrowseButton
     IntOp $PosY $PosY + 31
 

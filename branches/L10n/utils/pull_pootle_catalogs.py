@@ -28,14 +28,17 @@ parser.add_option("-G", "--gnu",action="store_true", dest="gnu", default=False,
             help="Whether the project is a GNU directory layout")
 parser.add_option("-L", "--languages",dest="languages", 
             help="A JSON list of languages to pull from Pootle", default='["nl", "ru"]')
+parser.add_option("-r", "--rmdir",action="store_true", dest="rmdir", default=False,
+            help="Clear the output directory before starting")
 
 (options, args) = parser.parse_args()
 
-# e.g http://pootle.multitheftauto.com/export/client/nl/client.po
-# Clear our output directory first
-if os.path.exists(options.output):
-    shutil.rmtree(options.output)
-print ( "Cleared output directory: '%s'"%(options.output) )
+# e.g http://translate.multitheftauto.com/export/client/nl/client.po
+if options.rmdir:
+    # Clear our output directory first
+    if os.path.exists(options.output):
+        shutil.rmtree(options.output)
+    print ( "Cleared output directory: '%s'"%(options.output) )
 
 # Let's decode our JSON list into a Python list, and loop it
 for lang in json.loads(options.languages):

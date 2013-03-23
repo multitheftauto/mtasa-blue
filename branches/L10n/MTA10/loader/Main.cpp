@@ -355,7 +355,7 @@ int DoLaunchGame ( LPSTR lpCmdLine )
     SString strGTAPath;
     ePathResult iResult = GetGamePath ( strGTAPath, true );
     if ( iResult == GAME_PATH_MISSING ) {
-        DisplayErrorMessageBox ( _("Registry entries are is missing. Please reinstall Multi Theft Auto: San Andreas."), _E("CL12"), "reg-entries-missing" );
+        DisplayErrorMessageBox ( _("Registry entries are missing. Please reinstall Multi Theft Auto: San Andreas."), _E("CL12"), "reg-entries-missing" );
         return 5;
     }
     else if ( iResult == GAME_PATH_UNICODE_CHARS ) {

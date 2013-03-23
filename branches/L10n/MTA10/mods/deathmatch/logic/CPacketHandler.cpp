@@ -472,7 +472,7 @@ void CPacketHandler::Packet_ServerDisconnected ( NetBitStreamInterface& bitStrea
             strReason = _("Disconnect from server"); strErrorCode = _E("CD31");
             break;
         case ePlayerDisconnectType::BANNED_SERIAL:
-            strReason = _("Disconnected: Serial is banned.\nReason:%s"); strErrorCode = _E("CD32");
+            strReason = _("Disconnected: Serial is banned.\nReason: %s"); strErrorCode = _E("CD32");
             bitStream.ReadString ( strDuration );
             break;
         case ePlayerDisconnectType::BANNED_IP:
@@ -491,13 +491,13 @@ void CPacketHandler::Packet_ServerDisconnected ( NetBitStreamInterface& bitStrea
             strReason = _("Disconnected: Server from different branch.\nInformation: %s"); strErrorCode = _E("CD37");
             break;
         case ePlayerDisconnectType::BAD_VERSION:
-            strReason = _("Disconnected: Bad version.\nInformation: "); strErrorCode = _E("CD38");
+            strReason = _("Disconnected: Bad version.\nInformation: %s"); strErrorCode = _E("CD38");
             break;
         case ePlayerDisconnectType::SERVER_NEWER:
-            strReason = _("Disconnected: Server is running a newer build.\nInformation: "); strErrorCode = _E("CD39");
+            strReason = _("Disconnected: Server is running a newer build.\nInformation: %s"); strErrorCode = _E("CD39");
             break;
         case ePlayerDisconnectType::SERVER_OLDER:
-            strReason = _("Disconnected: Server is running an older build.\nInformation: "); strErrorCode = _E("CD40");
+            strReason = _("Disconnected: Server is running an older build.\nInformation: %s"); strErrorCode = _E("CD40");
             break;
         case ePlayerDisconnectType::NICK_CLASH:
             strReason = _("Disconnected: Nick already in use"); strErrorCode = _E("CD41");
@@ -506,7 +506,7 @@ void CPacketHandler::Packet_ServerDisconnected ( NetBitStreamInterface& bitStrea
             strReason = _("Disconnected: Player Element Could not be created."); strErrorCode = _E("CD42");
             break;
         case ePlayerDisconnectType::GENERAL_REFUSED:
-            strReason = _("Disconnected: server refused the connection: %s"); strErrorCode = _E("CD43");
+            strReason = _("Disconnected: Server refused the connection: %s"); strErrorCode = _E("CD43");
             break;
         case ePlayerDisconnectType::SERIAL_VERIFICATION:
             strReason = _("Disconnected: Serial verification failed"); strErrorCode = _E("CD44");

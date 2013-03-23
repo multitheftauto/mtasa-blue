@@ -281,16 +281,16 @@ void CConnectManager::DoPulse ( void )
                         CServerInfo::GetSingletonPtr()->Show ( eWindowTypes::SERVER_INFO_QUEUE, m_strHost.c_str(), m_usPort, m_strPassword.c_str() );
                         break;
                     case RID_DISCONNECTION_NOTIFICATION:
-                        strError = _("Disconnected: disconnected"); strErrorCode = _E("CC28");
+                        strError = _("Disconnected: disconnected from the server"); strErrorCode = _E("CC28");
                         break;
                     case RID_CONNECTION_LOST:
-                        strError = _("Disconnected: connection lost"); strErrorCode = _E("CC29");
+                        strError = _("Disconnected: connection to the server was lost"); strErrorCode = _E("CC29");
                         break;
                     case RID_INVALID_PASSWORD:
                         CServerInfo::GetSingletonPtr()->Show ( eWindowTypes::SERVER_INFO_PASSWORD, m_strHost.c_str(), m_usPort, m_strPassword.c_str() );
                         break;
                     default:
-                        strError = _("Disconnected: connection refused"); strErrorCode = _E("CC30");
+                        strError = _("Disconnected: connection was refused"); strErrorCode = _E("CC30");
                         break;
                 }
 
