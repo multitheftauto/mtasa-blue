@@ -2143,17 +2143,6 @@ void CPacketHandler::Packet_MapInfo ( NetBitStreamInterface& bitStream )
         CStaticFunctionDefinitions::SetWaterColor ( ucRed, ucGreen, ucBlue, ucAlpha );
     }
 
-    // Non-Highway Speed Limiter Enabled
-    bool bNonHighwayLimiterEnabled = true;
-    if ( bitStream.Version () >= 0x045 )
-    {
-        if ( !bitStream.ReadBit ( bNonHighwayLimiterEnabled ) )
-            return;
-
-        g_pMultiplayer->DisableNonHighwayLimiter( !bNonHighwayLimiterEnabled );
-        g_pClientGame->SetNonHighwayLimiterEnabled ( bNonHighwayLimiterEnabled );
-    }
-
     // Interior sounds
     bool bInteriorSoundsEnabled = true;
     if ( !bitStream.ReadBit ( bInteriorSoundsEnabled ) )

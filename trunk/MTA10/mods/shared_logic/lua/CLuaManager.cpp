@@ -1020,8 +1020,6 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getBirdsEnabled", CLuaFunctionDefs::GetBirdsEnabled );
     CLuaCFunctions::AddFunction ( "setPedTargetingMarkerEnabled", CLuaFunctionDefs::SetPedTargetingMarkerEnabled );
     CLuaCFunctions::AddFunction ( "isPedTargetingMarkerEnabled", CLuaFunctionDefs::IsPedTargetingMarkerEnabled );
-    CLuaCFunctions::AddFunction ( "setNonHighwayLimiterEnabled", CLuaFunctionDefs::SetNonHighwayLimiterEnabled );
-    CLuaCFunctions::AddFunction ( "getNonHighwayLimiterEnabled", CLuaFunctionDefs::GetNonHighwayLimiterEnabled );
 
     // Input functions
     CLuaCFunctions::AddFunction ( "bindKey", CLuaFunctionDefs::BindKey );

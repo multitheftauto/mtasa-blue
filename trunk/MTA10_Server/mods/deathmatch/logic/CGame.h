@@ -276,9 +276,6 @@ public:
     inline bool                 GetInteriorSoundsEnabled    ( void )        { return m_bInteriorSoundsEnabled; }
     inline void                 SetInteriorSoundsEnabled    ( bool bEnable )    { m_bInteriorSoundsEnabled = bEnable; }
 
-    inline bool                 GetNonHighwayLimiterEnabled ( void )        { return m_bNonHighwayLimiterEnabled; }
-    inline void                 SetNonHighwayLimiterEnabled ( bool bEnable )    { m_bNonHighwayLimiterEnabled = bEnable; }
-
     inline bool                 HasWaterColor               ( void )        { return m_bOverrideWaterColor; }
     inline void                 SetHasWaterColor            ( bool bOverrideWaterColor ) { m_bOverrideWaterColor = bOverrideWaterColor; }
 
@@ -503,8 +500,6 @@ private:
     unsigned char               m_ucWaterRed, m_ucWaterGreen, m_ucWaterBlue, m_ucWaterAlpha;
 
     bool                        m_bInteriorSoundsEnabled;
-
-    bool                        m_bNonHighwayLimiterEnabled;
 
     bool                        m_bOverrideRainLevel;
     float                       m_fRainLevel;

@@ -67,7 +67,6 @@ public:
     DECLARE_RPC ( RestoreAllWorldModels );
     DECLARE_RPC ( SetMoonSize );
     DECLARE_RPC ( ResetMoonSize );
-    DECLARE_RPC ( SetNonHighwayLimiterEnabled );
     DECLARE_RPC ( SetSyncIntervals );
 };
 

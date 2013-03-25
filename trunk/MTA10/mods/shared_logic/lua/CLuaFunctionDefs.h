@@ -814,8 +814,6 @@ public:
     LUA_DECLARE ( SetMoonSize );
     LUA_DECLARE ( GetMoonSize );
     LUA_DECLARE ( ResetMoonSize );
-    LUA_DECLARE ( SetNonHighwayLimiterEnabled );
-    LUA_DECLARE ( GetNonHighwayLimiterEnabled );
 
     // Input functions
     LUA_DECLARE ( BindKey );

@@ -54,7 +54,6 @@ public:
     static int      setOcclusionsEnabled                ( lua_State* luaVM );
     static int      getOcclusionsEnabled                ( lua_State* luaVM );
     static int      getMoonSize                         ( lua_State* luaVM );
-    static int      getNonHighwayLimiterEnabled         ( lua_State* luaVM );
 
     // Set
     static int      setTime                             ( lua_State* luaVM );
@@ -85,7 +84,6 @@ public:
     static int      setPedTargetingMarkerEnabled        ( lua_State* luaVM );
     static int      isPedTargetingMarkerEnabled         ( lua_State* luaVM );
     static int      setMoonSize                         ( lua_State* luaVM );
-    static int      setNonHighwayLimiterEnabled         ( lua_State* luaVM );
 
     // Reset
     static int      resetSkyGradient                    ( lua_State* luaVM );

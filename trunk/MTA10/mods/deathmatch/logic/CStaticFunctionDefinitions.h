@@ -522,8 +522,6 @@ public:
     static bool                         SetBirdsEnabled                     ( bool bEnabled );
     static bool                         GetBirdsEnabled                     ( void );
     static bool                         SetMoonSize                         ( int iSize );
-    static bool                         SetNonHighwayLimiterEnabled            ( bool bEnabled );
-    static bool                         GetNonHighwayLimiterEnabled            ( void );
 
     // Input functions
     static bool                         BindKey                             ( const char* szKey, const char* szHitState, CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFunction, CLuaArguments& Arguments );
