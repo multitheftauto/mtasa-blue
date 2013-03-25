@@ -382,9 +382,6 @@ public:
     bool                                SetBirdsEnabled                 ( bool bEnabled );
     bool                                GetBirdsEnabled                 ( void );
 
-    bool                                SetNonHighwayLimiterEnabled        ( bool bEnabled );
-    bool                                GetNonHighwayLimiterEnabled        ( void );
-
     inline CTransferBox*                GetTransferBox                  ( void )                        { return m_pTransferBox; };
 
     void                                ChangeVehicleWeapon             ( bool bNext );
@@ -665,12 +662,10 @@ private:
 
     SFixedArray < bool, NUM_GLITCHES >  m_Glitches;
 
-    // Clouds Enabled
+    //Clouds Enabled
     bool                                m_bCloudsEnabled;
     // Birds Enabled
     bool                                m_bBirdsEnabled;
-    // Non-Highway Speed Limiter Enabled
-    bool                                m_bNonHighwayLimiterEnabled;
 
     unsigned long                       m_ulMinuteDuration;
 

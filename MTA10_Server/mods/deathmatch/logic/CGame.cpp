@@ -152,7 +152,6 @@ CGame::CGame ( void )
     m_bOverrideFarClip = false;
     m_bOverrideFogDistance = false;
     m_bOverrideMoonSize = false;
-    m_bNonHighwayLimiterEnabled = true;
 
     m_pASE = NULL;
     ResetMapInfo();
@@ -235,7 +234,6 @@ void CGame::ResetMapInfo ( void )
     g_pGame->SetHasSunSize ( false );
     g_pGame->SetHasWindVelocity ( false );
     g_pGame->SetHasMoonSize ( false );
-    g_pGame->SetNonHighwayLimiterEnabled ( true );
 }
 
 CGame::~CGame ( void )

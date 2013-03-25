@@ -65,8 +65,6 @@ void CWorldRPCs::LoadFunctions ( void )
 
     AddHandler ( SET_MOON_SIZE, SetMoonSize, "SetMoonSize" );
     AddHandler ( RESET_MOON_SIZE, ResetMoonSize, "ResetMoonSize" );
-
-    AddHandler ( SET_NONHIGHWAY_LIMITER_ENABLED, SetNonHighwayLimiterEnabled, "SetNonHighwayLimiterEnabled" );
 }
 
 
@@ -640,15 +638,4 @@ void CWorldRPCs::SetMoonSize ( NetBitStreamInterface& bitStream )
 void CWorldRPCs::ResetMoonSize ( NetBitStreamInterface& bitStream )
 {
     g_pMultiplayer->ResetMoonSize ();
-}
-
-void CWorldRPCs::SetNonHighwayLimiterEnabled ( NetBitStreamInterface& bitStream )
-{
-    bool bEnabled;
-
-    if ( bitStream.ReadBit ( bEnabled ) )
-    {
-        g_pMultiplayer->DisableNonHighwayLimiter( !bEnabled );
-        g_pClientGame->SetNonHighwayLimiterEnabled ( bEnabled );
-    }
 }
