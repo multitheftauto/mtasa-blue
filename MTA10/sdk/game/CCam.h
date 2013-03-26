@@ -24,6 +24,7 @@ public:
     virtual unsigned int    GetMode             () const = 0;
     virtual float           GetFOV              () const = 0;
     virtual void            SetFOV              ( float fFOV ) = 0;
+    virtual void            SetDirection        ( float fHorizontal, float fVertical ) = 0;
     virtual CEntity*        GetTargetEntity     () const = 0;
 };
 

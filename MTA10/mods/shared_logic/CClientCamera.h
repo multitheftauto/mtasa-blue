@@ -44,12 +44,13 @@ public:
     void                        SetPosition                 ( const CVector& vecPosition );
     void                        GetRotationDegrees          ( CVector& vecRotation ) const;
     void                        SetRotationRadians          ( const CVector& vecRotation );
-    void                        GetTarget                   ( CVector& vecTarget ) const;
-    void                        SetTarget                   ( const CVector& vecPosition );
+    void                        GetFixedTarget              ( CVector& vecTarget ) const;
+    void                        SetFixedTarget              ( const CVector& vecPosition );
     float                       GetRoll                     ()                              { return m_fRoll; }
     void                        SetRoll                     ( float fRoll )                 { m_fRoll = fRoll; }
     float                       GetFOV                      ()                              { return m_fFOV; }
     void                        SetFOV                      ( float fFOV )                  { m_fFOV = fFOV; }
+    void                        SetTarget                   ( const CVector& vecPosition );
 
     void                        FadeIn                      ( float fTime );
     void                        FadeOut                     ( float fTime, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue );

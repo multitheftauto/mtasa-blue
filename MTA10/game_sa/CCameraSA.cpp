@@ -232,8 +232,8 @@ void CCameraSA::RestoreLastGoodState ( void )
         pCamInterface->m_fBetaSpeedOverOneFrame = 0;
         pCamInterface->m_fTrueBeta = 1;
         pCamInterface->m_fTrueAlpha = 1;
-        pCamInterface->Alpha = 1;
-        pCamInterface->Beta = 1;
+        pCamInterface->m_fVerticalAngle = 1;
+        pCamInterface->m_fHorizontalAngle = 1;
         pCamInterface->BetaSpeed = 0;
         pCamInterface->SpeedVar = 0;
 

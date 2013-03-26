@@ -68,7 +68,7 @@ void CClientSoundManager::DoPulse ( void )
 
     CVector vecCameraPosition, vecPosition, vecLookAt, vecFront, vecVelocity;
     pCamera->GetPosition ( vecCameraPosition );
-    pCamera->GetTarget ( vecLookAt );
+    pCamera->GetFixedTarget ( vecLookAt );
     vecFront = vecLookAt - vecCameraPosition;
 
     CClientPlayer* p_LocalPlayer = m_pClientManager->GetPlayerManager()->GetLocalPlayer();

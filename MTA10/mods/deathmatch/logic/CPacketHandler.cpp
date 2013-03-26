@@ -433,7 +433,7 @@ void CPacketHandler::Packet_ServerJoined ( NetBitStreamInterface& bitStream )
     m_pCamera->SetFocus ( &vecPos, false );*/
     g_pClientGame->m_pCamera->ToggleCameraFixedMode ( true );
     g_pClientGame->m_pCamera->SetPosition ( vecPos );
-    g_pClientGame->m_pCamera->SetTarget ( CVector ( 0, 0, 720 ) );  
+    g_pClientGame->m_pCamera->SetFixedTarget ( CVector ( 0, 0, 720 ) );  
 
     // We're now joined
     g_pClientGame->m_Status = CClientGame::STATUS_JOINED;

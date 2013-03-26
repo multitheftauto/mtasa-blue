@@ -162,11 +162,15 @@ int CLuaFunctionDefs::SetCameraMatrix ( lua_State* luaVM )
 
 int CLuaFunctionDefs::SetCameraTarget ( lua_State* luaVM )
 {
-    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
+//  bool setCameraTarget ( element target = nil ) or setCameraTarget ( float x, float y, float z )
+
+    CScriptArgReader argStream ( luaVM );
+    if ( argStream.NextIsUserData () )
     {
-        // Grab the first argument
-        CClientEntity * pTarget = lua_toelement ( luaVM, 1 );
-        if ( pTarget )    
+        CClientEntity* pTarget;
+        argStream.ReadUserData ( pTarget );
+
+        if ( !argStream.HasErrors () )
         {
             if ( CStaticFunctionDefinitions::SetCameraTarget ( pTarget ) )
             {
@@ -174,11 +178,26 @@ int CLuaFunctionDefs::SetCameraTarget ( lua_State* luaVM )
                 return 1;
             }
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "target", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+    {
+        CVector vecTarget;
+        argStream.ReadNumber ( vecTarget.fX );
+        argStream.ReadNumber ( vecTarget.fY );
+        argStream.ReadNumber ( vecTarget.fZ );
+
+        if ( !argStream.HasErrors () )
+        {
+            if ( CStaticFunctionDefinitions::SetCameraTarget ( vecTarget ) )
+            {
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }
+        }
+    }
+
+    if ( argStream.HasErrors () )
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
 
     lua_pushboolean ( luaVM, false );
     return 1;
