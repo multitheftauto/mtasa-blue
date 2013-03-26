@@ -4224,7 +4224,7 @@ bool CStaticFunctionDefinitions::SetMarkerIcon ( CClientEntity& Entity, const ch
 bool CStaticFunctionDefinitions::GetCameraMatrix ( CVector& vecPosition, CVector& vecLookAt, float& fRoll, float& fFOV )
 {
     m_pCamera->GetPosition ( vecPosition );
-    m_pCamera->GetTarget ( vecLookAt );
+    m_pCamera->GetFixedTarget ( vecLookAt );
     fRoll = m_pCamera->GetRoll ();
     fFOV = m_pCamera->GetFOV ();
     return true;
@@ -4256,7 +4256,7 @@ bool CStaticFunctionDefinitions::SetCameraMatrix ( CVector& vecPosition, CVector
     // Put the camera there
     m_pCamera->SetPosition ( vecPosition );
     if ( pvecLookAt )
-        m_pCamera->SetTarget ( *pvecLookAt );
+        m_pCamera->SetFixedTarget ( *pvecLookAt );
     m_pCamera->SetRoll ( fRoll );
     m_pCamera->SetFOV ( fFOV );
     return true;
@@ -4293,6 +4293,13 @@ bool CStaticFunctionDefinitions::SetCameraTarget ( CClientEntity * pEntity )
             return false;
     }
 
+    return true;
+}
+
+
+bool CStaticFunctionDefinitions::SetCameraTarget ( const CVector& vecTarget )
+{
+    m_pCamera->SetTarget ( vecTarget );
     return true;
 }
 
