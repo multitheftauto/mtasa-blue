@@ -121,10 +121,6 @@ CElement::~CElement ( void )
             pPed->m_pContactElement = NULL;
     }
 
-    // Hack to fix crash
-    if ( IS_PLAYER ( this ) )
-        CPerPlayerEntity::StaticOnPlayerDelete ( (CPlayer*)this );
-
     // Remove from spatial database
     GetSpatialDatabase ()->RemoveEntity ( this );
 
