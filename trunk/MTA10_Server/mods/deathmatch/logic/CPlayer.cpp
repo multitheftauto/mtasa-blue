@@ -181,6 +181,9 @@ void CPlayer::Unlink ( void )
 {
     // Remove us from the player manager
     m_pPlayerManager->RemoveFromList ( this );
+
+    // Remove us from all and any PerPlayerEntity list
+    CPerPlayerEntity::StaticOnPlayerDelete( this );
 }
 
 
