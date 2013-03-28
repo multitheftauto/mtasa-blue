@@ -251,6 +251,18 @@ void CPerPlayerEntity::BroadcastOnlyVisible ( const CPacket& Packet )
     // Are we synced? (if not we're not visible to anybody)
     if ( m_bIsSynced )
     {
+        CPlayerManager* pPlayerManager = g_pGame->GetPlayerManager();
+        for ( std::set < CPlayer* >::iterator iter = m_Players.begin() ; iter != m_Players.end() ; )
+        {
+            if ( !pPlayerManager->Exists( *iter ) )
+            {
+                CLogger::ErrorPrintf( "CPerPlayerEntity removed invalid player from list: %08x", *iter );
+                m_Players.erase( iter++ );
+            }
+            else
+                ++iter;
+        }
+
         // Send it to all players we're visible to
         CPlayerManager::Broadcast ( Packet, m_Players );
     }
@@ -335,7 +347,10 @@ void CPerPlayerEntity::RemovePlayersBelow ( CElement* pElement, std::set < CPlay
 
 void CPerPlayerEntity::AddPlayerReference ( CPlayer* pPlayer )
 {
-    MapInsert( m_Players, pPlayer );
+    if ( g_pGame->GetPlayerManager()->Exists( pPlayer ) )
+        MapInsert( m_Players, pPlayer );
+    else
+        CLogger::ErrorPrintf( "CPerPlayerEntity tried to add reference for non existing player: %08x", pPlayer );
 }
 
 

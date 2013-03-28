@@ -7,11 +7,11 @@
 //
 // To compile a public server:
 //      1. set MTASA_VERSION_TYPE to VERSION_TYPE_RELEASE
-//      2. Use net.dll/net.so from the latest 1.1 untested/rc/release (nightly.mtasa.com)
+//      2. Use net.dll/net.so from the latest untested/rc/release (nightly.mtasa.com)
 //
 // To compile a custom server:
 //      1. set MTASA_VERSION_TYPE to VERSION_TYPE_CUSTOM
-//      2. Use net.dll/net.so from the latest 1.1 unstable (nightly.mtasa.com)
+//      2. Use net.dll/net.so from the latest unstable (nightly.mtasa.com)
 
 
 // New version info
