@@ -569,7 +569,7 @@ bool CNetAPI::IsCameraSyncNeeded ()
     {
         CVector vecPosition, vecLookAt;
         pCamera->GetPosition ( vecPosition );
-        pCamera->GetTarget ( vecLookAt );
+        pCamera->GetFixedTarget ( vecLookAt );
         // Is the camera at a different place?
         if ( m_vecLastSentCameraPosition != vecPosition || m_vecLastSentCameraLookAt != vecLookAt )
         {
@@ -1960,7 +1960,7 @@ void CNetAPI::WriteCameraSync ( NetBitStreamInterface& BitStream )
 
         // Write our lookAt
         SPositionSync lookAt ( false );
-        pCamera->GetTarget ( lookAt.data.vecPosition );
+        pCamera->GetFixedTarget ( lookAt.data.vecPosition );
         BitStream.Write ( &lookAt );
     }
     else
