@@ -256,7 +256,8 @@ void CPerPlayerEntity::BroadcastOnlyVisible ( const CPacket& Packet )
         {
             if ( !pPlayerManager->Exists( *iter ) )
             {
-                CLogger::ErrorPrintf( "CPerPlayerEntity removed invalid player from list: %08x", *iter );
+                // Why does this happen?
+                // CLogger::ErrorPrintf( "CPerPlayerEntity removed invalid player from list: %08x", *iter );
                 m_Players.erase( iter++ );
             }
             else
