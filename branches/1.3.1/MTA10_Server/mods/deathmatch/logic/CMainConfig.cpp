@@ -487,8 +487,8 @@ bool CMainConfig::Load ( void )
     GetInteger ( m_pRootNode, "idle_sleep_time", m_iNoWorkToDoSleepTime );
     m_iNoWorkToDoSleepTime = Clamp ( -1, m_iNoWorkToDoSleepTime, 50 );
 
-    // threadnet
-    GetBoolean ( m_pRootNode, "threadnet", m_bThreadNetEnabled );
+    // threadnet - Default to on at startup
+    m_bThreadNetEnabled = true;
     ApplyThreadNetEnabled ();
 
     // Check settings in this list here
@@ -719,10 +719,10 @@ bool CMainConfig::LoadExtended ( void )
                     {
                         if ( !bFoundDefault )
                         {
-                            std::string strProtected = pAttribute->GetValue ();
-                            if ( strProtected.compare ( "true" ) == 0 ||
-                                strProtected.compare ( "yes" ) == 0 ||
-                                strProtected.compare ( "1" ) == 0 )
+                            std::string strDefault = pAttribute->GetValue ();
+                            if ( strDefault.compare ( "true" ) == 0 ||
+                                strDefault.compare ( "yes" ) == 0 ||
+                                strDefault.compare ( "1" ) == 0 )
                             {
                                 std::string strName = loadedResource->GetName ();
                                 if ( !strName.empty () )
@@ -973,6 +973,73 @@ int CMainConfig::GetNoWorkToDoSleepTime ( void )
 
 //////////////////////////////////////////////////////////////////////
 //
+// Fetch multiple values for a named setting from the server config
+//
+//  <module src="module_test.dll" />
+//  <resource src="admin" startup="1" protected="0" />
+//
+//////////////////////////////////////////////////////////////////////
+bool CMainConfig::GetSettingTable ( const SString& strName, CLuaArguments* outTable )
+{
+    if ( strName == "module" )
+    {
+        static const char* szAttribNames[] = { "src" };
+        return GetSettingTable( strName, szAttribNames, NUMELMS( szAttribNames ), outTable );
+    }
+    else
+    if ( strName == "resource" )
+    {
+        static const char* szAttribNames[] = { "src", "startup", "protected", "default" };
+        return GetSettingTable( strName, szAttribNames, NUMELMS( szAttribNames ), outTable );
+    }
+
+    return false;
+}
+
+
+//////////////////////////////////////////////////////////////////////
+//
+// Fetch multiple values for a named setting from the server config
+//
+//  <module src="module_test.dll" />
+//  <resource src="admin" startup="1" protected="0" />
+//
+//////////////////////////////////////////////////////////////////////
+bool CMainConfig::GetSettingTable ( const SString& strName, const char** szAttribNames, uint uiNumAttribNames, CLuaArguments* outTable )
+{
+    uint uiXMLIndex = 0;
+    uint uiLuaIndex = 1;
+    CXMLNode* pNode = NULL;
+    do
+    {
+        // Grab the current script node
+        pNode = m_pRootNode->FindSubNode ( strName, uiXMLIndex++ );
+        if ( pNode )
+        {
+            CLuaArguments resultLine;
+            CXMLAttributes& attributes = pNode->GetAttributes();
+            for ( uint i = 0 ; i < attributes.Count() ; i++ )
+            {
+                CXMLAttribute* pAttribute = attributes.Get( i );
+                resultLine.PushString( pAttribute->GetName() );
+                resultLine.PushString( pAttribute->GetValue() );
+            }
+
+            if ( resultLine.Count() != 0 )
+            {
+                outTable->PushNumber( uiLuaIndex++ );
+                outTable->PushTable( &resultLine );
+            }
+        }
+    }
+    while( pNode );
+
+    return outTable->Count() != 0;
+}
+
+
+//////////////////////////////////////////////////////////////////////
+//
 // Fetch any single setting from the server config
 //
 //////////////////////////////////////////////////////////////////////
@@ -1046,6 +1113,17 @@ bool CMainConfig::GetSetting ( const SString& strName, SString& strValue )
     {
         strValue = SString ( "%d", m_iEnableClientChecks );
         return true;
+    }
+    else
+    if ( strName == "threadnet" )
+    {
+        strValue = SString ( "%d", m_bThreadNetEnabled ? 1 : 0 );
+        return true;
+    }
+    else
+    if ( strName == "module" || strName == "resource" )
+    {
+        return false;
     }
     else
     {
@@ -1191,11 +1269,6 @@ bool CMainConfig::SetSetting ( const SString& strName, const SString& strValue, 
         {
             m_bThreadNetEnabled = atoi ( strValue ) ? true : false;
             ApplyThreadNetEnabled ();
-            if ( bSave )
-            {
-                SetString ( m_pRootNode, "threadnet", SString ( "%d", m_bThreadNetEnabled ) );
-                Save ();
-            }
             return true;
         }
     }

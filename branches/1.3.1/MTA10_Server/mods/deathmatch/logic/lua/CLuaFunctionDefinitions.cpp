@@ -327,9 +327,17 @@ int CLuaFunctionDefinitions::GetServerConfigSetting ( lua_State* luaVM )
     if ( !argStream.HasErrors () )
     {
         SString strValue;
+        // Try as single setting
         if ( g_pGame->GetConfig ()->GetSetting ( strName, strValue ) )
         {
             lua_pushstring ( luaVM, strValue );
+            return 1;
+        }
+        // Try as multiple setting
+        CLuaArguments result;
+        if ( g_pGame->GetConfig ()->GetSettingTable ( strName, &result ) )
+        {
+            result.PushAsTable( luaVM );
             return 1;
         }
     }
