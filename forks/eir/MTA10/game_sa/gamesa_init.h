@@ -10,12 +10,13 @@
 *
 *****************************************************************************/
 
-#include "CGameSA.h"
 #include <multiplayer/CMultiplayer.h>
 #include <core/CCoreInterface.h>
 
 #ifndef __CGAMESA_INIT
 #define __CGAMESA_INIT
+
+class CGameSA;
 
 extern CGameSA * pGame;
 extern CCoreInterface * g_pCore;
@@ -99,6 +100,15 @@ template < class T, class U >
 void MemOrFast ( U ptr, const T value )
 {
     *(T*)ptr |= value;
+}
+
+// Helpful compiler hacking tool :)
+// Returns the Visual C++ member function pointer!
+template <class funcType>
+DWORD h_memFunc( funcType func )
+{
+    funcType f = func;
+    return (DWORD)*(void**)&f;
 }
 
 bool GetDebugIdEnabled ( uint uiDebugId );

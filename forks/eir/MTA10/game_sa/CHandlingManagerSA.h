@@ -33,14 +33,15 @@ public:
     void                        CheckSuspensionChanges          ( CHandlingEntry* pEntry );
     void                        RemoveChangedVehicle            ( void );
 
+    // Original handling data unaffected by handling.cfg changes
+    static tHandlingDataSA      m_OriginalHandlingData [HT_MAX];
+    static CHandlingEntrySA*    m_pOriginalEntries [HT_MAX];
+
 private:
     void                        InitializeDefaultHandlings      ( void );
 
     static DWORD                m_dwStore_LoadHandlingCfg;
 
-    // Original handling data unaffected by handling.cfg changes
-    static tHandlingDataSA      m_OriginalHandlingData [HT_MAX];
-    static CHandlingEntrySA*    m_pOriginalEntries [HT_MAX];
 
     std::map < std::string, eHandlingProperty > m_HandlingNames;
     int iChangedVehicles;

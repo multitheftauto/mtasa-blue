@@ -22,7 +22,7 @@ int CTaskComplexWanderSA::GetWanderType()
 {
     DEBUG_TRACE("int CTaskComplexWander::GetWanderType()");
     CTaskSAInterface * pTaskInterface = this->GetInterface();
-    DWORD dwFunc = ((TaskComplexWanderVTBL *)pTaskInterface->VTBL)->GetWanderType;
+    DWORD dwFunc = (*(TaskComplexWanderVTBL **)pTaskInterface)->GetWanderType;
     int iReturn = NO_WANDER_TYPE;
 
     if ( dwFunc && dwFunc != 0x82263A ) // some tasks have no wander type 0x82263A is purecal (assert?)

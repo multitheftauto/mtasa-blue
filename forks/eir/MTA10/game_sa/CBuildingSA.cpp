@@ -168,14 +168,7 @@ CBuildingSA::~CBuildingSA( )
         CWorldSA * world = (CWorldSA *)pGame->GetWorld();
         world->Remove(this->GetInterface(), CBuilding_Destructor);
     
-        DWORD dwThis = (DWORD)this->GetInterface();
-        DWORD dwFunc = this->GetInterface()->vtbl->SCALAR_DELETING_DESTRUCTOR; // we use the vtbl so we can be type independent
-        _asm    
-        {
-            mov     ecx, dwThis
-            push    1           //delete too
-            call    dwFunc
-        }
+        delete m_pInterface;
 
         this->BeingDeleted = true;
         //((CPoolsSA *)pGame->GetPools())->RemoveBuilding((CBuilding *)(CBuildingSA *)this);

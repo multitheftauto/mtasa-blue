@@ -32,23 +32,23 @@
 class CBuoyancySA
 {
 public:
-	CVector vecPos; // 0
-	CMatrixEx EntityMatrix; // 12
-	uint32 pad1[4]; // 84
-	float fWaterLevel; // 100
-	uint32 pad2; // 104
-	float fBuoyancy; // 108
-	CVector vecUnk1; // 112
-	CVector vecUnk2; // 124
-	uint32 pad3[4]; // 136
-	uint8 pad4[4]; // 152
-	uint32 pad5[7]; // 156
-	uint8 pad6[2]; // 184
-	uint8 bProcessingBoat; // 186
-	uint8 pad7; // 187
-	float fTurnForceZ; // 188
-	CVector vecMoveForce; // 192
-	uint32 pad8; // 204
+	CVector vecPos;                         // 0
+	CMatrixEx EntityMatrix;                 // 12
+	uint32 pad1[4];                         // 84
+	float fWaterLevel;                      // 100
+	uint32 pad2;                            // 104
+	float fBuoyancy;                        // 108
+	CVector vecUnk1;                        // 112
+	CVector vecUnk2;                        // 124
+	uint32 pad3[4];                         // 136
+	uint8 pad4[4];                          // 152
+	uint32 pad5[7];                         // 156
+	uint8 pad6[2];                          // 184
+	uint8 bProcessingBoat;                  // 186
+	uint8 pad7;                             // 187
+	float fTurnForceZ;                      // 188
+	CVector vecMoveForce;                   // 192
+	uint32 pad8;                            // 204
 };
 C_ASSERT(sizeof(CBuoyancySA) == 0xD0);
 

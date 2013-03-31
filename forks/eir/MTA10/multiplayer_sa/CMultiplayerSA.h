@@ -97,7 +97,6 @@ public:
     void                        SetGameObjectDestructHandler    ( GameObjectDestructHandler * pHandler );
     void                        SetGameVehicleDestructHandler   ( GameVehicleDestructHandler * pHandler );
     void                        SetGamePlayerDestructHandler    ( GamePlayerDestructHandler * pHandler );
-    void                        SetGameModelRemoveHandler       ( GameModelRemoveHandler * pHandler );
     void                        SetGameEntityRenderHandler  ( GameEntityRenderHandler * pHandler );
 
     void                        AllowMouseMovement          ( bool bAllow );

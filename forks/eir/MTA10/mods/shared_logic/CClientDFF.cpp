@@ -38,7 +38,7 @@ CClientDFF::~CClientDFF ( void )
 
 
 // Get a clump which has been loaded to replace the specified model id
-RpClump* CClientDFF::GetLoadedClump ( ushort usModelId )
+RpClump* CClientDFF::GetLoadedClump ( ushort usModelId, CColModel*& col )
 {
     if ( usModelId == 0 )
         return NULL;
@@ -53,7 +53,10 @@ RpClump* CClientDFF::GetLoadedClump ( ushort usModelId )
         m_pManager->GetModelRequestManager ()->RequestBlocking ( usModelId, "CClientDFF::LoadDFF" );
 
         // Attempt loading it
-        info.pClump = g_pGame->GetRenderWare ()->ReadDFF ( m_strDffFilename, usModelId, CClientVehicleManager::IsValidModel ( usModelId ) );
+        info.pClump = g_pGame->GetRenderWare ()->ReadDFF ( m_strDffFilename, usModelId, CClientVehicleManager::IsValidModel ( usModelId ), info.col );
+
+        // Maybe we loaded a collision (could be NULL)
+        col = info.col;
     }
 
     return info.pClump;
@@ -87,16 +90,21 @@ void CClientDFF::UnloadDFF ( void )
         SLoadedClumpInfo& info = iter->second;
         if ( info.pClump )
             g_pGame->GetRenderWare ()->DestroyDFF ( info.pClump );
+        if ( info.col )
+            delete info.col;    //gtfo col
     }
 
     m_LoadedClumpInfoMap.clear ();
 }
 
 
+
 bool CClientDFF::ReplaceModel ( unsigned short usModel, bool bAlphaTransparency )
 {
+    CColModel *col = NULL;
+
     // Get clump loaded for this model id
-    RpClump* pClump = GetLoadedClump ( usModel );
+    RpClump* pClump = GetLoadedClump ( usModel, col );
 
     // We have a DFF?
     if ( pClump )
@@ -110,6 +118,10 @@ bool CClientDFF::ReplaceModel ( unsigned short usModel, bool bAlphaTransparency 
             // again by an another resource.
             pReplaced->m_Replaced.remove ( usModel );
         }
+
+        // That collision has to be imported, yo.
+        if ( col )
+            col->Replace( usModel );
 
         // Is this a vehicle ID?
         if ( CClientVehicleManager::IsValidModel ( usModel ) )

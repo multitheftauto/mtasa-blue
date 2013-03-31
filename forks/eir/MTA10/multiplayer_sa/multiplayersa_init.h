@@ -19,7 +19,6 @@
 #include "Common.h"
 
 #include <game/CGame.h>
-#include "../game_sa/CGameSA.h"
 
 #include "multiplayer_keysync.h"
 #include "multiplayer_shotsync.h"

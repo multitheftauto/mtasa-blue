@@ -70,7 +70,7 @@ class CRenderWare {
     virtual bool                ModelInfoTXDAddTextures     ( SReplacementTextures* pReplacementTextures, ushort usModelId ) = 0;
     virtual void                ModelInfoTXDRemoveTextures  ( SReplacementTextures* pReplacementTextures ) = 0;
     virtual RwTexDictionary *   ReadTXD                     ( const char *szTXD ) = 0;
-    virtual RpClump *           ReadDFF                     ( const char *szDFF, unsigned short usModelID, bool bLoadEmbeddedCollisions ) = 0;
+    virtual RpClump *           ReadDFF                     ( const char *szDFF, unsigned short usModelID, bool bLoadEmbeddedCollisions, CColModel*& colOut ) = 0;
     virtual CColModel *         ReadCOL                     ( const char * szCOLFile ) = 0;
     virtual void                DestroyDFF                  ( RpClump * pClump ) = 0;
     virtual void                DestroyTXD                  ( RwTexDictionary * pTXD ) = 0;
@@ -80,9 +80,7 @@ class CRenderWare {
     virtual void                ReplaceAllAtomicsInModel    ( RpClump * pSrc, unsigned short usModelID ) = 0;
     virtual void                RepositionAtomic            ( RpClump * pDst, RpClump * pSrc, const char * szName ) = 0;
     virtual void                AddAllAtomics               ( RpClump * pDst, RpClump * pSrc ) = 0;
-    virtual void                ReplaceVehicleModel         ( RpClump * pNew, unsigned short usModelID ) = 0;
-    virtual void                ReplaceWeaponModel          ( RpClump * pNew, unsigned short usModelID ) = 0;
-    virtual void                ReplacePedModel             ( RpClump * pNew, unsigned short usModelID ) = 0;
+    virtual void                ReplaceModel                ( RpClump * pNew, unsigned short usModelID ) = 0;
     virtual void                PulseWorldTextureWatch      ( void ) = 0;
     virtual void                GetModelTextureNames        ( std::vector < SString >& outNameList, ushort usModelID ) = 0;
     virtual const SString&      GetTextureName              ( CD3DDUMMY* pD3DData ) = 0;

@@ -33,17 +33,18 @@
 // RenderWare extensions
 #define RW_EXTENSION_HANIM  0x253F2FB
 
-// Yet to analyze
+// Forward declarations
 struct RwScene;
 struct RwCamera;
 struct RpAtomic;
 struct RpClump;
 struct RwTexture;
 struct RpGeometry;
+struct RwStream;
 
 typedef RwCamera*   (*RwCameraPreCallback) (RwCamera * camera);
 typedef RwCamera*   (*RwCameraPostCallback) (RwCamera * camera);
-typedef bool        (*RpAtomicCallback) (RpAtomic * atomic);
+typedef RpAtomic*   (*RpAtomicCallback) (RpAtomic * atomic);
 typedef RpClump*    (*RpClumpCallback) (RpClump * clump, void *data);
 
 // RenderWare enumerations
@@ -112,7 +113,7 @@ enum RwRasterType : unsigned int
 
 #define RW_OBJ_REGISTERED           0x02
 #define RW_OBJ_VISIBLE              0x04
-#define RW_OBJ_HIERARCHY_CACHED     0x10
+#define RW_OBJ_HIERARCHY_CACHED     0x08
 
 // RenderWare/plugin base types
 struct RwObject
@@ -295,7 +296,7 @@ struct RwFrame : public RwObject
     void                    SetModelling                ( const RwMatrix& mat );
     const RwMatrix&         GetModelling                ( void ) const          { return modelling; }
     void                    SetPosition                 ( const CVector& pos );
-    const CVector&          GetPosition                 ( void ) const          { return modelling.pos; }
+    const CVector&          GetPosition                 ( void ) const          { return modelling.vPos; }
 
     const RwMatrix&         GetLTM                      ( void );
 
@@ -352,7 +353,7 @@ struct RwFrame : public RwObject
     static bool RwObjectDoAtomic( RwObject *child, _rwObjectGetAtomic <type> *info )
     {
         // Check whether the object is a atomic
-        if ( child->type != 0x14 )
+        if ( child->type != RW_ATOMIC )
             return true;
 
         return info->routine( (RpAtomic*)child, info->data );
@@ -369,10 +370,11 @@ struct RwFrame : public RwObject
         return ForAllObjects( RwObjectDoAtomic <type>, &info );
     }
     RpAtomic*               GetFirstAtomic              ( void );
-    void                    SetAtomicVisibility         ( unsigned short flags );
-    void                    FindVisibilityAtomics       ( RpAtomic **primary, RpAtomic **secondary );
+    void                    SetAtomicComponentFlags     ( unsigned short flags );
+    void                    FindComponentAtomics        ( RpAtomic **okay, RpAtomic **damaged );
 
     RpAnimHierarchy*        GetAnimHierarchy            ( void );
+    void                    _RegisterRoot               ( void );
     void                    RegisterRoot                ( void );
     void                    UnregisterRoot              ( void );
 };
@@ -442,8 +444,21 @@ struct RwTexture
     RwListEntry <RwTexture>     TXDList;                        // 8
     char                        name[RW_TEXTURE_NAME_LENGTH];   // 16
     char                        mask[RW_TEXTURE_NAME_LENGTH];   // 48
-    unsigned int                flags;                          // 80
+
+    union
+    {
+        unsigned int            flags;                          // 80
+
+        struct
+        {
+            unsigned char       flags_a;                        // 80
+            unsigned char       flags_b;                        // 81
+            unsigned char       flags_c;                        // 82
+            unsigned char       flags_d;                        // 83
+        };
+    };
     unsigned int                refs;                           // 84
+    char                        anisotropy;                     // 88
 
     void                        AddToDictionary         ( RwTexDictionary *txd );
     void                        RemoveFromDictionary    ( void );
@@ -577,10 +592,8 @@ struct RpAtomic : public RwObjectFrame
     RpAnimHierarchy*        anim;               // 120
 
     unsigned short          modelId;            // 124
-    unsigned short          structureId;        // 126, used for components (ok/dam)
-    unsigned char           matrixFlags;        // 128, not sure about this, might be component flags
-    unsigned char           renderFlags;        // 129, ^
-    BYTE                    pad3[6];            // 130
+    unsigned short          componentFlags;     // 126, used for components (ok/dam)
+    BYTE                    pad3[8];            // 128
     unsigned int            pipeline;           // 136
 
     bool                    IsNight                     ( void );
@@ -589,12 +602,6 @@ struct RpAtomic : public RwObjectFrame
     void                    RemoveFromClump             ( void );
 
     void                    SetRenderCallback           ( RpAtomicCallback callback );
-
-    void                    ApplyVisibilityFlags        ( unsigned short flags );
-    void                    RemoveVisibilityFlags       ( unsigned short flags );
-    unsigned short          GetVisibilityFlags          ( void );
-
-    void                    SetExtendedRenderFlags      ( unsigned short flags );
 
     void                    FetchMateria                ( RpMaterials& mats );
 };
@@ -605,19 +612,20 @@ public:
     RpAtomicCallback        m_render;
     float                   m_distance;
 };
-class RwAtomicRenderChain
+class RwAtomicRenderChain //size: 20
 {
 public:
-    RwAtomicZBufferEntry                m_entry;
-    RwListEntry <RwAtomicRenderChain>   list;
+    RwAtomicZBufferEntry                m_entry;    // 0
+    RwAtomicRenderChain*                next;       // 12
+    RwAtomicRenderChain*                prev;       // 16
 };
 class RwAtomicRenderChainInterface
 {
 public:
-    RwAtomicRenderChain     m_root;
-    RwAtomicRenderChain     m_rootLast;
-    RwAtomicRenderChain     m_renderStack;
-    RwAtomicRenderChain     m_renderLast;
+    RwAtomicRenderChain     m_root;             // 0
+    RwAtomicRenderChain     m_rootLast;         // 20
+    RwAtomicRenderChain     m_renderStack;      // 40
+    RwAtomicRenderChain     m_renderLast;       // 60
 
     bool                    PushRender                  ( RwAtomicZBufferEntry *level );
 };
@@ -667,7 +675,7 @@ struct RpClump : public RwObject
 
     BYTE                    pad[8];             // 44
     unsigned int            renderFlags;        // 52
-    BYTE                    pad2[4];            // 56
+    unsigned int            alpha;              // 56
 
     RwStaticGeometry*       m_static;           // 60
 
@@ -687,7 +695,7 @@ struct RpClump : public RwObject
     RpAtomic*               Find2dfx                    ( void );
 
     void                    SetupAtomicRender           ( void );
-    void                    RemoveAtomicVisibilityFlags ( unsigned short flags );
+    void                    RemoveAtomicComponentFlags  ( unsigned short flags );
     void                    FetchMateria                ( RpMaterials& mats );
 
     template <class type>
@@ -877,6 +885,7 @@ class RwRenderSystem    // TODO
 {
 public:
     void*                   m_unkStruct;                                    // 0
+    void*                   m_callback;                                     // 4
 };
 struct RwError
 {
@@ -887,6 +896,8 @@ struct RwError
 typedef void*               (__cdecl*RwFileOpen_t) ( const char *path, const char *mode );
 typedef void                (__cdecl*RwFileClose_t) ( void *fp );
 typedef long                (__cdecl*RwFileSeek_t) ( void *fp, long offset, int origin );
+
+typedef int                 (__cdecl*RwReadTexture_t) ( RwStream *stream, RwTexture **out, size_t blockSize );
 
 class RwInterface   // size: 1456
 {
@@ -899,10 +910,13 @@ public:
     BYTE                    m_pad11[4];                                     // 12
     RwRenderSystem          m_renderSystem;                                 // 16
 
-    BYTE                    m_pad[92];                                      // 20
+    BYTE                    m_pad[88];                                      // 24
     RwStructInfo*           m_sceneInfo;                                    // 112
 
-    BYTE                    m_pad14[72];                                    // 116
+    BYTE                    m_pad14[60];                                    // 116
+    RwReadTexture_t         m_readTexture;                                  // 176, actual internal texture reader
+
+    BYTE                    m_pad17[8];                                     // 180
     RwList <RwFrame>        m_nodeRoot;                                     // 188, list of all root frames
 
     BYTE                    m_pad6[24];                                     // 196
@@ -958,8 +972,8 @@ public:
     RwPipeline*             m_atomicPipeline;                               // 1192
     BYTE                    m_pad16[224];                                   // 1196
 
-    RwStructInfo*           m_clumpInfo;                                    // 1420
-    void*                   m_unk2;                                         // 1424
+    RwStructInfo*           m_atomicInfo;                                   // 1420
+    RwStructInfo*           m_clumpInfo;                                    // 1424
     RwStructInfo*           m_lightInfo;                                    // 1428
     void*                   m_unk;                                          // 1432
     RwList <void>           m_unkList;                                      // 1436
@@ -969,8 +983,17 @@ public:
 extern RwInterface **ppRwInterface;
 #define pRwInterface (*ppRwInterface)
 
+// offset 0x00C9BF00 (1.0 US and 1.0 EU)
+struct RwDeviceInformation
+{
+    BYTE                    pad[108];                                       // 0
+    char                    maxAnisotropy;                                  // 108
+};
+
+extern RwDeviceInformation *const pRwDeviceInfo;
+
 /*****************************************************************************/
-/** RenderWare Helper Classes                                               **/
+/** RenderWare Helper Definitions                                           **/
 /*****************************************************************************/
 
 // RenderWare type definitions
@@ -1068,7 +1091,7 @@ struct RwChunkHeader
     unsigned int        isComplex;
 };
 
-// Plugin functionss
+// Plugin functions
 typedef RpGeometry*     (__cdecl*RpGeometryPluginConstructor)( RpGeometry *geom, size_t offset );
 typedef void            (__cdecl*RpGeometryPluginDestructor)( RpGeometry *geom, size_t offset );
 typedef RpGeometry*     (__cdecl*RpGeometryPluginCopyConstructor)( RpGeometry *dst, RpGeometry *src, size_t offset );

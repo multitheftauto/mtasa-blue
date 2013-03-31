@@ -784,6 +784,22 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="coresdk"
+				>
+				<File
+					RelativePath="..\..\Shared\sdk\coresdk\CDynamicLibrary.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Shared\sdk\coresdk\CFileSystem.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Shared\sdk\coresdk\CFileSystem.zip.cpp"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -1944,6 +1960,10 @@
 					RelativePath="..\..\Shared\sdk\WString.hpp"
 					>
 				</File>
+			</Filter>
+			<Filter
+				Name="coresdk"
+				>
 			</Filter>
 		</Filter>
 	</Files>

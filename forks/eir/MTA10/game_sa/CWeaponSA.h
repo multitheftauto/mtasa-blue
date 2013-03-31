@@ -15,8 +15,6 @@
 #ifndef __CGAMESA_WEAPON
 #define __CGAMESA_WEAPON
 
-
-#include "CGameSA.h"
 #include <game/CWeapon.h>
 #include <game/CPed.h>
 
@@ -35,7 +33,6 @@
 #define FUNC_CBirds_CheckForHit                         0x712E40
 #define FUNC_CShadows_CheckForHit                       0x707550
 
-extern CGameSA * pGame;
 class CWeaponSAInterface;
 class CWeaponStatSA;
 
@@ -73,7 +70,7 @@ public:
     eWeaponSlot     GetSlot();
 
     VOID                    SetAsCurrentWeapon();
-    CWeaponInfo*            GetInfo( eWeaponSkill skill ) { return pGame->GetWeaponInfo( internalInterface->m_eWeaponType, skill ); };
+    CWeaponInfo*            GetInfo( eWeaponSkill skill );
     void                    Destroy             ( void );
     void                    Remove ();
     void                    Initialize          ( eWeaponType type, unsigned int uiAmmo, CPed * pPed );

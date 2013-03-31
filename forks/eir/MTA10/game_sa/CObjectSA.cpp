@@ -182,18 +182,12 @@ CObjectSA::~CObjectSA( )
         DWORD dwInterface = (DWORD)this->GetInterface();
         if ( dwInterface )
         {       
-            if ( (DWORD)this->GetInterface()->vtbl != VTBL_CPlaceable )
+            if ( *(DWORD*)this->GetInterface() != VTBL_CPlaceable )
             {
                 CWorldSA * world = (CWorldSA *)pGame->GetWorld();
                 world->Remove(this->GetInterface(), CObject_Destructor);
             
-                DWORD dwFunc = this->GetInterface()->vtbl->SCALAR_DELETING_DESTRUCTOR; // we use the vtbl so we can be type independent
-                _asm    
-                {
-                    mov     ecx, dwInterface
-                    push    1           //delete too
-                    call    dwFunc
-                }
+                delete m_pInterface;
         
 #ifdef MTA_USE_BUILDINGS_AS_OBJECTS
                 DWORD dwModelID = this->internalInterface->m_nModelIndex;
@@ -264,7 +258,8 @@ float CObjectSA::GetHealth ( void )
 void CObjectSA::SetModelIndex ( unsigned long ulModel )
 {
     // Jax: I'm not sure if using the vtbl is right (as ped and vehicle dont), but it works
-    DWORD dwFunc = this->GetInterface()->vtbl->SetModelIndex;
+    // The_GTA: Jax, you might have encountered compiler optimizations in constructors or destructors, where this is guaranteed type.
+    DWORD dwFunc = (*(CEntitySAInterfaceVTBL**)this->GetInterface())->SetModelIndex;
     DWORD dwThis = (DWORD)this->GetInterface();
     _asm    
     {

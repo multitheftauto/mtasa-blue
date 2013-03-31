@@ -5,6 +5,7 @@
 *  FILE:        game_sa/CRenderWareSA.h
 *  PURPOSE:     Header file for RenderWare game engine class
 *  DEVELOPERS:  Cecill Etheredge <ijsf@gmx.net>
+*               Martin Turski <quiret@gmx.de>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -32,6 +33,7 @@ public:
     ZERO_ON_NEW
                         CRenderWareSA               ( enum eGameVersion version );
                         ~CRenderWareSA              ( void );
+
     void                Initialize                  ( void );
     bool                ModelInfoTXDLoadTextures    ( SReplacementTextures* pReplacementTextures, const SString& szFilename, bool bFilteringEnabled );
     bool                ModelInfoTXDAddTextures     ( SReplacementTextures* pReplacementTextures, ushort usModelId );
@@ -41,7 +43,7 @@ public:
     RwTexDictionary *   ReadTXD                     ( const char *szTXD );
 
     // Reads and parses a DFF file specified by a path (szDFF) into a CModelInfo identified by the object id (usModelID)
-    RpClump *           ReadDFF                     ( const char * szDFF, unsigned short usModelID, bool bLoadEmbeddedCollisions );
+    RpClump *           ReadDFF                     ( const char * szDFF, unsigned short usModelID, bool bLoadEmbeddedCollisions, CColModel*& colOut );
 
     // Destroys a DFF instance
     void                DestroyDFF                  ( RpClump * pClump );
@@ -80,15 +82,7 @@ public:
     // Adds the atomics from a source clump (pSrc) to a destination clump (pDst)
     void                AddAllAtomics               ( RpClump * pDst, RpClump * pSrc );
 
-    // Replaces a CClumpModelInfo (or CVehicleModelInfo, since its just for vehicles) clump with a new clump
-    void                ReplaceVehicleModel         ( RpClump * pNew, unsigned short usModelID );
-
-    // Replaces a CClumpModelInfo clump with a new clump
-    void                ReplaceWeaponModel         ( RpClump * pNew, unsigned short usModelID );
-
-    void                ReplacePedModel            ( RpClump * pNew, unsigned short usModelID );
-
-    void                ReplaceModel                ( RpClump* pNew, unsigned short usModelID, DWORD dwFunc );
+    void                ReplaceModel                ( RpClump* pNew, unsigned short usModelID );
 
     // Replaces dynamic parts of the vehicle (models that have two different versions: 'ok' and 'dam'), such as doors
     // szName should be without the part suffix (e.g. 'door_lf' or 'door_rf', and not 'door_lf_dummy')
@@ -152,5 +146,6 @@ private:
 };
 
 #include "CRenderWareSA.rwapi.h"
+#include "CRenderWareSA.pipeline.h"
 
 #endif

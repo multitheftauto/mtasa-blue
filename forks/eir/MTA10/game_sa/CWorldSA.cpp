@@ -31,7 +31,7 @@ void CWorldSA::Add ( CEntity * pEntity, eDebugCaller CallerId )
     if ( pEntitySA )
     {
         CEntitySAInterface * pInterface = pEntitySA->GetInterface();
-        if ( (DWORD)pInterface->vtbl == VTBL_CPlaceable )
+        if ( *(DWORD*)pInterface == VTBL_CPlaceable )
         {
             SString strMessage ( "Caller: %i ", CallerId );
             LogEvent ( 506, "CWorld::Add ( CEntity * ) Crash", "", strMessage );
@@ -52,7 +52,7 @@ void CWorldSA::Add ( CEntitySAInterface * entityInterface, eDebugCaller CallerId
 {
     DEBUG_TRACE("VOID CWorldSA::Add ( CEntitySAInterface * entityInterface )");
     DWORD dwFunction = FUNC_Add;
-    if ( (DWORD)entityInterface->vtbl == VTBL_CPlaceable )
+    if ( *(DWORD*)entityInterface == VTBL_CPlaceable )
     {
         SString strMessage ( "Caller: %i ", CallerId );
         LogEvent ( 506, "CWorld::Add ( CEntitySAInterface * ) Crash", "", strMessage );
@@ -74,7 +74,7 @@ void CWorldSA::Remove ( CEntity * pEntity, eDebugCaller CallerId )
     if ( pEntitySA )
     {
         CEntitySAInterface * pInterface = pEntitySA->GetInterface();
-        if ( (DWORD)pInterface->vtbl == VTBL_CPlaceable )
+        if ( *(DWORD*)pInterface == VTBL_CPlaceable )
         {
             SString strMessage ( "Caller: %i ", CallerId );
             LogEvent ( 507, "CWorld::Remove ( CEntity * ) Crash", "", strMessage );
@@ -93,7 +93,7 @@ void CWorldSA::Remove ( CEntity * pEntity, eDebugCaller CallerId )
 void CWorldSA::Remove ( CEntitySAInterface * entityInterface, eDebugCaller CallerId )
 {
     DEBUG_TRACE("VOID CWorldSA::Remove ( CEntitySAInterface * entityInterface )");
-    if ( (DWORD)entityInterface->vtbl == VTBL_CPlaceable )
+    if ( *(DWORD*)entityInterface == VTBL_CPlaceable )
     {
         SString strMessage ( "Caller: %i ", CallerId );
         LogEvent ( 507, "CWorld::Remove ( CEntitySAInterface * ) Crash", "", strMessage );
@@ -535,9 +535,9 @@ void CWorldSA::RemoveBuilding ( unsigned short usModelToRemove, float fRange, fl
 
                 if ( pFind->m_pInterface->Placeable.matrix != NULL )
                 {
-                    fDistanceX = fX - pFind->m_pInterface->Placeable.matrix->pos.fX;
-                    fDistanceY = fY - pFind->m_pInterface->Placeable.matrix->pos.fY;
-                    fDistanceZ = fZ - pFind->m_pInterface->Placeable.matrix->pos.fZ;
+                    fDistanceX = fX - pFind->m_pInterface->Placeable.matrix->vPos.fX;
+                    fDistanceY = fY - pFind->m_pInterface->Placeable.matrix->vPos.fY;
+                    fDistanceZ = fZ - pFind->m_pInterface->Placeable.matrix->vPos.fZ;
                 }
 
                 // Square root 'em
@@ -554,7 +554,7 @@ void CWorldSA::RemoveBuilding ( unsigned short usModelToRemove, float fRange, fl
                         // if the building type is dummy or building and it's not already being removed
                         if ( ( pInterface->nType == ENTITY_TYPE_BUILDING || pInterface->nType == ENTITY_TYPE_DUMMY || pInterface->nType == ENTITY_TYPE_OBJECT ) && pInterface->bRemoveFromWorld != 1 )
                         {
-                            if ( (DWORD)(pInterface->vtbl) != VTBL_CPlaceable )
+                            if ( *(DWORD*)(pInterface) != VTBL_CPlaceable )
                             {
                                 // Add the Data Building to the list
                                 pRemoval->AddDataBuilding ( pInterface );
@@ -591,9 +591,9 @@ void CWorldSA::RemoveBuilding ( unsigned short usModelToRemove, float fRange, fl
 
                 if ( pFindBinary->m_pInterface->Placeable.matrix != NULL )
                 {
-                    fDistanceX = fX - pFindBinary->m_pInterface->Placeable.matrix->pos.fX;
-                    fDistanceY = fY - pFindBinary->m_pInterface->Placeable.matrix->pos.fY;
-                    fDistanceZ = fZ - pFindBinary->m_pInterface->Placeable.matrix->pos.fZ;
+                    fDistanceX = fX - pFindBinary->m_pInterface->Placeable.matrix->vPos.fX;
+                    fDistanceY = fY - pFindBinary->m_pInterface->Placeable.matrix->vPos.fY;
+                    fDistanceZ = fZ - pFindBinary->m_pInterface->Placeable.matrix->vPos.fZ;
                 }
 
                 // Square root 'em
@@ -610,7 +610,7 @@ void CWorldSA::RemoveBuilding ( unsigned short usModelToRemove, float fRange, fl
                         // if the building type is dummy or building and it's not already being removed
                         if ( ( pInterface->nType == ENTITY_TYPE_BUILDING || pInterface->nType == ENTITY_TYPE_DUMMY || pInterface->nType == ENTITY_TYPE_OBJECT ) && pInterface->bRemoveFromWorld != 1 )
                         {
-                            if ( (DWORD)(pInterface->vtbl) != VTBL_CPlaceable )
+                            if ( *(DWORD*)(pInterface) != VTBL_CPlaceable )
                             {
                                 // Add the Data Building to the list
                                 pRemoval->AddBinaryBuilding ( pInterface );
@@ -671,7 +671,8 @@ bool CWorldSA::RestoreBuilding ( unsigned short usModelToRestore, float fRange, 
                             if ( ( pEntity->nType == ENTITY_TYPE_BUILDING || pEntity->nType == ENTITY_TYPE_DUMMY || pEntity->nType == ENTITY_TYPE_OBJECT ) && pEntity->bRemoveFromWorld != 1 )
                             {
                                 // Don't call this on entities being removed.
-                                if ( (DWORD)(pEntity->vtbl) != VTBL_CPlaceable )
+                                // The_GTA: Dude, this check is redundant since we fixed the building streaming bug.
+                                if ( *(DWORD*)(pEntity) != VTBL_CPlaceable )
                                 {
                                     Add ( pEntity, Building_Restore );
                                 }
@@ -701,7 +702,7 @@ bool CWorldSA::RestoreBuilding ( unsigned short usModelToRestore, float fRange, 
                             // if the building type is dummy or building and it's not already being removed
                             if ( ( pEntity->nType == ENTITY_TYPE_BUILDING || pEntity->nType == ENTITY_TYPE_DUMMY || pEntity->nType == ENTITY_TYPE_OBJECT ) && pEntity->bRemoveFromWorld != 1 )
                             {
-                                if ( (DWORD)(pEntity->vtbl) != VTBL_CPlaceable )
+                                if ( *(DWORD*)(pEntity) != VTBL_CPlaceable )
                                 {
                                     Add ( pEntity, Building_Restore2 );
                                 }
@@ -740,9 +741,9 @@ bool CWorldSA::RestoreBuilding ( unsigned short usModelToRestore, float fRange, 
 
             if ( pFound->m_pInterface->Placeable.matrix != NULL )
             {
-                fDistanceX = fX - pFound->m_pInterface->Placeable.matrix->pos.fX;
-                fDistanceY = fY - pFound->m_pInterface->Placeable.matrix->pos.fY;
-                fDistanceZ = fZ - pFound->m_pInterface->Placeable.matrix->pos.fZ;
+                fDistanceX = fX - pFound->m_pInterface->Placeable.matrix->vPos.fX;
+                fDistanceY = fY - pFound->m_pInterface->Placeable.matrix->vPos.fY;
+                fDistanceZ = fZ - pFound->m_pInterface->Placeable.matrix->vPos.fZ;
             }
 
             // Square root 'em
@@ -771,9 +772,9 @@ bool CWorldSA::RestoreBuilding ( unsigned short usModelToRestore, float fRange, 
 
             if ( pFoundBinary->m_pInterface->Placeable.matrix != NULL )
             {
-                fDistanceX = fX - pFoundBinary->m_pInterface->Placeable.matrix->pos.fX;
-                fDistanceY = fY - pFoundBinary->m_pInterface->Placeable.matrix->pos.fY;
-                fDistanceZ = fZ - pFoundBinary->m_pInterface->Placeable.matrix->pos.fZ;
+                fDistanceX = fX - pFoundBinary->m_pInterface->Placeable.matrix->vPos.fX;
+                fDistanceY = fY - pFoundBinary->m_pInterface->Placeable.matrix->vPos.fY;
+                fDistanceZ = fZ - pFoundBinary->m_pInterface->Placeable.matrix->vPos.fZ;
             }
 
             // Square root 'em
@@ -842,9 +843,9 @@ bool CWorldSA::IsObjectRemoved ( CEntitySAInterface* pInterface )
 
                 if ( pInterface->Placeable.matrix != NULL )
                 {
-                    fDistanceX = pFind->m_vecPos.fX - pInterface->Placeable.matrix->pos.fX;
-                    fDistanceY = pFind->m_vecPos.fY - pInterface->Placeable.matrix->pos.fY;
-                    fDistanceZ = pFind->m_vecPos.fZ - pInterface->Placeable.matrix->pos.fZ;
+                    fDistanceX = pFind->m_vecPos.fX - pInterface->Placeable.matrix->vPos.fX;
+                    fDistanceY = pFind->m_vecPos.fY - pInterface->Placeable.matrix->vPos.fY;
+                    fDistanceZ = pFind->m_vecPos.fZ - pInterface->Placeable.matrix->vPos.fZ;
                 }
 
                 float fDistance = sqrt ( fDistanceX * fDistanceX + fDistanceY * fDistanceY + fDistanceZ * fDistanceZ );
@@ -899,7 +900,7 @@ void CWorldSA::ClearRemovedBuildingLists ( )
                         if ( ( pEntity->nType == ENTITY_TYPE_BUILDING || pEntity->nType == ENTITY_TYPE_DUMMY || pEntity->nType == ENTITY_TYPE_OBJECT ) && pEntity->bRemoveFromWorld != 1 )
                         {
                             // Don't call this on entities being removed.
-                            if ( (DWORD)(pEntity->vtbl) != VTBL_CPlaceable )
+                            if ( *(DWORD*)(pEntity) != VTBL_CPlaceable )
                             {
                                 Add ( pEntity, BuildingRemovalReset );
                             }
@@ -922,7 +923,7 @@ void CWorldSA::ClearRemovedBuildingLists ( )
                         if ( ( pEntity->nType == ENTITY_TYPE_BUILDING || pEntity->nType == ENTITY_TYPE_DUMMY || pEntity->nType == ENTITY_TYPE_OBJECT ) && pEntity->bRemoveFromWorld != 1 )
                         {
                             // Don't call this on entities being removed.
-                            if ( (DWORD)(pEntity->vtbl) != VTBL_CPlaceable )
+                            if ( *(DWORD*)(pEntity) != VTBL_CPlaceable )
                             {
                                 Add ( pEntity, BuildingRemovalReset2 );
                             }
@@ -986,9 +987,9 @@ SBuildingRemoval* CWorldSA::GetBuildingRemoval ( CEntitySAInterface * pInterface
 
             if ( pInterface->Placeable.matrix != NULL )
             {
-                fDistanceX = pFind->m_vecPos.fX - pInterface->Placeable.matrix->pos.fX;
-                fDistanceY = pFind->m_vecPos.fY - pInterface->Placeable.matrix->pos.fY;
-                fDistanceZ = pFind->m_vecPos.fZ - pInterface->Placeable.matrix->pos.fZ;
+                fDistanceX = pFind->m_vecPos.fX - pInterface->Placeable.matrix->vPos.fX;
+                fDistanceY = pFind->m_vecPos.fY - pInterface->Placeable.matrix->vPos.fY;
+                fDistanceZ = pFind->m_vecPos.fZ - pInterface->Placeable.matrix->vPos.fZ;
             }
 
             float fDistance = sqrt ( fDistanceX * fDistanceX + fDistanceY * fDistanceY + fDistanceZ * fDistanceZ );

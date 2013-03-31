@@ -72,10 +72,10 @@ void _declspec(naked) HOOK_CallIdle()
 void OnMY_CEntity_Render_Pre( CEntitySAInterface* pEntity )
 {
     // Ignore buildings
-    if ( pEntity->vtbl == (CEntitySAInterfaceVTBL*)0x08585c8 )
+    if ( *(CEntitySAInterfaceVTBL**)pEntity == (CEntitySAInterfaceVTBL*)0x08585c8 )
         return;
     // Ignore dummy objects
-    if ( pEntity->vtbl == (CEntitySAInterfaceVTBL*)0x0866E78 )
+    if ( *(CEntitySAInterfaceVTBL**)pEntity == (CEntitySAInterfaceVTBL*)0x0866E78 )
         return;
 
     ms_Rendering = pEntity;
@@ -137,10 +137,10 @@ inner:
 void OnMY_CEntity_RenderOneNonRoad_Pre( DWORD calledFrom, CEntitySAInterface* pEntity )
 {
     // Ignore buildings
-    if ( pEntity->vtbl == (CEntitySAInterfaceVTBL*)0x08585c8 )
+    if ( *(CEntitySAInterfaceVTBL**)pEntity == (CEntitySAInterfaceVTBL*)0x08585c8 )
         return;
     // Ignore dummy objects
-    if ( pEntity->vtbl == (CEntitySAInterfaceVTBL*)0x0866E78 )
+    if ( *(CEntitySAInterfaceVTBL**)pEntity == (CEntitySAInterfaceVTBL*)0x0866E78 )
         return;
 
     ms_RenderingOneNonRoad = pEntity;

@@ -1,11 +1,12 @@
 /*****************************************************************************
 *
-*  PROJECT:     Multi Theft Auto v1.0
+*  PROJECT:     Multi Theft Auto v1.2
 *               (Shared logic for modifications)
 *  LICENSE:     See LICENSE in the top level directory
 *  FILE:        mods/shared_logic/CClientColModel.h
 *  PURPOSE:     Model collision (.col file) entity class
 *  DEVELOPERS:  Christian Myhre Lundheim <>
+*               Martin Turski <quiret@gmx.de>
 *
 *****************************************************************************/
 
@@ -40,8 +41,6 @@ public:
     void                            SetPosition             ( const CVector& vecPosition ) {};
 
 private:
-    void                            InternalRestore         ( unsigned short usModel );
-
     class CClientColModelManager*   m_pColModelManager;
     
     CColModel*                      m_pColModel;

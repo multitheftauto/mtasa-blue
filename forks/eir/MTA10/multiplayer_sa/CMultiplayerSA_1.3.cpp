@@ -811,7 +811,7 @@ void _declspec(naked) HOOK_CVehicle_ProcessStuff_TestCameraPosition ( )
 }
 bool DisableVehicleSiren ( )
 {
-    if ( pVehicleWithTheSiren && pVehicleWithTheSiren->vtbl != NULL )
+    if ( pVehicleWithTheSiren )
     {
         CVehicle * pVehicle = pGameInterface->GetPools ()->GetVehicle ( (DWORD *)pVehicleWithTheSiren );
         if ( pVehicle && ( pVehicle->IsSirenSilentEffectEnabled ( ) || pVehicle->GetModelIndex ( ) == 420 ) )

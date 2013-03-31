@@ -28,6 +28,7 @@
 
 RwAtomicRenderChainInterface *const rwRenderChains = (RwAtomicRenderChainInterface*)0x00C88070;
 RwScene *const *p_gtaScene = (RwScene**)0x00C17038;
+RwDeviceInformation *const pRwDeviceInfo = (RwDeviceInformation*)0x00C9BF00;
 
 
 /*=========================================================
@@ -104,7 +105,7 @@ void RwFrame::SetModelling( const RwMatrix& mat )
 =========================================================*/
 void RwFrame::SetPosition( const CVector& pos )
 {
-    modelling.pos = pos;
+    modelling.vPos = pos;
 
     // Set the frame to dirty
     privateFlags |= RW_FRAME_DIRTY;
@@ -259,6 +260,8 @@ unsigned int RwFrame::CountChildren( void )
 
     Purpose:
         Returns the first child frame of this frame.
+    Binary offsets:
+        (1.0 US and 1.0 EU): 0x00734900
 =========================================================*/
 RwFrame* RwFrame::GetFirstChild( void )
 {
@@ -328,10 +331,7 @@ RwFrame* RwFrame::FindChildByName( const char *name )
 
     info.name = name;
 
-    if ( ForAllChildren( RwFrameGetByName, &info ) )
-        return NULL;
-
-    return info.result;
+    return ForAllChildren( RwFrameGetByName, &info ) ? NULL : info.result;
 }
 
 /*=========================================================
@@ -378,7 +378,7 @@ RwFrame* RwFrame::FindChildByHierarchy( unsigned int id )
     Purpose:
         Returns a newly allocated frame which is the exact copy
         of this frame. That means that all it's objects and children
-        frames have been cloned.
+        frames have been cloned (needs confirmation).
     Binary offsets:
         (1.0 US): 0x007F0050
         (1.0 EU): 0x007F0090
@@ -428,7 +428,7 @@ RwObject* RwFrame::GetFirstObject( void )
     Arguments:
         type - type of the object you want to find
     Purpose:
-        Returns the first frame with the matching type.
+        Returns the first object with the matching type.
 =========================================================*/
 struct _rwFindObjectType
 {
@@ -494,10 +494,7 @@ RwObject* RwFrame::GetObjectByIndex( unsigned char type, unsigned int idx )
     info.idx = idx;
     info.curIdx = 0;
     
-    if ( ForAllObjects( RwObjectGetByIndex, &info ) )
-        return NULL;
-
-    return info.rslt;
+    return ForAllObjects( RwObjectGetByIndex, &info ) ? NULL : info.rslt;
 }
 
 /*=========================================================
@@ -598,7 +595,7 @@ RpAtomic* RwFrame::GetFirstAtomic( void )
 }
 
 /*=========================================================
-    RwFrame::SetAtomicVisibility
+    RwFrame::SetAtomicComponentFlags
 
     Arguments:
         flags - visibility flags for all atomics
@@ -606,15 +603,15 @@ RpAtomic* RwFrame::GetFirstAtomic( void )
         Applies the specified visibility flags for all atomics
         in this frame.
 =========================================================*/
-static bool RwObjectAtomicSetVisibilityFlags( RpAtomic *atomic, void *ud )
+static bool RwObjectAtomicSetComponentFlags( RpAtomic *atomic, unsigned short flags )
 {
-    atomic->ApplyVisibilityFlags( (unsigned short)ud );
+    atomic->componentFlags |= flags;
     return true;
 }
 
-void RwFrame::SetAtomicVisibility( unsigned short flags )
+void RwFrame::SetAtomicComponentFlags( unsigned short flags )
 {
-    ForAllAtomics( RwObjectAtomicSetVisibilityFlags, (void*)flags );
+    ForAllAtomics( RwObjectAtomicSetComponentFlags, flags );
 }
 
 static bool RwFrameAtomicBaseRoot( RpAtomic *atomic, RwFrame *root )
@@ -624,45 +621,47 @@ static bool RwFrameAtomicBaseRoot( RpAtomic *atomic, RwFrame *root )
 }
 
 /*=========================================================
-    RwFrame::FindVisibilityAtomics
+    RwFrame::FindComponentAtomics
 
     Arguments:
         primary - atomic of primary visibility type
         secondary - atomic of secondary visibility type
     Purpose:
-        Returns the last atomics which are either primary or
-        secondary visibility. Otherwise, the values are left
+        Returns the last atomics which are either marked as 'ok'
+        or 'dam' versions. Otherwise, the values are left
         untouched [if you are unsure that the frame has the
         atomics, initialize the values to NULL yourself].
 =========================================================*/
-struct _rwFrameVisibilityAtomics
+struct _rwFrameComponentAtomics
 {
     RpAtomic **primary;
     RpAtomic **secondary;
 };
 
-static bool RwFrameAtomicFindVisibility( RpAtomic *atomic, _rwFrameVisibilityAtomics *info )
+static bool RwFrameAtomicFindComponents( RpAtomic *atomic, _rwFrameComponentAtomics *info )
 {
-    if ( atomic->GetVisibilityFlags() & 0x01 )
+    if ( atomic->componentFlags & 0x01 )
     {
-        *info->primary = atomic;
-        return true;
+        if ( info->primary )
+            *info->primary = atomic;
     }
-
-    if ( atomic->GetVisibilityFlags() & 0x02 )
-        *info->secondary = atomic;
+    else if ( atomic->componentFlags & 0x02 )
+    {
+        if ( info->secondary )
+            *info->secondary = atomic;
+    }
 
     return true;
 }
 
-void RwFrame::FindVisibilityAtomics( RpAtomic **primary, RpAtomic **secondary )
+void RwFrame::FindComponentAtomics( RpAtomic **okay, RpAtomic **damaged )
 {
-    _rwFrameVisibilityAtomics info;
+    _rwFrameComponentAtomics info;
 
-    info.primary = primary;
-    info.secondary = secondary;
+    info.primary = okay;
+    info.secondary = damaged;
 
-    ForAllAtomics( RwFrameAtomicFindVisibility, &info );
+    ForAllAtomics( RwFrameAtomicFindComponents, &info );
 }
 
 /*=========================================================
@@ -703,18 +702,27 @@ RpAnimHierarchy* RwFrame::GetAnimHierarchy( void )
         This function has been inlined into other RenderWare
         functions. Look closely at the pattern to find out
         where!
+        _RegisterRoot is the function which marks a frame as
+        root. RegisterRoot would mark the root frame as root,
+        so it more likely marks the frame as child.
 =========================================================*/
-void RwFrame::RegisterRoot( void )
+void RwFrame::_RegisterRoot( void )
 {
-    if ( !(root->privateFlags & ( RW_OBJ_REGISTERED | RW_FRAME_DIRTY ) ) )
+    unsigned char flagIntegrity = privateFlags;
+
+    if ( !( flagIntegrity & ( RW_OBJ_REGISTERED | RW_FRAME_DIRTY ) ) )
     {
         // Add it to the internal list
         LIST_INSERT( pRwInterface->m_nodeRoot.root, nodeRoot );
-
-        root->privateFlags |= RW_OBJ_REGISTERED | RW_FRAME_DIRTY;
     }
 
-    privateFlags |= RW_OBJ_REGISTERED | RW_OBJ_HIERARCHY_CACHED;
+    privateFlags = ( flagIntegrity | ( RW_OBJ_REGISTERED | RW_FRAME_DIRTY ) );
+}
+
+void RwFrame::RegisterRoot( void )
+{
+    root->_RegisterRoot();
+    privateFlags |= RW_OBJ_VISIBLE | RW_OBJ_HIERARCHY_CACHED;
 }
 
 /*=========================================================
@@ -726,16 +734,46 @@ void RwFrame::RegisterRoot( void )
         receives a parent frame.
     Note:
         This function has been heavily inlined and does only
-        occur in RwFrame::Unlink.
+        occur in RwFrame::Link.
 =========================================================*/
 void RwFrame::UnregisterRoot( void )
 {
-    if ( !(root->privateFlags & ( RW_OBJ_REGISTERED | 0x01 ) ) )
+    if ( !( privateFlags & ( RW_OBJ_REGISTERED | 0x01 ) ) )
         return;
 
     LIST_REMOVE( nodeRoot );
 
     privateFlags &= ~(RW_OBJ_REGISTERED | 1);
+}
+
+/*=========================================================
+    RwTexDictionaryCreate
+
+    Purpose:
+        Returns a newly created TexDictionary.
+    Binary offsets:
+        (1.0 US): 0x007F3600
+        (1.0 EU): 0x007F3640
+=========================================================*/
+RwTexDictionary* RwTexDictionaryCreate( void )
+{
+    RwTexDictionary *txd = (RwTexDictionary*)pRwInterface->m_allocStruct( pRwInterface->m_textureManager.m_txdStruct, 0x30016 );
+
+    if ( !txd )
+        return NULL;
+
+    txd->type = RW_TXD;
+    txd->subtype = 0;
+    txd->flags = 0;
+    txd->privateFlags = 0;
+    txd->parent = NULL;
+
+    LIST_CLEAR( txd->textures.root );
+    LIST_APPEND( pRwInterface->m_textureManager.m_globalTxd.root, txd->globalTXDs );
+
+    // Register the txd I guess
+    RwObjectRegister( (void*)0x008E23E4, txd );
+    return txd;
 }
 
 /*=========================================================
@@ -764,27 +802,14 @@ RwTexture* RwTexDictionary::GetFirstTexture( void )
         (1.0 US): 0x007F39F0
         (1.0 EU): 0x007F3A30
 =========================================================*/
-struct _rwTexDictFind
-{
-    const char *name;
-    RwTexture *tex;
-};
-
-static bool RwTexDictionaryFindTexture( RwTexture *tex, _rwTexDictFind *find )
-{
-    if ( stricmp( tex->name, find->name ) != 0 )
-        return true;
-
-    find->tex = tex;
-    return false;
-}
-
 RwTexture* RwTexDictionary::FindNamedTexture( const char *name )
 {
-    _rwTexDictFind find;
-    find.name = name;
+    LIST_FOREACH_BEGIN( RwTexture, textures.root, TXDList )
+        if ( stricmp( item->name, name ) == 0 )
+            return item;
+    LIST_FOREACH_END
 
-    return ForAllTextures( RwTexDictionaryFindTexture, &find ) ? NULL : find.tex;
+    return NULL;
 }
 
 /*=========================================================
@@ -1080,61 +1105,6 @@ void RpAtomic::SetRenderCallback( RpAtomicCallback callback )
 }
 
 /*=========================================================
-    RpAtomic::ApplyVisibilityFlags
-    (currently under investigation)
-
-    Arguments:
-        flags - visibility flags for this atomic
-    Purpose:
-        Applies the specified visibility flags for this atomic.
-        This means that they are OR'd to the existing flags.
-=========================================================*/
-void RpAtomic::ApplyVisibilityFlags( unsigned short flags )
-{
-    *(unsigned short*)&matrixFlags |= flags;
-}
-
-/*=========================================================
-    RpAtomic::RemoveVisibilityFlags
-    (currently under investigation)
-
-    Arguments:
-        flags - visibility flags for this atomic
-    Purpose:
-        Removes visibility flags from this atomic.
-=========================================================*/
-void RpAtomic::RemoveVisibilityFlags( unsigned short flags )
-{
-    *(unsigned short*)&matrixFlags &= ~flags;
-}
-
-/*=========================================================
-    RpAtomic::GetVisibilityFlags
-    (currently under investigation)
-
-    Purpose:
-        Returns the current atomic visibility flags.
-=========================================================*/
-unsigned short RpAtomic::GetVisibilityFlags( void )
-{
-    return *(unsigned short*)&matrixFlags;
-}
-
-/*=========================================================
-    RpAtomic::SetExtendedRenderFlags
-    (currently under investigation)
-
-    Arguments:
-        flags - extended render flags to set
-    Purpose:
-        Sets the extended render flags of this atomic
-=========================================================*/
-void RpAtomic::SetExtendedRenderFlags( unsigned short flags )
-{
-    *(unsigned short*)&renderFlags = flags;
-}
-
-/*=========================================================
     RpAtomic::FetchMateria
 
     Arguments:
@@ -1147,7 +1117,7 @@ void RpAtomic::SetExtendedRenderFlags( unsigned short flags )
 =========================================================*/
 void RpAtomic::FetchMateria( RpMaterials& mats )
 {
-    if ( !(GetVisibilityFlags() & 0x20) )
+    if ( componentFlags & 0x2000 )
         return;
 
     for ( unsigned int n = 0; n < geometry->linkedMaterials->m_count; n++ )
@@ -1164,10 +1134,15 @@ RpMaterials::RpMaterials( unsigned int max )
 
 RpMaterials::~RpMaterials( void )
 {
-    for ( unsigned int n = 0; n < m_entries; n++ )
-        RpMaterialDestroy( m_data[n] );
+    if ( m_data )
+    {
+        for ( unsigned int n = 0; n < m_entries; n++ )
+            RpMaterialDestroy( m_data[n] );
 
-    pRwInterface->m_free( m_data );
+        pRwInterface->m_free( m_data );
+
+        m_data = NULL;
+    }
 
     m_entries = 0;
     m_max = 0;
@@ -1349,7 +1324,7 @@ void RpLight::RemoveFromScene( void )
     RpClump::Render
 
     Purpose:
-        Renders all atomics of this clump if they are flagged
+        Renders all atomics of this clump that are flagged
         visible.
     Binary offsets:
         (1.0 US): 0x00749B20
@@ -1670,23 +1645,23 @@ void RpClump::SetupAtomicRender( void )
 }
 
 /*=========================================================
-    RpClump::RemoveAtomicVisibilityFlags
+    RpClump::RemoveAtomicComponentFlags
 
     Arguments:
         flags - the flags you wish to remove from all atomics
     Purpose:
         Loops through all atomics of this clump and removes the
-        specified visibility flags.
+        specified component flags.
 =========================================================*/
-static bool RwAtomicRemoveVisibilityFlags( RpAtomic *child, unsigned short flags )
+static bool RwAtomicRemoveComponentFlags( RpAtomic *child, unsigned short flags )
 {
-    child->RemoveVisibilityFlags( flags );
+    child->componentFlags &= ~flags;
     return true;
 }
 
-void RpClump::RemoveAtomicVisibilityFlags( unsigned short flags )
+void RpClump::RemoveAtomicComponentFlags( unsigned short flags )
 {
-    ForAllAtomics( RwAtomicRemoveVisibilityFlags, flags );
+    ForAllAtomics( RwAtomicRemoveComponentFlags, flags );
 }
 
 /*=========================================================
@@ -1742,7 +1717,7 @@ void RpClump::GetBoneTransform( CVector *offset )
 
     anim = atomic->anim;
 
-    // Reset the offset
+    // Initialize the first offset
     offset->fX = 0;
     offset->fY = 0;
     offset->fZ = 0;
@@ -1763,7 +1738,7 @@ void RpClump::GetBoneTransform( CVector *offset )
 
         RwMatrixInvert( &mat, skelMat );
 
-        pRwInterface->m_matrixTransform3( offset, &mat.up, 1, skel->boneMatrices + matId );
+        pRwInterface->m_matrixTransform3( offset, &mat.vUp, 1, skel->boneMatrices + matId );
 
         // Some sort of stacking mechanism, maximum 20
         if ( bone->flags & 0x02 )
@@ -1785,6 +1760,8 @@ void RpClump::GetBoneTransform( CVector *offset )
 
     Purpose:
         Returns whether the geometry requires alpha blending.
+        If it returns false, it may still require alpha blending
+        since the texture might have an alpha channel.
 =========================================================*/
 bool RwMaterialAlphaCheck( RpMaterial *mat, int )
 {
@@ -1845,26 +1822,26 @@ void RpGeometry::UnlinkFX( void )
 =========================================================*/
 bool RwAtomicRenderChainInterface::PushRender( RwAtomicZBufferEntry *level )
 {
-    RwAtomicRenderChain *iter = &m_root;
+    RwAtomicRenderChain *iter = m_root.prev;
     RwAtomicRenderChain *progr;
 
-    // Check at which position we may insert the z-buffer entry
-    while ( iter->list.prev != &m_rootLast.list )
-    {
-        iter = LIST_GETITEM(RwAtomicRenderChain, iter->list.prev, list);
+    // Scan until we find appropriate slot
+    for ( ; iter != &m_rootLast && iter->m_entry.m_distance < level->m_distance; 
+        iter = iter->prev );
 
-        if ( iter->m_entry.m_distance >= level->m_distance )
-            break;
-    }
-
-    if ( ( progr = LIST_GETITEM(RwAtomicRenderChain, m_renderStack.list.prev, list) ) == &m_renderLast )
+    if ( ( progr = m_renderStack.prev ) == &m_renderLast )
         return false;
 
     // Update render details
     progr->m_entry = *level;
 
-    LIST_REMOVE( progr->list );
-    LIST_INSERT( iter->list, progr->list );
+    LIST_REMOVE( *progr );
+    
+    iter = iter->next;
+    progr->prev = iter->prev;
+    iter->prev->next = progr;
+    progr->next = iter;
+    iter->prev = progr;
     return true;
 }
 
@@ -1894,7 +1871,7 @@ RwTexture* RwFindTexture( const char *name, const char *secName )
 {
     RwTexture *tex = pRwInterface->m_textureManager.m_findInstanceRef( name );
 
-    // The global store will reference textures
+    // The current TXD store will reference textures
     if ( tex )
     {
         tex->refs++;

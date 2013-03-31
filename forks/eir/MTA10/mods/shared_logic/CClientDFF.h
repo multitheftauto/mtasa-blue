@@ -22,6 +22,7 @@ struct SLoadedClumpInfo
     SLoadedClumpInfo ( void ) : bTriedLoad ( false ), pClump ( NULL ) {} 
     bool     bTriedLoad;
     RpClump* pClump;
+    CColModel* col;
 };
 
 
@@ -59,7 +60,7 @@ protected:
     bool                            ReplaceWeaponModel      ( RpClump* pClump, ushort usModel, bool bAlphaTransparency );
     bool                            ReplacePedModel         ( RpClump* pClump, ushort usModel, bool bAlphaTransparency );
 
-    RpClump*                        GetLoadedClump          ( ushort usModelId );
+    RpClump*                        GetLoadedClump          ( ushort usModelId, CColModel*& col );
 
     class CClientDFFManager*        m_pDFFManager;
 

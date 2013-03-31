@@ -224,7 +224,7 @@ void CVehicleSA::Init ( void )
 
     // Initialize doors depending on the vtable.
     DWORD dwOffset;
-    DWORD dwFunc = ((CVehicleSAInterfaceVTBL *)this->GetVehicleInterface()->vtbl)->GetDoorAngleOpenRatio_;
+    DWORD dwFunc = (*(CVehicleSAInterfaceVTBL**)this->GetVehicleInterface())->GetDoorAngleOpenRatio_;
     if ( dwFunc == FUNC_CAutomobile__GetDoorAngleOpenRatio )
         dwOffset = 1464;
     else if ( dwFunc == FUNC_CTrain__GetDoorAngleOpenRatio )
@@ -265,7 +265,7 @@ CVehicleSA::~CVehicleSA()
     DEBUG_TRACE("CVehicleSA::~CVehicleSA()");
     if(!this->BeingDeleted)
     {
-        if ( (DWORD)m_pInterface->vtbl != VTBL_CPlaceable )
+        if ( *(DWORD*)m_pInterface != VTBL_CPlaceable )
         {
             GetVehicleInterface ()->m_pVehicle = NULL;
 
@@ -293,14 +293,7 @@ CVehicleSA::~CVehicleSA()
             pWorld->Remove ( m_pInterface, CVehicle_Destructor );
             pWorld->RemoveReferencesToDeletedObject ( m_pInterface );
 
-            
-            dwFunc = m_pInterface->vtbl->SCALAR_DELETING_DESTRUCTOR; // we use the vtbl so we can be vehicle type independent
-            _asm
-            {
-                mov     ecx, dwThis
-                push    1           //delete too
-                call    dwFunc
-            }
+            delete m_pInterface;
         }
         this->BeingDeleted = true;
         ((CPoolsSA *)pGame->GetPools())->RemoveVehicle((CVehicle *)this);
@@ -570,7 +563,7 @@ CDoorSA* CVehicleSA::GetDoor ( unsigned char ucDoor )
 void CVehicleSA::OpenDoor ( unsigned char ucDoor, float fRatio, bool bMakeNoise )
 {
     DWORD dwThis = (DWORD) m_pInterface;
-    DWORD dwFunc = ((CVehicleSAInterfaceVTBL*)GetVehicleInterface()->vtbl)->OpenDoor;
+    DWORD dwFunc = (*(CVehicleSAInterfaceVTBL**)GetVehicleInterface())->OpenDoor;
 
     // Grab the car node index for the given door id
     static int s_iCarNodeIndexes [6] = { 0x10, 0x11, 0x0A, 0x08, 0x0B, 0x09 };
@@ -853,7 +846,7 @@ float CVehicleSA::GetSteerAngle ( void )
 bool CVehicleSA::GetTowBarPos ( CVector* pVector, CVehicle* pTrailer )
 {
     DEBUG_TRACE("bool CVehicleSA::GetTowBarPos ( CVector* pVector )");
-    CVehicleSAInterfaceVTBL * vehicleVTBL = (CVehicleSAInterfaceVTBL *)(m_pInterface->vtbl);
+    CVehicleSAInterfaceVTBL * vehicleVTBL = *(CVehicleSAInterfaceVTBL **)(m_pInterface);
     DWORD dwThis = (DWORD) m_pInterface;
     DWORD dwFunc = vehicleVTBL->GetTowbarPos;
     bool bReturn = false;
@@ -880,7 +873,7 @@ bool CVehicleSA::GetTowBarPos ( CVector* pVector, CVehicle* pTrailer )
 bool CVehicleSA::GetTowHitchPos ( CVector* pVector )
 {
     DEBUG_TRACE("bool CVehicleSA::GetTowHitchPos ( CVector* pVector )");
-    CVehicleSAInterfaceVTBL * vehicleVTBL = (CVehicleSAInterfaceVTBL *)(m_pInterface->vtbl);
+    CVehicleSAInterfaceVTBL * vehicleVTBL = *(CVehicleSAInterfaceVTBL **)(m_pInterface);
     DWORD dwThis = (DWORD) m_pInterface;
     DWORD dwFunc = vehicleVTBL->GetTowHitchPos;
     bool bReturn = false;
@@ -1467,7 +1460,7 @@ CDamageManager * CVehicleSA::GetDamageManager()
 
 void CVehicleSA::BlowUp ( CEntity* pCreator, unsigned long ulUnknown )
 {
-    CVehicleSAInterfaceVTBL * vehicleVTBL = (CVehicleSAInterfaceVTBL *)(this->GetInterface()->vtbl);
+    CVehicleSAInterfaceVTBL * vehicleVTBL = *(CVehicleSAInterfaceVTBL **)(this->GetInterface());
     DWORD dwThis = (DWORD) m_pInterface;
     DWORD dwFunc = vehicleVTBL->BlowUpCar;
 
@@ -1485,7 +1478,7 @@ void CVehicleSA::BlowUp ( CEntity* pCreator, unsigned long ulUnknown )
 
 void CVehicleSA::BlowUpCutSceneNoExtras ( unsigned long ulUnknown1, unsigned long ulUnknown2, unsigned long ulUnknown3, unsigned long ulUnknown4 )
 {
-    CVehicleSAInterfaceVTBL * vehicleVTBL = (CVehicleSAInterfaceVTBL *)(this->GetInterface()->vtbl);
+    CVehicleSAInterfaceVTBL * vehicleVTBL = *(CVehicleSAInterfaceVTBL **)this->GetInterface();
     DWORD dwThis = (DWORD) m_pInterface;
     DWORD dwFunc = vehicleVTBL->BlowUpCarCutSceneNoExtras;
 
@@ -1557,7 +1550,7 @@ bool CVehicleSA::BreakTowLink ( void )
     DEBUG_TRACE("bool CVehicleSA::BreakTowLink ( void )");
     DWORD dwThis = (DWORD) GetInterface();
 
-    CVehicleSAInterfaceVTBL * vehicleVTBL = (CVehicleSAInterfaceVTBL *)(this->GetInterface()->vtbl);
+    CVehicleSAInterfaceVTBL * vehicleVTBL = *(CVehicleSAInterfaceVTBL **)(this->GetInterface());
     DWORD dwFunc = vehicleVTBL->BreakTowLink;
     bool bReturn = false;
 
@@ -1810,7 +1803,7 @@ void CVehicleSA::RecalculateHandling ( void )
 
 void CVehicleSA::BurstTyre ( BYTE bTyre )
 {
-    CVehicleSAInterfaceVTBL * vehicleVTBL = (CVehicleSAInterfaceVTBL *)(m_pInterface->vtbl);
+    CVehicleSAInterfaceVTBL * vehicleVTBL = *(CVehicleSAInterfaceVTBL **)(m_pInterface);
     DWORD dwThis = (DWORD) m_pInterface;
     DWORD dwFunc = vehicleVTBL->BurstTyre;
     _asm
@@ -1897,7 +1890,7 @@ void CVehicleSA::SetGravity ( const CVector* pvecGravity )
         GetMatrixForGravity ( m_vecGravity, matOld );
         GetMatrixForGravity ( *pvecGravity, matNew );
         
-        CVector* pvecPosition = &m_pInterface->Placeable.matrix->pos;
+        CVector* pvecPosition = &m_pInterface->Placeable.matrix->vPos;
 
         matOld.Invert ();
         pCam->GetTargetHistoryPos () [ 0 ] = matOld * (pCam->GetTargetHistoryPos () [ 0 ] - *pvecPosition);
@@ -2108,7 +2101,7 @@ void CVehicleSA::RecalculateSuspensionLines ( void )
         if ( pModelInfo->IsTrain () || dwModel == 571 || dwModel == 570 || dwModel == 569 || dwModel == 590 )
             return;
 
-        CVehicleSAInterfaceVTBL* pVtbl = reinterpret_cast < CVehicleSAInterfaceVTBL* > ( pInt->vtbl );
+        CVehicleSAInterfaceVTBL* pVtbl = *reinterpret_cast < CVehicleSAInterfaceVTBL** > ( pInt );
         DWORD dwSetupSuspensionLines = pVtbl->SetupSuspensionLines;
         DWORD dwThis = (DWORD)pInt;
         _asm
@@ -2152,7 +2145,7 @@ void CVehicleSA::OnChangingPosition ( const CVector& vecNewPosition )
     // Only apply to CAutomobile and down
     if ( GetBaseVehicleType () == 0 )
     {
-        CVector vecDelta = vecNewPosition - m_pInterface->Placeable.matrix->pos;
+        CVector vecDelta = vecNewPosition - m_pInterface->Placeable.matrix->vPos;
         if ( vecDelta.LengthSquared () > 10 * 10 )
         {
             // Reposition colpoints for big moves to avoid random spinning
@@ -2227,9 +2220,9 @@ bool CVehicleSA::SetComponentRotation ( SString vehicleComponent, CVector vecRot
         RwMatrix matrixPadded;
         _MatrixConvertFromEulerAngles ( &matrixPadded, vecRotation.fX, vecRotation.fY, vecRotation.fZ );
         // copy it into the rotation field
-        pComponent->modelling.right = matrixPadded.right;
-        pComponent->modelling.up = matrixPadded.at;
-        pComponent->modelling.at = matrixPadded.up;
+        pComponent->modelling.vRight = matrixPadded.vRight;
+        pComponent->modelling.vUp = matrixPadded.vFront;
+        pComponent->modelling.vFront = matrixPadded.vUp;
         return true;
     }
     return false;
@@ -2244,9 +2237,9 @@ bool CVehicleSA::GetComponentRotation ( SString vehicleComponent, CVector &vecRo
     {
         // call our convert to euler angles function to get a valid rotation
         RwMatrix matrixPadded;
-        matrixPadded.right = pComponent->modelling.right;
-        matrixPadded.at = pComponent->modelling.up;
-        matrixPadded.up = pComponent->modelling.at;
+        matrixPadded.vRight = pComponent->modelling.vRight;
+        matrixPadded.vFront = pComponent->modelling.vUp;
+        matrixPadded.vUp = pComponent->modelling.vFront;
         _MatrixConvertToEulerAngles ( &matrixPadded, vecRotation.fX, vecRotation.fY, vecRotation.fZ );
         return true;
     }
@@ -2261,9 +2254,9 @@ bool CVehicleSA::SetComponentPosition ( SString vehicleComponent, CVector vecPos
     if ( pComponent )
     {
         // set our position (modelling is relative positions and ltm is world pos)
-        pComponent->modelling.pos[0] = vecPosition.fX;
-        pComponent->modelling.pos[1] = vecPosition.fY;
-        pComponent->modelling.pos[2] = vecPosition.fZ;
+        pComponent->modelling.vPos[0] = vecPosition.fX;
+        pComponent->modelling.vPos[1] = vecPosition.fY;
+        pComponent->modelling.vPos[2] = vecPosition.fZ;
         return true;
     }
     return false;
@@ -2277,7 +2270,7 @@ bool CVehicleSA::GetComponentPosition ( SString vehicleComponent, CVector &vecPo
     if ( pComponent )
     {
         // get our position (modelling is relative positions and ltm is world pos)
-        vecPositionModelling = pComponent->modelling.pos;
+        vecPositionModelling = pComponent->modelling.vPos;
         return true;
     }
     return false;
@@ -2310,15 +2303,8 @@ bool CVehicleSA::SetComponentMatrix ( SString vehicleComponent, RwMatrix &ltm, R
     if ( pFrame )
     {
         // Copy vectors and leave flags for now.
-        pFrame->ltm.at = ltm.at;
-        pFrame->ltm.pos = ltm.pos;
-        pFrame->ltm.right = ltm.right;
-        pFrame->ltm.up = ltm.up;
-
-        pFrame->modelling.at = modelling.at;
-        pFrame->modelling.pos = modelling.pos;
-        pFrame->modelling.right = modelling.right;
-        pFrame->modelling.up = modelling.up;
+        pFrame->ltm = ltm;
+        pFrame->modelling = modelling;
         return true;
     }
     return false;

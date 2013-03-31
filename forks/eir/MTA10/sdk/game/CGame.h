@@ -20,6 +20,7 @@ typedef void ( InRenderer ) ( void );
 #include "Common.h"
 
 #include "CRenderWare.h"
+#include "CTextureManager.h"
 #include "C3DMarkers.h"
 #include "CAERadioTrackManager.h"
 #include "CAnimBlendAssociation.h"

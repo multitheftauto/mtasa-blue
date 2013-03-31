@@ -17,9 +17,13 @@
 #define LIST_REMOVE(link) ( (link).prev->next = (link).next, (link).next->prev = (link).prev )
 #define LIST_CLEAR(link) ( (link).prev = &(link), (link).next = &(link) )
 #define LIST_INITNODE(link) ( (link).prev = NULL, (link).next = NULL )
+#ifdef _DEBUG
 #define LIST_EMPTY(link) ( (link).prev == &(link) && (link).next == &(link) )
+#else
+#define LIST_EMPTY(link) ( (link).next == &(link) )
+#endif //_DEBUG
 #define LIST_GETITEM(type, item, node) ( (type*)( (unsigned int)(item) - offsetof(type, node) ) )
-#define LIST_FOREACH_BEGIN(type, root, node) for ( RwListEntry <type> *iter = (root).next; iter != &(root); iter = iter->next ) { type *item = LIST_GETITEM(type, iter, node);
+#define LIST_FOREACH_BEGIN(type, root, node) for ( RwListEntry <type> *iter = (root).next, *niter; iter != &(root); iter = niter ) { type *item = LIST_GETITEM(type, iter, node); niter = iter->next;
 #define LIST_FOREACH_END }
 
 template < class type >

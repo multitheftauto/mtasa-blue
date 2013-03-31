@@ -94,6 +94,7 @@
 				MapExports="true"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
+				EntryPointSymbol="__dllInit"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="0"
 				ImportLibrary=".\Release/game_sa.lib"
@@ -192,6 +193,7 @@
 				SuppressStartupBanner="true"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\Debug/game_sa_d.pdb"
+				EntryPointSymbol="__dllInit"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="0"
 				ImportLibrary=".\Debug/game_sa_d.lib"
@@ -297,6 +299,7 @@
 				MapExports="true"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
+				EntryPointSymbol="__dllInit"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="0"
 				ImportLibrary=".\Release/game_sa.lib"
@@ -373,6 +376,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CAtomicModelInfoSA.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\CAudioEngineSA.cpp"
 				>
 			</File>
@@ -433,6 +440,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CClumpModelInfoSA.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\CColModelSA.cpp"
 				>
 			</File>
@@ -457,7 +468,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CDummySA.cpp"
+				>
+			</File>
+			<File
 				RelativePath="CEntitySA.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CEntryInfoSA.cpp"
 				>
 			</File>
 			<File
@@ -525,6 +544,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CIMGManagerSA.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\CKeyGenSA.cpp"
 				>
 			</File>
@@ -537,7 +560,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CModelInfoSA.base.cpp"
+				>
+			</File>
+			<File
 				RelativePath="CModelInfoSA.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CModelInfoSA.ide.cpp"
 				>
 			</File>
 			<File
@@ -613,6 +644,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CPlaceableSA.cpp"
+				>
+			</File>
+			<File
 				RelativePath="CPlaneSA.cpp"
 				>
 			</File>
@@ -645,11 +680,19 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CPtrNodeSA.cpp"
+				>
+			</File>
+			<File
 				RelativePath="CQuadBikeSA.cpp"
 				>
 			</File>
 			<File
 				RelativePath="CRadarSA.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CRecordingsSA.cpp"
 				>
 			</File>
 			<File
@@ -661,7 +704,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CRenderWareExtensionSA.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\CRenderWareSA.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CRenderWareSA.pipeline.cpp"
 				>
 			</File>
 			<File
@@ -689,6 +740,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CRouteSA.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\CSettingsSA.cpp"
 				>
 			</File>
@@ -701,7 +756,23 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CStreamerSA.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\CStreamingSA.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CStreamingSA.init.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CStreamingSA.utils.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CTaskAllocatorSA.cpp"
 				>
 			</File>
 			<File
@@ -721,11 +792,35 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CTextureManagerSA.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CTextureManagerSA.instance.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\CTheCarGeneratorsSA.cpp"
 				>
 			</File>
 			<File
 				RelativePath="CTrailerSA.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CTransformationSA.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CVehicleModelInfoSA.config.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CVehicleModelInfoSA.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CVehicleModelInfoSA.render.cpp"
 				>
 			</File>
 			<File
@@ -860,6 +955,14 @@
 				RelativePath=".\TaskSecondarySA.cpp"
 				>
 			</File>
+			<Filter
+				Name="debugsdk"
+				>
+				<File
+					RelativePath="..\..\Shared\sdk\debugsdk\dbgheap.cpp"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -903,6 +1006,10 @@
 			</File>
 			<File
 				RelativePath=".\CAnimManagerSA.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CAtomicModelInfoSA.h"
 				>
 			</File>
 			<File
@@ -970,6 +1077,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CClumpModelInfoSA.h"
+				>
+			</File>
+			<File
 				RelativePath=".\CColBoxSA.h"
 				>
 			</File>
@@ -1018,7 +1129,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CDummySA.h"
+				>
+			</File>
+			<File
 				RelativePath="CEntitySA.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CEntryInfoSA.h"
 				>
 			</File>
 			<File
@@ -1086,6 +1205,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CIMGManagerSA.h"
+				>
+			</File>
+			<File
 				RelativePath=".\CKeyGenSA.h"
 				>
 			</File>
@@ -1098,7 +1221,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CModelInfoSA.base.h"
+				>
+			</File>
+			<File
 				RelativePath="CModelInfoSA.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CModelInfoSA.ide.h"
 				>
 			</File>
 			<File
@@ -1178,6 +1309,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CPlaceableSA.h"
+				>
+			</File>
+			<File
 				RelativePath="CPlaneSA.h"
 				>
 			</File>
@@ -1210,11 +1345,19 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CPtrNodeSA.h"
+				>
+			</File>
+			<File
 				RelativePath="CQuadBikeSA.h"
 				>
 			</File>
 			<File
 				RelativePath="CRadarSA.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CRecordingsSA.h"
 				>
 			</File>
 			<File
@@ -1226,7 +1369,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CRenderWareExtensionSA.h"
+				>
+			</File>
+			<File
 				RelativePath=".\CRenderWareSA.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CRenderWareSA.pipeline.h"
 				>
 			</File>
 			<File
@@ -1250,6 +1401,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CRouteSA.h"
+				>
+			</File>
+			<File
 				RelativePath=".\CSettingsSA.h"
 				>
 			</File>
@@ -1262,7 +1417,23 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CStreamerSA.h"
+				>
+			</File>
+			<File
 				RelativePath=".\CStreamingSA.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CStreamingSA.init.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CStreamingSA.utils.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CTaskAllocatorSA.h"
 				>
 			</File>
 			<File
@@ -1282,11 +1453,35 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CTextureManagerSA.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CTextureManagerSA.instance.h"
+				>
+			</File>
+			<File
 				RelativePath=".\CTheCarGeneratorsSA.h"
 				>
 			</File>
 			<File
 				RelativePath="CTrailerSA.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CTransformationSA.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CVehicleModelInfoSA.config.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CVehicleModelInfoSA.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CVehicleModelInfoSA.render.h"
 				>
 			</File>
 			<File
@@ -1409,6 +1604,14 @@
 				RelativePath=".\TaskSecondarySA.h"
 				>
 			</File>
+			<Filter
+				Name="debugsdk"
+				>
+				<File
+					RelativePath="..\..\Shared\debugsdk\dbgheap.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 	</Files>
 	<Globals>

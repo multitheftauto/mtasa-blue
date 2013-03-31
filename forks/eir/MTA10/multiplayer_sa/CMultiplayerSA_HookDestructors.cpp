@@ -112,38 +112,6 @@ void _declspec(naked) HOOK_CPlayerPedDestructor()
     }
 }
 
-
-////////////////////////////////////////////////////////////////////////////////////////////////
-//
-void _cdecl OnCStreamingRemoveModel ( DWORD calledFrom, ushort usModelId )
-{
-    // Tell client to check for things going away
-    if ( pGameModelRemoveHandler )
-        pGameModelRemoveHandler ( usModelId );
-}
-
-// Hook info
-#define HOOKPOS_CStreamingRemoveModel        0x4089A0
-#define HOOKSIZE_CStreamingRemoveModel       5
-DWORD RETURN_CStreamingRemoveModel =         0x4089A5;
-void _declspec(naked) HOOK_CStreamingRemoveModel()
-{
-    _asm
-    {
-        pushad
-        push    [esp+32+4*1]
-        push    [esp+32+4*1]
-        call    OnCStreamingRemoveModel
-        add     esp, 4*2
-        popad
-
-        push    esi
-        mov     esi, [esp+8]
-        jmp     RETURN_CStreamingRemoveModel
-    }
-}
-
-
 //////////////////////////////////////////////////////////////////////////////////////////
 //
 // Set handlers
@@ -164,11 +132,6 @@ void CMultiplayerSA::SetGamePlayerDestructHandler ( GamePlayerDestructHandler * 
     pGamePlayerDestructHandler = pHandler;
 }
 
-void CMultiplayerSA::SetGameModelRemoveHandler ( GameModelRemoveHandler * pHandler )
-{
-    pGameModelRemoveHandler = pHandler;
-}
-
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -180,5 +143,4 @@ void CMultiplayerSA::InitHooks_HookDestructors ( void )
    EZHookInstall ( CObjectDestructor );
    EZHookInstall ( CVehicleDestructor );
    EZHookInstall ( CPlayerPedDestructor );
-   EZHookInstall ( CStreamingRemoveModel );
 }

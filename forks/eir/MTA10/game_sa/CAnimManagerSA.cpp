@@ -457,6 +457,40 @@ void CAnimManagerSA::RemoveAnimBlock ( int ID )
 }
 
 
+CAnimBlockSAInterface* CAnimManagerSA::GetAnimBlock( unsigned short id )
+{
+    if ( id > MAX_ANIM_BLOCKS-1 )
+        return NULL;
+
+    return (CAnimBlockSAInterface*)ARRAY_AnimBlock + id;
+}
+
+CAnimBlockSAInterface* CAnimManagerSA::GetAnimBlockByName( const char *name )
+{
+    unsigned int n;
+    
+    for ( n=0; n<GetNumAnimBlocks(); n++ )
+    {
+        CAnimBlockSAInterface *anim = (CAnimBlockSAInterface*)ARRAY_AnimBlock + n;
+
+        if ( strcmp( anim->GetName(), name ) == 0 )
+            return anim;
+    }
+
+    return NULL;
+}
+
+int CAnimManagerSA::GetAnimBlockIndex( const char *name )
+{
+    CAnimBlockSAInterface *anim = GetAnimBlockByName( name );
+
+    if ( !anim )
+        return -1;
+
+    return ((int)anim - ARRAY_AnimBlock) / sizeof(anim) + 1;
+}
+
+
 AnimAssocDefinition * CAnimManagerSA::AddAnimAssocDefinition ( const char * szBlockName, const char * szAnimName, AssocGroupId animGroup, AnimationId animID, AnimDescriptor * pDescriptor )
 {
     AnimAssocDefinition * pReturn;

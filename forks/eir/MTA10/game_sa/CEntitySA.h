@@ -25,6 +25,8 @@
 #include <CVector2D.h>
 #include <CVector.h>
 
+#include "CPlaceableSA.h"
+
 #define FUNC_GetDistanceFromCentreOfMassToBaseOfModel       0x536BE0
 
 #define FUNC_SetRwObjectAlpha                               0x5332C0
@@ -84,60 +86,18 @@ public:
     CReference *m_pFreeList;
 };
 
-class CMatrixEx
-{
-public:
-    RwMatrix matrix;
-    CMatrix * pMatrix; // usually not initialized
-    void * haveRwMatrix; // unknown pointer
-};
-
-class XYZ
-{
-public:
-    CMatrixEx matrix;
-    class CPlaceableSAInterface * pRef;
-    XYZ * pPrev;
-    XYZ * pNext;
-};
-C_ASSERT(sizeof(XYZ) == 0x54);
-
-class XYZStore
-{
-public:
-    XYZ head;
-    XYZ tail;
-    XYZ allocatedListHead;
-    XYZ allocatedListTail;
-    XYZ freeListHead;
-    XYZ freeListTail;
-    XYZ * pPool;
-};
-C_ASSERT(sizeof(XYZStore) == 0x1FC);
-
-
 class CSimpleTransformSAInterface   // 16 bytes
 {
 public:
     CVector                         m_translate;
-    FLOAT                           m_heading;
+    float                           m_heading;
 };
 
-class CPlaceableSAInterface // 20 bytes
+class CEntitySAInterface : public CPlaceableSAInterface
 {
 public:
-    CSimpleTransformSAInterface     m_transform;
-    RwMatrix                      * matrix; // This is actually XYZ*, change later
-};
-
-class CEntitySAInterface
-{
-public:
-    CEntitySAInterfaceVTBL      * vtbl; // the virtual table
-    
-    CPlaceableSAInterface   Placeable; // 4
-
     RpClump     * m_pRwObject; // 24
+
     /********** BEGIN CFLAGS **************/
     unsigned long bUsesCollision : 1;           // does entity use collision
     unsigned long bCollisionProcessed : 1;  // has object been processed by a ProcessEntityCollision function

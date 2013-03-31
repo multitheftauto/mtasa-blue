@@ -44,7 +44,7 @@ VOID CEntitySA::SetPosition(float fX, float fY, float fZ)
     if ( m_pInterface->Placeable.matrix )
     {
         OnChangingPosition ( CVector ( fX, fY, fZ ) );
-        vecPos = &m_pInterface->Placeable.matrix->pos;
+        vecPos = &m_pInterface->Placeable.matrix->vPos;
     }
     else
     {
@@ -84,7 +84,7 @@ VOID CEntitySA::Teleport ( float fX, float fY, float fZ )
     {
         SetPosition ( fX, fY, fZ );
 
-        DWORD dwFunc = m_pInterface->vtbl->Teleport;
+        DWORD dwFunc = (*(CEntitySAInterfaceVTBL**)m_pInterface)->Teleport;
         DWORD dwThis = (DWORD) m_pInterface;
         _asm
         {
@@ -107,7 +107,7 @@ VOID CEntitySA::Teleport ( float fX, float fY, float fZ )
 VOID CEntitySA::ProcessControl ( void )
 {
     DEBUG_TRACE("VOID CEntitySA::ProcessControl ( void )");
-    DWORD dwFunc = m_pInterface->vtbl->ProcessControl;
+    DWORD dwFunc = (*(CEntitySAInterfaceVTBL**)m_pInterface)->ProcessControl;
     DWORD dwThis = (DWORD) m_pInterface;
     if ( dwFunc )
     {
@@ -122,7 +122,7 @@ VOID CEntitySA::ProcessControl ( void )
 VOID CEntitySA::SetupLighting ( )
 {
     DEBUG_TRACE("VOID CEntitySA::SetupLighting ( )");
-    DWORD dwFunc = m_pInterface->vtbl->SetupLighting;
+    DWORD dwFunc = (*(CEntitySAInterfaceVTBL**)m_pInterface)->SetupLighting;
     DWORD dwThis = (DWORD) m_pInterface;
     if ( dwFunc )
     {
@@ -276,7 +276,7 @@ CVector * CEntitySA::GetPositionInternal ( )
 {
     DEBUG_TRACE("CVector * CEntitySA::GetPosition( )");
     if ( m_pInterface->Placeable.matrix )
-        return &m_pInterface->Placeable.matrix->pos;
+        return &m_pInterface->Placeable.matrix->vPos;
     else
         return &m_pInterface->Placeable.m_transform.m_translate; 
 }

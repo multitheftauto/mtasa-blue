@@ -99,6 +99,11 @@ VOID CWeaponSA::SetAsCurrentWeapon()
     owner->SetCurrentWeaponSlot( m_weaponSlot );
 }
 
+CWeaponInfo* CWeaponSA::GetInfo( eWeaponSkill skill )
+{
+    return pGame->GetWeaponInfo( internalInterface->m_eWeaponType, skill );
+}
+
 void CWeaponSA::Remove ()
 {
     DEBUG_TRACE("void CWeaponSA::Remove ()");

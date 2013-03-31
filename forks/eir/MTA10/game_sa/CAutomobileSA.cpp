@@ -13,6 +13,8 @@
 
 #include "StdInc.h"
 
+CUpgradeAssocStoreSA *const g_upgStore = (CUpgradeAssocStoreSA*)0x00B4E6D8;
+
 /**
  * \todo Spawn automobiles with engine off
  */

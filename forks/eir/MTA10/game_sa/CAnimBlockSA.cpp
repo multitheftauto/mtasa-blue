@@ -12,11 +12,24 @@
 
 #include "StdInc.h"
 
-int CAnimBlockSAInterface::GetIndex ( void )
+int CAnimBlockSAInterface::GetIndex( void )
 {
-    return ( ( ( DWORD ) this - ARRAY_CAnimManager_AnimBlocks ) / 32 );
+    // GTA:SA does this all the time; it ain't hacky.
+    return this - (CAnimBlockSAInterface*)ARRAY_CAnimManager_AnimBlocks;
 }
 
+CAnimBlendHierarchySAInterface* CAnimBlockSAInterface::GetAnimation( unsigned int hash )
+{
+    for ( unsigned int n = 0; n < GetCount(); n++ )
+    {
+        CAnimBlendHierarchySAInterface *anim = (CAnimBlendHierarchySAInterface*)ARRAY_CAnimManager_Animations + GetAnimIndex() + n;
+
+        if ( anim->iHashKey == hash )
+            return anim;
+    }
+
+    return NULL;
+}
 
 void CAnimBlockSA::Request ( EModelRequestType requestType, bool bAllowBlockingFail )
 {

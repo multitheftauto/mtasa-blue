@@ -1,12 +1,13 @@
 /*****************************************************************************
 *
-*  PROJECT:     Multi Theft Auto v1.0
+*  PROJECT:     Multi Theft Auto v1.2
 *  LICENSE:     See LICENSE in the top level directory
 *  FILE:        game_sa/TaskSA.h
 *  PURPOSE:     Base game task
 *  DEVELOPERS:  Ed Lyons <eai@opencoding.net>
 *               Christian Myhre Lundheim <>
 *               Jax <>
+*               Martin Turski <quiret@gmx.de>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -58,16 +59,45 @@ public:
     DWORD ControlSubTask;
 };
 
-class CTaskSAInterface
+class CTaskSAInterface abstract
 {
 public:
-    TaskVTBL * VTBL; // cast to either TaskSimpleVTBL or TaskComplexVTBL
+    virtual                                     ~CTaskSAInterface   ( void ) {}
+
+    virtual CTaskSAInterface* __thiscall        Clone               ( void );
+    virtual CTaskSAInterface* __thiscall        GetSubTask          ( void );
+    virtual bool __thiscall                     IsSimpleTask        ( void ) const;
+    virtual int __thiscall                      GetTaskType         ( void ) const;
+    virtual void __thiscall                     StopTimer           ( CEventSAInterface *evt );
+    virtual bool __thiscall                     MakeAbortable       ( CPedSAInterface *ped, int priority, CEventSAInterface *evt );
+
+    void*   operator new( size_t );
+    void    operator delete( void *ptr );
+
     CTaskSAInterface * m_pParent;
+};
+
+class CTaskSimpleSAInterface : public CTaskSAInterface
+{
+public:
+    virtual bool __thiscall                     ProcessPed( CPedSAInterface *ped ) = 0;
+    virtual bool __thiscall                     SetPedPosition( CPedSAInterface *ped ) = 0;
+};
+
+class CTaskComplexSAInterface : public CTaskSAInterface
+{
+public:
+    virtual void __thiscall                     SetSubTask( CTaskSAInterface *task ) = 0;
+    virtual CTaskSAInterface* __thiscall        CreateNextSubTask( CPedSAInterface *ped ) = 0;
+    virtual CTaskSAInterface* __thiscall        CreateFirstSubTask( CPedSAInterface *ped ) = 0;
+    virtual CTaskSAInterface* __thiscall        ControlSubTask( CPedSAInterface *ped ) = 0;
+
+    CTask*                      m_pSubTask;
 };
 
 class CTaskSA : public virtual CTask
 {
-private:
+protected:
     // our variable(s)
     CTaskSAInterface * TaskInterface;
     CTaskSA * Parent; // if the task was setup through an external source, this isn't going to be correct
@@ -106,35 +136,28 @@ union UCTask
     CTaskSA * pTaskSA;
 };
 
-class CTaskSimpleSAInterface : public CTaskSAInterface
-{
-    public:
-};
-
 class CTaskSimpleSA : public virtual CTaskSA, public virtual CTaskSimple
 {
 public:
-    CTaskSimpleSA ( ) {};
+                        CTaskSimpleSA           ( void )    {}
 
-    bool ProcessPed(CPed* pPed);
-    bool SetPedPosition(CPed *pPed);
-};
+    bool                ProcessPed              ( CPed *pPed );
+    bool                SetPedPosition          ( CPed *pPed );
 
-class CTaskComplexSAInterface : public CTaskSAInterface
-{
-public:
-    CTask* m_pSubTask;
+    CTaskSimpleSAInterface* GetInterface        ( void )            { return (CTaskSimpleSAInterface*)TaskInterface; }
 };
 
 class CTaskComplexSA : public virtual CTaskSA, public virtual CTaskComplex
 {
 public:
-    CTaskComplexSA() {};
+                        CTaskComplexSA          ( void )    {}
 
-    void SetSubTask(CTask* pSubTask);
-    CTask* CreateNextSubTask(CPed* pPed);
-    CTask* CreateFirstSubTask(CPed* pPed);
-    CTask* ControlSubTask(CPed* pPed);
+    void                SetSubTask              ( CTask* pSubTask );
+    CTask*              CreateNextSubTask       ( CPed* pPed );
+    CTask*              CreateFirstSubTask      ( CPed* pPed );
+    CTask*              ControlSubTask          ( CPed* pPed );
+
+    CTaskComplexSAInterface*    GetInterface    ( void )            { return (CTaskComplexSAInterface*)TaskInterface; }
 };
 
 

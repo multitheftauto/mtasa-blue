@@ -50,6 +50,22 @@ enum eVehicleUpgradePosn
     VEHICLE_UPGRADE_POSN_MISC,
 };
 
+enum eVehicleType : unsigned int
+{
+    VEHICLE_CAR,
+    VEHICLE_MONSTERTRUCK,
+    VEHICLE_QUADBIKE,
+    VEHICLE_HELI,
+    VEHICLE_PLANE,
+    VEHICLE_BOAT,
+    VEHICLE_TRAIN,
+    VEHICLE_UNKNOWN,
+    VEHICLE_FAKEPLANE,    // what is this?
+    VEHICLE_BIKE,
+    VEHICLE_BICYCLE,
+    VEHICLE_AUTOMOBILETRAILER
+};
+
 class CModelInfo
 {
 public:
@@ -109,8 +125,6 @@ public:
     // Custom collision related functions
     virtual void            SetCustomModel          ( RpClump* pClump ) = 0;
     virtual void            RestoreOriginalModel    ( void ) = 0;
-    virtual void            SetColModel             ( CColModel* pColModel ) = 0;
-    virtual void            RestoreColModel         ( void ) = 0;
 
     // Call this to make sure the custom vehicle models are being used after a load.
     virtual void            MakeCustomModel         ( void ) = 0;

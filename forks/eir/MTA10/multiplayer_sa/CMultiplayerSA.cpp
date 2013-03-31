@@ -2703,7 +2703,7 @@ bool processGrab () {
         //CObjectSA * object = (CObjectSA*)entity;
         //CModelInfo * info = pGameInterface->GetModelInfo(entity->m_nModelIndex);
         if ( entity->Placeable.matrix )
-            edgeHeight = *entityEdgeHeight + entity->Placeable.matrix->pos.fZ;
+            edgeHeight = *entityEdgeHeight + entity->Placeable.matrix->vPos.fZ;
         else
             edgeHeight = *entityEdgeHeight + entity->Placeable.m_transform.m_translate.fZ; 
     }
@@ -5821,13 +5821,13 @@ void RemoveObjectIfNeeded ( )
     SBuildingRemoval* pBuildingRemoval = pGameInterface->GetWorld ( )->GetBuildingRemoval ( pLODInterface );
     if ( pBuildingRemoval != NULL )
     {
-        if ( (DWORD)(pBuildingAdd->vtbl) != VTBL_CPlaceable )
+        if ( *(DWORD*)(pBuildingAdd) != VTBL_CPlaceable )
         {
             pBuildingRemoval->AddDataBuilding ( pBuildingAdd );
             pGameInterface->GetWorld ( )->Remove( pBuildingAdd, BuildingRemoval3 );
         }
 
-        if ( (DWORD)(pLODInterface->vtbl) != VTBL_CPlaceable )
+        if ( *(DWORD*)(pLODInterface) != VTBL_CPlaceable )
         {
             pBuildingRemoval->AddDataBuilding ( pLODInterface );
             pGameInterface->GetWorld ( )->Remove( pLODInterface, BuildingRemoval4 );
@@ -5899,7 +5899,7 @@ void RemoveDummyIfReplaced ( )
     SBuildingRemoval* pBuildingRemoval = pGameInterface->GetWorld ( )->GetBuildingRemoval ( pLODInterface );
     if ( pBuildingRemoval != NULL )
     {
-        if ( (DWORD)(pBuildingAdd->vtbl) != VTBL_CPlaceable )
+        if ( *(DWORD*)(pBuildingAdd) != VTBL_CPlaceable )
         {
             pBuildingRemoval->AddDataBuilding ( pBuildingAdd );
             pGameInterface->GetWorld ( )->Remove( pBuildingAdd, BuildingRemoval5 );

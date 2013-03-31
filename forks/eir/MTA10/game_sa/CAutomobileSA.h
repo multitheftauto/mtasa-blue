@@ -221,4 +221,27 @@ public:
     CDoor                   * GetDoor(eDoors doorID);
 };
 
+struct CUpgradeAssocStoreSA
+{
+    unsigned short FindModelAssociation( unsigned short model )
+    {
+        for ( unsigned char n = 0; n < m_count; n++ )
+        {
+            if ( primary[n] == model )
+                return secondary[n];
+            if ( secondary[n] == model )
+                return primary[n];
+        }
+
+        return 0xFFFF;
+    }
+
+    unsigned short primary[30];
+    unsigned short secondary[30];
+
+    unsigned int m_count;
+};
+
+extern CUpgradeAssocStoreSA *const g_upgStore;
+
 #endif

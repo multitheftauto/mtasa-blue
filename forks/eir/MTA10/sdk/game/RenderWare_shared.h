@@ -111,18 +111,18 @@ class RwMatrix
 public:
     inline void IdentityRotation( void )
     {
-        right.fX = 1; right.fY = 0; right.fZ = 0;
-        at.fX = 0; at.fY = 1; at.fZ = 0;
-        up.fX = 0; up.fY = 0; up.fZ = 1;
+        vRight.fX = 1; vRight.fY = 0; vRight.fZ = 0;
+        vFront.fX = 0; vFront.fY = 1; vFront.fZ = 0;
+        vUp.fX =    0; vUp.fY =    0; vUp.fZ =    1;
     }
 
     inline void Identity( void )
     {
         IdentityRotation();
 
-        pos.fX = (float)(1.15 * -0.25);
-        pos.fY = 0;
-        pos.fZ = 0;
+        vPos.fX = 0;//(float)(1.15 * -0.25);
+        vPos.fY = 0;
+        vPos.fZ = 0;
     }
 
     RwMatrix( void )
@@ -132,28 +132,28 @@ public:
 
     RwMatrix( const CMatrix& mat )
     {
-        right = mat.vRight;
-        at = mat.vFront;
-        up = mat.vUp;
-        pos = mat.vPos;
+        vRight = mat.vRight;
+        vFront = mat.vFront;
+        vUp = mat.vUp;
+        vPos = mat.vPos;
     }
 
     operator CMatrix( void ) const
     {
         CMatrix mat;
-        mat.vRight = right;
-        mat.vFront = at;
-        mat.vUp = up;
-        mat.vPos = pos;
+        mat.vRight = vRight;
+        mat.vFront = vFront;
+        mat.vUp = vUp;
+        mat.vPos = vPos;
         return mat;
     }
 
     inline void assign( const RwMatrix& mat )
     {
-        right = mat.right;
-        up = mat.up;
-        at = mat.at;
-        pos = mat.pos;
+        vRight = mat.vRight;
+        vUp = mat.vUp;
+        vFront = mat.vFront;
+        vPos = mat.vPos;
     }
 
     RwMatrix( const RwMatrix& mat )
@@ -246,9 +246,9 @@ public:
     CVector operator * ( const CVector& vec )
     {
         return CVector(
-            right.fX * vec.fX + at.fX * vec.fY + up.fX * vec.fZ,
-            right.fY * vec.fX + at.fY * vec.fY + up.fY * vec.fZ,
-            right.fZ * vec.fX + at.fZ * vec.fY + up.fZ * vec.fZ
+            vRight.fX * vec.fX + vFront.fX * vec.fY + vUp.fX * vec.fZ,
+            vRight.fY * vec.fX + vFront.fY * vec.fY + vUp.fY * vec.fZ,
+            vRight.fZ * vec.fX + vFront.fZ * vec.fY + vUp.fZ * vec.fZ
         );
     }
 
@@ -260,9 +260,9 @@ public:
         float ch = cos( heading );
         float sh = sin( heading );
 
-        right[0] = ch;  right[1] = sh;  right[2] = 0;
-        at[0] = -sh;    at[1] = ch;     at[2] = 0;
-        up[0] = 0;      up[1] = 0;      up[2] = 1.0f;
+        vRight[0] = ch;  vRight[1] = sh;  vRight[2] = 0;
+        vFront[0] = -sh; vFront[1] = ch;  vFront[2] = 0;
+        vUp[0]    = 0;   vUp[1]    = 0;   vUp[2] =    1.0f;
     }
 
     // I have done the homework for MTA
@@ -273,17 +273,17 @@ public:
         double cb = cos( y );
         double sb = sin( y );
 
-        right[0] = (float)( cb );
-        right[1] = 0;
-        right[2] = (float)( sb );
+        vRight[0] = (float)( cb );
+        vRight[1] = 0;
+        vRight[2] = (float)( sb );
 
-        at[0] = (float)( sb * sh );
-        at[1] = (float)( ch );
-        at[2] = (float)( -sh * cb );
+        vFront[0] = (float)( sb * sh );
+        vFront[1] = (float)( ch );
+        vFront[2] = (float)( -sh * cb );
 
-        up[0] = (float)( -sb * ch );
-        up[1] = (float)( sh );
-        up[2] = (float)( cb * ch );
+        vUp[0] = (float)( -sb * ch );
+        vUp[1] = (float)( sh );
+        vUp[2] = (float)( cb * ch );
     }
 
     inline void SetRotationRad( float x, float y, float z )
@@ -295,17 +295,17 @@ public:
         double ca = cos( z );
         double sa = sin( z );
 
-        right[0] = (float)( ca * cb );
-        right[1] = (float)( -sa * cb );
-        right[2] = (float)( sb );
+        vRight[0] = (float)( ca * cb );
+        vRight[1] = (float)( -sa * cb );
+        vRight[2] = (float)( sb );
 
-        at[0] = (float)( ca * sb * sh + sa * ch );
-        at[1] = (float)( ca * ch - sa * sb * sh );
-        at[2] = (float)( -sh * cb );
+        vFront[0] = (float)( ca * sb * sh + sa * ch );
+        vFront[1] = (float)( ca * ch - sa * sb * sh );
+        vFront[2] = (float)( -sh * cb );
 
-        up[0] = (float)( sa * sh - ca * sb * ch );
-        up[1] = (float)( sa * sb * ch + ca * sh );
-        up[2] = (float)( ch * cb );
+        vUp[0] = (float)( sa * sh - ca * sb * ch );
+        vUp[1] = (float)( sa * sb * ch + ca * sh );
+        vUp[2] = (float)( ch * cb );
     }
 
     inline void SetRotation( float x, float y, float z )
@@ -315,26 +315,26 @@ public:
 
     inline void GetRotationRad( float& x, float& y, float& z ) const
     {
-        if ( right[2] == 1 )
+        if ( vRight[2] == 1 )
         {
             y = (float)( M_PI / 2 );
 
             x = 0;
-            z = (float)atan2( right[0], right[1] );
+            z = (float)atan2( vRight[0], vRight[1] );
         }
-        else if ( right[2] == -1 )
+        else if ( vRight[2] == -1 )
         {
             y = -(float)( M_PI / 2 );
 
             x = -0;
-            z = (float)atan2( right[0], right[1] );
+            z = (float)atan2( vRight[0], vRight[1] );
         }
         else
         {
-            y = asin( right[2] );
+            y = asin( vRight[2] );
 
-            x = (float)atan2( -at[2], up[2] );
-            z = (float)atan2( -right[1], right[0] );
+            x = (float)atan2( -vFront[2], vUp[2] );
+            z = (float)atan2( -vRight[1], vRight[0] );
         }
     }
 
@@ -347,33 +347,25 @@ public:
         z = (float)RAD2DEG( z );
     }
 
-    inline void GetOffset( const CVector& offset, CVector& outPos ) const
-    {
-        outPos[0] = offset[0] * right[0] + offset[1] * at[0] + offset[2] * up[0] + pos[0];
-        outPos[1] = offset[0] * right[1] + offset[1] * at[1] + offset[2] * up[1] + pos[1];
-        outPos[2] = offset[0] * right[2] + offset[1] * at[2] + offset[2] * up[2] + pos[2];
-    }
-
     // Has been tested on multiple occasions.
-    inline void Multiply( const RwMatrix& mat, RwMatrix& dst )
+    inline void __thiscall Multiply( const RwMatrix& mat, RwMatrix& dst ) const
     {
 	    __asm
 	    {
-		    mov eax,this
 		    mov edx,[mat]
-		    mov esi,[dst]
+		    mov eax,[dst]
 
 		    movups xmm4,[edx]
 		    movups xmm5,[edx+0x10]
 		    movups xmm6,[edx+0x20]
     		
-		    movss xmm3,[eax+0x10]
-		    movss xmm7,[eax+0x20]
+		    movss xmm3,[ecx+0x10]
+		    movss xmm7,[ecx+0x20]
 
 		    // X
-		    movss xmm0,[eax]
-		    movss xmm1,[eax+4]
-		    movss xmm2,[eax+8]
+		    movss xmm0,[ecx]
+		    movss xmm1,[ecx+4]
+		    movss xmm2,[ecx+8]
 
 		    shufps xmm0,xmm0,0x40
 		    shufps xmm1,xmm1,0x40
@@ -390,11 +382,11 @@ public:
 		    addps xmm0,xmm1
 		    addps xmm0,xmm2
 
-		    movups [esi],xmm0
+		    movups [eax],xmm0
 
 		    // Y
-		    movss xmm1,[eax+0x14]
-		    movss xmm2,[eax+0x18]
+		    movss xmm1,[ecx+0x14]
+		    movss xmm2,[ecx+0x18]
 
 		    shufps xmm1,xmm1,0x40
 		    shufps xmm2,xmm2,0x40
@@ -406,11 +398,11 @@ public:
 		    addps xmm3,xmm1
 		    addps xmm3,xmm2
 
-		    movups [esi+0x10],xmm3
+		    movups [eax+0x10],xmm3
 
 		    // Z
-		    movss xmm1,[eax+0x24]
-		    movss xmm2,[eax+0x28]
+		    movss xmm1,[ecx+0x24]
+		    movss xmm2,[ecx+0x28]
 
 		    shufps xmm1,xmm1,0x40
 		    shufps xmm2,xmm2,0x40
@@ -422,28 +414,26 @@ public:
 		    addps xmm7,xmm1
 		    addps xmm7,xmm2
 
-		    movups [esi+0x20],xmm7
+		    movups [eax+0x20],xmm7
 	    }
     }
 
-    inline void Invert( void )
+    inline void __thiscall Invert( void )
     {
         // Optimization to use SSE registers instead of stack space
         __asm
         {
-            mov eax,this
-
-            movups xmm0,[eax]
-            movups xmm1,[eax+0x10]
-            movups xmm2,[eax+0x20]
-            movups xmm3,[eax+0x30]
+            movups xmm0,[ecx]
+            movups xmm1,[ecx+0x10]
+            movups xmm2,[ecx+0x20]
+            movups xmm3,[ecx+0x30]
 
             // Prepare for position invert
             movss xmm4,negOne
 
-            movss [eax],xmm0
-            movss [eax+0x04],xmm1
-            movss [eax+0x08],xmm2
+            movss [ecx],xmm0
+            movss [ecx+0x04],xmm1
+            movss [ecx+0x08],xmm2
 
             // Left-shift the vectors
             shufps xmm0,xmm0,0x49
@@ -453,23 +443,63 @@ public:
             // Pos invert prep
             shufps xmm4,xmm4,0x40
 
-            movss [eax+0x10],xmm0
-            movss [eax+0x14],xmm1
-            movss [eax+0x18],xmm2
+            movss [ecx+0x10],xmm0
+            movss [ecx+0x14],xmm1
+            movss [ecx+0x18],xmm2
 
             // Left-shift the vectors
             shufps xmm0,xmm0,0x49
             shufps xmm1,xmm1,0x49
             shufps xmm2,xmm2,0x49
 
-            movss [eax+0x20],xmm0
-            movss [eax+0x24],xmm1
-            movss [eax+0x28],xmm2
+            movss [ecx+0x20],xmm0
+            movss [ecx+0x24],xmm1
+            movss [ecx+0x28],xmm2
 
             // Invert the position
             mulps xmm3,xmm4
-            movups [eax+0x30],xmm3
+            movups [ecx+0x30],xmm3
         }
+    }
+
+    inline void __thiscall Transform( const CVector& point, CVector& vout ) const
+    {
+	    __asm
+	    {
+		    mov eax,[point]
+		    mov esi,[vout]
+
+            // __thiscall makes sure that our matrix is in ecx
+		    movups xmm4,[ecx]RwMatrix.vRight
+		    movups xmm5,[ecx]RwMatrix.vFront
+		    movups xmm6,[ecx]RwMatrix.vUp
+		    movups xmm3,[ecx]RwMatrix.vPos
+
+            // Read the offset parameters
+		    movss xmm0,[eax]CVector.fX
+		    movss xmm1,[eax]CVector.fY
+		    movss xmm2,[eax]CVector.fZ
+
+            // Expand to vectors
+		    shufps xmm0,xmm0,0x40
+		    shufps xmm1,xmm1,0x40
+		    shufps xmm2,xmm2,0x40
+
+		    mulps xmm0,xmm4
+		    mulps xmm1,xmm5
+		    mulps xmm2,xmm6
+
+		    addps xmm0,xmm1
+		    addps xmm0,xmm2
+		    addps xmm0,xmm3
+
+            // Write the output
+		    movss [esi]CVector.fX,xmm0
+		    shufps xmm0,xmm0,0x49
+		    movss [esi]CVector.fY,xmm0
+		    shufps xmm0,xmm0,0x49
+		    movss [esi]CVector.fZ,xmm0
+	    }
     }
 
     float& operator [] ( unsigned int i )
@@ -488,13 +518,13 @@ public:
         return ((float*)(this))[i];
     }
 
-    CVector         right;
+    CVector         vRight;
     unsigned int    a;
-    CVector         at;
+    CVector         vFront;
     unsigned int    b;
-    CVector         up;
+    CVector         vUp;
     unsigned int    c;
-    CVector         pos;
+    CVector         vPos;
     unsigned int    d;
 };
 

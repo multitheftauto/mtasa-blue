@@ -110,6 +110,9 @@ CCore::CCore ( void )
     };
     ParseCommandLine ( m_CommandLineOptions, m_szCommandLineArgs, pszNoValOptions );
 
+    // Filesystem.
+    m_fileSystem                = new CFileSystem;
+
     // Create a logger instance.
     m_pConsoleLogger            = new CConsoleLogger ( );
 
@@ -234,6 +237,9 @@ CCore::~CCore ( void )
 
     //Delete the Current Server
     delete m_pCurrentServer;
+
+    // Delete the FileSystem
+    delete m_fileSystem;
 }
 
 
@@ -1005,8 +1011,12 @@ void CCore::DestroyNetwork ( )
 void CCore::UpdateIsWindowMinimized ( void )
 {
     m_bIsWindowMinimized = IsIconic ( GetHookedWindow () ) ? true : false;
-    // Update CPU saver for when minimized and not connected
-    g_pCore->GetMultiplayer ()->SetIsMinimizedAndNotConnected ( m_bIsWindowMinimized && !IsConnected () );
+
+    if ( g_pCore->GetMultiplayer() )
+    {
+        // Update CPU saver for when minimized and not connected
+        g_pCore->GetMultiplayer ()->SetIsMinimizedAndNotConnected ( m_bIsWindowMinimized && !IsConnected () );
+    }
 }
 
 

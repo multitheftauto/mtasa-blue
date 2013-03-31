@@ -16,9 +16,61 @@
 
 #include "StdInc.h"
 
+#define FUNC_InitGamePools  0x00550F10
+
+CPtrNodeSinglePool      **ppPtrNodeSinglePool = (CPtrNodeSinglePool**)CLASS_CPtrNodeSingleLinkPool;
+CPtrNodeDoublePool      **ppPtrNodeDoublePool = (CPtrNodeDoublePool**)CLASS_CPtrNodeDoubleLinkPool;
+CEntryInfoPool          **ppEntryInfoPool = (CEntryInfoPool**)CLASS_CEntryInfoNodePool;
+
+CVehiclePool            **ppVehiclePool = (CVehiclePool**)CLASS_CVehiclePool;
+CPedPool                **ppPedPool = (CPedPool**)CLASS_CPedPool;
+CBuildingPool           **ppBuildingPool = (CBuildingPool**)CLASS_CBuildingPool;
+CObjectPool             **ppObjectPool = (CObjectPool**)CLASS_CObjectPool;
+
+CDummyPool              **ppDummyPool = (CDummyPool**)CLASS_CDummyPool;
+
+CColModelPool           **ppColModelPool = (CColModelPool**)CLASS_CColModelPool;
+
+CTaskPool               **ppTaskPool = (CTaskPool**)CLASS_CTaskPool;
+CEventPool              **ppEventPool = (CEventPool**)CLASS_CEventPool;
+
+CPointRoutePool         **ppPointRoutePool = (CPointRoutePool**)CLASS_CPointRoutePool;
+CPatrolRoutePool        **ppPatrolRoutePool = (CPatrolRoutePool**)CLASS_CPatrolRoutePool;
+CNodeRoutePool          **ppNodeRoutePool = (CNodeRoutePool**)CLASS_CNodeRoutePool;
+
+CTaskAllocatorPool      **ppTaskAllocatorPool = (CTaskAllocatorPool**)CLASS_CTaskAllocatorPool;
+CPedIntelligencePool    **ppPedIntelligencePool = (CPedIntelligencePool**)CLASS_CPedIntelligencePool;
+CPedAttractorPool       **ppPedAttractorPool = (CPedAttractorPool**)CLASS_CPedAttractorPool;
+
 CPoolsSA::CPoolsSA()
 {
     DEBUG_TRACE("CPoolsSA::CPoolsSA()");
+
+    // Do not let GTA:SA init pools!
+    *(unsigned char*)FUNC_InitGamePools = 0xC3;
+
+    *ppPtrNodeSinglePool = new CPtrNodeSinglePool();
+    *ppPtrNodeDoublePool = new CPtrNodeDoublePool();
+    *ppEntryInfoPool = new CEntryInfoPool();
+
+    *ppVehiclePool = new CVehiclePool();
+    *ppPedPool = new CPedPool();
+    *ppBuildingPool = new CBuildingPool();
+    *ppObjectPool = new CObjectPool();
+
+    *ppDummyPool = new CDummyPool();
+    *ppColModelPool = new CColModelPool();
+
+    *ppTaskPool = new CTaskPool();
+    *ppEventPool = new CEventPool();
+
+    *ppPointRoutePool = new CPointRoutePool();
+    *ppPatrolRoutePool = new CPatrolRoutePool();
+    *ppNodeRoutePool = new CNodeRoutePool();
+
+    *ppTaskAllocatorPool = new CTaskAllocatorPool();
+    *ppPedIntelligencePool = new CPedIntelligencePool();
+    *ppPedAttractorPool = new CPedAttractorPool();
     
     m_bGetVehicleEnabled = true;
     m_ulBuildingCount= 0;
@@ -53,6 +105,32 @@ CPoolsSA::~CPoolsSA ( void )
 
     if ( PointerNodeSingleLinkPool )
         delete PointerNodeSingleLinkPool;
+
+    delete *ppPtrNodeSinglePool;
+    delete *ppPtrNodeDoublePool;
+    delete *ppEntryInfoPool;
+
+    // Seems to be crashy
+#if TODO
+    delete *ppVehiclePool;
+    delete *ppPedPool;
+    delete *ppBuildingPool;
+    delete *ppObjectPool;
+
+    delete *ppDummyPool;
+#endif
+    delete *ppColModelPool;
+
+    delete *ppTaskPool;
+    delete *ppEventPool;
+
+    delete *ppPointRoutePool;
+    delete *ppPatrolRoutePool;
+    delete *ppNodeRoutePool;
+
+    delete *ppTaskAllocatorPool;
+    delete *ppPedIntelligencePool;
+    delete *ppPedAttractorPool;
 }
 
 void CPoolsSA::DeleteAllBuildings ( void )

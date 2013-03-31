@@ -1,11 +1,12 @@
 /*****************************************************************************
 *
-*  PROJECT:     Multi Theft Auto v1.0
+*  PROJECT:     Multi Theft Auto v1.2
 *               (Shared logic for modifications)
 *  LICENSE:     See LICENSE in the top level directory
 *  FILE:        mods/shared_logic/CClientColModel.cpp
 *  PURPOSE:     Model collision (.col file) entity class
 *  DEVELOPERS:  Christian Myhre Lundheim <>
+*               Martin Turski <quiret@gmx.de>
 *
 *****************************************************************************/
 
@@ -59,25 +60,7 @@ bool CClientColModel::Replace ( unsigned short usModel )
 {
     // We have a model loaded?
     if ( m_pColModel )
-    {
-        // Check if anyone has replaced that model already. If so make it forget that
-        // it replaced it. We're the new replacer.
-        CClientColModel* pAlready = m_pColModelManager->GetElementThatReplaced ( usModel );
-        if ( pAlready )
-        {
-            pAlready->m_Replaced.remove ( usModel );
-        }
-
-        // Replace the collisions
-        CModelInfo* pModelInfo = g_pGame->GetModelInfo ( usModel );
-        pModelInfo->SetColModel ( m_pColModel );
-
-        // Remember that we replaced it
-        m_Replaced.push_back ( usModel );
-
-        // Success
-        return true;
-    }
+        return m_pColModel->Replace( usModel );
 
     // Failed
     return false;
@@ -86,51 +69,22 @@ bool CClientColModel::Replace ( unsigned short usModel )
 
 void CClientColModel::Restore ( unsigned short usModel )
 {
-    // Restore it
-    InternalRestore ( usModel );
-
-    // Remove the restored id from the list
-    m_Replaced.remove ( usModel );
+    if ( m_pColModel )
+        m_pColModel->Restore( usModel );
 }
 
 
 void CClientColModel::RestoreAll ( void )
 {
-    // Loop through our replaced ids
-    std::list < unsigned short > ::iterator iter = m_Replaced.begin ();
-    for ( ; iter != m_Replaced.end (); iter++ )
-    {
-        // Restore this model
-        InternalRestore ( *iter );
-    }
-
-    // Clear the list
-    m_Replaced.clear ();
+    if ( m_pColModel )
+        m_pColModel->RestoreAll();
 }
 
 
 bool CClientColModel::HasReplaced ( unsigned short usModel )
 {
-    // Loop through our replaced ids
-    std::list < unsigned short > ::iterator iter = m_Replaced.begin ();
-    for ( ; iter != m_Replaced.end (); iter++ )
-    {
-        // Is this the given ID
-        if ( *iter == usModel )
-        {
-            // We have replaced it
-            return true;
-        }
-    }
+    if ( m_pColModel )
+        return m_pColModel->IsReplaced( usModel );
 
-    // We have not replaced it
     return false;
-}
-
-
-void CClientColModel::InternalRestore ( unsigned short usModel )
-{
-    // Grab the model info and restore it
-    CModelInfo* pModel = g_pGame->GetModelInfo ( usModel );
-    pModel->RestoreColModel ();
 }

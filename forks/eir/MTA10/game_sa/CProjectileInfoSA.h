@@ -83,8 +83,8 @@ public:
 
     bool                    IsActive ( void );
 
-    void                    SetCounter ( DWORD dwCounter )      { internalInterface->dwCounter = dwCounter + pGame->GetSystemTime(); }
-    DWORD                   GetCounter ( void )                 { return internalInterface->dwCounter - pGame->GetSystemTime(); }
+    void                    SetCounter ( DWORD dwCounter );
+    DWORD                   GetCounter ( void );
 };
 
 #endif

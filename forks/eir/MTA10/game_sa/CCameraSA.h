@@ -91,7 +91,7 @@ class CCameraSAInterface
 {
 public:
     // CPlaceable
-    CPlaceableSAInterface   Placeable;
+    CPlaceableSAInterface::Transform    Placeable;
     // End CPlaceable
 
     //move these out the class, have decided to set up a mirrored enumerated type thingy at the top

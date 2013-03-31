@@ -13,14 +13,22 @@
 
 #include "StdInc.h"
 
+void* CPedIntelligenceSAInterface::operator new( size_t )
+{
+    return (*ppPedIntelligencePool)->Allocate();
+}
+
+void CPedIntelligenceSAInterface::operator delete( void *ptr )
+{
+    (*ppPedIntelligencePool)->Free( (CPedIntelligenceSAInterface*)ptr );
+}
+
 CPedIntelligenceSA::CPedIntelligenceSA ( CPedIntelligenceSAInterface * pedIntelligenceSAInterface, CPed * ped )
 {
     this->internalInterface = pedIntelligenceSAInterface;
     this->ped = ped;
-    CTaskManagerSAInterface * pTaskManagerInterface = (CTaskManagerSAInterface * )&(pedIntelligenceSAInterface->taskManager);
-    this->TaskManager = new CTaskManagerSA(pTaskManagerInterface, this->ped );
-    CVehicleScannerSAInterface * pVehicleScannerInterface = (CVehicleScannerSAInterface *)&(pedIntelligenceSAInterface->vehicleScanner);
-    this->VehicleScanner = new CVehicleScannerSA(pVehicleScannerInterface);
+    this->TaskManager = new CTaskManagerSA( &pedIntelligenceSAInterface->m_taskManager, this->ped );
+    this->VehicleScanner = new CVehicleScannerSA(pedIntelligenceSAInterface->m_vehicleScanner);
 }
 
 CPedIntelligenceSA::~CPedIntelligenceSA ()

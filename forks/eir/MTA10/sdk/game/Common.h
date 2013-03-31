@@ -17,9 +17,9 @@
 
 #include <windows.h>
 
-#define MAX_VEHICLES                        110
-#define MAX_PEDS                            140
-#define MAX_OBJECTS                         700
+#define MAX_VEHICLES                        500
+#define MAX_PEDS                            500
+#define MAX_OBJECTS                         4000
 #define MAX_BUILDINGS                       13000
 
 /**

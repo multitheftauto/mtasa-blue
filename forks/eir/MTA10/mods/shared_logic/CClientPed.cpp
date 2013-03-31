@@ -2431,7 +2431,7 @@ void CClientPed::StreamedInPulse ( void )
         {
             m_iLoadAllModelsCounter--;
             if ( GetModelInfo () )
-                g_pGame->GetStreaming()->LoadAllRequestedModels( false, "CClientPed::StreamedInPulse - m_iLoadAllModelsCounter" );
+                g_pGame->GetStreaming()->LoadAllRequestedModels( false );//, "CClientPed::StreamedInPulse - m_iLoadAllModelsCounter" );
         }
 
         if ( m_bPendingRebuildPlayer )
@@ -5678,7 +5678,7 @@ void CClientPed::HandleWaitingForGroundToLoad ( void )
 
     // Load load load
     if ( GetModelInfo () )
-        g_pGame->GetStreaming()->LoadAllRequestedModels ( false, "CClientPed::HandleWaitingForGroundToLoad" );
+        g_pGame->GetStreaming()->LoadAllRequestedModels ( false );//, "CClientPed::HandleWaitingForGroundToLoad" );
 
     // Start out with a fairly big radius to check, and shrink it down over time
     float fUseRadius = 50.0f * ( 1.f - Max ( 0.f, m_fObjectsAroundTolerance ) );

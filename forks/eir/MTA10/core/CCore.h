@@ -98,6 +98,7 @@ public:
     CNet*                   GetNetwork                      ( void );
     CXML*                   GetXML                          ( void )                { return m_pXML; };
     CXMLNode*               GetConfig                       ( void );
+    CFileSystem*            GetFileSystem                   ( void )                { return m_fileSystem; }
     CClientVariables*       GetCVars                        ( void )                { return &m_ClientVariables; };
     CKeyBindsInterface*     GetKeyBinds                     ( void );
     CMouseControl*          GetMouseControl                 ( void )                { return m_pMouseControl; };
@@ -254,6 +255,7 @@ private:
     CDirect3DData *             m_pDirect3DData;
     CConnectManager*            m_pConnectManager;
     CModelCacheManager*         m_pModelCacheManager;
+    CFileSystem*                m_fileSystem;
 
     // Instances (put new classes here!)
     CXMLFile*                   m_pConfigFile;

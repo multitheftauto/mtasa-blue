@@ -44,13 +44,16 @@ public:
 class CPedIntelligenceSAInterface 
 {
 public:
+    void*   operator new( size_t );
+    void    operator delete( void *ptr );
+
 // CEventHandlerHistory @ + 56
-    CPedSAInterface *           pPed;
-    DWORD                       taskManager;        // +4 (really CTaskManagerSAInterface)
-    BYTE                        bPad[16];
-    CFightManagerInterface *    fightInterface;     // +24
-    BYTE                        bPad2[184];
-    DWORD                       vehicleScanner;     // +212 (really CVehicleScannerSAInterface)
+    CPedSAInterface*                m_ped;
+    CTaskManagerSAInterface         m_taskManager;          // 4
+    BYTE                            m_pad2[160];            // 52
+    CVehicleScannerSAInterface*     m_vehicleScanner;       // 212
+
+    BYTE                            m_pad3[444];            // 216
 };
 
 class CPedIntelligenceSA : public CPedIntelligence

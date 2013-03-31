@@ -14,6 +14,14 @@
 #include <string>
 #include <vector>
 
+// Define these if you are experiencing heap trouble.
+// Due to Cazo's heavy usage of STL containers, full page heap will not work.
+//#define USE_HEAP_DEBUGGING
+//#define USE_FULL_PAGE_HEAP
+//#define PAGE_HEAP_INTEGRITY_CHECK
+//#define PAGE_HEAP_MEMORY_STATS
+#include <debugsdk/dbgheap.h>
+
 // SDK includes
 #define MTA_CLIENT
 #define SHARED_UTIL_WITH_HASH_MAP
@@ -28,11 +36,16 @@
 
 // Game includes
 #include "RenderWare.h"
+#include "CRecordingsSA.h"
+#include "CTransformationSA.h"
 #include "CEntitySA.h"
+#include "CTextureManagerSA.h"
 #include "gamesa_init.h"
 #include "Common.h"
-#include "CGameSA.h"
 #include "CWorldSA.h"
+#include "CIMGManagerSA.h"
+#include "CStreamerSA.h"
+#include "CStreamingSA.h"
 #include "CPoolsSA.h"
 #include "CClockSA.h"
 #include "CFontSA.h"
@@ -72,14 +85,16 @@
 #include "CEventDamageSA.h"
 #include "CEventGunShotSA.h"
 #include "CAnimManagerSA.h"
-#include "CStreamingSA.h"
 #include "CVisibilityPluginsSA.h"
 #include "CKeyGenSA.h"
 #include "CRopesSA.h"
 #include "CFxSA.h"
 #include "HookSystem.h"
 #include "CModelInfoSA.h"
+#include "CAtomicModelInfoSA.h"
+#include "CClumpModelInfoSA.h"
 #include "CPedModelInfoSA.h"
+#include "CVehicleModelInfoSA.h"
 #include "CColPointSA.h"
 #include "CCivilianPedSA.h"
 #include "CAnimBlendAssociationSA.h"
@@ -109,3 +124,4 @@
 #include "CWeaponStatManagerSA.h"
 #include "CShadowDataSA.h"
 #include "CBuoyancySA.h"
+#include "CGameSA.h"

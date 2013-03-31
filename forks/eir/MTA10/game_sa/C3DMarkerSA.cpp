@@ -28,13 +28,13 @@ void C3DMarkerSA::SetMatrix ( CMatrix * pMatrix )
 VOID C3DMarkerSA::SetPosition(CVector * vecPosition)
 {
     DEBUG_TRACE("VOID C3DMarkerSA::SetPosition(CVector * vecPosition)");
-    this->GetInterface()->m_mat.pos = *vecPosition;
+    this->GetInterface()->m_mat.vPos = *vecPosition;
 }
 
 CVector * C3DMarkerSA::GetPosition()
 {
     DEBUG_TRACE("CVector * C3DMarkerSA::GetPosition()");
-    return &this->GetInterface()->m_mat.pos;
+    return &this->GetInterface()->m_mat.vPos;
 }
 
 DWORD C3DMarkerSA::GetType()
@@ -162,5 +162,5 @@ VOID C3DMarkerSA::DeleteMarkerObject ()
 
 VOID C3DMarkerSA::Reset()
 {
-    this->internalInterface->m_lastPosition = this->internalInterface->m_mat.pos;
+    this->internalInterface->m_lastPosition = this->internalInterface->m_mat.vPos;
 }

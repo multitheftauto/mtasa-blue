@@ -31,7 +31,7 @@
 
 #define MTA_CLIENT
 #define SHARED_UTIL_WITH_FAST_HASH_MAP
-#include "SharedUtil.h"
+#include <coresdk/Common.h>
 
 // SDK includes
 #include <xml/CXMLNode.h>

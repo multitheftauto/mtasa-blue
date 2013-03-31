@@ -107,54 +107,56 @@ public:
     CGameSA(); // constructor
     ~CGameSA ();
 
-    inline CPools                   * GetPools()                { DEBUG_TRACE("CPools     * GetPools()"); return m_pPools; };
-    inline CPlayerInfo              * GetPlayerInfo()           { DEBUG_TRACE("CPlayerInfo    * GetPlayerInfo()");return m_pPlayerInfo; };
-    inline CProjectileInfo          * GetProjectileInfo()       { DEBUG_TRACE("CProjectileInfo   * GetProjectileInfo()");return m_pProjectileInfo; };
-    inline CRadar                   * GetRadar()                { DEBUG_TRACE("CRadar     * GetRadar()"); return m_pRadar; };
-    inline CRestart                 * GetRestart()              { DEBUG_TRACE("CRestart    * GetRestart()"); return m_pRestart; };
-    inline CClock                   * GetClock()                { DEBUG_TRACE("CClock     * GetClock()"); return m_pClock; };
-    inline CCoronas                 * GetCoronas()              { DEBUG_TRACE("CCoronas    * GetCoronas()"); return m_pCoronas; };
-    inline CCheckpoints             * GetCheckpoints()          { DEBUG_TRACE("CCheckpoints   * GetCheckpoints()"); return m_pCheckpoints; };
-    inline CEventList               * GetEventList()            { DEBUG_TRACE("CEventList    * GetEventList()"); return m_pEventList; };
-    inline CFireManager             * GetFireManager()          { DEBUG_TRACE("CFireManager   * GetFireManager()"); return m_pFireManager; };
-    inline CExplosionManager        * GetExplosionManager()     { DEBUG_TRACE("CExplosionManager  * GetExplosionManager()");return m_pExplosionManager; };
-    inline CGarages                 * GetGarages()              { DEBUG_TRACE("CGarages    * GetGarages()"); return m_pGarages; };
-    inline CHud                     * GetHud()                  { DEBUG_TRACE("CHud     * GetHud()"); return m_pHud; };
-    inline CWeather                 * GetWeather()              { DEBUG_TRACE("CWeather    * GetWeather()");return m_pWeather; };
-    inline CWorld                   * GetWorld()                { DEBUG_TRACE("CWorld     * GetWorld()"); return m_pWorld; };
-    inline CCamera                  * GetCamera()               { DEBUG_TRACE("CCamera     * GetCamera()"); return m_pCamera; };
-    inline CPickups                 * GetPickups()              { DEBUG_TRACE("CPickups    * GetPickups()"); return m_pPickups; };
-    inline C3DMarkers               * Get3DMarkers()            { DEBUG_TRACE("C3DMarkers    * Get3DMarkers()");return m_p3DMarkers; };
-    inline CPad                     * GetPad()                  { DEBUG_TRACE("CPad     * GetPad()");return m_pPad; };
-    inline CTheCarGenerators        * GetTheCarGenerators()     { DEBUG_TRACE("CTheCarGenerators  * GetTheCarGenerators()");return m_pTheCarGenerators; };
-    inline CAERadioTrackManager     * GetAERadioTrackManager()  { DEBUG_TRACE("CAERadioTrackManager * GetAERadioTrackManager()");return m_pCAERadioTrackManager; };
-    inline CAudioEngine             * GetAudioEngine()          { DEBUG_TRACE("CAudio     * GetAudioEngine()");return m_pAudioEngine; };
-    inline CAudioEngine             * GetAudio()                { DEBUG_TRACE("CAudio     * GetAudioEngine()");return m_pAudioEngine; };
-    inline CMenuManager             * GetMenuManager()          { DEBUG_TRACE("CMenuManager         * GetMenuManager()");return m_pMenuManager; };
-    inline CText                    * GetText()                 { DEBUG_TRACE("CText                    * GetText()");return m_pText; };
-    inline CStats                   * GetStats()                { DEBUG_TRACE("CStats                   * GetStats()");return m_pStats; };
-    inline CFont                    * GetFont()                 { DEBUG_TRACE("CFont                    * GetFont()");return m_pFont; };
-    inline CPathFind                * GetPathFind()             { DEBUG_TRACE("CPathFind                * GetPathFind()");return m_pPathFind; };
-    inline CPopulation              * GetPopulation()           { DEBUG_TRACE("CPopulation              * GetPopulation()");return m_pPopulation; };
-    inline CTaskManagementSystem    * GetTaskManagementSystem() { DEBUG_TRACE("CTaskManagementSystemSA * GetTaskManagementSystem()");return m_pTaskManagementSystem; };
-    inline CTasks                   * GetTasks() { DEBUG_TRACE("CTasks * GetTasks()");return m_pTasks; };
-    inline CGameSettings            * GetSettings()             { DEBUG_TRACE("CGameSettings * GetSettings()");return m_pSettings; };
-    inline CCarEnterExit            * GetCarEnterExit()         { DEBUG_TRACE("CCarEnterExit           * GetCarEnterExit()");return m_pCarEnterExit; };
-    inline CControllerConfigManager * GetControllerConfigManager()  { DEBUG_TRACE("CControllerConfigManager* GetControllerConfigManager()");return m_pControllerConfigManager; };
-    inline CRenderWare              * GetRenderWare()           { DEBUG_TRACE("CRenderWare * GetRenderWare()");return m_pRenderWare; };
-    inline CHandlingManager         * GetHandlingManager ()      { return m_pHandlingManager; };
-    inline CAnimManager             * GetAnimManager ()          { return m_pAnimManager; }
-    inline CStreaming               * GetStreaming ()            { return m_pStreaming; }
-    inline CVisibilityPlugins       * GetVisibilityPlugins ()    { return m_pVisibilityPlugins; }
-    inline CKeyGen                  * GetKeyGen ()               { return m_pKeyGen; }
-    inline CRopes                   * GetRopes ()                { return m_pRopes; }
-    inline CFx                      * GetFx ()                   { return m_pFx; }
-    inline CWaterManager            * GetWaterManager ()         { return m_pWaterManager; }
-    inline CWeaponStatManager       * GetWeaponStatManager()     { return m_pWeaponStatsManager; }
-    inline CPointLights             * GetPointLights ()          { return m_pPointLights; }
+    inline CPoolsSA                     * GetPools()                { DEBUG_TRACE("CPools     * GetPools()"); return m_pPools; };
+    inline CPlayerInfoSA                * GetPlayerInfo()           { DEBUG_TRACE("CPlayerInfo    * GetPlayerInfo()");return m_pPlayerInfo; };
+    inline CProjectileInfoSA            * GetProjectileInfo()       { DEBUG_TRACE("CProjectileInfo   * GetProjectileInfo()");return m_pProjectileInfo; };
+    inline CRadarSA                     * GetRadar()                { DEBUG_TRACE("CRadar     * GetRadar()"); return m_pRadar; };
+    inline CRestartSA                   * GetRestart()              { DEBUG_TRACE("CRestart    * GetRestart()"); return m_pRestart; };
+    inline CClockSA                     * GetClock()                { DEBUG_TRACE("CClock     * GetClock()"); return m_pClock; };
+    inline CCoronasSA                   * GetCoronas()              { DEBUG_TRACE("CCoronas    * GetCoronas()"); return m_pCoronas; };
+    inline CCheckpointsSA               * GetCheckpoints()          { DEBUG_TRACE("CCheckpoints   * GetCheckpoints()"); return m_pCheckpoints; };
+    inline CEventListSA                 * GetEventList()            { DEBUG_TRACE("CEventList    * GetEventList()"); return m_pEventList; };
+    inline CFireManagerSA               * GetFireManager()          { DEBUG_TRACE("CFireManager   * GetFireManager()"); return m_pFireManager; };
+    inline CExplosionManagerSA          * GetExplosionManager()     { DEBUG_TRACE("CExplosionManager  * GetExplosionManager()");return m_pExplosionManager; };
+    inline CGaragesSA                   * GetGarages()              { DEBUG_TRACE("CGarages    * GetGarages()"); return m_pGarages; };
+    inline CHudSA                       * GetHud()                  { DEBUG_TRACE("CHud     * GetHud()"); return m_pHud; };
+    inline CWeatherSA                   * GetWeather()              { DEBUG_TRACE("CWeather    * GetWeather()");return m_pWeather; };
+    inline CWorldSA                     * GetWorld()                { DEBUG_TRACE("CWorld     * GetWorld()"); return m_pWorld; };
+    inline CCameraSA                    * GetCamera()               { DEBUG_TRACE("CCamera     * GetCamera()"); return m_pCamera; };
+    inline CPickupsSA                   * GetPickups()              { DEBUG_TRACE("CPickups    * GetPickups()"); return m_pPickups; };
+    inline C3DMarkersSA                 * Get3DMarkers()            { DEBUG_TRACE("C3DMarkers    * Get3DMarkers()");return m_p3DMarkers; };
+    inline CPadSA                       * GetPad()                  { DEBUG_TRACE("CPad     * GetPad()");return m_pPad; };
+    inline CTheCarGeneratorsSA          * GetTheCarGenerators()     { DEBUG_TRACE("CTheCarGenerators  * GetTheCarGenerators()");return m_pTheCarGenerators; };
+    inline CAERadioTrackManagerSA       * GetAERadioTrackManager()  { DEBUG_TRACE("CAERadioTrackManager * GetAERadioTrackManager()");return m_pCAERadioTrackManager; };
+    inline CAudioEngineSA               * GetAudioEngine()          { DEBUG_TRACE("CAudio     * GetAudioEngine()");return m_pAudioEngine; };
+    inline CAudioEngineSA               * GetAudio()                { DEBUG_TRACE("CAudio     * GetAudioEngine()");return m_pAudioEngine; };
+    inline CMenuManagerSA               * GetMenuManager()          { DEBUG_TRACE("CMenuManager         * GetMenuManager()");return m_pMenuManager; };
+    inline CTextSA                      * GetText()                 { DEBUG_TRACE("CText                    * GetText()");return m_pText; };
+    inline CStatsSA                     * GetStats()                { DEBUG_TRACE("CStats                   * GetStats()");return m_pStats; };
+    inline CFontSA                      * GetFont()                 { DEBUG_TRACE("CFont                    * GetFont()");return m_pFont; };
+    inline CPathFindSA                  * GetPathFind()             { DEBUG_TRACE("CPathFind                * GetPathFind()");return m_pPathFind; };
+    inline CPopulationSA                * GetPopulation()           { DEBUG_TRACE("CPopulation              * GetPopulation()");return m_pPopulation; };
+    inline CTaskManagementSystemSA      * GetTaskManagementSystem() { DEBUG_TRACE("CTaskManagementSystemSA * GetTaskManagementSystem()");return m_pTaskManagementSystem; };
+    inline CTasksSA                     * GetTasks() { DEBUG_TRACE("CTasks * GetTasks()");return m_pTasks; };
+    inline CGameSettings                * GetSettings()             { DEBUG_TRACE("CGameSettings * GetSettings()");return m_pSettings; };
+    inline CCarEnterExitSA              * GetCarEnterExit()         { DEBUG_TRACE("CCarEnterExit           * GetCarEnterExit()");return m_pCarEnterExit; };
+    inline CControllerConfigManagerSA   * GetControllerConfigManager()  { DEBUG_TRACE("CControllerConfigManager* GetControllerConfigManager()");return m_pControllerConfigManager; };
+    inline CRenderWareSA                * GetRenderWare()           { DEBUG_TRACE("CRenderWare * GetRenderWare()");return m_pRenderWare; };
+    inline CTextureManagerSA            * GetTextureManager()        { return m_textureManager; }
+    inline CHandlingManagerSA           * GetHandlingManager ()      { return m_pHandlingManager; };
+    inline CAnimManagerSA               * GetAnimManager ()          { return m_pAnimManager; }
+    inline CStreamingSA                 * GetStreaming ()            { return m_pStreaming; }
+    inline CVisibilityPluginsSA         * GetVisibilityPlugins ()    { return m_pVisibilityPlugins; }
+    inline CKeyGenSA                    * GetKeyGen ()               { return m_pKeyGen; }
+    inline CRopesSA                     * GetRopes ()                { return m_pRopes; }
+    inline CRecordingsSA                * GetRecordings()            { return m_pRecordings; }
+    inline CFxSA                        * GetFx ()                   { return m_pFx; }
+    inline CWaterManagerSA              * GetWaterManager ()         { return m_pWaterManager; }
+    inline CWeaponStatManagerSA         * GetWeaponStatManager()     { return m_pWeaponStatsManager; }
+    inline CPointLightsSA               * GetPointLights ()          { return m_pPointLights; }
 
     CWeaponInfo             * GetWeaponInfo(eWeaponType weapon,eWeaponSkill skill=WEAPONSKILL_STD);
-    CModelInfo              * GetModelInfo( DWORD dwModelID );
+    CModelInfoSA            * GetModelInfo( DWORD dwModelID );
 
     inline DWORD            GetSystemTime (  )      { DEBUG_TRACE("DWORD     GetSystemTime (  )");return *VAR_SystemTime; };
     inline BOOL             IsAtMenu (  )           { DEBUG_TRACE("BOOL     IsAtMenu (  )");if(*VAR_IsAtMenu) return TRUE; else return FALSE; };
@@ -239,54 +241,57 @@ public:
     PostWeaponFireHandler*  m_pPostWeaponFireHandler;
 
 private:
-    CPools                  * m_pPools;
-    CPlayerInfo             * m_pPlayerInfo;
-    CProjectileInfo         * m_pProjectileInfo;
-    CRadar                  * m_pRadar;
-    CRestart                * m_pRestart;
-    CClock                  * m_pClock;
-    CCoronas                * m_pCoronas;
-    CCheckpoints            * m_pCheckpoints;
-    CEventList              * m_pEventList;
-    CFireManager            * m_pFireManager;
-    CGarages                * m_pGarages;
-    CHud                    * m_pHud;
-    CWanted                 * m_pWanted;
-    CWeather                * m_pWeather;
-    CWorld                  * m_pWorld;
-    CCamera                 * m_pCamera;
-    CModelInfo              * m_pModelInfo; 
-    CPickups                * m_pPickups;
-    CWeaponInfo             * m_pWeaponInfo;
-    CExplosionManager       * m_pExplosionManager;
-    C3DMarkers              * m_p3DMarkers;
+    CPoolsSA                * m_pPools;
+    CPlayerInfoSA           * m_pPlayerInfo;
+    CProjectileInfoSA       * m_pProjectileInfo;
+    CRadarSA                * m_pRadar;
+    CRestartSA              * m_pRestart;
+    CClockSA                * m_pClock;
+    CCoronasSA              * m_pCoronas;
+    CCheckpointsSA          * m_pCheckpoints;
+    CEventListSA            * m_pEventList;
+    CFireManagerSA          * m_pFireManager;
+    CGaragesSA              * m_pGarages;
+    CHudSA                  * m_pHud;
+    CWantedSA               * m_pWanted;
+    CWeatherSA              * m_pWeather;
+    CWorldSA                * m_pWorld;
+    CCameraSA               * m_pCamera;
+    CModelInfoSA            * m_pModelInfo; 
+    CPickupsSA              * m_pPickups;
+    CWeaponInfoSA           * m_pWeaponInfo;
+    CExplosionManagerSA     * m_pExplosionManager;
+    C3DMarkersSA            * m_p3DMarkers;
     CRenderWareSA           * m_pRenderWare;
-    CHandlingManager        * m_pHandlingManager;
-    CAnimManager            * m_pAnimManager;
-    CStreaming              * m_pStreaming;
-    CVisibilityPlugins      * m_pVisibilityPlugins;
-    CKeyGen                 * m_pKeyGen;
-    CRopes                  * m_pRopes;
-    CFx                     * m_pFx;
-    CWaterManager           * m_pWaterManager;
-    CWeaponStatManager      * m_pWeaponStatsManager;
-    CPointLights            * m_pPointLights;
+    CRwExtensionManagerSA   * m_pRwExtensionManager;
+    CTextureManagerSA       * m_textureManager;
+    CHandlingManagerSA      * m_pHandlingManager;
+    CAnimManagerSA          * m_pAnimManager;
+    CStreamingSA            * m_pStreaming;
+    CVisibilityPluginsSA    * m_pVisibilityPlugins;
+    CKeyGenSA               * m_pKeyGen;
+    CRopesSA                * m_pRopes;
+    CFxSA                   * m_pFx;
+    CRecordingsSA           * m_pRecordings;
+    CWaterManagerSA         * m_pWaterManager;
+    CWeaponStatManagerSA    * m_pWeaponStatsManager;
+    CPointLightsSA          * m_pPointLights;
 
-    CPad                        * m_pPad;
-    CTheCarGenerators           * m_pTheCarGenerators;
-    CAERadioTrackManager        * m_pCAERadioTrackManager;
-    CAudioEngine                * m_pAudioEngine;
-    CMenuManager                * m_pMenuManager;
-    CText                       * m_pText;
-    CStats                      * m_pStats;
-    CFont                       * m_pFont;
-    CPathFind                   * m_pPathFind;
-    CPopulation                 * m_pPopulation;
-    CTaskManagementSystem       * m_pTaskManagementSystem; // not used outside the game_sa
-    CTasks                      * m_pTasks;
+    CPadSA                      * m_pPad;
+    CTheCarGeneratorsSA         * m_pTheCarGenerators;
+    CAERadioTrackManagerSA      * m_pCAERadioTrackManager;
+    CAudioEngineSA              * m_pAudioEngine;
+    CMenuManagerSA              * m_pMenuManager;
+    CTextSA                     * m_pText;
+    CStatsSA                    * m_pStats;
+    CFontSA                     * m_pFont;
+    CPathFindSA                 * m_pPathFind;
+    CPopulationSA               * m_pPopulation;
+    CTaskManagementSystemSA     * m_pTaskManagementSystem; // not used outside the game_sa
+    CTasksSA                    * m_pTasks;
     CGameSettings               * m_pSettings;
-    CCarEnterExit               * m_pCarEnterExit;
-    CControllerConfigManager    * m_pControllerConfigManager;
+    CCarEnterExitSA             * m_pCarEnterExit;
+    CControllerConfigManagerSA  * m_pControllerConfigManager;
 
     eGameVersion            m_eGameVersion;
     bool                    m_bAsyncSettingsDontUse;
@@ -316,6 +321,11 @@ private:
 
     CPed*                   m_pPedContext;
 };
+
+extern CFileTranslator *gameFileRoot;
+
+// Utility functions
+CFile*  OpenGlobalStream( const char *filename, const char *mode );
 
 #endif
 

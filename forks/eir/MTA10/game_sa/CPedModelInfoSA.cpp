@@ -17,9 +17,46 @@
 CPedModelInfoSAInterface::CPedModelInfoSAInterface ( void )
 {
     MemSetFast ( this, 0, sizeof ( CPedModelInfoSAInterface ) );
-    VFTBL = ( CBaseModelInfo_SA_VTBL * ) VAR_CPedModelInfo_VTBL;
+    *(DWORD*)this = (DWORD)VAR_CPedModelInfo_VTBL;
     pColModel = ( CColModelSAInterface * ) VAR_CTempColModels_ModelPed1;
     MemPutFast < DWORD > ( &pad, 0xFFFFFFFF );
+}
+
+CPedModelInfoSAInterface::~CPedModelInfoSAInterface( void )
+{
+
+}
+
+eModelType CPedModelInfoSAInterface::GetModelType( void )
+{
+    return MODEL_PED;
+}
+
+void CPedModelInfoSAInterface::DeleteRwObject( void )
+{
+    CClumpModelInfoSAInterface::DeleteRwObject();
+
+    if ( pColModel )
+    {
+        delete pColModel;
+
+        pColModel = NULL;
+    }
+}
+
+void CPedModelInfoSAInterface::SetAnimFile( const char *name )
+{
+
+}
+
+void CPedModelInfoSAInterface::ConvertAnimFileIndex( void )
+{
+
+}
+
+int CPedModelInfoSAInterface::GetAnimFileIndex( void )
+{
+    return -1;
 }
 
 CPedModelInfoSA::CPedModelInfoSA ( void ) : CModelInfoSA ()
@@ -29,12 +66,5 @@ CPedModelInfoSA::CPedModelInfoSA ( void ) : CModelInfoSA ()
 
 void CPedModelInfoSA::SetMotionAnimGroup ( AssocGroupId animGroup )
 {
-    DWORD dwThis = (DWORD)m_pInterface;
-    DWORD dwFunc = (DWORD)FUNC_SetMotionAnimGroup;
-    _asm
-    {
-        mov     ecx, dwThis
-        push    animGroup
-        call    dwFunc
-    }
+    m_pPedModelInterface->motionAnimGroup = animGroup;
 }

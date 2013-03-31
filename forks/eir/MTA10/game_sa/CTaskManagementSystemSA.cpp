@@ -1,6 +1,6 @@
 /*****************************************************************************
 *
-*  PROJECT:     Multi Theft Auto v1.0
+*  PROJECT:     Multi Theft Auto v1.2
 *  LICENSE:     See LICENSE in the top level directory
 *  FILE:        game_sa/CTaskManagementSystemSA.cpp
 *  PURPOSE:     Task management system
@@ -8,6 +8,7 @@
 *               Christian Myhre Lundheim <>
 *               Cecill Etheredge <ijsf@gmx.net>
 *               Jax <>
+*               Martin Turski <quiret@gmx.de>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -17,27 +18,53 @@
 
 using namespace std;
 
-VOID HOOK_CTask_Operator_Delete();
+//CMTATaskPool *mtaTaskPool;
+CTaskSA *mtaTasks[MAX_TASKS];
 
-CTaskSAInterface * pTempTaskInterface = 0;
+// This is an example how game pools should be managed.
+// Stop using dynamic lists and make use the simplicity of game pools:
+// * They are preallocated memory and slot-based.
+// Create an array of pointers and set the MTA interface into the slot which is handled by MTA.
+// This way we ca distinguish MTA handled game classes from GTA:SA classes fairly easy.
+// Looking up MTA classes takes very low execution time, as it will become an array offset operation.
+// (no more scaling depending on class count)
+
+// In order to create the same system for the vehicle interfaces, they should be seperated out properly.
+// The same goes for ped and object interfaces.
+
+void __cdecl HOOK_CTask_Operator_Delete( CTaskSAInterface *task )
+{
+    unsigned int id = (*ppTaskPool)->GetIndex( task );
+
+    if ( CTaskSA *task = mtaTasks[id] )
+    {
+        task->DestroyJustThis();
+        mtaTasks[id] = NULL;
+    }
+
+    // Free it from the pool
+    (*ppTaskPool)->Free( id );
+}
 
 CTaskManagementSystemSA::CTaskManagementSystemSA ( void )
 {
     // Install our hook used to delete our tasks when GTA does
     HookInstall ( FUNC_CTask_Operator_Delete, (DWORD)HOOK_CTask_Operator_Delete, 6 );
+
+#ifdef MTA_INTERFACES_WITH_POOLS
+    // Initiate our task pool
+    mtaTaskPool = new CMTATaskPool;
+#endif //MTA_INTERFACES_WITH_POOLS
+
+    // Zero is all out
+    memset( mtaTasks, 0, sizeof(mtaTasks) );
 }
 
 CTaskManagementSystemSA::~CTaskManagementSystemSA ( void )
 {
-    // Delete all the entries
-    list < STaskListItem* > ::const_iterator iter = m_TaskList.begin ();
-    for ( ; iter != m_TaskList.end (); iter++ )
-    {
-        delete *iter;
-    }
-
-    // Clear the list
-    m_TaskList.clear ();
+#ifdef MTA_INTERFACES_WITH_POOLS
+    delete mtaTaskPool;
+#endif //MTA_INTERFACES_WITH_POOLS
 }
 
 
@@ -45,95 +72,27 @@ CTask * CTaskManagementSystemSA::AddTask ( CTaskSA * pTask )
 {
     if ( !pTask )
         return NULL;
-    assert ( pTask->IsValid () );
-    STaskListItem* pItem = new STaskListItem;
-    pItem->pTaskSA = pTask;
-    pItem->taskInterface = pTask->GetInterface ();
-    m_TaskList.push_back ( pItem );
 
+    mtaTasks[(*ppTaskPool)->GetIndex( pTask->GetInterface() )] = pTask;
     return pTask;
 }
-
-// Only called from HOOK_CTask_Operator_Delete
-void CTaskManagementSystemSA::RemoveTask ( CTaskSAInterface * pTaskInterface )
-{
-    // Stops crash on exit
-    if ( m_TaskList.size () == 0 )
-        return;
-
-    assert ( pTaskInterface );
-
-    // Find it in our list
-    STaskListItem* pItem;
-    list < STaskListItem* > ::iterator iter = m_TaskList.begin ();
-    for ( ; iter != m_TaskList.end (); iter++ )
-    {
-        pItem = *iter;
-        if ( pItem->taskInterface == pTaskInterface )
-        {
-            // Grab the task SA
-            CTaskSA* pTaskSA = pItem->pTaskSA;
-
-            // Delete the object
-            delete pItem;
-
-            // Remove from list
-            m_TaskList.erase ( iter );
-
-            // Eventually destroy the task
-            if ( pTaskSA )
-                pTaskSA->DestroyJustThis ();
-
-            // Done (don't continue or we waste resources/crash)
-            return;
-        }
-    }
-}
-
 
 CTask * CTaskManagementSystemSA::GetTask ( CTaskSAInterface * pTaskInterface )
 {
     // Return NULL if we got passed NULL
     if ( pTaskInterface == 0 ) return NULL;
 
-    // Find it in our list
-    STaskListItem* pListItem;
-    list < STaskListItem* > ::const_iterator iter = m_TaskList.begin ();
-    for ( ; iter != m_TaskList.end (); iter++ )
-    {
-        // Matches?
-        pListItem = *iter;
-        if ( pListItem->taskInterface == pTaskInterface && pListItem->pTaskSA )
-        {
-            // Yes it has existed before, return it
-            return pListItem->pTaskSA;
-        }
-    }
+    if ( CTaskSA *task = mtaTasks[ (*ppTaskPool)->GetIndex( pTaskInterface ) ] )
+        return task;
 
     // its not existed before, lets create the task
     // First, we create a temp task
-    int iTaskType = 9999;
-    DWORD dwFunc = pTaskInterface->VTBL->GetTaskType;
-    if ( dwFunc && dwFunc != 0x82263A )
-    {
-        _asm
-        {
-            mov     ecx, pTaskInterface
-            call    dwFunc
-            mov     iTaskType, eax
-        }
-    }
+    int iTaskType = pTaskInterface->GetTaskType();
 
     // Create it and add it to our list
-    CTaskSA * pTask = dynamic_cast < CTaskSA* > ( CreateAppropriateTask ( pTaskInterface, iTaskType ) );
-    if ( pTask )
-    {
-        pListItem = new STaskListItem;
-        pListItem->pTaskSA = pTask;
-        pListItem->taskInterface = pTaskInterface;
-        m_TaskList.push_back ( pListItem );
-    }
+    CTaskSA *pTask = dynamic_cast < CTaskSA* > ( CreateAppropriateTask ( pTaskInterface, iTaskType ) );
 
+    AddTask( pTask );
     return pTask;
 }
 
@@ -244,31 +203,4 @@ CTask * CTaskManagementSystemSA::CreateAppropriateTask ( CTaskSAInterface * pTas
     // Set the internal interface
     pTaskSA->SetInterface ( pTaskInterface );
     return pTaskSA;
-}
-
-// HOOKS
-
-VOID _declspec(naked) HOOK_CTask_Operator_Delete()
-{
-    _asm 
-    {
-        mov     eax, [esp+4]
-        mov     pTempTaskInterface, eax
-
-        pushad
-    }
-
-    ((CTaskManagementSystemSA *)(pGame->GetTaskManagementSystem()))->RemoveTask ( pTempTaskInterface );
-
-    // Continue on our merry way....
-    _asm
-    {
-        popad
-
-        mov     eax, 0xB744A8
-        mov     ecx, dword ptr [eax]
-        mov     eax, FUNC_CTask_Operator_Delete
-        add     eax, 6
-        jmp     eax
-    }
 }

@@ -139,19 +139,12 @@ CPlayerPedSA::~CPlayerPedSA ( void )
     {
         DWORD dwInterface = (DWORD) m_pInterface;
         
-        if ( (DWORD)this->GetInterface()->vtbl != VTBL_CPlaceable )
+        if ( *(DWORD*)this->GetInterface() != VTBL_CPlaceable )
         {
             CWorldSA * world = (CWorldSA *)pGame->GetWorld();
             world->Remove ( m_pInterface, CPlayerPed_Destructor );
         
-            DWORD dwThis = (DWORD) m_pInterface;
-            DWORD dwFunc = m_pInterface->vtbl->SCALAR_DELETING_DESTRUCTOR; // we use the vtbl so we can be type independent
-            _asm    
-            {
-                mov     ecx, dwThis
-                push    1           //delete too
-                call    dwFunc
-            }
+            delete m_pInterface;
         }
         this->BeingDeleted = true;
         ((CPoolsSA *)pGame->GetPools())->RemovePed((CPed *)(CPedSA *)this, false);

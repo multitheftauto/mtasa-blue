@@ -14,5 +14,5 @@
 
 int CAnimBlendHierarchySAInterface::GetIndex ( void )
 {
-    return ( ( ( DWORD ) this - ARRAY_CAnimManager_Animations ) / 24 );
+    return this - (CAnimBlendHierarchySAInterface*)ARRAY_CAnimManager_Animations;
 }
