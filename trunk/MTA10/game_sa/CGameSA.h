@@ -212,7 +212,6 @@ public:
     int&                    GetCheckStatus          ( void )            { return m_iCheckStatus; }
 
 
-    void                    SetAsyncLoadingFromSettings     ( bool bSettingsDontUse, bool bSettingsEnabled );
     void                    SetAsyncLoadingFromScript       ( bool bScriptEnabled, bool bScriptForced );
     void                    SuspendASyncLoading             ( bool bSuspend );
     bool                    IsASyncLoadingEnabled           ( bool bIgnoreSuspend = false );
@@ -289,8 +288,6 @@ private:
     CControllerConfigManager    * m_pControllerConfigManager;
 
     eGameVersion            m_eGameVersion;
-    bool                    m_bAsyncSettingsDontUse;
-    bool                    m_bAsyncSettingsEnabled;
     bool                    m_bAsyncScriptEnabled;
     bool                    m_bAsyncScriptForced;
     bool                    m_bASyncLoadingSuspended;

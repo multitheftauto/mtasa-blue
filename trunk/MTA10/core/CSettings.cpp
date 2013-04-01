@@ -862,25 +862,6 @@ void CSettings::CreateGUI ( void )
     m_pAdvancedMiscLabel->AutoSize ( "Misc" );
     vecTemp.fY += 20;
 
-    // Asynchronous Loading
-    m_pAsyncLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Asynchronous Loading:" ) );
-    m_pAsyncLabel->SetPosition ( CVector2D ( vecTemp.fX + 10.f, vecTemp.fY ) );
-    m_pAsyncLabel->AutoSize ( m_pAsyncLabel->GetText ().c_str () );
-
-    m_pAsyncCombo = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabAdvanced, "" ) );
-    m_pAsyncCombo->SetPosition ( CVector2D ( vecTemp.fX + 156.0f, vecTemp.fY - 1.0f ) );
-    m_pAsyncCombo->SetSize ( CVector2D ( 148.0f, 95.0f ) );
-    m_pAsyncCombo->AddItem ( "Off" )->SetData ( (void*)0 );
-    m_pAsyncCombo->AddItem ( "On" )->SetData ( (void*)2 );
-    m_pAsyncCombo->AddItem ( "Auto" )->SetData ( (void*)1 );
-    m_pAsyncCombo->SetReadOnly ( true );
-
-    m_pAsyncLabelInfo = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Experimental feature which\nmay improve performance." ) );
-    m_pAsyncLabelInfo->SetPosition ( CVector2D ( vecTemp.fX + 342.f, vecTemp.fY - 4.f ) );
-    m_pAsyncLabelInfo->SetFont ( "default-bold-small" );
-    m_pAsyncLabelInfo->SetSize ( CVector2D ( 168.0f, 95.0f ) );
-    vecTemp.fY += 40-4;
-
     // Fast clothes loading
     m_pFastClothesLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Fast CJ clothes loading:" ) );
     m_pFastClothesLabel->SetPosition ( CVector2D ( vecTemp.fX + 10.f, vecTemp.fY ) );
@@ -953,6 +934,25 @@ void CSettings::CreateGUI ( void )
     m_pAltTabLabelInfo->SetPosition ( CVector2D ( vecTemp.fX + 342.f, vecTemp.fY - 4.f ) );
     m_pAltTabLabelInfo->SetFont ( "default-bold-small" );
     m_pAltTabLabelInfo->SetSize ( CVector2D ( 168.0f, 95.0f ) );
+    vecTemp.fY += 40-4;
+
+    // Process priority
+    m_pPriorityLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Process priority:" ) );
+    m_pPriorityLabel->SetPosition ( CVector2D ( vecTemp.fX + 10.f, vecTemp.fY ) );
+    m_pPriorityLabel->AutoSize ( m_pPriorityLabel->GetText ().c_str () );
+
+    m_pPriorityCombo = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabAdvanced, "" ) );
+    m_pPriorityCombo->SetPosition ( CVector2D ( vecTemp.fX + 156.0f, vecTemp.fY - 1.0f ) );
+    m_pPriorityCombo->SetSize ( CVector2D ( 148.0f, 95.0f ) );
+    m_pPriorityCombo->AddItem ( "Normal" )->SetData ( (void*)0 );
+    m_pPriorityCombo->AddItem ( "Above normal" )->SetData ( (void*)1 );
+    m_pPriorityCombo->AddItem ( "High" )->SetData ( (void*)2 );
+    m_pPriorityCombo->SetReadOnly ( true );
+
+    m_pPriorityLabelInfo = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Very experimental feature." ) );
+    m_pPriorityLabelInfo->SetPosition ( CVector2D ( vecTemp.fX + 342.f, vecTemp.fY - 4.f ) );
+    m_pPriorityLabelInfo->SetFont ( "default-bold-small" );
+    m_pPriorityLabelInfo->SetSize ( CVector2D ( 168.0f, 95.0f ) );
     vecTemp.fY += 40-4;
 
     // Debug setting
@@ -2366,17 +2366,19 @@ void CSettings::LoadData ( void )
     }
     m_pInterfaceSkinSelector->SetSelectedItemByIndex(uiIndex);
 
-    // Async loading
-    int iVar;
-    CVARS_GET ( "async_loading", iVar );
-    if ( iVar == 0 ) m_pAsyncCombo->SetText ( "Off" );
-    else if ( iVar == 1 ) m_pAsyncCombo->SetText ( "Auto" );
-    else if ( iVar == 2 ) m_pAsyncCombo->SetText ( "On" );
-
     // AltTab test
+    int iVar;
     CVARS_GET ( "display_alttab_handler", iVar );
     if ( iVar == 0 ) m_pAltTabCombo->SetText ( "Off" );
     else if ( iVar == 1 ) m_pAltTabCombo->SetText ( "On" );
+
+    // Process priority
+    CVARS_GET ( "process_priority", iVar );
+    if ( iVar == 0 ) m_pPriorityCombo->SetText ( "Normal" );
+    else if ( iVar == 1 ) m_pPriorityCombo->SetText ( "Above normal" );
+    else if ( iVar == 2 ) m_pPriorityCombo->SetText ( "High" );
+    int PriorityClassList[] = { NORMAL_PRIORITY_CLASS, ABOVE_NORMAL_PRIORITY_CLASS, HIGH_PRIORITY_CLASS };
+    SetPriorityClass( GetCurrentProcess(), PriorityClassList[ CVARS_GET_VALUE < int > ( "process_priority" ) % 3 ] );
 
     // Fast clothes loading
     CVARS_GET ( "fast_clothes_loading", iVar );
@@ -2526,6 +2528,14 @@ void CSettings::SaveData ( void )
         bAltTabHandlerEnabled = ( iSelected != 0 );
     }
 
+    if ( CGUIListItem* pSelected = m_pPriorityCombo->GetSelectedItem () )
+    {
+        int iSelected = ( int ) pSelected->GetData();
+        CVARS_SET ( "process_priority", iSelected );
+        int PriorityClassList[] = { NORMAL_PRIORITY_CLASS, ABOVE_NORMAL_PRIORITY_CLASS, HIGH_PRIORITY_CLASS };
+        SetPriorityClass( GetCurrentProcess(), PriorityClassList[ CVARS_GET_VALUE < int > ( "process_priority" ) % 3 ] );
+    }
+
     // change
     bool bIsVideoModeChanged = GetVideoModeManager ()->SetVideoMode ( iNextVidMode, bNextWindowed, bNextFSMinimize );
     bool bIsAntiAliasingChanged = gameSettings->GetAntiAliasing () != iAntiAliasing;
@@ -2628,14 +2638,6 @@ void CSettings::SaveData ( void )
     bool bHeatHazeEnabled = m_pCheckBoxHeatHaze->GetSelected ();
     CVARS_SET ( "heat_haze", bHeatHazeEnabled );
 	g_pCore->GetMultiplayer ()->SetHeatHazeEnabled ( bHeatHazeEnabled );
-
-    // Async loading
-    if ( CGUIListItem* pSelected = m_pAsyncCombo->GetSelectedItem () )
-    {
-        int iSelected = ( int ) pSelected->GetData();
-        CVARS_SET ( "async_loading", iSelected );
-        g_pCore->GetGame ()->SetAsyncLoadingFromSettings ( iSelected == 1, iSelected == 2 );
-    }
 
     // Fast clothes loading
     if ( CGUIListItem* pSelected = m_pFastClothesCombo->GetSelectedItem () )
