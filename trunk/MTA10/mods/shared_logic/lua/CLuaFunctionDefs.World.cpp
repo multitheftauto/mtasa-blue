@@ -127,7 +127,7 @@ int CLuaFunctionDefs::ProcessLineOfSight ( lua_State * luaVM )
 //        bool seeThroughStuff = false, bool ignoreSomeObjectsForCamera = false, bool shootThroughStuff = false, element ignoredElement = nil, bool returnBuildingInfo = false,
 //        bCheckCarTires = false ] )
     CVector vecStart; CVector vecEnd;
-    SLineOfSightFlags flags; CEntity* pIgnoredEntity; bool bIncludeBuildingInfo;
+    SLineOfSightFlags flags; CClientEntity* pIgnoredElement; bool bIncludeBuildingInfo;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadNumber ( vecStart.fX );
@@ -144,12 +144,13 @@ int CLuaFunctionDefs::ProcessLineOfSight ( lua_State * luaVM )
     argStream.ReadBool ( flags.bSeeThroughStuff, false );
     argStream.ReadBool ( flags.bIgnoreSomeObjectsForCamera, false );
     argStream.ReadBool ( flags.bShootThroughStuff, false );
-    argStream.ReadUserData ( pIgnoredEntity, NULL );
+    argStream.ReadUserData ( pIgnoredElement, NULL );
     argStream.ReadBool ( bIncludeBuildingInfo, false );
     argStream.ReadBool ( flags.bCheckCarTires, false );
 
     if ( !argStream.HasErrors () )
     {
+        CEntity* pIgnoredEntity = pIgnoredElement ? pIgnoredElement->GetGameEntity() : NULL;
         CColPoint* pColPoint = NULL;
         CClientEntity* pColEntity = NULL;
         bool bCollision;
@@ -242,7 +243,7 @@ int CLuaFunctionDefs::IsLineOfSightClear ( lua_State * luaVM )
     //    bool ignoreSomeObjectsForCamera = false, 
     //    element ignoredElement = nil ] )
     CVector vecStart; CVector vecEnd;
-    SLineOfSightFlags flags; CEntity* pIgnoredEntity;
+    SLineOfSightFlags flags; CClientEntity* pIgnoredElement;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadNumber ( vecStart.fX );
@@ -258,10 +259,11 @@ int CLuaFunctionDefs::IsLineOfSightClear ( lua_State * luaVM )
     argStream.ReadBool ( flags.bCheckDummies, true );
     argStream.ReadBool ( flags.bSeeThroughStuff, false );
     argStream.ReadBool ( flags.bIgnoreSomeObjectsForCamera, false );
-    argStream.ReadUserData ( pIgnoredEntity, NULL );
+    argStream.ReadUserData ( pIgnoredElement, NULL );
 
     if ( !argStream.HasErrors () )
     {
+        CEntity* pIgnoredEntity = pIgnoredElement ? pIgnoredElement->GetGameEntity() : NULL;
         bool bIsClear;
         if ( CStaticFunctionDefinitions::IsLineOfSightClear ( vecStart, vecEnd, bIsClear, flags, pIgnoredEntity ) )
         {        
