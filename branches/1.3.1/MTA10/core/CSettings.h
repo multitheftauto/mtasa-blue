@@ -181,9 +181,9 @@ protected:
     CGUILabel*          m_pAltTabLabelInfo;
     CGUILabel*          m_pAltTabLabel;
     CGUIComboBox*       m_pAltTabCombo;
-    CGUILabel*          m_pAsyncLabelInfo;
-    CGUILabel*          m_pAsyncLabel;
-    CGUIComboBox*       m_pAsyncCombo;
+    CGUILabel*          m_pPriorityLabelInfo;
+    CGUILabel*          m_pPriorityLabel;
+    CGUIComboBox*       m_pPriorityCombo;
     CGUILabel*          m_pFastClothesLabelInfo;
     CGUILabel*          m_pFastClothesLabel;
     CGUIComboBox*       m_pFastClothesCombo;

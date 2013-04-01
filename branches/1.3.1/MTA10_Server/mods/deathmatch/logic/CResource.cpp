@@ -22,6 +22,7 @@
 //#define RESOURCE_DEBUG_MESSAGES // show info about where the actual files are coming from
 
 #include "StdInc.h"
+#include "net/SimHeaders.h"
 #ifndef WIN32
 #include <utime.h>
 #endif
@@ -579,6 +580,14 @@ bool CResource::GenerateChecksums ( void )
                 case CResourceFile::RESOURCE_FILE_TYPE_CLIENT_FILE:
                 {
                     SString strCachedFilePath = pResourceFile->GetCachedPathFilename ();
+                    if ( !g_pRealNetServer->ValidateHttpCacheFileName( strCachedFilePath ) )
+                    {
+                        FileDelete( strCachedFilePath );
+                        CLogger::LogPrintf( SString ( "ERROR: Resource '%s' client filename '%s' not allowed\n", GetName().c_str(), *ExtractFilename(strCachedFilePath) ) );
+                        bOk = false;
+                        continue;
+                    }
+                    
                     CChecksum cachedChecksum = CChecksum::GenerateChecksumFromFile ( strCachedFilePath );
                     if ( checksum != cachedChecksum )
                     {
