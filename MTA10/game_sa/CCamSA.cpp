@@ -40,6 +40,12 @@ CEntity* CCamSA::GetTargetEntity ( void ) const
     return pReturn;
 }
 
+void CCamSA::GetDirection ( float& fHorizontal, float& fVertical )
+{
+    fHorizontal = m_pInterface->m_fHorizontalAngle;
+    fVertical = m_pInterface->m_fVerticalAngle;
+}
+
 void CCamSA::SetDirection ( float fHorizontal, float fVertical )
 {
     // Calculation @ sub 0x50F970
