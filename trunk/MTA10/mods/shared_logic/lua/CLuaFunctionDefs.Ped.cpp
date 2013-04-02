@@ -1588,25 +1588,23 @@ int CLuaFunctionDefs::SetPedFootBloodEnabled ( lua_State* luaVM )
 
 int CLuaFunctionDefs::SetPedCameraRotation ( lua_State* luaVM )
 {
-    int iArgument2 = lua_type ( luaVM, 2 );
-    if ( ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA ) &&
-        ( iArgument2 == LUA_TNUMBER || iArgument2 == LUA_TSTRING ) )
+//  bool setPedCameraRotation ( ped thePed, float cameraRotation )
+    CClientEntity* pEntity; float fRotation;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pEntity );
+    argStream.ReadNumber ( fRotation );
+
+    if ( !argStream.HasErrors () )
     {
-        CClientEntity* pEntity = lua_toelement ( luaVM, 1 );
-        float fRotation = static_cast < float > ( lua_tonumber ( luaVM, 2 ) );
-        if ( pEntity )
+        if ( CStaticFunctionDefinitions::SetPedCameraRotation ( *pEntity, fRotation ) )
         {
-            if ( CStaticFunctionDefinitions::SetPedCameraRotation ( *pEntity, fRotation ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
+            lua_pushboolean ( luaVM, true );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "ped", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
 
     lua_pushboolean ( luaVM, false );
     return 1;

@@ -176,6 +176,7 @@ public:
     unsigned int        GetMode                     () const        { return m_pInterface->Mode; }
     float               GetFOV                      () const        { return m_pInterface->FOV; }
     void                SetFOV                      ( float fFOV )  { m_pInterface->FOV = fFOV; }
+    void                GetDirection                ( float& fHorizontal, float& fVertical );
     void                SetDirection                ( float fHorizontal, float fVertical );
 
     CVector*            GetFixedModeSource          () const        { return &m_pInterface->m_cvecCamFixedModeSource; }

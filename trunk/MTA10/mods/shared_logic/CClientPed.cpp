@@ -744,8 +744,10 @@ void CClientPed::SetCameraRotation ( float fRotation )
     // Local player
     if ( m_bIsLocalPlayer )
     {
-        // Jax: only has an effect if CMultiplayer::SetCustomCameraRotationEnabled is called
-        g_pMultiplayer->SetLocalCameraRotation ( fRotation );
+        CCam* pCam = g_pGame->GetCamera ()->GetCam ( g_pGame->GetCamera ()->GetActiveCam () );
+        float fOldHorizontal, fOldVertical;
+        pCam->GetDirection ( fOldHorizontal, fOldVertical );
+        pCam->SetDirection ( fRotation - PI/2, fOldVertical );
     }
     else
     {
