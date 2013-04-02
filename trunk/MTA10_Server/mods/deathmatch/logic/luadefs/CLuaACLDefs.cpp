@@ -341,6 +341,8 @@ int CLuaACLDefs::aclListRights ( lua_State* luaVM )
     argStream.ReadUserData ( pACL );
     if ( argStream.NextIsString () )
     {
+        argStream.ReadString ( strType );
+
         bAll = false;
         if ( strType == "command" )
             eAllowed = CAccessControlListRight::RIGHT_TYPE_COMMAND;
