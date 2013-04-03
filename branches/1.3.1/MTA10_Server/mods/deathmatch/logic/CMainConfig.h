@@ -58,6 +58,7 @@ public:
 
     inline const std::string&       GetServerName                   ( void )        { return m_strServerName; };
     std::string                     GetServerIP                     ( void );
+    SString                         GetServerIPList                 ( void );
     unsigned short                  GetServerPort                   ( void );
     unsigned int                    GetMaxPlayers                   ( void );
     unsigned int                    GetHardMaxPlayers               ( void );
