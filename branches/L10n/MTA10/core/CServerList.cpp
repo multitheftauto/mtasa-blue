@@ -154,11 +154,11 @@ void CServerList::Pulse ( void )
     ss << "   ";
     if ( uiTotalSlots > 0 )
     {
-        SString strPlayersString = _n ("player", "players", uiOccupiedSlots);
-        ss << uiOccupiedSlots << " " << strPlayersString << _(" on ");
+        SString strPlayersString = _n("player", "players", uiOccupiedSlots);
+        ss << uiOccupiedSlots << " " << strPlayersString << " " << _("on") << " ";
     }
 
-    SString strServersString = _n ("server", "servers", uiActiveServers);
+    SString strServersString = _n("server", "servers", uiActiveServers);
     ss << uiActiveServers << " " << strServersString;
 
     if ( m_iPass )

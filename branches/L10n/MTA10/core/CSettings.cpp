@@ -1932,7 +1932,7 @@ void CSettings::Initialize ( void )
                     {
                         // Add bind to the list
                         iBind = m_pBindsList->InsertRowAfter ( iRowGame );
-                        m_pBindsList->SetItemText ( iBind, m_hBind, pControl->szDescription );
+                        m_pBindsList->SetItemText ( iBind, m_hBind, _(pControl->szDescription) );
                         m_pBindsList->SetItemText ( iBind, m_hPriKey, pBind->boundKey->szKey );
                         for ( int k = 0 ; k < SecKeyNum ; k++ )
                             m_pBindsList->SetItemText ( iBind, m_hSecKeys[k], CORE_SETTINGS_NO_KEY );

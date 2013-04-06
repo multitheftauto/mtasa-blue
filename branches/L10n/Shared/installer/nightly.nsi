@@ -92,7 +92,7 @@ Var ShowLastUsed
 
 ; Welcome page
 !define MUI_WELCOMEPAGE_TITLE_3LINES
-
+!define MUI_WELCOMEPAGE_TEXT 		"$(WELCOME_TEXT)"
 !define MUI_PAGE_CUSTOMFUNCTION_PRE "WelcomePreProc"
 !define MUI_PAGE_CUSTOMFUNCTION_SHOW "WelcomeShowProc"
 !define MUI_PAGE_CUSTOMFUNCTION_LEAVE "WelcomeLeaveProc"
@@ -124,6 +124,10 @@ Page custom CustomDirectoryPage DirectoryLeaveProc
 
 ; INSERT OUR PAGES
 !define MUI_PAGE_CUSTOMFUNCTION_PRE				SkipDirectoryPage
+!define MUI_PAGE_HEADER_TEXT					"$(HEADER_Text)"
+!define MUI_PAGE_HEADER_SUBTEXT					""
+!define MUI_DIRECTORYPAGE_TEXT_DESTINATION		"$(DIRECTORY_Text_Dest)"
+!define MUI_DIRECTORYPAGE_TEXT_TOP				"$(DIRECTORY_Text_Top)"
 !define MUI_DIRECTORYPAGE_VARIABLE				$GTA_DIR
 !define MUI_PAGE_CUSTOMFUNCTION_LEAVE           "GTADirectoryLeaveProc"
 !insertmacro MUI_PAGE_DIRECTORY
@@ -152,12 +156,6 @@ Click Next to continue."
 LangString 	HEADER_Text			${LANG_ENGLISH}	"Grand Theft Auto: San Andreas location"
 LangString 	DIRECTORY_Text_Dest	${LANG_ENGLISH}	"Grand Theft Auto: San Andreas folder"
 LangString 	DIRECTORY_Text_Top	${LANG_ENGLISH}	"Please select your Grand Theft Auto: San Andreas folder.$\n$\nYou MUST have Grand Theft Auto: San Andreas 1.0 installed to use MTA:SA, it does not support any other versions.$\n$\nClick Install to begin installing."
-
-!define MUI_WELCOMEPAGE_TEXT "$(WELCOME_TEXT)"
-!define MUI_PAGE_HEADER_TEXT					"$(HEADER_Text)"
-!define MUI_PAGE_HEADER_SUBTEXT					""
-!define MUI_DIRECTORYPAGE_TEXT_DESTINATION		"$(DIRECTORY_Text_Dest)"
-!define MUI_DIRECTORYPAGE_TEXT_TOP				"$(DIRECTORY_Text_Top)"
 
 ; Language files
 LangString	DESC_Section10			${LANG_ENGLISH}	"Create a Start Menu group for installed applications"
@@ -394,6 +392,7 @@ LangString INFO_UPDATE_PERMISSIONS ${LANG_ENGLISH}	"Updating permissions. This c
 LangString MSGBOX_INVALID_GTASA ${LANG_ENGLISH}	"A valid Windows version of Grand Theft Auto: San Andreas was not detected.\
 $\r$\nHowever installation will continue.\
 $\r$\nPlease reinstall if there are problems later."
+LangString INST_SEC_CORE_RESOURCES ${LANG_ENGLISH}	"Core Resources"
 LangString INST_SEC_OPTIONAL_RESOURCES ${LANG_ENGLISH}	"Optional Resources"
 LangString INST_SEC_EDITOR ${LANG_ENGLISH}	"Editor"
 
@@ -726,7 +725,7 @@ SectionGroup /e "$(INST_SEC_SERVER)" SECGSERVER
 	SectionEnd
 
 	!ifndef LIGHTBUILD
-		Section "Core resources" SEC06
+		Section "$(INST_SEC_CORE_RESOURCES)" SEC06
 		SectionIn 1 2 ; RO section is now optional
 			SetOutPath "$INSTDIR\server\mods\deathmatch\resources\"
             File "${SERVER_FILES_ROOT}\mods\deathmatch\resources\Directory layout readme.txt"

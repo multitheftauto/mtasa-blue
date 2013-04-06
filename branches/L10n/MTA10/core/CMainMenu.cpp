@@ -1089,14 +1089,14 @@ void CMainMenu::SetNewsHeadline ( int iIndex, const SString& strHeadline, const 
 /////////////////////////////////////////////////////////////
 void CMainMenu::AskUserIfHeWantsToDisconnect ( uchar menuType )
 {
-    SStringX strMessage ( "This will disconnect you from the current server." );
-    strMessage += "\n\nAre you sure you want to disconnect?";
+    SStringX strMessage ( _("This will disconnect you from the current server."
+                            "\n\nAre you sure you want to disconnect?" ) );
     CQuestionBox* pQuestionBox = CCore::GetSingleton ().GetLocalGUI ()->GetMainMenu ()->GetQuestionWindow ();
     pQuestionBox->Reset ();
-    pQuestionBox->SetTitle ( "DISCONNECT WARNING" );
+    pQuestionBox->SetTitle ( _("DISCONNECT WARNING") );
     pQuestionBox->SetMessage ( strMessage );
-    pQuestionBox->SetButton ( 0, "No" );
-    pQuestionBox->SetButton ( 1, "Yes" );
+    pQuestionBox->SetButton ( 0, _("No") );
+    pQuestionBox->SetButton ( 1, _("Yes") );
     pQuestionBox->SetCallback ( StaticWantsToDisconnectCallBack, (void*)menuType );
     pQuestionBox->Show ();
 }

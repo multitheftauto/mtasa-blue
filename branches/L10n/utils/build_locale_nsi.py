@@ -152,12 +152,6 @@ NSISourceLines = NSISourceFile.readlines()
 NSISourceFile.close()
 NSINewLines = []
 
-incr = 0
-def getlineincr(no):
-    global incr
-    incr += 1
-    return incr+no
-
 def tostr(obj):
     if type(obj) == unicode:
         return obj.encode("utf-8")
