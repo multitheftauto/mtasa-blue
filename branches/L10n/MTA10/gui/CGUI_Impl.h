@@ -165,6 +165,8 @@ public:
     CGUIFont*                       GetSansFont                 ( void );
     bool                            IsFontPresent               ( const char* szFont ) { return m_pFontManager->isFontPresent(szFont); }
 
+    float                           GetTextExtent               ( const char* szText, const char* szFont = "default-normal" );
+
     const SString&                  GetGuiWorkingDirectory         ( void ) const;
     void                            SetDefaultGuiWorkingDirectory  ( const SString& strDir );
     void                            PushGuiWorkingDirectory        ( const SString& strDir );

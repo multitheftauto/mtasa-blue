@@ -28,12 +28,10 @@ template<> CServerBrowser * CSingleton < CServerBrowser >::m_pSingleton = NULL;
 #define SB_NAVBAR_SIZE_Y    40 // Navbar button size
 #define SB_BUTTON_SIZE_X    26
 #define SB_BUTTON_SIZE_Y    26
-#define SB_CONNECT_SIZE_X   80
 #define SB_SPACER           10 //Spacer between searchbar and navbar
 #define SB_SMALL_SPACER     5
 #define SB_SEARCHBAR_COMBOBOX_SIZE_X   45  // Mow much the search type combobox occupies of searchbar
 #define SB_SEARCHBAR_COMBOBOX_SIZE_Y   22
-#define SB_SEARCHBAR_SIZE_X     200  // Width of search bar
 #define SB_PLAYERLIST_SIZE_X    200  // Width of players list [NB. adjusted for low resolutions in CServerBrowser::CreateTab]
 #define SB_BACK_BUTTON_SIZE_Y   40  // Size of the back butt
 #define COMBOBOX_ARROW_SIZE_X   23  //Fixed CEGUI size of the 'combobox' arrow
@@ -315,7 +313,10 @@ void CServerBrowser::CreateTab ( ServerBrowserType type, const char* szName )
     m_pTab [ type ] = m_pPanel->CreateTab ( szName );
 
     float fPlayerListSizeX = SB_PLAYERLIST_SIZE_X;
-    float fSearchBarSizeX = SB_SEARCHBAR_SIZE_X;
+    float fSearchBarSizeX = pManager->GetTextExtent ( _("Search players..."), "default-bold-small" ) + 90;
+    Max ( fSearchBarSizeX, pManager->GetTextExtent ( _("Search servers..."), "default-bold-small" ) + 60 );
+
+    float fConnectButtonWidth = 26 + pManager->GetTextExtent ( _("Connect"), "default-bold-small" ) + 5;
 
 	//Make our playerlist smaller, if it's a small panel - either 15%, or a max of 200px in size.
     fPlayerListSizeX = Min < float >( m_WidgetSize.fX*0.15, SB_PLAYERLIST_SIZE_X );
@@ -340,7 +341,7 @@ void CServerBrowser::CreateTab ( ServerBrowserType type, const char* szName )
     // Address Bar + History Combo
 	fX = fX + SB_BUTTON_SIZE_X + SB_SMALL_SPACER;
 	    // Work out our size by calculating from the end - minus the searchbox, combobox, spacing, info button, play button
-	float fWidth = m_WidgetSize.fX - SB_SMALL_SPACER - fSearchBarSizeX - SB_SPACER - SB_BUTTON_SIZE_X - SB_SMALL_SPACER - SB_CONNECT_SIZE_X - SB_SMALL_SPACER - COMBOBOX_ARROW_SIZE_X - fX;
+	float fWidth = m_WidgetSize.fX - SB_SMALL_SPACER - fSearchBarSizeX - SB_SPACER - SB_BUTTON_SIZE_X - SB_SMALL_SPACER - fConnectButtonWidth - SB_SMALL_SPACER - COMBOBOX_ARROW_SIZE_X - fX;
     m_pEditAddress [ type ] = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( m_pTab [ type ], "" ) );
     m_pEditAddress [ type ]->SetPosition ( CVector2D ( fX, fY ), false );
     m_pEditAddress [ type ]->SetSize ( CVector2D ( fWidth, SB_BUTTON_SIZE_Y ), false);
@@ -378,7 +379,7 @@ void CServerBrowser::CreateTab ( ServerBrowserType type, const char* szName )
     strButtonText = "     " + strButtonText;
     m_pButtonConnect [ type ] = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( m_pTab [ type ], strButtonText.c_str() ) );
     m_pButtonConnect [ type ]->SetPosition ( CVector2D ( fX, fY ), false );
-    m_pButtonConnect [ type ]->SetSize ( CVector2D ( SB_CONNECT_SIZE_X, SB_BUTTON_SIZE_Y ), false );  //!ACHTUNG: Dynamically set button size
+    m_pButtonConnect [ type ]->SetSize ( CVector2D ( fConnectButtonWidth, SB_BUTTON_SIZE_Y ), false );
     m_pButtonConnect [ type ]->SetClickHandler ( GUI_CALLBACK ( &CServerBrowser::OnConnectClick, this ) );
     m_pButtonConnect [ type ]->SetFont ( "default-bold-small" );
     m_pButtonConnect [ type ]->SetZOrderingEnabled ( false );
@@ -388,7 +389,7 @@ void CServerBrowser::CreateTab ( ServerBrowserType type, const char* szName )
     m_pButtonConnectIcon [ type ]->SetProperty ( "MousePassThroughEnabled","True" );
 
     // Info button + icon
-    fX = fX + SB_CONNECT_SIZE_X + SB_SMALL_SPACER;
+    fX = fX + fConnectButtonWidth + SB_SMALL_SPACER;
     m_pButtonInfo [ type ] = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( m_pTab [ type ], "" ) );
     m_pButtonInfo [ type ]->SetPosition ( CVector2D ( fX, fY ), false );
     m_pButtonInfo [ type ]->SetSize ( CVector2D ( SB_BUTTON_SIZE_X, SB_BUTTON_SIZE_Y ), false );
@@ -424,10 +425,10 @@ void CServerBrowser::CreateTab ( ServerBrowserType type, const char* szName )
     m_pEditSearch [ type ]->SetSize ( CVector2D ( fWidth, SB_SEARCHBAR_COMBOBOX_SIZE_Y ), false );
     m_pEditSearch [ type ]->SetTextChangedHandler( GUI_CALLBACK( &CServerBrowser::OnFilterChanged, this ) );
 
-    m_pLabelSearchDescription [ type ] = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pEditSearch [ type ], "Search servers..." ) );
+    m_pLabelSearchDescription [ type ] = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pEditSearch [ type ], _("Search servers...") ) );
     m_pLabelSearchDescription [ type ]->SetPosition ( CVector2D ( 10, 3 ), false ); 
     m_pLabelSearchDescription [ type ]->SetTextColor ( 0, 0, 0 );
-    m_pLabelSearchDescription [ type ]->AutoSize ( m_pLabelSearchDescription [ type ]->GetText ().c_str () );
+    m_pLabelSearchDescription [ type ]->SetSize ( CVector2D ( 1, 1 ), true );
     m_pLabelSearchDescription [ type ]->SetAlpha(0.6f);
     m_pLabelSearchDescription [ type ]->SetProperty ( "MousePassThroughEnabled","True" );
     m_pLabelSearchDescription [ type ]->SetProperty ( "DistributeCapturedInputs","True" );
@@ -493,22 +494,22 @@ void CServerBrowser::CreateTab ( ServerBrowserType type, const char* szName )
     m_pLabelInclude [ type ]->AutoSize ( m_pLabelInclude [ type ]->GetText ().c_str () );
 
     // Include checkboxes
-	fX = fX + m_pLabelInclude [ type ]->GetTextExtent() + SB_SPACER;
+	fX = fX + pManager->GetTextExtent( m_pLabelInclude [ type ]->GetText().c_str() ) + SB_SPACER;
     m_pIncludeEmpty [ type ] = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( m_pTab [ type ], _("Empty"), true ) );
     m_pIncludeEmpty [ type ]->SetPosition ( CVector2D ( fX, fY ), false );
-    m_pIncludeEmpty [ type ]->SetSize ( CVector2D ( 53, 17 ) );
+    m_pIncludeEmpty [ type ]->AutoSize ( m_pIncludeEmpty [ type ]->GetText ().c_str (), 20.0f );
     m_pIncludeEmpty [ type ]->SetClickHandler ( GUI_CALLBACK ( &CServerBrowser::OnFilterChanged, this ) );
 
-    fX = fX + 53 + SB_SPACER;
+    fX = fX + 20.0f + pManager->GetTextExtent( m_pIncludeEmpty [ type ]->GetText().c_str() ) + SB_SPACER;
     m_pIncludeFull [ type ] = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( m_pTab [ type ], _("Full"), true ) );
     m_pIncludeFull [ type ]->SetPosition ( CVector2D ( fX, fY ), false );
-    m_pIncludeFull [ type ]->SetSize ( CVector2D ( 35, 17 ) );
+    m_pIncludeFull [ type ]->AutoSize ( m_pIncludeFull [ type ]->GetText ().c_str (), 20.0f );
     m_pIncludeFull [ type ]->SetClickHandler ( GUI_CALLBACK ( &CServerBrowser::OnFilterChanged, this ) );
 
-    fX = fX + 35 + SB_SPACER;
+    fX = fX + 20.0f + pManager->GetTextExtent( m_pIncludeFull [ type ]->GetText().c_str() ) + SB_SPACER;
     m_pIncludeLocked [ type ] = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( m_pTab [ type ], _("Locked"), true ) );
     m_pIncludeLocked [ type ]->SetPosition ( CVector2D ( fX, fY ), false );
-    m_pIncludeLocked [ type ]->SetSize ( CVector2D ( 57, 17 ) );
+    m_pIncludeLocked [ type ]->AutoSize ( m_pIncludeLocked [ type ]->GetText ().c_str (), 20.0f );
     m_pIncludeLocked [ type ]->SetClickHandler ( GUI_CALLBACK ( &CServerBrowser::OnFilterChanged, this ) );
 
 #if MTA_DEBUG
@@ -517,21 +518,23 @@ void CServerBrowser::CreateTab ( ServerBrowserType type, const char* szName )
     if ( type != ServerBrowserTypes::INTERNET && type != ServerBrowserTypes::LAN )
 #endif
     {
-        fX = fX + 57 + SB_SPACER;
+        fX = fX + 20.0f + pManager->GetTextExtent( m_pIncludeLocked [ type ]->GetText().c_str() ) + SB_SPACER;
         m_pIncludeOffline [ type ] = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( m_pTab [ type ], _("Offline"), true ) );
         m_pIncludeOffline [ type ]->SetPosition ( CVector2D ( fX, fY ), false );
-        m_pIncludeOffline [ type ]->SetSize ( CVector2D ( 53, 17 ) );
+        m_pIncludeOffline [ type ]->AutoSize ( m_pIncludeLocked [ type ]->GetText ().c_str (), 20.0f );
         m_pIncludeOffline [ type ]->SetClickHandler ( GUI_CALLBACK ( &CServerBrowser::OnFilterChanged, this ) );
+        
+        fX = fX + 20.0f + pManager->GetTextExtent( m_pIncludeOffline [ type ]->GetText().c_str() ) + SB_SPACER*2;
     }
     else
     {
         m_pIncludeOffline [ type ] = NULL;
+        fX = fX + 20.0f + pManager->GetTextExtent( m_pIncludeLocked [ type ]->GetText().c_str() ) + SB_SPACER*2;
     }
 
-    fX = fX + 60 + SB_SPACER*2;
     m_pIncludeOtherVersions [ type ] = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( m_pTab [ type ], _("Other Versions"), false ) );
     m_pIncludeOtherVersions [ type ]->SetPosition ( CVector2D ( fX, fY ), false );
-    m_pIncludeOtherVersions [ type ]->SetSize ( CVector2D ( 99, 17 ) );
+    m_pIncludeOtherVersions [ type ]->AutoSize ( m_pIncludeOtherVersions [ type ]->GetText ().c_str (), 20.0f );
     m_pIncludeOtherVersions [ type ]->SetClickHandler ( GUI_CALLBACK ( &CServerBrowser::OnFilterChanged, this ) );
     m_pIncludeOtherVersions [ type ]->SetVisible ( false );
 
@@ -541,8 +544,11 @@ void CServerBrowser::CreateTab ( ServerBrowserType type, const char* szName )
 
     m_pServerListStatus [ type ] = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pTab [ type ], "" ) );
     m_pServerListStatus [ type ]->SetPosition ( CVector2D ( fX, fY ) );
-    m_pServerListStatus [ type ]->SetSize ( CVector2D ( 100, fLineHeight ), true );
+    m_pServerListStatus [ type ]->SetSize ( CVector2D ( m_WidgetSize.fX, fLineHeight ), true );
+    m_pServerListStatus [ type ]->MoveToBack();
     m_pServerListStatus [ type ]->SetZOrderingEnabled ( false );
+    m_pServerListStatus [ type ]->SetProperty ( "MousePassThroughEnabled","True" );
+    m_pServerListStatus [ type ]->SetProperty ( "DistributeCapturedInputs","True" );
 
     // Back button
     fX = m_WidgetSize.fX - fPlayerListSizeX - SB_SMALL_SPACER;
@@ -574,6 +580,17 @@ void CServerBrowser::CreateTab ( ServerBrowserType type, const char* szName )
     m_pServerList [ type ]->SetEnterKeyHandler ( GUI_CALLBACK ( &CServerBrowser::OnDoubleClick, this ) );
     m_pServerList [ type ]->SetDoubleClickHandler ( GUI_CALLBACK ( &CServerBrowser::OnDoubleClick, this ) );
     m_pServerList [ type ]->SetKeyDownHandler ( GUI_CALLBACK_KEY ( &CServerBrowser::OnServerListChangeRow, this ) );
+
+    // If any of the include checkboxes overlap with the help/back buttons, we move them down - next to the status bar.
+    CVector2D vecButtonPos = m_pButtonGeneralHelp [ type ]->GetPosition();
+    float fMoveX = vecButtonPos.fX;
+    std::vector < CGUICheckBox* > pCheckBox;
+    pCheckBox.push_back(m_pIncludeOtherVersions [ type ] );
+    pCheckBox.push_back(m_pIncludeOffline [ type ] );
+    pCheckBox.push_back(m_pIncludeLocked [ type ] );
+    for ( std::vector < CGUICheckBox* > ::iterator iter = pCheckBox.begin () ; iter != pCheckBox.end () ; ++iter )
+        if ( (*iter) != NULL && ( ( (*iter)->GetPosition(false).fX + (*iter)->GetSize(false).fX ) > vecButtonPos.fX ) )
+            (*iter)->SetPosition( CVector2D( fMoveX+= - SB_SPACER - (*iter)->GetSize(false).fX, m_pServerListStatus [ type ]->GetPosition().fY ) );
 }
 
 void CServerBrowser::DeleteTab ( ServerBrowserType type )

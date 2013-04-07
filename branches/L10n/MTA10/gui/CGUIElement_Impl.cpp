@@ -186,6 +186,12 @@ void CGUIElement_Impl::GetSize ( CVector2D& vecSize, bool bRelative )
     vecSize.fY = TempSize.d_height;
 }
 
+void CGUIElement_Impl::AutoSize ( const char* Text, float fPaddingX, float fPaddingY )
+{
+    const CEGUI::Font *pFont = m_pWindow->getFont();
+    m_pWindow->setSize ( CEGUI::Absolute, CEGUI::Size ( pFont->getTextExtent ( CGUI_Impl::GetUTFString( Text ? Text : GetText() ) ) + fPaddingX, pFont->getFontHeight() + fPaddingY ) );   // Add hack factor to height to allow for long characters such as 'g' or 'j'
+}
+
 
 void CGUIElement_Impl::SetMinimumSize ( const CVector2D& vecSize )
 {

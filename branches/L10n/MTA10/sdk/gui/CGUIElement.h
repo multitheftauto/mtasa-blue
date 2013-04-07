@@ -64,6 +64,8 @@ public:
     virtual CVector2D           GetSize                     ( bool bRelative = false ) = 0;
     virtual void                GetSize                     ( CVector2D& vecSize, bool bRelative = false ) = 0;
 
+    virtual void                AutoSize                    ( const char* Text = NULL, float fPaddingX = 0.0f, float fPaddingY = 2.0f ) = 0;
+
     virtual void                SetProperty                 ( const char *szProperty, const char *szValue ) = 0;
     virtual std::string         GetProperty                 ( const char *szProperty ) = 0;
 

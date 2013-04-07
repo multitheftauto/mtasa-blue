@@ -640,6 +640,12 @@ CGUIFont* CGUI_Impl::GetSansFont ( void )
     return m_pSansFont;
 }
 
+float CGUI_Impl::GetTextExtent ( const char* szText, const char* szFont )
+{
+    return m_pFontManager->getFont(szFont)->getTextExtent ( CGUI_Impl::GetUTFString( szText ) );
+}
+
+
 bool CGUI_Impl::Event_KeyDown ( const CEGUI::EventArgs& Args )
 {
     // Cast it to a set of keyboard arguments

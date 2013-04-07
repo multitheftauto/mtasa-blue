@@ -69,6 +69,7 @@ void CSettings::CreateGUI ( void )
     m_bShownVolumetricShadowsWarning = false;
     m_bShownAllowScreenUploadMessage = false;
     CVector2D vecTemp;
+    CVector2D vecSize;
 
     // Create the window
     m_pWindow = reinterpret_cast < CGUIWindow* > ( pManager->CreateWnd ( NULL, _("SETTINGS") ) );
@@ -141,7 +142,7 @@ void CSettings::CreateGUI ( void )
     //Mouse Options
     m_pControlsMouseLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabControls, _("Mouse options") ) );
     m_pControlsMouseLabel->SetPosition ( CVector2D ( vecTemp.fX + 11, vecTemp.fY ) );
-    m_pControlsMouseLabel->AutoSize ( _("Mouse options") );
+    m_pControlsMouseLabel->AutoSize ();
     m_pControlsMouseLabel->SetFont ( "default-bold-small" );
     vecTemp.fY += 18;
 
@@ -160,7 +161,7 @@ void CSettings::CreateGUI ( void )
     // MouseSensitivity
     m_pLabelMouseSensitivity = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabControls, _("Mouse sensitivity:") ) );
     m_pLabelMouseSensitivity->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY ) );
-    m_pLabelMouseSensitivity->AutoSize ( _("Mouse sensitivity:") );
+    m_pLabelMouseSensitivity->AutoSize ( );
 
     m_pMouseSensitivity = reinterpret_cast < CGUIScrollBar* > ( pManager->CreateScrollBar ( true, pTabControls ) );
     m_pMouseSensitivity->SetPosition ( CVector2D ( vecTemp.fX + 130.0f, vecTemp.fY ) );
@@ -191,7 +192,7 @@ void CSettings::CreateGUI ( void )
     //Joypad options
     m_pControlsJoypadLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabControls, _("Joypad options") ) );
     m_pControlsJoypadLabel->SetPosition ( CVector2D ( 11, vecTemp.fY ) );
-    m_pControlsJoypadLabel->AutoSize ( _("Joypad options") );
+    m_pControlsJoypadLabel->AutoSize ( );
     m_pControlsJoypadLabel->SetFont ( "default-bold-small" );
     vecTemp.fY += 18;
 
@@ -335,11 +336,11 @@ void CSettings::CreateGUI ( void )
     m_pLabelUser = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabCommunity, _("Username:") ) );
     m_pLabelUser->SetPosition ( CVector2D ( 0.022f, 0.46f ), true );
     m_pLabelUser->GetPosition ( vecTemp, false );
-    m_pLabelUser->AutoSize ( "Username:" );
+    m_pLabelUser->AutoSize ( );
 
     m_pLabelPass = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabCommunity, _("Password:") ) );
     m_pLabelPass->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32 ) );
-    m_pLabelPass->AutoSize ( "Password:" );
+    m_pLabelPass->AutoSize ( );
 
     m_pEditUser = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( pTabCommunity ) );
     m_pEditUser->SetPosition ( CVector2D ( 0.16f, 0.45f ), true );
@@ -374,10 +375,11 @@ void CSettings::CreateGUI ( void )
     m_pLabelNick->SetPosition ( CVector2D ( 11, 13 ) );
     m_pLabelNick->GetPosition ( vecTemp, false );
     m_pLabelNick->AutoSize ( _("Nick:") );
+    m_pLabelNick->GetSize ( vecSize );
 
     // Nick edit
     m_pEditNick = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( pTabMultiplayer ) );
-    m_pEditNick->SetPosition ( CVector2D ( vecTemp.fX + 100.0f, vecTemp.fY - 1.0f ) );
+    m_pEditNick->SetPosition ( CVector2D ( vecSize.fX + vecTemp.fX + 50.0f, vecTemp.fY - 1.0f ) );
     m_pEditNick->SetSize ( CVector2D ( 178.0f, 24.0f ) );
     m_pEditNick->SetMaxLength ( MAX_PLAYER_NICK_LENGTH );
     m_pEditNick->SetTextAcceptedHandler( GUI_CALLBACK( &CSettings::OnOKButtonClick, this ) );
@@ -385,17 +387,17 @@ void CSettings::CreateGUI ( void )
     m_pSavePasswords = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabMultiplayer, _("Save server passwords"), true ) );
     m_pSavePasswords->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 50.0f ) );
     m_pSavePasswords->GetPosition ( vecTemp, false );
-    m_pSavePasswords->SetSize ( CVector2D ( 224.0f, 16.0f ) );
+    m_pSavePasswords->AutoSize ( NULL, 20.0f );
 
     m_pAutoRefreshBrowser = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabMultiplayer, _("Auto-refresh server browser"), true ) );
     m_pAutoRefreshBrowser->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 20.0f ) );
     m_pAutoRefreshBrowser->GetPosition ( vecTemp, false );
-    m_pAutoRefreshBrowser->SetSize ( CVector2D ( 224.0f, 16.0f ) );
+    m_pAutoRefreshBrowser->AutoSize ( NULL, 20.0f );
 
     m_pCheckBoxAllowScreenUpload = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabMultiplayer, _("Allow screen upload"), true ) );
     m_pCheckBoxAllowScreenUpload->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 20.0f ) );
     m_pCheckBoxAllowScreenUpload->GetPosition ( vecTemp, false );
-    m_pCheckBoxAllowScreenUpload->SetSize ( CVector2D ( 224.0f, 16.0f ) );
+    m_pCheckBoxAllowScreenUpload->AutoSize ( NULL, 20.0f );
 
     m_pCheckBoxCustomizedSAFiles = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabMultiplayer, _("Use customized GTA:SA files"), true ) );
     m_pCheckBoxCustomizedSAFiles->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 20.0f ) );
@@ -408,13 +410,13 @@ void CSettings::CreateGUI ( void )
     m_pAudioGeneralLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, _("General") ) );
     m_pAudioGeneralLabel->SetPosition ( CVector2D ( 11, 13 ) );
     m_pAudioGeneralLabel->GetPosition ( vecTemp, false );
-    m_pAudioGeneralLabel->AutoSize ( _("General") );
+    m_pAudioGeneralLabel->AutoSize ( NULL, 5.0f );
     m_pAudioGeneralLabel->SetFont ( "default-bold-small" );
 
     m_pLabelRadioVolume = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, _("Radio volume:") ) );
     m_pLabelRadioVolume->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32.0f ), false );
     m_pLabelRadioVolume->GetPosition ( vecTemp, false );
-    m_pLabelRadioVolume->AutoSize ( "Radio volume:" );
+    m_pLabelRadioVolume->AutoSize ( );
 
     m_pAudioRadioVolume = reinterpret_cast < CGUIScrollBar* > ( pManager->CreateScrollBar ( true, pTabAudio ) );
     m_pAudioRadioVolume->SetPosition ( CVector2D ( vecTemp.fX + 80.0f, vecTemp.fY ) );
@@ -428,7 +430,7 @@ void CSettings::CreateGUI ( void )
     m_pLabelSFXVolume = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, _("SFX volume:") ) );
     m_pLabelSFXVolume->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32.0f ) );
     m_pLabelSFXVolume->GetPosition ( vecTemp, false );
-    m_pLabelSFXVolume->AutoSize ( _("SFX volume:") );
+    m_pLabelSFXVolume->AutoSize ( );
 
     m_pLabelSFXVolumeValue = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, "0%") );
     m_pLabelSFXVolumeValue->SetPosition ( CVector2D ( vecTemp.fX + 250.0f, vecTemp.fY ) );
@@ -450,7 +452,7 @@ void CSettings::CreateGUI ( void )
     m_pLabelMTAVolume = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, _("MTA volume:") ) );
     m_pLabelMTAVolume->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32.0f ) );
     m_pLabelMTAVolume->GetPosition ( vecTemp, false );
-    m_pLabelMTAVolume->AutoSize ( _("MTA volume:") );
+    m_pLabelMTAVolume->AutoSize ( );
 
     m_pLabelMTAVolumeValue = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, "0%") );
     m_pLabelMTAVolumeValue->SetPosition ( CVector2D ( vecTemp.fX + 250.0f, vecTemp.fY ) );
@@ -464,7 +466,7 @@ void CSettings::CreateGUI ( void )
     m_pLabelVoiceVolume = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, _("Voice volume:") ) );
     m_pLabelVoiceVolume->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32.0f ) );
     m_pLabelVoiceVolume->GetPosition ( vecTemp, false );
-    m_pLabelVoiceVolume->AutoSize ( _("Voice volume:") );
+    m_pLabelVoiceVolume->AutoSize ( );
 
     m_pLabelVoiceVolumeValue = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, "0%") );
     m_pLabelVoiceVolumeValue->SetPosition ( CVector2D ( vecTemp.fX + 250.0f, vecTemp.fY ) );
@@ -478,13 +480,13 @@ void CSettings::CreateGUI ( void )
     m_pAudioUsertrackLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, _("Usertrack options") ) );
     m_pAudioUsertrackLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 40.0f ), false );
     m_pAudioUsertrackLabel->GetPosition ( vecTemp, false );
-    m_pAudioUsertrackLabel->AutoSize ( _("Usertrack options") );
+    m_pAudioUsertrackLabel->AutoSize ( );
     m_pAudioUsertrackLabel->SetFont ( "default-bold-small" );
 
     m_pLabelUserTrackMode = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, _("Play mode:") ) );
     m_pLabelUserTrackMode->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32.0f ) );
     m_pLabelUserTrackMode->GetPosition ( vecTemp, false );
-    m_pLabelUserTrackMode->AutoSize ( _("Play mode:") );
+    m_pLabelUserTrackMode->AutoSize ( );
 
     m_pComboUsertrackMode = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabAudio, "" ) );
     m_pComboUsertrackMode->SetPosition ( CVector2D ( vecTemp.fX + 80.0f, vecTemp.fY ) );
@@ -511,96 +513,82 @@ void CSettings::CreateGUI ( void )
     m_pVideoGeneralLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, _("General") ) );
     m_pVideoGeneralLabel->SetPosition ( CVector2D ( 11, 13 ) );
     m_pVideoGeneralLabel->GetPosition ( vecTemp, false );
-    m_pVideoGeneralLabel->AutoSize ( _("General") + "  " );
+    m_pVideoGeneralLabel->AutoSize ( NULL, 3.0f );
     m_pVideoGeneralLabel->SetFont ( "default-bold-small" );
 
     m_pVideoResolutionLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, _("Resolution:") ) );
     m_pVideoResolutionLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 28.0f ) );
     m_pVideoResolutionLabel->GetPosition ( vecTemp, false );
-    m_pVideoResolutionLabel->AutoSize ( _("Resolution:") );
+    m_pVideoResolutionLabel->AutoSize ( );
+    m_pVideoResolutionLabel->GetSize ( vecSize );
 
     m_pComboResolution = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabVideo, "" ) );
-    m_pComboResolution->SetPosition ( CVector2D ( vecTemp.fX + 86.0f, vecTemp.fY - 5.0f ) );
+    m_pComboResolution->SetPosition ( CVector2D ( vecTemp.fX + vecSize.fX + 5.0f, vecTemp.fY - 5.0f ) );
+    m_pComboResolution->GetPosition ( vecTemp, false );
     m_pComboResolution->SetSize ( CVector2D ( 200.0f, 160.0f ) );
+    m_pComboResolution->GetSize ( vecSize );
     m_pComboResolution->SetReadOnly ( true );
 
     m_pCheckBoxWindowed = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, _("Windowed"), true ) );
-    m_pCheckBoxWindowed->SetPosition ( CVector2D ( vecTemp.fX + 340.0f, vecTemp.fY - 3.0f ) );
-    m_pCheckBoxWindowed->SetSize ( CVector2D ( 224.0f, 16.0f ) );
+    m_pCheckBoxWindowed->SetPosition ( CVector2D ( vecTemp.fX + vecSize.fX + 10.0f, vecTemp.fY + 3.0f ) );
+    m_pCheckBoxWindowed->AutoSize ( NULL, 20.0f );
 
-    float fPosY =  vecTemp.fY;
-    m_pCheckBoxMinimize = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, _("Full Screen Minimize"), true ) );
-    m_pCheckBoxMinimize->SetPosition ( CVector2D ( vecTemp.fX + 340.0f, fPosY + 13.0f ) );
-    m_pCheckBoxMinimize->SetSize ( CVector2D ( 224.0f, 16.0f ) );
-    if ( !GetVideoModeManager ()->IsMultiMonitor () )
-    {
-        m_pCheckBoxMinimize->SetVisible ( false );
-        fPosY -= 16.0f;
-    }
-
-    m_pCheckBoxDisableAero = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, _("Disable Aero Desktop"), true ) );
-    m_pCheckBoxDisableAero->SetPosition ( CVector2D ( vecTemp.fX + 340.0f, vecTemp.fY + 29.0f ) );
-    m_pCheckBoxDisableAero->SetSize ( CVector2D ( 224.0f, 16.0f ) );
-    if ( GetApplicationSetting ( "os-version" ) < "6.1" || GetApplicationSettingInt ( "aero-changeable" ) == 0 )
-    {
-        m_pCheckBoxDisableAero->SetVisible ( false );
-        fPosY -= 16.0f;
-    }
-
-    m_pCheckBoxDeviceSelectionDialog = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, _("Enable Device Selection Dialog"), true ) );
-    m_pCheckBoxDeviceSelectionDialog->SetPosition ( CVector2D ( vecTemp.fX + 340.0f, fPosY + 45.0f ) );
-    m_pCheckBoxDeviceSelectionDialog->SetSize ( CVector2D ( 224.0f, 16.0f ) );
-    if ( !GetVideoModeManager ()->IsMultiMonitor () )
-    {
-        m_pCheckBoxDeviceSelectionDialog->SetVisible ( false );
-        fPosY -= 16.0f;
-    }
+    m_pVideoResolutionLabel->GetPosition ( vecTemp, false ); // Restore our label position
 
     m_pCheckBoxMipMapping = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, _("Mip Mapping"), true ) );
+#ifndef MIP_MAPPING_SETTING_APPEARS_TO_DO_SOMETHING
     m_pCheckBoxMipMapping->SetPosition ( CVector2D ( vecTemp.fX + 340.0f, vecTemp.fY + 45.0f ) );
     m_pCheckBoxMipMapping->SetSize ( CVector2D ( 224.0f, 16.0f ) );
-#ifndef MIP_MAPPING_SETTING_APPEARS_TO_DO_SOMETHING
     m_pCheckBoxMipMapping->SetVisible ( false );
-    fPosY -= 16.0f;
 #endif
 
     vecTemp.fY -= 5;
     m_pDrawDistanceLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, _("Draw Distance:") ) );
     m_pDrawDistanceLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 30.0f ) );
     m_pDrawDistanceLabel->GetPosition ( vecTemp, false );
-    m_pDrawDistanceLabel->AutoSize ( _("Draw Distance:") );
+    m_pDrawDistanceLabel->AutoSize ( );
+    m_pDrawDistanceLabel->GetSize ( vecSize );
 
     m_pDrawDistance = reinterpret_cast < CGUIScrollBar* > ( pManager->CreateScrollBar ( true, pTabVideo ) );
-    m_pDrawDistance->SetPosition ( CVector2D ( vecTemp.fX + 86.0f, vecTemp.fY ) );
+    m_pDrawDistance->SetPosition ( CVector2D ( vecTemp.fX + vecSize.fX + 5.0f, vecTemp.fY ) );
+    m_pDrawDistance->GetPosition ( vecTemp, false );
     m_pDrawDistance->SetSize ( CVector2D ( 160.0f, 20.0f ) );
+    m_pDrawDistance->GetSize ( vecSize );
     m_pDrawDistance->SetProperty ( "StepSize", "0.01" );
 
     m_pDrawDistanceValueLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, "0%") );
-    m_pDrawDistanceValueLabel->SetPosition ( CVector2D ( vecTemp.fX + 256.0f, vecTemp.fY ) );
+    m_pDrawDistanceValueLabel->SetPosition ( CVector2D ( vecTemp.fX + vecSize.fX + 5.0f, vecTemp.fY ) );
     m_pDrawDistanceValueLabel->AutoSize ( "100% " );
 
+    vecTemp.fX = 11;
 
     m_pBrightnessLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, _("Brightness:") ) );
     m_pBrightnessLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 29.0f ) );
     m_pBrightnessLabel->GetPosition ( vecTemp, false );
-    m_pBrightnessLabel->AutoSize ( _("Brightness:") );
+    m_pBrightnessLabel->AutoSize ( );
+    m_pBrightnessLabel->GetSize ( vecSize );
 
     m_pBrightness = reinterpret_cast < CGUIScrollBar* > ( pManager->CreateScrollBar ( true, pTabVideo ) );
-    m_pBrightness->SetPosition ( CVector2D ( vecTemp.fX + 86.0f, vecTemp.fY ) );
+    m_pBrightness->SetPosition ( CVector2D ( vecTemp.fX + vecSize.fX + 5.0f, vecTemp.fY ) );
+    m_pBrightness->GetPosition ( vecTemp, false );
     m_pBrightness->SetSize ( CVector2D ( 160.0f, 20.0f ) );
+    m_pBrightness->GetSize ( vecSize );
     m_pBrightness->SetProperty ( "StepSize", "0.01" );
 
     m_pBrightnessValueLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, "0%") );
-    m_pBrightnessValueLabel->SetPosition ( CVector2D ( vecTemp.fX + 256.0f, vecTemp.fY ) );
+    m_pBrightnessValueLabel->SetPosition ( CVector2D ( vecTemp.fX + vecSize.fX + 5.0f, vecTemp.fY ) );
     m_pBrightnessValueLabel->AutoSize ( "100% " );
+
+    vecTemp.fX = 11;
 
     m_pFXQualityLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, _("FX Quality:") ) );
     m_pFXQualityLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 29.0f ) );
     m_pFXQualityLabel->GetPosition ( vecTemp, false );
-    m_pFXQualityLabel->AutoSize ( _("FX Quality:") );
+    m_pFXQualityLabel->AutoSize ( );
+    m_pFXQualityLabel->GetSize ( vecSize );
 
     m_pComboFxQuality = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabVideo, "" ) );
-    m_pComboFxQuality->SetPosition ( CVector2D ( vecTemp.fX + 86.0f, vecTemp.fY - 1.0f ) );
+    m_pComboFxQuality->SetPosition ( CVector2D ( vecTemp.fX + vecSize.fX + 5.0f, vecTemp.fY - 1.0f ) );
     m_pComboFxQuality->SetSize ( CVector2D ( 200.0f, 95.0f ) );
     m_pComboFxQuality->AddItem ( _("Low") )->SetData ( (void*)0 );
     m_pComboFxQuality->AddItem ( _("Medium") )->SetData ( (void*)1 );
@@ -608,31 +596,22 @@ void CSettings::CreateGUI ( void )
     m_pComboFxQuality->AddItem ( _("Very high") )->SetData ( (void*)3 );
     m_pComboFxQuality->SetReadOnly ( true );
 
-    m_pCheckBoxVolumetricShadows = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, _("Volumetric Shadows"), true ) );
-    m_pCheckBoxVolumetricShadows->SetPosition ( CVector2D ( vecTemp.fX + 340.0f, vecTemp.fY + 2.0f ) );
-    m_pCheckBoxVolumetricShadows->SetSize ( CVector2D ( 224.0f, 16.0f ) );
-
-    m_pCheckBoxGrass = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, _("Grass effect"), true ) );
-    m_pCheckBoxGrass->SetPosition ( CVector2D ( vecTemp.fX + 340.0f, vecTemp.fY + 22.0f ) );
-    m_pCheckBoxGrass->SetSize ( CVector2D ( 224.0f, 16.0f ) );
-
-    m_pCheckBoxHeatHaze = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, _("Heat haze"), true ) );
-    m_pCheckBoxHeatHaze->SetPosition ( CVector2D ( vecTemp.fX + 340.0f, vecTemp.fY + 42.0f ) );
-    m_pCheckBoxHeatHaze->SetSize ( CVector2D ( 224.0f, 16.0f ) );
-
     m_pAnisotropicLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, _("Anisotropic filtering:") ) );
     m_pAnisotropicLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 29.0f ) );
     m_pAnisotropicLabel->GetPosition ( vecTemp, false );
-    m_pAnisotropicLabel->AutoSize ( _("Anisotropic filtering:") );
+    m_pAnisotropicLabel->AutoSize ( );
+    m_pAnisotropicLabel->GetSize ( vecSize );
 
     m_pAnisotropic = reinterpret_cast < CGUIScrollBar* > ( pManager->CreateScrollBar ( true, pTabVideo ) );
-    m_pAnisotropic->SetPosition ( CVector2D ( vecTemp.fX + 86 + 44, vecTemp.fY ) );
+    m_pAnisotropic->SetPosition ( CVector2D ( vecTemp.fX + vecSize.fX + 5.0f, vecTemp.fY ) );
+    m_pAnisotropic->GetPosition ( vecTemp, false );
     m_pAnisotropic->SetSize ( CVector2D ( 160.0f, 20.0f ) );
+    m_pAnisotropic->GetSize ( vecSize );
     m_pAnisotropic->SetProperty ( "StepSize", SString ( "%1.2f", 1 / (float)m_iMaxAnisotropic ) );
 
     m_pAnisotropicValueLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, _("Off")) );
-    m_pAnisotropicValueLabel->SetPosition ( CVector2D ( vecTemp.fX + 256.0f + 44, vecTemp.fY ) );
-    m_pAnisotropicValueLabel->AutoSize ( "100x" );
+    m_pAnisotropicValueLabel->SetPosition ( CVector2D ( vecTemp.fX + vecSize.fX + 5.0f, vecTemp.fY ) );
+    m_pAnisotropicValueLabel->SetSize ( CVector2D ( 100.0f, 20.0f ) );
 
     if ( m_iMaxAnisotropic < 1 )
     {
@@ -643,13 +622,16 @@ void CSettings::CreateGUI ( void )
         m_pAnisotropicValueLabel->SetVisible ( false );
     }
 
+    vecTemp.fX = 11;
+
     m_pAntiAliasingLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, _("Anti-aliasing:") ) );
     m_pAntiAliasingLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 30.0f ) );
     m_pAntiAliasingLabel->GetPosition ( vecTemp, false );
-    m_pAntiAliasingLabel->AutoSize ( _("Anti-aliasing:") );
+    m_pAntiAliasingLabel->AutoSize ( );
+    m_pAntiAliasingLabel->GetSize ( vecSize );
 
     m_pComboAntiAliasing = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabVideo, "" ) );
-    m_pComboAntiAliasing->SetPosition ( CVector2D ( vecTemp.fX + 86.0f, vecTemp.fY - 1.0f ) );
+    m_pComboAntiAliasing->SetPosition ( CVector2D ( vecTemp.fX + vecSize.fX + 5.0f, vecTemp.fY - 1.0f ) );
     m_pComboAntiAliasing->SetSize ( CVector2D ( 200.0f, 95.0f ) );
     m_pComboAntiAliasing->AddItem ( _("Off") )->SetData ( (void*)1 );
     m_pComboAntiAliasing->AddItem ( _("1x") )->SetData ( (void*)2 );
@@ -661,10 +643,11 @@ void CSettings::CreateGUI ( void )
     m_pAspectRatioLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, _("Aspect Ratio:") ) );
     m_pAspectRatioLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 30.0f ) );
     m_pAspectRatioLabel->GetPosition ( vecTemp, false );
-    m_pAspectRatioLabel->AutoSize ( _("Aspect Ratio:") );
+    m_pAspectRatioLabel->AutoSize ( );
+    m_pAspectRatioLabel->GetSize ( vecSize );
 
     m_pComboAspectRatio = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabVideo, "" ) );
-    m_pComboAspectRatio->SetPosition ( CVector2D ( vecTemp.fX + 86.0f, vecTemp.fY - 1.0f ) );
+    m_pComboAspectRatio->SetPosition ( CVector2D ( vecTemp.fX + vecSize.fX + 5.0f, vecTemp.fY - 1.0f ) );
     m_pComboAspectRatio->SetSize ( CVector2D ( 200.0f, 95.0f ) );
     m_pComboAspectRatio->AddItem ( _("Auto") )->SetData ( (void*)ASPECT_RATIO_AUTO );
     m_pComboAspectRatio->AddItem ( _("4:3") )->SetData ( (void*)ASPECT_RATIO_4_3 );
@@ -672,31 +655,77 @@ void CSettings::CreateGUI ( void )
     m_pComboAspectRatio->AddItem ( _("16:9") )->SetData ( (void*)ASPECT_RATIO_16_9 );
     m_pComboAspectRatio->SetReadOnly ( true );
 
+    m_pCheckBoxVolumetricShadows = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, _("Volumetric Shadows"), true ) );
+    m_pCheckBoxVolumetricShadows->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 30.0f ) );
+    m_pCheckBoxVolumetricShadows->AutoSize ( NULL, 20.0f );
+
+    m_pCheckBoxGrass = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, _("Grass effect"), true ) );
+    m_pCheckBoxGrass->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 50.0f ) );
+    m_pCheckBoxGrass->AutoSize ( NULL, 20.0f );
+
+    m_pCheckBoxHeatHaze = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, _("Heat haze"), true ) );
+    m_pCheckBoxHeatHaze->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 70.0f ) );
+    m_pCheckBoxHeatHaze->AutoSize ( NULL, 20.0f );
+
+    float fPosY =  vecTemp.fY;
+    m_pCheckBoxMinimize = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, _("Full Screen Minimize"), true ) );
+    m_pCheckBoxMinimize->SetPosition ( CVector2D ( vecTemp.fX + 245.0f, fPosY + 30.0f ) );
+    m_pCheckBoxMinimize->AutoSize ( NULL, 20.0f );
+    if ( !GetVideoModeManager ()->IsMultiMonitor () )
+    {
+        m_pCheckBoxMinimize->SetVisible ( false );
+        fPosY -= 16.0f;
+    }
+
+    m_pCheckBoxDisableAero = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, _("Disable Aero Desktop"), true ) );
+    m_pCheckBoxDisableAero->SetPosition ( CVector2D ( vecTemp.fX + 245.0f, vecTemp.fY + 50.0f ) );
+    m_pCheckBoxDisableAero->AutoSize ( NULL, 20.0f );
+    if ( GetApplicationSetting ( "os-version" ) < "6.1" || GetApplicationSettingInt ( "aero-changeable" ) == 0 )
+    {
+        m_pCheckBoxDisableAero->SetVisible ( false );
+        fPosY -= 16.0f;
+    }
+
+    m_pCheckBoxDeviceSelectionDialog = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, _("Enable Device Selection Dialog"), true ) );
+    m_pCheckBoxDeviceSelectionDialog->SetPosition ( CVector2D ( vecTemp.fX + 245.0f, fPosY + 70.0f ) );
+    m_pCheckBoxDeviceSelectionDialog->AutoSize ( NULL, 20.0f );
+    if ( !GetVideoModeManager ()->IsMultiMonitor () )
+    {
+        m_pCheckBoxDeviceSelectionDialog->SetVisible ( false );
+        fPosY -= 16.0f;
+    }
+
     m_pMapRenderingLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, _("Map rendering options") ) );
-    m_pMapRenderingLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 38.0f ) );
+    m_pMapRenderingLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 104.0f ) );
     m_pMapRenderingLabel->GetPosition ( vecTemp, false );
-    m_pMapRenderingLabel->AutoSize ( _("Map rendering options") );
     m_pMapRenderingLabel->SetFont ( "default-bold-small" );
+    m_pMapRenderingLabel->AutoSize ( );
 
     m_pMapAlphaLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, _("Opacity:") ) );
     m_pMapAlphaLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 24.0f ) );
     m_pMapAlphaLabel->GetPosition ( vecTemp, false );
-    m_pMapAlphaLabel->AutoSize ( _("Opacity:") );
+    m_pMapAlphaLabel->AutoSize ( );
+    m_pMapAlphaLabel->GetSize ( vecSize );
 
     m_pMapAlpha = reinterpret_cast < CGUIScrollBar* > ( pManager->CreateScrollBar ( true, pTabVideo ) );
-    m_pMapAlpha->SetPosition ( CVector2D ( vecTemp.fX + 86.0f, vecTemp.fY ) );
+    m_pMapAlpha->SetPosition ( CVector2D ( vecTemp.fX + vecSize.fX + 5.0f, vecTemp.fY ) );
     m_pMapAlpha->GetPosition ( vecTemp, false );
     m_pMapAlpha->SetSize ( CVector2D ( 160.0f, 20.0f ) );
+    m_pMapAlpha->GetSize ( vecSize );
     m_pMapAlpha->SetProperty ( "StepSize", "0.01" );
 
     m_pMapAlphaValueLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, "0%") );
-    m_pMapAlphaValueLabel->SetPosition ( CVector2D ( vecTemp.fX + 170.0f, vecTemp.fY ) );
+    m_pMapAlphaValueLabel->SetPosition ( CVector2D ( vecTemp.fX + vecSize.fX + 5.0f, vecTemp.fY ) );
     m_pMapAlphaValueLabel->GetPosition ( vecTemp, false );
     m_pMapAlphaValueLabel->AutoSize ( "100% " );
 
+    m_pTabs->GetSize ( vecTemp );
+
     m_pVideoDefButton = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( pTabVideo, _("Load defaults") ) );
     m_pVideoDefButton->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnVideoDefaultClick, this ) );
-    m_pVideoDefButton->SetPosition ( CVector2D ( 402, 365 ) );
+    m_pVideoDefButton->AutoSize ( NULL, 20.0f, 8.0f );
+    m_pVideoDefButton->GetSize ( vecSize );
+    m_pVideoDefButton->SetPosition ( CVector2D ( vecTemp.fX - vecSize.fX - 12.0f, 365 ) );
     m_pVideoDefButton->SetZOrderingEnabled ( false );
 
     /**
