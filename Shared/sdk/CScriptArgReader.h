@@ -581,6 +581,17 @@ public:
         return false;
     }
 
+    template < class T >
+    bool NextIsUserDataOfType ( int iOffset = 0 ) const
+    {
+        int iArgument = lua_type ( m_luaVM, m_iIndex + iOffset );
+        if ( iArgument == LUA_TLIGHTUSERDATA )
+        {
+            if ( UserDataCast < T > ( (T*)0, lua_touserdata ( m_luaVM, m_iIndex + iOffset ), m_luaVM ) )
+                return true;
+        }
+        return false;
+    }
 
     //
     // Conditional reads. Default required in case condition is not met.
