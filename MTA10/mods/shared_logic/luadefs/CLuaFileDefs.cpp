@@ -214,15 +214,23 @@ int CLuaFileDefs::fileIsEOF ( lua_State* luaVM )
     // bool fileIsEOF ( file )
 
     // Grab the file pointer
-    CScriptFile* pFile = lua_tofile ( luaVM, 1 );
-    if ( pFile )
+    CScriptFile* pFile = NULL;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pFile );
+
+    if ( !argStream.HasErrors ( ) )
     {
-        // Return its EOF state
-        lua_pushboolean ( luaVM, pFile->IsEOF () );
-        return 1;
+        if ( pFile )
+        {
+            // Return its EOF state
+            lua_pushboolean ( luaVM, pFile->IsEOF () );
+            return 1;
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "file", 1 );
     }
     else
-        m_pScriptDebugging->LogBadPointer ( luaVM, "file", 1 );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     // Error
     lua_pushnil ( luaVM );
@@ -235,25 +243,32 @@ int CLuaFileDefs::fileGetPos ( lua_State* luaVM )
     // int fileGetPos ( file )
 
     // Grab the file pointer
-    CScriptFile* pFile = lua_tofile ( luaVM, 1 );
-    if ( pFile )
+    CScriptFile* pFile = NULL;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pFile );
+
+    if ( !argStream.HasErrors ( ) )
     {
-        long lPosition = pFile->GetPointer ();
-        if ( lPosition != -1 )
+        if ( pFile )
         {
-            // Return its position
-            lua_pushnumber ( luaVM, lPosition );
+            long lPosition = pFile->GetPointer ();
+            if ( lPosition != -1 )
+            {
+                // Return its position
+                lua_pushnumber ( luaVM, lPosition );
+            }
+            else
+            {
+                m_pScriptDebugging->LogBadPointer ( luaVM, "file", 1 );
+                lua_pushnil ( luaVM );
+            }
+            return 1;
         }
         else
-        {
             m_pScriptDebugging->LogBadPointer ( luaVM, "file", 1 );
-            lua_pushnil ( luaVM );
-        }
-        return 1;
     }
     else
-        m_pScriptDebugging->LogBadPointer ( luaVM, "file", 1 );
-
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
     // Error
     lua_pushnil ( luaVM );
     return 1;
@@ -265,17 +280,19 @@ int CLuaFileDefs::fileSetPos ( lua_State* luaVM )
     // bool fileSetPos ( file )
 
     // Grab the file pointer
-    CScriptFile* pFile = lua_tofile ( luaVM, 1 );
-    if ( pFile )
+    CScriptFile* pFile = NULL;
+    unsigned long ulPosition = 0;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pFile );
+    argStream.ReadNumber ( ulPosition );
+
+    if ( !argStream.HasErrors ( ) )
     {
-        // Check argument 2
-        if ( argtype2 ( 2, LUA_TNUMBER, LUA_TSTRING ) )
+        if ( pFile )
         {
-            // Grab position
-            long lPosition = static_cast < long > ( lua_tonumber ( luaVM, 2 ) );
-            if ( lPosition >= 0 )
+            if ( ulPosition >= 0 )
             {
-                long lResultPosition = pFile->SetPointer ( static_cast < unsigned long > ( lPosition ) );
+                long lResultPosition = pFile->SetPointer ( ulPosition );
                 if ( lResultPosition != -1 )
                 {
                     // Set the position and return where we actually got it put
@@ -292,10 +309,10 @@ int CLuaFileDefs::fileSetPos ( lua_State* luaVM )
                 m_pScriptDebugging->LogBadPointer ( luaVM, "number", 2 );
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "number", 2 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "file", 1 );
     }
     else
-        m_pScriptDebugging->LogBadPointer ( luaVM, "file", 1 );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     // Error
     lua_pushnil ( luaVM );
@@ -308,24 +325,32 @@ int CLuaFileDefs::fileGetSize ( lua_State* luaVM )
     // int fileGetSize ( file )
 
     // Grab the file pointer
-    CScriptFile* pFile = lua_tofile ( luaVM, 1 );
-    if ( pFile )
+    CScriptFile* pFile = NULL;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pFile );
+
+    if ( !argStream.HasErrors ( ) )
     {
-        long lSize = pFile->GetSize ();
-        if ( lSize != -1 )
+        if ( pFile )
         {
-            // Return its size
-            lua_pushnumber ( luaVM, lSize );
+            long lSize = pFile->GetSize ();
+            if ( lSize != -1 )
+            {
+                // Return its size
+                lua_pushnumber ( luaVM, lSize );
+            }
+            else
+            {
+                m_pScriptDebugging->LogBadPointer ( luaVM, "file", 1 );
+                lua_pushnil ( luaVM );
+            }
+            return 1;
         }
         else
-        {
             m_pScriptDebugging->LogBadPointer ( luaVM, "file", 1 );
-            lua_pushnil ( luaVM );
-        }
-        return 1;
     }
     else
-        m_pScriptDebugging->LogBadPointer ( luaVM, "file", 1 );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     // Error
     lua_pushnil ( luaVM );
@@ -338,19 +363,21 @@ int CLuaFileDefs::fileRead ( lua_State* luaVM )
     // string fileRead ( file, count )
 
     // Grab the file pointer
-    CScriptFile* pFile = lua_tofile ( luaVM, 1 );
-    if ( pFile )
+    CScriptFile* pFile = NULL;
+    unsigned long ulCount = 0;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pFile );
+    argStream.ReadNumber ( ulCount );
+
+    if ( !argStream.HasErrors ( ) )
     {
-        // Check argument 2
-        if ( argtype2 ( 2, LUA_TNUMBER, LUA_TSTRING ) )
+        if ( pFile )
         {
-            // Grab count arg
-            long lCount = static_cast < long > ( lua_tonumber ( luaVM, 2 ) );
-            if ( lCount > 0 )
+            if ( ulCount > 0 )
             {
                 // Allocate a buffer to read the stuff into and read some shit into it
-                char* pReadContent = new char [lCount + 1];
-                long lBytesRead = pFile->Read ( static_cast < unsigned long > ( lCount ),
+                char* pReadContent = new char [ulCount + 1];
+                long lBytesRead = pFile->Read ( static_cast < unsigned long > ( ulCount ),
                                                             pReadContent );
 
                 if ( lBytesRead != -1 )
@@ -371,14 +398,12 @@ int CLuaFileDefs::fileRead ( lua_State* luaVM )
                 // We're returning the result string
                 return 1;
             }
-            else
-                m_pScriptDebugging->LogBadPointer ( luaVM, "number", 2 );
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "number", 2 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "file", 1 );
     }
     else
-        m_pScriptDebugging->LogBadPointer ( luaVM, "file", 1 );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     // Error
     lua_pushnil ( luaVM );
@@ -391,24 +416,26 @@ int CLuaFileDefs::fileWrite ( lua_State* luaVM )
     // string fileWrite ( file, string [, string2, string3, ...] )
 
     // Grab the file pointer
-    CScriptFile* pFile = lua_tofile ( luaVM, 1 );
-    if ( pFile )
+    CScriptFile* pFile = NULL;
+    SString strMessage = "";
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pFile );
+    argStream.ReadString ( strMessage );
+
+    if ( !argStream.HasErrors ( ) )
     {
-        // Check argument 2
-        if ( argtype ( 2, LUA_TSTRING ) )
+        if ( pFile )
         {
             // While we're not out of string arguments
             long lBytesWritten = 0;
             long lArgBytesWritten = 0;
-            unsigned int uiCurrentArg = 2;
             do
             {
-                // Grab argument and length
-                const char* pData = lua_tostring ( luaVM, uiCurrentArg );
-                unsigned long ulDataLen = static_cast < unsigned long > ( lua_strlen ( luaVM, uiCurrentArg ) );
+                argStream.ReadString ( strMessage );
+                unsigned long ulDataLen = strMessage.length ( );
 
                 // Write it and add the bytes written to our total bytes written
-                lArgBytesWritten = pFile->Write ( ulDataLen, pData );
+                lArgBytesWritten = pFile->Write ( ulDataLen, strMessage.c_str ( ) );
                 if ( lArgBytesWritten == -1 )
                 {
                     m_pScriptDebugging->LogBadPointer ( luaVM, "file", 1 );
@@ -416,21 +443,18 @@ int CLuaFileDefs::fileWrite ( lua_State* luaVM )
                     return 1;
                 }
                 lBytesWritten += lArgBytesWritten;
-
-                // Increment current argument
-                ++uiCurrentArg;
             }
-            while ( argtype ( uiCurrentArg, LUA_TSTRING ) );
+            while ( argStream.NextIsString ( ) );
 
             // Return the number of bytes we wrote
             lua_pushnumber ( luaVM, lBytesWritten );
             return 1;
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "string", 2 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "file", 1 );
     }
     else
-        m_pScriptDebugging->LogBadPointer ( luaVM, "file", 1 );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     // Error
     lua_pushnil ( luaVM );
@@ -443,18 +467,26 @@ int CLuaFileDefs::fileFlush ( lua_State* luaVM )
     // string fileFlush ( file )
 
     // Grab the file pointer
-    CScriptFile* pFile = lua_tofile ( luaVM, 1 );
-    if ( pFile )
-    {
-        // Flush the file
-        pFile->Flush ();
+    CScriptFile* pFile = NULL;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pFile );
 
-        // Success. Return true
-        lua_pushboolean ( luaVM, true );
-        return 1;
+    if ( !argStream.HasErrors ( ) )
+    {
+        if ( pFile )
+        {
+            // Flush the file
+            pFile->Flush ();
+
+            // Success. Return true
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "file", 1 );
     }
     else
-        m_pScriptDebugging->LogBadPointer ( luaVM, "file", 1 );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     // Error
     lua_pushnil ( luaVM );
@@ -466,20 +498,28 @@ int CLuaFileDefs::fileClose ( lua_State* luaVM )
     // string fileClose ( file )
 
     // Grab the file pointer
-    CScriptFile* pFile = lua_tofile ( luaVM, 1 );
-    if ( pFile )
-    {
-        // Close the file and delete it
-        pFile->Unload ();
-//        m_pElementDeleter->Delete ( pFile );
-        g_pClientGame->GetElementDeleter()->Delete ( pFile );
+    CScriptFile* pFile = NULL;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pFile );
 
-        // Success. Return true
-        lua_pushboolean ( luaVM, true );
-        return 1;
+    if ( !argStream.HasErrors ( ) )
+    {
+        if ( pFile )
+        {
+            // Close the file and delete it
+            pFile->Unload ();
+            //m_pElementDeleter->Delete ( pFile );
+            g_pClientGame->GetElementDeleter()->Delete ( pFile );
+
+            // Success. Return true
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "file", 1 );
     }
     else
-        m_pScriptDebugging->LogBadPointer ( luaVM, "file", 1 );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     // Error
     lua_pushnil ( luaVM );
