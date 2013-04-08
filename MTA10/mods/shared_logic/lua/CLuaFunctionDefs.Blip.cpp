@@ -21,20 +21,14 @@
 
 int CLuaFunctionDefs::CreateBlip ( lua_State* luaVM )
 {
-    // Position arguments in place?
-    int iArgument1 = lua_type ( luaVM, 1 );
-    int iArgument2 = lua_type ( luaVM, 2 );
-    int iArgument3 = lua_type ( luaVM, 3 );
+    CVector vecPosition;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadNumber ( vecPosition.fX );
+    argStream.ReadNumber ( vecPosition.fY );
+    argStream.ReadNumber ( vecPosition.fZ );
 
-    if ( ( iArgument1 == LUA_TNUMBER || iArgument1 == LUA_TSTRING ) &&
-        ( iArgument2 == LUA_TNUMBER || iArgument2 == LUA_TSTRING ) &&
-        ( iArgument3 == LUA_TNUMBER || iArgument3 == LUA_TSTRING ) )
+    if ( !argStream.HasErrors ( ) )
     {
-        // Grab the vector
-        CVector vecPosition = CVector ( static_cast < float > ( lua_tonumber ( luaVM, 1 ) ),
-            static_cast < float > ( lua_tonumber ( luaVM, 2 ) ),
-            static_cast < float > ( lua_tonumber ( luaVM, 3 ) ) );
-
         // Default colors and size
         unsigned char ucIcon = 0;
         unsigned char ucSize = 2;
@@ -43,45 +37,37 @@ int CLuaFunctionDefs::CreateBlip ( lua_State* luaVM )
         unsigned short usVisibleDistance = 16383;
 
         // Read out the optional args
-        int iArgument4 = lua_type ( luaVM, 4 );
-        if ( iArgument4 == LUA_TNUMBER || iArgument4 == LUA_TSTRING )
+        if ( argStream.NextIsNumber ( ) )
         {
-            ucIcon = static_cast < unsigned char > ( lua_tonumber ( luaVM, 4 ) );
+            argStream.ReadNumber( ucIcon );
 
-            int iArgument5 = lua_type ( luaVM, 5 );
-            if ( iArgument5 == LUA_TNUMBER || iArgument5 == LUA_TSTRING )
+            if ( argStream.NextIsNumber ( ) )
             {
-                ucSize = static_cast < unsigned char > ( lua_tonumber ( luaVM, 5 ) );
+                argStream.ReadNumber( ucSize );
 
-                int iArgument6 = lua_type ( luaVM, 6 );
-                if ( iArgument6 == LUA_TNUMBER || iArgument6 == LUA_TSTRING )
+                if ( argStream.NextIsNumber ( ) )
                 {
-                    color.R = static_cast < unsigned char > ( lua_tonumber ( luaVM, 6 ) );
+                    argStream.ReadNumber( color.R );
 
-                    int iArgument7 = lua_type ( luaVM, 7 );
-                    if ( iArgument7 == LUA_TNUMBER || iArgument7 == LUA_TSTRING )
+                    if ( argStream.NextIsNumber ( ) )
                     {
-                        color.G = static_cast < unsigned char > ( lua_tonumber ( luaVM, 7 ) );
+                        argStream.ReadNumber( color.G );
 
-                        int iArgument8 = lua_type ( luaVM, 8 );
-                        if ( iArgument8 == LUA_TNUMBER || iArgument8 == LUA_TSTRING )
+                        if ( argStream.NextIsNumber ( ) )
                         {
-                            color.B = static_cast < unsigned char > ( lua_tonumber ( luaVM, 8 ) );
+                            argStream.ReadNumber( color.B );
 
-                            int iArgument9 = lua_type ( luaVM, 9 );
-                            if ( iArgument9 == LUA_TNUMBER || iArgument9 == LUA_TSTRING )
+                            if ( argStream.NextIsNumber ( ) )
                             {
-                                color.A = static_cast < unsigned char > ( lua_tonumber ( luaVM, 9 ) );
+                                argStream.ReadNumber( color.A );
 
-                                int iArgument10 = lua_type ( luaVM, 10 );
-                                if ( iArgument10 == LUA_TNUMBER || iArgument10 == LUA_TSTRING )
+                                if ( argStream.NextIsNumber ( ) )
                                 {
-                                    sOrdering = static_cast < short > ( lua_tonumber ( luaVM, 10 ) );
+                                    argStream.ReadNumber( sOrdering );
                                 
-                                    int iArgument11 = lua_type ( luaVM, 11 );
-                                    if ( iArgument11 == LUA_TNUMBER || iArgument11 == LUA_TSTRING )
+                                    if ( argStream.NextIsNumber ( ))
                                     {
-                                        usVisibleDistance = static_cast < unsigned short > ( lua_tonumber ( luaVM, 11 ) );
+                                        argStream.ReadNumber( usVisibleDistance );
                                     }
                                 }
                             }
@@ -114,7 +100,7 @@ int CLuaFunctionDefs::CreateBlip ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -123,11 +109,14 @@ int CLuaFunctionDefs::CreateBlip ( lua_State* luaVM )
 
 int CLuaFunctionDefs::CreateBlipAttachedTo ( lua_State* luaVM )
 {
+    CClientEntity* pEntity = NULL;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pEntity );
+
     // Element in place?
-    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
+    if ( !argStream.HasErrors( ) )
     {
         // Grab the element and verify it
-        CClientEntity* pEntity = lua_toelement ( luaVM, 1 );
         if ( pEntity )
         {
             // Default colors and size
@@ -138,45 +127,37 @@ int CLuaFunctionDefs::CreateBlipAttachedTo ( lua_State* luaVM )
             unsigned short usVisibleDistance = 16383;
 
             // Read out the optional args
-            int iArgument2 = lua_type ( luaVM, 2 );
-            if ( iArgument2 == LUA_TNUMBER || iArgument2 == LUA_TSTRING )
+            if ( argStream.NextIsNumber ( ) )
             {
-                ucIcon = static_cast < unsigned char > ( lua_tonumber ( luaVM, 2 ) );
+                argStream.ReadNumber( ucIcon );
 
-                int iArgument3 = lua_type ( luaVM, 3 );
-                if ( iArgument3 == LUA_TNUMBER || iArgument3 == LUA_TSTRING )
+                if ( argStream.NextIsNumber ( ) )
                 {
-                    ucSize = static_cast < unsigned char > ( lua_tonumber ( luaVM, 3 ) );
+                    argStream.ReadNumber( ucSize );
 
-                    int iArgument4 = lua_type ( luaVM, 4 );
-                    if ( iArgument4 == LUA_TNUMBER || iArgument4 == LUA_TSTRING )
+                    if ( argStream.NextIsNumber ( ) )
                     {
-                        color.R = static_cast < unsigned char > ( lua_tonumber ( luaVM, 4 ) );
+                        argStream.ReadNumber( color.R );
 
-                        int iArgument5 = lua_type ( luaVM, 5 );
-                        if ( iArgument5 == LUA_TNUMBER || iArgument5 == LUA_TSTRING )
+                        if ( argStream.NextIsNumber ( ) )
                         {
-                            color.G = static_cast < unsigned char > ( lua_tonumber ( luaVM, 5 ) );
+                            argStream.ReadNumber( color.G );
 
-                            int iArgument6 = lua_type ( luaVM, 6 );
-                            if ( iArgument6 == LUA_TNUMBER || iArgument6 == LUA_TSTRING )
+                            if ( argStream.NextIsNumber ( ) )
                             {
-                                color.B = static_cast < unsigned char > ( lua_tonumber ( luaVM, 6 ) );
+                                argStream.ReadNumber( color.B );
 
-                                int iArgument7 = lua_type ( luaVM, 7 );
-                                if ( iArgument7 == LUA_TNUMBER || iArgument7 == LUA_TSTRING )
+                                if ( argStream.NextIsNumber ( ) )
                                 {
-                                    color.A = static_cast < unsigned char > ( lua_tonumber ( luaVM, 7 ) );
+                                    argStream.ReadNumber( color.A );
 
-                                    int iArgument8 = lua_type ( luaVM, 8 );
-                                    if ( iArgument8 == LUA_TNUMBER || iArgument8 == LUA_TSTRING )
+                                    if ( argStream.NextIsNumber ( ) )
                                     {
-                                        sOrdering = static_cast < short > ( lua_tonumber ( luaVM, 8 ) );
-                                    
-                                        int iArgument9 = lua_type ( luaVM, 9 );
-                                        if ( iArgument9 == LUA_TNUMBER || iArgument9 == LUA_TSTRING )
+                                        argStream.ReadNumber( sOrdering );
+
+                                        if ( argStream.NextIsNumber ( ))
                                         {
-                                            usVisibleDistance = static_cast < unsigned short > ( lua_tonumber ( luaVM, 9 ) );
+                                            argStream.ReadNumber( usVisibleDistance );
                                         }
                                     }
                                 }
@@ -211,7 +192,7 @@ int CLuaFunctionDefs::CreateBlipAttachedTo ( lua_State* luaVM )
             m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -220,9 +201,13 @@ int CLuaFunctionDefs::CreateBlipAttachedTo ( lua_State* luaVM )
 
 int CLuaFunctionDefs::GetBlipIcon ( lua_State* luaVM )
 {
-    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
+    CClientRadarMarker* pMarker = NULL;
+    CVector vecPosition;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pMarker );
+
+    if ( !argStream.HasErrors ( ) )
     {
-        CClientRadarMarker* pMarker = lua_toblip ( luaVM, 1 );
         if ( pMarker )
         {
             unsigned char ucIcon = static_cast < unsigned char > ( pMarker->GetSprite () );
@@ -233,7 +218,7 @@ int CLuaFunctionDefs::GetBlipIcon ( lua_State* luaVM )
             m_pScriptDebugging->LogBadPointer ( luaVM, "blip", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -242,9 +227,13 @@ int CLuaFunctionDefs::GetBlipIcon ( lua_State* luaVM )
 
 int CLuaFunctionDefs::GetBlipSize ( lua_State* luaVM )
 {
-    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
+    CClientRadarMarker* pMarker = NULL;
+    CVector vecPosition;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pMarker );
+
+    if ( !argStream.HasErrors ( ) )
     {
-        CClientRadarMarker* pMarker = lua_toblip ( luaVM, 1 );
         if ( pMarker )
         {
             unsigned char ucSize = static_cast < unsigned char > ( pMarker->GetScale () );
@@ -255,7 +244,7 @@ int CLuaFunctionDefs::GetBlipSize ( lua_State* luaVM )
             m_pScriptDebugging->LogBadPointer ( luaVM, "blip", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -264,9 +253,13 @@ int CLuaFunctionDefs::GetBlipSize ( lua_State* luaVM )
 
 int CLuaFunctionDefs::GetBlipColor ( lua_State* luaVM )
 {
-    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
+    CClientRadarMarker* pMarker = NULL;
+    CVector vecPosition;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pMarker );
+
+    if ( !argStream.HasErrors ( ) )
     {
-        CClientRadarMarker* pMarker = lua_toblip ( luaVM, 1 );
         if ( pMarker )
         {
             SColor color = pMarker->GetColor ();
@@ -280,7 +273,7 @@ int CLuaFunctionDefs::GetBlipColor ( lua_State* luaVM )
             m_pScriptDebugging->LogBadPointer ( luaVM, "blip", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -289,9 +282,13 @@ int CLuaFunctionDefs::GetBlipColor ( lua_State* luaVM )
 
 int CLuaFunctionDefs::GetBlipOrdering ( lua_State* luaVM )
 {
-    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
+    CClientRadarMarker* pMarker = NULL;
+    CVector vecPosition;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pMarker );
+
+    if ( !argStream.HasErrors ( ) )
     {
-        CClientRadarMarker* pMarker = lua_toblip ( luaVM, 1 );
         if ( pMarker )
         {
             short sOrdering = pMarker->GetOrdering ();
@@ -302,7 +299,7 @@ int CLuaFunctionDefs::GetBlipOrdering ( lua_State* luaVM )
             m_pScriptDebugging->LogBadPointer ( luaVM, "blip", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -311,9 +308,13 @@ int CLuaFunctionDefs::GetBlipOrdering ( lua_State* luaVM )
 
 int CLuaFunctionDefs::GetBlipVisibleDistance ( lua_State* luaVM )
 {
-    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
+    CClientRadarMarker* pMarker = NULL;
+    CVector vecPosition;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pMarker );
+
+    if ( !argStream.HasErrors ( ) )
     {
-        CClientRadarMarker* pMarker = lua_toblip ( luaVM, 1 );
         if ( pMarker )
         {
             unsigned short usVisibleDistance = pMarker->GetVisibleDistance ();
@@ -324,7 +325,7 @@ int CLuaFunctionDefs::GetBlipVisibleDistance ( lua_State* luaVM )
             m_pScriptDebugging->LogBadPointer ( luaVM, "blip", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -333,16 +334,17 @@ int CLuaFunctionDefs::GetBlipVisibleDistance ( lua_State* luaVM )
 
 int CLuaFunctionDefs::SetBlipIcon ( lua_State* luaVM )
 {
-    int iArgument1 = lua_type ( luaVM, 1 );
-    int iArgument2 = lua_type ( luaVM, 2 );
-    if ( ( iArgument1 == LUA_TLIGHTUSERDATA ) &&
-        ( iArgument2 == LUA_TNUMBER || iArgument2 == LUA_TSTRING ) )
+    CClientRadarMarker* pMarker = NULL;
+    unsigned char ucIcon = 0;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pMarker );
+    argStream.ReadNumber ( ucIcon );
+
+    if ( !argStream.HasErrors ( ) )
     {
-        CClientEntity* pEntity = lua_toelement ( luaVM, 1 );
-        if ( pEntity )
+        if ( pMarker )
         {
-            unsigned char ucIcon = static_cast < unsigned char > ( lua_tonumber ( luaVM, 2 ) );
-            if ( CStaticFunctionDefinitions::SetBlipIcon ( *pEntity, ucIcon ) )
+            if ( CStaticFunctionDefinitions::SetBlipIcon ( *pMarker, ucIcon ) )
             {
                 lua_pushboolean ( luaVM, true );
                 return 1;
@@ -352,7 +354,7 @@ int CLuaFunctionDefs::SetBlipIcon ( lua_State* luaVM )
             m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -361,15 +363,17 @@ int CLuaFunctionDefs::SetBlipIcon ( lua_State* luaVM )
 
 int CLuaFunctionDefs::SetBlipSize ( lua_State* luaVM )
 {
-    int iArgument2 = lua_type ( luaVM, 2 );
-    if ( ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA ) &&
-        ( iArgument2 == LUA_TNUMBER || iArgument2 == LUA_TSTRING ) )
+    CClientRadarMarker* pMarker = NULL;
+    unsigned char ucSize = 0;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pMarker );
+    argStream.ReadNumber ( ucSize );
+
+    if ( !argStream.HasErrors ( ) )
     {
-        CClientEntity* pEntity = lua_toelement ( luaVM, 1 );
-        if ( pEntity )
+        if ( pMarker )
         {
-            unsigned char ucSize = static_cast < unsigned char > ( lua_tonumber ( luaVM, 2 ) );
-            if ( CStaticFunctionDefinitions::SetBlipSize ( *pEntity, ucSize ) )
+            if ( CStaticFunctionDefinitions::SetBlipSize ( *pMarker, ucSize ) )
             {
                 lua_pushboolean ( luaVM, true );
                 return 1;
@@ -379,7 +383,7 @@ int CLuaFunctionDefs::SetBlipSize ( lua_State* luaVM )
             m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -388,27 +392,20 @@ int CLuaFunctionDefs::SetBlipSize ( lua_State* luaVM )
 
 int CLuaFunctionDefs::SetBlipColor ( lua_State* luaVM )
 {
-    int iArgument1 = lua_type ( luaVM, 1 );
-    int iArgument2 = lua_type ( luaVM, 2 );
-    int iArgument3 = lua_type ( luaVM, 3 );
-    int iArgument4 = lua_type ( luaVM, 4 );
-    int iArgument5 = lua_type ( luaVM, 5 );
-    if ( ( iArgument1 == LUA_TLIGHTUSERDATA ) &&
-        ( iArgument2 == LUA_TNUMBER || iArgument2 == LUA_TSTRING ) &&
-        ( iArgument3 == LUA_TNUMBER || iArgument3 == LUA_TSTRING ) &&
-        ( iArgument4 == LUA_TNUMBER || iArgument4 == LUA_TSTRING ) &&
-        ( iArgument5 == LUA_TNUMBER || iArgument5 == LUA_TSTRING ) )
-    {
-        CClientEntity* pEntity = lua_toelement ( luaVM, 1 );
-        if ( pEntity )
-        {
-            SColor color;
-            color.R = static_cast < unsigned char > ( lua_tonumber ( luaVM, 2 ) );
-            color.G = static_cast < unsigned char > ( lua_tonumber ( luaVM, 3 ) );
-            color.B = static_cast < unsigned char > ( lua_tonumber ( luaVM, 4 ) );
-            color.A = static_cast < unsigned char > ( lua_tonumber ( luaVM, 5 ) );
+    CClientRadarMarker* pMarker = NULL;
+    SColor color;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pMarker );
+    argStream.ReadNumber ( color.R );
+    argStream.ReadNumber ( color.G );
+    argStream.ReadNumber ( color.B );
+    argStream.ReadNumber ( color.A );
 
-            if ( CStaticFunctionDefinitions::SetBlipColor ( *pEntity, color ) )
+    if ( !argStream.HasErrors ( ) )
+    {
+        if ( pMarker )
+        {
+            if ( CStaticFunctionDefinitions::SetBlipColor ( *pMarker, color ) )
             {
                 lua_pushboolean ( luaVM, true );
                 return 1;
@@ -418,7 +415,7 @@ int CLuaFunctionDefs::SetBlipColor ( lua_State* luaVM )
             m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -427,17 +424,17 @@ int CLuaFunctionDefs::SetBlipColor ( lua_State* luaVM )
 
 int CLuaFunctionDefs::SetBlipOrdering ( lua_State* luaVM )
 {
-    int iArgument1 = lua_type ( luaVM, 1 );
-    int iArgument2 = lua_type ( luaVM, 2 );
-    if ( ( iArgument1 == LUA_TLIGHTUSERDATA ) &&
-        ( iArgument2 == LUA_TNUMBER || iArgument2 == LUA_TSTRING ) )
-    {
-        CClientEntity* pEntity = lua_toelement ( luaVM, 1 );
-        if ( pEntity )
-        {
-            short sOrdering = static_cast < short > ( lua_tonumber ( luaVM, 2 ) );
+    CClientRadarMarker* pMarker = NULL;
+    short sOrdering;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pMarker );
+    argStream.ReadNumber ( sOrdering );
 
-            if ( CStaticFunctionDefinitions::SetBlipOrdering ( *pEntity, sOrdering ) )
+    if ( !argStream.HasErrors ( ) )
+    {
+        if ( pMarker )
+        {
+            if ( CStaticFunctionDefinitions::SetBlipOrdering ( *pMarker, sOrdering ) )
             {
                 lua_pushboolean ( luaVM, true );
                 return 1;
@@ -447,7 +444,7 @@ int CLuaFunctionDefs::SetBlipOrdering ( lua_State* luaVM )
             m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -456,17 +453,17 @@ int CLuaFunctionDefs::SetBlipOrdering ( lua_State* luaVM )
 
 int CLuaFunctionDefs::SetBlipVisibleDistance ( lua_State* luaVM )
 {
-    int iArgument1 = lua_type ( luaVM, 1 );
-    int iArgument2 = lua_type ( luaVM, 2 );
-    if ( ( iArgument1 == LUA_TLIGHTUSERDATA ) &&
-        ( iArgument2 == LUA_TNUMBER || iArgument2 == LUA_TSTRING ) )
-    {
-        CClientEntity* pEntity = lua_toelement ( luaVM, 1 );
-        if ( pEntity )
-        {
-            unsigned short usVisibleDistance = static_cast < unsigned short > ( lua_tonumber ( luaVM, 2 ) );
+    CClientRadarMarker* pMarker = NULL;
+    unsigned short usVisibleDistance;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pMarker );
+    argStream.ReadNumber ( usVisibleDistance );
 
-            if ( CStaticFunctionDefinitions::SetBlipVisibleDistance ( *pEntity, usVisibleDistance ) )
+    if ( !argStream.HasErrors ( ) )
+    {
+        if ( pMarker )
+        {
+            if ( CStaticFunctionDefinitions::SetBlipVisibleDistance ( *pMarker, usVisibleDistance ) )
             {
                 lua_pushboolean ( luaVM, true );
                 return 1;
@@ -476,7 +473,7 @@ int CLuaFunctionDefs::SetBlipVisibleDistance ( lua_State* luaVM )
             m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;

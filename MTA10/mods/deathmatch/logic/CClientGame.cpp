@@ -2708,6 +2708,8 @@ void CClientGame::AddBuiltInEvents ( void )
     m_Events.AddEvent ( "onClientPlayerChoke", "", NULL, false );
     m_Events.AddEvent ( "onClientPlayerVoiceStart", "", NULL, false );
     m_Events.AddEvent ( "onClientPlayerVoiceStop", "", NULL, false );
+    m_Events.AddEvent ( "onClientPlayerVoicePause", "reason", NULL, false );
+    m_Events.AddEvent ( "onClientPlayerVoiceResumed", "reason", NULL, false );
     m_Events.AddEvent ( "onClientPlayerStealthKill", "target", NULL, false );
     m_Events.AddEvent ( "onClientPlayerHitByWaterCannon", "vehicle", NULL, false );
     m_Events.AddEvent ( "onClientPlayerHeliKilled", "heli", NULL, false );

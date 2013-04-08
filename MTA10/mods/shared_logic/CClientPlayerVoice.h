@@ -36,11 +36,44 @@ public:
     std::list < SString >               m_EventQueue;
     CCriticalSection                    m_CS;
 
+    void                    GetTempoValues          ( float &fSampleRate, float &fTempo, float &fPitch, bool &bReverse )        { fSampleRate = m_fSampleRate; fTempo = m_fTempo; fPitch = m_fPitch; bReverse = false; };
+
+    void                    SetPaused               ( bool bPaused  );
+    bool                    IsPaused                ( void );
+
+    void                    SetPlayPosition         ( double dPosition );
+    double                  GetPlayPosition         ( void );
+
+    double                  GetLength               ( bool bAvoidLoad = false );
+
+    void                    SetVolume               ( float fVolume, bool bStore = true );
+    float                   GetVolume               ( void );
+
+    void                    SetPlaybackSpeed        ( float fSpeed );
+    float                   GetPlaybackSpeed        ( void );
+
+    void                    ApplyFXModifications    ( float fSampleRate, float fTempo, float fPitch, bool bReversed );
+    void                    GetFXModifications      ( float &fSampleRate, float &fTempo, float &fPitch, bool &bReversed );
+    bool                    IsTempoChanged          ( void )                            { return m_fSampleRate != 0.0f || m_fSampleRate != 0.0f || m_fTempo != 0.0f; }
+    float*                  GetFFTData              ( int iLength );
+    float*                  GetWaveData             ( int iLength );
+    bool                    IsPanEnabled            ( void );
+    bool                    SetPanEnabled           ( bool bPan );
+    DWORD                   GetLevelData            ( void );
+    float                   GetSoundBPM             ( void );
+
+    bool                    SetPan                  ( float fPan );
+    bool                    GetPan                   ( float& fPan );
+
+    bool                    SetFxEffect             ( uint uiFxEffect, bool bEnable );
+    bool                    IsFxEffectEnabled       ( uint uiFxEffect );
+    bool                                IsActive                    ( void )                        { return m_bVoiceActive; }
+    
 private:  
     void                                Init                        ( void );
     void                                DeInit                      ( void );
-    bool                                IsActive                    ( void )                        { return m_bVoiceActive; }
     void                                ServiceEventQueue           ( void );
+    void                                ApplyFxEffects              ( void );
    
     CClientPlayer*                      m_pPlayer;
     CVoiceRecorder*                     m_pVoiceRecorder;
@@ -49,5 +82,22 @@ private:
     void*                               m_pSpeexDecoderState;
     int                                 m_iSpeexIncomingFrameSampleCount;
     float                               m_fVolume;
+    float                               m_fVolumeScale;
+
+    // Playback altering stuff
+    float                               m_fPitch;
+    float                               m_fTempo;
+    float                               m_fSampleRate;
+    bool                                m_bPan;
+    float                               m_fPan;
+
+
+    // Playback state
+    bool                                m_bPaused;
+    float                               m_fPlaybackSpeed;
+    float                               m_fDefaultFrequency;
+
+    SFixedArray < int, 9 >              m_EnabledEffects;
+    SFixedArray < HFX, 9 >              m_FxEffects;
 };
 #endif
