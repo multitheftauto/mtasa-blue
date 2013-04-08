@@ -32,9 +32,6 @@ class CRenderWare;
 class CResourceManager;
 class CScriptDebugging;
 
-#define argtype(number,type) (lua_type(luaVM,number) == type)
-#define argtype2(number,type,type2) (lua_type(luaVM,number) == type || lua_type(luaVM,number) == type2)
-
 class CLuaDefs
 {
 public:

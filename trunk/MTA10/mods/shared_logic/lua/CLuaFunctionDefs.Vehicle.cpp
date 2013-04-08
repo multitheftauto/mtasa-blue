@@ -1307,7 +1307,6 @@ int CLuaFunctionDefs::CreateVehicle ( lua_State* luaVM )
         {
             argStream.ReadNumber ( vecPosition.fX );
 
-            int iArgument6 = lua_type ( luaVM, 6 );
             if ( argStream.NextIsNumber ( ) )
             {
                 argStream.ReadNumber ( vecPosition.fY );
