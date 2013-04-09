@@ -52,6 +52,20 @@ CLuaCFunction* CLuaCFunctions::GetFunction ( const char* szName, lua_CFunction f
     return NULL;
 }
 
+CLuaCFunction* CLuaCFunctions::GetFunction ( const char* szName )
+{
+    // Grab a function of the given name and type
+    std::vector < CLuaCFunction* > ::const_iterator iter = m_sFunctions.begin ();
+    for ( ; iter != m_sFunctions.end (); iter++ )
+    {
+        if ( strcmp ( (*iter)->GetFunctionName (), szName ) == 0 )
+        {
+            return *iter;
+        }
+    }
+
+    return NULL;
+}
 
 CLuaCFunction* CLuaCFunctions::GetFunction ( lua_CFunction f )
 {
