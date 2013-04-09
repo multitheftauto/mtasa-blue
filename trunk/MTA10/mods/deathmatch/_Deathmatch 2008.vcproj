@@ -1224,6 +1224,10 @@
 					Name="luadefs"
 					>
 					<File
+						RelativePath="..\shared_logic\luadefs\CLuaClassDefs.cpp"
+						>
+					</File>
+					<File
 						RelativePath="..\shared_logic\luadefs\CLuaDefs.cpp"
 						>
 					</File>
@@ -2641,6 +2645,10 @@
 				<Filter
 					Name="luadefs"
 					>
+					<File
+						RelativePath="..\shared_logic\luadefs\CLuaClassDefs.h"
+						>
+					</File>
 					<File
 						RelativePath="..\shared_logic\luadefs\CLuaDefs.h"
 						>
