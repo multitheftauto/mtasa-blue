@@ -560,7 +560,7 @@ public:
     bool NextIsNone         ( int iOffset = 0 ) const  { return NextIs ( LUA_TNONE, iOffset ); }
     bool NextIsNil          ( int iOffset = 0 ) const  { return NextIs ( LUA_TNIL, iOffset ); }
     bool NextIsBool         ( int iOffset = 0 ) const  { return NextIs ( LUA_TBOOLEAN, iOffset ); }
-    bool NextIsUserData     ( int iOffset = 0 ) const  { return NextIs ( LUA_TLIGHTUSERDATA, iOffset ); }
+    bool NextIsUserData     ( int iOffset = 0 ) const  { return NextIs ( LUA_TUSERDATA, iOffset ); }
     bool NextIsNumber       ( int iOffset = 0 ) const  { return NextIs ( LUA_TNUMBER, iOffset ); }
     bool NextIsString       ( int iOffset = 0 ) const  { return NextIs ( LUA_TSTRING, iOffset ); }
     bool NextIsTable        ( int iOffset = 0 ) const  { return NextIs ( LUA_TTABLE, iOffset ); }
@@ -699,7 +699,7 @@ public:
         // Compose error message
         SString strMessage ( "Expected %s at argument %d", *m_strErrorExpectedType, m_iErrorIndex );
 
-        if ( m_iErrorGotArgumentType == LUA_TLIGHTUSERDATA )
+        if ( m_iErrorGotArgumentType == LUA_TUSERDATA )
         {
 	        // Get name of userdata type
             strGotArgumentType = GetUserDataClassName ( lua_touserdata ( m_luaVM, m_iErrorIndex ), m_luaVM );

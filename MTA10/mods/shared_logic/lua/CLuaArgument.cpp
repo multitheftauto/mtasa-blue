@@ -40,7 +40,7 @@ CLuaArgument::CLuaArgument ( void )
 {
     m_iType = LUA_TNIL;
     m_pTableData = NULL;
-    m_pLightUserData = NULL;
+    m_pUserData = NULL;
 }
 
 
@@ -95,9 +95,9 @@ void CLuaArgument::CopyRecursive ( const CLuaArgument& Argument, CFastHashMap < 
             break;
         }
 
-        case LUA_TLIGHTUSERDATA:
+        case LUA_TUSERDATA:
         {
-            m_pLightUserData = Argument.m_pLightUserData;
+            m_pUserData = Argument.m_pUserData;
             break;
         }
 
@@ -167,9 +167,9 @@ bool CLuaArgument::CompareRecursive ( const CLuaArgument& Argument, std::set < C
             return m_bBoolean == Argument.m_bBoolean;
         }
 
-        case LUA_TLIGHTUSERDATA:
+        case LUA_TUSERDATA:
         {
-            return m_pLightUserData == Argument.m_pLightUserData;
+            return m_pUserData == Argument.m_pUserData;
         }
 
         case LUA_TNUMBER:
@@ -258,9 +258,9 @@ void CLuaArgument::Read ( lua_State* luaVM, int iArgument, CFastHashMap < const 
                 break;
             }
 
-            case LUA_TLIGHTUSERDATA:
+            case LUA_TUSERDATA:
             {
-                m_pLightUserData = lua_touserdata ( luaVM, iArgument );
+                m_pUserData = lua_touserdata ( luaVM, iArgument );
                 break;
             }
 
@@ -328,8 +328,8 @@ void CLuaArgument::ReadScriptID ( uint uiScriptID )
 {
     m_strString = "";
     DeleteTableData ();
-    m_iType = LUA_TLIGHTUSERDATA;
-    m_pLightUserData = reinterpret_cast < void* > ( uiScriptID );
+    m_iType = LUA_TUSERDATA;
+    m_pUserData = reinterpret_cast < void* > ( uiScriptID );
 }
 
 
@@ -339,8 +339,8 @@ void CLuaArgument::ReadElement ( CClientEntity* pElement )
     DeleteTableData ();
     if ( pElement )
     {   
-        m_iType = LUA_TLIGHTUSERDATA;
-        m_pLightUserData = (void*) reinterpret_cast<unsigned int *>(pElement->GetID ().Value());
+        m_iType = LUA_TUSERDATA;
+        m_pUserData = (void*) reinterpret_cast<unsigned int *>(pElement->GetID ().Value());
     }
     else
         m_iType = LUA_TNIL;
@@ -351,14 +351,14 @@ void CLuaArgument::ReadElementID ( ElementID ID )
 {
     m_strString = "";
     DeleteTableData ();
-    m_iType = LUA_TLIGHTUSERDATA;
-    m_pLightUserData = (void*) reinterpret_cast<unsigned int *>(ID.Value());
+    m_iType = LUA_TUSERDATA;
+    m_pUserData = (void*) reinterpret_cast<unsigned int *>(ID.Value());
 }
 
 
 CClientEntity* CLuaArgument::GetElement ( void ) const
 {
-    ElementID ID = TO_ELEMENTID ( m_pLightUserData );
+    ElementID ID = TO_ELEMENTID ( m_pUserData );
     return CElementIDs::GetElement ( ID );
 }
 
@@ -386,9 +386,9 @@ void CLuaArgument::Push ( lua_State* luaVM, CFastHashMap < CLuaArguments*, int >
                 break;
             }
 
-            case LUA_TLIGHTUSERDATA:
+            case LUA_TUSERDATA:
             {
-                lua_pushlightuserdata ( luaVM, m_pLightUserData );
+                lua_pushuserdata ( luaVM, "Element", m_pUserData );
                 break;
             }
 
@@ -550,6 +550,7 @@ bool CLuaArgument::ReadFromBitStream ( NetBitStreamInterface& bitStream, std::ve
 
             // Element type
             case LUA_TLIGHTUSERDATA:
+            case LUA_TUSERDATA:
             {
                 // Read out the elemnt ID
                 ElementID ElementID;
@@ -680,6 +681,7 @@ bool CLuaArgument::WriteToBitStream ( NetBitStreamInterface& bitStream, CFastHas
 
         // Element packet
         case LUA_TLIGHTUSERDATA:
+        case LUA_TUSERDATA:
         {
             // Got a valid element to send?
             CClientEntity* pElement = GetElement ();
@@ -806,10 +808,11 @@ json_object * CLuaArgument::WriteToJSONObject ( bool bSerialize, CFastHashMap < 
             }
             break;
         }
+        case LUA_TUSERDATA:
         case LUA_TLIGHTUSERDATA:
         {
             CClientEntity* pElement = GetElement ();
-            CResource* pResource = g_pClientGame->GetResourceManager ()->GetResourceFromScriptID ( reinterpret_cast < unsigned long > ( GetLightUserData () ) );
+            CResource* pResource = g_pClientGame->GetResourceManager ()->GetResourceFromScriptID ( reinterpret_cast < unsigned long > ( GetUserData () ) );
 
             // Elements are dynamic, so storing them is potentially unsafe
             if ( pElement && bSerialize )
@@ -900,9 +903,10 @@ char * CLuaArgument::WriteToString ( char * szBuffer, int length )
             break;
         }
         case LUA_TLIGHTUSERDATA:
+        case LUA_TUSERDATA:
         {
             CClientEntity* pElement = GetElement ();
-            CResource* pResource = reinterpret_cast < CResource* > ( GetLightUserData() );
+            CResource* pResource = reinterpret_cast < CResource* > ( GetUserData() );
             if ( pElement )
             {
                 snprintf ( szBuffer, length, "#E#%d", (int)pElement->GetID().Value() );
