@@ -174,8 +174,18 @@ void lua_newclass ( lua_State* luaVM )
 }
 
 
-void lua_registerclass ( lua_State* luaVM, const char* szName )
+void lua_registerclass ( lua_State* luaVM, const char* szName, const char* szParent )
 {
+    if ( szParent != NULL )
+    {
+        lua_rawget ( luaVM, LUA_REGISTRYINDEX );
+        lua_getfield ( luaVM, -1, szParent );
+
+        assert ( lua_istable ( luaVM, -1 ) );
+
+        lua_setfield ( luaVM, -2, "__parent" );
+    }
+
     lua_pushstring ( luaVM, "mt" );
     lua_rawget ( luaVM, LUA_REGISTRYINDEX );
 
