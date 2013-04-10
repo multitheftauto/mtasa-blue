@@ -192,7 +192,7 @@ void lua_registerclass ( lua_State* luaVM, const char* szName, const char* szPar
 
     // store in registry
     lua_pushvalue ( luaVM, -2 );
-    lua_setfield ( luaVM, -2, SString ( szName ).ToLower ().c_str () );
+    lua_setfield ( luaVM, -2, szName );
 
     lua_pop ( luaVM, 1 );
 
