@@ -61,18 +61,18 @@ CClientEntity* lua_toelement ( lua_State* luaVM, int iArgument )
 
 void lua_pushresource ( lua_State* luaVM, CResource* pResource )
 {
-    lua_pushlightuserdata ( luaVM, reinterpret_cast < void* > ( pResource->GetScriptID () ) );
+    lua_pushuserdata ( luaVM, "Element",  reinterpret_cast < void* > ( pResource->GetScriptID () ) );
 }
 
 void lua_pushtimer ( lua_State* luaVM, CLuaTimer* pTimer )
 {
-    lua_pushlightuserdata ( luaVM, reinterpret_cast < void* > ( pTimer->GetScriptID () ) );
+    lua_pushuserdata ( luaVM, "Element",  reinterpret_cast < void* > ( pTimer->GetScriptID () ) );
 }
 
 void lua_pushxmlnode ( lua_State* luaVM, CXMLNode* pElement )
 {
     unsigned long ulID = pElement->GetID ();
-    lua_pushlightuserdata ( luaVM, reinterpret_cast < void* > ( ulID ) );
+    lua_pushuserdata ( luaVM, "Element", reinterpret_cast < void* > ( ulID ) );
 }
 
 void lua_pushuserdata ( lua_State* luaVM, const char* szClass, void* value )
