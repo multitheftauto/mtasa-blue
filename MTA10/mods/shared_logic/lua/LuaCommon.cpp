@@ -38,10 +38,10 @@ void lua_pushelement ( lua_State* luaVM, CClientEntity* pElement )
                 lua_pushuserdata ( luaVM, "Ped", (void*) reinterpret_cast<unsigned int *>(ID.Value()) );
                 break;
             case CCLIENTVEHICLE:
-                lua_pushuserdata ( luaVM, "Element", (void*) reinterpret_cast<unsigned int *>(ID.Value()) );
+                lua_pushuserdata ( luaVM, "Vehicle", (void*) reinterpret_cast<unsigned int *>(ID.Value()) );
                 break;
             default:
-                lua_pushuserdata ( luaVM, "Unknown", (void*) reinterpret_cast<unsigned int *>(ID.Value()) );
+                lua_pushuserdata ( luaVM, "Element", (void*) reinterpret_cast<unsigned int *>(ID.Value()) );
                 break;
             }
             return;
@@ -105,18 +105,6 @@ void lua_pushuserdata ( lua_State* luaVM, const char* szClass, void* value )
         // we don't have it, create it
         * ( void ** ) lua_newuserdata ( luaVM, sizeof ( void * ) ) = value;
 
-        // Assign the class metatable
-        {
-            lua_pushstring ( luaVM, "mt" );
-            lua_rawget ( luaVM, LUA_REGISTRYINDEX );
-            
-            lua_pushstring ( luaVM, szClass );
-            lua_rawget ( luaVM, -2 );
-
-            lua_remove ( luaVM, -2 );
-            lua_setmetatable ( luaVM, -2 );
-        }
-
         // save in ud table
         lua_pushlightuserdata ( luaVM, value );
         lua_pushvalue ( luaVM, -2 );
@@ -125,6 +113,16 @@ void lua_pushuserdata ( lua_State* luaVM, const char* szClass, void* value )
 
     // userdata is already on the stack, just remove the table
     lua_remove ( luaVM, -2 );
+
+    // Assign the class metatable
+    lua_pushstring ( luaVM, "mt" ); // element, "mt"
+    lua_rawget ( luaVM, LUA_REGISTRYINDEX ); // element, mt
+
+    lua_pushstring ( luaVM, szClass ); // element, mt, class name
+    lua_rawget ( luaVM, -2 ); // element, mt, class
+
+    lua_remove ( luaVM, -2 ); // element, class
+    lua_setmetatable ( luaVM, -2 ); // element
 }
 
 // Just do a type check vs LUA_TNONE before calling this, or bant
@@ -178,13 +176,15 @@ void lua_registerclass ( lua_State* luaVM, const char* szName, const char* szPar
 {
     if ( szParent != NULL )
     {
-        lua_pushstring ( luaVM, "mt" );
-        lua_rawget ( luaVM, LUA_REGISTRYINDEX );
-        lua_getfield ( luaVM, -1, szParent );
+        lua_pushstring ( luaVM, "mt" ); // class table, "mt"
+        lua_rawget ( luaVM, LUA_REGISTRYINDEX ); // class table, mt table
+        lua_getfield ( luaVM, -1, szParent ); // class table, mt table, parent table
 
         assert ( lua_istable ( luaVM, -1 ) );
 
-        lua_setfield ( luaVM, -2, "__parent" );
+        lua_setfield ( luaVM, -3, "__parent" ); // class table, mt table
+
+        lua_pop ( luaVM, 1 ); // class table
     }
 
     lua_pushstring ( luaVM, "mt" );
@@ -192,7 +192,7 @@ void lua_registerclass ( lua_State* luaVM, const char* szName, const char* szPar
 
     // store in registry
     lua_pushvalue ( luaVM, -2 );
-    lua_setfield ( luaVM, -2, szName );
+    lua_setfield ( luaVM, -2, SString ( szName ).ToLower ().c_str () );
 
     lua_pop ( luaVM, 1 );
 
