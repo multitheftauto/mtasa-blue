@@ -260,7 +260,7 @@ void CLuaArgument::Read ( lua_State* luaVM, int iArgument, CFastHashMap < const 
 
             case LUA_TUSERDATA:
             {
-                m_pUserData = lua_touserdata ( luaVM, iArgument );
+                m_pUserData = * ( ( void** ) lua_touserdata ( luaVM, iArgument ) );
                 break;
             }
 
@@ -387,8 +387,33 @@ void CLuaArgument::Push ( lua_State* luaVM, CFastHashMap < CLuaArguments*, int >
             }
 
             case LUA_TUSERDATA:
-            {
-                lua_pushuserdata ( luaVM, "Element", m_pUserData );
+                {
+                if ( CClientEntity* pClientElement = UserDataCast < CClientEntity > ( (CClientEntity*)NULL, m_pUserData, NULL ) )
+                {
+
+                    switch ( pClientElement->GetType() )
+                    {
+                    case CCLIENTPLAYER:
+                        lua_pushuserdata ( luaVM, "Player", m_pUserData );
+                        break;
+                    case CCLIENTPED:
+                        lua_pushuserdata ( luaVM, "Ped", m_pUserData );
+                        break;
+                    case CCLIENTVEHICLE:
+                        lua_pushuserdata ( luaVM, "Vehicle", m_pUserData );
+                        break;
+                    case CCLIENTDUMMY:
+                        lua_pushuserdata ( luaVM, "Element", m_pUserData );
+                        break;
+                    default:
+                        lua_pushuserdata ( luaVM, "Unknown", m_pUserData );
+                        break;
+                    }
+                }
+                else
+                {
+                    lua_pushuserdata ( luaVM, "Unknown", m_pUserData );
+                }
                 break;
             }
 

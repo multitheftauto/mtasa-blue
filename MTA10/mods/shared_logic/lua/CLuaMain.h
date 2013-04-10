@@ -90,6 +90,10 @@ public:
     unsigned long                   GetTimerCount           ( void ) const                  { return m_pLuaTimerManager ? m_pLuaTimerManager->GetTimerCount () : 0; };
     unsigned long                   GetElementCount         ( void ) const;
 
+    void                            AddElementClasses       ( lua_State* luaVM );
+    void                            AddVehicleClasses       ( lua_State* luaVM );
+    void                            AddPedClasses           ( lua_State* luaVM );
+    void                            AddPlayerClasses        ( lua_State* luaVM );
     void                            InitClasses             ( lua_State* luaVM );
     void                            InitVM                  ( void );
     const SString&                  GetFunctionTag          ( int iLuaFunction );

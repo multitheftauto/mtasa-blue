@@ -121,21 +121,8 @@ void CLuaMain::InitSecurity ( void )
     lua_register ( m_luaVM, "newproxy", CLuaFunctionDefs::DisabledFunction );
 }
 
-void CLuaMain::InitClasses ( lua_State* luaVM )
+void CLuaMain::AddElementClasses ( lua_State* luaVM )
 {
-    lua_pushstring ( luaVM, "mt" );
-    lua_newtable ( luaVM );
-    lua_rawset ( luaVM, LUA_REGISTRYINDEX );
-
-    lua_pushstring ( luaVM, "ud" );
-    lua_newtable ( luaVM );
-    lua_rawset ( luaVM, LUA_REGISTRYINDEX );
-
-    // Element
-    lua_newclass ( luaVM );
-
-    lua_classfunction ( luaVM, "create", "createElement" );
-    lua_classfunction ( luaVM, "destroy", "destroyElement" );
     lua_classfunction ( luaVM, "clone", "cloneElement" );
 
     lua_classfunction ( luaVM, "isWithinColShape", "isElementWithinColShape" );
@@ -144,8 +131,6 @@ void CLuaMain::InitClasses ( lua_State* luaVM )
     lua_classfunction ( luaVM, "isFrozen", "isElementFrozen" );
     lua_classfunction ( luaVM, "isLowLOD", "isElementLowLOD" );
 
-    lua_classfunction ( luaVM, "getByID", "getElementByID" );
-    lua_classfunction ( luaVM, "getByIndex", "getElementByIndex" );
     lua_classfunction ( luaVM, "getChildren", "getElementChildren" );
     lua_classfunction ( luaVM, "getChild", "getElementChild" );
     lua_classfunction ( luaVM, "getChildrenCount", "getElementChildrenCount" );
@@ -214,8 +199,162 @@ void CLuaMain::InitClasses ( lua_State* luaVM )
     lua_classvariable ( luaVM, "inWater", NULL, "isElementInWater" );
     lua_classvariable ( luaVM, "dimension", "setElementDimension", "getElementDimension" );
     lua_classvariable ( luaVM, "interior", "setElementInterior", "getElementInterior" );
+}
+
+
+
+void CLuaMain::AddVehicleClasses ( lua_State* luaVM )
+{
+    //lua_classvariable ( luaVM, "id", "setElementID", "getElementID" );
+    lua_classvariable ( luaVM, "occupants", NULL, "getVehicleOccupants" );
+}
+
+void CLuaMain::AddPedClasses ( lua_State* luaVM )
+{
+    //lua_classvariable ( luaVM, "id", "setElementID", "getElementID" );
+    lua_classvariable ( luaVM, "vehicle", NULL, "getPedOccupiedVehicle" );
+}
+
+void CLuaMain::AddPlayerClasses ( lua_State* luaVM )
+{
+    //lua_classvariable ( luaVM, "id", "setElementID", "getElementID" );
+    lua_classvariable ( luaVM, "ping", NULL, "getPlayerPing" );
+}
+
+
+void CLuaMain::InitClasses ( lua_State* luaVM )
+{
+    //////////////////////////////////////////////////////////////////////////
+    //                          Element                                     //
+    //////////////////////////////////////////////////////////////////////////
+    lua_pushstring ( luaVM, "mt" );
+    lua_newtable ( luaVM );
+    lua_rawset ( luaVM, LUA_REGISTRYINDEX );
+
+    lua_pushstring ( luaVM, "ud" );
+    lua_newtable ( luaVM );
+    lua_rawset ( luaVM, LUA_REGISTRYINDEX );
+    // Element
+    lua_newclass ( luaVM );
+
+    // Stuff for elements only
+    lua_classfunction ( luaVM, "create", "createElement" );
+
+    lua_classfunction ( luaVM, "getByID", "getElementByID" );
+    lua_classfunction ( luaVM, "getByIndex", "getElementByIndex" );
+
+    // Add all the Element class methods and properties
+    AddElementClasses( luaVM );
 
     lua_registerclass ( luaVM, "Element" );
+
+    //////////////////////////////////////////////////////////////////////////
+    //                            End Of Element                            //
+    //////////////////////////////////////////////////////////////////////////
+
+
+    //////////////////////////////////////////////////////////////////////////
+    //                              Vehicle                                 //
+    //////////////////////////////////////////////////////////////////////////
+    lua_pushstring ( luaVM, "mt" );
+    lua_newtable ( luaVM );
+    lua_rawset ( luaVM, LUA_REGISTRYINDEX );
+
+    lua_pushstring ( luaVM, "ud" );
+    lua_newtable ( luaVM );
+    lua_rawset ( luaVM, LUA_REGISTRYINDEX );
+    // Vehicle
+    lua_newclass ( luaVM );
+
+    // Stuff for vehicles only
+    lua_classfunction ( luaVM, "create", "createVehicle" );
+
+    // Add all the Element class methods and properties
+    AddElementClasses ( luaVM );
+
+    // Add all the Vehicle class methods and properties
+    AddVehicleClasses ( luaVM );
+
+    lua_registerclass ( luaVM, "Vehicle" );
+
+    //////////////////////////////////////////////////////////////////////////
+    //                            End Of Vehicle                            //
+    //////////////////////////////////////////////////////////////////////////
+
+    //////////////////////////////////////////////////////////////////////////
+    //                                Ped                                   //
+    //////////////////////////////////////////////////////////////////////////
+    lua_pushstring ( luaVM, "mt" );
+    lua_newtable ( luaVM );
+    lua_rawset ( luaVM, LUA_REGISTRYINDEX );
+
+    lua_pushstring ( luaVM, "ud" );
+    lua_newtable ( luaVM );
+    lua_rawset ( luaVM, LUA_REGISTRYINDEX );
+
+    lua_newclass ( luaVM );
+
+    // Stuff for peds only
+    lua_classfunction ( luaVM, "create", "createPed" );
+
+    // Add all the Element class methods and properties
+    AddElementClasses ( luaVM );
+
+    // Add all the Ped class methods and properties
+    AddPedClasses ( luaVM );
+
+    lua_registerclass ( luaVM, "Ped" );
+
+    //////////////////////////////////////////////////////////////////////////
+    //                             End Of Ped                               //
+    //////////////////////////////////////////////////////////////////////////
+
+    //////////////////////////////////////////////////////////////////////////
+    //                             Player                                   //
+    //////////////////////////////////////////////////////////////////////////
+    lua_pushstring ( luaVM, "mt" );
+    lua_newtable ( luaVM );
+    lua_rawset ( luaVM, LUA_REGISTRYINDEX );
+
+    lua_pushstring ( luaVM, "ud" );
+    lua_newtable ( luaVM );
+    lua_rawset ( luaVM, LUA_REGISTRYINDEX );
+
+    lua_newclass ( luaVM );
+
+    // Add all the Element class methods and properties
+    AddElementClasses ( luaVM );
+
+    // Add all the Ped class methods and properties
+    AddPedClasses ( luaVM );
+
+    // Add all the Player class methods and properties
+    AddPlayerClasses ( luaVM );
+
+    lua_registerclass ( luaVM, "Player" );
+
+    //////////////////////////////////////////////////////////////////////////
+    //                          End Of Player                               //
+    //////////////////////////////////////////////////////////////////////////
+
+    //////////////////////////////////////////////////////////////////////////
+    //                             Unknown                                  //
+    //////////////////////////////////////////////////////////////////////////
+    /*lua_pushstring ( luaVM, "mt" );
+    lua_newtable ( luaVM );
+    lua_rawset ( luaVM, LUA_REGISTRYINDEX );
+
+    lua_pushstring ( luaVM, "ud" );
+    lua_newtable ( luaVM );
+    lua_rawset ( luaVM, LUA_REGISTRYINDEX );
+
+    lua_newclass ( luaVM );
+
+    lua_registerclass ( luaVM, "Unknown" );*/
+
+    //////////////////////////////////////////////////////////////////////////
+    //                          End Of Unknown                              //
+    //////////////////////////////////////////////////////////////////////////
 }
 
 void CLuaMain::InitVM ( void )
