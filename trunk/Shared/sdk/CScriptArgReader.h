@@ -590,6 +590,11 @@ public:
             if ( UserDataCast < T > ( (T*)0, lua_touserdata ( m_luaVM, m_iIndex + iOffset ), m_luaVM ) )
                 return true;
         }
+		else if ( iArgument == LUA_TUSERDATA )
+        {
+			if ( UserDataCast < T > ( (T*)0, * ( ( void** ) lua_touserdata ( m_luaVM, m_iIndex + iOffset ) ), m_luaVM ) )
+                return true;
+        }
         return false;
     }
 
@@ -698,6 +703,11 @@ public:
         {
 	        // Get name of userdata type
             strGotArgumentType = GetUserDataClassName ( lua_touserdata ( m_luaVM, m_iErrorIndex ), m_luaVM );
+            strGotArgumentValue = "";
+        }
+		else if ( m_iErrorGotArgumentType == LUA_TUSERDATA )
+        {
+			strGotArgumentType = GetUserDataClassName ( * ( ( void** ) lua_touserdata ( m_luaVM, m_iErrorIndex ) ), m_luaVM );
             strGotArgumentValue = "";
         }
 
