@@ -258,6 +258,12 @@ void CLuaArgument::Read ( lua_State* luaVM, int iArgument, CFastHashMap < const 
                 break;
             }
 
+            case LUA_TLIGHTUSERDATA:
+            {
+                m_pUserData = lua_touserdata ( luaVM, iArgument );
+                break;
+            }
+
             case LUA_TUSERDATA:
             {
                 m_pUserData = * ( ( void** ) lua_touserdata ( luaVM, iArgument ) );
@@ -402,11 +408,8 @@ void CLuaArgument::Push ( lua_State* luaVM, CFastHashMap < CLuaArguments*, int >
                     case CCLIENTVEHICLE:
                         lua_pushuserdata ( luaVM, "Vehicle", m_pUserData );
                         break;
-                    case CCLIENTDUMMY:
-                        lua_pushuserdata ( luaVM, "Element", m_pUserData );
-                        break;
                     default:
-                        lua_pushuserdata ( luaVM, "Unknown", m_pUserData );
+                        lua_pushuserdata ( luaVM, "Element", m_pUserData );
                         break;
                     }
                 }
