@@ -178,6 +178,7 @@ void lua_registerclass ( lua_State* luaVM, const char* szName, const char* szPar
 {
     if ( szParent != NULL )
     {
+        lua_pushstring ( luaVM, "mt" );
         lua_rawget ( luaVM, LUA_REGISTRYINDEX );
         lua_getfield ( luaVM, -1, szParent );
 
