@@ -4693,7 +4693,7 @@ void CClientGame::ProcessVehicleInOutKey ( bool bPassenger )
                                                     bool bIsOnWater = pVehicle->IsOnWater ();
                                                     unsigned char ucDoor = static_cast < unsigned char > ( uiDoor );
                                                     pBitStream->WriteBits ( &ucAction, 4 );
-                                                    pBitStream->WriteBits ( &ucSeat, 3 );
+                                                    pBitStream->WriteBits ( &ucSeat, 4 );
                                                     pBitStream->WriteBit ( bIsOnWater );
                                                     pBitStream->WriteBits ( &ucDoor, 3 );
 
