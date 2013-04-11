@@ -535,6 +535,7 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     // Read some settings
     m_pACLManager->SetFileName ( m_pMainConfig->GetAccessControlListFile ().c_str () );
     const SString strServerIP = m_pMainConfig->GetServerIP ();
+    const SString strServerIPList = m_pMainConfig->GetServerIPList ();
     unsigned short usServerPort = m_pMainConfig->GetServerPort ();
     unsigned int uiMaxPlayers = m_pMainConfig->GetMaxPlayers ();
 
@@ -622,7 +623,7 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
 
                                 MTA_DM_BUILDTAG_SHORT,
                                 m_pMainConfig->GetServerName ().c_str (),
-                                strServerIP.c_str (),
+                                strServerIPList.c_str (),
                                 usServerPort,
                                 pszLogFileName,
                                 uiMaxPlayers,
@@ -797,9 +798,9 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
         CLogger::LogPrintf ( "Network encryption disabled\n" );
 
     // Try to start the network
-    if ( !g_pNetServer->StartNetwork ( strServerIP, usServerPort, uiMaxPlayers, m_pMainConfig->GetServerName ().c_str () ) )
+    if ( !g_pNetServer->StartNetwork ( strServerIPList, usServerPort, uiMaxPlayers, m_pMainConfig->GetServerName ().c_str () ) )
     {
-        CLogger::ErrorPrintf ( "Could not bind the server on interface '%s' and port '%u'!\n", strServerIP.c_str (), usServerPort );
+        CLogger::ErrorPrintf ( "Could not bind the server on interface '%s' and port '%u'!\n", strServerIPList.c_str (), usServerPort );
         return false;
     }
 

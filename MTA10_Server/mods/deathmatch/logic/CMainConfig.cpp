@@ -897,6 +897,14 @@ std::string CMainConfig::GetServerIP ( void )
     std::string strServerIP;
     if ( m_pCommandLineParser && m_pCommandLineParser->GetIP ( strServerIP ) )
         return strServerIP;
+    return SString( m_strServerIP ).SplitLeft( "," );
+}
+
+SString CMainConfig::GetServerIPList ( void )
+{
+    std::string strServerIP;
+    if ( m_pCommandLineParser && m_pCommandLineParser->GetIP ( strServerIP ) )
+        return strServerIP;
     return m_strServerIP;
 }
 
