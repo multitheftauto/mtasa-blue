@@ -63,6 +63,7 @@ void ParseRGBA(CBuffer& outImage, const png_structp& png_ptr, const png_infop& i
             pData->G = rowData[byteIndex++];
             pData->B = rowData[byteIndex++];
             pData->A = rowData[byteIndex++];
+            pData++;
         }
         assert(byteIndex == bytesPerRow);
     }
