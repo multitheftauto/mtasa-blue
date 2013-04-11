@@ -81,7 +81,7 @@ searchparent:
 
                 lua_call ( luaVM, 2, 1 ); // ud, k, mt, __parent table, result
 
-                lua_replace ( luaVM, -2 ); // ud, k, result, __parent table
+                lua_replace ( luaVM, -3 ); // ud, k, result, __parent table
                 lua_pop ( luaVM, 1 ); // ud, k, result
                 return 1;
             }
