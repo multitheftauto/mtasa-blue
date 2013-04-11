@@ -1469,7 +1469,7 @@ void CPacketHandler::Packet_Vehicle_InOut ( NetBitStreamInterface& bitStream )
             {
                 // Read out the seat id
                 unsigned char ucSeat = 0xFF;
-                bitStream.ReadBits ( &ucSeat, 3 );
+                bitStream.ReadBits ( &ucSeat, 4 );
                 if ( ucSeat == 0xFF )
                 {
                     RaiseProtocolError ( 28 );

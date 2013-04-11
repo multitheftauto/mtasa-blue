@@ -2007,7 +2007,7 @@ struct SColorSync : public ISyncStructure
 //////////////////////////////////////////
 struct SOccupiedSeatSync : public ISyncStructure
 {
-    enum { BITCOUNT = 3 };
+    enum { BITCOUNT = 4 };
 
     bool Read ( NetBitStreamInterface& bitStream )
     {
@@ -2020,7 +2020,7 @@ struct SOccupiedSeatSync : public ISyncStructure
 
     struct
     {
-        unsigned char ucSeat : 3;
+        unsigned char ucSeat : 4;
     } data;
 };
 
