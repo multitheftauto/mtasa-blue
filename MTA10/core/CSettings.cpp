@@ -431,12 +431,28 @@ void CSettings::CreateGUI ( void )
     m_pAudioSFXVolume->SetProperty ( "StepSize", "0.01" );
 
     m_pCheckBoxAudioEqualizer = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabAudio, "Radio Equalizer", true ) );
-    m_pCheckBoxAudioEqualizer->SetPosition ( CVector2D ( vecTemp.fX + 300.0f, vecTemp.fY - 3.0f ) );
+    m_pCheckBoxAudioEqualizer->SetPosition ( CVector2D ( vecTemp.fX + 300.0f, vecTemp.fY - 32.0f ) );
     m_pCheckBoxAudioEqualizer->SetSize ( CVector2D ( 224.0f, 16.0f ) );
 
     m_pCheckBoxAudioAutotune = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabAudio, "Radio Auto-tune", true ) );
-    m_pCheckBoxAudioAutotune->SetPosition ( CVector2D ( vecTemp.fX + 300.0f, vecTemp.fY + 13.0f ) );
+    m_pCheckBoxAudioAutotune->SetPosition ( CVector2D ( vecTemp.fX + 300.0f, vecTemp.fY - 16.0f ) );
     m_pCheckBoxAudioAutotune->SetSize ( CVector2D ( 224.0f, 16.0f ) );
+
+    m_pCheckBoxMuteSFX = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabAudio, "Mute SFX sounds when minimized", true ) );
+    m_pCheckBoxMuteSFX->SetPosition ( CVector2D ( vecTemp.fX + 300.0f, vecTemp.fY + 18.0f ) );
+    m_pCheckBoxMuteSFX->SetSize ( CVector2D ( 224.0f, 16.0f ) );
+
+    m_pCheckBoxMuteRadio = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabAudio, "Mute Radio sounds when minimized", true ) );
+    m_pCheckBoxMuteRadio->SetPosition ( CVector2D ( vecTemp.fX + 300.0f, vecTemp.fY + 34.0f ) );
+    m_pCheckBoxMuteRadio->SetSize ( CVector2D ( 224.0f, 16.0f ) );
+
+    m_pCheckBoxMuteMTA = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabAudio, "Mute MTA sounds when minimized", true ) );
+    m_pCheckBoxMuteMTA->SetPosition ( CVector2D ( vecTemp.fX + 300.0f, vecTemp.fY + 50.0f ) );
+    m_pCheckBoxMuteMTA->SetSize ( CVector2D ( 224.0f, 16.0f ) );
+
+    m_pCheckBoxMuteVoice = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabAudio, "Mute Voice sounds when minimized", true ) );
+    m_pCheckBoxMuteVoice->SetPosition ( CVector2D ( vecTemp.fX + 300.0f, vecTemp.fY + 66.0f ) );
+    m_pCheckBoxMuteVoice->SetSize ( CVector2D ( 224.0f, 16.0f ) );
 
     m_pLabelMTAVolume = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, "MTA volume:" ) );
     m_pLabelMTAVolume->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32.0f ) );
@@ -1140,6 +1156,14 @@ void CSettings::UpdateAudioTab ()
     m_pCheckBoxAudioAutotune->SetSelected( gameSettings->IsRadioAutotuneEnabled() );
     m_pCheckBoxUserAutoscan->SetSelected( gameSettings->IsUsertrackAutoScan() );
 
+    CVARS_GET ( "mute_sfx_when_minimized", m_bMuteSFX );
+    CVARS_GET ( "mute_radio_when_minimized", m_bMuteRadio );
+    CVARS_GET ( "mute_mta_when_minimized", m_bMuteMTA );
+    CVARS_GET ( "mute_voice_when_minimized", m_bMuteVoice );
+    m_pCheckBoxMuteSFX->SetSelected ( m_bMuteSFX );
+    m_pCheckBoxMuteRadio->SetSelected ( m_bMuteRadio );
+    m_pCheckBoxMuteMTA->SetSelected ( m_bMuteMTA );
+    m_pCheckBoxMuteVoice->SetSelected ( m_bMuteVoice );
 
     m_pComboUsertrackMode->SetSelectedItemByIndex( gameSettings->GetUsertrackMode() );
 
@@ -1464,6 +1488,11 @@ bool CSettings::OnAudioDefaultClick ( CGUIElement* pElement )
     gameSettings->SetRadioEqualizerEnabled ( true );
 
     gameSettings->SetUsertrackAutoScan ( false );
+
+    CVARS_SET ( "mute_sfx_when_minimized", false );
+    CVARS_SET ( "mute_radio_when_minimized", false );
+    CVARS_SET ( "mute_mta_when_minimized", false );
+    CVARS_SET ( "mute_voice_when_minimized", false );
 
     gameSettings->SetUsertrackMode ( 0 );
     // Update the GUI
@@ -2237,6 +2266,15 @@ void CSettings::LoadData ( void )
     m_pCheckBoxAudioAutotune->SetSelected ( gameSettings->IsRadioAutotuneEnabled () );
     m_pCheckBoxUserAutoscan->SetSelected ( gameSettings->IsUsertrackAutoScan () );
 
+    CVARS_GET ( "mute_sfx_when_minimized", m_bMuteSFX );
+    CVARS_GET ( "mute_radio_when_minimized", m_bMuteRadio );
+    CVARS_GET ( "mute_mta_when_minimized", m_bMuteMTA );
+    CVARS_GET ( "mute_voice_when_minimized", m_bMuteVoice );
+    m_pCheckBoxMuteSFX->SetSelected ( m_bMuteSFX );
+    m_pCheckBoxMuteRadio->SetSelected ( m_bMuteRadio );
+    m_pCheckBoxMuteMTA->SetSelected ( m_bMuteMTA );
+    m_pCheckBoxMuteVoice->SetSelected ( m_bMuteVoice );
+
     unsigned int uiUsertrackMode = gameSettings->GetUsertrackMode ();
     if ( uiUsertrackMode == 0 ) m_pComboUsertrackMode->SetText ( "Radio" );
     else if ( uiUsertrackMode == 1 ) m_pComboUsertrackMode->SetText ( "Random" );
@@ -2651,6 +2689,15 @@ void CSettings::SaveData ( void )
     gameSettings->SetRadioEqualizerEnabled ( m_pCheckBoxAudioEqualizer->GetSelected() );
     gameSettings->SetRadioAutotuneEnabled ( m_pCheckBoxAudioAutotune->GetSelected() );
     gameSettings->SetUsertrackAutoScan ( m_pCheckBoxUserAutoscan->GetSelected() );
+
+    m_bMuteSFX = m_pCheckBoxMuteSFX->GetSelected ();
+    m_bMuteRadio = m_pCheckBoxMuteRadio->GetSelected ();
+    m_bMuteMTA = m_pCheckBoxMuteMTA->GetSelected ();
+    m_bMuteVoice = m_pCheckBoxMuteVoice->GetSelected ();
+    CVARS_SET ( "mute_sfx_when_minimized", m_bMuteSFX );
+    CVARS_SET ( "mute_radio_when_minimized", m_bMuteRadio );
+    CVARS_SET ( "mute_mta_when_minimized", m_bMuteMTA );
+    CVARS_SET ( "mute_voice_when_minimized", m_bMuteVoice );
 
     if ( CGUIListItem* pSelected = m_pComboUsertrackMode->GetSelectedItem () )
     {
