@@ -691,6 +691,11 @@ private:
 
     bool                                m_bWasMinimized;
 
+    bool                                m_bMuteSFX;
+    bool                                m_bMuteRadio;
+    bool                                m_bMuteMTA;
+    bool                                m_bMuteVoice;
+
     // Cache for speeding up collision processing
 public:
     std::map < CClientEntity *, bool >                m_AllDisabledCollisions;

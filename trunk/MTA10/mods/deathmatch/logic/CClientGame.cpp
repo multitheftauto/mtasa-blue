@@ -708,6 +708,33 @@ void CClientGame::DoPulsePreHUDRender ( bool bDidUnminimize, bool bDidRecreateRe
         Arguments.PushBoolean ( bDidRecreateRenderTargets );
         m_pRootEntity->CallEvent ( "onClientRestore", Arguments, false );
         m_bWasMinimized = false;
+
+        if ( m_bMuteSFX )
+        {
+            unsigned char ucOldSFXVolume = g_pGame->GetSettings ()->GetSFXVolume ();
+            g_pGame->GetAudio ()->SetEffectsMasterVolume ( ucOldSFXVolume );
+        }
+
+        if ( m_bMuteRadio )
+        {
+            unsigned char ucOldRadioVolume = g_pGame->GetSettings ()->GetRadioVolume ();
+            g_pGame->GetAudio ()->SetMusicMasterVolume ( ucOldRadioVolume );
+        }
+
+        if ( m_bMuteMTA )
+        {
+            m_pManager->GetSoundManager ()->SetMTAMuted ( false );
+        }
+
+        if ( m_bMuteVoice )
+        {
+            CClientPlayer* pPlayer = g_pClientGame->m_pPlayerManager->GetLocalPlayer ();
+            CClientPlayerVoice * pVoice = pPlayer->GetVoice();
+            if ( pVoice != NULL )
+            {
+                pVoice->SetVoiceMuted ( false );
+            }
+        }
     }
 
     // Call onClientHUDRender LUA event
@@ -3800,6 +3827,36 @@ void CClientGame::IdleHandler ( void )
             // Call onClientMinimize LUA event
             CLuaArguments Arguments;
             m_pRootEntity->CallEvent ( "onClientMinimize", Arguments, false );
+
+            g_pCore->GetCVars ()->Get ( "mute_sfx_when_minimized", m_bMuteSFX );
+            g_pCore->GetCVars ()->Get ( "mute_radio_when_minimized", m_bMuteRadio );
+            g_pCore->GetCVars ()->Get ( "mute_mta_when_minimized", m_bMuteMTA );
+            g_pCore->GetCVars ()->Get ( "mute_voice_when_minimized", m_bMuteVoice );
+
+            if ( m_bMuteSFX )
+            {
+                g_pGame->GetAudio ()->SetEffectsMasterVolume ( 0 );
+            }
+
+            if ( m_bMuteRadio )
+            {
+                g_pGame->GetAudio ()->SetMusicMasterVolume ( 0 );
+            }
+
+            if ( m_bMuteMTA )
+            {
+                m_pManager->GetSoundManager ()->SetMTAMuted ( true );
+            }
+
+            if ( m_bMuteVoice )
+            {
+                CClientPlayer* pPlayer = g_pClientGame->m_pPlayerManager->GetLocalPlayer ();
+                CClientPlayerVoice * pVoice = pPlayer->GetVoice();
+                if ( pVoice != NULL )
+                {
+                    pVoice->SetVoiceMuted ( true );
+                }
+            }
         }
     }
 
