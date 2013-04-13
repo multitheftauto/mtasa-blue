@@ -151,6 +151,8 @@ public:
 
     virtual void                SetCursorEnabled        ( bool bEnabled ) = 0;
     virtual bool                IsCursorEnabled         ( void ) = 0;
+    virtual void                SetCursorAlpha          ( float fAlpha, bool bOnlyCurrentServer = false ) = 0;
+    virtual float               GetCurrentServerCursorAlpha ( void ) = 0;
 
     virtual CVector2D           GetResolution           ( void ) = 0;
     virtual void                SetResolution           ( float fWidth, float fHeight ) = 0;

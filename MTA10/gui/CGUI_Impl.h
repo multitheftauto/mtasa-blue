@@ -142,6 +142,8 @@ public:
 
     void                            SetCursorEnabled            ( bool bEnabled );
     bool                            IsCursorEnabled             ( void );
+    void                            SetCursorAlpha              ( float fAlpha, bool bOnlyCurrentServer = false );
+    float                           GetCurrentServerCursorAlpha ( void );
 
     void                            AddChild                    ( CGUIElement_Impl* pChild );
     CEGUI::FontManager*             GetFontManager              ( void );
@@ -245,6 +247,7 @@ private:
 
     CEGUI::DefaultWindow*           m_pTop;
     const CEGUI::Image*             m_pCursor;
+    float                           m_fCurrentServerCursorAlpha;
 
     CGUIFont_Impl*                  m_pDefaultFont;
     CGUIFont_Impl*                  m_pSmallFont;

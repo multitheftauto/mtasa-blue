@@ -91,6 +91,30 @@ int CLuaFunctionDefs::IsCursorShowing ( lua_State* luaVM )
 }
 
 
+int CLuaFunctionDefs::SetCursorAlpha ( lua_State* luaVM )
+{
+//  bool setCursorAlpha ( float alpha )
+    float fAlpha;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadNumber ( fAlpha );
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( CStaticFunctionDefinitions::SetCursorAlpha ( fAlpha ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
 int CLuaFunctionDefs::ShowCursor ( lua_State* luaVM )
 {
     bool bShow = false, bToggleControls = true;

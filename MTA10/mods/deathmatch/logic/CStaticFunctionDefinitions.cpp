@@ -4411,6 +4411,17 @@ bool CStaticFunctionDefinitions::IsCursorShowing ( bool& bShowing )
 }
 
 
+bool CStaticFunctionDefinitions::SetCursorAlpha ( float fAlpha )
+{
+    if ( fAlpha >= 0.0f && fAlpha <= 1.0f )
+    {
+        m_pGUI->SetCursorAlpha ( fAlpha, true );
+        return true;
+    }
+    return false;
+}
+
+
 bool CStaticFunctionDefinitions::GUIGetInputEnabled ( void )
 {   // can't inline because statics are defined in .cpp not .h
     return m_pGUI->GetGUIInputEnabled ();
