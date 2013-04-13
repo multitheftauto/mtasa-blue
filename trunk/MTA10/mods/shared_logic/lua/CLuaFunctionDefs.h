@@ -508,6 +508,7 @@ public:
     LUA_DECLARE ( GetCursorPosition );
     LUA_DECLARE ( SetCursorPosition );
     LUA_DECLARE ( IsCursorShowing );
+    LUA_DECLARE ( SetCursorAlpha );
     
     LUA_DECLARE ( ShowCursor );
 
