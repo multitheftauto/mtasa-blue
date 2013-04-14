@@ -2349,9 +2349,9 @@ void CSettings::LoadData ( void )
     m_pCheckBoxUserAutoscan->SetSelected ( gameSettings->IsUsertrackAutoScan () );
 
     unsigned int uiUsertrackMode = gameSettings->GetUsertrackMode ();
-    if ( uiUsertrackMode == 0 ) m_pComboUsertrackMode->SetText ( "Radio" );
-    else if ( uiUsertrackMode == 1 ) m_pComboUsertrackMode->SetText ( "Random" );
-    else if ( uiUsertrackMode == 2 ) m_pComboUsertrackMode->SetText ( "Sequential" );
+    if ( uiUsertrackMode == 0 ) m_pComboUsertrackMode->SetText ( _("Radio") );
+    else if ( uiUsertrackMode == 1 ) m_pComboUsertrackMode->SetText ( _("Random") );
+    else if ( uiUsertrackMode == 2 ) m_pComboUsertrackMode->SetText ( _("Sequential") );
     
     CVARS_GET ( "mtavolume", m_fOldMTAVolume );
     CVARS_GET ( "voicevolume", m_fOldVoiceVolume );
