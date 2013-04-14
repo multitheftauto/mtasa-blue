@@ -6979,11 +6979,33 @@ bool CStaticFunctionDefinitions::SetSoundPosition ( CClientSound& Sound, double 
     return true;
 }
 
+bool CStaticFunctionDefinitions::SetSoundPosition ( CClientPlayer& Player, double dPosition )
+{
+    CClientPlayerVoice * pVoice = Player.GetVoice();
+    if ( pVoice != NULL )
+    {
+        pVoice->SetPlayPosition ( dPosition );
+        return true;
+    }
+    return false;
+}
 
 bool CStaticFunctionDefinitions::GetSoundPosition ( CClientSound& Sound, double& dPosition )
 {
     dPosition = Sound.GetPlayPosition ();
     return true;
+}
+
+bool CStaticFunctionDefinitions::GetSoundPosition ( CClientPlayer& Player, double& dPosition )
+{
+    dPosition = 0.0;
+    CClientPlayerVoice * pVoice = Player.GetVoice();
+    if ( pVoice != NULL )
+    {
+        dPosition = pVoice->GetPlayPosition ( );
+        return true;
+    }
+    return false;
 }
 
 
@@ -6993,6 +7015,17 @@ bool CStaticFunctionDefinitions::GetSoundLength ( CClientSound& Sound, double& d
     return true;
 }
 
+bool CStaticFunctionDefinitions::GetSoundLength ( CClientPlayer& Player, double& dLength )
+{
+    dLength = 0.0;
+    CClientPlayerVoice * pVoice = Player.GetVoice();
+    if ( pVoice != NULL )
+    {
+        dLength = pVoice->GetLength ( );
+        return true;
+    }
+    return false;
+}
 
 bool CStaticFunctionDefinitions::SetSoundPaused ( CClientSound& Sound, bool bPaused )
 {
@@ -7000,6 +7033,16 @@ bool CStaticFunctionDefinitions::SetSoundPaused ( CClientSound& Sound, bool bPau
     return true;
 }
 
+bool CStaticFunctionDefinitions::SetSoundPaused ( CClientPlayer& Player, bool bPaused )
+{
+    CClientPlayerVoice * pVoice = Player.GetVoice();
+    if ( pVoice != NULL )
+    {
+        pVoice->SetPaused ( bPaused );
+        return true;
+    }
+    return false;
+}
 
 bool CStaticFunctionDefinitions::IsSoundPaused ( CClientSound& Sound, bool& bPaused )
 {
@@ -7007,6 +7050,16 @@ bool CStaticFunctionDefinitions::IsSoundPaused ( CClientSound& Sound, bool& bPau
     return true;
 }
 
+bool CStaticFunctionDefinitions::IsSoundPaused ( CClientPlayer& Player, bool& bPaused )
+{
+    CClientPlayerVoice * pVoice = Player.GetVoice();
+    if ( pVoice != NULL )
+    {
+        bPaused = pVoice->IsPaused ( );
+        return true;
+    }
+    return false;
+}
 
 bool CStaticFunctionDefinitions::SetSoundVolume ( CClientSound& Sound, float fVolume )
 {
@@ -7014,6 +7067,16 @@ bool CStaticFunctionDefinitions::SetSoundVolume ( CClientSound& Sound, float fVo
     return true;
 }
 
+bool CStaticFunctionDefinitions::SetSoundVolume ( CClientPlayer& Player, float fVolume )
+{
+    CClientPlayerVoice * pVoice = Player.GetVoice();
+    if ( pVoice != NULL )
+    {
+        pVoice->SetVolume ( fVolume );
+        return true;
+    }
+    return false;
+}
 
 bool CStaticFunctionDefinitions::GetSoundVolume ( CClientSound& Sound, float& fVolume )
 {
@@ -7021,11 +7084,33 @@ bool CStaticFunctionDefinitions::GetSoundVolume ( CClientSound& Sound, float& fV
     return true;
 }
 
+bool CStaticFunctionDefinitions::GetSoundVolume ( CClientPlayer& Player, float& fVolume )
+{
+    fVolume = 0.0f;
+    CClientPlayerVoice * pVoice = Player.GetVoice();
+    if ( pVoice != NULL )
+    {
+        fVolume = pVoice->GetVolume ( );
+        return true;
+    }
+    return false;
+}
 
 bool CStaticFunctionDefinitions::SetSoundSpeed ( CClientSound& Sound, float fSpeed )
 {
     Sound.SetPlaybackSpeed ( fSpeed );
     return true;
+}
+
+bool CStaticFunctionDefinitions::SetSoundSpeed ( CClientPlayer& Player, float fSpeed )
+{
+    CClientPlayerVoice * pVoice = Player.GetVoice();
+    if ( pVoice != NULL )
+    {
+        pVoice->SetPlaybackSpeed ( fSpeed );
+        return true;
+    }
+    return false;
 }
 
 bool CStaticFunctionDefinitions::SetSoundProperties ( CClientSound& Sound, float fSampleRate, float fTempo, float fPitch, bool bReversed )
@@ -7100,9 +7185,78 @@ float* CStaticFunctionDefinitions::GetSoundFFTData ( CClientSound& Sound, int iL
     }
 }
 
+float* CStaticFunctionDefinitions::GetSoundFFTData ( CClientPlayer& Player, int iLength, int iBands )
+{
+    CClientPlayerVoice * pVoice = Player.GetVoice();
+    if ( pVoice != NULL && Player.GetVoice()->IsActive ( ) )
+    {
+        // Get our FFT Data
+        float* fData = pVoice->GetFFTData ( iLength );
+        if ( iBands != 0 && fData != NULL )
+        {
+            // Post Processing option
+            // i.e. Cram it all into iBands
+            // allocate our floats with room for bands
+            float* fDataNew = new float [ iBands ];
+            // Set our count
+            int bC = 0;
+            // Minus one from bands save us doing it every time iBands is used.
+            iBands--;
+            // while we are less than iBands
+            for ( int x = 0;x <= iBands;x++ ) 
+            {
+                // Peak = 0
+                float fPeak=0.0;
+
+                // Pick a range based on our counter
+                double bB = pow ( 2,x * 10.0 / iBands );
+
+                // if our range is greater than the # of data we have cap it
+                if ( bB > ( iLength / 2 ) - 1 )
+                    bB = ( iLength / 2 ) - 1;
+
+                // if our range is less than or equal to our count make sure we have at least one thing to read
+                if ( bB <= bC )
+                    bB = bC + 1;
+
+                // While our counter is less than the number of samples to read
+                while ( bC < bB )
+                {
+                    // if our peak is lower than the data value
+                    if ( fPeak < fData[ 1+bC ] )
+                    {
+                        // Set our peak and fDataNew variables accordingly
+                        fDataNew [ x ]=fData [ 1+bC ];
+                        fPeak = fData [ 1 + bC ];
+                    }
+                    // Increment our counter
+                    bC = bC + 1;
+                }
+            }
+            // Delte fData as it's not needed and return fDataNew
+            delete[] fData;
+            return fDataNew;
+        }
+        else
+        {
+            return fData;
+        }
+    }
+    return NULL;
+}
 float* CStaticFunctionDefinitions::GetSoundWaveData ( CClientSound& Sound, int iLength )
 {
     return Sound.GetWaveData ( iLength );
+}
+
+float* CStaticFunctionDefinitions::GetSoundWaveData ( CClientPlayer& Player, int iLength )
+{
+    CClientPlayerVoice * pVoice = Player.GetVoice();
+    if ( pVoice != NULL && pVoice->IsActive ( ) )
+    {
+        return pVoice->GetWaveData( iLength );
+    }
+    return NULL;
 }
 
 bool CStaticFunctionDefinitions::IsSoundPanEnabled ( CClientSound& Sound )
@@ -7124,6 +7278,19 @@ bool CStaticFunctionDefinitions::GetSoundLevelData ( CClientSound& Sound, DWORD&
     return dwData != 0;
 }
 
+bool CStaticFunctionDefinitions::GetSoundLevelData ( CClientPlayer& Player, DWORD& dwLeft, DWORD& dwRight )
+{
+    CClientPlayerVoice * pVoice = Player.GetVoice();
+    if ( pVoice != NULL && pVoice->IsActive ( ) )
+    {
+        DWORD dwData = pVoice->GetLevelData ( );
+        dwLeft = LOWORD(dwData);
+        dwRight = HIWORD(dwData);
+        return dwData != 0;
+    }
+    return false;
+}
+
 bool CStaticFunctionDefinitions::GetSoundBPM ( CClientSound& Sound, float& fBPM )
 {
     fBPM = Sound.GetSoundBPM ( );
@@ -7136,6 +7303,16 @@ bool CStaticFunctionDefinitions::GetSoundSpeed ( CClientSound& Sound, float& fSp
     return true;
 }
 
+bool CStaticFunctionDefinitions::GetSoundSpeed ( CClientPlayer& Player, float& fSpeed )
+{
+    CClientPlayerVoice * pVoice = Player.GetVoice();
+    if ( pVoice != NULL )
+    {
+        fSpeed = pVoice->GetPlaybackSpeed ();
+        return true;
+    }
+    return false;
+}
 
 bool CStaticFunctionDefinitions::SetSoundMinDistance ( CClientSound& Sound, float fDistance )
 {
@@ -7143,20 +7320,17 @@ bool CStaticFunctionDefinitions::SetSoundMinDistance ( CClientSound& Sound, floa
     return true;
 }
 
-
 bool CStaticFunctionDefinitions::GetSoundMinDistance ( CClientSound& Sound, float& fDistance )
 {
     fDistance = Sound.GetMinDistance ();
     return true;
 }
 
-
 bool CStaticFunctionDefinitions::SetSoundMaxDistance ( CClientSound& Sound, float fDistance )
 {
     Sound.SetMaxDistance ( fDistance );
     return true;
 }
-
 
 bool CStaticFunctionDefinitions::GetSoundMaxDistance ( CClientSound& Sound, float& fDistance )
 {
@@ -7178,6 +7352,22 @@ bool CStaticFunctionDefinitions::SetSoundEffectEnabled ( CClientSound& Sound, co
         if ( Sound.SetFxEffect ( iFxEffect, bEnable ) )
             return true;
 
+    return false;
+}
+
+
+bool CStaticFunctionDefinitions::SetSoundEffectEnabled ( CClientPlayer& Player, const SString& strEffectName, bool bEnable )
+{
+    CClientPlayerVoice * pVoice = Player.GetVoice();
+    if ( pVoice != NULL )
+    {
+        int iFxEffect = m_pSoundManager->GetFxEffectFromName ( strEffectName );
+
+        if ( iFxEffect >= 0 )
+            if ( pVoice->SetFxEffect ( iFxEffect, bEnable ) )
+                return true;
+
+    }
     return false;
 }
 

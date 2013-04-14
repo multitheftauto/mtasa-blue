@@ -50,7 +50,6 @@ class CXMLNode;
 
 
 // Lua push/pop macros for our datatypes
-CClientRadarMarker*     lua_toblip          ( lua_State* luaVM, int iArgument );
 CClientColModel*        lua_tocolmodel      ( lua_State* luaVM, int iArgument );
 CClientColShape*        lua_tocolshape      ( lua_State* luaVM, int iArgument );
 CScriptFile*            lua_tofile          ( lua_State* luaVM, int iArgument );
@@ -65,14 +64,11 @@ CClientPlayer*          lua_toplayer        ( lua_State* luaVM, int iArgument );
 CClientProjectile*      lua_toprojectile    ( lua_State* luaVM, int iArgument );
 CLuaTimer*              lua_totimer         ( lua_State* luaVM, int iArgument );
 CResource*              lua_toresource      ( lua_State* luaVM, int iArgument );
-CClientSound*           lua_tosound         ( lua_State* luaVM, int iArgument );
 CClientTeam*            lua_toteam          ( lua_State* luaVM, int iArgument );
 CClientTXD*             lua_totxd           ( lua_State* luaVM, int iArgument );
-CClientVehicle*         lua_tovehicle       ( lua_State* luaVM, int iArgument );
 CClientWater*           lua_towater         ( lua_State* luaVM, int iArgument );
 CClientWeapon*          lua_toweapon        ( lua_State* luaVM, int iArgument );
 CXMLNode*               lua_toxmlnode       ( lua_State* luaVM, int iArgument );
-CClientRadarArea*       lua_toradararea     ( lua_State* luaVM, int iArgument );
 
 void                    lua_pushelement     ( lua_State* luaVM, CClientEntity* pElement );
 void                    lua_pushresource    ( lua_State* luaVM, CResource* pElement );

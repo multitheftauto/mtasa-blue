@@ -624,6 +624,27 @@ public:
     static bool                         GetSoundMetaTags                    ( CClientSound& Sound, const SString& strFormat, SString& strMetaTags );
     static bool                         SetSoundEffectEnabled               ( CClientSound& Sound, const SString& strEffectName, bool bEnable );
 
+    // Player Voice Sound Functions
+
+    static bool                         SetSoundPosition                    ( CClientPlayer& Player, double dPosition );
+    static bool                         GetSoundPosition                    ( CClientPlayer& Player, double& dPosition );
+    static bool                         GetSoundLength                      ( CClientPlayer& Player, double& dLength );
+    static bool                         SetSoundPaused                      ( CClientPlayer& Sound, bool bPaused );
+    static bool                         IsSoundPaused                       ( CClientPlayer& Sound, bool& bPaused );
+    static bool                         SetSoundVolume                      ( CClientPlayer& Player, float fVolume );
+    static bool                         GetSoundVolume                      ( CClientPlayer& Player, float& fVolume );
+    static bool                         SetSoundSpeed                       ( CClientPlayer& Player, float fSpeed );
+    static float*                       GetSoundFFTData                     ( CClientPlayer& Player, int iLength, int iBands = 0 );
+    static float*                       GetSoundWaveData                    ( CClientPlayer& Player, int iLength );
+    static bool                         GetSoundLevelData                   ( CClientPlayer& Player, DWORD& dwLeft, DWORD& dwRight );
+    static bool                         GetSoundSpeed                       ( CClientPlayer& Player, float& fSpeed );
+    static bool                         SetSoundMinDistance                 ( CClientPlayer& Player, float fDistance );
+    static bool                         GetSoundMinDistance                 ( CClientPlayer& Player, float& fDistance );
+    static bool                         SetSoundMaxDistance                 ( CClientPlayer& Player, float fDistance );
+    static bool                         GetSoundMaxDistance                 ( CClientPlayer& Player, float& fDistance );
+    static bool                         GetSoundMetaTags                    ( CClientPlayer& Player, const SString& strFormat, SString& strMetaTags );
+    static bool                         SetSoundEffectEnabled               ( CClientPlayer& Player, const SString& strEffectName, bool bEnable );
+    
 
     // Handling funcs 
     static eHandlingProperty    GetVehicleHandlingEnum              ( std::string strProperty );

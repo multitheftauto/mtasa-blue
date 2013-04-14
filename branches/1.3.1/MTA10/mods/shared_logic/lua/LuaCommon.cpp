@@ -175,16 +175,6 @@ CResource* lua_toresource ( lua_State* luaVM, int iArgument )
     return g_pClientGame->GetResourceManager ()->GetResourceFromScriptID ( reinterpret_cast < unsigned long > ( lua_touserdata ( luaVM, iArgument ) ) );
 }
 
-CClientSound* lua_tosound ( lua_State* luaVM, int iArgument )
-{
-    CClientEntity* pElement = lua_toelement ( luaVM, iArgument );
-    if ( pElement && pElement->GetType () == CCLIENTSOUND )
-    {
-        return static_cast < CClientSound* > ( pElement );
-    }
-
-    return NULL;
-}
 
 CClientTeam* lua_toteam ( lua_State* luaVM, int iArgument )
 {

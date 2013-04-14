@@ -98,6 +98,7 @@ public:
     bool                            IsOnMyTeam              ( CClientPlayer* pPlayer );
 
     CClientPlayerVoice*             GetVoice                ( void )                                { return m_voice; }
+    void                            SetPlayerVoice          ( CClientPlayerVoice* voice )           { m_voice = voice; }
 
     inline float                    GetNametagDistance      ( void )                                { return m_fNametagDistance; }
     inline void                     SetNametagDistance      ( float fDistance )                     { m_fNametagDistance = fDistance; }
@@ -106,7 +107,7 @@ public:
     inline void                     SetDeadOnNetwork        ( bool bDead )                          { m_bNetworkDead = bDead; }
 
     void                            Reset                   ( void );
-
+    
     inline CClientManager*          GetManager              ( void )                                { return m_pManager; }
 
     void                            DischargeWeapon         ( eWeaponType weaponType, const CVector& vecStart, const CVector& vecEnd );
