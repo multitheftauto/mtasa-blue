@@ -85,7 +85,7 @@ class CRenderWare {
     virtual bool                ReplacePartModels           ( RpClump * pClump, RpAtomicContainer * pAtomics, unsigned int uiAtomics, const char * szName ) = 0;
     virtual void                PulseWorldTextureWatch      ( void ) = 0;
     virtual void                GetModelTextureNames        ( std::vector < SString >& outNameList, ushort usModelID ) = 0;
-    virtual const SString&      GetTextureName              ( CD3DDUMMY* pD3DData ) = 0;
+    virtual const char*         GetTextureName              ( CD3DDUMMY* pD3DData ) = 0;
 
     virtual void                SetRenderingClientEntity    ( CClientEntityBase* pClientEntity, ushort usModelId, int iTypeMask ) = 0;
     virtual SShaderItemLayers*  GetAppliedShaderForD3DData  ( CD3DDUMMY* pD3DData ) = 0;
