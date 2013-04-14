@@ -417,89 +417,119 @@ void CSettings::CreateGUI ( void )
     m_pLabelRadioVolume->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32.0f ), false );
     m_pLabelRadioVolume->GetPosition ( vecTemp, false );
     m_pLabelRadioVolume->AutoSize ( );
+    m_pLabelRadioVolume->GetSize ( vecSize );
 
     m_pAudioRadioVolume = reinterpret_cast < CGUIScrollBar* > ( pManager->CreateScrollBar ( true, pTabAudio ) );
-    m_pAudioRadioVolume->SetPosition ( CVector2D ( vecTemp.fX + 80.0f, vecTemp.fY ) );
+    m_pAudioRadioVolume->SetPosition ( CVector2D ( vecTemp.fX + vecSize.fX + 5.0f, vecTemp.fY ) );
+    m_pAudioRadioVolume->GetPosition ( vecTemp, false );
     m_pAudioRadioVolume->SetSize ( CVector2D ( 160.0f, 20.0f ) );
+    m_pAudioRadioVolume->GetSize ( vecSize );
     m_pAudioRadioVolume->SetProperty ( "StepSize", "0.01" );
 
     m_pLabelRadioVolumeValue = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, "0%") );
-    m_pLabelRadioVolumeValue->SetPosition ( CVector2D ( vecTemp.fX + 250.0f, vecTemp.fY ) );
+    m_pLabelRadioVolumeValue->SetPosition ( CVector2D ( vecTemp.fX + vecSize.fX + 5.0f, vecTemp.fY ) );
     m_pLabelRadioVolumeValue->AutoSize ( "100%" );
+
+    vecTemp.fX = 11;
 
     m_pLabelSFXVolume = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, _("SFX volume:") ) );
     m_pLabelSFXVolume->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32.0f ) );
     m_pLabelSFXVolume->GetPosition ( vecTemp, false );
     m_pLabelSFXVolume->AutoSize ( );
-
-    m_pLabelSFXVolumeValue = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, "0%") );
-    m_pLabelSFXVolumeValue->SetPosition ( CVector2D ( vecTemp.fX + 250.0f, vecTemp.fY ) );
-    m_pLabelSFXVolumeValue->AutoSize ( "100%" );
+    m_pLabelSFXVolume->GetSize ( vecSize );
 
     m_pAudioSFXVolume = reinterpret_cast < CGUIScrollBar* > ( pManager->CreateScrollBar ( true, pTabAudio ) );
-    m_pAudioSFXVolume->SetPosition ( CVector2D ( vecTemp.fX + 80.0f, vecTemp.fY ) );
+    m_pAudioSFXVolume->SetPosition ( CVector2D ( vecTemp.fX + vecSize.fX + 5.0f, vecTemp.fY ) );
+    m_pAudioSFXVolume->GetPosition ( vecTemp, false );
     m_pAudioSFXVolume->SetSize ( CVector2D ( 160.0f, 20.0f ) );
+    m_pAudioSFXVolume->GetSize ( vecSize );
     m_pAudioSFXVolume->SetProperty ( "StepSize", "0.01" );
 
+    m_pLabelSFXVolumeValue = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, "0%") );
+    m_pLabelSFXVolumeValue->SetPosition ( CVector2D ( vecTemp.fX + vecSize.fX + 5.0f, vecTemp.fY ) );
+    m_pLabelSFXVolumeValue->GetPosition ( vecTemp, false );
+    m_pLabelSFXVolumeValue->AutoSize ( "100%" );
+    m_pLabelSFXVolumeValue->GetSize ( vecSize );
+
     m_pCheckBoxAudioEqualizer = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabAudio, _("Radio Equalizer"), true ) );
-    m_pCheckBoxAudioEqualizer->SetPosition ( CVector2D ( vecTemp.fX + 300.0f, vecTemp.fY - 3.0f ) );
+    m_pCheckBoxAudioEqualizer->SetPosition ( CVector2D ( vecTemp.fX + vecSize.fX + 5.0f, vecTemp.fY - 3.0f ) );
     m_pCheckBoxAudioEqualizer->SetSize ( CVector2D ( 224.0f, 16.0f ) );
 
     m_pCheckBoxAudioAutotune = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabAudio, _("Radio Auto-tune"), true ) );
-    m_pCheckBoxAudioAutotune->SetPosition ( CVector2D ( vecTemp.fX + 300.0f, vecTemp.fY + 13.0f ) );
+    m_pCheckBoxAudioAutotune->SetPosition ( CVector2D ( vecTemp.fX + vecSize.fX + 5.0f, vecTemp.fY + 13.0f ) );
     m_pCheckBoxAudioAutotune->SetSize ( CVector2D ( 224.0f, 16.0f ) );
+
+    vecTemp.fX = 11;
 
     m_pLabelMTAVolume = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, _("MTA volume:") ) );
     m_pLabelMTAVolume->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32.0f ) );
     m_pLabelMTAVolume->GetPosition ( vecTemp, false );
     m_pLabelMTAVolume->AutoSize ( );
-
-    m_pLabelMTAVolumeValue = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, "0%") );
-    m_pLabelMTAVolumeValue->SetPosition ( CVector2D ( vecTemp.fX + 250.0f, vecTemp.fY ) );
-    m_pLabelMTAVolumeValue->AutoSize ( "100%" );
+    m_pLabelMTAVolume->GetSize ( vecSize );
 
     m_pAudioMTAVolume = reinterpret_cast < CGUIScrollBar* > ( pManager->CreateScrollBar ( true, pTabAudio ) );
-    m_pAudioMTAVolume->SetPosition ( CVector2D ( vecTemp.fX + 80.0f, vecTemp.fY ) );
+    m_pAudioMTAVolume->SetPosition ( CVector2D ( vecTemp.fX + vecSize.fX + 5.0f, vecTemp.fY ) );
+    m_pAudioMTAVolume->GetPosition ( vecTemp, false );
     m_pAudioMTAVolume->SetSize ( CVector2D ( 160.0f, 20.0f ) );
+    m_pAudioMTAVolume->GetSize ( vecSize );
     m_pAudioMTAVolume->SetProperty ( "StepSize", "0.01" );
+
+    m_pLabelMTAVolumeValue = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, "0%") );
+    m_pLabelMTAVolumeValue->SetPosition ( CVector2D ( vecTemp.fX + vecSize.fX + 5.0f, vecTemp.fY ) );
+    m_pLabelMTAVolumeValue->AutoSize ( "100%" );
+
+    vecTemp.fX = 11;
 
     m_pLabelVoiceVolume = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, _("Voice volume:") ) );
     m_pLabelVoiceVolume->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32.0f ) );
     m_pLabelVoiceVolume->GetPosition ( vecTemp, false );
     m_pLabelVoiceVolume->AutoSize ( );
-
-    m_pLabelVoiceVolumeValue = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, "0%") );
-    m_pLabelVoiceVolumeValue->SetPosition ( CVector2D ( vecTemp.fX + 250.0f, vecTemp.fY ) );
-    m_pLabelVoiceVolumeValue->AutoSize ( "100%" );
+    m_pLabelVoiceVolume->GetSize ( vecSize );
 
     m_pAudioVoiceVolume = reinterpret_cast < CGUIScrollBar* > ( pManager->CreateScrollBar ( true, pTabAudio ) );
-    m_pAudioVoiceVolume->SetPosition ( CVector2D ( vecTemp.fX + 80.0f, vecTemp.fY ) );
+    m_pAudioVoiceVolume->SetPosition ( CVector2D ( vecTemp.fX + vecSize.fX + 5.0f, vecTemp.fY ) );
+    m_pAudioVoiceVolume->GetPosition ( vecTemp, false );
     m_pAudioVoiceVolume->SetSize ( CVector2D ( 160.0f, 20.0f ) );
+    m_pAudioVoiceVolume->GetSize ( vecSize );
     m_pAudioVoiceVolume->SetProperty ( "StepSize", "0.01" );
+
+    m_pLabelVoiceVolumeValue = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, "0%") );
+    m_pLabelVoiceVolumeValue->SetPosition ( CVector2D ( vecTemp.fX + vecSize.fX + 5.0f, vecTemp.fY ) );
+    m_pLabelVoiceVolumeValue->AutoSize ( "100%" );
+
+    vecTemp.fX = 11;
 
     m_pAudioUsertrackLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, _("Usertrack options") ) );
     m_pAudioUsertrackLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 40.0f ), false );
     m_pAudioUsertrackLabel->GetPosition ( vecTemp, false );
-    m_pAudioUsertrackLabel->AutoSize ( );
+    m_pAudioUsertrackLabel->AutoSize ( NULL, 15.0f );
     m_pAudioUsertrackLabel->SetFont ( "default-bold-small" );
+
+    vecTemp.fX = 11;
 
     m_pLabelUserTrackMode = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, _("Play mode:") ) );
     m_pLabelUserTrackMode->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32.0f ) );
     m_pLabelUserTrackMode->GetPosition ( vecTemp, false );
     m_pLabelUserTrackMode->AutoSize ( );
+    m_pLabelUserTrackMode->GetSize ( vecSize );
 
     m_pComboUsertrackMode = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabAudio, "" ) );
-    m_pComboUsertrackMode->SetPosition ( CVector2D ( vecTemp.fX + 80.0f, vecTemp.fY ) );
+    m_pComboUsertrackMode->SetPosition ( CVector2D ( vecTemp.fX + vecSize.fX + 5.0f, vecTemp.fY ) );
+    m_pComboUsertrackMode->GetPosition ( vecTemp, false );
     m_pComboUsertrackMode->SetSize ( CVector2D ( 160.0f, 80.0f ) );
+    m_pComboUsertrackMode->GetSize ( vecSize );
     m_pComboUsertrackMode->AddItem ( _("Radio") )->SetData ( (void*)0 );
     m_pComboUsertrackMode->AddItem ( _("Random") )->SetData ( (void*)1 );
     m_pComboUsertrackMode->AddItem ( _("Sequential") )->SetData ( (void*)2 );
     m_pComboUsertrackMode->SetReadOnly ( true );
 
+    vecTemp.fX = 11;
+
     m_pCheckBoxUserAutoscan = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabAudio, _("Automatic Media Scan"), true ) );
     m_pCheckBoxUserAutoscan->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32.0f ) );
-    m_pCheckBoxUserAutoscan->SetSize ( CVector2D ( 224.0f, 16.0f ) );
     m_pCheckBoxUserAutoscan->GetPosition ( vecTemp, false );
+    m_pCheckBoxUserAutoscan->SetSize ( CVector2D ( 224.0f, 16.0f ) );
+    m_pCheckBoxUserAutoscan->GetSize ( vecSize );
 
     m_pAudioDefButton = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( pTabAudio, _("Load defaults") ) );
     m_pAudioDefButton->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnAudioDefaultClick, this ) );
