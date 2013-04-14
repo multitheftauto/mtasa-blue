@@ -14,6 +14,24 @@
 #include "StdInc.h"
 #include "CRenderWareSA.ShaderMatching.h"
 
+#define ADDR_CCustomCarPlateMgr_CreatePlateTexture_TextureSetName        0x06FDF40
+#define ADDR_CCustomRoadsignMgr_CreateRoadsignTexture_TextureSetName     0x06FED49
+#define ADDR_CClothesBuilder_ConstructTextures_Start                     0x05A6040
+#define ADDR_CClothesBuilder_ConstructTextures_End                       0x05A6520
+#define ADDR_CVehicle_DoHeadLightBeam_RenderPrimitive                    0x06E13CD
+#define ADDR_CHeli_SearchLightCone_RenderPrimitive                       0x06C62AD
+#define ADDR_CWaterCannon_Render_RenderPrimitive                         0x072956B
+
+enum
+{
+    RT_NONE,
+    RT_2DI,
+    RT_2DNI,
+    RT_3DI,
+    RT_3DNI,
+};
+
+int CRenderWareSA::ms_iRenderingType = 0;
 
 ////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////
@@ -176,7 +194,8 @@ void CRenderWareSA::PulseWorldTextureWatch ( void )
                 RwTexture* texture = *iter;
                 const char* szTextureName = texture->name;
                 CD3DDUMMY* pD3DData = texture->raster ? (CD3DDUMMY*)texture->raster->renderResource : NULL;
-                StreamingAddedTexture ( action.usTxdId, szTextureName, pD3DData );
+                if ( !MapContains( m_SpecialTextures, texture ) )
+                    StreamingAddedTexture ( action.usTxdId, szTextureName, pD3DData );
             }
         }
         else
@@ -280,7 +299,7 @@ void CRenderWareSA::ScriptAddedTxd ( RwTexDictionary *pTxd )
 void CRenderWareSA::ScriptRemovedTexture ( RwTexture* pTex )
 {
     TIMING_CHECKPOINT( "+ScriptRemovedTexture" );
-    // Find all TexInfo's for this txd
+    // Find TexInfo for this script added texture
     for ( std::multimap < ushort, STexInfo* >::iterator iter = m_TexInfoMap.begin () ; iter != m_TexInfoMap.end () ; )
     {
         STexInfo* pTexInfo = iter->second;
@@ -296,6 +315,62 @@ void CRenderWareSA::ScriptRemovedTexture ( RwTexture* pTex )
     TIMING_CHECKPOINT( "-ScriptRemovedTexture" );
 }
 
+
+////////////////////////////////////////////////////////////////
+//
+// CRenderWareSA::SpecialAddedTexture
+//
+// For game textures that are created (not loaded)
+//
+////////////////////////////////////////////////////////////////
+void CRenderWareSA::SpecialAddedTexture ( RwTexture* texture, const char* szTextureName )
+{
+    if ( !szTextureName )
+        szTextureName = texture->name;
+
+    OutputDebug( SString( "Adding special texture %s", szTextureName ) );
+
+    CD3DDUMMY* pD3DData = texture->raster ? (CD3DDUMMY*)texture->raster->renderResource : NULL;
+
+    // Added texture
+    STexInfo* pTexInfo = CreateTexInfo ( texture, szTextureName, pD3DData );
+    OnTextureStreamIn ( pTexInfo );
+
+    MapInsert( m_SpecialTextures, texture );
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// CRenderWareSA::SpecialRemovedTexture
+//
+// For game textures that are created (not loaded)
+//
+////////////////////////////////////////////////////////////////
+void CRenderWareSA::SpecialRemovedTexture ( RwTexture* pTex )
+{
+    if ( !MapContains( m_SpecialTextures, pTex ) )
+        return;
+
+    OutputDebug( SString( "Removing special texture (%s)", pTex->name ) );
+
+    MapRemove( m_SpecialTextures, pTex );
+
+    // Find TexInfo for this special texture
+    for ( std::multimap < ushort, STexInfo* >::iterator iter = m_TexInfoMap.begin () ; iter != m_TexInfoMap.end () ; )
+    {
+        STexInfo* pTexInfo = iter->second;
+        if ( pTexInfo->texTag == pTex )
+        {
+            OutputDebug( SString( "     %s", *pTexInfo->strTextureName ) );
+            OnTextureStreamOut ( pTexInfo );
+            DestroyTexInfo ( pTexInfo );
+            m_TexInfoMap.erase ( iter++ );
+        }
+        else
+            ++iter;
+    }
+}
 
 
 ////////////////////////////////////////////////////////////////
@@ -370,9 +445,9 @@ SShaderItemLayers* CRenderWareSA::GetAppliedShaderForD3DData ( CD3DDUMMY* pD3DDa
 {
     m_uiReplacementRequestCounter++;
 
-    // If rendering cj, use one special texinfo for all the textures
-    if ( m_iRenderingEntityType == TYPE_MASK_PED && m_usRenderingEntityModelId == 0 )
-        pD3DData = FAKE_D3DTEXTURE_CJ;
+    // If rendering with no texture, and doing an 3d model like render, use the 'unnamed' texinfo
+    if ( pD3DData == NULL && CRenderWareSA::ms_iRenderingType == RT_NONE )
+        pD3DData = FAKE_D3DTEXTURE_NO_TEXTURE;
 
     STexInfo* pTexInfo = MapFindRef ( m_D3DDataTexInfoMap, pD3DData );
 
@@ -403,9 +478,15 @@ SShaderItemLayers* CRenderWareSA::GetAppliedShaderForD3DData ( CD3DDUMMY* pD3DDa
 // Add additive match for a shader+entity combo
 //
 ////////////////////////////////////////////////////////////////
-void CRenderWareSA::AppendAdditiveMatch ( CSHADERDUMMY* pShaderData, CClientEntityBase* pClientEntity, const char* strTextureNameMatch, float fShaderPriority, bool bShaderLayered, int iTypeMask, uint uiShaderCreateTime, bool bShaderUsesVertexShader, bool bAppendLayers )
+void CRenderWareSA::AppendAdditiveMatch ( CSHADERDUMMY* pShaderData, CClientEntityBase* pClientEntity, const char* szTextureNameMatch, float fShaderPriority, bool bShaderLayered, int iTypeMask, uint uiShaderCreateTime, bool bShaderUsesVertexShader, bool bAppendLayers )
 {
     TIMING_CHECKPOINT( "+AppendAddMatch" );
+
+    // Make previous versions usage of "CJ" work with new way
+    SString strTextureNameMatch = szTextureNameMatch;
+    if ( strTextureNameMatch.CompareI( "cj" ) )
+        strTextureNameMatch = "cj_ped_*";
+
     m_pMatchChannelManager->AppendAdditiveMatch ( pShaderData, pClientEntity, strTextureNameMatch, fShaderPriority, bShaderLayered, iTypeMask, uiShaderCreateTime, bShaderUsesVertexShader, bAppendLayers );
     TIMING_CHECKPOINT( "-AppendAddMatch" );
 }
@@ -418,9 +499,15 @@ void CRenderWareSA::AppendAdditiveMatch ( CSHADERDUMMY* pShaderData, CClientEnti
 // Add subtractive match for a shader+entity combo
 //
 ////////////////////////////////////////////////////////////////
-void CRenderWareSA::AppendSubtractiveMatch ( CSHADERDUMMY* pShaderData, CClientEntityBase* pClientEntity, const char* strTextureNameMatch )
+void CRenderWareSA::AppendSubtractiveMatch ( CSHADERDUMMY* pShaderData, CClientEntityBase* pClientEntity, const char* szTextureNameMatch )
 {
     TIMING_CHECKPOINT( "+AppendSubMatch" );
+
+    // Make previous versions usage of "CJ" work with new way
+    SString strTextureNameMatch = szTextureNameMatch;
+    if ( strTextureNameMatch.CompareI( "cj" ) )
+        strTextureNameMatch = "cj_ped_*";
+
     m_pMatchChannelManager->AppendSubtractiveMatch ( pShaderData, pClientEntity, strTextureNameMatch );
     TIMING_CHECKPOINT( "-AppendSubMatch" );
 }
@@ -522,10 +609,10 @@ void CRenderWareSA::GetShaderReplacementStats ( SShaderReplacementStats& outStat
 ////////////////////////////////////////////////////////////////
 void CRenderWareSA::Initialize ( void )
 {
-    if ( !MapContains( m_D3DDataTexInfoMap, FAKE_D3DTEXTURE_CJ ) )
+    if ( !MapContains( m_D3DDataTexInfoMap, FAKE_D3DTEXTURE_NO_TEXTURE ) )
     {
-        // Make a fake texinfo to handle all CJ textures
-        STexInfo* pTexInfo = CreateTexInfo( FAKE_RWTEXTURE_CJ, "CJ", FAKE_D3DTEXTURE_CJ );
+        // Make a fake texinfo to handle all non-textures
+        STexInfo* pTexInfo = CreateTexInfo( FAKE_RWTEXTURE_NO_TEXTURE, FAKE_NAME_NO_TEXTURE, FAKE_D3DTEXTURE_NO_TEXTURE );
         OnTextureStreamIn( pTexInfo );
     }
 }
@@ -602,4 +689,330 @@ void CRenderWareSA::SetGTAVertexShadersEnabled( bool bEnable )
         MemPut < BYTE > ( pSkinAtomic + 3, 0x47 );
         MemPut < BYTE > ( pSkinAtomic + 4, 0x20 );
     }
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+// RwTextureSetName
+//
+// Check each created texture, so we can add special ones to the shader system
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+void OnMY_RwTextureSetName( DWORD dwAddrCalledFrom, RwTexture* pTexture, const char* szName )
+{
+    SString strReplacementName;
+    if ( dwAddrCalledFrom == ADDR_CCustomCarPlateMgr_CreatePlateTexture_TextureSetName )
+        strReplacementName = "custom_car_plate";
+    else
+    if ( dwAddrCalledFrom == ADDR_CCustomRoadsignMgr_CreateRoadsignTexture_TextureSetName )
+        strReplacementName = "custom_roadsign_text";
+    else
+    if ( dwAddrCalledFrom > ADDR_CClothesBuilder_ConstructTextures_Start && dwAddrCalledFrom < ADDR_CClothesBuilder_ConstructTextures_End )
+        strReplacementName = SString( "cj_ped_%s", szName );
+
+    if ( !strReplacementName.empty() )
+        pGame->GetRenderWareSA()->SpecialAddedTexture( pTexture, strReplacementName );
+}
+
+// Hook info
+#define HOOKPOS_RwTextureSetName_US     0x7F38A0
+#define HOOKSIZE_RwTextureSetName_US    9
+#define HOOKPOS_RwTextureSetName_EU     0x7F38D0
+#define HOOKSIZE_RwTextureSetName_EU    9
+DWORD RETURN_RwTextureSetName_US =      0x7F38A9;
+DWORD RETURN_RwTextureSetName_EU =      0x7F38D9;
+DWORD RETURN_RwTextureSetName_BOTH =    0;
+void _declspec(naked) HOOK_RwTextureSetName ()
+{
+    _asm
+    {
+        pushad
+        push    [esp+32+4*2]
+        push    [esp+32+4*2]
+        push    [esp+32+4*2]
+        call    OnMY_RwTextureSetName
+        add     esp, 4*3
+        popad
+
+        sub     esp, 8
+        mov     ecx, ds:0x0C97B24
+        jmp     RETURN_RwTextureSetName_BOTH
+    }
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+// RwTextureDestroy_Mid
+//
+// Check each destroyed texture, so we can remove special ones from the shader system
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+void OnMY_RwTextureDestroy_Mid( RwTexture* pTexture )
+{
+    pGame->GetRenderWareSA()->SpecialRemovedTexture( pTexture );
+}
+
+// Hook info
+#define HOOKPOS_RwTextureDestroy_Mid_US     0x07F3834
+#define HOOKSIZE_RwTextureDestroy_Mid_US    5
+#define HOOKPOS_RwTextureDestroy_Mid_EU     0x07F3874
+#define HOOKSIZE_RwTextureDestroy_Mid_EU    5
+DWORD RETURN_RwTextureDestroy_Mid_US =      0x07F3839;
+DWORD RETURN_RwTextureDestroy_Mid_EU =      0x07F3879;
+DWORD RETURN_RwTextureDestroy_Mid_BOTH =    0;
+void _declspec(naked) HOOK_RwTextureDestroy_Mid ()
+{
+    _asm
+    {
+        pushad
+        push    esi
+        call    OnMY_RwTextureDestroy_Mid
+        add     esp, 4*1
+        popad
+
+        push    0x08E23CC
+        jmp     RETURN_RwTextureDestroy_Mid_BOTH
+    }
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+// RwIm3DRenderIndexedPrimitive
+//
+// Classify what is going on here
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+void OnMY_RwIm3DRenderIndexedPrimitive_Pre( DWORD dwAddrCalledFrom )
+{
+    if ( dwAddrCalledFrom == ADDR_CVehicle_DoHeadLightBeam_RenderPrimitive
+        || dwAddrCalledFrom == ADDR_CHeli_SearchLightCone_RenderPrimitive
+        || dwAddrCalledFrom == ADDR_CWaterCannon_Render_RenderPrimitive )
+    {
+        CRenderWareSA::ms_iRenderingType = RT_NONE; // Treat these items like world models
+    }
+    else
+    {
+        CRenderWareSA::ms_iRenderingType = RT_3DI;
+    }
+}
+
+void OnMY_RwIm3DRenderIndexedPrimitive_Post( DWORD dwAddrCalledFrom )
+{
+    CRenderWareSA::ms_iRenderingType = RT_NONE;
+}
+
+// Hook info
+#define HOOKPOS_RwIm3DRenderIndexedPrimitive_US     0x07EF550
+#define HOOKSIZE_RwIm3DRenderIndexedPrimitive_US    5
+#define HOOKPOS_RwIm3DRenderIndexedPrimitive_EU     0x07EF590
+#define HOOKSIZE_RwIm3DRenderIndexedPrimitive_EU    5
+DWORD RETURN_RwIm3DRenderIndexedPrimitive_US =      0x07EF555;
+DWORD RETURN_RwIm3DRenderIndexedPrimitive_EU =      0x07EF595;
+DWORD RETURN_RwIm3DRenderIndexedPrimitive_BOTH =    0;
+void _declspec(naked) HOOK_RwIm3DRenderIndexedPrimitive ()
+{
+    _asm
+    {
+        pushad
+        push    [esp+32+4*0]
+        call    OnMY_RwIm3DRenderIndexedPrimitive_Pre
+        add     esp, 4*1
+        popad
+
+        push    [esp+4*3]
+        push    [esp+4*3]
+        push    [esp+4*3]
+        call inner
+        add     esp, 4*3
+
+        pushad
+        push    [esp+32+4*0]
+        call    OnMY_RwIm3DRenderIndexedPrimitive_Post
+        add     esp, 4*1
+        popad
+        retn
+inner:
+        mov     eax, ds:0x0C9C078
+        jmp     RETURN_RwIm3DRenderIndexedPrimitive_BOTH
+    }
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+// RwIm3DRenderPrimitive
+//
+// Note that RwIm3DRenderPrimitive is being called to render something
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+void OnMY_RwIm3DRenderPrimitive_Pre( DWORD dwAddrCalledFrom )
+{
+    CRenderWareSA::ms_iRenderingType = RT_3DNI;
+}
+
+void OnMY_RwIm3DRenderPrimitive_Post( DWORD dwAddrCalledFrom )
+{
+    CRenderWareSA::ms_iRenderingType = RT_NONE;
+}
+
+// Hook info
+#define HOOKPOS_RwIm3DRenderPrimitive_US    0x07EF6B0
+#define HOOKSIZE_RwIm3DRenderPrimitive_US   6
+#define HOOKPOS_RwIm3DRenderPrimitive_EU    0x07EF6F0
+#define HOOKSIZE_RwIm3DRenderPrimitive_EU   6
+DWORD RETURN_RwIm3DRenderPrimitive_US =     0x07EF6B6;
+DWORD RETURN_RwIm3DRenderPrimitive_EU =     0x07EF6F6;
+DWORD RETURN_RwIm3DRenderPrimitive_BOTH =   0;
+void _declspec(naked) HOOK_RwIm3DRenderPrimitive ()
+{
+    _asm
+    {
+        pushad
+        push    [esp+32+4*0]
+        call    OnMY_RwIm3DRenderPrimitive_Pre
+        add     esp, 4*1
+        popad
+
+        push    [esp+4*3]
+        push    [esp+4*3]
+        push    [esp+4*3]
+        call inner
+        add     esp, 4*3
+
+        pushad
+        push    [esp+32+4*0]
+        call    OnMY_RwIm3DRenderPrimitive_Post
+        add     esp, 4*1
+        popad
+        retn
+inner:
+        mov     ecx, ds:0x0C97B24
+        jmp     RETURN_RwIm3DRenderPrimitive_BOTH
+    }
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+// RwIm2DRenderIndexedPrimitive
+//
+// Note that RwIm2DRenderIndexedPrimitive is being called to render something
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+void OnMY_RwIm2DRenderIndexedPrimitive_Pre( DWORD dwAddrCalledFrom )
+{
+    CRenderWareSA::ms_iRenderingType = RT_2DI;
+}
+
+void OnMY_RwIm2DRenderIndexedPrimitive_Post( DWORD dwAddrCalledFrom )
+{
+    CRenderWareSA::ms_iRenderingType = RT_NONE;
+}
+
+// Hook info
+#define HOOKPOS_RwIm2DRenderIndexedPrimitive_US     0x0734EA1
+#define HOOKSIZE_RwIm2DRenderIndexedPrimitive_US    5
+#define HOOKPOS_RwIm2DRenderIndexedPrimitive_EU     0x0734EA1
+#define HOOKSIZE_RwIm2DRenderIndexedPrimitive_EU    5
+DWORD RETURN_RwIm2DRenderIndexedPrimitive_US =      0x0403927;
+DWORD RETURN_RwIm2DRenderIndexedPrimitive_EU =      0x0403937;
+DWORD RETURN_RwIm2DRenderIndexedPrimitive_BOTH =    0;
+void _declspec(naked) HOOK_RwIm2DRenderIndexedPrimitive ()
+{
+    _asm
+    {
+        pushad
+        push    [esp+32+4*0]
+        call    OnMY_RwIm2DRenderIndexedPrimitive_Pre
+        add     esp, 4*1
+        popad
+
+        push    [esp+4*5]
+        push    [esp+4*5]
+        push    [esp+4*5]
+        push    [esp+4*5]
+        push    [esp+4*5]
+        call inner
+        add     esp, 4*5
+
+        pushad
+        push    [esp+32+4*0]
+        call    OnMY_RwIm2DRenderIndexedPrimitive_Post
+        add     esp, 4*1
+        popad
+        retn
+
+inner:
+        jmp     RETURN_RwIm2DRenderIndexedPrimitive_BOTH
+    }
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+// RwIm2DRenderPrimitive
+//
+// Note that RwIm2DRenderPrimitive is being called to render something
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+void OnMY_RwIm2DRenderPrimitive_Pre( DWORD dwAddrCalledFrom )
+{
+    CRenderWareSA::ms_iRenderingType = RT_2DNI;
+}
+
+void OnMY_RwIm2DRenderPrimitive_Post( DWORD dwAddrCalledFrom )
+{
+    CRenderWareSA::ms_iRenderingType = RT_NONE;
+}
+
+// Hook info
+#define HOOKPOS_RwIm2DRenderPrimitive                0x0734E90
+#define HOOKSIZE_RwIm2DRenderPrimitive               5
+DWORD RETURN_RwIm2DRenderPrimitive =                 0x0734E95;
+void _declspec(naked) HOOK_RwIm2DRenderPrimitive ()
+{
+    _asm
+    {
+        pushad
+        push    [esp+32+4*0]
+        call    OnMY_RwIm2DRenderPrimitive_Pre
+        add     esp, 4*1
+        popad
+
+        push    [esp+4*3]
+        push    [esp+4*3]
+        push    [esp+4*3]
+        call inner
+        add     esp, 4*3
+
+        pushad
+        push    [esp+32+4*0]
+        call    OnMY_RwIm2DRenderPrimitive_Post
+        add     esp, 4*1
+        popad
+        retn
+
+inner:
+        mov     eax, ds:0x0C97B24
+        jmp     RETURN_RwIm2DRenderPrimitive
+    }
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+// Setup hooks
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+void CRenderWareSA::StaticSetHooks( void )
+{
+   EZHookInstall( RwTextureSetName );
+   EZHookInstall( RwTextureDestroy_Mid );
+   EZHookInstall( RwIm3DRenderIndexedPrimitive );
+   EZHookInstall( RwIm3DRenderPrimitive );
+   EZHookInstall( RwIm2DRenderIndexedPrimitive );
+   EZHookInstall( RwIm2DRenderPrimitive );
 }

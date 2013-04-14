@@ -152,6 +152,7 @@ public:
     inline CWaterManager            * GetWaterManager ()         { return m_pWaterManager; }
     inline CWeaponStatManager       * GetWeaponStatManager()     { return m_pWeaponStatsManager; }
     inline CPointLights             * GetPointLights ()          { return m_pPointLights; }
+    CRenderWareSA*                  GetRenderWareSA()            { return m_pRenderWare; }
 
     CWeaponInfo             * GetWeaponInfo(eWeaponType weapon,eWeaponSkill skill=WEAPONSKILL_STD);
     CModelInfo              * GetModelInfo( DWORD dwModelID );

@@ -39,6 +39,7 @@ unsigned long* CGameSA::VAR_Framelimiter;
  */
 CGameSA::CGameSA()
 {
+    pGame = this;
     m_bAsyncScriptEnabled = false;
     m_bAsyncScriptForced = false;
     m_bASyncLoadingSuspended = false;
@@ -182,6 +183,7 @@ CGameSA::CGameSA()
 
     CModelInfoSA::StaticSetHooks ();
     CPlayerPedSA::StaticSetHooks ();
+    CRenderWareSA::StaticSetHooks ();
 }
 
 CGameSA::~CGameSA ( void )
