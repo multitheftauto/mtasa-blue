@@ -920,13 +920,14 @@ bool CRenderWareSA::StaticGetTextureCB ( RwTexture* texture, std::vector < RwTex
 // Only called by CRenderItemManager::GetVisibleTextureNames ?
 //
 ////////////////////////////////////////////////////////////////
-const SString& CRenderWareSA::GetTextureName ( CD3DDUMMY* pD3DData )
+const char* CRenderWareSA::GetTextureName ( CD3DDUMMY* pD3DData )
 {
     STexInfo** ppTexInfo = MapFind ( m_D3DDataTexInfoMap, pD3DData );
     if ( ppTexInfo )
         return (*ppTexInfo)->strTextureName;
-    static SString strDummy;
-    return strDummy;
+    if ( !pD3DData )
+        return FAKE_NAME_NO_TEXTURE;
+    return "";
 }
 
 

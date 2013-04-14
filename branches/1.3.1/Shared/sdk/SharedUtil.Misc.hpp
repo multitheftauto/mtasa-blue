@@ -1092,14 +1092,14 @@ SString SharedUtil::ConformResourcePath ( const char* szRes, bool bConvertToUnix
     // else
     // remove up to first '/resource-cache/unzipped/'
     // else
-    // remove up to first '/http-client-protected-files/'
+    // remove up to first '/http-client-no-client-cache-files/'
     // else
     // remove up to first '/deathmatch/'
     // else
     // if starts with '...'
     //  remove up to first '/'
 
-    SString strDelimList[] = { "/resources/", "/resource-cache/unzipped/", "/http-client-files-protected/", "/deathmatch/" };
+    SString strDelimList[] = { "/resources/", "/resource-cache/unzipped/", "/http-client-files-no-client-cache/", "/deathmatch/" };
     SString strText = szRes ? szRes : "";
     char cPathSep;
 
