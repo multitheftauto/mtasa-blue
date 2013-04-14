@@ -4411,6 +4411,13 @@ bool CStaticFunctionDefinitions::IsCursorShowing ( bool& bShowing )
 }
 
 
+bool CStaticFunctionDefinitions::GetCursorAlpha ( float& fAlpha )
+{
+    fAlpha = m_pGUI->GetCurrentServerCursorAlpha ();
+    return true;
+}
+
+
 bool CStaticFunctionDefinitions::SetCursorAlpha ( float fAlpha )
 {
     if ( fAlpha >= 0.0f && fAlpha <= 1.0f )

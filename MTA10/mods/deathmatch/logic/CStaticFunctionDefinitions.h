@@ -347,6 +347,7 @@ public:
     // Cursor funcs
     static bool                         GetCursorPosition                   ( CVector2D& vecCursor, CVector& vecWorld );
     static bool                         IsCursorShowing                     ( bool& bShowing );
+    static bool                         GetCursorAlpha                      ( float& fAlpha );
     static bool                         SetCursorAlpha                      ( float fAlpha );
 
     // Drawing funcs

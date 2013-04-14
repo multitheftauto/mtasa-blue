@@ -91,6 +91,21 @@ int CLuaFunctionDefs::IsCursorShowing ( lua_State* luaVM )
 }
 
 
+int CLuaFunctionDefs::GetCursorAlpha ( lua_State* luaVM )
+{
+//  float getCursorAlpha ()
+    float fAlpha;
+
+    if ( CStaticFunctionDefinitions::GetCursorAlpha ( fAlpha ) )
+    {
+        lua_pushnumber ( luaVM, fAlpha );
+        return 1;
+    }
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
 int CLuaFunctionDefs::SetCursorAlpha ( lua_State* luaVM )
 {
 //  bool setCursorAlpha ( float alpha )
