@@ -718,10 +718,10 @@ void OnMY_RwTextureSetName( DWORD dwAddrCalledFrom, RwTexture* pTexture, const c
 // Hook info
 #define HOOKPOS_RwTextureSetName_US     0x7F38A0
 #define HOOKSIZE_RwTextureSetName_US    9
-#define HOOKPOS_RwTextureSetName_EU     0x7F38D0
+#define HOOKPOS_RwTextureSetName_EU     0x7F38E0
 #define HOOKSIZE_RwTextureSetName_EU    9
 DWORD RETURN_RwTextureSetName_US =      0x7F38A9;
-DWORD RETURN_RwTextureSetName_EU =      0x7F38D9;
+DWORD RETURN_RwTextureSetName_EU =      0x7F38E9;
 DWORD RETURN_RwTextureSetName_BOTH =    0;
 void _declspec(naked) HOOK_RwTextureSetName ()
 {
