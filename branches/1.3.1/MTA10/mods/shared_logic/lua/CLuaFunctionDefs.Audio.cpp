@@ -1472,13 +1472,10 @@ int CLuaFunctionDefs::SetSoundPan ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        if ( pSound )
+        if ( CStaticFunctionDefinitions::SetSoundPan ( *pSound, fPan ) )
         {
-            if ( CStaticFunctionDefinitions::SetSoundPan ( *pSound, fPan ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
+            lua_pushboolean ( luaVM, true );
+            return 1;
         }
     }
     else
@@ -1493,19 +1490,17 @@ int CLuaFunctionDefs::GetSoundPan ( lua_State* luaVM )
 {
 //  getSoundPan ( element theSound )
     CClientSound* pSound;
+
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pSound );
 
     if ( !argStream.HasErrors () )
     {
-        if ( pSound )
+        float fPan = 0.0;
+        if ( CStaticFunctionDefinitions::GetSoundPan ( *pSound, fPan ) )
         {
-            float fPan = 0.0;
-            if ( CStaticFunctionDefinitions::GetSoundPan ( *pSound, fPan ) )
-            {
-                lua_pushnumber ( luaVM, fPan );
-                return 1;
-            }
+            lua_pushnumber ( luaVM, fPan );
+            return 1;
         }
     }
     else

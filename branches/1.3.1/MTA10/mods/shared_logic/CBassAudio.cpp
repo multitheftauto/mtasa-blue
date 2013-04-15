@@ -477,6 +477,25 @@ SString CBassAudio::GetMetaTags( const SString& strFormat )
     return strMetaTags;
 }
 
+float CBassAudio::GetPan ( void )
+{
+    if ( m_pSound )
+    {
+        float fPan = 0.0f;
+        BASS_ChannelGetAttribute( m_pSound, BASS_ATTRIB_PAN, &fPan );
+        
+        return fPan;
+    }
+
+    return 0.0f;
+}
+
+void CBassAudio::SetPan ( float fPan )
+{
+    if ( m_pSound )
+        BASS_ChannelSetAttribute( m_pSound, BASS_ATTRIB_PAN, fPan );
+}
+
 void CBassAudio::SetVolume ( float fVolume, bool bStore )
 {
     m_fVolume = fVolume;

@@ -623,6 +623,8 @@ public:
     static bool                         GetSoundMaxDistance                 ( CClientSound& Sound, float& fDistance );
     static bool                         GetSoundMetaTags                    ( CClientSound& Sound, const SString& strFormat, SString& strMetaTags );
     static bool                         SetSoundEffectEnabled               ( CClientSound& Sound, const SString& strEffectName, bool bEnable );
+    static bool                         SetSoundPan                         ( CClientSound& Sound, float fPan );
+    static bool                         GetSoundPan                         ( CClientSound& Sound, float& fPan );
 
     // Player Voice Sound Functions
 
