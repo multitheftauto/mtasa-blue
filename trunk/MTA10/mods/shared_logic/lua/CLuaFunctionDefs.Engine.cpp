@@ -143,7 +143,7 @@ int CLuaFunctionDefs::EngineLoadTXD ( lua_State* luaVM )
     CScriptArgReader argStream ( luaVM );
     // Grab the DFF and model ID
     argStream.ReadString ( strFile );
-    argStream.ReadBool ( bFilteringEnabled );
+    argStream.ReadBool ( bFilteringEnabled, true );
 
     if ( !argStream.HasErrors ( ) )
     {
@@ -264,10 +264,10 @@ int CLuaFunctionDefs::EngineRestoreCOL ( lua_State* luaVM )
 int CLuaFunctionDefs::EngineImportTXD ( lua_State* luaVM )
 {
     CClientTXD* pTXD = NULL;
-    unsigned short usModelID = 0;
+    SString strModelName;
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pTXD );
-    argStream.ReadNumber ( usModelID );
+    argStream.ReadString ( strModelName );
 
     if ( !argStream.HasErrors ( ) )
     {
@@ -275,6 +275,9 @@ int CLuaFunctionDefs::EngineImportTXD ( lua_State* luaVM )
         if ( pTXD )
         {
             // Valid importable model?
+            ushort usModelID = CModelNames::ResolveModelID ( strModelName );
+            if ( usModelID == INVALID_MODEL_ID )
+                usModelID = CModelNames::ResolveClothesTexID ( strModelName );
             if ( CClientTXD::IsImportableModel ( usModelID ) )
             {
                 // Try to import
