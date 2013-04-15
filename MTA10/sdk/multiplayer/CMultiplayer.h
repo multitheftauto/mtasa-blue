@@ -281,6 +281,7 @@ public:
     virtual bool                        IsSuspensionEnabled         ( ) = 0;
     virtual void                        SetSuspensionEnabled        ( bool bEnabled ) = 0;
 
+    virtual void                        FlushClothesCache           ( void ) = 0;
     virtual void                        SetFastClothesLoading       ( EFastClothesLoading fastClothesLoading ) = 0;
     virtual void                        SetLODSystemEnabled         ( bool bEnable ) = 0;
     virtual void                        SetAltWaterOrderEnabled     ( bool bEnable ) = 0;

@@ -199,6 +199,7 @@ public:
     void                        SetSuspensionEnabled        ( bool bEnabled );
     bool                        IsSuspensionEnabled         ( void )                    { return m_bSuspensionEnabled; };
 
+    virtual void                FlushClothesCache           ( void );
     virtual void                SetFastClothesLoading       ( EFastClothesLoading fastClothesLoading );
     virtual void                SetLODSystemEnabled         ( bool bEnable );
     virtual void                SetAltWaterOrderEnabled     ( bool bEnable );

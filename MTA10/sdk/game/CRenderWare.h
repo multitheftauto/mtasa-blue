@@ -65,6 +65,9 @@ class CRenderWare {
     virtual bool                ModelInfoTXDLoadTextures    ( SReplacementTextures* pReplacementTextures, const SString& szFilename, bool bFilteringEnabled ) = 0;
     virtual bool                ModelInfoTXDAddTextures     ( SReplacementTextures* pReplacementTextures, ushort usModelId ) = 0;
     virtual void                ModelInfoTXDRemoveTextures  ( SReplacementTextures* pReplacementTextures ) = 0;
+    virtual void                ClothesAddReplacementTxd    ( char* pFileData, ushort usFileId ) = 0;
+    virtual void                ClothesRemoveReplacementTxd ( char* pFileData ) = 0;
+    virtual bool                HasClothesReplacementChanged( void ) = 0;
     virtual RwTexDictionary *   ReadTXD                     ( const char *szTXD ) = 0;
     virtual RpClump *           ReadDFF                     ( const char *szDFF, unsigned short usModelID, bool bLoadEmbeddedCollisions ) = 0;
     virtual CColModel *         ReadCOL                     ( const char * szCOLFile ) = 0;
