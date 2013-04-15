@@ -661,6 +661,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CRenderWareSA.ClothesReplacing.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\CRenderWareSA.cpp"
 				>
 			</File>

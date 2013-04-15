@@ -184,6 +184,7 @@ CGameSA::CGameSA()
     CModelInfoSA::StaticSetHooks ();
     CPlayerPedSA::StaticSetHooks ();
     CRenderWareSA::StaticSetHooks ();
+    CRenderWareSA::StaticSetClothesReplacingHooks ();
 }
 
 CGameSA::~CGameSA ( void )

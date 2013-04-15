@@ -106,6 +106,7 @@ public:
         RpClump* pClump;
         CPedClothesDesc clothedDesc;
         bool bUnused;
+        int iCacheRevision;
         CTickCount timeUnused;
     };
 
@@ -113,7 +114,7 @@ public:
     uint                m_uiMaxSize;
     uint                m_uiMinCacheTime;
     SClothesCacheStats  m_Stats;
-
+    int                 m_iCacheRevision;
 
     ///////////////////////////////////////
     //
@@ -125,6 +126,7 @@ public:
         memset ( &m_Stats, 0, sizeof ( m_Stats ) );
         m_uiMaxSize = 4;
         m_uiMinCacheTime = 1000;
+        m_iCacheRevision = 1;
     }
 
 
@@ -194,6 +196,7 @@ public:
 
         info.clothedDesc = *pClothesDesc;
         info.bUnused = false;
+        info.iCacheRevision = m_iCacheRevision;
         savedClumpList.push_back ( info );
         m_Stats.uiNumTotal++;
     }
@@ -277,6 +280,9 @@ public:
         for ( std::vector < SSavedClumpInfo >::iterator iter = savedClumpList.begin () ; iter != savedClumpList.end () ; ++iter )
         {
             SSavedClumpInfo& info = *iter;
+            if ( info.iCacheRevision != m_iCacheRevision )
+                continue;   // Don't match if it was generated with different custom clothes textures
+
             if ( info.clothedDesc == *pClothesDesc )
             {
                 if ( info.bUnused )
@@ -296,6 +302,19 @@ public:
 };
 
 CClumpStore ms_clumpStore;
+
+
+////////////////////////////////////////////////
+//
+// CMultiplayerSA::FlushClothesCache
+//
+// Stop using old cached clumps
+//
+////////////////////////////////////////////////
+void CMultiplayerSA::FlushClothesCache( void )
+{
+    ms_clumpStore.m_iCacheRevision++;
+}
 
 
 ////////////////////////////////////////////////

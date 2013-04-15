@@ -123,53 +123,57 @@ int CLuaFunctionDefs::EngineLoadDFF ( lua_State* luaVM )
 
 int CLuaFunctionDefs::EngineLoadTXD ( lua_State* luaVM )
 {
-    // Grab our virtual machine and grab our resource from that.
-    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
-    if ( pLuaMain )
+    SString strFile = "";
+    bool bFilteringEnabled = true;
+    CScriptArgReader argStream ( luaVM );
+    // Grab the DFF and model ID
+    argStream.ReadString ( strFile );
+    argStream.ReadBool ( bFilteringEnabled, true );
+
+    if ( !argStream.HasErrors ( ) )
     {
-        // Grab this resource
-        CResource* pResource = pLuaMain->GetResource ();
-        if ( pResource )
+        // Grab our virtual machine and grab our resource from that.
+        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+        if ( pLuaMain )
         {
-            bool bFilteringEnabled = true;
-
-            if ( lua_type ( luaVM, 2 ) == LUA_TBOOLEAN )
-                bFilteringEnabled = ( lua_toboolean ( luaVM, 2 ) ) ? true:false;
-
-            // Grab the filename
-            SString strFile = ( lua_istype ( luaVM, 1, LUA_TSTRING ) ? lua_tostring ( luaVM, 1 ) : "" );
-            
-            SString strPath;
-            // Is this a legal filepath?
-            if ( CResourceManager::ParseResourcePathInput( strFile, pResource, strPath ) )
+            // Grab this resource
+            CResource* pResource = pLuaMain->GetResource ();
+            if ( pResource )
             {
-                // Grab the resource root entity
-                CClientEntity* pRoot = pResource->GetResourceTXDRoot ();
-
-                // Create a TXD element
-                CClientTXD* pTXD = new CClientTXD ( m_pManager, INVALID_ELEMENT_ID );
-
-                // Try to load the TXD file
-                if ( pTXD->LoadTXD ( strPath, bFilteringEnabled ) )
+                SString strPath;
+                // Is this a legal filepath?
+                if ( CResourceManager::ParseResourcePathInput( strFile, pResource, strPath ) )
                 {
-                    // Success loading the file. Set parent to TXD root
-                    pTXD->SetParent ( pRoot );
+                    // Grab the resource root entity
+                    CClientEntity* pRoot = pResource->GetResourceTXDRoot ();
 
-                    // Return the TXD
-                    lua_pushelement ( luaVM, pTXD );
-                    return 1;
+                    // Create a TXD element
+                    CClientTXD* pTXD = new CClientTXD ( m_pManager, INVALID_ELEMENT_ID );
+
+                    // Try to load the TXD file
+                    if ( pTXD->LoadTXD ( strPath, bFilteringEnabled ) )
+                    {
+                        // Success loading the file. Set parent to TXD root
+                        pTXD->SetParent ( pRoot );
+
+                        // Return the TXD
+                        lua_pushelement ( luaVM, pTXD );
+                        return 1;
+                    }
+                    else
+                    {
+                        // Delete it again
+                        delete pTXD;
+                        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Load error @ '%s' [Unable to load '%s']", "engineLoadTXD", *strFile ) );
+                    }
                 }
                 else
-                {
-                    // Delete it again
-                    delete pTXD;
-                    m_pScriptDebugging->LogCustom ( luaVM, SString ( "Load error @ '%s' [Unable to load '%s']", "engineLoadTXD", *strFile ) );
-                }
+                    m_pScriptDebugging->LogBadPointer ( luaVM, "string", 1 );
             }
-            else
-                m_pScriptDebugging->LogBadPointer ( luaVM, "string", 1 );
         }
     }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     // We failed
     lua_pushboolean ( luaVM, false );
@@ -234,29 +238,39 @@ int CLuaFunctionDefs::EngineRestoreCOL ( lua_State* luaVM )
 
 int CLuaFunctionDefs::EngineImportTXD ( lua_State* luaVM )
 {
-    // Grab the TXD and the model ID
-    CClientTXD* pTXD = ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) ? lua_totxd ( luaVM, 1 ) : NULL );
-    unsigned short usModelID = CModelNames::ResolveModelID ( lua_tostring ( luaVM, 2 ) );
+    CClientTXD* pTXD = NULL;
+    SString strModelName;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pTXD );
+    argStream.ReadString ( strModelName );
 
-    // Valid txd?
-    if ( pTXD )
+    if ( !argStream.HasErrors ( ) )
     {
-        // Valid importable model?
-        if ( CClientTXD::IsImportableModel ( usModelID ) )
+        // Valid txd?
+        if ( pTXD )
         {
-            // Try to import
-            if ( pTXD->Import ( usModelID ) )
+            // Valid importable model?
+            ushort usModelID = CModelNames::ResolveModelID ( strModelName );
+            if ( usModelID == INVALID_MODEL_ID )
+                usModelID = CModelNames::ResolveClothesTexID ( strModelName );
+            if ( CClientTXD::IsImportableModel ( usModelID ) )
             {
-                // Success
-                lua_pushboolean ( luaVM, true );
-                return 1;
+                // Try to import
+                if ( pTXD->Import ( usModelID ) )
+                {
+                    // Success
+                    lua_pushboolean ( luaVM, true );
+                    return 1;
+                }
             }
+            else
+                m_pScriptDebugging->LogBadPointer ( luaVM, "number", 2 );
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "number", 2 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "txd", 1 );
     }
     else
-        m_pScriptDebugging->LogBadPointer ( luaVM, "txd", 1 );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     // Failed
     lua_pushboolean ( luaVM, false );

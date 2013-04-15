@@ -36,6 +36,9 @@ public:
     bool                ModelInfoTXDLoadTextures    ( SReplacementTextures* pReplacementTextures, const SString& szFilename, bool bFilteringEnabled );
     bool                ModelInfoTXDAddTextures     ( SReplacementTextures* pReplacementTextures, ushort usModelId );
     void                ModelInfoTXDRemoveTextures  ( SReplacementTextures* pReplacementTextures );
+    void                ClothesAddReplacementTxd    ( char* pFileData, ushort usFileId );
+    void                ClothesRemoveReplacementTxd ( char* pFileData );
+    bool                HasClothesReplacementChanged( void );
 
     // Reads and parses a TXD file specified by a path (szTXD)
     RwTexDictionary *   ReadTXD                     ( const char *szTXD );
@@ -115,6 +118,7 @@ public:
     RwFrame *           GetFrameFromName            ( RpClump * pRoot, SString strName );
 
     static void         StaticSetHooks              ( void );
+    static void         StaticSetClothesReplacingHooks ( void );
     static void         RwTexDictionaryRemoveTexture( RwTexDictionary* pTXD, RwTexture* pTex );
     static bool         RwTexDictionaryContainsTexture( RwTexDictionary* pTXD, RwTexture* pTex );
     static short        CTxdStore_GetTxdRefcount    ( unsigned short usTxdID );
