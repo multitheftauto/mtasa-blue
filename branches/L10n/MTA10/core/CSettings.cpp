@@ -120,14 +120,21 @@ void CSettings::CreateGUI ( void )
     m_pBindsList->SetSelectionMode ( SelectionModes::CellSingle );
     m_pBindsList->SetDoubleClickHandler ( GUI_CALLBACK( &CSettings::OnBindsListClick, this ) );
 
+    m_pTabs->GetSize ( vecTemp );
     m_pBindsDefButton = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( pTabBinds, _("Load defaults") ) ); //!ACHTUNG: Dynamic sizing
     m_pBindsDefButton->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnBindsDefaultClick, this ) );
-    m_pBindsDefButton->SetPosition ( CVector2D ( 402, 365 ) );
+    m_pBindsDefButton->AutoSize ( NULL, 20.0f, 8.0f );
+    m_pBindsDefButton->GetSize ( vecSize );
+    m_pBindsDefButton->SetPosition ( CVector2D ( vecTemp.fX - vecSize.fX - 12.0f, 365 ) );
     m_pBindsDefButton->SetZOrderingEnabled ( false );
 
     /**
      *  Controls tab
      **/
+    float fIndentX = pManager->CGUI_GetMaxTextExtent( "default-normal",
+        _("Mouse sensitivity:"),
+        _("Vertical aim sensitivity:")
+    );
     vecTemp = CVector2D( 0, 13 );
     //!ACHTUNG: This entire section needs review.  Suggestions:
     /* 
@@ -149,28 +156,33 @@ void CSettings::CreateGUI ( void )
     vecTemp.fX = 16;
     m_pInvertMouse = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabControls, _("Invert mouse vertically"), true ) );
     m_pInvertMouse->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY ) );
-    m_pInvertMouse->SetSize ( CVector2D ( 160.0f, 16.0f ) );
+    m_pInvertMouse->AutoSize ( NULL, 20.0f );
 
     m_pSteerWithMouse = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabControls, _("Steer with mouse"), true ) );
     m_pSteerWithMouse->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 16.0f ) );
+    m_pSteerWithMouse->AutoSize ( NULL, 20.0f );
 
     m_pFlyWithMouse = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabControls, _("Fly with mouse"), true ) );
     m_pFlyWithMouse->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32.0f ) );
+    m_pFlyWithMouse->AutoSize ( NULL, 20.0f );
 
-    vecTemp.fX = 180;
     // MouseSensitivity
+    vecTemp.fY += 52.0f;
     m_pLabelMouseSensitivity = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabControls, _("Mouse sensitivity:") ) );
     m_pLabelMouseSensitivity->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY ) );
     m_pLabelMouseSensitivity->AutoSize ( );
 
     m_pMouseSensitivity = reinterpret_cast < CGUIScrollBar* > ( pManager->CreateScrollBar ( true, pTabControls ) );
-    m_pMouseSensitivity->SetPosition ( CVector2D ( vecTemp.fX + 130.0f, vecTemp.fY ) );
+    m_pMouseSensitivity->SetPosition ( CVector2D ( vecTemp.fX + fIndentX + 5.0f, vecTemp.fY ) );
+    m_pMouseSensitivity->GetPosition ( vecTemp );
     m_pMouseSensitivity->SetSize ( CVector2D ( 160.0f, 20.0f ) );
+    m_pMouseSensitivity->GetSize ( vecSize );
     m_pMouseSensitivity->SetProperty ( "StepSize", "0.01" );
 
     m_pLabelMouseSensitivityValue = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabControls, "0%") );
-    m_pLabelMouseSensitivityValue->SetPosition ( CVector2D ( vecTemp.fX + 300.0f, vecTemp.fY ) );
+    m_pLabelMouseSensitivityValue->SetPosition ( CVector2D ( vecTemp.fX + vecSize.fX + 5.0f, vecTemp.fY ) );
     m_pLabelMouseSensitivityValue->AutoSize ( "100%" );
+    vecTemp.fX = 16;
     vecTemp.fY += 26.f;
 
     // VerticalAimSensitivity
@@ -179,12 +191,14 @@ void CSettings::CreateGUI ( void )
     m_pLabelVerticalAimSensitivity->AutoSize ( m_pLabelVerticalAimSensitivity->GetText().c_str() );
 
     m_pVerticalAimSensitivity = reinterpret_cast < CGUIScrollBar* > ( pManager->CreateScrollBar ( true, pTabControls ) );
-    m_pVerticalAimSensitivity->SetPosition ( CVector2D ( vecTemp.fX + 130.0f, vecTemp.fY ) );
+    m_pVerticalAimSensitivity->SetPosition ( CVector2D ( vecTemp.fX + fIndentX + 5.0f, vecTemp.fY ) );
+    m_pVerticalAimSensitivity->GetPosition ( vecTemp );
     m_pVerticalAimSensitivity->SetSize ( CVector2D ( 160.0f, 20.0f ) );
+    m_pVerticalAimSensitivity->GetSize ( vecSize );
     m_pVerticalAimSensitivity->SetProperty ( "StepSize", "0.01" );
 
     m_pLabelVerticalAimSensitivityValue = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabControls, "0%") );
-    m_pLabelVerticalAimSensitivityValue->SetPosition ( CVector2D ( vecTemp.fX + 300.0f, vecTemp.fY ) );
+    m_pLabelVerticalAimSensitivityValue->SetPosition ( CVector2D ( vecTemp.fX + vecSize.fX + 5.0f, vecTemp.fY ) );
     m_pLabelVerticalAimSensitivityValue->AutoSize ( "100%" );
     vecTemp.fY += 30.f;
 
@@ -206,17 +220,16 @@ void CSettings::CreateGUI ( void )
     m_pStandardControls = reinterpret_cast < CGUIRadioButton* > ( pManager->CreateRadioButton ( m_pControlsInputTypePane, _("Standard controls (Mouse + Keyboard)") ) ); 
     m_pStandardControls->SetSelected ( true );
     m_pStandardControls->SetPosition ( CVector2D ( 11, 0 ) );
-    m_pStandardControls->SetSize ( CVector2D ( 240.0f, 15.0f ), false );
+    m_pStandardControls->GetPosition ( vecTemp );
+    m_pStandardControls->AutoSize ( NULL, 20.0f );
+    m_pStandardControls->GetSize ( vecSize );
 
     m_pClassicControls = reinterpret_cast < CGUIRadioButton* > ( pManager->CreateRadioButton ( m_pControlsInputTypePane, _("Classic controls (Joypad)") ) ); 
-    m_pClassicControls->SetPosition ( CVector2D ( 270, 0 ) );
-    m_pClassicControls->SetSize ( CVector2D ( 270.0f, 15.0f ), false );
-    vecTemp.fY += 24;
+    m_pClassicControls->SetPosition ( CVector2D ( vecTemp.fX + vecSize.fX + 15, vecTemp.fY ) );
+    m_pClassicControls->AutoSize ( NULL, 20.0f );
 
-    CGUIButton*  pControlsDefButton = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( pTabControls, _("Load defaults") ) );
-    pControlsDefButton->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnControlsDefaultClick, this ) );
-    pControlsDefButton->SetPosition ( CVector2D ( 402, 365 ) );
-    pControlsDefButton->SetZOrderingEnabled ( false );
+    m_pControlsInputTypePane->GetPosition ( vecTemp );
+    vecTemp.fY += 24;
 
     //Advanced Joypad settings
     {
@@ -250,12 +263,12 @@ void CSettings::CreateGUI ( void )
 
         CGUILabel* pLabelDeadZone = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabControls, _("Dead Zone") ) );
         pLabelDeadZone->SetPosition ( m_pEditDeadzone->GetPosition () + CVector2D ( 52.f, -1.f ) );
-        pLabelDeadZone->SetSize ( CVector2D ( 68.0f, 24.0f ) );
+        pLabelDeadZone->AutoSize ();
         pLabelDeadZone->SetVerticalAlign( CGUI_ALIGN_VERTICALCENTER );
 
         CGUILabel* pLabelSaturation = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabControls, _("Saturation") ) );
         pLabelSaturation->SetPosition ( m_pEditSaturation->GetPosition () + CVector2D ( 52.f, -1.f ) );
-        pLabelSaturation->SetSize ( CVector2D ( 68.0f, 24.0f ) );
+        pLabelSaturation->AutoSize ();
         pLabelSaturation->SetVerticalAlign( CGUI_ALIGN_VERTICALCENTER );
         vecTemp.fY += 76;
 
@@ -266,15 +279,15 @@ void CSettings::CreateGUI ( void )
         vecTemp.fY += -91;
 
         // Layout the mapping buttons like a dual axis joypad
-        CVector2D vecPosList[] = {  CVector2D ( 162,  191 ),     // Left Stick
-                                    CVector2D ( 280,  191 ),
-                                    CVector2D ( 221,  159 ),
-                                    CVector2D ( 221,  222 ),
+        CVector2D vecPosList[] = {  CVector2D ( 162,  202 ),     // Left Stick
+                                    CVector2D ( 280,  202 ),
+                                    CVector2D ( 221,  182 ),
+                                    CVector2D ( 221,  220 ),
 
-                                    CVector2D ( 351,  191 ),     // Right Stick
-                                    CVector2D ( 469,  191 ),
-                                    CVector2D ( 410,  159 ),
-                                    CVector2D ( 410,  222 ),
+                                    CVector2D ( 351,  202 ),     // Right Stick
+                                    CVector2D ( 469,  202 ),
+                                    CVector2D ( 410,  182 ),
+                                    CVector2D ( 410,  220 ),
 
                                     CVector2D ( 386,  276 ),     // Acceleration/Brake
                                     CVector2D ( 245,  276 )     };
@@ -301,22 +314,29 @@ void CSettings::CreateGUI ( void )
             m_pJoypadButtons.push_back ( pButton );
         }
 
-        vecTemp.fY += -2;
+        vecTemp.fY += -34;
         CGUILabel* pLabelLeft = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabControls, _("Left Stick") ) );
-        pLabelLeft->SetPosition ( CVector2D ( 221, vecTemp.fY ) );
-        pLabelLeft->SetSize ( CVector2D ( 68.0f, 24.0f ) );
-        pLabelLeft->SetHorizontalAlign ( CGUI_ALIGN_HORIZONTALCENTER );
+        pLabelLeft->AutoSize ( );
+        pLabelLeft->GetSize ( vecSize );
+        pLabelLeft->SetPosition ( CVector2D ( 245.0f - vecSize.fX*0.5f, vecTemp.fY ) );
         pLabelLeft->SetVerticalAlign ( CGUI_ALIGN_VERTICALCENTER );
 
         CGUILabel* pLabelRight = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabControls, _("Right Stick") ) );
-        pLabelRight->SetPosition ( CVector2D ( 410, vecTemp.fY ) );
-        pLabelRight->SetSize ( CVector2D ( 68.0f, 24.0f ) );
-        pLabelRight->SetHorizontalAlign ( CGUI_ALIGN_HORIZONTALCENTER );
+        pLabelRight->AutoSize ( );
+        pLabelRight->GetSize ( vecSize );
+        pLabelRight->SetPosition ( CVector2D ( 434.0f - vecSize.fX*0.5f, vecTemp.fY ) );
         pLabelRight->SetVerticalAlign ( CGUI_ALIGN_VERTICALCENTER );
 
     }
 
-    //!ACHTUNG:  Are we going to translate the GTASA key names?
+    m_pTabs->GetSize ( vecTemp );
+    CGUIButton*  pControlsDefButton = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( pTabControls, _("Load defaults") ) );
+    pControlsDefButton->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnControlsDefaultClick, this ) );
+    pControlsDefButton->AutoSize ( NULL, 20.0f, 8.0f );
+    pControlsDefButton->GetSize ( vecSize );
+    pControlsDefButton->SetPosition ( CVector2D ( vecTemp.fX - vecSize.fX - 12.0f, 365 ) );
+    pControlsDefButton->SetZOrderingEnabled ( false );
+
     m_hBind = m_pBindsList->AddColumn ( _("DESCRIPTION"), 0.35f );
     m_hPriKey = m_pBindsList->AddColumn ( _("KEY"), 0.24f );
     for ( int k = 0 ; k < SecKeyNum ; k++ )
@@ -407,6 +427,14 @@ void CSettings::CreateGUI ( void )
     /**
      *  Audio tab
      **/
+    fIndentX = pManager->CGUI_GetMaxTextExtent( "default-normal",
+        _("Radio volume:"),
+        _("SFX volume:"),
+        _("MTA volume:"),
+        _("Voice volume:"),
+        _("Play mode:")
+    );
+
     m_pAudioGeneralLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, _("General") ) );
     m_pAudioGeneralLabel->SetPosition ( CVector2D ( 11, 13 ) );
     m_pAudioGeneralLabel->GetPosition ( vecTemp, false );
@@ -417,13 +445,12 @@ void CSettings::CreateGUI ( void )
     m_pLabelRadioVolume->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32.0f ), false );
     m_pLabelRadioVolume->GetPosition ( vecTemp, false );
     m_pLabelRadioVolume->AutoSize ( );
-    m_pLabelRadioVolume->GetSize ( vecSize );
 
     m_pAudioRadioVolume = reinterpret_cast < CGUIScrollBar* > ( pManager->CreateScrollBar ( true, pTabAudio ) );
-    m_pAudioRadioVolume->SetPosition ( CVector2D ( vecTemp.fX + vecSize.fX + 5.0f, vecTemp.fY ) );
+    m_pAudioRadioVolume->SetPosition ( CVector2D ( vecTemp.fX + fIndentX + 5.0f, vecTemp.fY ) );
     m_pAudioRadioVolume->GetPosition ( vecTemp, false );
     m_pAudioRadioVolume->SetSize ( CVector2D ( 160.0f, 20.0f ) );
-    m_pAudioRadioVolume->GetSize ( vecSize );
+    m_pAudioRadioVolume->GetSize ( vecSize, false );
     m_pAudioRadioVolume->SetProperty ( "StepSize", "0.01" );
 
     m_pLabelRadioVolumeValue = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, "0%") );
@@ -431,66 +458,51 @@ void CSettings::CreateGUI ( void )
     m_pLabelRadioVolumeValue->AutoSize ( "100%" );
 
     vecTemp.fX = 11;
-
     m_pLabelSFXVolume = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, _("SFX volume:") ) );
     m_pLabelSFXVolume->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32.0f ) );
     m_pLabelSFXVolume->GetPosition ( vecTemp, false );
     m_pLabelSFXVolume->AutoSize ( );
-    m_pLabelSFXVolume->GetSize ( vecSize );
 
     m_pAudioSFXVolume = reinterpret_cast < CGUIScrollBar* > ( pManager->CreateScrollBar ( true, pTabAudio ) );
-    m_pAudioSFXVolume->SetPosition ( CVector2D ( vecTemp.fX + vecSize.fX + 5.0f, vecTemp.fY ) );
+    m_pAudioSFXVolume->SetPosition ( CVector2D ( vecTemp.fX + fIndentX + 5.0f, vecTemp.fY ) );
     m_pAudioSFXVolume->GetPosition ( vecTemp, false );
     m_pAudioSFXVolume->SetSize ( CVector2D ( 160.0f, 20.0f ) );
-    m_pAudioSFXVolume->GetSize ( vecSize );
+    m_pAudioSFXVolume->GetSize ( vecSize, false );
     m_pAudioSFXVolume->SetProperty ( "StepSize", "0.01" );
 
     m_pLabelSFXVolumeValue = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, "0%") );
     m_pLabelSFXVolumeValue->SetPosition ( CVector2D ( vecTemp.fX + vecSize.fX + 5.0f, vecTemp.fY ) );
-    m_pLabelSFXVolumeValue->GetPosition ( vecTemp, false );
     m_pLabelSFXVolumeValue->AutoSize ( "100%" );
-    m_pLabelSFXVolumeValue->GetSize ( vecSize );
-
-    m_pCheckBoxAudioEqualizer = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabAudio, _("Radio Equalizer"), true ) );
-    m_pCheckBoxAudioEqualizer->SetPosition ( CVector2D ( vecTemp.fX + vecSize.fX + 5.0f, vecTemp.fY - 3.0f ) );
-    m_pCheckBoxAudioEqualizer->SetSize ( CVector2D ( 224.0f, 16.0f ) );
-
-    m_pCheckBoxAudioAutotune = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabAudio, _("Radio Auto-tune"), true ) );
-    m_pCheckBoxAudioAutotune->SetPosition ( CVector2D ( vecTemp.fX + vecSize.fX + 5.0f, vecTemp.fY + 13.0f ) );
-    m_pCheckBoxAudioAutotune->SetSize ( CVector2D ( 224.0f, 16.0f ) );
 
     vecTemp.fX = 11;
-
     m_pLabelMTAVolume = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, _("MTA volume:") ) );
     m_pLabelMTAVolume->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32.0f ) );
     m_pLabelMTAVolume->GetPosition ( vecTemp, false );
     m_pLabelMTAVolume->AutoSize ( );
-    m_pLabelMTAVolume->GetSize ( vecSize );
 
     m_pAudioMTAVolume = reinterpret_cast < CGUIScrollBar* > ( pManager->CreateScrollBar ( true, pTabAudio ) );
-    m_pAudioMTAVolume->SetPosition ( CVector2D ( vecTemp.fX + vecSize.fX + 5.0f, vecTemp.fY ) );
+    m_pAudioMTAVolume->SetPosition ( CVector2D ( vecTemp.fX + fIndentX + 5.0f, vecTemp.fY ) );
     m_pAudioMTAVolume->GetPosition ( vecTemp, false );
     m_pAudioMTAVolume->SetSize ( CVector2D ( 160.0f, 20.0f ) );
-    m_pAudioMTAVolume->GetSize ( vecSize );
+    m_pAudioMTAVolume->GetSize ( vecSize, false );
     m_pAudioMTAVolume->SetProperty ( "StepSize", "0.01" );
 
     m_pLabelMTAVolumeValue = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, "0%") );
     m_pLabelMTAVolumeValue->SetPosition ( CVector2D ( vecTemp.fX + vecSize.fX + 5.0f, vecTemp.fY ) );
     m_pLabelMTAVolumeValue->AutoSize ( "100%" );
+    m_pLabelMTAVolumeValue->GetSize ( vecSize, false );
 
     vecTemp.fX = 11;
-
     m_pLabelVoiceVolume = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, _("Voice volume:") ) );
     m_pLabelVoiceVolume->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32.0f ) );
     m_pLabelVoiceVolume->GetPosition ( vecTemp, false );
     m_pLabelVoiceVolume->AutoSize ( );
-    m_pLabelVoiceVolume->GetSize ( vecSize );
 
     m_pAudioVoiceVolume = reinterpret_cast < CGUIScrollBar* > ( pManager->CreateScrollBar ( true, pTabAudio ) );
-    m_pAudioVoiceVolume->SetPosition ( CVector2D ( vecTemp.fX + vecSize.fX + 5.0f, vecTemp.fY ) );
+    m_pAudioVoiceVolume->SetPosition ( CVector2D ( vecTemp.fX + fIndentX + 5.0f, vecTemp.fY ) );
     m_pAudioVoiceVolume->GetPosition ( vecTemp, false );
     m_pAudioVoiceVolume->SetSize ( CVector2D ( 160.0f, 20.0f ) );
-    m_pAudioVoiceVolume->GetSize ( vecSize );
+    m_pAudioVoiceVolume->GetSize ( vecSize, false );
     m_pAudioVoiceVolume->SetProperty ( "StepSize", "0.01" );
 
     m_pLabelVoiceVolumeValue = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, "0%") );
@@ -498,47 +510,60 @@ void CSettings::CreateGUI ( void )
     m_pLabelVoiceVolumeValue->AutoSize ( "100%" );
 
     vecTemp.fX = 11;
+    m_pCheckBoxAudioEqualizer = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabAudio, _("Radio Equalizer"), true ) );
+    m_pCheckBoxAudioEqualizer->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 30.0f ) );
+    m_pCheckBoxAudioEqualizer->SetSize ( CVector2D ( 224.0f, 16.0f ) );
+
+    m_pCheckBoxAudioAutotune = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabAudio, _("Radio Auto-tune"), true ) );
+    m_pCheckBoxAudioAutotune->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 50.0f ) );
+    m_pCheckBoxAudioAutotune->SetSize ( CVector2D ( 224.0f, 16.0f ) );
+    m_pCheckBoxAudioAutotune->GetPosition ( vecTemp );
 
     m_pAudioUsertrackLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, _("Usertrack options") ) );
-    m_pAudioUsertrackLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 40.0f ), false );
+    m_pAudioUsertrackLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 30.0f ), false );
     m_pAudioUsertrackLabel->GetPosition ( vecTemp, false );
-    m_pAudioUsertrackLabel->AutoSize ( NULL, 15.0f );
+    m_pAudioUsertrackLabel->AutoSize ( );
     m_pAudioUsertrackLabel->SetFont ( "default-bold-small" );
 
-    vecTemp.fX = 11;
-
     m_pLabelUserTrackMode = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, _("Play mode:") ) );
-    m_pLabelUserTrackMode->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32.0f ) );
+    m_pLabelUserTrackMode->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 30.0f ) );
     m_pLabelUserTrackMode->GetPosition ( vecTemp, false );
     m_pLabelUserTrackMode->AutoSize ( );
-    m_pLabelUserTrackMode->GetSize ( vecSize );
 
     m_pComboUsertrackMode = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabAudio, "" ) );
-    m_pComboUsertrackMode->SetPosition ( CVector2D ( vecTemp.fX + vecSize.fX + 5.0f, vecTemp.fY ) );
-    m_pComboUsertrackMode->GetPosition ( vecTemp, false );
+    m_pComboUsertrackMode->SetPosition ( CVector2D ( vecTemp.fX + fIndentX + 5.0f, vecTemp.fY ) );
     m_pComboUsertrackMode->SetSize ( CVector2D ( 160.0f, 80.0f ) );
-    m_pComboUsertrackMode->GetSize ( vecSize );
     m_pComboUsertrackMode->AddItem ( _("Radio") )->SetData ( (void*)0 );
     m_pComboUsertrackMode->AddItem ( _("Random") )->SetData ( (void*)1 );
     m_pComboUsertrackMode->AddItem ( _("Sequential") )->SetData ( (void*)2 );
     m_pComboUsertrackMode->SetReadOnly ( true );
 
-    vecTemp.fX = 11;
-
     m_pCheckBoxUserAutoscan = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabAudio, _("Automatic Media Scan"), true ) );
     m_pCheckBoxUserAutoscan->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32.0f ) );
+    m_pCheckBoxUserAutoscan->SetSize ( CVector2D ( 300.0f, 16.0f ) );
     m_pCheckBoxUserAutoscan->GetPosition ( vecTemp, false );
-    m_pCheckBoxUserAutoscan->SetSize ( CVector2D ( 224.0f, 16.0f ) );
-    m_pCheckBoxUserAutoscan->GetSize ( vecSize );
 
+    m_pTabs->GetSize ( vecTemp );
     m_pAudioDefButton = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( pTabAudio, _("Load defaults") ) );
     m_pAudioDefButton->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnAudioDefaultClick, this ) );
-    m_pAudioDefButton->SetPosition ( CVector2D ( 402, 365 ) );
+    m_pAudioDefButton->AutoSize ( NULL, 20.0f, 8.0f );
+    m_pAudioDefButton->GetSize ( vecSize );
+    m_pAudioDefButton->SetPosition ( CVector2D ( vecTemp.fX - vecSize.fX - 12.0f, 365 ) );
     m_pAudioDefButton->SetZOrderingEnabled ( false );
 
     /**
      *  Video tab
      **/
+    fIndentX = pManager->CGUI_GetMaxTextExtent( "default-normal",
+        _("Resolution:"),
+        _("Draw Distance:"),
+        _("Brightness:"),
+        _("FX Quality:"),
+        _("Anisotropic filtering:"),
+        _("Anti-aliasing:"),
+        _("Aspect Ratio:"),
+        _("Opacity:")
+    );
 
     m_pVideoGeneralLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, _("General") ) );
     m_pVideoGeneralLabel->SetPosition ( CVector2D ( 11, 13 ) );
@@ -550,10 +575,9 @@ void CSettings::CreateGUI ( void )
     m_pVideoResolutionLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 28.0f ) );
     m_pVideoResolutionLabel->GetPosition ( vecTemp, false );
     m_pVideoResolutionLabel->AutoSize ( );
-    m_pVideoResolutionLabel->GetSize ( vecSize );
 
     m_pComboResolution = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabVideo, "" ) );
-    m_pComboResolution->SetPosition ( CVector2D ( vecTemp.fX + vecSize.fX + 5.0f, vecTemp.fY - 5.0f ) );
+    m_pComboResolution->SetPosition ( CVector2D ( vecTemp.fX + fIndentX + 5.0f, vecTemp.fY - 5.0f ) );
     m_pComboResolution->GetPosition ( vecTemp, false );
     m_pComboResolution->SetSize ( CVector2D ( 200.0f, 160.0f ) );
     m_pComboResolution->GetSize ( vecSize );
@@ -577,10 +601,9 @@ void CSettings::CreateGUI ( void )
     m_pDrawDistanceLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 30.0f ) );
     m_pDrawDistanceLabel->GetPosition ( vecTemp, false );
     m_pDrawDistanceLabel->AutoSize ( );
-    m_pDrawDistanceLabel->GetSize ( vecSize );
 
     m_pDrawDistance = reinterpret_cast < CGUIScrollBar* > ( pManager->CreateScrollBar ( true, pTabVideo ) );
-    m_pDrawDistance->SetPosition ( CVector2D ( vecTemp.fX + vecSize.fX + 5.0f, vecTemp.fY ) );
+    m_pDrawDistance->SetPosition ( CVector2D ( vecTemp.fX + fIndentX + 5.0f, vecTemp.fY ) );
     m_pDrawDistance->GetPosition ( vecTemp, false );
     m_pDrawDistance->SetSize ( CVector2D ( 160.0f, 20.0f ) );
     m_pDrawDistance->GetSize ( vecSize );
@@ -596,10 +619,9 @@ void CSettings::CreateGUI ( void )
     m_pBrightnessLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 29.0f ) );
     m_pBrightnessLabel->GetPosition ( vecTemp, false );
     m_pBrightnessLabel->AutoSize ( );
-    m_pBrightnessLabel->GetSize ( vecSize );
 
     m_pBrightness = reinterpret_cast < CGUIScrollBar* > ( pManager->CreateScrollBar ( true, pTabVideo ) );
-    m_pBrightness->SetPosition ( CVector2D ( vecTemp.fX + vecSize.fX + 5.0f, vecTemp.fY ) );
+    m_pBrightness->SetPosition ( CVector2D ( vecTemp.fX + fIndentX + 5.0f, vecTemp.fY ) );
     m_pBrightness->GetPosition ( vecTemp, false );
     m_pBrightness->SetSize ( CVector2D ( 160.0f, 20.0f ) );
     m_pBrightness->GetSize ( vecSize );
@@ -615,10 +637,9 @@ void CSettings::CreateGUI ( void )
     m_pFXQualityLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 29.0f ) );
     m_pFXQualityLabel->GetPosition ( vecTemp, false );
     m_pFXQualityLabel->AutoSize ( );
-    m_pFXQualityLabel->GetSize ( vecSize );
 
     m_pComboFxQuality = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabVideo, "" ) );
-    m_pComboFxQuality->SetPosition ( CVector2D ( vecTemp.fX + vecSize.fX + 5.0f, vecTemp.fY - 1.0f ) );
+    m_pComboFxQuality->SetPosition ( CVector2D ( vecTemp.fX + fIndentX + 5.0f, vecTemp.fY - 1.0f ) );
     m_pComboFxQuality->SetSize ( CVector2D ( 200.0f, 95.0f ) );
     m_pComboFxQuality->AddItem ( _("Low") )->SetData ( (void*)0 );
     m_pComboFxQuality->AddItem ( _("Medium") )->SetData ( (void*)1 );
@@ -630,10 +651,9 @@ void CSettings::CreateGUI ( void )
     m_pAnisotropicLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 29.0f ) );
     m_pAnisotropicLabel->GetPosition ( vecTemp, false );
     m_pAnisotropicLabel->AutoSize ( );
-    m_pAnisotropicLabel->GetSize ( vecSize );
 
     m_pAnisotropic = reinterpret_cast < CGUIScrollBar* > ( pManager->CreateScrollBar ( true, pTabVideo ) );
-    m_pAnisotropic->SetPosition ( CVector2D ( vecTemp.fX + vecSize.fX + 5.0f, vecTemp.fY ) );
+    m_pAnisotropic->SetPosition ( CVector2D ( vecTemp.fX + fIndentX + 5.0f, vecTemp.fY ) );
     m_pAnisotropic->GetPosition ( vecTemp, false );
     m_pAnisotropic->SetSize ( CVector2D ( 160.0f, 20.0f ) );
     m_pAnisotropic->GetSize ( vecSize );
@@ -658,10 +678,9 @@ void CSettings::CreateGUI ( void )
     m_pAntiAliasingLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 30.0f ) );
     m_pAntiAliasingLabel->GetPosition ( vecTemp, false );
     m_pAntiAliasingLabel->AutoSize ( );
-    m_pAntiAliasingLabel->GetSize ( vecSize );
 
     m_pComboAntiAliasing = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabVideo, "" ) );
-    m_pComboAntiAliasing->SetPosition ( CVector2D ( vecTemp.fX + vecSize.fX + 5.0f, vecTemp.fY - 1.0f ) );
+    m_pComboAntiAliasing->SetPosition ( CVector2D ( vecTemp.fX + fIndentX + 5.0f, vecTemp.fY - 1.0f ) );
     m_pComboAntiAliasing->SetSize ( CVector2D ( 200.0f, 95.0f ) );
     m_pComboAntiAliasing->AddItem ( _("Off") )->SetData ( (void*)1 );
     m_pComboAntiAliasing->AddItem ( _("1x") )->SetData ( (void*)2 );
@@ -674,10 +693,9 @@ void CSettings::CreateGUI ( void )
     m_pAspectRatioLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 30.0f ) );
     m_pAspectRatioLabel->GetPosition ( vecTemp, false );
     m_pAspectRatioLabel->AutoSize ( );
-    m_pAspectRatioLabel->GetSize ( vecSize );
 
     m_pComboAspectRatio = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabVideo, "" ) );
-    m_pComboAspectRatio->SetPosition ( CVector2D ( vecTemp.fX + vecSize.fX + 5.0f, vecTemp.fY - 1.0f ) );
+    m_pComboAspectRatio->SetPosition ( CVector2D ( vecTemp.fX + fIndentX + 5.0f, vecTemp.fY - 1.0f ) );
     m_pComboAspectRatio->SetSize ( CVector2D ( 200.0f, 95.0f ) );
     m_pComboAspectRatio->AddItem ( _("Auto") )->SetData ( (void*)ASPECT_RATIO_AUTO );
     m_pComboAspectRatio->AddItem ( _("4:3") )->SetData ( (void*)ASPECT_RATIO_4_3 );
@@ -735,10 +753,9 @@ void CSettings::CreateGUI ( void )
     m_pMapAlphaLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 24.0f ) );
     m_pMapAlphaLabel->GetPosition ( vecTemp, false );
     m_pMapAlphaLabel->AutoSize ( );
-    m_pMapAlphaLabel->GetSize ( vecSize );
 
     m_pMapAlpha = reinterpret_cast < CGUIScrollBar* > ( pManager->CreateScrollBar ( true, pTabVideo ) );
-    m_pMapAlpha->SetPosition ( CVector2D ( vecTemp.fX + vecSize.fX + 5.0f, vecTemp.fY ) );
+    m_pMapAlpha->SetPosition ( CVector2D ( vecTemp.fX + fIndentX + 5.0f, vecTemp.fY ) );
     m_pMapAlpha->GetPosition ( vecTemp, false );
     m_pMapAlpha->SetSize ( CVector2D ( 160.0f, 20.0f ) );
     m_pMapAlpha->GetSize ( vecSize );
@@ -774,7 +791,7 @@ void CSettings::CreateGUI ( void )
         pLabel->AutoSize ( _("Language:") );
     }
 
-    m_pInterfaceLanguageSelector = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabInterface, _("English") ) );
+    m_pInterfaceLanguageSelector = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabInterface, "English" ) );
     m_pInterfaceLanguageSelector->SetPosition ( CVector2D ( 80.0f, 33.0f ) );
     m_pInterfaceLanguageSelector->SetSize ( CVector2D ( 320.0f, 200.0f ) );
     m_pInterfaceLanguageSelector->SetReadOnly ( true );

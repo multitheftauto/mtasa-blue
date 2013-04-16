@@ -41,14 +41,15 @@ CServerInfo::CServerInfo ( void )
     m_pWindow->SetMinimumSize ( CVector2D ( INFO_WINDOW_DEFAULTWIDTH, INFO_WINDOW_DEFAULTHEIGHT ) );
 
     // Determine our label draw position for L10n
-    unsigned int LabelTitleSizeX = Max( (float)pManager->GetTextExtent ( _("Name:"), "default-bold-small" ), 
-                                        (float)pManager->GetTextExtent ( _("Server Address:"), "default-bold-small" ) );
-    LabelTitleSizeX = Max( (float)LabelTitleSizeX, (float)pManager->GetTextExtent ( _("Gamemode:"), "default-bold-small" ) );
-    LabelTitleSizeX = Max( (float)LabelTitleSizeX, (float)pManager->GetTextExtent ( _("Map:"), "default-bold-small" ) );
-    LabelTitleSizeX = Max( (float)LabelTitleSizeX, (float)pManager->GetTextExtent ( _("Players:"), "default-bold-small" ) );
-    LabelTitleSizeX = Max( (float)LabelTitleSizeX, (float)pManager->GetTextExtent ( _("Passworded:"), "default-bold-small" ) );
-    LabelTitleSizeX = Max( (float)LabelTitleSizeX, (float)pManager->GetTextExtent ( _("Latency:"), "default-bold-small" ) );
-
+    unsigned int LabelTitleSizeX = pManager->CGUI_GetMaxTextExtent( "default-bold-small",
+        _("Name:"),
+        _("Server Address:"),
+        _("Gamemode:"),
+        _("Map:"),
+        _("Players:"),
+        _("Passworded:"),
+        _("Latency:")
+    );
     unsigned int LabelTitlePosX = 9;
     unsigned int LabelPosX = LabelTitlePosX + LabelTitleSizeX + 3;
     unsigned int LabelSizeX = INFO_WINDOW_DEFAULTWIDTH;
