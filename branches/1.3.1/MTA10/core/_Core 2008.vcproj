@@ -80,7 +80,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="strmiids.lib libv2.lib zlibd_2008.lib libpng2008d.lib odbc32.lib odbccp32.lib dinput8.lib dxguid.lib shlwapi.lib d3dx9d.lib winmm.lib Imagehlp.lib ws2_32.lib gdi32.lib Userenv.lib Imm32.lib pthreadVC2.lib jpegd.lib Psapi.lib xinput.lib"
+				AdditionalDependencies="strmiids.lib libv2.lib zlibd_2008.lib libpng2008d.lib odbc32.lib odbccp32.lib dinput8.lib dxguid.lib shlwapi.lib d3dx9.lib winmm.lib Imagehlp.lib ws2_32.lib gdi32.lib Userenv.lib Imm32.lib pthreadVC2.lib jpegd.lib Psapi.lib xinput.lib"
 				ShowProgress="0"
 				OutputFile="C:\Program Files\MTA San Andreas 1.3\mta\core_d.dll"
 				LinkIncremental="2"
@@ -1921,6 +1921,18 @@
 					>
 				</File>
 			</Filter>
+		</Filter>
+		<Filter
+			Name="NewFilter1"
+			>
+			<File
+				RelativePath=".\CGraphStats.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CGraphStats.h"
+				>
+			</File>
 		</Filter>
 	</Files>
 	<Globals>

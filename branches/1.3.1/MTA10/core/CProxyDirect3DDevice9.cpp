@@ -309,7 +309,10 @@ HRESULT CProxyDirect3DDevice9::Present                        ( CONST RECT* pSou
     m_pData->GetTransform ( D3DTS_PROJECTION, &projMatrix );
     m_pDevice->SetTransform ( D3DTS_PROJECTION, &projMatrix );
 
-    return m_pDevice->Present ( pSourceRect, pDestRect, hDestWindowOverride, pDirtyRegion );
+    TIMING_GRAPH("Present");
+    HRESULT hr = m_pDevice->Present ( pSourceRect, pDestRect, hDestWindowOverride, pDirtyRegion );
+    TIMING_GRAPH("PostPresent");
+    return hr;
 }
 
 HRESULT CProxyDirect3DDevice9::GetBackBuffer                  ( UINT iSwapChain,UINT iBackBuffer,D3DBACKBUFFER_TYPE Type,IDirect3DSurface9** ppBackBuffer )
