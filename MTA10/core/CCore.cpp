@@ -1170,6 +1170,7 @@ void CCore::DoPostFramePulse ( )
     m_pModManager->DoPulsePostFrame ();
     TIMING_CHECKPOINT( "+CorePostFrame2" );
     GetMemStats ()->Draw ();
+    GetGraphStats ()->Draw();
     m_pConnectManager->DoPulse ();
 
     m_Community.DoPulse ();
@@ -1258,6 +1259,7 @@ void CCore::RegisterCommands ( )
 
     m_pCommands->Add ( "test",              "",                                 CCommandFuncs::Test );
     m_pCommands->Add ( "showmemstat",       "shows the memory statistics",      CCommandFuncs::ShowMemStat );
+    m_pCommands->Add ( "showframegraph",    "shows the frame timing graph",     CCommandFuncs::ShowFrameGraph );
 
 #if defined(MTA_DEBUG) || defined(MTA_BETA)
     m_pCommands->Add ( "fakelag",           "",                                 CCommandFuncs::FakeLag );
@@ -1739,6 +1741,8 @@ void CCore::ApplyFrameRateLimit ( uint uiOverrideRate )
 
     uint uiUseRate = uiOverrideRate != -1 ? uiOverrideRate : m_uiFrameRateLimit;
 
+    TIMING_GRAPH("Limiter");
+
     if ( uiUseRate < 1 )
         return DoReliablePulse ();
 
@@ -1781,6 +1785,9 @@ void CCore::ApplyFrameRateLimit ( uint uiOverrideRate )
     m_dLastTimeMs = dTimeMs;
 
     DoReliablePulse ();
+
+    TIMING_GRAPH("FrameEnd");
+    TIMING_GRAPH("");
 }
 
 
