@@ -816,6 +816,8 @@ public:
     LUA_DECLARE ( SetMoonSize );
     LUA_DECLARE ( GetMoonSize );
     LUA_DECLARE ( ResetMoonSize );
+    LUA_DECLARE ( SetFPSLimit );
+    LUA_DECLARE ( GetFPSLimit );
 
     // Input functions
     LUA_DECLARE ( BindKey );

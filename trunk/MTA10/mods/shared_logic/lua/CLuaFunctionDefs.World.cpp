@@ -2059,3 +2059,39 @@ int CLuaFunctionDefs::ResetMoonSize ( lua_State* luaVM )
     lua_pushboolean ( luaVM, true );
     return 1;
 }
+
+int CLuaFunctionDefs::SetFPSLimit ( lua_State* luaVM )
+{
+// bool setFPSLimit ( int fpsLimit )
+    int iLimit;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadNumber( iLimit );
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( CStaticFunctionDefinitions::SetFPSLimit ( iLimit ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefs::GetFPSLimit ( lua_State* luaVM )
+{
+    int iLimit;
+    if ( CStaticFunctionDefinitions::GetFPSLimit ( iLimit ) )
+    {
+        lua_pushnumber ( luaVM, iLimit );
+        return 1;
+    }
+    
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}

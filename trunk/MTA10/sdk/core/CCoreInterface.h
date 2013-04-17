@@ -137,9 +137,10 @@ public:
     virtual void                    InitiateDataFilesFix            ( void ) = 0;
 
     virtual uint                    GetFrameRateLimit               ( void ) = 0;
-    virtual void                    RecalculateFrameRateLimit       ( uint uiServerFrameRateLimit = -1 ) = 0;
+    virtual void                    RecalculateFrameRateLimit       ( uint uiServerFrameRateLimit = -1, bool bLogToConsole = true ) = 0;
     virtual void                    ApplyFrameRateLimit             ( uint uiOverrideRate = -1 ) = 0;
     virtual void                    EnsureFrameRateLimitApplied     ( void ) = 0;
+    virtual void                    SetClientScriptFrameRateLimit   ( uint uiClientScriptFrameRateLimit ) = 0;
 
     virtual void                    OnPreFxRender                   ( void ) = 0;
     virtual void                    OnPreHUDRender                  ( void ) = 0;

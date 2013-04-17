@@ -970,6 +970,8 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "setMoonSize", CLuaFunctionDefs::SetMoonSize );
     CLuaCFunctions::AddFunction ( "getMoonSize", CLuaFunctionDefs::GetMoonSize );
     CLuaCFunctions::AddFunction ( "resetMoonSize", CLuaFunctionDefs::ResetMoonSize );
+    CLuaCFunctions::AddFunction ( "setFPSLimit", CLuaFunctionDefs::SetFPSLimit );
+    CLuaCFunctions::AddFunction ( "getFPSLimit", CLuaFunctionDefs::GetFPSLimit );
 
     // World set funcs
     CLuaCFunctions::AddFunction ( "setTime", CLuaFunctionDefs::SetTime );
