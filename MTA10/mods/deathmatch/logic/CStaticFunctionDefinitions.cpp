@@ -6157,6 +6157,22 @@ bool CStaticFunctionDefinitions::SetMoonSize ( int iSize )
     return false;
 }  
 
+bool CStaticFunctionDefinitions::SetFPSLimit( int iLimit )
+{
+    if ( iLimit == 0 || ( iLimit >= 25 && iLimit <= 100 ) )
+    {
+        g_pCore->SetClientScriptFrameRateLimit( iLimit );
+        return true;
+    }
+    return false;
+}  
+
+bool CStaticFunctionDefinitions::GetFPSLimit( int& iLimit )
+{
+    iLimit = g_pCore->GetFrameRateLimit();
+    return true;
+}  
+
 bool CStaticFunctionDefinitions::BindKey ( const char* szKey, const char* szHitState, CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFunction, CLuaArguments& Arguments )
 {
     assert ( szKey );
