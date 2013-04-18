@@ -1474,12 +1474,6 @@ int CLuaFunctionDefs::CreateElement ( lua_State* luaVM )
                 {
                     argStream.ReadString ( strID );
                 }
-                else
-                {
-                    m_pScriptDebugging->LogBadType ( luaVM );
-                    lua_pushboolean ( luaVM, false );
-                    return 1;
-                }
 
                 // Try to create
                 CClientDummy* pDummy = CStaticFunctionDefinitions::CreateElement ( *pResource, strTypeName.c_str ( ), strID.c_str ( ) );
