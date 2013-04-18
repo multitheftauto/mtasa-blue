@@ -29,12 +29,12 @@ int CLuaFunctionDefs::CreateMarker ( lua_State* luaVM )
     argStream.ReadNumber ( vecPosition.fX );
     argStream.ReadNumber ( vecPosition.fY );
     argStream.ReadNumber ( vecPosition.fZ );
-    argStream.ReadString ( strType );
-    argStream.ReadNumber ( fSize );
-    argStream.ReadNumber ( color.R );
-    argStream.ReadNumber ( color.G );
-    argStream.ReadNumber ( color.B );
-    argStream.ReadNumber ( color.A );
+    argStream.ReadString ( strType, "checkpoint" );
+    argStream.ReadNumber ( fSize, 4.0f );
+    argStream.ReadNumber ( color.R, 0 );
+    argStream.ReadNumber ( color.G, 0 );
+    argStream.ReadNumber ( color.B, 255 );
+    argStream.ReadNumber ( color.A, 255 );
 
     if ( !argStream.HasErrors ( ) )
     {

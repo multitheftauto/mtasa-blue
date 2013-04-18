@@ -26,7 +26,6 @@ int CLuaFunctionDefs::CreateColCircle ( lua_State* luaVM )
     CScriptArgReader argStream ( luaVM );
     argStream.ReadNumber ( vecPosition.fX );
     argStream.ReadNumber ( vecPosition.fY );
-    argStream.ReadNumber ( vecPosition.fZ );
     argStream.ReadNumber ( fRadius );
 
     if ( fRadius < 0.0f )
@@ -169,7 +168,6 @@ int CLuaFunctionDefs::CreateColRectangle ( lua_State* luaVM )
     CScriptArgReader argStream ( luaVM );
     argStream.ReadNumber ( vecPosition.fX );
     argStream.ReadNumber ( vecPosition.fY );
-    argStream.ReadNumber ( vecPosition.fZ );
     argStream.ReadNumber ( vecSize.fX );
     argStream.ReadNumber ( vecSize.fY );
 
@@ -219,7 +217,6 @@ int CLuaFunctionDefs::CreateColPolygon ( lua_State* luaVM )
     CScriptArgReader argStream ( luaVM );
     argStream.ReadNumber ( vecPosition.fX );
     argStream.ReadNumber ( vecPosition.fY );
-    argStream.ReadNumber ( vecPosition.fZ );
 
     if ( !argStream.HasErrors ( ) )
     {

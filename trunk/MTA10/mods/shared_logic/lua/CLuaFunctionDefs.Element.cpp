@@ -45,8 +45,6 @@ int CLuaFunctionDefs::IsElement ( lua_State* luaVM )
             return 1;
         }
     }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     // Failed
     lua_pushboolean ( luaVM, false );
