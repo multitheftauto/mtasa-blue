@@ -837,14 +837,13 @@ int CLuaACLDefs::hasObjectPermissionTo ( lua_State* luaVM )
 {
 //  bool hasObjectPermissionTo ( string / element theObject, string theAction [, bool defaultPermission = true ] )
     CResource* pResource = NULL; CElement* pElement = NULL; SString strObject; SString strRightName; bool bDefault; CAccessControlListGroupObject::EObjectType eObjectType;
-    
+
     CScriptArgReader argStream ( luaVM );
-    if ( argStream.NextIsUserData () )
-    {
+    if ( argStream.NextIsUserDataOfType < CResource > () )
         argStream.ReadUserData ( pResource );
-        argStream.m_iIndex--;
+    else
+    if ( argStream.NextIsUserDataOfType < CElement > () )
         argStream.ReadUserData ( pElement );
-    }
     else
         argStream.ReadString ( strObject );
 
