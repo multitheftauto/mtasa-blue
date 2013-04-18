@@ -114,7 +114,7 @@ int CLuaCameraDefs::getCameraInterior ( lua_State* luaVM )
 int CLuaCameraDefs::setCameraMatrix ( lua_State* luaVM )
 {
 //  bool setCameraMatrix ( player thePlayer, float positionX, float positionY, float positionZ [, float lookAtX, float lookAtY, float lookAtZ, float roll = 0, float fov = 70 ] )
-    CPlayer* pPlayer; CVector vecPosition; CVector vecLookAt; CVector* pvecLookAt = NULL; float fRoll; float fFOV;
+    CElement* pPlayer; CVector vecPosition; CVector vecLookAt; CVector* pvecLookAt = NULL; float fRoll; float fFOV;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pPlayer );
@@ -155,7 +155,7 @@ int CLuaCameraDefs::setCameraMatrix ( lua_State* luaVM )
 int CLuaCameraDefs::setCameraTarget ( lua_State* luaVM )
 {
 //  bool setCameraTarget ( player thePlayer [, element target = nil ] )
-    CPlayer* pPlayer; CElement* pTarget;
+    CElement* pPlayer; CElement* pTarget;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pPlayer );
@@ -205,7 +205,7 @@ int CLuaCameraDefs::setCameraInterior ( lua_State* luaVM )
 int CLuaCameraDefs::fadeCamera ( lua_State* luaVM )
 {
 //  bool fadeCamera ( player thePlayer, bool fadeIn, [ float timeToFade = 1.0, int red = 0, int green = 0, int blue = 0 ] )
-    CPlayer* pPlayer; bool bFadeIn; float fFadeTime; unsigned char ucRed; unsigned char ucGreen; unsigned char ucBlue;
+    CElement* pPlayer; bool bFadeIn; float fFadeTime; unsigned char ucRed; unsigned char ucGreen; unsigned char ucBlue;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pPlayer );
