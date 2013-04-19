@@ -534,63 +534,55 @@ int CLuaFunctionDefs::GetKeyBoundToFunction ( lua_State* luaVM )
 {
     SString strKey = "", strHitState = "";
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadString ( strKey );
-    argStream.ReadString ( strHitState, "" );
 
-    if ( !argStream.HasErrors ( ) )
+    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+    if ( pLuaMain )
     {
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
-        if ( pLuaMain )
+        if ( argStream.NextIsFunction ( ) )
         {
-            if ( argStream.NextIsFunction ( ) )
+            CLuaFunctionRef iLuaFunction = luaM_toref ( luaVM, 1 );
+            // get the key
+            list < CScriptKeyBind* > ::const_iterator iter =  m_pClientGame->GetScriptKeyBinds ()->IterBegin ();
+            for ( ; iter !=  m_pClientGame->GetScriptKeyBinds ()->IterEnd (); iter++ )
             {
-                CLuaFunctionRef iLuaFunction = luaM_toref ( luaVM, 1 );
-                // get the key
-                list < CScriptKeyBind* > ::const_iterator iter =  m_pClientGame->GetScriptKeyBinds ()->IterBegin ();
-                for ( ; iter !=  m_pClientGame->GetScriptKeyBinds ()->IterEnd (); iter++ )
+                CScriptKeyBind* pScriptKeyBind = *iter;
+                if ( !pScriptKeyBind->IsBeingDeleted () )
                 {
-                    CScriptKeyBind* pScriptKeyBind = *iter;
-                    if ( !pScriptKeyBind->IsBeingDeleted () )
+                    switch ( pScriptKeyBind->GetType () )
                     {
-                        switch ( pScriptKeyBind->GetType () )
+                        case SCRIPT_KEY_BIND_FUNCTION:
                         {
-                            case SCRIPT_KEY_BIND_FUNCTION:
+                            CScriptKeyFunctionBind* pBind = static_cast < CScriptKeyFunctionBind* > ( pScriptKeyBind );
+                            // ACHTUNG: DOES IT FIND THE CORRECT LUA REF HERE?
+                            if ( iLuaFunction == pBind->m_iLuaFunction )
                             {
-                                CScriptKeyFunctionBind* pBind = static_cast < CScriptKeyFunctionBind* > ( pScriptKeyBind );
-                                // ACHTUNG: DOES IT FIND THE CORRECT LUA REF HERE?
-                                if ( iLuaFunction == pBind->m_iLuaFunction )
-                                {
-                                    lua_pushstring ( luaVM, pBind->boundKey->szKey );
-                                    return 1;
-                                }
-                                break;
+                                lua_pushstring ( luaVM, pBind->boundKey->szKey );
+                                return 1;
                             }
-                            case SCRIPT_KEY_BIND_CONTROL_FUNCTION:
-                            {
-                                CScriptControlFunctionBind* pBind = static_cast < CScriptControlFunctionBind* > ( pScriptKeyBind );
-                                // ACHTUNG: DOES IT FIND THE CORRECT LUA REF HERE?
-                                if ( iLuaFunction == pBind->m_iLuaFunction )
-                                {
-                                    lua_pushstring ( luaVM, pBind->boundKey->szKey );
-                                    return 1;
-                                }
-                                break;
-                            }
-                            default:
-                                break;
+                            break;
                         }
+                        case SCRIPT_KEY_BIND_CONTROL_FUNCTION:
+                        {
+                            CScriptControlFunctionBind* pBind = static_cast < CScriptControlFunctionBind* > ( pScriptKeyBind );
+                            // ACHTUNG: DOES IT FIND THE CORRECT LUA REF HERE?
+                            if ( iLuaFunction == pBind->m_iLuaFunction )
+                            {
+                                lua_pushstring ( luaVM, pBind->boundKey->szKey );
+                                return 1;
+                            }
+                            break;
+                        }
+                        default:
+                            break;
                     }
                 }
-                lua_pushboolean ( luaVM, false );
-                return 1;
             }
-            else
-                m_pScriptDebugging->LogBadType ( luaVM );
+            lua_pushboolean ( luaVM, false );
+            return 1;
         }
+        else
+            m_pScriptDebugging->LogBadType ( luaVM );
     }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
-
     lua_pushboolean ( luaVM, false );
     return 1;
 }
@@ -686,6 +678,9 @@ int CLuaFunctionDefs::GetKeyBoundToCommand ( lua_State* luaVM )
             return 1;
         }
     }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+
     lua_pushboolean ( luaVM, false );
     return 1;
 }
