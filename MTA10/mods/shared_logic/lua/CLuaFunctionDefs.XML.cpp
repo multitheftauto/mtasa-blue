@@ -61,13 +61,13 @@ int CLuaFunctionDefs::XMLNodeGetChildren ( lua_State* luaVM )
     unsigned int uiIndex = 0;
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pNode );
-    argStream.ReadNumber ( uiIndex, 0 );
+    argStream.ReadNumber ( uiIndex, -1 );
 
     if ( !argStream.HasErrors ( ) )
     {
         if ( pNode )
         {
-            bool bGetAllChildren = uiIndex != 0;
+            bool bGetAllChildren = uiIndex == -1;
 
             CXMLNode * pFoundNode = NULL;
             if ( !bGetAllChildren )
