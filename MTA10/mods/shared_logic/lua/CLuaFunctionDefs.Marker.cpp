@@ -29,7 +29,7 @@ int CLuaFunctionDefs::CreateMarker ( lua_State* luaVM )
     argStream.ReadNumber ( vecPosition.fX );
     argStream.ReadNumber ( vecPosition.fY );
     argStream.ReadNumber ( vecPosition.fZ );
-    argStream.ReadString ( strType, "checkpoint" );
+    argStream.ReadString ( strType, "default" );
     argStream.ReadNumber ( fSize, 4.0f );
     argStream.ReadNumber ( color.R, 0 );
     argStream.ReadNumber ( color.G, 0 );
@@ -234,7 +234,7 @@ int CLuaFunctionDefs::SetMarkerType ( lua_State* luaVM )
     {
         if ( pEntity )
         {
-            bool bSuccess = CStaticFunctionDefinitions::SetMarkerType ( *pEntity, strType.c_str ( ) );
+            bool bSuccess = CStaticFunctionDefinitions::SetMarkerType ( *pEntity, strType );
             lua_pushboolean ( luaVM, bSuccess );
             return 1;
         }
@@ -376,7 +376,7 @@ int CLuaFunctionDefs::SetMarkerIcon ( lua_State* luaVM )
     {
         if ( pEntity )
         {
-            if ( CStaticFunctionDefinitions::SetMarkerIcon ( *pEntity, strIcon.c_str ( ) ) )
+            if ( CStaticFunctionDefinitions::SetMarkerIcon ( *pEntity, strIcon ) )
             {
                 lua_pushboolean ( luaVM, true );
                 return 1;

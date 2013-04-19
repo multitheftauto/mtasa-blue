@@ -136,15 +136,15 @@ int CLuaFunctionDefs::OutputClientDebugString ( lua_State* luaVM )
 {
     SString strText = "";
     unsigned int uiLevel = 3;
-    unsigned char ucRed = 235;
-    unsigned char ucGreen = 221;
-    unsigned char ucBlue = 178;
+    unsigned char ucRed = 255;
+    unsigned char ucGreen = 255;
+    unsigned char ucBlue = 255;
     CScriptArgReader argStream ( luaVM );
     argStream.ReadString ( strText );
     argStream.ReadNumber ( uiLevel, 3 );
-    argStream.ReadNumber ( ucRed, 235 );
-    argStream.ReadNumber ( ucGreen, 221 );
-    argStream.ReadNumber ( ucBlue, 178 );
+    argStream.ReadNumber ( ucRed, 255 );
+    argStream.ReadNumber ( ucGreen, 255 );
+    argStream.ReadNumber ( ucBlue, 255 );
 
     // check they're in range
     if ( ucRed > 255 || ucRed < 0 ) 
@@ -169,32 +169,26 @@ int CLuaFunctionDefs::OutputClientDebugString ( lua_State* luaVM )
         CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
         if ( pLuaMain )
         {
-            // Valid string?
-            if ( !argStream.NextIsNil ( ) )
+            if ( uiLevel == 1 )
             {
-                if ( uiLevel == 1 )
-                {
-                    m_pScriptDebugging->LogError ( luaVM, "%s", strText );
-                }
-                else if ( uiLevel == 2 )
-                {
-                    m_pScriptDebugging->LogWarning ( luaVM, "%s", strText );
-                }
-                else if ( uiLevel == 3 )
-                {
-                    m_pScriptDebugging->LogInformation ( luaVM, "%s", strText );
-                }
-                else if ( uiLevel == 0 )
-                {
-                    m_pScriptDebugging->LogCustom ( luaVM, ucRed, ucGreen, ucBlue, "%s", strText );
-                }
-
-                // Success
-                lua_pushboolean ( luaVM, true );
-                return 1;
+                m_pScriptDebugging->LogError ( luaVM, "%s", strText );
             }
-            else
-                m_pScriptDebugging->LogBadType ( luaVM );
+            else if ( uiLevel == 2 )
+            {
+                m_pScriptDebugging->LogWarning ( luaVM, "%s", strText );
+            }
+            else if ( uiLevel == 3 )
+            {
+                m_pScriptDebugging->LogInformation ( luaVM, "%s", strText );
+            }
+            else if ( uiLevel == 0 )
+            {
+                m_pScriptDebugging->LogCustom ( luaVM, ucRed, ucGreen, ucBlue, "%s", strText );
+            }
+
+            // Success
+            lua_pushboolean ( luaVM, true );
+            return 1;
         }
     }
     else
