@@ -1299,9 +1299,9 @@ int CLuaFunctionDefs::CreateVehicle ( lua_State* luaVM )
     argStream.ReadNumber ( vecPosition.fX );
     argStream.ReadNumber ( vecPosition.fY );
     argStream.ReadNumber ( vecPosition.fZ );
-    argStream.ReadNumber ( vecRotation.fX, 0 );
-    argStream.ReadNumber ( vecRotation.fY, 0 );
-    argStream.ReadNumber ( vecRotation.fZ, 0 );
+    argStream.ReadNumber ( vecRotation.fX, 0.0f );
+    argStream.ReadNumber ( vecRotation.fY, 0.0f );
+    argStream.ReadNumber ( vecRotation.fZ, 0.0f );
     argStream.ReadString ( strRegPlate, "" );
     argStream.ReadNumber ( ucVariant, 255 );
     argStream.ReadNumber ( ucVariant2, 255 );
@@ -1967,16 +1967,13 @@ int CLuaFunctionDefs::AttachTrailerToVehicle ( lua_State* luaVM )
 int CLuaFunctionDefs::DetachTrailerFromVehicle ( lua_State* luaVM )
 {
     CClientVehicle* pVehicle = NULL;
+    CClientVehicle* pTrailer = NULL;
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pVehicle );
+    argStream.ReadUserData ( pTrailer, NULL );
 
     if ( !argStream.HasErrors ( ) ) 
     {
-        CClientVehicle* pTrailer = NULL;
-
-        if ( argStream.NextIsUserData ( ) )
-            argStream.ReadUserData ( pTrailer );
-
         if ( pVehicle )
         {
             if ( CStaticFunctionDefinitions::DetachTrailerFromVehicle ( *pVehicle, pTrailer ) )
