@@ -1289,54 +1289,25 @@ int CLuaFunctionDefs::CreateVehicle ( lua_State* luaVM )
 {
     CVector vecPosition;
     unsigned short usModel = 0;
+    CVector vecRotation;
+    const char* szRegPlate = NULL;
+    unsigned char ucVariant = 255;
+    unsigned char ucVariant2 = 255;
+    SString strRegPlate = "";
     CScriptArgReader argStream ( luaVM );
     argStream.ReadNumber ( usModel );
     argStream.ReadNumber ( vecPosition.fX );
     argStream.ReadNumber ( vecPosition.fY );
     argStream.ReadNumber ( vecPosition.fZ );
-    argStream.ReadNumber ( vecPosition.fX );
+    argStream.ReadNumber ( vecRotation.fX, 0 );
+    argStream.ReadNumber ( vecRotation.fY, 0 );
+    argStream.ReadNumber ( vecRotation.fZ, 0 );
+    argStream.ReadString ( strRegPlate, "" );
+    argStream.ReadNumber ( ucVariant, 255 );
+    argStream.ReadNumber ( ucVariant2, 255 );
 
     if ( !argStream.HasErrors ( ) )
     {
-        // Grab the rotation parameters
-        CVector vecRotation;
-        const char* szRegPlate = NULL;
-        unsigned char ucVariant = 255;
-        unsigned char ucVariant2 = 255;
-        if ( argStream.NextIsNumber ( ) )
-        {
-            argStream.ReadNumber ( vecPosition.fX );
-
-            if ( argStream.NextIsNumber ( ) )
-            {
-                argStream.ReadNumber ( vecPosition.fY );
-
-                if ( argStream.NextIsNumber ( ) )
-                {
-                    argStream.ReadNumber ( vecPosition.fZ );
-
-                    if ( argStream.NextIsBool ( ) || argStream.NextIsString ( ) )
-                    {
-                        if ( argStream.NextIsString ( ) )
-                        {
-                            SString strRegPlate = "";
-                            argStream.ReadString ( strRegPlate );
-                            szRegPlate = strRegPlate.c_str();
-                        }
-
-                        if ( argStream.NextIsNumber ( ) )
-                        {
-                            argStream.ReadNumber ( ucVariant );
-                            if ( argStream.NextIsNumber ( ) )
-                            {
-                                argStream.ReadNumber ( ucVariant2 );
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
         CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
         if ( pLuaMain )
         {
@@ -1344,7 +1315,7 @@ int CLuaFunctionDefs::CreateVehicle ( lua_State* luaVM )
             if ( pResource )
             {
                 // Create the vehicle and return its handle
-                CClientVehicle* pVehicle = CStaticFunctionDefinitions::CreateVehicle ( *pResource, usModel, vecPosition, vecRotation, szRegPlate, ucVariant, ucVariant2 );
+                CClientVehicle* pVehicle = CStaticFunctionDefinitions::CreateVehicle ( *pResource, usModel, vecPosition, vecRotation, strRegPlate == "" ? NULL : strRegPlate, ucVariant, ucVariant2 );
                 if ( pVehicle )
                 {
                     CElementGroup * pGroup = pResource->GetElementGroup();

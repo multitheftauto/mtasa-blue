@@ -21,82 +21,37 @@
 
 int CLuaFunctionDefs::CreateProjectile ( lua_State* luaVM )
 {
+    CVector vecOrigin;
     CClientEntity* pCreator = NULL;
     CClientEntity* pTemp = NULL;
     unsigned char ucWeaponType = 0;
     CScriptArgReader argStream ( luaVM );
+    float fForce = 1.0f;
+    CClientEntity* pTarget = NULL;
+    CVector *pvecRotation = new CVector ( 0, 0, 0 ), *pvecMoveSpeed = new CVector ( 0, 0, 0 );
+    unsigned short usModel = 0;
     argStream.ReadUserData ( pCreator );
+    if ( pCreator )
+        pCreator->GetPosition ( vecOrigin );
+
     argStream.ReadNumber ( ucWeaponType );
+    argStream.ReadNumber ( vecOrigin.fX, vecOrigin.fX );
+    argStream.ReadNumber ( vecOrigin.fY, vecOrigin.fY );
+    argStream.ReadNumber ( vecOrigin.fZ, vecOrigin.fZ );
+    argStream.ReadNumber ( fForce, 1.0f );
+    argStream.ReadUserData ( pTemp, NULL );
+    argStream.ReadNumber ( pvecRotation->fX, pvecRotation->fX );
+    argStream.ReadNumber ( pvecRotation->fY, pvecRotation->fY );
+    argStream.ReadNumber ( pvecRotation->fZ, pvecRotation->fZ );
+    argStream.ReadNumber ( pvecMoveSpeed->fX, pvecMoveSpeed->fX );
+    argStream.ReadNumber ( pvecMoveSpeed->fY, pvecMoveSpeed->fY );
+    argStream.ReadNumber ( pvecMoveSpeed->fZ, pvecMoveSpeed->fZ );
+    argStream.ReadNumber ( usModel, 0 );
 
     if ( !argStream.HasErrors ( ) )
     {
         if ( pCreator )
         {
-            CVector vecOrigin;
-            pCreator->GetPosition ( vecOrigin );
-            float fForce = 1.0f;
-            CClientEntity* pTarget = NULL;
-            CVector *pvecRotation = new CVector ( 0, 0, 0 ), *pvecMoveSpeed = new CVector ( 0, 0, 0 );
-            unsigned short usModel = 0;
-            if ( argStream.NextIsNumber ( ) )
-            {
-                argStream.ReadNumber ( vecOrigin.fX );
-                if ( argStream.NextIsNumber ( ) )
-                {
-                    argStream.ReadNumber ( vecOrigin.fY );
-                    if ( argStream.NextIsNumber ( ) )
-                    {
-                        argStream.ReadNumber ( vecOrigin.fZ );
-
-                        if ( argStream.NextIsNumber ( ) )
-                        {
-                            argStream.ReadNumber ( fForce );
-
-                            if ( argStream.NextIsUserData ( ) )
-                            {
-                                argStream.ReadUserData ( pTemp );
-                                if ( pTemp )
-                                {
-                                    pTarget = pTemp;
-                                }
-                                else
-                                    m_pScriptDebugging->LogBadPointer ( luaVM, "element", 7 );
-                            }
-
-                            if ( argStream.NextIsNumber ( ) )
-                            {
-                                argStream.ReadNumber ( pvecRotation->fX );
-                                if ( argStream.NextIsNumber ( ) )
-                                {
-                                    argStream.ReadNumber ( pvecRotation->fY );
-                                    
-                                    if ( argStream.NextIsNumber ( ) )
-                                    {
-                                        argStream.ReadNumber ( pvecRotation->fZ );
-                                        if ( argStream.NextIsNumber ( ) )
-                                        {
-                                            argStream.ReadNumber ( pvecMoveSpeed->fX );
-                                            if ( argStream.NextIsNumber ( ) )
-                                            {
-                                                argStream.ReadNumber ( pvecMoveSpeed->fY );
-                                                if ( argStream.NextIsNumber ( ) )
-                                                {
-                                                    argStream.ReadNumber ( pvecMoveSpeed->fZ );
-                                                    if ( argStream.NextIsNumber ( ) )
-                                                    {
-                                                        argStream.ReadNumber ( usModel );
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
             CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
             if ( pLuaMain )
             {
@@ -128,16 +83,6 @@ int CLuaFunctionDefs::CreateProjectile ( lua_State* luaVM )
                     }
                 }
             }
-            if ( pvecRotation )
-            {
-                delete pvecRotation;
-                pvecRotation = NULL;
-            }
-            if ( pvecMoveSpeed )
-            {
-                delete pvecMoveSpeed;
-                pvecMoveSpeed = NULL;
-            }
         }
         else
             m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
@@ -145,6 +90,16 @@ int CLuaFunctionDefs::CreateProjectile ( lua_State* luaVM )
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
 
+    if ( pvecRotation )
+    {
+        delete pvecRotation;
+        pvecRotation = NULL;
+    }
+    if ( pvecMoveSpeed )
+    {
+        delete pvecMoveSpeed;
+        pvecMoveSpeed = NULL;
+    }
     lua_pushboolean ( luaVM, false );
     return 1;
 }
