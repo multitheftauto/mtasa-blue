@@ -898,22 +898,22 @@ int CLuaFunctionDefs::GetPedBonePosition ( lua_State* luaVM )
 int CLuaFunctionDefs::SetPedWeaponSlot ( lua_State* luaVM )
 {
     // Verify the argument
-    CClientPed* pPed = NULL;
+    CClientEntity* pElement = NULL;
     int iSlot = 0;
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pPed );
+    argStream.ReadUserData ( pElement );
     argStream.ReadNumber ( iSlot );
 
     if ( !argStream.HasErrors ( ) )
     {
-        // Valid ped?
-        if ( pPed )
+        // Valid entity?
+        if ( pElement )
         {
             // Valid slot?
             if ( iSlot >= 0 )
             {
                 // Set his slot
-                if ( CStaticFunctionDefinitions::SetPedWeaponSlot ( *pPed, iSlot ) )
+                if ( CStaticFunctionDefinitions::SetPedWeaponSlot ( *pElement, iSlot ) )
                 {
                     lua_pushboolean ( luaVM, true );
                     return 1;
@@ -978,7 +978,7 @@ int CLuaFunctionDefs::GetPedControlState ( lua_State* luaVM )
         if ( pPed )
         {
             bool bState;
-            if ( CStaticFunctionDefinitions::GetPedControlState ( *pPed, strControl.c_str ( ), bState ) )
+            if ( CStaticFunctionDefinitions::GetPedControlState ( *pPed, strControl, bState ) )
             {
                 lua_pushboolean ( luaVM, bState );
                 return 1;
@@ -1316,17 +1316,17 @@ int CLuaFunctionDefs::IsPedOnFire ( lua_State* luaVM )
 int CLuaFunctionDefs::SetPedOnFire ( lua_State* luaVM )
 {
     // Verify the argument
-    CClientPed* pPed = NULL;
+    CClientEntity* pEntity = NULL;
     bool bOnFire = false;
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pPed );
+    argStream.ReadUserData ( pEntity );
     argStream.ReadBool ( bOnFire );
 
     if ( !argStream.HasErrors ( ) )
     {
-        if ( pPed )
+        if ( pEntity )
         {
-            if ( CStaticFunctionDefinitions::SetPedOnFire ( *pPed, bOnFire ) )
+            if ( CStaticFunctionDefinitions::SetPedOnFire ( *pEntity, bOnFire ) )
             {
                 lua_pushboolean ( luaVM, true );
                 return 1;
@@ -1454,7 +1454,7 @@ int CLuaFunctionDefs::AddPedClothes ( lua_State* luaVM )
     {
         if ( pPed )
         {
-            if ( CStaticFunctionDefinitions::AddPedClothes ( *pPed, strTexture.c_str ( ), strModel.c_str ( ), ucType ) )
+            if ( CStaticFunctionDefinitions::AddPedClothes ( *pPed, strTexture, strModel, ucType ) )
             {
                 lua_pushboolean ( luaVM, true );
                 return 1;
@@ -1516,7 +1516,7 @@ int CLuaFunctionDefs::SetPedControlState ( lua_State* luaVM )
     {
         if ( pPed )
         {
-            if ( CStaticFunctionDefinitions::SetPedControlState ( *pPed, strControl.c_str ( ), bState ) )
+            if ( CStaticFunctionDefinitions::SetPedControlState ( *pPed, strControl, bState ) )
             {
                 lua_pushboolean ( luaVM, true );
                 return 1;
