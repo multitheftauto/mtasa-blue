@@ -1741,7 +1741,9 @@ int CLuaFunctionDefs::SetElementVelocity ( lua_State* luaVM )
     argStream.ReadUserData ( pEntity );
     argStream.ReadNumber ( vecVelocity.fX );
     argStream.ReadNumber ( vecVelocity.fY );
-    argStream.ReadNumber ( vecVelocity.fZ );
+    // previous code did this for some reason.
+    if ( pEntity && pEntity->GetType() != CCLIENTRADARAREA )
+        argStream.ReadNumber ( vecVelocity.fZ );
 
     // Verify the arguments
     if ( !argStream.HasErrors ( ) )
