@@ -265,17 +265,17 @@ int CLuaFunctionDefs::GetBlipVisibleDistance ( lua_State* luaVM )
 
 int CLuaFunctionDefs::SetBlipIcon ( lua_State* luaVM )
 {
-    CClientRadarMarker* pMarker = NULL;
+    CClientEntity* pEntity = NULL;
     unsigned char ucIcon = 0;
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pMarker );
+    argStream.ReadUserData ( pEntity );
     argStream.ReadNumber ( ucIcon );
 
     if ( !argStream.HasErrors ( ) )
     {
-        if ( pMarker )
+        if ( pEntity )
         {
-            if ( CStaticFunctionDefinitions::SetBlipIcon ( *pMarker, ucIcon ) )
+            if ( CStaticFunctionDefinitions::SetBlipIcon ( *pEntity, ucIcon ) )
             {
                 lua_pushboolean ( luaVM, true );
                 return 1;
@@ -294,17 +294,17 @@ int CLuaFunctionDefs::SetBlipIcon ( lua_State* luaVM )
 
 int CLuaFunctionDefs::SetBlipSize ( lua_State* luaVM )
 {
-    CClientRadarMarker* pMarker = NULL;
+    CClientEntity* pEntity = NULL;
     unsigned char ucSize = 0;
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pMarker );
+    argStream.ReadUserData ( pEntity );
     argStream.ReadNumber ( ucSize );
 
     if ( !argStream.HasErrors ( ) )
     {
-        if ( pMarker )
+        if ( pEntity )
         {
-            if ( CStaticFunctionDefinitions::SetBlipSize ( *pMarker, ucSize ) )
+            if ( CStaticFunctionDefinitions::SetBlipSize ( *pEntity, ucSize ) )
             {
                 lua_pushboolean ( luaVM, true );
                 return 1;
@@ -323,10 +323,10 @@ int CLuaFunctionDefs::SetBlipSize ( lua_State* luaVM )
 
 int CLuaFunctionDefs::SetBlipColor ( lua_State* luaVM )
 {
-    CClientRadarMarker* pMarker = NULL;
+    CClientEntity* pEntity = NULL;
     SColor color;
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pMarker );
+    argStream.ReadUserData ( pEntity );
     argStream.ReadNumber ( color.R );
     argStream.ReadNumber ( color.G );
     argStream.ReadNumber ( color.B );
@@ -334,9 +334,9 @@ int CLuaFunctionDefs::SetBlipColor ( lua_State* luaVM )
 
     if ( !argStream.HasErrors ( ) )
     {
-        if ( pMarker )
+        if ( pEntity )
         {
-            if ( CStaticFunctionDefinitions::SetBlipColor ( *pMarker, color ) )
+            if ( CStaticFunctionDefinitions::SetBlipColor ( *pEntity, color ) )
             {
                 lua_pushboolean ( luaVM, true );
                 return 1;
@@ -355,17 +355,17 @@ int CLuaFunctionDefs::SetBlipColor ( lua_State* luaVM )
 
 int CLuaFunctionDefs::SetBlipOrdering ( lua_State* luaVM )
 {
-    CClientRadarMarker* pMarker = NULL;
+    CClientEntity* pEntity = NULL;
     short sOrdering;
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pMarker );
+    argStream.ReadUserData ( pEntity );
     argStream.ReadNumber ( sOrdering );
 
     if ( !argStream.HasErrors ( ) )
     {
-        if ( pMarker )
+        if ( pEntity )
         {
-            if ( CStaticFunctionDefinitions::SetBlipOrdering ( *pMarker, sOrdering ) )
+            if ( CStaticFunctionDefinitions::SetBlipOrdering ( *pEntity, sOrdering ) )
             {
                 lua_pushboolean ( luaVM, true );
                 return 1;
@@ -384,17 +384,17 @@ int CLuaFunctionDefs::SetBlipOrdering ( lua_State* luaVM )
 
 int CLuaFunctionDefs::SetBlipVisibleDistance ( lua_State* luaVM )
 {
-    CClientRadarMarker* pMarker = NULL;
+    CClientEntity* pEntity = NULL;
     unsigned short usVisibleDistance;
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pMarker );
+    argStream.ReadUserData ( pEntity );
     argStream.ReadNumber ( usVisibleDistance );
 
     if ( !argStream.HasErrors ( ) )
     {
-        if ( pMarker )
+        if ( pEntity )
         {
-            if ( CStaticFunctionDefinitions::SetBlipVisibleDistance ( *pMarker, usVisibleDistance ) )
+            if ( CStaticFunctionDefinitions::SetBlipVisibleDistance ( *pEntity, usVisibleDistance ) )
             {
                 lua_pushboolean ( luaVM, true );
                 return 1;
