@@ -22,61 +22,26 @@
 int CLuaFunctionDefs::CreateBlip ( lua_State* luaVM )
 {
     CVector vecPosition;
+    unsigned char ucIcon = 0;
+    unsigned char ucSize = 2;
+    SColorRGBA color ( 255, 0, 0, 255 );
+    short sOrdering = 0;
+    unsigned short usVisibleDistance = 16383;
     CScriptArgReader argStream ( luaVM );
     argStream.ReadNumber ( vecPosition.fX );
     argStream.ReadNumber ( vecPosition.fY );
     argStream.ReadNumber ( vecPosition.fZ );
+    argStream.ReadNumber ( ucIcon, 0 );
+    argStream.ReadNumber( ucSize, 2 );
+    argStream.ReadNumber( color.R, 255 );
+    argStream.ReadNumber( color.G, 0 );
+    argStream.ReadNumber( color.B, 0 );
+    argStream.ReadNumber( color.A, 255 );
+    argStream.ReadNumber( sOrdering, 0 );
+    argStream.ReadNumber( usVisibleDistance, 16383 );
 
     if ( !argStream.HasErrors ( ) )
     {
-        // Default colors and size
-        unsigned char ucIcon = 0;
-        unsigned char ucSize = 2;
-        SColorRGBA color ( 255, 0, 0, 255 );
-        short sOrdering = 0;
-        unsigned short usVisibleDistance = 16383;
-
-        // Read out the optional args
-        if ( argStream.NextIsNumber ( ) )
-        {
-            argStream.ReadNumber( ucIcon );
-
-            if ( argStream.NextIsNumber ( ) )
-            {
-                argStream.ReadNumber( ucSize );
-
-                if ( argStream.NextIsNumber ( ) )
-                {
-                    argStream.ReadNumber( color.R );
-
-                    if ( argStream.NextIsNumber ( ) )
-                    {
-                        argStream.ReadNumber( color.G );
-
-                        if ( argStream.NextIsNumber ( ) )
-                        {
-                            argStream.ReadNumber( color.B );
-
-                            if ( argStream.NextIsNumber ( ) )
-                            {
-                                argStream.ReadNumber( color.A );
-
-                                if ( argStream.NextIsNumber ( ) )
-                                {
-                                    argStream.ReadNumber( sOrdering );
-                                
-                                    if ( argStream.NextIsNumber ( ))
-                                    {
-                                        argStream.ReadNumber( usVisibleDistance );
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
         CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
         if ( pLuaMain )
         {
@@ -110,8 +75,22 @@ int CLuaFunctionDefs::CreateBlip ( lua_State* luaVM )
 int CLuaFunctionDefs::CreateBlipAttachedTo ( lua_State* luaVM )
 {
     CClientEntity* pEntity = NULL;
+    // Default colors and size
+    unsigned char ucIcon = 0;
+    unsigned char ucSize = 2;
+    SColorRGBA color ( 255, 0, 0, 255 );
+    short sOrdering = 0;
+    unsigned short usVisibleDistance = 16383;
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pEntity );
+    argStream.ReadNumber ( ucIcon, 0 );
+    argStream.ReadNumber( ucSize, 2 );
+    argStream.ReadNumber( color.R, 255 );
+    argStream.ReadNumber( color.G, 0 );
+    argStream.ReadNumber( color.B, 0 );
+    argStream.ReadNumber( color.A, 255 );
+    argStream.ReadNumber( sOrdering, 0 );
+    argStream.ReadNumber( usVisibleDistance, 16383 );
 
     // Element in place?
     if ( !argStream.HasErrors( ) )
@@ -119,54 +98,6 @@ int CLuaFunctionDefs::CreateBlipAttachedTo ( lua_State* luaVM )
         // Grab the element and verify it
         if ( pEntity )
         {
-            // Default colors and size
-            unsigned char ucIcon = 0;
-            unsigned char ucSize = 2;
-            SColorRGBA color ( 255, 0, 0, 255 );
-            short sOrdering = 0;
-            unsigned short usVisibleDistance = 16383;
-
-            // Read out the optional args
-            if ( argStream.NextIsNumber ( ) )
-            {
-                argStream.ReadNumber( ucIcon );
-
-                if ( argStream.NextIsNumber ( ) )
-                {
-                    argStream.ReadNumber( ucSize );
-
-                    if ( argStream.NextIsNumber ( ) )
-                    {
-                        argStream.ReadNumber( color.R );
-
-                        if ( argStream.NextIsNumber ( ) )
-                        {
-                            argStream.ReadNumber( color.G );
-
-                            if ( argStream.NextIsNumber ( ) )
-                            {
-                                argStream.ReadNumber( color.B );
-
-                                if ( argStream.NextIsNumber ( ) )
-                                {
-                                    argStream.ReadNumber( color.A );
-
-                                    if ( argStream.NextIsNumber ( ) )
-                                    {
-                                        argStream.ReadNumber( sOrdering );
-
-                                        if ( argStream.NextIsNumber ( ))
-                                        {
-                                            argStream.ReadNumber( usVisibleDistance );
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
             CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
             if ( pLuaMain )
             {

@@ -293,22 +293,18 @@ int CLuaFunctionDefs::GetElementRotation ( lua_State* luaVM )
 {
     // Verify the argument
     CClientEntity* pEntity = NULL;
+    SString strRotationOrder = "default";
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pEntity );
+    argStream.ReadString ( strRotationOrder, "default" );
 
     if ( !argStream.HasErrors ( ) )
     {
-        SString strRotationOrder = "default";
-        if ( argStream.NextIsString ( ) ) 
-        {
-            argStream.ReadString ( strRotationOrder );
-        }
-
         if ( pEntity )
         {
             // Grab the rotation
             CVector vecRotation;
-            if ( CStaticFunctionDefinitions::GetElementRotation ( *pEntity, vecRotation, strRotationOrder.c_str ( ) ) )
+            if ( CStaticFunctionDefinitions::GetElementRotation ( *pEntity, vecRotation, strRotationOrder ) )
             {
                 // Return it
                 lua_pushnumber ( luaVM, vecRotation.fX );

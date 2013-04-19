@@ -1828,8 +1828,8 @@ int CLuaFunctionDefs::SetPedAnimation ( lua_State* luaVM )
     bool bFreezeLastFrame = true;
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pPed );
-    argStream.ReadString ( strBlockName );
-    argStream.ReadString ( strAnimName );
+    argStream.ReadString ( strBlockName, "" );
+    argStream.ReadString ( strAnimName, "" );
     argStream.ReadNumber ( iTime, -1 );
     argStream.ReadBool ( bLoop, true );
     argStream.ReadBool ( bUpdatePosition, true );
@@ -1840,7 +1840,7 @@ int CLuaFunctionDefs::SetPedAnimation ( lua_State* luaVM )
     {
         if ( pPed )
         {
-            if ( CStaticFunctionDefinitions::SetPedAnimation ( *pPed, strBlockName.c_str ( ), strAnimName.c_str ( ), iTime, bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame ) )
+            if ( CStaticFunctionDefinitions::SetPedAnimation ( *pPed, strBlockName == "" ? NULL : strBlockName, strAnimName == "" ? NULL : strAnimName, iTime, bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame ) )
             {
                 lua_pushboolean ( luaVM, true );
                 return 1;
@@ -1873,7 +1873,7 @@ int CLuaFunctionDefs::SetPedAnimationProgress( lua_State* luaVM )
     {
         if ( pPed )
         {
-            const char * szAnimName = NULL;
+            const char * szAnimName = strAnimName.c_str ( );
             float fProgress = 0.0f;
             if ( strAnimName != "" ) 
             {
@@ -1885,7 +1885,7 @@ int CLuaFunctionDefs::SetPedAnimationProgress( lua_State* luaVM )
             }
             else
             {
-                if ( CStaticFunctionDefinitions::SetPedAnimationProgress ( *pPed, szAnimName, fProgress ) )
+                if ( CStaticFunctionDefinitions::SetPedAnimationProgress ( *pPed, NULL, fProgress ) )
                 {
                     lua_pushboolean ( luaVM, true );
                     return 1;

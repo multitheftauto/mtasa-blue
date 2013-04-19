@@ -122,9 +122,9 @@ int CLuaFxDefs::fxAddSparks ( lua_State* luaVM )
     argStream.ReadNumber ( vecDirection.fZ );
     argStream.ReadNumber ( fForce, 1.0f );
     argStream.ReadNumber ( iCount, 1 );
-    argStream.ReadNumber ( vecAcrossLine.fX );
-    argStream.ReadNumber ( vecAcrossLine.fY );
-    argStream.ReadNumber ( vecAcrossLine.fZ );
+    argStream.ReadNumber ( vecAcrossLine.fX, 0 );
+    argStream.ReadNumber ( vecAcrossLine.fY, 0 );
+    argStream.ReadNumber ( vecAcrossLine.fZ, 0 );
     argStream.ReadBool ( bBlur, false );
     argStream.ReadNumber ( fSpread, 1.0f );
     argStream.ReadNumber ( fLife, 1.0f );

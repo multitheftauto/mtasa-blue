@@ -45,15 +45,15 @@ int CLuaFunctionDefs::OutputConsole ( lua_State* luaVM )
 int CLuaFunctionDefs::OutputChatBox ( lua_State* luaVM )
 {
     SString strText = "";
-    unsigned char ucRed = 235;
-    unsigned char ucGreen = 221;
-    unsigned char ucBlue = 178;
+    unsigned char ucRed = 231;
+    unsigned char ucGreen = 217;
+    unsigned char ucBlue = 176;
     bool bColorCoded = false;
     CScriptArgReader argStream ( luaVM );
     argStream.ReadString ( strText );
-    argStream.ReadNumber ( ucRed, 235 );
-    argStream.ReadNumber ( ucGreen, 221 );
-    argStream.ReadNumber ( ucBlue, 178 );
+    argStream.ReadNumber ( ucRed, 231 );
+    argStream.ReadNumber ( ucGreen, 217 );
+    argStream.ReadNumber ( ucBlue, 176 );
     argStream.ReadBool ( bColorCoded, false );
 
     if ( !argStream.HasErrors ( ) )

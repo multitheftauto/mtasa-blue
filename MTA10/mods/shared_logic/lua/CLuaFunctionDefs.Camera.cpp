@@ -215,10 +215,10 @@ int CLuaFunctionDefs::FadeCamera ( lua_State* luaVM )
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadBool ( bFadeIn );
+    argStream.ReadNumber ( fFadeTime, 1.0f );
     argStream.ReadNumber ( ucRed, 0 );
     argStream.ReadNumber ( ucGreen, 0 );
     argStream.ReadNumber ( ucBlue, 0 );
-    argStream.ReadNumber ( fFadeTime, 1.0f );
 
     if ( !argStream.HasErrors ( ) )
     {
