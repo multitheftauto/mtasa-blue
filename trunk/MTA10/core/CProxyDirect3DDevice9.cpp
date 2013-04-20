@@ -438,8 +438,6 @@ HRESULT CProxyDirect3DDevice9::BeginScene                     ( VOID )
     // Call the real routine.
     hResult = m_pDevice->BeginScene ( );
 
-    CGraphics::GetSingleton ().GetRenderItemManager ()->PreDrawWorld ();
-
     // Call our event handler.
     CDirect3DEvents9::OnBeginScene ( m_pDevice );
 
