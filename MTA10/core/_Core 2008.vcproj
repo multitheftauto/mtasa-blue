@@ -465,6 +465,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CGraphStats.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\CGUI.cpp"
 				>
 			</File>
@@ -903,6 +907,10 @@
 			</File>
 			<File
 				RelativePath=".\CGraphics.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CGraphStats.h"
 				>
 			</File>
 			<File
@@ -1921,18 +1929,6 @@
 					>
 				</File>
 			</Filter>
-		</Filter>
-		<Filter
-			Name="NewFilter1"
-			>
-			<File
-				RelativePath=".\CGraphStats.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\CGraphStats.h"
-				>
-			</File>
 		</Filter>
 	</Files>
 	<Globals>
