@@ -26,6 +26,7 @@
 #include <zlib.h>
 
 // SDK includes
+#include <core/CLocalizationInterface.h>
 #include <core/CCoreInterface.h>
 #include <core/CExceptionInformation.h>
 #include <xml/CXML.h>

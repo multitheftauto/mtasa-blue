@@ -12,7 +12,6 @@
 #ifndef __CCOREINTERFACE_H
 #define __CCOREINTERFACE_H
 
-#include "CLocalizationInterface.h"
 #include "CConsoleInterface.h"
 #include "CCommandsInterface.h"
 #include "CCommunityInterface.h"
@@ -32,6 +31,7 @@ class CMultiplayer;
 class CNet;
 class CGame;
 class CModelCacheManager;
+class CLocalizationInterface;
 
 namespace ChatFonts
 {
@@ -155,10 +155,6 @@ public:
     virtual CModelCacheManager*     GetModelCacheManager            ( void ) = 0;
     virtual void                    AddModelToPersistentCache       ( ushort usModelId ) = 0;
 };
-
-#ifndef __CCORE_H
-extern CCoreInterface* g_pCore;
-#endif
 
 class CClientTime
 {

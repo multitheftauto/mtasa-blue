@@ -78,6 +78,7 @@ class CCore;
 
 extern class CCore* g_pCore;
 extern class CGraphics* g_pGraphics;
+extern class CLocalization* g_pLocalization;
 
 class CCore : public CCoreInterface, public CSingleton < CCore >
 {
@@ -104,7 +105,7 @@ public:
     CMouseControl*          GetMouseControl                 ( void )                { return m_pMouseControl; };
     CLocalGUI*              GetLocalGUI                     ( void );
     CCommunityInterface*    GetCommunity                    ( void )                { return &m_Community; };
-    CLocalizationInterface* GetLocalization                 ( void )                { return m_pLocalization; };
+    CLocalizationInterface* GetLocalization                 ( void )                { return g_pLocalization; };
 
     void                    SaveConfig                      ( void );
 

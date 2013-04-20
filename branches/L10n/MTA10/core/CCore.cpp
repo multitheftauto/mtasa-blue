@@ -113,7 +113,7 @@ CCore::CCore ( void )
 
     // Load our settings and localization as early as possible
     CreateXML ( );
-    m_pLocalization = new CLocalization;
+    g_pLocalization = new CLocalization;
 
     // Create a logger instance.
     m_pConsoleLogger            = new CConsoleLogger ( );

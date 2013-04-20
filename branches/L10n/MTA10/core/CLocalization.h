@@ -21,7 +21,7 @@ using namespace tinygettext;
 class CLocalization : public CLocalizationInterface
 {
 public:
-                                CLocalization               ( SString strLocalePath = "" );
+                                CLocalization               ( SString strLocale = "", SString strLocalePath = "" );
                                 ~CLocalization              ( void );
 
     SString                     Translate                   ( SString strMessage );

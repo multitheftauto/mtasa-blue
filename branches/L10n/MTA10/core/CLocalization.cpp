@@ -14,13 +14,12 @@
 #define MTA_LOCALE_DIR              "MTA/locale/"
 #define MTA_LOCALE_TEXTDOMAIN       "client"
 
-CLocalization::CLocalization ( SString strLocalePath )
+CLocalization::CLocalization ( SString strLocale, SString strLocalePath )
 {
     strLocalePath = strLocalePath.empty() ? CalcMTASAPath ( MTA_LOCALE_DIR ) : strLocalePath;
 
     // Initialize our language
-    std::string strLocale;
-    if ( !CVARS_GET("locale", strLocale) )
+    if ( strLocale.empty() && !CVARS_GET("locale", strLocale) )
         strLocale = "en_US";
     
     WriteDebugEvent( SString("CLocalization::CLocalization Localization set to '%s'",strLocale.c_str()) );
@@ -33,7 +32,7 @@ CLocalization::CLocalization ( SString strLocalePath )
     CVARS_SET("locale", strLocale); 
     
     // Setup our dictionary manager
-    m_DictManager.add_directory ( CalcMTASAPath ( MTA_LOCALE_DIR ) );
+    m_DictManager.add_directory ( strLocalePath );
     
     // Grab our translation dictionary from this dir
     m_CurrentDict = m_DictManager.get_dictionary ( Lang, MTA_LOCALE_TEXTDOMAIN );
@@ -97,4 +96,21 @@ SString CLocalization::GetLanguageDirectory ( void )
 
     // Return everything up until (and including) the final forwardslash
     return strFullPath.substr( 0, strFullPath.find_last_of( '/' ) +1 );
+}
+
+
+///////////////////////////////////////////////////////
+//
+// Global interface
+//
+extern "C" _declspec(dllexport) CLocalizationInterface* __cdecl L10n_CreateLocalizationFromEnvironment ( void )
+{
+    // Eventually create a localization interface base interface, using the environment locale
+    if ( !g_pLocalization )
+    {
+        
+        g_pLocalization = new CLocalization ( "ru" );
+    }
+
+    return g_pLocalization;
 }

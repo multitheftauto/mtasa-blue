@@ -323,11 +323,50 @@ int LaunchGame ( LPSTR lpCmdLine )
 //
 //
 //////////////////////////////////////////////////////////
+#include "..\sdk\core\CLocalizationInterface.h"
 int DoLaunchGame ( LPSTR lpCmdLine )
 {
     assert ( !CreateSingleInstanceMutex () );
 
     CycleEventLog();
+    const SString strMTASAPath = GetMTASAPath ();
+
+    //////////////////////////////////////////////////////////
+    //
+    // Check for and load core.dll
+    //
+    SString strCoreDLL = strMTASAPath + "\\mta\\" + MTA_DLL_NAME;
+
+    // Check if the core (mta_blue.dll or mta_blue_d.dll exists)
+    if ( !FileExists ( strCoreDLL ) )
+    {
+        DisplayErrorMessageBox ( ("Load failed.  Please ensure that "
+                            "the file core.dll is in the modules "
+                            "directory within the MTA root directory."), _E("CL23"), "core-missing" ); // Core.dll missing
+
+        return 1;
+    }
+
+    SetDllDirectory( SString ( strMTASAPath + "\\mta" ) );
+
+    // Check if the core can be loaded - failure may mean msvcr90.dll or d3dx9_40.dll etc is not installed
+    HMODULE hCoreModule = LoadLibrary( strCoreDLL );
+    if ( hCoreModule == NULL )
+    {
+        DisplayErrorMessageBox ( ("Loading core failed.  Please ensure that \n"
+                            "Microsoft Visual C++ 2008 SP1 Redistributable Package (x86) \n"
+                            "and the latest DirectX is correctly installed."), _E("CL24"), "vc-redist-missing" );  // Core.dll load failed.  Ensure VC++ Redists and DX are installed
+        return 1;
+    }
+    CLocalizationInterface* g_pLocalization = ( CLocalizationInterface* )( GetProcAddress ( hCoreModule, "L10n_CreateLocalizationFromEnvironment" ) );
+    if ( g_pLocalization == NULL )
+    {
+        DisplayErrorMessageBox ( ("Loading core failed.  Please ensure that \n"
+                            "Microsoft Visual C++ 2008 SP1 Redistributable Package (x86) \n"
+                            "and the latest DirectX is correctly installed."), _E("CL26"), "vc-redist-missing" );  // Core.dll load failed.  Ensure VC++ Redists and DX are installed
+        FreeLibrary ( hCoreModule );
+        return 1;
+    }
 
     //////////////////////////////////////////////////////////
     //
@@ -367,8 +406,6 @@ int DoLaunchGame ( LPSTR lpCmdLine )
         BrowseToSolution ( "downgrade-steam" );
         return 5;
     }
-
-    const SString strMTASAPath = GetMTASAPath ();
 
     if ( strGTAPath.Contains ( ";" ) || strMTASAPath.Contains ( ";" ) )
     {
@@ -522,20 +559,6 @@ int DoLaunchGame ( LPSTR lpCmdLine )
 
     WriteDebugEvent( SString( "Loader - Process created: %s", *strGTAEXEPath ) );
 
-    SString strCoreDLL = strMTASAPath + "\\mta\\" + MTA_DLL_NAME;
-
-    // Check if the core (mta_blue.dll or mta_blue_d.dll exists)
-    if ( !FileExists ( strCoreDLL ) )
-    {
-        DisplayErrorMessageBox ( _("Load failed.  Please ensure that "
-                            "the file core.dll is in the modules "
-                            "directory within the MTA root directory."), _E("CL23"), "core-missing" ); // Core.dll missing
-
-        // Kill GTA and return errorcode
-        TerminateProcess ( piLoadee.hProcess, 1 );
-        return 1;
-    }
-
     // See if xinput is loadable
     HMODULE hXInputModule = LoadLibrary( "XInput9_1_0.dll" );
     if ( hXInputModule )
@@ -551,21 +574,6 @@ int DoLaunchGame ( LPSTR lpCmdLine )
         }
     }
     
-    SetDllDirectory( SString ( strMTASAPath + "\\mta" ) );
-
-    // Check if the core can be loaded - failure may mean msvcr90.dll or d3dx9_40.dll etc is not installed
-    HMODULE hCoreModule = LoadLibrary( strCoreDLL );
-    if ( hCoreModule == NULL )
-    {
-        DisplayErrorMessageBox ( _("Loading core failed.  Please ensure that \n"
-                            "Microsoft Visual C++ 2008 SP1 Redistributable Package (x86) \n"
-                            "and the latest DirectX is correctly installed."), _E("CL24"), "vc-redist-missing" );  // Core.dll load failed.  Ensure VC++ Redists and DX are installed
-        // Kill GTA and return errorcode
-        TerminateProcess ( piLoadee.hProcess, 1 );
-        return 1;
-    }
-    FreeLibrary ( hCoreModule );
-
     // Inject the core into GTA
     RemoteLoadLibrary ( piLoadee.hProcess, strCoreDLL );
     WriteDebugEvent( SString( "Loader - Core injected: %s", *strCoreDLL ) );
