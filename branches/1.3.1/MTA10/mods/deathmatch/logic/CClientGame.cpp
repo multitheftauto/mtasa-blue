@@ -3749,7 +3749,7 @@ void CClientGame::ProjectileInitiateHandler ( CClientProjectile * pProjectile )
 
 void CClientGame::Render3DStuffHandler ( void )
 {
-
+    g_pCore->GetGraphics ()->GetRenderItemManager ()->PreDrawWorld ();
 }
 
 
