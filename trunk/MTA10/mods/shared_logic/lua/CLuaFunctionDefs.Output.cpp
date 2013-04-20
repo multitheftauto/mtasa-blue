@@ -171,19 +171,19 @@ int CLuaFunctionDefs::OutputClientDebugString ( lua_State* luaVM )
         {
             if ( uiLevel == 1 )
             {
-                m_pScriptDebugging->LogError ( luaVM, "%s", strText );
+                m_pScriptDebugging->LogError ( luaVM, "%s", strText.c_str ( ) );
             }
             else if ( uiLevel == 2 )
             {
-                m_pScriptDebugging->LogWarning ( luaVM, "%s", strText );
+                m_pScriptDebugging->LogWarning ( luaVM, "%s", strText.c_str ( ) );
             }
             else if ( uiLevel == 3 )
             {
-                m_pScriptDebugging->LogInformation ( luaVM, "%s", strText );
+                m_pScriptDebugging->LogInformation ( luaVM, "%s", strText.c_str ( ) );
             }
             else if ( uiLevel == 0 )
             {
-                m_pScriptDebugging->LogCustom ( luaVM, ucRed, ucGreen, ucBlue, "%s", strText );
+                m_pScriptDebugging->LogCustom ( luaVM, ucRed, ucGreen, ucBlue, "%s", strText.c_str ( ) );
             }
 
             // Success
