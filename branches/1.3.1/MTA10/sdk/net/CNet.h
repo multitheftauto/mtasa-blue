@@ -24,6 +24,7 @@ namespace EDownloadMode
         NONE,
         CORE_UPDATER,
         RESOURCE_INITIAL_FILES,
+        CALL_REMOTE,
     };
 }
 using EDownloadMode::EDownloadModeType;

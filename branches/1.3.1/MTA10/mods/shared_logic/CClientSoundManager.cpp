@@ -40,6 +40,9 @@ CClientSoundManager::CClientSoundManager ( CClientManager* pClientManager )
 
     BASS_SetConfig ( BASS_CONFIG_NET_PREBUF, 0 );
     BASS_SetConfig ( BASS_CONFIG_NET_PLAYLIST, 1 ); // Allow playlists
+
+    m_strUserAgent = SString( "MTA:SA Server %s - See http://mtasa.com/agent/", g_pNet->GetConnectedServer( true ) );
+    BASS_SetConfigPtr ( BASS_CONFIG_NET_AGENT, (void*)*m_strUserAgent );
     
     UpdateVolume ();
 
