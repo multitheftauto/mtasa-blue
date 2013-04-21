@@ -957,6 +957,20 @@ public:
     // Voice functions
     LUA_DECLARE ( IsVoiceEnabled );
 
+    // Bitwise operator functions
+    LUA_DECLARE ( BitAnd );
+    LUA_DECLARE ( BitNot );
+    LUA_DECLARE ( BitOr );
+    LUA_DECLARE ( BitTest );
+    LUA_DECLARE ( BitXor );
+    LUA_DECLARE ( BitLRotate );
+    LUA_DECLARE ( BitRRotate );
+    LUA_DECLARE ( BitLShift );
+    LUA_DECLARE ( BitRShift );
+    LUA_DECLARE ( BitArShift );
+    LUA_DECLARE ( BitExtract );
+    LUA_DECLARE ( BitReplace );
+
 private:
     // Static references to objects
     static CLuaManager*                 m_pLuaManager;
