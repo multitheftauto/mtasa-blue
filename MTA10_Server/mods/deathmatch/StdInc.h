@@ -108,6 +108,7 @@ struct SAclRequest;
 
 // Lua function definition includes
 #include "luadefs/CLuaACLDefs.h"
+#include "luadefs/CLuaBitDefs.h"
 #include "luadefs/CLuaCameraDefs.h"
 #include "luadefs/CLuaDefs.h"
 #include "luadefs/CLuaElementDefs.h"

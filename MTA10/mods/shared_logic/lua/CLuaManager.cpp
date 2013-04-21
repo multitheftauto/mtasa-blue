@@ -1167,6 +1167,20 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "toJSON", CLuaFunctionDefs::toJSON );
     CLuaCFunctions::AddFunction ( "fromJSON", CLuaFunctionDefs::fromJSON );
 
+    // Bit functions
+    CLuaCFunctions::AddFunction ( "bitAnd", CLuaFunctionDefs::BitAnd );
+    CLuaCFunctions::AddFunction ( "bitNot", CLuaFunctionDefs::BitNot );
+    CLuaCFunctions::AddFunction ( "bitOr", CLuaFunctionDefs::BitOr );
+    CLuaCFunctions::AddFunction ( "bitTest", CLuaFunctionDefs::BitTest );
+    CLuaCFunctions::AddFunction ( "bitXor", CLuaFunctionDefs::BitXor );
+    CLuaCFunctions::AddFunction ( "bitLRotate", CLuaFunctionDefs::BitLRotate );
+    CLuaCFunctions::AddFunction ( "bitRRotate", CLuaFunctionDefs::BitRRotate );
+    CLuaCFunctions::AddFunction ( "bitLShift", CLuaFunctionDefs::BitLShift );
+    CLuaCFunctions::AddFunction ( "bitRShift", CLuaFunctionDefs::BitRShift );
+    CLuaCFunctions::AddFunction ( "bitArShift", CLuaFunctionDefs::BitArShift );
+    CLuaCFunctions::AddFunction ( "bitExtract", CLuaFunctionDefs::BitExtract );
+    CLuaCFunctions::AddFunction ( "bitReplace", CLuaFunctionDefs::BitReplace );
+
     // Luadef definitions
     CLuaFileDefs::LoadFunctions ();
     CLuaFxDefs::LoadFunctions ();

@@ -1272,6 +1272,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\logic\luadefs\CLuaBitDefs.cpp"
+						>
+					</File>
+					<File
 						RelativePath=".\logic\luadefs\CLuaCameraDefs.cpp"
 						>
 					</File>
@@ -2554,6 +2558,10 @@
 					>
 					<File
 						RelativePath=".\logic\luadefs\CLuaACLDefs.h"
+						>
+					</File>
+					<File
+						RelativePath=".\logic\luadefs\CLuaBitDefs.h"
 						>
 					</File>
 					<File

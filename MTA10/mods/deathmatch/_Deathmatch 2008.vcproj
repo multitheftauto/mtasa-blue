@@ -1072,6 +1072,10 @@
 						>
 					</File>
 					<File
+						RelativePath="..\shared_logic\lua\CLuaFunctionDefs.Bit.cpp"
+						>
+					</File>
+					<File
 						RelativePath="..\shared_logic\lua\CLuaFunctionDefs.Blip.cpp"
 						>
 					</File>
