@@ -358,7 +358,19 @@ int DoLaunchGame ( LPSTR lpCmdLine )
                             "and the latest DirectX is correctly installed."), _E("CL24"), "vc-redist-missing" );  // Core.dll load failed.  Ensure VC++ Redists and DX are installed
         return 1;
     }
-    CLocalizationInterface* g_pLocalization = ( CLocalizationInterface* )( GetProcAddress ( hCoreModule, "L10n_CreateLocalizationFromEnvironment" ) );
+
+    // Grab our locale from the registry if possible, if not Windows
+    SString strLocale = GetApplicationSetting ( "locale" );
+    if ( strLocale.empty() )
+    {
+        setlocale(LC_ALL, "");
+        char* szLocale = setlocale(LC_ALL, NULL);
+        strLocale = szLocale;
+    }
+
+    typedef CLocalizationInterface* (__cdecl *FUNC_CREATELOCALIZATIONFROMENVIRONMENT)(SString strLocale);
+    FUNC_CREATELOCALIZATIONFROMENVIRONMENT pFunc = (FUNC_CREATELOCALIZATIONFROMENVIRONMENT)GetProcAddress ( hCoreModule, "L10n_CreateLocalizationFromEnvironment" );
+    CLocalizationInterface* g_pLocalization = pFunc(strLocale);
     if ( g_pLocalization == NULL )
     {
         DisplayErrorMessageBox ( ("Loading core failed.  Please ensure that \n"

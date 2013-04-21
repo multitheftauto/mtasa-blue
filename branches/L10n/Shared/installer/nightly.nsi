@@ -535,46 +535,9 @@ DontInstallRedist:
 		File "${SERVER_FILES_ROOT}\pthreadVC2.dll"
 
 		${If} "$(LANGUAGE_CODE)" != ""
-			# Write our language to coreconfig.xml
-			IfFileExists "coreconfig.xml" WriteLanguageToConfig 0
-			# If we don't have a coreconfig, create one with tags leading up to the locale tag
-			nsisXML::create
-			nsisXML::createElement "mainconfig"
-			nsisXML::appendChild
-			StrCpy $1 $2
-			nsisXML::createElement "settings"
-			nsisXML::appendChild
-			StrCpy $1 $2
-			nsisXML::createElement "locale"
-			nsisXML::appendChild
-			nsisXML::setText "$(LANGUAGE_CODE)"
-			nsisXML::save "coreconfig.xml"
-			Goto FinishedWithConfig
-			
-			# We have a file, let's write to it
-			WriteLanguageToConfig:
-			nsisXML::create
-			nsisXML::loadAndValidate "coreconfig.xml"
-			IntCmp $0 0 FinishedWithConfig # Something is up, abort mission
-			nsisXML::select "/mainconfig"
-			IntCmp $2 0 FinishedWithConfig
-			nsisXML::select "/mainconfig/settings"
-			${If} $2 == 0
-				nsisXML::select "/mainconfig"
-				nsisXML::createElement "settings"
-				nsisXML::appendChild
-			${EndIf}
-			nsisXML::select "/mainconfig/settings/locale"
-			${If} $2 == 0 # Only create the locale tag - we never modify it
-				nsisXML::select "/mainconfig/settings"
-				nsisXML::createElement "locale"	
-				nsisXML::appendChild
-				nsisXML::setText "$(LANGUAGE_CODE)"
-				nsisXML::save "coreconfig.xml"
-			${EndIf}
+			# Write our language to registry
+			WriteRegStr HKLM "SOFTWARE\Multi Theft Auto: San Andreas All\${0.0}\Settings\general" "locale" "$(LANGUAGE_CODE)"
 		${EndIf}
-		
-		FinishedWithConfig:
 
         !ifndef LIGHTBUILD
 

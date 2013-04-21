@@ -2797,6 +2797,7 @@ void CSettings::SaveData ( void )
     {
         const char* szItemText = (const char*)pItem->GetData();
         CVARS_SET("locale", std::string(szItemText) );
+        SetApplicationSetting ( "locale", szItemText );
         if ( szItemText != strCurrentLocale )
             bIsLocaleChanged = true;
     }

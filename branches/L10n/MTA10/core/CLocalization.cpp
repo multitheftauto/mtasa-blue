@@ -24,12 +24,14 @@ CLocalization::CLocalization ( SString strLocale, SString strLocalePath )
     
     WriteDebugEvent( SString("CLocalization::CLocalization Localization set to '%s'",strLocale.c_str()) );
 
-    // Grab the nearest language based upon our setting
+    // Grab the nearest language based upon our setting, or revert to en_US
     Language Lang = Language::from_name(strLocale);
+    Lang = Lang ? Lang : Language::from_name("en_US");
 
     // Update our locale setting with full country code, now that we've matched it
     strLocale = Lang.str();
-    CVARS_SET("locale", strLocale); 
+    if ( g_pCore )
+        CVARS_SET("locale", strLocale); 
     
     // Setup our dictionary manager
     m_DictManager.add_directory ( strLocalePath );
@@ -103,14 +105,11 @@ SString CLocalization::GetLanguageDirectory ( void )
 //
 // Global interface
 //
-extern "C" _declspec(dllexport) CLocalizationInterface* __cdecl L10n_CreateLocalizationFromEnvironment ( void )
+extern "C" _declspec(dllexport) CLocalizationInterface* __cdecl L10n_CreateLocalizationFromEnvironment ( SString strLocale )
 {
     // Eventually create a localization interface base interface, using the environment locale
     if ( !g_pLocalization )
-    {
-        
-        g_pLocalization = new CLocalization ( "ru" );
-    }
+        g_pLocalization = new CLocalization ( strLocale );
 
     return g_pLocalization;
 }
