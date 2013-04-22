@@ -62,7 +62,7 @@ namespace SharedUtil
     bool            DelTree                         ( const SString& strPath, const SString& strInsideHere );
     bool            MkDir                           ( const SString& strInPath, bool bTree = true );
     bool            FileCopy                        ( const SString& strSrc, const SString& strDest, bool bForce = true );
-    std::vector < SString > FindFiles               ( const SString& strMatch, bool bFiles, bool bDirectories );
+    std::vector < SString > FindFiles               ( const SString& strMatch, bool bFiles, bool bDirectories, bool bSortByDate = false );
     SString         MakeUniquePath                  ( const SString& strPathFilename );
     SString         ConformPathForSorting           ( const SString& strPathFilename );
 

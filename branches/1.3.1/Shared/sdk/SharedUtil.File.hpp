@@ -447,11 +447,13 @@ bool SharedUtil::FileCopy ( const SString& strSrc, const SString& strDest, bool 
 // FindFiles
 //
 // Find all files or directories at a path
+// If sorted by date, returns last modified last
 //
 ///////////////////////////////////////////////////////////////
-std::vector < SString > SharedUtil::FindFiles ( const SString& strInMatch, bool bFiles, bool bDirectories )
+std::vector < SString > SharedUtil::FindFiles ( const SString& strInMatch, bool bFiles, bool bDirectories, bool bSortByDate )
 {
     std::vector < SString > strResult;
+    std::multimap < uint64, SString > sortMap;
 
     SString strMatch = PathConform ( strInMatch );
     if ( strMatch.Right ( 1 ) == PATH_SEPERATOR )
@@ -465,22 +467,39 @@ std::vector < SString > SharedUtil::FindFiles ( const SString& strInMatch, bool 
         {
             if ( ( findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY ) ? bDirectories : bFiles )
                 if ( strcmp ( findData.cFileName, "." ) && strcmp ( findData.cFileName, ".." ) )
-                    strResult.push_back ( findData.cFileName );
+                {
+                    if ( bSortByDate )
+                        MapInsert( sortMap, (uint64&)findData.ftLastWriteTime, findData.cFileName );
+                    else
+                        strResult.push_back ( findData.cFileName );
+                }
         }
         while( FindNextFile( hFind, &findData ) );
         FindClose( hFind );
     }
+
+    // Resolve sorted map if required
+    if ( !sortMap.empty() )
+    {
+        for ( std::multimap < uint64, SString >::iterator iter = sortMap.begin() ; iter != sortMap.end() ; ++iter )
+            strResult.push_back ( iter->second );
+    }
+
     return strResult;
 }
 
 #else
 
-std::vector < SString > SharedUtil::FindFiles ( const SString& strMatch, bool bFiles, bool bDirectories )
+std::vector < SString > SharedUtil::FindFiles ( const SString& strMatch, bool bFiles, bool bDirectories, bool bSortByDate )
 {
     std::vector < SString > strResult;
+    std::multimap < uint64, SString > sortMap;
 
     DIR *Dir;
     struct dirent *DirEntry;
+
+    // Remove any filename matching characters
+    SString strSearchDirectory = PathJoin( strMatch.SplitLeft( "/", NULL, -1 ), "/" );
 
     if ( ( Dir = opendir ( strMatch ) ) )
     {
@@ -499,11 +518,29 @@ std::vector < SString > SharedUtil::FindFiles ( const SString& strMatch, bool bF
                     bIsDir = S_ISDIR ( Info.st_mode );
 
                 if ( bIsDir ? bDirectories : bFiles )
-                    strResult.push_back ( DirEntry->d_name );
+                {
+                    if ( bSortByDate )
+                    {
+                        SString strAbsPath = strSearchDirectory + DirEntry->d_name;
+                        struct stat attrib;
+                        stat( strAbsPath, &attrib );
+                        MapInsert( sortMap, (uint64)attrib.st_mtime, DirEntry->d_name );
+                    }
+                    else
+                        strResult.push_back ( DirEntry->d_name );
+                }
             }
         }
         closedir ( Dir );
     }
+
+    // Resolve sorted map if required
+    if ( !sortMap.empty() )
+    {
+        for ( std::multimap < uint64, SString >::iterator iter = sortMap.begin() ; iter != sortMap.end() ; ++iter )
+            strResult.push_back ( iter->second );
+    }
+
     return strResult;
 }
 #endif

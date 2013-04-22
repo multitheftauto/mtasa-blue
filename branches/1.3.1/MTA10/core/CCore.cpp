@@ -1090,6 +1090,10 @@ void CCore::DoPostFramePulse ( )
         // Wait 250 frames more than the time it took to get status 7 (fade-out time)
         static short WaitForMenu = 0;
 
+        // Do crash dump encryption while the credit screen is displayed
+        if ( WaitForMenu == 0 )
+            HandleCrashDumpEncryption();
+
         // Cope with early finish
         if ( m_pGame->HasCreditScreenFadedOut () )
             WaitForMenu = 250;
@@ -2116,4 +2120,80 @@ void CCore::HandleIdlePulse ( void )
     }
     if ( m_pModManager->GetCurrentMod() )
         m_pModManager->GetCurrentMod()->IdleHandler();
+}
+
+
+//
+// Handle encryption of Windows crash dump files
+//
+void CCore::HandleCrashDumpEncryption( void )
+{
+    const int iMaxFiles = 10;
+    SString strDumpDirPath = CalcMTASAPath( "mta\\dumps" );
+    SString strDumpDirPrivatePath = PathJoin( strDumpDirPath, "private" );
+    SString strDumpDirPublicPath = PathJoin( strDumpDirPath, "public" );
+    MakeSureDirExists( strDumpDirPrivatePath + "/" );
+    MakeSureDirExists( strDumpDirPublicPath + "/" );
+
+    SString strMessage = "Dump files in this directory are encrypted and copied to 'dumps\\public' during startup\n\n";
+    FileSave( PathJoin( strDumpDirPrivatePath, "README.txt" ), strMessage );
+
+    // Move old dumps to the private folder
+    {
+        std::vector < SString > legacyList = FindFiles( PathJoin( strDumpDirPath, "*.dmp" ), true, false );
+        for ( uint i = 0 ; i < legacyList.size() ; i++ )
+        {
+            const SString& strFilename = legacyList[i];
+            SString strSrcPathFilename = PathJoin( strDumpDirPath, strFilename );
+            SString strDestPathFilename = PathJoin( strDumpDirPrivatePath, strFilename );
+            FileRename( strSrcPathFilename, strDestPathFilename );
+        }
+    }
+
+    // Limit number of files in the private folder
+    {
+        std::vector < SString > privateList = FindFiles( PathJoin( strDumpDirPrivatePath, "*.dmp" ), true, false, true );
+        for ( int i = 0 ; i < (int)privateList.size() - iMaxFiles ; i++ )
+            FileDelete( PathJoin( strDumpDirPrivatePath, privateList[i] ) );
+    }
+
+    // Copy and encrypt private files to public if they don't already exist
+    {
+        std::vector < SString > privateList = FindFiles( PathJoin( strDumpDirPrivatePath, "*.dmp" ), true, false );
+        for ( uint i = 0 ; i < privateList.size() ; i++ )
+        {
+            const SString& strPrivateFilename = privateList[i];
+            SString strPublicFilename = ExtractBeforeExtension( strPrivateFilename ) + ".rsa." + ExtractExtension( strPrivateFilename );
+            SString strPrivatePathFilename = PathJoin( strDumpDirPrivatePath, strPrivateFilename );
+            SString strPublicPathFilename = PathJoin( strDumpDirPublicPath, strPublicFilename );
+            if ( !FileExists( strPublicPathFilename ) )
+            {
+               GetNetwork()->EncryptDumpfile( strPrivatePathFilename, strPublicPathFilename );
+            }
+        }
+    }
+
+    // Limit number of files in the public folder
+    {
+        std::vector < SString > publicList = FindFiles( PathJoin( strDumpDirPublicPath, "*.dmp" ), true, false, true );
+        for ( int i = 0 ; i < (int)publicList.size() - iMaxFiles ; i++ )
+            FileDelete( PathJoin( strDumpDirPublicPath, publicList[i] ) );
+    }
+
+    // And while we are here, limit number of items in core.log as well
+    {
+        SString strCoreLogPathFilename = CalcMTASAPath( "mta\\core.log" );
+        SString strFileContents;
+        FileLoad( strCoreLogPathFilename, strFileContents );
+
+        SString strDelmiter = "** -- Unhandled exception -- **";
+        std::vector < SString > parts;
+        strFileContents.Split( strDelmiter, parts );
+
+        if ( parts.size() > iMaxFiles )
+        {
+            strFileContents = strDelmiter + strFileContents.Join( strDelmiter, parts, parts.size() - iMaxFiles );
+            FileSave( strCoreLogPathFilename, strFileContents );
+        }
+    }
 }
