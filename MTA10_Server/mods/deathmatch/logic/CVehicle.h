@@ -286,6 +286,15 @@ public:
     inline bool                     GetTrainDirection       ( void )                        { return m_bTrainDirection; }
     inline void                     SetTrainDirection       ( bool bDirection )             { m_bTrainDirection = bDirection; }
 
+    inline float                    GetTrainSpeed           ( void )                        { return m_fTrainSpeed; }
+    inline void                     SetTrainSpeed           ( float fSpeed )                { m_fTrainSpeed = fSpeed; }
+
+    inline float                    GetTrainPosition        ( void )                        { return m_fTrainPosition; }
+    inline void                     SetTrainPosition        ( float fPosition )             { m_fTrainPosition = fPosition; }
+
+    inline byte                     GetTrainTrack           ( void )                        { return m_bTrackID; }
+    inline void                     SetTrainTrack           ( byte bTrack )                 { m_bTrackID = bTrack; }
+
     inline SColor                   GetHeadLightColor       ( void )                        { return m_HeadLightColor; }
     inline void                     SetHeadLightColor       ( const SColor color )          { m_HeadLightColor = color; }
 
@@ -383,12 +392,17 @@ private:
     bool                            m_bSmokeTrail;
     unsigned char                   m_ucAlpha;
     bool                            m_bInWater;
-    bool                            m_bDerailed;
-    bool                            m_bIsDerailable;
-    bool                            m_bTrainDirection;
     CPlayer *                       m_pJackingPlayer;
     SColor                          m_HeadLightColor;
     bool                            m_bHeliSearchLightVisible;
+
+    // Train specific data
+    bool                        m_bDerailed;
+    bool                        m_bIsDerailable;
+    bool                        m_bTrainDirection;
+    float                       m_fTrainSpeed;
+    float                       m_fTrainPosition;
+    byte                        m_bTrackID;
 
     // Used to remember where this vehicle spawns
     CVector                         m_vecRespawnPosition;

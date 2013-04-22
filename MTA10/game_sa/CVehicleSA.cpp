@@ -438,29 +438,32 @@ void CVehicleSA::SetDerailed ( bool bDerailed )
     {
         CVehicleSAInterface* pInterface = GetVehicleInterface ();
         DWORD dwThis = (DWORD)pInterface;
-
-        if ( bDerailed )
+        if ( bDerailed != pInterface->trainFlags.bIsDerailed )
         {
-            pInterface->trainFlags.bIsDerailed = true;
-            MemAndFast < DWORD > ( dwThis + 64, ( DWORD ) 0xFFFDFFFB );
-        }
-        else
-        {
-            pInterface->trainFlags.bIsDerailed = false;
-            MemOrFast < DWORD > ( dwThis + 64, ( DWORD ) 0x20004 );
 
-            // Recalculate the on-rail distance from the start node (train position parameter, m_fTrainRailDistance)
-            DWORD dwFunc = FUNC_CVehicle_RecalcOnRailDistance;
-            _asm
+            if ( bDerailed )
             {
-                mov     ecx, dwThis
-                call    dwFunc
+                pInterface->trainFlags.bIsDerailed = true;
+                MemAndFast < DWORD > ( dwThis + 64, ( DWORD ) 0xFFFDFFFB );
             }
+            else
+            {
+                pInterface->trainFlags.bIsDerailed = false;
+                MemOrFast < DWORD > ( dwThis + 64, ( DWORD ) 0x20004 );
 
-            // Reset the speed
-            GetVehicleInterface ()->m_fTrainSpeed = 0.0f;
+                // Recalculate the on-rail distance from the start node (train position parameter, m_fTrainRailDistance)
+                DWORD dwFunc = FUNC_CVehicle_RecalcOnRailDistance;
+                _asm
+                {
+                    mov     ecx, dwThis
+                        call    dwFunc
+                }
+
+                // Reset the speed
+                GetVehicleInterface ()->m_fTrainSpeed = 0.0f;
+            }
         }
-    }   
+    }
 }
 
 float CVehicleSA::GetTrainSpeed ()
@@ -504,14 +507,41 @@ void CVehicleSA::SetRailTrack ( BYTE ucTrackID )
         return;
 
     CVehicleSAInterface* pInterf = GetVehicleInterface ();
-    pInterf->m_ucRailTrackID = ucTrackID;
-    if ( !IsDerailed () )
+    if ( pInterf->m_ucRailTrackID != ucTrackID )
     {
-        DWORD dwFunc = FUNC_CVehicle_RecalcOnRailDistance;
-        _asm
+        pInterf->m_ucRailTrackID = ucTrackID;
+        if ( !IsDerailed () )
         {
-            mov ecx, pInterf
-            call dwFunc
+            DWORD dwFunc = FUNC_CVehicle_RecalcOnRailDistance;
+            _asm
+            {
+                mov ecx, pInterf
+                call dwFunc
+            }
+        }
+    }
+}
+
+float CVehicleSA::GetTrainPosition ()
+{
+    return GetVehicleInterface ()->m_fTrainRailDistance;
+}
+
+
+void CVehicleSA::SetTrainPosition ( float fPosition )
+{
+    CVehicleSAInterface* pInterface = GetVehicleInterface ();
+    if ( pInterface->m_fTrainRailDistance <= fPosition - 0.1 || pInterface->m_fTrainRailDistance >= fPosition + 0.1 )
+    {
+        pInterface->m_fTrainRailDistance = fPosition;
+        if ( !IsDerailed () )
+        {
+            /*DWORD dwFunc = FUNC_CVehicle_RecalcOnRailDistance;
+            _asm
+            {
+                mov ecx, pInterface
+                call dwFunc
+            }*/
         }
     }
 }

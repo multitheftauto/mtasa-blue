@@ -51,6 +51,23 @@ bool CVehiclePuresyncPacket::Read ( NetBitStreamInterface& BitStream )
                 return false;
             pSourcePlayer->SetPosition ( position.data.vecPosition );
 
+            if ( pVehicle->GetVehicleType() == VEHICLE_TRAIN )
+            {
+                // Train specific data
+                float fPosition = 0.0f;
+                byte bTrack = 0;
+                bool bDirection = false;
+                float fSpeed = 0.0f;
+                BitStream.Read ( fPosition );
+                BitStream.ReadBit ( bDirection );
+                BitStream.Read ( bTrack );
+                BitStream.Read ( fSpeed );
+                pVehicle->SetTrainPosition ( fPosition );
+                pVehicle->SetTrainDirection ( bDirection );
+                pVehicle->SetTrainTrack ( bTrack );
+                pVehicle->SetTrainSpeed ( fSpeed );
+            }
+
             // Read the camera orientation
             CVector vecCamPosition, vecCamFwd;
             ReadCameraOrientation ( position.data.vecPosition, BitStream, vecCamPosition, vecCamFwd );
@@ -396,6 +413,19 @@ bool CVehiclePuresyncPacket::Write ( NetBitStreamInterface& BitStream ) const
                 SPositionSync position ( false );
                 position.data.vecPosition = pVehicle->GetPosition ();
                 BitStream.Write ( &position );
+
+                if ( pVehicle->GetVehicleType() == VEHICLE_TRAIN )
+                {
+                    // Train specific data
+                    float fPosition = pVehicle->GetTrainPosition ( );
+                    byte bTrack = pVehicle->GetTrainTrack ( );
+                    bool bDirection = pVehicle->GetTrainDirection ( );
+                    float fSpeed = pVehicle->GetTrainSpeed ( );
+                    BitStream.Write ( fPosition );
+                    BitStream.WriteBit ( bDirection );
+                    BitStream.Write ( bTrack );
+                    BitStream.Write ( fSpeed );
+                }
 
                 // Vehicle rotation
                 SRotationDegreesSync rotation;

@@ -64,6 +64,28 @@ bool CSimVehiclePuresyncPacket::Read ( NetBitStreamInterface& BitStream )
             return false;
         m_Cache.PlrPosition = position.data.vecPosition;
 
+        if ( m_usVehicleGotModel == 449 ||
+            m_usVehicleGotModel == 537 ||
+            m_usVehicleGotModel == 538 ||
+            m_usVehicleGotModel == 570 ||
+            m_usVehicleGotModel == 569 ||
+            m_usVehicleGotModel == 590 )
+        {
+            // Train specific data
+            float fRailPosition = 0.0f;
+            byte bRailTrack = 0;
+            bool bRailDirection = false;
+            float fRailSpeed = 0.0f;
+            if ( !BitStream.Read ( fRailPosition ) || !BitStream.ReadBit ( bRailDirection ) || !BitStream.Read ( bRailTrack ) || !BitStream.Read ( fRailSpeed ) )
+            {
+                return false;
+            }
+            m_Cache.fRailPosition = fRailPosition;
+            m_Cache.bRailDirection = bRailDirection;
+            m_Cache.bRailTrack = bRailTrack;
+            m_Cache.fRailSpeed = fRailSpeed;
+        }
+
         // Read the camera orientation
         ReadCameraOrientation ( position.data.vecPosition, BitStream, m_Cache.vecCamPosition, m_Cache.vecCamFwd );
 
@@ -251,6 +273,19 @@ bool CSimVehiclePuresyncPacket::Write ( NetBitStreamInterface& BitStream ) const
             SPositionSync position ( false );
             position.data.vecPosition = m_Cache.VehPosition;
             BitStream.Write ( &position );
+
+            if ( m_usVehicleGotModel == 449 ||
+                m_usVehicleGotModel == 537 ||
+                m_usVehicleGotModel == 538 ||
+                m_usVehicleGotModel == 570 ||
+                m_usVehicleGotModel == 569 ||
+                m_usVehicleGotModel == 590 )
+            {
+                BitStream.Write ( m_Cache.fRailPosition );
+                BitStream.WriteBit ( m_Cache.bRailDirection );
+                BitStream.Write ( m_Cache.bRailTrack );
+                BitStream.Write ( m_Cache.fRailSpeed );
+            }
 
             // Vehicle rotation
             SRotationDegreesSync rotation;

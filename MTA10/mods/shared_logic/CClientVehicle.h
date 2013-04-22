@@ -135,6 +135,8 @@ public:
     void                        SetPosition             ( const CVector& vecPosition )      { SetPosition ( vecPosition, true ); }
     void                        SetPosition             ( const CVector& vecPosition, bool bResetInterpolation );
 
+    void                        UpdatePedPositions      ( const CVector& vecPosition );
+
     void                        GetRotationDegrees      ( CVector& vecRotation ) const;
     void                        GetRotationRadians      ( CVector& vecRotation ) const;
     void                        SetRotationDegrees      ( const CVector& vecRotation )      { SetRotationDegrees ( vecRotation, true ); }
@@ -307,6 +309,13 @@ public:
 
     float                       GetTrainSpeed           ( void );
     void                        SetTrainSpeed           ( float fSpeed );
+
+    float                       GetTrainPosition        ( void );
+    void                        SetTrainPosition        ( float fPosition );
+
+    byte                        GetTrainTrack           ( void );
+    void                        SetTrainTrack           ( byte fPosition );
+
 
     inline unsigned char        GetOverrideLights       ( void )                            { return m_ucOverrideLights; }
     void                        SetOverrideLights       ( unsigned char ucOverrideLights );
@@ -561,6 +570,8 @@ protected:
     bool                        m_bIsDerailable;
     bool                        m_bTrainDirection;
     float                       m_fTrainSpeed;
+    float                       m_fTrainPosition;
+    byte                        m_bTrackID;
 
     // Time dependent error compensation interpolation
     struct
