@@ -130,6 +130,8 @@ CClientVehicle::CClientVehicle ( CClientManager* pManager, ElementID ID, unsigne
     m_bIsDerailable = true;
     m_bTrainDirection = false;
     m_fTrainSpeed = 0.0f;
+    m_fTrainPosition = 0.0f;
+    m_bTrackID = 0;
     m_bTaxiLightOn = false;
     m_vecGravity = CVector ( 0.0f, 0.0f, -1.0f );
     m_HeadLightColor = SColorRGBA ( 255, 255, 255, 255 );
@@ -328,6 +330,26 @@ void CClientVehicle::SetPosition ( const CVector& vecPosition, bool bResetInterp
     // Reset interpolation
     if ( bResetInterpolation )
         RemoveTargetPosition ();
+}
+
+void CClientVehicle::UpdatePedPositions ( const CVector& vecPosition )
+{
+    // Have we moved to a different position?
+    if ( m_Matrix.vPos != vecPosition )
+    {
+        // Store our new position
+        m_Matrix.vPos = vecPosition;
+        m_matFrozen.vPos = vecPosition;
+
+        // Update our streaming position
+        UpdateStreamPosition ( vecPosition );
+    }
+
+    // If we have any occupants, update their positions
+    for ( int i = 0; i <= NUMELMS ( m_pPassengers ) ; i++ )
+        if ( CClientPed* pOccupant = GetOccupant ( i ) )
+            pOccupant->SetPosition ( vecPosition );
+
 }
 
 
@@ -1961,6 +1983,42 @@ void CClientVehicle::SetTrainSpeed ( float fSpeed )
     m_fTrainSpeed = fSpeed;
 }
 
+float CClientVehicle::GetTrainPosition ( void )
+{
+    if ( m_pVehicle )
+    {
+        return m_pVehicle->GetTrainPosition ();
+    }
+    return m_fTrainPosition;
+}
+
+void CClientVehicle::SetTrainPosition ( float fSpeed )
+{
+    if ( m_pVehicle && GetVehicleType() == CLIENTVEHICLE_TRAIN  )
+    {
+        m_pVehicle->SetTrainPosition ( fSpeed );
+    }
+    m_fTrainPosition = fSpeed;
+}
+
+byte CClientVehicle::GetTrainTrack ( void )
+{
+    if ( m_pVehicle )
+    {
+        return m_pVehicle->GetRailTrack ();
+    }
+    return m_bTrackID;
+}
+
+void CClientVehicle::SetTrainTrack ( byte bTrack )
+{
+    if ( m_pVehicle && GetVehicleType() == CLIENTVEHICLE_TRAIN  )
+    {
+        m_pVehicle->SetRailTrack ( bTrack );
+    }
+    m_bTrackID = bTrack;
+}
+
 
 void CClientVehicle::SetOverrideLights ( unsigned char ucOverrideLights )
 {
@@ -2316,6 +2374,8 @@ void CClientVehicle::Create ( void )
             m_pVehicle->SetDerailable ( m_bIsDerailable );
             m_pVehicle->SetTrainDirection ( m_bTrainDirection );
             m_pVehicle->SetTrainSpeed ( m_fTrainSpeed );
+            m_pVehicle->SetTrainPosition ( m_fTrainPosition );
+            m_pVehicle->SetRailTrack ( m_bTrackID );
         }
 
         m_pVehicle->SetOverrideLights ( m_ucOverrideLights );
