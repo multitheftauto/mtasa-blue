@@ -1485,7 +1485,7 @@ void CNetAPI::ReadVehiclePuresync ( CClientPlayer* pPlayer, CClientVehicle* pVeh
         // Derailed state
         if ( pVehicle->GetVehicleType() == CLIENTVEHICLE_TRAIN )
         {
-            pVehicle->SetDerailed ( flags.data.bIsLandingGearDown );
+            pVehicle->SetDerailed ( flags.data.bIsDerailed );
         }
 
         // Heli search light
