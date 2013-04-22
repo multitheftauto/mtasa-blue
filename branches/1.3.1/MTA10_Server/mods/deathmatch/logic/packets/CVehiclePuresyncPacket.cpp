@@ -478,6 +478,11 @@ bool CVehiclePuresyncPacket::Write ( NetBitStreamInterface& BitStream ) const
             flags.data.bIsHeliSearchLightVisible = pVehicle->IsHeliSearchLightVisible ();
             BitStream.Write ( &flags );
 
+            #if MTASA_VERSION_MINOR == 3
+                // till r5289 the derailed state reads the landing gear down so since it's unused for trains put the derailed flag in there too so we can fix old clients
+                flags.FixDerailedState ( pVehicle->GetModel ( ) );
+            #endif
+
             // Write the weapon stuff
             if ( flags.data.bHasAWeapon )
             {

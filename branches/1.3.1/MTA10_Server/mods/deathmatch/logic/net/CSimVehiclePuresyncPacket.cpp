@@ -306,7 +306,38 @@ bool CSimVehiclePuresyncPacket::Write ( NetBitStreamInterface& BitStream ) const
         // Weapon
         unsigned char ucWeaponType = m_ucPlayerGotWeaponType;
 
-        BitStream.Write ( &m_Cache.flags );
+        #if MTASA_VERSION_MINOR == 3
+            // Trains do a copy of all flags then overwrite the landing gear down with derailed
+            if ( m_usVehicleGotModel == 449 ||
+                m_usVehicleGotModel == 537 ||
+                m_usVehicleGotModel == 538 ||
+                m_usVehicleGotModel == 570 ||
+                m_usVehicleGotModel == 569 ||
+                m_usVehicleGotModel == 590 )
+            {
+                SVehiclePuresyncFlags newFlags;
+                newFlags.data.bIsWearingGoggles = m_Cache.flags.data.bIsWearingGoggles;
+                newFlags.data.bIsDoingGangDriveby = m_Cache.flags.data.bIsDoingGangDriveby;
+                newFlags.data.bIsSirenOrAlarmActive = m_Cache.flags.data.bIsSirenOrAlarmActive;
+                newFlags.data.bIsSmokeTrailEnabled = m_Cache.flags.data.bIsSmokeTrailEnabled;
+                newFlags.data.bIsOnGround = m_Cache.flags.data.bIsOnGround;
+                newFlags.data.bIsInWater = m_Cache.flags.data.bIsInWater;
+                newFlags.data.bIsDerailed = m_Cache.flags.data.bIsDerailed;
+                newFlags.data.bIsAircraft = m_Cache.flags.data.bIsAircraft;
+                newFlags.data.bHasAWeapon = m_Cache.flags.data.bHasAWeapon;
+                newFlags.data.bIsHeliSearchLightVisible = m_Cache.flags.data.bIsHeliSearchLightVisible;
+
+                newFlags.data.bIsLandingGearDown = m_Cache.flags.data.bIsDerailed;
+
+                BitStream.Write ( &newFlags );
+            }
+            else
+            {
+                BitStream.Write ( &m_Cache.flags );
+            }
+        #else
+            BitStream.Write ( &m_Cache.flags );
+        #endif
 
         // Write the weapon stuff
         if ( m_Cache.flags.data.bHasAWeapon )

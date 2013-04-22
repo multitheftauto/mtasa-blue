@@ -1710,13 +1710,6 @@ void CNetAPI::WriteVehiclePuresync ( CClientPed* pPlayerModel, CClientVehicle* p
     flags.data.bHasAWeapon = ( pPlayerWeapon != NULL );
     flags.data.bIsHeliSearchLightVisible = pVehicle->IsHeliSearchLightVisible ();
 
-#if MTASA_VERSION_MINOR == 3
-    if ( pVehicle->GetVehicleType ( ) == CLIENTVEHICLE_TRAIN )
-    {
-        // till r5289 the derailed state reads the landing gear down so since it's unused for trains put the derailed flag in there too so we can fix old clients
-        flags.data.bIsLandingGearDown = flags.data.bIsDerailed;
-    }
-#endif
     // Write the flags
     BitStream.Write ( &flags );
 

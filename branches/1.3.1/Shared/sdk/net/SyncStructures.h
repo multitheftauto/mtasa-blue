@@ -714,6 +714,19 @@ struct SVehiclePuresyncFlags : public ISyncStructure
         bool bHasAWeapon : 1;
         bool bIsHeliSearchLightVisible : 1;
     } data;
+
+    void FixDerailedState ( const unsigned short uiModel )
+    {
+        if ( uiModel == 449 ||
+            uiModel == 537 ||
+            uiModel == 538 ||
+            uiModel == 570 ||
+            uiModel == 569 ||
+            uiModel == 590 )
+        {
+            data.bIsLandingGearDown = data.bIsDerailed;
+        }
+    }
 };
 
 
