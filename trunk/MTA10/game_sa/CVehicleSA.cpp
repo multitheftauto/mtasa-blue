@@ -536,12 +536,12 @@ void CVehicleSA::SetTrainPosition ( float fPosition )
         pInterface->m_fTrainRailDistance = fPosition;
         if ( !IsDerailed () )
         {
-            /*DWORD dwFunc = FUNC_CVehicle_RecalcOnRailDistance;
+            DWORD dwFunc = FUNC_CVehicle_RecalcOnRailDistance;
             _asm
             {
                 mov ecx, pInterface
                 call dwFunc
-            }*/
+            }
         }
     }
 }
