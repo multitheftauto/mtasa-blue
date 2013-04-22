@@ -292,8 +292,8 @@ public:
     inline float                    GetTrainPosition        ( void )                        { return m_fTrainPosition; }
     inline void                     SetTrainPosition        ( float fPosition )             { m_fTrainPosition = fPosition; }
 
-    inline byte                     GetTrainTrack           ( void )                        { return m_bTrackID; }
-    inline void                     SetTrainTrack           ( byte bTrack )                 { m_bTrackID = bTrack; }
+    inline uchar                    GetTrainTrack           ( void )                        { return m_ucTrackID; }
+    inline void                     SetTrainTrack           ( uchar ucTrack )               { m_ucTrackID = ucTrack; }
 
     inline SColor                   GetHeadLightColor       ( void )                        { return m_HeadLightColor; }
     inline void                     SetHeadLightColor       ( const SColor color )          { m_HeadLightColor = color; }
@@ -402,7 +402,7 @@ private:
     bool                        m_bTrainDirection;
     float                       m_fTrainSpeed;
     float                       m_fTrainPosition;
-    byte                        m_bTrackID;
+    uchar                       m_ucTrackID;
 
     // Used to remember where this vehicle spawns
     CVector                         m_vecRespawnPosition;

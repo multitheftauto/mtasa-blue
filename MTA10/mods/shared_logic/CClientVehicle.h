@@ -313,8 +313,8 @@ public:
     float                       GetTrainPosition        ( void );
     void                        SetTrainPosition        ( float fPosition );
 
-    byte                        GetTrainTrack           ( void );
-    void                        SetTrainTrack           ( byte fPosition );
+    uchar                       GetTrainTrack           ( void );
+    void                        SetTrainTrack           ( uchar ucTrack );
 
 
     inline unsigned char        GetOverrideLights       ( void )                            { return m_ucOverrideLights; }
@@ -571,7 +571,7 @@ protected:
     bool                        m_bTrainDirection;
     float                       m_fTrainSpeed;
     float                       m_fTrainPosition;
-    byte                        m_bTrackID;
+    uchar                       m_ucTrackID;
 
     // Time dependent error compensation interpolation
     struct

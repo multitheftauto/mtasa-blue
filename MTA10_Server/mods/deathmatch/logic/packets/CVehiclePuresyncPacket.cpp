@@ -55,16 +55,16 @@ bool CVehiclePuresyncPacket::Read ( NetBitStreamInterface& BitStream )
             {
                 // Train specific data
                 float fPosition = 0.0f;
-                byte bTrack = 0;
+                uchar ucTrack = 0;
                 bool bDirection = false;
                 float fSpeed = 0.0f;
                 BitStream.Read ( fPosition );
                 BitStream.ReadBit ( bDirection );
-                BitStream.Read ( bTrack );
+                BitStream.Read ( ucTrack );
                 BitStream.Read ( fSpeed );
                 pVehicle->SetTrainPosition ( fPosition );
                 pVehicle->SetTrainDirection ( bDirection );
-                pVehicle->SetTrainTrack ( bTrack );
+                pVehicle->SetTrainTrack ( ucTrack );
                 pVehicle->SetTrainSpeed ( fSpeed );
             }
 
@@ -418,12 +418,12 @@ bool CVehiclePuresyncPacket::Write ( NetBitStreamInterface& BitStream ) const
                 {
                     // Train specific data
                     float fPosition = pVehicle->GetTrainPosition ( );
-                    byte bTrack = pVehicle->GetTrainTrack ( );
+                    uchar ucTrack = pVehicle->GetTrainTrack ( );
                     bool bDirection = pVehicle->GetTrainDirection ( );
                     float fSpeed = pVehicle->GetTrainSpeed ( );
                     BitStream.Write ( fPosition );
                     BitStream.WriteBit ( bDirection );
-                    BitStream.Write ( bTrack );
+                    BitStream.Write ( ucTrack );
                     BitStream.Write ( fSpeed );
                 }
 
