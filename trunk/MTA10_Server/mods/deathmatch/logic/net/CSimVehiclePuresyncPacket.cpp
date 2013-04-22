@@ -73,16 +73,16 @@ bool CSimVehiclePuresyncPacket::Read ( NetBitStreamInterface& BitStream )
         {
             // Train specific data
             float fRailPosition = 0.0f;
-            byte bRailTrack = 0;
+            uchar ucRailTrack = 0;
             bool bRailDirection = false;
             float fRailSpeed = 0.0f;
-            if ( !BitStream.Read ( fRailPosition ) || !BitStream.ReadBit ( bRailDirection ) || !BitStream.Read ( bRailTrack ) || !BitStream.Read ( fRailSpeed ) )
+            if ( !BitStream.Read ( fRailPosition ) || !BitStream.ReadBit ( bRailDirection ) || !BitStream.Read ( ucRailTrack ) || !BitStream.Read ( fRailSpeed ) )
             {
                 return false;
             }
             m_Cache.fRailPosition = fRailPosition;
             m_Cache.bRailDirection = bRailDirection;
-            m_Cache.bRailTrack = bRailTrack;
+            m_Cache.ucRailTrack = ucRailTrack;
             m_Cache.fRailSpeed = fRailSpeed;
         }
 
@@ -283,7 +283,7 @@ bool CSimVehiclePuresyncPacket::Write ( NetBitStreamInterface& BitStream ) const
             {
                 BitStream.Write ( m_Cache.fRailPosition );
                 BitStream.WriteBit ( m_Cache.bRailDirection );
-                BitStream.Write ( m_Cache.bRailTrack );
+                BitStream.Write ( m_Cache.ucRailTrack );
                 BitStream.Write ( m_Cache.fRailSpeed );
             }
 

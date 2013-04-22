@@ -98,7 +98,7 @@ private:
         ushort          usAdjustableProperty;
 
         float           fRailPosition;
-        byte            bRailTrack;
+        uchar           ucRailTrack;
         bool            bRailDirection;
         float           fRailSpeed;
 
