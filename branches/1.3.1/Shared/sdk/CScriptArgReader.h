@@ -134,7 +134,8 @@ public:
         int iArgument = lua_type ( m_luaVM, m_iIndex );
         if ( iArgument == LUA_TSTRING || iArgument == LUA_TNUMBER )
         {
-            outValue = lua_tostring ( m_luaVM, m_iIndex++ );
+            uint uiLength = lua_strlen ( m_luaVM, m_iIndex );
+            outValue.assign( lua_tostring ( m_luaVM, m_iIndex++ ), uiLength );
             return;
         }
         else
