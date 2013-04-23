@@ -170,10 +170,9 @@ CClientVehicle::~CClientVehicle ( void )
     m_pManager->UnreferenceEntity ( this );    
 
     // Unlink any towing attachments
-    if ( m_pTowedVehicle )
-        m_pTowedVehicle->m_pTowedByVehicle = NULL;
+    SetTowedVehicle ( NULL );
     if ( m_pTowedByVehicle )
-        m_pTowedByVehicle->m_pTowedVehicle = NULL;
+        m_pTowedByVehicle->SetTowedVehicle ( NULL );
 
     AttachTo ( NULL );
 
