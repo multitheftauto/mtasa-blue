@@ -165,7 +165,7 @@ int CLuaFunctionDefs::ShowCursor ( lua_State* luaVM )
 
 int CLuaFunctionDefs::BindKey ( lua_State* luaVM )
 {
-    SString strKey = "", strHitState = "", strCommand = "", strArguments = "", strResource = "";
+    SString strKey = "", strHitState = "", strCommand = "", strArguments = "";
     CScriptArgReader argStream ( luaVM );
     argStream.ReadString ( strKey );
     argStream.ReadString ( strHitState );
@@ -177,22 +177,28 @@ int CLuaFunctionDefs::BindKey ( lua_State* luaVM )
         {
             if ( argStream.NextIsString ( ) )
             {
+                // bindKey ( string key, string keyState, string commandName, [ string arguments ] )
+                SString strResource = pLuaMain->GetResource()->GetName();
                 argStream.ReadString ( strCommand );
                 argStream.ReadString ( strArguments, "" );
-                if ( CStaticFunctionDefinitions::BindKey ( strKey, strHitState, strCommand, strArguments, strResource ) )
+                if ( !argStream.HasErrors ( ) )
                 {
-                    lua_pushboolean ( luaVM, true );
-                    return 1;
-                }  
+                    if ( CStaticFunctionDefinitions::BindKey ( strKey, strHitState, strCommand, strArguments, strResource ) )
+                    {
+                        lua_pushboolean ( luaVM, true );
+                        return 1;
+                    }  
+                }
             }
             else
-            { 
-                // Jax: grab our arguments first, luaM_toref pops the stack!
+            {
+                // bindKey ( string key, string keyState, function handlerFunction,  [ var arguments, ... ] )
+                CLuaFunctionRef iLuaFunction;
                 CLuaArguments Arguments;
-                Arguments.ReadArguments ( luaVM, 4 );
-                CLuaFunctionRef iLuaFunction = luaM_toref ( luaVM, 3 );
-
-                if ( VERIFY_FUNCTION ( iLuaFunction ) )
+                argStream.ReadFunction ( iLuaFunction );
+                argStream.ReadLuaArguments ( Arguments );
+                argStream.ReadFunctionComplete ();
+                if ( !argStream.HasErrors ( ) )
                 {
                     if ( CStaticFunctionDefinitions::BindKey ( strKey, strHitState, pLuaMain, iLuaFunction, Arguments ) )
                     {
@@ -200,12 +206,11 @@ int CLuaFunctionDefs::BindKey ( lua_State* luaVM )
                         return 1;
                     }
                 }
-                else
-                    m_pScriptDebugging->LogBadPointer ( luaVM, "function", 3 );
             }
         }
     }
-    else
+
+    if ( argStream.HasErrors ( ) )
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
@@ -218,48 +223,49 @@ int CLuaFunctionDefs::UnbindKey ( lua_State* luaVM )
     SString strKey = "", strHitState = "";
     CScriptArgReader argStream ( luaVM );
     argStream.ReadString ( strKey );
-    argStream.ReadString ( strHitState, "" );
 
     if ( !argStream.HasErrors ( ) )
     {
         CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
         if ( pLuaMain )
         {
-            const char* szHitState = strHitState == "" ? NULL : strHitState;
-
-            if ( argStream.NextIsString ( ) )
+            if ( argStream.NextIsString ( 1 ) ) // Check if has command
             {
+                // bool unbindKey ( string key, string keyState, string command )
                 SString strResource = pLuaMain->GetResource()->GetName();
                 SString strCommand = "";
+                argStream.ReadString ( strHitState );
                 argStream.ReadString ( strCommand );
-                if ( CStaticFunctionDefinitions::UnbindKey ( strCommand, szHitState, strCommand, strResource ) )
+                if ( !argStream.HasErrors ( ) )
                 {
-                    lua_pushboolean ( luaVM, true );
-                    return 1;
+                    if ( CStaticFunctionDefinitions::UnbindKey ( strKey, strHitState, strCommand, strResource ) )
+                    {
+                        lua_pushboolean ( luaVM, true );
+                        return 1;
+                    }
                 }
             }
             else
-            {   
+            {
+                // bool unbindKey ( string key, [ string keyState, function handler ] )
                 CLuaFunctionRef iLuaFunction;
-                if ( argStream.NextIsFunction ( ) )
-                    iLuaFunction = luaM_toref ( luaVM, 3 );
-
-                if ( IS_REFNIL ( iLuaFunction ) || VERIFY_FUNCTION ( iLuaFunction ) )
+                argStream.ReadString ( strHitState, "" );
+                argStream.ReadFunction ( iLuaFunction, LUA_REFNIL );
+                argStream.ReadFunctionComplete ();
+                if ( !argStream.HasErrors ( ) )
                 {
+                    const char* szHitState = strHitState == "" ? NULL : strHitState;
                     if ( CStaticFunctionDefinitions::UnbindKey ( strKey, pLuaMain, szHitState, iLuaFunction ) )
                     {
                         lua_pushboolean ( luaVM, true );
                         return 1;
                     }
                 }
-                else
-                {
-                    m_pScriptDebugging->LogBadType ( luaVM );
-                }
             }
         }
     }
-    else
+
+    if ( argStream.HasErrors ( ) )
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
@@ -337,6 +343,7 @@ int CLuaFunctionDefs::GetAnalogControlState ( lua_State * luaVM )
 
 int CLuaFunctionDefs::SetAnalogControlState ( lua_State * luaVM )
 {
+//  bool setAnalogControlState ( string controlName [, float state] )
     SString strControlState = "";
     float fState = 0.0f;
     CScriptArgReader argStream ( luaVM );
@@ -353,7 +360,7 @@ int CLuaFunctionDefs::SetAnalogControlState ( lua_State * luaVM )
                 return 1;
             }
         }
-        else if ( argStream.NextIsNil ( ) )
+        else if ( argStream.NextIsNone ( ) )
         {
             CClientPad::RemoveSetAnalogControlState ( strControlState );
             lua_pushboolean ( luaVM, true );
