@@ -431,7 +431,6 @@ int CLuaFileDefs::fileWrite ( lua_State* luaVM )
             long lArgBytesWritten = 0;
             do
             {
-                argStream.ReadString ( strMessage );
                 unsigned long ulDataLen = strMessage.length ( );
 
                 // Write it and add the bytes written to our total bytes written
@@ -443,8 +442,13 @@ int CLuaFileDefs::fileWrite ( lua_State* luaVM )
                     return 1;
                 }
                 lBytesWritten += lArgBytesWritten;
+
+                if ( !argStream.NextIsString ( ) )
+                    break;
+
+                argStream.ReadString ( strMessage );
             }
-            while ( argStream.NextIsString ( ) );
+            while ( true );
 
             // Return the number of bytes we wrote
             lua_pushnumber ( luaVM, lBytesWritten );

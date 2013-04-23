@@ -334,26 +334,21 @@ int CLuaFunctionDefs::SetMarkerTarget ( lua_State* luaVM )
 {
     // Verify the argument
     CClientEntity* pEntity = NULL;
-    CVector* pTargetVector = new CVector ( 0, 0, 0 );
+    CVector vecTarget;
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pEntity );
-    argStream.ReadNumber ( pTargetVector->fX );
-    argStream.ReadNumber ( pTargetVector->fY );
-    argStream.ReadNumber ( pTargetVector->fZ );
+    argStream.ReadNumber ( vecTarget.fX );
+    argStream.ReadNumber ( vecTarget.fY );
+    argStream.ReadNumber ( vecTarget.fZ );
 
     if ( !argStream.HasErrors ( ) )
     {
-        if ( pEntity )
+        // Do it
+        if ( CStaticFunctionDefinitions::SetMarkerTarget ( *pEntity, &vecTarget ) )
         {
-            // Do it
-            if ( CStaticFunctionDefinitions::SetMarkerTarget ( *pEntity, pTargetVector ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
+            lua_pushboolean ( luaVM, true );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
