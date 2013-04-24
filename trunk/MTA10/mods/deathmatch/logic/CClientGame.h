@@ -280,6 +280,7 @@ public:
 
     inline CElementDeleter*             GetElementDeleter               ( void )        { return &m_ElementDeleter; }
     inline CObjectRespawner*            GetObjectRespawner              ( void )        { return &m_ObjectRespawner; }
+    CRemoteCalls*                       GetRemoteCalls                  ( void )        { return m_pRemoteCalls; }
 
     // Status toggles
     void                                ShowNetstat                     ( int iCmd );
@@ -592,6 +593,7 @@ private:
     CSingularFileDownloadManager*       m_pSingularFileDownloadManager;
     CGameEntityXRefManager*             m_pGameEntityXRefManager;
     CClientModelCacheManager*           m_pModelCacheManager;
+    CRemoteCalls*                       m_pRemoteCalls;
 
     // Revised facilities
     CServer                             m_Server;

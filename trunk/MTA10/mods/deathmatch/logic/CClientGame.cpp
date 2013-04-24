@@ -186,6 +186,7 @@ CClientGame::CClientGame ( bool bLocalPlay )
     m_pLatentTransferManager = new CLatentTransferManager ();
     m_pZoneNames = new CZoneNames;
     m_pScriptKeyBinds = new CScriptKeyBinds;
+    m_pRemoteCalls = new CRemoteCalls();
 
     // Create our net API
     m_pNetAPI = new CNetAPI ( m_pManager );
@@ -448,6 +449,7 @@ CClientGame::~CClientGame ( void )
     delete m_pGameEntityXRefManager;
     delete m_pZoneNames;
     delete m_pScriptKeyBinds;    
+    SAFE_DELETE( m_pRemoteCalls );
 
     // Delete the scriptdebugger
     delete m_pScriptDebugging;
@@ -1182,6 +1184,7 @@ void CClientGame::DoPulses ( void )
         // Pulse DownloadFiles if we're transferring stuff
         DownloadInitialResourceFiles ();
         DownloadSingularResourceFiles ();
+        g_pNet->GetHTTPDownloadManager ( EDownloadMode::CALL_REMOTE )->ProcessQueuedFiles ();
     }
 
     // Not waiting for local connect?

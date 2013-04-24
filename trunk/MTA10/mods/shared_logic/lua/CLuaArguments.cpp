@@ -219,7 +219,7 @@ bool CLuaArguments::Call ( CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFuncti
     // Add the function name to the stack and get the event from the table
     lua_State* luaVM = pLuaMain->GetVirtualMachine ();
     assert ( luaVM );
-    LUA_CHECKSTACK ( luaVM, 1 );
+    LUA_CHECKSTACK ( luaVM, 2 );
     int luaStackPointer = lua_gettop ( luaVM );
     lua_getref ( luaVM, iLuaFunction.ToInt () );
 

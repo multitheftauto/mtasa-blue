@@ -2095,3 +2095,37 @@ int CLuaFunctionDefs::GetFPSLimit ( lua_State* luaVM )
     lua_pushboolean ( luaVM, false );
     return 1;
 }
+
+
+// Call a function on a remote server
+int CLuaFunctionDefs::FetchRemote ( lua_State* luaVM )
+{
+//  bool fetchRemote ( string URL [, int connectionAttempts = 10 ], callback callbackFunction, [ string postData, bool bPostBinary, arguments... ] )
+    CScriptArgReader argStream ( luaVM );
+    SString strURL; CLuaFunctionRef iLuaFunction; SString strPostData; bool bPostBinary; CLuaArguments args; uint uiConnectionAttempts;
+
+    argStream.ReadString ( strURL );
+    argStream.ReadIfNextIsNumber ( uiConnectionAttempts, 10 );
+    argStream.ReadFunction ( iLuaFunction );
+    argStream.ReadString ( strPostData, "" );
+    argStream.ReadBool ( bPostBinary, false );
+    argStream.ReadLuaArguments ( args );
+    argStream.ReadFunctionComplete ();
+
+    if ( !argStream.HasErrors () )
+    {
+        CLuaMain * luaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+        if ( luaMain )
+        {
+            g_pClientGame->GetRemoteCalls()->Call ( strURL, &args, strPostData, bPostBinary, luaMain, iLuaFunction, uiConnectionAttempts );
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
