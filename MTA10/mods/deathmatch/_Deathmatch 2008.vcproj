@@ -2712,6 +2712,18 @@
 				</Filter>
 			</Filter>
 		</Filter>
+		<Filter
+			Name="NewFilter1"
+			>
+			<File
+				RelativePath="..\shared_logic\CRemoteCalls.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\shared_logic\CRemoteCalls.h"
+				>
+			</File>
+		</Filter>
 	</Files>
 	<Globals>
 		<Global
