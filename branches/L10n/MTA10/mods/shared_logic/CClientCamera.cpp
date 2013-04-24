@@ -104,12 +104,12 @@ void CClientCamera::DoPulse ( void )
                     if ( eType == CCLIENTVEHICLE )
                     {
                         CVector vecVehicleRotation;
-                        static_cast < CClientVehicle* > ( m_pFocusedEntity )->GetRotationRadians ( vecVehicleRotation );
+                        static_cast < CClientVehicle* > ( (CClientEntity*)m_pFocusedEntity )->GetRotationRadians ( vecVehicleRotation );
                         fRotation = vecVehicleRotation.fZ * 3.14159f / 180;
                     }
                     else if ( eType == CCLIENTPED || eType == CCLIENTPLAYER )
                     {
-                        fRotation = static_cast < CClientPed* > ( m_pFocusedEntity )->GetCurrentRotation ();
+                        fRotation = static_cast < CClientPed* > ( (CClientEntity*)m_pFocusedEntity )->GetCurrentRotation ();
                     }
                 }
 
@@ -186,11 +186,11 @@ void CClientCamera::SetRotationRadians ( const CVector& vecRotation )
     vecPosition += vecNormal;
 
     // Set the calculated vector as the target
-    SetTarget ( vecPosition );
+    SetFixedTarget ( vecPosition );
 }
 
 
-void CClientCamera::GetTarget ( CVector & vecTarget ) const
+void CClientCamera::GetFixedTarget ( CVector & vecTarget ) const
 {
     if ( m_bFixed ) vecTarget = m_vecFixedTarget;
     else
@@ -204,10 +204,27 @@ void CClientCamera::GetTarget ( CVector & vecTarget ) const
 }
 
 
-void CClientCamera::SetTarget ( const CVector& vecPosition )
+void CClientCamera::SetFixedTarget ( const CVector& vecPosition )
 {
     // Store the target so it can be updated from our hook
     m_vecFixedTarget = vecPosition;
+}
+
+
+void CClientCamera::SetTarget ( const CVector& vecPosition )
+{
+    if ( m_pCamera )
+    {
+        CVector vecPlayerPosition;
+        g_pClientGame->GetLocalPlayer ()->GetPosition ( vecPlayerPosition );
+
+        float fDistance = (vecPosition - vecPlayerPosition).Length ();
+        float fAngleHorz = -atan2 ( vecPosition.fX - vecPlayerPosition.fX, vecPosition.fY - vecPlayerPosition.fY ) - PI/2;
+        float fAngleVert = atan2 ( vecPosition.fZ - vecPlayerPosition.fZ, fDistance );
+
+        CCam* pCam = m_pCamera->GetCam ( m_pCamera->GetActiveCam () );
+        pCam->SetDirection ( fAngleHorz, fAngleVert );
+    }
 }
 
 
@@ -233,7 +250,7 @@ void CClientCamera::SetFocus ( CClientEntity* pEntity, eCamMode eMode, bool bSmo
 
         // Remove stream reference from the previous target
         if ( m_pFocusedEntity && m_pFocusedEntity->IsStreamingCompatibleClass () )
-            static_cast < CClientStreamElement* > ( m_pFocusedEntity )->RemoveStreamReference ();
+            static_cast < CClientStreamElement* > ( (CClientEntity*)m_pFocusedEntity )->RemoveStreamReference ();
 
         // Add stream reference for our new target
         if ( pEntity && pEntity->IsStreamingCompatibleClass () )
@@ -330,7 +347,7 @@ void CClientCamera::SetFocusToLocalPlayer ( void )
 
     // Remove stream reference from the previous target
     if ( m_pFocusedEntity && m_pFocusedEntity->IsStreamingCompatibleClass () )
-        static_cast < CClientStreamElement* > ( m_pFocusedEntity )->RemoveStreamReference ();
+        static_cast < CClientStreamElement* > ( (CClientEntity*)m_pFocusedEntity )->RemoveStreamReference ();
 
     // Reset
     m_pFocusedPlayer = NULL;
@@ -358,7 +375,7 @@ void CClientCamera::UnreferenceEntity ( CClientEntity* pEntity )
 
         // Remove stream reference from the previous target
         if ( m_pFocusedEntity && m_pFocusedEntity->IsStreamingCompatibleClass () )
-            static_cast < CClientStreamElement* > ( m_pFocusedEntity )->RemoveStreamReference ();
+            static_cast < CClientStreamElement* > ( (CClientEntity*)m_pFocusedEntity )->RemoveStreamReference ();
 
         m_pFocusedEntity = NULL;
         m_pFocusedGameEntity = NULL;

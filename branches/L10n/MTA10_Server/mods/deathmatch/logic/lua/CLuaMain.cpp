@@ -244,13 +244,13 @@ void CLuaMain::InitClasses ( lua_State* luaVM )
     lua_classvariable ( luaVM, "health", "setElementHealth", "getElementHealth" );
     lua_classvariable ( luaVM, "alpha", "setElementAlpha", "getElementAlpha" );
     lua_classvariable ( luaVM, "doubleSided", "setElementDoubleSided", "isElementDoubleSided" );
-    lua_classvariable ( luaVM, "mode", "setElementModel", "getElementModel" );
+    lua_classvariable ( luaVM, "model", "setElementModel", "getElementModel" );
     lua_classvariable ( luaVM, "syncer", "setElementSyncer", "getElementSyncer" );
     lua_classvariable ( luaVM, "collisions", "setElementCollisionsEnabled", "getElementCollisionsEnabled" );
     lua_classvariable ( luaVM, "frozen", "setElementFrozen", "isElementFrozen" );
     lua_classvariable ( luaVM, "inWater", NULL, "isElementInWater" );
     lua_classvariable ( luaVM, "dimension", "setElementDimension", "getElementDimension" );
-    lua_classvariable ( luaVM, "interior", "setElementDimension", "getElementInterior" );
+    lua_classvariable ( luaVM, "interior", "setElementInterior", "getElementInterior" );
 
     lua_registerclass ( luaVM, "Element" );
 }

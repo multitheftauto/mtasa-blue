@@ -21,63 +21,64 @@
 
 int CLuaFunctionDefs::GetTok ( lua_State* luaVM )
 {
-    if ( ( lua_type ( luaVM, 1 ) != LUA_TSTRING ) || ( lua_type ( luaVM, 2 ) != LUA_TNUMBER ) || ( lua_type ( luaVM, 3 ) != LUA_TNUMBER ) && ( lua_type ( luaVM, 3 ) != LUA_TSTRING ) )
+    SString strInput = "";
+    unsigned int uiToken = 0;
+    unsigned int uiDelimiter = 0;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadString ( strInput );
+    argStream.ReadNumber ( uiToken );
+
+
+    if ( !argStream.HasErrors ( ) )
     {
-        m_pScriptDebugging->LogBadType ( luaVM );
-
-        lua_pushboolean ( luaVM, false );
-        return 1;
-    }
-
-    SString strDelimiter;
-    if ( lua_type ( luaVM, 3 ) == LUA_TNUMBER )
-    {
-        unsigned int uiCharacter = static_cast < unsigned int > ( lua_tonumber ( luaVM, 3 ) );
-        wchar_t wUNICODE[2] = { uiCharacter, '\0' };
-        strDelimiter = UTF16ToMbUTF8(wUNICODE);
-    }
-    else  // It's already a string
-        strDelimiter = lua_tostring ( luaVM, 3 );
-
-    const char* szText = lua_tostring ( luaVM, 1 );
-    int iToken = static_cast < int > ( lua_tonumber ( luaVM, 2 ) );
-    unsigned int uiCount = 0;
-
-    if ( iToken > 0 && iToken < 1024 )
-    {
-        // Copy the string
-        char* strText = new char [ strlen ( szText ) + 1 ];
-        strcpy ( strText, szText );
-
-        unsigned int uiCount = 1;
-        char* szToken = strtok ( strText, strDelimiter );
-
-        // We're looking for the first part?
-        if ( iToken != 1 )
+        SString strDelimiter;
+        if ( argStream.NextIsNumber ( ) )
         {
-            // strtok count number of times
-            do
+            argStream.ReadNumber ( uiDelimiter );
+            wchar_t wUNICODE[2] = { uiDelimiter, '\0' };
+            strDelimiter = UTF16ToMbUTF8(wUNICODE);
+        }
+        else  // It's already a string
+            argStream.ReadString ( strDelimiter );
+
+        unsigned int uiCount = 0;
+
+        if ( uiToken > 0 && uiToken < 1024 )
+        {
+            unsigned int uiCount = 1;
+            char* szText = new char [ strInput.length ( ) + 1 ];
+            strcpy ( szText, strInput );
+            char* szToken = strtok ( szText, strDelimiter );
+
+            // We're looking for the first part?
+            if ( uiToken != 1 )
             {
-                uiCount++;
-                szToken = strtok ( NULL, strDelimiter );
+                // strtok count number of times
+                do
+                {
+                    uiCount++;
+                    szToken = strtok ( NULL, strDelimiter );
+                }
+                while ( uiCount != uiToken );
             }
-            while ( uiCount != iToken );
-        }
 
-        // Found it?
-        if ( szToken )
-        {
-            // Return it
-            lua_pushstring ( luaVM, szToken );
-            delete [] strText;
-            return 1;
-        }
+            // Found it?
+            if ( szToken )
+            {
+                // Return it
+                lua_pushstring ( luaVM, szToken );
+                delete [] szText;
+                return 1;
+            }
 
-        // Delete the text
-        delete [] strText;
+            // Delete the text
+            delete [] szText;
+        }
+        else
+            m_pScriptDebugging->LogWarning ( luaVM, "Token parameter sent to split must be greater than 0 and smaller than 1024" );
     }
     else
-        m_pScriptDebugging->LogWarning ( luaVM, "Token parameter sent to split must be greater than 0 and smaller than 1024" );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -86,52 +87,53 @@ int CLuaFunctionDefs::GetTok ( lua_State* luaVM )
 
 int CLuaFunctionDefs::Split ( lua_State* luaVM )
 {
-    if ( ( lua_type ( luaVM, 1 ) != LUA_TSTRING ) || ( lua_type ( luaVM, 2 ) != LUA_TNUMBER && ( lua_type ( luaVM, 2 ) != LUA_TSTRING ) ) )
+    SString strInput = "";
+    unsigned int uiDelimiter = 0;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadString ( strInput );
+
+
+    if ( !argStream.HasErrors ( ) )
     {
-        m_pScriptDebugging->LogBadType ( luaVM );
+        SString strDelimiter;
+        if ( argStream.NextIsNumber ( ) )
+        {
+            argStream.ReadNumber ( uiDelimiter );
+            wchar_t wUNICODE[2] = { uiDelimiter, '\0' };
+            strDelimiter = UTF16ToMbUTF8(wUNICODE);
+        }
+        else  // It's already a string
+            argStream.ReadString ( strDelimiter );
 
-        lua_pushboolean ( luaVM, false );
-        return 1;
-    }
+        // Copy the string
+        char* strText = new char [ strInput.length ( ) + 1 ];
+        strcpy ( strText, strInput );
 
-    SString strDelimiter;
-    if ( lua_type ( luaVM, 2 ) == LUA_TNUMBER )
-    {
-        unsigned int uiCharacter = static_cast < unsigned int > ( lua_tonumber ( luaVM, 2 ) );
-        wchar_t wUNICODE[2] = { uiCharacter, '\0' };
-        strDelimiter = UTF16ToMbUTF8(wUNICODE);
-    }
-    else  // It's already a string
-        strDelimiter = lua_tostring ( luaVM, 2 );
+        unsigned int uiCount = 0;
+        char* szToken = strtok ( strText, strDelimiter );
 
-    const char* szText = lua_tostring ( luaVM, 1 );
+        // Create a new table
+        lua_newtable ( luaVM );
 
-    // Copy the string
-    char* strText = new char [ strlen ( szText ) + 1 ];
-    strcpy ( strText, szText );
-
-    unsigned int uiCount = 0;
-    char* szToken = strtok ( strText, strDelimiter );
-
-    // Create a new table
-    lua_newtable ( luaVM );
-
-    // Add our first token
-    lua_pushnumber ( luaVM, ++uiCount );
-    lua_pushstring ( luaVM, szToken );
-    lua_settable ( luaVM, -3 );
-
-    // strtok until we're out of tokens
-    while ( szToken = strtok ( NULL, strDelimiter ) )
-    {
-        // Add the token to the table
+        // Add our first token
         lua_pushnumber ( luaVM, ++uiCount );
         lua_pushstring ( luaVM, szToken );
         lua_settable ( luaVM, -3 );
-    }
 
-    // Delete the text
-    delete [] strText;
+        // strtok until we're out of tokens
+        while ( szToken = strtok ( NULL, strDelimiter ) )
+        {
+            // Add the token to the table
+            lua_pushnumber ( luaVM, ++uiCount );
+            lua_pushstring ( luaVM, szToken );
+            lua_settable ( luaVM, -3 );
+        }
+
+        // Delete the text
+        delete [] strText;
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     return 1;
 }
@@ -335,11 +337,14 @@ int CLuaFunctionDefs::GetTickCount_ ( lua_State* luaVM )
 
 int CLuaFunctionDefs::GetCTime ( lua_State* luaVM )
 {
+    // Verify the argument
     time_t timer;
     time ( &timer );
-    if ( lua_type ( luaVM, 1 ) == LUA_TNUMBER || lua_type ( luaVM, 1 ) == LUA_TSTRING )
+    CScriptArgReader argStream ( luaVM );
+
+    if ( argStream.NextIsNumber ( ) )
     {
-        timer = ( time_t ) lua_tonumber ( luaVM, 1 );
+        argStream.ReadNumber ( timer );
     }
     tm * time = localtime ( &timer );
 
@@ -396,10 +401,9 @@ int CLuaFunctionDefs::tocolor ( lua_State* luaVM )
 
 int CLuaFunctionDefs::Reference ( lua_State* luaVM )
 {
-    int iArgument1 = lua_type ( luaVM, 1 );
-    if ( iArgument1 == LUA_TTABLE || iArgument1 == LUA_TFUNCTION ||
-        iArgument1 == LUA_TUSERDATA || iArgument1 == LUA_TTHREAD ||
-        iArgument1 == LUA_TLIGHTUSERDATA )
+    CScriptArgReader argStream ( luaVM );
+    if ( argStream.NextIsTable ( ) || argStream.NextIsFunction ( ) ||
+        argStream.NextIsUserData ( ) )
     {
         int iPointer = lua_ref ( luaVM, 1 );
         lua_pushnumber ( luaVM, iPointer );
@@ -412,12 +416,18 @@ int CLuaFunctionDefs::Reference ( lua_State* luaVM )
 
 int CLuaFunctionDefs::Dereference ( lua_State* luaVM )
 {
-    if ( lua_type ( luaVM, 1 ) == LUA_TNUMBER )
+    int iPointer = 0;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadNumber ( iPointer );
+
+    if ( !argStream.HasErrors ( ) )
     {
-        int iPointer = static_cast < int > ( lua_tonumber ( luaVM, 1 ) );
         lua_getref ( luaVM, iPointer );
         return 1;
     }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+
     lua_pushboolean ( luaVM, false );
     return 1;
 }
@@ -585,20 +595,23 @@ int CLuaFunctionDefs::InterpolateBetween ( lua_State* luaVM )
 
 int CLuaFunctionDefs::Md5 ( lua_State* luaVM )
 {
-    if ( lua_type ( luaVM, 1 ) == LUA_TSTRING || lua_type ( luaVM, 1 ) == LUA_TNUMBER )
+    SString strMd5 = "";
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadString ( strMd5 );
+
+    if ( !argStream.HasErrors ( ) )
     {
         MD5 md5bytes;
         char szResult[33];
         CMD5Hasher hasher;
-        hasher.Calculate ( lua_tostring ( luaVM, 1 ), lua_objlen ( luaVM, 1 ), md5bytes );
+        hasher.Calculate ( strMd5, strMd5.length ( ), md5bytes );
         hasher.ConvertToHex ( md5bytes, szResult );
         lua_pushstring ( luaVM, szResult );
         return 1;
     }
     else
-    {
-        m_pScriptDebugging->LogBadType ( luaVM );
-    }
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+
     lua_pushboolean ( luaVM, false );
     return 1;
 }
@@ -676,43 +689,43 @@ int CLuaFunctionDefs::TeaDecode ( lua_State* luaVM )
 
 int CLuaFunctionDefs::Base64encode ( lua_State* luaVM )
 {
-	SString str;
+    SString str;
 
-	CScriptArgReader argStream ( luaVM );
-	argStream.ReadString ( str );
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadString ( str );
 
-	if ( !argStream.HasErrors() )
-	{
-		SString result = Base64::encode ( str );
-		lua_pushstring ( luaVM, result );
-		return 1;
-	}
-	else
-		m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+    if ( !argStream.HasErrors() )
+    {
+        SString result = Base64::encode ( str );
+        lua_pushstring ( luaVM, result );
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
 
-	lua_pushboolean ( luaVM, false );
-	return 1;
+    lua_pushboolean ( luaVM, false );
+    return 1;
 }
 
 int CLuaFunctionDefs::Base64decode ( lua_State* luaVM )
 {
-	SString str;
+    SString str;
 
-	CScriptArgReader argStream ( luaVM );
-	argStream.ReadString ( str );
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadString ( str );
 
-	if ( !argStream.HasErrors() )
-	{
-		SString result;
-		Base64::decode ( str, result );
-		lua_pushstring ( luaVM, result );
-		return 1;
-	}
-	else
-		m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+    if ( !argStream.HasErrors() )
+    {
+        SString result;
+        Base64::decode ( str, result );
+        lua_pushstring ( luaVM, result );
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
 
-	lua_pushboolean ( luaVM, false );
-	return 1;
+    lua_pushboolean ( luaVM, false );
+    return 1;
 }
 
 int CLuaFunctionDefs::GetNetworkUsageData ( lua_State* luaVM )
@@ -876,115 +889,139 @@ int CLuaFunctionDefs::GetVersion ( lua_State* luaVM )
 
 int CLuaFunctionDefs::UtfLen ( lua_State* luaVM )
 {
-    if ( ( lua_type ( luaVM, 1 ) != LUA_TSTRING ) )
-    {
-        m_pScriptDebugging->LogBadType ( luaVM );
 
-        lua_pushboolean ( luaVM, false );
+    SString strInput = "";
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadString ( strInput );
+
+    if ( !argStream.HasErrors ( ) )
+    {
+        lua_pushnumber ( luaVM, MbUTF8ToUTF16(strInput).size() );
         return 1;
     }
-    std::string strInput = lua_tostring ( luaVM, 1 );
-    lua_pushnumber ( luaVM, MbUTF8ToUTF16(strInput).size() );
-
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+    
+    lua_pushnil ( luaVM );
     return 1;
 }
 
 int CLuaFunctionDefs::UtfSeek ( lua_State* luaVM )
 {
-    if ( ( lua_type ( luaVM, 1 ) != LUA_TSTRING ) || ( lua_type ( luaVM, 2 ) != LUA_TNUMBER ) )
+    SString strInput = "";
+    int iPos = 0;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadString ( strInput );
+    argStream.ReadNumber ( iPos );
+
+    if ( !argStream.HasErrors ( ) )
     {
-        m_pScriptDebugging->LogBadType ( luaVM );
-        lua_pushnil ( luaVM );
-        return 1;
+        std::wstring strUTF = MbUTF8ToUTF16(strInput);
+        if ( iPos <= static_cast < int >(strUTF.size()) && iPos >= 0 )
+        {
+            strUTF = strUTF.substr(0,iPos);
+            lua_pushnumber ( luaVM, UTF16ToMbUTF8(strUTF).size() );
+            return 1;
+        }
     }
-    int iPos = static_cast < int > ( lua_tonumber ( luaVM, 2 ) );
-    std::string strInput = lua_tostring ( luaVM, 1 );
-    std::wstring strUTF = MbUTF8ToUTF16(strInput);
-    if ( iPos <= static_cast < int >(strUTF.size()) && iPos >= 0 )
-    {
-        strUTF = strUTF.substr(0,iPos);
-        lua_pushnumber ( luaVM, UTF16ToMbUTF8(strUTF).size() );
-        return 1;
-    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
 
     lua_pushboolean ( luaVM, false );
     return 1;
 }
 
-int CLuaFunctionDefs::UtfSub ( lua_State* L )
+int CLuaFunctionDefs::UtfSub ( lua_State* luaVM )
 {
-    if ( ( lua_type ( L, 1 ) != LUA_TSTRING ) || ( lua_type ( L, 2 ) != LUA_TNUMBER ) )
+    SString strInput = "";
+    int iStart = 0, iEnd = 0;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadString ( strInput );
+    argStream.ReadNumber ( iStart );
+    argStream.ReadNumber ( iEnd );
+
+    if ( !argStream.HasErrors ( ) )
     {
-        m_pScriptDebugging->LogBadType ( L );
-        lua_pushnil ( L );
-        return 1;
+        std::wstring strUTF = MbUTF8ToUTF16 ( strInput );
+        size_t l = static_cast < int > ( strUTF.size() );
+
+        ptrdiff_t start = iStart;
+        ptrdiff_t end = iEnd;
+
+        //posrelat them both
+        if (start < 0) start += (ptrdiff_t)l + 1;
+            start = (start >= 0) ? start : 0;
+
+        if (end < 0) end += (ptrdiff_t)l + 1;
+            end = (end >= 0) ? end : 0;
+
+        if (start < 1) start = 1;
+        if (end > (ptrdiff_t)l) end = (ptrdiff_t)l;
+        if (start <= end)
+        {
+            strUTF = strUTF.substr(start-1, end-start+1);
+            lua_pushstring(luaVM, UTF16ToMbUTF8(strUTF).c_str());
+        }
+        else 
+            lua_pushliteral(luaVM, "");
     }
-    //Ripped and modded Lua source.  It's pretty disgusting, i know.
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
 
-    const char *s = lua_tostring(L, 1);
-    std::wstring strUTF = MbUTF8ToUTF16(s);
-    size_t l = static_cast < int > ( strUTF.size() );
+    lua_pushboolean ( luaVM, false );
 
-    ptrdiff_t start = luaL_checkinteger(L, 2);
-    ptrdiff_t end = luaL_optinteger(L, 3, -1);
-
-    //posrelat them both
-    if (start < 0) start += (ptrdiff_t)l + 1;
-        start = (start >= 0) ? start : 0;
-
-    if (end < 0) end += (ptrdiff_t)l + 1;
-        end = (end >= 0) ? end : 0;
-
-    if (start < 1) start = 1;
-    if (end > (ptrdiff_t)l) end = (ptrdiff_t)l;
-    if (start <= end)
-    {
-        strUTF = strUTF.substr(start-1, end-start+1);
-        lua_pushstring(L, UTF16ToMbUTF8(strUTF).c_str());
-    }
-    else lua_pushliteral(L, "");
     return 1;
 }
 
 int CLuaFunctionDefs::UtfChar ( lua_State* luaVM )
 {
-    if ( ( lua_type ( luaVM, 1 ) != LUA_TNUMBER ) )
+    int iChar = 0;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadNumber ( iChar );
+
+    if ( !argStream.HasErrors ( ) )
     {
-        m_pScriptDebugging->LogBadType ( luaVM );
-        lua_pushnil ( luaVM );
+        if ( iChar > 65534 || iChar < 32 )
+        {
+            m_pScriptDebugging->LogBadType ( luaVM );
+            lua_pushnil ( luaVM );
+            return 1;
+        }
+
+        // Generate a null-terminating string for our character
+        wchar_t wUNICODE[2] = { iChar, '\0' };
+
+        // Convert our UTF character into an ANSI string
+        std::string strANSI = UTF16ToMbUTF8(wUNICODE);
+
+        lua_pushstring ( luaVM, strANSI.c_str() );
         return 1;
     }
-    int iChar = static_cast < int > ( lua_tonumber ( luaVM, 1 ) );
-    if ( iChar > 65534 || iChar < 32 )
-    {
-        m_pScriptDebugging->LogBadType ( luaVM );
-        lua_pushnil ( luaVM );
-        return 1;
-    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
 
-    // Generate a null-terminating string for our character
-    wchar_t wUNICODE[2] = { iChar, '\0' };
-
-    // Convert our UTF character into an ANSI string
-    std::string strANSI = UTF16ToMbUTF8(wUNICODE);
-
-    lua_pushstring ( luaVM, strANSI.c_str() );
+    lua_pushnil ( luaVM );
     return 1;
 }
 
 int CLuaFunctionDefs::UtfCode ( lua_State* luaVM )
 {
-    if ( ( lua_type ( luaVM, 1 ) != LUA_TSTRING ) )
+    SString strInput = "";
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadString ( strInput );
+
+    if ( !argStream.HasErrors ( ) )
     {
-        m_pScriptDebugging->LogBadType ( luaVM );
-        lua_pushnil ( luaVM );
+        std::wstring strUTF = MbUTF8ToUTF16(strInput);
+        unsigned long ulCode = strUTF.c_str()[0];
+
+        lua_pushnumber ( luaVM, ulCode );
         return 1;
     }
-    std::string strInput = lua_tostring ( luaVM, 1 );
-    std::wstring strUTF = MbUTF8ToUTF16(strInput);
-    unsigned long ulCode = strUTF.c_str()[0];
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
 
-    lua_pushnumber ( luaVM, ulCode );
+    lua_pushnil ( luaVM );
     return 1;
 }
 
@@ -1081,25 +1118,26 @@ int CLuaFunctionDefs::GetDevelopmentMode ( lua_State* luaVM )
 
 int CLuaFunctionDefs::DownloadFile ( lua_State* luaVM )
 {
-    // Grab our VM
-    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
-    if ( pLuaMain )
+    SString strFile = "";
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadString ( strFile );
+
+    if ( !argStream.HasErrors ( ) )
     {
-        // Grab its resource
-        CResource * pResource = pLuaMain->GetResource();
-        if ( pResource )
+        // Grab our VM
+        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+        if ( pLuaMain )
         {
-            const char* szFile = {0};
-            int iArgument = lua_type ( luaVM, 1 );
-            if ( iArgument == LUA_TSTRING )
+            // Grab its resource
+            CResource * pResource = pLuaMain->GetResource();
+            if ( pResource )
             {
-                szFile = lua_tostring ( luaVM, 1 );
                 std::list < CResourceFile* > ::const_iterator iter = pResource->IterBeginResourceFiles();
                 for ( ; iter != pResource->IterEndResourceFiles() ; iter++ ) 
                 {
-                    if ( strcmp ( szFile, (*iter)->GetShortName() ) == 0 )
+                    if ( strcmp ( strFile, (*iter)->GetShortName() ) == 0 )
                     {
-                        if ( CStaticFunctionDefinitions::DownloadFile ( pResource, szFile, (*iter)->GetServerChecksum() ) )
+                        if ( CStaticFunctionDefinitions::DownloadFile ( pResource, strFile, (*iter)->GetServerChecksum() ) )
                         {
                             lua_pushboolean ( luaVM, true );
                             return 1;
@@ -1108,8 +1146,6 @@ int CLuaFunctionDefs::DownloadFile ( lua_State* luaVM )
                 }
                 m_pScriptDebugging->LogCustom ( luaVM, 255, 255, 255, "%s: File doesn't exist", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ) );
             }
-            else
-                m_pScriptDebugging->LogBadType ( luaVM );
         }
     }
     lua_pushboolean ( luaVM, false );

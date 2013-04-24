@@ -127,7 +127,7 @@ int CLuaFunctionDefs::ProcessLineOfSight ( lua_State * luaVM )
 //        bool seeThroughStuff = false, bool ignoreSomeObjectsForCamera = false, bool shootThroughStuff = false, element ignoredElement = nil, bool returnBuildingInfo = false,
 //        bCheckCarTires = false ] )
     CVector vecStart; CVector vecEnd;
-    SLineOfSightFlags flags; CEntity* pIgnoredEntity; bool bIncludeBuildingInfo;
+    SLineOfSightFlags flags; CClientEntity* pIgnoredElement; bool bIncludeBuildingInfo;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadNumber ( vecStart.fX );
@@ -144,12 +144,13 @@ int CLuaFunctionDefs::ProcessLineOfSight ( lua_State * luaVM )
     argStream.ReadBool ( flags.bSeeThroughStuff, false );
     argStream.ReadBool ( flags.bIgnoreSomeObjectsForCamera, false );
     argStream.ReadBool ( flags.bShootThroughStuff, false );
-    argStream.ReadUserData ( pIgnoredEntity, NULL );
+    argStream.ReadUserData ( pIgnoredElement, NULL );
     argStream.ReadBool ( bIncludeBuildingInfo, false );
     argStream.ReadBool ( flags.bCheckCarTires, false );
 
     if ( !argStream.HasErrors () )
     {
+        CEntity* pIgnoredEntity = pIgnoredElement ? pIgnoredElement->GetGameEntity() : NULL;
         CColPoint* pColPoint = NULL;
         CClientEntity* pColEntity = NULL;
         bool bCollision;
@@ -242,7 +243,7 @@ int CLuaFunctionDefs::IsLineOfSightClear ( lua_State * luaVM )
     //    bool ignoreSomeObjectsForCamera = false, 
     //    element ignoredElement = nil ] )
     CVector vecStart; CVector vecEnd;
-    SLineOfSightFlags flags; CEntity* pIgnoredEntity;
+    SLineOfSightFlags flags; CClientEntity* pIgnoredElement;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadNumber ( vecStart.fX );
@@ -258,10 +259,11 @@ int CLuaFunctionDefs::IsLineOfSightClear ( lua_State * luaVM )
     argStream.ReadBool ( flags.bCheckDummies, true );
     argStream.ReadBool ( flags.bSeeThroughStuff, false );
     argStream.ReadBool ( flags.bIgnoreSomeObjectsForCamera, false );
-    argStream.ReadUserData ( pIgnoredEntity, NULL );
+    argStream.ReadUserData ( pIgnoredElement, NULL );
 
     if ( !argStream.HasErrors () )
     {
+        CEntity* pIgnoredEntity = pIgnoredElement ? pIgnoredElement->GetGameEntity() : NULL;
         bool bIsClear;
         if ( CStaticFunctionDefinitions::IsLineOfSightClear ( vecStart, vecEnd, bIsClear, flags, pIgnoredEntity ) )
         {        
@@ -2057,3 +2059,73 @@ int CLuaFunctionDefs::ResetMoonSize ( lua_State* luaVM )
     lua_pushboolean ( luaVM, true );
     return 1;
 }
+
+int CLuaFunctionDefs::SetFPSLimit ( lua_State* luaVM )
+{
+// bool setFPSLimit ( int fpsLimit )
+    int iLimit;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadNumber( iLimit );
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( CStaticFunctionDefinitions::SetFPSLimit ( iLimit ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefs::GetFPSLimit ( lua_State* luaVM )
+{
+    int iLimit;
+    if ( CStaticFunctionDefinitions::GetFPSLimit ( iLimit ) )
+    {
+        lua_pushnumber ( luaVM, iLimit );
+        return 1;
+    }
+    
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+// Call a function on a remote server
+int CLuaFunctionDefs::FetchRemote ( lua_State* luaVM )
+{
+//  bool fetchRemote ( string URL [, int connectionAttempts = 10 ], callback callbackFunction, [ string postData, bool bPostBinary, arguments... ] )
+    CScriptArgReader argStream ( luaVM );
+    SString strURL; CLuaFunctionRef iLuaFunction; SString strPostData; bool bPostBinary; CLuaArguments args; uint uiConnectionAttempts;
+
+    argStream.ReadString ( strURL );
+    argStream.ReadIfNextIsNumber ( uiConnectionAttempts, 10 );
+    argStream.ReadFunction ( iLuaFunction );
+    argStream.ReadString ( strPostData, "" );
+    argStream.ReadBool ( bPostBinary, false );
+    argStream.ReadLuaArguments ( args );
+    argStream.ReadFunctionComplete ();
+
+    if ( !argStream.HasErrors () )
+    {
+        CLuaMain * luaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+        if ( luaMain )
+        {
+            g_pClientGame->GetRemoteCalls()->Call ( strURL, &args, strPostData, bPostBinary, luaMain, iLuaFunction, uiConnectionAttempts );
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+

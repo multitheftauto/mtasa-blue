@@ -68,6 +68,7 @@
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(OutDir)/launcher.pdb"
 				SubSystem="1"
+				LargeAddressAware="2"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="0"
 				TargetMachine="1"

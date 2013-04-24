@@ -2040,9 +2040,13 @@ CPed* CStaticFunctionDefinitions::CreatePed ( CResource* pResource, unsigned sho
 
             pPed->SetRotation ( fRotationRadians );
 
-            CEntityAddPacket Packet;
-            Packet.Add ( pPed );
-            m_pPlayerManager->BroadcastOnlyJoined ( Packet );
+            // Only sync if the resource has fully started
+            if ( pResource->HasStarted() )
+            {
+                CEntityAddPacket Packet;
+                Packet.Add ( pPed );
+                m_pPlayerManager->BroadcastOnlyJoined ( Packet );
+            }
             return pPed;
         }
     }

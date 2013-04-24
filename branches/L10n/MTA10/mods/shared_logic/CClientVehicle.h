@@ -135,6 +135,8 @@ public:
     void                        SetPosition             ( const CVector& vecPosition )      { SetPosition ( vecPosition, true ); }
     void                        SetPosition             ( const CVector& vecPosition, bool bResetInterpolation );
 
+    void                        UpdatePedPositions      ( const CVector& vecPosition );
+
     void                        GetRotationDegrees      ( CVector& vecRotation ) const;
     void                        GetRotationRadians      ( CVector& vecRotation ) const;
     void                        SetRotationDegrees      ( const CVector& vecRotation )      { SetRotationDegrees ( vecRotation, true ); }
@@ -308,6 +310,13 @@ public:
     float                       GetTrainSpeed           ( void );
     void                        SetTrainSpeed           ( float fSpeed );
 
+    float                       GetTrainPosition        ( void );
+    void                        SetTrainPosition        ( float fPosition );
+
+    uchar                       GetTrainTrack           ( void );
+    void                        SetTrainTrack           ( uchar ucTrack );
+
+
     inline unsigned char        GetOverrideLights       ( void )                            { return m_ucOverrideLights; }
     void                        SetOverrideLights       ( unsigned char ucOverrideLights );
     bool                        SetTaxiLightOn          ( bool bLightOn );
@@ -477,15 +486,15 @@ protected:
     unsigned char               m_ucMaxPassengers;
     bool                        m_bIsVirtualized;
     CVehicle*                   m_pVehicle;
-    CClientPed*                 m_pDriver;
+    CClientPedPtr               m_pDriver;
     SFixedArray < CClientPed*, 8 >  m_pPassengers;
-    CClientPed*                 m_pOccupyingDriver;
+    CClientPedPtr               m_pOccupyingDriver;
     SFixedArray < CClientPed*, 8 >  m_pOccupyingPassengers;
     RpClump*                    m_pClump;
     short                       m_usRemoveTimer;
 
-    CClientVehicle*             m_pPreviousLink;
-    CClientVehicle*             m_pNextLink;
+    CClientVehiclePtr           m_pPreviousLink;
+    CClientVehiclePtr           m_pNextLink;
     CMatrix                     m_Matrix;
     CMatrix                     m_MatrixLast;
     CMatrix                     m_MatrixPure;   
@@ -539,10 +548,10 @@ protected:
     CMatrix                     m_matFrozen;
     CVehicleUpgrades*           m_pUpgrades;
     unsigned char               m_ucOverrideLights;
-    CClientVehicle*             m_pTowedVehicle;
-    CClientVehicle*             m_pTowedByVehicle;
+    CClientVehiclePtr           m_pTowedVehicle;
+    CClientVehiclePtr           m_pTowedByVehicle;
     eWinchType                  m_eWinchType;
-    CClientEntity*              m_pPickedUpWinchEntity;
+    CClientEntityPtr            m_pPickedUpWinchEntity;
     std::string                 m_strRegPlate;
     unsigned char               m_ucPaintjob;
     float                       m_fDirtLevel;
@@ -561,6 +570,8 @@ protected:
     bool                        m_bIsDerailable;
     bool                        m_bTrainDirection;
     float                       m_fTrainSpeed;
+    float                       m_fTrainPosition;
+    uchar                       m_ucTrackID;
 
     // Time dependent error compensation interpolation
     struct

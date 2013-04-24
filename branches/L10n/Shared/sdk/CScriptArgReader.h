@@ -134,7 +134,8 @@ public:
         int iArgument = lua_type ( m_luaVM, m_iIndex );
         if ( iArgument == LUA_TSTRING || iArgument == LUA_TNUMBER )
         {
-            outValue = lua_tostring ( m_luaVM, m_iIndex++ );
+            uint uiLength = lua_strlen ( m_luaVM, m_iIndex );
+            outValue.assign( lua_tostring ( m_luaVM, m_iIndex++ ), uiLength );
             return;
         }
         else
@@ -560,7 +561,8 @@ public:
     bool NextIsNone         ( int iOffset = 0 ) const  { return NextIs ( LUA_TNONE, iOffset ); }
     bool NextIsNil          ( int iOffset = 0 ) const  { return NextIs ( LUA_TNIL, iOffset ); }
     bool NextIsBool         ( int iOffset = 0 ) const  { return NextIs ( LUA_TBOOLEAN, iOffset ); }
-    bool NextIsUserData     ( int iOffset = 0 ) const  { return NextIs ( LUA_TLIGHTUSERDATA, iOffset ); }
+    bool NextIsUserData     ( int iOffset = 0 ) const  { return NextIs ( LUA_TUSERDATA, iOffset ) || NextIsLightUserData ( iOffset ); }
+    bool NextIsLightUserData( int iOffset = 0 ) const  { return NextIs ( LUA_TLIGHTUSERDATA, iOffset ); }
     bool NextIsNumber       ( int iOffset = 0 ) const  { return NextIs ( LUA_TNUMBER, iOffset ); }
     bool NextIsString       ( int iOffset = 0 ) const  { return NextIs ( LUA_TSTRING, iOffset ); }
     bool NextIsTable        ( int iOffset = 0 ) const  { return NextIs ( LUA_TTABLE, iOffset ); }
@@ -581,6 +583,22 @@ public:
         return false;
     }
 
+    template < class T >
+    bool NextIsUserDataOfType ( int iOffset = 0 ) const
+    {
+        int iArgument = lua_type ( m_luaVM, m_iIndex + iOffset );
+        if ( iArgument == LUA_TLIGHTUSERDATA )
+        {
+            if ( UserDataCast < T > ( (T*)0, lua_touserdata ( m_luaVM, m_iIndex + iOffset ), m_luaVM ) )
+                return true;
+        }
+        else if ( iArgument == LUA_TUSERDATA )
+        {
+            if ( UserDataCast < T > ( (T*)0, * ( ( void** ) lua_touserdata ( m_luaVM, m_iIndex + iOffset ) ), m_luaVM ) )
+                return true;
+        }
+        return false;
+    }
 
     //
     // Conditional reads. Default required in case condition is not met.
@@ -687,6 +705,11 @@ public:
         {
 	        // Get name of userdata type
             strGotArgumentType = GetUserDataClassName ( lua_touserdata ( m_luaVM, m_iErrorIndex ), m_luaVM );
+            strGotArgumentValue = "";
+        }
+        else if ( m_iErrorGotArgumentType == LUA_TUSERDATA )
+        {
+            strGotArgumentType = GetUserDataClassName ( * ( ( void** ) lua_touserdata ( m_luaVM, m_iErrorIndex ) ), m_luaVM );
             strGotArgumentValue = "";
         }
 

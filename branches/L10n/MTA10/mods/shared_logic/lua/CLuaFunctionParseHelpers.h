@@ -190,36 +190,6 @@ bool CheckWrappedUserDataType ( CClientGUIElement*& pGuiElement, SString& strErr
 }
 
 
-//
-// CEntity from userdata
-//
-template < class T >
-CEntity* UserDataCast ( CEntity*, void* ptr, lua_State* )
-{
-    // Get the client element
-    CClientEntity* pClientElement = UserDataCast < CClientEntity > ( (CClientEntity*)NULL, ptr, NULL );
-
-    // Get its game entity
-    CEntity* pEntity = NULL;
-    if ( pClientElement )
-    {
-        switch ( pClientElement->GetType () )
-        {
-            case CCLIENTPED:
-            case CCLIENTPLAYER:
-                pEntity = static_cast < CClientPed* > ( pClientElement )->GetGamePlayer ();
-                break;
-            case CCLIENTVEHICLE:
-                pEntity = static_cast < CClientVehicle* > ( pClientElement )->GetGameVehicle ();
-                break;
-            case CCLIENTOBJECT:
-                pEntity = static_cast < CClientObject* > ( pClientElement )->GetGameObject ();
-                break;
-        }
-    }
-    return pEntity;
-}
-
 SString GetUserDataClassName ( void* ptr, lua_State* luaVM );
 
 

@@ -58,6 +58,7 @@ public:
 
     inline const std::string&       GetServerName                   ( void )        { return m_strServerName; };
     std::string                     GetServerIP                     ( void );
+    SString                         GetServerIPList                 ( void );
     unsigned short                  GetServerPort                   ( void );
     unsigned int                    GetMaxPlayers                   ( void );
     unsigned int                    GetHardMaxPlayers               ( void );
@@ -121,6 +122,7 @@ public:
     SString                         GetSetting                      ( const SString& configSetting );
     bool                            GetSetting                      ( const SString& configSetting, SString& strValue );
     bool                            SetSetting                      ( const SString& configSetting, const SString& strValue, bool bSave );
+    bool                            GetSettingTable                 ( const SString& strName, CLuaArguments* outTable );
 
     void                            SetCommandLineParser            ( CCommandLineParser* pCommandLineParser );
     void                            ApplyNetOptions                 ( void );
@@ -135,6 +137,7 @@ public:
 
 private:
     void                            RegisterCommand                 ( const char* szName, FCommandHandler* pFunction, bool bRestricted );
+    bool                            GetSettingTable                 ( const SString& strName, const char** szAttribNames, uint uiNumAttribNames, CLuaArguments* outTable );
 
     CConsole*                       m_pConsole;
     CLuaManager*                    m_pLuaManager;

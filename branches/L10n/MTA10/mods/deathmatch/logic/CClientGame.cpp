@@ -186,6 +186,7 @@ CClientGame::CClientGame ( bool bLocalPlay )
     m_pLatentTransferManager = new CLatentTransferManager ();
     m_pZoneNames = new CZoneNames;
     m_pScriptKeyBinds = new CScriptKeyBinds;
+    m_pRemoteCalls = new CRemoteCalls();
 
     // Create our net API
     m_pNetAPI = new CNetAPI ( m_pManager );
@@ -448,6 +449,7 @@ CClientGame::~CClientGame ( void )
     delete m_pGameEntityXRefManager;
     delete m_pZoneNames;
     delete m_pScriptKeyBinds;    
+    SAFE_DELETE( m_pRemoteCalls );
 
     // Delete the scriptdebugger
     delete m_pScriptDebugging;
@@ -708,6 +710,33 @@ void CClientGame::DoPulsePreHUDRender ( bool bDidUnminimize, bool bDidRecreateRe
         Arguments.PushBoolean ( bDidRecreateRenderTargets );
         m_pRootEntity->CallEvent ( "onClientRestore", Arguments, false );
         m_bWasMinimized = false;
+
+        if ( m_bMuteSFX )
+        {
+            unsigned char ucOldSFXVolume = g_pGame->GetSettings ()->GetSFXVolume ();
+            g_pGame->GetAudio ()->SetEffectsMasterVolume ( ucOldSFXVolume );
+        }
+
+        if ( m_bMuteRadio )
+        {
+            unsigned char ucOldRadioVolume = g_pGame->GetSettings ()->GetRadioVolume ();
+            g_pGame->GetAudio ()->SetMusicMasterVolume ( ucOldRadioVolume );
+        }
+
+        if ( m_bMuteMTA )
+        {
+            m_pManager->GetSoundManager ()->SetMTAMuted ( false );
+        }
+
+        if ( m_bMuteVoice )
+        {
+            CClientPlayer* pPlayer = g_pClientGame->m_pPlayerManager->GetLocalPlayer ();
+            CClientPlayerVoice * pVoice = pPlayer->GetVoice();
+            if ( pVoice != NULL )
+            {
+                pVoice->SetVoiceMuted ( false );
+            }
+        }
     }
 
     // Call onClientHUDRender LUA event
@@ -1014,8 +1043,7 @@ void CClientGame::DoPulses ( void )
     // Pulse the network interface
 
     // Extrapolation test - Change the pulse order to reduce latency (Has side effects for peds)
-    if ( !IsUsingAlternatePulseOrder( true ) )
-        DoPulses2 ();
+    DoPulses2( false );
 
     m_pUnoccupiedVehicleSync->DoPulse ();
     m_pPedSync->DoPulse ();
@@ -1156,6 +1184,7 @@ void CClientGame::DoPulses ( void )
         // Pulse DownloadFiles if we're transferring stuff
         DownloadInitialResourceFiles ();
         DownloadSingularResourceFiles ();
+        g_pNet->GetHTTPDownloadManager ( EDownloadMode::CALL_REMOTE )->ProcessQueuedFiles ();
     }
 
     // Not waiting for local connect?
@@ -1300,15 +1329,47 @@ void CClientGame::DoPulses ( void )
 }
 
 // Extrapolation test
-void CClientGame::DoPulses2 ( void )
+void CClientGame::DoPulses2 ( bool bCalledFromIdle )
 {
-    // Pulse the network interface
-    TIMING_CHECKPOINT( "+NetPulse" );
-    g_pNet->DoPulse ();
-    TIMING_CHECKPOINT( "-NetPulse" );
+    bool bIsUsingAlternatePulseOrder = IsUsingAlternatePulseOrder( !bCalledFromIdle );
 
-    m_pManager->DoPulse ();
-    m_pNetAPI->DoPulse ();
+    // Figure out which pulses to do
+    bool bDoStandardPulses;
+    bool bDoVehicleManagerPulse;
+
+    if ( !bIsUsingAlternatePulseOrder )
+    {
+        // With std pulse order, do pulses when not called from idle
+        bDoStandardPulses = !bCalledFromIdle;
+        bDoVehicleManagerPulse = !bCalledFromIdle;
+    }
+    else
+    {
+        // With alt pulse order, do pulses when called from idle
+        bDoStandardPulses = bCalledFromIdle;
+        bDoVehicleManagerPulse = bCalledFromIdle;
+
+        // Except when watching a remote synced vehicle
+        if ( CClientVehicle* pTargetVehicle = DynamicCast < CClientVehicle > ( m_pCamera->GetTargetEntity() ) )
+            if ( pTargetVehicle->GetControllingPlayer() != m_pPlayerManager->GetLocalPlayer() )
+                bDoVehicleManagerPulse = !bDoVehicleManagerPulse;
+    }
+
+
+    if ( bDoStandardPulses )
+    {
+        // Pulse the network interface
+        TIMING_CHECKPOINT( "+NetPulse" );
+        g_pNet->DoPulse ();
+        TIMING_CHECKPOINT( "-NetPulse" );
+    }
+
+    m_pManager->DoPulse( bDoStandardPulses, bDoVehicleManagerPulse );
+
+    if ( bDoStandardPulses )
+    {
+        m_pNetAPI->DoPulse();
+    }
 }
 
 
@@ -2678,6 +2739,8 @@ void CClientGame::AddBuiltInEvents ( void )
     m_Events.AddEvent ( "onClientPlayerChoke", "", NULL, false );
     m_Events.AddEvent ( "onClientPlayerVoiceStart", "", NULL, false );
     m_Events.AddEvent ( "onClientPlayerVoiceStop", "", NULL, false );
+    m_Events.AddEvent ( "onClientPlayerVoicePause", "reason", NULL, false );
+    m_Events.AddEvent ( "onClientPlayerVoiceResumed", "reason", NULL, false );
     m_Events.AddEvent ( "onClientPlayerStealthKill", "target", NULL, false );
     m_Events.AddEvent ( "onClientPlayerHitByWaterCannon", "vehicle", NULL, false );
     m_Events.AddEvent ( "onClientPlayerHeliKilled", "heli", NULL, false );
@@ -3729,7 +3792,7 @@ void CClientGame::ProjectileInitiateHandler ( CClientProjectile * pProjectile )
 
 void CClientGame::Render3DStuffHandler ( void )
 {
-
+    g_pCore->GetGraphics ()->GetRenderItemManager ()->PreDrawWorld ();
 }
 
 
@@ -3768,12 +3831,41 @@ void CClientGame::IdleHandler ( void )
             // Call onClientMinimize LUA event
             CLuaArguments Arguments;
             m_pRootEntity->CallEvent ( "onClientMinimize", Arguments, false );
+
+            g_pCore->GetCVars ()->Get ( "mute_sfx_when_minimized", m_bMuteSFX );
+            g_pCore->GetCVars ()->Get ( "mute_radio_when_minimized", m_bMuteRadio );
+            g_pCore->GetCVars ()->Get ( "mute_mta_when_minimized", m_bMuteMTA );
+            g_pCore->GetCVars ()->Get ( "mute_voice_when_minimized", m_bMuteVoice );
+
+            if ( m_bMuteSFX )
+            {
+                g_pGame->GetAudio ()->SetEffectsMasterVolume ( 0 );
+            }
+
+            if ( m_bMuteRadio )
+            {
+                g_pGame->GetAudio ()->SetMusicMasterVolume ( 0 );
+            }
+
+            if ( m_bMuteMTA )
+            {
+                m_pManager->GetSoundManager ()->SetMTAMuted ( true );
+            }
+
+            if ( m_bMuteVoice )
+            {
+                CClientPlayer* pPlayer = g_pClientGame->m_pPlayerManager->GetLocalPlayer ();
+                CClientPlayerVoice * pVoice = pPlayer->GetVoice();
+                if ( pVoice != NULL )
+                {
+                    pVoice->SetVoiceMuted ( true );
+                }
+            }
         }
     }
 
     // Extrapolation test - Change the pulse order to reduce latency (Has side effects for peds)
-    if ( IsUsingAlternatePulseOrder() )
-        DoPulses2 ();
+    DoPulses2( true );
 }
 
 
@@ -4662,7 +4754,7 @@ void CClientGame::ProcessVehicleInOutKey ( bool bPassenger )
                                                     bool bIsOnWater = pVehicle->IsOnWater ();
                                                     unsigned char ucDoor = static_cast < unsigned char > ( uiDoor );
                                                     pBitStream->WriteBits ( &ucAction, 4 );
-                                                    pBitStream->WriteBits ( &ucSeat, 3 );
+                                                    pBitStream->WriteBits ( &ucSeat, 4 );
                                                     pBitStream->WriteBit ( bIsOnWater );
                                                     pBitStream->WriteBits ( &ucDoor, 3 );
 

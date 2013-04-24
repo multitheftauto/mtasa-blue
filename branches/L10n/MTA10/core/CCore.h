@@ -54,7 +54,7 @@ class CCore;
 #include <dinput.h>
 
 #define BLUE_VERSION_STRING     "Multi Theft Auto v" MTA_DM_BUILDTAG_LONG "\n" \
-                                "Copyright (C) 2003 - 2012 Multi Theft Auto" \
+                                "Copyright (C) 2003 - 2013 Multi Theft Auto" \
 
 // Configuration file path (relative to Grand Theft Auto directory)
 #define MTA_CONFIG_PATH             "mta/coreconfig.xml"
@@ -207,9 +207,10 @@ public:
     void                    InitiateDataFilesFix            ( void )                                        { m_pLocalGUI->InitiateDataFilesFix (); }
 
     uint                    GetFrameRateLimit               ( void )                                        { return m_uiFrameRateLimit; }
-    void                    RecalculateFrameRateLimit       ( uint uiServerFrameRateLimit = -1 );
+    void                    RecalculateFrameRateLimit       ( uint uiServerFrameRateLimit = -1, bool bLogToConsole = true );
     void                    ApplyFrameRateLimit             ( uint uiOverrideRate = -1 );
     void                    EnsureFrameRateLimitApplied     ( void );
+    void                    SetClientScriptFrameRateLimit   ( uint uiClientScriptFrameRateLimit );
     void                    DoReliablePulse                 ( void );
 
     bool                    IsTimingCheckpoints             ( void );
@@ -229,6 +230,7 @@ public:
     void                    RequestNewNickOnStart           ( void ) { m_bWaitToSetNick = true; };
     bool                    WillRequestNewNickOnStart       ( void ) { return m_bWaitToSetNick; };
     bool                    WasLaunchedWithConnectURI       ( void );
+    void                    HandleCrashDumpEncryption       ( void );
 
     //XFire
     SString                 UpdateXfire                     ( void );
@@ -324,6 +326,7 @@ private:
 
     bool                        m_bDoneFrameRateLimit;
     uint                        m_uiServerFrameRateLimit;
+    uint                        m_uiClientScriptFrameRateLimit;
     uint                        m_uiFrameRateLimit;
     double                      m_dLastTimeMs;
     double                      m_dPrevOverrun;

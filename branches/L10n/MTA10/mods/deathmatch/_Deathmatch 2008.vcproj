@@ -1072,6 +1072,10 @@
 						>
 					</File>
 					<File
+						RelativePath="..\shared_logic\lua\CLuaFunctionDefs.Bit.cpp"
+						>
+					</File>
+					<File
 						RelativePath="..\shared_logic\lua\CLuaFunctionDefs.Blip.cpp"
 						>
 					</File>
@@ -1223,6 +1227,10 @@
 				<Filter
 					Name="luadefs"
 					>
+					<File
+						RelativePath="..\shared_logic\luadefs\CLuaClassDefs.cpp"
+						>
+					</File>
 					<File
 						RelativePath="..\shared_logic\luadefs\CLuaDefs.cpp"
 						>
@@ -2642,6 +2650,10 @@
 					Name="luadefs"
 					>
 					<File
+						RelativePath="..\shared_logic\luadefs\CLuaClassDefs.h"
+						>
+					</File>
+					<File
 						RelativePath="..\shared_logic\luadefs\CLuaDefs.h"
 						>
 					</File>
@@ -2699,6 +2711,18 @@
 					</File>
 				</Filter>
 			</Filter>
+		</Filter>
+		<Filter
+			Name="NewFilter1"
+			>
+			<File
+				RelativePath="..\shared_logic\CRemoteCalls.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\shared_logic\CRemoteCalls.h"
+				>
+			</File>
 		</Filter>
 	</Files>
 	<Globals>

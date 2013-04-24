@@ -453,7 +453,13 @@ void CSettings::CreateGUI ( void )
 
     m_pLabelRadioVolumeValue = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, "0%") );
     m_pLabelRadioVolumeValue->SetPosition ( CVector2D ( vecTemp.fX + vecSize.fX + 5.0f, vecTemp.fY ) );
+    m_pLabelRadioVolumeValue->GetPosition ( vecTemp, false );
     m_pLabelRadioVolumeValue->AutoSize ( "100%" );
+    m_pLabelRadioVolumeValue->GetSize ( vecSize, false );
+
+    m_pCheckBoxMuteRadio = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabAudio, _("Mute when minimized"), true ) );
+    m_pCheckBoxMuteRadio->SetPosition ( CVector2D ( vecTemp.fX + vecSize.fX + 10.0f, vecTemp.fY ) );
+    m_pCheckBoxMuteRadio->AutoSize ( NULL, 20.0f );;
 
     vecTemp.fX = 11;
     m_pLabelSFXVolume = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, _("SFX volume:") ) );
@@ -470,7 +476,13 @@ void CSettings::CreateGUI ( void )
 
     m_pLabelSFXVolumeValue = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, "0%") );
     m_pLabelSFXVolumeValue->SetPosition ( CVector2D ( vecTemp.fX + vecSize.fX + 5.0f, vecTemp.fY ) );
+    m_pLabelSFXVolumeValue->GetPosition ( vecTemp, false );
     m_pLabelSFXVolumeValue->AutoSize ( "100%" );
+    m_pLabelSFXVolumeValue->GetSize ( vecSize, false );
+
+    m_pCheckBoxMuteSFX = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabAudio, _("Mute when minimized"), true ) );
+    m_pCheckBoxMuteSFX->SetPosition ( CVector2D ( vecTemp.fX + vecSize.fX + 10.0f, vecTemp.fY ) );
+    m_pCheckBoxMuteSFX->AutoSize ( NULL, 20.0f );;
 
     vecTemp.fX = 11;
     m_pLabelMTAVolume = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, _("MTA volume:") ) );
@@ -487,8 +499,13 @@ void CSettings::CreateGUI ( void )
 
     m_pLabelMTAVolumeValue = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, "0%") );
     m_pLabelMTAVolumeValue->SetPosition ( CVector2D ( vecTemp.fX + vecSize.fX + 5.0f, vecTemp.fY ) );
+    m_pLabelMTAVolumeValue->GetPosition ( vecTemp, false );
     m_pLabelMTAVolumeValue->AutoSize ( "100%" );
     m_pLabelMTAVolumeValue->GetSize ( vecSize, false );
+
+    m_pCheckBoxMuteMTA = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabAudio, _("Mute when minimized"), true ) );
+    m_pCheckBoxMuteMTA->SetPosition ( CVector2D ( vecTemp.fX + vecSize.fX + 10.0f, vecTemp.fY ) );
+    m_pCheckBoxMuteMTA->AutoSize ( NULL, 20.0f );;
 
     vecTemp.fX = 11;
     m_pLabelVoiceVolume = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, _("Voice volume:") ) );
@@ -505,16 +522,22 @@ void CSettings::CreateGUI ( void )
 
     m_pLabelVoiceVolumeValue = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, "0%") );
     m_pLabelVoiceVolumeValue->SetPosition ( CVector2D ( vecTemp.fX + vecSize.fX + 5.0f, vecTemp.fY ) );
+    m_pLabelVoiceVolumeValue->GetPosition ( vecTemp, false );
     m_pLabelVoiceVolumeValue->AutoSize ( "100%" );
+    m_pLabelVoiceVolumeValue->GetSize ( vecSize, false );
+
+    m_pCheckBoxMuteVoice = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabAudio, _("Mute when minimized"), true ) );
+    m_pCheckBoxMuteVoice->SetPosition ( CVector2D ( vecTemp.fX + vecSize.fX + 10.0f, vecTemp.fY ) );
+    m_pCheckBoxMuteVoice->AutoSize ( NULL, 20.0f );
 
     vecTemp.fX = 11;
     m_pCheckBoxAudioEqualizer = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabAudio, _("Radio Equalizer"), true ) );
     m_pCheckBoxAudioEqualizer->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 30.0f ) );
-    m_pCheckBoxAudioEqualizer->SetSize ( CVector2D ( 224.0f, 16.0f ) );
+    m_pCheckBoxAudioEqualizer->AutoSize ( NULL, 20.0f );
 
     m_pCheckBoxAudioAutotune = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabAudio, _("Radio Auto-tune"), true ) );
     m_pCheckBoxAudioAutotune->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 50.0f ) );
-    m_pCheckBoxAudioAutotune->SetSize ( CVector2D ( 224.0f, 16.0f ) );
+    m_pCheckBoxAudioAutotune->AutoSize ( NULL, 20.0f );
     m_pCheckBoxAudioAutotune->GetPosition ( vecTemp );
 
     m_pAudioUsertrackLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, _("Usertrack options") ) );
@@ -538,7 +561,7 @@ void CSettings::CreateGUI ( void )
 
     m_pCheckBoxUserAutoscan = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabAudio, _("Automatic Media Scan"), true ) );
     m_pCheckBoxUserAutoscan->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32.0f ) );
-    m_pCheckBoxUserAutoscan->SetSize ( CVector2D ( 300.0f, 16.0f ) );
+    m_pCheckBoxUserAutoscan->AutoSize ( NULL, 20.0f );
     m_pCheckBoxUserAutoscan->GetPosition ( vecTemp, false );
 
     m_pTabs->GetSize ( vecTemp );
@@ -973,20 +996,6 @@ void CSettings::CreateGUI ( void )
     m_pAdvancedMiscLabel->AutoSize ( _("Misc") );
     vecTemp.fY += 20;
 
-    // Asynchronous Loading
-    m_pAsyncLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, _("Asynchronous Loading:") ) );
-    m_pAsyncLabel->SetPosition ( CVector2D ( vecTemp.fX + 10.f, vecTemp.fY ) );
-    m_pAsyncLabel->AutoSize ( m_pAsyncLabel->GetText ().c_str () );
-    
-    m_pAsyncCombo = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabAdvanced, "" ) );
-    m_pAsyncCombo->SetPosition ( CVector2D ( vecTemp.fX + 156.0f, vecTemp.fY - 1.0f ) );
-    m_pAsyncCombo->SetSize ( CVector2D ( 148.0f, 95.0f ) );
-    m_pAsyncCombo->AddItem ( _("Off") )->SetData ( (void*)0 );
-    m_pAsyncCombo->AddItem ( _("On") )->SetData ( (void*)2 );
-    m_pAsyncCombo->AddItem ( _("Auto") )->SetData ( (void*)1 );
-    m_pAsyncCombo->SetReadOnly ( true );
-    vecTemp.fY += 40-4;
-
     // Fast clothes loading
     m_pFastClothesLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, _("Fast CJ clothes loading:") ) );
     m_pFastClothesLabel->SetPosition ( CVector2D ( vecTemp.fX + 10.f, vecTemp.fY ) );
@@ -1039,6 +1048,20 @@ void CSettings::CreateGUI ( void )
     m_pAltTabCombo->AddItem ( _("Off") )->SetData ( (void*)0 );
     m_pAltTabCombo->AddItem ( _("On") )->SetData ( (void*)1 );
     m_pAltTabCombo->SetReadOnly ( true );
+    vecTemp.fY += 40-4;
+
+    // Process priority
+    m_pPriorityLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Process priority:" ) );
+    m_pPriorityLabel->SetPosition ( CVector2D ( vecTemp.fX + 10.f, vecTemp.fY ) );
+    m_pPriorityLabel->AutoSize ( m_pPriorityLabel->GetText ().c_str () );
+
+    m_pPriorityCombo = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabAdvanced, "" ) );
+    m_pPriorityCombo->SetPosition ( CVector2D ( vecTemp.fX + 156.0f, vecTemp.fY - 1.0f ) );
+    m_pPriorityCombo->SetSize ( CVector2D ( 148.0f, 95.0f ) );
+    m_pPriorityCombo->AddItem ( "Normal" )->SetData ( (void*)0 );
+    m_pPriorityCombo->AddItem ( "Above normal" )->SetData ( (void*)1 );
+    m_pPriorityCombo->AddItem ( "High" )->SetData ( (void*)2 );
+    m_pPriorityCombo->SetReadOnly ( true );
     vecTemp.fY += 40-4;
 
     // Debug setting
@@ -1149,11 +1172,11 @@ void CSettings::CreateGUI ( void )
     */
 
     // Set up the events for advanced description 
-    m_pAsyncLabel->SetMouseEnterHandler ( GUI_CALLBACK ( &CSettings::OnShowAdvancedSettingDescription, this ) );
-    m_pAsyncLabel->SetMouseLeaveHandler ( GUI_CALLBACK ( &CSettings::OnHideAdvancedSettingDescription, this ) );    
+    m_pPriorityLabel->SetMouseEnterHandler ( GUI_CALLBACK ( &CSettings::OnShowAdvancedSettingDescription, this ) );
+    m_pPriorityLabel->SetMouseLeaveHandler ( GUI_CALLBACK ( &CSettings::OnHideAdvancedSettingDescription, this ) );    
 
-    m_pAsyncCombo->SetMouseEnterHandler ( GUI_CALLBACK ( &CSettings::OnShowAdvancedSettingDescription, this ) );
-    m_pAsyncCombo->SetMouseLeaveHandler ( GUI_CALLBACK ( &CSettings::OnHideAdvancedSettingDescription, this ) );
+    m_pPriorityCombo->SetMouseEnterHandler ( GUI_CALLBACK ( &CSettings::OnShowAdvancedSettingDescription, this ) );
+    m_pPriorityCombo->SetMouseLeaveHandler ( GUI_CALLBACK ( &CSettings::OnHideAdvancedSettingDescription, this ) );
 
     m_pFastClothesLabel->SetMouseEnterHandler ( GUI_CALLBACK ( &CSettings::OnShowAdvancedSettingDescription, this ) );
     m_pFastClothesLabel->SetMouseLeaveHandler ( GUI_CALLBACK ( &CSettings::OnHideAdvancedSettingDescription, this ) );
@@ -1270,6 +1293,14 @@ void CSettings::UpdateAudioTab ()
     m_pCheckBoxAudioAutotune->SetSelected( gameSettings->IsRadioAutotuneEnabled() );
     m_pCheckBoxUserAutoscan->SetSelected( gameSettings->IsUsertrackAutoScan() );
 
+    CVARS_GET ( "mute_sfx_when_minimized", m_bMuteSFX );
+    CVARS_GET ( "mute_radio_when_minimized", m_bMuteRadio );
+    CVARS_GET ( "mute_mta_when_minimized", m_bMuteMTA );
+    CVARS_GET ( "mute_voice_when_minimized", m_bMuteVoice );
+    m_pCheckBoxMuteSFX->SetSelected ( m_bMuteSFX );
+    m_pCheckBoxMuteRadio->SetSelected ( m_bMuteRadio );
+    m_pCheckBoxMuteMTA->SetSelected ( m_bMuteMTA );
+    m_pCheckBoxMuteVoice->SetSelected ( m_bMuteVoice );
 
     m_pComboUsertrackMode->SetSelectedItemByIndex( gameSettings->GetUsertrackMode() );
 
@@ -1597,6 +1628,11 @@ bool CSettings::OnAudioDefaultClick ( CGUIElement* pElement )
     gameSettings->SetRadioEqualizerEnabled ( true );
 
     gameSettings->SetUsertrackAutoScan ( false );
+
+    CVARS_SET ( "mute_sfx_when_minimized", false );
+    CVARS_SET ( "mute_radio_when_minimized", false );
+    CVARS_SET ( "mute_mta_when_minimized", false );
+    CVARS_SET ( "mute_voice_when_minimized", false );
 
     gameSettings->SetUsertrackMode ( 0 );
     // Update the GUI
@@ -2370,6 +2406,15 @@ void CSettings::LoadData ( void )
     m_pCheckBoxAudioAutotune->SetSelected ( gameSettings->IsRadioAutotuneEnabled () );
     m_pCheckBoxUserAutoscan->SetSelected ( gameSettings->IsUsertrackAutoScan () );
 
+    CVARS_GET ( "mute_sfx_when_minimized", m_bMuteSFX );
+    CVARS_GET ( "mute_radio_when_minimized", m_bMuteRadio );
+    CVARS_GET ( "mute_mta_when_minimized", m_bMuteMTA );
+    CVARS_GET ( "mute_voice_when_minimized", m_bMuteVoice );
+    m_pCheckBoxMuteSFX->SetSelected ( m_bMuteSFX );
+    m_pCheckBoxMuteRadio->SetSelected ( m_bMuteRadio );
+    m_pCheckBoxMuteMTA->SetSelected ( m_bMuteMTA );
+    m_pCheckBoxMuteVoice->SetSelected ( m_bMuteVoice );
+
     unsigned int uiUsertrackMode = gameSettings->GetUsertrackMode ();
     if ( uiUsertrackMode == 0 ) m_pComboUsertrackMode->SetText ( _("Radio") );
     else if ( uiUsertrackMode == 1 ) m_pComboUsertrackMode->SetText ( _("Random") );
@@ -2514,17 +2559,19 @@ void CSettings::LoadData ( void )
     }
     m_pInterfaceSkinSelector->SetSelectedItemByIndex(uiIndex);
 
-    // Async loading
-    int iVar;
-    CVARS_GET ( "async_loading", iVar );
-    if ( iVar == 0 ) m_pAsyncCombo->SetText ( _("Off") );
-    else if ( iVar == 1 ) m_pAsyncCombo->SetText ( _("Auto") );
-    else if ( iVar == 2 ) m_pAsyncCombo->SetText ( _("On") );
-
     // AltTab test
+    int iVar;
     CVARS_GET ( "display_alttab_handler", iVar );
     if ( iVar == 0 ) m_pAltTabCombo->SetText ( _("Off") );
     else if ( iVar == 1 ) m_pAltTabCombo->SetText ( _("On") );
+
+    // Process priority
+    CVARS_GET ( "process_priority", iVar );
+    if ( iVar == 0 ) m_pPriorityCombo->SetText ( "Normal" );
+    else if ( iVar == 1 ) m_pPriorityCombo->SetText ( "Above normal" );
+    else if ( iVar == 2 ) m_pPriorityCombo->SetText ( "High" );
+    int PriorityClassList[] = { NORMAL_PRIORITY_CLASS, ABOVE_NORMAL_PRIORITY_CLASS, HIGH_PRIORITY_CLASS };
+    SetPriorityClass( GetCurrentProcess(), PriorityClassList[ CVARS_GET_VALUE < int > ( "process_priority" ) % 3 ] );
 
     // Fast clothes loading
     CVARS_GET ( "fast_clothes_loading", iVar );
@@ -2674,6 +2721,14 @@ void CSettings::SaveData ( void )
         bAltTabHandlerEnabled = ( iSelected != 0 );
     }
 
+    if ( CGUIListItem* pSelected = m_pPriorityCombo->GetSelectedItem () )
+    {
+        int iSelected = ( int ) pSelected->GetData();
+        CVARS_SET ( "process_priority", iSelected );
+        int PriorityClassList[] = { NORMAL_PRIORITY_CLASS, ABOVE_NORMAL_PRIORITY_CLASS, HIGH_PRIORITY_CLASS };
+        SetPriorityClass( GetCurrentProcess(), PriorityClassList[ CVARS_GET_VALUE < int > ( "process_priority" ) % 3 ] );
+    }
+
     // change
     bool bIsVideoModeChanged = GetVideoModeManager ()->SetVideoMode ( iNextVidMode, bNextWindowed, bNextFSMinimize );
     bool bIsAntiAliasingChanged = gameSettings->GetAntiAliasing () != iAntiAliasing;
@@ -2732,14 +2787,6 @@ void CSettings::SaveData ( void )
     CVARS_SET ( "heat_haze", bHeatHazeEnabled );
 	g_pCore->GetMultiplayer ()->SetHeatHazeEnabled ( bHeatHazeEnabled );
 
-    // Async loading
-    if ( CGUIListItem* pSelected = m_pAsyncCombo->GetSelectedItem () )
-    {
-        int iSelected = ( int ) pSelected->GetData();
-        CVARS_SET ( "async_loading", iSelected );
-        g_pCore->GetGame ()->SetAsyncLoadingFromSettings ( iSelected == 1, iSelected == 2 );
-    }
-
     // Fast clothes loading
     if ( CGUIListItem* pSelected = m_pFastClothesCombo->GetSelectedItem () )
     {
@@ -2752,6 +2799,15 @@ void CSettings::SaveData ( void )
     gameSettings->SetRadioEqualizerEnabled ( m_pCheckBoxAudioEqualizer->GetSelected() );
     gameSettings->SetRadioAutotuneEnabled ( m_pCheckBoxAudioAutotune->GetSelected() );
     gameSettings->SetUsertrackAutoScan ( m_pCheckBoxUserAutoscan->GetSelected() );
+
+    m_bMuteSFX = m_pCheckBoxMuteSFX->GetSelected ();
+    m_bMuteRadio = m_pCheckBoxMuteRadio->GetSelected ();
+    m_bMuteMTA = m_pCheckBoxMuteMTA->GetSelected ();
+    m_bMuteVoice = m_pCheckBoxMuteVoice->GetSelected ();
+    CVARS_SET ( "mute_sfx_when_minimized", m_bMuteSFX );
+    CVARS_SET ( "mute_radio_when_minimized", m_bMuteRadio );
+    CVARS_SET ( "mute_mta_when_minimized", m_bMuteMTA );
+    CVARS_SET ( "mute_voice_when_minimized", m_bMuteVoice );
 
     if ( CGUIListItem* pSelected = m_pComboUsertrackMode->GetSelectedItem () )
     {
@@ -3562,8 +3618,8 @@ bool CSettings::OnShowAdvancedSettingDescription ( CGUIElement* pElement )
 
     std::string strText = "";
 
-    if ( pLabel && pLabel == m_pAsyncLabel || pComboBox && pComboBox == m_pAsyncCombo )
-        strText = std::string( _( "Asynchronous Loading:" ) ) + " " + std::string( _( "Experimental feature which may improve performance." ) );
+    if ( pLabel && pLabel == m_pPriorityLabel || pComboBox && pComboBox == m_pPriorityCombo )
+        strText = std::string( _( "Process priority:" ) ) + " " + std::string( _( "Very experimental feature." ) );
     else if ( pLabel && pLabel == m_pFastClothesLabel || pComboBox && pComboBox == m_pFastClothesCombo )
         strText = std::string( _( "Fast CJ clothes loading:" ) ) + " " + std::string( _( "Stops stalls with CJ variations (Uses 65MB more RAM)" ) );
     else if ( pLabel && pLabel == m_pBrowserSpeedLabel || pComboBox && pComboBox == m_pBrowserSpeedCombo )

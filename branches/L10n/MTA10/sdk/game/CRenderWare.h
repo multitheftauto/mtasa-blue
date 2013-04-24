@@ -65,6 +65,9 @@ class CRenderWare {
     virtual bool                ModelInfoTXDLoadTextures    ( SReplacementTextures* pReplacementTextures, const SString& szFilename, bool bFilteringEnabled ) = 0;
     virtual bool                ModelInfoTXDAddTextures     ( SReplacementTextures* pReplacementTextures, ushort usModelId ) = 0;
     virtual void                ModelInfoTXDRemoveTextures  ( SReplacementTextures* pReplacementTextures ) = 0;
+    virtual void                ClothesAddReplacementTxd    ( char* pFileData, ushort usFileId ) = 0;
+    virtual void                ClothesRemoveReplacementTxd ( char* pFileData ) = 0;
+    virtual bool                HasClothesReplacementChanged( void ) = 0;
     virtual RwTexDictionary *   ReadTXD                     ( const char *szTXD ) = 0;
     virtual RpClump *           ReadDFF                     ( const char *szDFF, unsigned short usModelID, bool bLoadEmbeddedCollisions ) = 0;
     virtual CColModel *         ReadCOL                     ( const char * szCOLFile ) = 0;
@@ -85,7 +88,7 @@ class CRenderWare {
     virtual bool                ReplacePartModels           ( RpClump * pClump, RpAtomicContainer * pAtomics, unsigned int uiAtomics, const char * szName ) = 0;
     virtual void                PulseWorldTextureWatch      ( void ) = 0;
     virtual void                GetModelTextureNames        ( std::vector < SString >& outNameList, ushort usModelID ) = 0;
-    virtual const SString&      GetTextureName              ( CD3DDUMMY* pD3DData ) = 0;
+    virtual const char*         GetTextureName              ( CD3DDUMMY* pD3DData ) = 0;
 
     virtual void                SetRenderingClientEntity    ( CClientEntityBase* pClientEntity, ushort usModelId, int iTypeMask ) = 0;
     virtual SShaderItemLayers*  GetAppliedShaderForD3DData  ( CD3DDUMMY* pD3DData ) = 0;

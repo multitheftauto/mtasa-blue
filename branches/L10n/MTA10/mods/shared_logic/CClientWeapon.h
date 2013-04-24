@@ -117,13 +117,13 @@ private:
     CClientMarker *         m_pMarker2;
     short                   m_sDamage;
     CWeaponStat *           m_pWeaponStat;
-    CClientEntity *         m_pTarget;
+    CClientEntityPtr        m_pTarget;
     CVector                 m_vecTarget;
     eTargetType             m_targetType;
     eBone                   m_targetBone;
     int                     m_itargetWheel;
     SWeaponConfiguration    m_weaponConfig;
-    CClientPlayer *         m_pOwner;  // For lag compensation
+    CClientPlayerPtr        m_pOwner;  // For lag compensation
     int                     m_nAmmoTotal;
     int                     m_nAmmoInClip;
     eWeaponState            m_PreviousState;

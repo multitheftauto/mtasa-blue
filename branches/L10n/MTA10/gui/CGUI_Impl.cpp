@@ -34,7 +34,7 @@ using std::list;
 #define CGUI_MTA_SANS_FONT_SIZE     9
 
 CGUI_Impl::CGUI_Impl ( IDirect3DDevice9* pDevice )
-    : m_HasSchemeLoaded(false)
+    : m_HasSchemeLoaded(false), m_fCurrentServerCursorAlpha(1.0f)
 {
     m_RenderOkTimer.SetMaxIncrement( 100 );
 
@@ -498,6 +498,21 @@ void CGUI_Impl::SetCursorEnabled ( bool bEnabled )
 bool CGUI_Impl::IsCursorEnabled ( void )
 {
     return CEGUI::MouseCursor::getSingleton ().isVisible ();
+}
+
+
+void CGUI_Impl::SetCursorAlpha ( float fAlpha, bool bOnlyCurrentServer )
+{
+    CEGUI::MouseCursor::getSingleton ().setAlpha ( fAlpha );
+
+    if ( bOnlyCurrentServer )
+        m_fCurrentServerCursorAlpha = fAlpha;
+}
+
+
+float CGUI_Impl::GetCurrentServerCursorAlpha ( void )
+{
+    return m_fCurrentServerCursorAlpha;
 }
 
 

@@ -535,6 +535,7 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     // Read some settings
     m_pACLManager->SetFileName ( m_pMainConfig->GetAccessControlListFile ().c_str () );
     const SString strServerIP = m_pMainConfig->GetServerIP ();
+    const SString strServerIPList = m_pMainConfig->GetServerIPList ();
     unsigned short usServerPort = m_pMainConfig->GetServerPort ();
     unsigned int uiMaxPlayers = m_pMainConfig->GetMaxPlayers ();
 
@@ -622,7 +623,7 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
 
                                 MTA_DM_BUILDTAG_SHORT,
                                 m_pMainConfig->GetServerName ().c_str (),
-                                strServerIP.c_str (),
+                                strServerIPList.c_str (),
                                 usServerPort,
                                 pszLogFileName,
                                 uiMaxPlayers,
@@ -641,21 +642,16 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
         SString strResourceCachePath ( "%s/resource-cache", g_pServerInterface->GetServerModPath () );
         SString strResourceCacheUnzippedPath ( "%s/unzipped", strResourceCachePath.c_str () );
         SString strResourceCacheHttpClientFilesPath ( "%s/http-client-files", strResourceCachePath.c_str () );
-        SString strResourceCacheHttpClientFilesProtectedPath ( "%s/http-client-files-protected", strResourceCachePath.c_str () );
+        SString strResourceCacheHttpClientFilesProtectedPath ( "%s/http-client-files-no-client-cache", strResourceCachePath.c_str () );
 
         // Make sure the resource-cache directories exists
         MakeSureDirExists ( ( strResourceCacheUnzippedPath + "/" ).c_str () );
         MakeSureDirExists ( ( strResourceCacheHttpClientFilesPath + "/" ).c_str () );
         MakeSureDirExists ( ( strResourceCacheHttpClientFilesProtectedPath + "/" ).c_str () );
 
-        // Rename old resourcecache dir to show that it is no longer used
-        SString strOldResourceCachePath ( "%s/resourcecache", g_pServerInterface->GetServerModPath () );
-        SString strOldResourceCachePath2 ( strResourceCachePath + "/_old_resourcecache.delete-me" );
-        #ifdef WIN32
-            MoveFile ( strOldResourceCachePath, strOldResourceCachePath2 );
-        #else
-            std::rename ( strOldResourceCachePath, strOldResourceCachePath2 );
-        #endif
+        // Rename old dirs to show that they are no longer used
+        FileRename( PathJoin( g_pServerInterface->GetServerModPath(), "resourcecache" ), strResourceCachePath + "/_old_resourcecache.delete-me" );
+        FileRename( strResourceCachePath + "/http-client-files-protected", strResourceCachePath + "/_old_http-client-files-protected.delete-me" );
 
         // Create cache readme
         SString strReadmeFilename ( "%s/DO_NOT_MODIFY_Readme.txt", strResourceCachePath.c_str () );
@@ -797,9 +793,9 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
         CLogger::LogPrintf ( "Network encryption disabled\n" );
 
     // Try to start the network
-    if ( !g_pNetServer->StartNetwork ( strServerIP, usServerPort, uiMaxPlayers, m_pMainConfig->GetServerName ().c_str () ) )
+    if ( !g_pNetServer->StartNetwork ( strServerIPList, usServerPort, uiMaxPlayers, m_pMainConfig->GetServerName ().c_str () ) )
     {
-        CLogger::ErrorPrintf ( "Could not bind the server on interface '%s' and port '%u'!\n", strServerIP.c_str (), usServerPort );
+        CLogger::ErrorPrintf ( "Could not bind the server on interface '%s' and port '%u'!\n", strServerIPList.c_str (), usServerPort );
         return false;
     }
 
@@ -2791,9 +2787,14 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
                                                     }
                                                     else
                                                     {
-                                                        pPlayer->SetOccupiedVehicle ( NULL, 0 );
+                                                        // Has he been warped to a vehicle in the mean time? (by lua f.e.)
+                                                        if ( !pPlayer->GetOccupiedVehicle () )
+                                                        {
+                                                            pPlayer->SetOccupiedVehicle ( NULL, 0 );
+                                                            pVehicle->SetOccupant ( NULL, 0 );
+                                                        }
+                                                        
                                                         pPlayer->SetVehicleAction ( CPlayer::VEHICLEACTION_NONE );
-                                                        pVehicle->SetOccupant ( NULL, 0 );
                                                         failReason = FAIL_SCRIPT;
                                                     }
                                                 }
@@ -2897,9 +2898,13 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
                                                     }
                                                     else
                                                     {
-                                                        pPlayer->SetOccupiedVehicle ( NULL, 0 );
+                                                        // Has he been warped to a vehicle in the mean time? (by lua f.e.)
+                                                        if ( !pPlayer->GetOccupiedVehicle () )
+                                                        {
+                                                            pPlayer->SetOccupiedVehicle ( NULL, 0 );
+                                                            pVehicle->SetOccupant ( NULL, ucSeat );
+                                                        }
                                                         pPlayer->SetVehicleAction ( CPlayer::VEHICLEACTION_NONE );
-                                                        pVehicle->SetOccupant ( NULL, ucSeat );
                                                         failReason = FAIL_SCRIPT;
                                                     }
                                                 }

@@ -19,8 +19,9 @@
 // Various dodgy pointer values
 #define FAKE_D3DTEXTURE_EMPTY_KEY   ( (CD3DDUMMY*)-1 )
 #define FAKE_D3DTEXTURE_DELETED_KEY ( (CD3DDUMMY*)-2 )
-#define FAKE_D3DTEXTURE_CJ          ( (CD3DDUMMY*)-7 )
-#define FAKE_RWTEXTURE_CJ           ( (RwTexture*)-8 )
+#define FAKE_D3DTEXTURE_NO_TEXTURE  ( (CD3DDUMMY*)-9 )
+#define FAKE_RWTEXTURE_NO_TEXTURE   ( (RwTexture*)-10 )
+#define FAKE_NAME_NO_TEXTURE        "unnamed"
 
 class CMatchChannel;
 class CMatchChannelManager;

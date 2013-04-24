@@ -160,9 +160,11 @@ void CClientStreamer::DoPulse ( CVector & vecPosition )
     }
     */
 
+    bool bMovedFar = false;
     // Has our position changed?
     if ( vecPosition != m_vecPosition )
     {
+        bMovedFar = ( ( m_vecPosition - vecPosition ).LengthSquared() > ( 50 * 50 ) );
         m_vecPosition = vecPosition;
 
         // Have we changed row?
@@ -183,7 +185,7 @@ void CClientStreamer::DoPulse ( CVector & vecPosition )
     SetExpDistances ( &m_ActiveElements );
     m_ActiveElements.sort ( CompareExpDistance );
 
-    Restream ();
+    Restream ( bMovedFar );
 }
 
 
@@ -397,8 +399,18 @@ bool CClientStreamer::IsActiveElement ( CClientStreamElement * pElement )
 }
 
 
-void CClientStreamer::Restream ( void )
+void CClientStreamer::Restream ( bool bMovedFar )
 {
+    // Limit distance stream in/out rate
+    // Vehicles might have to ignore this to reduce blocking loads elsewhere.
+    int iMaxOut = 4;
+    int iMaxIn = 4;
+    if ( bMovedFar )
+    {
+        iMaxOut = 1000;
+        iMaxIn = 1000;
+    }
+
     // Do we have any elements waiting to be streamed out?
     CClientStreamElement * pElement = NULL;
     while ( !m_ToStreamOut.empty () )
@@ -409,8 +421,12 @@ void CClientStreamer::Restream ( void )
         {
             // Stream out 1 of them per frame
             pElement->InternalStreamOut ();
+            iMaxOut--;
         }
         m_ToStreamOut.remove ( pElement );
+
+        if ( iMaxOut <= 0 )
+            break;
     }
 
     CClientStreamElement * pFurthestStreamed = NULL;
@@ -510,6 +526,13 @@ void CClientStreamer::Restream ( void )
                     // Stream in the new element. Don't do it instantly.
                     pElement->InternalStreamIn ( false );
                     bReachedLimit = ReachedLimit ();
+
+                    if ( !bReachedLimit )
+                    {
+                        iMaxIn--;
+                        if ( iMaxIn <= 0 )
+                            break;
+                    }
                 }
             }
         }

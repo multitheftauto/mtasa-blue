@@ -219,7 +219,7 @@ public:
     void                                DoPulsePreHUDRender             ( bool bDidUnminimize, bool bDidRecreateRenderTargets );
     void                                DoPulsePostFrame                ( void );
     void                                DoPulses                        ( void );
-    void                                DoPulses2                       ( void );
+    void                                DoPulses2                       ( bool bCalledFromIdle );
 
     uint                                GetFrameTimeSlice               ( void ) { return m_uiFrameTimeSlice; }
     uint                                GetFrameCount                   ( void ) { return m_uiFrameCount; }
@@ -280,6 +280,7 @@ public:
 
     inline CElementDeleter*             GetElementDeleter               ( void )        { return &m_ElementDeleter; }
     inline CObjectRespawner*            GetObjectRespawner              ( void )        { return &m_ObjectRespawner; }
+    CRemoteCalls*                       GetRemoteCalls                  ( void )        { return m_pRemoteCalls; }
 
     // Status toggles
     void                                ShowNetstat                     ( int iCmd );
@@ -592,6 +593,7 @@ private:
     CSingularFileDownloadManager*       m_pSingularFileDownloadManager;
     CGameEntityXRefManager*             m_pGameEntityXRefManager;
     CClientModelCacheManager*           m_pModelCacheManager;
+    CRemoteCalls*                       m_pRemoteCalls;
 
     // Revised facilities
     CServer                             m_Server;
@@ -690,6 +692,11 @@ private:
     bool                                m_bBeingDeleted;        // To enable speedy disconnect
 
     bool                                m_bWasMinimized;
+
+    bool                                m_bMuteSFX;
+    bool                                m_bMuteRadio;
+    bool                                m_bMuteMTA;
+    bool                                m_bMuteVoice;
 
     // Cache for speeding up collision processing
 public:

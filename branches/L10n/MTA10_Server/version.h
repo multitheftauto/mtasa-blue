@@ -7,11 +7,11 @@
 //
 // To compile a public server:
 //      1. set MTASA_VERSION_TYPE to VERSION_TYPE_RELEASE
-//      2. Use net.dll/net.so from the latest 1.1 untested/rc/release (nightly.mtasa.com)
+//      2. Use net.dll/net.so from the latest untested/rc/release (nightly.mtasa.com)
 //
 // To compile a custom server:
 //      1. set MTASA_VERSION_TYPE to VERSION_TYPE_CUSTOM
-//      2. Use net.dll/net.so from the latest 1.1 unstable (nightly.mtasa.com)
+//      2. Use net.dll/net.so from the latest unstable (nightly.mtasa.com)
 
 
 // New version info
@@ -78,8 +78,8 @@
 
 #define _ASE_VERSION QUOTE_DEFINE(MTASA_VERSION_MAJOR) "." QUOTE_DEFINE(MTASA_VERSION_MINOR)
 #define _NETCODE_VERSION_BRANCH_ID      0x4         // Use 0x1 - 0xF to indicate an incompatible branch is being used (0x0 is reserved, 0x4 is trunk)
-#define _SERVER_NET_MODULE_VERSION      0x07E       // (0x000 - 0xfff) Lvl9 wizards only
-#define _NETCODE_VERSION                0x1D5       // (0x000 - 0xfff) Increment when net messages change (pre-release)
+#define _SERVER_NET_MODULE_VERSION      0x07F       // (0x000 - 0xfff) Lvl9 wizards only
+#define _NETCODE_VERSION                0x1D6       // (0x000 - 0xfff) Increment when net messages change (pre-release)
 #define MTA_DM_BITSTREAM_VERSION        0x044       // (0x000 - 0xfff) Increment when net messages change (post-release). (Changing will also require additional backward compatibility code).
 
 // To avoid user confusion, make sure the ASE version matches only if communication is possible

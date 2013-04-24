@@ -67,3 +67,4 @@
 #include "CServerCache.h"
 #include "CCrashDumpWriter.h"
 #include "CMemStats.h"
+#include "CGraphStats.h"

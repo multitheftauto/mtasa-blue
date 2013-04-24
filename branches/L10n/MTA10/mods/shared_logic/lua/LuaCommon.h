@@ -50,37 +50,21 @@ class CXMLNode;
 
 
 // Lua push/pop macros for our datatypes
-CClientRadarMarker*     lua_toblip          ( lua_State* luaVM, int iArgument );
-CClientColModel*        lua_tocolmodel      ( lua_State* luaVM, int iArgument );
-CClientColShape*        lua_tocolshape      ( lua_State* luaVM, int iArgument );
-CScriptFile*            lua_tofile          ( lua_State* luaVM, int iArgument );
-CClientDFF*             lua_todff           ( lua_State* luaVM, int iArgument );
-CClientEntity*          lua_toelement       ( lua_State* luaVM, int iArgument );
-CClientGUIElement*      lua_toguielement    ( lua_State* luaVM, int iArgument );
-CClientMarker*          lua_tomarker        ( lua_State* luaVM, int iArgument );
-CClientObject*          lua_toobject        ( lua_State* luaVM, int iArgument );
-CClientPed*             lua_toped           ( lua_State* luaVM, int iArgument );
-CClientPickup*          lua_topickup        ( lua_State* luaVM, int iArgument );
-CClientPlayer*          lua_toplayer        ( lua_State* luaVM, int iArgument );
-CClientProjectile*      lua_toprojectile    ( lua_State* luaVM, int iArgument );
-CLuaTimer*              lua_totimer         ( lua_State* luaVM, int iArgument );
-CResource*              lua_toresource      ( lua_State* luaVM, int iArgument );
-CClientSound*           lua_tosound         ( lua_State* luaVM, int iArgument );
-CClientTeam*            lua_toteam          ( lua_State* luaVM, int iArgument );
-CClientTXD*             lua_totxd           ( lua_State* luaVM, int iArgument );
-CClientVehicle*         lua_tovehicle       ( lua_State* luaVM, int iArgument );
-CClientWater*           lua_towater         ( lua_State* luaVM, int iArgument );
-CClientWeapon*          lua_toweapon        ( lua_State* luaVM, int iArgument );
-CXMLNode*               lua_toxmlnode       ( lua_State* luaVM, int iArgument );
-CClientRadarArea*       lua_toradararea     ( lua_State* luaVM, int iArgument );
 
-void                    lua_pushelement     ( lua_State* luaVM, CClientEntity* pElement );
-void                    lua_pushresource    ( lua_State* luaVM, CResource* pElement );
-void                    lua_pushtimer       ( lua_State* luaVM, CLuaTimer* pElement );
-void                    lua_pushxmlnode     ( lua_State* luaVM, CXMLNode* pElement );
+class CClientEntity*         lua_toelement           ( lua_State* luaVM, int iArgument );
 
-const char*             lua_makestring      ( lua_State* luaVM, int iArgument );
+// Internal use
+void                    lua_newclass            ( lua_State* luaVM );
+void                    lua_registerclass       ( lua_State* luaVM, const char* szName, const char* szParent = NULL );
+void                    lua_classfunction       ( lua_State* luaVM, const char* szFunction, const char* szOriginal );
+void                    lua_classvariable       ( lua_State* luaVM, const char* szVariable, const char* set, const char* get );
 
-#define lua_istype(luavm, number,type) (lua_type(luavm,number) == type)
+void                    lua_pushelement         ( lua_State* luaVM, CClientEntity* pElement );
+void                    lua_pushresource        ( lua_State* luaVM, CResource* pElement );
+void                    lua_pushtimer           ( lua_State* luaVM, CLuaTimer* pElement );
+void                    lua_pushxmlnode         ( lua_State* luaVM, CXMLNode* pElement );
+void                    lua_pushuserdata        ( lua_State* luaVM, const char* szClass, void* value );
+
+const char*             lua_makestring          ( lua_State* luaVM, int iArgument );
 
 #endif

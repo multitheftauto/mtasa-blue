@@ -102,6 +102,7 @@
       <right name="function.setServerPassword" access="false"/>
       <right name="function.getServerPassword" access="false"/>
       <right name="function.callRemote" access="false"/>
+      <right name="function.fetchRemote" access="false"/>
       <right name="function.startResource" access="false"/>
       <right name="function.stopResource" access="false"/>
       <right name="function.restartResource" access="false"/>
@@ -219,6 +220,7 @@
    </acl>
    <acl name="RPC">
       <right name="function.callRemote" access="true"/>
+      <right name="function.fetchRemote" access="true"/>
    </acl>
    <acl name="MapEditor">
       <right name="general.ModifyOtherObjects" access="true"/>

@@ -338,7 +338,8 @@ public:
 
     // Camera set funcs
     static bool                         SetCameraMatrix                     ( CVector& vecPosition, CVector* pvecLookAt, float fRoll, float fFOV );
-    static bool                         SetCameraTarget                     ( CClientEntity * pEntity);
+    static bool                         SetCameraTarget                     ( CClientEntity * pEntity );
+    static bool                         SetCameraTarget                     ( const CVector& vecTarget );
     static bool                         SetCameraInterior                   ( unsigned char ucInterior );
     static bool                         FadeCamera                          ( bool bFadeIn, float fFadeTime, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue );
     static bool                         SetCameraViewMode                       ( unsigned short ucMode );
@@ -346,6 +347,8 @@ public:
     // Cursor funcs
     static bool                         GetCursorPosition                   ( CVector2D& vecCursor, CVector& vecWorld );
     static bool                         IsCursorShowing                     ( bool& bShowing );
+    static bool                         GetCursorAlpha                      ( float& fAlpha );
+    static bool                         SetCursorAlpha                      ( float fAlpha );
 
     // Drawing funcs
     static void                         DrawText                            ( float fLeft, float fTop, float fRight, float fBottom, unsigned long dwColor, const char* szText, float fScaleX, float fScaleY, unsigned long ulFormat, ID3DXFont* pDXFont, bool bPostGUI, bool bColorCoded, bool bSubPixelPositioning );
@@ -522,6 +525,8 @@ public:
     static bool                         SetBirdsEnabled                     ( bool bEnabled );
     static bool                         GetBirdsEnabled                     ( void );
     static bool                         SetMoonSize                         ( int iSize );
+    static bool                         SetFPSLimit                         ( int iLimit );
+    static bool                         GetFPSLimit                         ( int& iLimit );
 
     // Input functions
     static bool                         BindKey                             ( const char* szKey, const char* szHitState, CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFunction, CLuaArguments& Arguments );
@@ -631,6 +636,27 @@ public:
     static bool                         SetSoundPan                         ( CClientSound& Sound, float fPan );
     static bool                         GetSoundPan                         ( CClientSound& Sound, float& fPan );
 
+    // Player Voice Sound Functions
+
+    static bool                         SetSoundPosition                    ( CClientPlayer& Player, double dPosition );
+    static bool                         GetSoundPosition                    ( CClientPlayer& Player, double& dPosition );
+    static bool                         GetSoundLength                      ( CClientPlayer& Player, double& dLength );
+    static bool                         SetSoundPaused                      ( CClientPlayer& Sound, bool bPaused );
+    static bool                         IsSoundPaused                       ( CClientPlayer& Sound, bool& bPaused );
+    static bool                         SetSoundVolume                      ( CClientPlayer& Player, float fVolume );
+    static bool                         GetSoundVolume                      ( CClientPlayer& Player, float& fVolume );
+    static bool                         SetSoundSpeed                       ( CClientPlayer& Player, float fSpeed );
+    static float*                       GetSoundFFTData                     ( CClientPlayer& Player, int iLength, int iBands = 0 );
+    static float*                       GetSoundWaveData                    ( CClientPlayer& Player, int iLength );
+    static bool                         GetSoundLevelData                   ( CClientPlayer& Player, DWORD& dwLeft, DWORD& dwRight );
+    static bool                         GetSoundSpeed                       ( CClientPlayer& Player, float& fSpeed );
+    static bool                         SetSoundMinDistance                 ( CClientPlayer& Player, float fDistance );
+    static bool                         GetSoundMinDistance                 ( CClientPlayer& Player, float& fDistance );
+    static bool                         SetSoundMaxDistance                 ( CClientPlayer& Player, float fDistance );
+    static bool                         GetSoundMaxDistance                 ( CClientPlayer& Player, float& fDistance );
+    static bool                         GetSoundMetaTags                    ( CClientPlayer& Player, const SString& strFormat, SString& strMetaTags );
+    static bool                         SetSoundEffectEnabled               ( CClientPlayer& Player, const SString& strEffectName, bool bEnable );
+    
 
     // Handling funcs 
     static eHandlingProperty    GetVehicleHandlingEnum              ( std::string strProperty );

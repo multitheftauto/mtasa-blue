@@ -433,7 +433,7 @@ void CPacketHandler::Packet_ServerJoined ( NetBitStreamInterface& bitStream )
     m_pCamera->SetFocus ( &vecPos, false );*/
     g_pClientGame->m_pCamera->ToggleCameraFixedMode ( true );
     g_pClientGame->m_pCamera->SetPosition ( vecPos );
-    g_pClientGame->m_pCamera->SetTarget ( CVector ( 0, 0, 720 ) );  
+    g_pClientGame->m_pCamera->SetFixedTarget ( CVector ( 0, 0, 720 ) );  
 
     // We're now joined
     g_pClientGame->m_Status = CClientGame::STATUS_JOINED;
@@ -1558,7 +1558,7 @@ void CPacketHandler::Packet_Vehicle_InOut ( NetBitStreamInterface& bitStream )
             {
                 // Read out the seat id
                 unsigned char ucSeat = 0xFF;
-                bitStream.ReadBits ( &ucSeat, 3 );
+                bitStream.ReadBits ( &ucSeat, 4 );
                 if ( ucSeat == 0xFF )
                 {
                     RaiseProtocolError ( 28 );
@@ -3538,6 +3538,15 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                     bool bFriendlyFire;
                     bitStream.ReadBit ( bFriendlyFire );
                     pTeam->SetFriendlyFire ( bFriendlyFire );
+
+                    unsigned int uiPlayersCount;
+                    bitStream.Read ( uiPlayersCount );
+                    for ( unsigned int i = 0; i < uiPlayersCount; i++ )
+                    {
+                        ElementID PlayerId;
+                        if ( bitStream.Read ( PlayerId ) )
+                            g_pClientGame->m_pManager->GetPlayerManager ()->Get ( PlayerId )->SetTeam ( pTeam );
+                    }
 
                     delete [] szTeamName;
                     break;

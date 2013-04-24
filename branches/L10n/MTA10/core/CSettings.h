@@ -182,8 +182,8 @@ protected:
     CGUILabel*          m_pAltTabLabelInfo;
     CGUILabel*          m_pAltTabLabel;
     CGUIComboBox*       m_pAltTabCombo;
-    CGUILabel*          m_pAsyncLabel;
-    CGUIComboBox*       m_pAsyncCombo;
+    CGUILabel*          m_pPriorityLabel;
+    CGUIComboBox*       m_pPriorityCombo;
     CGUILabel*          m_pFastClothesLabel;
     CGUIComboBox*       m_pFastClothesCombo;
     CGUILabel*          m_pAudioGeneralLabel;
@@ -214,6 +214,10 @@ protected:
     CGUIScrollBar*      m_pAudioVoiceVolume;
     CGUICheckBox*       m_pCheckBoxAudioEqualizer;
     CGUICheckBox*       m_pCheckBoxAudioAutotune;
+    CGUICheckBox*       m_pCheckBoxMuteSFX;
+    CGUICheckBox*       m_pCheckBoxMuteRadio;
+    CGUICheckBox*       m_pCheckBoxMuteMTA;
+    CGUICheckBox*       m_pCheckBoxMuteVoice;
     CGUILabel*          m_pAudioUsertrackLabel;
     CGUICheckBox*       m_pCheckBoxUserAutoscan;
     CGUILabel*          m_pLabelUserTrackMode;
@@ -361,6 +365,11 @@ private:
     bool                m_bShownVolumetricShadowsWarning;
     bool                m_bShownAllowScreenUploadMessage;
     int                 m_iMaxAnisotropic;
+
+    bool                m_bMuteSFX;
+    bool                m_bMuteRadio;
+    bool                m_bMuteMTA;
+    bool                m_bMuteVoice;
 
     std::list < SKeyBindSection *> m_pKeyBindSections;
 

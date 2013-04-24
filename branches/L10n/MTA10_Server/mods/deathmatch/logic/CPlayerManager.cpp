@@ -305,6 +305,7 @@ void CPlayerManager::AddToList ( CPlayer* pPlayer )
         (*iter)->AddPlayerToDistLists ( pPlayer );
     }
 
+    assert( !m_Players.Contains( pPlayer ) );
     m_Players.push_back ( pPlayer );
     MapSet ( m_SocketPlayerMap, pPlayer->GetSocket (), pPlayer );
     assert ( m_Players.size () == m_SocketPlayerMap.size () );
@@ -315,6 +316,7 @@ void CPlayerManager::RemoveFromList ( CPlayer* pPlayer )
 {
     m_Players.remove ( pPlayer );
     MapRemove ( m_SocketPlayerMap, pPlayer->GetSocket () );
+    assert( !m_Players.Contains( pPlayer ) );
     assert ( m_Players.size () == m_SocketPlayerMap.size () );
 
     // Remove from other players near/far lists

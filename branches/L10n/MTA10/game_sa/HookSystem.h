@@ -29,7 +29,7 @@ BYTE * CreateJump ( DWORD dwFrom, DWORD dwTo, BYTE * ByteArray );
         } \
         __if_exists( RETURN_##type##_US ) \
         { \
-            if ( pGameInterface->GetGameVersion () == VERSION_US_10 ) \
+            if ( pGame->GetGameVersion () == VERSION_US_10 ) \
             { \
                 EZHookInstall_HERE( type, US ) \
             } \

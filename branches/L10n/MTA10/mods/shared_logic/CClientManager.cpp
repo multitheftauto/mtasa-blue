@@ -180,30 +180,42 @@ CClientManager::~CClientManager ( void )
     m_pConnectionTroubleTexture = NULL;
 }
 
-
-void CClientManager::DoPulse ( void )
+//
+// This function gets called twice.per game loop
+//
+void CClientManager::DoPulse ( bool bDoStandardPulses, bool bDoVehicleManagerPulse )
 {
-    m_pPacketRecorder->DoPulse ();
+    if ( bDoStandardPulses )
+        m_pPacketRecorder->DoPulse ();
 
     if ( IsGameLoaded () )
     {
-        m_pModelRequestManager->DoPulse ();
-        m_pCamera->DoPulse ();
-        /* now called from CClientGame::PostWorldProcessHandler so marker positions
-           are no longer a frame behind when attached to other entities.
-        m_pMarkerManager->DoPulse (); */ 
-        m_pRadarAreaManager->DoPulse ( false ); // DoPulse, but do not render (we render them from a hook to avoid render issues - the mask not blocking the edges)
-        m_pVehicleManager->DoPulse ();
-        m_pPathManager->DoPulse ();
-        m_pRadarMarkerManager->DoPulse ();
-        m_pPedManager->DoPulse ();
-        m_pObjectManager->DoPulse ();
-        m_pProjectileManager->DoPulse ();
-        m_pSoundManager->DoPulse ();
-        m_pPlayerManager->DoPulse ();
-        m_pColManager->DoPulse ();
-        m_pGUIManager->DoPulse ();
-        m_pWeaponManager->DoPulse ();
+        if ( bDoStandardPulses )
+        {
+            m_pModelRequestManager->DoPulse ();
+            m_pCamera->DoPulse ();
+            /* now called from CClientGame::PostWorldProcessHandler so marker positions
+            are no longer a frame behind when attached to other entities.
+            m_pMarkerManager->DoPulse (); */ 
+            m_pRadarAreaManager->DoPulse ( false ); // DoPulse, but do not render (we render them from a hook to avoid render issues - the mask not blocking the edges)
+        }
+
+        if ( bDoVehicleManagerPulse )
+            m_pVehicleManager->DoPulse ();
+
+        if ( bDoStandardPulses )
+        {
+            m_pPathManager->DoPulse ();
+            m_pRadarMarkerManager->DoPulse ();
+            m_pPedManager->DoPulse ();
+            m_pObjectManager->DoPulse ();
+            m_pProjectileManager->DoPulse ();
+            m_pSoundManager->DoPulse ();
+            m_pPlayerManager->DoPulse ();
+            m_pColManager->DoPulse ();
+            m_pGUIManager->DoPulse ();
+            m_pWeaponManager->DoPulse ();
+        }
     }
 }
 

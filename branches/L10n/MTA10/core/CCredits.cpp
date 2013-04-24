@@ -76,7 +76,7 @@ CCredits::CCredits ( void )
                               "Kris \"KWKSND\" Kulchisky\n"
                               "Dustin \"Ransom\" Morren\n"
                               "erorr404\n"
-                              "MeKorea\n"
+                              "Synecy\n"
                               "\n"
                               "\n";
 

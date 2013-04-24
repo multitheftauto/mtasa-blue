@@ -152,6 +152,7 @@ public:
     inline CWaterManager            * GetWaterManager ()         { return m_pWaterManager; }
     inline CWeaponStatManager       * GetWeaponStatManager()     { return m_pWeaponStatsManager; }
     inline CPointLights             * GetPointLights ()          { return m_pPointLights; }
+    CRenderWareSA*                  GetRenderWareSA()            { return m_pRenderWare; }
 
     CWeaponInfo             * GetWeaponInfo(eWeaponType weapon,eWeaponSkill skill=WEAPONSKILL_STD);
     CModelInfo              * GetModelInfo( DWORD dwModelID );
@@ -212,7 +213,6 @@ public:
     int&                    GetCheckStatus          ( void )            { return m_iCheckStatus; }
 
 
-    void                    SetAsyncLoadingFromSettings     ( bool bSettingsDontUse, bool bSettingsEnabled );
     void                    SetAsyncLoadingFromScript       ( bool bScriptEnabled, bool bScriptForced );
     void                    SuspendASyncLoading             ( bool bSuspend );
     bool                    IsASyncLoadingEnabled           ( bool bIgnoreSuspend = false );
@@ -289,8 +289,6 @@ private:
     CControllerConfigManager    * m_pControllerConfigManager;
 
     eGameVersion            m_eGameVersion;
-    bool                    m_bAsyncSettingsDontUse;
-    bool                    m_bAsyncSettingsEnabled;
     bool                    m_bAsyncScriptEnabled;
     bool                    m_bAsyncScriptForced;
     bool                    m_bASyncLoadingSuspended;

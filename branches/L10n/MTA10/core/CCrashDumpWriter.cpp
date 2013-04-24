@@ -256,6 +256,7 @@ void CCrashDumpWriter::DumpMiniDump ( _EXCEPTION_POINTERS* pException, CExceptio
 
                 // Create the dump directory
                 CreateDirectory ( CalcMTASAPath ( "mta\\dumps" ), 0 );
+                CreateDirectory ( CalcMTASAPath ( "mta\\dumps\\private" ), 0 );
 
                 SString strModuleName = pExceptionInformation->GetModuleBaseName ();
                 strModuleName = strModuleName.ReplaceI ( ".dll", "" ).Replace ( ".exe", "" ).Replace ( "_", "" ).Replace ( ".", "" ).Replace ( "-", "" );
@@ -294,7 +295,7 @@ void CCrashDumpWriter::DumpMiniDump ( _EXCEPTION_POINTERS* pException, CExceptio
                 }
 
                 // Ensure filename parts match up with EDumpFileNameParts
-                SString strFilename ( "mta\\dumps\\client_%s_%s_%08x_%x_%s_%08X_%04X_%03X_%s_%04d%02d%02d_%02d%02d.dmp",
+                SString strFilename ( "mta\\dumps\\private\\client_%s_%s_%08x_%x_%s_%08X_%04X_%03X_%s_%04d%02d%02d_%02d%02d.dmp",
                                              strMTAVersionFull.c_str (),
                                              strModuleName.c_str (),
                                              pExceptionInformation->GetAddressModuleOffset (),

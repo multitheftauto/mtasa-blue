@@ -144,6 +144,20 @@ void CClientModelCacheManagerImpl::DoPulse ( void )
     else
     if ( m_iFrameCounter == 3 )
         DoPulseVehicleModels ();
+
+    // Handle regeneration of possibly replaced clothes textures
+    if ( g_pGame->GetRenderWare()->HasClothesReplacementChanged() )
+    {
+        g_pMultiplayer->FlushClothesCache();
+
+        CClientPlayerManager* pPlayerManager = g_pClientGame->GetPlayerManager();
+        for ( std::vector < CClientPlayer* > ::const_iterator iter = pPlayerManager->IterBegin(); iter != pPlayerManager->IterEnd(); ++iter )
+            (*iter)->RebuildModel( false );
+
+        CClientPedManager* pPedManager = g_pClientGame->GetPedManager();
+        for ( std::vector < CClientPed* > ::const_iterator iter = pPedManager->IterBegin(); iter != pPedManager->IterEnd(); ++iter )
+            (*iter)->RebuildModel( false );
+    }
 }
 
     

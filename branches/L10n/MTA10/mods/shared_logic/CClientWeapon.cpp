@@ -100,7 +100,7 @@ void CClientWeapon::DoPulse ( void )
             {
                 if ( m_pTarget->GetType ( ) == CCLIENTPED || m_pTarget->GetType ( ) == CCLIENTPLAYER )
                 {
-                    CClientPed * pPed = (CClientPed *) m_pTarget;
+                    CClientPed * pPed = (CClientPed *) (CClientEntity *)(m_pTarget);
                     pPed->GetBonePosition( m_targetBone, vecTargetPos );
                 }
                 else
@@ -259,7 +259,7 @@ void CClientWeapon::Fire ( bool bServerFire )
                 {
                     if ( m_pTarget->GetType ( ) == CCLIENTPED || m_pTarget->GetType ( ) == CCLIENTPLAYER )
                     {
-                        CClientPed * pPed = (CClientPed *) m_pTarget;
+                        CClientPed * pPed = (CClientPed *) (CClientEntity *) m_pTarget;
                         pPed->GetBonePosition( m_targetBone, vecTarget );
                     }
                     else
@@ -268,7 +268,7 @@ void CClientWeapon::Fire ( bool bServerFire )
                         {
                             if ( m_itargetWheel <= MAX_WHEELS )
                             {
-                                CClientVehicle * pTarget = (CClientVehicle*)m_pTarget;
+                                CClientVehicle * pTarget = (CClientVehicle*)(CClientEntity *)m_pTarget;
                                 vecTarget = pTarget->GetGameVehicle()->GetWheelPosition ( (eWheels)m_itargetWheel );
                             }
                             else

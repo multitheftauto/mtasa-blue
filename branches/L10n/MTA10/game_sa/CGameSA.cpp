@@ -39,8 +39,7 @@ unsigned long* CGameSA::VAR_Framelimiter;
  */
 CGameSA::CGameSA()
 {
-    m_bAsyncSettingsDontUse = false;
-    m_bAsyncSettingsEnabled = false;
+    pGame = this;
     m_bAsyncScriptEnabled = false;
     m_bAsyncScriptForced = false;
     m_bASyncLoadingSuspended = false;
@@ -184,6 +183,8 @@ CGameSA::CGameSA()
 
     CModelInfoSA::StaticSetHooks ();
     CPlayerPedSA::StaticSetHooks ();
+    CRenderWareSA::StaticSetHooks ();
+    CRenderWareSA::StaticSetClothesReplacingHooks ();
 }
 
 CGameSA::~CGameSA ( void )
@@ -628,12 +629,6 @@ bool CGameSA::VerifySADataFileNames ()
            !strcmp ( *(char **)0x5BE686, "DATA\\WEAPON.DAT" );
 }
 
-void CGameSA::SetAsyncLoadingFromSettings ( bool bSettingsDontUse, bool bSettingsEnabled )
-{
-    m_bAsyncSettingsDontUse = bSettingsDontUse;
-    m_bAsyncSettingsEnabled = bSettingsEnabled;
-}
-
 void CGameSA::SetAsyncLoadingFromScript ( bool bScriptEnabled, bool bScriptForced )
 {
     m_bAsyncScriptEnabled = bScriptEnabled;
@@ -650,9 +645,9 @@ bool CGameSA::IsASyncLoadingEnabled ( bool bIgnoreSuspend )
     if ( m_bASyncLoadingSuspended && !bIgnoreSuspend )
         return false;
 
-    if ( m_bAsyncScriptForced || m_bAsyncSettingsDontUse )
+    if ( m_bAsyncScriptForced )
         return m_bAsyncScriptEnabled;
-    return m_bAsyncSettingsEnabled;
+    return true;
 }
 
 void CGameSA::SetupSpecialCharacters ( void )

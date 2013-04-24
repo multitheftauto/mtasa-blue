@@ -606,7 +606,6 @@ void CCore::ApplyGameSettings ( void )
     CVARS_GET ( "fly_with_mouse",   bval ); pController->SetFlyWithMouse ( bval );
     CVARS_GET ( "steer_with_mouse", bval ); pController->SetSteerWithMouse ( bval );
     CVARS_GET ( "classic_controls", bval ); pController->SetClassicControls ( bval );
-    CVARS_GET ( "async_loading",    iVal ); m_pGame->SetAsyncLoadingFromSettings ( iVal == 1, iVal == 2 );
     CVARS_GET ( "volumetric_shadows", bval ); m_pGame->GetSettings ()->SetVolumetricShadowsEnabled ( bval );
     CVARS_GET ( "aspect_ratio",     iVal ); m_pGame->GetSettings ()->SetAspectRatio ( (eAspectRatio)iVal );
     CVARS_GET ( "grass",            bval ); m_pGame->GetSettings ()->SetGrassEnabled ( bval );
@@ -1099,6 +1098,10 @@ void CCore::DoPostFramePulse ( )
         // Wait 250 frames more than the time it took to get status 7 (fade-out time)
         static short WaitForMenu = 0;
 
+        // Do crash dump encryption while the credit screen is displayed
+        if ( WaitForMenu == 0 )
+            HandleCrashDumpEncryption();
+
         // Cope with early finish
         if ( m_pGame->HasCreditScreenFadedOut () )
             WaitForMenu = 250;
@@ -1181,6 +1184,7 @@ void CCore::DoPostFramePulse ( )
     m_pModManager->DoPulsePostFrame ();
     TIMING_CHECKPOINT( "+CorePostFrame2" );
     GetMemStats ()->Draw ();
+    GetGraphStats ()->Draw();
     m_pConnectManager->DoPulse ();
 
     m_Community.DoPulse ();
@@ -1230,6 +1234,9 @@ void CCore::OnModUnload ( )
     // Ensure all these have been removed
     m_pKeyBinds->RemoveAllFunctions ();
     m_pKeyBinds->RemoveAllControlFunctions ();
+
+    // Reset client script frame rate limit
+    m_uiClientScriptFrameRateLimit = 0;
 }
 
 
@@ -1269,6 +1276,7 @@ void CCore::RegisterCommands ( )
 
     m_pCommands->Add ( "test",              "",                                 CCommandFuncs::Test );
     m_pCommands->Add ( "showmemstat",       "shows the memory statistics",      CCommandFuncs::ShowMemStat );
+    m_pCommands->Add ( "showframegraph",    "shows the frame timing graph",     CCommandFuncs::ShowFrameGraph );
 
 #if defined(MTA_DEBUG) || defined(MTA_BETA)
     m_pCommands->Add ( "fakelag",           "",                                 CCommandFuncs::FakeLag );
@@ -1696,29 +1704,49 @@ void CCore::SetXfireData ( std::string strServerName, std::string strVersion, bo
 // Recalculate FPS limit to use
 //
 // Uses client rate from config
+// Uses client rate from script
 // Uses server rate from argument, or last time if not supplied
 //
-void CCore::RecalculateFrameRateLimit ( uint uiServerFrameRateLimit )
+void CCore::RecalculateFrameRateLimit ( uint uiServerFrameRateLimit, bool bLogToConsole )
 {
     // Save rate from server if valid
     if ( uiServerFrameRateLimit != -1 )
         m_uiServerFrameRateLimit = uiServerFrameRateLimit;
 
-    // Fetch client setting
-    uint uiClientRate;
-    g_pCore->GetCVars ()->Get ( "fps_limit", uiClientRate );
+    // Start with value set by the server
+    m_uiFrameRateLimit = m_uiServerFrameRateLimit;
 
+    // Apply client config setting
+    uint uiClientConfigRate;
+    g_pCore->GetCVars ()->Get ( "fps_limit", uiClientConfigRate );
     // Lowest wins (Although zero is highest)
-    if ( ( m_uiServerFrameRateLimit > 0 && uiClientRate > m_uiServerFrameRateLimit ) || uiClientRate == 0 )
-        m_uiFrameRateLimit = m_uiServerFrameRateLimit;
-    else
-        m_uiFrameRateLimit = uiClientRate;
+    if ( ( m_uiFrameRateLimit == 0 || uiClientConfigRate < m_uiFrameRateLimit ) && uiClientConfigRate > 0 )
+        m_uiFrameRateLimit = uiClientConfigRate;
+
+    // Apply client script setting
+    uint uiClientScriptRate = m_uiClientScriptFrameRateLimit;
+    // Lowest wins (Although zero is highest)
+    if ( ( m_uiFrameRateLimit == 0 || uiClientScriptRate < m_uiFrameRateLimit ) && uiClientScriptRate > 0 )
+        m_uiFrameRateLimit = uiClientScriptRate;
 
     // Print new limits to the console
-    SString strStatus (  "Server FPS limit: %d", m_uiServerFrameRateLimit );
-    if ( m_uiFrameRateLimit != m_uiServerFrameRateLimit )
-        strStatus += SString (  " (Using %d)", m_uiFrameRateLimit );
-    CCore::GetSingleton ().GetConsole ()->Print( strStatus );
+    if ( bLogToConsole )
+    {
+        SString strStatus (  "Server FPS limit: %d", m_uiServerFrameRateLimit );
+        if ( m_uiFrameRateLimit != m_uiServerFrameRateLimit )
+            strStatus += SString (  " (Using %d)", m_uiFrameRateLimit );
+        CCore::GetSingleton ().GetConsole ()->Print( strStatus );
+    }
+}
+
+
+//
+// Change client rate as set by script
+//
+void CCore::SetClientScriptFrameRateLimit ( uint uiClientScriptFrameRateLimit )
+{
+    m_uiClientScriptFrameRateLimit = uiClientScriptFrameRateLimit;
+    RecalculateFrameRateLimit( -1, false );
 }
 
 
@@ -1749,6 +1777,8 @@ void CCore::ApplyFrameRateLimit ( uint uiOverrideRate )
     m_bDoneFrameRateLimit = true;
 
     uint uiUseRate = uiOverrideRate != -1 ? uiOverrideRate : m_uiFrameRateLimit;
+
+    TIMING_GRAPH("Limiter");
 
     if ( uiUseRate < 1 )
         return DoReliablePulse ();
@@ -1792,6 +1822,9 @@ void CCore::ApplyFrameRateLimit ( uint uiOverrideRate )
     m_dLastTimeMs = dTimeMs;
 
     DoReliablePulse ();
+
+    TIMING_GRAPH("FrameEnd");
+    TIMING_GRAPH("");
 }
 
 
@@ -2095,4 +2128,80 @@ void CCore::HandleIdlePulse ( void )
     }
     if ( m_pModManager->GetCurrentMod() )
         m_pModManager->GetCurrentMod()->IdleHandler();
+}
+
+
+//
+// Handle encryption of Windows crash dump files
+//
+void CCore::HandleCrashDumpEncryption( void )
+{
+    const int iMaxFiles = 10;
+    SString strDumpDirPath = CalcMTASAPath( "mta\\dumps" );
+    SString strDumpDirPrivatePath = PathJoin( strDumpDirPath, "private" );
+    SString strDumpDirPublicPath = PathJoin( strDumpDirPath, "public" );
+    MakeSureDirExists( strDumpDirPrivatePath + "/" );
+    MakeSureDirExists( strDumpDirPublicPath + "/" );
+
+    SString strMessage = "Dump files in this directory are encrypted and copied to 'dumps\\public' during startup\n\n";
+    FileSave( PathJoin( strDumpDirPrivatePath, "README.txt" ), strMessage );
+
+    // Move old dumps to the private folder
+    {
+        std::vector < SString > legacyList = FindFiles( PathJoin( strDumpDirPath, "*.dmp" ), true, false );
+        for ( uint i = 0 ; i < legacyList.size() ; i++ )
+        {
+            const SString& strFilename = legacyList[i];
+            SString strSrcPathFilename = PathJoin( strDumpDirPath, strFilename );
+            SString strDestPathFilename = PathJoin( strDumpDirPrivatePath, strFilename );
+            FileRename( strSrcPathFilename, strDestPathFilename );
+        }
+    }
+
+    // Limit number of files in the private folder
+    {
+        std::vector < SString > privateList = FindFiles( PathJoin( strDumpDirPrivatePath, "*.dmp" ), true, false, true );
+        for ( int i = 0 ; i < (int)privateList.size() - iMaxFiles ; i++ )
+            FileDelete( PathJoin( strDumpDirPrivatePath, privateList[i] ) );
+    }
+
+    // Copy and encrypt private files to public if they don't already exist
+    {
+        std::vector < SString > privateList = FindFiles( PathJoin( strDumpDirPrivatePath, "*.dmp" ), true, false );
+        for ( uint i = 0 ; i < privateList.size() ; i++ )
+        {
+            const SString& strPrivateFilename = privateList[i];
+            SString strPublicFilename = ExtractBeforeExtension( strPrivateFilename ) + ".rsa." + ExtractExtension( strPrivateFilename );
+            SString strPrivatePathFilename = PathJoin( strDumpDirPrivatePath, strPrivateFilename );
+            SString strPublicPathFilename = PathJoin( strDumpDirPublicPath, strPublicFilename );
+            if ( !FileExists( strPublicPathFilename ) )
+            {
+               GetNetwork()->EncryptDumpfile( strPrivatePathFilename, strPublicPathFilename );
+            }
+        }
+    }
+
+    // Limit number of files in the public folder
+    {
+        std::vector < SString > publicList = FindFiles( PathJoin( strDumpDirPublicPath, "*.dmp" ), true, false, true );
+        for ( int i = 0 ; i < (int)publicList.size() - iMaxFiles ; i++ )
+            FileDelete( PathJoin( strDumpDirPublicPath, publicList[i] ) );
+    }
+
+    // And while we are here, limit number of items in core.log as well
+    {
+        SString strCoreLogPathFilename = CalcMTASAPath( "mta\\core.log" );
+        SString strFileContents;
+        FileLoad( strCoreLogPathFilename, strFileContents );
+
+        SString strDelmiter = "** -- Unhandled exception -- **";
+        std::vector < SString > parts;
+        strFileContents.Split( strDelmiter, parts );
+
+        if ( parts.size() > iMaxFiles )
+        {
+            strFileContents = strDelmiter + strFileContents.Join( strDelmiter, parts, parts.size() - iMaxFiles );
+            FileSave( strCoreLogPathFilename, strFileContents );
+        }
+    }
 }

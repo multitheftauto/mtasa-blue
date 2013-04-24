@@ -127,6 +127,7 @@ public:
     virtual void                            SetNetOptions                   ( const SNetOptions& options ) = 0;
     virtual void                            GenerateRandomData              ( void* pOutData, uint uiLength ) = 0;
     virtual bool                            EncryptDumpfile                 ( const char* szClearPathFilename, const char* szEncryptedPathFilename ) { return false; }
+    virtual bool                            ValidateHttpCacheFileName       ( const char* szFilename ) { return false; }
 };
 
 #endif
