@@ -768,6 +768,9 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
                     BitStream.Write ( ucGreen );
                     BitStream.Write ( ucBlue );
                     BitStream.WriteBit ( bFriendlyFire );
+                    BitStream.Write ( pTeam->CountPlayers () );
+                    for ( list < CPlayer* >::const_iterator iter = pTeam->PlayersBegin (); iter != pTeam->PlayersEnd (); iter++ )
+                        BitStream.Write ( ( *iter )->GetID () );
 
                     break;
                 }
