@@ -2282,6 +2282,7 @@ bool CVehicleSA::GetComponentPosition ( SString vehicleComponent, CVector &vecPo
     }
     return false;
 }
+
 bool CVehicleSA::IsComponentPresent ( SString vehicleComponent )
 {
     return GetVehicleComponent ( vehicleComponent ) != NULL;

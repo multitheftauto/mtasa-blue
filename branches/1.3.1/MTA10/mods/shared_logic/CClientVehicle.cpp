@@ -168,10 +168,9 @@ CClientVehicle::~CClientVehicle ( void )
     m_pManager->UnreferenceEntity ( this );    
 
     // Unlink any towing attachments
-    if ( m_pTowedVehicle )
-        m_pTowedVehicle->m_pTowedByVehicle = NULL;
+    SetTowedVehicle ( NULL );
     if ( m_pTowedByVehicle )
-        m_pTowedByVehicle->m_pTowedVehicle = NULL;
+        m_pTowedByVehicle->SetTowedVehicle ( NULL );
 
     AttachTo ( NULL );
 
@@ -4081,19 +4080,25 @@ bool CClientVehicle::SetComponentPosition ( SString vehicleComponent, CVector ve
 {
     if ( m_pVehicle )
     {
-        // update our cache
-        m_ComponentData[vehicleComponent].m_vecComponentPosition = vecPosition;
-        m_ComponentData[vehicleComponent].m_bPositionChanged = true;
-
         // set our position on the model
-        return m_pVehicle->SetComponentPosition ( vehicleComponent, vecPosition );
+        if ( m_pVehicle->SetComponentPosition ( vehicleComponent, vecPosition ) )
+        {
+            // update our cache
+            m_ComponentData[vehicleComponent].m_vecComponentPosition = vecPosition;
+            m_ComponentData[vehicleComponent].m_bPositionChanged = true;
+
+            return true;
+        }
     }
     else
     {
-        // update our cache
-        m_ComponentData[vehicleComponent].m_vecComponentPosition = vecPosition;
-        m_ComponentData[vehicleComponent].m_bPositionChanged = true;
-        return true;
+        if ( m_ComponentData.find ( vehicleComponent ) != m_ComponentData.end ( ) )
+        {
+            // update our cache
+            m_ComponentData[vehicleComponent].m_vecComponentPosition = vecPosition;
+            m_ComponentData[vehicleComponent].m_bPositionChanged = true;
+            return true;
+        }
     }
     return false;
 }
@@ -4103,14 +4108,16 @@ bool CClientVehicle::GetComponentPosition ( SString vehicleComponent, CVector &v
     if ( m_pVehicle )
     {
         // fill our position from the actual position
-        m_pVehicle->GetComponentPosition ( vehicleComponent, vecPosition );
-        return true;
+        return m_pVehicle->GetComponentPosition ( vehicleComponent, vecPosition );
     }
     else
     {
-        // fill our position from the cached position
-        vecPosition = m_ComponentData[vehicleComponent].m_vecComponentPosition;
-        return true;
+        if ( m_ComponentData.find ( vehicleComponent ) != m_ComponentData.end ( ) )
+        {
+            // fill our position from the cached position
+            vecPosition = m_ComponentData[vehicleComponent].m_vecComponentPosition;
+            return true;
+        }
     }
     return false;
 }
@@ -4123,19 +4130,25 @@ bool CClientVehicle::SetComponentRotation ( SString vehicleComponent, CVector ve
         CVector vecTemp = vecRotation;
         ConvertDegreesToRadians ( vecTemp );
 
-        // update our cache
-        m_ComponentData[vehicleComponent].m_vecComponentRotation = vecRotation;
-        m_ComponentData[vehicleComponent].m_bRotationChanged = true;
-
         // set our rotation on the model
-        return m_pVehicle->SetComponentRotation ( vehicleComponent, vecTemp );
+        if ( m_pVehicle->SetComponentRotation ( vehicleComponent, vecTemp ) )
+        {
+            // update our cache
+            m_ComponentData[vehicleComponent].m_vecComponentRotation = vecRotation;
+            m_ComponentData[vehicleComponent].m_bRotationChanged = true;
+
+            return true;
+        }
     }
     else
     {
-        // update our cache
-        m_ComponentData[vehicleComponent].m_vecComponentRotation = vecRotation;
-        m_ComponentData[vehicleComponent].m_bRotationChanged = true;
-        return true;
+        if ( m_ComponentData.find ( vehicleComponent ) != m_ComponentData.end ( ) )
+        {
+            // update our cache
+            m_ComponentData[vehicleComponent].m_vecComponentRotation = vecRotation;
+            m_ComponentData[vehicleComponent].m_bRotationChanged = true;
+            return true;
+        }
     }
     return false;
 }
@@ -4145,17 +4158,20 @@ bool CClientVehicle::GetComponentRotation ( SString vehicleComponent, CVector &v
     if ( m_pVehicle )
     {
         // fill our rotation from the actual rotation
-        m_pVehicle->GetComponentRotation ( vehicleComponent, vecRotation );
+        bool bResult = m_pVehicle->GetComponentRotation ( vehicleComponent, vecRotation );
 
         // convert to degrees... none of our functions use radians.
         ConvertRadiansToDegrees ( vecRotation );
-        return true;
+        return bResult;
     }
     else
     {
-        // fill our rotation from the cached rotation
-        vecRotation = m_ComponentData[vehicleComponent].m_vecComponentRotation;
-        return true;
+        if ( m_ComponentData.find ( vehicleComponent ) != m_ComponentData.end ( ) )
+        {
+            // fill our rotation from the cached rotation
+            vecRotation = m_ComponentData[vehicleComponent].m_vecComponentRotation;
+            return true;
+        }
     }
     return false;
 }
@@ -4163,38 +4179,48 @@ bool CClientVehicle::GetComponentRotation ( SString vehicleComponent, CVector &v
 bool CClientVehicle::ResetComponentRotation ( SString vehicleComponent )
 {
     // set our rotation on the model
-    SetComponentRotation ( vehicleComponent, m_ComponentData[vehicleComponent].m_vecOriginalComponentRotation );
-
-    // update our cache
-    m_ComponentData[vehicleComponent].m_bRotationChanged = false;
-    return true;
+    if ( SetComponentRotation ( vehicleComponent, m_ComponentData[vehicleComponent].m_vecOriginalComponentRotation ) )
+    {
+        // update our cache
+        m_ComponentData[vehicleComponent].m_bRotationChanged = false;
+        return true;
+    }
+    return false;
 }
 bool CClientVehicle::ResetComponentPosition ( SString vehicleComponent )
 {
     // set our position on the model
-    SetComponentPosition ( vehicleComponent, m_ComponentData[vehicleComponent].m_vecOriginalComponentPosition );
-
-    // update our cache
-    m_ComponentData[vehicleComponent].m_bPositionChanged = false;
-    return true;
+    if ( SetComponentPosition ( vehicleComponent, m_ComponentData[vehicleComponent].m_vecOriginalComponentPosition ) )
+    {
+        // update our cache
+        m_ComponentData[vehicleComponent].m_bPositionChanged = false;
+        return true;
+    }
+    return false;
 }
 
 bool CClientVehicle::SetComponentVisible ( SString vehicleComponent, bool bVisible )
 {
     if ( m_pVehicle )
     {
-        // update our cache
-        m_ComponentData[vehicleComponent].m_bVisible = bVisible;
-        
-        // set our visibility on the model
-        m_pVehicle->SetComponentVisible ( vehicleComponent, bVisible );
-        return true;
+        if ( m_pVehicle->SetComponentVisible ( vehicleComponent, bVisible ) )
+        {
+            // update our cache
+            m_ComponentData[vehicleComponent].m_bVisible = bVisible;
+            
+            // set our visibility on the model
+            m_pVehicle->SetComponentVisible ( vehicleComponent, bVisible );
+            return true;
+        }
     }
     else
     {
-        // store our visible variable to the cached data
-        m_ComponentData[vehicleComponent].m_bVisible = bVisible;
-        return true;
+        if ( m_ComponentData.find ( vehicleComponent ) != m_ComponentData.end ( ) )
+        {
+            // store our visible variable to the cached data
+            m_ComponentData[vehicleComponent].m_bVisible = bVisible;
+            return true;
+        }
     }
     return false;
 }
@@ -4204,14 +4230,16 @@ bool CClientVehicle::GetComponentVisible ( SString vehicleComponent, bool &bVisi
     if ( m_pVehicle )
     {
         // fill our visible variable from the actual position
-        m_pVehicle->GetComponentVisible ( vehicleComponent, bVisible );
-        return true;
+        return m_pVehicle->GetComponentVisible ( vehicleComponent, bVisible );
     }
     else
     {
-        // fill our visible variable from the cached data
-        bVisible = m_ComponentData[vehicleComponent].m_bVisible;
-        return true;
+        if ( m_ComponentData.find ( vehicleComponent ) != m_ComponentData.end ( ) )
+        {
+            // fill our visible variable from the cached data
+            bVisible = m_ComponentData[vehicleComponent].m_bVisible;
+            return true;
+        }
     }
     return false;
 }
