@@ -486,15 +486,15 @@ protected:
     unsigned char               m_ucMaxPassengers;
     bool                        m_bIsVirtualized;
     CVehicle*                   m_pVehicle;
-    CClientPed*                 m_pDriver;
+    CClientPedPtr               m_pDriver;
     SFixedArray < CClientPed*, 8 >  m_pPassengers;
-    CClientPed*                 m_pOccupyingDriver;
+    CClientPedPtr               m_pOccupyingDriver;
     SFixedArray < CClientPed*, 8 >  m_pOccupyingPassengers;
     RpClump*                    m_pClump;
     short                       m_usRemoveTimer;
 
-    CClientVehicle*             m_pPreviousLink;
-    CClientVehicle*             m_pNextLink;
+    CClientVehiclePtr           m_pPreviousLink;
+    CClientVehiclePtr           m_pNextLink;
     CMatrix                     m_Matrix;
     CMatrix                     m_MatrixLast;
     CMatrix                     m_MatrixPure;   
@@ -548,10 +548,10 @@ protected:
     CMatrix                     m_matFrozen;
     CVehicleUpgrades*           m_pUpgrades;
     unsigned char               m_ucOverrideLights;
-    CClientVehicle*             m_pTowedVehicle;
-    CClientVehicle*             m_pTowedByVehicle;
+    CClientVehiclePtr           m_pTowedVehicle;
+    CClientVehiclePtr           m_pTowedByVehicle;
     eWinchType                  m_eWinchType;
-    CClientEntity*              m_pPickedUpWinchEntity;
+    CClientEntityPtr            m_pPickedUpWinchEntity;
     std::string                 m_strRegPlate;
     unsigned char               m_ucPaintjob;
     float                       m_fDirtLevel;

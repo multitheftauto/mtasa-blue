@@ -1632,7 +1632,7 @@ CClientPed* CClientVehicle::GetOccupant ( int iSeat ) const
     // Return the driver if the seat is 0
     if ( iSeat == 0 )
     {
-        return m_pDriver;
+        return (CClientPed*)(const CClientPed*)m_pDriver;
     }
     else if ( iSeat <= (sizeof(m_pPassengers)/sizeof(CClientPed*)) )
     {
@@ -3293,7 +3293,7 @@ void CClientVehicle::SetTargetPosition ( const CVector& vecTargetPosition, unsig
             // Base amount to account for something
             int iExtrapolateMs = vehExtrapolate.iBaseMs;
 
-            if ( CClientPlayer* pPlayerDriver = DynamicCast < CClientPlayer > ( m_pDriver ) )
+            if ( CClientPlayer* pPlayerDriver = DynamicCast < CClientPlayer > ( (CClientEntity*)m_pDriver ) )
                 iExtrapolateMs += pPlayerDriver->GetLatency () * vehExtrapolate.iScalePercent / 110;
 
             // Limit amount

@@ -494,8 +494,8 @@ public:
     bool                        m_bHealthLocked;
     bool                        m_bArmorLocked;
     unsigned long               m_ulLastOnScreenTime;
-    CClientVehicle*             m_pOccupiedVehicle;
-    CClientVehicle*             m_pOccupyingVehicle;
+    CClientVehiclePtr           m_pOccupiedVehicle;
+    CClientVehiclePtr           m_pOccupyingVehicle;
     //unsigned int                m_uiOccupyingSeat;
     unsigned int                m_uiOccupiedVehicleSeat;
     bool                        m_bForceGettingIn;
@@ -534,7 +534,7 @@ public:
     CVector                     m_vecTargetTarget;
     CVector                     m_vecTargetTargetAngle;
     CVector                     m_vecTargetInterpolateAngle;
-    CClientEntity*              m_pTargetedEntity;
+    CClientEntityPtr            m_pTargetedEntity;
     std::list < SDelayedSyncData* >  m_SyncBuffer;
     bool                        m_bDucked;
     bool                        m_bWasDucked; //For knowing when to register standing up
@@ -562,7 +562,7 @@ public:
     float                       m_fTargetRotation;
     int                         m_iVehicleInOutState;
     bool                        m_bRecreatingModel;
-    CClientEntity *             m_pCurrentContactEntity;
+    CClientEntityPtr            m_pCurrentContactEntity;
     bool                        m_bSunbathing;
     CClientPad                  m_Pad;
     bool                        m_bDestroyingSatchels;
@@ -592,7 +592,7 @@ public:
     uint                        m_uiFrameLastRebuildPlayer;
 
     bool                        m_bBulletImpactData;
-    CClientEntity*              m_pBulletImpactEntity;
+    CClientEntityPtr            m_pBulletImpactEntity;
     CVector                     m_vecBulletImpactHit;
 
     // Time dependent interpolation
@@ -607,7 +607,7 @@ public:
             float           fLastAlpha;
         } pos;
 
-        CClientEntity*      pTargetOriginSource;
+        CClientEntityPtr    pTargetOriginSource;
         // These variables are used to track the last known position
         // of the contact entity for if it's removed during the
         // interpolation.

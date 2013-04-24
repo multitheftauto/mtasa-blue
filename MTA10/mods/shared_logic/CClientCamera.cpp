@@ -104,12 +104,12 @@ void CClientCamera::DoPulse ( void )
                     if ( eType == CCLIENTVEHICLE )
                     {
                         CVector vecVehicleRotation;
-                        static_cast < CClientVehicle* > ( m_pFocusedEntity )->GetRotationRadians ( vecVehicleRotation );
+                        static_cast < CClientVehicle* > ( (CClientEntity*)m_pFocusedEntity )->GetRotationRadians ( vecVehicleRotation );
                         fRotation = vecVehicleRotation.fZ * 3.14159f / 180;
                     }
                     else if ( eType == CCLIENTPED || eType == CCLIENTPLAYER )
                     {
-                        fRotation = static_cast < CClientPed* > ( m_pFocusedEntity )->GetCurrentRotation ();
+                        fRotation = static_cast < CClientPed* > ( (CClientEntity*)m_pFocusedEntity )->GetCurrentRotation ();
                     }
                 }
 
@@ -250,7 +250,7 @@ void CClientCamera::SetFocus ( CClientEntity* pEntity, eCamMode eMode, bool bSmo
 
         // Remove stream reference from the previous target
         if ( m_pFocusedEntity && m_pFocusedEntity->IsStreamingCompatibleClass () )
-            static_cast < CClientStreamElement* > ( m_pFocusedEntity )->RemoveStreamReference ();
+            static_cast < CClientStreamElement* > ( (CClientEntity*)m_pFocusedEntity )->RemoveStreamReference ();
 
         // Add stream reference for our new target
         if ( pEntity && pEntity->IsStreamingCompatibleClass () )
@@ -347,7 +347,7 @@ void CClientCamera::SetFocusToLocalPlayer ( void )
 
     // Remove stream reference from the previous target
     if ( m_pFocusedEntity && m_pFocusedEntity->IsStreamingCompatibleClass () )
-        static_cast < CClientStreamElement* > ( m_pFocusedEntity )->RemoveStreamReference ();
+        static_cast < CClientStreamElement* > ( (CClientEntity*)m_pFocusedEntity )->RemoveStreamReference ();
 
     // Reset
     m_pFocusedPlayer = NULL;
@@ -375,7 +375,7 @@ void CClientCamera::UnreferenceEntity ( CClientEntity* pEntity )
 
         // Remove stream reference from the previous target
         if ( m_pFocusedEntity && m_pFocusedEntity->IsStreamingCompatibleClass () )
-            static_cast < CClientStreamElement* > ( m_pFocusedEntity )->RemoveStreamReference ();
+            static_cast < CClientStreamElement* > ( (CClientEntity*)m_pFocusedEntity )->RemoveStreamReference ();
 
         m_pFocusedEntity = NULL;
         m_pFocusedGameEntity = NULL;

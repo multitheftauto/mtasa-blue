@@ -49,10 +49,10 @@ private:
     std::list < CClientProjectile* >    m_List;
 
     bool                                m_bIsLocal;
-    CClientEntity *                     m_pCreator;
+    CClientEntityPtr                    m_pCreator;
 
     bool                                m_bCreating;
-    CClientProjectile *                 m_pLastCreated;
+    CClientProjectilePtr                m_pLastCreated;
 };
 
 #endif

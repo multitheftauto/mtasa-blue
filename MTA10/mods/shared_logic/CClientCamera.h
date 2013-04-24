@@ -87,8 +87,8 @@ private:
 
     CClientPlayerManager*       m_pPlayerManager;
 
-    CClientPlayer*              m_pFocusedPlayer;
-    CClientEntity*              m_pFocusedEntity;
+    CClientPlayerPtr            m_pFocusedPlayer;
+    CClientEntityPtr            m_pFocusedEntity;
     CEntity*                    m_pFocusedGameEntity;
     bool                        m_bInvalidated;
 
