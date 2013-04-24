@@ -369,7 +369,7 @@ int DoLaunchGame ( LPSTR lpCmdLine )
     }
 
     typedef CLocalizationInterface* (__cdecl *FUNC_CREATELOCALIZATIONFROMENVIRONMENT)(SString strLocale);
-    FUNC_CREATELOCALIZATIONFROMENVIRONMENT pFunc = (FUNC_CREATELOCALIZATIONFROMENVIRONMENT)GetProcAddress ( hCoreModule, "L10n_CreateLocalizationFromEnvironment" );
+    FUNC_CREATELOCALIZATIONFROMENVIRONMENT pFunc = (FUNC_CREATELOCALIZATIONFROMENVIRONMENT)GetProcAddress ( hCoreModule, "L10n_CreateLocalization" );
     CLocalizationInterface* g_pLocalization = pFunc(strLocale);
     if ( g_pLocalization == NULL )
     {

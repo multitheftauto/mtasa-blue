@@ -313,7 +313,7 @@ void CClientVariables::LoadDefaults ( void )
     if(!Exists("locale")) 
     {
         SString strLangCode = GetApplicationSetting ( "locale" );
-        Set ( "locale", strLangCode ? strLangCode : _S("en_US") );
+        Set ( "locale", !strLangCode.empty() ? strLangCode : _S("en_US") );
     }
 
     // We will default this one at CClientGame.cpp, because we need a valid direct3d device to give a proper default value.

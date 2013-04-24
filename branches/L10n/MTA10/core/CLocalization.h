@@ -24,10 +24,10 @@ public:
                                 CLocalization               ( SString strLocale = "", SString strLocalePath = "" );
                                 ~CLocalization              ( void );
 
-    SString                     Translate                   ( SString strMessage );
-    SString                     TranslateWithContext        ( SString strContext, SString strMessage );
-    SString                     TranslatePlural             ( SString strSingular, SString strPlural, int iNum );
-    SString                     TranslatePluralWithContext  ( SString strContext, SString strSingular, SString strPlural, int iNum );
+    SString                     Translate                   ( const SString& strMessage );
+    SString                     TranslateWithContext        ( const SString& strContext, const SString& strMessage );
+    SString                     TranslatePlural             ( const SString& strSingular, const SString& strPlural, int iNum );
+    SString                     TranslatePluralWithContext  ( const SString& strContext, const SString& strSingular, const SString& strPlural, int iNum );
 
     std::map<SString,SString>   GetAvailableLanguages       ( void );
     bool                        IsLocalized                 ( void );

@@ -24,8 +24,6 @@ using namespace std;
 
 #define CORE_SETTINGS_UPDATE_INTERVAL   30         // Settings update interval in frames
 #define CORE_SETTINGS_HEADERS           3
-#define CORE_SETTINGS_HEADER_GAME       "GTA GAME CONTROLS"
-#define CORE_SETTINGS_HEADER_MP         "MULTIPLAYER CONTROLS"
 #define CORE_SETTINGS_HEADER_SPACER     " "
 #define CORE_SETTINGS_NO_KEY            " "
 #define CORE_SETTINGS_COMMUNITY_TEXT    \
@@ -1971,9 +1969,9 @@ void CSettings::Initialize ( void )
     // Add the rows
     CKeyBinds* pKeyBinds = reinterpret_cast < CKeyBinds* > ( CCore::GetSingleton ().GetKeyBinds () );
     iRowGame = m_pBindsList->AddRow ();
-    m_pBindsList->SetItemText ( iRowGame, m_hBind, CORE_SETTINGS_HEADER_GAME, false, true );
+    m_pBindsList->SetItemText ( iRowGame, m_hBind, _("GTA GAME CONTROLS"), false, true );
     m_pBindsList->SetItemText ( m_pBindsList->AddRow (), m_hBind, CORE_SETTINGS_HEADER_SPACER, false, true );
-    m_pBindsList->SetItemText ( m_pBindsList->AddRow (), m_hBind, CORE_SETTINGS_HEADER_MP, false, true );
+    m_pBindsList->SetItemText ( m_pBindsList->AddRow (), m_hBind, _("MULTIPLAYER CONTROLS"), false, true );
     //iRows = CORE_SETTINGS_HEADERS;            // (game keys), (multiplayer keys)
     int iGameRowCount = 1;
     int iMultiplayerRowCount = 2;

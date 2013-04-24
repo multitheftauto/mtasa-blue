@@ -47,22 +47,22 @@ CLocalization::~CLocalization ( void )
     delete m_pCurrentLang;
 }
 
-SString CLocalization::Translate ( SString strMessage )
+SString CLocalization::Translate ( const SString & strMessage )
 {
     return m_pCurrentLang->Translate( strMessage ) ;
 }
 
-SString CLocalization::TranslateWithContext ( SString strContext, SString strMessage )
+SString CLocalization::TranslateWithContext ( const SString& strContext, const SString & strMessage )
 {
     return m_pCurrentLang->TranslateWithContext( strContext, strMessage );
 }
 
-SString CLocalization::TranslatePlural ( SString strSingular, SString strPlural, int iNum )
+SString CLocalization::TranslatePlural ( const SString& strSingular, const SString & strPlural, const int iNum )
 {
     return m_pCurrentLang->TranslatePlural ( strSingular, strPlural, iNum );
 }
 
-SString CLocalization::TranslatePluralWithContext ( SString strContext, SString strSingular, SString strPlural, int iNum )
+SString CLocalization::TranslatePluralWithContext ( const SString& strContext, const SString& strSingular, const SString& strPlural, int iNum )
 {
     return m_pCurrentLang->TranslatePluralWithContext ( strContext, strSingular, strPlural, iNum );
 }
@@ -105,9 +105,9 @@ SString CLocalization::GetLanguageDirectory ( void )
 //
 // Global interface
 //
-extern "C" _declspec(dllexport) CLocalizationInterface* __cdecl L10n_CreateLocalizationFromEnvironment ( SString strLocale )
+extern "C" _declspec(dllexport) CLocalizationInterface* __cdecl L10n_CreateLocalization ( SString strLocale )
 {
-    // Eventually create a localization interface base interface, using the environment locale
+    // Eventually create a localization interface
     if ( !g_pLocalization )
         g_pLocalization = new CLocalization ( strLocale );
 

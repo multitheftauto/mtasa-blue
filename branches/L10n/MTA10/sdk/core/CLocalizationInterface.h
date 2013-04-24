@@ -25,10 +25,10 @@
 class CLocalizationInterface
 {
 public:
-    virtual SString             Translate                   ( SString strMessage ) = 0;
-    virtual SString             TranslateWithContext        ( SString strContext, SString strMessage ) = 0;
-    virtual SString             TranslatePlural             ( SString strSingular, SString strPlural, int iNum ) = 0;
-    virtual SString             TranslatePluralWithContext  ( SString strContext, SString strSingular, SString strPlural, int iNum ) = 0;
+    virtual SString             Translate                   ( const SString& strMessage ) = 0;
+    virtual SString             TranslateWithContext        ( const SString& strContext, const SString& strMessage ) = 0;
+    virtual SString             TranslatePlural             ( const SString& strSingular, const SString& strPlural, int iNum ) = 0;
+    virtual SString             TranslatePluralWithContext  ( const SString& strContext, const SString& strSingular, const SString& strPlural, int iNum ) = 0;
 
     virtual std::map<SString,SString>   GetAvailableLanguages       ( void ) = 0;
     virtual bool                        IsLocalized                 ( void ) = 0;

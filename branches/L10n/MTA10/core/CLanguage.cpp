@@ -18,7 +18,7 @@ CLanguage::CLanguage ( Dictionary Dict )
     m_Dict = Dict;
 }
 
-CLanguage::CLanguage ( SString strPOPath )
+CLanguage::CLanguage ( const SString& strPOPath )
 { 
     std::ifstream in( strPOPath );
     POParser::parse( strPOPath, in, m_Dict );
@@ -30,22 +30,22 @@ CLanguage::~CLanguage ( void )
 {
 }
 
-SString CLanguage::Translate ( SString strMessage )
+SString CLanguage::Translate ( const SString& strMessage )
 {
     return SString(m_Dict.translate ( strMessage ));;
 }
 
-SString CLanguage::TranslateWithContext ( SString strContext, SString strMessage )
+SString CLanguage::TranslateWithContext ( const SString& strContext, const SString& strMessage )
 {
     return SString(m_Dict.translate_ctxt ( strContext, strMessage ));
 }
 
-SString CLanguage::TranslatePlural ( SString strSingular, SString strPlural, int iNum )
+SString CLanguage::TranslatePlural ( const SString& strSingular, const SString& strPlural, int iNum )
 {
     return SString(m_Dict.translate_plural ( strSingular, strPlural, iNum ));
 }
 
-SString CLanguage::TranslatePluralWithContext ( SString strContext, SString strSingular, SString strPlural, int iNum )
+SString CLanguage::TranslatePluralWithContext ( const SString& strContext, const SString& strSingular, const SString& strPlural, int iNum )
 {
     return SString(m_Dict.translate_ctxt_plural ( strContext, strSingular, strPlural, iNum ));
 }
