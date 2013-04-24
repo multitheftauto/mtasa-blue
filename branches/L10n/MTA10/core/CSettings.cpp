@@ -854,33 +854,41 @@ void CSettings::CreateGUI ( void )
     // Font Selection
     m_pPaneChatFont = reinterpret_cast < CGUIScrollPane* > ( pManager->CreateScrollPane ( pTabInterface ) ); 
     m_pPaneChatFont->SetProperty ( "ContentPaneAutoSized", "False" );
-    m_pPaneChatFont->SetPosition ( CVector2D ( 50.0f, 320.0f ) );
+    m_pPaneChatFont->SetPosition ( CVector2D ( 10.0f, 320.0f ) );
     m_pPaneChatFont->SetSize ( CVector2D ( 250.0f, 33.0f ) );
 
     CGUILabel* pFontLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pPaneChatFont, _("Font:") ) );
     pFontLabel->SetPosition ( CVector2D ( 0.0f, 8.0f ) );
+    pFontLabel->GetPosition ( vecTemp, false );
     pFontLabel->AutoSize ( _("Font:") );
+    pFontLabel->GetSize ( vecSize, false );
 
     m_pRadioChatFont [ ChatFonts::CHAT_FONT_DEFAULT ] = reinterpret_cast < CGUIRadioButton* > ( pManager->CreateRadioButton ( m_pPaneChatFont, "Tahoma" ) ); 
     m_pRadioChatFont [ ChatFonts::CHAT_FONT_DEFAULT ]->SetSelected ( true );
-    m_pRadioChatFont [ ChatFonts::CHAT_FONT_DEFAULT ]->SetPosition ( CVector2D ( 50.0f, 0.0f ) );
+    m_pRadioChatFont [ ChatFonts::CHAT_FONT_DEFAULT ]->SetPosition ( CVector2D ( vecTemp.fX + vecSize.fX + 5.0f, 0.0f ) );
     m_pRadioChatFont [ ChatFonts::CHAT_FONT_DEFAULT ]->SetSize ( CVector2D ( 100.0f, 15.0f ) );
 
     m_pRadioChatFont [ ChatFonts::CHAT_FONT_CLEAR ] = reinterpret_cast < CGUIRadioButton* > ( pManager->CreateRadioButton ( m_pPaneChatFont, "Verdana" ) ); 
-    m_pRadioChatFont [ ChatFonts::CHAT_FONT_CLEAR ]->SetPosition ( CVector2D ( 150.0f, 0.0f ) );
+    m_pRadioChatFont [ ChatFonts::CHAT_FONT_CLEAR ]->SetPosition ( CVector2D ( vecTemp.fX + vecSize.fX + 120.0f, 0.0f ) );
     m_pRadioChatFont [ ChatFonts::CHAT_FONT_CLEAR ]->SetSize ( CVector2D ( 100.0f, 15.0f ) );
 
     m_pRadioChatFont [ ChatFonts::CHAT_FONT_BOLD ] = reinterpret_cast < CGUIRadioButton* > ( pManager->CreateRadioButton ( m_pPaneChatFont, "Tahoma Bold" ) ); 
-    m_pRadioChatFont [ ChatFonts::CHAT_FONT_BOLD ]->SetPosition ( CVector2D ( 50.0f, 18.0f ) );
+    m_pRadioChatFont [ ChatFonts::CHAT_FONT_BOLD ]->SetPosition ( CVector2D ( vecTemp.fX + vecSize.fX + 5.0f, 18.0f ) );
     m_pRadioChatFont [ ChatFonts::CHAT_FONT_BOLD ]->SetSize ( CVector2D ( 100.0f, 15.0f ) );
 
     m_pRadioChatFont [ ChatFonts::CHAT_FONT_ARIAL ] = reinterpret_cast < CGUIRadioButton* > ( pManager->CreateRadioButton ( m_pPaneChatFont, "Arial" ) ); 
-    m_pRadioChatFont [ ChatFonts::CHAT_FONT_ARIAL ]->SetPosition ( CVector2D ( 150.0f, 18.0f ) );
+    m_pRadioChatFont [ ChatFonts::CHAT_FONT_ARIAL ]->SetPosition ( CVector2D ( vecTemp.fX + vecSize.fX + 120.0f, 18.0f ) );
     m_pRadioChatFont [ ChatFonts::CHAT_FONT_ARIAL ]->SetSize ( CVector2D ( 100.0f, 15.0f ) );
 
     // Misc. Options
     {
         CGUILabel* pLabel;
+
+        fIndentX = pManager->CGUI_GetMaxTextExtent( "default-normal",
+            _("Lines:"),
+            _("Scale:"),
+            _("Width:")
+        );
 
         pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabInterface, _("Lines:") ) );
         pLabel->SetPosition ( CVector2D ( 360.0f, 160.0f ) );
@@ -888,8 +896,8 @@ void CSettings::CreateGUI ( void )
         pLabel->AutoSize ( _("Lines:") );
 
         m_pChatLines = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( pTabInterface, "" ) );
-        m_pChatLines->SetPosition ( CVector2D ( vecTemp.fX + 40.0f, vecTemp.fY - 2.0f ) );
-        m_pChatLines->SetSize ( CVector2D ( 110.0f, 24.0f ) );
+        m_pChatLines->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, vecTemp.fY - 2.0f ) );
+        m_pChatLines->SetSize ( CVector2D ( 80.0f, 24.0f ) );
 
         pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabInterface, _("Scale:") ) );
         pLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 28.0f ) );
@@ -897,16 +905,16 @@ void CSettings::CreateGUI ( void )
         pLabel->AutoSize ( _("Scale:") );
 
         m_pChatScaleX = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( pTabInterface, "" ) );
-        m_pChatScaleX->SetPosition ( CVector2D ( vecTemp.fX + 40.0f, vecTemp.fY - 2.0f ) );
-        m_pChatScaleX->SetSize ( CVector2D ( 50.0f, 24.0f ) );
+        m_pChatScaleX->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, vecTemp.fY - 2.0f ) );
+        m_pChatScaleX->SetSize ( CVector2D ( 35.0f, 24.0f ) );
 
         pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabInterface, "x" ) );
-        pLabel->SetPosition ( CVector2D ( vecTemp.fX + 92.5f, vecTemp.fY + 2.0f ) );
+        pLabel->SetPosition ( CVector2D ( vecTemp.fX + fIndentX + 37.0f, vecTemp.fY + 2.0f ) );
         pLabel->AutoSize ( "x" );
 
         m_pChatScaleY = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( pTabInterface, "" ) );
-        m_pChatScaleY->SetPosition ( CVector2D ( vecTemp.fX + 100.0f, vecTemp.fY - 2.0f ) );
-        m_pChatScaleY->SetSize ( CVector2D ( 50.0f, 24.0f ) );
+        m_pChatScaleY->SetPosition ( CVector2D ( vecTemp.fX + fIndentX + 45.0f, vecTemp.fY - 2.0f ) );
+        m_pChatScaleY->SetSize ( CVector2D ( 35.0f, 24.0f ) );
 
         pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabInterface, _("Width:") ) );
         pLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 28.0f ) );
@@ -914,13 +922,8 @@ void CSettings::CreateGUI ( void )
         pLabel->AutoSize ( _("Width:") );
 
         m_pChatWidth = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( pTabInterface, "" ) );
-        m_pChatWidth->SetPosition ( CVector2D ( vecTemp.fX + 40.0f, vecTemp.fY - 2.0f ) );
-        m_pChatWidth->SetSize ( CVector2D ( 110.0f, 24.0f ) );
-
-        m_pChatCssBackground = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox( pTabInterface, _("Hide background when not typing") ) );  //!ACHTUNG: This is nasty.  Use a wrapped textbox
-        m_pChatCssBackground->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 28.0f ) );
-        m_pChatCssBackground->GetPosition ( vecTemp );
-        m_pChatCssBackground->SetSize ( CVector2D ( 160.0f, 32.0f ) );
+        m_pChatWidth->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, vecTemp.fY - 2.0f ) );
+        m_pChatWidth->SetSize ( CVector2D ( 80.0f, 24.0f ) );
 
         m_pChatCssText = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox( pTabInterface, _("Fade out old lines") ) );
         m_pChatCssText->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 34.0f ) );
@@ -952,6 +955,10 @@ void CSettings::CreateGUI ( void )
         pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabInterface, _("sec") ) );
         pLabel->SetPosition ( CVector2D ( vecTemp.fX + 115.0f, vecTemp.fY ) );
         pLabel->AutoSize ( _("sec") );
+
+        m_pChatCssBackground = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox( pTabInterface, _("Hide background when not typing") ) );  //!ACHTUNG: This is nasty.  Use a wrapped textbox
+        m_pChatCssBackground->SetPosition ( CVector2D ( vecTemp.fX - 15.0f, vecTemp.fY + 28.0f ) );
+        m_pChatCssBackground->SetSize ( CVector2D ( 160.0f, 32.0f ) );
     }
 
     /**
