@@ -3450,6 +3450,15 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                     bitStream.ReadBit ( bFriendlyFire );
                     pTeam->SetFriendlyFire ( bFriendlyFire );
 
+                    unsigned int uiPlayersCount;
+                    bitStream.Read ( uiPlayersCount );
+                    for ( unsigned int i = 0; i < uiPlayersCount; i++ )
+                    {
+                        ElementID PlayerId;
+                        if ( bitStream.Read ( PlayerId ) )
+                            g_pClientGame->m_pManager->GetPlayerManager ()->Get ( PlayerId )->SetTeam ( pTeam );
+                    }
+
                     delete [] szTeamName;
                     break;
                 }
