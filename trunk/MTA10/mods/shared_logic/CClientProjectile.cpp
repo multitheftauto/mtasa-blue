@@ -75,10 +75,10 @@ CClientProjectile::~CClientProjectile ( void )
         {
             case CCLIENTPLAYER:
             case CCLIENTPED:
-                static_cast < CClientPed * > ( m_pCreator )->RemoveProjectile ( this );
+                static_cast < CClientPed * > ( (CClientEntity*)m_pCreator )->RemoveProjectile ( this );
                 break;
             case CCLIENTVEHICLE:
-                static_cast < CClientVehicle * > ( m_pCreator )->RemoveProjectile ( this );
+                static_cast < CClientVehicle * > ( (CClientEntity*)m_pCreator )->RemoveProjectile ( this );
                 break;
             default: break;
         }
