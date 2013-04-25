@@ -56,7 +56,9 @@ class CClientEntity*         lua_toelement           ( lua_State* luaVM, int iAr
 // Internal use
 void                    lua_newclass            ( lua_State* luaVM );
 void                    lua_registerclass       ( lua_State* luaVM, const char* szName, const char* szParent = NULL );
-void                    lua_classfunction       ( lua_State* luaVM, const char* szFunction, const char* szOriginal );
+void                    lua_classfunction       ( lua_State* luaVM, const char* szFunction, lua_CFunction fn );
+void                    lua_classfunction       ( lua_State* luaVM, const char* szFunction, const char* fn );
+void                    lua_classvariable       ( lua_State* luaVM, const char* szVariable, lua_CFunction set, lua_CFunction get );
 void                    lua_classvariable       ( lua_State* luaVM, const char* szVariable, const char* set, const char* get );
 
 void                    lua_pushelement         ( lua_State* luaVM, CClientEntity* pElement );
