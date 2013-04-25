@@ -203,33 +203,37 @@ void lua_registerclass ( lua_State* luaVM, const char* szName, const char* szPar
     lua_pop ( luaVM, 1 );
 }
 
-void lua_classfunction ( lua_State* luaVM, const char* szFunction, const char* szOriginal )
+void lua_classfunction ( lua_State* luaVM, const char* szFunction, lua_CFunction fn )
 {
-    CLuaCFunction* pFunction = CLuaCFunctions::GetFunction ( szOriginal );
-    if ( pFunction )
+    if ( fn )
     {
         lua_pushstring ( luaVM, "__class" );
         lua_rawget ( luaVM, -2 );
 
         lua_pushstring ( luaVM, szFunction );
         lua_pushstring ( luaVM, szFunction );
-        lua_pushcclosure ( luaVM, pFunction->GetFunctionAddress (), 1 );
+        lua_pushcclosure ( luaVM, fn, 1 );
         lua_rawset ( luaVM, -3 );
 
         lua_pop ( luaVM, 1 );
     }
 }
 
-void lua_classvariable ( lua_State* luaVM, const char* szVariable, const char* set, const char* get )
+void lua_classfunction ( lua_State* luaVM, const char* szFunction, const char* fn )
 {
-    // Set
+    CLuaCFunction* pFunction = CLuaCFunctions::GetFunction ( fn );
+    if ( pFunction )
+    {
+        lua_classfunction ( luaVM, szFunction, pFunction->GetFunctionAddress () );
+    }
+}
+
+void lua_classvariable ( lua_State* luaVM, const char* szVariable, lua_CFunction set, lua_CFunction get )
+{
     lua_pushstring ( luaVM, "__set" );
     lua_rawget ( luaVM, -2 );
 
-    CLuaCFunction* pSet = NULL;
-    CLuaCFunction* pGet = NULL;
-
-    if ( ( !set ) || ! ( pSet = CLuaCFunctions::GetFunction ( set ) ) )
+    if ( !set )
     {
         lua_pushstring ( luaVM, szVariable );
         lua_pushstring ( luaVM, szVariable );
@@ -240,7 +244,7 @@ void lua_classvariable ( lua_State* luaVM, const char* szVariable, const char* s
     {
         lua_pushstring ( luaVM, szVariable );
         lua_pushstring ( luaVM, szVariable );
-        lua_pushcclosure ( luaVM, pSet->GetFunctionAddress (), 1 );
+        lua_pushcclosure ( luaVM, set, 1 );
         lua_rawset ( luaVM, -3 );
     }
     lua_pop ( luaVM, 1 );
@@ -249,7 +253,7 @@ void lua_classvariable ( lua_State* luaVM, const char* szVariable, const char* s
     lua_pushstring ( luaVM, "__get" );
     lua_rawget ( luaVM, -2 );
 
-    if ( ( !get ) || ! ( pGet = CLuaCFunctions::GetFunction ( get ) ) )
+    if ( !get )
     {
         lua_pushstring ( luaVM, szVariable );
         lua_pushstring ( luaVM, szVariable );
@@ -260,8 +264,25 @@ void lua_classvariable ( lua_State* luaVM, const char* szVariable, const char* s
     {
         lua_pushstring ( luaVM, szVariable );
         lua_pushstring ( luaVM, szVariable );
-        lua_pushcclosure ( luaVM, pGet->GetFunctionAddress (), 1 );
+        lua_pushcclosure ( luaVM, get, 1 );
         lua_rawset ( luaVM, -3 );
     }
     lua_pop ( luaVM, 1 );
+}
+
+void lua_classvariable ( lua_State* luaVM, const char* szVariable, const char* set, const char* get )
+{
+    lua_CFunction fnSet;
+    lua_CFunction fnGet;
+
+    if ( set )
+        if ( CLuaCFunction* pSet = CLuaCFunctions::GetFunction ( set ) )
+            fnSet = pSet->GetFunctionAddress ();
+
+    if ( get )
+        if ( CLuaCFunction* pGet = CLuaCFunctions::GetFunction ( get ) )
+            fnGet = pGet->GetFunctionAddress ();
+
+    if ( fnSet || fnGet )
+        lua_classvariable ( luaVM, szVariable, fnSet, fnGet );
 }
