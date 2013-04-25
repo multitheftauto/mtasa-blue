@@ -877,7 +877,7 @@ void CSettings::CreateGUI ( void )
     // Font Selection
     m_pPaneChatFont = reinterpret_cast < CGUIScrollPane* > ( pManager->CreateScrollPane ( pTabInterface ) ); 
     m_pPaneChatFont->SetProperty ( "ContentPaneAutoSized", "False" );
-    m_pPaneChatFont->SetPosition ( CVector2D ( 10.0f, 320.0f ) );
+    m_pPaneChatFont->SetPosition ( CVector2D ( 10.0f, 310.0f ) );
     m_pPaneChatFont->SetSize ( CVector2D ( 250.0f, 33.0f ) );
 
     CGUILabel* pFontLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pPaneChatFont, _("Font:") ) );
@@ -910,7 +910,9 @@ void CSettings::CreateGUI ( void )
         fIndentX = pManager->CGUI_GetMaxTextExtent( "default-normal",
             _("Lines:"),
             _("Scale:"),
-            _("Width:")
+            _("Width:"),
+            _("after"),
+            _("for")
         );
 
         pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabInterface, _("Lines:") ) );
@@ -948,22 +950,17 @@ void CSettings::CreateGUI ( void )
         m_pChatWidth->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, vecTemp.fY - 2.0f ) );
         m_pChatWidth->SetSize ( CVector2D ( 80.0f, 24.0f ) );
 
-        m_pChatCssText = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox( pTabInterface, _("Fade out old lines") ) );
-        m_pChatCssText->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 34.0f ) );
-        m_pChatCssText->GetPosition ( vecTemp );
-        m_pChatCssText->SetSize ( CVector2D ( 160.0f, 16.0f ) );
-
         pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabInterface, _("after") ) );
-        pLabel->SetPosition ( CVector2D ( vecTemp.fX + 17.0f, vecTemp.fY + 22.0f ) );
+        pLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 122.5f ) );
         pLabel->GetPosition ( vecTemp );
         pLabel->AutoSize ( _("after") );
 
         m_pChatLineLife = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( pTabInterface, "" ) );
-        m_pChatLineLife->SetPosition ( CVector2D ( vecTemp.fX + 40.0f, vecTemp.fY - 2.0f ) );
-        m_pChatLineLife->SetSize ( CVector2D ( 70.0f, 24.0f ) );
+        m_pChatLineLife->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, vecTemp.fY - 2.0f ) );
+        m_pChatLineLife->SetSize ( CVector2D ( 45.0f, 24.0f ) );
 
         pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabInterface, _("sec") ) );
-        pLabel->SetPosition ( CVector2D ( vecTemp.fX + 115.0f, vecTemp.fY ) );
+        pLabel->SetPosition ( CVector2D ( vecTemp.fX + fIndentX + 55.0f, vecTemp.fY ) );
         pLabel->AutoSize ( _("sec") );
 
         pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabInterface, _("for") ) );
@@ -972,16 +969,21 @@ void CSettings::CreateGUI ( void )
         pLabel->AutoSize ( _("for") );
 
         m_pChatLineFadeout = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( pTabInterface, "" ) );
-        m_pChatLineFadeout->SetPosition ( CVector2D ( vecTemp.fX + 40.0f, vecTemp.fY - 2.0f ) );
-        m_pChatLineFadeout->SetSize ( CVector2D ( 70.0f, 24.0f ) );
+        m_pChatLineFadeout->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, vecTemp.fY - 2.0f ) );
+        m_pChatLineFadeout->SetSize ( CVector2D ( 45.0f, 24.0f ) );
 
         pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabInterface, _("sec") ) );
-        pLabel->SetPosition ( CVector2D ( vecTemp.fX + 115.0f, vecTemp.fY ) );
+        pLabel->SetPosition ( CVector2D ( vecTemp.fX + fIndentX + 55.0f, vecTemp.fY ) );
         pLabel->AutoSize ( _("sec") );
 
         m_pChatCssBackground = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox( pTabInterface, _("Hide background when not typing") ) );  //!ACHTUNG: This is nasty.  Use a wrapped textbox
-        m_pChatCssBackground->SetPosition ( CVector2D ( vecTemp.fX - 15.0f, vecTemp.fY + 28.0f ) );
-        m_pChatCssBackground->SetSize ( CVector2D ( 160.0f, 32.0f ) );
+        m_pChatCssBackground->SetPosition ( CVector2D ( 10.0f, 350.0f ) );
+        m_pChatCssBackground->GetPosition ( vecTemp );
+        m_pChatCssBackground->AutoSize ( NULL, 20.0f );
+
+        m_pChatCssText = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox( pTabInterface, _("Fade out old lines") ) );
+        m_pChatCssText->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 15.0f ) );
+        m_pChatCssText->AutoSize ( NULL, 20.0f );
     }
 
     /**
