@@ -316,13 +316,13 @@ void CSettings::CreateGUI ( void )
         CGUILabel* pLabelLeft = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabControls, _("Left Stick") ) );
         pLabelLeft->AutoSize ( );
         pLabelLeft->GetSize ( vecSize );
-        pLabelLeft->SetPosition ( CVector2D ( 245.0f - vecSize.fX*0.5f, vecTemp.fY ) );
+        pLabelLeft->SetPosition ( CVector2D ( 255.0f - vecSize.fX*0.5f, vecTemp.fY ) );
         pLabelLeft->SetVerticalAlign ( CGUI_ALIGN_VERTICALCENTER );
 
         CGUILabel* pLabelRight = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabControls, _("Right Stick") ) );
         pLabelRight->AutoSize ( );
         pLabelRight->GetSize ( vecSize );
-        pLabelRight->SetPosition ( CVector2D ( 434.0f - vecSize.fX*0.5f, vecTemp.fY ) );
+        pLabelRight->SetPosition ( CVector2D ( 444.0f - vecSize.fX*0.5f, vecTemp.fY ) );
         pLabelRight->SetVerticalAlign ( CGUI_ALIGN_VERTICALCENTER );
 
     }

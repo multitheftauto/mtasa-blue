@@ -11,7 +11,6 @@
 ##############################################################################
 
 import os
-import json
 import shutil
 import urllib2
 import urlparse
@@ -27,7 +26,7 @@ parser.add_option("-p", "--project", dest="project",
 parser.add_option("-G", "--gnu",action="store_true", dest="gnu", default=False,
             help="Whether the project is a GNU directory layout")
 parser.add_option("-L", "--languages",dest="languages", 
-            help="A JSON list of languages to pull from Pootle", default='["nl", "ru"]')
+            help="A comma delimited list of languages to pull from Pootle", default='de,fr')
 parser.add_option("-r", "--rmdir",action="store_true", dest="rmdir", default=False,
             help="Clear the output directory before starting")
 
@@ -40,8 +39,8 @@ if options.rmdir:
         shutil.rmtree(options.output)
     print ( "Cleared output directory: '%s'"%(options.output) )
 
-# Let's decode our JSON list into a Python list, and loop it
-for lang in json.loads(options.languages):
+# Let's split our languages string into a Python list, and loop it
+for lang in (options.languages).replace(" ","").split(","):
     # Let's create our full Pootle export URL depending on whether we're GNU or not
     url = ""
     output = ""

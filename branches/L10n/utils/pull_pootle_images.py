@@ -11,7 +11,6 @@
 ##############################################################################
 
 import os
-import json
 import shutil
 import urllib2
 import urlparse
@@ -23,7 +22,7 @@ parser.add_option("-u", "--url", dest="url",
 parser.add_option("-o", "--output", dest="output",
             help="Output directory", default="../output/MTA San Andreas/mta/locale")
 parser.add_option("-L", "--languages",dest="languages", 
-            help="A JSON list of languages to pull from Pootle", default='["nl", "ru", "templates"]')
+            help="A comma delimited list of languages to pull from Pootle", default='de,fr')
 
 (options, args) = parser.parse_args()
 
@@ -38,8 +37,8 @@ image_names = [
     "menu_quit.png"
 ]
 
-# Let's decode our JSON list into a Python list, and loop it
-for lang in json.loads(options.languages):
+# Let's split our languages string into a Python list, and loop it
+for lang in (options.languages).replace(" ","").split(","):
     for image in image_names:
         # Let's create our full Pootle export URL depending on whether we're GNU or not
         url = urlparse.urljoin(options.url, "%s/%s"%(lang,image))
