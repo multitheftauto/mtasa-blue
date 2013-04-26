@@ -29,20 +29,28 @@ void lua_pushelement ( lua_State* luaVM, CClientEntity* pElement )
         ElementID ID = pElement->GetID ();
         if ( ID != INVALID_ELEMENT_ID )
         {
-            switch ( pElement->GetType() )
+            CResource * pResource = g_pClientGame->GetResourceManager ( )->GetResourceFromLuaState ( luaVM );
+            if ( pResource->IsOOPEnabled ( ) )
             {
-            case CCLIENTPLAYER:
-                lua_pushuserdata ( luaVM, "Player", (void*) reinterpret_cast<unsigned int *>(ID.Value()) );
-                break;
-            case CCLIENTPED:
-                lua_pushuserdata ( luaVM, "Ped", (void*) reinterpret_cast<unsigned int *>(ID.Value()) );
-                break;
-            case CCLIENTVEHICLE:
-                lua_pushuserdata ( luaVM, "Vehicle", (void*) reinterpret_cast<unsigned int *>(ID.Value()) );
-                break;
-            default:
-                lua_pushuserdata ( luaVM, "Element", (void*) reinterpret_cast<unsigned int *>(ID.Value()) );
-                break;
+                switch ( pElement->GetType() )
+                {
+                case CCLIENTPLAYER:
+                    lua_pushuserdata ( luaVM, "Player", (void*) reinterpret_cast<unsigned int *>(ID.Value()) );
+                    break;
+                case CCLIENTPED:
+                    lua_pushuserdata ( luaVM, "Ped", (void*) reinterpret_cast<unsigned int *>(ID.Value()) );
+                    break;
+                case CCLIENTVEHICLE:
+                    lua_pushuserdata ( luaVM, "Vehicle", (void*) reinterpret_cast<unsigned int *>(ID.Value()) );
+                    break;
+                default:
+                    lua_pushuserdata ( luaVM, "Element", (void*) reinterpret_cast<unsigned int *>(ID.Value()) );
+                    break;
+                }
+            }
+            else
+            {
+                lua_pushlightuserdata ( luaVM, (void*) reinterpret_cast<unsigned int *>(ID.Value()) );
             }
             return;
         }
@@ -75,18 +83,42 @@ CClientEntity* lua_toelement ( lua_State* luaVM, int iArgument )
 
 void lua_pushresource ( lua_State* luaVM, CResource* pResource )
 {
-    lua_pushuserdata ( luaVM, "Unknown",  reinterpret_cast < void* > ( pResource->GetScriptID () ) );
+    CResource * pSourceResource = g_pClientGame->GetResourceManager ( )->GetResourceFromLuaState ( luaVM );
+    if ( pSourceResource->IsOOPEnabled ( ) )
+    {
+        lua_pushuserdata ( luaVM, "Unknown",  reinterpret_cast < void* > ( pResource->GetScriptID () ) );
+    }
+    else
+    {
+        lua_pushlightuserdata ( luaVM, (void*) reinterpret_cast<unsigned int *>( pResource->GetScriptID () ) );
+    }
 }
 
 void lua_pushtimer ( lua_State* luaVM, CLuaTimer* pTimer )
 {
-    lua_pushuserdata ( luaVM, "Unknown",  reinterpret_cast < void* > ( pTimer->GetScriptID () ) );
+    CResource * pResource = g_pClientGame->GetResourceManager ( )->GetResourceFromLuaState ( luaVM );
+    if ( pResource->IsOOPEnabled ( ) )
+    {
+        lua_pushuserdata ( luaVM, "Unknown",  reinterpret_cast < void* > ( pTimer->GetScriptID () ) );
+    }
+    else
+    {
+        lua_pushlightuserdata ( luaVM, (void*) reinterpret_cast<unsigned int *>( pTimer->GetScriptID () ) );
+    }
 }
 
 void lua_pushxmlnode ( lua_State* luaVM, CXMLNode* pElement )
 {
     unsigned long ulID = pElement->GetID ();
-    lua_pushuserdata ( luaVM, "Unknown", reinterpret_cast < void* > ( ulID ) );
+    CResource * pResource = g_pClientGame->GetResourceManager ( )->GetResourceFromLuaState ( luaVM );
+    if ( pResource->IsOOPEnabled ( ) )
+    {
+        lua_pushuserdata ( luaVM, "Unknown",  reinterpret_cast < void* > ( ulID ) );
+    }
+    else
+    {
+        lua_pushlightuserdata ( luaVM, (void*) reinterpret_cast<unsigned int *>( ulID ) );
+    }
 }
 
 void lua_pushuserdata ( lua_State* luaVM, const char* szClass, void* value )

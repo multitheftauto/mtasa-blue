@@ -64,7 +64,7 @@ const char szPreloadedScript [] = ""\
     "exports = setmetatable({}, exportsMT)\n";
 
 
-CLuaMain::CLuaMain ( CLuaManager* pLuaManager, CResource* pResourceOwner )
+CLuaMain::CLuaMain ( CLuaManager* pLuaManager, CResource* pResourceOwner, bool bEnableOOP )
 {
     // Initialise everything to be setup in the Start function
     m_pLuaManager = pLuaManager;
@@ -77,6 +77,8 @@ CLuaMain::CLuaMain ( CLuaManager* pLuaManager, CResource* pResourceOwner )
     m_iOwner = OWNER_SERVER;
     
     m_pResource = pResourceOwner;
+
+    m_bEnableOOP = bEnableOOP;
 
     CClientPerfStatLuaMemory::GetSingleton ()->OnLuaMainCreate ( this );
     CClientPerfStatLuaTiming::GetSingleton ()->OnLuaMainCreate ( this );
@@ -263,7 +265,6 @@ void CLuaMain::InitVM ( void )
     // Create a new VM
     m_luaVM = lua_open ();
 
-
     // Set the instruction count hook
     lua_sethook ( m_luaVM, InstructionCountHook, LUA_MASKCOUNT, HOOK_INSTRUCTION_COUNT );
 
@@ -280,8 +281,22 @@ void CLuaMain::InitVM ( void )
     // Register module functions
     CLuaCFunctions::RegisterFunctionsWithVM ( m_luaVM );
 
-    // Create class metatables
-    InitClasses ( m_luaVM );
+    if ( m_bEnableOOP == true )
+    {
+        // Create class metatables
+        InitClasses ( m_luaVM );
+    }
+    else
+    {
+        // make ud and mt tables empty or crash
+        lua_pushstring ( m_luaVM, "mt" );
+        lua_newtable ( m_luaVM );
+        lua_rawset ( m_luaVM, LUA_REGISTRYINDEX );
+
+        lua_pushstring ( m_luaVM, "ud" );
+        lua_newtable ( m_luaVM );
+        lua_rawset ( m_luaVM, LUA_REGISTRYINDEX );
+    }
 
     // Update global variables
     lua_pushelement ( m_luaVM, g_pClientGame->GetRootEntity () );

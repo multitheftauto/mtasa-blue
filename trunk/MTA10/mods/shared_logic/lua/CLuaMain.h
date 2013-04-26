@@ -44,13 +44,7 @@ public:
     };
 
 public:
-                                    CLuaMain                ( class CLuaManager* pLuaManager, CResource* pResourceOwner /*,
-                                                              CObjectManager* pObjectManager,
-                                                              CPlayerManager* pPlayerManager,
-                                                              CVehicleManager* pVehicleManager,
-                                                              CBlipManager* pBlipManager,
-                                                              CRadarAreaManager* pRadarAreaManager,
-                                                              CMapManager* pMapManager*/ );
+                                    CLuaMain                ( class CLuaManager* pLuaManager, CResource* pResourceOwner, bool bEnableOOP );
                                     ~CLuaMain               ( void );
 
     inline int                      GetOwner                ( void )                        { return m_iOwner; };
@@ -117,6 +111,8 @@ private:
     class CResource*                m_pResource;
 
     std::list < CXMLFile* >         m_XMLFiles;
+
+    bool                            m_bEnableOOP;
 public:
     std::map < const void*, CRefInfo >      m_CallbackTable;
     std::map < int, SString >               m_FunctionTagMap;

@@ -44,7 +44,7 @@ class CResource
 {  
 
 public:
-                            CResource       ( unsigned short usNetID, const char* szResourceName, CClientEntity* pResourceEntity, CClientEntity* pResourceDynamicEntity, const SString& strMinServerReq, const SString& strMinClientReq );
+                            CResource       ( unsigned short usNetID, const char* szResourceName, CClientEntity* pResourceEntity, CClientEntity* pResourceDynamicEntity, const SString& strMinServerReq, const SString& strMinClientReq, bool bEnableOOP );
                             ~CResource      ( void );
 
     inline unsigned short   GetNetID        ( void )                { return m_usNetID; };
@@ -98,6 +98,7 @@ public:
     void                    LoadProtectedScript             ( const char* chunk, unsigned int length );
     const SString&          GetMinServerReq                 ( void ) const                  { return m_strMinServerReq; }
     const SString&          GetMinClientReq                 ( void ) const                  { return m_strMinClientReq; }
+    bool                    IsOOPEnabled                    ( void )                        { return m_bOOPEnabled; }
 
 private:
     unsigned short          m_usNetID;
@@ -118,6 +119,7 @@ private:
     bool                    m_bLoadAfterReceivingProtectedScripts;
     SString                 m_strMinServerReq;
     SString                 m_strMinClientReq;
+    bool                    m_bOOPEnabled;
 
     // To control cursor show/hide
     static int              m_iShowingCursor;
