@@ -972,6 +972,26 @@ public:
     LUA_DECLARE ( BitExtract );
     LUA_DECLARE ( BitReplace );
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // OOP Specific functions
+    LUA_DECLARE ( SetPedOccupiedVehicle );
+
 private:
     // Static references to objects
     static CLuaManager*                 m_pLuaManager;
