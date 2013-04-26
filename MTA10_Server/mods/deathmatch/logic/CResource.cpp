@@ -249,7 +249,7 @@ bool CResource::Load ( void )
 
                 m_bOOPEnabledInMetaXml = false;
                 CXMLNode * pNodeClientOOP = root->FindSubNode ( "oop", 0 );
-                if ( pNodeSyncMapElementData )
+                if ( pNodeClientOOP )
                 {
                     m_bOOPEnabledInMetaXml = StringToBool ( pNodeClientOOP->GetTagContent ().c_str () );
                 }
