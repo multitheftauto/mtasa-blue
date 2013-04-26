@@ -4557,13 +4557,19 @@ void CPacketHandler::Packet_ResourceStart ( NetBitStreamInterface& bitStream )
         bitStream.ReadString ( strMinClientReq );
     }
 
+    bool bEnableOOP = false;
+    if ( bitStream.Version () >= 0x45 )
+    {
+        bitStream.ReadBit ( bEnableOOP );
+    }
+
     // Get the resource entity
     CClientEntity* pResourceEntity = CElementIDs::GetElement ( ResourceEntityID );
 
     // Get the resource dynamic entity
     CClientEntity* pResourceDynamicEntity = CElementIDs::GetElement ( ResourceDynamicEntityID );
 
-    CResource* pResource = g_pClientGame->m_pResourceManager->Add ( usResourceID, szResourceName, pResourceEntity, pResourceDynamicEntity, strMinServerReq, strMinClientReq );
+    CResource* pResource = g_pClientGame->m_pResourceManager->Add ( usResourceID, szResourceName, pResourceEntity, pResourceDynamicEntity, strMinServerReq, strMinClientReq, bEnableOOP );
     if ( pResource )
     {
         pResource->SetRemainingProtectedScripts ( usProtectedScriptCount );
