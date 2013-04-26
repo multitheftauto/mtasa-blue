@@ -1215,6 +1215,18 @@
 						RelativePath="..\shared_logic\lua\LuaCommon.cpp"
 						>
 					</File>
+					<Filter
+						Name="oopdefs"
+						>
+						<File
+							RelativePath="..\shared_logic\lua\oopdefs\CLuaOOPFunctionDefs.Ped.cpp"
+							>
+						</File>
+						<File
+							RelativePath="..\shared_logic\lua\oopdefs\CLuaOOPFunctionDefs.Vehicle.cpp"
+							>
+						</File>
+					</Filter>
 				</Filter>
 				<Filter
 					Name="utils"
