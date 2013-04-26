@@ -99,7 +99,7 @@ void lua_pushtimer ( lua_State* luaVM, CLuaTimer* pTimer )
     CResource * pResource = g_pClientGame->GetResourceManager ( )->GetResourceFromLuaState ( luaVM );
     if ( pResource->IsOOPEnabled ( ) )
     {
-        lua_pushuserdata ( luaVM, "Unknown",  reinterpret_cast < void* > ( pTimer->GetScriptID () ) );
+        lua_pushlightuserdata ( luaVM, (void*) reinterpret_cast < void* > ( pTimer->GetScriptID () ) );
     }
     else
     {
