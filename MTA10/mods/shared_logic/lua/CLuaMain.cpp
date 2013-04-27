@@ -201,7 +201,7 @@ void CLuaMain::AddElementClass ( lua_State* luaVM )
     lua_classvariable ( luaVM, "alpha", "setElementAlpha", "getElementAlpha" );
     lua_classvariable ( luaVM, "doubleSided", "setElementDoubleSided", "isElementDoubleSided" );
     lua_classvariable ( luaVM, "model", "setElementModel", "getElementModel" );
-    lua_classvariable ( luaVM, "syncer", "setElementSyncer", "getElementSyncer" );
+    lua_classvariable ( luaVM, "syncer", NULL, "isElementSyncer" );
     lua_classvariable ( luaVM, "collisions", "setElementCollisionsEnabled", "getElementCollisionsEnabled" );
     lua_classvariable ( luaVM, "frozen", "setElementFrozen", "isElementFrozen" );
     lua_classvariable ( luaVM, "inWater", NULL, "isElementInWater" );
@@ -242,23 +242,308 @@ void CLuaMain::AddPlayerClass ( lua_State* luaVM )
     lua_registerclass ( luaVM, "Player", "Ped" );
 }
 
+void CLuaMain::AddObjectClass ( lua_State* luaVM )
+{
+    lua_newclass ( luaVM );
+
+    lua_registerclass ( luaVM, "Object", "Element" );
+}
+
+void CLuaMain::AddMarkerClass( lua_State* luaVM )
+{
+    lua_newclass ( luaVM );
+
+    lua_registerclass ( luaVM, "Marker", "Element" );
+}
+
+void CLuaMain::AddBlipClass( lua_State* luaVM )
+{
+    lua_newclass ( luaVM );
+
+    lua_registerclass ( luaVM, "Blip", "Element" );
+}
+
+void CLuaMain::AddPickupClass ( lua_State* luaVM )
+{
+    lua_newclass ( luaVM );
+
+    lua_registerclass ( luaVM, "Pickup", "Element" );
+}
+
+void CLuaMain::AddColShapeClass ( lua_State* luaVM )
+{
+    lua_newclass ( luaVM );
+
+    lua_registerclass ( luaVM, "ColShape", "Element" );
+}
+
+void CLuaMain::AddProjectileClass ( lua_State* luaVM )
+{
+    lua_newclass ( luaVM );
+
+    lua_registerclass ( luaVM, "Projectile", "Element" );
+}
+
+void CLuaMain::AddRadarAreaClass ( lua_State* luaVM )
+{
+    lua_newclass ( luaVM );
+
+    lua_registerclass ( luaVM, "RadarArea", "Element" );
+}
+
+void CLuaMain::AddTeamClass ( lua_State* luaVM )
+{
+    lua_newclass ( luaVM );
+
+    lua_registerclass ( luaVM, "Team", "Element" );
+}
+
+void CLuaMain::AddWaterClass ( lua_State* luaVM )
+{
+    lua_newclass ( luaVM );
+
+    lua_registerclass ( luaVM, "Water", "Element" );
+}
+
+void CLuaMain::AddSoundClass ( lua_State* luaVM )
+{
+    lua_newclass ( luaVM );
+    
+    lua_classfunction ( luaVM, "create", "playSound" );
+    lua_classfunction ( luaVM, "stop", "stopSound" );
+
+    lua_classfunction ( luaVM, "getEffects", "getSoundEffects" );
+    lua_classfunction ( luaVM, "setEffectEnabled", "setSoundEffectEnabled" );
+    lua_classfunction ( luaVM, "getPlaybackPosition", "getSoundPosition" );
+    lua_classfunction ( luaVM, "setPlaybackPosition", "setSoundPosition" );
+    lua_classfunction ( luaVM, "getSpeed", "getSoundSpeed" );
+    lua_classfunction ( luaVM, "setSpeed", "setSoundSpeed" );
+    lua_classfunction ( luaVM, "getVolume", "getSoundVolume" );
+    lua_classfunction ( luaVM, "setVolume", "setSoundVolume" );
+    lua_classfunction ( luaVM, "isPaused", "isSoundPaused" );
+    lua_classfunction ( luaVM, "setPaused", "setSoundPaused" );
+    lua_classfunction ( luaVM, "getPan", "getSoundPan" );
+    lua_classfunction ( luaVM, "setPan", "setSoundPan" );
+    lua_classfunction ( luaVM, "getProperties", "getSoundProperties" );
+    lua_classfunction ( luaVM, "setProperties", "setSoundProperties" );
+
+    lua_classfunction ( luaVM, "getLength", "getSoundLength" );
+    lua_classfunction ( luaVM, "getMetaTags", "getSoundMetaTags" );
+    lua_classfunction ( luaVM, "getBPM", "getSoundBPM" );
+    lua_classfunction ( luaVM, "getFFTData", "getSoundFFTData" );
+    lua_classfunction ( luaVM, "getWaveData", "getSoundWaveData" );
+    lua_classfunction ( luaVM, "getLevelData", "getSoundLevelData" );
+
+    lua_classvariable ( luaVM, "playbackPosition", "setSoundPosition", "getSoundPosition" );
+    lua_classvariable ( luaVM, "speed", "setSoundSpeed", "getSoundSpeed" );
+    lua_classvariable ( luaVM, "volume", "setSoundVolume", "getSoundVolume" );
+    lua_classvariable ( luaVM, "paused", "setSoundPaused", "isSoundPaused" );
+    lua_classvariable ( luaVM, "pan", "setSoundPan", "getSoundPan" );
+    lua_classvariable ( luaVM, "length", NULL, "getSoundLength" );
+
+    lua_registerclass ( luaVM, "Sound", "Element" );
+
+    lua_newclass ( luaVM );
+
+    lua_classfunction ( luaVM, "create", "playSound3D" );
+    lua_classfunction ( luaVM, "getMaxDistance", "getSoundMaxDistance" );
+    lua_classfunction ( luaVM, "setMaxDistance", "setSoundMaxDistance" );
+    lua_classfunction ( luaVM, "getMinDistance", "getSoundMinDistance" );
+    lua_classfunction ( luaVM, "setMinDistance", "setSoundMinDistance" );
+
+    lua_classvariable ( luaVM, "maxDistance", "setSoundMaxDistance", "getSoundMaxDistance" );
+    lua_classvariable ( luaVM, "minDistance", "setSoundMinDistance", "getSoundMinDistance" );
+
+    lua_registerclass ( luaVM, "Sound3D", "Sound" );
+}
+
+void CLuaMain::AddGuiElementClass ( lua_State* luaVM )
+{
+    lua_newclass ( luaVM );
+
+    lua_registerclass ( luaVM, "GuiElement", "Element" );
+}
+
+void CLuaMain::AddGuiWindowClass ( lua_State* luaVM )
+{
+    lua_newclass ( luaVM );
+
+    lua_registerclass ( luaVM, "GuiWindow", "GuiElement" );
+}
+
+void CLuaMain::AddGuiButtonClass ( lua_State* luaVM )
+{
+    lua_newclass ( luaVM );
+
+    lua_registerclass ( luaVM, "GuiButton", "GuiElement" );
+}
+
+void CLuaMain::AddGuiEditClass ( lua_State* luaVM )
+{
+    lua_newclass ( luaVM );
+
+    lua_registerclass ( luaVM, "GuiEdit", "GuiElement" );
+}
+
+void CLuaMain::AddGuiLabelClass ( lua_State* luaVM )
+{
+    lua_newclass ( luaVM );
+
+    lua_registerclass ( luaVM, "GuiLabel", "GuiElement" );
+}
+
+void CLuaMain::AddGuiMemoClass ( lua_State* luaVM )
+{
+    lua_newclass ( luaVM );
+
+    lua_registerclass ( luaVM, "GuiMemo", "GuiElement" );
+}
+
+void CLuaMain::AddGuiImageClass ( lua_State* luaVM )
+{
+    lua_newclass ( luaVM );
+
+    lua_registerclass ( luaVM, "GuiImage", "GuiElement" );
+}
+
+void CLuaMain::AddGuiComboBoxClass ( lua_State* luaVM )
+{
+    lua_newclass ( luaVM );
+
+    lua_registerclass ( luaVM, "GuiComboBox", "GuiElement" );
+}
+
+void CLuaMain::AddGuiCheckBoxClass ( lua_State* luaVM )
+{
+    lua_newclass ( luaVM );
+
+    lua_registerclass ( luaVM, "GuiCheckBox", "GuiElement" );
+}
+
+void CLuaMain::AddGuiRadioButtonClass ( lua_State* luaVM )
+{
+    lua_newclass ( luaVM );
+
+    lua_registerclass ( luaVM, "GuiRadioButton", "GuiElement" );
+}
+
+void CLuaMain::AddGuiScrollPaneClass ( lua_State* luaVM )
+{
+    lua_newclass ( luaVM );
+
+    lua_registerclass ( luaVM, "GuiScrollPane", "GuiElement" );
+}
+
+void CLuaMain::AddGuiScrollBarClass ( lua_State* luaVM )
+{
+    lua_newclass ( luaVM );
+
+    lua_registerclass ( luaVM, "GuiScrollBar", "GuiElement" );
+}
+
+void CLuaMain::AddGuiProgressBarClass ( lua_State* luaVM )
+{
+    lua_newclass ( luaVM );
+
+    lua_registerclass ( luaVM, "GuiProgressBar", "GuiElement" );
+}
+
+void CLuaMain::AddGuiGridlistClass ( lua_State* luaVM )
+{
+    lua_newclass ( luaVM );
+
+    lua_registerclass ( luaVM, "GuiGridlist", "GuiElement" );
+}
+
+void CLuaMain::AddGuiTabPanelClass ( lua_State* luaVM )
+{
+    lua_newclass ( luaVM );
+
+    lua_registerclass ( luaVM, "GuiTabPanel", "GuiElement" );
+}
+
+void CLuaMain::AddGuiTabClass ( lua_State* luaVM )
+{
+    lua_newclass ( luaVM );
+
+    lua_registerclass ( luaVM, "GuiTab", "GuiElement" );
+}
+
+void CLuaMain::AddResourceClass ( lua_State* luaVM )
+{
+    lua_newclass ( luaVM );
+
+    lua_registerclass ( luaVM, "Resource" );
+}
+
+void CLuaMain::AddTimerClass ( lua_State* luaVM )
+{
+    lua_newclass ( luaVM );
+
+    lua_classfunction ( luaVM, "create", "setTimer" );
+    lua_classfunction ( luaVM, "destroy", "killTimer" );
+    lua_classfunction ( luaVM, "reset", "resetTimer" );
+    lua_classfunction ( luaVM, "isValid", "isTimer" );
+    lua_classfunction ( luaVM, "getDetails", "getTimerDetails" );
+
+    lua_registerclass ( luaVM, "Timer" );
+}
+
+void CLuaMain::AddFileClass ( lua_State* luaVM )
+{
+    lua_newclass ( luaVM );
+
+    lua_registerclass ( luaVM, "File" );
+}
+
+void CLuaMain::AddXmlNodeClass ( lua_State* luaVM )
+{
+    lua_newclass ( luaVM );
+
+    lua_registerclass ( luaVM, "XmlNode" );
+}
+
 
 void CLuaMain::InitClasses ( lua_State* luaVM )
 {
-    lua_pushstring ( luaVM, "mt" );
-    lua_newtable ( luaVM );
-    lua_rawset ( luaVM, LUA_REGISTRYINDEX );
-
-    lua_pushstring ( luaVM, "ud" );
-    lua_newtable ( luaVM );
-    lua_rawset ( luaVM, LUA_REGISTRYINDEX );
+    lua_initclasses ( luaVM );
 
     AddElementClass ( luaVM );
-
     AddVehicleClass ( luaVM );
-
     AddPedClass ( luaVM );
     AddPlayerClass ( luaVM );
+    AddObjectClass ( luaVM );
+    AddMarkerClass ( luaVM );
+    AddBlipClass ( luaVM );
+    AddPickupClass ( luaVM );
+    AddColShapeClass ( luaVM );
+    AddProjectileClass ( luaVM );
+    AddRadarAreaClass ( luaVM );
+    AddTeamClass ( luaVM );
+    AddWaterClass ( luaVM );
+    AddSoundClass ( luaVM );
+
+    AddGuiElementClass ( luaVM );
+    AddGuiWindowClass ( luaVM );
+    AddGuiButtonClass ( luaVM );
+    AddGuiEditClass ( luaVM );
+    AddGuiLabelClass ( luaVM );
+    AddGuiMemoClass ( luaVM );
+    AddGuiImageClass ( luaVM );
+    AddGuiComboBoxClass ( luaVM );
+    AddGuiCheckBoxClass ( luaVM );
+    AddGuiRadioButtonClass ( luaVM );
+    AddGuiScrollPaneClass ( luaVM );
+    AddGuiScrollBarClass ( luaVM );
+    AddGuiProgressBarClass ( luaVM );
+    AddGuiGridlistClass ( luaVM );
+    AddGuiTabPanelClass ( luaVM );
+    AddGuiTabClass ( luaVM );
+
+    AddResourceClass ( luaVM );
+    AddTimerClass ( luaVM );
+    AddFileClass ( luaVM );
+    AddXmlNodeClass ( luaVM );
 }
 
 void CLuaMain::InitVM ( void )
@@ -282,21 +567,10 @@ void CLuaMain::InitVM ( void )
     // Register module functions
     CLuaCFunctions::RegisterFunctionsWithVM ( m_luaVM );
 
-    if ( m_bEnableOOP == true )
+    if ( m_bEnableOOP )
     {
         // Create class metatables
         InitClasses ( m_luaVM );
-    }
-    else
-    {
-        // make ud and mt tables empty or crash
-        lua_pushstring ( m_luaVM, "mt" );
-        lua_newtable ( m_luaVM );
-        lua_rawset ( m_luaVM, LUA_REGISTRYINDEX );
-
-        lua_pushstring ( m_luaVM, "ud" );
-        lua_newtable ( m_luaVM );
-        lua_rawset ( m_luaVM, LUA_REGISTRYINDEX );
     }
 
     // Update global variables

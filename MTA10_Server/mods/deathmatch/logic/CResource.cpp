@@ -93,7 +93,7 @@ CResource::CResource ( CResourceManager * resourceManager, bool bIsZipped, const
     m_bDoneUpgradeWarnings = false;
 
     Load ();
-    m_bOOPEnabledInMetaXml = false;
+    m_bOOPEnabledInMetaXml = true;
 }
 
 bool CResource::Load ( void )
@@ -247,7 +247,7 @@ bool CResource::Load ( void )
                     m_bSyncMapElementDataDefined = true;
                 }
 
-                m_bOOPEnabledInMetaXml = false;
+                m_bOOPEnabledInMetaXml = true;
                 CXMLNode * pNodeClientOOP = root->FindSubNode ( "oop", 0 );
                 if ( pNodeClientOOP )
                 {
