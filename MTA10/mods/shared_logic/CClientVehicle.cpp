@@ -130,8 +130,8 @@ CClientVehicle::CClientVehicle ( CClientManager* pManager, ElementID ID, unsigne
     m_bIsDerailable = true;
     m_bTrainDirection = false;
     m_fTrainSpeed = 0.0f;
-    m_fTrainPosition = 0.0f;
-    m_ucTrackID = 0;
+    m_fTrainPosition = -1.0f;
+    m_ucTrackID = -1;
     m_bTaxiLightOn = false;
     m_vecGravity = CVector ( 0.0f, 0.0f, -1.0f );
     m_HeadLightColor = SColorRGBA ( 255, 255, 255, 255 );
@@ -2011,7 +2011,7 @@ uchar CClientVehicle::GetTrainTrack ( void )
 
 void CClientVehicle::SetTrainTrack ( uchar ucTrack )
 {
-    if ( m_pVehicle && GetVehicleType() == CLIENTVEHICLE_TRAIN  )
+    if ( m_pVehicle && GetVehicleType() == CLIENTVEHICLE_TRAIN )
     {
         m_pVehicle->SetRailTrack ( ucTrack );
     }
@@ -2373,8 +2373,14 @@ void CClientVehicle::Create ( void )
             m_pVehicle->SetDerailable ( m_bIsDerailable );
             m_pVehicle->SetTrainDirection ( m_bTrainDirection );
             m_pVehicle->SetTrainSpeed ( m_fTrainSpeed );
-            m_pVehicle->SetTrainPosition ( m_fTrainPosition );
-            m_pVehicle->SetRailTrack ( m_ucTrackID );
+            if ( m_fTrainPosition >= 0 )
+            {
+                m_pVehicle->SetTrainPosition ( m_fTrainPosition );
+            }
+            if ( m_ucTrackID >= 0 )
+            {
+                m_pVehicle->SetRailTrack ( m_ucTrackID );
+            }
         }
 
         m_pVehicle->SetOverrideLights ( m_ucOverrideLights );
