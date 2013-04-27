@@ -51,21 +51,26 @@ class CXMLNode;
 
 // Lua push/pop macros for our datatypes
 
-class CClientEntity*         lua_toelement           ( lua_State* luaVM, int iArgument );
-
-// Internal use
-void                    lua_newclass            ( lua_State* luaVM );
-void                    lua_registerclass       ( lua_State* luaVM, const char* szName, const char* szParent = NULL );
-void                    lua_classfunction       ( lua_State* luaVM, const char* szFunction, lua_CFunction fn );
-void                    lua_classfunction       ( lua_State* luaVM, const char* szFunction, const char* fn );
-void                    lua_classvariable       ( lua_State* luaVM, const char* szVariable, lua_CFunction set, lua_CFunction get );
-void                    lua_classvariable       ( lua_State* luaVM, const char* szVariable, const char* set, const char* get );
+class CClientEntity*    lua_toelement           ( lua_State* luaVM, int iArgument );
 
 void                    lua_pushelement         ( lua_State* luaVM, CClientEntity* pElement );
 void                    lua_pushresource        ( lua_State* luaVM, CResource* pElement );
 void                    lua_pushtimer           ( lua_State* luaVM, CLuaTimer* pElement );
 void                    lua_pushxmlnode         ( lua_State* luaVM, CXMLNode* pElement );
-void                    lua_pushuserdata        ( lua_State* luaVM, const char* szClass, void* value );
+void                    lua_pushuserdata        ( lua_State* luaVM, void* pData );
+
+void                    lua_pushobject          ( lua_State* luaVM, const char* szClass, void* pObject );
+
+// Internal use
+void                    lua_initclasses         ( lua_State* luaVM );
+
+void                    lua_newclass            ( lua_State* luaVM );
+void                    lua_getclass            ( lua_State* luaVM, const char* szName );
+void                    lua_registerclass       ( lua_State* luaVM, const char* szName, const char* szParent = NULL );
+void                    lua_classfunction       ( lua_State* luaVM, const char* szFunction, lua_CFunction fn );
+void                    lua_classfunction       ( lua_State* luaVM, const char* szFunction, const char* fn );
+void                    lua_classvariable       ( lua_State* luaVM, const char* szVariable, lua_CFunction set, lua_CFunction get );
+void                    lua_classvariable       ( lua_State* luaVM, const char* szVariable, const char* set, const char* get );
 
 const char*             lua_makestring          ( lua_State* luaVM, int iArgument );
 
