@@ -134,16 +134,6 @@ void CSettings::CreateGUI ( void )
         _("Vertical aim sensitivity:")
     );
     vecTemp = CVector2D( 0, 13 );
-    //!ACHTUNG: This entire section needs review.  Suggestions:
-    /* 
-        * Create GUI on the same line based upon the length of labels, rather than fixed positions
-        * Video: Move checkboxes as far right as possible, dynamically
-        * Audio: Same as above
-        * Controls: Left Stick and Right Stick - Do we need to dynamically move the buttons that surround them accordingly?  Seems like a pain in the ass
-        * Interface: Be more stingy with Lines, Scale and Width, after/for textboxes.  Give more room to two checkboxes
-        * Advanced: Move descriptive strings as a 'status bar' at the bottom of the window, which appears upon mouse-over
-        * Do we need to have an alternate, non-tab layout?  Not much room for longer tab names
-    */
     //Mouse Options
     m_pControlsMouseLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabControls, _("Mouse options") ) );
     m_pControlsMouseLabel->SetPosition ( CVector2D ( vecTemp.fX + 11, vecTemp.fY ) );
@@ -268,12 +258,11 @@ void CSettings::CreateGUI ( void )
         pLabelSaturation->SetPosition ( m_pEditSaturation->GetPosition () + CVector2D ( 52.f, -1.f ) );
         pLabelSaturation->AutoSize ();
         pLabelSaturation->SetVerticalAlign( CGUI_ALIGN_VERTICALCENTER );
-        vecTemp.fY += 76;
+        vecTemp.fY += 106;
 
         CGUILabel* pLabelHelp = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabControls, _("Use the 'Binds' tab for joypad buttons.") ) );
         pLabelHelp->SetPosition ( CVector2D ( 10, vecTemp.fY ) );
-        pLabelHelp->SetSize ( CVector2D ( 250.0f, 24.0f ) );
-        pLabelHelp->SetVerticalAlign( CGUI_ALIGN_VERTICALCENTER );
+        pLabelHelp->AutoSize ();
         vecTemp.fY += -91;
 
         // Layout the mapping buttons like a dual axis joypad
@@ -287,23 +276,24 @@ void CSettings::CreateGUI ( void )
                                     CVector2D ( 410,  182 ),
                                     CVector2D ( 410,  220 ),
 
-                                    CVector2D ( 386,  276 ),     // Acceleration/Brake
-                                    CVector2D ( 245,  276 )     };
+                                    CVector2D ( 410,  276 ),     // Acceleration/Brake
+                                    CVector2D ( 221,  276 )     };
 
         for ( int i = 0 ; i < JoyMan->GetOutputCount () && i < 10 ; i++ )
         {
             CVector2D vecPos = vecPosList[i];
-            vecPos.fY += vecTemp.fY - 191;
+            vecPos.fY += vecTemp.fY - 231;
             CGUIButton* pButton = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( pTabControls ) );
             pButton->SetPosition ( vecPos + CVector2D ( 10, 0 ) );
             pButton->SetSize ( CVector2D ( 48.0f, 24.0f ) );
+            pButton->GetSize ( vecSize );
             pButton->SetUserData ( (void*) i );
             pButton->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnAxisSelectClick, this ) );
             pButton->SetZOrderingEnabled ( false );
 
             CGUILabel* pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabControls ) );
-            pLabel->SetPosition ( vecPos + CVector2D ( -10, -26 ) );
-            pLabel->SetSize ( CVector2D ( 88.0f, 24.0f ) );
+            pLabel->SetSize ( CVector2D ( 160.0f, 24.0f ) );
+            pLabel->SetPosition ( CVector2D ( (vecPos.fX + 10) + vecSize.fX*0.5f - 80.0f, vecPos.fY - 26 ) );
             pLabel->SetHorizontalAlign( CGUI_ALIGN_HORIZONTALCENTER );
             pLabel->SetVerticalAlign( CGUI_ALIGN_VERTICALCENTER );
             pLabel->SetVisible ( i >= 8 );      // Hide all labels except 'Acceleration' and 'Brake'
@@ -312,7 +302,7 @@ void CSettings::CreateGUI ( void )
             m_pJoypadButtons.push_back ( pButton );
         }
 
-        vecTemp.fY += -34;
+        vecTemp.fY += -74;
         CGUILabel* pLabelLeft = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabControls, _("Left Stick") ) );
         pLabelLeft->AutoSize ( );
         pLabelLeft->GetSize ( vecSize );
@@ -806,15 +796,22 @@ void CSettings::CreateGUI ( void )
         pLabel->SetFont ( "default-bold-small" );
     }
 
+    fIndentX = pManager->CGUI_GetMaxTextExtent( "default-normal",
+        _("Language:"),
+        _("Skin:"),
+        _("Presets:")
+    ) + 5.0f;
+
     {
         CGUILabel* pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabInterface, _("Language:") ) );
         pLabel->SetPosition ( CVector2D ( 10.0f, 35.0f ) );
-        pLabel->AutoSize ( _("Language:") );
+        pLabel->GetPosition ( vecTemp );
+        pLabel->AutoSize ( );
     }
 
     m_pInterfaceLanguageSelector = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabInterface, "English" ) );
-    m_pInterfaceLanguageSelector->SetPosition ( CVector2D ( 80.0f, 33.0f ) );
-    m_pInterfaceLanguageSelector->SetSize ( CVector2D ( 320.0f, 200.0f ) );
+    m_pInterfaceLanguageSelector->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, 33.0f ) );
+    m_pInterfaceLanguageSelector->SetSize ( CVector2D ( 400.0f - ( vecTemp.fX + fIndentX ), 200.0f ) );
     m_pInterfaceLanguageSelector->SetReadOnly ( true );
 
     // Grab languages and populate
@@ -830,18 +827,18 @@ void CSettings::CreateGUI ( void )
     {
         CGUILabel* pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabInterface, _("Skin:") ) );
         pLabel->SetPosition ( CVector2D ( 10.0f, 65.0f ) );
-        pLabel->AutoSize ( _("Skin:") );
+        pLabel->AutoSize ( );
     }
 
     m_pInterfaceSkinSelector = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabInterface ) );
-    m_pInterfaceSkinSelector->SetPosition ( CVector2D ( 80.0f, 63.0f ) );
-    m_pInterfaceSkinSelector->SetSize ( CVector2D ( 320.0f, 200.0f ) );
+    m_pInterfaceSkinSelector->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, 63.0f ) );
+    m_pInterfaceSkinSelector->SetSize ( CVector2D ( 400.0f - ( vecTemp.fX + fIndentX ), 200.0f ) );
     m_pInterfaceSkinSelector->SetReadOnly ( true );
 
     {
         CGUILabel* pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabInterface, _("Chat") ) );
         pLabel->SetPosition ( CVector2D ( 10.0f, 90.0f ) );
-        pLabel->AutoSize ( _("Chat") );
+        pLabel->AutoSize ( );
         pLabel->SetFont ( "default-bold-small" );
     }
 
@@ -851,12 +848,12 @@ void CSettings::CreateGUI ( void )
     {
         CGUILabel* pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabInterface, _("Presets:") ) );
         pLabel->SetPosition ( CVector2D ( 10.0f, 112.0f ) );
-        pLabel->AutoSize ( _("Presets:") );
+        pLabel->AutoSize ( );
     }
 
     m_pChatPresets = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabInterface ) );
-    m_pChatPresets->SetPosition ( CVector2D ( 80.0f, 110.0f ) );
-    m_pChatPresets->SetSize ( CVector2D ( 320.0f, 200.0f ) );
+    m_pChatPresets->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, 110.0f ) );
+    m_pChatPresets->SetSize ( CVector2D ( 400.0f - ( vecTemp.fX + fIndentX ), 200.0f ) );
     m_pChatPresets->SetReadOnly ( true );
 
     m_pChatLoadPreset = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( pTabInterface, _("Load") ) );
@@ -883,7 +880,7 @@ void CSettings::CreateGUI ( void )
     CGUILabel* pFontLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pPaneChatFont, _("Font:") ) );
     pFontLabel->SetPosition ( CVector2D ( 0.0f, 8.0f ) );
     pFontLabel->GetPosition ( vecTemp, false );
-    pFontLabel->AutoSize ( _("Font:") );
+    pFontLabel->AutoSize ( );
     pFontLabel->GetSize ( vecSize, false );
 
     m_pRadioChatFont [ ChatFonts::CHAT_FONT_DEFAULT ] = reinterpret_cast < CGUIRadioButton* > ( pManager->CreateRadioButton ( m_pPaneChatFont, "Tahoma" ) ); 
@@ -918,7 +915,7 @@ void CSettings::CreateGUI ( void )
         pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabInterface, _("Lines:") ) );
         pLabel->SetPosition ( CVector2D ( 360.0f, 160.0f ) );
         pLabel->GetPosition ( vecTemp );
-        pLabel->AutoSize ( _("Lines:") );
+        pLabel->AutoSize ( );
 
         m_pChatLines = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( pTabInterface, "" ) );
         m_pChatLines->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, vecTemp.fY - 2.0f ) );
@@ -927,7 +924,7 @@ void CSettings::CreateGUI ( void )
         pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabInterface, _("Scale:") ) );
         pLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 28.0f ) );
         pLabel->GetPosition ( vecTemp );
-        pLabel->AutoSize ( _("Scale:") );
+        pLabel->AutoSize ( );
 
         m_pChatScaleX = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( pTabInterface, "" ) );
         m_pChatScaleX->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, vecTemp.fY - 2.0f ) );
@@ -935,7 +932,7 @@ void CSettings::CreateGUI ( void )
 
         pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabInterface, "x" ) );
         pLabel->SetPosition ( CVector2D ( vecTemp.fX + fIndentX + 37.0f, vecTemp.fY + 2.0f ) );
-        pLabel->AutoSize ( "x" );
+        pLabel->AutoSize ( );
 
         m_pChatScaleY = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( pTabInterface, "" ) );
         m_pChatScaleY->SetPosition ( CVector2D ( vecTemp.fX + fIndentX + 45.0f, vecTemp.fY - 2.0f ) );
@@ -944,7 +941,7 @@ void CSettings::CreateGUI ( void )
         pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabInterface, _("Width:") ) );
         pLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 28.0f ) );
         pLabel->GetPosition ( vecTemp );
-        pLabel->AutoSize ( _("Width:") );
+        pLabel->AutoSize ( );
 
         m_pChatWidth = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( pTabInterface, "" ) );
         m_pChatWidth->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, vecTemp.fY - 2.0f ) );
@@ -953,7 +950,7 @@ void CSettings::CreateGUI ( void )
         pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabInterface, _("after") ) );
         pLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 122.5f ) );
         pLabel->GetPosition ( vecTemp );
-        pLabel->AutoSize ( _("after") );
+        pLabel->AutoSize ();
 
         m_pChatLineLife = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( pTabInterface, "" ) );
         m_pChatLineLife->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, vecTemp.fY - 2.0f ) );
@@ -961,12 +958,12 @@ void CSettings::CreateGUI ( void )
 
         pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabInterface, _("sec") ) );
         pLabel->SetPosition ( CVector2D ( vecTemp.fX + fIndentX + 55.0f, vecTemp.fY ) );
-        pLabel->AutoSize ( _("sec") );
+        pLabel->AutoSize ( );
 
         pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabInterface, _("for") ) );
         pLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 28.0f ) );
         pLabel->GetPosition ( vecTemp );
-        pLabel->AutoSize ( _("for") );
+        pLabel->AutoSize ( );
 
         m_pChatLineFadeout = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( pTabInterface, "" ) );
         m_pChatLineFadeout->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, vecTemp.fY - 2.0f ) );
@@ -974,7 +971,7 @@ void CSettings::CreateGUI ( void )
 
         pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabInterface, _("sec") ) );
         pLabel->SetPosition ( CVector2D ( vecTemp.fX + fIndentX + 55.0f, vecTemp.fY ) );
-        pLabel->AutoSize ( _("sec") );
+        pLabel->AutoSize ( );
 
         m_pChatCssBackground = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox( pTabInterface, _("Hide background when not typing") ) );  //!ACHTUNG: This is nasty.  Use a wrapped textbox
         m_pChatCssBackground->SetPosition ( CVector2D ( 10.0f, 350.0f ) );

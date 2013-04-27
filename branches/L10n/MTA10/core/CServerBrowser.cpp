@@ -174,7 +174,7 @@ CServerBrowser::CServerBrowser ( void )
     m_pQuickConnectHelpWindow = reinterpret_cast < CGUIWindow* > ( pManager->CreateWnd ( NULL, "" ) );
     m_pQuickConnectHelpWindow->SetMovable ( false );
     m_pQuickConnectHelpWindow->SetPosition ( helpPos );
-    m_pQuickConnectHelpWindow->SetSize ( CVector2D ( 300, 150 ) );
+    m_pQuickConnectHelpWindow->SetSize ( CVector2D ( 320, 150 ) );
     m_pQuickConnectHelpWindow->SetAlwaysOnTop ( true );
     m_pQuickConnectHelpWindow->SetFrameEnabled ( false );
     m_pQuickConnectHelpWindow->SetTitlebarEnabled ( false );
@@ -184,18 +184,17 @@ CServerBrowser::CServerBrowser ( void )
     // Quick connect help label
     {
         CGUILabel* pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pQuickConnectHelpWindow, "" ) );
-        pLabel->SetPosition ( CVector2D ( 0, 0 ) );
-        pLabel->SetSize ( CVector2D ( 300, 150 ) );
+        pLabel->SetPosition ( CVector2D ( 5, 0 ) );
+        pLabel->SetSize ( CVector2D ( 310, 150 ) );
         pLabel->SetVerticalAlign ( CGUI_ALIGN_VERTICALCENTER );
-        pLabel->SetHorizontalAlign ( CGUI_ALIGN_HORIZONTALCENTER );
+        pLabel->SetHorizontalAlign ( CGUI_ALIGN_HORIZONTALCENTER_WORDWRAP );
         pLabel->SetProperty( "BackgroundEnabled", "True" );
 
         SString strHelpMessage = _(
                             "FOR QUICK CONNECT:\n"
                             "\n"
-                            "Type the address and port into the address bar\n"
-                            "Or select a server from the history list\n"
-                            "and press 'Connect'" );
+                            "Type the address and port into the address bar.\n"
+                            "Or select a server from the history list and press 'Connect'" );
 
         pLabel->SetText ( strHelpMessage );
     }
@@ -205,13 +204,8 @@ CServerBrowser::CServerBrowser ( void )
     CVector2D helpButtonSize = m_pButtonGeneralHelp [ 0 ]->GetSize ();
     CVector2D helpButtonPos = CalcScreenPosition ( m_pButtonGeneralHelp [ 0 ] ) + CVector2D ( 0, 24 );
 
-    CVector2D generalHelpSize ( 350, 160 );
-    CVector2D generalHelpPos = helpButtonPos - generalHelpSize + CVector2D ( helpButtonSize.fX, 0 );
-
     m_pGeneralHelpWindow = reinterpret_cast < CGUIWindow* > ( pManager->CreateWnd ( NULL, _("HELP") ) );
     m_pGeneralHelpWindow->SetMovable ( false );
-    m_pGeneralHelpWindow->SetPosition ( generalHelpPos );
-    m_pGeneralHelpWindow->SetSize ( generalHelpSize );
     m_pGeneralHelpWindow->SetAlwaysOnTop ( true );
     m_pGeneralHelpWindow->SetFrameEnabled ( false );
     m_pGeneralHelpWindow->SetTitlebarEnabled ( false );
@@ -219,47 +213,23 @@ CServerBrowser::CServerBrowser ( void )
     m_pGeneralHelpWindow->SetVisible ( false );
     m_pGeneralHelpWindow->SetDeactivateHandler ( GUI_CALLBACK ( &CServerBrowser::OnGeneralHelpDeactivate, this ) );
 
-    // m_pGeneralHelpWindow Label 0 ( grey background )
-    {
-        CGUILabel* pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pGeneralHelpWindow, "" ) );
-        pLabel->SetPosition ( CVector2D ( 0, 0 ) );
-        pLabel->SetSize ( CVector2D ( generalHelpSize ) );
-        pLabel->SetZOrderingEnabled ( false );
-    }
+    float fMaxLeft = pManager->CGUI_GetMaxTextExtent( "default-normal",
+        _("Refresh"),
+        _("Add Favorite"),
+        _("Connect"),
+        _("Server information")
+    );
+    float fMaxRight = pManager->CGUI_GetMaxTextExtent( "default-normal",
+        _("Search servers"),
+        _("Search players"),
+        _("Start search")
+    );
 
+    CVector2D generalHelpSize ( 80 + fMaxLeft + 80 + fMaxRight, 160 );
+    CVector2D generalHelpPos = helpButtonPos - generalHelpSize + CVector2D ( helpButtonSize.fX, 0 );
+    m_pGeneralHelpWindow->SetPosition ( generalHelpPos );
+    m_pGeneralHelpWindow->SetSize ( generalHelpSize );
 
-    // m_pGeneralHelpWindow Label 1
-    {
-        CGUILabel* pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pGeneralHelpWindow, "" ) );
-        pLabel->SetPosition ( CVector2D ( 40, 28 ) );
-        pLabel->SetSize ( CVector2D ( 130, 100 ) );
-
-        SString strHelpMessage = _(
-                            "  -  Refresh\n\n"
-                            "  -  Add Favorite\n\n"
-                            "  -  Connect\n\n"
-                            "  -  Server information\n\n"
-                            );
-
-        pLabel->SetText ( strHelpMessage );
-    }
-
-    // m_pGeneralHelpWindow Label 2
-    {
-        CGUILabel* pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pGeneralHelpWindow, "" ) );
-        pLabel->SetPosition ( CVector2D ( 210, 28 ) );
-        pLabel->SetSize ( CVector2D ( 130, 100 ) );
-
-        SString strHelpMessage = _(
-                            "  -  Search servers\n\n"
-                            "  -  Search players\n\n"
-                            "  -  Start search\n\n"
-                            );
-
-        pLabel->SetText ( strHelpMessage );
-    }
-
-    // m_pGeneralHelpWindow icons
     {
         const int iBase = 23;
         const int iGap = 29;
@@ -272,9 +242,9 @@ CServerBrowser::CServerBrowser ( void )
                              {  25, iBase + iGap * 1 + 5,  16, 16, "cgui\\images\\serverbrowser\\favorite.png", },
                              {  20, iBase + iGap * 2,      26, 26, "cgui\\images\\serverbrowser\\connect.png", },
                              {  20, iBase + iGap * 3,      26, 26, "cgui\\images\\serverbrowser\\info.png", },
-                             { 195, iBase + iGap * 0 + 5,  29, 16, "cgui\\images\\serverbrowser\\search-servers.png", },
-                             { 195, iBase + iGap * 1 + 5,  29, 16, "cgui\\images\\serverbrowser\\search-players.png", },
-                             { 195, iBase + iGap * 2 + 5,  16, 16, "cgui\\images\\serverbrowser\\search.png", },
+                             {  80 + fMaxLeft, iBase + iGap * 0 + 5,  29, 16, "cgui\\images\\serverbrowser\\search-servers.png", },
+                             {  80 + fMaxLeft, iBase + iGap * 1 + 5,  29, 16, "cgui\\images\\serverbrowser\\search-players.png", },
+                             {  80 + fMaxLeft, iBase + iGap * 2 + 5,  16, 16, "cgui\\images\\serverbrowser\\search.png", },
                         };
 
         for ( uint i = 0 ; i < NUMELMS( iconInfoList ) ; i++ )
@@ -284,6 +254,27 @@ CServerBrowser::CServerBrowser ( void )
             pIcon->SetSize ( CVector2D ( iconInfoList[i].w, iconInfoList[i].h ) );
             pIcon->LoadFromFile ( iconInfoList[i].szName );
             pIcon->SetZOrderingEnabled ( false );
+        }
+
+        struct {
+            int x, y;
+            SString strDesc;
+        } helpInfoList [] = {
+             {  20, iBase + iGap * 0,       _("Refresh") },
+             {  20, iBase + iGap * 1,       _("Add Favorite") },
+             {  20, iBase + iGap * 2,       _("Connect") },
+             {  20, iBase + iGap * 3,       _("Server information") },
+             {  80 + fMaxLeft, iBase + iGap * 0,  _("Search servers") },
+             {  80 + fMaxLeft, iBase + iGap * 1,  _("Search players") },
+             {  80 + fMaxLeft, iBase + iGap * 2,  _("Start search") },
+        };
+
+        for ( uint i = 0 ; i < NUMELMS( helpInfoList ) ; i++ )
+        {
+            CGUILabel* pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pGeneralHelpWindow, "" ) );
+            pLabel->SetText ( SString("  -   %s",helpInfoList[i].strDesc.c_str()) );
+            pLabel->SetPosition ( CVector2D ( helpInfoList[i].x + 20, helpInfoList[i].y + 5 ) );
+            pLabel->AutoSize();
         }
     }
 }

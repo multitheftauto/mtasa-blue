@@ -49,18 +49,17 @@ CServerInfo::CServerInfo ( void )
         _("Players:"),
         _("Passworded:"),
         _("Latency:")
-    );
+    ) + 10;
     unsigned int LabelTitlePosX = 9;
-    unsigned int LabelPosX = LabelTitlePosX + LabelTitleSizeX + 3;
+    unsigned int LabelPosX = LabelTitlePosX + LabelTitleSizeX + 2;
     unsigned int LabelSizeX = INFO_WINDOW_DEFAULTWIDTH;
     unsigned int LabelSizeY = 15;
     unsigned int DrawPosY = 10; //Start position
-
     // Server Name
     m_pServerNameLabelTitle = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pWindow, _("Name:") ) );
     m_pServerNameLabelTitle->SetPosition ( CVector2D (LabelTitlePosX, DrawPosY+=INFO_LABEL_VSPACING+LabelSizeY ), false );
-    m_pServerNameLabelTitle->SetSize(CVector2D(LabelTitleSizeX, LabelSizeY), false);
     m_pServerNameLabelTitle->SetFont ( "default-bold-small" );
+    m_pServerNameLabelTitle->SetSize(CVector2D(LabelTitleSizeX, LabelSizeY), false);
     m_pServerNameLabelTitle->SetHorizontalAlign(CGUI_ALIGN_RIGHT);
 
     m_pServerNameLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pWindow, "" ) );
@@ -71,8 +70,8 @@ CServerInfo::CServerInfo ( void )
     // Server IP
     m_pServerAddressLabelTitle = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pWindow, _("Server Address:") ) );
     m_pServerAddressLabelTitle->SetPosition ( CVector2D ( LabelTitlePosX, DrawPosY+=INFO_LABEL_VSPACING+LabelSizeY ), false );
+    m_pServerAddressLabelTitle->SetFont ( "default-bold-small" );    
     m_pServerAddressLabelTitle->SetSize(CVector2D(LabelTitleSizeX, LabelSizeY), false);
-    m_pServerAddressLabelTitle->SetFont ( "default-bold-small" );
     m_pServerAddressLabelTitle->SetHorizontalAlign(CGUI_ALIGN_RIGHT);
 
     m_pServerAddressLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pWindow, "" ) );
@@ -83,8 +82,8 @@ CServerInfo::CServerInfo ( void )
     // Gamemode
     m_pGamemodeLabelTitle = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pWindow, _("Gamemode:") ) );
     m_pGamemodeLabelTitle->SetPosition ( CVector2D ( LabelTitlePosX, DrawPosY+=INFO_LABEL_VSPACING+LabelSizeY ), false );
-    m_pGamemodeLabelTitle->SetSize(CVector2D(LabelTitleSizeX, LabelSizeY), false);
     m_pGamemodeLabelTitle->SetFont ( "default-bold-small" );
+    m_pGamemodeLabelTitle->SetSize(CVector2D(LabelTitleSizeX, LabelSizeY), false);
     m_pGamemodeLabelTitle->SetHorizontalAlign(CGUI_ALIGN_RIGHT);
 
     m_pGamemodeLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pWindow, "" ) );
@@ -94,8 +93,8 @@ CServerInfo::CServerInfo ( void )
     // Map
     m_pMapLabelTitle = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pWindow, _("Map:") ) );
     m_pMapLabelTitle->SetPosition ( CVector2D ( LabelTitlePosX, DrawPosY+=INFO_LABEL_VSPACING+LabelSizeY ), false );
-    m_pMapLabelTitle->SetSize(CVector2D(LabelTitleSizeX, LabelSizeY), false);
     m_pMapLabelTitle->SetFont ( "default-bold-small" );
+    m_pMapLabelTitle->SetSize(CVector2D(LabelTitleSizeX, LabelSizeY), false);
     m_pMapLabelTitle->SetHorizontalAlign(CGUI_ALIGN_RIGHT);
 
     m_pMapLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pWindow, "" ) );
@@ -105,8 +104,8 @@ CServerInfo::CServerInfo ( void )
     // Players
     m_pPlayersLabelTitle = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pWindow, _("Players:") ) );
     m_pPlayersLabelTitle->SetPosition ( CVector2D ( LabelTitlePosX, DrawPosY+=INFO_LABEL_VSPACING+LabelSizeY ), false );
-    m_pPlayersLabelTitle->SetSize(CVector2D(LabelTitleSizeX, LabelSizeY), false);
     m_pPlayersLabelTitle->SetFont ( "default-bold-small" );
+    m_pPlayersLabelTitle->SetSize(CVector2D(LabelTitleSizeX, LabelSizeY), false);
     m_pPlayersLabelTitle->SetHorizontalAlign(CGUI_ALIGN_RIGHT);
 
     m_pPlayersLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pWindow, "" ) );
@@ -116,8 +115,8 @@ CServerInfo::CServerInfo ( void )
     // Passworded
     m_pPasswordedLabelTitle = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pWindow, _("Passworded:") ) );
     m_pPasswordedLabelTitle->SetPosition ( CVector2D ( LabelTitlePosX, DrawPosY+=INFO_LABEL_VSPACING+LabelSizeY ), false );
-    m_pPasswordedLabelTitle->SetSize(CVector2D(LabelTitleSizeX, LabelSizeY), false);
     m_pPasswordedLabelTitle->SetFont ( "default-bold-small" );
+    m_pPasswordedLabelTitle->SetSize(CVector2D(LabelTitleSizeX, LabelSizeY), false);
     m_pPasswordedLabelTitle->SetHorizontalAlign(CGUI_ALIGN_RIGHT);
 
     m_pPasswordedLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pWindow, "" ) );
@@ -127,8 +126,8 @@ CServerInfo::CServerInfo ( void )
     // Latency
     m_pLatencyLabelTitle = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pWindow, _("Latency:") ) );
     m_pLatencyLabelTitle->SetPosition ( CVector2D ( LabelTitlePosX, DrawPosY+=INFO_LABEL_VSPACING+LabelSizeY ), false );
-    m_pLatencyLabelTitle->SetSize(CVector2D(LabelTitleSizeX, LabelSizeY), false);
     m_pLatencyLabelTitle->SetFont ( "default-bold-small" );
+    m_pLatencyLabelTitle->SetSize(CVector2D(LabelTitleSizeX, LabelSizeY), false);
     m_pLatencyLabelTitle->SetHorizontalAlign(CGUI_ALIGN_RIGHT);
 
     m_pLatencyLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pWindow, "" ) );
