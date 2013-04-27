@@ -228,8 +228,7 @@ void CLuaMain::AddPedClass ( lua_State* luaVM )
 
     lua_classfunction ( luaVM, "create", "createPed" );
 
-    CLuaCFunction* pGet = CLuaCFunctions::GetFunction ( "getPedOccupiedVehicle" );
-    lua_classvariable ( luaVM, "vehicle", CLuaFunctionDefs::SetPedOccupiedVehicle, pGet->GetFunctionAddress ( ) );
+    lua_classvariable ( luaVM, "vehicle", CLuaFunctionDefs::SetPedOccupiedVehicle, CLuaFunctionDefs::GetPedOccupiedVehicle );
 
     lua_registerclass ( luaVM, "Ped", "Element" );
 }
