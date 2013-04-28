@@ -61,6 +61,8 @@ void                    lua_pushuserdata        ( lua_State* luaVM, void* pData 
 
 void                    lua_pushobject          ( lua_State* luaVM, const char* szClass, void* pObject );
 
+void                    lua_pushvector          ( lua_State* luaVM, CVector& vector );
+
 // Internal use
 void                    lua_initclasses         ( lua_State* luaVM );
 
@@ -71,6 +73,7 @@ void                    lua_classfunction       ( lua_State* luaVM, const char* 
 void                    lua_classfunction       ( lua_State* luaVM, const char* szFunction, const char* fn );
 void                    lua_classvariable       ( lua_State* luaVM, const char* szVariable, lua_CFunction set, lua_CFunction get );
 void                    lua_classvariable       ( lua_State* luaVM, const char* szVariable, const char* set, const char* get );
+void                    lua_classmetamethod     ( lua_State* luaVM, const char* szName, lua_CFunction fn );
 
 const char*             lua_makestring          ( lua_State* luaVM, int iArgument );
 

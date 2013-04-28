@@ -1212,6 +1212,10 @@
 						>
 					</File>
 					<File
+						RelativePath="..\shared_logic\lua\CLuaVector.cpp"
+						>
+					</File>
+					<File
 						RelativePath="..\shared_logic\lua\LuaCommon.cpp"
 						>
 					</File>
@@ -1257,6 +1261,10 @@
 					</File>
 					<File
 						RelativePath="..\shared_logic\luadefs\CLuaTaskDefs.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\shared_logic\luadefs\CLuaVectorDefs.cpp"
 						>
 					</File>
 				</Filter>
@@ -2646,6 +2654,10 @@
 						>
 					</File>
 					<File
+						RelativePath="..\shared_logic\lua\CLuaVector.h"
+						>
+					</File>
+					<File
 						RelativePath="..\shared_logic\lua\LuaCommon.h"
 						>
 					</File>
@@ -2679,6 +2691,10 @@
 					</File>
 					<File
 						RelativePath="..\shared_logic\luadefs\CLuaTaskDefs.h"
+						>
+					</File>
+					<File
+						RelativePath="..\shared_logic\luadefs\CLuaVectorDefs.h"
 						>
 					</File>
 				</Filter>

@@ -1296,12 +1296,8 @@ int CLuaFunctionDefs::CreateVehicle ( lua_State* luaVM )
     SString strRegPlate = "";
     CScriptArgReader argStream ( luaVM );
     argStream.ReadNumber ( usModel );
-    argStream.ReadNumber ( vecPosition.fX );
-    argStream.ReadNumber ( vecPosition.fY );
-    argStream.ReadNumber ( vecPosition.fZ );
-    argStream.ReadNumber ( vecRotation.fX, 0.0f );
-    argStream.ReadNumber ( vecRotation.fY, 0.0f );
-    argStream.ReadNumber ( vecRotation.fZ, 0.0f );
+    argStream.ReadVector3D ( vecPosition );
+    argStream.ReadVector3D ( vecRotation, vecRotation );
     argStream.ReadString ( strRegPlate, "" );
     argStream.ReadNumber ( ucVariant, 255 );
     argStream.ReadNumber ( ucVariant2, 255 );
@@ -1481,9 +1477,7 @@ int CLuaFunctionDefs::SetVehicleTurnVelocity ( lua_State* luaVM )
     CVector vecTurnVelocity;
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pEntity );
-    argStream.ReadNumber ( vecTurnVelocity.fX );
-    argStream.ReadNumber ( vecTurnVelocity.fY );
-    argStream.ReadNumber ( vecTurnVelocity.fZ );
+    argStream.ReadVector3D ( vecTurnVelocity );
 
     if ( !argStream.HasErrors ( ) )
     {

@@ -118,6 +118,11 @@ public:
         return CVector ( fX / vecRight.fX, fY / vecRight.fY, fZ / vecRight.fZ );
     }
 
+    CVector operator / ( float fRight ) const
+    {
+        return CVector ( fX / fRight, fY / fRight, fZ / fRight );
+    }
+
     CVector operator - () const
     {
         return CVector ( -fX, -fY, -fZ );

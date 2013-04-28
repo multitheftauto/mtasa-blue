@@ -19,6 +19,7 @@ class CLuaMain;
 #define __CLUAMAIN_H
 
 #include "CLuaTimerManager.h"
+#include "CLuaVector.h"
 
 #include "CLuaFunctionDefs.h"
 
@@ -120,6 +121,8 @@ public:
     void                            AddTimerClass           ( lua_State* luaVM );
     void                            AddFileClass            ( lua_State* luaVM );
     void                            AddXmlNodeClass         ( lua_State* luaVM );
+
+    void                            AddVectorClass          ( lua_State* luaVM );
 
     void                            InitClasses             ( lua_State* luaVM );
     void                            InitVM                  ( void );

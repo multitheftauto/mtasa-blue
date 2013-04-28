@@ -22,16 +22,15 @@
 int CLuaFunctionDefs::CreateObject ( lua_State* luaVM )
 {
 //  object createObject ( int modelid, float x, float y, float z, [float rx, float ry, float rz, bool lowLOD] )
-    ushort usModelID; CVector vecPosition; CVector vecRotation; bool bLowLod;
+    ushort usModelID;
+    CVector vecPosition;
+    CVector vecRotation;
+    bool bLowLod;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadNumber ( usModelID );
-    argStream.ReadNumber ( vecPosition.fX );
-    argStream.ReadNumber ( vecPosition.fY );
-    argStream.ReadNumber ( vecPosition.fZ );
-    argStream.ReadNumber ( vecRotation.fX, 0 );
-    argStream.ReadNumber ( vecRotation.fY, 0 );
-    argStream.ReadNumber ( vecRotation.fZ, 0 );
+    argStream.ReadVector3D ( vecPosition );
+    argStream.ReadVector3D ( vecRotation, vecRotation );
     argStream.ReadBool ( bLowLod, false );
 
     if ( !argStream.HasErrors () )

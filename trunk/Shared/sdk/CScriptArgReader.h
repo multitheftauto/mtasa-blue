@@ -83,6 +83,44 @@ public:
         m_iIndex++;
     }
 
+    //
+    // Read next Vector3d
+    //
+    void ReadVector3D ( CVector& outValue )
+    {
+        if ( ReadVector3D ( outValue, CVector () ) )
+            return;
+
+        SetTypeError ( "vector3" );
+        m_iIndex++;
+    }
+
+    bool ReadVector3D ( CVector& outValue, CVector vecDefault )
+    {
+        outValue = vecDefault;
+        int iArgument = lua_type ( m_luaVM, m_iIndex );
+        if ( iArgument == LUA_TNUMBER )
+        {
+            ReadNumber ( outValue.fX, vecDefault.fX );
+            ReadNumber ( outValue.fY, vecDefault.fY );
+            ReadNumber ( outValue.fZ, vecDefault.fZ );
+            return true;
+        }
+        else if ( iArgument == LUA_TUSERDATA )
+        {
+            // we don't pass around the pointer as it may get destroyed any time
+            CLuaVector3D* pVector = NULL;
+            ReadUserData ( pVector );
+            if ( pVector )
+            {
+                outValue.fX = pVector->fX;
+                outValue.fY = pVector->fY;
+                outValue.fZ = pVector->fZ;
+                return true;
+            }
+        }
+        return false;
+    }
 
     //
     // Read next bool

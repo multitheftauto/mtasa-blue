@@ -124,6 +124,7 @@ inline SString GetClassTypeName ( CResource* )              { return "resource-d
 inline SString GetClassTypeName ( CXMLNode* )               { return "xml-node"; }
 inline SString GetClassTypeName ( CLuaTimer* )              { return "lua-timer"; }
 inline SString GetClassTypeName ( CEntity* )                { return "entity"; }
+inline SString GetClassTypeName ( CLuaVector3D* )           { return "vector3"; }
 
 
 //
@@ -157,6 +158,21 @@ CLuaTimer* UserDataCast ( CLuaTimer*, void* ptr, lua_State* luaVM )
     if ( pLuaMain )
     {
         return pLuaMain->GetTimerManager ()->GetTimerFromScriptID ( reinterpret_cast < unsigned long > ( ptr ) );
+    }
+    return NULL;
+}
+
+
+//
+// CLuaTimer from userdata
+//
+template < class T >
+CLuaVector3D* UserDataCast ( CLuaVector3D*, void* ptr, lua_State* luaVM )
+{
+    CLuaMain* pLuaMain = CLuaDefs::m_pLuaManager->GetVirtualMachine ( luaVM );
+    if ( pLuaMain )
+    {
+        return CLuaVector3D::GetFromScriptID ( reinterpret_cast < unsigned int > ( ptr ) );
     }
     return NULL;
 }
