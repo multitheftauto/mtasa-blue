@@ -145,6 +145,12 @@ void lua_pushobject ( lua_State* luaVM, const char* szClass, void* pObject )
     lua_pushlightuserdata ( luaVM, pObject );
 }
 
+void lua_pushvector ( lua_State* luaVM, CVector& vector )
+{
+    CLuaVector3D* pVector = new CLuaVector3D ( vector );
+    lua_pushobject ( luaVM, "Vector3", ( void* ) reinterpret_cast < unsigned int * > ( pVector->GetScriptID () ) );
+}
+
 // Just do a type check vs LUA_TNONE before calling this, or bant
 const char* lua_makestring ( lua_State* luaVM, int iArgument )
 {
@@ -169,6 +175,10 @@ void lua_initclasses ( lua_State* luaVM )
     lua_setfield ( luaVM, LUA_REGISTRYINDEX, "mt" );
 
     lua_newtable ( luaVM );
+    lua_newtable ( luaVM );
+    lua_pushstring ( luaVM, "v" );
+    lua_setfield ( luaVM, -2, "__mode" );
+    lua_setmetatable ( luaVM, -2 );
     lua_setfield ( luaVM, LUA_REGISTRYINDEX, "ud" );
 
     lua_getfield ( luaVM, LUA_REGISTRYINDEX, "mt" );
@@ -337,4 +347,15 @@ void lua_classvariable ( lua_State* luaVM, const char* szVariable, const char* s
 
     if ( fnSet || fnGet )
         lua_classvariable ( luaVM, szVariable, fnSet, fnGet );
+}
+
+void lua_classmetamethod ( lua_State* luaVM, const char* szName, lua_CFunction fn )
+{
+    if ( fn )
+    {
+        lua_pushstring ( luaVM, szName );
+        lua_pushstring ( luaVM, szName );
+        lua_pushcclosure ( luaVM, fn, 1 );
+        lua_rawset ( luaVM, -3 );
+    }
 }

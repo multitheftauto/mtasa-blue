@@ -106,23 +106,15 @@ int CLuaFunctionDefs::SetCameraMatrix ( lua_State* luaVM )
     float fRoll = 0.0f;
     float fFOV = 70.0f;
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadNumber ( vecPosition.fX );
-    argStream.ReadNumber ( vecPosition.fY );
-    argStream.ReadNumber ( vecPosition.fZ );
-    if ( argStream.NextIsNumber ( ) &&
-        argStream.NextIsNumber ( 1 ) &&
-        argStream.NextIsNumber ( 2 ) )
-    {
-        argStream.ReadNumber ( vecLookAt.fX );
-        argStream.ReadNumber ( vecLookAt.fY );
-        argStream.ReadNumber ( vecLookAt.fZ );
-        argStream.ReadNumber ( fRoll, 0.0f );
-        argStream.ReadNumber ( fFOV, 70.0f );
-        if ( fFOV <= 0.0f || fFOV >= 180.0f )
-            fFOV = 70.0f;
+    argStream.ReadVector3D ( vecPosition );
+    argStream.ReadVector3D ( vecLookAt, vecLookAt );
+    argStream.ReadNumber ( fRoll, 0.0f );
+    argStream.ReadNumber ( fFOV, 70.0f );
+    if ( fFOV <= 0.0f || fFOV >= 180.0f )
+        fFOV = 70.0f;
 
-        pvecLookAt = &vecLookAt;
-    }
+    pvecLookAt = &vecLookAt;
+
     if ( !argStream.HasErrors ( ) )
     {
         if ( CStaticFunctionDefinitions::SetCameraMatrix ( vecPosition, pvecLookAt, fRoll, fFOV ) )
@@ -161,9 +153,7 @@ int CLuaFunctionDefs::SetCameraTarget ( lua_State* luaVM )
     else
     {
         CVector vecTarget;
-        argStream.ReadNumber ( vecTarget.fX );
-        argStream.ReadNumber ( vecTarget.fY );
-        argStream.ReadNumber ( vecTarget.fZ );
+        argStream.ReadVector3D ( vecTarget );
 
         if ( !argStream.HasErrors () )
         {

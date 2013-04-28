@@ -27,9 +27,7 @@ int CLuaFunctionDefs::CreatePickup ( lua_State* luaVM )
     unsigned char ucType = 0;
     double dArgumentDependant = 0;
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadNumber ( vecPosition.fX );
-    argStream.ReadNumber ( vecPosition.fY );
-    argStream.ReadNumber ( vecPosition.fZ );
+    argStream.ReadVector3D ( vecPosition );
     argStream.ReadNumber ( ucType );
     argStream.ReadNumber ( dArgumentDependant );
     argStream.ReadNumber ( ulRespawnInterval, 30000 );

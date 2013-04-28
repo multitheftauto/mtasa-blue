@@ -26,9 +26,7 @@ int CLuaFunctionDefs::CreateMarker ( lua_State* luaVM )
     SColorRGBA color ( 0, 0, 255, 255 );
     SString strType = "default";
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadNumber ( vecPosition.fX );
-    argStream.ReadNumber ( vecPosition.fY );
-    argStream.ReadNumber ( vecPosition.fZ );
+    argStream.ReadVector3D ( vecPosition );
     argStream.ReadString ( strType, "default" );
     argStream.ReadNumber ( fSize, 4.0f );
     argStream.ReadNumber ( color.R, 0 );
