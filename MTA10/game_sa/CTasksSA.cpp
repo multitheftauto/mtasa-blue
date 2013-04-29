@@ -209,6 +209,15 @@ CTaskSimpleDead* CTasksSA::CreateTaskSimpleDead ( unsigned int uiDeathTimeMS, bo
     return pTask;
 }
 
+CTaskSimpleBeHit* CTasksSA::CreateTaskSimpleBeHit ( CPed* pPedAttacker, ePedPieceTypes hitBodyPart, int hitBodySide, int weaponId )
+{
+    DEBUG_TRACE("CTaskSimpleBeHit* CTasksSA::CreateTaskSimpleBeHit ( CPed* pPedAttacker, ePedPieceTypes hitBodyPart, int hitBodySide, int weaponId )");
+
+    CTaskSimpleBeHitSA * pTask = NewTask < CTaskSimpleBeHitSA > ( pPedAttacker, hitBodyPart, hitBodySide, weaponId );
+    m_pTaskManagementSystem->AddTask ( pTask );
+    return pTask;
+}
+
 
 CTaskComplexSunbathe* CTasksSA::CreateTaskComplexSunbathe ( class CObject* pTowel, const bool bStartStanding )
 {
@@ -277,4 +286,60 @@ CTaskSimpleFight* CTasksSA::CreateTaskSimpleFight ( CEntity *pTargetEntity, int 
     CTaskSimpleFightSA * pTask = NewTask < CTaskSimpleFightSA > ( pTargetEntity, nCommand, nIdlePeriod );
     m_pTaskManagementSystem->AddTask ( pTask );
     return pTask;
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// CEventHandler_ComputeDamageResponse_Mid
+//
+// Detect when GTA will start the 'be hit' task
+//
+////////////////////////////////////////////////////////////////
+void _cdecl OnCEventHandler_ComputeDamageResponse_Mid( CPedSAInterface* pPedVictim, CPedSAInterface* pPedAttacker, ePedPieceTypes hitBodyPart, int hitBodySide, int weaponId )
+{
+    // Make sure victim is local player
+    CPedSAInterface* pLocalPlayer = ((CPoolsSA *)pGame->GetPools())->GetPedInterface( (DWORD)1 );
+    if ( pPedVictim != pLocalPlayer )
+        return;
+
+    if ( pGame->m_pTaskSimpleBeHitHandler  )
+        pGame->m_pTaskSimpleBeHitHandler( pPedAttacker, hitBodyPart, hitBodySide, weaponId );
+
+}
+
+// Hook info
+#define HOOKPOS_CEventHandler_ComputeDamageResponse_Mid        0x4C0593
+#define HOOKSIZE_CEventHandler_ComputeDamageResponse_Mid       5
+DWORD RETURN_CEventHandler_ComputeDamageResponse_Mid =         0x4C0598;
+DWORD CTaskSimpleBeHit_constructor = FUNC_CTaskSimpleBeHit__Constructor;
+void _declspec(naked) HOOK_CEventHandler_ComputeDamageResponse_Mid()
+{
+    _asm
+    {
+        pushad
+        push    [esp+32+4*3]
+        push    [esp+32+4*3]
+        push    [esp+32+4*3]
+        push    [esp+32+4*3]
+        push    [edi]
+        call    OnCEventHandler_ComputeDamageResponse_Mid
+        add     esp, 4*4+4
+        popad
+
+        // Replaced code
+        call    CTaskSimpleBeHit_constructor
+        jmp     RETURN_CEventHandler_ComputeDamageResponse_Mid
+    }
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+// Setup hooks
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+void CTasksSA::StaticSetHooks( void )
+{
+   EZHookInstall( CEventHandler_ComputeDamageResponse_Mid );
 }

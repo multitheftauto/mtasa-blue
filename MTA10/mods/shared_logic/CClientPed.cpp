@@ -1733,6 +1733,19 @@ bool CClientPed::IsDead ( void )
     return false;
 }
 
+void CClientPed::BeHit ( CClientPed* pClientPedAttacker, ePedPieceTypes hitBodyPart, int hitBodySide, int weaponId )
+{
+    CPlayerPed* pPedAttacker = pClientPedAttacker->GetGamePlayer();
+    if ( m_pPlayerPed && !IsDead () && !IsDying () && pPedAttacker )
+    {
+        CTask* pTask = g_pGame->GetTasks ()->CreateTaskSimpleBeHit ( pPedAttacker, hitBodyPart, hitBodySide, weaponId );
+        if ( pTask )
+        {
+            pTask->SetAsPedTask ( m_pPlayerPed, TASK_PRIORITY_PHYSICAL_RESPONSE );
+        }
+    }     
+}
+
 void CClientPed::Kill ( eWeaponType weaponType, unsigned char ucBodypart, bool bStealth, bool bSetDirectlyDead, AssocGroupId animGroup, AnimationId animID )
 {
     // Don't change task if already dead or dying

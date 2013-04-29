@@ -1044,6 +1044,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\logic\packets\CPedTaskPacket.cpp"
+						>
+					</File>
+					<File
 						RelativePath=".\logic\packets\CPedWastedPacket.cpp"
 						>
 					</File>
@@ -2306,6 +2310,10 @@
 					</File>
 					<File
 						RelativePath=".\logic\packets\CPedSyncPacket.h"
+						>
+					</File>
+					<File
+						RelativePath=".\logic\packets\CPedTaskPacket.h"
 						>
 					</File>
 					<File

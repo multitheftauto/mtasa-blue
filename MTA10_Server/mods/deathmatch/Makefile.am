@@ -235,6 +235,7 @@ LOGIC = \
 ./logic/packets/CObjectStartSyncPacket.cpp \
 ./logic/packets/CObjectSyncPacket.cpp \
 ./logic/packets/CPacket.cpp \
+./logic/packets/CPedTaskPacket.cpp \
 ./logic/packets/CPedStartSyncPacket.cpp \
 ./logic/packets/CPedSyncPacket.cpp \
 ./logic/packets/CPedWastedPacket.cpp \

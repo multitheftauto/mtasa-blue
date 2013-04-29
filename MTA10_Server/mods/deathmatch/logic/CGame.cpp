@@ -1100,6 +1100,12 @@ bool CGame::ProcessPacket ( CPacket& Packet )
             return true;
         }
 
+        case PACKET_ID_PED_TASK:
+        {
+            Packet_PedTask ( static_cast < CPedTaskPacket& > ( Packet ) );
+            return true;
+        }
+
         case PACKET_ID_DETONATE_SATCHELS:
         {
             Packet_DetonateSatchels ( static_cast < CDetonateSatchelsPacket& > ( Packet ) );
@@ -2355,6 +2361,51 @@ void CGame::Packet_WeaponBulletsync ( CCustomWeaponBulletSyncPacket& Packet )
         }
     }
 }
+
+void CGame::Packet_PedTask ( CPedTaskPacket& Packet )
+{
+    // Grab the source player
+    CPlayer* pPlayer = Packet.GetSourcePlayer ();
+    if ( pPlayer && pPlayer->IsJoined () )
+    {
+        // Relay to other players
+        RelayPedTask ( Packet );
+    }
+}
+
+
+// Relay this (ped task) packet to other players using distance rules
+void CGame::RelayPedTask ( CPacket& Packet )
+{
+    // Make a list of players to send this packet to
+    std::vector < CPlayer* > sendList;
+
+    CPlayer* pPlayer = Packet.GetSourcePlayer ();
+
+    //
+    // Process near sync
+    //
+    {
+        // Update list of players who need the packet
+        pPlayer->MaybeUpdateOthersNearList ();
+
+        // Use this players bulletsync near list for sending packets
+        SViewerMapType& nearList = pPlayer->GetNearPlayerList ();
+
+        // For each bulletsync near player
+        for ( SViewerMapType ::iterator it = nearList.begin (); it != nearList.end (); ++it )
+        {
+            CPlayer* pSendPlayer = it->first;
+            // Standard sending
+            sendList.push_back ( pSendPlayer );
+        }
+    }
+
+    // Relay packet
+    if ( !sendList.empty () )
+        CPlayerManager::Broadcast ( Packet, sendList );
+}
+
 
 // Relay this (bullet sync) packet to other players using distance rules
 void CGame::RelayBulletsync ( CPacket& Packet )
