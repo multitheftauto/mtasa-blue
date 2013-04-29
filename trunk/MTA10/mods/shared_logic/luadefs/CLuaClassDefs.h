@@ -25,6 +25,7 @@ class CLuaClassDefs: public CLuaDefs
 public:
     static int			Index               ( lua_State* luaVM );
     static int			NewIndex            ( lua_State* luaVM );
+    static int			StaticNewIndex      ( lua_State* luaVM );
     static int			Call                ( lua_State* luaVM );
 
     static int			ReadOnly            ( lua_State* luaVM );
