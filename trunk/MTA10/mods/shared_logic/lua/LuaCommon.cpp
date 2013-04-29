@@ -96,13 +96,13 @@ void lua_pushxmlnode ( lua_State* luaVM, CXMLNode* pElement )
 
 void lua_pushuserdata ( lua_State* luaVM, void* pData )
 {
-    if ( CClientEntity* pEntity = UserDataCast < CClientEntity > ( ( CClientEntity* ) NULL, pData, NULL ) )
+    if ( CClientEntity* pEntity = UserDataCast < CClientEntity > ( ( CClientEntity* ) NULL, pData, luaVM ) )
         return lua_pushelement ( luaVM, pEntity );
-    else if ( CResource* pResource = UserDataCast < CResource > ( ( CResource* ) NULL, pData, NULL ) )
+    else if ( CResource* pResource = UserDataCast < CResource > ( ( CResource* ) NULL, pData, luaVM ) )
         return lua_pushresource ( luaVM, pResource );
-    else if ( CXMLNode* pNode = UserDataCast < CXMLNode > ( ( CXMLNode* ) NULL, pData, NULL ) )
+    else if ( CXMLNode* pNode = UserDataCast < CXMLNode > ( ( CXMLNode* ) NULL, pData, luaVM ) )
         return lua_pushxmlnode ( luaVM, pNode );
-    else if ( CLuaTimer* pTimer = UserDataCast < CLuaTimer > ( ( CLuaTimer* ) NULL, pData, NULL ) )
+    else if ( CLuaTimer* pTimer = UserDataCast < CLuaTimer > ( ( CLuaTimer* ) NULL, pData, luaVM ) )
         return lua_pushtimer ( luaVM, pTimer );
 
     lua_pushobject ( luaVM, NULL, pData );
@@ -263,6 +263,33 @@ void lua_registerclass ( lua_State* luaVM, const char* szName, const char* szPar
     lua_setglobal ( luaVM, szName );
 
     lua_pop ( luaVM, 1 );
+}
+
+void lua_registerstaticclass ( lua_State* luaVM, const char* szName )
+{
+    lua_pushstring ( luaVM, "__newindex" );
+    lua_pushvalue ( luaVM, -2 );
+    lua_pushcclosure ( luaVM, CLuaClassDefs::StaticNewIndex, 1 );
+    lua_rawset ( luaVM, -3 );
+
+    lua_pushstring ( luaVM, "mt" );
+    lua_rawget ( luaVM, LUA_REGISTRYINDEX );
+
+    // store in registry
+    lua_pushvalue ( luaVM, -2 );
+    lua_setfield ( luaVM, -2, szName );
+
+    lua_pop ( luaVM, 1 );
+
+    // register with environment
+    lua_getfield ( luaVM, -1, "__class" );
+    lua_setglobal ( luaVM, szName );
+
+    lua_getfield ( luaVM, -1, "__class" );
+    lua_pushvalue ( luaVM, -2 );
+    lua_setmetatable ( luaVM, -2 );
+
+    lua_pop ( luaVM, 2 );
 }
 
 void lua_classfunction ( lua_State* luaVM, const char* szFunction, lua_CFunction fn )
