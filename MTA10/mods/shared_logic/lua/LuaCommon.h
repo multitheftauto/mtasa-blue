@@ -69,6 +69,7 @@ void                    lua_initclasses         ( lua_State* luaVM );
 void                    lua_newclass            ( lua_State* luaVM );
 void                    lua_getclass            ( lua_State* luaVM, const char* szName );
 void                    lua_registerclass       ( lua_State* luaVM, const char* szName, const char* szParent = NULL );
+void                    lua_registerstaticclass ( lua_State* luaVM, const char* szName );
 void                    lua_classfunction       ( lua_State* luaVM, const char* szFunction, lua_CFunction fn );
 void                    lua_classfunction       ( lua_State* luaVM, const char* szFunction, const char* fn );
 void                    lua_classvariable       ( lua_State* luaVM, const char* szVariable, lua_CFunction set, lua_CFunction get );
