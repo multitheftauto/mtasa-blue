@@ -47,6 +47,7 @@ class CGame;
 #include "packets/CVehicleResyncPacket.h"
 #include "packets/CKeysyncPacket.h"
 #include "packets/CBulletsyncPacket.h"
+#include "packets/CPedTaskPacket.h"
 #include "packets/CCustomWeaponBulletSyncPacket.h"
 #include "packets/CSyncSettingsPacket.h"
 #include "packets/CVehicleInOutPacket.h"
@@ -382,6 +383,7 @@ private:
     void                        RelayPlayerPuresync         ( class CPacket& Packet );
     void                        RelayKeysync                ( class CPacket& Packet );
     void                        RelayBulletsync             ( class CPacket& Packet );
+    void                        RelayPedTask                ( class CPacket& Packet );
 
     void                        ProcessTrafficLights        ( unsigned long ulCurrentTime );
 
@@ -401,6 +403,7 @@ private:
     void                        Packet_VehiclePuresync      ( class CVehiclePuresyncPacket& Packet );
     void                        Packet_Keysync              ( class CKeysyncPacket& Packet );
     void                        Packet_Bulletsync           ( class CBulletsyncPacket& Packet );
+    void                        Packet_PedTask              ( class CPedTaskPacket& Packet );
     void                        Packet_WeaponBulletsync     ( class CCustomWeaponBulletSyncPacket& Packet );
     void                        Packet_Vehicle_InOut        ( class CVehicleInOutPacket& Packet );
     void                        Packet_VehicleTrailer       ( class CVehicleTrailerPacket& Packet );
