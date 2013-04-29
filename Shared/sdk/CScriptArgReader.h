@@ -83,6 +83,7 @@ public:
         m_iIndex++;
     }
 
+#ifdef MTA_CLIENT
     //
     // Read next Vector3d
     //
@@ -121,6 +122,7 @@ public:
         }
         return false;
     }
+#endif
 
     //
     // Read next bool
