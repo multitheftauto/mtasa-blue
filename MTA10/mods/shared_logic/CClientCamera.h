@@ -47,7 +47,7 @@ public:
     void                        GetFixedTarget              ( CVector& vecTarget ) const;
     void                        SetFixedTarget              ( const CVector& vecPosition );
     float                       GetRoll                     ()                              { return m_fRoll; }
-    void                        SetRoll                     ( float fRoll )                 { m_fRoll = fRoll; }
+    void                        SetRoll                     ( float fRoll );
     float                       GetFOV                      ()                              { return m_fFOV; }
     void                        SetFOV                      ( float fFOV )                  { m_fFOV = fFOV; }
     void                        SetTarget                   ( const CVector& vecPosition );
@@ -97,6 +97,9 @@ private:
     CVector                     m_vecFixedTarget;
     float                       m_fRoll;
     float                       m_fFOV;
+
+    bool                        m_bPreferFixedRotation;
+    CVector                     m_vecFixedRotation;
 
     CCamera*                    m_pCamera;
 };
