@@ -120,6 +120,7 @@ CClientGame::CClientGame ( bool bLocalPlay )
     m_Glitches [ GLITCH_CROUCHBUG ] = false;
     m_Glitches [ GLITCH_CLOSEDAMAGE ] = false;
     g_pMultiplayer->DisableCloseRangeDamage ( true );
+    m_Glitches [ GLITCH_HITANIM ] = false;
 
     // Remove Night & Thermal vision view (if enabled).
     g_pMultiplayer->SetNightVisionEnabled ( false );
@@ -4239,12 +4240,25 @@ bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
                 fCurrentArmor = pDamagedPed->GetGamePlayer ()->GetArmor ();
             }
 
+            bool bIsBeingShotWhilstAiming = ( weaponUsed >= WEAPONTYPE_PISTOL && weaponUsed <= WEAPONTYPE_MINIGUN && pDamagedPed->IsUsingGun () );
+            bool bOldBehaviour = !IsGlitchEnabled( GLITCH_HITANIM );
+
             // Check if their health or armor is locked, and if so prevent applying the damage locally
             if ( pDamagedPed->IsHealthLocked () || pDamagedPed->IsArmorLocked () )
             {
                 // Restore health+armor
                 pDamagedPed->GetGamePlayer ()->SetHealth ( pDamagedPed->GetHealth () );
                 pDamagedPed->GetGamePlayer ()->SetArmor ( pDamagedPed->GetArmor () );
+
+                if ( bOldBehaviour )
+                {
+                    // Don't play the animation if it's going to be a death one, or if it's going to interrupt aiming
+                    if ( fCurrentHealth == 0.0f || bIsBeingShotWhilstAiming )
+                        return false;
+
+                    // Allow animation for remote players
+                    return true;
+                }
 
                 // No hit animation for remote players
                 return false;
@@ -4315,6 +4329,10 @@ bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
                     }
                 }
             }
+
+            // Inhibit hit-by-gun animation for local player if required
+            if ( bOldBehaviour )
+                if ( pDamagedPed->IsLocalPlayer () && bIsBeingShotWhilstAiming ) return false;
 
             ///////////////////////////////////////////////////////////////////////////
             // Pass 2 end
@@ -4622,6 +4640,10 @@ void CClientGame::GameModelRemoveHandler ( ushort usModelId )
 
 void CClientGame::TaskSimpleBeHitHandler ( CPedSAInterface* pPedAttacker, ePedPieceTypes hitBodyPart, int hitBodySide, int weaponId )
 {
+    bool bOldBehaviour = !IsGlitchEnabled( GLITCH_HITANIM );
+    if ( bOldBehaviour )
+        return;
+
     CClientPed* pClientPedAttacker = DynamicCast < CClientPed > ( GetGameEntityXRefManager()->FindClientEntity( (CEntitySAInterface*)pPedAttacker ) );
 
     // Make sure cause was networked ped
