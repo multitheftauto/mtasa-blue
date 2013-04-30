@@ -178,6 +178,7 @@ public:
         GLITCH_FASTMOVE,
         GLITCH_CROUCHBUG,
         GLITCH_CLOSEDAMAGE,
+        GLITCH_HITANIM,
         NUM_GLITCHES
     };
 public:
