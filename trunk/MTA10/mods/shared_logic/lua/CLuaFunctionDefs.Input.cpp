@@ -98,7 +98,7 @@ int CLuaFunctionDefs::GetCursorAlpha ( lua_State* luaVM )
 
     if ( CStaticFunctionDefinitions::GetCursorAlpha ( fAlpha ) )
     {
-        lua_pushnumber ( luaVM, fAlpha );
+        lua_pushnumber ( luaVM, Round( fAlpha * 255.f ) );
         return 1;
     }
     lua_pushboolean ( luaVM, false );
@@ -116,7 +116,7 @@ int CLuaFunctionDefs::SetCursorAlpha ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        if ( CStaticFunctionDefinitions::SetCursorAlpha ( fAlpha ) )
+        if ( CStaticFunctionDefinitions::SetCursorAlpha ( fAlpha / 255.f ) )
         {
             lua_pushboolean ( luaVM, true );
             return 1;
