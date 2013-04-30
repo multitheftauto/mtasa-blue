@@ -37,6 +37,8 @@ protected:
     void                        HandleResource      ( const char* szResource );
     void                        GetResourceNameList ( std::vector < SString >& outResourceNameList, const SString& strResourceDirectoryPath );
 
+    std::string                 GetConfigName       ( void ) { return m_strConfig; };
+
 private:
 
     std::string                 m_strConfig;

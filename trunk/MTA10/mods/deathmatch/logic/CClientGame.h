@@ -82,6 +82,13 @@ public:
         STATUS_JOINED,
     };
 
+    enum eServerType
+    {
+        SERVER_TYPE_NORMAL,
+        SERVER_TYPE_LOCAL,
+        SERVER_TYPE_EDITOR,
+    };
+
     enum
     {
         WASTED_DIED,
@@ -208,9 +215,9 @@ public:
                                         CClientGame                     ( bool bLocalPlay = false );
                                         ~CClientGame                    ( void );
 
-    bool                                StartGame                       ( const char* szNick, const char* szPassword );
-    bool                                StartLocalGame                  ( const char* szConfig, const char* szPassword = NULL );
-    void                                SetupLocalGame                  ( const char* szConfig );
+    bool                                StartGame                       ( const char* szNick, const char* szPassword, eServerType Type = SERVER_TYPE_NORMAL );
+    bool                                StartLocalGame                  ( eServerType Type, const char* szPassword = NULL );
+    void                                SetupLocalGame                  ( eServerType Type );
     //bool                                StartGame                       ( void );
     inline bool                         IsLocalGame                     ( ) const { return m_bLocalPlay; }
     bool                                OnCancelLocalGameClick          ( CGUIElement* pElement );
@@ -542,6 +549,7 @@ public:
 
 private:
     eStatus                             m_Status;
+    eServerType                         m_ServerType;
     unsigned long                       m_ulTimeStart;
     unsigned long                       m_ulVerifyTimeStart;
     unsigned long                       m_ulLastClickTick;

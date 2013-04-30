@@ -517,8 +517,9 @@ void CClientGame::StartPlayback ( void )
     }
 }
 
-bool CClientGame::StartGame ( const char* szNick, const char* szPassword )
+bool CClientGame::StartGame ( const char* szNick, const char* szPassword, eServerType Type )
 {
+    m_ServerType = Type;
     int dbg = _CrtSetDbgFlag ( _CRTDBG_REPORT_FLAG );
     //dbg |= _CRTDBG_ALLOC_MEM_DF;
     //dbg |= _CRTDBG_CHECK_ALWAYS_DF;
@@ -612,15 +613,16 @@ bool CClientGame::StartGame ( const char* szNick, const char* szPassword )
 }
 
 
-void CClientGame::SetupLocalGame ( const char* szConfig )
+void CClientGame::SetupLocalGame ( eServerType Type )
 {
+    SString strConfig = (Type == SERVER_TYPE_EDITOR) ? "editor.conf" : "local.conf";
     m_bWaitingForLocalConnect = true;
     if ( !m_pLocalServer )
-        m_pLocalServer = new CLocalServer ( szConfig );
+        m_pLocalServer = new CLocalServer ( strConfig );
 }
 
 
-bool CClientGame::StartLocalGame ( const char* szConfig, const char* szPassword )
+bool CClientGame::StartLocalGame ( eServerType Type, const char* szPassword )
 {
     // Verify that the nickname is valid
     std::string strNick;
@@ -634,9 +636,8 @@ bool CClientGame::StartLocalGame ( const char* szConfig, const char* szPassword 
     }
 
     m_bWaitingForLocalConnect = false;
-
-    // Gotta copy the config in case we got it from local server setup gui
-    SString strTemp = szConfig;
+    m_ServerType = Type;
+    SString strTemp = (Type == SERVER_TYPE_EDITOR) ? "editor.conf" : "local.conf";
 
     if ( m_pLocalServer )
     {
@@ -1077,7 +1078,7 @@ void CClientGame::DoPulses ( void )
             g_pNet->SetServerBitStreamVersion ( MTA_DM_BITSTREAM_VERSION );
 
             // Run the game normally.
-            StartGame ( m_strLocalNick, m_Server.GetPassword().c_str() );
+            StartGame ( m_strLocalNick, m_Server.GetPassword().c_str(), m_ServerType );
         }
         else
         {
@@ -3567,6 +3568,11 @@ void CClientGame::Event_OnIngameAndConnected ( void )
     //g_pCore->ShowMessageBox ( "Connecting", "Verifying client ...", false );
     m_ulVerifyTimeStart = CClientTime::GetTime ();
     
+    // Keep criminal records of how many times they've connected to servers
+    SetApplicationSettingInt ( "times-connected", GetApplicationSettingInt("times-connected") + 1 );
+    if ( m_ServerType == SERVER_TYPE_EDITOR )
+        SetApplicationSettingInt ( "times-connected-editor", GetApplicationSettingInt ("times-connected-editor") + 1 );
+
     /*
     // Notify the server telling we're ingame
     NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream ();
