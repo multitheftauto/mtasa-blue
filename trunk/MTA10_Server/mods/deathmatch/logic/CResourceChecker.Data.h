@@ -129,6 +129,18 @@ namespace
                                          { "getCursorAlpha",                "1.3.2" },
                                          { "setFPSLimit",                   "1.3.2" },
                                          { "fetchRemote",                   "1.3.2" },
+                                         { "bitAnd",                        "1.3.2" },
+                                         { "bitNot",                        "1.3.2" },
+                                         { "bitOr",                         "1.3.2" },
+                                         { "bitTest",                       "1.3.2" },
+                                         { "bitXor",                        "1.3.2" },
+                                         { "bitLRotate",                    "1.3.2" },
+                                         { "bitRRotate",                    "1.3.2" },
+                                         { "bitLShift",                     "1.3.2" },
+                                         { "bitRShift",                     "1.3.2" },
+                                         { "bitArShift",                    "1.3.2" },
+                                         { "bitExtract",                    "1.3.2" },
+                                         { "bitReplace",                    "1.3.2" },
                                         };
 
     SVersionItem serverFunctionInitList[] = {
@@ -179,6 +191,18 @@ namespace
                                          { "setPedWalkingStyle",        "1.3.1-9.04935" },
                                          { "setAircraftMaxVelocity",    "1.3.1-9.04997" },
                                          { "getAircraftMaxVelocity",    "1.3.1-9.04997" },
+                                         { "bitAnd",                    "1.3.2" },
+                                         { "bitNot",                    "1.3.2" },
+                                         { "bitOr",                     "1.3.2" },
+                                         { "bitTest",                   "1.3.2" },
+                                         { "bitXor",                    "1.3.2" },
+                                         { "bitLRotate",                "1.3.2" },
+                                         { "bitRRotate",                "1.3.2" },
+                                         { "bitLShift",                 "1.3.2" },
+                                         { "bitRShift",                 "1.3.2" },
+                                         { "bitArShift",                "1.3.2" },
+                                         { "bitExtract",                "1.3.2" },
+                                         { "bitReplace",                "1.3.2" },
                                         };
 
 
