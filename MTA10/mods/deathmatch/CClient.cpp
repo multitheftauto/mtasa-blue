@@ -161,7 +161,7 @@ int CClient::ClientInitialize ( const char* szArguments, CCoreInterface* pCore )
                 // Create clientgame
                 g_pClientGame = new CClientGame ( true );
 
-                g_pClientGame->SetupLocalGame ( "local.conf" );
+                g_pClientGame->SetupLocalGame ( CClientGame::SERVER_TYPE_LOCAL );
 
                 // Connect
                 //g_pClientGame->StartLocalGame ( "Player" );
@@ -172,7 +172,7 @@ int CClient::ClientInitialize ( const char* szArguments, CCoreInterface* pCore )
                 g_pClientGame = new CClientGame ( true );
 
                 // Connect
-                g_pClientGame->StartLocalGame ( "editor.conf" );
+                g_pClientGame->StartLocalGame ( CClientGame::SERVER_TYPE_EDITOR );
             }
             else
             {
