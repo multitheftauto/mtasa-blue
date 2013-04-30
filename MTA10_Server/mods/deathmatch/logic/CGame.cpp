@@ -32,6 +32,7 @@
 #define BULLET_SYNC_MIN_CLIENT_VERSION          "1.3.0-9.04311"
 #define VEH_EXTRAPOLATION_MIN_CLIENT_VERSION    "1.3.0-9.04460"
 #define ALT_PULSE_ORDER_MIN_CLIENT_VERSION      "1.3.1-9.04913"
+#define HIT_ANIM_CLIENT_VERSION                 "1.3.2"
 
 CGame* g_pGame = NULL;
 
@@ -4205,6 +4206,11 @@ SString CGame::CalculateMinClientRequirement ( void )
     {
         if ( strNewMin < ALT_PULSE_ORDER_MIN_CLIENT_VERSION )
             strNewMin = ALT_PULSE_ORDER_MIN_CLIENT_VERSION;
+    }
+    if ( g_pGame->IsGlitchEnabled( GLITCH_HITANIM ) )
+    {
+        if ( strNewMin < HIT_ANIM_CLIENT_VERSION )
+            strNewMin = HIT_ANIM_CLIENT_VERSION;
     }
 
     if ( strNewMin != m_strPrevMinClientConnectRequirement )

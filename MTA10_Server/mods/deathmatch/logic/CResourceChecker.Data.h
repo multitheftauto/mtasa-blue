@@ -120,6 +120,15 @@ namespace
                                          { "guiGridListGetColumnTitle",     "1.3.1-9.04945" },
                                          { "setAircraftMaxVelocity",        "1.3.1-9.04997" },
                                          { "getAircraftMaxVelocity",        "1.3.1-9.04997" },
+                                         { "guiStaticImageGetNativeSize",   "1.3.1-9.05122" },
+                                         { "toggleObjectRespawn",           "1.3.1-9.05122" },
+                                         { "breakObject",                   "1.3.1-9.05122" },
+                                         { "setObjectMass",                 "1.3.2" },
+                                         { "getObjectMass",                 "1.3.2" },
+                                         { "setCursorAlpha",                "1.3.2" },
+                                         { "getCursorAlpha",                "1.3.2" },
+                                         { "setFPSLimit",                   "1.3.2" },
+                                         { "fetchRemote",                   "1.3.2" },
                                         };
 
     SVersionItem serverFunctionInitList[] = {
