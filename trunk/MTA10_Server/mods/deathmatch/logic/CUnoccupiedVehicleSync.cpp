@@ -14,9 +14,6 @@
 
 #include "StdInc.h"
 
-extern CGame * g_pGame;
-
-#define MAX_PLAYER_SYNC_DISTANCE 130.0f // Vehicle explosions don't happen further than ~140.0
 
 CUnoccupiedVehicleSync::CUnoccupiedVehicleSync ( CPlayerManager* pPlayerManager, CVehicleManager* pVehicleManager )
 {
@@ -118,7 +115,7 @@ void CUnoccupiedVehicleSync::UpdateVehicle ( CVehicle* pVehicle )
         if ( pSyncer )
         {
             // He isn't close enough to the vehicle and in the right dimension?
-            if ( ( !IsPointNearPoint3D ( pSyncer->GetPosition (), pVehicle->GetPosition (), MAX_PLAYER_SYNC_DISTANCE ) ) ||
+            if ( ( !IsPointNearPoint3D ( pSyncer->GetPosition (), pVehicle->GetPosition (), (float)g_TickRateSettings.iUnoccupiedVehicleSyncerDistance ) ) ||
                  ( pVehicle->GetDimension () != pSyncer->GetDimension () ) )
             {
                 // Stop him from syncing it
@@ -154,7 +151,7 @@ void CUnoccupiedVehicleSync::FindSyncer ( CVehicle* pVehicle )
     else
     {
         // Find a player close enough to him
-        CPlayer* pPlayer = FindPlayerCloseToVehicle ( pVehicle, MAX_PLAYER_SYNC_DISTANCE - 20.0f );
+        CPlayer* pPlayer = FindPlayerCloseToVehicle ( pVehicle, g_TickRateSettings.iUnoccupiedVehicleSyncerDistance - 20.0f );
         if ( pPlayer )
         {
             // Tell him to start syncing it
