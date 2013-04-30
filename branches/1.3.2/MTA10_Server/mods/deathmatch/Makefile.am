@@ -195,6 +195,7 @@ LOGIC = \
 ./logic/lua/LuaCommon.cpp \
 ./logic/lua/LuaUtils.cpp \
 ./logic/luadefs/CLuaACLDefs.cpp \
+./logic/luadefs/CLuaBitDefs.cpp \
 ./logic/luadefs/CLuaCameraDefs.cpp \
 ./logic/luadefs/CLuaDefs.cpp \
 ./logic/luadefs/CLuaElementDefs.cpp \
@@ -229,6 +230,7 @@ LOGIC = \
 ./logic/packets/CObjectStartSyncPacket.cpp \
 ./logic/packets/CObjectSyncPacket.cpp \
 ./logic/packets/CPacket.cpp \
+./logic/packets/CPedTaskPacket.cpp \
 ./logic/packets/CPedStartSyncPacket.cpp \
 ./logic/packets/CPedSyncPacket.cpp \
 ./logic/packets/CPedWastedPacket.cpp \

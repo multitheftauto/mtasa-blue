@@ -521,6 +521,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\shared_logic\CRemoteCalls.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\logic\CResource.cpp"
 					>
 				</File>
@@ -1065,6 +1069,10 @@
 					</File>
 					<File
 						RelativePath="..\shared_logic\lua\CLuaFunctionDefs.Audio.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\shared_logic\lua\CLuaFunctionDefs.Bit.cpp"
 						>
 					</File>
 					<File
@@ -1900,6 +1908,10 @@
 				</File>
 				<File
 					RelativePath=".\logic\CRadarMap.h"
+					>
+				</File>
+				<File
+					RelativePath="..\shared_logic\CRemoteCalls.h"
 					>
 				</File>
 				<File

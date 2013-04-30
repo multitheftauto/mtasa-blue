@@ -254,6 +254,7 @@ public:
     static bool                         IsObjectStatic                      ( CClientObject& Object, bool & bStatic );
     static bool                         GetObjectScale                      ( CClientObject& Object, CVector& vecScale );
     static bool                         IsObjectBreakable                   ( CClientObject& Object, bool& bBreakable );
+    static bool                         GetObjectMass                       ( CClientObject& Object, float& fMass );
 
     // Object set funcs
     static bool                         SetObjectRotation                   ( CClientEntity& Entity, const CVector& vecRotation );
@@ -265,6 +266,7 @@ public:
     static bool                         BreakObject                         ( CClientEntity& Entity );
     static bool                         RespawnObject                       ( CClientEntity& Entity );
     static bool                         ToggleObjectRespawn                 ( CClientEntity& Entity, bool bRespawn );
+    static bool                         SetObjectMass                       ( CClientEntity& Entity, float fMass );
     
     // Radar-area get funcs
     static CClientRadarArea*            CreateRadarArea                     ( CResource& Resource, const CVector2D& vecPosition2D, const CVector2D& vecSize, const SColor color );
@@ -341,6 +343,8 @@ public:
     // Cursor funcs
     static bool                         GetCursorPosition                   ( CVector2D& vecCursor, CVector& vecWorld );
     static bool                         IsCursorShowing                     ( bool& bShowing );
+    static bool                         GetCursorAlpha                      ( float& fAlpha );
+    static bool                         SetCursorAlpha                      ( float fAlpha );
 
     // Drawing funcs
     static void                         DrawText                            ( float fLeft, float fTop, float fRight, float fBottom, unsigned long dwColor, const char* szText, float fScaleX, float fScaleY, unsigned long ulFormat, ID3DXFont* pDXFont, bool bPostGUI, bool bColorCoded, bool bSubPixelPositioning );
@@ -517,6 +521,8 @@ public:
     static bool                         SetBirdsEnabled                     ( bool bEnabled );
     static bool                         GetBirdsEnabled                     ( void );
     static bool                         SetMoonSize                         ( int iSize );
+    static bool                         SetFPSLimit                         ( int iLimit );
+    static bool                         GetFPSLimit                         ( int& iLimit );
 
     // Input functions
     static bool                         BindKey                             ( const char* szKey, const char* szHitState, CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFunction, CLuaArguments& Arguments );

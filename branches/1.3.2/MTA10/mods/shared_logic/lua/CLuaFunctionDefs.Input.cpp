@@ -93,6 +93,45 @@ int CLuaFunctionDefs::IsCursorShowing ( lua_State* luaVM )
 }
 
 
+int CLuaFunctionDefs::GetCursorAlpha ( lua_State* luaVM )
+{
+//  float getCursorAlpha ()
+    float fAlpha;
+
+    if ( CStaticFunctionDefinitions::GetCursorAlpha ( fAlpha ) )
+    {
+        lua_pushnumber ( luaVM, Round( fAlpha * 255.f ) );
+        return 1;
+    }
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::SetCursorAlpha ( lua_State* luaVM )
+{
+//  bool setCursorAlpha ( float alpha )
+    float fAlpha;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadNumber ( fAlpha );
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( CStaticFunctionDefinitions::SetCursorAlpha ( fAlpha / 255.f ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
 int CLuaFunctionDefs::ShowCursor ( lua_State* luaVM )
 {
     // Get the VM

@@ -100,6 +100,7 @@
 #include <luadefs/CLuaTaskDefs.h>
 #include <luadefs/CLuaFxDefs.h>
 #include <luadefs/CLuaFileDefs.h>
+#include <CRemoteCalls.h>
 
 // Shared includes
 #include "TInterpolation.h"
@@ -114,7 +115,6 @@
 #include "HeapTrace.h"
 #include "logic/CClientGame.h"
 #include "net/Packets.h"
-#include "logic/CClientEntityRefManager.h"
 #include "logic/CGameEntityXRefManager.h"
 #include "logic/CClientModelCacheManager.h"
 #include "logic/CClientPerfStatManager.h"

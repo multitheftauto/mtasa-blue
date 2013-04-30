@@ -22,6 +22,8 @@ public:
         iKeySyncRotation = 100;
         iKeySyncAnalogMove = 100;
         iNearListUpdate = 100;
+        iPedSyncerDistance = 100;
+        iUnoccupiedVehicleSyncerDistance = 130;
     }
 
     int iPureSync;
@@ -33,6 +35,8 @@ public:
     int iKeySyncRotation;
     int iKeySyncAnalogMove;
     int iNearListUpdate;
+    int iPedSyncerDistance;
+    int iUnoccupiedVehicleSyncerDistance;
 };
 
 extern CTickRateSettings g_TickRateSettings;

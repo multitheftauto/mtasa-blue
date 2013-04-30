@@ -309,6 +309,10 @@ void CClientVariables::LoadDefaults ( void )
     DEFAULT ( "multimon_fullscreen_minimize", 1 );                          // 0-off 1-on
     DEFAULT ( "vertical_aim_sensitivity",   0.0015f );                      // 0.0015f is GTA default setting
     DEFAULT ( "process_priority",           0 );                            // 0-normal 1-above normal 2-high
+    DEFAULT ( "mute_sfx_when_minimized",    0 );                            // 0-off 1-on
+    DEFAULT ( "mute_radio_when_minimized",  0 );                            // 0-off 1-on
+    DEFAULT ( "mute_mta_when_minimized",    0 );                            // 0-off 1-on
+    DEFAULT ( "mute_voice_when_minimized",  0 );                            // 0-off 1-on
 
     // We will default this one at CClientGame.cpp, because we need a valid direct3d device to give a proper default value.
 #if 0

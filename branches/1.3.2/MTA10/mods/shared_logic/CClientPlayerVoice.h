@@ -63,11 +63,14 @@ public:
     float                   GetSoundBPM             ( void );
 
     bool                    SetPan                  ( float fPan );
-    bool                    GetPan                   ( float& fPan );
+    bool                    GetPan                  ( float& fPan );
 
     bool                    SetFxEffect             ( uint uiFxEffect, bool bEnable );
     bool                    IsFxEffectEnabled       ( uint uiFxEffect );
-    bool                                IsActive                    ( void )                        { return m_bVoiceActive; }
+    bool                    IsActive                ( void )                            { return m_bVoiceActive; }
+
+    void                    SetVoiceMuted           ( bool bMute )                      { m_bMuteVoice = bMute; };
+    bool                    IsVoiceMuted            ( void )                            { return m_bMuteVoice; };
     
 private:  
     void                                Init                        ( void );
@@ -99,5 +102,7 @@ private:
 
     SFixedArray < int, 9 >              m_EnabledEffects;
     SFixedArray < HFX, 9 >              m_FxEffects;
+
+    bool                                m_bMuteVoice;
 };
 #endif

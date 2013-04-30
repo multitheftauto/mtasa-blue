@@ -73,6 +73,10 @@ CPacket* CPacketTranslator::Translate ( const NetServerPlayerID& Socket, ePacket
             pTemp = new CBulletsyncPacket;
             break;
 
+        case PACKET_ID_PED_TASK:
+            pTemp = new CPedTaskPacket;
+            break;
+
         case PACKET_ID_DETONATE_SATCHELS:
             pTemp = new CDetonateSatchelsPacket;
             break;

@@ -45,6 +45,7 @@ CClientObject::CClientObject ( CClientManager* pManager, ElementID ID, unsigned 
     m_fHealth = 1000.0f;
     m_bBreakable = true;
     m_bRespawnEnabled = true;
+    m_fMass = -1.0f;
 
     m_pModelInfo = g_pGame->GetModelInfo ( usModel );
 
@@ -524,6 +525,10 @@ void CClientObject::Create ( void )
                 SetAlpha ( m_ucAlpha );
                 m_pObject->SetHealth ( m_fHealth );
 
+                // Set object mass
+                if ( m_fMass != -1.0f )
+                    m_pObject->SetMass ( m_fMass );
+
                 // Reattach to an entity + any entities attached to this
                 ReattachEntities ();
 
@@ -700,4 +705,20 @@ bool CClientObject::Break ( void )
         return true;
     }
     return false;
+}
+
+float CClientObject::GetMass ( void )
+{
+    if ( m_pObject )
+        return m_pObject->GetMass ();
+
+    return m_fMass;
+}
+
+void CClientObject::SetMass ( float fMass )
+{
+    if ( m_pObject )
+        m_pObject->SetMass ( fMass );
+
+    m_fMass = fMass;
 }

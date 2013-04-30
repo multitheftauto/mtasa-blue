@@ -398,6 +398,7 @@ public:
     LUA_DECLARE ( IsObjectStatic );
     LUA_DECLARE ( GetObjectScale );
     LUA_DECLARE ( IsObjectBreakable );
+    LUA_DECLARE ( GetObjectMass );
 
     // Object set funcs
     LUA_DECLARE ( SetObjectRotation );
@@ -409,6 +410,7 @@ public:
     LUA_DECLARE ( BreakObject );
     LUA_DECLARE ( RespawnObject );
     LUA_DECLARE ( ToggleObjectRespawn );
+    LUA_DECLARE ( SetObjectMass );
 
     // Explosion functions
     LUA_DECLARE ( CreateExplosion );
@@ -502,6 +504,8 @@ public:
     LUA_DECLARE ( GetCursorPosition );
     LUA_DECLARE ( SetCursorPosition );
     LUA_DECLARE ( IsCursorShowing );
+    LUA_DECLARE ( GetCursorAlpha );
+    LUA_DECLARE ( SetCursorAlpha );
     
     LUA_DECLARE ( ShowCursor );
 
@@ -808,6 +812,9 @@ public:
     LUA_DECLARE ( SetMoonSize );
     LUA_DECLARE ( GetMoonSize );
     LUA_DECLARE ( ResetMoonSize );
+    LUA_DECLARE ( SetFPSLimit );
+    LUA_DECLARE ( GetFPSLimit );
+    LUA_DECLARE ( FetchRemote );
 
     // Input functions
     LUA_DECLARE ( BindKey );
@@ -936,6 +943,20 @@ public:
 
     // Voice functions
     LUA_DECLARE ( IsVoiceEnabled );
+
+    // Bitwise operator functions
+    LUA_DECLARE ( BitAnd );
+    LUA_DECLARE ( BitNot );
+    LUA_DECLARE ( BitOr );
+    LUA_DECLARE ( BitTest );
+    LUA_DECLARE ( BitXor );
+    LUA_DECLARE ( BitLRotate );
+    LUA_DECLARE ( BitRRotate );
+    LUA_DECLARE ( BitLShift );
+    LUA_DECLARE ( BitRShift );
+    LUA_DECLARE ( BitArShift );
+    LUA_DECLARE ( BitExtract );
+    LUA_DECLARE ( BitReplace );
 
 private:
     // Static references to objects

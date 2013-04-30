@@ -222,6 +222,9 @@ void CModManager::Unload ( void )
         CCore::GetSingleton ().SetClientMessageProcessor ( NULL );
         CCore::GetSingleton ().GetCommands ()->SetExecuteHandler ( NULL );
 
+        // Reset cursor alpha
+        CCore::GetSingleton ().GetGUI ()->SetCursorAlpha ( 1.0f, true );
+
         // Reset the modules
         CCore::GetSingleton ().GetGame ()->Reset ();
         CCore::GetSingleton ().GetMultiplayer ()->Reset ();

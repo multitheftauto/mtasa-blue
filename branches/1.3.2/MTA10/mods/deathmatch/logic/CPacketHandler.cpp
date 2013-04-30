@@ -194,6 +194,10 @@ bool CPacketHandler::ProcessPacket ( unsigned char ucPacketID, NetBitStreamInter
             Packet_SyncSettings ( bitStream );
             return true;
 
+        case PACKET_ID_PED_TASK:
+            Packet_PedTask ( bitStream );
+            return true;
+
         default:             break;
     }
 
@@ -2112,6 +2116,7 @@ void CPacketHandler::Packet_MapInfo ( NetBitStreamInterface& bitStream )
     g_pClientGame->SetGlitchEnabled ( CClientGame::GLITCH_FASTMOVE, funBugs.data.bFastMove );
     g_pClientGame->SetGlitchEnabled ( CClientGame::GLITCH_CROUCHBUG, funBugs.data.bCrouchBug );
     g_pClientGame->SetGlitchEnabled ( CClientGame::GLITCH_CLOSEDAMAGE, funBugs.data.bCloseRangeDamage );
+    g_pClientGame->SetGlitchEnabled ( CClientGame::GLITCH_HITANIM, funBugs.data2.bHitAnim );
 
     float fJetpackMaxHeight = 100;
     if ( !bitStream.Read ( fJetpackMaxHeight ) )
@@ -4750,4 +4755,48 @@ void CPacketHandler::Packet_SyncSettings ( NetBitStreamInterface& bitStream )
             g_pClientGame->SetVehExtrapolateSettings ( vehExtrapolateSettings );
         }
     }
+}
+
+
+void CPacketHandler::Packet_PedTask ( NetBitStreamInterface& bitStream )
+{
+    ElementID sourceID;
+    ushort usTaskType;
+
+    // Read header
+    bitStream.Read( sourceID );
+    if ( !bitStream.Read( usTaskType ) )
+        return;
+
+    // Resolve source
+    CClientPed* pSourcePlayer = g_pClientGame->m_pPlayerManager->Get( sourceID );
+    if ( !pSourcePlayer )
+        return;
+
+    // Read packet body
+    switch( usTaskType )
+    {
+        case TASK_SIMPLE_BE_HIT:
+        {
+            ElementID attackerID;
+            uchar hitBodyPart;
+            uchar hitBodySide;
+            uchar weaponId;
+            bitStream.Read( attackerID );
+            bitStream.Read( hitBodyPart );
+            bitStream.Read( hitBodySide );
+            if ( !bitStream.Read( weaponId ) )
+                return;
+
+            CClientPed* pClientPedAttacker = g_pClientGame->m_pPlayerManager->Get( attackerID );
+            if ( !pSourcePlayer )
+                return;
+
+            pSourcePlayer->BeHit( pClientPedAttacker, (ePedPieceTypes)hitBodyPart, hitBodySide, weaponId );
+        }
+        break;
+
+        default:
+            break;
+    };
 }

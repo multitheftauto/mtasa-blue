@@ -81,6 +81,13 @@ public:
         STATUS_JOINED,
     };
 
+    enum eServerType
+    {
+        SERVER_TYPE_NORMAL,
+        SERVER_TYPE_LOCAL,
+        SERVER_TYPE_EDITOR,
+    };
+
     enum
     {
         WASTED_DIED,
@@ -173,6 +180,7 @@ public:
         GLITCH_FASTMOVE,
         GLITCH_CROUCHBUG,
         GLITCH_CLOSEDAMAGE,
+        GLITCH_HITANIM,
         NUM_GLITCHES
     };
     class CStoredWeaponSlot
@@ -206,9 +214,9 @@ public:
                                         CClientGame                     ( bool bLocalPlay = false );
                                         ~CClientGame                    ( void );
 
-    bool                                StartGame                       ( const char* szNick, const char* szPassword );
-    bool                                StartLocalGame                  ( const char* szConfig, const char* szPassword = NULL );
-    void                                SetupLocalGame                  ( const char* szConfig );
+    bool                                StartGame                       ( const char* szNick, const char* szPassword, eServerType Type = SERVER_TYPE_NORMAL );
+    bool                                StartLocalGame                  ( eServerType Type, const char* szPassword = NULL );
+    void                                SetupLocalGame                  ( eServerType Type );
     //bool                                StartGame                       ( void );
     inline bool                         IsLocalGame                     ( ) const { return m_bLocalPlay; }
     bool                                OnCancelLocalGameClick          ( CGUIElement* pElement );
@@ -277,6 +285,7 @@ public:
 
     inline CElementDeleter*             GetElementDeleter               ( void )        { return &m_ElementDeleter; }
     inline CObjectRespawner*            GetObjectRespawner              ( void )        { return &m_ObjectRespawner; }
+    CRemoteCalls*                       GetRemoteCalls                  ( void )        { return m_pRemoteCalls; }
 
     // Status toggles
     void                                ShowNetstat                     ( int iCmd );
@@ -480,6 +489,7 @@ private:
     static void                         StaticGameModelRemoveHandler        ( ushort usModelId );
     static void                         StaticWorldSoundHandler         ( uint uiGroup, uint uiIndex );
     static void                         StaticGameEntityRenderHandler   ( CEntitySAInterface* pEntity );
+    static void                         StaticTaskSimpleBeHitHandler    ( CPedSAInterface* pPedAttacker, ePedPieceTypes hitBodyPart, int hitBodySide, int weaponId );
 
     bool                                DamageHandler                   ( CPed* pDamagePed, CEventDamage * pEvent );
     void                                FireHandler                     ( CFire* pFire );
@@ -502,6 +512,7 @@ private:
     void                                GamePlayerDestructHandler       ( CEntitySAInterface* pPlayer );
     void                                GameModelRemoveHandler          ( ushort usModelId );
     void                                WorldSoundHandler               ( uint uiGroup, uint uiIndex );
+    void                                TaskSimpleBeHitHandler          ( CPedSAInterface* pPedAttacker, ePedPieceTypes hitBodyPart, int hitBodySide, int weaponId );
 
     static bool                         StaticProcessMessage            ( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
     bool                                ProcessMessage                  ( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
@@ -532,6 +543,7 @@ public:
 
 private:
     eStatus                             m_Status;
+    eServerType                         m_ServerType;
     unsigned long                       m_ulTimeStart;
     unsigned long                       m_ulVerifyTimeStart;
     unsigned long                       m_ulLastClickTick;
@@ -584,6 +596,7 @@ private:
     bool                                m_bHudAreaNameDisabled;
     CGameEntityXRefManager*             m_pGameEntityXRefManager;
     CClientModelCacheManager*           m_pModelCacheManager;
+    CRemoteCalls*                       m_pRemoteCalls;
 
     // Revised facilities
     CServer                             m_Server;
@@ -681,6 +694,11 @@ private:
     bool                                m_bBeingDeleted;        // To enable speedy disconnect
 
     bool                                m_bWasMinimized;
+
+    bool                                m_bMuteSFX;
+    bool                                m_bMuteRadio;
+    bool                                m_bMuteMTA;
+    bool                                m_bMuteVoice;
 
     // Cache for speeding up collision processing
 public:

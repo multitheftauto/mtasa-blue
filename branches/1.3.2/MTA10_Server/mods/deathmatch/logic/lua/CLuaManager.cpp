@@ -629,6 +629,7 @@ void CLuaManager::LoadCFunctions ( void )
 
     // Load the functions from our classes
     CLuaACLDefs::LoadFunctions ();
+    CLuaBitDefs::LoadFunctions ();
     CLuaCameraDefs::LoadFunctions ();
     CLuaElementDefs::LoadFunctions ();
     CLuaFileDefs::LoadFunctions ();

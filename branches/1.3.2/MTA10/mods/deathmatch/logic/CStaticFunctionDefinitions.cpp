@@ -3427,6 +3427,12 @@ bool CStaticFunctionDefinitions::IsObjectBreakable ( CClientObject& Object, bool
     return true;
 }
 
+bool CStaticFunctionDefinitions::GetObjectMass ( CClientObject& Object, float& fMass )
+{
+    fMass = Object.GetMass ();
+    return true;
+}
+
 bool CStaticFunctionDefinitions::SetObjectRotation ( CClientEntity& Entity, const CVector& vecRotation )
 {
     RUN_CHILDREN SetObjectRotation ( **iter, vecRotation );
@@ -3580,6 +3586,22 @@ bool CStaticFunctionDefinitions::ToggleObjectRespawn ( CClientEntity& Entity, bo
         CDeathmatchObject& Object = static_cast < CDeathmatchObject& > ( Entity );
         Object.SetRespawnEnabled ( bRespawn );
         return true;
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::SetObjectMass ( CClientEntity& Entity, float fMass )
+{
+    if ( fMass >= 0.0f )
+    {
+        RUN_CHILDREN SetObjectMass ( **iter, fMass );
+
+        if ( IS_OBJECT ( &Entity ) )
+        {
+            CDeathmatchObject& Object = static_cast < CDeathmatchObject& > ( Entity );
+            Object.SetMass ( fMass );
+            return true;
+        }
     }
     return false;
 }
@@ -4376,6 +4398,24 @@ bool CStaticFunctionDefinitions::IsCursorShowing ( bool& bShowing )
 {
     bShowing = m_pClientGame->AreCursorEventsEnabled () || m_pCore->IsCursorForcedVisible();
     return true;
+}
+
+
+bool CStaticFunctionDefinitions::GetCursorAlpha ( float& fAlpha )
+{
+    fAlpha = m_pGUI->GetCurrentServerCursorAlpha ();
+    return true;
+}
+
+
+bool CStaticFunctionDefinitions::SetCursorAlpha ( float fAlpha )
+{
+    if ( fAlpha >= 0.0f && fAlpha <= 1.0f )
+    {
+        m_pGUI->SetCursorAlpha ( fAlpha, true );
+        return true;
+    }
+    return false;
 }
 
 
@@ -6105,6 +6145,22 @@ bool CStaticFunctionDefinitions::SetMoonSize ( int iSize )
         return true;
     }
     return false;
+}  
+
+bool CStaticFunctionDefinitions::SetFPSLimit( int iLimit )
+{
+    if ( iLimit == 0 || ( iLimit >= 25 && iLimit <= 100 ) )
+    {
+        g_pCore->SetClientScriptFrameRateLimit( iLimit );
+        return true;
+    }
+    return false;
+}  
+
+bool CStaticFunctionDefinitions::GetFPSLimit( int& iLimit )
+{
+    iLimit = g_pCore->GetFrameRateLimit();
+    return true;
 }  
 
 bool CStaticFunctionDefinitions::BindKey ( const char* szKey, const char* szHitState, CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFunction, CLuaArguments& Arguments )

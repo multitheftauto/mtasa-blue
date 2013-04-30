@@ -32,6 +32,7 @@
 #define BULLET_SYNC_MIN_CLIENT_VERSION          "1.3.0-9.04311"
 #define VEH_EXTRAPOLATION_MIN_CLIENT_VERSION    "1.3.0-9.04460"
 #define ALT_PULSE_ORDER_MIN_CLIENT_VERSION      "1.3.1-9.04913"
+#define HIT_ANIM_CLIENT_VERSION                 "1.3.2"
 
 CGame* g_pGame = NULL;
 
@@ -167,6 +168,7 @@ CGame::CGame ( void )
     m_Glitches [ GLITCH_FASTMOVE ] = false;
     m_Glitches [ GLITCH_CROUCHBUG ] = false;
     m_Glitches [ GLITCH_CLOSEDAMAGE ] = false;
+    m_Glitches [ GLITCH_HITANIM ] = false;
     for ( int i = 0; i < WEAPONTYPE_LAST_WEAPONTYPE; i++ )
         m_JetpackWeapons [ i ] = false;
 
@@ -179,6 +181,7 @@ CGame::CGame ( void )
     m_GlitchNames["fastmove"] = GLITCH_FASTMOVE;
     m_GlitchNames["crouchbug"] = GLITCH_CROUCHBUG;
     m_GlitchNames["highcloserangedamage"] = GLITCH_CLOSEDAMAGE;
+    m_GlitchNames["hitanim"] = GLITCH_HITANIM;
 
     m_bCloudsEnabled = true;
 
@@ -1088,6 +1091,12 @@ bool CGame::ProcessPacket ( CPacket& Packet )
         case PACKET_ID_PLAYER_BULLETSYNC:
         {
             Packet_Bulletsync ( static_cast < CBulletsyncPacket& > ( Packet ) );
+            return true;
+        }
+
+        case PACKET_ID_PED_TASK:
+        {
+            Packet_PedTask ( static_cast < CPedTaskPacket& > ( Packet ) );
             return true;
         }
 
@@ -2314,6 +2323,51 @@ void CGame::Packet_Bulletsync ( CBulletsyncPacket& Packet )
 }
 
 
+void CGame::Packet_PedTask ( CPedTaskPacket& Packet )
+{
+    // Grab the source player
+    CPlayer* pPlayer = Packet.GetSourcePlayer ();
+    if ( pPlayer && pPlayer->IsJoined () )
+    {
+        // Relay to other players
+        RelayPedTask ( Packet );
+    }
+}
+
+
+// Relay this (ped task) packet to other players using distance rules
+void CGame::RelayPedTask ( CPacket& Packet )
+{
+    // Make a list of players to send this packet to
+    std::vector < CPlayer* > sendList;
+
+    CPlayer* pPlayer = Packet.GetSourcePlayer ();
+
+    //
+    // Process near sync
+    //
+    {
+        // Update list of players who need the packet
+        pPlayer->MaybeUpdateOthersNearList ();
+
+        // Use this players bulletsync near list for sending packets
+        SViewerMapType& nearList = pPlayer->GetNearPlayerList ();
+
+        // For each bulletsync near player
+        for ( SViewerMapType ::iterator it = nearList.begin (); it != nearList.end (); ++it )
+        {
+            CPlayer* pSendPlayer = it->first;
+            // Standard sending
+            sendList.push_back ( pSendPlayer );
+        }
+    }
+
+    // Relay packet
+    if ( !sendList.empty () )
+        CPlayerManager::Broadcast ( Packet, sendList );
+}
+
+
 // Relay this (bullet sync) packet to other players using distance rules
 void CGame::RelayBulletsync ( CPacket& Packet )
 {
@@ -2718,9 +2772,14 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
                                                     }
                                                     else
                                                     {
-                                                        pPlayer->SetOccupiedVehicle ( NULL, 0 );
+                                                        // Has he been warped to a vehicle in the mean time? (by lua f.e.)
+                                                        if ( !pPlayer->GetOccupiedVehicle () )
+                                                        {
+                                                            pPlayer->SetOccupiedVehicle ( NULL, 0 );
+                                                            pVehicle->SetOccupant ( NULL, 0 );
+                                                        }
+                                                        
                                                         pPlayer->SetVehicleAction ( CPlayer::VEHICLEACTION_NONE );
-                                                        pVehicle->SetOccupant ( NULL, 0 );
                                                         failReason = FAIL_SCRIPT;
                                                     }
                                                 }
@@ -2824,9 +2883,13 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
                                                     }
                                                     else
                                                     {
-                                                        pPlayer->SetOccupiedVehicle ( NULL, 0 );
+                                                        // Has he been warped to a vehicle in the mean time? (by lua f.e.)
+                                                        if ( !pPlayer->GetOccupiedVehicle () )
+                                                        {
+                                                            pPlayer->SetOccupiedVehicle ( NULL, 0 );
+                                                            pVehicle->SetOccupant ( NULL, ucSeat );
+                                                        }
                                                         pPlayer->SetVehicleAction ( CPlayer::VEHICLEACTION_NONE );
-                                                        pVehicle->SetOccupant ( NULL, ucSeat );
                                                         failReason = FAIL_SCRIPT;
                                                     }
                                                 }
@@ -4087,6 +4150,11 @@ SString CGame::CalculateMinClientRequirement ( void )
     {
         if ( strNewMin < ALT_PULSE_ORDER_MIN_CLIENT_VERSION )
             strNewMin = ALT_PULSE_ORDER_MIN_CLIENT_VERSION;
+    }
+    if ( g_pGame->IsGlitchEnabled( GLITCH_HITANIM ) )
+    {
+        if ( strNewMin < HIT_ANIM_CLIENT_VERSION )
+            strNewMin = HIT_ANIM_CLIENT_VERSION;
     }
 
     if ( strNewMin != m_strPrevMinClientConnectRequirement )
