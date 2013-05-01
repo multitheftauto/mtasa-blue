@@ -151,6 +151,12 @@ void lua_pushvector ( lua_State* luaVM, CVector& vector )
     lua_pushobject ( luaVM, "Vector3", ( void* ) reinterpret_cast < unsigned int * > ( pVector->GetScriptID () ) );
 }
 
+void lua_pushmatrix ( lua_State* luaVM, CMatrix& matrix )
+{
+    CLuaMatrix* pMatrix = new CLuaMatrix ( matrix );
+    lua_pushobject ( luaVM, "Matrix", ( void* ) reinterpret_cast < unsigned int * > ( pMatrix->GetScriptID () ) );
+}
+
 // Just do a type check vs LUA_TNONE before calling this, or bant
 const char* lua_makestring ( lua_State* luaVM, int iArgument )
 {

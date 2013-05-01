@@ -14,7 +14,7 @@
 #define MIN_CLIENT_REQ_REMOVEPEDFROMVEHICLE_CLIENTSIDE  "1.3.0-9.04482"
 #define MIN_CLIENT_REQ_WARPPEDINTOVEHICLE_CLIENTSIDE    "1.3.0-9.04482"
 
-int CLuaFunctionDefs::SetPedOccupiedVehicle ( lua_State* luaVM )
+int CLuaOOPDefs::SetPedOccupiedVehicle ( lua_State* luaVM )
 {
     //  ped.vehicle = element vehicle
     //  ped.vehicle = nil

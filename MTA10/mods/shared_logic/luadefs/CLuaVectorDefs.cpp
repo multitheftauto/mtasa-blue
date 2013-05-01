@@ -2,7 +2,7 @@
 *
 *  PROJECT:     Multi Theft Auto v1.0
 *  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/deathmatch/logic/lua/CLuaClasses.cpp
+*  FILE:        mods/shared_logic/CLuaVectorDefs.cpp
 *  PURPOSE:     Lua general class functions
 *  DEVELOPERS:  Stanislav Bobrov <lil_toady@hotmail.com>
 *
