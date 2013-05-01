@@ -20,6 +20,7 @@ class CLuaMain;
 
 #include "CLuaTimerManager.h"
 #include "CLuaVector.h"
+#include "CLuaMatrix.h"
 
 #include "CLuaFunctionDefs.h"
 
@@ -122,7 +123,11 @@ public:
     void                            AddFileClass            ( lua_State* luaVM );
     void                            AddXmlNodeClass         ( lua_State* luaVM );
 
-    void                            AddVectorClass          ( lua_State* luaVM );
+    void                            AddCameraClass          ( lua_State* luaVM );
+
+    void                            AddVector3DClass        ( lua_State* luaVM );
+    void                            AddVector2DClass        ( lua_State* luaVM );
+    void                            AddMatrixClass          ( lua_State* luaVM );
 
     void                            InitClasses             ( lua_State* luaVM );
     void                            InitVM                  ( void );

@@ -228,7 +228,7 @@ void CLuaMain::AddPedClass ( lua_State* luaVM )
 
     lua_classfunction ( luaVM, "create", "createPed" );
 
-    lua_classvariable ( luaVM, "vehicle", CLuaFunctionDefs::SetPedOccupiedVehicle, CLuaFunctionDefs::GetPedOccupiedVehicle );
+    lua_classvariable ( luaVM, "vehicle", CLuaOOPDefs::SetPedOccupiedVehicle, CLuaFunctionDefs::GetPedOccupiedVehicle );
 
     lua_registerclass ( luaVM, "Ped", "Element" );
 }
@@ -503,7 +503,41 @@ void CLuaMain::AddXmlNodeClass ( lua_State* luaVM )
     lua_registerclass ( luaVM, "XmlNode" );
 }
 
-void CLuaMain::AddVectorClass ( lua_State* luaVM )
+void CLuaMain::AddCameraClass ( lua_State* luaVM )
+{
+    lua_newclass ( luaVM );
+
+    lua_classfunction ( luaVM, "getPosition", CLuaOOPDefs::GetCameraPosition );
+    lua_classfunction ( luaVM, "setPosition", CLuaOOPDefs::SetCameraPosition );
+    lua_classfunction ( luaVM, "getRotation", CLuaOOPDefs::GetCameraRotation );
+    lua_classfunction ( luaVM, "setRotation", CLuaOOPDefs::SetCameraRotation );
+
+    lua_classfunction ( luaVM, "getInterior", "getCameraInterior" );
+    lua_classfunction ( luaVM, "setInterior", "setCameraInterior" );
+    lua_classfunction ( luaVM, "getTarget", "getCameraTarget" );
+    lua_classfunction ( luaVM, "setTarget", "setCameraTarget" );
+    lua_classfunction ( luaVM, "getViewMode", "getCameraViewMode" );
+    lua_classfunction ( luaVM, "setViewMode", "setCameraViewMode" );
+    lua_classfunction ( luaVM, "getGoggleEffect", "getCameraGoggleEffect" );
+    lua_classfunction ( luaVM, "setGoggleEffect", "setCameraGoggleEffect" );
+
+    lua_classvariable ( luaVM, "getMatrix", NULL, CLuaOOPDefs::GetCameraMatrix );
+    lua_classfunction ( luaVM, "setClip", "setCameraClip" );
+    lua_classfunction ( luaVM, "fade", "fadeCamera" );
+
+    lua_classvariable ( luaVM, "interior", "setCameraInterior", "getCameraInterior" );
+    lua_classvariable ( luaVM, "target", "setCameraTarget", "getCameraTarget" );
+    lua_classvariable ( luaVM, "viewMode", "setViewMode", "getViewMode" );
+    lua_classvariable ( luaVM, "goggleEffect", "setGoggleEffect", "getGoggleEffect" );
+
+    lua_classvariable ( luaVM, "position", CLuaOOPDefs::SetCameraPosition, CLuaOOPDefs::GetCameraPosition );
+    lua_classvariable ( luaVM, "rotation", CLuaOOPDefs::SetCameraRotation, CLuaOOPDefs::GetCameraRotation );
+    lua_classvariable ( luaVM, "matrix", NULL, CLuaOOPDefs::GetCameraMatrix );
+
+    lua_registerstaticclass ( luaVM, "Camera" );
+}
+
+void CLuaMain::AddVector3DClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
 
@@ -547,11 +581,55 @@ void CLuaMain::AddVectorClass ( lua_State* luaVM )
 }
 
 
+void CLuaMain::AddVector2DClass ( lua_State* luaVM )
+{
+    lua_newclass ( luaVM );
+
+    lua_registerclass ( luaVM, "Vector2" );
+}
+
+
+void CLuaMain::AddMatrixClass ( lua_State* luaVM )
+{
+    lua_newclass ( luaVM );
+
+    lua_classmetamethod ( luaVM, "__tostring", CLuaMatrixDefs::ToString );
+    lua_classmetamethod ( luaVM, "__gc", CLuaMatrixDefs::Destroy );
+
+    lua_classmetamethod ( luaVM, "__add", CLuaMatrixDefs::Add );
+    lua_classmetamethod ( luaVM, "__sub", CLuaMatrixDefs::Sub );
+    lua_classmetamethod ( luaVM, "__mul", CLuaMatrixDefs::Mul );
+    lua_classmetamethod ( luaVM, "__div", CLuaMatrixDefs::Div );
+
+    lua_classfunction ( luaVM, "create", CLuaMatrixDefs::Create );
+
+    lua_classfunction ( luaVM, "getPosition", CLuaMatrixDefs::SetPosition );
+    lua_classfunction ( luaVM, "getRotation", CLuaMatrixDefs::SetPosition );
+    lua_classfunction ( luaVM, "getFront", CLuaMatrixDefs::GetFront );
+    lua_classfunction ( luaVM, "getRight", CLuaMatrixDefs::GetRight );
+    lua_classfunction ( luaVM, "getUp", CLuaMatrixDefs::GetUp );
+
+    lua_classfunction ( luaVM, "setPosition", CLuaMatrixDefs::SetPosition );
+    lua_classfunction ( luaVM, "setFront", CLuaMatrixDefs::SetFront );
+    lua_classfunction ( luaVM, "setRight", CLuaMatrixDefs::SetRight );
+    lua_classfunction ( luaVM, "getUp", CLuaMatrixDefs::SetUp );
+
+    lua_classvariable ( luaVM, "position", CLuaMatrixDefs::SetPosition, CLuaMatrixDefs::GetPosition );
+    lua_classvariable ( luaVM, "front", CLuaMatrixDefs::SetFront, CLuaMatrixDefs::GetFront );
+    lua_classvariable ( luaVM, "right", CLuaMatrixDefs::SetRight, CLuaMatrixDefs::GetRight );
+    lua_classvariable ( luaVM, "up", CLuaMatrixDefs::SetUp, CLuaMatrixDefs::GetUp );
+
+    lua_registerclass ( luaVM, "Matrix" );
+}
+
+
 void CLuaMain::InitClasses ( lua_State* luaVM )
 {
     lua_initclasses ( luaVM );
 
-    AddVectorClass ( luaVM );
+    AddVector3DClass ( luaVM );
+    //AddVector2DClass ( luaVM );
+    AddMatrixClass ( luaVM );
 
     if ( !m_bEnableOOP )
         return;
@@ -592,6 +670,8 @@ void CLuaMain::InitClasses ( lua_State* luaVM )
     AddTimerClass ( luaVM );
     AddFileClass ( luaVM );
     AddXmlNodeClass ( luaVM );
+
+    AddCameraClass ( luaVM );
 }
 
 void CLuaMain::InitVM ( void )

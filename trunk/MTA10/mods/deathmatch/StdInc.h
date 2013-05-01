@@ -100,9 +100,11 @@
 #include <luadefs/CLuaDefs.h>
 #include <luadefs/CLuaClassDefs.h>
 #include <luadefs/CLuaVectorDefs.h>
+#include <luadefs/CLuaMatrixDefs.h>
 #include <luadefs/CLuaTaskDefs.h>
 #include <luadefs/CLuaFxDefs.h>
 #include <luadefs/CLuaFileDefs.h>
+#include <lua/oopdefs/CLuaOOPDefs.h>
 #include <CRemoteCalls.h>
 
 // Shared includes

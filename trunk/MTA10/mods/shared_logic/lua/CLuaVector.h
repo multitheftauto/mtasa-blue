@@ -2,7 +2,7 @@
 *
 *  PROJECT:     Multi Theft Auto v1.0
 *  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/shared_logic/logic/lua/CLuaTimer.h
+*  FILE:        mods/shared_logic/logic/lua/CLuaVector.h
 *  PURPOSE:     Lua vector class
 *  DEVELOPERS:  Stanislav Bobrov <lil_toady@hotmail.com>
 *

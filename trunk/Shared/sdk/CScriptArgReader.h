@@ -91,9 +91,6 @@ public:
     {
         if ( ReadVector3D ( outValue, CVector () ) )
             return;
-
-        SetTypeError ( "vector3" );
-        m_iIndex++;
     }
 
     bool ReadVector3D ( CVector& outValue, CVector vecDefault )
@@ -120,6 +117,12 @@ public:
                 return true;
             }
         }
+        else if ( iArgument == LUA_TNIL )
+            return true;
+
+        SetTypeError ( "vector3" );
+        m_iIndex++;
+
         return false;
     }
 #endif

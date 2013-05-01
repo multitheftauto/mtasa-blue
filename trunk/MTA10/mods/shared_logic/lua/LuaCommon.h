@@ -62,6 +62,7 @@ void                    lua_pushuserdata        ( lua_State* luaVM, void* pData 
 void                    lua_pushobject          ( lua_State* luaVM, const char* szClass, void* pObject );
 
 void                    lua_pushvector          ( lua_State* luaVM, CVector& vector );
+void                    lua_pushmatrix          ( lua_State* luaVM, CMatrix& matrix );
 
 // Internal use
 void                    lua_initclasses         ( lua_State* luaVM );

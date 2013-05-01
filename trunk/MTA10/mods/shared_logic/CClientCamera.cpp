@@ -36,6 +36,8 @@ CClientCamera::CClientCamera ( CClientManager* pManager ) : ClassInit ( this ), 
 
     // Hook handler for the fixed camera
     g_pMultiplayer->SetProcessCamHandler ( CClientCamera::ProcessFixedCamera );
+
+    m_bPreferFixedRotation = true;
 }
 
 
@@ -165,10 +167,6 @@ void CClientCamera::GetRotationDegrees ( CVector& vecRotation ) const
     m_pCamera->GetMatrix ( &matrix );
     g_pMultiplayer->ConvertMatrixToEulerAngles ( matrix, vecRotation.fX, vecRotation.fY, vecRotation.fZ );
     ConvertRadiansToDegrees ( vecRotation );
-    vecRotation += CVector ( 180.0f, 180.0f, 180.0f );
-    if ( vecRotation.fX > 360.0f ) vecRotation.fX -= 360.0f;
-    if ( vecRotation.fY > 360.0f ) vecRotation.fY -= 360.0f;
-    if ( vecRotation.fZ > 360.0f ) vecRotation.fZ -= 360.0f;
 }
 
 
