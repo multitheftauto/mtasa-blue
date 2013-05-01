@@ -40,9 +40,7 @@ void CServerList::Clear ( void )
 {
 #if 1
     // Clear all entries
-    for ( CServerListIterator i = m_Servers.begin (); i != m_Servers.end (); i++ )
-        delete *i;
-    m_Servers.clear ();
+    m_Servers.DeleteAll ();
 #else
     for ( std::list<CServerListItem*>::iterator i = m_Servers.begin (); i != m_Servers.end (); i++ )
         (*i)->ResetForRefresh ();
@@ -96,7 +94,6 @@ void CServerList::Pulse ( void )
         for ( std::vector < SAddressPort >::iterator iter = endpointList.begin (); iter != endpointList.end (); ++iter )
         {
             CServerListItem* pServer = m_Servers.Find ( (in_addr&)iter->m_ulIp, iter->m_usPort );
-            // ** Crash - pServer can sometimes be invalid **
             if ( pServer && pServer->WaitingToSendQuery () )
             {
                 std::string strResult = pServer->Pulse ( (int)( uiQueriesSent /*+ uiQueriesResent*/ ) < iNumQueries, bRemoveNonResponding );
@@ -175,7 +172,7 @@ bool CServerList::AddUnique ( in_addr Address, ushort usGamePort, bool addAtFron
 {
     if ( m_Servers.Find ( Address, usGamePort ) )
         return false;
-    m_Servers.Add ( Address, usGamePort, addAtFront );
+    m_Servers.AddUnique ( Address, usGamePort, addAtFront );
     return true;
 }
 
@@ -192,8 +189,8 @@ void CServerList::Refresh ( void )
     for ( std::list<CServerListItem*>::iterator iter = m_Servers.begin (); iter != m_Servers.end (); iter++ )
     {
         CServerListItem* pOldItem = *iter;
-        *iter = new CServerListItem( *pOldItem );
-        delete pOldItem;
+        assert( pOldItem->m_pItemList == &m_Servers );
+        pOldItem->ResetForRefresh();
     }
 
     m_iPass = 1;
@@ -314,8 +311,7 @@ void CServerListLAN::Pulse ( void )
             if ( strncmp ( szBuffer, SERVER_LIST_SERVER_BROADCAST_STR, strlen ( SERVER_LIST_SERVER_BROADCAST_STR ) ) == 0 ) {
                 unsigned short usPort = ( unsigned short ) atoi ( &szBuffer[strlen ( SERVER_LIST_SERVER_BROADCAST_STR ) + 1] );
                 // Add the server if doesn't already exist
-                AddUnique ( m_Remote.sin_addr, usPort - SERVER_LIST_QUERY_PORT_OFFSET_LAN );
-                CServerBrowser::GetSingleton ().AddKnownLanServer ( m_Remote.sin_addr );
+                AddUnique ( m_Remote.sin_addr, usPort - SERVER_LIST_QUERY_PORT_OFFSET );
             }
 
     // Scan our already known servers
@@ -450,8 +446,6 @@ std::string CServerListItem::Pulse ( bool bCanSendQuery, bool bRemoveNonRespondi
 
 unsigned short CServerListItem::GetQueryPort ( void )
 {
-    if ( CServerBrowser::GetSingleton ().IsKnownLanServer ( Address ) )
-        return usGamePort + SERVER_LIST_QUERY_PORT_OFFSET_LAN;
     return usGamePort + SERVER_LIST_QUERY_PORT_OFFSET;
 }
 
@@ -528,7 +522,7 @@ bool CServerListItem::ParseQuery ( const char * szBuffer, unsigned int nLength )
     if ( !ReadString ( strTemp, szBuffer, i, nLength ) )
         return false;
     if ( ( uiMasterServerSaysRestrictions & ASE_FLAG_PORT ) == false )
-        usGamePort = atoi ( strTemp.c_str () );
+        ChangeAddress( Address, atoi ( strTemp.c_str () ) );
 
     // Server name
     if ( !ReadString ( strTemp, szBuffer, i, nLength ) )
@@ -638,6 +632,167 @@ bool CServerListItem::ParseQuery ( const char * szBuffer, unsigned int nLength )
     return true;
 }
 
+//////////////////////////////////////////////////////////////////////////////
+//
+// CServerListItemList implementation
+//
+//
+//////////////////////////////////////////////////////////////////////////////
+CServerListItemList::~CServerListItemList ( void )
+{
+    dassert( m_List.size() == m_AddressMap.size() );
+    while( m_List.size() )
+        delete m_List.front();
+    dassert( m_AddressMap.empty() );
+}
+
+void CServerListItemList::DeleteAll()
+{
+    while( m_List.size() )
+        delete m_List.front();
+    dassert( m_List.size() == m_AddressMap.size() );
+}
+
+CServerListItem* CServerListItemList::Find ( in_addr Address, ushort usGamePort )
+{
+    SAddressPort key ( Address, usGamePort );
+    if ( CServerListItem* pItem = MapFindRef ( m_AddressMap, key ) )
+    {
+        if ( !CServerListItem::StaticIsValid ( pItem ) )
+        {
+            // Bodge to fix invalid entry in map
+            Remove ( Address, usGamePort );
+            pItem = NULL;
+        }
+        return pItem;
+    }
+    return NULL;
+}
+
+CServerListItem* CServerListItemList::AddUnique ( in_addr Address, ushort usGamePort, bool bAtFront )
+{
+    SAddressPort key ( Address, usGamePort );
+    if ( MapContains ( m_AddressMap, key ) )
+        return NULL;
+    CServerListItem* pItem = new CServerListItem ( Address, usGamePort, this, bAtFront );
+    return pItem;
+}
+
+// Only called from CServerListItem constructor
+void CServerListItemList::AddNewItem ( CServerListItem* pItem, bool bAtFront )
+{
+    SAddressPort key ( pItem->Address, pItem->usGamePort );
+    if( MapContains( m_AddressMap, key ) )
+    {
+        dassert(0);
+        return;
+    }
+    MapSet ( m_AddressMap, key, pItem );
+    pItem->uiTieBreakPosition = 5000;
+    if ( !m_List.empty () )
+    {
+        if ( bAtFront )
+            pItem->uiTieBreakPosition = m_List.front ()->uiTieBreakPosition - 1;
+        else
+            pItem->uiTieBreakPosition = m_List.back ()->uiTieBreakPosition + 1;
+    }
+    if ( bAtFront )
+        m_List.push_front ( pItem );
+    else
+        m_List.push_back ( pItem );
+}
+
+bool CServerListItemList::Remove ( in_addr Address, ushort usGamePort )
+{
+    SAddressPort key ( Address, usGamePort );
+    CServerListItem* pItem = MapFindRef ( m_AddressMap, key );
+    if ( pItem )
+    {
+        assert( pItem->Address.s_addr == Address.s_addr );
+        assert( pItem->usGamePort == usGamePort );
+        delete pItem;
+        assert( !MapFindRef ( m_AddressMap, key ) );
+        return true;
+    }
+    return false;
+}
+
+// Only called from CServerListItem destructor
+void CServerListItemList::RemoveItem ( CServerListItem* pItem )
+{
+    SAddressPort key ( pItem->Address, pItem->usGamePort );
+
+    dassert( m_List.size() == m_AddressMap.size() );
+    dassert( MapFindRef ( m_AddressMap, key ) == pItem );
+
+    MapRemove( m_AddressMap, key );
+    ListRemove( m_List, pItem );
+
+    dassert( m_List.size() == m_AddressMap.size() );
+}
+
+void CServerListItemList::OnItemChangeAddress ( CServerListItem* pItem, in_addr Address, ushort usGamePort )
+{
+    // Changed?
+    if ( pItem->Address.s_addr == Address.s_addr && pItem->usGamePort == usGamePort )
+        return;
+
+    // New address free?
+    if ( Find( Address, usGamePort ) )
+        return;
+
+    // Remove old lookup
+    {
+        SAddressPort key ( pItem->Address, pItem->usGamePort );
+        CServerListItem* pItem2 = MapFindRef ( m_AddressMap, key );
+        assert( pItem == pItem2 );
+        MapRemove( m_AddressMap, key );
+    }
+
+    // Add new lookup
+    {
+        pItem->Address = Address;
+        pItem->AddressCopy = Address;
+        pItem->usGamePort = usGamePort;
+        pItem->usGamePortCopy = usGamePort;
+        SAddressPort key ( pItem->Address, pItem->usGamePort );
+        MapSet ( m_AddressMap, key, pItem );
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////
+//
+// CServerListItem implementation
+//
+//
+//////////////////////////////////////////////////////////////////////////////
+// Auto add to associated list
+CServerListItem::CServerListItem ( in_addr _Address, unsigned short _usGamePort, CServerListItemList* pItemList, bool bAtFront )
+{
+    Address = _Address;
+    usGamePort = _usGamePort;
+    m_pItemList = pItemList;
+    Init ();
+    if ( m_pItemList )
+    {
+        AddressCopy = _Address;
+        usGamePortCopy = _usGamePort;
+        m_pItemList->AddNewItem( this, bAtFront );
+    }
+}
+
+// Auto removes from associated list
+CServerListItem::~CServerListItem ( void )
+{
+    if ( m_pItemList )
+    {
+        // Check nothing changed
+        assert( AddressCopy.s_addr == Address.s_addr && usGamePortCopy == usGamePort );
+        m_pItemList->RemoveItem( this );
+    }
+    MapRemove ( ms_ValidServerListItemMap, this );
+    CloseSocket ();
+}
 
 void CServerListItem::ResetForRefresh ( void )
 {
@@ -650,4 +805,17 @@ void CServerListItem::ResetForRefresh ( void )
     if ( m_iDataQuality >= SERVER_INFO_QUERY )
         m_iDataQuality = SERVER_INFO_QUERY - 1;
     bMaybeOffline = false;
+}
+
+void CServerListItem::ChangeAddress( in_addr _Address, unsigned short _usGamePort )
+{
+    if ( m_pItemList )
+    {
+        m_pItemList->OnItemChangeAddress( this, _Address, _usGamePort );
+    }
+    else
+    {
+        Address = _Address;
+        usGamePort = _usGamePort;
+    }
 }

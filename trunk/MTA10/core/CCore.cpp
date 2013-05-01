@@ -1630,8 +1630,7 @@ void CCore::UpdateRecentlyPlayed()
 void CCore::SetCurrentServer( in_addr Addr, unsigned short usGamePort )
 {
     //Set the current server info so we can query it with ASE for xfire
-    m_pCurrentServer->Address = Addr;
-    m_pCurrentServer->usGamePort = usGamePort;
+    m_pCurrentServer->ChangeAddress( Addr, usGamePort );
 }
 
 SString CCore::UpdateXfire( void )
