@@ -2250,16 +2250,3 @@ bool CServerBrowser::OnServerListChangeRow ( CGUIKeyEventArgs Args )
 
     return true;
 }
-
-
-// Keep track of LAN servers so we can query the correct port for them
-void CServerBrowser::AddKnownLanServer ( in_addr Address )
-{
-    MapInsert ( m_KnownLanServerAddressMap, Address.s_addr );
-}
-
-
-bool CServerBrowser::IsKnownLanServer ( in_addr Address )
-{
-    return MapContains ( m_KnownLanServerAddressMap, Address.s_addr );
-}

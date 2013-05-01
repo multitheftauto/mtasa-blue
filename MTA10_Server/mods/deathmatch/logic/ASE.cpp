@@ -75,7 +75,7 @@ bool ASE::SetPortEnabled ( bool bInternetEnabled, bool bLanEnabled )
     // Calc requirements
     bool bPortEnableReq = bInternetEnabled || bLanEnabled;
     bool bLanOnly = !bInternetEnabled && bLanEnabled;
-    ushort usPortReq = m_usPortBase + ( ( bLanOnly ) ? SERVER_LIST_QUERY_PORT_OFFSET_LAN : SERVER_LIST_QUERY_PORT_OFFSET );
+    ushort usPortReq = m_usPortBase + SERVER_LIST_QUERY_PORT_OFFSET;
 
     // Any change?
     if ( ( m_Socket != INVALID_SOCKET ) == bPortEnableReq && m_usPort == usPortReq )
