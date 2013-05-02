@@ -2772,14 +2772,9 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
                                                     }
                                                     else
                                                     {
-                                                        // Has he been warped to a vehicle in the mean time? (by lua f.e.)
-                                                        if ( !pPlayer->GetOccupiedVehicle () )
-                                                        {
-                                                            pPlayer->SetOccupiedVehicle ( NULL, 0 );
-                                                            pVehicle->SetOccupant ( NULL, 0 );
-                                                        }
-                                                        
+                                                        pPlayer->SetOccupiedVehicle ( NULL, 0 );
                                                         pPlayer->SetVehicleAction ( CPlayer::VEHICLEACTION_NONE );
+                                                        pVehicle->SetOccupant ( NULL, 0 );
                                                         failReason = FAIL_SCRIPT;
                                                     }
                                                 }
@@ -2883,13 +2878,9 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
                                                     }
                                                     else
                                                     {
-                                                        // Has he been warped to a vehicle in the mean time? (by lua f.e.)
-                                                        if ( !pPlayer->GetOccupiedVehicle () )
-                                                        {
-                                                            pPlayer->SetOccupiedVehicle ( NULL, 0 );
-                                                            pVehicle->SetOccupant ( NULL, ucSeat );
-                                                        }
+                                                        pPlayer->SetOccupiedVehicle ( NULL, 0 );
                                                         pPlayer->SetVehicleAction ( CPlayer::VEHICLEACTION_NONE );
+                                                        pVehicle->SetOccupant ( NULL, ucSeat );
                                                         failReason = FAIL_SCRIPT;
                                                     }
                                                 }
