@@ -608,7 +608,7 @@ int CLuaFunctionDefs::GetVehicleUpgradeSlotName ( lua_State* luaVM )
         if ( usNumber < 17 )
         {
             SString strUpgradeName;
-            if ( CStaticFunctionDefinitions::GetVehicleUpgradeSlotName ( usNumber, strUpgradeName ) )
+            if ( CStaticFunctionDefinitions::GetVehicleUpgradeSlotName ( static_cast < unsigned char > ( usNumber ), strUpgradeName ) )
             {
                 lua_pushstring ( luaVM, strUpgradeName );
                 return 1;
