@@ -126,9 +126,10 @@ int CLuaFunctionDefs::EngineLoadTXD ( lua_State* luaVM )
     SString strFile = "";
     bool bFilteringEnabled = true;
     CScriptArgReader argStream ( luaVM );
-    // Grab the DFF and model ID
+    // Grab the TXD filename
     argStream.ReadString ( strFile );
-    argStream.ReadBool ( bFilteringEnabled, true );
+    if ( argStream.NextIsBool() )   // Some scripts have a number here (in error)
+        argStream.ReadBool ( bFilteringEnabled, true );
 
     if ( !argStream.HasErrors ( ) )
     {
