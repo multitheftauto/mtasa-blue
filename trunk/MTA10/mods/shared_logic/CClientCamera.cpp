@@ -166,13 +166,16 @@ void CClientCamera::GetRotationDegrees ( CVector& vecRotation ) const
     CMatrix matrix;
     m_pCamera->GetMatrix ( &matrix );
     g_pMultiplayer->ConvertMatrixToEulerAngles ( matrix, vecRotation.fX, vecRotation.fY, vecRotation.fZ );
+    vecRotation = CVector ( 2*PI, 2*PI, PI ) - vecRotation;
     ConvertRadiansToDegrees ( vecRotation );
+    // srsly, f knows, just pretend you never saw this line
+    vecRotation.fY = 360.0f - vecRotation.fY;
 }
 
 
 void CClientCamera::SetRotationRadians ( const CVector& vecRotation )
 {
-    m_vecFixedRotation = vecRotation + CVector ( 0, 0, PI );
+    m_vecFixedRotation = CVector ( 2*PI, 2*PI, 2*PI ) - vecRotation;
     m_bPreferFixedRotation = true;
 }
 

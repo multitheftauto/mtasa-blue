@@ -76,6 +76,8 @@ int CLuaMatrixDefs::GetRotation ( lua_State* luaVM )
     {
         CVector vecRotation;
         g_pMultiplayer->ConvertMatrixToEulerAngles ( *pMatrix, vecRotation.fX, vecRotation.fY, vecRotation.fZ );
+        ConvertRadiansToDegrees ( vecRotation );
+
         lua_pushvector ( luaVM, vecRotation );
         return 1;
     }

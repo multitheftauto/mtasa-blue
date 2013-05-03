@@ -145,8 +145,9 @@ void CLuaMain::AddElementClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "getAllData", "getAllElementData" );
     lua_classfunction ( luaVM, "getID", "getElementID" );
     lua_classfunction ( luaVM, "getParent", "getElementParent" );
-    lua_classfunction ( luaVM, "getPosition", "getElementPosition" );
-    lua_classfunction ( luaVM, "getRotation", "getElementRotation" );
+    lua_classfunction ( luaVM, "getPosition", CLuaOOPDefs::GetElementPosition );
+    lua_classfunction ( luaVM, "getRotation", CLuaOOPDefs::GetElementRotation );
+    lua_classfunction ( luaVM, "getMatrix", CLuaOOPDefs::GetElementMatrix );
     lua_classfunction ( luaVM, "getVelocity", "getElementVelocity" );
     lua_classfunction ( luaVM, "getByType", "getElementsByType" );
     lua_classfunction ( luaVM, "getType", "getElementType" );
@@ -207,6 +208,10 @@ void CLuaMain::AddElementClass ( lua_State* luaVM )
     lua_classvariable ( luaVM, "inWater", NULL, "isElementInWater" );
     lua_classvariable ( luaVM, "dimension", "setElementDimension", "getElementDimension" );
     lua_classvariable ( luaVM, "interior", "setElementInterior", "getElementInterior" );
+
+    lua_classvariable ( luaVM, "position", CLuaFunctionDefs::SetElementPosition, CLuaOOPDefs::GetElementPosition );
+    lua_classvariable ( luaVM, "rotation", CLuaFunctionDefs::SetElementRotation, CLuaOOPDefs::GetElementRotation );
+    lua_classvariable ( luaVM, "matrix", NULL, CLuaOOPDefs::GetElementMatrix );
 
 	lua_registerclass ( luaVM, "Element" );
 }
@@ -356,6 +361,20 @@ void CLuaMain::AddSoundClass ( lua_State* luaVM )
 
     lua_registerclass ( luaVM, "Sound3D", "Sound" );
 }
+
+void CLuaMain::AddWeaponClass ( lua_State* luaVM )
+{
+    lua_newclass ( luaVM );
+
+    lua_classfunction ( luaVM, "create", "createWeapon" );
+    lua_classfunction ( luaVM, "fire", "fireWeapon" );
+
+    lua_classfunction ( luaVM, "setOwner", "setWeaponOwner" );
+    lua_classfunction ( luaVM, "setTarget", "setWeaponTarget" );
+
+    lua_registerclass ( luaVM, "Weapon", "Element" );
+}
+
 
 void CLuaMain::AddGuiElementClass ( lua_State* luaVM )
 {
@@ -603,8 +622,8 @@ void CLuaMain::AddMatrixClass ( lua_State* luaVM )
 
     lua_classfunction ( luaVM, "create", CLuaMatrixDefs::Create );
 
-    lua_classfunction ( luaVM, "getPosition", CLuaMatrixDefs::SetPosition );
-    lua_classfunction ( luaVM, "getRotation", CLuaMatrixDefs::SetPosition );
+    lua_classfunction ( luaVM, "getPosition", CLuaMatrixDefs::GetPosition );
+    lua_classfunction ( luaVM, "getRotation", CLuaMatrixDefs::GetPosition );
     lua_classfunction ( luaVM, "getFront", CLuaMatrixDefs::GetFront );
     lua_classfunction ( luaVM, "getRight", CLuaMatrixDefs::GetRight );
     lua_classfunction ( luaVM, "getUp", CLuaMatrixDefs::GetUp );
@@ -615,6 +634,7 @@ void CLuaMain::AddMatrixClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "getUp", CLuaMatrixDefs::SetUp );
 
     lua_classvariable ( luaVM, "position", CLuaMatrixDefs::SetPosition, CLuaMatrixDefs::GetPosition );
+    lua_classvariable ( luaVM, "rotation", NULL, CLuaMatrixDefs::GetRotation );
     lua_classvariable ( luaVM, "front", CLuaMatrixDefs::SetFront, CLuaMatrixDefs::GetFront );
     lua_classvariable ( luaVM, "right", CLuaMatrixDefs::SetRight, CLuaMatrixDefs::GetRight );
     lua_classvariable ( luaVM, "up", CLuaMatrixDefs::SetUp, CLuaMatrixDefs::GetUp );
@@ -648,6 +668,7 @@ void CLuaMain::InitClasses ( lua_State* luaVM )
     AddTeamClass ( luaVM );
     AddWaterClass ( luaVM );
     AddSoundClass ( luaVM );
+    AddWeaponClass ( luaVM );
 
     AddGuiElementClass ( luaVM );
     AddGuiWindowClass ( luaVM );

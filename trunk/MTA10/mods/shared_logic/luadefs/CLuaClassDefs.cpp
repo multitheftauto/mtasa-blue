@@ -336,7 +336,7 @@ const char* CLuaClassDefs::GetEntityClass ( CClientEntity* pEntity )
         case CCLIENTGUIFONT: return NULL;
         case CCLIENTTEXTURE: return NULL;
         case CCLIENTSHADER: return NULL;
-        case CCLIENTWEAPON: return NULL;
+        case CCLIENTWEAPON: return "Weapon";
     }
     return "Element";
 }
