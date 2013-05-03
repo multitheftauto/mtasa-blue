@@ -565,7 +565,8 @@ void CPacketHandler::Packet_PlayerList ( NetBitStreamInterface& bitStream )
                 }
             }
         }
-        g_pCore->GetConsole ()->Print ( SString ( "Server AC info: [Allowed client files: %s] [Disabled AC: %s] [Enabled SD: %s]", *strAllowedFiles, *strDisabledAC, *strEnabledSD ) );
+        g_pClientGame->m_strACInfo = SString ( "[Allowed client files: %s] [Disabled AC: %s] [Enabled SD: %s]", *strAllowedFiles, *strDisabledAC, *strEnabledSD );
+        g_pCore->GetConsole ()->Print ( SString ( "Server AC info: %s", *g_pClientGame->m_strACInfo ) );
     }
 
     // While there are bytes left, parse player list items

@@ -416,6 +416,7 @@ public:
     SString                             GetHTTPURL                      ( void ) { return m_strHTTPDownloadURL; };
     void                                ProjectileInitiateHandler       ( CClientProjectile * pProjectile );
     void                                IdleHandler                     ( void );
+    void                                OutputServerInfo                ( void );
 
 private:
 
@@ -755,6 +756,7 @@ private:
 
     SVehExtrapolateSettings             m_VehExtrapolateSettings;
     uint                                m_uiAltPulseOrderCounter;
+    SString                             m_strACInfo;
 };
 
 extern CClientGame* g_pClientGame;

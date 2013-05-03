@@ -83,6 +83,7 @@ int CClient::ClientInitialize ( const char* szArguments, CCoreInterface* pCore )
     g_pCore->GetCommands ()->Add ( "msg_target",                "sends a message to the targetted player",              COMMAND_MessageTarget, true );
     g_pCore->GetCommands ()->Add ( "vehicle_next_weapon",       "changes to the next weapon whilst in a vehicle",       COMMAND_VehicleNextWeapon, true );
     g_pCore->GetCommands ()->Add ( "vehicle_previous_weapon",   "changes to the previous weapon whilst in a vehicle",   COMMAND_VehiclePreviousWeapon, true );
+    g_pCore->GetCommands ()->Add ( "sinfo",                     "Outputs info about the current server",                COMMAND_ServerInfo, true );
     
     // ACHTUNG" Should this be handled by the atomic cvar setter?
     g_pCore->GetCommands ()->Add ( "textscale",                 "defines the scale multiplier of all text-displays",    COMMAND_TextScale, true );
