@@ -1909,12 +1909,8 @@ int CLuaFunctionDefs::AttachElements ( lua_State* luaVM )
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pEntity );
     argStream.ReadUserData ( pAttachedToEntity );
-    argStream.ReadNumber ( vecPosition.fX, 0.0f );
-    argStream.ReadNumber ( vecPosition.fY, 0.0f );
-    argStream.ReadNumber ( vecPosition.fZ, 0.0f );
-    argStream.ReadNumber ( vecRotation.fX, 0.0f );
-    argStream.ReadNumber ( vecRotation.fY, 0.0f );
-    argStream.ReadNumber ( vecRotation.fZ, 0.0f );
+    argStream.ReadVector3D ( vecPosition, vecPosition );
+    argStream.ReadVector3D ( vecRotation, vecRotation );
 
     // Verify the arguments
     if ( !argStream.HasErrors ( ) )
@@ -1989,12 +1985,8 @@ int CLuaFunctionDefs::SetElementAttachedOffsets ( lua_State* luaVM )
     CVector vecPosition, vecRotation;
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pEntity );
-    argStream.ReadNumber ( vecPosition.fX, 0.0f );
-    argStream.ReadNumber ( vecPosition.fY, 0.0f );
-    argStream.ReadNumber ( vecPosition.fZ, 0.0f );
-    argStream.ReadNumber ( vecRotation.fX, 0.0f );
-    argStream.ReadNumber ( vecRotation.fY, 0.0f );
-    argStream.ReadNumber ( vecRotation.fZ, 0.0f );
+    argStream.ReadVector3D ( vecPosition, vecPosition );
+    argStream.ReadVector3D ( vecRotation, vecRotation );
 
     // Verify the arguments
     if ( !argStream.HasErrors ( ) )

@@ -253,7 +253,7 @@ int CLuaFunctionDefs::SetWeaponTarget ( lua_State* luaVM )
             }
         }
     }
-    else if ( argStream.NextIsNumber() )
+    else if ( argStream.NextIsNumber() || argStream.NextIsUserDataOfType < CLuaVector3D > () )
     {
         CVector vecTarget;
         argStream.ReadVector3D ( vecTarget );
