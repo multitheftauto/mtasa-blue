@@ -6138,3 +6138,102 @@ bool CClientGame::IsUsingAlternatePulseOrder( bool bAdvanceDelayCounter )
 
     return false;
 }
+
+
+//////////////////////////////////////////////////////////////////
+//
+// CClientGame::OutputServerInfo
+//
+// Output info about the connected server for player
+//
+//////////////////////////////////////////////////////////////////
+void CClientGame::OutputServerInfo( void )
+{
+    SString strTotalOutput;
+    strTotalOutput += SString( "Server info for %s\n", g_pNet->GetConnectedServer( true ) );
+    strTotalOutput += SString( "Ver: %s\n", *GetServerVersionSortable () );
+    strTotalOutput += SString( "AC: %s\n", *m_strACInfo );
+
+    {
+        SString strVoice;
+        if ( m_pVoiceRecorder && m_pVoiceRecorder->IsEnabled() )
+            strVoice += SString( "Enabled - Sample rate:%d  Quality:%d"
+                                    , m_pVoiceRecorder->GetSampleRate()
+                                    , m_pVoiceRecorder->GetSampleQuality()
+                                );
+        else
+            strVoice += "Disabled";
+
+        strTotalOutput += SString( "Voice: %s\n", *strVoice );
+    }
+
+    {
+        SString strEnabledGlitches;
+        const char* szGlitchNames[] = { "Quick reload", "Fast fire", "Fast move", "Crouch bug", "Close damage", "Hit anim" };
+        for( uint i = 0 ; i < NUM_GLITCHES ; i++ )
+        {
+            if ( IsGlitchEnabled( i ) )
+            {
+                if ( !strEnabledGlitches.empty() )
+                    strEnabledGlitches += ", ";
+                if ( i < NUMELMS( szGlitchNames ) )
+                    strEnabledGlitches += szGlitchNames[i];
+                else
+                    strEnabledGlitches += SString( "Unknown(#%d)", i + 1 );
+            }
+        }
+        if ( strEnabledGlitches.empty() )
+            strEnabledGlitches = "None";
+        strTotalOutput += SString( "Glitches: %s\n", *strEnabledGlitches );
+    }
+
+    {
+        SString strEnabledBulletSync;
+        for( std::set < eWeaponType >::iterator iter = m_weaponTypesUsingBulletSync.begin() ; iter != m_weaponTypesUsingBulletSync.end() ; ++iter )
+        {
+            eWeaponType weaponType = *iter;
+            if ( !strEnabledBulletSync.empty() )
+                strEnabledBulletSync += ",";
+            strEnabledBulletSync += SString( "%d", weaponType );
+        }
+        if ( strEnabledBulletSync.empty() )
+            strEnabledBulletSync = "None";
+        strTotalOutput += SString( "Bullet sync weapons: %s\n", *strEnabledBulletSync );
+    }
+
+    {
+        SString strVehExtrapolate;
+        if ( m_VehExtrapolateSettings.bEnabled )
+            strVehExtrapolate += SString( "Amount:%d%%  (LimitMs:%d)" , m_VehExtrapolateSettings.iScalePercent , m_VehExtrapolateSettings.iMaxMs );
+        else
+            strVehExtrapolate += "Disabled";
+
+        strTotalOutput += SString( "Vehicle extrapolation: %s\n", *strVehExtrapolate );
+    }
+
+    {
+        SString strTickRates;
+        strTickRates += SString( "Plr:%d  Cam:%d  Ped:%d  UnocVeh:%d  KeyRot:%d  KeyJoy:%d"
+                        ,g_TickRateSettings.iPureSync
+                        ,g_TickRateSettings.iCamSync
+                        ,g_TickRateSettings.iPedSync
+                        ,g_TickRateSettings.iUnoccupiedVehicle
+                        ,g_TickRateSettings.iKeySyncRotation
+                        ,g_TickRateSettings.iKeySyncAnalogMove
+                        );
+
+        strTotalOutput += SString( "Tick rates: %s\n", *strTickRates );
+    }
+
+    {
+        SString strSyncerDists;
+        strSyncerDists += SString( "Ped:%d  UnoccupiedVehicle:%d "
+                        ,g_TickRateSettings.iPedSyncerDistance
+                        ,g_TickRateSettings.iUnoccupiedVehicleSyncerDistance
+                        );
+
+        strTotalOutput += SString( "Syncer distances: %s\n", *strSyncerDists );
+    }
+
+    g_pCore->GetConsole ()->Print ( strTotalOutput );
+}
