@@ -123,14 +123,26 @@ int CLuaFunctionDefs::GetObjectScale ( lua_State* luaVM )
 
 int CLuaFunctionDefs::IsObjectBreakable ( lua_State* luaVM )
 {
-    //  bool isObjectBreakable ( object theObject )
-    CClientObject* pObject; 
-    bool bBreakable;
-
+//  bool isObjectBreakable ( int modelId )
+    
     CScriptArgReader argStream ( luaVM );
+
+    if ( argStream.NextIsNumber () )
+    {
+        unsigned short usModel;
+        argStream.ReadNumber ( usModel );
+
+        lua_pushboolean ( luaVM, CClientObjectManager::IsBreakableModel ( usModel ) );
+        return 1;
+    }
+
+//  bool isObjectBreakable ( object theObject )
+    CClientObject* pObject;
+
     argStream.ReadUserData ( pObject );
     if ( !argStream.HasErrors () )
     {
+        bool bBreakable;
         if ( CStaticFunctionDefinitions::IsObjectBreakable ( *pObject, bBreakable ) )
         {
             lua_pushboolean ( luaVM, bBreakable );

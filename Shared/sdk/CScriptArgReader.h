@@ -117,7 +117,7 @@ public:
                 return true;
             }
         }
-        else if ( iArgument == LUA_TNIL )
+        else if ( iArgument == LUA_TNIL || iArgument == LUA_TNONE )
             return true;
 
         SetTypeError ( "vector3" );
