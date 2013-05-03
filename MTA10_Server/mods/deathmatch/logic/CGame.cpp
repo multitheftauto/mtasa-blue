@@ -2794,6 +2794,7 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
                                                     // Mark him as entering the vehicle
                                                     pPlayer->SetOccupiedVehicle ( pVehicle, 0 );
                                                     pPlayer->SetVehicleAction ( CPlayer::VEHICLEACTION_ENTERING );
+                                                    pVehicle->m_bOccupantChanged = false;
 
                                                     // Call the entering vehicle event
                                                     CLuaArguments Arguments;
@@ -2828,9 +2829,12 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
                                                     }
                                                     else
                                                     {
-                                                        pPlayer->SetOccupiedVehicle ( NULL, 0 );
+                                                        if ( !pVehicle->m_bOccupantChanged )
+                                                        {
+                                                            pPlayer->SetOccupiedVehicle ( NULL, 0 );
+                                                            pVehicle->SetOccupant ( NULL, 0 );
+                                                        }
                                                         pPlayer->SetVehicleAction ( CPlayer::VEHICLEACTION_NONE );
-                                                        pVehicle->SetOccupant ( NULL, 0 );
                                                         failReason = FAIL_SCRIPT;
                                                     }
                                                 }
@@ -2906,6 +2910,7 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
                                                     // Mark him as entering the vehicle
                                                     pPlayer->SetOccupiedVehicle ( pVehicle, ucSeat );
                                                     pPlayer->SetVehicleAction ( CPlayer::VEHICLEACTION_ENTERING );
+                                                    pVehicle->m_bOccupantChanged = false;
 
                                                     // Call the entering vehicle event
                                                     CLuaArguments Arguments;
@@ -2934,9 +2939,12 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
                                                     }
                                                     else
                                                     {
-                                                        pPlayer->SetOccupiedVehicle ( NULL, 0 );
-                                                        pPlayer->SetVehicleAction ( CPlayer::VEHICLEACTION_NONE );
-                                                        pVehicle->SetOccupant ( NULL, ucSeat );
+                                                        if ( !pVehicle->m_bOccupantChanged )
+                                                        {
+                                                            pPlayer->SetOccupiedVehicle ( NULL, 0 );
+                                                            pVehicle->SetOccupant ( NULL, ucSeat );
+                                                        }
+                                                        pPlayer->SetVehicleAction ( CPlayer::VEHICLEACTION_NONE );                                                        
                                                         failReason = FAIL_SCRIPT;
                                                     }
                                                 }
