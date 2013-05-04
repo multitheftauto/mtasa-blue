@@ -1848,7 +1848,7 @@ int CLuaFunctionDefs::SetPedAnimation ( lua_State* luaVM )
     {
         if ( pEntity )
         {
-            if ( CStaticFunctionDefinitions::SetPedAnimation ( *pEntity, strBlockName == "" ? NULL : strBlockName, strAnimName == "" ? NULL : strAnimName, iTime, bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame ) )
+            if ( CStaticFunctionDefinitions::SetPedAnimation ( *pEntity, strBlockName == "" ? NULL : strBlockName.c_str(), strAnimName == "" ? NULL : strAnimName.c_str(), iTime, bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame ) )
             {
                 lua_pushboolean ( luaVM, true );
                 return 1;

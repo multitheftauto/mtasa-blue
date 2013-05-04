@@ -254,7 +254,7 @@ int CLuaFunctionDefs::UnbindKey ( lua_State* luaVM )
                 argStream.ReadFunctionComplete ();
                 if ( !argStream.HasErrors ( ) )
                 {
-                    const char* szHitState = strHitState == "" ? NULL : strHitState;
+                    const char* szHitState = strHitState == "" ? NULL : strHitState.c_str();
                     if ( CStaticFunctionDefinitions::UnbindKey ( strKey, pLuaMain, szHitState, iLuaFunction ) )
                     {
                         lua_pushboolean ( luaVM, true );
@@ -469,7 +469,7 @@ int CLuaFunctionDefs::GetFunctionsBoundToKey ( lua_State* luaVM )
         CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
         if ( pLuaMain )
         {
-            const char* szHitState = strHitState == "" ? NULL : strHitState;
+            const char* szHitState = strHitState == "" ? NULL : strHitState.c_str();
 
             bool bCheckHitState = false, bHitState = true;
             if ( szHitState )
@@ -607,7 +607,7 @@ int CLuaFunctionDefs::GetCommandsBoundToKey ( lua_State* luaVM )
         CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
         if ( pLuaMain )
         {
-            const char* szHitState = strHitState == "" ? NULL : strHitState;
+            const char* szHitState = strHitState == "" ? NULL : strHitState.c_str();
 
             bool bCheckHitState = false, bHitState = true;
             if ( szHitState )
