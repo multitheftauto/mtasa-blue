@@ -1819,6 +1819,7 @@ int CLuaFunctionDefs::SetPedAnimation ( lua_State* luaVM )
 {
     // Verify the argument
     CClientEntity* pEntity = NULL;
+    bool bDummy;
     SString strBlockName = "";
     SString strAnimName = "";
     int iTime = -1;
@@ -1826,9 +1827,16 @@ int CLuaFunctionDefs::SetPedAnimation ( lua_State* luaVM )
     bool bUpdatePosition = true;
     bool bInterruptable = true;
     bool bFreezeLastFrame = true;
+
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pEntity );
-    argStream.ReadString ( strBlockName, "" );
+    if ( argStream.NextIsBool() )
+        argStream.ReadBool ( bDummy );      // Wiki used setPedAnimation(source,false) as an example
+    else
+    if ( argStream.NextIsNil() )
+        argStream.m_iIndex++;               // Wiki docs said blockName could be nil
+    else
+        argStream.ReadString ( strBlockName, "" );
     argStream.ReadString ( strAnimName, "" );
     argStream.ReadNumber ( iTime, -1 );
     argStream.ReadBool ( bLoop, true );
