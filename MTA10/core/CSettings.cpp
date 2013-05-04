@@ -1672,7 +1672,7 @@ void CSettings::ProcessKeyBinds ( void )
             strCmdArgs.Split ( ": ", &strCommand, &strArguments );
 
             const char* szCommand = strCommand;
-            const char* szArguments = strArguments.empty () ? NULL : strArguments;
+            const char* szArguments = strArguments.empty () ? NULL : strArguments.c_str();
 
             /** Primary keybinds **/
             CCommandBind* pBind = reinterpret_cast < CCommandBind* > ( m_pBindsList->GetItemData ( i, m_hPriKey ) );
