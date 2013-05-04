@@ -534,6 +534,9 @@ void CClientVehicle::SetMoveSpeed ( const CVector& vecMoveSpeed )
             m_pVehicle->SetMoveSpeed ( const_cast < CVector* > ( &vecMoveSpeed ) );
         }
         m_vecMoveSpeed = vecMoveSpeed;
+
+        if ( IsFrozenWaitingForGroundToLoad() )
+            m_vecWaitingForGroundSavedMoveSpeed = vecMoveSpeed;
     }
 }
 
@@ -564,6 +567,9 @@ void CClientVehicle::SetTurnSpeed ( const CVector& vecTurnSpeed )
             m_pVehicle->SetTurnSpeed ( const_cast < CVector* > ( &vecTurnSpeed ) );
         }
         m_vecTurnSpeed = vecTurnSpeed;
+
+        if ( IsFrozenWaitingForGroundToLoad() )
+            m_vecWaitingForGroundSavedTurnSpeed = vecTurnSpeed;
     }
 }
 
@@ -1842,10 +1848,19 @@ void CClientVehicle::SetFrozenWaitingForGroundToLoad ( bool bFrozen )
                 m_vecMoveSpeed = vecTemp;
                 m_vecTurnSpeed = vecTemp;
             }
+            m_vecWaitingForGroundSavedMoveSpeed = vecTemp;
+            m_vecWaitingForGroundSavedTurnSpeed = vecTemp;
         }
         else
         {
             g_pGame->SuspendASyncLoading ( false );
+            m_vecMoveSpeed = m_vecWaitingForGroundSavedMoveSpeed;
+            m_vecTurnSpeed = m_vecWaitingForGroundSavedTurnSpeed;
+            if ( m_pVehicle )
+            {
+                m_pVehicle->SetMoveSpeed ( &m_vecMoveSpeed );
+                m_pVehicle->SetTurnSpeed ( &m_vecTurnSpeed );
+            }
         }
     }
 }
