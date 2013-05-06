@@ -238,6 +238,10 @@ CGUIListItem* CGUIGridList_Impl::GetItem ( int iRow, int hColumn )
 {
     try
     {
+        CEGUI::MultiColumnList* pMultiColumnList = reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow );
+        if ( iRow >= pMultiColumnList->getRowCount() || GetColumnIndex( hColumn ) >= pMultiColumnList->getColumnCount() )
+            return NULL;
+
         // Grab the item at the chosen row / column
         CEGUI::ListboxItem* pItem = reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> getItemAtGridReference ( CEGUI::MCLGridRef ( iRow, GetColumnIndex ( hColumn ) ) );
 
@@ -258,6 +262,10 @@ const char* CGUIGridList_Impl::GetItemText ( int iRow, int hColumn )
 {
     try
     {
+        CEGUI::MultiColumnList* pMultiColumnList = reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow );
+        if ( iRow >= pMultiColumnList->getRowCount() || GetColumnIndex( hColumn ) >= pMultiColumnList->getColumnCount() )
+            return "";
+
         // Grab the item at the chosen row / column
         CEGUI::ListboxItem* pItem = reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> getItemAtGridReference ( CEGUI::MCLGridRef ( iRow, GetColumnIndex ( hColumn ) ) );
         if ( pItem )
