@@ -54,8 +54,6 @@ struct SViewerInfo
         , iZone ( 0 )
         , llLastUpdateTime ( 0 )
         , bInPureSyncSimSendList ( false )
-        , bInKeySyncSimSendList ( false )
-        , bInBulletSyncSimSendList ( false )
     {}
 
     int iMoveToFarCountDown;
@@ -65,8 +63,6 @@ struct SViewerInfo
     long long llLastUpdateTime;
 
     bool bInPureSyncSimSendList;
-    bool bInKeySyncSimSendList;
-    bool bInBulletSyncSimSendList;
 };
 
 #ifdef WIN32
@@ -348,9 +344,8 @@ public:
     const CVector&                              GetCamPosition              ( void )            { return m_vecCamPosition; };
     const CVector&                              GetCamFwd                   ( void )            { return m_vecCamFwd; };
 
-    std::set < CPlayer* >                       m_PureSyncSimSendList;
-    std::set < CPlayer* >                       m_KeySyncSimSendList;
-    std::set < CPlayer* >                       m_BulletSyncSimSendList;
+    CFastHashSet < CPlayer* >                   m_PureSyncSimSendList;
+    bool                                        m_bPureSyncSimSendListDirty;
     class CSimPlayer*                           m_pSimPlayer;
 private:
     SLightweightSyncData                        m_lightweightSyncData;
