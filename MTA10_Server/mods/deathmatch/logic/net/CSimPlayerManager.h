@@ -27,6 +27,7 @@ public:
     bool            HandleVehiclePureSync   ( const NetServerPlayerID& Socket, NetBitStreamInterface* BitStream );
     bool            HandleKeySync           ( const NetServerPlayerID& Socket, NetBitStreamInterface* BitStream );
     bool            HandleBulletSync        ( const NetServerPlayerID& Socket, NetBitStreamInterface* BitStream );
+    bool            HandlePedTaskPacket     ( const NetServerPlayerID& Socket, NetBitStreamInterface* BitStream );
     CSimPlayer*     Get                     ( const NetServerPlayerID& PlayerSocket );
     void            Broadcast               ( const CSimPacket& Packet, const std::vector < CSimPlayer* >& sendList );
 
