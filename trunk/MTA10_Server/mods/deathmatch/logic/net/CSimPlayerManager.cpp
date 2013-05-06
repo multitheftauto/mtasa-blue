@@ -387,6 +387,44 @@ bool CSimPlayerManager::HandleBulletSync ( const NetServerPlayerID& Socket, NetB
 }
 
 
+///////////////////////////////////////////////////////////////
+//
+// CSimPlayerManager::HandlePedTaskPacket
+//
+// Thread:              sync
+// CS should be locked: no
+//
+///////////////////////////////////////////////////////////////
+bool CSimPlayerManager::HandlePedTaskPacket ( const NetServerPlayerID& Socket, NetBitStreamInterface* BitStream )
+{
+    if ( !CNetBufferWatchDog::CanSendPacket ( PACKET_ID_PED_TASK ) )
+        return true;
+
+    LockSimSystem ();     // Prevent player additions and deletions
+
+    // Grab the source player
+    CSimPlayer* pSourceSimPlayer = Get ( Socket );
+
+    // Check is good for ped task sync
+    if ( pSourceSimPlayer && pSourceSimPlayer->IsJoined () )
+    {
+        // Read the incoming packet data
+        CSimPedTaskPacket* pPacket = new CSimPedTaskPacket ( pSourceSimPlayer->m_PlayerID );
+
+        if ( pPacket->Read ( *BitStream ) )
+        {
+            // Relay it to nearbyers
+            Broadcast ( *pPacket, pSourceSimPlayer->GetPuresyncSendList () );
+        }
+
+        delete pPacket;
+    }
+
+    UnlockSimSystem ();
+    return true;
+}
+
+
 ///////////////////////////////////////////////////////////////////////////
 //
 // CSimPlayerManager::Get
