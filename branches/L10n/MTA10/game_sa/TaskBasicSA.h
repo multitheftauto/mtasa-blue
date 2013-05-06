@@ -27,6 +27,7 @@
 #define FUNC_CTaskComplexDie__Constructor                   0x630040
 #define FUNC_CTaskSimpleStealthKill__Constructor            0x6225F0
 #define FUNC_CTaskSimpleDead__Constructor                   0x630590
+#define FUNC_CTaskSimpleBeHit__Constructor                  0x620780
 #define FUNC_CTaskComplexSunbathe__Constructor              0x631F80
 #define FUNC_CTASKSimplePlayerOnFoot__Constructor           0x685750
 #define FUNC_CTASKComplexFacial__Constructor                0x690D20
@@ -184,6 +185,29 @@ public:
     CTaskSimpleDeadSA ( unsigned int uiDeathTimeMS, bool bUnk2 );
 };
 
+
+class CTaskSimpleBeHitSAInterface : public CTaskSimpleSAInterface
+{
+public:
+    CPed*   pPedAttacker;   // 0x08
+    uchar   a;              // 0x0c
+    uchar   b;              // 0x0d
+    uchar   c;              // 0x0e
+    uchar   d;              // 0x0f
+    uint    e;              // 0x10   inited with 0x000000BF
+    uint    f;              // 0x14   inited with 0
+    uint    hitBodyPart;    // 0x18
+    uint    weaponType;     // 0x1C
+    uint    hitBodySide;    // 0x20
+    uint    g;              // 0x24   inited with 0
+};
+
+class CTaskSimpleBeHitSA : public virtual CTaskSimpleSA, public virtual CTaskSimpleBeHit
+{
+public:
+    CTaskSimpleBeHitSA ( void ) {};
+    CTaskSimpleBeHitSA ( CPed* pPedAttacker, ePedPieceTypes hitBodyPart, int hitBodySide, int weaponId );
+};
 
 
 class CAnimBlock;

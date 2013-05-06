@@ -11,12 +11,16 @@
 #include "StdInc.h"
 extern CCoreInterface* g_pCore;
 
+#define VAR_CCullZones_NumMirrorAttributeZones  0x0C87AC4   // int
+#define VAR_CMirrors_d3dRestored                0x0C7C729   // uchar
+
 namespace
 {
     CEntitySAInterface* ms_Rendering = NULL;
     CEntitySAInterface* ms_RenderingOneNonRoad = NULL;
     GameEntityRenderHandler* pGameEntityRenderHandler = NULL;
     bool ms_bIsMinimizedAndNotConnected = false;
+    int ms_iSavedNumMirrorZones = 0;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -352,6 +356,40 @@ void CMultiplayerSA::SetGameEntityRenderHandler ( GameEntityRenderHandler * pHan
 void CMultiplayerSA::SetIsMinimizedAndNotConnected ( bool bIsMinimizedAndNotConnected )
 {
     ms_bIsMinimizedAndNotConnected = bIsMinimizedAndNotConnected;
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+// CMultiplayerSA::SetMirrorsEnabled
+//
+// Stop mirrors by skipping the frame setup and rendering code.
+// Forces mirror render buffer recreation when enabling.
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+void CMultiplayerSA::SetMirrorsEnabled ( bool bEnabled )
+{
+    int& iNumMirrorZones = *(int*)VAR_CCullZones_NumMirrorAttributeZones;
+    uchar& bResetMirror = *(uchar*)VAR_CMirrors_d3dRestored;
+
+    if ( !bEnabled )
+    {
+        // Remove mirror zones
+        ms_iSavedNumMirrorZones += iNumMirrorZones;
+        iNumMirrorZones = 0;
+    }
+    else
+    {
+        if ( ms_iSavedNumMirrorZones )
+        {
+            // Restore mirror zones
+            iNumMirrorZones += ms_iSavedNumMirrorZones;
+            ms_iSavedNumMirrorZones = 0;
+
+            // Recreate render buffers
+            bResetMirror = true;
+        }
+    }
 }
 
 

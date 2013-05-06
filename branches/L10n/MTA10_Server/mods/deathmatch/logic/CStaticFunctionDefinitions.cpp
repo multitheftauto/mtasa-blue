@@ -4068,6 +4068,9 @@ bool CStaticFunctionDefinitions::WarpPedIntoVehicle ( CPed* pPed, CVehicle* pVeh
                     VehiclePlayerArguments.PushBoolean ( false );
                 pVehicle->CallEvent ( "onVehicleEnter", VehiclePlayerArguments );
 
+                // Used to check if f.e. lua changed the player's vehicle (fix for #7570)
+                pVehicle->m_bOccupantChanged = true;
+
                 return true;
             }
         }

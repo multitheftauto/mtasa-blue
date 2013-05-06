@@ -242,6 +242,7 @@ public:
     bool                        IsDead                      ( void );
     void                        Kill                        ( eWeaponType weaponType, unsigned char ucBodypart, bool bStealth = false, bool bSetDirectlyDead = false, AssocGroupId animGroup = 0, AnimationId animID = 15 );
     void                        StealthKill                 ( CClientPed * pPed );
+    void                        BeHit                       ( CClientPed* pClientPedAttacker, ePedPieceTypes hitBodyPart, int hitBodySide, int weaponId );
 
     inline int                  GetRespawnState             ( void )                                    { return m_pRespawnState; };
     inline void                 SetRespawnState             ( int iRespawnState )                       { m_pRespawnState = iRespawnState; };

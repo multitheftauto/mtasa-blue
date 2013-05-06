@@ -758,12 +758,21 @@ void COMMAND_ShowSyncData ( const char* szCmdLine )
     }
 }
 
-void COMMAND_VoicePushToTalk ( const char* szCmdLine)
+void COMMAND_VoicePushToTalk ( const char* szCmdLine )
 {
     if ( g_pClientGame->GetVoiceRecorder()->IsEnabled() )
         g_pClientGame->GetVoiceRecorder()-> UpdatePTTState ( atoi(szCmdLine) );
     else
         g_pCore->GetConsole ()->Print ( "voiceptt: This server does not have voice enabled" );
+}
+
+void COMMAND_ServerInfo ( const char* szCmdLine )
+{
+    SString strSpacer;
+    strSpacer.insert( 0, 80, '-' );
+    g_pCore->GetConsole ()->Print ( *strSpacer );
+    g_pClientGame->OutputServerInfo();
+    g_pCore->GetConsole ()->Print ( *strSpacer );
 }
 
 #if defined (MTA_DEBUG) || defined (MTA_BETA)

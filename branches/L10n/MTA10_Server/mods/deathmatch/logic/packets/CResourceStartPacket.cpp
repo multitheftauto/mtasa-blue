@@ -65,6 +65,10 @@ bool CResourceStartPacket::Write ( NetBitStreamInterface& BitStream ) const
             BitStream.WriteString ( m_pResource->GetMinServerReqFromMetaXml () );
             BitStream.WriteString ( m_pResource->GetMinClientReqFromMetaXml () );
         }
+        if ( BitStream.Version () >= 0x45 )
+        {
+            BitStream.WriteBit ( m_pResource->IsOOPEnabledInMetaXml ( ) );
+        }
 
         // Send the resource files info
         list < CResourceFile* > ::iterator iter = m_pResource->IterBegin();

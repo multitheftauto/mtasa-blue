@@ -82,6 +82,13 @@ public:
         STATUS_JOINED,
     };
 
+    enum eServerType
+    {
+        SERVER_TYPE_NORMAL,
+        SERVER_TYPE_LOCAL,
+        SERVER_TYPE_EDITOR,
+    };
+
     enum
     {
         WASTED_DIED,
@@ -175,6 +182,7 @@ public:
         GLITCH_FASTMOVE,
         GLITCH_CROUCHBUG,
         GLITCH_CLOSEDAMAGE,
+        GLITCH_HITANIM,
         NUM_GLITCHES
     };
     class CStoredWeaponSlot
@@ -208,9 +216,9 @@ public:
                                         CClientGame                     ( bool bLocalPlay = false );
                                         ~CClientGame                    ( void );
 
-    bool                                StartGame                       ( const char* szNick, const char* szPassword );
-    bool                                StartLocalGame                  ( const char* szConfig, const char* szPassword = NULL );
-    void                                SetupLocalGame                  ( const char* szConfig );
+    bool                                StartGame                       ( const char* szNick, const char* szPassword, eServerType Type = SERVER_TYPE_NORMAL );
+    bool                                StartLocalGame                  ( eServerType Type, const char* szPassword = NULL );
+    void                                SetupLocalGame                  ( eServerType Type );
     //bool                                StartGame                       ( void );
     inline bool                         IsLocalGame                     ( ) const { return m_bLocalPlay; }
     bool                                OnCancelLocalGameClick          ( CGUIElement* pElement );
@@ -408,6 +416,7 @@ public:
     SString                             GetHTTPURL                      ( void ) { return m_strHTTPDownloadURL; };
     void                                ProjectileInitiateHandler       ( CClientProjectile * pProjectile );
     void                                IdleHandler                     ( void );
+    void                                OutputServerInfo                ( void );
 
 private:
 
@@ -486,6 +495,7 @@ private:
     static void                         StaticGameModelRemoveHandler        ( ushort usModelId );
     static void                         StaticWorldSoundHandler         ( uint uiGroup, uint uiIndex );
     static void                         StaticGameEntityRenderHandler   ( CEntitySAInterface* pEntity );
+    static void                         StaticTaskSimpleBeHitHandler    ( CPedSAInterface* pPedAttacker, ePedPieceTypes hitBodyPart, int hitBodySide, int weaponId );
 
     bool                                DamageHandler                   ( CPed* pDamagePed, CEventDamage * pEvent );
     void                                FireHandler                     ( CFire* pFire );
@@ -508,6 +518,7 @@ private:
     void                                GamePlayerDestructHandler       ( CEntitySAInterface* pPlayer );
     void                                GameModelRemoveHandler          ( ushort usModelId );
     void                                WorldSoundHandler               ( uint uiGroup, uint uiIndex );
+    void                                TaskSimpleBeHitHandler          ( CPedSAInterface* pPedAttacker, ePedPieceTypes hitBodyPart, int hitBodySide, int weaponId );
 
     static bool                         StaticProcessMessage            ( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
     bool                                ProcessMessage                  ( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
@@ -540,6 +551,7 @@ public:
 
 private:
     eStatus                             m_Status;
+    eServerType                         m_ServerType;
     unsigned long                       m_ulTimeStart;
     unsigned long                       m_ulVerifyTimeStart;
     unsigned long                       m_ulLastClickTick;
@@ -744,6 +756,7 @@ private:
 
     SVehExtrapolateSettings             m_VehExtrapolateSettings;
     uint                                m_uiAltPulseOrderCounter;
+    SString                             m_strACInfo;
 };
 
 extern CClientGame* g_pClientGame;

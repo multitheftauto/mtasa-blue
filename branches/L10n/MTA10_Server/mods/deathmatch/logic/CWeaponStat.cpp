@@ -11,6 +11,8 @@
 
 #include "StdInc.h"
 
+uint CWeaponStat::ms_uiAllWeaponStatsRevision = 0;
+
 CWeaponStat::CWeaponStat ( eWeaponType weaponType, eWeaponSkill skillLevel )
 {
     this->weaponType = weaponType;
@@ -38,10 +40,12 @@ eWeaponSkill CWeaponStat::GetWeaponSkillLevel ()
 
 void CWeaponStat::SetWeaponType ( eWeaponType weaponType )
 {
+    ms_uiAllWeaponStatsRevision++;
     this->weaponType = weaponType;
 }
 
 void CWeaponStat::SetWeaponSkillLevel ( eWeaponSkill skillLevel )
 {
+    ms_uiAllWeaponStatsRevision++;
     this->skillLevel = skillLevel;
 }

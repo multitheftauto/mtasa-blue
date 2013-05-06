@@ -39,12 +39,8 @@ int CLuaFxDefs::fxAddBlood ( lua_State* luaVM )
     float fBrightness = 1.0f;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadNumber ( vecPosition.fX );
-    argStream.ReadNumber ( vecPosition.fY );
-    argStream.ReadNumber ( vecPosition.fZ );
-    argStream.ReadNumber ( vecDirection.fX );
-    argStream.ReadNumber ( vecDirection.fY );
-    argStream.ReadNumber ( vecDirection.fZ );
+    argStream.ReadVector3D ( vecPosition );
+    argStream.ReadVector3D ( vecDirection );
     argStream.ReadNumber ( iCount, 1 );
     argStream.ReadNumber ( fBrightness, 1.0f );
 
@@ -74,12 +70,8 @@ int CLuaFxDefs::fxAddWood ( lua_State* luaVM )
     float fBrightness = 1.0f;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadNumber ( vecPosition.fX );
-    argStream.ReadNumber ( vecPosition.fY );
-    argStream.ReadNumber ( vecPosition.fZ );
-    argStream.ReadNumber ( vecDirection.fX );
-    argStream.ReadNumber ( vecDirection.fY );
-    argStream.ReadNumber ( vecDirection.fZ );
+    argStream.ReadVector3D ( vecPosition );
+    argStream.ReadVector3D ( vecDirection );
     argStream.ReadNumber ( iCount, 1 );
     argStream.ReadNumber ( fBrightness, 1.0f );
 
@@ -114,17 +106,11 @@ int CLuaFxDefs::fxAddSparks ( lua_State* luaVM )
     float fLife = 1.0f;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadNumber ( vecPosition.fX );
-    argStream.ReadNumber ( vecPosition.fY );
-    argStream.ReadNumber ( vecPosition.fZ );
-    argStream.ReadNumber ( vecDirection.fX );
-    argStream.ReadNumber ( vecDirection.fY );
-    argStream.ReadNumber ( vecDirection.fZ );
+    argStream.ReadVector3D ( vecPosition );
+    argStream.ReadVector3D ( vecDirection );
     argStream.ReadNumber ( fForce, 1.0f );
     argStream.ReadNumber ( iCount, 1 );
-    argStream.ReadNumber ( vecAcrossLine.fX, 0 );
-    argStream.ReadNumber ( vecAcrossLine.fY, 0 );
-    argStream.ReadNumber ( vecAcrossLine.fZ, 0 );
+    argStream.ReadVector3D ( vecAcrossLine, vecAcrossLine );
     argStream.ReadBool ( bBlur, false );
     argStream.ReadNumber ( fSpread, 1.0f );
     argStream.ReadNumber ( fLife, 1.0f );
@@ -155,12 +141,8 @@ int CLuaFxDefs::fxAddTyreBurst ( lua_State* luaVM )
     float fBrightness = 1.0f;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadNumber ( vecPosition.fX );
-    argStream.ReadNumber ( vecPosition.fY );
-    argStream.ReadNumber ( vecPosition.fZ );
-    argStream.ReadNumber ( vecDirection.fX );
-    argStream.ReadNumber ( vecDirection.fY );
-    argStream.ReadNumber ( vecDirection.fZ );
+    argStream.ReadVector3D ( vecPosition );
+    argStream.ReadVector3D ( vecDirection );
 
     if ( !argStream.HasErrors ( ) )
     {
@@ -190,12 +172,8 @@ int CLuaFxDefs::fxAddBulletImpact ( lua_State* luaVM )
     float fSmokeIntensity = 1.0f;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadNumber ( vecPosition.fX );
-    argStream.ReadNumber ( vecPosition.fY );
-    argStream.ReadNumber ( vecPosition.fZ );
-    argStream.ReadNumber ( vecDirection.fX );
-    argStream.ReadNumber ( vecDirection.fY );
-    argStream.ReadNumber ( vecDirection.fZ );
+    argStream.ReadVector3D ( vecPosition );
+    argStream.ReadVector3D ( vecDirection );
     argStream.ReadNumber ( iSmokeSize, 1 );
     argStream.ReadNumber ( iSparkCount, 1 );
     argStream.ReadNumber ( fSmokeIntensity, 1.0f );
@@ -225,12 +203,8 @@ int CLuaFxDefs::fxAddPunchImpact ( lua_State* luaVM )
     CVector vecPosition, vecDirection;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadNumber ( vecPosition.fX );
-    argStream.ReadNumber ( vecPosition.fY );
-    argStream.ReadNumber ( vecPosition.fZ );
-    argStream.ReadNumber ( vecDirection.fX );
-    argStream.ReadNumber ( vecDirection.fY );
-    argStream.ReadNumber ( vecDirection.fZ );
+    argStream.ReadVector3D ( vecPosition );
+    argStream.ReadVector3D ( vecDirection );
 
     if ( !argStream.HasErrors ( ) )
     {
@@ -264,9 +238,7 @@ int CLuaFxDefs::fxAddDebris ( lua_State* luaVM )
     int iCount = 1;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadNumber ( vecPosition.fX );
-    argStream.ReadNumber ( vecPosition.fY );
-    argStream.ReadNumber ( vecPosition.fZ );
+    argStream.ReadVector3D ( vecPosition );
     argStream.ReadNumber ( rwColor.r, 255 );
     argStream.ReadNumber ( rwColor.g, 0 );
     argStream.ReadNumber ( rwColor.b, 0 );
@@ -306,9 +278,7 @@ int CLuaFxDefs::fxAddGlass ( lua_State* luaVM )
     int iCount = 1;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadNumber ( vecPosition.fX );
-    argStream.ReadNumber ( vecPosition.fY );
-    argStream.ReadNumber ( vecPosition.fZ );
+    argStream.ReadVector3D ( vecPosition );
     argStream.ReadNumber ( rwColor.r, 255 );
     argStream.ReadNumber ( rwColor.g, 0 );
     argStream.ReadNumber ( rwColor.b, 0 );
@@ -341,9 +311,7 @@ int CLuaFxDefs::fxAddWaterHydrant ( lua_State* luaVM )
     CVector vecPosition;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadNumber ( vecPosition.fX );
-    argStream.ReadNumber ( vecPosition.fY );
-    argStream.ReadNumber ( vecPosition.fZ );
+    argStream.ReadVector3D ( vecPosition );
 
     if ( !argStream.HasErrors ( ) )
     {
@@ -371,12 +339,8 @@ int CLuaFxDefs::fxAddGunshot ( lua_State* luaVM )
     bool bIncludeSparks = true;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadNumber ( vecPosition.fX );
-    argStream.ReadNumber ( vecPosition.fY );
-    argStream.ReadNumber ( vecPosition.fZ );
-    argStream.ReadNumber ( vecDirection.fX );
-    argStream.ReadNumber ( vecDirection.fY );
-    argStream.ReadNumber ( vecDirection.fZ );
+    argStream.ReadVector3D ( vecPosition );
+    argStream.ReadVector3D ( vecDirection );
     argStream.ReadBool ( bIncludeSparks, true );
 
     if ( !argStream.HasErrors ( ) )
@@ -404,12 +368,8 @@ int CLuaFxDefs::fxAddTankFire ( lua_State* luaVM )
     CVector vecPosition, vecDirection;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadNumber ( vecPosition.fX );
-    argStream.ReadNumber ( vecPosition.fY );
-    argStream.ReadNumber ( vecPosition.fZ );
-    argStream.ReadNumber ( vecDirection.fX );
-    argStream.ReadNumber ( vecDirection.fY );
-    argStream.ReadNumber ( vecDirection.fZ );
+    argStream.ReadVector3D ( vecPosition );
+    argStream.ReadVector3D ( vecDirection );
 
     if ( !argStream.HasErrors ( ) )
     {
@@ -435,9 +395,7 @@ int CLuaFxDefs::fxAddWaterSplash ( lua_State* luaVM )
     // Verify types
     CVector vecPosition;
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadNumber ( vecPosition.fX );
-    argStream.ReadNumber ( vecPosition.fY );
-    argStream.ReadNumber ( vecPosition.fZ );
+    argStream.ReadVector3D ( vecPosition );
 
     if ( !argStream.HasErrors ( ) )
     {
@@ -463,9 +421,7 @@ int CLuaFxDefs::fxAddBulletSplash ( lua_State* luaVM )
     CVector vecPosition;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadNumber ( vecPosition.fX );
-    argStream.ReadNumber ( vecPosition.fY );
-    argStream.ReadNumber ( vecPosition.fZ );
+    argStream.ReadVector3D ( vecPosition );
 
     if ( !argStream.HasErrors ( ) )
     {
@@ -491,9 +447,7 @@ int CLuaFxDefs::fxAddFootSplash ( lua_State* luaVM )
     CVector vecPosition;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadNumber ( vecPosition.fX );
-    argStream.ReadNumber ( vecPosition.fY );
-    argStream.ReadNumber ( vecPosition.fZ );
+    argStream.ReadVector3D ( vecPosition );
 
     if ( !argStream.HasErrors ( ) )
     {

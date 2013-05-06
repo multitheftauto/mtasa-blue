@@ -130,8 +130,8 @@ CClientVehicle::CClientVehicle ( CClientManager* pManager, ElementID ID, unsigne
     m_bIsDerailable = true;
     m_bTrainDirection = false;
     m_fTrainSpeed = 0.0f;
-    m_fTrainPosition = 0.0f;
-    m_ucTrackID = 0;
+    m_fTrainPosition = -1.0f;
+    m_ucTrackID = -1;
     m_bTaxiLightOn = false;
     m_vecGravity = CVector ( 0.0f, 0.0f, -1.0f );
     m_HeadLightColor = SColorRGBA ( 255, 255, 255, 255 );
@@ -534,6 +534,9 @@ void CClientVehicle::SetMoveSpeed ( const CVector& vecMoveSpeed )
             m_pVehicle->SetMoveSpeed ( const_cast < CVector* > ( &vecMoveSpeed ) );
         }
         m_vecMoveSpeed = vecMoveSpeed;
+
+        if ( IsFrozenWaitingForGroundToLoad() )
+            m_vecWaitingForGroundSavedMoveSpeed = vecMoveSpeed;
     }
 }
 
@@ -564,6 +567,9 @@ void CClientVehicle::SetTurnSpeed ( const CVector& vecTurnSpeed )
             m_pVehicle->SetTurnSpeed ( const_cast < CVector* > ( &vecTurnSpeed ) );
         }
         m_vecTurnSpeed = vecTurnSpeed;
+
+        if ( IsFrozenWaitingForGroundToLoad() )
+            m_vecWaitingForGroundSavedTurnSpeed = vecTurnSpeed;
     }
 }
 
@@ -1842,10 +1848,19 @@ void CClientVehicle::SetFrozenWaitingForGroundToLoad ( bool bFrozen )
                 m_vecMoveSpeed = vecTemp;
                 m_vecTurnSpeed = vecTemp;
             }
+            m_vecWaitingForGroundSavedMoveSpeed = vecTemp;
+            m_vecWaitingForGroundSavedTurnSpeed = vecTemp;
         }
         else
         {
             g_pGame->SuspendASyncLoading ( false );
+            m_vecMoveSpeed = m_vecWaitingForGroundSavedMoveSpeed;
+            m_vecTurnSpeed = m_vecWaitingForGroundSavedTurnSpeed;
+            if ( m_pVehicle )
+            {
+                m_pVehicle->SetMoveSpeed ( &m_vecMoveSpeed );
+                m_pVehicle->SetTurnSpeed ( &m_vecTurnSpeed );
+            }
         }
     }
 }
@@ -2011,7 +2026,7 @@ uchar CClientVehicle::GetTrainTrack ( void )
 
 void CClientVehicle::SetTrainTrack ( uchar ucTrack )
 {
-    if ( m_pVehicle && GetVehicleType() == CLIENTVEHICLE_TRAIN  )
+    if ( m_pVehicle && GetVehicleType() == CLIENTVEHICLE_TRAIN )
     {
         m_pVehicle->SetRailTrack ( ucTrack );
     }
@@ -2373,8 +2388,14 @@ void CClientVehicle::Create ( void )
             m_pVehicle->SetDerailable ( m_bIsDerailable );
             m_pVehicle->SetTrainDirection ( m_bTrainDirection );
             m_pVehicle->SetTrainSpeed ( m_fTrainSpeed );
-            m_pVehicle->SetTrainPosition ( m_fTrainPosition );
-            m_pVehicle->SetRailTrack ( m_ucTrackID );
+            if ( m_fTrainPosition >= 0 )
+            {
+                m_pVehicle->SetTrainPosition ( m_fTrainPosition );
+            }
+            if ( m_ucTrackID >= 0 )
+            {
+                m_pVehicle->SetRailTrack ( m_ucTrackID );
+            }
         }
 
         m_pVehicle->SetOverrideLights ( m_ucOverrideLights );
