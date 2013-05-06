@@ -131,11 +131,6 @@ void CSimPlayerManager::UpdateSimPlayer ( CPlayer* pPlayer, const std::set < CPl
     //
     CVehicle* pVehicle = pPlayer->GetOccupiedVehicle ();
 
-    // Work out our weapon range.
-    eWeaponType eWeapon = static_cast < eWeaponType > ( pPlayer->GetWeaponType ( ) );
-    float fSkill = pPlayer->GetPlayerStat ( CWeaponStatManager::GetSkillStatIndex ( eWeapon ) );
-    float fWeaponRange = g_pGame->GetWeaponStatManager ( )->GetWeaponRangeFromSkillLevel ( eWeapon, fSkill );
-
     pSim->m_iStatus                 = pPlayer->GetStatus ();
     pSim->m_usBitStreamVersion      = pPlayer->GetBitStreamVersion ();
     pSim->m_bHasOccupiedVehicle     = pVehicle != NULL;
@@ -145,7 +140,7 @@ void CSimPlayerManager::UpdateSimPlayer ( CPlayer* pPlayer, const std::set < CPl
     pSim->m_usVehicleModel          = pVehicle ? pVehicle->GetModel () : 0;
     pSim->m_ucSyncTimeContext       = pPlayer->GetSyncTimeContext ();
     pSim->m_ucOccupiedVehicleSeat   = pPlayer->GetOccupiedVehicleSeat ();
-    pSim->m_fWeaponRange            = fWeaponRange;
+    pSim->m_fWeaponRange            = pPlayer->GetWeaponRangeFromSlot();
     pSim->m_bVehicleHasHydraulics   = pVehicle ? pVehicle->GetUpgrades ()->HasUpgrade ( 1087 ) : false;
     pSim->m_bVehicleIsPlaneOrHeli   = pVehicle ? pVehicle->GetVehicleType () == VEHICLE_PLANE || pVehicle->GetVehicleType () == VEHICLE_HELI : false;
     pSim->m_sharedControllerState.Copy ( pPlayer->GetPad ()->GetCurrentControllerState () );
