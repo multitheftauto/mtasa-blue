@@ -2001,10 +2001,14 @@ void CGame::Packet_PlayerTimeout ( CPlayerTimeoutPacket& Packet )
 // Relay this (pure sync) packet to all the other players using distance rules
 void CGame::RelayPlayerPuresync ( CPacket& Packet )
 {
-    UpdateModuleTickCount64 ();
+    // Only need to do this once every 8 calls
+    static uint uiUpdateCounter = 0;
+    if ( ( ++uiUpdateCounter & 7 ) == 0 )
+        UpdateModuleTickCount64 ();
 
     // Make a list of players to send this packet to
-    std::vector < CPlayer* > sendList;
+    static std::vector < CPlayer* > sendList;   // static to help reduce memory allocations
+    sendList.clear();
     bool bUseSimSendList = CSimControl::IsSimSystemEnabled ();
 
     CPlayer* pPlayer = Packet.GetSourcePlayer ();
@@ -2042,7 +2046,8 @@ void CGame::RelayPlayerPuresync ( CPacket& Packet )
         SViewerMapType& nearList = pPlayer->GetNearPlayerList ();
 
         // Array for holding players that need moving to the puresync far list
-        std::vector < CPlayer* > moveToFarListList;
+        static std::vector < CPlayer* > moveToFarListList;   // static to help reduce memory allocations
+        moveToFarListList.clear();
 
         // For each puresync near player
         for ( SViewerMapType ::iterator it = nearList.begin (); it != nearList.end (); ++it )
@@ -2093,6 +2098,7 @@ void CGame::RelayPlayerPuresync ( CPacket& Packet )
                             // If in sim list, sim send has already been done.
                             // So don't send here as well - Just remove from sim list
                             MapRemove ( pPlayer->m_PureSyncSimSendList, pSendPlayer );
+                            pPlayer->m_bPureSyncSimSendListDirty = true;
                             nearInfo.bInPureSyncSimSendList = false;
                         }
                     }
@@ -2109,6 +2115,7 @@ void CGame::RelayPlayerPuresync ( CPacket& Packet )
 
                             // and add it to sim list for next time
                             MapInsert ( pPlayer->m_PureSyncSimSendList, pSendPlayer );
+                            pPlayer->m_bPureSyncSimSendListDirty = true;
                             nearInfo.bInPureSyncSimSendList = true;
                         }
                     }
@@ -2135,7 +2142,7 @@ void CGame::RelayPlayerPuresync ( CPacket& Packet )
 
     CLOCK( "RelayPlayerPuresync", "UpdatePuresyncSimPlayer" );
     // Update sim data
-    CSimControl::UpdatePuresyncSimPlayer ( pPlayer, pPlayer->m_PureSyncSimSendList, &pPlayer->m_KeySyncSimSendList, &pPlayer->m_BulletSyncSimSendList );
+    CSimControl::UpdateSimPlayer ( pPlayer );
     UNCLOCK( "RelayPlayerPuresync", "UpdatePuresyncSimPlayer" );
 }
 
@@ -2271,69 +2278,9 @@ void CGame::Packet_Keysync ( CKeysyncPacket& Packet )
     if ( pPlayer && pPlayer->IsJoined () )
     {
         // Relay to other players
-        RelayKeysync ( Packet );
+        RelayNearbyPacket ( Packet );
     }
 }
-
-
-// Relay this (key sync) packet to other players using distance rules
-void CGame::RelayKeysync ( CPacket& Packet )
-{
-    // Make a list of players to send this packet to
-    std::vector < CPlayer* > sendList;
-    bool bUseSimSendList = CSimControl::IsSimSystemEnabled ();
-
-    CPlayer* pPlayer = Packet.GetSourcePlayer ();
-
-    //
-    // Process near sync
-    //
-    {
-        // Update list of players who need the packet
-        pPlayer->MaybeUpdateOthersNearList ();
-
-        // Use this players keysync near list for sending packets
-        SViewerMapType& nearList = pPlayer->GetNearPlayerList ();
-
-        // For each keysync near player
-        for ( SViewerMapType ::iterator it = nearList.begin (); it != nearList.end (); ++it )
-        {
-            CPlayer* pSendPlayer = it->first;
-            if ( !bUseSimSendList )
-            {
-                // Standard sending
-                sendList.push_back ( pSendPlayer );
-            }
-            else
-            {
-                SViewerInfo& nearInfo = it->second;
-                dassert ( MapContains ( pPlayer->m_KeySyncSimSendList, pSendPlayer ) == nearInfo.bInKeySyncSimSendList );
-
-                //
-                // Sim sync relays key sync packets to the other player when he is near
-                // Enabling/disabling sim keysync will only take effect for the next key sync packet, so:
-                //
-                if ( !nearInfo.bInKeySyncSimSendList )
-                {
-                    // If not in sim send list yet, do send here
-                    sendList.push_back ( pSendPlayer );
-
-                    // and add it to sim send list for next time
-                    MapInsert ( pPlayer->m_KeySyncSimSendList, pSendPlayer );
-                    nearInfo.bInKeySyncSimSendList = true;
-                }
-            }
-        }
-    }
-
-    // Relay packet
-    if ( !sendList.empty () )
-        CPlayerManager::Broadcast ( Packet, sendList );
-
-    // Update sim data
-    CSimControl::UpdateKeysyncSimPlayer ( pPlayer, pPlayer->m_KeySyncSimSendList );
-}
-
 
 void CGame::Packet_Bulletsync ( CBulletsyncPacket& Packet )
 {
@@ -2342,7 +2289,7 @@ void CGame::Packet_Bulletsync ( CBulletsyncPacket& Packet )
     if ( pPlayer && pPlayer->IsJoined () )
     {
         // Relay to other players
-        RelayBulletsync ( Packet );
+        RelayNearbyPacket ( Packet );
     }
 }
 
@@ -2372,16 +2319,18 @@ void CGame::Packet_PedTask ( CPedTaskPacket& Packet )
     if ( pPlayer && pPlayer->IsJoined () )
     {
         // Relay to other players
-        RelayPedTask ( Packet );
+        RelayNearbyPacket ( Packet );
     }
 }
 
 
-// Relay this (ped task) packet to other players using distance rules
-void CGame::RelayPedTask ( CPacket& Packet )
+// Relay this packet to other nearby players
+void CGame::RelayNearbyPacket ( CPacket& Packet )
 {
     // Make a list of players to send this packet to
-    std::vector < CPlayer* > sendList;
+    static std::vector < CPlayer* > sendList;   // static to help reduce memory allocations
+    sendList.clear();
+    bool bUseSimSendList = CSimControl::IsSimSystemEnabled () && Packet.HasSimHandler();
 
     CPlayer* pPlayer = Packet.GetSourcePlayer ();
 
@@ -2392,44 +2341,10 @@ void CGame::RelayPedTask ( CPacket& Packet )
         // Update list of players who need the packet
         pPlayer->MaybeUpdateOthersNearList ();
 
-        // Use this players bulletsync near list for sending packets
+        // Use this player's near list for sending packets
         SViewerMapType& nearList = pPlayer->GetNearPlayerList ();
 
-        // For each bulletsync near player
-        for ( SViewerMapType ::iterator it = nearList.begin (); it != nearList.end (); ++it )
-        {
-            CPlayer* pSendPlayer = it->first;
-            // Standard sending
-            sendList.push_back ( pSendPlayer );
-        }
-    }
-
-    // Relay packet
-    if ( !sendList.empty () )
-        CPlayerManager::Broadcast ( Packet, sendList );
-}
-
-
-// Relay this (bullet sync) packet to other players using distance rules
-void CGame::RelayBulletsync ( CPacket& Packet )
-{
-    // Make a list of players to send this packet to
-    std::vector < CPlayer* > sendList;
-    bool bUseSimSendList = CSimControl::IsSimSystemEnabled ();
-
-    CPlayer* pPlayer = Packet.GetSourcePlayer ();
-
-    //
-    // Process near sync
-    //
-    {
-        // Update list of players who need the packet
-        pPlayer->MaybeUpdateOthersNearList ();
-
-        // Use this players bulletsync near list for sending packets
-        SViewerMapType& nearList = pPlayer->GetNearPlayerList ();
-
-        // For each bulletsync near player
+        // For each near player
         for ( SViewerMapType ::iterator it = nearList.begin (); it != nearList.end (); ++it )
         {
             CPlayer* pSendPlayer = it->first;
@@ -2440,21 +2355,13 @@ void CGame::RelayBulletsync ( CPacket& Packet )
             }
             else
             {
-                SViewerInfo& nearInfo = it->second;
-                dassert ( MapContains ( pPlayer->m_BulletSyncSimSendList, pSendPlayer ) == nearInfo.bInBulletSyncSimSendList  );
+                const SViewerInfo& nearInfo = it->second;
+                dassert ( MapContains ( pPlayer->m_PureSyncSimSendList, pSendPlayer ) == nearInfo.bInPureSyncSimSendList  );
 
-                //
-                // Sim sync relays bullet sync packets to the other player when he is near
-                // Enabling/disabling sim bulletsync will only take effect for the next bullet sync packet, so:
-                //
-                if ( !nearInfo.bInBulletSyncSimSendList )
+                if ( !nearInfo.bInPureSyncSimSendList )
                 {
-                    // If not in sim send list yet, do send here
+                    // If not in sim send list, do send here
                     sendList.push_back ( pSendPlayer );
-
-                    // and add it to sim send list for next time
-                    MapInsert ( pPlayer->m_BulletSyncSimSendList, pSendPlayer );
-                    nearInfo.bInBulletSyncSimSendList = true;
                 }
             }
         }
@@ -2463,9 +2370,6 @@ void CGame::RelayBulletsync ( CPacket& Packet )
     // Relay packet
     if ( !sendList.empty () )
         CPlayerManager::Broadcast ( Packet, sendList );
-
-    // Update sim data
-    CSimControl::UpdateBulletsyncSimPlayer ( pPlayer, pPlayer->m_BulletSyncSimSendList );
 }
 
 
@@ -4261,6 +4165,9 @@ SString CGame::CalculateMinClientRequirement ( void )
                 CLogger::LogPrintf ( SString ( "Forced %d player(s) to reconnect so they can update to %s\n", uiNumIncompatiblePlayers, *strKickMin ) );
         }
     }
+
+    // Also seems a good place to keep this setting synchronized
+    g_pBandwidthSettings->NotifyBulletSyncEnabled( g_pGame->IsBulletSyncActive() );
 
 #ifndef MTA_DEBUG
     if ( strNewMin < RELEASE_MIN_CLIENT_VERSION )

@@ -16,7 +16,7 @@ public:
     // Main thread methods
     void            AddSimPlayer            ( CPlayer* pPlayer );
     void            RemoveSimPlayer         ( CPlayer* pPlayer );
-    void            UpdateSimPlayer         ( CPlayer* pPlayer, const std::set < CPlayer* >* pPuresyncSendList, const std::set < CPlayer* >* pKeysyncSendList, const std::set < CPlayer* >* pBulletsyncSendList );
+    void            UpdateSimPlayer         ( CPlayer* pPlayer );
 
     // Any thread methods
     void            LockSimSystem           ( void );
