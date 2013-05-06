@@ -219,6 +219,7 @@ public:
     virtual void                GetRwResourceStats          ( SRwResourceStats& outStats );
     virtual void                GetClothesCacheStats        ( SClothesCacheStats& outStats );
     virtual void                SetIsMinimizedAndNotConnected ( bool bIsMinimizedAndNotConnected );
+    virtual void                SetMirrorsEnabled           ( bool bEnabled );
 
     CVector                     m_vecAkimboTarget;
     bool                        m_bAkimboTargetUp;

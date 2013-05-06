@@ -1013,6 +1013,7 @@ void CCore::UpdateIsWindowMinimized ( void )
     m_bIsWindowMinimized = IsIconic ( GetHookedWindow () ) ? true : false;
     // Update CPU saver for when minimized and not connected
     g_pCore->GetMultiplayer ()->SetIsMinimizedAndNotConnected ( m_bIsWindowMinimized && !IsConnected () );
+    g_pCore->GetMultiplayer ()->SetMirrorsEnabled ( !m_bIsWindowMinimized );
 
     // Enable timer if not connected at least once
     bool bEnableTimer = !m_bGettingIdleCallsFromMultiplayer;
