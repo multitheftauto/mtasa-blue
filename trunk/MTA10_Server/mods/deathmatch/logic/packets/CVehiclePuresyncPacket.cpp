@@ -311,11 +311,8 @@ bool CVehiclePuresyncPacket::Read ( NetBitStreamInterface& BitStream )
                 pSourcePlayer->SetWeaponSlot ( slot.data.uiSlot );
 
                 if ( flags.data.bIsDoingGangDriveby && CWeaponNames::DoesSlotHaveAmmo ( slot.data.uiSlot ) )
-                {
-                    
-                    eWeaponType eWeapon = static_cast < eWeaponType > ( pSourcePlayer->GetWeaponType ( slot.data.uiSlot ) );
-                    float fSkill = pSourcePlayer->GetPlayerStat ( CWeaponStatManager::GetSkillStatIndex ( eWeapon ) );
-                    float fWeaponRange = g_pGame->GetWeaponStatManager ( )->GetWeaponRangeFromSkillLevel ( eWeapon, fSkill );
+                {      
+                    float fWeaponRange = pSourcePlayer->GetWeaponRangeFromSlot ( slot.data.uiSlot );
 
                     // Read the ammo states
                     SWeaponAmmoSync ammo ( pSourcePlayer->GetWeaponType (), pSourcePlayer->GetBitStreamVersion () >= 0x44, true );

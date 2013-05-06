@@ -1128,6 +1128,23 @@ void CPlayer::SetJackingVehicle ( CVehicle* pVehicle )
         m_pJackingVehicle->SetJackingPlayer ( this );
 }
 
+// Calculate weapon range using efficient stuffs
+float CPlayer::GetWeaponRangeFromSlot( uint uiSlot )
+{
+    eWeaponType eWeapon = static_cast < eWeaponType > ( GetWeaponType ( uiSlot ) );
+    float fSkill = GetPlayerStat ( CWeaponStatManager::GetSkillStatIndex ( eWeapon ) );
+
+    if ( fSkill != m_fWeaponRangeLastSkill || eWeapon != m_eWeaponRangeLastWeapon || CWeaponStat::GetAllWeaponStatsRevision() != m_uiWeaponRangeLastStatsRevision )
+    {
+        m_fWeaponRangeLastSkill = fSkill;
+        m_eWeaponRangeLastWeapon = eWeapon;
+        m_uiWeaponRangeLastStatsRevision = CWeaponStat::GetAllWeaponStatsRevision();
+        m_fWeaponRangeLast = g_pGame->GetWeaponStatManager ( )->GetWeaponRangeFromSkillLevel ( eWeapon, fSkill );       
+    }
+    return m_fWeaponRangeLast;
+}
+
+/////////////////////////////////////////////////////////////////
 // For NearList/FarList hash maps
 CPlayer* GetEmptyMapKey ( CPlayer** )
 {

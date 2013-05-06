@@ -278,6 +278,7 @@ public:
 
     CPlayerStatsPacket*                         GetPlayerStatsPacket        ( void )                        { return m_pPlayerStatsPacket; }
     void                                        SetPlayerStat               ( unsigned short usID, float fValue );
+    float                                       GetWeaponRangeFromSlot      ( uint uiSlot = 0xFF );
 
     CVehicle *                                  GetJackingVehicle           ( void )                        { return m_pJackingVehicle; }
     void                                        SetJackingVehicle           ( CVehicle * pVehicle );
@@ -461,6 +462,12 @@ private:
 
     CPlayerStatsPacket*                         m_pPlayerStatsPacket;
     CVehicle*                                   m_pJackingVehicle;
+
+    // Used to reduce calls when calculating weapon range
+    float                                       m_fWeaponRangeLast;
+    float                                       m_fWeaponRangeLastSkill;
+    eWeaponType                                 m_eWeaponRangeLastWeapon;
+    uint                                        m_uiWeaponRangeLastStatsRevision;
 };
 
 #endif
