@@ -135,6 +135,12 @@ public:
     virtual CRenderItemManagerInterface*   GetRenderItemManager  ( void ) = 0;
     virtual CScreenGrabberInterface*       GetScreenGrabber     ( void ) = 0;
     virtual CPixelsManagerInterface*       GetPixelsManager     ( void ) = 0;
+
+    // Transition between GTA and MTA controlled rendering
+    virtual void                            EnteringMTARenderZone       ( void ) = 0;
+    virtual void                            LeavingMTARenderZone        ( void ) = 0;
+    virtual void                            MaybeEnteringMTARenderZone  ( void ) = 0;
+    virtual void                            MaybeLeavingMTARenderZone   ( void ) = 0;
 };
 
 #endif

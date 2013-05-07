@@ -123,17 +123,7 @@ void CDirect3DEvents9::OnPresent ( IDirect3DDevice9 *pDevice )
         }
     }
 
-    // Create a state block.
-    IDirect3DStateBlock9 * pDeviceState = NULL;
-    pDevice->CreateStateBlock ( D3DSBT_ALL, &pDeviceState );
-
-    // Make sure linear sampling is enabled
-    pDevice->SetSamplerState ( 0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR );
-    pDevice->SetSamplerState ( 0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR );
-    pDevice->SetSamplerState ( 0, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR );
-
-    // Make sure stencil is off to avoid problems with flame effects
-    pDevice->SetRenderState ( D3DRS_STENCILENABLE, FALSE );
+    CGraphics::GetSingleton ().EnteringMTARenderZone();
 
     // Tell everyone that the zbuffer will need clearing before use
     CGraphics::GetSingleton ().OnZBufferModified ();
@@ -161,13 +151,8 @@ void CDirect3DEvents9::OnPresent ( IDirect3DDevice9 *pDevice )
     // Redraw the mouse cursor so it will always be over other elements
     CLocalGUI::GetSingleton().DrawMouseCursor();
 
-    // Restore the render states
-    if ( pDeviceState )
-    {
-        pDeviceState->Apply ( );
-        pDeviceState->Release ( );
-    }
-    
+    CGraphics::GetSingleton ().LeavingMTARenderZone();
+
     // End the scene that we started.
     pDevice->EndScene ();
 
