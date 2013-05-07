@@ -1371,3 +1371,130 @@ void CGraphics::OnChangingRenderTarget ( uint uiNewViewportSizeX, uint uiNewView
     // Inform tile batcher
     m_pTileBatcher->OnChangingRenderTarget ( uiNewViewportSizeX, uiNewViewportSizeY );
 }
+
+
+////////////////////////////////////////////////////////////////
+//
+// CGraphics::EnteringMTARenderZone
+//
+// Called when entering known areas of MTA rendering activity
+//
+////////////////////////////////////////////////////////////////
+void CGraphics::EnteringMTARenderZone( void )
+{
+    SaveGTARenderStates();
+    m_MTARenderZone = MTA_RZONE_MAIN;
+    m_iOutsideZoneCount = 0;
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// CGraphics::LeavingMTARenderZone
+//
+// Called when leaving known areas of MTA rendering activity
+//
+////////////////////////////////////////////////////////////////
+void CGraphics::LeavingMTARenderZone( void )
+{
+    RestoreGTARenderStates();
+    m_MTARenderZone = MTA_RZONE_NONE;
+    m_iOutsideZoneCount = 0;
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// CGraphics::MaybeEnteringMTARenderZone
+//
+// Should be called before MTA rendering activity, if there is a chance it will be outside the known areas
+//
+////////////////////////////////////////////////////////////////
+void CGraphics::MaybeEnteringMTARenderZone( void )
+{
+    if ( m_MTARenderZone == MTA_RZONE_OUTSIDE )
+    {
+        // Handle stacking if already outside
+        m_iOutsideZoneCount++;
+    }
+    else
+    if ( m_MTARenderZone == MTA_RZONE_NONE )
+    {
+        assert( !m_pSavedStateBlock );
+        assert( m_iOutsideZoneCount == 0 );
+
+        // Save states if moving from unknown area
+        SaveGTARenderStates();
+        m_iOutsideZoneCount = 1;
+        m_MTARenderZone = MTA_RZONE_OUTSIDE;
+    }
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// CGraphics::MaybeLeavingMTARenderZone
+//
+// Should be called sometime after MaybeEnteringMTARenderZone
+//
+////////////////////////////////////////////////////////////////
+void CGraphics::MaybeLeavingMTARenderZone( void )
+{
+    if ( m_MTARenderZone == MTA_RZONE_OUTSIDE )
+    {
+        // Handle unstacking multiple calls
+        m_iOutsideZoneCount--;
+        if ( m_iOutsideZoneCount == 0 )
+        {
+            // Do restore on final call
+            RestoreGTARenderStates();
+            m_MTARenderZone = MTA_RZONE_NONE;
+        }
+    }
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// CGraphics::SaveGTARenderStates
+//
+// Handle moving into MTA controlled rendering
+//
+////////////////////////////////////////////////////////////////
+void CGraphics::SaveGTARenderStates( void )
+{
+    SAFE_RELEASE( m_pSavedStateBlock );
+    // Create a state block.
+    m_pDevice->CreateStateBlock ( D3DSBT_ALL, &m_pSavedStateBlock );
+
+    // Make sure linear sampling is enabled
+    m_pDevice->SetSamplerState ( 0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR );
+    m_pDevice->SetSamplerState ( 0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR );
+    m_pDevice->SetSamplerState ( 0, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR );
+
+    // Make sure stencil is off to avoid problems with flame effects
+    m_pDevice->SetRenderState ( D3DRS_STENCILENABLE, FALSE );
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// CGraphics::RestoreGTARenderStates
+//
+// Handle moving out of MTA controlled rendering
+//
+////////////////////////////////////////////////////////////////
+void CGraphics::RestoreGTARenderStates( void )
+{
+    // Restore these transforms to fix various weird stuff
+    m_pDevice->SetTransform ( D3DTS_PROJECTION, &g_pDeviceState->TransformState.PROJECTION );
+    m_pDevice->SetTransform ( D3DTS_WORLD, &g_pDeviceState->TransformState.WORLD );
+    m_pDevice->SetTransform ( D3DTS_VIEW, &g_pDeviceState->TransformState.VIEW );
+
+    // Restore the render states
+    if ( m_pSavedStateBlock )
+    {
+        m_pSavedStateBlock->Apply ( );
+        SAFE_RELEASE( m_pSavedStateBlock );
+    }
+}

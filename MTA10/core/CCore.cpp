@@ -1876,31 +1876,11 @@ void CCore::OnPreFxRender ( void )
     if ( !CGraphics::GetSingleton ().HasMaterialLine3DQueueItems () )
         return;
 
-    IDirect3DDevice9* pDevice = CGraphics::GetSingleton ().GetDevice ();
-
-    // Create a state block.
-    IDirect3DStateBlock9 * pDeviceState = NULL;
-    pDevice->CreateStateBlock ( D3DSBT_ALL, &pDeviceState );
-    D3DXMATRIX matProjection;
-    pDevice->GetTransform ( D3DTS_PROJECTION, &matProjection );
-
-    // Make sure linear sampling is enabled
-    pDevice->SetSamplerState ( 0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR );
-    pDevice->SetSamplerState ( 0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR );
-    pDevice->SetSamplerState ( 0, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR );
-
-    // Make sure stencil is off to avoid problems with flame effects
-    pDevice->SetRenderState ( D3DRS_STENCILENABLE, FALSE );
+    CGraphics::GetSingleton ().EnteringMTARenderZone();
 
     CGraphics::GetSingleton ().DrawMaterialLine3DQueue ();
 
-    // Restore the render states
-    pDevice->SetTransform ( D3DTS_PROJECTION, &matProjection );
-    if ( pDeviceState )
-    {
-        pDeviceState->Apply ( );
-        pDeviceState->Release ( );
-    }
+    CGraphics::GetSingleton ().LeavingMTARenderZone();
 }
 
 
@@ -1914,19 +1894,7 @@ void CCore::OnPreHUDRender ( void )
     // Handle saving depth buffer
     CGraphics::GetSingleton ().GetRenderItemManager ()->SaveReadableDepthBuffer();
 
-    // Create a state block.
-    IDirect3DStateBlock9 * pDeviceState = NULL;
-    pDevice->CreateStateBlock ( D3DSBT_ALL, &pDeviceState );
-    D3DXMATRIX matProjection;
-    pDevice->GetTransform ( D3DTS_PROJECTION, &matProjection );
-
-    // Make sure linear sampling is enabled
-    pDevice->SetSamplerState ( 0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR );
-    pDevice->SetSamplerState ( 0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR );
-    pDevice->SetSamplerState ( 0, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR );
-
-    // Make sure stencil is off to avoid problems with flame effects
-    pDevice->SetRenderState ( D3DRS_STENCILENABLE, FALSE );
+    CGraphics::GetSingleton ().EnteringMTARenderZone();
 
     // Maybe capture screen and other stuff
     CGraphics::GetSingleton ().GetRenderItemManager ()->DoPulse ();
@@ -1946,13 +1914,7 @@ void CCore::OnPreHUDRender ( void )
     // Draw pre-GUI primitives
     CGraphics::GetSingleton ().DrawPreGUIQueue ();
 
-    // Restore the render states
-    pDevice->SetTransform ( D3DTS_PROJECTION, &matProjection );
-    if ( pDeviceState )
-    {
-        pDeviceState->Apply ( );
-        pDeviceState->Release ( );
-    }
+    CGraphics::GetSingleton ().LeavingMTARenderZone();
 }
 
 

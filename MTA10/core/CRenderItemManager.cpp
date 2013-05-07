@@ -518,14 +518,8 @@ bool CRenderItemManager::SaveDefaultRenderTarget ( void )
     SAFE_RELEASE ( pActiveD3DRenderTarget )
     SAFE_RELEASE ( pActiveD3DZStencilSurface )
 
-    // Set some render states in case called from outside onClientRender etc
-    // Make sure linear sampling is enabled
-    m_pDevice->SetSamplerState ( 0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR );
-    m_pDevice->SetSamplerState ( 0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR );
-    m_pDevice->SetSamplerState ( 0, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR );
-    // Make sure stencil is off to avoid problems with flame effects
-    m_pDevice->SetRenderState ( D3DRS_STENCILENABLE, FALSE );
-
+    // Do this in case dxSetRenderTarget is being called from some unexpected place
+    CGraphics::GetSingleton().MaybeEnteringMTARenderZone();
     return true;
 }
 
@@ -545,10 +539,8 @@ bool CRenderItemManager::RestoreDefaultRenderTarget ( void )
         ChangeRenderTarget ( m_uiDefaultViewportSizeX, m_uiDefaultViewportSizeY, m_pDefaultD3DRenderTarget, m_pDefaultD3DZStencilSurface );
         m_pDefaultD3DRenderTarget = NULL;
 
-        // Restore some render states in case called from outside onClientRender etc
-        m_pDevice->SetTransform ( D3DTS_PROJECTION, &g_pDeviceState->TransformState.PROJECTION );
-        m_pDevice->SetTransform ( D3DTS_WORLD, &g_pDeviceState->TransformState.WORLD );
-        m_pDevice->SetTransform ( D3DTS_VIEW, &g_pDeviceState->TransformState.VIEW );
+        // Do this in case dxSetRenderTarget is being called from some unexpected place
+        CGraphics::GetSingleton().MaybeLeavingMTARenderZone();
     }
 
     return true;
