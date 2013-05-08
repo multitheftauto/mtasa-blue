@@ -1,5 +1,140 @@
 Changelog for Multi Theft Auto
 
+Multi Theft Auto : San Andreas - 1.3.2
+======================================
+
+Goal: Improve 1.3.1 release.
+
+- 0007583: [General] Things what need testing in 1.4 before 1.3.2 can be released (ccw) - feedback.
+- 0007570: [Client] warpPedIntoVehicle after cancelEvent() of onVehicleStartEnter causes network trouble (Jusonex) - resolved.
+- 0007131: [Client] [REQUEST] client-side fetchRemote (ccw) - resolved.
+- 0007423: [Client] very slow streaming of Elements (ccw) - resolved.
+- 0007584: [Client] freeze deagle and shot (Shot hit animation sometimes doesn't work) (ccw) - resolved.
+- 0005950: [General] Turn off sounds when MTASA is minimized (ccw) - resolved.
+- 0007600: [Client] createVehicle no longer works in version 1.3.2 (ccw) - resolved.
+- 0007586: [Client] Replaced textures are loading incorrectly (ccw) - resolved.
+- 0007606: [Client] dxSetRenderTarget messes up all colors (ccw) - resolved.
+- 0007588: [Client] Mass crashes in very near area (ccw) - resolved.
+- 0007595: [Client] Admin panel customization window broken since 1.3.2 (Jusonex) - resolved.
+- 0007592: [Client] getVehicleUpgradeSlotName has broken (Jusonex) - resolved.
+- 0007436: [Client] Mouse sensitivity problem (ccw) - resolved.
+- 0007593: [Client] MTA freezes if you loose internet connection while connecting to a server (ccw) - resolved.
+- 0007471: [Client] Not recorded video in MTA:SA 1.3.1 via Mirillis Action! (ccw) - resolved.
+- 0006041: [Server] callRemote should return more informational error codes (ccw) - resolved.
+- 0007487: [Client] "getVehicleComponentPosition" returns only "0, 0, 0" for each component (Cazomino05) - resolved.
+- 0007579: [Client] Client crash after login and spawn on MTA:DayZ (ccw) - resolved.
+- 0007355: [Client] Shaders aren't applicable to skin model 0 (ccw) - resolved.
+- 0005839: [Synchronization] cj fat/muscle stats not resetting (ccw) - resolved.
+- 0007544: [Client] ignoredElement in processLineOfSight broken (ccw) - resolved.
+- 0007547: [Client] guiGetSelectedTab crashes after removing a tab (Jusonex) - resolved.
+- 0006496: [Client] Combobox isn't supported by onClientMouseEnter - onClientMouseLeave (Talidan) - resolved.
+- 0006969: [Client] GUI Clicking events won't get triggered when clicking at a GUI Scrollpane field. (Talidan) - resolved.
+- 0005870: [Scripting] onClientGUIMouseDown and onClientGUIMouseUp do not work for scrollbars (Talidan) - resolved.
+- 0006470: [Client] onClientGUIClick and onClientGUIDoubleClick not work with comboBoxes (Talidan) - resolved.
+- 0005680: [Server] Trigger onClientGuiClick also for comboboxes (Talidan) - resolved.
+- 0005090: [Client] GUI scrollpanes and scrollbars don't trigger onClientMouseEnter/Leave (Talidan) - resolved.
+- 0007060: [Server] Server crash 4061 (ccw) - resolved.
+- 0006239: [Scripting] getPedTotalAmmo does not return the correct values (Jusonex) - resolved.
+- 0006253: [Server] Projectile weapon ammo (slot 8) is not synchronized correctly (Jusonex) - resolved.
+- 0007528: [Server] outputChatBox to a invalid player goes to ALL players (ccw) - resolved.
+- 0007529: [Server] 16 server crashes (ccw) - resolved.
+- 0007521: [Client] Crash after finishing download while MTA is minimized - resolved.
+- 0005456: [Synchronization] Synchronise ped traffic lights (x0rh4x) - resolved.
+- 0007507: [Client] make setObjectScale except 1 scale value for each axis (x0rh4x) - resolved.
+- 0007459: [Client] onClientPlayerWeaponFire hitElement issue (ccw) - resolved.
+- 0007501: [Client] Binds that were attached directly to controls are getting reset when loading default binds in settings (Jusonex) - resolved.
+- 0007500: [Server] setAccountData / getAccountData (sbx320) - resolved.
+- 0006846: [Client] getVehicleType with trailers returns empty string client-side (Jusonex) - resolved.
+- 0007484: [Client] Disable the aircraft max velocity limit of 2.25 (Kenix) - resolved.
+- 0007496: [Client] Some functions output wrong warnings (Jusonex) - resolved.
+- 0006685: [Server] request function getEventHandlers (Kenix) - resolved.
+- 0006216: [Server] Add "shared" script type in meta.xml (Kenix) - resolved.
+- 0007490: [Server] 1.3.1-4954 Server Crash (ccw) - resolved.
+- 0007477: [Client] processLineOfSight doesn't return world object info without ignoredElement being set (ccw) - resolved.
+- 0006478: [Client] Add an icon near the player that is speaking in voice chat (Talidan) - resolved.
+- 0006570: [Client] Voice chat OFF on client side (Talidan) - resolved.
+- 0007478: [Client] MTA r4806 and newer ones do not work under WINE (ccw) - resolved.
+- 0003788: [Scripting] Certain ID's passed to setPedWalkingStyle crash all connected clients (ccw) - resolved.
+- 0007393: [Server] Server crashes with no apparent reason (ccw) - resolved.
+- 0005065: [Client] Disabling controls doesn't disable analog sticks in gamepads (Cazomino05) - resolved.
+- 0007461: [Server] Ammo Exploit (ccw) - resolved.
+- 0005452: [Client] After updating using the in-game updater, temporary installation files are not automatically deleted (ccw) - resolved.
+- 0003484: [GUI / Menus / Console] guiScrollPaneGetVerticalScrollPosition returns strange and stepped values (Jusonex) - resolved.
+- 0007450: [Client] Main menu items 'Map Editor'/'Host Game' should ask if you want to disconnect from your current server (ccw) - resolved.
+- 0007447: [Client] Moving flare needs to fixed (Cazomino05) - resolved.
+- 0007203: [Client] Xbox 360 Controllers, maybe others - Proper Axis Support (ccw) - resolved.
+- 0006418: [Client] onClientPlayerVoiceStop doesn't always work (Talidan) - resolved.
+- 0005879: [Client] Ability to use gamepad's analog Z-axis to aim and fire a weapon (ccw) - resolved.
+- 0006831: [Server] protected option for protecting client side files stops files from loading. (ryden) - resolved.
+- 0005810: [Client] If photo made in windowed-mode with in-game camera, it makes screen print (ccw) - resolved.
+- 0007399: [Server] setRuleValue crash (ccw) - resolved.
+- 0006321: [Server] Account passwords should be salted (ccw) - resolved.
+- 0007442: [Client] Element is destroyed client sided when created and parent set in different resource than the parent (ccw) - resolved.
+- 0007250: [Client] Crouching does not work (ccw) - resolved.
+- 0007410: [Client] Custom dx-fonts do not work on Windows 8 (ccw) - resolved.
+- 0007415: [Server] removeWorldModel doesn't work since MTA 1.3.1 (Cazomino05) - resolved.
+- 0006475: [Server] Crash after 5 seconds of connecting to a server (ccw) - resolved.
+- 0007388: [Client] Crash when destroying the source of onClientColShapeHit event (ccw) - resolved.
+- 0007397: [Server] MTA's weapon function usage differs lately (ccw) - resolved.
+- 0007398: [Server] giveWeapon problems (ccw) - resolved.
+- 0006583: [Client] Double-clicking on another server from server browser list while connecting to a server makes the game exit to desktop (ccw) - resolved.
+- 0007392: [Client] If you join a server of mine, you crash. (ccw) - resolved.
+- 0001237: [GUI / Menus / Console] Contents of client's console should be logged to a file (kevuwk) - resolved.
+- 0007383: [Server] Impossible fixdb ( internal/registy )db (ccw) - resolved.
+- 0007376: [Client] Protocol error (8) when starting Map Editor (ccw) - resolved.
+- 0006112: [Client] Steam and MTA (ccw) - resolved.
+- 0007368: [Server] Same serial can be banned more than one time. (ccw) - resolved.
+- 0007361: [Client] setFogDistance is resetted on some positions (ccw) - resolved.
+- 0007020: [Client] onClientPlayerWeaponFire returns incorrect hit positions (ccw) - resolved.
+- 0007360: [Server] Not working properly "setElementParent" (ccw) - resolved.
+- 0007196: [Server] getElementChildren seems not to work on custom element types (ccw) - resolved.
+- 0007308: [Map Editor] Locked Time isn't set correctly (arranTuna) - resolved.
+- 0007363: [Client] Please make onClientChatMessage cancelable (ccw) - resolved.
+- 0006786: [Client] setFarClipDistance messes with water drawing (ccw) - resolved.
+- 0007349: [Client] Ped won't move forwards in the rotation set (ccw) - resolved.
+- 0007350: [Client] FarClipDistance is reseting each respawn (ccw) - resolved.
+- 0007348: [Client] Rotation offset is messed up when using 'clamp' as texture edge (ccw) - resolved.
+- 0006482: [Client] In race, Objects of the same model suddenly lose collision (ccw) - resolved.
+- 0006635: [Client] Bikes and RC Bandit sometimes randomly bounce off the ground once their wheels touch the surface (roads, water, ground, etc) (ccw) - resolved.
+- 0007328: [Client] Pickups don't load in interiors (ccw) - resolved.
+- 0007330: [Client] isPlayerHudShown (ccw) - resolved.
+- 0007342: [Server] Server crashes randomly and hangs upon close. (ccw) - resolved.
+- 0006508: [Scripting] ped rotation while in air goes opposite direction. (ccw) - resolved.
+- 0007283: [Server] setElementFrozen() kills player. (ccw) - resolved.
+- 0007329: [Client] In some places, at some camera angles, textures dissapear or flicker (ccw) - resolved.
+- 0007337: [Client] Can't move left/right. (ccw) - resolved.
+- 0007333: [Server] last argument of server side restoreWorldModel (interior) is not optional, breaks backward compatibility (Cazomino05) - resolved.
+- 0007301: [Client] "onClientSoundBeat" don't work (ccw) - resolved.
+- 0007318: [Server] Adding one more info in "whowas" command (ccw) - resolved.
+- 0007306: [Client] setFarClipDistance() causes client crashes (ccw) - resolved.
+- 0007321: [Client] Another Hack (ccw) - resolved.
+- 0007320: [Client] New Hacks Detected ~ (ccw) - resolved.
+- 0007289: [Map Editor] 'team' types in definition (ccw) - resolved.
+- 0007290: [Server] (null) in debug messages (ccw) - resolved.
+- 0005179: [Scripting] Vehicle drowning event (JoeBullet) - resolved.
+- 0005318: [Server] setElementPosition for vehicles on a non streamed in position will make the vehicle spin very quickly (ccw) - resolved.
+
+Resources:
+
+
+- 0007420: [Resources] Realdriveby driver shooting bug (Talidan) - resolved.
+- 0007394: [Resources] Votemanager can't start votekick, votekill or voteban, if the player, who we want to vote, name contains 1 character. (arranTuna) - resolved.
+- 0007338: [Resources] [Admin] Selecting players no longer works (arranTuna) - resolved.
+- 0007351: [Optional] Hay: Make camera face haystack after player dies for walking away (arranTuna) - resolved.
+- 0007353: [Optional] Freeroam: setpos command parameter check (arranTuna) - resolved.
+- 0007271: [Resources] Race pickups and checkpoint improvement (ccw) - resolved.
+
+Map Editor:
+
+
+- 0007550: [Map Editor] Map Editor shouldn't overwrite script lines in meta.xml (arranTuna) - resolved.
+- 0007425: [Map Editor] Make objects, created by editor, have LOD model preinstalled (arranTuna) - resolved.
+- 0004767: [Map Editor] Race EDF - Can't enter pickup properties GUI (arranTuna) - resolved.
+- 0007311: [Map Editor] Map editor doesn't load object properly but race gamemode does. (arranTuna) - resolved.
+- 0007509: [Map Editor] Weapon model changes to 1337 after saving/loading some times (arranTuna) - resolved.
+- 0007405: [Map Editor] Some settings aren't reset when you start a new map after working in another (arranTuna) - resolved.
+
+
 Multi Theft Auto : San Andreas - 1.3.1
 ======================================
 
