@@ -1980,3 +1980,27 @@ bool CConsoleCommands::FakeLag ( CConsole* pConsole, const char* szArguments, CC
 #endif
     return true;
 }
+
+
+bool CConsoleCommands::DebugJoinFlood ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
+{
+    if ( !pClient->GetClientType () == CClient::CLIENT_CONSOLE )
+    {
+        if ( !g_pGame->GetACLManager()->CanObjectUseRight ( pClient->GetAccount ()->GetName ().c_str (), CAccessControlListGroupObject::OBJECT_TYPE_USER, "debugjoinflood", CAccessControlListRight::RIGHT_TYPE_COMMAND, false ) )
+        {
+            pEchoClient->SendConsole ( "debugjoinflood: You do not have sufficient rights to use this command." );
+            return false;
+        }
+    }
+
+    long long llTickCountAdd = 0;
+    if ( szArguments )
+    {
+        llTickCountAdd = atoi( szArguments );
+        llTickCountAdd *= 0x10000000LL;
+    }
+
+    SString strOutput = g_pGame->GetJoinFloodProtector()->DebugDump( llTickCountAdd );
+    pEchoClient->SendConsole ( strOutput );
+    return true;
+}

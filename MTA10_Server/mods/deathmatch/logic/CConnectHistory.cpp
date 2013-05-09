@@ -152,3 +152,47 @@ uint CConnectHistory::GetTotalFloodingCount ( void )
 
     return m_HistoryItemMap.size ();
 }
+
+// Internal function for debugging
+long long CConnectHistory::GetModuleTickCount64 ( void )
+{
+    long long llValue = ::GetModuleTickCount64();
+    llValue += m_llDebugTickCountOffset;
+    return llValue;
+}
+
+
+SString CConnectHistory::DebugDump ( long long llTickCountAdd )
+{
+    m_llDebugTickCountOffset += llTickCountAdd;
+
+    // Dump info
+    std::stringstream strOutput;
+
+    long long llCurrentTime = GetModuleTickCount64 ();
+    strOutput << SString( "CurrentTime: 0x%" PRIx64 "\n", llCurrentTime );
+    strOutput << SString( "TimeLastRemoveExpired: 0x%" PRIx64 "\n", m_llTimeLastRemoveExpired );
+    strOutput << SString( "HistoryItems: %d\n", m_HistoryItemMap.size() );
+    strOutput << SString( "TickCountAdd: 0x%" PRIx64 "\n", llTickCountAdd );
+    strOutput << SString( "DebugTickCountOffset: 0x%" PRIx64 "\n", m_llDebugTickCountOffset );
+
+    // Step through each IP's connect history
+    for ( HistoryItemMap::iterator mapIt = m_HistoryItemMap.begin () ; mapIt != m_HistoryItemMap.end (); ++mapIt )
+    {
+        const SString& strIP = mapIt->first;
+        const CConnectHistoryItem& historyItem = mapIt->second;
+        if ( !historyItem.joinTimes.empty () )
+        {
+            SString strInfo ( "IP:%s  ", strIP.c_str () );
+            for ( unsigned int i = 0 ; i < historyItem.joinTimes.size () ; i++ )
+            {
+                long long llTime = historyItem.joinTimes[i];
+                long long llAge = llCurrentTime - historyItem.joinTimes[i];
+                strInfo += SString ( "%" PRId64 "(0x%" PRIx64 ")  ", llAge, llTime );
+            }
+            strInfo += "\n";
+            strOutput << strInfo;
+        }
+    }
+    return strOutput.str();
+}
