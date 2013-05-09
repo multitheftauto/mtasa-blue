@@ -161,6 +161,9 @@ CClientVehicle::CClientVehicle ( CClientManager* pManager, ElementID ID, unsigne
 
     // clear our component data to regenerate
     m_ComponentData.clear ( );
+
+    // Prepare the sirens
+    RemoveVehicleSirens();
 }
 
 
@@ -4154,6 +4157,8 @@ void CClientVehicle::RemoveVehicleSirens ( void )
         SetVehicleSirenMinimumAlpha( i, 0 );
         SetVehicleSirenColour( i, SColor ( ) );
     }
+
+    m_tSirenBeaconInfo.m_ucSirenCount = 0;
 }
 
 
