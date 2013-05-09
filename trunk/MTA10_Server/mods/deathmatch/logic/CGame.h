@@ -229,6 +229,7 @@ public:
     inline CRadarAreaManager*       GetRadarAreaManager         ( void )        { return m_pRadarAreaManager; }
     inline CGroups*                 GetGroups                   ( void )        { return m_pGroups; }
     inline CElementDeleter*         GetElementDeleter           ( void )        { return &m_ElementDeleter; }
+    inline CConnectHistory*         GetJoinFloodProtector       ( void )        { return &m_FloodProtect; }
     inline CHTTPD*                  GetHTTPD                    ( void )        { return m_pHTTPD; }
     inline CSettings*               GetSettings                 ( void )        { return m_pSettings; }
     inline CAccessControlListManager* GetACLManager             ( void )        { return m_pACLManager; }
