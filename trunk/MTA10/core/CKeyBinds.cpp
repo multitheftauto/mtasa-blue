@@ -45,6 +45,7 @@ SBindableKey g_bkKeys[] =
     { "arrow_u", 0x26,          GTA_KEY_UP,             DATA_NUMPAD,            73 },
     { "arrow_r", 0x27,          GTA_KEY_RIGHT,          DATA_NUMPAD,            71 }, 
     { "arrow_d", 0x28,          GTA_KEY_DOWN,           DATA_NUMPAD,            67 },
+    { "print_screen", 0x2C,     NO_KEY_DEFINED,         DATA_NONE,              0,      true }, 
     { "insert",  0x2D,          GTA_KEY_INSERT,         DATA_NUMPAD,            65,     true }, 
     { "delete",  0x2E,          GTA_KEY_DELETE,         DATA_NUMPAD,            79 },
     { "0",       0x30,          GTA_KEY_0,              DATA_NONE,              0 }, 

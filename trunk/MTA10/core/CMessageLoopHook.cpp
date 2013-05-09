@@ -51,6 +51,9 @@ void CMessageLoopHook::ApplyHook ( HWND hFocusWindow )
 
         // Enable Unicode (UTF-16) characters in WM_CHAR messages
         SetWindowLongW ( hFocusWindow, GWL_WNDPROC, GetWindowLong ( hFocusWindow, GWL_WNDPROC ) );
+
+        // Enable print screen keydown via hotkey message
+        RegisterHotKey( hFocusWindow, VK_SNAPSHOT, 0, VK_SNAPSHOT );
     }
 }
 
@@ -138,6 +141,26 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage ( HWND hwnd,
 
     if ( uMsg == WM_TIMER && wParam == IDT_TIMER1 )
         g_pCore->WindowsTimerHandler();     // Used for 'minimized before first game' pulses
+
+    // Handle print screen key
+    if ( wParam == VK_SNAPSHOT )
+    {
+        static bool bRepeating = false;
+        if ( uMsg == WM_HOTKEY )
+        {
+            // Convert to keydown message
+            uMsg = WM_KEYDOWN;
+            lParam = bRepeating ? 0x41370001 : 0x01370001;
+            bRepeating = true;
+        }
+        else
+        if ( uMsg == WM_KEYUP )
+        {
+            // Change previous state because of fake keydown message
+            lParam |= 0x40000000;
+            bRepeating = false;
+        }
+    }
 
     // Handle IME if input is not for the GUI
     if ( !g_pCore->GetLocalGUI ()->InputGoesToGUI () )
