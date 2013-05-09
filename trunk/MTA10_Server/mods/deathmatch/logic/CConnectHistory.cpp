@@ -18,6 +18,7 @@ CConnectHistory::CConnectHistory ( unsigned long ulMaxConnections, unsigned long
     m_ulSamplePeriod = ulSamplePeriod;
     m_ulBanLength = ulBanLength;
     m_llTimeLastRemoveExpired = 0;
+    m_llDebugTickCountOffset = 0;
 }
 
 // Add flood candidate connection attempt and return true if flooding is occurring
