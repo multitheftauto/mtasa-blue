@@ -2918,7 +2918,7 @@ int CLuaFunctionDefs::GetVehicleSirens( lua_State* luaVM )
             tSirenInfo = pVehicle->m_tSirenBeaconInfo;// Grab the siren structure data
             lua_newtable ( luaVM );
 
-            for ( int i = 0; i <= tSirenInfo.m_ucSirenCount;i++ )
+            for ( int i = 0; i < tSirenInfo.m_ucSirenCount;i++ )
             {
                 lua_pushnumber ( luaVM, i+1 );
                 lua_newtable ( luaVM );
