@@ -1252,8 +1252,16 @@ void Window::releaseInput(void)
 		d_captureWindow = NULL;
 	}
 
-    WindowEventArgs args(this);
-	onCaptureLost(args);
+    try
+    {
+        WindowEventArgs args(this);
+	    onCaptureLost(args);
+    }
+    catch (UnknownObjectException)
+    {
+        // Guess fix for scrollbar throwing UnknownObjectException("WindowManager::getWindow ...") inside FalagardScrollbar::getValueFromThumb()
+        // (When called from Window::destroy())
+    }
 }
 
 
