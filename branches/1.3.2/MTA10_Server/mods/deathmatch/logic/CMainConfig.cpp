@@ -802,6 +802,7 @@ bool CMainConfig::LoadExtended ( void )
     RegisterCommand ( "reloadbans", CConsoleCommands::ReloadBans, false );
 
     RegisterCommand ( "aclrequest", CConsoleCommands::AclRequest, false );
+    RegisterCommand ( "debugjoinflood", CConsoleCommands::DebugJoinFlood, false );
 #if defined(MTA_DEBUG) || defined(MTA_BETA)
     RegisterCommand ( "sfakelag", CConsoleCommands::FakeLag, false );
 #endif
