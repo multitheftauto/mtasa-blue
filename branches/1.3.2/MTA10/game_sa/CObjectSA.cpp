@@ -148,8 +148,8 @@ CObjectSA::CObjectSA( DWORD dwModel, bool bBreakable )
         if ( !bBreakable )
         {
             // Set our immunities
-            // Sum of all flags checked @ CPhysical__CanPhysicalBeDamaged 
-            MemPutFast < int > ( dwObjectPtr + 64, 0x00BC0000 );
+            // Sum of all flags checked @ CPhysical__CanPhysicalBeDamaged
+            MemOrFast < int > ( dwObjectPtr + 64, 0x00BC0000 );
         }
         m_pInterface->bStreamingDontDelete = true;
     }

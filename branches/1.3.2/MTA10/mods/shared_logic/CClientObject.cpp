@@ -43,7 +43,7 @@ CClientObject::CClientObject ( CClientManager* pManager, ElementID ID, unsigned 
     m_ucAlpha = 255;
     m_vecScale = CVector ( 1.0f, 1.0f, 1.0f );
     m_fHealth = 1000.0f;
-    m_bBreakable = true;
+    m_bBreakable = CClientObjectManager::IsBreakableModel ( m_usModel );
     m_bRespawnEnabled = true;
     m_fMass = -1.0f;
 
