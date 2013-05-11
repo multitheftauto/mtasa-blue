@@ -17,11 +17,9 @@ DECLARE_ENUM( eLuaType );
 DECLARE_ENUM( TrafficLight::EColor );
 DECLARE_ENUM( TrafficLight::EState );
 DECLARE_ENUM( CEasingCurve::eType );
-DECLARE_ENUM( eWeaponType );
-DECLARE_ENUM( eWeaponProperty );
-DECLARE_ENUM( eWeaponSkill );
-DECLARE_ENUM( eWeaponState );
-DECLARE_ENUM( eWeaponFlags );
+DECLARE_ENUM( eWeaponType )
+DECLARE_ENUM( eWeaponProperty )
+DECLARE_ENUM( eWeaponSkill )
 DECLARE_ENUM( CAccessControlListRight::ERightType );
 DECLARE_ENUM( CElement::EElementType );
 
@@ -44,6 +42,7 @@ enum eHudComponent
 };
 DECLARE_ENUM( eHudComponent );
 
+
 // class -> class type
 typedef int eEntityType;
 inline eEntityType GetClassType ( CElement* )       { return -1; }
@@ -61,7 +60,6 @@ inline eEntityType GetClassType ( CDummy* )         { return CElement::DUMMY; }
 inline eEntityType GetClassType ( CScriptFile* )    { return CElement::SCRIPTFILE; }
 inline eEntityType GetClassType ( CWater* )         { return CElement::WATER; }
 inline eEntityType GetClassType ( class CDatabaseConnectionElement* )  { return CElement::DATABASE_CONNECTION; }
-inline eEntityType GetClassType ( class CCustomWeapon* )  { return CElement::WEAPON; }
 
 
 // class -> class name
@@ -88,7 +86,6 @@ inline SString GetClassTypeName ( CAccount* )       { return "account"; }
 inline SString GetClassTypeName ( CDbJobData* )     { return "db-query"; }
 inline SString GetClassTypeName ( CAccessControlList* )         { return "acl"; }
 inline SString GetClassTypeName ( CAccessControlListGroup* )    { return "acl-group"; }
-inline SString GetClassTypeName ( CCustomWeapon* )    { return "weapon"; }
 
 
 

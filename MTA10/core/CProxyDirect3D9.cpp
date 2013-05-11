@@ -314,6 +314,7 @@ namespace
     }
     #define WriteDebugEvent WriteDebugEventTest
 
+    uint ms_uiCreationAttempts = 0;
 }
 
 
@@ -331,6 +332,7 @@ HRESULT CreateDeviceInsist( uint uiMinTries, uint uiTimeout, IDirect3D9* pDirect
     uint uiRetryCount = 0;
     do
     {
+        ms_uiCreationAttempts++;
         hResult = pDirect3D->CreateDevice( Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters, ppReturnedDeviceInterface );
         if ( hResult == D3D_OK )
         {
@@ -361,6 +363,7 @@ HRESULT DoCreateDevice( IDirect3D9* pDirect3D, UINT Adapter, D3DDEVTYPE DeviceTy
     if ( hResult == D3D_OK )
         return hResult;
     WriteDebugEvent ( SString( "  CreateDevice failed #2: %08x", hResult ) );
+    HRESULT hResultFail = hResult;
 
     // If create failed, try removing multisampling if enabled
     if ( pPresentationParameters->MultiSampleType )
@@ -374,28 +377,143 @@ HRESULT DoCreateDevice( IDirect3D9* pDirect3D, UINT Adapter, D3DDEVTYPE DeviceTy
         WriteDebugEvent ( SString( "    CreateDevice failed #3: %08x", hResult ) );
     }
 
-    // If create failed, try using pure device
-    WriteDebugEvent ( "      Pass #4 with D3DCREATE_PUREDEVICE:" );
-    BehaviorFlags |= D3DCREATE_PUREDEVICE;
-    WriteDebugEvent ( ToString( Adapter, DeviceType, hFocusWindow, BehaviorFlags, *pPresentationParameters ) );
-    hResult = CreateDeviceInsist( 2, 1000, pDirect3D, Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters, ppReturnedDeviceInterface );
-    if ( hResult == D3D_OK )
-        return hResult;
-    WriteDebugEvent ( SString( "      CreateDevice failed #4: %08x", hResult ) );
-
-    // If create failed, do a test create for logging only
+    // Run through different combinations
+    uint presentIntervalList[] = { D3DPRESENT_INTERVAL_IMMEDIATE, D3DPRESENT_INTERVAL_DEFAULT, D3DPRESENT_INTERVAL_ONE };
+    D3DSWAPEFFECT swapEffectList[] = { D3DSWAPEFFECT_DISCARD, D3DSWAPEFFECT_FLIP, D3DSWAPEFFECT_COPY };
+    D3DFORMAT rtFormatList32[] = { D3DFMT_A8R8G8B8, D3DFMT_X8R8G8B8 };
+    D3DFORMAT depthFormatList32[] = { D3DFMT_D24S8, D3DFMT_D24X8 };
+    D3DFORMAT rtFormatList16[] = { D3DFMT_R5G6B5 };
+    D3DFORMAT depthFormatList16[] = { D3DFMT_D16 };
+    struct SFormat
     {
-        D3DPRESENT_PARAMETERS pp = *pPresentationParameters;
-        pp.BackBufferWidth = 640;
-        pp.BackBufferHeight = 480;
-        BehaviorFlags &= ~D3DCREATE_PUREDEVICE;
-        WriteDebugEvent ( "        Test with 640x480" );
-        WriteDebugEvent ( ToString( Adapter, DeviceType, hFocusWindow, BehaviorFlags, pp ) );
-        HRESULT hResult = CreateDeviceInsist( 2, 1000, pDirect3D, Adapter, DeviceType, hFocusWindow, BehaviorFlags, &pp, ppReturnedDeviceInterface );
-        WriteDebugEvent ( SString( "        Test result: %08x", hResult ) );
-    }
+        D3DFORMAT* rtFormatList;
+        uint rtFormatListSize;
+        D3DFORMAT* depthFormatList;
+        uint depthFormatListSize;
+    } formatList[] = { { rtFormatList32, NUMELMS( rtFormatList32 ), depthFormatList32, NUMELMS( depthFormatList32 ), },
+                       { rtFormatList16, NUMELMS( rtFormatList16 ), depthFormatList16, NUMELMS( depthFormatList16 ), } };
 
-    return hResult;
+    D3DPRESENT_PARAMETERS savedPresentationParameters = *pPresentationParameters;
+    for ( uint iRes = 0 ; iRes < 6 ; iRes++ )
+    {
+        // iRes:
+        //      0 - Full screen or windowed mode, as per options
+        //      1 - Force windowed mode
+        //      2 - Force full screen
+        //      3 - Force 640x480 full screen or windowed mode, as per options (for test only)
+        //      4 - Force 640x480 windowed mode (for test only)
+        //      5 - Force 640x480 full screen (for test only)
+
+        // Reset settings
+        *pPresentationParameters = savedPresentationParameters;
+
+        if ( iRes == 1 || iRes == 4 )
+        {
+            // Force windowed mode
+            if ( pPresentationParameters->Windowed )
+                continue;
+            pPresentationParameters->Windowed = true;
+            pPresentationParameters->FullScreen_RefreshRateInHz = D3DPRESENT_RATE_DEFAULT;
+        }
+
+        if ( iRes == 2 || iRes == 5 )
+        {
+            // Force full screen
+            if ( !pPresentationParameters->Windowed )
+                continue;
+            pPresentationParameters->Windowed = false;
+            pPresentationParameters->FullScreen_RefreshRateInHz = 60;
+        }
+
+        if ( iRes == 3 || iRes == 4 || iRes == 5 )
+        {
+            //640x480 test
+            pPresentationParameters->BackBufferWidth = 640;
+            pPresentationParameters->BackBufferHeight = 480;
+        }
+
+        for ( uint iColor = 0 ; iColor < 2 ; iColor++ )
+        {
+            for ( uint iBehavior = 0 ; iBehavior < 2 ; iBehavior++ )
+            {
+                if ( iBehavior == 0 )
+                    BehaviorFlags &= ~D3DCREATE_PUREDEVICE;
+                else
+                    BehaviorFlags |= D3DCREATE_PUREDEVICE;
+
+                for ( uint iRefresh = 0 ; iRefresh < 2 ; iRefresh++ )
+                {
+                    if ( iRefresh == 1 )
+                    {
+                        if ( pPresentationParameters->Windowed )
+                            continue;
+                        pPresentationParameters->FullScreen_RefreshRateInHz = 60;
+                    }
+
+                    for ( uint iPresent = 0 ; iPresent < NUMELMS( presentIntervalList ) ; iPresent++ )
+                    {
+                        for ( uint iSwap = 0 ; iSwap < NUMELMS( swapEffectList ) ; iSwap++ )
+                        {
+                            SFormat format = formatList[iColor];
+
+                            for ( uint iRt = 0 ; iRt < format.rtFormatListSize ; iRt++ )
+                            {
+                                for ( uint iDepth = 0 ; iDepth < format.depthFormatListSize ; iDepth++ )
+                                {
+                                    pPresentationParameters->PresentationInterval = presentIntervalList[ iPresent ];
+                                    pPresentationParameters->SwapEffect = swapEffectList[ iSwap ];
+                                    pPresentationParameters->BackBufferFormat = format.rtFormatList[ iRt ];
+                                    pPresentationParameters->AutoDepthStencilFormat = format.depthFormatList[ iDepth ];
+        #ifndef MTA_DEBUG
+                                    hResult = CreateDeviceInsist( 2, 0, pDirect3D, Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters, ppReturnedDeviceInterface );
+        #else
+                                    WriteDebugEvent ( "--------------------------------");
+                                    WriteDebugEvent ( ToString( Adapter, DeviceType, hFocusWindow, BehaviorFlags, *pPresentationParameters ) );
+                                    WriteDebugEvent ( SString( "        32 result: %08x", hResult ) );
+                                    hResult = -1;
+        #endif
+                                    if ( hResult == D3D_OK )
+                                    {
+                                        WriteDebugEvent ( SString( "      Pass #4 SUCCESS with: {Res:%d, Color:%d, Refresh:%d}", iRes, iColor, iRefresh ) );
+                                        WriteDebugEvent ( ToString( Adapter, DeviceType, hFocusWindow, BehaviorFlags, *pPresentationParameters ) );
+                                        if ( iRes == 1 )
+                                        {
+                                            // Toggle alt tab handler
+                                            int iOldSelected = 1;
+                                            CVARS_GET ( "display_alttab_handler", iOldSelected );
+                                            int iNewSelected = iOldSelected ? 0 : 1;
+                                            WriteDebugEvent ( SString( "      Switching alt tab handler from %d to %d after success", iOldSelected, iNewSelected ) );
+                                            CVARS_SET ( "display_alttab_handler", iNewSelected );
+                                            CCore::GetSingleton ().SaveConfig ();
+                                        }
+                                        if ( iRes >= 3 )
+                                        {
+                                            // Only test, so return as fail
+                                            WriteDebugEvent ( "      Test success" );
+                                            goto failed;
+                                        }
+                                        return hResult;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+failed:
+    WriteDebugEvent ( SString( "      Failed after %d creation attempts", ms_uiCreationAttempts ) );
+
+    // Toggle alt tab handler
+    int iOldSelected = 1;
+    CVARS_GET ( "display_alttab_handler", iOldSelected );
+    int iNewSelected = iOldSelected ? 0 : 1;
+    WriteDebugEvent ( SString( "      Switching alt tab handler from %d to %d after fail", iOldSelected, iNewSelected ) );
+    CVARS_SET ( "display_alttab_handler", iNewSelected );
+    CCore::GetSingleton ().SaveConfig ();
+
+    return hResultFail;
 }
 
 

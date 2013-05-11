@@ -20,17 +20,13 @@ class CResourceClientFileItem : public CResourceFile
     
 public:
 
-                                        CResourceClientFileItem         ( class CResource * resource, const char * szShortName, const char * szResourceFileName, CXMLAttributes * xmlAttributes, bool bClientAutoDownload = true );
+                                        CResourceClientFileItem         ( class CResource * resource, const char * szShortName, const char * szResourceFileName, CXMLAttributes * xmlAttributes );
                                         ~CResourceClientFileItem        ( void );
 
     bool                                Start                           ( void );
     bool                                Stop                            ( void );
-
-    bool                                IsAutoDownload                  ( void )    { return m_bClientAutoDownload; };
     
 private:
-
-    bool                                m_bClientAutoDownload;
 
 };
 

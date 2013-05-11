@@ -449,7 +449,6 @@ void CServerBrowser::CreateTab ( ServerBrowserType type, const char* szName )
     m_pServerList [ type ]->SetPosition ( CVector2D ( fX, fY ), false );
     m_pServerList [ type ]->SetSize ( CVector2D ( fWidth, fHeight ), false );
     m_pServerList [ type ]->SetIgnoreTextSpacer ( true );
-    m_pServerList [ type ]->SetClickHandler ( GUI_CALLBACK( &CServerBrowser::OnClick, this ) );
     m_pServerListRevision [ type ] = 0;
 
     // Server List Columns
@@ -572,7 +571,6 @@ void CServerBrowser::CreateTab ( ServerBrowserType type, const char* szName )
 
     // Attach some keyboard events to the serverlist.
     m_pServerList [ type ]->SetEnterKeyHandler ( GUI_CALLBACK ( &CServerBrowser::OnDoubleClick, this ) );
-    m_pServerList [ type ]->SetDoubleClickHandler ( GUI_CALLBACK ( &CServerBrowser::OnDoubleClick, this ) );
     m_pServerList [ type ]->SetKeyDownHandler ( GUI_CALLBACK_KEY ( &CServerBrowser::OnServerListChangeRow, this ) );
 }
 

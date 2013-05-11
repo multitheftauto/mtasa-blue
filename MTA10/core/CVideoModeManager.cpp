@@ -260,8 +260,13 @@ void CVideoModeManager::OnGainFocus ( void )
         dmScreenSettings.dmFields = DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT | DM_DISPLAYFREQUENCY;
         dmScreenSettings.dmDisplayFrequency = m_ulFullScreenRefreshRate;
 
-        if( ChangeDisplaySettings( &dmScreenSettings, CDS_FULLSCREEN ) != DISP_CHANGE_SUCCESSFUL )
-            return;
+        int iResult = ChangeDisplaySettings( &dmScreenSettings, CDS_FULLSCREEN );
+        AddReportLog( 8743, SString( "ChangeDisplaySettings CDS_FULLSCREEN result (%d) with %d x %d x %d"
+                                                                ,iResult
+                                                                ,dmScreenSettings.dmPelsWidth
+                                                                ,dmScreenSettings.dmPelsHeight
+                                                                ,dmScreenSettings.dmDisplayFrequency
+                                                            ) );
     }
 }
 
@@ -291,8 +296,8 @@ void CVideoModeManager::OnLoseFocus ( void )
 
         dmScreenSettings.dmFields = 0;
 
-        if( ChangeDisplaySettings( &dmScreenSettings, CDS_RESET ) != DISP_CHANGE_SUCCESSFUL )
-            return;
+        int iResult = ChangeDisplaySettings( &dmScreenSettings, CDS_RESET );
+        AddReportLog( 8744, SString( "ChangeDisplaySettings CDS_RESET result (%d)", iResult ) );
     }
 }
 

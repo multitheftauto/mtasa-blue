@@ -14,7 +14,6 @@ class CPedTaskPacket : public CPacket
 public:
                                             CPedTaskPacket          ( void );
 
-    bool                                    HasSimHandler           ( void ) const                  { return true; }
     ePacketID                               GetPacketID             ( void ) const                  { return PACKET_ID_PED_TASK; };
     unsigned long                           GetFlags                ( void ) const                  { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE; };
 

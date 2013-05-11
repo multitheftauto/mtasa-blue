@@ -21,7 +21,8 @@ bool CPlayerConnectCompletePacket::Write ( NetBitStreamInterface& BitStream ) co
     BitStream.WriteString ( strConnText.Left ( MAX_CONN_TEXT_LEN ) );
 
     // Send the full server version
-    BitStream.WriteString ( CStaticFunctionDefinitions::GetVersionSortable () );
+    if ( BitStream.Version () >= 0x29 )
+        BitStream.WriteString ( CStaticFunctionDefinitions::GetVersionSortable () );
 
     return true;
 }

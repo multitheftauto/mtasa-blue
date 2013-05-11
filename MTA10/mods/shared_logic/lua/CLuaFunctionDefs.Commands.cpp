@@ -117,9 +117,7 @@ int CLuaFunctionDefs::ExecuteCommandHandler ( lua_State* luaVM )
 int CLuaFunctionDefs::toJSON ( lua_State* luaVM )
 {
     // Got a string argument?
-    CScriptArgReader argStream ( luaVM );
-
-    if ( !argStream.NextIsNil ( ) )
+    if ( lua_type ( luaVM, 1 ) > LUA_TNIL )
     {
         // Read the argument
         CLuaArguments JSON;
@@ -134,8 +132,6 @@ int CLuaFunctionDefs::toJSON ( lua_State* luaVM )
             return 1;
         }
     }
-    else
-        m_pScriptDebugging->LogBadType ( luaVM );
 
     // Failed
     lua_pushnil ( luaVM );
@@ -146,23 +142,20 @@ int CLuaFunctionDefs::toJSON ( lua_State* luaVM )
 int CLuaFunctionDefs::fromJSON ( lua_State* luaVM )
 {
     // Got a string argument?
-    SString strJsonString = "";
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadString ( strJsonString );
-
-    if ( !argStream.HasErrors ( ) )
+    if ( lua_type ( luaVM, 1 ) == LUA_TSTRING )
     {
+        // Grab the JSON string
+        const char* szJSONString = lua_tostring ( luaVM, 1 );
+
         // Read it into lua arguments
         CLuaArguments Converted;
-        if ( Converted.ReadFromJSONString ( strJsonString ) )
+        if ( Converted.ReadFromJSONString ( szJSONString ) )
         {
             // Return it as data
             Converted.PushArguments ( luaVM );
             return Converted.Count ();
         }
     }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     // Failed
     lua_pushnil ( luaVM );

@@ -102,7 +102,6 @@ public:
     void                SetMovedHandler             ( GUI_CALLBACK Callback );
     void                SetSizedHandler             ( GUI_CALLBACK Callback );
     void                SetClickHandler             ( GUI_CALLBACK Callback );
-    void                SetDoubleClickHandler       ( GUI_CALLBACK Callback );
     void                SetMouseEnterHandler        ( GUI_CALLBACK Callback );
     void                SetMouseLeaveHandler        ( GUI_CALLBACK Callback );
     void                SetMouseButtonDownHandler   ( GUI_CALLBACK Callback );
@@ -111,12 +110,6 @@ public:
     void                SetKeyDownHandler           ( GUI_CALLBACK Callback );
     void                SetKeyDownHandler           ( const GUI_CALLBACK_KEY & Callback );
     void                SetEnterKeyHandler          ( GUI_CALLBACK Callback );
-
-    bool                Event_OnClick               ( void );
-    bool                Event_OnDoubleClick         ( void );
-    bool                Event_OnMouseEnter          ( void );
-    bool                Event_OnMouseLeave          ( void );
-    bool                Event_OnMouseButtonDown     ( void );
 
 protected:
     void                DestroyElement              ( void );
@@ -129,6 +122,10 @@ protected:
 
     bool                Event_OnMoved               ( const CEGUI::EventArgs& e );
     bool                Event_OnSized               ( const CEGUI::EventArgs& e );
+    bool                Event_OnClick               ( const CEGUI::EventArgs& e );
+    bool                Event_OnMouseEnter          ( const CEGUI::EventArgs& e );
+    bool                Event_OnMouseLeave          ( const CEGUI::EventArgs& e );
+    bool                Event_OnMouseButtonDown     ( const CEGUI::EventArgs& e );
     bool                Event_OnActivated           ( const CEGUI::EventArgs& e );
     bool                Event_OnDeactivated         ( const CEGUI::EventArgs& e );
     bool                Event_OnKeyDown             ( const CEGUI::EventArgs& e );
@@ -144,7 +141,6 @@ protected:
     std::list<CGUIProperty*>    m_Properties;
 
     GUI_CALLBACK               m_OnClick;
-    GUI_CALLBACK               m_OnDoubleClick;
     GUI_CALLBACK               m_OnMoved;
     GUI_CALLBACK               m_OnSized;
     GUI_CALLBACK               m_OnMouseEnter;

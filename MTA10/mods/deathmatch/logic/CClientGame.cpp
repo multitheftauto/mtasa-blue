@@ -228,9 +228,6 @@ CClientGame::CClientGame ( bool bLocalPlay )
     // MTA Voice
     m_pVoiceRecorder = new CVoiceRecorder();
 
-    // Singular file download manager
-    m_pSingularFileDownloadManager = new CSingularFileDownloadManager();
-
     // Register the message and the net packet handler
     g_pMultiplayer->SetPreWeaponFireHandler ( CClientGame::PreWeaponFire );
     g_pMultiplayer->SetPostWeaponFireHandler ( CClientGame::PostWeaponFire );
@@ -277,7 +274,6 @@ CClientGame::CClientGame ( bool bLocalPlay )
     m_pLuaManager->SetScriptDebugging ( m_pScriptDebugging );
     CStaticFunctionDefinitions ( m_pLuaManager, &m_Events, g_pCore, g_pGame, this, m_pManager );
     CLuaFunctionDefs::Initialize ( m_pLuaManager, m_pScriptDebugging, this );
-    CLuaOOPDefs::Initialize ( this, m_pLuaManager, m_pScriptDebugging );
     CLuaDefs::Initialize ( this, m_pLuaManager, m_pScriptDebugging );
 
     // Disable the enter/exit vehicle key button (we want to handle this button ourselves)
@@ -373,10 +369,6 @@ CClientGame::~CClientGame ( void )
 
     delete m_pVoiceRecorder;
     m_pVoiceRecorder = NULL;
-
-    // Singular file download manager
-    delete m_pSingularFileDownloadManager;
-    m_pSingularFileDownloadManager = NULL;
 
     // NULL the message/net stuff
     g_pMultiplayer->SetPreContextSwitchHandler ( NULL );
@@ -1188,7 +1180,7 @@ void CClientGame::DoPulses ( void )
     {
         // Pulse DownloadFiles if we're transferring stuff
         DownloadInitialResourceFiles ();
-        DownloadSingularResourceFiles ();
+
         g_pNet->GetHTTPDownloadManager ( EDownloadMode::CALL_REMOTE )->ProcessQueuedFiles ();
     }
 
@@ -2841,16 +2833,11 @@ void CClientGame::AddBuiltInEvents ( void )
     m_Events.AddEvent ( "onClientSoundStream", "success, length, streamName", NULL, false );
     m_Events.AddEvent ( "onClientSoundFinishedDownload", "length", NULL, false );
     m_Events.AddEvent ( "onClientSoundChangedMeta", "streamTitle", NULL, false );
-    m_Events.AddEvent ( "onClientSoundStarted", "reason", NULL, false );
-    m_Events.AddEvent ( "onClientSoundStopped", "reason", NULL, false );
     m_Events.AddEvent ( "onClientSoundBeat", "time", NULL, false );
 
     // Object events
     m_Events.AddEvent ( "onClientObjectDamage", "loss, attacker", NULL, false );
     m_Events.AddEvent ( "onClientObjectBreak", "attacker", NULL, false );
-
-    // Misc events
-    m_Events.AddEvent ( "onClientFileDownloadComplete", "fileName, success", NULL, false );
     
     m_Events.AddEvent ( "onClientWeaponFire", "ped, x, y, z", NULL, false );
 }
@@ -4013,31 +4000,6 @@ void CClientGame::DownloadInitialResourceFiles ( void )
 
 
 //
-// On demand files
-//
-void CClientGame::DownloadSingularResourceFiles ( void )
-{
-    if ( !IsTransferringSingularFiles () )
-        return;
-
-    CNetHTTPDownloadManagerInterface* pHTTP = g_pNet->GetHTTPDownloadManager ( EDownloadMode::RESOURCE_SINGULAR_FILES );
-    if ( !pHTTP->ProcessQueuedFiles () )
-    {
-        // Downloading
-    }
-    else
-    {
-        // Can't clear list until all files have been processed
-        if ( m_pSingularFileDownloadManager->AllComplete () )
-        {
-            SetTransferringSingularFiles ( false );
-            m_pSingularFileDownloadManager->ClearList ();
-        }
-    }
-}
-
-
-//
 // DamageHandler seems to be called 3 times for each bit of damage:
 //
 // pass 1 - preApplyDamage
@@ -4799,7 +4761,7 @@ void CClientGame::ProcessVehicleInOutKey ( bool bPassenger )
                                                     bool bIsOnWater = pVehicle->IsOnWater ();
                                                     unsigned char ucDoor = static_cast < unsigned char > ( uiDoor );
                                                     pBitStream->WriteBits ( &ucAction, 4 );
-                                                    pBitStream->WriteBits ( &ucSeat, 4 );
+                                                    pBitStream->WriteBits ( &ucSeat, 3 );
                                                     pBitStream->WriteBit ( bIsOnWater );
                                                     pBitStream->WriteBits ( &ucDoor, 3 );
 
@@ -5349,13 +5311,6 @@ void CClientGame::ResetMapInfo ( void )
         m_pLocalPlayer->SetVoice ( sVoiceType, sVoiceID );
 
         m_pLocalPlayer->DestroySatchelCharges( false, true );
-        // Tell the server we want to destroy our satchels
-        NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream ();
-        if ( pBitStream )
-        {
-            g_pNet->SendPacket ( PACKET_ID_DESTROY_SATCHELS, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED );
-            g_pNet->DeallocateNetBitStream ( pBitStream );
-        }
     }
 }
 
@@ -5639,12 +5594,6 @@ bool CClientGame::OnMouseEnter ( CGUIMouseEventArgs Args )
     CLuaArguments Arguments;
     Arguments.PushNumber ( Args.position.fX );
     Arguments.PushNumber ( Args.position.fY );
-    if ( Args.pSwitchedWindow )
-    {
-        CClientGUIElement * pGUISwitchedElement = CGUI_GET_CCLIENTGUIELEMENT ( Args.pSwitchedWindow );
-        if ( pGUISwitchedElement )
-            Arguments.PushElement( pGUISwitchedElement );
-    }
 
     CClientGUIElement * pGUIElement = CGUI_GET_CCLIENTGUIELEMENT ( Args.pWindow );
     if ( GetGUIManager ()->Exists ( pGUIElement ) ) pGUIElement->CallEvent ( "onClientMouseEnter", Arguments, true );
@@ -5660,12 +5609,6 @@ bool CClientGame::OnMouseLeave ( CGUIMouseEventArgs Args )
     CLuaArguments Arguments;
     Arguments.PushNumber ( Args.position.fX );
     Arguments.PushNumber ( Args.position.fY );
-    if ( Args.pSwitchedWindow )
-    {
-        CClientGUIElement * pGUISwitchedElement = CGUI_GET_CCLIENTGUIELEMENT ( Args.pSwitchedWindow );
-        if ( pGUISwitchedElement )
-            Arguments.PushElement( pGUISwitchedElement );
-    }
 
     CClientGUIElement * pGUIElement = CGUI_GET_CCLIENTGUIELEMENT ( Args.pWindow );
     if ( GetGUIManager ()->Exists ( pGUIElement ) ) pGUIElement->CallEvent ( "onClientMouseLeave", Arguments, true );

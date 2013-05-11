@@ -65,10 +65,6 @@ bool CResourceStartPacket::Write ( NetBitStreamInterface& BitStream ) const
             BitStream.WriteString ( m_pResource->GetMinServerReqFromMetaXml () );
             BitStream.WriteString ( m_pResource->GetMinClientReqFromMetaXml () );
         }
-        if ( BitStream.Version () >= 0x45 )
-        {
-            BitStream.WriteBit ( m_pResource->IsOOPEnabledInMetaXml ( ) );
-        }
 
         // Send the resource files info
         list < CResourceFile* > ::iterator iter = m_pResource->IterBegin();
@@ -108,12 +104,6 @@ bool CResourceStartPacket::Write ( NetBitStreamInterface& BitStream ) const
                 BitStream.Write ( checksum.ulCRC );
                 BitStream.Write ( (const char*)checksum.mD5, sizeof ( checksum.mD5 ) );
                 BitStream.Write ( ( *iter )->GetApproxSize () );
-                if ( ( *iter )->GetType () == CResourceScriptItem::RESOURCE_FILE_TYPE_CLIENT_FILE )
-                {
-                    CResourceClientFileItem* pRCFItem = reinterpret_cast < CResourceClientFileItem* > ( *iter );
-                    // write bool whether to download or not
-                    BitStream.WriteBit ( pRCFItem->IsAutoDownload() );
-                }
             }
         }
 

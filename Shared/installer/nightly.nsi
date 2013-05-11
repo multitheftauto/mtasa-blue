@@ -28,12 +28,12 @@ Var WhichRadio
 Var ShowLastUsed
 
 ; Games explorer: With each new X.X, update this GUID and the file at MTA10\launch\NEU\GDFImp.gdf.xml
-!define GUID "{DF780162-2450-4665-9BA2-EAB14ED640A3}"
+!define GUID "{DEEC1E88-94A4-412C-B64A-1D772535AD58}"
 
 
 !ifndef MAJOR_VER
     !define MAJOR_VER "1"
-    !define MINOR_VER "4"
+    !define MINOR_VER "3"
     !define MAINT_VER "0"
 !endif
 !define 0.0 "${MAJOR_VER}.${MINOR_VER}"
@@ -488,6 +488,7 @@ DontInstallRedist:
         File "${FILES_ROOT}\MTA San Andreas\mta\bass_fx.dll"
         File "${FILES_ROOT}\MTA San Andreas\mta\tags.dll"
 		File "${SERVER_FILES_ROOT}\pthreadVC2.dll"
+        File "${FILES_ROOT}\MTA San Andreas\mta\XInput9_1_0_mta.dll"
 
         !ifndef LIGHTBUILD
 
@@ -502,7 +503,6 @@ DontInstallRedist:
 			File "${FILES_ROOT}\MTA San Andreas\mta\bassmix.dll"
 			File "${FILES_ROOT}\MTA San Andreas\mta\chatboxpresets.xml"
 			File "${FILES_ROOT}\MTA San Andreas\mta\sa.dat"
-            File "${FILES_ROOT}\MTA San Andreas\mta\XInput9_1_0_mta.dll"
 
             SetOutPath "$INSTDIR\skins\Classic"
             File "${FILES_ROOT}\MTA San Andreas\skins\Classic\CGUI.is.xml"

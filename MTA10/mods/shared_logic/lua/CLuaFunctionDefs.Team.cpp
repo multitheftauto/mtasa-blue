@@ -23,13 +23,10 @@ using std::list;
 
 int CLuaFunctionDefs::GetTeamFromName ( lua_State* luaVM )
 {
-    SString strName = "";
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadString ( strName );
-
-    if ( !argStream.HasErrors () )
+    if ( lua_type ( luaVM, 1 ) == LUA_TSTRING )
     {
-        CClientTeam* pTeam = m_pTeamManager->GetTeam ( strName );
+        const char* szTeamName = lua_tostring ( luaVM, 1 );
+        CClientTeam* pTeam = m_pTeamManager->GetTeam ( szTeamName );
         if ( pTeam )
         {
             lua_pushelement ( luaVM, pTeam );
@@ -37,7 +34,7 @@ int CLuaFunctionDefs::GetTeamFromName ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -46,12 +43,9 @@ int CLuaFunctionDefs::GetTeamFromName ( lua_State* luaVM )
 
 int CLuaFunctionDefs::GetTeamName ( lua_State* luaVM )
 {
-    CClientTeam* pTeam = NULL;
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pTeam );
-
-    if ( !argStream.HasErrors () )
+    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
     {
+        CClientTeam* pTeam = lua_toteam ( luaVM, 1 );
         if ( pTeam )
         {
             const char* szName = pTeam->GetTeamName ();
@@ -65,7 +59,7 @@ int CLuaFunctionDefs::GetTeamName ( lua_State* luaVM )
             m_pScriptDebugging->LogBadPointer ( luaVM, "team", 1 );
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -74,12 +68,9 @@ int CLuaFunctionDefs::GetTeamName ( lua_State* luaVM )
 
 int CLuaFunctionDefs::GetTeamColor ( lua_State* luaVM )
 {
-    CClientTeam* pTeam = NULL;
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pTeam );
-
-    if ( !argStream.HasErrors () )
+    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
     {
+        CClientTeam* pTeam = lua_toteam ( luaVM, 1 );
         if ( pTeam )
         {
             unsigned char ucRed, ucGreen, ucBlue;
@@ -94,7 +85,7 @@ int CLuaFunctionDefs::GetTeamColor ( lua_State* luaVM )
             m_pScriptDebugging->LogBadPointer ( luaVM, "team", 1 );
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -103,12 +94,9 @@ int CLuaFunctionDefs::GetTeamColor ( lua_State* luaVM )
 
 int CLuaFunctionDefs::GetTeamFriendlyFire ( lua_State* luaVM )
 {
-    CClientTeam* pTeam = NULL;
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pTeam );
-
-    if ( !argStream.HasErrors () )
+    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
     {
+        CClientTeam* pTeam = lua_toteam ( luaVM, 1 );
         if ( pTeam )
         {
             bool bFriendlyFire = pTeam->GetFriendlyFire ();
@@ -119,7 +107,7 @@ int CLuaFunctionDefs::GetTeamFriendlyFire ( lua_State* luaVM )
             m_pScriptDebugging->LogBadPointer ( luaVM, "team", 1 );
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -128,34 +116,35 @@ int CLuaFunctionDefs::GetTeamFriendlyFire ( lua_State* luaVM )
 
 int CLuaFunctionDefs::GetPlayersInTeam ( lua_State* luaVM )
 {
-    CClientTeam* pTeam = NULL;
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pTeam );
-
-    if ( !argStream.HasErrors () )
+    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+    if ( pLuaMain )
     {
-        if ( pTeam )
+        if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
         {
-            lua_newtable ( luaVM );
-
-            unsigned int uiIndex = 0;
-
-            list < CClientPlayer* > ::const_iterator iter = pTeam->IterBegin ();
-            for ( ; iter != pTeam->IterEnd () ; iter++ )
+            CClientTeam* pTeam = lua_toteam ( luaVM, 1 );
+            if ( pTeam )
             {
-                CClientPlayer* pPlayer = *iter;
-                lua_pushnumber ( luaVM, ++uiIndex );
-                lua_pushelement ( luaVM, pPlayer );
-                lua_settable ( luaVM, -3 );
-            }
+                lua_newtable ( luaVM );
 
-            return 1;
+                unsigned int uiIndex = 0;
+
+                list < CClientPlayer* > ::const_iterator iter = pTeam->IterBegin ();
+                for ( ; iter != pTeam->IterEnd () ; iter++ )
+                {
+                    CClientPlayer* pPlayer = *iter;
+                    lua_pushnumber ( luaVM, ++uiIndex );
+                    lua_pushelement ( luaVM, pPlayer );
+                    lua_settable ( luaVM, -3 );
+                }
+
+                return 1;
+            }
+            else
+                m_pScriptDebugging->LogBadPointer ( luaVM, "team", 1 );
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "team", 1 );
+            m_pScriptDebugging->LogBadType ( luaVM );
     }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -164,12 +153,9 @@ int CLuaFunctionDefs::GetPlayersInTeam ( lua_State* luaVM )
 
 int CLuaFunctionDefs::CountPlayersInTeam ( lua_State* luaVM )
 {
-    CClientTeam* pTeam = NULL;
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pTeam );
-
-    if ( !argStream.HasErrors () )
+    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
     {
+        CClientTeam* pTeam = lua_toteam ( luaVM, 1 );
         if ( pTeam )
         {
             unsigned int uiCount = pTeam->CountPlayers ();
@@ -180,7 +166,7 @@ int CLuaFunctionDefs::CountPlayersInTeam ( lua_State* luaVM )
             m_pScriptDebugging->LogBadPointer ( luaVM, "team", 1 );
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;

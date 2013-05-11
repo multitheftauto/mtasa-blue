@@ -93,7 +93,6 @@ CResource::CResource ( CResourceManager * resourceManager, bool bIsZipped, const
     m_bDoneUpgradeWarnings = false;
 
     Load ();
-    m_bOOPEnabledInMetaXml = true;
 }
 
 bool CResource::Load ( void )
@@ -123,8 +122,6 @@ bool CResource::Load ( void )
         m_bClientScripts = true;
         m_bClientFiles = true;
         m_bHasStarted = false;
-
-        m_bOOPEnabledInMetaXml = false;
 
         m_pVM = NULL;
         // @@@@@ Set some type of HTTP access here
@@ -245,13 +242,6 @@ bool CResource::Load ( void )
                 {
                     m_bSyncMapElementData = StringToBool ( pNodeSyncMapElementData->GetTagContent ().c_str () );
                     m_bSyncMapElementDataDefined = true;
-                }
-
-                m_bOOPEnabledInMetaXml = true;
-                CXMLNode * pNodeClientOOP = root->FindSubNode ( "oop", 0 );
-                if ( pNodeClientOOP )
-                {
-                    m_bOOPEnabledInMetaXml = StringToBool ( pNodeClientOOP->GetTagContent ().c_str () );
                 }
 
                 // disabled for now
@@ -1020,7 +1010,7 @@ bool CResource::Stop ( bool bStopManually )
         CLogger::LogPrintf ( LOGLEVEL_LOW, "Stopping %s\n", m_strResourceName.c_str () );
 
         // Tell the modules we are stopping
-        g_pGame->GetLuaManager ()->GetLuaModuleManager ()->ResourceStopping ( m_pVM->GetVirtualMachine () );
+        g_pGame->GetLuaManager ()->GetLuaModuleManager ()->_ResourceStopping ( m_pVM->GetVirtualMachine () );
 
         // Remove us from the running resources list
         m_StartedResources.remove ( this );
@@ -1068,7 +1058,7 @@ bool CResource::Stop ( bool bStopManually )
         }
 
         // Tell the module manager we have stopped
-        g_pGame->GetLuaManager ()->GetLuaModuleManager ()->ResourceStopped ( m_pVM->GetVirtualMachine () );
+        g_pGame->GetLuaManager ()->GetLuaModuleManager ()->_ResourceStopped ( m_pVM->GetVirtualMachine () );
 
         // Remove the temporary XML storage node
         if ( m_pNodeStorage )
@@ -1659,18 +1649,9 @@ bool CResource::ReadIncludedFiles ( CXMLNode * root )
                 string strFullFilename;
                 ReplaceSlashes ( strFilename );
 
-                bool bDownload = true;
-                CXMLAttribute * download = attributes->Find("download");
-                if ( download )
-                {
-                    const char *szDownload = download->GetValue ().c_str ();
-                    if ( stricmp ( szDownload, "no" ) == 0 || stricmp ( szDownload, "false" ) == 0 )
-                        bDownload = false;
-                }
-
                 // Create a new resourcefile item
                 if ( IsValidFilePath ( strFilename.c_str () ) && GetFilePath ( strFilename.c_str (), strFullFilename ) )
-                    m_resourceFiles.push_back ( new CResourceClientFileItem ( this, strFilename.c_str (), strFullFilename.c_str (), attributes, bDownload ) );
+                    m_resourceFiles.push_back ( new CResourceClientFileItem ( this, strFilename.c_str (), strFullFilename.c_str (), attributes ) );
                 else
                 {
                     m_strFailureReason = SString ( "Couldn't find file %s for resource %s\n", strFilename.c_str (), m_strResourceName.c_str () );
@@ -1726,24 +1707,24 @@ bool CResource::ReadIncludedExports ( CXMLNode * root )
             }
 
             // Find the type attribute
-            bool bServer = true;
-            bool bClient = false;
-            
+            CExportedFunction::eExportedFunctionType ucType = CExportedFunction::EXPORTED_FUNCTION_TYPE_SERVER;
             CXMLAttribute * type = attributes->Find("type");
             if ( type )
             {
-                // Grab the type. Client or server or shared
+                // Grab the type. Client or server
                 const char *szType = type->GetValue ().c_str ();
-                if ( stricmp ( szType, "client" ) == 0 )
+                if ( stricmp ( szType, "server" ) == 0 )
                 {
-                    bServer = false;
-                    bClient = true;
+                    ucType = CExportedFunction::EXPORTED_FUNCTION_TYPE_SERVER;
                 }
-                else if ( stricmp ( szType, "shared" ) == 0 )
-                    bClient = true;
-                else 
-                if ( stricmp ( szType, "server" ) != 0 )
+                else if ( stricmp ( szType, "client" ) == 0 )
+                {
+                    ucType = CExportedFunction::EXPORTED_FUNCTION_TYPE_CLIENT;
+                }
+                else
+                {
                     CLogger::LogPrintf ( "Unknown exported function type specified in %s. Assuming 'server'\n", m_strResourceName.c_str () );
+                }
             }
 
             // Grab the functionname attribute
@@ -1756,10 +1737,7 @@ bool CResource::ReadIncludedExports ( CXMLNode * root )
                 // Add it to the list if it wasn't zero long. Otherwize show a warning
                 if ( !strFunction.empty () )
                 {
-                    if ( bServer )
-                        m_exportedFunctions.push_back ( CExportedFunction ( strFunction.c_str (), bHTTP, CExportedFunction::EXPORTED_FUNCTION_TYPE_SERVER, bRestricted || GetName () == "webadmin" || GetName () == "runcode" ) );
-                    if ( bClient )
-                        m_exportedFunctions.push_back ( CExportedFunction ( strFunction.c_str (), bHTTP, CExportedFunction::EXPORTED_FUNCTION_TYPE_CLIENT, bRestricted || GetName () == "webadmin" || GetName () == "runcode" ) );
+                    m_exportedFunctions.push_back ( CExportedFunction ( strFunction.c_str (), bHTTP, ucType, bRestricted || GetName () == "webadmin" || GetName () == "runcode" ) );
                 }
                 else
                 {

@@ -537,38 +537,6 @@ int CLuaFunctionDefinitions::RemoveEventHandler ( lua_State* luaVM )
 }
 
 
-int CLuaFunctionDefinitions::GetEventHandlers ( lua_State* luaVM )
-{
-//  table getEventHandlers ( string eventName, element attachedTo )
-    SString strName; CElement* pElement;
-
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadString ( strName );
-    argStream.ReadUserData ( pElement );
-
-    if ( !argStream.HasErrors () )
-    {
-        // Grab our virtual machine
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
-        if ( pLuaMain )
-        {
-            // Create a new table
-            lua_newtable ( luaVM );
-
-            pElement->GetEventManager ()->GetHandles ( pLuaMain, (const char*)strName, luaVM );
-
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
-
-    // Failed
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-
 int CLuaFunctionDefinitions::TriggerEvent ( lua_State* luaVM )
 {
 //  bool triggerEvent ( string eventName, element baseElement, [ var argument1, ... ] )
@@ -959,107 +927,64 @@ int CLuaFunctionDefinitions::SetWeaponProperty ( lua_State* luaVM )
     eWeaponProperty eProp = WEAPON_ACCURACY;
 
     CScriptArgReader argStream ( luaVM );
-    if ( argStream.NextIsUserData ( ) )
+    argStream.ReadEnumStringOrNumber ( eWep );
+    argStream.ReadEnumStringOrNumber ( eWepSkill );
+    argStream.ReadEnumString ( eProp );
+    if ( !argStream.HasErrors () )
     {
-
-        CCustomWeapon * pWeapon;
-        eWeaponProperty weaponProperty;
-        CScriptArgReader argStream ( luaVM );
-        argStream.ReadUserData ( pWeapon );
-        argStream.ReadEnumString ( weaponProperty );
-
-        if ( !argStream.HasErrors () )
+        switch ( eProp )
         {
-            if ( weaponProperty == WEAPON_DAMAGE )
+        case WEAPON_WEAPON_RANGE:
+        case WEAPON_TARGET_RANGE:
+        case WEAPON_ACCURACY:
+        case WEAPON_MOVE_SPEED:
+        case WEAPON_ANIM_LOOP_START:
+        case WEAPON_ANIM_LOOP_STOP:
+        case WEAPON_ANIM_LOOP_RELEASE_BULLET_TIME:
+        case WEAPON_ANIM2_LOOP_START:
+        case WEAPON_ANIM2_LOOP_STOP:
+        case WEAPON_ANIM2_LOOP_RELEASE_BULLET_TIME:
+        case WEAPON_ANIM_BREAKOUT_TIME:
             {
-                short sData = 0;
-                argStream.ReadNumber( sData );
-                if ( !argStream.HasErrors( ) )
+                float fWeaponInfo = 0.0f;
+                argStream.ReadNumber ( fWeaponInfo );
+                if ( !argStream.HasErrors () )
                 {
-                    if ( CStaticFunctionDefinitions::SetWeaponProperty ( pWeapon, weaponProperty, sData ) )
+                    if ( CStaticFunctionDefinitions::SetWeaponProperty ( eProp, eWep, eWepSkill, fWeaponInfo ) )
                     {
                         lua_pushboolean ( luaVM, true );
                         return 1;
                     }
                 }
+                break;
             }
-            else
+        case WEAPON_DAMAGE:
+        case WEAPON_MAX_CLIP_AMMO:
+        case WEAPON_FLAGS:
             {
-                float fData = 0.0f;
-                argStream.ReadNumber( fData );
-                if ( !argStream.HasErrors( ) )
+                short sWeaponInfo = 0;
+                argStream.ReadNumber ( sWeaponInfo );
+                if ( !argStream.HasErrors () )
                 {
-                    if ( CStaticFunctionDefinitions::SetWeaponProperty ( pWeapon, weaponProperty, fData ) )
+                    if ( CStaticFunctionDefinitions::SetWeaponProperty ( eProp, eWep, eWepSkill, sWeaponInfo ) )
                     {
                         lua_pushboolean ( luaVM, true );
                         return 1;
                     }
                 }
+                break;
             }
-        }
-        if ( argStream.HasErrors () )
-            m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
-    }
-    else
-    {
-        argStream.ReadEnumStringOrNumber ( eWep );
-        argStream.ReadEnumStringOrNumber ( eWepSkill );
-        argStream.ReadEnumString ( eProp );
-        if ( !argStream.HasErrors () )
-        {
-            switch ( eProp )
+        default:
             {
-            case WEAPON_WEAPON_RANGE:
-            case WEAPON_TARGET_RANGE:
-            case WEAPON_ACCURACY:
-            case WEAPON_MOVE_SPEED:
-            case WEAPON_ANIM_LOOP_START:
-            case WEAPON_ANIM_LOOP_STOP:
-            case WEAPON_ANIM_LOOP_RELEASE_BULLET_TIME:
-            case WEAPON_ANIM2_LOOP_START:
-            case WEAPON_ANIM2_LOOP_STOP:
-            case WEAPON_ANIM2_LOOP_RELEASE_BULLET_TIME:
-            case WEAPON_ANIM_BREAKOUT_TIME:
-                {
-                    float fWeaponInfo = 0.0f;
-                    argStream.ReadNumber ( fWeaponInfo );
-                    if ( !argStream.HasErrors () )
-                    {
-                        if ( CStaticFunctionDefinitions::SetWeaponProperty ( eProp, eWep, eWepSkill, fWeaponInfo ) )
-                        {
-                            lua_pushboolean ( luaVM, true );
-                            return 1;
-                        }
-                    }
-                    break;
-                }
-            case WEAPON_DAMAGE:
-            case WEAPON_MAX_CLIP_AMMO:
-            case WEAPON_FLAGS:
-                {
-                    short sWeaponInfo = 0;
-                    argStream.ReadNumber ( sWeaponInfo );
-                    if ( !argStream.HasErrors () )
-                    {
-                        if ( CStaticFunctionDefinitions::SetWeaponProperty ( eProp, eWep, eWepSkill, sWeaponInfo ) )
-                        {
-                            lua_pushboolean ( luaVM, true );
-                            return 1;
-                        }
-                    }
-                    break;
-                }
-            default:
-                {
-                    argStream.SetCustomError( "unsupported weapon property at argument 3" );
-                    break;
-                }
-
+                argStream.SetCustomError( "unsupported weapon property at argument 3" );
+                break;
             }
+
         }
-        if ( argStream.HasErrors () )
-            m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
     }
+    if ( argStream.HasErrors () )
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+
     // Failed
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -3815,53 +3740,29 @@ int CLuaFunctionDefinitions::TakeAllWeapons ( lua_State* luaVM )
     return 1;
 }
 
+
 int CLuaFunctionDefinitions::SetWeaponAmmo ( lua_State* luaVM )
 {
 // bool setWeaponAmmo ( player thePlayer, int weapon, int totalAmmo, [int ammoInClip = 0] )
-    CElement* pElement; 
-    eWeaponType weaponType; 
-    ushort usAmmo; 
-    ushort usAmmoInClip;
-    CCustomWeapon * pWeapon = NULL;
+    CElement* pElement; eWeaponType weaponType; ushort usAmmo; ushort usAmmoInClip;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pElement );
-    if ( pElement->GetType() != CElement::WEAPON )
-    {
-        argStream.ReadEnumStringOrNumber ( weaponType );
-        argStream.ReadNumber ( usAmmo );
-        argStream.ReadNumber ( usAmmoInClip, 0 );
+    argStream.ReadEnumStringOrNumber ( weaponType );
+    argStream.ReadNumber ( usAmmo );
+    argStream.ReadNumber ( usAmmoInClip, 0 );
 
-        if ( !argStream.HasErrors () )
+    if ( !argStream.HasErrors () )
+    {
+        if ( CStaticFunctionDefinitions::SetWeaponAmmo ( pElement, weaponType, usAmmo, usAmmoInClip ) )
         {
-            if ( CStaticFunctionDefinitions::SetWeaponAmmo ( pElement, weaponType, usAmmo, usAmmoInClip ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
+            lua_pushboolean ( luaVM, true );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
     }
     else
-    {
-        pWeapon = static_cast < CCustomWeapon * > ( pElement );
-        argStream.ReadNumber ( usAmmo );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
 
-        if ( !argStream.HasErrors() )
-        {
-            if ( CStaticFunctionDefinitions::SetWeaponAmmo ( pWeapon, usAmmo ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
-        }
-        else
-            m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
-
-        lua_pushboolean ( luaVM, false );
-        return 1;
-    }
     lua_pushboolean ( luaVM, false );
     return 1;
 }
@@ -9688,499 +9589,24 @@ int CLuaFunctionDefinitions::GetWeaponNameFromID ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::GetWeaponIDFromName ( lua_State* luaVM )
 {
-    SString strName = "";
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadString ( strName );
-
-    if ( !argStream.HasErrors ( ) )
+    if ( lua_type ( luaVM, 1 ) == LUA_TSTRING )
     {
+        const char* szName = lua_tostring ( luaVM, 1 );
         unsigned char ucID;
 
-        if ( CStaticFunctionDefinitions::GetWeaponIDFromName ( strName, ucID ) )
+        if ( CStaticFunctionDefinitions::GetWeaponIDFromName ( szName, ucID ) )
         {
             lua_pushnumber ( luaVM, ucID );
             return 1;
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;
 }
 
-
-int CLuaFunctionDefinitions::CreateWeapon ( lua_State* luaVM )
-{
-    CVector vecPos;
-    eWeaponType weaponType;
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadEnumStringOrNumber ( weaponType );
-    argStream.ReadNumber ( vecPos.fX );
-    argStream.ReadNumber ( vecPos.fY );
-    argStream.ReadNumber ( vecPos.fZ );
-
-    if ( !argStream.HasErrors ( ) )
-    {
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
-        if ( pLuaMain )
-        {
-            CResource* pResource = pLuaMain->GetResource ( );
-            if ( pResource )
-            {
-                CCustomWeapon * pWeapon = CStaticFunctionDefinitions::CreateWeapon ( pResource, weaponType, vecPos );
-                if ( pWeapon )
-                {
-                    CElementGroup * pGroup = pResource->GetElementGroup();
-                    if ( pGroup )
-                    {
-                        pGroup->Add ( ( CElement* ) pWeapon );
-                    }
-
-                    lua_pushelement ( luaVM, pWeapon );
-                    return 1;
-                }
-            }
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
-
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-int CLuaFunctionDefinitions::FireWeapon ( lua_State* luaVM )
-{
-    CCustomWeapon * pWeapon;
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pWeapon );
-
-    if ( !argStream.HasErrors () )
-    {
-        if ( CStaticFunctionDefinitions::FireWeapon ( pWeapon ) )
-        {
-            lua_pushboolean ( luaVM, true );
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
-
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-int CLuaFunctionDefinitions::SetWeaponState ( lua_State* luaVM )
-{
-    CCustomWeapon * pWeapon;
-    eWeaponState weaponState;
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pWeapon );
-    argStream.ReadEnumString ( weaponState );
-
-    if ( !argStream.HasErrors () )
-    {
-        if ( CStaticFunctionDefinitions::SetWeaponState ( pWeapon, weaponState ) )
-        {
-            lua_pushboolean ( luaVM, true );
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
-
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-int CLuaFunctionDefinitions::GetWeaponState ( lua_State* luaVM )
-{
-    CCustomWeapon * pWeapon;
-    eWeaponState weaponState;
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pWeapon );
-
-    if ( !argStream.HasErrors () )
-    {
-        weaponState = pWeapon->GetWeaponState ( );
-        SString strValue = EnumToString ( weaponState );
-        lua_pushstring ( luaVM, strValue );
-        return 1;
-    }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
-
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-int CLuaFunctionDefinitions::SetWeaponTarget ( lua_State* luaVM )
-{
-    CCustomWeapon * pWeapon;
-    CElement * pTarget;
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pWeapon );
-    if ( argStream.NextIsUserData() )
-    {
-        int targetBone;
-        argStream.ReadUserData ( pTarget );
-        argStream.ReadNumber ( targetBone, 255 );
-        if ( !argStream.HasErrors () )
-        {
-            if ( CStaticFunctionDefinitions::SetWeaponTarget ( pWeapon, pTarget, targetBone ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
-        }
-    }
-    else if ( argStream.NextIsNumber() )
-    {
-        CVector vecTarget;
-        argStream.ReadNumber( vecTarget.fX );
-        argStream.ReadNumber( vecTarget.fY );
-        argStream.ReadNumber( vecTarget.fZ );
-        if ( !argStream.HasErrors () )
-        {
-            if ( CStaticFunctionDefinitions::SetWeaponTarget ( pWeapon, vecTarget ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
-        }
-    }
-    else if ( argStream.NextIsNil() )
-    {
-        if ( !argStream.HasErrors () )
-        {
-            if ( CStaticFunctionDefinitions::ClearWeaponTarget ( pWeapon ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
-        }
-    }
-    else
-        argStream.SetCustomError( "Expected element, number or nil at argument 2" );
-
-    if ( argStream.HasErrors () )
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
-
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-int CLuaFunctionDefinitions::GetWeaponTarget ( lua_State* luaVM )
-{
-    CCustomWeapon * pWeapon;
-    CElement * pTarget;
-    CVector vecTarget;
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pWeapon );
-    if ( !argStream.HasErrors () )
-    {
-        switch ( pWeapon->GetTargetType ( ) )
-        {
-        case TARGET_TYPE_VECTOR:
-            vecTarget = pWeapon->GetVectorTarget ( );
-            lua_pushnumber ( luaVM, vecTarget.fX );
-            lua_pushnumber ( luaVM, vecTarget.fY );
-            lua_pushnumber ( luaVM, vecTarget.fZ );
-            return 3;
-        case TARGET_TYPE_ENTITY:
-            pTarget = pWeapon->GetElementTarget ( );
-            lua_pushelement ( luaVM, pTarget );
-            return 1;
-        case TARGET_TYPE_FIXED:
-            lua_pushnil ( luaVM );
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
-
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-int CLuaFunctionDefinitions::GetWeaponOwner ( lua_State* luaVM )
-{
-    CCustomWeapon * pWeapon;
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pWeapon );
-    if ( !argStream.HasErrors () )
-    {
-        CPlayer* pOwner = pWeapon->GetOwner();
-        if ( pOwner )
-        {
-            lua_pushelement ( luaVM, pOwner );
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
-
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-int CLuaFunctionDefinitions::SetWeaponOwner ( lua_State* luaVM )
-{
-    CCustomWeapon * pWeapon;
-    CPlayer * pPlayer;
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pWeapon );
-    if ( argStream.NextIsUserData() )
-    {
-        argStream.ReadUserData ( pPlayer );
-        if ( !argStream.HasErrors () )
-        {
-            if ( CStaticFunctionDefinitions::SetWeaponOwner ( pWeapon, pPlayer ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
-        }
-    }
-    else if ( argStream.NextIsNil() )
-    {
-        if ( !argStream.HasErrors () )
-        {
-            if ( CStaticFunctionDefinitions::SetWeaponOwner ( pWeapon, NULL ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
-        }
-    }
-    if ( argStream.HasErrors() )
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
-
-    lua_pushnil ( luaVM );
-    return 1;
-}
-
-int CLuaFunctionDefinitions::SetWeaponFlags ( lua_State* luaVM )
-{
-    CCustomWeapon * pWeapon = NULL;
-    SLineOfSightFlags flags;
-    eWeaponFlags flag;
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pWeapon );
-    argStream.ReadEnumString ( flag );
-    if ( !argStream.HasErrors() )
-    {
-        if ( flag != WEAPONFLAGS_FLAGS )
-        {
-            bool bData;
-            argStream.ReadBool ( bData );
-            if ( CStaticFunctionDefinitions::SetWeaponFlags( pWeapon, flag, bData ) )
-            {
-                lua_pushboolean( luaVM, bData );
-                return 1;
-            }
-        }
-        else
-        {
-            argStream.ReadBool ( flags.bCheckBuildings );
-            argStream.ReadBool ( flags.bCheckCarTires );
-            argStream.ReadBool ( flags.bCheckDummies );
-            argStream.ReadBool ( flags.bCheckObjects );
-            argStream.ReadBool ( flags.bCheckPeds );
-            argStream.ReadBool ( flags.bCheckVehicles );
-            argStream.ReadBool ( flags.bSeeThroughStuff );
-            argStream.ReadBool ( flags.bShootThroughStuff );
-            if ( !argStream.HasErrors() )
-            {
-                if ( CStaticFunctionDefinitions::SetWeaponFlags( pWeapon, flags ) )
-                {
-                    lua_pushboolean( luaVM, true );
-                }
-            }
-        }
-    }
-    if ( argStream.HasErrors() )
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
-
-    lua_pushboolean( luaVM, false );
-    return 1;
-}
-
-int CLuaFunctionDefinitions::GetWeaponFlags ( lua_State* luaVM )
-{
-    CCustomWeapon * pWeapon = NULL;
-    SLineOfSightFlags flags;
-    eWeaponFlags flag;
-    bool bData;
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pWeapon );
-    argStream.ReadEnumString ( flag );
-    if ( !argStream.HasErrors() )
-    {
-        if ( flag != WEAPONFLAGS_FLAGS )
-        {
-            if ( CStaticFunctionDefinitions::GetWeaponFlags( pWeapon, flag, bData ) )
-            {
-                lua_pushboolean( luaVM, bData );
-                return 1;
-            }
-        }
-        else
-        {
-            if ( CStaticFunctionDefinitions::GetWeaponFlags( pWeapon, flags ) )
-            {
-                lua_pushboolean( luaVM, flags.bCheckBuildings );
-                lua_pushboolean( luaVM, flags.bCheckCarTires );
-                lua_pushboolean( luaVM, flags.bCheckDummies );
-                lua_pushboolean( luaVM, flags.bCheckObjects );
-                lua_pushboolean( luaVM, flags.bCheckPeds );
-                lua_pushboolean( luaVM, flags.bCheckVehicles );
-                lua_pushboolean( luaVM, flags.bSeeThroughStuff );
-                lua_pushboolean( luaVM, flags.bShootThroughStuff );
-                return 8;
-            }
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
-
-    lua_pushboolean( luaVM, false );
-    return 1;
-}
-
-int CLuaFunctionDefinitions::SetWeaponFiringRate ( lua_State* luaVM )
-{
-    CCustomWeapon * pWeapon = NULL;
-    int iFiringRate = 0;
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pWeapon );
-    argStream.ReadNumber ( iFiringRate );
-
-    if ( !argStream.HasErrors() )
-    {
-        if ( CStaticFunctionDefinitions::SetWeaponFiringRate( pWeapon, iFiringRate ) )
-        {
-            lua_pushboolean ( luaVM, true );
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
-
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-int CLuaFunctionDefinitions::GetWeaponFiringRate ( lua_State* luaVM )
-{
-    CCustomWeapon * pWeapon = NULL;
-    int iFiringRate = 0;
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pWeapon );
-
-    if ( !argStream.HasErrors() )
-    {
-        if ( CStaticFunctionDefinitions::GetWeaponFiringRate( pWeapon, iFiringRate ) )
-        {
-            lua_pushnumber ( luaVM, iFiringRate );
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
-
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-int CLuaFunctionDefinitions::ResetWeaponFiringRate ( lua_State* luaVM )
-{
-    CCustomWeapon * pWeapon = NULL;
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pWeapon );
-
-    if ( !argStream.HasErrors() )
-    {
-        if ( CStaticFunctionDefinitions::ResetWeaponFiringRate( pWeapon ) )
-        {
-            lua_pushboolean ( luaVM, true );
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
-
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-int CLuaFunctionDefinitions::GetWeaponClipAmmo ( lua_State* luaVM )
-{
-    CCustomWeapon * pWeapon = NULL;
-    int iClipAmmo = 0;
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pWeapon );
-
-    if ( !argStream.HasErrors() )
-    {
-        if ( CStaticFunctionDefinitions::GetWeaponClipAmmo( pWeapon, iClipAmmo ) )
-        {
-            lua_pushnumber ( luaVM, iClipAmmo );
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
-
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-int CLuaFunctionDefinitions::GetWeaponAmmo ( lua_State* luaVM )
-{
-    CCustomWeapon * pWeapon = NULL;
-    int iAmmo = 0;
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pWeapon );
-
-    if ( !argStream.HasErrors() )
-    {
-        if ( CStaticFunctionDefinitions::GetWeaponAmmo( pWeapon, iAmmo ) )
-        {
-            lua_pushnumber ( luaVM, iAmmo );
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
-
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-int CLuaFunctionDefinitions::SetWeaponClipAmmo ( lua_State* luaVM )
-{
-    CCustomWeapon * pWeapon = NULL;
-    int iAmmo = 0;
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pWeapon );
-    argStream.ReadNumber ( iAmmo );
-
-    if ( !argStream.HasErrors() )
-    {
-        if ( CStaticFunctionDefinitions::SetWeaponClipAmmo( pWeapon, iAmmo ) )
-        {
-            lua_pushboolean ( luaVM, true );
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
-
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
 
 int CLuaFunctionDefinitions::GetBodyPartName ( lua_State* luaVM )
 {
@@ -10494,8 +9920,9 @@ int CLuaFunctionDefinitions::OutputChatBox ( lua_State* luaVM )
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
 
     lua_pushboolean ( luaVM, false );
-    return 1;   
+    return 1;
 }
+
 
 int CLuaFunctionDefinitions::OutputConsole ( lua_State* luaVM )
 {
@@ -13365,96 +12792,6 @@ int CLuaFunctionDefinitions::Sha256 ( lua_State* luaVM )
     return 1;
 }
 
-int CLuaFunctionDefinitions::TeaEncode ( lua_State* luaVM )
-{
-    SString str;
-    SString key;
-
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadString ( str );
-    argStream.ReadString ( key );
-
-    if ( !argStream.HasErrors() )
-    {
-        SString result;
-        SString humanReadableResult;
-        SharedUtil::TeaEncode ( str, key, &result );
-        humanReadableResult = Base64::encode ( result );
-        lua_pushstring ( luaVM, humanReadableResult );
-        return 1;
-    }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
-
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-int CLuaFunctionDefinitions::TeaDecode ( lua_State* luaVM )
-{
-    SString str;
-    SString key;
-
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadString ( str );
-    argStream.ReadString ( key );
-
-    if ( !argStream.HasErrors() )
-    {
-        SString result;
-        Base64::decode ( str, result );
-        SharedUtil::TeaDecode ( result, key, &str );
-        lua_pushstring ( luaVM, str );
-        return 1;
-    }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
-
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-int CLuaFunctionDefinitions::Base64encode ( lua_State* luaVM )
-{
-    SString str;
-
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadString ( str );
-
-    if ( !argStream.HasErrors() )
-    {
-        SString result = Base64::encode ( str );
-        lua_pushstring ( luaVM, result );
-        return 1;
-    }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
-
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-int CLuaFunctionDefinitions::Base64decode ( lua_State* luaVM )
-{
-    SString str;
-
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadString ( str );
-
-    if ( !argStream.HasErrors() )
-    {
-        SString result;
-        Base64::decode ( str, result );
-        lua_pushstring ( luaVM, result );
-        return 1;
-    }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
-
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
 int CLuaFunctionDefinitions::GetNetworkUsageData ( lua_State* luaVM )
 {
     SPacketStat m_PacketStats [ 2 ] [ 256 ];
@@ -13629,25 +12966,25 @@ int CLuaFunctionDefinitions::GetVersion ( lua_State* luaVM )
 int CLuaFunctionDefinitions::GetModuleInfo ( lua_State* luaVM )
 {
     if (lua_type( luaVM, 1 ) == LUA_TSTRING) {
-        list < CLuaModule* > lua_LoadedModules = m_pLuaModuleManager->GetLoadedModules();
-        list < CLuaModule* > ::iterator iter = lua_LoadedModules.begin ();
+        vector < FunctionInfo > func_LoadedModules = m_pLuaModuleManager->GetLoadedModules();
+        vector < FunctionInfo > ::iterator iter = func_LoadedModules.begin ();
         SString strAttribute = lua_tostring( luaVM, 2 );
         SString strModuleName = lua_tostring( luaVM, 1 );
-        for ( ; iter != lua_LoadedModules.end (); iter++ )
+        for ( ; iter != func_LoadedModules.end (); iter++ )
         {
-            if ( stricmp ( strModuleName, (*iter)->_GetName().c_str() ) == 0 ) {
+            if ( stricmp ( strModuleName, (*iter).szFileName ) == 0 ) {
                 lua_newtable ( luaVM );
 
                 lua_pushstring ( luaVM, "name" );
-                lua_pushstring ( luaVM, (*iter)->_GetFunctions().szModuleName );
+                lua_pushstring ( luaVM, (*iter).szModuleName );
                 lua_settable ( luaVM, -3 );
 
                 lua_pushstring ( luaVM, "author" );
-                lua_pushstring ( luaVM, (*iter)->_GetFunctions().szAuthor );
+                lua_pushstring ( luaVM, (*iter).szAuthor );
                 lua_settable ( luaVM, -3 );
 
                 lua_pushstring ( luaVM, "version" );
-                SString strVersion ( "%.2f", (*iter)->_GetFunctions().fVersion );
+                SString strVersion ( "%.2f", (*iter).fVersion );
                 lua_pushstring ( luaVM, strVersion );
                 lua_settable ( luaVM, -3 );
 
@@ -13663,13 +13000,13 @@ int CLuaFunctionDefinitions::GetModuleInfo ( lua_State* luaVM )
 int CLuaFunctionDefinitions::GetModules ( lua_State* luaVM )
 {
     lua_newtable ( luaVM );
-    list < CLuaModule* > lua_LoadedModules = m_pLuaModuleManager->GetLoadedModules();
-    list < CLuaModule* > ::iterator iter = lua_LoadedModules.begin ();
+    vector < FunctionInfo > func_LoadedModules = m_pLuaModuleManager->GetLoadedModules();
+    vector < FunctionInfo > ::iterator iter = func_LoadedModules.begin ();
     unsigned int uiIndex = 1;
-    for ( ; iter != lua_LoadedModules.end (); iter++ )
+    for ( ; iter != func_LoadedModules.end (); iter++ )
     {
         lua_pushnumber ( luaVM, uiIndex++ );
-        lua_pushstring ( luaVM, (*iter)->_GetFunctions().szFileName );
+        lua_pushstring ( luaVM, (*iter).szFileName );
         lua_settable ( luaVM, -3 );
     }
     return 1;
@@ -13722,97 +13059,6 @@ int CLuaFunctionDefinitions::GetPerformanceStats ( lua_State* luaVM )
     }
     else
         m_pScriptDebugging->LogBadType ( luaVM );
-
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-
-int CLuaFunctionDefinitions::PregFind ( lua_State* luaVM )
-{
-//  bool pregFind ( string base, string pattern )
-    SString strBase, strPattern;
-
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadString ( strBase );
-    argStream.ReadString ( strPattern );
-
-    if ( !argStream.HasErrors () )
-    {
-        pcrecpp::RE pPattern ( strPattern );
-
-        if ( pPattern.PartialMatch ( strBase ) )
-        {
-            lua_pushboolean ( luaVM, true );
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
-
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-
-int CLuaFunctionDefinitions::PregReplace ( lua_State* luaVM )
-{
-//  string pregReplace ( string base, string pattern, string replace )
-    SString strBase, strPattern, strReplace;
-
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadString ( strBase );
-    argStream.ReadString ( strPattern );
-    argStream.ReadString ( strReplace );
-
-    if ( !argStream.HasErrors () )
-    {
-        pcrecpp::RE pPattern ( strPattern );
-
-        string strNew = strBase;
-        if ( pPattern.GlobalReplace ( strReplace, &strNew ) )
-        {
-            lua_pushstring ( luaVM, strNew.c_str () );
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
-
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-
-int CLuaFunctionDefinitions::PregMatch ( lua_State* luaVM )
-{
-//  table pregMatch ( string base, string pattern )
-    SString strBase, strPattern;
-
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadString ( strBase );
-    argStream.ReadString ( strPattern );
-
-    if ( !argStream.HasErrors () )
-    {
-        lua_newtable ( luaVM );
-
-        pcrecpp::RE pPattern ( strPattern );
-        pcrecpp::StringPiece strInput ( strBase );
-
-        string strGet; int i = 1;
-        while ( pPattern.FindAndConsume ( &strInput, &strGet ) ) 
-        {
-            lua_pushnumber ( luaVM, i );
-            lua_pushstring ( luaVM, strGet.c_str () );
-            lua_settable ( luaVM, -3 );   
-            i++;
-        }
-        
-        return 1;
-    }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;

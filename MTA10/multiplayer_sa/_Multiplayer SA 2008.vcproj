@@ -81,7 +81,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="C:\Program Files\MTA San Andreas 1.4\mta\multiplayer_SA_d.dll"
+				OutputFile="C:\Program Files\MTA San Andreas 1.3\mta\multiplayer_SA_d.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
 				GenerateDebugInformation="true"
@@ -181,7 +181,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="C:\Program Files\MTA San Andreas 1.4\MTA\multiplayer_sa.dll"
+				OutputFile="C:\Program Files\MTA San Andreas 1.3\MTA\multiplayer_sa.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				GenerateDebugInformation="true"

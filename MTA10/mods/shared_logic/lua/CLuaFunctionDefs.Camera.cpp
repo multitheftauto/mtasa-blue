@@ -100,25 +100,52 @@ int CLuaFunctionDefs::GetCameraGoggleEffect ( lua_State *luaVM )
 
 int CLuaFunctionDefs::SetCameraMatrix ( lua_State* luaVM )
 {
-    CVector vecPosition;
-    CVector vecLookAt;
-    CVector * pvecLookAt = NULL;
-    float fRoll = 0.0f;
-    float fFOV = 70.0f;
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadVector3D ( vecPosition );
-    bool bHasVecLookAt = argStream.NextIsVector3D();
-    argStream.ReadVector3D ( vecLookAt, CVector() );
-    argStream.ReadNumber ( fRoll, 0.0f );
-    argStream.ReadNumber ( fFOV, 70.0f );
-    if ( fFOV <= 0.0f || fFOV >= 180.0f )
-        fFOV = 70.0f;
+    // Verify the parameter types
+    int iArgument1 = lua_type ( luaVM, 1 );
+    int iArgument2 = lua_type ( luaVM, 2 );
+    int iArgument3 = lua_type ( luaVM, 3 );
 
-    if ( bHasVecLookAt )
-        pvecLookAt = &vecLookAt;
-
-    if ( !argStream.HasErrors ( ) )
+    if ( ( iArgument1 == LUA_TNUMBER || iArgument1 == LUA_TSTRING ) &&
+         ( iArgument2 == LUA_TNUMBER || iArgument2 == LUA_TSTRING ) &&
+         ( iArgument3 == LUA_TNUMBER || iArgument3 == LUA_TSTRING ) )
     {
+        // Grab the parameters
+        CVector vecPosition;
+        vecPosition.fX = static_cast < float > ( lua_tonumber ( luaVM, 1 ) );
+        vecPosition.fY = static_cast < float > ( lua_tonumber ( luaVM, 2 ) );
+        vecPosition.fZ = static_cast < float > ( lua_tonumber ( luaVM, 3 ) );
+
+        CVector vecLookAt;
+        CVector * pvecLookAt = NULL;
+        float fRoll = 0.0f;
+        float fFOV = 70.0f;
+        int iArgument4 = lua_type ( luaVM, 4 );
+        int iArgument5 = lua_type ( luaVM, 5 );
+        int iArgument6 = lua_type ( luaVM, 6 );
+        if ( ( iArgument4 == LUA_TNUMBER || iArgument4 == LUA_TSTRING ) &&
+             ( iArgument5 == LUA_TNUMBER || iArgument5 == LUA_TSTRING ) &&
+             ( iArgument6 == LUA_TNUMBER || iArgument6 == LUA_TSTRING ) )
+        {
+            vecLookAt.fX = static_cast < float > ( lua_tonumber ( luaVM, 4 ) );
+            vecLookAt.fY = static_cast < float > ( lua_tonumber ( luaVM, 5 ) );
+            vecLookAt.fZ = static_cast < float > ( lua_tonumber ( luaVM, 6 ) );
+            pvecLookAt = &vecLookAt;
+
+            int iArgument7 = lua_type ( luaVM, 7 );
+            
+            if ( iArgument7 == LUA_TNUMBER || iArgument7 == LUA_TSTRING )
+            {
+                fRoll = static_cast < float > ( lua_tonumber ( luaVM, 7 ) );
+                int iArgument8 = lua_type ( luaVM, 8 );
+                if ( iArgument8 == LUA_TNUMBER || iArgument8 == LUA_TSTRING )
+                {
+                    fFOV = static_cast < float > ( lua_tonumber ( luaVM, 8 ) );
+                    if ( fFOV <= 0.0f || fFOV >= 180.0f )
+                        fFOV = 70.0f;
+                }
+            }
+        }
+
         if ( CStaticFunctionDefinitions::SetCameraMatrix ( vecPosition, pvecLookAt, fRoll, fFOV ) )
         {
             lua_pushboolean ( luaVM, true );
@@ -126,7 +153,7 @@ int CLuaFunctionDefs::SetCameraMatrix ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -155,7 +182,9 @@ int CLuaFunctionDefs::SetCameraTarget ( lua_State* luaVM )
     else
     {
         CVector vecTarget;
-        argStream.ReadVector3D ( vecTarget );
+        argStream.ReadNumber ( vecTarget.fX );
+        argStream.ReadNumber ( vecTarget.fY );
+        argStream.ReadNumber ( vecTarget.fZ );
 
         if ( !argStream.HasErrors () )
         {
@@ -177,12 +206,11 @@ int CLuaFunctionDefs::SetCameraTarget ( lua_State* luaVM )
 
 int CLuaFunctionDefs::SetCameraInterior ( lua_State* luaVM )
 {
-    unsigned char ucInterior = 0;
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadNumber ( ucInterior );
-
-    if ( !argStream.HasErrors ( ) )
+    int iArgument1 = lua_type ( luaVM, 1 );
+    if ( iArgument1 == LUA_TNUMBER || iArgument1 == LUA_TSTRING )
     {
+        unsigned char ucInterior = static_cast < unsigned char > ( lua_tonumber ( luaVM, 1 ) );
+
         if ( CStaticFunctionDefinitions::SetCameraInterior ( ucInterior ) )
         {
             lua_pushboolean ( luaVM, true );
@@ -190,7 +218,7 @@ int CLuaFunctionDefs::SetCameraInterior ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -199,21 +227,40 @@ int CLuaFunctionDefs::SetCameraInterior ( lua_State* luaVM )
 
 int CLuaFunctionDefs::FadeCamera ( lua_State* luaVM )
 {
-    bool bFadeIn = false;
-    unsigned char ucRed = 0;
-    unsigned char ucGreen = 0;
-    unsigned char ucBlue = 0;
-    float fFadeTime = 1.0f;
+    int iArgument1 = lua_type ( luaVM, 1 ); // fadeIn
+    int iArgument2 = lua_type ( luaVM, 2 ); // fadeTime
+    int iArgument3 = lua_type ( luaVM, 3 ); // red
+    int iArgument4 = lua_type ( luaVM, 4 ); // green
+    int iArgument5 = lua_type ( luaVM, 5 ); // blue
 
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadBool ( bFadeIn );
-    argStream.ReadNumber ( fFadeTime, 1.0f );
-    argStream.ReadNumber ( ucRed, 0 );
-    argStream.ReadNumber ( ucGreen, 0 );
-    argStream.ReadNumber ( ucBlue, 0 );
-
-    if ( !argStream.HasErrors ( ) )
+    if ( iArgument1 == LUA_TBOOLEAN )
     {
+        bool bFadeIn = lua_toboolean (luaVM, 1 ) ? true:false;
+        unsigned char ucRed = 0;
+        unsigned char ucGreen = 0;
+        unsigned char ucBlue = 0;
+        float fFadeTime = 1.0f;
+
+        if ( iArgument2 == LUA_TSTRING || iArgument2 == LUA_TNUMBER )
+        {
+            fFadeTime = static_cast < unsigned char > ( lua_tonumber ( luaVM, 2 ) );
+
+            if ( iArgument3 == LUA_TSTRING || iArgument3 == LUA_TNUMBER )
+            {
+                ucRed = static_cast < unsigned char > ( lua_tonumber ( luaVM, 3 ) );
+
+                if ( iArgument4 == LUA_TSTRING || iArgument4 == LUA_TNUMBER )
+                {
+                    ucGreen = static_cast < unsigned char > ( lua_tonumber ( luaVM, 4 ) );
+
+                    if ( iArgument5 == LUA_TSTRING || iArgument5 == LUA_TNUMBER )
+                    {
+                        ucBlue = static_cast < unsigned char > ( lua_tonumber ( luaVM, 5 ) );
+                    }
+                }
+            }
+        }
+
         if ( CStaticFunctionDefinitions::FadeCamera ( bFadeIn, fFadeTime, ucRed, ucGreen, ucBlue ) )
         {
             lua_pushboolean ( luaVM, true );
@@ -221,7 +268,7 @@ int CLuaFunctionDefs::FadeCamera ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -230,12 +277,8 @@ int CLuaFunctionDefs::FadeCamera ( lua_State* luaVM )
 
 int CLuaFunctionDefs::SetCameraClip ( lua_State* luaVM )
 {
-    bool bObjects = true;
-    bool bVehicles = true;
-
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadBool ( bObjects, true );
-    argStream.ReadBool ( bVehicles, true );
+    bool bObjects   = lua_type ( luaVM, 1 ) != LUA_TBOOLEAN ? true : lua_toboolean ( luaVM, 1 ) ? true : false;
+    bool bVehicles  = lua_type ( luaVM, 2 ) != LUA_TBOOLEAN ? true : lua_toboolean ( luaVM, 2 ) ? true : false;
 
     m_pManager->GetCamera ()->SetCameraClip ( bObjects, bVehicles );
 
@@ -245,19 +288,13 @@ int CLuaFunctionDefs::SetCameraClip ( lua_State* luaVM )
 
 int CLuaFunctionDefs::SetCameraViewMode ( lua_State* luaVM )
 {
-    unsigned short usViewMode = 0;
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadNumber ( usViewMode );
-
-    if ( !argStream.HasErrors ( ) )
+    if ( lua_type ( luaVM, 1 ) == LUA_TNUMBER )
     {
-        CStaticFunctionDefinitions::SetCameraViewMode ( usViewMode );
+        CStaticFunctionDefinitions::SetCameraViewMode ( static_cast <unsigned short> ( lua_tonumber ( luaVM, 1 ) ) );
 
         lua_pushboolean ( luaVM, true );
         return 1;
     }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -265,13 +302,10 @@ int CLuaFunctionDefs::SetCameraViewMode ( lua_State* luaVM )
 
 int CLuaFunctionDefs::SetCameraGoggleEffect ( lua_State *luaVM )
 {
-    SString strMode = "";
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadString ( strMode );
-
-    if ( !argStream.HasErrors ( ) )
+    if ( lua_type ( luaVM, 1 ) == LUA_TSTRING )
     {
-        bool bSuccess = false;
+        bool    bSuccess = false;
+        SString strMode  = lua_tostring ( luaVM, 1 );
 
         if ( strMode.compare ( "nightvision" ) == 0 )
         {
@@ -301,8 +335,6 @@ int CLuaFunctionDefs::SetCameraGoggleEffect ( lua_State *luaVM )
             return 1;
         }
     }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
 
     lua_pushboolean ( luaVM, false );
     return 1;

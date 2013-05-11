@@ -117,7 +117,6 @@ void CSettings::CreateGUI ( void )
     m_pBindsList->SetSize ( CVector2D ( 520.0f, 335.0f ) );
     m_pBindsList->SetSorting ( false );
     m_pBindsList->SetSelectionMode ( SelectionModes::CellSingle );
-    m_pBindsList->SetDoubleClickHandler ( GUI_CALLBACK( &CSettings::OnBindsListClick, this ) );
 
     m_pBindsDefButton = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( pTabBinds, "Load defaults" ) );
     m_pBindsDefButton->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnBindsDefaultClick, this ) );
@@ -1672,7 +1671,7 @@ void CSettings::ProcessKeyBinds ( void )
             strCmdArgs.Split ( ": ", &strCommand, &strArguments );
 
             const char* szCommand = strCommand;
-            const char* szArguments = strArguments.empty () ? NULL : strArguments.c_str();
+            const char* szArguments = strArguments.empty () ? NULL : strArguments;
 
             /** Primary keybinds **/
             CCommandBind* pBind = reinterpret_cast < CCommandBind* > ( m_pBindsList->GetItemData ( i, m_hPriKey ) );
