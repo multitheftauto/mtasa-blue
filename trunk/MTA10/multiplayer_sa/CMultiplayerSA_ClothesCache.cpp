@@ -12,6 +12,7 @@
 #include "StdInc.h"
 #define RWFUNC_IMPLEMENT
 #include "..\game_sa\gamesa_renderware.h"
+#include "..\game_sa\gamesa_renderware.hpp"
 
 #define CLOTHES_REF_TEST    1       // Debug clothes geometry refs
 
@@ -420,15 +421,5 @@ void CMultiplayerSA::GetClothesCacheStats ( SClothesCacheStats& outStats )
 void CMultiplayerSA::InitHooks_ClothesCache ( void )
 {
     EZHookInstall ( CClothesBuilderCreateSkinnedClump );
-
-    if ( pGameInterface->GetGameVersion () == VERSION_EU_10 )
-    {
-        RpClumpDestroy                      = (RpClumpDestroy_t)                        0x0074A360;
-        RpClumpClone                        = (RpClumpClone_t)                          0x00749FC0;
-    }
-    else
-    {
-        RpClumpDestroy                      = (RpClumpDestroy_t)                        0x0074A310;
-        RpClumpClone                        = (RpClumpClone_t)                          0x00749F70;
-    }
+    InitRwFunctions( pGameInterface->GetGameVersion () );
 }
