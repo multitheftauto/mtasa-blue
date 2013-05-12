@@ -431,7 +431,13 @@ public:
     unsigned int m_isUsingHornOrSecondarySiren;
 
     //1304
-    BYTE Padding220[136];
+    BYTE Padding220[112];
+
+    //1416
+    RwTexture* m_pCustomPlateTexture;
+
+    //1420
+    BYTE Padding225[20];
 
     //1440
     unsigned char m_ucTrackNodeID;  // Current node on train tracks
