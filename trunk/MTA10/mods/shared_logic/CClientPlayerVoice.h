@@ -26,6 +26,7 @@
 class CClientPlayerVoice
 {
 public:
+    ZERO_ON_NEW
                                         CClientPlayerVoice          ( CClientPlayer* pPlayer, CVoiceRecorder* pVoiceRecorder  );
                                         ~CClientPlayerVoice         ( void );
     void                                DecodeAndBuffer             ( char* pBuffer, unsigned int bytesWritten );
@@ -69,8 +70,8 @@ public:
     bool                    IsFxEffectEnabled       ( uint uiFxEffect );
     bool                    IsActive                ( void )                            { return m_bVoiceActive; }
 
-    void                    SetVoiceMuted           ( bool bMute )                      { m_bMuteVoice = bMute; };
-    bool                    IsVoiceMuted            ( void )                            { return m_bMuteVoice; };
+    void                    SetMinimizeMuted        ( bool bMute )                      { m_bMinimizeMuted = bMute; }
+    bool                    IsMinimizeMuted         ( void )                            { return m_bMinimizeMuted; }
     
 private:  
     void                                Init                        ( void );
@@ -103,6 +104,6 @@ private:
     SFixedArray < int, 9 >              m_EnabledEffects;
     SFixedArray < HFX, 9 >              m_FxEffects;
 
-    bool                                m_bMuteVoice;
+    bool                                m_bMinimizeMuted;
 };
 #endif
