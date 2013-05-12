@@ -716,32 +716,13 @@ void CClientGame::DoPulsePreHUDRender ( bool bDidUnminimize, bool bDidRecreateRe
         m_pRootEntity->CallEvent ( "onClientRestore", Arguments, false );
         m_bWasMinimized = false;
 
-        if ( m_bMuteSFX )
-        {
-            unsigned char ucOldSFXVolume = g_pGame->GetSettings ()->GetSFXVolume ();
-            g_pGame->GetAudio ()->SetEffectsMasterVolume ( ucOldSFXVolume );
-        }
-
-        if ( m_bMuteRadio )
-        {
-            unsigned char ucOldRadioVolume = g_pGame->GetSettings ()->GetRadioVolume ();
-            g_pGame->GetAudio ()->SetMusicMasterVolume ( ucOldRadioVolume );
-        }
-
-        if ( m_bMuteMTA )
-        {
-            m_pManager->GetSoundManager ()->SetMTAMuted ( false );
-        }
-
-        if ( m_bMuteVoice )
-        {
-            CClientPlayer* pPlayer = g_pClientGame->m_pPlayerManager->GetLocalPlayer ();
-            CClientPlayerVoice * pVoice = pPlayer->GetVoice();
-            if ( pVoice != NULL )
-            {
-                pVoice->SetVoiceMuted ( false );
-            }
-        }
+        // Reverse any mute on minimize effects
+        g_pGame->GetAudio ()->SetEffectsMasterVolume ( g_pGame->GetSettings ()->GetSFXVolume () );
+        g_pGame->GetAudio ()->SetMusicMasterVolume ( g_pGame->GetSettings ()->GetRadioVolume () );
+        m_pManager->GetSoundManager ()->SetMinimizeMuted ( false );
+        if ( CClientPlayer* pPlayer = g_pClientGame->m_pPlayerManager->GetLocalPlayer () )
+            if ( CClientPlayerVoice* pVoice = pPlayer->GetVoice() )
+                pVoice->SetMinimizeMuted ( false );
     }
 
     // Call onClientHUDRender LUA event
@@ -3846,33 +3827,23 @@ void CClientGame::IdleHandler ( void )
             CLuaArguments Arguments;
             m_pRootEntity->CallEvent ( "onClientMinimize", Arguments, false );
 
-            g_pCore->GetCVars ()->Get ( "mute_sfx_when_minimized", m_bMuteSFX );
-            g_pCore->GetCVars ()->Get ( "mute_radio_when_minimized", m_bMuteRadio );
-            g_pCore->GetCVars ()->Get ( "mute_mta_when_minimized", m_bMuteMTA );
-            g_pCore->GetCVars ()->Get ( "mute_voice_when_minimized", m_bMuteVoice );
-
-            if ( m_bMuteSFX )
-            {
+            // Apply mute on minimize options
+            if ( g_pCore->GetCVars ()->GetValue < bool > ( "mute_sfx_when_minimized" )  )
                 g_pGame->GetAudio ()->SetEffectsMasterVolume ( 0 );
-            }
 
-            if ( m_bMuteRadio )
-            {
+            if ( g_pCore->GetCVars ()->GetValue < bool > ( "mute_radio_when_minimized" )  )
                 g_pGame->GetAudio ()->SetMusicMasterVolume ( 0 );
-            }
 
-            if ( m_bMuteMTA )
-            {
-                m_pManager->GetSoundManager ()->SetMTAMuted ( true );
-            }
+            if ( g_pCore->GetCVars ()->GetValue < bool > ( "mute_mta_when_minimized" )  )
+                m_pManager->GetSoundManager ()->SetMinimizeMuted ( true );
 
-            if ( m_bMuteVoice )
+            if ( g_pCore->GetCVars ()->GetValue < bool > ( "mute_voice_when_minimized" )  )
             {
                 CClientPlayer* pPlayer = g_pClientGame->m_pPlayerManager->GetLocalPlayer ();
                 CClientPlayerVoice * pVoice = pPlayer->GetVoice();
                 if ( pVoice != NULL )
                 {
-                    pVoice->SetVoiceMuted ( true );
+                    pVoice->SetMinimizeMuted ( true );
                 }
             }
         }
