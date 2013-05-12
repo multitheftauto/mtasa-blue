@@ -132,7 +132,7 @@ private:
 
 public:
                                 CObjectSA           ( CObjectSAInterface * objectInterface );
-                                CObjectSA           ( DWORD dwModel, bool bBreakable );
+                                CObjectSA           ( DWORD dwModel, bool bBreakingDisabled );
                                 ~CObjectSA          ( void );
 
     inline CObjectSAInterface * GetObjectInterface  ( void )    { return ( CObjectSAInterface * ) GetInterface (); }
