@@ -2465,3 +2465,39 @@ float CVehicleSA::GetNitroLevel ()
     float fLevel = *( FLOAT *)( dwThis + 0x8A4 );
     return fLevel;
 }
+
+// Change plate text of existing vehicle
+bool CVehicleSA::SetPlateText( const SString& strText )
+{
+    CModelInfo* pModelInfo = pGame->GetModelInfo ( this->GetModelIndex() );
+    if ( !pModelInfo )
+        return false;
+    CVehicleModelInfoSAInterface* pVehicleModelInfo = (CVehicleModelInfoSAInterface*)pModelInfo->GetInterface();
+
+    // Copy text
+    strncpy ( pVehicleModelInfo->plateText, *strText, 8 );
+
+    // Check if changeable
+    if ( !pVehicleModelInfo->pPlateMaterial )
+        return false;
+
+    // Release texture ref, if was custom before
+    RwTexture*& pOldTexture = GetVehicleInterface ()->m_pCustomPlateTexture;
+    if ( pOldTexture && pOldTexture != pVehicleModelInfo->pPlateMaterial->texture )
+    {
+        RwTextureDestroy( pOldTexture );
+        pOldTexture = NULL;
+    }
+
+    DWORD dwThis = (DWORD) m_pInterface;
+    DWORD dwFunc = FUNC_CVehicle_CustomCarPlate_TextureCreate;
+    bool bReturn = false;
+    _asm
+    {
+        mov     ecx, dwThis
+        push    pVehicleModelInfo
+        call    dwFunc
+        mov     bReturn, al
+    }
+    return bReturn;
+}

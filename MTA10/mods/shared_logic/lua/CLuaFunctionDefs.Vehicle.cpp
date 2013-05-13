@@ -3483,3 +3483,28 @@ int CLuaFunctionDefs::SetVehicleNitroLevel ( lua_State* luaVM )
     lua_pushboolean ( luaVM, false );
     return 1;
 }
+
+
+int CLuaFunctionDefs::SetVehiclePlateText ( lua_State* luaVM )
+{
+//  bool setVehiclePlateText ( vehicle theVehicle, string plateText )
+    CClientEntity* pEntity; SString strText;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pEntity );
+    argStream.ReadString ( strText );
+
+    if ( !argStream.HasErrors() )
+    {
+        if ( CStaticFunctionDefinitions::SetVehiclePlateText ( *pEntity, strText ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}

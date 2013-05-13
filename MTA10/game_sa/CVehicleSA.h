@@ -121,6 +121,7 @@ class CVehicleSA;
 #define FUNC_CVehicle__SetRemapTexDictionary                    0x6D0BC0
 #define FUNC_CVehicle__GetRemapIndex                            0x6D0B70
 #define FUNC_CVehicle__SetRemap                                 0x6D0C00
+#define FUNC_CVehicle_CustomCarPlate_TextureCreate              0x6D10E0
 
 // from CBike
 #define FUNC_Bike_PlaceOnRoadProperly           0x6BEEB0
@@ -773,6 +774,7 @@ public:
     void                        AddComponent                    ( RwFrame * pFrame );
     bool                        GetComponentVisible             ( SString vehicleComponent, bool &bVisible );
     std::map < SString, RwFrame * > & GetComponentMap     ( void )                                                            { return m_ExtraFrames; }
+    bool                        SetPlateText                    ( const SString& strText );
 
 private:
     void                        RecalculateSuspensionLines          ( void );

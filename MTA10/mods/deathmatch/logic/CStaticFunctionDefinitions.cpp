@@ -3246,6 +3246,20 @@ bool CStaticFunctionDefinitions::SetVehicleNitroLevel ( CClientEntity& Entity, f
 }
 
 
+bool CStaticFunctionDefinitions::SetVehiclePlateText ( CClientEntity& Entity, const SString& strText )
+{
+    RUN_CHILDREN SetVehiclePlateText ( **iter, strText );
+
+    if ( IS_VEHICLE ( &Entity ) )
+    {
+        CClientVehicle& Vehicle = static_cast < CClientVehicle& > ( Entity );
+        return Vehicle.SetPlateText ( strText );
+    }
+
+    return false;
+}
+
+
 bool CStaticFunctionDefinitions::SetElementCollisionsEnabled ( CClientEntity& Entity, bool bEnabled )
 {
     switch ( Entity.GetType () )

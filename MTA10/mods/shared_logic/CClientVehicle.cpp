@@ -4329,3 +4329,17 @@ bool CClientVehicle::GetComponentVisible ( SString vehicleComponent, bool &bVisi
     }
     return false;
 }
+
+
+bool CClientVehicle::SetPlateText( const SString& strPlateText )
+{
+    if ( strPlateText != m_strRegPlate )
+    {
+        m_strRegPlate = strPlateText;
+        if ( m_pVehicle )
+        {
+            return m_pVehicle->SetPlateText( m_strRegPlate );
+        }
+    }
+    return false;
+}

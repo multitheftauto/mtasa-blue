@@ -247,5 +247,7 @@ enum eRPCFunctions
     RESET_MOON_SIZE,
     SET_MOON_SIZE,
 
+    SET_VEHICLE_PLATE_TEXT,
+
     NUM_RPC_FUNCS
 };
