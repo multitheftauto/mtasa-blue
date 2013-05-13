@@ -50,6 +50,7 @@ void CVehicleRPCs::LoadFunctions ( void )
     AddHandler ( GIVE_VEHICLE_SIRENS, GiveVehicleSirens, "giveVehicleSirens");
     AddHandler ( REMOVE_VEHICLE_SIRENS, RemoveVehicleSirens, "removeVehicleSirens");
     AddHandler ( SET_VEHICLE_SIRENS, SetVehicleSirens, "setVehicleSirens");
+    AddHandler ( SET_VEHICLE_PLATE_TEXT, SetVehiclePlateText, "setVehiclePlateText");
 }
 
 
@@ -630,5 +631,19 @@ void CVehicleRPCs::RemoveVehicleSirens ( CClientEntity* pSourceEntity, NetBitStr
     if ( pVehicle )
     {
         pVehicle->RemoveVehicleSirens ( );
+    }
+}
+
+
+void CVehicleRPCs::SetVehiclePlateText ( CClientEntity* pSourceEntity, NetBitStreamInterface& bitStream )
+{
+    SString strText;
+    if ( bitStream.ReadString ( strText ) )
+    {
+        CClientVehicle* pVehicle = m_pVehicleManager->Get ( pSourceEntity->GetID () );
+        if ( pVehicle )
+        {
+            pVehicle->SetPlateText ( strText );
+        }
     }
 }

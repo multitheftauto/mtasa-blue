@@ -293,7 +293,7 @@ public:
     virtual bool                 SetComponentVisible                    ( SString vehicleComponent, bool bVisible ) = 0;
     virtual bool                 GetComponentVisible                    ( SString vehicleComponent, bool &bVisible ) = 0;
     virtual std::map < SString, RwFrame * > & GetComponentMap       ( void ) = 0;
-
+    virtual bool                SetPlateText                            ( const SString& strText ) = 0;
 };
 
 #endif

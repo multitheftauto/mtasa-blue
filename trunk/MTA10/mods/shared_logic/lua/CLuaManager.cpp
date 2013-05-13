@@ -593,6 +593,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "setVehicleNitroActivated", CLuaFunctionDefs::SetVehicleNitroActivated );
     CLuaCFunctions::AddFunction ( "setVehicleNitroCount", CLuaFunctionDefs::SetVehicleNitroCount );
     CLuaCFunctions::AddFunction ( "setVehicleNitroLevel", CLuaFunctionDefs::SetVehicleNitroLevel );
+    CLuaCFunctions::AddFunction ( "setVehiclePlateText", CLuaFunctionDefs::SetVehiclePlateText );
 
     // Object create/destroy funcs
     CLuaCFunctions::AddFunction ( "createObject", CLuaFunctionDefs::CreateObject );

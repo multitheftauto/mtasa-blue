@@ -435,6 +435,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "setVehicleSirens", CLuaFunctionDefinitions::SetVehicleSirens );
     CLuaCFunctions::AddFunction ( "getVehicleSirens", CLuaFunctionDefinitions::GetVehicleSirens );
     CLuaCFunctions::AddFunction ( "getVehicleSirenParams", CLuaFunctionDefinitions::GetVehicleSirenParams );
+    CLuaCFunctions::AddFunction ( "setVehiclePlateText", CLuaFunctionDefinitions::SetVehiclePlateText );
 
     // Marker functions
     CLuaCFunctions::AddFunction ( "createMarker", CLuaFunctionDefinitions::CreateMarker );

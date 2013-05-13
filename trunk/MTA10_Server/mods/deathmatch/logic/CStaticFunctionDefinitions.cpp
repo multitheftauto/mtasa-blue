@@ -5053,6 +5053,27 @@ bool CStaticFunctionDefinitions::GetVehiclePlateText ( CVehicle* pVehicle, char*
 }
 
 
+bool CStaticFunctionDefinitions::SetVehiclePlateText ( CElement* pElement, const SString& strPlateText )
+{
+    assert ( pElement );
+    RUN_CHILDREN SetVehiclePlateText ( *iter, strPlateText );
+
+    if ( IS_VEHICLE ( pElement ) )
+    {
+        CVehicle* pVehicle = static_cast < CVehicle* > ( pElement );
+        pVehicle->SetRegPlate( strPlateText );
+
+        // Tell everybarry
+        CBitStream BitStream;
+        BitStream.pBitStream->WriteString ( strPlateText.Left( 8 ) );
+        m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pVehicle, SET_VEHICLE_PLATE_TEXT, *BitStream.pBitStream ) );
+        return true;
+    }
+
+    return false;
+}
+
+
 bool CStaticFunctionDefinitions::IsVehicleDamageProof ( CVehicle* pVehicle, bool& bDamageProof )
 {
     assert ( pVehicle );

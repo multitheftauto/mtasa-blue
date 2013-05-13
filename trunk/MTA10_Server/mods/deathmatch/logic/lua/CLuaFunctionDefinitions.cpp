@@ -6721,6 +6721,32 @@ int CLuaFunctionDefinitions::GetVehicleDoorOpenRatio ( lua_State* luaVM )
     return 1;
 }
 
+
+int CLuaFunctionDefinitions::SetVehiclePlateText ( lua_State* luaVM )
+{
+//  bool setVehiclePlateText ( vehicle theVehicle, string plateText )
+    CElement* pElement; SString strText;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pElement );
+    argStream.ReadString ( strText );
+
+    if ( !argStream.HasErrors() )
+    {
+        if ( CStaticFunctionDefinitions::SetVehiclePlateText ( pElement, strText ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
 int CLuaFunctionDefinitions::CreateMarker ( lua_State* luaVM )
 {
     // Valid position arguments?
