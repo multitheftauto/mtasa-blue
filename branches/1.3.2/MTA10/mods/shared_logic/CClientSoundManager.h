@@ -23,7 +23,7 @@ class CClientSoundManager;
 class CClientSoundManager
 {
 public:
-
+    ZERO_ON_NEW
                             CClientSoundManager         ( CClientManager* pClientManager );
                             ~CClientSoundManager        ( void );
 
@@ -48,8 +48,8 @@ public:
     void                    OnDistanceStreamIn          ( CClientSound* pSound );
     void                    OnDistanceStreamOut         ( CClientSound* pSound );
 
-    inline bool             IsMTAMuted                  ( void )                    { return m_bMuteMTA; };
-    inline void             SetMTAMuted                 ( bool bMute )              { m_bMuteMTA = bMute; };
+    bool                    IsMinimizeMuted             ( void )                    { return m_bMinimizeMuted; };
+    void                    SetMinimizeMuted            ( bool bMute )              { m_bMinimizeMuted = bMute; };
 
 private:
 
@@ -62,7 +62,7 @@ private:
 
     std::map < std::string, int >   m_FxEffectNames;
 
-    bool                            m_bMuteMTA;
+    bool                            m_bMinimizeMuted;
     SString                         m_strUserAgent;
 };
 

@@ -448,6 +448,15 @@ void CMemStats::SampleState ( SMemStatsInfo& memStatsInfo )
     if ( GetProcessMemoryInfo ( GetCurrentProcess (), &psmemCounters, sizeof ( psmemCounters ) ) )
         memStatsInfo.iProcessMemSizeKB = psmemCounters.WorkingSetSize / 1024LL;
 
+	MEMORYSTATUSEX status;
+    status.dwLength = sizeof(status);
+    if ( GlobalMemoryStatusEx(&status))
+    {
+	    //32bit LARGEADDRESSAWARE OFF : 2GB TotalVirtual
+	    //32bit LARGEADDRESSAWARE ON  : 4GB TotalVirtual
+        memStatsInfo.iProcessTotalVirtualKB = status.ullTotalVirtual / 1024LL;
+    }
+
     memStatsInfo.iStreamingMemoryUsed                  = *(int*)0x08E4CB4;
     memStatsInfo.iStreamingMemoryAvailable             = *(int*)0x08A5A80;
 
@@ -503,6 +512,7 @@ void CMemStats::UpdateIntervalStats ( void )
     // Calculate 'delta'
     //
     m_MemStatsDelta.iProcessMemSizeKB = m_MemStatsNow.iProcessMemSizeKB - m_MemStatsPrev.iProcessMemSizeKB;
+    m_MemStatsDelta.iProcessTotalVirtualKB = m_MemStatsNow.iProcessTotalVirtualKB - m_MemStatsPrev.iProcessTotalVirtualKB;
 
     m_MemStatsDelta.dxStatus.videoMemoryKB.iFreeForMTA              = m_MemStatsNow.dxStatus.videoMemoryKB.iFreeForMTA          - m_MemStatsPrev.dxStatus.videoMemoryKB.iFreeForMTA;
     m_MemStatsDelta.dxStatus.videoMemoryKB.iUsedByFonts             = m_MemStatsNow.dxStatus.videoMemoryKB.iUsedByFonts         - m_MemStatsPrev.dxStatus.videoMemoryKB.iUsedByFonts;
@@ -775,6 +785,7 @@ void CMemStats::CreateTables ( void )
         table.AddRow ( HEADER1( "GTA settings" ) "|" HEADER1( "Setting KB" ) );
         table.AddRow ( SString ( "Video card installed memory|%s", *FormatNumberWithCommas ( m_MemStatsNow.dxStatus.videoCard.iInstalledMemoryKB ) ) );
         table.AddRow ( SString ( "Streaming memory limit|%s", *FormatNumberWithCommas ( m_MemStatsNow.iStreamingMemoryAvailable / 1024 ) ) );
+        table.AddRow ( SString ( "Process memory limit|%s", *FormatNumberWithCommas ( m_MemStatsNow.iProcessTotalVirtualKB ) ) );
     }
 
     {

@@ -45,7 +45,6 @@ CClientPlayerVoice::CClientPlayerVoice( CClientPlayer* pPlayer, CVoiceRecorder* 
         m_fVolume = 0.0f;
     }
     m_fPlaybackSpeed = 1.0f;
-    m_bMuteVoice = false;
     Init ();
 }
 CClientPlayerVoice::~CClientPlayerVoice( void )
@@ -119,7 +118,7 @@ void CClientPlayerVoice::DoPulse( void )
 
     m_CS.Lock ();
     float fPreviousVolume = 0.0f;
-    if ( !m_bMuteVoice )
+    if ( !m_bMinimizeMuted )
     {
         g_pCore->GetCVars ()->Get ( "voicevolume", fPreviousVolume );
     }

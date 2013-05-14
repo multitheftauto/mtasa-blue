@@ -43,7 +43,7 @@ CClientObject::CClientObject ( CClientManager* pManager, ElementID ID, unsigned 
     m_ucAlpha = 255;
     m_vecScale = CVector ( 1.0f, 1.0f, 1.0f );
     m_fHealth = 1000.0f;
-    m_bBreakable = CClientObjectManager::IsBreakableModel ( m_usModel );
+    m_bBreakingDisabled = false;
     m_bRespawnEnabled = true;
     m_fMass = -1.0f;
 
@@ -491,7 +491,7 @@ void CClientObject::Create ( void )
             g_pMultiplayer->AllowCreatedObjectsInVerticalLineTest ( !CClientObjectManager::IsBreakableModel ( m_usModel ) );
 
             // Create the object
-            m_pObject = g_pGame->GetPools ()->AddObject ( m_usModel, m_bIsLowLod, m_bBreakable );
+            m_pObject = g_pGame->GetPools ()->AddObject ( m_usModel, m_bIsLowLod, m_bBreakingDisabled );
 
             // Restore default behaviour
             g_pMultiplayer->AllowCreatedObjectsInVerticalLineTest ( false );
@@ -683,12 +683,20 @@ CSphere CClientObject::GetWorldBoundingSphere ( void )
     return sphere;
 }
 
+
+bool CClientObject::IsBreakable ( void )
+{
+    return ( CClientObjectManager::IsBreakableModel ( m_usModel ) && !m_bBreakingDisabled );
+}
+
+
 bool CClientObject::SetBreakable ( bool bBreakable )
 {
+    bool bDisableBreaking = !bBreakable;
     // Are we breakable and have we changed
-    if ( CClientObjectManager::IsBreakableModel ( m_usModel ) && m_bBreakable != bBreakable )
+    if ( CClientObjectManager::IsBreakableModel ( m_usModel ) && m_bBreakingDisabled != bDisableBreaking )
     {
-        m_bBreakable = bBreakable;
+        m_bBreakingDisabled = bDisableBreaking;
         // We can't use ReCreate directly (otherwise the game will crash)
         g_pClientGame->GetObjectRespawner ()->Respawn ( this );
         return true;
@@ -696,10 +704,11 @@ bool CClientObject::SetBreakable ( bool bBreakable )
     return false;
 }
 
+
 bool CClientObject::Break ( void )
 {
     // Are we breakable?
-    if ( m_pObject && m_bBreakable )
+    if ( m_pObject && CClientObjectManager::IsBreakableModel ( m_usModel ) && !m_bBreakingDisabled )
     {
         m_pObject->Break ();
         return true;

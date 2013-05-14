@@ -91,7 +91,7 @@ public:
     float                           GetHealth               ( void );
     void                            SetHealth               ( float fHealth );
 
-    inline bool                     IsBreakable             ( void )                            { return m_bBreakable; };
+    bool                            IsBreakable             ( void );
     bool                            SetBreakable            ( bool bBreakable );
     bool                            Break                   ( void );
     inline bool                     IsRespawnEnabled        ( void )                            { return m_bRespawnEnabled; };
@@ -132,7 +132,7 @@ protected:
     unsigned char                       m_ucAlpha;
     CVector                             m_vecScale;
     float                               m_fHealth;
-    bool                                m_bBreakable;
+    bool                                m_bBreakingDisabled;
     bool                                m_bBeingRespawned;
     bool                                m_bRespawnEnabled;
     float                               m_fMass;
