@@ -348,8 +348,8 @@ public:
     int padaudio[108];
 
     tHandlingDataSA* pHandlingData;                             // +900
-    BYTE padyo[4];
-    DWORD dwHandlingFlags;
+    tFlyingHandlingDataSA* pFlyingHandlingData;                 // +904
+    DWORD dwHandlingFlags;                                      // +908
     int pad52321 [21];
 
     DWORD dwUnknown1201;                                        // +996
@@ -775,6 +775,8 @@ public:
     bool                        GetComponentVisible             ( SString vehicleComponent, bool &bVisible );
     std::map < SString, RwFrame * > & GetComponentMap     ( void )                                                            { return m_ExtraFrames; }
     bool                        SetPlateText                    ( const SString& strText );
+
+    void                        UpdateLandingGearPosition       ( );
 
 private:
     void                        RecalculateSuspensionLines          ( void );
