@@ -2220,6 +2220,12 @@ void CClientVehicle::StreamedInPulse ( void )
                     m_fDoorOpenRatio [ i ] = pDoor->GetAngleOpenRatio ();
             }
         }
+
+        // Update landing gear state if this is a plane and we have no driver / pilot
+        if ( this->HasLandingGear() && m_pDriver == NULL )
+        {
+            m_pVehicle->UpdateLandingGearPosition();
+        }
     }
 }
 

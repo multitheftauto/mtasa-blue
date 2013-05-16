@@ -2466,6 +2466,68 @@ float CVehicleSA::GetNitroLevel ()
     return fLevel;
 }
 
+// The following function is a reproduction of a part of
+// CPlane::ProcessControlInputs (006CADD0). This allows 
+// the usage of setVehicleLandingGearDown on non-occupied
+// planes. (Issue 0007608)
+void CVehicleSA::UpdateLandingGearPosition ()
+{
+    DWORD dwThis = ( DWORD ) GetInterface ();
+    CVehicleSAInterface* pVehicle = (CVehicleSAInterface*) (dwThis);
+    float& fGearPosition = *(float *)( dwThis + 0x9CC );
+    const float& fTimeStep = *(float *)( 0xB7CB5C );
+
+    // Guide to fGearPosition
+    //  1.0f = Landing gear is pulled in
+    //  0.0f = Landing gear is pulled out
+    // -1.0f to 0.0f -> Landing gear is being pulled out
+    //  0.0f to 1.0f -> Landing gear is being pulled in
+
+    if(fGearPosition < 0.0f)
+    {
+        fGearPosition = fTimeStep * 0.02f + fGearPosition;
+        
+        if(fGearPosition >= 0.0f)
+        {
+            // Set the position to 0.0f
+            fGearPosition = 0.0f;
+
+            // Remove Wheels
+            m_pDamageManager->SetWheelStatus(FRONT_LEFT_WHEEL, 0);
+            m_pDamageManager->SetWheelStatus(FRONT_RIGHT_WHEEL,0);
+            m_pDamageManager->SetWheelStatus(REAR_LEFT_WHEEL,  0);
+            m_pDamageManager->SetWheelStatus(REAR_RIGHT_WHEEL, 0);
+            
+            // Update Air Resistance
+            float fDragCoeff = GetHandlingData()->GetDragCoeff();
+            pVehicle->m_fAirResistance = fDragCoeff / 1000.0f * 0.5f;
+        }
+    }
+    else if(fGearPosition > 0.0f && fGearPosition < 1.0f)
+    {
+        // Pull in
+        fGearPosition = fTimeStep * 0.02f + fGearPosition;
+        if(fGearPosition >= 1.0f)
+        {
+            // Set the position to 1.0f
+            fGearPosition = 1.0f;
+               
+            // C++ Representaion of CPlane::SetLandingGearDown (006CAC20)
+            
+            // Recreate Wheels
+            m_pDamageManager->SetWheelStatus(FRONT_LEFT_WHEEL, 2);
+            m_pDamageManager->SetWheelStatus(FRONT_RIGHT_WHEEL,2);
+            m_pDamageManager->SetWheelStatus(REAR_LEFT_WHEEL,  2);
+            m_pDamageManager->SetWheelStatus(REAR_RIGHT_WHEEL, 2);
+        
+            // Update Air Resistance
+            float fDragCoeff = GetHandlingData()->GetDragCoeff();
+                
+            const float& fFlyingHandlingGearUpR = pVehicle->pFlyingHandlingData->GearUpR;
+            pVehicle->m_fAirResistance = fDragCoeff / 1000.0f * 0.5f * fFlyingHandlingGearUpR;
+        }
+    }
+}
 // Change plate text of existing vehicle
 bool CVehicleSA::SetPlateText( const SString& strText )
 {
