@@ -248,7 +248,8 @@ void CElement::GetDescendantsByType ( std::vector < CElement* >& outResult, EEle
     }
     else
     {
-        outResult.push_back ( this );
+        if ( GetTypeHash () == uiTypeHash )
+            outResult.push_back ( this );
         GetDescendantsByTypeSlow ( outResult, uiTypeHash );
     }
 }
