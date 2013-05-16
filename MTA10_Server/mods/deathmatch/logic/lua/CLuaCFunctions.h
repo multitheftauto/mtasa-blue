@@ -72,9 +72,8 @@ public:
 private:
     static CFastHashMap < lua_CFunction, CLuaCFunction* >               ms_Functions;
     static CFastHashMap < SString, CLuaCFunction* >                     ms_FunctionsByName;
-    static bool                                                         ms_bMapsInitialized;
-public:
-    static void                 InitializeHashMaps          ( );
+    static void*                                                        ms_pFunctionPtrLow;
+    static void*                                                        ms_pFunctionPtrHigh;
 };
 
 #endif

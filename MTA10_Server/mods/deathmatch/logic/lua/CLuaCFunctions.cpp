@@ -17,7 +17,8 @@
 
 CFastHashMap < lua_CFunction, CLuaCFunction* > CLuaCFunctions::ms_Functions;
 CFastHashMap < SString, CLuaCFunction* > CLuaCFunctions::ms_FunctionsByName;
-bool CLuaCFunctions::ms_bMapsInitialized = false;
+void* CLuaCFunctions::ms_pFunctionPtrLow = (void*)0xffffffff;
+void* CLuaCFunctions::ms_pFunctionPtrHigh = 0;
 
 // CFastHashMap helpers
 static lua_CFunction GetEmptyMapKey ( lua_CFunction* )   { return (lua_CFunction)0x00000000; }
@@ -39,16 +40,12 @@ CLuaCFunctions::~CLuaCFunctions ()
     RemoveAllFunctions ();
 }
 
-void CLuaCFunctions::InitializeHashMaps ( )
-{
-    if ( !ms_bMapsInitialized )
-    {
-        ms_bMapsInitialized = true;
-    }
-}
 
 CLuaCFunction* CLuaCFunctions::AddFunction ( const char* szName, lua_CFunction f, bool bRestricted )
 {
+    ms_pFunctionPtrLow = Min < void* > ( ms_pFunctionPtrLow, f );
+    ms_pFunctionPtrHigh = Max < void* > ( ms_pFunctionPtrHigh, f );
+
     // Already have a function by this name?
     CLuaCFunction* pFunction = GetFunction ( szName );
     if ( pFunction )
@@ -68,6 +65,10 @@ CLuaCFunction* CLuaCFunctions::AddFunction ( const char* szName, lua_CFunction f
 
 CLuaCFunction* CLuaCFunctions::GetFunction ( lua_CFunction f )
 {
+    // Quick cull of unknown pointer range
+    if ( f < ms_pFunctionPtrLow || f > ms_pFunctionPtrHigh )
+        return NULL;
+
     CFastHashMap < lua_CFunction, CLuaCFunction* >::iterator it;
     it = ms_Functions.find ( f );
     if ( it == ms_Functions.end () )

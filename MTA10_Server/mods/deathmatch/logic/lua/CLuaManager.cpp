@@ -44,7 +44,6 @@ CLuaManager::CLuaManager ( CObjectManager* pObjectManager,
     m_pLuaModuleManager->SetScriptDebugging ( g_pGame->GetScriptDebugging() );
 
     // Load our C Functions into LUA and hook callback
-    CLuaCFunctions::InitializeHashMaps ();
     LoadCFunctions ();
     lua_registerPreCallHook ( CLuaDefs::CanUseFunction );
 }
