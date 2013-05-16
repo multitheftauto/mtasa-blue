@@ -2394,10 +2394,10 @@ void CGame::Packet_LuaEvent ( CLuaEventPacket& Packet )
                 pElement->CallEvent ( szName, *pArguments, pCaller );
             }
             else
-                m_pScriptDebugging->LogError ( NULL, "Client triggered serverside event %s, but event is not marked as remotly triggerable", szName );
+                m_pScriptDebugging->LogError ( NULL, "Client (%s) triggered serverside event %s, but event is not marked as remotly triggerable", pCaller->GetNick(), szName );
         }
         else
-            m_pScriptDebugging->LogError ( NULL, "Client triggered serverside event %s, but event is not added serverside", szName );
+            m_pScriptDebugging->LogError ( NULL, "Client (%s) triggered serverside event %s, but event is not added serverside", pCaller->GetNick(), szName );
     }
 }
 
