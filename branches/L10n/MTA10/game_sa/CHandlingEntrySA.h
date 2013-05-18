@@ -209,4 +209,27 @@ private:
     bool                    m_bChanged;
 };
 
+// sizeof(tFlyingHandlingDataSA) == 0x58
+struct tFlyingHandlingDataSA
+{
+    int         iVehicleID;
+    float       fThrust;
+    float       fThrustFallOff;
+    float       fYaw;
+    float       fStab;
+    float       fSideSlip;
+    float       fRoll;
+    float       fRollStab;
+    float       fPitch;
+    float       fPitchStab;
+    float       fFormLift;
+    float       fAttackLift;
+    float       GearUpR;
+    float       GearDownL;
+    float       WindMult;
+    float       MoveResistance;
+    CVector     TurnResistance;
+    CVector     SpeedResistance;
+};
+
 #endif

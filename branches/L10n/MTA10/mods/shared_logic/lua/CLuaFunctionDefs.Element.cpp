@@ -1673,9 +1673,7 @@ int CLuaFunctionDefs::SetElementPosition ( lua_State* luaVM )
     bool bWarp = true;
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pEntity );
-    argStream.ReadNumber ( vecPosition.fX );
-    argStream.ReadNumber ( vecPosition.fY );
-    argStream.ReadNumber ( vecPosition.fZ );
+    argStream.ReadVector3D ( vecPosition );
     argStream.ReadBool ( bWarp, true );
 
     // Verify the arguments
@@ -1710,9 +1708,7 @@ int CLuaFunctionDefs::SetElementRotation ( lua_State* luaVM )
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pEntity );
-    argStream.ReadNumber ( vecRotation.fX );
-    argStream.ReadNumber ( vecRotation.fY );
-    argStream.ReadNumber ( vecRotation.fZ );
+    argStream.ReadVector3D ( vecRotation );
     argStream.ReadString ( strRotationOrder, "default" );
     argStream.ReadBool ( bNewWay, false );
 
@@ -1739,11 +1735,10 @@ int CLuaFunctionDefs::SetElementVelocity ( lua_State* luaVM )
     CVector vecVelocity;
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pEntity );
-    argStream.ReadNumber ( vecVelocity.fX );
-    argStream.ReadNumber ( vecVelocity.fY );
+    argStream.ReadVector3D ( vecVelocity );
     // previous code did this for some reason.
     if ( pEntity && pEntity->GetType() != CCLIENTRADARAREA )
-        argStream.ReadNumber ( vecVelocity.fZ );
+        vecVelocity.fZ = 0.0f;
 
     // Verify the arguments
     if ( !argStream.HasErrors ( ) )
@@ -1914,12 +1909,8 @@ int CLuaFunctionDefs::AttachElements ( lua_State* luaVM )
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pEntity );
     argStream.ReadUserData ( pAttachedToEntity );
-    argStream.ReadNumber ( vecPosition.fX, 0.0f );
-    argStream.ReadNumber ( vecPosition.fY, 0.0f );
-    argStream.ReadNumber ( vecPosition.fZ, 0.0f );
-    argStream.ReadNumber ( vecRotation.fX, 0.0f );
-    argStream.ReadNumber ( vecRotation.fY, 0.0f );
-    argStream.ReadNumber ( vecRotation.fZ, 0.0f );
+    argStream.ReadVector3D ( vecPosition, vecPosition );
+    argStream.ReadVector3D ( vecRotation, vecRotation );
 
     // Verify the arguments
     if ( !argStream.HasErrors ( ) )
@@ -1994,12 +1985,8 @@ int CLuaFunctionDefs::SetElementAttachedOffsets ( lua_State* luaVM )
     CVector vecPosition, vecRotation;
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pEntity );
-    argStream.ReadNumber ( vecPosition.fX, 0.0f );
-    argStream.ReadNumber ( vecPosition.fY, 0.0f );
-    argStream.ReadNumber ( vecPosition.fZ, 0.0f );
-    argStream.ReadNumber ( vecRotation.fX, 0.0f );
-    argStream.ReadNumber ( vecRotation.fY, 0.0f );
-    argStream.ReadNumber ( vecRotation.fZ, 0.0f );
+    argStream.ReadVector3D ( vecPosition, vecPosition );
+    argStream.ReadVector3D ( vecRotation, vecRotation );
 
     // Verify the arguments
     if ( !argStream.HasErrors ( ) )

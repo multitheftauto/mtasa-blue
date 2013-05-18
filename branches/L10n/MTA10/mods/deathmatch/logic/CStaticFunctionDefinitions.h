@@ -251,7 +251,7 @@ public:
     static bool                         SetVehicleNitroActivated            ( CClientEntity& Entity, bool bActivated );
     static bool                         SetVehicleNitroCount                ( CClientEntity& Entity, char cCount );
     static bool                         SetVehicleNitroLevel                ( CClientEntity& Entity, float fLevel );
-
+    static bool                         SetVehiclePlateText                 ( CClientEntity& Entity, const SString& strText );
 
     // Object get funcs
     static CClientObject*               CreateObject                        ( CResource& Resource, unsigned short usModelID, const CVector& vecPosition, const CVector& vecRotation, bool bLowLod );

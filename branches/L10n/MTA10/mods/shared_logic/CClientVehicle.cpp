@@ -130,8 +130,8 @@ CClientVehicle::CClientVehicle ( CClientManager* pManager, ElementID ID, unsigne
     m_bIsDerailable = true;
     m_bTrainDirection = false;
     m_fTrainSpeed = 0.0f;
-    m_fTrainPosition = 0.0f;
-    m_ucTrackID = 0;
+    m_fTrainPosition = -1.0f;
+    m_ucTrackID = -1;
     m_bTaxiLightOn = false;
     m_vecGravity = CVector ( 0.0f, 0.0f, -1.0f );
     m_HeadLightColor = SColorRGBA ( 255, 255, 255, 255 );
@@ -161,6 +161,9 @@ CClientVehicle::CClientVehicle ( CClientManager* pManager, ElementID ID, unsigne
 
     // clear our component data to regenerate
     m_ComponentData.clear ( );
+
+    // Prepare the sirens
+    RemoveVehicleSirens();
 }
 
 
@@ -534,6 +537,9 @@ void CClientVehicle::SetMoveSpeed ( const CVector& vecMoveSpeed )
             m_pVehicle->SetMoveSpeed ( const_cast < CVector* > ( &vecMoveSpeed ) );
         }
         m_vecMoveSpeed = vecMoveSpeed;
+
+        if ( IsFrozenWaitingForGroundToLoad() )
+            m_vecWaitingForGroundSavedMoveSpeed = vecMoveSpeed;
     }
 }
 
@@ -564,6 +570,9 @@ void CClientVehicle::SetTurnSpeed ( const CVector& vecTurnSpeed )
             m_pVehicle->SetTurnSpeed ( const_cast < CVector* > ( &vecTurnSpeed ) );
         }
         m_vecTurnSpeed = vecTurnSpeed;
+
+        if ( IsFrozenWaitingForGroundToLoad() )
+            m_vecWaitingForGroundSavedTurnSpeed = vecTurnSpeed;
     }
 }
 
@@ -1842,10 +1851,19 @@ void CClientVehicle::SetFrozenWaitingForGroundToLoad ( bool bFrozen )
                 m_vecMoveSpeed = vecTemp;
                 m_vecTurnSpeed = vecTemp;
             }
+            m_vecWaitingForGroundSavedMoveSpeed = vecTemp;
+            m_vecWaitingForGroundSavedTurnSpeed = vecTemp;
         }
         else
         {
             g_pGame->SuspendASyncLoading ( false );
+            m_vecMoveSpeed = m_vecWaitingForGroundSavedMoveSpeed;
+            m_vecTurnSpeed = m_vecWaitingForGroundSavedTurnSpeed;
+            if ( m_pVehicle )
+            {
+                m_pVehicle->SetMoveSpeed ( &m_vecMoveSpeed );
+                m_pVehicle->SetTurnSpeed ( &m_vecTurnSpeed );
+            }
         }
     }
 }
@@ -2011,7 +2029,7 @@ uchar CClientVehicle::GetTrainTrack ( void )
 
 void CClientVehicle::SetTrainTrack ( uchar ucTrack )
 {
-    if ( m_pVehicle && GetVehicleType() == CLIENTVEHICLE_TRAIN  )
+    if ( m_pVehicle && GetVehicleType() == CLIENTVEHICLE_TRAIN )
     {
         m_pVehicle->SetRailTrack ( ucTrack );
     }
@@ -2202,6 +2220,12 @@ void CClientVehicle::StreamedInPulse ( void )
                     m_fDoorOpenRatio [ i ] = pDoor->GetAngleOpenRatio ();
             }
         }
+
+        // Update landing gear state if this is a plane and we have no driver / pilot
+        if ( this->HasLandingGear() && m_pDriver == NULL )
+        {
+            m_pVehicle->UpdateLandingGearPosition();
+        }
     }
 }
 
@@ -2373,8 +2397,14 @@ void CClientVehicle::Create ( void )
             m_pVehicle->SetDerailable ( m_bIsDerailable );
             m_pVehicle->SetTrainDirection ( m_bTrainDirection );
             m_pVehicle->SetTrainSpeed ( m_fTrainSpeed );
-            m_pVehicle->SetTrainPosition ( m_fTrainPosition );
-            m_pVehicle->SetRailTrack ( m_ucTrackID );
+            if ( m_fTrainPosition >= 0 )
+            {
+                m_pVehicle->SetTrainPosition ( m_fTrainPosition );
+            }
+            if ( m_ucTrackID >= 0 )
+            {
+                m_pVehicle->SetRailTrack ( m_ucTrackID );
+            }
         }
 
         m_pVehicle->SetOverrideLights ( m_ucOverrideLights );
@@ -4133,6 +4163,8 @@ void CClientVehicle::RemoveVehicleSirens ( void )
         SetVehicleSirenMinimumAlpha( i, 0 );
         SetVehicleSirenColour( i, SColor ( ) );
     }
+
+    m_tSirenBeaconInfo.m_ucSirenCount = 0;
 }
 
 
@@ -4299,6 +4331,20 @@ bool CClientVehicle::GetComponentVisible ( SString vehicleComponent, bool &bVisi
             // fill our visible variable from the cached data
             bVisible = m_ComponentData[vehicleComponent].m_bVisible;
             return true;
+        }
+    }
+    return false;
+}
+
+
+bool CClientVehicle::SetPlateText( const SString& strPlateText )
+{
+    if ( strPlateText != m_strRegPlate )
+    {
+        m_strRegPlate = strPlateText;
+        if ( m_pVehicle )
+        {
+            return m_pVehicle->SetPlateText( m_strRegPlate );
         }
     }
     return false;

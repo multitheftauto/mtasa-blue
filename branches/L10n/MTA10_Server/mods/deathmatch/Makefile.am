@@ -197,6 +197,7 @@ LOGIC = \
 ./logic/lua/LuaCommon.cpp \
 ./logic/lua/LuaUtils.cpp \
 ./logic/luadefs/CLuaACLDefs.cpp \
+./logic/luadefs/CLuaBitDefs.cpp \
 ./logic/luadefs/CLuaCameraDefs.cpp \
 ./logic/luadefs/CLuaClassDefs.cpp \
 ./logic/luadefs/CLuaDefs.cpp \
@@ -234,6 +235,7 @@ LOGIC = \
 ./logic/packets/CObjectStartSyncPacket.cpp \
 ./logic/packets/CObjectSyncPacket.cpp \
 ./logic/packets/CPacket.cpp \
+./logic/packets/CPedTaskPacket.cpp \
 ./logic/packets/CPedStartSyncPacket.cpp \
 ./logic/packets/CPedSyncPacket.cpp \
 ./logic/packets/CPedWastedPacket.cpp \
@@ -282,7 +284,8 @@ LOGIC = \
 ./logic/net/CSimPlayerPuresyncPacket.cpp \
 ./logic/net/CSimVehiclePuresyncPacket.cpp \
 ./logic/net/CSimKeysyncPacket.cpp \
-./logic/net/CSimBulletsyncPacket.cpp
+./logic/net/CSimBulletsyncPacket.cpp \
+./logic/net/CSimPedTaskPacket.cpp
 
 if PRECOMPILE_HEADERS
 BUILT_SOURCES = StdInc.h.gch

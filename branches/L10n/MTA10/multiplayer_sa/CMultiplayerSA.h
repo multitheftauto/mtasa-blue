@@ -51,6 +51,7 @@ public:
     void                        InitHooks_Files ( void );
     void                        InitHooks_Weapons ( void );
     void                        InitHooks_Rendering ( void );
+    void                        InitHooks_LicensePlate ( void );
     CRemoteDataStorage *        CreateRemoteDataStorage     ();
     void                        DestroyRemoteDataStorage    ( CRemoteDataStorage* pData );
     void                        AddRemoteDataStorage        ( CPlayerPed* pPed, CRemoteDataStorage* pData );
@@ -219,6 +220,7 @@ public:
     virtual void                GetRwResourceStats          ( SRwResourceStats& outStats );
     virtual void                GetClothesCacheStats        ( SClothesCacheStats& outStats );
     virtual void                SetIsMinimizedAndNotConnected ( bool bIsMinimizedAndNotConnected );
+    virtual void                SetMirrorsEnabled           ( bool bEnabled );
 
     CVector                     m_vecAkimboTarget;
     bool                        m_bAkimboTargetUp;

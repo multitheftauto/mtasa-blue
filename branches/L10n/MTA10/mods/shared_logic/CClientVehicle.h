@@ -462,6 +462,8 @@ public:
     std::map < SString, SVehicleComponentData > ::iterator ComponentsBegin ( void )                               { return m_ComponentData.begin (); }
     std::map < SString, SVehicleComponentData > ::iterator ComponentsEnd   ( void )                               { return m_ComponentData.end (); }
 
+    bool                        SetPlateText            ( const SString& strText );
+
 protected:
     void                        StreamIn                ( bool bInstantly );
     void                        StreamOut               ( void );
@@ -545,6 +547,8 @@ protected:
     bool                        m_bFrozenWaitingForGroundToLoad;
     float                       m_fGroundCheckTolerance;
     float                       m_fObjectsAroundTolerance;
+    CVector                     m_vecWaitingForGroundSavedMoveSpeed;
+    CVector                     m_vecWaitingForGroundSavedTurnSpeed;
     CMatrix                     m_matFrozen;
     CVehicleUpgrades*           m_pUpgrades;
     unsigned char               m_ucOverrideLights;
@@ -552,7 +556,7 @@ protected:
     CClientVehiclePtr           m_pTowedByVehicle;
     eWinchType                  m_eWinchType;
     CClientEntityPtr            m_pPickedUpWinchEntity;
-    std::string                 m_strRegPlate;
+    SString                     m_strRegPlate;
     unsigned char               m_ucPaintjob;
     float                       m_fDirtLevel;
     bool                        m_bSmokeTrail;

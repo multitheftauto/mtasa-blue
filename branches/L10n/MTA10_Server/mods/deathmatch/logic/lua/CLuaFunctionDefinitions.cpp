@@ -4310,7 +4310,7 @@ int CLuaFunctionDefinitions::GetVehicleSirens( lua_State* luaVM )
             tSirenInfo = pVehicle->m_tSirenBeaconInfo;// Create a new table
             lua_newtable ( luaVM );
 
-            for ( int i = 0; i <= tSirenInfo.m_ucSirenCount;i++ )
+            for ( int i = 0; i < tSirenInfo.m_ucSirenCount;i++ )
             {
                 lua_pushnumber ( luaVM, i+1 );
                 lua_newtable ( luaVM );
@@ -6720,6 +6720,32 @@ int CLuaFunctionDefinitions::GetVehicleDoorOpenRatio ( lua_State* luaVM )
     lua_pushboolean ( luaVM, false );
     return 1;
 }
+
+
+int CLuaFunctionDefinitions::SetVehiclePlateText ( lua_State* luaVM )
+{
+//  bool setVehiclePlateText ( vehicle theVehicle, string plateText )
+    CElement* pElement; SString strText;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pElement );
+    argStream.ReadString ( strText );
+
+    if ( !argStream.HasErrors() )
+    {
+        if ( CStaticFunctionDefinitions::SetVehiclePlateText ( pElement, strText ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
 
 int CLuaFunctionDefinitions::CreateMarker ( lua_State* luaVM )
 {

@@ -195,7 +195,7 @@ void CCommunityRegistration::DoPulse ( void )
                         return;
                     }
                 }
-                g_pCore->ShowMessageBox ( _("Error")+_E("CC04"), _("Services currently unavaliable"), MB_BUTTON_OK | MB_ICON_ERROR );
+                g_pCore->ShowMessageBox ( _("Error")+_E("CC04"), _("Services currently unavailable"), MB_BUTTON_OK | MB_ICON_ERROR );
             }
             else if ( Result == REGISTRATION_ERROR_SUCCESS )
             {
@@ -217,13 +217,13 @@ void CCommunityRegistration::DoPulse ( void )
             }
             else
             {
-                g_pCore->ShowMessageBox ( _("Error")+_E("CC08"), _("Services currently unavaliable"), MB_BUTTON_OK | MB_ICON_ERROR );
+                g_pCore->ShowMessageBox ( _("Error")+_E("CC08"), _("Services currently unavailable"), MB_BUTTON_OK | MB_ICON_ERROR );
                 SetFrozen ( false );
             }
         }
         else if ( ( CClientTime::GetTime () - m_ulStartTime ) > REGISTRATION_DELAY )
         {
-            g_pCore->ShowMessageBox ( _("Error")+_E("CC10"), _("Services currently unavaliable"), MB_BUTTON_OK | MB_ICON_ERROR );
+            g_pCore->ShowMessageBox ( _("Error")+_E("CC10"), _("Services currently unavailable"), MB_BUTTON_OK | MB_ICON_ERROR );
             SetFrozen ( false );
             // Timed out
             m_ulStartTime = 0;

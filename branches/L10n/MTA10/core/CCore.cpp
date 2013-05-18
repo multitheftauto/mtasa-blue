@@ -195,6 +195,7 @@ CCore::~CCore ( void )
     SAFE_DELETE ( m_pMessageBox );
 
     // Destroy early subsystems
+    m_bModulesLoaded = false;
     DestroyNetwork ();
     DestroyMultiplayer ();
     DestroyGame ();
@@ -1023,6 +1024,7 @@ void CCore::UpdateIsWindowMinimized ( void )
     m_bIsWindowMinimized = IsIconic ( GetHookedWindow () ) ? true : false;
     // Update CPU saver for when minimized and not connected
     g_pCore->GetMultiplayer ()->SetIsMinimizedAndNotConnected ( m_bIsWindowMinimized && !IsConnected () );
+    g_pCore->GetMultiplayer ()->SetMirrorsEnabled ( !m_bIsWindowMinimized );
 
     // Enable timer if not connected at least once
     bool bEnableTimer = !m_bGettingIdleCallsFromMultiplayer;
@@ -1640,8 +1642,7 @@ void CCore::UpdateRecentlyPlayed()
 void CCore::SetCurrentServer( in_addr Addr, unsigned short usGamePort )
 {
     //Set the current server info so we can query it with ASE for xfire
-    m_pCurrentServer->Address = Addr;
-    m_pCurrentServer->usGamePort = usGamePort;
+    m_pCurrentServer->ChangeAddress( Addr, usGamePort );
 }
 
 SString CCore::UpdateXfire( void )
@@ -1886,31 +1887,11 @@ void CCore::OnPreFxRender ( void )
     if ( !CGraphics::GetSingleton ().HasMaterialLine3DQueueItems () )
         return;
 
-    IDirect3DDevice9* pDevice = CGraphics::GetSingleton ().GetDevice ();
-
-    // Create a state block.
-    IDirect3DStateBlock9 * pDeviceState = NULL;
-    pDevice->CreateStateBlock ( D3DSBT_ALL, &pDeviceState );
-    D3DXMATRIX matProjection;
-    pDevice->GetTransform ( D3DTS_PROJECTION, &matProjection );
-
-    // Make sure linear sampling is enabled
-    pDevice->SetSamplerState ( 0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR );
-    pDevice->SetSamplerState ( 0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR );
-    pDevice->SetSamplerState ( 0, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR );
-
-    // Make sure stencil is off to avoid problems with flame effects
-    pDevice->SetRenderState ( D3DRS_STENCILENABLE, FALSE );
+    CGraphics::GetSingleton ().EnteringMTARenderZone();
 
     CGraphics::GetSingleton ().DrawMaterialLine3DQueue ();
 
-    // Restore the render states
-    pDevice->SetTransform ( D3DTS_PROJECTION, &matProjection );
-    if ( pDeviceState )
-    {
-        pDeviceState->Apply ( );
-        pDeviceState->Release ( );
-    }
+    CGraphics::GetSingleton ().LeavingMTARenderZone();
 }
 
 
@@ -1924,19 +1905,7 @@ void CCore::OnPreHUDRender ( void )
     // Handle saving depth buffer
     CGraphics::GetSingleton ().GetRenderItemManager ()->SaveReadableDepthBuffer();
 
-    // Create a state block.
-    IDirect3DStateBlock9 * pDeviceState = NULL;
-    pDevice->CreateStateBlock ( D3DSBT_ALL, &pDeviceState );
-    D3DXMATRIX matProjection;
-    pDevice->GetTransform ( D3DTS_PROJECTION, &matProjection );
-
-    // Make sure linear sampling is enabled
-    pDevice->SetSamplerState ( 0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR );
-    pDevice->SetSamplerState ( 0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR );
-    pDevice->SetSamplerState ( 0, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR );
-
-    // Make sure stencil is off to avoid problems with flame effects
-    pDevice->SetRenderState ( D3DRS_STENCILENABLE, FALSE );
+    CGraphics::GetSingleton ().EnteringMTARenderZone();
 
     // Maybe capture screen and other stuff
     CGraphics::GetSingleton ().GetRenderItemManager ()->DoPulse ();
@@ -1956,13 +1925,7 @@ void CCore::OnPreHUDRender ( void )
     // Draw pre-GUI primitives
     CGraphics::GetSingleton ().DrawPreGUIQueue ();
 
-    // Restore the render states
-    pDevice->SetTransform ( D3DTS_PROJECTION, &matProjection );
-    if ( pDeviceState )
-    {
-        pDeviceState->Apply ( );
-        pDeviceState->Release ( );
-    }
+    CGraphics::GetSingleton ().LeavingMTARenderZone();
 }
 
 
@@ -2204,4 +2167,17 @@ void CCore::HandleCrashDumpEncryption( void )
             FileSave( strCoreLogPathFilename, strFileContents );
         }
     }
+}
+
+//
+// Flag to make sure stuff only gets done when everything is ready
+//
+void CCore::SetModulesLoaded( bool bLoaded )
+{
+    m_bModulesLoaded = bLoaded;
+}
+
+bool CCore::AreModulesLoaded( void )
+{
+    return m_bModulesLoaded;
 }

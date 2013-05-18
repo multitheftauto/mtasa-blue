@@ -353,7 +353,7 @@ inline bool CPoolsSA::AddObjectToPool ( CObjectSA* pObject )
     return true;
 }
 
-CObject* CPoolsSA::AddObject ( DWORD dwModelID, bool bLowLod, bool bBreakable )
+CObject* CPoolsSA::AddObject ( DWORD dwModelID, bool bLowLod, bool bBreakingDisabled )
 {
     DEBUG_TRACE("CObject * CPoolsSA::AddObject ( DWORD dwModelID )");
 
@@ -361,7 +361,7 @@ CObject* CPoolsSA::AddObject ( DWORD dwModelID, bool bLowLod, bool bBreakable )
 
     if ( m_objectPool.ulCount < MAX_OBJECTS )
     {
-        pObject = new CObjectSA ( dwModelID, bBreakable );
+        pObject = new CObjectSA ( dwModelID, bBreakingDisabled );
 
         if ( bLowLod )
         {

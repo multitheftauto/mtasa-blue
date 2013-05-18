@@ -155,6 +155,14 @@ public:
     CScreenGrabberInterface*     GetScreenGrabber       ( void )        { return m_pScreenGrabber; }
     CPixelsManagerInterface*     GetPixelsManager       ( void )        { return m_pPixelsManager; }
 
+    // Transition between GTA and MTA controlled rendering
+    virtual void                            EnteringMTARenderZone       ( void );
+    virtual void                            LeavingMTARenderZone        ( void );
+    virtual void                            MaybeEnteringMTARenderZone  ( void );
+    virtual void                            MaybeLeavingMTARenderZone   ( void );
+    void                                    SaveGTARenderStates         ( void );
+    void                                    RestoreGTARenderStates      ( void );
+
     // To draw queued up drawings
     void                DrawPreGUIQueue         ( void );
     void                DrawPostGUIQueue        ( void );
@@ -300,6 +308,17 @@ private:
 
     // Drawing types
     struct ID3DXLine*                   m_pLineInterface;
+
+    enum EMTARenderZone
+    {
+        MTA_RZONE_NONE,
+        MTA_RZONE_MAIN,     // MTA rendering inside known areas.
+        MTA_RZONE_OUTSIDE,  // MTA rendering outside known areas. i.e. During a keypress or GTA callback
+    };
+
+    EMTARenderZone                      m_MTARenderZone;
+    int                                 m_iOutsideZoneCount;
+    IDirect3DStateBlock9*               m_pSavedStateBlock;
 };
 
 #endif

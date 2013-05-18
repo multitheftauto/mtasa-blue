@@ -212,6 +212,8 @@ private:
     bool                    m_bProtected;
     bool                    m_bStartedManually;
 
+    bool                    m_bOOPEnabledInMetaXml;
+
     bool                    CheckState ( void ); // if the resource has no Dependents, stop it, if it has, start it. returns true if the resource is started.
     bool                    ReadIncludedResources ( class CXMLNode * root );
     bool                    ReadIncludedMaps ( CXMLNode * root );
@@ -372,6 +374,7 @@ public:
     bool                HandleAclRequestChange          ( const CAclRightName& strRightName, bool bAccess, const SString& strWho );
     const SString&      GetMinServerReqFromMetaXml      ( void )                                { return m_strMinServerReqFromMetaXml; }
     const SString&      GetMinClientReqFromMetaXml      ( void )                                { return m_strMinClientReqFromMetaXml; }
+    bool                IsOOPEnabledInMetaXml           ( void )                                { return m_bOOPEnabledInMetaXml; }
 
 protected:
     SString             GetAutoGroupName                ( void );

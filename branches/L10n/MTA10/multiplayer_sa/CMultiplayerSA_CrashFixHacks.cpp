@@ -911,6 +911,45 @@ cont:
 }
 
 
+////////////////////////////////////////////////////////////////////////
+// Handle CAEPCBankLoader::IsSoundBankLoaded with invalid argument
+#define HOOKPOS_CrashFix_Misc29                             0x4E022C
+#define HOOKSIZE_CrashFix_Misc29                            5
+DWORD RETURN_CrashFix_Misc29 =                              0x4E0231;
+DWORD RETURN_CrashFix_Misc29B =                             0x4E0227;
+void _declspec(naked) HOOK_CrashFix_Misc29 ()
+{
+    _asm
+    {
+        // Execute replaced code
+        movsx   eax,word ptr [esp+8]
+    }
+
+#if TEST_CRASH_FIXES
+    SIMULATE_ERROR_BEGIN( 10 )
+        _asm
+        {
+            mov     eax, 0xFFFFFFFF
+        }
+    SIMULATE_ERROR_END
+#endif
+
+    _asm
+    {
+        // Check word being -1
+        cmp     al, 0xffff
+        jz      cont
+
+        // Continue standard path
+        jmp     RETURN_CrashFix_Misc29
+
+cont:
+        // Skip much code
+        jmp     RETURN_CrashFix_Misc29B
+    }
+}
+
+
 //////////////////////////////////////////////////////////////////////////////////////////
 //
 // CClumpModelInfo::GetFrameFromId
@@ -1056,5 +1095,6 @@ void CMultiplayerSA::InitHooks_CrashFixHacks ( void )
     EZHookInstall ( CrashFix_Misc26 );
     EZHookInstall ( CrashFix_Misc27 );
     EZHookInstall ( CrashFix_Misc28 );
+    EZHookInstall ( CrashFix_Misc29 );
     EZHookInstall ( CClumpModelInfo_GetFrameFromId );
 }

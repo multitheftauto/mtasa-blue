@@ -23,7 +23,7 @@ int CLuaFunctionDefs::EngineLoadCOL ( lua_State* luaVM )
 {
     SString strFile = "";
     CScriptArgReader argStream ( luaVM );
-    // Grab the DFF and model ID
+    // Grab the COL filename
     argStream.ReadString ( strFile );
 
     if ( !argStream.HasErrors ( ) )
@@ -82,7 +82,7 @@ int CLuaFunctionDefs::EngineLoadDFF ( lua_State* luaVM )
 {
     SString strFile = "";
     CScriptArgReader argStream ( luaVM );
-    // Grab the DFF and model ID
+    // Grab the DFF filename (model ID ignored after 1.3.1)
     argStream.ReadString ( strFile );
 
     if ( !argStream.HasErrors ( ) )
@@ -141,9 +141,10 @@ int CLuaFunctionDefs::EngineLoadTXD ( lua_State* luaVM )
     SString strFile = "";
     bool bFilteringEnabled = true;
     CScriptArgReader argStream ( luaVM );
-    // Grab the DFF and model ID
+    // Grab the TXD filename
     argStream.ReadString ( strFile );
-    argStream.ReadBool ( bFilteringEnabled, true );
+    if ( argStream.NextIsBool() )   // Some scripts have a number here (in error)
+        argStream.ReadBool ( bFilteringEnabled, true );
 
     if ( !argStream.HasErrors ( ) )
     {
@@ -201,7 +202,7 @@ int CLuaFunctionDefs::EngineReplaceCOL ( lua_State* luaVM )
     CClientColModel* pCol = NULL;
     unsigned short usModel = 0;
     CScriptArgReader argStream ( luaVM );
-    // Grab the DFF and model ID
+    // Grab the COL and model ID
     argStream.ReadUserData ( pCol );
     argStream.ReadNumber ( usModel );
 

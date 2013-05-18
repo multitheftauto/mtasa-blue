@@ -61,9 +61,11 @@
 #ifdef _MSC_VER
     #define atoi64 _atoi64
     #define PRId64  "I64d"
+    #define PRIx64  "I64x"
 #else
     #define atoi64 std::atoll
     #define PRId64  "lld"
+    #define PRIx64  "llx"
 #endif
 
 //

@@ -79,6 +79,7 @@ typedef void ( InRenderer ) ( void );
 
 typedef bool ( PreWeaponFireHandler ) ( class CPlayerPed* pPlayer, bool bStopIfUsingBulletSync );
 typedef void ( PostWeaponFireHandler ) ( void );
+typedef void ( TaskSimpleBeHitHandler ) ( CPedSAInterface* pPedAttacker, ePedPieceTypes hitBodyPart, int hitBodySide, int weaponId );
 
 enum eGameVersion 
 {
@@ -228,6 +229,7 @@ public:
 
     virtual void                SetPreWeaponFireHandler         ( PreWeaponFireHandler* pPreWeaponFireHandler ) = 0;
     virtual void                SetPostWeaponFireHandler        ( PostWeaponFireHandler* pPostWeaponFireHandler ) = 0;
+    virtual void                SetTaskSimpleBeHitHandler       ( TaskSimpleBeHitHandler* pTaskSimpleBeHitHandler ) = 0;
 };
 
 #endif

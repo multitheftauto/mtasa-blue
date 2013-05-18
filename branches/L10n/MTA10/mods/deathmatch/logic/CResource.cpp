@@ -23,7 +23,7 @@ extern CClientGame* g_pClientGame;
 
 int CResource::m_iShowingCursor = 0;
 
-CResource::CResource ( unsigned short usNetID, const char* szResourceName, CClientEntity* pResourceEntity, CClientEntity* pResourceDynamicEntity, const SString& strMinServerReq, const SString& strMinClientReq )
+CResource::CResource ( unsigned short usNetID, const char* szResourceName, CClientEntity* pResourceEntity, CClientEntity* pResourceDynamicEntity, const SString& strMinServerReq, const SString& strMinClientReq, bool bEnableOOP )
 {
     m_uiScriptID = CIdArray::PopUniqueId ( this, EIdClass::RESOURCE );
     m_usNetID = usNetID;
@@ -65,13 +65,16 @@ CResource::CResource ( unsigned short usNetID, const char* szResourceName, CClie
     m_pResourceTXDRoot->MakeSystemEntity ();
 
     m_strResourceDirectoryPath = SString ( "%s/resources/%s", g_pClientGame->GetModRoot (), *m_strResourceName );
-    m_strResourcePrivateDirectoryPath = PathJoin ( CServerIdManager::GetSingleton ()->GetConnectionPrivateDirectory (), m_strResourceName );
+    m_strResourcePrivateDirectoryPath = PathJoin ( CServerIdManager::GetSingleton ( )->GetConnectionPrivateDirectory (), m_strResourceName );
 
     m_strResourcePrivateDirectoryPathOld = CServerIdManager::GetSingleton ()->GetConnectionPrivateDirectory ( true );
     if ( !m_strResourcePrivateDirectoryPathOld.empty () )
         m_strResourcePrivateDirectoryPathOld = PathJoin ( m_strResourcePrivateDirectoryPathOld, m_strResourceName );
 
-    m_pLuaVM = m_pLuaManager->CreateVirtualMachine ( this );
+    // Move this after the CreateVirtualMachine line and heads will roll
+    m_bOOPEnabled = bEnableOOP;
+
+    m_pLuaVM = m_pLuaManager->CreateVirtualMachine ( this, bEnableOOP );
     if ( m_pLuaVM )
     {
         m_pLuaVM->SetScriptName ( szResourceName );
@@ -318,15 +321,19 @@ void CResource::Load ( CClientEntity *pRootEntity )
             }
             else
             {
-                SString strBuffer ( "ERROR: File '%s' in resource '%s' - CRC mismatch.", pResourceFile->GetShortName (), *m_strResourceName );
-                g_pCore->ChatEchoColor ( strBuffer, 255, 0, 0 );
+                SString strBuffer ( "CRC mismatch (File '%s' in resource '%s')", pResourceFile->GetShortName (), *m_strResourceName );
+                g_pCore->ShowMessageBox ( "Error", strBuffer, MB_BUTTON_OK | MB_ICON_ERROR );
+                g_pCore->GetConsole ()->Printf ( "Download error: %s", *strBuffer );
+                g_pCore->GetModManager ()->RequestUnload ();
             }
         }
         else
         if ( CheckFileForCorruption ( pResourceFile->GetName () ) )
         {
-            SString strBuffer ( "WARNING: File '%s' in resource '%s' is invalid.", pResourceFile->GetShortName (), *m_strResourceName );
-            g_pCore->DebugEchoColor ( strBuffer, 255, 0, 0 );
+            SString strBuffer ( "Invalid file (File '%s' in resource '%s')", pResourceFile->GetShortName (), *m_strResourceName );
+            g_pCore->ShowMessageBox ( "Error", strBuffer, MB_BUTTON_OK | MB_ICON_ERROR );
+            g_pCore->GetConsole ()->Printf ( "Download error: %s", *strBuffer );
+            g_pCore->GetModManager ()->RequestUnload ();
         }
     }
 

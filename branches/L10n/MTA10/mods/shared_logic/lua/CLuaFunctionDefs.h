@@ -394,6 +394,7 @@ public:
     LUA_DECLARE ( SetVehicleNitroActivated );
     LUA_DECLARE ( SetVehicleNitroCount );
     LUA_DECLARE ( SetVehicleNitroLevel );
+    LUA_DECLARE ( SetVehiclePlateText );
 
     // Object create funcs
     LUA_DECLARE ( CreateObject );

@@ -78,7 +78,7 @@ int CLuaFunctionDefs::GetTypeIndexFromClothes ( lua_State* luaVM )
     if ( !argStream.HasErrors ( ) )
     {
         unsigned char ucType, ucIndex;
-        if ( CStaticFunctionDefinitions::GetTypeIndexFromClothes ( strTexture, strModel == "" ? NULL : strModel, ucType, ucIndex ) )
+        if ( CStaticFunctionDefinitions::GetTypeIndexFromClothes ( strTexture, strModel == "" ? NULL : strModel.c_str(), ucType, ucIndex ) )
         {
             lua_pushnumber ( luaVM, ucType );
             lua_pushnumber ( luaVM, ucIndex );

@@ -120,6 +120,7 @@ CClientGame::CClientGame ( bool bLocalPlay )
     m_Glitches [ GLITCH_CROUCHBUG ] = false;
     m_Glitches [ GLITCH_CLOSEDAMAGE ] = false;
     g_pMultiplayer->DisableCloseRangeDamage ( true );
+    m_Glitches [ GLITCH_HITANIM ] = false;
 
     // Remove Night & Thermal vision view (if enabled).
     g_pMultiplayer->SetNightVisionEnabled ( false );
@@ -263,6 +264,7 @@ CClientGame::CClientGame ( bool bLocalPlay )
     g_pMultiplayer->SetGameEntityRenderHandler( CClientGame::StaticGameEntityRenderHandler );
     g_pGame->SetPreWeaponFireHandler ( CClientGame::PreWeaponFire );
     g_pGame->SetPostWeaponFireHandler ( CClientGame::PostWeaponFire );
+    g_pGame->SetTaskSimpleBeHitHandler ( CClientGame::StaticTaskSimpleBeHitHandler );
     g_pCore->SetMessageProcessor ( CClientGame::StaticProcessMessage );
     g_pCore->GetKeyBinds ()->SetKeyStrokeHandler ( CClientGame::StaticKeyStrokeHandler );
     g_pCore->GetKeyBinds ()->SetCharacterKeyHandler ( CClientGame::StaticCharacterKeyHandler );
@@ -275,6 +277,7 @@ CClientGame::CClientGame ( bool bLocalPlay )
     m_pLuaManager->SetScriptDebugging ( m_pScriptDebugging );
     CStaticFunctionDefinitions ( m_pLuaManager, &m_Events, g_pCore, g_pGame, this, m_pManager );
     CLuaFunctionDefs::Initialize ( m_pLuaManager, m_pScriptDebugging, this );
+    CLuaOOPDefs::Initialize ( this, m_pLuaManager, m_pScriptDebugging );
     CLuaDefs::Initialize ( this, m_pLuaManager, m_pScriptDebugging );
 
     // Disable the enter/exit vehicle key button (we want to handle this button ourselves)
@@ -408,6 +411,7 @@ CClientGame::~CClientGame ( void )
     g_pMultiplayer->SetGameEntityRenderHandler( NULL );
     g_pGame->SetPreWeaponFireHandler ( NULL );
     g_pGame->SetPostWeaponFireHandler ( NULL );
+    g_pGame->SetTaskSimpleBeHitHandler ( NULL );
     g_pGame->GetAudio ()->SetWorldSoundHandler ( NULL );
     g_pCore->SetMessageProcessor ( NULL );
     g_pCore->GetKeyBinds ()->SetKeyStrokeHandler ( NULL );
@@ -515,8 +519,9 @@ void CClientGame::StartPlayback ( void )
     }
 }
 
-bool CClientGame::StartGame ( const char* szNick, const char* szPassword )
+bool CClientGame::StartGame ( const char* szNick, const char* szPassword, eServerType Type )
 {
+    m_ServerType = Type;
     int dbg = _CrtSetDbgFlag ( _CRTDBG_REPORT_FLAG );
     //dbg |= _CRTDBG_ALLOC_MEM_DF;
     //dbg |= _CRTDBG_CHECK_ALWAYS_DF;
@@ -610,15 +615,16 @@ bool CClientGame::StartGame ( const char* szNick, const char* szPassword )
 }
 
 
-void CClientGame::SetupLocalGame ( const char* szConfig )
+void CClientGame::SetupLocalGame ( eServerType Type )
 {
+    SString strConfig = (Type == SERVER_TYPE_EDITOR) ? "editor.conf" : "local.conf";
     m_bWaitingForLocalConnect = true;
     if ( !m_pLocalServer )
-        m_pLocalServer = new CLocalServer ( szConfig );
+        m_pLocalServer = new CLocalServer ( strConfig );
 }
 
 
-bool CClientGame::StartLocalGame ( const char* szConfig, const char* szPassword )
+bool CClientGame::StartLocalGame ( eServerType Type, const char* szPassword )
 {
     // Verify that the nickname is valid
     std::string strNick;
@@ -632,9 +638,8 @@ bool CClientGame::StartLocalGame ( const char* szConfig, const char* szPassword 
     }
 
     m_bWaitingForLocalConnect = false;
-
-    // Gotta copy the config in case we got it from local server setup gui
-    SString strTemp = szConfig;
+    m_ServerType = Type;
+    SString strTemp = (Type == SERVER_TYPE_EDITOR) ? "editor.conf" : "local.conf";
 
     if ( m_pLocalServer )
     {
@@ -711,32 +716,13 @@ void CClientGame::DoPulsePreHUDRender ( bool bDidUnminimize, bool bDidRecreateRe
         m_pRootEntity->CallEvent ( "onClientRestore", Arguments, false );
         m_bWasMinimized = false;
 
-        if ( m_bMuteSFX )
-        {
-            unsigned char ucOldSFXVolume = g_pGame->GetSettings ()->GetSFXVolume ();
-            g_pGame->GetAudio ()->SetEffectsMasterVolume ( ucOldSFXVolume );
-        }
-
-        if ( m_bMuteRadio )
-        {
-            unsigned char ucOldRadioVolume = g_pGame->GetSettings ()->GetRadioVolume ();
-            g_pGame->GetAudio ()->SetMusicMasterVolume ( ucOldRadioVolume );
-        }
-
-        if ( m_bMuteMTA )
-        {
-            m_pManager->GetSoundManager ()->SetMTAMuted ( false );
-        }
-
-        if ( m_bMuteVoice )
-        {
-            CClientPlayer* pPlayer = g_pClientGame->m_pPlayerManager->GetLocalPlayer ();
-            CClientPlayerVoice * pVoice = pPlayer->GetVoice();
-            if ( pVoice != NULL )
-            {
-                pVoice->SetVoiceMuted ( false );
-            }
-        }
+        // Reverse any mute on minimize effects
+        g_pGame->GetAudio ()->SetEffectsMasterVolume ( g_pGame->GetSettings ()->GetSFXVolume () );
+        g_pGame->GetAudio ()->SetMusicMasterVolume ( g_pGame->GetSettings ()->GetRadioVolume () );
+        m_pManager->GetSoundManager ()->SetMinimizeMuted ( false );
+        if ( CClientPlayer* pPlayer = g_pClientGame->m_pPlayerManager->GetLocalPlayer () )
+            if ( CClientPlayerVoice* pVoice = pPlayer->GetVoice() )
+                pVoice->SetMinimizeMuted ( false );
     }
 
     // Call onClientHUDRender LUA event
@@ -1075,7 +1061,7 @@ void CClientGame::DoPulses ( void )
             g_pNet->SetServerBitStreamVersion ( MTA_DM_BITSTREAM_VERSION );
 
             // Run the game normally.
-            StartGame ( m_strLocalNick, m_Server.GetPassword().c_str() );
+            StartGame ( m_strLocalNick, m_Server.GetPassword().c_str(), m_ServerType );
         }
         else
         {
@@ -3566,6 +3552,11 @@ void CClientGame::Event_OnIngameAndConnected ( void )
     //g_pCore->ShowMessageBox ( "Connecting", _("Verifying client ..."), false );
     m_ulVerifyTimeStart = CClientTime::GetTime ();
     
+    // Keep criminal records of how many times they've connected to servers
+    SetApplicationSettingInt ( "times-connected", GetApplicationSettingInt("times-connected") + 1 );
+    if ( m_ServerType == SERVER_TYPE_EDITOR )
+        SetApplicationSettingInt ( "times-connected-editor", GetApplicationSettingInt ("times-connected-editor") + 1 );
+
     /*
     // Notify the server telling we're ingame
     NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream ();
@@ -3722,6 +3713,11 @@ void CClientGame::StaticGameEntityRenderHandler ( CEntitySAInterface* pGameEntit
     g_pGame->GetRenderWare ()->SetRenderingClientEntity ( NULL, 0xFFFF, TYPE_MASK_WORLD );
 }
 
+void CClientGame::StaticTaskSimpleBeHitHandler ( CPedSAInterface* pPedAttacker, ePedPieceTypes hitBodyPart, int hitBodySide, int weaponId )
+{
+    g_pClientGame->TaskSimpleBeHitHandler ( pPedAttacker, hitBodyPart, hitBodySide, weaponId );
+}
+
 void CClientGame::DrawRadarAreasHandler ( void )
 {
     m_pRadarAreaManager->DoPulse ();
@@ -3832,33 +3828,23 @@ void CClientGame::IdleHandler ( void )
             CLuaArguments Arguments;
             m_pRootEntity->CallEvent ( "onClientMinimize", Arguments, false );
 
-            g_pCore->GetCVars ()->Get ( "mute_sfx_when_minimized", m_bMuteSFX );
-            g_pCore->GetCVars ()->Get ( "mute_radio_when_minimized", m_bMuteRadio );
-            g_pCore->GetCVars ()->Get ( "mute_mta_when_minimized", m_bMuteMTA );
-            g_pCore->GetCVars ()->Get ( "mute_voice_when_minimized", m_bMuteVoice );
-
-            if ( m_bMuteSFX )
-            {
+            // Apply mute on minimize options
+            if ( g_pCore->GetCVars ()->GetValue < bool > ( "mute_sfx_when_minimized" )  )
                 g_pGame->GetAudio ()->SetEffectsMasterVolume ( 0 );
-            }
 
-            if ( m_bMuteRadio )
-            {
+            if ( g_pCore->GetCVars ()->GetValue < bool > ( "mute_radio_when_minimized" )  )
                 g_pGame->GetAudio ()->SetMusicMasterVolume ( 0 );
-            }
 
-            if ( m_bMuteMTA )
-            {
-                m_pManager->GetSoundManager ()->SetMTAMuted ( true );
-            }
+            if ( g_pCore->GetCVars ()->GetValue < bool > ( "mute_mta_when_minimized" )  )
+                m_pManager->GetSoundManager ()->SetMinimizeMuted ( true );
 
-            if ( m_bMuteVoice )
+            if ( g_pCore->GetCVars ()->GetValue < bool > ( "mute_voice_when_minimized" )  )
             {
                 CClientPlayer* pPlayer = g_pClientGame->m_pPlayerManager->GetLocalPlayer ();
                 CClientPlayerVoice * pVoice = pPlayer->GetVoice();
                 if ( pVoice != NULL )
                 {
-                    pVoice->SetVoiceMuted ( true );
+                    pVoice->SetMinimizeMuted ( true );
                 }
             }
         }
@@ -4228,6 +4214,7 @@ bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
             }
 
             bool bIsBeingShotWhilstAiming = ( weaponUsed >= WEAPONTYPE_PISTOL && weaponUsed <= WEAPONTYPE_MINIGUN && pDamagedPed->IsUsingGun () );
+            bool bOldBehaviour = !IsGlitchEnabled( GLITCH_HITANIM );
 
             // Check if their health or armor is locked, and if so prevent applying the damage locally
             if ( pDamagedPed->IsHealthLocked () || pDamagedPed->IsArmorLocked () )
@@ -4236,11 +4223,18 @@ bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
                 pDamagedPed->GetGamePlayer ()->SetHealth ( pDamagedPed->GetHealth () );
                 pDamagedPed->GetGamePlayer ()->SetArmor ( pDamagedPed->GetArmor () );
 
-                // Don't play the animation if it's going to be a death one, or if it's going to interrupt aiming
-                if ( fCurrentHealth == 0.0f || bIsBeingShotWhilstAiming ) return false;
+                if ( bOldBehaviour )
+                {
+                    // Don't play the animation if it's going to be a death one, or if it's going to interrupt aiming
+                    if ( fCurrentHealth == 0.0f || bIsBeingShotWhilstAiming )
+                        return false;
 
-                // Allow animation and ensure the code below is not executed if health and armor are locked (i.e. remote players)
-                return true;
+                    // Allow animation for remote players
+                    return true;
+                }
+
+                // No hit animation for remote players
+                return false;
             }
 
             // Update our stored health/armor
@@ -4308,8 +4302,10 @@ bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
                     }
                 }
             }
+
             // Inhibit hit-by-gun animation for local player if required
-            if ( pDamagedPed->IsLocalPlayer () && bIsBeingShotWhilstAiming ) return false;
+            if ( bOldBehaviour )
+                if ( pDamagedPed->IsLocalPlayer () && bIsBeingShotWhilstAiming ) return false;
 
             ///////////////////////////////////////////////////////////////////////////
             // Pass 2 end
@@ -4615,6 +4611,27 @@ void CClientGame::GameModelRemoveHandler ( ushort usModelId )
     m_pGameEntityXRefManager->OnGameModelRemove ( usModelId );
 }
 
+void CClientGame::TaskSimpleBeHitHandler ( CPedSAInterface* pPedAttacker, ePedPieceTypes hitBodyPart, int hitBodySide, int weaponId )
+{
+    bool bOldBehaviour = !IsGlitchEnabled( GLITCH_HITANIM );
+    if ( bOldBehaviour )
+        return;
+
+    CClientPed* pClientPedAttacker = DynamicCast < CClientPed > ( GetGameEntityXRefManager()->FindClientEntity( (CEntitySAInterface*)pPedAttacker ) );
+
+    // Make sure cause was networked ped
+    if ( pClientPedAttacker && !pClientPedAttacker->IsLocalEntity() )
+    {
+        NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream ();
+        pBitStream->Write( (ushort)TASK_SIMPLE_BE_HIT );
+        pBitStream->Write( pClientPedAttacker->GetID() );
+        pBitStream->Write( (uchar)hitBodyPart );
+        pBitStream->Write( (uchar)hitBodySide );
+        pBitStream->Write( (uchar)weaponId );
+        g_pNet->SendPacket( PACKET_ID_PED_TASK, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED );
+        g_pNet->DeallocateNetBitStream( pBitStream );
+    }
+}
 
 bool CClientGame::StaticProcessMessage ( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
 {
@@ -6092,4 +6109,103 @@ bool CClientGame::IsUsingAlternatePulseOrder( bool bAdvanceDelayCounter )
     }
 
     return false;
+}
+
+
+//////////////////////////////////////////////////////////////////
+//
+// CClientGame::OutputServerInfo
+//
+// Output info about the connected server for player
+//
+//////////////////////////////////////////////////////////////////
+void CClientGame::OutputServerInfo( void )
+{
+    SString strTotalOutput;
+    strTotalOutput += SString( "Server info for %s\n", g_pNet->GetConnectedServer( true ) );
+    strTotalOutput += SString( "Ver: %s\n", *GetServerVersionSortable () );
+    strTotalOutput += SString( "AC: %s\n", *m_strACInfo );
+
+    {
+        SString strVoice;
+        if ( m_pVoiceRecorder && m_pVoiceRecorder->IsEnabled() )
+            strVoice += SString( "Enabled - Sample rate:%d  Quality:%d"
+                                    , m_pVoiceRecorder->GetSampleRate()
+                                    , m_pVoiceRecorder->GetSampleQuality()
+                                );
+        else
+            strVoice += "Disabled";
+
+        strTotalOutput += SString( "Voice: %s\n", *strVoice );
+    }
+
+    {
+        SString strEnabledGlitches;
+        const char* szGlitchNames[] = { "Quick reload", "Fast fire", "Fast move", "Crouch bug", "Close damage", "Hit anim" };
+        for( uint i = 0 ; i < NUM_GLITCHES ; i++ )
+        {
+            if ( IsGlitchEnabled( i ) )
+            {
+                if ( !strEnabledGlitches.empty() )
+                    strEnabledGlitches += ", ";
+                if ( i < NUMELMS( szGlitchNames ) )
+                    strEnabledGlitches += szGlitchNames[i];
+                else
+                    strEnabledGlitches += SString( "Unknown(#%d)", i + 1 );
+            }
+        }
+        if ( strEnabledGlitches.empty() )
+            strEnabledGlitches = "None";
+        strTotalOutput += SString( "Glitches: %s\n", *strEnabledGlitches );
+    }
+
+    {
+        SString strEnabledBulletSync;
+        for( std::set < eWeaponType >::iterator iter = m_weaponTypesUsingBulletSync.begin() ; iter != m_weaponTypesUsingBulletSync.end() ; ++iter )
+        {
+            eWeaponType weaponType = *iter;
+            if ( !strEnabledBulletSync.empty() )
+                strEnabledBulletSync += ",";
+            strEnabledBulletSync += SString( "%d", weaponType );
+        }
+        if ( strEnabledBulletSync.empty() )
+            strEnabledBulletSync = "None";
+        strTotalOutput += SString( "Bullet sync weapons: %s\n", *strEnabledBulletSync );
+    }
+
+    {
+        SString strVehExtrapolate;
+        if ( m_VehExtrapolateSettings.bEnabled )
+            strVehExtrapolate += SString( "Amount:%d%%  (LimitMs:%d)" , m_VehExtrapolateSettings.iScalePercent , m_VehExtrapolateSettings.iMaxMs );
+        else
+            strVehExtrapolate += "Disabled";
+
+        strTotalOutput += SString( "Vehicle extrapolation: %s\n", *strVehExtrapolate );
+    }
+
+    {
+        SString strTickRates;
+        strTickRates += SString( "Plr:%d  Cam:%d  Ped:%d  UnocVeh:%d  KeyRot:%d  KeyJoy:%d"
+                        ,g_TickRateSettings.iPureSync
+                        ,g_TickRateSettings.iCamSync
+                        ,g_TickRateSettings.iPedSync
+                        ,g_TickRateSettings.iUnoccupiedVehicle
+                        ,g_TickRateSettings.iKeySyncRotation
+                        ,g_TickRateSettings.iKeySyncAnalogMove
+                        );
+
+        strTotalOutput += SString( "Tick rates: %s\n", *strTickRates );
+    }
+
+    {
+        SString strSyncerDists;
+        strSyncerDists += SString( "Ped:%d  UnoccupiedVehicle:%d "
+                        ,g_TickRateSettings.iPedSyncerDistance
+                        ,g_TickRateSettings.iUnoccupiedVehicleSyncerDistance
+                        );
+
+        strTotalOutput += SString( "Syncer distances: %s\n", *strSyncerDists );
+    }
+
+    g_pCore->GetConsole ()->Print ( strTotalOutput );
 }

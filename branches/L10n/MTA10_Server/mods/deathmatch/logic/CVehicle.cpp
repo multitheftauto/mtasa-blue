@@ -99,6 +99,9 @@ CVehicle::CVehicle ( CVehicleManager* pVehicleManager, CElement* pParent, CXMLNo
 
     // Generate the handling data
     GenerateHandlingData ();
+
+    // Prepare the sirens
+    RemoveVehicleSirens();
     m_tSirenBeaconInfo.m_bOverrideSirens = false;
 }
 
@@ -800,6 +803,8 @@ void CVehicle::RemoveVehicleSirens ( void )
         SetVehicleSirenMinimumAlpha( i, 0 );
         SetVehicleSirenColour( i, SColor ( ) );
     }
+
+    m_tSirenBeaconInfo.m_ucSirenCount = 0;
 }
 
 

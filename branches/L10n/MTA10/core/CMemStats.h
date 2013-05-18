@@ -26,6 +26,7 @@ struct SMemStatsInfo
     CProxyDirect3DDevice9::SMemoryState d3dMemory;
     SDxStatus dxStatus;
     int iProcessMemSizeKB;
+    int iProcessTotalVirtualKB;
     int iStreamingMemoryUsed;
     int iStreamingMemoryAvailable;
     SRwResourceStats rwResourceStats;

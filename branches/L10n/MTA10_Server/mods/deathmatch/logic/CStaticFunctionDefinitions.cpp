@@ -4068,6 +4068,9 @@ bool CStaticFunctionDefinitions::WarpPedIntoVehicle ( CPed* pPed, CVehicle* pVeh
                     VehiclePlayerArguments.PushBoolean ( false );
                 pVehicle->CallEvent ( "onVehicleEnter", VehiclePlayerArguments );
 
+                // Used to check if f.e. lua changed the player's vehicle (fix for #7570)
+                pVehicle->m_bOccupantChanged = true;
+
                 return true;
             }
         }
@@ -5047,6 +5050,27 @@ bool CStaticFunctionDefinitions::GetVehiclePlateText ( CVehicle* pVehicle, char*
     const char* szRegPlate = pVehicle->GetRegPlate ();
     strcpy ( szPlateText, szRegPlate );
     return true;
+}
+
+
+bool CStaticFunctionDefinitions::SetVehiclePlateText ( CElement* pElement, const SString& strPlateText )
+{
+    assert ( pElement );
+    RUN_CHILDREN SetVehiclePlateText ( *iter, strPlateText );
+
+    if ( IS_VEHICLE ( pElement ) )
+    {
+        CVehicle* pVehicle = static_cast < CVehicle* > ( pElement );
+        pVehicle->SetRegPlate( strPlateText );
+
+        // Tell everybarry
+        CBitStream BitStream;
+        BitStream.pBitStream->WriteString ( strPlateText.Left( 8 ) );
+        m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pVehicle, SET_VEHICLE_PLATE_TEXT, *BitStream.pBitStream ) );
+        return true;
+    }
+
+    return false;
 }
 
 

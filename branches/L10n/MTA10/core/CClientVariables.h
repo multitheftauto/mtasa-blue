@@ -70,14 +70,6 @@ public:
     int             GetRevision             ( void ) { return m_iRevision; }
     void            ValidateValues          ( void );
 
-    template < class T >
-    T GetValue( const std::string& strVariable, const T& defaultValue = 0 )
-    {
-        T value = defaultValue;
-        Get( strVariable, value );
-        return value;
-    }
-
 private:
     CXMLNode*       Node                    ( const std::string& strVariable );
     void            LoadDefaults            ( void );

@@ -131,6 +131,15 @@ void CInstallManager::InitSequencer ( void )
                 CR " "
                 CR "aero_end: "                                     ////// End of 'Windows 7 aero desktop fix' //////
                 CR " "        
+                CR "largemem_check: "                               ////// Start of 'LargeMem fix' //////
+                CR "            CALL ProcessLargeMemChecks "        // Make changes to comply with user setting
+                CR "            IF LastResult == ok GOTO largemem_end: "
+                CR " "
+                CR "            CALL ChangeToAdmin "                // If changes failed, try as admin
+                CR "            IF LastResult == ok GOTO largemem_check: "
+                CR " "
+                CR "largemem_end: "                                 ////// End of 'LargeMem fix' //////
+                CR " "        
                 CR "service_check: "                                ////// Start of 'Service checks' //////
                 CR "            CALL ProcessServiceChecks "         // Make changes to comply with service requirements
                 CR "            IF LastResult == ok GOTO service_end: "
@@ -171,6 +180,7 @@ void CInstallManager::InitSequencer ( void )
     m_pSequencer->AddFunction ( "ShowCopyFailDialog",      &CInstallManager::_ShowCopyFailDialog );
     m_pSequencer->AddFunction ( "ProcessLayoutChecks",     &CInstallManager::_ProcessLayoutChecks );
     m_pSequencer->AddFunction ( "ProcessAeroChecks",       &CInstallManager::_ProcessAeroChecks );
+    m_pSequencer->AddFunction ( "ProcessLargeMemChecks",   &CInstallManager::_ProcessLargeMemChecks );
     m_pSequencer->AddFunction ( "ProcessServiceChecks",    &CInstallManager::_ProcessServiceChecks );
     m_pSequencer->AddFunction ( "ChangeFromAdmin",         &CInstallManager::_ChangeFromAdmin );
     m_pSequencer->AddFunction ( "InstallNewsItems",        &CInstallManager::_InstallNewsItems );
@@ -619,7 +629,7 @@ SString CInstallManager::_ProcessLayoutChecks ( void )
 SString CInstallManager::_ProcessAeroChecks ( void )
 {
     // Check is Windows 7
-    if ( GetApplicationSetting ( "os-version" ) >= "6.1" )
+    if ( GetApplicationSetting ( "os-version" ) == "6.1" )
     {
         SString strGTAPath;
         if ( GetGamePath ( strGTAPath ) == GAME_PATH_OK )
@@ -665,6 +675,64 @@ SString CInstallManager::_ProcessAeroChecks ( void )
                     }
                     fclose ( fh );
                 }
+            }
+        }
+    }
+    return "ok";
+}
+
+
+//////////////////////////////////////////////////////////
+//
+// CInstallManager::_ProcessLargeMemChecks
+//
+// Change the PE header to give GTA access to more memory
+//
+//////////////////////////////////////////////////////////
+SString CInstallManager::_ProcessLargeMemChecks ( void )
+{
+    SString strGTAPath;
+    if ( GetGamePath ( strGTAPath ) == GAME_PATH_OK )
+    {
+        SString strGTAEXEPath = PathJoin ( strGTAPath , MTA_GTAEXE_NAME );
+        // Get the top byte of the file link timestamp
+        ushort usCharacteristics = 0;
+        FILE* fh = fopen ( strGTAEXEPath, "rb" );
+        if ( fh )
+        {
+            if ( !fseek ( fh, 0x96, SEEK_SET ) )
+            {
+                if ( fread ( &usCharacteristics, sizeof ( usCharacteristics ), 1, fh ) != 1 )
+                {
+                    usCharacteristics = 0;
+                }
+            }
+            fclose ( fh );
+        }
+
+        const ushort LARGEMEM_DISABLED = 0x10f;
+        const ushort LARGEMEM_ENABLED  = 0x12f;
+
+        // Check it's a value we're expecting
+        bool bCanChangeLargeMemSetting = ( usCharacteristics == LARGEMEM_DISABLED || usCharacteristics == LARGEMEM_ENABLED );
+
+        if ( bCanChangeLargeMemSetting )
+        {
+            ushort usCharacteristicsRequired = LARGEMEM_ENABLED;
+            if ( usCharacteristics != usCharacteristicsRequired )
+            {
+                // Change needed!
+                FILE* fh = fopen ( strGTAEXEPath, "r+b" );
+                if ( !fh )
+                {
+                    m_strAdminReason = "Update Large Memory setting";
+                    return "fail";
+                }
+                if ( !fseek ( fh, 0x96, SEEK_SET ) )
+                {
+                    fwrite ( &usCharacteristicsRequired, sizeof ( usCharacteristicsRequired ), 1, fh );
+                }
+                fclose ( fh );
             }
         }
     }

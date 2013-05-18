@@ -22,8 +22,6 @@ CClientSoundManager::CClientSoundManager ( CClientManager* pClientManager )
 {
     m_pClientManager = pClientManager;
 
-    m_bMuteMTA = false;
-
     // Initialize BASS audio library
     if (!BASS_Init ( -1,44100,NULL,NULL,NULL ))
         g_pCore->GetConsole()->Printf ( "BASS ERROR %d in Init", BASS_ErrorGetCode() );
@@ -171,7 +169,7 @@ void CClientSoundManager::UpdateVolume ()
 {
     // set our master sound volume if the cvar changed
     float fValue = 0.0f;
-    if ( !m_bMuteMTA )
+    if ( !m_bMinimizeMuted )
     {
         if( g_pCore->GetCVars ()->Get ( "mtavolume", fValue ) )
         {

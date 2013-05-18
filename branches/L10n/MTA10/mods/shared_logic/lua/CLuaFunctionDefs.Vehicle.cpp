@@ -608,7 +608,7 @@ int CLuaFunctionDefs::GetVehicleUpgradeSlotName ( lua_State* luaVM )
         if ( usNumber < 17 )
         {
             SString strUpgradeName;
-            if ( CStaticFunctionDefinitions::GetVehicleUpgradeSlotName ( usNumber, strUpgradeName ) )
+            if ( CStaticFunctionDefinitions::GetVehicleUpgradeSlotName ( static_cast < unsigned char > ( usNumber ), strUpgradeName ) )
             {
                 lua_pushstring ( luaVM, strUpgradeName );
                 return 1;
@@ -1296,12 +1296,8 @@ int CLuaFunctionDefs::CreateVehicle ( lua_State* luaVM )
     SString strRegPlate = "";
     CScriptArgReader argStream ( luaVM );
     argStream.ReadNumber ( usModel );
-    argStream.ReadNumber ( vecPosition.fX );
-    argStream.ReadNumber ( vecPosition.fY );
-    argStream.ReadNumber ( vecPosition.fZ );
-    argStream.ReadNumber ( vecRotation.fX, 0.0f );
-    argStream.ReadNumber ( vecRotation.fY, 0.0f );
-    argStream.ReadNumber ( vecRotation.fZ, 0.0f );
+    argStream.ReadVector3D ( vecPosition );
+    argStream.ReadVector3D ( vecRotation, vecRotation );
     argStream.ReadString ( strRegPlate, "" );
     argStream.ReadNumber ( ucVariant, 255 );
     argStream.ReadNumber ( ucVariant2, 255 );
@@ -1315,7 +1311,7 @@ int CLuaFunctionDefs::CreateVehicle ( lua_State* luaVM )
             if ( pResource )
             {
                 // Create the vehicle and return its handle
-                CClientVehicle* pVehicle = CStaticFunctionDefinitions::CreateVehicle ( *pResource, usModel, vecPosition, vecRotation, strRegPlate == "" ? NULL : strRegPlate, ucVariant, ucVariant2 );
+                CClientVehicle* pVehicle = CStaticFunctionDefinitions::CreateVehicle ( *pResource, usModel, vecPosition, vecRotation, strRegPlate == "" ? NULL : strRegPlate.c_str(), ucVariant, ucVariant2 );
                 if ( pVehicle )
                 {
                     CElementGroup * pGroup = pResource->GetElementGroup();
@@ -1481,9 +1477,7 @@ int CLuaFunctionDefs::SetVehicleTurnVelocity ( lua_State* luaVM )
     CVector vecTurnVelocity;
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pEntity );
-    argStream.ReadNumber ( vecTurnVelocity.fX );
-    argStream.ReadNumber ( vecTurnVelocity.fY );
-    argStream.ReadNumber ( vecTurnVelocity.fZ );
+    argStream.ReadVector3D ( vecTurnVelocity );
 
     if ( !argStream.HasErrors ( ) )
     {
@@ -2924,7 +2918,7 @@ int CLuaFunctionDefs::GetVehicleSirens( lua_State* luaVM )
             tSirenInfo = pVehicle->m_tSirenBeaconInfo;// Grab the siren structure data
             lua_newtable ( luaVM );
 
-            for ( int i = 0; i <= tSirenInfo.m_ucSirenCount;i++ )
+            for ( int i = 0; i < tSirenInfo.m_ucSirenCount;i++ )
             {
                 lua_pushnumber ( luaVM, i+1 );
                 lua_newtable ( luaVM );
@@ -3481,6 +3475,31 @@ int CLuaFunctionDefs::SetVehicleNitroLevel ( lua_State* luaVM )
                 lua_pushboolean ( luaVM, true );
                 return 1;
             }
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::SetVehiclePlateText ( lua_State* luaVM )
+{
+//  bool setVehiclePlateText ( vehicle theVehicle, string plateText )
+    CClientEntity* pEntity; SString strText;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pEntity );
+    argStream.ReadString ( strText );
+
+    if ( !argStream.HasErrors() )
+    {
+        if ( CStaticFunctionDefinitions::SetVehiclePlateText ( *pEntity, strText ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
         }
     }
     else

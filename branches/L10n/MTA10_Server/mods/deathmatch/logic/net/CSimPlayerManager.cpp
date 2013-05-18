@@ -93,8 +93,6 @@ void CSimPlayerManager::RemoveSimPlayer ( CPlayer* pPlayer )
     {
         CSimPlayer* pOtherSim = *iter;
         ListRemove ( pOtherSim->m_PuresyncSendList, pSim );
-        ListRemove ( pOtherSim->m_KeysyncSendList, pSim );
-        ListRemove ( pOtherSim->m_BulletsyncSendList, pSim );
     }
 
     SAFE_DELETE( pSim );
@@ -112,7 +110,7 @@ void CSimPlayerManager::RemoveSimPlayer ( CPlayer* pPlayer )
 // Update matching sim player object with new datum
 //
 ///////////////////////////////////////////////////////////////////////////
-void CSimPlayerManager::UpdateSimPlayer ( CPlayer* pPlayer, const std::set < CPlayer* >* pPuresyncSendList, const std::set < CPlayer* >* pKeysyncSendList, const std::set < CPlayer* >* pBulletsyncSendList )
+void CSimPlayerManager::UpdateSimPlayer ( CPlayer* pPlayer )
 {
     LockSimSystem ();     // TODO - only lock the CSimPlayer
 
@@ -131,11 +129,6 @@ void CSimPlayerManager::UpdateSimPlayer ( CPlayer* pPlayer, const std::set < CPl
     //
     CVehicle* pVehicle = pPlayer->GetOccupiedVehicle ();
 
-    // Work out our weapon range.
-    eWeaponType eWeapon = static_cast < eWeaponType > ( pPlayer->GetWeaponType ( ) );
-    float fSkill = pPlayer->GetPlayerStat ( CWeaponStatManager::GetSkillStatIndex ( eWeapon ) );
-    float fWeaponRange = g_pGame->GetWeaponStatManager ( )->GetWeaponRangeFromSkillLevel ( eWeapon, fSkill );
-
     pSim->m_iStatus                 = pPlayer->GetStatus ();
     pSim->m_usBitStreamVersion      = pPlayer->GetBitStreamVersion ();
     pSim->m_bHasOccupiedVehicle     = pVehicle != NULL;
@@ -145,7 +138,7 @@ void CSimPlayerManager::UpdateSimPlayer ( CPlayer* pPlayer, const std::set < CPl
     pSim->m_usVehicleModel          = pVehicle ? pVehicle->GetModel () : 0;
     pSim->m_ucSyncTimeContext       = pPlayer->GetSyncTimeContext ();
     pSim->m_ucOccupiedVehicleSeat   = pPlayer->GetOccupiedVehicleSeat ();
-    pSim->m_fWeaponRange            = fWeaponRange;
+    pSim->m_fWeaponRange            = pPlayer->GetWeaponRangeFromSlot();
     pSim->m_bVehicleHasHydraulics   = pVehicle ? pVehicle->GetUpgrades ()->HasUpgrade ( 1087 ) : false;
     pSim->m_bVehicleIsPlaneOrHeli   = pVehicle ? pVehicle->GetVehicleType () == VEHICLE_PLANE || pVehicle->GetVehicleType () == VEHICLE_HELI : false;
     pSim->m_sharedControllerState.Copy ( pPlayer->GetPad ()->GetCurrentControllerState () );
@@ -153,39 +146,17 @@ void CSimPlayerManager::UpdateSimPlayer ( CPlayer* pPlayer, const std::set < CPl
     pSim->m_fPlayerRotation         = pPlayer->GetRotation ();
 
     // Update Puresync send list
-    if ( pPuresyncSendList )
+    if ( pPlayer->m_bPureSyncSimSendListDirty )
     {
+        pPlayer->m_bPureSyncSimSendListDirty = false;
         pSim->m_PuresyncSendList.clear ();
-        for ( std::set < CPlayer* > ::const_iterator iter = pPuresyncSendList->begin (); iter != pPuresyncSendList->end (); ++iter )
+        for ( CFastHashSet < CPlayer* > ::const_iterator iter = pPlayer->m_PureSyncSimSendList.begin (); iter != pPlayer->m_PureSyncSimSendList.end (); ++iter )
         {
             CSimPlayer* pSendSimPlayer = (*iter)->m_pSimPlayer;
             if ( pSendSimPlayer && pSendSimPlayer->m_bDoneFirstUpdate )
                 pSim->m_PuresyncSendList.push_back ( pSendSimPlayer );
-        }
-
-    }
-
-    // Update Keysync send list
-    if ( pKeysyncSendList )
-    {
-        pSim->m_KeysyncSendList.clear ();
-        for ( std::set < CPlayer* > ::const_iterator iter = pKeysyncSendList->begin (); iter != pKeysyncSendList->end (); ++iter )
-        {
-            CSimPlayer* pSendSimPlayer = (*iter)->m_pSimPlayer;
-            if ( pSendSimPlayer && pSendSimPlayer->m_bDoneFirstUpdate )
-                pSim->m_KeysyncSendList.push_back ( pSendSimPlayer );
-        }
-    }
-
-    // Update Bulletsync send list
-    if ( pBulletsyncSendList )
-    {
-        pSim->m_BulletsyncSendList.clear ();
-        for ( std::set < CPlayer* > ::const_iterator iter = pBulletsyncSendList->begin (); iter != pBulletsyncSendList->end (); ++iter )
-        {
-            CSimPlayer* pSendSimPlayer = (*iter)->m_pSimPlayer;
-            if ( pSendSimPlayer && pSendSimPlayer->m_bDoneFirstUpdate )
-                pSim->m_BulletsyncSendList.push_back ( pSendSimPlayer );
+            else
+                pPlayer->m_bPureSyncSimSendListDirty = true;    // Retry next time
         }
     }
 
@@ -367,7 +338,7 @@ bool CSimPlayerManager::HandleKeySync ( const NetServerPlayerID& Socket, NetBitS
         if ( pPacket->Read ( *BitStream ) )
         {
             // Relay it to nearbyers
-            Broadcast ( *pPacket, pSourceSimPlayer->GetKeysyncSendList () );
+            Broadcast ( *pPacket, pSourceSimPlayer->GetPuresyncSendList () );
         }
 
         delete pPacket;
@@ -405,7 +376,45 @@ bool CSimPlayerManager::HandleBulletSync ( const NetServerPlayerID& Socket, NetB
         if ( pPacket->Read ( *BitStream ) )
         {
             // Relay it to nearbyers
-            Broadcast ( *pPacket, pSourceSimPlayer->GetBulletsyncSendList () );
+            Broadcast ( *pPacket, pSourceSimPlayer->GetPuresyncSendList () );
+        }
+
+        delete pPacket;
+    }
+
+    UnlockSimSystem ();
+    return true;
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CSimPlayerManager::HandlePedTaskPacket
+//
+// Thread:              sync
+// CS should be locked: no
+//
+///////////////////////////////////////////////////////////////
+bool CSimPlayerManager::HandlePedTaskPacket ( const NetServerPlayerID& Socket, NetBitStreamInterface* BitStream )
+{
+    if ( !CNetBufferWatchDog::CanSendPacket ( PACKET_ID_PED_TASK ) )
+        return true;
+
+    LockSimSystem ();     // Prevent player additions and deletions
+
+    // Grab the source player
+    CSimPlayer* pSourceSimPlayer = Get ( Socket );
+
+    // Check is good for ped task sync
+    if ( pSourceSimPlayer && pSourceSimPlayer->IsJoined () )
+    {
+        // Read the incoming packet data
+        CSimPedTaskPacket* pPacket = new CSimPedTaskPacket ( pSourceSimPlayer->m_PlayerID );
+
+        if ( pPacket->Read ( *BitStream ) )
+        {
+            // Relay it to nearbyers
+            Broadcast ( *pPacket, pSourceSimPlayer->GetPuresyncSendList () );
         }
 
         delete pPacket;

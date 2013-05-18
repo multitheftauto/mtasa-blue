@@ -518,6 +518,8 @@ bool CRenderItemManager::SaveDefaultRenderTarget ( void )
     SAFE_RELEASE ( pActiveD3DRenderTarget )
     SAFE_RELEASE ( pActiveD3DZStencilSurface )
 
+    // Do this in case dxSetRenderTarget is being called from some unexpected place
+    CGraphics::GetSingleton().MaybeEnteringMTARenderZone();
     return true;
 }
 
@@ -536,6 +538,9 @@ bool CRenderItemManager::RestoreDefaultRenderTarget ( void )
     {
         ChangeRenderTarget ( m_uiDefaultViewportSizeX, m_uiDefaultViewportSizeY, m_pDefaultD3DRenderTarget, m_pDefaultD3DZStencilSurface );
         m_pDefaultD3DRenderTarget = NULL;
+
+        // Do this in case dxSetRenderTarget is being called from some unexpected place
+        CGraphics::GetSingleton().MaybeLeavingMTARenderZone();
     }
 
     return true;

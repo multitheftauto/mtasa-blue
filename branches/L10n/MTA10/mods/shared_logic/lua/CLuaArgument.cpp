@@ -96,6 +96,7 @@ void CLuaArgument::CopyRecursive ( const CLuaArgument& Argument, CFastHashMap < 
         }
 
         case LUA_TUSERDATA:
+        case LUA_TLIGHTUSERDATA:
         {
             m_pUserData = Argument.m_pUserData;
             break;
@@ -168,6 +169,7 @@ bool CLuaArgument::CompareRecursive ( const CLuaArgument& Argument, std::set < C
         }
 
         case LUA_TUSERDATA:
+        case LUA_TLIGHTUSERDATA:
         {
             return m_pUserData == Argument.m_pUserData;
         }
@@ -393,30 +395,8 @@ void CLuaArgument::Push ( lua_State* luaVM, CFastHashMap < CLuaArguments*, int >
             }
 
             case LUA_TUSERDATA:
-                {
-                if ( CClientEntity* pClientElement = UserDataCast < CClientEntity > ( (CClientEntity*)NULL, m_pUserData, NULL ) )
-                {
-
-                    switch ( pClientElement->GetType() )
-                    {
-                    case CCLIENTPLAYER:
-                        lua_pushuserdata ( luaVM, "Player", m_pUserData );
-                        break;
-                    case CCLIENTPED:
-                        lua_pushuserdata ( luaVM, "Ped", m_pUserData );
-                        break;
-                    case CCLIENTVEHICLE:
-                        lua_pushuserdata ( luaVM, "Vehicle", m_pUserData );
-                        break;
-                    default:
-                        lua_pushuserdata ( luaVM, "Element", m_pUserData );
-                        break;
-                    }
-                }
-                else
-                {
-                    lua_pushuserdata ( luaVM, "Unknown", m_pUserData );
-                }
+            {
+                lua_pushuserdata ( luaVM, m_pUserData );
                 break;
             }
 
