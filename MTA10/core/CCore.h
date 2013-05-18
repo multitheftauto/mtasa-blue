@@ -250,6 +250,8 @@ public:
     void                    IdleHandler                     ( void );
     void                    WindowsTimerHandler             ( void );
     void                    HandleIdlePulse                 ( void );
+    void                    SetModulesLoaded                ( bool bLoaded );
+    bool                    AreModulesLoaded                ( void );
 
 private:
     // Core devices.
@@ -333,6 +335,7 @@ private:
     float                       m_fMaxStreamingMemory;
     bool                        m_bGettingIdleCallsFromMultiplayer;
     bool                        m_bWindowsTimerEnabled;
+    bool                        m_bModulesLoaded;
 
     // Command line
     static void                 ParseCommandLine                ( std::map < std::string, std::string > & options, const char*& szArgs, const char** pszNoValOptions = NULL );
