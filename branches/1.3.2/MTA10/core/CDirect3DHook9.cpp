@@ -66,15 +66,14 @@ IDirect3D9* CDirect3DHook9::API_Direct3DCreate9 ( UINT SDKVersion )
 
     // A little hack to get past the loading time required to decrypt the gta 
     // executable into memory...
-    static bool bLoadedModules = false;
-    if ( !bLoadedModules )
+    if ( !CCore::GetSingleton ( ).AreModulesLoaded ( ) )
     {
         CCore::GetSingleton ( ).CreateNetwork ( );
         CCore::GetSingleton ( ).CreateGame ( );
         CCore::GetSingleton ( ).CreateMultiplayer ( );
         CCore::GetSingleton ( ).CreateXML ( );
         CCore::GetSingleton ( ).CreateGUI ( );
-        bLoadedModules = true;
+        CCore::GetSingleton ( ).SetModulesLoaded ( true );
     }
 
     // Create our interface.

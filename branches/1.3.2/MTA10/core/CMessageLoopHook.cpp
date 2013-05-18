@@ -79,7 +79,7 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage ( HWND hwnd,
     pThis = CMessageLoopHook::GetSingletonPtr ( );
 
     // Alternate alt-tab system
-    if ( hwnd == pThis->GetHookedWindowHandle () )
+    if ( pThis && hwnd == pThis->GetHookedWindowHandle () )
     {
         if ( uMsg == WM_ACTIVATE && LOWORD(wParam) == WA_ACTIVE )
         {
@@ -132,36 +132,34 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage ( HWND hwnd,
         }
     }
 
-    if ( hwnd != pThis->GetHookedWindowHandle () ) return NULL;
-
-    g_pCore->UpdateIsWindowMinimized ();  // Force update of stuff
-
-    if ( uMsg == WM_TIMER && wParam == IDT_TIMER1 )
-        g_pCore->WindowsTimerHandler();     // Used for 'minimized before first game' pulses
-
-    // Handle IME if input is not for the GUI
-    if ( !g_pCore->GetLocalGUI ()->InputGoesToGUI () )
-    {
-        if ( uMsg == WM_KEYDOWN )
-        {
-            // Recover virtual key
-            if ( wParam == VK_PROCESSKEY )
-                wParam = MapVirtualKey ( lParam >> 16, MAPVK_VSC_TO_VK_EX );
-        }
-
-        if ( uMsg == WM_IME_STARTCOMPOSITION || uMsg == WM_IME_ENDCOMPOSITION || uMsg == WM_IME_COMPOSITION )
-        {
-            // Cancel, stop, block and ignore
-            HIMC himc = ImmGetContext ( hwnd );
-            ImmNotifyIME ( himc, NI_COMPOSITIONSTR, CPS_CANCEL, 0 );
-            ImmReleaseContext ( hwnd, himc );
-            return true;
-        }
-    }
-   
     // Make sure our pointers are valid.
-    if ( pThis != NULL && CLocalGUI::GetSingletonPtr ( ) != NULL && CCore::GetSingleton ().GetGame () )
+    if ( pThis != NULL && hwnd == pThis->GetHookedWindowHandle () && g_pCore->AreModulesLoaded() )
     {
+        g_pCore->UpdateIsWindowMinimized ();  // Force update of stuff
+
+        if ( uMsg == WM_TIMER && wParam == IDT_TIMER1 )
+            g_pCore->WindowsTimerHandler();     // Used for 'minimized before first game' pulses
+
+        // Handle IME if input is not for the GUI
+        if ( !g_pCore->GetLocalGUI ()->InputGoesToGUI () )
+        {
+            if ( uMsg == WM_KEYDOWN )
+            {
+                // Recover virtual key
+                if ( wParam == VK_PROCESSKEY )
+                    wParam = MapVirtualKey ( lParam >> 16, MAPVK_VSC_TO_VK_EX );
+            }
+
+            if ( uMsg == WM_IME_STARTCOMPOSITION || uMsg == WM_IME_ENDCOMPOSITION || uMsg == WM_IME_COMPOSITION )
+            {
+                // Cancel, stop, block and ignore
+                HIMC himc = ImmGetContext ( hwnd );
+                ImmNotifyIME ( himc, NI_COMPOSITIONSTR, CPS_CANCEL, 0 );
+                ImmReleaseContext ( hwnd, himc );
+                return true;
+            }
+        }
+       
         if ( uMsg == WM_KEYUP && wParam == VK_ESCAPE ) 
             return true;
 
