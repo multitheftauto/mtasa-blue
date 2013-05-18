@@ -31,24 +31,26 @@ public:
     virtual void        PostCreateDevice            ( IDirect3DDevice9* pD3DDevice, D3DPRESENT_PARAMETERS* pp );
     virtual void        PreReset                    ( D3DPRESENT_PARAMETERS* pp );
     virtual void        PostReset                   ( D3DPRESENT_PARAMETERS* pp );
-    virtual void        GetNextVideoMode            ( int& iOutNextVideoMode, bool& bOutNextWindowed, bool& bOutNextFullScreenMinimize );
-    virtual bool        SetVideoMode                ( int nextVideoMode, bool bNextWindowed, bool bNextFullScreenMinimize );
+    virtual void        GetNextVideoMode            ( int& iOutNextVideoMode, bool& bOutNextWindowed, bool& bOutNextFullScreenMinimize, int& iNextFullscreenStyle );
+    virtual bool        SetVideoMode                ( int nextVideoMode, bool bNextWindowed, bool bNextFullScreenMinimize, int iNextFullscreenStyle );
     virtual bool        IsWindowed                  ( void );
     virtual bool        IsMultiMonitor              ( void );
     virtual bool        IsMinimizeEnabled           ( void );
     virtual void        OnGainFocus                 ( void );
     virtual void        OnLoseFocus                 ( void );
 
-    virtual bool        IsDisplayModeWindowed       ( void );
-    virtual bool        IsDisplayModeFullScreen     ( void );
-    virtual bool        IsDisplayModeFullScreenWindow   ( void );
+    bool                IsDisplayModeWindowed       ( void );
+    bool                IsDisplayModeFullScreen     ( void );
+    bool                IsDisplayModeFullScreenWindow   ( void );
 
 private:
     void                LoadCVars                   ( void );
     void                SaveCVars                   ( void );
+    bool                GameResMatchesPrimaryMonitor ( void );
 
     unsigned long       m_ulForceBackBufferWidth;
     unsigned long       m_ulForceBackBufferHeight;
+    unsigned long       m_ulForceBackBufferColorDepth;
     unsigned long       m_ulFullScreenRefreshRate;
     HWND                m_hDeviceWindow;
     CGameSettings *     m_pGameSettings;
@@ -57,12 +59,14 @@ private:
     int                 m_iCurrentVideoMode;    // VideoMode this run
     bool                m_bCurrentWindowed;
     bool                m_bCurrentFullScreenMinimize;
+    int                 m_iCurrentFullscreenStyle;
     int                 m_iNextVideoMode;       // VideoMode next run
     bool                m_bNextWindowed;
     bool                m_bNextFullScreenMinimize;
+    int                 m_iNextFullscreenStyle;
 
-    bool                m_bUsingAltTabHandler;
     bool                m_bPendingGainFocus;
+    bool                m_bOriginalDesktopResMatches;
 };
 
 
@@ -124,6 +128,7 @@ void CVideoModeManager::PreCreateDevice ( D3DPRESENT_PARAMETERS* pp )
     m_iNextVideoMode = m_iCurrentVideoMode;
     m_bNextWindowed  = m_bCurrentWindowed;
     m_bNextFullScreenMinimize  = m_bCurrentFullScreenMinimize;
+    m_iNextFullscreenStyle = m_iCurrentFullscreenStyle;
 
     // Remember this for later
     m_ulFullScreenRefreshRate = pp->FullScreen_RefreshRateInHz;
@@ -159,6 +164,9 @@ void CVideoModeManager::PreCreateDevice ( D3DPRESENT_PARAMETERS* pp )
 
     m_ulForceBackBufferWidth  = pp->BackBufferWidth;
     m_ulForceBackBufferHeight = pp->BackBufferHeight;
+    m_ulForceBackBufferColorDepth = ( pp->BackBufferFormat == D3DFMT_R5G6B5 ) ? 16 : 32;
+
+    m_bOriginalDesktopResMatches = GameResMatchesPrimaryMonitor();
 }
 
 
@@ -250,18 +258,22 @@ void CVideoModeManager::OnGainFocus ( void )
 
     if ( IsDisplayModeFullScreenWindow() )
     {
-        DEVMODE dmScreenSettings;
-        memset( &dmScreenSettings, 0, sizeof( dmScreenSettings ) );
-        dmScreenSettings.dmSize = sizeof( dmScreenSettings );
+        // Change only if needed
+        if ( !GameResMatchesPrimaryMonitor() )
+        {
+            DEVMODE dmScreenSettings;
+            memset( &dmScreenSettings, 0, sizeof( dmScreenSettings ) );
+            dmScreenSettings.dmSize = sizeof( dmScreenSettings );
 
-        dmScreenSettings.dmPelsWidth = m_ulForceBackBufferWidth;
-        dmScreenSettings.dmPelsHeight = m_ulForceBackBufferHeight;
-        dmScreenSettings.dmBitsPerPel = 32;
-        dmScreenSettings.dmFields = DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT | DM_DISPLAYFREQUENCY;
-        dmScreenSettings.dmDisplayFrequency = m_ulFullScreenRefreshRate;
+            dmScreenSettings.dmPelsWidth = m_ulForceBackBufferWidth;
+            dmScreenSettings.dmPelsHeight = m_ulForceBackBufferHeight;
+            dmScreenSettings.dmBitsPerPel = m_ulForceBackBufferColorDepth;
+            dmScreenSettings.dmFields = DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT | DM_DISPLAYFREQUENCY;
+            dmScreenSettings.dmDisplayFrequency = m_ulFullScreenRefreshRate;
 
-        if( ChangeDisplaySettings( &dmScreenSettings, CDS_FULLSCREEN ) != DISP_CHANGE_SUCCESSFUL )
-            return;
+            if( ChangeDisplaySettings( &dmScreenSettings, CDS_FULLSCREEN ) != DISP_CHANGE_SUCCESSFUL )
+                return;
+        }
     }
 }
 
@@ -285,14 +297,17 @@ void CVideoModeManager::OnLoseFocus ( void )
         HWND hWnd = CCore::GetSingleton().GetHookedWindow();
         ShowWindow( hWnd, SW_MINIMIZE );
 
-        DEVMODE dmScreenSettings;
-        memset( &dmScreenSettings, 0, sizeof( dmScreenSettings ) );
-        dmScreenSettings.dmSize = sizeof( dmScreenSettings );
+        if ( !m_bOriginalDesktopResMatches && ( m_iCurrentFullscreenStyle == FULLSCREEN_BORDERLESS ) )
+        {
+            DEVMODE dmScreenSettings;
+            memset( &dmScreenSettings, 0, sizeof( dmScreenSettings ) );
+            dmScreenSettings.dmSize = sizeof( dmScreenSettings );
 
-        dmScreenSettings.dmFields = 0;
+            dmScreenSettings.dmFields = 0;
 
-        if( ChangeDisplaySettings( &dmScreenSettings, CDS_RESET ) != DISP_CHANGE_SUCCESSFUL )
-            return;
+            if( ChangeDisplaySettings( &dmScreenSettings, CDS_RESET ) != DISP_CHANGE_SUCCESSFUL )
+                return;
+        }
     }
 }
 
@@ -304,11 +319,12 @@ void CVideoModeManager::OnLoseFocus ( void )
 //
 //
 ///////////////////////////////////////////////////////////////
-void CVideoModeManager::GetNextVideoMode ( int& iOutNextVideoMode, bool& bOutNextWindowed, bool& bOutNextFullScreenMinimize )
+void CVideoModeManager::GetNextVideoMode ( int& iOutNextVideoMode, bool& bOutNextWindowed, bool& bOutNextFullScreenMinimize, int& iOutNextFullscreenStyle )
 {
     iOutNextVideoMode   = m_iNextVideoMode;
     bOutNextWindowed    = m_bNextWindowed;
     bOutNextFullScreenMinimize = m_bNextFullScreenMinimize;
+    iOutNextFullscreenStyle = m_iNextFullscreenStyle;
 }
 
 
@@ -319,7 +335,7 @@ void CVideoModeManager::GetNextVideoMode ( int& iOutNextVideoMode, bool& bOutNex
 // Returns true if restart is required
 //
 ///////////////////////////////////////////////////////////////
-bool CVideoModeManager::SetVideoMode ( int iNextVideoMode, bool bNextWindowed, bool bNextFullScreenMinimize )
+bool CVideoModeManager::SetVideoMode ( int iNextVideoMode, bool bNextWindowed, bool bNextFullScreenMinimize, int iNextFullscreenStyle )
 {
     bool bRequiresRestart = false;
 
@@ -357,6 +373,24 @@ bool CVideoModeManager::SetVideoMode ( int iNextVideoMode, bool bNextWindowed, b
         }
     }
 
+    // Fullscreen style
+    if ( m_iNextFullscreenStyle != iNextFullscreenStyle )
+    {
+        m_iNextFullscreenStyle = iNextFullscreenStyle;
+        if ( m_iCurrentFullscreenStyle != m_iNextFullscreenStyle )
+        {
+            if ( m_iCurrentFullscreenStyle == FULLSCREEN_STANDARD || m_iNextFullscreenStyle == FULLSCREEN_STANDARD )
+            {
+                bRequiresRestart = true;
+            }
+            else
+            {
+                m_iCurrentFullscreenStyle = m_iNextFullscreenStyle;
+            }
+        }
+    }
+
+
     SaveCVars ();
 
     return bRequiresRestart;
@@ -372,9 +406,18 @@ bool CVideoModeManager::SetVideoMode ( int iNextVideoMode, bool bNextWindowed, b
 ///////////////////////////////////////////////////////////////
 void CVideoModeManager::LoadCVars ( void )
 {
+    // Upgrade display_alttab_handler
+    bool bAltTabHandlerWasEnabled = CVARS_GET_VALUE < bool > ( "display_alttab_handler" );
+    int iFullscreenStyle = CVARS_GET_VALUE < int > ( "display_fullscreen_style" );
+    if ( bAltTabHandlerWasEnabled && iFullscreenStyle == 0 )
+    {
+        CVARS_SET ( "display_alttab_handler", false );
+        CVARS_SET ( "display_fullscreen_style", FULLSCREEN_BORDERLESS );
+    }
+
     m_iCurrentVideoMode = m_pGameSettings->GetCurrentVideoMode ();
     CVARS_GET ( "display_windowed",             m_bCurrentWindowed );
-    CVARS_GET ( "display_alttab_handler",       m_bUsingAltTabHandler );
+    CVARS_GET ( "display_fullscreen_style",     m_iCurrentFullscreenStyle );
     CVARS_GET ( "multimon_fullscreen_minimize", m_bCurrentFullScreenMinimize );
 }
 
@@ -390,6 +433,7 @@ void CVideoModeManager::SaveCVars ( void )
 {
     m_pGameSettings->SetCurrentVideoMode ( m_iNextVideoMode, true );
     CVARS_SET ( "display_windowed",             m_bNextWindowed );
+    CVARS_SET ( "display_fullscreen_style",     m_iNextFullscreenStyle );
     CVARS_SET ( "multimon_fullscreen_minimize", m_bNextFullScreenMinimize );
 }
 
@@ -480,7 +524,7 @@ bool CVideoModeManager::IsDisplayModeWindowed( void )
 ///////////////////////////////////////////////////////////////
 bool CVideoModeManager::IsDisplayModeFullScreen( void )
 {
-    return !m_bCurrentWindowed && !m_bUsingAltTabHandler;
+    return !m_bCurrentWindowed && ( m_iCurrentFullscreenStyle == FULLSCREEN_STANDARD );
 }
 
 
@@ -493,5 +537,30 @@ bool CVideoModeManager::IsDisplayModeFullScreen( void )
 ///////////////////////////////////////////////////////////////
 bool CVideoModeManager::IsDisplayModeFullScreenWindow( void )
 {
-    return !m_bCurrentWindowed && m_bUsingAltTabHandler;
+    return !m_bCurrentWindowed && ( m_iCurrentFullscreenStyle != FULLSCREEN_STANDARD );
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CVideoModeManager::GameResMatchesPrimaryMonitor
+//
+// Returns true if desktop matches the game requirement
+//
+///////////////////////////////////////////////////////////////
+bool CVideoModeManager::GameResMatchesPrimaryMonitor( void )
+{
+    HDC hdcPrimaryMonitor = GetDC( NULL );
+    int iDesktopResX = GetDeviceCaps( hdcPrimaryMonitor, HORZRES );
+    int iDesktopResY = GetDeviceCaps( hdcPrimaryMonitor, VERTRES );
+    int iDesktopColorDepth = GetDeviceCaps( hdcPrimaryMonitor, BITSPIXEL );
+
+    if ( iDesktopResX == m_ulForceBackBufferWidth
+        && iDesktopResY == m_ulForceBackBufferHeight
+        && iDesktopColorDepth == m_ulForceBackBufferColorDepth )
+    {
+        return true;
+    }
+
+    return false;
 }
