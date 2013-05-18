@@ -119,7 +119,7 @@ void CSettings::CreateGUI ( void )
     m_pBindsList->SetDoubleClickHandler ( GUI_CALLBACK( &CSettings::OnBindsListClick, this ) );
 
     m_pTabs->GetSize ( vecTemp );
-    m_pBindsDefButton = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( pTabBinds, _("Load defaults") ) ); //!ACHTUNG: Dynamic sizing
+    m_pBindsDefButton = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( pTabBinds, _("Load defaults") ) );
     m_pBindsDefButton->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnBindsDefaultClick, this ) );
     m_pBindsDefButton->AutoSize ( NULL, 20.0f, 8.0f );
     m_pBindsDefButton->GetSize ( vecSize );
@@ -137,7 +137,7 @@ void CSettings::CreateGUI ( void )
     //Mouse Options
     m_pControlsMouseLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabControls, _("Mouse options") ) );
     m_pControlsMouseLabel->SetPosition ( CVector2D ( vecTemp.fX + 11, vecTemp.fY ) );
-    m_pControlsMouseLabel->AutoSize ();
+    m_pControlsMouseLabel->AutoSize ( NULL, 5.0f );
     m_pControlsMouseLabel->SetFont ( "default-bold-small" );
     vecTemp.fY += 18;
 
@@ -194,7 +194,7 @@ void CSettings::CreateGUI ( void )
     //Joypad options
     m_pControlsJoypadLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabControls, _("Joypad options") ) );
     m_pControlsJoypadLabel->SetPosition ( CVector2D ( 11, vecTemp.fY ) );
-    m_pControlsJoypadLabel->AutoSize ( );
+    m_pControlsJoypadLabel->AutoSize ( NULL, 5.0f );
     m_pControlsJoypadLabel->SetFont ( "default-bold-small" );
     vecTemp.fY += 18;
 
@@ -907,9 +907,7 @@ void CSettings::CreateGUI ( void )
         fIndentX = pManager->CGUI_GetMaxTextExtent( "default-normal",
             _("Lines:"),
             _("Scale:"),
-            _("Width:"),
-            _("after"),
-            _("for")
+            _("Width:")
         );
 
         pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabInterface, _("Lines:") ) );
@@ -947,6 +945,15 @@ void CSettings::CreateGUI ( void )
         m_pChatWidth->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, vecTemp.fY - 2.0f ) );
         m_pChatWidth->SetSize ( CVector2D ( 80.0f, 24.0f ) );
 
+        fIndentX = pManager->CGUI_GetMaxTextExtent( "default-normal",
+            _("after"),
+            _("for")
+        );
+
+        m_pChatCssText = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox( pTabInterface, _("Fade out old lines") ) );
+        m_pChatCssText->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 95.5f ) );
+        m_pChatCssText->AutoSize ( NULL, 20.0f );
+
         pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabInterface, _("after") ) );
         pLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 122.5f ) );
         pLabel->GetPosition ( vecTemp );
@@ -973,14 +980,18 @@ void CSettings::CreateGUI ( void )
         pLabel->SetPosition ( CVector2D ( vecTemp.fX + fIndentX + 55.0f, vecTemp.fY ) );
         pLabel->AutoSize ( );
 
+        if ( m_pChatCssText->GetSize().fX > 170 )
+        {
+            m_pChatCssText->SetPosition ( 
+                CVector2D ( pLabel->GetPosition().fX + pLabel->GetSize().fX - m_pChatCssText->GetSize().fX, 
+                            m_pChatCssText->GetPosition().fY ) 
+                          );
+        }
+
         m_pChatCssBackground = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox( pTabInterface, _("Hide background when not typing") ) );  //!ACHTUNG: This is nasty.  Use a wrapped textbox
         m_pChatCssBackground->SetPosition ( CVector2D ( 10.0f, 350.0f ) );
         m_pChatCssBackground->GetPosition ( vecTemp );
         m_pChatCssBackground->AutoSize ( NULL, 20.0f );
-
-        m_pChatCssText = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox( pTabInterface, _("Fade out old lines") ) );
-        m_pChatCssText->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 15.0f ) );
-        m_pChatCssText->AutoSize ( NULL, 20.0f );
     }
 
     /**
@@ -992,86 +1003,98 @@ void CSettings::CreateGUI ( void )
     m_pAdvancedMiscLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, _("Misc") ) );
     m_pAdvancedMiscLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY ) );
     m_pAdvancedMiscLabel->SetFont ( "default-bold-small" );
-    m_pAdvancedMiscLabel->AutoSize ( _("Misc") );
+    m_pAdvancedMiscLabel->AutoSize ( );
     vecTemp.fY += 20;
 
+    fIndentX = pManager->CGUI_GetMaxTextExtent( "default-normal",
+        _("Fast CJ clothes loading:"),
+        _("Browser speed:"),
+        _("Single connection:"),
+        _("Fullscreen mode:"),
+        _("Process priority:"),
+        _("Debug setting:"),
+        _("Streaming memory:"),
+        _("Update build type:")
+    ) + 5.0f;
+
+    vecTemp.fX += 10.0f;
     // Fast clothes loading
     m_pFastClothesLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, _("Fast CJ clothes loading:") ) );
-    m_pFastClothesLabel->SetPosition ( CVector2D ( vecTemp.fX + 10.f, vecTemp.fY ) );
-    m_pFastClothesLabel->AutoSize ( m_pFastClothesLabel->GetText ().c_str () );
+    m_pFastClothesLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY ) );
+    m_pFastClothesLabel->AutoSize ( );
 
     m_pFastClothesCombo = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabAdvanced, "" ) );
-    m_pFastClothesCombo->SetPosition ( CVector2D ( vecTemp.fX + 156.0f, vecTemp.fY - 1.0f ) );
+    m_pFastClothesCombo->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, vecTemp.fY - 1.0f ) );
     m_pFastClothesCombo->SetSize ( CVector2D ( 148.0f, 95.0f ) );
     m_pFastClothesCombo->AddItem ( _("Off") )->SetData ( (void*)CMultiplayer::FAST_CLOTHES_OFF );
     m_pFastClothesCombo->AddItem ( _("On") )->SetData ( (void*)CMultiplayer::FAST_CLOTHES_ON );
     m_pFastClothesCombo->AddItem ( _("Auto") )->SetData ( (void*)CMultiplayer::FAST_CLOTHES_AUTO );
     m_pFastClothesCombo->SetReadOnly ( true );
-    vecTemp.fY += 40-4;
+    vecTemp.fY += 29;
 
     // Browser scan speed
     m_pBrowserSpeedLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, _("Browser speed:") ) );
-    m_pBrowserSpeedLabel->SetPosition ( CVector2D ( vecTemp.fX + 10.f, vecTemp.fY ) );
-    m_pBrowserSpeedLabel->AutoSize ( m_pBrowserSpeedLabel->GetText ().c_str () );
+    m_pBrowserSpeedLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY ) );
+    m_pBrowserSpeedLabel->AutoSize ( );
 
     m_pBrowserSpeedCombo = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabAdvanced, "" ) );
-    m_pBrowserSpeedCombo->SetPosition ( CVector2D ( vecTemp.fX + 156.0f, vecTemp.fY - 1.0f ) );
+    m_pBrowserSpeedCombo->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, vecTemp.fY - 1.0f ) );
     m_pBrowserSpeedCombo->SetSize ( CVector2D ( 148.0f, 95.0f ) );
     m_pBrowserSpeedCombo->AddItem ( _("Very slow") )->SetData ( (void*)0 );
     m_pBrowserSpeedCombo->AddItem ( _("Slow") )->SetData ( (void*)1 );
     m_pBrowserSpeedCombo->AddItem ( _("Fast") )->SetData ( (void*)2 );
     m_pBrowserSpeedCombo->SetReadOnly ( true );
-    vecTemp.fY += 40-4;
+    vecTemp.fY += 29;
 
     // Single download
     m_pSingleDownloadLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, _("Single connection:") ) );
-    m_pSingleDownloadLabel->SetPosition ( CVector2D ( vecTemp.fX + 10.f, vecTemp.fY ) );
-    m_pSingleDownloadLabel->AutoSize ( m_pSingleDownloadLabel->GetText ().c_str () );
+    m_pSingleDownloadLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY ) );
+    m_pSingleDownloadLabel->AutoSize ( );
 
     m_pSingleDownloadCombo = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabAdvanced, "" ) );
-    m_pSingleDownloadCombo->SetPosition ( CVector2D ( vecTemp.fX + 156.0f, vecTemp.fY - 1.0f ) );
+    m_pSingleDownloadCombo->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, vecTemp.fY - 1.0f ) );
     m_pSingleDownloadCombo->SetSize ( CVector2D ( 148.0f, 95.0f ) );
     m_pSingleDownloadCombo->AddItem ( _("Default") )->SetData ( (void*)0 );
     m_pSingleDownloadCombo->AddItem ( _("On") )->SetData ( (void*)1 );
     m_pSingleDownloadCombo->SetReadOnly ( true );
-    vecTemp.fY += 40-4;
+    vecTemp.fY += 29;
 
     // Fullscreen mode
     m_pFullscreenStyleLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, _("Fullscreen mode:") ) );
-    m_pFullscreenStyleLabel->SetPosition ( CVector2D ( vecTemp.fX + 10.f, vecTemp.fY ) );
-    m_pFullscreenStyleLabel->AutoSize ( m_pFullscreenStyleLabel->GetText ().c_str () );
+    m_pFullscreenStyleLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY ) );
+    m_pFullscreenStyleLabel->AutoSize ( );
 
     m_pFullscreenStyleCombo = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabAdvanced, "" ) );
-    m_pFullscreenStyleCombo->SetPosition ( CVector2D ( vecTemp.fX + 156.0f, vecTemp.fY - 1.0f ) );
+    m_pFullscreenStyleCombo->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, vecTemp.fY - 1.0f ) );
     m_pFullscreenStyleCombo->SetSize ( CVector2D ( 148.0f, 95.0f ) );
     m_pFullscreenStyleCombo->AddItem ( _("Standard") )->SetData ( (void*)FULLSCREEN_STANDARD );
     m_pFullscreenStyleCombo->AddItem ( _("Borderless window") )->SetData ( (void*)FULLSCREEN_BORDERLESS );
     m_pFullscreenStyleCombo->AddItem ( _("Borderless keep res") )->SetData ( (void*)FULLSCREEN_BORDERLESS_KEEP_RES );
     m_pFullscreenStyleCombo->SetReadOnly ( true );
 
-    vecTemp.fY += 40-4;
+    vecTemp.fY += 29;
 
     // Process priority
     m_pPriorityLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Process priority:" ) );
-    m_pPriorityLabel->SetPosition ( CVector2D ( vecTemp.fX + 10.f, vecTemp.fY ) );
-    m_pPriorityLabel->AutoSize ( m_pPriorityLabel->GetText ().c_str () );
+    m_pPriorityLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY ) );
+    m_pPriorityLabel->AutoSize ( );
 
     m_pPriorityCombo = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabAdvanced, "" ) );
-    m_pPriorityCombo->SetPosition ( CVector2D ( vecTemp.fX + 156.0f, vecTemp.fY - 1.0f ) );
+    m_pPriorityCombo->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, vecTemp.fY - 1.0f ) );
     m_pPriorityCombo->SetSize ( CVector2D ( 148.0f, 95.0f ) );
     m_pPriorityCombo->AddItem ( "Normal" )->SetData ( (void*)0 );
     m_pPriorityCombo->AddItem ( "Above normal" )->SetData ( (void*)1 );
     m_pPriorityCombo->AddItem ( "High" )->SetData ( (void*)2 );
     m_pPriorityCombo->SetReadOnly ( true );
-    vecTemp.fY += 40-4;
+    vecTemp.fY += 29;
 
     // Debug setting
     m_pDebugSettingLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, _("Debug setting:") ) );
-    m_pDebugSettingLabel->SetPosition ( CVector2D ( vecTemp.fX + 10.f, vecTemp.fY ) );
-    m_pDebugSettingLabel->AutoSize ( m_pDebugSettingLabel->GetText ().c_str () );
+    m_pDebugSettingLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY ) );
+    m_pDebugSettingLabel->AutoSize ( );
 
     m_pDebugSettingCombo = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabAdvanced, "" ) );
-    m_pDebugSettingCombo->SetPosition ( CVector2D ( vecTemp.fX + 156.0f, vecTemp.fY - 1.0f ) );
+    m_pDebugSettingCombo->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, vecTemp.fY - 1.0f ) );
     m_pDebugSettingCombo->SetSize ( CVector2D ( 148.0f, 20.0f * ( EDiagnosticDebug::MAX + 1 ) ) );
     m_pDebugSettingCombo->AddItem ( _("Default") )->SetData ( (void*)0 );
     m_pDebugSettingCombo->AddItem ( "#6734 Graphics" )->SetData ( (void*)EDiagnosticDebug::GRAPHICS_6734 );
@@ -1080,70 +1103,73 @@ void CSettings::CreateGUI ( void )
     m_pDebugSettingCombo->AddItem ( "#0000 Log timing" )->SetData ( (void*)EDiagnosticDebug::LOG_TIMING_0000 );
     m_pDebugSettingCombo->AddItem ( "#0000 Joystick" )->SetData ( (void*)EDiagnosticDebug::JOYSTICK_0000 );
     m_pDebugSettingCombo->SetReadOnly ( true );
-    vecTemp.fY += 40-4;
+    vecTemp.fY += 29;
 
     m_pDebugSettingCombo->SetText ( _("Default") );
     SetApplicationSetting ( "diagnostics", "debug-setting", "none" );
 
     // Streaming memory
     m_pStreamingMemoryLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, _("Streaming memory:") ) );
-    m_pStreamingMemoryLabel->SetPosition ( CVector2D ( vecTemp.fX + 10.f, vecTemp.fY + 0.0f ) );
-    m_pStreamingMemoryLabel->AutoSize ( _("Streaming memory:") );
+    m_pStreamingMemoryLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 0.0f ) );
+    m_pStreamingMemoryLabel->AutoSize ( );
 
     unsigned int uiMinMemory = g_pCore->GetMinStreamingMemory ();
     unsigned int uiMaxMemory = g_pCore->GetMaxStreamingMemory ();
 
+    m_pStreamingMemoryMinLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, _("Min")) );
+    m_pStreamingMemoryMinLabel->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, vecTemp.fY ) );
+    m_pStreamingMemoryMinLabel->AutoSize ( );
+    m_pStreamingMemoryMinLabel->GetSize ( vecSize );
+    m_pStreamingMemoryMinLabel->GetPosition ( vecTemp );
+
     m_pStreamingMemory = reinterpret_cast < CGUIScrollBar* > ( pManager->CreateScrollBar ( true, pTabAdvanced ) );
-    m_pStreamingMemory->SetPosition ( CVector2D ( vecTemp.fX + 164.0f, vecTemp.fY - 0.f ) );
+    m_pStreamingMemory->SetPosition ( CVector2D ( vecTemp.fX + vecSize.fX + 5.0f, vecTemp.fY ) );
+    m_pStreamingMemory->GetPosition ( vecTemp );
     m_pStreamingMemory->SetSize ( CVector2D ( 130.0f, 20.0f ) );
+    m_pStreamingMemory->GetSize ( vecSize );
     m_pStreamingMemory->SetProperty ( "StepSize", SString("%.07lf", 1.0 / (uiMaxMemory - uiMinMemory)) );
 
-    m_pStreamingMemoryMinLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, _("Min")) );
-    m_pStreamingMemoryMinLabel->SetPosition ( CVector2D ( vecTemp.fX + 141.0f, vecTemp.fY ) );
-    m_pStreamingMemoryMinLabel->AutoSize ( m_pStreamingMemoryMinLabel->GetText ().c_str () );
-
     m_pStreamingMemoryMaxLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, _("Max")) );
-    m_pStreamingMemoryMaxLabel->SetPosition ( CVector2D ( vecTemp.fX + 300.0f, vecTemp.fY ) );
-    m_pStreamingMemoryMaxLabel->AutoSize ( m_pStreamingMemoryMaxLabel->GetText ().c_str () );
-    vecTemp.fY += 40-4;
+    m_pStreamingMemoryMaxLabel->SetPosition ( CVector2D ( vecTemp.fX + vecSize.fX + 5.0f, vecTemp.fY ) );
+    m_pStreamingMemoryMaxLabel->AutoSize ( );
+    vecTemp.fX = 22.f;
+    vecTemp.fY += 29;
 
     // Auto updater section label
     m_pAdvancedUpdaterLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, _("Auto updater") ) );
-    m_pAdvancedUpdaterLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY ) );
+    m_pAdvancedUpdaterLabel->SetPosition ( CVector2D ( vecTemp.fX - 10.0f, vecTemp.fY ) );
     m_pAdvancedUpdaterLabel->SetFont ( "default-bold-small" );
     m_pAdvancedUpdaterLabel->AutoSize ( _("Auto updater") );
     vecTemp.fY += 20;
 
     // Update build type
     m_pUpdateBuildTypeLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, _("Update build type:") ) );
-    m_pUpdateBuildTypeLabel->SetPosition ( CVector2D ( vecTemp.fX + 10.f, vecTemp.fY ) );
-    m_pUpdateBuildTypeLabel->AutoSize ( m_pUpdateBuildTypeLabel->GetText ().c_str () );
+    m_pUpdateBuildTypeLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY ) );
+    m_pUpdateBuildTypeLabel->AutoSize ( );
 
     m_pUpdateBuildTypeCombo = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabAdvanced, "" ) );
-    m_pUpdateBuildTypeCombo->SetPosition ( CVector2D ( vecTemp.fX + 156.0f, vecTemp.fY - 1.0f ) );
+    m_pUpdateBuildTypeCombo->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, vecTemp.fY - 1.0f ) );
     m_pUpdateBuildTypeCombo->SetSize ( CVector2D ( 148.0f, 95.0f ) );
     m_pUpdateBuildTypeCombo->AddItem ( _("Default") )->SetData ( (void*)0 );
     m_pUpdateBuildTypeCombo->AddItem ( "Beta" )->SetData ( (void*)1 );
     m_pUpdateBuildTypeCombo->AddItem ( "Nightly" )->SetData ( (void*)2 );
     m_pUpdateBuildTypeCombo->SetReadOnly ( true );
-    vecTemp.fY += 35;
+    vecTemp.fY += 29;
 
     // Check for updates
     m_pButtonUpdate = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( pTabAdvanced, _("Check for update now") ) );
-    m_pButtonUpdate->SetPosition ( CVector2D ( vecTemp.fX + 10.f, vecTemp.fY ) );
-    m_pButtonUpdate->SetSize ( CVector2D ( 168.0f, 24.0f ) );
+    m_pButtonUpdate->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY ) );
+    m_pButtonUpdate->AutoSize ( NULL, 20.0f, 8.0f );
     m_pButtonUpdate->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnUpdateButtonClick, this ) );
     m_pButtonUpdate->SetZOrderingEnabled ( false );
-    vecTemp.fY += 30;
+    vecTemp.fY += 70;
 
     // Description label
     m_pAdvancedSettingDescriptionLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "" ) );
     m_pAdvancedSettingDescriptionLabel->SetPosition ( CVector2D ( vecTemp.fX + 10.f, vecTemp.fY ) );
     m_pAdvancedSettingDescriptionLabel->SetFont ( "default-bold-small" );
     m_pAdvancedSettingDescriptionLabel->SetSize ( CVector2D ( 500.0f, 95.0f ) );
-    m_pAdvancedSettingDescriptionLabel->SetHorizontalAlign ( CGUI_ALIGN_HORIZONTALCENTER );
-
-    vecTemp.fY += 35;
+    m_pAdvancedSettingDescriptionLabel->SetHorizontalAlign ( CGUI_ALIGN_HORIZONTALCENTER_WORDWRAP );
 
     // Set up the events
     m_pWindow->SetEnterKeyHandler ( GUI_CALLBACK ( &CSettings::OnOKButtonClick, this ) );
