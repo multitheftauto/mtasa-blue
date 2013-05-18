@@ -82,7 +82,7 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage ( HWND hwnd,
     pThis = CMessageLoopHook::GetSingletonPtr ( );
 
     // Alternate alt-tab system
-    if ( hwnd == pThis->GetHookedWindowHandle () )
+    if ( pThis && hwnd == pThis->GetHookedWindowHandle () )
     {
         if ( uMsg == WM_ACTIVATE && LOWORD(wParam) == WA_ACTIVE )
         {
@@ -135,56 +135,54 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage ( HWND hwnd,
         }
     }
 
-    if ( hwnd != pThis->GetHookedWindowHandle () ) return NULL;
-
-    g_pCore->UpdateIsWindowMinimized ();  // Force update of stuff
-
-    if ( uMsg == WM_TIMER && wParam == IDT_TIMER1 )
-        g_pCore->WindowsTimerHandler();     // Used for 'minimized before first game' pulses
-
-    // Handle print screen key
-    if ( wParam == VK_SNAPSHOT )
-    {
-        static bool bRepeating = false;
-        if ( uMsg == WM_HOTKEY )
-        {
-            // Convert to keydown message
-            uMsg = WM_KEYDOWN;
-            lParam = bRepeating ? 0x41370001 : 0x01370001;
-            bRepeating = true;
-        }
-        else
-        if ( uMsg == WM_KEYUP )
-        {
-            // Change previous state because of fake keydown message
-            lParam |= 0x40000000;
-            bRepeating = false;
-        }
-    }
-
-    // Handle IME if input is not for the GUI
-    if ( !g_pCore->GetLocalGUI ()->InputGoesToGUI () )
-    {
-        if ( uMsg == WM_KEYDOWN )
-        {
-            // Recover virtual key
-            if ( wParam == VK_PROCESSKEY )
-                wParam = MapVirtualKey ( lParam >> 16, MAPVK_VSC_TO_VK_EX );
-        }
-
-        if ( uMsg == WM_IME_STARTCOMPOSITION || uMsg == WM_IME_ENDCOMPOSITION || uMsg == WM_IME_COMPOSITION )
-        {
-            // Cancel, stop, block and ignore
-            HIMC himc = ImmGetContext ( hwnd );
-            ImmNotifyIME ( himc, NI_COMPOSITIONSTR, CPS_CANCEL, 0 );
-            ImmReleaseContext ( hwnd, himc );
-            return true;
-        }
-    }
-   
     // Make sure our pointers are valid.
-    if ( pThis != NULL && CLocalGUI::GetSingletonPtr ( ) != NULL && CCore::GetSingleton ().GetGame () )
+    if ( pThis != NULL && hwnd == pThis->GetHookedWindowHandle () && g_pCore->AreModulesLoaded() )
     {
+        g_pCore->UpdateIsWindowMinimized ();  // Force update of stuff
+
+        if ( uMsg == WM_TIMER && wParam == IDT_TIMER1 )
+            g_pCore->WindowsTimerHandler();     // Used for 'minimized before first game' pulses
+
+        // Handle print screen key
+        if ( wParam == VK_SNAPSHOT )
+        {
+            static bool bRepeating = false;
+            if ( uMsg == WM_HOTKEY )
+            {
+                // Convert to keydown message
+                uMsg = WM_KEYDOWN;
+                lParam = bRepeating ? 0x41370001 : 0x01370001;
+                bRepeating = true;
+            }
+            else
+            if ( uMsg == WM_KEYUP )
+            {
+                // Change previous state because of fake keydown message
+                lParam |= 0x40000000;
+                bRepeating = false;
+            }
+        }
+
+        // Handle IME if input is not for the GUI
+        if ( !g_pCore->GetLocalGUI ()->InputGoesToGUI () )
+        {
+            if ( uMsg == WM_KEYDOWN )
+            {
+                // Recover virtual key
+                if ( wParam == VK_PROCESSKEY )
+                    wParam = MapVirtualKey ( lParam >> 16, MAPVK_VSC_TO_VK_EX );
+            }
+
+            if ( uMsg == WM_IME_STARTCOMPOSITION || uMsg == WM_IME_ENDCOMPOSITION || uMsg == WM_IME_COMPOSITION )
+            {
+                // Cancel, stop, block and ignore
+                HIMC himc = ImmGetContext ( hwnd );
+                ImmNotifyIME ( himc, NI_COMPOSITIONSTR, CPS_CANCEL, 0 );
+                ImmReleaseContext ( hwnd, himc );
+                return true;
+            }
+        }
+       
         if ( uMsg == WM_KEYUP && wParam == VK_ESCAPE ) 
             return true;
 

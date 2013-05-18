@@ -191,6 +191,7 @@ CCore::~CCore ( void )
     SAFE_DELETE ( m_pMessageBox );
 
     // Destroy early subsystems
+    m_bModulesLoaded = false;
     DestroyNetwork ();
     DestroyMultiplayer ();
     DestroyGame ();
@@ -2156,4 +2157,17 @@ void CCore::HandleCrashDumpEncryption( void )
             FileSave( strCoreLogPathFilename, strFileContents );
         }
     }
+}
+
+//
+// Flag to make sure stuff only gets done when everything is ready
+//
+void CCore::SetModulesLoaded( bool bLoaded )
+{
+    m_bModulesLoaded = bLoaded;
+}
+
+bool CCore::AreModulesLoaded( void )
+{
+    return m_bModulesLoaded;
 }
