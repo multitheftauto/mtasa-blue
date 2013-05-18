@@ -43,8 +43,8 @@ CLuaCFunctions::~CLuaCFunctions ()
 
 CLuaCFunction* CLuaCFunctions::AddFunction ( const char* szName, lua_CFunction f, bool bRestricted )
 {
-    ms_pFunctionPtrLow = Min < void* > ( ms_pFunctionPtrLow, f );
-    ms_pFunctionPtrHigh = Max < void* > ( ms_pFunctionPtrHigh, f );
+    ms_pFunctionPtrLow = Min < void* > ( ms_pFunctionPtrLow, (void*)f );
+    ms_pFunctionPtrHigh = Max < void* > ( ms_pFunctionPtrHigh, (void*)f );
 
     // Already have a function by this name?
     CLuaCFunction* pFunction = GetFunction ( szName );

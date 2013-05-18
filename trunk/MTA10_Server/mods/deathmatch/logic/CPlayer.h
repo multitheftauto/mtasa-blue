@@ -65,11 +65,21 @@ struct SViewerInfo
     bool bInPureSyncSimSendList;
 };
 
-#ifdef WIN32
-    typedef CFastHashMap < CPlayer*, SViewerInfo > SViewerMapType;
-#else
-    typedef std::map < CPlayer*, SViewerInfo > SViewerMapType;
+#ifndef WIN32
+    namespace __gnu_cxx
+    {
+        template <>
+        struct hash < CPlayer* >
+        {
+            size_t operator()( CPlayer* const& pFunc ) const
+            {
+                return (size_t)pFunc;
+            }
+        };
+    }
 #endif
+
+typedef CFastHashMap < CPlayer*, SViewerInfo > SViewerMapType;
 
 struct SScreenShotInfo
 {
