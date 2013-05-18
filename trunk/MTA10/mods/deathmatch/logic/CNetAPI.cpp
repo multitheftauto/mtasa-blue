@@ -1745,6 +1745,38 @@ void CNetAPI::WriteVehiclePuresync ( CClientPed* pPlayerModel, CClientVehicle* p
         BitStream.WriteBit ( false );
     }
 
+    // Update Damage Info if changed
+    if ( BitStream.Version() >= 0x047 )
+    {
+        if ( !g_pClientGame->GetDamageSent () )
+        {
+            g_pClientGame->SetDamageSent ( true );
+
+            ElementID DamagerID = g_pClientGame->GetDamagerID ();
+            if ( DamagerID != RESERVED_ELEMENT_ID )
+            {
+                BitStream.WriteBit ( true );
+                BitStream.Write ( DamagerID );
+                
+                SWeaponTypeSync weaponType;
+                weaponType.data.ucWeaponType = g_pClientGame->GetDamageWeapon ();
+                BitStream.Write ( &weaponType );
+
+                SBodypartSync bodypart;
+                bodypart.data.uiBodypart = g_pClientGame->GetDamageBodyPiece ();
+                BitStream.Write ( &bodypart );
+            }    
+            else
+            {
+                BitStream.WriteBit ( false );
+            }
+        }
+        else
+        {
+            BitStream.WriteBit ( false );
+        }
+    }
+
     // Player health sync (scaled from 0.0f-200.0f to 0-255 to save three bytes).
     // Scale goes up to 200.0f because having max stats gives you the double of health.
     SPlayerHealthSync health;
