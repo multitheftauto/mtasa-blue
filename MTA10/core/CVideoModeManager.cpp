@@ -62,7 +62,6 @@ private:
     int                 m_iCurrentFullscreenStyle;
     int                 m_iNextVideoMode;       // VideoMode next run
     bool                m_bNextWindowed;
-    bool                m_bNextFullScreenMinimize;
     int                 m_iNextFullscreenStyle;
 
     bool                m_bPendingGainFocus;
@@ -127,7 +126,6 @@ void CVideoModeManager::PreCreateDevice ( D3DPRESENT_PARAMETERS* pp )
     // Prime save values
     m_iNextVideoMode = m_iCurrentVideoMode;
     m_bNextWindowed  = m_bCurrentWindowed;
-    m_bNextFullScreenMinimize  = m_bCurrentFullScreenMinimize;
     m_iNextFullscreenStyle = m_iCurrentFullscreenStyle;
 
     // Remember this for later
@@ -294,19 +292,22 @@ void CVideoModeManager::OnLoseFocus ( void )
 
     if ( IsDisplayModeFullScreenWindow() )
     {
-        HWND hWnd = CCore::GetSingleton().GetHookedWindow();
-        ShowWindow( hWnd, SW_MINIMIZE );
-
-        if ( !m_bOriginalDesktopResMatches && ( m_iCurrentFullscreenStyle == FULLSCREEN_BORDERLESS ) )
+        if ( !IsMultiMonitor() || IsMinimizeEnabled() )
         {
-            DEVMODE dmScreenSettings;
-            memset( &dmScreenSettings, 0, sizeof( dmScreenSettings ) );
-            dmScreenSettings.dmSize = sizeof( dmScreenSettings );
+            HWND hWnd = CCore::GetSingleton().GetHookedWindow();
+            ShowWindow( hWnd, SW_MINIMIZE );
 
-            dmScreenSettings.dmFields = 0;
+            if ( !m_bOriginalDesktopResMatches && ( m_iCurrentFullscreenStyle == FULLSCREEN_BORDERLESS ) )
+            {
+                DEVMODE dmScreenSettings;
+                memset( &dmScreenSettings, 0, sizeof( dmScreenSettings ) );
+                dmScreenSettings.dmSize = sizeof( dmScreenSettings );
 
-            if( ChangeDisplaySettings( &dmScreenSettings, CDS_RESET ) != DISP_CHANGE_SUCCESSFUL )
-                return;
+                dmScreenSettings.dmFields = 0;
+
+                if( ChangeDisplaySettings( &dmScreenSettings, CDS_RESET ) != DISP_CHANGE_SUCCESSFUL )
+                    return;
+            }
         }
     }
 }
@@ -323,7 +324,7 @@ void CVideoModeManager::GetNextVideoMode ( int& iOutNextVideoMode, bool& bOutNex
 {
     iOutNextVideoMode   = m_iNextVideoMode;
     bOutNextWindowed    = m_bNextWindowed;
-    bOutNextFullScreenMinimize = m_bNextFullScreenMinimize;
+    bOutNextFullScreenMinimize = m_bCurrentFullScreenMinimize;
     iOutNextFullscreenStyle = m_iNextFullscreenStyle;
 }
 
@@ -362,16 +363,8 @@ bool CVideoModeManager::SetVideoMode ( int iNextVideoMode, bool bNextWindowed, b
         }
     }
 
-
     // Full Screen Minimize
-    if ( m_bNextFullScreenMinimize != bNextFullScreenMinimize )
-    {
-        m_bNextFullScreenMinimize = bNextFullScreenMinimize;
-        if ( m_bCurrentFullScreenMinimize != m_bNextFullScreenMinimize )
-        {
-            bRequiresRestart = true;
-        }
-    }
+    m_bCurrentFullScreenMinimize = bNextFullScreenMinimize;
 
     // Fullscreen style
     if ( m_iNextFullscreenStyle != iNextFullscreenStyle )
@@ -434,7 +427,7 @@ void CVideoModeManager::SaveCVars ( void )
     m_pGameSettings->SetCurrentVideoMode ( m_iNextVideoMode, true );
     CVARS_SET ( "display_windowed",             m_bNextWindowed );
     CVARS_SET ( "display_fullscreen_style",     m_iNextFullscreenStyle );
-    CVARS_SET ( "multimon_fullscreen_minimize", m_bNextFullScreenMinimize );
+    CVARS_SET ( "multimon_fullscreen_minimize", m_bCurrentFullScreenMinimize );
 }
 
 
