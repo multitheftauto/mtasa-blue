@@ -12,6 +12,9 @@
 
 #include "StdInc.h"
 
+extern CGame * g_pGame;
+
+#define MAX_PLAYER_SYNC_DISTANCE 100.0f
 
 CPedSync::CPedSync ( CPlayerManager* pPlayerManager, CPedManager* pPedManager )
 {
@@ -96,7 +99,7 @@ void CPedSync::UpdatePed ( CPed* pPed )
     if ( pSyncer )
     {
         // He isn't close enough to the ped and in the right dimension?
-        if ( ( !IsPointNearPoint3D ( pSyncer->GetPosition (), pPed->GetPosition (), (float)g_TickRateSettings.iPedSyncerDistance ) ) ||
+        if ( ( !IsPointNearPoint3D ( pSyncer->GetPosition (), pPed->GetPosition (), MAX_PLAYER_SYNC_DISTANCE ) ) ||
                 ( pPed->GetDimension () != pSyncer->GetDimension () ) )
         {
             // Stop him from syncing it
@@ -122,7 +125,7 @@ void CPedSync::FindSyncer ( CPed* pPed )
     assert ( pPed->IsSyncable () );
 
     // Find a player close enough to him
-    CPlayer* pPlayer = FindPlayerCloseToPed ( pPed, g_TickRateSettings.iPedSyncerDistance - 20.0f );
+    CPlayer* pPlayer = FindPlayerCloseToPed ( pPed, MAX_PLAYER_SYNC_DISTANCE - 20.0f );
     if ( pPlayer )
     {
         // Tell him to start syncing it

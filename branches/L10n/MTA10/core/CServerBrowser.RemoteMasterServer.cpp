@@ -405,6 +405,6 @@ CServerListItem* CRemoteMasterServer::GetServerListItem ( CServerListItemList& i
     if ( pItem )
         return pItem;
 
-    return itemList.AddUnique ( Address, usGamePort );
+    return itemList.Add ( Address, usGamePort );
 }
 

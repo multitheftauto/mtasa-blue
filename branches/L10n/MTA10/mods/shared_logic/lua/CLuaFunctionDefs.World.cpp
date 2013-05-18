@@ -25,7 +25,9 @@ int CLuaFunctionDefs::CreateExplosion ( lua_State* luaVM )
     CVector vecPosition; int iType; bool bMakeSound; float fCamShake = -1.0; bool bDamaging;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadVector3D ( vecPosition );
+    argStream.ReadNumber ( vecPosition.fX );
+    argStream.ReadNumber ( vecPosition.fY );
+    argStream.ReadNumber ( vecPosition.fZ );
     argStream.ReadNumber ( iType );
     argStream.ReadBool ( bMakeSound, true );
     argStream.ReadNumber ( fCamShake, -1.0f );
@@ -52,7 +54,9 @@ int CLuaFunctionDefs::CreateFire ( lua_State* luaVM )
     CVector vecPosition; float fSize;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadVector3D ( vecPosition );
+    argStream.ReadNumber ( vecPosition.fX );
+    argStream.ReadNumber ( vecPosition.fY );
+    argStream.ReadNumber ( vecPosition.fZ );
     argStream.ReadNumber ( fSize, 1.8f );
 
     if ( !argStream.HasErrors () )
@@ -313,9 +317,15 @@ int CLuaFunctionDefs::CreateWater ( lua_State* luaVM )
     CVector v1; CVector v2; CVector v3; CVector v4; bool bShallow;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadVector3D ( v1 );
-    argStream.ReadVector3D ( v2 );
-    argStream.ReadVector3D ( v3 );
+    argStream.ReadNumber ( v1.fX );
+    argStream.ReadNumber ( v1.fY );
+    argStream.ReadNumber ( v1.fZ );
+    argStream.ReadNumber ( v2.fX );
+    argStream.ReadNumber ( v2.fY );
+    argStream.ReadNumber ( v2.fZ );
+    argStream.ReadNumber ( v3.fX );
+    argStream.ReadNumber ( v3.fY );
+    argStream.ReadNumber ( v3.fZ );
     bool bIsQuad = argStream.NextCouldBeNumber ( 2 );   // Check for existence of v4.fZ
     if ( bIsQuad )
     {
@@ -1960,7 +1970,9 @@ int CLuaFunctionDefs::CreateSWATRope ( lua_State* luaVM )
     CVector vecPosition;
     DWORD dwDuration = 0;
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadVector3D ( vecPosition );
+    argStream.ReadNumber ( vecPosition.fX );
+    argStream.ReadNumber ( vecPosition.fY );
+    argStream.ReadNumber ( vecPosition.fZ );
     argStream.ReadNumber ( dwDuration, 4000 );
 
     if ( !argStream.HasErrors () )

@@ -98,7 +98,7 @@ int CLuaFunctionDefs::GetCursorAlpha ( lua_State* luaVM )
 
     if ( CStaticFunctionDefinitions::GetCursorAlpha ( fAlpha ) )
     {
-        lua_pushnumber ( luaVM, Round( fAlpha * 255.f ) );
+        lua_pushnumber ( luaVM, fAlpha );
         return 1;
     }
     lua_pushboolean ( luaVM, false );
@@ -116,7 +116,7 @@ int CLuaFunctionDefs::SetCursorAlpha ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        if ( CStaticFunctionDefinitions::SetCursorAlpha ( fAlpha / 255.f ) )
+        if ( CStaticFunctionDefinitions::SetCursorAlpha ( fAlpha ) )
         {
             lua_pushboolean ( luaVM, true );
             return 1;
@@ -254,7 +254,7 @@ int CLuaFunctionDefs::UnbindKey ( lua_State* luaVM )
                 argStream.ReadFunctionComplete ();
                 if ( !argStream.HasErrors ( ) )
                 {
-                    const char* szHitState = strHitState == "" ? NULL : strHitState.c_str();
+                    const char* szHitState = strHitState == "" ? NULL : strHitState;
                     if ( CStaticFunctionDefinitions::UnbindKey ( strKey, pLuaMain, szHitState, iLuaFunction ) )
                     {
                         lua_pushboolean ( luaVM, true );
@@ -469,7 +469,7 @@ int CLuaFunctionDefs::GetFunctionsBoundToKey ( lua_State* luaVM )
         CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
         if ( pLuaMain )
         {
-            const char* szHitState = strHitState == "" ? NULL : strHitState.c_str();
+            const char* szHitState = strHitState == "" ? NULL : strHitState;
 
             bool bCheckHitState = false, bHitState = true;
             if ( szHitState )
@@ -607,7 +607,7 @@ int CLuaFunctionDefs::GetCommandsBoundToKey ( lua_State* luaVM )
         CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
         if ( pLuaMain )
         {
-            const char* szHitState = strHitState == "" ? NULL : strHitState.c_str();
+            const char* szHitState = strHitState == "" ? NULL : strHitState;
 
             bool bCheckHitState = false, bHitState = true;
             if ( szHitState )

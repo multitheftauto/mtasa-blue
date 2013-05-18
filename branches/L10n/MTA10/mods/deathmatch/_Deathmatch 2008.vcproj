@@ -521,10 +521,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\shared_logic\CRemoteCalls.cpp"
-					>
-				</File>
-				<File
 					RelativePath=".\logic\CResource.cpp"
 					>
 				</File>
@@ -1208,10 +1204,6 @@
 						>
 					</File>
 					<File
-						RelativePath="..\shared_logic\lua\CLuaMatrix.cpp"
-						>
-					</File>
-					<File
 						RelativePath="..\shared_logic\lua\CLuaTimer.cpp"
 						>
 					</File>
@@ -1220,33 +1212,9 @@
 						>
 					</File>
 					<File
-						RelativePath="..\shared_logic\lua\CLuaVector.cpp"
-						>
-					</File>
-					<File
 						RelativePath="..\shared_logic\lua\LuaCommon.cpp"
 						>
 					</File>
-					<Filter
-						Name="oopdefs"
-						>
-						<File
-							RelativePath="..\shared_logic\lua\oopdefs\CLuaOOPFunctionDefs.Camera.cpp"
-							>
-						</File>
-						<File
-							RelativePath="..\shared_logic\lua\oopdefs\CLuaOOPFunctionDefs.Element.cpp"
-							>
-						</File>
-						<File
-							RelativePath="..\shared_logic\lua\oopdefs\CLuaOOPFunctionDefs.Ped.cpp"
-							>
-						</File>
-						<File
-							RelativePath="..\shared_logic\lua\oopdefs\CLuaOOPFunctionDefs.Vehicle.cpp"
-							>
-						</File>
-					</Filter>
 				</Filter>
 				<Filter
 					Name="utils"
@@ -1276,15 +1244,7 @@
 						>
 					</File>
 					<File
-						RelativePath="..\shared_logic\luadefs\CLuaMatrixDefs.cpp"
-						>
-					</File>
-					<File
 						RelativePath="..\shared_logic\luadefs\CLuaTaskDefs.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\shared_logic\luadefs\CLuaVectorDefs.cpp"
 						>
 					</File>
 				</Filter>
@@ -1956,10 +1916,6 @@
 				</File>
 				<File
 					RelativePath=".\logic\CRadarMap.h"
-					>
-				</File>
-				<File
-					RelativePath="..\shared_logic\CRemoteCalls.h"
 					>
 				</File>
 				<File
@@ -2666,10 +2622,6 @@
 						>
 					</File>
 					<File
-						RelativePath="..\shared_logic\lua\CLuaMatrix.h"
-						>
-					</File>
-					<File
 						RelativePath="..\shared_logic\lua\CLuaModuleManager.h"
 						>
 					</File>
@@ -2679,10 +2631,6 @@
 					</File>
 					<File
 						RelativePath="..\shared_logic\lua\CLuaTimerManager.h"
-						>
-					</File>
-					<File
-						RelativePath="..\shared_logic\lua\CLuaVector.h"
 						>
 					</File>
 					<File
@@ -2718,23 +2666,7 @@
 						>
 					</File>
 					<File
-						RelativePath="..\shared_logic\luadefs\CLuaMatrixDefs.h"
-						>
-					</File>
-					<File
 						RelativePath="..\shared_logic\luadefs\CLuaTaskDefs.h"
-						>
-					</File>
-					<File
-						RelativePath="..\shared_logic\luadefs\CLuaVectorDefs.h"
-						>
-					</File>
-				</Filter>
-				<Filter
-					Name="oopdefs"
-					>
-					<File
-						RelativePath="..\shared_logic\lua\oopdefs\CLuaOOPDefs.h"
 						>
 					</File>
 				</Filter>

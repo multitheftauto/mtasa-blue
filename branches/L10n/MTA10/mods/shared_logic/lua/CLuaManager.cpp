@@ -70,10 +70,10 @@ void CLuaManager::StopScriptsOwnedBy ( int iOwner )
     }
 }
 
-CLuaMain * CLuaManager::CreateVirtualMachine ( CResource* pResourceOwner, bool bEnableOOP )
+CLuaMain * CLuaManager::CreateVirtualMachine ( CResource* pResourceOwner )
 {
     // Create it and add it to the list over VM's
-    CLuaMain * vm = new CLuaMain ( this, pResourceOwner, bEnableOOP );
+    CLuaMain * vm = new CLuaMain ( this, pResourceOwner );
     m_virtualMachines.push_back ( vm );
     vm->InitVM ();
     return vm;

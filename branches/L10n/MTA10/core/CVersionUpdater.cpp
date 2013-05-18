@@ -2901,7 +2901,6 @@ int CVersionUpdater::DoSendDownloadRequestToNextServer ( void )
 
                              , *GetApplicationSetting ( "real-os-version" )
                            );
-    SString strConnectUsage = SString("%i_%i", GetApplicationSettingInt ( "times-connected-editor" ), GetApplicationSettingInt ( "times-connected" ) );
 
     // Make the query URL
     SString strQueryURL = strServerURL;
@@ -2917,7 +2916,6 @@ int CVersionUpdater::DoSendDownloadRequestToNextServer ( void )
     strQueryURL = strQueryURL.Replace ( "%FILE%", m_JobInfo.strPostFilename );
     strQueryURL = strQueryURL.Replace ( "%SYS%", strSystemStats );
     strQueryURL = strQueryURL.Replace ( "%VID%", strVideoCard );
-    strQueryURL = strQueryURL.Replace ( "%USAGE%", strConnectUsage );    
 
     // Perform the HTTP request
     m_HTTP.Get ( strQueryURL );

@@ -29,12 +29,6 @@ namespace
 void CSimControl::Startup ( void )
 {
     ms_pSimPlayerManager = new CSimPlayerManager ();
-
-    // Check packet flags are what we are expecting
-    dassert( CPlayerPuresyncPacket().HasSimHandler() );
-    dassert( CVehiclePuresyncPacket().HasSimHandler() );
-    dassert( CKeysyncPacket().HasSimHandler() );
-    dassert( CBulletsyncPacket().HasSimHandler() );
 }
 
 
@@ -158,12 +152,38 @@ void CSimControl::RemoveSimPlayer ( CPlayer* pPlayer )
 
 ///////////////////////////////////////////////////////////////
 //
-// CSimControl::UpdateSimPlayer
+// CSimControl::UpdatePuresyncSimPlayer
 //
-// Update a player at pure sync (and other) times
+// Update a player at pure sync time
 //
 ///////////////////////////////////////////////////////////////
-void CSimControl::UpdateSimPlayer ( CPlayer* pPlayer )
+void CSimControl::UpdatePuresyncSimPlayer ( CPlayer* pPlayer, const std::set < CPlayer* >& simSendList, const std::set < CPlayer* >* pKeysyncSendList, const std::set < CPlayer* >* pBulletsyncSendList )
 {
-    ms_pSimPlayerManager->UpdateSimPlayer ( pPlayer );
+    ms_pSimPlayerManager->UpdateSimPlayer ( pPlayer, &simSendList, pKeysyncSendList, pBulletsyncSendList );
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CSimControl::UpdateKeysyncSimPlayer
+//
+// Update a player at key sync time
+//
+///////////////////////////////////////////////////////////////
+void CSimControl::UpdateKeysyncSimPlayer ( CPlayer* pPlayer, const std::set < CPlayer* >& simSendList )
+{
+    ms_pSimPlayerManager->UpdateSimPlayer ( pPlayer, NULL, &simSendList, NULL );
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CSimControl::UpdateBulletsyncSimPlayer
+//
+// Update a player at bullet sync time
+//
+///////////////////////////////////////////////////////////////
+void CSimControl::UpdateBulletsyncSimPlayer ( CPlayer* pPlayer, const std::set < CPlayer* >& simSendList )
+{
+    ms_pSimPlayerManager->UpdateSimPlayer ( pPlayer, NULL, NULL, &simSendList );
 }

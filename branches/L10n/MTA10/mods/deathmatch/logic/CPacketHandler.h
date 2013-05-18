@@ -100,7 +100,6 @@ public:
     void                Packet_UpdateInfo               ( NetBitStreamInterface& bitStream );
     void                Packet_LatentTransfer           ( NetBitStreamInterface& bitStream );
     void                Packet_SyncSettings             ( NetBitStreamInterface& bitStream );
-    void                Packet_PedTask                  ( NetBitStreamInterface& bitStream );
 };
 
 #endif

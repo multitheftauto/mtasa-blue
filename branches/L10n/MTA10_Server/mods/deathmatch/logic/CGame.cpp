@@ -32,7 +32,6 @@
 #define BULLET_SYNC_MIN_CLIENT_VERSION          "1.3.0-9.04311"
 #define VEH_EXTRAPOLATION_MIN_CLIENT_VERSION    "1.3.0-9.04460"
 #define ALT_PULSE_ORDER_MIN_CLIENT_VERSION      "1.3.1-9.04913"
-#define HIT_ANIM_CLIENT_VERSION                 "1.3.2"
 
 CGame* g_pGame = NULL;
 
@@ -169,7 +168,6 @@ CGame::CGame ( void )
     m_Glitches [ GLITCH_FASTMOVE ] = false;
     m_Glitches [ GLITCH_CROUCHBUG ] = false;
     m_Glitches [ GLITCH_CLOSEDAMAGE ] = false;
-    m_Glitches [ GLITCH_HITANIM ] = false;
     for ( int i = 0; i < WEAPONTYPE_LAST_WEAPONTYPE; i++ )
         m_JetpackWeapons [ i ] = false;
 
@@ -182,7 +180,6 @@ CGame::CGame ( void )
     m_GlitchNames["fastmove"] = GLITCH_FASTMOVE;
     m_GlitchNames["crouchbug"] = GLITCH_CROUCHBUG;
     m_GlitchNames["highcloserangedamage"] = GLITCH_CLOSEDAMAGE;
-    m_GlitchNames["hitanim"] = GLITCH_HITANIM;
 
     m_bCloudsEnabled = true;
 
@@ -1103,12 +1100,6 @@ bool CGame::ProcessPacket ( CPacket& Packet )
             return true;
         }
 
-        case PACKET_ID_PED_TASK:
-        {
-            Packet_PedTask ( static_cast < CPedTaskPacket& > ( Packet ) );
-            return true;
-        }
-
         case PACKET_ID_DETONATE_SATCHELS:
         {
             Packet_DetonateSatchels ( static_cast < CDetonateSatchelsPacket& > ( Packet ) );
@@ -2014,14 +2005,10 @@ void CGame::Packet_PlayerTimeout ( CPlayerTimeoutPacket& Packet )
 // Relay this (pure sync) packet to all the other players using distance rules
 void CGame::RelayPlayerPuresync ( CPacket& Packet )
 {
-    // Only need to do this once every 8 calls
-    static uint uiUpdateCounter = 0;
-    if ( ( ++uiUpdateCounter & 7 ) == 0 )
-        UpdateModuleTickCount64 ();
+    UpdateModuleTickCount64 ();
 
     // Make a list of players to send this packet to
-    static std::vector < CPlayer* > sendList;   // static to help reduce memory allocations
-    sendList.clear();
+    std::vector < CPlayer* > sendList;
     bool bUseSimSendList = CSimControl::IsSimSystemEnabled ();
 
     CPlayer* pPlayer = Packet.GetSourcePlayer ();
@@ -2059,8 +2046,7 @@ void CGame::RelayPlayerPuresync ( CPacket& Packet )
         SViewerMapType& nearList = pPlayer->GetNearPlayerList ();
 
         // Array for holding players that need moving to the puresync far list
-        static std::vector < CPlayer* > moveToFarListList;   // static to help reduce memory allocations
-        moveToFarListList.clear();
+        std::vector < CPlayer* > moveToFarListList;
 
         // For each puresync near player
         for ( SViewerMapType ::iterator it = nearList.begin (); it != nearList.end (); ++it )
@@ -2111,7 +2097,6 @@ void CGame::RelayPlayerPuresync ( CPacket& Packet )
                             // If in sim list, sim send has already been done.
                             // So don't send here as well - Just remove from sim list
                             MapRemove ( pPlayer->m_PureSyncSimSendList, pSendPlayer );
-                            pPlayer->m_bPureSyncSimSendListDirty = true;
                             nearInfo.bInPureSyncSimSendList = false;
                         }
                     }
@@ -2128,7 +2113,6 @@ void CGame::RelayPlayerPuresync ( CPacket& Packet )
 
                             // and add it to sim list for next time
                             MapInsert ( pPlayer->m_PureSyncSimSendList, pSendPlayer );
-                            pPlayer->m_bPureSyncSimSendListDirty = true;
                             nearInfo.bInPureSyncSimSendList = true;
                         }
                     }
@@ -2155,7 +2139,7 @@ void CGame::RelayPlayerPuresync ( CPacket& Packet )
 
     CLOCK( "RelayPlayerPuresync", "UpdatePuresyncSimPlayer" );
     // Update sim data
-    CSimControl::UpdateSimPlayer ( pPlayer );
+    CSimControl::UpdatePuresyncSimPlayer ( pPlayer, pPlayer->m_PureSyncSimSendList, &pPlayer->m_KeySyncSimSendList, &pPlayer->m_BulletSyncSimSendList );
     UNCLOCK( "RelayPlayerPuresync", "UpdatePuresyncSimPlayer" );
 }
 
@@ -2291,9 +2275,69 @@ void CGame::Packet_Keysync ( CKeysyncPacket& Packet )
     if ( pPlayer && pPlayer->IsJoined () )
     {
         // Relay to other players
-        RelayNearbyPacket ( Packet );
+        RelayKeysync ( Packet );
     }
 }
+
+
+// Relay this (key sync) packet to other players using distance rules
+void CGame::RelayKeysync ( CPacket& Packet )
+{
+    // Make a list of players to send this packet to
+    std::vector < CPlayer* > sendList;
+    bool bUseSimSendList = CSimControl::IsSimSystemEnabled ();
+
+    CPlayer* pPlayer = Packet.GetSourcePlayer ();
+
+    //
+    // Process near sync
+    //
+    {
+        // Update list of players who need the packet
+        pPlayer->MaybeUpdateOthersNearList ();
+
+        // Use this players keysync near list for sending packets
+        SViewerMapType& nearList = pPlayer->GetNearPlayerList ();
+
+        // For each keysync near player
+        for ( SViewerMapType ::iterator it = nearList.begin (); it != nearList.end (); ++it )
+        {
+            CPlayer* pSendPlayer = it->first;
+            if ( !bUseSimSendList )
+            {
+                // Standard sending
+                sendList.push_back ( pSendPlayer );
+            }
+            else
+            {
+                SViewerInfo& nearInfo = it->second;
+                dassert ( MapContains ( pPlayer->m_KeySyncSimSendList, pSendPlayer ) == nearInfo.bInKeySyncSimSendList );
+
+                //
+                // Sim sync relays key sync packets to the other player when he is near
+                // Enabling/disabling sim keysync will only take effect for the next key sync packet, so:
+                //
+                if ( !nearInfo.bInKeySyncSimSendList )
+                {
+                    // If not in sim send list yet, do send here
+                    sendList.push_back ( pSendPlayer );
+
+                    // and add it to sim send list for next time
+                    MapInsert ( pPlayer->m_KeySyncSimSendList, pSendPlayer );
+                    nearInfo.bInKeySyncSimSendList = true;
+                }
+            }
+        }
+    }
+
+    // Relay packet
+    if ( !sendList.empty () )
+        CPlayerManager::Broadcast ( Packet, sendList );
+
+    // Update sim data
+    CSimControl::UpdateKeysyncSimPlayer ( pPlayer, pPlayer->m_KeySyncSimSendList );
+}
+
 
 void CGame::Packet_Bulletsync ( CBulletsyncPacket& Packet )
 {
@@ -2302,7 +2346,7 @@ void CGame::Packet_Bulletsync ( CBulletsyncPacket& Packet )
     if ( pPlayer && pPlayer->IsJoined () )
     {
         // Relay to other players
-        RelayNearbyPacket ( Packet );
+        RelayBulletsync ( Packet );
     }
 }
 
@@ -2325,25 +2369,12 @@ void CGame::Packet_WeaponBulletsync ( CCustomWeaponBulletSyncPacket& Packet )
     }
 }
 
-void CGame::Packet_PedTask ( CPedTaskPacket& Packet )
-{
-    // Grab the source player
-    CPlayer* pPlayer = Packet.GetSourcePlayer ();
-    if ( pPlayer && pPlayer->IsJoined () )
-    {
-        // Relay to other players
-        RelayNearbyPacket ( Packet );
-    }
-}
-
-
-// Relay this packet to other nearby players
-void CGame::RelayNearbyPacket ( CPacket& Packet )
+// Relay this (bullet sync) packet to other players using distance rules
+void CGame::RelayBulletsync ( CPacket& Packet )
 {
     // Make a list of players to send this packet to
-    static std::vector < CPlayer* > sendList;   // static to help reduce memory allocations
-    sendList.clear();
-    bool bUseSimSendList = CSimControl::IsSimSystemEnabled () && Packet.HasSimHandler();
+    std::vector < CPlayer* > sendList;
+    bool bUseSimSendList = CSimControl::IsSimSystemEnabled ();
 
     CPlayer* pPlayer = Packet.GetSourcePlayer ();
 
@@ -2354,10 +2385,10 @@ void CGame::RelayNearbyPacket ( CPacket& Packet )
         // Update list of players who need the packet
         pPlayer->MaybeUpdateOthersNearList ();
 
-        // Use this player's near list for sending packets
+        // Use this players bulletsync near list for sending packets
         SViewerMapType& nearList = pPlayer->GetNearPlayerList ();
 
-        // For each near player
+        // For each bulletsync near player
         for ( SViewerMapType ::iterator it = nearList.begin (); it != nearList.end (); ++it )
         {
             CPlayer* pSendPlayer = it->first;
@@ -2368,13 +2399,21 @@ void CGame::RelayNearbyPacket ( CPacket& Packet )
             }
             else
             {
-                const SViewerInfo& nearInfo = it->second;
-                dassert ( MapContains ( pPlayer->m_PureSyncSimSendList, pSendPlayer ) == nearInfo.bInPureSyncSimSendList  );
+                SViewerInfo& nearInfo = it->second;
+                dassert ( MapContains ( pPlayer->m_BulletSyncSimSendList, pSendPlayer ) == nearInfo.bInBulletSyncSimSendList  );
 
-                if ( !nearInfo.bInPureSyncSimSendList )
+                //
+                // Sim sync relays bullet sync packets to the other player when he is near
+                // Enabling/disabling sim bulletsync will only take effect for the next bullet sync packet, so:
+                //
+                if ( !nearInfo.bInBulletSyncSimSendList )
                 {
-                    // If not in sim send list, do send here
+                    // If not in sim send list yet, do send here
                     sendList.push_back ( pSendPlayer );
+
+                    // and add it to sim send list for next time
+                    MapInsert ( pPlayer->m_BulletSyncSimSendList, pSendPlayer );
+                    nearInfo.bInBulletSyncSimSendList = true;
                 }
             }
         }
@@ -2383,6 +2422,9 @@ void CGame::RelayNearbyPacket ( CPacket& Packet )
     // Relay packet
     if ( !sendList.empty () )
         CPlayerManager::Broadcast ( Packet, sendList );
+
+    // Update sim data
+    CSimControl::UpdateBulletsyncSimPlayer ( pPlayer, pPlayer->m_BulletSyncSimSendList );
 }
 
 
@@ -2711,7 +2753,6 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
                                                     // Mark him as entering the vehicle
                                                     pPlayer->SetOccupiedVehicle ( pVehicle, 0 );
                                                     pPlayer->SetVehicleAction ( CPlayer::VEHICLEACTION_ENTERING );
-                                                    pVehicle->m_bOccupantChanged = false;
 
                                                     // Call the entering vehicle event
                                                     CLuaArguments Arguments;
@@ -2746,11 +2787,13 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
                                                     }
                                                     else
                                                     {
-                                                        if ( !pVehicle->m_bOccupantChanged )
+                                                        // Has he been warped to a vehicle in the mean time? (by lua f.e.)
+                                                        if ( !pPlayer->GetOccupiedVehicle () )
                                                         {
                                                             pPlayer->SetOccupiedVehicle ( NULL, 0 );
                                                             pVehicle->SetOccupant ( NULL, 0 );
                                                         }
+                                                        
                                                         pPlayer->SetVehicleAction ( CPlayer::VEHICLEACTION_NONE );
                                                         failReason = FAIL_SCRIPT;
                                                     }
@@ -2827,7 +2870,6 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
                                                     // Mark him as entering the vehicle
                                                     pPlayer->SetOccupiedVehicle ( pVehicle, ucSeat );
                                                     pPlayer->SetVehicleAction ( CPlayer::VEHICLEACTION_ENTERING );
-                                                    pVehicle->m_bOccupantChanged = false;
 
                                                     // Call the entering vehicle event
                                                     CLuaArguments Arguments;
@@ -2856,12 +2898,13 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
                                                     }
                                                     else
                                                     {
-                                                        if ( !pVehicle->m_bOccupantChanged )
+                                                        // Has he been warped to a vehicle in the mean time? (by lua f.e.)
+                                                        if ( !pPlayer->GetOccupiedVehicle () )
                                                         {
                                                             pPlayer->SetOccupiedVehicle ( NULL, 0 );
                                                             pVehicle->SetOccupant ( NULL, ucSeat );
                                                         }
-                                                        pPlayer->SetVehicleAction ( CPlayer::VEHICLEACTION_NONE );                                                        
+                                                        pPlayer->SetVehicleAction ( CPlayer::VEHICLEACTION_NONE );
                                                         failReason = FAIL_SCRIPT;
                                                     }
                                                 }
@@ -4123,11 +4166,6 @@ SString CGame::CalculateMinClientRequirement ( void )
         if ( strNewMin < ALT_PULSE_ORDER_MIN_CLIENT_VERSION )
             strNewMin = ALT_PULSE_ORDER_MIN_CLIENT_VERSION;
     }
-    if ( g_pGame->IsGlitchEnabled( GLITCH_HITANIM ) )
-    {
-        if ( strNewMin < HIT_ANIM_CLIENT_VERSION )
-            strNewMin = HIT_ANIM_CLIENT_VERSION;
-    }
 
     if ( strNewMin != m_strPrevMinClientConnectRequirement )
     {
@@ -4178,9 +4216,6 @@ SString CGame::CalculateMinClientRequirement ( void )
                 CLogger::LogPrintf ( SString ( "Forced %d player(s) to reconnect so they can update to %s\n", uiNumIncompatiblePlayers, *strKickMin ) );
         }
     }
-
-    // Also seems a good place to keep this setting synchronized
-    g_pBandwidthSettings->NotifyBulletSyncEnabled( g_pGame->IsBulletSyncActive() );
 
 #ifndef MTA_DEBUG
     if ( strNewMin < RELEASE_MIN_CLIENT_VERSION )

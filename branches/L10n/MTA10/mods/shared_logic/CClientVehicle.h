@@ -545,8 +545,6 @@ protected:
     bool                        m_bFrozenWaitingForGroundToLoad;
     float                       m_fGroundCheckTolerance;
     float                       m_fObjectsAroundTolerance;
-    CVector                     m_vecWaitingForGroundSavedMoveSpeed;
-    CVector                     m_vecWaitingForGroundSavedTurnSpeed;
     CMatrix                     m_matFrozen;
     CVehicleUpgrades*           m_pUpgrades;
     unsigned char               m_ucOverrideLights;

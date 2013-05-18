@@ -902,9 +902,12 @@ void CPlayer::RemovePlayerFromDistLists ( CPlayer* pOther )
     if ( pInfo )
         info = *pInfo;
     dassert ( MapContains ( m_PureSyncSimSendList, pOther ) == info.bInPureSyncSimSendList );
+    dassert ( MapContains ( m_KeySyncSimSendList, pOther ) == info.bInKeySyncSimSendList );
+    dassert ( MapContains ( m_BulletSyncSimSendList, pOther ) == info.bInBulletSyncSimSendList );
 #endif
     MapRemove ( m_PureSyncSimSendList, pOther );
-    m_bPureSyncSimSendListDirty = true;
+    MapRemove ( m_KeySyncSimSendList, pOther );
+    MapRemove ( m_BulletSyncSimSendList, pOther );
 
     MapRemove ( m_NearPlayerList, pOther );
     MapRemove ( m_FarPlayerList, pOther );
@@ -930,12 +933,20 @@ void CPlayer::MovePlayerToFarList ( CPlayer* pOther )
 
 #ifdef MTA_DEBUG
     dassert ( MapContains ( m_PureSyncSimSendList, pOther ) == pInfo->bInPureSyncSimSendList );
+    dassert ( MapContains ( m_KeySyncSimSendList, pOther ) == pInfo->bInKeySyncSimSendList );
+    dassert ( MapContains ( m_BulletSyncSimSendList, pOther ) == pInfo->bInBulletSyncSimSendList );
 #endif
-    if ( pInfo->bInPureSyncSimSendList )
+    if ( pInfo->bInKeySyncSimSendList )
     {
-        MapRemove ( m_PureSyncSimSendList, pOther );
-        m_bPureSyncSimSendListDirty = true;
-        pInfo->bInPureSyncSimSendList = false;
+        pInfo->bInKeySyncSimSendList = false;
+        MapRemove ( m_KeySyncSimSendList, pOther );
+        // Call to CSimControl::UpdatePuresyncSimPlayer required to send list update to sim system        
+    }
+    if ( pInfo->bInBulletSyncSimSendList )
+    {
+        pInfo->bInBulletSyncSimSendList = false;
+        MapRemove ( m_BulletSyncSimSendList, pOther );
+        // Call to CSimControl::UpdatePuresyncSimPlayer required to send list update to sim system        
     }
 
     MapSet ( m_FarPlayerList, pOther, *pInfo );
@@ -945,10 +956,6 @@ void CPlayer::MovePlayerToFarList ( CPlayer* pOther )
 
 //
 // Dynamically increase the interval between near sync updates depending on stuffs
-//
-// Called by player who is in 'others' near list
-// i.e. 'other' is trying to figure out if should send sync to 'this'
-// i.e. Can 'this' see 'other'
 //
 bool CPlayer::IsTimeToReceivePuresyncNearFrom ( CPlayer* pOther, SViewerInfo& nearInfo )
 {
@@ -1025,10 +1032,6 @@ int CPlayer::GetApproxPuresyncPacketSize ( void )
 
 //
 // Deduce what zone the other player is in
-//
-// Called by player who is in 'others' near list
-// i.e. 'other' is trying to figure out if should send sync to 'this'
-// i.e. Can 'this' see 'other'
 //
 int CPlayer::GetPuresyncZone ( CPlayer* pOther )
 {
@@ -1125,23 +1128,6 @@ void CPlayer::SetJackingVehicle ( CVehicle* pVehicle )
         m_pJackingVehicle->SetJackingPlayer ( this );
 }
 
-// Calculate weapon range using efficient stuffs
-float CPlayer::GetWeaponRangeFromSlot( uint uiSlot )
-{
-    eWeaponType eWeapon = static_cast < eWeaponType > ( GetWeaponType ( uiSlot ) );
-    float fSkill = GetPlayerStat ( CWeaponStatManager::GetSkillStatIndex ( eWeapon ) );
-
-    if ( fSkill != m_fWeaponRangeLastSkill || eWeapon != m_eWeaponRangeLastWeapon || CWeaponStat::GetAllWeaponStatsRevision() != m_uiWeaponRangeLastStatsRevision )
-    {
-        m_fWeaponRangeLastSkill = fSkill;
-        m_eWeaponRangeLastWeapon = eWeapon;
-        m_uiWeaponRangeLastStatsRevision = CWeaponStat::GetAllWeaponStatsRevision();
-        m_fWeaponRangeLast = g_pGame->GetWeaponStatManager ( )->GetWeaponRangeFromSkillLevel ( eWeapon, fSkill );       
-    }
-    return m_fWeaponRangeLast;
-}
-
-/////////////////////////////////////////////////////////////////
 // For NearList/FarList hash maps
 CPlayer* GetEmptyMapKey ( CPlayer** )
 {

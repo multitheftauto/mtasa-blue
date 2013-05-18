@@ -68,8 +68,12 @@ int CLuaFunctionDefs::CreateColCuboid ( lua_State* luaVM )
 {
     CVector vecPosition, vecSize;
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadVector3D ( vecPosition );
-    argStream.ReadVector3D ( vecSize );
+    argStream.ReadNumber ( vecPosition.fX );
+    argStream.ReadNumber ( vecPosition.fY );
+    argStream.ReadNumber ( vecPosition.fZ );
+    argStream.ReadNumber ( vecSize.fX );
+    argStream.ReadNumber ( vecSize.fY );
+    argStream.ReadNumber ( vecSize.fZ );
 
     if ( vecSize.fX < 0.0f )
     {
@@ -116,7 +120,9 @@ int CLuaFunctionDefs::CreateColSphere ( lua_State* luaVM )
     CVector vecPosition;
     float fRadius = 0.1f;
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadVector3D ( vecPosition );
+    argStream.ReadNumber ( vecPosition.fX );
+    argStream.ReadNumber ( vecPosition.fY );
+    argStream.ReadNumber ( vecPosition.fZ );
     argStream.ReadNumber ( fRadius );
 
     if ( fRadius < 0.0f )

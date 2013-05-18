@@ -19,6 +19,8 @@ public:
 
     bool                                    IsJoined                    ( void )                        { return m_iStatus == STATUS_JOINED; };
     const std::vector < CSimPlayer* >&      GetPuresyncSendList         ( void )                        { return m_PuresyncSendList; }
+    const std::vector < CSimPlayer* >&      GetKeysyncSendList          ( void )                        { return m_KeysyncSendList; }
+    const std::vector < CSimPlayer* >&      GetBulletsyncSendList       ( void )                        { return m_BulletsyncSendList; }
     unsigned short                          GetBitStreamVersion         ( void )                        { return m_usBitStreamVersion; };
     NetServerPlayerID&                      GetSocket                   ( void )                        { return m_PlayerSocket; };
 
@@ -27,6 +29,8 @@ public:
     unsigned short              m_usBitStreamVersion;
     NetServerPlayerID           m_PlayerSocket;
     std::vector < CSimPlayer* > m_PuresyncSendList;
+    std::vector < CSimPlayer* > m_KeysyncSendList;
+    std::vector < CSimPlayer* > m_BulletsyncSendList;
     bool                        m_bHasOccupiedVehicle;
     CControllerState            m_sharedControllerState;        // Updated by CSim*Packet code
 

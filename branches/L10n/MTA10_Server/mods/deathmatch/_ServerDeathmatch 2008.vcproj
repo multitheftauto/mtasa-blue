@@ -1044,10 +1044,6 @@
 						>
 					</File>
 					<File
-						RelativePath=".\logic\packets\CPedTaskPacket.cpp"
-						>
-					</File>
-					<File
 						RelativePath=".\logic\packets\CPedWastedPacket.cpp"
 						>
 					</File>
@@ -1353,10 +1349,6 @@
 					</File>
 					<File
 						RelativePath=".\logic\net\CSimKeysyncPacket.cpp"
-						>
-					</File>
-					<File
-						RelativePath=".\logic\net\CSimPedTaskPacket.cpp"
 						>
 					</File>
 					<File
@@ -2317,10 +2309,6 @@
 						>
 					</File>
 					<File
-						RelativePath=".\logic\packets\CPedTaskPacket.h"
-						>
-					</File>
-					<File
 						RelativePath=".\logic\packets\CPedWastedPacket.h"
 						>
 					</File>
@@ -2654,10 +2642,6 @@
 					</File>
 					<File
 						RelativePath=".\logic\net\CSimKeysyncPacket.h"
-						>
-					</File>
-					<File
-						RelativePath=".\logic\net\CSimPedTaskPacket.h"
 						>
 					</File>
 					<File

@@ -83,77 +83,6 @@ public:
         m_iIndex++;
     }
 
-#ifdef MTA_CLIENT
-    //
-    // Read next Vector3d
-    //
-    void ReadVector3D ( CVector& outValue )
-    {
-        int iArgument = lua_type ( m_luaVM, m_iIndex );
-        if ( iArgument == LUA_TSTRING || iArgument == LUA_TNUMBER )
-        {
-            ReadNumber ( outValue.fX );
-            ReadNumber ( outValue.fY );
-            ReadNumber ( outValue.fZ );
-            return;
-        }
-        else if ( iArgument == LUA_TUSERDATA )
-        {
-            // we don't pass around the pointer as it may get destroyed any time
-            CLuaVector3D* pVector = NULL;
-            ReadUserData ( pVector );
-            if ( pVector )
-            {
-                outValue = *pVector;
-                return;
-            }
-            outValue = CVector();
-            return; // Error set in ReadUserData
-        }
-
-        outValue = CVector();
-        SetTypeError ( "vector3" );
-        m_iIndex++;
-    }
-
-    //
-    // Read next Vector3d, using default if needed
-    //
-    void ReadVector3D ( CVector& outValue, const CVector& vecDefault )
-    {
-        outValue = vecDefault;
-        int iArgument = lua_type ( m_luaVM, m_iIndex );
-        if ( iArgument == LUA_TSTRING || iArgument == LUA_TNUMBER )
-        {
-            ReadNumber ( outValue.fX, vecDefault.fX );
-            ReadNumber ( outValue.fY, vecDefault.fY );
-            ReadNumber ( outValue.fZ, vecDefault.fZ );
-            return;
-        }
-        else if ( iArgument == LUA_TUSERDATA )
-        {
-            // we don't pass around the pointer as it may get destroyed any time
-            CLuaVector3D* pVector = NULL;
-            ReadUserData ( pVector );
-            if ( pVector )
-            {
-                outValue.fX = pVector->fX;
-                outValue.fY = pVector->fY;
-                outValue.fZ = pVector->fZ;
-                return;
-            }
-            return; // Error set in ReadUserData
-        }
-        else if ( iArgument == LUA_TNIL || iArgument == LUA_TNONE )
-        {
-            m_iIndex++;
-            return;
-        }
-
-        SetTypeError ( "vector3" );
-        m_iIndex++;
-    }
-#endif
 
     //
     // Read next bool
@@ -670,14 +599,6 @@ public:
         }
         return false;
     }
-
-#ifdef MTA_CLIENT
-    bool NextIsVector3D ( void ) const
-    {
-        return ( NextCouldBeNumber() && NextCouldBeNumber( 1 ) && NextCouldBeNumber( 2 ) )
-               || NextIsUserDataOfType < CLuaVector3D > ();
-    }
-#endif
 
     //
     // Conditional reads. Default required in case condition is not met.

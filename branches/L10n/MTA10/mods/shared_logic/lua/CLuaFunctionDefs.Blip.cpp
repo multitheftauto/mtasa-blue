@@ -28,7 +28,9 @@ int CLuaFunctionDefs::CreateBlip ( lua_State* luaVM )
     short sOrdering = 0;
     unsigned short usVisibleDistance = 16383;
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadVector3D ( vecPosition );
+    argStream.ReadNumber ( vecPosition.fX );
+    argStream.ReadNumber ( vecPosition.fY );
+    argStream.ReadNumber ( vecPosition.fZ );
     argStream.ReadNumber ( ucIcon, 0 );
     argStream.ReadNumber( ucSize, 2 );
     argStream.ReadNumber( color.R, 255 );

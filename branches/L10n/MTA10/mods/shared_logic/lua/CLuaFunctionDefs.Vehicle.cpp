@@ -608,7 +608,7 @@ int CLuaFunctionDefs::GetVehicleUpgradeSlotName ( lua_State* luaVM )
         if ( usNumber < 17 )
         {
             SString strUpgradeName;
-            if ( CStaticFunctionDefinitions::GetVehicleUpgradeSlotName ( static_cast < unsigned char > ( usNumber ), strUpgradeName ) )
+            if ( CStaticFunctionDefinitions::GetVehicleUpgradeSlotName ( usNumber, strUpgradeName ) )
             {
                 lua_pushstring ( luaVM, strUpgradeName );
                 return 1;
@@ -1296,8 +1296,12 @@ int CLuaFunctionDefs::CreateVehicle ( lua_State* luaVM )
     SString strRegPlate = "";
     CScriptArgReader argStream ( luaVM );
     argStream.ReadNumber ( usModel );
-    argStream.ReadVector3D ( vecPosition );
-    argStream.ReadVector3D ( vecRotation, vecRotation );
+    argStream.ReadNumber ( vecPosition.fX );
+    argStream.ReadNumber ( vecPosition.fY );
+    argStream.ReadNumber ( vecPosition.fZ );
+    argStream.ReadNumber ( vecRotation.fX, 0.0f );
+    argStream.ReadNumber ( vecRotation.fY, 0.0f );
+    argStream.ReadNumber ( vecRotation.fZ, 0.0f );
     argStream.ReadString ( strRegPlate, "" );
     argStream.ReadNumber ( ucVariant, 255 );
     argStream.ReadNumber ( ucVariant2, 255 );
@@ -1311,7 +1315,7 @@ int CLuaFunctionDefs::CreateVehicle ( lua_State* luaVM )
             if ( pResource )
             {
                 // Create the vehicle and return its handle
-                CClientVehicle* pVehicle = CStaticFunctionDefinitions::CreateVehicle ( *pResource, usModel, vecPosition, vecRotation, strRegPlate == "" ? NULL : strRegPlate.c_str(), ucVariant, ucVariant2 );
+                CClientVehicle* pVehicle = CStaticFunctionDefinitions::CreateVehicle ( *pResource, usModel, vecPosition, vecRotation, strRegPlate == "" ? NULL : strRegPlate, ucVariant, ucVariant2 );
                 if ( pVehicle )
                 {
                     CElementGroup * pGroup = pResource->GetElementGroup();
@@ -1477,7 +1481,9 @@ int CLuaFunctionDefs::SetVehicleTurnVelocity ( lua_State* luaVM )
     CVector vecTurnVelocity;
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pEntity );
-    argStream.ReadVector3D ( vecTurnVelocity );
+    argStream.ReadNumber ( vecTurnVelocity.fX );
+    argStream.ReadNumber ( vecTurnVelocity.fY );
+    argStream.ReadNumber ( vecTurnVelocity.fZ );
 
     if ( !argStream.HasErrors ( ) )
     {

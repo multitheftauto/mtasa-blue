@@ -13,7 +13,6 @@
 
 class CServerList;
 class CServerListItem;
-class CServerListItemList;
 class CMasterServerManagerInterface;
 
 #ifndef __CSERVERLIST_H
@@ -85,12 +84,38 @@ public:
     {
         Address.S_un.S_addr = 0;
         usGamePort = 0;
-        m_pItemList = NULL;
         Init ();
     }
-    CServerListItem     ( in_addr _Address, unsigned short _usGamePort, CServerListItemList* pItemList = NULL, bool bAtFront = false );
-    ~CServerListItem    ( void );
-    void ChangeAddress  ( in_addr _Address, unsigned short _usGamePort );
+
+    CServerListItem ( in_addr _Address, unsigned short _usGamePort )
+    {
+        Address = _Address;
+        usGamePort = _usGamePort;
+        Init ();
+    }
+
+    CServerListItem ( in_addr _Address, unsigned short _usGamePort, std::string _strHostName )
+    {
+        Address = _Address;
+        usGamePort = _usGamePort;
+        strHostName = _strHostName;
+        Init ();
+    }
+
+    CServerListItem ( const CServerListItem & copy )
+    {
+        Address.S_un.S_addr = copy.Address.S_un.S_addr;
+        usGamePort = copy.usGamePort;
+        strHostName = copy.strHostName;
+        Init ();
+        uiTieBreakPosition = copy.uiTieBreakPosition;
+    }
+
+    ~CServerListItem ( void )
+    {
+        MapRemove ( ms_ValidServerListItemMap, this );
+        CloseSocket ();
+    }
 
     static bool         Parse           ( const char* szAddress, in_addr& Address )
     {
@@ -172,8 +197,6 @@ public:
     void                ResetForRefresh ( void );
     unsigned short      GetQueryPort    ( void );
 
-    in_addr             AddressCopy;       // Copy to ensure it doesn't get changed without us knowing
-    unsigned short      usGamePortCopy;
     in_addr             Address;        // IP-address
     unsigned short      usGamePort;     // Game port
     unsigned short      nPlayers;      // Current players
@@ -306,7 +329,6 @@ public:
     }
 
     int                 m_iTimeoutLength;
-    CServerListItemList* m_pItemList;
 protected:
     int                 m_Socket;
     CElapsedTime        m_ElapsedTime;
@@ -343,7 +365,7 @@ struct SAddressPort
 class CServerListItemList
 {
     std::list < CServerListItem* >                  m_List;
-    std::map < SAddressPort, CServerListItem* >     m_AddressMap;
+    std::map < SAddressPort, CServerListItem* >     m_Map;
 public:
 
     std::list < CServerListItem* >& GetList ( void )
@@ -376,15 +398,62 @@ public:
         return m_List.size ();
     }
 
-                        ~CServerListItemList    ( void );
-    void                DeleteAll               ( void );
-    CServerListItem*    Find                    ( in_addr Address, ushort usGamePort );
-    CServerListItem*    AddUnique               ( in_addr Address, ushort usGamePort, bool bAtFront = false );
-    void                AddNewItem              ( CServerListItem* pItem, bool bAtFront );
-    bool                Remove                  ( in_addr Address, ushort usGamePort );
-    void                RemoveItem              ( CServerListItem* pItem );
-    void                OnItemChangeAddress     ( CServerListItem* pItem, in_addr Address, ushort usGamePort );
+    void clear()
+    {
+        m_List.clear ();
+        m_Map.clear ();
+    }
+
+    CServerListItem* Find ( in_addr Address, ushort usGamePort )
+    {
+        SAddressPort key ( Address, usGamePort );
+        if ( CServerListItem** ppItem = MapFind ( m_Map, key ) )
+            return *ppItem;
+        return NULL;
+    }
+
+    CServerListItem* Add ( in_addr Address, ushort usGamePort, bool bAtFront = false )
+    {
+        SAddressPort key ( Address, usGamePort );
+        assert ( !MapContains ( m_Map, key ) );
+        CServerListItem* pItem = new CServerListItem ( Address, usGamePort );
+        MapSet ( m_Map, key, pItem );
+        pItem->uiTieBreakPosition = 5000;
+        if ( !m_List.empty () )
+        {
+            if ( bAtFront )
+                pItem->uiTieBreakPosition = m_List.front ()->uiTieBreakPosition - 1;
+            else
+                pItem->uiTieBreakPosition = m_List.back ()->uiTieBreakPosition + 1;
+        }
+        if ( bAtFront )
+            m_List.push_front ( pItem );
+        else
+            m_List.push_back ( pItem );
+        return pItem;
+    }
+
+    bool Remove ( in_addr Address, ushort usGamePort )
+    {
+        SAddressPort key ( Address, usGamePort );
+        if ( MapRemove ( m_Map, key ) )
+        {
+            for ( std::list<CServerListItem *>::iterator iter = m_List.begin (); iter != m_List.end (); iter++ )
+            {
+                CServerListItem* pItem = *iter;
+                if ( pItem->Address.s_addr == Address.s_addr && pItem->usGamePort == usGamePort )
+                {
+                    m_List.erase ( iter );
+                    delete pItem;
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 };
+
+
 
 
 class CServerList

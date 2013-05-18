@@ -85,7 +85,6 @@ int CClient::ClientInitialize ( const char* szArguments, CCoreInterface* pCore )
     g_pCore->GetCommands ()->Add ( "msg_target",                _("sends a message to the targetted player"),           COMMAND_MessageTarget, true );
     g_pCore->GetCommands ()->Add ( "vehicle_next_weapon",       _("changes to the next weapon whilst in a vehicle"),    COMMAND_VehicleNextWeapon, true );
     g_pCore->GetCommands ()->Add ( "vehicle_previous_weapon",   _("changes to the previous weapon whilst in a vehicle"),COMMAND_VehiclePreviousWeapon, true );
-    g_pCore->GetCommands ()->Add ( "sinfo",                     _("Outputs info about the current server"),                COMMAND_ServerInfo, true );
     
     // ACHTUNG" Should this be handled by the atomic cvar setter?
     g_pCore->GetCommands ()->Add ( "textscale",                 _("defines the scale multiplier of all text-displays"),    COMMAND_TextScale, true );
@@ -164,7 +163,7 @@ int CClient::ClientInitialize ( const char* szArguments, CCoreInterface* pCore )
                 // Create clientgame
                 g_pClientGame = new CClientGame ( true );
 
-                g_pClientGame->SetupLocalGame ( CClientGame::SERVER_TYPE_LOCAL );
+                g_pClientGame->SetupLocalGame ( "local.conf" );
 
                 // Connect
                 //g_pClientGame->StartLocalGame ( "Player" );
@@ -175,7 +174,7 @@ int CClient::ClientInitialize ( const char* szArguments, CCoreInterface* pCore )
                 g_pClientGame = new CClientGame ( true );
 
                 // Connect
-                g_pClientGame->StartLocalGame ( CClientGame::SERVER_TYPE_EDITOR );
+                g_pClientGame->StartLocalGame ( "editor.conf" );
             }
             else
             {

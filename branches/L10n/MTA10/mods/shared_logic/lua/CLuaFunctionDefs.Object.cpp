@@ -22,15 +22,16 @@
 int CLuaFunctionDefs::CreateObject ( lua_State* luaVM )
 {
 //  object createObject ( int modelid, float x, float y, float z, [float rx, float ry, float rz, bool lowLOD] )
-    ushort usModelID;
-    CVector vecPosition;
-    CVector vecRotation;
-    bool bLowLod;
+    ushort usModelID; CVector vecPosition; CVector vecRotation; bool bLowLod;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadNumber ( usModelID );
-    argStream.ReadVector3D ( vecPosition );
-    argStream.ReadVector3D ( vecRotation, vecRotation );
+    argStream.ReadNumber ( vecPosition.fX );
+    argStream.ReadNumber ( vecPosition.fY );
+    argStream.ReadNumber ( vecPosition.fZ );
+    argStream.ReadNumber ( vecRotation.fX, 0 );
+    argStream.ReadNumber ( vecRotation.fY, 0 );
+    argStream.ReadNumber ( vecRotation.fZ, 0 );
     argStream.ReadBool ( bLowLod, false );
 
     if ( !argStream.HasErrors () )
@@ -123,26 +124,14 @@ int CLuaFunctionDefs::GetObjectScale ( lua_State* luaVM )
 
 int CLuaFunctionDefs::IsObjectBreakable ( lua_State* luaVM )
 {
-//  bool isObjectBreakable ( int modelId )
-    
+    //  bool isObjectBreakable ( object theObject )
+    CClientObject* pObject; 
+    bool bBreakable;
+
     CScriptArgReader argStream ( luaVM );
-
-    if ( argStream.NextIsNumber () )
-    {
-        unsigned short usModel;
-        argStream.ReadNumber ( usModel );
-
-        lua_pushboolean ( luaVM, CClientObjectManager::IsBreakableModel ( usModel ) );
-        return 1;
-    }
-
-//  bool isObjectBreakable ( object theObject )
-    CClientObject* pObject;
-
     argStream.ReadUserData ( pObject );
     if ( !argStream.HasErrors () )
     {
-        bool bBreakable;
         if ( CStaticFunctionDefinitions::IsObjectBreakable ( *pObject, bBreakable ) )
         {
             lua_pushboolean ( luaVM, bBreakable );
