@@ -934,22 +934,23 @@ void CSettings::CreateGUI ( void )
     m_pSingleDownloadLabelInfo->SetSize ( CVector2D ( 168.0f, 95.0f ) );
     vecTemp.fY += 40-4;
 
-    // AltTab test
-    m_pAltTabLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Alt-tab handling test:" ) );
-    m_pAltTabLabel->SetPosition ( CVector2D ( vecTemp.fX + 10.f, vecTemp.fY ) );
-    m_pAltTabLabel->AutoSize ( m_pAltTabLabel->GetText ().c_str () );
+    // Fullscreen mode
+    m_pFullscreenStyleLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Fullscreen mode:" ) );
+    m_pFullscreenStyleLabel->SetPosition ( CVector2D ( vecTemp.fX + 10.f, vecTemp.fY ) );
+    m_pFullscreenStyleLabel->AutoSize ( m_pFullscreenStyleLabel->GetText ().c_str () );
 
-    m_pAltTabCombo = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabAdvanced, "" ) );
-    m_pAltTabCombo->SetPosition ( CVector2D ( vecTemp.fX + 156.0f, vecTemp.fY - 1.0f ) );
-    m_pAltTabCombo->SetSize ( CVector2D ( 148.0f, 95.0f ) );
-    m_pAltTabCombo->AddItem ( "Off" )->SetData ( (void*)0 );
-    m_pAltTabCombo->AddItem ( "On" )->SetData ( (void*)1 );
-    m_pAltTabCombo->SetReadOnly ( true );
+    m_pFullscreenStyleCombo = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabAdvanced, "" ) );
+    m_pFullscreenStyleCombo->SetPosition ( CVector2D ( vecTemp.fX + 156.0f, vecTemp.fY - 1.0f ) );
+    m_pFullscreenStyleCombo->SetSize ( CVector2D ( 148.0f, 95.0f ) );
+    m_pFullscreenStyleCombo->AddItem ( "Standard" )->SetData ( (void*)FULLSCREEN_STANDARD );
+    m_pFullscreenStyleCombo->AddItem ( "Borderless window" )->SetData ( (void*)FULLSCREEN_BORDERLESS );
+    m_pFullscreenStyleCombo->AddItem ( "Borderless keep res" )->SetData ( (void*)FULLSCREEN_BORDERLESS_KEEP_RES );
+    m_pFullscreenStyleCombo->SetReadOnly ( true );
 
-    m_pAltTabLabelInfo = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Experimental feature." ) );
-    m_pAltTabLabelInfo->SetPosition ( CVector2D ( vecTemp.fX + 342.f, vecTemp.fY - 4.f ) );
-    m_pAltTabLabelInfo->SetFont ( "default-bold-small" );
-    m_pAltTabLabelInfo->SetSize ( CVector2D ( 168.0f, 95.0f ) );
+    m_pFullscreenStyleLabelInfo = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Experimental feature." ) );
+    m_pFullscreenStyleLabelInfo->SetPosition ( CVector2D ( vecTemp.fX + 342.f, vecTemp.fY - 4.f ) );
+    m_pFullscreenStyleLabelInfo->SetFont ( "default-bold-small" );
+    m_pFullscreenStyleLabelInfo->SetSize ( CVector2D ( 168.0f, 95.0f ) );
     vecTemp.fY += 40-4;
 
     // Process priority
@@ -1177,7 +1178,8 @@ void CSettings::UpdateVideoTab ( bool bIsVideoModeChanged )
     bool bNextWindowed;
     bool bNextFSMinimize;
     int iNextVidMode;
-    GetVideoModeManager ()->GetNextVideoMode ( iNextVidMode, bNextWindowed, bNextFSMinimize );
+    int iNextFullscreenStyle;
+    GetVideoModeManager ()->GetNextVideoMode ( iNextVidMode, bNextWindowed, bNextFSMinimize, iNextFullscreenStyle );
 
     bool bIsAntiAliasingChanged = gameSettings->GetAntiAliasing () != m_pComboAntiAliasing->GetSelectedItemIndex ();
     bool bIsAeroChanged = GetApplicationSettingInt ( "aero-enabled"  ) ? false : true != m_pCheckBoxDisableAero->GetSelected ();
@@ -1315,6 +1317,11 @@ void CSettings::UpdateVideoTab ( bool bIsVideoModeChanged )
             m_pComboResolution->SetText ( strMode );
     }    
     
+    // Fullscreen style
+    if ( iNextFullscreenStyle == FULLSCREEN_STANDARD ) m_pFullscreenStyleCombo->SetText ( "Standard" );
+    else if ( iNextFullscreenStyle == FULLSCREEN_BORDERLESS ) m_pFullscreenStyleCombo->SetText ( "Borderless window" );
+    else if ( iNextFullscreenStyle == FULLSCREEN_BORDERLESS_KEEP_RES ) m_pFullscreenStyleCombo->SetText ( "Borderless keep res" );
+
     // Streaming memory
     unsigned int uiStreamingMemory = 0;
     CVARS_GET ( "streaming_memory", uiStreamingMemory );
@@ -1462,7 +1469,7 @@ bool CSettings::OnVideoDefaultClick ( CGUIElement* pElement )
     CVARS_SET ( "heat_haze", true );
 
     // change
-    bool bIsVideoModeChanged = GetVideoModeManager ()->SetVideoMode ( 0, false, false );
+    bool bIsVideoModeChanged = GetVideoModeManager ()->SetVideoMode ( 0, false, false, FULLSCREEN_STANDARD );
 
     CVARS_SET ( "streaming_memory", g_pCore->GetMaxStreamingMemory () );
 
@@ -2291,7 +2298,8 @@ void CSettings::LoadData ( void )
     int nextVideoMode;
     bool bNextWindowed;
     bool bNextFSMinimize;
-    GetVideoModeManager ()->GetNextVideoMode ( nextVideoMode, bNextWindowed, bNextFSMinimize );
+    int iNextFullscreenStyle;
+    GetVideoModeManager ()->GetNextVideoMode ( nextVideoMode, bNextWindowed, bNextFSMinimize, iNextFullscreenStyle );
 
 	m_pCheckBoxMipMapping->SetSelected ( gameSettings->IsMipMappingEnabled () );
     m_pCheckBoxWindowed->SetSelected ( bNextWindowed );
@@ -2404,13 +2412,13 @@ void CSettings::LoadData ( void )
     }
     m_pInterfaceSkinSelector->SetSelectedItemByIndex(uiIndex);
 
-    // AltTab test
-    int iVar;
-    CVARS_GET ( "display_alttab_handler", iVar );
-    if ( iVar == 0 ) m_pAltTabCombo->SetText ( "Off" );
-    else if ( iVar == 1 ) m_pAltTabCombo->SetText ( "On" );
+    // Fullscreen style
+    if ( iNextFullscreenStyle == FULLSCREEN_STANDARD ) m_pFullscreenStyleCombo->SetText ( "Standard" );
+    else if ( iNextFullscreenStyle == FULLSCREEN_BORDERLESS ) m_pFullscreenStyleCombo->SetText ( "Borderless window" );
+    else if ( iNextFullscreenStyle == FULLSCREEN_BORDERLESS_KEEP_RES ) m_pFullscreenStyleCombo->SetText ( "Borderless keep res" );
 
     // Process priority
+    int iVar;
     CVARS_GET ( "process_priority", iVar );
     if ( iVar == 0 ) m_pPriorityCombo->SetText ( "Normal" );
     else if ( iVar == 1 ) m_pPriorityCombo->SetText ( "Above normal" );
@@ -2541,7 +2549,8 @@ void CSettings::SaveData ( void )
     int iNextVidMode;
     bool bNextWindowed;
     bool bNextFSMinimize;
-    GetVideoModeManager ()->GetNextVideoMode ( iNextVidMode, bNextWindowed, bNextFSMinimize );
+    int iNextFullscreenStyle;
+    GetVideoModeManager ()->GetNextVideoMode ( iNextVidMode, bNextWindowed, bNextFSMinimize, iNextFullscreenStyle );
     int iAntiAliasing = gameSettings->GetAntiAliasing ();
 
     // update from gui
@@ -2549,22 +2558,13 @@ void CSettings::SaveData ( void )
     if ( CGUIListItem* pSelected = m_pComboResolution->GetSelectedItem () )
         iNextVidMode = ( int ) pSelected->GetData();
     bNextFSMinimize = m_pCheckBoxMinimize->GetSelected();
+    if ( CGUIListItem* pSelected = m_pFullscreenStyleCombo->GetSelectedItem () )
+        iNextFullscreenStyle = ( int ) pSelected->GetData();
     if ( CGUIListItem* pSelected = m_pComboAntiAliasing->GetSelectedItem () )
         iAntiAliasing = ( int ) pSelected->GetData();
     int iAeroEnabled = m_pCheckBoxDisableAero->GetSelected() ? 0 : 1;
     bool bCustomizedSAFilesEnabled = m_pCheckBoxCustomizedSAFiles->GetSelected();
     bool bCustomizedSAFilesWasEnabled = GetApplicationSettingInt ( "customized-sa-files-request" ) != 0;
-
-    // AltTab handling
-    bool bAltTabHandlerWasEnabled = false;
-    CVARS_GET ( "display_alttab_handler", bAltTabHandlerWasEnabled );
-    bool bAltTabHandlerEnabled = bAltTabHandlerWasEnabled;
-    if ( CGUIListItem* pSelected = m_pAltTabCombo->GetSelectedItem () )
-    {
-        int iSelected = ( int ) pSelected->GetData();
-        CVARS_SET ( "display_alttab_handler", iSelected );
-        bAltTabHandlerEnabled = ( iSelected != 0 );
-    }
 
     if ( CGUIListItem* pSelected = m_pPriorityCombo->GetSelectedItem () )
     {
@@ -2575,12 +2575,11 @@ void CSettings::SaveData ( void )
     }
 
     // change
-    bool bIsVideoModeChanged = GetVideoModeManager ()->SetVideoMode ( iNextVidMode, bNextWindowed, bNextFSMinimize );
+    bool bIsVideoModeChanged = GetVideoModeManager ()->SetVideoMode ( iNextVidMode, bNextWindowed, bNextFSMinimize, iNextFullscreenStyle );
     bool bIsAntiAliasingChanged = gameSettings->GetAntiAliasing () != iAntiAliasing;
     bool bIsAeroChanged = GetApplicationSettingInt ( "aero-enabled"  ) != iAeroEnabled;
     bool bIsCustomizedSAFilesChanged = bCustomizedSAFilesWasEnabled != bCustomizedSAFilesEnabled;
-    bool bAltTabHandlerChanged = bAltTabHandlerWasEnabled != bAltTabHandlerEnabled;
-    if ( bIsVideoModeChanged || bIsAntiAliasingChanged || bIsAeroChanged || bIsCustomizedSAFilesChanged || bAltTabHandlerChanged )
+    if ( bIsVideoModeChanged || bIsAntiAliasingChanged || bIsAeroChanged || bIsCustomizedSAFilesChanged )
     {
         SString strChangedOptions;
         if ( bIsVideoModeChanged )

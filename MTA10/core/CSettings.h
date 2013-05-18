@@ -86,6 +86,15 @@ namespace ChatColorTypes
 
 using ChatColorTypes::ChatColorType;
 
+enum
+{
+    FULLSCREEN_STANDARD,
+    FULLSCREEN_BORDERLESS,
+    FULLSCREEN_BORDERLESS_KEEP_RES,
+    FULLSCREEN_BORDERLESS_STRETCHED,
+};
+
+
 class CSettings
 {
     friend class CCore;
@@ -178,9 +187,9 @@ protected:
     CGUILabel*          m_pStreamingMemoryLabelInfo;
     CGUIButton*         m_pVideoDefButton;
 
-    CGUILabel*          m_pAltTabLabelInfo;
-    CGUILabel*          m_pAltTabLabel;
-    CGUIComboBox*       m_pAltTabCombo;
+    CGUILabel*          m_pFullscreenStyleLabelInfo;
+    CGUILabel*          m_pFullscreenStyleLabel;
+    CGUIComboBox*       m_pFullscreenStyleCombo;
     CGUILabel*          m_pPriorityLabelInfo;
     CGUILabel*          m_pPriorityLabel;
     CGUIComboBox*       m_pPriorityCombo;
