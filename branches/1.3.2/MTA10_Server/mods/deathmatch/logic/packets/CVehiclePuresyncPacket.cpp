@@ -230,6 +230,27 @@ bool CVehiclePuresyncPacket::Read ( NetBitStreamInterface& BitStream )
                 }
             }
 
+            // Update Damage info
+            if ( BitStream.Version() >= 0x047) 
+            {
+                if ( BitStream.ReadBit () == true )
+                {
+                    ElementID DamagerID;
+                    if ( !BitStream.Read ( DamagerID ) )
+                        return false;
+
+                    SWeaponTypeSync weaponType;
+                    if ( !BitStream.Read ( &weaponType ) )
+                        return false;
+
+                    SBodypartSync bodyPart;
+                    if ( !BitStream.Read ( &bodyPart ) )
+                        return false;
+
+                    pSourcePlayer->SetDamageInfo ( DamagerID, weaponType.data.ucWeaponType, bodyPart.data.uiBodypart );
+                }
+            }
+
             // Player health
             SPlayerHealthSync health;
             if ( !BitStream.Read ( &health ) )
@@ -242,13 +263,29 @@ bool CVehiclePuresyncPacket::Read ( NetBitStreamInterface& BitStream )
             // Less than last packet's frame?
             if ( fHealth < fOldHealth && fHealthLoss > 0 )
             {
-                // Call the onPlayerDamage event
-                CLuaArguments Arguments;
-                Arguments.PushNil ();
-                Arguments.PushNumber ( false );
-                Arguments.PushNumber ( false );
-                Arguments.PushNumber ( fHealthLoss );
-                pSourcePlayer->CallEvent ( "onPlayerDamage", Arguments );
+                if (BitStream.Version() <= 0x046)
+                {
+                    // Call the onPlayerDamage event
+                    CLuaArguments Arguments;
+                    Arguments.PushNil ();
+                    Arguments.PushNumber ( false );
+                    Arguments.PushNumber ( false );
+                    Arguments.PushNumber ( fHealthLoss );
+                    pSourcePlayer->CallEvent ( "onPlayerDamage", Arguments );
+                }
+                else
+                {
+                    // Call the onPlayerDamage event
+                    CLuaArguments Arguments;
+                    
+                    CElement* pDamageSource = CElementIDs::GetElement ( pSourcePlayer->GetPlayerAttacker () );
+                    if ( pDamageSource ) Arguments.PushElement ( pDamageSource );
+                    else Arguments.PushNil();
+                    Arguments.PushNumber ( pSourcePlayer->GetAttackWeapon () );
+                    Arguments.PushNumber ( pSourcePlayer->GetAttackBodyPart () );
+                    Arguments.PushNumber ( fHealthLoss );
+                    pSourcePlayer->CallEvent ( "onPlayerDamage", Arguments );              
+                }
             }
             pSourcePlayer->SetHealth ( fHealth );
 
@@ -264,14 +301,29 @@ bool CVehiclePuresyncPacket::Read ( NetBitStreamInterface& BitStream )
             // Less than last packet's frame?
             if ( fArmor < fOldArmor && fArmorLoss > 0 )
             {
-                // Call the onPlayerDamage event
-                CLuaArguments Arguments;
-                Arguments.PushNil ();
-                Arguments.PushNumber ( false );
-                Arguments.PushNumber ( false );
-                Arguments.PushNumber ( fArmorLoss );
-
-                pSourcePlayer->CallEvent ( "onPlayerDamage", Arguments );                   
+                if (BitStream.Version() <= 0x046)
+                {
+                    // Call the onPlayerDamage event
+                    CLuaArguments Arguments;
+                    Arguments.PushNil ();
+                    Arguments.PushNumber ( false );
+                    Arguments.PushNumber ( false );
+                    Arguments.PushNumber ( fArmorLoss );
+                    pSourcePlayer->CallEvent ( "onPlayerDamage", Arguments );
+                }
+                else
+                {
+                    // Call the onPlayerDamage event
+                    CLuaArguments Arguments;
+                    
+                    CElement* pDamageSource = CElementIDs::GetElement ( pSourcePlayer->GetPlayerAttacker () );
+                    if ( pDamageSource ) Arguments.PushElement ( pDamageSource );
+                    else Arguments.PushNil();
+                    Arguments.PushNumber ( pSourcePlayer->GetAttackWeapon () );
+                    Arguments.PushNumber ( pSourcePlayer->GetAttackBodyPart () );
+                    Arguments.PushNumber ( fArmorLoss );
+                    pSourcePlayer->CallEvent ( "onPlayerDamage", Arguments );              
+                }          
             }
             pSourcePlayer->SetArmor ( fArmor );
 

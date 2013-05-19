@@ -29,6 +29,7 @@ CConnectManager::CConnectManager ( void )
     m_bIsDetectingVersion = false;
     m_bIsConnecting = false;
     m_bSave = true;
+    m_bForceInternalHTTPServer = false;
     m_tConnectStarted = 0;
 
     m_pOnCancelClick = new GUI_CALLBACK ( &CConnectManager::Event_OnCancelClick, this );
@@ -51,7 +52,7 @@ CConnectManager::~CConnectManager ( void )
 }
 
 
-bool CConnectManager::Connect ( const char* szHost, unsigned short usPort, const char* szNick, const char* szPassword, bool bNotifyServerBrowser )
+bool CConnectManager::Connect ( const char* szHost, unsigned short usPort, const char* szNick, const char* szPassword, bool bNotifyServerBrowser, bool bForceInternalHTTPServer )
 {
     assert ( szHost );
     assert ( szNick );
@@ -96,6 +97,7 @@ bool CConnectManager::Connect ( const char* szHost, unsigned short usPort, const
     m_strPassword = szPassword;
     m_Address.s_addr = 0;
     m_usPort = usPort;
+    m_bForceInternalHTTPServer = bForceInternalHTTPServer;
     m_bSave = true;
 
     m_strLastHost = m_strHost;
@@ -142,7 +144,7 @@ bool CConnectManager::Connect ( const char* szHost, unsigned short usPort, const
 }
 
 
-bool CConnectManager::Reconnect ( const char* szHost, unsigned short usPort, const char* szPassword, bool bSave )
+bool CConnectManager::Reconnect ( const char* szHost, unsigned short usPort, const char* szPassword, bool bSave, bool bForceInternalHTTPServer )
 {
     // Use previous connection datum when function arguments are not set
     unsigned int uiPort = 0;
@@ -173,6 +175,7 @@ bool CConnectManager::Reconnect ( const char* szHost, unsigned short usPort, con
     m_bSave = bSave;
 
     m_bReconnect = true;
+    m_bForceInternalHTTPServer = bForceInternalHTTPServer;
 
     return true;
 }
@@ -319,7 +322,7 @@ void CConnectManager::DoPulse ( void )
     {
         std::string strNick;
         CVARS_GET ( "nick", strNick );
-        Connect ( m_strHost.c_str(), m_usPort, strNick.c_str(), m_strPassword.c_str() );
+        Connect ( m_strHost.c_str(), m_usPort, strNick.c_str(), m_strPassword.c_str(), false, m_bForceInternalHTTPServer );
         m_bReconnect = false;
     }
 }

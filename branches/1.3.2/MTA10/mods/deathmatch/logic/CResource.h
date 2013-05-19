@@ -95,6 +95,7 @@ public:
     void                    LoadProtectedScript             ( const char* chunk, unsigned int length );
     const SString&          GetMinServerReq                 ( void ) const                  { return m_strMinServerReq; }
     const SString&          GetMinClientReq                 ( void ) const                  { return m_strMinClientReq; }
+    void                    HandleDownloadedFileTrouble     ( CResourceFile* pResourceFile, bool bCRCMismatch );
 
 private:
     unsigned short          m_usNetID;
