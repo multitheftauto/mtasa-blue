@@ -246,9 +246,7 @@ void CServerListInternet::Pulse ( void )
 
     if ( m_iPass == 1 ) {
         // We are polling for the master server list (first pass)
-        stringstream ss;
-        ss << "Requesting master server list (" << ulTime << "ms elapsed)";
-        m_strStatus = ss.str ();
+        m_strStatus = SString ( _("Requesting master server list (%lu ms elapsed)"), ulTime );
         m_strStatus2 = "";
         m_bUpdated = true;
         
@@ -279,7 +277,7 @@ void CServerListInternet::Pulse ( void )
             GetServerCache ()->GenerateServerList ( this );
             GetServerCache ()->GetServerListCachedInfo ( this );
             SortByASEVersion ();
-            m_strStatus2 = "  " + string ( _("(Backup server list)") );
+            m_strStatus2 = "  " + _("(Backup server list)");
             m_iPass = 2;
         }
     } else if ( m_iPass == 2 ) {
@@ -329,7 +327,7 @@ void CServerListLAN::Refresh ( void )
     const int Flags = 1;
     setsockopt ( m_Socket, SOL_SOCKET, SO_REUSEADDR, (const char *)&Flags, sizeof ( Flags ) );
     if ( setsockopt ( m_Socket, SOL_SOCKET, SO_BROADCAST, (const char *)&Flags, sizeof ( Flags ) ) != 0 ) {
-        m_strStatus = "Cannot bind LAN-broadcast socket";
+        m_strStatus = _("Cannot bind LAN-broadcast socket");
         return;
     }
 
@@ -349,7 +347,7 @@ void CServerListLAN::Refresh ( void )
 
 void CServerListLAN::Discover ( void )
 {
-    m_strStatus = "Attempting to discover LAN servers";
+    m_strStatus = _("Attempting to discover LAN servers");
 
     // Send out the broadcast packet
     std::string strQuery = std::string ( SERVER_LIST_CLIENT_BROADCAST_STR ) + " " + std::string ( MTA_DM_ASE_VERSION );

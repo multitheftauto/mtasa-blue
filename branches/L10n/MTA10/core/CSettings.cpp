@@ -541,7 +541,7 @@ void CSettings::CreateGUI ( void )
     m_pAudioUsertrackLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, _("Usertrack options") ) );
     m_pAudioUsertrackLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 30.0f ), false );
     m_pAudioUsertrackLabel->GetPosition ( vecTemp, false );
-    m_pAudioUsertrackLabel->AutoSize ( );
+    m_pAudioUsertrackLabel->AutoSize ( NULL, 10.0f );
     m_pAudioUsertrackLabel->SetFont ( "default-bold-small" );
 
     m_pLabelUserTrackMode = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, _("Play mode:") ) );
