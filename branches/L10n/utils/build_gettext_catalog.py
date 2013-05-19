@@ -26,7 +26,7 @@ parser.add_option("-v", "--version", dest="version",
 (options, args) = parser.parse_args()
 
 directories = {
-    "../MTA10/locale/client.pot" : [ "../MTA10", "../Shared" ],
+    "client.pot" : [ "../MTA10", "../Shared" ],
     #"../MTA10/locale/client.pot" : [ "../MTA10_Server", "../Shared" ],
 }
 

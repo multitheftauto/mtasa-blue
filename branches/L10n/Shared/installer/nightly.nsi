@@ -43,9 +43,9 @@ Var ShowLastUsed
 ; ###########################################################################################################
 !ifndef FILES_ROOT
 	!define LIGHTBUILD    ; enable LIGHTBUILD for nightly
-	!define FILES_ROOT "D:/DevelopmentWorkspace/mtasa-blue/output"
-	!define SERVER_FILES_ROOT "D:/DevelopmentWorkspace/mtasa-blue/output/MTA San Andreas/server"
-	!define FILES_MODULE_SDK "D:/DevelopmentWorkspace/mtasa-blue/output/MTA San Andreas/development/publicsdk"
+	!define FILES_ROOT "Install files builder/output"
+	!define SERVER_FILES_ROOT "Install files builder/output/server"
+	!define FILES_MODULE_SDK "Install files builder/output/development/publicsdk"
 	!define INSTALL_OUTPUT "mtasa-${0.0.0}-unstable-00000-0-000-nsis.exe"
 	!define PRODUCT_VERSION "v${0.0.0}-unstable-00000-0-000"
 	!define REVISION "0000"

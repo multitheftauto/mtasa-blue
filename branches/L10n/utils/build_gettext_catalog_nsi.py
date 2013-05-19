@@ -19,7 +19,7 @@ parser = OptionParser()
 parser.add_option("-i", "--input", dest="input",
                   help="nightly.nsi location", default="../Shared/installer/nightly.nsi" )
 parser.add_option("-o", "--output", dest="output",
-                  help="POT file output location", default="../Shared/installer/installer.pot")
+                  help="POT file output location", default="installer.pot")
 parser.add_option("-p", "--project", dest="project",
                   help="Project name to write to the POT file", default="MTA San Andreas Installer" )
 parser.add_option("-v", "--version", dest="version",
