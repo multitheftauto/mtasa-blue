@@ -663,6 +663,7 @@ SString CInstallManager::_ProcessAeroChecks ( void )
                 if ( ucTimeStamp != ucTimeStampRequired )
                 {
                     // Change needed!
+                    SetFileAttributes ( strGTAEXEPath, FILE_ATTRIBUTE_NORMAL );
                     FILE* fh = fopen ( strGTAEXEPath, "r+b" );
                     if ( !fh )
                     {
@@ -722,6 +723,7 @@ SString CInstallManager::_ProcessLargeMemChecks ( void )
             if ( usCharacteristics != usCharacteristicsRequired )
             {
                 // Change needed!
+                SetFileAttributes ( strGTAEXEPath, FILE_ATTRIBUTE_NORMAL );
                 FILE* fh = fopen ( strGTAEXEPath, "r+b" );
                 if ( !fh )
                 {
