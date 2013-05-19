@@ -79,6 +79,7 @@ public:
     void                Draw2DPolygon ( float fX1, float fY1, float fX2, float fY2, float fX3, float fY3, float fX4, float fY4, DWORD dwColor );
     void                SetComponentVisible ( eHudComponent component, bool bVisible );
     bool                IsComponentVisible ( eHudComponent component );
+    void                AdjustComponents ( void );
 
 protected:
     void                InitComponentList ( void );

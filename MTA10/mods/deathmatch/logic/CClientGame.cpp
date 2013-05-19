@@ -328,6 +328,9 @@ CClientGame::CClientGame ( bool bLocalPlay )
     // Give a default value for the streaming memory
     if ( g_pCore->GetCVars()->Exists ( "streaming_memory" ) == false )
         g_pCore->GetCVars()->Set ( "streaming_memory", g_pCore->GetMaxStreamingMemory () );
+
+    // Adjust position and size of our HUD components
+    g_pGame->GetHud ()->AdjustComponents ();
 }
 
 
