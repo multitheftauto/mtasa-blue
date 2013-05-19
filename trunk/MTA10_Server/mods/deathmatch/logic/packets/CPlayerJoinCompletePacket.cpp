@@ -95,6 +95,11 @@ bool CPlayerJoinCompletePacket::Write ( NetBitStreamInterface& BitStream ) const
         break;
     case HTTP_DOWNLOAD_ENABLED_URL:
         {
+            // Internal http server port
+            if ( BitStream.Version() >= 0x48 )
+                BitStream.Write( m_usHTTPDownloadPort );
+
+            // External http server URL
             BitStream.WriteString ( m_strHTTPDownloadURL );
         }
 

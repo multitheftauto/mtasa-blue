@@ -321,19 +321,13 @@ void CResource::Load ( CClientEntity *pRootEntity )
             }
             else
             {
-                SString strBuffer ( "CRC mismatch (File '%s' in resource '%s')", pResourceFile->GetShortName (), *m_strResourceName );
-                g_pCore->ShowMessageBox ( "Error", strBuffer, MB_BUTTON_OK | MB_ICON_ERROR );
-                g_pCore->GetConsole ()->Printf ( "Download error: %s", *strBuffer );
-                g_pCore->GetModManager ()->RequestUnload ();
+                HandleDownloadedFileTrouble( pResourceFile, true );
             }
         }
         else
         if ( CheckFileForCorruption ( pResourceFile->GetName () ) )
         {
-            SString strBuffer ( "Invalid file (File '%s' in resource '%s')", pResourceFile->GetShortName (), *m_strResourceName );
-            g_pCore->ShowMessageBox ( "Error", strBuffer, MB_BUTTON_OK | MB_ICON_ERROR );
-            g_pCore->GetConsole ()->Printf ( "Download error: %s", *strBuffer );
-            g_pCore->GetModManager ()->RequestUnload ();
+            HandleDownloadedFileTrouble( pResourceFile, false );
         }
     }
 
@@ -448,5 +442,47 @@ void CResource::AddToElementGroup ( CClientEntity* pElement )
     if ( m_pDefaultElementGroup )
     {
         m_pDefaultElementGroup->Add ( pElement );
+    }
+}
+
+
+//
+// Handle when things go wrong 
+//
+void CResource::HandleDownloadedFileTrouble( CResourceFile* pResourceFile, bool bCRCMismatch )
+{
+    // Compose message
+    SString strMessage;
+    if ( bCRCMismatch )
+    {
+        if ( g_pClientGame->IsUsingExternalHTTPServer() )
+            strMessage += "External ";
+        strMessage += "HTTP server file mismatch";
+    }
+    else
+        strMessage += "Invalid file";
+    SString strFilename = ExtractFilename( PathConform( pResourceFile->GetShortName() ) );
+    strMessage += SString( " (%s) %s", GetName(), *strFilename );
+
+    // Report to server
+    g_pClientGame->TellServerSomethingImportant( 1000, strMessage, true );
+
+    // If invalid file is a png, use dummy replacement
+    if ( !bCRCMismatch && SStringX( pResourceFile->GetName() ).Right( 4 ).CompareI( ".png" ) )
+    {
+        FileCopy( CalcMTASAPath( "MTA\\cgui\\images\\error.png" ), pResourceFile->GetName() );
+        if ( !CheckFileForCorruption ( pResourceFile->GetName () ) )
+            return; // Fixed, sort of
+    }
+
+    // If using external HTTP server, reconnect and use internal one
+    if ( g_pClientGame->IsUsingExternalHTTPServer() && !g_pCore->ShouldUseInternalHTTPServer() )
+        g_pCore->Reconnect( "", 0, NULL, false, true );
+    else
+    {
+        // Otherwise, disconnect with message
+        g_pCore->ShowMessageBox( "Error", strMessage, MB_BUTTON_OK | MB_ICON_ERROR );
+        g_pCore->GetConsole ()->Printf ( "Download error: %s", *strMessage );
+        g_pCore->GetModManager()->RequestUnload();
     }
 }

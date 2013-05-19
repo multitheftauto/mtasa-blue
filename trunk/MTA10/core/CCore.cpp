@@ -631,9 +631,15 @@ bool CCore::IsConnected ( void )
 }
 
 
-bool CCore::Reconnect ( const char* szHost, unsigned short usPort, const char* szPassword, bool bSave )
+bool CCore::Reconnect ( const char* szHost, unsigned short usPort, const char* szPassword, bool bSave, bool bForceInternalHTTPServer )
 {
-    return m_pConnectManager->Reconnect ( szHost, usPort, szPassword, bSave );
+    return m_pConnectManager->Reconnect ( szHost, usPort, szPassword, bSave, bForceInternalHTTPServer );
+}
+
+
+bool CCore::ShouldUseInternalHTTPServer( void )
+{
+    return m_pConnectManager->ShouldUseInternalHTTPServer();
 }
 
 

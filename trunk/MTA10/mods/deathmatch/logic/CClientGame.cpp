@@ -6121,7 +6121,10 @@ bool CClientGame::IsUsingAlternatePulseOrder( bool bAdvanceDelayCounter )
 void CClientGame::OutputServerInfo( void )
 {
     SString strTotalOutput;
-    strTotalOutput += SString( "Server info for %s\n", g_pNet->GetConnectedServer( true ) );
+    strTotalOutput += SString( "Server info for %s", g_pNet->GetConnectedServer( true ) );
+    if ( IsUsingExternalHTTPServer() )
+        strTotalOutput += "  (External HTTP)";
+    strTotalOutput += "\n";
     strTotalOutput += SString( "Ver: %s\n", *GetServerVersionSortable () );
     strTotalOutput += SString( "AC: %s\n", *m_strACInfo );
 
@@ -6207,4 +6210,36 @@ void CClientGame::OutputServerInfo( void )
     }
 
     g_pCore->GetConsole ()->Print ( strTotalOutput );
+}
+
+
+//////////////////////////////////////////////////////////////////
+//
+// CClientGame::TellServerSomethingImportant
+//
+// Report misc important warnings/errors to the current server
+//
+//////////////////////////////////////////////////////////////////
+void CClientGame::TellServerSomethingImportant( uint uiId, const SString& strMessage, bool bOnlyOnceForThisId )
+{
+    if ( bOnlyOnceForThisId && MapContains( m_SentMessageIds, uiId ) )
+        return;
+    MapInsert( m_SentMessageIds, uiId );
+
+    NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream();
+
+    if ( pBitStream->Version() >= 0x48 )
+    {
+        pBitStream->WriteString( SString( "%d,%s", uiId, *strMessage ) );
+        g_pNet->SendPacket( PACKET_ID_PLAYER_DIAGNOSTIC, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_UNRELIABLE );
+    }
+    else
+    {
+        // Spam chat for older servers
+        SString strTemp( "say %s", *strMessage );
+        pBitStream->Write( strTemp.c_str(), strTemp.length() );
+        g_pNet->SendPacket( PACKET_ID_COMMAND, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_UNRELIABLE, PACKET_ORDERING_CHAT );
+    }
+
+    g_pNet->DeallocateNetBitStream( pBitStream );
 }

@@ -3586,7 +3586,7 @@ void CGame::Packet_PlayerDiagnostic ( CPlayerDiagnosticPacket & Packet )
     if ( pPlayer && pPlayer->IsJoined () )
     {
         // If diagnosticis enabled on this server, log it
-        if ( g_pGame->GetConfig ()->IsEnableDiagnostic ( SString ( "%d", Packet.m_uiLevel ) ) )
+        if ( Packet.m_uiLevel >= 1000 || g_pGame->GetConfig ()->IsEnableDiagnostic ( SString ( "%d", Packet.m_uiLevel ) ) )
         {
             SString strMessageCombo ( "DIAGNOSTIC: %s #%d %s\n", pPlayer->GetNick (), Packet.m_uiLevel, Packet.m_strMessage.c_str () );
             CLogger::LogPrint ( strMessageCombo );

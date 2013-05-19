@@ -99,6 +99,7 @@ public:
     const SString&          GetMinServerReq                 ( void ) const                  { return m_strMinServerReq; }
     const SString&          GetMinClientReq                 ( void ) const                  { return m_strMinClientReq; }
     bool                    IsOOPEnabled                    ( void )                        { return m_bOOPEnabled; }
+    void                    HandleDownloadedFileTrouble     ( CResourceFile* pResourceFile, bool bCRCMismatch );
 
 private:
     unsigned short          m_usNetID;
