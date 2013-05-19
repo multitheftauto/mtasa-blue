@@ -430,7 +430,7 @@ void CSettings::CreateGUI ( void )
     m_pAudioGeneralLabel->SetFont ( "default-bold-small" );
 
     m_pLabelRadioVolume = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, _("Radio volume:") ) );
-    m_pLabelRadioVolume->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32.0f ), false );
+    m_pLabelRadioVolume->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 29.0f ), false );
     m_pLabelRadioVolume->GetPosition ( vecTemp, false );
     m_pLabelRadioVolume->AutoSize ( );
 
@@ -447,13 +447,9 @@ void CSettings::CreateGUI ( void )
     m_pLabelRadioVolumeValue->AutoSize ( "100%" );
     m_pLabelRadioVolumeValue->GetSize ( vecSize, false );
 
-    m_pCheckBoxMuteRadio = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabAudio, _("Mute when minimized"), true ) );
-    m_pCheckBoxMuteRadio->SetPosition ( CVector2D ( vecTemp.fX + vecSize.fX + 10.0f, vecTemp.fY ) );
-    m_pCheckBoxMuteRadio->AutoSize ( NULL, 20.0f );;
-
     vecTemp.fX = 11;
     m_pLabelSFXVolume = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, _("SFX volume:") ) );
-    m_pLabelSFXVolume->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32.0f ) );
+    m_pLabelSFXVolume->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 29.0f ) );
     m_pLabelSFXVolume->GetPosition ( vecTemp, false );
     m_pLabelSFXVolume->AutoSize ( );
 
@@ -470,13 +466,9 @@ void CSettings::CreateGUI ( void )
     m_pLabelSFXVolumeValue->AutoSize ( "100%" );
     m_pLabelSFXVolumeValue->GetSize ( vecSize, false );
 
-    m_pCheckBoxMuteSFX = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabAudio, _("Mute when minimized"), true ) );
-    m_pCheckBoxMuteSFX->SetPosition ( CVector2D ( vecTemp.fX + vecSize.fX + 10.0f, vecTemp.fY ) );
-    m_pCheckBoxMuteSFX->AutoSize ( NULL, 20.0f );;
-
     vecTemp.fX = 11;
     m_pLabelMTAVolume = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, _("MTA volume:") ) );
-    m_pLabelMTAVolume->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32.0f ) );
+    m_pLabelMTAVolume->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 29.0f ) );
     m_pLabelMTAVolume->GetPosition ( vecTemp, false );
     m_pLabelMTAVolume->AutoSize ( );
 
@@ -493,13 +485,9 @@ void CSettings::CreateGUI ( void )
     m_pLabelMTAVolumeValue->AutoSize ( "100%" );
     m_pLabelMTAVolumeValue->GetSize ( vecSize, false );
 
-    m_pCheckBoxMuteMTA = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabAudio, _("Mute when minimized"), true ) );
-    m_pCheckBoxMuteMTA->SetPosition ( CVector2D ( vecTemp.fX + vecSize.fX + 10.0f, vecTemp.fY ) );
-    m_pCheckBoxMuteMTA->AutoSize ( NULL, 20.0f );;
-
     vecTemp.fX = 11;
     m_pLabelVoiceVolume = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, _("Voice volume:") ) );
-    m_pLabelVoiceVolume->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32.0f ) );
+    m_pLabelVoiceVolume->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 29.0f ) );
     m_pLabelVoiceVolume->GetPosition ( vecTemp, false );
     m_pLabelVoiceVolume->AutoSize ( );
 
@@ -516,11 +504,31 @@ void CSettings::CreateGUI ( void )
     m_pLabelVoiceVolumeValue->AutoSize ( "100%" );
     m_pLabelVoiceVolumeValue->GetSize ( vecSize, false );
 
-    m_pCheckBoxMuteVoice = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabAudio, _("Mute when minimized"), true ) );
-    m_pCheckBoxMuteVoice->SetPosition ( CVector2D ( vecTemp.fX + vecSize.fX + 10.0f, vecTemp.fY ) );
+
+    vecTemp.fX = 11;
+    
+    m_pCheckBoxMuteRadio = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabAudio, _("Mute Radio sounds when minimized"), true ) );
+    m_pCheckBoxMuteRadio->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32.0f ) );
+    m_pCheckBoxMuteRadio->GetPosition ( vecTemp, false );
+    m_pCheckBoxMuteRadio->AutoSize ( NULL, 20.0f );
+
+    m_pCheckBoxMuteSFX = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabAudio, _("Mute SFX sounds when minimized"), true ) );
+    m_pCheckBoxMuteSFX->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 16.0f ) );
+    m_pCheckBoxMuteSFX->GetPosition ( vecTemp, false );
+    m_pCheckBoxMuteSFX->AutoSize ( NULL, 20.0f );
+
+    m_pCheckBoxMuteMTA = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabAudio, _("Mute MTA sounds when minimized"), true ) );
+    m_pCheckBoxMuteMTA->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 16.0f ) );
+    m_pCheckBoxMuteMTA->GetPosition ( vecTemp, false );
+    m_pCheckBoxMuteMTA->AutoSize ( NULL, 20.0f );
+
+    m_pCheckBoxMuteVoice = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabAudio, _("Mute Voice sounds when minimized"), true ) );
+    m_pCheckBoxMuteVoice->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 16.0f ) );
+    m_pCheckBoxMuteVoice->GetPosition ( vecTemp, false );
     m_pCheckBoxMuteVoice->AutoSize ( NULL, 20.0f );
 
     vecTemp.fX = 11;
+
     m_pCheckBoxAudioEqualizer = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabAudio, _("Radio Equalizer"), true ) );
     m_pCheckBoxAudioEqualizer->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 30.0f ) );
     m_pCheckBoxAudioEqualizer->AutoSize ( NULL, 20.0f );
