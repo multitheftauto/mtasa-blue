@@ -382,7 +382,7 @@ SString CInstallManager::_ShowCrashFailDialog ( void )
     SetApplicationSetting ( "diagnostics", "last-crash-reason", "" );
     if ( strReason == "direct3ddevice-reset" )
     {
-        strMessage += "** The crash was caused by a graphics driver error **\n\n** Please update your graphics drivers **";
+        strMessage += _("** The crash was caused by a graphics driver error **\n\n** Please update your graphics drivers **");
     }
 
     strMessage = strMessage.Replace ( "\r", "" ).Replace ( "\n", "\r\n" );
@@ -725,7 +725,7 @@ SString CInstallManager::_ProcessLargeMemChecks ( void )
                 FILE* fh = fopen ( strGTAEXEPath, "r+b" );
                 if ( !fh )
                 {
-                    m_strAdminReason = "Update Large Memory setting";
+                    m_strAdminReason = _("Update Large Memory setting");
                     return "fail";
                 }
                 if ( !fseek ( fh, 0x96, SEEK_SET ) )

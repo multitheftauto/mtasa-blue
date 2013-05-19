@@ -557,11 +557,11 @@ void CPacketHandler::Packet_ServerDisconnected ( NetBitStreamInterface& bitStrea
             int iMins = static_cast < int > ( Duration / 60 );
 
             if ( iDays )
-                strReason += SString(_n( "%d day", "%d days", iDays ),iDays) += iHours ? " " : "";
+                strReason += SString(_tn( "%d day", "%d days", iDays ),iDays) += iHours ? " " : "";
             if ( iHours )
-                strReason += SString(_n( "%d hour", "%d hours", iHours ),iHours)  += iMins ? " " : "";
+                strReason += SString(_tn( "%d hour", "%d hours", iHours ),iHours)  += iMins ? " " : "";
             if ( iMins )
-                strReason += SString(_n( "%d minute", "%d minutes", iMins ),iMins);
+                strReason += SString(_tn( "%d minute", "%d minutes", iMins ),iMins);
         }
 
         // Display the error

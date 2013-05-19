@@ -17,6 +17,8 @@
 #if defined(_DEBUG) 
     #include "SharedUtil.Tests.hpp"
 #endif
+SString strCoreDLL;
+CLocalizationInterface* g_pLocalization;
 int DoLaunchGame ( LPSTR lpCmdLine );
 int LaunchGame ( LPSTR lpCmdLine );
 
@@ -34,6 +36,57 @@ int WINAPI WinMain ( HINSTANCE _hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
 #if defined(_DEBUG) 
     SharedUtil_Tests ();
 #endif
+
+    const SString strMTASAPath = GetMTASAPath ();
+
+    //////////////////////////////////////////////////////////
+    //
+    // Check for and load core.dll for localization
+    //
+    strCoreDLL = strMTASAPath + "\\mta\\" + MTA_DLL_NAME;
+
+    // Check if the core (mta_blue.dll or mta_blue_d.dll exists)
+    if ( !FileExists ( strCoreDLL ) )
+    {
+        DisplayErrorMessageBox ( ("Load failed.  Please ensure that "
+                            "the file core.dll is in the modules "
+                            "directory within the MTA root directory."), _E("CL23"), "core-missing" ); // Core.dll missing
+
+        return 1;
+    }
+
+    SetDllDirectory( SString ( strMTASAPath + "\\mta" ) );
+
+    // Check if the core can be loaded - failure may mean msvcr90.dll or d3dx9_40.dll etc is not installed
+    HMODULE hCoreModule = LoadLibrary( strCoreDLL );
+    if ( hCoreModule == NULL )
+    {
+        DisplayErrorMessageBox ( ("Loading core failed.  Please ensure that \n"
+                            "Microsoft Visual C++ 2008 SP1 Redistributable Package (x86) \n"
+                            "and the latest DirectX is correctly installed."), _E("CL24"), "vc-redist-missing" );  // Core.dll load failed.  Ensure VC++ Redists and DX are installed
+        return 1;
+    }
+
+    // Grab our locale from the registry if possible, if not Windows
+    SString strLocale = GetApplicationSetting ( "locale" );
+    if ( strLocale.empty() )
+    {
+        setlocale(LC_ALL, "");
+        char* szLocale = setlocale(LC_ALL, NULL);
+        strLocale = szLocale;
+    }
+
+    typedef CLocalizationInterface* (__cdecl *FUNC_CREATELOCALIZATIONFROMENVIRONMENT)(SString strLocale);
+    FUNC_CREATELOCALIZATIONFROMENVIRONMENT pFunc = (FUNC_CREATELOCALIZATIONFROMENVIRONMENT)GetProcAddress ( hCoreModule, "L10n_CreateLocalization" );
+    g_pLocalization = pFunc(strLocale);
+    if ( g_pLocalization == NULL )
+    {
+        DisplayErrorMessageBox ( ("Loading core failed.  Please ensure that \n"
+                            "Microsoft Visual C++ 2008 SP1 Redistributable Package (x86) \n"
+                            "and the latest DirectX is correctly installed."), _E("CL26"), "vc-redist-missing" );  // Core.dll load failed.  Ensure VC++ Redists and DX are installed
+        FreeLibrary ( hCoreModule );
+        return 1;
+    }
 
     //////////////////////////////////////////////////////////
     // Handle service install request from the installer
@@ -323,62 +376,12 @@ int LaunchGame ( LPSTR lpCmdLine )
 //
 //
 //////////////////////////////////////////////////////////
-#include "..\sdk\core\CLocalizationInterface.h"
 int DoLaunchGame ( LPSTR lpCmdLine )
 {
     assert ( !CreateSingleInstanceMutex () );
 
     CycleEventLog();
     const SString strMTASAPath = GetMTASAPath ();
-
-    //////////////////////////////////////////////////////////
-    //
-    // Check for and load core.dll
-    //
-    SString strCoreDLL = strMTASAPath + "\\mta\\" + MTA_DLL_NAME;
-
-    // Check if the core (mta_blue.dll or mta_blue_d.dll exists)
-    if ( !FileExists ( strCoreDLL ) )
-    {
-        DisplayErrorMessageBox ( ("Load failed.  Please ensure that "
-                            "the file core.dll is in the modules "
-                            "directory within the MTA root directory."), _E("CL23"), "core-missing" ); // Core.dll missing
-
-        return 1;
-    }
-
-    SetDllDirectory( SString ( strMTASAPath + "\\mta" ) );
-
-    // Check if the core can be loaded - failure may mean msvcr90.dll or d3dx9_40.dll etc is not installed
-    HMODULE hCoreModule = LoadLibrary( strCoreDLL );
-    if ( hCoreModule == NULL )
-    {
-        DisplayErrorMessageBox ( ("Loading core failed.  Please ensure that \n"
-                            "Microsoft Visual C++ 2008 SP1 Redistributable Package (x86) \n"
-                            "and the latest DirectX is correctly installed."), _E("CL24"), "vc-redist-missing" );  // Core.dll load failed.  Ensure VC++ Redists and DX are installed
-        return 1;
-    }
-
-    // Grab our locale from the registry if possible, if not Windows
-    SString strLocale = GetApplicationSetting ( "locale" );
-    if ( strLocale.empty() )
-    {
-        setlocale(LC_ALL, "");
-        char* szLocale = setlocale(LC_ALL, NULL);
-        strLocale = szLocale;
-    }
-
-    typedef CLocalizationInterface* (__cdecl *FUNC_CREATELOCALIZATIONFROMENVIRONMENT)(SString strLocale);
-    FUNC_CREATELOCALIZATIONFROMENVIRONMENT pFunc = (FUNC_CREATELOCALIZATIONFROMENVIRONMENT)GetProcAddress ( hCoreModule, "L10n_CreateLocalization" );
-    CLocalizationInterface* g_pLocalization = pFunc(strLocale);
-    if ( g_pLocalization == NULL )
-    {
-        DisplayErrorMessageBox ( ("Loading core failed.  Please ensure that \n"
-                            "Microsoft Visual C++ 2008 SP1 Redistributable Package (x86) \n"
-                            "and the latest DirectX is correctly installed."), _E("CL26"), "vc-redist-missing" );  // Core.dll load failed.  Ensure VC++ Redists and DX are installed
-        FreeLibrary ( hCoreModule );
-        return 1;
-    }
 
     //////////////////////////////////////////////////////////
     //
