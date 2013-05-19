@@ -25,14 +25,16 @@ public:
                     CConnectManager     ( void );
                     ~CConnectManager    ( void );
 
-    bool            Connect             ( const char* szHost, unsigned short usPort, const char* szNick, const char* szPassword, bool bNotifyServerBrowser = false );
-    bool            Reconnect           ( const char* szHost, unsigned short usPort, const char* szPassword, bool bSave = true );
+    bool            Connect             ( const char* szHost, unsigned short usPort, const char* szNick, const char* szPassword, bool bNotifyServerBrowser = false, bool bForceInternalHTTPServer = false );
+    bool            Reconnect           ( const char* szHost, unsigned short usPort, const char* szPassword, bool bSave = true, bool bForceInternalHTTPServer = false );
 
     bool            Abort               ( void );
 
     void            DoPulse             ( void );
 
     void            OnServerExists      ( void );
+
+    bool            ShouldUseInternalHTTPServer ( void )    { return m_bForceInternalHTTPServer; }
 
     static bool     StaticProcessPacket ( unsigned char ucPacketID, class NetBitStreamInterface& bitStream );
 
@@ -51,6 +53,7 @@ private:
     bool            m_bIsConnecting;
     bool            m_bReconnect;
     bool            m_bSave;
+    bool            m_bForceInternalHTTPServer;
     time_t          m_tConnectStarted;
 
     GUI_CALLBACK*   m_pOnCancelClick;

@@ -417,6 +417,8 @@ public:
     void                                ProjectileInitiateHandler       ( CClientProjectile * pProjectile );
     void                                IdleHandler                     ( void );
     void                                OutputServerInfo                ( void );
+    bool                                IsUsingExternalHTTPServer       ( void )                        { return m_ucHTTPDownloadType == HTTP_DOWNLOAD_ENABLED_URL; }
+    void                                TellServerSomethingImportant    ( uint uiId, const SString& strMessage, bool bOnlyOnceForThisId );
 
 private:
 
@@ -752,6 +754,7 @@ private:
     SVehExtrapolateSettings             m_VehExtrapolateSettings;
     uint                                m_uiAltPulseOrderCounter;
     SString                             m_strACInfo;
+    std::set < uint >                   m_SentMessageIds;
 };
 
 extern CClientGame* g_pClientGame;
