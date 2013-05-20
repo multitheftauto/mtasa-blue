@@ -47,6 +47,8 @@ void SetSize ( const CVector2D& vecSize, bool bRelative = false )           { CG
 CVector2D GetSize ( bool bRelative = false )                                { return CGUIElement_Impl::GetSize ( bRelative ); };
 void GetSize ( CVector2D& vecSize, bool bRelative = false )                 { CGUIElement_Impl::GetSize ( vecSize, bRelative ); };
 
+void AutoSize ( const char* Text = NULL, float fPaddingX = 0.0f, float fPaddingY = 2.0f )        { CGUIElement_Impl::AutoSize ( Text, fPaddingX, fPaddingY ); };
+
 void SetMinimumSize ( const CVector2D& vecSize )            { CGUIElement_Impl::SetMinimumSize ( vecSize ); };
 CVector2D GetMinimumSize ( void )                           { return CGUIElement_Impl::GetMinimumSize (); };
 void GetMinimumSize ( CVector2D& vecSize )                  { CGUIElement_Impl::GetMinimumSize ( vecSize ); };

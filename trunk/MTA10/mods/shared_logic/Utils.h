@@ -17,7 +17,7 @@
 
 #ifndef __UTILS_H
 #define __UTILS_H
-
+extern CLocalizationInterface* g_pLocalization;
 
 // Vector math
 inline float DistanceBetweenPoints2D ( const CVector& vecPosition1, const CVector& vecPosition2 )

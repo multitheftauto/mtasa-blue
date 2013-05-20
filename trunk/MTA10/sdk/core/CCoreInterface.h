@@ -31,6 +31,7 @@ class CMultiplayer;
 class CNet;
 class CGame;
 class CModelCacheManager;
+class CLocalizationInterface;
 
 namespace ChatFonts
 {
@@ -78,6 +79,7 @@ public:
     virtual CXMLNode*                   GetConfig                       ( void ) = 0;
     virtual CCVarsInterface*            GetCVars                        ( void ) = 0;
     virtual CCommunityInterface*        GetCommunity                    ( void ) = 0;
+    virtual CLocalizationInterface*     GetLocalization                 ( void ) = 0;
     
 
     // Temporary functions for r1

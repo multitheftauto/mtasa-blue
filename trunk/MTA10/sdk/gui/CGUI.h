@@ -43,6 +43,7 @@ class CGUI;
 #define CGUI_ICON_MESSAGEBOX_WARNING    "cgui\\images\\warning.png"
 #define CGUI_ICON_MESSAGEBOX_ERROR      "cgui\\images\\error.png"
 #define CGUI_ICON_SERVER_PASSWORD       "cgui\\images\\locked.png"
+#define CGUI_GetMaxTextExtent(...) GetMaxTextExtent(__VA_ARGS__, SString())
 
 // Message box types
 enum CMessageBoxFlag
@@ -163,6 +164,9 @@ public:
     virtual CGUIFont*           GetClearFont            ( void ) = 0;
     virtual CGUIFont*           GetSansFont             ( void ) = 0;
     virtual bool                IsFontPresent           ( const char* szFont ) = 0;
+
+    virtual float               GetTextExtent           ( const char* szText, const char* szFont = "default-normal" ) = 0;
+    virtual float               GetMaxTextExtent        ( SString strFont, SString arg, ... ) = 0;
 
     virtual void                PushGuiWorkingDirectory ( const SString& strDir ) = 0;
     virtual void                PopGuiWorkingDirectory  ( const SString& strDirCheck = "" ) = 0;

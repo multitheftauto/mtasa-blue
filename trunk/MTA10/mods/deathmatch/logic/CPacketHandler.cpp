@@ -532,26 +532,115 @@ void CPacketHandler::Packet_ServerDisconnected ( NetBitStreamInterface& bitStrea
 {
     // unsigned char [x]    - disconnect reason
 
-    // Any reason bytes?
-    int iSize = bitStream.GetNumberOfBytesUsed ();
-    if ( iSize > 0 )
-    {
-        // Adjust the size to our buffer size
-        char szReason [NET_DISCONNECT_REASON_SIZE];
-        memset ( szReason, 0, NET_DISCONNECT_REASON_SIZE );
+    char ucType;
 
-        if ( iSize > sizeof ( szReason ) - 1 )
+    // Adjust the size to our buffer size
+    SString strDuration;
+    SString strReason;
+    SString strErrorCode;
+    bool bShowMessageBox = true;
+
+    bitStream.ReadBits ( &ucType, 5 );
+
+    switch ( ucType )
+    {
+        case ePlayerDisconnectType::INVALID_NICKNAME:
+            strReason = _("Disconnected: Invalid nickname"); strErrorCode = _E("CD30");
+            break;
+        case ePlayerDisconnectType::NO_REASON:
+            strReason = _("Disconnect from server"); strErrorCode = _E("CD31");
+            break;
+        case ePlayerDisconnectType::BANNED_SERIAL:
+            strReason = _("Disconnected: Serial is banned.\nReason: %s"); strErrorCode = _E("CD32");
+            bitStream.ReadString ( strDuration );
+            break;
+        case ePlayerDisconnectType::BANNED_IP:
+            strReason = _("Disconnected: You are banned.\nReason: %s"); strErrorCode = _E("CD33");
+            bitStream.ReadString ( strDuration );
+        case ePlayerDisconnectType::BANNED_ACCOUNT:
+            strReason = _("Disconnected: Account is banned.\nReason: %s"); strErrorCode = _E("CD34");
+            break;
+        case ePlayerDisconnectType::VERSION_MISMATCH:
+            strReason = _("Disconnected: Version mismatch"); strErrorCode = _E("CD35");
+            break;
+        case ePlayerDisconnectType::JOIN_FLOOD:
+            strReason = _("Disconnected: Join flood. Please wait a minute, then reconnect."); strErrorCode = _E("CD36");
+            break;
+        case ePlayerDisconnectType::DIFFERENT_BRANCH:
+            strReason = _("Disconnected: Server from different branch.\nInformation: %s"); strErrorCode = _E("CD37");
+            break;
+        case ePlayerDisconnectType::BAD_VERSION:
+            strReason = _("Disconnected: Bad version.\nInformation: %s"); strErrorCode = _E("CD38");
+            break;
+        case ePlayerDisconnectType::SERVER_NEWER:
+            strReason = _("Disconnected: Server is running a newer build.\nInformation: %s"); strErrorCode = _E("CD39");
+            break;
+        case ePlayerDisconnectType::SERVER_OLDER:
+            strReason = _("Disconnected: Server is running an older build.\nInformation: %s"); strErrorCode = _E("CD40");
+            break;
+        case ePlayerDisconnectType::NICK_CLASH:
+            strReason = _("Disconnected: Nick already in use"); strErrorCode = _E("CD41");
+            break;
+        case ePlayerDisconnectType::ELEMENT_FAILURE:
+            strReason = _("Disconnected: Player Element Could not be created."); strErrorCode = _E("CD42");
+            break;
+        case ePlayerDisconnectType::GENERAL_REFUSED:
+            strReason = _("Disconnected: Server refused the connection: %s"); strErrorCode = _E("CD43");
+            break;
+        case ePlayerDisconnectType::SERIAL_VERIFICATION:
+            strReason = _("Disconnected: Serial verification failed"); strErrorCode = _E("CD44");
+            break;
+        case ePlayerDisconnectType::CONNECTION_DESYNC:
+            strReason = _("Disconnected: Connection desync %s"); strErrorCode = _E("CD45");
+            break;
+        case ePlayerDisconnectType::INVALID_PASSWORD:
+            g_pCore->ShowServerInfo ( 2 );
+            bShowMessageBox = false;
+            break;
+        case ePlayerDisconnectType::KICK:
+            strReason = _("Disconnected: You were kicked by %s"); strErrorCode = _E("CD46");
+            break;
+        case ePlayerDisconnectType::BAN:
+            strReason = _("Disconnected: You were banned by %s"); strErrorCode = _E("CD47");
+            bitStream.ReadString ( strDuration );
+            break;
+        case ePlayerDisconnectType::CUSTOM:
+            strReason = "%s"; strErrorCode = _E("CD48"); // Custom disconnect reason
+            break;
+        default: break;
+    }
+
+    if ( bShowMessageBox )
+    {
+        if ( bitStream.GetNumberOfUnreadBits() > 0 ) // We have our string left to read
         {
-            iSize = sizeof ( szReason ) - 1;
+            SString strMessage;
+            bitStream.ReadString ( strMessage );
+            strReason = SString(strReason,strMessage.c_str());
         }
 
-        bitStream.Read ( szReason, iSize );
+        if ( !strDuration.empty() )
+        {
+            time_t Duration;
+            std::istringstream ( strDuration ) >> Duration;
+            strReason += "\n" ;
+            strReason += _("Time Remaining: ");
+            int iDays = static_cast < int > ( Duration / 86400 );
+            Duration = Duration % 86400;
+            int iHours = static_cast < int > ( Duration / 3600 );
+            Duration = Duration % 3600;
+            int iMins = static_cast < int > ( Duration / 60 );
+
+            if ( iDays )
+                strReason += SString(_tn( "%d day", "%d days", iDays ),iDays) += iHours ? " " : "";
+            if ( iHours )
+                strReason += SString(_tn( "%d hour", "%d hours", iHours ),iHours)  += iMins ? " " : "";
+            if ( iMins )
+                strReason += SString(_tn( "%d minute", "%d minutes", iMins ),iMins);
+        }
 
         // Display the error
-        if ( strcmp(szReason,"Disconnected: Incorrect password") == 0 ) // Slight hack - if invalid password reason show Info box instead.
-            g_pCore->ShowServerInfo ( 2 );
-        else
-            g_pCore->ShowMessageBox ( "Disconnected", szReason, MB_BUTTON_OK | MB_ICON_INFO );
+         g_pCore->ShowMessageBox ( _("Disconnected")+strErrorCode, strReason, MB_BUTTON_OK | MB_ICON_INFO );
     }
 
     // Terminate the mod (disconnect first in case there were more packets after this one)

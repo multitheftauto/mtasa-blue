@@ -11045,18 +11045,18 @@ bool CStaticFunctionDefinitions::KickPlayer ( CPlayer* pPlayer, SString strRespo
             strReason = strReason.substr ( 0, MAX_KICK_REASON_LENGTH - 3 ) + "...";
 
         // Now create the messages which will be displayed to both the kicked player and the console
-        strMessage.Format ( "You were kicked by %s (%s)", strResponsible.c_str( ), strReason.c_str( ) );
+        strMessage.Format ( "%s (%s)", strResponsible.c_str( ), strReason.c_str( ) );
         strInfoMessage.Format ( "%s was kicked from the game by %s (%s)", pPlayer->GetNick( ), strResponsible.c_str( ), strReason.c_str( ) );
     }
     else
     {
         // Now create the messages which will be displayed to both the kicked player and the console
-        strMessage.Format ( "You were kicked by %s", strResponsible.c_str( ) );
+        strMessage.Format ( "%s", strResponsible.c_str( ) );
         strInfoMessage.Format ( "%s was kicked from the game by %s", pPlayer->GetNick( ), strResponsible.c_str( ) );
     }
 
     // Tell the player that was kicked why. QuitPlayer will delete the player.
-    pPlayer->Send ( CPlayerDisconnectedPacket ( strMessage.c_str ( ) ) );
+    pPlayer->Send ( CPlayerDisconnectedPacket ( CPlayerDisconnectedPacket::ePlayerDisconnectType::KICK, strMessage.c_str ( ) ) );
     g_pGame->QuitPlayer ( *pPlayer, CClient::QUIT_KICK, false, strReason.c_str( ), strResponsible.c_str( ) );
 
     // Tell everyone else that he was kicked from the game including console
@@ -11091,13 +11091,13 @@ CBan* CStaticFunctionDefinitions::BanPlayer ( CPlayer* pPlayer, bool bIP, bool b
             strReason = strReason.substr ( 0, MAX_BAN_REASON_LENGTH - 3 ) + "...";
 
         // Format the messages for both the banned player and the console
-        strMessage.Format     ( "You were banned by %s (%s)", strResponsible.c_str(), strReason.c_str() );
+        strMessage.Format     ( "%s (%s)", strResponsible.c_str(), strReason.c_str() );
         strInfoMessage.Format ( "%s was banned from the game by %s (%s)", pPlayer->GetNick(), strResponsible.c_str(), strReason.c_str() );
     }
     else
     {
         // Format the messages for both the banned player and the console
-        strMessage.Format     ( "You were banned by %s", strResponsible.c_str() );
+        strMessage.Format     ( "%s", strResponsible.c_str() );
         strInfoMessage.Format ( "%s was banned from the game by %s", pPlayer->GetNick(), strResponsible.c_str() );
     }
 
@@ -11141,7 +11141,9 @@ CBan* CStaticFunctionDefinitions::BanPlayer ( CPlayer* pPlayer, bool bIP, bool b
         pPlayer->CallEvent ( "onPlayerBan", Arguments );
 
         // Tell the player that was banned why. QuitPlayer will delete the player.
-        pPlayer->Send ( CPlayerDisconnectedPacket ( strMessage.c_str() ) );
+        time_t Duration = pBan->GetTimeOfUnban() - time ( NULL );
+        CPlayerDisconnectedPacket& Packet = CPlayerDisconnectedPacket ( CPlayerDisconnectedPacket::ePlayerDisconnectType::BAN, Duration, strMessage.c_str ( ) );
+        pPlayer->Send ( Packet );
         g_pGame->QuitPlayer ( *pPlayer, CClient::QUIT_BAN, false, strReason.c_str(), strResponsible.c_str() );
 
         // Tell everyone else that he was banned from the game including console
@@ -11210,7 +11212,7 @@ CBan* CStaticFunctionDefinitions::AddBan ( SString strIP, SString strUsername, S
 
 
         // Format the responsible element and the reason/duration into the message string
-        SString strMessage ( "You were banned by %s%s", strResponsible.c_str(), strDetails.c_str () );
+        SString strMessage ( "%s%s", strResponsible.c_str(), strDetails.c_str () );
 
         // Limit overall length of message
         if ( strMessage.length () > 255 )
@@ -11293,7 +11295,9 @@ CBan* CStaticFunctionDefinitions::AddBan ( SString strIP, SString strUsername, S
                 (*iter)->CallEvent ( "onPlayerBan", Arguments );
 
                 // Tell the player that was banned why. QuitPlayer will delete the player.
-                (*iter)->Send ( CPlayerDisconnectedPacket ( strMessage.c_str() ) );
+                time_t Duration = pBan->GetTimeOfUnban() - time ( NULL );
+                CPlayerDisconnectedPacket& Packet = CPlayerDisconnectedPacket ( CPlayerDisconnectedPacket::ePlayerDisconnectType::BAN, Duration, strMessage.c_str ( ) );
+                (*iter)->Send ( Packet );
                 g_pGame->QuitPlayer ( **iter, CClient::QUIT_BAN, false, strReason.c_str (), strResponsible.c_str () );
             }
         }

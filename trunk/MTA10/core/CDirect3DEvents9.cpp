@@ -209,13 +209,13 @@ void CDirect3DEvents9::CheckForScreenShot ( void )
             }
             else
             {
-                g_pCore->GetConsole()->Printf ( "Screenshot got %d bytes, but expected %d", uiDataSize, uiReqDataSize );
+                g_pCore->GetConsole()->Printf ( _("Screenshot got %d bytes, but expected %d"), uiDataSize, uiReqDataSize );
                 strFileName = "";
             }
         }
         else
         {
-            g_pCore->GetConsole()->Print ( "Screenshot failed" );
+            g_pCore->GetConsole()->Print ( _("Screenshot failed") );
             strFileName = "";
         }
 

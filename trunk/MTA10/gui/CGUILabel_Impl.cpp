@@ -72,13 +72,6 @@ void CGUILabel_Impl::SetText ( const char *Text )
 }
 
 
-void CGUILabel_Impl::AutoSize ( const char* Text )
-{
-    const CEGUI::Font *pFont = m_pWindow->getFont();
-    m_pWindow->setSize ( CEGUI::Absolute, CEGUI::Size ( pFont->getTextExtent ( Text ), pFont->getFontHeight() + 2.0f ) );   // Add hack factor to height to allow for long characters such as 'g' or 'j'
-}
-
-
 void CGUILabel_Impl::SetVerticalAlign ( CGUIVerticalAlign eAlign )
 {
     reinterpret_cast < CEGUI::StaticText* > ( m_pWindow ) -> setVerticalFormatting ( static_cast < CEGUI::StaticText::VertFormatting > ( eAlign ) );

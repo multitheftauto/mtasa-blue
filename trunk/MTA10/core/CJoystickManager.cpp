@@ -1592,8 +1592,8 @@ static string ToString( eStick value )
     if ( value == eLeftStickY )   return "LeftStickY";
     if ( value == eRightStickX )  return "RightStickX";
     if ( value == eRightStickY )  return "RightStickY";
-    if ( value == eAccelerate )   return "Accelerate Axis";
-    if ( value == eBrake )        return "Brake Axis";
+    if ( value == eAccelerate )   return _("Accelerate Axis");
+    if ( value == eBrake )        return _("Brake Axis");
     return "unknown";
 }
 

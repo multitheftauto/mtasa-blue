@@ -45,7 +45,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=".;../../vendor;../sdk;../../Shared/sdk;../../vendor/sparsehash/current/src;../../vendor/sparsehash/current/src/windows;../../vendor/pthreads/include;&quot;../../vendor/jpeg/jpeg-8d&quot;;../../vendor/zlib"
+				AdditionalIncludeDirectories=".;../../vendor;../sdk;../../Shared/sdk;../../vendor/sparsehash/current/src;../../vendor/sparsehash/current/src/windows;../../vendor/pthreads/include;&quot;../../vendor/jpeg/jpeg-8d&quot;;../../vendor/zlib;../../vendor/tinygettext"
 				PreprocessorDefinitions="_WIN32_WINNT=0x502;WIN32;MTA_DEBUG;_CRT_SECURE_NO_WARNINGS;INITGUID;PNG_SETJMP_NOT_SUPPORTED"
 				StringPooling="true"
 				BasicRuntimeChecks="3"
@@ -153,7 +153,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories=".;../../vendor;../sdk;../../Shared/sdk;../../vendor/sparsehash/current/src;../../vendor/sparsehash/current/src/windows;../../vendor/pthreads/include;&quot;../../vendor/jpeg/jpeg-8d&quot;;../../vendor/zlib"
+				AdditionalIncludeDirectories=".;../../vendor;../sdk;../../Shared/sdk;../../vendor/sparsehash/current/src;../../vendor/sparsehash/current/src/windows;../../vendor/pthreads/include;&quot;../../vendor/jpeg/jpeg-8d&quot;;../../vendor/zlib;../../vendor/tinygettext"
 				PreprocessorDefinitions="_WIN32_WINNT=0x502;WIN32;_CRT_SECURE_NO_WARNINGS;INITGUID;PNG_SETJMP_NOT_SUPPORTED"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -258,7 +258,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories=".;../../vendor;../sdk;../../Shared/sdk;../../vendor/sparsehash/current/src;../../vendor/sparsehash/current/src/windows;../../vendor/pthreads/include;&quot;../../vendor/jpeg/jpeg-8d&quot;;../../vendor/zlib"
+				AdditionalIncludeDirectories=".;../../vendor;../sdk;../../Shared/sdk;../../vendor/sparsehash/current/src;../../vendor/sparsehash/current/src/windows;../../vendor/pthreads/include;&quot;../../vendor/jpeg/jpeg-8d&quot;;../../vendor/zlib;../../vendor/tinygettext"
 				PreprocessorDefinitions="_WIN32_WINNT=0x502;WIN32;_CRT_SECURE_NO_WARNINGS;INITGUID;PNG_SETJMP_NOT_SUPPORTED"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -481,11 +481,15 @@
 				>
 			</File>
 			<File
-				RelativePath="CLanguageLocale.cpp"
+				RelativePath=".\CLanguage.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\CLine3DBatcher.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CLocalization.cpp"
 				>
 			</File>
 			<File
@@ -780,6 +784,238 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="utils"
+				>
+				<Filter
+					Name="tinygettext"
+					>
+					<File
+						RelativePath="..\..\vendor\tinygettext\dictionary.cpp"
+						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Release|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Nightly|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+					</File>
+					<File
+						RelativePath="..\..\vendor\tinygettext\dictionary_manager.cpp"
+						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Release|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Nightly|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+					</File>
+					<File
+						RelativePath="..\..\vendor\tinygettext\language.cpp"
+						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Release|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Nightly|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+					</File>
+					<File
+						RelativePath="..\..\vendor\tinygettext\log.cpp"
+						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Release|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Nightly|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+					</File>
+					<File
+						RelativePath="..\..\vendor\tinygettext\plural_forms.cpp"
+						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Release|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Nightly|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+					</File>
+					<File
+						RelativePath="..\..\vendor\tinygettext\po_parser.cpp"
+						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Release|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Nightly|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+					</File>
+					<File
+						RelativePath="..\..\vendor\tinygettext\tinygettext.cpp"
+						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Release|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Nightly|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+					</File>
+					<File
+						RelativePath="..\..\vendor\tinygettext\unix_file_system.cpp"
+						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Release|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Nightly|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+					</File>
+				</Filter>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -926,11 +1162,15 @@
 				>
 			</File>
 			<File
-				RelativePath=".\CLanguageLocale.h"
+				RelativePath=".\CLanguage.h"
 				>
 			</File>
 			<File
 				RelativePath=".\CLine3DBatcher.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CLocalization.h"
 				>
 			</File>
 			<File
@@ -1205,6 +1445,10 @@
 					</File>
 					<File
 						RelativePath="..\sdk\core\CKeyBindsInterface.h"
+						>
+					</File>
+					<File
+						RelativePath="..\sdk\core\CLocalizationInterface.h"
 						>
 					</File>
 					<File
@@ -1928,6 +2172,54 @@
 					RelativePath="..\..\Shared\sdk\WString.hpp"
 					>
 				</File>
+			</Filter>
+			<Filter
+				Name="utils"
+				>
+				<Filter
+					Name="tinygettext"
+					>
+					<File
+						RelativePath="..\..\vendor\tinygettext\dictionary.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\vendor\tinygettext\dictionary_manager.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\vendor\tinygettext\file_system.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\vendor\tinygettext\language.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\vendor\tinygettext\log.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\vendor\tinygettext\log_stream.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\vendor\tinygettext\plural_forms.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\vendor\tinygettext\po_parser.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\vendor\tinygettext\tinygettext.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\vendor\tinygettext\unix_file_system.hpp"
+						>
+					</File>
+				</Filter>
 			</Filter>
 		</Filter>
 	</Files>
