@@ -15,6 +15,7 @@
 using std::list;
 
 extern CCoreInterface* g_pCore;
+extern CLocalizationInterface* g_pLocalization;
 extern CClientGame* g_pClientGame;
 
 // SResInfo - Item in list of potential resources - Used in GetResourceNameList()
@@ -35,7 +36,7 @@ CLocalServer::CLocalServer ( const char* szConfig )
 
     m_pGUI = g_pCore->GetGUI();
 
-    m_pWindow = reinterpret_cast < CGUIWindow* > ( m_pGUI->CreateWnd ( NULL, "HOST GAME" ) );
+    m_pWindow = reinterpret_cast < CGUIWindow* > ( m_pGUI->CreateWnd ( NULL, _("HOST GAME") ) );
     m_pWindow->SetMovable ( true );
 
     CVector2D resolution = m_pGUI->GetResolution();
@@ -49,46 +50,46 @@ CLocalServer::CLocalServer ( const char* szConfig )
     m_pTabs = reinterpret_cast < CGUITabPanel* > ( m_pGUI->CreateTabPanel ( m_pWindow ) );
     m_pTabs->SetPosition ( CVector2D ( 0.0f, 0.06f ), true );
     m_pTabs->SetSize ( CVector2D ( 1.0f, 0.85f ), true );
-    m_pTabGeneral = m_pTabs->CreateTab ( "General" );
+    m_pTabGeneral = m_pTabs->CreateTab ( _("General") );
     //m_pTabs->CreateTab ( "Gamemode" );
-    m_pTabResources = m_pTabs->CreateTab ( "Resources" );
+    m_pTabResources = m_pTabs->CreateTab ( _("Resources") );
 
-    m_pLabelName = reinterpret_cast < CGUILabel* > ( m_pGUI->CreateLabel ( m_pTabGeneral, "Server name:" ) );
+    m_pLabelName = reinterpret_cast < CGUILabel* > ( m_pGUI->CreateLabel ( m_pTabGeneral, _("Server name:") ) );
     m_pLabelName->SetPosition ( CVector2D ( 0.03f, 0.07f ), true );
-    m_pLabelName->AutoSize ( "Server name:" );
+    m_pLabelName->AutoSize ( _("Server name:") );
 
     m_pEditName = reinterpret_cast < CGUIEdit* > ( m_pGUI->CreateEdit ( m_pTabGeneral, "Default MTA Server" ) );
     m_pEditName->SetPosition ( CVector2D ( 0.4f, 0.06f ), true );
     m_pEditName->SetSize ( CVector2D ( 0.57f, 0.06f ), true );
     m_pEditName->SetMaxLength ( 64 );
 
-    m_pLabelPass = reinterpret_cast < CGUILabel* > ( m_pGUI->CreateLabel ( m_pTabGeneral, "Password:" ) );
+    m_pLabelPass = reinterpret_cast < CGUILabel* > ( m_pGUI->CreateLabel ( m_pTabGeneral, _("Password:") ) );
     m_pLabelPass->SetPosition ( CVector2D ( 0.03f, 0.14f ), true );
-    m_pLabelPass->AutoSize ( "Password:" );
+    m_pLabelPass->AutoSize ( _("Password:") );
 
     m_pEditPass = reinterpret_cast < CGUIEdit* > ( m_pGUI->CreateEdit ( m_pTabGeneral ) );
     m_pEditPass->SetPosition ( CVector2D ( 0.4f, 0.13f ), true );
     m_pEditPass->SetSize ( CVector2D ( 0.57f, 0.06f ), true );
     m_pEditPass->SetMaxLength ( 8 );
 
-    m_pLabelPlayers = reinterpret_cast < CGUILabel* > ( m_pGUI->CreateLabel ( m_pTabGeneral, "Max players:" ) );
+    m_pLabelPlayers = reinterpret_cast < CGUILabel* > ( m_pGUI->CreateLabel ( m_pTabGeneral, _("Max players:") ) );
     m_pLabelPlayers->SetPosition ( CVector2D ( 0.03f, 0.21f ), true );
-    m_pLabelPlayers->AutoSize ( "Max players:" );
+    m_pLabelPlayers->AutoSize ( _("Max players:") );
 
     m_pEditPlayers = reinterpret_cast < CGUIEdit* > ( m_pGUI->CreateEdit ( m_pTabGeneral ) );
     m_pEditPlayers->SetPosition ( CVector2D ( 0.4f, 0.20f ), true );
     m_pEditPlayers->SetSize ( CVector2D ( 0.17f, 0.06f ), true );
     m_pEditPlayers->SetMaxLength ( 3 );
 
-    m_pLabelBroadcast = reinterpret_cast < CGUILabel* > ( m_pGUI->CreateLabel ( m_pTabGeneral, "Broadcast:" ) );
+    m_pLabelBroadcast = reinterpret_cast < CGUILabel* > ( m_pGUI->CreateLabel ( m_pTabGeneral, _("Broadcast:") ) );
     m_pLabelBroadcast->SetPosition ( CVector2D ( 0.03f, 0.35f ), true );
-    m_pLabelBroadcast->AutoSize ( "Broadcast:" );
+    m_pLabelBroadcast->AutoSize ( _("Broadcast:") );
 
-    m_pBroadcastLan = reinterpret_cast < CGUICheckBox* > ( m_pGUI->CreateCheckBox ( m_pTabGeneral, "LAN", true ) );
+    m_pBroadcastLan = reinterpret_cast < CGUICheckBox* > ( m_pGUI->CreateCheckBox ( m_pTabGeneral, _("LAN"), true ) );
     m_pBroadcastLan->SetPosition ( CVector2D ( 0.4f, 0.33f ), true );
     m_pBroadcastLan->SetSize ( CVector2D ( 0.45f, 0.08f ), true );
 
-    m_pBroadcastInternet = reinterpret_cast < CGUICheckBox* > ( m_pGUI->CreateCheckBox ( m_pTabGeneral, "Internet", true ) );
+    m_pBroadcastInternet = reinterpret_cast < CGUICheckBox* > ( m_pGUI->CreateCheckBox ( m_pTabGeneral, _("Internet"), true ) );
     m_pBroadcastInternet->SetPosition ( CVector2D ( 0.4f, 0.38f ), true );
     m_pBroadcastInternet->SetSize ( CVector2D ( 0.45f, 0.08f ), true );
 
@@ -97,7 +98,7 @@ CLocalServer::CLocalServer ( const char* szConfig )
     m_pResourcesCur->SetSize ( CVector2D ( 0.45f, 0.5f ), true );
     m_pResourcesCur->SetSorting ( false );
     m_pResourcesCur->SetSelectionMode ( SelectionModes::CellSingle );
-    m_hResourcesCur = m_pResourcesCur->AddColumn ( "Selected", 0.80f );
+    m_hResourcesCur = m_pResourcesCur->AddColumn ( _("Selected"), 0.80f );
 
     m_pResourceDel = reinterpret_cast < CGUIButton* > ( m_pGUI->CreateButton ( m_pTabResources, ">" ) );
     m_pResourceDel->SetPosition ( CVector2D ( 0.03f, 0.65f ), true );
@@ -114,14 +115,14 @@ CLocalServer::CLocalServer ( const char* szConfig )
     m_pResourcesAll->SetSize ( CVector2D ( 0.45f, 0.9f ), true );
     m_pResourcesAll->SetSorting ( false );
     m_pResourcesAll->SetSelectionMode ( SelectionModes::CellSingle );
-    m_hResourcesAll = m_pResourcesAll->AddColumn ( "All", 0.80f );
+    m_hResourcesAll = m_pResourcesAll->AddColumn ( _("All"), 0.80f );
 
-    m_pButtonStart = reinterpret_cast < CGUIButton* > ( m_pGUI->CreateButton ( m_pWindow, "Start" ) );
+    m_pButtonStart = reinterpret_cast < CGUIButton* > ( m_pGUI->CreateButton ( m_pWindow, _("Start") ) );
     m_pButtonStart->SetPosition ( CVector2D ( 0.33f, 0.93f ), true );
     m_pButtonStart->SetSize ( CVector2D ( 0.3f, 0.05f ), true );
     m_pButtonStart->SetZOrderingEnabled ( false );
 
-    m_pButtonCancel = reinterpret_cast < CGUIButton* > ( m_pGUI->CreateButton ( m_pWindow, "Cancel" ) );
+    m_pButtonCancel = reinterpret_cast < CGUIButton* > ( m_pGUI->CreateButton ( m_pWindow, _("Cancel") ) );
     m_pButtonCancel->SetPosition ( CVector2D ( 0.65f, 0.93f ), true );
     m_pButtonCancel->SetSize ( CVector2D ( 0.3f, 0.05f ), true );
     m_pButtonCancel->SetZOrderingEnabled ( false );

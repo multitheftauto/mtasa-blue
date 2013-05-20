@@ -267,18 +267,28 @@ bool IsNumericString ( const char* szString, size_t sizeString )
 
 void DisconnectPlayer ( CGame* pGame, CPlayer& Player, const char* szMessage )
 {
+    DisconnectPlayer ( pGame, Player, CPlayerDisconnectedPacket::ePlayerDisconnectType::CUSTOM, szMessage );
+}
+
+void DisconnectPlayer ( CGame* pGame, CPlayer& Player, CPlayerDisconnectedPacket::ePlayerDisconnectType eDisconnectType, const char* szMessage )
+{
     // Send it to the disconnected player
-    Player.Send ( CPlayerDisconnectedPacket ( szMessage ) );
+    Player.Send ( CPlayerDisconnectedPacket ( eDisconnectType, szMessage ) );
 
     // Quit him
     pGame->QuitPlayer ( Player );
 }
 
+void DisconnectPlayer ( CGame* pGame, CPlayer& Player, CPlayerDisconnectedPacket::ePlayerDisconnectType eDisconnectType, time_t BanDuration, const char* szMessage )
+{
+    Player.Send ( CPlayerDisconnectedPacket ( eDisconnectType, BanDuration, szMessage ) );
+    pGame->QuitPlayer ( Player );
+}
 
 void DisconnectConnectionDesync ( CGame* pGame, CPlayer& Player, unsigned int uiCode )
 {
     // Send message to the disconnected player
-    Player.Send ( CPlayerDisconnectedPacket ( SString ( "Disconnected: Connection desync (%u)", uiCode ) ) );
+    Player.Send ( CPlayerDisconnectedPacket ( CPlayerDisconnectedPacket::ePlayerDisconnectType::CONNECTION_DESYNC, SString ( "(%u)", uiCode ) ) );
 
     // Quit him
     pGame->QuitPlayer ( Player, CClient::QUIT_CONNECTION_DESYNC );

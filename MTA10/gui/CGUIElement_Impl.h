@@ -51,6 +51,8 @@ public:
     CVector2D           GetSize                     ( bool bRelative = false );
     void                GetSize                     ( CVector2D& vecSize, bool bRelative = false );
 
+    void                AutoSize                    ( const char* Text = NULL, float fPaddingX = 0.0f, float fPaddingY = 2.0f );
+
     bool                SetFont                     ( const char *szFontName );
     std::string         GetFont                     ( void );
 

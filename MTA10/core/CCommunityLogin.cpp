@@ -109,7 +109,7 @@ bool CCommunityLogin::OnButtonLoginClick ( CGUIElement* pElement )
     if ( m_pEditUsername->GetText().empty() ||
         m_pEditPassword->GetText().empty() )
     {
-        g_pCore->ShowMessageBox ( "Login Error", "Invalid username/password", MB_BUTTON_OK | MB_ICON_ERROR );
+        g_pCore->ShowMessageBox ( _("Login Error")+_E("CC02"), _("Invalid username/password"), MB_BUTTON_OK | MB_ICON_ERROR );
         return true;
     }
     SetFrozen ( true );
@@ -147,7 +147,7 @@ void CCommunityLogin::OnLoginCallback ( bool bResult, char* szError, void *obj )
     if ( !bResult )
     {
         pLogin->SetFrozen ( false );
-        g_pCore->ShowMessageBox ( "Login Error", szError, MB_BUTTON_OK | MB_ICON_ERROR );
+        g_pCore->ShowMessageBox ( _("Login Error")+_E("CC03"), szError, MB_BUTTON_OK | MB_ICON_ERROR );
     }
     else
     {

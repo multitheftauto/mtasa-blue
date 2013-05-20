@@ -39,6 +39,19 @@ std::map < uint, uint > ms_ReportAmountMap;
     #include <../../MTA10/version.h>
 #endif
 
+//
+// Output a UTF8 encoded messagebox
+// Used in the Win32 Client only
+//
+#ifdef _WINDOWS_ //Only for modules that use windows.h
+    int SharedUtil::MessageBoxUTF8 ( HWND hWnd, SString lpText, SString lpCaption, UINT uType )
+    {
+        WString strText = MbUTF8ToUTF16 ( lpText );
+        WString strCaption = MbUTF8ToUTF16 ( lpCaption );
+        return MessageBoxW ( hWnd, strText.c_str(), strCaption.c_str(), uType );
+    }
+#endif
+
 
 //
 // Get startup directory as saved in the registry by the launcher
@@ -52,7 +65,7 @@ SString SharedUtil::GetMTASABaseDir ( void )
         strInstallRoot = GetRegistryValue ( "", "Last Run Location" );
         if ( strInstallRoot.empty () )
         {
-            MessageBox ( 0, "Multi Theft Auto has not been installed properly, please reinstall.", "Error", MB_OK | MB_TOPMOST );
+            MessageBoxUTF8 ( 0, _("Multi Theft Auto has not been installed properly, please reinstall."), _("Error")+_E("U01"), MB_OK | MB_TOPMOST );
             TerminateProcess ( GetCurrentProcess (), 9 );
         }
     }
@@ -489,19 +502,19 @@ bool SharedUtil::ProcessPendingBrowseToSolution ( void )
     {
         if ( !strMessageBoxMessage.empty() )
             strMessageBoxMessage += "\n\n\n";
-        strMessageBoxMessage += "Do you want to see some on-line help about this problem ?";
-        if ( IDYES != MessageBox( NULL, strMessageBoxMessage, "MTA: San Andreas", MB_YESNO | MB_ICONQUESTION | MB_TOPMOST ) )
+        strMessageBoxMessage += _("Do you want to see some on-line help about this problem ?");
+        if ( IDYES != MessageBoxUTF8( NULL, strMessageBoxMessage, "MTA: San Andreas", MB_YESNO | MB_ICONQUESTION | MB_TOPMOST ) )
             return false;
     }
     else
     {
         if ( !strMessageBoxMessage.empty() )
-            MessageBox ( NULL, strMessageBoxMessage, "MTA: San Andreas", MB_OK | MB_ICONEXCLAMATION | MB_TOPMOST );
+            MessageBoxUTF8 ( NULL, strMessageBoxMessage, "MTA: San Andreas", MB_OK | MB_ICONEXCLAMATION | MB_TOPMOST );
         if ( iFlags & SHOW_MESSAGE_ONLY )
             return true;
     }
 
-    MessageBox ( NULL, "Your browser will now display a web page with some help infomation.\n\n(If the page fails to load, paste (CTRL-V) the URL into your web browser)"
+    MessageBoxUTF8 ( NULL, _("Your browser will now display a web page with some help infomation.\n\n(If the page fails to load, paste (CTRL-V) the URL into your web browser)")
                         , "MTA: San Andreas", MB_OK | MB_ICONINFORMATION | MB_TOPMOST );
 
     SString strQueryURL = GetApplicationSetting ( "trouble-url" );

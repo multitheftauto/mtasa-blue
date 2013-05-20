@@ -37,7 +37,7 @@ void CCommandFuncs::Help ( const char* szParameters )
     else
         CCore::GetSingleton().GetMultiplayer()->AllowWindowsCursorShowing(false);
 
-    pConsole->Printf ( "***[ COMMAND HELP ]***\n" );
+    pConsole->Print ( _("***[ COMMAND HELP ]***\n") );
 
     // Loop through all the available commands
     list < COMMANDENTRY* > ::iterator iter = CCommands::GetSingletonPtr ()->IterBegin ();
@@ -78,9 +78,11 @@ void CCommandFuncs::Ver ( const char* szParameters )
     unsigned short usNetRel = CCore::GetSingleton ().GetNetwork ()->GetNetRel ();
     SString strVersion = BLUE_VERSION_STRING;
     if ( usNetRev > 0 || usNetRel > 0 )
-        strVersion = strVersion.Replace ( "\n", SString ( ".%d\n", usNetRev ) );
+        strVersion += SString ( ".%d", usNetRev );
     if ( usNetRel > 0 )
-        strVersion = strVersion.Replace ( "\n", SString ( ".%03d\n", usNetRel ) );
+        strVersion += SString ( ".%03d", usNetRel );
+    strVersion += "\n";
+    strVersion += _(BLUE_COPYRIGHT_STRING);
     CLocalGUI::GetSingleton ( ).EchoConsole ( strVersion );
 }
 
@@ -189,7 +191,7 @@ void CCommandFuncs::Time ( const char* szParameters )
     time ( &rawtime );
     timeinfo = localtime ( &rawtime );
     
-    SString strTimeAndDate ( "* The time is %d:%02d:%02d", timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec );
+    SString strTimeAndDate ( _("* The time is %d:%02d:%02d"), timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec );
     CCore::GetSingleton ().ChatEchoColor ( strTimeAndDate, 255, 100, 100 );
 }
 
@@ -279,7 +281,7 @@ void CCommandFuncs::Connect ( const char* szParameters )
         // Got all required arguments?
         if ( !szHost || !szPort || strNick.empty () )
         {
-            CCore::GetSingleton ().GetConsole ()->Print ( "connect: Syntax is 'connect <host> <port> [<nick> <pass>]'" );
+            CCore::GetSingleton ().GetConsole ()->Print ( _("connect: Syntax is 'connect <host> <port> [<nick> <pass>]'") );
             return;
         }
 
@@ -287,7 +289,7 @@ void CCommandFuncs::Connect ( const char* szParameters )
         int iPort = atoi ( szPort );
         if ( iPort <= 0 || iPort > 0xFFFF )
         {
-            CCore::GetSingleton ().GetConsole ()->Print ( "connect: Bad port number" );
+            CCore::GetSingleton ().GetConsole ()->Print ( _("connect: Bad port number") );
             return;
         }
 
@@ -303,16 +305,16 @@ void CCommandFuncs::Connect ( const char* szParameters )
         // Start the connect
         if ( CCore::GetSingleton ().GetConnectManager ()->Connect ( szHost, usPort, strNick.c_str (), szPass ) )
         {
-            CCore::GetSingleton ().GetConsole ()->Printf ( "connect: Connecting to %s:%u...", szHost, usPort );
+            CCore::GetSingleton ().GetConsole ()->Printf ( _("connect: Connecting to %s:%u..."), szHost, usPort );
         }
         else
         {
-            CCore::GetSingleton ().GetConsole ()->Printf ( "connect: could not connect to %s:%u!", szHost, usPort );
+            CCore::GetSingleton ().GetConsole ()->Printf ( _("connect: could not connect to %s:%u!"), szHost, usPort );
         }
     }
     else
     {
-        CCore::GetSingleton ().GetConsole ()->Print ( "connect: Failed to unload current mod" );
+        CCore::GetSingleton ().GetConsole ()->Print ( _("connect: Failed to unload current mod") );
     }
 }
 
@@ -338,7 +340,7 @@ void CCommandFuncs::Reconnect ( const char* szParameters )
         // Verify and convert the port number
         if ( uiPort <= 0 || uiPort > 0xFFFF )
         {
-            CCore::GetSingleton ().GetConsole ()->Print ( "connect: Bad port number" );
+            CCore::GetSingleton ().GetConsole ()->Print ( _("connect: Bad port number") );
             return;
         }
 
@@ -353,11 +355,11 @@ void CCommandFuncs::Reconnect ( const char* szParameters )
         // Start the connect
         if ( CCore::GetSingleton ().GetConnectManager ()->Reconnect ( strHost.c_str(), usPort, strPassword.c_str(), false ) )
         {
-            CCore::GetSingleton ().GetConsole ()->Printf ( "connect: Connecting to %s:%u...", strHost.c_str(), usPort );
+            CCore::GetSingleton ().GetConsole ()->Printf ( _("connect: Connecting to %s:%u..."), strHost.c_str(), usPort );
         }
         else
         {
-            CCore::GetSingleton ().GetConsole ()->Printf ( "connect: could not connect to %s:%u!", strHost.c_str(), usPort );
+            CCore::GetSingleton ().GetConsole ()->Printf ( _("connect: could not connect to %s:%u!"), strHost.c_str(), usPort );
         }
     }
     else
@@ -389,7 +391,7 @@ void CCommandFuncs::CopyGTAControls ( const char* szParameters )
     {
         pKeyBinds->RemoveAllGTAControls ();
         pKeyBinds->LoadControlsFromGTA ();
-        CCore::GetSingleton ().GetConsole ()->Print ( "Bound all controls from GTA" );
+        CCore::GetSingleton ().GetConsole ()->Print ( _("Bound all controls from GTA") );
     }
 }
 
@@ -403,7 +405,7 @@ void CCommandFuncs::HUD ( const char* szParameters )
 void CCommandFuncs::SaveConfig ( const char* szParameters )
 {
     CCore::GetSingleton ().SaveConfig ();
-    g_pCore->GetConsole ()->Printf ( "Saved configuration file" );
+    g_pCore->GetConsole ()->Print ( _("Saved configuration file") );
 }
 
 void CCommandFuncs::ChatScrollUp ( const char* szParameters )
@@ -463,7 +465,7 @@ void CCommandFuncs::Serial ( const char* szParameters )
     g_pCore->GetNetwork ()->GetSerial (szSerial, sizeof ( szSerial ));
 
     // Print it
-    CCore::GetSingleton ().GetConsole ()->Printf ( "* Your serial is: %s", szSerial );
+    CCore::GetSingleton ().GetConsole ()->Printf ( _("* Your serial is: %s"), szSerial );
 }
 
 

@@ -14,124 +14,6 @@
 
 extern CCore* g_pCore;
 
-const char* g_szCredits = "== Multi Theft Auto: San Andreas v" MTA_DM_BUILDTAG_SHORT " ==\n"
-                          "\n"
-
-                          "Programming\n"
-                          "\n"
-
-                          "Alberto \"ryden\" Alonso\n"
-                          "Marcus \"mabako\" Bauer\n"
-                          "Hendrik \"arc_\" van den Berge\n"
-                          "Stanislav \"lil_Toady\" Bobrov\n"
-                          "Dan \"Talidan\" Chowdhury\n"
-                          "Chris \"ccw\" Cockwanger\n"
-                          "Adge \"Jax\" Cutler\n"
-                          "Cecill \"ijs\" Etheredge\n"
-                          "Sebas \"x86\" Lamers\n"
-                          "Raphael \"Mr.Hankey\" Leiteritz\n"
-                          "Ed \"eAi\" Lyons\n"
-                          "Christian \"ChrML\" Myhre Lundheim\n"
-                          "Arushan \"aru\" Raj\n"
-                          "Frank \"Aim\" Spijkerman\n"
-                          "Kevin \"Kevuwk\" Whiteside\n"
-                          "Richard \"Cazomino05\" Whitlock\n"
-                          "Gamesnert\n"
-                          "\n"
-                          "\n"
-
-                          "Contributors\n"
-                          "\n"
-
-                          "Arran\n"
-                          "Remp\n"
-                          "MX_Master\n"
-                          "Iztas\n"
-                          "impulze\n"
-                          "JoeBullet\n"
-                          "\n"
-                          "\n"
-
-                          "Game Design / Scripting\n"
-                          "\n"
-
-                          "John \"Johnline\" Borsberry\n"
-                          "Paul \"Brophy\" Brophy\n"
-                          "Maciej \"MACK\" Cieslak\n"
-                          "Jacek \"jhxp\" Halas vel Lagoda\n"
-                          "Brad \"Slothman\" Hammond\n"
-                          "Norbert \"norby89\" Juhos\n"
-                          "Kris \"KWKSND\" Kulchisky\n"
-                          "Dustin \"Ransom\" Morren\n"
-                          "erorr404\n"
-                          "Synecy\n"
-                          "\n"
-                          "\n"
-
-                          "Patch contributors\n"
-                          "\n"
-                          
-                          "Lukasz \"W\" Biegaj\n"
-                          "Florian \"Flobu\" Busse\n"
-                          "Philip \"Fenix\" Farquharson\n"
-                          "Robin \"robhol\" Holm\n"
-                          "Adam \"50p\" Telega\n"
-                          "Callum \"Callum\" Dawson\n"
-                          "Ilya \"Kenix\" Volkov\n"
-                          "Gothem\n"
-                          "rafalh\n"
-                          "Totto8492\n"
-                          "CubedDeath\n"
-                          "GRascm\n"
-                          "NeO_D-Power\n"
-                          "Dragon\n"
-                          "DirtY_iCE\n"
-                          "Zango\n"
-                          "lucasc190\n"
-                          "samt2497\n"
-                          "MCvarial\n"
-                          "tvc\n"
-                          "Audifire\n"
-                          "Kayl\n"
-                          "\n"
-                          "\n"
-
-                          "Special Thanks\n"
-                          "\n"
-
-                          "Derek \"slush\" Abdine\n"
-                          "Javier \"jbeta\" Beta\n"
-                          "Oliver \"Oli\" Brown\n"
-                          "Wojciech \"Wojjie\" Hlibowicki\n"
-                          "Chris \"Cray\" McArthur\n"
-                          "Hans \"Blokker\" Roes\n"
-                          "Kent \"Kent747\" Simon\n"
-                          "Matthew \"Towncivilian\" Wolfe\n"
-                          "Adamix\n"
-                          "Aibo\n"
-                          "Pugwipe\n"
-                          "The_GTA\n"
-                          "Phatlooser\n"
-                          "\n"
-                          "\n"
-                         
-                          "\n"
-                          "This software makes use of the following libraries and software:\n"
-                          "RakNet (http://www.jenkinssoftware.com)\n"
-                          "SA Limit adjuster source code (Credits to Sacky)\n"
-                          "CEGUI (http://www.cegui.org.uk/wiki/index.php/Main_Page)\n"
-                          "cURL (http://curl.haxx.se/)\n"
-                          "libpcre (http://www.pcre.org/)\n"
-                          "Lua (http://www.lua.org/)\n"
-                          "SQLite (http://www.sqlite.org/)\n"
-                          "libpng (http://www.libpng.org/)\n"
-                          "Embedded HTTP Server (http://ehs.fritz-elfert.de/)\n"
-                          "zlib (http://zlib.net/)\n"
-                          "bzip2 (http://bzip.org/)\n"
-                          "UnRAR (http://www.rarlab.com/)\n"
-                          ;
-
-
 namespace CCreditsGUI
 {
     float fWindowX =            560.0f;
@@ -142,6 +24,125 @@ using namespace CCreditsGUI;
 CCredits::CCredits ( void )
 {
     CGUI *pManager = g_pCore->GetGUI ();
+
+    // Define our credits string
+    m_strCredits +=           "== Multi Theft Auto: San Andreas v" MTA_DM_BUILDTAG_SHORT " ==\n"
+                              "\n";
+
+    m_strCredits +=           _("Programming");
+    m_strCredits +=           "\n\n"
+
+                              "Alberto \"ryden\" Alonso\n"
+                              "Marcus \"mabako\" Bauer\n"
+                              "Hendrik \"arc_\" van den Berge\n"
+                              "Stanislav \"lil_Toady\" Bobrov\n"
+                              "Dan \"Talidan\" Chowdhury\n"
+                              "Chris \"ccw\" Cockwanger\n"
+                              "Adge \"Jax\" Cutler\n"
+                              "Cecill \"ijs\" Etheredge\n"
+                              "Sebas \"x86\" Lamers\n"
+                              "Raphael \"Mr.Hankey\" Leiteritz\n"
+                              "Ed \"eAi\" Lyons\n"
+                              "Christian \"ChrML\" Myhre Lundheim\n"
+                              "Arushan \"aru\" Raj\n"
+                              "Frank \"Aim\" Spijkerman\n"
+                              "Kevin \"Kevuwk\" Whiteside\n"
+                              "Richard \"Cazomino05\" Whitlock\n"
+                              "Gamesnert\n"
+                              "\n"
+                              "\n";
+
+    m_strCredits +=           _("Contributors");
+    m_strCredits +=           "\n\n"
+
+                              "Arran\n"
+                              "Remp\n"
+                              "MX_Master\n"
+                              "Iztas\n"
+                              "impulze\n"
+                              "JoeBullet\n"
+                              "\n"
+                              "\n";
+
+    m_strCredits +=           _("Game Design / Scripting");
+    m_strCredits +=           "\n\n"
+
+                              "John \"Johnline\" Borsberry\n"
+                              "Paul \"Brophy\" Brophy\n"
+                              "Maciej \"MACK\" Cieslak\n"
+                              "Jacek \"jhxp\" Halas vel Lagoda\n"
+                              "Brad \"Slothman\" Hammond\n"
+                              "Norbert \"norby89\" Juhos\n"
+                              "Kris \"KWKSND\" Kulchisky\n"
+                              "Dustin \"Ransom\" Morren\n"
+                              "erorr404\n"
+                              "Synecy\n"
+                              "\n"
+                              "\n";
+
+    m_strCredits +=           _("Patch contributors");
+    m_strCredits +=           "\n\n"
+                              
+                              "Lukasz \"W\" Biegaj\n"
+                              "Florian \"Flobu\" Busse\n"
+                              "Philip \"Fenix\" Farquharson\n"
+                              "Robin \"robhol\" Holm\n"
+                              "Adam \"50p\" Telega\n"
+                              "Callum \"Callum\" Dawson\n"
+                              "Ilya \"Kenix\" Volkov\n"
+                              "Gothem\n"
+                              "rafalh\n"
+                              "Totto8492\n"
+                              "CubedDeath\n"
+                              "GRascm\n"
+                              "NeO_D-Power\n"
+                              "Dragon\n"
+                              "DirtY_iCE\n"
+                              "Zango\n"
+                              "lucasc190\n"
+                              "samt2497\n"
+                              "MCvarial\n"
+                              "tvc\n"
+                              "Audifire\n"
+                              "Kayl\n"
+                              "\n"
+                              "\n";
+
+    m_strCredits +=           _("Special Thanks");
+    m_strCredits +=           "\n\n"
+
+                              "Derek \"slush\" Abdine\n"
+                              "Javier \"jbeta\" Beta\n"
+                              "Oliver \"Oli\" Brown\n"
+                              "Wojciech \"Wojjie\" Hlibowicki\n"
+                              "Chris \"Cray\" McArthur\n"
+                              "Hans \"Blokker\" Roes\n"
+                              "Kent \"Kent747\" Simon\n"
+                              "Matthew \"Towncivilian\" Wolfe\n"
+                              "Adamix\n"
+                              "Aibo\n"
+                              "Pugwipe\n"
+                              "The_GTA\n"
+                              "Phatlooser\n"
+                              "\n"
+                              "\n"
+                             
+                              "\n";
+    m_strCredits +=           _("This software makes use of the following libraries and software:");
+    m_strCredits +=           "\n"
+                              "RakNet (http://www.jenkinssoftware.com)\n"
+                              "SA Limit adjuster source code (Credits to Sacky)\n"
+                              "CEGUI (http://www.cegui.org.uk/wiki/index.php/Main_Page)\n"
+                              "cURL (http://curl.haxx.se/)\n"
+                              "libpcre (http://www.pcre.org/)\n"
+                              "Lua (http://www.lua.org/)\n"
+                              "SQLite (http://www.sqlite.org/)\n"
+                              "libpng (http://www.libpng.org/)\n"
+                              "Embedded HTTP Server (http://ehs.fritz-elfert.de/)\n"
+                              "zlib (http://zlib.net/)\n"
+                              "bzip2 (http://bzip.org/)\n"
+                              "UnRAR (http://www.rarlab.com/)\n"
+                              ;
 
     // Create our window
     CVector2D RelativeWindow = CVector2D ( fWindowX / pManager->GetResolution ().fX, fWindowY / pManager->GetResolution ().fY );
@@ -159,8 +160,8 @@ CCredits::CCredits ( void )
 
     // Create one for every 15th line. This is because of some limit at 500 chars
     float fStartPosition = 1.0f;
-    const char* szCreditsIterator = g_szCredits;
-    const char* szCreditsBegin = g_szCredits;
+    const char* szCreditsIterator = m_strCredits.c_str();
+    const char* szCreditsBegin = m_strCredits.c_str();
     unsigned int uiLineCount = 0;
     unsigned int uiLabelIndex = 0;
     while ( true )

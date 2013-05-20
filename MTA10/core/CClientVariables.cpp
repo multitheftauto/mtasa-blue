@@ -314,6 +314,12 @@ void CClientVariables::LoadDefaults ( void )
     DEFAULT ( "mute_mta_when_minimized",    0 );                            // 0-off 1-on
     DEFAULT ( "mute_voice_when_minimized",  0 );                            // 0-off 1-on
 
+    if(!Exists("locale")) 
+    {
+        SString strLangCode = GetApplicationSetting ( "locale" );
+        Set ( "locale", !strLangCode.empty() ? strLangCode : _S("en_US") );
+    }
+
     // We will default this one at CClientGame.cpp, because we need a valid direct3d device to give a proper default value.
 #if 0
     DEFAULT ( "streaming_memory",           50 );                           // Streaming memory

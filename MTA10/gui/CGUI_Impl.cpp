@@ -655,6 +655,25 @@ CGUIFont* CGUI_Impl::GetSansFont ( void )
     return m_pSansFont;
 }
 
+float CGUI_Impl::GetTextExtent ( const char* szText, const char* szFont )
+{
+    return m_pFontManager->getFont(szFont)->getTextExtent ( CGUI_Impl::GetUTFString( szText ) );
+}
+
+float CGUI_Impl::GetMaxTextExtent ( SString strFont, SString arg, ... )
+{
+    float fMaxTextExtent = NULL;
+    va_list arguments;
+    for (va_start(arguments, arg); arg != ""; arg = va_arg(arguments, SString)) 
+    {
+        float fExtent = m_pFontManager->getFont(strFont)->getTextExtent ( CGUI_Impl::GetUTFString( arg ) );
+        if ( fExtent > fMaxTextExtent )
+            fMaxTextExtent = fExtent;
+    }
+    va_end(arguments);
+    return fMaxTextExtent;
+}
+
 bool CGUI_Impl::Event_KeyDown ( const CEGUI::EventArgs& Args )
 {
     // Cast it to a set of keyboard arguments

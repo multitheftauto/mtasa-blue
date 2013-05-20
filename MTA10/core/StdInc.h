@@ -33,6 +33,10 @@
 #include <iomanip>
 
 
+// Localization
+#include "../../vendor/tinygettext/tinygettext.hpp"
+#include "CLocalization.h"
+
 // SDK includes
 #include <xml/CXMLNode.h>
 #include <xml/CXMLFile.h>
@@ -55,7 +59,6 @@
 #include "CProxyDirectInput8.h"
 #include "CProxyDirect3D9.h"
 #include "CPEHookUtils.h"
-#include "CLanguageLocale.h"
 #include "CCommandFuncs.h"
 #include "CExceptionInformation_Impl.h"
 #include "tracking/CHTTPClient.h"
