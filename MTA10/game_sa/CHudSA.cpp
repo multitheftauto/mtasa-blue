@@ -275,10 +275,9 @@ bool CHudSA::IsComponentVisible ( eHudComponent component )
 //
 // CHudSA::AdjustComponents
 //
-void CHudSA::AdjustComponents ( void )
+void CHudSA::AdjustComponents ( float fAspectRatio )
 {
     // Fix for #7400 (HUD elements do not scale correctly for widescreen)
     // 0x859524: GTA multiplies all HUD and menu transformation variables by this floating point value. It is equal to 1/448, so just translate it to 16/10 / 16/9
-    CVector2D vecScreenSize = g_pCore->GetGUI ()->GetResolution ();
-    MemPut < float > ( 0x859524, 0.002232143f / (4.0f/3.0f) * (vecScreenSize.fX/vecScreenSize.fY) );
+    MemPut < float > ( 0x859524, 0.002232143f / (4.0f/3.0f) * fAspectRatio );
 }
