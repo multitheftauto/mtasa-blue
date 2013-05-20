@@ -464,25 +464,27 @@ void CResource::HandleDownloadedFileTrouble( CResourceFile* pResourceFile, bool 
     SString strFilename = ExtractFilename( PathConform( pResourceFile->GetShortName() ) );
     strMessage += SString( " (%s) %s", GetName(), *strFilename );
 
-    // Report to server
-    g_pClientGame->TellServerSomethingImportant( 1000, strMessage, true );
-
     // If invalid file is a png, use dummy replacement
     if ( !bCRCMismatch && SStringX( pResourceFile->GetName() ).Right( 4 ).CompareI( ".png" ) )
     {
         FileCopy( CalcMTASAPath( "MTA\\cgui\\images\\error.png" ), pResourceFile->GetName() );
         if ( !CheckFileForCorruption ( pResourceFile->GetName () ) )
+        {
+            g_pClientGame->TellServerSomethingImportant( 1000, strMessage, true );
             return; // Fixed, sort of
+        }
     }
 
     // If using external HTTP server, reconnect and use internal one
     if ( g_pClientGame->IsUsingExternalHTTPServer() && !g_pCore->ShouldUseInternalHTTPServer() )
+    {
+        g_pClientGame->TellServerSomethingImportant( 1001, strMessage, true );
         g_pCore->Reconnect( "", 0, NULL, false, true );
+    }
     else
     {
-        // Otherwise, disconnect with message
-        g_pCore->ShowMessageBox( "Error", strMessage, MB_BUTTON_OK | MB_ICON_ERROR );
+        // Otherwise, log to the client console
+        g_pClientGame->TellServerSomethingImportant( 1002, strMessage, true );
         g_pCore->GetConsole ()->Printf ( "Download error: %s", *strMessage );
-        g_pCore->GetModManager()->RequestUnload();
     }
 }
