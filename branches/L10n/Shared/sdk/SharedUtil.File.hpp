@@ -469,7 +469,7 @@ std::vector < SString > SharedUtil::FindFiles ( const SString& strInMatch, bool 
                 if ( strcmp ( findData.cFileName, "." ) && strcmp ( findData.cFileName, ".." ) )
                 {
                     if ( bSortByDate )
-                        MapInsert( sortMap, (uint64&)findData.ftLastWriteTime, findData.cFileName );
+                        MapInsert( sortMap, (uint64&)findData.ftLastWriteTime, SStringX( findData.cFileName ) );
                     else
                         strResult.push_back ( findData.cFileName );
                 }

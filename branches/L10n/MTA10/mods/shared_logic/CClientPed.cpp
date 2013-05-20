@@ -1927,7 +1927,22 @@ CWeapon * CClientPed::GiveWeapon ( eWeaponType weaponType, unsigned int uiAmmo )
         // Restore clip ammo?
         if ( uiPreviousAmmoInClip )
         {
-            pWeapon->SetAmmoTotal ( uiPreviousAmmoTotal + uiAmmo );
+            unsigned int uiTotalAmmo;
+            eWeaponSlot slot = pWeapon->GetSlot();
+
+            // Emulate GTA's behaviour of setting ammo to keep in sync
+            if ( slot <= 1 || slot >= 10 ) 
+                uiTotalAmmo = 1;        // Melee Weapons
+            if ( slot >= 3 && slot <= 5  || slot == m_pPlayerPed->GetCurrentWeaponSlot())
+                uiTotalAmmo = uiPreviousAmmoTotal + uiAmmo; // slot 3,4,5 share the ammo, also if it's the currently used weapon add
+            else
+                uiTotalAmmo = uiAmmo;   // Other slots replace the ammo
+
+            // If we have less ammo in total than in our clip, update it accordingly
+            if ( uiPreviousAmmoInClip > uiTotalAmmo )
+                uiPreviousAmmoInClip = uiTotalAmmo;
+
+            pWeapon->SetAmmoTotal ( uiTotalAmmo );
             pWeapon->SetAmmoInClip ( uiPreviousAmmoInClip );
         }            
     }

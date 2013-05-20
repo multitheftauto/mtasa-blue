@@ -293,6 +293,64 @@ void CPacketHandler::Packet_ServerConnected ( NetBitStreamInterface& bitStream )
 }
 
 
+///////////////////////////////////////////////////////////////
+//
+// Discover HTTP port for bitStream version < 0x48
+//
+// Can be removed for 1.4 release or later
+//
+///////////////////////////////////////////////////////////////
+static ushort usDiscoverHttpPortResult;
+static int iDiscoverHttpPortFailCounter;
+
+static bool DiscoverInternalHTTPPortCallback ( double sizeJustDownloaded, double totalDownloaded, char * data, size_t dataLength, void * obj, bool complete, int error )
+{
+    if ( complete || ( error >= 200 && error < 600 ) )
+    {
+        usDiscoverHttpPortResult = (ushort)obj;
+    }
+    else
+    if ( error )
+        iDiscoverHttpPortFailCounter++;
+
+    return true;
+}
+
+static ushort DiscoverInternalHTTPPort()
+{
+    // Make a list of ports to try
+    ushort usGamePort = atoi( SStringX( g_pNet->GetConnectedServer( true ) ).SplitRight( ":" ) );
+    std::vector < ushort > testPortList;
+    testPortList.push_back( usGamePort );
+    testPortList.push_back( usGamePort + 2 );
+
+    CNetHTTPDownloadManagerInterface* pHTTP = g_pCore->GetNetwork ()->GetHTTPDownloadManager ( EDownloadMode::RESOURCE_INITIAL_FILES );
+    pHTTP->SetMaxConnections( testPortList.size() );
+
+    usDiscoverHttpPortResult = 0;
+    iDiscoverHttpPortFailCounter = 0;
+
+    // Send request to each port
+    for ( uint i = 0 ; i < testPortList.size() ; i++ )
+    {
+        ushort usHTTPPort = testPortList[i];
+        SString strHTTPDownloadURL = SString ( "http://%s:%d/http_port_test/", g_pNet->GetConnectedServer(), usHTTPPort );
+        pHTTP->QueueFile ( strHTTPDownloadURL, "", 0, NULL, 0, false, (void*)usHTTPPort, DiscoverInternalHTTPPortCallback, g_pClientGame->IsLocalGame (), 1, false );
+    }    
+
+    // Wait up to 3 seconds for response
+    for ( uint i = 0 ; i < 3000 ; i += 100 )
+    {
+        Sleep( 100 );
+        pHTTP->ProcessQueuedFiles();
+        if ( usDiscoverHttpPortResult || iDiscoverHttpPortFailCounter >= testPortList.size() )
+            break;
+    }
+
+    return usDiscoverHttpPortResult;
+}
+
+
 void CPacketHandler::Packet_ServerJoined ( NetBitStreamInterface& bitStream )
 {
     // ElementID        (2)     - assigned player id
@@ -393,6 +451,7 @@ void CPacketHandler::Packet_ServerJoined ( NetBitStreamInterface& bitStream )
     unsigned char ucHTTPDownloadType;
     bitStream.Read ( ucHTTPDownloadType );
 
+    g_pClientGame->m_usHTTPDownloadPort = 0;
     g_pClientGame->m_ucHTTPDownloadType = static_cast < eHTTPDownloadType > ( ucHTTPDownloadType );
     // Depending on the HTTP Download Type, read more data
     switch ( g_pClientGame->m_ucHTTPDownloadType )
@@ -415,7 +474,23 @@ void CPacketHandler::Packet_ServerJoined ( NetBitStreamInterface& bitStream )
         }
         case HTTP_DOWNLOAD_ENABLED_URL:
         {
+            if ( bitStream.Version() >= 0x48 )
+                bitStream.Read( g_pClientGame->m_usHTTPDownloadPort );
+
             BitStreamReadUsString( bitStream, g_pClientGame->m_strHTTPDownloadURL );
+
+            // See if we should switch to the internal http server
+            if ( g_pCore->ShouldUseInternalHTTPServer() )
+            {
+                if ( !g_pClientGame->m_usHTTPDownloadPort )
+                    g_pClientGame->m_usHTTPDownloadPort = DiscoverInternalHTTPPort();
+                if ( g_pClientGame->m_usHTTPDownloadPort )
+                {
+                    g_pClientGame->m_strHTTPDownloadURL = SString ( "http://%s:%d", g_pNet->GetConnectedServer(), g_pClientGame->m_usHTTPDownloadPort );
+                    g_pClientGame->m_ucHTTPDownloadType = HTTP_DOWNLOAD_ENABLED_PORT;
+                    iHTTPMaxConnectionsPerClient = 1;
+                }
+            }
             break;
         }
     default:
