@@ -370,8 +370,8 @@ int CLuaACLDefs::aclListRights ( lua_State* luaVM )
         {
             // Type
             eType = (*iter)->GetRightType ();
-        	if ( !bAll && eType != eAllowed )
-        		continue;
+            if ( !bAll && eType != eAllowed )
+                continue;
 
             switch ( eType )
             {
