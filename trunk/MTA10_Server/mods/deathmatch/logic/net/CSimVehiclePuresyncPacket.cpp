@@ -168,6 +168,25 @@ bool CSimVehiclePuresyncPacket::Read ( NetBitStreamInterface& BitStream )
                     return false;
             }
         }
+         
+        // Read Damage info, but do not store, as we do not relay this info
+        if ( BitStream.Version() >= 0x047) 
+        {
+            if ( BitStream.ReadBit () == true )
+            {
+                ElementID DamagerID;
+                if ( !BitStream.Read ( DamagerID ) )
+                    return false;
+
+                SWeaponTypeSync weaponType;
+                if ( !BitStream.Read ( &weaponType ) )
+                    return false;
+
+                SBodypartSync bodyPart;
+                if ( !BitStream.Read ( &bodyPart ) )
+                    return false;
+            }
+        }
 
         // Player health
         SPlayerHealthSync health;
