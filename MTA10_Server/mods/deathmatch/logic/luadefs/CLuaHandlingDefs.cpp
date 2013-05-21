@@ -13,8 +13,6 @@
 
 #include "StdInc.h"
 
-#define lua_istype(luavm, number,type) (lua_type(luavm,number) == type)
-
 void CLuaHandlingDefs::LoadFunctions ( void )
 {
     // Set
