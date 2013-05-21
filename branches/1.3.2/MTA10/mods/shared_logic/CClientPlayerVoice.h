@@ -69,9 +69,6 @@ public:
     bool                    SetFxEffect             ( uint uiFxEffect, bool bEnable );
     bool                    IsFxEffectEnabled       ( uint uiFxEffect );
     bool                    IsActive                ( void )                            { return m_bVoiceActive; }
-
-    void                    SetMinimizeMuted        ( bool bMute )                      { m_bMinimizeMuted = bMute; }
-    bool                    IsMinimizeMuted         ( void )                            { return m_bMinimizeMuted; }
     
 private:  
     void                                Init                        ( void );
@@ -103,7 +100,5 @@ private:
 
     SFixedArray < int, 9 >              m_EnabledEffects;
     SFixedArray < HFX, 9 >              m_FxEffects;
-
-    bool                                m_bMinimizeMuted;
 };
 #endif

@@ -712,9 +712,6 @@ void CClientGame::DoPulsePreHUDRender ( bool bDidUnminimize, bool bDidRecreateRe
         g_pGame->GetAudio ()->SetEffectsMasterVolume ( g_pGame->GetSettings ()->GetSFXVolume () );
         g_pGame->GetAudio ()->SetMusicMasterVolume ( g_pGame->GetSettings ()->GetRadioVolume () );
         m_pManager->GetSoundManager ()->SetMinimizeMuted ( false );
-        if ( CClientPlayer* pPlayer = g_pClientGame->m_pPlayerManager->GetLocalPlayer () )
-            if ( CClientPlayerVoice* pVoice = pPlayer->GetVoice() )
-                pVoice->SetMinimizeMuted ( false );
     }
 
     // Call onClientHUDRender LUA event
@@ -3823,16 +3820,6 @@ void CClientGame::IdleHandler ( void )
 
             if ( g_pCore->GetCVars ()->GetValue < bool > ( "mute_mta_when_minimized" )  )
                 m_pManager->GetSoundManager ()->SetMinimizeMuted ( true );
-
-            if ( g_pCore->GetCVars ()->GetValue < bool > ( "mute_voice_when_minimized" )  )
-            {
-                CClientPlayer* pPlayer = g_pClientGame->m_pPlayerManager->GetLocalPlayer ();
-                CClientPlayerVoice * pVoice = pPlayer->GetVoice();
-                if ( pVoice != NULL )
-                {
-                    pVoice->SetMinimizeMuted ( true );
-                }
-            }
         }
     }
 
