@@ -418,21 +418,6 @@ bool CVehiclePuresyncPacket::Read ( NetBitStreamInterface& BitStream )
 
             pSourcePlayer->GetPad ()->NewControllerState ( ControllerState );
 
-            // Sync Nitro
-            if ( BitStream.Version() >= 0x49 )
-            {
-                float fNitroLevel;
-                char cNitroCount;
-
-                if (!BitStream.Read(&fNitroLevel))
-                    return false;
-                if (!BitStream.Read(&cNitroCount))
-                    return false;
-
-                pVehicle->SetNitroCount(cNitroCount);
-                pVehicle->SetNitroLevel(fNitroLevel);
-            }
-
             // Success
             return true;
         }
