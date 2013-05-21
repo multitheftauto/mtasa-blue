@@ -118,10 +118,7 @@ void CClientPlayerVoice::DoPulse( void )
 
     m_CS.Lock ();
     float fPreviousVolume = 0.0f;
-    if ( !m_bMinimizeMuted )
-    {
-        g_pCore->GetCVars ()->Get ( "voicevolume", fPreviousVolume );
-    }
+    g_pCore->GetCVars ()->Get ( "voicevolume", fNewVolume );
     m_CS.Unlock ();
 
     if ( fPreviousVolume != m_fVolumeScale && m_pPlayer->IsLocalPlayer() == false )
