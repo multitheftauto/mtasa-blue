@@ -426,10 +426,10 @@ bool SharedUtil::FileCopy ( const SString& strSrc, const SString& strDest, bool 
         return false;
     }
 
-    char cBuffer[16384];
+    char cBuffer[65536];
     while ( true )
     {
-        size_t dataLength = fread ( cBuffer, 1, 16384, fhSrc );
+        size_t dataLength = fread ( cBuffer, 1, 65536, fhSrc );
         if ( dataLength == 0 )
             break;
         fwrite ( cBuffer, 1, dataLength, fhDst );

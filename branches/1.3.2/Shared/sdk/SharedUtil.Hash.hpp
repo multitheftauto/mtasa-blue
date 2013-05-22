@@ -52,8 +52,8 @@ namespace SharedUtil
             Init ();
     
             // Hash it
-            unsigned char Buffer [1024];
-            while ( unsigned int uiRead = static_cast < unsigned int > ( fread ( Buffer, 1, 1024, pFile ) ) )
+            unsigned char Buffer [65536];
+            while ( unsigned int uiRead = static_cast < unsigned int > ( fread ( Buffer, 1, 65536, pFile ) ) )
             {
                 Update ( Buffer, uiRead );
             }
