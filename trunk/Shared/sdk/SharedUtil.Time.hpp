@@ -152,8 +152,9 @@ public:
     {
         while ( true )
         {
-            T resultA = m_OutputBuffersA[ m_ucLastWrittenIndex ];
-            T resultB = m_OutputBuffersB[ m_ucLastWrittenIndex ];
+            uchar ucIndex = m_ucLastWrittenIndex;
+            T resultA = m_OutputBuffersA[ ucIndex ];
+            T resultB = m_OutputBuffersB[ ucIndex ];
             if ( resultA == resultB )
                 return resultA;
         }
