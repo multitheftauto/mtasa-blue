@@ -478,13 +478,6 @@ HRESULT DoCreateDevice( IDirect3D9* pDirect3D, UINT Adapter, D3DDEVTYPE DeviceTy
                                         WriteDebugEvent ( ToString( Adapter, DeviceType, hFocusWindow, BehaviorFlags, *pPresentationParameters ) );
                                         if ( iRes == 1 )
                                         {
-                                            // Toggle alt tab handler
-                                            int iOldSelected = 1;
-                                            CVARS_GET ( "display_alttab_handler", iOldSelected );
-                                            int iNewSelected = iOldSelected ? 0 : 1;
-                                            WriteDebugEvent ( SString( "      Switching alt tab handler from %d to %d after success", iOldSelected, iNewSelected ) );
-                                            CVARS_SET ( "display_alttab_handler", iNewSelected );
-                                            CCore::GetSingleton ().SaveConfig ();
                                         }
                                         if ( iRes >= 3 )
                                         {
@@ -504,14 +497,6 @@ HRESULT DoCreateDevice( IDirect3D9* pDirect3D, UINT Adapter, D3DDEVTYPE DeviceTy
     }
 failed:
     WriteDebugEvent ( SString( "      Failed after %d creation attempts", ms_uiCreationAttempts ) );
-
-    // Toggle alt tab handler
-    int iOldSelected = 1;
-    CVARS_GET ( "display_alttab_handler", iOldSelected );
-    int iNewSelected = iOldSelected ? 0 : 1;
-    WriteDebugEvent ( SString( "      Switching alt tab handler from %d to %d after fail", iOldSelected, iNewSelected ) );
-    CVARS_SET ( "display_alttab_handler", iNewSelected );
-    CCore::GetSingleton ().SaveConfig ();
 
     return hResultFail;
 }

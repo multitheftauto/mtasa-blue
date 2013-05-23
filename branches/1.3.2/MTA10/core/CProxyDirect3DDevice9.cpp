@@ -279,14 +279,6 @@ HRESULT DoResetDevice( IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS* pPresen
                 // Prevent statup warning in loader
                 WatchDogCompletedSection ( "L3" );
 
-                // Toggle alt tab handler
-                int iOldSelected = 1;
-                CVARS_GET ( "display_alttab_handler", iOldSelected );
-                int iNewSelected = iOldSelected ? 0 : 1;
-                WriteDebugEvent ( SString( "      Switching alt tab handler from %d to %d after fail", iOldSelected, iNewSelected ) );
-                CVARS_SET ( "display_alttab_handler", iNewSelected );
-                CCore::GetSingleton ().SaveConfig ();
-
                 // Handle fatal error
                 SString strMessage;
                 strMessage += "There was a problem resetting Direct3D\n\n";
