@@ -288,7 +288,6 @@ HRESULT DoResetDevice( IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS* pPresen
             }
         }
     }
-
     return hResult;
 }
 
