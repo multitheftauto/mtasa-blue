@@ -41,6 +41,8 @@ private:
   std::string filepath;
   PluralForms plural_forms;
 
+  std::map<std::string, std::string> metadata;
+
   std::string translate(const Entries& dict, const std::string& msgid);
   std::string translate_plural(const Entries& dict, const std::string& msgid, const std::string& msgidplural, int num);
 
@@ -57,6 +59,9 @@ public:
 
   void set_plural_forms(const PluralForms&);
   PluralForms get_plural_forms() const;
+
+  void set_metadata(const std::map<std::string,std::string>&);
+  std::map<std::string,std::string> get_metadata() const;
 
 
   /** Translate the string \a msgid. */
