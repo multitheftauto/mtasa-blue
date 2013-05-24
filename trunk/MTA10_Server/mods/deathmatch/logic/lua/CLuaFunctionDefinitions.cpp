@@ -6097,7 +6097,7 @@ int CLuaFunctionDefinitions::CreateMarker ( lua_State* luaVM )
 
     if ( argStream.NextIsBool() || argStream.NextIsNil () )
     {
-        m_pRootElement = NULL;
+        pVisibleTo = NULL;
     }
     else
         argStream.ReadUserData(pVisibleTo, m_pRootElement); 
