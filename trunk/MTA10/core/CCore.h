@@ -167,7 +167,6 @@ public:
     // Subsystems
     void                    CreateGame                      ( void );
     void                    CreateMultiplayer               ( void );
-    void                    LoadNetwork                     ( void );
     void                    CreateNetwork                   ( void );
     void                    CreateXML                       ( void );
     void                    InitGUI                         ( IDirect3DDevice9* pDevice );
