@@ -229,16 +229,35 @@ static bool has_prefix(const std::string& lhs, const std::string rhs)
     return lhs.compare(0, rhs.length(), rhs) == 0;
 }
 
+static bool split_headerline(const std::string& input, std::string& lhs, std::string& rhs)
+{
+  std::string::size_type split_pos = input.find_first_of(':');
+  if ( ( split_pos != std::string::npos ) && ( (split_pos + 1) < (input.length() - 1) ) )
+  {
+    lhs = input.substr( 0, split_pos );
+    rhs = input.substr( split_pos + 2, std::string::npos );
+    return (!lhs.empty() && !rhs.empty());
+  }
+  else
+    return false;
+}
+
+
 void
 POParser::parse_header(const std::string& header)
 {
   std::string from_charset;
   std::string::size_type start = 0;
+  std::map<std::string,std::string> metadata;
   for(std::string::size_type i = 0; i < header.length(); ++i)
   {
     if (header[i] == '\n')
     {
       std::string line = header.substr(start, i - start);
+
+      std::string lhs, rhs;
+      if (split_headerline(line,lhs,rhs))
+        metadata.insert(std::pair<std::string,std::string>(lhs,rhs));
 
       if (has_prefix(line, "Content-Type:"))
       {
@@ -292,6 +311,7 @@ POParser::parse_header(const std::string& header)
     big5 = true;
   }
 
+  dict.set_metadata ( metadata );
   
 }
 

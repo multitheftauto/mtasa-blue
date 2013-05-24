@@ -58,6 +58,18 @@ Dictionary::get_plural_forms() const
   return plural_forms;
 }
 
+void
+Dictionary::set_metadata(const std::map<std::string,std::string>& metadata_)
+{
+  metadata = metadata_;
+}
+
+std::map<std::string,std::string>
+Dictionary::get_metadata() const
+{
+  return metadata;
+}
+
 std::string
 Dictionary::translate_plural(const std::string& msgid, const std::string& msgid_plural, int num)
 {
