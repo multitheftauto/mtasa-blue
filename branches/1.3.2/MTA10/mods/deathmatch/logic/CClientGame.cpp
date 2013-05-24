@@ -3925,6 +3925,9 @@ void CClientGame::DownloadInitialResourceFiles ( void )
     if ( !IsTransferringInitialFiles () )
         return;
 
+    if ( !g_pNet->IsConnected() )
+        return;
+
     CNetHTTPDownloadManagerInterface* pHTTP = g_pNet->GetHTTPDownloadManager ( EDownloadMode::RESOURCE_INITIAL_FILES );
     if ( !pHTTP->ProcessQueuedFiles () )
     {
