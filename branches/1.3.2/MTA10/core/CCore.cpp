@@ -111,8 +111,6 @@ CCore::CCore ( void )
     };
     ParseCommandLine ( m_CommandLineOptions, m_szCommandLineArgs, pszNoValOptions );
 
-    LoadNetwork ( );
-
     // Create a logger instance.
     m_pConsoleLogger            = new CConsoleLogger ( );
 
@@ -904,14 +902,9 @@ void CCore::DestroyGUI ( )
 }
 
 
-void CCore::LoadNetwork ( )
-{
-    LoadModule ( m_NetModule, "Network", "netc" );
-}
-
 void CCore::CreateNetwork ( )
 {
-    m_pNet = InitModule < CNet > ( m_NetModule, "Network", "InitNetInterface", this );
+    m_pNet = CreateModule < CNet > ( m_NetModule, "Network", "netc", "InitNetInterface", this );
 
     // Network module compatibility check
     typedef unsigned long (*PFNCHECKCOMPATIBILITY) ( unsigned long );
