@@ -241,6 +241,12 @@ SString SharedUtil::PathConform ( const SString& strPath )
     //      2. Another single slash is before it
     if ( iFirstDoubleSlash > 0 )
     {
+        if ( iFirstDoubleSlash == 2 && strTemp[1] == ':' )
+        {
+            // Replace all duplicate slashes
+            return strTemp.Replace ( PATH_SEPERATOR PATH_SEPERATOR, PATH_SEPERATOR, true );
+        }
+
         if ( strTemp.SubStr ( iFirstDoubleSlash - 1, 1 ) != ":" || strTemp.find ( PATH_SEPERATOR ) < iFirstDoubleSlash  )
         {
             // Replace all duplicate slashes
