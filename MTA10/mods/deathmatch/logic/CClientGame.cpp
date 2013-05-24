@@ -3939,6 +3939,9 @@ void CClientGame::DownloadInitialResourceFiles ( void )
     if ( !IsTransferringInitialFiles () )
         return;
 
+    if ( !g_pNet->IsConnected() )
+        return;
+
     CNetHTTPDownloadManagerInterface* pHTTP = g_pNet->GetHTTPDownloadManager ( EDownloadMode::RESOURCE_INITIAL_FILES );
     if ( !pHTTP->ProcessQueuedFiles () )
     {
@@ -3977,6 +3980,9 @@ void CClientGame::DownloadInitialResourceFiles ( void )
 void CClientGame::DownloadSingularResourceFiles ( void )
 {
     if ( !IsTransferringSingularFiles () )
+        return;
+
+    if ( !g_pNet->IsConnected() )
         return;
 
     CNetHTTPDownloadManagerInterface* pHTTP = g_pNet->GetHTTPDownloadManager ( EDownloadMode::RESOURCE_SINGULAR_FILES );
