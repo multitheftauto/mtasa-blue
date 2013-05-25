@@ -1268,7 +1268,7 @@ void CResourceManager::ReevaluateMinClientRequirement ( void )
 {
     // Calc highest requirement
     m_strMinClientRequirement = "";
-    for ( std::map < CResource*, SString >::iterator iter = m_MinClientRequirementMap.begin () ; iter != m_MinClientRequirementMap.end () ; ++iter )
+    for ( CFastHashMap < CResource*, SString >::iterator iter = m_MinClientRequirementMap.begin () ; iter != m_MinClientRequirementMap.end () ; ++iter )
         if ( iter->second > m_strMinClientRequirement )
             m_strMinClientRequirement = iter->second;
 
@@ -1318,7 +1318,7 @@ void CResourceManager::RemoveSyncMapElementDataOption ( CResource* pResource )
 void CResourceManager::ReevaluateSyncMapElementDataOption ( void )
 {
     bool bSyncMapElementData = true;
-    for ( std::map < CResource*, bool >::iterator iter = m_SyncMapElementDataOptionMap.begin () ; iter != m_SyncMapElementDataOptionMap.end () ; ++iter )
+    for ( CFastHashMap < CResource*, bool >::iterator iter = m_SyncMapElementDataOptionMap.begin () ; iter != m_SyncMapElementDataOptionMap.end () ; ++iter )
     {
         if ( iter->second )
         {

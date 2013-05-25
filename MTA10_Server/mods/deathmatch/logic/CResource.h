@@ -213,6 +213,8 @@ private:
     bool                    m_bStartedManually;
 
     bool                    m_bOOPEnabledInMetaXml;
+    uint                    m_uiFunctionRightCacheRevision;
+    CFastHashMap < lua_CFunction, bool > m_FunctionRightCacheMap;
 
     bool                    CheckState ( void ); // if the resource has no Dependents, stop it, if it has, start it. returns true if the resource is started.
     bool                    ReadIncludedResources ( class CXMLNode * root );
@@ -375,6 +377,8 @@ public:
     const SString&      GetMinServerReqFromMetaXml      ( void )                                { return m_strMinServerReqFromMetaXml; }
     const SString&      GetMinClientReqFromMetaXml      ( void )                                { return m_strMinClientReqFromMetaXml; }
     bool                IsOOPEnabledInMetaXml           ( void )                                { return m_bOOPEnabledInMetaXml; }
+    bool                CheckFunctionRightCache         ( lua_CFunction f, bool* pbOutAllowed );
+    void                UpdateFunctionRightCache        ( lua_CFunction f, bool bAllowed );
 
 protected:
     SString             GetAutoGroupName                ( void );
