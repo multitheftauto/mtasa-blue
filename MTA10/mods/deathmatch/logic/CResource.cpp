@@ -464,15 +464,12 @@ void CResource::HandleDownloadedFileTrouble( CResourceFile* pResourceFile, bool 
     SString strFilename = ExtractFilename( PathConform( pResourceFile->GetShortName() ) );
     strMessage += SString( " (%s) %s", GetName(), *strFilename );
 
-    // If invalid file is a png, use dummy replacement
-    if ( !bCRCMismatch && SStringX( pResourceFile->GetName() ).Right( 4 ).CompareI( ".png" ) )
+    if ( !bCRCMismatch )
     {
-        FileCopy( CalcMTASAPath( "MTA\\cgui\\images\\error.png" ), pResourceFile->GetName() );
-        if ( !CheckFileForCorruption ( pResourceFile->GetName () ) )
-        {
-            g_pClientGame->TellServerSomethingImportant( 1000, strMessage, true );
-            return; // Fixed, sort of
-        }
+        // For corrupt files, log to the client console
+        g_pClientGame->TellServerSomethingImportant( 1000, strMessage, true );
+        g_pCore->GetConsole()->Printf( "Download error: %s", *strMessage );
+        return;
     }
 
     // If using external HTTP server, reconnect and use internal one
