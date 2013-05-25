@@ -67,6 +67,17 @@ SString CLocalization::TranslatePluralWithContext ( const SString& strContext, c
     return m_pCurrentLang->TranslatePluralWithContext ( strContext, strSingular, strPlural, iNum );
 }
 
+SString CLocalization::GetTranslators ( )
+{
+    std::map<std::string,std::string> metaData = m_CurrentDict.get_metadata();
+    if ( metaData.find("Translators") != metaData.end() )
+    {
+        SString strTranslatorsList = metaData["Translators"];
+        return strTranslatorsList.Replace("; ","\n");
+    }
+    return "";
+}
+
 std::map<SString,SString> CLocalization::GetAvailableLanguages ( void )
 {
     std::map<SString,SString> m_LanguageMap;

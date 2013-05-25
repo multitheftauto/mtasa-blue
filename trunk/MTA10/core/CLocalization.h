@@ -29,6 +29,7 @@ public:
     SString                     TranslatePlural             ( const SString& strSingular, const SString& strPlural, int iNum );
     SString                     TranslatePluralWithContext  ( const SString& strContext, const SString& strSingular, const SString& strPlural, int iNum );
 
+    SString                     GetTranslators              ( void );
     std::map<SString,SString>   GetAvailableLanguages       ( void );
     bool                        IsLocalized                 ( void );
     SString                     GetLanguageDirectory        ( void );
