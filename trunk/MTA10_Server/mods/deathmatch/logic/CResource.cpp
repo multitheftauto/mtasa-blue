@@ -91,6 +91,7 @@ CResource::CResource ( CResourceManager * resourceManager, bool bIsZipped, const
     pthread_mutex_init(&m_mutex, NULL);
 
     m_bDoneUpgradeWarnings = false;
+    m_uiFunctionRightCacheRevision = 0;
 
     Load ();
     m_bOOPEnabledInMetaXml = true;
@@ -3473,4 +3474,38 @@ void CResource::InvalidateIncludedResourceReference ( CResource * resource )
     m_temporaryIncludes.remove ( resource );
     assert ( this != resource );
     m_dependents.remove ( resource );
+}
+
+//
+// Check ACL 'function right' cache for this resource.
+// Will automatically clear the cache if ACL has changed.
+//
+// Returns true if setting was found in cache
+//
+bool CResource::CheckFunctionRightCache( lua_CFunction f, bool* pbOutAllowed )
+{
+    uint uiACLRevision = g_pGame->GetACLManager()->GetGlobalRevision();
+
+    // Check validity of cache
+    if ( m_uiFunctionRightCacheRevision != uiACLRevision )
+    {
+        m_FunctionRightCacheMap.clear();
+        m_uiFunctionRightCacheRevision = uiACLRevision;
+    }
+
+    // Read cache
+    bool* pResult = MapFind( m_FunctionRightCacheMap, f );
+    if ( !pResult )
+        return false;
+
+    *pbOutAllowed = *pResult;
+    return true;
+}
+
+//
+// Update ACL 'function right' cache for this resource.
+//
+void CResource::UpdateFunctionRightCache( lua_CFunction f, bool bAllowed )
+{
+    MapSet( m_FunctionRightCacheMap, f, bAllowed );
 }

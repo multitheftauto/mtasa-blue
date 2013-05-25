@@ -89,6 +89,17 @@ CLuaCFunction* CLuaCFunctions::GetFunction ( const char* szName )
 }
 
 
+//
+// Returns true if definitely not a registered function.
+// Note: Returning false does not mean it is a registered function
+//
+bool CLuaCFunctions::IsNotFunction ( lua_CFunction f )
+{
+    // Return true if unknown pointer range
+    return ( f < ms_pFunctionPtrLow || f > ms_pFunctionPtrHigh );
+}
+
+
 void CLuaCFunctions::RegisterFunctionsWithVM ( lua_State* luaVM )
 {
     // Register all our functions to a lua VM
