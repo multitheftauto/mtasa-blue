@@ -10,6 +10,7 @@
 
 #include "StdInc.h"
 extern CCoreInterface* g_pCore;
+GameEntityRenderHandler* pGameEntityRenderHandler = NULL;
 
 #define VAR_CCullZones_NumMirrorAttributeZones  0x0C87AC4   // int
 #define VAR_CMirrors_d3dRestored                0x0C7C729   // uchar
@@ -18,7 +19,6 @@ namespace
 {
     CEntitySAInterface* ms_Rendering = NULL;
     CEntitySAInterface* ms_RenderingOneNonRoad = NULL;
-    GameEntityRenderHandler* pGameEntityRenderHandler = NULL;
     bool ms_bIsMinimizedAndNotConnected = false;
     int ms_iSavedNumMirrorZones = 0;
 }
@@ -84,8 +84,8 @@ void OnMY_CEntity_Render_Pre( CEntitySAInterface* pEntity )
 
     ms_Rendering = pEntity;
 
-    if ( pGameEntityRenderHandler && ms_Rendering )
-        pGameEntityRenderHandler ( ms_Rendering );
+    if ( ms_Rendering )
+        CallGameEntityRenderHandler ( ms_Rendering );
 }
 
 void OnMY_CEntity_Render_Post( CEntitySAInterface* pEntity )
@@ -93,8 +93,7 @@ void OnMY_CEntity_Render_Post( CEntitySAInterface* pEntity )
     if ( ms_Rendering )
     {
         ms_Rendering = NULL;
-        if ( pGameEntityRenderHandler )
-            pGameEntityRenderHandler ( ms_RenderingOneNonRoad );
+        CallGameEntityRenderHandler ( ms_RenderingOneNonRoad );
     }
 }
 
@@ -148,9 +147,7 @@ void OnMY_CEntity_RenderOneNonRoad_Pre( DWORD calledFrom, CEntitySAInterface* pE
         return;
 
     ms_RenderingOneNonRoad = pEntity;
-
-    if ( pGameEntityRenderHandler )
-        pGameEntityRenderHandler ( ms_RenderingOneNonRoad );
+    CallGameEntityRenderHandler ( ms_RenderingOneNonRoad );
 }
 
 void OnMY_CEntity_RenderOneNonRoad_Post( DWORD calledFrom, CEntitySAInterface* pEntity )
@@ -158,8 +155,7 @@ void OnMY_CEntity_RenderOneNonRoad_Post( DWORD calledFrom, CEntitySAInterface* p
     if ( ms_RenderingOneNonRoad )
     {
         ms_RenderingOneNonRoad = NULL;
-        if ( pGameEntityRenderHandler )
-            pGameEntityRenderHandler ( ms_RenderingOneNonRoad );
+        CallGameEntityRenderHandler ( ms_RenderingOneNonRoad );
     }
 }
 
