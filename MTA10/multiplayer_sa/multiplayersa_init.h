@@ -137,5 +137,7 @@ void MemSubFast ( U ptr, const T value )
 
 bool GetDebugIdEnabled ( uint uiDebugId );
 void LogEvent ( uint uiDebugId, const char* szType, const char* szContext, const char* szBody );
+void CallGameEntityRenderHandler( CEntitySAInterface* pEntity );
+extern GameEntityRenderHandler* pGameEntityRenderHandler;
 
 #endif
