@@ -108,6 +108,14 @@ CCredits::CCredits ( void )
                               "\n"
                               "\n";
 
+    if ( g_pLocalization->IsLocalized() && !g_pLocalization->GetTranslators().empty() ) 
+    {
+        m_strCredits +=           _("Language Localization");
+        m_strCredits +=           "\n\n";
+        m_strCredits +=           g_pLocalization->GetTranslators();
+        m_strCredits +=           "\n\n\n";
+    }
+
     m_strCredits +=           _("Special Thanks");
     m_strCredits +=           "\n\n"
 
@@ -142,6 +150,9 @@ CCredits::CCredits ( void )
                               "zlib (http://zlib.net/)\n"
                               "bzip2 (http://bzip.org/)\n"
                               "UnRAR (http://www.rarlab.com/)\n"
+                              "tinygettext (http://code.google.com/p/tinygettext/)\n"
+                              "PortAudio (http://www.portaudio.com/)\n"
+                              "speex (http://www.speex.org/)\n"
                               ;
 
     // Create our window
