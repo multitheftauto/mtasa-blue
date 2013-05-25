@@ -70,3 +70,9 @@ void LogEvent ( uint uiDebugId, const char* szType, const char* szContext, const
 {
     g_pCore->LogEvent ( uiDebugId, szType, szContext, szBody );  
 }
+
+void CallGameEntityRenderHandler( CEntitySAInterface* pEntity )
+{
+    if ( pGameEntityRenderHandler )
+        pGameEntityRenderHandler( pEntity );
+}

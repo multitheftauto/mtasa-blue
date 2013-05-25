@@ -79,6 +79,9 @@ IDirect3D9* CDirect3DHook9::API_Direct3DCreate9 ( UINT SDKVersion )
     // Create our interface.
     IDirect3D9* pDirect3D9 = pThis->m_pfnDirect3DCreate9 ( SDKVersion );
 
+    // Not needed now
+    pThis->RemoveHook();
+
     if ( !pDirect3D9 )
     {
         WriteDebugEvent ( "Direct3DCreate9 failed" );
