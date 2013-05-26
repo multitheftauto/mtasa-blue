@@ -240,6 +240,7 @@ CClientGame::CClientGame ( bool bLocalPlay )
     g_pMultiplayer->SetBreakTowLinkHandler ( CClientGame::StaticBreakTowLinkHandler );
     g_pMultiplayer->SetDrawRadarAreasHandler ( CClientGame::StaticDrawRadarAreasHandler );
     g_pMultiplayer->SetDamageHandler ( CClientGame::StaticDamageHandler );
+    g_pMultiplayer->SetDeathHandler ( CClientGame::StaticDeathHandler );
     g_pMultiplayer->SetFireHandler ( CClientGame::StaticFireHandler );
     g_pMultiplayer->SetProjectileStopHandler ( CClientProjectileManager::Hook_StaticProjectileAllow );
     g_pMultiplayer->SetProjectileHandler ( CClientProjectileManager::Hook_StaticProjectileCreation );
@@ -3580,6 +3581,11 @@ bool CClientGame::StaticDamageHandler ( CPed* pDamagePed, CEventDamage * pEvent 
     return g_pClientGame->DamageHandler ( pDamagePed, pEvent );
 }
 
+void CClientGame::StaticDeathHandler ( CPed* pKilledPed, unsigned char ucDeathReason, unsigned char ucBodyPart )
+{
+    g_pClientGame->DeathHandler ( pKilledPed, ucDeathReason, ucBodyPart );
+}
+
 void CClientGame::StaticFireHandler ( CFire* pFire )
 {
     g_pClientGame->FireHandler ( pFire );
@@ -4311,6 +4317,36 @@ bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
     
     // Allow the damage processing to continue
     return true;
+}
+
+void CClientGame::DeathHandler ( CPed* pKilledPedSA, unsigned char ucDeathReason, unsigned char ucBodyPart)
+{
+    CClientPed* pKilledPed = m_pPedManager->Get ( dynamic_cast < CPlayerPed* > ( pKilledPedSA ), true, true );
+
+    if ( !pKilledPed )
+        return;
+
+    // Set the health to zero (this is safe as GTA will do it anyway in a few ticks)
+    pKilledPed->SetHealth(0.0f);
+    
+    if ( IS_PLAYER ( pKilledPed ) )
+    {
+        if ( pKilledPed == m_pLocalPlayer )
+            DoWastedCheck();
+    }
+    else
+    {
+        // Call Lua
+        CLuaArguments Arguments;
+        Arguments.PushBoolean(false);
+        Arguments.PushNumber(ucDeathReason);
+        Arguments.PushNumber(ucBodyPart);
+
+        pKilledPed->CallEvent("onClientPedWasted", Arguments, true);
+        
+        // Notify the server
+        SendPedWastedPacket ( pKilledPed, INVALID_ELEMENT_ID, ucDeathReason, ucBodyPart );
+    }
 }
 
 bool CClientGame::VehicleCollisionHandler ( CVehicleSAInterface* pCollidingVehicle, CEntitySAInterface* pCollidedWith, int iModelIndex, float fDamageImpulseMag, float fCollidingDamageImpulseMag, uint16 usPieceType, CVector vecCollisionPos, CVector vecCollisionVelocity )
