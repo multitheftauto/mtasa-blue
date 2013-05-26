@@ -37,7 +37,7 @@ int WINAPI WinMain ( HINSTANCE _hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
     SharedUtil_Tests ();
 #endif
 
-    const SString strMTASAPath = GetMTASAPath ();
+    const SString strMTASAPath = GetMTASAPath ( false );
 
     //////////////////////////////////////////////////////////
     //
