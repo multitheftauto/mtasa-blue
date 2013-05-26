@@ -72,6 +72,7 @@ extern PostWeaponFireHandler* m_pPostWeaponFireHandler;
 extern BulletImpactHandler* m_pBulletImpactHandler;
 extern BulletFireHandler* m_pBulletFireHandler;
 extern DamageHandler* m_pDamageHandler;
+extern DeathHandler* m_pDeathHandler;
 extern FireHandler* m_pFireHandler;
 extern ProjectileHandler* m_pProjectileHandler;
 extern ProjectileStopHandler* m_pProjectileStopHandler;
@@ -95,6 +96,7 @@ VOID InitShotsyncHooks()
     HookInstall ( HOOKPOS_CTaskSimpleGangDriveBy__PlayerTarget, (DWORD)HOOK_CTaskSimpleGangDriveBy__PlayerTarget, 6 );
     HookInstall ( HOOKPOS_CWeapon__Fire_Sniper, (DWORD)HOOK_CWeapon__Fire_Sniper, 6 );
     HookInstall ( HOOKPOS_CEventDamage__AffectsPed, (DWORD)HOOK_CEventDamage__AffectsPed, 6 );
+    HookInstall ( HOOKPOS_CEventVehicleExplosion__AffectsPed, (DWORD)HOOK_CEventVehicleExplosion__AffectsPed, 5 );
     HookInstall ( HOOKPOS_CFireManager__StartFire, (DWORD)HOOK_CFireManager__StartFire, 6 );
     HookInstall ( HOOKPOS_CFireManager__StartFire_, (DWORD)HOOK_CFireManager__StartFire_, 6 );
     HookInstall ( HOOKPOS_CProjectileInfo__AddProjectile, (DWORD)HOOK_CProjectileInfo__AddProjectile, 7 );
@@ -1547,4 +1549,51 @@ VOID _declspec(naked) HOOK_CWeapon__FireShotgun()
     }   
 }*/
 
+CPedSAInterface *CEventVehicleExplosion_pPed;
+
+void CEventVehicleExplosion_NotifyDeathmatch()
+{
+    if ( m_pDeathHandler )
+    {
+        CPoolsSA * pPools = (CPoolsSA*)pGameInterface->GetPools();
+        CPed * pPed = pPools->GetPed ( (DWORD *)CEventVehicleExplosion_pPed );
+
+        if ( pPed ) 
+            m_pDeathHandler(pPed, 63, 3);
+    }
+}
+
+void _declspec(naked) HOOK_CEventVehicleExplosion__AffectsPed()
+{
+    _asm
+    {
+        // Save the ped
+        mov CEventVehicleExplosion_pPed, edi
+        // Replacement code for the hook
+        pop     edi
+        setz    al
+        pop esi
+        
+        // Verify that the ped is affected
+        cmp al, 1
+        jnz return_from
+
+        // Verify that this call is from the correct location
+        cmp [esp], 0x4ab4c4
+        jnz return_from
+        
+        pushad
+    }
+
+    // Notify Deathmatch about the death
+    CEventVehicleExplosion_NotifyDeathmatch();
+
+    _asm
+    {  
+        popad
+
+return_from:
+        retn 4
+    }
+}
 

@@ -47,6 +47,7 @@ typedef void ( PostWeaponFireHandler ) ( void );
 typedef void ( BulletImpactHandler ) ( class CPed* pInitiator, class CEntity* pVictim, const CVector* pvecStartPosition, const CVector* pvecEndPosition );
 typedef void ( BulletFireHandler ) ( class CPed* pInitiator, const CVector* pvecStartPosition, const CVector* pvecEndPosition );
 typedef bool ( DamageHandler ) ( class CPed* pDamagePed, class CEventDamage * pEvent );
+typedef void ( DeathHandler ) ( class CPed* pKilledPed, unsigned char ucDeathReason, unsigned char ucBodyPart );
 typedef void ( FireHandler ) ( class CFire* pFire );
 typedef bool ( ProjectileStopHandler ) ( class CEntity * owner, enum eWeaponType weaponType, class CVector * origin, float fForce, class CVector * target, class CEntity * targetEntity );
 typedef void ( ProjectileHandler ) ( class CEntity * owner, class CProjectile* projectile, class CProjectileInfo* projectileInfo, enum eWeaponType weaponType, class CVector * origin, float fForce, class CVector * target, class CEntity * targetEntity );
@@ -156,6 +157,7 @@ public:
     virtual void                        SetExplosionHandler         ( ExplosionHandler * pExplosionHandler ) = 0;
     virtual void                        SetBreakTowLinkHandler      ( BreakTowLinkHandler * pBreakTowLinkHandler ) = 0;
     virtual void                        SetDamageHandler            ( DamageHandler * pDamageHandler ) = 0;
+    virtual void                        SetDeathHandler             ( DeathHandler * pDeathHandler ) = 0;
     virtual void                        SetFireHandler              ( FireHandler * pFireHandler ) = 0;
     virtual void                        SetProcessCamHandler        ( ProcessCamHandler* pProcessCamHandler ) = 0;
     virtual void                        SetChokingHandler           ( ChokingHandler* pChokingHandler ) = 0;
