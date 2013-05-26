@@ -15,10 +15,15 @@
 
 #include "StdInc.h"
 HRESULT HandleCreateDeviceResult( HRESULT hResult, IDirect3D9* pDirect3D, UINT Adapter, D3DDEVTYPE DeviceType, HWND hFocusWindow, DWORD BehaviorFlags, D3DPRESENT_PARAMETERS* pPresentationParameters, IDirect3DDevice9** ppReturnedDeviceInterface );
+uint ms_uiInstanceCount = 0;
 
 CProxyDirect3D9::CProxyDirect3D9 ( IDirect3D9* pInterface )
 {
-    WriteDebugEvent ( "CProxyDirect3D9::CProxyDirect3D9" );
+    ms_uiInstanceCount++;
+    WriteDebugEvent ( SString( "CProxyDirect3D9::CProxyDirect3D9 #%d", ms_uiInstanceCount ) );
+    if ( ms_uiInstanceCount > 1 )
+        AddReportLog( 9401,  SString( "CProxyDirect3D9::CProxyDirect3D9 #%d", ms_uiInstanceCount ) );
+
     m_pDevice       = pInterface;
 
     // Give ourself a matching refcount.
