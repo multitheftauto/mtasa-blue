@@ -181,6 +181,7 @@ public:
     // Hooks
     void                    ApplyHooks                      ( void );
     void                    ApplyHooks2                     ( void );
+    void                    ApplyHooks3                     ( bool bEnable );
     HWND                    GetHookedWindow                 ( void );
     void                    SwitchRenderWindow              ( HWND hWnd, HWND hWndInput );
     void                    CallSetCursorPos                ( int X, int Y ) { m_pSetCursorPosHook->CallSetCursorPos(X,Y); }
