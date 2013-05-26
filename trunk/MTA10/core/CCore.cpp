@@ -747,6 +747,14 @@ void CCore::ApplyHooks2 ( )
     m_pDirect3DHookManager->ApplyHook ( );
 }
 
+void CCore::ApplyHooks3( bool bEnable )
+{
+    if ( bEnable )
+        CDirect3DHook9::GetSingletonPtr()->ApplyHook();
+    else
+        CDirect3DHook9::GetSingletonPtr()->RemoveHook();
+}
+
 
 void CCore::SetCenterCursor ( bool bEnabled )
 {

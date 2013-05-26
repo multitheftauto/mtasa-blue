@@ -32,11 +32,13 @@ CDirect3DHook9::~CDirect3DHook9 ( )
 bool CDirect3DHook9::ApplyHook ( )
 {
     // Hook Direct3DCreate9.
-    m_pfnDirect3DCreate9 = reinterpret_cast < pDirect3DCreate > ( DetourFunction ( DetourFindFunction ( "D3D9.DLL", "Direct3DCreate9" ), 
-                                                                  reinterpret_cast < PBYTE > ( API_Direct3DCreate9 ) ) );
+    if ( !m_pfnDirect3DCreate9 )
+    {
+        m_pfnDirect3DCreate9 = reinterpret_cast < pDirect3DCreate > ( DetourFunction ( DetourFindFunction ( "D3D9.DLL", "Direct3DCreate9" ), 
+                                                                      reinterpret_cast < PBYTE > ( API_Direct3DCreate9 ) ) );
 
-    WriteDebugEvent ( "Direct3D9 hook applied" );
-
+        WriteDebugEvent ( "Direct3D9 hook applied" );
+    }
     return true;
 }
 
@@ -51,9 +53,9 @@ bool CDirect3DHook9::RemoveHook ( )
 
         // Unset our hook variable.
         m_pfnDirect3DCreate9 = NULL;
-    }
 
-    WriteDebugEvent ( "Direct3D9 hook removed." );
+        WriteDebugEvent ( "Direct3D9 hook removed." );
+    }
 
     return true;
 }
@@ -78,9 +80,6 @@ IDirect3D9* CDirect3DHook9::API_Direct3DCreate9 ( UINT SDKVersion )
 
     // Create our interface.
     IDirect3D9* pDirect3D9 = pThis->m_pfnDirect3DCreate9 ( SDKVersion );
-
-    // Not needed now
-    pThis->RemoveHook();
 
     if ( !pDirect3D9 )
     {

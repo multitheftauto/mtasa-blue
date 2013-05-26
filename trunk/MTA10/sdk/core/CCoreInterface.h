@@ -107,6 +107,7 @@ public:
 
     virtual void                    SetConnected                    ( bool bConnected ) = 0;
     virtual void                    SetOfflineMod                   ( bool bOffline ) = 0;
+    virtual void                    ApplyHooks3                     ( bool bEnable ) = 0;
 
     virtual bool                    IsConnected                     ( void ) = 0;
     virtual bool                    Reconnect                       ( const char* szHost, unsigned short usPort, const char* szPassword, bool bSave = true, bool bForceInternalHTTPServer = false ) = 0;
