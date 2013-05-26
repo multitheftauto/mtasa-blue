@@ -7381,6 +7381,7 @@ int CLuaFunctionDefinitions::BindKey ( lua_State* luaVM )
 
     if ( argStream.NextIsString ( ) )
     {
+        // bindKey ( player thePlayer, string key, string keyState, string commandName, [ string arguments ] )
         argStream.ReadString(strCommand); 
         argStream.ReadString(strArguments, ""); 	
         if ( !argStream.HasErrors ( ) )
@@ -7391,17 +7392,16 @@ int CLuaFunctionDefinitions::BindKey ( lua_State* luaVM )
                 return 1;
             }
         }
-        else
-            m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
     }
     else if ( !argStream.HasErrors ( ) )
     {
+        // bindKey ( player thePlayer, string key, string keyState, function handlerFunction,  [ var arguments, ... ] )
+        CLuaFunctionRef iLuaFunction;
         CLuaArguments Arguments;
-        Arguments.ReadArguments ( luaVM, 5 );
-
-        CLuaFunctionRef iLuaFunction = luaM_toref ( luaVM, 4 );
-
-        if ( VERIFY_FUNCTION ( iLuaFunction ) )
+        argStream.ReadFunction ( iLuaFunction );
+        argStream.ReadLuaArguments ( Arguments );
+        argStream.ReadFunctionComplete ();
+        if ( !argStream.HasErrors ( ) )
         {
             if ( CStaticFunctionDefinitions::BindKey ( pPlayer, strKey, strHitState, pLuaMain, iLuaFunction, Arguments ) )
             {
@@ -7409,10 +7409,9 @@ int CLuaFunctionDefinitions::BindKey ( lua_State* luaVM )
                 return 1;
             }
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "function", 4 );
     }
-    else
+
+    if ( argStream.HasErrors ( ) )
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
@@ -7427,19 +7426,18 @@ int CLuaFunctionDefinitions::UnbindKey ( lua_State* luaVM )
     SString strKey; 
     SString strHitState; 
     SString strCommand; 
-    SString strArguments; 
 
     CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
     
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData(pPlayer); 
     argStream.ReadString(strKey); 
-    argStream.ReadString(strHitState); 
 
-    if ( argStream.NextIsString ( ) )
+    if ( argStream.NextIsString ( 1 ) ) // Check if has command
     {
+        // bool unbindKey ( player thePlayer, string key, string keyState, string command )
+        argStream.ReadString(strHitState); 
         argStream.ReadString(strCommand); 
-        argStream.ReadString(strArguments, ""); 	
         if ( !argStream.HasErrors ( ) )
         {
             if ( CStaticFunctionDefinitions::UnbindKey ( pPlayer, strKey, strHitState, strCommand, pLuaMain->GetResource()->GetName().c_str() ) )
@@ -7448,23 +7446,25 @@ int CLuaFunctionDefinitions::UnbindKey ( lua_State* luaVM )
                 return 1;
             }
         }
-        else
-            m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
     }
     else if ( !argStream.HasErrors ( ) )
     {
-
-        CLuaFunctionRef iLuaFunction = luaM_toref ( luaVM, 4 );
-
-        if ( CStaticFunctionDefinitions::UnbindKey ( pPlayer, strKey, pLuaMain, strHitState, iLuaFunction ) )
+        // bool unbindKey ( player thePlayer, string key, [ string keyState, function handler  ] )
+        CLuaFunctionRef iLuaFunction;
+        argStream.ReadString ( strHitState, "" );
+        argStream.ReadFunction ( iLuaFunction, LUA_REFNIL );
+        argStream.ReadFunctionComplete ();
+        if ( !argStream.HasErrors ( ) )
         {
+            if ( CStaticFunctionDefinitions::UnbindKey ( pPlayer, strKey, pLuaMain, strHitState, iLuaFunction ) )
+            {
                 lua_pushboolean ( luaVM, true );
                 return 1;
+            }
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "function", 4 );
     }
-    else
+
+    if ( argStream.HasErrors ( ) )
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
