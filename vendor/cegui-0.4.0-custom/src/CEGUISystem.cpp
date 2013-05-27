@@ -231,6 +231,7 @@ void System::constructor_impl(Renderer* renderer, ResourceProvider* resourceProv
 	d_rctrl		= false;
     d_ralt      = false;
     d_lalt      = false;
+    d_started   = false;
 
 	d_click_timeout		= DefaultSingleClickTimeout;
 	d_dblclick_timeout	= DefaultMultiClickTimeout;
@@ -523,8 +524,10 @@ bool System::renderGUI(void)
 
     // Flag for redraw to rebuild fonts if needed
     for ( FontManager::FontIterator fontIt = d_fontManager->getIterator() ; !fontIt.isAtEnd() ; ++fontIt )
-        if ( (*fontIt)->needsClearRenderList () )
+        if ( (*fontIt)->needsRebuild () )
             d_gui_redraw = true;
+
+    d_started = true;
 
     return bRenderOk;
 }

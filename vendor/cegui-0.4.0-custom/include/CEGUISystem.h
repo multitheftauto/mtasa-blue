@@ -826,9 +826,12 @@ public:
 	*/
 	bool	injectTimePulse(float timeElapsed);
 
+    bool    isStarted(void) { return d_started; }
+
     void                            SetGuiWorkingDirectory      ( const String& strDir )    { d_guiWorkingDirectory = strDir; }
     String                          GetGuiWorkingDirectory      ( void )                    { return d_guiWorkingDirectory; }
 
+    bool                            d_started;
     static void                     SetBidiEnabled              ( bool bEnabled ) { ms_bBidiEnabled = bEnabled; }
     static bool                     ms_bBidiEnabled;
 private:
