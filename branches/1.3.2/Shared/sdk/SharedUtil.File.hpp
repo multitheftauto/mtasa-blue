@@ -552,8 +552,9 @@ std::vector < SString > SharedUtil::FindFiles ( const SString& strMatch, bool bF
 #endif
 
 
-void SharedUtil::ExtractFilename ( const SString& strPathFilename, SString* strPath, SString* strFilename )
+void SharedUtil::ExtractFilename ( const SString& strInPathFilename, SString* strPath, SString* strFilename )
 {
+    const SString strPathFilename = PathConform ( strInPathFilename );
     if ( !strPathFilename.Split ( PATH_SEPERATOR, strPath, strFilename, -1 ) )
         if ( strFilename )
             *strFilename = strPathFilename;
@@ -598,8 +599,10 @@ SString SharedUtil::ExtractBeforeExtension ( const SString& strPathFilename )
 }
 
 
-SString SharedUtil::MakeUniquePath ( const SString& strPathFilename )
+SString SharedUtil::MakeUniquePath ( const SString& strInPathFilename )
 {
+    const SString strPathFilename = PathConform ( strInPathFilename );
+
     SString strBeforeUniqueChar, strAfterUniqueChar;
 
     SString strPath, strFilename;

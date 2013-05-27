@@ -20,6 +20,7 @@ CDirect3DHook9::CDirect3DHook9 (  )
     WriteDebugEvent ( "CDirect3DHook9::CDirect3DHook9" );
 
     m_pfnDirect3DCreate9 = NULL;
+    m_pfnDirect3DCreate9Suspended = false;
 }
 
 CDirect3DHook9::~CDirect3DHook9 ( )
@@ -37,26 +38,20 @@ bool CDirect3DHook9::ApplyHook ( )
         m_pfnDirect3DCreate9 = reinterpret_cast < pDirect3DCreate > ( DetourFunction ( DetourFindFunction ( "D3D9.DLL", "Direct3DCreate9" ), 
                                                                       reinterpret_cast < PBYTE > ( API_Direct3DCreate9 ) ) );
 
-        WriteDebugEvent ( "Direct3D9 hook applied" );
+        WriteDebugEvent ( SString( "Direct3D9 hook applied %08x", m_pfnDirect3DCreate9 ) );
+    }
+    else
+    {
+        WriteDebugEvent ( "Direct3D9 hook resumed." );
+        m_pfnDirect3DCreate9Suspended = false;
     }
     return true;
 }
 
 bool CDirect3DHook9::RemoveHook ( )
 {
-    // Make sure we should be doing this.
-    if ( m_pfnDirect3DCreate9 != NULL )
-    {
-        // Unhook Direct3DCreate9.
-        DetourRemove ( reinterpret_cast < PBYTE > ( m_pfnDirect3DCreate9 ), 
-                       reinterpret_cast < PBYTE > ( API_Direct3DCreate9  ) );
-
-        // Unset our hook variable.
-        m_pfnDirect3DCreate9 = NULL;
-
-        WriteDebugEvent ( "Direct3D9 hook removed." );
-    }
-
+    m_pfnDirect3DCreate9Suspended = true;
+    WriteDebugEvent ( "Direct3D9 hook suspended." );
     return true;
 }
 
@@ -65,6 +60,9 @@ IDirect3D9* CDirect3DHook9::API_Direct3DCreate9 ( UINT SDKVersion )
     // Get our self instance.
     CDirect3DHook9* pThis = CDirect3DHook9::GetSingletonPtr ( );
     assert( pThis && "API_Direct3DCreate9: No CDirect3DHook9" );
+
+    if ( pThis->m_pfnDirect3DCreate9Suspended )
+        return pThis->m_pfnDirect3DCreate9( SDKVersion );
 
     // A little hack to get past the loading time required to decrypt the gta 
     // executable into memory...

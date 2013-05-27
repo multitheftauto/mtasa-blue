@@ -595,9 +595,13 @@ void WriteEvent( const char* szType, const SString& strText )
             WriteEvent( szType, lineList[i] );
         return;
     }
-    SString strPathFilename = CalcMTASAPath( PathJoin( "mta", "logfile.txt" ) );
     SString strMessage( "%s - %s %s", *GetLocalTimeString(), szType, *strText );
-    FileAppend( strPathFilename, strMessage + "\n" );
+    SString strPathFilename1 = CalcMTASAPath( PathJoin( "mta", "logfile.txt" ) );
+    FileAppend( strPathFilename1, strMessage + "\n" );
+
+    SString strPathFilename2 = PathJoin( GetMTADataPath (), "logfile.txt" );
+    MakeSureDirExists( strPathFilename2 );
+    FileAppend( strPathFilename2, strMessage + "\n" );
 #ifdef MTA_DEBUG
     OutputDebugLine ( strMessage );
 #endif
@@ -617,6 +621,12 @@ void SharedUtil::CycleEventLog( void )
 {
     SString strPathFilename = CalcMTASAPath( PathJoin( "mta", "logfile.txt" ) );
     SString strPathFilenamePrev = CalcMTASAPath( PathJoin( "mta", "logfile_old.txt" ) );
+    FileDelete( strPathFilenamePrev );
+    FileRename( strPathFilename, strPathFilenamePrev );
+    FileDelete( strPathFilename );
+
+    strPathFilename = PathJoin( GetMTADataPath (), "logfile.txt" );
+    strPathFilenamePrev = PathJoin( GetMTADataPath (), "logfile_old.txt" );
     FileDelete( strPathFilenamePrev );
     FileRename( strPathFilename, strPathFilenamePrev );
     FileDelete( strPathFilename );

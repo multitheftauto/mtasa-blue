@@ -11,8 +11,8 @@
 *****************************************************************************/
 
 #include "StdInc.h"
-
-using std::string;
+#define DECLARE_PROFILER_SECTION_Core
+#include "profiler/SharedUtil.Profiler.h"
 
 CCore* g_pCore = NULL;
 CGraphics* g_pGraphics = NULL;
@@ -21,12 +21,11 @@ bool IsRealDeal ( void );
 int WINAPI DllMain(HINSTANCE hModule, DWORD dwReason, PVOID pvNothing)
 {
     CFilePathTranslator     FileTranslator;
-    string                  WorkingDirectory;
-
+    std::string             WorkingDirectory;
 
     if ( dwReason == DLL_PROCESS_ATTACH )
     {
-        WriteDebugEvent( "DLL_PROCESS_ATTACH" );
+        WriteDebugEvent( SString( "DLL_PROCESS_ATTACH %08x", pvNothing ) );
         if ( IsRealDeal () )
         {
             FileTranslator.GetGTARootDirectory ( WorkingDirectory );
@@ -45,7 +44,7 @@ int WINAPI DllMain(HINSTANCE hModule, DWORD dwReason, PVOID pvNothing)
     } 
     else if (dwReason == DLL_PROCESS_DETACH)
     {
-        WriteDebugEvent( "DLL_PROCESS_DETACH" );
+        WriteDebugEvent( SString( "DLL_PROCESS_DETACH %08x", pvNothing ) );
         if ( IsRealDeal () )
         {
             // For now, TerminateProcess if any destruction is attempted (or we'll crash)
