@@ -243,25 +243,15 @@ public:
     \return
         Nothing.
     */
-    void setSubstituteFont(const String& name,  uint size, const String& resourceGroup = "") const;
-
-    /*!
-    \brief
-        Gets a substitute glyph incase a given font doenst have a glyph
-
-    \param name
-        Glyph id of the glyph.
-
-    \return
-        The FT_GlyphSlot containing the glyph.
-    */
-    void* getSubstituteGlyph(unsigned long ulGlyph) const;
-
+    void setSubstituteFont(Font* subfont) { d_subfont = subfont; d_subfont->setIsSubstituteFont(true); };
+    Font* getSubstituteFont(void) { return d_subfont; };
 
 private:
 	/*************************************************************************
 		Implementation Data
 	*************************************************************************/
+    Font*   d_subfont;
+
 	typedef	std::map<String, Font*>		FontRegistry;
 	FontRegistry		d_fonts;
 

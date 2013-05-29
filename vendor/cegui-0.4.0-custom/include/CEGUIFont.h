@@ -657,6 +657,12 @@ public:
 	*/
 	const String getAvailableGlyphs(void) const;
 
+    // Subsitute font extensions
+    const std::map < utf32, SCharSize >&       getSizesMap ( void ) { return d_sizes_map; };
+    const std::map < uint, GlyphPageInfo >&    getPageInfoMap ( void ) { return d_GlyphPageInfoMap; };
+    bool                d_is_subfont;
+    void                setIsSubstituteFont ( bool bIsSubFont ) { d_is_subfont = bIsSubFont; };
+
 	/*!
 	\brief
         glyph cache functions
@@ -667,7 +673,7 @@ public:
     GlyphPageInfo*      addGlyphPageInfo                ( ulong ulGlyph );
     void                redrawGlyphCache                ( );
     void                refreshCachedGlyph              ( unsigned long ulGlyph );
-    void                insertGlyphToCache              ( unsigned long ulGlyph );
+    GlyphPageInfo*      insertGlyphToCache              ( unsigned long ulGlyph );
     void	            refreshStringForGlyphs          ( const String& strText );
     void	            insertStringForGlyphs           ( const String& strText );
     void                pulse                           ( void );
@@ -1048,6 +1054,9 @@ private:
 	float	d_nativeVertRes;		//!< native vertical resolution for this Imageset.
 
 	bool	d_antiAliased;			//!< True if the font should be rendered as anti-alaised by freeType.
+
+    // Substitute font
+    const CodepointMap&               getCodepointMap ( void ) { return d_cp_map; };
 
     // Glyph cache
     String  d_imagesetName;

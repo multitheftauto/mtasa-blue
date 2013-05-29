@@ -259,6 +259,7 @@ private:
     CGUIFont_Impl*                  m_pSAHeaderFont;
     CGUIFont_Impl*                  m_pSAGothicFont;
     CGUIFont_Impl*                  m_pSansFont;
+    CGUIFont_Impl*                  m_pUniFont;
                 
     std::list < CGUIElement* >      m_RedrawQueue;
 
