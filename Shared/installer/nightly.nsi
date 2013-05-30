@@ -48,7 +48,7 @@ Var ShowLastUsed
 	!define FILES_MODULE_SDK "Install files builder/output/development/publicsdk"
 	!define INSTALL_OUTPUT "mtasa-${0.0.0}-unstable-00000-0-000-nsis.exe"
 	!define PRODUCT_VERSION "v${0.0.0}-unstable-00000-0-000"
-	!define REVISION "0000"
+	!define REVISION "0"
 !endif
 !ifndef LIGHTBUILD
 	!define INCLUDE_DEVELOPMENT
@@ -77,6 +77,30 @@ Var ShowLastUsed
 !define PRODUCT_DIR_REGKEY "Software\Microsoft\Windows\CurrentVersion\App Paths\Multi Theft Auto ${0.0}.exe"
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
 !define PRODUCT_UNINST_ROOT_KEY "HKLM"
+
+; Set file version information
+!ifndef VI_PRODUCT_VERSION
+    !ifdef REVISION
+        !define VI_PRODUCT_VERSION "${0.0.0}.${REVISION}"
+    !else
+        !define VI_PRODUCT_VERSION "${0.0.0}.0"
+    !endif
+    !define VI_PRODUCT_NAME "MTA San Andreas"
+    !define VI_COMPANY_NAME "Multi Theft Auto"
+    !define VI_LEGAL_COPYRIGHT "(C) 2003 - 2013 Multi Theft Auto"
+    !ifndef LIGHTBUILD
+        !define VI_FILE_DESCRIPTION "Multi Theft Auto Full Installer"
+    !else
+        !define VI_FILE_DESCRIPTION "Multi Theft Auto Nightly Installer"
+    !endif
+!endif
+VIProductVersion "${VI_PRODUCT_VERSION}"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductName" "${VI_PRODUCT_NAME}"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "CompanyName" "${VI_COMPANY_NAME}"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "LegalCopyright" "${VI_LEGAL_COPYRIGHT}"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "FileDescription" "${VI_FILE_DESCRIPTION}"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "FileVersion" "${VI_PRODUCT_VERSION}"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductVersion" "${VI_PRODUCT_VERSION}"
 
 ; MUI 1.67 compatible ------
 !include "MUI.nsh"
