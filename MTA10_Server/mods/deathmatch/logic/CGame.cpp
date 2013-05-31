@@ -252,11 +252,7 @@ CGame::~CGame ( void )
         m_pHTTPD->StopHTTPD ();
 
      // Destroy our stuff
-    if ( m_pResourceManager )
-    {
-        delete m_pResourceManager;
-        m_pResourceManager = NULL;
-    }
+    SAFE_DELETE( m_pResourceManager );
 
     // Delete everything we have undeleted
     m_ElementDeleter.DoDeleteAll ();
@@ -267,6 +263,7 @@ CGame::~CGame ( void )
 #endif
     SAFE_DELETE ( m_pConsole );
     SAFE_DELETE ( m_pMapManager );
+    SAFE_DELETE ( m_pRemoteCalls );
     SAFE_DELETE ( m_pLuaManager );
     SAFE_DELETE ( m_pPacketTranslator );
     SAFE_DELETE ( m_pMarkerManager );
@@ -299,7 +296,6 @@ CGame::~CGame ( void )
     SAFE_DELETE ( m_pZoneNames );
     SAFE_DELETE ( m_pASE );
     SAFE_DELETE ( m_pSettings );
-    SAFE_DELETE ( m_pRemoteCalls );
     SAFE_DELETE ( m_pRPCFunctions );
     SAFE_DELETE ( m_pWaterManager );
     SAFE_DELETE ( m_pWeaponStatsManager );

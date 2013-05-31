@@ -372,12 +372,10 @@ CClientGame::~CClientGame ( void )
     m_pTransferBox->Hide();
     m_pBigPacketTransferBox->Hide();
 
-    delete m_pVoiceRecorder;
-    m_pVoiceRecorder = NULL;
+    SAFE_DELETE( m_pVoiceRecorder );
 
     // Singular file download manager
-    delete m_pSingularFileDownloadManager;
-    m_pSingularFileDownloadManager = NULL;
+    SAFE_DELETE( m_pSingularFileDownloadManager );
 
     // NULL the message/net stuff
     g_pMultiplayer->SetPreContextSwitchHandler ( NULL );
@@ -430,46 +428,42 @@ CClientGame::~CClientGame ( void )
     SetCursorEventsEnabled ( false );   
 
     // Destroy our stuff
-    delete m_pNametags;
-    delete m_pSyncDebug;
-    delete m_pNetworkStats;
-    delete m_pNetAPI;
-    delete m_pManager;
-    delete m_pRPCFunctions;
-    delete m_pUnoccupiedVehicleSync;
-    delete m_pPedSync;
+    SAFE_DELETE( m_pNametags );
+    SAFE_DELETE( m_pSyncDebug );
+    SAFE_DELETE( m_pNetworkStats );
+    SAFE_DELETE( m_pNetAPI );
+    SAFE_DELETE( m_pManager );
+    SAFE_DELETE( m_pRPCFunctions );
+    SAFE_DELETE( m_pUnoccupiedVehicleSync );
+    SAFE_DELETE( m_pPedSync );
 #ifdef WITH_OBJECT_SYNC
-    delete m_pObjectSync;
+    SAFE_DELETE( m_pObjectSync );
 #endif
-    delete m_pBlendedWeather;
-    m_pBlendedWeather = NULL;
-    delete m_pMovingObjectsManager;
-    delete m_pRadarMap;
-    delete m_pLuaManager;
-    delete m_pLatentTransferManager;
-
-    delete m_pRootEntity;
-
-    delete m_pModelCacheManager;
-    delete m_pGameEntityXRefManager;
-    delete m_pZoneNames;
-    delete m_pScriptKeyBinds;    
+    SAFE_DELETE( m_pBlendedWeather );
+    SAFE_DELETE( m_pMovingObjectsManager );
+    SAFE_DELETE( m_pRadarMap );
     SAFE_DELETE( m_pRemoteCalls );
+    SAFE_DELETE( m_pLuaManager );
+    SAFE_DELETE( m_pLatentTransferManager );
+
+    SAFE_DELETE( m_pRootEntity );
+
+    SAFE_DELETE( m_pModelCacheManager );
+    SAFE_DELETE( m_pGameEntityXRefManager );
+    SAFE_DELETE( m_pZoneNames );
+    SAFE_DELETE( m_pScriptKeyBinds );   
 
     // Delete the scriptdebugger
-    delete m_pScriptDebugging;
+    SAFE_DELETE( m_pScriptDebugging );
 
     // Delete the transfer boxes
-    delete m_pTransferBox;
-    delete m_pBigPacketTransferBox;
+    SAFE_DELETE( m_pTransferBox );
+    SAFE_DELETE( m_pBigPacketTransferBox );
 
-    if ( m_pLocalServer )
-    {
-        delete m_pLocalServer;
-    }
+    SAFE_DELETE( m_pLocalServer );
 
     // Packet handler
-    delete m_pPacketHandler;
+    SAFE_DELETE( m_pPacketHandler );
 
     // Delete PerfStatManager
     delete CClientPerfStatManager::GetSingleton ();
@@ -642,11 +636,7 @@ bool CClientGame::StartLocalGame ( eServerType Type, const char* szPassword )
     m_ServerType = Type;
     SString strTemp = (Type == SERVER_TYPE_EDITOR) ? "editor.conf" : "local.conf";
 
-    if ( m_pLocalServer )
-    {
-        delete m_pLocalServer;
-        m_pLocalServer = NULL;
-    }
+    SAFE_DELETE( m_pLocalServer );
 
     // Store our nickname
     m_strLocalNick.AssignLeft ( strNick.c_str(), MAX_PLAYER_NICK_LENGTH );
