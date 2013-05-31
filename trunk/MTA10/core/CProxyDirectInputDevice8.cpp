@@ -14,16 +14,12 @@
 
 CProxyDirectInputDevice8::CProxyDirectInputDevice8 ( IDirectInputDevice8A* pDevice )
 {
-    WriteDebugEvent ( "CProxyDirectInputDevice8::CProxyDirectInputDevice8" );
+    WriteDebugEvent ( SString( "CProxyDirectInputDevice8::CProxyDirectInputDevice8 %08x", this ) );
     CCore::GetSingleton().ApplyHooks2 ( );
 
     // Initialize our device member variable.
     m_pDevice       = pDevice;
     m_bDropDataIfInputGoesToGUI = true;
-
-    // Get the current refcount.
-    pDevice->AddRef ( );
-    m_dwRefCount = pDevice->Release ( );
 
     // Don't block joystick if GUI wants input (so same as XInput joystick)
     DIDEVICEINSTANCE didi;
@@ -46,7 +42,7 @@ CProxyDirectInputDevice8::CProxyDirectInputDevice8 ( IDirectInputDevice8A* pDevi
 CProxyDirectInputDevice8::~CProxyDirectInputDevice8 ( )
 {
     GetJoystickManager ( )->RemoveDevice ( m_pDevice );
-    WriteDebugEvent ( "CProxyDirectInputDevice8::~CProxyDirectInputDevice8" );
+    WriteDebugEvent ( SString( "CProxyDirectInputDevice8::~CProxyDirectInputDevice8 %08x", this ) );
 }
 
 /*** IUnknown methods ***/
@@ -57,37 +53,19 @@ HRESULT CProxyDirectInputDevice8::QueryInterface             ( REFIID riid,  LPV
 
 ULONG   CProxyDirectInputDevice8::AddRef                     ( VOID )
 {
-    // Incrase our refcount
-    m_dwRefCount++;
-
     return m_pDevice->AddRef ( );
 }
 
 ULONG   CProxyDirectInputDevice8::Release                    ( VOID )
 {
-    ULONG       ulRefCount;
-    IUnknown *  pDestroyedDevice;
-
-    // Determine if we should self destruct
-    if ( --m_dwRefCount == 0 )
+	// Call original function
+	ULONG ulRefCount = m_pDevice->Release ();
+    if ( ulRefCount == 0 )
     {
         WriteDebugEvent ( "Releasing IDirectInputDevice8 Proxy..." );
-
-        // Save device so we can destroy it after.
-        pDestroyedDevice = m_pDevice;
-
-        // Destroy object.
-        delete this;
-
-        // Call the release routine and get the refcount.
-        ulRefCount = pDestroyedDevice->Release ( );
-
-        return ulRefCount;
+		delete this;
     }
-
-    ulRefCount = m_pDevice->Release ( );
-
-    return ulRefCount;
+	return ulRefCount;
 }
 
 /*** IDirectInputDevice8A methods ***/
