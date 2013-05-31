@@ -45,7 +45,6 @@ class CProxyDirect3D9 : public IDirect3D9
     private:
 
     IDirect3D9 *    m_pDevice;
-    DWORD           m_dwRefCount;
 };
 
 #endif

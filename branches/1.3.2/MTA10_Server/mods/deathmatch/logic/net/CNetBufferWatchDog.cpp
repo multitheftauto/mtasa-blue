@@ -163,10 +163,10 @@ void CNetBufferWatchDog::DoChecks ( void )
     m_pNetBuffer->GetQueueSizes ( uiFinishedList, uiOutCommandQueue, uiOutResultQueue, uiInResultQueue, m_uiGamePlayerCount );
 
     // Update queue status
-    UpdateQueueInfo ( m_FinishedListQueueInfo, uiFinishedList, "FinishedList" );
-    UpdateQueueInfo ( m_OutCommandQueueInfo, uiOutCommandQueue, "OutCommandQueue" );
-    UpdateQueueInfo ( m_OutResultQueueInfo, uiOutResultQueue, "OutResultQueue" );
-    UpdateQueueInfo ( m_InResultQueueInfo, uiInResultQueue, "InResultQueue" );
+    UpdateQueueInfo ( m_FinishedListQueueInfo, uiFinishedList, "[Network] FinishedList" );
+    UpdateQueueInfo ( m_OutCommandQueueInfo, uiOutCommandQueue, "[Network] OutCommandQueue" );
+    UpdateQueueInfo ( m_OutResultQueueInfo, uiOutResultQueue, "[Network] OutResultQueue" );
+    UpdateQueueInfo ( m_InResultQueueInfo, uiInResultQueue, "[Network] InResultQueue" );
 
     // Apply queue status
     if ( m_OutCommandQueueInfo.status == EQueueStatus::STATUS_OK )

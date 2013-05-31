@@ -107,8 +107,8 @@ CDatabaseJobQueue* NewDatabaseJobQueue ( void )
 //
 ///////////////////////////////////////////////////////////////
 CDatabaseJobQueueImpl::CDatabaseJobQueueImpl ( void )
-    : m_uiJobCountWarnThresh ( 30 )
-    , m_uiConnectionCountWarnThresh ( 10 )
+    : m_uiJobCountWarnThresh ( 200 )
+    , m_uiConnectionCountWarnThresh ( 20 )
 {
     // Add known database types
     CDatabaseType* pDatabaseTypeSqlite = NewDatabaseTypeSqlite ();
@@ -310,7 +310,7 @@ void CDatabaseJobQueueImpl::UpdateDebugData ( void )
     if ( m_uiJobCount10sMin > m_uiJobCountWarnThresh )
     {
         m_uiJobCountWarnThresh = m_uiJobCount10sMin * 2;
-        CLogger::LogPrintf ( "Notice: There are now %d job handles\n", m_uiJobCount10sMin );
+        CLogger::LogPrintf ( "Notice: %d database query handles created in the last 10 seconds\n", m_uiJobCount10sMin );
     }
     m_JobCountElpasedTime.Reset ();
     m_uiJobCount10sMin = m_ActiveJobHandles.size ();
