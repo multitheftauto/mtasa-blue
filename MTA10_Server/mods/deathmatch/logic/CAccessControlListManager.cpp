@@ -28,6 +28,9 @@ CAccessControlListManager::CAccessControlListManager ( void ) : CXMLConfig ( NUL
 
 CAccessControlListManager::~CAccessControlListManager ( void )
 {
+    if ( m_bNeedsSave )
+        Save();
+
     // Clear the ACL stuff
     ClearACLs ();
     ClearGroups ();
