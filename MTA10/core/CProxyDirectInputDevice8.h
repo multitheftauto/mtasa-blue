@@ -61,7 +61,6 @@ class CProxyDirectInputDevice8 : public IDirectInputDevice8A
     private:
 
     IDirectInputDevice8A *   m_pDevice;
-    DWORD                    m_dwRefCount;
     bool                     m_bDropDataIfInputGoesToGUI;
 };
 

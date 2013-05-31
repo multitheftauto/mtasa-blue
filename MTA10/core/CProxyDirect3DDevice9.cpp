@@ -19,14 +19,10 @@ CProxyDirect3DDevice9::SD3DDeviceState* g_pDeviceState = NULL;
 // Proxy constructor and destructor.
 CProxyDirect3DDevice9::CProxyDirect3DDevice9 ( IDirect3DDevice9 * pDevice  )
 {
-    WriteDebugEvent ( "CProxyDirect3DDevice9::CProxyDirect3DDevice9" );
+    WriteDebugEvent ( SString( "CProxyDirect3DDevice9::CProxyDirect3DDevice9 %08x", this ) );
 
     // Set our wrapped device.
     m_pDevice       = pDevice;
-
-    // Give ourself a matching refcount.
-    pDevice->AddRef ( );
-    m_dwRefCount = pDevice->Release ( );
 
     // Get CDirect3DData pointer.
     m_pData = CDirect3DData::GetSingletonPtr ( );
@@ -84,7 +80,7 @@ CProxyDirect3DDevice9::CProxyDirect3DDevice9 ( IDirect3DDevice9 * pDevice  )
 
 CProxyDirect3DDevice9::~CProxyDirect3DDevice9 ( )
 {
-    WriteDebugEvent ( "CProxyDirect3DDevice9::~CProxyDirect3DDevice9" );
+    WriteDebugEvent ( SString( "CProxyDirect3DDevice9::~CProxyDirect3DDevice9 %08x", this ) );
     g_pDeviceState = NULL;
     g_pProxyDevice = NULL;
 }
@@ -97,45 +93,23 @@ HRESULT CProxyDirect3DDevice9::QueryInterface                 ( REFIID riid, voi
 
 ULONG   CProxyDirect3DDevice9::AddRef                         ( VOID )
 {
-    ULONG ulResult;
-
-    // Incrase the device's refcount
-    ulResult = m_pDevice->AddRef ( );
-
-    // Increase our refcount
-    m_dwRefCount++;
-
-    return ulResult;
+    return m_pDevice->AddRef ( );
 }
 
 ULONG   CProxyDirect3DDevice9::Release                        ( VOID )
 {
-    ULONG       ulResult;
-    IUnknown *  pDestroyedDevice;
-
-    // Check to see if we should destroy ourself
-    if ( --m_dwRefCount == 0 )
+	// Check if will be final release
+    m_pDevice->AddRef ();
+	ULONG ulRefCount = m_pDevice->Release ();
+    if ( ulRefCount == 1 )
     {
         WriteDebugEvent ( "Releasing IDirect3DDevice9 Proxy..." );
-
         // Call event handler
         CDirect3DEvents9::OnDirect3DDeviceDestroy ( m_pDevice );
-
-        // Save device so we can destroy it after.
-        pDestroyedDevice = m_pDevice;
-
-        // Destroy...
-        delete this;
-
-        // Release device...
-        ulResult = pDestroyedDevice->Release ( );
-
-        return ulResult;
+		delete this;
     }
-    
-    ulResult = m_pDevice->Release ( );
 
-    return ulResult;
+	return m_pDevice->Release ();
 }
 
 /*** IDirect3DDevice9 methods ***/

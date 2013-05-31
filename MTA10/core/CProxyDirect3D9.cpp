@@ -15,27 +15,17 @@
 
 #include "StdInc.h"
 HRESULT HandleCreateDeviceResult( HRESULT hResult, IDirect3D9* pDirect3D, UINT Adapter, D3DDEVTYPE DeviceType, HWND hFocusWindow, DWORD BehaviorFlags, D3DPRESENT_PARAMETERS* pPresentationParameters, IDirect3DDevice9** ppReturnedDeviceInterface );
-uint ms_uiInstanceCount = 0;
 
 CProxyDirect3D9::CProxyDirect3D9 ( IDirect3D9* pInterface )
 {
-    ms_uiInstanceCount++;
-    WriteDebugEvent ( SString( "CProxyDirect3D9::CProxyDirect3D9 #%d", ms_uiInstanceCount ) );
-    if ( ms_uiInstanceCount > 1 )
-        AddReportLog( 9401,  SString( "CProxyDirect3D9::CProxyDirect3D9 #%d", ms_uiInstanceCount ) );
-
+    WriteDebugEvent ( SString( "CProxyDirect3D9::CProxyDirect3D9 %08x", this ) );
     m_pDevice       = pInterface;
-
-    // Give ourself a matching refcount.
-    pInterface->AddRef ( );
-    m_dwRefCount = pInterface->Release ( );
 }
 
 CProxyDirect3D9::~CProxyDirect3D9             ( )
 {
-    WriteDebugEvent ( "CProxyDirect3D9::~CProxyDirect3D9" );
+    WriteDebugEvent ( SString( "CProxyDirect3D9::~CProxyDirect3D9 %08x", this ) );
     m_pDevice       = NULL;
-    m_dwRefCount    = 0;
 }
 
 /*** IUnknown methods ***/
@@ -46,35 +36,16 @@ HRESULT    CProxyDirect3D9::QueryInterface              ( REFIID riid, void** pp
 
 ULONG      CProxyDirect3D9::AddRef                      ( VOID )
 {
-    // Increment our refcount.
-    m_dwRefCount++;
-
     return m_pDevice->AddRef ( );
 }
 
 ULONG      CProxyDirect3D9::Release                     ( VOID )
 {
-    ULONG       ulRefCount;
-    IUnknown *  pDestroyedDevice;
-
-    // Check to see if we should self-destruct
-    if ( --m_dwRefCount == 0 )
-    {
-        // Save device so we can destroy it after.
-        pDestroyedDevice = m_pDevice;
-
-        delete this;  
-
-        // Call device's AddRef routine and get the current refcount.
-        ulRefCount = pDestroyedDevice->Release( );
-
-        return ulRefCount;
-    }
-
-    // Call device's AddRef routine and get the current refcount.
-    ulRefCount = m_pDevice->Release( );
-
-    return ulRefCount;          
+	// Call original function
+	ULONG ulRefCount = m_pDevice->Release ();
+    if ( ulRefCount == 0 )
+		delete this;
+	return ulRefCount;
 }
 
 /*** IDirect3D9 methods ***/
