@@ -24,6 +24,10 @@ class CGraphics;
 #include "CSingleton.h"
 #include <CRenderItemManager.h>
 
+#define DUMMY_PROGRESS_INITIAL_DELAY        1000    // Game stall time before spinner is displayed
+#define DUMMY_PROGRESS_MIN_DISPLAY_TIME     1000    // Minimum time spinner is drawn (to prevent flicker)
+#define DUMMY_PROGRESS_ANIMATION_INTERVAL   100     // Animation speed
+
 class CTileBatcher;
 class CLine3DBatcher;
 class CMaterialLine3DBatcher;
@@ -89,7 +93,7 @@ public:
     float               GetDXTextExtentW        ( const wchar_t* wszText, float fScale = 1.0f, LPD3DXFONT pDXFont = NULL );
 
     // Textures
-    void                DrawTexture             ( CTextureItem* texture, float fX, float fY, float fScaleX = 1.0f, float fScaleY = 1.0f, float fRotation = 0.0f, float fCenterX = 0.0f, float fCenterY = 0.0f, DWORD dwColor = 0xFFFFFFFF );
+    void                DrawTexture             ( CTextureItem* texture, float fX, float fY, float fScaleX = 1.0f, float fScaleY = 1.0f, float fRotation = 0.0f, float fCenterX = 0.0f, float fCenterY = 0.0f, DWORD dwColor = 0xFFFFFFFF, float fU = 0, float fV = 0, float fSizeU = 1, float fSizeV = 1, bool bRelativeUV = true );
 
     // Interface functions
     void                SetCursorPosition       ( int iX, int iY, DWORD Flags );
@@ -168,6 +172,10 @@ public:
     void                DrawPostGUIQueue        ( void );
     void                DrawMaterialLine3DQueue ( void );
     bool                HasMaterialLine3DQueueItems ( void );
+
+    void                DidRenderScene          ( void );
+    void                SetProgressMessage      ( const SString& strMessage );
+    void                DrawProgressMessage     ( bool bPreserveBackbuffer = true );
 
 private:
     void                OnDeviceCreate          ( IDirect3DDevice9 * pDevice );
@@ -319,6 +327,15 @@ private:
     EMTARenderZone                      m_MTARenderZone;
     int                                 m_iOutsideZoneCount;
     IDirect3DStateBlock9*               m_pSavedStateBlock;
+    CElapsedTime                        m_LastRenderedSceneTimer;
+    IDirect3DSurface9*                  m_pSavedFrontBufferData;
+    CTextureItem*                       m_ProgressSpinnerTexture;
+    SString                             m_strProgressMessage;
+    CElapsedTime                        m_FirstDrawnProgressTimer;
+    CElapsedTime                        m_LastDrawnProgressTimer;
+    bool                                m_bProgressVisible;
+    CElapsedTime                        m_ProgressAnimTimer;
+    uint                                m_uiProgressAnimFrame;
 };
 
 #endif

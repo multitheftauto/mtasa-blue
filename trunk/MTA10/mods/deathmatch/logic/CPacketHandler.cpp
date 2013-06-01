@@ -2703,8 +2703,10 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
         return;
     }
 
-    for ( ElementID EntityIndex = 0 ; EntityIndex < NumEntities ; EntityIndex++ )
+    for ( uint EntityIndex = 0 ; EntityIndex < NumEntities ; EntityIndex++ )
     {
+        g_pCore->UpdateDummyProgress( EntityIndex * 100 / NumEntities );
+
         // Read out the entity type id and the entity id
         ElementID EntityID;
         unsigned char ucEntityTypeID;
@@ -3983,6 +3985,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
         delete pEntityStuff;
     }
     newEntitiesStuff.clear ();
+    g_pCore->UpdateDummyProgress( 0 );
 }
 
 void CPacketHandler::Packet_EntityRemove ( NetBitStreamInterface& bitStream )

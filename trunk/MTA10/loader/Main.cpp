@@ -445,10 +445,12 @@ int DoLaunchGame ( LPSTR lpCmdLine )
     //
     const char* dataFilesFiles [] = { "\\MTA\\cgui\\images\\background_logo.png"
                                      ,"\\MTA\\cgui\\images\\radarset\\up.png"
+                                     ,"\\MTA\\cgui\\images\\busy_spinner.png"
                                      ,"\\MTA\\D3DX9_42.dll"
                                      ,"\\MTA\\D3DCompiler_42.dll"
                                      ,"\\MTA\\bass.dll"
                                      ,"\\MTA\\bass_fx.dll"
+                                     ,"\\MTA\\tags.dll"
                                      ,"\\MTA\\sa.dat"
                                      ,"\\MTA\\pthreadVC2.dll"
                                      ,"\\MTA\\XInput9_1_0_mta.dll"

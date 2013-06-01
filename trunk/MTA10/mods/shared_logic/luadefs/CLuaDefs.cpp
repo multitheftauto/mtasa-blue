@@ -59,6 +59,12 @@ void CLuaDefs::Initialize ( CClientGame* pClientGame,
 
 int CLuaDefs::CanUseFunction ( lua_CFunction f, lua_State* luaVM )
 {
+    // Quick cull of unknown pointer range
+    if ( CLuaCFunctions::IsNotFunction( f ) )
+        return true;
+
+    g_pCore->UpdateDummyProgress();
+
     // Cached enabled setting here as it doesn't usually change
     static bool bLogLuaFunctions = g_pCore->GetDebugIdEnabled ( 401 );
     if ( !bLogLuaFunctions )

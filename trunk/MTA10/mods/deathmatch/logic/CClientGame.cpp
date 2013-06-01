@@ -5042,6 +5042,7 @@ bool CClientGame::StaticProcessPacket ( unsigned char ucPacketID, NetBitStreamIn
 {
     if ( g_pClientGame )
     {
+        g_pCore->UpdateDummyProgress();
         g_pClientGame->GetManager ()->GetPacketRecorder ()->RecordPacket ( ucPacketID, bitStream );
         return g_pClientGame->m_pPacketHandler->ProcessPacket ( ucPacketID, bitStream );
     }

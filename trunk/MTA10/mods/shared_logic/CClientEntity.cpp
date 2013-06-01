@@ -64,7 +64,7 @@ CClientEntity::CClientEntity ( ElementID ID )
     g_pClientGame->GetGameEntityXRefManager ()->OnClientEntityCreate ( this );
 
     m_bWorldIgnored = false;
-
+    g_pCore->UpdateDummyProgress();
 }
 
 
@@ -174,6 +174,7 @@ CClientEntity::~CClientEntity ( void )
 
     g_pClientGame->GetGameEntityXRefManager ()->OnClientEntityDelete ( this );
     g_pCore->GetGraphics ()->GetRenderItemManager ()->RemoveClientEntityRefs ( this );
+    g_pCore->UpdateDummyProgress();
 }
 
 

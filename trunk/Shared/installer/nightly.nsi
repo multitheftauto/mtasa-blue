@@ -554,9 +554,12 @@ DontInstallRedist:
 		File "${FILES_ROOT}\MTA San Andreas\mta\netc.dll"
 		File "${SERVER_FILES_ROOT}\libcurl.dll"
 		File "${FILES_ROOT}\MTA San Andreas\mta\loader.dll"
+        ; The files below can be moved out of the LIGHTBUILD zone at some point
         File "${FILES_ROOT}\MTA San Andreas\mta\bass_fx.dll"
         File "${FILES_ROOT}\MTA San Andreas\mta\tags.dll"
 		File "${SERVER_FILES_ROOT}\pthreadVC2.dll"
+        File "${FILES_ROOT}\MTA San Andreas\mta\XInput9_1_0_mta.dll"
+        File "${FILES_ROOT}\MTA San Andreas\mta\cgui\images\busy_spinner.png"
 
 		${If} "$(LANGUAGE_CODE)" != ""
 			# Write our language to registry
@@ -576,7 +579,6 @@ DontInstallRedist:
 			File "${FILES_ROOT}\MTA San Andreas\mta\bassmix.dll"
 			File "${FILES_ROOT}\MTA San Andreas\mta\chatboxpresets.xml"
 			File "${FILES_ROOT}\MTA San Andreas\mta\sa.dat"
-            File "${FILES_ROOT}\MTA San Andreas\mta\XInput9_1_0_mta.dll"
 
             SetOutPath "$INSTDIR\skins\Classic"
             File "${FILES_ROOT}\MTA San Andreas\skins\Classic\CGUI.is.xml"
