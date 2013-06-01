@@ -66,12 +66,13 @@ int CLuaXMLDefs::xmlCreateFile ( lua_State* luaVM )
         {
             SString strPath;
             CResource* pThisResource = pLUA->GetResource ();
-            CResource* pResource = pThisResource;
+            CResource* pOtherResource = pThisResource;
             
-            if ( CResourceManager::ParseResourcePathInput ( strFile, pThisResource, &strPath, NULL ) )
+            // Resolve other resource from name
+            if ( CResourceManager::ParseResourcePathInput ( strFile, pOtherResource, &strPath, NULL ) )
             {
-                // We have access to modify this resource?
-                if ( pResource == pThisResource ||
+                // We have access to modify other resource?
+                if ( pOtherResource == pThisResource ||
                     m_pACLManager->CanObjectUseRight ( pThisResource->GetName ().c_str (),
                                                     CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE,
                                                     "ModifyOtherObjects",
@@ -97,10 +98,12 @@ int CLuaXMLDefs::xmlCreateFile ( lua_State* luaVM )
                         pLUA->DestroyXML ( xmlFile );
                     }
                 }
+                else
+                    argStream.SetCustomError( SString( "ModifyOtherObjects in ACL denied resource '%s' to access '%s'", pThisResource->GetName ().c_str (), pOtherResource->GetName ().c_str () ), "Access denied" );
             }
-        
         }
-        else
+
+        if ( argStream.HasErrors () )
             m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
     }
             
@@ -127,12 +130,13 @@ int CLuaXMLDefs::xmlLoadFile ( lua_State* luaVM )
         {
             SString strPath;
             CResource* pThisResource = pLUA->GetResource ();
-            CResource* pResource = pThisResource;
+            CResource* pOtherResource = pThisResource;
             
-            if ( CResourceManager::ParseResourcePathInput ( strFile, pThisResource, &strPath, NULL ) )
+            // Resolve other resource from name
+            if ( CResourceManager::ParseResourcePathInput ( strFile, pOtherResource, &strPath, NULL ) )
             {
-                // We have access to modify this resource?
-                if ( pResource == pThisResource ||
+                // We have access to modify other resource?
+                if ( pOtherResource == pThisResource ||
                     m_pACLManager->CanObjectUseRight ( pThisResource->GetName ().c_str (),
                                                     CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE,
                                                     "ModifyOtherObjects",
@@ -168,11 +172,12 @@ int CLuaXMLDefs::xmlLoadFile ( lua_State* luaVM )
                         pLUA->DestroyXML ( xmlFile );
                     }
                 }
+                else
+                    argStream.SetCustomError( SString( "ModifyOtherObjects in ACL denied resource '%s' to access '%s'", pThisResource->GetName ().c_str (), pOtherResource->GetName ().c_str () ), "Access denied" );
             }
-            else
-                m_pScriptDebugging->LogError ( luaVM, "%s failed; ModifyOtherObjects in ACL denied resource %s to access %s", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), pThisResource->GetName ().c_str (), pResource->GetName ().c_str () );
         }
-        else
+
+        if ( argStream.HasErrors () )
             m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
     }
 
@@ -201,12 +206,13 @@ int CLuaXMLDefs::xmlCopyFile ( lua_State* luaVM )
         {
             SString strPath;
             CResource* pThisResource = pLUA->GetResource ();
-            CResource* pResource = pThisResource;
+            CResource* pOtherResource = pThisResource;
             
-            if ( CResourceManager::ParseResourcePathInput ( strFile, pThisResource, &strPath, NULL ) )
+            // Resolve other resource from name
+            if ( CResourceManager::ParseResourcePathInput ( strFile, pOtherResource, &strPath, NULL ) )
             {
-                // We have access to modify this resource?
-                if ( pResource == pThisResource ||
+                // We have access to modify other resource?
+                if ( pOtherResource == pThisResource ||
                     m_pACLManager->CanObjectUseRight ( pThisResource->GetName ().c_str (),
                                                     CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE,
                                                     "ModifyOtherObjects",
@@ -253,13 +259,11 @@ int CLuaXMLDefs::xmlCopyFile ( lua_State* luaVM )
                     }
                 }
                 else
-                    CLogger::ErrorPrintf ( "Unable to copy xml file; bad filepath\n" );
+                    argStream.SetCustomError( SString( "ModifyOtherObjects in ACL denied resource '%s' to access '%s'", pThisResource->GetName ().c_str (), pOtherResource->GetName ().c_str () ), "Access denied" );
             }
-            else
-                m_pScriptDebugging->LogError ( luaVM, "%s failed; ModifyOtherObjects in ACL denied resource %s to access %s", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), pThisResource->GetName ().c_str (), pResource->GetName ().c_str () );
-
         }
-        else
+
+        if ( argStream.HasErrors () )
             m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
     }
 
