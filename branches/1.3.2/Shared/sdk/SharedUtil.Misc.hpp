@@ -32,6 +32,8 @@ std::map < uint, uint > ms_ReportAmountMap;
 #ifdef MTA_CLIENT
 #ifdef WIN32
 
+extern "C" {   _declspec(dllexport) DWORD NvOptimusEnablement = 0x00000001; }
+
 #define TROUBLE_URL1 "http://updatesa.multitheftauto.com/sa/trouble/?v=%VERSION%&id=%ID%&tr=%TROUBLE%"
 
 
