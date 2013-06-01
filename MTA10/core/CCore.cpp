@@ -2195,3 +2195,39 @@ bool CCore::AreModulesLoaded( void )
 {
     return m_bModulesLoaded;
 }
+
+//
+// Handle dummy progress when game seems stalled
+//
+int ms_iDummyProgressTimerCounter = 0;
+
+void CALLBACK TimerProc( void* lpParametar, BOOLEAN TimerOrWaitFired )
+{
+    ms_iDummyProgressTimerCounter++;
+}
+
+//
+// Refresh progress output
+//
+void CCore::UpdateDummyProgress( int iPercent )
+{
+    if ( iPercent != -1 )
+        m_iDummyProgressPercent = iPercent;
+
+    if ( m_DummyProgressTimerHandle == NULL )
+    {
+        // Using this timer is quicker than checking tick count with every call to UpdateDummyProgress()
+        ::CreateTimerQueueTimer( &m_DummyProgressTimerHandle, NULL, TimerProc, this, DUMMY_PROGRESS_ANIMATION_INTERVAL, DUMMY_PROGRESS_ANIMATION_INTERVAL, WT_EXECUTEINTIMERTHREAD );
+    }
+
+    if ( !ms_iDummyProgressTimerCounter )
+        return;
+    ms_iDummyProgressTimerCounter = 0;
+
+    // Compose message with amount
+    SString strMessage;
+    if ( m_iDummyProgressPercent )
+        strMessage = SString( "%d%%", m_iDummyProgressPercent );
+
+    CGraphics::GetSingleton().SetProgressMessage( strMessage );
+}

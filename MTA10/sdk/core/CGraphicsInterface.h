@@ -75,7 +75,7 @@ public:
 
     virtual ID3DXFont *             GetFont             ( eFontType fontType = FONT_DEFAULT ) = 0;
 
-    virtual void                    DrawTexture         ( CTextureItem* texture, float fX, float fY, float fScaleX = 1.0f, float fScaleY = 1.0f, float fRotation = 0.0f, float fCenterX = 0.0f, float fCenterY = 0.0f, DWORD dwColor = 0xFFFFFFFF ) = 0;
+    virtual void                    DrawTexture         ( CTextureItem* texture, float fX, float fY, float fScaleX = 1.0f, float fScaleY = 1.0f, float fRotation = 0.0f, float fCenterX = 0.0f, float fCenterY = 0.0f, DWORD dwColor = 0xFFFFFFFF, float fU = 0, float fV = 0, float fSizeU = 1, float fSizeV = 1, bool bRelativeUV = true ) = 0;
 
     // Queued up drawing
     virtual void                    DrawLineQueued      ( float fX1, float fY1,

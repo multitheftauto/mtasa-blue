@@ -549,6 +549,20 @@ bool CRenderItemManager::RestoreDefaultRenderTarget ( void )
 
 ////////////////////////////////////////////////////////////////
 //
+// CRenderItemManager::IsUsingDefaultRenderTarget
+//
+// Check if currently drawing to the default render target
+//
+////////////////////////////////////////////////////////////////
+bool CRenderItemManager::IsUsingDefaultRenderTarget ( void )
+{
+    // If this is NULL, it means we haven't saved it, so aren't using another render target
+    return m_pDefaultD3DRenderTarget == NULL;
+}
+
+
+////////////////////////////////////////////////////////////////
+//
 // CRenderItemManager::ChangeRenderTarget
 //
 // Worker function to change the D3D render target

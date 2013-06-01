@@ -61,6 +61,7 @@ CGraphics::~CGraphics ( void )
 
     DestroyStandardDXFonts ();
 
+    SAFE_RELEASE ( m_ProgressSpinnerTexture );
     SAFE_DELETE ( m_pRenderItemManager );
     SAFE_DELETE ( m_pTileBatcher );
     SAFE_DELETE ( m_pLine3DBatcherPreGUI );
@@ -1019,7 +1020,7 @@ bool CGraphics::DestroyStandardDXFonts ( void )
     return true;
 }
 
-void CGraphics::DrawTexture ( CTextureItem* pTexture, float fX, float fY, float fScaleX, float fScaleY, float fRotation, float fCenterX, float fCenterY, DWORD dwColor )
+void CGraphics::DrawTexture ( CTextureItem* pTexture, float fX, float fY, float fScaleX, float fScaleY, float fRotation, float fCenterX, float fCenterY, DWORD dwColor, float fU, float fV, float fSizeU, float fSizeV, bool bRelativeUV )
 {
     if ( g_pCore->IsWindowMinimized () )
         return;
@@ -1033,14 +1034,24 @@ void CGraphics::DrawTexture ( CTextureItem* pTexture, float fX, float fY, float 
     const float fFileHeight    = pTexture->m_uiSizeY;
 
     BeginDrawBatch ();
+    RECT cutImagePos;
+    const float fMultU = ( bRelativeUV ? fSurfaceWidth  : fSurfaceWidth  / fFileWidth );
+    const float fMultV = ( bRelativeUV ? fSurfaceHeight : fSurfaceHeight / fFileHeight );
+    cutImagePos.left    = ( fU )          * fMultU;
+    cutImagePos.right   = ( fU + fSizeU ) * fMultU;
+    cutImagePos.top     = ( fV )          * fMultV;
+    cutImagePos.bottom  = ( fV + fSizeV ) * fMultV;
+    const float fCutWidth  = cutImagePos.right - cutImagePos.left;
+    const float fCutHeight = cutImagePos.bottom - cutImagePos.top;
+
     D3DXMATRIX matrix;
-    D3DXVECTOR2 scaling ( fScaleX * fFileWidth / fSurfaceWidth, fScaleY * fFileHeight / fSurfaceHeight );
+    D3DXVECTOR2 scaling ( fScaleX * fFileWidth / fCutWidth, fScaleY * fFileHeight / fCutHeight );
     D3DXVECTOR2 rotationCenter  ( fFileWidth * fScaleX * fCenterX, fFileHeight * fScaleX * fCenterY );
     D3DXVECTOR2 position ( fX - fFileWidth * fScaleX * fCenterX, fY - fFileHeight * fScaleY * fCenterY );
     D3DXMatrixTransformation2D ( &matrix, NULL, NULL, &scaling, &rotationCenter, fRotation * 6.2832f / 360.f, &position );
     CheckModes ( EDrawMode::DX_SPRITE, m_ActiveBlendMode );
     m_pDXSprite->SetTransform ( &matrix );
-    m_pDXSprite->Draw ( (IDirect3DTexture9*)pTexture->m_pD3DTexture, NULL, NULL, NULL, /*ModifyColorForBlendMode (*/ dwColor/*, blendMode )*/ );
+    m_pDXSprite->Draw ( (IDirect3DTexture9*)pTexture->m_pD3DTexture, &cutImagePos, NULL, NULL, /*ModifyColorForBlendMode (*/ dwColor/*, blendMode )*/ );
     EndDrawBatch ();
 }
 
@@ -1061,6 +1072,7 @@ void CGraphics::OnDeviceCreate ( IDirect3DDevice9 * pDevice )
     m_pRenderItemManager->OnDeviceCreate ( pDevice, GetViewportWidth (), GetViewportHeight () );
     m_pScreenGrabber->OnDeviceCreate ( pDevice );
     m_pPixelsManager->OnDeviceCreate ( pDevice );
+    m_ProgressSpinnerTexture = GetRenderItemManager ()->CreateTexture ( CalcMTASAPath( "MTA\\cgui\\images\\busy_spinner.png" ), NULL, false, -1, -1, RFORMAT_DXT3, TADDRESS_CLAMP );
 }
 
 
@@ -1080,6 +1092,7 @@ void CGraphics::OnDeviceInvalidate ( IDirect3DDevice9 * pDevice )
 
     m_pRenderItemManager->OnLostDevice ();
     m_pScreenGrabber->OnLostDevice ();
+    SAFE_RELEASE( m_pSavedFrontBufferData );
 }
 
 
@@ -1497,4 +1510,210 @@ void CGraphics::RestoreGTARenderStates( void )
         m_pSavedStateBlock->Apply ( );
         SAFE_RELEASE( m_pSavedStateBlock );
     }
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// CGraphics::DidRenderScene
+//
+// Notify that scene rendering is working
+//
+////////////////////////////////////////////////////////////////
+void CGraphics::DidRenderScene( void )
+{
+    if ( m_bProgressVisible )
+    {
+        // Min display time before turning off spinner
+        if ( m_FirstDrawnProgressTimer.Get() > DUMMY_PROGRESS_MIN_DISPLAY_TIME )
+            m_bProgressVisible = false;
+        else
+            DrawProgressMessage( false );
+    }
+    SAFE_RELEASE( m_pSavedFrontBufferData );
+    m_LastRenderedSceneTimer.Reset();
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// CGraphics::SetProgressMessage
+//
+// Set (and maybe show) status message used when scene rendering is stalled
+//
+////////////////////////////////////////////////////////////////
+void CGraphics::SetProgressMessage( const SString& strMessage )
+{
+    if ( !m_bProgressVisible )
+    {
+        if ( m_LastRenderedSceneTimer.Get() < DUMMY_PROGRESS_INITIAL_DELAY )
+            return;
+
+        // Enable progress drawing
+        m_bProgressVisible = true;
+        m_FirstDrawnProgressTimer.Reset();
+    }
+
+    if ( g_pCore->IsWindowMinimized() )
+        return;
+
+    if ( !m_pRenderItemManager->IsUsingDefaultRenderTarget() )
+        return;
+
+    if ( m_LastDrawnProgressTimer.Get() < 100 )
+        return;
+
+    m_strProgressMessage = strMessage;
+    DrawProgressMessage();
+
+    m_LastDrawnProgressTimer.Reset();
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// CGraphics::DrawProgressMessage
+//
+// Do clever things to draw and show message without changing the backbuffer contents (if required)
+//
+////////////////////////////////////////////////////////////////
+void CGraphics::DrawProgressMessage( bool bPreserveBackbuffer )
+{
+    //
+    // Save stuff
+    //
+    if ( m_iDrawBatchRefCount )
+        CheckModes( EDrawMode::NONE, EBlendMode::BLEND );
+    EBlendModeType savedBlendMode = m_ActiveBlendMode;
+
+    HRESULT hr;
+    hr = m_pDevice->EndScene();
+    bool bWasInScene = SUCCEEDED( hr );
+
+    IDirect3DStateBlock9* pSavedStateBlock = NULL;
+    m_pDevice->CreateStateBlock( D3DSBT_ALL, &pSavedStateBlock );
+
+    //
+    // Do stuff
+    //
+    IDirect3DSurface9* pD3DBackBufferSurface = NULL;
+    CRenderTargetItem* pSavedBackBufferData = NULL;
+    IDirect3DSurface9* pTempFrontBufferData = NULL;
+    do
+    {
+        if ( bPreserveBackbuffer )
+        {
+            // Get backbuffer surface
+            hr = m_pDevice->GetBackBuffer( 0, 0, D3DBACKBUFFER_TYPE_MONO, &pD3DBackBufferSurface );
+            if ( FAILED( hr ) )
+                break;
+            D3DSURFACE_DESC BackBufferDesc;
+            hr = pD3DBackBufferSurface->GetDesc( &BackBufferDesc );
+
+            // Maybe save frontbuffer pixels
+            if ( !m_pSavedFrontBufferData )
+            {
+                D3DDISPLAYMODE displayMode;
+                hr = m_pDevice->GetDisplayMode( 0, &displayMode );
+                hr = m_pDevice->CreateOffscreenPlainSurface( displayMode.Width, displayMode.Height, D3DFMT_A8R8G8B8, D3DPOOL_SYSTEMMEM, &pTempFrontBufferData, NULL );
+                hr = m_pDevice->GetFrontBufferData( 0, pTempFrontBufferData );
+                if ( FAILED( hr ) )
+                    break;
+
+                HWND hwnd = g_pCore->GetHookedWindow();
+                RECT clientRect;
+                GetClientRect( hwnd, &clientRect );
+                MapWindowPoints(hwnd, NULL, (LPPOINT)(&clientRect), (sizeof(clientRect)/sizeof(POINT)) );
+                hr = m_pDevice->CreateOffscreenPlainSurface( BackBufferDesc.Width, BackBufferDesc.Height, BackBufferDesc.Format, D3DPOOL_SYSTEMMEM, &m_pSavedFrontBufferData, NULL );
+                if ( FAILED( hr ) )
+                    break;
+                hr = D3DXLoadSurfaceFromSurface( m_pSavedFrontBufferData, NULL, NULL, pTempFrontBufferData, NULL, &clientRect, D3DX_FILTER_NONE, 0 );
+                if ( FAILED( hr ) )
+                    break;
+                SAFE_RELEASE( pTempFrontBufferData );
+            }
+
+            // Save backbuffer pixels
+            pSavedBackBufferData = CGraphics::GetSingleton().GetRenderItemManager()->CreateRenderTarget( BackBufferDesc.Width, BackBufferDesc.Height, true, true );
+            hr = m_pDevice->StretchRect( pD3DBackBufferSurface, NULL, pSavedBackBufferData->m_pD3DRenderTargetSurface, NULL, D3DTEXF_POINT );
+            if ( FAILED( hr ) )
+                break;
+
+            // Copy saved frontbuffer pixels onto backbuffer surface
+            hr = D3DXLoadSurfaceFromSurface( pD3DBackBufferSurface, NULL, NULL, m_pSavedFrontBufferData, NULL, NULL, D3DX_FILTER_NONE, 0 );
+            if ( FAILED( hr ) )
+                break;
+        }
+
+        // Draw progress graphics on backbuffer surface
+        m_pDevice->BeginScene();
+        {
+            m_ActiveBlendMode = EBlendMode::MODULATE_ADD;
+
+            const uint uiViewportHeight = GetViewportHeight();
+            const uint uiViewportWidth = GetViewportWidth();
+
+            if ( !m_strProgressMessage.empty() )
+            {
+                const uint uiMessageWidth = GetDXTextExtent( m_strProgressMessage );
+                const uint uiMessagePosX = uiViewportWidth / 2 - uiMessageWidth / 2;
+                const DWORD dwMessageColor = 0xA0FFFFFF;
+                DrawText( uiMessagePosX, uiViewportHeight - 57, dwMessageColor, 1, "%s", *m_strProgressMessage );
+            }
+
+            if ( m_ProgressSpinnerTexture )
+            {
+                const uint uiNumFrames = 12;
+                const uint uiTextureSizeX = m_ProgressSpinnerTexture->m_uiSurfaceSizeX;
+                const uint uiTextureSizeY = m_ProgressSpinnerTexture->m_uiSurfaceSizeY;
+                const uint uiFrameWidth = uiTextureSizeX / uiNumFrames;
+                const uint uiFrameHeight = uiTextureSizeY;
+                const uint uiSpinnerPosX = uiViewportWidth / 2 - uiFrameWidth / 2;
+                const float fScaleX = 1.f / uiNumFrames;
+                const DWORD dwSpinnerColor = 0x90FFFFFF;
+
+                if ( m_ProgressAnimTimer.Get() > DUMMY_PROGRESS_ANIMATION_INTERVAL )
+                {
+                    m_ProgressAnimTimer.Reset();
+                    m_uiProgressAnimFrame = ( m_uiProgressAnimFrame + 1 ) % uiNumFrames;
+                }
+                DrawTexture( m_ProgressSpinnerTexture, uiSpinnerPosX, uiViewportHeight - 40, fScaleX, 1, 0, 0, 0, dwSpinnerColor, m_uiProgressAnimFrame * uiFrameWidth, 0, uiFrameWidth, uiFrameHeight, false );
+            }
+
+            CheckModes( EDrawMode::NONE, EBlendMode::BLEND );
+        }
+        m_pDevice->EndScene();
+
+        if ( bPreserveBackbuffer )
+        {
+            // Flip backbuffer onto front buffer
+            SAFE_RELEASE( pD3DBackBufferSurface );
+            hr = m_pDevice->Present( NULL, NULL, NULL, NULL );
+
+            // Restore backbuffer surface
+            hr = m_pDevice->GetBackBuffer( 0, 0, D3DBACKBUFFER_TYPE_MONO, &pD3DBackBufferSurface );
+            if ( FAILED( hr ) )
+                break;
+            hr = m_pDevice->StretchRect( pSavedBackBufferData->m_pD3DRenderTargetSurface, NULL, pD3DBackBufferSurface, NULL, D3DTEXF_POINT );
+        }
+    }
+    while( false );
+
+    // Tidy
+    SAFE_RELEASE( pTempFrontBufferData );
+    SAFE_RELEASE( pD3DBackBufferSurface );
+    SAFE_RELEASE( pSavedBackBufferData );
+
+    //
+    // Restore stuff
+    //
+    if ( pSavedStateBlock )
+    {
+        pSavedStateBlock->Apply();
+        SAFE_RELEASE( pSavedStateBlock );
+    }
+
+    if ( bWasInScene )
+        m_pDevice->BeginScene();
+    m_ActiveBlendMode = savedBlendMode;
 }
