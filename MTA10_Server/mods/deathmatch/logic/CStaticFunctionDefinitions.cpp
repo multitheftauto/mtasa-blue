@@ -4040,6 +4040,10 @@ bool CStaticFunctionDefinitions::WarpPedIntoVehicle ( CPed* pPed, CVehicle* pVeh
                 pPed->SetOccupiedVehicle ( pVehicle, uiSeat );
                 pPed->SetVehicleAction ( CPlayer::VEHICLEACTION_NONE );
 
+                // If he's the driver, switch on the engine
+                if ( uiSeat == 0 )
+                    pVehicle->SetEngineOn( true );
+
                 // Tell all the players
                 CBitStream BitStream;
                 BitStream.pBitStream->Write ( pVehicle->GetID () );
