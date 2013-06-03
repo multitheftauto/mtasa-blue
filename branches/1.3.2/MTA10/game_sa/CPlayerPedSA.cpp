@@ -24,6 +24,7 @@
 
 static CPedClothesDesc* pLocalClothes = 0;
 static CWantedSAInterface* pLocalWanted = 0;
+static std::set < SString > ms_DoneAnimBlockRefMap;
 
 CPlayerPedSA::CPlayerPedSA( ePedModel pedType )
 {
@@ -226,11 +227,34 @@ eMoveAnim CPlayerPedSA::GetMoveAnim ( void )
 
 
 // Helper for SetMoveAnim
-bool IsBlendAssocGroupValid( int iGroup )
+bool IsBlendAssocGroupLoaded( int iGroup )
 {
     CAnimBlendAssocGroupSAInterface* pBlendAssocGroup = *(CAnimBlendAssocGroupSAInterface**)0xB4EA34;
     pBlendAssocGroup += iGroup;
     return pBlendAssocGroup->pAnimBlock != NULL;
+}
+
+
+// Helper for SetMoveAnim
+bool IsBlendAssocGroupValid( int iGroup )
+{
+    CAnimBlendAssocGroupSAInterface* pBlendAssocGroup = *(CAnimBlendAssocGroupSAInterface**)0xB4EA34;
+    pBlendAssocGroup += iGroup;
+    if ( pBlendAssocGroup->pAnimBlock == NULL )
+        return false;
+    if ( pBlendAssocGroup->pAssociationsArray == NULL )
+        return false;
+    int moveIds[] = { 0, 1, 2, 3, 5 };
+    for( uint i = 0 ; i < NUMELMS( moveIds ) ; i++ )
+    {
+        int iUseAnimId = moveIds[i] - pBlendAssocGroup->iIDOffset;
+        CAnimBlendStaticAssociationSAInterface* pAssociation = pBlendAssocGroup->pAssociationsArray + iUseAnimId;
+        if ( pAssociation == NULL )
+            return false;
+        if ( pAssociation->pAnimHeirarchy == NULL )
+            return false;
+    }
+    return true;
 }
 
 
@@ -246,41 +270,56 @@ void CPlayerPedSA::SetMoveAnim ( eMoveAnim iAnimGroup )
         return;
     }
 
-    // Need to load ?
-    if ( !IsBlendAssocGroupValid( iAnimGroup ) )
+    // Find which anim block to load
+    SString strBlockName;
+    switch ( iAnimGroup )
     {
-        // Find which anim block to load
-        SString strBlockName;
-        switch ( iAnimGroup )
-        {
-            case 55: case 58: case 61: case 64: case 67:
-                strBlockName = "fat";
-                break;
+        case 55: case 58: case 61: case 64: case 67:
+            strBlockName = "fat";
+            break;
 
-            case 56: case 59: case 62: case 65: case 68:
-                strBlockName = "muscular";
-                break;
+        case 56: case 59: case 62: case 65: case 68:
+            strBlockName = "muscular";
+            break;
 
-            case 138:
-                strBlockName = "skate";
-                break;
+        case 138:
+            strBlockName = "skate";
+            break;
 
-            default:
-                strBlockName = "ped";
-                break;
-        }
-            
+        default:
+            strBlockName = "ped";
+            break;
+    }
+
+    // Need to load ?
+    if ( !IsBlendAssocGroupLoaded( iAnimGroup ) )
+    {
         CAnimBlock* pAnimBlock = pGame->GetAnimManager()->GetAnimationBlock ( strBlockName );
 
         // Try load
         if ( pAnimBlock && !pAnimBlock->IsLoaded() )
         {
             pAnimBlock->Request( BLOCKING, true );
+            MapInsert( ms_DoneAnimBlockRefMap, strBlockName );  // Request() adds a ref for us
         }
 
         // Load fail?
-        if ( !IsBlendAssocGroupValid( iAnimGroup ) )
+        if ( !IsBlendAssocGroupLoaded( iAnimGroup ) )
             return;
+    }
+
+    // Check it all looks good
+    if ( !IsBlendAssocGroupValid( iAnimGroup ) )
+        return;
+
+    // Ensure we add a ref to this block, even if it wasn't loaded by us
+    CAnimBlock* pAnimBlock = pGame->GetAnimManager()->GetAnimationBlock ( strBlockName );
+    if ( !pAnimBlock )
+        return;
+    if ( !MapContains( ms_DoneAnimBlockRefMap, strBlockName ) )
+    {
+        MapInsert( ms_DoneAnimBlockRefMap, strBlockName );
+        pAnimBlock->AddRef();
     }
 
     m_iCustomMoveAnim = iAnimGroup;
