@@ -75,25 +75,18 @@ void _declspec(naked) HOOK_CallIdle()
 //////////////////////////////////////////////////////////////////////////////////////////
 void OnMY_CEntity_Render_Pre( CEntitySAInterface* pEntity )
 {
-    // Ignore buildings
-    if ( pEntity->vtbl == (CEntitySAInterfaceVTBL*)0x08585c8 )
-        return;
-    // Ignore dummy objects
-    if ( pEntity->vtbl == (CEntitySAInterfaceVTBL*)0x0866E78 )
-        return;
-
     ms_Rendering = pEntity;
 
     if ( ms_Rendering )
         CallGameEntityRenderHandler ( ms_Rendering );
 }
 
-void OnMY_CEntity_Render_Post( CEntitySAInterface* pEntity )
+void OnMY_CEntity_Render_Post( void )
 {
     if ( ms_Rendering )
     {
         ms_Rendering = NULL;
-        CallGameEntityRenderHandler ( ms_RenderingOneNonRoad );
+        CallGameEntityRenderHandler ( ms_RenderingOneNonRoad ); // restore value set in RenderOneNonRoad
     }
 }
 
@@ -114,9 +107,7 @@ void _declspec(naked) HOOK_CEntity_Render()
         call inner
 
         pushad
-        push    ecx
         call    OnMY_CEntity_Render_Post
-        add     esp, 4*1
         popad
         retn
 
@@ -137,20 +128,13 @@ inner:
 // Detect entity rendering
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-void OnMY_CEntity_RenderOneNonRoad_Pre( DWORD calledFrom, CEntitySAInterface* pEntity )
+void OnMY_CEntity_RenderOneNonRoad_Pre( CEntitySAInterface* pEntity )
 {
-    // Ignore buildings
-    if ( pEntity->vtbl == (CEntitySAInterfaceVTBL*)0x08585c8 )
-        return;
-    // Ignore dummy objects
-    if ( pEntity->vtbl == (CEntitySAInterfaceVTBL*)0x0866E78 )
-        return;
-
     ms_RenderingOneNonRoad = pEntity;
     CallGameEntityRenderHandler ( ms_RenderingOneNonRoad );
 }
 
-void OnMY_CEntity_RenderOneNonRoad_Post( DWORD calledFrom, CEntitySAInterface* pEntity )
+void OnMY_CEntity_RenderOneNonRoad_Post( CEntitySAInterface* pEntity )
 {
     if ( ms_RenderingOneNonRoad )
     {
@@ -169,9 +153,8 @@ void _declspec(naked) HOOK_CEntity_RenderOneNonRoad()
     {
         pushad
         push    [esp+32+4*1]
-        push    [esp+32+4*1]
         call    OnMY_CEntity_RenderOneNonRoad_Pre
-        add     esp, 4*2
+        add     esp, 4*1
         popad
 
         push    [esp+4*1]
@@ -180,9 +163,8 @@ void _declspec(naked) HOOK_CEntity_RenderOneNonRoad()
 
         pushad
         push    [esp+32+4*1]
-        push    [esp+32+4*1]
         call    OnMY_CEntity_RenderOneNonRoad_Post
-        add     esp, 4*2
+        add     esp, 4*1
         popad
         retn
 
@@ -190,6 +172,70 @@ inner:
         push    esi  
         mov     esi, [esp+08h]
         jmp     RETURN_CEntity_RenderOneNonRoad
+    }
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+// CVisibilityPlugin::RenderWeaponPedsForPC_Mid
+//
+// Detect next ped weapon rendering
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+void OnMY_CVisibilityPlugins_RenderWeaponPedsForPC_Mid( CPedSAInterface* pEntity )
+{
+    CallGameEntityRenderHandler( pEntity );
+}
+
+// Hook info
+#define HOOKPOS_CVisibilityPlugins_RenderWeaponPedsForPC_Mid                0x733080
+#define HOOKSIZE_CVisibilityPlugins_RenderWeaponPedsForPC_Mid               6
+DWORD RETURN_CVisibilityPlugins_RenderWeaponPedsForPC_Mid =                 0x733086;
+void _declspec(naked) HOOK_CVisibilityPlugins_RenderWeaponPedsForPC_Mid()
+{
+    _asm
+    {
+        pushad
+        push    ebx
+        call    OnMY_CVisibilityPlugins_RenderWeaponPedsForPC_Mid
+        add     esp, 4*1
+        popad
+
+        // Continue original code
+        mov     ecx,dword ptr [ebx+4F4h]
+        jmp     RETURN_CVisibilityPlugins_RenderWeaponPedsForPC_Mid
+    }
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+// CVisibilityPlugin::RenderWeaponPedsForPC_End
+//
+// End of all ped weapon rendering
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+void OnMY_CVisibilityPlugins_RenderWeaponPedsForPC_End( void )
+{
+    CallGameEntityRenderHandler( NULL );
+}
+
+// Hook info
+#define HOOKPOS_CVisibilityPlugins_RenderWeaponPedsForPC_End                0x73314D
+#define HOOKSIZE_CVisibilityPlugins_RenderWeaponPedsForPC_End               5
+void _declspec(naked) HOOK_CVisibilityPlugins_RenderWeaponPedsForPC_End()
+{
+    _asm
+    {
+        pushad
+        call    OnMY_CVisibilityPlugins_RenderWeaponPedsForPC_End
+        popad
+
+        // Continue original code
+        pop         esi  
+        add         esp,0Ch 
+        ret
     }
 }
 
@@ -401,6 +447,8 @@ void CMultiplayerSA::InitHooks_Rendering ( void )
     EZHookInstall ( CallIdle );
     EZHookInstall ( CEntity_Render );
     EZHookInstall ( CEntity_RenderOneNonRoad );
+    EZHookInstall ( CVisibilityPlugins_RenderWeaponPedsForPC_Mid );
+    EZHookInstall ( CVisibilityPlugins_RenderWeaponPedsForPC_End );
     EZHookInstall ( Check_NoOfVisibleLods );
     EZHookInstall ( Check_NoOfVisibleEntities );
     EZHookInstall ( WinLoop );

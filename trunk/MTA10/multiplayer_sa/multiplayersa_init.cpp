@@ -73,6 +73,8 @@ void LogEvent ( uint uiDebugId, const char* szType, const char* szContext, const
 
 void CallGameEntityRenderHandler( CEntitySAInterface* pEntity )
 {
-    if ( pGameEntityRenderHandler )
-        pGameEntityRenderHandler( pEntity );
+    // Only call if not a building or a dummy
+    if ( !pEntity || ( pEntity->nType != ENTITY_TYPE_BUILDING && pEntity->nType != ENTITY_TYPE_DUMMY ) )
+        if ( pGameEntityRenderHandler )
+            pGameEntityRenderHandler( pEntity );
 }
