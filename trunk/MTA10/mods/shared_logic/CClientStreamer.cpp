@@ -403,8 +403,8 @@ void CClientStreamer::Restream ( bool bMovedFar )
 {
     // Limit distance stream in/out rate
     // Vehicles might have to ignore this to reduce blocking loads elsewhere.
-    int iMaxOut = 4;
-    int iMaxIn = 4;
+    int iMaxOut = 6;
+    int iMaxIn = 6;
     if ( bMovedFar )
     {
         iMaxOut = 1000;
@@ -412,10 +412,9 @@ void CClientStreamer::Restream ( bool bMovedFar )
     }
 
     // Do we have any elements waiting to be streamed out?
-    CClientStreamElement * pElement = NULL;
     while ( !m_ToStreamOut.empty () )
     {
-        pElement = m_ToStreamOut.front ();
+        CClientStreamElement* pElement = m_ToStreamOut.front ();
         // Make sure we have no stream-references
         if ( pElement->GetTotalStreamReferences () == 0 )
         {
@@ -429,16 +428,18 @@ void CClientStreamer::Restream ( bool bMovedFar )
             break;
     }
 
-    CClientStreamElement * pFurthestStreamed = NULL;
-    CClientStreamElement * pClosestStreamedOut = NULL;
-    float fElementDistanceExp;
+    static std::vector < CClientStreamElement* > ClosestStreamedOutList;
+    static std::vector < CClientStreamElement* > FurthestStreamedInList;
+    ClosestStreamedOutList.clear();
+    FurthestStreamedInList.clear();
+
     bool bReachedLimit = ReachedLimit ();
     // Loop through our active elements list (they should be ordered closest to furthest)
     list < CClientStreamElement* > ::iterator iter = m_ActiveElements.begin ();
     for ( ; iter != m_ActiveElements.end (); iter++ )
     {
-        pElement = *iter;
-        fElementDistanceExp = pElement->GetExpDistance ();
+        CClientStreamElement* pElement = *iter;
+        float fElementDistanceExp = pElement->GetExpDistance ();
         
         // Is this element streamed in?
         if ( pElement->IsStreamedIn () )
@@ -468,10 +469,28 @@ void CClientStreamer::Restream ( bool bMovedFar )
             // Too far away? Use the threshold so we won't flicker load it if it's on the border moving.
             if ( fElementDistanceExp > m_fMaxDistanceThreshold )
             {
-                // Unstream it
-                m_ToStreamOut.push_back ( pElement );
+                // Unstream it now?
+                if ( iMaxOut > 0 )
+                {
+                    // Make sure we have no stream-references
+                    if ( pElement->GetTotalStreamReferences () == 0 )
+                    {
+                        // Stream out now
+                        pElement->InternalStreamOut ();
+                        iMaxOut--;
+                    }
+                    m_ToStreamOut.remove ( pElement );
+                }
+                else
+                {
+                    // or later
+                    m_ToStreamOut.push_back ( pElement );
+                }
             }
-            else pFurthestStreamed = pElement;
+            else
+            {
+                FurthestStreamedInList.push_back( pElement );
+            }
         }
         else
         {
@@ -505,7 +524,7 @@ void CClientStreamer::Restream ( bool bMovedFar )
                     }
                 }
                 // If attached and attached-to is streamed out, don't consider for streaming in
-                CClientStreamElement* pAttachedTo = dynamic_cast< CClientStreamElement * >( pElement->GetAttachedTo() );
+                CClientStreamElement* pAttachedTo = DynamicCast< CClientStreamElement >( pElement->GetAttachedTo() );
                 if ( pAttachedTo && !pAttachedTo->IsStreamedIn() )
                 {
                     // ...unless attached to low LOD version
@@ -518,13 +537,14 @@ void CClientStreamer::Restream ( bool bMovedFar )
                 // Not room to stream in more elements?
                 if ( bReachedLimit )
                 {
-                    // Do we not have a closest streamed out element yet? set it to this
-                    if ( !pClosestStreamedOut ) pClosestStreamedOut = pElement;
+                    // Add to the list that might be streamed in during the final phase
+                    if ( ClosestStreamedOutList.size() < iMaxIn )     // (only add if there is a chance it will be used)
+                        ClosestStreamedOutList.push_back( pElement );
                 }
                 else
                 {
-                    // Stream in the new element. Don't do it instantly.
-                    pElement->InternalStreamIn ( false );
+                    // Stream in the new element. Don't do it instantly unless moved from far away.
+                    pElement->InternalStreamIn ( bMovedFar );
                     bReachedLimit = ReachedLimit ();
 
                     if ( !bReachedLimit )
@@ -538,28 +558,49 @@ void CClientStreamer::Restream ( bool bMovedFar )
         }
     }
 
-    // Stream in the closest elements if we're at the limit
+    // Complex code of doom:
+    //      ClosestStreamedOutList is {nearest to furthest} list of streamed out elements within streaming distance
+    //      FurthestStreamedInList is {nearest to furthest} list of streamed in elements
     if ( bReachedLimit )
     {
-        // Do we have furthest-streamed and closest-streamed-out elements
-        if ( pFurthestStreamed && pClosestStreamedOut )
+        // Check 'furthest streamed in' against 'closest streamed out' to see if the state can be swapped
+        int iFurthestStreamedInIndex = FurthestStreamedInList.size() - 1;
+        uint uiClosestStreamedOutIndex = 0;
+        for( uint i = 0 ; i < 10 ; i++ )
         {
-            // It isn't the same object
-            if ( pFurthestStreamed != pClosestStreamedOut )
-            {
-                // Is the streamed out element closer?
-                if ( pClosestStreamedOut->GetExpDistance () < pFurthestStreamed->GetExpDistance () )
-                {   
-                    // Unstream the one furthest away
-                    pFurthestStreamed->InternalStreamOut();
+            // Check limits for this frame
+            if ( iMaxIn <= 0 || iMaxOut <= 0 )
+                break;
 
-                    // Room to stream in element now? Stream it in.
-                    if ( !ReachedLimit () )
-                    {
-                        // Stream in the new element. No need to do it instantly.
-                        pClosestStreamedOut->InternalStreamIn ( false );
-                    }
-                }
+            // Check indicies are valid
+            if ( iFurthestStreamedInIndex < 0 )
+                break;
+            if ( uiClosestStreamedOutIndex >= ClosestStreamedOutList.size() )
+                break;
+
+            // See if ClosestStreamedOut is nearer than FurthestStreamedIn
+            CClientStreamElement* pFurthestStreamedIn = FurthestStreamedInList[ iFurthestStreamedInIndex ];
+            CClientStreamElement* pClosestStreamedOut = ClosestStreamedOutList[ uiClosestStreamedOutIndex ];
+            if ( pClosestStreamedOut->GetExpDistance () >= pFurthestStreamedIn->GetExpDistance () )
+                break;
+
+            // Stream out FurthestStreamedIn candidate if possible
+            if ( pFurthestStreamedIn->GetTotalStreamReferences () == 0 )
+            {
+                // Stream out now
+                pFurthestStreamedIn->InternalStreamOut ();
+                iMaxOut--;
+            }
+            m_ToStreamOut.remove ( pFurthestStreamedIn );
+            iFurthestStreamedInIndex--;     // Always advance to the next candidate
+
+            // Stream in ClosestStreamedOut candidate if possible
+            if ( !ReachedLimit () )
+            {
+                // Stream in the new element. No need to do it instantly unless moved from far away.
+                pClosestStreamedOut->InternalStreamIn ( bMovedFar );
+                iMaxIn--;
+                uiClosestStreamedOutIndex++;
             }
         }
     }
