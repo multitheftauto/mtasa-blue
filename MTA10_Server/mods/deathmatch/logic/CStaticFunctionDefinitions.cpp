@@ -10626,6 +10626,8 @@ bool CStaticFunctionDefinitions::SetJetpackWeaponEnabled ( eWeaponType weaponTyp
         BitStream.pBitStream->Write ( static_cast < unsigned char > ( weaponType ) );
         BitStream.pBitStream->WriteBit ( bEnabled );
         m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_JETPACK_WEAPON_ENABLED, *BitStream.pBitStream ) );
+
+        g_pGame->SetJetpackWeaponEnabled ( weaponType, bEnabled );
         return true;
     }
     return false;
