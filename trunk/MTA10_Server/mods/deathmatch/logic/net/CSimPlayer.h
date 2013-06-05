@@ -14,21 +14,23 @@ class CSimPlayer
 {
 public:
     ZERO_ON_NEW
-                                            CSimPlayer                  ( void )                        { DEBUG_CREATE_COUNT( "CSimPlayer" ); }
-                                            ~CSimPlayer                 ( void )                        { DEBUG_DESTROY_COUNT( "CSimPlayer" ); }
+                                                    CSimPlayer                  ( void )                        { DEBUG_CREATE_COUNT( "CSimPlayer" ); }
+                                                    ~CSimPlayer                 ( void )                        { DEBUG_DESTROY_COUNT( "CSimPlayer" ); }
 
-    bool                                    IsJoined                    ( void )                        { return m_iStatus == STATUS_JOINED; };
-    const std::vector < CSimPlayer* >&      GetPuresyncSendList         ( void )                        { return m_PuresyncSendList; }
-    unsigned short                          GetBitStreamVersion         ( void )                        { return m_usBitStreamVersion; };
-    NetServerPlayerID&                      GetSocket                   ( void )                        { return m_PlayerSocket; };
+    bool                                            IsJoined                    ( void )                        { return m_iStatus == STATUS_JOINED; };
+    const std::multimap < ushort, CSimPlayer* >&    GetPuresyncSendList         ( void );
+    unsigned short                                  GetBitStreamVersion         ( void )                        { return m_usBitStreamVersion; };
+    NetServerPlayerID&                              GetSocket                   ( void )                        { return m_PlayerSocket; };
 
     // General synced vars
-    int                         m_iStatus;
-    unsigned short              m_usBitStreamVersion;
-    NetServerPlayerID           m_PlayerSocket;
-    std::vector < CSimPlayer* > m_PuresyncSendList;
-    bool                        m_bHasOccupiedVehicle;
-    CControllerState            m_sharedControllerState;        // Updated by CSim*Packet code
+    int                                     m_iStatus;
+    unsigned short                          m_usBitStreamVersion;
+    NetServerPlayerID                       m_PlayerSocket;
+    std::vector < CSimPlayer* >             m_PuresyncSendListFlat;
+    std::multimap < ushort, CSimPlayer* >   m_PuresyncSendListGrouped;      // Send list grouped by bitstream version
+    bool                                    m_bSendListChanged;
+    bool                                    m_bHasOccupiedVehicle;
+    CControllerState                        m_sharedControllerState;        // Updated by CSim*Packet code
 
     // Used in CSimPlayerPuresyncPacket and CSimVehiclePuresyncPacket
     ElementID                   m_PlayerID;

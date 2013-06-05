@@ -141,6 +141,17 @@ class CWeaponDamageCheckPacket;
 
 typedef SFixedArray < bool, MAX_GARAGES > SGarageStates;
 
+// CSendList - Can be used like a std::list of players for sending packets.
+//             Used to construct an optimized list of players for CGame::Broadcast
+class CSendList : public std::multimap < ushort, CPlayer* >
+{
+public:
+    void push_back( CPlayer* pPlayer )
+    {
+        MapInsert( *this, pPlayer->GetBitStreamVersion(), pPlayer );
+    }
+};
+
 class CGame
 {
 public:

@@ -1432,12 +1432,12 @@ void CGame::QuitPlayer ( CPlayer& Player, CClient::eQuitReasons Reason, bool bSa
         // Tell the map manager
         m_pMapManager->OnPlayerQuit ( Player );
 
-        // Tell all the players except the parting one (we don't tell them if he hadn't joined because the players don't know about him)
-        CPlayerQuitPacket Packet;
-        Packet.SetPlayer ( Player.GetID () );
-        Packet.SetQuitReason ( static_cast < unsigned char > ( Reason ) );
-        m_pPlayerManager->BroadcastOnlyJoined ( Packet, &Player );
-    }
+            // Tell all the players except the parting one (we don't tell them if he hadn't joined because the players don't know about him)
+            CPlayerQuitPacket Packet;
+            Packet.SetPlayer ( Player.GetID () );
+            Packet.SetQuitReason ( static_cast < unsigned char > ( Reason ) );
+            m_pPlayerManager->BroadcastOnlyJoined ( Packet, &Player );
+        }
 
     // Tell net module connection version info will no longer be required
     g_pNetServer->ClearClientBitStreamVersion ( Player.GetSocket () );
@@ -2010,14 +2010,13 @@ void CGame::Packet_PlayerTimeout ( CPlayerTimeoutPacket& Packet )
 // Relay this (pure sync) packet to all the other players using distance rules
 void CGame::RelayPlayerPuresync ( CPacket& Packet )
 {
-    // Only need to do this once every 8 calls
+    // No need to update tick counter every call
     static uint uiUpdateCounter = 0;
     if ( ( ++uiUpdateCounter & 7 ) == 0 )
         UpdateModuleTickCount64 ();
 
     // Make a list of players to send this packet to
-    static std::vector < CPlayer* > sendList;   // static to help reduce memory allocations
-    sendList.clear();
+    CSendList sendList;
     bool bUseSimSendList = CSimControl::IsSimSystemEnabled ();
 
     CPlayer* pPlayer = Packet.GetSourcePlayer ();
@@ -2337,8 +2336,7 @@ void CGame::Packet_PedTask ( CPedTaskPacket& Packet )
 void CGame::RelayNearbyPacket ( CPacket& Packet )
 {
     // Make a list of players to send this packet to
-    static std::vector < CPlayer* > sendList;   // static to help reduce memory allocations
-    sendList.clear();
+    CSendList sendList;
     bool bUseSimSendList = CSimControl::IsSimSystemEnabled () && Packet.HasSimHandler();
 
     CPlayer* pPlayer = Packet.GetSourcePlayer ();
@@ -2550,7 +2548,7 @@ void CGame::Packet_ExplosionSync ( CExplosionSyncPacket& Packet )
         if ( bBroadcast )
         {
             // Make a list of players to send this packet to
-            std::vector < CPlayer* > sendList;
+            CSendList sendList;
 
             // Loop through all the players
             std::list < CPlayer* > ::const_iterator iter = m_pPlayerManager->IterBegin ();
@@ -2592,7 +2590,7 @@ void CGame::Packet_ProjectileSync ( CProjectileSyncPacket& Packet )
         }
 
         // Make a list of players to send this packet to
-        std::vector < CPlayer* > sendList;
+        CSendList sendList;
 
         // Loop through all the players
         std::list < CPlayer* > ::const_iterator iter = m_pPlayerManager->IterBegin ();
