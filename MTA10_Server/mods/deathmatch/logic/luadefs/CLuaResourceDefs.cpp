@@ -1071,7 +1071,7 @@ int CLuaResourceDefs::call ( lua_State* luaVM )
                     OldResourceRoot.Push ( targetLuaVM );
                     lua_setglobal ( targetLuaVM, "sourceResourceRoot" );
 
-                    m_pScriptDebugging->LogError ( luaVM, "%s: failed to call '%s:%s'", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), pResource->GetName ().c_str (), strFunctionName );
+                    m_pScriptDebugging->LogError ( luaVM, "%s: failed to call '%s:%s'", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), pResource->GetName ().c_str (), *strFunctionName );
                 }
             }
         }

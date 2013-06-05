@@ -393,7 +393,7 @@ int CLuaFunctionDefinitions::shutdown ( lua_State* luaVM )
             if ( pResource )
             {
                 // Log it
-                CLogger::LogPrintf ( "Server shutdown as requested by resource %s (%s)\n", pResource->GetName ().c_str (), strReason );
+                CLogger::LogPrintf ( "Server shutdown as requested by resource %s (%s)\n", pResource->GetName ().c_str (), *strReason );
 
                 // Shut it down
                 g_pGame->SetIsFinished ( true );
@@ -5259,6 +5259,7 @@ int CLuaFunctionDefinitions::AddVehicleUpgrade ( lua_State* luaVM )
         SString strAll;
         argStream.ReadString(strAll);
         bAll = strAll == "all";
+        usUpgrade = 0;
     }
     else
         argStream.ReadNumber(usUpgrade);
@@ -7373,6 +7374,11 @@ int CLuaFunctionDefinitions::BindKey ( lua_State* luaVM )
     SString strArguments; 
 
     CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+    if ( !pLuaMain )
+    {
+        lua_pushboolean ( luaVM, false );
+        return 1;
+    }
     
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData(pPlayer); 
@@ -7428,7 +7434,12 @@ int CLuaFunctionDefinitions::UnbindKey ( lua_State* luaVM )
     SString strCommand; 
 
     CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
-    
+    if ( !pLuaMain )
+    {
+        lua_pushboolean ( luaVM, false );
+        return 1;
+    }
+
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData(pPlayer); 
     argStream.ReadString(strKey); 
@@ -7483,7 +7494,12 @@ int CLuaFunctionDefinitions::IsKeyBound ( lua_State* luaVM )
     CLuaFunctionRef iLuaFunction;
 
     CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
-    
+    if ( !pLuaMain )
+    {
+        lua_pushboolean ( luaVM, false );
+        return 1;
+    }
+
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData(pPlayer); 
     argStream.ReadString(strKey); 
@@ -7511,7 +7527,6 @@ int CLuaFunctionDefinitions::IsKeyBound ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::GetFunctionsBoundToKey ( lua_State* luaVM )
 {
-    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
     CPlayer* pPlayer; 
     SString strKey; 
     SString strHitState; 
@@ -7526,13 +7541,13 @@ int CLuaFunctionDefinitions::GetFunctionsBoundToKey ( lua_State* luaVM )
         bool bCheckHitState = false, bHitState = false;
         if ( strHitState == "down" )
         {
-            bool bCheckHitState = true;
-            bool bHitState = true;
+            bCheckHitState = true;
+            bHitState = true;
         }
         else if ( strHitState == "up" )
         {
-            bool bCheckHitState = true;
-            bool bHitState = false;
+            bCheckHitState = true;
+            bHitState = false;
         } 
         
         // Create a new table
@@ -7593,7 +7608,6 @@ int CLuaFunctionDefinitions::GetFunctionsBoundToKey ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::GetKeyBoundToFunction ( lua_State* luaVM )
 {   
-    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
     CPlayer* pPlayer; 
     SString strKey; 
     CLuaFunctionRef iLuaFunction;
@@ -8083,6 +8097,11 @@ int CLuaFunctionDefinitions::SetTeamFriendlyFire ( lua_State* luaVM )
 int CLuaFunctionDefinitions::CreateWater ( lua_State* luaVM )
 {
     CLuaMain* pLuaMain = g_pGame->GetLuaManager ()->GetVirtualMachine ( luaVM );
+    if ( !pLuaMain )
+    {
+        lua_pushboolean ( luaVM, false );
+        return 1;
+    }
 
     CVector v1, v2, v3, v4;
     CVector* pv4 = NULL;
@@ -9430,9 +9449,12 @@ int CLuaFunctionDefinitions::OutputChatBox ( lua_State* luaVM )
     if ( !argStream.HasErrors () )
     {
         CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
-        CStaticFunctionDefinitions::OutputChatBox ( (const char*)ssChat, pElement, ucRed, ucGreen, ucBlue, bColorCoded, pLuaMain );
-        lua_pushboolean ( luaVM, true );
-        return 1;
+        if ( pLuaMain )
+        {
+            CStaticFunctionDefinitions::OutputChatBox ( (const char*)ssChat, pElement, ucRed, ucGreen, ucBlue, bColorCoded, pLuaMain );
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
@@ -9782,8 +9804,6 @@ int CLuaFunctionDefinitions::GetTok ( lua_State* luaVM )
         }
         else  // It's already a string
             argStream.ReadString ( strDelimiter );
-
-        unsigned int uiCount = 0;
 
         if ( uiToken > 0 && uiToken < 1024 )
         {
@@ -10279,11 +10299,14 @@ int CLuaFunctionDefinitions::LoadMapData ( lua_State* luaVM )
     if ( !argStream.HasErrors ( ) )
     {
         CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
-        CElement* pLoadedRoot = CStaticFunctionDefinitions::LoadMapData ( pLuaMain, pParent, pXML );
-        if ( pLoadedRoot )
+        if ( pLuaMain )
         {
-            lua_pushelement ( luaVM, pLoadedRoot );
-            return 1;
+            CElement* pLoadedRoot = CStaticFunctionDefinitions::LoadMapData ( pLuaMain, pParent, pXML );
+            if ( pLoadedRoot )
+            {
+                lua_pushelement ( luaVM, pLoadedRoot );
+                return 1;
+            }
         }
     }
     else
