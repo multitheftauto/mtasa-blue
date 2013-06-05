@@ -8834,9 +8834,10 @@ bool CStaticFunctionDefinitions::ToggleAllControls ( CPlayer* pPlayer, bool bGTA
     assert ( pPlayer );
 
     if ( bGTAControls )
-        pPlayer->GetPad ()->SetAllControlsEnabled ( bEnabled );
+        pPlayer->GetPad ()->SetAllGTAControlsEnabled ( bEnabled );
 
-    // TODO: Add mta controls to CPad
+    if ( bMTAControls )
+        pPlayer->GetPad ()->SetAllMTAControlsEnabled ( bEnabled );
 
     CBitStream BitStream;
     BitStream.pBitStream->Write ( static_cast < unsigned char > ( ( bGTAControls ) ? 1 : 0 ) );

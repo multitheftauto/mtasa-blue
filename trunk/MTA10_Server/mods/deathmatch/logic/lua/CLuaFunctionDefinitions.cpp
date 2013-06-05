@@ -7790,7 +7790,7 @@ int CLuaFunctionDefinitions::ToggleAllControls ( lua_State* luaVM )
     
     if ( !argStream.HasErrors ( ) )
     {
-        if ( CStaticFunctionDefinitions::ToggleAllControls( pPlayer, bEnabled, bGTAControls, bMTAControls) )
+        if ( CStaticFunctionDefinitions::ToggleAllControls( pPlayer, bGTAControls, bMTAControls, bEnabled ) )
         {
             lua_pushboolean ( luaVM, true );
             return 1;
