@@ -92,7 +92,8 @@ void CSimPlayerManager::RemoveSimPlayer ( CPlayer* pPlayer )
     for ( std::set < CSimPlayer* > ::const_iterator iter = m_AllSimPlayerMap.begin () ; iter != m_AllSimPlayerMap.end (); iter++ )
     {
         CSimPlayer* pOtherSim = *iter;
-        ListRemove ( pOtherSim->m_PuresyncSendList, pSim );
+        ListRemove ( pOtherSim->m_PuresyncSendListFlat, pSim );
+        pOtherSim->m_bSendListChanged = true;
     }
 
     SAFE_DELETE( pSim );
@@ -149,12 +150,13 @@ void CSimPlayerManager::UpdateSimPlayer ( CPlayer* pPlayer )
     if ( pPlayer->m_bPureSyncSimSendListDirty )
     {
         pPlayer->m_bPureSyncSimSendListDirty = false;
-        pSim->m_PuresyncSendList.clear ();
+        pSim->m_PuresyncSendListFlat.clear ();
+        pSim->m_bSendListChanged = true;
         for ( CFastHashSet < CPlayer* > ::const_iterator iter = pPlayer->m_PureSyncSimSendList.begin (); iter != pPlayer->m_PureSyncSimSendList.end (); ++iter )
         {
             CSimPlayer* pSendSimPlayer = (*iter)->m_pSimPlayer;
             if ( pSendSimPlayer && pSendSimPlayer->m_bDoneFirstUpdate )
-                pSim->m_PuresyncSendList.push_back ( pSendSimPlayer );
+                pSim->m_PuresyncSendListFlat.push_back ( pSendSimPlayer );
             else
                 pPlayer->m_bPureSyncSimSendListDirty = true;    // Retry next time
         }
@@ -452,7 +454,7 @@ CSimPlayer* CSimPlayerManager::Get ( const NetServerPlayerID& PlayerSocket )
 // Send one packet to a list of players
 //
 ///////////////////////////////////////////////////////////////////////////
-void CSimPlayerManager::Broadcast ( const CSimPacket& Packet, const std::vector < CSimPlayer* >& sendList )
+void CSimPlayerManager::Broadcast ( const CSimPacket& Packet, const std::multimap < ushort, CSimPlayer* >& groupMap )
 {
     dassert ( m_bIsLocked );
 
@@ -495,16 +497,8 @@ void CSimPlayerManager::Broadcast ( const CSimPacket& Packet, const std::vector 
         packetPriority = PACKET_PRIORITY_LOW;
     }
 
-    // Group players by bitstream version
-    std::multimap < ushort, CSimPlayer* > groupMap;
-    for ( std::vector < CSimPlayer* >::const_iterator iter = sendList.begin () ; iter != sendList.end () ; ++iter )
-    {
-        CSimPlayer* pPlayer = *iter;
-        MapInsert ( groupMap, pPlayer->GetBitStreamVersion (), pPlayer );
-    }
-
     // For each bitstream version, make and send a packet
-    typedef std::multimap < ushort, CSimPlayer* > ::iterator mapIter;
+    typedef std::multimap < ushort, CSimPlayer* > ::const_iterator mapIter;
     mapIter m_it, s_it;
     for ( m_it = groupMap.begin () ; m_it != groupMap.end () ; m_it = s_it )
     {
@@ -517,7 +511,7 @@ void CSimPlayerManager::Broadcast ( const CSimPacket& Packet, const std::vector 
         if ( Packet.Write ( *pBitStream ) )
         {
             // For each player, send the packet
-            pair < mapIter , mapIter > keyRange = groupMap.equal_range ( usBitStreamVersion );
+            const pair < mapIter , mapIter > keyRange = groupMap.equal_range ( usBitStreamVersion );
             for ( s_it = keyRange.first ; s_it != keyRange.second ; ++s_it )
             {
                 CSimPlayer* pPlayer = s_it->second;
@@ -528,7 +522,7 @@ void CSimPlayerManager::Broadcast ( const CSimPacket& Packet, const std::vector 
         else
         {
             // Skip
-            pair < mapIter , mapIter > keyRange = groupMap.equal_range ( usBitStreamVersion );
+            const pair < mapIter , mapIter > keyRange = groupMap.equal_range ( usBitStreamVersion );
             for ( s_it = keyRange.first ; s_it != keyRange.second ; ++s_it )
             {}
         }
@@ -536,4 +530,30 @@ void CSimPlayerManager::Broadcast ( const CSimPacket& Packet, const std::vector 
         // Destroy the bitstream
         g_pRealNetServer->DeallocateNetServerBitStream ( pBitStream );
     }
+}
+
+
+///////////////////////////////////////////////////////////////////////////
+//
+// CSimPlayer::GetPuresyncSendList
+//
+// Returns list of players, grouped by bitstream version
+//
+///////////////////////////////////////////////////////////////////////////
+const std::multimap < ushort, CSimPlayer* >& CSimPlayer::GetPuresyncSendList ( void )
+{
+    if ( m_bSendListChanged )
+    {
+        m_bSendListChanged = false;
+        // Group players by bitstream version
+        m_PuresyncSendListGrouped.clear();
+        for ( std::vector < CSimPlayer* >::const_iterator iter = m_PuresyncSendListFlat.begin () ; iter != m_PuresyncSendListFlat.end () ; ++iter )
+        {
+            CSimPlayer* pPlayer = *iter;
+            MapInsert ( m_PuresyncSendListGrouped, pPlayer->GetBitStreamVersion (), pPlayer );
+        }
+    }
+
+    dassert( m_PuresyncSendListFlat.size() == m_PuresyncSendListGrouped.size() );
+    return m_PuresyncSendListGrouped;
 }
