@@ -243,8 +243,15 @@ CGame::~CGame ( void )
 {
     m_bBeingDeleted = true;
 
-    // Eventually stop our game
+    // Stop and flush sim packet handling
     CSimControl::EnableSimSystem ( false );
+
+    // Disconnect all players
+    std::list < CPlayer* > ::const_iterator iter = m_pPlayerManager->IterBegin ();
+    for ( ; iter != m_pPlayerManager->IterEnd (); iter++ )
+        DisconnectPlayer ( this, **iter, CPlayerDisconnectedPacket::ePlayerDisconnectType::NO_REASON );
+
+    // Stop networking
     Stop ();
 
     // Stop the web server
@@ -1398,7 +1405,7 @@ void CGame::QuitPlayer ( CPlayer& Player, CClient::eQuitReasons Reason, bool bSa
 
     // Output
     const char* szNick = Player.GetNick ();
-    if ( bSayInConsole && szNick && szNick [0] )
+    if ( bSayInConsole && szNick && szNick [0] && !m_bBeingDeleted )
     {
         CLogger::LogPrintf ( "QUIT: %s left the game [%s]\n", szNick, szReason );
     }
@@ -1432,12 +1439,15 @@ void CGame::QuitPlayer ( CPlayer& Player, CClient::eQuitReasons Reason, bool bSa
         // Tell the map manager
         m_pMapManager->OnPlayerQuit ( Player );
 
+        if ( !m_bBeingDeleted )
+        {
             // Tell all the players except the parting one (we don't tell them if he hadn't joined because the players don't know about him)
             CPlayerQuitPacket Packet;
             Packet.SetPlayer ( Player.GetID () );
             Packet.SetQuitReason ( static_cast < unsigned char > ( Reason ) );
             m_pPlayerManager->BroadcastOnlyJoined ( Packet, &Player );
         }
+    }
 
     // Tell net module connection version info will no longer be required
     g_pNetServer->ClearClientBitStreamVersion ( Player.GetSocket () );
