@@ -50,7 +50,7 @@ public:
     inline ePacketID        GetPacketID                 ( void ) const              { return PACKET_ID_SERVER_DISCONNECTED; };
     inline unsigned long    GetFlags                    ( void ) const              { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
 
-    inline bool             Write                       ( NetBitStreamInterface& BitStream ) const;
+    bool                    Write                       ( NetBitStreamInterface& BitStream ) const;
 
     inline const char*      GetReason                   ( void )                    { return m_strReason; }
     inline void             SetReason                   ( const char* szReason )    { m_strReason = szReason; }

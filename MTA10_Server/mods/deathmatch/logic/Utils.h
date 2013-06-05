@@ -22,7 +22,6 @@
 #include <cmath>
 #include "CCommon.h"
 #include "CPad.h"
-#include "../packets/CPlayerDisconnectedPacket.h"
 
 bool            CheckNickProvided           ( const char* szNick );
 float           DistanceBetweenPoints2D     ( const CVector& vecPosition1, const CVector& vecPosition2 );
