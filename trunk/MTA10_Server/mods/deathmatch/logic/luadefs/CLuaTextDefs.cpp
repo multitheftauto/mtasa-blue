@@ -90,7 +90,7 @@ int CLuaTextDefs::textCreateTextItem ( lua_State* luaVM )
     float fX, fY, fScale;
     int iPriority;
     SColorRGBA color ( 255, 255, 255, 255 );
-    unsigned char ucFormat, ucShadowAlpha;
+    unsigned char ucShadowAlpha;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadString ( strText, "" );
@@ -102,9 +102,9 @@ int CLuaTextDefs::textCreateTextItem ( lua_State* luaVM )
         SString strPriority;
         argStream.ReadString ( strPriority );
 
-        if ( strPriority == "low" )         iPriority = PRIORITY_LOW;
+        if ( strPriority == "high" )        iPriority = PRIORITY_HIGH;
         else if ( strPriority == "medium" ) iPriority = PRIORITY_MEDIUM;
-        else if ( strPriority == "high" )   iPriority = PRIORITY_HIGH;
+        else                                iPriority = PRIORITY_LOW;
 
     }
     else
@@ -123,7 +123,7 @@ int CLuaTextDefs::textCreateTextItem ( lua_State* luaVM )
 
     if ( !argStream.HasErrors ( ) )
     {
-        
+        unsigned char ucFormat = 0; 
         if ( strHorzAlign == "center" ) 
             ucFormat |= 0x00000001; // DT_CENTER
         else if ( strHorzAlign == "right" )
@@ -510,9 +510,9 @@ int CLuaTextDefs::textItemSetPriority ( lua_State* luaVM )
         SString strPriority;
         argStream.ReadString ( strPriority );
 
-        if ( strPriority == "low" )         iPriority = PRIORITY_LOW;
+        if ( strPriority == "high" )        iPriority = PRIORITY_HIGH;
         else if ( strPriority == "medium" ) iPriority = PRIORITY_MEDIUM;
-        else if ( strPriority == "high" )   iPriority = PRIORITY_HIGH;
+        else                                iPriority = PRIORITY_LOW;
 
     }
     else
