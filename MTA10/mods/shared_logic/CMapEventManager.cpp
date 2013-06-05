@@ -154,106 +154,103 @@ bool CMapEventManager::Call ( const char* szName, const CLuaArguments& Arguments
     // Copy the results into a array in case m_EventsMap is modified during the call
     std::vector< CMapEvent* > matchingEvents;
     for ( EventsIter iter = itPair.first ; iter != itPair.second ; ++iter )
-    {
-        CMapEvent* pMapEvent = iter->second;
-        // If it's not being destroyed
-        if ( !pMapEvent->IsBeingDestroyed () )
-        {
-            // Call if propagated?
-            if ( pSource == pThis || pMapEvent->IsPropagated () )
-            {
-                matchingEvents.push_back(iter->second);
-            }
-        }
-    }
+        matchingEvents.push_back(iter->second);
+
     for ( std::vector< CMapEvent* >::iterator iter = matchingEvents.begin() ; iter != matchingEvents.end() ; ++iter )
     {
         CMapEvent* pMapEvent = *iter;
 
-       
-        // Compare the names
-        dassert ( strcmp ( pMapEvent->GetName (), szName ) == 0 );
+        // If it's not being destroyed
+        if ( !pMapEvent->IsBeingDestroyed () )
+        {
+            // Compare the names
+            dassert ( strcmp ( pMapEvent->GetName (), szName ) == 0 );
+            {
+                // Call if propagated?
+                if ( pSource == pThis || pMapEvent->IsPropagated () )
+                {
+                    // Grab the current VM
+                    lua_State* pState = pMapEvent->GetVM ()->GetVM ();
+                    #if MTA_DEBUG
+                        int luaStackPointer = lua_gettop ( pState );
+                    #endif
 
-        // Grab the current VM
-        lua_State* pState = pMapEvent->GetVM ()->GetVM ();
-        #if MTA_DEBUG
-            int luaStackPointer = lua_gettop ( pState );
-        #endif
+                    TIMEUS startTime = GetTimeUs();
 
-        TIMEUS startTime = GetTimeUs();
+                    // Record event for the crash dump writer
+                    g_pCore->LogEvent ( 405, "Lua Event", pMapEvent->GetVM ()->GetScriptName (), szName );
 
-        // Record event for the crash dump writer
-        g_pCore->LogEvent ( 405, "Lua Event", pMapEvent->GetVM ()->GetScriptName (), szName );
+                    // Store the current values of the globals
+                    lua_getglobal ( pState, "source" );
+                    CLuaArgument OldSource ( pState, -1 );
+                    lua_pop( pState, 1 );
 
-        // Store the current values of the globals
-        lua_getglobal ( pState, "source" );
-        CLuaArgument OldSource ( pState, -1 );
-        lua_pop( pState, 1 );
+                    lua_getglobal ( pState, "this" );
+                    CLuaArgument OldThis ( pState, -1 );
+                    lua_pop( pState, 1 );
 
-        lua_getglobal ( pState, "this" );
-        CLuaArgument OldThis ( pState, -1 );
-        lua_pop( pState, 1 );
+                    lua_getglobal ( pState, "sourceResource" );
+                    CLuaArgument OldResource ( pState, -1 );
+                    lua_pop( pState, 1 );
 
-        lua_getglobal ( pState, "sourceResource" );
-        CLuaArgument OldResource ( pState, -1 );
-        lua_pop( pState, 1 );
+                    lua_getglobal ( pState, "sourceResourceRoot" );
+                    CLuaArgument OldResourceRoot ( pState, -1 );
+                    lua_pop( pState, 1 );
 
-        lua_getglobal ( pState, "sourceResourceRoot" );
-        CLuaArgument OldResourceRoot ( pState, -1 );
-        lua_pop( pState, 1 );
+                    lua_getglobal ( pState, "eventName" );
+                    CLuaArgument OldEventName ( pState, -1 );
+                    lua_pop( pState, 1 );
 
-        lua_getglobal ( pState, "eventName" );
-        CLuaArgument OldEventName ( pState, -1 );
-        lua_pop( pState, 1 );
+                    // Set the "source", "this", "sourceResource" and the "sourceResourceRoot" globals on that VM
+                    lua_pushelement ( pState, pSource );
+                    lua_setglobal ( pState, "source" );
 
-        // Set the "source", "this", "sourceResource" and the "sourceResourceRoot" globals on that VM
-        lua_pushelement ( pState, pSource );
-        lua_setglobal ( pState, "source" );
+                    lua_pushelement ( pState, pThis );
+                    lua_setglobal ( pState, "this" );
 
-        lua_pushelement ( pState, pThis );
-        lua_setglobal ( pState, "this" );
+                    lua_pushresource ( pState, pMapEvent->GetVM()->GetResource() );     // This is not correct
+                    lua_setglobal ( pState, "sourceResource" );
 
-        lua_pushresource ( pState, pMapEvent->GetVM()->GetResource() );     // This is not correct
-        lua_setglobal ( pState, "sourceResource" );
+                    lua_pushelement ( pState, pMapEvent->GetVM()->GetResource()->GetResourceDynamicEntity() );     // This is not correct
+                    lua_setglobal ( pState, "sourceResourceRoot" );
 
-        lua_pushelement ( pState, pMapEvent->GetVM()->GetResource()->GetResourceDynamicEntity() );     // This is not correct
-        lua_setglobal ( pState, "sourceResourceRoot" );
+                    lua_pushstring ( pState, szName );
+                    lua_setglobal ( pState, "eventName" );
+                    
+                    // Call it
+                    pMapEvent->Call ( Arguments );
+                    bCalled = true;
 
-        lua_pushstring ( pState, szName );
-        lua_setglobal ( pState, "eventName" );
-        
-        // Call it
-        pMapEvent->Call ( Arguments );
-        bCalled = true;
+                    // Reset the globals on that VM
+                    OldSource.Push ( pState );
+                    lua_setglobal ( pState, "source" );
 
-        // Reset the globals on that VM
-        OldSource.Push ( pState );
-        lua_setglobal ( pState, "source" );
+                    OldThis.Push ( pState );
+                    lua_setglobal ( pState, "this" );                
 
-        OldThis.Push ( pState );
-        lua_setglobal ( pState, "this" );                
+                    OldResource.Push ( pState );
+                    lua_setglobal ( pState, "sourceResource" );
 
-        OldResource.Push ( pState );
-        lua_setglobal ( pState, "sourceResource" );
+                    OldResourceRoot.Push ( pState );
+                    lua_setglobal ( pState, "sourceResourceRoot" );
 
-        OldResourceRoot.Push ( pState );
-        lua_setglobal ( pState, "sourceResourceRoot" );
+                    OldEventName.Push ( pState );
+                    lua_setglobal ( pState, "eventName" );
 
-        OldEventName.Push ( pState );
-        lua_setglobal ( pState, "eventName" );
+                    #if MTA_DEBUG
+                        assert ( lua_gettop ( pState ) == luaStackPointer );
+                    #endif
 
-        #if MTA_DEBUG
-            assert ( lua_gettop ( pState ) == luaStackPointer );
-        #endif
+                    TIMEUS deltaTimeUs = GetTimeUs() - startTime;
 
-        TIMEUS deltaTimeUs = GetTimeUs() - startTime;
+                    if ( deltaTimeUs > 3000 ) 
+                        if ( IS_TIMING_CHECKPOINTS() )
+                            strStatus += SString ( " (%s %d ms)", pMapEvent->GetVM ()->GetScriptName (), deltaTimeUs / 1000 );
 
-        if ( deltaTimeUs > 3000 ) 
-            if ( IS_TIMING_CHECKPOINTS() )
-                strStatus += SString ( " (%s %d ms)", pMapEvent->GetVM ()->GetScriptName (), deltaTimeUs / 1000 );
-
-        CClientPerfStatLuaTiming::GetSingleton ()->UpdateLuaTiming ( pMapEvent->GetVM (), szName, deltaTimeUs );
-    
+                    CClientPerfStatLuaTiming::GetSingleton ()->UpdateLuaTiming ( pMapEvent->GetVM (), szName, deltaTimeUs );
+                }
+            }
+        }
     }
 
     // Clean out the trash if we're no longer calling events.
