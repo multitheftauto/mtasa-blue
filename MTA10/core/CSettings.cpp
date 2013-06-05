@@ -410,7 +410,7 @@ void CSettings::CreateGUI ( void )
     m_pCheckBoxCustomizedSAFiles = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabMultiplayer, _("Use customized GTA:SA files"), true ) );
     m_pCheckBoxCustomizedSAFiles->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 20.0f ) );
     m_pCheckBoxCustomizedSAFiles->GetPosition ( vecTemp, false );
-    m_pCheckBoxCustomizedSAFiles->SetSize ( CVector2D ( 224.0f, 16.0f ) );
+    m_pCheckBoxCustomizedSAFiles->AutoSize ( NULL, 20.0f );
 
     /**
      *  Audio tab
