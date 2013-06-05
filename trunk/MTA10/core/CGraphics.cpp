@@ -1664,10 +1664,8 @@ void CGraphics::DrawProgressMessage( bool bPreserveBackbuffer )
             if ( m_ProgressSpinnerTexture )
             {
                 const uint uiNumFrames = 12;
-                const uint uiTextureSizeX = m_ProgressSpinnerTexture->m_uiSurfaceSizeX;
-                const uint uiTextureSizeY = m_ProgressSpinnerTexture->m_uiSurfaceSizeY;
-                const uint uiFrameWidth = uiTextureSizeX / uiNumFrames;
-                const uint uiFrameHeight = uiTextureSizeY;
+                const uint uiFrameWidth = m_ProgressSpinnerTexture->m_uiSizeX / uiNumFrames;
+                const uint uiFrameHeight = m_ProgressSpinnerTexture->m_uiSizeY;
                 const uint uiSpinnerPosX = uiViewportWidth / 2 - uiFrameWidth / 2;
                 const float fScaleX = 1.f / uiNumFrames;
                 const DWORD dwSpinnerColor = 0x90FFFFFF;
