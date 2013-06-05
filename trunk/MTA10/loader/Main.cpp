@@ -57,6 +57,21 @@ int WINAPI WinMain ( HINSTANCE _hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
 
     SetDllDirectory( SString ( strMTASAPath + "\\mta" ) );
 
+    // See if xinput is loadable (XInput9_1_0.dll is core.dll dependency)
+    HMODULE hXInputModule = LoadLibrary( "XInput9_1_0.dll" );
+    if ( hXInputModule )
+        FreeLibrary( hXInputModule );
+    else
+    {
+        // If not, do hack to use dll supplied with MTA
+        SString strDest = PathJoin( strMTASAPath, "mta", "XInput9_1_0.dll" );
+        if ( !FileExists( strDest ) )
+        {
+            SString strSrc = PathJoin( strMTASAPath, "mta", "XInput9_1_0_mta.dll" );       
+            FileCopy( strSrc, strDest );
+        }
+    }
+
     // Check if the core can be loaded - failure may mean msvcr90.dll or d3dx9_40.dll etc is not installed
     HMODULE hCoreModule = LoadLibrary( strCoreDLL );
     if ( hCoreModule == NULL )
@@ -575,21 +590,6 @@ int DoLaunchGame ( LPSTR lpCmdLine )
     }
 
     WriteDebugEvent( SString( "Loader - Process created: %s", *strGTAEXEPath ) );
-
-    // See if xinput is loadable
-    HMODULE hXInputModule = LoadLibrary( "XInput9_1_0.dll" );
-    if ( hXInputModule )
-        FreeLibrary( hXInputModule );
-    else
-    {
-        // If not, do hack to use dll supplied with MTA
-        SString strDest = PathJoin( strMTASAPath, "mta", "XInput9_1_0.dll" );
-        if ( !FileExists( strDest ) )
-        {
-            SString strSrc = PathJoin( strMTASAPath, "mta", "XInput9_1_0_mta.dll" );       
-            FileCopy( strSrc, strDest );
-        }
-    }
     
     // Inject the core into GTA
     RemoteLoadLibrary ( piLoadee.hProcess, strCoreDLL );
