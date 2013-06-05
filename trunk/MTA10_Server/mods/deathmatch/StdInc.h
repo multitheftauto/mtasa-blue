@@ -27,6 +27,7 @@ struct SAclRequest;
 #include "MTAPlatform.h"
 #define SHARED_UTIL_WITH_FAST_HASH_MAP
 #include "SharedUtil.h"
+#include "gccHashSupport.h"
 #include <xml/CXML.h>
 #include <xml/CXMLNode.h>
 #include <xml/CXMLFile.h>
@@ -127,6 +128,7 @@ struct SAclRequest;
 #include "lua/LuaCommon.h"
 #include "lua/CLuaMain.h"
 #include "CEasingCurve.h"
+#include "CBanManager.h"
 #include "lua/CLuaFunctionParseHelpers.h"
 #include "CScriptArgReader.h"
 #include "lua/CLuaManager.h"
@@ -159,7 +161,6 @@ struct SAclRequest;
 #include "CAccountManager.h"
 #include "CAclRightName.h"
 #include "CBan.h"
-#include "CBanManager.h"
 #include "CBandwidthSettings.h"
 #include "CBlendedWeather.h"
 #include "CBlip.h"
@@ -297,27 +298,3 @@ struct SAclRequest;
 #include "Config.h"
 #define SHOW_SELF_COMPILE_WARNING
 #include "../../version.h"
-
-
-#if defined(__GNUC__) && (__GNUC__ >= 3)
-    namespace __gnu_cxx
-    {
-        template <>
-        struct hash < CLuaArguments* >
-        {
-            size_t operator()( const CLuaArguments* pArguments ) const
-            {
-                return (size_t)pArguments;
-            }
-        };
-
-        template <>
-        struct hash < const void* >
-        {
-            size_t operator()( const void* pArguments ) const
-            {
-                return (size_t)pArguments;
-            }
-        };
-    }
-#endif

@@ -20,7 +20,6 @@
 #include "CColShape.h"
 #include "CEvents.h"
 #include "CPerPlayerEntity.h"
-#include "Utils.h"
 
 class CMarker : public CPerPlayerEntity, private CColCallback
 {
@@ -52,7 +51,6 @@ public:
     void                    Unlink                  ( void );
     bool                    ReadSpecialData         ( void );
 
-    inline bool             IsNear                  ( const CVector& vecPosition, float fDistance ) { return IsPointNearPoint2D ( m_vecPosition, vecPosition, fDistance ); };
     inline bool             HasTarget               ( void )                                        { return m_bHasTarget; };
     inline const CVector&   GetTarget               ( void )                                        { return m_vecTarget; };
     inline unsigned char    GetMarkerType           ( void )                                        { return m_ucType; };

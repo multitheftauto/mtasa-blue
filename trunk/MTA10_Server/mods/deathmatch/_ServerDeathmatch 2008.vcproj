@@ -1667,6 +1667,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\gccHashSupport.h"
+				>
+			</File>
+			<File
 				RelativePath="Server.h"
 				>
 			</File>
