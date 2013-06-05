@@ -13,7 +13,7 @@
 
 CPlayerDisconnectedPacket::CPlayerDisconnectedPacket ( const char* szReason )
 { 
-    m_eType = ePlayerDisconnectType::CUSTOM;
+    m_eType = CPlayerDisconnectedPacket::CUSTOM;
     m_strReason = szReason; 
     m_Duration = 0;
 }

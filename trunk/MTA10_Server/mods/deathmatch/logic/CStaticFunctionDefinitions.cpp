@@ -11062,7 +11062,7 @@ bool CStaticFunctionDefinitions::KickPlayer ( CPlayer* pPlayer, SString strRespo
     }
 
     // Tell the player that was kicked why. QuitPlayer will delete the player.
-    pPlayer->Send ( CPlayerDisconnectedPacket ( CPlayerDisconnectedPacket::ePlayerDisconnectType::KICK, strMessage.c_str ( ) ) );
+    pPlayer->Send ( CPlayerDisconnectedPacket ( CPlayerDisconnectedPacket::KICK, strMessage.c_str ( ) ) );
     g_pGame->QuitPlayer ( *pPlayer, CClient::QUIT_KICK, false, strReason.c_str( ), strResponsible.c_str( ) );
 
     // Tell everyone else that he was kicked from the game including console
@@ -11148,7 +11148,7 @@ CBan* CStaticFunctionDefinitions::BanPlayer ( CPlayer* pPlayer, bool bIP, bool b
 
         // Tell the player that was banned why. QuitPlayer will delete the player.
         time_t Duration = pBan->GetTimeOfUnban() - time ( NULL );
-        CPlayerDisconnectedPacket& Packet = CPlayerDisconnectedPacket ( CPlayerDisconnectedPacket::ePlayerDisconnectType::BAN, Duration, strMessage.c_str ( ) );
+        CPlayerDisconnectedPacket Packet ( CPlayerDisconnectedPacket::BAN, Duration, strMessage.c_str ( ) );
         pPlayer->Send ( Packet );
         g_pGame->QuitPlayer ( *pPlayer, CClient::QUIT_BAN, false, strReason.c_str(), strResponsible.c_str() );
 
@@ -11302,7 +11302,7 @@ CBan* CStaticFunctionDefinitions::AddBan ( SString strIP, SString strUsername, S
 
                 // Tell the player that was banned why. QuitPlayer will delete the player.
                 time_t Duration = pBan->GetTimeOfUnban() - time ( NULL );
-                CPlayerDisconnectedPacket& Packet = CPlayerDisconnectedPacket ( CPlayerDisconnectedPacket::ePlayerDisconnectType::BAN, Duration, strMessage.c_str ( ) );
+                CPlayerDisconnectedPacket Packet ( CPlayerDisconnectedPacket::BAN, Duration, strMessage.c_str ( ) );
                 (*iter)->Send ( Packet );
                 g_pGame->QuitPlayer ( **iter, CClient::QUIT_BAN, false, strReason.c_str (), strResponsible.c_str () );
             }
