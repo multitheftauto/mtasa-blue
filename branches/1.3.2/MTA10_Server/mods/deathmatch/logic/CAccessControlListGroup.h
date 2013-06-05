@@ -17,7 +17,6 @@ class CAccessControlListGroup;
 #define __CACCESSCONTROLLISTGROUP_H
 
 #include "../Config.h"
-#include "Utils.h"
 #include <xml/CXMLNode.h>
 #include <list>
 
