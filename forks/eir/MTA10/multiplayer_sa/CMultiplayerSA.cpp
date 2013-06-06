@@ -78,10 +78,6 @@ DWORD RETURN_CCam_ProcessFixed =                            0x51D475;
 DWORD RETURN_CTaskSimplePlayerOnFoot_ProcessPlayerWeapon =  0x6859A7;
 DWORD RETURN_CPed_IsPlayer =                                0x5DF8F6;
 
-#define VAR_CollisionStreamRead_ModelInfo                   0x9689E0
-#define HOOKPOS_CollisionStreamRead                         0x41B1D0
-DWORD RETURN_CollisionStreamRead =                          0x41B1D6;
-
 #define CALL_Render3DStuff                                  0x53EABF
 #define FUNC_Render3DStuff                                  0x53DF40
 
@@ -575,7 +571,6 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_EndWorldColors, (DWORD)HOOK_EndWorldColors, 5);
     HookInstall(HOOKPOS_CWorld_ProcessVerticalLineSectorList, (DWORD)HOOK_CWorld_ProcessVerticalLineSectorList, 8);
     HookInstall(HOOKPOS_ComputeDamageResponse_StartChoking, (DWORD)HOOK_ComputeDamageResponse_StartChoking, 7);
-    HookInstall(HOOKPOS_CollisionStreamRead, (DWORD)HOOK_CollisionStreamRead, 6);
     HookInstall(HOOKPOS_VehicleCamStart, (DWORD)HOOK_VehicleCamStart, 6);
     HookInstall(HOOKPOS_VehicleCamTargetZTweak, (DWORD)HOOK_VehicleCamTargetZTweak, 8);
     HookInstall(HOOKPOS_VehicleCamLookDir1, (DWORD)HOOK_VehicleCamLookDir1, 5);
@@ -3844,25 +3839,6 @@ void CMultiplayerSA::SetDebugVars ( float f1, float f2, float f3 )
 
 }
 
-void _declspec(naked) HOOK_CollisionStreamRead ()
-{
-    if ( *(DWORD *)VAR_CollisionStreamRead_ModelInfo )
-    {
-        _asm
-        {
-            mov eax, dword ptr fs:[0]
-            jmp RETURN_CollisionStreamRead
-        }
-    }
-    else
-    {
-        _asm
-        {
-            ret
-        }
-    }
-}
-
 unsigned char ucDesignatedLightState = 0;
 void _declspec(naked) HOOK_CTrafficLights_GetPrimaryLightState ()
 {
@@ -5176,7 +5152,7 @@ bool CPed_GetWeaponSkill ()
     CPed * pPed = pGameInterface->GetPools ()->GetPed ( (DWORD*) weaponSkillPed );
     if ( pPed )
     {
-        CPed* pLocalPlayerPed = pGameInterface->GetPools ()->GetPedFromRef ( (DWORD)1 );
+        CPed* pLocalPlayerPed = pGameInterface->GetPools ()->GetPedFromRef ( (DWORD)0 );
         if ( pPed != pLocalPlayerPed )
         {
             if ( weaponSkillWeapon >= WEAPONTYPE_PISTOL && weaponSkillWeapon <= WEAPONTYPE_TEC9 )
@@ -5238,7 +5214,7 @@ void _declspec(naked) HOOK_CPed_GetWeaponSkill ()
 // applying the visual effect
 bool _cdecl CPed_AddGogglesModelCheck ( void* pPedInterface )
 {
-    return pGameInterface->GetPools ()->GetPed ( (DWORD *)pPedInterface ) == pGameInterface->GetPools ()->GetPedFromRef ( 1 );
+    return pGameInterface->GetPools ()->GetPed ( (DWORD *)pPedInterface ) == pGameInterface->GetPools ()->GetPedFromRef ( 0 );
 }
 
 void _declspec(naked) HOOK_CPed_AddGogglesModel ()

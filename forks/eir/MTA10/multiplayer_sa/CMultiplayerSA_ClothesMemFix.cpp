@@ -10,6 +10,7 @@
 *****************************************************************************/
 
 #include "StdInc.h"
+#include "../game_sa/CModelInfoSA.h"
 
 #define     FUNC_CPedModelInfo_DeleteRwObject               0x04C6C50
 #define     FUNC_CPedModelInfo_SetClump                     0x04C7340

@@ -61,7 +61,7 @@ bool CMouseControl::ProcessMouseMove ( UINT uMsg, WPARAM wParam, LPARAM lParam )
         return false;
 
     // HACK:  Grab our local player, and check his vehicle
-    CPed* pPed = g_pCore->GetGame ()->GetPools ()->GetPedFromRef ( (DWORD)1 );
+    CPed* pPed = g_pCore->GetGame ()->GetPools ()->GetPedFromRef ( (DWORD)0 );
     if ( !pPed )
         return false;
 

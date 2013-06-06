@@ -12,8 +12,6 @@
 
 #include <StdInc.h>
 
-extern CBaseModelInfoSAInterface *ppModelInfo;
-
 static void __cdecl ConvertIDECompositeToInfoFlags( CBaseModelInfoSAInterface *info, unsigned int flags )
 {
     BOOL_FLAG( info->renderFlags, RENDER_LAST, flags & ( OBJECT_ALPHA1 | OBJECT_ALPHA2 ) );

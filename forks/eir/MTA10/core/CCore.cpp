@@ -87,6 +87,12 @@ template<> CCore * CSingleton< CCore >::m_pSingleton = NULL;
 
 CCore::CCore ( void )
 {
+    // Enable this to debug the core initialization.
+#if defined(_DEBUG) && 0
+    while ( !IsDebuggerPresent() )
+        Sleep( 1 );
+#endif
+
     // Initialize the global pointer
     g_pCore = this;
 
@@ -180,6 +186,10 @@ CCore::CCore ( void )
     m_bDidRecreateRenderTargets = false;
     m_fMinStreamingMemory = 0;
     m_fMaxStreamingMemory = 0;
+
+    // We require pre initialization to hook API before GTA:SA uses it
+    CCore::GetSingleton ( ).CreateGame ( );
+    CCore::GetSingleton ( ).CreateMultiplayer ( );
 }
 
 CCore::~CCore ( void )

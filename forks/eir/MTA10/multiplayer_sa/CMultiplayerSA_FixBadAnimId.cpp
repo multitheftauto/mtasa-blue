@@ -19,6 +19,8 @@ int _cdecl OnCAnimBlendAssocGroupCopyAnimation ( CAnimBlendAssocGroupSAInterface
     // Apply offset
     int iUseAnimId = iAnimId - pGroup->iIDOffset;
 
+    assert( pGroup->pAssociationsArray );
+
     CAnimBlendStaticAssociationSAInterface* pAssociation = pGroup->pAssociationsArray + iUseAnimId;
 
     if ( pAssociation )

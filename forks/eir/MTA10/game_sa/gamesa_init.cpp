@@ -15,7 +15,6 @@
 #include "profiler/SharedUtil.Profiler.h"
 
 CGameSA* pGame = NULL;
-CNet* g_pNet = NULL;
 CCoreInterface* g_pCore = NULL;
 
 //-----------------------------------------------------------
@@ -27,9 +26,6 @@ extern "C" _declspec(dllexport)
 CGame * GetGameInterface( CCoreInterface* pCore )
 {
     DEBUG_TRACE("CGame * GetGameInterface()");
-
-    g_pNet = pCore->GetNetwork ();
-    assert ( g_pNet );
 
     g_pCore = pCore;
 

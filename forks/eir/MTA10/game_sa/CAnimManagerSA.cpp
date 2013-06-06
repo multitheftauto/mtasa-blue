@@ -467,9 +467,7 @@ CAnimBlockSAInterface* CAnimManagerSA::GetAnimBlock( unsigned short id )
 
 CAnimBlockSAInterface* CAnimManagerSA::GetAnimBlockByName( const char *name )
 {
-    unsigned int n;
-    
-    for ( n=0; n<GetNumAnimBlocks(); n++ )
+    for ( int n = 0; n < GetNumAnimBlocks(); n++ )
     {
         CAnimBlockSAInterface *anim = (CAnimBlockSAInterface*)ARRAY_AnimBlock + n;
 

@@ -13,8 +13,6 @@
 #ifndef _STREAMING_INIT_
 #define _STREAMING_INIT_
 
-#include "CIMGManagerSA.h"
-
 // IMG archive entries stored in a global array (parallel to model info array)
 #define ARRAY_CModelLoadInfo                                0x008E4CC0
 
@@ -22,16 +20,43 @@
 
 class CBaseModelInfoSAInterface;
 
+#include "CIMGManagerSA.h"
+
 // Streaming exports
 namespace Streaming
 {
-    inline CModelLoadInfoSA&    GetModelLoadInfo( unsigned short id )
+    inline CModelLoadInfoSA&    GetModelLoadInfo( modelId_t id )
     {
         return *( (CModelLoadInfoSA*)ARRAY_CModelLoadInfo + id );
     }
 
-    CBaseModelInfoSAInterface* __cdecl  GetModelByHash      ( unsigned int hash, unsigned short *id );
-    CBaseModelInfoSAInterface*          GetModelInfoByName  ( const char *name, unsigned short startId, unsigned short endId, unsigned short *id );
+    inline CModelLoadInfoSA&    GetModelLoadInfo( modelId_t offset, modelId_t id )
+    {
+        return *( ( (CModelLoadInfoSA*)ARRAY_CModelLoadInfo + offset ) + id );
+    }
+
+    inline CModelLoadInfoSA*    GetQueuedLoadInfo( void )
+    {
+        CModelLoadInfoSA *item = *(CModelLoadInfoSA**)0x008E4C58;
+
+        if ( item->m_primaryModel == 0xFFFF )
+            return NULL;
+
+        return &GetModelLoadInfo( item->m_primaryModel );
+    }
+
+    inline CModelLoadInfoSA*    GetLastQueuedLoadInfo( void )
+    {
+        CModelLoadInfoSA *last = *(CModelLoadInfoSA**)0x008E4C54;
+
+        if ( last->m_secondaryModel == 0xFFFF )
+            return NULL;
+        
+        return &GetModelLoadInfo( last->m_secondaryModel );
+    }
+
+    CBaseModelInfoSAInterface* __cdecl  GetModelByHash      ( unsigned int hash, modelId_t *id );
+    CBaseModelInfoSAInterface*          GetModelInfoByName  ( const char *name, modelId_t startId, modelId_t endId, modelId_t *id );
 };
 
 #define MAX_REGION          1000000

@@ -20,8 +20,6 @@
 #include <game/CModelInfo.h>
 #include <game/Common.h>
 
-#include "CColModelSA.h"
-#include "CRenderWareSA.h"
 class CPedModelInfoSA;
 class CPedModelInfoSAInterface;
 
@@ -52,6 +50,9 @@ class CPedModelInfoSAInterface;
 
 void    ModelInfo_Init( void );
 void    ModelInfo_Shutdown( void );
+
+#include "CColModelSA.h"
+#include "CRenderWareSA.h"
 
 
 /**

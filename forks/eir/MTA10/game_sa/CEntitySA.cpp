@@ -21,6 +21,16 @@ extern CGameSA * pGame;
 unsigned long CEntitySA::FUNC_CClumpModelInfo__GetFrameFromId;
 unsigned long CEntitySA::FUNC_RwFrameGetLTM;
 
+void Entity_Init( void )
+{
+    EntityRender_Init();
+}
+
+void Entity_Shutdown( void )
+{
+    EntityRender_Shutdown();
+}   
+
 CEntitySA::CEntitySA ( void )
 {
     // Set these variables to a constant state

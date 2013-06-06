@@ -182,9 +182,11 @@ CRenderWareSA::CRenderWareSA ( eGameVersion version )
             // Utility functions
             RwDeviceSystemRequest               = (RwDeviceSystemRequest_t)                 0x007F2AF0;
             RwPrefetch                          = (RwPrefetch_t)                            0x0072F480;
+            RwFlushLoader                       = (RwFlushLoader_t)                         0x0072E700;
             RwErrorGet                          = (RwErrorGet_t)                            0x008088C0;
             RwAllocAligned                      = (RwAllocAligned_t)                        0x0072F4C0;
             RwFreeAligned                       = (RwFreeAligned_t)                         0x0072F4F0;
+            RwPluginRegistryReadDataChunks      = (RwPluginRegistryReadDataChunks_t)        0x008089C0;
             RwCreateExtension                   = (RwCreateExtension_t)                     0x007CCE80;
 
             RwIm3DTransform                     = (RwIm3DTransform_t)                       0x007EF490;
@@ -211,6 +213,7 @@ CRenderWareSA::CRenderWareSA ( eGameVersion version )
             RwStreamReadChunkHeaderInfo         = (RwStreamReadChunkHeaderInfo_t)           0x007ED5D0;
             RwStreamFindChunk                   = (RwStreamFindChunk_t)                     0x007ED310;
             RwStreamReadBlocks                  = (RwStreamReadBlocks_t)                    0x007ECA10;
+            RwStreamSkip                        = (RwStreamSkip_t)                          0x007ECD40;
             RwStreamClose                       = (RwStreamClose_t)                         0x007ECE60;
 
             // Frame functions
@@ -247,6 +250,7 @@ CRenderWareSA::CRenderWareSA ( eGameVersion version )
             RpAtomicClone                       = (RpAtomicClone_t)                         0x00749EB0;
             RpAtomicSetFrame                    = (RpAtomicSetFrame_t)                      0x0074BF70;
             RpAtomicSetGeometry                 = (RpAtomicSetGeometry_t)                   0x00749D90;
+            RpAtomicGetWorldBoundingSphere      = (RpAtomicGetWorldBoundingSphere_t)        0x00749380;
             RpAtomicSetupObjectPipeline         = (RpAtomicSetupObjectPipeline_t)           0x005D7F00;
             RpAtomicSetupVehiclePipeline        = (RpAtomicSetupVehiclePipeline_t)          0x005D5B20;
             RpAtomicRender                      = (RpAtomicRender_t)                        0x00749210;
@@ -349,6 +353,7 @@ CRenderWareSA::CRenderWareSA ( eGameVersion version )
             RwStreamReadBlocks                  = (RwStreamReadBlocks_t)                    0x007EC9D0;
             RwStreamFindChunk                   = (RwStreamFindChunk_t)                     0x007ED2D0;
             RwStreamReadChunkHeaderInfo         = (RwStreamReadChunkHeaderInfo_t)           0x007ED590;
+            RwStreamSkip                        = (RwStreamSkip_t)                          0x007ECD00;
             RwStreamClose                       = (RwStreamClose_t)                         0x007ECE20;
 
             // Frame functions
@@ -384,6 +389,7 @@ CRenderWareSA::CRenderWareSA ( eGameVersion version )
             RpAtomicClone                       = (RpAtomicClone_t)                         0x00749E60;
             RpAtomicSetFrame                    = (RpAtomicSetFrame_t)                      0x0074BF20;
             RpAtomicSetGeometry                 = (RpAtomicSetGeometry_t)                   0x00749D40;
+            RpAtomicGetWorldBoundingSphere      = (RpAtomicGetWorldBoundingSphere_t)        0x00749330;
             RpAtomicSetupObjectPipeline         = (RpAtomicSetupObjectPipeline_t)           0x005D7F00;
             RpAtomicSetupVehiclePipeline        = (RpAtomicSetupVehiclePipeline_t)          0x005D5B20;
             RpAtomicRender                      = (RpAtomicRender_t)                        0x007491C0;
@@ -451,7 +457,6 @@ CRenderWareSA::CRenderWareSA ( eGameVersion version )
     }
 
     // Shared addresses
-    RpPrtStdGlobalDataSetStreamEmbedded = (RpPrtStdGlobalDataSetStreamEmbedded_t)   0x0041B350;
     LoadCollisionModel                  = (LoadCollisionModel_t)                    0x00537580;
     LoadCollisionModelVer2              = (LoadCollisionModelVer2_t)                0x00537EE0;
     LoadCollisionModelVer3              = (LoadCollisionModelVer3_t)                0x00537CE0;
@@ -531,29 +536,19 @@ RpClump * CRenderWareSA::ReadDFF ( const char *szDFF, unsigned short id, bool bL
 
     CBaseModelInfoSAInterface *model = ppModelInfo[id];
     CTxdInstanceSA *txd;
-    CColModelSAInterface *col;
-    bool origDynamic;
     bool txdReference;
     bool isVehicle;
+    
+    CColLoaderModelAcquisition *colAcq;
 
     if ( id != 0 )
     {
         CModelLoadInfoSA *info = (CModelLoadInfoSA*)ARRAY_CModelLoadInfo + id;
 
-        if ( bLoadEmbeddedCollisions )
-        {
-            // rockstar's collision hack: set the global particle emitter to the modelinfo pointer of this model
-            RpPrtStdGlobalDataSetStreamEmbedded( model );
-        }
-
         // The_GTA: Clumps and atomics load their requirements while being read in this rwStream
         // We therefor have to prepare all resources so it can retrive them; textures and animations!
         if ( model )
         {
-            col = model->pColModel;
-            origDynamic = model->IsDynamicCol();
-            model->pColModel = NULL;
-
             txd = (*ppTxdPool)->Get( model->usTextureDictionary );
 
             if ( !txd->m_txd )
@@ -598,11 +593,15 @@ RpClump * CRenderWareSA::ReadDFF ( const char *szDFF, unsigned short id, bool bL
                 RwRemapScan::Apply();
         }
 
+        if ( bLoadEmbeddedCollisions )
+        {
+            // rockstar's collision hack: set the global particle emitter to the modelinfo pointer of this model
+            colAcq = new CColLoaderModelAcquisition;
+        }
+
 #ifdef RENDERWARE_VIRTUAL_INTERFACES
         RwImportedScan::Apply( model->usTextureDictionary );
 #endif //RENDERWARE_VIRTUAL_INTERFACES
-
-
     }
 
     // read the clump with all its extensions
@@ -611,18 +610,24 @@ RpClump * CRenderWareSA::ReadDFF ( const char *szDFF, unsigned short id, bool bL
     if ( id != 0 )
     {
 #ifdef RENDERWARE_VIRTUAL_INTERFACES
+        // Do not import our textures anymore
         RwImportedScan::Unapply();
 #endif //RENDERWARE_VIRTUAL_INTERFACES
 
         if ( bLoadEmbeddedCollisions )
         {
+            CColModelSAInterface *col = colAcq->GetCollision();
+
+            // Store the collision we retrieved (if there is one)
+            colOut = ( col ) ? ( new CColModelSA( col, true ) ) : NULL;
+
             // reset model schemantic loader
-            RpPrtStdGlobalDataSetStreamEmbedded( NULL );
+            delete colAcq;
         }
 
         if ( model )
         {
-            // Unapply the remap scan
+            // Unapply the VEHICLE.TXD look-up
             if ( isVehicle )
                 RwRemapScan::Unapply();
 
@@ -630,24 +635,7 @@ RpClump * CRenderWareSA::ReadDFF ( const char *szDFF, unsigned short id, bool bL
             // to textures itself
             if ( txdReference )
                 txd->Dereference();
-
-            // If there is no collision in our model information by now, the clump did not provide one
-            // We should restore to the original collision then
-            if ( !model->pColModel )
-            {
-                colOut = new CColModelSA( col, false );
-            }
-            else
-            {
-                colOut = new CColModelSA( model->pColModel, true );
-            }
-
-            // Restore the original colmodel as we have not requested the custom model yet
-            // We do not wanna break the collision integrity.
-            model->SetColModel( col, origDynamic );
         }
-        else
-            colOut = NULL;
     }
     else
         colOut = NULL;

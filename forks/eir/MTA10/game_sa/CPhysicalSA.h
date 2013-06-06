@@ -110,7 +110,7 @@ public:
 };
 C_ASSERT(sizeof(CPhysicalSAInterface) == 0x138);
 
-class CPhysicalSA : public virtual CPhysical, public virtual CEntitySA
+class CPhysicalSA : public virtual CPhysical, public CEntitySA
 {
 public:
     virtual void RestoreLastGoodPhysicsState ( void );

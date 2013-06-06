@@ -127,7 +127,8 @@ public:
                                     CColModelSAInterface    ( void );
                                     ~CColModelSAInterface   ( void );
 
-    void                            ReleaseData             ( void );
+    void __thiscall                 AllocateData            ( void );
+    void __thiscall                 ReleaseData             ( void );
 
     void*   operator new ( size_t );
     void    operator delete ( void *ptr );
@@ -137,6 +138,7 @@ public:
     BYTE                            m_pad[3];           // 41
     CColDataSA*                     pColData;           // 44
 };
+
 
 class CColModelSA : public CColModel
 {
@@ -155,12 +157,12 @@ public:
 
     const imports_t&                GetImportList       ( void ) const                  { return m_imported; }
 
-    void                            SetOriginal         ( CColModelSAInterface *col )   { m_original = col; }
+    void                            SetOriginal         ( CColModelSAInterface *col, bool isDynamic )   { m_original = col; m_originalDynamic = isDynamic; }
     CColModelSAInterface*           GetOriginal         ( void )                        { return m_original; }
 
-private:
-    void                            Apply               ( unsigned short id );
+    bool                            IsOriginalDynamic   ( void )                        { return m_originalDynamic; }
 
+private:
     CColModelSAInterface*           m_pInterface;
     CColModelSAInterface*           m_original;
     bool                            m_originalDynamic;
@@ -168,6 +170,7 @@ private:
 
     imports_t                       m_imported;
 };
+
 
 typedef void    (__cdecl*SetCachedCollision_t)              ( unsigned int id, CColModelSAInterface *col );
 extern SetCachedCollision_t     SetCachedCollision;

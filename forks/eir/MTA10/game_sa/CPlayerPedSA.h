@@ -43,7 +43,7 @@ public:
 
 };
 
-class CPlayerPedSA : public virtual CPlayerPed, public virtual CPedSA
+class CPlayerPedSA : public virtual CPlayerPed, public CPedSA
 {
 private:
     bool                                m_bIsLocal;
@@ -51,7 +51,7 @@ private:
     CWantedSA*                          m_pWanted;
 
 public:
-                        CPlayerPedSA                ( ePedModel pedType );
+                        CPlayerPedSA                ( modelId_t pedType );
                         CPlayerPedSA                ( CPlayerPedSAInterface * ped );
                         ~CPlayerPedSA               ( void );
 

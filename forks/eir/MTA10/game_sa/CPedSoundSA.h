@@ -52,15 +52,15 @@ typedef struct
     char szName[20];
 } SPedVoiceName;
 
-class CPedSoundSAInterface
+class CPedSoundSAInterface  //size: 154
 {
 public:
-    BYTE ucPad1[0x92];
-    short m_sVoiceType;
-    short m_sVoiceID;
-    short m_bIsFemale;
-    BYTE ucPad2[1];
-    bool m_bDisabled;
+    BYTE ucPad1[0x92];      // 0
+    short m_sVoiceType;     // 146
+    short m_sVoiceID;       // 148
+    short m_bIsFemale;      // 150
+    BYTE ucPad2[1];         // 152
+    bool m_bDisabled;       // 153
 };
 
 class CPedSoundSA : public CPedSound

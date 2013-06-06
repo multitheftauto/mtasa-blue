@@ -9,6 +9,7 @@
 *               Cecill Etheredge <ijsf@gmx.net>
 *               Jax <>
 *               Alberto Alonso <rydencillo@gmail.com>
+*               Martin Turski <quiret@gmx.de>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -42,9 +43,9 @@ CTaskAllocatorPool      **ppTaskAllocatorPool = (CTaskAllocatorPool**)CLASS_CTas
 CPedIntelligencePool    **ppPedIntelligencePool = (CPedIntelligencePool**)CLASS_CPedIntelligencePool;
 CPedAttractorPool       **ppPedAttractorPool = (CPedAttractorPool**)CLASS_CPedAttractorPool;
 
-CPoolsSA::CPoolsSA()
+CPoolsSA::CPoolsSA( void )
 {
-    DEBUG_TRACE("CPoolsSA::CPoolsSA()");
+    DEBUG_TRACE("CPoolsSA::CPoolsSA( void )");
 
     // Do not let GTA:SA init pools!
     *(unsigned char*)FUNC_InitGamePools = 0xC3;
@@ -71,22 +72,14 @@ CPoolsSA::CPoolsSA()
     *ppTaskAllocatorPool = new CTaskAllocatorPool();
     *ppPedIntelligencePool = new CPedIntelligencePool();
     *ppPedAttractorPool = new CPedAttractorPool();
-    
-    m_bGetVehicleEnabled = true;
-    m_ulBuildingCount= 0;
 
-    MemSetFast (&Buildings,0,sizeof(CBuilding *) * MAX_BUILDINGS);
+    memset( mtaVehicles, 0, sizeof( mtaVehicles ) );
+    memset( mtaObjects, 0, sizeof( mtaObjects ) );
+    memset( mtaPeds, 0, sizeof( mtaPeds ) );
 
     EntryInfoNodePool = new CEntryInfoNodePoolSA();
     PointerNodeDoubleLinkPool = new CPointerNodeDoubleLinkPoolSA();
     PointerNodeSingleLinkPool = new CPointerNodeSingleLinkPoolSA();
-
-    m_vehiclePool.map.set_deleted_key ( (CVehicleSAInterface *)0x9001 );
-    m_objectPool.map.set_deleted_key ( (CObjectSAInterface *)0x9001 );
-    m_pedPool.map.set_deleted_key ( (CPedSAInterface *)0x9001 );
-    m_vehiclePool.map.set_empty_key ( (CVehicleSAInterface *)NULL );
-    m_objectPool.map.set_empty_key ( (CObjectSAInterface *)NULL );
-    m_pedPool.map.set_empty_key ( (CPedSAInterface *)NULL );
 }
 
 CPoolsSA::~CPoolsSA ( void )
@@ -95,7 +88,6 @@ CPoolsSA::~CPoolsSA ( void )
     DeleteAllVehicles ();
     DeleteAllPeds ();
     DeleteAllObjects ();
-    DeleteAllBuildings ();
 
     if ( EntryInfoNodePool )
         delete EntryInfoNodePool;
@@ -133,144 +125,37 @@ CPoolsSA::~CPoolsSA ( void )
     delete *ppPedAttractorPool;
 }
 
-void CPoolsSA::DeleteAllBuildings ( void )
-{
-    /*
-    for ( int i = 0; i < MAX_BUILDINGS; i++ )
-    {
-        if ( Buildings [i] )
-        {
-            RemoveBuilding ( Buildings [i] );
-        }
-    }
-    */
-}
-
-
 //////////////////////////////////////////////////////////////////////////////////////////
 //                                    VEHICLES POOL                                     //
 //////////////////////////////////////////////////////////////////////////////////////////
-inline bool CPoolsSA::AddVehicleToPool ( CVehicleSA* pVehicle )
-{
-    DEBUG_TRACE("inline bool CPoolsSA::AddVehicleToPool ( CVehicleSA* pVehicle )");
+CVehicleSA *mtaVehicles[MAX_VEHICLES];
 
-    // We always add to the end of the pool array because
-    // it's ensured that there won't be empty spaces in the
-    // middle of the array.
-    unsigned long ulNewPos = m_vehiclePool.ulCount;
-
-    // Grab the interface
-    CVehicleSAInterface* pInterface = pVehicle->GetVehicleInterface ();
-
-    if ( ! pInterface )
-    {
-        return false;
-    }
-    else
-    {
-        // Add it to the pool array
-        m_vehiclePool.array [ ulNewPos ] = pVehicle;
-        pVehicle->SetArrayID ( ulNewPos );
-
-        // Add it to the pool map
-        m_vehiclePool.map.insert ( vehiclePool_t::mapType::value_type ( pInterface, pVehicle ) );
-
-        // Increase the count of vehicles
-        ++m_vehiclePool.ulCount;
-    }
-
-    return true;
-}
-
-CVehicle* CPoolsSA::AddVehicle ( eVehicleTypes eVehicleType, unsigned char ucVariation, unsigned char ucVariation2 )
+CVehicleSA* CPoolsSA::AddVehicle( modelId_t model, unsigned char ucVariation, unsigned char ucVariation2 )
 {
     DEBUG_TRACE("CVehicle* CPoolsSA::AddVehicle ( eVehicleTypes eVehicleType )");
-    CVehicleSA* pVehicle = NULL;
 
-    if ( m_vehiclePool.ulCount < MAX_VEHICLES )
-    {
-        pVehicle = new CVehicleSA ( eVehicleType, ucVariation, ucVariation2 );
-        if ( ! AddVehicleToPool ( pVehicle ) )
-        {
-            delete pVehicle;
-            pVehicle = NULL;
-        }
-    }
+    if ( (*ppVehiclePool)->Full() )
+        return NULL;
 
-    return pVehicle;
+    return new CVehicleSA ( model, ucVariation, ucVariation2 );
 }
 
-CVehicle* CPoolsSA::AddVehicle ( DWORD* pGameInterface )
+CVehicleSA* CPoolsSA::AddVehicle ( DWORD* pGameInterface )
 {
     DEBUG_TRACE("CVehicle* CPoolsSA::AddVehicle ( DWORD* pGameInterface )");
-    CVehicleSA* pVehicle = NULL;
-
-    if ( m_vehiclePool.ulCount < MAX_VEHICLES )
-    {
-        CVehicleSAInterface* pInterface = reinterpret_cast < CVehicleSAInterface* > ( pGameInterface );
-        if ( pInterface )
-        {
-            // Make sure that it's not already in the pool
-            vehiclePool_t::mapType::iterator iter = m_vehiclePool.map.find ( pInterface );
-            if ( iter != m_vehiclePool.map.end () )
-            {
-                pVehicle = (*iter).second;
-            }
-            else
-            {
-                // Create it
-                pVehicle = new CVehicleSA ( pInterface );
-                if ( ! AddVehicleToPool ( pVehicle ) )
-                {
-                    delete pVehicle;
-                    pVehicle = NULL;
-                }
-            }
-        }
-    }
-
-    return pVehicle;
+    
+    return new CVehicleSA ( (CVehicleSAInterface*)pGameInterface );
 }
 
 void CPoolsSA::RemoveVehicle ( unsigned long ulID, bool )
 {
     DEBUG_TRACE("void CPoolsSA::RemoveVehicle ( unsigned long ulID, bool )");
 
-    static bool bIsDeletingVehicleAlready = false; // to prevent delete being called twice
-    if ( !bIsDeletingVehicleAlready ) 
-    {
-        bIsDeletingVehicleAlready = true;
+    if ( ulID >= MAX_VEHICLES )
+        return;
 
-        CVehicleSA* pVehicleSA = m_vehiclePool.array [ ulID ];
-        assert ( NULL != pVehicleSA );
-
-        // Pop the element to remove from the pool array
-        if ( ulID != m_vehiclePool.ulCount - 1 )
-        {
-            // We are removing an intermediate position of
-            // the array. Move the last element to the just
-            // deleted element position to not allow empty
-            // spaces on it.
-            m_vehiclePool.array [ ulID ] = m_vehiclePool.array [ m_vehiclePool.ulCount - 1 ];
-            m_vehiclePool.array [ ulID ]->SetArrayID ( ulID );
-        }
-        m_vehiclePool.array [ m_vehiclePool.ulCount - 1 ] = NULL;
-
-        // Unlink the element to remove from the pool map
-        vehiclePool_t::mapType::iterator iter = m_vehiclePool.map.find ( pVehicleSA->GetVehicleInterface () );
-        if ( iter != m_vehiclePool.map.end () )
-        {
-            m_vehiclePool.map.erase ( iter );
-        }
-
-        // Delete it from memory
-        delete pVehicleSA;
-
-        // Decrease the count of elements in the pool
-        --m_vehiclePool.ulCount;
-
-        bIsDeletingVehicleAlready = false;
-    }
+    // Delete it from memory
+    delete mtaVehicles[ulID];
 }
 
 void CPoolsSA::RemoveVehicle ( CVehicle* pVehicle, bool bDelete )
@@ -282,189 +167,89 @@ void CPoolsSA::RemoveVehicle ( CVehicle* pVehicle, bool bDelete )
     CVehicleSA* pVehicleSA = dynamic_cast < CVehicleSA* > ( pVehicle );
     if ( pVehicleSA )
     {
-        RemoveVehicle ( pVehicleSA->GetArrayID (), bDelete );
+        RemoveVehicle ( pVehicleSA->GetPoolIndex(), bDelete );
     }
 }
 
-CVehicle* CPoolsSA::GetVehicle ( unsigned long ulID )
+CVehicleSA* CPoolsSA::GetVehicle ( unsigned long ulID )
 {
     DEBUG_TRACE("CVehicle* CPoolsSA::GetVehicle ( unsigned long ulID )");
 
-    assert ( ulID < MAX_VEHICLES );
+    if ( ulID >= MAX_VEHICLES )
+        return NULL;
 
-    return m_vehiclePool.array [ ulID ];
+    return mtaVehicles[ulID];
 }
 
-CVehicle* CPoolsSA::GetVehicle ( DWORD* pGameInterface )
+CVehicleSA* CPoolsSA::GetVehicle ( void* pGameInterface )
 {
     DEBUG_TRACE("CVehicle* CPoolsSA::GetVehicle ( DWORD* pGameInterface )");
 
-    assert ( pGameInterface );
+    unsigned int id = (*ppVehiclePool)->GetIndex( (CVehicleSAInterface*)pGameInterface );
+    
+    if ( id > MAX_VEHICLES-1 )
+        return NULL;
 
-    if ( m_bGetVehicleEnabled )
-    {
-        CVehicleSAInterface* pInterface = reinterpret_cast < CVehicleSAInterface* > ( pGameInterface );
-
-        // Lookup in the pool map for the vehicle related to this interface.
-        vehiclePool_t::mapType::iterator iter = m_vehiclePool.map.find ( pInterface );
-        if ( iter != m_vehiclePool.map.end () )
-        {
-            return (*iter).second;
-        }
-    }
-
-    return NULL;
+    return mtaVehicles[id];
 }
 
 DWORD CPoolsSA::GetVehicleRef ( CVehicle* pVehicle )
 {
     DEBUG_TRACE("DWORD CPoolsSA::GetVehicleRef ( CVehicle* pVehicle )");
 
-    DWORD dwRef = 0;
-    CVehicleSA* pVehicleSA = dynamic_cast < CVehicleSA * > ( pVehicle );
-    if ( pVehicleSA )
-    {
-        CVehicleSAInterface* pInterface = pVehicleSA->GetVehicleInterface ();
-        DWORD dwFunc = FUNC_GetVehicleRef;
-        _asm
-        {
-            push    pInterface
-            call    dwFunc
-            add     esp, 0x4
-            mov     dwRef, eax
-        }
-    }
-
-    return dwRef;
+    return pVehicle->GetPoolIndex();
 }
 
 DWORD CPoolsSA::GetVehicleRef ( DWORD* pGameInterface )
 {
     DEBUG_TRACE("DWORD CPoolsSA::GetVehicleRef ( DWORD* pGameInterface )");
 
-    DWORD dwRef = 0;
-    CVehicleSAInterface* pInterface = reinterpret_cast < CVehicleSAInterface * > ( pGameInterface );
-    if ( pInterface )
-    {
-        DWORD dwFunc = FUNC_GetVehicleRef;
-        _asm
-        {
-            push    pInterface
-            call    dwFunc
-            add     esp, 0x4
-            mov     dwRef, eax
-        }
-    }
-
-    return dwRef;
+    return (*ppVehiclePool)->GetIndex( (CVehicleSAInterface*)pGameInterface );
 }
 
-CVehicle* CPoolsSA::GetVehicleFromRef ( DWORD dwGameRef )
+CVehicleSA* CPoolsSA::GetVehicleFromRef ( DWORD dwGameRef )
 {
     DEBUG_TRACE("CVehicle* CPoolsSA::GetVehicleFromRef ( DWORD dwGameRef )");
 
-    DWORD dwReturn;
-    DWORD dwFunction = FUNC_GetVehicle;
+    if ( dwGameRef >= MAX_VEHICLES )
+        return NULL;
 
-    _asm
-    {
-        mov     ecx, dword ptr ds:[CLASS_CPool_Vehicle]
-        push    dwGameRef
-        call    dwFunction
-        add     esp, 0x4
-        mov     dwReturn, eax
-    }
-
-    CVehicleSAInterface* pInterface = (CVehicleSAInterface*)dwReturn;
-    if ( pInterface )
-    {
-        // We have a special slot in vehicles GTA interface pointing to
-        // our game_sa instance for it.
-        return pInterface->m_pVehicle;
-    }
-
-    return NULL;
+    return mtaVehicles[dwGameRef];
 }
 
 void CPoolsSA::DeleteAllVehicles ( )
 {
     DEBUG_TRACE("void CPoolsSA::DeleteAllVehicles ( )");
 
-    while ( m_vehiclePool.ulCount > 0 )
-        RemoveVehicle ( m_vehiclePool.ulCount - 1 );
-    m_vehiclePool.map.clear ();
+    // TODO: not done yet
+    (*ppVehiclePool)->Clear();
+
+    memset( mtaVehicles, 0, sizeof( mtaVehicles ) );
 }
-
-
-
-
-
-
-
-
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //                                     OBJECTS POOL                                     //
 //////////////////////////////////////////////////////////////////////////////////////////
-inline bool CPoolsSA::AddObjectToPool ( CObjectSA* pObject )
-{
-    DEBUG_TRACE("inline bool CPoolsSA::AddObjectToPool ( CObjectSA* pObject )");
+CObjectSA *mtaObjects[MAX_OBJECTS];
 
-    // We always add to the end of the pool array because
-    // it's ensured that there won't be empty spaces in the
-    // middle of the array.
-    unsigned long ulNewPos = m_objectPool.ulCount;
-
-    // Grab the new object interface
-    CObjectSAInterface* pInterface = pObject->GetObjectInterface ();
-
-    if ( ! pInterface )
-    {
-        return false;
-    }
-    else
-    {
-        // Add it to the pool array
-        m_objectPool.array [ ulNewPos ] = pObject;
-        pObject->SetArrayID ( ulNewPos );
-
-        // Add it to the pool map
-        m_objectPool.map.insert ( objectPool_t::mapType::value_type ( pInterface, pObject ) );
-
-        // Increase the count of objects
-        ++m_objectPool.ulCount;
-    }
-
-    return true;
-}
-
-CObject* CPoolsSA::AddObject ( DWORD dwModelID, bool bLowLod, bool bBreakable )
+CObjectSA* CPoolsSA::AddObject( modelId_t dwModelID, bool bLowLod, bool bBreakable )
 {
     DEBUG_TRACE("CObject * CPoolsSA::AddObject ( DWORD dwModelID )");
 
-    CObjectSA* pObject = NULL;
+    if ( (*ppObjectPool)->Full() )
+        return NULL;
 
-    if ( m_objectPool.ulCount < MAX_OBJECTS )
+    CObjectSA *pObject = new CObjectSA ( dwModelID, bBreakable );
+
+    if ( bLowLod )
     {
-        pObject = new CObjectSA ( dwModelID, bBreakable );
-
-        if ( bLowLod )
-        {
-            pObject->m_pInterface->bUsesCollision = 0;
-            pObject->m_pInterface->bDontCastShadowsOn = 1; 
-            // Set super hacky flag to indicate this is a special low lod object
-            pObject->m_pInterface->SetIsLowLodEntity ();
-        }
-        else
-            pObject->m_pInterface->SetIsHighLodEntity ();
-
-
-        if ( ! AddObjectToPool ( pObject ) )
-        {
-            delete pObject;
-            pObject = NULL;
-        }
+        pObject->m_pInterface->bUsesCollision = 0;
+        pObject->m_pInterface->bDontCastShadowsOn = 1; 
+        // Set super hacky flag to indicate this is a special low lod object
+        pObject->m_pInterface->SetIsLowLodEntity ();
     }
+    else
+        pObject->m_pInterface->SetIsHighLodEntity ();
 
     return pObject;
 }
@@ -473,41 +258,11 @@ void CPoolsSA::RemoveObject ( unsigned long ulID, bool )
 {
     DEBUG_TRACE("void CPoolsSA::RemoveObject ( unsigned long ulID, bool )");
 
-    static bool bIsDeletingObjectAlready = false; // to prevent delete being called twice
-    if ( !bIsDeletingObjectAlready ) 
-    {
-        bIsDeletingObjectAlready = true;
+    if ( ulID >= MAX_OBJECTS )
+        return;
 
-        CObjectSA* pObjectSA = m_objectPool.array [ ulID ];
-        assert ( NULL != pObjectSA );
-
-        // Pop the element to remove from the pool array
-        if ( ulID != m_objectPool.ulCount - 1 )
-        {
-            // We are removing an intermediate position of
-            // the array. Move the last element to the just
-            // deleted element position to not allow empty
-            // spaces on it.
-            m_objectPool.array [ ulID ] = m_objectPool.array [ m_objectPool.ulCount - 1 ];
-            m_objectPool.array [ ulID ]->SetArrayID ( ulID );
-        }
-        m_objectPool.array [ m_objectPool.ulCount - 1 ] = NULL;
-
-        // Unlink the element to remove from the pool map
-        objectPool_t::mapType::iterator iter = m_objectPool.map.find ( pObjectSA->GetObjectInterface () );
-        if ( iter != m_objectPool.map.end () )
-        {
-            m_objectPool.map.erase ( iter );
-        }
-
-        // Delete it from memory
-        delete pObjectSA;
-
-        // Decrease the count of elements in the pool
-        --m_objectPool.ulCount;
-
-        bIsDeletingObjectAlready = false;
-    }
+    // Delete it from memory
+    delete mtaObjects[ulID];
 }
 
 void CPoolsSA::RemoveObject ( CObject* pObject, bool bDelete )
@@ -519,314 +274,138 @@ void CPoolsSA::RemoveObject ( CObject* pObject, bool bDelete )
     CObjectSA* pObjectSA = dynamic_cast < CObjectSA* > ( pObject );
     if ( pObjectSA )
     {
-        RemoveObject ( pObjectSA->GetArrayID (), bDelete );
+        RemoveObject ( pObjectSA->GetPoolIndex(), bDelete );
     }
 }
 
-CObject* CPoolsSA::GetObject ( unsigned long ulID )
+CObjectSA* CPoolsSA::GetObject ( unsigned long ulID )
 {
     DEBUG_TRACE("CObject* CPoolsSA::GetObject ( unsigned long ulID )");
 
-    assert ( ulID < MAX_OBJECTS );
+    if ( ulID >= MAX_OBJECTS )
+        return NULL;
 
-    return m_objectPool.array [ ulID ];
+    return mtaObjects[ulID];
 }
 
-CObject* CPoolsSA::GetObject ( DWORD* pGameInterface )
+CObjectSA* CPoolsSA::GetObject ( void* pGameInterface )
 {
     DEBUG_TRACE("CObject* CPoolsSA::GetObject ( DWORD* pGameInterface )");
 
-    CObjectSAInterface* pInterface = reinterpret_cast < CObjectSAInterface* > ( pGameInterface );
+    unsigned int id = (*ppObjectPool)->GetIndex( (CObjectSAInterface*)pGameInterface );
 
-    if ( pInterface )
-    {
-        // Lookup in the pool map for the object related to this interface.
-        objectPool_t::mapType::iterator iter = m_objectPool.map.find ( pInterface );
-        if ( iter != m_objectPool.map.end () )
-        {
-            return (*iter).second;
-        }
-    }
+    if ( id > MAX_OBJECTS-1 )
+        return NULL;
 
-    return NULL;
+    return mtaObjects[ id ];
 }
 
 DWORD CPoolsSA::GetObjectRef ( CObject* pObject )
 {
     DEBUG_TRACE("DWORD CPoolsSA::GetObjectRef ( CObject* pObject )");
 
-    DWORD dwRef = 0;
-    CObjectSA* pObjectSA = dynamic_cast < CObjectSA * > ( pObject );
-    if ( pObjectSA )
-    {
-        CObjectSAInterface* pInterface = pObjectSA->GetObjectInterface ();
-        DWORD dwFunc = FUNC_GetObjectRef;
-        _asm
-        {
-            push    pInterface
-            call    dwFunc
-            add     esp, 0x4
-            mov     dwRef, eax
-        }
-    }
-
-    return dwRef;
+    return pObject->GetPoolIndex();
 }
 
 DWORD CPoolsSA::GetObjectRef ( DWORD* pGameInterface )
 {
     DEBUG_TRACE("DWORD CPoolsSA::GetObjectRef ( DWORD* pGameInterface )");
 
-    DWORD dwRef = 0;
-    CObjectSAInterface* pInterface = reinterpret_cast < CObjectSAInterface * > ( pGameInterface );
-    if ( pInterface )
-    {
-        DWORD dwFunc = FUNC_GetObjectRef;
-        _asm
-        {
-            push    pInterface
-            call    dwFunc
-            add     esp, 0x4
-            mov     dwRef, eax
-        }
-    }
-
-    return dwRef;
+    return (*ppObjectPool)->GetIndex( (CObjectSAInterface*)pGameInterface );
 }
 
-CObject* CPoolsSA::GetObjectFromRef ( DWORD dwGameRef )
+CObjectSA* CPoolsSA::GetObjectFromRef ( DWORD dwGameRef )
 {
     DEBUG_TRACE("CObject* CPoolsSA::GetObjectFromRef ( DWORD dwGameRef )");
 
-    DWORD dwReturn;
-    DWORD dwFunction = FUNC_GetObject;
+    if ( dwGameRef >= MAX_OBJECTS )
+        return NULL;
 
-    _asm
-    {
-        mov     ecx, dword ptr ds:[CLASS_CPool_Object]
-        push    dwGameRef
-        call    dwFunction
-        add     esp, 0x4
-        mov     dwReturn, eax
-    }
-
-    CObjectSAInterface* pInterface = (CObjectSAInterface*)dwReturn;
-    if ( pInterface )
-    {
-        // Lookup in the pool map for this GTA interface.
-        objectPool_t::mapType::iterator iter = m_objectPool.map.find ( pInterface );
-        if ( iter != m_objectPool.map.end () )
-        {
-            return (*iter).second;
-        }
-    }
-
-    return NULL;
+    return mtaObjects[dwGameRef];
 }
 
 void CPoolsSA::DeleteAllObjects ( )
 {
     DEBUG_TRACE("void CPoolsSA::DeleteAllObjects ( )");
 
-    while ( m_objectPool.ulCount > 0 )
-        RemoveObject ( m_objectPool.ulCount - 1 );
-    m_objectPool.map.clear ();
+#if 0
+    (*ppObjectPool)->Clear();
+
+    memset( mtaObjects, 0, sizeof( mtaObjects ) );
+#endif
 }
-
-
-
-
-
-
-
-
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //                                       PEDS POOL                                      //
 //////////////////////////////////////////////////////////////////////////////////////////
-inline bool CPoolsSA::AddPedToPool ( CPedSA* pPed )
-{
-    DEBUG_TRACE("inline bool CPoolsSA::AddPedToPool ( CPedSA* pPed )");
+CPedSA *mtaPeds[MAX_PEDS];
 
-    // We always add to the end of the pool array because
-    // it's ensured that there won't be empty spaces in the
-    // middle of the array.
-    unsigned long ulNewPos = m_pedPool.ulCount;
-
-    // Grab the ped interface
-    CPedSAInterface* pInterface = pPed->GetPedInterface ();
-
-    if ( ! pInterface )
-    {
-        return false;
-    }
-    else
-    {
-        // Add it to the pool array
-        m_pedPool.array [ ulNewPos ] = pPed;
-        pPed->SetArrayID ( ulNewPos );
-
-        // Add it to the pool map
-        m_pedPool.map.insert ( pedPool_t::mapType::value_type ( pInterface, pPed ) );
-
-        // Increase the count of peds
-        ++m_pedPool.ulCount;
-    }
-
-    return true;
-}
-
-CPed* CPoolsSA::AddPed ( ePedModel ePedType )
+CPedSA* CPoolsSA::AddPed( modelId_t model )
 {
     DEBUG_TRACE("CPed* CPoolsSA::AddPed ( ePedModel ePedType )");
 
-    CPedSA* pPed = NULL;
+    if ( (*ppPedPool)->Full() )
+        return NULL;
 
-    if ( m_pedPool.ulCount < MAX_PEDS )
-    {
-        pPed = new CPlayerPedSA ( ePedType );
-        if ( ! AddPedToPool ( pPed ) )
-        {
-            delete pPed;
-            pPed = NULL;
-        }
-    }
-
-    return pPed;
+    return new CPlayerPedSA ( model );
 }
 
-CPed* CPoolsSA::AddPed ( DWORD* pGameInterface )
+CPedSA* CPoolsSA::AddPed ( DWORD* pGameInterface )
 {
     DEBUG_TRACE("CPed* CPoolsSA::AddPed ( DWORD* pGameInterface )");
 
-    CPedSA* pPed = NULL;
-
-    if ( m_pedPool.ulCount < MAX_PEDS )
-    {
-        CPlayerPedSAInterface* pInterface = reinterpret_cast < CPlayerPedSAInterface* > ( pGameInterface );
-        if ( pInterface )
-        {
-            // Make sure that it's not already in the peds pool
-            pedPool_t::mapType::iterator iter = m_pedPool.map.find ( pInterface );
-            if ( iter != m_pedPool.map.end () )
-            {
-                pPed = (*iter).second;
-            }
-            else
-            {
-                // Create it
-                pPed = new CPlayerPedSA ( pInterface );
-                if ( ! AddPedToPool ( pPed ) )
-                {
-                    delete pPed;
-                    pPed = NULL;
-                }
-            }
-        }
-    }
-
-    return pPed;
+    return new CPlayerPedSA( (CPlayerPedSAInterface*)pGameInterface );
 }
 
-CPed* CPoolsSA::AddCivilianPed ( DWORD* pGameInterface )
+CPedSA* CPoolsSA::AddCivilianPed ( DWORD* pGameInterface )
 {
     DEBUG_TRACE("CPed* CPoolsSA::AddCivilianPed ( DWORD* pGameInterface )");
 
-    CPedSA* pPed = NULL;
+    if ( (*ppPedPool)->Full() )
+        return NULL;
 
-    if ( m_pedPool.ulCount < MAX_PEDS )
-    {
-        CPedSAInterface* pInterface = reinterpret_cast < CPedSAInterface* > ( pGameInterface );
-        if ( pInterface )
-        {
-            // Make sure that it's not already in the peds pool
-            pedPool_t::mapType::iterator iter = m_pedPool.map.find ( pInterface );
-            if ( iter != m_pedPool.map.end () )
-            {
-                pPed = (*iter).second;
-            }
-            else
-            {
-                // Create it
-                pPed = new CCivilianPedSA ( pInterface );
-                if ( ! AddPedToPool ( pPed ) )
-                {
-                    delete pPed;
-                    pPed = NULL;
-                }
-            }
-        }
-    }
-
-    return pPed;
+    return new CCivilianPedSA ( (CCivilianPedSAInterface*)pGameInterface );
 }
 
 void CPoolsSA::RemovePed ( unsigned long ulID, bool bDelete )
 {
     DEBUG_TRACE("void CPoolsSA::RemovePed ( unsigned long ulID, bool bDelete )");
 
-    static bool bIsDeletingPedAlready = false; // to prevent delete being called twice
-    if ( !bIsDeletingPedAlready ) 
+    if ( ulID >= MAX_PEDS )
+        return;
+
+    CPedSA *pPedSA = mtaPeds[ulID];
+
+    // Delete the element from memory
+    switch ( pPedSA->GetType () )
     {
-        bIsDeletingPedAlready = true;
-
-        CPedSA* pPedSA = m_pedPool.array [ ulID ];
-        assert ( NULL != pPedSA );
-
-        // Pop the element to remove from the pool array
-        if ( ulID != m_pedPool.ulCount - 1 )
+        case PLAYER_PED:
         {
-            // We are removing an intermediate position of
-            // the array. Move the last element to the just
-            // deleted element position to not allow empty
-            // spaces on it.
-            m_pedPool.array [ ulID ] = m_pedPool.array [ m_pedPool.ulCount - 1 ];
-            m_pedPool.array [ ulID ]->SetArrayID ( ulID );
-        }
-        m_pedPool.array [ m_pedPool.ulCount - 1 ] = NULL;
-
-        // Unlink the element to remove from the pool map
-        pedPool_t::mapType::iterator iter = m_pedPool.map.find ( pPedSA->GetPedInterface () );
-        if ( iter != m_pedPool.map.end () )
-        {
-            m_pedPool.map.erase ( iter );
-        }
-
-
-        // Delete the element from memory
-        switch ( pPedSA->GetType () )
-        {
-            case PLAYER_PED:
+            CPlayerPedSA* pPlayerPed = dynamic_cast < CPlayerPedSA* > ( pPedSA );
+            if ( pPlayerPed )
             {
-                CPlayerPedSA* pPlayerPed = dynamic_cast < CPlayerPedSA* > ( pPedSA );
-                if ( pPlayerPed )
-                {
-                    if ( ! bDelete )
-                        pPlayerPed->SetDoNotRemoveFromGameWhenDeleted ( true );
-                }
-
-                delete pPlayerPed;
-
-                break;
+                if ( ! bDelete )
+                    pPlayerPed->SetDoNotRemoveFromGameWhenDeleted ( true );
             }
 
-            default:
-            {
-                CCivilianPedSA* pCivPed = dynamic_cast < CCivilianPedSA* > ( pPedSA );
-                if ( pCivPed )
-                {
-                    if ( ! bDelete )
-                        pCivPed->SetDoNotRemoveFromGameWhenDeleted ( true );
-                }
+            delete pPlayerPed;
 
-                delete pCivPed;
-            }
+            break;
         }
 
-        // Decrease the count of elements in the pool
-        --m_pedPool.ulCount;
+        default:
+        {
+            CCivilianPedSA* pCivPed = dynamic_cast < CCivilianPedSA* > ( pPedSA );
+            if ( pCivPed )
+            {
+                if ( ! bDelete )
+                    pCivPed->SetDoNotRemoveFromGameWhenDeleted ( true );
+            }
 
-        bIsDeletingPedAlready = false;
+            delete pCivPed;
+
+            break;
+        }
     }
 }
 
@@ -839,34 +418,32 @@ void CPoolsSA::RemovePed ( CPed* pPed, bool bDelete )
     CPedSA* pPedSA = dynamic_cast < CPedSA* > ( pPed );
     if ( pPedSA )
     {
-        RemovePed ( pPedSA->GetArrayID (), bDelete );
+        RemovePed ( pPedSA->GetPoolIndex(), bDelete );
     }
 }
 
-CPed* CPoolsSA::GetPed ( unsigned long ulID )
+CPedSA* CPoolsSA::GetPed ( unsigned long ulID )
 {
     DEBUG_TRACE("CPed* CPoolsSA::GetPed ( unsigned long ulID )");
 
-    assert ( ulID < MAX_PEDS );
+    if ( ulID >= MAX_PEDS )
+        return NULL;
 
-    return m_pedPool.array [ ulID ];
+    return mtaPeds[ulID];
 }
 
-CPed* CPoolsSA::GetPed ( DWORD* pGameInterface )
+CPedSA* CPoolsSA::GetPed ( void* pGameInterface )
 {
     DEBUG_TRACE("CPed* CPoolsSA::GetPed ( DWORD* pGameInterface )");
 
-    CPedSAInterface* pInterface = reinterpret_cast < CPedSAInterface* > ( pGameInterface );
-
     // 0x00400000 is used for bad player pointers some places in GTA
-    if ( pInterface && pGameInterface != (DWORD*)0x00400000 )
+    // The_GTA: where exactly does this occur? is it important?
+    if ( pGameInterface && pGameInterface != (DWORD*)0x00400000 )
     {
-        // Lookup in the pool map for the ped related to this interface.
-        pedPool_t::mapType::iterator iter = m_pedPool.map.find ( pInterface );
-        if ( iter != m_pedPool.map.end () )
-        {
-            return (*iter).second;
-        }
+        unsigned int id = (*ppPedPool)->GetIndex( (CPedSAInterface*)pGameInterface );
+
+        if ( id < MAX_PEDS )
+            return mtaPeds[ id ];
     }
 
     return NULL;
@@ -876,112 +453,66 @@ DWORD CPoolsSA::GetPedRef ( CPed* pPed )
 {
     DEBUG_TRACE("DWORD CPoolsSA::GetPedRef ( CPed* pPed )");
 
-    DWORD dwRef = 0;
-    CPedSA* pPedSA = dynamic_cast < CPedSA * > ( pPed );
-    if ( pPedSA )
-    {
-        CPedSAInterface* pInterface = pPedSA->GetPedInterface ();
-        DWORD dwFunc = FUNC_GetPedRef;
-        _asm
-        {
-            push    pInterface
-            call    dwFunc
-            add     esp, 0x4
-            mov     dwRef, eax
-        }
-    }
-
-    return dwRef;
+    return pPed->GetPoolIndex();
 }
 
 DWORD CPoolsSA::GetPedRef ( DWORD* pGameInterface )
 {
     DEBUG_TRACE("DWORD CPoolsSA::GetPedRef ( DWORD* pGameInterface )");
 
-    DWORD dwRef = 0;
-    CPedSAInterface* pInterface = reinterpret_cast < CPedSAInterface * > ( pGameInterface );
-    if ( pInterface )
-    {
-        DWORD dwFunc = FUNC_GetPedRef;
-        _asm
-        {
-            push    pInterface
-            call    dwFunc
-            add     esp, 0x4
-            mov     dwRef, eax
-        }
-    }
-
-    return dwRef;
+    return (*ppPedPool)->GetIndex( (CPedSAInterface*)pGameInterface );
 }
 
-CPed* CPoolsSA::GetPedFromRef ( DWORD dwGameRef )
+CPedSA* CPoolsSA::GetPedFromRef ( DWORD dwGameRef )
 {
     DEBUG_TRACE("CPed* CPoolsSA::GetPedFromRef ( DWORD dwGameRef )");
 
-    CPedSAInterface* pInterface = this->GetPedInterface ( dwGameRef );
-    if ( pInterface )
-    {
-        // Lookup in the pool map for this GTA interface.
-        pedPool_t::mapType::iterator iter = m_pedPool.map.find ( pInterface );
-        if ( iter != m_pedPool.map.end () )
-        {
-            return (*iter).second;
-        }
-    }
+    if ( dwGameRef >= MAX_PEDS )
+        return NULL;
 
-    return NULL;
+    return mtaPeds[dwGameRef];
 }
 
 CPedSAInterface* CPoolsSA::GetPedInterface ( DWORD dwGameRef )
 {
     DEBUG_TRACE("CPedSAInterface* CPoolsSA::GetPedInterface ( DWORD dwGameRef )");
 
-    DWORD dwReturn;
-    DWORD dwFunction = FUNC_GetPed;
-
-    _asm
-    {
-        mov     ecx, dword ptr ds:[CLASS_CPool_Ped]
-        push    dwGameRef
-        call    dwFunction
-        add     esp, 0x4
-        mov     dwReturn, eax
-    }
-
-    CPedSAInterface* pInterface = (CPedSAInterface*)dwReturn;
-    return pInterface;
+    return (*ppPedPool)->Get( dwGameRef );
 }
 
 void CPoolsSA::DeleteAllPeds ( )
 {
     DEBUG_TRACE("void CPoolsSA::DeleteAllPeds ( )");
 
-    while ( m_pedPool.ulCount > 0 )
-        RemovePed ( m_pedPool.ulCount - 1 );
-    m_pedPool.map.clear ();
+#if 0
+    (*ppPedPool)->Clear();
+
+    memset( mtaPeds, 0, sizeof( mtaPeds ) );
+#endif
 }
 
-CEntity * CPoolsSA::GetEntity ( DWORD* pGameInterface )
+CEntitySA* CPoolsSA::GetEntity ( void *pGameInterface )
 {
     if ( pGameInterface )
     {
-        CEntitySAInterface * pEntityInterface = ( CEntitySAInterface * ) ( pGameInterface );
+        CEntitySAInterface *pEntityInterface = (CEntitySAInterface*)pGameInterface;
+
         switch ( pEntityInterface->nType )
         {
-            case ENTITY_TYPE_PED: return ( CEntity * ) GetPed ( pGameInterface ); break;
-            case ENTITY_TYPE_VEHICLE: return ( CEntity * ) GetVehicle ( pGameInterface ); break;
-            case ENTITY_TYPE_OBJECT: return ( CEntity * ) GetObject ( pGameInterface ); break;
-            default: break;
+        case ENTITY_TYPE_PED:           return GetPed ( pGameInterface );
+        case ENTITY_TYPE_VEHICLE:       return GetVehicle ( pGameInterface );
+        case ENTITY_TYPE_OBJECT:        return GetObject ( pGameInterface );
         }
     }
+
     return NULL;
 }
 
-
-CBuilding * CPoolsSA::AddBuilding ( DWORD dwModelID )
+CBuildingSA* CPoolsSA::AddBuilding ( DWORD dwModelID )
 {
     DEBUG_TRACE("CBuilding * CPoolsSA::AddBuilding ( DWORD dwModelID )");
+
+#if 0
     if(m_ulBuildingCount <= MAX_BUILDINGS)
     {
         for(int i = 0;i<MAX_BUILDINGS;i++)
@@ -997,13 +528,18 @@ CBuilding * CPoolsSA::AddBuilding ( DWORD dwModelID )
             }
         }
     }
+#endif
+
     return NULL;
 }
 
-
-CVehicle* CPoolsSA::AddTrain ( CVector * vecPosition, DWORD dwModels[], int iSize, bool bDirection )
+CVehicleSA* CPoolsSA::AddTrain ( CVector * vecPosition, DWORD dwModels[], int iSize, bool bDirection )
 {
     DEBUG_TRACE("CVehicle* CPoolsSA::AddTrain ( CVector * vecPosition, DWORD dwModels[], int iSize, bool bDirection )");
+
+    // There is no way we can overshoot the pool.
+    if ( (*ppVehiclePool)->GetCount() + iSize > MAX_VEHICLES )
+        return NULL;
 
     // clean the existing array
     MemSetFast ( (void *)VAR_TrainModelArray, 0, 32 * sizeof(DWORD) );
@@ -1026,9 +562,6 @@ CVehicle* CPoolsSA::AddTrain ( CVector * vecPosition, DWORD dwModels[], int iSiz
     float fY = vecPosition->fY;
     float fZ = vecPosition->fZ;
 
-    // Disable GetVehicle because CreateMissionTrain calls it before our CVehicleSA instance is inited
-    m_bGetVehicleEnabled = false;
-
     DWORD dwFunc = FUNC_CTrain_CreateMissionTrain;
     _asm
     {
@@ -1048,47 +581,22 @@ CVehicle* CPoolsSA::AddTrain ( CVector * vecPosition, DWORD dwModels[], int iSiz
         add     esp, 0x28   
     }
 
-    // Enable GetVehicle
-    m_bGetVehicleEnabled = true;
-
     CVehicleSA * trainHead = NULL;
+
     if ( trainBegining )
     {
-        DWORD vehicleIndex = 0;
+        trainHead = new CVehicleSA ( trainBegining );
 
-        if ( m_vehiclePool.ulCount < MAX_VEHICLES )
-        {
-            trainHead = new CVehicleSA ( trainBegining );
-            if ( ! AddVehicleToPool ( trainHead ) )
-            {
-                delete trainHead;
-                trainHead = NULL;
-            }
-            else
-                ++vehicleIndex;
-        }
-
-        CVehicleSA * carriage = trainHead;
+        CVehicleSA *carriage = trainHead;
         
         while ( carriage )
         {
-            if ( m_vehiclePool.ulCount < MAX_VEHICLES)
-            {
-                CVehicleSAInterface* vehCarriage = carriage->GetNextCarriageInTrain ();
-                if ( vehCarriage )
-                {
-                    carriage = new CVehicleSA ( vehCarriage );
-                    if ( ! AddVehicleToPool ( carriage ) )
-                    {
-                        delete carriage;
-                        carriage = NULL;
-                    }
-                    else
-                        ++vehicleIndex;
-                }
-                else
-                    carriage = NULL;
-            }
+            CVehicleSAInterface* vehCarriage = carriage->GetNextCarriageInTrain();
+
+            if ( !vehCarriage )
+                break;
+
+            carriage = new CVehicleSA ( vehCarriage );
         }
     }
 
@@ -1192,6 +700,8 @@ int CPoolsSA::GetPoolCapacity ( ePools pool )
 
 
 // Must be called before CPools::Initialise()
+// The_GTA: do we really need this?
+// Changing pool capacity is dangerous; letting API access can lead to crashes (i.e. TXD pool hardcode limit to 5000)
 void CPoolsSA::SetPoolCapacity ( ePools pool, int iValue )
 {
     DWORD iPtr = NULL;
@@ -1229,44 +739,31 @@ void CPoolsSA::SetPoolCapacity ( ePools pool, int iValue )
 
 int CPoolsSA::GetNumberOfUsedSpaces ( ePools pool )
 {
-    DWORD dwFunc = NULL;
-    DWORD dwThis = NULL;
     switch ( pool )
     {
-        case BUILDING_POOL: dwFunc = FUNC_CBuildingPool_GetNoOfUsedSpaces; dwThis = CLASS_CBuildingPool; break;
-        case PED_POOL: dwFunc = FUNC_CPedPool_GetNoOfUsedSpaces; dwThis = CLASS_CPedPool; break;
-        case OBJECT_POOL: dwFunc = FUNC_CObjectPool_GetNoOfUsedSpaces; dwThis = CLASS_CObjectPool; break;
-        case DUMMY_POOL: dwFunc = FUNC_CDummyPool_GetNoOfUsedSpaces; dwThis = CLASS_CDummyPool; break;
-        case VEHICLE_POOL: dwFunc = FUNC_CVehiclePool_GetNoOfUsedSpaces; dwThis = CLASS_CVehiclePool; break;
-        case COL_MODEL_POOL: dwFunc = FUNC_CColModelPool_GetNoOfUsedSpaces; dwThis = CLASS_CColModelPool; break;
-        case TASK_POOL: dwFunc = FUNC_CTaskPool_GetNoOfUsedSpaces; dwThis = CLASS_CTaskPool; break;
-        case EVENT_POOL: dwFunc = FUNC_CEventPool_GetNoOfUsedSpaces; dwThis = CLASS_CEventPool; break;
-        case TASK_ALLOCATOR_POOL: dwFunc = FUNC_CTaskAllocatorPool_GetNoOfUsedSpaces; dwThis = CLASS_CTaskAllocatorPool; break;
-        case PED_INTELLIGENCE_POOL: dwFunc = FUNC_CPedIntelligencePool_GetNoOfUsedSpaces; dwThis = CLASS_CPedIntelligencePool; break;
-        case PED_ATTRACTOR_POOL: dwFunc = FUNC_CPedAttractorPool_GetNoOfUsedSpaces; dwThis = CLASS_CPedAttractorPool; break;
-        case ENTRY_INFO_NODE_POOL: dwFunc = FUNC_CEntryInfoNodePool_GetNoOfUsedSpaces; dwThis = CLASS_CEntryInfoNodePool; break;
-        case NODE_ROUTE_POOL: dwFunc = FUNC_CNodeRoutePool_GetNoOfUsedSpaces; dwThis = CLASS_CNodeRoutePool; break;
-        case PATROL_ROUTE_POOL: dwFunc = FUNC_CPatrolRoutePool_GetNoOfUsedSpaces; dwThis = CLASS_CPatrolRoutePool; break;
-        case POINT_ROUTE_POOL: dwFunc = FUNC_CPointRoutePool_GetNoOfUsedSpaces; dwThis = CLASS_CPointRoutePool; break;
-        case POINTER_DOUBLE_LINK_POOL: dwFunc = FUNC_CPtrNodeDoubleLinkPool_GetNoOfUsedSpaces; dwThis = CLASS_CPtrNodeDoubleLinkPool; break;
-        case POINTER_SINGLE_LINK_POOL: dwFunc = FUNC_CPtrNodeSingleLinkPool_GetNoOfUsedSpaces; dwThis = CLASS_CPtrNodeSingleLinkPool; break;
-        default: return -1;
+    case BUILDING_POOL:                 return (*ppBuildingPool)->GetCount();
+    case PED_POOL:                      return (*ppPedPool)->GetCount();
+    case OBJECT_POOL:                   return (*ppObjectPool)->GetCount();
+    case DUMMY_POOL:                    return (*ppDummyPool)->GetCount();
+    case VEHICLE_POOL:                  return (*ppVehiclePool)->GetCount();
+    case COL_MODEL_POOL:                return (*ppColModelPool)->GetCount();
+    case TASK_POOL:                     return (*ppTaskPool)->GetCount();
+    case EVENT_POOL:                    return (*ppEventPool)->GetCount();
+    case TASK_ALLOCATOR_POOL:           return (*ppTaskAllocatorPool)->GetCount();
+    case PED_INTELLIGENCE_POOL:         return (*ppPedIntelligencePool)->GetCount();
+    case PED_ATTRACTOR_POOL:            return (*ppPedAttractorPool)->GetCount();
+    case ENTRY_INFO_NODE_POOL:          return (*ppEntryInfoPool)->GetCount();
+    case NODE_ROUTE_POOL:               return (*ppNodeRoutePool)->GetCount();
+    case PATROL_ROUTE_POOL:             return (*ppPatrolRoutePool)->GetCount();
+    case POINT_ROUTE_POOL:              return (*ppPointRoutePool)->GetCount();
+    case POINTER_DOUBLE_LINK_POOL:      return (*ppPtrNodeDoublePool)->GetCount();
+    case POINTER_SINGLE_LINK_POOL:      return (*ppPtrNodeSinglePool)->GetCount();
+    case ENV_MAP_MATERIAL_POOL:         return (*ppEnvMapMaterialPool)->GetCount();
+    case ENV_MAP_ATOMIC_POOL:           return (*ppEnvMapAtomicPool)->GetCount();
+    case SPEC_MAP_MATERIAL_POOL:        return (*ppSpecMapMaterialPool)->GetCount();
     }
 
-    int iOut = -2;
-    if ( *(DWORD *)dwThis != NULL )
-    {
-        _asm
-        {
-            mov     ecx, dwThis
-            mov     ecx, [ecx]
-            call    dwFunc
-            mov     iOut, eax
-
-        }
-    }
-
-    return iOut;
+    return -1;
 }
 
 CEntryInfoNodePool * CPoolsSA::GetEntryInfoNodePool ( void )
@@ -1276,17 +773,7 @@ CEntryInfoNodePool * CPoolsSA::GetEntryInfoNodePool ( void )
 
 int CEntryInfoNodePoolSA::GetNumberOfUsedSpaces ( void )
 {
-    DWORD dwFunc = FUNC_CEntryInfoNodePool_GetNoOfUsedSpaces;
-    int iOut = 0;
-    _asm
-    {
-        mov     ecx, CLASS_CEntryInfoNodePool
-        mov     ecx, [ecx]
-        call    dwFunc
-        mov     iOut, eax
-    }
-
-    return iOut;
+    return (*ppEntryInfoPool)->GetCount();
 }
 
 CPointerNodeDoubleLinkPool * CPoolsSA::GetPointerNodeDoubleLinkPool ( void )
@@ -1296,17 +783,7 @@ CPointerNodeDoubleLinkPool * CPoolsSA::GetPointerNodeDoubleLinkPool ( void )
 
 int CPointerNodeDoubleLinkPoolSA::GetNumberOfUsedSpaces ( void )
 {
-    DWORD dwFunc = FUNC_CPtrNodeDoubleLinkPool_GetNoOfUsedSpaces;
-    int iOut = 0;
-    _asm
-    {
-        mov     ecx, CLASS_CPtrNodeDoubleLinkPool
-        mov     ecx, [ecx]
-        call    dwFunc
-        mov     iOut, eax
-    }
-
-    return iOut;
+    return (*ppPtrNodeDoublePool)->GetCount();
 }
 
 CPointerNodeSingleLinkPool * CPoolsSA::GetPointerNodeSingleLinkPool ( void )
@@ -1316,15 +793,5 @@ CPointerNodeSingleLinkPool * CPoolsSA::GetPointerNodeSingleLinkPool ( void )
 
 int CPointerNodeSingleLinkPoolSA::GetNumberOfUsedSpaces ( void )
 {
-    DWORD dwFunc = FUNC_CPtrNodeSingleLinkPool_GetNoOfUsedSpaces;
-    int iOut = 0;
-    _asm
-    {
-        mov     ecx, CLASS_CPtrNodeSingleLinkPool
-        mov     ecx, [ecx]
-        call    dwFunc
-        mov     iOut, eax
-    }
-
-    return iOut;
+    return (*ppPtrNodeSinglePool)->GetCount();
 }

@@ -476,6 +476,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CEntitySA.render.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\CEntryInfoSA.cpp"
 				>
 			</File>
@@ -768,6 +772,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CStreamingSA.runtime.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\CStreamingSA.utils.cpp"
 				>
 			</File>
@@ -825,6 +833,10 @@
 			</File>
 			<File
 				RelativePath="CVehicleSA.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CVehicleSA.render.cpp"
 				>
 			</File>
 			<File
@@ -1137,6 +1149,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CEntitySA.render.h"
+				>
+			</File>
+			<File
 				RelativePath=".\CEntryInfoSA.h"
 				>
 			</File>
@@ -1429,7 +1445,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CStreamingSA.runtime.h"
+				>
+			</File>
+			<File
 				RelativePath=".\CStreamingSA.utils.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CStreamingSA.utils.hxx"
 				>
 			</File>
 			<File
@@ -1486,6 +1510,10 @@
 			</File>
 			<File
 				RelativePath="CVehicleSA.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CVehicleSA.render.h"
 				>
 			</File>
 			<File

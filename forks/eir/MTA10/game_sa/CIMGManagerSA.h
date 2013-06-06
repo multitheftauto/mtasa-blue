@@ -24,11 +24,11 @@ enum eLoadingState : unsigned char
     MODEL_UNAVAILABLE,
     MODEL_LOADED,
     MODEL_LOADING,
-    MODEL_LOD,    // Perhaps
+    MODEL_QUEUE,
     MODEL_RELOAD
 };
 
-// Allocated at 0x008E4CC0 in an array[MAX_MODELS]
+// Allocated at 0x008E4CC0 in an array[MAX_RESOURCES]
 class CModelLoadInfoSA  // size: 20
 {
 public:
@@ -43,15 +43,36 @@ public:
 
     BYTE            m_pad[3];           // 17
 
+    size_t                      GetSize             ( void ) const      { return m_blockCount * 2048; }
+
     bool __thiscall             GetOffset           ( unsigned int& offset, unsigned int& blockCount ) const;
     void __thiscall             SetOffset           ( unsigned int offset, unsigned int blockCount );
     unsigned int __thiscall     GetStreamOffset     ( void ) const;
 
+    bool __thiscall             GetBlockCount       ( unsigned int& blockCount ) const
+    {
+        if ( m_blockCount == 0 )
+            return false;
+
+        blockCount  = m_blockCount;
+        return true;
+    }
+
+    inline unsigned int         GetIndex            ( void ) const
+    {
+        return this - (CModelLoadInfoSA*)0x008E4CC0;
+    }
+
+    inline unsigned int         GetIndexLoader      ( void ) const
+    {
+        return this - *(CModelLoadInfoSA**)ARRAY_ModelLoadCache;
+    }
+
     // Binary offsets: (1.0 US and 1.0 EU): 0x00407480
     inline void __thiscall      PushIntoLoader      ( CModelLoadInfoSA *chainInfo )
     {
-        unsigned short thisId = this - *(CModelLoadInfoSA**)ARRAY_ModelLoadCache;
-        unsigned short chainId = chainInfo - *(CModelLoadInfoSA**)ARRAY_ModelLoadCache;
+        unsigned short thisId = GetIndexLoader();
+        unsigned short chainId = chainInfo->GetIndexLoader();
 
         unsigned short primId = m_primaryModel = chainInfo->m_primaryModel;
         m_secondaryModel = chainId;
@@ -61,7 +82,17 @@ public:
         ( *(CModelLoadInfoSA**)ARRAY_ModelLoadCache + primId )->m_secondaryModel = thisId;
     }
 
+    inline bool                 IsOnLoader          ( void ) const
+    {
+#ifdef _DEBUG
+        return m_primaryModel != 0xFFFF && m_secondaryModel != 0xFFFF;
+#else
+        return m_primaryModel != 0xFFFF;
+#endif
+    }
+
     // inlined into RequestModel and FreeModel.
+    // Otherwise found at (1.0 US and 1.0 EU) 0x004074E0
     inline void __thiscall      PopFromLoader       ( void )
     {
         // Appears to notify the loader; will not be loading anymore

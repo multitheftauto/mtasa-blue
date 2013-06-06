@@ -12,7 +12,9 @@
 #ifndef __GAME_COMMON
 #define __GAME_COMMON
 
+// Flag management definitions
 #define IS_FLAG( mem, flag ) ( ( (mem) & (flag) ) == flag )
+#define IS_ANY_FLAG( num, flag ) ( ( (num) & (flag) ) != 0 )
 #define BOOL_FLAG( mem, flag, b ) { if ( b ) { (mem) |= (flag); } else { mem &= ~(flag); } }
 
 #include <windows.h>

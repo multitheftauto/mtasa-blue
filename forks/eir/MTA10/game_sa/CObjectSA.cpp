@@ -37,6 +37,9 @@ CObjectSA::CObjectSA(CObjectSAInterface * objectInterface)
     this->SetInterface(objectInterface);
     m_ucAlpha = 255;
 
+    m_poolIndex = (*ppObjectPool)->GetIndex( objectInterface );
+    mtaObjects[m_poolIndex] = this;
+
     ResetScale ();
 
     CheckForGangTag ();
@@ -48,7 +51,7 @@ CObjectSA::CObjectSA( DWORD dwModel, bool bBreakable )
 
     CWorldSA * world = (CWorldSA *)pGame->GetWorld();
 
-    DWORD dwThis = 0;
+    CObjectSAInterface *dwThis = NULL;
     
 #ifdef MTA_USE_BUILDINGS_AS_OBJECTS
 
@@ -126,37 +129,42 @@ CObjectSA::CObjectSA( DWORD dwModel, bool bBreakable )
 
 
     DWORD CObjectCreate = FUNC_CObject_Create;  
-    DWORD dwObjectPtr = 0;
+    CObjectSAInterface *objInt;
     _asm
     {
         push    1
         push    dwModel
         call    CObjectCreate
         add     esp, 8
-        mov     dwObjectPtr, eax
+        mov     objInt, eax
     }
-    if ( dwObjectPtr )
+    if ( objInt )
     {
-        this->SetInterface((CEntitySAInterface *)dwObjectPtr);
+        SetInterface( objInt );
+
+        m_poolIndex = (*ppObjectPool)->GetIndex( objInt );
+        mtaObjects[m_poolIndex] = this;
 
         world->Add( m_pInterface, CObject_Constructor );
 
         // Setup some flags
-        this->BeingDeleted = FALSE;
-        this->DoNotRemoveFromGame = FALSE;
-        MemPutFast < BYTE > ( dwObjectPtr + 316, 6 );
+        BeingDeleted = FALSE;
+        DoNotRemoveFromGame = FALSE;
+
+        MemPutFast < BYTE > ( (unsigned char*)objInt + 316, 6 );
+
         if ( !bBreakable )
         {
             // Set our immunities
             // Sum of all flags checked @ CPhysical__CanPhysicalBeDamaged 
-            MemPutFast < int > ( dwObjectPtr + 64, 0x00BC0000 );
+            MemPutFast < int > ( objInt + 64, 0x00BC0000 );
         }
         m_pInterface->bStreamingDontDelete = true;
     }
     else
     {
-        // The exception handler doesn't work for some reason, so do this
-        this->SetInterface ( NULL );
+        assert( 0 );
+        __asm int 3
     }
 #endif
 
@@ -176,42 +184,35 @@ CObjectSA::CObjectSA( DWORD dwModel, bool bBreakable )
 CObjectSA::~CObjectSA( )
 {
     DEBUG_TRACE("CObjectSA::~CObjectSA( )");
-    //OutputDebugString("Attempting to destroy Object\n");
-    if(!this->BeingDeleted && DoNotRemoveFromGame == false)
+
+    if(DoNotRemoveFromGame == false)
     {
-        DWORD dwInterface = (DWORD)this->GetInterface();
-        if ( dwInterface )
-        {       
-            if ( *(DWORD*)this->GetInterface() != VTBL_CPlaceable )
-            {
-                CWorldSA * world = (CWorldSA *)pGame->GetWorld();
-                world->Remove(this->GetInterface(), CObject_Destructor);
-            
-                delete m_pInterface;
-        
+        CObjectSAInterface *objInt = (CObjectSAInterface*)GetInterface();
+
+        CWorldSA *world = (CWorldSA *)pGame->GetWorld();
+        world->Remove( objInt, CObject_Destructor );
+    
+        delete m_pInterface;
+
 #ifdef MTA_USE_BUILDINGS_AS_OBJECTS
-                DWORD dwModelID = this->internalInterface->m_nModelIndex;
-                // REMOVE ref to colstore thingy
-                dwFunc = 0x4107D0;
-                _asm
-                {
-                    mov     eax, dwModelID
-                    mov     eax, 0xA9B0C8[eax*4]
-                    mov     eax, [eax+20]
-                    movzx   eax, byte ptr [eax+40]
-                    push    eax
-                    call    dwFunc
-                    add     esp, 4
-                }
-#endif
-            }
+        DWORD dwModelID = this->internalInterface->m_nModelIndex;
+        // REMOVE ref to colstore thingy
+        dwFunc = 0x4107D0;
+        _asm
+        {
+            mov     eax, dwModelID
+            mov     eax, 0xA9B0C8[eax*4]
+            mov     eax, [eax+20]
+            movzx   eax, byte ptr [eax+40]
+            push    eax
+            call    dwFunc
+            add     esp, 4
         }
+#endif
 
-        this->BeingDeleted = true;
-        ((CPoolsSA *)pGame->GetPools())->RemoveObject((CObject *)(CObjectSA *)this);
-
-        //OutputDebugString("Destroying Object\n");
     }
+
+    mtaObjects[m_poolIndex] = NULL;
 }
 
 void CObjectSA::Explode()

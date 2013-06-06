@@ -264,15 +264,19 @@ public:
 };
 struct RwObjectFrame : public RwObject
 {
+    typedef void (__cdecl*syncCallback_t)( RwObject *obj );
+
     RwListEntry <RwObjectFrame>     lFrame;
-    void*                           callback;
+    syncCallback_t                  callback;
 
     void                    AddToFrame                  ( RwFrame *frame );
     void                    RemoveFromFrame             ( void );
 };
 
 // Private flags
-#define RW_FRAME_DIRTY  0x01
+#define RW_FRAME_DIRTY          0x01    // needs updating in RwFrameSyncDirty
+#define RW_FRAME_UPDATEMATRIX   0x04    // modelling will be copied to LTM
+#define RW_FRAME_UPDATEFLAG     ( RW_FRAME_DIRTY | 2 )
 
 struct RwFrame : public RwObject
 {
@@ -373,10 +377,14 @@ struct RwFrame : public RwObject
     void                    SetAtomicComponentFlags     ( unsigned short flags );
     void                    FindComponentAtomics        ( RpAtomic **okay, RpAtomic **damaged );
 
+    bool                    IsWaitingForUpdate          ( void ) const          { return IS_ANY_FLAG( privateFlags, RW_FRAME_UPDATEFLAG ); }
+    void                    SetUpdating                 ( bool flag )           { BOOL_FLAG( privateFlags, RW_FRAME_UPDATEFLAG, flag ); }
+
     RpAnimHierarchy*        GetAnimHierarchy            ( void );
-    void                    _RegisterRoot               ( void );
-    void                    RegisterRoot                ( void );
-    void                    UnregisterRoot              ( void );
+    void                    _Update                     ( RwList <RwFrame>& list );
+    void                    Update                      ( void );
+    void                    UpdateMTA                   ( void );
+    void                    ThrowUpdate                 ( void );
 };
 struct RwTexDictionary : public RwObject
 {
@@ -460,8 +468,13 @@ struct RwTexture
     unsigned int                refs;                           // 84
     char                        anisotropy;                     // 88
 
+    void                        SetName                 ( const char *name );
+
     void                        AddToDictionary         ( RwTexDictionary *txd );
     void                        RemoveFromDictionary    ( void );
+
+    void                        SetFiltering            ( bool filter )     { BOOL_FLAG( flags, 0x1102, filter ); }
+    bool                        IsFiltering             ( void ) const      { return IS_FLAG( flags, 0x1102 ); }
 };
 struct RwTextureCoordinates
 {
@@ -521,6 +534,8 @@ public:
     unsigned short      refs;         // 24
     short               id;           // 26
     void*               unknown;      // 28
+
+    void                SetTexture      ( RwTexture *tex );
 };
 class RpMaterials
 {
@@ -596,6 +611,8 @@ struct RpAtomic : public RwObjectFrame
     BYTE                    pad3[8];            // 128
     unsigned int            pipeline;           // 136
 
+    const RwSphere&         GetWorldBoundingSphere      ( void );
+
     bool                    IsNight                     ( void );
 
     void                    AddToClump                  ( RpClump *clump );
@@ -605,33 +622,6 @@ struct RpAtomic : public RwObjectFrame
 
     void                    FetchMateria                ( RpMaterials& mats );
 };
-class RwAtomicZBufferEntry
-{
-public:
-    RpAtomic*               m_atomic;
-    RpAtomicCallback        m_render;
-    float                   m_distance;
-};
-class RwAtomicRenderChain //size: 20
-{
-public:
-    RwAtomicZBufferEntry                m_entry;    // 0
-    RwAtomicRenderChain*                next;       // 12
-    RwAtomicRenderChain*                prev;       // 16
-};
-class RwAtomicRenderChainInterface
-{
-public:
-    RwAtomicRenderChain     m_root;             // 0
-    RwAtomicRenderChain     m_rootLast;         // 20
-    RwAtomicRenderChain     m_renderStack;      // 40
-    RwAtomicRenderChain     m_renderLast;       // 60
-
-    bool                    PushRender                  ( RwAtomicZBufferEntry *level );
-};
-
-extern RwAtomicRenderChainInterface *const rwRenderChains;
-
 struct RpLight : public RwObjectFrame
 {
 public:
@@ -811,9 +801,7 @@ struct RpGeometry : public RwObject
     template <class type>
     bool                    ForAllMateria( bool (*callback)( RpMaterial *mat, type data ), type data )
     {
-        unsigned int n;
-
-        for ( n=0; n<materials.m_entries; n++ )
+        for ( unsigned int n = 0; n < materials.m_entries; n++ )
         {
             if ( !callback( materials.m_data[n], data ) )
                 return false;
@@ -827,12 +815,52 @@ struct RpGeometry : public RwObject
 
 typedef RpGeometry RwGeometry;
 
-// RwStructInfo stores the plugin allocation information, such as size.
-class RwStructInfo
+#define ALIGN( num, sector, align ) (((num) + (sector) - 1) & (~((align) - 1)))
+
+struct RwFreeListMemBlock
 {
-public:
-    size_t                  m_size;
+    RwListEntry <RwFreeListMemBlock>    list;
+
+    unsigned char*  GetMetaData( void )
+    {
+        return (unsigned char*)( this + 1 );
+    }
+
+    static inline void SetBlockUsed( unsigned char *meta, unsigned int idx, bool used )
+    {
+        if ( used )
+            meta[idx / 8] |= 0x80 >> (idx % 8);
+        else
+            meta[idx / 8] &= ~(0x80 >> (idx % 8));
+    }
+
+    void SetBlockUsed( unsigned int idx, bool used = true )
+    {
+        SetBlockUsed( GetMetaData(), idx, used );
+    }
+
+    void* GetBlockPointer( unsigned int index, size_t blockSize, size_t alignment, size_t metaDataSize )
+    {
+        return (void*)( ALIGN( (unsigned int)this + alignment + metaDataSize, 8, alignment ) + index * blockSize );
+    }
 };
+
+#define RWALLOC_SELFCONSTRUCT   0x01
+#define RWALLOC_RUNTIME         0x02
+
+struct RwFreeList
+{
+    size_t                          m_blockSize;    // 0
+    unsigned int                    m_blockCount;   // 4
+    size_t                          m_metaDataSize; // 8
+    size_t                          m_alignment;    // 12
+    RwList <RwFreeListMemBlock>     m_memBlocks;    // 16
+    unsigned int                    m_flags;        // 24
+    RwListEntry <RwFreeList>        m_globalLists;  // 28
+};
+
+typedef RwFreeList RwStructInfo;    // I leave this for understanding purposes.
+
 struct RwScene : public RwObject
 {
     BYTE                    m_pad[44];                          // 8
@@ -899,6 +927,10 @@ typedef long                (__cdecl*RwFileSeek_t) ( void *fp, long offset, int 
 
 typedef int                 (__cdecl*RwReadTexture_t) ( RwStream *stream, RwTexture **out, size_t blockSize );
 
+enum eRwDeviceCmd : unsigned int
+{
+};
+
 class RwInterface   // size: 1456
 {
 public:
@@ -910,14 +942,17 @@ public:
     BYTE                    m_pad11[4];                                     // 12
     RwRenderSystem          m_renderSystem;                                 // 16
 
-    BYTE                    m_pad[88];                                      // 24
+    BYTE                    m_pad[8];                                       // 24
+    void                    (*m_deviceCommand)( eRwDeviceCmd cmd, int param );  // 32
+
+    BYTE                    m_pad20[76];                                    // 36
     RwStructInfo*           m_sceneInfo;                                    // 112
 
     BYTE                    m_pad14[60];                                    // 116
     RwReadTexture_t         m_readTexture;                                  // 176, actual internal texture reader
 
     BYTE                    m_pad17[8];                                     // 180
-    RwList <RwFrame>        m_nodeRoot;                                     // 188, list of all root frames
+    RwList <RwFrame>        m_nodeRoot;                                     // 188, list of dirty [RwFrame]s
 
     BYTE                    m_pad6[24];                                     // 196
     
@@ -925,7 +960,13 @@ public:
     RwFileClose_t           m_fileClose;                                    // 224
     RwFileSeek_t            m_fileSeek;                                     // 228
 
-    BYTE                    m_pad13[76];                                    // 232
+    BYTE                    m_pad13[20];                                    // 232
+
+    void                    (*m_strncpy)( char *buf, const char *dst, size_t cnt ); // 252
+    BYTE                    m_pad18[32];                                    // 256
+
+    size_t                  (*m_strlen)( const char *str );                 // 288
+    BYTE                    m_pad19[16];                                    // 292
 
     void*                   (*m_malloc)( size_t size );                     // 308
     void                    (*m_free)( void *data );                        // 312

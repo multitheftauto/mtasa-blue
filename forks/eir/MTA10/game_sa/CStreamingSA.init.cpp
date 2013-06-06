@@ -88,7 +88,7 @@ namespace Streaming
     static HANDLE *const VAR_UnkFileHandle = (HANDLE*)0x008E4010;
     static size_t *const VAR_NumResourceEntries = (size_t*)0x008E4C68;
     static unsigned short *const VAR_BiggestPrimaryBlockOffset = (unsigned short*)0x008E4CA8;
-    static unsigned int *const VAR_LastModelScanIndex = (unsigned int*)0x00AAE948;
+    static modelId_t *const VAR_LastModelScanIndex = (modelId_t*)0x00AAE948;
     static CModelLoadInfoSA *const VAR_ModelLoadInfo = (CModelLoadInfoSA*)0x008E4CC0;
     static CMissingModelInfoSA *const *VAR_MissingModelInfo = (CMissingModelInfoSA**)0x008E48D0;
 
@@ -104,10 +104,10 @@ namespace Streaming
         Binary offsets:
             (1.0 US and 1.0 EU): 0x004C5940
     =========================================================*/
-    CBaseModelInfoSAInterface* __cdecl GetModelByHash( unsigned int hash, unsigned short *id )
+    CBaseModelInfoSAInterface* __cdecl GetModelByHash( unsigned int hash, modelId_t *id )
     {
         // Use the last model index (performance improvement?)
-        unsigned int n = *VAR_LastModelScanIndex;
+        modelId_t n = *VAR_LastModelScanIndex;
         CBaseModelInfoSAInterface *model;
 
         for ( ; n < DATA_TEXTURE_BLOCK; n++ )
@@ -132,7 +132,7 @@ namespace Streaming
 
 success:
         if ( id )
-            *id = (unsigned short)n;
+            *id = n;
 
         *VAR_LastModelScanIndex = n;
         return model;
@@ -157,11 +157,11 @@ success:
             The id argument is an extension which the original
             function does not have.
     =========================================================*/
-    CBaseModelInfoSAInterface* GetModelInfoByName( const char *name, unsigned short startId, unsigned short endId, unsigned short *id )
+    CBaseModelInfoSAInterface* GetModelInfoByName( const char *name, modelId_t startId, modelId_t endId, modelId_t *id )
     {
         unsigned int hash = pGame->GetKeyGen()->GetUppercaseKey( name );
 
-        for ( unsigned short n = startId; n <= endId; n++ )
+        for ( modelId_t n = startId; n <= endId; n++ )
         {
             CBaseModelInfoSAInterface *info = ppModelInfo[n];
 
@@ -189,7 +189,7 @@ success:
         Binary offsets:
             (1.0 US and 1.0 EU): 0x004C9360
     =========================================================*/
-    static void __cdecl TxdAssignVehiclePaintjob( const char *name, unsigned int id )
+    static void __cdecl TxdAssignVehiclePaintjob( const char *name, modelId_t id )
     {
         unsigned char len = (unsigned char)strlen( name ) - 1;
         unsigned char lastchr = name[len];
@@ -358,7 +358,7 @@ success:
         if ( !file )
             return;
 
-        unsigned short lastID = 0xFFFF;
+        modelId_t lastID = 0xFFFF;
         union
         {
             char version[4];    // has to be "VER2"
@@ -402,7 +402,7 @@ success:
 
             *dot = '\0';
 
-            unsigned short id;
+            modelId_t id;
 
             if ( strnicmp( ext, "DFF", 3 ) == 0 )
             {
@@ -413,7 +413,7 @@ success:
                     // Some sort of debug container
                     (*VAR_MissingModelInfo)->Add( header.name );
                     
-                    lastID = 0xFFFF;
+                    lastID = -1;
                     continue;
                 }
             }
@@ -421,7 +421,7 @@ success:
             {
                 id = pGame->GetTextureManager()->FindTxdEntry( header.name );
 
-                if ( id == 0xFFFF )
+                if ( id == -1 )
                 {
                     id = pGame->GetTextureManager()->CreateTxdEntry( header.name );
 
@@ -433,32 +433,32 @@ success:
             }
             else if ( strnicmp( ext, "COL", 3 ) == 0 )
             {
-                id = 25000 + RegisterCollision( header.name );
+                id = DATA_COLL_BLOCK + RegisterCollision( header.name );
             }
             else if ( strnicmp( ext, "IPL", 3 ) == 0 )
             {
                 id = FindIPLFile( header.name );
 
-                if ( id == 0xFFFF )
+                if ( id == -1 )
                 {
                     id = RegisterIPLFile( header.name );
                 }
 
-                id += 25255;
+                id += DATA_IPL_BLOCK;
             }
             else if ( strnicmp( ext, "DAT", 3 ) == 0 )
             {
                 sscanf( header.name + 5, "%d", &id );
                 
-                id += 25511;
+                id += DATA_PATHFIND_BLOCK;
             }
             else if ( strnicmp( ext, "IFP", 3 ) == 0 )
             {
-                id = 25575 + pGame->GetAnimManager()->RegisterAnimBlock( header.name );
+                id = DATA_ANIM_BLOCK + pGame->GetAnimManager()->RegisterAnimBlock( header.name );
             }
             else if ( strnicmp( ext, "RRR", 3 ) == 0 )
             {
-                id = 25755 + pGame->GetRecordings()->Register( header.name );
+                id = DATA_RECORD_BLOCK + pGame->GetRecordings()->Register( header.name );
             }
             else if ( strnicmp( ext, "SCM", 3 ) == 0 )
             {
@@ -472,7 +472,7 @@ success:
             else
             {
                 *dot = '.';
-                lastID = 0xFFFF;
+                lastID = -1;
                 continue;
             }
 
@@ -492,7 +492,7 @@ success:
             info.SetOffset( header.offset, header.primaryBlockOffset );
             info.m_flags = 0;
 
-            if ( lastID != 0xFFFF )
+            if ( lastID != -1 )
                 VAR_ModelLoadInfo[lastID].m_lastID = id;
 
             lastID = id;

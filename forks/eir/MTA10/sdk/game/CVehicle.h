@@ -69,6 +69,8 @@ class CVehicle : public virtual CPhysical
 public:
     virtual                     ~CVehicle () {};
 
+    virtual unsigned int        GetPoolIndex                ( void ) const = 0;
+
     virtual bool                AddProjectile ( eWeaponType eWeapon, CVector vecOrigin, float fForce, CVector * target, CEntity * targetEntity )=0;
     
     virtual CPed*               GetDriver                   () = 0;

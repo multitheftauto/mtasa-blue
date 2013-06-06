@@ -79,8 +79,6 @@ IUnknown * CDirect3DHook9::API_Direct3DCreate9 ( UINT SDKVersion )
     if ( !bLoadedModules )
     {
         CCore::GetSingleton ( ).CreateNetwork ( );
-        CCore::GetSingleton ( ).CreateGame ( );
-        CCore::GetSingleton ( ).CreateMultiplayer ( );
         CCore::GetSingleton ( ).CreateXML ( );
         CCore::GetSingleton ( ).CreateGUI ( );
         bLoadedModules = true;

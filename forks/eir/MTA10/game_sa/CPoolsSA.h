@@ -17,9 +17,9 @@
 #define __CGAMESA_POOLS
 
 #include <game/CPools.h>
+#include "CModelInfoSA.h"
 #include "CRenderWareExtensionSA.h"
 #include "CTextureManagerSA.h"
-#include "CModelInfoSA.h"
 #include "CAtomicModelInfoSA.h"
 #include "CClumpModelInfoSA.h"
 #include "CVehicleModelInfoSA.h"
@@ -60,22 +60,17 @@ public:
         return (type*)( (unsigned int)m_pool + size * id );
     }
 
+    // This function expects the entities to free themselves from this;
+    // so do not decrease the count here!
     void    Clear( void )
     {
-        unsigned int n;
-
-        for (n=0; n<m_max; n++)
+        for ( unsigned int n = 0; n < GetMax(); n++ )
         {
             if ( m_flags[n] & 0x80 )
                 continue;
 
             delete GetOffset( n );
         }
-
-#ifdef _DEBUG
-        if ( GetCount() != 0 )
-            __asm int 3
-#endif
     }
 
     ~CPool( void )
@@ -89,7 +84,7 @@ public:
     inline type*    Allocate( void )
     {
         // The original code did two iterations, but it is not required
-        for ( unsigned int n = ++m_lastUsed; n < m_max; n++ )
+        for ( unsigned int n = ++m_lastUsed; n < GetMax(); n++ )
         {
             // If slot is used, we skip
             if ( !( m_flags[n] & 0x80 ) )
@@ -108,7 +103,7 @@ public:
 
     inline type*    Get( unsigned int id )
     {
-        return ( (id < m_max) && !(m_flags[id] & 0x80) ) ? GetOffset( id ) : NULL;
+        return ( (id < GetMax()) && !(m_flags[id] & 0x80) ) ? GetOffset( id ) : NULL;
     }
 
     unsigned int    GetIndex( type *entity )
@@ -118,7 +113,7 @@ public:
 
     bool    IsValid( type *entity )
     {
-        return entity >= m_pool && GetIndex( entity ) < m_max;
+        return entity >= m_pool && GetIndex( entity ) < GetMax();
     }
 
     void    Free( unsigned int id )
@@ -146,7 +141,7 @@ public:
 
     bool    IsAnySlotFree( void )
     {
-        for ( unsigned int n = m_lastUsed + 1; n < m_max; n++ )
+        for ( unsigned int n = m_lastUsed + 1; n < GetMax(); n++ )
         {
             if ( m_flags[n] & 0x80 )
                 return true;
@@ -166,7 +161,7 @@ public:
         // Count all occupied slots in this pool
         unsigned int count = 0;
 
-        for ( unsigned int n = 0; n < m_max; n++ )
+        for ( unsigned int n = 0; n < GetMax(); n++ )
         {
             if ( !( m_flags[n] & 0x80 ) )
                 count++;
@@ -177,7 +172,10 @@ public:
 
     unsigned int    GetMax( void )
     {
-        return m_max;
+        // We enable compiler optimizations by using the constant template variable.
+        // Using the dynamic variable here may enable support for hacks (which dynamically extend pool size).
+        // Why should we enable that kind of support?
+        return max;
     }
 
     type*           m_pool;
@@ -353,60 +351,51 @@ public:
 
     
     // Vehicles pool
-    CVehicle*               AddVehicle          ( eVehicleTypes eVehicleType, unsigned char ucVariation, unsigned char ucVariation2 );
-    CVehicle*               AddVehicle          ( DWORD* pGameInterface );
-private:
-    bool                    AddVehicleToPool    ( CVehicleSA* pVehicle );
-public:
+    CVehicleSA*             AddVehicle          ( modelId_t model, unsigned char ucVariation, unsigned char ucVariation2 );
+    CVehicleSA*             AddVehicle          ( DWORD* pGameInterface );
     void                    RemoveVehicle       ( CVehicle* pVehicle, bool bDelete = true );
     void                    RemoveVehicle       ( unsigned long ulID, bool bDelete = true );
-    CVehicle*               GetVehicle          ( unsigned long ulID );
-    CVehicle*               GetVehicle          ( DWORD* pGameInterface );
+    CVehicleSA*             GetVehicle          ( unsigned long ulID );
+    CVehicleSA*             GetVehicle          ( void *entity );
     DWORD                   GetVehicleRef       ( CVehicle* pVehicle );
     DWORD                   GetVehicleRef       ( DWORD* pGameInterface );
-    CVehicle*               GetVehicleFromRef   ( DWORD dwGameRef );
-    inline unsigned long    GetVehicleCount     ( ) { return m_vehiclePool.ulCount;; }
+    CVehicleSA*             GetVehicleFromRef   ( DWORD dwGameRef );
+    inline unsigned long    GetVehicleCount     ( ) { return (*ppVehiclePool)->GetCount(); }
     void                    DeleteAllVehicles   ( );
 
     // Objects pool
-    CObject*                AddObject           ( DWORD dwModelID, bool bLowLod, bool bBreakable );
-private:
-    bool                    AddObjectToPool     ( CObjectSA* pObject );
-public:
+    CObjectSA*              AddObject           ( modelId_t dwModelID, bool bLowLod, bool bBreakable );
     void                    RemoveObject        ( CObject* pObject, bool bDelete = true );
     void                    RemoveObject        ( unsigned long ulID, bool bDelete = true );
-    CObject*                GetObject           ( unsigned long ulID );
-    CObject*                GetObject           ( DWORD* pGameInterface );
+    CObjectSA*              GetObject           ( unsigned long ulID );
+    CObjectSA*              GetObject           ( void *entity );
     DWORD                   GetObjectRef        ( CObject* pObject );
     DWORD                   GetObjectRef        ( DWORD* pGameInterface );
-    CObject*                GetObjectFromRef    ( DWORD dwGameRef );
-    inline unsigned long    GetObjectCount      ( ) { return m_objectPool.ulCount; }
+    CObjectSA*              GetObjectFromRef    ( DWORD dwGameRef );
+    inline unsigned long    GetObjectCount      ( ) { return (*ppObjectPool)->GetCount(); }
     void                    DeleteAllObjects    ( );
 
     // Peds pool
-    CPed*                   AddPed              ( ePedModel ePedType );
-    CPed*                   AddPed              ( DWORD* pGameInterface );
-    CPed*                   AddCivilianPed      ( DWORD* pGameInterface );
-private:
-    bool                    AddPedToPool        ( CPedSA* pPed );
-public:
+    CPedSA*                 AddPed              ( modelId_t model );
+    CPedSA*                 AddPed              ( DWORD* pGameInterface );
+    CPedSA*                 AddCivilianPed      ( DWORD* pGameInterface );
     void                    RemovePed           ( CPed* ped, bool bDelete = true );
     void                    RemovePed           ( unsigned long ulID, bool bDelete = true);
-    CPed*                   GetPed              ( unsigned long ulID );
-    CPed*                   GetPed              ( DWORD* pGameInterface );
+    CPedSA*                 GetPed              ( unsigned long ulID );
+    CPedSA*                 GetPed              ( void *entity );
     DWORD                   GetPedRef           ( CPed* pPed );
     DWORD                   GetPedRef           ( DWORD* pGameInterface );
-    CPed*                   GetPedFromRef       ( DWORD dwGameRef );
+    CPedSA*                 GetPedFromRef       ( DWORD dwGameRef );
     CPedSAInterface*        GetPedInterface     ( DWORD dwGameRef ); // game_sa specific
-    inline unsigned long    GetPedCount         ( ) { return m_pedPool.ulCount; }
+    inline unsigned long    GetPedCount         ( ) { return (*ppPedPool)->GetCount(); }
     void                    DeleteAllPeds       ( );
 
-    CEntity*                GetEntity           ( DWORD* pGameInterface );
+    CEntitySA*              GetEntity           ( void *pGameInterface );
 
     // Others
-    CBuilding*              AddBuilding         ( DWORD dwModelID );
+    CBuildingSA*            AddBuilding         ( DWORD dwModelID );
     void                    DeleteAllBuildings  ( );
-    CVehicle*               AddTrain            ( CVector* vecPosition, DWORD dwModels[], int iSize, bool bDirection );
+    CVehicleSA*             AddTrain            ( CVector* vecPosition, DWORD dwModels[], int iSize, bool bDirection );
 
     int                     GetNumberOfUsedSpaces   ( ePools pools );
     void                    DumpPoolsStatus         ( );
@@ -445,18 +434,6 @@ private:
     };
 
     // Pools
-    typedef SPoolData < CVehicleSA, CVehicleSAInterface, MAX_VEHICLES > vehiclePool_t;
-    typedef SPoolData < CPedSA, CPedSAInterface, MAX_PEDS > pedPool_t;
-    typedef SPoolData < CObjectSA, CObjectSAInterface, MAX_OBJECTS > objectPool_t;
-    vehiclePool_t   m_vehiclePool;
-    pedPool_t       m_pedPool;
-    objectPool_t    m_objectPool;
-
-    CBuildingSA*    Buildings [ MAX_BUILDINGS ];
-    unsigned long   m_ulBuildingCount;
-
-    bool            m_bGetVehicleEnabled;
-
     CEntryInfoNodePool*             EntryInfoNodePool;
     CPointerNodeDoubleLinkPool*     PointerNodeDoubleLinkPool;
     CPointerNodeSingleLinkPool*     PointerNodeSingleLinkPool;
@@ -520,5 +497,12 @@ private:
 
 #define FUNC_CTrain_CreateMissionTrain                      0x6F7550
 #define VAR_TrainModelArray                                 0x8D44F8
+
+// Maintenance globals.
+// Can be used instead of the CPools API.
+// Is used by the classes to register themselves.
+extern CVehicleSA *mtaVehicles[MAX_VEHICLES];
+extern CObjectSA *mtaObjects[MAX_OBJECTS];
+extern CPedSA *mtaPeds[MAX_PEDS];
 
 #endif

@@ -25,7 +25,7 @@
 static CPedClothesDesc* pLocalClothes = 0;
 static CWantedSAInterface* pLocalWanted = 0;
 
-CPlayerPedSA::CPlayerPedSA( ePedModel pedType )
+CPlayerPedSA::CPlayerPedSA( modelId_t pedType )
 {
     DEBUG_TRACE("CPlayerPedSA::CPlayerPedSA( ePedModel pedType )");
     // based on CPlayerPed::SetupPlayerPed (R*)
@@ -64,7 +64,7 @@ CPlayerPedSA::CPlayerPedSA( ePedModel pedType )
     m_pData = new CPlayerPedDataSAInterface;
 
     // Copy the local player data so we're defaulted to something good
-    CPlayerPedSA* pLocalPlayerSA = dynamic_cast < CPlayerPedSA* > ( pools->GetPedFromRef ( (DWORD)1 ) );
+    CPlayerPedSA* pLocalPlayerSA = dynamic_cast < CPlayerPedSA* > ( pools->GetPedFromRef ( (DWORD)0 ) );
     if ( pLocalPlayerSA )
         MemCpyFast ( m_pData, ((CPlayerPedSAInterface*)pLocalPlayerSA->GetInterface ())->pPlayerData, sizeof ( CPlayerPedDataSAInterface ) );
 

@@ -3365,7 +3365,7 @@ void CClientPed::_CreateLocalModel ( void )
 {
     // Init the local player and grab the pointers
     g_pGame->InitLocalPlayer ();
-    m_pPlayerPed = dynamic_cast < CPlayerPed* > ( g_pGame->GetPools ()->GetPedFromRef ( (DWORD)1 ) );
+    m_pPlayerPed = dynamic_cast < CPlayerPed* > ( g_pGame->GetPools ()->GetPedFromRef ( (DWORD)0 ) );
     
     if ( m_pPlayerPed )
     {

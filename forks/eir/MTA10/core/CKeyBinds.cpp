@@ -1960,7 +1960,7 @@ void CKeyBinds::DoPostFramePulse ( void )
     if ( SystemState != 9 /* GS_PLAYING_GAME */ ) return;
 
     bool bInVehicle = false, bHasDetonator = false, bIsDead = false, bEnteringVehicle = false;
-    CPed* pPed = m_pCore->GetGame ()->GetPools ()->GetPedFromRef ( (DWORD)1 );
+    CPed* pPed = m_pCore->GetGame ()->GetPools ()->GetPedFromRef ( (DWORD)0 );
     // Don't set any controller states if the local player isnt alive
     if ( !pPed )
         return;

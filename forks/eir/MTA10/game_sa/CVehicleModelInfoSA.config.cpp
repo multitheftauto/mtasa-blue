@@ -13,6 +13,7 @@
 #include <StdInc.h>
 
 #define FUNC_InitVehicleData                0x005B8F00
+
 #define FUNC_LoadVehicleColors              0x005B6890
 #define FUNC_LoadCarMods                    0x005B65A0
 #define FUNC_LoadVehicleParticles           0x004C8780
@@ -36,15 +37,10 @@ RwTexDictionary *g_vehicleTxd = NULL;
 =========================================================*/
 static void __cdecl _VehicleModels_Init( void )
 {
-    __asm
-    {
-        mov eax,FUNC_LoadVehicleColors
-        call eax
-        mov eax,FUNC_LoadCarMods
-        call eax
-        mov eax,FUNC_LoadVehicleParticles
-        call eax
-    }
+    // Initialize stuff.
+    ((void (__cdecl*)( void ))FUNC_LoadVehicleColors)();
+    ((void (__cdecl*)( void ))FUNC_LoadCarMods)();
+    ((void (__cdecl*)( void ))FUNC_LoadVehicleParticles)();
 
     // Load the generic vehicle textures
     CTxdInstanceSA *txdEntry = (*ppTxdPool)->Get( pGame->GetTextureManager()->FindTxdEntry( "vehicle" ) );
@@ -74,11 +70,8 @@ static void __cdecl _VehicleModels_Init( void )
     // Allocate the component info pool
     *ppVehicleComponentInfoPool = new CVehicleComponentInfoPool;
 
-    __asm
-    {
-        mov ecx,0x005D5BC0
-        call ecx
-    }
+    // ???
+    ((void (__cdecl*)( void ))0x005D5BC0)();
 }
 
 void    VehicleModels_Init( void )
@@ -88,7 +81,7 @@ void    VehicleModels_Init( void )
 
     VehicleModelInfoRender_Init();
 
-    // Debug
+    // Hook
     HookInstall( 0x004C8E60, h_memFunc( &CVehicleModelInfoSAInterface::Setup ), 5 );
 
     // Temporary vehicle look-up fix (will not be needed anymore in future patch)

@@ -14,11 +14,10 @@
 
 #include "StdInc.h"
 
+// In this pool we store all COL libraries
 CColFilePool **ppColFilePool = (CColFilePool**)CLASS_CColFilePool;
 
 #define FUNC_ColFilePoolInit    0x004113F0
-
-extern CBaseModelInfoSAInterface **ppModelInfo;
 
 SetCachedCollision_t    SetCachedCollision =                (SetCachedCollision_t)0x005B2C20;
 
@@ -42,11 +41,20 @@ CColModelSAInterface::~CColModelSAInterface( void )
     }
 }
 
+void CColModelSAInterface::AllocateData( void )
+{
+    __asm
+    {
+        mov eax,0x0040F740
+        call eax
+    }
+}
+
 void CColModelSAInterface::ReleaseData( void )
 {
     __asm
     {
-        mov ecx,this
+        // __thiscall -> ecx == this
         mov eax,0x0040F9E0
         call eax
     }
@@ -160,15 +168,6 @@ void CColModelSA::RestoreAll( void )
 {
     while ( !m_imported.empty() )
         Restore( m_imported.front() );
-}
-
-void CColModelSA::Apply( unsigned short id )
-{
-    CBaseModelInfoSAInterface *info = ppModelInfo[id];
-
-    m_original = info->pColModel;
-
-    info->SetColModel( m_pInterface, false );
 }
 
 void* CColFileSA::operator new ( size_t )

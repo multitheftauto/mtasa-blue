@@ -178,10 +178,6 @@ VOID CRadarSA::ClearMarkerForEntity(CPed * ped)
     }
 }
 
-struct CRect {
-    float fX1, fY1, fX2, fY2;
-};
-
 VOID CRadarSA::DrawAreaOnRadar(float fX1, float fY1, float fX2, float fY2, const SColor color )
 {
     // Convert color to required abgr at the last moment

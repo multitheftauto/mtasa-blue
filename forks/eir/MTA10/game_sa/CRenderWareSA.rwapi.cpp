@@ -26,7 +26,6 @@
 *
 *****************************************************************************/
 
-RwAtomicRenderChainInterface *const rwRenderChains = (RwAtomicRenderChainInterface*)0x00C88070;
 RwScene *const *p_gtaScene = (RwScene**)0x00C17038;
 RwDeviceInformation *const pRwDeviceInfo = (RwDeviceInformation*)0x00C9BF00;
 
@@ -48,7 +47,6 @@ void RwObjectFrame::AddToFrame( RwFrame *frame )
     RemoveFromFrame();
 
     parent = frame;
-    privateFlags |= RW_FRAME_DIRTY;
 
     if ( !frame )
         return;
@@ -84,13 +82,15 @@ void RwObjectFrame::RemoveFromFrame( void )
         will then be recalculated.
         The modelling matrix is the local offset of the frame based
         on the absolute position of the parent frame.
+    Note:
+        This function is MTA centered because it uses UpdateMTA.
 =========================================================*/
 void RwFrame::SetModelling( const RwMatrix& mat )
 {
     modelling = mat;
 
-    // Set the frame to dirty
-    privateFlags |= RW_FRAME_DIRTY;
+    // Update the frame.
+    UpdateMTA();
 }
 
 /*=========================================================
@@ -107,8 +107,8 @@ void RwFrame::SetPosition( const CVector& pos )
 {
     modelling.vPos = pos;
 
-    // Set the frame to dirty
-    privateFlags |= RW_FRAME_DIRTY;
+    // Update the frame
+    UpdateMTA();
 }
 
 /*=========================================================
@@ -129,6 +129,8 @@ void RwFrame::SetPosition( const CVector& pos )
 const RwMatrix& RwFrame::GetLTM( void )
 {
     // This function will recalculate the LTM if frame is dirty
+    // It does what RwFrameSyncDirty would do, but instantly without
+    // synchronizing the objects.
     return *RwFrameGetLTM( this );
 }
 
@@ -141,7 +143,8 @@ const RwMatrix& RwFrame::GetLTM( void )
         Adds a child to the frame. The child will have this frame
         as parent, while the previous parent is unlinked. Reparenting
         the frame this way will update it's frame root, too.
-        Children frames cannot be root themselves.
+        Children frames are not root frames. The child frame is
+        then updated.
     Binary offsets:
         (1.0 US): 0x007F0B00
         (1.0 EU): 0x007F0A00
@@ -158,10 +161,10 @@ void RwFrame::Link( RwFrame *frame )
     frame->parent = this;
 
     frame->SetRootForHierarchy( root );
-    frame->UnregisterRoot();
+    frame->root->ThrowUpdate();
 
-    // Mark the main root as independent
-    root->RegisterRoot();
+    // Update the child frame (position and object synchronization)
+    frame->Update();
 }
 
 /*=========================================================
@@ -169,13 +172,15 @@ void RwFrame::Link( RwFrame *frame )
 
     Purpose:
         Unparents this frame from any hierarchy. This frame will
-        then be a root frame.
+        then be a root frame. It is then updated to set it at the
+        correct position.
     Binary offsets:
         (1.0 US): 0x007F0CD0
         (1.0 EU): 0x007F0D10
 =========================================================*/
 void RwFrame::Unlink( void )
 {
+    // We only execute if we have got a parent frame.
     if ( !parent )
         return;
 
@@ -194,10 +199,11 @@ void RwFrame::Unlink( void )
     parent = NULL;
     next = NULL;
 
+    // All our children frames need to set root as this frame.
     SetRootForHierarchy( this );
 
-    // Mark as independent
-    RegisterRoot();
+    // Update our position and synchronize objects.
+    Update();
 }
 
 /*=========================================================
@@ -218,6 +224,9 @@ void RwFrame::SetRootForHierarchy( RwFrame *_root )
 
     RwFrame *_child = child;
 
+    // Loop through all children and set their root frame.
+    // These children would call this function again for their
+    // children so the whole hierarchy is updated.
     while ( _child )
     {
         _child->SetRootForHierarchy( root );
@@ -238,6 +247,7 @@ void RwFrame::SetRootForHierarchy( RwFrame *_root )
     Note:
         The function at the binary offsets is RwFrameCountHierarchyFrames.
         It returns 1 at least, since it stands for parent frame itself.
+        MTA does not need to count the main frame?
 =========================================================*/
 static bool RwFrameGetChildCount( RwFrame *child, unsigned int *count )
 {
@@ -249,7 +259,7 @@ static bool RwFrameGetChildCount( RwFrame *child, unsigned int *count )
 
 unsigned int RwFrame::CountChildren( void )
 {
-    unsigned int count = 0;
+    unsigned int count = 0; // not counting this frame here, unlike original function.
 
     ForAllChildren( RwFrameGetChildCount, &count );
     return count;
@@ -378,7 +388,8 @@ RwFrame* RwFrame::FindChildByHierarchy( unsigned int id )
     Purpose:
         Returns a newly allocated frame which is the exact copy
         of this frame. That means that all it's objects and children
-        frames have been cloned (needs confirmation).
+        frames have been cloned (needs confirmation). Thew new frame
+        is forced into the update synchronization queue.
     Binary offsets:
         (1.0 US): 0x007F0050
         (1.0 EU): 0x007F0090
@@ -390,8 +401,8 @@ RwFrame* RwFrame::CloneRecursive( void ) const
     if ( !cloned )
         return NULL;
 
-    cloned->privateFlags &= ~( RW_OBJ_REGISTERED | RW_FRAME_DIRTY );
-    cloned->RegisterRoot();
+    cloned->SetUpdating( false );
+    cloned->Update();
     return cloned;
 }
 
@@ -430,27 +441,14 @@ RwObject* RwFrame::GetFirstObject( void )
     Purpose:
         Returns the first object with the matching type.
 =========================================================*/
-struct _rwFindObjectType
-{
-    unsigned char type;
-    RwObject *rslt;
-};
-
-static bool RwObjectGetByType( RwObject *child, _rwFindObjectType *info )
-{
-    if ( child->type != info->type )
-        return true;
-
-    info->rslt = child;
-    return false;
-}
-
 RwObject* RwFrame::GetFirstObject( unsigned char type )
 {
-    _rwFindObjectType info;
-    info.type = type;
+    LIST_FOREACH_BEGIN( RwObjectFrame, objects.root, lFrame )
+        if ( item->type == type )
+            return item;
+    LIST_FOREACH_END
 
-    return ForAllObjects( RwObjectGetByType, &info ) ? NULL : info.rslt;
+    return NULL;
 }
 
 /*=========================================================
@@ -576,22 +574,14 @@ RwObject* RwFrame::GetLastVisibleObject( void )
     Purpose:
         Returns the first atomic type object in this frame.
     Note:
-        This function was created as a ossible bugfix for GTA:SA.
+        This function was created as a possible bugfix for GTA:SA.
         When the engine handles frames, it automatically assumes
         that their objects are all atomics which they may not be
         (light, camera).
 =========================================================*/
-static bool RwObjectGetAtomic( RpAtomic *atomic, RpAtomic **dst )
-{
-    *dst = atomic;
-    return false;
-}
-
 RpAtomic* RwFrame::GetFirstAtomic( void )
 {
-    RpAtomic *atomic;
-
-    return ForAllAtomics( RwObjectGetAtomic, &atomic ) ? NULL : atomic;
+    return (RpAtomic*)GetFirstObject( RW_ATOMIC );
 }
 
 /*=========================================================
@@ -688,13 +678,13 @@ RpAnimHierarchy* RwFrame::GetAnimHierarchy( void )
 }
 
 /*=========================================================
-    RwFrame::RegisterRoot
+    RwFrame::Update
 
     Purpose:
-        Marks this frame as root frame. All root frames
-        are registered in the main RenderWare interface.
-        Root frames are not children; they may not have a
-        parent frame.
+        Marks this frame to be updated in the next camera
+        focus call (RwCameraBeginUpdate). Once it is updated,
+        the flags are unset and it is removed from the list.
+        There is a MTA and a GTA:SA dirty list.
     Binary offsets:
         (1.0 US): 0x007F0910
         (1.0 EU): 0x007F0950
@@ -702,48 +692,59 @@ RpAnimHierarchy* RwFrame::GetAnimHierarchy( void )
         This function has been inlined into other RenderWare
         functions. Look closely at the pattern to find out
         where!
-        _RegisterRoot is the function which marks a frame as
-        root. RegisterRoot would mark the root frame as root,
-        so it more likely marks the frame as child.
+        _Update may only be used on root frames, as their
+        whole hierarchy is being updated during RwFrameSyncDirty.
+        RW_FRAME_UPDATEMATRIX tells the updater that the LTM
+        matrix should be updated. Only the modelling matrix
+        should be changed by code, LTM is read-only.
 =========================================================*/
-void RwFrame::_RegisterRoot( void )
+void RwFrame::_Update( RwList <RwFrame>& list )
 {
     unsigned char flagIntegrity = privateFlags;
 
-    if ( !( flagIntegrity & ( RW_OBJ_REGISTERED | RW_FRAME_DIRTY ) ) )
+    if ( !( flagIntegrity & RW_FRAME_UPDATEFLAG ) )
     {
         // Add it to the internal list
-        LIST_INSERT( pRwInterface->m_nodeRoot.root, nodeRoot );
+        LIST_INSERT( list.root, nodeRoot );
     }
 
-    privateFlags = ( flagIntegrity | ( RW_OBJ_REGISTERED | RW_FRAME_DIRTY ) );
+    privateFlags = ( flagIntegrity | RW_FRAME_UPDATEFLAG );
 }
 
-void RwFrame::RegisterRoot( void )
+void RwFrame::Update( void )
 {
-    root->_RegisterRoot();
-    privateFlags |= RW_OBJ_VISIBLE | RW_OBJ_HIERARCHY_CACHED;
+    root->_Update( (*ppRwInterface)->m_nodeRoot );
+    privateFlags |= RW_FRAME_UPDATEMATRIX | 8;
+}
+
+void RwFrame::UpdateMTA( void )
+{
+#if 0
+    root->_Update( RwFrameGetDirtyList_MTA() );
+    privateFlags |= RW_FRAME_UPDATEMATRIX | 8;
+#endif
+    Update();   // for this patch.
 }
 
 /*=========================================================
-    RwFrame::UnregisterRoot
+    RwFrame::ThrowUpdate
 
     Purpose:
-        Unregisters this frame, so that it is not a root frame
-        anymore. This is done if the frame turns a child; it
-        receives a parent frame.
+        Unregisters this frame from the update queue.
+        Synchronization attempts will be halted no matter on
+        what queue the frame resides in.
     Note:
         This function has been heavily inlined and does only
         occur in RwFrame::Link.
 =========================================================*/
-void RwFrame::UnregisterRoot( void )
+void RwFrame::ThrowUpdate( void )
 {
-    if ( !( privateFlags & ( RW_OBJ_REGISTERED | 0x01 ) ) )
+    if ( !IsWaitingForUpdate() )
         return;
 
     LIST_REMOVE( nodeRoot );
 
-    privateFlags &= ~(RW_OBJ_REGISTERED | 1);
+    SetUpdating( false );
 }
 
 /*=========================================================
@@ -757,6 +758,7 @@ void RwFrame::UnregisterRoot( void )
 =========================================================*/
 RwTexDictionary* RwTexDictionaryCreate( void )
 {
+    // Fact: m_allocStruct is RwFreeListAllocate!
     RwTexDictionary *txd = (RwTexDictionary*)pRwInterface->m_allocStruct( pRwInterface->m_textureManager.m_txdStruct, 0x30016 );
 
     if ( !txd )
@@ -781,6 +783,8 @@ RwTexDictionary* RwTexDictionaryCreate( void )
 
     Purpose:
         Returns the first texture of this TXD.
+    Binary offsets:
+        (1.0 US and 1.0 EU): 0x00734940
 =========================================================*/
 RwTexture* RwTexDictionary::GetFirstTexture( void )
 {
@@ -810,6 +814,35 @@ RwTexture* RwTexDictionary::FindNamedTexture( const char *name )
     LIST_FOREACH_END
 
     return NULL;
+}
+
+/*=========================================================
+    RwTexture::SetName
+
+    Arguments:
+        name - NULL-terminated string of the new texture name
+    Purpose:
+        Changes the name of this texture. If the name is too long
+        it triggers a RenderWare error.
+    Binary offsets:
+        (1.0 US): 0x007F38A0
+        (1.0 EU): 0x007F38E0
+=========================================================*/
+void RwTexture::SetName( const char *_name )
+{
+    (*ppRwInterface)->m_strncpy( name, _name, sizeof(name) );
+
+    if ( (*ppRwInterface)->m_strlen( _name ) >= sizeof(name) )
+    {
+        RwError err;
+        err.err1 = 1;
+        err.err2 = 0x8000001E;
+
+        RwSetError( &err );
+
+        // Make sure we are zero terminated
+        name[sizeof(name) - 1] = 0;
+    }
 }
 
 /*=========================================================
@@ -879,7 +912,7 @@ RwCamera* RwCameraCreate( void )
     cam->privateFlags = 0;
     cam->parent = NULL;
 
-    cam->callback = (void*)0x007EE5A0;
+    cam->callback = (RwObjectFrame::syncCallback_t)0x007EE5A0;
     cam->preCallback = (RwCameraPreCallback)0x007EF370;
     cam->postCallback = (RwCameraPostCallback)0x007EF340;
 
@@ -1016,6 +1049,21 @@ RwRenderLink* RwStaticGeometry::AllocateLink( unsigned int _count )
 }
 
 /*=========================================================
+    RpAtomic::GetWorldBoundingSphere
+
+    Purpose:
+        Calculates and returns a bounding sphere in world space
+        which entirely contains the geometry.
+    Binary offsets:
+        (1.0 US): 0x00749330
+        (1.0 EU): 0x00749380
+=========================================================*/
+const RwSphere& RpAtomic::GetWorldBoundingSphere( void )
+{
+    return RpAtomicGetWorldBoundingSphere( this );
+}
+
+/*=========================================================
     RpAtomic::IsNight (GTA:SA extension)
 
     Purpose:
@@ -1122,6 +1170,32 @@ void RpAtomic::FetchMateria( RpMaterials& mats )
 
     for ( unsigned int n = 0; n < geometry->linkedMaterials->m_count; n++ )
         mats.Add( geometry->linkedMaterials->Get(n)->m_material );
+}
+
+/*=========================================================
+    RpMaterial::SetTexture
+
+    Arguments:
+        tex - new texture to assign to material (can be NULL)
+    Purpose:
+        Changes the texture of this material. If tex is NULL,
+        then this material will not use a texture anymore.
+    Binary offsets:
+        (1.0 US): 0x0074DBC0
+        (1.0 EU): 0x0074DC10
+=========================================================*/
+void RpMaterial::SetTexture( RwTexture *tex )
+{
+    // Reference our texture for usage
+    if ( tex )
+        tex->refs++;
+
+    // Dereference the previous texture
+    if ( texture )
+        RwTextureDestroy( texture );
+
+    // Assign the new texture
+    texture = tex;
 }
 
 RpMaterials::RpMaterials( unsigned int max )
@@ -1287,7 +1361,7 @@ void RpLight::AddToScene_Local( RwScene *_scene )
     scene = _scene;
 
     if ( _scene->parent )
-        _scene->parent->RegisterRoot();
+        _scene->parent->Update();
 
     LIST_INSERT( scene->m_localLights.root, sceneLights );
 }
@@ -1334,10 +1408,7 @@ void RpClump::Render( void )
 {
     LIST_FOREACH_BEGIN( RpAtomic, atomics.root, atomics )
         if ( item->IsVisible() )
-        {
-            item->parent->GetLTM();     // Possibly update it's world position
             item->renderCallback( item );
-        }
     LIST_FOREACH_END
 }
 
@@ -1422,7 +1493,7 @@ void RpClump::InitStaticSkeleton( void )
         // I guess its always one bone ahead...?
         link++;
 
-        for (n=0; n<boneCount; n++)
+        for ( n=0; n<boneCount; n++ )
         {
             link->context = info;
             link->id = bone->index;
@@ -1566,27 +1637,14 @@ RpAtomic* RpClump::GetLastAtomic( void )
         whose parent frame matches the name. If not found it returns
         NULL.
 =========================================================*/
-struct _rwFindAtomicNamed
-{
-    const char *name;
-    RpAtomic *rslt;
-};
-
-static bool RpClumpFindNamedAtomic( RpAtomic *atom, _rwFindAtomicNamed *info )
-{
-    if ( stricmp( atom->parent->szName, info->name ) != 0 )
-        return true;
-
-    info->rslt = atom;
-    return false;
-}
-
 RpAtomic* RpClump::FindNamedAtomic( const char *name )
 {
-    _rwFindAtomicNamed info;
-    info.name = name;
+    LIST_FOREACH_BEGIN( RpAtomic, atomics.root, atomics )
+        if ( strcmp( item->parent->szName, name ) == 0 )
+            return item;
+    LIST_FOREACH_END
 
-    return ForAllAtomics( RpClumpFindNamedAtomic, &info ) ? NULL : info.rslt;
+    return NULL;
 }
 
 /*=========================================================
@@ -1806,46 +1864,6 @@ void RpGeometry::UnlinkFX( void )
 }
 
 /*=========================================================
-    RwAtomicRenderChainInterface::PushRender
-
-    Arguments:
-        level - the description of the new entry
-    Purpose:
-        Queries to render this atomic internally using the specified
-        callback. The new render request will occupy a slot.
-    Binary offsets:
-        (1.0 US and 1.0 EU): 0x00733910
-    Note:
-        Apparrently the render chains have a pre-allocated amount of
-        possible render instances. We should investigate, how this limit
-        affects the performance and quality of gameplay.
-=========================================================*/
-bool RwAtomicRenderChainInterface::PushRender( RwAtomicZBufferEntry *level )
-{
-    RwAtomicRenderChain *iter = m_root.prev;
-    RwAtomicRenderChain *progr;
-
-    // Scan until we find appropriate slot
-    for ( ; iter != &m_rootLast && iter->m_entry.m_distance < level->m_distance; 
-        iter = iter->prev );
-
-    if ( ( progr = m_renderStack.prev ) == &m_renderLast )
-        return false;
-
-    // Update render details
-    progr->m_entry = *level;
-
-    LIST_REMOVE( *progr );
-    
-    iter = iter->next;
-    progr->prev = iter->prev;
-    iter->prev->next = progr;
-    progr->next = iter;
-    iter->prev = progr;
-    return true;
-}
-
-/*=========================================================
     RwFindTexture
 
     Arguments:
@@ -1962,7 +1980,7 @@ RpLight* RpLightCreate( unsigned char type )
     light->color.g = 0;
     light->color.b = 0;
 
-    light->callback = (void*)_lightCallback;
+    light->callback = (RwObjectFrame::syncCallback_t)_lightCallback;
     light->flags = 0;
     light->parent = NULL;
 

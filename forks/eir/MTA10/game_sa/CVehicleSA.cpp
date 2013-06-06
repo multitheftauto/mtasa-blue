@@ -74,7 +74,7 @@ CVehicleSA::CVehicleSA ()
 /**
  *\todo ASAP: Remove all the VC specific (SCM) function calls propperly
  */
-CVehicleSA::CVehicleSA( eVehicleTypes dwModelID, unsigned char ucVariation, unsigned char ucVariation2 )
+CVehicleSA::CVehicleSA( modelId_t dwModelID, unsigned char ucVariation, unsigned char ucVariation2 )
     : m_ucAlpha ( 255 ), m_bIsDerailable ( true ), m_vecGravity ( 0.0f, 0.0f, -1.0f ), m_HeadLightColor ( SColorRGBA ( 255, 255, 255, 255 ) )
 {
     DEBUG_TRACE("CVehicleSA::CVehicleSA( eVehicleTypes dwModelID )");
@@ -85,7 +85,7 @@ CVehicleSA::CVehicleSA( eVehicleTypes dwModelID, unsigned char ucVariation, unsi
     m_pHandlingData = NULL;
     m_pSuspensionLines = NULL;
 
-    DWORD dwReturn = 0;
+    CVehicleSAInterface *vehInt;
 
     // Set Variation 1 before creation.
     MemSetFast( (void *)VAR_CVehicle_Variation1, ucVariation, 1 );
@@ -101,10 +101,12 @@ CVehicleSA::CVehicleSA( eVehicleTypes dwModelID, unsigned char ucVariation, unsi
         push    dwModelID   
         call    dwFunc
         add     esp, 0x14
-        mov     dwReturn, eax
+        mov     vehInt, eax
     }
 
-    m_pInterface = reinterpret_cast < CEntitySAInterface* > ( dwReturn );
+    m_pInterface = vehInt;
+    m_poolIndex = (*ppVehiclePool)->GetIndex( vehInt );
+    mtaVehicles[m_poolIndex] = this;
 #if 0
     this->BeingDeleted = FALSE;
 
@@ -151,6 +153,9 @@ CVehicleSA::CVehicleSA ( CVehicleSAInterface* pVehicleInterface )
     m_pInterface = pVehicleInterface;
     m_pHandlingData = NULL;
     m_pSuspensionLines = NULL;
+
+    m_poolIndex = (*ppVehiclePool)->GetIndex( pVehicleInterface );
+    mtaVehicles[m_poolIndex] = this;
 
 #if 0
     m_pInterface->bStreamingDontDelete = true;
@@ -263,41 +268,36 @@ void CVehicleSA::Init ( void )
 CVehicleSA::~CVehicleSA()
 {
     DEBUG_TRACE("CVehicleSA::~CVehicleSA()");
-    if(!this->BeingDeleted)
+
+    GetVehicleInterface ()->m_pVehicle = NULL;
+
+    if ( m_pDamageManager )
     {
-        if ( *(DWORD*)m_pInterface != VTBL_CPlaceable )
-        {
-            GetVehicleInterface ()->m_pVehicle = NULL;
-
-            if ( m_pDamageManager )
-            {
-                delete m_pDamageManager;
-                m_pDamageManager = NULL;
-            }
-
-            if ( m_pSuspensionLines )
-            {
-                delete [] m_pSuspensionLines;
-                m_pSuspensionLines = NULL;
-            }
-            
-            DWORD dwThis = (DWORD) m_pInterface;
-            DWORD dwFunc = 0x6D2460;        // CVehicle::ExtinguishCarFire
-            _asm
-            {
-                mov     ecx, dwThis
-                call    dwFunc
-            }
-
-            CWorldSA* pWorld = (CWorldSA *)pGame->GetWorld();
-            pWorld->Remove ( m_pInterface, CVehicle_Destructor );
-            pWorld->RemoveReferencesToDeletedObject ( m_pInterface );
-
-            delete m_pInterface;
-        }
-        this->BeingDeleted = true;
-        ((CPoolsSA *)pGame->GetPools())->RemoveVehicle((CVehicle *)this);
+        delete m_pDamageManager;
+        m_pDamageManager = NULL;
     }
+
+    if ( m_pSuspensionLines )
+    {
+        delete [] m_pSuspensionLines;
+        m_pSuspensionLines = NULL;
+    }
+    
+    DWORD dwThis = (DWORD) m_pInterface;
+    DWORD dwFunc = 0x6D2460;        // CVehicle::ExtinguishCarFire
+    _asm
+    {
+        mov     ecx, dwThis
+        call    dwFunc
+    }
+
+    CWorldSA* pWorld = (CWorldSA *)pGame->GetWorld();
+    pWorld->Remove ( m_pInterface, CVehicle_Destructor );
+    pWorld->RemoveReferencesToDeletedObject ( m_pInterface );
+
+    delete m_pInterface;
+
+    mtaVehicles[m_poolIndex] = NULL;
 }
 
 VOID CVehicleSA::SetMoveSpeed ( CVector* vecMoveSpeed )
@@ -1879,7 +1879,7 @@ void GetMatrixForGravity ( const CVector& vecGravity, CMatrix& mat )
 
 void CVehicleSA::SetGravity ( const CVector* pvecGravity )
 {
-    if ( pGame->GetPools ()->GetPedFromRef ( 1 )->GetVehicle () == this )
+    if ( pGame->GetPools ()->GetPedFromRef ( 0 )->GetVehicle () == this )
     {
         // If this is the local player's vehicle, adjust the camera's position history.
         // This is to keep the automatic camera settling (which happens when driving while not moving the mouse)
@@ -2012,7 +2012,7 @@ bool CVehicleSA::UpdateMovingCollision ( float fAngle )
     CPedSAInterface * pDriver = vehicle->pDriver;    
     if ( !pDriver )
     {
-        CPed * pLocalPed = pGame->GetPools ()->GetPedFromRef ( 1 );
+        CPed * pLocalPed = pGame->GetPools ()->GetPedFromRef ( 0 );
         if ( pLocalPed ) vehicle->pDriver = ( CPedSAInterface * ) pLocalPed->GetInterface ();
     }
 
@@ -2092,23 +2092,23 @@ void CVehicleSA::RecalculateSuspensionLines ( void )
     //    return;
     //}
 
+    CVehicleSAInterface* pInt = GetVehicleInterface ();
+    CVehicleSAInterfaceVTBL* pVtbl = *reinterpret_cast < CVehicleSAInterfaceVTBL** > ( pInt );
+    DWORD dwSetupSuspensionLines = pVtbl->SetupSuspensionLines;
+    DWORD dwThis = (DWORD)pInt;
+    _asm
+    {
+        mov ecx, dwThis
+        call dwSetupSuspensionLines
+    }
+
     DWORD dwModel = GetModelIndex ();
     CModelInfo* pModelInfo = pGame->GetModelInfo ( dwModel );
-    if ( pModelInfo && pModelInfo->IsMonsterTruck() || pModelInfo->IsCar() )
+    if ( pModelInfo && ( pModelInfo->IsMonsterTruck() || pModelInfo->IsCar() ) )
     {
-        CVehicleSAInterface* pInt = GetVehicleInterface ();
         // Trains (Their trailers do as well!)
         if ( pModelInfo->IsTrain () || dwModel == 571 || dwModel == 570 || dwModel == 569 || dwModel == 590 )
             return;
-
-        CVehicleSAInterfaceVTBL* pVtbl = *reinterpret_cast < CVehicleSAInterfaceVTBL** > ( pInt );
-        DWORD dwSetupSuspensionLines = pVtbl->SetupSuspensionLines;
-        DWORD dwThis = (DWORD)pInt;
-        _asm
-        {
-            mov ecx, dwThis
-            call dwSetupSuspensionLines
-        }
 
         CopyGlobalSuspensionLinesToPrivate ();
     }

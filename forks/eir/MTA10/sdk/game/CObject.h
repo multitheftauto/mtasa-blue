@@ -23,6 +23,8 @@ class CObject : public virtual CPhysical
 public:
     virtual                         ~CObject            ( void ) {};
 
+    virtual unsigned int            GetPoolIndex        ( void ) const = 0;
+
     virtual CObjectSAInterface *    GetObjectInterface  ( void ) = 0;
 
     virtual void                    Explode             ( void ) = 0;

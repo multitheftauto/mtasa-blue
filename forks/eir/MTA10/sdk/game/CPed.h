@@ -162,6 +162,8 @@ class CPed : public virtual CPhysical
 public:
     virtual                 ~CPed ( void ) {};
 
+    virtual unsigned int    GetPoolIndex                ( void ) const = 0;
+
     virtual class CPedSAInterface * GetPedInterface ( void ) = 0;
 
     virtual void            AttachPedToBike(CEntity * entity, CVector * vector, unsigned short sUnk, FLOAT fUnk, FLOAT fUnk2, eWeaponType weaponType)=0;

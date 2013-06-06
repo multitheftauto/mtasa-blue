@@ -36,6 +36,7 @@
 
 // Game includes
 #include "RenderWare.h"
+#include "CModelInfoSA.h"
 #include "CRecordingsSA.h"
 #include "CTransformationSA.h"
 #include "CEntitySA.h"
@@ -90,7 +91,6 @@
 #include "CRopesSA.h"
 #include "CFxSA.h"
 #include "HookSystem.h"
-#include "CModelInfoSA.h"
 #include "CAtomicModelInfoSA.h"
 #include "CClumpModelInfoSA.h"
 #include "CPedModelInfoSA.h"

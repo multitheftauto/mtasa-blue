@@ -186,4 +186,7 @@ public:
 void ModelInfoBase_Init();
 void ModelInfoBase_Shutdown();
 
+// So we do not have to redefine it anymore.
+extern CBaseModelInfoSAInterface **ppModelInfo;
+
 #endif //_MODELINFO_BASE_

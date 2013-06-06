@@ -792,17 +792,10 @@ bool CModelInfoSA::IsUpgradeAvailable ( eVehicleUpgradePosn posn )
 
 void CModelInfoSA::SetCustomCarPlateText ( const char * szText )
 {
-    char * szStoredText;
-    DWORD ModelID = m_dwModelID;
-    _asm
-    {
-        push    ecx
-        mov     ecx, ModelID
-        mov     ecx, ARRAY_ModelInfo[ecx*4]
-        add     ecx, 40
-        mov     szStoredText, ecx
-        pop     ecx
-    }
+    if ( !IsVehicle() )
+        return;
+
+    char *szStoredText = ((CVehicleModelInfoSAInterface*)GetInterface())->m_plateText;
 
     if ( szText ) 
         strncpy ( szStoredText, szText, 8 );

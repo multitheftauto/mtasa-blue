@@ -35,7 +35,6 @@ class CColModelSAInterface;
 typedef RwError*                (__cdecl *RwErrorGet_t)                         (RwError *code);
 
 // Utility functions
-typedef void                    (__cdecl *RpPrtStdGlobalDataSetStreamEmbedded_t)(class CBaseModelInfoSAInterface *info);
 typedef void                    (__cdecl *RwDeviceSystemRequest_t)              (RwRenderSystem& rend, int objectID, unsigned int& result, int, int);
 typedef void                    (__cdecl *RwPrefetch_t)                         (void);
 typedef void                    (__cdecl *RwFlushLoader_t)                      (void);
@@ -67,7 +66,8 @@ typedef RwStream*               (__cdecl *RwStreamInitialize_t)                 
 typedef RwStream*               (__cdecl *RwStreamOpen_t)                       (RwStreamType type, RwStreamMode mode, const void *pData);
 typedef RwStream*               (__cdecl *RwStreamReadChunkHeaderInfo_t)        (RwStream *stream, RwChunkHeader& header);
 typedef int                     (__cdecl *RwStreamFindChunk_t)                  (RwStream *stream, unsigned int type, unsigned int *lengthOut, unsigned int *versionOut);
-typedef unsigned int            (__cdecl *RwStreamReadBlocks_t)                 (RwStream *stream, RwBlocksInfo& info, unsigned int size);
+typedef unsigned int            (__cdecl *RwStreamReadBlocks_t)                 (RwStream *stream, void *data, unsigned int size);
+typedef int                     (__cdecl *RwStreamSkip_t)                       (RwStream *stream, unsigned int offset);
 typedef int                     (__cdecl *RwStreamClose_t)                      (RwStream *stream, void *pData);
 
 // Frame functions
@@ -106,6 +106,7 @@ typedef RpAtomic*               (__cdecl *RpAtomicClone_t)                      
 typedef RpAtomic*               (__cdecl *RpAtomicSetGeometry_t)                (RpAtomic *atomic, RpGeometry *geometry, unsigned int flags);
 typedef RpAtomic*               (__cdecl *RpAtomicSetFrame_t)                   (RpAtomic *atomic, RwFrame *frame);
 typedef RpAtomic*               (__cdecl *RpAtomicRender_t)                     (RpAtomic *atomic);
+typedef const RwSphere&         (__cdecl *RpAtomicGetWorldBoundingSphere_t)     (RpAtomic *atomic);
 typedef void                    (__cdecl *RpAtomicSetupObjectPipeline_t)        (RpAtomic *atomic);
 typedef void                    (__cdecl *RpAtomicSetupVehiclePipeline_t)       (RpAtomic *atomic);
 typedef int                     (__cdecl *RpAtomicDestroy_t)                    (RpAtomic *atomic);
@@ -187,7 +188,6 @@ static void __declspec(naked)    invalid_ptr()
 // Utility functions
 RWFUNC ( RwDeviceSystemRequest_t                    RwDeviceSystemRequest                   , (RwDeviceSystemRequest_t)                 invalid_ptr )
 RWFUNC ( RwErrorGet_t                               RwErrorGet                              , (RwErrorGet_t)                            invalid_ptr )
-RWFUNC ( RpPrtStdGlobalDataSetStreamEmbedded_t      RpPrtStdGlobalDataSetStreamEmbedded     , (RpPrtStdGlobalDataSetStreamEmbedded_t)   invalid_ptr )
 RWFUNC ( RwAllocAligned_t                           RwAllocAligned                          , (RwAllocAligned_t)                        invalid_ptr )
 RWFUNC ( RwFreeAligned_t                            RwFreeAligned                           , (RwFreeAligned_t)                         invalid_ptr )
 RWFUNC ( RwCreateExtension_t                        RwCreateExtension                       , (RwCreateExtension_t)                     invalid_ptr )
@@ -219,6 +219,7 @@ RWFUNC ( RwStreamOpen_t                             RwStreamOpen                
 RWFUNC ( RwStreamFindChunk_t                        RwStreamFindChunk                       , (RwStreamFindChunk_t)                     invalid_ptr )
 RWFUNC ( RwStreamReadChunkHeaderInfo_t              RwStreamReadChunkHeaderInfo             , (RwStreamReadChunkHeaderInfo_t)           invalid_ptr )
 RWFUNC ( RwStreamReadBlocks_t                       RwStreamReadBlocks                      , (RwStreamReadBlocks_t)                    invalid_ptr )
+RWFUNC ( RwStreamSkip_t                             RwStreamSkip                            , (RwStreamSkip_t)                          invalid_ptr )
 RWFUNC ( RwStreamClose_t                            RwStreamClose                           , (RwStreamClose_t)                         invalid_ptr )
 
 // Frame functions
@@ -255,6 +256,7 @@ RWFUNC ( RpAtomicCreate_t                           RpAtomicCreate              
 RWFUNC ( RpAtomicClone_t                            RpAtomicClone                           , (RpAtomicClone_t)                         invalid_ptr )
 RWFUNC ( RpAtomicSetFrame_t                         RpAtomicSetFrame                        , (RpAtomicSetFrame_t)                      invalid_ptr )
 RWFUNC ( RpAtomicSetGeometry_t                      RpAtomicSetGeometry                     , (RpAtomicSetGeometry_t)                   invalid_ptr )
+RWFUNC ( RpAtomicGetWorldBoundingSphere_t           RpAtomicGetWorldBoundingSphere          , (RpAtomicGetWorldBoundingSphere_t)        invalid_ptr )
 RWFUNC ( RpAtomicSetupObjectPipeline_t              RpAtomicSetupObjectPipeline             , (RpAtomicSetupObjectPipeline_t)           invalid_ptr )
 RWFUNC ( RpAtomicSetupVehiclePipeline_t             RpAtomicSetupVehiclePipeline            , (RpAtomicSetupVehiclePipeline_t)          invalid_ptr )
 RWFUNC ( RpAtomicRender_t                           RpAtomicRender                          , (RpAtomicRender_t)                        invalid_ptr )

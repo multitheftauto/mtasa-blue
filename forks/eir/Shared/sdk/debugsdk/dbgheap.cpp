@@ -54,6 +54,21 @@
         detects memory corruption
 */
 
+/*
+=====================================================================================================================
+    TRIVIA!
+
+    You can use this space to report your own experiences with heap debugging. Sharing is caring!
+    (The_GTA):
+    -   If a memory object is not freed properly, DebugHeap (up to a previous version) did not report
+        corruption to me. The corruption was caused by GTA:SA writing on a too small memory structure
+        which was allocated in MTA code.
+        -> make sure your structures are properly sized! otherwise you'd be debugging all day on clumsy errors.
+           C_ASSERT is a very nice tool for that; kudos to the guy who created it.
+
+=====================================================================================================================
+*/
+
 #ifdef USE_HEAP_DEBUGGING
 #include <windows.h>
 #ifndef LIST_VALIDATE

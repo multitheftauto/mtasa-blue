@@ -41,4 +41,50 @@ RwStream*           RwStreamOpenTranslated          ( const char *path, RwStream
 RwTexture*          RwTextureStreamReadEx           ( RwStream *stream );
 RwTexDictionary*    RwTexDictionaryStreamReadEx     ( RwStream *stream );
 
+extern struct CColLoaderModelAcquisition *g_clumpLoaderCOLAcquisition;
+
+// Stack based col model requesting!
+struct CColLoaderModelAcquisition
+{
+    CColLoaderModelAcquisition( void )
+    {
+        // Make sure our acquistion is most recent
+        prev = g_clumpLoaderCOLAcquisition;
+        g_clumpLoaderCOLAcquisition = this;
+
+        // We do not have a collision by default
+        colModel = NULL;
+    }
+
+    ~CColLoaderModelAcquisition( void )
+    {
+        // If the collision was not retrieved, destroy it
+        if ( colModel )
+            delete colModel;
+
+        // Pop the stack
+        g_clumpLoaderCOLAcquisition = prev;
+    }
+
+    void SetCollision( CColModelSAInterface *col )
+    {
+        // Make sure we do not have any valid collision
+        if ( colModel )
+            delete colModel;
+
+        // Set new collision information
+        colModel = col;
+    }
+
+    CColModelSAInterface* GetCollision( void )
+    {
+        CColModelSAInterface *col = colModel;
+        colModel = NULL;
+        return col;
+    }
+
+    CColLoaderModelAcquisition *prev;
+    CColModelSAInterface *colModel;
+};
+
 #endif //_CRenderWareExtensionSA_H_

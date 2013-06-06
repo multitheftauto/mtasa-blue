@@ -79,8 +79,11 @@ public:
     void                            AssignPaintjob                  ( unsigned short txdId );
     unsigned short                  GetNumberOfValidPaintjobs       ( void ) const;
 
+    void __thiscall                 SetRenderColor                  ( unsigned char color1, unsigned char color2, unsigned char color3, unsigned char color4 );
+
     RpMaterial*                     m_plateMaterial;        // 36
-    BYTE                            m_pad2[9];              // 40
+    char                            m_plateText[8];         // 40
+    BYTE                            m_pad3;                 // 48
     unsigned char                   m_plateDesign;          // 49
     char                            m_name[10];             // 50
     eVehicleType                    m_vehicleType;          // 60
@@ -98,9 +101,11 @@ public:
     float                           m_steerAngle;           // 88
     CVehicleComponentInfoSAInterface*   m_componentInfo;    // 92
     BYTE                            m_pad4[84];             // 96
-    BYTE                            m_padUpgrade[540];      // 180
-    unsigned int                    m_numberOfColors;       // 720
-    BYTE                            m_pad5[2];              // 724
+    BYTE                            m_padUpgrade[380];      // 180
+    RpMaterial*                     m_bodyMaterials[16];    // 560
+    BYTE                            m_pad6[96];             // 624
+    unsigned short                  m_numberOfColors;       // 720
+    unsigned char   m_color1, m_color2, m_color3, m_color4; // 722
     unsigned short                  m_upgradeTypes[18];     // 726
     unsigned short                  m_paintjobTypes[5];     // 762, http://www.gtaforums.com/index.php?showtopic=209878
     int                             m_animFileIndex;        // 772

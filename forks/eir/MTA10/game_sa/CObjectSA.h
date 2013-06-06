@@ -123,17 +123,21 @@ public:
 };
 C_ASSERT(sizeof(CObjectSAInterface) == 0x17C);
 
-class CObjectSA : public virtual CObject, public virtual CPhysicalSA
+class CObjectSA : public virtual CObject, public CPhysicalSA
 {
 private:
     unsigned char               m_ucAlpha;
     bool                        m_bIsAGangTag;
     CVector                     m_vecScale;
 
+    unsigned int                m_poolIndex;
+
 public:
                                 CObjectSA           ( CObjectSAInterface * objectInterface );
                                 CObjectSA           ( DWORD dwModel, bool bBreakable );
                                 ~CObjectSA          ( void );
+
+    unsigned int                GetPoolIndex        ( void ) const          { return m_poolIndex; }
 
     inline CObjectSAInterface * GetObjectInterface  ( void )    { return ( CObjectSAInterface * ) GetInterface (); }
 

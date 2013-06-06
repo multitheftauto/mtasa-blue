@@ -21,6 +21,7 @@
 #include "../game_sa/CPedSA.h"
 #include "../game_sa/CEventDamageSA.h"
 #include "../game_sa/CColPointSA.h"
+#include "../game_sa/CPoolsSA.h"
 
 extern CMultiplayerSA* pMultiplayer;
 
@@ -124,7 +125,7 @@ CShotSyncData * GetLocalPedShotSyncData ( )
 
 bool IsLocalPlayer ( CPed * pPed )
 {
-    CPed * pLocalPed = m_pools->GetPedFromRef ( (DWORD)1 );
+    CPed * pLocalPed = m_pools->GetPedFromRef ( (DWORD)0 );
     return ( pPed == pLocalPed );
 }
 

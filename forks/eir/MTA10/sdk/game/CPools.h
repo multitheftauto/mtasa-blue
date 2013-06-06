@@ -14,6 +14,7 @@
 
 #include "Common.h"
 
+#include "CStreaming.h"
 #include "CAutomobile.h"
 #include "CBoat.h"
 #include "CBike.h"
@@ -68,36 +69,36 @@ class CPools
 {
 public:
     // Vehicles pool
-    virtual CVehicle*       AddVehicle              ( eVehicleTypes eVehicleType, unsigned char ucVariation, unsigned char ucVariation2 ) = 0;
+    virtual CVehicle*       AddVehicle              ( modelId_t model, unsigned char ucVariation, unsigned char ucVariation2 ) = 0;
     virtual CVehicle*       AddVehicle              ( DWORD* pGameInterface ) = 0;
     virtual void            RemoveVehicle           ( CVehicle* pVehicle, bool bDelete = true ) = 0;
     virtual void            RemoveVehicle           ( unsigned long ulID, bool bDelete = true ) = 0;
     virtual CVehicle*       GetVehicle              ( unsigned long ulID ) = 0;
-    virtual CVehicle*       GetVehicle              ( DWORD* pGameInterface ) = 0;
+    virtual CVehicle*       GetVehicle              ( void* pGameInterface ) = 0;
     virtual DWORD           GetVehicleRef           ( CVehicle* pVehicle ) = 0;
     virtual DWORD           GetVehicleRef           ( DWORD* pGameInterface ) = 0;
     virtual CVehicle*       GetVehicleFromRef       ( DWORD dwGameRef ) = 0;
     virtual unsigned long   GetVehicleCount         ( ) = 0;
 
     // Objects pool
-    virtual CObject*        AddObject               ( DWORD dwModelID, bool bLowLod, bool bBreakable ) = 0;
+    virtual CObject*        AddObject               ( modelId_t dwModelID, bool bLowLod, bool bBreakable ) = 0;
     virtual void            RemoveObject            ( CObject* pObject, bool bDelete = true ) = 0;
     virtual void            RemoveObject            ( unsigned long ulID, bool bDelete = true ) = 0;
     virtual CObject*        GetObject               ( unsigned long ulID ) = 0;
-    virtual CObject*        GetObject               ( DWORD* pGameInterface ) = 0;
+    virtual CObject*        GetObject               ( void* pGameInterface ) = 0;
     virtual DWORD           GetObjectRef            ( CObject* pObject ) = 0;
     virtual DWORD           GetObjectRef            ( DWORD* pGameInterface ) = 0;
     virtual CObject*        GetObjectFromRef        ( DWORD dwGameRef ) = 0;
     virtual unsigned long   GetObjectCount          ( ) = 0;
 
     // Peds pool
-    virtual CPed*           AddPed                  ( ePedModel ePedType ) = 0;
+    virtual CPed*           AddPed                  ( modelId_t model ) = 0;
     virtual CPed*           AddPed                  ( DWORD* pGameInterface ) = 0;
     virtual CPed*           AddCivilianPed          ( DWORD* pGameInterface ) = 0;
     virtual void            RemovePed               ( CPed* pPed, bool bDelete = true ) = 0;
     virtual void            RemovePed               ( unsigned long ulID, bool bDelete = true ) = 0;
     virtual CPed*           GetPed                  ( unsigned long ulID ) = 0;
-    virtual CPed*           GetPed                  ( DWORD* pGameInterface ) = 0; // not sure we really want this here
+    virtual CPed*           GetPed                  ( void* pGameInterface ) = 0; // not sure we really want this here
     virtual DWORD           GetPedRef               ( CPed* pPed ) = 0;
     virtual DWORD           GetPedRef               ( DWORD* pGameInterface ) = 0;
     virtual CPed*           GetPedFromRef           ( DWORD dwGameRef ) = 0;
@@ -106,7 +107,7 @@ public:
     // Others
     virtual CBuilding*      AddBuilding             ( DWORD dwModelID ) = 0;
     virtual CVehicle*       AddTrain                ( CVector* vecPosition, DWORD dwModels[], int iSize, bool iDirection ) = 0;
-    virtual CEntity*        GetEntity               ( DWORD* pGameInterface ) = 0;
+    virtual CEntity*        GetEntity               ( void *entity ) = 0;
 
     virtual int             GetNumberOfUsedSpaces   ( ePools pool ) = 0;
     virtual void            DumpPoolsStatus         ( ) = 0;

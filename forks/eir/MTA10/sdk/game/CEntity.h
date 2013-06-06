@@ -102,8 +102,6 @@ public:
 
     virtual bool                        IsStaticWaitingForCollision ( void ) = 0;
     virtual void                        SetStaticWaitingForCollision ( bool bStatic ) = 0;
-
-    virtual unsigned long               GetArrayID ( void ) = 0;
 };
 
 #endif

@@ -51,16 +51,16 @@ struct LimbOrientation {
 
 /********* END ***********/
 
-class CPedIKSAInterface
+class CPedIKSAInterface //size: 32
 {
 public:
-    CPedSAInterface * ThisPed;          // 528
-    LimbOrientation m_torsoOrien;
-    float m_fSlopePitch;
-    float m_fSlopePitchLimitMult;
-    float m_fSlopeRoll;
-    float m_fBodyRoll;
-    DWORD m_flags;
+    CPedSAInterface * ThisPed;          // 0,528
+    LimbOrientation m_torsoOrien;       // 4
+    float m_fSlopePitch;                // 12
+    float m_fSlopePitchLimitMult;       // 16
+    float m_fSlopeRoll;                 // 20
+    float m_fBodyRoll;                  // 24
+    DWORD m_flags;                      // 28
 };
 
 class CPedIKSA : public CPedIK

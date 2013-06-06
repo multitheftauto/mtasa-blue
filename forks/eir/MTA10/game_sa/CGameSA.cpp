@@ -124,7 +124,7 @@ CGameSA::CGameSA()
     RenderWarePipeline_Init();
     Transformation_Init();
     Placeable_Init();
-    //Entity_Init();
+    Entity_Init();
     //Physical_Init();
     //Objects_Init();
     Streamer_Init();
@@ -223,7 +223,7 @@ CGameSA::~CGameSA ( void )
     Streamer_Shutdown();
     //Objects_Shutdown();
     //Physical_Shutdown();
-    //Entity_Shutdown();
+    Entity_Shutdown();
     Placeable_Shutdown();
     Transformation_Shutdown();
     RenderWarePipeline_Shutdown();
@@ -386,7 +386,7 @@ BOOL CGameSA::InitLocalPlayer(  )
     if ( pools )
     {
         //* HACKED IN HERE FOR NOW *//
-        CPedSAInterface* pInterface = pools->GetPedInterface ( (DWORD)1 );
+        CPedSAInterface* pInterface = pools->GetPedInterface ( (DWORD)0 );
 
         if ( pInterface )
         {
@@ -800,7 +800,7 @@ void CGameSA::OnPedContextChange ( CPed* pPedContext )
 CPed* CGameSA::GetPedContext ( void )
 {
     if ( !m_pPedContext )
-        m_pPedContext = pGame->GetPools ()->GetPedFromRef ( (DWORD)1 );
+        m_pPedContext = pGame->GetPools ()->GetPedFromRef ( (DWORD)0 );
     return m_pPedContext;
 }
 

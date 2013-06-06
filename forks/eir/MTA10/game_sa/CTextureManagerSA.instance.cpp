@@ -15,8 +15,8 @@
 #include "gamesa_renderware.h"
 
 // Events (for shader system)
-void _cdecl OnAddTxd( unsigned short id );
-void _cdecl OnRemoveTxd( unsigned short id );
+void _cdecl OnStreamingAddedTxd ( DWORD dwTxdId );
+void _cdecl OnStreamingRemoveTxd ( DWORD dwTxdId );
 
 /*=========================================================
     CTxdInstanceSA::constructor
@@ -104,10 +104,8 @@ void CTxdInstanceSA::Deallocate( void )
 {
     unsigned short id = (*ppTxdPool)->GetIndex( this );
 
-#if 0
     // Notify the shader system
-    OnRemoveTxd( id );
-#endif
+    OnStreamingRemoveTxd( id + 20000 );
 
     if ( m_txd )
     {
@@ -204,10 +202,8 @@ void CTxdInstanceSA::InitParent( void )
     // Assign texture imports
     unsigned short id = (*ppTxdPool)->GetIndex( this );
 
-#if 0
     // Notify the shader system
-    OnAddTxd( id );
-#endif
+    OnStreamingAddedTxd( id );
 
     CTxdInstanceSA *parent = (*ppTxdPool)->Get( m_parentTxd );
 
