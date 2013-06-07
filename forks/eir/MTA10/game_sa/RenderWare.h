@@ -931,6 +931,19 @@ enum eRwDeviceCmd : unsigned int
 {
 };
 
+typedef void*               (__cdecl*RwMemAlloc_t) ( size_t size, unsigned int flags );
+typedef void                (__cdecl*RwMemFree_t) ( void *ptr );
+typedef void*               (__cdecl*RwMemRealloc_t) ( void *ptr, size_t size );
+typedef void*               (__cdecl*RwMemCellAlloc_t) ( size_t count, size_t cellSize );
+
+struct RwMemoryDescriptor
+{
+    RwMemAlloc_t        m_malloc;
+    RwMemFree_t         m_free;
+    RwMemRealloc_t      m_realloc;
+    RwMemCellAlloc_t    m_calloc;
+};
+
 class RwInterface   // size: 1456
 {
 public:
@@ -968,12 +981,9 @@ public:
     size_t                  (*m_strlen)( const char *str );                 // 288
     BYTE                    m_pad19[16];                                    // 292
 
-    void*                   (*m_malloc)( size_t size );                     // 308
-    void                    (*m_free)( void *data );                        // 312
-    void*                   (*m_realloc)( void *data, size_t size );        // 316
-    void*                   (*m_calloc)( unsigned int count, size_t size ); // 320
+    RwMemoryDescriptor      m_memory;                                       // 308
     void*                   (*m_allocStruct)( RwStructInfo *info, unsigned int flags ); // 324
-    void*                   m_callback2;                                    // 328
+    void*                   (*m_freeStruct)( RwStructInfo *info, void *ptr );   // 328
 
     BYTE                    m_pad2[12];                                     // 332
     RwError                 m_errorInfo;                                    // 344

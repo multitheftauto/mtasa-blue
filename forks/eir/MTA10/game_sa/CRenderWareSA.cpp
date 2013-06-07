@@ -473,11 +473,19 @@ CRenderWareSA::CRenderWareSA ( eGameVersion version )
     m_iRenderingEntityType = TYPE_MASK_WORLD;
     m_GTAVertexShadersDisabledTimer.SetMaxIncrement( 1000, true );
     m_bGTAVertexShadersEnabled = true;
+
+    // Initialize sub modules
+    RenderWareMem_Init();
+    RenderWareRender_Init();
 }
 
 
 CRenderWareSA::~CRenderWareSA ( void )
 {
+    // Shutdown sub modules
+    RenderWareRender_Shutdown();
+    RenderWareMem_Shutdown();
+
     SAFE_DELETE ( m_pMatchChannelManager );
 }
 

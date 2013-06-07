@@ -1200,7 +1200,7 @@ void RpMaterial::SetTexture( RwTexture *tex )
 
 RpMaterials::RpMaterials( unsigned int max )
 {
-    m_data = (RpMaterial**)pRwInterface->m_malloc( sizeof(long) * max );
+    m_data = (RpMaterial**)pRwInterface->m_memory.m_malloc( sizeof(long) * max, 0 );
 
     m_max = max;
     m_entries = 0;
@@ -1213,7 +1213,7 @@ RpMaterials::~RpMaterials( void )
         for ( unsigned int n = 0; n < m_entries; n++ )
             RpMaterialDestroy( m_data[n] );
 
-        pRwInterface->m_free( m_data );
+        pRwInterface->m_memory.m_free( m_data );
 
         m_data = NULL;
     }
@@ -1858,7 +1858,7 @@ void RpGeometry::UnlinkFX( void )
     if ( m_2dfx )
     {
         // Clean the 2dfx structure
-        pRwInterface->m_free( m_2dfx );
+        pRwInterface->m_memory.m_free( m_2dfx );
         m_2dfx = NULL;
     }
 }

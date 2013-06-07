@@ -475,7 +475,7 @@ void __cdecl Streaming::LoadAllRequestedModels( bool onlyPriority )
     unsigned int pulseCount = max( 10, *(unsigned int*)0x008E4CB8 * 2 );
     unsigned int threadId = 0;
 
-    for (;;)
+    for ( ; pulseCount != 0; pulseCount-- )
     {
         // Check whether activity is required at all
         if ( GetLastQueuedLoadInfo() == *(CModelLoadInfoSA**)0x008E4C58 &&

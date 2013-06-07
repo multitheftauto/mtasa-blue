@@ -17,6 +17,7 @@ CEnvMapMaterialPool **ppEnvMapMaterialPool = (CEnvMapMaterialPool**)0x00C02D28;
 CEnvMapAtomicPool **ppEnvMapAtomicPool = (CEnvMapAtomicPool**)0x00C02D2C;
 CSpecMapMaterialPool **ppSpecMapMaterialPool = (CSpecMapMaterialPool**)0x00C02D30;
 
+// Global storage used by RwRenderStateLock classes to communicate with each other.
 RwRenderStateLock::_rsLockDesc RwRenderStateLock::_rsLockInfo[210];
 
 /*=========================================================

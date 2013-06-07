@@ -83,7 +83,11 @@ namespace Streaming
 
     // There is a maximum of 2 streaming requests internally in the engine.
     // Those slots are parallel to the maximum syncSemaphores.
-    // streamingRequest contains model ids which request data throug
+    // streamingRequest contains model ids which request data through the
+    // IMG resource loader. It is like a region of memory requested from
+    // the file of specific size. All of the resources inside this region
+    // can be requested very quickly. That is instead of requesting every
+    // resource individually (because HDDs/disk drives are slow).
     inline streamingRequest&    GetStreamingRequest( unsigned int id )
     {
         if ( id > 2 )

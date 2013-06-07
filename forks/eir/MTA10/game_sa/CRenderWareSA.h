@@ -145,7 +145,10 @@ private:
     bool                                    m_bGTAVertexShadersEnabled;
 };
 
+// Include sub modules
+#include "CRenderWareSA.mem.h"
 #include "CRenderWareSA.rwapi.h"
 #include "CRenderWareSA.pipeline.h"
+#include "CRenderWareSA.render.h"
 
 #endif
