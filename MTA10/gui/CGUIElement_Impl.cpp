@@ -336,6 +336,10 @@ CVector2D CGUIElement_Impl::RelativeToAbsolute ( const CVector2D& Vector )
 
 void CGUIElement_Impl::SetParent ( CGUIElement* pParent )
 {
+    // Disable z-sorting if the label has a parent
+    if ( GetType() == CGUI_LABEL )
+        m_pWindow->setZOrderingEnabled ( pParent == NULL );
+
     if ( pParent )
     {
         CGUIElement_Impl* pElement = dynamic_cast < CGUIElement_Impl* > ( pParent );
