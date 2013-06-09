@@ -4084,12 +4084,12 @@ void CClientVehicle::HandleWaitingForGroundToLoad ( void )
         #endif
 
         // Stop waiting after 3 frames, if the object limit has not been reached. (bASync should always be false here) 
-        if ( m_fGroundCheckTolerance > 0.03f && !bMTAObjLimit && !bASync )
+        if ( m_fGroundCheckTolerance > 0.03f /*&& !bMTAObjLimit*/ && !bASync )
             SetFrozenWaitingForGroundToLoad ( false );
     }
 
     #ifdef ASYNC_LOADING_DEBUG_OUTPUTA
-        OutputDebugLine ( SStringX ( "[AsyncLoading] " ) ++ status );
+        OutputDebugLine ( SStringX ( "[AsyncLoading] " ) + status );
         g_pCore->GetGraphics ()->DrawText ( 10, 220, -1, 1, status );
 
         std::vector < SString > lineList;
