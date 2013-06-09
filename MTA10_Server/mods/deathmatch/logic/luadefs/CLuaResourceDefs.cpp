@@ -88,7 +88,7 @@ int CLuaResourceDefs::createResource ( lua_State* luaVM )
             return 1;
         }
     }
-    else
+    if ( argStream.HasErrors () )
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
@@ -120,7 +120,7 @@ int CLuaResourceDefs::copyResource ( lua_State* luaVM )
             return 1;
         }
     }
-    else
+    if ( argStream.HasErrors () )
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
@@ -152,7 +152,7 @@ int CLuaResourceDefs::renameResource ( lua_State* luaVM )
             return 1;
         }
     }
-    else
+    if ( argStream.HasErrors () )
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
@@ -181,7 +181,7 @@ int CLuaResourceDefs::deleteResource ( lua_State* luaVM )
             return 1;
         }
     }
-    else
+    if ( argStream.HasErrors () )
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
