@@ -156,9 +156,6 @@ void COMMAND_Help ( const char *szCmdLine )
 
 void COMMAND_Disconnect ( const char *szCmdLine )
 {
-    if ( g_pClientGame->IsWaitingForLocalConnect() )
-        g_pCore->RemoveMessageBox ();
-
     g_pCore->GetModManager ()->RequestUnload ();
 }
 

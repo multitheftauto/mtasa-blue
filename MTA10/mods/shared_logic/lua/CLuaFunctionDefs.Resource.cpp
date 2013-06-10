@@ -23,25 +23,27 @@ using std::list;
 
 int CLuaFunctionDefs::Call ( lua_State* luaVM )
 {
-    CResource * pResource = NULL;
-    SString strFunctionName = "";
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pResource );
-    argStream.ReadString ( strFunctionName );
-    if ( !argStream.HasErrors ( ) )
+    // Grab our VM
+    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+    if ( pLuaMain )
     {
-        // Grab our VM
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
-        if ( pLuaMain )
+        // Grab this resource
+        CResource* pThisResource = pLuaMain->GetResource ();
+        if ( pThisResource )
         {
-            // Grab this resource
-            CResource* pThisResource = pLuaMain->GetResource ();
-            if ( pThisResource )
+            // Typechecking
+            if ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) &&
+                lua_istype ( luaVM, 2, LUA_TSTRING ) )
             {
+                // Grab the resource
+                CResource* pResource = lua_toresource ( luaVM, 1 );
                 if ( pResource )
                 {
                     //Get the target Lua VM
                     lua_State* targetLuaVM = pResource->GetVM()->GetVM();
+
+                    // The function name
+                    const char* szFunctionName = lua_tostring ( luaVM, 2 );
 
                     // Read out the vargs
                     CLuaArguments args;
@@ -65,7 +67,7 @@ int CLuaFunctionDefs::Call ( lua_State* luaVM )
                     lua_setglobal ( targetLuaVM, "sourceResourceRoot" );
 
                     // Call the exported function with the given name and the args
-                    if ( pResource->CallExportedFunction ( strFunctionName, args, returns, *pThisResource ) )
+                    if ( pResource->CallExportedFunction ( szFunctionName, args, returns, *pThisResource ) )
                     {
                         // Push return arguments
                         returns.PushArguments ( luaVM );
@@ -86,19 +88,20 @@ int CLuaFunctionDefs::Call ( lua_State* luaVM )
 
                         OldResourceRoot.Push ( targetLuaVM );
                         lua_setglobal ( targetLuaVM, "sourceResourceRoot" );
-                        m_pScriptDebugging->LogError ( luaVM, "call: failed to call '%s:%s'", pResource->GetName (), strFunctionName );
+                        m_pScriptDebugging->LogError ( luaVM, "call: failed to call '%s:%s'", pResource->GetName (), szFunctionName );
                     }
                 }
                 else
                 {
-                    m_pScriptDebugging->LogBadType ( luaVM );
+                    m_pScriptDebugging->LogBadPointer ( luaVM, "resource", 1 );
                 }
+            }
+            else
+            {
+                m_pScriptDebugging->LogBadType ( luaVM );
             }
         }
     }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
-
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -121,8 +124,7 @@ int CLuaFunctionDefs::GetThisResource ( lua_State* luaVM )
         }
     }
 
-    // No this resource (heh that'd be strange) 
-    // Indeed it would. 08/04/2013
+    // No this resource (heh that'd be strange)
     lua_pushboolean ( luaVM, false );
     return 1;
 }
@@ -130,19 +132,16 @@ int CLuaFunctionDefs::GetThisResource ( lua_State* luaVM )
 
 int CLuaFunctionDefs::GetResourceConfig ( lua_State* luaVM )
 {
-    CScriptArgReader argStream ( luaVM );
-    if ( argStream.NextIsUserData ( ) )
+    if ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) )
         m_pScriptDebugging->LogCustom ( luaVM, "getResourceConfig may be using an outdated syntax. Please check and update." );
 
     // Resource and config name
     CResource* pResource = NULL;
-    SString strInput;
-    SString strAbsPath;
-    SString strMetaPath;
+    const char* szInput = NULL;
+    std::string strAbsPath;
+    std::string strMetaPath;
 
-    argStream.ReadString ( strInput );
-
-    if ( !argStream.HasErrors () )
+    if ( lua_istype ( luaVM, 1, LUA_TSTRING ) )
     {
         // Grab our lua main
         CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
@@ -150,37 +149,36 @@ int CLuaFunctionDefs::GetResourceConfig ( lua_State* luaVM )
         {
             // Grab resource and the config name from arg
             pResource = pLuaMain->GetResource ();
+            szInput = lua_tostring ( luaVM, 1 );
+        }
+    }
 
-            // We have both a resource file to grab the config from and a config name?
-            if ( pResource )
+    // We have both a resource file to grab the config from and a config name?
+    if ( pResource && szInput )
+    {
+        if ( CResourceManager::ParseResourcePathInput ( szInput, pResource, strAbsPath, strMetaPath ) )
+        {
+            // Loop through the configs in that resource
+            list < CResourceConfigItem* >::iterator iter = pResource->ConfigIterBegin ();
+            for ( ; iter != pResource->ConfigIterEnd (); iter++ )
             {
-                if ( CResourceManager::ParseResourcePathInput ( strInput, pResource, strAbsPath, strMetaPath ) )
+                // Matching name?
+                if ( strcmp ( (*iter)->GetShortName(), strMetaPath.c_str() ) == 0 )
                 {
-                    // Loop through the configs in that resource
-                    list < CResourceConfigItem* >::iterator iter = pResource->ConfigIterBegin ();
-                    for ( ; iter != pResource->ConfigIterEnd (); iter++ )
+                    // Return it
+                    CResourceConfigItem* pConfig = (CResourceConfigItem*) (*iter);
+                    CXMLNode* pNode = pConfig->GetRoot ();
+                    if ( pNode )
                     {
-                        // Matching name?
-                        if ( strcmp ( (*iter)->GetShortName(), strMetaPath.c_str() ) == 0 )
-                        {
-                            // Return it
-                            CResourceConfigItem* pConfig = (CResourceConfigItem*) (*iter);
-                            CXMLNode* pNode = pConfig->GetRoot ();
-                            if ( pNode )
-                            {
-                                lua_pushxmlnode ( luaVM, pNode );
-                                return 1;
-                            }
-                        }
+                        lua_pushxmlnode ( luaVM, pNode );
+                        return 1;
                     }
                 }
             }
         }
-        else
-            m_pScriptDebugging->LogBadType ( luaVM );
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -191,12 +189,10 @@ int CLuaFunctionDefs::GetResourceConfig ( lua_State* luaVM )
 int CLuaFunctionDefs::GetResourceName ( lua_State* luaVM )
 {
     // Verify arguments
-    CResource* pResource = NULL;
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pResource );
-
-    if ( !argStream.HasErrors ( ) )
+    if ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) )
     {
+        // Grab the resource argument
+        CResource* pResource = lua_toresource ( luaVM, 1 );
         if ( pResource )
         {
             // Grab its name and return it
@@ -211,7 +207,7 @@ int CLuaFunctionDefs::GetResourceName ( lua_State* luaVM )
             m_pScriptDebugging->LogBadPointer ( luaVM, "resource", 1 );
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -222,14 +218,13 @@ int CLuaFunctionDefs::GetResourceName ( lua_State* luaVM )
 int CLuaFunctionDefs::GetResourceFromName ( lua_State* luaVM )
 {
     // Verify arguments
-    SString strResourceName = "";
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadString ( strResourceName );
-
-    if ( !argStream.HasErrors ( ) )
+    if ( lua_istype ( luaVM, 1, LUA_TSTRING ) )
     {
+        // Grab the argument
+        const char* szResource = lua_tostring ( luaVM, 1 );
+
         // Try to find a resource with that name
-        CResource* pResource = m_pResourceManager->GetResource ( strResourceName );
+        CResource* pResource = m_pResourceManager->GetResource ( szResource );
         if ( pResource )
         {
             lua_pushresource ( luaVM, pResource );
@@ -237,7 +232,7 @@ int CLuaFunctionDefs::GetResourceFromName ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -247,13 +242,15 @@ int CLuaFunctionDefs::GetResourceFromName ( lua_State* luaVM )
 
 int CLuaFunctionDefs::GetResourceRootElement ( lua_State* luaVM )
 {
-    // Verify arguments
+    // Resource given?
     CResource* pResource = NULL;
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pResource, NULL );
+    if ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) )
+    {
+        pResource = lua_toresource ( luaVM, 1 );
+    }
 
     // No resource given, get this resource's root
-    if ( pResource == NULL )
+    else if ( lua_istype ( luaVM, 1, LUA_TNONE ) )
     {
         // Find our vm and get the root
         CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
@@ -262,6 +259,8 @@ int CLuaFunctionDefs::GetResourceRootElement ( lua_State* luaVM )
             pResource = pLuaMain->GetResource ();
         }
     }
+    else
+        m_pScriptDebugging->LogBadPointer ( luaVM, "resource", 1 );
 
     // Did we find a resource?
     if ( pResource )
@@ -285,13 +284,15 @@ int CLuaFunctionDefs::GetResourceRootElement ( lua_State* luaVM )
 
 int CLuaFunctionDefs::GetResourceGUIElement ( lua_State* luaVM )
 {
-    // Verify arguments
+    // Resource given?
     CResource* pResource = NULL;
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pResource, NULL );
+    if ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) )
+    {
+        pResource = lua_toresource ( luaVM, 1 );
+    }
 
     // No resource given, get this resource's root
-    if ( pResource == NULL )
+    else if ( lua_istype ( luaVM, 1, LUA_TNONE ) )
     {
         // Find our vm and get the root
         CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
@@ -300,6 +301,8 @@ int CLuaFunctionDefs::GetResourceGUIElement ( lua_State* luaVM )
             pResource = pLuaMain->GetResource ();
         }
     }
+    else
+        m_pScriptDebugging->LogBadPointer ( luaVM, "resource", 1 );
 
     // Did we get a resource?
     if ( pResource )
@@ -322,12 +325,9 @@ int CLuaFunctionDefs::GetResourceGUIElement ( lua_State* luaVM )
 
 int CLuaFunctionDefs::GetResourceDynamicElementRoot ( lua_State* luaVM )
 {
-    CResource* pResource = NULL;
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pResource );
-
-    if ( !argStream.HasErrors () )
+    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
     {
+        CResource* pResource = lua_toresource ( luaVM, 1 );
         if ( pResource )
         {
             CClientEntity* pEntity = pResource->GetResourceDynamicEntity();
@@ -343,7 +343,7 @@ int CLuaFunctionDefs::GetResourceDynamicElementRoot ( lua_State* luaVM )
             m_pScriptDebugging->LogBadPointer ( luaVM, "resource", 1 );
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -351,27 +351,24 @@ int CLuaFunctionDefs::GetResourceDynamicElementRoot ( lua_State* luaVM )
 
 int CLuaFunctionDefs::GetResourceExportedFunctions ( lua_State *luaVM )
 {
-    CResource* pResource = NULL;
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pResource, NULL );
+    CResource* resource = NULL;
     
-    // No resource given, get this resource's root
-    if ( pResource == NULL )
+    // resource
+    if ( argtype ( 1, LUA_TLIGHTUSERDATA ) )
+        resource = lua_toresource ( luaVM, 1 );
+    else if ( argtype ( 1, LUA_TNONE ) )
     {
-        // Find our vm and get the root
         CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
         if ( pLuaMain )
-        {
-            pResource = pLuaMain->GetResource ();
-        }
+            resource = pLuaMain->GetResource ();
     }
 
-    if ( pResource )
+    if ( resource )
     {
         lua_newtable ( luaVM );
         unsigned int uiIndex = 0;
-        list<CExportedFunction *>::iterator iterd = pResource->IterBeginExportedFunctions();
-        for ( ; iterd != pResource->IterEndExportedFunctions(); iterd++ )
+        list<CExportedFunction *>::iterator iterd = resource->IterBeginExportedFunctions();
+        for ( ; iterd != resource->IterEndExportedFunctions(); iterd++ )
         {
             lua_pushnumber ( luaVM, ++uiIndex );
             lua_pushstring ( luaVM, (*iterd)->GetFunctionName () );

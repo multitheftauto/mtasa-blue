@@ -53,8 +53,8 @@ class CCore;
 #define DIRECTINPUT_VERSION 0x0800
 #include <dinput.h>
 
-#define BLUE_VERSION_STRING     "Multi Theft Auto v" MTA_DM_BUILDTAG_LONG
-#define BLUE_COPYRIGHT_STRING    _td("Copyright (C) 2003 - 2013 Multi Theft Auto")
+#define BLUE_VERSION_STRING     "Multi Theft Auto v" MTA_DM_BUILDTAG_LONG "\n" \
+                                "Copyright (C) 2003 - 2013 Multi Theft Auto" \
 
 // Configuration file path (relative to Grand Theft Auto directory)
 #define MTA_CONFIG_PATH             "mta/coreconfig.xml"
@@ -78,7 +78,6 @@ class CCore;
 
 extern class CCore* g_pCore;
 extern class CGraphics* g_pGraphics;
-extern class CLocalization* g_pLocalization;
 
 class CCore : public CCoreInterface, public CSingleton < CCore >
 {
@@ -105,7 +104,6 @@ public:
     CMouseControl*          GetMouseControl                 ( void )                { return m_pMouseControl; };
     CLocalGUI*              GetLocalGUI                     ( void );
     CCommunityInterface*    GetCommunity                    ( void )                { return &m_Community; };
-    CLocalizationInterface* GetLocalization                 ( void )                { return g_pLocalization; };
 
     void                    SaveConfig                      ( void );
 
@@ -198,6 +196,8 @@ public:
     void                    DoPostFramePulse                ( void );
 
     // Events
+    bool                    OnMouseClick                    ( CGUIMouseEventArgs Args );
+    bool                    OnMouseDoubleClick              ( CGUIMouseEventArgs Args );
     void                    OnModUnload                     ( void );
 
     // Misc
@@ -256,7 +256,6 @@ public:
     void                    HandleIdlePulse                 ( void );
     void                    SetModulesLoaded                ( bool bLoaded );
     bool                    AreModulesLoaded                ( void );
-    void                    UpdateDummyProgress             ( int iPercent = -1 );
 
 private:
     // Core devices.
@@ -305,8 +304,6 @@ private:
     // Logger utility interface.
     CConsoleLogger *            m_pConsoleLogger;
 
-    CLocalization*              m_pLocalization;
-
     CKeyBinds*                  m_pKeyBinds;
     CMouseControl*              m_pMouseControl;
     
@@ -343,8 +340,6 @@ private:
     bool                        m_bGettingIdleCallsFromMultiplayer;
     bool                        m_bWindowsTimerEnabled;
     bool                        m_bModulesLoaded;
-    int                         m_iDummyProgressPercent;
-    HANDLE                      m_DummyProgressTimerHandle;
 
     // Command line
     static void                 ParseCommandLine                ( std::map < std::string, std::string > & options, const char*& szArgs, const char** pszNoValOptions = NULL );

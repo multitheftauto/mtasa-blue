@@ -186,12 +186,6 @@ void CGUIElement_Impl::GetSize ( CVector2D& vecSize, bool bRelative )
     vecSize.fY = TempSize.d_height;
 }
 
-void CGUIElement_Impl::AutoSize ( const char* Text, float fPaddingX, float fPaddingY )
-{
-    const CEGUI::Font *pFont = m_pWindow->getFont();
-    m_pWindow->setSize ( CEGUI::Absolute, CEGUI::Size ( pFont->getTextExtent ( CGUI_Impl::GetUTFString( Text ? Text : GetText() ) ) + fPaddingX, pFont->getFontHeight() + fPaddingY ) );   // Add hack factor to height to allow for long characters such as 'g' or 'j'
-}
-
 
 void CGUIElement_Impl::SetMinimumSize ( const CVector2D& vecSize )
 {
@@ -336,10 +330,6 @@ CVector2D CGUIElement_Impl::RelativeToAbsolute ( const CVector2D& Vector )
 
 void CGUIElement_Impl::SetParent ( CGUIElement* pParent )
 {
-    // Disable z-sorting if the label has a parent
-    if ( GetType() == CGUI_LABEL )
-        m_pWindow->setZOrderingEnabled ( pParent == NULL );
-
     if ( pParent )
     {
         CGUIElement_Impl* pElement = dynamic_cast < CGUIElement_Impl* > ( pParent );
@@ -518,10 +508,6 @@ void CGUIElement_Impl::SetClickHandler ( GUI_CALLBACK Callback )
     m_OnClick = Callback;
 }
 
-void CGUIElement_Impl::SetDoubleClickHandler ( GUI_CALLBACK Callback )
-{
-    m_OnDoubleClick = Callback;
-}
 
 void CGUIElement_Impl::SetMouseEnterHandler ( GUI_CALLBACK Callback )
 {
@@ -572,10 +558,13 @@ void CGUIElement_Impl::SetKeyDownHandler ( const GUI_CALLBACK_KEY & Callback )
 
 void CGUIElement_Impl::AddEvents ( void )
 {
-    // Note: Mouse Click, Double Click, Enter, Leave and ButtonDown are handled by global events in CGUI_Impl
     // Register our events
     m_pWindow->subscribeEvent ( CEGUI::Window::EventMoved, CEGUI::Event::Subscriber ( &CGUIElement_Impl::Event_OnMoved, this ) );
     m_pWindow->subscribeEvent ( CEGUI::Window::EventSized, CEGUI::Event::Subscriber ( &CGUIElement_Impl::Event_OnSized, this ) );
+    m_pWindow->subscribeEvent ( CEGUI::Window::EventMouseClick, CEGUI::Event::Subscriber ( &CGUIElement_Impl::Event_OnClick, this ) );
+    m_pWindow->subscribeEvent ( CEGUI::Window::EventMouseEnters, CEGUI::Event::Subscriber ( &CGUIElement_Impl::Event_OnMouseEnter, this ) );
+    m_pWindow->subscribeEvent ( CEGUI::Window::EventMouseLeaves, CEGUI::Event::Subscriber ( &CGUIElement_Impl::Event_OnMouseLeave, this ) );
+    m_pWindow->subscribeEvent ( CEGUI::Window::EventMouseButtonDown, CEGUI::Event::Subscriber ( &CGUIElement_Impl::Event_OnMouseButtonDown, this ) );
     m_pWindow->subscribeEvent ( CEGUI::Window::EventActivated, CEGUI::Event::Subscriber ( &CGUIElement_Impl::Event_OnActivated, this ) );
     m_pWindow->subscribeEvent ( CEGUI::Window::EventDeactivated, CEGUI::Event::Subscriber ( &CGUIElement_Impl::Event_OnDeactivated, this ) );
     m_pWindow->subscribeEvent ( CEGUI::Window::EventKeyDown, CEGUI::Event::Subscriber ( &CGUIElement_Impl::Event_OnKeyDown, this ) );
@@ -598,22 +587,15 @@ bool CGUIElement_Impl::Event_OnSized ( const CEGUI::EventArgs& e )
 }
 
 
-bool CGUIElement_Impl::Event_OnClick ( void )
+bool CGUIElement_Impl::Event_OnClick ( const CEGUI::EventArgs& e )
 {
     if ( m_OnClick )
         m_OnClick ( reinterpret_cast < CGUIElement* > ( this ) );
     return true;
 }
 
-bool CGUIElement_Impl::Event_OnDoubleClick ( void )
-{
-    if ( m_OnDoubleClick )
-        m_OnDoubleClick ( reinterpret_cast < CGUIElement* > ( this ) );
-    return true;
-}
 
-
-bool CGUIElement_Impl::Event_OnMouseEnter ( void )
+bool CGUIElement_Impl::Event_OnMouseEnter ( const CEGUI::EventArgs& e )
 {
     if ( m_OnMouseEnter )
         m_OnMouseEnter ( reinterpret_cast < CGUIElement* > ( this ) );
@@ -621,7 +603,7 @@ bool CGUIElement_Impl::Event_OnMouseEnter ( void )
 }
 
 
-bool CGUIElement_Impl::Event_OnMouseLeave ( void )
+bool CGUIElement_Impl::Event_OnMouseLeave ( const CEGUI::EventArgs& e )
 {
     if ( m_OnMouseLeave )
         m_OnMouseLeave ( reinterpret_cast < CGUIElement* > ( this ) );
@@ -629,7 +611,7 @@ bool CGUIElement_Impl::Event_OnMouseLeave ( void )
 }
 
 
-bool CGUIElement_Impl::Event_OnMouseButtonDown ( void )
+bool CGUIElement_Impl::Event_OnMouseButtonDown ( const CEGUI::EventArgs& e )
 {
     if ( m_OnMouseDown )
         m_OnMouseDown ( reinterpret_cast < CGUIElement* > ( this ) );

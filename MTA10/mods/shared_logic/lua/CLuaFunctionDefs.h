@@ -56,7 +56,6 @@ public:
     LUA_DECLARE ( AddEvent );
     LUA_DECLARE ( AddEventHandler );
     LUA_DECLARE ( RemoveEventHandler );
-    LUA_DECLARE ( GetEventHandlers );
     LUA_DECLARE ( TriggerEvent );
     LUA_DECLARE ( TriggerServerEvent );
     LUA_DECLARE ( CancelEvent );
@@ -65,9 +64,6 @@ public:
     LUA_DECLARE ( GetLatentEventHandles );
     LUA_DECLARE ( GetLatentEventStatus );
     LUA_DECLARE ( CancelLatentEvent );
-
-    // Misc functions
-    LUA_DECLARE ( DownloadFile );
 
     // Sound effects and synth functions
     LUA_DECLARE ( PlaySound );
@@ -394,7 +390,6 @@ public:
     LUA_DECLARE ( SetVehicleNitroActivated );
     LUA_DECLARE ( SetVehicleNitroCount );
     LUA_DECLARE ( SetVehicleNitroLevel );
-    LUA_DECLARE ( SetVehiclePlateText );
 
     // Object create funcs
     LUA_DECLARE ( CreateObject );
@@ -929,10 +924,6 @@ public:
     // Utility
     LUA_DECLARE ( Md5 );
     LUA_DECLARE ( Sha256 );
-    LUA_DECLARE ( TeaEncode );
-    LUA_DECLARE ( TeaDecode );
-    LUA_DECLARE ( Base64encode );
-    LUA_DECLARE ( Base64decode );
     LUA_DECLARE ( GetNetworkUsageData );
     LUA_DECLARE ( GetNetworkStats );
     LUA_DECLARE ( GetPerformanceStats );
@@ -949,12 +940,6 @@ public:
     LUA_DECLARE ( UtfSub );
     LUA_DECLARE ( UtfChar );
     LUA_DECLARE ( UtfCode );
-
-    // PCRE functions
-
-    LUA_DECLARE ( PregFind );
-    LUA_DECLARE ( PregReplace );
-    LUA_DECLARE ( PregMatch );
 
     // Voice functions
     LUA_DECLARE ( IsVoiceEnabled );

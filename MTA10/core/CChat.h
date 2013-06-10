@@ -282,7 +282,6 @@ protected:
     bool                        m_bUseCEGUI;
     CVector2D                   m_vecScale;
     float                       m_fNativeWidth;
-    float                       m_fRcpUsingFontScale;
 
     bool                        m_bCanChangeWidth;
     int                         m_iCVarsRevision;

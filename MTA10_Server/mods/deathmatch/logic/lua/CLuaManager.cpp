@@ -41,9 +41,10 @@ CLuaManager::CLuaManager ( CObjectManager* pObjectManager,
 
     // Create our lua dynamic module manager
     m_pLuaModuleManager = new CLuaModuleManager ( this );
-    m_pLuaModuleManager->SetScriptDebugging ( g_pGame->GetScriptDebugging() );
+    m_pLuaModuleManager->_SetScriptDebugging ( g_pGame->GetScriptDebugging() );
 
     // Load our C Functions into LUA and hook callback
+    CLuaCFunctions::InitializeHashMaps ();
     LoadCFunctions ();
     lua_registerPreCallHook ( CLuaDefs::CanUseFunction );
 }
@@ -91,7 +92,7 @@ CLuaMain * CLuaManager::CreateVirtualMachine ( CResource* pResourceOwner )
     m_virtualMachines.push_back ( vm );
     vm->InitVM ();
 
-    m_pLuaModuleManager->RegisterFunctions ( vm->GetVirtualMachine() );
+    m_pLuaModuleManager->_RegisterFunctions ( vm->GetVirtualMachine() );
 
     return vm;
 }
@@ -127,7 +128,7 @@ void CLuaManager::DoPulse ( void )
     {
         (*iter)->DoPulse();
     }
-    m_pLuaModuleManager->DoPulse ();
+    m_pLuaModuleManager->_DoPulse ();
 }
 
 CLuaMain* CLuaManager::GetVirtualMachine ( lua_State* luaVM )
@@ -212,7 +213,6 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "addEvent", CLuaFunctionDefinitions::AddEvent );
     CLuaCFunctions::AddFunction ( "addEventHandler", CLuaFunctionDefinitions::AddEventHandler );
     CLuaCFunctions::AddFunction ( "removeEventHandler", CLuaFunctionDefinitions::RemoveEventHandler );
-    CLuaCFunctions::AddFunction ( "getEventHandlers", CLuaFunctionDefinitions::GetEventHandlers );
     CLuaCFunctions::AddFunction ( "triggerEvent", CLuaFunctionDefinitions::TriggerEvent );
     CLuaCFunctions::AddFunction ( "triggerClientEvent", CLuaFunctionDefinitions::TriggerClientEvent );
     CLuaCFunctions::AddFunction ( "cancelEvent", CLuaFunctionDefinitions::CancelEvent );
@@ -434,7 +434,6 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "setVehicleSirens", CLuaFunctionDefinitions::SetVehicleSirens );
     CLuaCFunctions::AddFunction ( "getVehicleSirens", CLuaFunctionDefinitions::GetVehicleSirens );
     CLuaCFunctions::AddFunction ( "getVehicleSirenParams", CLuaFunctionDefinitions::GetVehicleSirenParams );
-    CLuaCFunctions::AddFunction ( "setVehiclePlateText", CLuaFunctionDefinitions::SetVehiclePlateText );
 
     // Marker functions
     CLuaCFunctions::AddFunction ( "createMarker", CLuaFunctionDefinitions::CreateMarker );
@@ -568,24 +567,6 @@ void CLuaManager::LoadCFunctions ( void )
     // Weapon funcs
     CLuaCFunctions::AddFunction ( "getWeaponNameFromID", CLuaFunctionDefinitions::GetWeaponNameFromID );
     CLuaCFunctions::AddFunction ( "getWeaponIDFromName", CLuaFunctionDefinitions::GetWeaponIDFromName );
-    CLuaCFunctions::AddFunction ( "createWeapon", CLuaFunctionDefinitions::CreateWeapon );
-    CLuaCFunctions::AddFunction ( "setWeaponProperty", CLuaFunctionDefinitions::SetWeaponProperty );
-    CLuaCFunctions::AddFunction ( "fireWeapon", CLuaFunctionDefinitions::FireWeapon );
-    CLuaCFunctions::AddFunction ( "setWeaponState", CLuaFunctionDefinitions::SetWeaponState );
-    CLuaCFunctions::AddFunction ( "getWeaponState", CLuaFunctionDefinitions::GetWeaponState );
-    CLuaCFunctions::AddFunction ( "setWeaponTarget", CLuaFunctionDefinitions::SetWeaponTarget );
-    CLuaCFunctions::AddFunction ( "getWeaponTarget", CLuaFunctionDefinitions::GetWeaponTarget );
-    CLuaCFunctions::AddFunction ( "setWeaponOwner", CLuaFunctionDefinitions::SetWeaponOwner );
-    CLuaCFunctions::AddFunction ( "getWeaponOwner", CLuaFunctionDefinitions::GetWeaponOwner );
-    CLuaCFunctions::AddFunction ( "setWeaponFlags", CLuaFunctionDefinitions::SetWeaponFlags );
-    CLuaCFunctions::AddFunction ( "getWeaponFlags", CLuaFunctionDefinitions::GetWeaponFlags );
-    CLuaCFunctions::AddFunction ( "setWeaponFiringRate", CLuaFunctionDefinitions::SetWeaponFiringRate );
-    CLuaCFunctions::AddFunction ( "getWeaponFiringRate", CLuaFunctionDefinitions::GetWeaponFiringRate );
-    CLuaCFunctions::AddFunction ( "resetWeaponFiringRate", CLuaFunctionDefinitions::ResetWeaponFiringRate );
-    CLuaCFunctions::AddFunction ( "getWeaponAmmo", CLuaFunctionDefinitions::GetWeaponAmmo );
-    CLuaCFunctions::AddFunction ( "getWeaponClipAmmo", CLuaFunctionDefinitions::GetWeaponClipAmmo );
-    CLuaCFunctions::AddFunction ( "setWeaponAmmo", CLuaFunctionDefinitions::SetWeaponAmmo );
-    CLuaCFunctions::AddFunction ( "setWeaponClipAmmo", CLuaFunctionDefinitions::SetWeaponClipAmmo );
 
     // Console funcs
     CLuaCFunctions::AddFunction ( "addCommandHandler", CLuaFunctionDefinitions::AddCommandHandler );
@@ -640,11 +621,6 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "utfCode", CLuaFunctionDefinitions::UtfCode );
 
     CLuaCFunctions::AddFunction ( "getValidPedModels", CLuaFunctionDefinitions::GetValidPedModels );
-
-    // PCRE functions
-    CLuaCFunctions::AddFunction ( "pregFind", CLuaFunctionDefinitions::PregFind );
-    CLuaCFunctions::AddFunction ( "pregReplace", CLuaFunctionDefinitions::PregReplace );
-    CLuaCFunctions::AddFunction ( "pregMatch", CLuaFunctionDefinitions::PregMatch );
 
     // Loaded map funcs
     CLuaCFunctions::AddFunction ( "getRootElement", CLuaFunctionDefinitions::GetRootElement );
@@ -769,10 +745,6 @@ void CLuaManager::LoadCFunctions ( void )
     // Utility
     CLuaCFunctions::AddFunction ( "md5", CLuaFunctionDefinitions::Md5 );
     CLuaCFunctions::AddFunction ( "sha256", CLuaFunctionDefinitions::Sha256 );
-    CLuaCFunctions::AddFunction ( "teaEncode", CLuaFunctionDefinitions::TeaEncode );
-    CLuaCFunctions::AddFunction ( "teaDecode", CLuaFunctionDefinitions::TeaDecode );
-    CLuaCFunctions::AddFunction ( "base64encode", CLuaFunctionDefinitions::Base64encode );
-    CLuaCFunctions::AddFunction ( "base64decode", CLuaFunctionDefinitions::Base64decode );
     CLuaCFunctions::AddFunction ( "getVersion", CLuaFunctionDefinitions::GetVersion );
     CLuaCFunctions::AddFunction ( "getNetworkUsageData", CLuaFunctionDefinitions::GetNetworkUsageData );
     CLuaCFunctions::AddFunction ( "getNetworkStats", CLuaFunctionDefinitions::GetNetworkStats );

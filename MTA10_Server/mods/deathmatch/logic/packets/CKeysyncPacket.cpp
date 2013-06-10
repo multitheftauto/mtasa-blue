@@ -106,7 +106,9 @@ bool CKeysyncPacket::Read ( NetBitStreamInterface& BitStream )
                     if ( !BitStream.Read ( &ammo ) )
                         return false;
 
-                    float fWeaponRange = pSourcePlayer->GetWeaponRangeFromSlot( uiSlot );
+                    eWeaponType eWeapon = static_cast < eWeaponType > ( pSourcePlayer->GetWeaponType ( uiSlot ) );
+                    float fSkill = pSourcePlayer->GetPlayerStat ( CWeaponStatManager::GetSkillStatIndex ( eWeapon ) );
+                    float fWeaponRange = g_pGame->GetWeaponStatManager ( )->GetWeaponRangeFromSkillLevel ( eWeapon, fSkill );
 
                     // Read the aim data
                     SWeaponAimSync aim ( fWeaponRange );

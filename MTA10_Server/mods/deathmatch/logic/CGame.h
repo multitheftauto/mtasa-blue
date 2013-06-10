@@ -48,14 +48,12 @@ class CGame;
 #include "packets/CKeysyncPacket.h"
 #include "packets/CBulletsyncPacket.h"
 #include "packets/CPedTaskPacket.h"
-#include "packets/CCustomWeaponBulletSyncPacket.h"
 #include "packets/CSyncSettingsPacket.h"
 #include "packets/CVehicleInOutPacket.h"
 #include "packets/CVehicleDamageSyncPacket.h"
 #include "packets/CVehicleTrailerPacket.h"
 #include "packets/CVoiceDataPacket.h"
 #include "packets/CLuaEventPacket.h"
-#include "packets/CDestroySatchelsPacket.h"
 #include "packets/CDetonateSatchelsPacket.h"
 #include "packets/CCustomDataPacket.h"
 #include "packets/CCameraSyncPacket.h"
@@ -117,7 +115,6 @@ class CWaterManager;
 class CWeaponStatManager;
 class CBuildingRemovalManager;
 
-class CCustomWeaponManager;
 
 // Packet forward declarations
 class CCommandPacket;
@@ -140,17 +137,6 @@ class CVoiceDataPacket;
 class CWeaponDamageCheckPacket;
 
 typedef SFixedArray < bool, MAX_GARAGES > SGarageStates;
-
-// CSendList - Can be used like a std::list of players for sending packets.
-//             Used to construct an optimized list of players for CGame::Broadcast
-class CSendList : public std::multimap < ushort, CPlayer* >
-{
-public:
-    void push_back( CPlayer* pPlayer )
-    {
-        MapInsert( *this, pPlayer->GetBitStreamVersion(), pPlayer );
-    }
-};
 
 class CGame
 {
@@ -252,7 +238,6 @@ public:
     inline CLightsyncManager*       GetLightSyncManager         ( void )        { return &m_lightsyncManager; }
     inline CWeaponStatManager*      GetWeaponStatManager        ( void )        { return m_pWeaponStatsManager; }
     inline CBuildingRemovalManager* GetBuildingRemovalManager   ( void )        { return m_pBuildingRemovalManager; }
-    inline CCustomWeaponManager*    GetCustomWeaponManager      ( void )        { return m_pCustomWeaponManager; }
 
     void                        JoinPlayer                  ( CPlayer& Player );
     void                        InitialDataStream           ( CPlayer& Player );
@@ -394,7 +379,9 @@ public:
 private:
     void                        AddBuiltInEvents            ( void );
     void                        RelayPlayerPuresync         ( class CPacket& Packet );
-    void                        RelayNearbyPacket           ( class CPacket& Packet );
+    void                        RelayKeysync                ( class CPacket& Packet );
+    void                        RelayBulletsync             ( class CPacket& Packet );
+    void                        RelayPedTask                ( class CPacket& Packet );
 
     void                        ProcessTrafficLights        ( unsigned long ulCurrentTime );
 
@@ -406,7 +393,6 @@ private:
     void                        Packet_PlayerTimeout        ( class CPlayerTimeoutPacket& Packet );
     void                        Packet_PlayerPuresync       ( class CPlayerPuresyncPacket& Packet );
     void                        Packet_DetonateSatchels     ( class CDetonateSatchelsPacket& Packet );
-    void                        Packet_DestroySatchels     ( class CDestroySatchelsPacket& Packet );
     void                        Packet_ExplosionSync        ( class CExplosionSyncPacket& Packet );
     void                        Packet_ProjectileSync       ( class CProjectileSyncPacket& Packet );
     void                        Packet_Command              ( class CCommandPacket& Packet );
@@ -415,7 +401,6 @@ private:
     void                        Packet_Keysync              ( class CKeysyncPacket& Packet );
     void                        Packet_Bulletsync           ( class CBulletsyncPacket& Packet );
     void                        Packet_PedTask              ( class CPedTaskPacket& Packet );
-    void                        Packet_WeaponBulletsync     ( class CCustomWeaponBulletSyncPacket& Packet );
     void                        Packet_Vehicle_InOut        ( class CVehicleInOutPacket& Packet );
     void                        Packet_VehicleTrailer       ( class CVehicleTrailerPacket& Packet );
     void                        Packet_LuaEvent             ( class CLuaEventPacket& Packet );
@@ -483,8 +468,6 @@ private:
 
     CWeaponStatManager*             m_pWeaponStatsManager;
     CBuildingRemovalManager*        m_pBuildingRemovalManager;
-
-    CCustomWeaponManager*           m_pCustomWeaponManager;
 
     char*                       m_szCurrentFileName;
 

@@ -111,7 +111,6 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
                     break;
                 }
                 case CElement::OBJECT:
-                case CElement::WEAPON:
                 {
                     CObject* pObject = static_cast < CObject* > ( pElement );
                     bCollisionsEnabled = pObject->GetCollisionEnabled ( );
@@ -172,7 +171,6 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
             switch ( ucEntityTypeID )
             {
                 case CElement::OBJECT:
-                case CElement::WEAPON:
                 {
                     CObject* pObject = static_cast < CObject* > ( pElement );
 
@@ -250,84 +248,6 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
                     SObjectHealthSync health;
                     health.data.fValue = pObject->GetHealth ();
                     BitStream.Write ( &health );
-
-                    if ( ucEntityTypeID == CElement::WEAPON )
-                    {
-                        CCustomWeapon* pWeapon = static_cast < CCustomWeapon* > ( pElement );
-                        unsigned char targetType = pWeapon->GetTargetType ( );
-                        BitStream.WriteBits ( &targetType, 3 ); // 3 bits = 4 possible values.
-
-                        switch ( targetType )
-                        {
-                            case TARGET_TYPE_FIXED:
-                            {
-                                break;
-                            }
-                            case TARGET_TYPE_ENTITY:
-                            {
-                                CElement * pTarget = pWeapon->GetElementTarget ( );
-                                ElementID targetID = pTarget->GetID ( );
-
-                                BitStream.Write ( targetID );
-                                if ( IS_PED ( pTarget ) )
-                                {
-                                    // Send full unsigned char... bone documentation looks scarce.
-                                    unsigned char ucSubTarget = pWeapon->GetTargetBone ( );
-                                    BitStream.Write ( ucSubTarget ); // Send the entire unsigned char as there are a lot of bones.
-                                }
-                                else if ( IS_VEHICLE ( pTarget ) )
-                                {
-                                    unsigned char ucSubTarget = pWeapon->GetTargetWheel ( );
-                                    BitStream.WriteBits ( &ucSubTarget, 4 ); // 4 bits = 8 possible values.
-                                }
-                                break;
-                            }
-                            case TARGET_TYPE_VECTOR:
-                            {
-                                CVector vecTarget = pWeapon->GetVectorTarget ( );
-                                BitStream.WriteVector ( vecTarget.fX, vecTarget.fY, vecTarget.fZ );
-                                break;
-                            }
-                        }
-                        bool bChanged = false;
-                        BitStream.WriteBit ( bChanged );
-                        if ( bChanged )
-                        {
-                            CWeaponStat * pWeaponStat = pWeapon->GetWeaponStat ( );
-                            unsigned short usDamage = pWeaponStat->GetDamagePerHit ( );
-                            float fAccuracy = pWeaponStat->GetAccuracy ( );
-                            float fTargetRange = pWeaponStat->GetTargetRange ( );
-                            float fWeaponRange = pWeaponStat->GetWeaponRange ( );
-                            BitStream.WriteBits ( &usDamage, 12 ); // 12 bits = 2048 values... plenty.
-                            BitStream.Write ( fAccuracy );
-                            BitStream.Write ( fTargetRange );
-                            BitStream.Write ( fWeaponRange );
-                        }
-                        SWeaponConfiguration weaponConfig = pWeapon->GetFlags ( );
-                        
-                        BitStream.WriteBit ( weaponConfig.bDisableWeaponModel );
-                        BitStream.WriteBit ( weaponConfig.bInstantReload );
-                        BitStream.WriteBit ( weaponConfig.bShootIfTargetBlocked );
-                        BitStream.WriteBit ( weaponConfig.bShootIfTargetOutOfRange );
-                        BitStream.WriteBit ( weaponConfig.flags.bCheckBuildings );
-                        BitStream.WriteBit ( weaponConfig.flags.bCheckCarTires );
-                        BitStream.WriteBit ( weaponConfig.flags.bCheckDummies );
-                        BitStream.WriteBit ( weaponConfig.flags.bCheckObjects );
-                        BitStream.WriteBit ( weaponConfig.flags.bCheckPeds );
-                        BitStream.WriteBit ( weaponConfig.flags.bCheckVehicles );
-                        BitStream.WriteBit ( weaponConfig.flags.bIgnoreSomeObjectsForCamera );
-                        BitStream.WriteBit ( weaponConfig.flags.bSeeThroughStuff );
-                        BitStream.WriteBit ( weaponConfig.flags.bShootThroughStuff );
-
-                        unsigned short usAmmo = pWeapon->GetAmmo ( );
-                        unsigned short usClipAmmo = pWeapon->GetAmmo ( );
-                        ElementID OwnerID = pWeapon->GetOwner ( ) == NULL ? INVALID_ELEMENT_ID : pWeapon->GetOwner ( )->GetID ( );
-                        unsigned char ucWeaponState = pWeapon->GetWeaponState ( );
-                        BitStream.WriteBits ( &ucWeaponState, 4 ); // 4 bits = 8 possible values for weapon state
-                        BitStream.Write ( usAmmo );
-                        BitStream.Write ( usClipAmmo );
-                        BitStream.Write ( OwnerID );
-                    }
 
                     break;
                 }
@@ -768,9 +688,6 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
                     BitStream.Write ( ucGreen );
                     BitStream.Write ( ucBlue );
                     BitStream.WriteBit ( bFriendlyFire );
-                    BitStream.Write ( pTeam->CountPlayers () );
-                    for ( list < CPlayer* >::const_iterator iter = pTeam->PlayersBegin (); iter != pTeam->PlayersEnd (); iter++ )
-                        BitStream.Write ( ( *iter )->GetID () );
 
                     break;
                 }

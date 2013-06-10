@@ -19,9 +19,10 @@ namespace
     // For timing C function calls from Lua
     struct STimingFunction
     {
-        STimingFunction ( lua_State* luaVM, lua_CFunction f, TIMEUS startTime, uint uiStartByteCount ) : luaVM ( luaVM ), f ( f ), startTime ( startTime ), uiStartByteCount ( uiStartByteCount ) {}
+        STimingFunction ( lua_State* luaVM, lua_CFunction f, CLuaCFunction* pFunction, TIMEUS startTime, uint uiStartByteCount ) : luaVM ( luaVM ), f ( f ), pFunction ( pFunction ), startTime ( startTime ), uiStartByteCount ( uiStartByteCount ) {}
         lua_State* luaVM;
         lua_CFunction f;
+        CLuaCFunction* pFunction;
         TIMEUS startTime;
         uint uiStartByteCount;
     };
@@ -121,58 +122,32 @@ bool CLuaDefs::CanUseFunction ( const char* szFunction, lua_State* luaVM, bool b
 
 int CLuaDefs::CanUseFunction ( lua_CFunction f, lua_State* luaVM )
 {
-    // Quick cull of unknown pointer range
-    if ( CLuaCFunctions::IsNotFunction( f ) )
-        return true;
-
-    // Get associated resource
-    CResource* pResource = m_pResourceManager->GetResourceFromLuaState( luaVM );
-    if ( !pResource )
-        return true;
-
-    // Check function right cache in resource
-    bool bAllowed;
-    if ( pResource->CheckFunctionRightCache( f, &bAllowed ) )
+    // Grab the function name we're calling. If it's one of our functions, see if we can use it.
+    std::string strFunction;
+    CLuaCFunction* pFunction = CLuaCFunctions::GetFunction ( f );
+    if ( pFunction )
     {
-        // If in cache, and not allowed, do warning here
-        if ( !bAllowed )
-            m_pScriptDebugging->LogBadAccess ( luaVM );
-    }
-    else
-    {
-        // If not in cache, do full check
-        bAllowed = true;
+        // If it's not one of lua's functions, see if we allow it
+        if ( !CLuaDefs::CanUseFunction ( pFunction->GetName ().c_str (), luaVM, pFunction->IsRestricted () ) )
+            return false;
 
-        // Grab the function name we're calling. If it's one of our functions, see if we can use it.
-        CLuaCFunction* pFunction = CLuaCFunctions::GetFunction ( f );
-        dassert( pFunction );
-        if ( pFunction )
+        // Check if function timing is active
+        if ( g_pStats->bFunctionTimingActive )
         {
-            // If it's not one of lua's functions, see if we allow it
-            bAllowed = CLuaDefs::CanUseFunction ( pFunction->GetName ().c_str (), luaVM/*, pResource*/, pFunction->IsRestricted () );
+            // Check if hook needs applying
+            if ( !ms_bRegisterdPostCallHook )
+            {
+                OutputDebugLine ( "[Lua] Registering PostCallHook" );
+                ms_bRegisterdPostCallHook = true;
+                lua_registerPostCallHook ( CLuaDefs::DidUseFunction );
+            }
+            // Start to time the function
+            ms_TimingFunctionStack.push_back ( STimingFunction( luaVM, f, pFunction, GetTimeUs(), g_uiNetSentByteCounter ) );
         }
-
-        // Update cache in resource
-        pResource->UpdateFunctionRightCache( f, bAllowed );
+        return true;
     }
 
-    // If not allowed, do no more
-    if ( !bAllowed )
-        return false;
-
-    // Check if function timing is active
-    if ( g_pStats->bFunctionTimingActive )
-    {
-        // Check if hook needs applying
-        if ( !ms_bRegisterdPostCallHook )
-        {
-            OutputDebugLine ( "[Lua] Registering PostCallHook" );
-            ms_bRegisterdPostCallHook = true;
-            lua_registerPostCallHook ( CLuaDefs::DidUseFunction );
-        }
-        // Start to time the function
-        ms_TimingFunctionStack.push_back ( STimingFunction( luaVM, f, GetTimeUs(), g_uiNetSentByteCounter ) );
-    }
+    // It's one of lua's functions, allow this
     return true;
 }
 
@@ -194,13 +169,9 @@ void CLuaDefs::DidUseFunction ( lua_CFunction f, lua_State* luaVM )
             // Record timing over a threshold
             if ( elapsedTime > 1000 || uiDeltaBytes > 1000 )
             {
-                CLuaCFunction* pFunction = CLuaCFunctions::GetFunction ( info.f );
-                if ( pFunction )
-                {
-                    CResource* pResource = g_pGame->GetResourceManager ()->GetResourceFromLuaState ( info.luaVM );
-                    SString strResourceName = pResource ? pResource->GetName() : "unknown";
-                    CPerfStatFunctionTiming::GetSingleton ()->UpdateTiming ( strResourceName, pFunction->GetName ().c_str (), elapsedTime, uiDeltaBytes );
-                }
+                CResource* pResource = g_pGame->GetResourceManager ()->GetResourceFromLuaState ( info.luaVM );
+                SString strResourceName = pResource ? pResource->GetName() : "unknown";
+                CPerfStatFunctionTiming::GetSingleton ()->UpdateTiming ( strResourceName, info.pFunction->GetName ().c_str (), elapsedTime, uiDeltaBytes );
             }
 
             ms_TimingFunctionStack.pop_back ();

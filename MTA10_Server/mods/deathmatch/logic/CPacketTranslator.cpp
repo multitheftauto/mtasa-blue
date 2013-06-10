@@ -77,16 +77,8 @@ CPacket* CPacketTranslator::Translate ( const NetServerPlayerID& Socket, ePacket
             pTemp = new CPedTaskPacket;
             break;
 
-        case PACKET_ID_WEAPON_BULLETSYNC:
-            pTemp = new CCustomWeaponBulletSyncPacket;
-            break;
-
         case PACKET_ID_DETONATE_SATCHELS:
             pTemp = new CDetonateSatchelsPacket;
-            break;
-
-        case PACKET_ID_DESTROY_SATCHELS:
-            pTemp = new CDestroySatchelsPacket;
             break;
 
         case PACKET_ID_COMMAND:

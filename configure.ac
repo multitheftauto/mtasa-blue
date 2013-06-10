@@ -28,7 +28,6 @@ AC_PROG_LN_S
 AC_PROG_MAKE_SET
 AC_PROG_LIBTOOL
 
-m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES])
 AM_INIT_AUTOMAKE
 AM_PROG_CC_C_O
 AC_PROG_MAKE_SET
@@ -63,7 +62,7 @@ AC_ARG_ENABLE([system-pcre],
 AC_DEFUN([USE_BUNDLED_PCRE], [
 	HAVE_BUNDLED_PCRE=yes
 	PCRE_CFLAGS="-I\$(top_builddir)/vendor/pcre"
-	PCRE_LIBS="\$(top_builddir)/vendor/pcre/libpcrecpp.la"
+	PCRE_LIBS="\$(top_builddir)/vendor/pcre/libpcre.la"
 ])
 
 if test "x$enable_system_pcre" != "xno" ; then

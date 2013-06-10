@@ -200,9 +200,6 @@ void CClientPed::Init ( CClientManager* pManager, unsigned long ulModelID, bool 
     //These two are inactive for now
     m_MovementStateNames[MOVEMENTSTATE_CRAWL]       =    "crawl";
     m_MovementStateNames[MOVEMENTSTATE_ROLL]        =    "roll";
-    m_MovementStateNames[MOVEMENTSTATE_JUMP]        =    "jump";
-    m_MovementStateNames[MOVEMENTSTATE_FALL]        =    "fall";
-    m_MovementStateNames[MOVEMENTSTATE_CLIMB]       =    "climb";
 
     // Create the player model
     if ( m_bIsLocalPlayer )
@@ -744,10 +741,8 @@ void CClientPed::SetCameraRotation ( float fRotation )
     // Local player
     if ( m_bIsLocalPlayer )
     {
-        CCam* pCam = g_pGame->GetCamera ()->GetCam ( g_pGame->GetCamera ()->GetActiveCam () );
-        float fOldHorizontal, fOldVertical;
-        pCam->GetDirection ( fOldHorizontal, fOldVertical );
-        pCam->SetDirection ( fRotation - PI/2, fOldVertical );
+        // Jax: only has an effect if CMultiplayer::SetCustomCameraRotationEnabled is called
+        g_pMultiplayer->SetLocalCameraRotation ( fRotation );
     }
     else
     {
@@ -2162,22 +2157,6 @@ eMovementState CClientPed::GetMovementState ( void )
         CControllerState cs;
         GetControllerState ( cs );
 
-        // Get his current task(s)
-        const char* szComplexTaskName = GetTaskManager()->GetActiveTask()->GetTaskName();
-        const char* szSimpleTaskName = GetTaskManager()->GetSimplestActiveTask()->GetTaskName();
-
-        // Is he climbing?
-        if ( strcmp ( szSimpleTaskName, "TASK_SIMPLE_CLIMB" ) == 0 )
-            return MOVEMENTSTATE_CLIMB;
-
-        // Is he jumping?
-        else if ( strcmp ( szComplexTaskName, "TASK_COMPLEX_JUMP" ) == 0 )
-            return MOVEMENTSTATE_JUMP;
-
-        // Is he falling?
-        else if ( !IsOnGround() && !GetContactEntity() )
-            return MOVEMENTSTATE_FALL;
-
         // Grab his controller state
         bool bWalkKey = false;
         if ( GetType () == CCLIENTPLAYER )
@@ -2209,8 +2188,6 @@ eMovementState CClientPed::GetMovementState ( void )
             // Is he moving the contoller at all?
             if ( cs.LeftStickX == 0 && cs.LeftStickY == 0 )
                 return MOVEMENTSTATE_CROUCH;
-            else
-                return MOVEMENTSTATE_CRAWL;
         }
     }
     return MOVEMENTSTATE_UNKNOWN;

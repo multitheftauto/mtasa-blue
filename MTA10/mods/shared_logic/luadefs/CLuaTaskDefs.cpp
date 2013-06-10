@@ -33,16 +33,17 @@ void CLuaTaskDefs::LoadFunctions ( void )
 
 int CLuaTaskDefs::createTaskInstance ( lua_State* luaVM )
 {
-    // Verify the argument
-    SString strTaskName = "";
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadString ( strTaskName );
+    // taskinstance createTaskInstance ( string taskname, table parameters )
+    // returns taskinstance or false on failure
 
-    if ( !argStream.HasErrors ( ) && argStream.NextIsTable ( ) )
+    // Verify types
+    if ( argtype ( 1, LUA_TSTRING ) &&
+         argtype ( 2, LUA_TTABLE ) )
     {
         // Grab the task name
         CClientTask Task ( m_pManager );
-        Task.SetTaskName ( strTaskName );
+        const char* szTaskName = lua_tostring ( luaVM, 1 );
+        Task.SetTaskName ( szTaskName );
 
         // Generate an unique identifier
         Task.SetUniqueIdentifier ( CClientTask::GenerateUniqueIdentifier () );
@@ -56,8 +57,6 @@ int CLuaTaskDefs::createTaskInstance ( lua_State* luaVM )
             return 1;
         }
     }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -70,9 +69,8 @@ int CLuaTaskDefs::getTaskName ( lua_State* luaVM )
     // string getTaskName ( taskinstance task )
     // returns a string or false on failure
 
-    CScriptArgReader argStream ( luaVM );
-
-    if ( argStream.NextIsTable ( ) )
+    // Verify types
+    if ( argtype ( 1, LUA_TTABLE ) )
     {
         // Read out the task data
         CClientTask Task ( m_pManager );
@@ -95,20 +93,19 @@ int CLuaTaskDefs::getTaskParameter ( lua_State* luaVM )
     // string getTaskParameter ( taskinstance task, string key )
     // returns a string or false on failure
 
-    CScriptArgReader argStream ( luaVM );
-
-    if ( argStream.NextIsTable ( ) && argStream.NextIsString ( 1 ) )
+    // Verify types
+    if ( argtype ( 1, LUA_TTABLE ) &&
+         argtype ( 2, LUA_TSTRING ) )
     {
         // Read out the task data
         CClientTask Task ( m_pManager );
         if ( Task.Read ( luaVM, 1, true ) )
         {
-            SString strKey = "";
             // Read out the key string
-            argStream.ReadString ( strKey );
+            const char* szKey = lua_tostring ( luaVM, 2 );
 
             // Grab the parameter
-            CLuaArgument* pValue = Task.GetParameter ( strKey );
+            CLuaArgument* pValue = Task.GetParameter ( szKey );
             if ( pValue )
             {
                 // Return it
@@ -130,9 +127,7 @@ int CLuaTaskDefs::getTaskParameters ( lua_State* luaVM )
     // returns a table or false on failure
 
     // Verify types
-    CScriptArgReader argStream ( luaVM );
-
-    if ( argStream.NextIsTable ( ) )
+    if ( argtype ( 1, LUA_TTABLE ) )
     {
         // Read out the task data
         CClientTask Task ( m_pManager );
@@ -157,9 +152,8 @@ int CLuaTaskDefs::setTaskParameters ( lua_State* luaVM )
     // returns true on success or false on failure
 
     // Verify types
-    CScriptArgReader argStream ( luaVM );
-
-    if ( argStream.NextIsTable ( ) && argStream.NextIsTable ( 1 ) )
+    if ( argtype ( 1, LUA_TTABLE ) &&
+         argtype ( 2, LUA_TTABLE ) )
     {
         // Read out the task data
         CClientTask Task ( m_pManager );
@@ -189,9 +183,7 @@ int CLuaTaskDefs::clearTaskParameters ( lua_State* luaVM )
     // returns true on success or false on failure
 
     // Verify types
-    CScriptArgReader argStream ( luaVM );
-
-    if ( argStream.NextIsTable ( ) )
+    if ( argtype ( 1, LUA_TTABLE ) )
     {
         // Read out the task data
         CClientTask Task ( m_pManager );
@@ -232,13 +224,12 @@ int CLuaTaskDefs::setPlayerTask ( lua_State* luaVM )
     // returns true on success or false on failure
 
     // Verify types
-    CClientEntity* pEntity = NULL;
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pEntity );
-
-    if ( argStream.NextIsTable ( ) )
+    if ( argtype ( 1, LUA_TLIGHTUSERDATA ) &&
+         argtype ( 2, LUA_TTABLE ) )
     {
+        // Grab the player
         // TODO: Support peds too
+        CClientEntity* pEntity = lua_toelement ( luaVM, 1 );
         if ( pEntity )
         {
             // Player?

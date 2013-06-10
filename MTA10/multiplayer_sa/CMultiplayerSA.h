@@ -51,7 +51,6 @@ public:
     void                        InitHooks_Files ( void );
     void                        InitHooks_Weapons ( void );
     void                        InitHooks_Rendering ( void );
-    void                        InitHooks_LicensePlate ( void );
     CRemoteDataStorage *        CreateRemoteDataStorage     ();
     void                        DestroyRemoteDataStorage    ( CRemoteDataStorage* pData );
     void                        AddRemoteDataStorage        ( CPlayerPed* pPed, CRemoteDataStorage* pData );
@@ -76,7 +75,6 @@ public:
     void                        DisableExplosions           ( bool bDisabled );
     void                        SetExplosionHandler         ( ExplosionHandler * pExplosionHandler );
     void                        SetDamageHandler            ( DamageHandler * pDamageHandler );
-    void                        SetDeathHandler             ( DeathHandler * pDeathHandler );
     void                        SetProjectileHandler        ( ProjectileHandler * pProjectileHandler );
     void                        SetProjectileStopHandler    ( ProjectileStopHandler * pProjectileHandler );
     void                        SetFireHandler              ( FireHandler * pFireHandler );

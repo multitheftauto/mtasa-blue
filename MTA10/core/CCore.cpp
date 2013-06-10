@@ -111,10 +111,6 @@ CCore::CCore ( void )
     };
     ParseCommandLine ( m_CommandLineOptions, m_szCommandLineArgs, pszNoValOptions );
 
-    // Load our settings and localization as early as possible
-    CreateXML ( );
-    g_pLocalization = new CLocalization;
-
     // Create a logger instance.
     m_pConsoleLogger            = new CConsoleLogger ( );
 
@@ -828,7 +824,7 @@ T* InitModule ( CModuleLoader& m_Loader, const SString& strName, const SString& 
 
     if ( pfnInit == NULL )
     {
-        MessageBoxUTF8 ( 0, SString(_("%s module is incorrect!"),*strName), "Error"+_E("CC40"), MB_OK | MB_ICONEXCLAMATION | MB_TOPMOST  );
+        MessageBox ( 0, strName + " module is incorrect!", "Error", MB_OK | MB_ICONEXCLAMATION | MB_TOPMOST  );
         TerminateProcess ( GetCurrentProcess (), 1 );
     }
 
@@ -945,27 +941,21 @@ void CCore::CreateNetwork ( )
 
 void CCore::CreateXML ( )
 {
-    if ( !m_pXML )
-        m_pXML = CreateModule < CXML > ( m_XMLModule, "XML", "xmll", "InitXMLInterface", this );
-
-    if ( !m_pConfigFile )
-    {
-        // Load config XML file
-        m_pConfigFile = m_pXML->CreateXML ( CalcMTASAPath ( MTA_CONFIG_PATH ) );
-        if ( !m_pConfigFile ) {
-            assert ( false );
-            return;
-        }
-
-        m_pConfigFile->Parse ();
+    m_pXML = CreateModule < CXML > ( m_XMLModule, "XML", "xmll", "InitXMLInterface", this );
+   
+    // Load config XML file
+    m_pConfigFile = m_pXML->CreateXML ( CalcMTASAPath ( MTA_CONFIG_PATH ) );
+    if ( !m_pConfigFile ) {
+        assert ( false );
+        return;
     }
+    m_pConfigFile->Parse ();
 
     // Load the keybinds (loads defaults if the subnode doesn't exist)
-    if ( m_pKeyBinds )
-    {
-        m_pKeyBinds->LoadFromXML ( GetConfig ()->FindSubNode ( CONFIG_NODE_KEYBINDS ) );
-        m_pKeyBinds->LoadDefaultCommands( false );
-    }
+    GetKeyBinds ()->LoadFromXML ( GetConfig ()->FindSubNode ( CONFIG_NODE_KEYBINDS ) );
+
+    // Load the default commandbinds if not exist
+    GetKeyBinds ()->LoadDefaultCommands( false );
 
     // Load XML-dependant subsystems
     m_ClientVariables.Load ( );
@@ -1097,6 +1087,8 @@ void CCore::DoPostFramePulse ( )
         ApplyConsoleSettings ();
         ApplyGameSettings ();
 
+        m_pGUI->SetMouseClickHandler ( INPUT_CORE, GUI_CALLBACK_MOUSE ( &CCore::OnMouseClick, this ) );
+        m_pGUI->SetMouseDoubleClickHandler ( INPUT_CORE, GUI_CALLBACK_MOUSE ( &CCore::OnMouseDoubleClick, this ) );
         m_pGUI->SelectInputHandlers( INPUT_CORE );
 
         m_Community.Initialize ();
@@ -1139,7 +1131,7 @@ void CCore::DoPostFramePulse ( )
                     // Run the connect command
                     if ( strArguments.length () > 0 && !m_pCommands->Execute ( strArguments ) )
                     {
-                        ShowMessageBox ( _("Error")+_E("CC41"), _("Error executing URL"), MB_BUTTON_OK | MB_ICON_ERROR );
+                        ShowMessageBox ( "Error", "Error executing URL", MB_BUTTON_OK | MB_ICON_ERROR );
                     }
                 }
                 else
@@ -1151,8 +1143,8 @@ void CCore::DoPostFramePulse ( )
                         // Try to load the mod
                         if ( !m_pModManager->Load ( szOptionValue, m_szCommandLineArgs ) )
                         {
-                            SString strTemp ( _("Error running mod specified in command line ('%s')"), szOptionValue );
-                            ShowMessageBox ( _("Error")+_E("CC42"), strTemp, MB_BUTTON_OK | MB_ICON_ERROR ); // Command line Mod load failed
+                            SString strTemp ( "Error running mod specified in command line ('%s')", szOptionValue );
+                            ShowMessageBox ( "Error", strTemp, MB_BUTTON_OK | MB_ICON_ERROR );
                         }
                     }
                     // We want to connect to a server?
@@ -1260,14 +1252,14 @@ void CCore::RegisterCommands ( )
 {
     //m_pCommands->Add ( "e", CCommandFuncs::Editor );
     //m_pCommands->Add ( "clear", CCommandFuncs::Clear );
-    m_pCommands->Add ( "help",              _("this help screen"),                 CCommandFuncs::Help );
-    m_pCommands->Add ( "exit",              _("exits the application"),            CCommandFuncs::Exit );
-    m_pCommands->Add ( "quit",              _("exits the application"),            CCommandFuncs::Exit );
-    m_pCommands->Add ( "ver",               _("shows the version"),                CCommandFuncs::Ver );
-    m_pCommands->Add ( "time",              _("shows the time"),                   CCommandFuncs::Time );
-    m_pCommands->Add ( "showhud",           _("shows the hud"),                    CCommandFuncs::HUD );
-    m_pCommands->Add ( "binds",             _("shows all the binds"),              CCommandFuncs::Binds );
-    m_pCommands->Add ( "serial",            _("shows your serial"),                CCommandFuncs::Serial );
+    m_pCommands->Add ( "help",              "this help screen",                 CCommandFuncs::Help );
+    m_pCommands->Add ( "exit",              "exits the application",            CCommandFuncs::Exit );
+    m_pCommands->Add ( "quit",              "exits the application",            CCommandFuncs::Exit );
+    m_pCommands->Add ( "ver",               "shows the version",                CCommandFuncs::Ver );
+    m_pCommands->Add ( "time",              "shows the time",                   CCommandFuncs::Time );
+    m_pCommands->Add ( "showhud",           "shows the hud",                    CCommandFuncs::HUD );
+    m_pCommands->Add ( "binds",             "shows all the binds",              CCommandFuncs::Binds );
+    m_pCommands->Add ( "serial",            "shows your serial",                CCommandFuncs::Serial );
 
 #if 0
     m_pCommands->Add ( "vid",               "changes the video settings (id)",  CCommandFuncs::Vid );
@@ -1276,23 +1268,23 @@ void CCore::RegisterCommands ( )
     m_pCommands->Add ( "unload",            "unloads a mod (name)",             CCommandFuncs::Unload );
 #endif
 
-    m_pCommands->Add ( "connect",           _("connects to a server (host port nick pass)"),   CCommandFuncs::Connect );
-    m_pCommands->Add ( "reconnect",         _("connects to a previous server"),    CCommandFuncs::Reconnect );
-    m_pCommands->Add ( "bind",              _("binds a key (key control)"),        CCommandFuncs::Bind );
-    m_pCommands->Add ( "unbind",            _("unbinds a key (key)"),              CCommandFuncs::Unbind );
-    m_pCommands->Add ( "copygtacontrols",   _("copies the default gta controls"),  CCommandFuncs::CopyGTAControls );
-    m_pCommands->Add ( "screenshot",        _("outputs a screenshot"),             CCommandFuncs::ScreenShot );
-    m_pCommands->Add ( "saveconfig",        _("immediately saves the config"),     CCommandFuncs::SaveConfig );
+    m_pCommands->Add ( "connect",           "connects to a server (host port nick pass)",   CCommandFuncs::Connect );
+    m_pCommands->Add ( "reconnect",         "connects to a previous server",    CCommandFuncs::Reconnect );
+    m_pCommands->Add ( "bind",              "binds a key (key control)",        CCommandFuncs::Bind );
+    m_pCommands->Add ( "unbind",            "unbinds a key (key)",              CCommandFuncs::Unbind );
+    m_pCommands->Add ( "copygtacontrols",   "copies the default gta controls",  CCommandFuncs::CopyGTAControls );
+    m_pCommands->Add ( "screenshot",        "outputs a screenshot",             CCommandFuncs::ScreenShot );
+    m_pCommands->Add ( "saveconfig",        "immediately saves the config",     CCommandFuncs::SaveConfig );
 
-    m_pCommands->Add ( "cleardebug",        _("clears the debug view"),            CCommandFuncs::DebugClear );
-    m_pCommands->Add ( "chatscrollup",      _("scrolls the chatbox upwards"),      CCommandFuncs::ChatScrollUp );
-    m_pCommands->Add ( "chatscrolldown",    _("scrolls the chatbox downwards"),    CCommandFuncs::ChatScrollDown );
-    m_pCommands->Add ( "debugscrollup",     _("scrolls the debug view upwards"),   CCommandFuncs::DebugScrollUp );
-    m_pCommands->Add ( "debugscrolldown",   _("scrolls the debug view downwards"), CCommandFuncs::DebugScrollDown );
+    m_pCommands->Add ( "cleardebug",        "clears the debug view",            CCommandFuncs::DebugClear );
+    m_pCommands->Add ( "chatscrollup",      "scrolls the chatbox upwards",      CCommandFuncs::ChatScrollUp );
+    m_pCommands->Add ( "chatscrolldown",    "scrolls the chatbox downwards",    CCommandFuncs::ChatScrollDown );
+    m_pCommands->Add ( "debugscrollup",     "scrolls the debug view upwards",   CCommandFuncs::DebugScrollUp );
+    m_pCommands->Add ( "debugscrolldown",   "scrolls the debug view downwards", CCommandFuncs::DebugScrollDown );
 
     m_pCommands->Add ( "test",              "",                                 CCommandFuncs::Test );
-    m_pCommands->Add ( "showmemstat",       _("shows the memory statistics"),      CCommandFuncs::ShowMemStat );
-    m_pCommands->Add ( "showframegraph",    _("shows the frame timing graph"),     CCommandFuncs::ShowFrameGraph );
+    m_pCommands->Add ( "showmemstat",       "shows the memory statistics",      CCommandFuncs::ShowMemStat );
+    m_pCommands->Add ( "showframegraph",    "shows the frame timing graph",     CCommandFuncs::ShowFrameGraph );
 
 #if defined(MTA_DEBUG) || defined(MTA_BETA)
     m_pCommands->Add ( "fakelag",           "",                                 CCommandFuncs::FakeLag );
@@ -1377,6 +1369,29 @@ void CCore::Quit ( bool bInstantly )
     {
         m_bQuitOnPulse = true;
     }
+}
+
+
+bool CCore::OnMouseClick ( CGUIMouseEventArgs Args )
+{
+    bool bHandled = false;
+
+    bHandled = m_pLocalGUI->GetMainMenu ()->GetServerBrowser ()->OnMouseClick ( Args );     // CServerBrowser
+
+    return bHandled;
+}
+
+
+bool CCore::OnMouseDoubleClick ( CGUIMouseEventArgs Args )
+{
+    bool bHandled = false;
+
+    // Call the event handlers, where necessary
+    bHandled =
+        m_pLocalGUI->GetMainMenu ()->GetSettingsWindow ()->OnMouseDoubleClick ( Args ) |    // CSettings
+        m_pLocalGUI->GetMainMenu ()->GetServerBrowser ()->OnMouseDoubleClick ( Args );      // CServerBrowser
+    
+    return bHandled;
 }
 
 
@@ -2194,40 +2209,4 @@ void CCore::SetModulesLoaded( bool bLoaded )
 bool CCore::AreModulesLoaded( void )
 {
     return m_bModulesLoaded;
-}
-
-//
-// Handle dummy progress when game seems stalled
-//
-int ms_iDummyProgressTimerCounter = 0;
-
-void CALLBACK TimerProc( void* lpParametar, BOOLEAN TimerOrWaitFired )
-{
-    ms_iDummyProgressTimerCounter++;
-}
-
-//
-// Refresh progress output
-//
-void CCore::UpdateDummyProgress( int iPercent )
-{
-    if ( iPercent != -1 )
-        m_iDummyProgressPercent = iPercent;
-
-    if ( m_DummyProgressTimerHandle == NULL )
-    {
-        // Using this timer is quicker than checking tick count with every call to UpdateDummyProgress()
-        ::CreateTimerQueueTimer( &m_DummyProgressTimerHandle, NULL, TimerProc, this, DUMMY_PROGRESS_ANIMATION_INTERVAL, DUMMY_PROGRESS_ANIMATION_INTERVAL, WT_EXECUTEINTIMERTHREAD );
-    }
-
-    if ( !ms_iDummyProgressTimerCounter )
-        return;
-    ms_iDummyProgressTimerCounter = 0;
-
-    // Compose message with amount
-    SString strMessage;
-    if ( m_iDummyProgressPercent )
-        strMessage = SString( "%d%%", m_iDummyProgressPercent );
-
-    CGraphics::GetSingleton().SetProgressMessage( strMessage );
 }

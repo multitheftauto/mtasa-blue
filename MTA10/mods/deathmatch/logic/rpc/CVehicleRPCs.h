@@ -56,7 +56,6 @@ public:
     DECLARE_ELEMENT_RPC ( GiveVehicleSirens );
     DECLARE_ELEMENT_RPC ( RemoveVehicleSirens );
     DECLARE_ELEMENT_RPC ( SetVehicleSirens );
-    DECLARE_ELEMENT_RPC ( SetVehiclePlateText );
 };
 
 #endif

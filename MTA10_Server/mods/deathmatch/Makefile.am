@@ -71,14 +71,13 @@ LOGIC = \
 ./logic/CColTube.cpp \
 ./logic/CCommandFile.cpp \
 ./logic/CCommandLineParser.cpp \
+./logic/CConfig.cpp \
 ./logic/CConnectHistory.cpp \
 ./logic/CConsole.cpp \
 ./logic/CConsoleClient.cpp \
 ./logic/CConsoleCommand.cpp \
 ./logic/CConsoleCommands.cpp \
 ./logic/CCustomData.cpp \
-./logic/CCustomWeapon.cpp \
-./logic/CCustomWeaponManager.cpp \
 ./logic/CDummy.cpp \
 ./logic/CDatabaseConnectionSqlite.cpp \
 ./logic/CDatabaseJobQueue.cpp \
@@ -190,7 +189,6 @@ LOGIC = \
 ./logic/lua/CLuaFunctionRef.cpp \
 ./logic/lua/CLuaMain.cpp \
 ./logic/lua/CLuaManager.cpp \
-./logic/lua/CLuaModule.cpp \
 ./logic/lua/CLuaModuleManager.cpp \
 ./logic/lua/CLuaTimer.cpp \
 ./logic/lua/CLuaTimerManager.cpp \
@@ -199,7 +197,6 @@ LOGIC = \
 ./logic/luadefs/CLuaACLDefs.cpp \
 ./logic/luadefs/CLuaBitDefs.cpp \
 ./logic/luadefs/CLuaCameraDefs.cpp \
-./logic/luadefs/CLuaClassDefs.cpp \
 ./logic/luadefs/CLuaDefs.cpp \
 ./logic/luadefs/CLuaElementDefs.cpp \
 ./logic/luadefs/CLuaFileDefs.cpp \
@@ -216,9 +213,7 @@ LOGIC = \
 ./logic/packets/CCommandPacket.cpp \
 ./logic/packets/CConsoleEchoPacket.cpp \
 ./logic/packets/CCustomDataPacket.cpp \
-./logic/packets/CCustomWeaponBulletSyncPacket.cpp \
 ./logic/packets/CDebugEchoPacket.cpp \
-./logic/packets/CDestroySatchelsPacket.cpp \
 ./logic/packets/CDetonateSatchelsPacket.cpp \
 ./logic/packets/CEntityAddPacket.cpp \
 ./logic/packets/CEntityRemovePacket.cpp \
@@ -284,8 +279,7 @@ LOGIC = \
 ./logic/net/CSimPlayerPuresyncPacket.cpp \
 ./logic/net/CSimVehiclePuresyncPacket.cpp \
 ./logic/net/CSimKeysyncPacket.cpp \
-./logic/net/CSimBulletsyncPacket.cpp \
-./logic/net/CSimPedTaskPacket.cpp
+./logic/net/CSimBulletsyncPacket.cpp
 
 if PRECOMPILE_HEADERS
 BUILT_SOURCES = StdInc.h.gch

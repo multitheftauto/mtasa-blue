@@ -64,7 +64,7 @@ CClientEntity::CClientEntity ( ElementID ID )
     g_pClientGame->GetGameEntityXRefManager ()->OnClientEntityCreate ( this );
 
     m_bWorldIgnored = false;
-    g_pCore->UpdateDummyProgress();
+
 }
 
 
@@ -174,7 +174,6 @@ CClientEntity::~CClientEntity ( void )
 
     g_pClientGame->GetGameEntityXRefManager ()->OnClientEntityDelete ( this );
     g_pCore->GetGraphics ()->GetRenderItemManager ()->RemoveClientEntityRefs ( this );
-    g_pCore->UpdateDummyProgress();
 }
 
 
@@ -566,13 +565,6 @@ bool CClientEntity::GetMatrix ( CMatrix& matrix ) const
     // When streamed out
     CVector vecRotation;
     GetRotationRadians ( vecRotation );
-
-    // Change rotation order so it works correctly for CClientObjects
-    // Any maybe other types that don't have a GetMatrix() override - Needs checking.
-    ConvertRadiansToDegreesNoWrap( vecRotation );
-    vecRotation = ConvertEulerRotationOrder( vecRotation, EULER_ZXY, EULER_MINUS_ZYX );
-    ConvertDegreesToRadiansNoWrap( vecRotation );
-
     g_pMultiplayer->ConvertEulerAnglesToMatrix ( matrix, vecRotation.fX, vecRotation.fY, vecRotation.fZ );
     GetPosition ( matrix.vPos );
     return true;
@@ -592,13 +584,6 @@ bool CClientEntity::SetMatrix ( const CMatrix& matrix )
     SetPosition ( matrix.vPos );
     CVector vecRotation;
     g_pMultiplayer->ConvertMatrixToEulerAngles ( matrix, vecRotation.fX, vecRotation.fY, vecRotation.fZ );
-
-    // Change rotation order so it works correctly for CClientObjects
-    // Any maybe other types that don't have a SetMatrix() override - Needs checking.
-    ConvertRadiansToDegreesNoWrap( vecRotation );
-    vecRotation = ConvertEulerRotationOrder( vecRotation, EULER_MINUS_ZYX, EULER_ZXY );
-    ConvertDegreesToRadiansNoWrap( vecRotation );
-
     SetRotationRadians ( vecRotation );
     return true;
 }

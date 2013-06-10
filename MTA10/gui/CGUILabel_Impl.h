@@ -26,6 +26,7 @@ public:
                             ~CGUILabel_Impl             ( void );
 
     void                    SetText                     ( const char* Text );
+    void                    AutoSize                    ( const char* Text );
 
     void                    SetVerticalAlign            ( CGUIVerticalAlign eAlign );
     CGUIVerticalAlign       GetVerticalAlign            ( void );

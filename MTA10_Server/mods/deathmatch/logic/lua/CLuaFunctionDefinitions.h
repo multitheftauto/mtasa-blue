@@ -63,7 +63,6 @@ public:
     static int      AddEvent                            ( lua_State* luaVM );
     static int      AddEventHandler                     ( lua_State* luaVM );
     static int      RemoveEventHandler                  ( lua_State* luaVM );
-    static int      GetEventHandlers                    ( lua_State* luaVM );
     static int      TriggerEvent                        ( lua_State* luaVM );
     static int      TriggerClientEvent                  ( lua_State* luaVM );
     static int      CancelEvent                         ( lua_State* luaVM );
@@ -280,7 +279,6 @@ public:
     static int      SetVehicleSirens                    ( lua_State* luaVM );
     static int      GetVehicleSirens                    ( lua_State* luaVM );
     static int      GetVehicleSirenParams               ( lua_State* luaVM );
-    static int      SetVehiclePlateText                 ( lua_State* luaVM );
 
     // Marker create/destroy functions
     static int      CreateMarker                        ( lua_State* luaVM );
@@ -411,24 +409,8 @@ public:
     static int      ResetWaterColor                     ( lua_State* luaVM );
 
     // Weapon funcs
-    static int      CreateWeapon                        ( lua_State* luaVM );
     static int      GetWeaponNameFromID                 ( lua_State* luaVM );
     static int      GetWeaponIDFromName                 ( lua_State* luaVM );
-    static int      FireWeapon                          ( lua_State* luaVM );
-    static int      SetWeaponState                      ( lua_State* luaVM );
-    static int      GetWeaponState                      ( lua_State* luaVM );
-    static int      SetWeaponTarget                     ( lua_State* luaVM );
-    static int      GetWeaponTarget                     ( lua_State* luaVM );
-    static int      SetWeaponOwner                      ( lua_State* luaVM );
-    static int      GetWeaponOwner                      ( lua_State* luaVM );
-    static int      SetWeaponFlags                      ( lua_State* luaVM );
-    static int      GetWeaponFlags                      ( lua_State* luaVM );
-    static int      SetWeaponFiringRate                 ( lua_State* luaVM );
-    static int      GetWeaponFiringRate                 ( lua_State* luaVM );
-    static int      ResetWeaponFiringRate               ( lua_State* luaVM );
-    static int      GetWeaponAmmo                       ( lua_State* luaVM );
-    static int      GetWeaponClipAmmo                   ( lua_State* luaVM );
-    static int      SetWeaponClipAmmo                   ( lua_State* luaVM );
 
     // Console functions
     static int      AddCommandHandler                   ( lua_State* luaVM );
@@ -483,11 +465,6 @@ public:
     static int      UtfChar                             ( lua_State* luaVM );
     static int      UtfCode                             ( lua_State* luaVM );
     static int      GetValidPedModels                   ( lua_State* luaVM );
-
-    // PCRE functions
-    static int      PregFind                            ( lua_State* luaVM );
-    static int      PregReplace                         ( lua_State* luaVM );
-    static int      PregMatch                           ( lua_State* luaVM );
 
     // Loaded Map Functions
     static int      GetRootElement                      ( lua_State* luaVM );
@@ -585,10 +562,6 @@ public:
     // Utility
     static int      Md5                                 ( lua_State* luaVM );
     static int      Sha256                              ( lua_State* luaVM );
-    static int      TeaEncode                           ( lua_State* luaVM );
-    static int      TeaDecode                           ( lua_State* luaVM );
-    static int      Base64encode                        ( lua_State* luaVM );
-    static int      Base64decode                        ( lua_State* luaVM );
     static int      GetNetworkUsageData                 ( lua_State* luaVM );
     static int      GetNetworkStats                     ( lua_State* luaVM );
     static int      GetVersion                          ( lua_State* luaVM );

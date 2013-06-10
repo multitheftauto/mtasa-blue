@@ -22,6 +22,61 @@
 
 #pragma message(__LOC__"Use RTTI/dynamic_casting here for safety?")
 
+// Lua push/pop macros for our datatypes
+CClientRadarMarker* lua_toblip ( lua_State* luaVM, int iArgument )
+{
+    CClientEntity* pElement = lua_toelement ( luaVM, iArgument );
+    if ( pElement && pElement->GetType () == CCLIENTRADARMARKER )
+    {
+        return static_cast < CClientRadarMarker* > ( pElement );
+    }
+
+    return NULL;
+}
+
+
+CClientColModel* lua_tocolmodel ( lua_State* luaVM, int iArgument )
+{
+    CClientEntity* pElement = lua_toelement ( luaVM, iArgument );
+    if ( pElement && pElement->GetType () == CCLIENTCOL )
+    {
+        return static_cast < CClientColModel* > ( pElement );
+    }
+
+    return NULL;
+}
+
+CClientColShape* lua_tocolshape ( lua_State* luaVM, int iArgument )
+{
+    CClientEntity* pElement = lua_toelement ( luaVM, iArgument );
+    if ( pElement && pElement->GetType () == CCLIENTCOLSHAPE )
+    {
+        return static_cast < CClientColShape* > ( pElement );
+    }
+
+    return NULL;
+}
+
+CScriptFile* lua_tofile ( lua_State* luaVM, int iArgument )
+{
+    CClientEntity* pElement = lua_toelement ( luaVM, iArgument );
+    if ( pElement && pElement->GetType () == SCRIPTFILE )
+        return static_cast < CScriptFile* > ( pElement );
+    else
+        return NULL;
+}
+
+CClientDFF* lua_todff ( lua_State* luaVM, int iArgument )
+{
+    CClientEntity* pElement = lua_toelement ( luaVM, iArgument );
+    if ( pElement && pElement->GetType () == CCLIENTDFF )
+    {
+        return static_cast < CClientDFF* > ( pElement );
+    }
+
+    return NULL;
+}
+
 CClientEntity* lua_toelement ( lua_State* luaVM, int iArgument )
 {
     if ( lua_type ( luaVM, iArgument ) == LUA_TLIGHTUSERDATA )
@@ -32,16 +87,153 @@ CClientEntity* lua_toelement ( lua_State* luaVM, int iArgument )
             return NULL;
         return pEntity;
     }
-    else if ( lua_type ( luaVM, iArgument ) == LUA_TUSERDATA )
+
+    return NULL;
+}
+
+CClientGUIElement* lua_toguielement ( lua_State* luaVM, int iArgument )
+{
+    CClientEntity* pElement = lua_toelement ( luaVM, iArgument );
+    if ( pElement && pElement->GetType () == CCLIENTGUI )
     {
-        ElementID ID = TO_ELEMENTID ( * ( ( void ** ) lua_touserdata ( luaVM, iArgument ) ) );
-        CClientEntity* pEntity = CElementIDs::GetElement ( ID );
-        if ( !pEntity || pEntity->IsBeingDeleted () )
-            return NULL;
-        return pEntity;
+        return static_cast < CClientGUIElement* > ( pElement );
     }
 
     return NULL;
+}
+
+CClientMarker* lua_tomarker ( lua_State* luaVM, int iArgument )
+{
+    CClientEntity* pElement = lua_toelement ( luaVM, iArgument );
+    if ( pElement && pElement->GetType () == CCLIENTMARKER )
+    {
+        return static_cast < CClientMarker* > ( pElement );
+    }
+
+    return NULL;
+}
+
+CClientObject* lua_toobject ( lua_State* luaVM, int iArgument )
+{
+    CClientEntity* pElement = lua_toelement ( luaVM, iArgument );
+    if ( pElement && pElement->GetType () == CCLIENTOBJECT )
+    {
+        return static_cast < CClientObject* > ( pElement );
+    }
+
+    return NULL;
+}
+
+CClientPed* lua_toped ( lua_State* luaVM, int iArgument )
+{
+    CClientEntity* pElement = lua_toelement ( luaVM, iArgument );
+    if ( pElement )
+    {
+        eClientEntityType eType = pElement->GetType ();
+        if ( eType == CCLIENTPED || eType == CCLIENTPLAYER )
+            return static_cast < CClientPed* > ( pElement );
+    }
+
+    return NULL;
+}
+
+CClientPickup* lua_topickup ( lua_State* luaVM, int iArgument )
+{
+    CClientEntity* pElement = lua_toelement ( luaVM, iArgument );
+    if ( pElement && pElement->GetType () == CCLIENTPICKUP )
+    {
+        return static_cast < CClientPickup* > ( pElement );
+    }
+
+    return NULL;
+}
+
+CClientPlayer* lua_toplayer ( lua_State* luaVM, int iArgument )
+{
+    CClientEntity* pElement = lua_toelement ( luaVM, iArgument );
+    if ( pElement && pElement->GetType () == CCLIENTPLAYER )
+    {
+        return static_cast < CClientPlayer* > ( pElement );
+    }
+
+    return NULL;
+}
+
+CClientProjectile* lua_toprojectile ( lua_State* luaVM, int iArgument )
+{
+    CClientEntity* pElement = lua_toelement ( luaVM, iArgument );
+    if ( pElement && pElement->GetType () == CCLIENTPROJECTILE )
+    {
+        return static_cast < CClientProjectile* > ( pElement );
+    }
+
+    return NULL;
+}
+
+CResource* lua_toresource ( lua_State* luaVM, int iArgument )
+{
+    return g_pClientGame->GetResourceManager ()->GetResourceFromScriptID ( reinterpret_cast < unsigned long > ( lua_touserdata ( luaVM, iArgument ) ) );
+}
+
+
+CClientTeam* lua_toteam ( lua_State* luaVM, int iArgument )
+{
+    CClientEntity* pElement = lua_toelement ( luaVM, iArgument );
+    if ( pElement && pElement->GetType () == CCLIENTTEAM )
+    {
+        return static_cast < CClientTeam* > ( pElement );
+    }
+
+    return NULL;
+}
+
+CClientTXD* lua_totxd ( lua_State* luaVM, int iArgument )
+{
+    CClientEntity* pElement = lua_toelement ( luaVM, iArgument );
+    if ( pElement && pElement->GetType () == CCLIENTTXD )
+    {
+        return static_cast < CClientTXD* > ( pElement );
+    }
+
+    return NULL;
+}
+
+CClientVehicle* lua_tovehicle ( lua_State* luaVM, int iArgument )
+{
+    CClientEntity* pElement = lua_toelement ( luaVM, iArgument );
+    if ( pElement && pElement->GetType () == CCLIENTVEHICLE )
+    {
+        return static_cast < CClientVehicle* > ( pElement );
+    }
+
+    return NULL;
+}
+
+CClientWater* lua_towater ( lua_State* luaVM, int iArgument )
+{
+    CClientEntity* pElement = lua_toelement ( luaVM, iArgument );
+    if ( pElement && pElement->GetType () == CCLIENTWATER )
+    {
+        return static_cast < CClientWater* > ( pElement );
+    }
+
+    return NULL;
+}
+
+CClientWeapon* lua_toweapon ( lua_State* luaVM, int iArgument )
+{
+    CClientEntity* pElement = lua_toelement ( luaVM, iArgument );
+    if ( pElement && pElement->GetType () == CCLIENTWEAPON )
+    {
+        return static_cast < CClientWeapon* > ( pElement );
+    }
+
+    return NULL;
+}
+
+CXMLNode* lua_toxmlnode ( lua_State* luaVM, int iArgument )
+{
+    return g_pCore->GetXML ()->GetNodeFromID ( reinterpret_cast < unsigned long > ( lua_touserdata ( luaVM, iArgument ) ) );
 }
 
 void lua_pushelement ( lua_State* luaVM, CClientEntity* pElement )
@@ -51,12 +243,7 @@ void lua_pushelement ( lua_State* luaVM, CClientEntity* pElement )
         ElementID ID = pElement->GetID ();
         if ( ID != INVALID_ELEMENT_ID )
         {
-            const char* szClass = NULL;
-            CLuaMain* pLuaMain = g_pClientGame->GetLuaManager ()->GetVirtualMachine ( luaVM );
-            if ( pLuaMain->IsOOPEnabled () )
-                szClass = CLuaClassDefs::GetEntityClass ( pElement );
-
-            lua_pushobject ( luaVM, szClass, ( void* ) reinterpret_cast < unsigned int * > ( ID.Value () ) );
+            lua_pushlightuserdata ( luaVM, (void*) reinterpret_cast<unsigned int *>(ID.Value()) );
             return;
         }
     }
@@ -66,96 +253,29 @@ void lua_pushelement ( lua_State* luaVM, CClientEntity* pElement )
 
 void lua_pushresource ( lua_State* luaVM, CResource* pResource )
 {
-    const char* szClass = NULL;
-    CLuaMain* pLuaMain = g_pClientGame->GetLuaManager ()->GetVirtualMachine ( luaVM );
-    if ( pLuaMain->IsOOPEnabled () )
-        szClass = CLuaClassDefs::GetResourceClass ( pResource );
-
-    lua_pushobject ( luaVM, szClass, ( void* ) reinterpret_cast < unsigned int * > ( pResource->GetScriptID () ) );
+    lua_pushlightuserdata ( luaVM, reinterpret_cast < void* > ( pResource->GetScriptID () ) );
 }
 
 void lua_pushtimer ( lua_State* luaVM, CLuaTimer* pTimer )
 {
-    const char* szClass = NULL;
-    CLuaMain* pLuaMain = g_pClientGame->GetLuaManager ()->GetVirtualMachine ( luaVM );
-    if ( pLuaMain->IsOOPEnabled () )
-        szClass = CLuaClassDefs::GetTimerClass ( pTimer );
-
-    lua_pushobject ( luaVM, szClass, ( void* ) reinterpret_cast < unsigned int * > ( pTimer->GetScriptID () ) );
+    lua_pushlightuserdata ( luaVM, reinterpret_cast < void* > ( pTimer->GetScriptID () ) );
 }
 
 void lua_pushxmlnode ( lua_State* luaVM, CXMLNode* pElement )
 {
-    const char* szClass = NULL;
-    CLuaMain* pLuaMain = g_pClientGame->GetLuaManager ()->GetVirtualMachine ( luaVM );
-    if ( pLuaMain->IsOOPEnabled () )
-        szClass = CLuaClassDefs::GetXmlNodeClass ( pElement );
-
-    lua_pushobject ( luaVM, szClass, ( void* ) reinterpret_cast < unsigned int * > ( pElement->GetID () ) );
+    unsigned long ulID = pElement->GetID ();
+    lua_pushlightuserdata ( luaVM, reinterpret_cast < void* > ( ulID ) );
 }
 
-void lua_pushuserdata ( lua_State* luaVM, void* pData )
+CClientRadarArea* lua_toradararea ( lua_State* luaVM, int iArgument )
 {
-    if ( CClientEntity* pEntity = UserDataCast < CClientEntity > ( ( CClientEntity* ) NULL, pData, luaVM ) )
-        return lua_pushelement ( luaVM, pEntity );
-    else if ( CResource* pResource = UserDataCast < CResource > ( ( CResource* ) NULL, pData, luaVM ) )
-        return lua_pushresource ( luaVM, pResource );
-    else if ( CXMLNode* pNode = UserDataCast < CXMLNode > ( ( CXMLNode* ) NULL, pData, luaVM ) )
-        return lua_pushxmlnode ( luaVM, pNode );
-    else if ( CLuaTimer* pTimer = UserDataCast < CLuaTimer > ( ( CLuaTimer* ) NULL, pData, luaVM ) )
-        return lua_pushtimer ( luaVM, pTimer );
-
-    lua_pushobject ( luaVM, NULL, pData );
+    CClientEntity* pElement = lua_toelement ( luaVM, iArgument );
+    if ( pElement && IS_RADAR_AREA ( pElement ) )
+        return static_cast < CClientRadarArea* > ( pElement );
+    else
+        return NULL;
 }
 
-void lua_pushobject ( lua_State* luaVM, const char* szClass, void* pObject )
-{
-    if ( szClass )
-    {
-        lua_pushstring ( luaVM, "ud" );
-        lua_rawget ( luaVM, LUA_REGISTRYINDEX );
-
-        assert ( lua_istable ( luaVM, -1 ) );
-
-        // First we want to check if we have a userdata for this already
-        lua_pushlightuserdata ( luaVM, pObject );
-        lua_rawget ( luaVM, -2 );
-
-        if ( lua_isnil ( luaVM, -1 ) )
-        {
-            lua_pop ( luaVM, 1 );
-
-            // we don't have it, create it
-            * ( void ** ) lua_newuserdata ( luaVM, sizeof ( void * ) ) = pObject;
-
-            // save in ud table
-            lua_pushlightuserdata ( luaVM, pObject );
-            lua_pushvalue ( luaVM, -2 );
-            lua_rawset ( luaVM, -4 );
-        }
-
-        // userdata is already on the stack, just remove the table
-        lua_remove ( luaVM, -2 );
-
-        // Assign the class metatable
-        lua_getclass ( luaVM, szClass );
-        lua_setmetatable ( luaVM, -2 ); // element
-        return;
-    }
-    lua_pushlightuserdata ( luaVM, pObject );
-}
-
-void lua_pushvector ( lua_State* luaVM, CVector& vector )
-{
-    CLuaVector3D* pVector = new CLuaVector3D ( vector );
-    lua_pushobject ( luaVM, "Vector3", ( void* ) reinterpret_cast < unsigned int * > ( pVector->GetScriptID () ) );
-}
-
-void lua_pushmatrix ( lua_State* luaVM, CMatrix& matrix )
-{
-    CLuaMatrix* pMatrix = new CLuaMatrix ( matrix );
-    lua_pushobject ( luaVM, "Matrix", ( void* ) reinterpret_cast < unsigned int * > ( pMatrix->GetScriptID () ) );
-}
 
 // Just do a type check vs LUA_TNONE before calling this, or bant
 const char* lua_makestring ( lua_State* luaVM, int iArgument )
@@ -173,222 +293,4 @@ const char* lua_makestring ( lua_State* luaVM, int iArgument )
     lua_pop ( luaVM, 2 );
 
     return szString;
-}
-
-void lua_initclasses ( lua_State* luaVM )
-{
-    lua_newtable ( luaVM );
-    lua_setfield ( luaVM, LUA_REGISTRYINDEX, "mt" );
-
-    lua_newtable ( luaVM );
-    lua_newtable ( luaVM );
-    lua_pushstring ( luaVM, "v" );
-    lua_setfield ( luaVM, -2, "__mode" );
-    lua_setmetatable ( luaVM, -2 );
-    lua_setfield ( luaVM, LUA_REGISTRYINDEX, "ud" );
-
-    lua_getfield ( luaVM, LUA_REGISTRYINDEX, "mt" );
-    lua_newtable ( luaVM );
-    lua_pushcfunction ( luaVM, CLuaClassDefs::Call );
-    lua_setfield ( luaVM, -2, "__call" );
-    lua_setfield ( luaVM, -2, "Generic" );
-    lua_pop ( luaVM, 1 );
-}
-
-
-void lua_newclass ( lua_State* luaVM )
-{
-    lua_newtable ( luaVM );
-
-    lua_pushstring ( luaVM, "__class" );
-    lua_newtable ( luaVM );
-    lua_getclass ( luaVM, "Generic" );
-    lua_setmetatable ( luaVM, -2 );
-    lua_rawset ( luaVM, -3 );
-
-    lua_pushstring ( luaVM, "__get" );
-    lua_newtable ( luaVM );
-    lua_rawset ( luaVM, -3 );
-
-    lua_pushstring ( luaVM, "__set" );
-    lua_newtable ( luaVM );
-    lua_rawset ( luaVM, -3 );
-
-    lua_pushstring ( luaVM, "__index" );
-    lua_pushvalue ( luaVM, -2 );
-    lua_pushcclosure ( luaVM, CLuaClassDefs::Index, 1 );
-    lua_rawset ( luaVM, -3 );
-
-    lua_pushstring ( luaVM, "__newindex" );
-    lua_pushvalue ( luaVM, -2 );
-    lua_pushcclosure ( luaVM, CLuaClassDefs::NewIndex, 1 );
-    lua_rawset ( luaVM, -3 );
-}
-
-
-void lua_getclass ( lua_State* luaVM, const char* szName )
-{
-    lua_pushstring ( luaVM, "mt" ); // "mt"
-    lua_rawget ( luaVM, LUA_REGISTRYINDEX ); // mt
-
-    assert ( lua_istable ( luaVM, -1 ) );
-
-    lua_pushstring ( luaVM, szName ); // mt, class name
-    lua_rawget ( luaVM, -2 ); // mt, class
-
-    lua_remove ( luaVM, -2 ); // class
-}
-
-
-void lua_registerclass ( lua_State* luaVM, const char* szName, const char* szParent )
-{
-    if ( szParent != NULL )
-    {
-        lua_pushstring ( luaVM, "mt" ); // class table, "mt"
-        lua_rawget ( luaVM, LUA_REGISTRYINDEX ); // class table, mt table
-        lua_getfield ( luaVM, -1, szParent ); // class table, mt table, parent table
-
-        assert ( lua_istable ( luaVM, -1 ) );
-
-        lua_setfield ( luaVM, -3, "__parent" ); // class table, mt table
-
-        lua_pop ( luaVM, 1 ); // class table
-    }
-
-    lua_pushstring ( luaVM, "mt" );
-    lua_rawget ( luaVM, LUA_REGISTRYINDEX );
-
-    // store in registry
-    lua_pushvalue ( luaVM, -2 );
-    lua_setfield ( luaVM, -2, szName );
-
-    lua_pop ( luaVM, 1 );
-
-    // register with environment
-    lua_getfield ( luaVM, -1, "__class" );
-    lua_setglobal ( luaVM, szName );
-
-    lua_pop ( luaVM, 1 );
-}
-
-void lua_registerstaticclass ( lua_State* luaVM, const char* szName )
-{
-    lua_pushstring ( luaVM, "__newindex" );
-    lua_pushvalue ( luaVM, -2 );
-    lua_pushcclosure ( luaVM, CLuaClassDefs::StaticNewIndex, 1 );
-    lua_rawset ( luaVM, -3 );
-
-    lua_pushstring ( luaVM, "mt" );
-    lua_rawget ( luaVM, LUA_REGISTRYINDEX );
-
-    // store in registry
-    lua_pushvalue ( luaVM, -2 );
-    lua_setfield ( luaVM, -2, szName );
-
-    lua_pop ( luaVM, 1 );
-
-    // register with environment
-    lua_getfield ( luaVM, -1, "__class" );
-    lua_setglobal ( luaVM, szName );
-
-    lua_getfield ( luaVM, -1, "__class" );
-    lua_pushvalue ( luaVM, -2 );
-    lua_setmetatable ( luaVM, -2 );
-
-    lua_pop ( luaVM, 2 );
-}
-
-void lua_classfunction ( lua_State* luaVM, const char* szFunction, lua_CFunction fn )
-{
-    if ( fn )
-    {
-        lua_pushstring ( luaVM, "__class" );
-        lua_rawget ( luaVM, -2 );
-
-        lua_pushstring ( luaVM, szFunction );
-        lua_pushstring ( luaVM, szFunction );
-        lua_pushcclosure ( luaVM, fn, 1 );
-        lua_rawset ( luaVM, -3 );
-
-        lua_pop ( luaVM, 1 );
-    }
-}
-
-void lua_classfunction ( lua_State* luaVM, const char* szFunction, const char* fn )
-{
-    CLuaCFunction* pFunction = CLuaCFunctions::GetFunction ( fn );
-    if ( pFunction )
-    {
-        lua_classfunction ( luaVM, szFunction, pFunction->GetFunctionAddress () );
-    }
-}
-
-void lua_classvariable ( lua_State* luaVM, const char* szVariable, lua_CFunction set, lua_CFunction get )
-{
-    lua_pushstring ( luaVM, "__set" );
-    lua_rawget ( luaVM, -2 );
-
-    if ( !set )
-    {
-        lua_pushstring ( luaVM, szVariable );
-        lua_pushstring ( luaVM, szVariable );
-        lua_pushcclosure ( luaVM, CLuaClassDefs::ReadOnly, 1 );
-        lua_rawset ( luaVM, -3 );
-    }
-    else
-    {
-        lua_pushstring ( luaVM, szVariable );
-        lua_pushstring ( luaVM, szVariable );
-        lua_pushcclosure ( luaVM, set, 1 );
-        lua_rawset ( luaVM, -3 );
-    }
-    lua_pop ( luaVM, 1 );
-
-    // Get
-    lua_pushstring ( luaVM, "__get" );
-    lua_rawget ( luaVM, -2 );
-
-    if ( !get )
-    {
-        lua_pushstring ( luaVM, szVariable );
-        lua_pushstring ( luaVM, szVariable );
-        lua_pushcclosure ( luaVM, CLuaClassDefs::WriteOnly, 1 );
-        lua_rawset ( luaVM, -3 );
-    }
-    else
-    {
-        lua_pushstring ( luaVM, szVariable );
-        lua_pushstring ( luaVM, szVariable );
-        lua_pushcclosure ( luaVM, get, 1 );
-        lua_rawset ( luaVM, -3 );
-    }
-    lua_pop ( luaVM, 1 );
-}
-
-void lua_classvariable ( lua_State* luaVM, const char* szVariable, const char* set, const char* get )
-{
-    lua_CFunction fnSet = NULL;
-    lua_CFunction fnGet = NULL;
-
-    if ( set )
-        if ( CLuaCFunction* pSet = CLuaCFunctions::GetFunction ( set ) )
-            fnSet = pSet->GetFunctionAddress ();
-
-    if ( get )
-        if ( CLuaCFunction* pGet = CLuaCFunctions::GetFunction ( get ) )
-            fnGet = pGet->GetFunctionAddress ();
-
-    if ( fnSet || fnGet )
-        lua_classvariable ( luaVM, szVariable, fnSet, fnGet );
-}
-
-void lua_classmetamethod ( lua_State* luaVM, const char* szName, lua_CFunction fn )
-{
-    if ( fn )
-    {
-        lua_pushstring ( luaVM, szName );
-        lua_pushstring ( luaVM, szName );
-        lua_pushcclosure ( luaVM, fn, 1 );
-        lua_rawset ( luaVM, -3 );
-    }
 }

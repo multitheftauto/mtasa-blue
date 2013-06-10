@@ -16,8 +16,8 @@ public:
         iPureSync = 100;
         iLightSync = 1500;
         iCamSync = 500;
-        iPedSync = 400;
-        iUnoccupiedVehicle = 400;
+        iPedSync = 500;
+        iUnoccupiedVehicle = 1000;
         iObjectSync = 500;
         iKeySyncRotation = 100;
         iKeySyncAnalogMove = 100;

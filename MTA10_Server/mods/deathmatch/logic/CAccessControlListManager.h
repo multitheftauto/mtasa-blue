@@ -65,7 +65,6 @@ public:
                                                                               CAccessControlListRight::ERightType& eType );
 
     void                                        OnChange                    ( void );
-    uint                                        GetGlobalRevision           ( void )        { return m_uiGlobalRevision; }
 
 private:
     void                                        ClearReadCache              ( void );
@@ -86,7 +85,6 @@ private:
 
     bool                                        m_bNeedsSave;
     CElapsedTime                                m_AutoSaveTimer;
-    uint                                        m_uiGlobalRevision;
 };
 
 #endif

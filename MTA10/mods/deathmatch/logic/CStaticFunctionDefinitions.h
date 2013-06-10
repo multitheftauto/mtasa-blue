@@ -39,15 +39,11 @@ public:
     static bool                         AddEvent                            ( CLuaMain& LuaMain, const char* szName, bool bAllowRemoteTrigger );
     static bool                         AddEventHandler                     ( CLuaMain& LuaMain, const char* szName, CClientEntity& Entity, const CLuaFunctionRef& iLuaFunction, bool bPropagated, EEventPriorityType eventPriority, float fPriorityMod );
     static bool                         RemoveEventHandler                  ( CLuaMain& LuaMain, const char* szName, CClientEntity& Entity, const CLuaFunctionRef& iLuaFunction );
-    static bool                         GetEventHandlers                    ( CLuaMain& LuaMain, const char* szName );
     static bool                         TriggerEvent                        ( const char* szName, CClientEntity& Entity, const CLuaArguments& Arguments, bool& bWasCancelled );
     static bool                         TriggerServerEvent                  ( const char* szName, CClientEntity& CallWithEntity, CLuaArguments& Arguments );
     static bool                         TriggerLatentServerEvent            ( const char* szName, CClientEntity& CallWithEntity, CLuaArguments& Arguments, int bandwidth, CLuaMain* pLuaMain, ushort usResourceNetId );
     static bool                         CancelEvent                         ( bool bCancel );
     static bool                         WasEventCancelled                   ( void );
-
-    // Misc funcs
-    static bool                         DownloadFile                        ( CResource* pResource, const char* szFile, CChecksum checksum = CChecksum() );
 
     // Output funcs
     static bool                         OutputConsole                       ( const char* szText );
@@ -251,7 +247,7 @@ public:
     static bool                         SetVehicleNitroActivated            ( CClientEntity& Entity, bool bActivated );
     static bool                         SetVehicleNitroCount                ( CClientEntity& Entity, char cCount );
     static bool                         SetVehicleNitroLevel                ( CClientEntity& Entity, float fLevel );
-    static bool                         SetVehiclePlateText                 ( CClientEntity& Entity, const SString& strText );
+
 
     // Object get funcs
     static CClientObject*               CreateObject                        ( CResource& Resource, unsigned short usModelID, const CVector& vecPosition, const CVector& vecRotation, bool bLowLod );

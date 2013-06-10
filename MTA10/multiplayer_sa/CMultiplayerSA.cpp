@@ -325,7 +325,6 @@ PostWeaponFireHandler* m_pPostWeaponFireHandler = NULL;
 BulletImpactHandler* m_pBulletImpactHandler = NULL;
 BulletFireHandler* m_pBulletFireHandler = NULL;
 DamageHandler* m_pDamageHandler = NULL;
-DeathHandler* m_pDeathHandler = NULL;
 FireHandler* m_pFireHandler = NULL;
 ProjectileHandler* m_pProjectileHandler = NULL;
 ProjectileStopHandler* m_pProjectileStopHandler = NULL;
@@ -1390,7 +1389,6 @@ void CMultiplayerSA::InitHooks()
 
     // Init our 1.3 hooks.
     Init_13 ();
-    InitHooks_LicensePlate ();
 }
 
 
@@ -2020,11 +2018,6 @@ void CMultiplayerSA::SetRender3DStuffHandler ( Render3DStuffHandler * pHandler )
 void CMultiplayerSA::SetDamageHandler ( DamageHandler * pDamageHandler )
 {
     m_pDamageHandler = pDamageHandler;
-}
-
-void CMultiplayerSA::SetDeathHandler ( DeathHandler * pDeathHandler )
-{
-    m_pDeathHandler = pDeathHandler;
 }
 
 void CMultiplayerSA::SetFireHandler ( FireHandler * pFireHandler )
@@ -3691,7 +3684,6 @@ void CMultiplayerSA::Reset ( void )
     m_pDrawRadarAreasHandler = NULL;
     DisableAllVehicleWeapons ( false );
     m_pDamageHandler = NULL;
-    m_pDeathHandler = NULL;
     m_pFireHandler = NULL;
     m_pRender3DStuffHandler = NULL;
 }

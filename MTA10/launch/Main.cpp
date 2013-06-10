@@ -19,6 +19,8 @@
     the launch/output diectory.
 
     The .exe in launch/output will be used by the installer and updater.
+
+    (set flag.newexe on the build server to generate new exe)
 */
 
 //

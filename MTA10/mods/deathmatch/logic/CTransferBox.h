@@ -27,20 +27,13 @@
 class CTransferBox
 {
 public:
-    enum Type
-    {
-        NORMAL,
-        PACKET,
-        MAX_TYPES
-    };
-    
                                         CTransferBox                            ( void );
     virtual                             ~CTransferBox                           ( void );
 
     void                                Show                                    ( void );
     void                                Hide                                    ( void );
 
-    void                                SetInfo                                 ( double dDownloadSizeNow, CTransferBox::Type eTransferType = CTransferBox::NORMAL );
+    void                                SetInfo                                 ( double dDownloadSizeNow, const char* szMessage = NULL );
 
     void                                DoPulse                                 ( void );
 
@@ -61,8 +54,6 @@ private:
     unsigned int                        m_uiVisible;
     CElapsedTime                        m_AnimTimer;
     double                              m_dTotalSize;
-
-    SString                             m_strTransferText[Type::MAX_TYPES];
 };
 
 #endif

@@ -36,8 +36,6 @@ CClientCamera::CClientCamera ( CClientManager* pManager ) : ClassInit ( this ), 
 
     // Hook handler for the fixed camera
     g_pMultiplayer->SetProcessCamHandler ( CClientCamera::ProcessFixedCamera );
-
-    m_bPreferFixedRotation = true;
 }
 
 
@@ -166,17 +164,29 @@ void CClientCamera::GetRotationDegrees ( CVector& vecRotation ) const
     CMatrix matrix;
     m_pCamera->GetMatrix ( &matrix );
     g_pMultiplayer->ConvertMatrixToEulerAngles ( matrix, vecRotation.fX, vecRotation.fY, vecRotation.fZ );
-    vecRotation = CVector ( 2*PI, 2*PI, PI ) - vecRotation;
     ConvertRadiansToDegrees ( vecRotation );
-    // srsly, f knows, just pretend you never saw this line
-    vecRotation.fY = 360.0f - vecRotation.fY;
+    vecRotation += CVector ( 180.0f, 180.0f, 180.0f );
+    if ( vecRotation.fX > 360.0f ) vecRotation.fX -= 360.0f;
+    if ( vecRotation.fY > 360.0f ) vecRotation.fY -= 360.0f;
+    if ( vecRotation.fZ > 360.0f ) vecRotation.fZ -= 360.0f;
 }
 
 
 void CClientCamera::SetRotationRadians ( const CVector& vecRotation )
 {
-    m_vecFixedRotation = CVector ( 2*PI, 2*PI, 2*PI ) - vecRotation;
-    m_bPreferFixedRotation = true;
+    // Rotate a 1000,0,0 vector with the given rotation vector
+    CVector vecRotationCopy = vecRotation;
+    vecRotationCopy.fX = 0.0f;
+    CVector vecNormal = CVector ( 1000.0f, 0.0f, 0.0f );
+    RotateVector ( vecNormal, vecRotationCopy );
+
+    // Add it with our current position
+    CVector vecPosition;
+    GetPosition ( vecPosition );
+    vecPosition += vecNormal;
+
+    // Set the calculated vector as the target
+    SetFixedTarget ( vecPosition );
 }
 
 
@@ -198,14 +208,6 @@ void CClientCamera::SetFixedTarget ( const CVector& vecPosition )
 {
     // Store the target so it can be updated from our hook
     m_vecFixedTarget = vecPosition;
-    m_bPreferFixedRotation = false;
-}
-
-
-void CClientCamera::SetRoll ( float fRoll )
-{
-    m_fRoll = fRoll;
-    m_bPreferFixedRotation = false;
 }
 
 
@@ -222,7 +224,6 @@ void CClientCamera::SetTarget ( const CVector& vecPosition )
 
         CCam* pCam = m_pCamera->GetCam ( m_pCamera->GetActiveCam () );
         pCam->SetDirection ( fAngleHorz, fAngleVert );
-        m_bPreferFixedRotation = false;
     }
 }
 
@@ -532,15 +533,6 @@ bool CClientCamera::ProcessFixedCamera ( CCam* pCam )
     }
 
     *pCam->GetUp () = vecUp;
-
-    if ( pThis->m_bPreferFixedRotation )
-    {
-        const CVector& vecRotation = pThis->m_vecFixedRotation;
-        CMatrix newMatrix;
-        g_pMultiplayer->ConvertEulerAnglesToMatrix( newMatrix, vecRotation.fX, vecRotation.fY, vecRotation.fZ );
-        *pCam->GetUp() = newMatrix.vUp;
-        *pCam->GetFront() = newMatrix.vFront;
-    }
 
     // Set the zoom
     pCam->SetFOV ( pThis->m_fFOV );

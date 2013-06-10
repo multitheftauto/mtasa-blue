@@ -31,7 +31,6 @@ class CMultiplayer;
 class CNet;
 class CGame;
 class CModelCacheManager;
-class CLocalizationInterface;
 
 namespace ChatFonts
 {
@@ -79,7 +78,6 @@ public:
     virtual CXMLNode*                   GetConfig                       ( void ) = 0;
     virtual CCVarsInterface*            GetCVars                        ( void ) = 0;
     virtual CCommunityInterface*        GetCommunity                    ( void ) = 0;
-    virtual CLocalizationInterface*     GetLocalization                 ( void ) = 0;
     
 
     // Temporary functions for r1
@@ -135,6 +133,10 @@ public:
     virtual void                    OnTimingCheckpoint              ( const char* szTag ) = 0;
     virtual void                    OnTimingDetail                  ( const char* szTag ) = 0;
 
+    // CGUI Callbacks
+    virtual bool                    OnMouseClick                    ( CGUIMouseEventArgs Args ) = 0;
+    virtual bool                    OnMouseDoubleClick              ( CGUIMouseEventArgs Args ) = 0;
+
     virtual void                    Quit                            ( bool bInstantly = true) = 0;
     virtual void                    InitiateUpdate                  ( const char* szType, const char* szData, const char* szHost ) = 0;
     virtual bool                    IsOptionalUpdateInfoRequired    ( const char* szHost ) = 0;
@@ -157,7 +159,6 @@ public:
     virtual void                    SetDiagnosticDebug              ( EDiagnosticDebugType value ) = 0;
     virtual CModelCacheManager*     GetModelCacheManager            ( void ) = 0;
     virtual void                    AddModelToPersistentCache       ( ushort usModelId ) = 0;
-    virtual void                    UpdateDummyProgress             ( int iPercent = -1 ) = 0;
 };
 
 class CClientTime

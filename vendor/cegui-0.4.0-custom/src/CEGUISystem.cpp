@@ -231,7 +231,6 @@ void System::constructor_impl(Renderer* renderer, ResourceProvider* resourceProv
 	d_rctrl		= false;
     d_ralt      = false;
     d_lalt      = false;
-    d_started   = false;
 
 	d_click_timeout		= DefaultSingleClickTimeout;
 	d_dblclick_timeout	= DefaultMultiClickTimeout;
@@ -524,10 +523,8 @@ bool System::renderGUI(void)
 
     // Flag for redraw to rebuild fonts if needed
     for ( FontManager::FontIterator fontIt = d_fontManager->getIterator() ; !fontIt.isAtEnd() ; ++fontIt )
-        if ( (*fontIt)->needsRebuild () )
+        if ( (*fontIt)->needsClearRenderList () )
             d_gui_redraw = true;
-
-    d_started = true;
 
     return bRenderOk;
 }
@@ -776,11 +773,9 @@ bool System::injectMouseMove(float delta_x, float delta_y)
 			if (d_wndWithMouse != NULL)
 			{
 				ma.window = d_wndWithMouse;
-                ma.switchedWindow = dest_window;
 				d_wndWithMouse->onMouseLeaves(ma);
 			}
 
-            ma.switchedWindow = d_wndWithMouse;
 			d_wndWithMouse = dest_window;
 			ma.window = dest_window;
 			dest_window->onMouseEnters(ma);

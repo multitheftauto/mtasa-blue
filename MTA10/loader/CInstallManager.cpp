@@ -132,13 +132,22 @@ void CInstallManager::InitSequencer ( void )
                 CR "aero_end: "                                     ////// End of 'Windows 7 aero desktop fix' //////
                 CR " "        
                 CR "largemem_check: "                               ////// Start of 'LargeMem fix' //////
-                CR "            CALL ProcessLargeMemChecks "        // Make changes to comply with user setting
+                CR "            CALL ProcessLargeMemChecks "        // Make changes to comply with requirements
                 CR "            IF LastResult == ok GOTO largemem_end: "
                 CR " "
                 CR "            CALL ChangeToAdmin "                // If changes failed, try as admin
                 CR "            IF LastResult == ok GOTO largemem_check: "
                 CR " "
                 CR "largemem_end: "                                 ////// End of 'LargeMem fix' //////
+                CR " "        
+                CR "nvidia_check: "                               ////// Start of 'NVidia Optimus fix' //////
+                CR "            CALL ProcessNvightmareChecks "      // Make changes to comply with requirements
+                CR "            IF LastResult == ok GOTO nvidia_end: "
+                CR " "
+                CR "            CALL ChangeToAdmin "                // If changes failed, try as admin
+                CR "            IF LastResult == ok GOTO nvidia_check: "
+                CR " "
+                CR "nvidia_end: "                                 ////// End of 'LargeMem fix' //////
                 CR " "        
                 CR "service_check: "                                ////// Start of 'Service checks' //////
                 CR "            CALL ProcessServiceChecks "         // Make changes to comply with service requirements
@@ -181,6 +190,7 @@ void CInstallManager::InitSequencer ( void )
     m_pSequencer->AddFunction ( "ProcessLayoutChecks",     &CInstallManager::_ProcessLayoutChecks );
     m_pSequencer->AddFunction ( "ProcessAeroChecks",       &CInstallManager::_ProcessAeroChecks );
     m_pSequencer->AddFunction ( "ProcessLargeMemChecks",   &CInstallManager::_ProcessLargeMemChecks );
+    m_pSequencer->AddFunction ( "ProcessNvightmareChecks", &CInstallManager::_ProcessNvightmareChecks );
     m_pSequencer->AddFunction ( "ProcessServiceChecks",    &CInstallManager::_ProcessServiceChecks );
     m_pSequencer->AddFunction ( "ChangeFromAdmin",         &CInstallManager::_ChangeFromAdmin );
     m_pSequencer->AddFunction ( "InstallNewsItems",        &CInstallManager::_InstallNewsItems );
@@ -322,7 +332,7 @@ SString CInstallManager::_ChangeToAdmin ( void )
 {
     if ( !IsUserAdmin () )
     {
-        MessageBoxUTF8( NULL, SString ( _("MTA:SA needs Administrator access for the following task:\n\n  '%s'\n\nPlease confirm in the next window."), *m_strAdminReason ), "Multi Theft Auto: San Andreas", MB_OK | MB_TOPMOST  );
+        MessageBox( NULL, SString ( "MTA:SA needs Administrator access for the following task:\n\n  '%s'\n\nPlease confirm in the next window.", *m_strAdminReason ), "Multi Theft Auto: San Andreas", MB_OK | MB_TOPMOST  );
         SetIsBlockingUserProcess ();
         ReleaseSingleInstanceMutex ();
         if ( ShellExecuteBlocking ( "runas", GetLauncherPathFilename (), GetSequencerSnapshot () ) )
@@ -336,7 +346,7 @@ SString CInstallManager::_ChangeToAdmin ( void )
         }
         CreateSingleInstanceMutex ();
         ClearIsBlockingUserProcess ();
-        MessageBoxUTF8( NULL, SString ( _("MTA:SA could not complete the following task:\n\n  '%s'\n"), *m_strAdminReason ), "Multi Theft Auto: San Andreas"+_E("CL01"), MB_OK | MB_TOPMOST  );
+        MessageBox( NULL, SString ( "MTA:SA could not complete the following task:\n\n  '%s'\n", *m_strAdminReason ), "Multi Theft Auto: San Andreas", MB_OK | MB_TOPMOST  );
     }
     return "fail";
 }
@@ -382,7 +392,7 @@ SString CInstallManager::_ShowCrashFailDialog ( void )
     SetApplicationSetting ( "diagnostics", "last-crash-reason", "" );
     if ( strReason == "direct3ddevice-reset" )
     {
-        strMessage += _("** The crash was caused by a graphics driver error **\n\n** Please update your graphics drivers **");
+        strMessage += "** The crash was caused by a graphics driver error **\n\n** Please update your graphics drivers **";
     }
 
     strMessage = strMessage.Replace ( "\r", "" ).Replace ( "\n", "\r\n" );
@@ -489,7 +499,7 @@ SString CInstallManager::_InstallFiles ( void )
         else
             AddReportLog ( 5049, SString ( "_InstallFiles: Couldn't install files %s", "" ) );
 
-        m_strAdminReason = _("Install updated MTA:SA files");
+        m_strAdminReason = "Install updated MTA:SA files";
         return "fail";
     }
     else
@@ -510,7 +520,7 @@ SString CInstallManager::_InstallFiles ( void )
 //////////////////////////////////////////////////////////
 SString CInstallManager::_ShowCopyFailDialog ( void )
 {
-    int iResponse = MessageBoxUTF8 ( NULL, _("Could not update due to file conflicts. Please close other applications and retry"), _("Error")+_E("CL02"), MB_RETRYCANCEL | MB_ICONERROR | MB_TOPMOST  );
+    int iResponse = MessageBox ( NULL, "Could not update due to file conflicts. Please close other applications and retry", "Error", MB_RETRYCANCEL | MB_ICONERROR | MB_TOPMOST  );
     if ( iResponse == IDRETRY )
         return "retry";
     return "ok";
@@ -519,7 +529,7 @@ SString CInstallManager::_ShowCopyFailDialog ( void )
 
 void ShowLayoutError ( const SString& strExtraInfo )
 {
-    MessageBoxUTF8 ( 0, SString ( _("Multi Theft Auto has not been installed properly, please reinstall. %s"), *strExtraInfo ), _("Error")+_E("CL03"), MB_OK | MB_TOPMOST  );
+    MessageBox ( 0, SString ( "Multi Theft Auto has not been installed properly, please reinstall. %s", *strExtraInfo ), "Error", MB_OK | MB_TOPMOST  );
     TerminateProcess ( GetCurrentProcess (), 9 );
 }
 
@@ -667,7 +677,7 @@ SString CInstallManager::_ProcessAeroChecks ( void )
                     FILE* fh = fopen ( strGTAEXEPath, "r+b" );
                     if ( !fh )
                     {
-                        m_strAdminReason = _("Update Aero setting");
+                        m_strAdminReason = "Update Aero setting";
                         return "fail";
                     }
                     if ( !fseek ( fh, 0x8B, SEEK_SET ) )
@@ -727,7 +737,7 @@ SString CInstallManager::_ProcessLargeMemChecks ( void )
                 FILE* fh = fopen ( strGTAEXEPath, "r+b" );
                 if ( !fh )
                 {
-                    m_strAdminReason = _("Update Large Memory setting");
+                    m_strAdminReason = "Update Large Memory setting";
                     return "fail";
                 }
                 if ( !fseek ( fh, 0x96, SEEK_SET ) )
@@ -744,6 +754,129 @@ SString CInstallManager::_ProcessLargeMemChecks ( void )
 
 //////////////////////////////////////////////////////////
 //
+// CInstallManager::_ProcessNvightmareChecks
+//
+// Change the PE header to export 'NvOptimusEnablement'
+//
+//////////////////////////////////////////////////////////
+namespace
+{
+    #define EU_VERSION_BYTE 0x004A1AA0     // Zero if US version 
+
+    uint oldExportDir[] = { 0, 0 };
+    uint newExportDir[] = { 0x004a32d0, 0x00000060 };
+    uint oldExportTable[] = { 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0 };
+    uint newExportTable[] = { 0x00000000, 0x51a9df70, 0x00000000, 0x004a3302,   //  ....pß©Q.....3J.
+                              0x00000001, 0x00000001, 0x00000001, 0x004a32f8,   //  ............ø2J.
+                              0x004a32fc, 0x004a3300, 0x004c6988, 0x004a3317,   //  ü/£..3J.ˆiL..3J.
+                              0x74670000, 0x61735f61, 0x6578652e, 0x00000000,   //  ..gta_sa.exe....
+                              0x00000000, 0x4e000000, 0x74704f76, 0x73756d69,   //  .......NvOptimus
+                              0x62616e45, 0x656d656c, 0x0000746e, 0x00000000 }; //  Enablement......
+    uint newExportValue[] = { 0x00000001 };
+
+    C_ASSERT( sizeof( oldExportDir ) == sizeof( newExportDir ) );
+    C_ASSERT( sizeof( oldExportTable ) == sizeof( newExportTable ) );
+
+    struct SDataumRow
+    {
+        uint uiFileOffsetUS;
+        uint uiFileOffsetEU;
+        void* pOldData;
+        void* pNewData;
+        uint uiDataSize;
+    };
+
+    // List of patchlets
+    SDataumRow datumList[] = {
+                    { 0x004C4588, 0x004C4988, NULL,             newExportValue, sizeof( newExportValue ), },
+                    { 0x004A1AD0, 0x004A1ED0, oldExportTable,   newExportTable, sizeof( newExportTable ), },
+                    { 0x000000F8, 0x000000F8, oldExportDir,     newExportDir,   sizeof( newExportDir ), },
+                };
+}
+
+SString CInstallManager::_ProcessNvightmareChecks ( void )
+{
+    SString strGTAPath;
+    if ( GetGamePath( strGTAPath ) == GAME_PATH_OK )
+    {
+        SString strGTAEXEPath = PathJoin( strGTAPath , MTA_GTAEXE_NAME );
+
+        char bIsEUVersion = false;
+        bool bNeedsInstall = false;
+        bool bUnknownBytes = false;
+        FILE* fh = fopen( strGTAEXEPath, "rb" );
+        bool bFileError = ( fh == NULL );
+        if( !bFileError )
+        {
+            // Determine version
+            bFileError |= ( fseek( fh, EU_VERSION_BYTE, SEEK_SET ) != 0 );
+            bFileError |= ( fread( &bIsEUVersion, 1, 1, fh ) != 1 );
+
+            // Determine patched status
+            for ( uint i = 0 ; i < NUMELMS( datumList ) ; i++ )
+            {
+                const SDataumRow& row = datumList[ i ];
+                uint uiFileOffset = bIsEUVersion ? row.uiFileOffsetEU : row.uiFileOffsetUS;
+
+                bFileError |= ( fseek( fh, uiFileOffset, SEEK_SET ) != 0 );
+
+                std::vector < char > buffer( row.uiDataSize );
+                bFileError |=  ( fread( &buffer[0], row.uiDataSize, 1, fh ) != 1 );
+
+                if ( row.pOldData && memcmp( &buffer[0], row.pOldData, row.uiDataSize ) == 0 )
+                    bNeedsInstall = true;
+                else
+                if ( memcmp( &buffer[0], row.pNewData, row.uiDataSize ) != 0 )
+                    bUnknownBytes = true;
+            }
+            fclose ( fh );
+        }
+
+        if ( bFileError )
+            WriteDebugEvent( "Nvightmare patch: Can not apply due to unknown file error" );
+        else
+        if ( bUnknownBytes )
+            WriteDebugEvent( "Nvightmare patch: Can not apply due to unknown file bytes" );
+        else
+        if ( !bNeedsInstall )
+            WriteDebugEvent( "Nvightmare patch: Already applied" );
+        else
+        {
+            WriteDebugEvent( "Nvightmare patch: Starting file update" );
+            // Change needed!
+            SetFileAttributes( strGTAEXEPath, FILE_ATTRIBUTE_NORMAL );
+            FILE* fh = fopen( strGTAEXEPath, "r+b" );
+            if ( !fh )
+            {
+                m_strAdminReason = "Update graphics driver compliance";
+                return "fail";
+            }
+
+            bool bFileError = false;
+            // Write patches
+            for ( uint i = 0 ; i < NUMELMS( datumList ) ; i++ )
+            {
+                const SDataumRow& row = datumList[ i ];
+                uint uiFileOffset = bIsEUVersion ? row.uiFileOffsetEU : row.uiFileOffsetUS;
+
+                if ( row.pOldData )
+                {
+                    bFileError |= ( fseek( fh, uiFileOffset, SEEK_SET ) != 0 );
+                    bFileError |= ( fwrite( row.pNewData, row.uiDataSize, 1, fh ) != 1 );
+                }
+            }
+            fclose ( fh );
+            if ( bFileError )
+                WriteDebugEvent( "Nvightmare patch: File update completed with file errors" );
+            else
+                WriteDebugEvent( "Nvightmare patch: File update completed" );
+        }
+    }
+    return "ok";
+}
+
+//////////////////////////////////////////////////////////
+//
 // CInstallManager::_ProcessServiceChecks
 //
 //
@@ -755,7 +888,7 @@ SString CInstallManager::_ProcessServiceChecks ( void )
     {
         if ( !IsUserAdmin() )
         {
-            m_strAdminReason = _("Update install settings");
+            m_strAdminReason = "Update install settings";
             return "fail";
         }
     }

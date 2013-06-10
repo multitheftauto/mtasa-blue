@@ -33,7 +33,7 @@ CGUIFont_Impl::CGUIFont_Impl ( CGUI_Impl* pGUI, const char* szFontName, const ch
     }
 
     // Define our glyphs
-    defineFontGlyphs( " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~", "default" );
+    defineFontGlyphs( " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~" );
 
     // Set default attributes
     SetNativeResolution ( 1024, 768 );
@@ -121,7 +121,7 @@ CEGUI::Font* CGUIFont_Impl::GetFont ( void )
     return m_pFont;
 }
 
-void CGUIFont_Impl::defineFontGlyphs (unsigned int uExtraGlyphs[], CEGUI::String ID )
+void CGUIFont_Impl::defineFontGlyphs (unsigned int uExtraGlyphs[])
 {
         CEGUI::String glyphSet; // (?) we needs temporary (CEGUI::String) string to define our glyphs correctly
         
@@ -130,10 +130,15 @@ void CGUIFont_Impl::defineFontGlyphs (unsigned int uExtraGlyphs[], CEGUI::String
             glyphSet += (CEGUI::utf32) uExtraGlyphs[g];
 	    }
         
-        defineFontGlyphs( glyphSet.c_str(), ID ); // (?) defining font's glyphs
+        m_pFont->defineFontGlyphs( glyphSet ); // (?) defining font's glyphs
 }
 
-void CGUIFont_Impl::defineFontGlyphs (const char *szExtraGlyphs,  CEGUI::String ID )
+void CGUIFont_Impl::defineFontGlyphs (const char *szExtraGlyphs)
 {
-    m_pFont->addFontGlyphs( (CEGUI::utf8*)szExtraGlyphs, ID );
+    m_pFont->defineFontGlyphs( (CEGUI::utf8*)szExtraGlyphs );
+}
+
+bool CGUIFont_Impl::isGlyphBeingUsed (unsigned long ulGlyph)
+{
+    return m_pFont->isGlyphBeingUsed ( ulGlyph );
 }
