@@ -1,0 +1,1 @@
+Contents of this directory is not required to compile the main solution.
