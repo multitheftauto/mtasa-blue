@@ -522,8 +522,45 @@ float CGraphics::GetDXTextExtentW ( const wchar_t* wszText, float fScale, LPD3DX
 }
 
 
-ID3DXFont * CGraphics::GetFont ( eFontType fontType )
+ID3DXFont * CGraphics::GetFont ( eFontType fontType, float* pfOutScaleUsed, float fRequestedScale, const char* szCustomScaleUser )
 {
+    if ( pfOutScaleUsed )
+        *pfOutScaleUsed = fRequestedScale;
+
+    if ( szCustomScaleUser )
+    {
+        // Try for a custom scale
+        SCustomScaleFontInfo& info = MapGet( m_CustomScaleFontMap, szCustomScaleUser );
+
+        // Already have font?
+        if ( info.pFont )
+        {
+            // Can keep old font?
+            if ( fontType == info.fontType && fRequestedScale == info.fScale )
+                return info.pFont;
+
+            // Otherwise delete old font
+            SAFE_RELEASE( info.pFont );
+            info.fScale = 0;
+            info.fontType = FONT_DEFAULT;
+        }
+
+        // Need to create new font?     
+        if ( fRequestedScale != 1 )
+        {
+            if ( CreateStandardDXFontWithCustomScale( fontType, fRequestedScale, &info.pFont ) )
+            {
+                info.fScale = fRequestedScale;
+                info.fontType = fontType;
+                return info.pFont;
+            }
+        }
+    }
+
+    // Didn't / couldn't do custom scale
+    if ( pfOutScaleUsed )
+        *pfOutScaleUsed = 1;
+
     if ( fontType < 0 || fontType >= NUM_FONTS )
         return m_pDXFonts [ FONT_DEFAULT ];
 
@@ -910,6 +947,19 @@ void CGraphics::DrawColorCodedTextLine ( float fLeft, float fRight, float fY, SC
 }
 
 
+static const sFontInfo fontInfos[] = {
+    { "tahoma",               15, FW_NORMAL },
+    { "tahomabd",             15, FW_BOLD   },
+    { "verdana",              15, FW_NORMAL },
+    { "arial",                15, FW_NORMAL },
+    { "microsoft sans serif", 15, FW_BOLD   },
+    { "pricedown",            30, FW_NORMAL },
+    { "bankgothic md bt",     30, FW_NORMAL },
+    { "diploma",              30, FW_NORMAL },
+    { "beckett",              30, FW_NORMAL },
+    { "unifont",              14, FW_NORMAL }
+};
+
 bool CGraphics::LoadStandardDXFonts ( void )
 {
     // Add our custom font resources
@@ -931,19 +981,6 @@ bool CGraphics::LoadStandardDXFonts ( void )
     }
 
     // Create DirectX font and sprite objects
-    static const sFontInfo fontInfos[] = {
-        { "tahoma",               15, FW_NORMAL },
-        { "tahomabd",             15, FW_BOLD   },
-        { "verdana",              15, FW_NORMAL },
-        { "arial",                15, FW_NORMAL },
-        { "microsoft sans serif", 15, FW_BOLD   },
-        { "pricedown",            30, FW_NORMAL },
-        { "bankgothic md bt",     30, FW_NORMAL },
-        { "diploma",              30, FW_NORMAL },
-        { "beckett",              30, FW_NORMAL },
-        { "unifont",              14, FW_NORMAL }
-    };
-
     for ( int i = 0; i < NUM_FONTS; i++ )
     {
         m_pDXFonts[i] = m_pBigDXFonts[i] = NULL;
@@ -974,6 +1011,25 @@ bool CGraphics::LoadStandardDXFonts ( void )
 
     return true;
 }
+
+
+bool CGraphics::CreateStandardDXFontWithCustomScale ( eFontType fontType, float fScale, ID3DXFont** ppD3DXFont )
+{
+    if ( fontType < 0 || fontType >= NUMELMS( fontInfos ) )
+        return false;
+
+    const sFontInfo& info = fontInfos[ fontType ];
+
+    if( FAILED ( D3DXCreateFont ( m_pDevice, info.uiHeight * fScale, 0, info.uiWeight, 1,
+        FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, info.szName,
+        ppD3DXFont ) ) )
+    {
+        return false;
+    }
+
+    return true;
+}
+
 
 bool CGraphics::LoadAdditionalDXFont ( std::string strFontPath, std::string strFontName, unsigned int uiHeight, bool bBold, ID3DXFont** ppD3DXFont )
 {

@@ -46,6 +46,20 @@ namespace EDrawMode
 }
 using EDrawMode::EDrawModeType;
 
+struct SCustomScaleFontInfo
+{
+    SCustomScaleFontInfo( void ) : fScale( 0 ), fontType( FONT_DEFAULT ), pFont( NULL ) {}
+    float fScale;
+    eFontType fontType;
+    ID3DXFont* pFont;
+};
+
+struct sFontInfo
+{
+    const char* szName;
+    unsigned int uiHeight;
+    unsigned int uiWeight;
+};
 
 class CGraphics : public CGraphicsInterface, public CSingleton < CGraphics >
 {
@@ -79,10 +93,11 @@ public:
     unsigned int        GetViewportHeight       ( void );
 
     // DirectX font functions
-    ID3DXFont *         GetFont                 ( eFontType fontType = FONT_DEFAULT );
+    ID3DXFont *         GetFont                 ( eFontType fontType = FONT_DEFAULT, float* pfOutScaleUsed = NULL, float fRequestedScale = 1, const char* szCustomScaleUser = NULL );
 
     bool                LoadStandardDXFonts     ( void );
     bool                DestroyStandardDXFonts  ( void );
+    bool                CreateStandardDXFontWithCustomScale ( eFontType fontType, float fScale, ID3DXFont** ppD3DXFont );
 
     bool                LoadAdditionalDXFont    ( std::string strFontPath, std::string strFontName, unsigned int uiHeight, bool bBold, ID3DXFont** ppD3DXFont );
     bool                DestroyAdditionalDXFont ( std::string strFontPath, ID3DXFont* pD3DXFont );
@@ -293,14 +308,6 @@ private:
         };
     };
 
-
-    struct sFontInfo
-    {
-        const char* szName;
-        unsigned int uiHeight;
-        unsigned int uiWeight;
-    };
-
     // Drawing queues
     std::vector < sDrawQueueItem >      m_PreGUIQueue;
     std::vector < sDrawQueueItem >      m_PostGUIQueue;
@@ -336,6 +343,7 @@ private:
     bool                                m_bProgressVisible;
     CElapsedTime                        m_ProgressAnimTimer;
     uint                                m_uiProgressAnimFrame;
+    std::map < SString, SCustomScaleFontInfo > m_CustomScaleFontMap;
 };
 
 #endif
