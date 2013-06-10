@@ -47,6 +47,7 @@ public:
     static CLuaCFunction*       AddFunction                 ( const char* szName, lua_CFunction f, bool bRestricted = false );
     static CLuaCFunction*       GetFunction                 ( lua_CFunction f );
     static CLuaCFunction*       GetFunction                 ( const char* szName );
+    static bool                 IsNotFunction               ( lua_CFunction f );
 
     static void                 RegisterFunctionsWithVM     ( lua_State* luaVM );
 
@@ -55,9 +56,8 @@ public:
 private:
     static CFastHashMap < lua_CFunction, CLuaCFunction* >               ms_Functions;
     static CFastHashMap < SString, CLuaCFunction* >                     ms_FunctionsByName;
-    static bool                                                         ms_bMapsInitialized;
-public:
-    static void                 InitializeHashMaps          ( );
+    static void*                                                        ms_pFunctionPtrLow;
+    static void*                                                        ms_pFunctionPtrHigh;
 };
 
 #endif

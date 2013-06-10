@@ -134,15 +134,15 @@ private:
     list<CResource *>           m_resourcesToStartAfterRefresh;
 
     // Maps to speed things up
-    std::map < CResource*, lua_State* >     m_ResourceLuaStateMap;
-    std::map < lua_State*, CResource* >     m_LuaStateResourceMap;
-    std::map < SString, CResource* >        m_NameResourceMap;
+    CFastHashMap < CResource*, lua_State* > m_ResourceLuaStateMap;
+    CFastHashMap < lua_State*, CResource* > m_LuaStateResourceMap;
+    CFastHashMap < SString, CResource* >    m_NameResourceMap;
 
     list<sResourceQueue>        m_resourceQueue;
 
     SString                                 m_strMinClientRequirement;
-    std::map < CResource*, SString >        m_MinClientRequirementMap;
-    std::map < CResource*, bool >           m_SyncMapElementDataOptionMap;
+    CFastHashMap < CResource*, SString >    m_MinClientRequirementMap;
+    CFastHashMap < CResource*, bool >       m_SyncMapElementDataOptionMap;
 
     ushort                      m_usNextNetId;
 };

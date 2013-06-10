@@ -1332,6 +1332,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\logic\net\CSimPedTaskPacket.cpp"
+						>
+					</File>
+					<File
 						RelativePath=".\logic\net\CSimPlayerManager.cpp"
 						>
 					</File>
@@ -2606,6 +2610,10 @@
 					</File>
 					<File
 						RelativePath=".\logic\net\CSimKeysyncPacket.h"
+						>
+					</File>
+					<File
+						RelativePath=".\logic\net\CSimPedTaskPacket.h"
 						>
 					</File>
 					<File

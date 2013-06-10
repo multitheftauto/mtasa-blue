@@ -42,6 +42,7 @@ public:
     virtual                             ~CPacket            ( void ) {};
 
     virtual bool                        RequiresSourcePlayer ( void ) const                                     { return true; }
+    virtual bool                        HasSimHandler       ( void ) const                                      { return false; }
     virtual ePacketID                   GetPacketID         ( void ) const = 0;
     virtual ePacketOrdering             GetPacketOrdering   ( void ) const { return PACKET_ORDERING_DEFAULT; }
     virtual unsigned long               GetFlags            ( void ) const = 0;

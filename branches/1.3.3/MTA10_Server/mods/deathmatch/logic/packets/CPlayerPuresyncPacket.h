@@ -25,6 +25,7 @@ public:
     inline                  CPlayerPuresyncPacket           ( void )                        {};
     inline explicit         CPlayerPuresyncPacket           ( CPlayer* pPlayer )            { m_pSourceElement = pPlayer; };
 
+    bool                            HasSimHandler           ( void ) const                  { return true; }
     inline ePacketID                GetPacketID             ( void ) const                  { return PACKET_ID_PLAYER_PURESYNC; };
     inline unsigned long            GetFlags                ( void ) const                  { return PACKET_MEDIUM_PRIORITY | PACKET_SEQUENCED; };
 

@@ -509,13 +509,17 @@ DontInstallRedist:
 		File "${FILES_ROOT}\MTA San Andreas\mta\netc.dll"
 		File "${SERVER_FILES_ROOT}\libcurl.dll"
 		File "${FILES_ROOT}\MTA San Andreas\mta\loader.dll"
+        ; The files below can be moved out of the LIGHTBUILD zone at some point
         File "${FILES_ROOT}\MTA San Andreas\mta\bass_fx.dll"
         File "${FILES_ROOT}\MTA San Andreas\mta\tags.dll"
 		File "${SERVER_FILES_ROOT}\pthreadVC2.dll"
         File "${FILES_ROOT}\MTA San Andreas\mta\XInput9_1_0_mta.dll"
+        SetOutPath "$INSTDIR\MTA\cgui\images"
+        File "${FILES_ROOT}\MTA San Andreas\mta\cgui\images\busy_spinner.png"
 
         !ifndef LIGHTBUILD
 
+		    SetOutPath "$INSTDIR\MTA"
 			File "${FILES_ROOT}\MTA San Andreas\mta\d3dx9_42.dll"
 			File "${FILES_ROOT}\MTA San Andreas\mta\D3DCompiler_42.dll"
 			File "${FILES_ROOT}\MTA San Andreas\mta\bass.dll"

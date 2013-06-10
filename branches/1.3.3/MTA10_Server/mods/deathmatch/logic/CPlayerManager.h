@@ -52,6 +52,7 @@ public:
     static void                                 Broadcast                       ( const CPacket& Packet, const std::set < CPlayer* >& sendList );
     static void                                 Broadcast                       ( const CPacket& Packet, const std::list < CPlayer* >& sendList );
     static void                                 Broadcast                       ( const CPacket& Packet, const std::vector < CPlayer* >& sendList );
+    static void                                 Broadcast                       ( const CPacket& Packet, const std::multimap < ushort, CPlayer* >& groupMap );
 
     static bool                                 IsValidPlayerModel              ( unsigned short usPlayerModel );
 

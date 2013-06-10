@@ -371,23 +371,23 @@ bool CUnoccupiedVehicleSync::WriteVehicleInformation ( NetBitStreamInterface* pB
     if ( pVehicle->m_LastSyncedData->bEngineOn != pVehicle->IsEngineOn () )
     {
         bSyncVehicle = true;
-        vehicle.data.bEngineOn = pVehicle->IsEngineOn ();
-        pVehicle->m_LastSyncedData->bEngineOn = vehicle.data.bEngineOn;
+        pVehicle->m_LastSyncedData->bEngineOn = pVehicle->IsEngineOn ();
     }
+    vehicle.data.bEngineOn = pVehicle->IsEngineOn ();
 
     if ( pVehicle->m_LastSyncedData->bDerailed != pVehicle->IsDerailed () )
     {
         bSyncVehicle = true;
-        vehicle.data.bDerailed = pVehicle->IsDerailed ();
-        pVehicle->m_LastSyncedData->bDerailed = vehicle.data.bDerailed;
+        pVehicle->m_LastSyncedData->bDerailed = pVehicle->IsDerailed ();
     }
+    vehicle.data.bDerailed = pVehicle->IsDerailed ();
 
     if ( pVehicle->m_LastSyncedData->bIsInWater != pVehicle->IsInWater () )
     {
         bSyncVehicle = true;
-        vehicle.data.bIsInWater = pVehicle->IsInWater ();
-        pVehicle->m_LastSyncedData->bIsInWater = vehicle.data.bIsInWater;
+        pVehicle->m_LastSyncedData->bIsInWater = pVehicle->IsInWater ();
     }
+    vehicle.data.bIsInWater = pVehicle->IsInWater ();
 
     // If nothing has changed we dont sync the vehicle
     if ( !bSyncVehicle )

@@ -220,6 +220,16 @@ public:
     // +772 = Anim file index
 };
 
+
+class CVehicleModelInfoSAInterface : public CBaseModelInfoSAInterface
+{
+public:
+    uint32          pad1;               // +32
+    RpMaterial*     pPlateMaterial;     // +36
+    char            plateText[8];       // +40
+};
+
+
 /**
  * \todo Someone move GetLevelFromPosition out of here or delete it entirely please
  */

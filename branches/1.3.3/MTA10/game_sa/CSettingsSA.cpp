@@ -384,6 +384,9 @@ void CSettingsSA::SetAspectRatio ( eAspectRatio aspectRatio )
     }
 
     MemPutFast < float > ( 0xC3EFA4, fValue );
+
+    // Adjust position and size of our HUD components
+    pGame->GetHud ()->AdjustComponents ( fValue );
 }
 
 ////////////////////////////////////////////////

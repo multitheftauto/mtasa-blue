@@ -2162,6 +2162,12 @@ void CClientVehicle::StreamedInPulse ( void )
                     m_fDoorOpenRatio [ i ] = pDoor->GetAngleOpenRatio ();
             }
         }
+
+        // Update landing gear state if this is a plane and we have no driver / pilot
+        if ( this->HasLandingGear() && m_pDriver == NULL )
+        {
+            m_pVehicle->UpdateLandingGearPosition();
+        }
     }
 }
 
@@ -4012,12 +4018,12 @@ void CClientVehicle::HandleWaitingForGroundToLoad ( void )
         #endif
 
         // Stop waiting after 3 frames, if the object limit has not been reached. (bASync should always be false here) 
-        if ( m_fGroundCheckTolerance > 0.03f && !bMTAObjLimit && !bASync )
+        if ( m_fGroundCheckTolerance > 0.03f /*&& !bMTAObjLimit*/ && !bASync )
             SetFrozenWaitingForGroundToLoad ( false );
     }
 
     #ifdef ASYNC_LOADING_DEBUG_OUTPUTA
-        OutputDebugLine ( SStringX ( "[AsyncLoading] " ) ++ status );
+        OutputDebugLine ( SStringX ( "[AsyncLoading] " ) + status );
         g_pCore->GetGraphics ()->DrawText ( 10, 220, -1, 1, status );
 
         std::vector < SString > lineList;
@@ -4259,6 +4265,20 @@ bool CClientVehicle::GetComponentVisible ( SString vehicleComponent, bool &bVisi
             // fill our visible variable from the cached data
             bVisible = m_ComponentData[vehicleComponent].m_bVisible;
             return true;
+        }
+    }
+    return false;
+}
+
+
+bool CClientVehicle::SetPlateText( const SString& strPlateText )
+{
+    if ( strPlateText != m_strRegPlate )
+    {
+        m_strRegPlate = strPlateText;
+        if ( m_pVehicle )
+        {
+            return m_pVehicle->SetPlateText( m_strRegPlate );
         }
     }
     return false;

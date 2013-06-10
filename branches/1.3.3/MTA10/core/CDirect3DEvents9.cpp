@@ -151,6 +151,8 @@ void CDirect3DEvents9::OnPresent ( IDirect3DDevice9 *pDevice )
     // Redraw the mouse cursor so it will always be over other elements
     CLocalGUI::GetSingleton().DrawMouseCursor();
 
+    CGraphics::GetSingleton().DidRenderScene();
+
     CGraphics::GetSingleton ().LeavingMTARenderZone();
 
     // End the scene that we started.

@@ -4036,6 +4036,10 @@ bool CStaticFunctionDefinitions::WarpPedIntoVehicle ( CPed* pPed, CVehicle* pVeh
                 pPed->SetOccupiedVehicle ( pVehicle, uiSeat );
                 pPed->SetVehicleAction ( CPlayer::VEHICLEACTION_NONE );
 
+                // If he's the driver, switch on the engine
+                if ( uiSeat == 0 )
+                    pVehicle->SetEngineOn( true );
+
                 // Tell all the players
                 CBitStream BitStream;
                 BitStream.pBitStream->Write ( pVehicle->GetID () );
@@ -5043,6 +5047,27 @@ bool CStaticFunctionDefinitions::GetVehiclePlateText ( CVehicle* pVehicle, char*
     const char* szRegPlate = pVehicle->GetRegPlate ();
     strcpy ( szPlateText, szRegPlate );
     return true;
+}
+
+
+bool CStaticFunctionDefinitions::SetVehiclePlateText ( CElement* pElement, const SString& strPlateText )
+{
+    assert ( pElement );
+    RUN_CHILDREN SetVehiclePlateText ( *iter, strPlateText );
+
+    if ( IS_VEHICLE ( pElement ) )
+    {
+        CVehicle* pVehicle = static_cast < CVehicle* > ( pElement );
+        pVehicle->SetRegPlate( strPlateText );
+
+        // Tell everybarry
+        CBitStream BitStream;
+        BitStream.pBitStream->WriteString ( strPlateText.Left( 8 ) );
+        m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pVehicle, SET_VEHICLE_PLATE_TEXT, *BitStream.pBitStream ) );
+        return true;
+    }
+
+    return false;
 }
 
 
@@ -8802,9 +8827,10 @@ bool CStaticFunctionDefinitions::ToggleAllControls ( CPlayer* pPlayer, bool bGTA
     assert ( pPlayer );
 
     if ( bGTAControls )
-        pPlayer->GetPad ()->SetAllControlsEnabled ( bEnabled );
+        pPlayer->GetPad ()->SetAllGTAControlsEnabled ( bEnabled );
 
-    // TODO: Add mta controls to CPad
+    if ( bMTAControls )
+        pPlayer->GetPad ()->SetAllMTAControlsEnabled ( bEnabled );
 
     CBitStream BitStream;
     BitStream.pBitStream->Write ( static_cast < unsigned char > ( ( bGTAControls ) ? 1 : 0 ) );
@@ -10239,6 +10265,8 @@ bool CStaticFunctionDefinitions::SetJetpackWeaponEnabled ( eWeaponType weaponTyp
         BitStream.pBitStream->Write ( static_cast < unsigned char > ( weaponType ) );
         BitStream.pBitStream->WriteBit ( bEnabled );
         m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_JETPACK_WEAPON_ENABLED, *BitStream.pBitStream ) );
+
+        g_pGame->SetJetpackWeaponEnabled ( weaponType, bEnabled );
         return true;
     }
     return false;

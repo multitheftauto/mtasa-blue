@@ -256,6 +256,7 @@ public:
     void                    HandleIdlePulse                 ( void );
     void                    SetModulesLoaded                ( bool bLoaded );
     bool                    AreModulesLoaded                ( void );
+    void                    UpdateDummyProgress             ( int iPercent = -1 );
 
 private:
     // Core devices.
@@ -340,6 +341,8 @@ private:
     bool                        m_bGettingIdleCallsFromMultiplayer;
     bool                        m_bWindowsTimerEnabled;
     bool                        m_bModulesLoaded;
+    int                         m_iDummyProgressPercent;
+    HANDLE                      m_DummyProgressTimerHandle;
 
     // Command line
     static void                 ParseCommandLine                ( std::map < std::string, std::string > & options, const char*& szArgs, const char** pszNoValOptions = NULL );

@@ -61,6 +61,7 @@ public:
     void                        OnResetDevice                       ( void );
     void                        UpdateBackBufferCopySize            ( void );
     bool                        SaveDefaultRenderTarget             ( void );
+    bool                        IsUsingDefaultRenderTarget          ( void );
     void                        ChangeRenderTarget                  ( uint uiSizeX, uint uiSizeY, IDirect3DSurface9* pD3DRenderTarget, IDirect3DSurface9* pD3DZStencilSurface );
     void                        RemoveShaderItemFromWatchLists      ( CShaderItem* pShaderItem );
     void                        UpdateMemoryUsage                   ( void );

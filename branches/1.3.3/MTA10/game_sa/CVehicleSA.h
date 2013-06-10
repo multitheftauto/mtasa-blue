@@ -121,6 +121,7 @@ class CVehicleSA;
 #define FUNC_CVehicle__SetRemapTexDictionary                    0x6D0BC0
 #define FUNC_CVehicle__GetRemapIndex                            0x6D0B70
 #define FUNC_CVehicle__SetRemap                                 0x6D0C00
+#define FUNC_CVehicle_CustomCarPlate_TextureCreate              0x6D10E0
 
 // from CBike
 #define FUNC_Bike_PlaceOnRoadProperly           0x6BEEB0
@@ -347,8 +348,8 @@ public:
     int padaudio[108];
 
     tHandlingDataSA* pHandlingData;                             // +900
-    BYTE padyo[4];
-    DWORD dwHandlingFlags;
+    tFlyingHandlingDataSA* pFlyingHandlingData;                 // +904
+    DWORD dwHandlingFlags;                                      // +908
     int pad52321 [21];
 
     DWORD dwUnknown1201;                                        // +996
@@ -431,7 +432,13 @@ public:
     unsigned int m_isUsingHornOrSecondarySiren;
 
     //1304
-    BYTE Padding220[136];
+    BYTE Padding220[112];
+
+    //1416
+    RwTexture* m_pCustomPlateTexture;
+
+    //1420
+    BYTE Padding225[20];
 
     //1440
     unsigned char m_ucTrackNodeID;  // Current node on train tracks
@@ -763,6 +770,9 @@ public:
     void                        AddComponent                    ( RwFrame * pFrame );
     bool                        GetComponentVisible             ( SString vehicleComponent, bool &bVisible );
     std::map < SString, RwFrame * > & GetComponentMap     ( void )                                                            { return m_ExtraFrames; }
+    bool                        SetPlateText                    ( const SString& strText );
+
+    void                        UpdateLandingGearPosition       ( );
 
 private:
     void                        RecalculateSuspensionLines          ( void );

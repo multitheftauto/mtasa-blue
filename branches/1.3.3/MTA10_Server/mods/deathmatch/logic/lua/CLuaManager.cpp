@@ -44,7 +44,6 @@ CLuaManager::CLuaManager ( CObjectManager* pObjectManager,
     m_pLuaModuleManager->_SetScriptDebugging ( g_pGame->GetScriptDebugging() );
 
     // Load our C Functions into LUA and hook callback
-    CLuaCFunctions::InitializeHashMaps ();
     LoadCFunctions ();
     lua_registerPreCallHook ( CLuaDefs::CanUseFunction );
 }
@@ -434,6 +433,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "setVehicleSirens", CLuaFunctionDefinitions::SetVehicleSirens );
     CLuaCFunctions::AddFunction ( "getVehicleSirens", CLuaFunctionDefinitions::GetVehicleSirens );
     CLuaCFunctions::AddFunction ( "getVehicleSirenParams", CLuaFunctionDefinitions::GetVehicleSirenParams );
+    CLuaCFunctions::AddFunction ( "setVehiclePlateText", CLuaFunctionDefinitions::SetVehiclePlateText );
 
     // Marker functions
     CLuaCFunctions::AddFunction ( "createMarker", CLuaFunctionDefinitions::CreateMarker );

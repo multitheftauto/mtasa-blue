@@ -54,8 +54,6 @@ struct SViewerInfo
         , iZone ( 0 )
         , llLastUpdateTime ( 0 )
         , bInPureSyncSimSendList ( false )
-        , bInKeySyncSimSendList ( false )
-        , bInBulletSyncSimSendList ( false )
     {}
 
     int iMoveToFarCountDown;
@@ -65,8 +63,6 @@ struct SViewerInfo
     long long llLastUpdateTime;
 
     bool bInPureSyncSimSendList;
-    bool bInKeySyncSimSendList;
-    bool bInBulletSyncSimSendList;
 };
 
 typedef CFastHashMap < CPlayer*, SViewerInfo > SViewerMapType;
@@ -274,6 +270,7 @@ public:
 
     CPlayerStatsPacket*                         GetPlayerStatsPacket        ( void )                        { return m_pPlayerStatsPacket; }
     void                                        SetPlayerStat               ( unsigned short usID, float fValue );
+    float                                       GetWeaponRangeFromSlot      ( uint uiSlot = 0xFF );
 
     CVehicle *                                  GetJackingVehicle           ( void )                        { return m_pJackingVehicle; }
     void                                        SetJackingVehicle           ( CVehicle * pVehicle );
@@ -343,9 +340,8 @@ public:
     const CVector&                              GetCamPosition              ( void )            { return m_vecCamPosition; };
     const CVector&                              GetCamFwd                   ( void )            { return m_vecCamFwd; };
 
-    std::set < CPlayer* >                       m_PureSyncSimSendList;
-    std::set < CPlayer* >                       m_KeySyncSimSendList;
-    std::set < CPlayer* >                       m_BulletSyncSimSendList;
+    CFastHashSet < CPlayer* >                   m_PureSyncSimSendList;
+    bool                                        m_bPureSyncSimSendListDirty;
     class CSimPlayer*                           m_pSimPlayer;
 private:
     SLightweightSyncData                        m_lightweightSyncData;
@@ -457,6 +453,12 @@ private:
 
     CPlayerStatsPacket*                         m_pPlayerStatsPacket;
     CVehicle*                                   m_pJackingVehicle;
+
+    // Used to reduce calls when calculating weapon range
+    float                                       m_fWeaponRangeLast;
+    float                                       m_fWeaponRangeLastSkill;
+    eWeaponType                                 m_eWeaponRangeLastWeapon;
+    uint                                        m_uiWeaponRangeLastStatsRevision;
 };
 
 #endif
