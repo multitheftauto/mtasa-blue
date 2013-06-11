@@ -1,5 +1,25 @@
 Changelog for Multi Theft Auto
 
+Multi Theft Auto : San Andreas - 1.3.3
+======================================
+
+Goal: Improve 1.3.2 release.
+
+- 0007644: [Client] setElementPosition for players vehicle causes freeze for few seconds (ccw) - resolved.
+- 0007396: [Resources] Voice icon doesn't disappear for other players after the speaking have been stopped (ccw) - resolved.
+- 0005420: [Server] enter_passenger does not work when using it with serverside toggleControl() (Jusonex) - resolved.
+- 0007639: [Client] Crash in ReApplyMoveAnims (ccw) - resolved.
+- 0007636: [Client] MTA Hack (ccw) - resolved.
+- 0007623: [Server] getPedTotalAmmo sometimes returns 0 while player is aiming (Slot 8) (sbx320) - resolved.
+- 0007400: [GUI] HUD elements do not scale correctly for widescreen (Jusonex) - resolved.
+- 0006495: [Server] onPlayerDamage has wrong parameters if source on vehicle (sbx320) - resolved.
+- 0007627: [Server] "Client triggered serverside event" debug error could show client (ccw) - resolved.
+- 0003166: [Scripting] setVehiclePlateText function missing (ccw) - resolved.
+- 0003117: [Scripting] Custom vehicle plate text is only set on one of both plates and is reset on damage (ccw) - resolved.
+- 0007609: [Server] getVehicleSirens on a sandking (495) crashes the server immediately (ccw) - resolved.
+- 0007613: [Client] Download Exploit (ccw) - resolved.
+
+
 Multi Theft Auto : San Andreas - 1.3.2
 ======================================
 
