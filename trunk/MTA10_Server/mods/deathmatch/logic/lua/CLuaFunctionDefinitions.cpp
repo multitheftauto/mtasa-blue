@@ -1879,6 +1879,39 @@ int CLuaFunctionDefinitions::GetPlayerPing ( lua_State* luaVM )
 }
 
 
+int CLuaFunctionDefinitions::GetPlayerACInfo ( lua_State* luaVM )
+{
+    CPlayer* pPlayer;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData(pPlayer);
+
+    if ( !argStream.HasErrors ( ) )
+    {
+        lua_newtable ( luaVM );
+
+        lua_pushstring ( luaVM, "DetectedAC" );
+        lua_pushstring ( luaVM, pPlayer->m_strDetectedAC );
+        lua_settable   ( luaVM, -3 );
+
+        lua_pushstring ( luaVM, "d3d9Size" );
+        lua_pushnumber ( luaVM, pPlayer->m_uiD3d9Size );
+        lua_settable   ( luaVM, -3 );
+
+        lua_pushstring ( luaVM, "d3d9MD5" );
+        lua_pushstring ( luaVM, pPlayer->m_strD3d9Md5 );
+        lua_settable   ( luaVM, -3 );
+
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
 int CLuaFunctionDefinitions::GetPedRotation ( lua_State* luaVM )
 {
     CPed* pPed;
@@ -10585,6 +10618,7 @@ int CLuaFunctionDefinitions::ResendPlayerModInfo ( lua_State* luaVM )
     lua_pushboolean ( luaVM, false );
     return 1;
 }
+
 
 int CLuaFunctionDefinitions::ExecuteSQLCreateTable ( lua_State* luaVM )
 {

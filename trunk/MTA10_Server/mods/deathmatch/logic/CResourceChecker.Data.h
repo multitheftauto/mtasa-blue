@@ -203,6 +203,7 @@ namespace
                                          { "bitArShift",                "1.3.2" },
                                          { "bitExtract",                "1.3.2" },
                                          { "bitReplace",                "1.3.2" },
+                                         { "getPlayerACInfo",           "1.3.3" },
                                         };
 
 
