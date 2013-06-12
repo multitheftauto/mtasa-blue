@@ -343,6 +343,9 @@ public:
     CFastHashSet < CPlayer* >                   m_PureSyncSimSendList;
     bool                                        m_bPureSyncSimSendListDirty;
     class CSimPlayer*                           m_pSimPlayer;
+    SString                                     m_strDetectedAC;
+    uint                                        m_uiD3d9Size;
+    SString                                     m_strD3d9Md5;
 private:
     SLightweightSyncData                        m_lightweightSyncData;
 

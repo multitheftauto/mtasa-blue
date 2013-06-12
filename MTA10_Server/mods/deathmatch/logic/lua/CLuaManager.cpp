@@ -252,6 +252,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getPlayerIP", CLuaFunctionDefinitions::GetPlayerIP );
     CLuaCFunctions::AddFunction ( "getPlayerAccount", CLuaFunctionDefinitions::GetPlayerAccount );
     CLuaCFunctions::AddFunction ( "getPlayerVersion", CLuaFunctionDefinitions::GetPlayerVersion );
+    CLuaCFunctions::AddFunction ( "getPlayerACInfo", CLuaFunctionDefinitions::GetPlayerACInfo );
     CLuaCFunctions::AddFunction ( "getWeaponProperty", CLuaFunctionDefinitions::GetWeaponProperty );
     CLuaCFunctions::AddFunction ( "getOriginalWeaponProperty", CLuaFunctionDefinitions::GetOriginalWeaponProperty );
     CLuaCFunctions::AddFunction ( "resendPlayerModInfo", CLuaFunctionDefinitions::ResendPlayerModInfo );
