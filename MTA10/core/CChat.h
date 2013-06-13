@@ -196,6 +196,7 @@ public:
     void                        Clear                   ( void );
     void                        ClearInput              ( void );
     bool                        CharacterKeyHandler     ( CGUIKeyEventArgs KeyboardArgs );
+    void                        SetDxFont               ( LPD3DXFONT pDXFont );
 
     inline bool                 IsVisible               ( void )            { return m_bVisible; }
     void                        SetVisible              ( bool bVisible );
@@ -282,7 +283,7 @@ protected:
     bool                        m_bUseCEGUI;
     CVector2D                   m_vecScale;
     float                       m_fNativeWidth;
-    float                       m_fRcpUsingFontScale;
+    float                       m_fRcpUsingDxFontScale;
 
     bool                        m_bCanChangeWidth;
     int                         m_iCVarsRevision;
