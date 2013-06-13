@@ -43,9 +43,10 @@ CDebugView::CDebugView ( CGUI * pManager, const CVector2D & vecPosition ) : CCha
     m_fSmoothScrollResetTime = 0;
     m_fSmoothRepeatTimer = 0;
     m_pFont = m_pManager->GetBoldFont ();
-    m_pDXFont = g_pCore->GetGraphics ()->GetFont ();
+    m_pDXFont = NULL;
+    SetDxFont( g_pCore->GetGraphics ()->GetFont () );
     m_fNativeWidth = DEBUGVIEW_WIDTH;
-    m_fRcpUsingFontScale = 1;
+    m_fRcpUsingDxFontScale = 1;
     m_bCanChangeWidth = false;
     m_iScrollingBack = 0;
     m_fCssStyleOverrideAlpha = 0.0f;
