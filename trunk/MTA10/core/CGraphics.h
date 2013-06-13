@@ -340,6 +340,7 @@ private:
     SString                             m_strProgressMessage;
     CElapsedTime                        m_FirstDrawnProgressTimer;
     CElapsedTime                        m_LastDrawnProgressTimer;
+    CElapsedTime                        m_LastLostDeviceTimer;
     bool                                m_bProgressVisible;
     CElapsedTime                        m_ProgressAnimTimer;
     uint                                m_uiProgressAnimFrame;
