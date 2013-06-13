@@ -51,6 +51,7 @@ CGraphics::CGraphics ( CLocalGUI* pGUI )
 
     m_pScreenGrabber = NewScreenGrabber ();
     m_pPixelsManager = NewPixelsManager ();
+    m_LastLostDeviceTimer.SetMaxIncrement( 250 );
 }
 
 
@@ -1635,6 +1636,16 @@ void CGraphics::SetProgressMessage( const SString& strMessage )
 ////////////////////////////////////////////////////////////////
 void CGraphics::DrawProgressMessage( bool bPreserveBackbuffer )
 {
+    // Check d3d device is usable for at least 1 second and 4 calls
+    if ( IsIconic( g_pCore->GetHookedWindow() ) || m_pDevice->TestCooperativeLevel() != D3D_OK )
+    {
+        m_LastLostDeviceTimer.Reset();
+        return;
+    }
+
+    if ( m_LastLostDeviceTimer.Get() < 1000 )
+        return;
+
     //
     // Save stuff
     //
