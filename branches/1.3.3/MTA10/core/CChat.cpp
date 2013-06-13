@@ -45,9 +45,10 @@ CChat::CChat ( CGUI* pManager, const CVector2D & vecPosition )
     m_bVisible = false;
     m_bInputVisible = false;
     m_pFont = m_pManager->GetClearFont ();
-    m_pDXFont = g_pCore->GetGraphics ()->GetFont ();
+    m_pDXFont = NULL;
+    SetDxFont( g_pCore->GetGraphics ()->GetFont () );
     m_fNativeWidth = CHAT_WIDTH;
-    m_fRcpUsingFontScale = 1;
+    m_fRcpUsingDxFontScale = 1;
     m_bCanChangeWidth = true;
     m_iScrollingBack = 0;
     m_fCssStyleOverrideAlpha = 0.0f;
@@ -89,6 +90,7 @@ CChat::~CChat ( void )
     Clear ();
     ClearInput ();
 
+    SetDxFont( NULL );
     SAFE_DELETE ( m_pBackground );
     SAFE_DELETE ( m_pBackgroundTexture );
     SAFE_DELETE ( m_pInput );
@@ -669,33 +671,48 @@ void CChat::SetChatFont ( eChatFont Font )
 {
     CGUIFont* pFont = g_pCore->GetGUI ()->GetDefaultFont ();
     ID3DXFont* pDXFont = g_pCore->GetGraphics ()->GetFont ();
-    float fFontScaleUsed = 1;
-    float fReqestedScale = Max( m_vecScale.fX, m_vecScale.fY );
+    float fUsingDxFontScale = 1;
+    float fReqestedDxFontScale = Max( m_vecScale.fX, m_vecScale.fY );
     switch ( Font )
     {
         case ChatFonts::CHAT_FONT_DEFAULT:
             pFont = g_pCore->GetGUI ()->GetDefaultFont ();
-            pDXFont = g_pCore->GetGraphics ()->GetFont ( FONT_DEFAULT, &fFontScaleUsed, fReqestedScale, "chat" );
+            pDXFont = g_pCore->GetGraphics ()->GetFont ( FONT_DEFAULT, &fUsingDxFontScale, fReqestedDxFontScale, "chat" );
             break;
         case ChatFonts::CHAT_FONT_CLEAR:
             pFont = g_pCore->GetGUI ()->GetClearFont ();
-            pDXFont = g_pCore->GetGraphics ()->GetFont ( FONT_CLEAR, &fFontScaleUsed, fReqestedScale, "chat" );
+            pDXFont = g_pCore->GetGraphics ()->GetFont ( FONT_CLEAR, &fUsingDxFontScale, fReqestedDxFontScale, "chat" );
             break;
         case ChatFonts::CHAT_FONT_BOLD:
             pFont = g_pCore->GetGUI ()->GetBoldFont ();
-            pDXFont = g_pCore->GetGraphics ()->GetFont ( FONT_DEFAULT_BOLD, &fFontScaleUsed, fReqestedScale, "chat" );
+            pDXFont = g_pCore->GetGraphics ()->GetFont ( FONT_DEFAULT_BOLD, &fUsingDxFontScale, fReqestedDxFontScale, "chat" );
             break;
         case ChatFonts::CHAT_FONT_ARIAL:
-            pDXFont = g_pCore->GetGraphics ()->GetFont ( FONT_ARIAL, &fFontScaleUsed, fReqestedScale, "chat" );
+            pDXFont = g_pCore->GetGraphics ()->GetFont ( FONT_ARIAL, &fUsingDxFontScale, fReqestedDxFontScale, "chat" );
             break;                
     }
 
-    m_fRcpUsingFontScale = 1 / fFontScaleUsed;
+    m_fRcpUsingDxFontScale = 1 / fUsingDxFontScale;
     SAFE_RELEASE( m_pCacheTexture );
 
     // Set fonts
     m_pFont = pFont;
-    m_pDXFont = pDXFont;
+    SetDxFont( pDXFont );
+}
+
+
+void CChat::SetDxFont ( LPD3DXFONT pDXFont )
+{
+    if ( m_pDXFont != pDXFont )
+    {
+        if ( m_pDXFont )
+            m_pDXFont->Release();
+
+        m_pDXFont = pDXFont;
+
+        if ( m_pDXFont )
+            m_pDXFont->AddRef();
+    }
 }
 
 
@@ -827,7 +844,7 @@ float CChat::GetFontHeight ( float fScale )
     {
         return g_pChat->m_pFont->GetFontHeight ( fScale );
     }
-    fScale *= g_pChat->m_fRcpUsingFontScale;
+    fScale *= g_pChat->m_fRcpUsingDxFontScale;
     return g_pCore->GetGraphics ()->GetDXFontHeight ( fScale, g_pChat->m_pDXFont );
 }
 
@@ -841,7 +858,7 @@ float CChat::GetTextExtent ( const char * szText, float fScale )
     {
         return g_pChat->m_pFont->GetTextExtent ( szText, fScale );
     }
-    fScale *= g_pChat->m_fRcpUsingFontScale;
+    fScale *= g_pChat->m_fRcpUsingDxFontScale;
     return g_pCore->GetGraphics ()->GetDXTextExtent ( szText, fScale, g_pChat->m_pDXFont );
 }
 
@@ -858,8 +875,8 @@ void CChat::DrawTextString ( const char * szText, CRect2D DrawArea, float fZ, CR
     else
     {
         float fLineHeight   = CChat::GetFontHeight ( g_pChat->m_vecScale.fY );
-        fScaleX *= g_pChat->m_fRcpUsingFontScale;
-        fScaleY *= g_pChat->m_fRcpUsingFontScale;
+        fScaleX *= g_pChat->m_fRcpUsingDxFontScale;
+        fScaleY *= g_pChat->m_fRcpUsingDxFontScale;
 
         if ( DrawArea.fY1 < RenderBounds.fY1 )
         {
