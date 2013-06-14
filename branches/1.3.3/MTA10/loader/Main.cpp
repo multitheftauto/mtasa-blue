@@ -475,6 +475,9 @@ int DoLaunchGame ( LPSTR lpCmdLine )
     SetDllDirectory( SString ( strMTASAPath + "\\mta" ) );
     CheckService ( CHECK_SERVICE_PRE_CREATE );
 
+    // Do some D3D dancing
+    BeginD3DStuff();
+
     //////////////////////////////////////////////////////////
     //
     // Hook 'n' go
@@ -645,6 +648,8 @@ int DoLaunchGame ( LPSTR lpCmdLine )
     }
 
     WriteDebugEvent( "Loader - Finishing" );
+
+    EndD3DStuff();
 
     // Get its exit code
     DWORD dwExitCode = -1;

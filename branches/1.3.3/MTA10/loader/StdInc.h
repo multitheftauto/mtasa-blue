@@ -19,3 +19,4 @@
 #include "Utils.h"
 #include "..\version.h"
 #include "CInstallManager.h"
+#include "D3DStuff.h"
