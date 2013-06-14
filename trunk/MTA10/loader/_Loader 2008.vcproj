@@ -79,7 +79,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="shlwapi.lib psapi.lib UnRAR.lib Version.lib"
+				AdditionalDependencies="shlwapi.lib psapi.lib UnRAR.lib Version.lib d3d9.lib"
 				OutputFile="C:/Program Files/MTA San Andreas 1.4/mta/loader_d.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
@@ -181,7 +181,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="shlwapi.lib psapi.lib UnRAR.lib Version.lib"
+				AdditionalDependencies="shlwapi.lib psapi.lib UnRAR.lib Version.lib d3d9.lib"
 				OutputFile="c:\program files\MTA San Andreas 1.4\mta\loader.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
@@ -288,7 +288,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="shlwapi.lib psapi.lib UnRAR.lib Version.lib"
+				AdditionalDependencies="shlwapi.lib psapi.lib UnRAR.lib Version.lib d3d9.lib"
 				OutputFile="..\..\output\MTA San Andreas\mta\loader.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
@@ -337,6 +337,10 @@
 			>
 			<File
 				RelativePath=".\CInstallManager.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\D3DStuff.cpp"
 				>
 			</File>
 			<File
@@ -390,6 +394,10 @@
 			</File>
 			<File
 				RelativePath=".\CSequencer.h"
+				>
+			</File>
+			<File
+				RelativePath=".\D3DStuff.h"
 				>
 			</File>
 			<File
