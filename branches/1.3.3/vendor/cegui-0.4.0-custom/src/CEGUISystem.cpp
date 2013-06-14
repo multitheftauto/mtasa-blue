@@ -773,9 +773,11 @@ bool System::injectMouseMove(float delta_x, float delta_y)
 			if (d_wndWithMouse != NULL)
 			{
 				ma.window = d_wndWithMouse;
+                ma.switchedWindow = dest_window;
 				d_wndWithMouse->onMouseLeaves(ma);
 			}
 
+            ma.switchedWindow = d_wndWithMouse;
 			d_wndWithMouse = dest_window;
 			ma.window = dest_window;
 			dest_window->onMouseEnters(ma);

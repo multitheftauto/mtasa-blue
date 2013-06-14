@@ -196,8 +196,6 @@ public:
     void                    DoPostFramePulse                ( void );
 
     // Events
-    bool                    OnMouseClick                    ( CGUIMouseEventArgs Args );
-    bool                    OnMouseDoubleClick              ( CGUIMouseEventArgs Args );
     void                    OnModUnload                     ( void );
 
     // Misc

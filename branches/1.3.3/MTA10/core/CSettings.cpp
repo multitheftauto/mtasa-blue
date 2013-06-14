@@ -117,6 +117,7 @@ void CSettings::CreateGUI ( void )
     m_pBindsList->SetSize ( CVector2D ( 520.0f, 335.0f ) );
     m_pBindsList->SetSorting ( false );
     m_pBindsList->SetSelectionMode ( SelectionModes::CellSingle );
+    m_pBindsList->SetDoubleClickHandler ( GUI_CALLBACK( &CSettings::OnBindsListClick, this ) );
 
     m_pBindsDefButton = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( pTabBinds, "Load defaults" ) );
     m_pBindsDefButton->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnBindsDefaultClick, this ) );
