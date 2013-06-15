@@ -22,7 +22,7 @@
 #include "CVertexStreamBoundingBoxManager.h"
 #include "CProxyDirect3DVertexDeclaration.h"
 
-#include <stdexcept>
+bool g_bInMTAScene = false;
 
 // Variables used for screen shot saving
 static CBuffer             ms_ScreenShotBuffer;
@@ -108,7 +108,8 @@ void CDirect3DEvents9::OnPresent ( IDirect3DDevice9 *pDevice )
     // Start a new scene. This isn't ideal and is not really recommended by MSDN.
     // I tried disabling EndScene from GTA and just end it after this code ourselves
     // before present, but that caused graphical issues randomly with the sky.
-    pDevice->BeginScene ();
+    if ( pDevice->BeginScene() == D3D_OK )
+        g_bInMTAScene = true;
 
     // Reset samplers on first call
     static bool bDoneReset = false;
@@ -157,6 +158,7 @@ void CDirect3DEvents9::OnPresent ( IDirect3DDevice9 *pDevice )
 
     // End the scene that we started.
     pDevice->EndScene ();
+    g_bInMTAScene = false;
 
     // Update incase settings changed
     int iAnisotropic;

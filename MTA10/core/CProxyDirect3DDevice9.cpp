@@ -12,7 +12,7 @@
 
 #include "StdInc.h"
 
-#include <stdexcept>
+bool g_bInGTAScene = false;
 CProxyDirect3DDevice9* g_pProxyDevice = NULL;
 CProxyDirect3DDevice9::SD3DDeviceState* g_pDeviceState = NULL;
 
@@ -411,6 +411,8 @@ HRESULT CProxyDirect3DDevice9::BeginScene                     ( VOID )
 
     // Call the real routine.
     hResult = m_pDevice->BeginScene ( );
+    if ( hResult == D3D_OK )
+        g_bInGTAScene = true;
 
     // Call our event handler.
     CDirect3DEvents9::OnBeginScene ( m_pDevice );
@@ -436,6 +438,7 @@ HRESULT CProxyDirect3DDevice9::EndScene                       ( VOID )
     {
         // Call real routine.
         HRESULT hResult = m_pDevice->EndScene ();
+        g_bInGTAScene = false;
 
         CGraphics::GetSingleton ().GetRenderItemManager ()->SaveReadableDepthBuffer ();
         return hResult;
