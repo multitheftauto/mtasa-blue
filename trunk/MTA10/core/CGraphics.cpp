@@ -18,6 +18,8 @@
 #include "CLine3DBatcher.h"
 #include "CMaterialLine3DBatcher.h"
 extern CCore* g_pCore;
+extern bool g_bInGTAScene;
+extern bool g_bInMTAScene;
 
 using namespace std;
 
@@ -1646,6 +1648,12 @@ void CGraphics::DrawProgressMessage( bool bPreserveBackbuffer )
     if ( m_LastLostDeviceTimer.Get() < 1000 )
         return;
 
+    // Must be in a scene
+    if ( !g_bInGTAScene && !g_bInMTAScene )
+        return;
+    const bool bWasInScene = true;
+    bool bInScene = true;
+
     //
     // Save stuff
     //
@@ -1654,9 +1662,6 @@ void CGraphics::DrawProgressMessage( bool bPreserveBackbuffer )
     EBlendModeType savedBlendMode = m_ActiveBlendMode;
 
     HRESULT hr;
-    hr = m_pDevice->EndScene();
-    bool bWasInScene = SUCCEEDED( hr );
-
     IDirect3DStateBlock9* pSavedStateBlock = NULL;
     m_pDevice->CreateStateBlock( D3DSBT_ALL, &pSavedStateBlock );
 
@@ -1670,6 +1675,12 @@ void CGraphics::DrawProgressMessage( bool bPreserveBackbuffer )
     {
         if ( bPreserveBackbuffer )
         {
+            if ( bInScene )
+            {
+                m_pDevice->EndScene();
+                bInScene = false;
+            }
+
             // Get backbuffer surface
             hr = m_pDevice->GetBackBuffer( 0, 0, D3DBACKBUFFER_TYPE_MONO, &pD3DBackBufferSurface );
             if ( FAILED( hr ) )
@@ -1710,10 +1721,12 @@ void CGraphics::DrawProgressMessage( bool bPreserveBackbuffer )
             hr = D3DXLoadSurfaceFromSurface( pD3DBackBufferSurface, NULL, NULL, m_pSavedFrontBufferData, NULL, NULL, D3DX_FILTER_NONE, 0 );
             if ( FAILED( hr ) )
                 break;
+
+            m_pDevice->BeginScene();
+            bInScene = true;
         }
 
         // Draw progress graphics on backbuffer surface
-        m_pDevice->BeginScene();
         {
             m_ActiveBlendMode = EBlendMode::MODULATE_ADD;
 
@@ -1747,10 +1760,12 @@ void CGraphics::DrawProgressMessage( bool bPreserveBackbuffer )
 
             CheckModes( EDrawMode::NONE, EBlendMode::BLEND );
         }
-        m_pDevice->EndScene();
 
         if ( bPreserveBackbuffer )
         {
+            m_pDevice->EndScene();
+            bInScene = false;
+
             // Flip backbuffer onto front buffer
             SAFE_RELEASE( pD3DBackBufferSurface );
             hr = m_pDevice->Present( NULL, NULL, NULL, NULL );
@@ -1760,6 +1775,9 @@ void CGraphics::DrawProgressMessage( bool bPreserveBackbuffer )
             if ( FAILED( hr ) )
                 break;
             hr = m_pDevice->StretchRect( pSavedBackBufferData->m_pD3DRenderTargetSurface, NULL, pD3DBackBufferSurface, NULL, D3DTEXF_POINT );
+
+            m_pDevice->BeginScene();
+            bInScene = true;
         }
     }
     while( false );
@@ -1768,6 +1786,16 @@ void CGraphics::DrawProgressMessage( bool bPreserveBackbuffer )
     SAFE_RELEASE( pTempFrontBufferData );
     SAFE_RELEASE( pD3DBackBufferSurface );
     SAFE_RELEASE( pSavedBackBufferData );
+
+    // Ensure scene status is restored
+    if ( bInScene != bWasInScene )
+    {
+        if ( bWasInScene )
+            m_pDevice->BeginScene();
+        else
+            m_pDevice->EndScene();
+        bInScene = bWasInScene;
+    }
 
     //
     // Restore stuff
@@ -1778,7 +1806,5 @@ void CGraphics::DrawProgressMessage( bool bPreserveBackbuffer )
         SAFE_RELEASE( pSavedStateBlock );
     }
 
-    if ( bWasInScene )
-        m_pDevice->BeginScene();
     m_ActiveBlendMode = savedBlendMode;
 }
