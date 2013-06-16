@@ -472,6 +472,7 @@ public:
     //
     // Read next userdata, using NULL default if needed, allowing NULL result
     // Userdata might be NULL even when no error
+    //  * false              - use NULL (For easier use of function returns as arguments)
     //  * value not userdata - error
     //  * nil value          - use NULL
     //  * no arguments left  - use NULL
@@ -480,6 +481,12 @@ public:
     void ReadUserData ( T*& outValue, int*** defaultValue )
     {
         assert( defaultValue == NULL );
+        if ( NextIsBool() && !lua_toboolean ( m_luaVM, m_iIndex ) )
+        {
+            outValue = NULL;
+            m_iIndex++;
+            return;
+        }
         InternalReadUserData ( true, outValue, true, (T*)NULL );
     }
 
