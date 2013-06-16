@@ -180,11 +180,6 @@ typedef bool                    (__cdecl *RwSkeletonUpdate_t)                   
     #define RWFUNC(a,b) extern a;
 #endif
 
-static void __declspec(naked)    invalid_ptr()
-{
-    __asm int 3;
-}
-
 // Utility functions
 RWFUNC ( RwDeviceSystemRequest_t                    RwDeviceSystemRequest                   , (RwDeviceSystemRequest_t)                 invalid_ptr )
 RWFUNC ( RwErrorGet_t                               RwErrorGet                              , (RwErrorGet_t)                            invalid_ptr )

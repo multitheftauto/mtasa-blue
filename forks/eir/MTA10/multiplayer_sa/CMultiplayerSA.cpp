@@ -180,12 +180,6 @@ DWORD RETURN_CheckAnimMatrix_US =                           0x7C5A61;
 DWORD RETURN_CheckAnimMatrix_EU =                           0x7C5AA1;
 DWORD RETURN_CheckAnimMatrix_BOTH =                         0;
 
-#define HOOKPOS_VehColCB                                    0x04C838D
-DWORD RETURN_VehColCB =                                     0x04C83AA;
-
-#define HOOKPOS_VehCol                                      0x06D6603
-DWORD RETURN_VehCol =                                       0x06D660C;
-
 // Handling fix - driveType is per model
 #define HOOKPOS_CHandlingData_isNotRWD              0x6A048C
 DWORD RETURN_CHandlingData_isNotRWD =               0x6A0493;
@@ -357,7 +351,6 @@ void HOOK_CCustomRoadsignMgr__RenderRoadsignAtomic();
 void HOOK_Trailer_BreakTowLink();
 void HOOK_CRadar__DrawRadarGangOverlay();
 void HOOK_CTaskComplexJump__CreateSubTask();
-void HOOK_CBike_ProcessRiderAnims();
 void HOOK_FxManager_CreateFxSystem ();
 void HOOK_FxManager_DestroyFxSystem ();
 void HOOK_CCam_ProcessFixed ();
@@ -365,8 +358,6 @@ void HOOK_Render3DStuff ();
 void HOOK_CTaskSimplePlayerOnFoot_ProcessPlayerWeapon ();
 void HOOK_CPed_IsPlayer ();
 void HOOK_CTrain_ProcessControl_Derail ();
-void HOOK_CVehicle_SetupRender ();
-void HOOK_CVehicle_ResetAfterRender();
 void HOOK_CObject_Render ();
 void HOOK_EndWorldColors ();
 void HOOK_CWorld_ProcessVerticalLineSectorList ();
@@ -426,8 +417,6 @@ void HOOK_CrashFix_Misc22 ();
 void HOOK_CrashFix_Misc23 ();
 void HOOK_CrashFix_Misc24 ();
 void HOOK_CheckAnimMatrix ();
-void HOOK_VehColCB ();
-void HOOK_VehCol ();
 void HOOK_isVehDriveTypeNotRWD ();
 void HOOK_isVehDriveTypeNotFWD ();
 void HOOK_PreFxRender ();
@@ -565,8 +554,6 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_CTaskSimplePlayerOnFoot_ProcessPlayerWeapon, (DWORD)HOOK_CTaskSimplePlayerOnFoot_ProcessPlayerWeapon, 7);
     HookInstall(HOOKPOS_CPed_IsPlayer, (DWORD)HOOK_CPed_IsPlayer, 6);
     HookInstall(HOOKPOS_CTrain_ProcessControl_Derail, (DWORD)HOOK_CTrain_ProcessControl_Derail, 6);
-    HookInstall(HOOKPOS_CVehicle_SetupRender, (DWORD)HOOK_CVehicle_SetupRender, 5);
-    HookInstall(HOOKPOS_CVehicle_ResetAfterRender, (DWORD)HOOK_CVehicle_ResetAfterRender, 5);
     HookInstall(HOOKPOS_CObject_Render, (DWORD)HOOK_CObject_Render, 5);
     HookInstall(HOOKPOS_EndWorldColors, (DWORD)HOOK_EndWorldColors, 5);
     HookInstall(HOOKPOS_CWorld_ProcessVerticalLineSectorList, (DWORD)HOOK_CWorld_ProcessVerticalLineSectorList, 8);
@@ -609,8 +596,6 @@ void CMultiplayerSA::InitHooks()
         RETURN_PreFxRender_BOTH = RETURN_PreFxRender_EU;
     }
 
-    HookInstall(HOOKPOS_VehColCB, (DWORD)HOOK_VehColCB, 29 );
-    HookInstall(HOOKPOS_VehCol, (DWORD)HOOK_VehCol, 9 );
     HookInstall(HOOKPOS_PreFxRender, (DWORD)HOOK_PreFxRender, 5 );
     HookInstall(HOOKPOS_PreHUDRender, (DWORD)HOOK_PreHUDRender, 5 );
     HookInstall(HOOKPOS_CAutomobile__ProcessSwingingDoor, (DWORD)HOOK_CAutomobile__ProcessSwingingDoor, 7 );
@@ -618,7 +603,6 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_CHandlingData_isNotRWD, (DWORD)HOOK_isVehDriveTypeNotRWD, 7 );
     HookInstall(HOOKPOS_CHandlingData_isNotFWD, (DWORD)HOOK_isVehDriveTypeNotFWD, 7 );
 
-    HookInstallCall ( CALL_CBike_ProcessRiderAnims, (DWORD)HOOK_CBike_ProcessRiderAnims );
     HookInstallCall ( CALL_Render3DStuff, (DWORD)HOOK_Render3DStuff );
     HookInstallCall ( CALL_VehicleCamUp, (DWORD)HOOK_VehicleCamUp );
     HookInstallCall ( CALL_VehicleLookBehindUp, (DWORD)HOOK_VehicleCamUp );
@@ -680,9 +664,6 @@ void CMultiplayerSA::InitHooks()
 
     // Disable GTA setting g_bGotFocus to false when we minimize
     MemSet ( (void *)ADDR_GotFocus, 0x90, pGameInterface->GetGameVersion () == VERSION_EU_10 ? 6 : 10 );
-
-    // Increase double link limit from 3200 ro 8000
-    MemPut < int > ( 0x00550F82, 8000 );
 
 
     // Disable GTA being able to call CAudio::StopRadio ()
@@ -763,10 +744,6 @@ void CMultiplayerSA::InitHooks()
 
     // DISABLE CCrime__ReportCrime
     MemPut < BYTE > ( 0x532010, 0xC3 );
-    
-    // Disables deletion of RenderWare objects during unloading of ModelInfo
-    // This is used so we can circumvent the limit of ~21 different vehicles by managing the RwObject ourselves
-    //*(BYTE *)0x4C9890 = 0xC3;
 
     /*
     004C021D   B0 00            MOV AL,0
@@ -869,14 +846,6 @@ void CMultiplayerSA::InitHooks()
 
     // Prevent gta stopping driveby players from falling off
     MemSet ( (LPVOID)0x6B5B17, 0x90, 6 );
-
-    // Increase VehicleStruct pool size
-    MemPut < BYTE > ( 0x5B8342 + 0, 0x33 );     // xor eax, eax
-    MemPut < BYTE > ( 0x5B8342 + 1, 0xC0 );
-    MemPut < BYTE > ( 0x5B8342 + 2, 0xB0 );     // mov al, 0xFF
-    MemPut < BYTE > ( 0x5B8342 + 3, 0xFF );
-    MemPut < BYTE > ( 0x5B8342 + 4, 0x8B );     // mov edi, eax
-    MemPut < BYTE > ( 0x5B8342 + 5, 0xF8 );
     
     /*
     // CTaskSimpleCarDrive: Swaps driveby for gang-driveby for drivers
@@ -1139,9 +1108,6 @@ void CMultiplayerSA::InitHooks()
     // Trains may infact go further than Los Santos
     MemPut < BYTE > ( 0x4418E0, 0xC3 );
 
-    // EXPERIMENTAL - disable unloading of cols
-   // MemSet ( (void*)0x4C4EDA, 0x90, 10 );
-
     // Make CTaskComplexSunbathe::CanSunbathe always return true
     MemPut < BYTE > ( 0x632140, 0xB0 );
     MemPut < BYTE > ( 0x632141, 0x01 );
@@ -1364,9 +1330,6 @@ void CMultiplayerSA::InitHooks()
     MemPut < BYTE > ( 0x4322B0, 0xC3 );
     // Disable CStreaming::StreamVehiclesAndPeds_Always
     MemPut < BYTE > ( 0x40B650, 0xC3 );
-
-    // Double the size of CPlaceable matrix array to fix a crash after CMatrixLinkList::AddToList1
-    MemPut < int > ( 0x54F3A1, 1800 );
 
     SetSuspensionEnabled ( true );
 
@@ -2483,52 +2446,6 @@ void _declspec(naked) HOOK_Trailer_BreakTowLink()
     }
 }
 
-
-bool ProcessRiderAnims ( CPedSAInterface * pPedInterface )
-{
-    CPed * pPed = pGameInterface->GetPools ()->GetPed ( (DWORD*) pPedInterface );
-    if ( pPed )
-    {
-        CPedSA * pPedSA = dynamic_cast < CPedSA * > ( pPed );
-        if ( pPedSA->GetOccupiedSeat () == 0 )
-        {
-            return true;
-        }
-    }
-    return false;
-}
-
-
-CPedSAInterface * pRiderPed = NULL;
-void _declspec(naked) HOOK_CBike_ProcessRiderAnims ()
-{    
-    // This hook is no longer needed
-    _asm jmp    FUNC_CBike_ProcessRiderAnims
-
-    _asm
-    {
-        mov     pRiderPed, eax
-        pushad
-    }
-
-    if ( ProcessRiderAnims ( pRiderPed ) )
-    {
-        _asm
-        {
-            popad
-            jmp    FUNC_CBike_ProcessRiderAnims
-        }
-    }
-    else
-    {
-        _asm
-        {
-            popad
-            ret
-        }
-    }
-}
-
 eExplosionType explosionType;
 CVector vecExplosionLocation;
 DWORD explosionCreator = 0;
@@ -3275,46 +3192,6 @@ static void SetVehicleAlpha ( )
     else
         bEntityHasAlpha = false;
 }
-
-static DWORD dwCVehicle_SetupRender_ret = 0x6D6517;
-void _declspec(naked) HOOK_CVehicle_SetupRender()
-{
-    _asm
-    {
-        mov     dwAlphaEntity, esi
-        pushad
-    }
-
-    SetVehicleAlpha ( );
-
-    _asm
-    {
-        popad
-        add     esp, 0x8
-        test    eax, eax
-        jmp     dwCVehicle_SetupRender_ret
-    }
-}
-
-static DWORD dwCVehicle_ResetAfterRender_ret = 0x6D0E43;
-void _declspec(naked) HOOK_CVehicle_ResetAfterRender ()
-{
-    _asm
-    {
-        pushad
-    }
-
-    RestoreAlphaValues ();
-
-    _asm
-    {
-        popad
-        add     esp, 0x0C
-        test    eax, eax
-        jmp     dwCVehicle_ResetAfterRender_ret
-    }
-}
-
 
 /**
  ** Objects
@@ -5390,74 +5267,6 @@ void _declspec(naked) HOOK_CheckAnimMatrix ()
         // continue standard path
         push    eax
         jmp     RETURN_CheckAnimMatrix_BOTH      // 7C5A61/7C5AA1
-    }
-}
-
-
-
-static SColor vehColors[4];
-
-void _cdecl SaveVehColors ( DWORD dwThis )
-{
-    CVehicle* pVehicle = pGameInterface->GetPools ()->GetVehicle ( (DWORD *)dwThis );
-    if ( pVehicle )
-    {
-        pVehicle->GetColor ( &vehColors[0], &vehColors[1], &vehColors[2], &vehColors[3], 0 );
-
-        // 0xFF00FF and 0x00FFFF both result in black for some reason
-        for ( uint i = 0 ; i < NUMELMS( vehColors ) ; i++ )
-        {
-            if ( vehColors[i] == 0xFF00FF )
-                vehColors[i] = 0xFF01FF;
-            if ( vehColors[i] == 0x00FFFF )
-                vehColors[i] = 0x01FFFF;
-        }
-    }
-}
-
-
-void _declspec(naked) HOOK_VehCol ()
-{
-    _asm
-    {
-        // Get vehColors for this vehicle
-        pushad
-        push esi
-        call SaveVehColors
-        add esp, 4
-        popad
-
-        // Hooked from 006D6603  9 bytes
-        mov         dl, 3
-        mov         al, 2
-        mov         cl, 1
-        push        edx  
-        xor         edx,edx 
-        mov         dl,byte ptr [esi+434h] 
-        mov         dl, 0
-
-        jmp     RETURN_VehCol  // 006D660C
-    }
-}
-
-
-void _declspec(naked) HOOK_VehColCB ()
-{
-    _asm
-    {
-        // Hooked from 004C838D  29 bytes
-
-        // Apply vehColors for this vehicle
-        mov         cl,byte ptr [esi*4+vehColors.R] 
-        mov         byte ptr [eax+4],cl
-
-        mov         cl,byte ptr [esi*4+vehColors.G] 
-        mov         byte ptr [eax+5],cl
-
-        mov         cl,byte ptr [esi*4+vehColors.B] 
-        mov         byte ptr [eax+6],cl
-
-        jmp     RETURN_VehColCB  // 004C83AA
     }
 }
 

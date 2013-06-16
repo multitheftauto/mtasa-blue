@@ -1142,9 +1142,73 @@ struct RwChunkHeader
     unsigned int        isComplex;
 };
 
+inline void __declspec(naked)    invalid_ptr()
+{
+    __asm int 3;
+}
+
+// RenderWare method helpers
+#define RWP_METHOD_NAME( className, methodName )    className##methodName
+#define RWP_METHOD_OPEN( className, methodName ) \
+    RWP_METHOD_NAME( className, methodName )##_t    RWP_METHOD_NAME( className, methodName )
+
+#define RWP_METHOD_INST( className, methodName ) \
+    RWP_METHOD_OPEN( className, methodName ) = (RWP_METHOD_NAME( className, methodName )##_t)invalid_ptr
+
+#define RWP_METHOD_DECLARE( className, methodName ) \
+    extern RWP_METHOD_OPEN( className, methodName )
+
 // Plugin functions
-typedef RpGeometry*     (__cdecl*RpGeometryPluginConstructor)( RpGeometry *geom, size_t offset );
-typedef void            (__cdecl*RpGeometryPluginDestructor)( RpGeometry *geom, size_t offset );
-typedef RpGeometry*     (__cdecl*RpGeometryPluginCopyConstructor)( RpGeometry *dst, RpGeometry *src, size_t offset );
+#define RWP_UTIL_CONSTRUCTOR( rwobj ) \
+    rwobj*              (__cdecl*##rwobj##PluginConstructor)( rwobj *obj, size_t offset )
+#define RWP_UTIL_DESTRUCTOR( rwobj ) \
+    void                (__cdecl*##rwobj##PluginDestructor)( rwobj *obj, size_t offset )
+#define RWP_UTIL_COPYCONSTRUCTOR( rwobj ) \
+    rwobj*              (__cdecl*##rwobj##PluginCopyConstructor)( rwobj *dst, rwobj *src, size_t offset )
+
+#define RWP_UTIL_REGISTER( rwobj ) \
+    typedef RWP_UTIL_CONSTRUCTOR( rwobj ); \
+    typedef RWP_UTIL_DESTRUCTOR( rwobj ); \
+    typedef RWP_UTIL_COPYCONSTRUCTOR( rwobj ); \
+    typedef size_t      (__cdecl*##rwobj##RegisterPlugin_t)( size_t size, unsigned int id, rwobj##PluginConstructor constructor, rwobj##PluginDestructor destructor, rwobj##PluginCopyConstructor copyConstr )
+
+// Stream plugin functions
+#define RWP_UTIL_STREAMFUNCS( rwobj ) \
+    typedef RwStream*   (__cdecl*##rwobj##PluginStreamRead)( RwStream *stream, size_t size, rwobj *obj ); \
+    typedef int         (__cdecl*##rwobj##PluginStreamWrite)( RwStream *stream, size_t size, rwobj *obj ); \
+    typedef size_t      (__cdecl*##rwobj##PluginStreamGetSize)( rwobj *obj ); \
+    typedef size_t      (__cdecl*##rwobj##RegisterPluginStream_t)( unsigned int id, rwobj##PluginStreamRead readCallback, rwobj##PluginStreamWrite writeCallback, rwobj##PluginStreamGetSize sizeCallback )
+
+// Used to declare a plugin type.
+#define RW_PLUGIN_DECLARE( className ) \
+    RWP_UTIL_STREAMFUNCS( className ); \
+    RWP_UTIL_REGISTER( className )
+
+// Declare all plugins.
+RW_PLUGIN_DECLARE( RpAtomic );
+RW_PLUGIN_DECLARE( RpClump );
+RW_PLUGIN_DECLARE( RpGeometry );
+RW_PLUGIN_DECLARE( RpMaterial );
+RW_PLUGIN_DECLARE( RwScene );
+RW_PLUGIN_DECLARE( RpLight );
+RW_PLUGIN_DECLARE( RwFrame );
+RW_PLUGIN_DECLARE( RwCamera );
+RW_PLUGIN_DECLARE( RwRaster );
+RW_PLUGIN_DECLARE( RwTexture );
+RW_PLUGIN_DECLARE( RwTexDictionary );
+
+// Used to declare the plugin interface
+#define RW_PLUGIN_INTERFACE_INST( className ) \
+    RWP_METHOD_INST( className, RegisterPlugin ); \
+    RWP_METHOD_INST( className, RegisterPluginStream );
+
+// For headers.
+#define RW_PLUGIN_INTERFACE_EXTERN( className ) \
+    RWP_METHOD_DECLARE( className, RegisterPlugin ); \
+    RWP_METHOD_DECLARE( className, RegisterPluginStream )
+
+// Utilities
+#define RW_FUNC_PTR( className, methodName, ptr ) \
+    RWP_METHOD_NAME( className, methodName ) = (RWP_METHOD_NAME(className, methodName)##_t)ptr
 
 #endif

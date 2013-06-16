@@ -632,6 +632,8 @@ RpClump * CRenderWareSA::ReadDFF ( const char *szDFF, unsigned short id, bool bL
             // reset model schemantic loader
             delete colAcq;
         }
+        else
+            colOut = NULL;
 
         if ( model )
         {
