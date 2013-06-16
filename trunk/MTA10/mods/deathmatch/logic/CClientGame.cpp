@@ -428,11 +428,11 @@ CClientGame::~CClientGame ( void )
     SetCursorEventsEnabled ( false );   
 
     // Destroy our stuff
+    SAFE_DELETE( m_pManager );  // Will trigger onClientResourceStop
     SAFE_DELETE( m_pNametags );
     SAFE_DELETE( m_pSyncDebug );
     SAFE_DELETE( m_pNetworkStats );
     SAFE_DELETE( m_pNetAPI );
-    SAFE_DELETE( m_pManager );
     SAFE_DELETE( m_pRPCFunctions );
     SAFE_DELETE( m_pUnoccupiedVehicleSync );
     SAFE_DELETE( m_pPedSync );
