@@ -153,7 +153,6 @@ public:
     CEGUI::SchemeManager*           GetSchemeManager            ( void );
     CEGUI::WindowManager*           GetWindowManager            ( void );
     void                            GetUniqueName               ( char* pBuf );
-    CEGUI::Window*                  GetMasterWindow             ( CEGUI::Window* Window );
 
     CVector2D                       GetResolution               ( void );
     void                            SetResolution               ( float fWidth, float fHeight );

@@ -1087,6 +1087,8 @@ void CCore::DoPostFramePulse ( )
         ApplyConsoleSettings ();
         ApplyGameSettings ();
 
+        m_pGUI->SetMouseClickHandler ( INPUT_CORE, GUI_CALLBACK_MOUSE ( &CCore::OnMouseClick, this ) );
+        m_pGUI->SetMouseDoubleClickHandler ( INPUT_CORE, GUI_CALLBACK_MOUSE ( &CCore::OnMouseDoubleClick, this ) );
         m_pGUI->SelectInputHandlers( INPUT_CORE );
 
         m_Community.Initialize ();
@@ -1367,6 +1369,29 @@ void CCore::Quit ( bool bInstantly )
     {
         m_bQuitOnPulse = true;
     }
+}
+
+
+bool CCore::OnMouseClick ( CGUIMouseEventArgs Args )
+{
+    bool bHandled = false;
+
+    bHandled = m_pLocalGUI->GetMainMenu ()->GetServerBrowser ()->OnMouseClick ( Args );     // CServerBrowser
+
+    return bHandled;
+}
+
+
+bool CCore::OnMouseDoubleClick ( CGUIMouseEventArgs Args )
+{
+    bool bHandled = false;
+
+    // Call the event handlers, where necessary
+    bHandled =
+        m_pLocalGUI->GetMainMenu ()->GetSettingsWindow ()->OnMouseDoubleClick ( Args ) |    // CSettings
+        m_pLocalGUI->GetMainMenu ()->GetServerBrowser ()->OnMouseDoubleClick ( Args );      // CServerBrowser
+    
+    return bHandled;
 }
 
 
