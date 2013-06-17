@@ -15,6 +15,7 @@
 bool g_bInGTAScene = false;
 CProxyDirect3DDevice9* g_pProxyDevice = NULL;
 CProxyDirect3DDevice9::SD3DDeviceState* g_pDeviceState = NULL;
+uint ms_uiDeviceResetFailCount = 0;
 
 // Proxy constructor and destructor.
 CProxyDirect3DDevice9::CProxyDirect3DDevice9 ( IDirect3DDevice9 * pDevice  )
@@ -211,10 +212,22 @@ HRESULT CProxyDirect3DDevice9::Reset                          ( D3DPRESENT_PARAM
             g_pCore->LogEvent( 7124, "Direct3D", "Direct3DDevice9::Reset", SString( "Fail2:%08x", hResult ) );
             WriteDebugEvent( SString( "Direct3DDevice9::Reset  Fail2:%08x", hResult ) );
 
+            if ( ++ms_uiDeviceResetFailCount > 2 )
+            {
+                // Handle fatal error
+                SString strMessage;
+                strMessage += "There was a problem resetting Direct3D\n\n";
+                strMessage += SString( "Direct3DDevice9 Reset error: %08x", hResult );
+                BrowseToSolution( "d3dresetdevice-fail", EXIT_GAME_FIRST | ASK_GO_ONLINE, strMessage );
+                // Won't get here as BrowseToSolution will terminate the process
+            }
+
             // Let caller handle what to do
             return hResult;
         }
     }
+
+    ms_uiDeviceResetFailCount = 0;
 
     // Store actual present parameters used
     IDirect3DSwapChain9* pSwapChain;
