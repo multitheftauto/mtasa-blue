@@ -1069,13 +1069,17 @@ bool CGraphics::DestroyStandardDXFonts ( void )
         RemoveFontResourceEx ( CalcMTASAPath ( "MTA\\cgui\\" + m_FontResourceNames[i] ), FR_PRIVATE, 0 );
     }
 
+    // Release 
     for ( int i = 0; i < NUM_FONTS; i++ )
     {
         SAFE_RELEASE( m_pDXFonts[i] );
         SAFE_RELEASE( m_pBigDXFonts[i] );
     }
 
-    // Release 
+    // Release custom scale versions of standard fonts as well
+    for ( std::map < SString, SCustomScaleFontInfo >::iterator iter = m_CustomScaleFontMap.begin() ; iter != m_CustomScaleFontMap.end() ; ++iter )
+        SAFE_RELEASE( iter->second.pFont );
+
     return true;
 }
 
@@ -1143,6 +1147,10 @@ void CGraphics::OnDeviceInvalidate ( IDirect3DDevice9 * pDevice )
         if( m_pBigDXFonts[i] ) m_pBigDXFonts[i]->OnLostDevice ();
     }
 
+    for ( std::map < SString, SCustomScaleFontInfo >::iterator iter = m_CustomScaleFontMap.begin() ; iter != m_CustomScaleFontMap.end() ; ++iter )
+        if ( iter->second.pFont )
+            iter->second.pFont->OnLostDevice();
+
     if ( m_pDXSprite )
         m_pDXSprite->OnLostDevice ();
 
@@ -1162,6 +1170,10 @@ void CGraphics::OnDeviceRestore ( IDirect3DDevice9 * pDevice )
         if( m_pDXFonts[i] ) m_pDXFonts[i]->OnResetDevice ();
         if( m_pBigDXFonts[i] ) m_pBigDXFonts[i]->OnResetDevice ();
     }
+
+    for ( std::map < SString, SCustomScaleFontInfo >::iterator iter = m_CustomScaleFontMap.begin() ; iter != m_CustomScaleFontMap.end() ; ++iter )
+        if ( iter->second.pFont )
+            iter->second.pFont->OnResetDevice();
 
     if ( m_pDXSprite )
         m_pDXSprite->OnResetDevice ();
