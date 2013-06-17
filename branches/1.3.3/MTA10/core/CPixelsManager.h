@@ -11,6 +11,21 @@
 #define XRGB_BYTES_PER_PIXEL (4)
 #define SIZEOF_PLAIN_TAIL (4)
 
+//
+// Scope release and zeroing of pointer
+//
+template < class T >
+class CAutoReleaseMe
+{
+    T*& pPtr;
+public:
+    CAutoReleaseMe( T*& pPtr ) : pPtr( pPtr ) {}
+    ~CAutoReleaseMe( void )
+    {
+        SAFE_RELEASE ( pPtr );
+    }
+};
+
 ///////////////////////////////////////////////////////////////
 //
 // CPixelsManager
