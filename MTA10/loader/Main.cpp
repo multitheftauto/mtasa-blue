@@ -22,6 +22,7 @@ CLocalizationInterface* g_pLocalization;
 int DoLaunchGame ( LPSTR lpCmdLine );
 int LaunchGame ( LPSTR lpCmdLine );
 
+HINSTANCE g_hLauncherInstance = NULL;
 HINSTANCE g_hInstance = NULL;
 
 ///////////////////////////////////////////////////////////////
@@ -33,6 +34,7 @@ HINSTANCE g_hInstance = NULL;
 ///////////////////////////////////////////////////////////////
 int WINAPI WinMain ( HINSTANCE _hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow )
 {
+    g_hLauncherInstance = _hInstance;
 #if defined(_DEBUG) 
     SharedUtil_Tests ();
 #endif
