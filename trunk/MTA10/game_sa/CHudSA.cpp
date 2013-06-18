@@ -19,6 +19,22 @@ char szZoneName[50] = {'\0'};
 CHudSA::CHudSA ( void )
 {
     InitComponentList ();
+
+    // Set the default values
+    m_fSniperCrosshairScale = 210.0f;
+
+    m_pfCameraCrosshairScale = (float*) VAR_CameraCrosshairScale;
+    *m_pfCameraCrosshairScale = 192.0f;
+    m_pfAspectRatioMultiplicator = (float*) VAR_AspectRatioMult;
+    *m_pfAspectRatioMultiplicator = 0.002232143f;
+
+    // Patch xrefs to 0x863B34, because this variable seems to be shared (2 other functions without any context access to it; probably a compiler optimization)
+    MemPut < DWORD > ( 0x58E7D4 + 2, (DWORD)&m_fSniperCrosshairScale );
+    MemPut < DWORD > ( 0x58E7EA + 2, (DWORD)&m_fSniperCrosshairScale );
+    MemPut < DWORD > ( 0x53E3ED + 2, (DWORD)&m_fSniperCrosshairScale );
+    MemPut < DWORD > ( 0x53E41A + 2, (DWORD)&m_fSniperCrosshairScale );
+    MemPut < DWORD > ( 0x53E488 + 2, (DWORD)&m_fSniperCrosshairScale );
+    MemPut < DWORD > ( 0x53E4BF + 2, (DWORD)&m_fSniperCrosshairScale );
 }
 
 VOID CHudSA::SetHelpMessage( char * szMessage )
@@ -279,5 +295,23 @@ void CHudSA::AdjustComponents ( float fAspectRatio )
 {
     // Fix for #7400 (HUD elements do not scale correctly for widescreen)
     // 0x859524: GTA multiplies all HUD and menu transformation variables by this floating point value. It is equal to 1/448, so just translate it to 16/10 / 16/9
-    MemPut < float > ( 0x859524, 0.002232143f / (4.0f/3.0f) * fAspectRatio );
+    *m_pfAspectRatioMultiplicator = 0.002232143f / (4.0f/3.0f) * fAspectRatio;
+
+    // Set the sniper crosshair scale (fix for #7659) | formular (re)produced by maximum scales (there's no exact clue to calculate these scales)
+    m_fSniperCrosshairScale = -39.375f * pow(fAspectRatio, 2) + 28.0f * fAspectRatio + 242.6666666666f;
+
+    // Set the camera crosshair scale (same display flaw as in #7659)
+    *m_pfCameraCrosshairScale = -36.0f * pow(fAspectRatio, 2) + 25.6f * fAspectRatio  + 221.866666666f;
+
+}
+
+//
+// CHudSA::ResetComponentAdjustment
+//
+void CHudSA::ResetComponentAdjustment ( void )
+{
+    // Restore default values (4:3 aspect ratio)
+    *m_pfAspectRatioMultiplicator = 0.002232143f;
+    *m_pfCameraCrosshairScale = 192.0f;
+    m_fSniperCrosshairScale = 210.0f;
 }
