@@ -127,7 +127,7 @@ public:
     void                    SetVolumetricShadowsEnabled    ( bool bEnable );
 
     eAspectRatio            GetAspectRatio              ( void );
-    void                    SetAspectRatio              ( eAspectRatio aspectRatio );
+    void                    SetAspectRatio              ( eAspectRatio aspectRatio, bool bAdjustmentEnabled = true );
 
     bool                    IsGrassEnabled              ( void );
     void                    SetGrassEnabled             ( bool bEnable );

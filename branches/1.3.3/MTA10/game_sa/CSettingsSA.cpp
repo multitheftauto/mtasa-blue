@@ -356,7 +356,7 @@ eAspectRatio CSettingsSA::GetAspectRatio ( void )
     return m_AspectRatio;
 }
 
-void CSettingsSA::SetAspectRatio ( eAspectRatio aspectRatio )
+void CSettingsSA::SetAspectRatio ( eAspectRatio aspectRatio, bool bAdjustmentEnabled )
 {
     // Process change
     m_AspectRatio = aspectRatio;
@@ -386,7 +386,10 @@ void CSettingsSA::SetAspectRatio ( eAspectRatio aspectRatio )
     MemPutFast < float > ( 0xC3EFA4, fValue );
 
     // Adjust position and size of our HUD components
-    pGame->GetHud ()->AdjustComponents ( fValue );
+    if ( bAdjustmentEnabled )
+        pGame->GetHud ()->AdjustComponents ( fValue );
+    else
+        pGame->GetHud ()->ResetComponentAdjustment ();
 }
 
 ////////////////////////////////////////////////
