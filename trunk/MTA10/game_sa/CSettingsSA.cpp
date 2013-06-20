@@ -356,6 +356,11 @@ eAspectRatio CSettingsSA::GetAspectRatio ( void )
     return m_AspectRatio;
 }
 
+float CSettingsSA::GetAspectRatioValue ( void )
+{
+    return *(float*)0xC3EFA4;
+}
+
 void CSettingsSA::SetAspectRatio ( eAspectRatio aspectRatio, bool bAdjustmentEnabled )
 {
     // Process change

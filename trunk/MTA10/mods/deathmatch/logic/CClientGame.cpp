@@ -1258,6 +1258,7 @@ void CClientGame::DoPulses ( void )
 
     // Check for radar input
     m_pRadarMap->DoPulse ();
+    g_pCore->GetGraphics ()->SetAspectRatioAdjustmentSuspended( m_pRadarMap->IsRadarShowing() );
 
     // Got a local player?
     if ( m_pLocalPlayer )

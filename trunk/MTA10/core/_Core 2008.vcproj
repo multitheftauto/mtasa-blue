@@ -1026,6 +1026,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CAspectRatioConverter.h"
+				>
+			</File>
+			<File
 				RelativePath=".\CChat.h"
 				>
 			</File>

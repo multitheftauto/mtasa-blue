@@ -31,6 +31,7 @@ class CGraphics;
 class CTileBatcher;
 class CLine3DBatcher;
 class CMaterialLine3DBatcher;
+class CAspectRatioConverter;
 struct IDirect3DDevice9;
 struct IDirect3DSurface9;
 
@@ -91,6 +92,13 @@ public:
 
     unsigned int        GetViewportWidth        ( void );
     unsigned int        GetViewportHeight       ( void );
+
+    void                SetAspectRatioAdjustmentEnabled     ( bool bEnabled, float fSourceRatio = 4/3.f );
+    bool                IsAspectRatioAdjustmentEnabled      ( void );
+    float               GetAspectRatioAdjustmentSourceRatio ( void );
+    void                SetAspectRatioAdjustmentSuspended   ( bool bSuspended );
+    float               ConvertPositionForAspectRatio       ( float fY );
+    void                ConvertSideForAspectRatio           ( float* pfY, float* pfHeight );
 
     // DirectX font functions
     ID3DXFont *         GetFont                 ( eFontType fontType = FONT_DEFAULT, float* pfOutScaleUsed = NULL, float fRequestedScale = 1, const char* szCustomScaleUser = NULL );
@@ -222,6 +230,7 @@ private:
     CLine3DBatcher*             m_pLine3DBatcherPreGUI;
     CLine3DBatcher*             m_pLine3DBatcherPostGUI;
     CMaterialLine3DBatcher*     m_pMaterialLine3DBatcher;
+    CAspectRatioConverter*      m_pAspectRatioConverter;
 
     // Fonts
     ID3DXFont*          m_pDXFonts [ NUM_FONTS ];

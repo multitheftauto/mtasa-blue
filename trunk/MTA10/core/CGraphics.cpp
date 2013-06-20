@@ -17,6 +17,7 @@
 #include "CTileBatcher.h"
 #include "CLine3DBatcher.h"
 #include "CMaterialLine3DBatcher.h"
+#include "CAspectRatioConverter.h"
 extern CCore* g_pCore;
 extern bool g_bInGTAScene;
 extern bool g_bInMTAScene;
@@ -54,6 +55,7 @@ CGraphics::CGraphics ( CLocalGUI* pGUI )
     m_pScreenGrabber = NewScreenGrabber ();
     m_pPixelsManager = NewPixelsManager ();
     m_LastLostDeviceTimer.SetMaxIncrement( 250 );
+    m_pAspectRatioConverter = new CAspectRatioConverter();
 }
 
 
@@ -72,6 +74,7 @@ CGraphics::~CGraphics ( void )
     SAFE_DELETE ( m_pMaterialLine3DBatcher );
     SAFE_DELETE ( m_pScreenGrabber );
     SAFE_DELETE ( m_pPixelsManager );
+    SAFE_DELETE ( m_pAspectRatioConverter );
 }
 
 
@@ -154,6 +157,41 @@ void CGraphics::DrawRectangle ( float fX, float fY, float fWidth, float fHeight,
     m_pDXSprite->SetTransform ( &matrix );
     m_pDXSprite->Draw ( m_pDXPixelTexture, NULL, NULL, NULL, ulColor );
     EndDrawBatch ();
+}
+
+
+//
+// Aspect ratio compensation malarky
+// 
+void CGraphics::SetAspectRatioAdjustmentEnabled( bool bEnabled, float fSourceRatio )
+{
+    m_pAspectRatioConverter->SetSourceRatioValue( bEnabled ? fSourceRatio : 0 );
+}
+
+bool CGraphics::IsAspectRatioAdjustmentEnabled( void )
+{
+    return m_pAspectRatioConverter->IsEnabled();
+}
+
+float CGraphics::GetAspectRatioAdjustmentSourceRatio( void )
+{
+    return m_pAspectRatioConverter->GetSourceRatioValue();
+}
+
+void CGraphics::SetAspectRatioAdjustmentSuspended( bool bSuspended )
+{
+    m_pAspectRatioConverter->SetSuspended( bSuspended );
+}
+
+
+float CGraphics::ConvertPositionForAspectRatio( float fY )
+{
+    return m_pAspectRatioConverter->ConvertPositionForAspectRatio( fY );
+}
+
+void CGraphics::ConvertSideForAspectRatio( float* pfY, float* pfHeight )
+{
+    m_pAspectRatioConverter->ConvertSideForAspectRatio( pfY, pfHeight );
 }
 
 
@@ -583,6 +621,9 @@ void CGraphics::DrawLineQueued ( float fX1, float fY1,
                                  unsigned long ulColor,
                                  bool bPostGUI )
 {
+    fY1 = m_pAspectRatioConverter->ConvertPositionForAspectRatio( fY1 );
+    fY2 = m_pAspectRatioConverter->ConvertPositionForAspectRatio( fY2 );
+
     // Set up a queue item
     sDrawQueueItem Item;
     Item.eType = QUEUE_LINE;
@@ -646,6 +687,8 @@ void CGraphics::DrawRectQueued ( float fX, float fY,
                                  unsigned long ulColor,
                                  bool bPostGUI )
 {
+    m_pAspectRatioConverter->ConvertSideForAspectRatio( &fY, &fHeight );
+
     // Set up a queue item
     sDrawQueueItem Item;
     Item.eType = QUEUE_RECT;
@@ -673,6 +716,7 @@ void CGraphics::DrawTextureQueued ( float fX, float fY,
                                  unsigned long ulColor,
                                  bool bPostGUI )
 {
+    m_pAspectRatioConverter->ConvertSideForAspectRatio( &fY, &fHeight );
 
     // Set up a queue item
     sDrawQueueItem Item;
@@ -739,6 +783,9 @@ void CGraphics::DrawTextQueued ( float fLeft, float fTop,
 
     if ( !pDXFont )
         return;
+
+    fTop = m_pAspectRatioConverter->ConvertPositionForAspectRatio( fTop );
+    fBottom = m_pAspectRatioConverter->ConvertPositionForAspectRatio( fBottom );
 
     if ( !bColorCoded )
     {
@@ -1136,6 +1183,7 @@ void CGraphics::OnDeviceCreate ( IDirect3DDevice9 * pDevice )
     m_pScreenGrabber->OnDeviceCreate ( pDevice );
     m_pPixelsManager->OnDeviceCreate ( pDevice );
     m_ProgressSpinnerTexture = GetRenderItemManager ()->CreateTexture ( CalcMTASAPath( "MTA\\cgui\\images\\busy_spinner.png" ), NULL, false, -1, -1, RFORMAT_DXT3, TADDRESS_CLAMP );
+    m_pAspectRatioConverter->Init( GetViewportHeight () );
 }
 
 
@@ -1603,6 +1651,7 @@ void CGraphics::DidRenderScene( void )
     }
     SAFE_RELEASE( m_pSavedFrontBufferData );
     m_LastRenderedSceneTimer.Reset();
+    m_pAspectRatioConverter->Pulse( CCore::GetSingleton ().GetGame ()->GetSettings ()->GetAspectRatioValue() );
 }
 
 

@@ -19,6 +19,7 @@
 
 #include "StdInc.h"
 #define MIN_CLIENT_REQ_DXSETRENDERTARGET_CALL_RESTRICTIONS  "1.3.0-9.04431"
+extern bool g_bAllowAspectRatioAdjustment;
 
 int CLuaFunctionDefs::dxDrawLine ( lua_State* luaVM )
 {
@@ -931,7 +932,7 @@ int CLuaFunctionDefs::dxGetStatus ( lua_State* luaVM )
         SDxStatus dxStatus;
         g_pCore->GetGraphics ()->GetRenderItemManager ()->GetDxStatus ( dxStatus );
 
-        lua_createtable ( luaVM, 0, 13 );
+        lua_createtable ( luaVM, 0, 21 );
 
         lua_pushstring ( luaVM, "TestMode" );
         lua_pushstring ( luaVM, EnumToString ( dxStatus.testMode ) );
@@ -1269,4 +1270,42 @@ int CLuaFunctionDefs::dxGetBlendMode ( lua_State* luaVM )
     EBlendModeType blendMode = g_pCore->GetGraphics ()->GetBlendMode ();
     lua_pushstring ( luaVM, EnumToString ( blendMode ) );
     return 1;
+}
+
+
+int CLuaFunctionDefs::dxSetAspectRatioAdjustmentEnabled ( lua_State* luaVM )
+{
+//  bool dxSetAspectRatioAdjustmentEnabled( bool enabled, float sourceRatio = 4/3 )
+    bool bEnabled; float fSourceRatio;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadBool ( bEnabled );
+    argStream.ReadNumber ( fSourceRatio, 4/3.f );
+
+    if ( !g_bAllowAspectRatioAdjustment )
+        argStream.SetCustomError( "Function can only be used inside certain events" );
+
+    if ( !argStream.HasErrors () )
+    {
+        g_pCore->GetGraphics ()->SetAspectRatioAdjustmentEnabled ( bEnabled, fSourceRatio );
+        lua_pushboolean ( luaVM, true );
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+
+    // Failed
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::dxIsAspectRatioAdjustmentEnabled ( lua_State* luaVM )
+{
+//  bool, float dxIsAspectRatioAdjustmentEnabled()
+    bool bEnabled = g_pCore->GetGraphics ()->IsAspectRatioAdjustmentEnabled();
+    float fSourceRatio = g_pCore->GetGraphics ()->GetAspectRatioAdjustmentSourceRatio();
+    lua_pushboolean ( luaVM, bEnabled );
+    lua_pushnumber ( luaVM, fSourceRatio );
+    return 2;
 }

@@ -680,6 +680,8 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "dxSetPixelColor", CLuaFunctionDefs::dxSetPixelColor );
     CLuaCFunctions::AddFunction ( "dxSetBlendMode", CLuaFunctionDefs::dxSetBlendMode );
     CLuaCFunctions::AddFunction ( "dxGetBlendMode", CLuaFunctionDefs::dxGetBlendMode );
+    CLuaCFunctions::AddFunction ( "dxSetAspectRatioAdjustmentEnabled", CLuaFunctionDefs::dxSetAspectRatioAdjustmentEnabled );
+    CLuaCFunctions::AddFunction ( "dxIsAspectRatioAdjustmentEnabled", CLuaFunctionDefs::dxIsAspectRatioAdjustmentEnabled );
 
     // Audio funcs
     CLuaCFunctions::AddFunction ( "playSoundFrontEnd", CLuaFunctionDefs::PlaySoundFrontEnd );

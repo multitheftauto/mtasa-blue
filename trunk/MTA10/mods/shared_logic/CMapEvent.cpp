@@ -24,6 +24,10 @@ CMapEvent::CMapEvent ( CLuaMain* pMain, const char* szName, const CLuaFunctionRe
     m_eventPriority = eventPriority;
     m_fPriorityMod = fPriorityMod;
     m_strName.AssignLeft ( szName, MAPEVENT_MAX_LENGTH_NAME );
+    // Only allow dxSetAspectRatioAdjustmentEnabled during these events
+    m_bAllowAspectRatioAdjustment = ( m_strName == "onClientRender" ) || ( m_strName == "onClientPreRender" ) || ( m_strName == "onClientHUDRender" );
+    // Force aspect ratio adjustment for 'customblips' resource
+    m_bForceAspectRatioAdjustment = m_bAllowAspectRatioAdjustment && SStringX( pMain->GetScriptName() ) == "customblips";
 }
 
 
