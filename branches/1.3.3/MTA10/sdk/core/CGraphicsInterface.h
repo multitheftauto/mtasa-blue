@@ -66,6 +66,13 @@ public:
     virtual unsigned int            GetViewportWidth    ( void ) = 0;
     virtual unsigned int            GetViewportHeight   ( void ) = 0;
 
+    virtual void                    SetAspectRatioAdjustmentEnabled     ( bool bEnabled, float fSourceRatio = 4/3.f ) = 0;
+    virtual bool                    IsAspectRatioAdjustmentEnabled      ( void ) = 0;
+    virtual float                   GetAspectRatioAdjustmentSourceRatio ( void ) = 0;
+    virtual void                    SetAspectRatioAdjustmentSuspended   ( bool bSuspended ) = 0;
+    virtual float                   ConvertPositionForAspectRatio       ( float fY ) = 0;
+    virtual void                    ConvertSideForAspectRatio           ( float* pfY, float* pfHeight ) = 0;
+
     virtual float                   GetDXFontHeight     ( float fScale = 1.0f, ID3DXFont * pDXFont = NULL ) = 0;
     virtual float                   GetDXCharacterWidth ( char c, float fScale = 1.0f, ID3DXFont * pDXFont = NULL ) = 0;
     virtual float                   GetDXTextExtent     ( const char * szText, float fScale = 1.0f, ID3DXFont * pDXFont = NULL, bool bColorCoded = false ) = 0;

@@ -14,7 +14,7 @@
 *****************************************************************************/
 
 #include "StdInc.h"
-
+bool g_bAllowAspectRatioAdjustment = false;
 
 CMapEventManager::CMapEventManager ( void )
 {
@@ -177,6 +177,14 @@ bool CMapEventManager::Call ( const char* szName, const CLuaArguments& Arguments
 
                     TIMEUS startTime = GetTimeUs();
 
+                    // Aspect ratio adjustment bodges
+                    if ( pMapEvent->ShouldAllowAspectRatioAdjustment() )
+                    {
+                        g_bAllowAspectRatioAdjustment = true;
+                        if ( pMapEvent->ShouldForceAspectRatioAdjustment() )
+                            g_pCore->GetGraphics()->SetAspectRatioAdjustmentEnabled( true );
+                    }
+
                     // Record event for the crash dump writer
                     g_pCore->LogEvent ( 405, "Lua Event", pMapEvent->GetVM ()->GetScriptName (), szName );
 
@@ -240,6 +248,13 @@ bool CMapEventManager::Call ( const char* szName, const CLuaArguments& Arguments
                     #if MTA_DEBUG
                         assert ( lua_gettop ( pState ) == luaStackPointer );
                     #endif
+
+                    // Aspect ratio adjustment bodges
+                    if ( pMapEvent->ShouldAllowAspectRatioAdjustment() )
+                    {
+                        g_pCore->GetGraphics()->SetAspectRatioAdjustmentEnabled( false );
+                        g_bAllowAspectRatioAdjustment = false;
+                    }
 
                     TIMEUS deltaTimeUs = GetTimeUs() - startTime;
 

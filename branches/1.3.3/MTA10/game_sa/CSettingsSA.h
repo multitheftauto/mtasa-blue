@@ -126,6 +126,7 @@ public:
     bool                    IsVolumetricShadowsEnabled     ( void );
     void                    SetVolumetricShadowsEnabled    ( bool bEnable );
 
+    float                   GetAspectRatioValue         ( void );
     eAspectRatio            GetAspectRatio              ( void );
     void                    SetAspectRatio              ( eAspectRatio aspectRatio, bool bAdjustmentEnabled = true );
 

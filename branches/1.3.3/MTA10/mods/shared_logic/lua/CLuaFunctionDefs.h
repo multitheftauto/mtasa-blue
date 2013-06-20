@@ -577,6 +577,8 @@ public:
     LUA_DECLARE ( dxSetPixelColor );
     LUA_DECLARE ( dxSetBlendMode );
     LUA_DECLARE ( dxGetBlendMode );
+    LUA_DECLARE ( dxSetAspectRatioAdjustmentEnabled );
+    LUA_DECLARE ( dxIsAspectRatioAdjustmentEnabled );
 
     // Util functions to make scripting easier for the end user
     // Some of these are based on standard mIRC script funcs as a lot of people will be used to them
