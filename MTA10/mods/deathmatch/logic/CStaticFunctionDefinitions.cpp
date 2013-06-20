@@ -4994,6 +4994,17 @@ void CStaticFunctionDefinitions::GUISetPosition ( CClientEntity& Entity, const C
 
         // Set the positin
         GUIElement.GetCGUIElement ()->SetPosition ( vecPosition, bRelative );
+
+        // Adjust for aspect ratio if needed
+        if ( g_pCore->GetGraphics ()->IsAspectRatioAdjustmentEnabled() )
+        {
+            CVector2D vecNewPosition = GUIElement.GetCGUIElement ()->GetPosition ( false );
+            CVector2D vecSize = GUIElement.GetCGUIElement ()->GetSize ( false );
+            float fY = vecNewPosition.fY + vecSize.fY * 0.5f;
+            fY = g_pCore->GetGraphics ()->ConvertPositionForAspectRatio( fY );
+            vecNewPosition.fY = fY - vecSize.fY * 0.5f;
+            GUIElement.GetCGUIElement ()->SetPosition ( vecNewPosition, false );
+        }
     }
 }
 
