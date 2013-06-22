@@ -497,21 +497,33 @@ failed:
 // Check caps seem correct
 //
 ////////////////////////////////////////////////
-void AddCapsReport( IDirect3DDevice9* pD3DDevice9 )
+void AddCapsReport( UINT Adapter, IDirect3D9* pDirect3D, IDirect3DDevice9* pD3DDevice9, bool bFixGTACaps )
 {
     HRESULT hr;
 
     // Get caps that GTA got
-    D3DCAPS9* GTACaps9 = (D3DCAPS9*)0x00C9BF00;
-    WriteDebugEvent( SString( "CapsReport GTACaps9 - %s ", *ToString( *GTACaps9 ) ) );
+    D3DCAPS9* pGTACaps9 = (D3DCAPS9*)0x00C9BF00;
+    WriteDebugEvent( SString( "CapsReport GTACaps9 - %s ", *ToString( *pGTACaps9 ) ) );
 
     if ( !pD3DDevice9 )
         return;
 
-    // Get caps for ourselves
-    D3DCAPS9 Caps9;
-    hr = pD3DDevice9->GetDeviceCaps( &Caps9 );
-    WriteDebugEvent( SString( "CapsReport Caps9 - %s ", *ToString( Caps9 ) ) );
+    // Check device returns same D3D interface
+    IDirect3D9* pDirect3DOther = NULL;
+    pD3DDevice9->GetDirect3D( &pDirect3DOther );
+    if ( pDirect3DOther != pDirect3D )
+        WriteDebugEvent( SString( "IDirect3D9 differs: %x %x", pDirect3DOther, pDirect3D ) );
+    SAFE_RELEASE( pDirect3DOther );
+
+    // Get caps from D3D
+    D3DCAPS9 D3DCaps9;
+    hr = pDirect3D->GetDeviceCaps( Adapter, D3DDEVTYPE_HAL, &D3DCaps9 );
+    WriteDebugEvent( SString( "IDirect3D9 CapsReport Caps9 - %s ", *ToString( D3DCaps9 ) ) );
+
+    // Get caps from Device
+    D3DCAPS9 DeviceCaps9;
+    hr = pD3DDevice9->GetDeviceCaps( &DeviceCaps9 );
+    WriteDebugEvent( SString( "IDirect3DDevice9 CapsReport Caps9 - %s ", *ToString( DeviceCaps9 ) ) );
 
     // Test caps
     struct {
@@ -547,7 +559,7 @@ void AddCapsReport( IDirect3DDevice9* pD3DDevice9 )
         SAFE_RELEASE( pD3DVertexDecl );
 
         // Check against device caps
-        bool bCapsSaysOk = ( Caps9.DeclTypes & DeclTypesList[i].CapsType ) ? true : false;
+        bool bCapsSaysOk = ( DeviceCaps9.DeclTypes & DeclTypesList[i].CapsType ) ? true : false;
         bool bMatchesCaps = ( hr == D3D_OK ) == ( bCapsSaysOk == true );
         if ( bMatchesCaps )
             uiNumMatchesCaps++;
@@ -555,6 +567,24 @@ void AddCapsReport( IDirect3DDevice9* pD3DDevice9 )
             WriteDebugEvent( SString( "CapsReport - CreateVertexDeclaration %d/%d [MISMATCH] (VertexType:%d) result: %x (Matches caps:%d)", i, uiNumItems, DeclTypesList[i].VertexType, hr, bMatchesCaps ) );
     }
     WriteDebugEvent( SString( "CapsReport - CreateVertexDeclarations MatchesCaps:%d/%d", uiNumMatchesCaps, uiNumItems ) );
+
+    DeviceCaps9.MaxActiveLights = Min( DeviceCaps9.MaxActiveLights, pGTACaps9->MaxActiveLights );
+    DeviceCaps9.MaxVertexBlendMatrixIndex = Min( DeviceCaps9.MaxVertexBlendMatrixIndex, pGTACaps9->MaxVertexBlendMatrixIndex );
+    pGTACaps9->MaxActiveLights = DeviceCaps9.MaxActiveLights;
+    pGTACaps9->MaxVertexBlendMatrixIndex = DeviceCaps9.MaxVertexBlendMatrixIndex;
+    D3DCaps9.MaxActiveLights = DeviceCaps9.MaxActiveLights;
+    D3DCaps9.MaxVertexBlendMatrixIndex = DeviceCaps9.MaxVertexBlendMatrixIndex;
+
+    bool DeviceCapsSameAsGTACaps = memcmp( &DeviceCaps9, pGTACaps9, sizeof( D3DCAPS9 ) ) == 0;
+    bool DeviceCapsSameAsD3DCaps9 = memcmp( &DeviceCaps9, &D3DCaps9, sizeof( D3DCAPS9 ) ) == 0;
+
+    WriteDebugEvent( SString( "DeviceCaps==GTACaps:%d  DeviceCaps==D3DCaps9:%d", DeviceCapsSameAsGTACaps, DeviceCapsSameAsD3DCaps9 ) );
+
+    if ( bFixGTACaps && !DeviceCapsSameAsGTACaps )
+    {
+        WriteDebugEvent( "Fixing GTA caps" );
+        memcpy( pGTACaps9, &DeviceCaps9, sizeof( D3DCAPS9 ) );
+    }
 }
 
 
@@ -645,7 +675,7 @@ HRESULT HandleCreateDeviceResult( HRESULT hResult, IDirect3D9* pDirect3D, UINT A
         if ( GetApplicationSettingInt( "diagnostics", "optimus" ) )
             uiDiagnosticLogLevel = 1;
 
-    AddCapsReport( *ppReturnedDeviceInterface );
+    AddCapsReport( Adapter, pDirect3D, *ppReturnedDeviceInterface, false );
 
     if ( uiDiagnosticLogLevel )
     {
@@ -683,6 +713,8 @@ namespace
 ////////////////////////////////////////////////
 void CCore::OnPreCreateDevice( IDirect3D9* pDirect3D, UINT Adapter, D3DDEVTYPE DeviceType, HWND hFocusWindow, DWORD& BehaviorFlags, D3DPRESENT_PARAMETERS* pPresentationParameters )
 {
+    assert( 0 );
+
     if ( !UsingAltD3DSetup() )
         return;
 
@@ -733,47 +765,54 @@ HRESULT CCore::OnPostCreateDevice( HRESULT hResult, IDirect3D9* pDirect3D, UINT 
     if ( !UsingAltD3DSetup() )
         return D3D_OK;
 
+    //
+    // - Allow create device with no changes
+    // - Check caps and report diff with GTA caps
+    // - Release device
+    //
     WriteDebugEvent ( "CCore::OnPostCreateDevice - Alt startup used" );
 
-    // Do diagnostic log if initial attempt failed or previous run failed
-    bool bDiagnosticLog = ( hResult != D3D_OK ) || GetApplicationSettingInt( "diagnostics", "last-create-device-result" );
-
-    // If failed, try again a few more times over the next second
     if ( hResult != D3D_OK )
-        hResult = CreateDeviceInsist( 2, 1000, pDirect3D, Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters, ppReturnedDeviceInterface );
+        WriteDebugEvent ( SString( "Initial CreateDevice failed: %08x", hResult ) );
+    else
+        WriteDebugEvent ( "Initial CreateDevice succeeded" );
 
-    // Save result so we can do something different next time if needed
-    SetApplicationSettingInt( "diagnostics", "last-create-device-result", hResult );
+    AddCapsReport( Adapter, pDirect3D, *ppReturnedDeviceInterface, false );
+
+    SAFE_RELEASE( *ppReturnedDeviceInterface );
+
+    //
+    // - Create device with required changes
+    // - Check caps and report diff with GTA caps
+    // - Fix GTA caps if needed
+    //
+
+    // Save original values for later
+    BehaviorFlagsOrig = BehaviorFlags;
+    presentationParametersOrig = *pPresentationParameters;
+
+    WriteDebugEvent ( "  Original paramters:" );
+    WriteDebugEvent ( ToString( Adapter, DeviceType, hFocusWindow, BehaviorFlags, *pPresentationParameters ) );
+
+    // Make sure DirectX Get...() calls will work
+    BehaviorFlags &= ~D3DCREATE_PUREDEVICE;
+
+    // Enable the auto depth stencil parameter
+    pPresentationParameters->EnableAutoDepthStencil = true;
+
+    GetVideoModeManager ()->PreCreateDevice ( pPresentationParameters );
+
+    WriteDebugEvent ( "  Modified paramters:" );
+    WriteDebugEvent ( ToString( Adapter, DeviceType, hFocusWindow, BehaviorFlags, *pPresentationParameters ) );
+
+    hResult = CreateDeviceInsist( 2, 1000, pDirect3D, Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters, ppReturnedDeviceInterface );
 
     if ( hResult != D3D_OK )
-    {
-        // Handle retry on failure
-        WriteDebugEvent ( SString( "CreateDevice failed #1: %08x", hResult ) );
+        WriteDebugEvent ( SString( "MTA CreateDevice failed: %08x", hResult ) );
+    else
+        WriteDebugEvent ( "MTA CreateDevice succeeded" );
 
-        // If create failed, try using original presentationParameters
-        *pPresentationParameters = presentationParametersOrig;
-        WriteDebugEvent ( "  Attempt #2 with orig pp:" );
-        WriteDebugEvent ( ToString( Adapter, DeviceType, hFocusWindow, BehaviorFlags, *pPresentationParameters ) );
-        hResult = CreateDeviceInsist( 2, 1000, pDirect3D, Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters, ppReturnedDeviceInterface );
-
-        if ( hResult != D3D_OK )
-        {
-            WriteDebugEvent ( SString( "CreateDevice failed #2: %08x", hResult ) );
-
-            // If create failed, try using original BehaviorFlags as well
-            WriteDebugEvent ( "  Attempt #3 with orig bf+pp:" );
-            WriteDebugEvent ( ToString( Adapter, DeviceType, hFocusWindow, BehaviorFlagsOrig, *pPresentationParameters ) );
-            hResult = CreateDeviceInsist( 2, 1000, pDirect3D, Adapter, DeviceType, hFocusWindow, BehaviorFlagsOrig, pPresentationParameters, ppReturnedDeviceInterface );
-
-            if ( hResult != D3D_OK )
-            {
-                WriteDebugEvent ( SString( "CreateDevice failed #3: %08x", hResult ) );
-            }
-        }
-    }
-
-    AddCapsReport( *ppReturnedDeviceInterface );
-
+    AddCapsReport( Adapter, pDirect3D, *ppReturnedDeviceInterface, true );
 
     // Change the window title to MTA: San Andreas
     #ifdef MTA_DEBUG

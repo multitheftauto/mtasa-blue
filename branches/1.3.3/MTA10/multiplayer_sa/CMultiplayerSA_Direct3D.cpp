@@ -39,7 +39,7 @@ void _cdecl OnPreCreateDevice( IDirect3D9* pDirect3D, UINT Adapter, D3DDEVTYPE D
     // Unpatch
     MemCpy( (PVOID)RESTORE_Addr_PreCreateDevice, RESTORE_Bytes_PreCreateDevice, RESTORE_Size_PreCreateDevice );
 
-    g_pCore->OnPreCreateDevice( pDirect3D, Adapter, DeviceType, hFocusWindow, *BehaviorFlags, pPresentationParameters );
+    //g_pCore->OnPreCreateDevice( pDirect3D, Adapter, DeviceType, hFocusWindow, *BehaviorFlags, pPresentationParameters );
     ms_pDirect3D                 = pDirect3D;
     ms_Adapter                   = Adapter;
     ms_DeviceType                = DeviceType;
