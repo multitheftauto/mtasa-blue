@@ -512,7 +512,30 @@ void AddCapsReport( UINT Adapter, IDirect3D9* pDirect3D, IDirect3DDevice9* pD3DD
     IDirect3D9* pDirect3DOther = NULL;
     pD3DDevice9->GetDirect3D( &pDirect3DOther );
     if ( pDirect3DOther != pDirect3D )
-        WriteDebugEvent( SString( "IDirect3D9 differs: %x %x", pDirect3DOther, pDirect3D ) );
+    {
+        WriteDebugEvent( SString( "IDirect3D9 differs: %x %x", pDirect3D, pDirect3DOther ) );
+
+        if ( pDirect3DOther )
+        {
+              // Log graphic card name
+              D3DADAPTER_IDENTIFIER9 AdapterIdent1;
+              pDirect3D->GetAdapterIdentifier ( Adapter, 0, &AdapterIdent1 );
+              WriteDebugEvent ( "pDirect3D:" );
+              WriteDebugEvent ( ToString( AdapterIdent1 ) );
+      
+              // Log graphic card name
+              D3DADAPTER_IDENTIFIER9 AdapterIdent2;
+              pDirect3DOther->GetAdapterIdentifier ( Adapter, 0, &AdapterIdent2 );
+              WriteDebugEvent ( "pDirect3DOther:" );
+              WriteDebugEvent ( ToString( AdapterIdent2 ) );
+
+            // Get caps from pDirect3DOther
+            D3DCAPS9 D3DCaps9;
+            hr = pDirect3DOther->GetDeviceCaps( Adapter, D3DDEVTYPE_HAL, &D3DCaps9 );
+            WriteDebugEvent( SString( "pDirect3DOther CapsReport Caps9 - %s ", *ToString( D3DCaps9 ) ) );
+        }
+    }
+
     SAFE_RELEASE( pDirect3DOther );
 
     // Get caps from D3D
