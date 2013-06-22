@@ -43,6 +43,13 @@ BYTE * CreateJump ( DWORD dwFrom, DWORD dwTo, BYTE * ByteArray );
 // US/EU hook installation
 // Includes additional return pointer copies if required
 #define EZHookInstall_HERE(type,CO) \
+        __if_exists( RESTORE_Bytes_##type ) \
+        { \
+            RESTORE_Addr_##type = HOOKPOS_##type##_##CO##; \
+            RESTORE_Size_##type = HOOKSIZE_##type##_##CO##; \
+            assert( sizeof(RESTORE_Bytes_##type) >= RESTORE_Size_##type ); \
+            MemCpyFast ( RESTORE_Bytes_##type, (PVOID)RESTORE_Addr_##type, RESTORE_Size_##type ); \
+        } \
         HookInstall( HOOKPOS_##type##_##CO##, (DWORD)HOOK_##type, HOOKSIZE_##type##_##CO## ); \
         RETURN_##type##_BOTH = RETURN_##type##_##CO##; \
         __if_exists( RETURN_##type##B_##CO## ) \

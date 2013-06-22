@@ -146,9 +146,21 @@ void BeginD3DStuff( void )
         WriteDebugEvent( SString( "D3DStuff %d Caps9 - %s ", i, *ToString( Caps9 ) ) );
     }
 
+#ifdef MTA_DEBUG
+    bDetectedOptimus = true;
+#endif
+    bool bAltStartup = false;
+
+    if ( bDetectedOptimus )
+    {
+        int iResponse = MessageBox( NULL, "NVidia Optimus detected.\n\nDo you want to try the alternate startup method?", "MTA:SA Startup", MB_YESNO );
+        if ( iResponse == IDYES )
+            bAltStartup = true;
+    }
+
     SetApplicationSettingInt( "diagnostics", "optimus", bDetectedOptimus );
-    if ( !bDetectedOptimus )
-        return;
+    SetApplicationSettingInt( "diagnostics", "optimus-alt-startup", bAltStartup );
+    return;
 
     // Try extra stuff
     HWND hWnd = CreateWindowForD3D();

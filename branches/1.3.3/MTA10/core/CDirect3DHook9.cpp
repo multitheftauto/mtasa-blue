@@ -32,6 +32,9 @@ CDirect3DHook9::~CDirect3DHook9 ( )
 
 bool CDirect3DHook9::ApplyHook ( )
 {
+    if ( UsingAltD3DSetup() )
+        return true;
+
     // Hook Direct3DCreate9.
     if ( !m_pfnDirect3DCreate9 )
     {
@@ -50,6 +53,9 @@ bool CDirect3DHook9::ApplyHook ( )
 
 bool CDirect3DHook9::RemoveHook ( )
 {
+    if ( UsingAltD3DSetup() )
+        return true;
+
     m_bDirect3DCreate9Suspended = true;
     WriteDebugEvent ( "Direct3D9 hook suspended." );
     return true;
