@@ -804,7 +804,7 @@ SString CInstallManager::_ProcessDepChecks ( void )
                 FILE* fh = fopen ( strGTAEXEPath, "r+b" );
                 if ( !fh )
                 {
-                    m_strAdminReason = _("Update DEP setting");
+                    m_strAdminReason = "Update DEP setting";
                     return "fail";
                 }
                 if ( !fseek ( fh, 0xDC, SEEK_SET ) )
