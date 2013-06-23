@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    FreeType renderer modules public interface (specification).          */
 /*                                                                         */
-/*  Copyright 1996-2001, 2005 by                                           */
+/*  Copyright 1996-2001, 2005, 2006, 2010 by                               */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -46,9 +46,9 @@ FT_BEGIN_HEADER
   (*FT_Glyph_DoneFunc)( FT_Glyph  glyph );
 
   typedef void
-  (*FT_Glyph_TransformFunc)( FT_Glyph    glyph,
-                             FT_Matrix*  matrix,
-                             FT_Vector*  delta );
+  (*FT_Glyph_TransformFunc)( FT_Glyph          glyph,
+                             const FT_Matrix*  matrix,
+                             const FT_Vector*  delta );
 
   typedef void
   (*FT_Glyph_GetBBoxFunc)( FT_Glyph  glyph,
@@ -85,16 +85,16 @@ FT_BEGIN_HEADER
 
 
   typedef FT_Error
-  (*FT_Renderer_RenderFunc)( FT_Renderer   renderer,
-                             FT_GlyphSlot  slot,
-                             FT_UInt       mode,
-                             FT_Vector*    origin );
+  (*FT_Renderer_RenderFunc)( FT_Renderer       renderer,
+                             FT_GlyphSlot      slot,
+                             FT_UInt           mode,
+                             const FT_Vector*  origin );
 
   typedef FT_Error
-  (*FT_Renderer_TransformFunc)( FT_Renderer   renderer,
-                                FT_GlyphSlot  slot,
-                                FT_Matrix*    matrix,
-                                FT_Vector*    delta );
+  (*FT_Renderer_TransformFunc)( FT_Renderer       renderer,
+                                FT_GlyphSlot      slot,
+                                const FT_Matrix*  matrix,
+                                const FT_Vector*  delta );
 
 
   typedef void
@@ -124,27 +124,28 @@ FT_BEGIN_HEADER
   /*    The renderer module class descriptor.                              */
   /*                                                                       */
   /* <Fields>                                                              */
-  /*    root         :: The root FT_Module_Class fields.                   */
+  /*    root            :: The root @FT_Module_Class fields.               */
   /*                                                                       */
-  /*    glyph_format :: The glyph image format this renderer handles.      */
+  /*    glyph_format    :: The glyph image format this renderer handles.   */
   /*                                                                       */
-  /*    render_glyph :: A method used to render the image that is in a     */
-  /*                    given glyph slot into a bitmap.                    */
+  /*    render_glyph    :: A method used to render the image that is in a  */
+  /*                       given glyph slot into a bitmap.                 */
   /*                                                                       */
-  /*    set_mode     :: A method used to pass additional parameters.       */
+  /*    transform_glyph :: A method used to transform the image that is in */
+  /*                       a given glyph slot.                             */
   /*                                                                       */
-  /*    raster_class :: For `FT_GLYPH_FORMAT_OUTLINE' renderers only, this */
-  /*                    is a pointer to its raster's class.                */
+  /*    get_glyph_cbox  :: A method used to access the glyph's cbox.       */
   /*                                                                       */
-  /*    raster       :: For `FT_GLYPH_FORMAT_OUTLINE' renderers only. this */
-  /*                    is a pointer to the corresponding raster object,   */
-  /*                    if any.                                            */
+  /*    set_mode        :: A method used to pass additional parameters.    */
+  /*                                                                       */
+  /*    raster_class    :: For @FT_GLYPH_FORMAT_OUTLINE renderers only.    */
+  /*                       This is a pointer to its raster's class.        */
   /*                                                                       */
   typedef struct  FT_Renderer_Class_
   {
-    FT_Module_Class       root;
+    FT_Module_Class            root;
 
-    FT_Glyph_Format       glyph_format;
+    FT_Glyph_Format            glyph_format;
 
     FT_Renderer_RenderFunc     render_glyph;
     FT_Renderer_TransformFunc  transform_glyph;
@@ -162,7 +163,7 @@ FT_BEGIN_HEADER
   /*    FT_Get_Renderer                                                    */
   /*                                                                       */
   /* <Description>                                                         */
-  /*    Retrieves the current renderer for a given glyph format.           */
+  /*    Retrieve the current renderer for a given glyph format.            */
   /*                                                                       */
   /* <Input>                                                               */
   /*    library :: A handle to the library object.                         */
@@ -170,14 +171,14 @@ FT_BEGIN_HEADER
   /*    format  :: The glyph format.                                       */
   /*                                                                       */
   /* <Return>                                                              */
-  /*    A renderer handle.  0 if none found.                               */
+  /*    A renderer handle.  0~if none found.                               */
   /*                                                                       */
   /* <Note>                                                                */
   /*    An error will be returned if a module already exists by that name, */
   /*    or if the module requires a version of FreeType that is too great. */
   /*                                                                       */
-  /*    To add a new renderer, simply use FT_Add_Module().  To retrieve a  */
-  /*    renderer by its name, use FT_Get_Module().                         */
+  /*    To add a new renderer, simply use @FT_Add_Module.  To retrieve a   */
+  /*    renderer by its name, use @FT_Get_Module.                          */
   /*                                                                       */
   FT_EXPORT( FT_Renderer )
   FT_Get_Renderer( FT_Library       library,
@@ -190,7 +191,7 @@ FT_BEGIN_HEADER
   /*    FT_Set_Renderer                                                    */
   /*                                                                       */
   /* <Description>                                                         */
-  /*    Sets the current renderer to use, and set additional mode.         */
+  /*    Set the current renderer to use, and set additional mode.          */
   /*                                                                       */
   /* <InOut>                                                               */
   /*    library    :: A handle to the library object.                      */
@@ -203,13 +204,21 @@ FT_BEGIN_HEADER
   /*    parameters :: Additional parameters.                               */
   /*                                                                       */
   /* <Return>                                                              */
-  /*    FreeType error code.  0 means success.                             */
+  /*    FreeType error code.  0~means success.                             */
   /*                                                                       */
   /* <Note>                                                                */
   /*    In case of success, the renderer will be used to convert glyph     */
   /*    images in the renderer's known format into bitmaps.                */
   /*                                                                       */
   /*    This doesn't change the current renderer for other formats.        */
+  /*                                                                       */
+  /*    Currently, only the B/W renderer, if compiled with                 */
+  /*    FT_RASTER_OPTION_ANTI_ALIASING (providing a 5-levels               */
+  /*    anti-aliasing mode; this option must be set directly in            */
+  /*    `ftraster.c' and is undefined by default) accepts a single tag     */
+  /*    `pal5' to set its gray palette as a character string with          */
+  /*    5~elements.  Consequently, the third and fourth argument are zero  */
+  /*    normally.                                                          */
   /*                                                                       */
   FT_EXPORT( FT_Error )
   FT_Set_Renderer( FT_Library     library,

@@ -7,7 +7,7 @@
 /*                                                                         */
 /*    This is _not_ used to retrieve glyph names!                          */
 /*                                                                         */
-/*  Copyright 1996-2001, 2002, 2003 by                                     */
+/*  Copyright 1996-2001, 2002, 2003, 2006, 2009, 2010 by                   */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -48,7 +48,7 @@ FT_BEGIN_HEADER
   /*    Access the names embedded in TrueType and OpenType files.          */
   /*                                                                       */
   /* <Description>                                                         */
-  /*    The TrueType and OpenType specification allow the inclusion of     */
+  /*    The TrueType and OpenType specifications allow the inclusion of    */
   /*    a special `names table' in font files.  This table contains        */
   /*    textual (and internationalized) information regarding the font,    */
   /*    like family name, copyright, version, etc.                         */
@@ -78,12 +78,12 @@ FT_BEGIN_HEADER
   /*    name_id     :: An identifier for `string'.                         */
   /*                                                                       */
   /*    string      :: The `name' string.  Note that its format differs    */
-  /*                   depending on the (platform,encoding) pair. It can   */
-  /*                   be a Pascal String, a UTF-16 one, etc..             */
+  /*                   depending on the (platform,encoding) pair.  It can  */
+  /*                   be a Pascal String, a UTF-16 one, etc.              */
   /*                                                                       */
   /*                   Generally speaking, the string is not               */
-  /*                   zero-terminated. Please refer to the TrueType       */
-  /*                   specification for details..                         */
+  /*                   zero-terminated.  Please refer to the TrueType      */
+  /*                   specification for details.                          */
   /*                                                                       */
   /*    string_len  :: The length of `string' in bytes.                    */
   /*                                                                       */
@@ -91,6 +91,9 @@ FT_BEGIN_HEADER
   /*    Possible values for `platform_id', `encoding_id', `language_id',   */
   /*    and `name_id' are given in the file `ttnameid.h'.  For details     */
   /*    please refer to the TrueType or OpenType specification.            */
+  /*                                                                       */
+  /*    See also @TT_PLATFORM_XXX, @TT_APPLE_ID_XXX, @TT_MAC_ID_XXX,       */
+  /*    @TT_ISO_ID_XXX, and @TT_MS_ID_XXX.                                 */
   /*                                                                       */
   typedef struct  FT_SfntName_
   {
@@ -111,7 +114,7 @@ FT_BEGIN_HEADER
   /*    FT_Get_Sfnt_Name_Count                                             */
   /*                                                                       */
   /* <Description>                                                         */
-  /*    Retrieves the number of name strings in the SFNT `name' table.     */
+  /*    Retrieve the number of name strings in the SFNT `name' table.      */
   /*                                                                       */
   /* <Input>                                                               */
   /*    face :: A handle to the source face.                               */
@@ -129,7 +132,7 @@ FT_BEGIN_HEADER
   /*    FT_Get_Sfnt_Name                                                   */
   /*                                                                       */
   /* <Description>                                                         */
-  /*    Retrieves a string of the SFNT `name' table for a given index.     */
+  /*    Retrieve a string of the SFNT `name' table for a given index.      */
   /*                                                                       */
   /* <Input>                                                               */
   /*    face  :: A handle to the source face.                              */
@@ -137,16 +140,17 @@ FT_BEGIN_HEADER
   /*    idx   :: The index of the `name' string.                           */
   /*                                                                       */
   /* <Output>                                                              */
-  /*    aname :: The indexed FT_SfntName structure.                        */
+  /*    aname :: The indexed @FT_SfntName structure.                       */
   /*                                                                       */
   /* <Return>                                                              */
-  /*    FreeType error code.  0 means success.                             */
+  /*    FreeType error code.  0~means success.                             */
   /*                                                                       */
   /* <Note>                                                                */
   /*    The `string' array returned in the `aname' structure is not        */
-  /*    null-terminated.                                                   */
+  /*    null-terminated.  The application should deallocate it if it is no */
+  /*    longer in use.                                                     */
   /*                                                                       */
-  /*    Use FT_Get_Sfnt_Name_Count() to get the total number of available  */
+  /*    Use @FT_Get_Sfnt_Name_Count to get the total number of available   */
   /*    `name' table entries, then do a loop until you get the right       */
   /*    platform, encoding, and name ID.                                   */
   /*                                                                       */
@@ -155,6 +159,35 @@ FT_BEGIN_HEADER
                     FT_UInt       idx,
                     FT_SfntName  *aname );
 
+
+  /***************************************************************************
+   *
+   * @constant:
+   *   FT_PARAM_TAG_IGNORE_PREFERRED_FAMILY
+   *
+   * @description:
+   *   A constant used as the tag of @FT_Parameter structures to make
+   *   FT_Open_Face() ignore preferred family subfamily names in `name'
+   *   table since OpenType version 1.4.  For backwards compatibility with
+   *   legacy systems which has 4-face-per-family restriction.
+   *
+   */
+#define FT_PARAM_TAG_IGNORE_PREFERRED_FAMILY  FT_MAKE_TAG( 'i', 'g', 'p', 'f' )
+
+
+  /***************************************************************************
+   *
+   * @constant:
+   *   FT_PARAM_TAG_IGNORE_PREFERRED_SUBFAMILY
+   *
+   * @description:
+   *   A constant used as the tag of @FT_Parameter structures to make
+   *   FT_Open_Face() ignore preferred subfamily names in `name' table since
+   *   OpenType version 1.4.  For backwards compatibility with legacy
+   *   systems which has 4-face-per-family restriction.
+   *
+   */
+#define FT_PARAM_TAG_IGNORE_PREFERRED_SUBFAMILY  FT_MAKE_TAG( 'i', 'g', 'p', 's' )
 
   /* */
 
