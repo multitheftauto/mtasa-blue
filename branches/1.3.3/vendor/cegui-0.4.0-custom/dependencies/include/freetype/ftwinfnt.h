@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    FreeType API for accessing Windows fnt-specific data.                */
 /*                                                                         */
-/*  Copyright 2003, 2004 by                                                */
+/*  Copyright 2003, 2004, 2008 by                                          */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -64,7 +64,7 @@ FT_BEGIN_HEADER
    *
    * @values:
    *   FT_WinFNT_ID_DEFAULT ::
-   *     This is used for font enumeration and font creation as a 
+   *     This is used for font enumeration and font creation as a
    *     `don't care' value.  Valid font files don't contain this value.
    *     When querying for information about the character set of the font
    *     that is currently selected into a specified device context, this
@@ -77,7 +77,8 @@ FT_BEGIN_HEADER
    *     Mac Roman encoding.
    *
    *   FT_WinFNT_ID_OEM ::
-   *     From Michael Pöttgen <michael@poettgen.de>:
+   *     From Michael PÃ¶ttgen <michael@poettgen.de>:
+   *
    *       The `Windows Font Mapping' article says that FT_WinFNT_ID_OEM
    *       is used for the charset of vector fonts, like `modern.fon',
    *       `roman.fon', and `script.fon' on Windows.
@@ -94,7 +95,7 @@ FT_BEGIN_HEADER
    *       Windows have.  It is one of the OEM codepages from
    *
    *         http://www.microsoft.com/globaldev/reference/cphome.mspx,
-   *    
+   *
    *       and is used for the `DOS boxes', to support legacy applications.
    *       A German Windows version for example usually uses ANSI codepage
    *       1252 and OEM codepage 850.
@@ -110,11 +111,11 @@ FT_BEGIN_HEADER
    *     ordering and minor deviations).
    *
    *   FT_WinFNT_ID_CP949 ::
-   *     A superset of Korean Hangul KS C 5601-1987 (with different
+   *     A superset of Korean Hangul KS~C 5601-1987 (with different
    *     ordering and minor deviations).
    *
    *   FT_WinFNT_ID_CP950 ::
-   *     A superset of traditional Chinese Big 5 ETen (with different
+   *     A superset of traditional Chinese Big~5 ETen (with different
    *     ordering and minor deviations).
    *
    *   FT_WinFNT_ID_CP1250 ::
@@ -129,10 +130,10 @@ FT_BEGIN_HEADER
    *
    *   FT_WinFNT_ID_CP1253 ::
    *     A superset of Greek ISO 8859-7 (with minor modifications).
-   *     
+   *
    *   FT_WinFNT_ID_CP1254 ::
    *     A superset of Turkish ISO 8859-9.
-   *     
+   *
    *   FT_WinFNT_ID_CP1255 ::
    *     A superset of Hebrew ISO 8859-8 (with some modifications).
    *
@@ -218,36 +219,47 @@ FT_BEGIN_HEADER
     FT_UShort  color_table_offset;
     FT_ULong   reserved1[4];
 
-  } FT_WinFNT_HeaderRec, *FT_WinFNT_Header;
+  } FT_WinFNT_HeaderRec;
 
 
- /**********************************************************************
-  *
-  * @function:
-  *    FT_Get_WinFNT_Header
-  *
-  * @description:
-  *    Retrieve a Windows FNT font info header.
-  *
-  * @input:
-  *    face    :: A handle to the input face.
-  *
-  * @output:
-  *    aheader :: The WinFNT header.
-  *
-  * @return:
-  *   FreeType error code.  0 means success.
-  *
-  * @note:
-  *   This function only works with Windows FNT faces, returning an error
-  *   otherwise.
-  */
+  /*************************************************************************/
+  /*                                                                       */
+  /* <Struct>                                                              */
+  /*    FT_WinFNT_Header                                                   */
+  /*                                                                       */
+  /* <Description>                                                         */
+  /*    A handle to an @FT_WinFNT_HeaderRec structure.                     */
+  /*                                                                       */
+  typedef struct FT_WinFNT_HeaderRec_*  FT_WinFNT_Header;
+
+
+  /**********************************************************************
+   *
+   * @function:
+   *    FT_Get_WinFNT_Header
+   *
+   * @description:
+   *    Retrieve a Windows FNT font info header.
+   *
+   * @input:
+   *    face    :: A handle to the input face.
+   *
+   * @output:
+   *    aheader :: The WinFNT header.
+   *
+   * @return:
+   *   FreeType error code.  0~means success.
+   *
+   * @note:
+   *   This function only works with Windows FNT faces, returning an error
+   *   otherwise.
+   */
   FT_EXPORT( FT_Error )
   FT_Get_WinFNT_Header( FT_Face               face,
                         FT_WinFNT_HeaderRec  *aheader );
 
 
- /* */
+  /* */
 
 FT_END_HEADER
 
@@ -255,3 +267,8 @@ FT_END_HEADER
 
 
 /* END */
+
+
+/* Local Variables: */
+/* coding: utf-8    */
+/* End:             */
