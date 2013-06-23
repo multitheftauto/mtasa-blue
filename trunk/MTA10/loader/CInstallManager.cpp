@@ -140,6 +140,15 @@ void CInstallManager::InitSequencer ( void )
                 CR " "
                 CR "largemem_end: "                                 ////// End of 'LargeMem fix' //////
                 CR " "        
+                CR "dep_check: "                                    ////// Start of 'DEP fix' //////
+                CR "            CALL ProcessDepChecks "             // Make changes to comply with user setting
+                CR "            IF LastResult == ok GOTO dep_end: "
+                CR " "
+                CR "            CALL ChangeToAdmin "                // If changes failed, try as admin
+                CR "            IF LastResult == ok GOTO dep_check: "
+                CR " "
+                CR "dep_end: "                                      ////// End of 'DEP fix' //////
+                CR " "        
                 CR "service_check: "                                ////// Start of 'Service checks' //////
                 CR "            CALL ProcessServiceChecks "         // Make changes to comply with service requirements
                 CR "            IF LastResult == ok GOTO service_end: "
@@ -181,6 +190,7 @@ void CInstallManager::InitSequencer ( void )
     m_pSequencer->AddFunction ( "ProcessLayoutChecks",     &CInstallManager::_ProcessLayoutChecks );
     m_pSequencer->AddFunction ( "ProcessAeroChecks",       &CInstallManager::_ProcessAeroChecks );
     m_pSequencer->AddFunction ( "ProcessLargeMemChecks",   &CInstallManager::_ProcessLargeMemChecks );
+    m_pSequencer->AddFunction ( "ProcessDepChecks",        &CInstallManager::_ProcessDepChecks );
     m_pSequencer->AddFunction ( "ProcessServiceChecks",    &CInstallManager::_ProcessServiceChecks );
     m_pSequencer->AddFunction ( "ChangeFromAdmin",         &CInstallManager::_ChangeFromAdmin );
     m_pSequencer->AddFunction ( "InstallNewsItems",        &CInstallManager::_InstallNewsItems );
@@ -628,54 +638,52 @@ SString CInstallManager::_ProcessLayoutChecks ( void )
 //////////////////////////////////////////////////////////
 SString CInstallManager::_ProcessAeroChecks ( void )
 {
-    // Check is Windows 7
-    if ( GetApplicationSetting ( "os-version" ) == "6.1" )
+    SString strGTAPath;
+    if ( GetGamePath ( strGTAPath ) == GAME_PATH_OK )
     {
-        SString strGTAPath;
-        if ( GetGamePath ( strGTAPath ) == GAME_PATH_OK )
+        SString strGTAEXEPath = PathJoin ( strGTAPath , MTA_GTAEXE_NAME );
+        // Get the top byte of the file link timestamp
+        uchar ucTimeStamp = 0;
+        FILE* fh = fopen ( strGTAEXEPath, "rb" );
+        if ( fh )
         {
-            SString strGTAEXEPath = PathJoin ( strGTAPath , MTA_GTAEXE_NAME );
-            // Get the top byte of the file link timestamp
-            uchar ucTimeStamp = 0;
-            FILE* fh = fopen ( strGTAEXEPath, "rb" );
-            if ( fh )
+            if ( !fseek ( fh, 0x8B, SEEK_SET ) )
             {
+                if ( fread ( &ucTimeStamp, sizeof ( ucTimeStamp ), 1, fh ) != 1 )
+                {
+                    ucTimeStamp = 0;
+                }
+            }
+            fclose ( fh );
+        }
+
+        const uchar AERO_DISABLED = 0x42;
+        const uchar AERO_ENABLED  = 0x43;
+
+        // Check it's a value we're expecting
+        bool bCanChangeAeroSetting = ( ucTimeStamp == AERO_DISABLED || ucTimeStamp == AERO_ENABLED );
+        SetApplicationSettingInt ( "aero-changeable", bCanChangeAeroSetting );
+
+        if ( bCanChangeAeroSetting )
+        {
+            // Get option to set (and check is Windows 7)
+            bool bAeroEnabled = GetApplicationSettingInt ( "aero-enabled" ) && ( GetApplicationSetting ( "os-version" ) == "6.1" );
+            uchar ucTimeStampRequired = bAeroEnabled ? AERO_ENABLED : AERO_DISABLED;
+            if ( ucTimeStamp != ucTimeStampRequired )
+            {
+                // Change needed!
+                SetFileAttributes ( strGTAEXEPath, FILE_ATTRIBUTE_NORMAL );
+                FILE* fh = fopen ( strGTAEXEPath, "r+b" );
+                if ( !fh )
+                {
+                    m_strAdminReason = _("Update Aero setting");
+                    return "fail";
+                }
                 if ( !fseek ( fh, 0x8B, SEEK_SET ) )
                 {
-                    if ( fread ( &ucTimeStamp, sizeof ( ucTimeStamp ), 1, fh ) != 1 )
-                    {
-                        ucTimeStamp = 0;
-                    }
+                    fwrite ( &ucTimeStampRequired, sizeof ( ucTimeStampRequired ), 1, fh );
                 }
                 fclose ( fh );
-            }
-
-            const uchar AERO_DISABLED = 0x42;
-            const uchar AERO_ENABLED  = 0x43;
-
-            // Check it's a value we're expecting
-            bool bCanChangeAeroSetting = ( ucTimeStamp == AERO_DISABLED || ucTimeStamp == AERO_ENABLED );
-            SetApplicationSettingInt ( "aero-changeable", bCanChangeAeroSetting );
-
-            if ( bCanChangeAeroSetting )
-            {
-                uchar ucTimeStampRequired = GetApplicationSettingInt ( "aero-enabled" ) ? AERO_ENABLED : AERO_DISABLED;
-                if ( ucTimeStamp != ucTimeStampRequired )
-                {
-                    // Change needed!
-                    SetFileAttributes ( strGTAEXEPath, FILE_ATTRIBUTE_NORMAL );
-                    FILE* fh = fopen ( strGTAEXEPath, "r+b" );
-                    if ( !fh )
-                    {
-                        m_strAdminReason = _("Update Aero setting");
-                        return "fail";
-                    }
-                    if ( !fseek ( fh, 0x8B, SEEK_SET ) )
-                    {
-                        fwrite ( &ucTimeStampRequired, sizeof ( ucTimeStampRequired ), 1, fh );
-                    }
-                    fclose ( fh );
-                }
             }
         }
     }
@@ -733,6 +741,65 @@ SString CInstallManager::_ProcessLargeMemChecks ( void )
                 if ( !fseek ( fh, 0x96, SEEK_SET ) )
                 {
                     fwrite ( &usCharacteristicsRequired, sizeof ( usCharacteristicsRequired ), 1, fh );
+                }
+                fclose ( fh );
+            }
+        }
+    }
+    return "ok";
+}
+
+
+//////////////////////////////////////////////////////////
+//
+// CInstallManager::_ProcessDepChecks
+//
+// Change the PE header to enable DEP
+//
+//////////////////////////////////////////////////////////
+SString CInstallManager::_ProcessDepChecks ( void )
+{
+    SString strGTAPath;
+    if ( GetGamePath ( strGTAPath ) == GAME_PATH_OK )
+    {
+        SString strGTAEXEPath = PathJoin ( strGTAPath , MTA_GTAEXE_NAME );
+        // Get the top byte of the file link timestamp
+        ulong ulDllCharacteristics = 0;
+        FILE* fh = fopen ( strGTAEXEPath, "rb" );
+        if ( fh )
+        {
+            if ( !fseek ( fh, 0xDC, SEEK_SET ) )
+            {
+                if ( fread ( &ulDllCharacteristics, sizeof ( ulDllCharacteristics ), 1, fh ) != 1 )
+                {
+                    ulDllCharacteristics = 0;
+                }
+            }
+            fclose ( fh );
+        }
+
+        const ulong DEP_DISABLED = 0x00000002;
+        const ulong DEP_ENABLED  = 0x01000002;
+
+        // Check it's a value we're expecting
+        bool bCanChangeDepSetting = ( ulDllCharacteristics == DEP_DISABLED || ulDllCharacteristics == DEP_ENABLED );
+
+        if ( bCanChangeDepSetting )
+        {
+            ulong ulDllCharacteristicsRequired = DEP_ENABLED;
+            if ( ulDllCharacteristics != ulDllCharacteristicsRequired )
+            {
+                // Change needed!
+                SetFileAttributes ( strGTAEXEPath, FILE_ATTRIBUTE_NORMAL );
+                FILE* fh = fopen ( strGTAEXEPath, "r+b" );
+                if ( !fh )
+                {
+                    m_strAdminReason = _("Update DEP setting");
+                    return "fail";
+                }
+                if ( !fseek ( fh, 0xDC, SEEK_SET ) )
+                {
+                    fwrite ( &ulDllCharacteristicsRequired, sizeof ( ulDllCharacteristicsRequired ), 1, fh );
                 }
                 fclose ( fh );
             }
