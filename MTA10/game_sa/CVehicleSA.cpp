@@ -1980,11 +1980,11 @@ void CVehicleSA::SetWheelVisibility ( eWheels wheel, bool bVisible )
         RwObject * pObject = NULL;
 
         // Stop GetCurrentAtomicObjectCB from returning null for 'invisible' objects
-        MemPut < BYTE > ( 0x6A0758, 0x90 );
-        MemPut < BYTE > ( 0x6A0759, 0x90 );
+        MemPutFast < BYTE > ( 0x6A0758, 0x90 );
+        MemPutFast < BYTE > ( 0x6A0759, 0x90 );
         RwFrameForAllObjects ( pFrame, ( void * ) dw_GetCurrentAtomicObjectCB, &pObject );
-        MemPut < BYTE > ( 0x6A0758, 0x74 );
-        MemPut < BYTE > ( 0x6A0759, 0x06 );
+        MemPutFast < BYTE > ( 0x6A0758, 0x74 );
+        MemPutFast < BYTE > ( 0x6A0759, 0x06 );
 
         if ( pObject ) pObject->flags = ( bVisible ) ? 4 : 0;
     }

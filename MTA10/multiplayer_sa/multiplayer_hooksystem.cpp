@@ -39,7 +39,10 @@ BOOL HookInstall( DWORD dwInstallAddress,
     MemSetFast ( JumpBytes, 0x90, MAX_JUMPCODE_SIZE );
     if ( CreateJump ( dwInstallAddress, dwHookHandler, JumpBytes ) )
     {
-        MemCpy ( (PVOID)dwInstallAddress, JumpBytes, iJmpCodeSize );
+        if ( IsSlowMem( (PVOID)dwInstallAddress, iJmpCodeSize ) )
+            MemCpy ( (PVOID)dwInstallAddress, JumpBytes, iJmpCodeSize );
+        else
+            MemCpyFast ( (PVOID)dwInstallAddress, JumpBytes, iJmpCodeSize );
         return TRUE;
     }
     else
