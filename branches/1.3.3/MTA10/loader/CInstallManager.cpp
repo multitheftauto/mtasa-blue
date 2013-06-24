@@ -686,8 +686,8 @@ SString CInstallManager::_ProcessAeroChecks ( void )
 
         if ( bCanChangeAeroSetting )
         {
-            // Get option to set (and check is Windows 7)
-            bool bAeroEnabled = GetApplicationSettingInt ( "aero-enabled" ) && ( GetApplicationSetting ( "os-version" ) == "6.1" );
+            // Get option to set
+            bool bAeroEnabled = GetApplicationSettingInt ( "aero-enabled" );
             uchar ucTimeStampRequired = bAeroEnabled ? AERO_ENABLED : AERO_DISABLED;
             if ( ucTimeStamp != ucTimeStampRequired )
             {

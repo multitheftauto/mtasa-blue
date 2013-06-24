@@ -160,6 +160,11 @@ void BeginD3DStuff( void )
         ShowOptimusDialog ( g_hInstance );
         HideOptimusDialog ();
     }
+    else
+    {
+        SetApplicationSettingInt( "nvhacks", "optimus-alt-startup", 0 );
+        SetApplicationSettingInt( "nvhacks", "optimus-rename-exe", 0 );
+    }
 }
 
 
