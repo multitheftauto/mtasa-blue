@@ -492,6 +492,29 @@ failed:
 
 ////////////////////////////////////////////////
 //
+// GetByteDiffDesc
+//
+// Get string describing differences between the two memory blocks
+//
+////////////////////////////////////////////////
+SString GetByteDiffDesc( const void* pData1, const void* pData2, uint uiSize )
+{
+    SString strResult;
+    for ( uint i = 0 ; i < uiSize ; i++ )
+    {
+        uchar c1 = ((const uchar*)pData1)[i];
+        uchar c2 = ((const uchar*)pData2)[i];
+        if ( c1 != c2 )
+        {
+            strResult += SString( "[%d(%02x/%02x)]", i, c1, c2 );
+        }
+    }
+    return strResult;
+}
+
+
+////////////////////////////////////////////////
+//
 // AddCapsReport
 //
 // Check caps seem correct
@@ -606,6 +629,15 @@ void AddCapsReport( UINT Adapter, IDirect3D9* pDirect3D, IDirect3DDevice9* pD3DD
     bool DeviceCapsSameAsD3DCaps9 = memcmp( &DeviceCaps9, &D3DCaps9, sizeof( D3DCAPS9 ) ) == 0;
 
     WriteDebugEvent( SString( "DeviceCaps==GTACaps:%d  DeviceCaps==D3DCaps9:%d", DeviceCapsSameAsGTACaps, DeviceCapsSameAsD3DCaps9 ) );
+
+    SString strDiffDesc1 = GetByteDiffDesc( &DeviceCaps9, pGTACaps9, sizeof( D3DCAPS9 ) );
+    if ( !strDiffDesc1.empty() )
+        WriteDebugEvent( SString( "DeviceCaps==GTACaps diff:%s", *strDiffDesc1.Left( 500 ) ) );
+
+    SString strDiffDesc2 = GetByteDiffDesc( &DeviceCaps9, &D3DCaps9, sizeof( D3DCAPS9 ) );
+    if ( !strDiffDesc2.empty() )
+        WriteDebugEvent( SString( "DeviceCaps==D3DCaps9 diff:%s", *strDiffDesc2.Left( 500 ) ) );
+
 
     if ( bFixGTACaps && !DeviceCapsSameAsGTACaps )
     {

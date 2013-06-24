@@ -149,14 +149,23 @@ void CInstallManager::InitSequencer ( void )
                 CR " "
                 CR "dep_end: "                                      ////// End of 'DEP fix' //////
                 CR " "        
-                CR "nvidia_check: "                               ////// Start of 'NVidia Optimus fix' //////
+                CR "nvidia_check: "                                 ////// Start of 'NVidia Optimus fix' //////
                 CR "            CALL ProcessNvightmareChecks "      // Make changes to comply with requirements
                 CR "            IF LastResult == ok GOTO nvidia_end: "
                 CR " "
                 CR "            CALL ChangeToAdmin "                // If changes failed, try as admin
                 CR "            IF LastResult == ok GOTO nvidia_check: "
                 CR " "
-                CR "nvidia_end: "                                 ////// End of 'LargeMem fix' //////
+                CR "nvidia_end: "                                   ////// End of 'NVidia Optimus fix' //////
+                CR " "        
+                CR "execopy_check: "                                ////// Start of 'Exe copy fix' //////
+                CR "            CALL ProcessExeCopyChecks "         // Make changes to comply with requirements
+                CR "            IF LastResult == ok GOTO execopy_end: "
+                CR " "
+                CR "            CALL ChangeToAdmin "                // If changes failed, try as admin
+                CR "            IF LastResult == ok GOTO execopy_check: "
+                CR " "
+                CR "execopy_end: "                                  ////// End of 'Exe copy fix' //////
                 CR " "        
                 CR "service_check: "                                ////// Start of 'Service checks' //////
                 CR "            CALL ProcessServiceChecks "         // Make changes to comply with service requirements
@@ -201,6 +210,7 @@ void CInstallManager::InitSequencer ( void )
     m_pSequencer->AddFunction ( "ProcessLargeMemChecks",   &CInstallManager::_ProcessLargeMemChecks );
     m_pSequencer->AddFunction ( "ProcessDepChecks",        &CInstallManager::_ProcessDepChecks );
     m_pSequencer->AddFunction ( "ProcessNvightmareChecks", &CInstallManager::_ProcessNvightmareChecks );
+    m_pSequencer->AddFunction ( "ProcessExeCopyChecks",    &CInstallManager::_ProcessExeCopyChecks );
     m_pSequencer->AddFunction ( "ProcessServiceChecks",    &CInstallManager::_ProcessServiceChecks );
     m_pSequencer->AddFunction ( "ChangeFromAdmin",         &CInstallManager::_ChangeFromAdmin );
     m_pSequencer->AddFunction ( "InstallNewsItems",        &CInstallManager::_InstallNewsItems );
@@ -941,6 +951,41 @@ SString CInstallManager::_ProcessNvightmareChecks ( void )
     }
     return "ok";
 }
+
+
+//////////////////////////////////////////////////////////
+//
+// CInstallManager::_ProcessExeCopyChecks
+//
+// Make copy of main exe if required
+//
+//////////////////////////////////////////////////////////
+SString CInstallManager::_ProcessExeCopyChecks ( void )
+{
+    SString strGTAPath;
+    if ( GetGamePath( strGTAPath ) == GAME_PATH_OK )
+    {
+        if ( GetApplicationSettingInt( "diagnostics", "optimus" ) )
+        {
+            SString strGTAEXEPath = PathJoin( strGTAPath, MTA_GTAEXE_NAME );
+            SString strHTAEXEPath = PathJoin( strGTAPath, "hta_sa.exe" );
+
+            SString strGTAEXEMd5 = CMD5Hasher::CalculateHexString( strGTAEXEPath );
+            SString strHTAEXEMd5 = CMD5Hasher::CalculateHexString( strHTAEXEPath );
+
+            if ( strGTAEXEMd5 != strHTAEXEMd5 )
+            {
+                if ( !FileCopy( strGTAEXEPath, strHTAEXEPath ) )
+                {
+                    m_strAdminReason = "Copy main executable to avoid graphic driver issues";
+                    return "fail";
+                }
+            }
+        }
+    }
+    return "ok";
+}
+
 
 //////////////////////////////////////////////////////////
 //

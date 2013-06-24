@@ -483,9 +483,16 @@ int DoLaunchGame ( LPSTR lpCmdLine )
     // Copy exe and see if it helps
     if ( GetApplicationSettingInt( "diagnostics", "optimus" ) )
     {
-        SString strHTAEXEPath = strGTAPath + "\\" + "hta_sa.exe";
-        FileCopy( strGTAEXEPath, strHTAEXEPath );
-        if ( FileSize( strHTAEXEPath ) > 12000000 )
+        SString strHTAEXEPath = PathJoin( strGTAPath, "hta_sa.exe" );
+        SString strGTAEXEMd5 = CMD5Hasher::CalculateHexString( strGTAEXEPath );
+        SString strHTAEXEMd5 = CMD5Hasher::CalculateHexString( strHTAEXEPath );
+        if ( strGTAEXEMd5 != strHTAEXEMd5 )
+        {
+            FileCopy( strGTAEXEPath, strHTAEXEPath );
+            strGTAEXEMd5 = CMD5Hasher::CalculateHexString( strGTAEXEPath );
+            strHTAEXEMd5 = CMD5Hasher::CalculateHexString( strHTAEXEPath );
+        }
+        if ( strGTAEXEMd5 == strHTAEXEMd5 )
             strGTAEXEPath = strHTAEXEPath;
     }
 

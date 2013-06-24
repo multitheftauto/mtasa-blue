@@ -41,6 +41,7 @@ protected:
     SString         _ProcessLargeMemChecks          ( void );
     SString         _ProcessDepChecks               ( void );
     SString         _ProcessNvightmareChecks        ( void );
+    SString         _ProcessExeCopyChecks           ( void );
     SString         _ProcessServiceChecks           ( void );
     SString         _ChangeFromAdmin                ( void );
     SString         _InstallNewsItems               ( void );
