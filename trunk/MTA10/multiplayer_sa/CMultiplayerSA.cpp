@@ -488,8 +488,7 @@ void HOOK_CObject_ProcessCollision ();
 CMultiplayerSA::CMultiplayerSA()
 {
     // Unprotect all of the GTASA code at once and leave it that way
-    DWORD oldProt;
-    VirtualProtect((LPVOID)0x401000, 0x4A3000, PAGE_EXECUTE_READWRITE, &oldProt);
+    SetInitialVirtualProtect();
 
     // Initialize the offsets
     eGameVersion version = pGameInterface->GetGameVersion ();
@@ -6197,9 +6196,9 @@ void CMultiplayerSA::SetAutomaticVehicleStartupOnPedEnter ( bool bSet )
         MemCpyFast ( &originalCode[0], (const void *)0x64BC0D, 6 );
 
     if ( bSet )
-        MemCpyFast ( (char *)0x64BC0D, originalCode, 6 );
+        MemCpy ( (char *)0x64BC0D, originalCode, 6 );
     else
-        MemSetFast ( (char *)0x64BC0D, 0x90, 6 );
+        MemSet ( (char *)0x64BC0D, 0x90, 6 );
 }
 
 // Storage

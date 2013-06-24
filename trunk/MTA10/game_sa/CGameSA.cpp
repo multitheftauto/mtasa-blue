@@ -19,6 +19,7 @@
 #include "StdInc.h"
 #define ALLOC_STATS_MODULE_NAME "game_sa"
 #include "SharedUtil.hpp"
+#include "SharedUtil.MemAccess.hpp"
 
 unsigned long* CGameSA::VAR_SystemTime;
 unsigned long* CGameSA::VAR_IsAtMenu;
@@ -45,9 +46,7 @@ CGameSA::CGameSA()
     m_bASyncLoadingSuspended = false;
     m_iCheckStatus = 0;
 
-    // Unprotect all of the GTASA code at once and leave it that way
-    DWORD oldProt;
-    VirtualProtect((LPVOID)0x401000, 0x4A3000, PAGE_EXECUTE_READWRITE, &oldProt);
+    SetInitialVirtualProtect();
 
     // Initialize the offsets
     eGameVersion version = FindGameVersion ();

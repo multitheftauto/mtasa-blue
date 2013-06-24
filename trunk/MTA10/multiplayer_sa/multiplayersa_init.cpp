@@ -48,12 +48,20 @@ CMultiplayer* InitMultiplayerInterface(CCoreInterface* pCore)
 
 void MemSet ( void* dwDest, int cValue, uint uiAmount )
 {
+    if ( ismemset( dwDest, cValue, uiAmount ) )
+        return;
+    SMemWrite hMem = OpenMemWrite( dwDest, uiAmount );
     memset ( dwDest, cValue, uiAmount );
+    CloseMemWrite( hMem );
 }
 
 void MemCpy ( void* dwDest, const void* dwSrc, uint uiAmount )
 {
+    if ( memcmp( dwDest, dwSrc, uiAmount ) == 0 )
+        return;
+    SMemWrite hMem = OpenMemWrite( dwDest, uiAmount );
     memcpy ( dwDest, dwSrc, uiAmount );
+    CloseMemWrite( hMem );
 }
 
 void OnCrashAverted ( uint uiId )
