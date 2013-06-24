@@ -114,24 +114,28 @@ void MemPut ( U ptr, const T value )
 inline
 void MemCpyFast ( void* dwDest, const void* dwSrc, uint uiAmount )
 {
+    DEBUG_CHECK_IS_FAST_MEM( dwDest, uiAmount );
     memcpy ( dwDest, dwSrc, uiAmount );
 }
 
 inline
 void MemSetFast ( void* dwDest, int cValue, uint uiAmount )
 {
+    DEBUG_CHECK_IS_FAST_MEM( dwDest, uiAmount );
     memset ( dwDest, cValue, uiAmount );
 }
 
 template < class T, class U >
 void MemPutFast ( U ptr, const T value )
 {
+    DEBUG_CHECK_IS_FAST_MEM( ptr, sizeof( T ) );
     *(T*)ptr = value;
 }
 
 template < class T, class U >
 void MemSubFast ( U ptr, const T value )
 {
+    DEBUG_CHECK_IS_FAST_MEM( ptr, sizeof( T ) );
     *(T*)ptr -= value;
 }
 
