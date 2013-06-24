@@ -73,6 +73,9 @@ void            HideCrashedDialog                   ( void );
 void            ShowD3dDllDialog                    ( HINSTANCE hInstance, const SString& strPath );
 void            HideD3dDllDialog                    ( void );
 
+void            ShowOptimusDialog                   ( HINSTANCE hInstance );
+void            HideOptimusDialog                   ( void );
+
 void            UpdateMTAVersionApplicationSetting  ( bool bQuiet = false );
 bool            Is32bitProcess                      ( DWORD processID );
 

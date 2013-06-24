@@ -738,7 +738,7 @@ void CCore::ApplyHooks ( )
 
 bool UsingAltD3DSetup()
 {
-    static bool bAltStartup = GetApplicationSettingInt( "diagnostics", "optimus-alt-startup" ) ? true : false;
+    static bool bAltStartup = GetApplicationSettingInt( "nvhacks", "optimus-alt-startup" ) ? true : false;
     return bAltStartup;
 }
 

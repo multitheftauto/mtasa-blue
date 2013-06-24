@@ -480,19 +480,19 @@ int DoLaunchGame ( LPSTR lpCmdLine )
     // Do some D3D dancing
     BeginD3DStuff();
 
-    // Copy exe and see if it helps
-    if ( GetApplicationSettingInt( "diagnostics", "optimus" ) )
+    // Use renamed exe if required
+    if ( GetApplicationSettingInt( "nvhacks", "optimus-rename-exe" ) )
     {
-        SString strHTAEXEPath = PathJoin( strGTAPath, "hta_sa.exe" );
-        SString strGTAEXEMd5 = CMD5Hasher::CalculateHexString( strGTAEXEPath );
-        SString strHTAEXEMd5 = CMD5Hasher::CalculateHexString( strHTAEXEPath );
-        if ( strGTAEXEMd5 != strHTAEXEMd5 )
+        SString strHTAEXEPath = PathJoin( strGTAPath, MTA_HTAEXE_NAME );
+        SString strGTAMd5 = CMD5Hasher::CalculateHexString( strGTAEXEPath );
+        SString strHTAMd5 = CMD5Hasher::CalculateHexString( strHTAEXEPath );
+        if ( strGTAMd5 != strHTAMd5 )
         {
             FileCopy( strGTAEXEPath, strHTAEXEPath );
-            strGTAEXEMd5 = CMD5Hasher::CalculateHexString( strGTAEXEPath );
-            strHTAEXEMd5 = CMD5Hasher::CalculateHexString( strHTAEXEPath );
+            strGTAMd5 = CMD5Hasher::CalculateHexString( strGTAEXEPath );
+            strHTAMd5 = CMD5Hasher::CalculateHexString( strHTAEXEPath );
         }
-        if ( strGTAEXEMd5 == strHTAEXEMd5 )
+        if ( strGTAMd5 == strHTAMd5 )
             strGTAEXEPath = strHTAEXEPath;
     }
 

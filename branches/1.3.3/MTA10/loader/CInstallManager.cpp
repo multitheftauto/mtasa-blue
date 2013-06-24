@@ -965,15 +965,15 @@ SString CInstallManager::_ProcessExeCopyChecks ( void )
     SString strGTAPath;
     if ( GetGamePath( strGTAPath ) == GAME_PATH_OK )
     {
-        if ( GetApplicationSettingInt( "diagnostics", "optimus" ) )
+        if ( GetApplicationSettingInt( "nvhacks", "optimus" ) )
         {
             SString strGTAEXEPath = PathJoin( strGTAPath, MTA_GTAEXE_NAME );
-            SString strHTAEXEPath = PathJoin( strGTAPath, "hta_sa.exe" );
+            SString strHTAEXEPath = PathJoin( strGTAPath, MTA_HTAEXE_NAME );
 
-            SString strGTAEXEMd5 = CMD5Hasher::CalculateHexString( strGTAEXEPath );
-            SString strHTAEXEMd5 = CMD5Hasher::CalculateHexString( strHTAEXEPath );
+            SString strGTAMd5 = CMD5Hasher::CalculateHexString( strGTAEXEPath );
+            SString strHTAMd5 = CMD5Hasher::CalculateHexString( strHTAEXEPath );
 
-            if ( strGTAEXEMd5 != strHTAEXEMd5 )
+            if ( strGTAMd5 != strHTAMd5 )
             {
                 if ( !FileCopy( strGTAEXEPath, strHTAEXEPath ) )
                 {

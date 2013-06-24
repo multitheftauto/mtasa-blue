@@ -618,12 +618,20 @@ void AddCapsReport( UINT Adapter, IDirect3D9* pDirect3D, IDirect3DDevice9* pD3DD
     }
     WriteDebugEvent( SString( "CapsReport - CreateVertexDeclarations MatchesCaps:%d/%d", uiNumMatchesCaps, uiNumItems ) );
 
-    DeviceCaps9.MaxActiveLights = Min( DeviceCaps9.MaxActiveLights, pGTACaps9->MaxActiveLights );
-    DeviceCaps9.MaxVertexBlendMatrixIndex = Min( DeviceCaps9.MaxVertexBlendMatrixIndex, pGTACaps9->MaxVertexBlendMatrixIndex );
-    pGTACaps9->MaxActiveLights = DeviceCaps9.MaxActiveLights;
-    pGTACaps9->MaxVertexBlendMatrixIndex = DeviceCaps9.MaxVertexBlendMatrixIndex;
-    D3DCaps9.MaxActiveLights = DeviceCaps9.MaxActiveLights;
-    D3DCaps9.MaxVertexBlendMatrixIndex = DeviceCaps9.MaxVertexBlendMatrixIndex;
+    DWORD MaxActiveLights = Min( DeviceCaps9.MaxActiveLights, pGTACaps9->MaxActiveLights );
+    pGTACaps9->MaxActiveLights = MaxActiveLights;
+    D3DCaps9.MaxActiveLights = MaxActiveLights;
+    DeviceCaps9.MaxActiveLights = MaxActiveLights;
+
+    DWORD MaxVertexBlendMatrixIndex = Min( DeviceCaps9.MaxVertexBlendMatrixIndex, pGTACaps9->MaxVertexBlendMatrixIndex );
+    pGTACaps9->MaxVertexBlendMatrixIndex = MaxVertexBlendMatrixIndex;
+    D3DCaps9.MaxVertexBlendMatrixIndex = MaxVertexBlendMatrixIndex;
+    DeviceCaps9.MaxVertexBlendMatrixIndex = MaxVertexBlendMatrixIndex;
+
+    DWORD VertexProcessingCaps =  DeviceCaps9.VertexProcessingCaps & pGTACaps9->VertexProcessingCaps;
+    pGTACaps9->VertexProcessingCaps = VertexProcessingCaps;
+    D3DCaps9.VertexProcessingCaps = VertexProcessingCaps;
+    DeviceCaps9.VertexProcessingCaps = VertexProcessingCaps;
 
     bool DeviceCapsSameAsGTACaps = memcmp( &DeviceCaps9, pGTACaps9, sizeof( D3DCAPS9 ) ) == 0;
     bool DeviceCapsSameAsD3DCaps9 = memcmp( &DeviceCaps9, &D3DCaps9, sizeof( D3DCAPS9 ) ) == 0;
@@ -637,7 +645,6 @@ void AddCapsReport( UINT Adapter, IDirect3D9* pDirect3D, IDirect3DDevice9* pD3DD
     SString strDiffDesc2 = GetByteDiffDesc( &DeviceCaps9, &D3DCaps9, sizeof( D3DCAPS9 ) );
     if ( !strDiffDesc2.empty() )
         WriteDebugEvent( SString( "DeviceCaps==D3DCaps9 diff:%s", *strDiffDesc2.Left( 500 ) ) );
-
 
     if ( bFixGTACaps && !DeviceCapsSameAsGTACaps )
     {
@@ -730,11 +737,15 @@ HRESULT HandleCreateDeviceResult( HRESULT hResult, IDirect3D9* pDirect3D, UINT A
     if ( uiCurrentStatus == CREATE_DEVICE_FAIL )
         uiDiagnosticLogLevel = 2;   // Log and wait - If fail status
 
-    if ( uiDiagnosticLogLevel == 0 )
-        if ( GetApplicationSettingInt( "diagnostics", "optimus" ) )
+    bool bFixCaps = false;
+    if ( GetApplicationSettingInt( "nvhacks", "optimus" ) )
+    {
+        bFixCaps = true;
+        if ( uiDiagnosticLogLevel == 0 )
             uiDiagnosticLogLevel = 1;
+    }
 
-    AddCapsReport( Adapter, pDirect3D, *ppReturnedDeviceInterface, false );
+    AddCapsReport( Adapter, pDirect3D, *ppReturnedDeviceInterface, bFixCaps );
 
     if ( uiDiagnosticLogLevel )
     {
@@ -924,7 +935,7 @@ HRESULT CCore::OnPostCreateDevice( HRESULT hResult, IDirect3D9* pDirect3D, UINT 
 
     // Calc log level to use
     uint uiDiagnosticLogLevel = 0;
-    if ( GetApplicationSettingInt( "diagnostics", "optimus" ) )
+    if ( GetApplicationSettingInt( "nvhacks", "optimus" ) )
         uiDiagnosticLogLevel = 1;   // Log and continue
     if ( hResult != D3D_OK )
         uiDiagnosticLogLevel = 2;   // Log and wait - If fail status
