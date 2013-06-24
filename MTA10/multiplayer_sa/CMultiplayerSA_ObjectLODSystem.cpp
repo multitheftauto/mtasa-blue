@@ -25,7 +25,7 @@ namespace
 
     void SetGlobalDrawDistanceScale ( float fValue )
     {
-        *(float*)0x858FD8 = 300.f * fValue;
+        MemPut < float > ( 0x858FD8, 300.f * fValue );
     }
 
     float GetDrawDistanceSetting ( void )
