@@ -480,6 +480,15 @@ int DoLaunchGame ( LPSTR lpCmdLine )
     // Do some D3D dancing
     BeginD3DStuff();
 
+    // Copy exe and see if it helps
+    if ( GetApplicationSettingInt( "diagnostics", "optimus" ) )
+    {
+        SString strHTAEXEPath = strGTAPath + "\\" + "hta_sa.exe";
+        FileCopy( strGTAEXEPath, strHTAEXEPath );
+        if ( FileSize( strHTAEXEPath ) > 12000000 )
+            strGTAEXEPath = strHTAEXEPath;
+    }
+
     //////////////////////////////////////////////////////////
     //
     // Hook 'n' go

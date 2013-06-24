@@ -501,6 +501,10 @@ void AddCapsReport( UINT Adapter, IDirect3D9* pDirect3D, IDirect3DDevice9* pD3DD
 {
     HRESULT hr;
 
+    char szBuffer[64000];
+    GetModuleFileName ( NULL, szBuffer, sizeof(szBuffer) - 1 );
+    WriteDebugEvent( SString( "ModuleFileName - %s ", szBuffer ) );
+
     // Get caps that GTA got
     D3DCAPS9* pGTACaps9 = (D3DCAPS9*)0x00C9BF00;
     WriteDebugEvent( SString( "CapsReport GTACaps9 - %s ", *ToString( *pGTACaps9 ) ) );
