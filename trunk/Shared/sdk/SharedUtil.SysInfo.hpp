@@ -21,6 +21,27 @@ using namespace std;
 # pragma comment(lib, "wbemuuid.lib")
 
 
+namespace
+{
+    HRESULT CallNext( IEnumWbemClassObject* pEnumerator,
+            /* [in] */ long lTimeout,
+            /* [in] */ ULONG uCount,
+            /* [length_is][size_is][out] */ __RPC__out_ecount_part(uCount, *puReturned) IWbemClassObject **apObjects,
+            /* [out] */ __RPC__out ULONG *puReturned)
+    {
+        __try
+        {
+            return pEnumerator->Next(lTimeout, uCount, apObjects, puReturned );
+        }
+        __except( GetExceptionCode() == EXCEPTION_ACCESS_VIOLATION )
+        {
+            *puReturned = 0;
+            return STATUS_ACCESS_VIOLATION;
+        }
+    }
+}
+
+
 /////////////////////////////////////////////////////////////////////
 //
 // QueryWMI
@@ -174,11 +195,25 @@ bool SharedUtil::QueryWMI ( SQueryWMIResult& outResult, const SString& strQuery,
     // Fill each row
     while (pEnumerator)
     {
-        HRESULT hr = pEnumerator->Next(WBEM_INFINITE, 1, 
+        uReturn = 0;
+
+        HRESULT hr = CallNext(pEnumerator, WBEM_INFINITE, 1, 
             &pclsObj, &uReturn);
+
+        if ( hr == STATUS_ACCESS_VIOLATION )
+        {
+            AddReportLog( 9130, SString( "QueryWMI pEnumerator->Next returned STATUS_ACCESS_VIOLATION for %s", *strQuery ) );
+            break;
+        }
 
         if(0 == uReturn)
         {
+            break;
+        }
+
+        if ( hr != WBEM_S_NO_ERROR )
+        {
+            AddReportLog( 9131, SString( "QueryWMI pEnumerator->Next returned %08x for %s", hr, *strQuery ) );
             break;
         }
 
