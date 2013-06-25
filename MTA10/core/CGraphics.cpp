@@ -1651,7 +1651,10 @@ void CGraphics::DidRenderScene( void )
     }
     SAFE_RELEASE( m_pSavedFrontBufferData );
     m_LastRenderedSceneTimer.Reset();
-    m_pAspectRatioConverter->Pulse( CCore::GetSingleton ().GetGame ()->GetSettings ()->GetAspectRatioValue() );
+    float fTargetAspectRatioValue = 0;
+    if ( CVARS_GET_VALUE < bool > ( "hud_match_aspect_ratio" ) )
+        fTargetAspectRatioValue = CCore::GetSingleton ().GetGame ()->GetSettings ()->GetAspectRatioValue();
+    m_pAspectRatioConverter->Pulse( fTargetAspectRatioValue );
 }
 
 

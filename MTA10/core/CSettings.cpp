@@ -722,6 +722,10 @@ void CSettings::CreateGUI ( void )
     m_pComboAspectRatio->AddItem ( _("16:9") )->SetData ( (void*)ASPECT_RATIO_16_9 );
     m_pComboAspectRatio->SetReadOnly ( true );
 
+    m_pCheckBoxHudMatchAspectRatio = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, _("HUD Match Aspect Ratio"), true ) );
+    m_pCheckBoxHudMatchAspectRatio->SetPosition ( CVector2D ( vecTemp.fX + 323.0f, vecTemp.fY + 3.0f ) );
+    m_pCheckBoxHudMatchAspectRatio->AutoSize ( NULL, 20.0f );
+
     m_pCheckBoxVolumetricShadows = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, _("Volumetric Shadows"), true ) );
     m_pCheckBoxVolumetricShadows->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 30.0f ) );
     m_pCheckBoxVolumetricShadows->AutoSize ( NULL, 20.0f );
@@ -1423,6 +1427,9 @@ void CSettings::UpdateVideoTab ( bool bIsVideoModeChanged )
     else if ( aspectRatio == ASPECT_RATIO_4_3 ) m_pComboAspectRatio->SetText ( _("4:3") );
     else if ( aspectRatio == ASPECT_RATIO_16_10 ) m_pComboAspectRatio->SetText ( _("16:10") );
     else if ( aspectRatio == ASPECT_RATIO_16_9 ) m_pComboAspectRatio->SetText ( _("16:9") );
+
+    // HUD match aspect ratio
+    m_pCheckBoxHudMatchAspectRatio->SetSelected( CVARS_GET_VALUE < bool > ( "hud_match_aspect_ratio" ) );
 
     // Volumetric shadows
     bool bVolumetricShadowsEnabled;
@@ -2507,6 +2514,9 @@ void CSettings::LoadData ( void )
     else if ( aspectRatio == ASPECT_RATIO_16_10 ) m_pComboAspectRatio->SetText ( _("16:10") );
     else if ( aspectRatio == ASPECT_RATIO_16_9 ) m_pComboAspectRatio->SetText ( _("16:9") );
 
+    // HUD match aspect ratio
+    m_pCheckBoxHudMatchAspectRatio->SetSelected( CVARS_GET_VALUE < bool > ( "hud_match_aspect_ratio" ) );
+
     // Volumetric shadows
     bool bVolumetricShadowsEnabled;
     CVARS_GET("volumetric_shadows", bVolumetricShadowsEnabled);
@@ -2794,8 +2804,12 @@ void CSettings::SaveData ( void )
     {
         eAspectRatio aspectRatio = ( eAspectRatio ) ( int ) pRatioSelected->GetData();
         CVARS_SET("aspect_ratio", aspectRatio);
-	    gameSettings->SetAspectRatio ( aspectRatio );
     }
+
+    // HUD match aspect ratio
+    bool bHudMatchAspectRatio = m_pCheckBoxHudMatchAspectRatio->GetSelected ();
+    CVARS_SET ( "hud_match_aspect_ratio", bHudMatchAspectRatio );
+    gameSettings->SetAspectRatio ( (eAspectRatio)CVARS_GET_VALUE < int > ( "aspect_ratio" ), bHudMatchAspectRatio );
 
     // Volumetric shadows
     bool bVolumetricShadowsEnabled = m_pCheckBoxVolumetricShadows->GetSelected ();
