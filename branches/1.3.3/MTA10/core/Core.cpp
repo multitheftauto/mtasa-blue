@@ -71,7 +71,8 @@ bool IsRealDeal ( void )
     char szBuffer[64000];
     GetModuleFileName ( NULL, szBuffer, sizeof(szBuffer) - 1 );
     WriteDebugEvent( SString( "ModuleFileName: %s", szBuffer ) );
-    if ( SStringX( szBuffer ).EndsWithI( "ta_sa.exe" ) )
+    if ( SStringX( szBuffer ).EndsWithI( "gta_sa.exe" )
+        || SStringX( szBuffer ).EndsWithI( "proxy_sa.exe" ) )
         return true;
     return false;
 }
