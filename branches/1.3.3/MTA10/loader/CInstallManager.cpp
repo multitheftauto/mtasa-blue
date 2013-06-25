@@ -689,7 +689,7 @@ SString CInstallManager::_ProcessAeroChecks ( void )
         if ( bCanChangeAeroSetting )
         {
             // Get option to set
-            bool bAeroEnabled = GetApplicationSettingInt ( "aero-enabled" );
+            bool bAeroEnabled = GetApplicationSettingInt ( "aero-enabled" ) ? true : false;
             uchar ucTimeStampRequired = bAeroEnabled ? AERO_ENABLED : AERO_DISABLED;
             if ( ucTimeStamp != ucTimeStampRequired )
             {
@@ -967,22 +967,12 @@ SString CInstallManager::_ProcessExeCopyChecks ( void )
     SString strGTAPath;
     if ( GetGamePath( strGTAPath ) == GAME_PATH_OK )
     {
-        if ( GetApplicationSettingInt( "nvhacks", "optimus" ) )
+        bool bCopyFailed;
+        MaybeRenameExe( strGTAPath, &bCopyFailed );
+        if ( bCopyFailed )
         {
-            SString strGTAEXEPath = PathJoin( strGTAPath, MTA_GTAEXE_NAME );
-            SString strHTAEXEPath = PathJoin( strGTAPath, MTA_HTAEXE_NAME );
-
-            SString strGTAMd5 = CMD5Hasher::CalculateHexString( strGTAEXEPath );
-            SString strHTAMd5 = CMD5Hasher::CalculateHexString( strHTAEXEPath );
-
-            if ( strGTAMd5 != strHTAMd5 )
-            {
-                if ( !FileCopy( strGTAEXEPath, strHTAEXEPath ) )
-                {
-                    m_strAdminReason = "Copy main executable to avoid graphic driver issues";
-                    return "fail";
-                }
-            }
+            m_strAdminReason = "Copy main executable to avoid graphic driver issues";
+            return "fail";
         }
     }
     return "ok";

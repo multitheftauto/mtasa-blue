@@ -481,20 +481,7 @@ int DoLaunchGame ( LPSTR lpCmdLine )
     BeginD3DStuff();
 
     // Use renamed exe if required
-    if ( GetApplicationSettingInt( "nvhacks", "optimus-rename-exe" ) )
-    {
-        SString strHTAEXEPath = PathJoin( strGTAPath, MTA_HTAEXE_NAME );
-        SString strGTAMd5 = CMD5Hasher::CalculateHexString( strGTAEXEPath );
-        SString strHTAMd5 = CMD5Hasher::CalculateHexString( strHTAEXEPath );
-        if ( strGTAMd5 != strHTAMd5 )
-        {
-            FileCopy( strGTAEXEPath, strHTAEXEPath );
-            strGTAMd5 = CMD5Hasher::CalculateHexString( strGTAEXEPath );
-            strHTAMd5 = CMD5Hasher::CalculateHexString( strHTAEXEPath );
-        }
-        if ( strGTAMd5 == strHTAMd5 )
-            strGTAEXEPath = strHTAEXEPath;
-    }
+    strGTAEXEPath = MaybeRenameExe( strGTAPath );
 
     //////////////////////////////////////////////////////////
     //

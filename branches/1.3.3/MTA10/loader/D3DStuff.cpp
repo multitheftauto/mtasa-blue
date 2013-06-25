@@ -149,10 +149,6 @@ void BeginD3DStuff( void )
     if ( GetApplicationSettingInt( "nvhacks", "optimus-force-detection" ) )
         bDetectedOptimus = true;
 
-#ifdef MTA_DEBUG
-    bDetectedOptimus = true;
-#endif
-
     SetApplicationSettingInt( "nvhacks", "optimus", bDetectedOptimus );
 
     if ( bDetectedOptimus )

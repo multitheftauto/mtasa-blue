@@ -94,6 +94,8 @@ void            MaybeShowCopySettingsDialog         ( void );
 
 bool            CheckAndShowFileOpenFailureMessage  ( void );
 
+SString         MaybeRenameExe                      ( const SString& strGTAPath, bool* pbCopyFailed = NULL );
+
 //
 // Determine if game process has gone wonky
 //

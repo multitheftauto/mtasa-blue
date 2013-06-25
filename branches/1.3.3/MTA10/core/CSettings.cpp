@@ -545,11 +545,21 @@ void CSettings::CreateGUI ( void )
     }
 
     m_pCheckBoxDisableAero = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, "Disable Aero Desktop", true ) );
-    m_pCheckBoxDisableAero->SetPosition ( CVector2D ( vecTemp.fX + 340.0f, vecTemp.fY + 29.0f ) );
+    m_pCheckBoxDisableAero->SetPosition ( CVector2D ( vecTemp.fX + 340.0f, fPosY + 29.0f ) );
     m_pCheckBoxDisableAero->SetSize ( CVector2D ( 224.0f, 16.0f ) );
     if ( GetApplicationSetting ( "os-version" ) < "6.1" || GetApplicationSettingInt ( "aero-changeable" ) == 0 )
     {
         m_pCheckBoxDisableAero->SetVisible ( false );
+        fPosY -= 16.0f;
+    }
+
+    fPosY += 16.0f;
+    m_pCheckBoxDisableDriverOverrides = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, "Disable Driver Overrides", true ) );
+    m_pCheckBoxDisableDriverOverrides->SetPosition ( CVector2D ( vecTemp.fX + 340.0f, fPosY + 29.0f ) );
+    m_pCheckBoxDisableDriverOverrides->SetSize ( CVector2D ( 224.0f, 16.0f ) );
+    if ( GetApplicationSettingInt ( "nvhacks", "optimus" ) )
+    {
+        m_pCheckBoxDisableDriverOverrides->SetVisible ( false );
         fPosY -= 16.0f;
     }
 
@@ -679,8 +689,8 @@ void CSettings::CreateGUI ( void )
     m_pComboAspectRatio->SetReadOnly ( true );
 
     m_pCheckBoxHudMatchAspectRatio = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, "HUD Match Aspect Ratio", true ) );
-    m_pCheckBoxHudMatchAspectRatio->SetPosition ( CVector2D ( vecTemp.fX + 323.0f, vecTemp.fY + 3.0f ) );
-    m_pCheckBoxHudMatchAspectRatio->AutoSize ( NULL, 20.0f );
+    m_pCheckBoxHudMatchAspectRatio->SetPosition ( CVector2D ( vecTemp.fX + 300.0f, vecTemp.fY + 3.0f ) );
+    m_pCheckBoxHudMatchAspectRatio->SetSize ( CVector2D ( 224.0f, 16.0f ) );
 
     m_pMapRenderingLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, "Map rendering options" ) );
     m_pMapRenderingLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 38.0f ) );
@@ -1185,8 +1195,9 @@ void CSettings::UpdateVideoTab ( bool bIsVideoModeChanged )
     GetVideoModeManager ()->GetNextVideoMode ( iNextVidMode, bNextWindowed, bNextFSMinimize, iNextFullscreenStyle );
 
     bool bIsAntiAliasingChanged = gameSettings->GetAntiAliasing () != m_pComboAntiAliasing->GetSelectedItemIndex ();
-    bool bIsAeroChanged = GetApplicationSettingInt ( "aero-enabled"  ) ? false : true != m_pCheckBoxDisableAero->GetSelected ();
-    if ( bIsVideoModeChanged || bIsAntiAliasingChanged || bIsAeroChanged )
+    bool bIsAeroChanged = ( GetApplicationSettingInt ( "aero-enabled"  ) ? false : true ) != m_pCheckBoxDisableAero->GetSelected ();
+    bool bIsDriverOverridesChanged = ( GetApplicationSettingInt ( "driver-overrides-disabled"  ) ? true : false ) != m_pCheckBoxDisableDriverOverrides->GetSelected ();
+    if ( bIsVideoModeChanged || bIsAntiAliasingChanged || bIsAeroChanged || bIsDriverOverridesChanged )
     {
         SString strChangedOptions;
         if ( bIsVideoModeChanged )
@@ -1210,6 +1221,9 @@ void CSettings::UpdateVideoTab ( bool bIsVideoModeChanged )
             strChangedOptions += "Aero setting";
         }
 
+        if ( strChangedOptions.empty () )
+            strChangedOptions += "Some settings";
+
         SString strMessage ( "%s will be changed when you next start MTA", strChangedOptions.c_str () );
         strMessage += "\n\nDo you want to restart now?";
         CQuestionBox* pQuestionBox = CCore::GetSingleton ().GetLocalGUI ()->GetMainMenu ()->GetQuestionWindow ();
@@ -1225,6 +1239,7 @@ void CSettings::UpdateVideoTab ( bool bIsVideoModeChanged )
     m_pCheckBoxWindowed->SetSelected ( bNextWindowed );
     m_pCheckBoxMinimize->SetSelected ( bNextFSMinimize );
     m_pCheckBoxDisableAero->SetSelected ( GetApplicationSettingInt ( "aero-enabled" ) ? false : true );
+    m_pCheckBoxDisableDriverOverrides->SetSelected ( GetApplicationSettingInt ( "driver-overrides-disabled" ) ? true : false );
     m_pDrawDistance->SetScrollPosition ( ( gameSettings->GetDrawDistance () - 0.925f ) / 0.8749f );
     m_pBrightness->SetScrollPosition ( ( float )gameSettings->GetBrightness () / 384 );
 
@@ -2311,6 +2326,7 @@ void CSettings::LoadData ( void )
     m_pCheckBoxWindowed->SetSelected ( bNextWindowed );
     m_pCheckBoxMinimize->SetSelected ( bNextFSMinimize );
     m_pCheckBoxDisableAero->SetSelected ( GetApplicationSettingInt ( "aero-enabled" ) ? false : true );
+    m_pCheckBoxDisableDriverOverrides->SetSelected ( GetApplicationSettingInt ( "driver-overrides-disabled" ) ? true : false );
     m_pDrawDistance->SetScrollPosition ( ( gameSettings->GetDrawDistance () - 0.925f ) / 0.8749f );
     m_pBrightness->SetScrollPosition ( ( float )gameSettings->GetBrightness () / 384 );
 
@@ -2572,6 +2588,7 @@ void CSettings::SaveData ( void )
     if ( CGUIListItem* pSelected = m_pComboAntiAliasing->GetSelectedItem () )
         iAntiAliasing = ( int ) pSelected->GetData();
     int iAeroEnabled = m_pCheckBoxDisableAero->GetSelected() ? 0 : 1;
+    int iDriverOverridesDisabled = m_pCheckBoxDisableDriverOverrides->GetSelected() ? 1 : 0;
     bool bCustomizedSAFilesEnabled = m_pCheckBoxCustomizedSAFiles->GetSelected();
     bool bCustomizedSAFilesWasEnabled = GetApplicationSettingInt ( "customized-sa-files-request" ) != 0;
 
@@ -2587,8 +2604,9 @@ void CSettings::SaveData ( void )
     bool bIsVideoModeChanged = GetVideoModeManager ()->SetVideoMode ( iNextVidMode, bNextWindowed, bNextFSMinimize, iNextFullscreenStyle );
     bool bIsAntiAliasingChanged = gameSettings->GetAntiAliasing () != iAntiAliasing;
     bool bIsAeroChanged = GetApplicationSettingInt ( "aero-enabled"  ) != iAeroEnabled;
+    bool bIsDriverOverridesChanged = GetApplicationSettingInt ( "driver-overrides-disabled"  ) != iDriverOverridesDisabled;
     bool bIsCustomizedSAFilesChanged = bCustomizedSAFilesWasEnabled != bCustomizedSAFilesEnabled;
-    if ( bIsVideoModeChanged || bIsAntiAliasingChanged || bIsAeroChanged || bIsCustomizedSAFilesChanged )
+    if ( bIsVideoModeChanged || bIsAntiAliasingChanged || bIsAeroChanged || bIsDriverOverridesChanged || bIsCustomizedSAFilesChanged )
     {
         SString strChangedOptions;
         if ( bIsVideoModeChanged )
@@ -2643,6 +2661,7 @@ void CSettings::SaveData ( void )
 
     // Update Aero override setting. This need to be a registry setting as it's done in the launcher
     SetApplicationSettingInt ( "aero-enabled", m_pCheckBoxDisableAero->GetSelected() ? 0 : 1 );
+    SetApplicationSettingInt ( "driver-overrides-disabled", m_pCheckBoxDisableDriverOverrides->GetSelected() ? 1 : 0 );
 
     // Anisotropic filtering
     int iAnisotropic = Min < int > ( m_iMaxAnisotropic, ( m_pAnisotropic->GetScrollPosition () ) * ( m_iMaxAnisotropic + 1 ) );

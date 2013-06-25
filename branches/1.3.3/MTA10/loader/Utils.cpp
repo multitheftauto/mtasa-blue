@@ -487,7 +487,7 @@ DWORD FindProcessId ( const SString& processName )
 //
 // GetGTAProcessList
 //
-// Get list of process id's with the image name ending in "gta_sa.exe" or "hta_sa.exe"
+// Get list of process id's with the image name ending in "gta_sa.exe" or "proxy_sa.exe"
 //
 ///////////////////////////////////////////////////////////////////////////
 std::vector < DWORD > GetGTAProcessList ( void )
@@ -2132,4 +2132,44 @@ void* LoadFunction( const char* c, const char* a, const char* b )
     static HMODULE hModule = LoadLibrary( "kernel32" );
     SString strFunctionName( "%s%s%s", a, b, c );
     return static_cast < PVOID >( GetProcAddress( hModule, strFunctionName ) );
+}
+
+
+//////////////////////////////////////////////////////////
+//
+// MaybeRenameExe
+//
+// Figure out whether to use a renamed exe, and return filename to use.
+// Also tries file copy if required.
+//
+//////////////////////////////////////////////////////////
+SString MaybeRenameExe( const SString& strGTAPath, bool* pbCopyFailed )
+{
+    SString strGTAEXEPath = PathJoin( strGTAPath, MTA_GTAEXE_NAME );
+    if ( pbCopyFailed )
+        *pbCopyFailed = false;
+
+    int iDoRename;
+    if ( GetApplicationSettingInt( "nvhacks", "optimus" ) )
+        iDoRename = GetApplicationSettingInt( "nvhacks", "optimus-rename-exe" );
+    else
+        iDoRename = GetApplicationSettingInt( "driver-overrides-disabled" );
+
+    if ( iDoRename )
+    {
+        SString strHTAEXEPath = PathJoin( strGTAPath, MTA_HTAEXE_NAME );
+        SString strGTAMd5 = CMD5Hasher::CalculateHexString( strGTAEXEPath );
+        SString strHTAMd5 = CMD5Hasher::CalculateHexString( strHTAEXEPath );
+        if ( strGTAMd5 != strHTAMd5 )
+        {
+            if ( !FileCopy( strGTAEXEPath, strHTAEXEPath ) )
+                if ( pbCopyFailed )
+                    *pbCopyFailed = true;
+            strGTAMd5 = CMD5Hasher::CalculateHexString( strGTAEXEPath );
+            strHTAMd5 = CMD5Hasher::CalculateHexString( strHTAEXEPath );
+        }
+        if ( strGTAMd5 == strHTAMd5 )
+            strGTAEXEPath = strHTAEXEPath;
+    }
+    return strGTAEXEPath;
 }
