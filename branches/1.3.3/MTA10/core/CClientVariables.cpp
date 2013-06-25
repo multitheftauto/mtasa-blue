@@ -298,6 +298,7 @@ void CClientVariables::LoadDefaults ( void )
     DEFAULT ( "update_build_type",          0 );                            // 0-stable 1-test 2-nightly
     DEFAULT ( "volumetric_shadows",         0 );                            // Enable volumetric shadows
     DEFAULT ( "aspect_ratio",               0 );                            // Display aspect ratio
+    DEFAULT ( "hud_match_aspect_ratio",     1 );                            // GTA HUD should match the display aspect ratio
     DEFAULT ( "anisotropic",                0 );                            // Anisotropic filtering
     DEFAULT ( "grass",                      1 );                            // Enable grass
     DEFAULT ( "heat_haze",                  1 );                            // Enable heat haze

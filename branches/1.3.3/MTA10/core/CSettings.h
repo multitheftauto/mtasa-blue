@@ -153,6 +153,7 @@ protected:
     CGUIComboBox*       m_pComboResolution;
 	CGUICheckBox*       m_pCheckBoxMipMapping;
     CGUICheckBox*       m_pCheckBoxWindowed;
+    CGUICheckBox*       m_pCheckBoxHudMatchAspectRatio;
     CGUICheckBox*       m_pCheckBoxMinimize;
     CGUICheckBox*       m_pCheckBoxDisableAero;
     CGUILabel*          m_pMapRenderingLabel;

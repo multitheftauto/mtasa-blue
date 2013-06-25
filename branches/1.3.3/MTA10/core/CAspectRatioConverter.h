@@ -28,14 +28,15 @@ public:
     {
         m_fTargetRatioValue = fTargetRatioValue;
         m_fTargetBase = 1 - 0.36 * fTargetRatioValue;
+        m_bValidRatios = ( m_fSourceRatioValue != 0 ) && ( m_fTargetRatioValue != 0 );
     }
 
     // Call when Source Ratio Value changes
     void SetSourceRatioValue( float fSourceRatioValue )
     {
         m_fSourceRatioValue = fSourceRatioValue;
-        m_bValidSourceRatio = ( fSourceRatioValue != 0 );
-        if ( m_bValidSourceRatio )
+        m_bValidRatios = ( m_fSourceRatioValue != 0 ) && ( m_fTargetRatioValue != 0 );
+        if ( m_bValidRatios )
         {
             m_fSourceBase = 1 - 0.36 * m_fSourceRatioValue;
             m_fConvertScale = m_fTargetRatioValue / m_fSourceRatioValue;
@@ -55,7 +56,7 @@ public:
 
     bool IsEnabled( void ) const
     {
-        return ( m_bValidSourceRatio && !m_bSuspended );
+        return ( m_bValidRatios && !m_bSuspended );
     }
 
     // Convert a y screen position
@@ -89,7 +90,7 @@ public:
     }
 
 protected:
-    bool m_bValidSourceRatio;
+    bool m_bValidRatios;
     bool m_bSuspended;
     float m_fSourceRatioValue;
     float m_fTargetRatioValue;
