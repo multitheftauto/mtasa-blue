@@ -608,5 +608,5 @@ BYTE CCameraSA::GetCameraViewMode ( void )
 
 VOID CCameraSA::SetCameraViewMode ( BYTE dwCamMode )
 {
-    MemPut < BYTE > ( VAR_VehicleCameraView, dwCamMode );
+    MemPutFast < BYTE > ( VAR_VehicleCameraView, dwCamMode );
 }

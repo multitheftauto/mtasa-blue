@@ -95,12 +95,20 @@ namespace SharedUtil
     // Temporarily unprotect slow mem area
     SMemWrite OpenMemWrite( const void* pAddr, uint uiAmount )
     {
+        SMemWrite hMem;
+
+        // Check for incorrect use of function
+        if ( !IsSlowMem( pAddr, uiAmount ) )
+        {
+            dassert( 0 && "Should use Mem*Fast function" );
+            hMem.dwFirstPage = 0;
+            return hMem;
+        }
+
         // Checks
         assert( IsMainThread() );
-        assert( IsSlowMem( pAddr, uiAmount ) );
 
         // Calc info for VirtualProtect
-        SMemWrite hMem;
         hMem.dwFirstPage = ((DWORD)pAddr) & ~0xFFF;
         DWORD dwLastPage = (((DWORD)pAddr) + uiAmount - 1) & ~0xFFF;
         hMem.dwSize = dwLastPage - hMem.dwFirstPage + 0x1000;
@@ -129,6 +137,8 @@ namespace SharedUtil
     // Restore slow mem area protection
     void CloseMemWrite( SMemWrite& hMem )
     {
+        if ( hMem.dwFirstPage == 0 )
+            return;
         DWORD oldProt;
         VirtualProtect((LPVOID)hMem.dwFirstPage, hMem.dwSize, hMem.oldProt, &oldProt);
         assert( oldProt == PAGE_EXECUTE_READWRITE );
