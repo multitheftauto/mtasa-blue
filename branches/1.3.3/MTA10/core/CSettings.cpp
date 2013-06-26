@@ -1700,7 +1700,7 @@ void CSettings::ProcessKeyBinds ( void )
             strCmdArgs.Split ( ": ", &strCommand, &strArguments );
 
             const char* szCommand = strCommand;
-            const char* szArguments = strArguments.empty () ? NULL : strArguments;
+            const char* szArguments = strArguments.empty () ? NULL : strArguments.c_str();
 
             /** Primary keybinds **/
             CCommandBind* pBind = reinterpret_cast < CCommandBind* > ( m_pBindsList->GetItemData ( i, m_hPriKey ) );
@@ -2606,51 +2606,6 @@ void CSettings::SaveData ( void )
     bool bIsAeroChanged = GetApplicationSettingInt ( "aero-enabled"  ) != iAeroEnabled;
     bool bIsDriverOverridesChanged = GetApplicationSettingInt ( "driver-overrides-disabled"  ) != iDriverOverridesDisabled;
     bool bIsCustomizedSAFilesChanged = bCustomizedSAFilesWasEnabled != bCustomizedSAFilesEnabled;
-    if ( bIsVideoModeChanged || bIsAntiAliasingChanged || bIsAeroChanged || bIsDriverOverridesChanged || bIsCustomizedSAFilesChanged )
-    {
-        SString strChangedOptions;
-        if ( bIsVideoModeChanged )
-        {
-            strChangedOptions += "Resolution";
-            if ( bNextFSMinimize != GetVideoModeManager ()->IsMinimizeEnabled () )
-                strChangedOptions += "/Full Screen Minimize";
-        }
-
-        if ( bIsAntiAliasingChanged )
-        {
-            if ( !strChangedOptions.empty () )
-                strChangedOptions += " and ";
-            strChangedOptions += "Anti-aliasing";
-        }
-
-        if ( bIsAeroChanged )
-        {
-            if ( !strChangedOptions.empty () )
-                strChangedOptions += " and ";
-            strChangedOptions += "Aero setting";
-        }
-
-        if ( bIsCustomizedSAFilesChanged )
-        {
-            if ( !strChangedOptions.empty () )
-                strChangedOptions += " and ";
-            strChangedOptions += "Customized GTA:SA files setting";
-        }
-
-        if ( strChangedOptions.empty () )
-            strChangedOptions += "Some settings";
-
-        SString strMessage ( "%s will be changed when you next start MTA", strChangedOptions.c_str () );
-        strMessage += "\n\nDo you want to restart now?";
-        CQuestionBox* pQuestionBox = CCore::GetSingleton ().GetLocalGUI ()->GetMainMenu ()->GetQuestionWindow ();
-        pQuestionBox->Reset ();
-        pQuestionBox->SetTitle ( "RESTART REQUIRED" );
-        pQuestionBox->SetMessage ( strMessage );
-        pQuestionBox->SetButton ( 0, "No" );
-        pQuestionBox->SetButton ( 1, "Yes" );
-        pQuestionBox->SetCallback ( RestartCallBack );
-        pQuestionBox->Show ();
-    }
 
     gameSettings->SetAntiAliasing ( iAntiAliasing, true );
     gameSettings->SetDrawDistance ( ( m_pDrawDistance->GetScrollPosition () * 0.875f ) + 0.925f );
@@ -2811,6 +2766,53 @@ void CSettings::SaveData ( void )
     CCore::GetSingleton ().SaveConfig ();
     // Save the single player settings (e.g. video mode, volume)
     gameSettings->Save ();
+
+    // Ask to restart?
+    if ( bIsVideoModeChanged || bIsAntiAliasingChanged || bIsAeroChanged || bIsDriverOverridesChanged || bIsCustomizedSAFilesChanged )
+    {
+        SString strChangedOptions;
+        if ( bIsVideoModeChanged )
+        {
+            strChangedOptions += "Resolution";
+            if ( bNextFSMinimize != GetVideoModeManager ()->IsMinimizeEnabled () )
+                strChangedOptions += "/Full Screen Minimize";
+        }
+
+        if ( bIsAntiAliasingChanged )
+        {
+            if ( !strChangedOptions.empty () )
+                strChangedOptions += " and ";
+            strChangedOptions += "Anti-aliasing";
+        }
+
+        if ( bIsAeroChanged )
+        {
+            if ( !strChangedOptions.empty () )
+                strChangedOptions += " and ";
+            strChangedOptions += "Aero setting";
+        }
+
+        if ( bIsCustomizedSAFilesChanged )
+        {
+            if ( !strChangedOptions.empty () )
+                strChangedOptions += " and ";
+            strChangedOptions += "Customized GTA:SA files setting";
+        }
+
+        if ( strChangedOptions.empty () )
+            strChangedOptions += "Some settings";
+
+        SString strMessage ( "%s will be changed when you next start MTA", strChangedOptions.c_str () );
+        strMessage += "\n\nDo you want to restart now?";
+        CQuestionBox* pQuestionBox = CCore::GetSingleton ().GetLocalGUI ()->GetMainMenu ()->GetQuestionWindow ();
+        pQuestionBox->Reset ();
+        pQuestionBox->SetTitle ( "RESTART REQUIRED" );
+        pQuestionBox->SetMessage ( strMessage );
+        pQuestionBox->SetButton ( 0, "No" );
+        pQuestionBox->SetButton ( 1, "Yes" );
+        pQuestionBox->SetCallback ( RestartCallBack );
+        pQuestionBox->Show ();
+    }
 }
 
 void CSettings::RemoveKeyBindSection ( char * szSectionName )

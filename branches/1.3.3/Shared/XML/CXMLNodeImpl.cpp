@@ -286,6 +286,7 @@ void CXMLNodeImpl::SetTagContent ( const char* szText )
     m_pNode->Clear();
     TiXmlText* pNewNode = new TiXmlText ( szText );
     m_pNode->LinkEndChild ( pNewNode );
+    m_Children.clear();
 }
 
 
