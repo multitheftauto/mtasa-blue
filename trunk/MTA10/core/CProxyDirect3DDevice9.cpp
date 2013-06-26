@@ -15,7 +15,6 @@
 bool g_bInGTAScene = false;
 CProxyDirect3DDevice9* g_pProxyDevice = NULL;
 CProxyDirect3DDevice9::SD3DDeviceState* g_pDeviceState = NULL;
-uint ms_uiDeviceResetFailCount = 0;
 
 // Proxy constructor and destructor.
 CProxyDirect3DDevice9::CProxyDirect3DDevice9 ( IDirect3DDevice9 * pDevice  )
@@ -179,6 +178,94 @@ UINT    CProxyDirect3DDevice9::GetNumberOfSwapChains          ( VOID )
     return m_pDevice->GetNumberOfSwapChains ( );
 }
 
+////////////////////////////////////////////////
+//
+// ResetDeviceInsist
+//
+// Keep trying reset device for a little bit
+//
+////////////////////////////////////////////////
+HRESULT ResetDeviceInsist( uint uiMinTries, uint uiTimeout, IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS* pPresentationParameters )
+{
+    HRESULT hResult;
+    CElapsedTime retryTimer;
+    uint uiRetryCount = 0;
+    do
+    {
+        hResult = pDevice->Reset ( pPresentationParameters );
+        if ( hResult == D3D_OK )
+        {
+            WriteDebugEvent( SString( "   -- ResetDeviceInsist succeeded on try #%d", uiRetryCount + 1 ) );
+            break;
+        }
+        Sleep( 100 );
+    }
+    while( ++uiRetryCount < uiMinTries || retryTimer.Get() < uiTimeout );
+
+    return hResult;
+}
+
+
+////////////////////////////////////////////////
+//
+// DoResetDevice
+//
+// In various ways
+//
+////////////////////////////////////////////////
+HRESULT DoResetDevice( IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS* pPresentationParameters, D3DPRESENT_PARAMETERS& presentationParametersOrig )
+{
+    HRESULT hResult;
+    hResult = pDevice->Reset ( pPresentationParameters );
+
+    if ( SUCCEEDED ( hResult ) )
+    {
+        // Log success
+        WriteDebugEvent ( "Reset success" );
+    }
+    else
+    if ( FAILED ( hResult ) )
+    {
+        // Handle failure of initial reset device call
+        g_pCore->LogEvent( 7124, "Direct3D", "Direct3DDevice9::Reset", SString( "Fail0:%08x", hResult ) );
+        WriteDebugEvent ( SString( "Reset failed #0: %08x", hResult ) );
+
+        // Try reset device again
+        hResult = ResetDeviceInsist ( 5, 1000, pDevice, pPresentationParameters );
+
+        // Handle retry result
+        if ( FAILED ( hResult ) )
+        {
+            // Record problem
+            g_pCore->LogEvent( 7124, "Direct3D", "Direct3DDevice9::Reset", SString( "Fail1:%08x", hResult ) );
+            WriteDebugEvent( SString( "Direct3DDevice9::Reset  Fail1:%08x", hResult ) );
+
+            // Try with original presentation parameters
+            *pPresentationParameters = presentationParametersOrig;
+            hResult = ResetDeviceInsist ( 5, 1000, pDevice, pPresentationParameters );
+
+            if ( FAILED ( hResult ) )
+            {
+                // Record problem
+                g_pCore->LogEvent( 7124, "Direct3D", "Direct3DDevice9::Reset", SString( "Fail2:%08x", hResult ) );
+                WriteDebugEvent( SString( "Direct3DDevice9::Reset  Fail2:%08x", hResult ) );
+
+                // Prevent statup warning in loader
+                WatchDogCompletedSection ( "L3" );
+
+                // Handle fatal error
+                SString strMessage;
+                strMessage += "There was a problem resetting Direct3D\n\n";
+                strMessage += SString( "Direct3DDevice9 Reset error: %08x", hResult );
+                BrowseToSolution( "d3dresetdevice-fail", EXIT_GAME_FIRST | ASK_GO_ONLINE, strMessage );
+                // Won't get here as BrowseToSolution will terminate the process
+            }
+        }
+    }
+    return hResult;
+}
+
+
 HRESULT CProxyDirect3DDevice9::Reset                          ( D3DPRESENT_PARAMETERS* pPresentationParameters )
 {
     WriteDebugEvent ( "CProxyDirect3DDevice9::Reset" );
@@ -194,40 +281,7 @@ HRESULT CProxyDirect3DDevice9::Reset                          ( D3DPRESENT_PARAM
     CDirect3DEvents9::OnInvalidate ( m_pDevice );
 
     // Call the real reset routine.
-    hResult = m_pDevice->Reset ( pPresentationParameters );
-
-    if ( FAILED ( hResult ) )
-    {
-        // Record problem
-        g_pCore->LogEvent( 7124, "Direct3D", "Direct3DDevice9::Reset", SString( "Fail1:%08x", hResult ) );
-        WriteDebugEvent( SString( "Direct3DDevice9::Reset  Fail1:%08x", hResult ) );
-
-        // Try with original presentation parameters
-        *pPresentationParameters = presentationParametersOrig;
-        hResult = m_pDevice->Reset ( pPresentationParameters );
-
-        if ( FAILED ( hResult ) )
-        {
-            // Record problem
-            g_pCore->LogEvent( 7124, "Direct3D", "Direct3DDevice9::Reset", SString( "Fail2:%08x", hResult ) );
-            WriteDebugEvent( SString( "Direct3DDevice9::Reset  Fail2:%08x", hResult ) );
-
-            if ( ++ms_uiDeviceResetFailCount > 2 )
-            {
-                // Handle fatal error
-                SString strMessage;
-                strMessage += "There was a problem resetting Direct3D\n\n";
-                strMessage += SString( "Direct3DDevice9 Reset error: %08x", hResult );
-                BrowseToSolution( "d3dresetdevice-fail", EXIT_GAME_FIRST | ASK_GO_ONLINE, strMessage );
-                // Won't get here as BrowseToSolution will terminate the process
-            }
-
-            // Let caller handle what to do
-            return hResult;
-        }
-    }
-
-    ms_uiDeviceResetFailCount = 0;
+    hResult = DoResetDevice( m_pDevice, pPresentationParameters, presentationParametersOrig );
 
     // Store actual present parameters used
     IDirect3DSwapChain9* pSwapChain;

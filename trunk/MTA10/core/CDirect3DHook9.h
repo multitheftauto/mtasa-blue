@@ -30,6 +30,7 @@ public:
 
 
     pDirect3DCreate     m_pfnDirect3DCreate9;
+    bool                m_bDirect3DCreate9Suspended;
 };
 
 #endif

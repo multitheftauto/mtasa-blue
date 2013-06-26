@@ -27,6 +27,7 @@ static unsigned long ulProgressStartTime = 0;
 static SString g_strMTASAPath;
 static HWND hwndCrashedDialog = NULL;
 static HWND hwndD3dDllDialog = NULL;
+static HWND hwndOptimusDialog = NULL;
 HANDLE g_hMutex = NULL;
 HMODULE hLibraryModule = NULL;
 
@@ -486,7 +487,7 @@ DWORD FindProcessId ( const SString& processName )
 //
 // GetGTAProcessList
 //
-// Get list of process id's with the image name ending in "gta_sa.exe"
+// Get list of process id's with the image name ending in "gta_sa.exe" or "proxy_sa.exe"
 //
 ///////////////////////////////////////////////////////////////////////////
 std::vector < DWORD > GetGTAProcessList ( void )
@@ -503,11 +504,14 @@ std::vector < DWORD > GetGTAProcessList ( void )
 
         std::vector < SString > filenameList = GetPossibleProcessPathFilenames ( processId );
         for ( uint i = 0; i < filenameList.size (); i++ )
-            if ( filenameList[i].EndsWith ( MTA_GTAEXE_NAME ) )
+            if ( filenameList[i].EndsWith ( MTA_GTAEXE_NAME ) || filenameList[i].EndsWith ( MTA_HTAEXE_NAME ) )
                 ListAddUnique ( result, processId );
     }
 
     if ( DWORD processId = FindProcessId ( MTA_GTAEXE_NAME ) )
+        ListAddUnique ( result, processId );
+
+    if ( DWORD processId = FindProcessId ( MTA_HTAEXE_NAME ) )
         ListAddUnique ( result, processId );
 
     return result;
@@ -1204,6 +1208,75 @@ void HideD3dDllDialog ( void )
     {
         DestroyWindow ( hwndD3dDllDialog );
         hwndD3dDllDialog = NULL;
+    }
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// Optimus dialog
+//
+//
+//
+///////////////////////////////////////////////////////////////
+void ShowOptimusDialog( HINSTANCE hInstance )
+{
+    uint RadioButtons[] = { IDC_RADIO1, IDC_RADIO2, IDC_RADIO3, IDC_RADIO4 };
+	// Create and show dialog
+    if ( !hwndOptimusDialog )
+    {
+        HideSplash ();
+        bCancelPressed = false;
+        bOkPressed = false;
+        bOtherPressed = false;
+        iOtherCode = IDC_BUTTON_HELP;
+        hwndOptimusDialog = CreateDialog ( hInstance, MAKEINTRESOURCE(IDD_OPTIMUS_DIALOG), 0, DialogProc );
+        uint uiStartupOption = GetApplicationSettingInt( "nvhacks", "optimus-startup-option" ) % NUMELMS( RadioButtons );
+        CheckRadioButton( hwndOptimusDialog, IDC_RADIO1, IDC_RADIO4, RadioButtons[ uiStartupOption ] );
+    }
+    SetForegroundWindow ( hwndOptimusDialog );
+    SetWindowPos ( hwndOptimusDialog, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE );
+
+	// Wait for input
+    while ( !bCancelPressed && !bOkPressed && !bOtherPressed )
+    {
+        MSG msg;
+        while( PeekMessage( &msg, NULL, 0, 0, PM_NOREMOVE ) )
+        {
+            if( GetMessage( &msg, NULL, 0, 0 ) )
+            {
+                TranslateMessage(&msg);
+                DispatchMessage(&msg);
+            }
+        }
+        Sleep( 10 );
+    }
+
+	// Process input
+    uint uiStartupOption = 0;
+    for ( ; uiStartupOption < NUMELMS( RadioButtons ) - 1 ; uiStartupOption++ )
+    {
+        if ( IsDlgButtonChecked( hwndOptimusDialog, RadioButtons[ uiStartupOption ] ) == BST_CHECKED )
+            break;
+    }
+
+    SetApplicationSettingInt( "nvhacks", "optimus-startup-option", uiStartupOption );
+    SetApplicationSettingInt( "nvhacks", "optimus-alt-startup", ( uiStartupOption & 1 ) ? 1 : 0 );
+    SetApplicationSettingInt( "nvhacks", "optimus-rename-exe", ( uiStartupOption & 2 ) ? 1 : 0 );
+
+    if ( bOtherPressed )
+    {
+        BrowseToSolution ( "optimus-startup-option-help", TERMINATE_PROCESS );
+    }
+}
+
+
+void HideOptimusDialog ( void )
+{
+    if ( hwndOptimusDialog )
+    {
+        DestroyWindow ( hwndOptimusDialog );
+        hwndOptimusDialog = NULL;
     }
 }
 
@@ -2061,4 +2134,44 @@ void* LoadFunction( const char* c, const char* a, const char* b )
     static HMODULE hModule = LoadLibrary( "kernel32" );
     SString strFunctionName( "%s%s%s", a, b, c );
     return static_cast < PVOID >( GetProcAddress( hModule, strFunctionName ) );
+}
+
+
+//////////////////////////////////////////////////////////
+//
+// MaybeRenameExe
+//
+// Figure out whether to use a renamed exe, and return filename to use.
+// Also tries file copy if required.
+//
+//////////////////////////////////////////////////////////
+SString MaybeRenameExe( const SString& strGTAPath, bool* pbCopyFailed )
+{
+    SString strGTAEXEPath = PathJoin( strGTAPath, MTA_GTAEXE_NAME );
+    if ( pbCopyFailed )
+        *pbCopyFailed = false;
+
+    int iDoRename;
+    if ( GetApplicationSettingInt( "nvhacks", "optimus" ) )
+        iDoRename = GetApplicationSettingInt( "nvhacks", "optimus-rename-exe" );
+    else
+        iDoRename = GetApplicationSettingInt( "driver-overrides-disabled" );
+
+    if ( iDoRename )
+    {
+        SString strHTAEXEPath = PathJoin( strGTAPath, MTA_HTAEXE_NAME );
+        SString strGTAMd5 = CMD5Hasher::CalculateHexString( strGTAEXEPath );
+        SString strHTAMd5 = CMD5Hasher::CalculateHexString( strHTAEXEPath );
+        if ( strGTAMd5 != strHTAMd5 )
+        {
+            if ( !FileCopy( strGTAEXEPath, strHTAEXEPath ) )
+                if ( pbCopyFailed )
+                    *pbCopyFailed = true;
+            strGTAMd5 = CMD5Hasher::CalculateHexString( strGTAEXEPath );
+            strHTAMd5 = CMD5Hasher::CalculateHexString( strHTAEXEPath );
+        }
+        if ( strGTAMd5 == strHTAMd5 )
+            strGTAEXEPath = strHTAEXEPath;
+    }
+    return strGTAEXEPath;
 }
