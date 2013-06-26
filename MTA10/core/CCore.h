@@ -79,6 +79,7 @@ class CCore;
 extern class CCore* g_pCore;
 extern class CGraphics* g_pGraphics;
 extern class CLocalization* g_pLocalization;
+bool UsingAltD3DSetup();
 
 class CCore : public CCoreInterface, public CSingleton < CCore >
 {
@@ -257,6 +258,9 @@ public:
     void                    SetModulesLoaded                ( bool bLoaded );
     bool                    AreModulesLoaded                ( void );
     void                    UpdateDummyProgress             ( int iPercent = -1 );
+
+    void                    OnPreCreateDevice               ( IDirect3D9* pDirect3D, UINT Adapter, D3DDEVTYPE DeviceType, HWND hFocusWindow, DWORD& BehaviorFlags, D3DPRESENT_PARAMETERS* pPresentationParameters );
+    HRESULT                 OnPostCreateDevice              ( HRESULT hResult, IDirect3D9* pDirect3D, UINT Adapter, D3DDEVTYPE DeviceType, HWND hFocusWindow, DWORD BehaviorFlags, D3DPRESENT_PARAMETERS* pPresentationParameters, IDirect3DDevice9** ppReturnedDeviceInterface );
 
 private:
     // Core devices.

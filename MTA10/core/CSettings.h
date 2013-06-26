@@ -156,6 +156,7 @@ protected:
     CGUICheckBox*       m_pCheckBoxHudMatchAspectRatio;
     CGUICheckBox*       m_pCheckBoxMinimize;
     CGUICheckBox*       m_pCheckBoxDisableAero;
+    CGUICheckBox*       m_pCheckBoxDisableDriverOverrides;
     CGUILabel*          m_pMapRenderingLabel;
     CGUIComboBox*       m_pComboFxQuality;
     CGUILabel*          m_pFXQualityLabel;

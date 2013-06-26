@@ -740,11 +740,32 @@ void CCore::ApplyHooks ( )
     //m_pFileSystemHook->RedirectFile ( "main.scm", "../../mta/gtafiles/main.scm" );
 }
 
+bool UsingAltD3DSetup()
+{
+    static bool bAltStartup = GetApplicationSettingInt( "nvhacks", "optimus-alt-startup" ) ? true : false;
+    return bAltStartup;
+}
+
 void CCore::ApplyHooks2 ( )
 { 
     WriteDebugEvent ( "CCore::ApplyHooks2" );
     // Try this one a little later
-    m_pDirect3DHookManager->ApplyHook ( );
+    if ( !UsingAltD3DSetup() )
+        m_pDirect3DHookManager->ApplyHook ( );
+    else
+    {
+        // Done a little later to get past the loading time required to decrypt the gta 
+        // executable into memory...
+        if ( !CCore::GetSingleton ( ).AreModulesLoaded ( ) )
+        {
+            CCore::GetSingleton ( ).CreateNetwork ( );
+            CCore::GetSingleton ( ).CreateGame ( );
+            CCore::GetSingleton ( ).CreateMultiplayer ( );
+            CCore::GetSingleton ( ).CreateXML ( );
+            CCore::GetSingleton ( ).CreateGUI ( );
+            CCore::GetSingleton ( ).SetModulesLoaded ( true );
+        }
+    }
 }
 
 void CCore::ApplyHooks3( bool bEnable )

@@ -29,7 +29,11 @@ HINSTANCE g_hInstance = NULL;
 //
 // WinMain
 //
-//
+// 'MTA San Andreas.exe' is launched as a subprocess under the following circumstances:
+//      1. During install with /kdinstall command (as admin)
+//      2. During uninstall with /kduninstall command (as admin)
+//      3. By 'MTA San Andreas.exe' when temporary elevated privileges are required (as admin)
+//      4. By 'MTA San Andreas.exe' during auto-update (Which may then call it again as admin)
 //
 ///////////////////////////////////////////////////////////////
 int WINAPI WinMain ( HINSTANCE _hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow )
@@ -546,6 +550,9 @@ int DoLaunchGame ( LPSTR lpCmdLine )
 
     // Do some D3D dancing
     BeginD3DStuff();
+
+    // Use renamed exe if required
+    strGTAEXEPath = MaybeRenameExe( strGTAPath );
 
     //////////////////////////////////////////////////////////
     //

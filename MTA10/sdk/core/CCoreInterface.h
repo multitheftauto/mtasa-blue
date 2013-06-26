@@ -158,6 +158,9 @@ public:
     virtual CModelCacheManager*     GetModelCacheManager            ( void ) = 0;
     virtual void                    AddModelToPersistentCache       ( ushort usModelId ) = 0;
     virtual void                    UpdateDummyProgress             ( int iPercent = -1 ) = 0;
+
+    virtual void                    OnPreCreateDevice               ( IDirect3D9* pDirect3D, UINT Adapter, D3DDEVTYPE DeviceType, HWND hFocusWindow, DWORD& BehaviorFlags, D3DPRESENT_PARAMETERS* pPresentationParameters ) = 0;
+    virtual HRESULT                 OnPostCreateDevice              ( HRESULT hResult, IDirect3D9* pDirect3D, UINT Adapter, D3DDEVTYPE DeviceType, HWND hFocusWindow, DWORD BehaviorFlags, D3DPRESENT_PARAMETERS* pPresentationParameters, IDirect3DDevice9** ppReturnedDeviceInterface ) = 0;
 };
 
 class CClientTime

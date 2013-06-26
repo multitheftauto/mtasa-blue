@@ -681,7 +681,10 @@ HRESULT CDirect3DEvents9::CreateVertexBuffer ( IDirect3DDevice9 *pDevice, UINT L
 
         if ( hr != D3DERR_OUTOFVIDEOMEMORY || i > 0 )
         {
-            CCore::GetSingleton ().LogEvent ( 610, "CreateVertexBuffer", "", SString ( "hr:%x Length:%x Usage:%x FVF:%x Pool:%x", hr, Length, Usage, FVF, Pool ) );
+            SString strMessage( "CreateVertexBuffer fail: hr:%x Length:%x Usage:%x FVF:%x Pool:%x", hr, Length, Usage, FVF, Pool );
+            WriteDebugEvent( strMessage );
+            AddReportLog( 8610, strMessage );
+            CCore::GetSingleton ().LogEvent ( 610, "CreateVertexBuffer", "", strMessage );
             return hr;
         }
 
@@ -713,7 +716,10 @@ HRESULT CDirect3DEvents9::CreateIndexBuffer ( IDirect3DDevice9 *pDevice, UINT Le
 
         if ( hr != D3DERR_OUTOFVIDEOMEMORY || i > 0 )
         {
-            CCore::GetSingleton ().LogEvent ( 611, "CreateIndexBuffer", "", SString ( "hr:%x Length:%x Usage:%x Format:%x Pool:%x", hr, Length, Usage, Format, Pool ) );
+            SString strMessage( "CreateIndexBuffer fail: hr:%x Length:%x Usage:%x Format:%x Pool:%x", hr, Length, Usage, Format, Pool );
+            WriteDebugEvent( strMessage );
+            AddReportLog( 8611, strMessage );
+            CCore::GetSingleton ().LogEvent ( 611, "CreateIndexBuffer", "", strMessage );
             return hr;
         }
 
@@ -745,7 +751,10 @@ HRESULT CDirect3DEvents9::CreateTexture ( IDirect3DDevice9 *pDevice, UINT Width,
 
         if ( hr != D3DERR_OUTOFVIDEOMEMORY || i > 0 )
         {
-            CCore::GetSingleton ().LogEvent ( 612, "CreateTexture", "", SString ( "hr:%x W:%x H:%x L:%x Usage:%x Format:%x Pool:%x", hr, Width, Height, Levels, Usage, Format, Pool ) );
+            SString strMessage( "CreateTexture fail: hr:%x W:%x H:%x L:%x Usage:%x Format:%x Pool:%x", hr, Width, Height, Levels, Usage, Format, Pool );
+            WriteDebugEvent( strMessage );
+            AddReportLog( 8612, strMessage );
+            CCore::GetSingleton ().LogEvent ( 612, "CreateTexture", "", strMessage );
             return hr;
         }
 
@@ -841,7 +850,31 @@ HRESULT CDirect3DEvents9::CreateVertexDeclaration ( IDirect3DDevice9 *pDevice, C
 
     hr = pDevice->CreateVertexDeclaration ( pVertexElements, ppDecl );
     if ( FAILED(hr) )
+    {
+        SString strStatus;
+        // Make a string with decl info
+        for ( uint i = 0 ; i < MAXD3DDECLLENGTH ; i++ )
+        {
+            const D3DVERTEXELEMENT9& element = pVertexElements[ i ];
+            if ( element.Stream == 0xFF )
+                break;
+
+            strStatus += SString( "[%d,%d,%d,%d,%d,%d]"
+                                    ,element.Stream
+                                    ,element.Offset
+                                    ,element.Type
+                                    ,element.Method
+                                    ,element.Usage
+                                    ,element.UsageIndex
+                                    );
+        }
+
+        SString strMessage( "CreateVertexDecl fail: hr:%x %s", hr, *strStatus );
+        WriteDebugEvent( strMessage );
+        AddReportLog( 8613, strMessage );
+        CCore::GetSingleton ().LogEvent ( 613, "CreateVertexDecl", "", strMessage );
         return hr;
+    }
 
     // Create proxy
 	*ppDecl = new CProxyDirect3DVertexDeclaration ( pDevice, *ppDecl, pVertexElements );

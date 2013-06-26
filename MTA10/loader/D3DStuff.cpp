@@ -146,90 +146,20 @@ void BeginD3DStuff( void )
         WriteDebugEvent( SString( "D3DStuff %d Caps9 - %s ", i, *ToString( Caps9 ) ) );
     }
 
-    SetApplicationSettingInt( "diagnostics", "optimus", bDetectedOptimus );
-    if ( !bDetectedOptimus )
-        return;
+    if ( GetApplicationSettingInt( "nvhacks", "optimus-force-detection" ) )
+        bDetectedOptimus = true;
 
-    // Try extra stuff
-    HWND hWnd = CreateWindowForD3D();
+    SetApplicationSettingInt( "nvhacks", "optimus", bDetectedOptimus );
 
-    DWORD BehaviorFlags = 0x40;
-    D3DPRESENT_PARAMETERS pp;
-    pp.BackBufferWidth = 800;
-    pp.BackBufferHeight = 600;
-    pp.BackBufferFormat = D3DFMT_X8R8G8B8;
-    pp.BackBufferCount = 1;
-    pp.MultiSampleType = D3DMULTISAMPLE_NONE;
-    pp.MultiSampleQuality = 0;
-    pp.SwapEffect = D3DSWAPEFFECT_DISCARD;
-    pp.hDeviceWindow = hWnd;
-    pp.Windowed = true;
-    pp.EnableAutoDepthStencil = true;
-    pp.AutoDepthStencilFormat = D3DFMT_D24S8;
-    pp.Flags = 0;
-    pp.FullScreen_RefreshRateInHz = 0;
-    pp.PresentationInterval = D3DPRESENT_INTERVAL_DEFAULT;
-
-    HRESULT hr = pD3D9->CreateDevice( 0, D3DDEVTYPE_HAL, hWnd, BehaviorFlags, &pp, &pD3DDevice9 );
-    if ( FAILED( hr ) )
+    if ( bDetectedOptimus )
     {
-        WriteDebugEvent( SString( "D3DStuff - CreateDevice failed %x", hr ) );
+        ShowOptimusDialog ( g_hInstance );
+        HideOptimusDialog ();
     }
     else
     {
-        WriteDebugEvent( "D3DStuff - CreateDevice succeeded" );
-
-        // Try some rendering
-        pD3DDevice9->Clear( 0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER | D3DCLEAR_STENCIL, 0xffff00ff, 1, 0 );
-        pD3DDevice9->Present( NULL, NULL, NULL, NULL );
-        pD3DDevice9->Clear( 0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER | D3DCLEAR_STENCIL, 0xff00000f, 1, 0 );
-        pD3DDevice9->Present( NULL, NULL, NULL, NULL );
-
-        // Get caps
-        D3DCAPS9 Caps9;
-        hr = pD3DDevice9->GetDeviceCaps( &Caps9 );
-        WriteDebugEvent( SString( "D3DStuff Caps9 - %s ", *ToString( Caps9 ) ) );
-
-        // Test caps
-        struct {
-            DWORD CapsType;
-            BYTE  VertexType;
-        } DeclTypesList[] = {
-                        { D3DDTCAPS_UBYTE4,     D3DDECLTYPE_UBYTE4 },
-                        { D3DDTCAPS_UBYTE4N,    D3DDECLTYPE_UBYTE4N },
-                        { D3DDTCAPS_SHORT2N,    D3DDECLTYPE_SHORT2N },
-                        { D3DDTCAPS_SHORT4N,    D3DDECLTYPE_SHORT4N },
-                        { D3DDTCAPS_USHORT2N,   D3DDECLTYPE_USHORT2N },
-                        { D3DDTCAPS_USHORT4N,   D3DDECLTYPE_USHORT4N },
-                        { D3DDTCAPS_UDEC3,      D3DDECLTYPE_UDEC3 },
-                        { D3DDTCAPS_DEC3N,      D3DDECLTYPE_DEC3N },
-                        { D3DDTCAPS_FLOAT16_2,  D3DDECLTYPE_FLOAT16_2 },
-                        { D3DDTCAPS_FLOAT16_4,  D3DDECLTYPE_FLOAT16_4 },
-                    };
-
-        // Try each vertex declaration type to see if it matches with what was advertised
-        uint uiNumItems = Min( NUMELMS( DeclTypesList ), NUMELMS( pD3DVertexDeclarations ) );
-        uint uiNumMatchesCaps = 0;
-        for( uint i = 0 ; i < uiNumItems ; i++ )
-        {
-            // Try create
-            D3DVERTEXELEMENT9 VertexElements[] =
-            {
-                { 0,  0, D3DDECLTYPE_FLOAT3,   D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0 },
-                D3DDECL_END()
-            };
-            VertexElements[0].Type = DeclTypesList[i].VertexType;
-            hr = pD3DDevice9->CreateVertexDeclaration( VertexElements, &pD3DVertexDeclarations[i] );
-
-            // Check against device caps
-            bool bCapsSaysOk = ( Caps9.DeclTypes & DeclTypesList[i].CapsType ) ? true : false;
-            bool bMatchesCaps = ( hr == D3D_OK ) == ( bCapsSaysOk == true );
-            if ( bMatchesCaps )
-                uiNumMatchesCaps++;
-            else
-                WriteDebugEvent( SString( "D3DStuff - CreateVertexDeclaration %d/%d [MISMATCH] (VertexType:%d) result: %x (Matches caps:%d)", i, uiNumItems, DeclTypesList[i].VertexType, hr, bMatchesCaps ) );
-        }
-        WriteDebugEvent( SString( "D3DStuff - CreateVertexDeclarations MatchesCaps:%d/%d", uiNumMatchesCaps, uiNumItems ) );
+        SetApplicationSettingInt( "nvhacks", "optimus-alt-startup", 0 );
+        SetApplicationSettingInt( "nvhacks", "optimus-rename-exe", 0 );
     }
 }
 

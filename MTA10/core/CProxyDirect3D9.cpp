@@ -279,6 +279,18 @@ namespace
                     );
     }
 
+    SString ToString( const D3DCAPS9& a )
+    {
+        return SString(
+                        " VertexShaderVersion:0x%08x"
+                        " PixelShaderVersion:0x%08x"
+                        " DeclTypes:0x%03x"
+                        , a.VertexShaderVersion
+                        , a.PixelShaderVersion
+                        , a.DeclTypes
+                    );
+    }
+
     //
     // Hacky log interception
     //
@@ -290,6 +302,7 @@ namespace
     }
     #define WriteDebugEvent WriteDebugEventTest
 
+    uint ms_uiCreationAttempts = 0;
 }
 
 
@@ -307,6 +320,7 @@ HRESULT CreateDeviceInsist( uint uiMinTries, uint uiTimeout, IDirect3D9* pDirect
     uint uiRetryCount = 0;
     do
     {
+        ms_uiCreationAttempts++;
         hResult = pDirect3D->CreateDevice( Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters, ppReturnedDeviceInterface );
         if ( hResult == D3D_OK )
         {
@@ -337,6 +351,7 @@ HRESULT DoCreateDevice( IDirect3D9* pDirect3D, UINT Adapter, D3DDEVTYPE DeviceTy
     if ( hResult == D3D_OK )
         return hResult;
     WriteDebugEvent ( SString( "  CreateDevice failed #2: %08x", hResult ) );
+    HRESULT hResultFail = hResult;
 
     // If create failed, try removing multisampling if enabled
     if ( pPresentationParameters->MultiSampleType )
@@ -350,28 +365,292 @@ HRESULT DoCreateDevice( IDirect3D9* pDirect3D, UINT Adapter, D3DDEVTYPE DeviceTy
         WriteDebugEvent ( SString( "    CreateDevice failed #3: %08x", hResult ) );
     }
 
-    // If create failed, try using pure device
-    WriteDebugEvent ( "      Pass #4 with D3DCREATE_PUREDEVICE:" );
-    BehaviorFlags |= D3DCREATE_PUREDEVICE;
-    WriteDebugEvent ( ToString( Adapter, DeviceType, hFocusWindow, BehaviorFlags, *pPresentationParameters ) );
-    hResult = CreateDeviceInsist( 2, 1000, pDirect3D, Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters, ppReturnedDeviceInterface );
-    if ( hResult == D3D_OK )
-        return hResult;
-    WriteDebugEvent ( SString( "      CreateDevice failed #4: %08x", hResult ) );
-
-    // If create failed, do a test create for logging only
+    // Run through different combinations
+    uint presentIntervalList[] = { D3DPRESENT_INTERVAL_IMMEDIATE, D3DPRESENT_INTERVAL_DEFAULT, D3DPRESENT_INTERVAL_ONE };
+    D3DSWAPEFFECT swapEffectList[] = { D3DSWAPEFFECT_DISCARD, D3DSWAPEFFECT_FLIP, D3DSWAPEFFECT_COPY };
+    D3DFORMAT rtFormatList32[] = { D3DFMT_A8R8G8B8, D3DFMT_X8R8G8B8 };
+    D3DFORMAT depthFormatList32[] = { D3DFMT_D24S8, D3DFMT_D24X8 };
+    D3DFORMAT rtFormatList16[] = { D3DFMT_R5G6B5 };
+    D3DFORMAT depthFormatList16[] = { D3DFMT_D16 };
+    struct SFormat
     {
-        D3DPRESENT_PARAMETERS pp = *pPresentationParameters;
-        pp.BackBufferWidth = 640;
-        pp.BackBufferHeight = 480;
-        BehaviorFlags &= ~D3DCREATE_PUREDEVICE;
-        WriteDebugEvent ( "        Test with 640x480" );
-        WriteDebugEvent ( ToString( Adapter, DeviceType, hFocusWindow, BehaviorFlags, pp ) );
-        HRESULT hResult = CreateDeviceInsist( 2, 1000, pDirect3D, Adapter, DeviceType, hFocusWindow, BehaviorFlags, &pp, ppReturnedDeviceInterface );
-        WriteDebugEvent ( SString( "        Test result: %08x", hResult ) );
+        D3DFORMAT* rtFormatList;
+        uint rtFormatListSize;
+        D3DFORMAT* depthFormatList;
+        uint depthFormatListSize;
+    } formatList[] = { { rtFormatList32, NUMELMS( rtFormatList32 ), depthFormatList32, NUMELMS( depthFormatList32 ), },
+                       { rtFormatList16, NUMELMS( rtFormatList16 ), depthFormatList16, NUMELMS( depthFormatList16 ), } };
+
+    D3DPRESENT_PARAMETERS savedPresentationParameters = *pPresentationParameters;
+    for ( uint iRes = 0 ; iRes < 6 ; iRes++ )
+    {
+        // iRes:
+        //      0 - Full screen or windowed mode, as per options
+        //      1 - Force windowed mode
+        //      2 - Force full screen
+        //      3 - Force 640x480 full screen or windowed mode, as per options (for test only)
+        //      4 - Force 640x480 windowed mode (for test only)
+        //      5 - Force 640x480 full screen (for test only)
+
+        // Reset settings
+        *pPresentationParameters = savedPresentationParameters;
+
+        if ( iRes == 1 || iRes == 4 )
+        {
+            // Force windowed mode
+            if ( pPresentationParameters->Windowed )
+                continue;
+            pPresentationParameters->Windowed = true;
+            pPresentationParameters->FullScreen_RefreshRateInHz = D3DPRESENT_RATE_DEFAULT;
+        }
+
+        if ( iRes == 2 || iRes == 5 )
+        {
+            // Force full screen
+            if ( !pPresentationParameters->Windowed )
+                continue;
+            pPresentationParameters->Windowed = false;
+            pPresentationParameters->FullScreen_RefreshRateInHz = 60;
+        }
+
+        if ( iRes == 3 || iRes == 4 || iRes == 5 )
+        {
+            //640x480 test
+            pPresentationParameters->BackBufferWidth = 640;
+            pPresentationParameters->BackBufferHeight = 480;
+        }
+
+        for ( uint iColor = 0 ; iColor < 2 ; iColor++ )
+        {
+            for ( uint iBehavior = 0 ; iBehavior < 2 ; iBehavior++ )
+            {
+                if ( iBehavior == 0 )
+                    BehaviorFlags &= ~D3DCREATE_PUREDEVICE;
+                else
+                    BehaviorFlags |= D3DCREATE_PUREDEVICE;
+
+                for ( uint iRefresh = 0 ; iRefresh < 2 ; iRefresh++ )
+                {
+                    if ( iRefresh == 1 )
+                    {
+                        if ( pPresentationParameters->Windowed )
+                            continue;
+                        pPresentationParameters->FullScreen_RefreshRateInHz = 60;
+                    }
+
+                    for ( uint iPresent = 0 ; iPresent < NUMELMS( presentIntervalList ) ; iPresent++ )
+                    {
+                        for ( uint iSwap = 0 ; iSwap < NUMELMS( swapEffectList ) ; iSwap++ )
+                        {
+                            SFormat format = formatList[iColor];
+
+                            for ( uint iRt = 0 ; iRt < format.rtFormatListSize ; iRt++ )
+                            {
+                                for ( uint iDepth = 0 ; iDepth < format.depthFormatListSize ; iDepth++ )
+                                {
+                                    pPresentationParameters->PresentationInterval = presentIntervalList[ iPresent ];
+                                    pPresentationParameters->SwapEffect = swapEffectList[ iSwap ];
+                                    pPresentationParameters->BackBufferFormat = format.rtFormatList[ iRt ];
+                                    pPresentationParameters->AutoDepthStencilFormat = format.depthFormatList[ iDepth ];
+        #ifndef MTA_DEBUG
+                                    hResult = CreateDeviceInsist( 2, 0, pDirect3D, Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters, ppReturnedDeviceInterface );
+        #else
+                                    WriteDebugEvent ( "--------------------------------");
+                                    WriteDebugEvent ( ToString( Adapter, DeviceType, hFocusWindow, BehaviorFlags, *pPresentationParameters ) );
+                                    WriteDebugEvent ( SString( "        32 result: %08x", hResult ) );
+                                    hResult = -1;
+        #endif
+                                    if ( hResult == D3D_OK )
+                                    {
+                                        WriteDebugEvent ( SString( "      Pass #4 SUCCESS with: {Res:%d, Color:%d, Refresh:%d}", iRes, iColor, iRefresh ) );
+                                        WriteDebugEvent ( ToString( Adapter, DeviceType, hFocusWindow, BehaviorFlags, *pPresentationParameters ) );
+                                        if ( iRes == 1 )
+                                        {
+                                        }
+                                        if ( iRes >= 3 )
+                                        {
+                                            // Only test, so return as fail
+                                            WriteDebugEvent ( "      Test success" );
+                                            goto failed;
+                                        }
+                                        return hResult;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+failed:
+    WriteDebugEvent ( SString( "      Failed after %d creation attempts", ms_uiCreationAttempts ) );
+
+    return hResultFail;
+}
+
+
+////////////////////////////////////////////////
+//
+// GetByteDiffDesc
+//
+// Get string describing differences between the two memory blocks
+//
+////////////////////////////////////////////////
+SString GetByteDiffDesc( const void* pData1, const void* pData2, uint uiSize )
+{
+    SString strResult;
+    for ( uint i = 0 ; i < uiSize ; i++ )
+    {
+        uchar c1 = ((const uchar*)pData1)[i];
+        uchar c2 = ((const uchar*)pData2)[i];
+        if ( c1 != c2 )
+        {
+            strResult += SString( "[%d(%02x/%02x)]", i, c1, c2 );
+        }
+    }
+    return strResult;
+}
+
+
+////////////////////////////////////////////////
+//
+// AddCapsReport
+//
+// Check caps seem correct
+//
+////////////////////////////////////////////////
+void AddCapsReport( UINT Adapter, IDirect3D9* pDirect3D, IDirect3DDevice9* pD3DDevice9, bool bFixGTACaps )
+{
+    HRESULT hr;
+
+    char szBuffer[64000];
+    GetModuleFileName ( NULL, szBuffer, sizeof(szBuffer) - 1 );
+    WriteDebugEvent( SString( "ModuleFileName - %s ", szBuffer ) );
+
+    // Get caps that GTA got
+    D3DCAPS9* pGTACaps9 = (D3DCAPS9*)0x00C9BF00;
+    WriteDebugEvent( SString( "CapsReport GTACaps9 - %s ", *ToString( *pGTACaps9 ) ) );
+
+    if ( !pD3DDevice9 )
+        return;
+
+    // Check device returns same D3D interface
+    IDirect3D9* pDirect3DOther = NULL;
+    pD3DDevice9->GetDirect3D( &pDirect3DOther );
+    if ( pDirect3DOther != pDirect3D )
+    {
+        WriteDebugEvent( SString( "IDirect3D9 differs: %x %x", pDirect3D, pDirect3DOther ) );
+
+        if ( pDirect3DOther )
+        {
+              // Log graphic card name
+              D3DADAPTER_IDENTIFIER9 AdapterIdent1;
+              pDirect3D->GetAdapterIdentifier ( Adapter, 0, &AdapterIdent1 );
+              WriteDebugEvent ( "pDirect3D:" );
+              WriteDebugEvent ( ToString( AdapterIdent1 ) );
+      
+              // Log graphic card name
+              D3DADAPTER_IDENTIFIER9 AdapterIdent2;
+              pDirect3DOther->GetAdapterIdentifier ( Adapter, 0, &AdapterIdent2 );
+              WriteDebugEvent ( "pDirect3DOther:" );
+              WriteDebugEvent ( ToString( AdapterIdent2 ) );
+
+            // Get caps from pDirect3DOther
+            D3DCAPS9 D3DCaps9;
+            hr = pDirect3DOther->GetDeviceCaps( Adapter, D3DDEVTYPE_HAL, &D3DCaps9 );
+            WriteDebugEvent( SString( "pDirect3DOther CapsReport Caps9 - %s ", *ToString( D3DCaps9 ) ) );
+        }
     }
 
-    return hResult;
+    SAFE_RELEASE( pDirect3DOther );
+
+    // Get caps from D3D
+    D3DCAPS9 D3DCaps9;
+    hr = pDirect3D->GetDeviceCaps( Adapter, D3DDEVTYPE_HAL, &D3DCaps9 );
+    WriteDebugEvent( SString( "IDirect3D9 CapsReport Caps9 - %s ", *ToString( D3DCaps9 ) ) );
+
+    // Get caps from Device
+    D3DCAPS9 DeviceCaps9;
+    hr = pD3DDevice9->GetDeviceCaps( &DeviceCaps9 );
+    WriteDebugEvent( SString( "IDirect3DDevice9 CapsReport Caps9 - %s ", *ToString( DeviceCaps9 ) ) );
+
+    // Test caps
+    struct {
+        DWORD CapsType;
+        BYTE  VertexType;
+    } DeclTypesList[] = {
+                    { D3DDTCAPS_UBYTE4,     D3DDECLTYPE_UBYTE4 },
+                    { D3DDTCAPS_UBYTE4N,    D3DDECLTYPE_UBYTE4N },
+                    { D3DDTCAPS_SHORT2N,    D3DDECLTYPE_SHORT2N },
+                    { D3DDTCAPS_SHORT4N,    D3DDECLTYPE_SHORT4N },
+                    { D3DDTCAPS_USHORT2N,   D3DDECLTYPE_USHORT2N },
+                    { D3DDTCAPS_USHORT4N,   D3DDECLTYPE_USHORT4N },
+                    { D3DDTCAPS_UDEC3,      D3DDECLTYPE_UDEC3 },
+                    { D3DDTCAPS_DEC3N,      D3DDECLTYPE_DEC3N },
+                    { D3DDTCAPS_FLOAT16_2,  D3DDECLTYPE_FLOAT16_2 },
+                    { D3DDTCAPS_FLOAT16_4,  D3DDECLTYPE_FLOAT16_4 },
+                };
+
+    // Try each vertex declaration type to see if it matches with what was advertised
+    uint uiNumItems = NUMELMS( DeclTypesList );
+    uint uiNumMatchesCaps = 0;
+    for( uint i = 0 ; i < uiNumItems ; i++ )
+    {
+        // Try create
+        D3DVERTEXELEMENT9 VertexElements[] =
+        {
+            { 0,  0, D3DDECLTYPE_FLOAT3,   D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0 },
+            D3DDECL_END()
+        };
+        VertexElements[0].Type = DeclTypesList[i].VertexType;
+        IDirect3DVertexDeclaration9* pD3DVertexDecl;
+        hr = pD3DDevice9->CreateVertexDeclaration( VertexElements, &pD3DVertexDecl );
+        SAFE_RELEASE( pD3DVertexDecl );
+
+        // Check against device caps
+        bool bCapsSaysOk = ( DeviceCaps9.DeclTypes & DeclTypesList[i].CapsType ) ? true : false;
+        bool bMatchesCaps = ( hr == D3D_OK ) == ( bCapsSaysOk == true );
+        if ( bMatchesCaps )
+            uiNumMatchesCaps++;
+        else
+            WriteDebugEvent( SString( "CapsReport - CreateVertexDeclaration %d/%d [MISMATCH] (VertexType:%d) result: %x (Matches caps:%d)", i, uiNumItems, DeclTypesList[i].VertexType, hr, bMatchesCaps ) );
+    }
+    WriteDebugEvent( SString( "CapsReport - CreateVertexDeclarations MatchesCaps:%d/%d", uiNumMatchesCaps, uiNumItems ) );
+
+    DWORD MaxActiveLights = Min( DeviceCaps9.MaxActiveLights, pGTACaps9->MaxActiveLights );
+    pGTACaps9->MaxActiveLights = MaxActiveLights;
+    D3DCaps9.MaxActiveLights = MaxActiveLights;
+    DeviceCaps9.MaxActiveLights = MaxActiveLights;
+
+    DWORD MaxVertexBlendMatrixIndex = Min( DeviceCaps9.MaxVertexBlendMatrixIndex, pGTACaps9->MaxVertexBlendMatrixIndex );
+    pGTACaps9->MaxVertexBlendMatrixIndex = MaxVertexBlendMatrixIndex;
+    D3DCaps9.MaxVertexBlendMatrixIndex = MaxVertexBlendMatrixIndex;
+    DeviceCaps9.MaxVertexBlendMatrixIndex = MaxVertexBlendMatrixIndex;
+
+    DWORD VertexProcessingCaps =  DeviceCaps9.VertexProcessingCaps & pGTACaps9->VertexProcessingCaps;
+    pGTACaps9->VertexProcessingCaps = VertexProcessingCaps;
+    D3DCaps9.VertexProcessingCaps = VertexProcessingCaps;
+    DeviceCaps9.VertexProcessingCaps = VertexProcessingCaps;
+
+    bool DeviceCapsSameAsGTACaps = memcmp( &DeviceCaps9, pGTACaps9, sizeof( D3DCAPS9 ) ) == 0;
+    bool DeviceCapsSameAsD3DCaps9 = memcmp( &DeviceCaps9, &D3DCaps9, sizeof( D3DCAPS9 ) ) == 0;
+
+    WriteDebugEvent( SString( "DeviceCaps==GTACaps:%d  DeviceCaps==D3DCaps9:%d", DeviceCapsSameAsGTACaps, DeviceCapsSameAsD3DCaps9 ) );
+
+    SString strDiffDesc1 = GetByteDiffDesc( &DeviceCaps9, pGTACaps9, sizeof( D3DCAPS9 ) );
+    if ( !strDiffDesc1.empty() )
+        WriteDebugEvent( SString( "DeviceCaps==GTACaps diff:%s", *strDiffDesc1.Left( 500 ) ) );
+
+    SString strDiffDesc2 = GetByteDiffDesc( &DeviceCaps9, &D3DCaps9, sizeof( D3DCAPS9 ) );
+    if ( !strDiffDesc2.empty() )
+        WriteDebugEvent( SString( "DeviceCaps==D3DCaps9 diff:%s", *strDiffDesc2.Left( 500 ) ) );
+
+    if ( bFixGTACaps && !DeviceCapsSameAsGTACaps )
+    {
+        WriteDebugEvent( "Fixing GTA caps" );
+        memcpy( pGTACaps9, &DeviceCaps9, sizeof( D3DCAPS9 ) );
+    }
 }
 
 
@@ -458,6 +737,16 @@ HRESULT HandleCreateDeviceResult( HRESULT hResult, IDirect3D9* pDirect3D, UINT A
     if ( uiCurrentStatus == CREATE_DEVICE_FAIL )
         uiDiagnosticLogLevel = 2;   // Log and wait - If fail status
 
+    bool bFixCaps = false;
+    if ( GetApplicationSettingInt( "nvhacks", "optimus" ) )
+    {
+        bFixCaps = true;
+        if ( uiDiagnosticLogLevel == 0 )
+            uiDiagnosticLogLevel = 1;
+    }
+
+    AddCapsReport( Adapter, pDirect3D, *ppReturnedDeviceInterface, bFixCaps );
+
     if ( uiDiagnosticLogLevel )
     {
         // Prevent statup warning in loader
@@ -469,6 +758,203 @@ HRESULT HandleCreateDeviceResult( HRESULT hResult, IDirect3D9* pDirect3D, UINT A
     if ( hResult != D3D_OK )
     {
         // Handle fatal error
+        SString strMessage;
+        strMessage += "There was a problem starting MTA:SA\n\n";
+        strMessage += SString( "Direct3D CreateDevice error: %08x", hResult );
+        BrowseToSolution( "d3dcreatedevice-fail", EXIT_GAME_FIRST | ASK_GO_ONLINE, strMessage );
+    }
+
+    return hResult;
+}
+
+
+namespace
+{
+    DWORD BehaviorFlagsOrig = 0;
+    D3DPRESENT_PARAMETERS presentationParametersOrig;
+}
+
+////////////////////////////////////////////////
+//
+// Hook CCore::OnPreCreateDevice
+//
+// Modify paramters
+//
+////////////////////////////////////////////////
+void CCore::OnPreCreateDevice( IDirect3D9* pDirect3D, UINT Adapter, D3DDEVTYPE DeviceType, HWND hFocusWindow, DWORD& BehaviorFlags, D3DPRESENT_PARAMETERS* pPresentationParameters )
+{
+    assert( 0 );
+
+    if ( !UsingAltD3DSetup() )
+        return;
+
+    WriteDebugEvent ( "CCore::OnPreCreateDevice" );
+
+    uint uiPrevResult = GetApplicationSettingInt( "diagnostics", "last-create-device-result" );
+    if ( uiPrevResult )
+    {
+        // Failed last time, so as a test for logging, try a create device with no modifications
+        WriteDebugEvent ( SString( "Previous CreateDevice failed with: %08x", uiPrevResult ) );
+        WriteDebugEvent ( "  Test unmodified:" );
+        WriteDebugEvent ( ToString( Adapter, DeviceType, hFocusWindow, BehaviorFlags, *pPresentationParameters ) );
+        IDirect3DDevice9* pReturnedDeviceInterface = NULL;
+        HRESULT hResult = pDirect3D->CreateDevice( Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters, &pReturnedDeviceInterface );
+        SAFE_RELEASE( pReturnedDeviceInterface );
+        WriteDebugEvent ( SString( "  Unmodified result is: %08x", hResult ) );
+    }
+
+    // Save original values for later
+    BehaviorFlagsOrig = BehaviorFlags;
+    presentationParametersOrig = *pPresentationParameters;
+
+    WriteDebugEvent ( "  Original paramters:" );
+    WriteDebugEvent ( ToString( Adapter, DeviceType, hFocusWindow, BehaviorFlags, *pPresentationParameters ) );
+
+    // Make sure DirectX Get...() calls will work
+    BehaviorFlags &= ~D3DCREATE_PUREDEVICE;
+
+    // Enable the auto depth stencil parameter
+    pPresentationParameters->EnableAutoDepthStencil = true;
+
+    GetVideoModeManager ()->PreCreateDevice ( pPresentationParameters );
+
+    WriteDebugEvent ( "  Modified paramters:" );
+    WriteDebugEvent ( ToString( Adapter, DeviceType, hFocusWindow, BehaviorFlags, *pPresentationParameters ) );
+}
+
+
+////////////////////////////////////////////////
+//
+// Hook CCore::OnPostCreateDevice
+//
+// Wrap device or log failure
+//
+////////////////////////////////////////////////
+HRESULT CCore::OnPostCreateDevice( HRESULT hResult, IDirect3D9* pDirect3D, UINT Adapter, D3DDEVTYPE DeviceType, HWND hFocusWindow, DWORD BehaviorFlags, D3DPRESENT_PARAMETERS* pPresentationParameters, IDirect3DDevice9** ppReturnedDeviceInterface )
+{
+    if ( !UsingAltD3DSetup() )
+        return D3D_OK;
+
+    //
+    // - Allow create device with no changes
+    // - Check caps and report diff with GTA caps
+    // - Release device
+    //
+    WriteDebugEvent ( "CCore::OnPostCreateDevice - Alt startup used" );
+
+    if ( hResult != D3D_OK )
+        WriteDebugEvent ( SString( "Initial CreateDevice failed: %08x", hResult ) );
+    else
+        WriteDebugEvent ( "Initial CreateDevice succeeded" );
+
+    AddCapsReport( Adapter, pDirect3D, *ppReturnedDeviceInterface, false );
+
+    SAFE_RELEASE( *ppReturnedDeviceInterface );
+
+    //
+    // - Create device with required changes
+    // - Check caps and report diff with GTA caps
+    // - Fix GTA caps if needed
+    //
+
+    // Save original values for later
+    BehaviorFlagsOrig = BehaviorFlags;
+    presentationParametersOrig = *pPresentationParameters;
+
+    WriteDebugEvent ( "  Original paramters:" );
+    WriteDebugEvent ( ToString( Adapter, DeviceType, hFocusWindow, BehaviorFlags, *pPresentationParameters ) );
+
+    // Make sure DirectX Get...() calls will work
+    BehaviorFlags &= ~D3DCREATE_PUREDEVICE;
+
+    // Enable the auto depth stencil parameter
+    pPresentationParameters->EnableAutoDepthStencil = true;
+
+    GetVideoModeManager ()->PreCreateDevice ( pPresentationParameters );
+
+    WriteDebugEvent ( "  Modified paramters:" );
+    WriteDebugEvent ( ToString( Adapter, DeviceType, hFocusWindow, BehaviorFlags, *pPresentationParameters ) );
+
+    hResult = CreateDeviceInsist( 2, 1000, pDirect3D, Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters, ppReturnedDeviceInterface );
+
+    if ( hResult != D3D_OK )
+        WriteDebugEvent ( SString( "MTA CreateDevice failed: %08x", hResult ) );
+    else
+        WriteDebugEvent ( "MTA CreateDevice succeeded" );
+
+    AddCapsReport( Adapter, pDirect3D, *ppReturnedDeviceInterface, true );
+
+    // Change the window title to MTA: San Andreas
+    #ifdef MTA_DEBUG
+        SetWindowTextW ( hFocusWindow, MbUTF8ToUTF16("MTA: San Andreas [DEBUG]").c_str() );
+    #else
+        SetWindowTextW ( hFocusWindow, MbUTF8ToUTF16("MTA: San Andreas").c_str() );
+    #endif
+
+    // Log graphic card name
+    D3DADAPTER_IDENTIFIER9 AdapterIdent;
+    pDirect3D->GetAdapterIdentifier ( Adapter, 0, &AdapterIdent );
+    WriteDebugEvent ( ToString( AdapterIdent ) );
+
+    // Store the rendering window in the direct 3d data
+    CDirect3DData::GetSingleton ().StoreDeviceWindow ( pPresentationParameters->hDeviceWindow );
+
+    // Apply input hook
+    CMessageLoopHook::GetSingleton ( ).ApplyHook ( hFocusWindow );
+
+    // Make sure the object was created successfully.
+    if ( hResult == D3D_OK )
+    {
+        WriteDebugEvent ( "CreateDevice succeeded" );
+        GetVideoModeManager ()->PostCreateDevice ( *ppReturnedDeviceInterface, pPresentationParameters );
+
+        // We must first store the presentation values.
+        CDirect3DData::GetSingleton ( ).StoreViewport ( 0, 0,
+                                                        pPresentationParameters->BackBufferWidth,
+                                                        pPresentationParameters->BackBufferHeight );
+        
+        // Calc and store readable depth format for shader use
+        ERenderFormat ReadableDepthFormat = CDirect3DEvents9::DiscoverReadableDepthFormat ( *ppReturnedDeviceInterface, pPresentationParameters->MultiSampleType, pPresentationParameters->Windowed != 0 );
+        CGraphics::GetSingleton ().GetRenderItemManager ()->SetDepthBufferFormat ( ReadableDepthFormat );
+
+        // Now create the proxy device.
+        *ppReturnedDeviceInterface = new CProxyDirect3DDevice9 ( *ppReturnedDeviceInterface );
+
+        // Debug output
+        D3DDEVICE_CREATION_PARAMETERS parameters;
+        (*ppReturnedDeviceInterface)->GetCreationParameters ( &parameters );
+
+        WriteDebugEvent( "   Used creation parameters:" );
+        WriteDebugEvent ( SString ( "    Adapter:%d  DeviceType:%d  BehaviorFlags:0x%x  ReadableDepth:%s"
+                                    ,parameters.AdapterOrdinal
+                                    ,parameters.DeviceType
+                                    ,parameters.BehaviorFlags
+                                    ,ReadableDepthFormat ? std::string ( (char*)&ReadableDepthFormat, 4 ).c_str () : "None"
+                                ) );
+    }
+
+    // Calc log level to use
+    uint uiDiagnosticLogLevel = 0;
+    if ( GetApplicationSettingInt( "nvhacks", "optimus" ) )
+        uiDiagnosticLogLevel = 1;   // Log and continue
+    if ( hResult != D3D_OK )
+        uiDiagnosticLogLevel = 2;   // Log and wait - If fail status
+
+    // Do diagnostic log now if needed
+    if ( uiDiagnosticLogLevel )
+    {
+        // Prevent statup warning in loader
+        WatchDogCompletedSection ( "L3" );
+
+        // Run diagnostic
+        CCore::GetSingleton().GetNetwork()->ResetStub( 'dia3', *ms_strExtraLogBuffer, uiDiagnosticLogLevel );
+    }
+    ms_strExtraLogBuffer.clear();
+
+    // Handle fatal error
+    if ( hResult != D3D_OK )
+    {
+        // Inform user
         SString strMessage;
         strMessage += "There was a problem starting MTA:SA\n\n";
         strMessage += SString( "Direct3D CreateDevice error: %08x", hResult );
