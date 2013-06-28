@@ -117,11 +117,13 @@ namespace SharedUtil
         // Make sure not using this slow function too much
         OutputDebugLine( SString( "[Mem] OpenMemWrite at %08x for %d bytes  (oldProt:%04x)", pAddr, uiAmount, hMem.oldProt ) );
 
+#ifdef MTA_DEBUG
         // Checks
         if ( IsProtectedSlowMem( (const void*)hMem.dwFirstPage ) )
             assert( hMem.oldProt == PAGE_EXECUTE_READ || hMem.oldProt == PAGE_READONLY );
         else
             assert( hMem.oldProt == PAGE_EXECUTE_READWRITE || hMem.oldProt == PAGE_EXECUTE_WRITECOPY );
+#endif
 
         // Extra if more than one page
         for ( uint i = 0x1000 ; i < hMem.dwSize ; i += 0x1000 )
