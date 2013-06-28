@@ -19,11 +19,10 @@ int _cdecl OnCAnimBlendAssocGroupCopyAnimation ( CAnimBlendAssocGroupSAInterface
     // Apply offset
     int iUseAnimId = iAnimId - pGroup->iIDOffset;
 
-    CAnimBlendStaticAssociationSAInterface* pAssociation = pGroup->pAssociationsArray + iUseAnimId;
-
-    if ( pAssociation )
+    if ( pGroup->pAssociationsArray )
     {
-        if ( pAssociation->pAnimHeirarchy == NULL )
+        CAnimBlendStaticAssociationSAInterface* pAssociation = pGroup->pAssociationsArray + iUseAnimId;
+        if ( pAssociation && pAssociation->pAnimHeirarchy == NULL )
         {
             // Choose another animId
             int iNewAnimId = iUseAnimId;
