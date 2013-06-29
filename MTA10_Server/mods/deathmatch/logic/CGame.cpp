@@ -3737,6 +3737,15 @@ void CGame::Packet_PlayerModInfo ( CPlayerModInfoPacket & Packet )
 
                 resultItem.PushString ( "sizeZ" );
                 resultItem.PushNumber ( in.vecSize.fZ - fmod ( (double)in.vecSize.fZ, 0.01 ) );
+
+                resultItem.PushString ( "originalSizeX" );
+                resultItem.PushNumber ( in.vecOriginalSize.fX - fmod ( (double)in.vecOriginalSize.fX, 0.01 ) );
+
+                resultItem.PushString ( "originalSizeY" );
+                resultItem.PushNumber ( in.vecOriginalSize.fY - fmod ( (double)in.vecOriginalSize.fY, 0.01 ) );
+
+                resultItem.PushString ( "originalSizeZ" );
+                resultItem.PushNumber ( in.vecOriginalSize.fZ - fmod ( (double)in.vecOriginalSize.fZ, 0.01 ) );
             }
 
             resultItemList.PushNumber ( resultItemList.Count () / 2 + 1 );
