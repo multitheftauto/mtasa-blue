@@ -158,7 +158,8 @@ std::string genre( const id3v22_frame* frame, bool utf8 )
 		return str;
 
 	typedef std::string::const_iterator sir;
-	sir p = str.begin(), e = str.end();
+	const char* p = str.c_str();
+	const char* e = p + str.length();
 
 	std::string ret;
 
@@ -175,12 +176,12 @@ std::string genre( const id3v22_frame* frame, bool utf8 )
 		{
 			return std::string( p,e ); // just text in parentheses
 		}else
-		if( p+3<e && p[0] =='R' && p[1] == 'X' && p[2] == ')' )
+		if( p+2<e && p[0] =='R' && p[1] == 'X' && p[2] == ')' )
 		{
 			ret = "Remix";
 			p+=3;
 		}else
-		if( p+3<e && p[0] =='C' && p[2] == 'R' && p[2] == ')' )
+		if( p+2<e && p[0] =='C' && p[1] == 'R' && p[2] == ')' )
 		{
 			ret = "Cover";
 			p+=3;
