@@ -621,13 +621,13 @@ int CLuaFunctionDefs::GetCommandsBoundToKey ( lua_State* luaVM )
             // Create a new table
             lua_newtable ( luaVM );
 
-            // Add all the bound functions to it
+            // Add all the bound commands to it
             unsigned int uiIndex = 0;
             list < CKeyBind* > ::const_iterator iter = g_pCore->GetKeyBinds ()->IterBegin ();
             for ( ; iter != g_pCore->GetKeyBinds ()->IterEnd (); iter++ )
             {
                 CKeyBind* pKeyBind = *iter;
-                if ( !pKeyBind->IsBeingDeleted () && pKeyBind->GetType () == KEY_BIND_COMMAND )
+                if ( !pKeyBind->IsBeingDeleted () && pKeyBind->bActive && pKeyBind->GetType () == KEY_BIND_COMMAND )
                 {
                     CCommandBind* pBind = static_cast < CCommandBind* > ( pKeyBind );
                     if ( !bCheckHitState || pBind->bHitState == bHitState )
@@ -668,7 +668,7 @@ int CLuaFunctionDefs::GetKeyBoundToCommand ( lua_State* luaVM )
             for ( ; iter != g_pCore->GetKeyBinds ()->IterEnd (); iter++ )
             {
                 CKeyBind* pKeyBind = *iter;
-                if ( !pKeyBind->IsBeingDeleted () )
+                if ( !pKeyBind->IsBeingDeleted () && pKeyBind->bActive )
                 {
                     if ( pKeyBind->GetType () == KEY_BIND_COMMAND )
                     {
