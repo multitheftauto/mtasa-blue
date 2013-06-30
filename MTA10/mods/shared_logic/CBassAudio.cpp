@@ -136,7 +136,7 @@ bool CBassAudio::BeginLoadingMedia ( void )
         m_pSound = BASS_FX_ReverseCreate ( m_pSound, 2.0f, BASS_STREAM_DECODE | BASS_FX_FREESOURCE | BASS_MUSIC_PRESCAN );
         BASS_ChannelSetAttribute ( m_pSound, BASS_ATTRIB_REVERSE_DIR, BASS_FX_RVS_FORWARD );
         // Sucks.
-        /*if ( BASS_FX_BPM_CallbackSet ( m_pSound, (BPMPROC*)&BPMCallback, 60, 0, BASS_FX_BPM_MULT2, this ) == false )
+        /*if ( BASS_FX_BPM_CallbackSet ( m_pSound, (BPMPROC*)&BPMCallback, 1, 0, 0, this ) == false )
         {
             g_pCore->GetConsole()->Printf ( "BASS ERROR %d in BASS_FX_BPM_CallbackSet  path:%s  3d:%d  loop:%d", BASS_ErrorGetCode(), *m_strPath, m_b3D, m_bLoop );
         }*/
@@ -628,16 +628,28 @@ float CBassAudio::GetSoundBPM ( void )
 {
     if ( m_fBPM == 0.0f && !m_bStream )
     {
-        // Get us a bpm by getting the max bpm over each minute so we get a good bpm value which fits.
-        double dStart = 0;
-        while ( dStart <= GetLength ( ))
+        float fData = 0.0f;
+        // open the same file as played but for bpm decoding detection
+        DWORD bpmChan = BASS_StreamCreateFile ( false, m_strPath, 0, 0, BASS_STREAM_DECODE );
+        if ( !bpmChan ) 
         {
-            float fData = BASS_FX_BPM_DecodeGet ( BASS_FX_TempoGetSource ( m_pSound ) , dStart, dStart + 60, 0, BASS_FX_FREESOURCE | BASS_FX_BPM_MULT2, NULL );
-            
-            g_pCore->GetConsole()->Printf ( "BASS ERROR %d in BASS_FX_BPM_DecodeGet  path:%s  3d:%d  loop:%d", BASS_ErrorGetCode(), *m_strPath, m_b3D, m_bLoop );
-            m_fBPM = Max( fData, m_fBPM );
-            dStart += 60;
+            bpmChan = BASS_MusicLoad ( false, m_strPath, 0, 0, BASS_MUSIC_DECODE|BASS_MUSIC_PRESCAN, 0 );
         }
+        // detect bpm in background and return progress in GetBPM_ProgressCallback function
+        if ( bpmChan ) 
+        {
+            fData = BASS_FX_BPM_DecodeGet ( bpmChan, 0, GetLength ( ), 0, BASS_FX_FREESOURCE, NULL, NULL );
+        }
+
+        if ( BASS_ErrorGetCode ( ) != BASS_OK )
+        {
+            g_pCore->GetConsole ( )->Printf ( "BASS ERROR %d in BASS_FX_BPM_DecodeGet  path:%s  3d:%d  loop:%d", BASS_ErrorGetCode ( ), *m_strPath, m_b3D, m_bLoop );
+        }
+        else
+        {
+            m_fBPM = floor ( fData );
+        }
+        BASS_FX_BPM_BeatFree ( bpmChan );
     }
     return m_fBPM;
 }

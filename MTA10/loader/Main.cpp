@@ -486,7 +486,7 @@ int DoLaunchGame ( LPSTR lpCmdLine )
         }
     }
 
-    if ( FileSize ( strMTASAPath + "\\MTA\\bass.dll" ) != 0x00018838 )
+    if ( FileSize ( strMTASAPath + "\\MTA\\bass.dll" ) != 0x0001A440 )
     {
         return DisplayErrorMessageBox ( _("Load failed. Please ensure that the latest data files have been installed correctly."), _E("CL17"), "mta-datafiles-missing" );
     }
