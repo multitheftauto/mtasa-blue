@@ -189,7 +189,7 @@ std::string genre( const id3v2_frame* frame, const id3v2_header *header, bool ut
 
 	std::string ret;
 
-	while( p[0] == '(' )
+	while( p != e && p[0] == '(' )
 	{
 		++p;
 		if( !ret.empty() )
