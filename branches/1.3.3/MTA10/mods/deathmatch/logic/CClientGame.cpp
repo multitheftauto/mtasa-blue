@@ -2804,6 +2804,8 @@ void CClientGame::AddBuiltInEvents ( void )
     m_Events.AddEvent ( "onClientSoundFinishedDownload", "length", NULL, false );
     m_Events.AddEvent ( "onClientSoundChangedMeta", "streamTitle", NULL, false );
     m_Events.AddEvent ( "onClientSoundBeat", "time", NULL, false );
+    m_Events.AddEvent ( "onClientSoundStarted", "reason", NULL, false );
+    m_Events.AddEvent ( "onClientSoundStopped", "reason", NULL, false );
 
     // Object events
     m_Events.AddEvent ( "onClientObjectDamage", "loss, attacker", NULL, false );
