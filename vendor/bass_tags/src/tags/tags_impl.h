@@ -15,7 +15,7 @@
 
 #include <string>
 #include <vector>
-#include "bass.h"
+#include "../../../bass/bass.h"
 #include "config.h"
 #include "simplemap.h"
 
