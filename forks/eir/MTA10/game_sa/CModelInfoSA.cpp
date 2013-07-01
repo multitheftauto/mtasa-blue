@@ -261,12 +261,6 @@ VOID CModelInfoSA::Request( EModelRequestType requestType, const char* szTag )
     if ( IsLoaded () )
         return;
 
-    if ( m_dwModelID <= 288 && m_dwModelID != 7 && !pGame->GetModelInfo ( 7 )->IsLoaded () )
-    {
-        // Skin 7 must be loaded in order for other skins to work. No, really. (#4010)
-        pGame->GetModelInfo ( 7 )->Request ( requestType, "Model 7" );
-    }
-
     // Bikes can sometimes get stuck when loading unless the anim file is handled like what is does here
     // Don't change the code below unless you can test it (by recreating the problem it solves)
     if ( IsVehicle () )
