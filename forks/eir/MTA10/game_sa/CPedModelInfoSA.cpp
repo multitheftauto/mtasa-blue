@@ -19,7 +19,7 @@ CPedModelInfoSAInterface::CPedModelInfoSAInterface ( void )
     MemSetFast ( this, 0, sizeof ( CPedModelInfoSAInterface ) );
     *(DWORD*)this = (DWORD)VAR_CPedModelInfo_VTBL;
     pColModel = ( CColModelSAInterface * ) VAR_CTempColModels_ModelPed1;
-    MemPutFast < DWORD > ( &pad, 0xFFFFFFFF );
+    m_animBlock = -1;
 }
 
 CPedModelInfoSAInterface::~CPedModelInfoSAInterface( void )

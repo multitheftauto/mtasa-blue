@@ -376,6 +376,9 @@ void CPoolsSA::RemovePed ( unsigned long ulID, bool bDelete )
 
     CPedSA *pPedSA = mtaPeds[ulID];
 
+    if ( !pPedSA )
+        return;
+
     // Delete the element from memory
     switch ( pPedSA->GetType () )
     {

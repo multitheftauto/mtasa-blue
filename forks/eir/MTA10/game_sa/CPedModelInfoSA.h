@@ -38,7 +38,6 @@ public:
     void                            ConvertAnimFileIndex        ( void );
     int                             GetAnimFileIndex            ( void );
 
-    BYTE                pad [ 4 ];              // 32   
     AssocGroupID        motionAnimGroup;        // 36   Motion anim group (AssocGroupID, long)
     DWORD               pedType;                // 40   Default ped type (long)
     ePedStats *         pedStats;               // 44   Default ped stats (ePedStats)

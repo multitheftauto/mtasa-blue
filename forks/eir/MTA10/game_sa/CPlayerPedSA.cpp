@@ -135,7 +135,7 @@ CPlayerPedSA::CPlayerPedSA ( CPlayerPedSAInterface * pPlayer )
 CPlayerPedSA::~CPlayerPedSA ( void )
 {
     DEBUG_TRACE("CPlayerPedSA::~CPlayerPedSA( )");
-    if(!this->BeingDeleted && DoNotRemoveFromGame == false)
+    if( DoNotRemoveFromGame == false)
     {
         DWORD dwInterface = (DWORD) m_pInterface;
         
@@ -147,7 +147,6 @@ CPlayerPedSA::~CPlayerPedSA ( void )
             delete m_pInterface;
         }
         this->BeingDeleted = true;
-        ((CPoolsSA *)pGame->GetPools())->RemovePed((CPed *)(CPedSA *)this, false);
     }
 
     // Delete the player data

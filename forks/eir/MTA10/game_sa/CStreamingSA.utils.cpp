@@ -1766,7 +1766,7 @@ inline bool EnsureResourceAvailability( const unsigned short offset, modelId_t i
 inline bool AreAnimationDependenciesLoaded( modelId_t id )
 {
     // Are we loading animations at all?
-    return !*(bool*)0x00B5F852;// && Streaming::GetModelLoadInfo( 7 ).m_eLoading == MODEL_LOADED;
+    return !*(bool*)0x00B5F852 && Streaming::GetModelLoadInfo( 7 ).m_eLoading == MODEL_LOADED;
 
     // The_GTA: I removed the check which prevented animation loading if skin 7 was
     // not previously loaded. This should allow ped loading without the previous limitation.
