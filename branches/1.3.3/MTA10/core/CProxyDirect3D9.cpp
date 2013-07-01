@@ -648,8 +648,15 @@ void AddCapsReport( UINT Adapter, IDirect3D9* pDirect3D, IDirect3DDevice9* pD3DD
 
     if ( bFixGTACaps && !DeviceCapsSameAsGTACaps )
     {
-        WriteDebugEvent( "Fixing GTA caps" );
-        memcpy( pGTACaps9, &DeviceCaps9, sizeof( D3DCAPS9 ) );
+        if ( DeviceCaps9.DeclTypes > pGTACaps9->DeclTypes )
+        {
+            WriteDebugEvent( "Not Fixing GTA caps as DeviceCaps are better" );
+        }
+        else
+        {
+            WriteDebugEvent( "Fixing GTA caps" );
+            memcpy( pGTACaps9, &DeviceCaps9, sizeof( D3DCAPS9 ) );
+        }
     }
 }
 
