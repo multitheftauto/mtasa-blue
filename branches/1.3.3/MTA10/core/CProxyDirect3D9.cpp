@@ -650,7 +650,7 @@ void AddCapsReport( UINT Adapter, IDirect3D9* pDirect3D, IDirect3DDevice9* pD3DD
     {
         if ( DeviceCaps9.DeclTypes > pGTACaps9->DeclTypes )
         {
-            WriteDebugEvent( "Not Fixing GTA caps as DeviceCaps are better" );
+            WriteDebugEvent( "Not Fixing GTA caps as DeviceCaps is better" );
         }
         else
         {
