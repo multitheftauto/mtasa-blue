@@ -130,7 +130,7 @@ namespace SharedUtil
         {
             DWORD oldProtCheck;
             VirtualProtect((LPVOID)(hMem.dwFirstPage + i), 0x1000, PAGE_EXECUTE_READWRITE, &oldProtCheck);
-            assert( hMem.oldProt == oldProtCheck );
+            dassert( hMem.oldProt == oldProtCheck );
         }
 
         return hMem;
@@ -143,7 +143,7 @@ namespace SharedUtil
             return;
         DWORD oldProt;
         VirtualProtect((LPVOID)hMem.dwFirstPage, hMem.dwSize, hMem.oldProt, &oldProt);
-        assert( oldProt == PAGE_EXECUTE_READWRITE );
+        dassert( oldProt == PAGE_EXECUTE_READWRITE );
     }
 
 }
