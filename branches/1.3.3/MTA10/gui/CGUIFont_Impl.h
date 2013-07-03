@@ -38,10 +38,8 @@ public:
 
     void                    DrawTextString          ( const char *szText, CRect2D DrawArea, float fZ, CRect2D ClipRect, unsigned long ulFormat, unsigned long ulColor, float fScaleX, float fScaleY );
 
-    void                    defineFontGlyphs        ( unsigned int uExtraGlyphs[] );
-    void                    defineFontGlyphs        ( const char* szExtraGlyphs );
-
-    bool                    isGlyphBeingUsed        (unsigned long ulGlyph);
+    void                    defineFontGlyphs        ( unsigned int uExtraGlyphs[], CEGUI::String ID );
+    void                    defineFontGlyphs        ( const char* szExtraGlyphs,  CEGUI::String ID );
 
 private:
     CEGUI::Font*            m_pFont;

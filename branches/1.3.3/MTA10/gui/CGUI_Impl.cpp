@@ -76,7 +76,17 @@ CGUI_Impl::CGUI_Impl ( IDirect3DDevice9* pDevice )
     // Load our fonts
     SString strFontsPath = PathJoin ( GetSystemWindowsPath (), "fonts" );
 
-    m_pFontManager->setSubstituteFont ( CGUI_MTA_SUBSTITUTE_FONT, 9 );
+    try
+    {
+        m_pUniFont = (CGUIFont_Impl*) CreateFnt ( "unifont", CGUI_MTA_SUBSTITUTE_FONT, 9, 0, false );
+        m_pFontManager->setSubstituteFont ( m_pUniFont->GetFont() );
+    }
+	catch ( CEGUI::InvalidRequestException e )
+	{
+        SString strMessage = e.getMessage ().c_str ();
+        BrowseToSolution ( "create-fonts", EXIT_GAME_FIRST | ASK_GO_ONLINE, SString ( "Error loading fonts!\n\n%s", *strMessage ) );
+	}
+
 
     // Window fonts first
     m_pDefaultFont = (CGUIFont_Impl*) CreateFntFromWinFont ( "default-normal", CGUI_MTA_DEFAULT_REG, CGUI_MTA_DEFAULT_FONT, 9, 0 );
