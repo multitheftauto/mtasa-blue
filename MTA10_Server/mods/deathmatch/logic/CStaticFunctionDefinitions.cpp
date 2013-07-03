@@ -5052,7 +5052,7 @@ bool CStaticFunctionDefinitions::GetVehiclePlateText ( CVehicle* pVehicle, char*
     assert ( pVehicle );
 
     const char* szRegPlate = pVehicle->GetRegPlate ();
-    strcpy ( szPlateText, szRegPlate );
+    STRNCPY( szPlateText, szRegPlate, 9 );
     return true;
 }
 

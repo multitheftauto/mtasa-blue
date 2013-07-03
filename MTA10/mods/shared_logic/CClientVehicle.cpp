@@ -3030,12 +3030,22 @@ CClientEntity* CClientVehicle::GetPickedUpEntityWithWinch ( void )
 }
 
 
-void CClientVehicle::SetRegPlate ( const char* szPlate )
+bool CClientVehicle::SetRegPlate ( const char* szPlate )
 {
     if ( szPlate )
     {
-        m_strRegPlate = szPlate;
+        SString strPlateText = SStringX( szPlate ).Left( 8 );
+        if ( strPlateText != m_strRegPlate )
+        {
+            m_strRegPlate = strPlateText;
+            if ( m_pVehicle )
+            {
+                m_pVehicle->SetPlateText( m_strRegPlate );
+            }
+            return true;
+        }
     }
+    return false;
 }
 
 
@@ -4331,20 +4341,6 @@ bool CClientVehicle::GetComponentVisible ( SString vehicleComponent, bool &bVisi
             // fill our visible variable from the cached data
             bVisible = m_ComponentData[vehicleComponent].m_bVisible;
             return true;
-        }
-    }
-    return false;
-}
-
-
-bool CClientVehicle::SetPlateText( const SString& strPlateText )
-{
-    if ( strPlateText != m_strRegPlate )
-    {
-        m_strRegPlate = strPlateText;
-        if ( m_pVehicle )
-        {
-            return m_pVehicle->SetPlateText( m_strRegPlate );
         }
     }
     return false;

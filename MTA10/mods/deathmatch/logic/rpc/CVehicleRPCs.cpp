@@ -643,7 +643,7 @@ void CVehicleRPCs::SetVehiclePlateText ( CClientEntity* pSourceEntity, NetBitStr
         CClientVehicle* pVehicle = m_pVehicleManager->Get ( pSourceEntity->GetID () );
         if ( pVehicle )
         {
-            pVehicle->SetPlateText ( strText );
+            pVehicle->SetRegPlate ( strText );
         }
     }
 }
