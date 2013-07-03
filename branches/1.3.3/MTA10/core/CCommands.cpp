@@ -48,11 +48,8 @@ void CCommands::Add ( const char* szCommand, const char* szDescription, PFNCOMMA
     COMMANDENTRY* pCommand = new COMMANDENTRY;
 
     // Copy the command name and description to the new command entry.
-    strncpy ( pCommand->szCommandName, szCommand,
-              Min < size_t > ( MAX_COMMAND_NAME_LENGTH, strlen ( szCommand ) + 1 ) );
-
-    strncpy ( pCommand->szDescription, szDescription,
-              Min < size_t > ( MAX_COMMAND_DESCRIPTION_LENGTH, strlen ( szDescription ) + 1 ) );
+    STRNCPY ( pCommand->szCommandName, szCommand, MAX_COMMAND_NAME_LENGTH );
+    STRNCPY ( pCommand->szDescription, szDescription, MAX_COMMAND_DESCRIPTION_LENGTH );
 
     // Set the command.
     pCommand->pfnCmdFunc = pfnHandler;
