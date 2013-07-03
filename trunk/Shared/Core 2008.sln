@@ -279,6 +279,7 @@ Global
 		{CCABBC2E-172D-46FD-BC43-5A9FCD295112}.Release|Win32.ActiveCfg = Release|Win32
 		{CCABBC2E-172D-46FD-BC43-5A9FCD295112}.Release|Win32.Build.0 = Release|Win32
 		{39452ACC-FF12-488D-94B6-301B4EFBB606}.Debug client only|Win32.ActiveCfg = Debug|Win32
+		{39452ACC-FF12-488D-94B6-301B4EFBB606}.Debug client only|Win32.Build.0 = Debug|Win32
 		{39452ACC-FF12-488D-94B6-301B4EFBB606}.Debug server only|Win32.ActiveCfg = Debug|Win32
 		{39452ACC-FF12-488D-94B6-301B4EFBB606}.Debug server only|Win32.Build.0 = Debug|Win32
 		{39452ACC-FF12-488D-94B6-301B4EFBB606}.Debug|Win32.ActiveCfg = Debug|Win32
@@ -286,6 +287,7 @@ Global
 		{39452ACC-FF12-488D-94B6-301B4EFBB606}.Nightly|Win32.ActiveCfg = Nightly|Win32
 		{39452ACC-FF12-488D-94B6-301B4EFBB606}.Nightly|Win32.Build.0 = Nightly|Win32
 		{39452ACC-FF12-488D-94B6-301B4EFBB606}.Release client only|Win32.ActiveCfg = Release|Win32
+		{39452ACC-FF12-488D-94B6-301B4EFBB606}.Release client only|Win32.Build.0 = Release|Win32
 		{39452ACC-FF12-488D-94B6-301B4EFBB606}.Release server only|Win32.ActiveCfg = Release|Win32
 		{39452ACC-FF12-488D-94B6-301B4EFBB606}.Release server only|Win32.Build.0 = Release|Win32
 		{39452ACC-FF12-488D-94B6-301B4EFBB606}.Release|Win32.ActiveCfg = Release|Win32
