@@ -341,7 +341,7 @@ public:
     CClientEntity*              GetPickedUpEntityWithWinch ( void );
 
     inline const char*          GetRegPlate             ( void )                            { return m_strRegPlate.empty () ? NULL : m_strRegPlate.c_str (); }
-    void                        SetRegPlate             ( const char* szPlate );
+    bool                        SetRegPlate             ( const char* szPlate );
 
     unsigned char               GetPaintjob             ( void );
     void                        SetPaintjob             ( unsigned char ucPaintjob );
@@ -461,8 +461,6 @@ public:
     bool                        GetComponentVisible     ( SString vehicleComponent, bool &bVisible );
     std::map < SString, SVehicleComponentData > ::iterator ComponentsBegin ( void )                               { return m_ComponentData.begin (); }
     std::map < SString, SVehicleComponentData > ::iterator ComponentsEnd   ( void )                               { return m_ComponentData.end (); }
-
-    bool                        SetPlateText            ( const SString& strText );
 
 protected:
     void                        StreamIn                ( bool bInstantly );

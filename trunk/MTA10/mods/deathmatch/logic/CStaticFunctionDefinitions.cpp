@@ -3253,7 +3253,7 @@ bool CStaticFunctionDefinitions::SetVehiclePlateText ( CClientEntity& Entity, co
     if ( IS_VEHICLE ( &Entity ) )
     {
         CClientVehicle& Vehicle = static_cast < CClientVehicle& > ( Entity );
-        return Vehicle.SetPlateText ( strText );
+        return Vehicle.SetRegPlate ( strText );
     }
 
     return false;

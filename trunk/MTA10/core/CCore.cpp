@@ -1423,7 +1423,7 @@ void CCore::ParseCommandLine ( std::map < std::string, std::string > & options, 
 
     const char* szCmdLine = GetCommandLine ();
     char szCmdLineCopy[512];
-    strncpy ( szCmdLineCopy, szCmdLine, sizeof(szCmdLineCopy) );
+    STRNCPY ( szCmdLineCopy, szCmdLine, sizeof(szCmdLineCopy) );
     
     char* pCmdLineEnd = szCmdLineCopy + strlen ( szCmdLineCopy );
     char* pStart = szCmdLineCopy;

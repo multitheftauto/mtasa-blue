@@ -695,7 +695,7 @@ void CVehicle::SetRegPlate ( const char* szRegPlate )
 {
     // Copy the text and make sure non-used chars are nulled.
     memset ( m_szRegPlate, 0, 9 );
-    strncpy ( m_szRegPlate, szRegPlate, 9 );
+    STRNCPY ( m_szRegPlate, szRegPlate, 9 );
 }
 
 
