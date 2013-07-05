@@ -664,6 +664,15 @@ void CMapManager::SpawnPlayer ( CPlayer& Player, const CVector& vecPosition, flo
     Player.SetDimension ( usDimension );
     Player.AttachTo ( NULL );
 
+    // Remove all previous weapons
+    for ( unsigned char ucWeaponSlot = 0; ucWeaponSlot < WEAPON_SLOTS; ++ ucWeaponSlot )
+    {
+        Player.SetWeaponType ( 0, ucWeaponSlot );
+        Player.SetWeaponAmmoInClip ( 0, ucWeaponSlot );
+        Player.SetWeaponTotalAmmo ( 0, ucWeaponSlot );
+    }
+
+
     // Call onPlayerSpawn
     CLuaArguments OnPlayerSpawnArguments;
     OnPlayerSpawnArguments.PushNumber ( vecPosition.fX );
