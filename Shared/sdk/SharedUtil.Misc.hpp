@@ -1076,6 +1076,12 @@ std::wstring SharedUtil::ANSIToUTF16 ( const std::string& input )
     return strOutput;
 }
 
+// Check for BOM bytes
+bool SharedUtil::IsUTF8BOM( const void* pData, uint uiLength )
+{
+    const uchar* pCharData = (const uchar*)pData;
+    return ( uiLength > 2 && pCharData[0] == 0xEF && pCharData[1] == 0xBB && pCharData[2] == 0xBF );
+}
 
 //
 // Return true if supplied version string will sort correctly

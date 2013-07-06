@@ -813,8 +813,24 @@ bool CLuaMain::LoadScriptFromFile ( const char* szLUAScript )
 }
 
 
-bool CLuaMain::LoadScriptFromBuffer ( const char* cpBuffer, unsigned int uiSize, const char* szFileName, bool bUTF8 )
+bool CLuaMain::LoadScriptFromBuffer ( const char* cpBuffer, unsigned int uiSize, const char* szFileName )
 {
+    bool bUTF8;
+
+    // UTF-8 BOM?  Compare by checking the standard UTF-8 BOM
+    if ( IsUTF8BOM( cpBuffer, uiSize ) == false )
+    {
+        // Maybe not UTF-8, if we have a >80% heuristic detection confidence, assume it is
+        bUTF8 = ( GetUTF8Confidence ( (const unsigned char*)cpBuffer, uiSize ) >= 80 );
+    }
+    else
+    {
+        // If there's a BOM, load ignoring the first 3 bytes
+        bUTF8 = true;
+        cpBuffer += 3;
+        uiSize -= 3;
+    }
+
     if ( m_luaVM )
     {
         // Are we not marked as UTF-8 already, and not precompiled?

@@ -43,21 +43,21 @@ bool CResourceStartPacket::Write ( NetBitStreamInterface& BitStream ) const
         // Write the resource dynamic element id
         BitStream.Write ( m_pResource->GetDynamicElementRoot ()->GetID () );
         
-        // Count the amount of protected scripts
-        unsigned short usProtectedScriptCount = 0;
+        // Count the amount of 'no client cache' scripts
+        unsigned short usNoClientCacheScriptCount = 0;
         if ( m_pResource->IsClientScriptsOn () == true )
         {
             list < CResourceFile* > ::iterator iter = m_pResource->IterBegin();
             for ( ; iter != m_pResource->IterEnd (); iter++ )
             {
                 if ( ( *iter )->GetType () == CResourceScriptItem::RESOURCE_FILE_TYPE_CLIENT_SCRIPT &&
-                     static_cast<CResourceClientScriptItem*>(*iter)->IsProtected() == true )
+                     static_cast<CResourceClientScriptItem*>(*iter)->IsNoClientCache() == true )
                 {
-                    ++usProtectedScriptCount;
+                    ++usNoClientCacheScriptCount;
                 }
             }
         }
-        BitStream.Write ( usProtectedScriptCount );
+        BitStream.Write ( usNoClientCacheScriptCount );
 
         // Write the declared min client version for this resource
         if ( BitStream.Version () >= 0x32 )
@@ -75,7 +75,7 @@ bool CResourceStartPacket::Write ( NetBitStreamInterface& BitStream ) const
         for ( ; iter != m_pResource->IterEnd (); iter++ )
         {
             if ( ( ( *iter )->GetType () == CResourceScriptItem::RESOURCE_FILE_TYPE_CLIENT_CONFIG && m_pResource->IsClientConfigsOn () ) ||
-                 ( ( *iter )->GetType () == CResourceScriptItem::RESOURCE_FILE_TYPE_CLIENT_SCRIPT && m_pResource->IsClientScriptsOn () && static_cast<CResourceClientScriptItem*>(*iter)->IsProtected() == false ) ||
+                 ( ( *iter )->GetType () == CResourceScriptItem::RESOURCE_FILE_TYPE_CLIENT_SCRIPT && m_pResource->IsClientScriptsOn () && static_cast<CResourceClientScriptItem*>(*iter)->IsNoClientCache() == false ) ||
                  ( ( *iter )->GetType () == CResourceScriptItem::RESOURCE_FILE_TYPE_CLIENT_FILE && m_pResource->IsClientFilesOn () ) )
             {
                 // Write the Type of chunk to read (F - File, E - Exported Function)
