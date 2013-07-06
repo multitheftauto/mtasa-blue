@@ -608,8 +608,8 @@ bool CResource::GenerateChecksums ( void )
                             bOk = false;
                         }
 
-                        // If script is protected, make sure there is no trace of it in the unprotected cache
-                        if ( pResourceFile->IsProtected () )
+                        // If script is 'no client cache', make sure there is no trace of it in the output dir
+                        if ( pResourceFile->IsNoClientCache () )
                             FileDelete ( pResourceFile->GetCachedPathFilename ( true ) );
                     }
                 }
@@ -982,7 +982,7 @@ bool CResource::Start ( list<CResource *> * dependents, bool bStartedManually, b
         // Broadcast new resourceelement that is loaded and tell the players that a new resource was started
         g_pGame->GetMapManager()->BroadcastResourceElements ( m_pResourceElement, m_pDefaultElementGroup );
         g_pGame->GetPlayerManager ()->BroadcastOnlyJoined ( CResourceStartPacket ( m_strResourceName.c_str (), this ) );
-        SendProtectedScripts ();
+        SendNoClientCacheScripts ();
 
         // HACK?: stops resources getting loaded twice when you change them then manually restart
         GenerateChecksums ();
@@ -3124,10 +3124,10 @@ void CResource::OnPlayerJoin ( CPlayer& Player )
 {
     // do the player join crap
     Player.Send ( CResourceStartPacket ( m_strResourceName.c_str (), this ) );
-    SendProtectedScripts ( &Player );
+    SendNoClientCacheScripts ( &Player );
 }
 
-void CResource::SendProtectedScripts ( CPlayer* player )
+void CResource::SendNoClientCacheScripts ( CPlayer* player )
 {
     if ( !IsClientScriptsOn() )
         return;
@@ -3161,7 +3161,7 @@ void CResource::SendProtectedScripts ( CPlayer* player )
             if ( file->GetType() == CResourceFile::RESOURCE_FILE_TYPE_CLIENT_SCRIPT )
             {
                 CResourceClientScriptItem* clientScript = static_cast < CResourceClientScriptItem* > ( file );
-                if ( clientScript->IsProtected() == true )
+                if ( clientScript->IsNoClientCache() == true )
                 {
                     packet.AddItem ( clientScript );
                     anyScript = true;

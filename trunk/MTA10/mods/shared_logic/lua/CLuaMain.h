@@ -53,7 +53,7 @@ public:
     inline void                     SetOwner                ( int iOwner )                  { m_iOwner = iOwner; };
 
     bool                            LoadScriptFromFile      ( const char* szLUAScript );
-    bool                            LoadScriptFromBuffer    ( const char* cpBuffer, unsigned int uiSize, const char* szFileName, bool bUTF8 );
+    bool                            LoadScriptFromBuffer    ( const char* cpBuffer, unsigned int uiSize, const char* szFileName );
     bool                            LoadScript              ( const char* szLUAScript );
     void                            UnloadScript            ( void );
     bool                            CompileScriptFromFile   ( const char* szFile, SString* pDest );

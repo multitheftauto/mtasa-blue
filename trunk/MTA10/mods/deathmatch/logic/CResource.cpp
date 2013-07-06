@@ -30,8 +30,8 @@ CResource::CResource ( unsigned short usNetID, const char* szResourceName, CClie
     m_bActive = false;
     m_bInDownloadQueue = false;
     m_bShowingCursor = false;
-    m_usRemainingProtectedScripts = 0;
-    m_bLoadAfterReceivingProtectedScripts = false;
+    m_usRemainingNoClientCacheScripts = 0;
+    m_bLoadAfterReceivingNoClientCacheScripts = false;
     m_strMinServerReq = strMinServerReq;
     m_strMinClientReq = strMinClientReq;
 
@@ -269,9 +269,9 @@ void CResource::Load ( CClientEntity *pRootEntity )
 {
     m_pRootEntity = pRootEntity;
 
-    if ( m_usRemainingProtectedScripts > 0 )
+    if ( m_usRemainingNoClientCacheScripts > 0 )
     {
-        m_bLoadAfterReceivingProtectedScripts = true;
+        m_bLoadAfterReceivingNoClientCacheScripts = true;
         return;
     }
 
@@ -312,12 +312,7 @@ void CResource::Load ( CClientEntity *pRootEntity )
             // Check the contents
             if ( iSize > 0 && CChecksum::GenerateChecksumFromBuffer ( &buffer.at ( 0 ), iSize ).CompareWithLegacy ( pResourceFile->GetServerChecksum () ) )
             {
-                //UTF-8 BOM?  Compare by checking the standard UTF-8 BOM of 3 characters (in signed format, hence negative)
-                if ( iSize < 3 || buffer[0] != -0x11 || buffer[1] != -0x45 || buffer[2] != -0x41 ) 
-                    //Maybe not UTF-8, if we have a >80% heuristic detection confidence, assume it is
-                    m_pLuaVM->LoadScriptFromBuffer ( &buffer.at ( 0 ), iSize, pResourceFile->GetName (), GetUTF8Confidence ( (const unsigned char*)&buffer.at ( 0 ), iSize ) >= 80 );
-                else if ( iSize != 3 )  //If there's a BOM, but the script is not empty, load ignoring the first 3 bytes
-                    m_pLuaVM->LoadScriptFromBuffer ( &buffer.at ( 3 ), iSize-3, pResourceFile->GetName (), true );
+                m_pLuaVM->LoadScriptFromBuffer ( &buffer.at ( 0 ), iSize, pResourceFile->GetName () );
             }
             else
             {
@@ -418,16 +413,16 @@ SString CResource::GetResourceDirectoryPath ( eAccessType accessType, const SStr
 }
 
 
-void CResource::LoadProtectedScript ( const char* chunk, unsigned int len )
+void CResource::LoadNoClientCacheScript ( const char* chunk, unsigned int len )
 {
-    if ( m_usRemainingProtectedScripts > 0 )
+    if ( m_usRemainingNoClientCacheScripts > 0 )
     {
-        --m_usRemainingProtectedScripts;
-        GetVM()->LoadScriptFromBuffer ( chunk, len, "(unknown)", false );
+        --m_usRemainingNoClientCacheScripts;
+        GetVM()->LoadScriptFromBuffer ( chunk, len, "(unknown)" );
 
-        if ( m_usRemainingProtectedScripts == 0 && m_bLoadAfterReceivingProtectedScripts )
+        if ( m_usRemainingNoClientCacheScripts == 0 && m_bLoadAfterReceivingNoClientCacheScripts )
         {
-            m_bLoadAfterReceivingProtectedScripts = false;
+            m_bLoadAfterReceivingNoClientCacheScripts = false;
             Load ( m_pRootEntity );
         }
     }

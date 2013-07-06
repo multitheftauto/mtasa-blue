@@ -4690,8 +4690,8 @@ void CPacketHandler::Packet_ResourceStart ( NetBitStreamInterface& bitStream )
 
     CNetHTTPDownloadManagerInterface* pHTTP = g_pCore->GetNetwork ()->GetHTTPDownloadManager ( EDownloadMode::RESOURCE_INITIAL_FILES );
 
-    // Number of protected scripts
-    unsigned short usProtectedScriptCount = 0;
+    // Number of 'no client cache' scripts
+    unsigned short usNoClientCacheScriptCount = 0;
 
     // Resource Name Size
     unsigned char ucResourceNameSize;
@@ -4718,9 +4718,9 @@ void CPacketHandler::Packet_ResourceStart ( NetBitStreamInterface& bitStream )
     bitStream.Read ( ResourceEntityID );
     bitStream.Read ( ResourceDynamicEntityID );
 
-    // Read the amount of protected scripts
+    // Read the amount of 'no client cache' scripts
     if ( bitStream.Version () >= 0x26 )
-        bitStream.Read ( usProtectedScriptCount );
+        bitStream.Read ( usNoClientCacheScriptCount );
 
     // Read the declared min client version for this resource
     SString strMinServerReq, strMinClientReq;
@@ -4745,7 +4745,7 @@ void CPacketHandler::Packet_ResourceStart ( NetBitStreamInterface& bitStream )
     CResource* pResource = g_pClientGame->m_pResourceManager->Add ( usResourceID, szResourceName, pResourceEntity, pResourceDynamicEntity, strMinServerReq, strMinClientReq, bEnableOOP );
     if ( pResource )
     {
-        pResource->SetRemainingProtectedScripts ( usProtectedScriptCount );
+        pResource->SetRemainingNoClientCacheScripts ( usNoClientCacheScriptCount );
 
         // Resource Chunk Type (F = Resource File, E = Exported Function)
         unsigned char ucChunkType;
@@ -4934,7 +4934,7 @@ void CPacketHandler::Packet_ResourceClientScripts ( NetBitStreamInterface& bitSt
                 if ( uncompress ( (Bytef *)uncompressedBuffer, &originalLength, (const Bytef *)&data[4], len-4 ) == Z_OK )
                 {
                     // Load the script!
-                    pResource->LoadProtectedScript ( uncompressedBuffer, originalLength );
+                    pResource->LoadNoClientCacheScript ( uncompressedBuffer, originalLength );
                 }
 
                 memset ( uncompressedBuffer, 0, originalLength );

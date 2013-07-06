@@ -96,9 +96,9 @@ ResponseCode CResourceFile::Request ( HttpRequest * ipoHttpRequest, HttpResponse
 }
 
 
-SString CResourceFile::GetCachedPathFilename ( bool bForceUnprotectedPath )
+SString CResourceFile::GetCachedPathFilename ( bool bForceClientCachePath )
 {
-    if ( IsProtected() == false || bForceUnprotectedPath )
+    if ( IsNoClientCache() == false || bForceClientCachePath )
         return PathJoin ( g_pServerInterface->GetServerModPath (), "resource-cache", "http-client-files", m_resource->GetName(), GetName () );
     else
         return PathJoin ( g_pServerInterface->GetServerModPath (), "resource-cache", "http-client-files-no-client-cache", m_resource->GetName(), GetName () );

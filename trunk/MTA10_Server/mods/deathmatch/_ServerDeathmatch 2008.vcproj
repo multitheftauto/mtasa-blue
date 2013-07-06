@@ -2066,6 +2066,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\logic\CResourceClientScriptItem.h"
+					>
+				</File>
+				<File
 					RelativePath=".\logic\CResourceConfigItem.h"
 					>
 				</File>
