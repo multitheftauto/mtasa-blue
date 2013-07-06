@@ -157,6 +157,7 @@ VOID CPickupSA::GiveUsAPickUpObject(int ForcedObjectIndex)
     {
         if ( this->object )
         {
+            ((CEntitySA*)this->object)->DoNotRemoveFromGame = true;
             delete this->object;
         }
 
@@ -172,6 +173,7 @@ VOID CPickupSA::GetRidOfObjects()
     
     if(this->object)
     {
+        ((CEntitySA*)this->object)->DoNotRemoveFromGame = true;
         delete this->object;
         this->object = NULL;
     }
