@@ -98,7 +98,6 @@
       <right name="function.unbanIP" access="false"/>
       <right name="function.unbanSerial" access="false"/>
       <right name="function.reloadBans" access="false"/>
-      <right name="function.getClientIP" access="false"/>
       <right name="function.setServerPassword" access="false"/>
       <right name="function.getServerPassword" access="false"/>
       <right name="function.callRemote" access="false"/>
@@ -151,7 +150,6 @@
       <right name="function.getBansXML" access="true"/>
       <right name="function.unbanIP" access="true"/>
       <right name="function.unbanSerial" access="true"/>
-      <right name="function.getClientIP" access="true"/>
       <right name="function.startResource" access="true"/>
       <right name="function.stopResource" access="true"/>
       <right name="function.restartResource" access="true"/>
