@@ -157,58 +157,6 @@ CLuaMain* CLuaManager::GetVirtualMachine ( lua_State* luaVM )
 
 void CLuaManager::LoadCFunctions ( void )
 {
-    // ** BACKWARDS COMPATIBILITY FUNCS. SHOULD BE REMOVED BEFORE FINAL RELEASE! **
-    CLuaCFunctions::AddFunction ( "getPlayerSkin", CLuaElementDefs::getElementModel );
-    CLuaCFunctions::AddFunction ( "setPlayerSkin", CLuaElementDefs::setElementModel );
-    CLuaCFunctions::AddFunction ( "getVehicleModel", CLuaElementDefs::getElementModel );
-    CLuaCFunctions::AddFunction ( "setVehicleModel", CLuaElementDefs::setElementModel );
-    CLuaCFunctions::AddFunction ( "getObjectModel", CLuaElementDefs::getElementModel );    
-    CLuaCFunctions::AddFunction ( "setObjectModel", CLuaElementDefs::setElementModel );
-    CLuaCFunctions::AddFunction ( "getVehicleID", CLuaElementDefs::getElementModel );
-    CLuaCFunctions::AddFunction ( "getVehicleIDFromName", CLuaFunctionDefinitions::GetVehicleModelFromName );
-    CLuaCFunctions::AddFunction ( "getVehicleNameFromID", CLuaFunctionDefinitions::GetVehicleNameFromModel );
-    CLuaCFunctions::AddFunction ( "getPlayerWeaponSlot", CLuaFunctionDefinitions::GetPedWeaponSlot );
-    CLuaCFunctions::AddFunction ( "getPlayerArmor", CLuaFunctionDefinitions::GetPedArmor );
-    CLuaCFunctions::AddFunction ( "getPlayerRotation", CLuaFunctionDefinitions::GetPedRotation );
-    CLuaCFunctions::AddFunction ( "isPlayerChoking", CLuaFunctionDefinitions::IsPedChoking );
-    CLuaCFunctions::AddFunction ( "isPlayerDead", CLuaFunctionDefinitions::IsPedDead );
-    CLuaCFunctions::AddFunction ( "isPlayerDucked", CLuaFunctionDefinitions::IsPedDucked );
-    CLuaCFunctions::AddFunction ( "getPlayerStat", CLuaFunctionDefinitions::GetPedStat );
-    CLuaCFunctions::AddFunction ( "getPlayerTarget", CLuaFunctionDefinitions::GetPedTarget );
-    CLuaCFunctions::AddFunction ( "getPlayerClothes", CLuaFunctionDefinitions::GetPedClothes );
-    CLuaCFunctions::AddFunction ( "doesPlayerHaveJetPack", CLuaFunctionDefinitions::DoesPedHaveJetPack );
-    CLuaCFunctions::AddFunction ( "isPlayerInWater", CLuaElementDefs::isElementInWater );
-    CLuaCFunctions::AddFunction ( "isPedInWater", CLuaElementDefs::isElementInWater );
-    CLuaCFunctions::AddFunction ( "isPlayerOnGround", CLuaFunctionDefinitions::IsPedOnGround );
-    CLuaCFunctions::AddFunction ( "getPlayerFightingStyle", CLuaFunctionDefinitions::GetPedFightingStyle );
-    CLuaCFunctions::AddFunction ( "getPlayerGravity", CLuaFunctionDefinitions::GetPedGravity );
-    CLuaCFunctions::AddFunction ( "getPlayerContactElement", CLuaFunctionDefinitions::GetPedContactElement );
-    CLuaCFunctions::AddFunction ( "setPlayerArmor", CLuaFunctionDefinitions::SetPedArmor );
-    CLuaCFunctions::AddFunction ( "setPlayerWeaponSlot", CLuaFunctionDefinitions::SetPedWeaponSlot );
-    CLuaCFunctions::AddFunction ( "killPlayer", CLuaFunctionDefinitions::KillPed );
-    CLuaCFunctions::AddFunction ( "setPlayerRotation", CLuaFunctionDefinitions::SetPedRotation );
-    CLuaCFunctions::AddFunction ( "setPlayerStat", CLuaFunctionDefinitions::SetPedStat );
-    CLuaCFunctions::AddFunction ( "addPlayerClothes", CLuaFunctionDefinitions::AddPedClothes );
-    CLuaCFunctions::AddFunction ( "removePlayerClothes", CLuaFunctionDefinitions::RemovePedClothes );
-    CLuaCFunctions::AddFunction ( "givePlayerJetPack", CLuaFunctionDefinitions::GivePedJetPack );
-    CLuaCFunctions::AddFunction ( "removePlayerJetPack", CLuaFunctionDefinitions::RemovePedJetPack );
-    CLuaCFunctions::AddFunction ( "setPlayerFightingStyle", CLuaFunctionDefinitions::SetPedFightingStyle );
-    CLuaCFunctions::AddFunction ( "setPlayerGravity", CLuaFunctionDefinitions::SetPedGravity );
-    CLuaCFunctions::AddFunction ( "setPlayerChoking", CLuaFunctionDefinitions::SetPedChoking );
-    CLuaCFunctions::AddFunction ( "warpPlayerIntoVehicle", CLuaFunctionDefinitions::WarpPedIntoVehicle );
-    CLuaCFunctions::AddFunction ( "removePlayerFromVehicle", CLuaFunctionDefinitions::RemovePedFromVehicle );
-    CLuaCFunctions::AddFunction ( "getPlayerOccupiedVehicle", CLuaFunctionDefinitions::GetPedOccupiedVehicle );
-    CLuaCFunctions::AddFunction ( "getPlayerOccupiedVehicleSeat", CLuaFunctionDefinitions::GetPedOccupiedVehicleSeat );
-    CLuaCFunctions::AddFunction ( "isPlayerInVehicle", CLuaFunctionDefinitions::IsPedInVehicle );
-    CLuaCFunctions::AddFunction ( "getClientName", CLuaFunctionDefinitions::GetPlayerName );
-    CLuaCFunctions::AddFunction ( "getClientIP", CLuaFunctionDefinitions::GetPlayerIP );
-    CLuaCFunctions::AddFunction ( "getClientAccount", CLuaFunctionDefinitions::GetPlayerAccount );
-    CLuaCFunctions::AddFunction ( "setClientName", CLuaFunctionDefinitions::SetPlayerName );
-    CLuaCFunctions::AddFunction ( "getPlayerWeapon", CLuaFunctionDefinitions::GetPedWeapon );
-    CLuaCFunctions::AddFunction ( "getPlayerTotalAmmo", CLuaFunctionDefinitions::GetPedTotalAmmo );
-    CLuaCFunctions::AddFunction ( "getPlayerAmmoInClip", CLuaFunctionDefinitions::GetPedAmmoInClip );
-    // ** END OF BACKWARDS COMPATIBILITY FUNCS. **
-
     CLuaCFunctions::AddFunction ( "addEvent", CLuaFunctionDefinitions::AddEvent );
     CLuaCFunctions::AddFunction ( "addEventHandler", CLuaFunctionDefinitions::AddEventHandler );
     CLuaCFunctions::AddFunction ( "removeEventHandler", CLuaFunctionDefinitions::RemoveEventHandler );
@@ -779,4 +727,58 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getNetworkStats", CLuaFunctionDefinitions::GetNetworkStats );
     CLuaCFunctions::AddFunction ( "getLoadedModules", CLuaFunctionDefinitions::GetModules );
     CLuaCFunctions::AddFunction ( "getModuleInfo", CLuaFunctionDefinitions::GetModuleInfo );
+
+    // Backward compat functions at the end, so the new function name is used in ACL
+
+    // ** BACKWARDS COMPATIBILITY FUNCS. SHOULD BE REMOVED BEFORE FINAL RELEASE! **
+    CLuaCFunctions::AddFunction ( "getPlayerSkin", CLuaElementDefs::getElementModel );
+    CLuaCFunctions::AddFunction ( "setPlayerSkin", CLuaElementDefs::setElementModel );
+    CLuaCFunctions::AddFunction ( "getVehicleModel", CLuaElementDefs::getElementModel );
+    CLuaCFunctions::AddFunction ( "setVehicleModel", CLuaElementDefs::setElementModel );
+    CLuaCFunctions::AddFunction ( "getObjectModel", CLuaElementDefs::getElementModel );    
+    CLuaCFunctions::AddFunction ( "setObjectModel", CLuaElementDefs::setElementModel );
+    CLuaCFunctions::AddFunction ( "getVehicleID", CLuaElementDefs::getElementModel );
+    CLuaCFunctions::AddFunction ( "getVehicleIDFromName", CLuaFunctionDefinitions::GetVehicleModelFromName );
+    CLuaCFunctions::AddFunction ( "getVehicleNameFromID", CLuaFunctionDefinitions::GetVehicleNameFromModel );
+    CLuaCFunctions::AddFunction ( "getPlayerWeaponSlot", CLuaFunctionDefinitions::GetPedWeaponSlot );
+    CLuaCFunctions::AddFunction ( "getPlayerArmor", CLuaFunctionDefinitions::GetPedArmor );
+    CLuaCFunctions::AddFunction ( "getPlayerRotation", CLuaFunctionDefinitions::GetPedRotation );
+    CLuaCFunctions::AddFunction ( "isPlayerChoking", CLuaFunctionDefinitions::IsPedChoking );
+    CLuaCFunctions::AddFunction ( "isPlayerDead", CLuaFunctionDefinitions::IsPedDead );
+    CLuaCFunctions::AddFunction ( "isPlayerDucked", CLuaFunctionDefinitions::IsPedDucked );
+    CLuaCFunctions::AddFunction ( "getPlayerStat", CLuaFunctionDefinitions::GetPedStat );
+    CLuaCFunctions::AddFunction ( "getPlayerTarget", CLuaFunctionDefinitions::GetPedTarget );
+    CLuaCFunctions::AddFunction ( "getPlayerClothes", CLuaFunctionDefinitions::GetPedClothes );
+    CLuaCFunctions::AddFunction ( "doesPlayerHaveJetPack", CLuaFunctionDefinitions::DoesPedHaveJetPack );
+    CLuaCFunctions::AddFunction ( "isPlayerInWater", CLuaElementDefs::isElementInWater );
+    CLuaCFunctions::AddFunction ( "isPedInWater", CLuaElementDefs::isElementInWater );
+    CLuaCFunctions::AddFunction ( "isPlayerOnGround", CLuaFunctionDefinitions::IsPedOnGround );
+    CLuaCFunctions::AddFunction ( "getPlayerFightingStyle", CLuaFunctionDefinitions::GetPedFightingStyle );
+    CLuaCFunctions::AddFunction ( "getPlayerGravity", CLuaFunctionDefinitions::GetPedGravity );
+    CLuaCFunctions::AddFunction ( "getPlayerContactElement", CLuaFunctionDefinitions::GetPedContactElement );
+    CLuaCFunctions::AddFunction ( "setPlayerArmor", CLuaFunctionDefinitions::SetPedArmor );
+    CLuaCFunctions::AddFunction ( "setPlayerWeaponSlot", CLuaFunctionDefinitions::SetPedWeaponSlot );
+    CLuaCFunctions::AddFunction ( "killPlayer", CLuaFunctionDefinitions::KillPed );
+    CLuaCFunctions::AddFunction ( "setPlayerRotation", CLuaFunctionDefinitions::SetPedRotation );
+    CLuaCFunctions::AddFunction ( "setPlayerStat", CLuaFunctionDefinitions::SetPedStat );
+    CLuaCFunctions::AddFunction ( "addPlayerClothes", CLuaFunctionDefinitions::AddPedClothes );
+    CLuaCFunctions::AddFunction ( "removePlayerClothes", CLuaFunctionDefinitions::RemovePedClothes );
+    CLuaCFunctions::AddFunction ( "givePlayerJetPack", CLuaFunctionDefinitions::GivePedJetPack );
+    CLuaCFunctions::AddFunction ( "removePlayerJetPack", CLuaFunctionDefinitions::RemovePedJetPack );
+    CLuaCFunctions::AddFunction ( "setPlayerFightingStyle", CLuaFunctionDefinitions::SetPedFightingStyle );
+    CLuaCFunctions::AddFunction ( "setPlayerGravity", CLuaFunctionDefinitions::SetPedGravity );
+    CLuaCFunctions::AddFunction ( "setPlayerChoking", CLuaFunctionDefinitions::SetPedChoking );
+    CLuaCFunctions::AddFunction ( "warpPlayerIntoVehicle", CLuaFunctionDefinitions::WarpPedIntoVehicle );
+    CLuaCFunctions::AddFunction ( "removePlayerFromVehicle", CLuaFunctionDefinitions::RemovePedFromVehicle );
+    CLuaCFunctions::AddFunction ( "getPlayerOccupiedVehicle", CLuaFunctionDefinitions::GetPedOccupiedVehicle );
+    CLuaCFunctions::AddFunction ( "getPlayerOccupiedVehicleSeat", CLuaFunctionDefinitions::GetPedOccupiedVehicleSeat );
+    CLuaCFunctions::AddFunction ( "isPlayerInVehicle", CLuaFunctionDefinitions::IsPedInVehicle );
+    CLuaCFunctions::AddFunction ( "getClientName", CLuaFunctionDefinitions::GetPlayerName );
+    CLuaCFunctions::AddFunction ( "getClientIP", CLuaFunctionDefinitions::GetPlayerIP );
+    CLuaCFunctions::AddFunction ( "getClientAccount", CLuaFunctionDefinitions::GetPlayerAccount );
+    CLuaCFunctions::AddFunction ( "setClientName", CLuaFunctionDefinitions::SetPlayerName );
+    CLuaCFunctions::AddFunction ( "getPlayerWeapon", CLuaFunctionDefinitions::GetPedWeapon );
+    CLuaCFunctions::AddFunction ( "getPlayerTotalAmmo", CLuaFunctionDefinitions::GetPedTotalAmmo );
+    CLuaCFunctions::AddFunction ( "getPlayerAmmoInClip", CLuaFunctionDefinitions::GetPedAmmoInClip );
+    // ** END OF BACKWARDS COMPATIBILITY FUNCS. **
 }
