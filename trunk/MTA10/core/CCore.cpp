@@ -2252,3 +2252,12 @@ void CCore::UpdateDummyProgress( int iPercent )
 
     CGraphics::GetSingleton().SetProgressMessage( strMessage );
 }
+
+//
+// Do SetCursorPos if allowed
+//
+void CCore::CallSetCursorPos( int X, int Y )
+{
+    if ( CCore::GetSingleton ().IsFocused () && !CLocalGUI::GetSingleton ().IsMainMenuVisible () )
+        m_pSetCursorPosHook->CallSetCursorPos(X,Y);
+}
