@@ -404,6 +404,12 @@
     <ClCompile Include="CRenderWareSA.TxdRightSizing.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CTrainTrackManagerSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CTrainTrackSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="C3DMarkerSA.h">
@@ -824,6 +830,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="gamesa_renderware.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CTrainTrackManagerSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CTrainTrackSA.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

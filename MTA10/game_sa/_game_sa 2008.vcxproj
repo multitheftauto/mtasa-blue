@@ -320,6 +320,8 @@
     <ClCompile Include="CTextSA.cpp" />
     <ClCompile Include="CTheCarGeneratorsSA.cpp" />
     <ClCompile Include="CTrailerSA.cpp" />
+    <ClCompile Include="CTrainTrackManagerSA.cpp" />
+    <ClCompile Include="CTrainTrackSA.cpp" />
     <ClCompile Include="CVehicleSA.cpp" />
     <ClCompile Include="CVehicleScannerSA.cpp" />
     <ClCompile Include="CVisibilityPluginsSA.cpp" />
@@ -463,6 +465,8 @@
     <ClInclude Include="CTextSA.h" />
     <ClInclude Include="CTheCarGeneratorsSA.h" />
     <ClInclude Include="CTrailerSA.h" />
+    <ClInclude Include="CTrainTrackManagerSA.h" />
+    <ClInclude Include="CTrainTrackSA.h" />
     <ClInclude Include="CVehicleSA.h" />
     <ClInclude Include="CVehicleScannerSA.h" />
     <ClInclude Include="CVisibilityPluginsSA.h" />

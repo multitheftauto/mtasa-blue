@@ -981,6 +981,12 @@
     <ClCompile Include="logic\packets\CPlayerACInfoPacket.cpp">
       <Filter>Source Files\logic\packets</Filter>
     </ClCompile>
+    <ClCompile Include="logic\CTrainTrack.cpp">
+      <Filter>Source Files\logic</Filter>
+    </ClCompile>
+    <ClCompile Include="logic\CTrainTrackManager.cpp">
+      <Filter>Source Files\logic</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="logic\CLightsyncManager.h">
@@ -1885,6 +1891,12 @@
     </ClInclude>
     <ClInclude Include="logic\packets\CPlayerACInfoPacket.h">
       <Filter>Header Files\logic\packets</Filter>
+    </ClInclude>
+    <ClInclude Include="logic\CTrainTrack.h">
+      <Filter>Header Files\logic</Filter>
+    </ClInclude>
+    <ClInclude Include="logic\CTrainTrackManager.h">
+      <Filter>Header Files\logic</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -12112,3 +12112,92 @@ SString CStaticFunctionDefinitions::GetVersionSortable ()
                             ,0
                             );
 }
+
+
+CTrainTrack * CStaticFunctionDefinitions::CreateTrainTrack ( CResource * pResource, unsigned int uiTrackNodes )
+{
+    CTrainTrackManager * pTrainTrackManager = g_pGame->GetTrainTrackManager ( ) ;
+    CTrainTrack * pTrainTrack = pTrainTrackManager->CreateTrainTrack ( uiTrackNodes, pResource->GetDynamicElementRoot(), NULL );
+    if ( pResource->HasStarted ( ) )
+    {
+        CEntityAddPacket Packet;
+        Packet.Add ( pTrainTrack );
+        m_pPlayerManager->BroadcastOnlyJoined ( Packet );
+    }
+    return pTrainTrack;
+}
+
+bool CStaticFunctionDefinitions::DestroyTrainTrack ( CTrainTrack * pTrainTrack )
+{
+    delete pTrainTrack;
+    return true;
+}
+
+bool CStaticFunctionDefinitions::SetTrainTrackPosition ( unsigned char ucTrackID, unsigned int uiTrackNode, CVector vecPosition )
+{
+    CTrainTrack * pTrainTrack = g_pGame->GetTrainTrackManager ( )->GetTrainTrack ( ucTrackID );
+    if ( pTrainTrack )
+    {
+        if ( pTrainTrack->SetRailNodePosition ( uiTrackNode, vecPosition ) )
+        {
+            CBitStream BitStream;
+            BitStream.pBitStream->Write ( uiTrackNode );
+            BitStream.pBitStream->Write ( vecPosition.fX );
+            BitStream.pBitStream->Write ( vecPosition.fY );
+            BitStream.pBitStream->Write ( vecPosition.fZ );
+            m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pTrainTrack, SET_TRAIN_TRACK_POSITION, *BitStream.pBitStream ) );
+            return true;
+        }
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::GetTrainTrackPosition ( unsigned char ucTrackID, unsigned int uiTrackNode, CVector& vecPosition )
+{
+    CTrainTrack * pTrainTrack = g_pGame->GetTrainTrackManager ( )->GetTrainTrack ( ucTrackID );
+    if ( pTrainTrack )
+    {
+        return pTrainTrack->GetRailNodePosition ( uiTrackNode, vecPosition );
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::SetTrainTrackLength ( CTrainTrack * pTrainTrack, float fLength )
+{
+    if ( pTrainTrack->SetTrackLength ( fLength ) )
+    {
+        CBitStream BitStream;
+        BitStream.pBitStream->Write ( fLength );
+        m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pTrainTrack, SET_TRAIN_TRACK_LENGTH, *BitStream.pBitStream ) );
+    }
+    return true;
+}
+
+bool CStaticFunctionDefinitions::GetTrainTrackLength ( CTrainTrack * pTrainTrack, float &fLength )
+{
+    fLength = pTrainTrack->GetTrackLength ( );
+    return true;
+}
+
+bool CStaticFunctionDefinitions::SetTrainTrackNumberOfNodes ( CTrainTrack * pTrainTrack, unsigned int uiNodes )
+{
+    if ( pTrainTrack->SetNumberOfNodes ( uiNodes ) )
+    {
+        CBitStream BitStream;
+        BitStream.pBitStream->Write ( uiNodes );
+        m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pTrainTrack, SET_TRAIN_TRACK_NUMBER_OF_NODES, *BitStream.pBitStream ) );
+    }
+    return true;
+}
+
+bool CStaticFunctionDefinitions::GetTrainTrackNumberOfNodes ( CTrainTrack * pTrainTrack, unsigned int &uiNodes )
+{
+    uiNodes = pTrainTrack->GetNumberOfNodes ( );
+    return true;
+}
+
+bool CStaticFunctionDefinitions::GetTrainTrackID ( CTrainTrack * pTrainTrack, unsigned char &ucTrack )
+{
+    ucTrack = pTrainTrack->GetTrackID ( );
+    return true;
+}

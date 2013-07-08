@@ -73,6 +73,8 @@ typedef void ( InRenderer ) ( void );
 #include "CVisibilityPlugins.h"
 #include "CWaterManager.h"
 #include "CWeaponStatManager.h"
+#include "CTrainTrack.h"
+#include "CTrainTrackManager.h"
 #include "CWeather.h"
 #include "CWeaponInfo.h"
 #include "CWorld.h"
@@ -160,6 +162,7 @@ public:
     virtual CWaterManager       * GetWaterManager () = 0;
     virtual CWeaponStatManager  * GetWeaponStatManager () = 0;
     virtual CPointLights        * GetPointLights () = 0;
+    virtual CTrainTrackManager  * GetTrainTrackManager () = 0;
 
     virtual CWeaponInfo         * GetWeaponInfo(eWeaponType weapon,eWeaponSkill skill=WEAPONSKILL_STD)=0;
     virtual CModelInfo          * GetModelInfo(DWORD dwModelID)=0;

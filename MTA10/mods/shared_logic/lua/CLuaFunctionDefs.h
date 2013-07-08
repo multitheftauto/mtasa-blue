@@ -374,6 +374,12 @@ public:
     LUA_DECLARE ( GetFPSLimit );
     LUA_DECLARE ( FetchRemote );
 
+    // Train functions
+    LUA_DECLARE ( GetTrainTrackLength );
+    LUA_DECLARE ( GetTrainTrackNumberOfNodes );
+    LUA_DECLARE ( GetTrainTrackID );
+    LUA_DECLARE ( GetTrainTrackPosition );
+
     // Input functions
     LUA_DECLARE ( BindKey );
     LUA_DECLARE ( UnbindKey );

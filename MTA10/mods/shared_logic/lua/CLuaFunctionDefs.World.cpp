@@ -2178,3 +2178,138 @@ int CLuaFunctionDefs::FetchRemote ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaFunctionDefs::GetTrainTrackPosition ( lua_State* luaVM )
+{
+    unsigned char ucTrackID = 0;
+    unsigned int uiTrackNode = 0;
+    CVector vecPosition;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadNumber ( ucTrackID );
+    argStream.ReadNumber ( uiTrackNode );
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( CStaticFunctionDefinitions::GetTrainTrackPosition ( ucTrackID, uiTrackNode, vecPosition ) )
+        {
+            lua_pushvector ( luaVM, vecPosition );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefs::GetTrainTrackLength ( lua_State* luaVM )
+{
+    float fLength = 0.0f;
+    CClientTrainTrack * pTrainTrack = NULL;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pTrainTrack );
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( CStaticFunctionDefinitions::GetTrainTrackLength ( *pTrainTrack, fLength ) )
+        {
+            lua_pushnumber ( luaVM, fLength );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefs::GetTrainTrackNumberOfNodes ( lua_State* luaVM )
+{
+    unsigned int uiNodes = 0;
+    CClientTrainTrack * pTrainTrack = NULL;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pTrainTrack );
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( CStaticFunctionDefinitions::GetTrainTrackNumberOfNodes ( *pTrainTrack, uiNodes ) )
+        {
+            lua_pushnumber ( luaVM, uiNodes );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefs::GetTrainTrackID ( lua_State* luaVM )
+{
+    unsigned char ucTrack = 0;
+    CClientTrainTrack * pTrainTrack = NULL;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pTrainTrack );
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( CStaticFunctionDefinitions::GetTrainTrackID ( *pTrainTrack, ucTrack ) )
+        {
+            lua_pushnumber ( luaVM, ucTrack );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefs::SetVehicleTrainTrack ( lua_State* luaVM )
+{
+    unsigned char ucTrack = 0;
+    CClientVehicle * pVehicle = NULL;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pVehicle );
+    argStream.ReadNumber ( ucTrack );
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( CStaticFunctionDefinitions::SetVehicleTrainTrack ( *pVehicle, ucTrack ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefs::GetVehicleTrainTrack ( lua_State* luaVM )
+{
+    unsigned char ucTrack = 0;
+    CClientVehicle * pVehicle = NULL;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pVehicle );
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( CStaticFunctionDefinitions::GetVehicleTrainTrack ( *pVehicle, ucTrack ) )
+        {
+            lua_pushnumber ( luaVM, ucTrack );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}

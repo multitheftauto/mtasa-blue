@@ -84,6 +84,7 @@ public:
         SCRIPTFILE,
         WATER,
         WEAPON,
+        TRAINTRACK,
         DATABASE_CONNECTION,
         ROOT,
         UNKNOWN,

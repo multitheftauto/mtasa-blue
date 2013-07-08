@@ -365,6 +365,7 @@
     <ClCompile Include="..\shared_logic\CClientSearchLight.cpp" />
     <ClCompile Include="..\shared_logic\CClientPointLights.cpp" />
     <ClCompile Include="..\shared_logic\CClientPointLightsManager.cpp" />
+    <ClCompile Include="..\shared_logic\CClientTrainTrack.cpp" />
     <ClCompile Include="..\shared_logic\luadefs\CLuaAudioDefs.cpp" />
     <ClCompile Include="..\shared_logic\luadefs\CLuaBitDefs.cpp" />
     <ClCompile Include="..\shared_logic\luadefs\CLuaBlipDefs.cpp" />
@@ -755,6 +756,7 @@
     <ClInclude Include="..\shared_logic\CClientSearchLight.h" />
     <ClInclude Include="..\shared_logic\CClientPointLights.h" />
     <ClInclude Include="..\shared_logic\CClientPointLightsManager.h" />
+    <ClInclude Include="..\shared_logic\CClientTrainTrack.h" />
     <ClInclude Include="..\shared_logic\luadefs\CLuaAudioDefs.h" />
     <ClInclude Include="..\shared_logic\luadefs\CLuaBitDefs.h" />
     <ClInclude Include="..\shared_logic\luadefs\CLuaBlipDefs.h" />

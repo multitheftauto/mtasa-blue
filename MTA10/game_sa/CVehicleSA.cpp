@@ -325,7 +325,14 @@ void CVehicleSA::Init ( void )
     m_ExtraFrames.clear ( ); 
     // dump the frames
     VehicleDump( this );
-    FinalizeFramesList();
+
+    if ( GetVehicleInterface()->m_nModelIndex == 449 )
+    {
+        CVehicleSAInterface * pInterface = GetVehicleInterface ( );
+        pInterface->m_ucRailTrackID = 4;
+    }
+
+    FinalizeFramesList ();
 }
 
 // DESTRUCTOR
@@ -642,12 +649,13 @@ BYTE CVehicleSA::GetRailTrack ()
 
 void CVehicleSA::SetRailTrack ( BYTE ucTrackID )
 {
-    if ( ucTrackID >= NUM_RAILTRACKS )
+    if ( pGame->GetTrainTrackManager ( )->IsValid ( ucTrackID ) == false )
         return;
 
     CVehicleSAInterface* pInterf = GetVehicleInterface ();
     if ( pInterf->m_ucRailTrackID != ucTrackID )
     {
+        pInterf->m_fTrainRailDistance = 0.0f;
         pInterf->m_ucRailTrackID = ucTrackID;
         if ( !IsDerailed () )
         {

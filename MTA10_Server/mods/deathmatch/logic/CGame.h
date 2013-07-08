@@ -125,6 +125,8 @@ class CMasterServerAnnouncer;
 class CHqComms;
 class CFunctionUseLogger;
 
+class CTrainTrackManager;
+
 // Packet forward declarations
 class CCommandPacket;
 class CCustomDataPacket;
@@ -266,6 +268,7 @@ public:
     inline CCustomWeaponManager*    GetCustomWeaponManager      ( void )        { return m_pCustomWeaponManager; }
     inline CFunctionUseLogger*      GetFunctionUseLogger        ( void )        { return m_pFunctionUseLogger; }
     inline CMasterServerAnnouncer*  GetMasterServerAnnouncer    ( void )        { return m_pMasterServerAnnouncer; }
+    inline CTrainTrackManager*      GetTrainTrackManager        ( void )        { return m_pTrainTrackManager; }
 
     void                        JoinPlayer                  ( CPlayer& Player );
     void                        InitialDataStream           ( CPlayer& Player );
@@ -503,6 +506,8 @@ private:
 
     CCustomWeaponManager*           m_pCustomWeaponManager;
     CFunctionUseLogger*             m_pFunctionUseLogger;
+
+    CTrainTrackManager*             m_pTrainTrackManager;
 
     char*                       m_szCurrentFileName;
 

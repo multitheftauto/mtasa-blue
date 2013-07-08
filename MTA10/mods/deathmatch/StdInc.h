@@ -90,6 +90,7 @@
 #include <CClientWebBrowser.h>
 #include <CClientSearchLight.h>
 #include <CClientEffect.h>
+#include <CClientTrainTrack.h>
 #include <CCustomData.h>
 #include <CElementArray.h>
 #include <CLogger.h>

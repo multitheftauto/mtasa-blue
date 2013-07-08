@@ -3949,6 +3949,28 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                     break;
                 }
 
+                case CClientGame::TRAINTRACK:
+                {
+                    unsigned char ucTrackID = 0;
+                    unsigned int uiNumberOfNodes = 0;
+                    bool bLinkedLastNode = false;
+                    bitStream.Read ( ucTrackID );
+                    bitStream.Read ( uiNumberOfNodes );
+                    bitStream.ReadBit ( bLinkedLastNode );
+
+                    CClientTrainTrack * pTrainTrack = new CClientTrainTrack ( g_pClientGame->GetManager ( ), EntityID, uiNumberOfNodes, ucTrackID, bLinkedLastNode );
+                    CVector vecTrackPos;
+                    for ( unsigned int i = 0; i < uiNumberOfNodes; i++ )
+                    {
+                        bitStream.Read ( vecTrackPos.fX );
+                        bitStream.Read ( vecTrackPos.fY );
+                        bitStream.Read ( vecTrackPos.fZ );
+                        pTrainTrack->SetNodePosition ( i, vecTrackPos );
+                    }
+                    pEntity = pTrainTrack;
+                    break;
+                }
+
                 default:
                 {
                     assert ( 0 );

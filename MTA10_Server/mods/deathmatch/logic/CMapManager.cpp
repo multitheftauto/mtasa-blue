@@ -288,6 +288,19 @@ void CMapManager::SendMapInformation ( CPlayer& Player )
 
     marker.Set ( "Water" );
 
+    // Add the water polys to the packet
+    CTrainTrackManager* pTrainTrackManager = g_pGame->GetTrainTrackManager ();
+    for ( unsigned int i = 0; i < MAX_TOTAL_TRACKS; i++ )
+    {
+        CTrainTrack* pTrack = pTrainTrackManager->GetTrainTrack ( i );
+        if ( pTrack && pTrack->GetTrackID ( ) >= NUM_RAILTRACKS  )
+        {
+            EntityPacket.Add ( pTrack );
+        }
+    }
+
+    marker.Set ( "TrainTracks" );
+
     // Send it
     Player.Send ( EntityPacket );
 

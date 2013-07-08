@@ -129,6 +129,7 @@ public:
         WATER,
         WEAPON,
         POINTLIGHTS,
+        TRAINTRACK,
         UNKNOWN,
     };
 
@@ -351,6 +352,7 @@ public:
 
     static bool                         StaticKeyStrokeHandler          ( const SString& strKey, bool bState, bool bIsConsoleInputKey );
     bool                                KeyStrokeHandler                ( const SString& strKey, bool bState, bool bIsConsoleInputKey );
+
     static bool                         StaticCharacterKeyHandler       ( WPARAM wChar );
     bool                                CharacterKeyHandler             ( WPARAM wChar );
 

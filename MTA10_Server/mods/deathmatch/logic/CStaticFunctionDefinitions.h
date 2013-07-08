@@ -715,6 +715,18 @@ public:
     static const char*          GetOperatingSystemName              ( );
     static const char*          GetVersionBuildTag                  ( );
     static SString              GetVersionSortable                  ( );
+
+    
+    // Train track funcs
+    static bool                         SetTrainTrackPosition               ( unsigned char ucTrackID, unsigned int uiTrackNode, CVector vecPosition );
+    static bool                         GetTrainTrackPosition               ( unsigned char ucTrackID, unsigned int uiTrackNode, CVector& vecPosition );
+    static CTrainTrack *                CreateTrainTrack                    ( CResource * pResource, unsigned int uiTrackNodes );
+    static bool                         DestroyTrainTrack                   ( CTrainTrack * pTrainTrack );
+    static bool                         SetTrainTrackLength                 ( CTrainTrack * pTrainTrack, float fLength );
+    static bool                         GetTrainTrackLength                 ( CTrainTrack * pTrainTrack, float &fLength );
+    static bool                         SetTrainTrackNumberOfNodes          ( CTrainTrack * pTrainTrack, unsigned int uiNodes );
+    static bool                         GetTrainTrackNumberOfNodes          ( CTrainTrack * pTrainTrack, unsigned int &uiNodes );
+    static bool                         GetTrainTrackID                     ( CTrainTrack * pTrainTrack, unsigned char &ucTrack );
 };
 
 #endif

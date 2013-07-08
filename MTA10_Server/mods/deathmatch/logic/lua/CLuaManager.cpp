@@ -367,6 +367,17 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getModuleInfo", CLuaFunctionDefs::GetModuleInfo );
     CLuaCFunctions::AddFunction ( "isOOPEnabled", CLuaFunctionDefs::IsOOPEnabled );
 
+    // Train
+    CLuaCFunctions::AddFunction ( "setTrainTrackPosition", CLuaFunctionDefinitions::SetTrainTrackPosition );
+    CLuaCFunctions::AddFunction ( "getTrainTrackNumberOfNodes", CLuaFunctionDefinitions::GetTrainTrackNumberOfNodes );
+    CLuaCFunctions::AddFunction ( "getTrainTrackID", CLuaFunctionDefinitions::GetTrainTrackID );
+    CLuaCFunctions::AddFunction ( "getTrainTrackLength", CLuaFunctionDefinitions::GetTrainTrackLength );
+
+    CLuaCFunctions::AddFunction ( "createTrainTrack", CLuaFunctionDefinitions::CreateTrainTrack );
+    CLuaCFunctions::AddFunction ( "getTrainTrackPosition", CLuaFunctionDefinitions::GetTrainTrackPosition );
+    CLuaCFunctions::AddFunction ( "setTrainTrackLength", CLuaFunctionDefinitions::SetTrainTrackLength );
+    CLuaCFunctions::AddFunction ( "setTrainTrackNumberOfNodes", CLuaFunctionDefinitions::SetTrainTrackNumberOfNodes );
+
     // Backward compat functions at the end, so the new function name is used in ACL
 
     // ** BACKWARDS COMPATIBILITY FUNCS. SHOULD BE REMOVED BEFORE FINAL RELEASE! **

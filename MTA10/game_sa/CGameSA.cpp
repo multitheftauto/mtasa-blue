@@ -109,6 +109,7 @@ CGameSA::CGameSA()
     this->m_pWaterManager           = new CWaterManagerSA ();
     this->m_pWeaponStatsManager     = new CWeaponStatManagerSA ();
     this->m_pPointLights            = new CPointLightsSA ();
+    this->m_pTrainTrackManager      = new CTrainTrackManagerSA ( );
 
     // Normal weapon types (WEAPONSKILL_STD)
     for ( int i = 0; i < NUM_WeaponInfosStdSkill; i++)
@@ -242,6 +243,7 @@ CGameSA::~CGameSA ( void )
     delete reinterpret_cast < CAudioEngineSA* > ( m_pAudioEngine );
     delete reinterpret_cast < CAudioContainerSA* > ( m_pAudioContainer );
     delete reinterpret_cast < CPointLightsSA * > ( m_pPointLights );
+    delete reinterpret_cast < CTrainTrackManagerSA * > ( m_pTrainTrackManager );
 }
 
 CWeaponInfo * CGameSA::GetWeaponInfo(eWeaponType weapon, eWeaponSkill skill)
@@ -485,6 +487,7 @@ void CGameSA::Initialize ( void )
     m_pGarages->Initialize();
     SetupSpecialCharacters ();
     m_pRenderWare->Initialize();
+    m_pTrainTrackManager->Initialise ( );
 
     // *Sebas* Hide the GTA:SA Main menu.
     MemPutFast < BYTE > ( CLASS_CMenuManager+0x5C, 0 );

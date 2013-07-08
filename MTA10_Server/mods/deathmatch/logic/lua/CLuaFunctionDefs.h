@@ -198,6 +198,16 @@ public:
     LUA_DECLARE ( GetModuleInfo );
     LUA_DECLARE ( IsOOPEnabled );
 
+    // Train functions
+    LUA_DECLARE ( SetTrainTrackPosition );
+    LUA_DECLARE ( GetTrainTrackPosition );
+    LUA_DECLARE ( CreateTrainTrack );
+    LUA_DECLARE ( SetTrainTrackLength );
+    LUA_DECLARE ( GetTrainTrackLength );
+    LUA_DECLARE ( SetTrainTrackNumberOfNodes );
+    LUA_DECLARE ( GetTrainTrackNumberOfNodes );
+    LUA_DECLARE ( GetTrainTrackID );
+
 private:
     // Static references to objects
     static CBlipManager*                                m_pBlipManager;
