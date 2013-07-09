@@ -1083,6 +1083,26 @@ bool SharedUtil::IsUTF8BOM( const void* pData, uint uiLength )
     return ( uiLength > 2 && pCharData[0] == 0xEF && pCharData[1] == 0xBB && pCharData[2] == 0xBF );
 }
 
+// Check for UTF8/ANSI compiled script
+bool SharedUtil::IsLuaCompiledScript( const void* pData, uint uiLength )
+{
+    const uchar* pCharData = (const uchar*)pData;
+    if ( IsUTF8BOM( pCharData, uiLength ) )
+    {
+        pCharData += 3;
+        uiLength -= 3;
+    }
+    return ( uiLength > 0 && pCharData[0] == 0x1B );    // Do the same check as what the Lua parser does
+}
+
+// Check for encypted script
+bool SharedUtil::IsLuaEncryptedScript( const void* pData, uint uiLength )
+{
+    const uchar* pCharData = (const uchar*)pData;
+    return ( uiLength > 0 && pCharData[0] == 0x1C );    // Look for our special marker
+}
+
+
 //
 // Return true if supplied version string will sort correctly
 //

@@ -169,6 +169,9 @@ namespace SharedUtil
 
     bool IsUTF8BOM( const void* pData, uint uiLength );
 
+    // Buffer identification
+    bool IsLuaCompiledScript( const void* pData, uint uiLength );
+    bool IsLuaEncryptedScript( const void* pData, uint uiLength );
 
     //
     // Some templates

@@ -125,6 +125,7 @@ public:
     virtual bool                        ValidateBinaryFileName      ( const char* szFilename ) = 0;
     virtual CBinaryFileInterface*       AllocateBinaryFile          ( void ) = 0;
     virtual bool                        EncryptDumpfile             ( const char* szClearPathFilename, const char* szEncryptedPathFilename ) = 0;
+    virtual bool                        DecryptScript               ( const char* cpInBuffer, uint uiInSize, const char** pcpOutBuffer, uint* puiOutSize ) = 0;
 };
 
 #endif
