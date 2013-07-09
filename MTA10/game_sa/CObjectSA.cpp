@@ -169,10 +169,9 @@ CObjectSA::CObjectSA( DWORD dwModel, bool bBreakingDisabled )
 
     m_ucAlpha = 255;
 
-    ResetScale ();
-
     if ( m_pInterface )
     {
+        ResetScale ();
         CheckForGangTag ();
     }
 
