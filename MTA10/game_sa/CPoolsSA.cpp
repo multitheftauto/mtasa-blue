@@ -363,18 +363,19 @@ CObject* CPoolsSA::AddObject ( DWORD dwModelID, bool bLowLod, bool bBreakingDisa
     {
         pObject = new CObjectSA ( dwModelID, bBreakingDisabled );
 
-        if ( bLowLod )
+        if ( AddObjectToPool ( pObject ) )
         {
-            pObject->m_pInterface->bUsesCollision = 0;
-            pObject->m_pInterface->bDontCastShadowsOn = 1; 
-            // Set super hacky flag to indicate this is a special low lod object
-            pObject->m_pInterface->SetIsLowLodEntity ();
+            if ( bLowLod )
+            {
+                pObject->m_pInterface->bUsesCollision = 0;
+                pObject->m_pInterface->bDontCastShadowsOn = 1; 
+                // Set super hacky flag to indicate this is a special low lod object
+                pObject->m_pInterface->SetIsLowLodEntity ();
+            }
+            else
+                pObject->m_pInterface->SetIsHighLodEntity ();       
         }
         else
-            pObject->m_pInterface->SetIsHighLodEntity ();
-
-
-        if ( ! AddObjectToPool ( pObject ) )
         {
             delete pObject;
             pObject = NULL;
@@ -389,7 +390,7 @@ void CPoolsSA::RemoveObject ( unsigned long ulID, bool )
     DEBUG_TRACE("void CPoolsSA::RemoveObject ( unsigned long ulID, bool )");
 
     static bool bIsDeletingObjectAlready = false; // to prevent delete being called twice
-    if ( !bIsDeletingObjectAlready ) 
+    if ( !bIsDeletingObjectAlready && ulID != INVALID_POOL_ARRAY_ID ) 
     {
         bIsDeletingObjectAlready = true;
 
