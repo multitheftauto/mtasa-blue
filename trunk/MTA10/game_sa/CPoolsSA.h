@@ -21,6 +21,7 @@
 #include "CVehicleSA.h"
 #include "CObjectSA.h"
 #include "CBuildingSA.h"
+#define INVALID_POOL_ARRAY_ID    0xFFFFFFFF
 
 class CEntryInfoNodePoolSA : public CEntryInfoNodePool
 {

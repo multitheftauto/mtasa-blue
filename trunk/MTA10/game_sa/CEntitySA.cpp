@@ -29,7 +29,7 @@ CEntitySA::CEntitySA ( void )
     BeingDeleted = false;
     DoNotRemoveFromGame = false;
     m_pStoredPointer = NULL;
-    m_ulArrayID = 0;
+    m_ulArrayID = INVALID_POOL_ARRAY_ID;
 }
 
 /*VOID CEntitySA::SetModelAlpha ( int iAlpha )
