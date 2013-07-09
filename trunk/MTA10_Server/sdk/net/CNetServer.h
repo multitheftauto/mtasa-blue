@@ -73,6 +73,13 @@ struct SNetOptions
     } netOptimize;
 };
 
+struct SScriptInfo
+{
+    const char* szMinServerHostVer;
+    const char* szMinServerRunVer;
+    const char* szMinClientRunVer;
+};
+
 class CNetServer
 {
 public:
@@ -128,6 +135,8 @@ public:
     virtual void                            GenerateRandomData              ( void* pOutData, uint uiLength ) = 0;
     virtual bool                            EncryptDumpfile                 ( const char* szClearPathFilename, const char* szEncryptedPathFilename ) { return false; }
     virtual bool                            ValidateHttpCacheFileName       ( const char* szFilename ) { return false; }
+    virtual bool                            GetScriptInfo                   ( const char* cpInBuffer, uint uiInSize, SScriptInfo* pOutInfo ) { return false; }
+    virtual bool                            DecryptScript                   ( const char* cpInBuffer, uint uiInSize, const char** pcpOutBuffer, uint* puiOutSize ) { return false; }
 };
 
 #endif

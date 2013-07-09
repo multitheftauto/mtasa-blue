@@ -25,6 +25,7 @@ static CLuaManager* m_pLuaManager;
 #define HOOK_MAXIMUM_TIME 5000
 
 extern CGame* g_pGame;
+extern CNetServer* g_pRealNetServer;
 
 // This script is loaded into all VM's created.
 const char szPreloadedScript [] = ""\
@@ -323,63 +324,47 @@ void CLuaMain::InstructionCountHook ( lua_State* luaVM, lua_Debug* pDebug )
     }
 }
 
-
-bool CLuaMain::LoadScriptFromFile ( const char* szLUAScript )
+bool CLuaMain::LoadScriptFromBuffer ( const char* cpInBuffer, unsigned int uiInSize, const char* szFileName )
 {
-    if ( m_luaVM )
+    // Decrypt if required
+    const char* cpBuffer;
+    uint uiSize;
+    if ( !g_pRealNetServer->DecryptScript( cpInBuffer, uiInSize, &cpBuffer, &uiSize ) )
     {
-        // Load the script
-        if ( luaL_loadfile ( m_luaVM, szLUAScript ) )
-        {
-            // Print the error
-            std::string strRes = ConformResourcePath ( lua_tostring( m_luaVM, -1 ) );
-            if ( strRes.length () )
-            {
-                CLogger::LogPrintf ( "SCRIPT ERROR: %s\n", strRes.c_str () );
-                g_pGame->GetScriptDebugging()->LogWarning ( m_luaVM, "Loading script failed: %s", strRes.c_str () );
-            }
-            else
-            {
-                CLogger::LogPrint ( "SCRIPT ERROR: Unknown\n" );
-                g_pGame->GetScriptDebugging()->LogInformation ( m_luaVM, "Loading script failed for unknown reason" );
-            }
-        }
-        else
-        {
-            ResetInstructionCount ();
-            int iret = this->PCall ( m_luaVM, 0, 0, 0 ) ;
-            if ( iret == LUA_ERRRUN || iret == LUA_ERRMEM )
-            {
-                SString strRes = ConformResourcePath ( lua_tostring( m_luaVM, -1 ) );
-        
-                vector <SString> vecSplit;
-                strRes.Split ( ":", vecSplit );
-                
-                if ( vecSplit.size ( ) >= 3 )
-                {
-                    SString strFile = vecSplit[0];
-                    int     iLine   = atoi ( vecSplit[1].c_str ( ) );
-                    SString strMsg  = vecSplit[2].substr ( 1 );
-                    
-                    g_pGame->GetScriptDebugging()->LogError ( strFile, iLine, strMsg );
-                }
-                else
-                    g_pGame->GetScriptDebugging()->LogError ( m_luaVM, "%s", strRes.c_str () );
-            }
-            return true;
-        }
+        // Problems problems
+#if MTA_DM_VERSION < 0x135 
+        SString strMessage( "%s is invalid and will not work in future versions. Please re-compile at http://luac.mtasa.com/", *ConformResourcePath( szFileName ) ); 
+        g_pGame->GetScriptDebugging()->LogWarning ( m_luaVM, "Script warning: %s", *strMessage );
+        // cpBuffer is always valid after call to DecryptScript
+#else
+        SString strMessage( "%s is invalid. Please re-compile at http://luac.mtasa.com/", *ConformResourcePath( szFileName ) ); 
+        g_pGame->GetScriptDebugging()->LogWarning ( m_luaVM, "Loading script failed: %s", *strMessage );
+        return false;
+#endif
     }
 
-    return false;
-}
+    bool bUTF8;
 
-bool CLuaMain::LoadScriptFromBuffer ( const char* cpBuffer, unsigned int uiSize, const char* szFileName, bool bUTF8 )
-{
+    // UTF-8 BOM?  Compare by checking the standard UTF-8 BOM
+    if ( IsUTF8BOM( cpBuffer, uiSize ) == false )
+    {
+        // Maybe not UTF-8, if we have a >80% heuristic detection confidence, assume it is
+        bUTF8 = ( GetUTF8Confidence ( (const unsigned char*)cpBuffer, uiSize ) >= 80 );
+    }
+    else
+    {
+        // If there's a BOM, load ignoring the first 3 bytes
+        bUTF8 = true;
+        cpBuffer += 3;
+        uiSize -= 3;
+    }
+
+
     if ( m_luaVM )
     {
         // Are we not marked as UTF-8 already, and not precompiled?
         std::string strUTFScript;
-        if ( !bUTF8 && ( uiSize < 5 || cpBuffer[0] != 27 || cpBuffer[1] != 'L' || cpBuffer[2] != 'u' || cpBuffer[3] != 'a' || cpBuffer[4] != 'Q' ) )
+        if ( !bUTF8 && !IsLuaCompiledScript( cpBuffer, uiSize ) )
         {
             std::string strBuffer = std::string(cpBuffer, uiSize);
 #ifdef WIN32
@@ -504,97 +489,6 @@ void CLuaMain::UnloadScript ( void )
         lua_close( m_luaVM );
         m_luaVM = NULL;
     }
-}
-
-static int lua_dump_writer ( lua_State* luaVM, const void* data, size_t size, void* myUserData )
-{
-    (void)luaVM;
-    SString* pDest = (SString *)myUserData;
-    pDest->append ( (const char *)data, size );
-    return 0;
-}
-
-bool CLuaMain::CompileScriptFromFile ( const char* szFile, SString* pDest )
-{
-    if ( m_luaVM )
-    {
-        // Load the file
-        std::vector < char > buffer;
-        FileLoad ( szFile, buffer );
-        unsigned int iSize = buffer.size();
-
-        //UTF-8 BOM?  Compare by checking the standard UTF-8 BOM of 3 characters (in signed format, hence negative)
-        if ( iSize > 0 ) 
-        {
-            if ( iSize < 3 || buffer[0] != -0x11 || buffer[1] != -0x45 || buffer[2] != -0x41 )
-            {
-                //Maybe not UTF-8, if we have a >80% heuristic detection confidence, assume it is
-                return CompileScriptFromBuffer ( &buffer.at ( 0 ), iSize, szFile, GetUTF8Confidence ( (const unsigned char*)&buffer.at ( 0 ), iSize ) >= 80, pDest );
-            }
-            else if ( iSize != 3 ) //If there's a BOM, but the script is not empty, load ignoring the first 3 bytes
-            {
-                return CompileScriptFromBuffer ( &buffer.at ( 3 ), iSize-3, szFile, true, pDest );
-            }
-        }
-    }
-    return false;
-}
-
-
-bool CLuaMain::CompileScriptFromBuffer ( const char* cpBuffer, unsigned int uiSize, const char* szFileName, bool bUTF8, SString* pDest )
-{
-    if ( m_luaVM )
-    {
-        // Are we not marked as UTF-8 already, and not precompiled?
-        std::string strUTFScript;
-        if ( !bUTF8 && ( uiSize < 5 || cpBuffer[0] != 27 || cpBuffer[1] != 'L' || cpBuffer[2] != 'u' || cpBuffer[3] != 'a' || cpBuffer[4] != 'Q' ) )
-        {
-            std::string strBuffer = std::string(cpBuffer, uiSize);
-#ifdef WIN32
-            std::setlocale(LC_CTYPE,""); // Temporarilly use locales to read the script
-            strUTFScript = UTF16ToMbUTF8(ANSIToUTF16( strBuffer ));
-            std::setlocale(LC_CTYPE,"C");
-#else
-            strUTFScript = UTF16ToMbUTF8(ANSIToUTF16( strBuffer ));
-#endif
-
-            if ( uiSize != strUTFScript.size() )
-            {
-                uiSize = strUTFScript.size();
-                g_pGame->GetScriptDebugging()->LogWarning ( m_luaVM, "Script '%s' is not encoded in UTF-8.  Loading as ANSI...", ConformResourcePath(szFileName).c_str() );
-            }
-        }
-        else
-            strUTFScript = std::string(cpBuffer, uiSize);
-
-        // Load the script
-        if ( luaL_loadbuffer ( m_luaVM, bUTF8 ? cpBuffer : strUTFScript.c_str(), uiSize, SString ( "@%s", szFileName ) ) )
-        {
-            // Print the error
-            std::string strRes = ConformResourcePath ( lua_tostring( m_luaVM, -1 ) );
-            if ( strRes.length () )
-            {
-                CLogger::LogPrintf ( "SCRIPT ERROR: %s\n", strRes.c_str () );
-                g_pGame->GetScriptDebugging()->LogWarning ( m_luaVM, "Loading script failed: %s", strRes.c_str () );
-            }
-            else
-            {
-                CLogger::LogPrint ( "SCRIPT ERROR: Unknown\n" );
-                g_pGame->GetScriptDebugging()->LogInformation ( m_luaVM, "Loading script failed for unknown reason" );
-            }
-        }
-        else
-        {
-            pDest->assign ( "" );
-            if ( lua_dump(m_luaVM, lua_dump_writer, pDest) != 0 )
-                return false;
-            lua_pop ( m_luaVM, 1 );
-
-            return true;
-        }
-    }
-
-    return false;
 }
 
 

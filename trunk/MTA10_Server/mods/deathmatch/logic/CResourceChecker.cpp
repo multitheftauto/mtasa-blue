@@ -13,6 +13,7 @@
 #include "StdInc.h"
 #include "CResourceChecker.Data.h"
 #include <clocale>
+extern CNetServer* g_pRealNetServer;
 
 ///////////////////////////////////////////////////////////////
 //
@@ -399,8 +400,12 @@ void CResourceChecker::CheckLuaFileForIssues ( const string& strPath, const stri
     if ( strFileContents.length () == 0 )
         return;
 
+    // Update decrypt version requirements, and do no more checking if encrypted
+    if ( CheckLuaDecryptRequirements( strFileContents, strFileName, strResourceName, bClientScript ) )
+        return;
+
     // Check if a compiled script
-    bool bCompiledScript = ( strncmp ( "\x1B\x4C\x75\x61", strFileContents, 4 ) == 0 );
+    bool bCompiledScript = IsLuaCompiledScript( strFileContents.c_str(), strFileContents.length() );
 
     // Process
     if ( strFileContents.length () > 1000000 )
@@ -441,6 +446,61 @@ void CResourceChecker::CheckLuaFileForIssues ( const string& strPath, const stri
 
 ///////////////////////////////////////////////////////////////
 //
+// CResourceChecker::CheckLuaDecryptRequirements
+//
+// Updates version requirements and returns true if encrypted
+//
+///////////////////////////////////////////////////////////////
+bool CResourceChecker::CheckLuaDecryptRequirements ( const string& strFileContents, const string& strFileName, const string& strResourceName, bool bClientScript )
+{
+    // Get embedded version requirements
+    SScriptInfo scriptInfo;
+    if ( !g_pRealNetServer->GetScriptInfo( strFileContents.c_str(), strFileContents.length(), &scriptInfo ) )
+    {
+        if ( bClientScript && IsLuaCompiledScript( strFileContents.c_str(), strFileContents.length() ) )
+        {
+            // Compiled client script with no version info
+    #if MTA_DM_VERSION < 0x135 
+            SString strMessage( "%s is invalid and will not work in future versions. Please re-compile at http://luac.mtasa.com/", strFileName.c_str() ); 
+            CLogger::LogPrint ( SString ( "WARNING: %s %s\n", strResourceName.c_str (), *strMessage ) );
+    #else
+            SString strMessage( "%s is invalid. Please re-compile at http://luac.mtasa.com/", strFileName.c_str() ); 
+            CLogger::LogPrint ( SString ( "ERROR: %s %s\n", strResourceName.c_str (), *strMessage ) );
+    #endif
+        }
+        return false;
+    }
+
+    SString strMinServerHostVer = scriptInfo.szMinServerHostVer;
+    SString strMinServerRunVer = scriptInfo.szMinServerRunVer;
+    SString strMinClientRunVer = scriptInfo.szMinClientRunVer;
+
+    // Check server host requirements
+    if ( strMinServerHostVer > m_strReqServerVersion )
+    {
+        m_strReqServerVersion = strMinServerHostVer;
+        m_strReqServerReason = strFileName;
+    }
+
+    // Check run requirements
+    if ( bClientScript && strMinClientRunVer > m_strReqClientVersion )
+    {
+        m_strReqClientVersion = strMinClientRunVer;
+        m_strReqClientReason = strFileName;
+    }
+    else
+    if ( !bClientScript && strMinServerRunVer > m_strReqServerVersion )
+    {
+        m_strReqServerVersion = strMinServerRunVer;
+        m_strReqServerReason = strFileName;
+    }
+
+    return IsLuaEncryptedScript( strFileContents.c_str(), strFileContents.length() );
+}
+
+
+///////////////////////////////////////////////////////////////
+//
 // CResourceChecker::CheckLuaSourceForIssues
 //
 // Look for function names not in comment blocks
@@ -451,14 +511,8 @@ void CResourceChecker::CheckLuaSourceForIssues ( string strLuaSource, const stri
 {
     CHashMap < SString, long > doneWarningMap;
     long lLineNumber = 1;
-    bool bUTF8 = false;
-
     // Check if this is a UTF-8 script
-    if ( strLuaSource.length() > 2 )
-    {
-        if ( strLuaSource.at(0) == -0x11 && strLuaSource.at(1) == -0x45 && strLuaSource.at(2) == -0x41 )
-            bUTF8 = true;
-    }
+    bool bUTF8 = IsUTF8BOM( strLuaSource.c_str(), strLuaSource.length() );
 
     // If it's not a UTF8 script, does it contain foreign language characters that should be upgraded?
     if ( !bCompiledScript && !bUTF8 && GetUTF8Confidence ( (const unsigned char*)&strLuaSource.at ( 0 ), strLuaSource.length() ) < 80 )
