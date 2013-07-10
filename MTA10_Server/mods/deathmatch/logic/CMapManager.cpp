@@ -290,10 +290,10 @@ void CMapManager::SendMapInformation ( CPlayer& Player )
 
     // Add the water polys to the packet
     CTrainTrackManager* pTrainTrackManager = g_pGame->GetTrainTrackManager ();
-    for ( unsigned int i = 0; i < MAX_TOTAL_TRACKS; i++ )
+    for ( unsigned int i = NUM_RAILTRACKS; i < MAX_TOTAL_TRACKS; i++ )
     {
         CTrainTrack* pTrack = pTrainTrackManager->GetTrainTrack ( i );
-        if ( pTrack && pTrack->GetTrackID ( ) >= NUM_RAILTRACKS  )
+        if ( pTrack )
         {
             EntityPacket.Add ( pTrack );
         }
