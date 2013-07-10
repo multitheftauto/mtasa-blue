@@ -1393,10 +1393,10 @@ int CLuaFunctionDefs::ResetWorldSounds ( lua_State* luaVM )
 int CLuaFunctionDefs::PlaySFX ( lua_State* luaVM )
 {
 //  sound playSFX ( string audioContainer, int bankIndex, int audioIndex [, loop = false ] )
-    int iContainerIndex; int iBankIndex; int iAudioIndex; bool bLoop;
+    eAudioLookupIndex containerIndex; int iBankIndex; int iAudioIndex; bool bLoop;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadNumber ( iContainerIndex ); // Todo: use enum
+    argStream.ReadEnumString ( containerIndex );
     argStream.ReadNumber ( iBankIndex );
     argStream.ReadNumber ( iAudioIndex );
     argStream.ReadBool ( bLoop, false );
@@ -1410,7 +1410,7 @@ int CLuaFunctionDefs::PlaySFX ( lua_State* luaVM )
             if ( pResource )
             {
                 CClientSound* pSound;
-                if ( CStaticFunctionDefinitions::PlaySFX ( pResource, iContainerIndex, iBankIndex, iAudioIndex, bLoop, pSound ) )
+                if ( CStaticFunctionDefinitions::PlaySFX ( pResource, containerIndex, iBankIndex, iAudioIndex, bLoop, pSound ) )
                 {
                     lua_pushelement ( luaVM, pSound );
                     return 1;

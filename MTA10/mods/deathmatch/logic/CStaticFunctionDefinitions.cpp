@@ -3966,12 +3966,12 @@ bool CStaticFunctionDefinitions::ResetWorldSounds ( void )
 }
 
 
-bool CStaticFunctionDefinitions::PlaySFX ( CResource* pResource, int iContainerIndex, int iBankIndex, int iAudioIndex, bool bLoop, CClientSound*& outSound )
+bool CStaticFunctionDefinitions::PlaySFX ( CResource* pResource, eAudioLookupIndex containerIndex, int iBankIndex, int iAudioIndex, bool bLoop, CClientSound*& outSound )
 {
     void* pAudioData;
     unsigned int uiAudioLength;
 
-    if ( !g_pGame->GetAudioContainer ()->GetAudioData ( static_cast<eAudioLookupIndex>(iContainerIndex), iBankIndex, iAudioIndex, pAudioData, uiAudioLength ) )
+    if ( !g_pGame->GetAudioContainer ()->GetAudioData ( containerIndex, iBankIndex, iAudioIndex, pAudioData, uiAudioLength ) )
         return false;
 
     CClientSound* pSound = m_pSoundManager->PlaySound2D ( pAudioData, uiAudioLength, bLoop );

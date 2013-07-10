@@ -137,7 +137,7 @@ bool CAudioContainerSA::GetRawAudioData ( eAudioLookupIndex lookupIndex, int ban
     iSampleRateOut = audioEntry->sampleRate;
 
     // Seek to the correct offset and read
-    archive.seekg ( audioEntry->offset );
+    archive.seekg ( lookupEntry->offset + audioEntry->offset );
     return archive.read(reinterpret_cast<char*> ( buffer ), rawLength ) != NULL;
 }
 
@@ -146,15 +146,15 @@ const SString CAudioContainerSA::GetAudioArchiveName ( eAudioLookupIndex lookupI
     SString archiveName = "AUDIO\\SFX\\";
     switch ( lookupIndex )
     {
-        case FEET: archiveName += "FEET"; break;
-        case GENRL: archiveName += "GENRL"; break;
-        case PAIN_A: archiveName += "PAIN_A"; break;
-        case SCRIPT: archiveName += "SCRIPT"; break;
-        case SPC_EA: archiveName += "SPC_EA"; break;
-        case SPC_FA: archiveName += "SPC_FA"; break;
-        case SPC_GA: archiveName += "SPC_GA"; break;
-        case SPC_NA: archiveName += "SPC_NA"; break;
-        case SPC_PA: archiveName += "SPC_PA"; break;
+        case AUDIO_LOOKUP_FEET: archiveName += "FEET"; break;
+        case AUDIO_LOOKUP_GENRL: archiveName += "GENRL"; break;
+        case AUDIO_LOOKUP_PAIN_A: archiveName += "PAIN_A"; break;
+        case AUDIO_LOOKUP_SCRIPT: archiveName += "SCRIPT"; break;
+        case AUDIO_LOOKUP_SPC_EA: archiveName += "SPC_EA"; break;
+        case AUDIO_LOOKUP_SPC_FA: archiveName += "SPC_FA"; break;
+        case AUDIO_LOOKUP_SPC_GA: archiveName += "SPC_GA"; break;
+        case AUDIO_LOOKUP_SPC_NA: archiveName += "SPC_NA"; break;
+        case AUDIO_LOOKUP_SPC_PA: archiveName += "SPC_PA"; break;
     }
     return archiveName;
 }
