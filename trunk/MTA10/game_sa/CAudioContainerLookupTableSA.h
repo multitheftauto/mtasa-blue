@@ -15,7 +15,6 @@
 #define __CAUDIOCONTAINERLOOKUPTABLESA_H
 
 #include <fstream>
-#include <algorithm>
 
 typedef unsigned char uint8;
 typedef unsigned short uint16;

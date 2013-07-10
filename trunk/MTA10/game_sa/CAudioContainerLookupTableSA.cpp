@@ -56,7 +56,7 @@ SAudioLookupEntrySA* CAudioContainerLookupTableSA::GetEntry ( eAudioLookupIndex 
     if ( lookupIndex < 0 || lookupIndex > 8 )
         return NULL;
 
-    if ( bankIndex+1 > m_Entries[lookupIndex].size () )
+    if ( static_cast<unsigned int>(bankIndex+1) > m_Entries[lookupIndex].size () )
         return NULL;
 
     return m_Entries[lookupIndex][bankIndex];
