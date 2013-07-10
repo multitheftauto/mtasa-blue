@@ -38,6 +38,18 @@ CBassAudio::CBassAudio ( bool bStream, const SString& strPath, bool bLoop, bool 
 }
 
 
+CBassAudio::CBassAudio ( void* pBuffer, unsigned int uiBufferLength, bool bLoop, bool b3D ) : m_bStream ( false ), m_pBuffer ( pBuffer ), m_uiBufferLength ( uiBufferLength ), m_bLoop ( bLoop ), m_b3D ( b3D )
+{
+    m_fVolume = 1.0f;
+    m_fDefaultFrequency = 44100.0f;
+    m_fMinDistance = 5.0f;
+    m_fMaxDistance = 20.0f;
+    m_fPlaybackSpeed = 1.0f;
+    m_bPaused = false;
+    m_bPan = true;
+}
+
+
 CBassAudio::~CBassAudio ( void )
 {
     if ( m_pSound )
@@ -69,6 +81,10 @@ CBassAudio::~CBassAudio ( void )
 void CBassAudio::Destroy ( void )
 {
     CreateThread ( NULL, 0, reinterpret_cast <LPTHREAD_START_ROUTINE> ( &CBassAudio::DestroyInternal ), this, 0, NULL );
+
+    // Free the buffer if sound has been loaded from memory
+    if ( m_pBuffer )
+        delete[] m_pBuffer;
 }
 
 void CBassAudio::DestroyInternal ( CBassAudio* pBassAudio )
@@ -120,11 +136,20 @@ bool CBassAudio::BeginLoadingMedia ( void )
         */
         long lCreateFlags = BASS_MUSIC_PRESCAN|BASS_STREAM_DECODE;
 
-        m_pSound = BASS_StreamCreateFile ( false, m_strPath, 0, 0, lCreateFlags );
-        if ( !m_pSound )
-            m_pSound = BASS_MusicLoad ( false, m_strPath, 0, 0, BASS_MUSIC_RAMP|BASS_MUSIC_PRESCAN|BASS_STREAM_DECODE, 0 );  // Try again
-        if ( !m_pSound && m_b3D )
-            m_pSound = ConvertFileToMono ( m_strPath );                       // Last try if 3D
+        if ( !m_pBuffer )
+        {
+            m_pSound = BASS_StreamCreateFile ( false, m_strPath, 0, 0, lCreateFlags );
+            if ( !m_pSound )
+                m_pSound = BASS_MusicLoad ( false, m_strPath, 0, 0, BASS_MUSIC_RAMP|BASS_MUSIC_PRESCAN|BASS_STREAM_DECODE, 0 );  // Try again
+            if ( !m_pSound && m_b3D )
+                m_pSound = ConvertFileToMono ( m_strPath );                       // Last try if 3D
+        }
+        else
+        {
+            m_pSound = BASS_StreamCreateFile ( true, m_pBuffer, 0, m_uiBufferLength, lCreateFlags );
+            if ( !m_pSound )
+                m_pSound = BASS_MusicLoad ( true, m_pBuffer, 0, m_uiBufferLength, lCreateFlags, 0 );
+        }
 
         // Failed to load ?
         if ( !m_pSound )

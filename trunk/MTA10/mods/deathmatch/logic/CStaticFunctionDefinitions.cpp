@@ -3966,6 +3966,22 @@ bool CStaticFunctionDefinitions::ResetWorldSounds ( void )
 }
 
 
+bool CStaticFunctionDefinitions::PlaySFX ( CResource* pResource, int iContainerIndex, int iBankIndex, int iAudioIndex, bool bLoop, CClientSound*& outSound )
+{
+    void* pAudioData;
+    unsigned int uiAudioLength;
+
+    if ( !g_pGame->GetAudioContainer ()->GetAudioData ( static_cast<eAudioLookupIndex>(iContainerIndex), iBankIndex, iAudioIndex, pAudioData, uiAudioLength ) )
+        return false;
+
+    CClientSound* pSound = m_pSoundManager->PlaySound2D ( pAudioData, uiAudioLength, bLoop );
+    if ( pSound ) pSound->SetParent ( pResource->GetResourceDynamicEntity() );
+    
+    outSound = pSound;
+    return true;
+}
+
+
 CClientRadarMarker* CStaticFunctionDefinitions::CreateBlip ( CResource& Resource, const CVector& vecPosition, unsigned char ucIcon, unsigned char ucSize, const SColor color, short sOrdering, unsigned short usVisibleDistance )
 {
     CClientRadarMarker* pBlip = new CClientRadarMarker ( m_pManager, INVALID_ELEMENT_ID, sOrdering, usVisibleDistance );

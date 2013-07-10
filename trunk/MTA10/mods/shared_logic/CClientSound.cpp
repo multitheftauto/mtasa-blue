@@ -29,6 +29,8 @@ CClientSound::CClientSound ( CClientManager* pManager, ElementID ID ) : ClassIni
     m_fPlaybackSpeed = 1.0f;
     m_bPan = true;
     m_fPan = 0.0f;
+
+    m_pBuffer = NULL;
 }
 
 CClientSound::~CClientSound ( void )
@@ -106,7 +108,11 @@ bool CClientSound::Create ( void )
         return false;
 
     // Initial state
-    m_pAudio = new CBassAudio ( m_bStream, m_strPath, m_bLoop, m_b3D );
+    if ( !m_pBuffer )
+        m_pAudio = new CBassAudio ( m_bStream, m_strPath, m_bLoop, m_b3D );
+    else
+        m_pAudio = new CBassAudio ( m_pBuffer, m_uiBufferLength, m_bLoop, m_b3D );
+        
     m_bDoneCreate = true;
 
     // Load file/start connect
@@ -223,6 +229,22 @@ bool CClientSound::Play ( const SString& strPath, bool bLoop )
     m_bStream = false;
     m_b3D = false;
     m_strPath = strPath;
+    m_bLoop = bLoop;
+    m_bPan = false;
+
+    // Instant distance-stream in
+    return Create ();
+}
+
+
+bool CClientSound::Play ( void* pMemory, unsigned int uiLength, bool bLoop )
+{
+    assert ( pMemory );
+
+    m_bStream = false;
+    m_b3D = false;
+    m_pBuffer = pMemory;
+    m_uiBufferLength = uiLength;
     m_bLoop = bLoop;
     m_bPan = false;
 

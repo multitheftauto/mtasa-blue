@@ -424,15 +424,14 @@ public:
     LUA_DECLARE ( CreateFire );
 
     // Audio funcs
-    LUA_DECLARE ( PlayMissionAudio );
     LUA_DECLARE ( PlaySoundFrontEnd );
-    LUA_DECLARE ( PreloadMissionAudio );
     LUA_DECLARE ( SetAmbientSoundEnabled );
     LUA_DECLARE ( IsAmbientSoundEnabled );
     LUA_DECLARE ( ResetAmbientSounds );
     LUA_DECLARE ( SetWorldSoundEnabled );
     LUA_DECLARE ( IsWorldSoundEnabled );
     LUA_DECLARE ( ResetWorldSounds );
+    LUA_DECLARE ( PlaySFX );
 
     // Blip funcs
     LUA_DECLARE ( CreateBlip );

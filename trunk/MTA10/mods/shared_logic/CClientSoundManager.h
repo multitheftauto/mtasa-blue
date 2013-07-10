@@ -32,6 +32,7 @@ public:
     void                    SetDimension                ( unsigned short usDimension );
 
     CClientSound*           PlaySound2D                 ( const SString& strSound, bool bIsURL, bool bLoop );
+    CClientSound*           PlaySound2D                 ( void* pMemory, unsigned int uiLength, bool bLoop );
     CClientSound*           PlaySound3D                 ( const SString& strSound, bool bIsURL, const CVector& vecPosition, bool bLoop );
 
     void                    AddToList                   ( CClientSound* pSound );
