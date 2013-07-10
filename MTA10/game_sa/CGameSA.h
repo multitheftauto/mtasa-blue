@@ -130,6 +130,7 @@ public:
     inline CAERadioTrackManager     * GetAERadioTrackManager()  { DEBUG_TRACE("CAERadioTrackManager * GetAERadioTrackManager()");return m_pCAERadioTrackManager; };
     inline CAudioEngine             * GetAudioEngine()          { DEBUG_TRACE("CAudio     * GetAudioEngine()");return m_pAudioEngine; };
     inline CAudioEngine             * GetAudio()                { DEBUG_TRACE("CAudio     * GetAudioEngine()");return m_pAudioEngine; };
+    inline CAudioContainer          * GetAudioContainer()       { DEBUG_TRACE("CAudio     * GetAudioContainer()");return m_pAudioContainer; };
     inline CMenuManager             * GetMenuManager()          { DEBUG_TRACE("CMenuManager         * GetMenuManager()");return m_pMenuManager; };
     inline CText                    * GetText()                 { DEBUG_TRACE("CText                    * GetText()");return m_pText; };
     inline CStats                   * GetStats()                { DEBUG_TRACE("CStats                   * GetStats()");return m_pStats; };
@@ -277,6 +278,7 @@ private:
     CTheCarGenerators           * m_pTheCarGenerators;
     CAERadioTrackManager        * m_pCAERadioTrackManager;
     CAudioEngine                * m_pAudioEngine;
+    CAudioContainer             * m_pAudioContainer;
     CMenuManager                * m_pMenuManager;
     CText                       * m_pText;
     CStats                      * m_pStats;

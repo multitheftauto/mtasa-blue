@@ -306,6 +306,7 @@ public:
     static bool                         SetWorldSoundEnabled                ( uint uiGroup, uint uiIndex, bool bMute );
     static bool                         IsWorldSoundEnabled                 ( uint uiGroup, uint uiIndex, bool& bOutMute );
     static bool                         ResetWorldSounds                    ( void );
+    static bool                         PlaySFX                             ( CResource* pResource, int iContainerIndex, int iBankIndex, int iAudioIndex, bool bLoop, CClientSound*& outSound );
 
     // Blip funcs
     static CClientRadarMarker*          CreateBlip                          ( CResource& Resource, const CVector& vecPosition, unsigned char ucIcon, unsigned char ucSize, const SColor color, short sOrdering, unsigned short usVisibleDistance );

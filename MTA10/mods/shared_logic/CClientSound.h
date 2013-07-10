@@ -35,6 +35,7 @@ public:
     eClientEntityType       GetType                 ( void ) const                      { return CCLIENTSOUND; }
 
     bool                    Play                    ( const SString& strPath, bool bLoop );
+    bool                    Play                    ( void* pMemory, unsigned int uiLength, bool bLoop );
     bool                    Play3D                  ( const SString& strPath, bool bLoop );
     void                    PlayStream              ( const SString& strURL, bool bLoop, bool b3D = false );
 
@@ -110,6 +111,8 @@ private:
     bool        m_b3D;
     SString     m_strPath;
     bool        m_bLoop;
+    void*       m_pBuffer;
+    unsigned int m_uiBufferLength;
 
     // Info
     bool        m_bDoneCreate;

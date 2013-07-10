@@ -132,6 +132,17 @@ CClientSound* CClientSoundManager::PlaySound2D ( const SString& strSound, bool b
     return NULL;
 }
 
+CClientSound* CClientSoundManager::PlaySound2D ( void* pMemory, unsigned int uiLength, bool bLoop )
+{
+    CClientSound* pSound = new CClientSound ( m_pClientManager, INVALID_ELEMENT_ID );
+
+    if ( pSound->Play ( pMemory, uiLength, bLoop ) )
+        return pSound;
+
+    delete pSound;
+    return NULL;
+}
+
 CClientSound* CClientSoundManager::PlaySound3D ( const SString& strSound, bool bIsURL, const CVector& vecPosition, bool bLoop )
 {
     CClientSound* pSound = new CClientSound ( m_pClientManager, INVALID_ELEMENT_ID );
