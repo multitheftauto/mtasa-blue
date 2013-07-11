@@ -137,7 +137,7 @@ bool CAudioContainerSA::GetRawAudioData ( eAudioLookupIndex lookupIndex, int ban
     iSampleRateOut = audioEntry->sampleRate;
 
     // Seek to the correct offset and read
-    archive.seekg ( lookupEntry->offset + audioEntry->offset );
+    archive.seekg ( lookupEntry->offset + sizeof(SAudioBankHeaderSA) + audioEntry->offset ); // Or just archive.seekg ( archive.tellg() + audioEntry->offset )
     return archive.read(reinterpret_cast<char*> ( buffer ), rawLength ) != NULL;
 }
 
