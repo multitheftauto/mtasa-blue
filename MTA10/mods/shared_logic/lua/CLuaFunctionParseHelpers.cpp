@@ -384,6 +384,13 @@ IMPLEMENT_ENUM_BEGIN ( eAudioLookupIndex )
     ADD_ENUM ( AUDIO_LOOKUP_SPC_PA, "spc_pa" )
 IMPLEMENT_ENUM_END ( "audio-lookup-index" )
 
+IMPLEMENT_ENUM_BEGIN ( eAspectRatio )
+    ADD_ENUM ( ASPECT_RATIO_AUTO, "auto" )
+    ADD_ENUM ( ASPECT_RATIO_4_3, "4:3" )
+    ADD_ENUM ( ASPECT_RATIO_16_10, "16:10" )
+    ADD_ENUM ( ASPECT_RATIO_16_9, "16:9" )
+IMPLEMENT_ENUM_END ( "aspectratio" )
+
 
 //
 // Get best guess at name of userdata type

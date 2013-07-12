@@ -728,6 +728,8 @@ void CRenderItemManager::GetDxStatus ( SDxStatus& outStatus )
     outStatus.settings.bGrassEffect = false;
     outStatus.settings.bHeatHaze = false;
     outStatus.settings.iAnisotropicFiltering = 0;
+    outStatus.settings.aspectRatio = gameSettings->GetAspectRatio ();
+    outStatus.settings.bHUDMatchAspectRatio = true;
 
     CVARS_GET ( "streaming_memory",     outStatus.settings.iStreamingMemory );
     CVARS_GET ( "display_windowed",     outStatus.settings.bWindowed );
@@ -736,6 +738,7 @@ void CRenderItemManager::GetDxStatus ( SDxStatus& outStatus )
     CVARS_GET ( "grass",                outStatus.settings.bGrassEffect );
     CVARS_GET ( "heat_haze",            outStatus.settings.bHeatHaze );
     CVARS_GET ( "anisotropic",          outStatus.settings.iAnisotropicFiltering );
+    CVARS_GET ( "hud_match_aspect_ratio", outStatus.settings.bHUDMatchAspectRatio );
 
     if ( outStatus.settings.iFXQuality == 0 )
     {

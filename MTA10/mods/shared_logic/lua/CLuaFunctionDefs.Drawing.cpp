@@ -932,7 +932,7 @@ int CLuaFunctionDefs::dxGetStatus ( lua_State* luaVM )
         SDxStatus dxStatus;
         g_pCore->GetGraphics ()->GetRenderItemManager ()->GetDxStatus ( dxStatus );
 
-        lua_createtable ( luaVM, 0, 21 );
+        lua_createtable ( luaVM, 0, 23 );
 
         lua_pushstring ( luaVM, "TestMode" );
         lua_pushstring ( luaVM, EnumToString ( dxStatus.testMode ) );
@@ -1016,6 +1016,14 @@ int CLuaFunctionDefs::dxGetStatus ( lua_State* luaVM )
 
         lua_pushstring ( luaVM, "SettingAntiAliasing" );
         lua_pushnumber ( luaVM, dxStatus.settings.iAntiAliasing );
+        lua_settable   ( luaVM, -3 );
+
+        lua_pushstring ( luaVM, "SettingAspectRatio" );
+        lua_pushstring ( luaVM, EnumToString ( dxStatus.settings.aspectRatio ) );
+        lua_settable   ( luaVM, -3 );
+
+        lua_pushstring ( luaVM, "SettingHUDMatchAspectRatio" );
+        lua_pushboolean( luaVM, dxStatus.settings.bHUDMatchAspectRatio );
         lua_settable   ( luaVM, -3 );
 
         return 1;
