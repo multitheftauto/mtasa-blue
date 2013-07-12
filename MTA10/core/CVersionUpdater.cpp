@@ -2880,6 +2880,25 @@ int CVersionUpdater::DoSendDownloadRequestToNextServer ( void )
     SString strUpdateBuildType;
     CVARS_GET ( "update_build_type", strUpdateBuildType );
 
+    // Supercode to determine if sound files have been cut
+    static SString strSoundCut = "u";
+    if ( strSoundCut == "u" )
+    {
+        SString strGTARootDir;
+        CFilePathTranslator().GetGTARootDirectory( strGTARootDir );
+        if ( FILE* fh = fopen( PathJoin( strGTARootDir, "audio", "SFX", "SPC_EA" ), "rb" ) )
+        {
+            strSoundCut = "y";
+            fseek( fh, 0x38BDC80, SEEK_SET );
+            for ( uint i = 0 ; i < 20 ; i++ )
+                if ( fgetc( fh ) )
+                    strSoundCut = "n";  // Non-zero found
+            if ( ferror( fh ) )
+                strSoundCut = "e";      // File error
+            fclose( fh );
+        }
+    }
+
     // Compile some system stats
     SDxStatus dxStatus;
     g_pGraphics->GetRenderItemManager ()->GetDxStatus ( dxStatus );
@@ -2918,6 +2937,7 @@ int CVersionUpdater::DoSendDownloadRequestToNextServer ( void )
     strQueryURL = strQueryURL.Replace ( "%SYS%", strSystemStats );
     strQueryURL = strQueryURL.Replace ( "%VID%", strVideoCard );
     strQueryURL = strQueryURL.Replace ( "%USAGE%", strConnectUsage );    
+    strQueryURL = strQueryURL.Replace ( "%SCUT%", strSoundCut );    
 
     // Perform the HTTP request
     m_HTTP.Get ( strQueryURL );
