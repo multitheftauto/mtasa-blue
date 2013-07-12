@@ -35,6 +35,7 @@ class CPixels;
 class CClientEntityBase;
 struct SShaderItemLayers;
 typedef CShaderItem CSHADERDUMMY;
+enum eAspectRatio;
 
 #define RDEFAULT            ((uint) -1)
 
@@ -111,6 +112,8 @@ struct SDxStatus
         bool            bHeatHaze;
         int             iAnisotropicFiltering;
         int             iAntiAliasing;
+        eAspectRatio    aspectRatio;
+        bool            bHUDMatchAspectRatio;
     } settings;
 };
 
