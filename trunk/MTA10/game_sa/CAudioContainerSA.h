@@ -42,6 +42,7 @@ struct SAudioEntrySA
     uint16 sampleRate;
     uint16 unknown2;
 };
+C_ASSERT ( sizeof ( SAudioEntrySA ) == 0xC );
 
 struct SAudioBankHeaderSA
 {
@@ -67,5 +68,6 @@ struct SRiffWavePCMHeader
     uint32 subchunk2Id; // big-endian // 36
     uint32 subchunk2Size; // 40
 }; // size = 44 = 0x2C
+C_ASSERT ( sizeof ( SRiffWavePCMHeader ) == 0x2C );
 
 #endif
