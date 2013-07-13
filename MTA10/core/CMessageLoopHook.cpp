@@ -203,14 +203,17 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage ( HWND hwnd,
                         // The mainmenu makes sure it isn't hidden if UseIngameButtons == false
                         if ( !CCore::GetSingleton().IsOfflineMod () )
                         {
-                            // Stop chat input
-                            if ( CLocalGUI::GetSingleton ().IsChatBoxInputEnabled () )
+                            if ( g_pCore->GetKeyBinds()->TriggerKeyStrokeHandler ( "escape", uMsg == WM_KEYDOWN ) )
                             {
-                                CLocalGUI::GetSingleton ().SetChatBoxInputEnabled ( false );
-                                return true;
-                            }
+                                // Stop chat input
+                                if ( CLocalGUI::GetSingleton ().IsChatBoxInputEnabled () )
+                                {
+                                    CLocalGUI::GetSingleton ().SetChatBoxInputEnabled ( false );
+                                    return true;
+                                }
 
-                            CLocalGUI::GetSingleton ().SetMainMenuVisible ( !CLocalGUI::GetSingleton ().IsMainMenuVisible () );
+                                CLocalGUI::GetSingleton ().SetMainMenuVisible ( !CLocalGUI::GetSingleton ().IsMainMenuVisible () );
+                            }
                             return true;
                         }
                     }

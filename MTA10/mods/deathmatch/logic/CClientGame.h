@@ -333,8 +333,8 @@ public:
 
     void                                SetAllDimensions                ( unsigned short usDimension );
 
-    static bool                         StaticKeyStrokeHandler          ( const SBindableKey * pKey, bool bState );
-    bool                                KeyStrokeHandler                ( const SBindableKey * pKey, bool bState );
+    static bool                         StaticKeyStrokeHandler          ( const SString strKey, bool bState );
+    bool                                KeyStrokeHandler                ( const SString strKey, bool bState );
     static bool                         StaticCharacterKeyHandler       ( WPARAM wChar );
     bool                                CharacterKeyHandler             ( WPARAM wChar );
 
@@ -758,6 +758,8 @@ private:
     uint                                m_uiAltPulseOrderCounter;
     SString                             m_strACInfo;
     std::set < uint >                   m_SentMessageIds;
+
+    bool                                m_bLastKeyWasEscape;
 };
 
 extern CClientGame* g_pClientGame;

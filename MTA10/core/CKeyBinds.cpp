@@ -351,10 +351,7 @@ bool CKeyBinds::ProcessKeyStroke ( const SBindableKey * pKey, bool bState )
     if ( pKey->iGTARelative == GTA_KEY_MSCROLLUP || pKey->iGTARelative == GTA_KEY_MSCROLLDOWN )
         m_bMouseWheel = true;
 
-    bool bCancelled = false;
-
-    // Call the key-stroke handler if we have one
-    if ( m_KeyStrokeHandler ) bCancelled = !m_KeyStrokeHandler ( pKey, bState );
+    bool bAllowed = TriggerKeyStrokeHandler ( pKey->szKey, bState );
 
     // Search through binds
     bool bFound = false;
@@ -376,7 +373,7 @@ bool CKeyBinds::ProcessKeyStroke ( const SBindableKey * pKey, bool bState )
             {
                 case KEY_BIND_GTA_CONTROL:
                 {
-                    if ( bCancelled == false )
+                    if ( bAllowed )
                     {
                         if ( !bState || ( !bInputGoesToGUI && ( !m_pCore->IsCursorForcedVisible() || !m_pCore->IsCursorControlsToggled() ) ) )
                         {
@@ -407,7 +404,7 @@ bool CKeyBinds::ProcessKeyStroke ( const SBindableKey * pKey, bool bState )
                                     if ( !bInputGoesToGUI )
                                     {
                                         CCommandBind* pCommandBind = static_cast < CCommandBind* > ( pBind );
-                                        if ( bCancelled == false || strcmp ( pCommandBind->szCommand, "screenshot" ) == 0 )
+                                        if ( bAllowed || strcmp ( pCommandBind->szCommand, "screenshot" ) == 0 )
                                         {
                                             // HACK: call chatbox commands on the next frame to stop a translated WM_CHAR key to pop up                                            
                                             if ( strcmp ( pCommandBind->szCommand, "chatbox" ) == 0 )
@@ -446,7 +443,7 @@ bool CKeyBinds::ProcessKeyStroke ( const SBindableKey * pKey, bool bState )
                                 }
                                 case KEY_BIND_FUNCTION:
                                 {
-                                    if ( bCancelled == false )
+                                    if ( bAllowed )
                                     {
                                         CKeyFunctionBind* pFunctionBind = static_cast < CKeyFunctionBind* > ( pBind );
                                         if ( !bInputGoesToGUI || pFunctionBind->bIgnoreGUI )
@@ -2726,4 +2723,14 @@ bool CKeyBinds::IsFakeCtrl_L ( UINT message, WPARAM wParam, LPARAM lParam )
   
     /* Not a fake control left press/release */
     return FALSE;
+}
+
+bool CKeyBinds::TriggerKeyStrokeHandler ( const SString strKey, bool bState )
+{
+    // Call the key-stroke handler if we have one
+    if ( m_KeyStrokeHandler ) 
+    {
+        return m_KeyStrokeHandler ( strKey, bState );
+    }
+    return true;
 }

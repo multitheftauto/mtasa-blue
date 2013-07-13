@@ -329,6 +329,8 @@ CClientGame::CClientGame ( bool bLocalPlay )
     // Give a default value for the streaming memory
     if ( g_pCore->GetCVars()->Exists ( "streaming_memory" ) == false )
         g_pCore->GetCVars()->Set ( "streaming_memory", g_pCore->GetMaxStreamingMemory () );
+
+    m_bLastKeyWasEscape = false;
 }
 
 
@@ -2294,23 +2296,35 @@ void CClientGame::SetAllDimensions ( unsigned short usDimension )
 }
 
 
-bool CClientGame::StaticKeyStrokeHandler ( const SBindableKey * pKey, bool bState )
+bool CClientGame::StaticKeyStrokeHandler ( const SString strKey, bool bState )
 {
-    return g_pClientGame->KeyStrokeHandler ( pKey, bState );
+    return g_pClientGame->KeyStrokeHandler ( strKey, bState );
 }
 
 
-bool CClientGame::KeyStrokeHandler ( const SBindableKey * pKey, bool bState )
+bool CClientGame::KeyStrokeHandler ( const SString strKey, bool bState )
 {
     // Do we have a root yet?
-    if ( m_pRootEntity )
+    if ( m_pRootEntity && g_pCore->IsMenuVisible() == false )
     {
+        bool bAllow = true;
         // Call our key-stroke event
         CLuaArguments Arguments;
-        Arguments.PushString ( pKey->szKey );
+        Arguments.PushString ( strKey );
         Arguments.PushBoolean ( bState );
-        return m_pRootEntity->CallEvent ( "onClientKey", Arguments, false );
+        bAllow = m_pRootEntity->CallEvent ( "onClientKey", Arguments, false );
+        if ( bAllow == false && bState == true )
+        {
+            // Escape cannot be skipped twice... ever.
+            if ( m_bLastKeyWasEscape && strKey == "escape" )
+            {
+                bAllow = true;
+            }
+            m_bLastKeyWasEscape = strKey == "escape";
+        }
+        return bAllow;
     }
+    m_bLastKeyWasEscape = false;
     return true;
 }
 
