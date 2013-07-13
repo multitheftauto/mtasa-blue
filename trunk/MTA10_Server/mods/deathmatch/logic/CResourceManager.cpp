@@ -215,12 +215,13 @@ bool CResourceManager::Refresh ( bool bRefreshAll, const SString& strJustThisRes
         CLogger::LogPrintf ( "Resources: %d loaded, %d failed\n", m_uiResourceLoadedCount, m_uiResourceFailedCount );
     }
 
-    list < CResource* > ::iterator iter = m_resourcesToStartAfterRefresh.begin ();
-    for ( ; iter != m_resourcesToStartAfterRefresh.end (); iter++ )
+    // CResource::Start() might modify this list
+    while ( !m_resourcesToStartAfterRefresh.empty() )
     {
-        (*iter)->Start();
+        CResource* pResource = m_resourcesToStartAfterRefresh.front();
+        m_resourcesToStartAfterRefresh.pop_front();
+        pResource->Start();
     }
-    m_resourcesToStartAfterRefresh.clear();
 
     s_bNotFirstTime = true;
 
