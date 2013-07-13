@@ -23,7 +23,7 @@ struct SBindableKey;
 
 typedef void ( *KeyFunctionBindHandler ) ( CKeyFunctionBind* pBind );
 typedef void ( *ControlFunctionBindHandler ) ( CControlFunctionBind* pBind );
-typedef void ( *KeyStrokeHandler ) ( const SBindableKey * pKey, bool bState );
+typedef bool ( *KeyStrokeHandler ) ( const SBindableKey * pKey, bool bState );
 typedef bool ( *CharacterKeyHandler ) ( WPARAM wChar );
  
 enum eKeyData
