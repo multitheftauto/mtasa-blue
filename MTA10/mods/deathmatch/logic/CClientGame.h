@@ -333,8 +333,8 @@ public:
 
     void                                SetAllDimensions                ( unsigned short usDimension );
 
-    static void                         StaticKeyStrokeHandler          ( const SBindableKey * pKey, bool bState );
-    void                                KeyStrokeHandler                ( const SBindableKey * pKey, bool bState );
+    static bool                         StaticKeyStrokeHandler          ( const SBindableKey * pKey, bool bState );
+    bool                                KeyStrokeHandler                ( const SBindableKey * pKey, bool bState );
     static bool                         StaticCharacterKeyHandler       ( WPARAM wChar );
     bool                                CharacterKeyHandler             ( WPARAM wChar );
 

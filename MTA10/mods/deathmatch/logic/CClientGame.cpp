@@ -2294,13 +2294,13 @@ void CClientGame::SetAllDimensions ( unsigned short usDimension )
 }
 
 
-void CClientGame::StaticKeyStrokeHandler ( const SBindableKey * pKey, bool bState )
+bool CClientGame::StaticKeyStrokeHandler ( const SBindableKey * pKey, bool bState )
 {
-    g_pClientGame->KeyStrokeHandler ( pKey, bState );
+    return g_pClientGame->KeyStrokeHandler ( pKey, bState );
 }
 
 
-void CClientGame::KeyStrokeHandler ( const SBindableKey * pKey, bool bState )
+bool CClientGame::KeyStrokeHandler ( const SBindableKey * pKey, bool bState )
 {
     // Do we have a root yet?
     if ( m_pRootEntity )
@@ -2309,8 +2309,9 @@ void CClientGame::KeyStrokeHandler ( const SBindableKey * pKey, bool bState )
         CLuaArguments Arguments;
         Arguments.PushString ( pKey->szKey );
         Arguments.PushBoolean ( bState );
-        m_pRootEntity->CallEvent ( "onClientKey", Arguments, false );
+        return m_pRootEntity->CallEvent ( "onClientKey", Arguments, false );
     }
+    return true;
 }
 
 
