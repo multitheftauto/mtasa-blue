@@ -2707,7 +2707,7 @@ void CVersionUpdater::_ProcessCrashDumpQuery ( void )
     if ( m_JobInfo.downloadBuffer.size () == 0 )
         return;
 
-    SString strResponse ( &m_JobInfo.downloadBuffer[0], m_JobInfo.downloadBuffer.size () );
+    SStringX strResponse ( &m_JobInfo.downloadBuffer[0], m_JobInfo.downloadBuffer.size () );
 
     // Is the dump file wanted?
     if ( strResponse.BeginsWithI ( "yes" ) )
