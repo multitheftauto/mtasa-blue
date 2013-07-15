@@ -432,6 +432,7 @@ public:
     LUA_DECLARE ( IsWorldSoundEnabled );
     LUA_DECLARE ( ResetWorldSounds );
     LUA_DECLARE ( PlaySFX );
+    LUA_DECLARE ( PlaySFX3D );
 
     // Blip funcs
     LUA_DECLARE ( CreateBlip );

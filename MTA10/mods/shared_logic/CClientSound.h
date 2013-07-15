@@ -37,6 +37,7 @@ public:
     bool                    Play                    ( const SString& strPath, bool bLoop );
     bool                    Play                    ( void* pMemory, unsigned int uiLength, bool bLoop );
     bool                    Play3D                  ( const SString& strPath, bool bLoop );
+    bool                    Play3D                  ( void* pMemory, unsigned int uiLength, bool bLoop );
     void                    PlayStream              ( const SString& strURL, bool bLoop, bool b3D = false );
 
     void                    SetPaused               ( bool bPaused  );

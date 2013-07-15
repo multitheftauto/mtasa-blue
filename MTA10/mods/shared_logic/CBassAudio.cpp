@@ -67,13 +67,6 @@ CBassAudio::~CBassAudio ( void )
         m_pVars = NULL;
     }
 
-    // Free the buffer if sound has been loaded from memory
-    if ( m_pBuffer )
-    {
-        delete[] m_pBuffer;
-        m_pBuffer = NULL;
-    }
-
 #ifdef MTA_DEBUG // OutputDebugLine only works in debug mode!
     if ( m_bStream )
         OutputDebugLine ( "[Bass]        stream destroyed" );
