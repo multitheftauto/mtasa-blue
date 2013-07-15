@@ -34,6 +34,10 @@ public:
     CClientSound*           PlaySound2D                 ( const SString& strSound, bool bIsURL, bool bLoop );
     CClientSound*           PlaySound2D                 ( void* pMemory, unsigned int uiLength, bool bLoop );
     CClientSound*           PlaySound3D                 ( const SString& strSound, bool bIsURL, const CVector& vecPosition, bool bLoop );
+    CClientSound*           PlaySound3D                 ( void* pMemory, unsigned int uiLength, const CVector& vecPosition, bool bLoop );
+
+    CClientSound*           PlayGTASFX                  ( eAudioLookupIndex containerIndex, int iBankIndex, int iAudioIndex, bool bLoop = false );
+    CClientSound*           PlayGTASFX3D                ( eAudioLookupIndex containerIndex, int iBankIndex, int iAudioIndex, const CVector& vecPosition, bool bLoop = false );
 
     void                    AddToList                   ( CClientSound* pSound );
     void                    RemoveFromList              ( CClientSound* pSound );

@@ -37,6 +37,9 @@ CClientSound::~CClientSound ( void )
 {
     Destroy ();
     m_pSoundManager->RemoveFromList ( this );
+
+    delete m_pBuffer;
+    m_pBuffer = NULL;
 }
 
 
@@ -260,6 +263,20 @@ bool CClientSound::Play3D ( const SString& strPath, bool bLoop )
     m_bStream = false;
     m_b3D = true;
     m_strPath = strPath;
+    m_bLoop = bLoop;
+
+    BeginSimulationOfPlayPosition ();
+
+    return true;
+}
+
+
+bool CClientSound::Play3D ( void* pMemory, unsigned int uiLength, bool bLoop )
+{
+    m_bStream = false;
+    m_b3D = true;
+    m_pBuffer = pMemory;
+    m_uiBufferLength = uiLength;
     m_bLoop = bLoop;
 
     BeginSimulationOfPlayPosition ();

@@ -164,6 +164,55 @@ CClientSound* CClientSoundManager::PlaySound3D ( const SString& strSound, bool b
     return NULL;
 }
 
+CClientSound* CClientSoundManager::PlaySound3D ( void* pMemory, unsigned int uiLength, const CVector& vecPosition, bool bLoop )
+{
+    CClientSound* pSound = new CClientSound ( m_pClientManager, INVALID_ELEMENT_ID );
+
+    if ( pSound->Play3D ( pMemory, uiLength, bLoop ) )
+    {
+        pSound->SetPosition ( vecPosition );
+        return pSound;
+    }
+
+    delete pSound;
+    return NULL;
+
+}
+
+CClientSound* CClientSoundManager::PlayGTASFX ( eAudioLookupIndex containerIndex, int iBankIndex, int iAudioIndex, bool bLoop )
+{
+    void* pAudioData;
+    unsigned int uiAudioLength;
+
+    if ( !g_pGame->GetAudioContainer ()->GetAudioData ( containerIndex, iBankIndex, iAudioIndex, pAudioData, uiAudioLength ) )
+        return NULL;
+
+    CClientSound* pSound = PlaySound2D ( pAudioData, uiAudioLength, bLoop );
+    if ( pSound )
+    {
+        CGameSettings * gameSettings = g_pGame->GetSettings ();
+        pSound->SetVolume ( gameSettings->GetSFXVolume () / 255.0f );
+    }
+    return pSound;
+}
+
+CClientSound* CClientSoundManager::PlayGTASFX3D ( eAudioLookupIndex containerIndex, int iBankIndex, int iAudioIndex, const CVector& vecPosition, bool bLoop )
+{
+    void* pAudioData;
+    unsigned int uiAudioLength;
+
+    if ( !g_pGame->GetAudioContainer ()->GetAudioData ( containerIndex, iBankIndex, iAudioIndex, pAudioData, uiAudioLength ) )
+        return NULL;
+
+    CClientSound* pSound = PlaySound3D ( pAudioData, uiAudioLength, vecPosition, bLoop );
+    if ( pSound )
+    {
+        CGameSettings * gameSettings = g_pGame->GetSettings ();
+        pSound->SetVolume ( gameSettings->GetSFXVolume () / 255.0f );
+    }
+    return pSound;
+}
+
 int CClientSoundManager::GetFxEffectFromName ( const std::string& strEffectName )
 {
     std::map < std::string, int >::iterator it;

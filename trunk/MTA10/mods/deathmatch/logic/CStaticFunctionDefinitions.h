@@ -297,9 +297,7 @@ public:
     static bool                         CreateFire                          ( CVector& vecPosition, float fSize );
 
     // Audio funcs
-    static bool                         PlayMissionAudio                    ( const CVector& vecPosition, unsigned short usSound );
     static bool                         PlaySoundFrontEnd                   ( unsigned char ucSound );
-    static bool                         PreloadMissionAudio                 ( unsigned short usSound, unsigned short usSlot );
     static bool                         SetAmbientSoundEnabled              ( eAmbientSoundType eType, bool bMute );
     static bool                         IsAmbientSoundEnabled               ( eAmbientSoundType eType, bool& bOutMute );
     static bool                         ResetAmbientSounds                  ( void );
@@ -307,6 +305,7 @@ public:
     static bool                         IsWorldSoundEnabled                 ( uint uiGroup, uint uiIndex, bool& bOutMute );
     static bool                         ResetWorldSounds                    ( void );
     static bool                         PlaySFX                             ( CResource* pResource, eAudioLookupIndex containerIndex, int iBankIndex, int iAudioIndex, bool bLoop, CClientSound*& outSound );
+    static bool                         PlaySFX3D                           ( CResource* pResource, eAudioLookupIndex containerIndex, int iBankIndex, int iAudioIndex, const CVector& vecPosition, bool bLoop, CClientSound*& outSound );
     
     // Blip funcs
     static CClientRadarMarker*          CreateBlip                          ( CResource& Resource, const CVector& vecPosition, unsigned char ucIcon, unsigned char ucSize, const SColor color, short sOrdering, unsigned short usVisibleDistance );

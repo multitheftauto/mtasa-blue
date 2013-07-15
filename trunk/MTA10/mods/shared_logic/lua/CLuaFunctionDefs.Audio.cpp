@@ -1426,6 +1426,45 @@ int CLuaFunctionDefs::PlaySFX ( lua_State* luaVM )
 }
 
 
+int CLuaFunctionDefs::PlaySFX3D ( lua_State* luaVM )
+{
+//  sound playSFX3D ( string audioContainer, int bankIndex, int audioIndex, float posX, float posY, float posZ [, loop = false ] )
+    eAudioLookupIndex containerIndex; int iBankIndex; int iAudioIndex; CVector vecPosition; bool bLoop;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadEnumString ( containerIndex );
+    argStream.ReadNumber ( iBankIndex );
+    argStream.ReadNumber ( iAudioIndex );
+    argStream.ReadNumber ( vecPosition.fX );
+    argStream.ReadNumber ( vecPosition.fY );
+    argStream.ReadNumber ( vecPosition.fZ );
+    argStream.ReadBool ( bLoop, false );
+
+    if ( !argStream.HasErrors () )
+    {
+        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+        if ( pLuaMain )
+        {
+            CResource* pResource = pLuaMain->GetResource ();
+            if ( pResource )
+            {
+                CClientSound* pSound;
+                if ( CStaticFunctionDefinitions::PlaySFX3D ( pResource, containerIndex, iBankIndex, iAudioIndex, vecPosition, bLoop, pSound ) )
+                {
+                    lua_pushelement ( luaVM, pSound );
+                    return 1;
+                }
+            }
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
 int CLuaFunctionDefs::SetSoundPan ( lua_State* luaVM )
 {
 //  setSoundPan ( element theSound, float pan )
