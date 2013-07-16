@@ -202,5 +202,5 @@ void CProjectileInfoSA::SetTarget ( CEntity* pEntity )
 
 bool CProjectileInfoSA::IsActive ( void )
 {
-    return ( internalInterface->bProjectileActive == 1 );
+    return ( internalInterface->bProjectileActive == 1 && internalInterface->dwProjectileType != 0 );
 }

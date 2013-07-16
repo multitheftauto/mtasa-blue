@@ -37,9 +37,16 @@ CObjectSA::CObjectSA(CObjectSAInterface * objectInterface)
     this->SetInterface(objectInterface);
     m_ucAlpha = 255;
 
-    ResetScale ();
+    // Setup some flags
+    this->BeingDeleted = FALSE;
+    this->DoNotRemoveFromGame = FALSE;
 
-    CheckForGangTag ();
+    if ( m_pInterface )
+    {
+        ResetScale ();
+        CheckForGangTag ();
+        m_pInterface->bStreamingDontDelete = true;
+    }
 }
 
 CObjectSA::CObjectSA( DWORD dwModel, bool bBreakingDisabled )
