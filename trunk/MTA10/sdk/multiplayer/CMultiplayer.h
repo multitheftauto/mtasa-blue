@@ -72,6 +72,7 @@ typedef bool ( WaterCannonHitHandler ) ( class CVehicleSAInterface* pCannonVehic
 typedef void ( GameObjectDestructHandler ) ( CEntitySAInterface* pObject );
 typedef void ( GameVehicleDestructHandler ) ( CEntitySAInterface* pVehicle );
 typedef void ( GamePlayerDestructHandler ) ( CEntitySAInterface* pPlayer );
+typedef void ( GameProjectileDestructHandler ) ( CEntitySAInterface* pProjectile );
 typedef void ( GameModelRemoveHandler ) ( ushort usModelId );
 typedef void ( GameEntityRenderHandler ) ( CEntitySAInterface* pEntity );
 
@@ -179,6 +180,7 @@ public:
     virtual void                        SetGameObjectDestructHandler    ( GameObjectDestructHandler * pHandler ) = 0;
     virtual void                        SetGameVehicleDestructHandler   ( GameVehicleDestructHandler * pHandler ) = 0;
     virtual void                        SetGamePlayerDestructHandler    ( GamePlayerDestructHandler * pHandler ) = 0;
+    virtual void                        SetGameProjectileDestructHandler( GameProjectileDestructHandler * pHandler ) = 0;
     virtual void                        SetGameModelRemoveHandler       ( GameModelRemoveHandler * pHandler ) = 0;
     virtual void                        SetGameEntityRenderHandler      ( GameEntityRenderHandler * pHandler ) = 0;
 
