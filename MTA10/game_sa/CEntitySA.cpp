@@ -320,12 +320,7 @@ CMatrix * CEntitySA::GetMatrixInternal ( CMatrix * matrix )
 VOID CEntitySA::SetMatrix ( CMatrix * matrix )
 {
     DEBUG_TRACE("VOID CEntitySA::SetMatrix ( CMatrix * matrix )");
-    if ( (DWORD)m_pInterface->vtbl == VTBL_CPlaceable )
-    {
-        #pragma message(__LOC__ "(Cazomino05) Delete before release.")
-        CEntitySAInterface * pInterface = NULL;
-        pInterface->SetIsLowLodEntity();
-    }
+
     if ( m_pInterface->Placeable.matrix && matrix )
     {
         OnChangingPosition ( matrix->vPos );

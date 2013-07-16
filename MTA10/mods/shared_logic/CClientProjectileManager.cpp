@@ -57,13 +57,6 @@ void CClientProjectileManager::DoPulse ( void )
         {
             pProjectile->DoPulse ();
         }
-        else
-        {           
-            // Remove this projectile            
-            m_List.remove ( pProjectile );
-            pProjectile->m_bLinked = false;
-            pElementDeleter->Delete ( pProjectile );
-        }
     }
 }
 
