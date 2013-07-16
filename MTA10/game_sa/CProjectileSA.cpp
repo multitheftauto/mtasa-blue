@@ -28,7 +28,7 @@ CProjectileSA::CProjectileSA (CProjectileSAInterface* projectileInterface) : COb
 CProjectileSA::~CProjectileSA( )
 {
     DEBUG_TRACE("CProjectileSA::~CProjectileSA( )");
-    pGame->GetProjectileInfo ()->RemoveProjectile ( projectileInfo, this );
+
     this->BeingDeleted = true;
     /*
     //OutputDebugString("Attempting to destroy Object\n");
@@ -65,5 +65,5 @@ CProjectileSA::~CProjectileSA( )
 
 void CProjectileSA::Destroy() 
 {
-    delete this;
+    pGame->GetProjectileInfo ()->RemoveProjectile ( projectileInfo, this );
 }
