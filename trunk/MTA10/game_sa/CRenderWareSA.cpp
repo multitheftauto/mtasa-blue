@@ -339,6 +339,26 @@ void CRenderWareSA::ReplaceModel ( RpClump* pNew, unsigned short usModelID, DWOR
             RpClump* pNewClone = RpClumpClone ( pTemp );
             RpClumpDestroy ( pTemp );
 
+            // Calling CVehicleModelInfo::SetClump() allocates a new CVehicleStructure.
+            // So let's delete the old one first to avoid CPool<CVehicleStructure> depletion.
+            if ( dwFunc == FUNC_LoadVehicleModel )
+            {
+                CVehicleModelInfoSAInterface* pVehicleModelInfoInterface = (CVehicleModelInfoSAInterface*)pModelInfo->GetInterface ();
+                if ( pVehicleModelInfoInterface->pSomeInfo )
+                {
+                    DWORD dwDeleteFunc = FUNC_CVehicleStructure_delete;
+                    CVehicleStructure* pSomeInfo = pVehicleModelInfoInterface->pSomeInfo;
+                    __asm
+                    {
+                        mov     eax, pSomeInfo
+                        push    eax
+                        call    dwDeleteFunc
+                        add     esp, 4
+                    }
+                    pVehicleModelInfoInterface->pSomeInfo = NULL;
+                }
+            }
+
             // ModelInfo::SetClump
             CBaseModelInfoSAInterface* pModelInfoInterface = pModelInfo->GetInterface ();
             __asm

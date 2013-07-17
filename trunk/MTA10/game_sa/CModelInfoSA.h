@@ -63,6 +63,7 @@ class CPedModelInfoSAInterface;
 #define     FUNC_RequestVehicleUpgrade      0x408C70
 
 #define     FUNC_CVehicleModelInfo__GetNumRemaps        0x4C86B0
+#define     FUNC_CVehicleStructure_delete   0x4C9580
 
 #define     FUNC_SetColModel                0x4C4BC0
 #define     FUNC_AddPedModel                0x4c67a0
@@ -227,6 +228,8 @@ public:
     uint32          pad1;               // +32
     RpMaterial*     pPlateMaterial;     // +36
     char            plateText[8];       // +40
+    char            pad[44];
+    class CVehicleStructure* pSomeInfo; // +92
 };
 
 
