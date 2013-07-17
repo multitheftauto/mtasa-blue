@@ -4650,7 +4650,7 @@ void CClientGame::GamePlayerDestructHandler ( CEntitySAInterface* pPlayer )
 
 void CClientGame::GameProjectileDestructHandler ( CEntitySAInterface* pProjectile )
 {
-    CClientProjectile* pClientProjectile = DynamicCast < CClientProjectile > ( GetGameEntityXRefManager()->FindClientEntity( (CEntitySAInterface*)pProjectile ) );
+    CClientProjectile* pClientProjectile = m_pManager->GetProjectileManager ( )->Get ( pProjectile );
     CStaticFunctionDefinitions::DestroyElement( *pClientProjectile );
 }
 
