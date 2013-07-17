@@ -72,7 +72,9 @@ CClientProjectile::~CClientProjectile ( void )
     g_pClientGame->GetGameEntityXRefManager ()->RemoveEntityXRef ( this, m_pProjectile );
 
     // Make sure we're destroyed
-    Destroy ();
+    delete m_pProjectile;
+
+    m_pProjectile = NULL;
 
     // If our creator is getting destroyed, this should be null
     if ( m_pCreator )
