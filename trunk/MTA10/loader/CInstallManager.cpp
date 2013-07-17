@@ -414,6 +414,10 @@ SString CInstallManager::_ShowCrashFailDialog ( void )
     {
         strMessage += _("** The crash was caused by a graphics driver error **\n\n** Please update your graphics drivers **");
     }
+    else
+    {
+        strMessage += strReason;
+    }
 
     strMessage = strMessage.Replace ( "\r", "" ).Replace ( "\n", "\r\n" );
     SString strResult = ShowCrashedDialog ( g_hInstance, strMessage );

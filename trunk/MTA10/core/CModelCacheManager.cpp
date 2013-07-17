@@ -10,6 +10,13 @@
 #include "StdInc.h"
 #include "CModelCacheManager.h"
 
+#define WD_SECTION_PRELOAD_UPGRADES         "preload-upgrades"
+#define DIAG_PRELOAD_UPGRADES_SLOW          "diagnostics", "preloading-upgrades-slow"
+#define DIAG_PRELOAD_UPGRADE_ATTEMPT_ID     "diagnostics", "preloading-upgrade-attempt-id"
+#define DIAG_PRELOAD_UPGRADES_LOWEST_UNSAFE "diagnostics", "preloading-upgrades-lowest-unsafe"
+#define DIAG_PRELOAD_UPGRADES_HISCORE       "diagnostics", "preloading-upgrades-hiscore"
+#define DIAG_CRASH_EXTRA_MSG                "diagnostics", "last-crash-reason"
+
 namespace
 {
     struct SModelCacheInfo
@@ -144,13 +151,49 @@ void CModelCacheManagerImpl::PreLoad ( void )
         if ( CClientPedManager::IsValidWeaponModel ( i ) )
             AddModelRefCount ( i );
     }
-    m_pGame->GetStreaming()->LoadAllRequestedModels ( false );
 #endif
-    for ( uint i = 1000 ; i <= 1193 ; i++ )
-    {
-        AddModelRefCount ( i );
-    }
     m_pGame->GetStreaming()->LoadAllRequestedModels ( false );
+
+    // Get current limits
+    int bSlowMethod = GetApplicationSettingInt( DIAG_PRELOAD_UPGRADES_SLOW );
+    int iLowestUnsafeUpgrade = GetApplicationSettingInt( DIAG_PRELOAD_UPGRADES_LOWEST_UNSAFE );
+    SetApplicationSetting( DIAG_CRASH_EXTRA_MSG, "** AUTO FIXING CRASH (Step 1/2) **\n\n** Please continue and connect to a server **" );
+
+    // Crashed during previous PreLoad?
+    if ( WatchDogIsSectionOpen( WD_SECTION_PRELOAD_UPGRADES ) )
+    {
+        AddReportLog( 8545, SString( "PreLoad Upgrades - Crash detect - bSlowMethod:%d  iLowestUnsafeUpgrade:%d", bSlowMethod, iLowestUnsafeUpgrade ) );
+        iLowestUnsafeUpgrade = GetApplicationSettingInt( DIAG_PRELOAD_UPGRADE_ATTEMPT_ID );
+        bSlowMethod = 1;
+        SetApplicationSettingInt( DIAG_PRELOAD_UPGRADES_LOWEST_UNSAFE, iLowestUnsafeUpgrade );
+        SetApplicationSettingInt( DIAG_PRELOAD_UPGRADES_SLOW, bSlowMethod );
+        SetApplicationSetting( DIAG_CRASH_EXTRA_MSG, "** AUTO FIXING CRASH (Step 2/2) **\n\n** Please continue and connect to a server **" );
+    }
+
+    if ( iLowestUnsafeUpgrade == 0 )
+        iLowestUnsafeUpgrade = 1194;
+
+    // PreLoad upgrades
+    WatchDogBeginSection( WD_SECTION_PRELOAD_UPGRADES );
+    {
+        for ( int i = 1000 ; i < iLowestUnsafeUpgrade ; i++ )
+        {
+            if ( bSlowMethod )
+                SetApplicationSettingInt( DIAG_PRELOAD_UPGRADE_ATTEMPT_ID, i );
+            AddModelRefCount ( i );
+            if ( bSlowMethod )
+                m_pGame->GetStreaming()->LoadAllRequestedModels ( false );
+        }
+        m_pGame->GetStreaming()->LoadAllRequestedModels ( false );
+    }
+    WatchDogCompletedSection( WD_SECTION_PRELOAD_UPGRADES );
+    SetApplicationSetting( DIAG_CRASH_EXTRA_MSG, "" );
+
+    // Report if LowestUnsafeUpgrade has fallen
+    int iPrevHiScore = GetApplicationSettingInt( DIAG_PRELOAD_UPGRADES_HISCORE );
+    SetApplicationSettingInt( DIAG_PRELOAD_UPGRADES_HISCORE, iLowestUnsafeUpgrade );
+    if ( iPrevHiScore > iLowestUnsafeUpgrade )
+        AddReportLog( 8544, SString( "PreLoad Upgrades - LowestUnsafeUpgrade fallen from %d to %d", iPrevHiScore, iLowestUnsafeUpgrade ) );
 
     CTickCount deltaTicks = CTickCount::Now () - startTicks;
     OutputDebugLine ( SString ( "CModelCacheManagerImpl::PreLoad completed in %d ms", deltaTicks.ToInt () ) );
