@@ -4651,7 +4651,8 @@ void CClientGame::GamePlayerDestructHandler ( CEntitySAInterface* pPlayer )
 void CClientGame::GameProjectileDestructHandler ( CEntitySAInterface* pProjectile )
 {
     CClientProjectile* pClientProjectile = m_pManager->GetProjectileManager ( )->Get ( pProjectile );
-    CStaticFunctionDefinitions::DestroyElement( *pClientProjectile );
+    if ( pClientProjectile )
+        CStaticFunctionDefinitions::DestroyElement( *pClientProjectile );
 }
 
 void CClientGame::GameModelRemoveHandler ( ushort usModelId )
