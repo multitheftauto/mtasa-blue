@@ -257,6 +257,7 @@ CClientGame::CClientGame ( bool bLocalPlay )
     g_pMultiplayer->SetGameObjectDestructHandler( CClientGame::StaticGameObjectDestructHandler );
     g_pMultiplayer->SetGameVehicleDestructHandler( CClientGame::StaticGameVehicleDestructHandler );
     g_pMultiplayer->SetGamePlayerDestructHandler( CClientGame::StaticGamePlayerDestructHandler );
+    g_pMultiplayer->SetGameProjectileDestructHandler( CClientGame::StaticGameProjectileDestructHandler );
     g_pMultiplayer->SetGameModelRemoveHandler( CClientGame::StaticGameModelRemoveHandler );
     g_pMultiplayer->SetGameEntityRenderHandler( CClientGame::StaticGameEntityRenderHandler );
     g_pGame->SetPreWeaponFireHandler ( CClientGame::PreWeaponFire );
@@ -398,6 +399,7 @@ CClientGame::~CClientGame ( void )
     g_pMultiplayer->SetGameObjectDestructHandler( NULL );
     g_pMultiplayer->SetGameVehicleDestructHandler( NULL );
     g_pMultiplayer->SetGamePlayerDestructHandler( NULL );
+    g_pMultiplayer->SetGameProjectileDestructHandler( NULL );
     g_pMultiplayer->SetGameModelRemoveHandler( NULL );
     g_pMultiplayer->SetGameEntityRenderHandler( NULL );
     g_pGame->SetPreWeaponFireHandler ( NULL );
@@ -3650,6 +3652,11 @@ void CClientGame::StaticGamePlayerDestructHandler ( CEntitySAInterface* pPlayer 
     g_pClientGame->GamePlayerDestructHandler ( pPlayer );
 }
 
+void CClientGame::StaticGameProjectileDestructHandler ( CEntitySAInterface* pProjectile )
+{
+    g_pClientGame->GameProjectileDestructHandler ( pProjectile );
+}
+
 void CClientGame::StaticGameModelRemoveHandler ( ushort usModelId )
 {
     g_pClientGame->GameModelRemoveHandler ( usModelId );
@@ -4549,6 +4556,12 @@ void CClientGame::GameVehicleDestructHandler ( CEntitySAInterface* pVehicle )
 void CClientGame::GamePlayerDestructHandler ( CEntitySAInterface* pPlayer )
 {
     m_pGameEntityXRefManager->OnGameEntityDestruct ( pPlayer );
+}
+
+void CClientGame::GameProjectileDestructHandler ( CEntitySAInterface* pProjectile )
+{
+    CClientProjectile* pClientProjectile = DynamicCast < CClientProjectile > ( GetGameEntityXRefManager()->FindClientEntity( (CEntitySAInterface*)pProjectile ) );
+    CStaticFunctionDefinitions::DestroyElement( *pClientProjectile );
 }
 
 void CClientGame::GameModelRemoveHandler ( ushort usModelId )

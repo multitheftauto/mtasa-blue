@@ -25,7 +25,7 @@ CClientProjectile::CClientProjectile ( class CClientManager* pManager, CProjecti
     m_pManager = pManager;
     m_pProjectileManager = pManager->GetProjectileManager ();
     m_pProjectile = pProjectile;
-    m_pProjectileInfo = pProjectileInfo;   
+    m_pProjectileInfo = pProjectileInfo;
 
     SetTypeName ( "projectile" );
 
@@ -60,11 +60,17 @@ CClientProjectile::CClientProjectile ( class CClientManager* pManager, CProjecti
             default: break;
         }
     }
+
+    // Add XRef
+    g_pClientGame->GetGameEntityXRefManager ()->AddEntityXRef ( this, m_pProjectile );
 }
 
 
 CClientProjectile::~CClientProjectile ( void )
-{   
+{
+    // Remove XRef - needs to be done before Destroy or m_pProjectile is null
+    g_pClientGame->GetGameEntityXRefManager ()->RemoveEntityXRef ( this, m_pProjectile );
+
     // Make sure we're destroyed
     Destroy ();
 
@@ -153,7 +159,6 @@ void CClientProjectile::Destroy ( void )
     if ( m_pProjectile )
     {
         m_pProjectile->Destroy ();
-        m_pProjectile = NULL;
     }
 }
 
