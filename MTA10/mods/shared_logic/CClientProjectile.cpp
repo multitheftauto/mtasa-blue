@@ -65,11 +65,6 @@ CClientProjectile::CClientProjectile ( class CClientManager* pManager, CProjecti
 
 CClientProjectile::~CClientProjectile ( void )
 {
-    // Make sure we're destroyed
-    delete m_pProjectile;
-
-    m_pProjectile = NULL;
-
     // If our creator is getting destroyed, this should be null
     if ( m_pCreator )
     {
@@ -92,6 +87,11 @@ CClientProjectile::~CClientProjectile ( void )
     if ( m_pInitiateData ) delete m_pInitiateData;
 
     Unlink ();
+
+    // Make sure we're destroyed
+    delete m_pProjectile;
+
+    m_pProjectile = NULL;
 
     CClientEntityRefManager::RemoveEntityRefs ( 0, &m_pCreator, &m_pTarget, NULL );
 }
