@@ -11701,7 +11701,7 @@ int CLuaFunctionDefinitions::BanPlayer ( lua_State* luaVM )
     CPlayer* pPlayer;
     SString strResponsible;
     SString strReason;
-    CPlayer* pResponsible;
+    CPlayer* pResponsible = NULL;
     
     bool bIP;
     bool bUsername;
@@ -11725,9 +11725,15 @@ int CLuaFunctionDefinitions::BanPlayer ( lua_State* luaVM )
         argStream.ReadString(strResponsible, "Console");
 
     argStream.ReadString(strReason, "");
-    argStream.ReadNumber(tUnban, 0);
 
-
+    if ( argStream.NextIsString() )
+    {
+        SString strTime;
+        argStream.ReadString(strTime);
+        tUnban = atoi(strTime);
+    }
+    else
+        argStream.ReadNumber(tUnban, 0);
 
     if ( !argStream.HasErrors () )
     {
@@ -11753,10 +11759,8 @@ int CLuaFunctionDefinitions::AddBan ( lua_State* luaVM )
     SString strUsername    = "";
     SString strSerial      = "";
     SString strResponsible = "Console";
-    CPlayer * pResponsible; 
+    CPlayer * pResponsible = NULL; 
     SString strReason      = "";
-
-
     time_t tUnban;
 
 
@@ -11764,7 +11768,6 @@ int CLuaFunctionDefinitions::AddBan ( lua_State* luaVM )
     argStream.ReadString(strIP, "");
     argStream.ReadString(strUsername, "");
     argStream.ReadString(strSerial, "");
-    argStream.ReadString(strIP, "");
     if (argStream.NextIsUserData())
     {
         argStream.ReadUserData(pResponsible, NULL);
@@ -11775,7 +11778,15 @@ int CLuaFunctionDefinitions::AddBan ( lua_State* luaVM )
         argStream.ReadString(strResponsible, "Console");
 
     argStream.ReadString(strReason, "");
-    argStream.ReadNumber(tUnban, 0);
+
+    if ( argStream.NextIsString() )
+    {
+        SString strTime;
+        argStream.ReadString(strTime);
+        tUnban = atoi(strTime);
+    }
+    else
+        argStream.ReadNumber(tUnban, 0);
 
 
 
