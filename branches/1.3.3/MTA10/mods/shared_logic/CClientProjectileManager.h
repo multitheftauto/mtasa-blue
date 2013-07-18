@@ -29,6 +29,7 @@ public:
     void                            DoPulse                             ( void );
     void                            RemoveAll                           ( void );
     bool                            Exists                              ( CClientProjectile * pProjectile );
+    CClientProjectile*              Get                                 ( CEntitySAInterface * pProjectile );
 
     inline unsigned int             Count                               ( void )                                    { return static_cast < unsigned int > ( m_List.size () ); }
 

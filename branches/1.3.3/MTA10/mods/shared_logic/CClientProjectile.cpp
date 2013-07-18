@@ -60,19 +60,15 @@ CClientProjectile::CClientProjectile ( class CClientManager* pManager, CProjecti
             default: break;
         }
     }
-
-    // Add XRef
-    g_pClientGame->GetGameEntityXRefManager ()->AddEntityXRef ( this, m_pProjectile );
 }
 
 
 CClientProjectile::~CClientProjectile ( void )
 {
-    // Remove XRef - needs to be done before Destroy or m_pProjectile is null
-    g_pClientGame->GetGameEntityXRefManager ()->RemoveEntityXRef ( this, m_pProjectile );
-
     // Make sure we're destroyed
-    Destroy ();
+    delete m_pProjectile;
+
+    m_pProjectile = NULL;
 
     // If our creator is getting destroyed, this should be null
     if ( m_pCreator )
