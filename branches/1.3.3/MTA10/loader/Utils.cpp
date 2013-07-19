@@ -1221,7 +1221,13 @@ void HideD3dDllDialog ( void )
 ///////////////////////////////////////////////////////////////
 void ShowOptimusDialog( HINSTANCE hInstance )
 {
-    uint RadioButtons[] = { IDC_RADIO1, IDC_RADIO2, IDC_RADIO3, IDC_RADIO4 };
+    if ( GetApplicationSettingInt( "nvhacks", "optimus-dialog-skip" ) )
+    {
+        SetApplicationSettingInt( "nvhacks", "optimus-dialog-skip", 0 );
+        return;
+    }
+
+    uint RadioButtons[] = { IDC_RADIO1, IDC_RADIO2, IDC_RADIO3, IDC_RADIO4, IDC_RADIO5, IDC_RADIO6, IDC_RADIO7, IDC_RADIO8 };
 	// Create and show dialog
     if ( !hwndOptimusDialog )
     {
@@ -1232,7 +1238,7 @@ void ShowOptimusDialog( HINSTANCE hInstance )
         iOtherCode = IDC_BUTTON_HELP;
         hwndOptimusDialog = CreateDialog ( hInstance, MAKEINTRESOURCE(IDD_OPTIMUS_DIALOG), 0, DialogProc );
         uint uiStartupOption = GetApplicationSettingInt( "nvhacks", "optimus-startup-option" ) % NUMELMS( RadioButtons );
-        CheckRadioButton( hwndOptimusDialog, IDC_RADIO1, IDC_RADIO4, RadioButtons[ uiStartupOption ] );
+        CheckRadioButton( hwndOptimusDialog, IDC_RADIO1, IDC_RADIO8, RadioButtons[ uiStartupOption ] );
     }
     SetForegroundWindow ( hwndOptimusDialog );
     SetWindowPos ( hwndOptimusDialog, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE );
@@ -1252,6 +1258,11 @@ void ShowOptimusDialog( HINSTANCE hInstance )
         Sleep( 10 );
     }
 
+    if ( bOtherPressed )
+    {
+        BrowseToSolution ( "optimus-startup-option-help", TERMINATE_PROCESS );
+    }
+
 	// Process input
     uint uiStartupOption = 0;
     for ( ; uiStartupOption < NUMELMS( RadioButtons ) - 1 ; uiStartupOption++ )
@@ -1263,10 +1274,14 @@ void ShowOptimusDialog( HINSTANCE hInstance )
     SetApplicationSettingInt( "nvhacks", "optimus-startup-option", uiStartupOption );
     SetApplicationSettingInt( "nvhacks", "optimus-alt-startup", ( uiStartupOption & 1 ) ? 1 : 0 );
     SetApplicationSettingInt( "nvhacks", "optimus-rename-exe", ( uiStartupOption & 2 ) ? 1 : 0 );
+    SetApplicationSettingInt( "nvhacks", "optimus-export-enablement", ( uiStartupOption & 4 ) ? 0 : 1 );
 
-    if ( bOtherPressed )
+    if ( !GetInstallManager()->UpdateOptimusSymbolExport() )
     {
-        BrowseToSolution ( "optimus-startup-option-help", TERMINATE_PROCESS );
+        // Restart required to apply change because of permissions
+        SetApplicationSettingInt( "nvhacks", "optimus-dialog-skip", 1 );
+        ShellExecuteNonBlocking( "open", PathJoin ( GetMTASAPath ( false ), MTA_EXE_NAME ) );
+        TerminateProcess( GetCurrentProcess(), 0 );
     }
 }
 

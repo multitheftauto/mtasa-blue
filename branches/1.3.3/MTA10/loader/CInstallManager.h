@@ -27,6 +27,7 @@ public:
     void            RestoreSequencerFromSnapshot    ( const SString& strText );
     SString         GetSequencerSnapshot            ( void );
     SString         GetLauncherPathFilename         ( void );
+    bool            UpdateOptimusSymbolExport       ( void );
 
 protected:
     SString         _ShowCrashFailDialog            ( void );
