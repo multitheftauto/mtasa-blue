@@ -885,7 +885,7 @@ SString CInstallManager::_ProcessNvightmareChecks ( void )
         SString strGTAEXEPath = PathJoin( strGTAPath , MTA_GTAEXE_NAME );
 
         char bIsEUVersion = false;
-        bool bNeedsInstall = false;
+        bool bHasExportTable = true;
         bool bUnknownBytes = false;
         FILE* fh = fopen( strGTAEXEPath, "rb" );
         bool bFileError = ( fh == NULL );
@@ -907,7 +907,7 @@ SString CInstallManager::_ProcessNvightmareChecks ( void )
                 bFileError |=  ( fread( &buffer[0], row.uiDataSize, 1, fh ) != 1 );
 
                 if ( row.pOldData && memcmp( &buffer[0], row.pOldData, row.uiDataSize ) == 0 )
-                    bNeedsInstall = true;
+                    bHasExportTable = false;
                 else
                 if ( memcmp( &buffer[0], row.pNewData, row.uiDataSize ) != 0 )
                     bUnknownBytes = true;
@@ -921,41 +921,65 @@ SString CInstallManager::_ProcessNvightmareChecks ( void )
         if ( bUnknownBytes )
             WriteDebugEvent( "Nvightmare patch: Can not apply due to unknown file bytes" );
         else
-        if ( !bNeedsInstall )
-            WriteDebugEvent( "Nvightmare patch: Already applied" );
-        else
         {
-            WriteDebugEvent( "Nvightmare patch: Starting file update" );
-            // Change needed!
-            SetFileAttributes( strGTAEXEPath, FILE_ATTRIBUTE_NORMAL );
-            FILE* fh = fopen( strGTAEXEPath, "r+b" );
-            if ( !fh )
+            // Determine if change required
+            bool bReqExportTable = GetApplicationSettingInt( "nvhacks", "optimus-export-enablement" ) ? true : false;
+            if ( bReqExportTable == bHasExportTable )
             {
-                m_strAdminReason = _("Update graphics driver compliance");
-                return "fail";
+                if ( bReqExportTable )
+                    WriteDebugEvent( "Nvightmare patch: Already applied" );
             }
-
-            bool bFileError = false;
-            // Write patches
-            for ( uint i = 0 ; i < NUMELMS( datumList ) ; i++ )
-            {
-                const SDataumRow& row = datumList[ i ];
-                uint uiFileOffset = bIsEUVersion ? row.uiFileOffsetEU : row.uiFileOffsetUS;
-
-                if ( row.pOldData )
-                {
-                    bFileError |= ( fseek( fh, uiFileOffset, SEEK_SET ) != 0 );
-                    bFileError |= ( fwrite( row.pNewData, row.uiDataSize, 1, fh ) != 1 );
-                }
-            }
-            fclose ( fh );
-            if ( bFileError )
-                WriteDebugEvent( "Nvightmare patch: File update completed with file errors" );
             else
-                WriteDebugEvent( "Nvightmare patch: File update completed" );
+            {
+                WriteDebugEvent( SString( "Nvightmare patch: Changing HasExportTable to %d", bReqExportTable ) );
+                // Change needed!
+                SetFileAttributes( strGTAEXEPath, FILE_ATTRIBUTE_NORMAL );
+                FILE* fh = fopen( strGTAEXEPath, "r+b" );
+                if ( !fh )
+                {
+                    m_strAdminReason = _("Update graphics driver compliance");
+                    return "fail";
+                }
+
+                bool bFileError = false;
+                // Write patches
+                for ( uint i = 0 ; i < NUMELMS( datumList ) ; i++ )
+                {
+                    const SDataumRow& row = datumList[ i ];
+                    uint uiFileOffset = bIsEUVersion ? row.uiFileOffsetEU : row.uiFileOffsetUS;
+
+                    if ( row.pOldData )
+                    {
+                        bFileError |= ( fseek( fh, uiFileOffset, SEEK_SET ) != 0 );
+                        if ( bReqExportTable )
+                            bFileError |= ( fwrite( row.pNewData, row.uiDataSize, 1, fh ) != 1 );
+                        else
+                            bFileError |= ( fwrite( row.pOldData, row.uiDataSize, 1, fh ) != 1 );
+                    }
+                }
+                fclose ( fh );
+                if ( bFileError )
+                    WriteDebugEvent( "Nvightmare patch: File update completed with file errors" );
+                else
+                    WriteDebugEvent( "Nvightmare patch: File update completed" );
+            }
         }
     }
     return "ok";
+}
+
+
+//////////////////////////////////////////////////////////
+//
+// CInstallManager::UpdateOptimusSymbolExport
+//
+// Try to update NvightmareChecks
+// Return false if admin required
+//
+//////////////////////////////////////////////////////////
+bool CInstallManager::UpdateOptimusSymbolExport( void )
+{
+    return _ProcessNvightmareChecks() == "ok";
 }
 
 

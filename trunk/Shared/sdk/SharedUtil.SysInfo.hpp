@@ -23,6 +23,27 @@ using namespace std;
 
 namespace
 {
+    HRESULT CallConnectServer( IWbemLocator *pLoc,
+            /* [in] */ const BSTR strNetworkResource,
+            /* [in] */ const BSTR strUser,
+            /* [in] */ const BSTR strPassword,
+            /* [in] */ const BSTR strLocale,
+            /* [in] */ long lSecurityFlags,
+            /* [in] */ const BSTR strAuthority,
+            /* [in] */ IWbemContext *pCtx,
+            /* [out] */ IWbemServices **ppNamespace)
+    {
+        __try
+        {
+            return pLoc->ConnectServer(strNetworkResource, strUser, strPassword, strLocale, lSecurityFlags, strAuthority, pCtx, ppNamespace );
+        }
+        __except( GetExceptionCode() == 0xC000041D )
+        {
+            *ppNamespace = NULL;
+            return 0xC000041D;
+        }
+    }
+
     HRESULT CallNext( IEnumWbemClassObject* pEnumerator,
             /* [in] */ long lTimeout,
             /* [in] */ ULONG uCount,
@@ -121,7 +142,7 @@ bool SharedUtil::QueryWMI ( SQueryWMIResult& outResult, const SString& strQuery,
     // Connect to the root\cimv2 namespace with
     // the current user and obtain pointer pSvc
     // to make IWbemServices calls.
-    hres = pLoc->ConnectServer(
+    hres = CallConnectServer( pLoc,
          _bstr_t( "ROOT\\CIMV2" ), // Object path of WMI namespace
          NULL,                    // User name. NULL = current user
          NULL,                    // User password. NULL = current
