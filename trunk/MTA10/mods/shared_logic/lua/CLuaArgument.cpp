@@ -397,13 +397,9 @@ void CLuaArgument::Push ( lua_State* luaVM, CFastHashMap < CLuaArguments*, int >
                 break;
             }
 
+            case LUA_TUSERDATA:
             case LUA_TLIGHTUSERDATA:
             {
-                lua_pushlightuserdata ( luaVM, m_pUserData );
-            }
-
-            case LUA_TUSERDATA:
-            { // should make sure oop is enabled ?
                 lua_pushuserdata ( luaVM, m_pUserData );
                 break;
             }
