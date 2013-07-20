@@ -373,7 +373,10 @@ CClientEntity* CLuaArgument::GetElement ( void ) const
 
 void CLuaArgument::Push ( lua_State* luaVM, CFastHashMap < CLuaArguments*, int > * pKnownTables ) const
 {
-    // Got any type?
+    // WARNING:
+    // Stuff using this function is kinda unsafe, we expect
+    // it to successfully push something, when it actually may not,
+    // corrupting the Lua stack
     if ( m_iType != LUA_TNONE )
     {
         // Make sure the stack has enough room
@@ -395,6 +398,7 @@ void CLuaArgument::Push ( lua_State* luaVM, CFastHashMap < CLuaArguments*, int >
             }
 
             case LUA_TUSERDATA:
+            case LUA_TLIGHTUSERDATA:
             {
                 lua_pushuserdata ( luaVM, m_pUserData );
                 break;
