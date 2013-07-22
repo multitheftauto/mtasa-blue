@@ -855,7 +855,6 @@ namespace
                               0x74670000, 0x61735f61, 0x6578652e, 0x00000000,   //  ..gta_sa.exe....
                               0x00000000, 0x4e000000, 0x74704f76, 0x73756d69,   //  .......NvOptimus
                               0x62616e45, 0x656d656c, 0x0000746e, 0x00000000 }; //  Enablement......
-    uint newExportValue[] = { 0x00000001 };
 
     C_ASSERT( sizeof( oldExportDir ) == sizeof( newExportDir ) );
     C_ASSERT( sizeof( oldExportTable ) == sizeof( newExportTable ) );
@@ -871,9 +870,12 @@ namespace
 
     // List of patchlets
     SDataumRow datumList[] = {
-                    { 0x004C4588, 0x004C4988, NULL,             newExportValue, sizeof( newExportValue ), },
                     { 0x004A1AD0, 0x004A1ED0, oldExportTable,   newExportTable, sizeof( newExportTable ), },
                     { 0x000000F8, 0x000000F8, oldExportDir,     newExportDir,   sizeof( newExportDir ), },
+                };
+
+    SDataumRow valueItem = {
+                    0x004C4588, 0x004C4988, NULL, NULL, 0
                 };
 }
 
@@ -886,6 +888,7 @@ SString CInstallManager::_ProcessNvightmareChecks ( void )
 
         char bIsEUVersion = false;
         bool bHasExportTable = true;
+        uint uiExportValue = 0;
         bool bUnknownBytes = false;
         FILE* fh = fopen( strGTAEXEPath, "rb" );
         bool bFileError = ( fh == NULL );
@@ -906,11 +909,17 @@ SString CInstallManager::_ProcessNvightmareChecks ( void )
                 std::vector < char > buffer( row.uiDataSize );
                 bFileError |=  ( fread( &buffer[0], row.uiDataSize, 1, fh ) != 1 );
 
-                if ( row.pOldData && memcmp( &buffer[0], row.pOldData, row.uiDataSize ) == 0 )
+                if ( memcmp( &buffer[0], row.pOldData, row.uiDataSize ) == 0 )
                     bHasExportTable = false;
                 else
                 if ( memcmp( &buffer[0], row.pNewData, row.uiDataSize ) != 0 )
                     bUnknownBytes = true;
+            }
+            // Determine export value
+            {
+                uint uiFileOffset = bIsEUVersion ? valueItem.uiFileOffsetEU : valueItem.uiFileOffsetUS;
+                bFileError |= ( fseek( fh, uiFileOffset, SEEK_SET ) != 0 );
+                bFileError |= ( fread( &uiExportValue, sizeof( uiExportValue ), 1, fh ) != 1 );
             }
             fclose ( fh );
         }
@@ -923,15 +932,15 @@ SString CInstallManager::_ProcessNvightmareChecks ( void )
         else
         {
             // Determine if change required
-            bool bReqExportTable = GetApplicationSettingInt( "nvhacks", "optimus-export-enablement" ) ? true : false;
-            if ( bReqExportTable == bHasExportTable )
+            bool bReqExportTable = GetApplicationSettingInt( "nvhacks", "optimus" ) ? true : false;
+            uint uiReqExportValue = GetApplicationSettingInt( "nvhacks", "optimus-export-enablement" ) ? 1 : 0;
+            if ( bReqExportTable == bHasExportTable && uiReqExportValue == uiExportValue )
             {
                 if ( bReqExportTable )
-                    WriteDebugEvent( "Nvightmare patch: Already applied" );
+                    WriteDebugEvent( SString( "Nvightmare patch:  Already applied ExportValue of %d", uiReqExportValue ) );
             }
             else
             {
-                WriteDebugEvent( SString( "Nvightmare patch: Changing HasExportTable to %d", bReqExportTable ) );
                 // Change needed!
                 SetFileAttributes( strGTAEXEPath, FILE_ATTRIBUTE_NORMAL );
                 FILE* fh = fopen( strGTAEXEPath, "r+b" );
@@ -943,13 +952,14 @@ SString CInstallManager::_ProcessNvightmareChecks ( void )
 
                 bool bFileError = false;
                 // Write patches
-                for ( uint i = 0 ; i < NUMELMS( datumList ) ; i++ )
+                if ( bReqExportTable != bHasExportTable )
                 {
-                    const SDataumRow& row = datumList[ i ];
-                    uint uiFileOffset = bIsEUVersion ? row.uiFileOffsetEU : row.uiFileOffsetUS;
-
-                    if ( row.pOldData )
+                    WriteDebugEvent( SString( "Nvightmare patch: Changing HasExportTable to %d", bReqExportTable ) );
+                    for ( uint i = 0 ; i < NUMELMS( datumList ) ; i++ )
                     {
+                        const SDataumRow& row = datumList[ i ];
+                        uint uiFileOffset = bIsEUVersion ? row.uiFileOffsetEU : row.uiFileOffsetUS;
+
                         bFileError |= ( fseek( fh, uiFileOffset, SEEK_SET ) != 0 );
                         if ( bReqExportTable )
                             bFileError |= ( fwrite( row.pNewData, row.uiDataSize, 1, fh ) != 1 );
@@ -957,6 +967,15 @@ SString CInstallManager::_ProcessNvightmareChecks ( void )
                             bFileError |= ( fwrite( row.pOldData, row.uiDataSize, 1, fh ) != 1 );
                     }
                 }
+                // Write value
+                if ( uiReqExportValue != uiExportValue )
+                {
+                    WriteDebugEvent( SString( "Nvightmare patch: Changing ExportValue to %d", uiReqExportValue ) );
+                    uint uiFileOffset = bIsEUVersion ? valueItem.uiFileOffsetEU : valueItem.uiFileOffsetUS;
+                    bFileError |= ( fseek( fh, uiFileOffset, SEEK_SET ) != 0 );
+                    bFileError |= ( fwrite( &uiReqExportValue, sizeof( uiReqExportValue ), 1, fh ) != 1 );
+                }
+
                 fclose ( fh );
                 if ( bFileError )
                     WriteDebugEvent( "Nvightmare patch: File update completed with file errors" );

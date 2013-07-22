@@ -1238,7 +1238,9 @@ void ShowOptimusDialog( HINSTANCE hInstance )
         iOtherCode = IDC_BUTTON_HELP;
         hwndOptimusDialog = CreateDialog ( hInstance, MAKEINTRESOURCE(IDD_OPTIMUS_DIALOG), 0, DialogProc );
         uint uiStartupOption = GetApplicationSettingInt( "nvhacks", "optimus-startup-option" ) % NUMELMS( RadioButtons );
+        uint uiForceWindowed = GetApplicationSettingInt( "nvhacks", "optimus-force-windowed" );
         CheckRadioButton( hwndOptimusDialog, IDC_RADIO1, IDC_RADIO8, RadioButtons[ uiStartupOption ] );
+        CheckDlgButton( hwndOptimusDialog, IDC_CHECK_FORCE_WINDOWED, uiForceWindowed );
     }
     SetForegroundWindow ( hwndOptimusDialog );
     SetWindowPos ( hwndOptimusDialog, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE );
@@ -1270,11 +1272,13 @@ void ShowOptimusDialog( HINSTANCE hInstance )
         if ( IsDlgButtonChecked( hwndOptimusDialog, RadioButtons[ uiStartupOption ] ) == BST_CHECKED )
             break;
     }
+    uint uiForceWindowed = ( IsDlgButtonChecked( hwndOptimusDialog, IDC_CHECK_FORCE_WINDOWED ) == BST_CHECKED ) ? 1 : 0;
 
     SetApplicationSettingInt( "nvhacks", "optimus-startup-option", uiStartupOption );
     SetApplicationSettingInt( "nvhacks", "optimus-alt-startup", ( uiStartupOption & 1 ) ? 1 : 0 );
     SetApplicationSettingInt( "nvhacks", "optimus-rename-exe", ( uiStartupOption & 2 ) ? 1 : 0 );
     SetApplicationSettingInt( "nvhacks", "optimus-export-enablement", ( uiStartupOption & 4 ) ? 0 : 1 );
+    SetApplicationSettingInt( "nvhacks", "optimus-force-windowed", uiForceWindowed );
 
     if ( !GetInstallManager()->UpdateOptimusSymbolExport() )
     {
