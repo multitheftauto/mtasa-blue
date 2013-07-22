@@ -127,25 +127,27 @@ BEGIN
     PUSHBUTTON      "Show me the file",IDC_BUTTON_SHOW_DIR,61,209,67,14
 END
 
-IDD_OPTIMUS_DIALOG DIALOGEX 0, 0, 238, 228
+IDD_OPTIMUS_DIALOG DIALOGEX 0, 0, 238, 240
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
 CAPTION "MTA: San Andreas - Confusing options"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    DEFPUSHBUTTON   "OK",IDOK,171,207,50,14
+    DEFPUSHBUTTON   "OK",IDOK,171,219,50,14
     LTEXT           "NVidia Optimus detected!",IDC_STATIC,75,20,81,8,WS_DISABLED
-    CONTROL         " A - Standard NVidia",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,57,74,80,10
-    CONTROL         " B - Alternate NVidia",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,57,87,80,10
-    CONTROL         " C - Standard NVidia with exe rename",IDC_RADIO3,"Button",BS_AUTORADIOBUTTON,57,100,135,10
+    CONTROL         " A - Standard NVidia",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,58,60,80,10
+    CONTROL         " B - Alternate NVidia",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,58,73,80,10
+    CONTROL         " C - Standard NVidia with exe rename",IDC_RADIO3,"Button",BS_AUTORADIOBUTTON,58,86,135,10
     CONTROL         " D - Alternate NVidia with exe rename",IDC_RADIO4,
-                    "Button",BS_AUTORADIOBUTTON,57,113,136,10
-    CONTROL         " E - Standard Intel",IDC_RADIO5,"Button",BS_AUTORADIOBUTTON,57,126,75,10
-    CONTROL         " F - Alternate Intel",IDC_RADIO6,"Button",BS_AUTORADIOBUTTON,57,140,75,10
-    CONTROL         " G - Standard Intel with exe rename",IDC_RADIO7,"Button",BS_AUTORADIOBUTTON,57,153,131,10
-    CONTROL         " H - Alternate Intel with exe rename",IDC_RADIO8,"Button",BS_AUTORADIOBUTTON,57,166,131,10
-    PUSHBUTTON      "Help",IDC_BUTTON_HELP,15,207,50,14
+                    "Button",BS_AUTORADIOBUTTON,58,99,136,10
+    CONTROL         " E - Standard Intel",IDC_RADIO5,"Button",BS_AUTORADIOBUTTON,58,112,75,10
+    CONTROL         " F - Alternate Intel",IDC_RADIO6,"Button",BS_AUTORADIOBUTTON,58,126,75,10
+    CONTROL         " G - Standard Intel with exe rename",IDC_RADIO7,"Button",BS_AUTORADIOBUTTON,58,139,131,10
+    CONTROL         " H - Alternate Intel with exe rename",IDC_RADIO8,"Button",BS_AUTORADIOBUTTON,58,152,131,10
+    PUSHBUTTON      "Help",IDC_BUTTON_HELP,15,219,50,14
     CONTROL         "Try each option and see what works:",IDC_STATIC,"Static",SS_LEFTNOWORDWRAP | WS_GROUP,58,34,120,8
-    GROUPBOX        "",IDC_STATIC,37,57,163,133
+    GROUPBOX        "",IDC_STATIC,38,50,163,119
+    LTEXT           "If you get desperate, this might help:",IDC_STATIC,59,180,120,8
+    CONTROL         " Force windowed mode",IDC_CHECK_FORCE_WINDOWED,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,75,193,87,10
 END
 
 
@@ -186,7 +188,7 @@ BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 231
         TOPMARGIN, 7
-        BOTTOMMARGIN, 221
+        BOTTOMMARGIN, 233
     END
 END
 #endif    // APSTUDIO_INVOKED
