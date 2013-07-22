@@ -207,7 +207,7 @@ void CTileBatcher::Flush ( void )
         // Set vertex stream
         uint PrimitiveCount                 = m_Indices.size () / 3;
         const void* pIndexData              = &m_Indices[0];
-        uint NumVertices                    = m_Indices.size ();
+        uint NumVertices                    = m_Vertices.size ();
         const void* pVertexStreamZeroData   = &m_Vertices[0];
         uint VertexStreamZeroStride         = sizeof(SPDTVertex);
         m_pDevice->SetFVF ( SPDTVertex::FVF );
@@ -375,6 +375,8 @@ void CTileBatcher::AddTile ( float fX1, float fY1,
         m_fCurrentRotCenY = fRotCenY;
     }
 
+    uint uiBaseIndex = m_Vertices.size ();
+
     // Do quicker things if tessellation is not required
     if ( uiTessellationX == 1 && uiTessellationY == 1 )
     {
@@ -389,7 +391,6 @@ void CTileBatcher::AddTile ( float fX1, float fY1,
         WRITE_PDT_VERTEX( pVBuffer, fX2, fY2, 0, ulColor, fU2 , fV2 );
 
         // Make room for 6 more indices
-        uint uiBaseIndex = m_Indices.size ();
         m_Indices.resize ( m_Indices.size () + 6 );
         WORD* pIBuffer = &m_Indices[m_Indices.size () - 6];
 
@@ -439,7 +440,7 @@ void CTileBatcher::AddTile ( float fX1, float fY1,
 
             for ( uint x = 0 ; x < uiTessellationX ; x++ )
             {
-                WRITE_QUAD_INDICES( pIBuffer, uiRow0Base + x, uiRow1Base + x );
+                WRITE_QUAD_INDICES( pIBuffer, uiBaseIndex + uiRow0Base + x, uiBaseIndex + uiRow1Base + x );
             }
         }
     }
