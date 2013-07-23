@@ -28,6 +28,9 @@ public:
     // CRemoteMasterServer
     void                    Init                        ( const SString& strURL );
 protected:
+    bool                    CheckParsable               ( void );
+    bool                    CheckParsableVer0           ( void );
+    bool                    CheckParsableVer2           ( void );
     bool                    ParseListVer0               ( CServerListItemList& itemList );
     bool                    ParseListVer2               ( CServerListItemList& itemList );
     CServerListItem*        GetServerListItem           ( CServerListItemList& itemList, in_addr Address, ushort usGamePort );
@@ -130,11 +133,93 @@ bool CRemoteMasterServer::HasData ( void )
             m_strStage = "hasdata";
             m_Data = CBuffer ( buffer.GetData (), buffer.GetSize () );
             m_HTTP.Reset();
+            if ( !CheckParsable() )
+                m_strStage = "nogood";
         }
     }
 
     return m_strStage == "hasdata";
 }
+
+
+///////////////////////////////////////////////////////////////
+//
+// CRemoteMasterServer::CheckParsable
+//
+// Return true if data looks usable
+//
+///////////////////////////////////////////////////////////////
+bool CRemoteMasterServer::CheckParsable ( void )
+{
+    CBufferReadStream stream ( m_Data, true );
+
+    // Figure out which type of list it is
+    unsigned short usVersion = 0;
+    unsigned short usCount = 0;
+    stream.Read ( usCount );
+    if ( usCount == 0 )
+        stream.Read ( usVersion );
+
+    if ( usVersion == 0 )
+        return CheckParsableVer0 ();
+    else
+    if ( usVersion == 2 )
+        return CheckParsableVer2 ();
+    else
+        return false;
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CRemoteMasterServer::CheckParsableVer0
+//
+// Standard Game Monitor reply
+// Return true if data looks usable
+//
+///////////////////////////////////////////////////////////////
+bool CRemoteMasterServer::CheckParsableVer0 ( void )
+{
+    CBufferReadStream stream ( m_Data, true );
+
+    if ( stream.GetSize () < 2 )
+        return false;
+
+    unsigned short usCount = 0;
+    stream.Read ( usCount );
+
+    uint uiMinSize = 2 + usCount * 6;
+    uint uiMaxSize = uiMinSize + 128;
+
+    if ( stream.GetSize () < uiMinSize || stream.GetSize () > uiMaxSize )
+        return false;
+   
+    return true;
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CRemoteMasterServer::CheckParsableVer2
+//
+// Extended reply
+// Return true if data looks usable
+//
+///////////////////////////////////////////////////////////////
+bool CRemoteMasterServer::CheckParsableVer2 ( void )
+{
+    CBufferReadStream stream ( m_Data, true );
+
+    // Check EOF marker
+    stream.Seek ( stream.GetSize () - 4 );
+    uint uiEOFMarker = 0;
+    stream.Read ( uiEOFMarker );
+    if ( uiEOFMarker != 0x12345679 )
+        return false;
+
+    return true;
+}
+
 
 
 ///////////////////////////////////////////////////////////////
