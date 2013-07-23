@@ -932,8 +932,8 @@ SString CInstallManager::_ProcessNvightmareChecks ( void )
         else
         {
             // Determine if change required
-            bool bReqExportTable = GetApplicationSettingInt( "nvhacks", "optimus" ) ? true : false;
-            uint uiReqExportValue = GetApplicationSettingInt( "nvhacks", "optimus-export-enablement" ) ? 1 : 0;
+            bool bReqExportTable = GetApplicationSettingInt( "nvhacks", "optimus-export-enablement" ) ? true : false;
+            uint uiReqExportValue = 1;
             if ( bReqExportTable == bHasExportTable && uiReqExportValue == uiExportValue )
             {
                 if ( bReqExportTable )
