@@ -1718,6 +1718,10 @@ void CGraphics::DrawProgressMessage( bool bPreserveBackbuffer )
     const bool bWasInScene = true;
     bool bInScene = true;
 
+    // Check if disabled
+    if ( g_pCore->GetDiagnosticDebug() == EDiagnosticDebug::SPINNER_0000 )
+        return;
+
     //
     // Save stuff
     //

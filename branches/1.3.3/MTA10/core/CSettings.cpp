@@ -999,6 +999,7 @@ void CSettings::CreateGUI ( void )
     m_pDebugSettingCombo->AddItem ( "#6732 D3D" )->SetData ( (void*)EDiagnosticDebug::D3D_6732 );
     m_pDebugSettingCombo->AddItem ( "#0000 Log timing" )->SetData ( (void*)EDiagnosticDebug::LOG_TIMING_0000 );
     m_pDebugSettingCombo->AddItem ( "#0000 Joystick" )->SetData ( (void*)EDiagnosticDebug::JOYSTICK_0000 );
+    m_pDebugSettingCombo->AddItem ( "#0000 Spinner" )->SetData ( (void*)EDiagnosticDebug::SPINNER_0000 );
     m_pDebugSettingCombo->SetReadOnly ( true );
 
     m_pDebugSettingLabelInfo = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Select default always.\n(This setting is not saved)" ) );
