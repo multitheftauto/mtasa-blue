@@ -100,6 +100,7 @@ namespace SharedUtil
             LOG_TIMING_0000,
             JOYSTICK_0000,
             SPINNER_0000,
+            DEBUG_RESET_0000,
             MAX,
         };
     };
