@@ -5101,7 +5101,7 @@ void CPacketHandler::Packet_PedTask ( NetBitStreamInterface& bitStream )
                 return;
 
             CClientPed* pClientPedAttacker = g_pClientGame->m_pPlayerManager->Get( attackerID );
-            if ( !pSourcePlayer )
+            if ( !pClientPedAttacker )
                 return;
 
             pSourcePlayer->BeHit( pClientPedAttacker, (ePedPieceTypes)hitBodyPart, hitBodySide, weaponId );
