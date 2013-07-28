@@ -1654,12 +1654,15 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
             // Get the serial number from the packet source
             NetServerPlayerID p = Packet.GetSourceSocket ();
             SString strSerial;
+            SString strExtra;
             SString strPlayerVersion;
             {
                 SFixedString < 32 > strSerialTemp;
+                SFixedString < 64 > strExtraTemp;
                 SFixedString < 32 > strPlayerVersionTemp;
-                g_pNetServer->GetClientSerialAndVersion ( p, strSerialTemp, strPlayerVersionTemp );
+                g_pNetServer->GetClientSerialAndVersion ( p, strSerialTemp, strExtraTemp, strPlayerVersionTemp );
                 strSerial = SStringX ( strSerialTemp );
+                strExtra = SStringX ( strExtraTemp );
                 strPlayerVersion = SStringX ( strPlayerVersionTemp );
             }
 
@@ -1713,7 +1716,8 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
                                 pPlayer->SetGameVersion ( Packet.GetGameVersion () );
                                 pPlayer->SetMTAVersion ( Packet.GetMTAVersion () );
                                 pPlayer->SetSerialUser ( Packet.GetSerialUser () );
-                                pPlayer->SetSerial ( strSerial );
+                                pPlayer->SetSerial ( strSerial, 0 );
+                                pPlayer->SetSerial ( strExtra, 1 );
                                 pPlayer->SetPlayerVersion ( strPlayerVersion );
 
                                 // Check if client must update

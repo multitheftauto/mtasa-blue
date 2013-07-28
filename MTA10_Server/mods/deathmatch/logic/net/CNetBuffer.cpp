@@ -654,9 +654,9 @@ void CNetServerBuffer::ResendModPackets ( const NetServerPlayerID& playerID )
 // (To make non blocking, don't)
 //
 ///////////////////////////////////////////////////////////////////////////
-void CNetServerBuffer::GetClientSerialAndVersion ( const NetServerPlayerID& playerID, SFixedString < 32 >& strSerial, SFixedString < 32 >& strVersion )
+void CNetServerBuffer::GetClientSerialAndVersion ( const NetServerPlayerID& playerID, SFixedString < 32 >& strSerial, SFixedString < 64 >& strExtra, SFixedString < 32 >& strVersion )
 {
-    SGetClientSerialAndVersionArgs* pArgs = new SGetClientSerialAndVersionArgs ( playerID, strSerial, strVersion );
+    SGetClientSerialAndVersionArgs* pArgs = new SGetClientSerialAndVersionArgs ( playerID, strSerial, strExtra, strVersion );
     AddCommandAndWait ( pArgs );
 }
 
@@ -1045,6 +1045,7 @@ void CNetServerBuffer::ProcessCommand ( CNetJobData* pJobData )
 #define CALLREALNET1(func,t1,n1)                                          CALLPRE(func) m_pRealNetServer->func ( a.n1 ); CALLPOST
 #define CALLREALNET2(func,t1,n1,t2,n2)                                    CALLPRE(func) m_pRealNetServer->func ( a.n1, a.n2 ); CALLPOST
 #define CALLREALNET3(func,t1,n1,t2,n2,t3,n3)                              CALLPRE(func) m_pRealNetServer->func ( a.n1, a.n2, a.n3 ); CALLPOST
+#define CALLREALNET4(func,t1,n1,t2,n2,t3,n3,t4,n4)                        CALLPRE(func) m_pRealNetServer->func ( a.n1, a.n2, a.n3, a.n4 ); CALLPOST
 #define CALLREALNET5(func,t1,n1,t2,n2,t3,n3,t4,n4,t5,n5)                  CALLPRE(func) m_pRealNetServer->func ( a.n1, a.n2, a.n3, a.n4, a.n5 ); CALLPOST
 
 #define CALLREALNET0R(ret,func)                                           CALLPRE(func) a.result = m_pRealNetServer->func (); CALLPOST
@@ -1084,7 +1085,7 @@ void CNetServerBuffer::ProcessCommand ( CNetJobData* pJobData )
         CALLREALNET1R( bool,                InitServerId                    , const char*, szPath )
         CALLREALNET1 (                      SetEncryptionEnabled            , bool, bEncryptionEnabled )
         CALLREALNET1 (                      ResendModPackets                , const NetServerPlayerID&, playerID )
-        CALLREALNET3 (                      GetClientSerialAndVersion       , const NetServerPlayerID&, playerID, SFixedString < 32 >&, strSerial, SFixedString < 32 >&, strVersion )
+        CALLREALNET4 (                      GetClientSerialAndVersion       , const NetServerPlayerID&, playerID, SFixedString < 32 >&, strSerial, SFixedString < 64 >&, strExtra, SFixedString < 32 >&, strVersion )
         CALLREALNET1 (                      SetNetOptions                   , const SNetOptions&, options )
         CALLREALNET2 (                      GenerateRandomData              , void*, pOutData, uint, uiLength )
 
