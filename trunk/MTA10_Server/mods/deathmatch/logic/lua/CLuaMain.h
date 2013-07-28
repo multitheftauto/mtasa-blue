@@ -42,13 +42,7 @@ struct CRefInfo
 class CLuaMain //: public CClient
 {
 public:
-    enum
-    {
-        OWNER_SERVER,
-        OWNER_MAP,
-    };
-
-public:
+    ZERO_ON_NEW
                                     CLuaMain                ( class CLuaManager* pLuaManager,
                                                               CObjectManager* pObjectManager,
                                                               CPlayerManager* pPlayerManager,
@@ -58,9 +52,6 @@ public:
                                                               CMapManager* pMapManager,
                                                               CResource* pResourceOwner );
                                     ~CLuaMain               ( void );
-
-    inline int                      GetOwner                ( void )                        { return m_iOwner; };
-    inline void                     SetOwner                ( int iOwner )                  { m_iOwner = iOwner; };
 
     bool                            LoadScriptFromBuffer    ( const char* cpBuffer, unsigned int uiSize, const char* szFileName );
     bool                            LoadScript              ( const char* szLUAScript );
@@ -126,7 +117,6 @@ private:
     static void                     InstructionCountHook    ( lua_State* luaVM, lua_Debug* pDebug );
 
     SString                         m_strScriptName;
-    int                             m_iOwner;
 
     lua_State*                      m_luaVM;
     CLuaTimerManager*               m_pLuaTimerManager;
