@@ -127,7 +127,7 @@ public:
     static bool                 GetPlayerNametagText                ( CPlayer* pPlayer, SString& strOutText );
     static bool                 GetPlayerNametagColor               ( CPlayer* pPlayer, unsigned char& ucR, unsigned char& ucG, unsigned char& ucB );
     static bool                 IsPlayerNametagShowing              ( CPlayer* pPlayer, bool& bShowing );
-    static const std::string&   GetPlayerSerial                     ( CPlayer* pPlayer );
+    static const std::string&   GetPlayerSerial                     ( CPlayer* pPlayer, uint uiIndex );
     static const std::string&   GetPlayerUserName                   ( CPlayer* pPlayer );
     static const std::string&   GetPlayerCommunityID                ( CPlayer* pPlayer );
     static bool                 GetPlayerBlurLevel                  ( CPlayer* pPlayer, unsigned char& ucLevel );

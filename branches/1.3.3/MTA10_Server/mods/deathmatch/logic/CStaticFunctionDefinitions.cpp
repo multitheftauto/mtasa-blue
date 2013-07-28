@@ -2895,11 +2895,11 @@ bool CStaticFunctionDefinitions::IsPlayerNametagShowing ( CPlayer* pPlayer, bool
 }
 
 
-const std::string& CStaticFunctionDefinitions::GetPlayerSerial ( CPlayer* pPlayer )
+const std::string& CStaticFunctionDefinitions::GetPlayerSerial ( CPlayer* pPlayer, uint uiIndex )
 {
     assert ( pPlayer );
 
-    return pPlayer->GetSerial ();
+    return pPlayer->GetSerial ( uiIndex );
 }
 
 

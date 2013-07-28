@@ -225,8 +225,8 @@ public:
     inline bool                                 IsNametagShowing            ( void )                        { return m_bNametagShowing; }
     inline void                                 SetNametagShowing           ( bool bShowing )               { m_bNametagShowing = bShowing; }
 
-    inline const std::string&                   GetSerial                   ( void )                        { return m_strSerial; }
-    inline void                                 SetSerial                   ( const std::string& strSerial ){ m_strSerial = strSerial; };
+    inline const std::string&                   GetSerial                   ( uint uiIndex = 0 )            { return m_strSerials[ uiIndex % NUMELMS( m_strSerials ) ]; }
+    inline void                                 SetSerial                   ( const std::string& strSerial, uint uiIndex ) { m_strSerials[ uiIndex % NUMELMS( m_strSerials ) ] = strSerial; }
 
     inline const std::string&                   GetSerialUser               ( void )                        { return m_strSerialUser; };
     inline void                                 SetSerialUser               ( const std::string& strUser )  { m_strSerialUser = strUser; };
@@ -417,7 +417,7 @@ private:
     unsigned char                               m_ucNametagB;
     bool                                        m_bNametagShowing;       
 
-    std::string                                 m_strSerial;
+    std::string                                 m_strSerials[ 2 ];
     std::string                                 m_strSerialUser;
     std::string                                 m_strCommunityID;
 

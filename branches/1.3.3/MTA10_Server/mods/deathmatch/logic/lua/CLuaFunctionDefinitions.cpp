@@ -2617,23 +2617,23 @@ int CLuaFunctionDefinitions::GetPedGravity ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::GetPlayerSerial ( lua_State* luaVM )
 {
-    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
+    CPlayer* pPlayer; uint uiIndex;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData( pPlayer );
+    argStream.ReadNumber( uiIndex, 0 );
+
+    if ( !argStream.HasErrors ( ) )
     {
-        CPlayer* pPlayer = lua_toplayer ( luaVM, 1 );
-        if ( pPlayer )
+        SString strSerial = CStaticFunctionDefinitions::GetPlayerSerial ( pPlayer, uiIndex );
+        if ( !strSerial.empty () )
         {
-            std::string strSerial = CStaticFunctionDefinitions::GetPlayerSerial ( pPlayer );
-            if ( !strSerial.empty () )
-            {
-                lua_pushstring ( luaVM, strSerial.c_str () );
-                return 1;
-            }
+            lua_pushstring ( luaVM, strSerial );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "player", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
