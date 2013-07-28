@@ -2534,14 +2534,15 @@ int CLuaFunctionDefinitions::GetPedGravity ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::GetPlayerSerial ( lua_State* luaVM )
 {
-    CPlayer* pPlayer;
+    CPlayer* pPlayer; uint uiIndex;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData(pPlayer);
+    argStream.ReadUserData( pPlayer );
+    argStream.ReadNumber( uiIndex, 0 );
 
     if ( !argStream.HasErrors ( ) )
     {
-        SString strSerial = CStaticFunctionDefinitions::GetPlayerSerial ( pPlayer );
+        SString strSerial = CStaticFunctionDefinitions::GetPlayerSerial ( pPlayer, uiIndex );
         if ( !strSerial.empty () )
         {
             lua_pushstring ( luaVM, strSerial );

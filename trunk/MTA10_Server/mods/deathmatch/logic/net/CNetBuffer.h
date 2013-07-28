@@ -102,7 +102,7 @@ public:
     virtual void                            SetEncryptionEnabled            ( bool bEncryptionEnabled );
     virtual void                            ResendModPackets                ( const NetServerPlayerID& playerID );
 
-    virtual void                            GetClientSerialAndVersion       ( const NetServerPlayerID& playerID, SFixedString < 32 >& strSerial, SFixedString < 32 >& strVersion );
+    virtual void                            GetClientSerialAndVersion       ( const NetServerPlayerID& playerID, SFixedString < 32 >& strSerial, SFixedString < 64 >& strExtra, SFixedString < 32 >& strVersion );
     virtual void                            SetNetOptions                   ( const SNetOptions& options );
     virtual void                            GenerateRandomData              ( void* pOutData, uint uiLength );
 
@@ -116,6 +116,7 @@ public:
     #define DECLARE_FUNC_ARGS1(func,t1,n1)                          DOTYPE(func) struct S##func##Args : SArgs { S##func##Args ( t1 n1 ) : n1(n1) {SETTYPE(func)} t1 n1; };
     #define DECLARE_FUNC_ARGS2(func,t1,n1,t2,n2)                    DOTYPE(func) struct S##func##Args : SArgs { S##func##Args ( t1 n1,t2 n2 ) : n1(n1), n2(n2) {SETTYPE(func)} t1 n1; t2 n2; };
     #define DECLARE_FUNC_ARGS3(func,t1,n1,t2,n2,t3,n3)              DOTYPE(func) struct S##func##Args : SArgs { S##func##Args ( t1 n1,t2 n2,t3 n3 ) : n1(n1), n2(n2), n3(n3) {SETTYPE(func)} t1 n1; t2 n2; t3 n3; };
+    #define DECLARE_FUNC_ARGS4(func,t1,n1,t2,n2,t3,n3,t4,n4)        DOTYPE(func) struct S##func##Args : SArgs { S##func##Args ( t1 n1,t2 n2,t3 n3,t4 n4 ) : n1(n1), n2(n2), n3(n3), n4(n4) {SETTYPE(func)} t1 n1; t2 n2; t3 n3; t4 n4; };
     #define DECLARE_FUNC_ARGS5(func,t1,n1,t2,n2,t3,n3,t4,n4,t5,n5)  DOTYPE(func) struct S##func##Args : SArgs { S##func##Args ( t1 n1,t2 n2,t3 n3,t4 n4,t5 n5 ) : n1(n1), n2(n2), n3(n3), n4(n4), n5(n5) {SETTYPE(func)} t1 n1; t2 n2; t3 n3; t4 n4; t5 n5; };
 
     #define DECLARE_FUNC_ARGS0R(ret,func)                                           DOTYPE(func) struct S##func##Args : SArgs { S##func##Args ( ) {SETTYPE(func)} ret result; };
@@ -150,7 +151,7 @@ public:
     DECLARE_FUNC_ARGS1R( bool,                  InitServerId                    , const char*, szPath );
     DECLARE_FUNC_ARGS1 (                        SetEncryptionEnabled            , bool, bEncryptionEnabled );
     DECLARE_FUNC_ARGS1 (                        ResendModPackets                , const NetServerPlayerIDRef, playerID );
-    DECLARE_FUNC_ARGS3 (                        GetClientSerialAndVersion       , const NetServerPlayerIDRef, playerID, SFixedString < 32 >&, strSerial, SFixedString < 32 >&, strVersion );
+    DECLARE_FUNC_ARGS4 (                        GetClientSerialAndVersion       , const NetServerPlayerIDRef, playerID, SFixedString < 32 >&, strSerial, SFixedString < 64 >&, strExtra, SFixedString < 32 >&, strVersion );
     DECLARE_FUNC_ARGS1 (                        SetNetOptions                   , const SNetOptions, options );
     DECLARE_FUNC_ARGS2 (                        GenerateRandomData              , void*, pOutData, uint, uiLength );
     DECLARE_FUNC_ARGS4R( bool,                  ProcessPacket                   , unsigned char, ucPacketID, const NetServerPlayerIDRef, Socket, NetBitStreamInterface*, BitStream, SNetExtraInfo*, pNetExtraInfo );

@@ -130,7 +130,7 @@ public:
     virtual void                            SetEncryptionEnabled            ( bool bEncryptionEnabled ) = 0;
     virtual void                            ResendModPackets                ( const NetServerPlayerID& playerID ) = 0;
 
-    virtual void                            GetClientSerialAndVersion       ( const NetServerPlayerID& playerID, SFixedString < 32 >& strSerial, SFixedString < 32 >& strVersion ) = 0;
+    virtual void                            GetClientSerialAndVersion       ( const NetServerPlayerID& playerID, SFixedString < 32 >& strSerial, SFixedString < 64 >& strExtra, SFixedString < 32 >& strVersion ) = 0;
     virtual void                            SetNetOptions                   ( const SNetOptions& options ) = 0;
     virtual void                            GenerateRandomData              ( void* pOutData, uint uiLength ) = 0;
     virtual bool                            EncryptDumpfile                 ( const char* szClearPathFilename, const char* szEncryptedPathFilename ) { return false; }
