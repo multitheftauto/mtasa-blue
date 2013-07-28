@@ -51,56 +51,48 @@ CLuaManager::~CLuaManager ( void )
     CLuaCFunctions::RemoveAllFunctions ();
 }
 
-void CLuaManager::StopScriptsOwnedBy ( int iOwner )
-{
-    // Delete all the scripts by the given owner
-    list < CLuaMain* > ::iterator iter = m_virtualMachines.begin ();
-    while ( iter != m_virtualMachines.end () )
-    {
-        if ( (*iter)->GetOwner () == iOwner )
-        {
-            // Delete the object
-            delete *iter;
-
-            // Remove from list
-            iter = m_virtualMachines.erase ( iter );
-        }
-        else
-            ++iter;
-    }
-}
-
 CLuaMain * CLuaManager::CreateVirtualMachine ( CResource* pResourceOwner, bool bEnableOOP )
 {
     // Create it and add it to the list over VM's
-    CLuaMain * vm = new CLuaMain ( this, pResourceOwner, bEnableOOP );
-    m_virtualMachines.push_back ( vm );
-    vm->InitVM ();
-    return vm;
+    CLuaMain * pLuaMain = new CLuaMain ( this, pResourceOwner, bEnableOOP );
+    m_virtualMachines.push_back ( pLuaMain );
+    pLuaMain->InitVM ();
+    return pLuaMain;
 }
 
 
-bool CLuaManager::RemoveVirtualMachine ( CLuaMain * vm )
+bool CLuaManager::RemoveVirtualMachine ( CLuaMain * pLuaMain )
 {
-    if ( vm )
+    if ( pLuaMain )
     {
         // Remove all events registered by it
-        m_pEvents->RemoveAllEvents ( vm );
-        m_pRegisteredCommands->CleanUpForVM ( vm );
+        m_pEvents->RemoveAllEvents ( pLuaMain );
+        m_pRegisteredCommands->CleanUpForVM ( pLuaMain );
 
         // Delete it unless it is already
-        if ( !vm->BeingDeleted () )
+        if ( !pLuaMain->BeingDeleted () )
         {
-            delete vm;
+            delete pLuaMain;
         }
 
         // Remove it from our list
-        if ( !m_virtualMachines.empty () ) m_virtualMachines.remove ( vm );
-
+        m_virtualMachines.remove ( pLuaMain );
         return true;
     }
 
     return false;
+}
+
+
+void CLuaManager::OnLuaMainOpenVM( CLuaMain* pLuaMain, lua_State* luaVM )
+{
+    MapSet( m_VirtualMachineMap, pLuaMain->GetVirtualMachine(), pLuaMain );
+}
+
+
+void CLuaManager::OnLuaMainCloseVM( CLuaMain* pLuaMain, lua_State* luaVM )
+{
+    MapRemove( m_VirtualMachineMap, pLuaMain->GetVirtualMachine() );
 }
 
 
@@ -134,61 +126,24 @@ CLuaMain* CLuaManager::GetVirtualMachine ( lua_State* luaVM )
         luaVM = main;
     }
 
-    // Find a matching VM in our list
+    // Find a matching VM in our map
+    CLuaMain* pLuaMain = MapFindRef( m_VirtualMachineMap, luaVM );
+    if ( pLuaMain )
+        return pLuaMain;
+
+    // Find a matching VM in our list (should not be needed)
     list < CLuaMain* >::const_iterator iter = m_virtualMachines.begin ();
     for ( ; iter != m_virtualMachines.end (); iter++ )
     {
         if ( luaVM == (*iter)->GetVirtualMachine () )
         {
+            dassert( 0 );   // Why not in map?
             return *iter;
         }
     }
 
     // Doesn't exist
     return NULL;
-}
-
-
-CLuaMain* CLuaManager::GetVirtualMachine ( const char* szFilename )
-{
-    assert ( szFilename );
-
-    // Find a matching VM in our list
-    list < CLuaMain* >::const_iterator iter = m_virtualMachines.begin ();
-    for ( ; iter != m_virtualMachines.end (); iter++ )
-    {
-        if ( strcmp ( szFilename, (*iter)->GetScriptName () ) == 0 )
-        {
-            return *iter;
-        }
-    }
-
-    // Doesn't exist
-    return NULL;
-}
-
-
-bool CLuaManager::DoesVirtualMachineExist ( CLuaMain* luaVM )
-{
-    if ( luaVM )
-    {
-        // Find a matching VM in our list
-        list < CLuaMain* >::const_iterator iter = m_virtualMachines.begin ();
-        for ( ; iter != m_virtualMachines.end (); iter++ )
-        {
-            if ( *iter == luaVM )
-            {
-                return true;
-            }
-        }
-    }
-
-    return false;
-}
-
-
-void CLuaManager::SetScriptDebugging ( CScriptDebugging* pScriptDebugging )
-{
 }
 
 

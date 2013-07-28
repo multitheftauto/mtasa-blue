@@ -81,9 +81,6 @@ CLuaMain::CLuaMain ( CLuaManager* pLuaManager,
     m_pLuaTimerManager = new CLuaTimerManager;
     m_FunctionEnterTimer.SetMaxIncrement ( 500 );
 
-    // Set up the name of our script
-    m_iOwner = OWNER_SERVER;
-
     m_pObjectManager = pObjectManager;
     m_pPlayerManager = pPlayerManager;
     m_pRadarAreaManager = pRadarAreaManager;
@@ -258,8 +255,11 @@ void CLuaMain::InitClasses ( lua_State* luaVM )
 
 void CLuaMain::InitVM ( void )
 {
+    assert( !m_luaVM );
+
     // Create a new VM
     m_luaVM = lua_open ();
+    m_pLuaManager->OnLuaMainOpenVM( this, m_luaVM );
 
     // Set the instruction count hook
     lua_sethook ( m_luaVM, InstructionCountHook, LUA_MASKCOUNT, HOOK_INSTRUCTION_COUNT );
@@ -486,6 +486,7 @@ void CLuaMain::UnloadScript ( void )
     // End the lua vm
     if ( m_luaVM )
     {
+        m_pLuaManager->OnLuaMainCloseVM( this, m_luaVM );
         lua_close( m_luaVM );
         m_luaVM = NULL;
     }
