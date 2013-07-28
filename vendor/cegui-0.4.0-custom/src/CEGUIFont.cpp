@@ -731,6 +731,12 @@ void Font::drawTextLine(const String& text, const Vector3& position, const Rect&
             if ( pos_sub == d_sub_cp_map.end() )
             {
 		        pos = d_cp_map.find('*');
+        		if (pos == end)
+                {
+    		        pos = d_cp_map.begin(); // Get first
+        		    if (pos == end)
+                        continue;           // empty?
+                }
                 img = pos->second.d_image;
                 horz_advance = (float)pos->second.d_horz_advance;
             }
