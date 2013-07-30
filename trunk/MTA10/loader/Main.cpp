@@ -402,6 +402,7 @@ int DoLaunchGame ( LPSTR lpCmdLine )
     assert ( !CreateSingleInstanceMutex () );
 
     CycleEventLog();
+    BsodDetectionPreLaunch();
     const SString strMTASAPath = GetMTASAPath ();
 
     //////////////////////////////////////////////////////////
@@ -619,6 +620,7 @@ int DoLaunchGame ( LPSTR lpCmdLine )
     {
         WriteDebugEvent( "Loader - Waiting for L3 to close" );
 
+        BsodDetectionOnGameBegin();
         // Show splash until game window is displayed (or max 20 seconds)
         DWORD status;
         for ( uint i = 0 ; i < 20 ; i++ )
@@ -677,6 +679,8 @@ int DoLaunchGame ( LPSTR lpCmdLine )
                 status = WaitForSingleObject( piLoadee.hProcess, 1000 );
             }
         }
+
+        BsodDetectionOnGameEnd();
     }
 
     WriteDebugEvent( "Loader - Finishing" );

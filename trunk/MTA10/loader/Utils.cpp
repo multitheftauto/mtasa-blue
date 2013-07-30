@@ -2194,3 +2194,87 @@ SString MaybeRenameExe( const SString& strGTAPath, bool* pbCopyFailed )
     }
     return strGTAEXEPath;
 }
+
+
+//////////////////////////////////////////////////////////
+//
+// BsodDetectionPreLaunch
+//
+// Possible BSOD situation if a new mini-dump file was created after the last game was started
+//
+//////////////////////////////////////////////////////////
+void BsodDetectionPreLaunch( void )
+{
+    // Find latest system minidump file
+    SString strMatch = PathJoin( GetSystemWindowsPath(), "MiniDump", "*" );
+    SString strMinidumpTime;
+    WIN32_FIND_DATA findData;
+    HANDLE hFind = FindFirstFile( strMatch, &findData );
+    if( hFind != INVALID_HANDLE_VALUE )
+    {
+        do
+        {
+            if ( ( findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY ) == false )
+                if ( strcmp( findData.cFileName, "." ) && strcmp( findData.cFileName, ".." ) )
+                {
+                    SYSTEMTIME s;
+                    FileTimeToSystemTime( &findData.ftCreationTime, &s );
+                    SString strCreationTime( "%02d-%02d-%02d %02d:%02d:%02d", s.wYear, s.wMonth, s.wDay, s.wHour, s.wMinute, s.wSecond );
+                    if ( strCreationTime > strMinidumpTime )
+                        strMinidumpTime = strCreationTime;
+                }
+        }
+        while( FindNextFile( hFind, &findData ) );
+        FindClose( hFind );
+    }
+
+    // Is it a new file?
+    SString strLastMinidumpTime = GetApplicationSetting( "diagnostics", "last-minidump-time" );
+    if ( strMinidumpTime > strLastMinidumpTime )
+    {
+        SetApplicationSetting( "diagnostics", "last-minidump-time", strMinidumpTime );
+
+        // Was it created during the game?
+        SString strGameBeginTime = GetApplicationSetting( "diagnostics", "game-begin-time" );
+        if ( strMinidumpTime > strGameBeginTime && !strGameBeginTime.empty() )
+        {
+            // Ask user to confirm
+            int iResponse = MessageBoxUTF8 ( NULL, _("Did your computer restart when playing MTA:SA?"), "MTA: San Andreas", MB_YESNO | MB_ICONERROR | MB_TOPMOST );
+            if ( iResponse == IDYES )
+            {
+                SetApplicationSetting( "diagnostics", "user-confirmed-bsod-time", strMinidumpTime );
+            }
+        }
+    }
+
+    // Log BSOD status
+    SString strBsodTime = GetApplicationSetting( "diagnostics", "user-confirmed-bsod-time" );
+    if ( !strBsodTime.empty() )
+        WriteDebugEvent( SString( "User confirmed bsod time: %s", *strBsodTime ) );
+}
+
+
+//////////////////////////////////////////////////////////
+//
+// BsodDetectionOnGameBegin
+//
+// Record game start time
+//
+//////////////////////////////////////////////////////////
+void BsodDetectionOnGameBegin( void )
+{
+    SetApplicationSetting( "diagnostics", "game-begin-time", GetTimeString( true ) );
+}
+
+
+//////////////////////////////////////////////////////////
+//
+// BsodDetectionOnGameEnd
+//
+// Unrecord game start time
+//
+//////////////////////////////////////////////////////////
+void BsodDetectionOnGameEnd( void )
+{
+    SetApplicationSetting( "diagnostics", "game-begin-time", "" );
+}

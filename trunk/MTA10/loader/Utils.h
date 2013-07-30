@@ -96,6 +96,10 @@ bool            CheckAndShowFileOpenFailureMessage  ( void );
 
 SString         MaybeRenameExe                      ( const SString& strGTAPath, bool* pbCopyFailed = NULL );
 
+void            BsodDetectionPreLaunch              ( void );
+void            BsodDetectionOnGameBegin            ( void );
+void            BsodDetectionOnGameEnd              ( void );
+
 //
 // Determine if game process has gone wonky
 //
