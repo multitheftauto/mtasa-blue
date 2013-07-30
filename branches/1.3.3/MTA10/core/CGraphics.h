@@ -345,6 +345,7 @@ private:
     IDirect3DStateBlock9*               m_pSavedStateBlock;
     CElapsedTime                        m_LastRenderedSceneTimer;
     IDirect3DSurface9*                  m_pSavedFrontBufferData;
+    CRenderTargetItem*                  m_pTempBackBufferData;
     CTextureItem*                       m_ProgressSpinnerTexture;
     SString                             m_strProgressMessage;
     CElapsedTime                        m_FirstDrawnProgressTimer;

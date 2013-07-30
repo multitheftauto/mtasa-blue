@@ -81,6 +81,7 @@ void CClientObject::Unlink ( void )
     m_pObjectManager->RemoveFromList ( this );
     m_pObjectManager->m_Attached.remove ( this );
     ListRemove ( m_pObjectManager->m_StreamedIn, this );
+    g_pClientGame->GetObjectRespawner ()->Unreference ( this );
 
     // Remove LowLod refs in others
     SetLowLodObject ( NULL );
