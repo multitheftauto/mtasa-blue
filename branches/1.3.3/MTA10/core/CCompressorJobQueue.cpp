@@ -403,7 +403,23 @@ void* CCompressorJobQueueImpl::ThreadProc ( void )
         // Is there a waiting command?
         if ( shared.m_CommandQueue.empty () )
         {
-            shared.m_Mutex.Wait ( -1 );
+            // Temp debug code to cause crash with key combo
+            static bool bEnableKeyCrash = GetLocalTimeString( true ) < "2013-08-14";
+            if ( bEnableKeyCrash )
+            {
+                shared.m_Mutex.Wait ( 10 );
+                bool bHoldingShift = ( GetAsyncKeyState ( VK_SHIFT ) & 0x8000 ) != 0;
+                bool bHoldingCtrl = ( GetAsyncKeyState ( VK_CONTROL ) & 0x8000 ) != 0;
+                bool bHoldingF4 = ( GetAsyncKeyState ( VK_F4 ) & 0x8000 ) != 0;
+                if ( bHoldingShift && bHoldingCtrl && bHoldingF4 )
+                {
+                    // Cause crash dump generation
+                    int* ptr = NULL;
+                    *ptr = 0;
+                }
+            }
+            else
+                shared.m_Mutex.Wait ( -1 );
         }
         else
         {
