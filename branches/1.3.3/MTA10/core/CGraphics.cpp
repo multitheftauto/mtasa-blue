@@ -1693,36 +1693,6 @@ void CGraphics::SetProgressMessage( const SString& strMessage )
 }
 
 
-//
-// Temp debug code
-//
-#define DEBUG_RESET(msg) \
-    if ( bDebugReset ) \
-        LogDebugReset msg ;
-
-#define UNUSED_VALUE (-12345)
-
-void LogDebugReset( const char* szMsg, uint a = UNUSED_VALUE, uint b = UNUSED_VALUE, uint c = UNUSED_VALUE )
-{
-    SString strMsg;
-    if ( a == UNUSED_VALUE )
-        strMsg = szMsg;
-    else
-    if ( b == UNUSED_VALUE )
-        strMsg = SString ( "%s [%08x]", szMsg, a );
-    else
-    if ( c == UNUSED_VALUE )
-        strMsg = SString ( "%s [%08x] [%08x]", szMsg, a, b );
-    else
-        strMsg = SString ( "%s [%08x] [%08x] [%08x]",szMsg, a, b, c );
-
-    strMsg = SString ( "%s - %s", *GetLocalTimeString( false, true ), *strMsg );
-    FileAppend( "reset_log.txt", strMsg + "\n" );
-    SetApplicationSetting ( "diagnostics", "reset-log-last-line", strMsg );
-    Sleep( 1 );
-}
-
-
 ////////////////////////////////////////////////////////////////
 //
 // CGraphics::DrawProgressMessage
@@ -1752,11 +1722,6 @@ void CGraphics::DrawProgressMessage( bool bPreserveBackbuffer )
     if ( g_pCore->GetDiagnosticDebug() == EDiagnosticDebug::SPINNER_0000 )
         return;
 
-    bool bDebugReset = ( g_pCore->GetDiagnosticDebug() == EDiagnosticDebug::DEBUG_RESET_0000 );
-
-    DEBUG_RESET(( "---------------------------------------" ));
-    DEBUG_RESET(( "A", bPreserveBackbuffer, bInScene ));
-
     //
     // Save stuff
     //
@@ -1766,9 +1731,7 @@ void CGraphics::DrawProgressMessage( bool bPreserveBackbuffer )
 
     HRESULT hr;
     IDirect3DStateBlock9* pSavedStateBlock = NULL;
-    hr = m_pDevice->CreateStateBlock( D3DSBT_ALL, &pSavedStateBlock );
-
-    DEBUG_RESET(( "B CreateStateBlock", hr ));
+    m_pDevice->CreateStateBlock( D3DSBT_ALL, &pSavedStateBlock );
 
     //
     // Do stuff
@@ -1786,28 +1749,20 @@ void CGraphics::DrawProgressMessage( bool bPreserveBackbuffer )
                 bInScene = false;
             }
 
-            DEBUG_RESET(( "C Pre GetBackBuffer" ));
-
             // Get backbuffer surface
             hr = m_pDevice->GetBackBuffer( 0, 0, D3DBACKBUFFER_TYPE_MONO, &pD3DBackBufferSurface );
-            DEBUG_RESET(( "C2 GetBackBuffer", hr ));
             if ( FAILED( hr ) )
                 break;
             D3DSURFACE_DESC BackBufferDesc;
             hr = pD3DBackBufferSurface->GetDesc( &BackBufferDesc );
-
-            DEBUG_RESET(( "D GetDesc", hr ));
 
             // Maybe save frontbuffer pixels
             if ( !m_pSavedFrontBufferData )
             {
                 D3DDISPLAYMODE displayMode;
                 hr = m_pDevice->GetDisplayMode( 0, &displayMode );
-                DEBUG_RESET(( "E GetDisplayMode", hr, displayMode.Width, displayMode.Height ));
                 hr = m_pDevice->CreateOffscreenPlainSurface( displayMode.Width, displayMode.Height, D3DFMT_A8R8G8B8, D3DPOOL_SYSTEMMEM, &pTempFrontBufferData, NULL );
-                DEBUG_RESET(( "F CreateOffscreenPlainSurface", hr, (uint)pTempFrontBufferData ));
                 hr = m_pDevice->GetFrontBufferData( 0, pTempFrontBufferData );
-                DEBUG_RESET(( "G GetFrontBufferData", hr ));
                 if ( FAILED( hr ) )
                     break;
 
@@ -1816,33 +1771,26 @@ void CGraphics::DrawProgressMessage( bool bPreserveBackbuffer )
                 GetClientRect( hwnd, &clientRect );
                 MapWindowPoints(hwnd, NULL, (LPPOINT)(&clientRect), (sizeof(clientRect)/sizeof(POINT)) );
                 hr = m_pDevice->CreateOffscreenPlainSurface( BackBufferDesc.Width, BackBufferDesc.Height, BackBufferDesc.Format, D3DPOOL_SYSTEMMEM, &m_pSavedFrontBufferData, NULL );
-                DEBUG_RESET(( "H CreateOffscreenPlainSurface", hr, (uint)m_pSavedFrontBufferData ));
                 if ( FAILED( hr ) )
                     break;
                 hr = D3DXLoadSurfaceFromSurface( m_pSavedFrontBufferData, NULL, NULL, pTempFrontBufferData, NULL, &clientRect, D3DX_FILTER_NONE, 0 );
-                DEBUG_RESET(( "I D3DXLoadSurfaceFromSurface", hr ));
                 if ( FAILED( hr ) )
                     break;
                 SAFE_RELEASE( pTempFrontBufferData );
-                DEBUG_RESET(( "J Release" ));
             }
 
             // Save backbuffer pixels
             pSavedBackBufferData = CGraphics::GetSingleton().GetRenderItemManager()->CreateRenderTarget( BackBufferDesc.Width, BackBufferDesc.Height, true, true );
-            DEBUG_RESET(( "K CreateRenderTarget", (uint)pSavedBackBufferData ));
             hr = m_pDevice->StretchRect( pD3DBackBufferSurface, NULL, pSavedBackBufferData->m_pD3DRenderTargetSurface, NULL, D3DTEXF_POINT );
-            DEBUG_RESET(( "L StretchRect", hr ));
             if ( FAILED( hr ) )
                 break;
 
             // Copy saved frontbuffer pixels onto backbuffer surface
             hr = D3DXLoadSurfaceFromSurface( pD3DBackBufferSurface, NULL, NULL, m_pSavedFrontBufferData, NULL, NULL, D3DX_FILTER_NONE, 0 );
-            DEBUG_RESET(( "M D3DXLoadSurfaceFromSurface", hr ));
             if ( FAILED( hr ) )
                 break;
 
-            hr = m_pDevice->BeginScene();
-            DEBUG_RESET(( "N BeginScene", hr ));
+            m_pDevice->BeginScene();
             bInScene = true;
         }
 
@@ -1858,7 +1806,6 @@ void CGraphics::DrawProgressMessage( bool bPreserveBackbuffer )
                 const uint uiMessageWidth = GetDXTextExtent( m_strProgressMessage );
                 const uint uiMessagePosX = uiViewportWidth / 2 - uiMessageWidth / 2;
                 const DWORD dwMessageColor = 0xA0FFFFFF;
-                DEBUG_RESET(( "O Pre DrawText" ));
                 DrawText( uiMessagePosX, uiViewportHeight - 57, dwMessageColor, 1, "%s", *m_strProgressMessage );
             }
 
@@ -1876,55 +1823,45 @@ void CGraphics::DrawProgressMessage( bool bPreserveBackbuffer )
                     m_ProgressAnimTimer.Reset();
                     m_uiProgressAnimFrame = ( m_uiProgressAnimFrame + 1 ) % uiNumFrames;
                 }
-                DEBUG_RESET(( "P Pre DrawTexture" ));
                 DrawTexture( m_ProgressSpinnerTexture, uiSpinnerPosX, uiViewportHeight - 40, fScaleX, 1, 0, 0, 0, dwSpinnerColor, m_uiProgressAnimFrame * uiFrameWidth, 0, uiFrameWidth, uiFrameHeight, false );
             }
 
             CheckModes( EDrawMode::NONE, EBlendMode::BLEND );
-            DEBUG_RESET(( "Q" ));
         }
 
         if ( bPreserveBackbuffer )
         {
-            hr = m_pDevice->EndScene();
-            DEBUG_RESET(( "R EndScene", hr ));
+            m_pDevice->EndScene();
             bInScene = false;
 
             // Flip backbuffer onto front buffer
             SAFE_RELEASE( pD3DBackBufferSurface );
             hr = m_pDevice->Present( NULL, NULL, NULL, NULL );
-            DEBUG_RESET(( "S Present", hr ));
 
             // Restore backbuffer surface
             hr = m_pDevice->GetBackBuffer( 0, 0, D3DBACKBUFFER_TYPE_MONO, &pD3DBackBufferSurface );
-            DEBUG_RESET(( "T GetBackBuffer", hr ));
             if ( FAILED( hr ) )
                 break;
             hr = m_pDevice->StretchRect( pSavedBackBufferData->m_pD3DRenderTargetSurface, NULL, pD3DBackBufferSurface, NULL, D3DTEXF_POINT );
-            DEBUG_RESET(( "U StretchRect", hr ));
 
-            hr = m_pDevice->BeginScene();
-            DEBUG_RESET(( "V BeginScene", hr ));
+            m_pDevice->BeginScene();
             bInScene = true;
         }
     }
     while( false );
 
     // Tidy
-    DEBUG_RESET(( "W" ));
     SAFE_RELEASE( pTempFrontBufferData );
     SAFE_RELEASE( pD3DBackBufferSurface );
     SAFE_RELEASE( pSavedBackBufferData );
-    DEBUG_RESET(( "X" ));
 
     // Ensure scene status is restored
     if ( bInScene != bWasInScene )
     {
         if ( bWasInScene )
-            hr = m_pDevice->BeginScene();
+            m_pDevice->BeginScene();
         else
-            hr = m_pDevice->EndScene();
-        DEBUG_RESET(( "Y", bWasInScene, hr ));
+            m_pDevice->EndScene();
         bInScene = bWasInScene;
     }
 
@@ -1933,12 +1870,9 @@ void CGraphics::DrawProgressMessage( bool bPreserveBackbuffer )
     //
     if ( pSavedStateBlock )
     {
-        DEBUG_RESET(( "Z Pre StateBlock->Apply" ));
-        hr = pSavedStateBlock->Apply();
-        DEBUG_RESET(( "AA StateBlock->Apply", hr ));
+        pSavedStateBlock->Apply();
         SAFE_RELEASE( pSavedStateBlock );
     }
 
-    DEBUG_RESET(( "AB" ));
     m_ActiveBlendMode = savedBlendMode;
 }
