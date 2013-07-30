@@ -1208,6 +1208,7 @@ void CGraphics::OnDeviceInvalidate ( IDirect3DDevice9 * pDevice )
     m_pRenderItemManager->OnLostDevice ();
     m_pScreenGrabber->OnLostDevice ();
     SAFE_RELEASE( m_pSavedFrontBufferData );
+    SAFE_RELEASE( m_pTempBackBufferData );
 }
 
 
@@ -1650,6 +1651,7 @@ void CGraphics::DidRenderScene( void )
             DrawProgressMessage( false );
     }
     SAFE_RELEASE( m_pSavedFrontBufferData );
+    SAFE_RELEASE( m_pTempBackBufferData );
     m_LastRenderedSceneTimer.Reset();
     float fTargetAspectRatioValue = 0;
     if ( CVARS_GET_VALUE < bool > ( "hud_match_aspect_ratio" ) )
@@ -1718,6 +1720,11 @@ void CGraphics::DrawProgressMessage( bool bPreserveBackbuffer )
     const bool bWasInScene = true;
     bool bInScene = true;
 
+    // Check if disabled
+    static bool bDisabled = !GetApplicationSetting( "diagnostics", "user-confirmed-bsod-time" ).empty();
+    if ( bDisabled )
+        return;
+
     //
     // Save stuff
     //
@@ -1733,7 +1740,6 @@ void CGraphics::DrawProgressMessage( bool bPreserveBackbuffer )
     // Do stuff
     //
     IDirect3DSurface9* pD3DBackBufferSurface = NULL;
-    CRenderTargetItem* pSavedBackBufferData = NULL;
     IDirect3DSurface9* pTempFrontBufferData = NULL;
     do
     {
@@ -1751,13 +1757,19 @@ void CGraphics::DrawProgressMessage( bool bPreserveBackbuffer )
                 break;
             D3DSURFACE_DESC BackBufferDesc;
             hr = pD3DBackBufferSurface->GetDesc( &BackBufferDesc );
+            if ( FAILED( hr ) )
+                break;
 
             // Maybe save frontbuffer pixels
             if ( !m_pSavedFrontBufferData )
             {
                 D3DDISPLAYMODE displayMode;
                 hr = m_pDevice->GetDisplayMode( 0, &displayMode );
+                if ( FAILED( hr ) )
+                    break;
                 hr = m_pDevice->CreateOffscreenPlainSurface( displayMode.Width, displayMode.Height, D3DFMT_A8R8G8B8, D3DPOOL_SYSTEMMEM, &pTempFrontBufferData, NULL );
+                if ( FAILED( hr ) )
+                    break;
                 hr = m_pDevice->GetFrontBufferData( 0, pTempFrontBufferData );
                 if ( FAILED( hr ) )
                     break;
@@ -1776,8 +1788,11 @@ void CGraphics::DrawProgressMessage( bool bPreserveBackbuffer )
             }
 
             // Save backbuffer pixels
-            pSavedBackBufferData = CGraphics::GetSingleton().GetRenderItemManager()->CreateRenderTarget( BackBufferDesc.Width, BackBufferDesc.Height, true, true );
-            hr = m_pDevice->StretchRect( pD3DBackBufferSurface, NULL, pSavedBackBufferData->m_pD3DRenderTargetSurface, NULL, D3DTEXF_POINT );
+            if ( !m_pTempBackBufferData)
+                m_pTempBackBufferData = CGraphics::GetSingleton().GetRenderItemManager()->CreateRenderTarget( BackBufferDesc.Width, BackBufferDesc.Height, true, true );
+            if ( !m_pTempBackBufferData )
+                break;
+            hr = m_pDevice->StretchRect( pD3DBackBufferSurface, NULL, m_pTempBackBufferData->m_pD3DRenderTargetSurface, NULL, D3DTEXF_POINT );
             if ( FAILED( hr ) )
                 break;
 
@@ -1833,12 +1848,14 @@ void CGraphics::DrawProgressMessage( bool bPreserveBackbuffer )
             // Flip backbuffer onto front buffer
             SAFE_RELEASE( pD3DBackBufferSurface );
             hr = m_pDevice->Present( NULL, NULL, NULL, NULL );
+            if ( FAILED( hr ) )
+                break;
 
             // Restore backbuffer surface
             hr = m_pDevice->GetBackBuffer( 0, 0, D3DBACKBUFFER_TYPE_MONO, &pD3DBackBufferSurface );
             if ( FAILED( hr ) )
                 break;
-            hr = m_pDevice->StretchRect( pSavedBackBufferData->m_pD3DRenderTargetSurface, NULL, pD3DBackBufferSurface, NULL, D3DTEXF_POINT );
+            hr = m_pDevice->StretchRect( m_pTempBackBufferData->m_pD3DRenderTargetSurface, NULL, pD3DBackBufferSurface, NULL, D3DTEXF_POINT );
 
             m_pDevice->BeginScene();
             bInScene = true;
@@ -1849,7 +1866,6 @@ void CGraphics::DrawProgressMessage( bool bPreserveBackbuffer )
     // Tidy
     SAFE_RELEASE( pTempFrontBufferData );
     SAFE_RELEASE( pD3DBackBufferSurface );
-    SAFE_RELEASE( pSavedBackBufferData );
 
     // Ensure scene status is restored
     if ( bInScene != bWasInScene )
