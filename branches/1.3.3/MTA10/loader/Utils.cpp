@@ -2237,7 +2237,7 @@ void BsodDetectionPreLaunch( void )
         if ( strMinidumpTime > strGameBeginTime && !strGameBeginTime.empty() )
         {
             // Ask user to confirm
-            int iResponse = MessageBoxUTF8 ( NULL, _("Did your computer restart when playing MTA:SA?"), "MTA: San Andreas", MB_YESNO | MB_ICONERROR | MB_TOPMOST );
+            int iResponse = MessageBox ( NULL, "Did your computer restart when playing MTA:SA?", "MTA: San Andreas", MB_YESNO | MB_ICONERROR | MB_TOPMOST );
             if ( iResponse == IDYES )
             {
                 SetApplicationSetting( "diagnostics", "user-confirmed-bsod-time", strMinidumpTime );
