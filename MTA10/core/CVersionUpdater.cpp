@@ -2903,7 +2903,13 @@ int CVersionUpdater::DoSendDownloadRequestToNextServer ( void )
     SDxStatus dxStatus;
     g_pGraphics->GetRenderItemManager ()->GetDxStatus ( dxStatus );
     CGameSettings* gameSettings = CCore::GetSingleton ( ).GetGame ( )->GetSettings();
-    SString strVideoCard = SStringX ( g_pDeviceState->AdapterState.Name ).Left ( 30 ).Replace ( "&", "_" ).Replace ( "=", "_" );
+    SString strVideoCard = SStringX ( g_pDeviceState->AdapterState.Name ).Left ( 30 );
+    {
+        LOCAL_FUNCTION_START
+            static bool IsNotAlnum ( int c ) { return !isalnum(c); }
+        LOCAL_FUNCTION_END
+        std::replace_if( strVideoCard.begin(), strVideoCard.end(), LOCAL_FUNCTION::IsNotAlnum, '_' ); 
+    }
     SString strSystemStats ( "1_%d_%d_%d_%d_%d"
                              "_%d%d%d%d"
                              "_%s"
@@ -2921,23 +2927,26 @@ int CVersionUpdater::DoSendDownloadRequestToNextServer ( void )
                              , *GetApplicationSetting ( "real-os-version" )
                            );
     SString strConnectUsage = SString("%i_%i", GetApplicationSettingInt ( "times-connected-editor" ), GetApplicationSettingInt ( "times-connected" ) );
+    SString strOptimusInfo = SString("%i_%i_%i", GetApplicationSettingInt ( "nvhacks", "optimus" ), GetApplicationSettingInt ( "nvhacks", "optimus-startup-option" ), GetApplicationSettingInt ( "nvhacks", "optimus-force-windowed" ) );
 
     // Make the query URL
     SString strQueryURL = strServerURL;
-    strQueryURL = strQueryURL.Replace ( "%VERSION%", strPlayerVersion );
-    strQueryURL = strQueryURL.Replace ( "%ID%", szSerial );
-    strQueryURL = strQueryURL.Replace ( "%STATUS%", szStatus );
-    strQueryURL = strQueryURL.Replace ( "%BETA%", strUpdateBuildType );
-    strQueryURL = strQueryURL.Replace ( "%TYPE%", m_strServerSaysType );
-    strQueryURL = strQueryURL.Replace ( "%DATA%", m_strServerSaysData );
-    strQueryURL = strQueryURL.Replace ( "%REFER%", m_strServerSaysHost );
-    strQueryURL = strQueryURL.Replace ( "%WANTVER%", m_strSidegradeVersion );
-    strQueryURL = strQueryURL.Replace ( "%LASTNEWS%", m_VarConfig.news_lastNewsDate );
-    strQueryURL = strQueryURL.Replace ( "%FILE%", m_JobInfo.strPostFilename );
-    strQueryURL = strQueryURL.Replace ( "%SYS%", strSystemStats );
-    strQueryURL = strQueryURL.Replace ( "%VID%", strVideoCard );
-    strQueryURL = strQueryURL.Replace ( "%USAGE%", strConnectUsage );    
-    strQueryURL = strQueryURL.Replace ( "%SCUT%", strSoundCut );    
+    strQueryURL = strQueryURL.Replace ( "%", "_" );
+    strQueryURL = strQueryURL.Replace ( "_VERSION_", strPlayerVersion );
+    strQueryURL = strQueryURL.Replace ( "_ID_", szSerial );
+    strQueryURL = strQueryURL.Replace ( "_STATUS_", szStatus );
+    strQueryURL = strQueryURL.Replace ( "_BETA_", strUpdateBuildType );
+    strQueryURL = strQueryURL.Replace ( "_TYPE_", m_strServerSaysType );
+    strQueryURL = strQueryURL.Replace ( "_DATA_", m_strServerSaysData );
+    strQueryURL = strQueryURL.Replace ( "_REFER_", m_strServerSaysHost );
+    strQueryURL = strQueryURL.Replace ( "_WANTVER_", m_strSidegradeVersion );
+    strQueryURL = strQueryURL.Replace ( "_LASTNEWS_", m_VarConfig.news_lastNewsDate );
+    strQueryURL = strQueryURL.Replace ( "_FILE_", m_JobInfo.strPostFilename );
+    strQueryURL = strQueryURL.Replace ( "_SYS_", strSystemStats );
+    strQueryURL = strQueryURL.Replace ( "_VID_", strVideoCard );
+    strQueryURL = strQueryURL.Replace ( "_USAGE_", strConnectUsage );
+    strQueryURL = strQueryURL.Replace ( "_SCUT_", strSoundCut );
+    strQueryURL = strQueryURL.Replace ( "_OPTIMUS_", strOptimusInfo );
 
     // Perform the HTTP request
     m_HTTP.Get ( strQueryURL );
@@ -3049,10 +3058,11 @@ int CVersionUpdater::DoSendPostToNextServer ( void )
 
     // Make the query URL
     SString strQueryURL = strServerURL;
-    strQueryURL = strQueryURL.Replace ( "%VERSION%", strPlayerVersion );
-    strQueryURL = strQueryURL.Replace ( "%ID%", szSerial );
-    strQueryURL = strQueryURL.Replace ( "%STATUS%", szStatus );
-    strQueryURL = strQueryURL.Replace ( "%FILE%", m_JobInfo.strPostFilename );
+    strQueryURL = strQueryURL.Replace ( "%", "_" );
+    strQueryURL = strQueryURL.Replace ( "_VERSION_", strPlayerVersion );
+    strQueryURL = strQueryURL.Replace ( "_ID_", szSerial );
+    strQueryURL = strQueryURL.Replace ( "_STATUS_", szStatus );
+    strQueryURL = strQueryURL.Replace ( "_FILE_", m_JobInfo.strPostFilename );
 
     //
     // Send data. Doesn't check if it was received.
