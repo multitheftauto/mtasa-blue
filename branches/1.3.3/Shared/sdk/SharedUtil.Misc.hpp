@@ -34,7 +34,7 @@ std::map < uint, uint > ms_ReportAmountMap;
 
 extern "C" {   _declspec(dllexport) DWORD NvOptimusEnablement = 0x00000001; }
 
-#define TROUBLE_URL1 "http://updatesa.multitheftauto.com/sa/trouble/?v=%VERSION%&id=%ID%&tr=%TROUBLE%"
+#define TROUBLE_URL1 "http://updatesa.multitheftauto.com/sa/trouble/?v=_VERSION_&id=_ID_&tr=_TROUBLE_"
 
 
 #ifndef MTA_DM_ASE_VERSION
@@ -509,9 +509,10 @@ bool SharedUtil::ProcessPendingBrowseToSolution ( void )
     SString strQueryURL = GetApplicationSetting ( "trouble-url" );
     if ( strQueryURL == "" )
         strQueryURL = TROUBLE_URL1;
-    strQueryURL = strQueryURL.Replace ( "%VERSION%", GetApplicationSetting ( "mta-version-ext" ) );
-    strQueryURL = strQueryURL.Replace ( "%ID%", GetApplicationSetting ( "serial" ) );
-    strQueryURL = strQueryURL.Replace ( "%TROUBLE%", strType );
+    strQueryURL = strQueryURL.Replace ( "%", "_" );
+    strQueryURL = strQueryURL.Replace ( "_VERSION_", GetApplicationSetting ( "mta-version-ext" ) );
+    strQueryURL = strQueryURL.Replace ( "_ID_", GetApplicationSetting ( "serial" ) );
+    strQueryURL = strQueryURL.Replace ( "_TROUBLE_", strType );
     SetClipboardText( strQueryURL );
     ShellExecuteNonBlocking ( "open", strQueryURL.c_str () );
 
