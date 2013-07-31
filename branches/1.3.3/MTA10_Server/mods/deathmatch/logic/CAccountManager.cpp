@@ -557,8 +557,24 @@ bool CAccountManager::IntegrityCheck ()
         CLogger::ErrorPrintf ( "Maybe now is the perfect time to panic.\n" );
         CLogger::ErrorPrintf ( "See - http://wiki.multitheftauto.com/wiki/fixdb\n" );
         CLogger::ErrorPrintf ( "************************\n" );
+        return true;    // Allow server to continue
+    }
+
+    // Check can update file
+    m_pDatabaseManager->Execf ( m_hDbConnection, "DROP TABLE IF EXISTS write_test" );
+    m_pDatabaseManager->Execf ( m_hDbConnection, "CREATE TABLE IF NOT EXISTS write_test (id INTEGER PRIMARY KEY, value INTEGER)" );
+    m_pDatabaseManager->Execf ( m_hDbConnection, "INSERT OR IGNORE INTO write_test (id, value) VALUES(1,2)" ) ;
+    bOk = m_pDatabaseManager->QueryWithResultf ( m_hDbConnection, NULL, "UPDATE write_test SET value=3 WHERE id=1" );
+    if ( !bOk )
+    {
+        CLogger::ErrorPrintf ( "%s\n", *m_pDatabaseManager->GetLastErrorMessage () );
+        CLogger::ErrorPrintf ( "Errors were encountered updating '%s' database\n", *ExtractFilename ( PathConform ( "internal.db" ) ) );
+        CLogger::ErrorPrintf ( "Database might be locked by another process, or damaged.\n" );
+        CLogger::ErrorPrintf ( "See - http://wiki.multitheftauto.com/wiki/fixdb\n" );
+        CLogger::ErrorPrintf ( "************************\n" );
         return false;
     }
+    m_pDatabaseManager->Execf ( m_hDbConnection, "DROP TABLE write_test" );
     return true;
 }
 
