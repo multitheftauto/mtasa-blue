@@ -120,6 +120,11 @@ HRESULT    CProxyDirect3D9::CreateDevice                ( UINT Adapter, D3DDEVTY
 // Some graphic card drivers seem sensitive to the content of the CreateDevice function.
     HRESULT hResult;
 
+    // Temp debug
+    static bool bDone = false;
+    assert( !bDone );
+    bDone = true;
+
     WriteDebugEvent ( "CProxyDirect3D9::CreateDevice" );
 
     WriteDebugEvent ( SString ( "    Adapter:%d  DeviceType:%d  BehaviorFlags:0x%x"
