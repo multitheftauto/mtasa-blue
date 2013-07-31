@@ -641,7 +641,8 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
         CLogger::ErrorPrintf ( "Unable to save logfile to '%s'\n", m_pMainConfig->GetLogFile ().c_str () );
 
     // Check accounts database and print message if there is a problem
-    m_pAccountManager->IntegrityCheck ();
+    if ( !m_pAccountManager->IntegrityCheck () )
+        return false;
 
     // Setup resource-cache directory
     {
