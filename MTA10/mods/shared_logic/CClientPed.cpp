@@ -1910,10 +1910,12 @@ CWeapon * CClientPed::GiveWeapon ( eWeaponType weaponType, unsigned int uiAmmo )
         pWeapon = GetWeapon ( weaponType );
         unsigned int uiPreviousAmmoTotal = 0, uiPreviousAmmoInClip = 0;
         eWeaponSkill weaponSkill = WEAPONSKILL_STD;
+        eWeaponType previousWeaponType = eWeaponType::WEAPONTYPE_ANYWEAPON;
         if ( pWeapon )
         {
             uiPreviousAmmoTotal = pWeapon->GetAmmoTotal ();
             uiPreviousAmmoInClip = pWeapon->GetAmmoInClip ();
+            previousWeaponType = pWeapon->GetType ( );
         }
 
         if ( weaponType >= WEAPONTYPE_PISTOL && weaponType <= WEAPONTYPE_TEC9 )
@@ -1929,15 +1931,30 @@ CWeapon * CClientPed::GiveWeapon ( eWeaponType weaponType, unsigned int uiAmmo )
         {
             unsigned int uiTotalAmmo;
             eWeaponSlot slot = pWeapon->GetSlot();
-
-            // Emulate GTA's behaviour of setting ammo to keep in sync
-            if ( slot <= 1 || slot >= 10 ) 
-                uiTotalAmmo = 1;        // Melee Weapons
-            else if ( slot >= 3 && slot <= 5 )
-                uiTotalAmmo = uiPreviousAmmoTotal + uiAmmo; // slot 3,4,5 share the ammo, also if it's the currently used weapon add
+            if ( pWeapon->GetType() != previousWeaponType )
+            {
+                // Emulate GTA's behaviour of setting ammo to keep in sync
+                if ( slot <= 1 || slot >= 10 ) 
+                {
+                    // Melee Weapons
+                    uiTotalAmmo = 1;
+                }
+                else if ( slot >= 3 && slot <= 5 )
+                {
+                     // slot 3,4,5 share the ammo, also if it's the currently used weapon add
+                    uiTotalAmmo = uiPreviousAmmoTotal + uiAmmo;
+                }
+                else
+                {
+                    // Other slots replace the ammo
+                    uiTotalAmmo = uiAmmo;
+                }
+            }
             else
-                uiTotalAmmo = uiAmmo;   // Other slots replace the ammo
-
+            {
+                // same weapon so always add
+                uiTotalAmmo = uiPreviousAmmoTotal + uiAmmo;
+            }
             // If we have less ammo in total than in our clip, update it accordingly
             if ( uiPreviousAmmoInClip > uiTotalAmmo )
                 uiPreviousAmmoInClip = uiTotalAmmo;
