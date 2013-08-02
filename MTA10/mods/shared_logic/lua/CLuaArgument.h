@@ -57,8 +57,8 @@ public:
 
     inline bool             GetBoolean          ( void ) const      { return m_bBoolean; };
     inline lua_Number       GetNumber           ( void ) const      { return m_Number; };
-    const char*             GetString           ( void )            { return m_strString.c_str (); };
-    inline void*            GetUserData    ( void ) const      { return m_pUserData; };
+    const SString&          GetString           ( void )            { return m_strString; };
+    inline void*            GetUserData         ( void ) const      { return m_pUserData; };
     CClientEntity*          GetElement          ( void ) const;
 
     bool                    ReadFromBitStream   ( NetBitStreamInterface& bitStream, std::vector < CLuaArguments* > * pKnownTables = NULL );
@@ -73,7 +73,7 @@ private:
     int                     m_iType;
     bool                    m_bBoolean;
     lua_Number              m_Number;
-    std::string             m_strString;
+    SString                 m_strString;
     void*                   m_pUserData;
     CLuaArguments*          m_pTableData;
     bool                    m_bWeakTableRef;
