@@ -15,6 +15,7 @@
 *****************************************************************************/
 
 #include "StdInc.h"
+extern CNetServer* g_pRealNetServer;
 
 void CLuaResourceDefs::LoadFunctions ( void )
 {
@@ -62,6 +63,8 @@ void CLuaResourceDefs::LoadFunctions ( void )
 
     CLuaCFunctions::AddFunction ( "getResourceACLRequests", CLuaResourceDefs::getResourceACLRequests );
     CLuaCFunctions::AddFunction ( "updateResourceACLRequest", CLuaResourceDefs::updateResourceACLRequest, true );
+    CLuaCFunctions::AddFunction ( "loadstring", CLuaResourceDefs::LoadString );
+    CLuaCFunctions::AddFunction ( "load", CLuaResourceDefs::Load );
 }
 
 
@@ -1190,5 +1193,137 @@ int CLuaResourceDefs::updateResourceACLRequest ( lua_State* luaVM )
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaResourceDefs::LoadString( lua_State* luaVM )
+{
+//  func,err loadstring( string text[, string name] )
+    SString strInput; SString strName;
+
+    CScriptArgReader argStream( luaVM );
+    argStream.ReadString( strInput );
+    argStream.ReadString( strName, "" );
+
+    if ( !argStream.HasErrors() )
+    {
+        const char* szChunkname = strName.empty() ? *strInput : *strName;
+        const char* cpInBuffer = strInput;
+        uint uiInSize = strInput.length();
+
+        // Decrypt if required
+        const char* cpBuffer;
+        uint uiSize;
+        if ( !g_pRealNetServer->DecryptScript( cpInBuffer, uiInSize, &cpBuffer, &uiSize ) )
+        {
+            // Problems problems
+    #if MTA_DM_VERSION < 0x135 
+            SString strMessage( "loadstring argument 1 is invalid and will not work in future versions. Please re-compile at http://luac.mtasa.com/", 0 ); 
+            m_pScriptDebugging->LogCustom( luaVM, strMessage );
+            // cpBuffer is always valid after call to DecryptScript
+    #else
+            SString strMessage( "argument 1 is invalid. Please re-compile at http://luac.mtasa.com/", 0 ); 
+            argStream.SetCustomError( strMessage );
+            cpBuffer = NULL;
+    #endif
+        }
+
+        if ( !argStream.HasErrors() )
+        {
+            if ( !luaL_loadbuffer( luaVM, cpBuffer, uiSize, szChunkname ) )
+            {
+                // Ok
+                return 1;
+            }
+            else
+            {
+                lua_pushnil( luaVM );
+                lua_insert( luaVM, -2 );  /* put before error message */
+                return 2;  /* return nil plus error message */
+            }
+        }
+    }
+    if ( argStream.HasErrors() )
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+
+    lua_pushboolean( luaVM, false );
+    return 1;
+}
+
+
+int CLuaResourceDefs::Load( lua_State* luaVM )
+{
+//  func,err load( callback callbackFunction[, string name] )
+    CLuaFunctionRef iLuaFunction; SString strName;
+
+    CScriptArgReader argStream( luaVM );
+    argStream.ReadFunction( iLuaFunction );
+    argStream.ReadString( strName, "=(load)" );
+    argStream.ReadFunctionComplete();
+
+    if ( !argStream.HasErrors() )
+    {
+        // Call supplied function to get all the bits
+        // Should apply some limit here?
+        SString strInput;
+        CLuaArguments callbackArguments;
+        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine( luaVM );
+        while( pLuaMain )
+        {
+            CLuaArguments returnValues;
+            callbackArguments.Call( pLuaMain, iLuaFunction, &returnValues );
+            if ( returnValues.Count() )
+            {
+                CLuaArgument* returnedValue = *returnValues.IterBegin();
+                if ( returnedValue->GetType() == LUA_TSTRING )
+                {
+                    strInput += returnedValue->GetString();
+                    continue;
+                }
+            }
+            break;
+        }
+
+        const char* szChunkname = *strName;
+        const char* cpInBuffer = strInput;
+        uint uiInSize = strInput.length();
+
+        // Decrypt if required
+        const char* cpBuffer;
+        uint uiSize;
+        if ( !g_pRealNetServer->DecryptScript( cpInBuffer, uiInSize, &cpBuffer, &uiSize ) )
+        {
+            // Problems problems
+    #if MTA_DM_VERSION < 0x135 
+            SString strMessage( "loadstring argument 1 is invalid and will not work in future versions. Please re-compile at http://luac.mtasa.com/", 0 ); 
+            m_pScriptDebugging->LogCustom( luaVM, strMessage );
+            // cpBuffer is always valid after call to DecryptScript
+    #else
+            SString strMessage( "argument 1 is invalid. Please re-compile at http://luac.mtasa.com/", 0 ); 
+            argStream.SetCustomError( strMessage );
+            cpBuffer = NULL;
+    #endif
+        }
+
+        if ( !argStream.HasErrors() )
+        {
+            if ( !luaL_loadbuffer( luaVM, cpBuffer, uiSize, szChunkname ) )
+            {
+                // Ok
+                return 1;
+            }
+            else
+            {
+                lua_pushnil( luaVM );
+                lua_insert( luaVM, -2 );  /* put before error message */
+                return 2;  /* return nil plus error message */
+            }
+        }
+    }
+    if ( argStream.HasErrors() )
+        m_pScriptDebugging->LogCustom( luaVM, argStream.GetFullErrorMessage() );
+
+    lua_pushboolean( luaVM, false );
     return 1;
 }
