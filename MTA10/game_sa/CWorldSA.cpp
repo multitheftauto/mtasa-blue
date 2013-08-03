@@ -179,6 +179,15 @@ void ConvertMatrixToEulerAngles ( const CMatrix_Padded& matrixPadded, float& fX,
 }
 
 
+// Ensures position is withing a validish range
+void CWorldSA::LimitPositionVector( CVector& vecPosition )
+{
+    vecPosition.fX = Clamp( -16000.f, vecPosition.fX, 16000.f );
+    vecPosition.fY = Clamp( -16000.f, vecPosition.fY, 16000.f );
+    vecPosition.fZ = Clamp( -160000.f, vecPosition.fZ, 160000.f );
+}
+
+
 bool CWorldSA::ProcessLineOfSight(const CVector * vecStart, const CVector * vecEnd, CColPoint ** colCollision, 
                                   CEntity ** CollisionEntity,
                                   const SLineOfSightFlags flags,
@@ -187,6 +196,14 @@ bool CWorldSA::ProcessLineOfSight(const CVector * vecStart, const CVector * vecE
     DEBUG_TRACE("VOID CWorldSA::ProcessLineOfSight(CVector * vecStart, CVector * vecEnd, CColPoint * colCollision, CEntity * CollisionEntity)");
     DWORD dwPadding[100]; // stops the function missbehaving and overwriting the return address
     dwPadding [0] = 0;  // prevent the warning and eventual compiler optimizations from removing it
+
+    // Keep positions sane
+    CVector vecStartTemp = *vecStart;
+    CVector vecEndTemp = *vecEnd;
+    LimitPositionVector( vecStartTemp );
+    LimitPositionVector( vecEndTemp );
+    vecStart = &vecStartTemp;
+    vecEnd = &vecEndTemp;
 
     CColPointSA * pColPointSA = new CColPointSA();
     CColPointSAInterface * pColPointSAInterface = pColPointSA->GetInterface();  
@@ -420,6 +437,14 @@ bool CWorldSA::IsLineOfSightClear ( const CVector * vecStart, const CVector * ve
     // bool bCheckBuildings = true, bool bCheckVehicles = true, bool bCheckPeds = true, 
     // bool bCheckObjects = true, bool bCheckDummies = true, bool bSeeThroughStuff = false, 
     // bool bIgnoreSomeObjectsForCamera = false
+
+    // Keep positions sane
+    CVector vecStartTemp = *vecStart;
+    CVector vecEndTemp = *vecEnd;
+    LimitPositionVector( vecStartTemp );
+    LimitPositionVector( vecEndTemp );
+    vecStart = &vecStartTemp;
+    vecEnd = &vecEndTemp;
 
     _asm
     {
