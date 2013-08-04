@@ -761,7 +761,7 @@ private:
     SString                             m_strACInfo;
     std::set < uint >                   m_SentMessageIds;
 
-    bool                                m_bLastKeyWasEscape;
+    bool                                m_bLastKeyWasEscapeCancelled;
 };
 
 extern CClientGame* g_pClientGame;
