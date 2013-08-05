@@ -17,16 +17,25 @@ CConsoleHistory::CConsoleHistory ( unsigned int uiHistoryLength )
 }
 
 
-void CConsoleHistory::LoadFromFile ( const char* szFilename )
+void CConsoleHistory::LoadFromFile ( void )
 {
-    m_strFilename = szFilename;
+    // Copy and clean console input history
+    SString strLogDir = CalcMTASAPath( "MTA" );
+    SString strPathFilenameSource = PathJoin( strLogDir, "console.log" );
+    SString strPathFilenameDest = PathJoin( strLogDir, "console_input.log" );
+    CConsoleLogger::CleanFile( strPathFilenameSource, strPathFilenameDest );
+
+    m_strFilename = strPathFilenameDest;
 
     // Load the history lines
     char szBuffer [256];
     std::ifstream infile ( m_strFilename );
     while( infile.getline ( szBuffer, 256 ) )
         if ( szBuffer[0] && !m_History.Contains ( szBuffer ) )
+        {
             m_History.push_back ( szBuffer );
+            m_HistoryNotSaved.push_back ( szBuffer );
+        }
     infile.close ();
 }
 
@@ -36,15 +45,24 @@ void CConsoleHistory::Add ( const char* szLine )
     if ( !szLine[0] )
         return;
 
+    SString strLineClean = szLine;
+    CConsoleLogger::CleanLine( strLineClean );
+
     // Remove any matching line
-    m_History.remove ( szLine );
+    m_History.remove ( strLineClean );
+    m_HistoryNotSaved.remove ( szLine );
 
     // Push to front
-    m_History.push_front ( szLine );
+    m_History.push_front ( strLineClean );
+    m_HistoryNotSaved.push_front ( szLine );
 
     // Is the list too big? Remove the last items
     while ( m_History.size () > m_uiHistoryLength )
         m_History.pop_back ();
+
+    // Is the list too big? Remove the last items
+    while ( m_HistoryNotSaved.size () > m_uiHistoryLength )
+        m_HistoryNotSaved.pop_back ();
 
     // Write the history, one per line
     std::ofstream outfile ( m_strFilename );
@@ -57,7 +75,7 @@ const char* CConsoleHistory::Get ( unsigned int uiIndex )
 {
     // Grab the item with the chosen index
     uint i = 0;
-    for ( std::list < SString > ::iterator iter = m_History.begin (); iter != m_History.end (); iter++, i++ )
+    for ( std::list < SString > ::iterator iter = m_HistoryNotSaved.begin (); iter != m_HistoryNotSaved.end (); iter++, i++ )
         if ( i == uiIndex )
             return *iter;
 

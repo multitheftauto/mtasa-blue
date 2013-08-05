@@ -53,7 +53,7 @@ CConsole::CConsole ( CGUI* pManager, CGUIElement* pParent )
     m_pHistory->SetTextChangedHandler ( GUI_CALLBACK ( &CConsole::History_OnTextChanged, this ) );
 
     // Load the console history from a file
-    m_pConsoleHistory->LoadFromFile ( CalcMTASAPath ( "\\MTA\\console.log" ) );
+    m_pConsoleHistory->LoadFromFile ();
 }
 
 CConsole::~CConsole ( void )
