@@ -2296,7 +2296,7 @@ void CClientGame::StaticKeyStrokeHandler ( const SBindableKey * pKey, bool bStat
 void CClientGame::KeyStrokeHandler ( const SBindableKey * pKey, bool bState )
 {
     // Do we have a root yet?
-    if ( m_pRootEntity )
+    if ( m_pRootEntity && g_pCore->IsMenuVisible() == false && g_pCore->GetConsole()->IsVisible() == false )
     {
         // Call our key-stroke event
         CLuaArguments Arguments;
@@ -2316,7 +2316,7 @@ bool CClientGame::StaticCharacterKeyHandler ( WPARAM wChar )
 bool CClientGame::CharacterKeyHandler ( WPARAM wChar )
 {
     // Do we have a root yet?
-    if ( m_pRootEntity )
+    if ( m_pRootEntity && g_pCore->IsMenuVisible() == false && g_pCore->GetConsole()->IsVisible() == false )
     {
         // Safe character?
         if ( wChar >= 32 )
