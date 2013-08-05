@@ -2304,7 +2304,7 @@ bool CClientGame::StaticKeyStrokeHandler ( const SString strKey, bool bState )
 bool CClientGame::KeyStrokeHandler ( const SString strKey, bool bState )
 {
     // Do we have a root yet?
-    if ( m_pRootEntity && g_pCore->IsMenuVisible() == false )
+    if ( m_pRootEntity && g_pCore->IsMenuVisible() == false && g_pCore->GetConsole()->IsVisible() == false )
     {
         bool bAllow = true;
         // Call our key-stroke event
@@ -2342,7 +2342,7 @@ bool CClientGame::StaticCharacterKeyHandler ( WPARAM wChar )
 bool CClientGame::CharacterKeyHandler ( WPARAM wChar )
 {
     // Do we have a root yet?
-    if ( m_pRootEntity )
+    if ( m_pRootEntity && g_pCore->IsMenuVisible() == false && g_pCore->GetConsole()->IsVisible() == false )
     {
         // Safe character?
         if ( wChar >= 32 )
