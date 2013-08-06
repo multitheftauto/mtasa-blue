@@ -570,6 +570,9 @@ void CPedSA::SetCurrentWeaponSlot ( eWeaponSlot weaponSlot )
     }
 }
 
+CVector g_vecBonePosition;
+int g_iBoneCallType = 0;
+
 CVector * CPedSA::GetBonePosition ( eBone bone, CVector * vecPosition )
 {
     DWORD dwFunc = FUNC_GetBonePosition;
@@ -585,7 +588,11 @@ CVector * CPedSA::GetBonePosition ( eBone bone, CVector * vecPosition )
 
     // Clamp to a sane range as this function can occasionally return massive values,
     // which causes ProcessLineOfSight to effectively freeze
-    CWorldSA::LimitPositionVector( *vecPosition );
+    if ( !IsValidPosition( *vecPosition ) )
+        *vecPosition = *GetPosition();
+
+    g_vecBonePosition = *vecPosition;
+    g_iBoneCallType = 1;
     return vecPosition;
 }
 
@@ -604,7 +611,11 @@ CVector * CPedSA::GetTransformedBonePosition ( eBone bone, CVector * vecPosition
 
     // Clamp to a sane range as this function can occasionally return massive values,
     // which causes ProcessLineOfSight to effectively freeze
-    CWorldSA::LimitPositionVector( *vecPosition );
+    if ( !IsValidPosition( *vecPosition ) )
+        *vecPosition = *GetPosition();
+
+    g_vecBonePosition = *vecPosition;
+    g_iBoneCallType = 2;
     return vecPosition;
 }
 

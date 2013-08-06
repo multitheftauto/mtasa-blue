@@ -80,7 +80,6 @@ public:
     float       GetAircraftMaxVelocity    ( void );
     void        SetOcclusionsEnabled      ( bool bEnabled );
     bool        GetOcclusionsEnabled      ( void );
-    static void LimitPositionVector       ( CVector& vecPosition );
 
     /**
      * \todo Add FindObjectsKindaColliding (see 0x430577)
