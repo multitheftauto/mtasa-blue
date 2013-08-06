@@ -178,15 +178,33 @@ void ConvertMatrixToEulerAngles ( const CMatrix_Padded& matrixPadded, float& fX,
     }
 }
 
-
-// Ensures position is withing a validish range
-void CWorldSA::LimitPositionVector( CVector& vecPosition )
+// Ensure both ends of a line are valid
+void LimitLinePoints( CVector& vecStart, CVector& vecEnd )
 {
-    vecPosition.fX = Clamp( -16000.f, vecPosition.fX, 16000.f );
-    vecPosition.fY = Clamp( -16000.f, vecPosition.fY, 16000.f );
-    vecPosition.fZ = Clamp( -160000.f, vecPosition.fZ, 160000.f );
+    bool bStartValid = IsValidPosition( vecStart );
+    bool bEndValid = IsValidPosition( vecEnd );
+    if ( bStartValid && bEndValid )
+        return;
+    if ( !bStartValid && !bEndValid )
+    {
+        vecStart = CVector( 0, 0, 100 );
+        vecEnd = CVector( 0, 0, 100.01f );
+    }
+    else
+    if ( !bStartValid )
+    {
+        vecStart = vecEnd + CVector( 0, 0, 0.01f );
+    }
+    else
+    {
+        vecEnd = vecStart + CVector( 0, 0, 0.01f );
+    }
 }
 
+// Debugging vars
+CVector g_vecStart;
+CVector g_vecEnd;
+int g_iCallType = 1;
 
 bool CWorldSA::ProcessLineOfSight(const CVector * vecStart, const CVector * vecEnd, CColPoint ** colCollision, 
                                   CEntity ** CollisionEntity,
@@ -200,10 +218,13 @@ bool CWorldSA::ProcessLineOfSight(const CVector * vecStart, const CVector * vecE
     // Keep positions sane
     CVector vecStartTemp = *vecStart;
     CVector vecEndTemp = *vecEnd;
-    LimitPositionVector( vecStartTemp );
-    LimitPositionVector( vecEndTemp );
+    LimitLinePoints( vecStartTemp, vecEndTemp );
     vecStart = &vecStartTemp;
     vecEnd = &vecEndTemp;
+
+    g_vecStart = *vecStart;
+    g_vecEnd = *vecEnd;
+    g_iCallType = 0x10;
 
     CColPointSA * pColPointSA = new CColPointSA();
     CColPointSAInterface * pColPointSAInterface = pColPointSA->GetInterface();  
@@ -237,6 +258,8 @@ bool CWorldSA::ProcessLineOfSight(const CVector * vecStart, const CVector * vecE
         mov     bReturn, al
         add     esp, 0x30
     }
+
+    g_iCallType = 0x20;
 
     MemPutFast < BYTE > ( VAR_CWorld_bIncludeCarTires, 0 );
 
@@ -441,10 +464,13 @@ bool CWorldSA::IsLineOfSightClear ( const CVector * vecStart, const CVector * ve
     // Keep positions sane
     CVector vecStartTemp = *vecStart;
     CVector vecEndTemp = *vecEnd;
-    LimitPositionVector( vecStartTemp );
-    LimitPositionVector( vecEndTemp );
+    LimitLinePoints( vecStartTemp, vecEndTemp );
     vecStart = &vecStartTemp;
     vecEnd = &vecEndTemp;
+
+    g_vecStart = *vecStart;
+    g_vecEnd = *vecEnd;
+    g_iCallType = 0x100;
 
     _asm
     {
@@ -461,6 +487,8 @@ bool CWorldSA::IsLineOfSightClear ( const CVector * vecStart, const CVector * ve
         mov     bReturn, al
         add     esp, 0x24
     }
+
+    g_iCallType = 0x200;
     return bReturn;
 }
 
