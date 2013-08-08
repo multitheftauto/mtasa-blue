@@ -2134,7 +2134,7 @@ bool CheckAndShowFileOpenFailureMessage ( void )
     {
         //SetApplicationSetting ( "diagnostics", "gta-fopen-fail", "" );
         SString strMsg ( _("GTA:SA had trouble opening the file '%s'\n\nTry reinstalling GTA:SA to fix it"), *strFilename );
-        MessageBoxUTF8 ( NULL, strMsg, "MTA: San Andreas"+_E("CL26"), MB_OK | MB_ICONERROR | MB_TOPMOST );
+        MessageBoxUTF8 ( NULL, strMsg, "MTA: San Andreas"+_E("CL27"), MB_OK | MB_ICONERROR | MB_TOPMOST );
         return true;
     }
     return false;

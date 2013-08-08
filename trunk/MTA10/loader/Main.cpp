@@ -376,6 +376,7 @@ int LaunchGame ( LPSTR lpCmdLine )
     WatchDogBeginSection ( "L1" );      // Gets closed when online game has started
     SetApplicationSetting ( "diagnostics", "gta-fopen-fail", "" );
     SetApplicationSetting ( "diagnostics", "last-crash-reason", "" );
+    SetApplicationSetting ( "diagnostics", "gta-fopen-last", "" );
     HandleCustomStartMessage();
 
     int iReturnCode = DoLaunchGame ( lpCmdLine );
@@ -523,6 +524,17 @@ int DoLaunchGame ( LPSTR lpCmdLine )
         {
             return DisplayErrorMessageBox ( SString ( _("Load failed. %s exists in the GTA directory. Please delete before continuing."), dllCheckList[i] ), _E("CL21"), "file-clash" );
         }    
+    }
+
+    // Check for asi files
+    {
+        bool bFoundInGTADir = !FindFiles( PathJoin( strGTAPath, "*.asi" ), true, false ).empty();
+        bool bFoundInMTADir = !FindFiles( PathJoin( strMTASAPath, "mta", "*.asi" ), true, false ).empty();
+        if ( bFoundInGTADir || bFoundInMTADir )
+        {
+            DisplayErrorMessageBox (_( ".asi files are in the 'MTA:SA' or 'GTA: San Andreas' installation directory.\n\n"
+                                       "Remove these .asi files if you experience problems with MTA:SA." ), _E("CL28") );
+        }
     }
 
     // Warning if d3d9.dll exists in the GTA install directory
