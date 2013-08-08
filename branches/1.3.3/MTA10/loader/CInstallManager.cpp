@@ -407,6 +407,11 @@ SString CInstallManager::_ShowCrashFailDialog ( void )
 
     HideSplash ();
 
+    // Transfer gta-fopen-last info
+    if ( GetApplicationSetting ( "diagnostics", "gta-fopen-fail" ).empty() )
+        SetApplicationSetting ( "diagnostics", "gta-fopen-fail", GetApplicationSetting ( "diagnostics", "gta-fopen-last" ) );
+    SetApplicationSetting ( "diagnostics", "gta-fopen-last", "" );
+
     SString strMessage = GetApplicationSetting ( "diagnostics", "last-crash-info" );
     SString strReason = GetApplicationSetting ( "diagnostics", "last-crash-reason" );
     SetApplicationSetting ( "diagnostics", "last-crash-reason", "" );
