@@ -80,7 +80,7 @@ int CLuaDefs::CanUseFunction ( lua_CFunction f, lua_State* luaVM )
             strScriptName = pLuaMain->GetScriptName ();
 
         // Record for the crash dump file
-        g_pCore->LogEvent ( 404, "LuaCFunction", strScriptName, pFunction->GetFunctionName () );
+        //g_pCore->LogEvent ( 404, "LuaCFunction", strScriptName, pFunction->GetFunctionName () );
     }
 
     // Everything is allowed on the client

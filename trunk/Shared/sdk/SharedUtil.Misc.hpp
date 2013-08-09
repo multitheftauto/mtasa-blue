@@ -331,6 +331,13 @@ int SharedUtil::GetApplicationSettingInt ( const SString& strPath, const SString
     return atoi ( GetApplicationSetting ( strPath, strName ) );
 }
 
+int SharedUtil::IncApplicationSettingInt ( const SString& strPath, const SString& strName )
+{
+    int iValue = GetApplicationSettingInt ( strPath, strName ) + 1;
+    SetApplicationSettingInt ( strPath, strName, iValue );
+    return iValue;
+}
+
 
 
 //
@@ -354,6 +361,13 @@ void SharedUtil::SetApplicationSettingInt ( const SString& strName, int iValue )
 int SharedUtil::GetApplicationSettingInt ( const SString& strName )
 {
     return GetApplicationSettingInt ( "general", strName );
+}
+
+int SharedUtil::IncApplicationSettingInt ( const SString& strName )
+{
+    int iValue = GetApplicationSettingInt ( strName ) + 1;
+    SetApplicationSettingInt ( strName, iValue );
+    return iValue;
 }
 
 

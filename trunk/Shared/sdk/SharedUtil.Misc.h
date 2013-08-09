@@ -91,11 +91,13 @@ namespace SharedUtil
     bool            RemoveApplicationSettingKey     ( const SString& strPath );
     void            SetApplicationSettingInt        ( const SString& strPath, const SString& strName, int iValue );
     int             GetApplicationSettingInt        ( const SString& strPath, const SString& strName );
+    int             IncApplicationSettingInt        ( const SString& strPath, const SString& strName );
 
     void            SetApplicationSetting           ( const SString& strName, const SString& strValue );
     SString         GetApplicationSetting           ( const SString& strName );
     void            SetApplicationSettingInt        ( const SString& strName, int iValue );
     int             GetApplicationSettingInt        ( const SString& strName );
+    int             IncApplicationSettingInt        ( const SString& strName );
 
     void            WatchDogReset                   ( void );
     bool            WatchDogIsSectionOpen           ( const SString& str );
