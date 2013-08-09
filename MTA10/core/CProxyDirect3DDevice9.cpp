@@ -253,6 +253,18 @@ HRESULT DoResetDevice( IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS* pPresen
                 // Prevent statup warning in loader
                 WatchDogCompletedSection ( "L3" );
 
+                // Try removing anti-aliasing for next time
+                if ( CGame* pGame = g_pCore->GetGame() )
+                {
+                    CGameSettings* pGameSettings = pGame->GetSettings ();
+                    int iAntiAliasing = pGameSettings->GetAntiAliasing();
+                    if ( iAntiAliasing > 1 )
+                    {
+                        pGameSettings->SetAntiAliasing( 1, true );
+                        pGameSettings->Save();
+                    }
+                }
+
                 // Handle fatal error
                 SString strMessage;
                 strMessage += "There was a problem resetting Direct3D\n\n";

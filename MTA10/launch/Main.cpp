@@ -58,6 +58,14 @@ int WINAPI WinMain ( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     SString strMTASAPath = PathJoin ( GetLaunchPath (), "mta" );
     SString strLoaderDllPathFilename = PathJoin ( strMTASAPath, strLoaderDllFilename );
 
+    if ( strMTASAPath.Contains( "?" ) )
+    {
+        SString strMessage = "WARNING: Install path contains unicode characters\n\n";
+        strMessage += "If MTA fails to load, please reinstall with basic Latin characters.\n\n";
+        AddReportLog ( 5712, strMessage );
+        BrowseToSolution ( "unicode-mta-path", ASK_GO_ONLINE | TERMINATE_IF_YES, strMessage );
+    }
+
     // Load loader dll
     HMODULE hModule = LoadLibrary ( strLoaderDllPathFilename );
 
