@@ -10,13 +10,6 @@
 #include "StdInc.h"
 #include "CModelCacheManager.h"
 
-#define WD_SECTION_PRELOAD_UPGRADES         "preload-upgrades"
-#define DIAG_PRELOAD_UPGRADES_SLOW          "diagnostics", "preloading-upgrades-slow"
-#define DIAG_PRELOAD_UPGRADE_ATTEMPT_ID     "diagnostics", "preloading-upgrade-attempt-id"
-#define DIAG_PRELOAD_UPGRADES_LOWEST_UNSAFE "diagnostics", "preloading-upgrades-lowest-unsafe"
-#define DIAG_PRELOAD_UPGRADES_HISCORE       "diagnostics", "preloading-upgrades-hiscore"
-#define DIAG_CRASH_EXTRA_MSG                "diagnostics", "last-crash-reason"
-
 namespace
 {
     struct SModelCacheInfo

@@ -2926,6 +2926,18 @@ int CVersionUpdater::DoSendDownloadRequestToNextServer ( void )
 
                              , *GetApplicationSetting ( "real-os-version" )
                            );
+
+    SString strSystemStats2 ( "2_%d_%d_%d"
+                             "_%d_%d_%d"
+                             , g_pGraphics->GetViewportWidth()
+                             , g_pGraphics->GetViewportHeight()
+                             , dxStatus.settings.b32BitColor
+
+                             , GetApplicationSettingInt( DIAG_PRELOAD_UPGRADES_LOWEST_UNSAFE )
+                             , GetApplicationSettingInt( DIAG_MINIDUMP_DETECTED_COUNT )
+                             , GetApplicationSettingInt( DIAG_MINIDUMP_CONFIRMED_COUNT )
+                           );
+
     SString strConnectUsage = SString("%i_%i", GetApplicationSettingInt ( "times-connected-editor" ), GetApplicationSettingInt ( "times-connected" ) );
     SString strOptimusInfo = SString("%i_%i_%i", GetApplicationSettingInt ( "nvhacks", "optimus" ), GetApplicationSettingInt ( "nvhacks", "optimus-startup-option" ), GetApplicationSettingInt ( "nvhacks", "optimus-force-windowed" ) );
 
@@ -2943,6 +2955,7 @@ int CVersionUpdater::DoSendDownloadRequestToNextServer ( void )
     strQueryURL = strQueryURL.Replace ( "_LASTNEWS_", m_VarConfig.news_lastNewsDate );
     strQueryURL = strQueryURL.Replace ( "_FILE_", m_JobInfo.strPostFilename );
     strQueryURL = strQueryURL.Replace ( "_SYS_", strSystemStats );
+    strQueryURL = strQueryURL.Replace ( "_SYS2_", strSystemStats2 );
     strQueryURL = strQueryURL.Replace ( "_VID_", strVideoCard );
     strQueryURL = strQueryURL.Replace ( "_USAGE_", strConnectUsage );
     strQueryURL = strQueryURL.Replace ( "_SCUT_", strSoundCut );

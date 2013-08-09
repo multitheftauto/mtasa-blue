@@ -2231,6 +2231,7 @@ void BsodDetectionPreLaunch( void )
     if ( strMinidumpTime > strLastMinidumpTime )
     {
         SetApplicationSetting( "diagnostics", "last-minidump-time", strMinidumpTime );
+        IncApplicationSettingInt( DIAG_MINIDUMP_DETECTED_COUNT );
 
         // Was it created during the game?
         SString strGameBeginTime = GetApplicationSetting( "diagnostics", "game-begin-time" );
@@ -2241,6 +2242,7 @@ void BsodDetectionPreLaunch( void )
             if ( iResponse == IDYES )
             {
                 SetApplicationSetting( "diagnostics", "user-confirmed-bsod-time", strMinidumpTime );
+                IncApplicationSettingInt( DIAG_MINIDUMP_CONFIRMED_COUNT );
             }
         }
     }
