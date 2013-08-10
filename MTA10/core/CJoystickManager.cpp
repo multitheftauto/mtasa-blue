@@ -521,6 +521,12 @@ void CJoystickManager::InitDirectInput( void )
         return;
     }
 
+    // In case device did not identify itself as a joysitck during creation,
+    // set flag again to ensure input data will not be dropped when the mouse cursor is showing.
+    CProxyDirectInputDevice8* pProxyInputDevice = dynamic_cast < CProxyDirectInputDevice8* > ( m_DevInfo.pDevice );
+    if ( pProxyInputDevice )
+        pProxyInputDevice->m_bDropDataIfInputGoesToGUI = false;
+
     // Set the data format to "simple Joystick" - a predefined data format 
     //
     // A data format specifies which controls on a device we are interested in,
