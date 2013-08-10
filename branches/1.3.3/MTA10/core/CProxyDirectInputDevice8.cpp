@@ -28,12 +28,13 @@ CProxyDirectInputDevice8::CProxyDirectInputDevice8 ( IDirectInputDevice8A* pDevi
     if ( SUCCEEDED( hResult ) )
     {
         uint uiType = didi.dwDevType & 0xff;
-        uint uiSubType = didi.dwDevType >> 8;
+        uint uiSubType = ( didi.dwDevType >> 8 ) & 0xff;
+        uint uiHid = ( didi.dwDevType >> 16 ) & 0xff;
 
         if ( uiType == DI8DEVTYPE_GAMEPAD || uiType == DI8DEVTYPE_JOYSTICK )
             m_bDropDataIfInputGoesToGUI = false;
 
-        WriteDebugEvent ( SString( "   CProxyDirectInputDevice8 Device:%08x  Type:0x%x  SubType:0x%x  ProductName:%s", pDevice, uiType, uiSubType, didi.tszProductName ) );
+        WriteDebugEvent ( SString( "   CProxyDirectInputDevice8 Device:%08x  Type:0x%x  SubType:0x%x  HID:0x%x  ProductName:%s", pDevice, uiType, uiSubType, uiHid, didi.tszProductName ) );
     }
     else
         WriteDebugEvent ( SString( "   CProxyDirectInputDevice8 GetDeviceInfo failed:%08x", hResult ) );
