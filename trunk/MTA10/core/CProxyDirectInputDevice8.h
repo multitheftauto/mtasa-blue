@@ -58,8 +58,6 @@ class CProxyDirectInputDevice8 : public IDirectInputDevice8A
     virtual HRESULT __stdcall    SetActionMap               ( LPDIACTIONFORMATA a, LPCSTR b, DWORD c );
     virtual HRESULT __stdcall    GetImageInfo               ( LPDIDEVICEIMAGEINFOHEADERA a);
 
-    private:
-
     IDirectInputDevice8A *   m_pDevice;
     bool                     m_bDropDataIfInputGoesToGUI;
 };
