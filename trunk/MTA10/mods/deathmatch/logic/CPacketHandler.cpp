@@ -965,11 +965,6 @@ void CPacketHandler::Packet_PlayerList ( NetBitStreamInterface& bitStream )
                         pPlayer->GiveWeapon ( static_cast < eWeaponType > ( weaponType.data.ucWeaponType ), 1 );
                     }
                 }
-
-                if ( bitStream.GetNumberOfUnreadBits() != 0 )
-                {
-                    RaiseFatalError ( 15 );
-                }
             }
 
             // Set move anim even if not spawned
