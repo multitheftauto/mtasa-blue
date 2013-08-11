@@ -136,7 +136,9 @@ void CRPCFunctions::ProcessPacket ( unsigned char ucPacketID, NetBitStreamInterf
         SRPCHandler* pHandler = &m_RPCHandlers [ ucFunctionID ];
         if ( pHandler->Callback != NULL )
         {
-            //g_pCore->LogEvent ( 402, "RPC", "", pHandler->strName );
+            static bool bEnabled = ( g_pCore->GetDiagnosticDebug () == EDiagnosticDebug::LUA_TRACE_0000 );
+            if ( bEnabled )
+                g_pCore->LogEvent ( 0, "RPC", "", pHandler->strName );
             if ( m_bShowRPCs )
                 g_pCore->GetConsole ()->Printf ( "* rpc: %s", *pHandler->strName );
             (pHandler->Callback) ( bitStream );
@@ -147,7 +149,9 @@ void CRPCFunctions::ProcessPacket ( unsigned char ucPacketID, NetBitStreamInterf
         SElementRPCHandler* pElementHandler = &m_ElementRPCHandlers [ ucFunctionID ];
         if ( pElementHandler->Callback != NULL )
         {
-            //g_pCore->LogEvent ( 403, "Element RPC", "", pElementHandler->strName );
+            static bool bEnabled = ( g_pCore->GetDiagnosticDebug () == EDiagnosticDebug::LUA_TRACE_0000 );
+            if ( bEnabled )
+                g_pCore->LogEvent ( 0, "Element RPC", "", pElementHandler->strName );
             if ( m_bShowRPCs )
                 g_pCore->GetConsole ()->Printf ( "* element-rpc: %s", *pElementHandler->strName );
 

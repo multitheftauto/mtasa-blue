@@ -100,6 +100,7 @@ namespace SharedUtil
             LOG_TIMING_0000,
             JOYSTICK_0000,
             SPINNER_0000,
+            LUA_TRACE_0000,
             MAX,
         };
     };
