@@ -178,33 +178,126 @@ void ConvertMatrixToEulerAngles ( const CMatrix_Padded& matrixPadded, float& fX,
     }
 }
 
-// Ensure both ends of a line are valid
-void LimitLinePoints( CVector& vecStart, CVector& vecEnd )
+
+namespace
 {
-    bool bStartValid = IsValidPosition( vecStart );
-    bool bEndValid = IsValidPosition( vecEnd );
-    if ( bStartValid && bEndValid )
-        return;
-    if ( !bStartValid && !bEndValid )
+    //
+    // Helpers to keep lines legal for line of sight functions
+    //
+
+    //
+    // Modify line to fit within the box.
+    // Return false if line is outside the box. 'Inspired' from internet.
+    //
+    bool ClipLineSegmentWithAxisAlignedBox( CVector& segmentBegin, CVector& segmentEnd, const CVector& boxCenter, const CVector& boxSize )
     {
-        vecStart = CVector( 0, 0, 100 );
-        vecEnd = CVector( 0, 0, 100.01f );
+        CVector vbeginToEnd = segmentEnd - segmentBegin;
+        CVector minToMax(boxSize.fX, boxSize.fY, boxSize.fZ);
+        CVector mmin = boxCenter - minToMax / 2;
+        CVector mmax = boxCenter + minToMax / 2;
+        CVector vbeginToMin = mmin - segmentBegin;
+        CVector vbeginToMax = mmax - segmentBegin;
+        float tNear = -1e7;
+        float tFar = 1e7;
+        for ( uint axis = 0 ; axis < 3 ; axis++ )
+        {
+            float beginToEnd = ((float*)&vbeginToEnd)[axis];
+            float beginToMin = ((float*)&vbeginToMin)[axis];
+            float beginToMax = ((float*)&vbeginToMax)[axis];
+            if (beginToEnd == 0) // parallel
+            {
+                if (beginToMin > 0 || beginToMax < 0)
+                    return false;   // segment is not between planes
+            }
+            else
+            {
+                float t1 = beginToMin / beginToEnd;
+                float t2 = beginToMax / beginToEnd;
+                float tMin = Min(t1, t2);
+                float tMax = Max(t1, t2);
+                if (tMin > tNear)
+                    tNear = tMin;
+                if (tMax < tFar)
+                    tFar = tMax;
+                if (tNear > tFar || tFar < 0)
+                    return false;
+            }
+        }
+
+        // Clip end
+        if (tFar >= 0 && tFar <= 1)
+            segmentEnd = segmentBegin + vbeginToEnd * tFar;
+
+        // Clip begin
+        if (tNear >= 0 && tNear <= 1)
+            segmentBegin = segmentBegin + vbeginToEnd * tNear;
+
+        return true;
     }
-    else
-    if ( !bStartValid )
+
+    // You crazy position!
+    static bool IsCrazyPosition ( const CVector& vec )
     {
-        vecStart = vecEnd + CVector( 0, 0, 0.01f );
+        if ( vec.fX < -1600000 || vec.fX > 1600000 || _isnan ( vec.fX )
+            || vec.fY < -1600000 || vec.fY > 1600000 || _isnan ( vec.fY )
+            || vec.fZ < -10000000 || vec.fZ > 10000000 || _isnan ( vec.fZ ) )
+            return true;
+        return false;          
     }
-    else
+
+    static bool IsClippingNeeded ( const CVector& vec, const CVector& boxMin, const CVector& boxMax )
     {
-        vecEnd = vecStart + CVector( 0, 0, 0.01f );
+        if ( vec.fX < boxMin.fX || vec.fX > boxMax.fX
+            || vec.fY < boxMin.fY || vec.fY > boxMax.fY
+            || vec.fZ < boxMin.fZ || vec.fZ > boxMax.fZ )
+            return true;
+        return false;          
+    }
+
+    // Ensure both ends of a line are valid
+    void LimitLinePoints( CVector& vecStart, CVector& vecEnd )
+    {
+        // Deal with number overflow problems first
+        {
+            bool bStartCrazy = IsCrazyPosition( vecStart );
+            bool bEndCrazy = IsCrazyPosition( vecEnd );
+            if ( bStartCrazy && bEndCrazy )
+            {
+                vecStart = CVector( 0, 0, 10000 );
+                vecEnd = CVector( 0, 0, 10000.01f );
+            }
+            else
+            if ( bStartCrazy )
+            {
+                vecStart = vecEnd + CVector( 0, 0, 0.01f );
+            }
+            else
+            if ( bEndCrazy )
+            {
+                vecEnd = vecStart + CVector( 0, 0, 0.01f );
+            }
+        }
+
+        // Clip line to reasonable range
+        {
+            static CVector vecBoxMin( -10000, -10000, -2000 );
+            static CVector vecBoxMax( 10000, 10000, 100000 );
+            static CVector vecBoxSize = vecBoxMax - vecBoxMin;
+            static CVector vecBoxCenter = vecBoxSize / 2 + vecBoxMin;
+            bool bStartClippingNeeded = IsClippingNeeded( vecStart, vecBoxMin, vecBoxMax );
+            bool bEndClippingNeeded = IsClippingNeeded( vecEnd, vecBoxMin, vecBoxMax );
+            if ( bStartClippingNeeded || bEndClippingNeeded )
+            {
+                if ( !ClipLineSegmentWithAxisAlignedBox( vecStart, vecEnd, vecBoxCenter, vecBoxSize ) )
+                {
+                    vecStart = CVector( 0, 0, 10000 );
+                    vecEnd = CVector( 0, 0, 10000.01f );
+                }
+            }
+        }
     }
 }
 
-// Debugging vars
-CVector g_vecStart;
-CVector g_vecEnd;
-int g_iCallType = 1;
 
 bool CWorldSA::ProcessLineOfSight(const CVector * vecStart, const CVector * vecEnd, CColPoint ** colCollision, 
                                   CEntity ** CollisionEntity,
@@ -221,10 +314,6 @@ bool CWorldSA::ProcessLineOfSight(const CVector * vecStart, const CVector * vecE
     LimitLinePoints( vecStartTemp, vecEndTemp );
     vecStart = &vecStartTemp;
     vecEnd = &vecEndTemp;
-
-    g_vecStart = *vecStart;
-    g_vecEnd = *vecEnd;
-    g_iCallType = 0x10;
 
     CColPointSA * pColPointSA = new CColPointSA();
     CColPointSAInterface * pColPointSAInterface = pColPointSA->GetInterface();  
@@ -258,8 +347,6 @@ bool CWorldSA::ProcessLineOfSight(const CVector * vecStart, const CVector * vecE
         mov     bReturn, al
         add     esp, 0x30
     }
-
-    g_iCallType = 0x20;
 
     MemPutFast < BYTE > ( VAR_CWorld_bIncludeCarTires, 0 );
 
@@ -468,10 +555,6 @@ bool CWorldSA::IsLineOfSightClear ( const CVector * vecStart, const CVector * ve
     vecStart = &vecStartTemp;
     vecEnd = &vecEndTemp;
 
-    g_vecStart = *vecStart;
-    g_vecEnd = *vecEnd;
-    g_iCallType = 0x100;
-
     _asm
     {
         push    flags.bIgnoreSomeObjectsForCamera
@@ -487,8 +570,6 @@ bool CWorldSA::IsLineOfSightClear ( const CVector * vecStart, const CVector * ve
         mov     bReturn, al
         add     esp, 0x24
     }
-
-    g_iCallType = 0x200;
     return bReturn;
 }
 

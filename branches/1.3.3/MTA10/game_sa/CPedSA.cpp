@@ -570,9 +570,6 @@ void CPedSA::SetCurrentWeaponSlot ( eWeaponSlot weaponSlot )
     }
 }
 
-CVector g_vecBonePosition;
-int g_iBoneCallType = 0;
-
 CVector * CPedSA::GetBonePosition ( eBone bone, CVector * vecPosition )
 {
     DWORD dwFunc = FUNC_GetBonePosition;
@@ -591,8 +588,6 @@ CVector * CPedSA::GetBonePosition ( eBone bone, CVector * vecPosition )
     if ( !IsValidPosition( *vecPosition ) )
         *vecPosition = *GetPosition();
 
-    g_vecBonePosition = *vecPosition;
-    g_iBoneCallType = 1;
     return vecPosition;
 }
 
@@ -614,8 +609,6 @@ CVector * CPedSA::GetTransformedBonePosition ( eBone bone, CVector * vecPosition
     if ( !IsValidPosition( *vecPosition ) )
         *vecPosition = *GetPosition();
 
-    g_vecBonePosition = *vecPosition;
-    g_iBoneCallType = 2;
     return vecPosition;
 }
 
