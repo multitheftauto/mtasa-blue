@@ -810,6 +810,16 @@ void CPacketHandler::Packet_PlayerList ( NetBitStreamInterface& bitStream )
             bitStream.Read ( ucNametagB );
         }
 
+        // Move anim
+        uchar ucMoveAnim = MOVE_DEFAULT;
+        if ( bitStream.Version() > 0x4B )
+            bitStream.Read ( ucMoveAnim );
+
+        // **************************************************************************************************************
+        // Note: The code below skips various attributes if the player is not spawned.
+        // This means joining clients will not receive the current value of these attributes, which could lead to desync.
+        // **************************************************************************************************************
+
         // Read out the spawndata if he has spawned
         unsigned short usPlayerModelID;
         ElementID TeamID = INVALID_ELEMENT_ID;
@@ -955,7 +965,15 @@ void CPacketHandler::Packet_PlayerList ( NetBitStreamInterface& bitStream )
                         pPlayer->GiveWeapon ( static_cast < eWeaponType > ( weaponType.data.ucWeaponType ), 1 );
                     }
                 }
+
+                if ( bitStream.GetNumberOfUnreadBits() != 0 )
+                {
+                    RaiseFatalError ( 15 );
+                }
             }
+
+            // Set move anim even if not spawned
+            pPlayer->SetMoveAnim ( ( eMoveAnim ) ucMoveAnim );
 
             // Print the join message in the chat
             if ( bJustJoined )
@@ -3704,6 +3722,12 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                     SEntityAlphaSync alpha;
                     bitStream.Read ( &alpha );
                     pPed->SetAlpha ( alpha.data.ucAlpha );
+
+                    // Move anim
+                    uchar ucMoveAnim = MOVE_DEFAULT;
+                    if ( bitStream.Version() > 0x4B )
+                        bitStream.Read ( ucMoveAnim );
+                    pPed->SetMoveAnim ( ( eMoveAnim ) ucMoveAnim );
 
                     // clothes
                     unsigned char ucNumClothes, ucTextureLength, ucModelLength, ucType;

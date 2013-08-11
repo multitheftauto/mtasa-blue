@@ -104,7 +104,19 @@ bool CPlayerListPacket::Write ( NetBitStreamInterface& BitStream ) const
             BitStream.Write ( ucG );
             BitStream.Write ( ucB );
         }
-        
+
+        // Move anim
+        if ( BitStream.Version() > 0x4B )
+        {
+            uchar ucMoveAnim = pPlayer->GetMoveAnim();
+            BitStream.Write ( ucMoveAnim );
+        }
+
+        // **************************************************************************************************************
+        // Note: The code below skips various attributes if the player is not spawned.
+        // This means joining clients will not receive the current value of these attributes, which could lead to desync.
+        // **************************************************************************************************************
+
         // Write spawn info if he's spawned
         if ( bIsSpawned )
         {

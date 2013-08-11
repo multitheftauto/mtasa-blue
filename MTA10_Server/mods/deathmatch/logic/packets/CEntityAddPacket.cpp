@@ -827,6 +827,13 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
                     alpha.data.ucAlpha = pPed->GetAlpha ();
                     BitStream.Write ( &alpha );
 
+                    // Move anim
+                    if ( BitStream.Version() > 0x4B )
+                    {
+                        uchar ucMoveAnim = pPed->GetMoveAnim();
+                        BitStream.Write ( ucMoveAnim );
+                    }
+
                     // clothes
                     unsigned char ucNumClothes = 0;
                     CPlayerClothes* pClothes = pPed->GetClothes ( );
