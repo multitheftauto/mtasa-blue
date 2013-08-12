@@ -427,6 +427,7 @@ private:
     void                        Packet_PlayerDiagnostic     ( class CPlayerDiagnosticPacket& Packet );
     void                        Packet_PlayerModInfo        ( class CPlayerModInfoPacket & Packet );
     void                        Packet_PlayerScreenShot     ( class CPlayerScreenShotPacket & Packet );
+    void                        Packet_PlayerNoSocket       ( class CPlayerNoSocketPacket & Packet );
 
     static void                 PlayerCompleteConnect       ( CPlayer* pPlayer, bool bSuccess, const char* szError );
 

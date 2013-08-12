@@ -2385,6 +2385,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\logic\packets\CPlayerNoSocketPacket.h"
+						>
+					</File>
+					<File
 						RelativePath=".\logic\packets\CPlayerPuresyncPacket.h"
 						>
 					</File>
