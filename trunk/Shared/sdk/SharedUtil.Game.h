@@ -99,6 +99,7 @@ namespace SharedUtil
             D3D_6732,
             LOG_TIMING_0000,
             JOYSTICK_0000,
+            LUA_TRACE_0000,
             MAX,
         };
     };

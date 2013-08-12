@@ -186,7 +186,9 @@ bool CMapEventManager::Call ( const char* szName, const CLuaArguments& Arguments
                     }
 
                     // Record event for the crash dump writer
-                    //g_pCore->LogEvent ( 405, "Lua Event", pMapEvent->GetVM ()->GetScriptName (), szName );
+                    static bool bEnabled = ( g_pCore->GetDiagnosticDebug () == EDiagnosticDebug::LUA_TRACE_0000 );
+                    if ( bEnabled )
+                        g_pCore->LogEvent ( 0, "Lua Event", pMapEvent->GetVM ()->GetScriptName (), szName );
 
                     // Store the current values of the globals
                     lua_getglobal ( pState, "source" );
