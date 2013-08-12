@@ -81,6 +81,7 @@ struct SAclRequest;
 #include "packets/CPlayerJoinPacket.h"
 #include "packets/CPlayerListPacket.h"
 #include "packets/CPlayerPuresyncPacket.h"
+#include "packets/CPlayerNoSocketPacket.h"
 #include "packets/CPlayerQuitPacket.h"
 #include "packets/CPlayerSpawnPacket.h"
 #include "packets/CPlayerStatsPacket.h"
