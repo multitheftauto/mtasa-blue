@@ -404,7 +404,7 @@ void* CCompressorJobQueueImpl::ThreadProc ( void )
         if ( shared.m_CommandQueue.empty () )
         {
             // Temp debug code to cause crash with key combo
-            static bool bEnableKeyCrash = GetLocalTimeString( true ) < "2013-08-14";
+            static bool bEnableKeyCrash = GetLocalTimeString( true ) < "2013-08-26";
             if ( bEnableKeyCrash )
             {
                 shared.m_Mutex.Wait ( 10 );
