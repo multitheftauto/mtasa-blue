@@ -9247,9 +9247,18 @@ CColRectangle* CStaticFunctionDefinitions::CreateColRectangle ( CResource* pReso
 }
 
 
-CColPolygon* CStaticFunctionDefinitions::CreateColPolygon ( CResource* pResource, const CVector& vecPosition )
+CColPolygon* CStaticFunctionDefinitions::CreateColPolygon ( CResource* pResource, const std::vector < CVector2D >& vecPointList )
 {
+    if ( vecPointList.size() < 4 )
+        return NULL;
+
+    CVector vecPosition( vecPointList[0].fX, vecPointList[0].fY, 0 );
     CColPolygon * pColShape = new CColPolygon ( m_pColManager, pResource->GetDynamicElementRoot(), vecPosition );
+
+    for( int i = 1 ; i < vecPointList.size() ; i++ )
+    {
+        pColShape->AddPoint( vecPointList[i] );
+    }
 
     // Run collision detection
     CElement* pRoot = m_pMapManager->GetRootElement ();
