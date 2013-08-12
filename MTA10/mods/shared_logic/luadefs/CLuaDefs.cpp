@@ -66,7 +66,7 @@ int CLuaDefs::CanUseFunction ( lua_CFunction f, lua_State* luaVM )
     g_pCore->UpdateDummyProgress();
 
     // Cached enabled setting here as it doesn't usually change
-    static bool bLogLuaFunctions = g_pCore->GetDebugIdEnabled ( 401 );
+    static bool bLogLuaFunctions = ( g_pCore->GetDiagnosticDebug () == EDiagnosticDebug::LUA_TRACE_0000 );
     if ( !bLogLuaFunctions )
         return true;
 
@@ -80,7 +80,7 @@ int CLuaDefs::CanUseFunction ( lua_CFunction f, lua_State* luaVM )
             strScriptName = pLuaMain->GetScriptName ();
 
         // Record for the crash dump file
-        //g_pCore->LogEvent ( 404, "LuaCFunction", strScriptName, pFunction->GetFunctionName () );
+        g_pCore->LogEvent ( 0, "LuaCFunction", strScriptName, pFunction->GetFunctionName () );
     }
 
     // Everything is allowed on the client

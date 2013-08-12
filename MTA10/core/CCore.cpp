@@ -2064,7 +2064,7 @@ void CCore::LogEvent ( uint uiDebugId, const char* szType, const char* szContext
 bool CCore::GetDebugIdEnabled ( uint uiDebugId )
 {
     static CFilterMap debugIdFilterMap ( GetVersionUpdater ()->GetDebugFilterString () );
-    return !debugIdFilterMap.IsFiltered ( uiDebugId );
+    return ( uiDebugId == 0 ) || !debugIdFilterMap.IsFiltered ( uiDebugId );
 }
 
 EDiagnosticDebugType CCore::GetDiagnosticDebug ( void )
