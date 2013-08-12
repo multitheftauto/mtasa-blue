@@ -8547,13 +8547,19 @@ int CLuaFunctionDefinitions::CreateColRectangle ( lua_State* luaVM )
 }
 
 int CLuaFunctionDefinitions::CreateColPolygon ( lua_State* luaVM )
-{ 
-    CVector2D vecPoint; 
+{
+//  colshape createColPolygon ( float fX, float fY, float fX1, float fY1, float fX2, float fY2, float fX3, float fY3, ... )
+    std::vector < CVector2D > vecPointList; 
     
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadNumber(vecPoint.fX); 
-    argStream.ReadNumber(vecPoint.fY); 
-    
+    for( uint i = 0 ; i < 4 || argStream.NextCouldBeNumber() ; i++ )
+    {
+        CVector2D vecPoint;
+        argStream.ReadNumber( vecPoint.fX ); 
+        argStream.ReadNumber( vecPoint.fY );
+        vecPointList.push_back( vecPoint );
+    }
+
     if ( !argStream.HasErrors ( ) )
     {  
         CLuaMain* pLuaMain = g_pGame->GetLuaManager()->GetVirtualMachine ( luaVM );
@@ -8562,29 +8568,9 @@ int CLuaFunctionDefinitions::CreateColPolygon ( lua_State* luaVM )
             CResource* pResource = pLuaMain->GetResource();
             if ( pResource )
             {
-                // Create it and return it
-                CVector vecPos;
-                vecPos.fX = vecPoint.fX;
-                vecPos.fY = vecPoint.fY;
-
-                CColPolygon* pShape = CStaticFunctionDefinitions::CreateColPolygon ( pResource, vecPos );
+                CColPolygon* pShape = CStaticFunctionDefinitions::CreateColPolygon ( pResource, vecPointList );
                 if ( pShape )
                 {
-                    while ( argStream.NextIsNumber ( ) )
-                    {
-                        argStream.ReadNumber(vecPoint.fX); 
-                        argStream.ReadNumber(vecPoint.fY); 
-                        if ( argStream.HasErrors ( ) ) 
-                        {
-                            m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
-
-                            lua_pushboolean ( luaVM, false );
-                            return 1;
-                        }
-                        pShape->AddPoint(vecPoint);
-                    }
-
-
                     CElementGroup * pGroup = pResource->GetElementGroup();
                     if ( pGroup )
                     {
