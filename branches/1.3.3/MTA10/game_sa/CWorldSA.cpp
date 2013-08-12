@@ -257,6 +257,39 @@ namespace
     // Ensure both ends of a line are valid
     void LimitLinePoints( CVector& vecStart, CVector& vecEnd )
     {
+        bool bDebugFreezes = ( g_pCore->GetDiagnosticDebug () == EDiagnosticDebug::LUA_TRACE_0000 );
+
+        if ( !bDebugFreezes )
+        {
+            // If not debugging freezes, use this way as it seems slightly better
+
+            // Temp fix for freeroam warp
+            if ( vecEnd.fZ < -1900 && vecEnd.fZ > -5000 )
+                vecEnd.fZ = -1900;
+            if ( vecStart.fZ < -1900 && vecStart.fZ > -5000 )
+                vecStart.fZ = -1900;
+
+            bool bStartValid = IsValidPosition( vecStart );
+            bool bEndValid = IsValidPosition( vecEnd );
+            if ( bStartValid && bEndValid )
+                return;
+            if ( !bStartValid && !bEndValid )
+            {
+                vecStart = CVector( 0, 0, 100 );
+                vecEnd = CVector( 0, 0, 100.01f );
+            }
+            else
+            if ( !bStartValid )
+            {
+                vecStart = vecEnd + CVector( 0, 0, 0.01f );
+            }
+            else
+            {
+                vecEnd = vecStart + CVector( 0, 0, 0.01f );
+            }
+            return;
+        }
+
         // Deal with number overflow problems first
         {
             bool bStartCrazy = IsCrazyPosition( vecStart );

@@ -105,6 +105,8 @@ CPlayer::CPlayer ( CPlayerManager* pPlayerManager, class CScriptDebugging* pScri
     CSimControl::AddSimPlayer ( this );
 
     m_pPlayerStatsPacket = new CPlayerStatsPacket ( );
+
+    m_LastReceivedSyncTimer.SetMaxIncrement( 2000, true );
 }
 
 
