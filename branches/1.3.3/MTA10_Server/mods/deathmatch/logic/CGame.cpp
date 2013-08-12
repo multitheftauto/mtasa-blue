@@ -3648,7 +3648,7 @@ void CGame::Packet_PlayerNoSocket ( CPlayerNoSocketPacket & Packet )
         if ( pPlayer->GetTimeSinceReceivedSync() > 20000 )
         {
             CLogger::LogPrintf ( "INFO: Dead connection detected for %s\n", pPlayer->GetNick() );
-            pPlayer->Send ( CPlayerDisconnectedPacket ( CPlayerDisconnectedPacket::KICK, "Worrying message" ) );
+            pPlayer->Send ( CPlayerDisconnectedPacket ( "Worrying message" ) );
             g_pGame->QuitPlayer ( *pPlayer, CClient::QUIT_TIMEOUT );
         }
     }
