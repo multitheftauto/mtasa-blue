@@ -118,10 +118,11 @@ void CClientObjectManager::DoPulse ( void )
 
     CClientObject * pObject = NULL;
     // Loop through all our streamed-in objects
-    vector < CClientObject * > ::iterator iter = m_StreamedIn.begin ();
-    for ( ; iter != m_StreamedIn.end () ; ++iter )
+    list < CClientObject * > ::iterator iter = m_StreamedIn.begin ();
+    for ( ; iter != m_StreamedIn.end () ; )
     {
         pObject = *iter;
+        ++iter;
         // We should have a game-object here
         assert ( pObject->GetGameObject () );
         pObject->StreamedInPulse ();
