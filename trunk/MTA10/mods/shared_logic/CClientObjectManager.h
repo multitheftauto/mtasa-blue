@@ -76,7 +76,7 @@ private:
     class CClientManager*                   m_pManager;
     bool                                    m_bCanRemoveFromList;
     CMappedList < CClientObject* >          m_Objects;
-    std::vector < CClientObject* >          m_StreamedIn;
+    std::list   < CClientObject* >          m_StreamedIn;
     CMappedList < CClientObject* >          m_Attached;
 };
 
