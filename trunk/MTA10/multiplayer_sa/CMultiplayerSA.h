@@ -53,6 +53,7 @@ public:
     void                        InitHooks_Rendering ( void );
     void                        InitHooks_LicensePlate ( void );
     void                        InitHooks_Direct3D ( void );
+    void                        InitHooks_FixLineOfSightArgs ( void );
     CRemoteDataStorage *        CreateRemoteDataStorage     ();
     void                        DestroyRemoteDataStorage    ( CRemoteDataStorage* pData );
     void                        AddRemoteDataStorage        ( CPlayerPed* pPed, CRemoteDataStorage* pData );

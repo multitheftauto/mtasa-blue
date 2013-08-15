@@ -341,7 +341,7 @@ inline bool IsValidPosition ( const CVector& vec )
 {
     if ( vec.fX < -16000 || vec.fX > 16000 || _isnan ( vec.fX )
         || vec.fY < -16000 || vec.fY > 16000 || _isnan ( vec.fY )
-        || vec.fZ < -2000 || vec.fZ > 100000 || _isnan ( vec.fZ ) )
+        || vec.fZ < -5000 || vec.fZ > 100000 || _isnan ( vec.fZ ) )
         return false;          
     return true;
 }
