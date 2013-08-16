@@ -1692,9 +1692,10 @@ void CClientGame::UpdateVehicleInOut ( void )
                                         bAlreadyStartedJacking = true;
                                     }
                                 }
-                                pBitStream->WriteBits ( &(m_pLocalPlayer->m_ucEnteringDoor ), 3 );
+                                unsigned char ucDoor = m_pLocalPlayer->m_ucEnteringDoor - 2;
+                                pBitStream->WriteBits ( &ucDoor, 3 );
                                 SDoorOpenRatioSync door;
-                                door.data.fRatio = pVehicle->GetDoorOpenRatio ( m_pLocalPlayer->m_ucEnteringDoor + 2 );
+                                door.data.fRatio = pVehicle->GetDoorOpenRatio ( m_pLocalPlayer->m_ucEnteringDoor );
                                 pBitStream->Write ( &door );
                             }
                             pBitStream->WriteBit ( bAlreadyStartedJacking );
