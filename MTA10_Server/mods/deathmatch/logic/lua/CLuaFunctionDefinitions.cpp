@@ -1482,16 +1482,27 @@ int CLuaFunctionDefinitions::IsPedFrozen ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::SetPedAnimation ( lua_State* luaVM )
 {
+// bool setPedAnimation ( ped thePed [, string block=nil, string anim=nil, int time=-1, bool loop=true, bool updatePosition=true, bool interruptable=true, bool freezeLastFrame = true] )
     CElement * pPed;
     SString strBlockName, strAnimName;
     int iTime;
     bool bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame;
+    bool bDummy;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData(pPed);
-    argStream.ReadString(strBlockName, "");
+    if ( argStream.NextIsBool() )
+        argStream.ReadBool ( bDummy );      // Wiki used setPedAnimation(source,false) as an example
+    else
+    if ( argStream.NextIsNil() )
+        argStream.m_iIndex++;               // Wiki docs said blockName could be nil
+    else
+        argStream.ReadString ( strBlockName, "" );
     argStream.ReadString(strAnimName, "");
-    argStream.ReadNumber(iTime, -1);
+    if ( argStream.NextCouldBeNumber() )    // Freeroam skips the time arg sometimes
+        argStream.ReadNumber(iTime, -1);
+    else
+        iTime = -1;
     argStream.ReadBool(bLoop, true);
     argStream.ReadBool(bUpdatePosition, true);
     argStream.ReadBool(bInterruptable, true);
