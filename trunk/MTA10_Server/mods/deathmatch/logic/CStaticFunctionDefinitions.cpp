@@ -9255,7 +9255,7 @@ CColPolygon* CStaticFunctionDefinitions::CreateColPolygon ( CResource* pResource
     CVector vecPosition( vecPointList[0].fX, vecPointList[0].fY, 0 );
     CColPolygon * pColShape = new CColPolygon ( m_pColManager, pResource->GetDynamicElementRoot(), vecPosition );
 
-    for( int i = 1 ; i < vecPointList.size() ; i++ )
+    for( uint i = 1 ; i < vecPointList.size() ; i++ )
     {
         pColShape->AddPoint( vecPointList[i] );
     }

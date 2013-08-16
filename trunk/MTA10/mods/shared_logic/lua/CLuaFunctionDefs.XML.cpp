@@ -159,14 +159,8 @@ int CLuaFunctionDefs::XMLNodeGetName ( lua_State* luaVM )
 
     if ( !argStream.HasErrors ( ) )
     {
-        if ( pNode )
-        {
-            if ( pNode )
-            {
-                lua_pushstring ( luaVM, pNode->GetTagName ().c_str () );
-                return 1;
-            }
-        }
+        lua_pushstring ( luaVM, pNode->GetTagName ().c_str () );
+        return 1;
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );

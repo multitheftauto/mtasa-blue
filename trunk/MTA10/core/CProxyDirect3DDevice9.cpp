@@ -529,7 +529,7 @@ HRESULT CProxyDirect3DDevice9::EndScene                       ( VOID )
 HRESULT CProxyDirect3DDevice9::Clear                          ( DWORD Count,CONST D3DRECT* pRects,DWORD Flags,D3DCOLOR Color,float Z,DWORD Stencil )
 {
     // If clearing z buffer, make sure we save it first
-    if ( Flags | D3DCLEAR_ZBUFFER )
+    if ( Flags & D3DCLEAR_ZBUFFER )
         CGraphics::GetSingleton ().GetRenderItemManager ()->SaveReadableDepthBuffer ();
 
     return m_pDevice->Clear ( Count, pRects, Flags, Color, Z, Stencil );

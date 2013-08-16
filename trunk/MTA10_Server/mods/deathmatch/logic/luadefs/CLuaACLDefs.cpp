@@ -397,7 +397,7 @@ int CLuaACLDefs::aclListRights ( lua_State* luaVM )
             }
 
             // Append right name
-            strncat ( szRightName, (*iter)->GetRightName (), 128 );
+            strncat ( szRightName, (*iter)->GetRightName (), NUMELMS( szRightName ) - 1 );
 
             // Push its name onto the table
             lua_pushnumber ( luaVM, ++uiIndex );
