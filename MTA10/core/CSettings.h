@@ -124,7 +124,7 @@ public:
 
     void                UpdateAudioTab          ();
 
-    void                UpdateVideoTab          ( bool bIsVideoModeChanged = false );
+    void                UpdateVideoTab          ( void );
 
     void                AddKeyBindSection       ( char * szSectionName );
     void                RemoveKeyBindSection    ( char * szSectionName );
@@ -134,6 +134,7 @@ public:
     void                OnLoginStateChange      ( bool bResult );
 
     void                RequestNewNickname      ( void );
+    void                ShowRestartQuestion     ( void );
 
 protected:
     const static int    SecKeyNum = 3;     // Number of secondary keys
