@@ -129,14 +129,14 @@ CResource::~CResource ( void )
     {
         delete ( *iter );
     }
-    m_ResourceFiles.empty ();
+    m_ResourceFiles.clear ();
 
     list < CResourceConfigItem* >::iterator iterc = m_ConfigFiles.begin ();
     for ( ; iterc != m_ConfigFiles.end (); iterc++ )
     {
         delete ( *iterc );
     }
-    m_ConfigFiles.empty ();
+    m_ConfigFiles.clear ();
 
     // Delete the exported functions
     list < CExportedFunction* >::iterator iterExportedFunction = m_exportedFunctions.begin();
@@ -144,7 +144,7 @@ CResource::~CResource ( void )
     {
         delete ( *iterExportedFunction );
     }
-    m_exportedFunctions.empty();
+    m_exportedFunctions.clear();
 }
 
 CDownloadableResource* CResource::QueueFile ( CDownloadableResource::eResourceType resourceType, const char *szFileName, CChecksum serverChecksum, bool bAutoDownload )

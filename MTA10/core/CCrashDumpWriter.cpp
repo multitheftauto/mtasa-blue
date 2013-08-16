@@ -633,7 +633,7 @@ void CCrashDumpWriter::GetD3DInfo ( CBuffer& buffer )
     // Try to get CRenderWare pointer
     CCore* pCore = CCore::GetSingletonPtr ();
     CGame* pGame = pCore ? pCore->GetGame () : NULL;
-    CRenderWare* pRenderWare = pGame->GetRenderWare ();
+    CRenderWare* pRenderWare = pGame ? pGame->GetRenderWare () : NULL;
     // Write on how we got on with doing that
     stream.Write ( (uchar)( pCore ? 1 : 0 ) );
     stream.Write ( (uchar)( pGame ? 1 : 0 ) );

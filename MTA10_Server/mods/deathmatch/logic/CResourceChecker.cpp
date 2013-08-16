@@ -918,7 +918,7 @@ int CResourceChecker::ReplaceFilesInZIP( const string& strOrigZip, const string&
                 buf = new char[ ulLength ];
                 if ( fread ( buf, 1, ulLength, pFile ) != ulLength )
                 {
-                    free( buf );
+                    delete [] buf;
                     buf = NULL;
                 }
 

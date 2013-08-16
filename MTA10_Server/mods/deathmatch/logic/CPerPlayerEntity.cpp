@@ -366,7 +366,7 @@ void CPerPlayerEntity::RemovePlayerReference ( CPlayer* pPlayer )
 //
 void CPerPlayerEntity::StaticOnPlayerDelete ( CPlayer* pPlayer )
 {
-    for ( std::set < CPerPlayerEntity* >::iterator iter = ms_AllPerPlayerEntityMap.begin (); iter != ms_AllPerPlayerEntityMap.begin () ; ++iter )
+    for ( std::set < CPerPlayerEntity* >::iterator iter = ms_AllPerPlayerEntityMap.begin (); iter != ms_AllPerPlayerEntityMap.end () ; ++iter )
     {
         (*iter)->OnPlayerDelete ( pPlayer );
     }

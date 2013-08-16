@@ -557,6 +557,7 @@ void CPacketHandler::Packet_ServerDisconnected ( NetBitStreamInterface& bitStrea
         case ePlayerDisconnectType::BANNED_IP:
             strReason = _("Disconnected: You are banned.\nReason: %s"); strErrorCode = _E("CD33");
             bitStream.ReadString ( strDuration );
+            break;
         case ePlayerDisconnectType::BANNED_ACCOUNT:
             strReason = _("Disconnected: Account is banned.\nReason: %s"); strErrorCode = _E("CD34");
             break;

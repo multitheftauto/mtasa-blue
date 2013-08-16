@@ -81,7 +81,7 @@ bool CVehicleUpgrades::IsUpgradeCompatible ( unsigned short usUpgrade )
     {
         case 400: return ( us == 1020 || us == 1021 || us == 1019 || us == 1018 || us == 1013 || us == 1024 || us == 1008 || us == 1009 || us == 1010 );
         case 401: return ( us == 1005 || us == 1004 || us == 1142 || us == 1143 || us == 1144 || us == 114 || us == 1020 || us == 1019 || us == 1013 || us == 1008 || us == 1009 || us == 1010 || us == 1006 || us == 1001 || us == 1003 || us == 1017 || us == 1007 );
-        case 402: return ( us == 1009 || us == 1009 || us == 1010 );
+        case 402: return ( us == 1009 || us == 1010 );
         case 404: return ( us == 1020 || us == 1021 || us == 1019 || us == 1013 || us == 1008 || us == 1009 || us == 1010 || us == 1002 || us == 1016 || us == 1000 || us == 1017 || us == 1007 );
         case 405: return ( us == 1020 || us == 1021 || us == 1019 || us == 1018 || us == 1008 || us == 1009 || us == 1010 || us == 1001 || us == 1014 || us == 1023 || us == 1000 );
         case 409: return ( us == 1009 );

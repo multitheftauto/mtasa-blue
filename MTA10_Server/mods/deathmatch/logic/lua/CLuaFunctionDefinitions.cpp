@@ -4443,26 +4443,26 @@ int CLuaFunctionDefinitions::GetVehicleUpgradeOnSlot ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::GetVehicleUpgradeSlotName ( lua_State* luaVM )
 {
-    unsigned char ucNumber; 
+    unsigned short usNumber; 
     
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadNumber(ucNumber); 
+    argStream.ReadNumber(usNumber); 
     
     if ( !argStream.HasErrors ( ) )
     {
-        if ( ucNumber < 17 )
+        if ( usNumber < 17 )
         {
             SString strUpgradeName;
-            if ( CStaticFunctionDefinitions::GetVehicleUpgradeSlotName ( static_cast < unsigned char >( ucNumber ), strUpgradeName ) )
+            if ( CStaticFunctionDefinitions::GetVehicleUpgradeSlotName ( static_cast < unsigned char >( usNumber ), strUpgradeName ) )
             {
                 lua_pushstring ( luaVM, strUpgradeName );
                 return 1;
             }
         }
-        else if ( ucNumber >= 1000 && ucNumber <= 1193 )
+        else if ( usNumber >= 1000 && usNumber <= 1193 )
         {
             SString strUpgradeName;
-            if ( CStaticFunctionDefinitions::GetVehicleUpgradeSlotName ( static_cast < unsigned short >( ucNumber ), strUpgradeName )  )
+            if ( CStaticFunctionDefinitions::GetVehicleUpgradeSlotName ( usNumber, strUpgradeName )  )
             {
                 lua_pushstring ( luaVM, strUpgradeName );
                 return 1;

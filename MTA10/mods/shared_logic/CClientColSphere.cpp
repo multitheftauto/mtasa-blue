@@ -31,7 +31,7 @@ namespace
     void CreateSphereFaces ( std::vector < SFace >& faceList, int iIterations )
     {
         int numFaces = (int)( pow ( 4.0, iIterations ) * 8 );
-        faceList.empty ();
+        faceList.clear ();
         faceList.reserve ( numFaces );
 
         // Initial octahedron
