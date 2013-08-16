@@ -1301,6 +1301,21 @@ void RestartCallBack ( void* ptr, unsigned int uiButton )
 }
 
 
+void CSettings::ShowRestartQuestion ( void )
+{
+    SString strMessage = _("Some settings will be changed when you next start MTA");
+    strMessage += _("\n\nDo you want to restart now?");
+    CQuestionBox* pQuestionBox = CCore::GetSingleton ().GetLocalGUI ()->GetMainMenu ()->GetQuestionWindow ();
+    pQuestionBox->Reset ();
+    pQuestionBox->SetTitle ( _("RESTART REQUIRED") );
+    pQuestionBox->SetMessage ( strMessage );
+    pQuestionBox->SetButton ( 0, _("No") );
+    pQuestionBox->SetButton ( 1, _("Yes") );
+    pQuestionBox->SetCallback ( RestartCallBack );
+    pQuestionBox->Show ();
+}
+
+
 bool CSettings::OnMouseDoubleClick ( CGUIMouseEventArgs Args )
 {
     if ( Args.pWindow == m_pBindsList ) {
@@ -1356,10 +1371,9 @@ void CSettings::UpdateAudioTab ()
 
 }
 
-void CSettings::UpdateVideoTab ( bool bIsVideoModeChanged )
+void CSettings::UpdateVideoTab ( void )
 {
     CGameSettings * gameSettings = CCore::GetSingleton ().GetGame ()->GetSettings ();
-    
 
     bool bNextWindowed;
     bool bNextFSMinimize;
@@ -1367,50 +1381,6 @@ void CSettings::UpdateVideoTab ( bool bIsVideoModeChanged )
     int iNextFullscreenStyle;
     GetVideoModeManager ()->GetNextVideoMode ( iNextVidMode, bNextWindowed, bNextFSMinimize, iNextFullscreenStyle );
 
-    bool bIsAntiAliasingChanged = gameSettings->GetAntiAliasing () != m_pComboAntiAliasing->GetSelectedItemIndex ();
-    bool bIsAeroChanged = ( GetApplicationSettingInt ( "aero-enabled"  ) ? false : true ) != m_pCheckBoxDisableAero->GetSelected ();
-    bool bIsDriverOverridesChanged = ( GetApplicationSettingInt ( "driver-overrides-disabled"  ) ? true : false ) != m_pCheckBoxDisableDriverOverrides->GetSelected ();
-    if ( bIsVideoModeChanged || bIsAntiAliasingChanged || bIsAeroChanged || bIsDriverOverridesChanged )
-    {
-        SString strChangedOptions; //!ACHTUNG:  Need to consider something that applies universally to grammar rules
-        if ( bIsVideoModeChanged )
-        {
-            strChangedOptions += _("Resolution");
-            if ( bNextFSMinimize != GetVideoModeManager ()->IsMinimizeEnabled () )
-            {
-                strChangedOptions += "/";
-                strChangedOptions += _("Full Screen Minimize");
-            }
-        }
-
-        if ( bIsAntiAliasingChanged )
-        {
-            if ( !strChangedOptions.empty () )
-                strChangedOptions += _(" and ");
-            strChangedOptions += _("Anti-aliasing");
-        }
-
-        if ( bIsAeroChanged )
-        {
-            if ( !strChangedOptions.empty () )
-                strChangedOptions += _(" and ");
-            strChangedOptions += _("Aero setting");
-        }
-
-        if ( strChangedOptions.empty () )
-            strChangedOptions += _("Some settings");
-
-        SString strMessage ( _("%s will be changed when you next start MTA"), strChangedOptions.c_str () );
-        strMessage += _("\n\nDo you want to restart now?");
-        CQuestionBox* pQuestionBox = CCore::GetSingleton ().GetLocalGUI ()->GetMainMenu ()->GetQuestionWindow ();
-        pQuestionBox->Reset ();
-        pQuestionBox->SetTitle ( _("RESTART REQUIRED") );
-        pQuestionBox->SetMessage ( strMessage );
-        pQuestionBox->SetButton ( 0, _("No") );
-        pQuestionBox->SetButton ( 1, _("Yes") );
-        pQuestionBox->SetCallback ( RestartCallBack );
-        pQuestionBox->Show ();
-    }
     m_pCheckBoxMipMapping->SetSelected ( gameSettings->IsMipMappingEnabled () );
     m_pCheckBoxWindowed->SetSelected ( bNextWindowed );
     m_pCheckBoxMinimize->SetSelected ( bNextFSMinimize );
@@ -1515,9 +1485,9 @@ void CSettings::UpdateVideoTab ( bool bIsVideoModeChanged )
     }    
     
     // Fullscreen style
-    if ( iNextFullscreenStyle == FULLSCREEN_STANDARD ) m_pFullscreenStyleCombo->SetText ( "Standard" );
-    else if ( iNextFullscreenStyle == FULLSCREEN_BORDERLESS ) m_pFullscreenStyleCombo->SetText ( "Borderless window" );
-    else if ( iNextFullscreenStyle == FULLSCREEN_BORDERLESS_KEEP_RES ) m_pFullscreenStyleCombo->SetText ( "Borderless keep res" );
+    if ( iNextFullscreenStyle == FULLSCREEN_STANDARD ) m_pFullscreenStyleCombo->SetText ( _("Standard") );
+    else if ( iNextFullscreenStyle == FULLSCREEN_BORDERLESS ) m_pFullscreenStyleCombo->SetText ( _("Borderless window") );
+    else if ( iNextFullscreenStyle == FULLSCREEN_BORDERLESS_KEEP_RES ) m_pFullscreenStyleCombo->SetText ( _("Borderless keep res") );
 
     // Streaming memory
     unsigned int uiStreamingMemory = 0;
@@ -1672,8 +1642,15 @@ bool CSettings::OnVideoDefaultClick ( CGUIElement* pElement )
 
     CVARS_SET ( "mapalpha", 140.25f);
 
+    // Display restart required message if required
+    bool bIsAntiAliasingChanged = gameSettings->GetAntiAliasing () != m_pComboAntiAliasing->GetSelectedItemIndex ();
+    bool bIsAeroChanged = ( GetApplicationSettingInt ( "aero-enabled"  ) ? false : true ) != m_pCheckBoxDisableAero->GetSelected ();
+    bool bIsDriverOverridesChanged = ( GetApplicationSettingInt ( "driver-overrides-disabled"  ) ? true : false ) != m_pCheckBoxDisableDriverOverrides->GetSelected ();
+    if ( bIsVideoModeChanged || bIsAntiAliasingChanged || bIsAeroChanged || bIsDriverOverridesChanged )
+        ShowRestartQuestion();
+
     // Update the GUI
-    UpdateVideoTab ( bIsVideoModeChanged );
+    UpdateVideoTab ();
 
     return true;
 }
@@ -2491,116 +2468,7 @@ void CSettings::LoadData ( void )
     m_pAudioMTAVolume->SetScrollPosition ( m_fOldMTAVolume );
     m_pAudioVoiceVolume->SetScrollPosition ( m_fOldVoiceVolume );
 
-    // Video
-    int nextVideoMode;
-    bool bNextWindowed;
-    bool bNextFSMinimize;
-    int iNextFullscreenStyle;
-    GetVideoModeManager ()->GetNextVideoMode ( nextVideoMode, bNextWindowed, bNextFSMinimize, iNextFullscreenStyle );
-
-	m_pCheckBoxMipMapping->SetSelected ( gameSettings->IsMipMappingEnabled () );
-    m_pCheckBoxWindowed->SetSelected ( bNextWindowed );
-    m_pCheckBoxMinimize->SetSelected ( bNextFSMinimize );
-    m_pCheckBoxDisableAero->SetSelected ( GetApplicationSettingInt ( "aero-enabled" ) ? false : true );
-    m_pCheckBoxDisableDriverOverrides->SetSelected ( GetApplicationSettingInt ( "driver-overrides-disabled" ) ? true : false );
-    m_pDrawDistance->SetScrollPosition ( ( gameSettings->GetDrawDistance () - 0.925f ) / 0.8749f );
-    m_pBrightness->SetScrollPosition ( ( float )gameSettings->GetBrightness () / 384 );
-
-    // Anisotropic filtering
-    int iAnisotropic;
-    CVARS_GET ( "anisotropic", iAnisotropic );
-    m_pAnisotropic->SetScrollPosition ( iAnisotropic / ( float )m_iMaxAnisotropic );
-
-    int FxQuality = gameSettings->GetFXQuality();
-    if ( FxQuality == 0 ) m_pComboFxQuality->SetText ( _("Low") );
-    else if ( FxQuality == 1 ) m_pComboFxQuality->SetText ( _("Medium") );
-    else if ( FxQuality == 2 ) m_pComboFxQuality->SetText ( _("High") );
-    else if ( FxQuality == 3 ) m_pComboFxQuality->SetText ( _("Very high") );
-
-    char AntiAliasing = gameSettings->GetAntiAliasing();
-    if ( AntiAliasing == 1 ) m_pComboAntiAliasing->SetText ( _("Off") );
-    else if ( AntiAliasing == 2 ) m_pComboAntiAliasing->SetText ( _("1x") );
-    else if ( AntiAliasing == 3 ) m_pComboAntiAliasing->SetText ( _("2x") );
-    else if ( AntiAliasing == 4 ) m_pComboAntiAliasing->SetText ( _("3x") );
-
-    // Aspect ratio
-    int aspectRatio;
-    CVARS_GET("aspect_ratio", aspectRatio);
-    if ( aspectRatio == ASPECT_RATIO_AUTO ) m_pComboAspectRatio->SetText ( _("Auto") );
-    else if ( aspectRatio == ASPECT_RATIO_4_3 ) m_pComboAspectRatio->SetText ( _("4:3") );
-    else if ( aspectRatio == ASPECT_RATIO_16_10 ) m_pComboAspectRatio->SetText ( _("16:10") );
-    else if ( aspectRatio == ASPECT_RATIO_16_9 ) m_pComboAspectRatio->SetText ( _("16:9") );
-
-    // HUD match aspect ratio
-    m_pCheckBoxHudMatchAspectRatio->SetSelected( CVARS_GET_VALUE < bool > ( "hud_match_aspect_ratio" ) );
-
-    // Volumetric shadows
-    bool bVolumetricShadowsEnabled;
-    CVARS_GET("volumetric_shadows", bVolumetricShadowsEnabled);
-	m_pCheckBoxVolumetricShadows->SetSelected ( bVolumetricShadowsEnabled );
-	m_pCheckBoxVolumetricShadows->SetEnabled ( FxQuality != 0 );
-
-    // Device selection dialog
-    bool bDeviceSelectionDialogEnabled = GetApplicationSettingInt ( "device-selection-disabled" ) ? false : true;
-    m_pCheckBoxDeviceSelectionDialog->SetSelected ( bDeviceSelectionDialogEnabled );
-
-    // Allow screen upload
-    bool bAllowScreenUploadEnabled;
-    CVARS_GET("allow_screen_upload", bAllowScreenUploadEnabled);
-    m_pCheckBoxAllowScreenUpload->SetSelected ( bAllowScreenUploadEnabled );
-
-    // Customized sa files
-	m_pCheckBoxCustomizedSAFiles->SetSelected ( GetApplicationSettingInt ( "customized-sa-files-request" ) != 0 );
-	m_pCheckBoxCustomizedSAFiles->SetVisible ( GetApplicationSettingInt ( "customized-sa-files-show" ) != 0 );
-
-    // Grass
-    bool bGrassEnabled;
-    CVARS_GET ( "grass", bGrassEnabled );
-    m_pCheckBoxGrass->SetSelected ( bGrassEnabled );
-    m_pCheckBoxGrass->SetEnabled ( FxQuality != 0 );
-
-    // Heat haze
-    bool bHeatHazeEnabled;
-    CVARS_GET ( "heat_haze", bHeatHazeEnabled );
-    m_pCheckBoxHeatHaze->SetSelected ( bHeatHazeEnabled );
-
-    VideoMode           vidModemInfo;
-    int                 vidMode, numVidModes;
-
-    m_pComboResolution->Clear ();
-    numVidModes = gameSettings->GetNumVideoModes();
-
-    for (vidMode = 0; vidMode < numVidModes; vidMode++)
-    {
-        gameSettings->GetVideoModeInfo(&vidModemInfo, vidMode);
-
-        // Remove resolutions that will make the gui unusable
-        if ( vidModemInfo.width < 640 || vidModemInfo.height < 480 )
-            continue;
-
-        // Check resolution hasn't already been added
-        bool bDuplicate = false;
-        for ( int i = 1; i < vidMode ; i++ )
-        {
-            VideoMode info;
-            gameSettings->GetVideoModeInfo(&info, i);
-            if ( info.width == vidModemInfo.width && info.height == vidModemInfo.height && info.depth == vidModemInfo.depth )
-                bDuplicate = true;
-        }
-        if ( bDuplicate )
-            continue;
-
-        SString strMode ( "%lu x %lu x %lu", vidModemInfo.width, vidModemInfo.height, vidModemInfo.depth );
-
-        if ( vidModemInfo.flags & rwVIDEOMODEEXCLUSIVE )
-            m_pComboResolution->AddItem ( strMode )->SetData ( (void*)vidMode );
-
-        VideoMode currentInfo;
-        gameSettings->GetVideoModeInfo ( &currentInfo, nextVideoMode );
-
-        if ( currentInfo.width == vidModemInfo.width && currentInfo.height == vidModemInfo.height && currentInfo.depth == vidModemInfo.depth )
-            m_pComboResolution->SetText ( strMode );
-    }
+    UpdateVideoTab();
 
     // Locale
     SString strLocale;
@@ -2627,11 +2495,6 @@ void CSettings::LoadData ( void )
         strItemText = m_pInterfaceSkinSelector->GetItemText( ++uiIndex );
     }
     m_pInterfaceSkinSelector->SetSelectedItemByIndex(uiIndex);
-
-    // Fullscreen style
-    if ( iNextFullscreenStyle == FULLSCREEN_STANDARD ) m_pFullscreenStyleCombo->SetText ( _("Standard") );
-    else if ( iNextFullscreenStyle == FULLSCREEN_BORDERLESS ) m_pFullscreenStyleCombo->SetText ( _("Borderless window") );
-    else if ( iNextFullscreenStyle == FULLSCREEN_BORDERLESS_KEEP_RES ) m_pFullscreenStyleCombo->SetText ( _("Borderless keep res") );
 
     // Process priority
     int iVar;
@@ -2664,13 +2527,6 @@ void CSettings::LoadData ( void )
     if ( iVar == 0 ) m_pUpdateBuildTypeCombo->SetText ( _("Default") );
     else if ( iVar == 1 ) m_pUpdateBuildTypeCombo->SetText ( "Beta" );
     else if ( iVar == 2 ) m_pUpdateBuildTypeCombo->SetText ( "Nightly" );
-
-    // Map alpha
-    CVARS_GET ( "mapalpha", iVar);
-    int iAlphaPercent = ceil( ( (float)Clamp ( 0, iVar, 255 ) / 255 ) * 100 );
-    m_pMapAlphaValueLabel->SetText ( SString("%i%%", iAlphaPercent).c_str() );
-    float sbPos = (float)iAlphaPercent / 100.0f;
-    m_pMapAlpha->SetScrollPosition ( sbPos );
 
     // Chat
     LoadChatColorFromCVar ( ChatColorTypes::CHAT_COLOR_BG, "chat_color" );
@@ -2711,13 +2567,6 @@ void CSettings::LoadData ( void )
         CVARS_GET ( "chat_line_fade_out", iVar ); 
         SetMilliseconds ( m_pChatLineFadeout, iVar );
     }
-
-    // Streaming memory
-    unsigned int uiStreamingMemory;
-    CVARS_GET ( "streaming_memory", uiStreamingMemory );
-    uiStreamingMemory = SharedUtil::Clamp ( g_pCore->GetMinStreamingMemory (), uiStreamingMemory, g_pCore->GetMaxStreamingMemory () );
-    float fPos = SharedUtil::Unlerp ( g_pCore->GetMinStreamingMemory (), uiStreamingMemory, g_pCore->GetMaxStreamingMemory () );
-    m_pStreamingMemory->SetScrollPosition ( fPos );
 }
 
 void CSettings::SaveData ( void )
@@ -2975,58 +2824,7 @@ void CSettings::SaveData ( void )
 
     // Ask to restart?
     if ( bIsVideoModeChanged || bIsAntiAliasingChanged || bIsAeroChanged || bIsDriverOverridesChanged || bIsCustomizedSAFilesChanged || bIsLocaleChanged )
-    {
-        SString strChangedOptions; //!ACHTUNG:  Need to consider something that applies universally to grammar rules
-        if ( bIsVideoModeChanged )
-        {
-            strChangedOptions += _("Resolution");
-            if ( bNextFSMinimize != GetVideoModeManager ()->IsMinimizeEnabled () )
-                strChangedOptions += _("/Full Screen Minimize");
-        }
-
-        if ( bIsAntiAliasingChanged )
-        {
-            if ( !strChangedOptions.empty () )
-                strChangedOptions += _(" and ");
-            strChangedOptions += _("Anti-aliasing");
-        }
-
-        if ( bIsAeroChanged )
-        {
-            if ( !strChangedOptions.empty () )
-                strChangedOptions += _(" and ");
-            strChangedOptions += _("Aero setting");
-        }
-
-        if ( bIsCustomizedSAFilesChanged )
-        {
-            if ( !strChangedOptions.empty () )
-                strChangedOptions += _(" and ");
-            strChangedOptions += _("Customized GTA:SA files setting");
-        }
-
-        if ( bIsLocaleChanged )
-        {
-            if ( !strChangedOptions.empty () )
-                strChangedOptions += _(" and ");
-            strChangedOptions += _("Language setting");
-        }
-
-
-        if ( strChangedOptions.empty () )
-            strChangedOptions += _("Some settings");
-
-        SString strMessage ( _("%s will be changed when you next start MTA"), strChangedOptions.c_str () );
-        strMessage += _("\n\nDo you want to restart now?");
-        CQuestionBox* pQuestionBox = CCore::GetSingleton ().GetLocalGUI ()->GetMainMenu ()->GetQuestionWindow ();
-        pQuestionBox->Reset ();
-        pQuestionBox->SetTitle ( _("RESTART REQUIRED") );
-        pQuestionBox->SetMessage ( strMessage );
-        pQuestionBox->SetButton ( 0, _("No") );
-        pQuestionBox->SetButton ( 1, _("Yes") );
-        pQuestionBox->SetCallback ( RestartCallBack );
-        pQuestionBox->Show ();
-    }
+        ShowRestartQuestion();
 }
 
 void CSettings::RemoveKeyBindSection ( char * szSectionName )
