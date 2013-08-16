@@ -165,7 +165,7 @@ public:
     float                       GetDoorOpenRatio        ( unsigned char ucDoor );
     void                        SetSwingingDoorsAllowed ( bool bAllowed );
     bool                        AreSwingingDoorsAllowed () const;
-    void                        AllowDoorRatioSetting   ( unsigned char ucDoor, bool bAllow );
+    void                        AllowDoorRatioSetting   ( unsigned char ucDoor, bool bAllow, bool bAutoReallowAfterDelay = true );
     bool                        AreDoorsLocked          ( void );
     void                        SetDoorsLocked          ( bool bLocked );
 
@@ -514,6 +514,7 @@ protected:
     bool                        m_bLandingGearDown;
     bool                        m_bHasAdjustableProperty;
     unsigned short              m_usAdjustablePropertyValue;
+    std::map < eDoors, CTickCount > m_AutoReallowDoorRatioMap;
     SFixedArray < bool, 6 >     m_bAllowDoorRatioSetting;
     SFixedArray < float, 6 >    m_fDoorOpenRatio;
     struct

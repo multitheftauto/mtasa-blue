@@ -722,12 +722,17 @@ bool CClientVehicle::AreSwingingDoorsAllowed () const
     return m_bSwingingDoorsAllowed;
 }
 
-void CClientVehicle::AllowDoorRatioSetting ( unsigned char ucDoor, bool bAllow )
+void CClientVehicle::AllowDoorRatioSetting ( unsigned char ucDoor, bool bAllow, bool bAutoReallowAfterDelay )
 {
     if ( ucDoor < NUMELMS(m_bAllowDoorRatioSetting) )
     {
         m_bAllowDoorRatioSetting [ucDoor] = bAllow;
         CancelDoorInterpolation ( ucDoor );
+        MapRemove( m_AutoReallowDoorRatioMap, (eDoors)ucDoor );
+        if ( !bAllow && bAutoReallowAfterDelay )
+        {
+            MapSet( m_AutoReallowDoorRatioMap, (eDoors)ucDoor, CTickCount::Now() );
+        }
     }
 }
 
@@ -2062,6 +2067,23 @@ void CClientVehicle::StreamedInPulse ( void )
         {
             Blow ( false );
             m_bBlowNextFrame = false;
+        }
+
+        // Handle door ratio auto reallowment
+        if ( !m_AutoReallowDoorRatioMap.empty() )
+        {
+            for ( std::map < eDoors, CTickCount >::iterator iter = m_AutoReallowDoorRatioMap.begin() ; iter != m_AutoReallowDoorRatioMap.end() ; )
+            {
+                if ( ( CTickCount::Now() - iter->second ).ToInt() > 4000 )
+                {
+                    uchar ucDoor = iter->first;
+                    m_AutoReallowDoorRatioMap.erase( iter++ );
+                    if ( !m_bAllowDoorRatioSetting[ ucDoor ] )
+                        AllowDoorRatioSetting( ucDoor, true );
+                }
+                else
+                    ++iter;
+            }
         }
  
         // Are we an unmanned, invisible, blown-up plane?
@@ -3757,6 +3779,8 @@ void CClientVehicle::SetPedOccupiedVehicle ( CClientPed* pClientPed, CClientVehi
 
     if ( ucDoor != 0xFF )
         pVehicle->AllowDoorRatioSetting ( ucDoor, true );
+    else if ( uiSeat < 4 )
+        pVehicle->AllowDoorRatioSetting ( uiSeat + 2, true );
 
     // Checks
     ValidatePedAndVehiclePair ( pClientPed, pVehicle );
