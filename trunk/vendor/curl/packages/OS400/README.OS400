@@ -1,4 +1,3 @@
-$Id: README.OS400,v 1.12 2009-02-17 16:16:07 patrickm Exp $
 
 Implementation notes:
 
@@ -40,22 +39,24 @@ header files are thus altered during build process to use this pragma, in
 order to force libcurl enums of being type int (the pragma disposition in use
 before inclusion is restored before resuming the including unit compilation).
 
-  Three SSL implementations were present in libcurl. Nevertheless, none of them
-is available on OS/400. To support SSL on OS/400, a fourth implementation has
-been added (qssl.[ch]). There is no way to have different certificate stores
-for CAs and for personal/application certificates/key. More, the SSL context
-may be defined as an application identifier in the main certificate store,
-or as a keyring file. As a consequence, the meaning of some fields have been
-slightly altered:
-_ The "certificate identifier" is taken from CURLOPT_SSLCERT if defined, else
-from CURLOPT_CAINFO.
-_ The certificate identifier is then used as an application identifier in the
-main certificate store. If successful, this context is used.
-_ If the previous step failed, the certificate identifier is used as the file
-name of a keyring. CURLOPT_KEYPASSWD is used here as the keyring password.
-_ The default ca-bundle (CURLOPT_CAINFO) is set to the main certificate store's
-keyring file name: this allows to use the system global CAs by default. (In that
-case, the keyring password is safely recovered from the system... IBM dixit!)
+  Two SSL implementations are available to libcurl on OS/400: QsoSSL which is
+obsolescent, does not support asynchronous I/O and only allows a single SSL
+context within a job, and GSKit that does not suffer from these limitations
+and is able to provide some information about the server certificate.
+  Both implementations of SSL are working on "certificate stores" or keyrings,
+rather than individual certificate/key files. Certificate stores, as weel as
+"certificate labels" are managed by external IBM-defined applications.
+  There are two ways to specify an SSL context:
+- By an application identifier.
+- By a keyring file pathname and (optionally) certificate label.
+  To identify an SSL context by application identifier, use option
+SETOPT_SSLCERT to specify the application identifier.
+  To address an SSL context by keyring and certificate label, use CURLOPT_CAINFO
+to set-up the keyring pathname, CURLOPT_SSLCERT to define the certificate label
+(omitting it will cause the default certificate in keyring to be used) and
+CURLOPT_KEYPASSWD to give the keyring password. If SSL is used without
+defining any of these options, the default (i.e.: system) keyring is used for
+server certificate validation.
 
   Non-standard EBCDIC wrapper prototypes are defined in an additional header
 file: ccsidcurl.h. These should be self-explanatory to an OS/400-aware
@@ -71,42 +72,52 @@ options:
         CURLOPT_COOKIEFILE
         CURLOPT_COOKIEJAR
         CURLOPT_COOKIELIST
+        CURLOPT_COPYPOSTFIELDS
+        CURLOPT_CRLFILE
         CURLOPT_CUSTOMREQUEST
+        CURLOPT_DNS_SERVERS
         CURLOPT_EGDSOCKET
         CURLOPT_ENCODING
-        CURLOPT_FTPPORT
         CURLOPT_FTP_ACCOUNT
         CURLOPT_FTP_ALTERNATIVE_TO_USER
+        CURLOPT_FTPPORT
         CURLOPT_INTERFACE
+        CURLOPT_ISSUERCERT
         CURLOPT_KEYPASSWD
         CURLOPT_KRBLEVEL
+        CURLOPT_MAIL_FROM
+        CURLOPT_MAIL_AUTH
         CURLOPT_NETRC_FILE
-        CURLOPT_COPYPOSTFIELDS
+        CURLOPT_NOPROXY
+        CURLOPT_PASSWORD
         CURLOPT_PROXY
+        CURLOPT_PROXYPASSWORD
+        CURLOPT_PROXYUSERNAME
         CURLOPT_PROXYUSERPWD
         CURLOPT_RANDOM_FILE
         CURLOPT_RANGE
         CURLOPT_REFERER
-        CURLOPT_SSH_PRIVATE_KEYFILE
-        CURLOPT_SSH_PUBLIC_KEYFILE
+        CURLOPT_RTSP_SESSION_UID
+        CURLOPT_RTSP_STREAM_URI
+        CURLOPT_RTSP_TRANSPORT
+        CURLOPT_SOCKS5_GSSAPI_SERVICE
+        CURLOPT_SSH_HOST_PUBLIC_KEY_MD5 Note: SSH not available on OS400.
+        CURLOPT_SSH_KNOWNHOSTS          Note: SSH not available on OS400.
+        CURLOPT_SSH_PRIVATE_KEYFILE     Note: SSH not available on OS400.
+        CURLOPT_SSH_PUBLIC_KEYFILE      Note: SSH not available on OS400.
         CURLOPT_SSLCERT
         CURLOPT_SSLCERTTYPE
+        CURLOPT_SSL_CIPHER_LIST
         CURLOPT_SSLENGINE
         CURLOPT_SSLKEY
         CURLOPT_SSLKEYTYPE
-        CURLOPT_SSL_CIPHER_LIST
+        CURLOPT_TLSAUTH_PASSWORD
+        CURLOPT_TLSAUTH_TYPE
+        CURLOPT_TLSAUTH_USERNAME
         CURLOPT_URL
         CURLOPT_USERAGENT
-        CURLOPT_USERPWD
-        CURLOPT_SSH_HOST_PUBLIC_KEY_MD5
-        CURLOPT_CRLFILE
-        CURLOPT_ISSUERCERT
         CURLOPT_USERNAME
-        CURLOPT_PASSWORD
-        CURLOPT_PROXYUSERNAME
-        CURLOPT_PROXYPASSWORD
-        CURLOPT_NOPROXY
-        CURLOPT_SOCKS5_GSSAPI_SERVICE
+        CURLOPT_USERPWD
   Else it is the same as for curl_easy_setopt().
   Note that CURLOPT_ERRORBUFFER is not in the list above, since it gives the
 address of an (empty) character buffer, not the address of a string.
@@ -141,6 +152,18 @@ use:
         CURLINFO_EFFECTIVE_URL
         CURLINFO_CONTENT_TYPE
         CURLINFO_FTP_ENTRY_PATH
+        CURLINFO_REDIRECT_URL
+        CURLINFO_PRIMARY_IP
+        CURLINFO_RTSP_SESSION_ID
+        CURLINFO_LOCAL_IP
+  Likewise, the following options are followed by a struct curl_slist * * and a
+CCSID.
+        CURLINFO_SSL_ENGINES
+        CURLINFO_COOKIELIST
+Lists returned should be released with curl_slist_free_all() after use.
+  Option CURLINFO_CERTINFO is followed by a struct curl_certinfo * * and a
+CCSID. Returned structures sould be free'ed using curl_certinfo_free_all() after
+use.
   Other options are processed like in curl_easy_getinfo().
 
   Standard compilation environment does support neither autotools nor make;
@@ -153,14 +176,27 @@ OS/400.
 
 
 Protocols currently implemented on OS/400:
-_ HTTP
-_ HTTPS
+_ DICT
+_ FILE
 _ FTP
 _ FTPS
-_ FTP with secure transmission.
+_ FTP with secure transmission
+_ GOPHER
+_ HTTP
+_ HTTPS
+_ IMAP
+_ IMAPS
+_ IMAP with secure transmission
 _ LDAP
-_ DICT
+_ POP3
+_ POP3S
+_ POP3 with secure transmission
+_ RTSP
+_ SMTP
+_ SMTPS
+_ SMTP with secure transmission
 _ TELNET
+_ TFTP
 
 
 
@@ -174,6 +210,8 @@ _ As a prerequisite, QADRT development environment must be installed.
 _ Install the curl source directory in IFS.
 _ Enter shell (QSH)
 _ Change current directory to the curl installation directory
+- If the SSL backend has to be changed, edit file lib/config-os400.h
+  accordingly.
 _ Change current directory to ./packages/OS400
 _ Edit file iniscript.sh. You may want to change tunable configuration
   parameters, like debug info generation, optimisation level, listing option,

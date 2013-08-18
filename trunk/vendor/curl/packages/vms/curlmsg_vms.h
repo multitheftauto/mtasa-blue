@@ -1,5 +1,30 @@
-/* $Id: curlmsg_vms.h,v 1.7 2008-09-03 20:51:36 curlvms Exp $                                                                     */
+#ifndef HEADER_CURLMSG_VMS_H
+#define HEADER_CURLMSG_VMS_H
+/***************************************************************************
+ *                                  _   _ ____  _
+ *  Project                     ___| | | |  _ \| |
+ *                             / __| | | | |_) | |
+ *                            | (__| |_| |  _ <| |___
+ *                             \___|\___/|_| \_\_____|
+ *
+ * Copyright (C) 1998 - 2011, Daniel Stenberg, <daniel@haxx.se>, et al.
+ *
+ * This software is licensed as described in the file COPYING, which
+ * you should have received as part of this distribution. The terms
+ * are also available at http://curl.haxx.se/docs/copyright.html.
+ *
+ * You may opt to use, copy, modify, merge, publish, distribute and/or sell
+ * copies of the Software, and permit persons to whom the Software is
+ * furnished to do so, under the terms of the COPYING file.
+ *
+ * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+ * KIND, either express or implied.
+ *
+ ***************************************************************************/
+
+/*                                                                          */
 /* CURLMSG_VMS.H                                                            */
+/*                                                                          */
 /* This defines the necessary bits to change CURLE_* error codes to VMS     */
 /* style error codes.  CURLMSG.H is built from CURLMSG.SDL which is built   */
 /* from CURLMSG.MSG.  The vms_cond array is used to return VMS errors by    */
@@ -7,23 +32,24 @@
 /*                                                                          */
 /* If you update CURLMSG.MSG make sure to update this file to match.        */
 /*                                                                          */
+
 #include "curlmsg.h"
-int       vms_show = 0;
+
 /*
 #define   FAC_CURL      0xC01
 #define   FAC_SYSTEM    0
 #define   MSG_NORMAL    0
 */
-#define   VMS_STS(c,f,e,s) (((c&0xF)<<28)|((f&0xFFF)<<16)|((e&0x1FFF)<3)|(s&7))
-#define   VMSSTS_HIDE   VMS_STS(1,0,0,0)
+
 /*
 #define   SEV_WARNING   0
 #define   SEV_SUCCESS   1
 #define   SEV_ERROR     2
-#define   SEV_INFO      3   
+#define   SEV_INFO      3
 #define   SEV_FATAL     4
 */
-long vms_cond[] = 
+
+static const long vms_cond[] =
         {
         CURL_OK,
 	CURL_UNSUPPORTED_PROTOCOL,
@@ -111,3 +137,5 @@ long vms_cond[] =
 	CURLE_SSL_ISSUER_ERROR,
         CURL_CURL_LAST
         };
+
+#endif /* HEADER_CURLMSG_VMS_H */

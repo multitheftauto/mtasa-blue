@@ -9,11 +9,11 @@ from client applications as well as creating a GUI application to allow
 file transfers.  The author has no current plans to do so.
 
 This means that integration with standard Symbian OS programs can be
-tricky, since libcurl isn't designed with Symbian's native asynchronous 
+tricky, since libcurl isn't designed with Symbian's native asynchronous
 message passing idioms in mind. However, it may be possible to use libcurl
 in an active object-based application through libcurl's multi interface.
 The port is most easily used when porting POSIX applications to Symbian
-OS using P.I.P.S.
+OS using P.I.P.S. (a.k.a. Open C).
 
 libcurl is built as a standard Symbian ordinal-linked DLL, and curl is
 built as a text mode EXE application.  They have not been Symbian
@@ -63,20 +63,25 @@ calling certain other libcurl functions) before any libcurl functions
 that could allocate memory (like curl_getenv()).
 
 P.I.P.S. doesn't support signals or the alarm() call, so some timeouts
-(such as the connect timeout) are not honoured.
+(such as the connect timeout) are not honoured. This should not be
+an issue once support for CURLRES_THREADED is added for Symbian.
 
 P.I.P.S. causes a USER:87 panic if certain timeouts much longer than
 half an hour are selected.
 
-LDAP, SCP or SFTP methods are not supported.
+LDAP, SCP or SFTP methods are not supported due to lack of support for
+the dependent libaries on Symbian.
 
-gzip and deflate decompression is supported when enabled in the libcurl.mmp
-file.
+gzip and deflate decompression is supported when the appropriate macro
+is uncommented in the libcurl.mmp file.
 
-SSL/TLS encryption is not supported by default, but it has been reported
-to be made working with macros similar to the ones in config-symbian.h
-and libcurl.mmp. This requires the OpenSSL libraries included in the S60
-Open C SDK.
+SSL/TLS encryption is not enabled by default, but it is possible to add
+when the OpenSSL libraries included in the S60 Open C SDK are available.
+The appropriate macro in the libcurl.mmp file must be uncommented to
+enable support.
+
+NTLM authentication may not work on some servers due to the lack of
+MD4 support in the OpenSSL libraries included with Open C.
 
 Debug builds are not supported (i.e. --enable-debug) because they cause
 additional symbol exports in the library which are not frozen in the .def
@@ -85,4 +90,4 @@ files.
 
 Dan Fandrich
 dan@coneharvesters.com
-October 2008
+March 2010
