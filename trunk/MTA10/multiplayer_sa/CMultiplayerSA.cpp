@@ -5417,7 +5417,7 @@ void _cdecl CheckMatrix ( float* pMatrix )
     int PosBits = p[12] | p[13] | p[14];
 
     // If rotational part is outside -2 to 2 range, then flag fix
-    bool bFix = ( RotBits & 0x40000000 );
+    bool bFix = ( RotBits & 0x40000000 ) != 0;
   
     // If positional part is outside -2 to 2 range, then do further check for -10 to 10 range
     if ( PosBits & 0x40000000 )

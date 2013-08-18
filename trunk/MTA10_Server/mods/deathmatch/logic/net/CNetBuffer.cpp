@@ -84,9 +84,9 @@ CNetServerBuffer::~CNetServerBuffer ( void )
 ///////////////////////////////////////////////////////////////
 void CNetServerBuffer::SetAutoPulseEnabled ( bool bEnable )
 {
-    shared.m_Mutex.Lock ( EActionWho::MAIN, EActionWhere::SetAutoPulseEnabled );
+    shared.m_Mutex.Lock ();
     shared.m_bAutoPulse = bEnable;
-    shared.m_Mutex.Unlock ( EActionWho::MAIN, EActionWhere::SetAutoPulseEnabled );
+    shared.m_Mutex.Unlock ();
 }
 
 
@@ -100,10 +100,10 @@ void CNetServerBuffer::SetAutoPulseEnabled ( bool bEnable )
 void CNetServerBuffer::StopThread ( void )
 {
     // Stop the job queue processing thread
-    shared.m_Mutex.Lock ( EActionWho::MAIN, EActionWhere::StopThread );
+    shared.m_Mutex.Lock ();
     shared.m_bTerminateThread = true;
-    shared.m_Mutex.Signal ( EActionWho::MAIN, EActionWhere::StopThread );
-    shared.m_Mutex.Unlock ( EActionWho::MAIN, EActionWhere::StopThread );
+    shared.m_Mutex.Signal ();
+    shared.m_Mutex.Unlock ();
 
     for ( uint i = 0 ; i < 5000 ; i += 15 )
     {
@@ -182,11 +182,11 @@ void CNetServerBuffer::DoPulse ( void )
     {
         m_TimeThreadFPSLastCalced.Reset ();
         float fSyncFPS;
-        shared.m_Mutex.Lock ( EActionWho::MAIN, EActionWhere::DoPulse );
+        shared.m_Mutex.Lock ();
         fSyncFPS = static_cast < float > ( shared.m_iThreadFrameCount );
         shared.m_iThreadFrameCount = 0;
         shared.m_iuGamePlayerCount = g_pGame->GetPlayerManager ()->Count (); // Also update player count here (for scaling buffer size checks)
-        shared.m_Mutex.Unlock ( EActionWho::MAIN, EActionWhere::DoPulse );
+        shared.m_Mutex.Unlock ();
 
         // Compress high counts
         if ( fSyncFPS > 500 )
@@ -551,9 +551,9 @@ void CNetServerBuffer::SetChecks ( const char* szDisableComboACMap, const char* 
 ///////////////////////////////////////////////////////////////////////////
 unsigned int CNetServerBuffer::GetPendingPacketCount ( void )
 {
-    shared.m_Mutex.Lock ( EActionWho::MAIN, EActionWhere::GetPendingPacketCount );
+    shared.m_Mutex.Lock ();
     uint uiCount = shared.m_InResultQueue.size ();
-    shared.m_Mutex.Unlock ( EActionWho::MAIN, EActionWhere::GetPendingPacketCount );
+    shared.m_Mutex.Unlock ();
     return uiCount;
 }
 
@@ -727,11 +727,11 @@ CNetJobData* CNetServerBuffer::AddCommand ( SArgs* pArgs, bool bAutoFree )
     pJobData->bAutoFree = bAutoFree;
 
     // Add to queue
-    shared.m_Mutex.Lock ( EActionWho::MAIN, EActionWhere::AddCommand );
+    shared.m_Mutex.Lock ();
     pJobData->stage = EJobStage::COMMAND_QUEUE;
     shared.m_OutCommandQueue.push_back ( pJobData );
-    shared.m_Mutex.Signal ( EActionWho::MAIN, EActionWhere::AddCommand );
-    shared.m_Mutex.Unlock ( EActionWho::MAIN, EActionWhere::AddCommand );
+    shared.m_Mutex.Signal ();
+    shared.m_Mutex.Unlock ();
 
     return bAutoFree ? NULL : pJobData;
 }
@@ -799,7 +799,7 @@ bool CNetServerBuffer::PollCommand ( CNetJobData* pJobData, uint uiTimeout )
 {
     bool bFound = false;
 
-    shared.m_Mutex.Lock ( EActionWho::MAIN, EActionWhere::PollCommand );
+    shared.m_Mutex.Lock ();
     while ( true )
     {
         // Find result with the required job handle
@@ -815,9 +815,9 @@ bool CNetServerBuffer::PollCommand ( CNetJobData* pJobData, uint uiTimeout )
                 // Do callback incase any cleanup is needed
                 if ( pJobData->HasCallback () )
                 {
-                    shared.m_Mutex.Unlock ( EActionWho::MAIN, EActionWhere::PollCommand2 );                 
+                    shared.m_Mutex.Unlock ();                 
                     pJobData->ProcessCallback ();              
-                    shared.m_Mutex.Lock ( EActionWho::MAIN, EActionWhere::PollCommand2 );
+                    shared.m_Mutex.Lock ();
                 }
 
                 bFound = true;
@@ -827,11 +827,11 @@ bool CNetServerBuffer::PollCommand ( CNetJobData* pJobData, uint uiTimeout )
 
         if ( bFound || uiTimeout == 0 )
         {
-            shared.m_Mutex.Unlock ( EActionWho::MAIN, EActionWhere::PollCommand );
+            shared.m_Mutex.Unlock ();
             break;
         }
 
-        shared.m_Mutex.Wait ( uiTimeout, EActionWho::MAIN, EActionWhere::PollCommand );
+        shared.m_Mutex.Wait ( uiTimeout );
 
         // If not infinite, break after next check
         if ( uiTimeout != (uint)-1 )
@@ -868,10 +868,10 @@ void CNetServerBuffer::ProcessIncoming ( void )
     bool bTimePacketHandler = m_TimeSinceGetPacketStats.Get () < 10000;
 
     // Get incoming packets
-    shared.m_Mutex.Lock ( EActionWho::MAIN, EActionWhere::ProcessIncoming );
+    shared.m_Mutex.Lock ();
     std::list < SProcessPacketArgs* > inResultQueue = shared.m_InResultQueue;
     shared.m_InResultQueue.clear ();
-    shared.m_Mutex.Unlock ( EActionWho::MAIN, EActionWhere::ProcessIncoming );
+    shared.m_Mutex.Unlock ();
 
     // Handle incoming packets
     for ( std::list < SProcessPacketArgs* >::iterator iter = inResultQueue.begin () ; iter != inResultQueue.end () ; ++iter )
@@ -894,7 +894,7 @@ void CNetServerBuffer::ProcessIncoming ( void )
         SAFE_DELETE( pArgs );
     }
 
-    shared.m_Mutex.Lock ( EActionWho::MAIN, EActionWhere::ProcessIncoming2 );
+    shared.m_Mutex.Lock ();
 
     // Delete finished
     for ( std::set < CNetJobData* >::iterator iter = shared.m_FinishedList.begin () ; iter != shared.m_FinishedList.end () ; )
@@ -916,16 +916,16 @@ again:
 
         if ( pJobData->HasCallback () )
         {
-            shared.m_Mutex.Unlock ( EActionWho::MAIN, EActionWhere::ProcessIncoming3 );
+            shared.m_Mutex.Unlock ();
             pJobData->ProcessCallback ();              
-            shared.m_Mutex.Lock ( EActionWho::MAIN, EActionWhere::ProcessIncoming3 );
+            shared.m_Mutex.Lock ();
 
             // Redo from the top ensure everything is consistent
             goto again;
         }
     }
 
-    shared.m_Mutex.Unlock ( EActionWho::MAIN, EActionWhere::ProcessIncoming2 );
+    shared.m_Mutex.Unlock ();
 }
 
 
@@ -947,7 +947,6 @@ again:
 ///////////////////////////////////////////////////////////////
 void* CNetServerBuffer::StaticThreadProc ( void* pContext )
 {
-    SetCurrentThreadType ( EActionWho::SYNC );
     CThreadHandle::AllowASyncCancel ();
     return ((CNetServerBuffer*)pContext)->ThreadProc ();
 }
@@ -962,23 +961,23 @@ void* CNetServerBuffer::StaticThreadProc ( void* pContext )
 ///////////////////////////////////////////////////////////////
 void* CNetServerBuffer::ThreadProc ( void )
 {
-    shared.m_Mutex.Lock ( EActionWho::SYNC, EActionWhere::ThreadProc );
+    shared.m_Mutex.Lock ();
     while ( !shared.m_bTerminateThread )
     {
         shared.m_iThreadFrameCount++;
 
         if ( shared.m_bAutoPulse )
         {
-            shared.m_Mutex.Unlock ( EActionWho::SYNC, EActionWhere::ThreadProc2 );
+            shared.m_Mutex.Unlock ();
             m_pRealNetServer->DoPulse ();
             g_uiThreadnetProcessorNumber = _GetCurrentProcessorNumber ();
-            shared.m_Mutex.Lock ( EActionWho::SYNC, EActionWhere::ThreadProc2 );
+            shared.m_Mutex.Lock ();
         }
 
         // Is there a waiting command?
         if ( shared.m_OutCommandQueue.empty () )
         {
-            shared.m_Mutex.Wait ( 10, EActionWho::SYNC, EActionWhere::ThreadProc );
+            shared.m_Mutex.Wait ( 10 );
         }
         else
         {
@@ -990,13 +989,13 @@ void* CNetServerBuffer::ThreadProc ( void )
                 // Get next command
                 CNetJobData* pJobData = shared.m_OutCommandQueue.front ();
                 pJobData->stage = EJobStage::PROCCESSING;
-                shared.m_Mutex.Unlock ( EActionWho::SYNC, EActionWhere::ThreadProc3 );
+                shared.m_Mutex.Unlock ();
 
                 // Process command
                 ProcessCommand ( pJobData );
 
                 // Store result
-                shared.m_Mutex.Lock ( EActionWho::SYNC, EActionWhere::ThreadProc3 );
+                shared.m_Mutex.Lock ();
                 // Check command has not been cancelled (this should not be possible)
                 assert ( pJobData == shared.m_OutCommandQueue.front () );
 
@@ -1009,13 +1008,13 @@ void* CNetServerBuffer::ThreadProc ( void )
                 else
                     shared.m_OutResultQueue.push_back ( pJobData );
 
-                shared.m_Mutex.Signal ( EActionWho::SYNC, EActionWhere::ThreadProc );
+                shared.m_Mutex.Signal ();
             }
         }
     }
 
     shared.m_bThreadTerminated = true;
-    shared.m_Mutex.Unlock ( EActionWho::SYNC, EActionWhere::ThreadProc );
+    shared.m_Mutex.Unlock ();
 
     return NULL;
 }
@@ -1189,9 +1188,9 @@ void CNetServerBuffer::ProcessPacket ( unsigned char ucPacketID, const NetServer
     SProcessPacketArgs* pArgs = new SProcessPacketArgs ( ucPacketID, Socket, BitStream, pNetExtraInfo );
 
     // Store result
-    shared.m_Mutex.Lock ( EActionWho::SYNC, EActionWhere::ProcessPacket );
+    shared.m_Mutex.Lock ();
     shared.m_InResultQueue.push_back ( pArgs );
-    shared.m_Mutex.Unlock ( EActionWho::SYNC, EActionWhere::ProcessPacket );
+    shared.m_Mutex.Unlock ();
 }
 
 
@@ -1204,7 +1203,7 @@ void CNetServerBuffer::ProcessPacket ( unsigned char ucPacketID, const NetServer
 ///////////////////////////////////////////////////////////////
 void CNetServerBuffer::GetQueueSizes ( uint& uiFinishedList, uint& uiOutCommandQueue, uint& uiOutResultQueue, uint& uiInResultQueue, uint& uiGamePlayerCount )
 {
-    shared.m_Mutex.Lock ( EActionWho::WATCHDOG, EActionWhere::GetQueueSizes );
+    shared.m_Mutex.Lock ();
 
     uiFinishedList = shared.m_FinishedList.size ();
     uiOutCommandQueue = shared.m_OutCommandQueue.size ();
@@ -1212,7 +1211,7 @@ void CNetServerBuffer::GetQueueSizes ( uint& uiFinishedList, uint& uiOutCommandQ
     uiInResultQueue = shared.m_InResultQueue.size ();
     uiGamePlayerCount = shared.m_iuGamePlayerCount;
 
-    shared.m_Mutex.Unlock ( EActionWho::WATCHDOG, EActionWhere::GetQueueSizes );
+    shared.m_Mutex.Unlock ();
 }
 
 
