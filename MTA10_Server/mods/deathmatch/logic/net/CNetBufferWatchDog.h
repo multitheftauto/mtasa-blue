@@ -9,136 +9,6 @@
 
 class CNetServerBuffer;
 
-namespace EActionWho
-{
-    enum EActionWhoType
-    {
-        MAIN,
-        SYNC,
-        WATCHDOG,
-    };
-}
-using EActionWho::EActionWhoType;
-
-
-namespace EActionWhere
-{
-    enum EActionWhereType
-    {
-        AddCommand,
-        PollCommand,
-        PollCommand2,
-        SetAutoPulseEnabled,
-        StopThread,
-        GetPendingPacketCount,
-        ProcessIncoming,
-        ProcessIncoming2,
-        ProcessIncoming3,
-        ThreadProc,
-        ThreadProc2,
-        ThreadProc3,
-        ProcessPacket,
-        GetQueueSizes,
-        DoPulse,
-    };
-}
-using EActionWhere::EActionWhereType;
-
-
-namespace EActionWhat
-{
-    enum EActionWhatType
-    {
-        PRE_LOCK,
-        POST_LOCK,
-        PRE_UNLOCK,
-        POST_UNLOCK,
-        PRE_WAIT,
-        POST_WAIT,
-        SIGNAL,
-    };
-}
-using EActionWhat::EActionWhatType;
-
-void SetCurrentThreadType ( EActionWhoType type );
-bool IsCurrentThreadType ( EActionWhoType type );
-
-//
-// History for a thread
-//
-class CActionHistory
-{
-public:
-    volatile bool bChanged;
-    uint uiLastChangedTime;
-
-    CActionHistory ( void ) : bChanged ( 0 ), uiLastChangedTime ( 0 ) {}
-    void AddAction ( EActionWhoType uiWho, EActionWhereType uiWhere, EActionWhatType uiWhat, int iExtra = 0 )
-    {
-        bChanged = true;
-    }
-};
-
-
-//
-// History for two threads
-//
-class CActionHistorySet
-{
-public:
-    CActionHistory main;
-    CActionHistory sync;
-
-    void AddAction ( EActionWhoType uiWho, EActionWhereType uiWhere, EActionWhatType uiWhat, int iExtra = 0 )
-    {
-        dassert ( IsCurrentThreadType ( uiWho ) );
-
-        if ( uiWho == EActionWho::MAIN )
-            main.AddAction ( EActionWho::MAIN, uiWhere, uiWhat, iExtra );
-        else
-            sync.AddAction ( EActionWho::SYNC, uiWhere, uiWhat, iExtra );
-    }
-};
-extern CActionHistorySet      g_HistorySet;
-
-//
-// Debug mutex
-//
-class CDebugComboMutex : public CComboMutex
-{
-public:
-    void Lock ( EActionWhoType uiWho, EActionWhereType uiWhere )
-    {
-        g_HistorySet.AddAction ( uiWho, uiWhere, EActionWhat::PRE_LOCK );
-        CComboMutex::Lock ();
-        g_HistorySet.AddAction ( uiWho, uiWhere, EActionWhat::POST_LOCK );
-    }
-
-    void Unlock ( EActionWhoType uiWho, EActionWhereType uiWhere )
-    {
-        g_HistorySet.AddAction ( uiWho, uiWhere, EActionWhat::PRE_UNLOCK );
-        CComboMutex::Unlock ();
-        g_HistorySet.AddAction ( uiWho, uiWhere, EActionWhat::POST_UNLOCK );
-    }
-
-    // unlock - wait for signal - lock
-    // Returns ETIMEDOUT if timeout period expired
-    int Wait ( uint uiTimeout, EActionWhoType uiWho, EActionWhereType uiWhere )
-    {
-        g_HistorySet.AddAction ( uiWho, uiWhere, EActionWhat::PRE_WAIT, uiTimeout );
-        int iResult = CComboMutex::Wait ( uiTimeout );
-        g_HistorySet.AddAction ( uiWho, uiWhere, EActionWhat::POST_WAIT );
-        return iResult;
-    }
-
-    void Signal ( EActionWhoType uiWho, EActionWhereType uiWhere )
-    {
-        g_HistorySet.AddAction ( uiWho, uiWhere, EActionWhat::SIGNAL );
-        CComboMutex::Signal ();
-    }
-};
-
-
 //
 // Info about a queue
 //
@@ -204,7 +74,6 @@ public:
     static void*                StaticThreadProc            ( void* pContext );
     void*                       ThreadProc                  ( void );
     void                        DoChecks                    ( void );
-    void                        CheckActionHistory          ( CActionHistory& history, const char* szTag, uint& uiDoneMessage );
     void                        UpdateQueueInfo             ( CQueueInfo& queueInfo, int iQueueSize, const char* szTag );
     void                        BlockOutgoingSyncPackets    ( void );
     void                        AllowOutgoingSyncPackets    ( void );
@@ -216,8 +85,6 @@ public:
 
     // Check thread variables
     CNetServerBuffer*           m_pNetBuffer;
-    uint                        m_uiMainAgeHigh;
-    uint                        m_uiSyncAgeHigh;
     uint                        m_uiFinishedListHigh;
     uint                        m_uiOutCommandQueueHigh;
     uint                        m_uiOutResultQueueHigh;
