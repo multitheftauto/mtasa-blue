@@ -1,5 +1,5 @@
-#ifndef __INET_PTON_H
-#define __INET_PTON_H
+#ifndef HEADER_CURL_INET_PTON_H
+#define HEADER_CURL_INET_PTON_H
 /***************************************************************************
  *                                  _   _ ____  _
  *  Project                     ___| | | |  _ \| |
@@ -20,10 +20,9 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
- * $Id: inet_pton.h,v 1.8 2008-09-24 19:13:02 yangtse Exp $
  ***************************************************************************/
 
-#include "setup.h"
+#include "curl_setup.h"
 
 int Curl_inet_pton(int, const char *, void *);
 
@@ -34,4 +33,5 @@ int Curl_inet_pton(int, const char *, void *);
 #define Curl_inet_pton(x,y,z) inet_pton(x,y,z)
 #endif
 
-#endif /* __INET_PTON_H */
+#endif /* HEADER_CURL_INET_PTON_H */
+

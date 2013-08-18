@@ -1,5 +1,5 @@
-#ifndef __TIMEVAL_H
-#define __TIMEVAL_H
+#ifndef HEADER_CURL_TIMEVAL_H
+#define HEADER_CURL_TIMEVAL_H
 /***************************************************************************
  *                                  _   _ ____  _
  *  Project                     ___| | | |  _ \| |
@@ -20,7 +20,6 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
- * $Id: timeval.h,v 1.34 2007-04-03 18:25:18 yangtse Exp $
  ***************************************************************************/
 
 /*
@@ -28,7 +27,7 @@
  * as well as the library. Do not mix with library internals!
  */
 
-#include "setup.h"
+#include "curl_setup.h"
 
 struct timeval curlx_tvnow(void);
 
@@ -55,4 +54,5 @@ long Curl_tvlong(struct timeval t1);
 #define Curl_tvdiff(x,y) curlx_tvdiff(x,y)
 #define Curl_tvdiff_secs(x,y) curlx_tvdiff_secs(x,y)
 
-#endif
+#endif /* HEADER_CURL_TIMEVAL_H */
+

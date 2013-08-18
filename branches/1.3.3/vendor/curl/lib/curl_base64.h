@@ -1,5 +1,5 @@
-#ifndef __CURL_BASE64_H
-#define __CURL_BASE64_H
+#ifndef HEADER_CURL_BASE64_H
+#define HEADER_CURL_BASE64_H
 /***************************************************************************
  *                                  _   _ ____  _
  *  Project                     ___| | | |  _ \| |
@@ -7,7 +7,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2008, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2011, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -20,9 +20,13 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
- * $Id: curl_base64.h,v 1.1 2008-08-17 00:25:38 yangtse Exp $
  ***************************************************************************/
-size_t Curl_base64_encode(struct SessionHandle *data,
-                          const char *input, size_t size, char **str);
-size_t Curl_base64_decode(const char *source, unsigned char **outptr);
-#endif
+
+CURLcode Curl_base64_encode(struct SessionHandle *data,
+                            const char *inputbuff, size_t insize,
+                            char **outptr, size_t *outlen);
+
+CURLcode Curl_base64_decode(const char *src,
+                            unsigned char **outptr, size_t *outlen);
+
+#endif /* HEADER_CURL_BASE64_H */

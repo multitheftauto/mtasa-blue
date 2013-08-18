@@ -1,6 +1,5 @@
 #!/bin/sh
 
-# $Id: initscript.sh,v 1.7 2009-02-16 15:33:17 patrickm Exp $
 
 case "${SCRIPTDIR}" in
 /*)     ;;
@@ -41,7 +40,7 @@ TGTCCSID='500'                  # Target CCSID of objects
 DEBUG='*ALL'                    # Debug level
 OPTIMIZE='10'                   # Optimisation level
 OUTPUT='*NONE'                  # Compilation output option.
-TGTRLS='V5R2M0'                 # Target OS release
+TGTRLS='V5R3M0'                 # Target OS release
 
 export TARGETLIB STATBNDDIR DYNBNDDIR SRVPGM TGTCCSID DEBUG OPTIMIZE OUTPUT
 export TGTRLS
@@ -156,9 +155,10 @@ db2_name()
 
 {
         basename "${1}"                                                 |
-        tr '[a-z-]' '[A-Z_]'                                            |
+        tr 'a-z-' 'A-Z_'                                                |
         sed -e 's/\..*//'                                               \
-            -e 's/^\(..........\).*/\1/'
+            -e 's/^CURL_*/C/'                                           \
+            -e 's/^\(.\).*\(.........\)$/\1\2/'
 }
 
 

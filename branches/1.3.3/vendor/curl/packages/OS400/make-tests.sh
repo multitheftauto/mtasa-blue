@@ -2,7 +2,6 @@
 #
 #       tests compilation script for the OS/400.
 #
-# $Id: make-tests.sh,v 1.1 2007-08-23 14:30:24 patrickm Exp $
 
 
 SCRIPTDIR=`dirname "${0}"`
@@ -17,7 +16,7 @@ cd "${TOPDIR}/tests"
 
 cd libtest
 
-#       Get definitions from the Makefile.am file.
+#       Get definitions from the Makefile.inc file.
 #       The `sed' statement works as follows:
 #       _ Join \nl-separated lines.
 #       _ Retain only lines that begins with "identifier =".
@@ -35,7 +34,12 @@ eval "`sed -e ': begin'                                                 \
         -e 's/[ 	]*=[ 	]*/=/'                                  \
         -e 's/=\\(.*[^ 	]\\)[ 	]*$/=\\"\\1\\"/'                        \
         -e 's/\\$(\\([^)]*\\))/${\\1}/g'                                \
-        < Makefile.am`"
+        < Makefile.inc`"
+
+#       Special case: redefine chkhostname compilation parameters.
+
+chkhostname_SOURCES=chkhostname.c
+chkhostname_LDADD=curl_gethostname.o
 
 #       Compile all programs.
 #       The list is found in variable "noinst_PROGRAMS"
@@ -90,7 +94,15 @@ do      DB2PGM=`db2_name "${PGM}"`
         #       Link program if needed.
 
         if [ "${LINK}" ]
-        then    MODULES="`echo \"${MODULES}\" |
+        then    PGMLDADD="`eval echo \"\\${${PGM}_LDADD}\"`"
+                for LDARG in ${PGMLDADD}
+                do      case "${LDARG}" in
+                        -*)     ;;              # Ignore non-module.
+                        *)      MODULES="${MODULES} "`db2_name "${LDARG}"`
+                                ;;
+                        esac
+                done
+                MODULES="`echo \"${MODULES}\" |
                     sed \"s/[^ ][^ ]*/${TARGETLIB}\/&/g\"`"
                 CMD="CRTPGM PGM(${TARGETLIB}/${DB2PGM})"
                 CMD="${CMD} ENTMOD(QADRT/QADRTMAIN2)"

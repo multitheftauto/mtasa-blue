@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2009, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2012, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -18,10 +18,9 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
- * $Id: curl_sspi.c,v 1.2 2009-01-30 01:54:22 yangtse Exp $
  ***************************************************************************/
 
-#include "setup.h"
+#include "curl_setup.h"
 
 #ifdef USE_WINDOWS_SSPI
 
@@ -32,17 +31,29 @@
 #define _MPRINTF_REPLACE /* use our functions only */
 #include <curl/mprintf.h>
 
-#include "memory.h"
+#include "curl_memory.h"
 /* The last #include file should be: */
 #include "memdebug.h"
 
+/* We use our own typedef here since some headers might lack these */
+typedef PSecurityFunctionTable (APIENTRY *INITSECURITYINTERFACE_FN)(VOID);
+
+/* See definition of SECURITY_ENTRYPOINT in sspi.h */
+#ifdef UNICODE
+#  ifdef _WIN32_WCE
+#    define SECURITYENTRYPOINT L"InitSecurityInterfaceW"
+#  else
+#    define SECURITYENTRYPOINT "InitSecurityInterfaceW"
+#  endif
+#else
+#  define SECURITYENTRYPOINT "InitSecurityInterfaceA"
+#endif
 
 /* Handle of security.dll or secur32.dll, depending on Windows version */
 HMODULE s_hSecDll = NULL;
 
 /* Pointer to SSPI dispatch table */
-PSecurityFunctionTableA s_pSecFn = NULL;
-
+PSecurityFunctionTable s_pSecFn = NULL;
 
 /*
  * Curl_sspi_global_init()
@@ -55,20 +66,18 @@ PSecurityFunctionTableA s_pSecFn = NULL;
  * Once this function has been executed, Windows SSPI functions can be
  * called through the Security Service Provider Interface dispatch table.
  */
-
-CURLcode
-Curl_sspi_global_init(void)
+CURLcode Curl_sspi_global_init(void)
 {
   OSVERSIONINFO osver;
-  INIT_SECURITY_INTERFACE_A pInitSecurityInterface;
+  INITSECURITYINTERFACE_FN pInitSecurityInterface;
 
   /* If security interface is not yet initialized try to do this */
-  if(s_hSecDll == NULL) {
+  if(!s_hSecDll) {
 
     /* Find out Windows version */
     memset(&osver, 0, sizeof(osver));
     osver.dwOSVersionInfoSize = sizeof(osver);
-    if(! GetVersionEx(&osver))
+    if(!GetVersionEx(&osver))
       return CURLE_FAILED_INIT;
 
     /* Security Service Provider Interface (SSPI) functions are located in
@@ -78,27 +87,26 @@ Curl_sspi_global_init(void)
     /* Load SSPI dll into the address space of the calling process */
     if(osver.dwPlatformId == VER_PLATFORM_WIN32_NT
       && osver.dwMajorVersion == 4)
-      s_hSecDll = LoadLibrary("security.dll");
+      s_hSecDll = LoadLibrary(TEXT("security.dll"));
     else
-      s_hSecDll = LoadLibrary("secur32.dll");
-    if(! s_hSecDll)
+      s_hSecDll = LoadLibrary(TEXT("secur32.dll"));
+    if(!s_hSecDll)
       return CURLE_FAILED_INIT;
 
     /* Get address of the InitSecurityInterfaceA function from the SSPI dll */
-    pInitSecurityInterface = (INIT_SECURITY_INTERFACE_A)
-      GetProcAddress(s_hSecDll, "InitSecurityInterfaceA");
-    if(! pInitSecurityInterface)
+    pInitSecurityInterface = (INITSECURITYINTERFACE_FN)
+      GetProcAddress(s_hSecDll, SECURITYENTRYPOINT);
+    if(!pInitSecurityInterface)
       return CURLE_FAILED_INIT;
 
     /* Get pointer to Security Service Provider Interface dispatch table */
     s_pSecFn = pInitSecurityInterface();
-    if(! s_pSecFn)
+    if(!s_pSecFn)
       return CURLE_FAILED_INIT;
-
   }
+
   return CURLE_OK;
 }
-
 
 /*
  * Curl_sspi_global_cleanup()
@@ -106,8 +114,7 @@ Curl_sspi_global_init(void)
  * This deinitializes the Security Service Provider Interface from libcurl.
  */
 
-void
-Curl_sspi_global_cleanup(void)
+void Curl_sspi_global_cleanup(void)
 {
   if(s_hSecDll) {
     FreeLibrary(s_hSecDll);
