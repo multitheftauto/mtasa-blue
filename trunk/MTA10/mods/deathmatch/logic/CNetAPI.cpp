@@ -52,13 +52,8 @@ bool CNetAPI::ProcessPacket ( unsigned char bytePacketID, NetBitStreamInterface&
             {
                 // Grab the player
                 CClientPlayer* pPlayer = m_pPlayerManager->Get ( PlayerID );
-                if ( pPlayer )
-                {
-                    // Read out and apply the lightsync data
-                    ReadLightweightSync ( pPlayer, BitStream );
-                }
-                else
-                    OutputDebugLine ( "[Sync] Player not found" );
+                // Read out the lightsync data (and apply if the player exists on the client)
+                ReadLightweightSync ( pPlayer, BitStream );
             }
             return true;
         }
@@ -2171,6 +2166,13 @@ void CNetAPI::ReadLightweightSync ( CClientPlayer* pPlayer, NetBitStreamInterfac
                 return;
             }
         }
+    }
+
+    // Don't do anything beyond reading the data if the player does not exist on the client
+    if ( !pPlayer )
+    {
+        OutputDebugLine ( "[Sync] Player not found" );
+        return;
     }
 
     // Only update the sync if this packet is from the same context.
