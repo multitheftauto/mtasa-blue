@@ -121,7 +121,7 @@ public:
     bool                CancelSend                  ( SSendHandle handle );
     void                CancelAllSends              ( void );
     bool                GetSendStatus               ( SSendHandle handle, SSendStatus* pOutSendStatus );
-    bool                GetSendHandles              ( std::vector < SSendHandle >& outResultList );
+    void                GetSendHandles              ( std::vector < SSendHandle >& outResultList );
 
 protected:
     void                SendCancelNotification      ( SSendItem& activeTx );
@@ -188,7 +188,7 @@ public:
     bool                CancelSend                  ( NetPlayerID remoteId, SSendHandle handle );
     void                CancelAllSends              ( NetPlayerID remoteId );
     bool                GetSendStatus               ( NetPlayerID remoteId, SSendHandle handle, SSendStatus* pOutSendStatus );
-    bool                GetSendHandles              ( NetPlayerID remoteId, std::vector < SSendHandle >& outResultList );
+    void                GetSendHandles              ( NetPlayerID remoteId, std::vector < SSendHandle >& outResultList );
 
     // Receive functions
     void                OnReceive                   ( NetPlayerID remoteId, NetBitStreamInterface* pBitStream );

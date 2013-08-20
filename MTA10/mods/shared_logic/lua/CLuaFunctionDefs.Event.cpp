@@ -309,17 +309,16 @@ int CLuaFunctionDefs::GetLatentEventHandles ( lua_State* luaVM )
     if ( !argStream.HasErrors () )
     {
         std::vector < uint > resultList;
-        if ( g_pClientGame->GetLatentTransferManager ()->GetSendHandles ( 0, resultList ) )
+        g_pClientGame->GetLatentTransferManager ()->GetSendHandles ( 0, resultList );
+
+        lua_createtable ( luaVM, 0, resultList.size () );
+        for ( uint i = 0 ; i < resultList.size () ; i++ )
         {
-            lua_createtable ( luaVM, 0, resultList.size () );
-            for ( uint i = 0 ; i < resultList.size () ; i++ )
-            {
-                lua_pushnumber ( luaVM, i + 1 );
-                lua_pushnumber ( luaVM, resultList[i] );
-                lua_settable   ( luaVM, -3 );
-            }
-            return 1;
+            lua_pushnumber ( luaVM, i + 1 );
+            lua_pushnumber ( luaVM, resultList[i] );
+            lua_settable   ( luaVM, -3 );
         }
+        return 1;
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
