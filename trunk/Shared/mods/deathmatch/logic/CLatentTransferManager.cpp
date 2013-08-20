@@ -232,13 +232,13 @@ bool CLatentTransferManager::GetSendStatus ( NetPlayerID remoteId, SSendHandle h
 //
 //
 ///////////////////////////////////////////////////////////////
-bool CLatentTransferManager::GetSendHandles ( NetPlayerID remoteId, std::vector < SSendHandle >& outResultList )
+void CLatentTransferManager::GetSendHandles ( NetPlayerID remoteId, std::vector < SSendHandle >& outResultList )
 {
-    CLatentSendQueue* pSendQueue = FindSendQueueForRemote ( remoteId );
-    if ( !pSendQueue )
-        return false;
+    outResultList.clear();
 
-    return pSendQueue->GetSendHandles ( outResultList );
+    CLatentSendQueue* pSendQueue = FindSendQueueForRemote ( remoteId );
+    if ( pSendQueue )
+        pSendQueue->GetSendHandles ( outResultList );
 }
 
 
