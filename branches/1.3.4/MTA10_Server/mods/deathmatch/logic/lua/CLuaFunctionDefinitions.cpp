@@ -537,6 +537,38 @@ int CLuaFunctionDefinitions::RemoveEventHandler ( lua_State* luaVM )
 }
 
 
+int CLuaFunctionDefinitions::GetEventHandlers ( lua_State* luaVM )
+{
+//  table getEventHandlers ( string eventName, element attachedTo )
+    SString strName; CElement* pElement;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadString ( strName );
+    argStream.ReadUserData ( pElement );
+
+    if ( !argStream.HasErrors () )
+    {
+        // Grab our virtual machine
+        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+        if ( pLuaMain )
+        {
+            // Create a new table
+            lua_newtable ( luaVM );
+
+            pElement->GetEventManager ()->GetHandles ( pLuaMain, (const char*)strName, luaVM );
+
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+
+    // Failed
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
 int CLuaFunctionDefinitions::TriggerEvent ( lua_State* luaVM )
 {
 //  bool triggerEvent ( string eventName, element baseElement, [ var argument1, ... ] )
@@ -684,17 +716,16 @@ int CLuaFunctionDefinitions::GetLatentEventHandles ( lua_State* luaVM )
     if ( !argStream.HasErrors () )
     {
         std::vector < uint > resultList;
-        if ( g_pGame->GetLatentTransferManager ()->GetSendHandles ( pPlayer->GetSocket (), resultList ) )
+        g_pGame->GetLatentTransferManager ()->GetSendHandles ( pPlayer->GetSocket (), resultList );
+
+        lua_createtable ( luaVM, 0, resultList.size () );
+        for ( uint i = 0 ; i < resultList.size () ; i++ )
         {
-            lua_createtable ( luaVM, 0, resultList.size () );
-            for ( uint i = 0 ; i < resultList.size () ; i++ )
-            {
-                lua_pushnumber ( luaVM, i + 1 );
-                lua_pushnumber ( luaVM, resultList[i] );
-                lua_settable   ( luaVM, -3 );
-            }
-            return 1;
+            lua_pushnumber ( luaVM, i + 1 );
+            lua_pushnumber ( luaVM, resultList[i] );
+            lua_settable   ( luaVM, -3 );
         }
+        return 1;
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
@@ -9514,47 +9545,30 @@ int CLuaFunctionDefinitions::CreateColRectangle ( lua_State* luaVM )
 
 
 int CLuaFunctionDefinitions::CreateColPolygon ( lua_State* luaVM )
-{ // Formerly createColSquare
-    // Verify the argument types
-    int iArgument1 = lua_type ( luaVM, 1 );
-    int iArgument2 = lua_type ( luaVM, 2 );
-    if ( ( iArgument1 == LUA_TNUMBER || iArgument1 == LUA_TSTRING ) &&
-         ( iArgument2 == LUA_TNUMBER || iArgument2 == LUA_TSTRING ) )
+{
+//  colshape createColPolygon ( float fX, float fY, float fX1, float fY1, float fX2, float fY2, float fX3, float fY3, ... )
+    std::vector < CVector2D > vecPointList; 
+    
+    CScriptArgReader argStream ( luaVM );
+    for( uint i = 0 ; i < 4 || argStream.NextCouldBeNumber() ; i++ )
     {
-        // Grab the values
-        CVector vecPosition = CVector ( ( float ) lua_tonumber ( luaVM, 1 ), ( float ) lua_tonumber ( luaVM, 2 ), 0.0f );
+        CVector2D vecPoint;
+        argStream.ReadNumber( vecPoint.fX ); 
+        argStream.ReadNumber( vecPoint.fY );
+        vecPointList.push_back( vecPoint );
+    }
 
+    if ( !argStream.HasErrors ( ) )
+    {  
         CLuaMain* pLuaMain = g_pGame->GetLuaManager()->GetVirtualMachine ( luaVM );
         if ( pLuaMain )
         {
             CResource* pResource = pLuaMain->GetResource();
             if ( pResource )
             {
-                // Create it and return it
-                CColPolygon* pShape = CStaticFunctionDefinitions::CreateColPolygon ( pResource, vecPosition );
+                CColPolygon* pShape = CStaticFunctionDefinitions::CreateColPolygon ( pResource, vecPointList );
                 if ( pShape )
                 {
-                    // Get the points
-                    int iArgument = 3;
-                    int iArgumentX = lua_type ( luaVM, iArgument++ );
-                    int iArgumentY = lua_type ( luaVM, iArgument++ );
-                    while ( iArgumentX != LUA_TNONE && iArgumentY != LUA_TNONE )
-                    {
-                        if ( ( iArgumentX == LUA_TNUMBER || iArgumentX == LUA_TSTRING ) &&
-                             ( iArgumentY == LUA_TNUMBER || iArgumentY == LUA_TSTRING ) )
-                        {
-                            pShape->AddPoint ( CVector2D ( ( float ) lua_tonumber ( luaVM, iArgument - 2 ),
-                                                           ( float ) lua_tonumber ( luaVM, iArgument - 1 ) ) );
-
-                            iArgumentX = lua_type ( luaVM, iArgument++ );
-                            iArgumentY = lua_type ( luaVM, iArgument++ );
-                        }
-                        else
-                        {
-                            break;
-                        }
-                    }
-
                     CElementGroup * pGroup = pResource->GetElementGroup();
                     if ( pGroup )
                     {

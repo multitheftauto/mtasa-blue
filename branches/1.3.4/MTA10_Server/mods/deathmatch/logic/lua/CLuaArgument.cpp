@@ -430,7 +430,11 @@ bool CLuaArgument::GetAsString ( SString& strBuffer )
             return false;
             break;
         case LUA_TNUMBER:
-            strBuffer = SString ( "%d", ( int ) m_Number );
+            if ( m_Number == static_cast <int> ( m_Number ) )
+                strBuffer = SString ( "%d", static_cast <int> ( m_Number ) );
+            else
+                strBuffer = SString ( "%f", m_Number );
+
             break;
         default: return false; break;
     }

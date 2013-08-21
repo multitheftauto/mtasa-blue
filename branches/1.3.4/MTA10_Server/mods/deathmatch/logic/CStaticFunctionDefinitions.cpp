@@ -1216,7 +1216,7 @@ bool CStaticFunctionDefinitions::GetElementVelocity ( CElement* pElement, CVecto
 bool CStaticFunctionDefinitions::SetElementPosition ( CElement* pElement, const CVector& vecPosition, bool bWarp )
 {
     assert ( pElement );
-    RUN_CHILDREN SetElementPosition ( *iter, vecPosition );
+    RUN_CHILDREN SetElementPosition ( *iter, vecPosition, bWarp );
 
     // Update our position for that entity.
     pElement->SetPosition ( vecPosition );
@@ -1391,7 +1391,7 @@ bool CStaticFunctionDefinitions::SetElementInterior ( CElement* pElement, unsign
 bool CStaticFunctionDefinitions::SetElementDimension ( CElement* pElement, unsigned short usDimension )
 {
     assert ( pElement );
-    RUN_CHILDREN ( *iter, usDimension );
+    RUN_CHILDREN SetElementDimension ( *iter, usDimension );
 
     if ( pElement->GetType () == CElement::TEAM )
     {
@@ -1460,7 +1460,6 @@ bool CStaticFunctionDefinitions::AttachElements ( CElement* pElement, CElement* 
 {
     assert ( pElement );
     assert ( pAttachedToElement );
-    RUN_CHILDREN AttachElements ( *iter, pAttachedToElement, vecPosition, vecRotation );
 
     // Check the elements we are attaching are not already connected
     std::set < CElement* > history;
@@ -1499,7 +1498,6 @@ bool CStaticFunctionDefinitions::AttachElements ( CElement* pElement, CElement* 
 bool CStaticFunctionDefinitions::DetachElements ( CElement* pElement, CElement* pAttachedToElement )
 {
     assert ( pElement );
-    RUN_CHILDREN DetachElements ( *iter, pAttachedToElement );
 
     CElement* pActualAttachedToElement = pElement->GetAttachedToElement ();
     if ( pActualAttachedToElement )
@@ -2040,9 +2038,13 @@ CPed* CStaticFunctionDefinitions::CreatePed ( CResource* pResource, unsigned sho
 
             pPed->SetRotation ( fRotationRadians );
 
-            CEntityAddPacket Packet;
-            Packet.Add ( pPed );
-            m_pPlayerManager->BroadcastOnlyJoined ( Packet );
+            // Only sync if the resource has fully started
+            if ( pResource->HasStarted() )
+            {
+                CEntityAddPacket Packet;
+                Packet.Add ( pPed );
+                m_pPlayerManager->BroadcastOnlyJoined ( Packet );
+            }
             return pPed;
         }
     }
@@ -4067,6 +4069,9 @@ bool CStaticFunctionDefinitions::WarpPedIntoVehicle ( CPed* pPed, CVehicle* pVeh
                 else
                     VehiclePlayerArguments.PushBoolean ( false );
                 pVehicle->CallEvent ( "onVehicleEnter", VehiclePlayerArguments );
+
+                // Used to check if f.e. lua changed the player's vehicle (fix for #7570)
+                pVehicle->m_bOccupantChanged = true;
 
                 return true;
             }
@@ -9240,9 +9245,18 @@ CColRectangle* CStaticFunctionDefinitions::CreateColRectangle ( CResource* pReso
 }
 
 
-CColPolygon* CStaticFunctionDefinitions::CreateColPolygon ( CResource* pResource, const CVector& vecPosition )
+CColPolygon* CStaticFunctionDefinitions::CreateColPolygon ( CResource* pResource, const std::vector < CVector2D >& vecPointList )
 {
+    if ( vecPointList.size() < 4 )
+        return NULL;
+
+    CVector vecPosition( vecPointList[0].fX, vecPointList[0].fY, 0 );
     CColPolygon * pColShape = new CColPolygon ( m_pColManager, pResource->GetDynamicElementRoot(), vecPosition );
+
+    for( uint i = 1 ; i < vecPointList.size() ; i++ )
+    {
+        pColShape->AddPoint( vecPointList[i] );
+    }
 
     // Run collision detection
     CElement* pRoot = m_pMapManager->GetRootElement ();

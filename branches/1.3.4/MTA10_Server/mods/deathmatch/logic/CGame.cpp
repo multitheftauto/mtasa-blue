@@ -646,12 +646,12 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
         SString strResourceCachePath ( "%s/resource-cache", g_pServerInterface->GetServerModPath () );
         SString strResourceCacheUnzippedPath ( "%s/unzipped", strResourceCachePath.c_str () );
         SString strResourceCacheHttpClientFilesPath ( "%s/http-client-files", strResourceCachePath.c_str () );
-        SString strResourceCacheHttpClientFilesProtectedPath ( "%s/http-client-files-no-client-cache", strResourceCachePath.c_str () );
+        SString strResourceCacheHttpClientFilesNoClientCachePath ( "%s/http-client-files-no-client-cache", strResourceCachePath.c_str () );
 
         // Make sure the resource-cache directories exists
         MakeSureDirExists ( ( strResourceCacheUnzippedPath + "/" ).c_str () );
         MakeSureDirExists ( ( strResourceCacheHttpClientFilesPath + "/" ).c_str () );
-        MakeSureDirExists ( ( strResourceCacheHttpClientFilesProtectedPath + "/" ).c_str () );
+        MakeSureDirExists ( ( strResourceCacheHttpClientFilesNoClientCachePath + "/" ).c_str () );
 
         // Rename old dirs to show that they are no longer used
         FileRename( PathJoin( g_pServerInterface->GetServerModPath(), "resourcecache" ), strResourceCachePath + "/_old_resourcecache.delete-me" );
@@ -1872,13 +1872,7 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
         else
         {
             // Tell the console
-            CLogger::LogPrintf ( "CONNECT: %s failed to connect (Player Element Could not be created.)\n", pPlayer->GetSourceIP () );
-
-            // Tell the console
-            CLogger::LogPrint ( "URGENT: Report this error on bugs.mtasa.com error code: 6930-2\n" );
-
-            // Tell the player the problem
-            DisconnectPlayer ( this, *pPlayer, "Disconnected: Player Element Could not be created." );
+            CLogger::LogPrintf ( "CONNECT: %s failed to connect (Player Element Could not be created.)\n", szNick );
         }
     }
 }
@@ -2252,11 +2246,17 @@ void CGame::Packet_VehiclePuresync ( CVehiclePuresyncPacket& Packet )
             RelayPlayerPuresync ( Packet );
             UNCLOCK( "VehiclePuresync", "RelayPlayerPuresync" );
 
+            CVehicle * pTrailer = pVehicle->GetTowedVehicle();
 
             // Run colpoint checks
             CLOCK( "VehiclePuresync", "DoHitDetection" );
             m_pColManager->DoHitDetection ( pPlayer->GetPosition (), pPlayer );
             m_pColManager->DoHitDetection ( pVehicle->GetPosition (), pVehicle );
+            while ( pTrailer )
+            {
+                m_pColManager->DoHitDetection ( pTrailer->GetPosition (), pTrailer );
+                pTrailer = pTrailer->GetTowedVehicle();
+            }
             UNCLOCK( "VehiclePuresync", "DoHitDetection" );
         }
     }
@@ -2657,6 +2657,7 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
                                                     // Mark him as entering the vehicle
                                                     pPlayer->SetOccupiedVehicle ( pVehicle, 0 );
                                                     pPlayer->SetVehicleAction ( CPlayer::VEHICLEACTION_ENTERING );
+                                                    pVehicle->m_bOccupantChanged = false;
 
                                                     // Call the entering vehicle event
                                                     CLuaArguments Arguments;
@@ -2691,9 +2692,12 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
                                                     }
                                                     else
                                                     {
-                                                        pPlayer->SetOccupiedVehicle ( NULL, 0 );
+                                                        if ( !pVehicle->m_bOccupantChanged )
+                                                        {
+                                                            pPlayer->SetOccupiedVehicle ( NULL, 0 );
+                                                            pVehicle->SetOccupant ( NULL, 0 );
+                                                        }
                                                         pPlayer->SetVehicleAction ( CPlayer::VEHICLEACTION_NONE );
-                                                        pVehicle->SetOccupant ( NULL, 0 );
                                                         failReason = FAIL_SCRIPT;
                                                     }
                                                 }
@@ -2769,6 +2773,7 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
                                                     // Mark him as entering the vehicle
                                                     pPlayer->SetOccupiedVehicle ( pVehicle, ucSeat );
                                                     pPlayer->SetVehicleAction ( CPlayer::VEHICLEACTION_ENTERING );
+                                                    pVehicle->m_bOccupantChanged = false;
 
                                                     // Call the entering vehicle event
                                                     CLuaArguments Arguments;
@@ -2797,9 +2802,12 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
                                                     }
                                                     else
                                                     {
-                                                        pPlayer->SetOccupiedVehicle ( NULL, 0 );
-                                                        pPlayer->SetVehicleAction ( CPlayer::VEHICLEACTION_NONE );
-                                                        pVehicle->SetOccupant ( NULL, ucSeat );
+                                                        if ( !pVehicle->m_bOccupantChanged )
+                                                        {
+                                                            pPlayer->SetOccupiedVehicle ( NULL, 0 );
+                                                            pVehicle->SetOccupant ( NULL, ucSeat );
+                                                        }
+                                                        pPlayer->SetVehicleAction ( CPlayer::VEHICLEACTION_NONE );                                                        
                                                         failReason = FAIL_SCRIPT;
                                                     }
                                                 }

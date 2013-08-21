@@ -351,8 +351,7 @@ bool CKeyBinds::ProcessKeyStroke ( const SBindableKey * pKey, bool bState )
     if ( pKey->iGTARelative == GTA_KEY_MSCROLLUP || pKey->iGTARelative == GTA_KEY_MSCROLLDOWN )
         m_bMouseWheel = true;
 
-    // Call the key-stroke handler if we have one
-    if ( m_KeyStrokeHandler ) m_KeyStrokeHandler ( pKey, bState );
+    bool bAllowed = TriggerKeyStrokeHandler ( pKey->szKey, bState );
 
     // Search through binds
     bool bFound = false;
@@ -374,10 +373,13 @@ bool CKeyBinds::ProcessKeyStroke ( const SBindableKey * pKey, bool bState )
             {
                 case KEY_BIND_GTA_CONTROL:
                 {
-                    if ( !bState || ( !bInputGoesToGUI && ( !m_pCore->IsCursorForcedVisible() || !m_pCore->IsCursorControlsToggled() ) ) )
+                    if ( bAllowed )
                     {
-                        CallGTAControlBind ( static_cast < CGTAControlBind* > ( *iter ), bState );
-                        bFound = true;
+                        if ( !bState || ( !bInputGoesToGUI && ( !m_pCore->IsCursorForcedVisible() || !m_pCore->IsCursorControlsToggled() ) ) )
+                        {
+                            CallGTAControlBind ( static_cast < CGTAControlBind* > ( *iter ), bState );
+                            bFound = true;
+                        }
                     }
                     break;
                 }
@@ -402,35 +404,38 @@ bool CKeyBinds::ProcessKeyStroke ( const SBindableKey * pKey, bool bState )
                                     if ( !bInputGoesToGUI )
                                     {
                                         CCommandBind* pCommandBind = static_cast < CCommandBind* > ( pBind );
-                                        // HACK: call chatbox commands on the next frame to stop a translated WM_CHAR key to pop up                                            
-                                        if ( strcmp ( pCommandBind->szCommand, "chatbox" ) == 0 )
+                                        if ( bAllowed || strcmp ( pCommandBind->szCommand, "screenshot" ) == 0 )
                                         {
-                                            m_pChatBoxBind = pCommandBind;
-                                        }                                                                            
-                                        else
-                                        {
-                                            bool bAlreadyProcessed = false;
-                                            list < CCommandBind* > ::iterator iter = processedList->begin ();
-                                            for ( ; iter != processedList->end (); iter++ )
+                                            // HACK: call chatbox commands on the next frame to stop a translated WM_CHAR key to pop up                                            
+                                            if ( strcmp ( pCommandBind->szCommand, "chatbox" ) == 0 )
                                             {
-                                                if ( strcmp ( ( *iter )->szCommand, pCommandBind->szCommand ) == 0 )
+                                                m_pChatBoxBind = pCommandBind;
+                                            }                                                                            
+                                            else
+                                            {
+                                                bool bAlreadyProcessed = false;
+                                                list < CCommandBind* > ::iterator iter = processedList->begin ();
+                                                for ( ; iter != processedList->end (); iter++ )
                                                 {
-                                                    if ( ( *iter )->bHitState == pCommandBind->bHitState )
+                                                    if ( strcmp ( ( *iter )->szCommand, pCommandBind->szCommand ) == 0 )
                                                     {
-                                                        if ( !pCommandBind->szArguments || ( ( *iter )->szArguments && strcmp ( ( *iter )->szArguments, pCommandBind->szArguments ) == 0 ) )
+                                                        if ( ( *iter )->bHitState == pCommandBind->bHitState )
                                                         {
-                                                            bAlreadyProcessed = true;
-                                                            break;
+                                                            if ( !pCommandBind->szArguments || ( ( *iter )->szArguments && strcmp ( ( *iter )->szArguments, pCommandBind->szArguments ) == 0 ) )
+                                                            {
+                                                                bAlreadyProcessed = true;
+                                                                break;
+                                                            }
                                                         }
                                                     }
                                                 }
-                                            }
 
-                                            //don't fire if its already fired
-                                            if ( !bAlreadyProcessed )
-                                            {
-                                                Call ( pCommandBind );
-                                                processedList->push_back ( pCommandBind );
+                                                //don't fire if its already fired
+                                                if ( !bAlreadyProcessed )
+                                                {
+                                                    Call ( pCommandBind );
+                                                    processedList->push_back ( pCommandBind );
+                                                }
                                             }
                                         }
                                     }
@@ -438,12 +443,15 @@ bool CKeyBinds::ProcessKeyStroke ( const SBindableKey * pKey, bool bState )
                                 }
                                 case KEY_BIND_FUNCTION:
                                 {
-                                    CKeyFunctionBind* pFunctionBind = static_cast < CKeyFunctionBind* > ( pBind );
-                                    if ( !bInputGoesToGUI || pFunctionBind->bIgnoreGUI )
+                                    if ( bAllowed )
                                     {
-                                        if ( pFunctionBind->Handler )
+                                        CKeyFunctionBind* pFunctionBind = static_cast < CKeyFunctionBind* > ( pBind );
+                                        if ( !bInputGoesToGUI || pFunctionBind->bIgnoreGUI )
                                         {
-                                            pFunctionBind->Handler ( pFunctionBind );
+                                            if ( pFunctionBind->Handler )
+                                            {
+                                                pFunctionBind->Handler ( pFunctionBind );
+                                            }
                                         }
                                     }
                                     break;
@@ -2715,4 +2723,14 @@ bool CKeyBinds::IsFakeCtrl_L ( UINT message, WPARAM wParam, LPARAM lParam )
   
     /* Not a fake control left press/release */
     return FALSE;
+}
+
+bool CKeyBinds::TriggerKeyStrokeHandler ( const SString strKey, bool bState )
+{
+    // Call the key-stroke handler if we have one
+    if ( m_KeyStrokeHandler ) 
+    {
+        return m_KeyStrokeHandler ( strKey, bState );
+    }
+    return true;
 }

@@ -271,7 +271,7 @@ void CVideoModeManager::OnGainFocus ( void )
 
             if( ChangeDisplaySettings( &dmScreenSettings, CDS_FULLSCREEN ) != DISP_CHANGE_SUCCESSFUL )
                 return;
-	   }
+        }
     }
 }
 

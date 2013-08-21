@@ -144,6 +144,38 @@ int CLuaFunctionDefs::RemoveEventHandler ( lua_State* luaVM )
 }
 
 
+int CLuaFunctionDefs::GetEventHandlers ( lua_State* luaVM )
+{
+//  table getEventHandlers ( string eventName, element attachedTo )
+    SString strName; CClientEntity* pElement;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadString ( strName );
+    argStream.ReadUserData ( pElement );
+
+    if ( !argStream.HasErrors () )
+    {
+        // Grab our virtual machine
+        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+        if ( pLuaMain )
+        {
+            // Create a new table
+            lua_newtable ( luaVM );
+
+            pElement->GetEventManager ()->GetHandles ( pLuaMain, (const char*)strName, luaVM );
+
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+
+    // Failed
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
 int CLuaFunctionDefs::TriggerEvent ( lua_State* luaVM )
 {
 //  bool triggerEvent ( string eventName, element baseElement, [ var argument1, ... ] )
@@ -277,17 +309,16 @@ int CLuaFunctionDefs::GetLatentEventHandles ( lua_State* luaVM )
     if ( !argStream.HasErrors () )
     {
         std::vector < uint > resultList;
-        if ( g_pClientGame->GetLatentTransferManager ()->GetSendHandles ( 0, resultList ) )
+        g_pClientGame->GetLatentTransferManager ()->GetSendHandles ( 0, resultList );
+
+        lua_createtable ( luaVM, 0, resultList.size () );
+        for ( uint i = 0 ; i < resultList.size () ; i++ )
         {
-            lua_createtable ( luaVM, 0, resultList.size () );
-            for ( uint i = 0 ; i < resultList.size () ; i++ )
-            {
-                lua_pushnumber ( luaVM, i + 1 );
-                lua_pushnumber ( luaVM, resultList[i] );
-                lua_settable   ( luaVM, -3 );
-            }
-            return 1;
+            lua_pushnumber ( luaVM, i + 1 );
+            lua_pushnumber ( luaVM, resultList[i] );
+            lua_settable   ( luaVM, -3 );
         }
+        return 1;
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );

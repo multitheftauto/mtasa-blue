@@ -91,8 +91,8 @@ public:
     inline std::list < CExportedFunction* >::iterator    IterBeginExportedFunctions   ( void )        { return m_exportedFunctions.begin(); }
     inline std::list < CExportedFunction* >::iterator    IterEndExportedFunctions     ( void )        { return m_exportedFunctions.end(); }
 
-    void                    SetRemainingProtectedScripts    ( unsigned short usRemaining ) { m_usRemainingProtectedScripts = usRemaining; }
-    void                    LoadProtectedScript             ( const char* chunk, unsigned int length );
+    void                    SetRemainingNoClientCacheScripts    ( unsigned short usRemaining ) { m_usRemainingNoClientCacheScripts = usRemaining; }
+    void                    LoadNoClientCacheScript         ( const char* chunk, unsigned int length );
     const SString&          GetMinServerReq                 ( void ) const                  { return m_strMinServerReq; }
     const SString&          GetMinClientReq                 ( void ) const                  { return m_strMinClientReq; }
     void                    HandleDownloadedFileTrouble     ( CResourceFile* pResourceFile, bool bCRCMismatch );
@@ -112,8 +112,8 @@ private:
     class CClientEntity*    m_pResourceGUIEntity;
     class CClientEntity*    m_pResourceTXDRoot;
     bool                    m_bInDownloadQueue;
-    unsigned short          m_usRemainingProtectedScripts;
-    bool                    m_bLoadAfterReceivingProtectedScripts;
+    unsigned short          m_usRemainingNoClientCacheScripts;
+    bool                    m_bLoadAfterReceivingNoClientCacheScripts;
     SString                 m_strMinServerReq;
     SString                 m_strMinClientReq;
 

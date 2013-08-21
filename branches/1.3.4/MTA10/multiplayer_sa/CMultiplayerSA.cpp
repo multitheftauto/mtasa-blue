@@ -325,6 +325,7 @@ PostWeaponFireHandler* m_pPostWeaponFireHandler = NULL;
 BulletImpactHandler* m_pBulletImpactHandler = NULL;
 BulletFireHandler* m_pBulletFireHandler = NULL;
 DamageHandler* m_pDamageHandler = NULL;
+DeathHandler* m_pDeathHandler = NULL;
 FireHandler* m_pFireHandler = NULL;
 ProjectileHandler* m_pProjectileHandler = NULL;
 ProjectileStopHandler* m_pProjectileStopHandler = NULL;
@@ -2022,6 +2023,11 @@ void CMultiplayerSA::SetDamageHandler ( DamageHandler * pDamageHandler )
     m_pDamageHandler = pDamageHandler;
 }
 
+void CMultiplayerSA::SetDeathHandler ( DeathHandler * pDeathHandler )
+{
+    m_pDeathHandler = pDeathHandler;
+}
+
 void CMultiplayerSA::SetFireHandler ( FireHandler * pFireHandler )
 {
     m_pFireHandler = pFireHandler;
@@ -3686,6 +3692,7 @@ void CMultiplayerSA::Reset ( void )
     m_pDrawRadarAreasHandler = NULL;
     DisableAllVehicleWeapons ( false );
     m_pDamageHandler = NULL;
+    m_pDeathHandler = NULL;
     m_pFireHandler = NULL;
     m_pRender3DStuffHandler = NULL;
 }
@@ -5410,7 +5417,7 @@ void _cdecl CheckMatrix ( float* pMatrix )
     int PosBits = p[12] | p[13] | p[14];
 
     // If rotational part is outside -2 to 2 range, then flag fix
-    bool bFix = ( RotBits & 0x40000000 );
+    bool bFix = ( RotBits & 0x40000000 ) != 0;
   
     // If positional part is outside -2 to 2 range, then do further check for -10 to 10 range
     if ( PosBits & 0x40000000 )

@@ -1030,7 +1030,8 @@ void CPoolsSA::DumpPoolsStatus ()
     int iPosition = 0;
     char percent = '%';
     iPosition += snprintf ( szOutput, 1024, "-----------------\n" );
-    for ( int i = 0; i < MAX_POOLS; i++ )
+    int iAmount = Min < int > ( MAX_POOLS, Min( NUMELMS( poolNames ), NUMELMS( poolSizes ) ) );
+    for ( int i = 0; i < iAmount; i++ )
     {
         int usedSpaces = GetNumberOfUsedSpaces ( (ePools)i );
         iPosition += snprintf ( szOutput + iPosition, 1024 - iPosition, "%s: %d (%d) (%.2f%c)\n", poolNames[i], usedSpaces, poolSizes[i], ((float)usedSpaces / (float)poolSizes[i] * 100), percent  );

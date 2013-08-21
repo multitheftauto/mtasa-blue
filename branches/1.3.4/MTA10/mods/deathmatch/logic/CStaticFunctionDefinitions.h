@@ -39,6 +39,7 @@ public:
     static bool                         AddEvent                            ( CLuaMain& LuaMain, const char* szName, bool bAllowRemoteTrigger );
     static bool                         AddEventHandler                     ( CLuaMain& LuaMain, const char* szName, CClientEntity& Entity, const CLuaFunctionRef& iLuaFunction, bool bPropagated, EEventPriorityType eventPriority, float fPriorityMod );
     static bool                         RemoveEventHandler                  ( CLuaMain& LuaMain, const char* szName, CClientEntity& Entity, const CLuaFunctionRef& iLuaFunction );
+    static bool                         GetEventHandlers                    ( CLuaMain& LuaMain, const char* szName );
     static bool                         TriggerEvent                        ( const char* szName, CClientEntity& Entity, const CLuaArguments& Arguments, bool& bWasCancelled );
     static bool                         TriggerServerEvent                  ( const char* szName, CClientEntity& CallWithEntity, CLuaArguments& Arguments );
     static bool                         TriggerLatentServerEvent            ( const char* szName, CClientEntity& CallWithEntity, CLuaArguments& Arguments, int bandwidth, CLuaMain* pLuaMain, ushort usResourceNetId );
@@ -293,16 +294,16 @@ public:
     static bool                         CreateFire                          ( CVector& vecPosition, float fSize );
 
     // Audio funcs
-    static bool                         PlayMissionAudio                    ( const CVector& vecPosition, unsigned short usSound );
     static bool                         PlaySoundFrontEnd                   ( unsigned char ucSound );
-    static bool                         PreloadMissionAudio                 ( unsigned short usSound, unsigned short usSlot );
     static bool                         SetAmbientSoundEnabled              ( eAmbientSoundType eType, bool bMute );
     static bool                         IsAmbientSoundEnabled               ( eAmbientSoundType eType, bool& bOutMute );
     static bool                         ResetAmbientSounds                  ( void );
     static bool                         SetWorldSoundEnabled                ( uint uiGroup, uint uiIndex, bool bMute );
     static bool                         IsWorldSoundEnabled                 ( uint uiGroup, uint uiIndex, bool& bOutMute );
     static bool                         ResetWorldSounds                    ( void );
-
+    static bool                         PlaySFX                             ( CResource* pResource, eAudioLookupIndex containerIndex, int iBankIndex, int iAudioIndex, bool bLoop, CClientSound*& outSound );
+    static bool                         PlaySFX3D                           ( CResource* pResource, eAudioLookupIndex containerIndex, int iBankIndex, int iAudioIndex, const CVector& vecPosition, bool bLoop, CClientSound*& outSound );
+    
     // Blip funcs
     static CClientRadarMarker*          CreateBlip                          ( CResource& Resource, const CVector& vecPosition, unsigned char ucIcon, unsigned char ucSize, const SColor color, short sOrdering, unsigned short usVisibleDistance );
     static CClientRadarMarker*          CreateBlipAttachedTo                ( CResource& Resource, CClientEntity& Entity, unsigned char ucIcon, unsigned char ucSize, const SColor color, short sOrdering, unsigned short usVisibleDistance );

@@ -36,6 +36,7 @@ DECLARE_ENUM( eWeaponState );
 DECLARE_ENUM( eWeaponFlags );
 DECLARE_ENUM( eVehicleComponent );
 DECLARE_ENUM( eFontType );
+DECLARE_ENUM( eAudioLookupIndex );
 
 enum eDXHorizontalAlign
 {

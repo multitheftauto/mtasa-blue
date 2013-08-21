@@ -153,6 +153,9 @@ namespace
                                          { "bitReplace",                    "1.3.2" },
                                          { "dxSetAspectRatioAdjustmentEnabled", "1.3.3-9.05546" },
                                          { "dxIsAspectRatioAdjustmentEnabled",  "1.3.3-9.05546" },
+                                         { "getEventHandlers",              "1.3.4" },
+                                         { "playSFX",                       "1.3.4" },
+                                         { "playSFX3D",                     "1.3.4" },
                                         };
 
     SVersionItem serverFunctionInitList[] = {
@@ -219,6 +222,7 @@ namespace
                                          { "bitExtract",                "1.3.2" },
                                          { "bitReplace",                "1.3.2" },
                                          { "getPlayerACInfo",           "1.3.3" },
+                                         { "getEventHandlers",          "1.3.4" },
                                         };
 
 

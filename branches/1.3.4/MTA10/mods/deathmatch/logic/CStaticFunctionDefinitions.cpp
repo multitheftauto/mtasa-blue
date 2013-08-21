@@ -3884,32 +3884,10 @@ bool CStaticFunctionDefinitions::CreateFire ( CVector& vecPosition, float fSize 
     return g_pGame->GetFireManager ()->StartFire ( vecPosition, fSize ) != NULL;
 }
 
-bool CStaticFunctionDefinitions::PlayMissionAudio ( const CVector& vecPosition, unsigned short usSlot )
-{
-    // TODO: Position of the sound
-
-    // Play the sound if it's loaded
-    if ( g_pGame->GetAudioEngine ()->GetMissionAudioLoadingStatus ( usSlot ) == 1 )
-    {
-        g_pGame->GetAudioEngine ()->PlayLoadedMissionAudio ( usSlot );
-        return true;
-    }
-
-    return false;
-}
-
 
 bool CStaticFunctionDefinitions::PlaySoundFrontEnd ( unsigned char ucSound )
 {
     g_pGame->GetAudioEngine ()->PlayFrontEndSound ( ucSound );
-    return true;
-}
-
-
-bool CStaticFunctionDefinitions::PreloadMissionAudio ( unsigned short usSound, unsigned short usSlot )
-{
-    g_pCore->ChatPrintf ( "Preload %u into slot %u", false, usSound, usSlot );
-    g_pGame->GetAudioEngine ()->PreloadMissionAudio ( usSound, usSlot );
     return true;
 }
 
@@ -3953,6 +3931,34 @@ bool CStaticFunctionDefinitions::ResetWorldSounds ( void )
 {
     g_pGame->GetAudio ()->ResetWorldSounds ();
     return true;
+}
+
+
+bool CStaticFunctionDefinitions::PlaySFX ( CResource* pResource, eAudioLookupIndex containerIndex, int iBankIndex, int iAudioIndex, bool bLoop, CClientSound*& outSound )
+{
+    CClientSound* pSound = m_pSoundManager->PlayGTASFX ( containerIndex, iBankIndex, iAudioIndex, bLoop );
+    if ( pSound )
+    {
+        pSound->SetParent ( pResource->GetResourceDynamicEntity() );
+
+        outSound = pSound;
+        return true;
+    }
+    return false;
+}
+
+
+bool CStaticFunctionDefinitions::PlaySFX3D ( CResource* pResource, eAudioLookupIndex containerIndex, int iBankIndex, int iAudioIndex, const CVector& vecPosition, bool bLoop, CClientSound*& outSound )
+{
+    CClientSound* pSound = m_pSoundManager->PlayGTASFX3D ( containerIndex, iBankIndex, iAudioIndex, vecPosition, bLoop );
+    if ( pSound )
+    {
+        pSound->SetParent ( pResource->GetResourceDynamicEntity() );
+
+        outSound = pSound;
+        return true;
+    }
+    return false;
 }
 
 

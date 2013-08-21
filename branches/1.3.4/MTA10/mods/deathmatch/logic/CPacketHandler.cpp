@@ -298,7 +298,7 @@ void CPacketHandler::Packet_ServerConnected ( NetBitStreamInterface& bitStream )
 //
 ///////////////////////////////////////////////////////////////
 static ushort usDiscoverHttpPortResult;
-static int iDiscoverHttpPortFailCounter;
+static uint uiDiscoverHttpPortFailCounter;
 
 static bool DiscoverInternalHTTPPortCallback ( double sizeJustDownloaded, double totalDownloaded, char * data, size_t dataLength, void * obj, bool complete, int error )
 {
@@ -308,7 +308,7 @@ static bool DiscoverInternalHTTPPortCallback ( double sizeJustDownloaded, double
     }
     else
     if ( error )
-        iDiscoverHttpPortFailCounter++;
+        uiDiscoverHttpPortFailCounter++;
 
     return true;
 }
@@ -325,7 +325,7 @@ static ushort DiscoverInternalHTTPPort()
     pHTTP->SetMaxConnections( testPortList.size() );
 
     usDiscoverHttpPortResult = 0;
-    iDiscoverHttpPortFailCounter = 0;
+    uiDiscoverHttpPortFailCounter = 0;
 
     // Send request to each port
     for ( uint i = 0 ; i < testPortList.size() ; i++ )
@@ -340,7 +340,7 @@ static ushort DiscoverInternalHTTPPort()
     {
         Sleep( 100 );
         pHTTP->ProcessQueuedFiles();
-        if ( usDiscoverHttpPortResult || iDiscoverHttpPortFailCounter >= testPortList.size() )
+        if ( usDiscoverHttpPortResult || uiDiscoverHttpPortFailCounter >= testPortList.size() )
             break;
     }
 
@@ -929,30 +929,13 @@ void CPacketHandler::Packet_PlayerQuit ( NetBitStreamInterface& bitStream )
 
 void CPacketHandler::Packet_PlayerSpawn ( NetBitStreamInterface& bitStream )
 {
-    // unsigned char    (1)     - player id
-    // bool                     - in vehicle?
-    // CVector          (12)    - spawn position
-    // float            (4)     - spawn rotation
-    // unsigned char    (1)     - player model id
-    // unsigned char    (1)     - interior
-    // unsigned short   (2)     - dimension
-    // unsigned short   (2)     - team id
-    // unsigned char    (1)     - vehicle id (minus 400) (if vehicle)
-    // unsigned char    (1)     - color 1 (if vehicle)
-    // unsigned char    (1)     - color 2 (if vehicle)
-    // unsigned char    (1)     - color 3 (if vehicle)
-    // unsigned char    (1)     - color 4 (if vehicle)
-
     // Read out the player id
     ElementID PlayerID;
     bitStream.Read ( PlayerID );
 
     // Flags
     unsigned char ucFlags;
-    bitStream.Read ( ucFlags );
-
-    // Decode the flags
-    bool bInVehicle = ucFlags & 0x01;
+    bitStream.Read ( ucFlags );    // Unused
 
     // Position vector
     CVector vecPosition;
@@ -991,38 +974,6 @@ void CPacketHandler::Packet_PlayerSpawn ( NetBitStreamInterface& bitStream )
     // Time context
     unsigned char ucTimeContext = 0;
     bitStream.Read ( ucTimeContext ) ;
-
-    // Read out some vehicle stuff if we spawn in a vehicle
-    unsigned short usModel = 0;
-    unsigned char ucColor1 = 0;
-    unsigned char ucColor2 = 0;
-    unsigned char ucColor3 = 0;
-    unsigned char ucColor4 = 0;
-    if ( bInVehicle )
-    {
-        // Read out the vehicle id
-        unsigned char ucModel = 0xFF;
-        bitStream.Read ( ucModel );
-        if ( ucModel == 0xFF )
-        {
-            RaiseProtocolError ( 17 );
-            return;
-        }
-
-        // Convert to a short. Valid id?
-        usModel = ucModel + 400;
-        if ( !CClientVehicleManager::IsValidModel ( usModel ) )
-        {
-            RaiseProtocolError ( 18 );
-            return;
-        }
-
-        // Read out the colors
-        bitStream.Read ( ucColor1 );
-        bitStream.Read ( ucColor2 );
-        bitStream.Read ( ucColor3 );
-        bitStream.Read ( ucColor4 );
-    }
 
     // Grab the player this is about
     CClientPlayer* pPlayer = g_pClientGame->m_pPlayerManager->Get ( PlayerID );
@@ -1830,7 +1781,7 @@ void CPacketHandler::Packet_Vehicle_InOut ( NetBitStreamInterface& bitStream )
                             pJacked->SetVehicleInOutState ( VEHICLE_INOUT_GETTING_JACKED );
 
                         // Start animating him in
-                        pPlayer->GetIntoVehicle ( pVehicle, ucSeat, ucDoor );
+                        pPlayer->GetIntoVehicle ( pVehicle, ucSeat, ucDoor + 2 );
 
                         // Remember that this player is working on leaving a vehicle
                         pPlayer->SetVehicleInOutState ( VEHICLE_INOUT_JACKING );
@@ -4503,8 +4454,8 @@ void CPacketHandler::Packet_ResourceStart ( NetBitStreamInterface& bitStream )
 
     CNetHTTPDownloadManagerInterface* pHTTP = g_pCore->GetNetwork ()->GetHTTPDownloadManager ( EDownloadMode::RESOURCE_INITIAL_FILES );
 
-    // Number of protected scripts
-    unsigned short usProtectedScriptCount = 0;
+    // Number of 'no client cache' scripts
+    unsigned short usNoClientCacheScriptCount = 0;
 
     // Resource Name Size
     unsigned char ucResourceNameSize;
@@ -4531,9 +4482,9 @@ void CPacketHandler::Packet_ResourceStart ( NetBitStreamInterface& bitStream )
     bitStream.Read ( ResourceEntityID );
     bitStream.Read ( ResourceDynamicEntityID );
 
-    // Read the amount of protected scripts
+    // Read the amount of 'no client cache' scripts
     if ( bitStream.Version () >= 0x26 )
-        bitStream.Read ( usProtectedScriptCount );
+        bitStream.Read ( usNoClientCacheScriptCount );
 
     // Read the declared min client version for this resource
     SString strMinServerReq, strMinClientReq;
@@ -4552,7 +4503,7 @@ void CPacketHandler::Packet_ResourceStart ( NetBitStreamInterface& bitStream )
     CResource* pResource = g_pClientGame->m_pResourceManager->Add ( usResourceID, szResourceName, pResourceEntity, pResourceDynamicEntity, strMinServerReq, strMinClientReq );
     if ( pResource )
     {
-        pResource->SetRemainingProtectedScripts ( usProtectedScriptCount );
+        pResource->SetRemainingNoClientCacheScripts ( usNoClientCacheScriptCount );
 
         // Resource Chunk Type (F = Resource File, E = Exported Function)
         unsigned char ucChunkType;
@@ -4738,7 +4689,7 @@ void CPacketHandler::Packet_ResourceClientScripts ( NetBitStreamInterface& bitSt
                 if ( uncompress ( (Bytef *)uncompressedBuffer, &originalLength, (const Bytef *)&data[4], len-4 ) == Z_OK )
                 {
                     // Load the script!
-                    pResource->LoadProtectedScript ( uncompressedBuffer, originalLength );
+                    pResource->LoadNoClientCacheScript ( uncompressedBuffer, originalLength );
                 }
 
                 memset ( uncompressedBuffer, 0, originalLength );

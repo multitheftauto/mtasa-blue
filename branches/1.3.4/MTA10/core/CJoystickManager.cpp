@@ -1006,7 +1006,6 @@ bool CJoystickManager::IsXInputDeviceAttached ( void )
         m_DevInfo.axis[5].lMax = 255;
 
         m_DevInfo.axis[6].bEnabled = 0;
-        m_DevInfo.axis[7].bEnabled = 0;
 
         // Compose a guid for saving config
         m_DevInfo.guidProduct.Data1 = 0x12345678;

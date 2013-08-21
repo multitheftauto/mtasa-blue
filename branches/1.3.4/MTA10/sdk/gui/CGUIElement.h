@@ -115,6 +115,7 @@ public:
     virtual void                SetMovedHandler             ( GUI_CALLBACK Callback ) = 0;
     virtual void                SetSizedHandler             ( GUI_CALLBACK Callback ) = 0;
     virtual void                SetClickHandler             ( GUI_CALLBACK Callback ) = 0;
+    virtual void                SetDoubleClickHandler       ( GUI_CALLBACK Callback ) = 0;
     virtual void                SetMouseEnterHandler        ( GUI_CALLBACK Callback ) = 0;
     virtual void                SetMouseLeaveHandler        ( GUI_CALLBACK Callback ) = 0;
     virtual void                SetMouseButtonDownHandler   ( GUI_CALLBACK Callback ) = 0;
@@ -123,6 +124,12 @@ public:
     virtual void                SetKeyDownHandler           ( GUI_CALLBACK Callback ) = 0;
     virtual void                SetKeyDownHandler           ( const GUI_CALLBACK_KEY & Callback ) = 0;
     virtual void                SetEnterKeyHandler          ( GUI_CALLBACK Callback ) = 0;
+
+    virtual bool                Event_OnClick               ( void ) = 0;
+    virtual bool                Event_OnDoubleClick         ( void ) = 0;
+    virtual bool                Event_OnMouseEnter          ( void ) = 0;
+    virtual bool                Event_OnMouseLeave          ( void ) = 0;
+    virtual bool                Event_OnMouseButtonDown     ( void ) = 0;
 };
 
 #endif

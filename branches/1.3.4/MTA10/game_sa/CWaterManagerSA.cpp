@@ -592,7 +592,7 @@ CWaterPoly* CWaterManagerSA::CreateQuad ( const CVector& vecBL, const CVector& v
     pInterface->m_wVertexIDs [ 0 ] = pV1->GetID ();
     pInterface->m_wVertexIDs [ 1 ] = pV2->GetID ();
     pInterface->m_wVertexIDs [ 2 ] = pV3->GetID ();
-    pInterface->m_wVertexIDs [ 3 ] = pV4->GetID ();
+    pInterface->m_wVertexIDs [ 3 ] = pV4->GetID ();     // This is ok
     pInterface->m_wFlags = WATER_VISIBLE;
     if ( bShallow )
         pInterface->m_wFlags |= WATER_SHALLOW;

@@ -423,6 +423,7 @@ public: // 'Safe' variables (that have no need for accessors)
     SFixedArray < unsigned char, MAX_PANELS >  m_ucPanelStates;
     SFixedArray < unsigned char, MAX_LIGHTS >  m_ucLightStates;
     SSirenInfo                      m_tSirenBeaconInfo;
+    bool                            m_bOccupantChanged;
 };
 
 #endif

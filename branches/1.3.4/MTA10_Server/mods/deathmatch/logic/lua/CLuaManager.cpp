@@ -61,62 +61,50 @@ CLuaManager::~CLuaManager ( void )
     delete m_pLuaModuleManager;
 }
 
-void CLuaManager::StopScriptsOwnedBy ( int iOwner )
-{
-    // Delete all the scripts by the given owner
-    CLuaMain* pLuaMain = NULL;
-    list < CLuaMain* > ::iterator iter = m_virtualMachines.begin ();
-    for ( ; iter != m_virtualMachines.end (); iter++ )
-    {
-        pLuaMain = *iter;
-        if ( pLuaMain->GetOwner () == iOwner )
-        {
-            // Delete the object
-            delete pLuaMain;
-
-            // Remove from list
-            m_virtualMachines.erase ( iter );
-
-            // Continue from the beginning, unless the list is empty
-            if ( m_virtualMachines.empty () ) break;
-            iter = m_virtualMachines.begin ();
-        }
-    }
-}
-
 CLuaMain * CLuaManager::CreateVirtualMachine ( CResource* pResourceOwner )
 {
     // Create it and add it to the list over VM's
-    CLuaMain * vm = new CLuaMain ( this, m_pObjectManager, m_pPlayerManager, m_pVehicleManager, m_pBlipManager, m_pRadarAreaManager, m_pMapManager, pResourceOwner );
-    m_virtualMachines.push_back ( vm );
-    vm->InitVM ();
+    CLuaMain * pLuaMain = new CLuaMain ( this, m_pObjectManager, m_pPlayerManager, m_pVehicleManager, m_pBlipManager, m_pRadarAreaManager, m_pMapManager, pResourceOwner );
+    m_virtualMachines.push_back ( pLuaMain );
+    pLuaMain->InitVM ();
 
-    m_pLuaModuleManager->_RegisterFunctions ( vm->GetVirtualMachine() );
+    m_pLuaModuleManager->_RegisterFunctions ( pLuaMain->GetVirtualMachine() );
 
-    return vm;
+    return pLuaMain;
 }
 
-bool CLuaManager::RemoveVirtualMachine ( CLuaMain * vm )
+bool CLuaManager::RemoveVirtualMachine ( CLuaMain * pLuaMain )
 {
-    if ( vm )
+    if ( pLuaMain )
     {
         // Remove all events registered by it and all commands added
-        m_pEvents->RemoveAllEvents ( vm );
-        m_pRegisteredCommands->CleanUpForVM ( vm );
+        m_pEvents->RemoveAllEvents ( pLuaMain );
+        m_pRegisteredCommands->CleanUpForVM ( pLuaMain );
 
         // Delete it unless it is already
-        if ( !vm->BeingDeleted () )
+        if ( !pLuaMain->BeingDeleted () )
         {
-            delete vm;
+            delete pLuaMain;
         }
 
         // Remove it from our list
-        m_virtualMachines.remove ( vm );
-
+        m_virtualMachines.remove ( pLuaMain );
         return true;
     }
 
     return false;
+}
+
+
+void CLuaManager::OnLuaMainOpenVM( CLuaMain* pLuaMain, lua_State* luaVM )
+{
+    MapSet( m_VirtualMachineMap, pLuaMain->GetVirtualMachine(), pLuaMain );
+}
+
+
+void CLuaManager::OnLuaMainCloseVM( CLuaMain* pLuaMain, lua_State* luaVM )
+{
+    MapRemove( m_VirtualMachineMap, pLuaMain->GetVirtualMachine() );
 }
 
 
@@ -132,6 +120,9 @@ void CLuaManager::DoPulse ( void )
 
 CLuaMain* CLuaManager::GetVirtualMachine ( lua_State* luaVM )
 {
+    if ( !luaVM )
+        return NULL;
+
     // Grab the main virtual state because the one we've got passed might be a coroutine state
     // and only the main state is in our list.
     lua_State* main = lua_getmainstate ( luaVM );
@@ -140,12 +131,18 @@ CLuaMain* CLuaManager::GetVirtualMachine ( lua_State* luaVM )
         luaVM = main;
     }
 
+    // Find a matching VM in our map
+    CLuaMain* pLuaMain = MapFindRef( m_VirtualMachineMap, luaVM );
+    if ( pLuaMain )
+        return pLuaMain;
+
     // Find a matching VM in our list
     list < CLuaMain* >::const_iterator iter = m_virtualMachines.begin ();
     for ( ; iter != m_virtualMachines.end (); iter++ )
     {
         if ( luaVM == (*iter)->GetVirtualMachine () )
         {
+            dassert( 0 );   // Why not in map?
             return *iter;
         }
     }
@@ -160,6 +157,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "addEvent", CLuaFunctionDefinitions::AddEvent );
     CLuaCFunctions::AddFunction ( "addEventHandler", CLuaFunctionDefinitions::AddEventHandler );
     CLuaCFunctions::AddFunction ( "removeEventHandler", CLuaFunctionDefinitions::RemoveEventHandler );
+    CLuaCFunctions::AddFunction ( "getEventHandlers", CLuaFunctionDefinitions::GetEventHandlers );
     CLuaCFunctions::AddFunction ( "triggerEvent", CLuaFunctionDefinitions::TriggerEvent );
     CLuaCFunctions::AddFunction ( "triggerClientEvent", CLuaFunctionDefinitions::TriggerClientEvent );
     CLuaCFunctions::AddFunction ( "cancelEvent", CLuaFunctionDefinitions::CancelEvent );

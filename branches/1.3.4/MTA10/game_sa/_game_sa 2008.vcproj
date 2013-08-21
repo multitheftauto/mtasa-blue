@@ -373,6 +373,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CAudioContainerLookupTableSA.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CAudioContainerSA.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\CAudioEngineSA.cpp"
 				>
 			</File>
@@ -903,6 +911,14 @@
 			</File>
 			<File
 				RelativePath=".\CAnimManagerSA.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CAudioContainerLookupTableSA.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CAudioContainerSA.h"
 				>
 			</File>
 			<File

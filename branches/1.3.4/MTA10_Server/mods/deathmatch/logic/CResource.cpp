@@ -598,8 +598,8 @@ bool CResource::GenerateChecksums ( void )
                             bOk = false;
                         }
 
-                        // If script is protected, make sure there is no trace of it in the unprotected cache
-                        if ( pResourceFile->IsProtected () )
+                        // If script is 'no client cache', make sure there is no trace of it in the output dir
+                        if ( pResourceFile->IsNoClientCache () )
                             FileDelete ( pResourceFile->GetCachedPathFilename ( true ) );
                     }
                 }
@@ -972,7 +972,7 @@ bool CResource::Start ( list<CResource *> * dependents, bool bStartedManually, b
         // Broadcast new resourceelement that is loaded and tell the players that a new resource was started
         g_pGame->GetMapManager()->BroadcastResourceElements ( m_pResourceElement, m_pDefaultElementGroup );
         g_pGame->GetPlayerManager ()->BroadcastOnlyJoined ( CResourceStartPacket ( m_strResourceName.c_str (), this ) );
-        SendProtectedScripts ();
+        SendNoClientCacheScripts ();
 
         // HACK?: stops resources getting loaded twice when you change them then manually restart
         GenerateChecksums ();
@@ -1708,24 +1708,24 @@ bool CResource::ReadIncludedExports ( CXMLNode * root )
             }
 
             // Find the type attribute
-            CExportedFunction::eExportedFunctionType ucType = CExportedFunction::EXPORTED_FUNCTION_TYPE_SERVER;
+            bool bServer = true;
+            bool bClient = false;
+            
             CXMLAttribute * type = attributes->Find("type");
             if ( type )
             {
-                // Grab the type. Client or server
+                // Grab the type. Client or server or shared
                 const char *szType = type->GetValue ().c_str ();
-                if ( stricmp ( szType, "server" ) == 0 )
+                if ( stricmp ( szType, "client" ) == 0 )
                 {
-                    ucType = CExportedFunction::EXPORTED_FUNCTION_TYPE_SERVER;
+                    bServer = false;
+                    bClient = true;
                 }
-                else if ( stricmp ( szType, "client" ) == 0 )
-                {
-                    ucType = CExportedFunction::EXPORTED_FUNCTION_TYPE_CLIENT;
-                }
-                else
-                {
+                else if ( stricmp ( szType, "shared" ) == 0 )
+                    bClient = true;
+                else 
+                if ( stricmp ( szType, "server" ) != 0 )
                     CLogger::LogPrintf ( "Unknown exported function type specified in %s. Assuming 'server'\n", m_strResourceName.c_str () );
-                }
             }
 
             // Grab the functionname attribute
@@ -1738,7 +1738,10 @@ bool CResource::ReadIncludedExports ( CXMLNode * root )
                 // Add it to the list if it wasn't zero long. Otherwize show a warning
                 if ( !strFunction.empty () )
                 {
-                    m_exportedFunctions.push_back ( CExportedFunction ( strFunction.c_str (), bHTTP, ucType, bRestricted || GetName () == "webadmin" || GetName () == "runcode" ) );
+                    if ( bServer )
+                        m_exportedFunctions.push_back ( CExportedFunction ( strFunction.c_str (), bHTTP, CExportedFunction::EXPORTED_FUNCTION_TYPE_SERVER, bRestricted || GetName () == "webadmin" || GetName () == "runcode" ) );
+                    if ( bClient )
+                        m_exportedFunctions.push_back ( CExportedFunction ( strFunction.c_str (), bHTTP, CExportedFunction::EXPORTED_FUNCTION_TYPE_CLIENT, bRestricted || GetName () == "webadmin" || GetName () == "runcode" ) );
                 }
                 else
                 {
@@ -3102,10 +3105,10 @@ void CResource::OnPlayerJoin ( CPlayer& Player )
 {
     // do the player join crap
     Player.Send ( CResourceStartPacket ( m_strResourceName.c_str (), this ) );
-    SendProtectedScripts ( &Player );
+    SendNoClientCacheScripts ( &Player );
 }
 
-void CResource::SendProtectedScripts ( CPlayer* player )
+void CResource::SendNoClientCacheScripts ( CPlayer* player )
 {
     if ( !IsClientScriptsOn() )
         return;
@@ -3139,7 +3142,7 @@ void CResource::SendProtectedScripts ( CPlayer* player )
             if ( file->GetType() == CResourceFile::RESOURCE_FILE_TYPE_CLIENT_SCRIPT )
             {
                 CResourceClientScriptItem* clientScript = static_cast < CResourceClientScriptItem* > ( file );
-                if ( clientScript->IsProtected() == true )
+                if ( clientScript->IsNoClientCache() == true )
                 {
                     packet.AddItem ( clientScript );
                     anyScript = true;

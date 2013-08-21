@@ -78,6 +78,7 @@ public:
     void                        DisableExplosions           ( bool bDisabled );
     void                        SetExplosionHandler         ( ExplosionHandler * pExplosionHandler );
     void                        SetDamageHandler            ( DamageHandler * pDamageHandler );
+    void                        SetDeathHandler             ( DeathHandler * pDeathHandler );
     void                        SetProjectileHandler        ( ProjectileHandler * pProjectileHandler );
     void                        SetProjectileStopHandler    ( ProjectileStopHandler * pProjectileHandler );
     void                        SetFireHandler              ( FireHandler * pFireHandler );

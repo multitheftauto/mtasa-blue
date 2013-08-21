@@ -330,8 +330,8 @@ public:
 
     void                                SetAllDimensions                ( unsigned short usDimension );
 
-    static void                         StaticKeyStrokeHandler          ( const SBindableKey * pKey, bool bState );
-    void                                KeyStrokeHandler                ( const SBindableKey * pKey, bool bState );
+    static bool                         StaticKeyStrokeHandler          ( const SString strKey, bool bState );
+    bool                                KeyStrokeHandler                ( const SString strKey, bool bState );
     static bool                         StaticCharacterKeyHandler       ( WPARAM wChar );
     bool                                CharacterKeyHandler             ( WPARAM wChar );
 
@@ -470,6 +470,7 @@ private:
     void                                Event_OnIngameAndConnected      ( void );
 
     static bool                         StaticDamageHandler             ( CPed* pDamagePed, CEventDamage * pEvent );
+    static void                         StaticDeathHandler              ( CPed* pKilledPed, unsigned char ucDeathReason, unsigned char ucBodyPart);
     static void                         StaticFireHandler               ( CFire* pFire );
     static bool                         StaticBreakTowLinkHandler       ( CVehicle* pTowedVehicle );
     static void                         StaticDrawRadarAreasHandler     ( void );
@@ -497,6 +498,7 @@ private:
     static void                         StaticTaskSimpleBeHitHandler    ( CPedSAInterface* pPedAttacker, ePedPieceTypes hitBodyPart, int hitBodySide, int weaponId );
 
     bool                                DamageHandler                   ( CPed* pDamagePed, CEventDamage * pEvent );
+    void                                DeathHandler                    ( CPed* pKilledPed, unsigned char ucDeathReason, unsigned char ucBodyPart );
     void                                FireHandler                     ( CFire* pFire );
     bool                                BreakTowLinkHandler             ( CVehicle* pTowedVehicle );
     void                                DrawRadarAreasHandler           ( void );
@@ -749,6 +751,8 @@ private:
     uint                                m_uiAltPulseOrderCounter;
     SString                             m_strACInfo;
     std::set < uint >                   m_SentMessageIds;
+
+    bool                                m_bLastKeyWasEscapeCancelled;
 };
 
 extern CClientGame* g_pClientGame;

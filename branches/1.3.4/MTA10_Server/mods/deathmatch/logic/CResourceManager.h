@@ -137,6 +137,7 @@ private:
     CFastHashMap < CResource*, lua_State* > m_ResourceLuaStateMap;
     CFastHashMap < lua_State*, CResource* > m_LuaStateResourceMap;
     CFastHashMap < SString, CResource* >    m_NameResourceMap;
+    std::map < ushort, CResource* >         m_NetIdResourceMap;
 
     list<sResourceQueue>        m_resourceQueue;
 

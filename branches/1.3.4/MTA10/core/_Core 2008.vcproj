@@ -1304,6 +1304,10 @@
 						>
 					</File>
 					<File
+						RelativePath="..\..\MTA10\sdk\game\CAudioContainer.h"
+						>
+					</File>
+					<File
 						RelativePath="..\..\MTA10\sdk\game\CAutomobile.h"
 						>
 					</File>

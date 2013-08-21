@@ -237,6 +237,7 @@ CClientGame::CClientGame ( bool bLocalPlay )
     g_pMultiplayer->SetBreakTowLinkHandler ( CClientGame::StaticBreakTowLinkHandler );
     g_pMultiplayer->SetDrawRadarAreasHandler ( CClientGame::StaticDrawRadarAreasHandler );
     g_pMultiplayer->SetDamageHandler ( CClientGame::StaticDamageHandler );
+    g_pMultiplayer->SetDeathHandler ( CClientGame::StaticDeathHandler );
     g_pMultiplayer->SetFireHandler ( CClientGame::StaticFireHandler );
     g_pMultiplayer->SetProjectileStopHandler ( CClientProjectileManager::Hook_StaticProjectileAllow );
     g_pMultiplayer->SetProjectileHandler ( CClientProjectileManager::Hook_StaticProjectileCreation );
@@ -272,7 +273,6 @@ CClientGame::CClientGame ( bool bLocalPlay )
     m_pScriptDebugging = new CScriptDebugging ( m_pLuaManager );
     m_pScriptDebugging->SetLogfile ( CalcMTASAPath("mta\\clientscript.log"), 3 );
 
-    m_pLuaManager->SetScriptDebugging ( m_pScriptDebugging );
     CStaticFunctionDefinitions ( m_pLuaManager, &m_Events, g_pCore, g_pGame, this, m_pManager );
     CLuaFunctionDefs::Initialize ( m_pLuaManager, m_pScriptDebugging, this );
     CLuaDefs::Initialize ( this, m_pLuaManager, m_pScriptDebugging );
@@ -1684,9 +1684,10 @@ void CClientGame::UpdateVehicleInOut ( void )
                                         bAlreadyStartedJacking = true;
                                     }
                                 }
-                                pBitStream->WriteBits ( &(m_pLocalPlayer->m_ucEnteringDoor ), 3 );
+                                unsigned char ucDoor = m_pLocalPlayer->m_ucEnteringDoor - 2;
+                                pBitStream->WriteBits ( &ucDoor, 3 );
                                 SDoorOpenRatioSync door;
-                                door.data.fRatio = pVehicle->GetDoorOpenRatio ( m_pLocalPlayer->m_ucEnteringDoor + 2 );
+                                door.data.fRatio = pVehicle->GetDoorOpenRatio ( m_pLocalPlayer->m_ucEnteringDoor );
                                 pBitStream->Write ( &door );
                             }
                             pBitStream->WriteBit ( bAlreadyStartedJacking );
@@ -2287,23 +2288,41 @@ void CClientGame::SetAllDimensions ( unsigned short usDimension )
 }
 
 
-void CClientGame::StaticKeyStrokeHandler ( const SBindableKey * pKey, bool bState )
+bool CClientGame::StaticKeyStrokeHandler ( const SString strKey, bool bState )
 {
-    g_pClientGame->KeyStrokeHandler ( pKey, bState );
+    return g_pClientGame->KeyStrokeHandler ( strKey, bState );
 }
 
 
-void CClientGame::KeyStrokeHandler ( const SBindableKey * pKey, bool bState )
+bool CClientGame::KeyStrokeHandler ( const SString strKey, bool bState )
 {
     // Do we have a root yet?
     if ( m_pRootEntity && g_pCore->IsMenuVisible() == false && g_pCore->GetConsole()->IsVisible() == false )
     {
+        bool bAllow = true;
         // Call our key-stroke event
         CLuaArguments Arguments;
-        Arguments.PushString ( pKey->szKey );
+        Arguments.PushString ( strKey );
         Arguments.PushBoolean ( bState );
-        m_pRootEntity->CallEvent ( "onClientKey", Arguments, false );
+        bAllow = m_pRootEntity->CallEvent ( "onClientKey", Arguments, false );
+        if ( bAllow == false && bState == true && strKey == "escape" )
+        {
+            if ( m_bLastKeyWasEscapeCancelled )
+            {
+                // Escape cannot be skipped twice
+                bAllow = true;
+                m_bLastKeyWasEscapeCancelled = false;
+            }
+            else
+                m_bLastKeyWasEscapeCancelled = true;
+        }
+        else
+            m_bLastKeyWasEscapeCancelled = false;
+
+        return bAllow;
     }
+    m_bLastKeyWasEscapeCancelled = false;
+    return true;
 }
 
 
@@ -3562,6 +3581,11 @@ bool CClientGame::StaticDamageHandler ( CPed* pDamagePed, CEventDamage * pEvent 
     return g_pClientGame->DamageHandler ( pDamagePed, pEvent );
 }
 
+void CClientGame::StaticDeathHandler ( CPed* pKilledPed, unsigned char ucDeathReason, unsigned char ucBodyPart )
+{
+    g_pClientGame->DeathHandler ( pKilledPed, ucDeathReason, ucBodyPart );
+}
+
 void CClientGame::StaticFireHandler ( CFire* pFire )
 {
     g_pClientGame->FireHandler ( pFire );
@@ -4270,6 +4294,36 @@ bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
     
     // Allow the damage processing to continue
     return true;
+}
+
+void CClientGame::DeathHandler ( CPed* pKilledPedSA, unsigned char ucDeathReason, unsigned char ucBodyPart)
+{
+    CClientPed* pKilledPed = m_pPedManager->Get ( dynamic_cast < CPlayerPed* > ( pKilledPedSA ), true, true );
+
+    if ( !pKilledPed )
+        return;
+
+    // Set the health to zero (this is safe as GTA will do it anyway in a few ticks)
+    pKilledPed->SetHealth(0.0f);
+    
+    if ( IS_PLAYER ( pKilledPed ) )
+    {
+        if ( pKilledPed == m_pLocalPlayer )
+            DoWastedCheck();
+    }
+    else
+    {
+        // Call Lua
+        CLuaArguments Arguments;
+        Arguments.PushBoolean(false);
+        Arguments.PushNumber(ucDeathReason);
+        Arguments.PushNumber(ucBodyPart);
+
+        pKilledPed->CallEvent("onClientPedWasted", Arguments, true);
+        
+        // Notify the server
+        SendPedWastedPacket ( pKilledPed, INVALID_ELEMENT_ID, ucDeathReason, ucBodyPart );
+    }
 }
 
 bool CClientGame::VehicleCollisionHandler ( CVehicleSAInterface* pCollidingVehicle, CEntitySAInterface* pCollidedWith, int iModelIndex, float fDamageImpulseMag, float fCollidingDamageImpulseMag, uint16 usPieceType, CVector vecCollisionPos, CVector vecCollisionVelocity )
@@ -5564,6 +5618,12 @@ bool CClientGame::OnMouseEnter ( CGUIMouseEventArgs Args )
     CLuaArguments Arguments;
     Arguments.PushNumber ( Args.position.fX );
     Arguments.PushNumber ( Args.position.fY );
+    if ( Args.pSwitchedWindow )
+    {
+        CClientGUIElement * pGUISwitchedElement = CGUI_GET_CCLIENTGUIELEMENT ( Args.pSwitchedWindow );
+        if ( pGUISwitchedElement )
+            Arguments.PushElement( pGUISwitchedElement );
+    }
 
     CClientGUIElement * pGUIElement = CGUI_GET_CCLIENTGUIELEMENT ( Args.pWindow );
     if ( GetGUIManager ()->Exists ( pGUIElement ) ) pGUIElement->CallEvent ( "onClientMouseEnter", Arguments, true );
@@ -5579,6 +5639,12 @@ bool CClientGame::OnMouseLeave ( CGUIMouseEventArgs Args )
     CLuaArguments Arguments;
     Arguments.PushNumber ( Args.position.fX );
     Arguments.PushNumber ( Args.position.fY );
+    if ( Args.pSwitchedWindow )
+    {
+        CClientGUIElement * pGUISwitchedElement = CGUI_GET_CCLIENTGUIELEMENT ( Args.pSwitchedWindow );
+        if ( pGUISwitchedElement )
+            Arguments.PushElement( pGUISwitchedElement );
+    }
 
     CClientGUIElement * pGUIElement = CGUI_GET_CCLIENTGUIELEMENT ( Args.pWindow );
     if ( GetGUIManager ()->Exists ( pGUIElement ) ) pGUIElement->CallEvent ( "onClientMouseLeave", Arguments, true );
@@ -5924,9 +5990,9 @@ void CClientGame::GottenPlayerScreenShot ( const CBuffer& buffer, uint uiTimeSpe
         delayedPacketInfo.useTickCount = tickCount;
         delayedPacketInfo.ucPacketID = PACKET_ID_PLAYER_SCREENSHOT;
         delayedPacketInfo.pBitStream = pBitStream;
-        delayedPacketInfo.packetPriority = PACKET_PRIORITY_MEDIUM;
+        delayedPacketInfo.packetPriority = PACKET_PRIORITY_LOW;
         delayedPacketInfo.packetReliability = PACKET_RELIABILITY_RELIABLE_ORDERED;
-        delayedPacketInfo.packetOrdering = PACKET_ORDERING_CHAT;
+        delayedPacketInfo.packetOrdering = PACKET_ORDERING_DATA_TRANSFER;
         m_DelayedSendList.push_back ( delayedPacketInfo );
 
         // Increment stuff
@@ -6173,14 +6239,14 @@ void CClientGame::TellServerSomethingImportant( uint uiId, const SString& strMes
     if ( pBitStream->Version() >= 0x48 )
     {
         pBitStream->WriteString( SString( "%d,%s", uiId, *strMessage ) );
-        g_pNet->SendPacket( PACKET_ID_PLAYER_DIAGNOSTIC, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_UNRELIABLE );
+        g_pNet->SendPacket( PACKET_ID_PLAYER_DIAGNOSTIC, pBitStream, PACKET_PRIORITY_MEDIUM, PACKET_RELIABILITY_UNRELIABLE );
     }
     else
     {
         // Spam chat for older servers
         SString strTemp( "say %s", *strMessage );
         pBitStream->Write( strTemp.c_str(), strTemp.length() );
-        g_pNet->SendPacket( PACKET_ID_COMMAND, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_UNRELIABLE, PACKET_ORDERING_CHAT );
+        g_pNet->SendPacket( PACKET_ID_COMMAND, pBitStream, PACKET_PRIORITY_MEDIUM, PACKET_RELIABILITY_UNRELIABLE );
     }
 
     g_pNet->DeallocateNetBitStream( pBitStream );

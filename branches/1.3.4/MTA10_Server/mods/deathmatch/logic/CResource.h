@@ -350,7 +350,7 @@ public:
     unsigned short          GetNetID ( void ) { return m_usNetID; }
     uint                    GetScriptID ( void ) const { return m_uiScriptID; }
     void                    OnPlayerJoin ( CPlayer& Player );
-    void                    SendProtectedScripts ( CPlayer* player = 0 );
+    void                    SendNoClientCacheScripts ( CPlayer* pPlayer = NULL );
     CDummy*                 GetResourceRootElement ( void ) { return m_pResourceElement; };
     CDummy*                 GetDynamicElementRoot ( void ) { return m_pResourceDynamicElementRoot; };
 

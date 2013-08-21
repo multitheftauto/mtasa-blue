@@ -161,6 +161,11 @@ namespace SharedUtil
 
     int  GetUTF8Confidence (const unsigned char* input, int len);
 
+    bool IsUTF8BOM( const void* pData, uint uiLength );
+
+    // Buffer identification
+    bool IsLuaCompiledScript( const void* pData, uint uiLength );
+    bool IsLuaEncryptedScript( const void* pData, uint uiLength );
 
     //
     // Some templates
@@ -1604,7 +1609,6 @@ namespace SharedUtil
             return *this;
         }
     };
-
 
 };
 

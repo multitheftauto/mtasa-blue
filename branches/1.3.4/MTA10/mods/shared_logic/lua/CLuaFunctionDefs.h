@@ -51,11 +51,14 @@ public:
     LUA_DECLARE ( GetResourceGUIElement );
     LUA_DECLARE ( GetResourceDynamicElementRoot );
     LUA_DECLARE ( GetResourceExportedFunctions );
+    LUA_DECLARE ( LoadString );
+    LUA_DECLARE ( Load );
 
     // Event functions
     LUA_DECLARE ( AddEvent );
     LUA_DECLARE ( AddEventHandler );
     LUA_DECLARE ( RemoveEventHandler );
+    LUA_DECLARE ( GetEventHandlers );
     LUA_DECLARE ( TriggerEvent );
     LUA_DECLARE ( TriggerServerEvent );
     LUA_DECLARE ( CancelEvent );
@@ -420,15 +423,15 @@ public:
     LUA_DECLARE ( CreateFire );
 
     // Audio funcs
-    LUA_DECLARE ( PlayMissionAudio );
     LUA_DECLARE ( PlaySoundFrontEnd );
-    LUA_DECLARE ( PreloadMissionAudio );
     LUA_DECLARE ( SetAmbientSoundEnabled );
     LUA_DECLARE ( IsAmbientSoundEnabled );
     LUA_DECLARE ( ResetAmbientSounds );
     LUA_DECLARE ( SetWorldSoundEnabled );
     LUA_DECLARE ( IsWorldSoundEnabled );
     LUA_DECLARE ( ResetWorldSounds );
+    LUA_DECLARE ( PlaySFX );
+    LUA_DECLARE ( PlaySFX3D );
 
     // Blip funcs
     LUA_DECLARE ( CreateBlip );

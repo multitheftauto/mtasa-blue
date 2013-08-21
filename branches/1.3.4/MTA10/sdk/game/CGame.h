@@ -25,6 +25,7 @@ typedef void ( InRenderer ) ( void );
 #include "CAnimBlock.h"
 #include "CAnimManager.h"
 #include "CAudioEngine.h"
+#include "CAudioContainer.h"
 #include "CCam.h"
 #include "CCamera.h"
 #include "CCarEnterExit.h"
@@ -134,6 +135,7 @@ public:
     virtual CAERadioTrackManager* GetAERadioTrackManager()=0;
     virtual CAudioEngine        * GetAudioEngine()=0;
     virtual CAudioEngine        * GetAudio()=0;
+    virtual CAudioContainer     * GetAudioContainer()=0;
     virtual CMenuManager        * GetMenuManager()=0;
     virtual CText               * GetText()=0;
     virtual CStats              * GetStats()=0;

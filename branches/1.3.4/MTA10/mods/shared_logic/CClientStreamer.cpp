@@ -538,7 +538,7 @@ void CClientStreamer::Restream ( bool bMovedFar )
                 if ( bReachedLimit )
                 {
                     // Add to the list that might be streamed in during the final phase
-                    if ( ClosestStreamedOutList.size() < iMaxIn )     // (only add if there is a chance it will be used)
+                    if ( (int)ClosestStreamedOutList.size() < iMaxIn )     // (only add if there is a chance it will be used)
                         ClosestStreamedOutList.push_back( pElement );
                 }
                 else
