@@ -33,6 +33,8 @@ CResourceManager::~CResourceManager ( void )
         CLuaArguments Arguments;
         Arguments.PushResource ( pResource );
         pResource->GetResourceEntity ()->CallEvent ( "onClientResourceStop", Arguments, true );
+        assert( MapContains( m_NetIdResourceMap, pResource->GetNetID() ) );
+        MapRemove( m_NetIdResourceMap, pResource->GetNetID() );
         delete pResource;
 
         m_resources.pop_back ();
@@ -45,6 +47,8 @@ CResource* CResourceManager::Add ( unsigned short usNetID, const char* szResourc
     if ( pResource )
     {
         m_resources.push_back ( pResource );
+        assert( !MapContains( m_NetIdResourceMap, pResource->GetNetID() ) );
+        MapSet( m_NetIdResourceMap, usNetID, pResource );
         return pResource;
     }
     return NULL;
@@ -53,11 +57,21 @@ CResource* CResourceManager::Add ( unsigned short usNetID, const char* szResourc
 
 CResource* CResourceManager::GetResourceFromNetID ( unsigned short usNetID )
 {
+    CResource* pResource = MapFindRef( m_NetIdResourceMap, usNetID );
+    if ( pResource )
+    {
+        assert( pResource->GetNetID() == usNetID );
+        return pResource;
+    }
+
     list < CResource* > ::const_iterator iter = m_resources.begin ();
     for ( ; iter != m_resources.end (); iter++ )
     {
         if ( ( *iter )->GetNetID() == usNetID )
+        {
+            assert( 0 );    // Should be in map
             return ( *iter );
+        }
     }
     return NULL;
 }
@@ -73,7 +87,7 @@ CResource* CResourceManager::GetResourceFromScriptID ( uint uiScriptID )
 CResource* CResourceManager::GetResourceFromLuaState ( lua_State* luaVM )
 {
     CLuaMain* pLuaMain = g_pClientGame->GetLuaManager()->GetVirtualMachine ( luaVM );
-    CResource * pResource = pLuaMain->GetResource();
+    CResource* pResource = pLuaMain ? pLuaMain->GetResource() : NULL;
     return pResource;
 }
 
@@ -117,7 +131,9 @@ void CResourceManager::Remove ( CResource* pResource )
     pResource->DeleteClientChildren ();
 
     // Delete the resource
-    if ( !m_resources.empty() ) m_resources.remove ( pResource );
+    m_resources.remove ( pResource );
+    assert( MapContains( m_NetIdResourceMap, pResource->GetNetID() ) );
+    MapRemove( m_NetIdResourceMap, pResource->GetNetID() );
     delete pResource;
 }
 

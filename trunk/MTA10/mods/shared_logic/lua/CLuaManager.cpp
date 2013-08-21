@@ -118,6 +118,9 @@ void CLuaManager::DoPulse ( void )
 
 CLuaMain* CLuaManager::GetVirtualMachine ( lua_State* luaVM )
 {
+    if ( !luaVM )
+        return NULL;
+
     // Grab the main virtual state because the one we've got passed might be a coroutine state
     // and only the main state is in our list.
     lua_State* main = lua_getmainstate ( luaVM );

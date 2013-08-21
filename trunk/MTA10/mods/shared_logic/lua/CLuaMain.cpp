@@ -777,7 +777,7 @@ bool CLuaMain::LoadScriptFromBuffer ( const char* cpInBuffer, unsigned int uiInS
         // cpBuffer is always valid after call to DecryptScript
 #else
         SString strMessage( "%s is invalid. Please re-compile at http://luac.mtasa.com/", *ConformResourcePath( szFileName ) ); 
-        g_pClientGame->GetScriptDebugging()->LogWarning ( m_luaVM, "Loading script failed: %s", *strMessage );
+        g_pClientGame->GetScriptDebugging()->LogError ( m_luaVM, "Loading script failed: %s", *strMessage );
         return false;
 #endif
     }
@@ -823,12 +823,12 @@ bool CLuaMain::LoadScriptFromBuffer ( const char* cpInBuffer, unsigned int uiInS
             if ( strRes.length () )
             {
                 CLogger::LogPrintf ( "SCRIPT ERROR: %s\n", strRes.c_str () );
-                g_pClientGame->GetScriptDebugging()->LogWarning ( m_luaVM, "Loading script failed: %s", strRes.c_str () );
+                g_pClientGame->GetScriptDebugging()->LogError ( m_luaVM, "Loading script failed: %s", strRes.c_str () );
             }
             else
             {
                 CLogger::LogPrint ( "SCRIPT ERROR: Unknown\n" );
-                g_pClientGame->GetScriptDebugging()->LogInformation ( m_luaVM, "Loading script failed for unknown reason" );
+                g_pClientGame->GetScriptDebugging()->LogError ( m_luaVM, "Loading script failed for unknown reason" );
             }
         }
         else

@@ -6036,9 +6036,9 @@ void CClientGame::GottenPlayerScreenShot ( const CBuffer& buffer, uint uiTimeSpe
         delayedPacketInfo.useTickCount = tickCount;
         delayedPacketInfo.ucPacketID = PACKET_ID_PLAYER_SCREENSHOT;
         delayedPacketInfo.pBitStream = pBitStream;
-        delayedPacketInfo.packetPriority = PACKET_PRIORITY_MEDIUM;
+        delayedPacketInfo.packetPriority = PACKET_PRIORITY_LOW;
         delayedPacketInfo.packetReliability = PACKET_RELIABILITY_RELIABLE_ORDERED;
-        delayedPacketInfo.packetOrdering = PACKET_ORDERING_CHAT;
+        delayedPacketInfo.packetOrdering = PACKET_ORDERING_DATA_TRANSFER;
         m_DelayedSendList.push_back ( delayedPacketInfo );
 
         // Increment stuff
@@ -6285,14 +6285,14 @@ void CClientGame::TellServerSomethingImportant( uint uiId, const SString& strMes
     if ( pBitStream->Version() >= 0x48 )
     {
         pBitStream->WriteString( SString( "%d,%s", uiId, *strMessage ) );
-        g_pNet->SendPacket( PACKET_ID_PLAYER_DIAGNOSTIC, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_UNRELIABLE );
+        g_pNet->SendPacket( PACKET_ID_PLAYER_DIAGNOSTIC, pBitStream, PACKET_PRIORITY_MEDIUM, PACKET_RELIABILITY_UNRELIABLE );
     }
     else
     {
         // Spam chat for older servers
         SString strTemp( "say %s", *strMessage );
         pBitStream->Write( strTemp.c_str(), strTemp.length() );
-        g_pNet->SendPacket( PACKET_ID_COMMAND, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_UNRELIABLE, PACKET_ORDERING_CHAT );
+        g_pNet->SendPacket( PACKET_ID_COMMAND, pBitStream, PACKET_PRIORITY_MEDIUM, PACKET_RELIABILITY_UNRELIABLE );
     }
 
     g_pNet->DeallocateNetBitStream( pBitStream );
