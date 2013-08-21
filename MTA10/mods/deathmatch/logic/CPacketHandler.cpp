@@ -301,7 +301,7 @@ void CPacketHandler::Packet_ServerConnected ( NetBitStreamInterface& bitStream )
 //
 ///////////////////////////////////////////////////////////////
 static ushort usDiscoverHttpPortResult;
-static int iDiscoverHttpPortFailCounter;
+static uint uiDiscoverHttpPortFailCounter;
 
 static bool DiscoverInternalHTTPPortCallback ( double sizeJustDownloaded, double totalDownloaded, char * data, size_t dataLength, void * obj, bool complete, int error )
 {
@@ -311,7 +311,7 @@ static bool DiscoverInternalHTTPPortCallback ( double sizeJustDownloaded, double
     }
     else
     if ( error )
-        iDiscoverHttpPortFailCounter++;
+        uiDiscoverHttpPortFailCounter++;
 
     return true;
 }
@@ -328,7 +328,7 @@ static ushort DiscoverInternalHTTPPort()
     pHTTP->SetMaxConnections( testPortList.size() );
 
     usDiscoverHttpPortResult = 0;
-    iDiscoverHttpPortFailCounter = 0;
+    uiDiscoverHttpPortFailCounter = 0;
 
     // Send request to each port
     for ( uint i = 0 ; i < testPortList.size() ; i++ )
@@ -343,7 +343,7 @@ static ushort DiscoverInternalHTTPPort()
     {
         Sleep( 100 );
         pHTTP->ProcessQueuedFiles();
-        if ( usDiscoverHttpPortResult || iDiscoverHttpPortFailCounter >= testPortList.size() )
+        if ( usDiscoverHttpPortResult || uiDiscoverHttpPortFailCounter >= testPortList.size() )
             break;
     }
 
@@ -1022,30 +1022,13 @@ void CPacketHandler::Packet_PlayerQuit ( NetBitStreamInterface& bitStream )
 
 void CPacketHandler::Packet_PlayerSpawn ( NetBitStreamInterface& bitStream )
 {
-    // unsigned char    (1)     - player id
-    // bool                     - in vehicle?
-    // CVector          (12)    - spawn position
-    // float            (4)     - spawn rotation
-    // unsigned char    (1)     - player model id
-    // unsigned char    (1)     - interior
-    // unsigned short   (2)     - dimension
-    // unsigned short   (2)     - team id
-    // unsigned char    (1)     - vehicle id (minus 400) (if vehicle)
-    // unsigned char    (1)     - color 1 (if vehicle)
-    // unsigned char    (1)     - color 2 (if vehicle)
-    // unsigned char    (1)     - color 3 (if vehicle)
-    // unsigned char    (1)     - color 4 (if vehicle)
-
     // Read out the player id
     ElementID PlayerID;
     bitStream.Read ( PlayerID );
 
     // Flags
     unsigned char ucFlags;
-    bitStream.Read ( ucFlags );
-
-    // Decode the flags
-    bool bInVehicle = ucFlags & 0x01;
+    bitStream.Read ( ucFlags );    // Unused
 
     // Position vector
     CVector vecPosition;
@@ -1084,38 +1067,6 @@ void CPacketHandler::Packet_PlayerSpawn ( NetBitStreamInterface& bitStream )
     // Time context
     unsigned char ucTimeContext = 0;
     bitStream.Read ( ucTimeContext ) ;
-
-    // Read out some vehicle stuff if we spawn in a vehicle
-    unsigned short usModel = 0;
-    unsigned char ucColor1 = 0;
-    unsigned char ucColor2 = 0;
-    unsigned char ucColor3 = 0;
-    unsigned char ucColor4 = 0;
-    if ( bInVehicle )
-    {
-        // Read out the vehicle id
-        unsigned char ucModel = 0xFF;
-        bitStream.Read ( ucModel );
-        if ( ucModel == 0xFF )
-        {
-            RaiseProtocolError ( 17 );
-            return;
-        }
-
-        // Convert to a short. Valid id?
-        usModel = ucModel + 400;
-        if ( !CClientVehicleManager::IsValidModel ( usModel ) )
-        {
-            RaiseProtocolError ( 18 );
-            return;
-        }
-
-        // Read out the colors
-        bitStream.Read ( ucColor1 );
-        bitStream.Read ( ucColor2 );
-        bitStream.Read ( ucColor3 );
-        bitStream.Read ( ucColor4 );
-    }
 
     // Grab the player this is about
     CClientPlayer* pPlayer = g_pClientGame->m_pPlayerManager->Get ( PlayerID );

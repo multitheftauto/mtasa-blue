@@ -55,7 +55,8 @@ public:
 
 private:
 
-    CMappedList < CResource* >  m_resources;
+    CMappedList < CResource* >          m_resources;
+    std::map < ushort, CResource* >     m_NetIdResourceMap;
 };
 
 #endif
