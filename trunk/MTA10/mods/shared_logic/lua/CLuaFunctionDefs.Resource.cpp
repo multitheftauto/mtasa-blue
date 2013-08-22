@@ -416,6 +416,7 @@ int CLuaFunctionDefs::LoadString( lua_State* luaVM )
             argStream.SetCustomError( strMessage );
             cpBuffer = NULL;
     #endif
+            g_pClientGame->TellServerSomethingImportant( 1004, argStream.GetFullErrorMessage(), true );
         }
 
         if ( !argStream.HasErrors() )
@@ -493,6 +494,7 @@ int CLuaFunctionDefs::Load( lua_State* luaVM )
             argStream.SetCustomError( strMessage );
             cpBuffer = NULL;
     #endif
+            g_pClientGame->TellServerSomethingImportant( 1005, argStream.GetFullErrorMessage(), true );
         }
 
         if ( !argStream.HasErrors() )

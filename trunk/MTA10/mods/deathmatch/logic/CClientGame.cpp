@@ -6276,6 +6276,10 @@ void CClientGame::OutputServerInfo( void )
 //////////////////////////////////////////////////////////////////
 void CClientGame::TellServerSomethingImportant( uint uiId, const SString& strMessage, bool bOnlyOnceForThisId )
 {
+    // Force message only once if will be spamming chat
+    if ( g_pNet->GetServerBitStreamVersion() < 0x48 )
+        bOnlyOnceForThisId = true;
+
     if ( bOnlyOnceForThisId && MapContains( m_SentMessageIds, uiId ) )
         return;
     MapInsert( m_SentMessageIds, uiId );
