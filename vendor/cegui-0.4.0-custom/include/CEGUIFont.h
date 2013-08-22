@@ -385,6 +385,7 @@ public:
 	*/
 	Imageset*	addFontGlyphs(const String& glyphset,const String& id);
 
+	void	    setInitialFontGlyphs(const String& glyphset);
 
 	/*!
 	\brief
@@ -1063,6 +1064,7 @@ private:
     bool    d_bAddedGlyphPage;
     uint    d_uiLastPulseTime;
     String  d_glyphset_default;
+    Imageset* d_glyph_images_default;
     std::map < uint, GlyphPageInfo >    d_GlyphPageInfoMap;
 
     // Character sizes

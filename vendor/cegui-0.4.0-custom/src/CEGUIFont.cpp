@@ -79,6 +79,7 @@ Font::Font(const String& filename, const String& resourceGroup, FontImplData* da
     d_antiAliased(false),
     d_bAddedGlyphPage(false),
     d_uiLastPulseTime(0),
+    d_glyph_images_default(NULL),
     d_total_width(0),
     d_avg_width(0)
 {
@@ -110,6 +111,7 @@ Font::Font(const String& name, const String& fontname, const String& resourceGro
     d_antiAliased(false),
     d_bAddedGlyphPage(false),
     d_uiLastPulseTime(0),
+    d_glyph_images_default(NULL),
     d_total_width(0),
     d_avg_width(0)
 {
@@ -138,6 +140,7 @@ Font::Font(const String& name, const String& fontname, const String& resourceGro
     d_antiAliased(false),
     d_bAddedGlyphPage(false),
     d_uiLastPulseTime(0),
+    d_glyph_images_default(NULL),
     d_total_width(0),
     d_avg_width(0)
 {
@@ -172,6 +175,7 @@ Font::Font(const String& name, const String& fontname, const String& resourceGro
     d_antiAliased(false),
     d_bAddedGlyphPage(false),
     d_uiLastPulseTime(0),
+    d_glyph_images_default(NULL),
     d_total_width(0),
     d_avg_width(0)
 {
@@ -196,6 +200,11 @@ Font::Font(const String& name, const String& fontname, const String& resourceGro
 Font::~Font(void)
 {
 	unload();
+    if ( d_glyph_images_default )
+    {
+        ImagesetManager::getSingleton().destroyImageset(d_glyph_images_default);
+        d_glyph_images_default = NULL;
+    }
 	delete d_impldat;
 }
 
@@ -929,12 +938,24 @@ void Font::unload(void)
 
 
 /*************************************************************************
-	Defines the set of code points on the font. (implementation).
+	Defines the initial set of code points on the font. (implementation).
+*************************************************************************/
+void Font::setInitialFontGlyphs(const String& glyphset)
+{
+    // Ensure this is called first and once
+    assert ( d_glyphset_default.empty() && !glyphset.empty() );
+    d_glyphset_default = glyphset;
+    d_glyph_images_default = addFontGlyphs( glyphset, "default" );
+}
+
+
+/*************************************************************************
+	Defines the additional set of code points on the font. (implementation).
 *************************************************************************/
 Imageset* Font::addFontGlyphs(const String& glyphset,const String& id)
 {
-    if ( d_glyphset_default.empty() ) // Make our first set of glyphs are default
-        d_glyphset_default = glyphset;
+    // Ensure this is not called before setInitialFontGlyphs
+    assert ( !d_glyphset_default.empty() );
 
 	// must be a font using the FreeType system
 	if (!d_freetype)
