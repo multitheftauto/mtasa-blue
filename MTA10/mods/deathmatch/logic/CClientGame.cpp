@@ -1930,10 +1930,11 @@ void CClientGame::UpdatePlayerWeapons ( void )
             NetBitStreamInterface& BitStream = *(bitStream.pBitStream);
             SWeaponSlotSync slot;
 
-            if ( BitStream.Version () >= 0x44 && m_lastWeaponSlot == WEAPONSLOT_TYPE_THROWN )
+            // Always send bit in case server is not in sync
+            if ( ( BitStream.Version () >= 0x44 && m_lastWeaponSlot == WEAPONSLOT_TYPE_THROWN ) || BitStream.Version () >= 0x4D )
             {
                 CWeapon* pLastWeapon = m_pLocalPlayer->GetWeapon ( m_lastWeaponSlot );
-                if ( pLastWeapon && pLastWeapon->GetAmmoTotal () == 0 )
+                if ( pLastWeapon && pLastWeapon->GetAmmoTotal () == 0 && m_lastWeaponSlot == WEAPONSLOT_TYPE_THROWN )
                     BitStream.WriteBit ( true );
                 else
                     BitStream.WriteBit ( false );
