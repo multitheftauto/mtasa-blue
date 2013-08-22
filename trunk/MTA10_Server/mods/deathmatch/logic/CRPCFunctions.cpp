@@ -149,13 +149,16 @@ void CRPCFunctions::PlayerWeapon ( NetBitStreamInterface & bitStream )
     if ( m_pSourcePlayer->IsJoined () && m_pSourcePlayer->IsSpawned () )
     {
         unsigned char ucPrevSlot = m_pSourcePlayer->GetWeaponSlot ();
-        
+
         // We don't get the puresync packet containing totalAmmo = 0 for slot 8 (THROWN)
-        if ( m_pSourcePlayer->GetBitStreamVersion () >= 0x44 && ucPrevSlot == WEAPONSLOT_TYPE_THROWN && bitStream.ReadBit () )
+        if ( ( bitStream.Version() >= 0x44 && ucPrevSlot == WEAPONSLOT_TYPE_THROWN ) || bitStream.Version() >= 0x4D )
         {
-            CWeapon* pPrevWeapon = m_pSourcePlayer->GetWeapon ( ucPrevSlot );
-            pPrevWeapon->usAmmo = 0;
-            pPrevWeapon->usAmmoInClip = 0;
+            if ( bitStream.ReadBit() && ucPrevSlot == WEAPONSLOT_TYPE_THROWN )
+            {
+                CWeapon* pPrevWeapon = m_pSourcePlayer->GetWeapon ( ucPrevSlot );
+                pPrevWeapon->usAmmo = 0;
+                pPrevWeapon->usAmmoInClip = 0;
+            }
         }
 
         SWeaponSlotSync slot;
