@@ -22,13 +22,11 @@ CResourceClientScriptItem::CResourceClientScriptItem ( CResource * resource, con
 {
     m_type = RESOURCE_FILE_TYPE_CLIENT_SCRIPT;
 
-#if 0
     // Check if this file should be cached by the client
     if ( MapGet(m_attributeMap, "protected") == "true" ||
          MapGet(m_attributeMap, "cache") == "false" )
         m_bIsNoClientCache = true;
     else
-#endif
         m_bIsNoClientCache = false;
 }
 
