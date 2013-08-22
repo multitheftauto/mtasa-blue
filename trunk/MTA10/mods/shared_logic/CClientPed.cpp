@@ -1910,12 +1910,10 @@ CWeapon * CClientPed::GiveWeapon ( eWeaponType weaponType, unsigned int uiAmmo )
         pWeapon = GetWeapon ( weaponType );
         unsigned int uiPreviousAmmoTotal = 0, uiPreviousAmmoInClip = 0;
         eWeaponSkill weaponSkill = WEAPONSKILL_STD;
-        eWeaponType previousWeaponType = eWeaponType::WEAPONTYPE_ANYWEAPON;
         if ( pWeapon )
         {
             uiPreviousAmmoTotal = pWeapon->GetAmmoTotal ();
             uiPreviousAmmoInClip = pWeapon->GetAmmoInClip ();
-            previousWeaponType = pWeapon->GetType ( );
         }
 
         if ( weaponType >= WEAPONTYPE_PISTOL && weaponType <= WEAPONTYPE_TEC9 )
@@ -1931,7 +1929,7 @@ CWeapon * CClientPed::GiveWeapon ( eWeaponType weaponType, unsigned int uiAmmo )
         {
             unsigned int uiTotalAmmo;
             eWeaponSlot slot = pWeapon->GetSlot();
-            if ( pWeapon->GetType() != previousWeaponType )
+            if ( pWeapon->GetType() != GetCurrentWeaponType() )
             {
                 // Emulate GTA's behaviour of setting ammo to keep in sync
                 if ( slot <= 1 || slot >= 10 ) 
