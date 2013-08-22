@@ -361,7 +361,7 @@ SString InsertQueryArgumentsMySql ( const SString& strQuery, CLuaArguments* pArg
 SString InsertQueryArgumentsMySql ( const char* szQuery, va_list vl )
 {
     SString strParsedQuery;
-    for ( unsigned int i = 0 ; i < strlen ( szQuery ) ; i++ )
+    for ( unsigned int i = 0; szQuery[i] != '\0'; i++ )
     {
         if ( szQuery[i] != SQL_VARIABLE_PLACEHOLDER )
         {

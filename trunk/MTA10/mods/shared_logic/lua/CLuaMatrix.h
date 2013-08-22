@@ -10,7 +10,7 @@
 *
 *****************************************************************************/
 
-class CLuaTimer;
+class CLuaMatrix;
 
 #ifndef __CLUAMATRIX_H
 #define __CLUAMATRIX_H

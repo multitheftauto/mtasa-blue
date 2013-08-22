@@ -10,7 +10,7 @@
 *
 *****************************************************************************/
 
-class CLuaTimer;
+class CLuaVector3D;
 
 #ifndef __CLUAVECTOR_H
 #define __CLUAVECTOR_H

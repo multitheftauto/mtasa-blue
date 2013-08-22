@@ -146,14 +146,6 @@ int CLuaFunctionDefs::OutputClientDebugString ( lua_State* luaVM )
     argStream.ReadNumber ( ucGreen, 255 );
     argStream.ReadNumber ( ucBlue, 255 );
 
-    // check they're in range
-    if ( ucRed > 255 || ucRed < 0 ) 
-        m_pScriptDebugging->LogWarning ( luaVM, "Specify a red value between 0 and 255" );
-    else if ( ucGreen > 255 || ucGreen < 0 )
-        m_pScriptDebugging->LogWarning ( luaVM, "Specify a green value between 0 and 255" );
-    else if ( ucBlue >  255 || ucBlue <  0 )
-        m_pScriptDebugging->LogWarning ( luaVM, "Specify a blue value between 0 and 255" );
-
     // Too big level?
     if ( uiLevel > 3 )
     {

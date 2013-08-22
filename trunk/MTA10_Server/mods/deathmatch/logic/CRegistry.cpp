@@ -289,7 +289,7 @@ bool CRegistry::Query ( const std::string& strQuery, CLuaArguments *pArgs, CRegi
 
             // Copy the string into the query, and escape the single quotes as well
             if ( szContent ) {
-                for ( unsigned int k = 0; k < strlen ( szContent ); k++ ) {
+                for ( unsigned int k = 0; szContent[k] != '\0'; k++ ) {
                     if ( szContent[k] == '\'' )
                         strParsedQuery += '\'';
                     strParsedQuery += szContent[k];
@@ -399,7 +399,7 @@ bool CRegistry::Query ( CRegistryResult* pResult, const char* szQuery, va_list v
     }
 
     SString strParsedQuery;
-    for ( unsigned int i = 0 ; i < strlen ( szQuery ) ; i++ )
+    for ( unsigned int i = 0; szQuery[i] != '\0'; i++ )
     {
         if ( szQuery[i] != SQL_VARIABLE_PLACEHOLDER )
         {

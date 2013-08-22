@@ -103,7 +103,7 @@ ResponseCode CResourceHTMLItem::Request ( HttpRequest * ipoHttpRequest, HttpResp
             rewind ( file );
             fread ( pBuffer, 1, lBufferLength, file );
             fclose ( file );
-            ipoHttpResponse->oResponseHeaders [ "content-type" ] = m_strMime.c_str ();
+            ipoHttpResponse->oResponseHeaders [ "content-type" ] = m_strMime;
             ipoHttpResponse->SetBody ( pBuffer, lBufferLength );
             delete[] pBuffer;
         }
