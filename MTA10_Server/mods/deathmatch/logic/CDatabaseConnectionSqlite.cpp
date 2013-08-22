@@ -467,7 +467,7 @@ SString InsertQueryArgumentsSqlite ( const SString& strQuery, CLuaArguments* pAr
 SString InsertQueryArgumentsSqlite ( const char* szQuery, va_list vl )
 {
     SString strParsedQuery;
-    for ( unsigned int i = 0 ; i < strlen ( szQuery ) ; i++ )
+    for(int i = 0; szQuery[i] != '\0'; i++)
     {
         if ( szQuery[i] != SQL_VARIABLE_PLACEHOLDER )
         {

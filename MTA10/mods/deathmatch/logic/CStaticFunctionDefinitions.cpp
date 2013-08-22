@@ -6419,7 +6419,7 @@ bool CStaticFunctionDefinitions::GetControlState ( const char* szControl, bool& 
         CClientPlayer* pLocalPlayer = m_pPlayerManager->GetLocalPlayer ();
         pLocalPlayer->GetControllerState( cs );
         bool bOnFoot = ( !pLocalPlayer->GetRealOccupiedVehicle () );
-        bState = ( CClientPad::GetControlState ( szControl, cs, bOnFoot ) == true ? 1.0f : 0.0f ) > 0;
+        bState = CClientPad::GetControlState ( szControl, cs, bOnFoot );
         return true;
     }
 

@@ -1026,7 +1026,7 @@ bool CLuaArgument::ReadFromJSONObject ( json_object* object, std::vector < CLuaA
                         case 'T':   // Table reference
                         {
                             unsigned long ulTableID = static_cast < unsigned long > ( atol ( szString + 3 ) );
-                            if ( pKnownTables && ulTableID >= 0 && ulTableID < pKnownTables->size () )
+                            if ( pKnownTables && ulTableID < pKnownTables->size () )
                             {
                                 m_pTableData = pKnownTables->at ( ulTableID );
                                 m_bWeakTableRef = true;

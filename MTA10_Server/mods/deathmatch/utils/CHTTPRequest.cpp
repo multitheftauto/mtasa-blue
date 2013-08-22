@@ -326,8 +326,7 @@ bool CHTTPRequest::ReadHeader ( CTCPSocket* pSocket, std::string& strHeader )
     bool bLastWasR = false;
     unsigned int uiNewLines = 0;
     char cChar;
-    int iReturn;
-    while ( ( iReturn = pSocket->ReadBuffer ( &cChar, 1 ) == 1 ) )
+    while ( pSocket->ReadBuffer ( &cChar, 1 ) == 1 )
     {
         // Put it in the buffer
         strHeader += cChar;

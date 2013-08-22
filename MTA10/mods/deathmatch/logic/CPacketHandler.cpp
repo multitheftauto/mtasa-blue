@@ -2727,8 +2727,8 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                     else
                     {
                         #ifdef MTA_DEBUG
-                            char buf[1024] = {0};
-                            bitStream.Read ( buf, (ucNameLength > 1024) ? 1024 : ucNameLength );
+                            char buf[256] = {0};
+                            bitStream.Read ( buf, ucNameLength );
                             // Raise a special assert, as we have to try and figure out this error.
                             assert ( 0 );
                             // Replay the problem for debugging
@@ -4668,6 +4668,7 @@ void CPacketHandler::Packet_ResourceStart ( NetBitStreamInterface& bitStream )
     unsigned char ucResourceNameSize;
     bitStream.Read ( ucResourceNameSize );
 
+    // ucResourceNameSize > 255 ??
     if ( ucResourceNameSize > MAX_RESOURCE_NAME_LENGTH )
     {
         RaiseFatalError ( 14 );

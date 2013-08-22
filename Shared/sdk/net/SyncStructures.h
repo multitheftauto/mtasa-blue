@@ -93,7 +93,6 @@ struct SIntegerSync : public ISyncStructure
     }
     SIntegerSync ( type value )
     {
-        SIntegerSync ();
         data.value = value;
     }
 

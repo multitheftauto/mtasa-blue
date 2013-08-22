@@ -208,7 +208,7 @@ bool CAccountManager::LoadXML ( CXMLNode* pParent )
     //##Keep for backwards compatability with accounts.xml##
     #define ACCOUNT_VALUE_LENGTH 128
 
-    std::string strBuffer, strName, strPassword, strLevel, strIP, strDataKey, strDataValue;
+    std::string strBuffer, strName, strPassword, strIP, strDataKey, strDataValue;
 
     if ( pParent )
     {

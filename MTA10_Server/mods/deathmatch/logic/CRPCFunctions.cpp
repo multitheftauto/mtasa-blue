@@ -212,14 +212,12 @@ void CRPCFunctions::KeyBind ( NetBitStreamInterface & bitStream )
     bitStream.ReadBit ( bHitState );
 
     unsigned char ucKeyLength = bitStream.GetNumberOfUnreadBits () >> 3;
-    if ( ucKeyLength < 256 )
-    {
-        char szKey [ 256 ];
-        bitStream.Read ( szKey, ucKeyLength );
-        szKey [ ucKeyLength ] = 0;
 
-        m_pSourcePlayer->GetKeyBinds ()->ProcessKey ( szKey, bHitState, ( eKeyBindType ) ucType );
-    }
+    char szKey [ 256 ] = { '\0' };
+    bitStream.Read ( szKey, ucKeyLength );
+    szKey [ ucKeyLength ] = 0;
+
+    m_pSourcePlayer->GetKeyBinds ()->ProcessKey ( szKey, bHitState, ( eKeyBindType ) ucType );
 
     UNCLOCK( "NetServerPulse::RPC", "KeyBind" );
 }

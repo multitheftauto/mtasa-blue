@@ -290,23 +290,18 @@ int CLuaFileDefs::fileSetPos ( lua_State* luaVM )
     {
         if ( pFile )
         {
-            if ( ulPosition >= 0 )
+            long lResultPosition = pFile->SetPointer ( ulPosition );
+            if ( lResultPosition != -1 )
             {
-                long lResultPosition = pFile->SetPointer ( ulPosition );
-                if ( lResultPosition != -1 )
-                {
-                    // Set the position and return where we actually got it put
-                    lua_pushnumber ( luaVM, lResultPosition );
-                }
-                else
-                {
-                    m_pScriptDebugging->LogBadPointer ( luaVM, "file", 1 );
-                    lua_pushnil ( luaVM );
-                }
-                return 1;
+                // Set the position and return where we actually got it put
+                lua_pushnumber ( luaVM, lResultPosition );
             }
             else
-                m_pScriptDebugging->LogBadPointer ( luaVM, "number", 2 );
+            {
+                m_pScriptDebugging->LogBadPointer ( luaVM, "file", 1 );
+                lua_pushnil ( luaVM );
+            }
+            return 1;
         }
         else
             m_pScriptDebugging->LogBadPointer ( luaVM, "file", 1 );

@@ -4355,7 +4355,7 @@ void CClientPed::PreviousRadioChannel ( void )
 bool CClientPed::SetCurrentRadioChannel ( unsigned char ucChannel )
 {
     // Local player?
-    if ( m_bIsLocalPlayer && ucChannel >= 0 && ucChannel <= 12 )
+    if ( m_bIsLocalPlayer && ucChannel <= 12 )
     {
         if ( m_ucRadioChannel != ucChannel )
         {

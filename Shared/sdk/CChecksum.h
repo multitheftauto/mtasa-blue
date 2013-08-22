@@ -28,7 +28,7 @@ public:
     bool operator == ( const CChecksum& other ) const
     {
         return ulCRC == other.ulCRC
-            && memcmp ( &ulCRC, &other.ulCRC, sizeof ( CChecksum ) ) == 0;
+            && memcmp ( this, &other, sizeof ( CChecksum ) ) == 0;
     }
 
     bool operator != ( const CChecksum& other ) const
