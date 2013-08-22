@@ -4519,6 +4519,7 @@ bool CStaticFunctionDefinitions::GiveWeapon ( CElement* pElement, unsigned char 
                 }
 
                 unsigned char ucWeaponSlot = CWeaponNames::GetSlotFromWeapon ( ucWeaponID );
+                unsigned char ucPreviousWeaponID = pPed->GetWeaponType ( ucWeaponSlot );
                 pPed->SetWeaponType ( ucWeaponID, ucWeaponSlot );
                 if ( bSetAsCurrent )
                     pPed->SetWeaponSlot ( ucWeaponSlot );
@@ -4529,8 +4530,8 @@ bool CStaticFunctionDefinitions::GiveWeapon ( CElement* pElement, unsigned char 
                 if ( ucWeaponSlot <= 1 || ucWeaponSlot >= 10 )
                     uiTotalAmmo = Min( 1U, uiTotalAmmo + usAmmo );  // If slot 0,1,10,11,12 - Ammo is max 1
                 else
-                if ( ( ucWeaponSlot >= 3 && ucWeaponSlot <= 5 ) || ucCurrentWeapon == ucWeaponID )
-                    uiTotalAmmo += usAmmo;                          // If slot 3,4,5 or weapon the same, ammo is shared, so add
+                if ( ( ucWeaponSlot >= 3 && ucWeaponSlot <= 5 ) || ucPreviousWeaponID == ucWeaponID )
+                    uiTotalAmmo += usAmmo;                          // If slot 3,4,5 or slot weapon the same, ammo is shared, so add
                 else
                     uiTotalAmmo = usAmmo;                           // Otherwise ammo is not shared, so replace
 
