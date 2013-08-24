@@ -22,6 +22,7 @@ template<> CMessageLoopHook * CSingleton< CMessageLoopHook >::m_pSingleton = NUL
 WPARAM  CMessageLoopHook::m_LastVirtualKeyCode = NULL;
 UCHAR   CMessageLoopHook::m_LastScanCode = NULL;
 BYTE*   CMessageLoopHook::m_LastKeyboardState = new BYTE[256];
+bool    ms_bIgnoreNextEscapeCharacter = false;
 
 CMessageLoopHook::CMessageLoopHook ( )
 {
@@ -159,9 +160,30 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage ( HWND hwnd,
                 return true;
             }
         }
-       
-        if ( uMsg == WM_KEYUP && wParam == VK_ESCAPE ) 
+
+        // Pass escape keyup to onClientKey
+        if ( uMsg == WM_KEYUP && wParam == VK_ESCAPE )
+        {
+            g_pCore->GetKeyBinds()->TriggerKeyStrokeHandler ( "escape", uMsg == WM_KEYDOWN, true );
             return true;
+        }
+
+        // Suppress auto repeat of escape and console toggle keys
+        if ( ( uMsg == WM_KEYDOWN || uMsg == WM_CHAR ) && ( wParam == VK_ESCAPE || wParam == VK_F8 || wParam == '`' ) )
+        {
+            bool bFirstHit = ( lParam & 0x40000000 ) ? false:true;
+            if ( !bFirstHit )
+                return true;
+        }
+
+        // Slightly hacky way of suppressing escape character when console is closed with escape key
+        if ( uMsg == WM_CHAR && wParam == VK_ESCAPE )
+        {
+            bool bTemp = ms_bIgnoreNextEscapeCharacter;
+            ms_bIgnoreNextEscapeCharacter = false;
+            if ( bTemp )
+                return true;
+        }
 
         if ( CKeyBinds::IsFakeCtrl_L ( uMsg, wParam, lParam ) )
             return true;
@@ -196,6 +218,7 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage ( HWND hwnd,
                         CConsoleInterface* pConsole = g_pCore->GetConsole ();
                         if ( pConsole->IsVisible () )
                         {
+                            ms_bIgnoreNextEscapeCharacter = true;
                             pConsole->SetVisible ( false );
                             return true;
                         }
@@ -203,7 +226,7 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage ( HWND hwnd,
                         // The mainmenu makes sure it isn't hidden if UseIngameButtons == false
                         if ( !CCore::GetSingleton().IsOfflineMod () )
                         {
-                            if ( g_pCore->GetKeyBinds()->TriggerKeyStrokeHandler ( "escape", uMsg == WM_KEYDOWN ) )
+                            if ( g_pCore->GetKeyBinds()->TriggerKeyStrokeHandler ( "escape", uMsg == WM_KEYDOWN, true ) )
                             {
                                 // Stop chat input
                                 if ( CLocalGUI::GetSingleton ().IsChatBoxInputEnabled () )

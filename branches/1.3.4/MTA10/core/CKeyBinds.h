@@ -143,7 +143,7 @@ public:
     static bool             IsFakeCtrl_L                ( UINT message, WPARAM wParam, LPARAM lParam );
 
 
-    bool                    TriggerKeyStrokeHandler     ( const SString strKey, bool bState );
+    bool                    TriggerKeyStrokeHandler     ( const SString& strKey, bool bState, bool bIsConsoleInputKey );
 
 private:    
     CCore*                      m_pCore;

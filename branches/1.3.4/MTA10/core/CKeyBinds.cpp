@@ -351,7 +351,12 @@ bool CKeyBinds::ProcessKeyStroke ( const SBindableKey * pKey, bool bState )
     if ( pKey->iGTARelative == GTA_KEY_MSCROLLUP || pKey->iGTARelative == GTA_KEY_MSCROLLDOWN )
         m_bMouseWheel = true;
 
-    bool bAllowed = TriggerKeyStrokeHandler ( pKey->szKey, bState );
+    // Allow some keys to trigger onClientKey even when console input has focus
+    bool bIsConsoleInputKey = true;
+    if ( ( pKey->ulCode >= VK_F1 && pKey->ulCode <= VK_F12 ) || ( pKey->ulCode <= VK_MBUTTON ) )
+        bIsConsoleInputKey = false;
+
+    bool bAllowed = TriggerKeyStrokeHandler ( pKey->szKey, bState, bIsConsoleInputKey );
 
     // Search through binds
     bool bFound = false;
@@ -2725,12 +2730,12 @@ bool CKeyBinds::IsFakeCtrl_L ( UINT message, WPARAM wParam, LPARAM lParam )
     return FALSE;
 }
 
-bool CKeyBinds::TriggerKeyStrokeHandler ( const SString strKey, bool bState )
+bool CKeyBinds::TriggerKeyStrokeHandler ( const SString& strKey, bool bState, bool bIsConsoleInputKey )
 {
     // Call the key-stroke handler if we have one
     if ( m_KeyStrokeHandler ) 
     {
-        return m_KeyStrokeHandler ( strKey, bState );
+        return m_KeyStrokeHandler ( strKey, bState, bIsConsoleInputKey );
     }
     return true;
 }
