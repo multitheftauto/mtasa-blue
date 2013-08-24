@@ -131,8 +131,7 @@ void BeginD3DStuff( void )
         }
 
         // Detect Optimus combo
-        if ( uiNumAdapters == 1
-            && SStringX( Identifier.Driver ).BeginsWithI( "nv" )
+        if ( SStringX( Identifier.Driver ).BeginsWithI( "nv" )
             && SStringX( Identifier.Description ).BeginsWithI( "Intel" )
             )
         {
