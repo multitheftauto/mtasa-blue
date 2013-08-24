@@ -112,11 +112,14 @@ public:
     void                AddBinaryBuilding               ( CEntitySAInterface * pInterface );
     bool                IsObjectRemoved                 ( CEntitySAInterface * pInterface );
     bool                IsDataModelRemoved              ( unsigned short usModelID );
+    bool                IsEntityRemoved                 ( CEntitySAInterface * pInterface );
 private:
     std::multimap< unsigned short, SBuildingRemoval* >          *m_pBuildingRemovals;
     std::multimap < unsigned short, sDataBuildingRemovalItem* > *m_pDataBuildings;
     std::multimap < unsigned short, sBuildingRemovalItem* >     *m_pBinaryBuildings;
     std::map < unsigned short, unsigned short >                 *m_pRemovedObjects;
+    std::map < DWORD, bool >                                    m_pRemovedEntities;
+    std::map < DWORD, bool >                                    m_pAddedEntities;
     float                                                       m_fAircraftMaxHeight;
 };
 
