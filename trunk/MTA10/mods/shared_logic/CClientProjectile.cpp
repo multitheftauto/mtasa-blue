@@ -88,10 +88,13 @@ CClientProjectile::~CClientProjectile ( void )
 
     Unlink ();
 
-    // Make sure we're destroyed
-    delete m_pProjectile;
+    if ( m_pProjectile )
+    {
+        // Make sure we're destroyed
+        delete m_pProjectile;
 
-    m_pProjectile = NULL;
+        m_pProjectile = NULL;
+    }
 
     CClientEntityRefManager::RemoveEntityRefs ( 0, &m_pCreator, &m_pTarget, NULL );
 }
@@ -104,6 +107,13 @@ void CClientProjectile::Unlink ( void )
     {
         m_pProjectileManager->RemoveFromList ( this ); 
         m_bLinked = false;
+        if ( m_pProjectile )
+        {
+            // Make sure we're destroyed
+            delete m_pProjectile;
+
+            m_pProjectile = NULL;
+        }
     }
 }
 
