@@ -199,6 +199,7 @@ public:
     virtual void        RemoveWorldBuildingFromLists( CEntitySAInterface * pInterface ) = 0;
     virtual bool        IsObjectRemoved             ( CEntitySAInterface * pInterface ) = 0;
     virtual bool        IsDataModelRemoved          ( unsigned short usModelID ) = 0;
+    virtual bool        IsEntityRemoved             ( CEntitySAInterface * pInterface ) = 0;
 };
 
 #endif
