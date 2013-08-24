@@ -188,6 +188,10 @@ void CConsole::Hide ( void )
     SetVisible ( false );
 }
 
+bool CConsole::IsInputActive ( void )
+{
+    return IsVisible() && m_pInput->IsActive();
+}
 
 void CConsole::ActivateInput ( void )
 {

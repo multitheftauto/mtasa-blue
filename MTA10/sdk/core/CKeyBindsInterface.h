@@ -23,7 +23,7 @@ struct SBindableKey;
 
 typedef void ( *KeyFunctionBindHandler ) ( CKeyFunctionBind* pBind );
 typedef void ( *ControlFunctionBindHandler ) ( CControlFunctionBind* pBind );
-typedef bool ( *KeyStrokeHandler ) ( const SString strKey, bool bState );
+typedef bool ( *KeyStrokeHandler ) ( const SString& strKey, bool bState, bool bIsConsoleInputKey );
 typedef bool ( *CharacterKeyHandler ) ( WPARAM wChar );
  
 enum eKeyData
@@ -219,7 +219,7 @@ public:
     virtual void                    BindCommand                 ( const char* szCmdLine ) = 0;
     virtual void                    UnbindCommand               ( const char* szCmdLine ) = 0;
     virtual void                    PrintBindsCommand           ( const char* szCmdLine ) = 0;
-    virtual bool                    TriggerKeyStrokeHandler     ( const SString strKey, bool bActive ) = 0;
+    virtual bool                    TriggerKeyStrokeHandler     ( const SString& strKey, bool bActive, bool bIsConsoleInputKey ) = 0;
 };
 
 #endif
