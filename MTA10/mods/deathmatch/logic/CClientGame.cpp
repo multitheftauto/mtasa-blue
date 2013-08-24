@@ -4655,6 +4655,10 @@ void CClientGame::GamePlayerDestructHandler ( CEntitySAInterface* pPlayer )
 void CClientGame::GameProjectileDestructHandler ( CEntitySAInterface* pProjectile )
 {
     CClientProjectile* pClientProjectile = m_pManager->GetProjectileManager ( )->Get ( pProjectile );
+    // Happens when destroyElement is called rather than letting the projectile expire
+    // Normal code path is destruction from CProjectileSAInterface -> CProjectileSA -> CClientProjectile
+    // destroyElement is CClientProjectile -> CProjectileSA -> CProjectileSAInterface 
+    // which means the CClientProjectile element is deleted when we get here
     if ( pClientProjectile )
         CStaticFunctionDefinitions::DestroyElement( *pClientProjectile );
 }
