@@ -404,14 +404,18 @@ void* CCompressorJobQueueImpl::ThreadProc ( void )
         if ( shared.m_CommandQueue.empty () )
         {
             // Temp debug code to cause crash with key combo
-            static bool bEnableKeyCrash = GetLocalTimeString( true ) < "2013-08-26";
-            if ( bEnableKeyCrash )
+            static bool bEnableKeyCrash = GetLocalTimeString( true ) < "2013-08-30";
+            bool bEnableKeyCrash2 = ( g_pCore && g_pCore->GetDiagnosticDebug () == EDiagnosticDebug::LUA_TRACE_0000 );
+            if ( bEnableKeyCrash || bEnableKeyCrash2 )
             {
                 shared.m_Mutex.Wait ( 10 );
                 bool bHoldingShift = ( GetAsyncKeyState ( VK_SHIFT ) & 0x8000 ) != 0;
                 bool bHoldingCtrl = ( GetAsyncKeyState ( VK_CONTROL ) & 0x8000 ) != 0;
                 bool bHoldingF4 = ( GetAsyncKeyState ( VK_F4 ) & 0x8000 ) != 0;
-                if ( bHoldingShift && bHoldingCtrl && bHoldingF4 )
+                bool bHoldingCtrlL = ( GetAsyncKeyState ( VK_LCONTROL ) & 0x8000 ) != 0;
+                bool bHoldingCtrlR = ( GetAsyncKeyState ( VK_RCONTROL ) & 0x8000 ) != 0;
+                if ( ( bHoldingShift && bHoldingCtrl && bHoldingF4 )
+                    || ( bEnableKeyCrash2 && bHoldingCtrlL && bHoldingCtrlR ) )
                 {
                     // Cause crash dump generation
                     int* ptr = NULL;
