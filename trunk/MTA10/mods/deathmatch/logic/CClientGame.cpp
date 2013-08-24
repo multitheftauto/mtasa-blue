@@ -2297,38 +2297,58 @@ void CClientGame::SetAllDimensions ( unsigned short usDimension )
 }
 
 
-bool CClientGame::StaticKeyStrokeHandler ( const SString strKey, bool bState )
+bool CClientGame::StaticKeyStrokeHandler ( const SString& strKey, bool bState, bool bIsConsoleInputKey )
 {
-    return g_pClientGame->KeyStrokeHandler ( strKey, bState );
+    return g_pClientGame->KeyStrokeHandler ( strKey, bState, bIsConsoleInputKey );
 }
 
 
-bool CClientGame::KeyStrokeHandler ( const SString strKey, bool bState )
+bool CClientGame::KeyStrokeHandler ( const SString& strKey, bool bState, bool bIsConsoleInputKey )
 {
     // Do we have a root yet?
-    if ( m_pRootEntity && g_pCore->IsMenuVisible() == false && g_pCore->GetConsole()->IsVisible() == false )
+    if ( m_pRootEntity )
     {
-        bool bAllow = true;
-        // Call our key-stroke event
-        CLuaArguments Arguments;
-        Arguments.PushString ( strKey );
-        Arguments.PushBoolean ( bState );
-        bAllow = m_pRootEntity->CallEvent ( "onClientKey", Arguments, false );
-        if ( bAllow == false && bState == true && strKey == "escape" )
+        // Ignore keydown/up pair if main menu is displayed, or console input will use the character
+        bool bIgnore = false;
+        if ( bState )
         {
-            if ( m_bLastKeyWasEscapeCancelled )
-            {
-                // Escape cannot be skipped twice
-                bAllow = true;
-                m_bLastKeyWasEscapeCancelled = false;
-            }
+            if ( g_pCore->IsMenuVisible() || ( g_pCore->GetConsole()->IsInputActive() && bIsConsoleInputKey ) )
+                bIgnore = true;                         // Ignore this keydown and the matching keyup
             else
-                m_bLastKeyWasEscapeCancelled = true;
+                MapInsert( m_AllowKeyUpMap, strKey );   // Use this keydown and the matching keyup
         }
         else
-            m_bLastKeyWasEscapeCancelled = false;
+        {
+            if ( !MapContains( m_AllowKeyUpMap, strKey ) )
+                bIgnore = true;                         // Ignore this keyup
+            else
+                MapRemove( m_AllowKeyUpMap, strKey );   // Use this keyup
+        }
 
-        return bAllow;
+        if ( !bIgnore )
+        {
+            bool bAllow = true;
+            // Call our key-stroke event
+            CLuaArguments Arguments;
+            Arguments.PushString ( strKey );
+            Arguments.PushBoolean ( bState );
+            bAllow = m_pRootEntity->CallEvent ( "onClientKey", Arguments, false );
+            if ( bAllow == false && bState == true && strKey == "escape" )
+            {
+                if ( m_bLastKeyWasEscapeCancelled )
+                {
+                    // Escape cannot be skipped twice
+                    bAllow = true;
+                    m_bLastKeyWasEscapeCancelled = false;
+                }
+                else
+                    m_bLastKeyWasEscapeCancelled = true;
+            }
+            else
+                m_bLastKeyWasEscapeCancelled = false;
+
+            return bAllow;
+        }
     }
     m_bLastKeyWasEscapeCancelled = false;
     return true;
@@ -2344,7 +2364,7 @@ bool CClientGame::StaticCharacterKeyHandler ( WPARAM wChar )
 bool CClientGame::CharacterKeyHandler ( WPARAM wChar )
 {
     // Do we have a root yet?
-    if ( m_pRootEntity && g_pCore->IsMenuVisible() == false && g_pCore->GetConsole()->IsVisible() == false )
+    if ( m_pRootEntity && g_pCore->IsMenuVisible() == false && g_pCore->GetConsole()->IsInputActive() == false )
     {
         // Safe character?
         if ( wChar >= 32 )

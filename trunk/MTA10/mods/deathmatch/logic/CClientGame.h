@@ -333,8 +333,8 @@ public:
 
     void                                SetAllDimensions                ( unsigned short usDimension );
 
-    static bool                         StaticKeyStrokeHandler          ( const SString strKey, bool bState );
-    bool                                KeyStrokeHandler                ( const SString strKey, bool bState );
+    static bool                         StaticKeyStrokeHandler          ( const SString& strKey, bool bState, bool bIsConsoleInputKey );
+    bool                                KeyStrokeHandler                ( const SString& strKey, bool bState, bool bIsConsoleInputKey );
     static bool                         StaticCharacterKeyHandler       ( WPARAM wChar );
     bool                                CharacterKeyHandler             ( WPARAM wChar );
 
@@ -762,6 +762,7 @@ private:
     std::set < uint >                   m_SentMessageIds;
 
     bool                                m_bLastKeyWasEscapeCancelled;
+    std::set < SString >                m_AllowKeyUpMap;
 };
 
 extern CClientGame* g_pClientGame;

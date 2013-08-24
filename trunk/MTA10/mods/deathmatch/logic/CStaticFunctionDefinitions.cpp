@@ -5047,7 +5047,9 @@ void CStaticFunctionDefinitions::GUISetProperty ( CClientEntity& Entity, const c
     if ( IS_GUI ( &Entity ) )
     {
         CClientGUIElement& GUIElement = static_cast < CClientGUIElement& > ( Entity );
-    
+
+        bool bConsoleHadInputFocus = g_pCore->GetConsole()->IsInputActive();
+
         // Set the property
         GUIElement.GetCGUIElement ()->SetProperty ( szProperty, szValue );
 
@@ -5056,6 +5058,10 @@ void CStaticFunctionDefinitions::GUISetProperty ( CClientEntity& Entity, const c
               ( stricmp ( szValue, "True" ) == 0 ) )
         {
             GUIElement.GetCGUIElement ()->MoveToBack();
+
+            // Restore input focus to the console if required
+            if ( bConsoleHadInputFocus )
+                g_pCore->GetConsole ()->ActivateInput();
         }
     }
 }
@@ -5084,8 +5090,14 @@ bool CStaticFunctionDefinitions::GUIBringToFront ( CClientEntity& Entity )
         std::string strValue = GUIElement.GetCGUIElement ()->GetProperty ( "AlwaysOnTop" );
         if ( strValue.compare ( "True" ) != 0 )
         {
+            bool bConsoleHadInputFocus = g_pCore->GetConsole()->IsInputActive();
+
             // Bring it to the front
             GUIElement.GetCGUIElement ()->BringToFront ();
+
+            // Restore input focus to the console if required
+            if ( bConsoleHadInputFocus )
+                g_pCore->GetConsole ()->ActivateInput();
             return true;
         }
     }
