@@ -107,6 +107,14 @@ struct SLastSyncedPedData
     float               fRotation;
 };
 
+struct SRestoreWeaponItem
+{
+    DWORD               dwAmmo;
+    DWORD               dwClipAmmo;
+    bool                bCurrentWeapon;
+    eWeaponType         eWeaponID;
+};
+
 class CClientObject;
 
 // To hide the ugly "pointer truncation from DWORD* to unsigned long warning
@@ -618,10 +626,7 @@ public:
 
     // Hacks for player model replacement and weapon model replacement respectively
     unsigned long               m_ulStoredModel;
-    DWORD                       m_dwStoredAmmo;
-    DWORD                       m_dwStoredClipAmmo;
-    bool                        m_bStoredCurrentWeapon;
-    eWeaponType                 m_eStoredWeaponID;
+    std::list < SRestoreWeaponItem > m_RestoreWeaponList;
 };
 
 #endif

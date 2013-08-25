@@ -238,10 +238,6 @@ void CClientPed::Init ( CClientManager* pManager, unsigned long ulModelID, bool 
 
         SetArmor ( 0.0f );
     }
-    m_eStoredWeaponID = (eWeaponType)0;
-    m_dwStoredAmmo = 0;
-    m_dwStoredClipAmmo = 0;
-    m_bStoredCurrentWeapon = false;
 }
 
 
@@ -2975,21 +2971,19 @@ void CClientPed::StreamedInPulse ( void )
             m_ulStoredModel = 0;
         }
         // Fix for unloading weapon models which are currently streamed in (DO NOT REMOVE or weapons will not reset to the default models!)
-        if ( m_eStoredWeaponID > 0 )
+        while ( !m_RestoreWeaponList.empty() )
         {
+            // Fixme: Scripted weapon gets/sets may be incorrect when this code is being used.
+            const SRestoreWeaponItem item = m_RestoreWeaponList.front();
+            m_RestoreWeaponList.pop_front();
+
             // Give our Weapon back after deleting to reload the model
-            CWeapon * pWeapon = GiveWeapon ( m_eStoredWeaponID, m_dwStoredAmmo );
+            CWeapon * pWeapon = GiveWeapon ( item.eWeaponID, item.dwAmmo );
 
             // Reset our states
-            pWeapon->SetAmmoInClip ( m_dwStoredClipAmmo );
-            if ( m_bStoredCurrentWeapon )
+            pWeapon->SetAmmoInClip ( item.dwClipAmmo );
+            if ( item.bCurrentWeapon )
                 pWeapon->SetAsCurrentWeapon ( );
-
-            // Reset for next time.
-            m_eStoredWeaponID = (eWeaponType)0;
-            m_dwStoredAmmo = 0;
-            m_dwStoredClipAmmo = 0;
-            m_bStoredCurrentWeapon = false;
         }
     }
 }
@@ -3819,10 +3813,12 @@ void CClientPed::StreamOutWeaponForABit ( eWeaponSlot eSlot )
     if ( pWeapon )
     {
         // Store our states i.e. clip Ammo, Ammo, type and if it's the current weapon
-        m_dwStoredClipAmmo = pWeapon->GetAmmoInClip ( );
-        m_dwStoredAmmo = pWeapon->GetAmmoTotal ( );
-        m_eStoredWeaponID = pWeapon->GetType();
-        m_bStoredCurrentWeapon = GetCurrentWeaponType () == m_eStoredWeaponID;
+        SRestoreWeaponItem item;
+        item.dwClipAmmo = pWeapon->GetAmmoInClip ( );
+        item.dwAmmo = pWeapon->GetAmmoTotal ( );
+        item.eWeaponID = pWeapon->GetType();
+        item.bCurrentWeapon = GetCurrentWeaponType () == item.eWeaponID;
+        m_RestoreWeaponList.push_back( item );
 
         // Remove it
         pWeapon->Remove ();
