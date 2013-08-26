@@ -952,7 +952,7 @@ void CModelInfoSA::SetCustomModel ( RpClump* pClump )
         {
             pGame->GetRenderWare ()->ReplaceVehicleModel ( pClump, static_cast < unsigned short > ( m_dwModelID ) );
         }
-        else if ( m_dwModelID >= 331 && m_dwModelID <= 369 )
+        else if ( ( m_dwModelID >= 331 && m_dwModelID <= 369 ) || m_dwModelID == 372 )
         {
             // We are a weapon.
             pGame->GetRenderWare ()->ReplaceWeaponModel ( pClump, static_cast < unsigned short > ( m_dwModelID ) );

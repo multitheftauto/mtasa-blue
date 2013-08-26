@@ -152,8 +152,8 @@ void CGUI_Impl::SetSkin ( const char* szName )
 
     SubscribeToMouseEvents();
 
-    // Disallow input routing to the GUI
-    m_eInputMode = INPUTMODE_ALLOW_BINDS;
+    // Disallow input routing to the GUI unless edit box has focus
+    m_eInputMode = INPUTMODE_NO_BINDS_ON_EDIT;
 
     // The transfer box is not visible by default
     m_bTransferBoxVisible = false;
