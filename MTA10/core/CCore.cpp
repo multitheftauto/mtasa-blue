@@ -535,9 +535,7 @@ void CCore::EnableChatInput ( char* szCommand, DWORD dwColor )
         {
             CChat* pChat = m_pLocalGUI->GetChat ();
             pChat->SetCommand ( szCommand );
-            //pChat->SetInputColor ( dwColor );
             m_pLocalGUI->SetChatBoxInputEnabled ( true );
-            m_pLocalGUI->SetVisibleWindows ( true );
         }
     }
 }

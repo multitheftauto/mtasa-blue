@@ -566,8 +566,7 @@ void CChat::ScrollDown ()
 bool CChat::CharacterKeyHandler ( CGUIKeyEventArgs KeyboardArgs )
 {
     // If we can take input
-    if ( CLocalGUI::GetSingleton ().GetVisibleWindows () == 0 &&
-        !CLocalGUI::GetSingleton ().GetConsole ()->IsVisible () &&
+    if ( !CLocalGUI::GetSingleton ().GetConsole ()->IsVisible () &&
         m_bInputVisible )
     {
         // Check if it's a special key like enter and backspace, if not, add it as a character to the message
@@ -592,8 +591,6 @@ bool CChat::CharacterKeyHandler ( CGUIKeyEventArgs KeyboardArgs )
                 if ( !m_strCommand.empty () && !m_strInputText.empty () )
                     CCommands::GetSingleton().Execute ( m_strCommand.c_str (), m_strInputText.c_str () );
             
-                // Deactivate the VisibleWindows counter
-                CLocalGUI::GetSingleton ().SetVisibleWindows ( false );
                 SetInputVisible ( false );
 
                 m_fSmoothScrollResetTime = GetSecondCount ();

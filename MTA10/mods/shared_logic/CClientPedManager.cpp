@@ -266,48 +266,58 @@ bool CClientPedManager::IsValidWeaponModel ( DWORD dwModel )
     switch ( dwModel )
     {
         case 0:
-        case 331:
-        case 333:
-        case 334:
-        case 335:
-        case 336:
-        case 337:
-        case 338:
-        case 339:
-        case 341:
-        case 346:
-        case 347:
-        case 348:
-        case 349:
-        case 350:
-        case 351:
-        case 352:
-        case 353:
-        case 372:
-        case 355:
-        case 356:
-        case 357:
-        case 358:
-        case 359:
-        case 360:
-        case 361:
-        case 362:
-        case 342:
-        case 343:
-        case 344:
-        case 363:
-        case 365:
-        case 366:
-        case 367:
-        case 321:
-        case 322:
-        case 323:
-        case 325:
-        case 326:
-        case 368:
-        case 369:
-        case 371:
-        case 364:
+        case 321:   // Regular_Dildo
+        case 322:   // Vibrator
+        case 323:   // White_Dildo
+       //    324    // Vibrator_unused
+        case 325:   // Flowers
+        case 326:   // Cane
+       //    327
+       //    328
+       //    329
+       //    330
+        case 331:   // Brass_Knuckles
+       //    332
+        case 333:   // Golf_Club
+        case 334:   // Night_Strick
+        case 335:   // Knife
+        case 336:   // Baseball_Bat
+        case 337:   // Shovel
+        case 338:   // Pool_Cue
+        case 339:   // Katana
+       //    340
+        case 341:   // Chainsaw
+        case 342:   // Grenade
+        case 343:   // Tear_Gas
+        case 344:   // Molotov_Cocktail
+       //    345    // Missile
+        case 346:   // Pistol
+        case 347:   // Silenced_Pistol
+        case 348:   // Desert_Eagle
+        case 349:   // Shotgun
+        case 350:   // Sawn-Off_Shotgun
+        case 351:   // Combat_Shotgun
+        case 352:   // Uzi
+        case 353:   // MP5
+       //    354    // Hydra_Flare
+        case 355:   // AK47
+        case 356:   // M4
+        case 357:   // Country_Rifle
+        case 358:   // Sniper_Rifle
+        case 359:   // Rocket_Launcher
+        case 360:   // Heat_Seeking_Rocket_Launcher
+        case 361:   // Flamethrower
+        case 362:   // Minigun
+        case 363:   // Satchel_Charge
+        case 364:   // Detonator
+        case 365:   // Spray_Can
+        case 366:   // Fire_Extinguisher
+        case 367:   // Camera
+        case 368:   // Night_Vision_Goggles
+        case 369:   // Infra-Red_Goggles
+        //    370   // Jet_Pack
+        case 371:   // Parachute
+        case 372:   // Tec-9
         {
             return true;
         }

@@ -258,9 +258,9 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage ( HWND hwnd,
                         return true;
                     }
 
-                    // If the console is visible, and we pressed down/up, scroll the console history
+                    // If the console is accepting input, and we pressed down/up, scroll the console history
                     //                          or if we pressed tab, step through possible autocomplete matches
-                    if ( CLocalGUI::GetSingleton ().IsConsoleVisible () )
+                    if ( CLocalGUI::GetSingleton ().GetConsole()->IsInputActive() )
                     {
                         if ( uMsg == WM_KEYDOWN )
                         {

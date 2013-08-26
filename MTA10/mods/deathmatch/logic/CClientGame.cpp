@@ -349,7 +349,7 @@ CClientGame::~CClientGame ( void )
     }
 
     // Reset the GUI input mode
-    g_pCore->GetGUI ()->SetGUIInputMode ( INPUTMODE_ALLOW_BINDS );
+    g_pCore->GetGUI ()->SetGUIInputMode ( INPUTMODE_NO_BINDS_ON_EDIT );
 
     // Reset CGUI's global events
     g_pCore->GetGUI ()->ClearInputHandlers ( INPUT_MOD );
@@ -2451,7 +2451,6 @@ bool CClientGame::ProcessMessageForCursorEvents ( HWND hwnd, UINT uMsg, WPARAM w
     bool bCursorForcedVisible = g_pCore->IsCursorForcedVisible ();
     bool bMenuVisible = g_pCore->IsMenuVisible ();
     bool bConsoleVisible = g_pCore->GetConsole ()->IsVisible ();
-    bool bChatInputEnabled = g_pCore->IsChatInputEnabled ();
 
     if ( bCursorForcedVisible )
     {
