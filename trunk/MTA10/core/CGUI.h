@@ -90,14 +90,6 @@ public:
     inline bool         IsCursorForcedVisible       ( void )                { return m_bForceCursorVisible; }
     void                ForceCursorVisible          ( bool bVisible );
 
-    void                KeyDownHandler              ( bool bHandled );
-
-    void                ShownHandler                ( bool bHandled );
-    void                HiddenHandler               ( bool bHandled );
-
-    int                 GetVisibleWindows           ( );
-    void                SetVisibleWindows           ( bool bEnable );
-
     void                InitiateUpdate              ( const char* szType, const char* szData, const char* szHost )      { m_pVersionUpdater->InitiateUpdate ( szType, szData, szHost ); }
     bool                IsOptionalUpdateInfoRequired( const char* szHost )                          { return m_pVersionUpdater->IsOptionalUpdateInfoRequired ( szHost ); }
     void                InitiateDataFilesFix        ( void )                                        { m_pVersionUpdater->InitiateDataFilesFix (); }
@@ -117,9 +109,6 @@ private:
 
 
     CGUILabel*              m_pLabelVersionTag;
-
-    int                     m_iVisibleWindows;
-    bool                    m_bVisibleWindows;
 
     bool                    m_bForceCursorVisible;
     bool                    m_bChatboxVisible;
