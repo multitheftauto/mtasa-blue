@@ -6229,14 +6229,14 @@ void CMultiplayerSA::SetAutomaticVehicleStartupOnPedEnter ( bool bSet )
 
 // Storage
 CVehicleSAInterface * pHeliKiller = NULL;
-CPedSAInterface * pPedKilledByHeli = NULL;
+CEntitySAInterface * pHitByHeli = NULL;
 bool CallHeliKillEvent ( )
 {
     // Is our handler alive
     if ( m_pHeliKillHandler )
     {
         // Return our handlers return
-        return m_pHeliKillHandler ( pHeliKiller, pPedKilledByHeli );
+        return m_pHeliKillHandler ( pHeliKiller, pHitByHeli );
     }
     // Return true else
     return true;
@@ -6256,7 +6256,7 @@ void _declspec(naked) HOOK_CHeli_ProcessHeliKill ( )
         pushfd
         pushad
         mov pHeliKiller, esi
-        mov pPedKilledByHeli, edi
+        mov pHitByHeli, edi
     }
     // Call our event
     if ( CallHeliKillEvent ( ) == false )

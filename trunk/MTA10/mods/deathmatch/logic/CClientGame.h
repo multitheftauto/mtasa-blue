@@ -489,7 +489,7 @@ private:
     static void                         StaticBlendAnimationHandler     ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID, float fBlendDelta );
     static bool                         StaticProcessCollisionHandler   ( CEntitySAInterface* pThisInterface, CEntitySAInterface* pOtherInterface );
     static bool                         StaticVehicleCollisionHandler   ( CVehicleSAInterface* pThisInterface, CEntitySAInterface* pOtherInterface, int iModelIndex, float fDamageImpulseMag, float fCollidingDamageImpulseMag, uint16 usPieceType, CVector vecCollisionPos, CVector vecCollisionVelocity  );
-    static bool                         StaticHeliKillHandler           ( CVehicleSAInterface* pHeli, CPedSAInterface* pPed );
+    static bool                         StaticHeliKillHandler           ( CVehicleSAInterface* pHeli, CEntitySAInterface* pHitInterface );
     static bool                         StaticObjectDamageHandler       ( CObjectSAInterface* pObjectInterface, float fLoss, CEntitySAInterface* pAttackerInterface );
     static bool                         StaticObjectBreakHandler        ( CObjectSAInterface* pObjectInterface, CEntitySAInterface* pAttackerInterface );
     static bool                         StaticWaterCannonHandler        ( CVehicleSAInterface* pCannonVehicle, CPedSAInterface* pHitPed );
@@ -515,7 +515,7 @@ private:
     void                                BlendAnimationHandler           ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID, float fBlendDelta );
     bool                                ProcessCollisionHandler         ( CEntitySAInterface* pThisInterface, CEntitySAInterface* pOtherInterface );
     bool                                VehicleCollisionHandler         ( CVehicleSAInterface* pCollidingVehicle, CEntitySAInterface* pCollidedVehicle, int iModelIndex, float fDamageImpulseMag, float fCollidingDamageImpulseMag, uint16 usPieceType, CVector vecCollisionPos, CVector vecCollisionVelocity  );
-    bool                                HeliKillHandler                 ( CVehicleSAInterface* pHeli, CPedSAInterface* pPed );
+    bool                                HeliKillHandler                 ( CVehicleSAInterface* pHeli, CEntitySAInterface* pHitInterface );
     bool                                ObjectDamageHandler             ( CObjectSAInterface* pObjectInterface, float fLoss, CEntitySAInterface* pAttackerInterface );
     bool                                ObjectBreakHandler              ( CObjectSAInterface* pObjectInterface, CEntitySAInterface* pAttackerInterface );
     bool                                WaterCannonHitHandler           ( CVehicleSAInterface* pCannonVehicle, CPedSAInterface* pHitPed );
