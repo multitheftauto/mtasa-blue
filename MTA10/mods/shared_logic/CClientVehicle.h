@@ -464,6 +464,10 @@ public:
     
     bool                        DoesSupportUpgrade      ( SString strFrameName );
 
+    bool                        AreHeliBladeCollisionsEnabled              ( void )                              { return m_bEnableHeliBladeCollisions; }
+
+    void                        SetHeliBladeCollisionsEnabled              ( bool bEnable )                    { m_bEnableHeliBladeCollisions = bEnable; }
+
 protected:
     void                        StreamIn                ( bool bInstantly );
     void                        StreamOut               ( void );
@@ -629,6 +633,7 @@ protected:
     CTickCount                  m_LastPushedTime;
     uint                        m_uiForceLocalZCounter;
 
+    bool                        m_bEnableHeliBladeCollisions;
 public:
 #ifdef MTA_DEBUG
     CClientPlayer *             m_pLastSyncer;

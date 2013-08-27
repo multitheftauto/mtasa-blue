@@ -3672,9 +3672,9 @@ bool CClientGame::StaticVehicleCollisionHandler ( CVehicleSAInterface* pCollidin
     return g_pClientGame->VehicleCollisionHandler( pCollidingVehicle, pCollidedVehicle, iModelIndex, fDamageImpulseMag, fCollidingDamageImpulseMag, usPieceType, vecCollisionPos, vecCollisionVelocity );
 }
 
-bool CClientGame::StaticHeliKillHandler ( CVehicleSAInterface* pHeliInterface, CPedSAInterface* pPed )
+bool CClientGame::StaticHeliKillHandler ( CVehicleSAInterface* pHeliInterface, CEntitySAInterface* pHitInterface )
 {
-    return g_pClientGame->HeliKillHandler ( pHeliInterface, pPed );
+    return g_pClientGame->HeliKillHandler ( pHeliInterface, pHitInterface );
 }
 
 bool CClientGame::StaticObjectDamageHandler ( CObjectSAInterface* pObjectInterface, float fLoss, CEntitySAInterface* pAttackerInterface )
@@ -4477,57 +4477,67 @@ bool CClientGame::VehicleCollisionHandler ( CVehicleSAInterface* pCollidingVehic
     return false;
 }
 
-bool CClientGame::HeliKillHandler ( CVehicleSAInterface* pHeliInterface, CPedSAInterface* pPedInterface )
+bool CClientGame::HeliKillHandler ( CVehicleSAInterface* pHeliInterface, CEntitySAInterface* pHitInterface )
 {
-    if ( pHeliInterface && pPedInterface )
+    if ( pHeliInterface && pHitInterface )
     {
-        // Get our ped and client ped
-        CPed * pPed = g_pGame->GetPools ( )->GetPed ( (DWORD *)pPedInterface );
-        CClientPed * pClientPed = m_pManager->GetPedManager ( )->GetSafe( pPed, true );
-        // Was our client ped valid
-        if ( pClientPed )
+        // Get our heli and client heli
+        CVehicle * pHeli = g_pGame->GetPools ( )->GetVehicle( (DWORD *)pHeliInterface );
+        CClientVehicle * pClientHeli = m_pManager->GetVehicleManager ( )->GetSafe( pHeli );
+        if ( pHeli && pClientHeli && pClientHeli->AreHeliBladeCollisionsEnabled ( ) )
         {
-            // Get our heli and client heli
-            CVehicle * pHeli = g_pGame->GetPools ( )->GetVehicle( (DWORD *)pHeliInterface );
-            CClientVehicle * pClientHeli = m_pManager->GetVehicleManager ( )->GetSafe( pHeli );
+            // Get our ped and client ped
+            CPed * pPed = g_pGame->GetPools ( )->GetPed ( (DWORD *)pHitInterface );
+            CClientPed * pClientPed = m_pManager->GetPedManager ( )->GetSafe( pPed, true );
+            // Was our client ped valid
+            if ( pClientPed )
+            {
+                // Get our heli and client heli
+                CVehicle * pHeli = g_pGame->GetPools ( )->GetVehicle( (DWORD *)pHeliInterface );
+                CClientVehicle * pClientHeli = m_pManager->GetVehicleManager ( )->GetSafe( pHeli );
 
-            // Iterate our "stored" cancel state and find the heli in question
-            std::pair < std::multimap < CClientVehicle *, CClientPed * >::iterator, std::multimap < CClientVehicle *, CClientPed * >::iterator> iterators = m_HeliCollisionsMap.equal_range ( pClientHeli );
-            std::multimap < CClientVehicle *, CClientPed * > ::const_iterator iter = iterators.first;
-            for ( ; iter != iterators.second; ++iter )
-            {
-                // If the Heli and ped collided within the clear rate return false
-                if ( (*iter).first == pClientHeli && (*iter).second == pClientPed )
-                    return false;
-            }
+                // Iterate our "stored" cancel state and find the heli in question
+                std::pair < std::multimap < CClientVehicle *, CClientPed * >::iterator, std::multimap < CClientVehicle *, CClientPed * >::iterator> iterators = m_HeliCollisionsMap.equal_range ( pClientHeli );
+                std::multimap < CClientVehicle *, CClientPed * > ::const_iterator iter = iterators.first;
+                for ( ; iter != iterators.second; ++iter )
+                {
+                    // If the Heli and ped collided within the clear rate return false
+                    if ( (*iter).first == pClientHeli && (*iter).second == pClientPed )
+                        return false;
+                }
 
-            CLuaArguments Arguments;
-            if ( pClientHeli )
-            {
-                // Push our heli
-                Arguments.PushElement ( pClientHeli );
-            }
-            else
-            {
-                Arguments.PushNil ( );
-            }
-            
-            // Trigger our event
-            bool bContinue;
-            if ( IS_PLAYER ( pClientPed ) )
-                bContinue = pClientPed->CallEvent ( "onClientPlayerHeliKilled", Arguments, true );
-            else
-                bContinue = pClientPed->CallEvent ( "onClientPedHeliKilled", Arguments, true );
+                CLuaArguments Arguments;
+                if ( pClientHeli )
+                {
+                    // Push our heli
+                    Arguments.PushElement ( pClientHeli );
+                }
+                else
+                {
+                    Arguments.PushNil ( );
+                }
 
-            // Was our event cancelled
-            if ( !bContinue )
-            {
-                // Add our heli and ped pair to the list
-                std::pair < CClientVehicle *, CClientPed * > pair = std::pair < CClientVehicle *, CClientPed * > ( pClientHeli, pClientPed ); 
-                m_HeliCollisionsMap.insert( pair );
+                // Trigger our event
+                bool bContinue;
+                if ( IS_PLAYER ( pClientPed ) )
+                    bContinue = pClientPed->CallEvent ( "onClientPlayerHeliKilled", Arguments, true );
+                else
+                    bContinue = pClientPed->CallEvent ( "onClientPedHeliKilled", Arguments, true );
+
+                // Was our event cancelled
+                if ( !bContinue )
+                {
+                    // Add our heli and ped pair to the list
+                    std::pair < CClientVehicle *, CClientPed * > pair = std::pair < CClientVehicle *, CClientPed * > ( pClientHeli, pClientPed ); 
+                    m_HeliCollisionsMap.insert( pair );
+                }
+                // Return if it was cancelled
+                return bContinue;
             }
-            // Return if it was cancelled
-            return bContinue;
+        }
+        else
+        {
+            return false;
         }
     }
     return true;
