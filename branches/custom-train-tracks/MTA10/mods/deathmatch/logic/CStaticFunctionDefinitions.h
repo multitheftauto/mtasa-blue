@@ -212,6 +212,7 @@ public:
     static bool                         IsVehicleNitroActivated             ( CClientVehicle& Vehicle, bool& bActivated );
     static bool                         GetVehicleNitroCount                ( CClientVehicle& Vehicle, char& cCount );
     static bool                         GetVehicleNitroLevel                ( CClientVehicle& Vehicle, float& fLevel );
+    static bool                         GetHeliBladeCollisionsEnabled       ( CClientVehicle& Vehicle );
     static bool                         GetVehicleTrainTrack                ( CClientVehicle& Vehicle, unsigned char& ucTrack );
 
     // Vehicle set functions
@@ -253,6 +254,7 @@ public:
     static bool                         SetVehicleNitroCount                ( CClientEntity& Entity, char cCount );
     static bool                         SetVehicleNitroLevel                ( CClientEntity& Entity, float fLevel );
     static bool                         SetVehiclePlateText                 ( CClientEntity& Entity, const SString& strText );
+    static bool                         SetHeliBladeCollisionsEnabled       ( CClientVehicle& Vehicle, bool bEnabled );
     static bool                         SetVehicleTrainTrack                ( CClientVehicle& Vehicle, unsigned char ucTrack );
 
     // Object get funcs

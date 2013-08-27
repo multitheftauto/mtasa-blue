@@ -3508,3 +3508,54 @@ int CLuaFunctionDefs::SetVehiclePlateText ( lua_State* luaVM )
     lua_pushboolean ( luaVM, false );
     return 1;
 }
+
+int CLuaFunctionDefs::SetHeliBladeCollisionsEnabled ( lua_State* luaVM )
+{
+//  bool setHeliBladeCollisionsEnabled ( vehicle theVehicle, bool bEnabled )
+    CClientVehicle* pVehicle; 
+    bool bEnabled = true;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pVehicle );
+    argStream.ReadBool ( bEnabled );
+
+    if ( !argStream.HasErrors() )
+    {
+        if ( CStaticFunctionDefinitions::SetHeliBladeCollisionsEnabled ( *pVehicle, bEnabled ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::GetHeliBladeCollisionsEnabled ( lua_State* luaVM )
+{
+//  bool getHeliBladeCollisionsEnabled ( vehicle theVehicle )
+    CClientVehicle* pVehicle; 
+    bool bEnabled = true;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pVehicle );
+    argStream.ReadBool ( bEnabled );
+
+    if ( !argStream.HasErrors() )
+    {
+        if ( CStaticFunctionDefinitions::GetHeliBladeCollisionsEnabled ( *pVehicle ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}

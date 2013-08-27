@@ -140,6 +140,7 @@ CClientVehicle::CClientVehicle ( CClientManager* pManager, ElementID ID, unsigne
     m_bHasCustomHandling = false;
     m_ucVariation = ucVariation;
     m_ucVariation2 = ucVariation2;
+    m_bEnableHeliBladeCollisions = true;
 
 #ifdef MTA_DEBUG
     m_pLastSyncer = NULL;
