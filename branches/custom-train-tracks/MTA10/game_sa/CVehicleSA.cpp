@@ -25,8 +25,8 @@ namespace
     RpAtomic* ClumpDumpCB (RpAtomic* pAtomic, void * data)
     {
         CVehicleSA * pVehicleSA = (CVehicleSA *)data;
-        RwFrame* pFrame = RpGetFrame ( pAtomic );
-        pVehicleSA->AddComponent ( pFrame );
+        RwFrame* pFrame = RpGetFrame ( pAtomic );   
+        pVehicleSA->AddComponent ( pFrame, false );
         //g_pCore->GetConsole()->Print ( SString ( "Atomic:%08x  Frame:%08x %s", pAtomic, pFrame, pFrame ? pFrame->szName : "" ) );
         //OutputDebugLine ( SString ( "Atomic:%08x  Frame:%08x %s", pAtomic, pFrame, pFrame ? pFrame->szName : "" ) );
         return pAtomic;
@@ -43,11 +43,32 @@ namespace
         // Do for all atomics
         RpClumpForAllAtomics ( pClump, ClumpDumpCB, pVehicleSA );
     }
+    
+    // Recursive RwFrame children searching function
+    inline RwFrame * RwFrameDump ( RwFrame * parent, CVehicleSA * pVehicleSA ) {
+        RwFrame * ret = parent->child, * buf;
+        while ( ret != NULL ) {
+            // recurse into the child
+            if ( ret->child != NULL ) {         
+                buf = RwFrameDump ( ret, pVehicleSA );
+                if ( buf != NULL ) return buf;
+            }
+            // don't re-add, check ret for validity, if it has an empty string at this point it isn't a variant or it's already added
+            if ( pVehicleSA->IsComponentPresent ( ret->szName ) == false && ret != NULL && ret->szName != "" )
+            {
+                pVehicleSA->AddComponent ( ret, true );
+            }
+            ret = ret->next;
+        }
+        return NULL;
+    }
 
     void VehicleDump ( CVehicleSA* pVehicleSA )
     {
-        //OutputDebugLine ( SString ( "Interface:%08x", pVehicleSA->GetVehicleInterface() ) );
-        ClumpDump( pVehicleSA->GetInterface()->m_pRwObject, pVehicleSA );
+        // This grabs 90% of the frames
+        ClumpDump( pVehicleSA->GetInterface()->m_pRwObject, pVehicleSA );    
+        // This grabs the rest which aren't always copied to the Model Info in the interface ( usually markers for things like NOS ) 
+        RwFrameDump( RpGetFrame ( (RpClump *)pGame->GetModelInfo ( pVehicleSA->GetModelIndex ( ) )->GetRwObject ( ) ), pVehicleSA );
     }
 
     RwObject * __cdecl GetAllAtomicObjectCB(struct RwObject * object, void * data)
@@ -707,12 +728,6 @@ void CVehicleSA::AddVehicleUpgrade ( DWORD dwModelID )
             call    dwFunc
         }
     }
-    // set our variant count
-    m_ucVariantCount = 0;
-    // clear our rw frames list
-    m_ExtraFrames.clear ( ); 
-    // dump the frames
-    VehicleDump( this );
 }
 
 void CVehicleSA::RemoveVehicleUpgrade ( DWORD dwModelID )
@@ -727,12 +742,18 @@ void CVehicleSA::RemoveVehicleUpgrade ( DWORD dwModelID )
         push    dwModelID
         call    dwFunc
     }
-    // set our variant count
-    m_ucVariantCount = 0;
-    // clear our rw frames list
-    m_ExtraFrames.clear ( ); 
-    // dump the frames
-    VehicleDump( this );
+}
+
+bool CVehicleSA::DoesSupportUpgrade ( SString strFrameName )
+{
+    SVehicleFrame Component;
+    if ( GetVehicleComponent ( strFrameName, Component ) && Component.pFrame != NULL )
+    {
+        // Todo: enforce hierarchy
+        return true;
+    }
+
+    return false;
 }
 
 bool CVehicleSA::CanPedLeanOut ( CPed* pPed )
@@ -2240,26 +2261,27 @@ namespace
     }
 }
 
-RwFrame * CVehicleSA::GetVehicleComponent ( SString vehicleComponent )
+bool CVehicleSA::GetVehicleComponent ( SString vehicleComponent, SVehicleFrame &Frame )
 {
     // find a match
-    std::map < SString, RwFrame* >::iterator iter = m_ExtraFrames.find ( vehicleComponent );
+    std::map < SString, SVehicleFrame >::iterator iter = m_ExtraFrames.find ( vehicleComponent );
     if ( iter != m_ExtraFrames.end ( ) )
     {
+        Frame = iter->second;
         // did we find a match if so return it
-        return iter->second;
+        return true;
     }
     // return null
-    return NULL;
+    return false;
 }
 
 bool CVehicleSA::SetComponentRotation ( SString vehicleComponent, CVector vecRotation )  
 { 
-    // Call our get component method
-    RwFrame * pComponent = GetVehicleComponent ( vehicleComponent );
+    SVehicleFrame Component;
     // Check validty
-    if ( pComponent )
+    if ( GetVehicleComponent ( vehicleComponent, Component ) && Component.pFrame != NULL && Component.bReadOnly == false )
     {
+        RwFrame * pComponent = Component.pFrame;
         // call our convert from euler angles function to get a valid matrix
         CMatrix_Padded matrixPadded;
         _MatrixConvertFromEulerAngles ( &matrixPadded, vecRotation.fX, vecRotation.fY, vecRotation.fZ );
@@ -2274,11 +2296,11 @@ bool CVehicleSA::SetComponentRotation ( SString vehicleComponent, CVector vecRot
 
 bool CVehicleSA::GetComponentRotation ( SString vehicleComponent, CVector &vecRotation )
 {
-    // Call our get component method
-    RwFrame * pComponent = GetVehicleComponent ( vehicleComponent );
-    // check validity
-    if ( pComponent )
+    SVehicleFrame Component;
+    // Check validty
+    if ( GetVehicleComponent ( vehicleComponent, Component ) && Component.pFrame != NULL )
     {
+        RwFrame * pComponent = Component.pFrame;
         // call our convert to euler angles function to get a valid rotation
         CMatrix_Padded matrixPadded;
         (RwV3d&)matrixPadded.vRight = pComponent->modelling.right;
@@ -2292,11 +2314,11 @@ bool CVehicleSA::GetComponentRotation ( SString vehicleComponent, CVector &vecRo
 
 bool CVehicleSA::SetComponentPosition ( SString vehicleComponent, CVector vecPosition )  
 { 
-    // Call our get component method
-    RwFrame * pComponent = GetVehicleComponent ( vehicleComponent );
-    // check validity
-    if ( pComponent )
+    SVehicleFrame Component;
+    // Check validty
+    if ( GetVehicleComponent ( vehicleComponent, Component ) && Component.pFrame != NULL && Component.bReadOnly == false )
     {
+        RwFrame * pComponent = Component.pFrame;
         // set our position (modelling is relative positions and ltm is world pos)
         pComponent->modelling.pos.x = vecPosition.fX;
         pComponent->modelling.pos.y = vecPosition.fY;
@@ -2308,11 +2330,11 @@ bool CVehicleSA::SetComponentPosition ( SString vehicleComponent, CVector vecPos
 
 bool CVehicleSA::GetComponentPosition ( SString vehicleComponent, CVector &vecPositionModelling )  
 { 
-    // Call our get component method
-    RwFrame * pComponent = GetVehicleComponent ( vehicleComponent );
-    // check validity
-    if ( pComponent )
+    SVehicleFrame Component;
+    // Check validty
+    if ( GetVehicleComponent ( vehicleComponent, Component ) && Component.pFrame != NULL )
     {
+        RwFrame * pComponent = Component.pFrame;
         // get our position (modelling is relative positions and ltm is world pos)
         vecPositionModelling = CVector ( pComponent->modelling.pos.x, pComponent->modelling.pos.y, pComponent->modelling.pos.z );
         return true;
@@ -2322,16 +2344,17 @@ bool CVehicleSA::GetComponentPosition ( SString vehicleComponent, CVector &vecPo
 
 bool CVehicleSA::IsComponentPresent ( SString vehicleComponent )
 {
-    return GetVehicleComponent ( vehicleComponent ) != NULL;
+    SVehicleFrame Frame;
+    return GetVehicleComponent ( vehicleComponent, Frame );
 }
 
 bool CVehicleSA::GetComponentMatrix ( SString vehicleComponent, RwMatrix &ltm, RwMatrix &modelling )
 {
-    // call our get component method
-    RwFrame * pFrame = GetVehicleComponent ( vehicleComponent );
-    // check validity
-    if ( pFrame )
+    SVehicleFrame Component;
+    // Check validty
+    if ( GetVehicleComponent ( vehicleComponent, Component ) && Component.pFrame != NULL )
     {
+        RwFrame * pFrame = Component.pFrame;
         // fill in our matricies
         ltm = pFrame->ltm;
         modelling = pFrame->modelling;
@@ -2342,11 +2365,11 @@ bool CVehicleSA::GetComponentMatrix ( SString vehicleComponent, RwMatrix &ltm, R
 
 bool CVehicleSA::SetComponentMatrix ( SString vehicleComponent, RwMatrix &ltm, RwMatrix &modelling )
 {
-    // call our get component method
-    RwFrame * pFrame = GetVehicleComponent ( vehicleComponent );
-    // check validity
-    if ( pFrame )
+    SVehicleFrame Component;
+    // Check validty
+    if ( GetVehicleComponent ( vehicleComponent, Component ) && Component.pFrame != NULL && Component.bReadOnly == false )
     {
+        RwFrame * pFrame = Component.pFrame;
         // Copy vectors and leave flags for now.
         pFrame->ltm.at = ltm.at;
         pFrame->ltm.pos = ltm.pos;
@@ -2362,10 +2385,13 @@ bool CVehicleSA::SetComponentMatrix ( SString vehicleComponent, RwMatrix &ltm, R
     return false;
 }
 
-void CVehicleSA::AddComponent ( RwFrame * pFrame )
+void CVehicleSA::AddComponent ( RwFrame * pFrame, bool bReadOnly )
 {
     // if the frame is invalid we don't want to be here
     if ( !pFrame )
+        return;
+    // if the frame already exists ignore it
+    if ( IsComponentPresent ( pFrame->szName ) || pFrame->szName == "" )
         return;
 
     SString strName = pFrame->szName;
@@ -2387,18 +2413,19 @@ void CVehicleSA::AddComponent ( RwFrame * pFrame )
         // increment the variant count ( we assume that the first variant created is variant1 and the second is variant2 )
         m_ucVariantCount++;
     }
+    SVehicleFrame frame = SVehicleFrame ( pFrame, bReadOnly );
     // insert our new frame
-    m_ExtraFrames.insert ( std::pair < SString, RwFrame * > ( strName, pFrame ) );
+    m_ExtraFrames.insert ( std::pair < SString, SVehicleFrame > ( strName, frame ) );
 }
 
 
 bool CVehicleSA::SetComponentVisible ( SString vehicleComponent, bool bRequestVisible )  
 { 
-    // get our component
-    RwFrame * pComponent = GetVehicleComponent ( vehicleComponent );
-    // check validity
-    if ( pComponent )
+    SVehicleFrame Component;
+    // Check validty
+    if ( GetVehicleComponent ( vehicleComponent, Component ) && Component.pFrame != NULL && Component.bReadOnly == false )
     {
+        RwFrame * pComponent = Component.pFrame;
         // Get all atomics for this component - Usually one, or two if there is a damaged version
         std::vector< RwObject* > atomicList;
         GetAllAtomicObjects( pComponent, atomicList );
@@ -2438,11 +2465,11 @@ bool CVehicleSA::SetComponentVisible ( SString vehicleComponent, bool bRequestVi
 
 bool CVehicleSA::GetComponentVisible ( SString vehicleComponent, bool &bOutVisible )  
 { 
-    // get our component
-    RwFrame * pComponent = GetVehicleComponent ( vehicleComponent );
-    // check validity
-    if ( pComponent )
+    SVehicleFrame Component;
+    // Check validty
+    if ( GetVehicleComponent ( vehicleComponent, Component ) && Component.pFrame != NULL && Component.bReadOnly == false )
     {
+        RwFrame * pComponent = Component.pFrame;
         // Get all atomics for this component - Usually one, or two if there is a damaged version
         std::vector< RwObject* > atomicList;
         GetAllAtomicObjects( pComponent, atomicList );
