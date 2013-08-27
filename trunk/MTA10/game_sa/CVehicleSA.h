@@ -523,7 +523,7 @@ private:
     CDoorSA                     m_doors[6];
     bool                        m_bSwingingDoorsAllowed;
     SSirenInfo                  m_tSirenInfo;
-    std::map<SString, RwFrame*> m_ExtraFrames;
+    std::map<SString, SVehicleFrame> m_ExtraFrames;
     unsigned char               m_ucVariant;
     unsigned char               m_ucVariant2;
     unsigned char               m_ucVariantCount;
@@ -566,6 +566,7 @@ public:
     bool                        CanPedJumpOutCar                ( CPed* pPed );
     void                        AddVehicleUpgrade               ( DWORD dwModelID );
     void                        RemoveVehicleUpgrade            ( DWORD dwModelID );
+    bool                        DoesSupportUpgrade              ( SString strFrameName );
     bool                        CanPedLeanOut                   ( CPed* pPed );
     bool                        CanPedStepOutCar                ( bool bUnknown );
 
@@ -771,9 +772,9 @@ public:
     bool                        GetComponentMatrix              ( SString vehicleComponent, RwMatrix &ltm, RwMatrix &modelling );
     bool                        SetComponentMatrix              ( SString vehicleComponent, RwMatrix &ltm, RwMatrix &modelling );
     bool                        SetComponentVisible             ( SString vehicleComponent, bool bVisible );
-    void                        AddComponent                    ( RwFrame * pFrame );
+    void                        AddComponent                    ( RwFrame * pFrame, bool bReadOnly );
     bool                        GetComponentVisible             ( SString vehicleComponent, bool &bVisible );
-    std::map < SString, RwFrame * > & GetComponentMap     ( void )                                                            { return m_ExtraFrames; }
+    std::map < SString, SVehicleFrame > & GetComponentMap       ( void )                                                            { return m_ExtraFrames; }
     bool                        SetPlateText                    ( const SString& strText );
 
     void                        UpdateLandingGearPosition       ( );
@@ -781,7 +782,7 @@ public:
 private:
     void                        RecalculateSuspensionLines          ( void );
     void                        CopyGlobalSuspensionLinesToPrivate  ( void );
-    RwFrame *                   GetVehicleComponent                 ( SString vehicleComponent );
+    bool                        GetVehicleComponent                 ( SString vehicleComponent, SVehicleFrame &Frame );
 
 };
 

@@ -63,6 +63,27 @@ struct SSirenInfo
     SFixedArray < SSirenBeaconInfo, 8 > m_tSirenInfo;
     SColor                      m_tPointLightColour;
 };
+
+struct SVehicleFrame
+{
+    SVehicleFrame ( RwFrame * pFrame )
+    {
+        this->pFrame = pFrame;
+        this->bReadOnly = true;
+    }
+    SVehicleFrame ( RwFrame * pFrame, bool bReadOnly )
+    {
+        this->pFrame = pFrame;
+        this->bReadOnly = bReadOnly;
+    }
+    SVehicleFrame ( )
+    {
+        this->pFrame = NULL;
+    }
+    RwFrame * pFrame;
+    bool bReadOnly;
+};
+
 class CVehicle : public virtual CPhysical
 {
 public:
@@ -96,6 +117,7 @@ public:
     virtual bool                CanPedJumpOutCar            ( CPed* pPed ) = 0;
     virtual void                AddVehicleUpgrade           ( DWORD dwModelID ) = 0;
     virtual void                RemoveVehicleUpgrade        ( DWORD dwModelID ) = 0;
+    virtual bool                DoesSupportUpgrade          ( SString strFrameName ) = 0;
     virtual bool                CanPedLeanOut               ( CPed* pPed ) = 0;
     virtual bool                CanPedStepOutCar            ( bool bUnknown ) = 0;
 
@@ -292,9 +314,9 @@ public:
     virtual bool                 SetComponentMatrix                     ( SString vehicleComponent, RwMatrix &ltm, RwMatrix &modelling ) = 0;
     virtual bool                 SetComponentVisible                    ( SString vehicleComponent, bool bVisible ) = 0;
     virtual bool                 GetComponentVisible                    ( SString vehicleComponent, bool &bVisible ) = 0;
-    virtual std::map < SString, RwFrame * > & GetComponentMap       ( void ) = 0;
+    virtual std::map < SString, SVehicleFrame > & GetComponentMap       ( void ) = 0;
     virtual void                 UpdateLandingGearPosition              ( void ) = 0;
-    virtual bool                SetPlateText                            ( const SString& strText ) = 0;
+    virtual bool                 SetPlateText                            ( const SString& strText ) = 0;
 };
 
 #endif
