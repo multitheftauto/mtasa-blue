@@ -651,6 +651,7 @@ int CLuaResourceDefs::setResourceInfo ( lua_State* luaVM )
 {
     CResource* pResource;
     SString strInfoValueKey;
+    SString strTempInfoValue;
     const char *szInfoValue = NULL;
     bool bSave;
     
@@ -660,7 +661,6 @@ int CLuaResourceDefs::setResourceInfo ( lua_State* luaVM )
     
     if ( argStream.NextIsString ( ) )
     {
-        SString strTempInfoValue;
         argStream.ReadString ( strTempInfoValue );
         szInfoValue = strTempInfoValue.c_str();
     }

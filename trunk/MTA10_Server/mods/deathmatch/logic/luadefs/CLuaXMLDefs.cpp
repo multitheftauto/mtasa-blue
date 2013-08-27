@@ -556,8 +556,12 @@ int CLuaXMLDefs::xmlNodeGetAttribute ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        lua_pushstring(luaVM, pNode->GetAttributeValue(strAttributeName));
-        return 1;
+        CXMLAttribute* pAttribute = pNode->GetAttributes().Find( strAttributeName );
+        if ( pAttribute )
+        {
+            lua_pushstring( luaVM, pAttribute->GetValue().c_str () );
+            return 1;
+        }
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
