@@ -76,99 +76,295 @@ bool CVehicleUpgrades::IsUpgradeCompatible ( unsigned short usUpgrade )
          us == 1097 || us == 1098 )
          return true;
 
+    bool bReturn = false;
     switch ( usModel )
     {
-        case 400: return ( us == 1020 || us == 1021 || us == 1019 || us == 1018 || us == 1013 || us == 1024 || us == 1008 || us == 1009 || us == 1010 );
-        case 401: return ( us == 1005 || us == 1004 || us == 1142 || us == 1143 || us == 1144 || us == 114 || us == 1020 || us == 1019 || us == 1013 || us == 1008 || us == 1009 || us == 1010 || us == 1006 || us == 1001 || us == 1003 || us == 1017 || us == 1007 );
-        case 402: return ( us == 1009 || us == 1010 );
-        case 404: return ( us == 1020 || us == 1021 || us == 1019 || us == 1013 || us == 1008 || us == 1009 || us == 1010 || us == 1002 || us == 1016 || us == 1000 || us == 1017 || us == 1007 );
-        case 405: return ( us == 1020 || us == 1021 || us == 1019 || us == 1018 || us == 1008 || us == 1009 || us == 1010 || us == 1001 || us == 1014 || us == 1023 || us == 1000 );
-        case 409: return ( us == 1009 );
-        case 410: return ( us == 1019 || us == 1021 || us == 1020 || us == 1013 || us == 1024 || us == 1008 || us == 1009 || us == 1010 || us == 1001 || us == 1023 || us == 1003 || us == 1017 || us == 1007 );
-        case 411: return ( us == 1008 || us == 1009 || us == 1010 );
-        case 412: return ( us == 1008 || us == 1009 || us == 1010 );
-        case 415: return ( us == 1019 || us == 1018 || us == 1008 || us == 1009 || us == 1010 || us == 1001 || us == 1023 || us == 1003 || us == 1017 || us == 1007 );
-        case 418: return ( us == 1020 || us == 1021 || us == 1008 || us == 1009 || us == 1010 || us == 1006 || us == 1002 || us == 1016 );
-        case 419: return ( us == 1008 || us == 1009 || us == 1010 );
-        case 420: return ( us == 1005 || us == 1004 || us == 1021 || us == 1019 || us == 1008 || us == 1009 || us == 1010 || us == 1001 || us == 1003 );
-        case 421: return ( us == 1020 || us == 1021 || us == 1019 || us == 1018 || us == 1008 || us == 1009 || us == 1010 || us == 1014 || us == 1023 || us == 1016 || us == 1000 );
-        case 422: return ( us == 1020 || us == 1021 || us == 1019 || us == 1013 || us == 1008 || us == 1009 || us == 1010 || us == 1017 || us == 1007 );
-        case 426: return ( us == 1005 || us == 1004 || us == 1021 || us == 1019 || us == 1008 || us == 1009 || us == 1010 || us == 1006 || us == 1001 || us == 1003 );
-        case 429: return ( us == 1008 || us == 1009 || us == 1010 );
-        case 436: return ( us == 1020 || us == 1021 || us == 1022 || us == 1019 || us == 1013 || us == 1008 || us == 1009 || us == 1010 || us == 1006 || us == 1001 || us == 1003 || us == 1017 || us == 1007 );
-        case 438: return ( us == 1008 || us == 1009 || us == 1010 );
-        case 439: return ( us == 1003 || us == 1023 || us == 1001 || us == 1008 || us == 1009 || us == 1010 || us == 1017 || us == 1007 || us == 1142 || us == 1143 || us == 1144 || us == 1145 || us == 1013 );
-        case 442: return ( us == 1008 || us == 1009 || us == 1010 );
-        case 445: return ( us == 1008 || us == 1009 || us == 1010 );
-        case 451: return ( us == 1008 || us == 1009 || us == 1010 );
-        case 458: return ( us == 1008 || us == 1009 || us == 1010 );
-        case 466: return ( us == 1008 || us == 1009 || us == 1010 );
-        case 467: return ( us == 1008 || us == 1009 || us == 1010 );
-        case 474: return ( us == 1008 || us == 1009 || us == 1010 );
-        case 475: return ( us == 1008 || us == 1009 || us == 1010 );
-        case 477: return ( us == 1020 || us == 1021 || us == 1019 || us == 1018 || us == 1008 || us == 1009 || us == 1010 || us == 1006 || us == 1017 || us == 1007 );
-        case 478: return ( us == 1005 || us == 1004 || us == 1012 || us == 1020 || us == 1021 || us == 1022 || us == 1013 || us == 1024 || us == 1008 || us == 1009 || us == 1010 );
-        case 479: return ( us == 1008 || us == 1009 || us == 1010 );
-        case 480: return ( us == 1008 || us == 1009 || us == 1010 );
-        case 489: return ( us == 1005 || us == 1004 || us == 1020 || us == 1019 || us == 1018 || us == 1013 || us == 1024 || us == 1008 || us == 1009 || us == 1010 || us == 1006 || us == 1002 || us == 1016 || us == 1000 );
-        case 491: return ( us == 1142 || us == 1143 || us == 1144 || us == 1145 || us == 1020 || us == 1021 || us == 1019 || us == 1018 || us == 1008 || us == 1009 || us == 1010 || us == 1014 || us == 1023 || us == 1003 || us == 1017 || us == 1007 );
-        case 492: return ( us == 1005 || us == 1004 || us == 1008 || us == 1009 || us == 1010 || us == 1006 || us == 1016 || us == 1000 );
-        case 496: return ( us == 1006 || us == 1017 || us == 1007 || us == 1011 || us == 1019 || us == 1023 || us == 1001 || us == 1008 || us == 1009 || us == 1010 || us == 1003 || us == 1002 || us == 1142 || us == 1143 || us == 1020 );
-        case 500: return ( us == 1020 || us == 1021 || us == 1019 || us == 1013 || us == 1024 || us == 1008 || us == 1009 || us == 1010 );
-        case 506: return ( us == 1009 );
-        case 507: return ( us == 1008 || us == 1009 || us == 1010 );
-        case 516: return ( us == 1004 || us == 1020 || us == 1021 || us == 1019 || us == 1018 || us == 1008 || us == 1009 || us == 1010 || us == 1002 || us == 1015 || us == 1016 || us == 1000 || us == 1017 || us == 1007 );
-        case 517: return ( us == 1142 || us == 1143 || us == 1144 || us == 1145 || us == 1020 || us == 1019 || us == 1018 || us == 1008 || us == 1009 || us == 1010 || us == 1002 || us == 1023 || us == 1016 || us == 1003 || us == 1017 || us == 1007 );
-        case 518: return ( us == 1005 || us == 1142 || us == 1143 || us == 1144 || us == 1145 || us == 1020 || us == 1018 || us == 1013 || us == 1008 || us == 1009 || us == 1010 || us == 1006 || us == 1001 || us == 1023 || us == 1003 || us == 1017 || us == 1007 );
-        case 526: return ( us == 1008 || us == 1009 || us == 1010 );
-        case 527: return ( us == 1021 || us == 1020 || us == 1018 || us == 1008 || us == 1009 || us == 1010 || us == 1001 || us == 1014 || us == 1015 || us == 1017 || us == 1007 );
-        case 529: return ( us == 1012 || us == 1011 || us == 1020 || us == 1019 || us == 1018 || us == 1008 || us == 1009 || us == 1010 || us == 1006 || us == 1001 || us == 1023 || us == 1003 || us == 1017 || us == 1007 );
-        case 533: return ( us == 1008 || us == 1009 || us == 1010 );
-        case 534: return ( us == 1126 || us == 1127 || us == 1179 || us == 1185 || us == 1100 || us == 1123 || us == 1125 || us == 1008 || us == 1009 || us == 1010 || us == 1180 || us == 1178 || us == 1101 || us == 1122 || us == 1124 || us == 1106 );
-        case 535: return ( us == 1109 || us == 1110 || us == 1113 || us == 1114 || us == 1115 || us == 1116 || us == 1117 || us == 1008 || us == 1009 || us == 1010 || us == 1120 || us == 1118 || us == 1121 || us == 1119 );
-        case 536: return ( us == 1104 || us == 1105 || us == 1182 || us == 1181 || us == 1008 || us == 1009 || us == 1010 || us == 1184 || us == 1183 || us == 1128 || us == 1103 || us == 1107 || us == 1108 );
-        case 540: return ( us == 1004 || us == 1142 || us == 1143 || us == 1144 || us == 1145 || us == 1020 || us == 1019 || us == 1018 || us == 1024 || us == 1008 || us == 1009 || us == 1010 || us == 1006 || us == 1001 || us == 1023 || us == 1017 || us == 1007 );
-        case 541: return ( us == 1008 || us == 1009 || us == 1010 );
-        case 542: return ( us == 1144 || us == 1145 || us == 1020 || us == 1021 || us == 1019 || us == 1018 || us == 1008 || us == 1009 || us == 1010 || us == 1014 || us == 1015 );
-        case 545: return ( us == 1008 || us == 1009 || us == 1010 );
-        case 546: return ( us == 1004 || us == 1142 || us == 1143 || us == 1144 || us == 1145 || us == 1019 || us == 1018 || us == 1024 || us == 1008 || us == 1009 || us == 1010 || us == 1006 || us == 1002 || us == 1001 || us == 1023 || us == 1017 || us == 1007 );
-        case 547: return ( us == 1142 || us == 1143 || us == 1020 || us == 1021 || us == 1019 || us == 1018 || us == 1008 || us == 1009 || us == 1010 || us == 1016 || us == 1003 || us == 1000 );
-        case 549: return ( us == 1012 || us == 1011 || us == 1142 || us == 1143 || us == 1144 || us == 1145 || us == 1020 || us == 1019 || us == 1018 || us == 1008 || us == 1009 || us == 1010 || us == 1001 || us == 1023 || us == 1003 || us == 1017 || us == 1007 );
-        case 550: return ( us == 1005 || us == 1004 || us == 1142 || us == 1143 || us == 1144 || us == 1145 || us == 1020 || us == 1019 || us == 1018 || us == 1008 || us == 1009 || us == 1010 || us == 1006 || us == 1001 || us == 1023 || us == 1003 );
-        case 551: return ( us == 1005 || us == 1020 || us == 1021 || us == 1019 || us == 1018 || us == 1008 || us == 1009 || us == 1010 || us == 1006 || us == 1002 || us == 1023 || us == 1016 || us == 1003 );
-        case 555: return ( us == 1008 || us == 1009 || us == 1010 );
-        case 558: return ( us == 1092 || us == 1089 || us == 1166 || us == 1165 || us == 1008 || us == 1009 || us == 1010 || us == 1168 || us == 1167 || us == 1088 || us == 1091 || us == 1164 || us == 1163 || us == 1094 || us == 1090 || us == 1095 || us == 1093 );
-        case 559: return ( us == 1065 || us == 1066 || us == 1160 || us == 1173 || us == 1008 || us == 1009 || us == 1010 || us == 1159 || us == 1161 || us == 1162 || us == 1158 || us == 1067 || us == 1068 || us == 1071 || us == 1069 || us == 1072 || us == 1070 );
-        case 560: return ( us == 1028 || us == 1029 || us == 1169 || us == 1170 || us == 1008 || us == 1009 || us == 1010 || us == 1141 || us == 1140 || us == 1032 || us == 1033 || us == 1138 || us == 1139 || us == 1027 || us == 1026 || us == 1030 || us == 1031 );
-        case 561: return ( us == 1064 || us == 1059 || us == 1155 || us == 1157 || us == 1008 || us == 1009 || us == 1010 || us == 1154 || us == 1156 || us == 1055 || us == 1061 || us == 1058 || us == 1060 || us == 1062 || us == 1056 || us == 1063 || us == 1057 );
-        case 562: return ( us == 1034 || us == 1037 || us == 1171 || us == 1172 || us == 1008 || us == 1009 || us == 1010 || us == 1149 || us == 1148 || us == 1038 || us == 1035 || us == 1147 || us == 1146 || us == 1040 || us == 1036 || us == 1041 || us == 1039 );
-        case 565: return ( us == 1046 || us == 1045 || us == 1153 || us == 1152 || us == 1008 || us == 1009 || us == 1010 || us == 1150 || us == 1151 || us == 1054 || us == 1053 || us == 1049 || us == 1050 || us == 1051 || us == 1047 || us == 1052 || us == 1048 );
-        case 566: return ( us == 1008 || us == 1009 || us == 1010 );
-        case 567: return ( us == 1129 || us == 1132 || us == 1189 || us == 1188 || us == 1008 || us == 1009 || us == 1010 || us == 1187 || us == 1186 || us == 1130 || us == 1131 || us == 1102 || us == 1133 );
-        case 575: return ( us == 1044 || us == 1043 || us == 1174 || us == 1175 || us == 1008 || us == 1009 || us == 1010 || us == 1176 || us == 1177 || us == 1099 || us == 1042 );
-        case 576: return ( us == 1136 || us == 1135 || us == 1191 || us == 1190 || us == 1008 || us == 1009 || us == 1010 || us == 1192 || us == 1193 || us == 1137 || us == 1134 );
-        case 579: return ( us == 1008 || us == 1009 || us == 1010 );
-        case 580: return ( us == 1020 || us == 1018 || us == 1008 || us == 1009 || us == 1010 || us == 1006 || us == 1001 || us == 1023 || us == 1017 || us == 1007 );
-        case 585: return ( us == 1142 || us == 1143 || us == 1144 || us == 1145 || us == 1020 || us == 1019 || us == 1018 || us == 1013 || us == 1008 || us == 1009 || us == 1010 || us == 1006 || us == 1001 || us == 1023 || us == 1003 || us == 1017 || us == 1007 );
-        case 587: return ( us == 1008 || us == 1009 || us == 1010 );
-        case 589: return ( us == 1005 || us == 1004 || us == 1144 || us == 1145 || us == 1020 || us == 1018 || us == 1008 || us == 1009 || us == 1010 || us == 1024 || us == 1013 || us == 1006 || us == 1016 || us == 1000 || us == 1017 || us == 1007 );
-        case 600: return ( us == 1005 || us == 1004 || us == 1020 || us == 1022 || us == 1018 || us == 1013 || us == 1008 || us == 1009 || us == 1010 || us == 1006 || us == 1017 || us == 1007 );
-        case 602: return ( us == 1008 || us == 1009 || us == 1010 );
-        case 603: return ( us == 1144 || us == 1145 || us == 1142 || us == 1143 || us == 1020 || us == 1019 || us == 1018 || us == 1024 || us == 1008 || us == 1009 || us == 1010 || us == 1006 || us == 1001 || us == 1023 || us == 1017 || us == 1007 );
+        case 400: 
+            bReturn = ( us == 1020 || us == 1021 || us == 1019 || us == 1018 || us == 1013 || us == 1024 || us == 1008 || us == 1009 || us == 1010 );
+        break;
+        case 401: 
+            bReturn = ( us == 1005 || us == 1004 || us == 1142 || us == 1143 || us == 1144 || us == 114 || us == 1020 || us == 1019 || us == 1013 || us == 1008 || us == 1009 || us == 1010 || us == 1006 || us == 1001 || us == 1003 || us == 1017 || us == 1007 );
+        break;
+        case 402: 
+            bReturn = ( us == 1009 || us == 1009 || us == 1010 );
+        break;
+        case 404: 
+            bReturn = ( us == 1020 || us == 1021 || us == 1019 || us == 1013 || us == 1008 || us == 1009 || us == 1010 || us == 1002 || us == 1016 || us == 1000 || us == 1017 || us == 1007 );
+        break;
+        case 405: 
+            bReturn = ( us == 1020 || us == 1021 || us == 1019 || us == 1018 || us == 1008 || us == 1009 || us == 1010 || us == 1001 || us == 1014 || us == 1023 || us == 1000 );
+        break;
+        case 409: 
+            bReturn = ( us == 1009 );
+        break;
+        case 410: 
+            bReturn = ( us == 1019 || us == 1021 || us == 1020 || us == 1013 || us == 1024 || us == 1008 || us == 1009 || us == 1010 || us == 1001 || us == 1023 || us == 1003 || us == 1017 || us == 1007 );
+        break;
+        case 411: 
+            bReturn = ( us == 1008 || us == 1009 || us == 1010 );
+        break;
+        case 412: 
+            bReturn = ( us == 1008 || us == 1009 || us == 1010 );
+        break;
+        case 415: 
+            bReturn = ( us == 1019 || us == 1018 || us == 1008 || us == 1009 || us == 1010 || us == 1001 || us == 1023 || us == 1003 || us == 1017 || us == 1007 );
+        break;
+        case 418: 
+            bReturn = ( us == 1020 || us == 1021 || us == 1008 || us == 1009 || us == 1010 || us == 1006 || us == 1002 || us == 1016 );
+        break;
+        case 419: 
+            bReturn = ( us == 1008 || us == 1009 || us == 1010 );
+        break;
+        case 420: 
+            bReturn = ( us == 1005 || us == 1004 || us == 1021 || us == 1019 || us == 1008 || us == 1009 || us == 1010 || us == 1001 || us == 1003 );
+        break;
+        case 421: 
+            bReturn = ( us == 1020 || us == 1021 || us == 1019 || us == 1018 || us == 1008 || us == 1009 || us == 1010 || us == 1014 || us == 1023 || us == 1016 || us == 1000 );
+        break;
+        case 422: 
+            bReturn = ( us == 1020 || us == 1021 || us == 1019 || us == 1013 || us == 1008 || us == 1009 || us == 1010 || us == 1017 || us == 1007 );
+        break;
+        case 426: 
+            bReturn = ( us == 1005 || us == 1004 || us == 1021 || us == 1019 || us == 1008 || us == 1009 || us == 1010 || us == 1006 || us == 1001 || us == 1003 );
+        break;
+        case 429: 
+            bReturn = ( us == 1008 || us == 1009 || us == 1010 );
+        break;
+        case 436: 
+            bReturn = ( us == 1020 || us == 1021 || us == 1022 || us == 1019 || us == 1013 || us == 1008 || us == 1009 || us == 1010 || us == 1006 || us == 1001 || us == 1003 || us == 1017 || us == 1007 );
+        break;
+        case 438: 
+            bReturn = ( us == 1008 || us == 1009 || us == 1010 );
+        break;
+        case 439: 
+            bReturn = ( us == 1003 || us == 1023 || us == 1001 || us == 1008 || us == 1009 || us == 1010 || us == 1017 || us == 1007 || us == 1142 || us == 1143 || us == 1144 || us == 1145 || us == 1013 );
+        break;
+        case 442: 
+            bReturn = ( us == 1008 || us == 1009 || us == 1010 );
+        break;
+        case 445: 
+            bReturn = ( us == 1008 || us == 1009 || us == 1010 );
+        break;
+        case 451: 
+            bReturn = ( us == 1008 || us == 1009 || us == 1010 );
+        break;
+        case 458: 
+            bReturn = ( us == 1008 || us == 1009 || us == 1010 );
+        break;
+        case 466: 
+            bReturn = ( us == 1008 || us == 1009 || us == 1010 );
+        break;
+        case 467: 
+            bReturn = ( us == 1008 || us == 1009 || us == 1010 );
+        break;
+        case 474: 
+            bReturn = ( us == 1008 || us == 1009 || us == 1010 );
+        break;
+        case 475: 
+            bReturn = ( us == 1008 || us == 1009 || us == 1010 );
+        break;
+        case 477: 
+            bReturn = ( us == 1020 || us == 1021 || us == 1019 || us == 1018 || us == 1008 || us == 1009 || us == 1010 || us == 1006 || us == 1017 || us == 1007 );
+        break;
+        case 478: 
+            bReturn = ( us == 1005 || us == 1004 || us == 1012 || us == 1020 || us == 1021 || us == 1022 || us == 1013 || us == 1024 || us == 1008 || us == 1009 || us == 1010 );
+        break;
+        case 479: 
+            bReturn = ( us == 1008 || us == 1009 || us == 1010 );
+        break;
+        case 480: 
+            bReturn = ( us == 1008 || us == 1009 || us == 1010 );
+        break;
+        case 489: 
+            bReturn = ( us == 1005 || us == 1004 || us == 1020 || us == 1019 || us == 1018 || us == 1013 || us == 1024 || us == 1008 || us == 1009 || us == 1010 || us == 1006 || us == 1002 || us == 1016 || us == 1000 );
+        break;
+        case 491: 
+            bReturn = ( us == 1142 || us == 1143 || us == 1144 || us == 1145 || us == 1020 || us == 1021 || us == 1019 || us == 1018 || us == 1008 || us == 1009 || us == 1010 || us == 1014 || us == 1023 || us == 1003 || us == 1017 || us == 1007 );
+        break;
+        case 492: 
+            bReturn = ( us == 1005 || us == 1004 || us == 1008 || us == 1009 || us == 1010 || us == 1006 || us == 1016 || us == 1000 );
+        break;
+        case 496: 
+            bReturn = ( us == 1006 || us == 1017 || us == 1007 || us == 1011 || us == 1019 || us == 1023 || us == 1001 || us == 1008 || us == 1009 || us == 1010 || us == 1003 || us == 1002 || us == 1142 || us == 1143 || us == 1020 );
+        break;
+        case 500: 
+            bReturn = ( us == 1020 || us == 1021 || us == 1019 || us == 1013 || us == 1024 || us == 1008 || us == 1009 || us == 1010 );
+        break;
+        case 506: 
+            bReturn = ( us == 1009 );
+        break;
+        case 507: 
+            bReturn = ( us == 1008 || us == 1009 || us == 1010 );
+        break;
+        case 516: 
+            bReturn = ( us == 1004 || us == 1020 || us == 1021 || us == 1019 || us == 1018 || us == 1008 || us == 1009 || us == 1010 || us == 1002 || us == 1015 || us == 1016 || us == 1000 || us == 1017 || us == 1007 );
+        break;
+        case 517: 
+            bReturn = ( us == 1142 || us == 1143 || us == 1144 || us == 1145 || us == 1020 || us == 1019 || us == 1018 || us == 1008 || us == 1009 || us == 1010 || us == 1002 || us == 1023 || us == 1016 || us == 1003 || us == 1017 || us == 1007 );
+        break;
+        case 518: 
+            bReturn = ( us == 1005 || us == 1142 || us == 1143 || us == 1144 || us == 1145 || us == 1020 || us == 1018 || us == 1013 || us == 1008 || us == 1009 || us == 1010 || us == 1006 || us == 1001 || us == 1023 || us == 1003 || us == 1017 || us == 1007 );
+        break;
+        case 526: 
+            bReturn = ( us == 1008 || us == 1009 || us == 1010 );
+        break;
+        case 527: 
+            bReturn = ( us == 1021 || us == 1020 || us == 1018 || us == 1008 || us == 1009 || us == 1010 || us == 1001 || us == 1014 || us == 1015 || us == 1017 || us == 1007 );
+        break;
+        case 529: 
+            bReturn = ( us == 1012 || us == 1011 || us == 1020 || us == 1019 || us == 1018 || us == 1008 || us == 1009 || us == 1010 || us == 1006 || us == 1001 || us == 1023 || us == 1003 || us == 1017 || us == 1007 );
+        break;
+        case 533: 
+            bReturn = ( us == 1008 || us == 1009 || us == 1010 );
+        break;
+        case 534: 
+            bReturn = ( us == 1126 || us == 1127 || us == 1179 || us == 1185 || us == 1100 || us == 1123 || us == 1125 || us == 1008 || us == 1009 || us == 1010 || us == 1180 || us == 1178 || us == 1101 || us == 1122 || us == 1124 || us == 1106 );
+        break;
+        case 535: 
+            bReturn = ( us == 1109 || us == 1110 || us == 1113 || us == 1114 || us == 1115 || us == 1116 || us == 1117 || us == 1008 || us == 1009 || us == 1010 || us == 1120 || us == 1118 || us == 1121 || us == 1119 );
+        break;
+        case 536: 
+            bReturn = ( us == 1104 || us == 1105 || us == 1182 || us == 1181 || us == 1008 || us == 1009 || us == 1010 || us == 1184 || us == 1183 || us == 1128 || us == 1103 || us == 1107 || us == 1108 );
+        break;
+        case 540: 
+            bReturn = ( us == 1004 || us == 1142 || us == 1143 || us == 1144 || us == 1145 || us == 1020 || us == 1019 || us == 1018 || us == 1024 || us == 1008 || us == 1009 || us == 1010 || us == 1006 || us == 1001 || us == 1023 || us == 1017 || us == 1007 );
+        break;
+        case 541: 
+            bReturn = ( us == 1008 || us == 1009 || us == 1010 );
+        break;
+        case 542: 
+            bReturn = ( us == 1144 || us == 1145 || us == 1020 || us == 1021 || us == 1019 || us == 1018 || us == 1008 || us == 1009 || us == 1010 || us == 1014 || us == 1015 );
+        break;
+        case 545: 
+            bReturn = ( us == 1008 || us == 1009 || us == 1010 );
+        break;
+        case 546: 
+            bReturn = ( us == 1004 || us == 1142 || us == 1143 || us == 1144 || us == 1145 || us == 1019 || us == 1018 || us == 1024 || us == 1008 || us == 1009 || us == 1010 || us == 1006 || us == 1002 || us == 1001 || us == 1023 || us == 1017 || us == 1007 );
+        break;
+        case 547: 
+            bReturn = ( us == 1142 || us == 1143 || us == 1020 || us == 1021 || us == 1019 || us == 1018 || us == 1008 || us == 1009 || us == 1010 || us == 1016 || us == 1003 || us == 1000 );
+        break;
+        case 549: 
+            bReturn = ( us == 1012 || us == 1011 || us == 1142 || us == 1143 || us == 1144 || us == 1145 || us == 1020 || us == 1019 || us == 1018 || us == 1008 || us == 1009 || us == 1010 || us == 1001 || us == 1023 || us == 1003 || us == 1017 || us == 1007 );
+        break;
+        case 550: 
+            bReturn = ( us == 1005 || us == 1004 || us == 1142 || us == 1143 || us == 1144 || us == 1145 || us == 1020 || us == 1019 || us == 1018 || us == 1008 || us == 1009 || us == 1010 || us == 1006 || us == 1001 || us == 1023 || us == 1003 );
+        break;
+        case 551: 
+            bReturn = ( us == 1005 || us == 1020 || us == 1021 || us == 1019 || us == 1018 || us == 1008 || us == 1009 || us == 1010 || us == 1006 || us == 1002 || us == 1023 || us == 1016 || us == 1003 );
+        break;
+        case 555: 
+            bReturn = ( us == 1008 || us == 1009 || us == 1010 );
+        break;
+        case 558: 
+            bReturn = ( us == 1092 || us == 1089 || us == 1166 || us == 1165 || us == 1008 || us == 1009 || us == 1010 || us == 1168 || us == 1167 || us == 1088 || us == 1091 || us == 1164 || us == 1163 || us == 1094 || us == 1090 || us == 1095 || us == 1093 );
+        break;
+        case 559: 
+            bReturn = ( us == 1065 || us == 1066 || us == 1160 || us == 1173 || us == 1008 || us == 1009 || us == 1010 || us == 1159 || us == 1161 || us == 1162 || us == 1158 || us == 1067 || us == 1068 || us == 1071 || us == 1069 || us == 1072 || us == 1070 || us == 1009 );
+        break;
+        case 560: 
+            bReturn = ( us == 1028 || us == 1029 || us == 1169 || us == 1170 || us == 1008 || us == 1009 || us == 1010 || us == 1141 || us == 1140 || us == 1032 || us == 1033 || us == 1138 || us == 1139 || us == 1027 || us == 1026 || us == 1030 || us == 1031 );
+        break;
+        case 561: 
+            bReturn = ( us == 1064 || us == 1059 || us == 1155 || us == 1157 || us == 1008 || us == 1009 || us == 1010 || us == 1154 || us == 1156 || us == 1055 || us == 1061 || us == 1058 || us == 1060 || us == 1062 || us == 1056 || us == 1063 || us == 1057 );
+        break;
+        case 562: 
+            bReturn = ( us == 1034 || us == 1037 || us == 1171 || us == 1172 || us == 1008 || us == 1009 || us == 1010 || us == 1149 || us == 1148 || us == 1038 || us == 1035 || us == 1147 || us == 1146 || us == 1040 || us == 1036 || us == 1041 || us == 1039 );
+        break;
+        case 565: 
+            bReturn = ( us == 1046 || us == 1045 || us == 1153 || us == 1152 || us == 1008 || us == 1009 || us == 1010 || us == 1150 || us == 1151 || us == 1054 || us == 1053 || us == 1049 || us == 1050 || us == 1051 || us == 1047 || us == 1052 || us == 1048 );
+        break;
+        case 566: 
+            bReturn = ( us == 1008 || us == 1009 || us == 1010 );
+        break;
+        case 567: 
+            bReturn = ( us == 1129 || us == 1132 || us == 1189 || us == 1188 || us == 1008 || us == 1009 || us == 1010 || us == 1187 || us == 1186 || us == 1130 || us == 1131 || us == 1102 || us == 1133 );
+        break;
+        case 575: 
+            bReturn = ( us == 1044 || us == 1043 || us == 1174 || us == 1175 || us == 1008 || us == 1009 || us == 1010 || us == 1176 || us == 1177 || us == 1099 || us == 1042 );
+        break;
+        case 576: 
+            bReturn = ( us == 1136 || us == 1135 || us == 1191 || us == 1190 || us == 1008 || us == 1009 || us == 1010 || us == 1192 || us == 1193 || us == 1137 || us == 1134 );
+        break;
+        case 579: 
+            bReturn = ( us == 1008 || us == 1009 || us == 1010 );
+        break;
+        case 580: 
+            bReturn = ( us == 1020 || us == 1018 || us == 1008 || us == 1009 || us == 1010 || us == 1006 || us == 1001 || us == 1023 || us == 1017 || us == 1007 );
+        break;
+        case 585: 
+            bReturn = ( us == 1142 || us == 1143 || us == 1144 || us == 1145 || us == 1020 || us == 1019 || us == 1018 || us == 1013 || us == 1008 || us == 1009 || us == 1010 || us == 1006 || us == 1001 || us == 1023 || us == 1003 || us == 1017 || us == 1007 );
+        break;
+        case 587: 
+            bReturn = ( us == 1008 || us == 1009 || us == 1010 );
+        break;
+        case 589: 
+            bReturn = ( us == 1005 || us == 1004 || us == 1144 || us == 1145 || us == 1020 || us == 1018 || us == 1008 || us == 1009 || us == 1010 || us == 1024 || us == 1013 || us == 1006 || us == 1016 || us == 1000 || us == 1017 || us == 1007 );
+        break;
+        case 600: 
+            bReturn = ( us == 1005 || us == 1004 || us == 1020 || us == 1022 || us == 1018 || us == 1013 || us == 1008 || us == 1009 || us == 1010 || us == 1006 || us == 1017 || us == 1007 );
+        break;
+        case 602: 
+            bReturn = ( us == 1008 || us == 1009 || us == 1010 );
+        break;
+        case 603: 
+            bReturn = ( us == 1144 || us == 1145 || us == 1142 || us == 1143 || us == 1020 || us == 1019 || us == 1018 || us == 1024 || us == 1008 || us == 1009 || us == 1010 || us == 1006 || us == 1001 || us == 1023 || us == 1017 || us == 1007 );
+        break;
     }
-    return false;
-}
+    if ( bReturn )
+    {
+        unsigned char ucSlot = 0;
+        if ( GetSlotFromUpgrade ( us, ucSlot ) )
+        {
+            if ( ucSlot == 0 ) // Bonnet
+            {
+                bReturn = m_pVehicle->DoesSupportUpgrade ( "ug_bonnet" );
+            }
+            else if ( ucSlot == 2 ) // Spoiler
+            {
+                bReturn = m_pVehicle->DoesSupportUpgrade ( "ug_spoiler" );
+            }
+            else if ( ucSlot == 3 ) // Side Skirt
+            {
+                bReturn = m_pVehicle->DoesSupportUpgrade ( "ug_wing_right" );
+                bReturn &= m_pVehicle->DoesSupportUpgrade ( "ug_wing_left" );
+            }
+            else if ( ucSlot == 4 ) // Front bullbars
+            {
+                bReturn = m_pVehicle->DoesSupportUpgrade ( "ug_frontbullbar" );
+            }
+            else if ( ucSlot == 5 ) // rear bullbars
+            {
+                bReturn = m_pVehicle->DoesSupportUpgrade ( "ug_backbullbar" );
+            }
+            else if ( ucSlot == 7 ) // Roof
+            {
+                bReturn = m_pVehicle->DoesSupportUpgrade ( "ug_roof" );
+            }
+            else if ( ucSlot == 13 ) // Exhaust
+            {
+                bReturn = m_pVehicle->DoesSupportUpgrade ( "exhaust_ok" );
+            }
+            else if ( ucSlot == 14 ) // Front bumper
+            {
+                bReturn = m_pVehicle->DoesSupportUpgrade ( "bump_front_dummy" );
+            }
+            else if ( ucSlot == 15 ) // Rear bumper
+            {
+                bReturn = m_pVehicle->DoesSupportUpgrade ( "bump_rear_dummy" );
+            }
+        }
 
+    }
+    return bReturn;
+}
 
 bool CVehicleUpgrades::GetSlotFromUpgrade ( unsigned short us, unsigned char& ucSlot )
 {
-    // TODO: 1013, 1024, 1109, 1110
-    if ( us == 1000 || us == 1001 || us == 1002 || us == 1003 || us == 1014 || /* spoiler */
-         us == 1015 || us == 1016 || us == 1023 || us == 1049 || us == 1050 ||
-         us == 1058 || us == 1060 || us == 1138 || us == 1139 || us == 1146 ||
-         us == 1147 || us == 1158 || us == 1162 || us == 1163 || us == 1164 )
+    if ( us == 1011 || us == 1012 || us == 1111 || us == 1112 || us == 1142 || /* bonet */
+         us == 1143 || us == 1144 || us == 1145 )
     {
-        ucSlot = 2;
+        ucSlot = 0;
         return true;
     }
     if ( us == 1004 || us == 1005 ) // vent
@@ -176,12 +372,12 @@ bool CVehicleUpgrades::GetSlotFromUpgrade ( unsigned short us, unsigned char& uc
         ucSlot = 1;
         return true;
     }
-    if ( us == 1006 || us == 1032 || us == 1033 || us == 1035 || us == 1038 || /* roof */
-         us == 1053 || us == 1054 || us == 1055 || us == 1061 || us == 1067 ||
-         us == 1068 || us == 1088 || us == 1091 || us == 1103 || us == 1128 ||
-         us == 1130 || us == 1131 )
+    if ( us == 1000 || us == 1001 || us == 1002 || us == 1003 || us == 1014 || /* spoiler */
+         us == 1015 || us == 1016 || us == 1023 || us == 1049 || us == 1050 ||
+         us == 1058 || us == 1060 || us == 1138 || us == 1139 || us == 1146 ||
+         us == 1147 || us == 1158 || us == 1162 || us == 1163 || us == 1164 )
     {
-        ucSlot = 7;
+        ucSlot = 2;
         return true;
     }
     if ( us == 1007 || us == 1017 || us == 1026 || us == 1027 || us == 1030 || /* sideskirt */
@@ -197,25 +393,42 @@ bool CVehicleUpgrades::GetSlotFromUpgrade ( unsigned short us, unsigned char& uc
         ucSlot = 3;
         return true;
     }
+    if ( us == 1115 || us == 1116 ) // front bullbars
+    {
+        ucSlot = 4;
+        return true;
+    }
+    if ( us == 1109 || us == 1110 ) // rear bullbars
+    {
+        ucSlot = 5;
+        return true;
+    }
+    if ( us == 1013 || us == 1024 ) // lamps
+    {
+        ucSlot = 6;
+        return true;
+    }
+    if ( us == 1006 || us == 1032 || us == 1033 || us == 1035 || us == 1038 || /* roof */
+         us == 1053 || us == 1054 || us == 1055 || us == 1061 || us == 1067 ||
+         us == 1068 || us == 1088 || us == 1091 || us == 1103 || us == 1128 ||
+         us == 1130 || us == 1131 )
+    {
+        ucSlot = 7;
+        return true;
+    }
     if ( us == 1008 || us == 1009 || us == 1010 ) // nitro
     {
         ucSlot = 8;
         return true;
     }
-    if ( us == 1011 || us == 1012 || us == 1111 || us == 1112 || us == 1142 || /* bonet */
-         us == 1143 || us == 1144 || us == 1145 )
+    if ( us == 1087 ) // hydraulics
     {
-        ucSlot = 0;
+        ucSlot = 9;
         return true;
     }
-    if ( us == 1018 || us == 1019 || us == 1020 || us == 1021 || us == 1022 || /* exhaust */
-         us == 1028 || us == 1029 || us == 1034 || us == 1037 || us == 1043 ||
-         us == 1044 || us == 1045 || us == 1046 || us == 1059 || us == 1064 ||
-         us == 1065 || us == 1066 || us == 1089 || us == 1092 || us == 1104 ||
-         us == 1105 || us == 1113 || us == 1114 || us == 1126 || us == 1127 ||
-         us == 1129 || us == 1132 || us == 1135 || us == 1136 )
+    if ( us == 1086 ) // stereo
     {
-        ucSlot = 13;
+        ucSlot = 10;
         return true;
     }
     if ( us == 1025 || us == 1073 || us == 1074 || us == 1075 || us == 1076 || /* wheels */
@@ -226,24 +439,14 @@ bool CVehicleUpgrades::GetSlotFromUpgrade ( unsigned short us, unsigned char& uc
         ucSlot = 12;
         return true;
     }
-    if ( us == 1086 ) // stereo
+    if ( us == 1018 || us == 1019 || us == 1020 || us == 1021 || us == 1022 || /* exhaust */
+         us == 1028 || us == 1029 || us == 1034 || us == 1037 || us == 1043 ||
+         us == 1044 || us == 1045 || us == 1046 || us == 1059 || us == 1064 ||
+         us == 1065 || us == 1066 || us == 1089 || us == 1092 || us == 1104 ||
+         us == 1105 || us == 1113 || us == 1114 || us == 1126 || us == 1127 ||
+         us == 1129 || us == 1132 || us == 1135 || us == 1136 )
     {
-        ucSlot = 10;
-        return true;
-    }
-    if ( us == 1087 ) // hydraulics
-    {
-        ucSlot = 9;
-        return true;
-    }
-    if ( us == 1100 || us == 1123 || us == 1125 ) // misc
-    {
-        ucSlot = 16;
-        return true;
-    }
-    if ( us == 1115 || us == 1116 ) // front bullbars
-    {
-        ucSlot = 4;
+        ucSlot = 13;
         return true;
     }
     if ( us == 1117 || us == 1152 || us == 1153 || us == 1155 || us == 1157 || /* front bumper */
@@ -262,6 +465,11 @@ bool CVehicleUpgrades::GetSlotFromUpgrade ( unsigned short us, unsigned char& uc
          us == 1192 || us == 1193 )
     {
         ucSlot = 15;
+        return true;
+    }
+    if ( us == 1100 || us == 1123 || us == 1125 ) // misc
+    {
+        ucSlot = 16;
         return true;
     }
 
@@ -414,10 +622,15 @@ void CVehicleUpgrades::ReAddAll ( void )
     {
         if ( m_SlotStates [ ucSlot ] )
         {
-            #ifdef MTA_DEBUG
-                assert ( IsUpgradeCompatible ( m_SlotStates [ ucSlot ] ) );
-            #endif
-            ForceAddUpgrade ( m_SlotStates [ ucSlot ] );
+            if ( IsUpgradeCompatible ( m_SlotStates [ ucSlot ] ) )
+            {
+                ForceAddUpgrade ( m_SlotStates [ ucSlot ] );
+            }
+            else
+            {
+                // Not compatible with the mod they are using so just ignore it
+                m_SlotStates [ ucSlot ] = 0;
+            }
         }
     }
 }

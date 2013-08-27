@@ -2574,9 +2574,9 @@ void CClientVehicle::Create ( void )
         if ( m_ComponentData.empty ( ) )
         {
             // grab our map of components
-            std::map < SString, RwFrame * > componentMap = m_pVehicle->GetComponentMap ( );
+            std::map < SString, SVehicleFrame > componentMap = m_pVehicle->GetComponentMap ( );
             // get our beginning
-            std::map < SString, RwFrame * >::iterator iter = componentMap.begin ( );
+            std::map < SString, SVehicleFrame >::iterator iter = componentMap.begin ( );
             // loop through all the components.... we don't care about the RwFrame we just want the names.
             for ( ; iter != componentMap.end () ; iter++ )
             {
@@ -4368,4 +4368,13 @@ bool CClientVehicle::GetComponentVisible ( SString vehicleComponent, bool &bVisi
         }
     }
     return false;
+}
+
+bool CClientVehicle::DoesSupportUpgrade ( SString strFrameName )
+{
+    if ( m_pVehicle != NULL )
+    {
+        return m_pVehicle->DoesSupportUpgrade ( strFrameName );
+    }
+    return true;
 }
