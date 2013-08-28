@@ -94,19 +94,19 @@ bool CAudioContainerSA::GetRawAudioData ( eAudioLookupIndex lookupIndex, int ban
         return false;
 
     // Get archive file size
-    std::ifstream archive ( GetAudioArchiveName ( lookupIndex ), std::ios::binary | std::ios::ate ); // ate = seek to end of file
-    int archiveSize = archive.tellg (); // get file pointer position
+    std::ifstream archive ( GetAudioArchiveName ( lookupIndex ), std::ios::binary );
 
     SAudioLookupEntrySA* lookupEntry = m_pLookupTable->GetEntry ( lookupIndex, bankIndex );
     if ( !lookupEntry )
         return false;
 
-    // Read audio archieve bank header (an audio archieve has multiple bank headers)
+    // Read audio archive bank header (an audio archieve has multiple bank headers)
     SAudioBankHeaderSA bankHeader;
 
     // Seek to the bank offset and read the header
     archive.seekg ( lookupEntry->offset );
-    archive.read ( reinterpret_cast<char*> ( &bankHeader ), sizeof ( SAudioBankHeaderSA ) );
+    if ( !archive.read ( reinterpret_cast<char*> ( &bankHeader ), sizeof ( SAudioBankHeaderSA ) ) )
+        return false;
 
     // Get offsets to calculate the length
     SAudioEntrySA* audioEntry = &bankHeader.sounds[audioIndex];
@@ -157,4 +157,45 @@ const SString CAudioContainerSA::GetAudioArchiveName ( eAudioLookupIndex lookupI
         case AUDIO_LOOKUP_SPC_PA: archiveName += "SPC_PA"; break;
     }
     return archiveName;
+}
+
+bool CAudioContainerSA::ValidateContainer ( eAudioLookupIndex lookupIndex )
+{
+#ifdef MTA_DEBUG
+    return true;
+#endif
+
+    // Open archive and place file pointer at the end
+    std::ifstream archive ( GetAudioArchiveName ( lookupIndex ), std::ios::binary );
+
+    // Check if it does not exist
+    if ( !archive )
+        return false;
+
+    // Get the archive size divided by 10 and seek to the beginning
+    archive.seekg ( 0, std::ios::end );
+    std::streampos stepSize = archive.tellg () / 10;
+    archive.seekg ( 0 );
+
+    // Count the zeros -> if more than 80% we assume that it has been cut (read 4KB blocks at once)
+    uint8 buffer[VALIDATE_BUFFER_SIZE];
+    unsigned long long numZeros = 0;
+    while ( archive.read ( reinterpret_cast<char*>(buffer), VALIDATE_BUFFER_SIZE ) )
+    {
+        for ( unsigned int i = 0; i < VALIDATE_BUFFER_SIZE; i++ )
+        {
+            if ( buffer[i] == 0 )
+                numZeros++;
+        }
+
+        archive.seekg ( stepSize, std::ios::cur );
+    }
+
+    // Close the archive
+    archive.close ();
+
+    if ( static_cast < float > ( numZeros ) / (10*VALIDATE_BUFFER_SIZE) >= 0.8f )
+        return false;
+
+    return true;
 }

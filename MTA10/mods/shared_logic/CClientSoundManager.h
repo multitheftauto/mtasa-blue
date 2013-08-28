@@ -39,6 +39,8 @@ public:
     CClientSound*           PlayGTASFX                  ( eAudioLookupIndex containerIndex, int iBankIndex, int iAudioIndex, bool bLoop = false );
     CClientSound*           PlayGTASFX3D                ( eAudioLookupIndex containerIndex, int iBankIndex, int iAudioIndex, const CVector& vecPosition, bool bLoop = false );
 
+    bool                    GetSFXStatus                ( eAudioLookupIndex containerIndex );
+
     void                    AddToList                   ( CClientSound* pSound );
     void                    RemoveFromList              ( CClientSound* pSound );
 
@@ -69,6 +71,8 @@ private:
     SString                         m_strUserAgent;
 
     bool                            m_bMinimizeMuted;
+
+    bool                            m_aValidatedSFX[9];
 };
 
 #endif

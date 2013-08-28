@@ -18,6 +18,8 @@
 #include "CAudioContainerLookupTableSA.h"
 #include <fstream>
 
+#define VALIDATE_BUFFER_SIZE 4096
+
 class CAudioContainerSA : public CAudioContainer
 {
 public:
@@ -25,6 +27,7 @@ public:
     ~CAudioContainerSA(void);
     
     bool GetAudioData ( eAudioLookupIndex lookupIndex, int bankIndex, int audioIndex, void*& pMemory, unsigned int& length );
+    bool ValidateContainer ( eAudioLookupIndex lookupIndex );
 
 private:
     CAudioContainerLookupTableSA* m_pLookupTable;

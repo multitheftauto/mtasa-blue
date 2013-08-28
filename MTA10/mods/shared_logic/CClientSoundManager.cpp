@@ -55,6 +55,12 @@ CClientSoundManager::CClientSoundManager ( CClientManager* pClientManager )
     m_FxEffectNames["i3dl2reverb"] =    BASS_FX_DX8_I3DL2REVERB;
     m_FxEffectNames["parameq"] =        BASS_FX_DX8_PARAMEQ;
     m_FxEffectNames["reverb"] =         BASS_FX_DX8_REVERB;
+
+    // Validate audio container on startup
+    for ( int i = 0; i < 9; i++ )
+    {
+        m_aValidatedSFX[i] = g_pGame->GetAudioContainer ()->ValidateContainer ( static_cast < eAudioLookupIndex > ( i ) );
+    }
 }
 
 CClientSoundManager::~CClientSoundManager ( void )
@@ -211,6 +217,11 @@ CClientSound* CClientSoundManager::PlayGTASFX3D ( eAudioLookupIndex containerInd
         pSound->SetVolume ( gameSettings->GetSFXVolume () / 255.0f );
     }
     return pSound;
+}
+
+bool CClientSoundManager::GetSFXStatus ( eAudioLookupIndex containerIndex )
+{
+    return m_aValidatedSFX[static_cast<int>(containerIndex)];
 }
 
 int CClientSoundManager::GetFxEffectFromName ( const std::string& strEffectName )
