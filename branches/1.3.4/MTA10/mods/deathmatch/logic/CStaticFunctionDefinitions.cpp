@@ -3250,6 +3250,17 @@ bool CStaticFunctionDefinitions::SetVehiclePlateText ( CClientEntity& Entity, co
 }
 
 
+bool CStaticFunctionDefinitions::SetHeliBladeCollisionsEnabled ( CClientVehicle& Vehicle, bool bEnabled )
+{
+    Vehicle.SetHeliBladeCollisionsEnabled ( bEnabled );
+    return true;
+}
+
+bool CStaticFunctionDefinitions::GetHeliBladeCollisionsEnabled ( CClientVehicle& Vehicle )
+{
+    return Vehicle.AreHeliBladeCollisionsEnabled ( );
+}
+
 bool CStaticFunctionDefinitions::SetElementCollisionsEnabled ( CClientEntity& Entity, bool bEnabled )
 {
     switch ( Entity.GetType () )
