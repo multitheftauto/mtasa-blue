@@ -3983,6 +3983,13 @@ bool CStaticFunctionDefinitions::PlaySFX3D ( CResource* pResource, eAudioLookupI
 }
 
 
+bool CStaticFunctionDefinitions::GetSFXStatus ( eAudioLookupIndex containerIndex, bool& bOutNotCut )
+{
+    bOutNotCut = m_pSoundManager->GetSFXStatus ( containerIndex );
+    return true;
+}
+
+
 CClientRadarMarker* CStaticFunctionDefinitions::CreateBlip ( CResource& Resource, const CVector& vecPosition, unsigned char ucIcon, unsigned char ucSize, const SColor color, short sOrdering, unsigned short usVisibleDistance )
 {
     CClientRadarMarker* pBlip = new CClientRadarMarker ( m_pManager, INVALID_ELEMENT_ID, sOrdering, usVisibleDistance );

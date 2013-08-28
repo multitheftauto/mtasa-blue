@@ -437,6 +437,7 @@ public:
     LUA_DECLARE ( ResetWorldSounds );
     LUA_DECLARE ( PlaySFX );
     LUA_DECLARE ( PlaySFX3D );
+    LUA_DECLARE ( GetSFXStatus );
 
     // Blip funcs
     LUA_DECLARE ( CreateBlip );

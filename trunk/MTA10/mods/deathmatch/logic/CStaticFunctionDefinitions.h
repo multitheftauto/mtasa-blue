@@ -308,6 +308,7 @@ public:
     static bool                         ResetWorldSounds                    ( void );
     static bool                         PlaySFX                             ( CResource* pResource, eAudioLookupIndex containerIndex, int iBankIndex, int iAudioIndex, bool bLoop, CClientSound*& outSound );
     static bool                         PlaySFX3D                           ( CResource* pResource, eAudioLookupIndex containerIndex, int iBankIndex, int iAudioIndex, const CVector& vecPosition, bool bLoop, CClientSound*& outSound );
+    static bool                         GetSFXStatus                        ( eAudioLookupIndex containerIndex, bool& bOutNotCut );
     
     // Blip funcs
     static CClientRadarMarker*          CreateBlip                          ( CResource& Resource, const CVector& vecPosition, unsigned char ucIcon, unsigned char ucSize, const SColor color, short sOrdering, unsigned short usVisibleDistance );

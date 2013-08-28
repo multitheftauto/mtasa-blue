@@ -1465,6 +1465,31 @@ int CLuaFunctionDefs::PlaySFX3D ( lua_State* luaVM )
 }
 
 
+int CLuaFunctionDefs::GetSFXStatus ( lua_State* luaVM )
+{
+//  bool getSFXStatus ( string audioContainer )
+    eAudioLookupIndex containerIndex;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadEnumString ( containerIndex );
+
+    if ( !argStream.HasErrors () )
+    {
+        bool bNotCut;
+        if ( CStaticFunctionDefinitions::GetSFXStatus ( containerIndex, bNotCut ) )
+        {
+            lua_pushboolean ( luaVM, bNotCut );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    lua_pushnil ( luaVM );
+    return 1;
+}
+        
+
 int CLuaFunctionDefs::SetSoundPan ( lua_State* luaVM )
 {
 //  setSoundPan ( element theSound, float pan )
