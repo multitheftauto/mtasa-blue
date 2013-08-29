@@ -487,6 +487,7 @@ void CLuaMain::UnloadScript ( void )
     if ( m_luaVM )
     {
         m_pLuaManager->OnLuaMainCloseVM( this, m_luaVM );
+        CLuaFunctionRef::RemoveLuaFunctionRefsForVM( m_luaVM );
         lua_close( m_luaVM );
         m_luaVM = NULL;
     }
