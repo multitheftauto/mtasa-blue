@@ -214,6 +214,12 @@ LUA_API void lua_close (lua_State *L) {
 
 // MTA specific
 LUA_API lua_State* lua_getmainstate (lua_State *L) {
-  return G(L)->mainthread;
+    if ( L )
+    {
+        lua_State* Result = G(L)->mainthread;
+        if ( Result )
+            L = Result;
+    }
+    return L;
 }
 

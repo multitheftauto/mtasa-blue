@@ -13,6 +13,8 @@
 #include "StdInc.h"
 #pragma warning( disable : 4355 )   // warning C4355: 'this' : used in base member initializer list
 
+CIntrusiveList < CLuaFunctionRef > CLuaFunctionRef::ms_AllRefList ( &CLuaFunctionRef::m_ListNode );
+
 // Custom Lua stack argument->reference function
 CLuaFunctionRef luaM_toref ( lua_State *luaVM, int iArgument )
 {
@@ -88,30 +90,38 @@ void luaM_dec_use ( lua_State *luaVM, int iFunction, const void* pFuncPtr )
 //
 
 CLuaFunctionRef::CLuaFunctionRef ( void )
+    : m_ListNode( this )
 {
     m_luaVM = NULL;
     m_iFunction = LUA_REFNIL;
     m_pFuncPtr = NULL;
+    ms_AllRefList.push_back( this );
 }
 
 CLuaFunctionRef::CLuaFunctionRef ( lua_State *luaVM, int iFunction, const void* pFuncPtr )
+    : m_ListNode( this )
 {
-    m_luaVM = lua_getmainstate ( luaVM );
+    m_luaVM = luaVM;
     m_iFunction = iFunction;
     m_pFuncPtr = pFuncPtr;
+    ms_AllRefList.push_back( this );
 }
 
 CLuaFunctionRef::CLuaFunctionRef ( const CLuaFunctionRef& other )
+    : m_ListNode( this )
 {
     m_luaVM = other.m_luaVM;
     m_iFunction = other.m_iFunction;
     m_pFuncPtr = other.m_pFuncPtr;
+    ms_AllRefList.push_back( this );
     luaM_inc_use ( m_luaVM, m_iFunction, m_pFuncPtr );
 }
 
 CLuaFunctionRef::~CLuaFunctionRef ( void )
 {
     luaM_dec_use ( m_luaVM, m_iFunction, m_pFuncPtr );
+    dassert( ms_AllRefList.contains( this ) );
+    ms_AllRefList.remove( this );
 }
 
 CLuaFunctionRef& CLuaFunctionRef::operator=( const CLuaFunctionRef& other )
@@ -139,4 +149,28 @@ bool CLuaFunctionRef::operator==( const CLuaFunctionRef& other ) const
 bool CLuaFunctionRef::operator!=( const CLuaFunctionRef& other ) const
 {
     return !operator==( other );
+}
+
+// Make sure function refs can't be used after a VM has closed
+void CLuaFunctionRef::RemoveLuaFunctionRefsForVM( lua_State *luaVM )
+{
+    luaVM = lua_getmainstate ( luaVM );
+
+    if ( !luaVM )
+        return;
+
+    uint uiCount = 0;
+    for ( CIntrusiveList < CLuaFunctionRef >::iterator iter = ms_AllRefList.begin() ; iter != ms_AllRefList.end() ; ++iter )
+    {
+        CLuaFunctionRef* ref = *iter;
+        // Compare the main state values to see if its the same VM
+        if ( lua_getmainstate ( ref->m_luaVM ) == luaVM )
+        {
+            uiCount++;
+            luaM_dec_use ( ref->m_luaVM, ref->m_iFunction, ref->m_pFuncPtr );
+            ref->m_luaVM = NULL;
+        }
+    }
+    if ( uiCount )
+        OutputDebugLine( SString( "Client RemoveLuaFunctionRefsForVM: zeroed:%d  total:%d", uiCount, ms_AllRefList.size() ) );
 }
