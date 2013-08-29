@@ -143,6 +143,8 @@ namespace
                                          { "bitReplace",                    "1.3.2" },
                                          { "dxSetAspectRatioAdjustmentEnabled", "1.3.3-9.05546" },
                                          { "dxIsAspectRatioAdjustmentEnabled",  "1.3.3-9.05546" },
+                                         { "getHeliBladeCollisionsEnabled",  "1.3.4-9.05764" },
+                                         { "setHeliBladeCollisionsEnabled",  "1.3.4-9.05764" },
                                         };
 
     SVersionItem serverFunctionInitList[] = {
