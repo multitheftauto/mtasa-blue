@@ -60,7 +60,6 @@ CLuaMain * CLuaManager::CreateVirtualMachine ( CResource* pResourceOwner, bool b
     return pLuaMain;
 }
 
-
 bool CLuaManager::RemoveVirtualMachine ( CLuaMain * pLuaMain )
 {
     if ( pLuaMain )
@@ -102,6 +101,7 @@ void CLuaManager::ProcessPendingDeleteList ( void )
     {
         lua_State* luaVM = m_PendingDeleteList.front ();
         m_PendingDeleteList.pop_front ();
+        CLuaFunctionRef::RemoveLuaFunctionRefsForVM( luaVM );
         lua_close( luaVM );
     }
 }

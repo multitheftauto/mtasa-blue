@@ -270,7 +270,7 @@ bool CLuaArguments::Call ( CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFuncti
             lua_pop ( luaVM, 1 );
     }
 
-    CPerfStatLuaTiming::GetSingleton ()->UpdateLuaTiming ( pLuaMain, pLuaMain->GetFunctionTag ( iLuaFunction.m_iFunction ), GetTimeUs() - startTime );
+    CPerfStatLuaTiming::GetSingleton ()->UpdateLuaTiming ( pLuaMain, pLuaMain->GetFunctionTag ( iLuaFunction.ToInt() ), GetTimeUs() - startTime );
     return true;
 }
 
