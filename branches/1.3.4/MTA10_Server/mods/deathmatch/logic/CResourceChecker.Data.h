@@ -156,6 +156,8 @@ namespace
                                          { "getEventHandlers",              "1.3.4" },
                                          { "playSFX",                       "1.3.4" },
                                          { "playSFX3D",                     "1.3.4" },
+                                         { "getHeliBladeCollisionsEnabled",  "1.3.4-9.05764" },
+                                         { "setHeliBladeCollisionsEnabled",  "1.3.4-9.05764" },
                                         };
 
     SVersionItem serverFunctionInitList[] = {
