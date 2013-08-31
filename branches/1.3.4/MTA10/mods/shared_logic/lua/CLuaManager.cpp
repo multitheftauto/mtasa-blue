@@ -655,6 +655,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "resetWorldSounds", CLuaFunctionDefs::ResetWorldSounds );
     CLuaCFunctions::AddFunction ( "playSFX", CLuaFunctionDefs::PlaySFX );
     CLuaCFunctions::AddFunction ( "playSFX3D", CLuaFunctionDefs::PlaySFX3D );
+    CLuaCFunctions::AddFunction ( "getSFXStatus", CLuaFunctionDefs::GetSFXStatus );
 
     // Blip funcs
     CLuaCFunctions::AddFunction ( "createBlip", CLuaFunctionDefs::CreateBlip );

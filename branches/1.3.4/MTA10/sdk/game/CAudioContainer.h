@@ -22,6 +22,7 @@ class CAudioContainer
 {
 public:
     virtual bool GetAudioData ( eAudioLookupIndex lookupIndex, int bankIndex, int audioIndex, void*& pMemory, unsigned int& length ) = 0;
+    virtual bool ValidateContainer ( eAudioLookupIndex lookupIndex ) = 0;
 
 };
 
