@@ -27,13 +27,11 @@ extern "C"
 #include "json.h"
 #include "CLuaFunctionRef.h"
 
-#if MTA_DEBUG
-    // Tight allocation in debug to find trouble.
-    #define LUA_CHECKSTACK(vm,space) lua_checkstack(vm, (space) )
-#else
-    // Extra room in release to avoid trouble.
-    #define LUA_CHECKSTACK(vm,space) lua_checkstack(vm, ((space)+2)*3 )
-#endif
+inline void LUA_CHECKSTACK( lua_State *L, int size )
+{
+    if ( lua_getstackgap( L ) < size + 1 )
+        lua_checkstack( L, ( size + 2 ) * 3 );
+}
 
 class CAccessControlList;
 class CAccessControlListGroup;
