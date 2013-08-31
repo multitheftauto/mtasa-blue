@@ -19,6 +19,7 @@ EXPORTS
   lua_lessthan
   lua_rawequal
   lua_checkstack
+  lua_getstackgap
   lua_cpcall
   lua_error
   lua_getmetatable

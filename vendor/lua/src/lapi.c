@@ -106,6 +106,16 @@ LUA_API int lua_checkstack (lua_State *L, int size) {
   return res;
 }
 
+// MTA addition - Return stack space
+LUA_API int lua_getstackgap (lua_State *L) {
+  int res, gap1, gap2; 
+  lua_lock(L);
+  gap1 = ( (char *)L->stack_last - (char *)L->top ) / (int)sizeof(TValue);
+  gap2 = L->ci->top - L->top;
+  res = gap1 < gap2 ? gap1 : gap2;
+  lua_unlock(L);
+  return res;
+}
 
 LUA_API void lua_xmove (lua_State *from, lua_State *to, int n) {
   int i;

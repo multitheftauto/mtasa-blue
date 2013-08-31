@@ -928,9 +928,9 @@ void CLuaMain::UnloadScript ( void )
     // End the lua vm
     if ( m_luaVM )
     {
+        CLuaFunctionRef::RemoveLuaFunctionRefsForVM( m_luaVM );
         m_pLuaManager->OnLuaMainCloseVM( this, m_luaVM );
         m_pLuaManager->AddToPendingDeleteList ( m_luaVM );
-        CLuaFunctionRef::RemoveLuaFunctionRefsForVM( m_luaVM );
         m_luaVM = NULL;
     }
 }

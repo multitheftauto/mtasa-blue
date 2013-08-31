@@ -91,7 +91,7 @@ typedef void * (*lua_Alloc) (void *ud, void *ptr, size_t osize, size_t nsize);
 
 
 /* minimum Lua stack available to a C function */
-#define LUA_MINSTACK	20
+#define LUA_MINSTACK	40     // MTA change. Was 20
 
 
 /*
@@ -134,6 +134,7 @@ LUA_API void  (lua_remove) (lua_State *L, int idx);
 LUA_API void  (lua_insert) (lua_State *L, int idx);
 LUA_API void  (lua_replace) (lua_State *L, int idx);
 LUA_API int   (lua_checkstack) (lua_State *L, int sz);
+LUA_API int   (lua_getstackgap) (lua_State *L);         // MTA addition
 
 LUA_API void  (lua_xmove) (lua_State *from, lua_State *to, int n);
 
