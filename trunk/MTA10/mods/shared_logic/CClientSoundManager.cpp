@@ -187,6 +187,9 @@ CClientSound* CClientSoundManager::PlaySound3D ( void* pMemory, unsigned int uiL
 
 CClientSound* CClientSoundManager::PlayGTASFX ( eAudioLookupIndex containerIndex, int iBankIndex, int iAudioIndex, bool bLoop )
 {
+    if ( !GetSFXStatus ( containerIndex ) )
+        return NULL;
+
     void* pAudioData;
     unsigned int uiAudioLength;
 
@@ -204,6 +207,9 @@ CClientSound* CClientSoundManager::PlayGTASFX ( eAudioLookupIndex containerIndex
 
 CClientSound* CClientSoundManager::PlayGTASFX3D ( eAudioLookupIndex containerIndex, int iBankIndex, int iAudioIndex, const CVector& vecPosition, bool bLoop )
 {
+    if ( !GetSFXStatus ( containerIndex ) )
+        return NULL;
+
     void* pAudioData;
     unsigned int uiAudioLength;
 
