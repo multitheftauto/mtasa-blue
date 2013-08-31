@@ -101,7 +101,7 @@ CLuaFunctionRef::CLuaFunctionRef ( void )
 CLuaFunctionRef::CLuaFunctionRef ( lua_State *luaVM, int iFunction, const void* pFuncPtr )
     : m_ListNode( this )
 {
-    m_luaVM = luaVM;
+    m_luaVM = lua_getmainstate ( luaVM );
     m_iFunction = iFunction;
     m_pFuncPtr = pFuncPtr;
     ms_AllRefList.push_back( this );
@@ -164,7 +164,7 @@ void CLuaFunctionRef::RemoveLuaFunctionRefsForVM( lua_State *luaVM )
     {
         CLuaFunctionRef* ref = *iter;
         // Compare the main state values to see if its the same VM
-        if ( lua_getmainstate ( ref->m_luaVM ) == luaVM )
+        if ( ref->m_luaVM == luaVM )
         {
             uiCount++;
             luaM_dec_use ( ref->m_luaVM, ref->m_iFunction, ref->m_pFuncPtr );
