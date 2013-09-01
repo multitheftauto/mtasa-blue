@@ -4017,65 +4017,69 @@ bool CStaticFunctionDefinitions::WarpPedIntoVehicle ( CPed* pPed, CVehicle* pVeh
         {
             if ( pVehicle->GetHealth () > 0.0f )
             {
-                // Toss the previous player out of it if neccessary
                 CPed* pPreviousOccupant = pVehicle->GetOccupant ( uiSeat );
-                if ( pPreviousOccupant )
+                // Make sure no one is entering or he will get stuck in the entry packet handshaking and network trouble
+                if ( pPreviousOccupant->GetVehicleAction ( ) == CPlayer::VEHICLEACTION_NONE )
                 {
-                    // Remove him from the vehicle
-                    RemovePedFromVehicle ( pPreviousOccupant );
+                    // Toss the previous player out of it if neccessary
+                    if ( pPreviousOccupant )
+                    {
+                        // Remove him from the vehicle
+                        RemovePedFromVehicle ( pPreviousOccupant );
+                    }
+
+                    // Jax: ::RemovePedFromVehicle caused a short delay between removing and entering,
+                    // which creates a buggy effect if we're just warping into a different seat
+
+                    // Is he already in a vehicle? Remove him from it
+                    CVehicle* pPreviousVehicle = pPed->GetOccupiedVehicle ();
+                    if ( pPreviousVehicle )
+                    {
+                        // Remove him from the vehicle
+                        pPreviousVehicle->SetOccupant ( NULL, pPed->GetOccupiedVehicleSeat () );
+                    }
+
+                    // Put him in the new vehicle
+                    pPed->SetOccupiedVehicle ( pVehicle, uiSeat );
+                    pPed->SetVehicleAction ( CPlayer::VEHICLEACTION_NONE );
+
+                    // If he's the driver, switch on the engine
+                    if ( uiSeat == 0 )
+                        pVehicle->SetEngineOn( true );
+
+                    // Tell all the players
+                    CBitStream BitStream;
+                    BitStream.pBitStream->Write ( pVehicle->GetID () );
+                    BitStream.pBitStream->Write ( static_cast < unsigned char > ( uiSeat ) );
+                    BitStream.pBitStream->Write ( pPed->GenerateSyncTimeContext () );
+                    m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pPed, WARP_PED_INTO_VEHICLE, *BitStream.pBitStream ) );
+
+                    // Call the player->vehicle event
+                    CLuaArguments PlayerVehicleArguments;
+                    PlayerVehicleArguments.PushElement ( pVehicle );        // vehicle
+                    PlayerVehicleArguments.PushNumber ( uiSeat );            // seat
+                    if ( pPreviousOccupant )                    // jacked
+                        PlayerVehicleArguments.PushElement ( pPreviousOccupant );
+                    else
+                        PlayerVehicleArguments.PushBoolean ( false );
+                    // Leave onPlayerVehicleEnter for backwards compatibility
+                    pPed->CallEvent ( "onPlayerVehicleEnter", PlayerVehicleArguments );
+
+                    // Call the vehicle->player event
+                    CLuaArguments VehiclePlayerArguments;
+                    VehiclePlayerArguments.PushElement ( pPed );            // player
+                    VehiclePlayerArguments.PushNumber ( uiSeat );           // seat
+                    if ( pPreviousOccupant )                                // jacked
+                        VehiclePlayerArguments.PushElement ( pPreviousOccupant );
+                    else
+                        VehiclePlayerArguments.PushBoolean ( false );
+                    pVehicle->CallEvent ( "onVehicleEnter", VehiclePlayerArguments );
+
+                    // Used to check if f.e. lua changed the player's vehicle (fix for #7570)
+                    pVehicle->m_bOccupantChanged = true;
+
+                    return true;
                 }
-
-                // Jax: ::RemovePedFromVehicle caused a short delay between removing and entering,
-                // which creates a buggy effect if we're just warping into a different seat
-
-                // Is he already in a vehicle? Remove him from it
-                CVehicle* pPreviousVehicle = pPed->GetOccupiedVehicle ();
-                if ( pPreviousVehicle )
-                {
-                    // Remove him from the vehicle
-                    pPreviousVehicle->SetOccupant ( NULL, pPed->GetOccupiedVehicleSeat () );
-                }
-
-                // Put him in the new vehicle
-                pPed->SetOccupiedVehicle ( pVehicle, uiSeat );
-                pPed->SetVehicleAction ( CPlayer::VEHICLEACTION_NONE );
-
-                // If he's the driver, switch on the engine
-                if ( uiSeat == 0 )
-                    pVehicle->SetEngineOn( true );
-
-                // Tell all the players
-                CBitStream BitStream;
-                BitStream.pBitStream->Write ( pVehicle->GetID () );
-                BitStream.pBitStream->Write ( static_cast < unsigned char > ( uiSeat ) );
-                BitStream.pBitStream->Write ( pPed->GenerateSyncTimeContext () );
-                m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pPed, WARP_PED_INTO_VEHICLE, *BitStream.pBitStream ) );
-
-                // Call the player->vehicle event
-                CLuaArguments PlayerVehicleArguments;
-                PlayerVehicleArguments.PushElement ( pVehicle );        // vehicle
-                PlayerVehicleArguments.PushNumber ( uiSeat );            // seat
-                if ( pPreviousOccupant )                    // jacked
-                    PlayerVehicleArguments.PushElement ( pPreviousOccupant );
-                else
-                    PlayerVehicleArguments.PushBoolean ( false );
-                // Leave onPlayerVehicleEnter for backwards compatibility
-                pPed->CallEvent ( "onPlayerVehicleEnter", PlayerVehicleArguments );
-
-                // Call the vehicle->player event
-                CLuaArguments VehiclePlayerArguments;
-                VehiclePlayerArguments.PushElement ( pPed );            // player
-                VehiclePlayerArguments.PushNumber ( uiSeat );           // seat
-                if ( pPreviousOccupant )                                // jacked
-                    VehiclePlayerArguments.PushElement ( pPreviousOccupant );
-                else
-                    VehiclePlayerArguments.PushBoolean ( false );
-                pVehicle->CallEvent ( "onVehicleEnter", VehiclePlayerArguments );
-
-                // Used to check if f.e. lua changed the player's vehicle (fix for #7570)
-                pVehicle->m_bOccupantChanged = true;
-
-                return true;
             }
         }
     }
