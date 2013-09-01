@@ -4019,7 +4019,7 @@ bool CStaticFunctionDefinitions::WarpPedIntoVehicle ( CPed* pPed, CVehicle* pVeh
             {
                 CPed* pPreviousOccupant = pVehicle->GetOccupant ( uiSeat );
                 // Make sure no one is entering or he will get stuck in the entry packet handshaking and network trouble
-                if ( pPreviousOccupant->GetVehicleAction ( ) == CPlayer::VEHICLEACTION_NONE )
+                if ( pPreviousOccupant != NULL || pPreviousOccupant->GetVehicleAction ( ) == CPlayer::VEHICLEACTION_NONE )
                 {
                     // Toss the previous player out of it if neccessary
                     if ( pPreviousOccupant )
