@@ -45,35 +45,37 @@ bool CVehicleUpgrades::IsUpgrade ( unsigned short usModel )
 
 bool CVehicleUpgrades::IsUpgradeCompatible ( unsigned short usUpgrade )
 {
-    unsigned short usModel = m_pVehicle->GetModel ();
-
-    // No upgrades for trains
-    if ( usModel == 537 ||
-         usModel == 538 ||
-         usModel == 449 ||
-         usModel == 569 ||
-         usModel == 570 ||
-         usModel == 590  )
-    {
-        return false;
-    }
-
     unsigned short us = usUpgrade;
-
     eClientVehicleType vehicleType = m_pVehicle->GetVehicleType ();
-    if ( vehicleType == CLIENTVEHICLE_BOAT || vehicleType == CLIENTVEHICLE_PLANE ||
-         vehicleType == CLIENTVEHICLE_BIKE || vehicleType == CLIENTVEHICLE_BMX )
+
+    // No upgrades for trains/boats
+    if ( vehicleType == CLIENTVEHICLE_TRAIN || vehicleType == CLIENTVEHICLE_BOAT )
+        return false;
+
+    // In MTA every vehicle has a radio...
+    if ( us == 1086 )
+        return true;
+
+    if ( vehicleType == CLIENTVEHICLE_BIKE || vehicleType == CLIENTVEHICLE_BMX ||
+         vehicleType == CLIENTVEHICLE_HELI )
          return false;
+
+    unsigned short usModel = m_pVehicle->GetModel ();
+    // Wheels should be compatible with any vehicle which have wheels, except
+    // bike/bmx (they're buggy). Vortex is technically a car, but it has no
+    // wheels.
+    if ( (us == 1025 || us == 1073 || us == 1074 || us == 1075 || us == 1076 ||
+          us == 1077 || us == 1078 || us == 1079 || us == 1080 || us == 1081 ||
+          us == 1082 || us == 1083 || us == 1084 || us == 1085 || us == 1096 ||
+          us == 1097 || us == 1098) && usModel != 539 )
+         return true;
+
+    // No nitro or other upgrades for planes
+    if ( vehicleType == CLIENTVEHICLE_PLANE )
+        return false;
 
     if ( us == VEHICLEUPGRADE_NITRO_5X || us == VEHICLEUPGRADE_NITRO_2X ||
          us == VEHICLEUPGRADE_NITRO_10X || us == VEHICLEUPGRADE_HYDRAULICS )
-         return true;
-
-    // Wheels should be compatible with any car
-    if ( us == 1025 || us == 1073 || us == 1074 || us == 1075 || us == 1076 ||
-         us == 1077 || us == 1078 || us == 1079 || us == 1080 || us == 1081 ||
-         us == 1082 || us == 1083 || us == 1084 || us == 1085 || us == 1096 ||
-         us == 1097 || us == 1098 )
          return true;
 
     bool bReturn = false;
@@ -367,7 +369,7 @@ bool CVehicleUpgrades::GetSlotFromUpgrade ( unsigned short us, unsigned char& uc
         ucSlot = 0;
         return true;
     }
-    if ( us == 1004 || us == 1005 ) // vent
+    if ( us == 1142 || us == 1143 || us == 1144 || us == 1145 ) /* vent */
     {
         ucSlot = 1;
         return true;
@@ -449,6 +451,11 @@ bool CVehicleUpgrades::GetSlotFromUpgrade ( unsigned short us, unsigned char& uc
         ucSlot = 13;
         return true;
     }
+    if ( us == 1109 || us == 1110 ) // rear bullbars
+    {
+        ucSlot = 5;
+        return true;
+    }
     if ( us == 1117 || us == 1152 || us == 1153 || us == 1155 || us == 1157 || /* front bumper */
          us == 1160 || us == 1165 || us == 1166 || us == 1169 || us == 1170 ||
          us == 1171 || us == 1172 || us == 1173 || us == 1174 || us == 1175 ||
@@ -470,6 +477,11 @@ bool CVehicleUpgrades::GetSlotFromUpgrade ( unsigned short us, unsigned char& uc
     if ( us == 1100 || us == 1123 || us == 1125 ) // misc
     {
         ucSlot = 16;
+        return true;
+    }
+    if ( us == 1013 || us == 1024 ) /* lamp */
+    {
+        ucSlot = 6;
         return true;
     }
 
