@@ -84,6 +84,10 @@ DWORD RETN_CTaskSimplePlayerOnFoot_ProcessWeaponFire_Call        =  0x540670;
 #define HOOKPOS_CObject_PreRender                   0x59FE69
 DWORD RETURN_CObject_PreRender =                    0x59FE6F;
 
+#define HOOKPOS_CWorld_RemoveFallenPeds                     0x565D0D
+DWORD RETURN_CWorld_RemoveFallenPeds_Cont               =   0x565D13;
+DWORD RETURN_CWorld_RemoveFallenPeds_Cancel             =   0x565E6F;
+
 void HOOK_CVehicle_ProcessStuff_TestSirenTypeSingle ( );
 void HOOK_CVehicle_ProcessStuff_PostPushSirenPositionSingle ( );
 void HOOK_CVehicle_ProcessStuff_TestSirenTypeDual ( );
@@ -105,6 +109,7 @@ void HOOK_CTaskSimpleJetpack_ProcessInput ( );
 void HOOK_CTaskSimplePlayerOnFoot_ProcessWeaponFire ( );
 void HOOK_CTaskSimpleJetpack_ProcessInputFixFPS2 ( );
 void HOOK_CObject_PreRender ( );
+void HOOK_CWorld_RemoveFallenPeds ( );
 
 void CMultiplayerSA::Init_13 ( void )
 {
@@ -142,6 +147,8 @@ void CMultiplayerSA::InitHooks_13 ( void )
     HookInstall ( HOOKPOS_CTaskSimplePlayerOnFoot_ProcessWeaponFire, (DWORD) HOOK_CTaskSimplePlayerOnFoot_ProcessWeaponFire, 5 );
 
     HookInstall ( HOOKPOS_CObject_PreRender, (DWORD)HOOK_CObject_PreRender, 6 );
+
+    HookInstall ( HOOKPOS_CWorld_RemoveFallenPeds, (DWORD)HOOK_CWorld_RemoveFallenPeds, 6 );
 
     InitHooks_ClothesSpeedUp ();
     EnableHooks_ClothesMemFix ( true );
@@ -1310,6 +1317,45 @@ void _declspec(naked) HOOK_CObject_PreRender ()
             lea edx, [esp+14h]
             jmp RETURN_CObject_PreRender
         }
+    }
+}
+
+CPedSAInterface * pFallingPedInterface;
+bool CWorld_Remove_FallenPedsCheck ( )
+{
+    CPed* pPed = pGameInterface->GetPools ()->GetPed ( (DWORD *)pFallingPedInterface );
+    if ( pPed && pPed->GetVehicle() != NULL )
+    {
+        // Disallow
+        return true;
+    }
+    // Allow
+    return false;
+}
+
+void _declspec(naked) HOOK_CWorld_RemoveFallenPeds ( )
+{
+    // If it's going to skip the code anyway just do it otherwise check if he's in a vehicle as the vehicle will be respawned anyway and he will be warped with it.
+    _asm
+    {
+        test ah, 5
+        jp [RemoveFallenPeds_Cancel]
+        pushad
+        mov pFallingPedInterface, esi
+    }
+    if ( CWorld_Remove_FallenPedsCheck ( ) )
+    {
+        _asm
+        {
+            popad
+RemoveFallenPeds_Cancel:
+            jmp RETURN_CWorld_RemoveFallenPeds_Cancel
+        }
+    }
+    _asm
+    {
+        popad
+        jmp RETURN_CWorld_RemoveFallenPeds_Cont
     }
 }
 
