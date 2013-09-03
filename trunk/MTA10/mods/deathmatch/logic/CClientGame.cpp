@@ -5701,7 +5701,7 @@ bool CClientGame::OnMouseEnter ( CGUIMouseEventArgs Args )
     if ( Args.pSwitchedWindow )
     {
         CClientGUIElement * pGUISwitchedElement = CGUI_GET_CCLIENTGUIELEMENT ( Args.pSwitchedWindow );
-        if ( pGUISwitchedElement )
+        if ( GetGUIManager ()->Exists ( pGUISwitchedElement ) )
             Arguments.PushElement( pGUISwitchedElement );
     }
 
@@ -5722,7 +5722,7 @@ bool CClientGame::OnMouseLeave ( CGUIMouseEventArgs Args )
     if ( Args.pSwitchedWindow )
     {
         CClientGUIElement * pGUISwitchedElement = CGUI_GET_CCLIENTGUIELEMENT ( Args.pSwitchedWindow );
-        if ( pGUISwitchedElement )
+        if ( GetGUIManager ()->Exists ( pGUISwitchedElement ) )
             Arguments.PushElement( pGUISwitchedElement );
     }
 

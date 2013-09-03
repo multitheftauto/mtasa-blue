@@ -182,6 +182,10 @@ int CLuaDefs::CanUseFunction ( lua_CFunction f, lua_State* luaVM )
 //
 void CLuaDefs::DidUseFunction ( lua_CFunction f, lua_State* luaVM )
 {
+    // Quick cull of unknown pointer range - Deals with calls from client dll (when the server has been loaded into the same process)
+    if ( CLuaCFunctions::IsNotFunction( f ) )
+        return;
+
     if ( !ms_TimingFunctionStack.empty () )
     {
         // Check if the function used was being timed
