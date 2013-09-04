@@ -326,6 +326,8 @@ void CLuaMain::InstructionCountHook ( lua_State* luaVM, lua_Debug* pDebug )
 
 bool CLuaMain::LoadScriptFromBuffer ( const char* cpInBuffer, unsigned int uiInSize, const char* szFileName )
 {
+    SString strNiceFilename = ConformResourcePath( szFileName );
+
     // Decrypt if required
     const char* cpBuffer;
     uint uiSize;
@@ -333,11 +335,11 @@ bool CLuaMain::LoadScriptFromBuffer ( const char* cpInBuffer, unsigned int uiInS
     {
         // Problems problems
 #if MTA_DM_VERSION < 0x135 
-        SString strMessage( "%s is invalid and will not work in future versions. Please re-compile at http://luac.mtasa.com/", *ConformResourcePath( szFileName ) ); 
+        SString strMessage( "%s is invalid and will not work in future versions. Please re-compile at http://luac.mtasa.com/", *strNiceFilename ); 
         g_pGame->GetScriptDebugging()->LogWarning ( m_luaVM, "Script warning: %s", *strMessage );
         // cpBuffer is always valid after call to DecryptScript
 #else
-        SString strMessage( "%s is invalid. Please re-compile at http://luac.mtasa.com/", *ConformResourcePath( szFileName ) ); 
+        SString strMessage( "%s is invalid. Please re-compile at http://luac.mtasa.com/", *strNiceFilename ); 
         g_pGame->GetScriptDebugging()->LogError ( m_luaVM, "Loading script failed: %s", *strMessage );
         return false;
 #endif
@@ -359,6 +361,8 @@ bool CLuaMain::LoadScriptFromBuffer ( const char* cpInBuffer, unsigned int uiInS
         uiSize -= 3;
     }
 
+    // If compiled script, make sure correct chunkname is embedded
+    EmbedChunkName( strNiceFilename, &cpBuffer, &uiSize );
 
     if ( m_luaVM )
     {
@@ -378,17 +382,17 @@ bool CLuaMain::LoadScriptFromBuffer ( const char* cpInBuffer, unsigned int uiInS
             if ( uiSize != strUTFScript.size() )
             {
                 uiSize = strUTFScript.size();
-                g_pGame->GetScriptDebugging()->LogWarning ( m_luaVM, "Script '%s' is not encoded in UTF-8.  Loading as ANSI...", ConformResourcePath(szFileName).c_str() );
+                g_pGame->GetScriptDebugging()->LogWarning ( m_luaVM, "Script '%s' is not encoded in UTF-8.  Loading as ANSI...", strNiceFilename.c_str() );
             }
         }
         else
             strUTFScript = std::string(cpBuffer, uiSize);
 
         // Run the script
-        if ( luaL_loadbuffer ( m_luaVM, bUTF8 ? cpBuffer : strUTFScript.c_str(), uiSize, SString ( "@%s", szFileName ) ) )
+        if ( luaL_loadbuffer ( m_luaVM, bUTF8 ? cpBuffer : strUTFScript.c_str(), uiSize, SString ( "@%s", *strNiceFilename ) ) )
         {
             // Print the error
-            std::string strRes = ConformResourcePath ( lua_tostring( m_luaVM, -1 ) );
+            std::string strRes = lua_tostring( m_luaVM, -1 );
             if ( strRes.length () )
             {
                 CLogger::LogPrintf ( "SCRIPT ERROR: %s\n", strRes.c_str () );
@@ -406,7 +410,7 @@ bool CLuaMain::LoadScriptFromBuffer ( const char* cpInBuffer, unsigned int uiInS
             int iret = this->PCall ( m_luaVM, 0, 0, 0 ) ;
             if ( iret == LUA_ERRRUN || iret == LUA_ERRMEM )
             {
-                SString strRes = ConformResourcePath ( lua_tostring( m_luaVM, -1 ) );
+                SString strRes = lua_tostring( m_luaVM, -1 );
         
                 std::vector <SString> vecSplit;
                 strRes.Split ( ":", vecSplit );
@@ -421,11 +425,10 @@ bool CLuaMain::LoadScriptFromBuffer ( const char* cpInBuffer, unsigned int uiInS
                 }
                 else
                 {
-                    SString strResourcePath = ConformResourcePath ( szFileName );
-                    if ( !strRes.ContainsI ( ExtractFilename ( strResourcePath ) ) )
+                    if ( !strRes.ContainsI ( ExtractFilename ( strNiceFilename ) ) )
                     {
                         // Add filename to error message, if not already present
-                        strRes = SString ( "%s (global scope) - %s", *strResourcePath, *strRes );
+                        strRes = SString ( "%s (global scope) - %s", *strNiceFilename, *strRes );
                     }
                     g_pGame->GetScriptDebugging()->LogError ( m_luaVM, "%s", strRes.c_str () );
                 }

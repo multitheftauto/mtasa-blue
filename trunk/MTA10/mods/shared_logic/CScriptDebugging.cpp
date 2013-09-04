@@ -249,7 +249,7 @@ void CScriptDebugging::LogString ( const char* szPrePend, lua_State* luaVM, cons
         if ( debugInfo.source[0] == '@' )
         {
             // Get and store the location of the debug message
-            strFile = ConformResourcePath ( debugInfo.source );
+            strFile = debugInfo.source + 1;
             iLine   = debugInfo.currentline;
 
             // Populate a message to print/send (unless "info" type)
