@@ -106,6 +106,7 @@
 #include "TInterpolation.h"
 #include "CPositionRotationAnimation.h"
 #include "CLatentTransferManager.h"
+#include "CLuaShared.h"
 
 // Deathmatch includes
 #include "Client.h"

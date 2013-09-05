@@ -1749,6 +1749,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\..\Shared\mods\deathmatch\logic\CLuaShared.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\Shared\mods\deathmatch\logic\CZoneNames.cpp"
 					>
 				</File>
@@ -2668,6 +2672,10 @@
 				</File>
 				<File
 					RelativePath="..\..\..\Shared\mods\deathmatch\logic\CLatentTransferManager.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\Shared\mods\deathmatch\logic\CLuaShared.h"
 					>
 				</File>
 				<File

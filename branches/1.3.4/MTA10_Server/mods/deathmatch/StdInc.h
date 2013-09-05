@@ -148,6 +148,7 @@ struct SAclRequest;
 #include "TInterpolation.h"
 #include "CPositionRotationAnimation.h"
 #include "CLatentTransferManager.h"
+#include "CLuaShared.h"
 
 // Logic includes
 #include "ASE.h"
