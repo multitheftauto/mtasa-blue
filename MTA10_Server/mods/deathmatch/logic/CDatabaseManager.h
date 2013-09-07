@@ -10,7 +10,7 @@
 *****************************************************************************/
 
 typedef uint SDbConnectionId;
-typedef uint SDbJobId;
+typedef intptr_t SDbJobId;
 typedef SDbConnectionId SConnectionHandle;
 #define INVALID_DB_HANDLE (0)
 

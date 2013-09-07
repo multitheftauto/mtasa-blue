@@ -1003,7 +1003,7 @@ void SharedUtil::RemoveColorCodesInPlaceW( WString& strText )
     uint uiSearchPos = 0;
     while( true )
     {
-        uint uiFoundPos = strText.find( L'#', uiSearchPos );
+        std::wstring::size_type uiFoundPos = strText.find( L'#', uiSearchPos );
         if ( uiFoundPos == std::wstring::npos )
             break;
 
