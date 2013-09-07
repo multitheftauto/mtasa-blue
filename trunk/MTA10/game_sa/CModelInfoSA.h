@@ -24,6 +24,8 @@
 class CPedModelInfoSA;
 class CPedModelInfoSAInterface;
 
+#define     RpGetFrame(__c)                 ((RwFrame*)(((RwObject *)(__c))->parent))
+
 #define     ARRAY_ModelLoaded               0x8E4CD0 // ##SA##
 
 #define     FUNC_CStreaming__HasModelLoaded 0x4044C0
@@ -237,7 +239,6 @@ public:
  * \todo Someone move GetLevelFromPosition out of here or delete it entirely please
  */
 
-
 class CModelInfoSA : public CModelInfo
 {
 protected:
@@ -252,6 +253,7 @@ protected:
     static std::map < DWORD, float > ms_ModelDefaultLodDistanceMap;
     static std::map < DWORD, BYTE > ms_ModelDefaultAlphaTransparencyMap;
     bool                            m_bAddedRefForCollision;
+    SVehicleSupportedUpgrades       m_ModelSupportedUpgrades;
 public:
     static std::set < uint >        ms_ReplacedColModels;
 
@@ -337,6 +339,13 @@ public:
     // CModelInfoSA methods
     void                            MakePedModel            ( char * szTexture );
 
+    SVehicleSupportedUpgrades       GetVehicleSupportedUpgrades ( void ) { return m_ModelSupportedUpgrades; }
+
+    void                            InitialiseSupportedUpgrades ( RpClump * pClump );
+    void                            ResetSupportedUpgrades      ( void );
+
+private:
+    RwFrame *                       RwSetSupportedUpgrades      ( RwFrame * parent, DWORD dwModel );
 };
 
 #endif
