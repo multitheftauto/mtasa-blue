@@ -313,50 +313,79 @@ bool CVehicleUpgrades::IsUpgradeCompatible ( unsigned short usUpgrade )
             bReturn = ( us == 1144 || us == 1145 || us == 1142 || us == 1143 || us == 1020 || us == 1019 || us == 1018 || us == 1024 || us == 1008 || us == 1009 || us == 1010 || us == 1006 || us == 1001 || us == 1023 || us == 1017 || us == 1007 );
         break;
     }
-    if ( bReturn )
+    unsigned char ucSlot = 0;
+    // Allow slot 2 to be upgraded regardless of ID and then check it has the required part
+    if ( GetSlotFromUpgrade ( us, ucSlot ) && ( bReturn || ucSlot == 2 ) )
     {
-        unsigned char ucSlot = 0;
-        if ( GetSlotFromUpgrade ( us, ucSlot ) )
+        // Get our model supported upgrades
+        SVehicleSupportedUpgrades supportedUpgrades = m_pVehicle->GetModelInfo ( )->GetVehicleSupportedUpgrades ( );
+        // Initialisation happens when we load the clump which is done when we require a specific model rather than in bulk
+        if ( supportedUpgrades.m_bInitialised == true )
         {
-            if ( ucSlot == 0 ) // Bonnet
+            // Hood and Vents
+            if ( ucSlot == 0 || ucSlot == 1 )
             {
-                bReturn = m_pVehicle->DoesSupportUpgrade ( "ug_bonnet" );
+                if ( supportedUpgrades.m_bBonnet == true )
+                {
+                    if ( us == 1142 || us == 1144 )
+                    {
+                        // We add both left and right for some reason seems to be SA doing it
+                        bReturn &= supportedUpgrades.m_bBonnet_Left;
+                        bReturn &= supportedUpgrades.m_bBonnet_Left_dam;
+
+                        bReturn &= supportedUpgrades.m_bBonnet_Right;
+                        bReturn &= supportedUpgrades.m_bBonnet_Right_dam;
+                    }
+                    else if ( us == 1004 || us == 1005 || us == 1011 || us == 1012 )
+                    {
+                        // Just needs m_bBonnet
+                        bReturn = true;
+                    }
+                }
             }
-            else if ( ucSlot == 2 ) // Spoiler
+            else if ( ucSlot == 2 )
             {
-                bReturn = m_pVehicle->DoesSupportUpgrade ( "ug_spoiler" );
+                bReturn = supportedUpgrades.m_bSpoiler;
             }
-            else if ( ucSlot == 3 ) // Side Skirt
+            else if ( ucSlot == 3 )
             {
-                bReturn = m_pVehicle->DoesSupportUpgrade ( "ug_wing_right" );
-                bReturn &= m_pVehicle->DoesSupportUpgrade ( "ug_wing_left" );
+                bReturn = supportedUpgrades.m_bSideSkirt_Right;
+                bReturn &= supportedUpgrades.m_bSideSkirt_Left;
             }
-            else if ( ucSlot == 4 ) // Front bullbars
+            else if ( ucSlot == 4 )
             {
-                bReturn = m_pVehicle->DoesSupportUpgrade ( "ug_frontbullbar" );
+                bReturn = supportedUpgrades.m_bFrontBullbars;
             }
-            else if ( ucSlot == 5 ) // rear bullbars
+            else if ( ucSlot == 5 )
             {
-                bReturn = m_pVehicle->DoesSupportUpgrade ( "ug_backbullbar" );
+                bReturn = supportedUpgrades.m_bRearBullbars;
             }
-            else if ( ucSlot == 7 ) // Roof
+            else if ( ucSlot == 6 )
             {
-                bReturn = m_pVehicle->DoesSupportUpgrade ( "ug_roof" );
+                bReturn = supportedUpgrades.m_bLamps;
+                bReturn &= supportedUpgrades.m_bLamps_dam;
             }
-            else if ( ucSlot == 13 ) // Exhaust
+            else if ( ucSlot == 7 )
             {
-                bReturn = m_pVehicle->DoesSupportUpgrade ( "exhaust_ok" );
+                bReturn = supportedUpgrades.m_bRoof;
             }
-            else if ( ucSlot == 14 ) // Front bumper
+            else if ( ucSlot == 13 )
             {
-                bReturn = m_pVehicle->DoesSupportUpgrade ( "bump_front_dummy" );
+                bReturn = supportedUpgrades.m_bExhaust;
             }
-            else if ( ucSlot == 15 ) // Rear bumper
+            else if ( ucSlot == 14 )
             {
-                bReturn = m_pVehicle->DoesSupportUpgrade ( "bump_rear_dummy" );
+                bReturn = supportedUpgrades.m_bFrontBumper;
+            }
+            else if ( ucSlot == 15 )
+            {
+                bReturn = supportedUpgrades.m_bRearBumper;
+            }
+            else if ( ucSlot == 16 )
+            {
+                bReturn = supportedUpgrades.m_bMisc;
             }
         }
-
     }
     return bReturn;
 }
@@ -369,7 +398,7 @@ bool CVehicleUpgrades::GetSlotFromUpgrade ( unsigned short us, unsigned char& uc
         ucSlot = 0;
         return true;
     }
-    if ( us == 1142 || us == 1143 || us == 1144 || us == 1145 ) /* vent */
+    if ( us == 1004 || us == 1005 || us == 1142 || us == 1143 || us == 1144 || us == 1145 ) /* vent */
     {
         ucSlot = 1;
         return true;
@@ -451,11 +480,6 @@ bool CVehicleUpgrades::GetSlotFromUpgrade ( unsigned short us, unsigned char& uc
         ucSlot = 13;
         return true;
     }
-    if ( us == 1109 || us == 1110 ) // rear bullbars
-    {
-        ucSlot = 5;
-        return true;
-    }
     if ( us == 1117 || us == 1152 || us == 1153 || us == 1155 || us == 1157 || /* front bumper */
          us == 1160 || us == 1165 || us == 1166 || us == 1169 || us == 1170 ||
          us == 1171 || us == 1172 || us == 1173 || us == 1174 || us == 1175 ||
@@ -474,14 +498,10 @@ bool CVehicleUpgrades::GetSlotFromUpgrade ( unsigned short us, unsigned char& uc
         ucSlot = 15;
         return true;
     }
-    if ( us == 1100 || us == 1123 || us == 1125 ) // misc
+
+    if ( us == 1100 || us == 1123 || us == 1125 ) /* misc */
     {
         ucSlot = 16;
-        return true;
-    }
-    if ( us == 1013 || us == 1024 ) /* lamp */
-    {
-        ucSlot = 6;
         return true;
     }
 

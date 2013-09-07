@@ -333,6 +333,12 @@ void CRenderWareSA::ReplaceModel ( RpClump* pNew, unsigned short usModelID, DWOR
         RpClump* pOldClump = (RpClump *)pModelInfo->GetRwObject ();
         if ( !DoContainTheSameGeometry ( pNew, pOldClump, NULL ) )
         {
+            if ( pModelInfo->IsVehicle ( ) )
+            {
+                // Reset our valid upgrade list
+                pModelInfo->ResetSupportedUpgrades ( );
+            }
+
             // Make new clump container for the model geometry
             // Clone twice as the geometry render order seems to be reversed each time it is cloned.
             RpClump* pTemp = RpClumpClone ( pNew );
