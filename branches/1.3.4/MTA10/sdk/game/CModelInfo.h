@@ -50,6 +50,56 @@ enum eVehicleUpgradePosn
     VEHICLE_UPGRADE_POSN_MISC,
 };
 
+struct SVehicleSupportedUpgrades
+{
+    SVehicleSupportedUpgrades ( )
+    {
+        Reset ( );
+    }
+    void Reset ( )
+    {
+        m_bBonnet = false;
+        m_bBonnet_Left = false;
+        m_bBonnet_Left_dam = false;
+        m_bBonnet_Right = false;
+        m_bBonnet_Right_dam = false;
+        m_bSpoiler = false;
+        m_bSpoiler_dam = false;
+        m_bVent = false;
+        m_bSideSkirt_Right = false;
+        m_bSideSkirt_Left = false;
+        m_bFrontBullbars = false;
+        m_bRearBullbars = false;
+        m_bLamps = false;
+        m_bLamps_dam = false;
+        m_bRoof = false;
+        m_bExhaust = false;
+        m_bFrontBumper = false;
+        m_bRearBumper = false;
+        m_bMisc = false;
+        m_bInitialised = false;
+    }
+    bool m_bBonnet;
+    bool m_bBonnet_Left;
+    bool m_bBonnet_Left_dam;
+    bool m_bBonnet_Right;
+    bool m_bBonnet_Right_dam;
+    bool m_bSpoiler;
+    bool m_bSpoiler_dam;
+    bool m_bVent;
+    bool m_bSideSkirt_Right;
+    bool m_bSideSkirt_Left;
+    bool m_bFrontBullbars;
+    bool m_bRearBullbars;
+    bool m_bLamps;
+    bool m_bLamps_dam;
+    bool m_bRoof;
+    bool m_bExhaust;
+    bool m_bFrontBumper;
+    bool m_bRearBumper;
+    bool m_bMisc;
+    bool m_bInitialised;
+};
 class CModelInfo
 {
 public:
@@ -100,6 +150,9 @@ public:
     virtual void*           GetVehicleSuspensionData( void ) = 0;
     virtual void*           SetVehicleSuspensionData( void* pSuspensionLines ) = 0;
 
+    // Init the supported upgrades structure
+    virtual void            InitialiseSupportedUpgrades ( RpClump * pClump ) = 0;
+
     // ONLY use for peds
     virtual void            GetVoice                ( short* psVoiceType, short* psVoice ) = 0;
     virtual void            GetVoice                ( const char** pszVoiceType, const char** szVoice ) = 0;
@@ -115,6 +168,10 @@ public:
     // Call this to make sure the custom vehicle models are being used after a load.
     virtual void            MakeCustomModel         ( void ) = 0;
     virtual RwObject*       GetRwObject             ( void ) = 0;
+
+
+    virtual SVehicleSupportedUpgrades               GetVehicleSupportedUpgrades         ( void ) = 0;
+    virtual void                                    ResetSupportedUpgrades              ( void ) = 0;
 };
 
 #endif
