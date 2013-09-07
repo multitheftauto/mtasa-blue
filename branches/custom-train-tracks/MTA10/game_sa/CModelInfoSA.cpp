@@ -1221,3 +1221,121 @@ void CModelInfoSA::StaticSetHooks ( void )
 {
     HookInstall( HOOKPOS_CFileLoader_LoadCollisionFile_Mid, (DWORD)HOOK_CFileLoader_LoadCollisionFile_Mid, HOOKSIZE_CFileLoader_LoadCollisionFile_Mid );
 }
+
+// Recursive RwFrame children searching function
+inline RwFrame * CModelInfoSA::RwSetSupportedUpgrades ( RwFrame * parent, DWORD dwModel ) 
+{
+    RwFrame * ret = parent->child, * buf;
+    while ( ret != NULL ) { 
+        // recurse into the child
+        if ( ret->child != NULL ) {
+            buf = RwSetSupportedUpgrades ( ret, dwModel );
+            if ( buf != NULL ) return buf;
+        }
+        // don't re-add, check ret for validity, if it has an empty string at this point it isn't a variant or it's already added
+        if ( ret != NULL )
+        {
+            SString strName = ret->szName;
+            g_pCore->GetConsole ( )->Printf ( "model: %s", ret->szName );
+            // Spoiler
+            if ( strName == "ug_bonnet" )
+            {
+                m_ModelSupportedUpgrades.m_bBonnet = true;
+            }
+            else if ( strName == "ug_bonnet_left" )
+            {
+                m_ModelSupportedUpgrades.m_bBonnet_Left = true;
+            }
+            else if ( strName == "ug_bonnet_left_dam" )
+            {
+                m_ModelSupportedUpgrades.m_bBonnet_Left_dam = true;
+            }
+            else if ( strName == "ug_bonnet_right" )
+            {
+                m_ModelSupportedUpgrades.m_bBonnet_Right = true;
+            }
+            else if ( strName == "ug_bonnet_right_dam" )
+            {
+                m_ModelSupportedUpgrades.m_bBonnet_Right_dam = true;
+            }
+            // Spoiler
+            else if ( strName == "ug_spoiler" )
+            {
+                m_ModelSupportedUpgrades.m_bSpoiler = true;
+            }
+            else if ( strName == "ug_spoiler_dam" )
+            {
+                m_ModelSupportedUpgrades.m_bSpoiler_dam = true;
+            }
+            // Bonnet
+            else if ( strName == "ug_lights" )
+            {
+                m_ModelSupportedUpgrades.m_bLamps = true;
+            }
+            else if ( strName == "ug_lights_dam" )
+            {
+                m_ModelSupportedUpgrades.m_bLamps_dam = true;
+            }
+            // Roof
+            else if ( strName == "ug_roof" )
+            {
+                m_ModelSupportedUpgrades.m_bRoof = true;
+            }
+            // Side Skirt
+            else if ( strName == "ug_wing_right" )
+            {
+                m_ModelSupportedUpgrades.m_bSideSkirt_Right = true;
+            }
+            // Side Skirt
+            else if ( strName == "ug_wing_left" )
+            {
+                m_ModelSupportedUpgrades.m_bSideSkirt_Left = true;
+            }
+            // Exhaust
+            else if ( strName == "exhaust_ok" )
+            {
+                m_ModelSupportedUpgrades.m_bExhaust = true;
+            }
+            // Front bullbars
+            else if ( strName == "ug_frontbullbar" )
+            {
+                m_ModelSupportedUpgrades.m_bFrontBullbars = true;
+            }
+            // rear bullbars
+            else if ( strName == "ug_backbullbar" )
+            {
+                m_ModelSupportedUpgrades.m_bRearBullbars = true;
+            }
+            // Front bumper
+            else if ( strName == "bump_front_dummy" )
+            {
+                m_ModelSupportedUpgrades.m_bFrontBumper = true;
+            }
+            // Rear bumper
+            else if ( strName == "bump_rear_dummy" )
+            {   
+                m_ModelSupportedUpgrades.m_bRearBumper = true;
+            }
+            // Rear bumper
+            else if ( strName == "misc_c" )
+            {   
+                m_ModelSupportedUpgrades.m_bMisc = true;
+            }
+        }
+        ret = ret->next;
+    }
+    return NULL;
+}
+
+void CModelInfoSA::InitialiseSupportedUpgrades ( RpClump * pClump )
+{
+    m_ModelSupportedUpgrades.Reset ( );
+    RwFrame * pFrame = RpGetFrame ( pClump );
+    RwSetSupportedUpgrades ( pFrame, m_dwModelID );
+    m_ModelSupportedUpgrades.m_bInitialised = true;
+}
+
+void CModelInfoSA::ResetSupportedUpgrades ( void )
+{
+    m_ModelSupportedUpgrades.Reset ( );
+}
