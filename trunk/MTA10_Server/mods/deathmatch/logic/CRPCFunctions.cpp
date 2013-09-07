@@ -216,7 +216,7 @@ void CRPCFunctions::KeyBind ( NetBitStreamInterface & bitStream )
 
     unsigned char ucKeyLength = bitStream.GetNumberOfUnreadBits () >> 3;
 
-    char szKey [ 256 ] = { '\0' };
+    char szKey [ 256 ];
     bitStream.Read ( szKey, ucKeyLength );
     szKey [ ucKeyLength ] = 0;
 
