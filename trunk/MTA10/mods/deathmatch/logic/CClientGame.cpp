@@ -2333,20 +2333,22 @@ bool CClientGame::KeyStrokeHandler ( const SString& strKey, bool bState, bool bI
             Arguments.PushString ( strKey );
             Arguments.PushBoolean ( bState );
             bAllow = m_pRootEntity->CallEvent ( "onClientKey", Arguments, false );
-            if ( bAllow == false && bState == true && strKey == "escape" )
+            if ( bState == true )
             {
-                if ( m_bLastKeyWasEscapeCancelled )
+                if ( bAllow == false && strKey == "escape" )
                 {
-                    // Escape cannot be skipped twice
-                    bAllow = true;
-                    m_bLastKeyWasEscapeCancelled = false;
+                    if ( m_bLastKeyWasEscapeCancelled )
+                    {
+                        // Escape cannot be skipped twice
+                        bAllow = true;
+                        m_bLastKeyWasEscapeCancelled = false;
+                    }
+                    else
+                        m_bLastKeyWasEscapeCancelled = true;
                 }
                 else
-                    m_bLastKeyWasEscapeCancelled = true;
+                    m_bLastKeyWasEscapeCancelled = false;
             }
-            else
-                m_bLastKeyWasEscapeCancelled = false;
-
             return bAllow;
         }
     }
