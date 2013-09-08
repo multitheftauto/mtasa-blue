@@ -256,6 +256,9 @@ void CPedSync::Packet_PedSync ( CPedSyncPacket& Packet )
                     }
 
                     if ( pData->ucFlags & 0x10 ) pPed->SetArmor ( pData->fArmor );
+                    
+                    if ( pPlayer->GetBitStreamVersion() >= 0x04E )
+                        pPed->SetOnFire(pData->bOnFire);
 
                     // Send this sync
                     pData->bSend = true;

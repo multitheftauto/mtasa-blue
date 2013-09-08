@@ -5457,6 +5457,14 @@ bool CClientPed::IsFootBloodEnabled ( void )
     return false;
 }
 
+bool CClientPed::IsOnFire ( )
+{
+    if ( m_pPlayerPed )
+    {
+        return m_pPlayerPed->IsOnFire();
+    }
+    return m_bIsOnFire;
+}
 
 void CClientPed::SetOnFire ( bool bIsOnFire )
 {
