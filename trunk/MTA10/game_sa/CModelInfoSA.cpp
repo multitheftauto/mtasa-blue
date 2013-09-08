@@ -1236,7 +1236,6 @@ inline RwFrame * CModelInfoSA::RwSetSupportedUpgrades ( RwFrame * parent, DWORD 
         if ( ret != NULL )
         {
             SString strName = ret->szName;
-            g_pCore->GetConsole ( )->Printf ( "model: %s", ret->szName );
             // Spoiler
             if ( strName == "ug_bonnet" )
             {
