@@ -145,4 +145,10 @@ public:
 // Game-monitor.com query URL (use %u for port input)
 #define QUERY_URL_GAME_MONITOR      "http://master.game-monitor.com/heartbeat.php?p=%u&e=3"
 
+// MTA master server query URL (Inputs: game port, ase port, http port, version, extra, serverip)
+#define QUERY_URL_MTA_MASTER_SERVER "http://master.mtasa.com/ase/add.php?g=%u&a=%u&h=%u&v=%s&x=%s&ip=%s"
+
+// MTA port tester URL
+#define PORT_TESTER_URL             "http://nightly.mtasa.com/ports/"
+
 #endif
