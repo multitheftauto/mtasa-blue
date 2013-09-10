@@ -281,17 +281,6 @@ struct SAclRequest;
 #include "CStaticFunctionDefinitions.h"
 
 // Utility includes
-#include "utils/CHTTPClient.h"
-#include "utils/CHTTPRequest.h"
-#include "utils/CHTTPResponse.h"
-#include "utils/CTCP.h"
-#include "utils/CTCPClientSocket.h"
-#include "utils/CTCPClientSocketImpl.h"
-#include "utils/CTCPImpl.h"
-#include "utils/CTCPServerSocket.h"
-#include "utils/CTCPServerSocketImpl.h"
-#include "utils/CTCPSocket.h"
-#include "utils/CTCPSocketImpl.h"
 #include "utils/CZipMaker.h"
 #include <base64.h>
 

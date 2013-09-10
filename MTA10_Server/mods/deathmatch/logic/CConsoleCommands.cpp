@@ -235,46 +235,6 @@ bool CConsoleCommands::StopAllResources ( CConsole* pConsole, const char* szArgu
 }
 
 
-bool CConsoleCommands::InstallResource ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
-{
-    return false;
-
-    COPY_CSTR_TO_TEMP_BUFFER( szBuffer, szArguments, 256 );
-
-    char* szURL = strtok ( szBuffer, " " );
-    char* szName = strtok ( NULL, "\0" );
-    if ( strlen ( szURL ) < 150 && strlen ( szURL ) > 1 )
-    {
-        if ( szName && strncmp(szURL, "http://", 7 ) == 0 )
-        {
-            if ( strlen ( szName ) < 100 && strlen ( szName ) > 1 )
-            {
-                if ( g_pGame->GetResourceManager()->Install ( szURL, szName ) )
-                {
-                    char szOutput[512];
-                    snprintf ( szOutput, 511, "Resource %s from %s installed succesfully.", szName, szURL );
-                    pEchoClient->SendConsole ( szOutput );
-                    g_pGame->GetResourceManager()->Refresh();
-                }
-            }
-        }
-        else
-        {
-            char szNewURL[250];
-            szNewURL[249] = '\0';
-            snprintf ( szNewURL, 249, "http://development.mtasa.com/%s.zip", szURL );
-            if ( g_pGame->GetResourceManager()->Install ( szNewURL, szURL ) )
-            {
-                char szOutput[512];
-                snprintf ( szOutput, 511, "Resource %s installed succesfully.", szURL );
-                pEchoClient->SendConsole ( szOutput );
-                g_pGame->GetResourceManager()->Refresh();
-            }
-        }
-    }
-    return true;
-}
-
 bool CConsoleCommands::UpgradeResources ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
 {
     // To work on remote clients, 'upgrade' needs ACL entry + console capture

@@ -61,13 +61,6 @@ CServerImpl::CServerImpl ( void )
     memset(&m_szTag, 0, sizeof ( m_szTag ) * sizeof ( char ) );
     m_uiInputCount = 0;
 
-    // Create the TCP interface
-    m_pTCP = new CTCPImpl;
-    if ( !m_pTCP->Initialize () )
-    {
-        Print ( "WARNING: Initializing TCP failed ('%s')\n", m_pTCP->GetLastError () );
-    }
-
     // Create our stuff
     m_pModManager = new CModManagerImpl ( this );
 }
@@ -77,7 +70,6 @@ CServerImpl::~CServerImpl ( void )
 {
     // Destroy our stuff
     delete m_pModManager;
-    delete m_pTCP;
 }
 
 
@@ -90,12 +82,6 @@ CNetServer* CServerImpl::GetNetwork ( void )
 CModManager* CServerImpl::GetModManager ( void )
 {
     return m_pModManager;
-}
-
-
-CTCP* CServerImpl::GetTCP ( void )
-{
-    return m_pTCP;
 }
 
 
