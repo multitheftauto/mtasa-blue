@@ -2710,6 +2710,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\utils\CMasterServerAnnouncer.h"
+					>
+				</File>
+				<File
 					RelativePath=".\utils\COpenPortsTester.h"
 					>
 				</File>

@@ -21,6 +21,7 @@
 
 #include "StdInc.h"
 #include "../utils/COpenPortsTester.h"
+#include "../utils/CMasterServerAnnouncer.h"
 #include "net/SimHeaders.h"
 #include <signal.h>
 
@@ -186,8 +187,6 @@ CGame::CGame ( void )
 
     m_bCloudsEnabled = true;
 
-    m_llLastAnnounceTime = 0;
-    m_llLastPushTime = 0;
     m_pOpenPortsTester = NULL;
 
     m_bTrafficLightsLocked = false;
@@ -309,6 +308,7 @@ CGame::~CGame ( void )
     SAFE_DELETE ( m_pBuildingRemovalManager );
     SAFE_DELETE ( m_pCustomWeaponManager );
     SAFE_DELETE ( m_pOpenPortsTester );
+    SAFE_DELETE ( m_pMasterServerAnnouncer );
     CSimControl::Shutdown ();
 
     // Clear our global pointer
@@ -450,10 +450,8 @@ void CGame::DoPulse ( void )
 
     CLOCK_CALL1( CPerfStatManager::GetSingleton ()->DoPulse (); );
 
-    PulseMasterServerAnnounce ();
-
-    if ( m_pOpenPortsTester )
-        m_pOpenPortsTester->Poll ();
+    if ( m_pMasterServerAnnouncer )
+        m_pMasterServerAnnouncer->Pulse ();
 
     CLOCK_CALL1( m_lightsyncManager.DoPulse (); );
 
@@ -830,7 +828,8 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     if ( m_pMainConfig->GetSerialVerificationEnabled () )
         m_pASE->SetRuleValue ( "SerialVerification", "yes" );
     ApplyAseSetting ();
-    PulseMasterServerAnnounce ( true );
+    m_pMasterServerAnnouncer = new CMasterServerAnnouncer();
+    m_pMasterServerAnnouncer->Pulse( true );
 
 
     // Now load the rest of the config
@@ -855,6 +854,9 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
         CLogger::LogPrintf ( "autoexec.conf file found! Executing...\n" );
         Autoexec.Run ();
     }
+
+    // Flush any pending master server announce messages
+    g_pNetServer->GetHTTPDownloadManager ( EDownloadMode::ASE )->ProcessQueuedFiles ();
 
     // Done
     // If you're ever going to change this message, update the "server ready" determination
@@ -893,111 +895,6 @@ void CGame::StartOpenPortsTest ( void )
 {
     if ( m_pOpenPortsTester )
         m_pOpenPortsTester->Start ();
-}
-
-
-// Remind master server once every 24 hrs
-void CGame::PulseMasterServerAnnounce ( bool bIsInitialAnnounce )
-{
-    long long llTickCountNow = GetTickCount64_ ();
-    bool bIsTimeForAnnounce = false;
-    bool bIsTimeForPush = false;
-
-    if ( m_pMainConfig->GetAseInternetListenEnabled() &&
-        ( bIsInitialAnnounce || m_llLastAnnounceTime == 0 || llTickCountNow - m_llLastAnnounceTime > 1000 * 60 * 60 * 24 ) )   // 24 hrs
-    {
-        bIsTimeForAnnounce = true;
-        m_llLastAnnounceTime = llTickCountNow;
-    }
-    else
-    if ( m_pMainConfig->GetAseInternetPushEnabled() &&
-        ( m_llLastPushTime == 0 || llTickCountNow - m_llLastPushTime > 1000 * 60 * 10 ) ) // 10 mins
-    {
-        bIsTimeForPush = true;
-        m_llLastPushTime = llTickCountNow;
-    }
-    else
-        return;
-
-
-    const SString strServerIP = m_pMainConfig->GetServerIP ();
-    unsigned short usServerPort = m_pMainConfig->GetServerPort ();
-    unsigned short usHTTPPort = m_pMainConfig->GetHTTPPort ();
-    uint uiPlayerCount = m_pPlayerManager->Count ();
-    uint uiMaxPlayerCount = m_pMainConfig->GetMaxPlayers();
-    bool bPassworded = m_pMainConfig->HasPassword ();
-    SString strAseMode = m_pMainConfig->GetSetting( "ase" );
-    bool bAseLanListen = m_pMainConfig->GetAseLanListenEnabled();
-
-    SString strVersion ( "%d.%d.%d-%d.%05d", MTASA_VERSION_MAJOR, MTASA_VERSION_MINOR, MTASA_VERSION_MAINTENANCE, MTASA_VERSION_TYPE, MTASA_VERSION_BUILD );
-    SString strExtra ( "%d_%d_%d_%s_%d", uiPlayerCount, uiMaxPlayerCount, bPassworded, *strAseMode, bAseLanListen );
-
-    struct {
-        SString strDesc;
-        SString strURL;
-        bool bAcceptsPush;
-        bool bDoReminders;
-    } masterServerList[] = {
-                             { "Querying game-monitor.com master server... ", SString ( QUERY_URL_GAME_MONITOR, usServerPort + 123 ), false, false },
-                             { "Querying backup master server... ", SString ( "h" "ttp://master.mtasa.com/ase/add.php?g=%u&a=%u&h=%u&v=%s&x=%s&ip=%s", usServerPort, usServerPort + 123, usHTTPPort, *strVersion, *strExtra, *strServerIP ), true, true },
-                           };
-
-    for ( uint i = 0 ; i < NUMELMS( masterServerList ) ; i++ )
-    {
-        const SString& strDesc = masterServerList[i].strDesc;
-        const SString& strURL = masterServerList[i].strURL;
-        bool bServerAcceptsPush = masterServerList[i].bAcceptsPush;
-        bool bServerAcceptsReminders = masterServerList[i].bDoReminders;
-
-        if ( bIsTimeForAnnounce )
-        {
-            // Only log on first pass
-            if ( bIsInitialAnnounce )
-                CLogger::LogPrint ( strDesc );
-
-            // Don't repeat announce for some servers
-            if ( !bIsInitialAnnounce && !bServerAcceptsReminders )
-                continue;
-
-            // Send request
-            CTCPImpl * pTCP = new CTCPImpl ();
-            pTCP->Initialize ();
-            CHTTPRequest * request = new CHTTPRequest ( strURL );
-            request->SetLocalIP ( strServerIP );
-            CHTTPResponse * response = request->Send ( pTCP );
-
-            // Only log on first pass
-            if ( bIsInitialAnnounce )
-            {
-                if ( !response )
-                    CLogger::LogPrintfNoStamp ( "failed! (Not available)\n" );
-                else if ( response->GetErrorCode () != 200 )
-                {
-                    if ( response->GetErrorCode () == 500 && strDesc.ContainsI ( "game-monitor" ) )
-                        CLogger::LogPrintfNoStamp ( "maybe!\n" );
-                    else
-                        CLogger::LogPrintfNoStamp ( "failed! (%u: %s)\n", response->GetErrorCode (), response->GetErrorDescription () );
-                }
-                else
-                    CLogger::LogPrintfNoStamp ( "success!\n");
-            }
-
-            if ( response )
-                delete response;
-            delete pTCP;
-            delete request;
-        }
-
-        // Send extra data if required
-        if ( bIsTimeForPush && bServerAcceptsPush )
-        {
-            SString strPostContent = m_pASE->QueryLight ();
-            bool bPostContentBinary = true;
-
-            CNetHTTPDownloadManagerInterface * downloadManager = g_pNetServer->GetHTTPDownloadManager ( EDownloadMode::ASE );
-            downloadManager->QueueFile ( strURL, NULL, 0, &strPostContent.at ( 0 ), strPostContent.length (), bPostContentBinary, NULL, NULL, false, 1 );
-        }
-    }
 }
 
 
