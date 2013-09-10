@@ -335,7 +335,7 @@ static ushort DiscoverInternalHTTPPort()
     {
         ushort usHTTPPort = testPortList[i];
         SString strHTTPDownloadURL = SString ( "http://%s:%d/http_port_test/", g_pNet->GetConnectedServer(), usHTTPPort );
-        pHTTP->QueueFile ( strHTTPDownloadURL, "", 0, NULL, 0, false, (void*)usHTTPPort, DiscoverInternalHTTPPortCallback, g_pClientGame->IsLocalGame (), 1, false );
+        pHTTP->QueueFile ( strHTTPDownloadURL, "", 0, NULL, 0, false, (void*)usHTTPPort, DiscoverInternalHTTPPortCallback, g_pClientGame->IsLocalGame (), 1, 10000, false );
     }    
 
     // Wait up to 3 seconds for response
@@ -4813,7 +4813,7 @@ void CPacketHandler::Packet_ResourceStart ( NetBitStreamInterface& bitStream )
                                 unlink ( pDownloadableResource->GetName () );
 
                                 // Queue the file to be downloaded
-                                bool bAddedFile = pHTTP->QueueFile ( strHTTPDownloadURLFull, pDownloadableResource->GetName (), dChunkDataSize, NULL, 0, false, NULL, NULL, g_pClientGame->IsLocalGame (), 10, true );
+                                bool bAddedFile = pHTTP->QueueFile ( strHTTPDownloadURLFull, pDownloadableResource->GetName (), dChunkDataSize, NULL, 0, false, NULL, NULL, g_pClientGame->IsLocalGame (), 10, 10000, true );
 
                                 // If the file was successfully queued, increment the resources to be downloaded
                                 g_pClientGame->SetTransferringInitialFiles ( true );
