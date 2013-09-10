@@ -23,6 +23,7 @@
 #include "StdInc.h"
 #define MIN_SERVER_REQ_CALLREMOTE_CONNECTION_ATTEMPTS       "1.3.0-9.04563"
 #define MIN_SERVER_REQ_TRIGGERCLIENTEVENT_SENDLIST          "1.3.0-9.04570"
+#define MIN_SERVER_REQ_CALLREMOTE_CONNECT_TIMEOUT           "1.3.5"
 
 extern CGame* g_pGame;
 
@@ -160,13 +161,16 @@ int CLuaFunctionDefinitions::CallRemote ( lua_State* luaVM )
     if ( !argStream.NextIsFunction ( 1 ) && !argStream.NextIsFunction ( 2 ) )
     {
         // Call type 1
-        //  bool callRemote ( string host [, int connectionAttempts = 10 ], string resourceName, string functionName, callback callbackFunction, [ arguments... ] )
-        SString strHost; uint uiConnectionAttempts; SString strResourceName; SString strFunctionName; CLuaFunctionRef iLuaFunction; CLuaArguments args;
+        //  bool callRemote ( string host [, int connectionAttempts = 10, int connectTimeout = 10000 ], string resourceName, string functionName, callback callbackFunction, [ arguments... ] )
+        SString strHost; uint uiConnectionAttempts; uint uiConnectTimeoutMs; SString strResourceName; SString strFunctionName; CLuaFunctionRef iLuaFunction; CLuaArguments args;
 
         argStream.ReadString ( strHost );
         if ( argStream.NextIsNumber () )
             MinServerReqCheck ( argStream, MIN_SERVER_REQ_CALLREMOTE_CONNECTION_ATTEMPTS, "'connection attempts' is being used" );
         argStream.ReadIfNextIsNumber ( uiConnectionAttempts, 10 );
+        if ( argStream.NextIsNumber () )
+            MinServerReqCheck ( argStream, MIN_SERVER_REQ_CALLREMOTE_CONNECT_TIMEOUT, "'connect timeout' is being used" );
+        argStream.ReadIfNextIsNumber ( uiConnectTimeoutMs, 10000 );
         argStream.ReadString ( strResourceName );
         argStream.ReadString ( strFunctionName );
         argStream.ReadFunction ( iLuaFunction );
@@ -178,7 +182,7 @@ int CLuaFunctionDefinitions::CallRemote ( lua_State* luaVM )
             CLuaMain * luaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
             if ( luaMain )
             {
-                g_pGame->GetRemoteCalls()->Call ( strHost, strResourceName, strFunctionName, &args, luaMain, iLuaFunction, uiConnectionAttempts );
+                g_pGame->GetRemoteCalls()->Call ( strHost, strResourceName, strFunctionName, &args, luaMain, iLuaFunction, uiConnectionAttempts, uiConnectTimeoutMs );
                 lua_pushboolean ( luaVM, true );
                 return 1;
             }
@@ -187,13 +191,16 @@ int CLuaFunctionDefinitions::CallRemote ( lua_State* luaVM )
     else
     {
         // Call type 2
-        //  bool callRemote ( string URL [, int connectionAttempts = 10 ], callback callbackFunction, [ arguments... ] )
-        SString strURL; uint uiConnectionAttempts; CLuaFunctionRef iLuaFunction; CLuaArguments args;
+        //  bool callRemote ( string URL [, int connectionAttempts = 10, int connectTimeout = 10000 ], callback callbackFunction, [ arguments... ] )
+        SString strURL; uint uiConnectionAttempts; uint uiConnectTimeoutMs; CLuaFunctionRef iLuaFunction; CLuaArguments args;
 
         argStream.ReadString ( strURL );
         if ( argStream.NextIsNumber () )
             MinServerReqCheck ( argStream, MIN_SERVER_REQ_CALLREMOTE_CONNECTION_ATTEMPTS, "'connection attempts' is being used" );
         argStream.ReadIfNextIsNumber ( uiConnectionAttempts, 10 );
+        if ( argStream.NextIsNumber () )
+            MinServerReqCheck ( argStream, MIN_SERVER_REQ_CALLREMOTE_CONNECT_TIMEOUT, "'connect timeout' is being used" );
+        argStream.ReadIfNextIsNumber ( uiConnectTimeoutMs, 10000 );
         argStream.ReadFunction ( iLuaFunction );
         argStream.ReadLuaArguments ( args );
         argStream.ReadFunctionComplete ();
@@ -203,7 +210,7 @@ int CLuaFunctionDefinitions::CallRemote ( lua_State* luaVM )
             CLuaMain * luaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
             if ( luaMain )
             {
-                g_pGame->GetRemoteCalls()->Call ( strURL, &args, luaMain, iLuaFunction, uiConnectionAttempts );
+                g_pGame->GetRemoteCalls()->Call ( strURL, &args, luaMain, iLuaFunction, uiConnectionAttempts, uiConnectTimeoutMs );
                 lua_pushboolean ( luaVM, true );
                 return 1;
             }
@@ -221,14 +228,17 @@ int CLuaFunctionDefinitions::CallRemote ( lua_State* luaVM )
 // Call a function on a remote server
 int CLuaFunctionDefinitions::FetchRemote ( lua_State* luaVM )
 {
-//  bool fetchRemote ( string URL [, int connectionAttempts = 10 ], callback callbackFunction, [ string postData, bool bPostBinary, arguments... ] )
+//  bool fetchRemote ( string URL [, int connectionAttempts = 10, int connectTimeout = 10000 ], callback callbackFunction, [ string postData, bool bPostBinary, arguments... ] )
     CScriptArgReader argStream ( luaVM );
-    SString strURL; CLuaFunctionRef iLuaFunction; SString strPostData; bool bPostBinary; CLuaArguments args; uint uiConnectionAttempts;
+    SString strURL; CLuaFunctionRef iLuaFunction; SString strPostData; bool bPostBinary; CLuaArguments args; uint uiConnectionAttempts; uint uiConnectTimeoutMs;
 
     argStream.ReadString ( strURL );
     if ( argStream.NextIsNumber () )
         MinServerReqCheck ( argStream, MIN_SERVER_REQ_CALLREMOTE_CONNECTION_ATTEMPTS, "'connection attempts' is being used" );
     argStream.ReadIfNextIsNumber ( uiConnectionAttempts, 10 );
+    if ( argStream.NextIsNumber () )
+        MinServerReqCheck ( argStream, MIN_SERVER_REQ_CALLREMOTE_CONNECT_TIMEOUT, "'connect timeout' is being used" );
+    argStream.ReadIfNextIsNumber ( uiConnectTimeoutMs, 10000 );
     argStream.ReadFunction ( iLuaFunction );
     argStream.ReadString ( strPostData, "" );
     argStream.ReadBool ( bPostBinary, false );
@@ -240,7 +250,7 @@ int CLuaFunctionDefinitions::FetchRemote ( lua_State* luaVM )
         CLuaMain * luaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
         if ( luaMain )
         {
-            g_pGame->GetRemoteCalls()->Call ( strURL, &args, strPostData, bPostBinary, luaMain, iLuaFunction, uiConnectionAttempts );
+            g_pGame->GetRemoteCalls()->Call ( strURL, &args, strPostData, bPostBinary, luaMain, iLuaFunction, uiConnectionAttempts, uiConnectTimeoutMs );
             lua_pushboolean ( luaVM, true );
             return 1;
         }
