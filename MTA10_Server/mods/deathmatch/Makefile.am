@@ -31,10 +31,6 @@ UTILS = \
 	../../../Shared/mods/deathmatch/logic/CZoneNames.cpp \
 	../../../Shared/mods/deathmatch/logic/Enums.cpp \
 	../../../Shared/mods/deathmatch/logic/CIdArray.cpp \
-	./utils/CHTTPClient.cpp ./utils/CHTTPRequest.cpp \
-	./utils/CHTTPResponse.cpp \
-	./utils/CTCPClientSocketImpl.cpp \
-	./utils/CTCPImpl.cpp \
 	./utils/CZipMaker.cpp \
 	$(srcdir)/../../../vendor/bob_withers/base64.cpp \
 	$(srcdir)/../../../vendor/bochs/bochs_internal/crc32.cpp \
