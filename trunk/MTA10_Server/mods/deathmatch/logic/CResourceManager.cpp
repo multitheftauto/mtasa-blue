@@ -856,42 +856,6 @@ void CResourceManager::RemoveFromQueue ( CResource* pResource )
 }
 
 
-bool CResourceManager::Install ( char * szURL, char * szName )
-{
-    if ( IsValidFilePath(szName) )
-    {
-        CTCPImpl * pTCP = new CTCPImpl;
-        pTCP->Initialize ();
-
-        CHTTPRequest * request = new CHTTPRequest ( szURL );
-        CHTTPResponse * response = request->Send ( pTCP );
-        if ( response )
-        {
-            size_t dataLength = response->GetDataLength();
-            if ( dataLength != 0 )
-            {
-                const char* szBuffer = response->GetData ();
-
-                SString strResourceRoot = g_pServerInterface->GetModManager ()->GetAbsolutePath ( "resources" );
-                SString strResourceFileName ( "%s/%s.zip", strResourceRoot.c_str (), szName );
-
-                FILE * file = fopen ( strResourceFileName, "wb" );
-                if ( file )
-                {
-                    fwrite ( szBuffer, dataLength, 1, file );
-                    fclose ( file );
-                    delete pTCP;
-                    return true;
-                }
-            }
-        }
-        delete request;
-        delete pTCP;
-    }
-    return false;
-}
-
-
 /////////////////////////////////
 //
 // CreateResource

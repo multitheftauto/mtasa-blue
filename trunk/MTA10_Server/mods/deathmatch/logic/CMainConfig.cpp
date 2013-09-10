@@ -757,7 +757,6 @@ bool CMainConfig::LoadExtended ( void )
     RegisterCommand ( "refreshall", CConsoleCommands::RefreshAllResources, false );
     RegisterCommand ( "list", CConsoleCommands::ListResources, false );
     RegisterCommand ( "info", CConsoleCommands::ResourceInfo, false );
-    RegisterCommand ( "install", CConsoleCommands::InstallResource, false );
     RegisterCommand ( "upgrade", CConsoleCommands::UpgradeResources, false );
     RegisterCommand ( "check", CConsoleCommands::CheckResources, false );
 
