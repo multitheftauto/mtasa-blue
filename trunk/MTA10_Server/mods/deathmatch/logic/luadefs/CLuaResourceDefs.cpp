@@ -15,6 +15,8 @@
 *****************************************************************************/
 
 #include "StdInc.h"
+#include "../utils/CFunctionUseLogger.h"
+
 extern CNetServer* g_pRealNetServer;
 
 void CLuaResourceDefs::LoadFunctions ( void )
@@ -1234,6 +1236,8 @@ int CLuaResourceDefs::LoadString( lua_State* luaVM )
             if ( !luaL_loadbuffer( luaVM, cpBuffer, uiSize, szChunkname ) )
             {
                 // Ok
+                if ( g_pGame->GetConfig()->GetLoadstringLogEnabled() )
+                    g_pGame->GetFunctionUseLogger()->OnFunctionUse( luaVM, "loadstring", cpBuffer, uiSize );
                 return 1;
             }
             else
@@ -1311,6 +1315,8 @@ int CLuaResourceDefs::Load( lua_State* luaVM )
             if ( !luaL_loadbuffer( luaVM, cpBuffer, uiSize, szChunkname ) )
             {
                 // Ok
+                if ( g_pGame->GetConfig()->GetLoadstringLogEnabled() )
+                    g_pGame->GetFunctionUseLogger()->OnFunctionUse( luaVM, "load", cpBuffer, uiSize );
                 return 1;
             }
             else

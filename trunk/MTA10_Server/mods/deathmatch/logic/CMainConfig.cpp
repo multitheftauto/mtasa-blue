@@ -422,6 +422,8 @@ bool CMainConfig::Load ( void )
     else
         m_strDbLogFilename = g_pServerInterface->GetModManager ()->GetAbsolutePath ( "logs/db.log" );
 
+    if ( GetString ( m_pRootNode, "loadstringfile", strBuffer, 1 ) == IS_SUCCESS )
+        m_strLoadstringLogFilename = g_pServerInterface->GetModManager ()->GetAbsolutePath ( strBuffer.c_str () );
 
     // Grab the server access control list
     if ( GetString ( m_pRootNode, "acl", strBuffer, 1, 255 ) == IS_SUCCESS )
