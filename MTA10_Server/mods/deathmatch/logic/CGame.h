@@ -120,6 +120,7 @@ class CBuildingRemovalManager;
 class CCustomWeaponManager;
 class COpenPortsTester;
 class CMasterServerAnnouncer;
+class CFunctionUseLogger;
 
 // Packet forward declarations
 class CCommandPacket;
@@ -255,6 +256,7 @@ public:
     inline CWeaponStatManager*      GetWeaponStatManager        ( void )        { return m_pWeaponStatsManager; }
     inline CBuildingRemovalManager* GetBuildingRemovalManager   ( void )        { return m_pBuildingRemovalManager; }
     inline CCustomWeaponManager*    GetCustomWeaponManager      ( void )        { return m_pCustomWeaponManager; }
+    inline CFunctionUseLogger*      GetFunctionUseLogger        ( void )        { return m_pFunctionUseLogger; }
 
     void                        JoinPlayer                  ( CPlayer& Player );
     void                        InitialDataStream           ( CPlayer& Player );
@@ -487,6 +489,7 @@ private:
     CBuildingRemovalManager*        m_pBuildingRemovalManager;
 
     CCustomWeaponManager*           m_pCustomWeaponManager;
+    CFunctionUseLogger*             m_pFunctionUseLogger;
 
     char*                       m_szCurrentFileName;
 

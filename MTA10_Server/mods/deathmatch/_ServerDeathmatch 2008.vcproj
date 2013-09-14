@@ -1405,6 +1405,10 @@
 					</FileConfiguration>
 				</File>
 				<File
+					RelativePath=".\utils\CFunctionUseLogger.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\vendor\bochs\bochs_internal\crc32.cpp"
 					>
 					<FileConfiguration
@@ -2687,6 +2691,10 @@
 				>
 				<File
 					RelativePath="..\..\..\vendor\bob_withers\base64.h"
+					>
+				</File>
+				<File
+					RelativePath=".\utils\CFunctionUseLogger.h"
 					>
 				</File>
 				<File
