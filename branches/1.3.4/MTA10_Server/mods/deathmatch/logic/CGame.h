@@ -115,6 +115,7 @@ class CWaterManager;
 class CWeaponStatManager;
 class CBuildingRemovalManager;
 
+class CFunctionUseLogger;
 
 // Packet forward declarations
 class CCommandPacket;
@@ -249,6 +250,7 @@ public:
     inline CLightsyncManager*       GetLightSyncManager         ( void )        { return &m_lightsyncManager; }
     inline CWeaponStatManager*      GetWeaponStatManager        ( void )        { return m_pWeaponStatsManager; }
     inline CBuildingRemovalManager* GetBuildingRemovalManager   ( void )        { return m_pBuildingRemovalManager; }
+    inline CFunctionUseLogger*      GetFunctionUseLogger        ( void )        { return m_pFunctionUseLogger; }
 
     void                        JoinPlayer                  ( CPlayer& Player );
     void                        InitialDataStream           ( CPlayer& Player );
@@ -478,6 +480,8 @@ private:
 
     CWeaponStatManager*             m_pWeaponStatsManager;
     CBuildingRemovalManager*        m_pBuildingRemovalManager;
+
+    CFunctionUseLogger*             m_pFunctionUseLogger;
 
     char*                       m_szCurrentFileName;
 

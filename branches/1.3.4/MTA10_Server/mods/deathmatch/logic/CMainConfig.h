@@ -118,6 +118,8 @@ public:
     int                             GetVehExtrapolatePercent        ( void ) const              { return m_iVehExtrapolatePercent; }
     int                             GetVehExtrapolatePingLimit      ( void ) const              { return m_iVehExtrapolatePingLimit; }
     bool                            GetUseAltPulseOrder             ( void ) const              { return m_bUseAltPulseOrder != 0; }
+    const SString&                  GetLoadstringLogFilename        ( void ) const              { return m_strLoadstringLogFilename; }
+    bool                            GetLoadstringLogEnabled         ( void ) const              { return !m_strLoadstringLogFilename.empty(); }
 
     SString                         GetSetting                      ( const SString& configSetting );
     bool                            GetSetting                      ( const SString& configSetting, SString& strValue );
@@ -201,6 +203,7 @@ private:
     int                             m_iVehExtrapolatePingLimit;
     int                             m_bUseAltPulseOrder;
     int                             m_bNetAutoFilter;
+    SString                         m_strLoadstringLogFilename;
 };
 
 #endif

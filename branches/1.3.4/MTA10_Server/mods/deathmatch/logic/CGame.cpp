@@ -21,6 +21,7 @@
 
 #include "StdInc.h"
 #include "../utils/COpenPortsTester.h"
+#include "../utils/CFunctionUseLogger.h"
 #include "net/SimHeaders.h"
 #include <signal.h>
 
@@ -140,6 +141,7 @@ CGame::CGame ( void )
     m_pWaterManager = NULL;
     m_pWeaponStatsManager = NULL;
     m_pBuildingRemovalManager = NULL;
+    m_pFunctionUseLogger = NULL;
 #ifdef WITH_OBJECT_SYNC
     m_pObjectSync = NULL;
 #endif
@@ -306,6 +308,7 @@ CGame::~CGame ( void )
     SAFE_DELETE ( m_pWaterManager );
     SAFE_DELETE ( m_pWeaponStatsManager );
     SAFE_DELETE ( m_pBuildingRemovalManager );
+    SAFE_DELETE ( m_pFunctionUseLogger );
     SAFE_DELETE ( m_pOpenPortsTester );
     CSimControl::Shutdown ();
 
@@ -450,6 +453,7 @@ void CGame::DoPulse ( void )
 
     PulseMasterServerAnnounce ();
 
+    CLOCK_CALL1( m_pFunctionUseLogger->Pulse (); );
     if ( m_pOpenPortsTester )
         m_pOpenPortsTester->Poll ();
 
@@ -562,6 +566,8 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
             return false;
         }
     }
+
+    m_pFunctionUseLogger = new CFunctionUseLogger( m_pMainConfig->GetLoadstringLogFilename() );
 
     // Setup server id
     if ( !g_pNetServer->InitServerId ( m_pMainConfig->GetIdFile () ) )
