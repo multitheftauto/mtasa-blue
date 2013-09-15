@@ -2159,46 +2159,6 @@ void* LoadFunction( const char* c, const char* a, const char* b )
 
 //////////////////////////////////////////////////////////
 //
-// MaybeRenameExe
-//
-// Figure out whether to use a renamed exe, and return filename to use.
-// Also tries file copy if required.
-//
-//////////////////////////////////////////////////////////
-SString MaybeRenameExe( const SString& strGTAPath, bool* pbCopyFailed )
-{
-    SString strGTAEXEPath = PathJoin( strGTAPath, MTA_GTAEXE_NAME );
-    if ( pbCopyFailed )
-        *pbCopyFailed = false;
-
-    int iDoRename;
-    if ( GetApplicationSettingInt( "nvhacks", "optimus" ) )
-        iDoRename = GetApplicationSettingInt( "nvhacks", "optimus-rename-exe" );
-    else
-        iDoRename = GetApplicationSettingInt( "driver-overrides-disabled" );
-
-    if ( iDoRename )
-    {
-        SString strHTAEXEPath = PathJoin( strGTAPath, MTA_HTAEXE_NAME );
-        SString strGTAMd5 = CMD5Hasher::CalculateHexString( strGTAEXEPath );
-        SString strHTAMd5 = CMD5Hasher::CalculateHexString( strHTAEXEPath );
-        if ( strGTAMd5 != strHTAMd5 )
-        {
-            if ( !FileCopy( strGTAEXEPath, strHTAEXEPath ) )
-                if ( pbCopyFailed )
-                    *pbCopyFailed = true;
-            strGTAMd5 = CMD5Hasher::CalculateHexString( strGTAEXEPath );
-            strHTAMd5 = CMD5Hasher::CalculateHexString( strHTAEXEPath );
-        }
-        if ( strGTAMd5 == strHTAMd5 )
-            strGTAEXEPath = strHTAEXEPath;
-    }
-    return strGTAEXEPath;
-}
-
-
-//////////////////////////////////////////////////////////
-//
 // BsodDetectionPreLaunch
 //
 // Possible BSOD situation if a new mini-dump file was created after the last game was started
