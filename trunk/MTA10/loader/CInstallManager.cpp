@@ -121,51 +121,15 @@ void CInstallManager::InitSequencer ( void )
                 CR "            CALL ChangeToAdmin "                // If changes failed, try as admin
                 CR "            IF LastResult == ok GOTO newlayout_check: "
                 CR "newlayout_end: "                                ////// End of 'new layout check' //////
-                CR " "        
-                CR "aero_check: "                                   ////// Start of 'Windows 7 aero desktop fix' //////
-                CR "            CALL ProcessAeroChecks "            // Make changes to comply with user setting
-                CR "            IF LastResult == ok GOTO aero_end: "
+                CR " "
+                CR "exepatch_check: "                               ////// Start of 'Exe patch fix' //////
+                CR "            CALL ProcessExePatchChecks "        // Make changes to comply with requirements
+                CR "            IF LastResult == ok GOTO exepatch_end: "
                 CR " "
                 CR "            CALL ChangeToAdmin "                // If changes failed, try as admin
-                CR "            IF LastResult == ok GOTO aero_check: "
+                CR "            IF LastResult == ok GOTO exepatch_check: "
                 CR " "
-                CR "aero_end: "                                     ////// End of 'Windows 7 aero desktop fix' //////
-                CR " "        
-                CR "largemem_check: "                               ////// Start of 'LargeMem fix' //////
-                CR "            CALL ProcessLargeMemChecks "        // Make changes to comply with requirements
-                CR "            IF LastResult == ok GOTO largemem_end: "
-                CR " "
-                CR "            CALL ChangeToAdmin "                // If changes failed, try as admin
-                CR "            IF LastResult == ok GOTO largemem_check: "
-                CR " "
-                CR "largemem_end: "                                 ////// End of 'LargeMem fix' //////
-                CR " "        
-                CR "dep_check: "                                    ////// Start of 'DEP fix' //////
-                CR "            CALL ProcessDepChecks "             // Make changes to comply with user setting
-                CR "            IF LastResult == ok GOTO dep_end: "
-                CR " "
-                CR "            CALL ChangeToAdmin "                // If changes failed, try as admin
-                CR "            IF LastResult == ok GOTO dep_check: "
-                CR " "
-                CR "dep_end: "                                      ////// End of 'DEP fix' //////
-                CR " "        
-                CR "nvidia_check: "                                 ////// Start of 'NVidia Optimus fix' //////
-                CR "            CALL ProcessNvightmareChecks "      // Make changes to comply with requirements
-                CR "            IF LastResult == ok GOTO nvidia_end: "
-                CR " "
-                CR "            CALL ChangeToAdmin "                // If changes failed, try as admin
-                CR "            IF LastResult == ok GOTO nvidia_check: "
-                CR " "
-                CR "nvidia_end: "                                   ////// End of 'NVidia Optimus fix' //////
-                CR " "        
-                CR "execopy_check: "                                ////// Start of 'Exe copy fix' //////
-                CR "            CALL ProcessExeCopyChecks "         // Make changes to comply with requirements
-                CR "            IF LastResult == ok GOTO execopy_end: "
-                CR " "
-                CR "            CALL ChangeToAdmin "                // If changes failed, try as admin
-                CR "            IF LastResult == ok GOTO execopy_check: "
-                CR " "
-                CR "execopy_end: "                                  ////// End of 'Exe copy fix' //////
+                CR "exepatch_end: "                                 ////// End of 'Exe patch fix' //////
                 CR " "        
                 CR "service_check: "                                ////// Start of 'Service checks' //////
                 CR "            CALL ProcessServiceChecks "         // Make changes to comply with service requirements
@@ -206,11 +170,7 @@ void CInstallManager::InitSequencer ( void )
     m_pSequencer->AddFunction ( "ChangeToAdmin",           &CInstallManager::_ChangeToAdmin );
     m_pSequencer->AddFunction ( "ShowCopyFailDialog",      &CInstallManager::_ShowCopyFailDialog );
     m_pSequencer->AddFunction ( "ProcessLayoutChecks",     &CInstallManager::_ProcessLayoutChecks );
-    m_pSequencer->AddFunction ( "ProcessAeroChecks",       &CInstallManager::_ProcessAeroChecks );
-    m_pSequencer->AddFunction ( "ProcessLargeMemChecks",   &CInstallManager::_ProcessLargeMemChecks );
-    m_pSequencer->AddFunction ( "ProcessDepChecks",        &CInstallManager::_ProcessDepChecks );
-    m_pSequencer->AddFunction ( "ProcessNvightmareChecks", &CInstallManager::_ProcessNvightmareChecks );
-    m_pSequencer->AddFunction ( "ProcessExeCopyChecks",    &CInstallManager::_ProcessExeCopyChecks );
+    m_pSequencer->AddFunction ( "ProcessExePatchChecks",   &CInstallManager::_ProcessExePatchChecks );
     m_pSequencer->AddFunction ( "ProcessServiceChecks",    &CInstallManager::_ProcessServiceChecks );
     m_pSequencer->AddFunction ( "ChangeFromAdmin",         &CInstallManager::_ChangeFromAdmin );
     m_pSequencer->AddFunction ( "InstallNewsItems",        &CInstallManager::_InstallNewsItems );
@@ -662,339 +622,6 @@ SString CInstallManager::_ProcessLayoutChecks ( void )
 
 //////////////////////////////////////////////////////////
 //
-// CInstallManager::_ProcessAeroChecks
-//
-// Change the link timestamp in gta_sa.exe to trick windows 7 into using aero
-//
-//////////////////////////////////////////////////////////
-SString CInstallManager::_ProcessAeroChecks ( void )
-{
-    SString strGTAPath;
-    if ( GetGamePath ( strGTAPath ) == GAME_PATH_OK )
-    {
-        SString strGTAEXEPath = PathJoin ( strGTAPath , MTA_GTAEXE_NAME );
-        // Get the top byte of the file link timestamp
-        uchar ucTimeStamp = 0;
-        FILE* fh = fopen ( strGTAEXEPath, "rb" );
-        if ( fh )
-        {
-            if ( !fseek ( fh, 0x8B, SEEK_SET ) )
-            {
-                if ( fread ( &ucTimeStamp, sizeof ( ucTimeStamp ), 1, fh ) != 1 )
-                {
-                    ucTimeStamp = 0;
-                }
-            }
-            fclose ( fh );
-        }
-
-        const uchar AERO_DISABLED = 0x42;
-        const uchar AERO_ENABLED  = 0x43;
-
-        // Check it's a value we're expecting
-        bool bCanChangeAeroSetting = ( ucTimeStamp == AERO_DISABLED || ucTimeStamp == AERO_ENABLED );
-        SetApplicationSettingInt ( "aero-changeable", bCanChangeAeroSetting );
-
-        if ( bCanChangeAeroSetting )
-        {
-            // Get option to set
-            bool bAeroEnabled = GetApplicationSettingInt ( "aero-enabled" ) ? true : false;
-            uchar ucTimeStampRequired = bAeroEnabled ? AERO_ENABLED : AERO_DISABLED;
-            if ( ucTimeStamp != ucTimeStampRequired )
-            {
-                // Change needed!
-                SetFileAttributes ( strGTAEXEPath, FILE_ATTRIBUTE_NORMAL );
-                FILE* fh = fopen ( strGTAEXEPath, "r+b" );
-                if ( !fh )
-                {
-                    m_strAdminReason = _("Update Aero setting");
-                    return "fail";
-                }
-                if ( !fseek ( fh, 0x8B, SEEK_SET ) )
-                {
-                    fwrite ( &ucTimeStampRequired, sizeof ( ucTimeStampRequired ), 1, fh );
-                }
-                fclose ( fh );
-            }
-        }
-    }
-    return "ok";
-}
-
-
-//////////////////////////////////////////////////////////
-//
-// CInstallManager::_ProcessLargeMemChecks
-//
-// Change the PE header to give GTA access to more memory
-//
-//////////////////////////////////////////////////////////
-SString CInstallManager::_ProcessLargeMemChecks ( void )
-{
-    SString strGTAPath;
-    if ( GetGamePath ( strGTAPath ) == GAME_PATH_OK )
-    {
-        SString strGTAEXEPath = PathJoin ( strGTAPath , MTA_GTAEXE_NAME );
-        // Get the top byte of the file link timestamp
-        ushort usCharacteristics = 0;
-        FILE* fh = fopen ( strGTAEXEPath, "rb" );
-        if ( fh )
-        {
-            if ( !fseek ( fh, 0x96, SEEK_SET ) )
-            {
-                if ( fread ( &usCharacteristics, sizeof ( usCharacteristics ), 1, fh ) != 1 )
-                {
-                    usCharacteristics = 0;
-                }
-            }
-            fclose ( fh );
-        }
-
-        const ushort LARGEMEM_DISABLED = 0x10f;
-        const ushort LARGEMEM_ENABLED  = 0x12f;
-
-        // Check it's a value we're expecting
-        bool bCanChangeLargeMemSetting = ( usCharacteristics == LARGEMEM_DISABLED || usCharacteristics == LARGEMEM_ENABLED );
-
-        if ( bCanChangeLargeMemSetting )
-        {
-            ushort usCharacteristicsRequired = LARGEMEM_ENABLED;
-            if ( usCharacteristics != usCharacteristicsRequired )
-            {
-                // Change needed!
-                SetFileAttributes ( strGTAEXEPath, FILE_ATTRIBUTE_NORMAL );
-                FILE* fh = fopen ( strGTAEXEPath, "r+b" );
-                if ( !fh )
-                {
-                    m_strAdminReason = _("Update Large Memory setting");
-                    return "fail";
-                }
-                if ( !fseek ( fh, 0x96, SEEK_SET ) )
-                {
-                    fwrite ( &usCharacteristicsRequired, sizeof ( usCharacteristicsRequired ), 1, fh );
-                }
-                fclose ( fh );
-            }
-        }
-    }
-    return "ok";
-}
-
-
-//////////////////////////////////////////////////////////
-//
-// CInstallManager::_ProcessDepChecks
-//
-// Change the PE header to enable DEP
-//
-//////////////////////////////////////////////////////////
-SString CInstallManager::_ProcessDepChecks ( void )
-{
-    SString strGTAPath;
-    if ( GetGamePath ( strGTAPath ) == GAME_PATH_OK )
-    {
-        SString strGTAEXEPath = PathJoin ( strGTAPath , MTA_GTAEXE_NAME );
-        // Get the top byte of the file link timestamp
-        ulong ulDllCharacteristics = 0;
-        FILE* fh = fopen ( strGTAEXEPath, "rb" );
-        if ( fh )
-        {
-            if ( !fseek ( fh, 0xDC, SEEK_SET ) )
-            {
-                if ( fread ( &ulDllCharacteristics, sizeof ( ulDllCharacteristics ), 1, fh ) != 1 )
-                {
-                    ulDllCharacteristics = 0;
-                }
-            }
-            fclose ( fh );
-        }
-
-        const ulong DEP_DISABLED = 0x00000002;
-        const ulong DEP_ENABLED  = 0x01000002;
-
-        // Check it's a value we're expecting
-        bool bCanChangeDepSetting = ( ulDllCharacteristics == DEP_DISABLED || ulDllCharacteristics == DEP_ENABLED );
-
-        if ( bCanChangeDepSetting )
-        {
-            ulong ulDllCharacteristicsRequired = DEP_ENABLED;
-            if ( ulDllCharacteristics != ulDllCharacteristicsRequired )
-            {
-                // Change needed!
-                SetFileAttributes ( strGTAEXEPath, FILE_ATTRIBUTE_NORMAL );
-                FILE* fh = fopen ( strGTAEXEPath, "r+b" );
-                if ( !fh )
-                {
-                    m_strAdminReason = _("Update DEP setting");
-                    return "fail";
-                }
-                if ( !fseek ( fh, 0xDC, SEEK_SET ) )
-                {
-                    fwrite ( &ulDllCharacteristicsRequired, sizeof ( ulDllCharacteristicsRequired ), 1, fh );
-                }
-                fclose ( fh );
-            }
-        }
-    }
-    return "ok";
-}
-
-
-//////////////////////////////////////////////////////////
-//
-// CInstallManager::_ProcessNvightmareChecks
-//
-// Change the PE header to export 'NvOptimusEnablement'
-//
-//////////////////////////////////////////////////////////
-namespace
-{
-    #define EU_VERSION_BYTE 0x004A1AA0     // Zero if US version 
-
-    uint oldExportDir[] = { 0, 0 };
-    uint newExportDir[] = { 0x004a32d0, 0x00000060 };
-    uint oldExportTable[] = { 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0 };
-    uint newExportTable[] = { 0x00000000, 0x51a9df70, 0x00000000, 0x004a3302,   //  ....pß©Q.....3J.
-                              0x00000001, 0x00000001, 0x00000001, 0x004a32f8,   //  ............ø2J.
-                              0x004a32fc, 0x004a3300, 0x004c6988, 0x004a3317,   //  ü/£..3J.ˆiL..3J.
-                              0x74670000, 0x61735f61, 0x6578652e, 0x00000000,   //  ..gta_sa.exe....
-                              0x00000000, 0x4e000000, 0x74704f76, 0x73756d69,   //  .......NvOptimus
-                              0x62616e45, 0x656d656c, 0x0000746e, 0x00000000 }; //  Enablement......
-
-    C_ASSERT( sizeof( oldExportDir ) == sizeof( newExportDir ) );
-    C_ASSERT( sizeof( oldExportTable ) == sizeof( newExportTable ) );
-
-    struct SDataumRow
-    {
-        uint uiFileOffsetUS;
-        uint uiFileOffsetEU;
-        void* pOldData;
-        void* pNewData;
-        uint uiDataSize;
-    };
-
-    // List of patchlets
-    SDataumRow datumList[] = {
-                    { 0x004A1AD0, 0x004A1ED0, oldExportTable,   newExportTable, sizeof( newExportTable ), },
-                    { 0x000000F8, 0x000000F8, oldExportDir,     newExportDir,   sizeof( newExportDir ), },
-                };
-
-    SDataumRow valueItem = {
-                    0x004C4588, 0x004C4988, NULL, NULL, 0
-                };
-}
-
-SString CInstallManager::_ProcessNvightmareChecks ( void )
-{
-    SString strGTAPath;
-    if ( GetGamePath( strGTAPath ) == GAME_PATH_OK )
-    {
-        SString strGTAEXEPath = PathJoin( strGTAPath , MTA_GTAEXE_NAME );
-
-        char bIsEUVersion = false;
-        bool bHasExportTable = true;
-        uint uiExportValue = 0;
-        bool bUnknownBytes = false;
-        FILE* fh = fopen( strGTAEXEPath, "rb" );
-        bool bFileError = ( fh == NULL );
-        if( !bFileError )
-        {
-            // Determine version
-            bFileError |= ( fseek( fh, EU_VERSION_BYTE, SEEK_SET ) != 0 );
-            bFileError |= ( fread( &bIsEUVersion, 1, 1, fh ) != 1 );
-
-            // Determine patched status
-            for ( uint i = 0 ; i < NUMELMS( datumList ) ; i++ )
-            {
-                const SDataumRow& row = datumList[ i ];
-                uint uiFileOffset = bIsEUVersion ? row.uiFileOffsetEU : row.uiFileOffsetUS;
-
-                bFileError |= ( fseek( fh, uiFileOffset, SEEK_SET ) != 0 );
-
-                std::vector < char > buffer( row.uiDataSize );
-                bFileError |=  ( fread( &buffer[0], row.uiDataSize, 1, fh ) != 1 );
-
-                if ( memcmp( &buffer[0], row.pOldData, row.uiDataSize ) == 0 )
-                    bHasExportTable = false;
-                else
-                if ( memcmp( &buffer[0], row.pNewData, row.uiDataSize ) != 0 )
-                    bUnknownBytes = true;
-            }
-            // Determine export value
-            {
-                uint uiFileOffset = bIsEUVersion ? valueItem.uiFileOffsetEU : valueItem.uiFileOffsetUS;
-                bFileError |= ( fseek( fh, uiFileOffset, SEEK_SET ) != 0 );
-                bFileError |= ( fread( &uiExportValue, sizeof( uiExportValue ), 1, fh ) != 1 );
-            }
-            fclose ( fh );
-        }
-
-        if ( bFileError )
-            WriteDebugEvent( "Nvightmare patch: Can not apply due to unknown file error" );
-        else
-        if ( bUnknownBytes )
-            WriteDebugEvent( "Nvightmare patch: Can not apply due to unknown file bytes" );
-        else
-        {
-            // Determine if change required
-            bool bReqExportTable = GetApplicationSettingInt( "nvhacks", "optimus-export-enablement" ) ? true : false;
-            uint uiReqExportValue = 1;
-            if ( bReqExportTable == bHasExportTable && uiReqExportValue == uiExportValue )
-            {
-                if ( bReqExportTable )
-                    WriteDebugEvent( SString( "Nvightmare patch:  Already applied ExportValue of %d", uiReqExportValue ) );
-            }
-            else
-            {
-                // Change needed!
-                SetFileAttributes( strGTAEXEPath, FILE_ATTRIBUTE_NORMAL );
-                FILE* fh = fopen( strGTAEXEPath, "r+b" );
-                if ( !fh )
-                {
-                    m_strAdminReason = _("Update graphics driver compliance");
-                    return "fail";
-                }
-
-                bool bFileError = false;
-                // Write patches
-                if ( bReqExportTable != bHasExportTable )
-                {
-                    WriteDebugEvent( SString( "Nvightmare patch: Changing HasExportTable to %d", bReqExportTable ) );
-                    for ( uint i = 0 ; i < NUMELMS( datumList ) ; i++ )
-                    {
-                        const SDataumRow& row = datumList[ i ];
-                        uint uiFileOffset = bIsEUVersion ? row.uiFileOffsetEU : row.uiFileOffsetUS;
-
-                        bFileError |= ( fseek( fh, uiFileOffset, SEEK_SET ) != 0 );
-                        if ( bReqExportTable )
-                            bFileError |= ( fwrite( row.pNewData, row.uiDataSize, 1, fh ) != 1 );
-                        else
-                            bFileError |= ( fwrite( row.pOldData, row.uiDataSize, 1, fh ) != 1 );
-                    }
-                }
-                // Write value
-                if ( uiReqExportValue != uiExportValue )
-                {
-                    WriteDebugEvent( SString( "Nvightmare patch: Changing ExportValue to %d", uiReqExportValue ) );
-                    uint uiFileOffset = bIsEUVersion ? valueItem.uiFileOffsetEU : valueItem.uiFileOffsetUS;
-                    bFileError |= ( fseek( fh, uiFileOffset, SEEK_SET ) != 0 );
-                    bFileError |= ( fwrite( &uiReqExportValue, sizeof( uiReqExportValue ), 1, fh ) != 1 );
-                }
-
-                fclose ( fh );
-                if ( bFileError )
-                    WriteDebugEvent( "Nvightmare patch: File update completed with file errors" );
-                else
-                    WriteDebugEvent( "Nvightmare patch: File update completed" );
-            }
-        }
-    }
-    return "ok";
-}
-
-
-//////////////////////////////////////////////////////////
-//
 // CInstallManager::UpdateOptimusSymbolExport
 //
 // Try to update NvightmareChecks
@@ -1003,28 +630,76 @@ SString CInstallManager::_ProcessNvightmareChecks ( void )
 //////////////////////////////////////////////////////////
 bool CInstallManager::UpdateOptimusSymbolExport( void )
 {
-    return _ProcessNvightmareChecks() == "ok";
+    return _ProcessExePatchChecks() == "ok";
 }
 
 
 //////////////////////////////////////////////////////////
 //
-// CInstallManager::_ProcessExeCopyChecks
+// MaybeRenameExe
 //
-// Make copy of main exe if required
+// Figure out whether to use a renamed exe, and return filename to use.
+// Also tries file copy if required.
 //
 //////////////////////////////////////////////////////////
-SString CInstallManager::_ProcessExeCopyChecks ( void )
+SString CInstallManager::MaybeRenameExe( const SString& strGTAPath )
 {
-    SString strGTAPath;
-    if ( GetGamePath( strGTAPath ) == GAME_PATH_OK )
+    // Try patch/copy (may fail if not admin)
+    _ProcessExePatchChecks();
+
+    SString strGTAEXEPath = PathJoin( strGTAPath, MTA_GTAEXE_NAME );
+    if ( ShouldUseExeCopy() )
     {
-        bool bCopyFailed;
-        MaybeRenameExe( strGTAPath, &bCopyFailed );
-        if ( bCopyFailed )
+        // See if exe copy seems usable
+        SString strHTAEXEPath = PathJoin( strGTAPath, MTA_HTAEXE_NAME );
+        uint uiStdFileSize = FileSize( strGTAEXEPath );
+        if ( uiStdFileSize && uiStdFileSize == FileSize( strHTAEXEPath ) )
+            strGTAEXEPath = strHTAEXEPath;
+    }
+
+    return strGTAEXEPath;
+}
+
+
+//////////////////////////////////////////////////////////
+//
+// CInstallManager::_ProcessExePatchChecks
+//
+// Check which changes need to be made to the exe and make a copy if required
+//
+//////////////////////////////////////////////////////////
+SString CInstallManager::_ProcessExePatchChecks ( void )
+{
+    SExePatchedStatus reqStatus = GetExePatchRequirements();
+
+    if ( !ShouldUseExeCopy() )
+    {
+        // Simple patching if won't be using a exe copy
+        if ( !SetExePatchedStatus( false, reqStatus ) )
         {
-            m_strAdminReason = _("Copy main executable to avoid graphic driver issues");
+            m_strAdminReason = GetPatchExeAdminReason( false, reqStatus );
             return "fail";
+        }
+    }
+    else
+    {
+        // Bit more complercated if will be using a exe copy
+
+        // First check if we need to create/update the exe copy
+        if ( GetExePatchedStatus( true ) != reqStatus || GetExeFileSize( false ) != GetExeFileSize( true ) )
+        {
+            // Copy
+            if ( !CopyExe() )
+            {
+                m_strAdminReason = GetPatchExeAdminReason( true, reqStatus );
+                return "fail";
+            }
+            // Apply patches
+            if ( !SetExePatchedStatus( true, reqStatus ) )
+            {
+                m_strAdminReason = GetPatchExeAdminReason( true, reqStatus );
+                return "fail";
+            }
         }
     }
     return "ok";

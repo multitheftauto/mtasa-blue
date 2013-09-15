@@ -561,6 +561,11 @@ DontInstallRedist:
         File "${FILES_ROOT}\MTA San Andreas\mta\XInput9_1_0_mta.dll"
         SetOutPath "$INSTDIR\MTA\cgui\images"
         File "${FILES_ROOT}\MTA San Andreas\mta\cgui\images\busy_spinner.png"
+        File "${FILES_ROOT}\MTA San Andreas\mta\vea.dll"
+        File "${FILES_ROOT}\MTA San Andreas\mta\vog.dll"
+        File "${FILES_ROOT}\MTA San Andreas\mta\vvo.dll"
+        File "${FILES_ROOT}\MTA San Andreas\mta\vvof.dll"
+
 
 		${If} "$(LANGUAGE_CODE)" != ""
 			# Write our language to registry

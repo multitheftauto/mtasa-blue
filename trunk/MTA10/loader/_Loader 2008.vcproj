@@ -336,6 +336,10 @@
 			Filter="cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 			>
 			<File
+				RelativePath=".\CExePatchedStatus.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\CInstallManager.cpp"
 				>
 			</File>
@@ -388,6 +392,10 @@
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl"
 			>
+			<File
+				RelativePath=".\CExePatchedStatus.h"
+				>
+			</File>
 			<File
 				RelativePath=".\CInstallManager.h"
 				>
