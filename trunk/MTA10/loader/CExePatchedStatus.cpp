@@ -639,13 +639,14 @@ EPatchResult UpdatePatchStatusAltModules( const SString& strGTAEXEPath, EPatchMo
         return PATCH_CHECK_RESULT_OFF;
     }
 
-    uint uiReqNumOldNames = ( mode == PATCH_SET_ON ) ? 0 : 2;
-    if ( uiNumOldNames != uiReqNumOldNames )
+    if ( ( mode == PATCH_SET_ON && uiNumOldNames == 2 )
+      || ( mode == PATCH_SET_OFF && uiNumNewNames == 2 ) )
     {
+        // Change needed!
+
         // Can't do this to gta_sa.exe 4 sure
         assert( !strGTAEXEPath.EndsWithI( "gta_sa.exe" ) );
 
-        // Change needed!
         SetFileAttributes ( strGTAEXEPath, FILE_ATTRIBUTE_NORMAL );
         FILE* fh = fopen ( strGTAEXEPath, "r+b" );
         if ( !fh )
