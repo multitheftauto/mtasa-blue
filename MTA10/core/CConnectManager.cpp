@@ -224,6 +224,17 @@ static SString AppendNetErrorCode ( const SString& strText )
     return strText;
 }
 
+void CConnectManager::StaticWantsTimeoutHelpCallBack( void* pData, uint uiButton )
+{
+    CCore::GetSingleton ().GetLocalGUI ()->GetMainMenu ()->GetQuestionWindow ()->Reset ();
+
+    if ( uiButton == 1 )
+    {
+        uint uiErrorCode = (uchar)pData;
+        BrowseToSolution ( SString( "connect-timeout&code=%08X", uiErrorCode ), EXIT_GAME_FIRST );
+    }
+}
+
 
 void CConnectManager::DoPulse ( void )
 {
@@ -255,7 +266,25 @@ void CConnectManager::DoPulse ( void )
         if ( time ( NULL ) >= m_tConnectStarted + 8 )
         {
             // Show a message that the connection timed out and abort
-            CCore::GetSingleton ().ShowMessageBox ( _("Error")+_E("CC23"), AppendNetErrorCode ( _("Connection timed out") ), MB_BUTTON_OK | MB_ICON_ERROR );
+            SString strMessage = AppendNetErrorCode ( _("Connection timed out") );
+            uint uiErrorCode = CCore::GetSingleton ().GetNetwork ()->GetExtendedErrorCode ();
+            if ( uiErrorCode == 0 )
+            {
+                CCore::GetSingleton ().ShowMessageBox ( _("Error")+_E("CC23"), strMessage, MB_BUTTON_OK | MB_ICON_ERROR );
+            }
+            else
+            {
+                strMessage += "\n\n";
+                strMessage += _("Do you want to see some on-line help about this problem ?");
+                CQuestionBox* pQuestionBox = CCore::GetSingleton ().GetLocalGUI ()->GetMainMenu ()->GetQuestionWindow ();
+                pQuestionBox->Reset ();
+                pQuestionBox->SetTitle ( _("Error")+_E("CC23") );
+                pQuestionBox->SetMessage ( strMessage );
+                pQuestionBox->SetButton ( 0, _("No") );
+                pQuestionBox->SetButton ( 1, _("Yes") );
+                pQuestionBox->SetCallback ( StaticWantsTimeoutHelpCallBack, (void*)uiErrorCode );
+                pQuestionBox->Show ();
+            }
             Abort ();
         }
         else
