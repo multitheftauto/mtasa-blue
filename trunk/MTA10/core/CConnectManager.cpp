@@ -230,7 +230,7 @@ void CConnectManager::StaticWantsTimeoutHelpCallBack( void* pData, uint uiButton
 
     if ( uiButton == 1 )
     {
-        uint uiErrorCode = (uchar)pData;
+        uint uiErrorCode = (uint)pData;
         BrowseToSolution ( SString( "connect-timeout&code=%08X", uiErrorCode ), EXIT_GAME_FIRST );
     }
 }
