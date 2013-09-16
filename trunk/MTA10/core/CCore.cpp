@@ -729,7 +729,7 @@ void CCore::ShowErrorMessageBox( const SString& strTitle, SString strMessage, co
 // Show message box with possibility of on-line help
 //  + with net error code appended to message and trouble link
 //
-void CCore::ShowNetErrorMessageBox( const SString& strTitle, SString strMessage, SString strTroubleLink )
+void CCore::ShowNetErrorMessageBox( const SString& strTitle, SString strMessage, SString strTroubleLink, bool bLinkRequiresErrorCode )
 {
     uint uiErrorCode = CCore::GetSingleton ().GetNetwork ()->GetExtendedErrorCode ();
     if ( uiErrorCode != 0 )
@@ -738,6 +738,10 @@ void CCore::ShowNetErrorMessageBox( const SString& strTitle, SString strMessage,
         if ( !strTroubleLink.empty() )
             strTroubleLink += SString ( "&neterrorcode=%08X", uiErrorCode );
     }
+    else
+    if ( bLinkRequiresErrorCode )
+        strTroubleLink = "";        // No link if no error code
+
     ShowErrorMessageBox( strTitle, strMessage, strTroubleLink );
 }
 
