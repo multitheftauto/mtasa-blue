@@ -1139,7 +1139,7 @@ void CClientGame::DoPulses ( void )
         // Timed out?
         if ( !m_bWaitingForLocalConnect && ulCurrentTime >= m_ulTimeStart + NET_CONNECT_TIMEOUT )
         {
-            g_pCore->ShowNetErrorMessageBox ( _("Error")+_E("CD08"), _("Connection timed out"), "connect-timed-out" );
+            g_pCore->ShowNetErrorMessageBox ( _("Error")+_E("CD08"), _("Connection timed out"), "connect-timed-out", true );
             g_pCore->GetModManager ()->RequestUnload ();
             return;
         }

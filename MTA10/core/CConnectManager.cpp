@@ -246,7 +246,7 @@ void CConnectManager::DoPulse ( void )
         if ( time ( NULL ) >= m_tConnectStarted + 8 )
         {
             // Show a message that the connection timed out and abort
-            g_pCore->ShowNetErrorMessageBox ( _("Error")+_E("CC23"), _("Connection timed out"), "connect-timed-out" );
+            g_pCore->ShowNetErrorMessageBox ( _("Error")+_E("CC23"), _("Connection timed out"), "connect-timed-out", true );
             Abort ();
         }
         else

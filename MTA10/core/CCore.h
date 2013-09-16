@@ -162,7 +162,7 @@ public:
     void                    ShowMessageBox                  ( const char* szTitle, const char* szText, unsigned int uiFlags, GUI_CALLBACK * ResponseHandler = NULL );
     void                    RemoveMessageBox                ( bool bNextFrame = false );
     void                    ShowErrorMessageBox             ( const SString& strTitle, SString strMessage, const SString& strTroubleLink = "" );
-    void                    ShowNetErrorMessageBox          ( const SString& strTitle, SString strMessage, SString strTroubleLink = "" );
+    void                    ShowNetErrorMessageBox          ( const SString& strTitle, SString strMessage, SString strTroubleLink = "", bool bLinkRequiresErrorCode = false );
     static void             ErrorMessageBoxCallBack         ( void* pData, uint uiButton );
     bool                    IsOfflineMod                    ( void ) { return m_bIsOfflineMod; }
     const char *            GetModInstallRoot               ( const char * szModName );
