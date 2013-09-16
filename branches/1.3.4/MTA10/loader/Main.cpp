@@ -494,7 +494,16 @@ int DoLaunchGame ( LPSTR lpCmdLine )
     BeginD3DStuff();
 
     // Use renamed exe if required
-    strGTAEXEPath = MaybeRenameExe( strGTAPath );
+    strGTAEXEPath = GetInstallManager()->MaybeRenameExe( strGTAPath );
+
+    // Check for extra data files when using exe copy
+    if ( ShouldUseExeCopy() )
+    {
+        if ( !FileExists ( PathJoin( strMTASAPath, "MTA", "vea.dll" ) ) )
+        {
+            return DisplayErrorMessageBox ( "Load failed. Please ensure that the latest data files have been installed correctly.", "mta-datafiles-missing" );
+        }
+    }
 
     //////////////////////////////////////////////////////////
     //

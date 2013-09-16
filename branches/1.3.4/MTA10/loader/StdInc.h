@@ -20,3 +20,4 @@
 #include "..\version.h"
 #include "CInstallManager.h"
 #include "D3DStuff.h"
+#include "CExePatchedStatus.h"
