@@ -916,16 +916,6 @@ void CClientGame::DoPulsePostFrame ( void )
     }
 }
 
-
-static SString AppendNetErrorCode ( const SString& strText )
-{
-    uint uiErrorCode = g_pNet->GetExtendedErrorCode ();
-    if ( uiErrorCode != 0 )
-        return strText + SString ( " \nCode: %08X", uiErrorCode );
-    return strText;
-}
-
-
 void CClientGame::DoPulses ( void )
 {
     TIMING_CHECKPOINT( "-CClientGame::DoPulsePostFrame" );
@@ -1070,7 +1060,7 @@ void CClientGame::DoPulses ( void )
                 }
                 else
                 {
-                    g_pCore->ShowMessageBox ( _("Error")+_E("CD06"), AppendNetErrorCode ( _("Error connecting to server.") ), MB_BUTTON_OK | MB_ICON_ERROR );
+                    g_pCore->ShowNetErrorMessageBox ( _("Error")+_E("CD06"), _("Error connecting to server.") );
                     g_pCore->GetModManager ()->RequestUnload ();
                     return;
                 }
@@ -1080,7 +1070,7 @@ void CClientGame::DoPulses ( void )
             if ( m_ulTimeStart != 0 && CClientTime::GetTime () >= m_ulTimeStart + 5000 )
             {
                 // Show timeout message and disconnect
-                g_pCore->ShowMessageBox ( _("Error")+_E("CD07"), AppendNetErrorCode ( _("Connecting to local server timed out. See console for details.") ), MB_BUTTON_OK | MB_ICON_ERROR );
+                g_pCore->ShowNetErrorMessageBox ( _("Error")+_E("CD07"), _("Connecting to local server timed out. See console for details.") );
                 g_pCore->GetModManager ()->RequestUnload ();
                 return;
             }
@@ -1149,7 +1139,7 @@ void CClientGame::DoPulses ( void )
         // Timed out?
         if ( !m_bWaitingForLocalConnect && ulCurrentTime >= m_ulTimeStart + NET_CONNECT_TIMEOUT )
         {
-            g_pCore->ShowMessageBox ( _("Error")+_E("CD08"), AppendNetErrorCode ( _("Connection timed out") ), MB_BUTTON_OK | MB_ICON_ERROR );
+            g_pCore->ShowNetErrorMessageBox ( _("Error")+_E("CD08"), _("Connection timed out"), "connect-timed-out" );
             g_pCore->GetModManager ()->RequestUnload ();
             return;
         }
@@ -1183,8 +1173,7 @@ void CClientGame::DoPulses ( void )
             // See if we can figure out what specifically it was
             if ( ucError == 0 )
             {
-                g_pCore->ShowMessageBox ( _("Error")+_E("CD09"), AppendNetErrorCode ( _("Connection with the server was lost") ), MB_BUTTON_OK | MB_ICON_ERROR );
-                g_pNet->SetImmediateError ( 0 );
+                g_pCore->ShowNetErrorMessageBox ( _("Error")+_E("CD09"), _("Connection with the server was lost") );
                 g_pCore->GetModManager ()->RequestUnload ();
                 return;
             }
@@ -1224,9 +1213,8 @@ void CClientGame::DoPulses ( void )
                 }
 
                 // Display an error, reset the error status and exit
-                g_pCore->ShowMessageBox ( _("Error")+strErrorCode, AppendNetErrorCode ( strError ), MB_BUTTON_OK | MB_ICON_ERROR );
+                g_pCore->ShowNetErrorMessageBox ( _("Error")+strErrorCode, strError );
                 g_pNet->SetConnectionError ( 0 );
-                g_pNet->SetImmediateError ( 0 );
                 g_pCore->GetModManager ()->RequestUnload ();
             }
         }
@@ -1237,7 +1225,7 @@ void CClientGame::DoPulses ( void )
             // Time out the verification if it takes too long
             if ( m_ulVerifyTimeStart != 0 && ulCurrentTime >= m_ulVerifyTimeStart + CLIENT_VERIFICATION_TIMEOUT )
             {
-                g_pCore->ShowMessageBox ( _("Error")+_E("CD19"), AppendNetErrorCode ( _("MTA Client verification failed!") ), MB_BUTTON_OK | MB_ICON_ERROR );
+                g_pCore->ShowNetErrorMessageBox ( _("Error")+_E("CD19"), _("MTA Client verification failed!") );
                 g_pCore->GetModManager ()->RequestUnload ();
             }
         }

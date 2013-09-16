@@ -701,6 +701,62 @@ void CCore::RemoveMessageBox ( bool bNextFrame )
     }
 }
 
+//
+// Show message box with possibility of on-line help
+//
+void CCore::ShowErrorMessageBox( const SString& strTitle, SString strMessage, const SString& strTroubleLink )
+{
+    if ( strTroubleLink.empty() )
+    {
+        CCore::GetSingleton ().ShowMessageBox ( strTitle, strMessage, MB_BUTTON_OK | MB_ICON_ERROR );
+    }
+    else
+    {
+        strMessage += "\n\n";
+        strMessage += _("Do you want to see some on-line help about this problem ?");
+        CQuestionBox* pQuestionBox = CCore::GetSingleton ().GetLocalGUI ()->GetMainMenu ()->GetQuestionWindow ();
+        pQuestionBox->Reset ();
+        pQuestionBox->SetTitle ( strTitle );
+        pQuestionBox->SetMessage ( strMessage );
+        pQuestionBox->SetButton ( 0, _("No") );
+        pQuestionBox->SetButton ( 1, _("Yes") );
+        pQuestionBox->SetCallback ( CCore::ErrorMessageBoxCallBack, new SString( strTroubleLink ) );
+        pQuestionBox->Show ();
+    }
+}
+
+//
+// Show message box with possibility of on-line help
+//  + with net error code appended to message and trouble link
+//
+void CCore::ShowNetErrorMessageBox( const SString& strTitle, SString strMessage, SString strTroubleLink )
+{
+    uint uiErrorCode = CCore::GetSingleton ().GetNetwork ()->GetExtendedErrorCode ();
+    if ( uiErrorCode != 0 )
+    {
+        strMessage += SString ( " \nCode: %08X", uiErrorCode );
+        if ( !strTroubleLink.empty() )
+            strTroubleLink += SString ( "&neterrorcode=%08X", uiErrorCode );
+    }
+    ShowErrorMessageBox( strTitle, strMessage, strTroubleLink );
+}
+
+//
+// Callback used in CCore::ShowErrorMessageBox
+//
+void CCore::ErrorMessageBoxCallBack( void* pData, uint uiButton )
+{
+    CCore::GetSingleton ().GetLocalGUI ()->GetMainMenu ()->GetQuestionWindow ()->Reset ();
+
+    SString* pstrTroubleLink = (SString*)pData;
+    if ( uiButton == 1 )
+    {
+        uint uiErrorCode = (uint)pData;
+        BrowseToSolution ( *pstrTroubleLink, EXIT_GAME_FIRST );
+    }
+    delete pstrTroubleLink;
+}
+
 
 HWND CCore::GetHookedWindow ( void )
 {
