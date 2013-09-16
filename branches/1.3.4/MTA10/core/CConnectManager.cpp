@@ -216,26 +216,6 @@ bool CConnectManager::Abort ( void )
 }
 
 
-static SString AppendNetErrorCode ( const SString& strText )
-{
-    uint uiErrorCode = CCore::GetSingleton ().GetNetwork ()->GetExtendedErrorCode ();
-    if ( uiErrorCode != 0 )
-        return strText + SString ( " \nCode: %08X", uiErrorCode );
-    return strText;
-}
-
-void CConnectManager::StaticWantsTimeoutHelpCallBack( void* pData, uint uiButton )
-{
-    CCore::GetSingleton ().GetLocalGUI ()->GetMainMenu ()->GetQuestionWindow ()->Reset ();
-
-    if ( uiButton == 1 )
-    {
-        uint uiErrorCode = (uint)pData;
-        BrowseToSolution ( SString( "connect-timeout&code=%08X", uiErrorCode ), EXIT_GAME_FIRST );
-    }
-}
-
-
 void CConnectManager::DoPulse ( void )
 {
     // Are we connecting?
@@ -266,25 +246,7 @@ void CConnectManager::DoPulse ( void )
         if ( time ( NULL ) >= m_tConnectStarted + 8 )
         {
             // Show a message that the connection timed out and abort
-            SString strMessage = AppendNetErrorCode ( "Connection timed out" );
-            uint uiErrorCode = CCore::GetSingleton ().GetNetwork ()->GetExtendedErrorCode ();
-            if ( uiErrorCode == 0 )
-            {
-                CCore::GetSingleton ().ShowMessageBox ( "Error", strMessage, MB_BUTTON_OK | MB_ICON_ERROR );
-            }
-            else
-            {
-                strMessage += "\n\n";
-                strMessage += "Do you want to see some on-line help about this problem ?";
-                CQuestionBox* pQuestionBox = CCore::GetSingleton ().GetLocalGUI ()->GetMainMenu ()->GetQuestionWindow ();
-                pQuestionBox->Reset ();
-                pQuestionBox->SetTitle ( "Error" );
-                pQuestionBox->SetMessage ( strMessage );
-                pQuestionBox->SetButton ( 0, "No" );
-                pQuestionBox->SetButton ( 1, "Yes" );
-                pQuestionBox->SetCallback ( StaticWantsTimeoutHelpCallBack, (void*)uiErrorCode );
-                pQuestionBox->Show ();
-            }
+            g_pCore->ShowNetErrorMessageBox ( "Error", "Connection timed out", "connect-timed-out" );
             Abort ();
         }
         else
@@ -330,7 +292,7 @@ void CConnectManager::DoPulse ( void )
                 // Only display the error if we set one
                 if ( strError.length() > 0 )
                 {
-                    CCore::GetSingleton ().ShowMessageBox ( "Error", AppendNetErrorCode ( strError ), MB_BUTTON_OK | MB_ICON_ERROR );
+                    CCore::GetSingleton ().ShowNetErrorMessageBox ( "Error", strError );
                 }
                 else // Otherwise, remove the message box and hide quick connect
                 {
@@ -339,7 +301,6 @@ void CConnectManager::DoPulse ( void )
                 }
 
                 CCore::GetSingleton ().GetNetwork ()->SetConnectionError ( 0 );
-                CCore::GetSingleton ().GetNetwork ()->SetImmediateError ( 0 );
                 Abort ();
             }
         }
@@ -432,7 +393,7 @@ bool CConnectManager::StaticProcessPacket ( unsigned char ucPacketID, NetBitStre
             else
             {
                 // Show failed message and abort the attempt
-                CCore::GetSingleton ().ShowMessageBox ( "Error", AppendNetErrorCode ( "Bad server response (2)" ), MB_BUTTON_OK | MB_ICON_ERROR );
+                CCore::GetSingleton ().ShowNetErrorMessageBox ( "Error", "Bad server response (2)" );
                 g_pConnectManager->Abort ();
             }
         }
@@ -442,7 +403,7 @@ bool CConnectManager::StaticProcessPacket ( unsigned char ucPacketID, NetBitStre
             if ( ucPacketID != PACKET_ID_SERVER_JOIN && ucPacketID != PACKET_ID_SERVER_JOIN_DATA )
             {
                 // Show failed message and abort the attempt
-                CCore::GetSingleton ().ShowMessageBox ( "Error", AppendNetErrorCode ( "Bad server response (1)" ), MB_BUTTON_OK | MB_ICON_ERROR );
+                CCore::GetSingleton ().ShowNetErrorMessageBox ( "Error", "Bad server response (1)" );
                 g_pConnectManager->Abort ();
             }
         }

@@ -37,7 +37,6 @@ public:
     bool            ShouldUseInternalHTTPServer ( void )    { return m_bForceInternalHTTPServer; }
 
     static bool     StaticProcessPacket ( unsigned char ucPacketID, class NetBitStreamInterface& bitStream );
-    static void     StaticWantsTimeoutHelpCallBack ( void* pData, uint uiButton );
 
     std::string     m_strLastHost;
     unsigned short  m_usLastPort;
