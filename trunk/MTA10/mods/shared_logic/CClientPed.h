@@ -175,7 +175,6 @@ public:
                                                               unsigned short usModel,
                                                               unsigned char ucInterior );
 
-    void                        SetTargetPosition           ( unsigned long ulDelay, const CVector& vecPosition );
     void                        ResetInterpolation          ( void );
 
     float                       GetCurrentRotation          ( void );
@@ -382,6 +381,7 @@ public:
     void                        SetTargetPosition       ( const CVector& vecPosition, unsigned long ulDelay, CClientEntity* pTargetOriginSource = NULL );
     void                        RemoveTargetPosition    ( void );
     void                        UpdateTargetPosition    ( void );
+    void                        UpdateUnderFloorFix     ( const CVector& vecTargetPosition );
 
     CClientEntity*              GetTargetedEntity       ( void );    
     CClientPed*                 GetTargetedPed          ( void );
@@ -628,6 +628,9 @@ public:
     // Hacks for player model replacement and weapon model replacement respectively
     unsigned long               m_ulStoredModel;
     std::list < SRestoreWeaponItem > m_RestoreWeaponList;
+
+    CVector                     m_vecPrevTargetPosition;
+    uint                        m_uiForceLocalCounter;
 };
 
 #endif

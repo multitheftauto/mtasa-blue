@@ -4959,6 +4959,7 @@ void CClientPed::SetTargetPosition ( const CVector& vecPosition, unsigned long u
 {
 
     UpdateTargetPosition ();
+    UpdateUnderFloorFix ( vecPosition );
 
     // Get the origin of the position if we are in contact with anything
     CVector vecOrigin;
@@ -5072,6 +5073,66 @@ void CClientPed::UpdateTargetPosition ( void )
         }
 
         SetPosition ( vecNewPosition + vecOrigin, false );
+    }
+}
+
+
+// Peds under floor fix hack
+void CClientPed::UpdateUnderFloorFix ( const CVector& vecTargetPosition )
+{
+    // Calc remote movement
+    CVector vecRemoteMovement = vecTargetPosition - m_vecPrevTargetPosition;
+    m_vecPrevTargetPosition = vecTargetPosition;
+
+    // Calc local error
+    CVector vecLocalPosition;
+    GetPosition ( vecLocalPosition );
+    CVector vecLocalError = vecTargetPosition - vecLocalPosition;
+
+    // Small remote movement + local position error = force a warp
+    bool bForceLocalZ = false;
+    bool bForceLocalXY = false;
+    if ( abs( vecRemoteMovement.fZ ) < 0.01f )
+    {
+        float fLocalErrorZ = abs( vecLocalError.fZ );
+        if ( fLocalErrorZ > 0.1f && fLocalErrorZ < 10.f )
+        {
+            bForceLocalZ = true;
+        }
+    }
+
+    if ( abs( vecRemoteMovement.fX ) < 0.01f )
+    {
+        float fLocalErrorX = abs( vecLocalError.fX );
+        if ( fLocalErrorX > 0.1f && fLocalErrorX < 10.f )
+        {
+            bForceLocalXY = true;
+        }
+    }
+
+    if ( abs( vecRemoteMovement.fY ) < 0.01f )
+    {
+        float fLocalErrorY = abs( vecLocalError.fY );
+        if ( fLocalErrorY > 0.1f && fLocalErrorY < 10.f )
+        {
+            bForceLocalXY = true;
+        }
+    }
+
+    // Only force position if needed for at least two consecutive calls
+    if ( !bForceLocalZ && !bForceLocalXY )
+        m_uiForceLocalCounter = 0;
+    else
+    if ( m_uiForceLocalCounter++ > 1 )
+    {
+        if ( bForceLocalZ )
+            vecLocalPosition.fZ = vecTargetPosition.fZ;
+        if ( bForceLocalXY )
+        {
+            vecLocalPosition.fX = vecTargetPosition.fX;
+            vecLocalPosition.fY = vecTargetPosition.fY;
+        }
+        SetPosition ( vecLocalPosition );
     }
 }
 
