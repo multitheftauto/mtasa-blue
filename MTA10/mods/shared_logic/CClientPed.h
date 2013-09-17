@@ -381,7 +381,7 @@ public:
     void                        SetTargetPosition       ( const CVector& vecPosition, unsigned long ulDelay, CClientEntity* pTargetOriginSource = NULL );
     void                        RemoveTargetPosition    ( void );
     void                        UpdateTargetPosition    ( void );
-    void                        UpdateUnderFloorFix     ( const CVector& vecTargetPosition );
+    void                        UpdateUnderFloorFix     ( const CVector& vecTargetPosition, const CVector& vecOrigin );
 
     CClientEntity*              GetTargetedEntity       ( void );    
     CClientPed*                 GetTargetedPed          ( void );
