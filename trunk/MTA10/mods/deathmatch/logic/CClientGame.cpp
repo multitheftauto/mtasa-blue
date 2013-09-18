@@ -5194,6 +5194,10 @@ void CClientGame::SendProjectileSync ( CClientProjectile * pProjectile )
         weaponTypeSync.data.ucWeaponType = static_cast < unsigned char > ( weaponType );
         pBitStream->Write ( &weaponTypeSync );
 
+        // Write the projectile's model
+        if ( pBitStream->Version () >= 0x4F )
+            pBitStream->Write ( pProjectile->GetModel () );
+
         switch ( weaponType )
         {
             case WEAPONTYPE_GRENADE:
