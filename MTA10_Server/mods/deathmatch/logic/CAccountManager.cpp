@@ -358,6 +358,7 @@ bool CAccountManager::Load( void )
         strName = (const char *)result.Data[i][1].pVal;
 
         // Check for overlong names and incorrect escapement
+        bool bRemoveAccount = false;
         bool bChanged = false;
         if ( strName.length () > 64 )
         {
@@ -371,12 +372,22 @@ bool CAccountManager::Load( void )
             // If name gone doolally or account with this name already exists, remove account
             if ( strName.length () > 256 || Get ( strName, true ) )
             {
-                m_pDatabaseManager->Execf ( m_hDbConnection, "DELETE FROM accounts WHERE id=?", SQLITE_INTEGER, iUserID );
-                m_pDatabaseManager->Execf ( m_hDbConnection, "DELETE FROM userdata WHERE userid=?", SQLITE_INTEGER, iUserID );
                 bNeedsVacuum = true;
+                bRemoveAccount = true;
                 CLogger::LogPrintf ( "Removed duplicate or damaged account for %s\n", strName.substr ( 0, 64 ).c_str() );
-                continue;
             }
+        }
+
+        // Check for disallowed account names
+        if ( strName == "*****" )
+            bRemoveAccount = true;
+
+        // Do account remove if required
+        if ( bRemoveAccount )
+        {
+            m_pDatabaseManager->Execf ( m_hDbConnection, "DELETE FROM accounts WHERE id=?", SQLITE_INTEGER, iUserID );
+            m_pDatabaseManager->Execf ( m_hDbConnection, "DELETE FROM userdata WHERE userid=?", SQLITE_INTEGER, iUserID );
+            continue;
         }
 
         strPassword = "";
@@ -692,7 +703,7 @@ bool CAccountManager::LogIn ( CClient* pClient, CClient* pEchoClient, const char
         if ( pEchoClient ) pEchoClient->SendEcho ( SString( "login: Account for '%s' is already in use", szNick ).c_str() );
         return false;
     }
-    if ( strlen ( szPassword ) <= MIN_PASSWORD_LENGTH || strlen ( szPassword ) > MAX_PASSWORD_LENGTH || !pAccount->IsPassword ( szPassword ) )
+    if ( !IsValidPassword( szPassword ) || !pAccount->IsPassword ( szPassword ) )
     {
         if ( pEchoClient ) pEchoClient->SendEcho ( SString( "login: Invalid password for account '%s'", szNick ).c_str() );
         CLogger::AuthPrintf ( "LOGIN: %s tried to log in as '%s' with an invalid password (IP: %s  Serial: %s)\n", strPlayerName.c_str (), szNick, strPlayerIP.c_str (), strPlayerSerial.c_str () );
@@ -1078,4 +1089,54 @@ void CAccountManager::DbCallback ( CDbJobData* pJobData )
     {
         CLogger::LogPrintf ( "ERROR: Something worrying happened in DbCallback '%s': %s.\n", *pJobData->command.strData, *pJobData->result.strReason );
     }
+}
+
+//
+// Check name is legal for an existing account
+//
+bool CAccountManager::IsValidAccountName( const SString& strName )
+{
+    if ( strName.length() < 1 )
+        return false;
+    return true;
+}
+
+//
+// Check password is legal for an existing account
+//
+bool CAccountManager::IsValidPassword( const SString& strPassword )
+{
+    if ( strPassword.length() < MIN_PASSWORD_LENGTH || strPassword.length() > MAX_PASSWORD_LENGTH )
+        return false;
+    return true;
+}
+
+//
+// Check name is legal for a new account
+//
+bool CAccountManager::IsValidNewAccountName( const SString& strName )
+{
+    if ( !IsValidAccountName( strName ) )
+        return false;
+
+    // Extra restrictions for new account names
+    if ( strName == "*****" )
+        return false;
+
+    return true;
+}
+
+//
+// Check password is legal for a new account/password
+//
+bool CAccountManager::IsValidNewPassword( const SString& strPassword )
+{
+    if ( !IsValidPassword( strPassword ) )
+        return false;
+
+    // Extra restrictions for new account passwords
+    if ( strPassword == "*****" )
+        return false;
+
+    return true;
 }

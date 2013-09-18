@@ -22,7 +22,9 @@ void CConsoleHistory::LoadFromFile ( void )
     // Copy and clean console input history
     SString strLogDir = CalcMTASAPath( "MTA" );
     SString strPathFilenameSource = PathJoin( strLogDir, "console.log" );
-    SString strPathFilenameDest = PathJoin( strLogDir, "console_input.log" );
+    SString strPathFilenameDest = PathJoin( strLogDir, "console-input.log" );
+    CConsoleLogger::CleanFile( strPathFilenameSource, strPathFilenameDest );
+    strPathFilenameSource = PathJoin( strLogDir, "console_input.log" );
     CConsoleLogger::CleanFile( strPathFilenameSource, strPathFilenameDest );
 
     m_strFilename = strPathFilenameDest;
