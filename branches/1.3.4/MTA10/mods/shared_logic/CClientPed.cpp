@@ -4936,12 +4936,13 @@ void CClientPed::SetTargetPosition ( const CVector& vecPosition, unsigned long u
 {
 
     UpdateTargetPosition ();
-    UpdateUnderFloorFix ( vecPosition );
 
     // Get the origin of the position if we are in contact with anything
     CVector vecOrigin;
     if ( pTargetOriginSource )
         pTargetOriginSource->GetPosition ( vecOrigin );
+
+    UpdateUnderFloorFix ( vecPosition, vecOrigin );
 
     // Update the references to the contact entity
     if ( pTargetOriginSource != m_interp.pTargetOriginSource )
@@ -5055,7 +5056,7 @@ void CClientPed::UpdateTargetPosition ( void )
 
 
 // Peds under floor fix hack
-void CClientPed::UpdateUnderFloorFix ( const CVector& vecTargetPosition )
+void CClientPed::UpdateUnderFloorFix ( const CVector& vecTargetPosition, const CVector& vecOrigin )
 {
     // Calc remote movement
     CVector vecRemoteMovement = vecTargetPosition - m_vecPrevTargetPosition;
@@ -5064,6 +5065,7 @@ void CClientPed::UpdateUnderFloorFix ( const CVector& vecTargetPosition )
     // Calc local error
     CVector vecLocalPosition;
     GetPosition ( vecLocalPosition );
+    vecLocalPosition -= vecOrigin;
     CVector vecLocalError = vecTargetPosition - vecLocalPosition;
 
     // Small remote movement + local position error = force a warp
@@ -5109,7 +5111,7 @@ void CClientPed::UpdateUnderFloorFix ( const CVector& vecTargetPosition )
             vecLocalPosition.fX = vecTargetPosition.fX;
             vecLocalPosition.fY = vecTargetPosition.fY;
         }
-        SetPosition ( vecLocalPosition );
+        SetPosition ( vecLocalPosition + vecOrigin );
     }
 }
 

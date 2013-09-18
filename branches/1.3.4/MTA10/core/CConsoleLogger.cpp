@@ -150,6 +150,8 @@ void CConsoleLogger::CleanFile( const SString& strPathFilenameSource, const SStr
         SString strLine;
         std::getline( fileSource, strLine );
         CleanLine( strLine );
+        strLine.Replace( " ***** *****", " " );
+        strLine.Replace( " *****", " " );
         fileDest << strLine << endl;
     }
     fileSource.close();
@@ -162,7 +164,7 @@ void CConsoleLogger::CleanFile( const SString& strPathFilenameSource, const SStr
 //
 void CConsoleLogger::CleanLine( SString& strLine )
 {
-    const char* szBlankText = "*****";
+    const char* szBlankText = "";
     for ( uint i = 0 ; i < NUMELMS( g_WordsToCheck ) ; i++ )
     {
         int uiNumBlanks = g_WordsToCheck[i].uiNumBlanks;
@@ -179,6 +181,9 @@ void CConsoleLogger::CleanLine( SString& strLine )
                 while ( uiNumBlanks-- )
                 {
                     iPos = ReplaceNextWord( strLine, iPos, szBlankText );
+                    // Also remove trailing space if present
+                    if ( strLine.SubStr( iPos, 1 ) == " " )
+                        strLine = strLine.SubStr( 0, iPos ) + strLine.SubStr( iPos + 1 );
                 }
             }
         }      
