@@ -4413,6 +4413,14 @@ void CPacketHandler::Packet_ProjectileSync ( NetBitStreamInterface& bitStream )
     if ( !bitStream.Read ( &weaponTypeSync ) )
         return;
 
+    // Read the model
+    unsigned short usModel = 0;
+    if ( bitStream.Version () >= 0x4F )
+    {
+        if ( !bitStream.Read ( usModel ) )
+            return;
+    }
+
     CClientEntity* pCreator = NULL;
     if ( CreatorID != INVALID_ELEMENT_ID ) pCreator = CElementIDs::GetElement ( CreatorID );
     if ( OriginID != INVALID_ELEMENT_ID )
@@ -4513,7 +4521,7 @@ void CPacketHandler::Packet_ProjectileSync ( NetBitStreamInterface& bitStream )
             CClientProjectile * pProjectile = g_pClientGame->m_pManager->GetProjectileManager ()->Create ( pCreator, weaponType, origin.data.vecPosition, fForce, NULL, pTargetEntity );
             if ( pProjectile )
             {
-                pProjectile->Initiate ( &origin.data.vecPosition, pvecRotation, pvecVelocity, 0 );
+                pProjectile->Initiate ( &origin.data.vecPosition, pvecRotation, pvecVelocity, usModel );
             }
         }
     }

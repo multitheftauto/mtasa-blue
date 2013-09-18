@@ -87,6 +87,7 @@ public:
     void                                SetRotationDegrees      ( const CVector & vecRotation );
     void                                GetVelocity             ( CVector & vecVelocity );
     void                                SetVelocity             ( CVector & vecVelocity );
+    unsigned short                      GetModel                ( void );
     void                                SetModel                ( unsigned short usModel );
     void                                SetCounter              ( DWORD dwCounter );
     DWORD                               GetCounter              ( void );

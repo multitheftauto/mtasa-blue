@@ -37,6 +37,18 @@ bool CProjectileSyncPacket::Read ( NetBitStreamInterface& BitStream )
         return false;
     m_ucWeaponType = weaponType.data.ucWeaponType;
 
+    if ( m_pSourceElement )
+    {
+        CPlayer* pSourcePlayer = static_cast < CPlayer* > ( m_pSourceElement );
+        if ( pSourcePlayer->GetBitStreamVersion () >= 0x4F )
+        {
+            unsigned short usModel;
+            if ( !BitStream.Read ( usModel ) )
+                return false;
+            m_usModel = usModel;
+        }
+    }
+
     switch ( m_ucWeaponType )
     {
         case 16: // WEAPONTYPE_GRENADE
@@ -120,6 +132,13 @@ bool CProjectileSyncPacket::Write ( NetBitStreamInterface& BitStream ) const
     SWeaponTypeSync weaponType;
     weaponType.data.ucWeaponType = m_ucWeaponType;
     BitStream.Write ( &weaponType );
+
+    if ( m_pSourceElement )
+    {
+        CPlayer* pSourcePlayer = static_cast < CPlayer* > ( m_pSourceElement );
+        if ( pSourcePlayer->GetBitStreamVersion () >= 0x4F )
+            BitStream.Write ( m_usModel );
+    }
 
     switch ( m_ucWeaponType )
     {
