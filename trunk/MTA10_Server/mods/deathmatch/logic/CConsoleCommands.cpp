@@ -1032,7 +1032,7 @@ bool CConsoleCommands::LogIn ( CConsole* pConsole, const char* szArguments, CCli
             szPassword = szTempPassword;
         }
 
-        if ( szNick && szPassword )
+        if ( CAccountManager::IsValidAccountName( szNick ) && CAccountManager::IsValidPassword( szPassword ) )
         {
             return g_pGame->GetAccountManager ()->LogIn ( pClient, pEchoClient, szNick, szPassword );
         }
@@ -1076,7 +1076,7 @@ bool CConsoleCommands::ChgMyPass ( CConsole* pConsole, const char* szArguments, 
             // Split it up into nick and password
             char* szOldPassword = strtok ( szBuffer, " " );
             char* szNewPassword = strtok ( NULL, "\0" );
-            if ( szOldPassword && szNewPassword && strlen ( szOldPassword ) > 0 && strlen ( szNewPassword ) > 0 )
+            if ( CAccountManager::IsValidPassword( szOldPassword ) && CAccountManager::IsValidNewPassword( szNewPassword ) )
             {
                 // Grab the account with that nick
                 CAccount* pAccount = pClient->GetAccount ();
@@ -1141,7 +1141,7 @@ bool CConsoleCommands::AddAccount ( CConsole* pConsole, const char* szArguments,
         if ( szNick && szPassword )
         {
             // Long enough strings?
-            if ( strlen ( szNick ) > 0 && strlen ( szPassword ) > MIN_PASSWORD_LENGTH && strlen ( szPassword ) <= MAX_PASSWORD_LENGTH )
+            if ( CAccountManager::IsValidNewAccountName( szNick ) && CAccountManager::IsValidNewPassword( szPassword ) )
             {
                 // Try creating the account
                 if ( !g_pGame->GetAccountManager ()->Get ( szNick ) )
@@ -1245,7 +1245,7 @@ bool CConsoleCommands::ChgPass ( CConsole* pConsole, const char* szArguments, CC
         // Split it up into nick and password
         char* szNick = strtok ( szBuffer, " " );
         char* szPassword = strtok ( NULL, "\0" );
-        if ( szNick && szPassword && strlen ( szNick ) > 0 && strlen ( szPassword ) > 0 )
+        if ( CAccountManager::IsValidAccountName( szNick ) && CAccountManager::IsValidNewPassword( szPassword ) )
         {
             // Grab the account with that nick
             CAccount* pAccount = g_pGame->GetAccountManager ()->Get ( szNick );
