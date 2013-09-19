@@ -1,5 +1,49 @@
 Changelog for Multi Theft Auto
 
+Multi Theft Auto : San Andreas - 1.3.4
+======================================
+
+Goal: Improve 1.3.3 release.
+
+- 0007746: [Security] About "MTA/console.log" (ccw) - resolved.
+- 0007801: [Client] warpPedIntoVehicle can cause totally desync if another Player starts to enter the vehicle (Cazomino05) - resolved.
+- 0005618: [Server] Heli Rotors are not in ghostmode in race (Cazomino05) - resolved.
+- 0007803: [Multi Theft Auto : San Andreas] Spoilers (Cazomino05) - resolved.
+- 0007780: [GUI] Console(F8) input focus begin lost when guiBringToFront or 'AlwaysOnTop' property used. (ccw) - resolved.
+- 0007794: [Client] Bad debug from encrypted client scripts (ccw) - resolved.
+- 0007787: [Map Editor] Map Editor crashes after pressing "Stop Testing" (ccw) - resolved.
+- 0007784: [Multi Theft Auto : San Andreas] Crash when streaming in tec-9 with a replaced weapon model. (ccw) - resolved.
+- 0007372: [Client] Applying weapon mods may remove your weapon (ccw) - resolved.
+- 0007762: [Server] Projectile-type weapons messing up ammo count (ccw) - resolved.
+- 0007765: [Client] guiCreateFont fails each second time resource is started (ccw) - resolved.
+- 0006930: [Server] Client disconnects but player element remains indefinitely (ccw) - resolved.
+- 0007752: [Client] Cheat tool for block 5.08.2013 (ccw) - resolved.
+- 0007672: [Client] Mouse input delayed (ccw) - resolved.
+- 0007757: [Server] setAccountData clips the digits after the decimal point (Jusonex) - resolved.
+- 0007721: [Client] cancelEvent() onClientKey escape key bug (ccw) - resolved.
+- 0007696: [Client] PCs restarted after joining MTA:DayZ server (ccw) - resolved.
+- 0007705: [Server] Server crash when restarting resources (ccw) - resolved.
+- 0001838: [Scripting] Enable playMissionAudio and extend its functionality (Jusonex) - resolved.
+- 0007699: [Client] Crash at certain position and interior (ccw) - resolved.
+- 0007682: [Client] MTA 1.3.3: 'Modified GTA3.img, SD 0000020' connect bug (ccw) - resolved.
+- 0007685: [Server] getVehiclePlateText can crash if return longer than 8 chars (ccw) - resolved.
+- 0007659: [Client] 1.3.3 r5541 has a bug on high screen resolutions (Jusonex) - resolved.
+- 0007544: [Client] ignoredElement in processLineOfSight broken (ccw) - resolved.
+- 0007568: [Client] Vertexshader fails on some objects. (ccw) - resolved.
+- 0007515: [Server] Add "shared" export type in meta.xml (Kenix) - resolved.
+- 0004731: [Server] onColShapeHit isn't triggered for towed vehicles server side (sbx320) - resolved.
+
+Resources:
+
+
+- 0007773: [Client] setLowLODElement doesn't work as intended. (ccw) - resolved.
+
+Map Editor:
+
+
+- 0007693: [Map Editor] Add object breakable option (sbx320) - resolved.
+
+
 Multi Theft Auto : San Andreas - 1.3.3
 ======================================
 
