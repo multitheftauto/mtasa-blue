@@ -94,6 +94,7 @@ bool ListContains ( const CMappedAccountList& itemList, const T& item )
     return itemList.contains ( item );
 }
 
+
 //
 // CAccountManager
 //
@@ -148,10 +149,6 @@ public:
     void                        RemoveAll                   ( void );
     static void                 StaticDbCallback            ( CDbJobData* pJobData, void* pContext );
     void                        DbCallback                  ( CDbJobData* pJobData );
-    static bool                 IsValidAccountName          ( const SString& strName );
-    static bool                 IsValidPassword             ( const SString& strPassword );
-    static bool                 IsValidNewAccountName       ( const SString& strName );
-    static bool                 IsValidNewPassword          ( const SString& strPassword );
 
     CMappedAccountList::const_iterator  IterBegin           ( void )                    { return m_List.begin (); };
     CMappedAccountList::const_iterator  IterEnd             ( void )                    { return m_List.end (); };
@@ -169,6 +166,5 @@ protected:
     bool                        m_bLoadXML;
     int                         m_iAccounts;
 };
-
 
 #endif

@@ -46,9 +46,6 @@ public:
     static bool                         CancelEvent                         ( bool bCancel );
     static bool                         WasEventCancelled                   ( void );
 
-    // Misc funcs
-    static bool                         DownloadFile                        ( CResource* pResource, const char* szFile, CChecksum checksum = CChecksum() );
-
     // Output funcs
     static bool                         OutputConsole                       ( const char* szText );
     static bool                         OutputChatBox                       ( const char* szText, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, bool bColorCoded );

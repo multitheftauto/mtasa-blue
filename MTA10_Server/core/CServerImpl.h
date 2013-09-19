@@ -27,6 +27,8 @@ class CServerImpl;
 
 #include "CDynamicLibrary.h"
 #include "CModManagerImpl.h"
+#include "sockets/CTCPImpl.h"
+#include "sockets/CTCPServerSocketImplManager.h"
 #include <xml/CXML.h>
 #include "CThreadCommandQueue.h"
 
@@ -56,6 +58,7 @@ public:
 
     CNetServer*         GetNetwork          ( void );
     CModManager*        GetModManager       ( void );
+    CTCP*               GetTCP              ( void );
     CXML*               GetXML              ( void );
 
     const char*         GetServerModPath    ( void )                { return m_strServerModPath; };
@@ -85,6 +88,7 @@ private:
     CDynamicLibrary     m_XMLLibrary;
     CNetServer*         m_pNetwork;
     CModManagerImpl*    m_pModManager;
+    CTCPImpl*           m_pTCP;
     CXML*               m_pXML;
 
 #ifdef WIN32

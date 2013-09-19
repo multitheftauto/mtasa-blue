@@ -176,7 +176,7 @@ void CClientWeapon::DoPulse ( void )
             }
         }
     }
-    if ( m_nAmmoInClip > 0 && ( !IsLocalEntity ( ) && m_pOwner == g_pClientGame->GetLocalPlayer ( ) ) )
+    if ( m_nAmmoInClip > 0 )
     {
         if ( m_State == WEAPONSTATE_FIRING && m_fireTimer.Get() >= m_iWeaponFireRate ) 
         {
@@ -213,10 +213,10 @@ void CClientWeapon::Destroy ( void )
 }
 
 
-void CClientWeapon::Fire ( bool bServerFire )
-{
+void CClientWeapon::Fire ( void )
+{       
 
-    if ( !m_pWeapon || !m_pObject || ( !IsLocalEntity ( ) && m_pOwner != g_pClientGame->GetLocalPlayer ( ) && bServerFire == false ) ) return;
+    if ( !m_pWeapon || !m_pObject ) return;
     switch ( m_Type )
     {
         case WEAPONTYPE_PISTOL:
@@ -321,6 +321,14 @@ void CClientWeapon::Fire ( bool bServerFire )
             m_pWeaponInfo->SetTargetRange ( m_pWeaponStat->GetTargetRange ( ) );
             m_pWeaponInfo->SetWeaponRange ( m_pWeaponStat->GetWeaponRange ( ) );
 
+            // Begin our lag compensation
+            CPlayerPed* pOwnerPed = NULL;
+            if ( m_pOwner && !m_pTarget && g_pClientGame->GetPlayerManager()->Exists(m_pOwner) ) // No need for compensation if we're hitting a target directly
+            {
+                pOwnerPed = m_pOwner->GetGamePlayer();
+                //if ( g_pGame->m_pPreWeaponFireHandler && pOwnerPed )
+                    //g_pGame->m_pPreWeaponFireHandler ( pOwnerPed, false );
+            }
 #ifdef SHOTGUN_TEST
             CVector vecTemp;
             CVector vecFireOffset = *m_pWeaponInfo->GetFireOffset ();
@@ -339,13 +347,18 @@ void CClientWeapon::Fire ( bool bServerFire )
             vecTemp2.fZ += 84.6f;
             SetRotationDegrees(vecTemp2);
 #else
-            FireInstantHit ( vecOrigin, vecTarget, bServerFire );
+            FireInstantHit ( vecOrigin, vecTarget );
 #endif
             // Restore
             m_pWeaponInfo->SetDamagePerHit ( sDamage );
             m_pWeaponInfo->SetAccuracy ( fAccuracy );
             m_pWeaponInfo->SetTargetRange ( fTargetRange );
             m_pWeaponInfo->SetWeaponRange ( fRange );
+
+            // End our lag compensation
+            //if ( g_pGame->m_pPostWeaponFireHandler && pOwnerPed )
+                //g_pGame->m_pPostWeaponFireHandler ();
+
             m_nAmmoInClip--;
             m_fireTimer.Reset();
             break;
@@ -355,15 +368,15 @@ void CClientWeapon::Fire ( bool bServerFire )
 }
 
 #ifdef SHOTGUN_TEST
-void CClientWeapon::FireInstantHit ( CVector & vecOrigin, CVector & vecTarget, CVector & vecRotation, bool bRemote )
+void CClientWeapon::FireInstantHit ( CVector & vecOrigin, CVector & vecTarget, CVector & vecRotation )
 #else
-void CClientWeapon::FireInstantHit ( CVector & vecOrigin, CVector & vecTarget, bool bServerFire, bool bRemote )
+void CClientWeapon::FireInstantHit ( CVector & vecOrigin, CVector & vecTarget )
 #endif
 {
     CVector vecDirection = vecTarget - vecOrigin;
     vecDirection.Normalize ();
     CClientEntity * pAttachedTo = GetAttachedTo ();    
-    CVector vecOriginalTarget = vecTarget;
+    
     CEntity * pColEntity = NULL;
     CColPoint * pColPoint = NULL;
     SLineOfSightBuildingResult pBuildingResult;
@@ -371,44 +384,6 @@ void CClientWeapon::FireInstantHit ( CVector & vecOrigin, CVector & vecTarget, b
 
     if ( m_Type != WEAPONTYPE_SHOTGUN )
     {
-        CVector vecWeaponFirePosition;
-        if ( !IsLocalEntity ( ) && m_pOwner )
-        {
-            CClientPlayer * pPlayer = m_pOwner;
-            CClientPed * pLocalPlayer = g_pClientGame->GetLocalPlayer();
-            if ( pLocalPlayer && pPlayer )
-            {
-                CClientVehicle* pVehicle = pLocalPlayer->GetRealOccupiedVehicle ();
-
-                // Move both players to where they should be for shot compensation
-                if ( pPlayer && !pPlayer->IsLocalPlayer () )
-                {
-                    if ( !pVehicle || pLocalPlayer->GetOccupiedVehicleSeat() == 0 )
-                    {
-                        // Warp back in time to where we were when this player shot (their latency)
-
-                        // We don't account for interpolation here, +250ms seems to work better
-                        // ** Changed ajustment to +125ms as the position of this clients player on the firers screen
-                        // has been changed. See CClientPed::UpdateTargetPosition() **
-                        CVector vecPosition;
-                        unsigned short usLatency = ( pPlayer->GetLatency () + 125 );
-                        g_pClientGame->GetNetAPI()->GetInterpolation ( vecPosition, usLatency );
-
-                        // Move the entity back
-                        if ( pVehicle )
-                        {
-                            pVehicle->GetPosition ( vecWeaponFirePosition );
-                            pVehicle->SetPosition ( vecPosition );
-                        }
-                        else
-                        {
-                            pLocalPlayer->GetPosition ( vecWeaponFirePosition );
-                            pLocalPlayer->SetPosition ( vecPosition );
-                        }
-                    }
-                }
-            }
-        }
         //if ( pAttachedTo ) pAttachedTo->WorldIgnore ( true );
         if ( m_pWeapon->ProcessLineOfSight ( &vecOrigin, &vecTarget, &pColPoint, &pColEntity, m_weaponConfig.flags, &pBuildingResult, m_Type, &pEntity ) )
         {
@@ -418,11 +393,14 @@ void CClientWeapon::FireInstantHit ( CVector & vecOrigin, CVector & vecTarget, b
         // Don't continue without a valid colpoint
         if ( !pColPoint )
             return;
+
         //if ( pAttachedTo ) pAttachedTo->WorldIgnore ( false );
 
         // return if shoot if target is blocked is false and we aren't pointing at our target
-        if ( ( m_pTarget != NULL && m_pTarget->GetGameEntity ( ) != NULL && m_pTarget->GetGameEntity()->GetInterface ( ) != pEntity ) && m_weaponConfig.bShootIfTargetBlocked == false && bRemote == false )
+        if ( ( m_pTarget != NULL && m_pTarget->GetGameEntity ( ) != NULL && m_pTarget->GetGameEntity()->GetInterface ( ) != pEntity ) && m_weaponConfig.bShootIfTargetBlocked == false )
+        {
             return;
+        }
 
         // Execute our weapon fire event
         CClientEntity * pClientEntity = m_pManager->FindEntitySafe ( pColEntity );
@@ -462,31 +440,6 @@ void CClientWeapon::FireInstantHit ( CVector & vecOrigin, CVector & vecTarget, b
             ePedPieceTypes hitZone = ( ePedPieceTypes ) pColPoint->GetPieceTypeB ();
             short sDamage = m_pWeaponInfo->GetDamagePerHit ();
             m_pWeapon->GenerateDamageEvent ( dynamic_cast < CPed * > ( pColEntity ), m_pObject, m_Type, sDamage, hitZone, 0 );
-        }
-        if ( !IsLocalEntity ( ) && m_pOwner )
-        {
-            CClientPed * pPed = m_pOwner;
-            CClientPed * pLocalPlayer = g_pClientGame->GetLocalPlayer();
-            if ( pPed->GetType () == CCLIENTPLAYER )
-            {
-                // Restore compensated positions            
-                if ( !pPed->IsLocalPlayer () )
-                {
-                    CClientVehicle* pVehicle = pLocalPlayer->GetRealOccupiedVehicle ();
-                    if ( !pVehicle )
-                    {
-                        pLocalPlayer->SetPosition ( vecWeaponFirePosition );
-                    }
-                    else if ( pLocalPlayer->GetOccupiedVehicleSeat() == 0 )
-                    {
-                        pVehicle->SetPosition ( vecWeaponFirePosition );
-                    }
-                }
-            }
-        }
-        if ( !IsLocalEntity ( ) && GetOwner ( ) == g_pClientGame->GetLocalPlayer ( ) && bServerFire == false )
-        {
-            g_pClientGame->GetNetAPI ( )->SendBulletSyncCustomWeaponFire ( this, vecOrigin, vecOriginalTarget );
         }
     }
 #ifdef SHOTGUN_TEST
@@ -587,25 +540,25 @@ bool CClientWeapon::SetFlags ( eWeaponFlags flag, bool bData )
 {
     switch ( flag )
     {
-        case WEAPONFLAGS_SHOOT_IF_OUT_OF_RANGE:
-            m_weaponConfig.bShootIfTargetOutOfRange = bData;
+    case WEAPONFLAGS_SHOOT_IF_OUT_OF_RANGE:
+        m_weaponConfig.bShootIfTargetOutOfRange = bData;
         return true;
-        case WEAPONFLAGS_SHOOT_IF_TARGET_BOCKED:
-            m_weaponConfig.bShootIfTargetBlocked = bData;
+    case WEAPONFLAGS_SHOOT_IF_TARGET_BOCKED:
+        m_weaponConfig.bShootIfTargetBlocked = bData;
         return true;
-        case WEAPONFLAGS_DISABLE_MODEL:
-            m_weaponConfig.bDisableWeaponModel = bData;
-            if ( m_weaponConfig.bDisableWeaponModel )
-            {
-                SetVisible( false );
-            }
-            else
-            {
-                SetVisible( true );
-            }
+    case WEAPONFLAGS_DISABLE_MODEL:
+        m_weaponConfig.bDisableWeaponModel = bData;
+        if ( m_weaponConfig.bDisableWeaponModel )
+        {
+            SetVisible( false );
+        }
+        else
+        {
+            SetVisible( true );
+        }
         return true;
-        case WEAPONFLAGS_INSTANT_RELOAD:
-            m_weaponConfig.bInstantReload = bData;
+    case WEAPONFLAGS_INSTANT_RELOAD:
+        m_weaponConfig.bInstantReload = bData;
         return true;
     }
     return false;
@@ -622,17 +575,17 @@ bool CClientWeapon::GetFlags ( eWeaponFlags flag, bool &bData )
 
     switch ( flag )
     {
-        case WEAPONFLAGS_SHOOT_IF_OUT_OF_RANGE:
-            bData = m_weaponConfig.bShootIfTargetOutOfRange;
+    case WEAPONFLAGS_SHOOT_IF_OUT_OF_RANGE:
+        bData = m_weaponConfig.bShootIfTargetOutOfRange;
         return true;
-        case WEAPONFLAGS_SHOOT_IF_TARGET_BOCKED:
-            bData = m_weaponConfig.bShootIfTargetBlocked;
+    case WEAPONFLAGS_SHOOT_IF_TARGET_BOCKED:
+        bData = m_weaponConfig.bShootIfTargetBlocked;
         return true;
-        case WEAPONFLAGS_DISABLE_MODEL:
-            bData = m_weaponConfig.bDisableWeaponModel;
+    case WEAPONFLAGS_DISABLE_MODEL:
+        bData = m_weaponConfig.bDisableWeaponModel;
         return true;
-        case WEAPONFLAGS_INSTANT_RELOAD:
-            bData = m_weaponConfig.bInstantReload;
+    case WEAPONFLAGS_INSTANT_RELOAD:
+        bData = m_weaponConfig.bInstantReload;
         return true;
     }
     return false;
@@ -692,12 +645,11 @@ void CClientWeapon::DoGunShells ( CVector vecOrigin, CVector vecDirection )
         if ( !m_weaponConfig.bDisableWeaponModel )
         {
             g_pGame->GetPointLights ()->AddLight ( PLTYPE_POINTLIGHT, vecOrigin, CVector (), 3.0f, 0.22f, 0.25f, 0, 0, 0, 0 );
-
-            // Note: Nozzle flare lags behind attached object if it is moving, but we can't set attached entity here as it will crash if not a ped
-            g_pGame->GetFx ()->TriggerGunshot ( NULL, vecOrigin, vecDirection, true );
-
-            m_pWeapon->AddGunshell ( m_pObject, &vecOrigin, &CVector2D ( 0, -1 ), fShellSize );
         }
+        if ( GetAttachedTo () ) g_pGame->GetFx ()->TriggerGunshot ( NULL, vecOrigin, vecDirection, true );
+        else g_pGame->GetFx ()->TriggerGunshot ( NULL, vecOrigin, vecDirection, true );
+
+        m_pWeapon->AddGunshell ( m_pObject, &vecOrigin, &CVector2D ( 0, -1 ), fShellSize );
         if ( m_Type != WEAPONTYPE_MINIGUN )
         {
             g_pGame->GetAudioEngine ()->ReportWeaponEvent ( WEAPON_EVENT_FIRE, m_Type, m_pObject );

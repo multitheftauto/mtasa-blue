@@ -562,6 +562,14 @@ bool CLuaArgument::ReadFromBitStream ( NetBitStreamInterface& bitStream, std::ve
                 else
                     ReadString ( "" );
 
+                // Enforce min_mta_version version rule
+                if ( uiLength > 65535 && g_pGame->CalculateMinClientRequirement () < LONG_STRING_MIN_VERSION )
+                {
+                    LogUnableToPacketize ( "#### Couldn't packetize argument list. Invalid string specified, limit is 65535 characters."
+                                           " To use longer strings, set script <min_mta_version> to " LONG_STRING_MIN_VERSION " or higher." );
+                    m_iType = LUA_TNIL;
+                }
+
                 break;
             }
 
@@ -676,6 +684,7 @@ bool CLuaArgument::WriteToBitStream ( NetBitStreamInterface& bitStream, CFastHas
                 }
             }
             else
+            if ( sizeTemp > 65535 && bitStream.Version () >= 0x027 && g_pGame->CalculateMinClientRequirement () >= LONG_STRING_MIN_VERSION )
             {
                 // This is a long string argument
                 type.data.ucType = LUA_TSTRING_LONG;
@@ -691,6 +700,17 @@ bool CLuaArgument::WriteToBitStream ( NetBitStreamInterface& bitStream, CFastHas
                     bitStream.AlignWriteToByteBoundary ();
                     bitStream.Write ( szTemp, uiLength );
                 }
+            }
+            else
+            {
+                // Too long string
+                LogUnableToPacketize ( "Couldn't packetize argument list. Invalid string specified, limit is 65535 characters."
+                                       " To use longer strings, set script <min_mta_version> to " LONG_STRING_MIN_VERSION " or higher." );
+
+                // Write a nil though so other side won't get out of sync
+                type.data.ucType = LUA_TNIL;
+                bitStream.Write ( &type );
+                return false;
             }
             break;
         }

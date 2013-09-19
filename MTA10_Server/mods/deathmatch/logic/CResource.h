@@ -212,7 +212,7 @@ private:
     bool                    m_bProtected;
     bool                    m_bStartedManually;
 
-    bool                    m_bOOPEnabledInMetaXml;
+
     uint                    m_uiFunctionRightCacheRevision;
     CFastHashMap < lua_CFunction, bool > m_FunctionRightCacheMap;
 
@@ -376,7 +376,6 @@ public:
     bool                HandleAclRequestChange          ( const CAclRightName& strRightName, bool bAccess, const SString& strWho );
     const SString&      GetMinServerReqFromMetaXml      ( void )                                { return m_strMinServerReqFromMetaXml; }
     const SString&      GetMinClientReqFromMetaXml      ( void )                                { return m_strMinClientReqFromMetaXml; }
-    bool                IsOOPEnabledInMetaXml           ( void )                                { return m_bOOPEnabledInMetaXml; }
     bool                CheckFunctionRightCache         ( lua_CFunction f, bool* pbOutAllowed );
     void                UpdateFunctionRightCache        ( lua_CFunction f, bool bAllowed );
 

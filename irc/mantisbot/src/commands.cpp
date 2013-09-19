@@ -150,6 +150,13 @@ static void* issuecmdThread(void* data_)
   issuecmdData* data = (issuecmdData *)data_;
   const Config& config = bot->GetConfig();
 
+  if(data->number > 9000) {
+    bot->SendChannel(IRCText("%s: It's over 9000 %BD:%B", data->source.GetName().c_str()), data->dest.GetName().c_str());
+    delete data;
+    return 0;
+  }
+
+
   IPV4Addr addr(config.data.mantis.address, config.data.mantis.service);
   IPV4Addr bindAddr("0.0.0.0", "0");
 
@@ -181,13 +188,6 @@ static void* issuecmdThread(void* data_)
   int p;
   if (output.find("APPLICATION ERROR #1100") != -1 || output.find("Access Denied") != -1)
   {
-    if(data->number > 9000)
-    {
-      bot->SendChannel(IRCText("%s: It's over 9000 %BD:%B", data->source.GetName().c_str()), data->dest.GetName().c_str());
-      delete data;
-      return 0;
-    }
-
     bot->SendChannel(IRCText("%s: %C04Issue not found%C", data->source.GetName().c_str()), data->dest.GetName().c_str());
     delete data;
     return 0;

@@ -93,6 +93,7 @@ struct SIntegerSync : public ISyncStructure
     }
     SIntegerSync ( type value )
     {
+        SIntegerSync ();
         data.value = value;
     }
 
@@ -713,6 +714,19 @@ struct SVehiclePuresyncFlags : public ISyncStructure
         bool bHasAWeapon : 1;
         bool bIsHeliSearchLightVisible : 1;
     } data;
+
+    void FixDerailedState ( const unsigned short uiModel )
+    {
+        if ( uiModel == 449 ||
+            uiModel == 537 ||
+            uiModel == 538 ||
+            uiModel == 570 ||
+            uiModel == 569 ||
+            uiModel == 590 )
+        {
+            data.bIsLandingGearDown = data.bIsDerailed;
+        }
+    }
 };
 
 
@@ -2020,7 +2034,7 @@ struct SColorSync : public ISyncStructure
 //////////////////////////////////////////
 struct SOccupiedSeatSync : public ISyncStructure
 {
-    enum { BITCOUNT = 4 };
+    enum { BITCOUNT = 3 };
 
     bool Read ( NetBitStreamInterface& bitStream )
     {
@@ -2033,7 +2047,7 @@ struct SOccupiedSeatSync : public ISyncStructure
 
     struct
     {
-        unsigned char ucSeat : 4;
+        unsigned char ucSeat : 3;
     } data;
 };
 

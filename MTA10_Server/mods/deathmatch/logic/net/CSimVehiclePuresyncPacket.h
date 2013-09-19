@@ -97,11 +97,6 @@ private:
         float           fTurretY;
         ushort          usAdjustableProperty;
 
-        float           fRailPosition;
-        uchar           ucRailTrack;
-        bool            bRailDirection;
-        float           fRailSpeed;
-
         SFixedArray < float, 4 >    fDoorOpenRatio;
     } m_Cache;
 };

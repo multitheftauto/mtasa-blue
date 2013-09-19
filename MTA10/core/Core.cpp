@@ -16,7 +16,6 @@
 
 CCore* g_pCore = NULL;
 CGraphics* g_pGraphics = NULL;
-CLocalization* g_pLocalization = NULL;
 bool IsRealDeal ( void );
 
 int WINAPI DllMain(HINSTANCE hModule, DWORD dwReason, PVOID pvNothing)

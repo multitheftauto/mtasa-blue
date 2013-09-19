@@ -476,10 +476,10 @@ CPed* CClientTask::GetParameterPed ( const char* szKey )
 {
     // Grab the parameter, is it userdata?
     CLuaArgument* pArgument = GetParameter ( szKey );
-    if ( pArgument && pArgument->GetType () == LUA_TUSERDATA )
+    if ( pArgument && pArgument->GetType () == LUA_TLIGHTUSERDATA )
     {
         // Grab the player and verify it
-        CClientPlayer* pPlayer = reinterpret_cast < CClientPlayer* > ( pArgument->GetUserData () );
+        CClientPlayer* pPlayer = reinterpret_cast < CClientPlayer* > ( pArgument->GetLightUserData () );
         if ( VERIFY_PLAYER ( pPlayer ) )
         {
             // Return his game player
@@ -511,10 +511,10 @@ CVehicle* CClientTask::GetParameterVehicle ( const char* szKey )
 {
     // Grab the parameter, is it userdata?
     CLuaArgument* pArgument = GetParameter ( szKey );
-    if ( pArgument && pArgument->GetType () == LUA_TUSERDATA )
+    if ( pArgument && pArgument->GetType () == LUA_TLIGHTUSERDATA )
     {
         // Grab the player and verify it
-        CClientVehicle* pVehicle = reinterpret_cast < CClientVehicle* > ( pArgument->GetUserData () );
+        CClientVehicle* pVehicle = reinterpret_cast < CClientVehicle* > ( pArgument->GetLightUserData () );
         if ( VERIFY_VEHICLE ( pVehicle ) )
         {
             // Return the game vehicle

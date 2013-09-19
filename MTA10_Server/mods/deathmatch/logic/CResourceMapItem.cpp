@@ -108,7 +108,7 @@ bool CResourceMapItem::LoadMap ( const char * szMapFilename )
         // Create Map Element
         m_pMapElement = new CDummy ( g_pGame->GetGroups(), m_resource->GetResourceRootElement () );
         m_pMapElement->SetTypeName ( "map" );
-        m_pMapElement->SetName ( m_strShortName );
+        m_pMapElement->SetName ( m_strShortName.c_str () );
 
         // Load and parse it
         m_pXMLFile = g_pServerInterface->GetXML ()->CreateXML ( szMapFilename );

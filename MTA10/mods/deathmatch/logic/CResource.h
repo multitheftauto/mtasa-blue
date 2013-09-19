@@ -44,7 +44,7 @@ class CResource
 {  
 
 public:
-                            CResource       ( unsigned short usNetID, const char* szResourceName, CClientEntity* pResourceEntity, CClientEntity* pResourceDynamicEntity, const SString& strMinServerReq, const SString& strMinClientReq, bool bEnableOOP );
+                            CResource       ( unsigned short usNetID, const char* szResourceName, CClientEntity* pResourceEntity, CClientEntity* pResourceDynamicEntity, const SString& strMinServerReq, const SString& strMinClientReq );
                             ~CResource      ( void );
 
     inline unsigned short   GetNetID        ( void )                { return m_usNetID; };
@@ -58,7 +58,7 @@ public:
     bool                    InDownloadQueue     ( void )            { return m_bInDownloadQueue; };
     bool                    SetInDownloadQueue  ( bool bIn )        { m_bInDownloadQueue = bIn; };
 
-    CDownloadableResource*  QueueFile       ( CDownloadableResource::eResourceType resourceType, const char *szFileName, CChecksum serverChecksum, bool bAutoDownload = true );
+    CDownloadableResource*  QueueFile       ( CDownloadableResource::eResourceType resourceType, const char *szFileName, CChecksum serverChecksum );
 
     CDownloadableResource*  AddConfigFile   ( const char *szFileName, CChecksum serverChecksum );
 
@@ -91,14 +91,10 @@ public:
     inline std::list < CExportedFunction* >::iterator    IterBeginExportedFunctions   ( void )        { return m_exportedFunctions.begin(); }
     inline std::list < CExportedFunction* >::iterator    IterEndExportedFunctions     ( void )        { return m_exportedFunctions.end(); }
 
-    inline std::list < CResourceFile* >::iterator    IterBeginResourceFiles   ( void )        { return m_ResourceFiles.begin(); }
-    inline std::list < CResourceFile* >::iterator    IterEndResourceFiles     ( void )        { return m_ResourceFiles.end(); }
-
     void                    SetRemainingNoClientCacheScripts    ( unsigned short usRemaining ) { m_usRemainingNoClientCacheScripts = usRemaining; }
     void                    LoadNoClientCacheScript         ( const char* chunk, unsigned int length );
     const SString&          GetMinServerReq                 ( void ) const                  { return m_strMinServerReq; }
     const SString&          GetMinClientReq                 ( void ) const                  { return m_strMinClientReq; }
-    bool                    IsOOPEnabled                    ( void )                        { return m_bOOPEnabled; }
     void                    HandleDownloadedFileTrouble     ( CResourceFile* pResourceFile, bool bCRCMismatch );
 
 private:
@@ -120,7 +116,6 @@ private:
     bool                    m_bLoadAfterReceivingNoClientCacheScripts;
     SString                 m_strMinServerReq;
     SString                 m_strMinClientReq;
-    bool                    m_bOOPEnabled;
 
     // To control cursor show/hide
     static int              m_iShowingCursor;

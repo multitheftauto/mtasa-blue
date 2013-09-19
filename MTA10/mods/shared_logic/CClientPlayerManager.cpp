@@ -87,6 +87,13 @@ void CClientPlayerManager::DoPulse ( void )
             {
                 pPlayer->SetHasConnectionTrouble ( false );
             }
+
+            if ( pPlayer && pPlayer->GetLatency ( ) == 0 && ulCurrentTime >= pPlayer->GetLastPuresyncTime ( ) + 2000 && pPlayer->m_bMessageShown == false ) 
+            {
+                // Tell the console
+                CLogger::LogPrintf ( "URGENT: Report this error on bugs.mtasa.com error code: 6930-3. Extra info: %i, %i, %i, %i, %i \n", pPlayer->IsDeadOnNetwork ( ) == true ? 1 : 0, pPlayer->GetLastPuresyncTime ( ), pPlayer->IsBeingDeleted ( ) == true ? 1 : 0, pPlayer->GetPing ( ), pPlayer->GetLastPuresyncType ( ) );
+                pPlayer->m_bMessageShown = true;
+            }
         }
     }
 }

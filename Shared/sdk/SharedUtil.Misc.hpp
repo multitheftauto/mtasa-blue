@@ -32,24 +32,13 @@ std::map < uint, uint > ms_ReportAmountMap;
 #ifdef MTA_CLIENT
 #ifdef WIN32
 
+extern "C" {   _declspec(dllexport) DWORD NvOptimusEnablement = 0x00000001; }
+
 #define TROUBLE_URL1 "http://updatesa.multitheftauto.com/sa/trouble/?v=_VERSION_&id=_ID_&tr=_TROUBLE_"
 
 
 #ifndef MTA_DM_ASE_VERSION
     #include <../../MTA10/version.h>
-#endif
-
-//
-// Output a UTF8 encoded messagebox
-// Used in the Win32 Client only
-//
-#ifdef _WINDOWS_ //Only for modules that use windows.h
-    int SharedUtil::MessageBoxUTF8 ( HWND hWnd, SString lpText, SString lpCaption, UINT uType )
-    {
-        WString strText = MbUTF8ToUTF16 ( lpText );
-        WString strCaption = MbUTF8ToUTF16 ( lpCaption );
-        return MessageBoxW ( hWnd, strText.c_str(), strCaption.c_str(), uType );
-    }
 #endif
 
 
@@ -65,7 +54,7 @@ SString SharedUtil::GetMTASABaseDir ( void )
         strInstallRoot = GetRegistryValue ( "", "Last Run Location" );
         if ( strInstallRoot.empty () )
         {
-            MessageBoxUTF8 ( 0, _("Multi Theft Auto has not been installed properly, please reinstall."), _("Error")+_E("U01"), MB_OK | MB_TOPMOST );
+            MessageBox ( 0, "Multi Theft Auto has not been installed properly, please reinstall.", "Error", MB_OK | MB_TOPMOST );
             TerminateProcess ( GetCurrentProcess (), 9 );
         }
     }
@@ -516,19 +505,19 @@ bool SharedUtil::ProcessPendingBrowseToSolution ( void )
     {
         if ( !strMessageBoxMessage.empty() )
             strMessageBoxMessage += "\n\n\n";
-        strMessageBoxMessage += _("Do you want to see some on-line help about this problem ?");
-        if ( IDYES != MessageBoxUTF8( NULL, strMessageBoxMessage, "MTA: San Andreas", MB_YESNO | MB_ICONQUESTION | MB_TOPMOST ) )
+        strMessageBoxMessage += "Do you want to see some on-line help about this problem ?";
+        if ( IDYES != MessageBox( NULL, strMessageBoxMessage, "MTA: San Andreas", MB_YESNO | MB_ICONQUESTION | MB_TOPMOST ) )
             return false;
     }
     else
     {
         if ( !strMessageBoxMessage.empty() )
-            MessageBoxUTF8 ( NULL, strMessageBoxMessage, "MTA: San Andreas", MB_OK | MB_ICONEXCLAMATION | MB_TOPMOST );
+            MessageBox ( NULL, strMessageBoxMessage, "MTA: San Andreas", MB_OK | MB_ICONEXCLAMATION | MB_TOPMOST );
         if ( iFlags & SHOW_MESSAGE_ONLY )
             return true;
     }
 
-    MessageBoxUTF8 ( NULL, _("Your browser will now display a web page with some help infomation.\n\n(If the page fails to load, paste (CTRL-V) the URL into your web browser)")
+    MessageBox ( NULL, "Your browser will now display a web page with some help infomation.\n\n(If the page fails to load, paste (CTRL-V) the URL into your web browser)"
                         , "MTA: San Andreas", MB_OK | MB_ICONINFORMATION | MB_TOPMOST );
 
     SString strQueryURL = GetApplicationSetting ( "trouble-url" );
@@ -623,9 +612,13 @@ void WriteEvent( const char* szType, const SString& strText )
             WriteEvent( szType, lineList[i] );
         return;
     }
-    SString strPathFilename = CalcMTASAPath( PathJoin( "mta", "logfile.txt" ) );
     SString strMessage( "%s - %s %s", *GetLocalTimeString(), szType, *strText );
-    FileAppend( strPathFilename, strMessage + "\n" );
+    SString strPathFilename1 = CalcMTASAPath( PathJoin( "mta", "logfile.txt" ) );
+    FileAppend( strPathFilename1, strMessage + "\n" );
+
+    SString strPathFilename2 = PathJoin( GetMTADataPath (), "logfile.txt" );
+    MakeSureDirExists( strPathFilename2 );
+    FileAppend( strPathFilename2, strMessage + "\n" );
 #ifdef MTA_DEBUG
     OutputDebugLine ( strMessage );
 #endif
@@ -645,6 +638,12 @@ void SharedUtil::CycleEventLog( void )
 {
     SString strPathFilename = CalcMTASAPath( PathJoin( "mta", "logfile.txt" ) );
     SString strPathFilenamePrev = CalcMTASAPath( PathJoin( "mta", "logfile_old.txt" ) );
+    FileDelete( strPathFilenamePrev );
+    FileRename( strPathFilename, strPathFilenamePrev );
+    FileDelete( strPathFilename );
+
+    strPathFilename = PathJoin( GetMTADataPath (), "logfile.txt" );
+    strPathFilenamePrev = PathJoin( GetMTADataPath (), "logfile_old.txt" );
     FileDelete( strPathFilenamePrev );
     FileRename( strPathFilename, strPathFilenamePrev );
     FileDelete( strPathFilename );
@@ -1003,7 +1002,7 @@ void SharedUtil::RemoveColorCodesInPlaceW( WString& strText )
     uint uiSearchPos = 0;
     while( true )
     {
-        std::wstring::size_type uiFoundPos = strText.find( L'#', uiSearchPos );
+        uint uiFoundPos = strText.find( L'#', uiSearchPos );
         if ( uiFoundPos == std::wstring::npos )
             break;
 

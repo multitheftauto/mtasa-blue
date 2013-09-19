@@ -64,28 +64,6 @@ bool CSimVehiclePuresyncPacket::Read ( NetBitStreamInterface& BitStream )
             return false;
         m_Cache.PlrPosition = position.data.vecPosition;
 
-        if ( m_usVehicleGotModel == 449 ||
-            m_usVehicleGotModel == 537 ||
-            m_usVehicleGotModel == 538 ||
-            m_usVehicleGotModel == 570 ||
-            m_usVehicleGotModel == 569 ||
-            m_usVehicleGotModel == 590 )
-        {
-            // Train specific data
-            float fRailPosition = 0.0f;
-            uchar ucRailTrack = 0;
-            bool bRailDirection = false;
-            float fRailSpeed = 0.0f;
-            if ( !BitStream.Read ( fRailPosition ) || !BitStream.ReadBit ( bRailDirection ) || !BitStream.Read ( ucRailTrack ) || !BitStream.Read ( fRailSpeed ) )
-            {
-                return false;
-            }
-            m_Cache.fRailPosition = fRailPosition;
-            m_Cache.bRailDirection = bRailDirection;
-            m_Cache.ucRailTrack = ucRailTrack;
-            m_Cache.fRailSpeed = fRailSpeed;
-        }
-
         // Read the camera orientation
         ReadCameraOrientation ( position.data.vecPosition, BitStream, m_Cache.vecCamPosition, m_Cache.vecCamFwd );
 
@@ -293,19 +271,6 @@ bool CSimVehiclePuresyncPacket::Write ( NetBitStreamInterface& BitStream ) const
             position.data.vecPosition = m_Cache.VehPosition;
             BitStream.Write ( &position );
 
-            if ( m_usVehicleGotModel == 449 ||
-                m_usVehicleGotModel == 537 ||
-                m_usVehicleGotModel == 538 ||
-                m_usVehicleGotModel == 570 ||
-                m_usVehicleGotModel == 569 ||
-                m_usVehicleGotModel == 590 )
-            {
-                BitStream.Write ( m_Cache.fRailPosition );
-                BitStream.WriteBit ( m_Cache.bRailDirection );
-                BitStream.Write ( m_Cache.ucRailTrack );
-                BitStream.Write ( m_Cache.fRailSpeed );
-            }
-
             // Vehicle rotation
             SRotationDegreesSync rotation;
             rotation.data.vecRotation = m_Cache.VehRotationDeg;
@@ -360,7 +325,38 @@ bool CSimVehiclePuresyncPacket::Write ( NetBitStreamInterface& BitStream ) const
         // Weapon
         unsigned char ucWeaponType = m_ucPlayerGotWeaponType;
 
-        BitStream.Write ( &m_Cache.flags );
+        #if MTASA_VERSION_MINOR == 3
+            // Trains do a copy of all flags then overwrite the landing gear down with derailed
+            if ( m_usVehicleGotModel == 449 ||
+                m_usVehicleGotModel == 537 ||
+                m_usVehicleGotModel == 538 ||
+                m_usVehicleGotModel == 570 ||
+                m_usVehicleGotModel == 569 ||
+                m_usVehicleGotModel == 590 )
+            {
+                SVehiclePuresyncFlags newFlags;
+                newFlags.data.bIsWearingGoggles = m_Cache.flags.data.bIsWearingGoggles;
+                newFlags.data.bIsDoingGangDriveby = m_Cache.flags.data.bIsDoingGangDriveby;
+                newFlags.data.bIsSirenOrAlarmActive = m_Cache.flags.data.bIsSirenOrAlarmActive;
+                newFlags.data.bIsSmokeTrailEnabled = m_Cache.flags.data.bIsSmokeTrailEnabled;
+                newFlags.data.bIsOnGround = m_Cache.flags.data.bIsOnGround;
+                newFlags.data.bIsInWater = m_Cache.flags.data.bIsInWater;
+                newFlags.data.bIsDerailed = m_Cache.flags.data.bIsDerailed;
+                newFlags.data.bIsAircraft = m_Cache.flags.data.bIsAircraft;
+                newFlags.data.bHasAWeapon = m_Cache.flags.data.bHasAWeapon;
+                newFlags.data.bIsHeliSearchLightVisible = m_Cache.flags.data.bIsHeliSearchLightVisible;
+
+                newFlags.data.bIsLandingGearDown = m_Cache.flags.data.bIsDerailed;
+
+                BitStream.Write ( &newFlags );
+            }
+            else
+            {
+                BitStream.Write ( &m_Cache.flags );
+            }
+        #else
+            BitStream.Write ( &m_Cache.flags );
+        #endif
 
         // Write the weapon stuff
         if ( m_Cache.flags.data.bHasAWeapon )

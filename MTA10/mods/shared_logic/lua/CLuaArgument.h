@@ -29,6 +29,7 @@ class CLuaArguments;
 
 #define LUA_TTABLEREF 9
 #define LUA_TSTRING_LONG 10
+#define LONG_STRING_MIN_VERSION     "1.3.0-9.03772"
 
 class CLuaArgument
 {
@@ -58,7 +59,7 @@ public:
     inline bool             GetBoolean          ( void ) const      { return m_bBoolean; };
     inline lua_Number       GetNumber           ( void ) const      { return m_Number; };
     const SString&          GetString           ( void )            { return m_strString; };
-    inline void*            GetUserData         ( void ) const      { return m_pUserData; };
+    inline void*            GetLightUserData    ( void ) const      { return m_pLightUserData; };
     CClientEntity*          GetElement          ( void ) const;
 
     bool                    ReadFromBitStream   ( NetBitStreamInterface& bitStream, std::vector < CLuaArguments* > * pKnownTables = NULL );
@@ -74,7 +75,7 @@ private:
     bool                    m_bBoolean;
     lua_Number              m_Number;
     SString                 m_strString;
-    void*                   m_pUserData;
+    void*                   m_pLightUserData;
     CLuaArguments*          m_pTableData;
     bool                    m_bWeakTableRef;
 

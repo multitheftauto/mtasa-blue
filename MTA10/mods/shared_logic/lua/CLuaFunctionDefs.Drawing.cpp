@@ -56,8 +56,12 @@ int CLuaFunctionDefs::dxDrawLine3D ( lua_State* luaVM )
     CVector vecBegin; CVector vecEnd; uint ulColor; float fWidth; bool bPostGUI;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadVector3D ( vecBegin );
-    argStream.ReadVector3D ( vecEnd );
+    argStream.ReadNumber ( vecBegin.fX );
+    argStream.ReadNumber ( vecBegin.fY );
+    argStream.ReadNumber ( vecBegin.fZ );
+    argStream.ReadNumber ( vecEnd.fX );
+    argStream.ReadNumber ( vecEnd.fY );
+    argStream.ReadNumber ( vecEnd.fZ );
     argStream.ReadNumber ( ulColor, 0xFFFFFFFF );
     argStream.ReadNumber ( fWidth, 1 );
     argStream.ReadBool ( bPostGUI, false );
@@ -85,14 +89,20 @@ int CLuaFunctionDefs::dxDrawMaterialLine3D ( lua_State* luaVM )
     CVector vecFaceToward; bool bUseFaceToward = false;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadVector3D ( vecBegin );
-    argStream.ReadVector3D ( vecEnd );
+    argStream.ReadNumber ( vecBegin.fX );
+    argStream.ReadNumber ( vecBegin.fY );
+    argStream.ReadNumber ( vecBegin.fZ );
+    argStream.ReadNumber ( vecEnd.fX );
+    argStream.ReadNumber ( vecEnd.fY );
+    argStream.ReadNumber ( vecEnd.fZ );
     argStream.ReadUserData ( pMaterial );
     argStream.ReadNumber ( fWidth );
     argStream.ReadNumber ( ulColor, 0xFFFFFFFF );
     if ( argStream.NextCouldBeNumber () )
     {
-        argStream.ReadVector3D ( vecFaceToward );
+        argStream.ReadNumber ( vecFaceToward.fX );
+        argStream.ReadNumber ( vecFaceToward.fY );
+        argStream.ReadNumber ( vecFaceToward.fZ );
         bUseFaceToward = true;
     }
 
@@ -119,8 +129,12 @@ int CLuaFunctionDefs::dxDrawMaterialSectionLine3D ( lua_State* luaVM )
     CClientMaterial* pMaterial; float fWidth; uint ulColor; CVector vecFaceToward; bool bUseFaceToward = false;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadVector3D ( vecBegin );
-    argStream.ReadVector3D ( vecEnd );
+    argStream.ReadNumber ( vecBegin.fX );
+    argStream.ReadNumber ( vecBegin.fY );
+    argStream.ReadNumber ( vecBegin.fZ );
+    argStream.ReadNumber ( vecEnd.fX );
+    argStream.ReadNumber ( vecEnd.fY );
+    argStream.ReadNumber ( vecEnd.fZ );
     argStream.ReadNumber ( fU );
     argStream.ReadNumber ( fV );
     argStream.ReadNumber ( fSizeU );
@@ -130,7 +144,9 @@ int CLuaFunctionDefs::dxDrawMaterialSectionLine3D ( lua_State* luaVM )
     argStream.ReadNumber ( ulColor, 0xFFFFFFFF );
     if ( argStream.NextCouldBeNumber () )
     {
-        argStream.ReadVector3D ( vecFaceToward );
+        argStream.ReadNumber ( vecFaceToward.fX );
+        argStream.ReadNumber ( vecFaceToward.fY );
+        argStream.ReadNumber ( vecFaceToward.fZ );
         bUseFaceToward = true;
     }
 
@@ -932,7 +948,7 @@ int CLuaFunctionDefs::dxGetStatus ( lua_State* luaVM )
         SDxStatus dxStatus;
         g_pCore->GetGraphics ()->GetRenderItemManager ()->GetDxStatus ( dxStatus );
 
-        lua_createtable ( luaVM, 0, 23 );
+        lua_createtable ( luaVM, 0, 21 );
 
         lua_pushstring ( luaVM, "TestMode" );
         lua_pushstring ( luaVM, EnumToString ( dxStatus.testMode ) );
@@ -1016,14 +1032,6 @@ int CLuaFunctionDefs::dxGetStatus ( lua_State* luaVM )
 
         lua_pushstring ( luaVM, "SettingAntiAliasing" );
         lua_pushnumber ( luaVM, dxStatus.settings.iAntiAliasing );
-        lua_settable   ( luaVM, -3 );
-
-        lua_pushstring ( luaVM, "SettingAspectRatio" );
-        lua_pushstring ( luaVM, EnumToString ( dxStatus.settings.aspectRatio ) );
-        lua_settable   ( luaVM, -3 );
-
-        lua_pushstring ( luaVM, "SettingHUDMatchAspectRatio" );
-        lua_pushboolean( luaVM, dxStatus.settings.bHUDMatchAspectRatio );
         lua_settable   ( luaVM, -3 );
 
         return 1;

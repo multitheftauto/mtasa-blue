@@ -60,7 +60,6 @@ public:
     void                    AddInterpolation                ( const CVector& vecPosition );
     bool                    GetInterpolation                ( CVector& vecPosition, unsigned short usLatency );
     void                    SendBulletSyncFire              ( eWeaponType weaponType, const CVector& vecStart, const CVector& vecEnd );
-    void                    SendBulletSyncCustomWeaponFire  ( CClientWeapon * pWeapon, const CVector& vecStart, const CVector& vecEnd );
 
     static bool             IsWeaponIDAkimbo                ( unsigned char ucWeaponID );
     static bool             IsDriveByWeapon                 ( unsigned char ucWeaponID );
@@ -73,7 +72,6 @@ private:
     void                    WriteKeysync                    ( CClientPed* pPed, NetBitStreamInterface& BitStream );
 
     void                    ReadBulletsync                  ( CClientPlayer* pPlayer, NetBitStreamInterface& BitStream );
-    void                    ReadWeaponBulletsync            ( CClientPlayer* pWeapon, NetBitStreamInterface& BitStream );
 
     void                    ReadPlayerPuresync              ( CClientPlayer* pPlayer, NetBitStreamInterface& BitStream );
     void                    WritePlayerPuresync             ( CClientPlayer* pPed, NetBitStreamInterface& BitStream );
@@ -133,7 +131,6 @@ private:
     float                   m_fLastSentCameraRotation;
     float                   m_fLastSentAimY;
     uchar                   m_ucBulletSyncOrderCounter;
-    uchar                   m_ucCustomWeaponBulletSyncOrderCounter;
 };
 
 #endif

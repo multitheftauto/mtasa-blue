@@ -228,9 +228,6 @@ CClientGame::CClientGame ( bool bLocalPlay )
     // MTA Voice
     m_pVoiceRecorder = new CVoiceRecorder();
 
-    // Singular file download manager
-    m_pSingularFileDownloadManager = new CSingularFileDownloadManager();
-
     // Register the message and the net packet handler
     g_pMultiplayer->SetPreWeaponFireHandler ( CClientGame::PreWeaponFire );
     g_pMultiplayer->SetPostWeaponFireHandler ( CClientGame::PostWeaponFire );
@@ -278,7 +275,6 @@ CClientGame::CClientGame ( bool bLocalPlay )
 
     CStaticFunctionDefinitions ( m_pLuaManager, &m_Events, g_pCore, g_pGame, this, m_pManager );
     CLuaFunctionDefs::Initialize ( m_pLuaManager, m_pScriptDebugging, this );
-    CLuaOOPDefs::Initialize ( this, m_pLuaManager, m_pScriptDebugging );
     CLuaDefs::Initialize ( this, m_pLuaManager, m_pScriptDebugging );
 
     // Disable the enter/exit vehicle key button (we want to handle this button ourselves)
@@ -373,9 +369,6 @@ CClientGame::~CClientGame ( void )
     m_pBigPacketTransferBox->Hide();
 
     SAFE_DELETE( m_pVoiceRecorder );
-
-    // Singular file download manager
-    SAFE_DELETE( m_pSingularFileDownloadManager );
 
     // NULL the message/net stuff
     g_pMultiplayer->SetPreContextSwitchHandler ( NULL );
@@ -528,7 +521,7 @@ bool CClientGame::StartGame ( const char* szNick, const char* szPassword, eServe
     // Verify that the nickname is valid
     if ( !IsNickValid ( szNick ) )
     {
-        g_pCore->ShowMessageBox ( _("Error")+_E("CD01"), _("Invalid nickname! Please go to Settings and set a new one!"), MB_BUTTON_OK | MB_ICON_ERROR );
+        g_pCore->ShowMessageBox ( "Error", "A valid nickname isn't set. Please go to Settings and set a new.", MB_BUTTON_OK | MB_ICON_ERROR );
         g_pCore->GetModManager ()->RequestUnload ();
         return false;
     }
@@ -544,7 +537,7 @@ bool CClientGame::StartGame ( const char* szNick, const char* szPassword, eServe
            g_pCore->GetConsole ()->SetVisible ( false );
 
         // Display the status box
-        g_pCore->ShowMessageBox ( _("CONNECTING"), _("Entering the game ..."), MB_ICON_INFO );
+        g_pCore->ShowMessageBox ( "CONNECTING", "Entering the game ...", MB_ICON_INFO );
 
         // Send the initial data to the server
         NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream ();
@@ -603,7 +596,7 @@ bool CClientGame::StartGame ( const char* szNick, const char* szPassword, eServe
     }
     else
     {
-        g_pCore->ShowMessageBox ( _("Error")+_E("CD02"), _("Not connected; please use Quick Connect or the 'connect' command to connect to a server."), MB_BUTTON_OK | MB_ICON_ERROR );
+        g_pCore->ShowMessageBox ( "Error", "Not connected; please use Quick Connect or the 'connect' command to connect to a server.", MB_BUTTON_OK | MB_ICON_ERROR );
         g_pCore->GetModManager ()->RequestUnload ();
     }
 
@@ -628,7 +621,7 @@ bool CClientGame::StartLocalGame ( eServerType Type, const char* szPassword )
 
     if ( !IsNickValid ( strNick.c_str() ) )
     {
-        g_pCore->ShowMessageBox ( _("Error")+_E("CD03"), _("Invalid nickname! Please go to Settings and set a new one!"), MB_BUTTON_OK | MB_ICON_ERROR );
+        g_pCore->ShowMessageBox ( "Error", "A valid nickname isn't set. Please go to Settings and set a new.", MB_BUTTON_OK | MB_ICON_ERROR );
         g_pCore->GetModManager ()->RequestUnload ();
         return false;
     }
@@ -650,7 +643,7 @@ bool CClientGame::StartLocalGame ( eServerType Type, const char* szPassword )
         {
             m_bWaitingForLocalConnect = true;
             m_bErrorStartingLocal = true;
-            g_pCore->ShowMessageBox ( _("Error")+_E("CD04"), _("The server is not installed"), MB_ICON_ERROR | MB_BUTTON_OK );
+            g_pCore->ShowMessageBox ( "Error", "The server is not installed", MB_ICON_ERROR | MB_BUTTON_OK );
             g_pCore->GetModManager ()->RequestUnload ();
             return false;
         }
@@ -660,7 +653,7 @@ bool CClientGame::StartLocalGame ( eServerType Type, const char* szPassword )
 
         // Display the status box<<<<<
         m_OnCancelLocalGameClick = GUI_CALLBACK ( &CClientGame::OnCancelLocalGameClick, this );
-        g_pCore->ShowMessageBox ( _("Local Server"), _("Starting local server ..."), MB_BUTTON_CANCEL | MB_ICON_INFO, &m_OnCancelLocalGameClick );
+        g_pCore->ShowMessageBox ( "Local Server", "Starting local server ...", MB_BUTTON_CANCEL | MB_ICON_INFO, &m_OnCancelLocalGameClick );
     }
     else
     {
@@ -916,6 +909,16 @@ void CClientGame::DoPulsePostFrame ( void )
     }
 }
 
+
+static SString AppendNetErrorCode ( const SString& strText )
+{
+    uint uiErrorCode = g_pNet->GetExtendedErrorCode ();
+    if ( uiErrorCode != 0 )
+        return strText + SString ( " \nCode: %08X", uiErrorCode );
+    return strText;
+}
+
+
 void CClientGame::DoPulses ( void )
 {
     TIMING_CHECKPOINT( "-CClientGame::DoPulsePostFrame" );
@@ -981,7 +984,7 @@ void CClientGame::DoPulses ( void )
             else
             {
                 // Otherwise, disconnect here
-                g_pCore->ShowMessageBox ( _("Error")+_E("CD05"), SString ( _("You were kicked from the game ( %s )"), *strMessageCombo ), MB_BUTTON_OK | MB_ICON_ERROR );
+                g_pCore->ShowMessageBox ( "Error", SString ( "You were kicked from the game (" + strMessageCombo + ")" ), MB_BUTTON_OK | MB_ICON_ERROR );
                 g_pCore->GetModManager ()->RequestUnload ();
                 return;
             }
@@ -1049,7 +1052,7 @@ void CClientGame::DoPulses ( void )
             if ( m_Server.IsReady () &&
                 m_iLocalConnectAttempts == 0 )
             {
-                g_pCore->ShowMessageBox ( _("Local Server"), _("Connecting to local server..."), MB_ICON_INFO );
+                g_pCore->ShowMessageBox ( "Local Server", "Connecting to local server...", MB_ICON_INFO );
 
                 // Connect
                 if ( g_pNet->StartNetwork ( "localhost", 22010 ) )
@@ -1060,7 +1063,7 @@ void CClientGame::DoPulses ( void )
                 }
                 else
                 {
-                    g_pCore->ShowNetErrorMessageBox ( _("Error")+_E("CD06"), _("Error connecting to server.") );
+                    g_pCore->ShowMessageBox ( "Error", AppendNetErrorCode ( "Error connecting to server." ), MB_BUTTON_OK | MB_ICON_ERROR );
                     g_pCore->GetModManager ()->RequestUnload ();
                     return;
                 }
@@ -1070,7 +1073,7 @@ void CClientGame::DoPulses ( void )
             if ( m_ulTimeStart != 0 && CClientTime::GetTime () >= m_ulTimeStart + 5000 )
             {
                 // Show timeout message and disconnect
-                g_pCore->ShowNetErrorMessageBox ( _("Error")+_E("CD07"), _("Connecting to local server timed out. See console for details.") );
+                g_pCore->ShowMessageBox ( "Error", AppendNetErrorCode ( "Connecting to local server timed out. See console for details." ), MB_BUTTON_OK | MB_ICON_ERROR );
                 g_pCore->GetModManager ()->RequestUnload ();
                 return;
             }
@@ -1139,7 +1142,7 @@ void CClientGame::DoPulses ( void )
         // Timed out?
         if ( !m_bWaitingForLocalConnect && ulCurrentTime >= m_ulTimeStart + NET_CONNECT_TIMEOUT )
         {
-            g_pCore->ShowNetErrorMessageBox ( _("Error")+_E("CD08"), _("Connection timed out"), "connect-timed-out", true );
+            g_pCore->ShowMessageBox ( "Error", AppendNetErrorCode ( "Connection timed out" ), MB_BUTTON_OK | MB_ICON_ERROR );
             g_pCore->GetModManager ()->RequestUnload ();
             return;
         }
@@ -1148,7 +1151,7 @@ void CClientGame::DoPulses ( void )
     {
         // Pulse DownloadFiles if we're transferring stuff
         DownloadInitialResourceFiles ();
-        DownloadSingularResourceFiles ();
+
         g_pNet->GetHTTPDownloadManager ( EDownloadMode::CALL_REMOTE )->ProcessQueuedFiles ();
     }
 
@@ -1173,48 +1176,49 @@ void CClientGame::DoPulses ( void )
             // See if we can figure out what specifically it was
             if ( ucError == 0 )
             {
-                g_pCore->ShowNetErrorMessageBox ( _("Error")+_E("CD09"), _("Connection with the server was lost") );
+                g_pCore->ShowMessageBox ( "Error", AppendNetErrorCode ( "Connection with the server was lost" ), MB_BUTTON_OK | MB_ICON_ERROR );
+                g_pNet->SetImmediateError ( 0 );
                 g_pCore->GetModManager ()->RequestUnload ();
                 return;
             }
             else
             {
                 SString strError;
-                SString strErrorCode;
                 switch ( ucError )
                 {
                     case RID_RSA_PUBLIC_KEY_MISMATCH:
-                        strError = _("Disconnected: unknown protocol error"); strErrorCode = _E("CD10"); // encryption key mismatch
+                        strError = "Disconnected: unknown protocol error.";  // encryption key mismatch
                         break;
                     case RID_REMOTE_DISCONNECTION_NOTIFICATION:
-                        strError = _("Disconnected: disconnected remotely"); strErrorCode = _E("CD11");
+                        strError = "Disconnected: disconnected remotely.";
                         break;
                     case RID_REMOTE_CONNECTION_LOST:
-                        strError = _("Disconnected: connection lost remotely"); strErrorCode = _E("CD12");
+                        strError = "Disconnected: connection lost remotely.";
                         break;
                     case RID_CONNECTION_BANNED:
-                        strError = _("Disconnected: you are banned from this server"); strErrorCode = _E("CD13");
+                        strError = "Disconnected: you are banned from this server.";
                         break;
                     case RID_NO_FREE_INCOMING_CONNECTIONS:
-                        strError = _("Disconnected: the server is currently full"); strErrorCode = _E("CD14");
+                        strError = "Disconnected: the server is currently full.";
                         break;
                     case RID_DISCONNECTION_NOTIFICATION:
-                        strError = _("Disconnected: disconnected from the server"); strErrorCode = _E("CD15");
+                        strError = "Disconnected: disconnected from the server.";
                         break;
                     case RID_CONNECTION_LOST:
-                        strError = _("Disconnected: connection to the server was lost"); strErrorCode = _E("CD16");
+                        strError = "Disconnected: connection to the server was lost.";
                         break;
                     case RID_INVALID_PASSWORD:
-                        strError = _("Disconnected: invalid password specified"); strErrorCode = _E("CD17");
+                        strError = "Disconnected: invalid password specified.";
                         break;
                     default:
-                        strError = _("Disconnected: connection was refused"); strErrorCode = _E("CD18");
+                        strError = "Disconnected: connection was refused.";
                         break;
                 }
 
                 // Display an error, reset the error status and exit
-                g_pCore->ShowNetErrorMessageBox ( _("Error")+strErrorCode, strError );
+                g_pCore->ShowMessageBox ( "Error", AppendNetErrorCode ( strError ), MB_BUTTON_OK | MB_ICON_ERROR );
                 g_pNet->SetConnectionError ( 0 );
+                g_pNet->SetImmediateError ( 0 );
                 g_pCore->GetModManager ()->RequestUnload ();
             }
         }
@@ -1225,7 +1229,7 @@ void CClientGame::DoPulses ( void )
             // Time out the verification if it takes too long
             if ( m_ulVerifyTimeStart != 0 && ulCurrentTime >= m_ulVerifyTimeStart + CLIENT_VERIFICATION_TIMEOUT )
             {
-                g_pCore->ShowNetErrorMessageBox ( _("Error")+_E("CD19"), _("MTA Client verification failed!") );
+                g_pCore->ShowMessageBox ( "Error", AppendNetErrorCode ( "MTA Client verification failed!" ), MB_BUTTON_OK | MB_ICON_ERROR );
                 g_pCore->GetModManager ()->RequestUnload ();
             }
         }
@@ -2321,22 +2325,20 @@ bool CClientGame::KeyStrokeHandler ( const SString& strKey, bool bState, bool bI
             Arguments.PushString ( strKey );
             Arguments.PushBoolean ( bState );
             bAllow = m_pRootEntity->CallEvent ( "onClientKey", Arguments, false );
-            if ( bState == true )
+            if ( bAllow == false && bState == true && strKey == "escape" )
             {
-                if ( bAllow == false && strKey == "escape" )
+                if ( m_bLastKeyWasEscapeCancelled )
                 {
-                    if ( m_bLastKeyWasEscapeCancelled )
-                    {
-                        // Escape cannot be skipped twice
-                        bAllow = true;
-                        m_bLastKeyWasEscapeCancelled = false;
-                    }
-                    else
-                        m_bLastKeyWasEscapeCancelled = true;
+                    // Escape cannot be skipped twice
+                    bAllow = true;
+                    m_bLastKeyWasEscapeCancelled = false;
                 }
                 else
-                    m_bLastKeyWasEscapeCancelled = false;
+                    m_bLastKeyWasEscapeCancelled = true;
             }
+            else
+                m_bLastKeyWasEscapeCancelled = false;
+
             return bAllow;
         }
     }
@@ -2842,16 +2844,13 @@ void CClientGame::AddBuiltInEvents ( void )
     m_Events.AddEvent ( "onClientSoundStream", "success, length, streamName", NULL, false );
     m_Events.AddEvent ( "onClientSoundFinishedDownload", "length", NULL, false );
     m_Events.AddEvent ( "onClientSoundChangedMeta", "streamTitle", NULL, false );
+    m_Events.AddEvent ( "onClientSoundBeat", "time", NULL, false );
     m_Events.AddEvent ( "onClientSoundStarted", "reason", NULL, false );
     m_Events.AddEvent ( "onClientSoundStopped", "reason", NULL, false );
-    m_Events.AddEvent ( "onClientSoundBeat", "time", NULL, false );
 
     // Object events
     m_Events.AddEvent ( "onClientObjectDamage", "loss, attacker", NULL, false );
     m_Events.AddEvent ( "onClientObjectBreak", "attacker", NULL, false );
-
-    // Misc events
-    m_Events.AddEvent ( "onClientFileDownloadComplete", "fileName, success", NULL, false );
     
     m_Events.AddEvent ( "onClientWeaponFire", "ped, x, y, z", NULL, false );
 }
@@ -3568,7 +3567,7 @@ void CClientGame::Event_OnIngameAndReady ( void )
 void CClientGame::Event_OnIngameAndConnected ( void )
 {
     // Create a messagebox saying that we're verifying the client
-    //g_pCore->ShowMessageBox ( "Connecting", _("Verifying client ..."), false );
+    //g_pCore->ShowMessageBox ( "Connecting", "Verifying client ...", false );
     m_ulVerifyTimeStart = CClientTime::GetTime ();
     
     // Keep criminal records of how many times they've connected to servers
@@ -3999,36 +3998,8 @@ void CClientGame::DownloadInitialResourceFiles ( void )
         {
             // Throw the error and disconnect
             g_pCore->GetModManager ()->RequestUnload ();
-            g_pCore->ShowMessageBox ( _("Error")+_E("CD20"), szHTTPError, MB_BUTTON_OK | MB_ICON_ERROR ); // HTTP Error
-            g_pCore->GetConsole ()->Printf ( _("Download error: %s"), szHTTPError );
-        }
-    }
-}
-
-
-//
-// On demand files
-//
-void CClientGame::DownloadSingularResourceFiles ( void )
-{
-    if ( !IsTransferringSingularFiles () )
-        return;
-
-    if ( !g_pNet->IsConnected() )
-        return;
-
-    CNetHTTPDownloadManagerInterface* pHTTP = g_pNet->GetHTTPDownloadManager ( EDownloadMode::RESOURCE_SINGULAR_FILES );
-    if ( !pHTTP->ProcessQueuedFiles () )
-    {
-        // Downloading
-    }
-    else
-    {
-        // Can't clear list until all files have been processed
-        if ( m_pSingularFileDownloadManager->AllComplete () )
-        {
-            SetTransferringSingularFiles ( false );
-            m_pSingularFileDownloadManager->ClearList ();
+            g_pCore->ShowMessageBox ( "Error", szHTTPError, MB_BUTTON_OK | MB_ICON_ERROR );
+            g_pCore->GetConsole ()->Printf ( "Download error: %s", szHTTPError );
         }
     }
 }
@@ -4847,7 +4818,7 @@ void CClientGame::ProcessVehicleInOutKey ( bool bPassenger )
                                                     bool bIsOnWater = pVehicle->IsOnWater ();
                                                     unsigned char ucDoor = static_cast < unsigned char > ( uiDoor );
                                                     pBitStream->WriteBits ( &ucAction, 4 );
-                                                    pBitStream->WriteBits ( &ucSeat, 4 );
+                                                    pBitStream->WriteBits ( &ucSeat, 3 );
                                                     pBitStream->WriteBit ( bIsOnWater );
                                                     pBitStream->WriteBits ( &ucDoor, 3 );
 
@@ -5194,10 +5165,6 @@ void CClientGame::SendProjectileSync ( CClientProjectile * pProjectile )
         weaponTypeSync.data.ucWeaponType = static_cast < unsigned char > ( weaponType );
         pBitStream->Write ( &weaponTypeSync );
 
-        // Write the projectile's model
-        if ( pBitStream->Version () >= 0x4F )
-            pBitStream->Write ( pProjectile->GetModel () );
-
         switch ( weaponType )
         {
             case WEAPONTYPE_GRENADE:
@@ -5402,13 +5369,6 @@ void CClientGame::ResetMapInfo ( void )
         m_pLocalPlayer->SetVoice ( sVoiceType, sVoiceID );
 
         m_pLocalPlayer->DestroySatchelCharges( false, true );
-        // Tell the server we want to destroy our satchels
-        NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream ();
-        if ( pBitStream )
-        {
-            g_pNet->SendPacket ( PACKET_ID_DESTROY_SATCHELS, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED );
-            g_pNet->DeallocateNetBitStream ( pBitStream );
-        }
     }
 }
 
@@ -5832,7 +5792,7 @@ void CClientGame::NotifyBigPacketProgress ( unsigned long ulBytesReceived, unsig
     }
 
     m_pBigPacketTransferBox->DoPulse ();
-    m_pBigPacketTransferBox->SetInfo ( Min ( ulTotalSize, ulBytesReceived ), CTransferBox::PACKET );
+    m_pBigPacketTransferBox->SetInfo ( Min ( ulTotalSize, ulBytesReceived ), "Map download progress:" );
 }
 
 bool CClientGame::SetGlitchEnabled ( unsigned char ucGlitch, bool bEnabled )

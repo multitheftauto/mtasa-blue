@@ -13,6 +13,7 @@
 #define __CSERVERINTERFACE_H
 
 #include "net/CNetServer.h"
+#include "CTCP.h"
 #include "CModManager.h"
 #include <xml/CXML.h>
 
@@ -21,6 +22,7 @@ class CServerInterface
 public:
     virtual CNetServer*     GetNetwork          ( void ) = 0;
     virtual CModManager*    GetModManager       ( void ) = 0;
+    virtual CTCP*           GetTCP              ( void ) = 0;
     virtual CXML*           GetXML              ( void ) = 0;
 
     virtual const char*     GetServerModPath    ( void ) = 0;

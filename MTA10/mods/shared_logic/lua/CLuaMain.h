@@ -19,8 +19,6 @@ class CLuaMain;
 #define __CLUAMAIN_H
 
 #include "CLuaTimerManager.h"
-#include "CLuaVector.h"
-#include "CLuaMatrix.h"
 
 #include "CLuaFunctionDefs.h"
 
@@ -40,7 +38,7 @@ class CLuaMain //: public CClient
 {
 public:
     ZERO_ON_NEW
-                                    CLuaMain                ( class CLuaManager* pLuaManager, CResource* pResourceOwner, bool bEnableOOP );
+                                    CLuaMain                ( class CLuaManager* pLuaManager, CResource* pResourceOwner );
                                     ~CLuaMain               ( void );
 
     bool                            LoadScriptFromBuffer    ( const char* cpBuffer, unsigned int uiSize, const char* szFileName );
@@ -75,56 +73,10 @@ public:
     unsigned long                   GetTimerCount           ( void ) const                  { return m_pLuaTimerManager ? m_pLuaTimerManager->GetTimerCount () : 0; };
     unsigned long                   GetElementCount         ( void ) const;
 
-    void                            AddElementClass         ( lua_State* luaVM );
-    void                            AddVehicleClass         ( lua_State* luaVM );
-    void                            AddPedClass             ( lua_State* luaVM );
-    void                            AddPlayerClass          ( lua_State* luaVM );
-    void                            AddObjectClass          ( lua_State* luaVM );
-    void                            AddMarkerClass          ( lua_State* luaVM );
-    void                            AddBlipClass            ( lua_State* luaVM );
-    void                            AddPickupClass          ( lua_State* luaVM );
-    void                            AddColShapeClass        ( lua_State* luaVM );
-    void                            AddProjectileClass      ( lua_State* luaVM );
-    void                            AddRadarAreaClass       ( lua_State* luaVM );
-    void                            AddTeamClass            ( lua_State* luaVM );
-    void                            AddWaterClass           ( lua_State* luaVM );
-    void                            AddSoundClass           ( lua_State* luaVM );
-    void                            AddWeaponClass          ( lua_State* luaVM );
-
-    void                            AddGuiElementClass      ( lua_State* luaVM );
-    void                            AddGuiWindowClass       ( lua_State* luaVM );
-    void                            AddGuiButtonClass       ( lua_State* luaVM );
-    void                            AddGuiEditClass         ( lua_State* luaVM );
-    void                            AddGuiLabelClass        ( lua_State* luaVM );
-    void                            AddGuiMemoClass         ( lua_State* luaVM );
-    void                            AddGuiImageClass        ( lua_State* luaVM );
-    void                            AddGuiComboBoxClass     ( lua_State* luaVM );
-    void                            AddGuiCheckBoxClass     ( lua_State* luaVM );
-    void                            AddGuiRadioButtonClass  ( lua_State* luaVM );
-    void                            AddGuiScrollPaneClass   ( lua_State* luaVM );
-    void                            AddGuiScrollBarClass    ( lua_State* luaVM );
-    void                            AddGuiProgressBarClass  ( lua_State* luaVM );
-    void                            AddGuiGridlistClass     ( lua_State* luaVM );
-    void                            AddGuiTabPanelClass     ( lua_State* luaVM );
-    void                            AddGuiTabClass          ( lua_State* luaVM );
-
-    void                            AddResourceClass        ( lua_State* luaVM );
-    void                            AddTimerClass           ( lua_State* luaVM );
-    void                            AddFileClass            ( lua_State* luaVM );
-    void                            AddXmlNodeClass         ( lua_State* luaVM );
-
-    void                            AddCameraClass          ( lua_State* luaVM );
-
-    void                            AddVector3DClass        ( lua_State* luaVM );
-    void                            AddVector2DClass        ( lua_State* luaVM );
-    void                            AddMatrixClass          ( lua_State* luaVM );
-
-    void                            InitClasses             ( lua_State* luaVM );
     void                            InitVM                  ( void );
     const SString&                  GetFunctionTag          ( int iLuaFunction );
     int                             PCall                   ( lua_State *L, int nargs, int nresults, int errfunc );
 
-    bool                            IsOOPEnabled            ( void )                        { return m_bEnableOOP; }
 private:
     void                            InitSecurity            ( void );
 
@@ -142,8 +94,6 @@ private:
     class CResource*                m_pResource;
 
     std::list < CXMLFile* >         m_XMLFiles;
-
-    bool                            m_bEnableOOP;
 public:
     std::map < const void*, CRefInfo >      m_CallbackTable;
     std::map < int, SString >               m_FunctionTagMap;

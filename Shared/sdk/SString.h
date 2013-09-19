@@ -82,10 +82,6 @@ public:
     {
         return std::string ( *this ) + other;
     }
-	SString operator+( const SString& other ) const
-    {
-        return std::string ( *this ) + other;
-    }
 
     // Assignment  
     operator const char*() const    { return c_str (); }        // Auto assign to const char* without using c_str()
@@ -142,7 +138,7 @@ struct SCharStringRef
 {
     SCharStringRef ( void ) : pData ( NULL ),  uiSize ( 0 ) {}
     char* pData;
-    size_t uiSize;
+    uint uiSize;
 };
 
 

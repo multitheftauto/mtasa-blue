@@ -59,24 +59,26 @@ int CLuaTextDefs::textCreateDisplay ( lua_State* luaVM )
 
 int CLuaTextDefs::textDestroyDisplay ( lua_State* luaVM )
 {
-    CTextDisplay * pTextDisplay;
-
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pTextDisplay );
-
-    if ( !argStream.HasErrors ( ) )
-    {        
+    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
+    {
+        // Grab our VM
         CLuaMain * luaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
         if ( luaMain )
         {
-            luaMain->DestroyDisplay ( pTextDisplay );
+            // Grab the text display and check its existence
+            CTextDisplay* pTextDisplay = lua_totextdisplay ( luaVM, 1 );
+            if ( pTextDisplay )
+            {
+                // Destroy it
+                luaMain->DestroyDisplay ( pTextDisplay );
 
-            lua_pushboolean ( luaVM, true );
-            return 1;
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -85,67 +87,78 @@ int CLuaTextDefs::textDestroyDisplay ( lua_State* luaVM )
 
 int CLuaTextDefs::textCreateTextItem ( lua_State* luaVM )
 {
-    
-    SString strText, strHorzAlign, strVertAlign;
-    float fX, fY, fScale;
-    int iPriority;
+    const char * szText = "";
+    float fX = 0.5f;
+    float fY = 0.5f;
+    int priority = PRIORITY_LOW;
     SColorRGBA color ( 255, 255, 255, 255 );
-    unsigned char ucShadowAlpha;
+    float scale = 1.0f;
+    unsigned char format = 0;
+    unsigned char ucShadowAlpha = 0;
+    if ( lua_type ( luaVM, 1 ) == LUA_TSTRING )
+        szText = lua_tostring ( luaVM, 1 );
 
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadString ( strText, "" );
-    argStream.ReadNumber ( fX, 0.5f );
-    argStream.ReadNumber ( fY, 0.5f );
+    if ( lua_type ( luaVM, 2 ) == LUA_TNUMBER )
+        fX = static_cast < float > ( lua_tonumber ( luaVM, 2 ) );
 
-    if ( argStream.NextIsString( ) )
+    if ( lua_type ( luaVM, 3 ) == LUA_TNUMBER )
+        fY = static_cast < float > ( lua_tonumber ( luaVM, 3 ) );
+
+    if ( lua_type ( luaVM, 4 ) == LUA_TNUMBER )
+        priority = static_cast < int > ( lua_tonumber ( luaVM, 4 ) );
+    else if ( lua_type ( luaVM, 4 ) == LUA_TSTRING )
     {
-        SString strPriority;
-        argStream.ReadString ( strPriority );
-
-        if ( strPriority == "high" )        iPriority = PRIORITY_HIGH;
-        else if ( strPriority == "medium" ) iPriority = PRIORITY_MEDIUM;
-        else                                iPriority = PRIORITY_LOW;
-
+        const char * szTemp = lua_tostring ( luaVM, 4 );
+        if ( strcmp ( szTemp, "low" ) == 0 )
+            priority = PRIORITY_LOW;
+        else if ( strcmp ( szTemp, "medium" ) == 0 )
+            priority = PRIORITY_MEDIUM;
+        else if ( strcmp ( szTemp, "high" ) == 0 )
+            priority = PRIORITY_HIGH;
     }
-    else
-    {
-        argStream.ReadNumber(iPriority, PRIORITY_LOW);
-    }
-    
-    argStream.ReadNumber( color.R, 255 );
-    argStream.ReadNumber( color.G, 255 );
-    argStream.ReadNumber( color.B, 255 );
-    argStream.ReadNumber( color.A, 255 );
-    argStream.ReadNumber( fScale, 1 );
-    argStream.ReadString( strHorzAlign, "left" );
-    argStream.ReadString( strVertAlign, "top" );
-    argStream.ReadNumber( ucShadowAlpha, 0);
-
-    if ( !argStream.HasErrors ( ) )
-    {
-        unsigned char ucFormat = 0; 
-        if ( strHorzAlign == "center" ) 
-            ucFormat |= 0x00000001; // DT_CENTER
-        else if ( strHorzAlign == "right" )
-            ucFormat |= 0x00000002; // DT_RIGHT
-
-        if ( strVertAlign == "center" )
-            ucFormat |= 0x00000004; // DT_VCENTER
-        else if ( strVertAlign == "bottom" )
-            ucFormat |= 0x00000008; // DT_BOTTOM
         
-        // Grab our virtual machine
-        CLuaMain* luaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
-        if ( luaMain )
-        {
-            CTextItem* pTextItem = luaMain->CreateTextItem ( strText, fX, fY, (eTextPriority) iPriority, color, fScale, ucFormat, ucShadowAlpha );
-            lua_pushtextitem ( luaVM, pTextItem );
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+    if ( lua_type ( luaVM, 5 ) == LUA_TNUMBER )
+        color.R = static_cast < unsigned char > ( lua_tonumber ( luaVM, 5 ) );
 
+    if ( lua_type ( luaVM, 6 ) == LUA_TNUMBER )
+        color.G = static_cast < unsigned char > ( lua_tonumber ( luaVM, 6 ) );
+
+    if ( lua_type ( luaVM, 7 ) == LUA_TNUMBER )
+        color.B = static_cast < unsigned char > ( lua_tonumber ( luaVM, 7 ) );
+
+    if ( lua_type ( luaVM, 8 ) == LUA_TNUMBER )
+        color.A = static_cast < unsigned char > ( lua_tonumber ( luaVM, 8 ) );
+
+    if ( lua_type ( luaVM, 9 ) == LUA_TNUMBER )
+        scale = static_cast < float > ( lua_tonumber ( luaVM, 9 ) );
+
+    if ( lua_type ( luaVM, 10 ) == LUA_TSTRING )
+    {
+        const char * szTemp = lua_tostring ( luaVM, 10 );
+        if ( !stricmp ( szTemp, "center" ) )
+            format |= 0x00000001; // DT_CENTER
+        else if ( !stricmp ( szTemp, "right" ) )
+            format |= 0x00000002; // DT_RIGHT
+    }
+    if ( lua_type ( luaVM, 11 ) == LUA_TSTRING )
+    {
+        const char * szTemp = lua_tostring ( luaVM, 11 );
+        if ( !stricmp ( szTemp, "center" ) )
+            format |= 0x00000004; // DT_VCENTER
+        else if ( !stricmp ( szTemp, "bottom" ) )
+            format |= 0x00000008; // DT_BOTTOM
+    }
+    if ( lua_type ( luaVM, 12 ) == LUA_TNUMBER )
+        ucShadowAlpha = static_cast < unsigned char > ( lua_tonumber ( luaVM, 12 ) );
+
+    // Grab our virtual machine
+    CLuaMain* luaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+    if ( luaMain )
+    {
+        CTextItem* pTextItem = luaMain->CreateTextItem ( szText, fX, fY, (eTextPriority)priority, color, scale, format, ucShadowAlpha );
+        lua_pushtextitem ( luaVM, pTextItem );
+        return 1;
+    }
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -154,24 +167,24 @@ int CLuaTextDefs::textCreateTextItem ( lua_State* luaVM )
 
 int CLuaTextDefs::textDestroyTextItem ( lua_State* luaVM )
 {
-    CTextItem * pTextItem;
-
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pTextItem );
-
-    if ( !argStream.HasErrors ( ) )
+    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
     {
         CLuaMain * luaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
         if ( luaMain )
-        { 
-            luaMain->DestroyTextItem ( pTextItem );
+        {
+            // Grab the text item and verify its existence
+            CTextItem* pTextItem = lua_totextitem ( luaVM, 1 ) ;
+            if ( pTextItem )
+            {
+                luaMain->DestroyTextItem ( pTextItem );
 
-            lua_pushboolean ( luaVM, true );
-            return 1;
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -180,22 +193,26 @@ int CLuaTextDefs::textDestroyTextItem ( lua_State* luaVM )
 
 int CLuaTextDefs::textDisplayAddText ( lua_State* luaVM )
 {
-    CTextDisplay * pTextDisplay;
-    CTextItem * pTextItem;  
-
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pTextDisplay );
-    argStream.ReadUserData ( pTextItem );
-
-    if ( !argStream.HasErrors ( ) )
+    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA &&
+         lua_type ( luaVM, 2 ) == LUA_TLIGHTUSERDATA )
     {
-        pTextDisplay->Add ( pTextItem );
+        CLuaMain * luaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+        if ( luaMain )
+        {
+            // Grab the display and the item and check their validty
+            CTextDisplay* pTextDisplay = lua_totextdisplay ( luaVM, 1 );
+            CTextItem* pTextItem = lua_totextitem ( luaVM, 2 );
+            if ( pTextDisplay && pTextItem )
+            {
+                pTextDisplay->Add ( pTextItem );
 
-        lua_pushboolean ( luaVM, true );
-        return 1;
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }
+        }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -204,45 +221,62 @@ int CLuaTextDefs::textDisplayAddText ( lua_State* luaVM )
 
 int CLuaTextDefs::textDisplayRemoveText ( lua_State* luaVM )
 {
-    CTextDisplay * pTextDisplay;
-    CTextItem * pTextItem;  
-
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pTextDisplay );
-    argStream.ReadUserData ( pTextItem );
-
-    if ( !argStream.HasErrors ( ) )
+    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA &&
+         lua_type ( luaVM, 2 ) == LUA_TLIGHTUSERDATA )
     {
-        pTextDisplay->Remove ( pTextItem );
+        CLuaMain * luaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+        if ( luaMain )
+        {
+            // Grab the display and the item and check their validty
+            CTextDisplay* pTextDisplay = lua_totextdisplay ( luaVM, 1 );
+            CTextItem* pTextItem = lua_totextitem ( luaVM, 2 );
+            if ( pTextDisplay )
+            {
+                if ( pTextItem )
+                {
+                    pTextDisplay->Remove ( pTextItem );
 
-        lua_pushboolean ( luaVM, true );
-        return 1;
+                    lua_pushboolean ( luaVM, true );
+                    return 1;
+                }
+                else
+                    m_pScriptDebugging->LogBadPointer ( luaVM, "textItem", 2 );
+            }
+            else
+                    m_pScriptDebugging->LogBadPointer ( luaVM, "textDisplay", 1 );
+        }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;
 }
 
+
 int CLuaTextDefs::textDisplayAddObserver ( lua_State* luaVM )
 {
-    CTextDisplay * pTextDisplay;
-    CPlayer * pPlayer;  
-
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pTextDisplay );
-    argStream.ReadUserData ( pPlayer );
-
-    if ( !argStream.HasErrors ( ) )
+    // Check argument validty
+    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA &&
+         lua_type ( luaVM, 2 ) == LUA_TLIGHTUSERDATA )
     {
-        pTextDisplay->AddObserver ( pPlayer );
+        CLuaMain * luaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+        if ( luaMain )
+        {
+            // Grab the pointers and verify them
+            CTextDisplay* pTextDisplay = lua_totextdisplay ( luaVM, 1 );
+            CPlayer* pPlayer = lua_toplayer ( luaVM, 2 );
+            if ( pTextDisplay && pPlayer )
+            {
+                pTextDisplay->AddObserver ( pPlayer );
 
-        lua_pushboolean ( luaVM, true );
-        return 1;
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }
+        }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -251,22 +285,34 @@ int CLuaTextDefs::textDisplayAddObserver ( lua_State* luaVM )
 
 int CLuaTextDefs::textDisplayRemoveObserver ( lua_State* luaVM )
 {
-    CTextDisplay * pTextDisplay;
-    CPlayer * pPlayer;  
-
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pTextDisplay );
-    argStream.ReadUserData ( pPlayer );
-
-    if ( !argStream.HasErrors ( ) )
+    // Check argument validty
+    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA &&
+         lua_type ( luaVM, 2 ) == LUA_TLIGHTUSERDATA )
     {
-        pTextDisplay->RemoveObserver ( pPlayer );
+        CLuaMain * luaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+        if ( luaMain )
+        {
+            // Grab the pointers and verify them
+            CTextDisplay* pTextDisplay = lua_totextdisplay ( luaVM, 1 );
+            CPlayer* pPlayer = lua_toplayer ( luaVM, 2 );
+            if ( pTextDisplay )
+            {
+                if ( pPlayer )
+                {
+                    pTextDisplay->RemoveObserver ( pPlayer );
 
-        lua_pushboolean ( luaVM, true );
-        return 1;
+                    lua_pushboolean ( luaVM, true );
+                    return 1;
+                }
+                else
+                    m_pScriptDebugging->LogBadPointer ( luaVM, "observer", 2 );
+            }
+            else
+                m_pScriptDebugging->LogBadPointer ( luaVM, "textDisplay", 1 );
+        }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -274,20 +320,36 @@ int CLuaTextDefs::textDisplayRemoveObserver ( lua_State* luaVM )
 
 int CLuaTextDefs::textDisplayIsObserver ( lua_State* luaVM )
 {
-    CTextDisplay * pTextDisplay;
-    CPlayer * pPlayer;  
-
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pTextDisplay );
-    argStream.ReadUserData ( pPlayer );
-
-    if ( !argStream.HasErrors ( ) )
+    // Check argument validty
+    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA &&
+         lua_type ( luaVM, 2 ) == LUA_TLIGHTUSERDATA )
     {
-        lua_pushboolean ( luaVM, pTextDisplay->IsObserver ( pPlayer ) );
-        return 1;
+        CLuaMain * luaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+        if ( luaMain )
+        {
+            // Grab the pointers and verify them
+            CTextDisplay* pTextDisplay = lua_totextdisplay ( luaVM, 1 );
+            CPlayer* pPlayer = lua_toplayer ( luaVM, 2 );
+            if ( pTextDisplay )
+            {
+                if ( pPlayer )
+                {
+                    if ( pTextDisplay -> IsObserver ( pPlayer ) )
+                        lua_pushboolean ( luaVM, true );
+                    else
+                        lua_pushboolean ( luaVM, false );
+
+                    return 1;
+                }
+                else
+                    m_pScriptDebugging->LogBadPointer ( luaVM, "observer", 2 );
+            }
+            else
+                m_pScriptDebugging->LogBadPointer ( luaVM, "textDisplay", 1 );
+        }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -295,20 +357,29 @@ int CLuaTextDefs::textDisplayIsObserver ( lua_State* luaVM )
 
 int CLuaTextDefs::textDisplayGetObservers ( lua_State* luaVM )
 {
-    CTextDisplay * pTextDisplay;
-
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pTextDisplay );
-
-    if ( !argStream.HasErrors ( ) )
+    // Check argument validty
+    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA)
     {
-        lua_newtable ( luaVM );
-        pTextDisplay->GetObservers ( luaVM );
+        CLuaMain * luaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+        if ( luaMain )
+        {
+            // Grab the pointer and verify it
+            CTextDisplay* pTextDisplay = lua_totextdisplay ( luaVM, 1 );
+            if ( pTextDisplay )
+            {
+                // We want a table obviously
+                lua_newtable ( luaVM );
 
-        return 1;
+                // And make the text-display list all the observers
+                pTextDisplay -> GetObservers ( luaVM );
+                return 1;
+            }
+            else
+                m_pScriptDebugging->LogBadPointer ( luaVM, "textDisplay", 1 );
+        }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -316,66 +387,73 @@ int CLuaTextDefs::textDisplayGetObservers ( lua_State* luaVM )
 
 int CLuaTextDefs::textItemSetText ( lua_State* luaVM )
 {
-    CTextItem * pTextItem;
-    SString strText;  
-
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pTextItem );
-    argStream.ReadString ( strText );
-
-    if ( !argStream.HasErrors ( ) )
+    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA &&
+         lua_type ( luaVM, 2 ) == LUA_TSTRING )
     {
-        pTextItem->SetText( strText );
-
-        lua_pushboolean ( luaVM, true );
-        return 1;
+        CLuaMain * luaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+        if ( luaMain )
+        {
+            CTextItem* pTextItem = lua_totextitem ( luaVM, 1 );
+            const char* szText = lua_tostring ( luaVM, 2 );
+            if ( szText && strlen( szText ) < 1024 && pTextItem )
+            {
+                pTextItem->SetText ( szText );
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }
+        }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;
 }
+
 
 int CLuaTextDefs::textItemGetText ( lua_State* luaVM )
 {
-    CTextItem * pTextItem;
-
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pTextItem );
-
-    if ( !argStream.HasErrors ( ) )
+    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
     {
-        lua_pushstring ( luaVM, pTextItem->GetText() );
-        return 1;
+        CLuaMain * luaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+        if ( luaMain )
+        {
+            CTextItem* pTextItem = lua_totextitem ( luaVM, 1 );
+            if ( pTextItem )
+            {
+                lua_pushstring ( luaVM, pTextItem->GetText() );
+                return 1;
+            }
+        }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;
 }
-
 
 
 int CLuaTextDefs::textItemSetScale ( lua_State* luaVM )
 {
-    CTextItem * pTextItem;
-    float fScale;
-
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pTextItem );
-    argStream.ReadNumber ( fScale );
-
-    if ( !argStream.HasErrors ( ) )
+    CLuaMain * luaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+    if ( luaMain )
     {
-        pTextItem->SetScale ( fScale ); 
+        if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA &&
+             lua_type ( luaVM, 2 ) == LUA_TNUMBER )
+        {
+            CTextItem* pTextItem = lua_totextitem ( luaVM, 1 );
+            if ( pTextItem )
+            {
+                pTextItem->SetScale ( static_cast < float > ( lua_tonumber ( luaVM, 2 ) ) );
 
-        lua_pushboolean ( luaVM, true);
-        return 1;
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }
+        }
+        else
+            m_pScriptDebugging->LogBadType ( luaVM );
     }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -384,63 +462,74 @@ int CLuaTextDefs::textItemSetScale ( lua_State* luaVM )
 
 int CLuaTextDefs::textItemGetScale ( lua_State* luaVM )
 {
-    CTextItem * pTextItem;
-
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pTextItem );
-
-    if ( !argStream.HasErrors ( ) )
+    CLuaMain * luaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+    if ( luaMain )
     {
-        lua_pushnumber ( luaVM, pTextItem->GetScale ( ) );
-        return 1;
+        if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
+        {
+            CTextItem* pTextItem = lua_totextitem ( luaVM, 1 );
+            if ( pTextItem )
+            {
+                lua_pushnumber ( luaVM, pTextItem->GetScale () );
+                return 1;
+            }
+        }
+        else
+            m_pScriptDebugging->LogBadType ( luaVM );
     }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
 }
+
 
 int CLuaTextDefs::textItemSetPosition ( lua_State* luaVM )
 {
-    CTextItem * pTextItem;
-    CVector2D vecPosition;
-
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pTextItem );
-    argStream.ReadNumber ( vecPosition.fX );
-    argStream.ReadNumber ( vecPosition.fY );
-
-    if ( !argStream.HasErrors ( ) )
+    CLuaMain * luaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+    if ( luaMain )
     {
-        pTextItem->SetPosition ( vecPosition );
+        if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA &&
+             lua_type ( luaVM, 2 ) == LUA_TNUMBER && 
+             lua_type ( luaVM, 3 ) == LUA_TNUMBER )
+        {
+            CTextItem* pTextItem = lua_totextitem ( luaVM, 1 );
+            if ( pTextItem )
+            {
+                CVector2D vecPosition ( static_cast < float > ( lua_tonumber ( luaVM, 2 ) ), static_cast < float > ( lua_tonumber ( luaVM, 3 ) ) );
+                pTextItem->SetPosition ( vecPosition );
 
-        lua_pushboolean ( luaVM, true );
-        return 1;
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }
+        }
+        else
+            m_pScriptDebugging->LogBadType ( luaVM );
     }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
 }
 
+
 int CLuaTextDefs::textItemGetPosition ( lua_State* luaVM )
 {
-    CTextItem * pTextItem;
-
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pTextItem );
-
-    if ( !argStream.HasErrors ( ) )
+    CLuaMain * luaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+    if ( luaMain )
     {
-        CVector2D vecPosition = pTextItem->GetPosition ();
-        lua_pushnumber ( luaVM, vecPosition.fX );
-        lua_pushnumber ( luaVM, vecPosition.fY );
-        return 2;
+        if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA  )
+        {
+            CTextItem* pTextItem = lua_totextitem ( luaVM, 1 );
+            if ( pTextItem )
+            {
+                CVector2D vecPosition = pTextItem->GetPosition ();
+                lua_pushnumber ( luaVM, vecPosition.fX );
+                lua_pushnumber ( luaVM, vecPosition.fY );
+                return 2;
+            }
+        }
+        else
+            m_pScriptDebugging->LogBadType ( luaVM );
     }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -449,49 +538,59 @@ int CLuaTextDefs::textItemGetPosition ( lua_State* luaVM )
 
 int CLuaTextDefs::textItemSetColor ( lua_State* luaVM )
 {
-    CTextItem * pTextItem;
-    SColor color;
-
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pTextItem );
-    argStream.ReadNumber ( color.R );
-    argStream.ReadNumber ( color.G );
-    argStream.ReadNumber ( color.B);
-    argStream.ReadNumber ( color.A );
-
-    if ( !argStream.HasErrors ( ) )
+    CLuaMain * luaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+    if ( luaMain )
     {
-        pTextItem->SetColor ( color );
+        if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA &&
+             lua_type ( luaVM, 2 ) == LUA_TNUMBER && 
+             lua_type ( luaVM, 3 ) == LUA_TNUMBER &&
+             lua_type ( luaVM, 4 ) == LUA_TNUMBER &&
+             lua_type ( luaVM, 5 ) == LUA_TNUMBER )
+        {
+            CTextItem* pTextItem = lua_totextitem ( luaVM, 1 );
+            if ( pTextItem )
+            {
+                SColor color;
+                color.R = static_cast < unsigned char > ( lua_tonumber ( luaVM, 2 ) );
+                color.G = static_cast < unsigned char > ( lua_tonumber ( luaVM, 3 ) );
+                color.B = static_cast < unsigned char > ( lua_tonumber ( luaVM, 4 ) );
+                color.A = static_cast < unsigned char > ( lua_tonumber ( luaVM, 5 ) );
+                pTextItem->SetColor ( color );
 
-        lua_pushboolean ( luaVM, true );
-        return 1;
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }
+        }
+        else
+            m_pScriptDebugging->LogBadType ( luaVM );
     }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
 }
 
+
 int CLuaTextDefs::textItemGetColor ( lua_State* luaVM )
 {
-    CTextItem * pTextItem;
-
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pTextItem );
-
-    if ( !argStream.HasErrors ( ) )
-    { 
-        SColor color = pTextItem->GetColor ();
-        lua_pushnumber ( luaVM, color.R );
-        lua_pushnumber ( luaVM, color.G );
-        lua_pushnumber ( luaVM, color.B );
-        lua_pushnumber ( luaVM, color.A );
-        return 4;
-
+    CLuaMain * luaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+    if ( luaMain )
+    {
+        if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
+        {
+            CTextItem* pTextItem = lua_totextitem ( luaVM, 1 );
+            if ( pTextItem )
+            {
+                SColor color = pTextItem->GetColor ();
+                lua_pushnumber ( luaVM, color.R );
+                lua_pushnumber ( luaVM, color.G );
+                lua_pushnumber ( luaVM, color.B );
+                lua_pushnumber ( luaVM, color.A );
+                return 4;
+            }
+        }
+        else
+            m_pScriptDebugging->LogBadType ( luaVM );
     }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -500,33 +599,40 @@ int CLuaTextDefs::textItemGetColor ( lua_State* luaVM )
 
 int CLuaTextDefs::textItemSetPriority ( lua_State* luaVM )
 {
-    CTextItem * pTextItem;
-    int iPriority;
-
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pTextItem );
-    if ( argStream.NextIsString( ) )
+    CLuaMain * luaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+    if ( luaMain )
     {
-        SString strPriority;
-        argStream.ReadString ( strPriority );
+        if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA &&
+            ( lua_type ( luaVM, 2 ) == LUA_TSTRING || lua_type ( luaVM, 2 ) == LUA_TNUMBER ) )
+        {
+            CTextItem* pTextItem = lua_totextitem ( luaVM, 1 );
+            if ( pTextItem )
+            {
+                int priority = PRIORITY_LOW;
+                if ( lua_type ( luaVM, 2 ) == LUA_TSTRING )
+                {
+                    const char * szTemp = lua_tostring ( luaVM, 2 );
+                    if ( strcmp ( szTemp, "low" ) == 0 )
+                        priority = PRIORITY_LOW;
+                    else if ( strcmp ( szTemp, "medium" ) == 0 )
+                        priority = PRIORITY_MEDIUM;
+                    else if ( strcmp ( szTemp, "high" ) == 0 )
+                        priority = PRIORITY_HIGH;
+                }
+                else
+                {
+                    priority = static_cast < int > ( lua_tonumber ( luaVM, 2 ) );
+                }
 
-        if ( strPriority == "high" )        iPriority = PRIORITY_HIGH;
-        else if ( strPriority == "medium" ) iPriority = PRIORITY_MEDIUM;
-        else                                iPriority = PRIORITY_LOW;
+                pTextItem->SetPriority ( (eTextPriority)priority );
 
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }
+        }
+        else
+            m_pScriptDebugging->LogBadType ( luaVM );
     }
-    else
-    {
-        argStream.ReadNumber(iPriority);
-    }
-
-    if ( !argStream.HasErrors ( ) )
-    {
-        pTextItem->SetPriority ( (eTextPriority)iPriority );
-        return 1;
-    }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -535,18 +641,21 @@ int CLuaTextDefs::textItemSetPriority ( lua_State* luaVM )
 
 int CLuaTextDefs::textItemGetPriority ( lua_State* luaVM )
 {
-    CTextItem * pTextItem;
-
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pTextItem );
-
-    if ( !argStream.HasErrors ( ) )
+    CLuaMain * luaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+    if ( luaMain )
     {
-        lua_pushnumber( luaVM, pTextItem->GetPriority( ) );
-        return 1;
+        if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
+        {
+            CTextItem* pTextItem = lua_totextitem ( luaVM, 1 );
+            if ( pTextItem )
+            {
+                lua_pushnumber ( luaVM, pTextItem->GetPriority () );
+                return 1;
+            }
+        }
+        else
+            m_pScriptDebugging->LogBadType ( luaVM );
     }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;

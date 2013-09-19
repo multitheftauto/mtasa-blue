@@ -54,7 +54,6 @@
 #include "../../shared_logic/CClientGUIElement.h"
 #include "CLocalServer.h"
 #include "CVoiceRecorder.h"
-#include "CSingularFileDownloadManager.h"
 #include "CObjectRespawner.h"
 #define HeliKill_List_Clear_Rate 500
 #define MIN_PUSH_ANTISPAM_RATE 1500
@@ -116,7 +115,6 @@ public:
         COLSHAPE,
         SCRIPTFILE,
         WATER,
-        WEAPON,
         UNKNOWN,
     };
 
@@ -267,7 +265,6 @@ public:
     inline CNametags*                   GetNametags                     ( void )        { return m_pNametags; }
     inline CSyncDebug*                  GetSyncDebug                    ( void )        { return m_pSyncDebug; };
     inline CRPCFunctions*               GetRPCFunctions                 ( void )        { return m_pRPCFunctions; }
-    inline CSingularFileDownloadManager* GetSingularFileDownloadManager ( void )        { return m_pSingularFileDownloadManager; };
 
     inline CClientEntity*               GetRootEntity                   ( void )        { return m_pRootEntity; }
     inline CEvents*                     GetEvents                       ( void )        { return &m_Events; }
@@ -414,7 +411,6 @@ public:
     void                                SetWeaponTypesUsingBulletSync   ( const std::set < eWeaponType >& weaponTypesUsingBulletSync );
     bool                                GetWeaponTypeUsesBulletSync     ( eWeaponType weaponType );
 
-    SString                             GetHTTPURL                      ( void ) { return m_strHTTPDownloadURL; };
     void                                ProjectileInitiateHandler       ( CClientProjectile * pProjectile );
     void                                IdleHandler                     ( void );
     void                                OutputServerInfo                ( void );
@@ -466,7 +462,6 @@ private:
     #endif
 
     void                                DownloadInitialResourceFiles    ( void );
-    void                                DownloadSingularResourceFiles   ( void );
 
     void                                QuitPlayer                      ( CClientPlayer* pPlayer, eQuitReason Reason );
 
@@ -549,8 +544,6 @@ public:
 
     void                                SetTransferringInitialFiles     ( bool bTransfer );
     bool                                IsTransferringInitialFiles      ( void )            { return m_bTransferringInitialFiles; }
-    void                                SetTransferringSingularFiles    ( bool bTransfer )  { m_bTransferringSingularFiles = bTransfer; }
-    bool                                IsTransferringSingularFiles     ( void )            { return m_bTransferringSingularFiles; }
 
     void                                SetVehExtrapolateSettings       ( const SVehExtrapolateSettings& settings ) { m_VehExtrapolateSettings = settings; }
     const SVehExtrapolateSettings&      GetVehExtrapolateSettings       ( void )                                    { return m_VehExtrapolateSettings; }
@@ -609,7 +602,6 @@ private:
     CLatentTransferManager*             m_pLatentTransferManager;
     bool                                m_bInitiallyFadedOut;
     bool                                m_bHudAreaNameDisabled;
-    CSingularFileDownloadManager*       m_pSingularFileDownloadManager;
     CGameEntityXRefManager*             m_pGameEntityXRefManager;
     CClientModelCacheManager*           m_pModelCacheManager;
     CRemoteCalls*                       m_pRemoteCalls;
@@ -675,7 +667,6 @@ private:
     bool                                m_bShowFPS;
 
     bool                                m_bTransferringInitialFiles;
-    bool                                m_bTransferringSingularFiles;
 
     float                               m_fGameSpeed;
     long                                m_lMoney;

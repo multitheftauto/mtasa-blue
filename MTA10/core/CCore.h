@@ -53,8 +53,8 @@ class CCore;
 #define DIRECTINPUT_VERSION 0x0800
 #include <dinput.h>
 
-#define BLUE_VERSION_STRING     "Multi Theft Auto v" MTA_DM_BUILDTAG_LONG
-#define BLUE_COPYRIGHT_STRING    _td("Copyright (C) 2003 - 2013 Multi Theft Auto")
+#define BLUE_VERSION_STRING     "Multi Theft Auto v" MTA_DM_BUILDTAG_LONG "\n" \
+                                "Copyright (C) 2003 - 2013 Multi Theft Auto" \
 
 // Configuration file path (relative to Grand Theft Auto directory)
 #define MTA_CONFIG_PATH             "mta/coreconfig.xml"
@@ -78,7 +78,6 @@ class CCore;
 
 extern class CCore* g_pCore;
 extern class CGraphics* g_pGraphics;
-extern class CLocalization* g_pLocalization;
 bool UsingAltD3DSetup();
 
 class CCore : public CCoreInterface, public CSingleton < CCore >
@@ -106,7 +105,6 @@ public:
     CMouseControl*          GetMouseControl                 ( void )                { return m_pMouseControl; };
     CLocalGUI*              GetLocalGUI                     ( void );
     CCommunityInterface*    GetCommunity                    ( void )                { return &m_Community; };
-    CLocalizationInterface* GetLocalization                 ( void )                { return g_pLocalization; };
 
     void                    SaveConfig                      ( void );
 
@@ -161,9 +159,6 @@ public:
     void                    SetMessageProcessor             ( pfnProcessMessage pfnMessageProcessor );
     void                    ShowMessageBox                  ( const char* szTitle, const char* szText, unsigned int uiFlags, GUI_CALLBACK * ResponseHandler = NULL );
     void                    RemoveMessageBox                ( bool bNextFrame = false );
-    void                    ShowErrorMessageBox             ( const SString& strTitle, SString strMessage, const SString& strTroubleLink = "" );
-    void                    ShowNetErrorMessageBox          ( const SString& strTitle, SString strMessage, SString strTroubleLink = "", bool bLinkRequiresErrorCode = false );
-    static void             ErrorMessageBoxCallBack         ( void* pData, uint uiButton );
     bool                    IsOfflineMod                    ( void ) { return m_bIsOfflineMod; }
     const char *            GetModInstallRoot               ( const char * szModName );
 
@@ -311,8 +306,6 @@ private:
 
     // Logger utility interface.
     CConsoleLogger *            m_pConsoleLogger;
-
-    CLocalization*              m_pLocalization;
 
     CKeyBinds*                  m_pKeyBinds;
     CMouseControl*              m_pMouseControl;

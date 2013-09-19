@@ -21,12 +21,11 @@
 
 int CLuaFunctionDefs::GetBodyPartName ( lua_State* luaVM )
 {
-    unsigned char ucID = 0;
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadNumber ( ucID );
-
-    if ( !argStream.HasErrors ( ) )
+    int iArgument1 = lua_type ( luaVM, 1 );
+    if ( iArgument1 == LUA_TNUMBER || iArgument1 == LUA_TSTRING )
     {
+        unsigned char ucID = static_cast < unsigned char > ( lua_tonumber ( luaVM, 1 ) );
+
         SString strBuffer;
         if ( CStaticFunctionDefinitions::GetBodyPartName ( ucID, strBuffer ) )
         {
@@ -35,7 +34,7 @@ int CLuaFunctionDefs::GetBodyPartName ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -44,14 +43,14 @@ int CLuaFunctionDefs::GetBodyPartName ( lua_State* luaVM )
 
 int CLuaFunctionDefs::GetClothesByTypeIndex ( lua_State* luaVM )
 {
-    unsigned char ucType = 0;
-    unsigned char ucIndex = 0;
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadNumber ( ucType );
-    argStream.ReadNumber ( ucIndex );
-
-    if ( !argStream.HasErrors ( ) )
+    int iArgument1 = lua_type ( luaVM, 1 );
+    int iArgument2 = lua_type ( luaVM, 2 );
+    if ( ( iArgument1 == LUA_TNUMBER || iArgument1 == LUA_TSTRING ) &&
+        ( iArgument2 == LUA_TNUMBER || iArgument2 == LUA_TSTRING ) )
     {
+        unsigned char ucType = static_cast < unsigned char > ( lua_tonumber ( luaVM, 1 ) );
+        unsigned char ucIndex = static_cast < unsigned char > ( lua_tonumber ( luaVM, 2 ) );
+
         SString strTexture, strModel;
         if ( CStaticFunctionDefinitions::GetClothesByTypeIndex ( ucType, ucIndex, strTexture, strModel ) )
         {
@@ -61,7 +60,7 @@ int CLuaFunctionDefs::GetClothesByTypeIndex ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -70,15 +69,15 @@ int CLuaFunctionDefs::GetClothesByTypeIndex ( lua_State* luaVM )
 
 int CLuaFunctionDefs::GetTypeIndexFromClothes ( lua_State* luaVM )
 {
-    SString strTexture = "", strModel = "";
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadString ( strTexture );
-    argStream.ReadString ( strModel, "" );
-
-    if ( !argStream.HasErrors ( ) )
+    if ( lua_type ( luaVM, 1 ) == LUA_TSTRING )
     {
+        const char* szTexture = lua_tostring ( luaVM, 1 );
+        const char* szModel = NULL;
+        if ( lua_type ( luaVM, 2 ) == LUA_TSTRING )
+            szModel = lua_tostring ( luaVM, 2 );
+
         unsigned char ucType, ucIndex;
-        if ( CStaticFunctionDefinitions::GetTypeIndexFromClothes ( strTexture, strModel == "" ? NULL : strModel.c_str(), ucType, ucIndex ) )
+        if ( CStaticFunctionDefinitions::GetTypeIndexFromClothes ( szTexture, szModel, ucType, ucIndex ) )
         {
             lua_pushnumber ( luaVM, ucType );
             lua_pushnumber ( luaVM, ucIndex );
@@ -86,7 +85,7 @@ int CLuaFunctionDefs::GetTypeIndexFromClothes ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -95,12 +94,11 @@ int CLuaFunctionDefs::GetTypeIndexFromClothes ( lua_State* luaVM )
 
 int CLuaFunctionDefs::GetClothesTypeName ( lua_State* luaVM )
 {
-    unsigned char ucType = 0;
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadNumber ( ucType );
-
-    if ( !argStream.HasErrors ( ) )
+    int iArgument1 = lua_type ( luaVM, 1 );
+    if ( iArgument1 == LUA_TNUMBER || iArgument1 == LUA_TSTRING )
     {
+        unsigned char ucType = static_cast < unsigned char > ( lua_tonumber ( luaVM, 1 ) );
+
         SString strName;
         if ( CStaticFunctionDefinitions::GetClothesTypeName ( ucType, strName ) )
         {
@@ -109,7 +107,7 @@ int CLuaFunctionDefs::GetClothesTypeName ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;

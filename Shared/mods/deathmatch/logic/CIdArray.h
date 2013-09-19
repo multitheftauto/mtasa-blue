@@ -50,8 +50,6 @@ namespace EIdClass
         TEXT_DISPLAY,
         TEXT_ITEM,
         TIMER,
-        VECTOR,
-        MATRIX
     };
 };
 

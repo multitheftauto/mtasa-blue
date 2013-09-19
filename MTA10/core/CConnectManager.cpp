@@ -79,8 +79,8 @@ bool CConnectManager::Connect ( const char* szHost, unsigned short usPort, const
     // Is the nick valid?
     if ( !CheckNickProvided ( (char*) szNick ) )
     {
-        SString strBuffer = _("Connecting failed. Invalid nick provided!");
-        CCore::GetSingleton ().ShowMessageBox ( _("Error")+_E("CC20"), strBuffer, MB_BUTTON_OK | MB_ICON_ERROR ); // Invalid nick provided
+        SString strBuffer = "Connecting failed. Invalid nick provided!";
+        CCore::GetSingleton ().ShowMessageBox ( "Error", strBuffer, MB_BUTTON_OK | MB_ICON_ERROR );
         return false;
     }
 
@@ -107,8 +107,8 @@ bool CConnectManager::Connect ( const char* szHost, unsigned short usPort, const
     // Parse host into a server item
     if ( !CServerListItem::Parse ( m_strHost.c_str(), m_Address ) )
     {
-        SString strBuffer = _("Connecting failed. Invalid host provided!");
-        CCore::GetSingleton ().ShowMessageBox ( _("Error")+_E("CC21"), strBuffer, MB_BUTTON_OK | MB_ICON_ERROR ); // Invalid host provided
+        SString strBuffer = "Connecting failed. Invalid host provided!";
+        CCore::GetSingleton ().ShowMessageBox ( "Error", strBuffer, MB_BUTTON_OK | MB_ICON_ERROR );
         return false;
     }
 
@@ -119,8 +119,8 @@ bool CConnectManager::Connect ( const char* szHost, unsigned short usPort, const
     SString strAddress = inet_ntoa ( m_Address );
     if ( m_usPort && !pNet->StartNetwork ( strAddress, m_usPort ) )
     {
-        SString strBuffer ( _("Connecting to %s at port %u failed!"), m_strHost.c_str (), m_usPort );
-        CCore::GetSingleton ().ShowMessageBox ( _("Error")+_E("CC22"), strBuffer, MB_BUTTON_OK | MB_ICON_ERROR ); // Failed to connect
+        SString strBuffer ( "Connecting to %s at port %u failed!", m_strHost.c_str (), m_usPort );
+        CCore::GetSingleton ().ShowMessageBox ( "Error", strBuffer, MB_BUTTON_OK | MB_ICON_ERROR );
         return false;
     }
 
@@ -138,8 +138,8 @@ bool CConnectManager::Connect ( const char* szHost, unsigned short usPort, const
     m_bIsDetectingVersion = true;
 
     // Display the status box
-    SString strBuffer ( _("Connecting to %s:%u ..."), m_strHost.c_str(), m_usPort );
-    CCore::GetSingleton ().ShowMessageBox ( _("CONNECTING"), strBuffer, MB_BUTTON_CANCEL | MB_ICON_INFO, m_pOnCancelClick );
+    SString strBuffer ( "Connecting to %s:%u ...", m_strHost.c_str(), m_usPort );
+    CCore::GetSingleton ().ShowMessageBox ( "CONNECTING", strBuffer, MB_BUTTON_CANCEL | MB_ICON_INFO, m_pOnCancelClick );
     return true;
 }
 
@@ -216,6 +216,15 @@ bool CConnectManager::Abort ( void )
 }
 
 
+static SString AppendNetErrorCode ( const SString& strText )
+{
+    uint uiErrorCode = CCore::GetSingleton ().GetNetwork ()->GetExtendedErrorCode ();
+    if ( uiErrorCode != 0 )
+        return strText + SString ( " \nCode: %08X", uiErrorCode );
+    return strText;
+}
+
+
 void CConnectManager::DoPulse ( void )
 {
     // Are we connecting?
@@ -246,7 +255,7 @@ void CConnectManager::DoPulse ( void )
         if ( time ( NULL ) >= m_tConnectStarted + 8 )
         {
             // Show a message that the connection timed out and abort
-            g_pCore->ShowNetErrorMessageBox ( _("Error")+_E("CC23"), _("Connection timed out"), "connect-timed-out", true );
+            CCore::GetSingleton ().ShowMessageBox ( "Error", AppendNetErrorCode ( "Connection timed out" ), MB_BUTTON_OK | MB_ICON_ERROR );
             Abort ();
         }
         else
@@ -256,35 +265,34 @@ void CConnectManager::DoPulse ( void )
             if ( ucError != 0 )
             {
                 SString strError;
-                SString strErrorCode;
                 switch ( ucError )
                 {
                     case RID_RSA_PUBLIC_KEY_MISMATCH:
-                        strError = _("Disconnected: unknown protocol error"); strErrorCode = _E("CC24");  // encryption key mismatch
+                        strError = "Disconnected: unknown protocol error";  // encryption key mismatch
                         break;
                     case RID_REMOTE_DISCONNECTION_NOTIFICATION:
-                        strError = _("Disconnected: disconnected remotely"); strErrorCode = _E("CC25");
+                        strError = "Disconnected: disconnected remotely";
                         break;
                     case RID_REMOTE_CONNECTION_LOST:
-                        strError = _("Disconnected: connection lost remotely"); strErrorCode = _E("CC26");
+                        strError = "Disconnected: connection lost remotely";
                         break;
                     case RID_CONNECTION_BANNED:
-                        strError = _("Disconnected: you are banned from this server"); strErrorCode = _E("CC27");
+                        strError = "Disconnected: you are banned from this server";
                         break;
                     case RID_NO_FREE_INCOMING_CONNECTIONS:
                         CServerInfo::GetSingletonPtr()->Show ( eWindowTypes::SERVER_INFO_QUEUE, m_strHost.c_str(), m_usPort, m_strPassword.c_str() );
                         break;
                     case RID_DISCONNECTION_NOTIFICATION:
-                        strError = _("Disconnected: disconnected from the server"); strErrorCode = _E("CC28");
+                        strError = "Disconnected: disconnected";
                         break;
                     case RID_CONNECTION_LOST:
-                        strError = _("Disconnected: connection to the server was lost"); strErrorCode = _E("CC29");
+                        strError = "Disconnected: connection lost";
                         break;
                     case RID_INVALID_PASSWORD:
                         CServerInfo::GetSingletonPtr()->Show ( eWindowTypes::SERVER_INFO_PASSWORD, m_strHost.c_str(), m_usPort, m_strPassword.c_str() );
                         break;
                     default:
-                        strError = _("Disconnected: connection was refused"); strErrorCode = _E("CC30");
+                        strError = "Disconnected: connection refused";
                         break;
                 }
 
@@ -293,7 +301,7 @@ void CConnectManager::DoPulse ( void )
                 // Only display the error if we set one
                 if ( strError.length() > 0 )
                 {
-                    CCore::GetSingleton ().ShowNetErrorMessageBox ( _("Error")+strErrorCode, strError );
+                    CCore::GetSingleton ().ShowMessageBox ( "Error", AppendNetErrorCode ( strError ), MB_BUTTON_OK | MB_ICON_ERROR );
                 }
                 else // Otherwise, remove the message box and hide quick connect
                 {
@@ -302,6 +310,7 @@ void CConnectManager::DoPulse ( void )
                 }
 
                 CCore::GetSingleton ().GetNetwork ()->SetConnectionError ( 0 );
+                CCore::GetSingleton ().GetNetwork ()->SetImmediateError ( 0 );
                 Abort ();
             }
         }
@@ -386,15 +395,15 @@ bool CConnectManager::StaticProcessPacket ( unsigned char ucPacketID, NetBitStre
                 if ( !CModManager::GetSingleton ().Load ( strModName, strArguments ) )
                 {
                     // Failed loading the mod
-                    strArguments.Format ( _("No such mod installed (%s)"), strModName.c_str() );
-                    CCore::GetSingleton ().ShowMessageBox ( _("Error")+_E("CC31"), strArguments, MB_BUTTON_OK | MB_ICON_ERROR ); // Mod loading failed
+                    strArguments.Format ( "No such mod installed (%s)", strModName.c_str() );
+                    CCore::GetSingleton ().ShowMessageBox ( "Error", strArguments, MB_BUTTON_OK | MB_ICON_ERROR );
                     g_pConnectManager->Abort ();
                 }
             }
             else
             {
                 // Show failed message and abort the attempt
-                CCore::GetSingleton ().ShowNetErrorMessageBox ( _("Error")+_E("CC32"), _("Bad server response (2)") );
+                CCore::GetSingleton ().ShowMessageBox ( "Error", AppendNetErrorCode ( "Bad server response (2)" ), MB_BUTTON_OK | MB_ICON_ERROR );
                 g_pConnectManager->Abort ();
             }
         }
@@ -404,7 +413,7 @@ bool CConnectManager::StaticProcessPacket ( unsigned char ucPacketID, NetBitStre
             if ( ucPacketID != PACKET_ID_SERVER_JOIN && ucPacketID != PACKET_ID_SERVER_JOIN_DATA )
             {
                 // Show failed message and abort the attempt
-                CCore::GetSingleton ().ShowNetErrorMessageBox ( _("Error")+_E("CC33"), _("Bad server response (1)") );
+                CCore::GetSingleton ().ShowMessageBox ( "Error", AppendNetErrorCode ( "Bad server response (1)" ), MB_BUTTON_OK | MB_ICON_ERROR );
                 g_pConnectManager->Abort ();
             }
         }

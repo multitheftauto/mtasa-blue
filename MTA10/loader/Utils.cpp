@@ -709,10 +709,10 @@ bool CommandLineContains( const SString& strText )
 //
 // General error message box
 //
-long DisplayErrorMessageBox ( const SString& strMessage, const SString& strErrorCode, const SString& strTroubleType )
+long DisplayErrorMessageBox ( const SString& strMessage, const SString& strTroubleType )
 {
     HideSplash ();
-    MessageBoxUTF8( 0, strMessage, _("Error! (CTRL+C to copy)")+strErrorCode, MB_ICONEXCLAMATION|MB_OK | MB_TOPMOST );
+    MessageBox( 0, strMessage, "Error! (CTRL+C to copy)", MB_ICONEXCLAMATION|MB_OK | MB_TOPMOST );
 
     if ( strTroubleType != "" )
         BrowseToSolution ( strTroubleType, ASK_GO_ONLINE );
@@ -831,9 +831,9 @@ SString DoUserAssistedSearch ( void )
 {
     SString strResult;
 
-    ShowProgressDialog( g_hInstance, _("Searching for Grand Theft Auto San Andreas"), true );
+    ShowProgressDialog( g_hInstance, "Searching for Grand Theft Auto San Andreas", true );
 
-    while ( !UpdateProgress ( 0, 100, _("Please start Grand Theft Auto San Andreas") ) )
+    while ( !UpdateProgress ( 0, 100, "Please start Grand Theft Auto San Andreas" ) )
     {
         SString strPathFilename;
         // Check if user has started GTA
@@ -921,8 +921,7 @@ ePathResult GetGamePath ( SString& strOutResult, bool bFindIfMissing )
 
     // Ask user to browse for GTA
     BROWSEINFO bi = { 0 };
-    SString strMessage = _("Select your Grand Theft Auto: San Andreas Installation Directory");
-    bi.lpszTitle = strMessage;
+    bi.lpszTitle = "Select your Grand Theft Auto: San Andreas Installation Directory";
     LPITEMIDLIST pidl = SHBrowseForFolder ( &bi );
 
     if ( pidl != 0 )
@@ -1668,7 +1667,7 @@ void UpdateMTAVersionApplicationSetting ( bool bQuiet )
     if ( !bQuiet )
     {
         SString strError = GetSystemErrorMessage ( GetLastError () );            
-        SString strMessage( _("Error loading %s module! (%s)"), *strFilename.ToLower (), *strError );
+        SString strMessage( "Error loading %s module! (%s)", *strFilename.ToLower (), *strError );
         BrowseToSolution ( strFilename + "-not-loadable", ASK_GO_ONLINE | TERMINATE_PROCESS, strMessage );
     }
 
@@ -1976,7 +1975,7 @@ void DirectoryCopy ( SString strSrcBase, SString strDestBase, bool bShowProgress
         bCheckFreeSpace = ( llFreeBytesAvailable < ( iMinFreeSpaceMB + 10000 ) * 0x100000LL );    // Only check if initial freespace is less than 10GB
 
     if ( bShowProgressDialog )
-        ShowProgressDialog( g_hInstance, _("Copying files..."), true );
+        ShowProgressDialog( g_hInstance, "Copying files...", true );
 
     strSrcBase = PathConform ( strSrcBase ).TrimEnd ( PATH_SEPERATOR );
     strDestBase = PathConform ( strDestBase ).TrimEnd ( PATH_SEPERATOR );
@@ -2036,15 +2035,15 @@ stop_copy:
         if ( toDoList.size () )
         {
             Sleep ( 1000 );
-            UpdateProgress ( (int)fUseProgress, 100, _("Copy finished early. Everything OK.") );
+            UpdateProgress ( (int)fUseProgress, 100, "Copy finished early. Everything OK." );
             Sleep ( 2000 );
         }
         else
         {
             fUseProgress = Max ( 90.f, fUseProgress );
-            UpdateProgress ( (int)fUseProgress, 100, _("Finishing...") );
+            UpdateProgress ( (int)fUseProgress, 100, "Finishing..." );
             Sleep ( 1000 );
-            UpdateProgress ( 100, 100, _("Done!") );
+            UpdateProgress ( 100, 100, "Done!" );
             Sleep ( 2000 );
         }
 
@@ -2083,12 +2082,10 @@ void MaybeShowCopySettingsDialog ( void )
 
     // Show dialog
     SString strMessage;
-    strMessage += SString( g_pLocalization->Translate( "New installation of %s detected.\n"
-                              "\n"
-                              "Do you want to copy your settings from %s ?" ),
-                                *strCurrentVersion,
-                                *strPreviousVersion  );
-    int iResponse = MessageBoxUTF8 ( NULL, strMessage, "MTA: San Andreas", MB_YESNO | MB_ICONQUESTION | MB_TOPMOST );
+    strMessage += "New installation of " + strCurrentVersion + " detected.\n";
+    strMessage += "\n";
+    strMessage += "Do you want to copy your settings from " + strPreviousVersion + " ?";
+    int iResponse = MessageBox ( NULL, strMessage, "MTA: San Andreas", MB_YESNO | MB_ICONQUESTION | MB_TOPMOST );
     if ( iResponse != IDYES )
         return;
 
@@ -2134,8 +2131,8 @@ bool CheckAndShowFileOpenFailureMessage ( void )
     if ( !strFilename.empty () )
     {
         //SetApplicationSetting ( "diagnostics", "gta-fopen-fail", "" );
-        SString strMsg ( _("GTA:SA had trouble opening the file '%s'\n\nTry reinstalling GTA:SA to fix it"), *strFilename );
-        MessageBoxUTF8 ( NULL, strMsg, "MTA: San Andreas"+_E("CL27"), MB_OK | MB_ICONERROR | MB_TOPMOST );
+        SString strMsg ( "GTA:SA had trouble opening the file '%s'\n\nTry reinstalling GTA:SA to fix it", *strFilename );
+        MessageBox ( NULL, strMsg, "MTA: San Andreas", MB_OK | MB_ICONERROR | MB_TOPMOST );
         return true;
     }
     return false;
@@ -2154,6 +2151,46 @@ void* LoadFunction( const char* c, const char* a, const char* b )
     static HMODULE hModule = LoadLibrary( "kernel32" );
     SString strFunctionName( "%s%s%s", a, b, c );
     return static_cast < PVOID >( GetProcAddress( hModule, strFunctionName ) );
+}
+
+
+//////////////////////////////////////////////////////////
+//
+// MaybeRenameExe
+//
+// Figure out whether to use a renamed exe, and return filename to use.
+// Also tries file copy if required.
+//
+//////////////////////////////////////////////////////////
+SString MaybeRenameExe( const SString& strGTAPath, bool* pbCopyFailed )
+{
+    SString strGTAEXEPath = PathJoin( strGTAPath, MTA_GTAEXE_NAME );
+    if ( pbCopyFailed )
+        *pbCopyFailed = false;
+
+    int iDoRename;
+    if ( GetApplicationSettingInt( "nvhacks", "optimus" ) )
+        iDoRename = GetApplicationSettingInt( "nvhacks", "optimus-rename-exe" );
+    else
+        iDoRename = GetApplicationSettingInt( "driver-overrides-disabled" );
+
+    if ( iDoRename )
+    {
+        SString strHTAEXEPath = PathJoin( strGTAPath, MTA_HTAEXE_NAME );
+        SString strGTAMd5 = CMD5Hasher::CalculateHexString( strGTAEXEPath );
+        SString strHTAMd5 = CMD5Hasher::CalculateHexString( strHTAEXEPath );
+        if ( strGTAMd5 != strHTAMd5 )
+        {
+            if ( !FileCopy( strGTAEXEPath, strHTAEXEPath ) )
+                if ( pbCopyFailed )
+                    *pbCopyFailed = true;
+            strGTAMd5 = CMD5Hasher::CalculateHexString( strGTAEXEPath );
+            strHTAMd5 = CMD5Hasher::CalculateHexString( strHTAEXEPath );
+        }
+        if ( strGTAMd5 == strHTAMd5 )
+            strGTAEXEPath = strHTAEXEPath;
+    }
+    return strGTAEXEPath;
 }
 
 
@@ -2201,7 +2238,7 @@ void BsodDetectionPreLaunch( void )
         if ( strMinidumpTime > strGameBeginTime && !strGameBeginTime.empty() )
         {
             // Ask user to confirm
-            int iResponse = MessageBoxUTF8 ( NULL, _("Did your computer restart when playing MTA:SA?"), "MTA: San Andreas", MB_YESNO | MB_ICONERROR | MB_TOPMOST );
+            int iResponse = MessageBox ( NULL, "Did your computer restart when playing MTA:SA?", "MTA: San Andreas", MB_YESNO | MB_ICONERROR | MB_TOPMOST );
             if ( iResponse == IDYES )
             {
                 SetApplicationSetting( "diagnostics", "user-confirmed-bsod-time", strMinidumpTime );

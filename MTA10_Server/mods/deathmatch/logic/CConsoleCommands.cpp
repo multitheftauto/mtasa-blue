@@ -235,6 +235,46 @@ bool CConsoleCommands::StopAllResources ( CConsole* pConsole, const char* szArgu
 }
 
 
+bool CConsoleCommands::InstallResource ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
+{
+    return false;
+
+    COPY_CSTR_TO_TEMP_BUFFER( szBuffer, szArguments, 256 );
+
+    char* szURL = strtok ( szBuffer, " " );
+    char* szName = strtok ( NULL, "\0" );
+    if ( strlen ( szURL ) < 150 && strlen ( szURL ) > 1 )
+    {
+        if ( szName && strncmp(szURL, "http://", 7 ) == 0 )
+        {
+            if ( strlen ( szName ) < 100 && strlen ( szName ) > 1 )
+            {
+                if ( g_pGame->GetResourceManager()->Install ( szURL, szName ) )
+                {
+                    char szOutput[512];
+                    snprintf ( szOutput, 511, "Resource %s from %s installed succesfully.", szName, szURL );
+                    pEchoClient->SendConsole ( szOutput );
+                    g_pGame->GetResourceManager()->Refresh();
+                }
+            }
+        }
+        else
+        {
+            char szNewURL[250];
+            szNewURL[249] = '\0';
+            snprintf ( szNewURL, 249, "http://development.mtasa.com/%s.zip", szURL );
+            if ( g_pGame->GetResourceManager()->Install ( szNewURL, szURL ) )
+            {
+                char szOutput[512];
+                snprintf ( szOutput, 511, "Resource %s installed succesfully.", szURL );
+                pEchoClient->SendConsole ( szOutput );
+                g_pGame->GetResourceManager()->Refresh();
+            }
+        }
+    }
+    return true;
+}
+
 bool CConsoleCommands::UpgradeResources ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
 {
     // To work on remote clients, 'upgrade' needs ACL entry + console capture
@@ -1032,7 +1072,7 @@ bool CConsoleCommands::LogIn ( CConsole* pConsole, const char* szArguments, CCli
             szPassword = szTempPassword;
         }
 
-        if ( CAccountManager::IsValidAccountName( szNick ) && CAccountManager::IsValidPassword( szPassword ) )
+        if ( szNick && szPassword )
         {
             return g_pGame->GetAccountManager ()->LogIn ( pClient, pEchoClient, szNick, szPassword );
         }
@@ -1076,7 +1116,7 @@ bool CConsoleCommands::ChgMyPass ( CConsole* pConsole, const char* szArguments, 
             // Split it up into nick and password
             char* szOldPassword = strtok ( szBuffer, " " );
             char* szNewPassword = strtok ( NULL, "\0" );
-            if ( CAccountManager::IsValidPassword( szOldPassword ) && CAccountManager::IsValidNewPassword( szNewPassword ) )
+            if ( szOldPassword && szNewPassword && strlen ( szOldPassword ) > 0 && strlen ( szNewPassword ) > 0 )
             {
                 // Grab the account with that nick
                 CAccount* pAccount = pClient->GetAccount ();
@@ -1141,7 +1181,7 @@ bool CConsoleCommands::AddAccount ( CConsole* pConsole, const char* szArguments,
         if ( szNick && szPassword )
         {
             // Long enough strings?
-            if ( CAccountManager::IsValidNewAccountName( szNick ) && CAccountManager::IsValidNewPassword( szPassword ) )
+            if ( strlen ( szNick ) > 0 && strlen ( szPassword ) > MIN_PASSWORD_LENGTH && strlen ( szPassword ) <= MAX_PASSWORD_LENGTH )
             {
                 // Try creating the account
                 if ( !g_pGame->GetAccountManager ()->Get ( szNick ) )
@@ -1245,7 +1285,7 @@ bool CConsoleCommands::ChgPass ( CConsole* pConsole, const char* szArguments, CC
         // Split it up into nick and password
         char* szNick = strtok ( szBuffer, " " );
         char* szPassword = strtok ( NULL, "\0" );
-        if ( CAccountManager::IsValidAccountName( szNick ) && CAccountManager::IsValidNewPassword( szPassword ) )
+        if ( szNick && szPassword && strlen ( szNick ) > 0 && strlen ( szPassword ) > 0 )
         {
             // Grab the account with that nick
             CAccount* pAccount = g_pGame->GetAccountManager ()->Get ( szNick );
@@ -1615,7 +1655,7 @@ bool CConsoleCommands::ReloadBans ( CConsole* pConsole, const char* szArguments,
 
 
 bool CConsoleCommands::LoadModule ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
-{   
+{
     if ( szArguments && szArguments[0] )
     {
         if ( pClient->GetNick () )
@@ -1624,57 +1664,10 @@ bool CConsoleCommands::LoadModule ( CConsole* pConsole, const char* szArguments,
         SString strFilename ( "%s/modules/%s", g_pServerInterface->GetModManager ()->GetModPath (), szArguments );
 
         // These modules are late loaded
-        int iSuccess = g_pGame->GetLuaManager ()->GetLuaModuleManager ()->LoadModule ( szArguments, strFilename, true );
-        switch ( iSuccess )
+        if ( !g_pGame->GetLuaManager ()->GetLuaModuleManager ()->_LoadModule ( szArguments, strFilename, true ) )
         {
-            case 1:
-            {
-                pEchoClient->SendConsole ( "loadmodule: Module failed to load" );
-                pEchoClient->SendConsole ( "loadmodule: Couldn't find module file" );
+                pEchoClient->SendConsole ( "stop: Resource could not be found" );
                 return true;
-            }
-            case 2:
-            {
-                pEchoClient->SendConsole ( "loadmodule: Module failed to load" );
-                pEchoClient->SendConsole ( "loadmodule: Couldn't find InitModule function in module" );
-                return true;
-            }
-            case 3:
-            {
-                pEchoClient->SendConsole ( "loadmodule: Module failed to load" );
-                pEchoClient->SendConsole ( "loadmodule: Couldn't find DoPulse function in module" );
-                return true;
-            }
-            case 4:
-            {
-                pEchoClient->SendConsole ( "loadmodule: Module failed to load" );
-                pEchoClient->SendConsole ( "loadmodule: Couldn't find ShutdownModule function in module" );
-                return true;
-            }
-            case 5:
-            {
-                pEchoClient->SendConsole ( "loadmodule: Module failed to load" );
-                pEchoClient->SendConsole ( "loadmodule: Couldn't find RegisterFunctions function in module" );
-                return true;
-            }
-            case 6:
-            {
-                pEchoClient->SendConsole ( "loadmodule: Module failed to load" );
-                pEchoClient->SendConsole ( "loadmodule: Couldn't find ResourceStopping function in module" );
-                return true;
-            }
-            case 7:
-            {
-                pEchoClient->SendConsole ( "loadmodule: Module failed to load" );
-                pEchoClient->SendConsole ( "loadmodule: Couldn't find ResourceStopped function in module" );
-                return true;
-            }
-            case 8:
-            {
-                pEchoClient->SendConsole ( "loadmodule: Module already loaded" );
-                return true;
-            }
-            default: break;
         }
     }
     else
@@ -1685,91 +1678,44 @@ bool CConsoleCommands::LoadModule ( CConsole* pConsole, const char* szArguments,
 
 
 bool CConsoleCommands::UnloadModule ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
-{   
+{
     if ( szArguments && szArguments[0] )
     {
         if ( pClient->GetNick () )
             CLogger::LogPrintf ( "unloadmodule: Requested by %s\n", GetAdminNameForLog ( pClient ).c_str () );
 
-        if ( g_pGame->GetLuaManager()->GetLuaModuleManager()->UnloadModule ( szArguments ) != 0 )
+        SString strFilename ( "%s/modules/%s", g_pServerInterface->GetModManager ()->GetModPath (), szArguments );
+
+        /*if ( !g_pGame->GetLuaManager()->GetLuaModuleManager()->_UnloadModule ( szArguments, strFilename ) )
         {
-            pEchoClient->SendConsole ( "unloadmodule: Module failed to unload" );
-            pEchoClient->SendConsole ( "unloadmodule: Couldn't find a module by that name" );
-            return true;
-        }
+                pEchoClient->SendConsole ( "stop: Resource could not be found" );
+                return true;
+        }*/
     }
     else
-        pEchoClient->SendConsole ( "* Syntax: unloadmodule <module-name-with-extension>" );
+        pEchoClient->SendConsole ( "* Syntax: loadmodule <module-name-with-extension>" );
 
     return false;
 }
 
 
 bool CConsoleCommands::ReloadModule ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
-{   
+{
     if ( szArguments && szArguments[0] )
     {
         if ( pClient->GetNick () )
-            CLogger::LogPrintf ( "reloadmodule: Requested by %s\n", pClient->GetNick () );
+            CLogger::LogPrintf ( "loadmodule: Requested by %s\n", pClient->GetNick () );
 
         SString strFilename ( "%s/modules/%s", g_pServerInterface->GetModManager ()->GetModPath (), szArguments );
 
-        int iSuccess = g_pGame->GetLuaManager()->GetLuaModuleManager()->ReloadModule ( szArguments, strFilename, true );
-        switch ( iSuccess )
+        /*if ( !g_pGame->GetLuaManager()->GetLuaModuleManager()->_ReloadModule ( szArguments, strFilename ) )
         {
-            case 1:
-            {
-                pEchoClient->SendConsole ( "reloadmodule: Module unloaded but failed on load" );
-                pEchoClient->SendConsole ( "reloadmodule: Couldn't find module file" );
+                pEchoClient->SendConsole ( "stop: Resource could not be found" );
                 return true;
-            }
-            case 2:
-            {
-                pEchoClient->SendConsole ( "reloadmodule: Module unloaded but failed on load" );
-                pEchoClient->SendConsole ( "reloadmodule: Couldn't find InitModule function in module" );
-                return true;
-            }
-            case 3:
-            {
-                pEchoClient->SendConsole ( "reloadmodule: Module unloaded but failed on load" );
-                pEchoClient->SendConsole ( "reloadmodule: Couldn't find DoPulse function in module" );
-                return true;
-            }
-            case 4:
-            {
-                pEchoClient->SendConsole ( "reloadmodule: Module unloaded but failed on load" );
-                pEchoClient->SendConsole ( "reloadmodule: Couldn't find ShutdownModule function in module" );
-                return true;
-            }
-            case 5:
-            {
-                pEchoClient->SendConsole ( "reloadmodule: Module unloaded but failed on load" );
-                pEchoClient->SendConsole ( "reloadmodule: Couldn't find RegisterFunctions function in module" );
-                return true;
-            }
-            case 6:
-            {
-                pEchoClient->SendConsole ( "reloadmodule: Module unloaded but failed on load" );
-                pEchoClient->SendConsole ( "reloadmodule: Couldn't find ResourceStopping function in module" );
-                return true;
-            }
-            case 7:
-            {
-                pEchoClient->SendConsole ( "reloadmodule: Module unloaded but failed on load" );
-                pEchoClient->SendConsole ( "reloadmodule: Couldn't find ResourceStopped function in module" );
-                return true;
-            }
-            case 9:
-            {
-                pEchoClient->SendConsole ( "reloadmodule: Module failed to unload" );
-                pEchoClient->SendConsole ( "reloadmodule: Couldn't find a module by that name" );
-                return true;
-            }
-            default:;
-        }
+        }*/
     }
     else
-        pEchoClient->SendConsole ( "* Syntax: reloadmodule <module-name-with-extension>" );
+        pEchoClient->SendConsole ( "* Syntax: loadmodule <module-name-with-extension>" );
 
     return false;
 }

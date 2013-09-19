@@ -184,7 +184,7 @@ bool CCommands::Execute ( const char* szCommand, const char* szParametersIn, boo
     }
 
     // Unknown command
-    val = _( "Unknown command or cvar: " ) + szCommand;
+    val = std::string ( "Unknown command or cvar: " ) + szCommand;
     if ( !bIsScriptedBind )
         CCore::GetSingleton ().GetConsole ()->Print ( val.c_str () );
     return false;

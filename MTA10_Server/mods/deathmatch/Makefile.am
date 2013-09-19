@@ -31,8 +31,11 @@ UTILS = \
 	../../../Shared/mods/deathmatch/logic/CZoneNames.cpp \
 	../../../Shared/mods/deathmatch/logic/Enums.cpp \
 	../../../Shared/mods/deathmatch/logic/CIdArray.cpp \
+	./utils/CHTTPClient.cpp ./utils/CHTTPRequest.cpp \
+	./utils/CHTTPResponse.cpp \
+	./utils/CTCPClientSocketImpl.cpp \
+	./utils/CTCPImpl.cpp \
 	./utils/CZipMaker.cpp \
-	./utils/CFunctionUseLogger.cpp \
 	$(srcdir)/../../../vendor/bob_withers/base64.cpp \
 	$(srcdir)/../../../vendor/bochs/bochs_internal/crc32.cpp \
 	$(ZIPDIR)/ioapi.c \
@@ -69,14 +72,13 @@ LOGIC = \
 ./logic/CColTube.cpp \
 ./logic/CCommandFile.cpp \
 ./logic/CCommandLineParser.cpp \
+./logic/CConfig.cpp \
 ./logic/CConnectHistory.cpp \
 ./logic/CConsole.cpp \
 ./logic/CConsoleClient.cpp \
 ./logic/CConsoleCommand.cpp \
 ./logic/CConsoleCommands.cpp \
 ./logic/CCustomData.cpp \
-./logic/CCustomWeapon.cpp \
-./logic/CCustomWeaponManager.cpp \
 ./logic/CDummy.cpp \
 ./logic/CDatabaseConnectionSqlite.cpp \
 ./logic/CDatabaseJobQueue.cpp \
@@ -188,7 +190,6 @@ LOGIC = \
 ./logic/lua/CLuaFunctionRef.cpp \
 ./logic/lua/CLuaMain.cpp \
 ./logic/lua/CLuaManager.cpp \
-./logic/lua/CLuaModule.cpp \
 ./logic/lua/CLuaModuleManager.cpp \
 ./logic/lua/CLuaTimer.cpp \
 ./logic/lua/CLuaTimerManager.cpp \
@@ -197,7 +198,6 @@ LOGIC = \
 ./logic/luadefs/CLuaACLDefs.cpp \
 ./logic/luadefs/CLuaBitDefs.cpp \
 ./logic/luadefs/CLuaCameraDefs.cpp \
-./logic/luadefs/CLuaClassDefs.cpp \
 ./logic/luadefs/CLuaDefs.cpp \
 ./logic/luadefs/CLuaElementDefs.cpp \
 ./logic/luadefs/CLuaFileDefs.cpp \
@@ -214,9 +214,7 @@ LOGIC = \
 ./logic/packets/CCommandPacket.cpp \
 ./logic/packets/CConsoleEchoPacket.cpp \
 ./logic/packets/CCustomDataPacket.cpp \
-./logic/packets/CCustomWeaponBulletSyncPacket.cpp \
 ./logic/packets/CDebugEchoPacket.cpp \
-./logic/packets/CDestroySatchelsPacket.cpp \
 ./logic/packets/CDetonateSatchelsPacket.cpp \
 ./logic/packets/CEntityAddPacket.cpp \
 ./logic/packets/CEntityRemovePacket.cpp \

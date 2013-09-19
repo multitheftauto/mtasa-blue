@@ -72,11 +72,9 @@ enum eMovementState
     MOVEMENTSTATE_JOG, //Jogging
     MOVEMENTSTATE_SPRINT, //Sprinting
     MOVEMENTSTATE_CROUCH, //Crouching still
+    // Duds for now.  We should add methods to detect these
     MOVEMENTSTATE_CRAWL, //Crouch-moving
-    MOVEMENTSTATE_ROLL, //Crouch-rolling (Needs adding)
-    MOVEMENTSTATE_JUMP, // Jumping
-    MOVEMENTSTATE_FALL, // Falling
-    MOVEMENTSTATE_CLIMB // Climbing
+    MOVEMENTSTATE_ROLL, //Crouch-rolling
 };
 
 enum eDeathAnims
@@ -105,7 +103,6 @@ struct SLastSyncedPedData
     CVector             vPosition;
     CVector             vVelocity;
     float               fRotation;
-    bool                bOnFire;
 };
 
 struct SRestoreWeaponItem
@@ -175,6 +172,7 @@ public:
                                                               unsigned short usModel,
                                                               unsigned char ucInterior );
 
+    void                        SetTargetPosition           ( unsigned long ulDelay, const CVector& vecPosition );
     void                        ResetInterpolation          ( void );
 
     float                       GetCurrentRotation          ( void );
@@ -381,7 +379,6 @@ public:
     void                        SetTargetPosition       ( const CVector& vecPosition, unsigned long ulDelay, CClientEntity* pTargetOriginSource = NULL );
     void                        RemoveTargetPosition    ( void );
     void                        UpdateTargetPosition    ( void );
-    void                        UpdateUnderFloorFix     ( const CVector& vecTargetPosition, const CVector& vecOrigin );
 
     CClientEntity*              GetTargetedEntity       ( void );    
     CClientPed*                 GetTargetedPed          ( void );
@@ -421,7 +418,7 @@ public:
     bool                        IsFootBloodEnabled      ( void );
     void                        SetFootBloodEnabled     ( bool bHasFootBlood );
 
-    bool                        IsOnFire                ( void );
+    inline bool                 IsOnFire                ( void )                                        { return m_bIsOnFire; }
     void                        SetOnFire               ( bool bOnFire );
 
     void                        GetVoice                ( short* psVoiceType, short* psVoiceID );
@@ -628,9 +625,6 @@ public:
     // Hacks for player model replacement and weapon model replacement respectively
     unsigned long               m_ulStoredModel;
     std::list < SRestoreWeaponItem > m_RestoreWeaponList;
-
-    CVector                     m_vecPrevTargetPosition;
-    uint                        m_uiForceLocalCounter;
 };
 
 #endif

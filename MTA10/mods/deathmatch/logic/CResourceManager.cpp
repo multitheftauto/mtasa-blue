@@ -41,9 +41,9 @@ CResourceManager::~CResourceManager ( void )
     }
 }
 
-CResource* CResourceManager::Add ( unsigned short usNetID, const char* szResourceName, CClientEntity* pResourceEntity, CClientEntity* pResourceDynamicEntity, const SString& strMinServerReq, const SString& strMinClientReq, bool bEnableOOP )
+CResource* CResourceManager::Add ( unsigned short usNetID, const char* szResourceName, CClientEntity* pResourceEntity, CClientEntity* pResourceDynamicEntity, const SString& strMinServerReq, const SString& strMinClientReq )
 {
-    CResource* pResource = new CResource ( usNetID, szResourceName, pResourceEntity, pResourceDynamicEntity, strMinServerReq, strMinClientReq, bEnableOOP );
+    CResource* pResource = new CResource ( usNetID, szResourceName, pResourceEntity, pResourceDynamicEntity, strMinServerReq, strMinClientReq );
     if ( pResource )
     {
         m_resources.push_back ( pResource );
@@ -84,12 +84,6 @@ CResource* CResourceManager::GetResourceFromScriptID ( uint uiScriptID )
     return pResource;
 }
 
-CResource* CResourceManager::GetResourceFromLuaState ( lua_State* luaVM )
-{
-    CLuaMain* pLuaMain = g_pClientGame->GetLuaManager()->GetVirtualMachine ( luaVM );
-    CResource* pResource = pLuaMain ? pLuaMain->GetResource() : NULL;
-    return pResource;
-}
 
 CResource* CResourceManager::GetResource ( const char* szResourceName )
 {

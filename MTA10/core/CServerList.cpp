@@ -23,7 +23,7 @@ CServerList::CServerList ( void )
 {
     m_bUpdated = false;
     m_iPass = 0;
-    m_strStatus = _("Idle");
+    m_strStatus = "Idle";
     m_nScanned = 0;
     m_nSkipped = 0;
     m_iRevision = 1;
@@ -151,13 +151,14 @@ void CServerList::Pulse ( void )
     ss << "   ";
     if ( uiTotalSlots > 0 )
     {
-        SString strPlayersString = _tn("player", "players", uiOccupiedSlots);
-        ss << uiOccupiedSlots << " " << strPlayersString << " " << _("on") << " ";
+        ss << uiOccupiedSlots << " player";
+        if ( uiOccupiedSlots != 1 )
+            ss << "s";
+        ss << " on ";
     }
-
-    SString strServersString = _tn("server", "servers", uiActiveServers);
-    ss << uiActiveServers << " " << strServersString;
-
+    ss << uiActiveServers << " server";
+    if ( uiActiveServers != 1 )
+        ss << "s";
     if ( m_iPass )
         ss << "...";
 
@@ -246,7 +247,9 @@ void CServerListInternet::Pulse ( void )
 
     if ( m_iPass == 1 ) {
         // We are polling for the master server list (first pass)
-        m_strStatus = SString ( _("Requesting master server list (%lu ms elapsed)"), ulTime );
+        stringstream ss;
+        ss << "Requesting master server list (" << ulTime << "ms elapsed)";
+        m_strStatus = ss.str ();
         m_strStatus2 = "";
         m_bUpdated = true;
         
@@ -260,14 +263,14 @@ void CServerListInternet::Pulse ( void )
                 SortByASEVersion ();
             } else {
                 // Abort
-                m_strStatus = _("Master server list could not be parsed.");
+                m_strStatus = "Master server list could not be parsed.";
                 m_iPass = 0;
             }
         } else {
             // Take care of timeouts
             if ( ulTime > SERVER_LIST_MASTER_TIMEOUT ) {
                 // Abort
-                m_strStatus = _("Master server list could not be retrieved.");
+                m_strStatus = "Master server list could not be retrieved.";
                 m_iPass = 0;
             }
         }
@@ -277,7 +280,7 @@ void CServerListInternet::Pulse ( void )
             GetServerCache ()->GenerateServerList ( this );
             GetServerCache ()->GetServerListCachedInfo ( this );
             SortByASEVersion ();
-            m_strStatus2 = "  " + _("(Backup server list)");
+            m_strStatus2 = string ( "  (Backup server list)" );
             m_iPass = 2;
         }
     } else if ( m_iPass == 2 ) {
@@ -327,7 +330,7 @@ void CServerListLAN::Refresh ( void )
     const int Flags = 1;
     setsockopt ( m_Socket, SOL_SOCKET, SO_REUSEADDR, (const char *)&Flags, sizeof ( Flags ) );
     if ( setsockopt ( m_Socket, SOL_SOCKET, SO_BROADCAST, (const char *)&Flags, sizeof ( Flags ) ) != 0 ) {
-        m_strStatus = _("Cannot bind LAN-broadcast socket");
+        m_strStatus = "Cannot bind LAN-broadcast socket";
         return;
     }
 
@@ -347,7 +350,7 @@ void CServerListLAN::Refresh ( void )
 
 void CServerListLAN::Discover ( void )
 {
-    m_strStatus = _("Attempting to discover LAN servers");
+    m_strStatus = "Attempting to discover LAN servers";
 
     // Send out the broadcast packet
     std::string strQuery = std::string ( SERVER_LIST_CLIENT_BROADCAST_STR ) + " " + std::string ( MTA_DM_ASE_VERSION );

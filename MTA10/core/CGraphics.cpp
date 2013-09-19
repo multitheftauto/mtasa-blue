@@ -1721,6 +1721,10 @@ void CGraphics::DrawProgressMessage( bool bPreserveBackbuffer )
     bool bInScene = true;
 
     // Check if disabled
+    if ( g_pCore->GetDiagnosticDebug() == EDiagnosticDebug::SPINNER_0000 )
+        return;
+
+    // Check if disabled
     static bool bDisabled = !GetApplicationSetting( "diagnostics", "user-confirmed-bsod-time" ).empty();
     if ( bDisabled )
         return;

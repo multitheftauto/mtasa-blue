@@ -19,15 +19,15 @@
 
 #include "StdInc.h"
 
-#define MIN_CLIENT_REQ_FETCHREMOTE_CONNECT_TIMEOUT          "1.3.5"
-
 int CLuaFunctionDefs::CreateExplosion ( lua_State* luaVM )
 {
 //  bool createExplosion ( float x, float y, float z, int type [, bool makeSound = true, float camShake = -1.0, bool damaging = true ] )
     CVector vecPosition; int iType; bool bMakeSound; float fCamShake = -1.0; bool bDamaging;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadVector3D ( vecPosition );
+    argStream.ReadNumber ( vecPosition.fX );
+    argStream.ReadNumber ( vecPosition.fY );
+    argStream.ReadNumber ( vecPosition.fZ );
     argStream.ReadNumber ( iType );
     argStream.ReadBool ( bMakeSound, true );
     argStream.ReadNumber ( fCamShake, -1.0f );
@@ -54,7 +54,9 @@ int CLuaFunctionDefs::CreateFire ( lua_State* luaVM )
     CVector vecPosition; float fSize;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadVector3D ( vecPosition );
+    argStream.ReadNumber ( vecPosition.fX );
+    argStream.ReadNumber ( vecPosition.fY );
+    argStream.ReadNumber ( vecPosition.fZ );
     argStream.ReadNumber ( fSize, 1.8f );
 
     if ( !argStream.HasErrors () )
@@ -315,9 +317,15 @@ int CLuaFunctionDefs::CreateWater ( lua_State* luaVM )
     CVector v1; CVector v2; CVector v3; CVector v4; bool bShallow;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadVector3D ( v1 );
-    argStream.ReadVector3D ( v2 );
-    argStream.ReadVector3D ( v3 );
+    argStream.ReadNumber ( v1.fX );
+    argStream.ReadNumber ( v1.fY );
+    argStream.ReadNumber ( v1.fZ );
+    argStream.ReadNumber ( v2.fX );
+    argStream.ReadNumber ( v2.fY );
+    argStream.ReadNumber ( v2.fZ );
+    argStream.ReadNumber ( v3.fX );
+    argStream.ReadNumber ( v3.fY );
+    argStream.ReadNumber ( v3.fZ );
     bool bIsQuad = argStream.NextCouldBeNumber ( 2 );   // Check for existence of v4.fZ
     if ( bIsQuad )
     {
@@ -1962,7 +1970,9 @@ int CLuaFunctionDefs::CreateSWATRope ( lua_State* luaVM )
     CVector vecPosition;
     DWORD dwDuration = 0;
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadVector3D ( vecPosition );
+    argStream.ReadNumber ( vecPosition.fX );
+    argStream.ReadNumber ( vecPosition.fY );
+    argStream.ReadNumber ( vecPosition.fZ );
     argStream.ReadNumber ( dwDuration, 4000 );
 
     if ( !argStream.HasErrors () )
@@ -2090,15 +2100,12 @@ int CLuaFunctionDefs::GetFPSLimit ( lua_State* luaVM )
 // Call a function on a remote server
 int CLuaFunctionDefs::FetchRemote ( lua_State* luaVM )
 {
-//  bool fetchRemote ( string URL [, int connectionAttempts = 10, int connectTimeout = 10000 ], callback callbackFunction, [ string postData, bool bPostBinary, arguments... ] )
+//  bool fetchRemote ( string URL [, int connectionAttempts = 10 ], callback callbackFunction, [ string postData, bool bPostBinary, arguments... ] )
     CScriptArgReader argStream ( luaVM );
-    SString strURL; CLuaFunctionRef iLuaFunction; SString strPostData; bool bPostBinary; CLuaArguments args; uint uiConnectionAttempts; uint uiConnectTimeoutMs;
+    SString strURL; CLuaFunctionRef iLuaFunction; SString strPostData; bool bPostBinary; CLuaArguments args; uint uiConnectionAttempts;
 
     argStream.ReadString ( strURL );
     argStream.ReadIfNextIsNumber ( uiConnectionAttempts, 10 );
-    if ( argStream.NextIsNumber () )
-        MinClientReqCheck ( argStream, MIN_CLIENT_REQ_FETCHREMOTE_CONNECT_TIMEOUT, "'connect timeout' is being used" );
-    argStream.ReadIfNextIsNumber ( uiConnectTimeoutMs, 10000 );
     argStream.ReadFunction ( iLuaFunction );
     argStream.ReadString ( strPostData, "" );
     argStream.ReadBool ( bPostBinary, false );
@@ -2110,7 +2117,7 @@ int CLuaFunctionDefs::FetchRemote ( lua_State* luaVM )
         CLuaMain * luaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
         if ( luaMain )
         {
-            g_pClientGame->GetRemoteCalls()->Call ( strURL, &args, strPostData, bPostBinary, luaMain, iLuaFunction, uiConnectionAttempts, uiConnectTimeoutMs );
+            g_pClientGame->GetRemoteCalls()->Call ( strURL, &args, strPostData, bPostBinary, luaMain, iLuaFunction, uiConnectionAttempts );
             lua_pushboolean ( luaVM, true );
             return 1;
         }

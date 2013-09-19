@@ -29,107 +29,79 @@ int CLuaVoiceDefs::IsVoiceEnabled ( lua_State* luaVM )
 
 int CLuaVoiceDefs::SetPlayerVoiceBroadcastTo ( lua_State* luaVM )
 {
-    CPlayer *pPlayer;
-
-    CScriptArgReader argStream( luaVM );
-    argStream.ReadUserData( pPlayer );
-
-    if ( !argStream.HasErrors () )
+    // Arg 1, player
+    CPlayer* pPlayer = lua_toplayer ( luaVM, 1 );
+    if ( !pPlayer )
     {
-        // Second argument can be an element, table or nil
-
-        if ( argStream.NextIsNil() ) 
-        {
-            pPlayer->SetVoiceBroadcastTo ( NULL ); 
-            
-            lua_pushboolean ( luaVM, true );
-            return 1;
-        }
-        else if ( argStream.NextIsTable () )
-        {
-            std::list < CElement* > lstElements;
-            for (lua_pushnil(luaVM); lua_next(luaVM, 2); lua_pop(luaVM, 1))
-            {
-                CElement* pListedElement = lua_toelement ( luaVM, -1 );
-                if ( pListedElement )
-                    lstElements.push_back ( pListedElement );
-            }
-
-            pPlayer->SetVoiceBroadcastTo ( lstElements );
-
-            lua_pushboolean ( luaVM, true );
-            return 1;
-        }
-        else if ( argStream.NextIsUserData () )
-        {
-            CElement * pElement;
-            argStream.ReadUserData( pElement );
-            
-            pPlayer->SetVoiceBroadcastTo ( pElement );
-            
-            lua_pushboolean ( luaVM, true );
-            return 1;
-        }
-        else
-             m_pScriptDebugging->LogBadPointer ( luaVM, "broadcastTo", 2 );
+        m_pScriptDebugging->LogBadPointer ( luaVM, "player", 1 );
+        lua_pushboolean ( luaVM, false );
+        return 1;
     }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
 
-    lua_pushboolean ( luaVM, false );
+    // Arg 2, element OR table OR nil
+    CElement* pElement = lua_toelement ( luaVM, 2 );
+    if ( pElement )
+        pPlayer->SetVoiceBroadcastTo ( pElement );
+    else if ( lua_type ( luaVM, 2 ) == LUA_TTABLE )
+    {
+        std::list < CElement* > lstElements;
+        for (lua_pushnil(luaVM); lua_next(luaVM, 2); lua_pop(luaVM, 1))
+        {
+            CElement* pListedElement = lua_toelement ( luaVM, -1 );
+            if ( pListedElement )
+                lstElements.push_back ( pListedElement );
+        }
+        pPlayer->SetVoiceBroadcastTo ( lstElements );
+    }
+    else if ( lua_type ( luaVM, 2 ) == LUA_TNIL )
+        pPlayer->SetVoiceBroadcastTo ( NULL ); //Muted
+    else
+    {
+        m_pScriptDebugging->LogBadPointer ( luaVM, "broadcastTo", 2 );
+        lua_pushboolean ( luaVM, false );
+        return 1;
+    }
+
+    lua_pushboolean ( luaVM, true );
     return 1;
 }
 
 
 int CLuaVoiceDefs::setPlayerVoiceIgnoreFrom ( lua_State* luaVM )
 {
-    CPlayer *pPlayer;
-
-    CScriptArgReader argStream( luaVM );
-    argStream.ReadUserData( pPlayer );
-
-    if ( !argStream.HasErrors () )
+    // Arg 1, player
+    CPlayer* pPlayer = lua_toplayer ( luaVM, 1 );
+    if ( !pPlayer )
     {
-        // Second argument can be an element, table or nil
-
-        if ( argStream.NextIsNil() ) 
-        {
-            pPlayer->SetVoiceIgnoredElement ( NULL ); 
-            
-            lua_pushboolean ( luaVM, true );
-            return 1;
-        }
-        else if ( argStream.NextIsTable () )
-        {
-            std::list < CElement* > lstElements;
-            for (lua_pushnil(luaVM); lua_next(luaVM, 2); lua_pop(luaVM, 1))
-            {
-                CElement* pListedElement = lua_toelement ( luaVM, -1 );
-                if ( pListedElement )
-                    lstElements.push_back ( pListedElement );
-            }
-
-            pPlayer->SetVoiceIgnoredList ( lstElements );
-
-            lua_pushboolean ( luaVM, true );
-            return 1;
-        }
-        else if ( argStream.NextIsUserData () )
-        {
-            CElement * pElement;
-            argStream.ReadUserData( pElement );
-            
-            pPlayer->SetVoiceIgnoredElement ( pElement );
-            
-            lua_pushboolean ( luaVM, true );
-            return 1;
-        }
-        else
-             m_pScriptDebugging->LogBadPointer ( luaVM, "ignoreFrom", 2 );
+        m_pScriptDebugging->LogBadPointer ( luaVM, "player", 1 );
+        lua_pushboolean ( luaVM, false );
+        return 1;
     }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
 
-    lua_pushboolean ( luaVM, false );
+    // Arg 2, element OR table OR nil
+    CElement* pElement = lua_toelement ( luaVM, 2 );
+    if ( pElement )
+        pPlayer->SetVoiceIgnoredElement ( pElement );
+    else if ( lua_type ( luaVM, 2 ) == LUA_TTABLE )
+    {
+        std::list < CElement* > lstElements;
+        for (lua_pushnil(luaVM); lua_next(luaVM, 2); lua_pop(luaVM, 1))
+        {
+            CElement* pListedElement = lua_toelement ( luaVM, -1 );
+            if ( pListedElement )
+                lstElements.push_back ( pListedElement );
+        }
+        pPlayer->SetVoiceIgnoredList ( lstElements );
+    }
+    else if ( lua_type ( luaVM, 2 ) == LUA_TNIL )
+        pPlayer->SetVoiceIgnoredElement ( NULL ); // Remove all ignored
+    else
+    {
+        m_pScriptDebugging->LogBadPointer ( luaVM, "ignoreFrom", 2 );
+        lua_pushboolean ( luaVM, false );
+        return 1;
+    }
+
+    lua_pushboolean ( luaVM, true );
     return 1;
 }

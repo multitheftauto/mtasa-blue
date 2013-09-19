@@ -351,7 +351,7 @@ void CPerPlayerEntity::AddPlayerReference ( CPlayer* pPlayer )
     if ( g_pGame->GetPlayerManager()->Exists( pPlayer ) )
         MapInsert( m_Players, pPlayer );
     else
-        CLogger::ErrorPrintf( "CPerPlayerEntity tried to add reference for non existing player: %08x", pPlayer );
+        CLogger::ErrorPrintf( "CPerPlayerEntity tried to add reference for non existing player: %08x\n", pPlayer );
 }
 
 
@@ -378,7 +378,9 @@ void CPerPlayerEntity::OnPlayerDelete ( CPlayer* pPlayer )
     SString strStatus;
     if ( MapContains( m_Players, pPlayer ) )
     {
+#ifdef MTA_DEBUG
         strStatus += "m_Players ";
+#endif
         MapRemove( m_Players, pPlayer );
     }
 
@@ -396,6 +398,6 @@ void CPerPlayerEntity::OnPlayerDelete ( CPlayer* pPlayer )
 
     if ( !strStatus.empty() )
     {
-        CLogger::ErrorPrintf( "CPerPlayerEntity problem: %s", *strStatus );
+        CLogger::ErrorPrintf( "CPerPlayerEntity problem: %s\n", *strStatus );
     }
 }

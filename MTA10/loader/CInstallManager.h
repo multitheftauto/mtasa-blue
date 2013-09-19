@@ -28,7 +28,6 @@ public:
     SString         GetSequencerSnapshot            ( void );
     SString         GetLauncherPathFilename         ( void );
     bool            UpdateOptimusSymbolExport       ( void );
-    SString         MaybeRenameExe                  ( const SString& strGTAPath );
 
 protected:
     SString         _ShowCrashFailDialog            ( void );
@@ -39,7 +38,11 @@ protected:
     SString         _ChangeToAdmin                  ( void );
     SString         _ShowCopyFailDialog             ( void );
     SString         _ProcessLayoutChecks            ( void );
-    SString         _ProcessExePatchChecks          ( void );
+    SString         _ProcessAeroChecks              ( void );
+    SString         _ProcessLargeMemChecks          ( void );
+    SString         _ProcessDepChecks               ( void );
+    SString         _ProcessNvightmareChecks        ( void );
+    SString         _ProcessExeCopyChecks           ( void );
     SString         _ProcessServiceChecks           ( void );
     SString         _ChangeFromAdmin                ( void );
     SString         _InstallNewsItems               ( void );

@@ -15,6 +15,7 @@
 
 #include "StdInc.h"
 HRESULT HandleCreateDeviceResult( HRESULT hResult, IDirect3D9* pDirect3D, UINT Adapter, D3DDEVTYPE DeviceType, HWND hFocusWindow, DWORD BehaviorFlags, D3DPRESENT_PARAMETERS* pPresentationParameters, IDirect3DDevice9** ppReturnedDeviceInterface );
+bool CreateDeviceSecondCallCheck( HRESULT& hOutResult, IDirect3D9* pDirect3D, UINT Adapter, D3DDEVTYPE DeviceType, HWND hFocusWindow, DWORD BehaviorFlags, D3DPRESENT_PARAMETERS* pPresentationParameters, IDirect3DDevice9** ppReturnedDeviceInterface );
 
 CProxyDirect3D9::CProxyDirect3D9 ( IDirect3D9* pInterface )
 {
@@ -163,6 +164,12 @@ HRESULT    CProxyDirect3D9::CreateDevice                ( UINT Adapter, D3DDEVTY
     #else
         SetWindowTextW ( hFocusWindow, MbUTF8ToUTF16("MTA: San Andreas").c_str() );
     #endif
+
+    // Detect if second call to CreateDevice
+    if ( CreateDeviceSecondCallCheck( hResult, m_pDevice, Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters, ppReturnedDeviceInterface ) )
+    {
+        return hResult;
+    }
 
     // Enable the auto depth stencil parameter
     pPresentationParameters->EnableAutoDepthStencil = true;
@@ -648,9 +655,35 @@ void AddCapsReport( UINT Adapter, IDirect3D9* pDirect3D, IDirect3DDevice9* pD3DD
 
     if ( bFixGTACaps && !DeviceCapsSameAsGTACaps )
     {
-        WriteDebugEvent( "Fixing GTA caps" );
-        memcpy( pGTACaps9, &DeviceCaps9, sizeof( D3DCAPS9 ) );
+        if ( DeviceCaps9.DeclTypes > pGTACaps9->DeclTypes )
+        {
+            WriteDebugEvent( "Not Fixing GTA caps as DeviceCaps is better" );
+        }
+        else
+        {
+            WriteDebugEvent( "Fixing GTA caps" );
+            memcpy( pGTACaps9, &DeviceCaps9, sizeof( D3DCAPS9 ) );
+        }
     }
+}
+
+
+////////////////////////////////////////////////
+//
+// CreateDeviceSecondCallCheck
+//
+// Check for, and handle subsequent calls to create device
+// Know to occur with RTSSHooks.dll (EVGA Precision X on screen display)
+//
+////////////////////////////////////////////////
+bool CreateDeviceSecondCallCheck( HRESULT& hOutResult, IDirect3D9* pDirect3D, UINT Adapter, D3DDEVTYPE DeviceType, HWND hFocusWindow, DWORD BehaviorFlags, D3DPRESENT_PARAMETERS* pPresentationParameters, IDirect3DDevice9** ppReturnedDeviceInterface )
+{
+    static uint uiCreateCount = 0;
+    if ( ++uiCreateCount == 1 )
+        return false;
+    WriteDebugEvent ( SString ( " Passing through call #%d to CreateDevice", uiCreateCount ) );
+    hOutResult = pDirect3D->CreateDevice ( Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters, ppReturnedDeviceInterface );
+    return true;
 }
 
 

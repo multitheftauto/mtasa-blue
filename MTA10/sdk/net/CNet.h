@@ -25,7 +25,6 @@ namespace EDownloadMode
         CORE_ASE_LIST,
         CORE_UPDATER,
         RESOURCE_INITIAL_FILES,
-        RESOURCE_SINGULAR_FILES,
         CALL_REMOTE,
     };
 }

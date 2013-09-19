@@ -42,7 +42,6 @@ public:
     static CLuaCFunction*               AddFunction                 ( const char* szName, lua_CFunction f, bool bRestricted = false );
 
     static CLuaCFunction*               GetFunction                 ( const char* szName, lua_CFunction f );
-    static CLuaCFunction*               GetFunction                 ( const char* szName );
     static CLuaCFunction*               GetFunction                 ( lua_CFunction f );
     static const char*                  GetFunctionName             ( lua_CFunction f, bool& bRestricted );
     static bool                         IsNotFunction               ( lua_CFunction f );

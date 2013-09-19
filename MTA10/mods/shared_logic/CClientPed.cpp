@@ -200,9 +200,6 @@ void CClientPed::Init ( CClientManager* pManager, unsigned long ulModelID, bool 
     //These two are inactive for now
     m_MovementStateNames[MOVEMENTSTATE_CRAWL]       =    "crawl";
     m_MovementStateNames[MOVEMENTSTATE_ROLL]        =    "roll";
-    m_MovementStateNames[MOVEMENTSTATE_JUMP]        =    "jump";
-    m_MovementStateNames[MOVEMENTSTATE_FALL]        =    "fall";
-    m_MovementStateNames[MOVEMENTSTATE_CLIMB]       =    "climb";
 
     // Create the player model
     if ( m_bIsLocalPlayer )
@@ -740,10 +737,8 @@ void CClientPed::SetCameraRotation ( float fRotation )
     // Local player
     if ( m_bIsLocalPlayer )
     {
-        CCam* pCam = g_pGame->GetCamera ()->GetCam ( g_pGame->GetCamera ()->GetActiveCam () );
-        float fOldHorizontal, fOldVertical;
-        pCam->GetDirection ( fOldHorizontal, fOldVertical );
-        pCam->SetDirection ( fRotation - PI/2, fOldVertical );
+        // Jax: only has an effect if CMultiplayer::SetCustomCameraRotationEnabled is called
+        g_pMultiplayer->SetLocalCameraRotation ( fRotation );
     }
     else
     {
@@ -2174,22 +2169,6 @@ eMovementState CClientPed::GetMovementState ( void )
         CControllerState cs;
         GetControllerState ( cs );
 
-        // Get his current task(s)
-        const char* szComplexTaskName = GetTaskManager()->GetActiveTask()->GetTaskName();
-        const char* szSimpleTaskName = GetTaskManager()->GetSimplestActiveTask()->GetTaskName();
-
-        // Is he climbing?
-        if ( strcmp ( szSimpleTaskName, "TASK_SIMPLE_CLIMB" ) == 0 )
-            return MOVEMENTSTATE_CLIMB;
-
-        // Is he jumping?
-        else if ( strcmp ( szComplexTaskName, "TASK_COMPLEX_JUMP" ) == 0 )
-            return MOVEMENTSTATE_JUMP;
-
-        // Is he falling?
-        else if ( !IsOnGround() && !GetContactEntity() )
-            return MOVEMENTSTATE_FALL;
-
         // Grab his controller state
         bool bWalkKey = false;
         if ( GetType () == CCLIENTPLAYER )
@@ -2221,8 +2200,6 @@ eMovementState CClientPed::GetMovementState ( void )
             // Is he moving the contoller at all?
             if ( cs.LeftStickX == 0 && cs.LeftStickY == 0 )
                 return MOVEMENTSTATE_CROUCH;
-            else
-                return MOVEMENTSTATE_CRAWL;
         }
     }
     return MOVEMENTSTATE_UNKNOWN;
@@ -4351,7 +4328,7 @@ void CClientPed::PreviousRadioChannel ( void )
 bool CClientPed::SetCurrentRadioChannel ( unsigned char ucChannel )
 {
     // Local player?
-    if ( m_bIsLocalPlayer && ucChannel <= 12 )
+    if ( m_bIsLocalPlayer && ucChannel >= 0 && ucChannel <= 12 )
     {
         if ( m_ucRadioChannel != ucChannel )
         {
@@ -4965,8 +4942,6 @@ void CClientPed::SetTargetPosition ( const CVector& vecPosition, unsigned long u
     if ( pTargetOriginSource )
         pTargetOriginSource->GetPosition ( vecOrigin );
 
-    UpdateUnderFloorFix ( vecPosition, vecOrigin );
-
     // Update the references to the contact entity
     if ( pTargetOriginSource != m_interp.pTargetOriginSource )
     {
@@ -5074,67 +5049,6 @@ void CClientPed::UpdateTargetPosition ( void )
         }
 
         SetPosition ( vecNewPosition + vecOrigin, false );
-    }
-}
-
-
-// Peds under floor fix hack
-void CClientPed::UpdateUnderFloorFix ( const CVector& vecTargetPosition, const CVector& vecOrigin )
-{
-    // Calc remote movement
-    CVector vecRemoteMovement = vecTargetPosition - m_vecPrevTargetPosition;
-    m_vecPrevTargetPosition = vecTargetPosition;
-
-    // Calc local error
-    CVector vecLocalPosition;
-    GetPosition ( vecLocalPosition );
-    vecLocalPosition -= vecOrigin;
-    CVector vecLocalError = vecTargetPosition - vecLocalPosition;
-
-    // Small remote movement + local position error = force a warp
-    bool bForceLocalZ = false;
-    bool bForceLocalXY = false;
-    if ( abs( vecRemoteMovement.fZ ) < 0.01f )
-    {
-        float fLocalErrorZ = abs( vecLocalError.fZ );
-        if ( fLocalErrorZ > 0.1f && fLocalErrorZ < 10.f )
-        {
-            bForceLocalZ = true;
-        }
-    }
-
-    if ( abs( vecRemoteMovement.fX ) < 0.01f )
-    {
-        float fLocalErrorX = abs( vecLocalError.fX );
-        if ( fLocalErrorX > 0.1f && fLocalErrorX < 10.f )
-        {
-            bForceLocalXY = true;
-        }
-    }
-
-    if ( abs( vecRemoteMovement.fY ) < 0.01f )
-    {
-        float fLocalErrorY = abs( vecLocalError.fY );
-        if ( fLocalErrorY > 0.1f && fLocalErrorY < 10.f )
-        {
-            bForceLocalXY = true;
-        }
-    }
-
-    // Only force position if needed for at least two consecutive calls
-    if ( !bForceLocalZ && !bForceLocalXY )
-        m_uiForceLocalCounter = 0;
-    else
-    if ( m_uiForceLocalCounter++ > 1 )
-    {
-        if ( bForceLocalZ )
-            vecLocalPosition.fZ = vecTargetPosition.fZ;
-        if ( bForceLocalXY )
-        {
-            vecLocalPosition.fX = vecTargetPosition.fX;
-            vecLocalPosition.fY = vecTargetPosition.fY;
-        }
-        SetPosition ( vecLocalPosition + vecOrigin );
     }
 }
 
@@ -5520,14 +5434,6 @@ bool CClientPed::IsFootBloodEnabled ( void )
     return false;
 }
 
-bool CClientPed::IsOnFire ( )
-{
-    if ( m_pPlayerPed )
-    {
-        return m_pPlayerPed->IsOnFire();
-    }
-    return m_bIsOnFire;
-}
 
 void CClientPed::SetOnFire ( bool bIsOnFire )
 {

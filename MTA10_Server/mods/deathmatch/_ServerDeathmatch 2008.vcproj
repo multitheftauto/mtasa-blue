@@ -84,7 +84,7 @@
 				Name="VCLinkerTool"
 				LinkLibraryDependencies="false"
 				AdditionalDependencies="lua5.1.lib wsock32.lib sqlite3.lib zlib_2008.lib ehs_2008.lib pthreadVC2.lib pme_2008.lib pcre_2008.lib json2008.lib psapi.lib"
-				OutputFile="C:\Program Files\MTA San Andreas 1.4\server/mods/deathmatch/deathmatch.dll"
+				OutputFile="C:\Program Files\MTA San Andreas 1.3\server/mods/deathmatch/deathmatch.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="logic/lib;../../../vendor/lua/lib;&quot;../../../vendor/json-c/lib&quot;;../../../vendor/ehs/lib;../../../vendor/pme/lib;../../../vendor/pcre/lib;../../../vendor/pthreads/lib;../../../vendor/sqlite/lib;../../../vendor/zlib/lib"
@@ -189,7 +189,7 @@
 				Name="VCLinkerTool"
 				LinkLibraryDependencies="false"
 				AdditionalDependencies="lua5.1d.lib wsock32.lib sqlite3d.lib zlibd_2008.lib ehsd_2008.lib pthreadVC2.lib pmed_2008.lib pcred_2008.lib jsonD2008.lib psapi.lib"
-				OutputFile="C:\Program Files\MTA San Andreas 1.4\server/mods/deathmatch/deathmatch_d.dll"
+				OutputFile="C:\Program Files\MTA San Andreas 1.3\server\mods\deathmatch\deathmatch_d.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="logic/lib;../../../vendor/lua/lib;&quot;../../../vendor/json-c/lib&quot;;../../../vendor/ehs/lib;../../../vendor/pme/lib;../../../vendor/pcre/lib;../../../vendor/pthreads/lib;../../../vendor/sqlite/lib;../../../vendor/zlib/lib"
@@ -522,14 +522,6 @@
 				</File>
 				<File
 					RelativePath=".\logic\CCustomData.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\logic\CCustomWeapon.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\logic\CCustomWeaponManager.cpp"
 					>
 				</File>
 				<File
@@ -968,15 +960,7 @@
 						>
 					</File>
 					<File
-						RelativePath=".\logic\packets\CCustomWeaponBulletSyncPacket.cpp"
-						>
-					</File>
-					<File
 						RelativePath=".\logic\packets\CDebugEchoPacket.cpp"
-						>
-					</File>
-					<File
-						RelativePath=".\logic\packets\CDestroySatchelsPacket.cpp"
 						>
 					</File>
 					<File
@@ -1244,10 +1228,6 @@
 						>
 					</File>
 					<File
-						RelativePath=".\logic\lua\CLuaModule.cpp"
-						>
-					</File>
-					<File
 						RelativePath=".\logic\lua\CLuaModuleManager.cpp"
 						>
 					</File>
@@ -1281,10 +1261,6 @@
 					</File>
 					<File
 						RelativePath=".\logic\luadefs\CLuaCameraDefs.cpp"
-						>
-					</File>
-					<File
-						RelativePath=".\logic\luadefs\CLuaClassDefs.cpp"
 						>
 					</File>
 					<File
@@ -1405,7 +1381,11 @@
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath=".\utils\CFunctionUseLogger.cpp"
+					RelativePath=".\utils\CHTTPRequest.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\utils\CHTTPResponse.cpp"
 					>
 				</File>
 				<File
@@ -1435,6 +1415,14 @@
 							UsePrecompiledHeader="0"
 						/>
 					</FileConfiguration>
+				</File>
+				<File
+					RelativePath=".\utils\CTCPClientSocketImpl.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\utils\CTCPImpl.cpp"
+					>
 				</File>
 				<File
 					RelativePath=".\utils\CZipMaker.cpp"
@@ -1823,14 +1811,6 @@
 				</File>
 				<File
 					RelativePath=".\logic\CCustomData.h"
-					>
-				</File>
-				<File
-					RelativePath=".\logic\CCustomWeapon.h"
-					>
-				</File>
-				<File
-					RelativePath=".\logic\CCustomWeaponManager.h"
 					>
 				</File>
 				<File
@@ -2233,15 +2213,7 @@
 						>
 					</File>
 					<File
-						RelativePath=".\logic\packets\CCustomWeaponBulletSyncPacket.h"
-						>
-					</File>
-					<File
 						RelativePath=".\logic\packets\CDebugEchoPacket.h"
-						>
-					</File>
-					<File
-						RelativePath=".\logic\packets\CDestroySatchelsPacket.h"
 						>
 					</File>
 					<File
@@ -2537,10 +2509,6 @@
 						>
 					</File>
 					<File
-						RelativePath=".\logic\lua\CLuaModule.h"
-						>
-					</File>
-					<File
 						RelativePath=".\logic\lua\CLuaModuleManager.h"
 						>
 					</File>
@@ -2582,10 +2550,6 @@
 					</File>
 					<File
 						RelativePath=".\logic\luadefs\CLuaCameraDefs.h"
-						>
-					</File>
-					<File
-						RelativePath=".\logic\luadefs\CLuaClassDefs.h"
 						>
 					</File>
 					<File
@@ -2694,11 +2658,7 @@
 					>
 				</File>
 				<File
-					RelativePath=".\utils\CFunctionUseLogger.h"
-					>
-				</File>
-				<File
-					RelativePath=".\utils\CMasterServerAnnouncer.h"
+					RelativePath=".\utils\CHTTPResponse.h"
 					>
 				</File>
 				<File
