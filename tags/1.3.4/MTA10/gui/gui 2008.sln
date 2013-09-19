@@ -1,0 +1,22 @@
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Client - GUI", "gui 2008.vcproj", "{485149E1-799C-4925-AA17-0FEA77C85418}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Nightly|Win32 = Nightly|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{485149E1-799C-4925-AA17-0FEA77C85418}.Debug|Win32.ActiveCfg = Debug|Win32
+		{485149E1-799C-4925-AA17-0FEA77C85418}.Debug|Win32.Build.0 = Debug|Win32
+		{485149E1-799C-4925-AA17-0FEA77C85418}.Nightly|Win32.ActiveCfg = Nightly|Win32
+		{485149E1-799C-4925-AA17-0FEA77C85418}.Nightly|Win32.Build.0 = Nightly|Win32
+		{485149E1-799C-4925-AA17-0FEA77C85418}.Release|Win32.ActiveCfg = Release|Win32
+		{485149E1-799C-4925-AA17-0FEA77C85418}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
