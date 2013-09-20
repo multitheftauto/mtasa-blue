@@ -188,7 +188,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				LinkLibraryDependencies="false"
-				AdditionalDependencies="lua5.1d.lib wsock32.lib sqlite3d.lib zlibd_2008.lib ehsd_2008.lib pthreadVC2.lib pmed_2008.lib pcred_2008.lib jsonD2008.lib psapi.lib"
+				AdditionalDependencies="lua5.1_d.lib wsock32.lib sqlite3d.lib zlibd_2008.lib ehsd_2008.lib pthreadVC2.lib pmed_2008.lib pcred_2008.lib jsonD2008.lib psapi.lib"
 				OutputFile="C:\Program Files\MTA San Andreas 1.4\server/mods/deathmatch/deathmatch_d.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"

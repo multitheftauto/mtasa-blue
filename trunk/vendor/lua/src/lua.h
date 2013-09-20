@@ -55,9 +55,9 @@ typedef int (*lua_CFunction) (lua_State *L);
 ** MTA Specific stuff written by Oli for pre C Function call hooking
 */
 typedef int (*lua_PreCallHook) ( lua_CFunction f, lua_State* L );
-void lua_registerPreCallHook ( lua_PreCallHook f );
+LUA_API void lua_registerPreCallHook ( lua_PreCallHook f );
 typedef void (*lua_PostCallHook) ( lua_CFunction f, lua_State* L );
-void lua_registerPostCallHook ( lua_PostCallHook f );
+LUA_API void lua_registerPostCallHook ( lua_PostCallHook f );
 
 /*
 ** functions that read/write blocks when loading/dumping Lua chunks

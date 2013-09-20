@@ -32,6 +32,12 @@ CLuaManager::CLuaManager ( CClientGame* pClientGame )
     m_pGUIManager = pClientGame->GetGUIManager ();
     m_pRegisteredCommands = pClientGame->GetRegisteredCommands ();
 
+    // Ensure lua was compiled with apichecks
+    #ifdef NDEBUG
+        #error "NDEBUG should not be defined"
+    #endif
+    assert( luaX_is_apicheck_enabled() );
+
     // Load the C functions
     LoadCFunctions ();
     lua_registerPreCallHook ( CLuaDefs::CanUseFunction );

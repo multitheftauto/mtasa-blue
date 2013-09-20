@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="lua5.1_dll"
-	ProjectGUID="{8EEECEE6-A6EC-BC48-8E76-22B87825444B}"
-	RootNamespace="lua5.1_dll"
+	Name="lua5.1c_dll"
+	ProjectGUID="{7922DB76-1413-4113-A2BE-88FD233E910D}"
+	RootNamespace="lua5.1c_dll"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="131072"
 	>
@@ -19,7 +19,7 @@
 		<Configuration
 			Name="Debug|Win32"
 			OutputDirectory="../../"
-			IntermediateDirectory="../obj/lua5.1_dll/Debug"
+			IntermediateDirectory="../obj/lua5.1c_dll/Debug"
 			ConfigurationType="2"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			CharacterSet="2"
@@ -68,16 +68,16 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="C:\Program Files\MTA San Andreas 1.4\server\mods\deathmatch\lua5.1_d.dll"
+				OutputFile="C:\Program Files\MTA San Andreas 1.4\mods\deathmatch\lua5.1c_d.dll"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="../lib"
 				ModuleDefinitionFile=""
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="$(OutDir)/lua5.1.pdb"
+				ProgramDatabaseFile="$(OutDir)/lua5.1c.pdb"
 				SubSystem="2"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="0"
-				ImportLibrary="../lib/lua5.1_d.lib"
+				ImportLibrary="../lib/lua5.1c_d.lib"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -106,7 +106,7 @@
 		<Configuration
 			Name="Release|Win32"
 			OutputDirectory="../../"
-			IntermediateDirectory="../obj/lua5.1_dll/Release"
+			IntermediateDirectory="../obj/lua5.1c_dll/Release"
 			ConfigurationType="2"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			CharacterSet="2"
@@ -130,7 +130,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				AdditionalIncludeDirectories="../../../Shared/publicsdk/lua/include"
-				PreprocessorDefinitions="LUA_BUILD_AS_DLL"
+				PreprocessorDefinitions="LUA_USE_APICHECK;LUA_BUILD_AS_DLL"
 				StringPooling="true"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
@@ -153,7 +153,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="C:\Program Files\MTA San Andreas 1.4\server\mods\deathmatch\lua5.1.dll"
+				OutputFile="C:\Program Files\MTA San Andreas 1.4\mods\deathmatch\lua5.1c.dll"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="../lib"
 				ModuleDefinitionFile=""
@@ -167,7 +167,7 @@
 				EnableCOMDATFolding="2"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="0"
-				ImportLibrary="../lib/lua5.1.lib"
+				ImportLibrary="../lib/lua5.1c.lib"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -220,7 +220,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				AdditionalIncludeDirectories="../../../Shared/publicsdk/lua/include"
-				PreprocessorDefinitions="LUA_BUILD_AS_DLL"
+				PreprocessorDefinitions="LUA_USE_APICHECK;LUA_BUILD_AS_DLL"
 				StringPooling="true"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
@@ -242,7 +242,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="..\..\..\output\MTA San Andreas\server\mods\deathmatch\lua5.1.dll"
+				OutputFile="..\..\..\output\MTA San Andreas\mods\deathmatch\lua5.1c.dll"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="../lib"
 				ModuleDefinitionFile=""
@@ -256,7 +256,7 @@
 				EnableCOMDATFolding="2"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="0"
-				ImportLibrary="../lib/lua5.1.lib"
+				ImportLibrary="../lib/lua5.1c.lib"
 				TargetMachine="1"
 			/>
 			<Tool

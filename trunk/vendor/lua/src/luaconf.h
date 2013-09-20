@@ -375,7 +375,13 @@
 ** with Lua. A useful redefinition is to use assert.h.
 */
 #if defined(LUA_USE_APICHECK)
-#include <assert.h>
+/////////////////////////////////////////////////////////////////////////
+// MTA addition for testing if apicheck (and assert) will function as expected
+    #ifndef NDEBUG
+        #include <assert.h>
+        LUA_API int luaX_is_apicheck_enabled();
+    #endif
+/////////////////////////////////////////////////////////////////////////
 #define luai_apicheck(L,o)	{ (void)L; assert(o); }
 #else
 #define luai_apicheck(L,o)	{ (void)L; }
