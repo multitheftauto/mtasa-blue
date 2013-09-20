@@ -658,7 +658,7 @@ DontInstallRedist:
 		SectionIn 1 RO
 		SetOutPath "$INSTDIR\mods\deathmatch"
 		File "${FILES_ROOT}\MTA San Andreas\mods\deathmatch\Client.dll"
-		File "${SERVER_FILES_ROOT}\mods\deathmatch\lua5.1.dll"
+		File "${FILES_ROOT}\MTA San Andreas\mods\deathmatch\lua5.1c.dll"
 		File "${SERVER_FILES_ROOT}\mods\deathmatch\pcre3.dll"
 		SetOutPath "$INSTDIR\mods\deathmatch\resources"
 	SectionEnd
@@ -945,6 +945,8 @@ Section Uninstall
 	Delete "$INSTDIR\Uninstall.exe"
 
 	Delete "$INSTDIR\mods\deathmatch\Client.dll"
+	Delete "$INSTDIR\mods\deathmatch\lua5.1c.dll"
+	Delete "$INSTDIR\mods\deathmatch\pcre3.dll"
 
 	RmDir /r "$INSTDIR\MTA\cgui"
 	RmDir /r "$INSTDIR\MTA\data"
