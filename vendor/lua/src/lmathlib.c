@@ -9,6 +9,7 @@
 #include <math.h>
 
 #define lmathlib_c
+#define LUA_LIB
 
 #include "lua.h"
 

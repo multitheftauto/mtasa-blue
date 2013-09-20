@@ -12,6 +12,7 @@
 #include <string.h>
 
 #define lbaselib_c
+#define LUA_LIB
 
 #include "lua.h"
 

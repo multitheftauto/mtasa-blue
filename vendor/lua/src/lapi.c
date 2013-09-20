@@ -1111,3 +1111,15 @@ LUA_API const char *lua_setupvalue (lua_State *L, int funcindex, int n) {
   return name;
 }
 
+// MTA addition to validate inclusion of working apichecks
+#if defined(LUA_USE_APICHECK)
+LUA_API int luaX_is_apicheck_enabled()
+{
+    #if defined(LUA_USE_APICHECK)
+        #ifndef NDEBUG
+            return 1;
+        #endif
+    #endif
+    return 0;
+}
+#endif
