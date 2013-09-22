@@ -1672,7 +1672,7 @@ int CLuaFunctionDefinitions::SetPedFrozen ( lua_State* luaVM )
 int CLuaFunctionDefinitions::GetPedAmmoInClip ( lua_State* luaVM )
 {
     CPed* pPed;
-    unsigned char ucSlot;
+    unsigned char ucSlot = 0;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData(pPed);
@@ -1701,7 +1701,7 @@ int CLuaFunctionDefinitions::GetPedAmmoInClip ( lua_State* luaVM )
 int CLuaFunctionDefinitions::GetPedTotalAmmo ( lua_State* luaVM )
 {
     CPed* pPed;
-    unsigned char ucSlot;
+    unsigned char ucSlot = 0;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData(pPed);
@@ -4099,7 +4099,7 @@ int CLuaFunctionDefinitions::GiveVehicleSirens ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::GetVehicleMaxPassengers ( lua_State* luaVM )
 {
-    unsigned int uiModel; 
+    unsigned int uiModel = 0; 
     
     CScriptArgReader argStream ( luaVM );
     
@@ -11016,6 +11016,15 @@ int CLuaFunctionDefinitions::DbPoll ( lua_State* luaVM )
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pJobData );
     argStream.ReadNumber ( uiTimeout );
+
+    if ( !argStream.HasErrors () )
+    {
+        // Extra input validation
+        if ( pJobData->stage > EJobStage::RESULT )
+            argStream.SetCustomError( "Previous dbPoll already returned result" );
+        if ( pJobData->result.bIgnoreResult )
+            argStream.SetCustomError( "Cannot call dbPoll after dbFree" );
+    }
 
     if ( !argStream.HasErrors () )
     {

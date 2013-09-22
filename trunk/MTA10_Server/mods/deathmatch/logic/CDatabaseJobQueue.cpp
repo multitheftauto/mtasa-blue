@@ -352,27 +352,29 @@ bool CDatabaseJobQueueImpl::PollCommand ( CDbJobData* pJobData, uint uiTimeout )
     shared.m_Mutex.Lock ();
     while ( true )
     {
-        // Remove ignored before checking
+        // Should not be called for ignored results
+        dassert ( !pJobData->result.bIgnoreResult );
 
-        if ( !pJobData->result.bIgnoreResult )
+        // Should not be called for collected results
+        dassert ( pJobData->stage != EJobStage::FINISHED );
+
+        // See if result has come in yet
+        if ( ListContains( shared.m_ResultQueue, pJobData ) )
         {
-            if ( ListContains( shared.m_ResultQueue, pJobData ) )
+            ListRemove( shared.m_ResultQueue, pJobData );
+
+            pJobData->stage = EJobStage::FINISHED;
+            MapInsert ( m_FinishedList, pJobData );
+
+            // Do callback incase any cleanup is needed
+            if ( pJobData->HasCallback () )
             {
-                ListRemove( shared.m_ResultQueue, pJobData );
-
-                pJobData->stage = EJobStage::FINISHED;
-                MapInsert ( m_FinishedList, pJobData );
-
-                // Do callback incase any cleanup is needed
-                if ( pJobData->HasCallback () )
-                {
-                    shared.m_Mutex.Unlock ();                 
-                    pJobData->ProcessCallback ();              
-                    shared.m_Mutex.Lock ();
-                }
-
-                bFound = true;
+                shared.m_Mutex.Unlock ();                 
+                pJobData->ProcessCallback ();              
+                shared.m_Mutex.Lock ();
             }
+
+            bFound = true;
         }
 
         if ( bFound || uiTimeout == 0 )
