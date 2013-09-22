@@ -376,11 +376,10 @@
 */
 #if defined(LUA_USE_APICHECK)
 /////////////////////////////////////////////////////////////////////////
-// MTA addition for testing if apicheck (and assert) will function as expected
-    #ifndef NDEBUG
-        #include <assert.h>
-        LUA_API int luaX_is_apicheck_enabled();
-    #endif
+// MTA addition for testing if apicheck will function as expected, and generating more useful crash dumps
+    #undef assert
+    #define assert(_Expression) (void)( (!!(_Expression)) || ( *((int*)NULL) = 0) )
+    LUA_API int luaX_is_apicheck_enabled();
 /////////////////////////////////////////////////////////////////////////
 #define luai_apicheck(L,o)	{ (void)L; assert(o); }
 #else

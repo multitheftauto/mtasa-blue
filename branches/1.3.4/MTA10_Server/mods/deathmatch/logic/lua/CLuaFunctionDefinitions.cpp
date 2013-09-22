@@ -11525,6 +11525,15 @@ int CLuaFunctionDefinitions::DbPoll ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
+        // Extra input validation
+        if ( pJobData->stage > EJobStage::RESULT )
+            argStream.SetCustomError( "Previous dbPoll already returned result" );
+        if ( pJobData->result.bIgnoreResult )
+            argStream.SetCustomError( "Cannot call dbPoll after dbFree" );
+    }
+
+    if ( !argStream.HasErrors () )
+    {
         if ( !g_pGame->GetDatabaseManager ()->QueryPoll ( pJobData, uiTimeout ) )
         {
             // Not ready yet
