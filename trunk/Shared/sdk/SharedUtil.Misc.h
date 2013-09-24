@@ -1399,6 +1399,40 @@ namespace SharedUtil
 
     ///////////////////////////////////////////////////////////////
     //
+    // CRefCountableST
+    //
+    // Reference counting base class
+    //
+    ///////////////////////////////////////////////////////////////
+    class CRefCountableST
+    {
+        int                     m_iRefCount;
+    protected:
+        virtual ~CRefCountableST  ( void ) {}
+    public:
+
+        CRefCountableST ( void ) : m_iRefCount ( 1 ) {}
+
+        void AddRef ( void )
+        {
+            ++m_iRefCount;
+        }
+
+        void Release ( void )
+        {
+            assert ( m_iRefCount > 0 );
+            bool bLastRef = --m_iRefCount == 0;
+
+            if ( !bLastRef )
+                return;
+
+            delete this;
+        }
+    };
+
+
+    ///////////////////////////////////////////////////////////////
+    //
     // CRefCountable
     //
     // Thread safe reference counting base class
