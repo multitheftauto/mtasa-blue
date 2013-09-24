@@ -90,6 +90,11 @@ class CLuaMain;
 class CMapEventManager;
 typedef CFastList < CClientEntity* > CChildListType;
 
+// List of elements which is auto deleted when the last user calls Release()
+class CElementListSnapshot : public std::vector < CClientEntity* >, public CRefCountableST
+{
+};
+
 enum eCClientEntityClassTypes
 {
     CLASS_CClientEntity,
@@ -183,6 +188,7 @@ public:
 
     CChildListType ::const_iterator             IterBegin               ( void )                    { return m_Children.begin (); }
     CChildListType ::const_iterator             IterEnd                 ( void )                    { return m_Children.end (); }
+    CElementListSnapshot*                       GetChildrenListSnapshot ( void );
 
     inline ElementID                            GetID                   ( void )                    { return m_ID; };
     void                                        SetID                   ( ElementID ID );
@@ -312,6 +318,8 @@ protected:
     CClientManager*                             m_pManager;
     CClientEntity*                              m_pParent;
     CChildListType                              m_Children;
+    CElementListSnapshot*                       m_pChildrenListSnapshot;
+    uint                                        m_uiChildrenListSnapshotRevision;
 
     CCustomData*                                m_pCustomData;
 

@@ -50,6 +50,11 @@
 typedef CFastList < CElement* > CChildListType;
 typedef CFastList < CElement* > CElementListType;
 
+// List of elements which is auto deleted when the last user calls Release()
+class CElementListSnapshot : public std::vector < CElement* >, public CRefCountableST
+{
+};
+
 class CElement
 {
     friend class CPerPlayerEntity;
@@ -148,6 +153,7 @@ public:
     CChildListType ::const_iterator             IterEnd                     ( void )                        { return m_Children.end (); };
     CChildListType ::const_reverse_iterator     IterReverseBegin            ( void )                        { return m_Children.rbegin (); };
     CChildListType ::const_reverse_iterator     IterReverseEnd              ( void )                        { return m_Children.rend (); };
+    CElementListSnapshot*                       GetChildrenListSnapshot     ( void );
 
     static uint                                 GetTypeHashFromString       ( const SString& strTypeName );
     EElementType                                GetType                     ( void )                        { return m_iType; };
@@ -248,6 +254,8 @@ protected:
     std::string                                 m_strTypeName;
     std::string                                 m_strName;
     CChildListType                              m_Children;
+    CElementListSnapshot*                       m_pChildrenListSnapshot;
+    uint                                        m_uiChildrenListSnapshotRevision;
 
     std::list < class CPerPlayerEntity* >       m_ElementReferenced;
     std::list < class CColShape* >              m_Collisions;
