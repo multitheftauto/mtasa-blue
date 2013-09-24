@@ -173,6 +173,7 @@ CClientEntity::~CClientEntity ( void )
         CClientEntityRefManager::OnEntityDelete ( this );
 
     g_pClientGame->GetGameEntityXRefManager ()->OnClientEntityDelete ( this );
+    SAFE_RELEASE( m_pChildrenListSnapshot );
     g_pCore->GetGraphics ()->GetRenderItemManager ()->RemoveClientEntityRefs ( this );
     g_pCore->UpdateDummyProgress();
 }
@@ -1615,4 +1616,31 @@ float CClientEntity::GetDistanceBetweenBoundingSpheres ( CClientEntity* pOther )
     CSphere sphere = GetWorldBoundingSphere ();
     CSphere otherSphere = pOther->GetWorldBoundingSphere ();
     return ( sphere.vecPosition - otherSphere.vecPosition ).Length () - sphere.fRadius - otherSphere.fRadius;
+}
+
+//
+// Ensure children list snapshot is up to date and return it
+//
+CElementListSnapshot* CClientEntity::GetChildrenListSnapshot( void )
+{
+    // See if list needs updating
+    if ( m_Children.GetRevision() != m_uiChildrenListSnapshotRevision || m_pChildrenListSnapshot == NULL )
+    {
+        m_uiChildrenListSnapshotRevision = m_Children.GetRevision();
+
+        // Detach old
+        SAFE_RELEASE( m_pChildrenListSnapshot );
+
+        // Make new
+        m_pChildrenListSnapshot = new CElementListSnapshot();
+
+        // Fill it up
+        m_pChildrenListSnapshot->reserve( m_Children.size() );
+        for ( CChildListType::const_iterator iter = m_Children.begin() ; iter != m_Children.end() ; iter++ )
+        {
+            m_pChildrenListSnapshot->push_back( *iter );
+        }
+    }
+
+    return m_pChildrenListSnapshot;
 }
