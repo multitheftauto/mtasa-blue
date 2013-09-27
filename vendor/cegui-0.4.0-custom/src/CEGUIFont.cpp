@@ -739,6 +739,11 @@ void Font::drawTextLine(const String& text, const Vector3& position, const Rect&
             CodepointMap::const_iterator pos_sub = d_sub_cp_map.find(text[c]);
             if ( pos_sub == d_sub_cp_map.end() )
             {
+// 5599 ////////////
+#pragma message("Assigned: Talidan")
+                if ( text[c] < 32 )
+                    continue;
+////////////////////
 		        pos = d_cp_map.find('*');
         		if (pos == end)
                 {
