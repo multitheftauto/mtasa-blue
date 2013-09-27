@@ -228,7 +228,8 @@ bool CLuaMain::LoadScriptFromBuffer ( const char* cpInBuffer, unsigned int uiInS
     }
 
     // If compiled script, make sure correct chunkname is embedded
-    EmbedChunkName( strNiceFilename, &cpBuffer, &uiSize );
+    if ( strNiceFilename != "(unknown)" )
+        EmbedChunkName( strNiceFilename, &cpBuffer, &uiSize );
 
     if ( m_luaVM )
     {
