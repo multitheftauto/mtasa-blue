@@ -259,7 +259,13 @@ int CLuaFunctionDefs::dxDrawImage ( lua_State* luaVM )
             return 1;
         }
         else
-            argStream.SetCustomError( "Can't load file" );
+        {
+            SString strFilename;
+            argStream.m_iIndex = 4;
+            if ( argStream.NextIsString () )
+                argStream.ReadString ( strFilename );
+            argStream.SetCustomError( SString( "Can't load file %s", *strFilename ) );
+        }
     }
     if ( argStream.HasErrors () )
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
