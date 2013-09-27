@@ -95,7 +95,7 @@ public:
     inline std::list < CResourceFile* >::iterator    IterEndResourceFiles     ( void )        { return m_ResourceFiles.end(); }
 
     void                    SetRemainingNoClientCacheScripts    ( unsigned short usRemaining ) { m_usRemainingNoClientCacheScripts = usRemaining; }
-    void                    LoadNoClientCacheScript         ( const char* chunk, unsigned int length );
+    void                    LoadNoClientCacheScript         ( const char* chunk, unsigned int length, const SString& strFilename );
     const SString&          GetMinServerReq                 ( void ) const                  { return m_strMinServerReq; }
     const SString&          GetMinClientReq                 ( void ) const                  { return m_strMinClientReq; }
     bool                    IsOOPEnabled                    ( void )                        { return m_bOOPEnabled; }
