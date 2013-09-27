@@ -915,10 +915,10 @@ int CResourceChecker::ReplaceFilesInZIP( const string& strOrigZip, const string&
                 fseek( pFile, 0, SEEK_SET );
 
                 // Load file into a buffer
-                buf = new char[ ulLength ];
+                buf = malloc( ulLength );
                 if ( fread ( buf, 1, ulLength, pFile ) != ulLength )
                 {
-                    delete [] buf;
+                    free( buf );
                     buf = NULL;
                 }
 
@@ -954,6 +954,8 @@ int CResourceChecker::ReplaceFilesInZIP( const string& strOrigZip, const string&
 
             if (zipCloseFileInZip(dzip/*, unzfi.uncompressed_size, unzfi.crc*/)!=UNZ_OK)
                 {free(extrafield); free(commentary); free(local_extra); free(buf); break;}
+
+            free( buf );
         }
 
         // Copy file in zip

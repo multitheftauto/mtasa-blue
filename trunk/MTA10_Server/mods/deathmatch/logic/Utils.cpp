@@ -357,6 +357,47 @@ bool IsValidFilePath ( const char *szDir )
     return true;
 }
 
+bool IsValidOrganizationPath ( const char *szDir )
+{
+    if ( szDir == NULL ) return false;
+
+    unsigned int uiLen = strlen ( szDir );
+
+    if ( uiLen > 0 && szDir [ uiLen - 1 ] == '/' ) // will return false if ending with an invalid character, mainly used for linux (#6871)
+        return false;
+
+    unsigned char c, c_d;
+    bool bInsideBraces = false;
+    
+    // iterate through the char array
+    for ( unsigned int i = 0; i < uiLen; i++ ) {
+        c = szDir[i];                                       // current character
+        c_d = ( i < ( uiLen - 1 ) ) ? szDir[i+1] : 0;       // one character ahead, if any
+
+        // Enforce braces around visible letters
+        if ( !bInsideBraces && IsVisibleCharacter ( c ) && c != '[' && c != ']' && c != '/' && c != '\\' )
+            return false;
+
+        if ( c == '[' )
+        {
+            if ( bInsideBraces ) return false; // Duplicate braces (e.g. "[hel[lo]world]")
+            else bInsideBraces = true;
+        }
+        else if ( c == ']' )
+        {
+            if ( !bInsideBraces ) return false; // Ending brace without opening brace (e.g. "hello]")
+            else bInsideBraces = false;
+        }
+        else if ( c == '/' || c == '\\' )
+        {
+            if ( bInsideBraces ) return false; // Slash within braches (e.g. "[hell/o]")
+        }
+    }
+
+    // Make sure we ended with closed braces
+    return !bInsideBraces;
+}
+
 unsigned int HexToInt ( const char * szHex )
 {
     unsigned int value = 0;

@@ -91,8 +91,12 @@ bool CGUIStaticImage_Impl::LoadFromTexture ( CGUITexture* pTexture )
 
     if ( m_pTexture && pTexture != m_pTexture )
     {
-        delete m_pTexture;
-        m_bCreatedTexture = false;
+        if ( m_bCreatedTexture )
+        {
+            delete m_pTexture;
+            m_pTexture = NULL;
+            m_bCreatedTexture = false;
+        }
     }
     
     m_pTexture = (CGUITexture_Impl *)pTexture;
@@ -141,6 +145,7 @@ void CGUIStaticImage_Impl::Clear ( void )
         {
             delete m_pTexture;
             m_pTexture = NULL;
+            m_bCreatedTexture = false;
         }
         m_pImage = NULL;
         m_pImageset = NULL;

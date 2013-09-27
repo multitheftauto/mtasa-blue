@@ -868,11 +868,19 @@ CResource* CResourceManager::CreateResource ( const SString& strNewResourceName,
     // Calculate destination location
     SString strDstAbsPath          = PathJoin ( g_pServerInterface->GetServerModPath (), "resources", strNewOrganizationalPath );
     SString strDstResourceLocation = PathJoin ( strDstAbsPath, strNewResourceName );
+    SString strRelResourceLocation = PathJoin ( strNewOrganizationalPath, strNewResourceName );
 
     // Does the resource name already exist?
     if ( GetResource ( strNewResourceName ) != NULL )
     {
         strOutStatus = SString ( "CreateResource - Could not create '%s' as the resource already exists\n", *strNewResourceName );
+        return NULL;
+    }
+    
+    // Is it a valid path?
+    if ( !IsValidFilePath ( strRelResourceLocation ) || !IsValidOrganizationPath ( strNewOrganizationalPath ) )
+    {
+        strOutStatus = SString ( "CreateResource - Could not create '%s' as the provided path is invalid", *strNewResourceName );
         return NULL;
     }
 
@@ -929,6 +937,7 @@ CResource* CResourceManager::CopyResource ( CResource* pSourceResource, const SS
     SString strDstOrganizationalPath = strNewOrganizationalPath.empty () ? strSrcOrganizationalPath : strNewOrganizationalPath;
     SString strDstAbsPath          = PathJoin ( g_pServerInterface->GetServerModPath (), "resources", strDstOrganizationalPath );
     SString strDstResourceLocation = PathJoin ( strDstAbsPath, strNewResourceName );
+    SString strRelResourceLocation = PathJoin ( strDstOrganizationalPath, strNewResourceName );
 
     // Is the source resource loaded
     if ( !pSourceResource->IsLoaded () )
@@ -948,6 +957,13 @@ CResource* CResourceManager::CopyResource ( CResource* pSourceResource, const SS
     if ( FileExists ( strDstResourceLocation ) || DirectoryExists ( strDstResourceLocation ) )
     {
         strOutStatus = SString ( "Could not copy '%s' as the file/directory '%s' already exists\n", *strSrcResourceName, *strNewResourceName );
+        return NULL;
+    }
+   
+    // Is it a valid path?
+    if ( !IsValidFilePath ( strRelResourceLocation ) || !IsValidOrganizationPath ( strDstOrganizationalPath ) )
+    {
+        strOutStatus = SString ( "Could not copy '%s' as the provided path is invalid", *strSrcResourceName );
         return NULL;
     }
 
@@ -1030,6 +1046,8 @@ CResource* CResourceManager::RenameResource ( CResource* pSourceResource, const 
     SString strDstOrganizationalPath = strNewOrganizationalPath.empty () ? strSrcOrganizationalPath : strNewOrganizationalPath;
     SString strDstAbsPath          = PathJoin ( g_pServerInterface->GetServerModPath (), "resources", strDstOrganizationalPath );
     SString strDstResourceLocation = PathJoin ( strDstAbsPath, strNewResourceName );
+    SString strRelResourceLocation = PathJoin ( strDstOrganizationalPath, strNewResourceName );
+
     if ( bIsZip )
         strDstResourceLocation = strDstResourceLocation.TrimEnd ( "\\" ).TrimEnd ( "/" ) + ".zip";
 
@@ -1051,6 +1069,13 @@ CResource* CResourceManager::RenameResource ( CResource* pSourceResource, const 
     if ( FileExists ( strDstResourceLocation ) || DirectoryExists ( strDstResourceLocation ) )
     {
         strOutStatus = SString ( "Could not rename to '%s' as the file/directory name already exists\n", *strNewResourceName );
+        return NULL;
+    }
+
+    // Is it a valid path?
+    if ( !IsValidFilePath ( strRelResourceLocation ) || !IsValidOrganizationPath ( strDstOrganizationalPath ) )
+    {
+        strOutStatus = SString ( "Could not rename to '%s' as the provided path is invalid", *strNewResourceName );
         return NULL;
     }
 

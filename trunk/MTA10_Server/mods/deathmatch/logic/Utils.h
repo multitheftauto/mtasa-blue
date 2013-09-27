@@ -55,6 +55,7 @@ double          GetRandomDouble             ( void );
 int             GetRandom                   ( int iLow, int iHigh );
 
 bool            IsValidFilePath             ( const char* szPath );
+bool            IsValidOrganizationPath     ( const char* szPath );
 
 unsigned int    HexToInt                    ( const char* szHex );
 bool            XMLColorToInt               ( const char* szColor, unsigned long& ulColor );
