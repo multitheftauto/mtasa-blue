@@ -1672,7 +1672,11 @@ CEGUI::Window* CGUI_Impl::GetMasterWindow ( CEGUI::Window* wnd )
 {
     // A titlebar should always return the parent (i.e. the frame window)
     if ( wnd->testClassName ( CEGUI::Titlebar::EventNamespace ) )
-         return wnd->getParent ();
+    {
+        if ( wnd->getParent () )
+            return wnd->getParent ();
+        return wnd;
+    }
 
     // if there's no CEGUI userdata, we deduce that it's not an MTA gui element
     if ( !wnd->getUserData() )
