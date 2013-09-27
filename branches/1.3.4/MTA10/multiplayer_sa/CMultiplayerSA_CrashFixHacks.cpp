@@ -1067,7 +1067,7 @@ inner:
 //////////////////////////////////////////////////////////////////////////////////////////
 void CMultiplayerSA::InitHooks_CrashFixHacks ( void )
 {
-    //EZHookInstall ( CrashFix_Misc1 );
+    EZHookInstall ( CrashFix_Misc1 );
     EZHookInstall ( CrashFix_Misc2 );
     //EZHookInstall ( CrashFix_Misc3 );
     EZHookInstall ( CrashFix_Misc4 );

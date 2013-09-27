@@ -388,26 +388,6 @@
 					/>
 				</FileConfiguration>
 			</File>
-			<Filter
-				Name="sockets"
-				>
-				<File
-					RelativePath=".\sockets\CTCPClientSocketImpl.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\sockets\CTCPImpl.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\sockets\CTCPServerSocketImpl.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\sockets\CTCPServerSocketImplManager.cpp"
-					>
-				</File>
-			</Filter>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -482,26 +462,6 @@
 				</File>
 			</Filter>
 			<Filter
-				Name="sockets"
-				>
-				<File
-					RelativePath=".\sockets\CTCPClientSocketImpl.h"
-					>
-				</File>
-				<File
-					RelativePath=".\sockets\CTCPImpl.h"
-					>
-				</File>
-				<File
-					RelativePath=".\sockets\CTCPServerSocketImpl.h"
-					>
-				</File>
-				<File
-					RelativePath=".\sockets\CTCPServerSocketImplManager.h"
-					>
-				</File>
-			</Filter>
-			<Filter
 				Name="sdk"
 				>
 				<File
@@ -527,30 +487,10 @@
 						RelativePath="..\sdk\core\CServerInterface.h"
 						>
 					</File>
-					<File
-						RelativePath="..\sdk\core\CTCP.h"
-						>
-					</File>
-					<File
-						RelativePath="..\sdk\core\CTCPClientSocket.h"
-						>
-					</File>
-					<File
-						RelativePath="..\sdk\core\CTCPServerSocket.h"
-						>
-					</File>
-					<File
-						RelativePath="..\sdk\core\CTCPSocket.h"
-						>
-					</File>
 				</Filter>
 				<Filter
 					Name="net"
 					>
-					<File
-						RelativePath="..\sdk\net\CLanBroadcastInterface.h"
-						>
-					</File>
 					<File
 						RelativePath="..\sdk\net\CNetHTTPDownloadManagerInterface.h"
 						>

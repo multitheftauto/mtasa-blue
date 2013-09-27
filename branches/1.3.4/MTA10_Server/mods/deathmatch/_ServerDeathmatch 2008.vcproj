@@ -1385,14 +1385,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\utils\CHTTPRequest.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\utils\CHTTPResponse.cpp"
-					>
-				</File>
-				<File
 					RelativePath="..\..\..\vendor\bochs\bochs_internal\crc32.cpp"
 					>
 					<FileConfiguration
@@ -1419,14 +1411,6 @@
 							UsePrecompiledHeader="0"
 						/>
 					</FileConfiguration>
-				</File>
-				<File
-					RelativePath=".\utils\CTCPClientSocketImpl.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\utils\CTCPImpl.cpp"
-					>
 				</File>
 				<File
 					RelativePath=".\utils\CZipMaker.cpp"
@@ -2666,7 +2650,7 @@
 					>
 				</File>
 				<File
-					RelativePath=".\utils\CHTTPResponse.h"
+					RelativePath=".\utils\CMasterServerAnnouncer.h"
 					>
 				</File>
 				<File

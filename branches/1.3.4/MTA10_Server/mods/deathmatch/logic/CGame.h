@@ -116,6 +116,8 @@ class CWeaponStatManager;
 class CBuildingRemovalManager;
 
 class CFunctionUseLogger;
+class COpenPortsTester;
+class CMasterServerAnnouncer;
 
 // Packet forward declarations
 class CCommandPacket;
@@ -365,7 +367,6 @@ public:
     inline int                  GetMoonSize                  ( void )        { return m_iMoonSize; }
     inline void                 SetMoonSize                  ( int iMoonSize ) { m_iMoonSize = iMoonSize; }
 
-    void                        PulseMasterServerAnnounce   ( bool bIsInitialAnnounce = false );
     void                        StartOpenPortsTest          ( void );
 
     bool                        IsServerFullyUp             ( void )        { return m_bServerFullyUp; }
@@ -551,9 +552,8 @@ private:
     //Clouds Enabled
     bool                        m_bCloudsEnabled;
 
-    long long                   m_llLastAnnounceTime;
-    long long                   m_llLastPushTime;
-    class COpenPortsTester*     m_pOpenPortsTester;
+    COpenPortsTester*           m_pOpenPortsTester;
+    CMasterServerAnnouncer*     m_pMasterServerAnnouncer;
 
     CLightsyncManager           m_lightsyncManager;
 

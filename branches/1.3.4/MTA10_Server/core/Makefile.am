@@ -41,12 +41,4 @@ core_la_SOURCES = \
 	CThreadCommandQueue.cpp \
 	CThreadCommandQueue.h \
 	ErrorCodes.h \
-	Server.cpp \
-	sockets/CTCPClientSocketImpl.cpp \
-	sockets/CTCPClientSocketImpl.h \
-	sockets/CTCPImpl.cpp \
-	sockets/CTCPImpl.h \
-	sockets/CTCPServerSocketImpl.cpp \
-	sockets/CTCPServerSocketImpl.h \
-	sockets/CTCPServerSocketImplManager.cpp \
-	sockets/CTCPServerSocketImplManager.h
+	Server.cpp
