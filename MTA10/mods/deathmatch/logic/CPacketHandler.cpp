@@ -4893,6 +4893,10 @@ void CPacketHandler::Packet_ResourceClientScripts ( NetBitStreamInterface& bitSt
         {
             for ( unsigned int i = 0; i < usScriptCount; ++i )
             {
+                SString strFilename = "(unknown)";
+                if ( bitStream.Version() >= 0x50 )
+                    bitStream.ReadString( strFilename );
+
                 // Read the script compressed chunk
                 unsigned int len;
                 if ( !bitStream.Read ( len ) || len < 4 )
@@ -4914,7 +4918,7 @@ void CPacketHandler::Packet_ResourceClientScripts ( NetBitStreamInterface& bitSt
                 if ( uncompress ( (Bytef *)uncompressedBuffer, &originalLength, (const Bytef *)&data[4], len-4 ) == Z_OK )
                 {
                     // Load the script!
-                    pResource->LoadNoClientCacheScript ( uncompressedBuffer, originalLength );
+                    pResource->LoadNoClientCacheScript ( uncompressedBuffer, originalLength, strFilename );
                 }
 
                 memset ( uncompressedBuffer, 0, originalLength );

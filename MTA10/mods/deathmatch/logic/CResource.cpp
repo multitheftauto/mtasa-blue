@@ -413,12 +413,12 @@ SString CResource::GetResourceDirectoryPath ( eAccessType accessType, const SStr
 }
 
 
-void CResource::LoadNoClientCacheScript ( const char* chunk, unsigned int len )
+void CResource::LoadNoClientCacheScript ( const char* chunk, unsigned int len, const SString& strFilename )
 {
     if ( m_usRemainingNoClientCacheScripts > 0 )
     {
         --m_usRemainingNoClientCacheScripts;
-        GetVM()->LoadScriptFromBuffer ( chunk, len, "(unknown)" );
+        GetVM()->LoadScriptFromBuffer ( chunk, len, strFilename );
 
         if ( m_usRemainingNoClientCacheScripts == 0 && m_bLoadAfterReceivingNoClientCacheScripts )
         {
