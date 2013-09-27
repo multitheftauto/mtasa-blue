@@ -220,6 +220,7 @@ void lua_pushelement ( lua_State* luaVM, CElement* pElement )
         ElementID ID = pElement->GetID ();
         if ( ID != INVALID_ELEMENT_ID )
         {
+#pragma message( "Assigned to: lil_Toady" )
     #if REMOVE_WHEN_FIXED
             lua_pushuserdata ( luaVM, "Element", (void*) reinterpret_cast<unsigned int *>(ID.Value()) );
     #else
