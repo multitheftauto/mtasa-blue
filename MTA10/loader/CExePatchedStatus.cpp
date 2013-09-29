@@ -552,6 +552,9 @@ bool GetPatchRequirementAltModules( void )
             }
         }
         bDone = true;
+
+        if ( bMismatch )
+            WriteDebugEvent( "PatchRequirementAltModules: Need to use alt modules" );
     }
     return bMismatch;
 }
@@ -566,9 +569,10 @@ bool GetPatchRequirementAltModules( void )
 //////////////////////////////////////////////////////////
 struct SSearchInfo
 {
+    uint uiOffsetStart;
+    uint uiSearchSize;
     const char* szOldName;
     const char* szNewName;
-    bool bHasNewName;
     uint uiFileOffset;
 };
 
@@ -581,28 +585,27 @@ EPatchResult UpdatePatchStatusAltModules( const SString& strGTAEXEPath, EPatchMo
 {
     // List of names to check/change
     SSearchInfo searchList[] = {
-                    { "vorbisfile.dll", "vvof.dll", false, 0, },
-                    { "eax.dll",        "vea.dll",  false, 0, },
+                    { 0x4a0000, 0x3000, "vorbisfile.dll", "vvof.dll", 0, },
+                    { 0x4a0000, 0x3000, "eax.dll",        "vea.dll",  0, },
+                    { 0xD96000, 0x7000, "vorbisfile.dll", "vvof.dll", 0, },
+                    { 0xD96000, 0x7000, "eax.dll",        "vea.dll",  0, },
                 };
 
-    const uint uiOffsetStart = 0x4a0000;
-    const uint uiSearchSize = 0x3000;
     uint uiNumOldNames = 0;
     uint uiNumNewNames = 0;
 
     FILE* fh = fopen ( strGTAEXEPath, "rb" );
     if ( fh )
     {
-        if ( !fseek ( fh, uiOffsetStart, SEEK_SET ) )
+        for ( uint i = 0 ; i < NUMELMS( searchList ) ; i++ )
         {
-            std::vector < char > buffer;
-            buffer.resize( uiSearchSize );
-            if ( fread ( &buffer[0], uiSearchSize, 1, fh ) == 1 )
+            SSearchInfo& item = searchList[i];
+            if ( !fseek ( fh, item.uiOffsetStart, SEEK_SET ) )
             {
-                for ( uint i = 0 ; i < NUMELMS( searchList ) ; i++ )
+                std::vector < char > buffer;
+                buffer.resize( item.uiSearchSize );
+                if ( fread ( &buffer[0], item.uiSearchSize, 1, fh ) == 1 )
                 {
-                    SSearchInfo& item = searchList[i];
-
                     std::vector < char >::iterator it;
                     it = std::search( buffer.begin(), buffer.end(), item.szOldName, item.szOldName + strlen( item.szOldName ), SearchPredicate );
                     if ( it != buffer.end() )
@@ -615,7 +618,6 @@ EPatchResult UpdatePatchStatusAltModules( const SString& strGTAEXEPath, EPatchMo
                         if ( it != buffer.end() )
                         {
                             uiNumNewNames++;
-                            item.bHasNewName = true;
                         }
                     }
 
@@ -623,7 +625,7 @@ EPatchResult UpdatePatchStatusAltModules( const SString& strGTAEXEPath, EPatchMo
                     {
                         char* p0 = &buffer[0];
                         char* p1 = &(*it);
-                        item.uiFileOffset = uiOffsetStart + (uint)p1 - (uint)p0;
+                        item.uiFileOffset = item.uiOffsetStart + (uint)p1 - (uint)p0;
                     }
                 }
             }
@@ -639,8 +641,13 @@ EPatchResult UpdatePatchStatusAltModules( const SString& strGTAEXEPath, EPatchMo
         return PATCH_CHECK_RESULT_OFF;
     }
 
-    if ( ( mode == PATCH_SET_ON && uiNumOldNames == 2 )
-      || ( mode == PATCH_SET_OFF && uiNumNewNames == 2 ) )
+    if ( uiNumOldNames + uiNumNewNames != 4 )
+    {
+        WriteDebugEvent( SString ( "UpdatePatchStatusAltModules: Can't find module names (%d,%d)", uiNumOldNames, uiNumNewNames ) );
+    }
+
+    if ( ( mode == PATCH_SET_ON && uiNumOldNames > 0 )
+      || ( mode == PATCH_SET_OFF && uiNumNewNames > 0 ) )
     {
         // Change needed!
 
@@ -668,6 +675,9 @@ EPatchResult UpdatePatchStatusAltModules( const SString& strGTAEXEPath, EPatchMo
             }
         }
         fclose ( fh );
+
+        if ( mode == PATCH_SET_ON )
+            WriteDebugEvent( SString ( "UpdatePatchStatusAltModules: Now using alt modules (%d,%d)", uiNumOldNames, uiNumNewNames ) );
     }
 
     return PATCH_SET_RESULT_OK;
