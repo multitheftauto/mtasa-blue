@@ -248,6 +248,7 @@ public:
 
     bool                        IsDying                     ( void );
     bool                        IsDead                      ( void );
+    inline void                 SetIsDead                   ( bool bDead ) { m_bDead = bDead; };
     void                        Kill                        ( eWeaponType weaponType, unsigned char ucBodypart, bool bStealth = false, bool bSetDirectlyDead = false, AssocGroupId animGroup = 0, AnimationId animID = 15 );
     void                        StealthKill                 ( CClientPed * pPed );
     void                        BeHit                       ( CClientPed* pClientPedAttacker, ePedPieceTypes hitBodyPart, int hitBodySide, int weaponId );
@@ -554,6 +555,7 @@ public:
     bool                        m_bUsesCollision;
     float                       m_fHealth;
     float                       m_fArmor;
+    bool                        m_bDead;
     bool                        m_bWorldIgnored;
     float                       m_fCurrentRotation;
     float                       m_fMoveSpeed;
