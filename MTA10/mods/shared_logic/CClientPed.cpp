@@ -137,6 +137,7 @@ void CClientPed::Init ( CClientManager* pManager, unsigned long ulModelID, bool 
     m_bUsesCollision = true;
     m_fHealth = 100.0f;
     m_fArmor = 0.0f;
+    m_bDead = false;
     m_bWorldIgnored = false;
     m_fCurrentRotation = 0.0f;
     m_fMoveSpeed = 0.0f;
@@ -1590,6 +1591,9 @@ void CClientPed::SetHealth ( float fHealth )
 
     InternalSetHealth ( fHealth );
     m_fHealth = fHealth;
+
+    if ( m_fHealth > 0.0f )
+        m_bDead = false;
 }
 
 
@@ -1725,8 +1729,9 @@ bool CClientPed::IsDead ( void )
                 return true;
             }
         }
+        return false;
     }
-    return false;
+    return m_bDead;
 }
 
 void CClientPed::BeHit ( CClientPed* pClientPedAttacker, ePedPieceTypes hitBodyPart, int hitBodySide, int weaponId )
@@ -1797,6 +1802,8 @@ void CClientPed::Kill ( eWeaponType weaponType, unsigned char ucBodypart, bool b
 
     // Stop pressing buttons
     SetControllerState ( CControllerState () );
+
+    m_bDead = true;
 }
 
 
