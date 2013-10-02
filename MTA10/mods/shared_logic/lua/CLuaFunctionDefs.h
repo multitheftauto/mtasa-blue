@@ -197,7 +197,6 @@ public:
     LUA_DECLARE ( IsPlayerNametagShowing );
     LUA_DECLARE ( GetPlayerPing );
     LUA_DECLARE ( GetPlayerTeam );
-    LUA_DECLARE ( IsPlayerDead );
     LUA_DECLARE ( GetPlayerMoney );
     LUA_DECLARE ( GetPlayerWantedLevel );
     
@@ -259,6 +258,7 @@ public:
     LUA_DECLARE ( GetWeaponProperty );
     LUA_DECLARE ( GetOriginalWeaponProperty );
     LUA_DECLARE ( GetPedOxygenLevel );
+    LUA_DECLARE ( IsPedDead );
 
     LUA_DECLARE ( SetPedRotation );
     LUA_DECLARE ( SetPedCanBeKnockedOffBike );

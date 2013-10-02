@@ -1438,6 +1438,29 @@ int CLuaFunctionDefs::GetPedOxygenLevel ( lua_State* luaVM )
 }
 
 
+int CLuaFunctionDefs::IsPedDead ( lua_State* luaVM )
+{
+//  bool isPedDead ( ped thePed )
+    CClientPed* pPed;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pPed );
+
+    if ( !argStream.HasErrors () )
+    {
+        // Grab his dead state and return it
+        bool bDead = pPed->IsDead ();
+        lua_pushboolean ( luaVM, bDead );
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+
+    // Failed
+    lua_pushnil ( luaVM );
+    return 1;
+}
+
+
 int CLuaFunctionDefs::AddPedClothes ( lua_State* luaVM )
 {
     // Verify the argument

@@ -281,6 +281,7 @@ namespace
                 { false, "setPedFrozen",                   "setElementFrozen" },
                 { false, "setVehicleFrozen",               "setElementFrozen" },
                 { false, "setObjectStatic",                "setElementFrozen" },
+                { false, "isPlayerDead",                   "isPedDead" },
                 // Edit
                 { false, "guiEditSetCaratIndex",           "guiEditSetCaretIndex" },
                 // XML
