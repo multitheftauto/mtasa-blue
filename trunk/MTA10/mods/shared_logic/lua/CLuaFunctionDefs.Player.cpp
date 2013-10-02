@@ -210,29 +210,6 @@ int CLuaFunctionDefs::GetPlayerTeam ( lua_State* luaVM )
 }
 
 
-int CLuaFunctionDefs::IsPlayerDead ( lua_State* luaVM )
-{
-//  bool isPlayerDead ( player thePlayer )
-    CClientPlayer* pPlayer;
-
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pPlayer );
-
-    if ( !argStream.HasErrors () )
-    {
-        // Grab his dead state and return it
-        bool bDead = pPlayer->IsDead ();
-        lua_pushboolean ( luaVM, bDead );
-        return 1;
-    }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
-
-    // Failed
-    lua_pushnil ( luaVM );
-    return 1;
-}
-
 int CLuaFunctionDefs::GetPlayerMoney ( lua_State* luaVM )
 {
     long lMoney;
