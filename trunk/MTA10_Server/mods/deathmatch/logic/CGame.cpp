@@ -540,6 +540,21 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     // Encrypt crash dumps for uploading
     HandleCrashDumpEncryption();
 
+    // Check Windows server is using correctly compiled Lua dll
+    #ifndef MTA_DEBUG
+        #ifdef WIN32
+            HMODULE hModule = LoadLibrary( "lua5.1s.dll" );
+            // Release server should not have this function
+            PVOID pFunc = static_cast < PVOID > ( GetProcAddress ( hModule, "luaX_is_apicheck_enabled" ) );
+            FreeLibrary( hModule );
+            if ( pFunc )
+            {
+                CLogger::ErrorPrintf( "Problem with Lua dll\n" );
+                return false;
+            }
+        #endif
+    #endif
+
     // Read some settings
     m_pACLManager->SetFileName ( m_pMainConfig->GetAccessControlListFile ().c_str () );
     const SString strServerIP = m_pMainConfig->GetServerIP ();

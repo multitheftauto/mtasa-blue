@@ -690,7 +690,7 @@ SectionGroup /e "$(INST_SEC_SERVER)" SECGSERVER
 		
 		SetOverwrite on
 		File "${SERVER_FILES_ROOT}\mods\deathmatch\deathmatch.dll"
-		File "${SERVER_FILES_ROOT}\mods\deathmatch\lua5.1.dll"
+		File "${SERVER_FILES_ROOT}\mods\deathmatch\lua5.1s.dll"
 		File "${SERVER_FILES_ROOT}\mods\deathmatch\pcre3.dll"
 		File "${SERVER_FILES_ROOT}\mods\deathmatch\sqlite3.dll"
 		File "${SERVER_FILES_ROOT}\mods\deathmatch\dbconmy.dll"
@@ -933,7 +933,7 @@ Section Uninstall
 
 	; server files
 	Delete "$INSTDIR\server\mods\deathmatch\deathmatch.dll"
-	Delete "$INSTDIR\server\mods\deathmatch\lua5.1.dll"
+	Delete "$INSTDIR\server\mods\deathmatch\lua5.1s.dll"
 	Delete "$INSTDIR\server\mods\deathmatch\pcre3.dll"
 	Delete "$INSTDIR\server\mods\deathmatch\pthreadVC2.dll"
 	Delete "$INSTDIR\server\mods\deathmatch\sqlite3.dll"
