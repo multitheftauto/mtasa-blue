@@ -70,14 +70,14 @@
 				Name="VCLinkerTool"
 				OutputFile="C:\Program Files\MTA San Andreas 1.4\mods\deathmatch\lua5.1c_d.dll"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="../lib"
+				AdditionalLibraryDirectories=""
 				ModuleDefinitionFile=""
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(OutDir)/lua5.1c.pdb"
 				SubSystem="2"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="0"
-				ImportLibrary="../lib/lua5.1c_d.lib"
+				ImportLibrary="../lib/lua5.1c_dll/lua5.1c_d.lib"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -155,7 +155,7 @@
 				Name="VCLinkerTool"
 				OutputFile="C:\Program Files\MTA San Andreas 1.4\mods\deathmatch\lua5.1c.dll"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="../lib"
+				AdditionalLibraryDirectories=""
 				ModuleDefinitionFile=""
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="../../../symbols/$(ConfigurationName)_$(SafeInputName).pdb"
@@ -167,7 +167,7 @@
 				EnableCOMDATFolding="2"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="0"
-				ImportLibrary="../lib/lua5.1c.lib"
+				ImportLibrary="../lib/lua5.1c_dll/lua5.1c.lib"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -244,7 +244,7 @@
 				Name="VCLinkerTool"
 				OutputFile="..\..\..\output\MTA San Andreas\mods\deathmatch\lua5.1c.dll"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="../lib"
+				AdditionalLibraryDirectories=""
 				ModuleDefinitionFile=""
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="../../../symbols/$(ConfigurationName)_$(SafeInputName).pdb"
@@ -256,7 +256,7 @@
 				EnableCOMDATFolding="2"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="0"
-				ImportLibrary="../lib/lua5.1c.lib"
+				ImportLibrary="../lib/lua5.1c_dll/lua5.1c.lib"
 				TargetMachine="1"
 			/>
 			<Tool
