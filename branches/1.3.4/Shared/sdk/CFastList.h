@@ -46,9 +46,9 @@ public:
 
 
     CFastList ( void )
-        : uiNextFrontIndex ( UINT_MAX / 2 - 1 )
+        : uiRevision ( 1 )
+        , uiNextFrontIndex ( UINT_MAX / 2 - 1 )
         , uiNextBackIndex ( UINT_MAX / 2 )
-        , uiRevision ( 1 )
     {
         // T must be a pointer
         void* ptr = (T)NULL;

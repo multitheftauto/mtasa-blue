@@ -81,7 +81,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "json", "..\vendor\json-c\js
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libpng", "..\vendor\libpng\projects\vs2008\libpng.vcproj", "{0008960E-E0DD-41A6-8265-00B31DDB4C21}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lua5.1_dll", "..\vendor\lua\mak.vs2008\lua5.1_dll.vcproj", "{8EEECEE6-A6EC-BC48-8E76-22B87825444B}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lua5.1s_dll", "..\vendor\lua\mak.vs2008\lua5.1s_dll.vcproj", "{8EEECEE6-A6EC-BC48-8E76-22B87825444B}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lua5.1c_dll", "..\vendor\lua\mak.vs2008\lua5.1c_dll.vcproj", "{7922DB76-1413-4113-A2BE-88FD233E910D}"
 EndProject
