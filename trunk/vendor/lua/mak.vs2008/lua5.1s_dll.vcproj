@@ -68,7 +68,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="C:\Program Files\MTA San Andreas 1.4\server\mods\deathmatch\lua5.1s_d.dll"
+				OutputFile="C:\Program Files\MTA San Andreas 1.4\server\mods\deathmatch\lua5.1_d.dll"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories=""
 				ModuleDefinitionFile=""
@@ -153,7 +153,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="C:\Program Files\MTA San Andreas 1.4\server\mods\deathmatch\lua5.1s.dll"
+				OutputFile="C:\Program Files\MTA San Andreas 1.4\server\mods\deathmatch\lua5.1.dll"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories=""
 				ModuleDefinitionFile=""
@@ -242,7 +242,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="..\..\..\output\MTA San Andreas\server\mods\deathmatch\lua5.1s.dll"
+				OutputFile="..\..\..\output\MTA San Andreas\server\mods\deathmatch\lua5.1.dll"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories=""
 				ModuleDefinitionFile=""
