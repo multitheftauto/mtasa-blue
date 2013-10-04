@@ -10,7 +10,6 @@
 *****************************************************************************/
 
 extern HINSTANCE g_hInstance;
-extern HANDLE g_hMutex;
 
 enum ePathResult
 {
@@ -46,11 +45,12 @@ void            ShowSplash                          ( HINSTANCE hInstance );
 void            HideSplash                          ( void );
 
 bool            CommandLineContains                 ( const SString& strText );
-long            DisplayErrorMessageBox              ( const SString& strMessage, const SString& strErrorCode = "", const SString& strTroubleType = "" );
+void            DisplayErrorMessageBox              ( const SString& strMessage, const SString& strErrorCode = "", const SString& strTroubleType = "" );
 
 void            SetMTASAPathSource                  ( bool bReadFromRegistry );
-SString         GetMTASAPath                        ( bool bReadFromRegistry = true );
-ePathResult     GetGamePath                         ( SString& strOutResult, bool bFindIfMissing = false );
+SString         GetMTASAPath                        ( void );
+ePathResult     DiscoverGTAPath                     ( bool bFindIfMissing );
+SString         GetGTAPath                          ( void );
 SString         GetMTASAModuleFileName              ( void );
 
 void            ShowProgressDialog                  ( HINSTANCE hInstance, const SString& strTitle, bool bAllowCancel = false );

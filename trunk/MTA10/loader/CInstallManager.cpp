@@ -149,14 +149,6 @@ void CInstallManager::InitSequencer ( void )
                 CR "            IF LastResult == ok GOTO initial: "
                 CR "            CALL Quit "
                 CR " "
-                CR "post_install: "                                 // *** Starts here when NSIS installer is nearly complete
-                CR "            CALL HandlePostNsisInstall "
-                CR "            CALL Quit "
-                CR " "
-                CR "pre_uninstall: "                                // *** Starts here when NSIS uninstaller is starting
-                CR "            CALL HandlePreNsisUninstall "
-                CR "            CALL Quit "
-                CR " "
                 CR "launch: ";
 
 
@@ -175,8 +167,29 @@ void CInstallManager::InitSequencer ( void )
     m_pSequencer->AddFunction ( "ChangeFromAdmin",         &CInstallManager::_ChangeFromAdmin );
     m_pSequencer->AddFunction ( "InstallNewsItems",        &CInstallManager::_InstallNewsItems );
     m_pSequencer->AddFunction ( "Quit",                    &CInstallManager::_Quit );
-    m_pSequencer->AddFunction ( "HandlePostNsisInstall",   &CInstallManager::_HandlePostNsisInstall );
-    m_pSequencer->AddFunction ( "HandlePreNsisUninstall",  &CInstallManager::_HandlePreNsisUninstall );
+}
+
+
+//////////////////////////////////////////////////////////
+//
+// CInstallManager::SetMTASAPathSource
+//
+// Figure out and set the path that GetMTASAPath() should use
+//
+//////////////////////////////////////////////////////////
+void CInstallManager::SetMTASAPathSource ( const SString& strCommandLineIn  )
+{
+    // Update some settings which are used by ReportLog
+    UpdateSettingsForReportLog ();
+
+    InitSequencer ();
+    RestoreSequencerFromSnapshot ( strCommandLineIn );
+
+    // If command line says we're not running from the launch directory, get the launch directory location from the registry
+    if ( m_pSequencer->GetVariable ( INSTALL_LOCATION ) == "far" )
+        ::SetMTASAPathSource ( true );
+    else
+        ::SetMTASAPathSource ( false );
 }
 
 
@@ -187,24 +200,8 @@ void CInstallManager::InitSequencer ( void )
 // Process next step
 //
 //////////////////////////////////////////////////////////
-SString CInstallManager::Continue ( const SString& strCommandLineIn  )
+SString CInstallManager::Continue ( void )
 {
-    ShowSplash ( g_hInstance );
-
-    // Update some settings which are used by ReportLog
-    UpdateSettingsForReportLog ();
-    ClearPendingBrowseToSolution ();
-
-    // Restore sequencer
-    InitSequencer ();
-    RestoreSequencerFromSnapshot ( strCommandLineIn );
-
-    // If command line says we're not running from the launch directory, get the launch directory location from the registry
-    if ( m_pSequencer->GetVariable ( INSTALL_LOCATION ) == "far" )
-        SetMTASAPathSource ( true );
-    else
-        SetMTASAPathSource ( false );
-
     // Initial report line
     DWORD dwProcessId = GetCurrentProcessId();
     SString GotPathFrom = ( m_pSequencer->GetVariable ( INSTALL_LOCATION ) == "far" ) ? "registry" : "module location";
@@ -796,35 +793,4 @@ SString CInstallManager::_Quit ( void )
 {
     ExitProcess ( 0 );
     //return "ok";
-}
-
-
-//////////////////////////////////////////////////////////
-//
-// CInstallManager::_HandlePostNsisInstall
-//
-//
-//
-//////////////////////////////////////////////////////////
-SString CInstallManager::_HandlePostNsisInstall ( void )
-{
-    if ( !CheckService ( CHECK_SERVICE_POST_INSTALL ) )
-        return "fail";
-    return "ok";
-}
-
-
-//////////////////////////////////////////////////////////
-//
-// CInstallManager::_HandlePreNsisUninstall
-//
-//
-//
-//////////////////////////////////////////////////////////
-SString CInstallManager::_HandlePreNsisUninstall ( void )
-{
-    // stop & delete service
-    if ( !CheckService ( CHECK_SERVICE_PRE_UNINSTALL ) )
-        return "fail";
-    return "ok";
 }

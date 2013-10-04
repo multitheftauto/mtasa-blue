@@ -641,13 +641,25 @@ void SharedUtil::WriteErrorEvent( const SString& strText )
     WriteEvent( "[Error]", strText );
 }
 
+void SharedUtil::BeginEventLog( void )
+{
+    // Cycle now if flag requires it
+    if ( GetApplicationSettingInt(  "no-cycle-event-log" ) == 0 )
+    {
+        SetApplicationSettingInt( "no-cycle-event-log", 1 );
+        SString strPathFilename = CalcMTASAPath( PathJoin( "mta", "logfile.txt" ) );
+        SString strPathFilenamePrev = CalcMTASAPath( PathJoin( "mta", "logfile_old.txt" ) );
+        FileDelete( strPathFilenamePrev );
+        FileRename( strPathFilename, strPathFilenamePrev );
+        FileDelete( strPathFilename );
+    }
+    WriteDebugEvent( "BeginEventLog" );
+}
+
 void SharedUtil::CycleEventLog( void )
 {
-    SString strPathFilename = CalcMTASAPath( PathJoin( "mta", "logfile.txt" ) );
-    SString strPathFilenamePrev = CalcMTASAPath( PathJoin( "mta", "logfile_old.txt" ) );
-    FileDelete( strPathFilenamePrev );
-    FileRename( strPathFilename, strPathFilenamePrev );
-    FileDelete( strPathFilename );
+    // Set flag to cycle on next start
+    SetApplicationSettingInt( "no-cycle-event-log", 0 );
 }
 
 ///////////////////////////////////////////////////////////////////////////
