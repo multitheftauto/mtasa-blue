@@ -13,778 +13,102 @@
 *****************************************************************************/
 
 #include "StdInc.h"
-#include "direct.h"
 #if defined(_DEBUG) 
     #include "SharedUtil.Tests.hpp"
 #endif
-SString strCoreDLL;
-CLocalizationInterface* g_pLocalization;
-int DoLaunchGame ( LPSTR lpCmdLine );
-int LaunchGame ( LPSTR lpCmdLine );
 
-HINSTANCE g_hLauncherInstance = NULL;
-HINSTANCE g_hInstance = NULL;
 
 ///////////////////////////////////////////////////////////////
 //
-// WinMain
+// DoWinMain
 //
 // 'MTA San Andreas.exe' is launched as a subprocess under the following circumstances:
 //      1. During install with /kdinstall command (as admin)
 //      2. During uninstall with /kduninstall command (as admin)
 //      3. By 'MTA San Andreas.exe' when temporary elevated privileges are required (as admin)
-//      4. By 'MTA San Andreas.exe' during auto-update (Which may then call it again as admin)
+//      4. By 'MTA San Andreas.exe' during auto-update (in a temporary directory somewhere) (Which may then call it again as admin)
 //
 ///////////////////////////////////////////////////////////////
-int WINAPI WinMain ( HINSTANCE _hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow )
+extern "C" _declspec(dllexport)
+int DoWinMain ( HINSTANCE hLauncherInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow )
 {
-    g_hLauncherInstance = _hInstance;
 #if defined(_DEBUG) 
     SharedUtil_Tests ();
 #endif
 
-    const SString strMTASAPath = GetMTASAPath ( false );
-
-    //////////////////////////////////////////////////////////
     //
-    // Check for and load core.dll for localization
+    // Init
     //
-    strCoreDLL = strMTASAPath + "\\mta\\" + MTA_DLL_NAME;
 
-    // Check if the core (mta_blue.dll or mta_blue_d.dll exists)
-    if ( !FileExists ( strCoreDLL ) )
-    {
-        DisplayErrorMessageBox ( ("Load failed.  Please ensure that "
-                            "the file core.dll is in the modules "
-                            "directory within the MTA root directory."), _E("CL23"), "core-missing" ); // Core.dll missing
+    // Let install manager figure out what MTASA path to use
+    GetInstallManager()->SetMTASAPathSource( lpCmdLine );
 
-        return 1;
-    }
+    // Start logging.....now
+    BeginEventLog();
 
-    SetDllDirectory( SString ( strMTASAPath + "\\mta" ) );
+    // Start localization
+    InitLocalization();
 
-    // See if xinput is loadable (XInput9_1_0.dll is core.dll dependency)
-    HMODULE hXInputModule = LoadLibrary( "XInput9_1_0.dll" );
-    if ( hXInputModule )
-        FreeLibrary( hXInputModule );
-    else
-    {
-        // If not, do hack to use dll supplied with MTA
-        SString strDest = PathJoin( strMTASAPath, "mta", "XInput9_1_0.dll" );
-        if ( !FileExists( strDest ) )
-        {
-            SString strSrc = PathJoin( strMTASAPath, "mta", "XInput9_1_0_mta.dll" );       
-            FileCopy( strSrc, strDest );
-        }
-    }
+    // Handle commands from the installer
+    HandleSpecialLaunchOptions();
 
-    // Check if the core can be loaded - failure may mean msvcr90.dll or d3dx9_40.dll etc is not installed
-    HMODULE hCoreModule = LoadLibrary( strCoreDLL );
-    if ( hCoreModule == NULL )
-    {
-        DisplayErrorMessageBox ( ("Loading core failed.  Please ensure that \n"
-                            "Microsoft Visual C++ 2008 SP1 Redistributable Package (x86) \n"
-                            "and the latest DirectX is correctly installed."), _E("CL24"), "vc-redist-missing" );  // Core.dll load failed.  Ensure VC++ Redists and DX are installed
-        return 1;
-    }
+    // Check MTA is launched only once
+    HandleDuplicateLaunching();
 
-    // Grab our locale from the registry if possible, if not Windows
-    SString strLocale = GetApplicationSetting ( "locale" );
-    if ( strLocale.empty() )
-    {
-        setlocale(LC_ALL, "");
-        char* szLocale = setlocale(LC_ALL, NULL);
-        strLocale = szLocale;
-    }
+    // Show logo
+    ShowSplash( g_hInstance );
 
-    typedef CLocalizationInterface* (__cdecl *FUNC_CREATELOCALIZATIONFROMENVIRONMENT)(SString strLocale);
-    FUNC_CREATELOCALIZATIONFROMENVIRONMENT pFunc = (FUNC_CREATELOCALIZATIONFROMENVIRONMENT)GetProcAddress ( hCoreModule, "L10n_CreateLocalization" );
-    g_pLocalization = pFunc(strLocale);
-    if ( g_pLocalization == NULL )
-    {
-        DisplayErrorMessageBox ( ("Loading core failed.  Please ensure that \n"
-                            "Microsoft Visual C++ 2008 SP1 Redistributable Package (x86) \n"
-                            "and the latest DirectX is correctly installed."), _E("CL26"), "vc-redist-missing" );  // Core.dll load failed.  Ensure VC++ Redists and DX are installed
-        FreeLibrary ( hCoreModule );
-        return 1;
-    }
+    // Other init stuff
+    ClearPendingBrowseToSolution();
 
-    //////////////////////////////////////////////////////////
-    // Handle service install request from the installer
-    if ( CommandLineContains( "/kdinstall" ) )
-    {
-        UpdateMTAVersionApplicationSetting( true );
-        if ( CheckService( CHECK_SERVICE_POST_INSTALL ) )
-            return 0;
-        return 1;
-    }
-
-    //////////////////////////////////////////////////////////
-    // Handle service uninstall request from the installer
-    if ( CommandLineContains( "/kduninstall" ) )
-    {
-        UpdateMTAVersionApplicationSetting( true );
-        if ( CheckService( CHECK_SERVICE_PRE_UNINSTALL ) )
-            return 0;
-        return 1;
-    }
-
-    //////////////////////////////////////////////////////////
-    // No run 4 sure check
-    if ( CommandLineContains( "/nolaunch" ) )
-    {
-        return 0;
-    }
-
-    //////////////////////////////////////////////////////////
-    //
-    // Handle duplicate launching, or running from mtasa:// URI ?
-    //
-    int iRecheckTimeLimit = 2000;
-    while ( ! CreateSingleInstanceMutex () )
-    {
-        if ( strcmp ( lpCmdLine, "" ) != 0 )
-        {
-            COPYDATASTRUCT cdStruct;
-
-            cdStruct.cbData = strlen(lpCmdLine)+1;
-            cdStruct.lpData = const_cast<char *>((lpCmdLine));
-            cdStruct.dwData = URI_CONNECT;
-
-            HWND hwMTAWindow = FindWindow( NULL, "MTA: San Andreas" );
-#ifdef MTA_DEBUG
-            if( hwMTAWindow == NULL )
-                hwMTAWindow = FindWindow( NULL, "MTA: San Andreas [DEBUG]" );
-#endif
-            if( hwMTAWindow != NULL )
-            {
-                SendMessage( hwMTAWindow,
-                            WM_COPYDATA,
-                            NULL,
-                            (LPARAM)&cdStruct );
-            }
-            else
-            {
-                if ( iRecheckTimeLimit > 0 )
-                {
-                    // Sleep a little bit and check the mutex again
-                    Sleep ( 500 );
-                    iRecheckTimeLimit -= 500;
-                    continue;
-                }
-                SString strMessage;
-                strMessage += _(    "Trouble restarting MTA:SA\n\n"
-                                    "If the problem persists, open Task Manager and\n"
-                                    "stop the 'gta_sa.exe' and 'Multi Theft Auto.exe' processes\n\n\n"
-                                    "Try to launch MTA:SA again?" );
-                if ( MessageBoxUTF8( 0, strMessage, _("Error")+_E("CL04"), MB_ICONERROR | MB_YESNO | MB_TOPMOST  ) == IDYES ) // Trouble restarting MTA:SA
-                {
-                    TerminateGTAIfRunning ();
-                    TerminateOtherMTAIfRunning ();
-                    ShellExecuteNonBlocking( "open", PathJoin ( GetMTASAPath ( false ), MTA_EXE_NAME ), lpCmdLine );
-                }
-                return 0;
-            }
-        }
-        else
-        {
-            if ( !IsGTARunning () && !IsOtherMTARunning () )
-            {
-                MessageBoxUTF8 ( 0, _("Another instance of MTA is already running.\n\nIf this problem persists, please restart your computer"), _("Error")+_E("CL05"), MB_ICONERROR | MB_TOPMOST  );
-            }
-            else
-            if ( MessageBoxUTF8( 0, _("Another instance of MTA is already running.\n\nDo you want to terminate it?"), _("Error")+_E("CL06"), MB_ICONERROR | MB_YESNO | MB_TOPMOST  ) == IDYES )
-            {
-                TerminateGTAIfRunning ();
-                TerminateOtherMTAIfRunning ();
-                ShellExecuteNonBlocking( "open", PathJoin ( GetMTASAPath ( false ), MTA_EXE_NAME ), lpCmdLine );
-            }
-        }
-        return 0;
-    }
 
     //
-    // Continue any install procedure
+    // Update
     //
-    SString strCmdLine = GetInstallManager ()->Continue ( lpCmdLine );
+
+    // Continue any update procedure
+    SString strCmdLine = GetInstallManager()->Continue();
+
 
     //
+    // Launch
+    //
+
+    // Setup/test various counters and flags for monitoring problems
+    PreLaunchWatchDogs();
+
+    // Stuff
+    HandleCustomStartMessage();
+    CycleEventLog();
+    BsodDetectionPreLaunch();
+    MaybeShowCopySettingsDialog ();
+
+    // Make sure GTA is not running
+    HandleIfGTAIsAlreadyRunning();
+
+    // Find GTA path to use
+    ValidateGTAPath();
+
+    // Ensure logo is showing
+    ShowSplash( g_hInstance );
+
+    // Check MTA files look good
+    CheckDataFiles();
+
     // Go for launch
+    int iReturnCode = LaunchGame( strCmdLine );
+
+    PostRunWatchDogs( iReturnCode );
+
     //
-    int iReturnCode = LaunchGame ( const_cast < char* > ( *strCmdLine ) );
+    // Quit
+    //
+
+    HandleOnQuitCommand();
+
+    // Maybe show help if trouble was encountered
+    ProcessPendingBrowseToSolution();
 
     AddReportLog ( 1044, SString ( "* End (%d)* pid:%d",  iReturnCode, GetCurrentProcessId() ) );
     return iReturnCode;
-}
-
-
-//////////////////////////////////////////////////////////
-//
-// HandleTrouble
-//
-//
-//
-//////////////////////////////////////////////////////////
-void HandleTrouble ( void )
-{
-    if ( CheckAndShowFileOpenFailureMessage () )
-        return;
-
-    int iResponse = MessageBoxUTF8 ( NULL, _("Are you having problems running MTA:SA?.\n\nDo you want to revert to an earlier version?"), "MTA: San Andreas"+_E("CL07"), MB_YESNO | MB_ICONERROR | MB_TOPMOST );
-    if ( iResponse == IDYES )
-    {
-        BrowseToSolution ( "crashing-before-gtagame", TERMINATE_PROCESS );
-    }
-}
-
-
-//////////////////////////////////////////////////////////
-//
-// HandleResetSettings
-//
-//
-//
-//////////////////////////////////////////////////////////
-void HandleResetSettings ( void )
-{
-    if ( CheckAndShowFileOpenFailureMessage () )
-        return;
-
-    char szResult[MAX_PATH] = "";
-    SHGetFolderPath( NULL, CSIDL_PERSONAL, NULL, 0, szResult );
-    SString strSettingsFilename = PathJoin ( szResult, "GTA San Andreas User Files", "gta_sa.set" );
-    SString strSettingsFilenameBak = PathJoin ( szResult, "GTA San Andreas User Files", "gta_sa_old.set" );
-
-    if ( FileExists ( strSettingsFilename ) )
-    {
-        int iResponse = MessageBoxUTF8 ( NULL, _("There seems to be a problem launching MTA:SA.\nResetting GTA settings can sometimes fix this problem.\n\nDo you want to reset GTA settings now?"), "MTA: San Andreas"+_E("CL08"), MB_YESNO | MB_ICONERROR | MB_TOPMOST );
-        if ( iResponse == IDYES )
-        {
-            FileDelete ( strSettingsFilenameBak );
-            FileRename ( strSettingsFilename, strSettingsFilenameBak );
-            FileDelete ( strSettingsFilename );
-            if ( !FileExists ( strSettingsFilename ) )
-            {
-                AddReportLog ( 4053, "Deleted gta_sa.set" );
-                MessageBoxUTF8 ( NULL, _("GTA settings have been reset.\n\nPress OK to continue."), "MTA: San Andreas", MB_OK | MB_ICONINFORMATION | MB_TOPMOST );
-            }
-            else
-            {
-                AddReportLog ( 5054, SString ( "Delete gta_sa.set failed with '%s'", *strSettingsFilename ) );
-                MessageBoxUTF8 ( NULL, SString ( _("File could not be deleted: '%s'"), *strSettingsFilename ), "Error"+_E("CL09"), MB_OK | MB_ICONERROR | MB_TOPMOST );
-            }
-        }
-    }
-    else
-    {
-        // No settings to delete, or can't find them
-        int iResponse = MessageBoxUTF8 ( NULL, _("Are you having problems running MTA:SA?.\n\nDo you want to see some online help?"), "MTA: San Andreas", MB_YESNO | MB_ICONERROR | MB_TOPMOST );
-        if ( iResponse == IDYES )
-        {
-            BrowseToSolution ( "crashing-before-gtalaunch", TERMINATE_PROCESS );
-        }
-    }
-}
-
-
-//////////////////////////////////////////////////////////
-//
-// HandleCustomStartMessage
-//
-//
-//
-//////////////////////////////////////////////////////////
-void HandleCustomStartMessage ( void )
-{
-    SString strStartMessage = GetApplicationSetting( "diagnostics", "start-message" );
-    SString strTrouble = GetApplicationSetting( "diagnostics", "start-message-trouble" );
-
-    if ( strStartMessage.empty() )
-        return;
-
-    SetApplicationSetting( "diagnostics", "start-message", "" );
-    SetApplicationSetting( "diagnostics", "start-message-trouble", "" );
-
-    if ( strTrouble.empty() )
-    {
-        MessageBoxUTF8 ( NULL, strStartMessage, "MTA: San Andreas", MB_OK | MB_ICONINFORMATION | MB_TOPMOST ); //!ACHTUNG: Where 2 localize?
-    }
-    else
-    {
-        BrowseToSolution ( strTrouble, ASK_GO_ONLINE | TERMINATE_IF_YES, strStartMessage ); //!ACHTUNG: Where 2 localize?
-    }
-}
-
-
-//////////////////////////////////////////////////////////
-//
-// LaunchGame
-//
-//
-//
-//////////////////////////////////////////////////////////
-int LaunchGame ( LPSTR lpCmdLine )
-{
-    //
-    // "L0" is opened before the launch sequence and is closed if MTA shutsdown with no error
-    // "L1" is opened before the launch sequence and is closed if GTA is succesfully started
-    // "CR1" is a counter which is incremented if GTA was not started and MTA shutsdown with an error
-    //
-    // "L2" is opened before the launch sequence and is closed if the GTA loading screen is shown
-    // "CR2" is a counter which is incremented at startup, if the previous run didn't make it to the loading screen
-    //
-    // "L3" is opened before the launch sequence and is closed if the GTA loading screen is shown, or a startup problem is handled elsewhere
-    //
-
-    // Check for unclean stop on previous run
-    if ( WatchDogIsSectionOpen ( "L0" ) )
-        WatchDogSetUncleanStop ( true );    // Flag to maybe do things differently if MTA exit code on last run was not 0
-    else
-        WatchDogSetUncleanStop ( false );
-
-    // Reset counter if gta game was run last time
-    if ( !WatchDogIsSectionOpen ( "L1" ) )
-        WatchDogClearCounter ( "CR1" );
-
-    // If crashed 3 times in a row before starting the game, do something
-    if ( WatchDogGetCounter ( "CR1" ) >= 3 )
-    {
-        WatchDogReset ();
-        HandleTrouble ();
-    }
-
-    // Check for possible gta_sa.set problems
-    if ( WatchDogIsSectionOpen ( "L2" ) )
-    {
-        WatchDogIncCounter ( "CR2" );       // Did not reach loading screen last time
-        WatchDogCompletedSection ( "L2" );
-    }
-    else
-        WatchDogClearCounter ( "CR2" );
-
-    // If didn't reach loading screen 5 times in a row, do something
-    if ( WatchDogGetCounter ( "CR2" ) >= 5 )
-    {
-        WatchDogClearCounter ( "CR2" );
-        HandleResetSettings ();
-    }
-
-    // Clear down freeze on quit detection
-    WatchDogCompletedSection( "Q0" );
-
-    WatchDogBeginSection ( "L0" );      // Gets closed if MTA exits with a return code of 0
-    WatchDogBeginSection ( "L1" );      // Gets closed when online game has started
-    SetApplicationSetting ( "diagnostics", "gta-fopen-fail", "" );
-    SetApplicationSetting ( "diagnostics", "last-crash-reason", "" );
-    SetApplicationSetting ( "diagnostics", "gta-fopen-last", "" );
-    HandleCustomStartMessage();
-
-    int iReturnCode = DoLaunchGame ( lpCmdLine );
-
-    if ( iReturnCode == 0 )
-    {
-        WatchDogClearCounter ( "CR1" );
-        WatchDogCompletedSection ( "L0" );
-    }
-
-    return iReturnCode;
-}
-
-
-//////////////////////////////////////////////////////////
-//
-// DoLaunchGame
-//
-//
-//
-//////////////////////////////////////////////////////////
-int DoLaunchGame ( LPSTR lpCmdLine )
-{
-    assert ( !CreateSingleInstanceMutex () );
-
-    CycleEventLog();
-    BsodDetectionPreLaunch();
-    const SString strMTASAPath = GetMTASAPath ();
-
-    //////////////////////////////////////////////////////////
-    //
-    // Handle GTA already running
-    //
-    if ( IsGTARunning () )
-    {
-        if ( MessageBoxUTF8 ( 0, _("An instance of GTA: San Andreas is already running. It needs to be terminated before MTA:SA can be started. Do you want to do that now?"), _("Information")+_E("CL10"), MB_YESNO | MB_ICONQUESTION | MB_TOPMOST ) == IDYES )
-        {
-            TerminateGTAIfRunning ();
-            if ( IsGTARunning () )
-            {
-                MessageBoxUTF8 ( 0, _("Unable to terminate GTA: San Andreas. If the problem persists, please restart your computer."), _("Information")+_E("CL11"), MB_OK | MB_ICONQUESTION | MB_TOPMOST );
-                return 1;
-            }       
-        }
-        else
-            return 0;
-    }
-
-    //////////////////////////////////////////////////////////
-    //
-    // Get path to GTASA
-    //
-    SString strGTAPath;
-    ePathResult iResult = GetGamePath ( strGTAPath, true );
-    if ( iResult == GAME_PATH_MISSING ) {
-        DisplayErrorMessageBox ( _("Registry entries are missing. Please reinstall Multi Theft Auto: San Andreas."), _E("CL12"), "reg-entries-missing" );
-        return 5;
-    }
-    else if ( iResult == GAME_PATH_UNICODE_CHARS ) {
-        DisplayErrorMessageBox ( _("The path to your installation of GTA: San Andreas contains unsupported (unicode) characters. Please move your Grand Theft Auto: San Andreas installation to a compatible path that contains only standard ASCII characters and reinstall Multi Theft Auto: San Andreas."), _E("CL13") );
-        return 5;
-    }
-    else if ( iResult == GAME_PATH_STEAM ) {
-        DisplayErrorMessageBox ( _("It appears you have a Steam version of GTA:SA, which is currently incompatible with MTASA.  You are now being redirected to a page where you can find information to resolve this issue."), _E("CL14") );
-        BrowseToSolution ( "downgrade-steam" );
-        return 5;
-    }
-
-    if ( strGTAPath.Contains ( ";" ) || strMTASAPath.Contains ( ";" ) )
-    {
-        DisplayErrorMessageBox (_( "The path to your installation of 'MTA:SA' or 'GTA: San Andreas'\n"
-                                   "contains a ';' (semicolon).\n\n"
-                                   " If you experience problems when running MTA:SA,\n"
-                                   " move your installation(s) to a path that does not contain a semicolon." ), _E("CL15") );
-    }
-
-    SetCurrentDirectory ( strMTASAPath );
-    SetDllDirectory( strMTASAPath );
-
-    //////////////////////////////////////////////////////////
-    //
-    // Show splash screen and wait 2 seconds
-    //
-    ShowSplash ( g_hInstance );
-
-    //////////////////////////////////////////////////////////
-    //
-    // Basic check for some essential files
-    //
-    const char* dataFilesFiles [] = { "\\MTA\\cgui\\images\\background_logo.png"
-                                     ,"\\MTA\\cgui\\images\\radarset\\up.png"
-                                     ,"\\MTA\\cgui\\images\\busy_spinner.png"
-                                     ,"\\MTA\\D3DX9_42.dll"
-                                     ,"\\MTA\\D3DCompiler_42.dll"
-                                     ,"\\MTA\\bass.dll"
-                                     ,"\\MTA\\bass_fx.dll"
-                                     ,"\\MTA\\tags.dll"
-                                     ,"\\MTA\\sa.dat"
-                                     ,"\\MTA\\pthreadVC2.dll"
-                                     ,"\\MTA\\XInput9_1_0_mta.dll"
-                                     ,"\\server\\pthreadVC2.dll"
-                                     ,"\\server\\mods\\deathmatch\\libmysql.dll"};
-
-    for ( uint i = 0 ; i < NUMELMS( dataFilesFiles ) ; i++ )
-    {
-        if ( !FileExists ( strMTASAPath + dataFilesFiles [ i ] ) )
-        {
-            return DisplayErrorMessageBox ( _("Load failed. Please ensure that the latest data files have been installed correctly."), _E("CL16"), "mta-datafiles-missing" );
-        }
-    }
-
-    if ( FileSize ( strMTASAPath + "\\MTA\\bass.dll" ) != 0x0001A440 )
-    {
-        return DisplayErrorMessageBox ( _("Load failed. Please ensure that the latest data files have been installed correctly."), _E("CL17"), "mta-datafiles-missing" );
-    }
-
-    // Check for client file
-    if ( !FileExists ( strMTASAPath + "\\" +  CHECK_DM_CLIENT_NAME ) )
-    {
-        return DisplayErrorMessageBox ( SString(_("Load failed. Please ensure that %s is installed correctly."),CHECK_DM_CLIENT_NAME), _E("CL18"), "client-missing" );
-    }
-
-    // Check for lua file
-    if ( !FileExists ( strMTASAPath + "\\" + CHECK_DM_LUA_NAME ) )
-    {
-        return DisplayErrorMessageBox ( SString(_("Load failed. Please ensure that %s is installed correctly."),CHECK_DM_LUA_NAME), _E("CL19"), "lua-missing" );
-    }
-
-    // Grab the MTA folder
-    SString strGTAEXEPath = strGTAPath + "\\" + MTA_GTAEXE_NAME;
-    SString strMtaDir = strMTASAPath + "\\mta";
-
-    // Make sure the gta executable exists
-    SetCurrentDirectory ( strGTAPath );
-    if ( !FileExists( strGTAEXEPath ) )
-    {
-        return DisplayErrorMessageBox ( SString ( _("Load failed. Could not find gta_sa.exe in %s."), strGTAPath.c_str () ), _E("CL20"), "gta_sa-missing" );
-    }
-
-    // Make sure important dll's do not exist in the wrong place
-    char* dllCheckList[] = { "xmll.dll", "cgui.dll", "netc.dll", "libcurl.dll" };
-    for ( int i = 0 ; i < NUMELMS ( dllCheckList ); i++ )
-    {
-        if ( FileExists( strGTAPath + "\\" + dllCheckList[i] ) )
-        {
-            return DisplayErrorMessageBox ( SString ( _("Load failed. %s exists in the GTA directory. Please delete before continuing."), dllCheckList[i] ), _E("CL21"), "file-clash" );
-        }    
-    }
-
-    // Check for asi files
-    {
-        bool bFoundInGTADir = !FindFiles( PathJoin( strGTAPath, "*.asi" ), true, false ).empty();
-        bool bFoundInMTADir = !FindFiles( PathJoin( strMTASAPath, "mta", "*.asi" ), true, false ).empty();
-        if ( bFoundInGTADir || bFoundInMTADir )
-        {
-            DisplayErrorMessageBox (_( ".asi files are in the 'MTA:SA' or 'GTA: San Andreas' installation directory.\n\n"
-                                       "Remove these .asi files if you experience problems with MTA:SA." ), _E("CL28") );
-        }
-    }
-
-    // Warning if d3d9.dll exists in the GTA install directory
-    if ( FileExists( PathJoin ( strGTAPath, "d3d9.dll" ) ) )
-    {
-        ShowD3dDllDialog ( g_hInstance, PathJoin ( strGTAPath, "d3d9.dll" ) );
-        HideD3dDllDialog ();
-    }
-
-    // Remove old log files saved in the wrong place
-    if ( strGTAPath.CompareI( strMtaDir ) == false )
-    {
-        FileDelete( PathJoin( strGTAPath, "CEGUI.log" ) );
-        FileDelete( PathJoin( strGTAPath, "logfile.txt" ) );
-        FileDelete( PathJoin( strGTAPath, "shutdown.log" ) );
-    }
-
-    // Strip out flag from command line
-    SString strCmdLine = lpCmdLine;
-    bool bDoneAdmin = strCmdLine.Contains ( "/done-admin" );
-    strCmdLine = strCmdLine.Replace ( " /done-admin", "" );
-
-    MaybeShowCopySettingsDialog ();
-    SetDllDirectory( SString ( strMTASAPath + "\\mta" ) );
-    CheckService ( CHECK_SERVICE_PRE_CREATE );
-
-    // Do some D3D dancing
-    BeginD3DStuff();
-
-    // Use renamed exe if required
-    strGTAEXEPath = GetInstallManager()->MaybeRenameExe( strGTAPath );
-
-    // Check for extra data files when using exe copy
-    if ( ShouldUseExeCopy() )
-    {
-        if ( !FileExists ( PathJoin( strMTASAPath, "MTA", "vea.dll" ) ) )
-        {
-            return DisplayErrorMessageBox ( _("Load failed. Please ensure that the latest data files have been installed correctly."), _E("CL16"), "mta-datafiles-missing" );
-        }
-    }
-
-    //////////////////////////////////////////////////////////
-    //
-    // Hook 'n' go
-    //
-    // Launch GTA using CreateProcess
-    PROCESS_INFORMATION piLoadee;
-    STARTUPINFO siLoadee;
-    memset( &piLoadee, 0, sizeof ( PROCESS_INFORMATION ) );
-    memset( &siLoadee, 0, sizeof ( STARTUPINFO ) );
-    siLoadee.cb = sizeof ( STARTUPINFO );
-
-    WatchDogBeginSection ( "L2" );      // Gets closed when loading screen is shown
-    WatchDogBeginSection ( "L3" );      // Gets closed when loading screen is shown, or a startup problem is handled elsewhere
-
-    // Start GTA
-    if ( 0 == _CreateProcessA( strGTAEXEPath,
-                              (LPSTR)*strCmdLine,
-                              NULL,
-                              NULL,
-                              FALSE,
-                              CREATE_SUSPENDED,
-                              NULL,
-                              strMtaDir,    //    strMTASAPath\mta is used so pthreadVC2.dll can be found
-                              &siLoadee,
-                              &piLoadee ) )
-    {
-        DWORD dwError = GetLastError ();
-        WriteDebugEvent( SString( "Loader - Process not created[%d]: %s", dwError, *strGTAEXEPath ) );
-
-        if ( dwError == ERROR_ELEVATION_REQUIRED && !bDoneAdmin )
-        {
-            // Try to relaunch as admin if not done so already
-            ReleaseSingleInstanceMutex ();
-            ShellExecuteNonBlocking( "runas", PathJoin ( strMTASAPath, MTA_EXE_NAME ), strCmdLine + " /done-admin" );            
-            return 5;
-        }
-        else
-        {
-            // Otherwise, show error message
-            SString strError = GetSystemErrorMessage ( dwError );            
-            DisplayErrorMessageBox ( SString(_("Could not start Grand Theft Auto: San Andreas.  "
-                                "Please try restarting, or if the problem persists,"
-                                "contact MTA at www.multitheftauto.com. \n\n[%s]"),*strError), _E("CL22"), "createprocess-fail;" + strError ); // Could not start GTA:SA
-            return 5;
-        }
-    }
-
-    WriteDebugEvent( SString( "Loader - Process created: %s", *strGTAEXEPath ) );
-    
-    // Inject the core into GTA
-    RemoteLoadLibrary ( piLoadee.hProcess, strCoreDLL );
-    WriteDebugEvent( SString( "Loader - Core injected: %s", *strCoreDLL ) );
-    
-    // Clear previous on quit commands
-    SetOnQuitCommand ( "" );
-
-    ShowSplash( g_hInstance );  // Bring splash to the front
-
-    // Resume execution for the game.
-    ResumeThread ( piLoadee.hThread );
-
-    if ( piLoadee.hThread)
-    {
-        WriteDebugEvent( "Loader - Waiting for L3 to close" );
-
-        BsodDetectionOnGameBegin();
-        // Show splash until game window is displayed (or max 20 seconds)
-        DWORD status;
-        for ( uint i = 0 ; i < 20 ; i++ )
-        {
-            status = WaitForSingleObject ( piLoadee.hProcess, 1000 );
-            if ( status != WAIT_TIMEOUT )
-                break;
-
-            if ( !WatchDogIsSectionOpen( "L3" ) )     // Gets closed when loading screen is shown
-            {
-                WriteDebugEvent( "Loader - L3 closed" );
-                break;
-            }
-        }
-
-        // Actually hide the splash
-        HideSplash ();
-
-        // If hasn't shown the loading screen and gta_sa.exe process memory usage is not changing, give user option to terminate
-        if ( status == WAIT_TIMEOUT )
-        {
-            CStuckProcessDetector stuckProcessDetector( piLoadee.hProcess, 5000 );
-            while ( status == WAIT_TIMEOUT && WatchDogIsSectionOpen( "L3" ) )     // Gets closed when loading screen is shown
-            {
-                if ( stuckProcessDetector.UpdateIsStuck() )
-                {
-                    WriteDebugEvent( "Detected stuck process at startup" );
-                    if ( MessageBoxUTF8 ( 0, _("GTA: San Andreas may not have launched correctly. Do you want to terminate it?"), _("Information")+_E("CL25"), MB_YESNO | MB_ICONQUESTION | MB_TOPMOST ) == IDYES )
-                    {
-                        WriteDebugEvent( "User selected process termination" );
-                        TerminateProcess ( piLoadee.hProcess, 1 );
-                    }
-                    break;
-                }
-                status = WaitForSingleObject( piLoadee.hProcess, 1000 );
-            }
-        }
-
-        // Wait for game to exit
-        WriteDebugEvent( "Loader - Wait for game to exit" );
-        while ( status == WAIT_TIMEOUT )
-        {
-            status = WaitForSingleObject( piLoadee.hProcess, 1500 );
-
-            // If core is closing and gta_sa.exe process memory usage is not changing, terminate
-            CStuckProcessDetector stuckProcessDetector( piLoadee.hProcess, 5000 );
-            while ( status == WAIT_TIMEOUT && WatchDogIsSectionOpen( "Q0" ) )     // Gets closed when quit has completed
-            {
-                if ( stuckProcessDetector.UpdateIsStuck() )
-                {
-                    WriteDebugEvent( "Detected stuck process at quit" );
-                    TerminateProcess( piLoadee.hProcess, 1 );
-                    status = WAIT_FAILED;
-                    break;
-                }
-                status = WaitForSingleObject( piLoadee.hProcess, 1000 );
-            }
-        }
-
-        BsodDetectionOnGameEnd();
-    }
-
-    WriteDebugEvent( "Loader - Finishing" );
-
-    EndD3DStuff();
-
-    // Get its exit code
-    DWORD dwExitCode = -1;
-    GetExitCodeProcess( piLoadee.hProcess, &dwExitCode );
-
-    // Terminate to be sure
-    TerminateProcess ( piLoadee.hProcess, 1 );
-
-    //////////////////////////////////////////////////////////
-    //
-    // On exit
-    //
-    // Cleanup and exit.
-    CloseHandle ( piLoadee.hProcess );
-    CloseHandle ( piLoadee.hThread );
-    ReleaseSingleInstanceMutex ();
-
-
-    //////////////////////////////////////////////////////////
-    //
-    // Handle OnQuitCommand
-    //
-    // Maybe spawn an exe
-    {
-        SetCurrentDirectory ( strMTASAPath );
-        SetDllDirectory( strMTASAPath );
-
-        SString strOnQuitCommand = GetRegistryValue ( "", "OnQuitCommand" );
-
-        std::vector < SString > vecParts;
-        strOnQuitCommand.Split ( "\t", vecParts );
-        if ( vecParts.size () > 4 && vecParts[0].length () )
-        {
-            SString strOperation = vecParts[0];
-            SString strFile = vecParts[1];
-            SString strParameters = vecParts[2];
-            SString strDirectory = vecParts[3];
-            SString strShowCmd = vecParts[4];
-
-            if ( strOperation == "restart" )
-            {
-                strOperation = "open";
-                strFile = strMTASAPath + "\\" + MTA_EXE_NAME;
-            }
-            else
-                CheckService ( CHECK_SERVICE_POST_GAME );     // Stop service here if quit command is not 'restart'
-
-            LPCTSTR lpOperation     = strOperation == "" ? NULL : strOperation.c_str ();
-            LPCTSTR lpFile          = strFile.c_str ();
-            LPCTSTR lpParameters    = strParameters == "" ? NULL : strParameters.c_str ();
-            LPCTSTR lpDirectory     = strDirectory == "" ? NULL : strDirectory.c_str ();
-            INT nShowCmd            = strShowCmd == "" ? SW_SHOWNORMAL : atoi( strShowCmd );
-
-            if ( lpOperation && lpFile )
-            {
-                ShellExecuteNonBlocking( lpOperation, lpFile, lpParameters, lpDirectory, nShowCmd );            
-            }
-        }
-        else
-            CheckService ( CHECK_SERVICE_POST_GAME );     // Stop service here if quit command is empty
-    }
-
-    // Maybe show help if trouble was encountered
-    ProcessPendingBrowseToSolution ();
-
-    // Success, maybe
-    return dwExitCode;
-}
-
-
-extern "C" _declspec(dllexport)
-int DoWinMain ( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow )
-{
-    return WinMain ( hInstance, hPrevInstance, lpCmdLine, nCmdShow );
-}
-
-int WINAPI DllMain(HINSTANCE hModule, DWORD dwReason, PVOID pvNothing)
-{
-    g_hInstance = hModule;
-    return TRUE;
 }

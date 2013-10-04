@@ -25,11 +25,13 @@ static HWND hwndSplash = NULL;
 static HWND hwndProgressDialog = NULL;
 static unsigned long ulProgressStartTime = 0;
 static SString g_strMTASAPath;
+static SString g_strGTAPath;
 static HWND hwndCrashedDialog = NULL;
 static HWND hwndD3dDllDialog = NULL;
 static HWND hwndOptimusDialog = NULL;
-HANDLE g_hMutex = NULL;
-HMODULE hLibraryModule = NULL;
+static HANDLE g_hMutex = NULL;
+static HMODULE hLibraryModule = NULL;
+HINSTANCE g_hInstance = NULL;
 
 HMODULE RemoteLoadLibrary(HANDLE hProcess, const char* szLibPath)
 {
@@ -709,14 +711,13 @@ bool CommandLineContains( const SString& strText )
 //
 // General error message box
 //
-long DisplayErrorMessageBox ( const SString& strMessage, const SString& strErrorCode, const SString& strTroubleType )
+void DisplayErrorMessageBox ( const SString& strMessage, const SString& strErrorCode, const SString& strTroubleType )
 {
     HideSplash ();
     MessageBoxUTF8( 0, strMessage, _("Error! (CTRL+C to copy)")+strErrorCode, MB_ICONEXCLAMATION|MB_OK | MB_TOPMOST );
 
     if ( strTroubleType != "" )
         BrowseToSolution ( strTroubleType, ASK_GO_ONLINE );
-    return 1;
 }
 
 
@@ -786,10 +787,10 @@ void SetMTASAPathSource ( bool bReadFromRegistry )
 }
 
 
-SString GetMTASAPath ( bool bReadFromRegistry )
+SString GetMTASAPath ( void )
 {
     if ( g_strMTASAPath == "" )
-        SetMTASAPathSource ( bReadFromRegistry );
+        SetMTASAPathSource ( false );
     return g_strMTASAPath;
 }
 
@@ -965,6 +966,34 @@ ePathResult GetGamePath ( SString& strOutResult, bool bFindIfMissing )
     // File found. Update registry.
     SetCommonRegistryValue ( "", "GTA:SA Path", strOutResult );
     return GAME_PATH_OK;
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// DiscoverGTAPath
+//
+// Find and cache GTA path
+//
+///////////////////////////////////////////////////////////////
+ePathResult DiscoverGTAPath ( bool bFindIfMissing )
+{
+    return GetGamePath ( g_strGTAPath, bFindIfMissing );
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// GetGTAPath
+//
+// 
+//
+///////////////////////////////////////////////////////////////
+SString GetGTAPath ( void )
+{
+    if ( g_strGTAPath == "" )
+        DiscoverGTAPath( false );
+    return g_strGTAPath;
 }
 
 
@@ -1285,7 +1314,7 @@ void ShowOptimusDialog( HINSTANCE hInstance )
     {
         // Restart required to apply change because of permissions
         SetApplicationSettingInt( "nvhacks", "optimus-dialog-skip", 1 );
-        ShellExecuteNonBlocking( "open", PathJoin ( GetMTASAPath ( false ), MTA_EXE_NAME ) );
+        ShellExecuteNonBlocking( "open", PathJoin ( GetMTASAPath (), MTA_EXE_NAME ) );
         TerminateProcess( GetCurrentProcess(), 0 );
     }
 }
@@ -2240,4 +2269,18 @@ void BsodDetectionOnGameBegin( void )
 void BsodDetectionOnGameEnd( void )
 {
     SetApplicationSetting( "diagnostics", "game-begin-time", "" );
+}
+
+
+//////////////////////////////////////////////////////////
+//
+// DllMain
+//
+// Used to save handle to loader dll, so we can get at the resources
+//
+//////////////////////////////////////////////////////////
+int WINAPI DllMain(HINSTANCE hModule, DWORD dwReason, PVOID pvNothing)
+{
+    g_hInstance = hModule;
+    return TRUE;
 }

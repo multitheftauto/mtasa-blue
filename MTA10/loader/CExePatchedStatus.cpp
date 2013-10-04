@@ -164,8 +164,8 @@ bool CopyExe( void )
 //////////////////////////////////////////////////////////
 SString GetExePathFilename( bool bUseExeCopy )
 {
-    SString strGTAPath;
-    if ( GetGamePath( strGTAPath ) == GAME_PATH_OK )
+    SString strGTAPath = GetGTAPath();
+    if ( !strGTAPath.empty() )
     {
         const char* szExeName = bUseExeCopy ? MTA_HTAEXE_NAME : MTA_GTAEXE_NAME;
         SString strGTAEXEPath = PathJoin( strGTAPath, szExeName );
@@ -532,8 +532,8 @@ bool GetPatchRequirementAltModules( void )
 
     if ( !bDone )
     {
-        SString strGTAPath;
-        if ( GetGamePath( strGTAPath ) == GAME_PATH_OK )
+        SString strGTAPath = GetGTAPath();
+        if ( !strGTAPath.empty() )
         {
             struct {
                 const char* szMd5;

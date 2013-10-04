@@ -140,6 +140,7 @@ bool CConnectManager::Connect ( const char* szHost, unsigned short usPort, const
     // Display the status box
     SString strBuffer ( _("Connecting to %s:%u ..."), m_strHost.c_str(), m_usPort );
     CCore::GetSingleton ().ShowMessageBox ( _("CONNECTING"), strBuffer, MB_BUTTON_CANCEL | MB_ICON_INFO, m_pOnCancelClick );
+    WriteDebugEvent( SString( "Connecting to %s:%u ...", m_strHost.c_str(), m_usPort ) );
     return true;
 }
 

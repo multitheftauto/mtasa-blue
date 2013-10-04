@@ -84,6 +84,7 @@ namespace SharedUtil
     SString         GetReportLogContents            ( void );
     void            WriteDebugEvent                 ( const SString& strText );
     void            WriteErrorEvent                 ( const SString& strText );
+    void            BeginEventLog                   ( void );
     void            CycleEventLog                   ( void );
 
     void            SetApplicationSetting           ( const SString& strPath, const SString& strName, const SString& strValue );

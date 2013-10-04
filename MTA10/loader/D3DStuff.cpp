@@ -10,8 +10,6 @@
 
 #include "StdInc.h"
 #include "d3d9.h"
-HWND CreateWindowForD3D( void );
-extern HINSTANCE g_hLauncherInstance;
 
 namespace
 {
@@ -178,53 +176,4 @@ void EndD3DStuff( void )
         SAFE_RELEASE( pD3DVertexDeclarations[i] );
     SAFE_RELEASE( pD3DDevice9 );
     SAFE_RELEASE( pD3D9 );
-}
-
-
-////////////////////////////////////////////////////////////////
-//
-// CreateWindowForD3D
-//
-//
-//
-////////////////////////////////////////////////////////////////
-HWND CreateWindowForD3D( void )
-{
-    DWORD dwStyle = WS_VISIBLE | WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX | WS_MAXIMIZEBOX;
-    int X = 10;
-    int Y = 10;
-    int XL = 100;
-    int YL = 100;
-    HWND Parent = NULL;
-    HINSTANCE hInstance = g_hLauncherInstance;
-
-    // Register class if required
-    const TCHAR* lpszClassName = "D3D window class";
-    {
-        WNDCLASS wcex;
-
-        wcex.style          = CS_HREDRAW | CS_VREDRAW;
-        wcex.lpfnWndProc    = (WNDPROC)DefWindowProc;
-        wcex.cbClsExtra     = 0;
-        wcex.cbWndExtra     = 0;
-        wcex.hInstance      = hInstance;
-        wcex.hIcon          = LoadIcon( NULL, IDI_APPLICATION );
-        wcex.hCursor        = LoadCursor( NULL, IDC_ARROW );
-        wcex.hbrBackground  = (HBRUSH)( COLOR_WINDOW + 1 );
-        wcex.lpszMenuName   = NULL;
-        wcex.lpszClassName  = lpszClassName;
-
-        // Returns null if already registered
-        RegisterClass(&wcex);
-    }
-
-    HWND hWnd = CreateWindowEx( WS_EX_APPWINDOW, lpszClassName, "D3D window", dwStyle, X, Y, XL, YL, Parent, NULL, hInstance, NULL );
-
-    if ( !hWnd )
-      return FALSE;
-
-   ShowWindow( hWnd, SW_SHOW );
-   UpdateWindow( hWnd );
-
-   return hWnd;
 }
