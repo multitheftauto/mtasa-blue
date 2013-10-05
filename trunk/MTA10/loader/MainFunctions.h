@@ -16,6 +16,7 @@ void    PreLaunchWatchDogs              ( void );
 void    PostRunWatchDogs                ( int iReturnCode );
 void    HandleIfGTAIsAlreadyRunning     ( void );
 void    ValidateGTAPath                 ( void );
+void    CheckAntiVirusStatus            ( void );
 void    CheckDataFiles                  ( void );
 int     LaunchGame                      ( SString strCmdLine );
 void    HandleOnQuitCommand             ( void );

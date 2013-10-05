@@ -9,6 +9,7 @@
 #include <shlwapi.h>
 #include <stdio.h>
 #include "shellapi.h"
+#include <Wscapi.h>
 
 #include <shlobj.h>
 #include <Psapi.h>
