@@ -31,6 +31,7 @@ public:
     virtual const SString&  GetLastErrorMessage     ( void );
     virtual uint            GetLastErrorCode        ( void );
     virtual uint            GetNumAffectedRows      ( void );
+    virtual uint64          GetLastInsertId         ( void );
     virtual void            AddRef                  ( void );
     virtual void            Release                 ( void );
     virtual bool            Query                   ( const SString& strQuery, CRegistryResult& registryResult );
@@ -50,6 +51,7 @@ public:
     SString                 m_strLastErrorMessage;
     uint                    m_uiLastErrorCode;
     uint                    m_uiNumAffectedRows;
+    uint64                  m_ullLastInsertId;
     bool                    m_bAutomaticTransactionsEnabled;
     bool                    m_bInAutomaticTransaction;
     CTickCount              m_AutomaticTransactionStartTime;
@@ -213,6 +215,19 @@ uint CDatabaseConnectionSqlite::GetNumAffectedRows ( void )
 
 ///////////////////////////////////////////////////////////////
 //
+// CDatabaseConnectionSqlite::GetLastInsertId
+//
+// Only valid when Query() returns true
+//
+///////////////////////////////////////////////////////////////
+uint64 CDatabaseConnectionSqlite::GetLastInsertId ( void )
+{
+    return m_ullLastInsertId;
+}
+
+
+///////////////////////////////////////////////////////////////
+//
 // CDatabaseConnectionSqlite::Query
 //
 //
@@ -311,6 +326,9 @@ bool CDatabaseConnectionSqlite::QueryInternal ( const SString& strQuery, CRegist
 
     // Number of affects rows/num of rows like MySql
     m_uiNumAffectedRows = pResult->nRows ? pResult->nRows : sqlite3_changes ( m_handle );
+
+    // Last insert id
+    m_ullLastInsertId = sqlite3_last_insert_rowid( m_handle );
 
     return true;
 }
