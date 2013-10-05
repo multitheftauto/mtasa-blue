@@ -711,6 +711,7 @@ void CDatabaseJobQueueImpl::ProcessQuery ( CDbJobData* pJobData )
     {
         pJobData->result.status = EJobResult::SUCCESS;
         pJobData->result.uiNumAffectedRows = pConnection->GetNumAffectedRows ();
+        pJobData->result.ullLastInsertId = pConnection->GetLastInsertId ();
     }
 
     // And log if required

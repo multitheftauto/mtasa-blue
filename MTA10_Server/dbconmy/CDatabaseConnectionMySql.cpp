@@ -33,6 +33,7 @@ public:
     virtual const SString&  GetLastErrorMessage     ( void );
     virtual uint            GetLastErrorCode        ( void );
     virtual uint            GetNumAffectedRows      ( void );
+    virtual uint64          GetLastInsertId         ( void );
     virtual void            AddRef                  ( void );
     virtual void            Release                 ( void );
     virtual bool            Query                   ( const SString& strQuery, CRegistryResult& registryResult );
@@ -53,6 +54,7 @@ public:
     SString                 m_strLastErrorMessage;
     uint                    m_uiLastErrorCode;
     uint                    m_uiNumAffectedRows;
+    uint64                  m_ullLastInsertId;
     int                     m_bAutomaticReconnect;
     int                     m_bAutomaticTransactionsEnabled;
     bool                    m_bInAutomaticTransaction;
@@ -239,6 +241,19 @@ uint CDatabaseConnectionMySql::GetNumAffectedRows ( void )
 
 ///////////////////////////////////////////////////////////////
 //
+// CDatabaseConnectionMySql::GetLastInsertId
+//
+// Only valid when Query() returns true
+//
+///////////////////////////////////////////////////////////////
+uint64 CDatabaseConnectionMySql::GetLastInsertId ( void )
+{
+    return m_ullLastInsertId;
+}
+
+
+///////////////////////////////////////////////////////////////
+//
 // CDatabaseConnectionMySql::Query
 //
 //
@@ -274,6 +289,7 @@ bool CDatabaseConnectionMySql::QueryInternal ( const SString& strQuery, CRegistr
     MYSQL_RES* res = mysql_store_result ( m_handle );
 
     m_uiNumAffectedRows = static_cast < uint > ( mysql_affected_rows ( m_handle ) );
+    m_ullLastInsertId = mysql_insert_id( m_handle );
 
     if ( !res )
     {
