@@ -356,6 +356,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\MainFunctions.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\StdInc.cpp"
 				>
 				<FileConfiguration
@@ -414,6 +418,10 @@
 			</File>
 			<File
 				RelativePath=".\Main.h"
+				>
+			</File>
+			<File
+				RelativePath=".\MainFunctions.h"
 				>
 			</File>
 			<File

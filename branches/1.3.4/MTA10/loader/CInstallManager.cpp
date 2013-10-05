@@ -149,14 +149,6 @@ void CInstallManager::InitSequencer ( void )
                 CR "            IF LastResult == ok GOTO initial: "
                 CR "            CALL Quit "
                 CR " "
-                CR "post_install: "                                 // *** Starts here when NSIS installer is nearly complete
-                CR "            CALL HandlePostNsisInstall "
-                CR "            CALL Quit "
-                CR " "
-                CR "pre_uninstall: "                                // *** Starts here when NSIS uninstaller is starting
-                CR "            CALL HandlePreNsisUninstall "
-                CR "            CALL Quit "
-                CR " "
                 CR "launch: ";
 
 
@@ -175,8 +167,29 @@ void CInstallManager::InitSequencer ( void )
     m_pSequencer->AddFunction ( "ChangeFromAdmin",         &CInstallManager::_ChangeFromAdmin );
     m_pSequencer->AddFunction ( "InstallNewsItems",        &CInstallManager::_InstallNewsItems );
     m_pSequencer->AddFunction ( "Quit",                    &CInstallManager::_Quit );
-    m_pSequencer->AddFunction ( "HandlePostNsisInstall",   &CInstallManager::_HandlePostNsisInstall );
-    m_pSequencer->AddFunction ( "HandlePreNsisUninstall",  &CInstallManager::_HandlePreNsisUninstall );
+}
+
+
+//////////////////////////////////////////////////////////
+//
+// CInstallManager::SetMTASAPathSource
+//
+// Figure out and set the path that GetMTASAPath() should use
+//
+//////////////////////////////////////////////////////////
+void CInstallManager::SetMTASAPathSource ( const SString& strCommandLineIn  )
+{
+    // Update some settings which are used by ReportLog
+    UpdateSettingsForReportLog ();
+
+    InitSequencer ();
+    RestoreSequencerFromSnapshot ( strCommandLineIn );
+
+    // If command line says we're not running from the launch directory, get the launch directory location from the registry
+    if ( m_pSequencer->GetVariable ( INSTALL_LOCATION ) == "far" )
+        ::SetMTASAPathSource ( true );
+    else
+        ::SetMTASAPathSource ( false );
 }
 
 
@@ -187,24 +200,8 @@ void CInstallManager::InitSequencer ( void )
 // Process next step
 //
 //////////////////////////////////////////////////////////
-SString CInstallManager::Continue ( const SString& strCommandLineIn  )
+SString CInstallManager::Continue ( void )
 {
-    ShowSplash ( g_hInstance );
-
-    // Update some settings which are used by ReportLog
-    UpdateSettingsForReportLog ();
-    ClearPendingBrowseToSolution ();
-
-    // Restore sequencer
-    InitSequencer ();
-    RestoreSequencerFromSnapshot ( strCommandLineIn );
-
-    // If command line says we're not running from the launch directory, get the launch directory location from the registry
-    if ( m_pSequencer->GetVariable ( INSTALL_LOCATION ) == "far" )
-        SetMTASAPathSource ( true );
-    else
-        SetMTASAPathSource ( false );
-
     // Initial report line
     DWORD dwProcessId = GetCurrentProcessId();
     SString GotPathFrom = ( m_pSequencer->GetVariable ( INSTALL_LOCATION ) == "far" ) ? "registry" : "module location";
@@ -312,7 +309,7 @@ SString CInstallManager::_ChangeToAdmin ( void )
 {
     if ( !IsUserAdmin () )
     {
-        MessageBox( NULL, SString ( "MTA:SA needs Administrator access for the following task:\n\n  '%s'\n\nPlease confirm in the next window.", *m_strAdminReason ), "Multi Theft Auto: San Andreas", MB_OK | MB_TOPMOST  );
+        MessageBoxUTF8( NULL, SString ( _("MTA:SA needs Administrator access for the following task:\n\n  '%s'\n\nPlease confirm in the next window."), *m_strAdminReason ), "Multi Theft Auto: San Andreas", MB_OK | MB_TOPMOST  );
         SetIsBlockingUserProcess ();
         ReleaseSingleInstanceMutex ();
         if ( ShellExecuteBlocking ( "runas", GetLauncherPathFilename (), GetSequencerSnapshot () ) )
@@ -326,7 +323,7 @@ SString CInstallManager::_ChangeToAdmin ( void )
         }
         CreateSingleInstanceMutex ();
         ClearIsBlockingUserProcess ();
-        MessageBox( NULL, SString ( "MTA:SA could not complete the following task:\n\n  '%s'\n", *m_strAdminReason ), "Multi Theft Auto: San Andreas", MB_OK | MB_TOPMOST  );
+        MessageBoxUTF8( NULL, SString ( _("MTA:SA could not complete the following task:\n\n  '%s'\n"), *m_strAdminReason ), "Multi Theft Auto: San Andreas"+_E("CL01"), MB_OK | MB_TOPMOST  );
     }
     return "fail";
 }
@@ -377,7 +374,7 @@ SString CInstallManager::_ShowCrashFailDialog ( void )
     SetApplicationSetting ( "diagnostics", "last-crash-reason", "" );
     if ( strReason == "direct3ddevice-reset" )
     {
-        strMessage += "** The crash was caused by a graphics driver error **\n\n** Please update your graphics drivers **";
+        strMessage += _("** The crash was caused by a graphics driver error **\n\n** Please update your graphics drivers **");
     }
     else
     {
@@ -488,7 +485,7 @@ SString CInstallManager::_InstallFiles ( void )
         else
             AddReportLog ( 5049, SString ( "_InstallFiles: Couldn't install files %s", "" ) );
 
-        m_strAdminReason = "Install updated MTA:SA files";
+        m_strAdminReason = _("Install updated MTA:SA files");
         return "fail";
     }
     else
@@ -509,7 +506,7 @@ SString CInstallManager::_InstallFiles ( void )
 //////////////////////////////////////////////////////////
 SString CInstallManager::_ShowCopyFailDialog ( void )
 {
-    int iResponse = MessageBox ( NULL, "Could not update due to file conflicts. Please close other applications and retry", "Error", MB_RETRYCANCEL | MB_ICONERROR | MB_TOPMOST  );
+    int iResponse = MessageBoxUTF8 ( NULL, _("Could not update due to file conflicts. Please close other applications and retry"), _("Error")+_E("CL02"), MB_RETRYCANCEL | MB_ICONERROR | MB_TOPMOST  );
     if ( iResponse == IDRETRY )
         return "retry";
     return "ok";
@@ -518,7 +515,7 @@ SString CInstallManager::_ShowCopyFailDialog ( void )
 
 void ShowLayoutError ( const SString& strExtraInfo )
 {
-    MessageBox ( 0, SString ( "Multi Theft Auto has not been installed properly, please reinstall. %s", *strExtraInfo ), "Error", MB_OK | MB_TOPMOST  );
+    MessageBoxUTF8 ( 0, SString ( _("Multi Theft Auto has not been installed properly, please reinstall. %s"), *strExtraInfo ), _("Error")+_E("CL03"), MB_OK | MB_TOPMOST  );
     TerminateProcess ( GetCurrentProcess (), 9 );
 }
 
@@ -719,7 +716,7 @@ SString CInstallManager::_ProcessServiceChecks ( void )
     {
         if ( !IsUserAdmin() )
         {
-            m_strAdminReason = "Update install settings";
+            m_strAdminReason = _("Update install settings");
             return "fail";
         }
     }
@@ -796,35 +793,4 @@ SString CInstallManager::_Quit ( void )
 {
     ExitProcess ( 0 );
     //return "ok";
-}
-
-
-//////////////////////////////////////////////////////////
-//
-// CInstallManager::_HandlePostNsisInstall
-//
-//
-//
-//////////////////////////////////////////////////////////
-SString CInstallManager::_HandlePostNsisInstall ( void )
-{
-    if ( !CheckService ( CHECK_SERVICE_POST_INSTALL ) )
-        return "fail";
-    return "ok";
-}
-
-
-//////////////////////////////////////////////////////////
-//
-// CInstallManager::_HandlePreNsisUninstall
-//
-//
-//
-//////////////////////////////////////////////////////////
-SString CInstallManager::_HandlePreNsisUninstall ( void )
-{
-    // stop & delete service
-    if ( !CheckService ( CHECK_SERVICE_PRE_UNINSTALL ) )
-        return "fail";
-    return "ok";
 }

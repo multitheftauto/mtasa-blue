@@ -15,6 +15,9 @@
 #include <tchar.h>
 #include <strsafe.h>
 #include <Tlhelp32.h>
+#include <Softpub.h>
+#include <wintrust.h>
+#pragma comment (lib, "wintrust")
 #define BUFSIZE 512
 
 static bool bCancelPressed = false;
@@ -25,11 +28,13 @@ static HWND hwndSplash = NULL;
 static HWND hwndProgressDialog = NULL;
 static unsigned long ulProgressStartTime = 0;
 static SString g_strMTASAPath;
+static SString g_strGTAPath;
 static HWND hwndCrashedDialog = NULL;
 static HWND hwndD3dDllDialog = NULL;
 static HWND hwndOptimusDialog = NULL;
-HANDLE g_hMutex = NULL;
-HMODULE hLibraryModule = NULL;
+static HANDLE g_hMutex = NULL;
+static HMODULE hLibraryModule = NULL;
+HINSTANCE g_hInstance = NULL;
 
 HMODULE RemoteLoadLibrary(HANDLE hProcess, const char* szLibPath)
 {
@@ -709,14 +714,13 @@ bool CommandLineContains( const SString& strText )
 //
 // General error message box
 //
-long DisplayErrorMessageBox ( const SString& strMessage, const SString& strTroubleType )
+void DisplayErrorMessageBox ( const SString& strMessage, const SString& strErrorCode, const SString& strTroubleType )
 {
     HideSplash ();
-    MessageBox( 0, strMessage, "Error! (CTRL+C to copy)", MB_ICONEXCLAMATION|MB_OK | MB_TOPMOST );
+    MessageBoxUTF8( 0, strMessage, _("Error! (CTRL+C to copy)")+strErrorCode, MB_ICONEXCLAMATION|MB_OK | MB_TOPMOST );
 
     if ( strTroubleType != "" )
-        BrowseToSolution ( strTroubleType, ASK_GO_ONLINE );
-    return 1;
+        BrowseToSolution ( strTroubleType, ASK_GO_ONLINE | TERMINATE_IF_YES );
 }
 
 
@@ -786,10 +790,10 @@ void SetMTASAPathSource ( bool bReadFromRegistry )
 }
 
 
-SString GetMTASAPath ( bool bReadFromRegistry )
+SString GetMTASAPath ( void )
 {
     if ( g_strMTASAPath == "" )
-        SetMTASAPathSource ( bReadFromRegistry );
+        SetMTASAPathSource ( false );
     return g_strMTASAPath;
 }
 
@@ -831,9 +835,9 @@ SString DoUserAssistedSearch ( void )
 {
     SString strResult;
 
-    ShowProgressDialog( g_hInstance, "Searching for Grand Theft Auto San Andreas", true );
+    ShowProgressDialog( g_hInstance, _("Searching for Grand Theft Auto San Andreas"), true );
 
-    while ( !UpdateProgress ( 0, 100, "Please start Grand Theft Auto San Andreas" ) )
+    while ( !UpdateProgress ( 0, 100, _("Please start Grand Theft Auto San Andreas") ) )
     {
         SString strPathFilename;
         // Check if user has started GTA
@@ -921,7 +925,8 @@ ePathResult GetGamePath ( SString& strOutResult, bool bFindIfMissing )
 
     // Ask user to browse for GTA
     BROWSEINFO bi = { 0 };
-    bi.lpszTitle = "Select your Grand Theft Auto: San Andreas Installation Directory";
+    SString strMessage = _("Select your Grand Theft Auto: San Andreas Installation Directory");
+    bi.lpszTitle = strMessage;
     LPITEMIDLIST pidl = SHBrowseForFolder ( &bi );
 
     if ( pidl != 0 )
@@ -964,6 +969,34 @@ ePathResult GetGamePath ( SString& strOutResult, bool bFindIfMissing )
     // File found. Update registry.
     SetCommonRegistryValue ( "", "GTA:SA Path", strOutResult );
     return GAME_PATH_OK;
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// DiscoverGTAPath
+//
+// Find and cache GTA path
+//
+///////////////////////////////////////////////////////////////
+ePathResult DiscoverGTAPath ( bool bFindIfMissing )
+{
+    return GetGamePath ( g_strGTAPath, bFindIfMissing );
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// GetGTAPath
+//
+// 
+//
+///////////////////////////////////////////////////////////////
+SString GetGTAPath ( void )
+{
+    if ( g_strGTAPath == "" )
+        DiscoverGTAPath( false );
+    return g_strGTAPath;
 }
 
 
@@ -1284,7 +1317,7 @@ void ShowOptimusDialog( HINSTANCE hInstance )
     {
         // Restart required to apply change because of permissions
         SetApplicationSettingInt( "nvhacks", "optimus-dialog-skip", 1 );
-        ShellExecuteNonBlocking( "open", PathJoin ( GetMTASAPath ( false ), MTA_EXE_NAME ) );
+        ShellExecuteNonBlocking( "open", PathJoin ( GetMTASAPath (), MTA_EXE_NAME ) );
         TerminateProcess( GetCurrentProcess(), 0 );
     }
 }
@@ -1667,7 +1700,7 @@ void UpdateMTAVersionApplicationSetting ( bool bQuiet )
     if ( !bQuiet )
     {
         SString strError = GetSystemErrorMessage ( GetLastError () );            
-        SString strMessage( "Error loading %s module! (%s)", *strFilename.ToLower (), *strError );
+        SString strMessage( _("Error loading %s module! (%s)"), *strFilename.ToLower (), *strError );
         BrowseToSolution ( strFilename + "-not-loadable", ASK_GO_ONLINE | TERMINATE_PROCESS, strMessage );
     }
 
@@ -1975,7 +2008,7 @@ void DirectoryCopy ( SString strSrcBase, SString strDestBase, bool bShowProgress
         bCheckFreeSpace = ( llFreeBytesAvailable < ( iMinFreeSpaceMB + 10000 ) * 0x100000LL );    // Only check if initial freespace is less than 10GB
 
     if ( bShowProgressDialog )
-        ShowProgressDialog( g_hInstance, "Copying files...", true );
+        ShowProgressDialog( g_hInstance, _("Copying files..."), true );
 
     strSrcBase = PathConform ( strSrcBase ).TrimEnd ( PATH_SEPERATOR );
     strDestBase = PathConform ( strDestBase ).TrimEnd ( PATH_SEPERATOR );
@@ -2035,15 +2068,15 @@ stop_copy:
         if ( toDoList.size () )
         {
             Sleep ( 1000 );
-            UpdateProgress ( (int)fUseProgress, 100, "Copy finished early. Everything OK." );
+            UpdateProgress ( (int)fUseProgress, 100, _("Copy finished early. Everything OK.") );
             Sleep ( 2000 );
         }
         else
         {
             fUseProgress = Max ( 90.f, fUseProgress );
-            UpdateProgress ( (int)fUseProgress, 100, "Finishing..." );
+            UpdateProgress ( (int)fUseProgress, 100, _("Finishing...") );
             Sleep ( 1000 );
-            UpdateProgress ( 100, 100, "Done!" );
+            UpdateProgress ( 100, 100, _("Done!") );
             Sleep ( 2000 );
         }
 
@@ -2082,10 +2115,12 @@ void MaybeShowCopySettingsDialog ( void )
 
     // Show dialog
     SString strMessage;
-    strMessage += "New installation of " + strCurrentVersion + " detected.\n";
-    strMessage += "\n";
-    strMessage += "Do you want to copy your settings from " + strPreviousVersion + " ?";
-    int iResponse = MessageBox ( NULL, strMessage, "MTA: San Andreas", MB_YESNO | MB_ICONQUESTION | MB_TOPMOST );
+    strMessage += SString( _( "New installation of %s detected.\n"
+                              "\n"
+                              "Do you want to copy your settings from %s ?" ),
+                                *strCurrentVersion,
+                                *strPreviousVersion  );
+    int iResponse = MessageBoxUTF8 ( NULL, strMessage, "MTA: San Andreas", MB_YESNO | MB_ICONQUESTION | MB_TOPMOST );
     if ( iResponse != IDYES )
         return;
 
@@ -2131,8 +2166,8 @@ bool CheckAndShowFileOpenFailureMessage ( void )
     if ( !strFilename.empty () )
     {
         //SetApplicationSetting ( "diagnostics", "gta-fopen-fail", "" );
-        SString strMsg ( "GTA:SA had trouble opening the file '%s'\n\nTry reinstalling GTA:SA to fix it", *strFilename );
-        MessageBox ( NULL, strMsg, "MTA: San Andreas", MB_OK | MB_ICONERROR | MB_TOPMOST );
+        SString strMsg ( _("GTA:SA had trouble opening the file '%s'\n\nTry reinstalling GTA:SA to fix it"), *strFilename );
+        MessageBoxUTF8 ( NULL, strMsg, "MTA: San Andreas"+_E("CL27"), MB_OK | MB_ICONERROR | MB_TOPMOST );
         return true;
     }
     return false;
@@ -2146,11 +2181,17 @@ bool CheckAndShowFileOpenFailureMessage ( void )
 // Load a library function
 //
 //////////////////////////////////////////////////////////
-void* LoadFunction( const char* c, const char* a, const char* b )
+void* LoadFunction( const char* szLibName, const char* c, const char* a, const char* b )
 {
-    static HMODULE hModule = LoadLibrary( "kernel32" );
+    static std::map < SString, HMODULE > libMap;
+    HMODULE* phModule = MapFind( libMap, szLibName );
+    if ( !phModule )
+    {
+        MapSet( libMap, szLibName, LoadLibrary( szLibName ) );
+        phModule = MapFind( libMap, szLibName );
+    }
     SString strFunctionName( "%s%s%s", a, b, c );
-    return static_cast < PVOID >( GetProcAddress( hModule, strFunctionName ) );
+    return static_cast < PVOID >( GetProcAddress( *phModule, strFunctionName ) );
 }
 
 
@@ -2198,7 +2239,7 @@ void BsodDetectionPreLaunch( void )
         if ( strMinidumpTime > strGameBeginTime && !strGameBeginTime.empty() )
         {
             // Ask user to confirm
-            int iResponse = MessageBox ( NULL, "Did your computer restart when playing MTA:SA?", "MTA: San Andreas", MB_YESNO | MB_ICONERROR | MB_TOPMOST );
+            int iResponse = MessageBoxUTF8 ( NULL, _("Did your computer restart when playing MTA:SA?"), "MTA: San Andreas", MB_YESNO | MB_ICONERROR | MB_TOPMOST );
             if ( iResponse == IDYES )
             {
                 SetApplicationSetting( "diagnostics", "user-confirmed-bsod-time", strMinidumpTime );
@@ -2237,4 +2278,46 @@ void BsodDetectionOnGameBegin( void )
 void BsodDetectionOnGameEnd( void )
 {
     SetApplicationSetting( "diagnostics", "game-begin-time", "" );
+}
+
+
+//////////////////////////////////////////////////////////
+//
+// VerifyEmbeddedSignature
+//
+// Check a file has been signed proper
+//
+//////////////////////////////////////////////////////////
+bool VerifyEmbeddedSignature( const WString& strFilename )
+{
+    WINTRUST_FILE_INFO FileData;
+    memset(&FileData, 0, sizeof(FileData));
+    FileData.cbStruct = sizeof(WINTRUST_FILE_INFO);
+    FileData.pcwszFilePath = *strFilename;
+
+    WINTRUST_DATA WinTrustData;
+    memset(&WinTrustData, 0, sizeof(WinTrustData));
+    WinTrustData.cbStruct = sizeof(WinTrustData);
+    WinTrustData.dwUIChoice = WTD_UI_NONE;
+    WinTrustData.fdwRevocationChecks = WTD_REVOKE_NONE; 
+    WinTrustData.dwUnionChoice = WTD_CHOICE_FILE;
+    WinTrustData.pFile = &FileData;
+
+    GUID WVTPolicyGUID = WINTRUST_ACTION_GENERIC_VERIFY_V2;
+    LONG lStatus = WinVerifyTrust( NULL, &WVTPolicyGUID, &WinTrustData );
+    return lStatus == ERROR_SUCCESS;
+}
+
+
+//////////////////////////////////////////////////////////
+//
+// DllMain
+//
+// Used to save handle to loader dll, so we can get at the resources
+//
+//////////////////////////////////////////////////////////
+int WINAPI DllMain(HINSTANCE hModule, DWORD dwReason, PVOID pvNothing)
+{
+    g_hInstance = hModule;
+    return TRUE;
 }

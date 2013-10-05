@@ -111,16 +111,16 @@ SString GetPatchExeAdminReason( bool bUseExeCopy, const SExePatchedStatus& reqSt
 
     // See what needs doing
     if ( status.bTimestamp != reqStatus.bTimestamp )
-        return "Update Aero setting";
+        return _("Update Aero setting");
     if ( status.bLargeMem != reqStatus.bLargeMem )
-        return "Update Large Memory setting";
+        return _("Update Large Memory setting");
     if ( status.bDep != reqStatus.bDep )
-        return "Update DEP setting";
+        return _("Update DEP setting");
     if ( status.bNvightmare != reqStatus.bNvightmare )
-        return "Update graphics driver compliance";
+        return _("Update graphics driver compliance");
     if ( status.bAltModules != reqStatus.bAltModules )
-        return "Fix file issues";
-    return "Copy main executable to avoid graphic driver issues";
+        return _("Fix file issues");
+    return _("Copy main executable to avoid graphic driver issues");
 }
 
 
@@ -164,8 +164,8 @@ bool CopyExe( void )
 //////////////////////////////////////////////////////////
 SString GetExePathFilename( bool bUseExeCopy )
 {
-    SString strGTAPath;
-    if ( GetGamePath( strGTAPath ) == GAME_PATH_OK )
+    SString strGTAPath = GetGTAPath();
+    if ( !strGTAPath.empty() )
     {
         const char* szExeName = bUseExeCopy ? MTA_HTAEXE_NAME : MTA_GTAEXE_NAME;
         SString strGTAEXEPath = PathJoin( strGTAPath, szExeName );
@@ -532,8 +532,8 @@ bool GetPatchRequirementAltModules( void )
 
     if ( !bDone )
     {
-        SString strGTAPath;
-        if ( GetGamePath( strGTAPath ) == GAME_PATH_OK )
+        SString strGTAPath = GetGTAPath();
+        if ( !strGTAPath.empty() )
         {
             struct {
                 const char* szMd5;

@@ -168,9 +168,9 @@ bool DoInstallFiles ( void )
         }
 
         //if ( bPossibleDisaster )
-        //    MessageBox ( NULL, "Installation may be corrupt. Please redownload from www.mtasa.com", "Error", MB_OK | MB_ICONERROR );
+        //    MessageBox ( NULL, _("Installation may be corrupt. Please redownload from www.mtasa.com"), _("Error"), MB_OK | MB_ICONERROR );
         //else 
-        //    MessageBox ( NULL, "Could not update due to file conflicts.", "Error", MB_OK | MB_ICONERROR );
+        //    MessageBox ( NULL, _("Could not update due to file conflicts."), _("Error"), MB_OK | MB_ICONERROR );
     }
 
     // Launch MTA_EXE_NAME

@@ -22,8 +22,9 @@ typedef CBadLang < class CInstallManager > CSequencerType;
 class CInstallManager
 {
 public:
+    void            SetMTASAPathSource              ( const SString& strCommandLineIn );
     void            InitSequencer                   ( void );
-    SString         Continue                        ( const SString& strCommandLine );
+    SString         Continue                        ( /*const SString& strCommandLine*/ );
     void            RestoreSequencerFromSnapshot    ( const SString& strText );
     SString         GetSequencerSnapshot            ( void );
     SString         GetLauncherPathFilename         ( void );
@@ -44,8 +45,6 @@ protected:
     SString         _ChangeFromAdmin                ( void );
     SString         _InstallNewsItems               ( void );
     SString         _Quit                           ( void );
-    SString         _HandlePostNsisInstall          ( void );
-    SString         _HandlePreNsisUninstall         ( void );
 
     CSequencerType*     m_pSequencer;
     SString             m_strAdminReason;
