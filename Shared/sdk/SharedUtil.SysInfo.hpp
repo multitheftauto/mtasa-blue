@@ -70,7 +70,7 @@ namespace
 //
 //
 /////////////////////////////////////////////////////////////////////
-bool SharedUtil::QueryWMI ( SQueryWMIResult& outResult, const SString& strQuery, const SString& strKeys )
+bool SharedUtil::QueryWMI ( SQueryWMIResult& outResult, const SString& strQuery, const SString& strKeys, const SString& strNamespace )
 {
     HRESULT hres;
 
@@ -143,7 +143,7 @@ bool SharedUtil::QueryWMI ( SQueryWMIResult& outResult, const SString& strQuery,
     // the current user and obtain pointer pSvc
     // to make IWbemServices calls.
     hres = CallConnectServer( pLoc,
-         _bstr_t( "ROOT\\CIMV2" ), // Object path of WMI namespace
+         _bstr_t( SStringX( "ROOT\\" ) + strNamespace ), // Object path of WMI namespace
          NULL,                    // User name. NULL = current user
          NULL,                    // User password. NULL = current
          0,                       // Locale. NULL indicates current
@@ -398,6 +398,50 @@ long long SharedUtil::GetWMIVideoAdapterMemorySize ( const SString& strDisplay )
     }
 
     return llResult;
+}
+
+
+/////////////////////////////////////////////////////////////////////
+//
+// GetWMIAntiVirusStatus
+//
+// Returns a list of enabled AVs and disabled AVs
+//
+/////////////////////////////////////////////////////////////////////
+void SharedUtil::GetWMIAntiVirusStatus( std::vector < SString >& outEnabledList, std::vector < SString >& outDisabledList )
+{
+    SQueryWMIResult result;
+
+    QueryWMI ( result, "AntiVirusProduct", "displayName,productState", "SecurityCenter2" );
+
+    if ( !result.empty () )
+    {
+        // Vista and up
+        for ( uint i = 0 ; i < result.size () ; i++ )
+        {
+            const SString& displayName = result[i][0];
+            uint uiProductState = atoi( result[i][1] );
+            if ( uiProductState & 0x1000 )
+                outEnabledList.push_back( displayName );
+            else
+                outDisabledList.push_back( displayName );
+        }
+    }
+    else
+    {
+        // XP
+        QueryWMI ( result, "AntiVirusProduct", "displayName,onAccessScanningEnabled", "SecurityCenter" );
+
+        for ( uint i = 0 ; i < result.size () ; i++ )
+        {
+            const SString& displayName = result[i][0];
+            const SString& onAccessScanningEnabled = result[i][1];
+            if ( onAccessScanningEnabled.CompareI( "True" ) )
+                outEnabledList.push_back( displayName );
+            else
+                outDisabledList.push_back( displayName );
+        }
+    }
 }
 
 #endif

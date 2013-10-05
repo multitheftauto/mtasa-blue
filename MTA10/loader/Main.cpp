@@ -89,6 +89,9 @@ int DoWinMain ( HINSTANCE hLauncherInstance, HINSTANCE hPrevInstance, LPSTR lpCm
     // Find GTA path to use
     ValidateGTAPath();
 
+    // Maybe warn user if no anti-virus running
+    CheckAntiVirusStatus();
+
     // Ensure logo is showing
     ShowSplash( g_hInstance );
 

@@ -444,6 +444,38 @@ void ValidateGTAPath( void )
 
 //////////////////////////////////////////////////////////
 //
+// CheckAntiVirusStatus
+//
+// Maybe warn user if no anti-virus running
+//
+//////////////////////////////////////////////////////////
+void CheckAntiVirusStatus( void )
+{
+    if ( _WscGetSecurityProviderHealth )
+    {
+        WSC_SECURITY_PROVIDER_HEALTH health;
+        if ( SUCCEEDED( _WscGetSecurityProviderHealth( WSC_SECURITY_PROVIDER_ANTIVIRUS, &health ) ) )
+        {
+            if ( health == WSC_SECURITY_PROVIDER_HEALTH_GOOD )
+                return;
+        }
+    }
+
+    // Fallback to getting data from WMI
+    std::vector < SString > enabledList;
+    std::vector < SString > disabledList;
+    GetWMIAntiVirusStatus( enabledList, disabledList );
+
+    if ( !enabledList.empty() )
+        return;
+
+    // No running anti-virus found
+    DisplayErrorMessageBox ( _("Warning: Could not detect anti-virus product.\n\nSee online help if MTA does not work correctly."), _E("CL31"), "no-anti-virus" );
+}
+
+
+//////////////////////////////////////////////////////////
+//
 // CheckDataFiles
 //
 // Basic check for some essential files
@@ -506,13 +538,50 @@ void CheckDataFiles( void )
     }
 
     // Make sure important dll's do not exist in the wrong place
-    char* dllCheckList[] = { "xmll.dll", "cgui.dll", "netc.dll", "libcurl.dll" };
+    const char* dllCheckList[] = { "xmll.dll", "cgui.dll", "netc.dll", "libcurl.dll" };
     for ( int i = 0 ; i < NUMELMS ( dllCheckList ); i++ )
     {
         if ( FileExists( PathJoin( strGTAPath, dllCheckList[i] ) ) )
         {
             DisplayErrorMessageBox ( SString ( _("Load failed. %s exists in the GTA directory. Please delete before continuing."), dllCheckList[i] ), _E("CL21"), "file-clash" );
             return ExitProcess( EXIT_ERROR );
+        }    
+    }
+
+    // Check for possible virus file changing activities
+    if ( !VerifyEmbeddedSignature( *PathJoin( strMTASAPath, MTA_EXE_NAME ) ) )
+    {
+        SString strMessage( _("Main file is unsigned. Possible virus activity.\n\nSee online help if MTA does not work correctly.") );
+        #if MTASA_VERSION_BUILD > 0 && defined(MTA_DM_CONNECT_TO_PUBLIC)
+            DisplayErrorMessageBox( strMessage, _E("CL29"), "maybe-virus1" );
+        #endif
+    }
+
+    struct {
+        const char* szMd5;
+        const char* szFilename;
+    } integrityCheckList[] = { { "9586E7BE6AE8016932038932D1417241", "bass.dll", },
+                               { "B2E49F0C22C8B7D92D615F942BA19353", "bass_aac.dll", },
+                               { "569C60F8397C34034E685A303B7404C0", "bass_ac3.dll", },
+                               { "0E44BCAC0E940DB2BFB13448E96E4B29", "bass_fx.dll", },
+                               { "50AF8A7D49E83A723ED0F70FB682DCFB", "bassflac.dll", },
+                               { "BEBA64522AA8265751187E38D1FC0653", "bassmidi.dll", },
+                               { "99F4F38007D347CEED482B7C04FDD122", "bassmix.dll", },
+                               { "7B52BE6D702AA590DB57A0E135F81C45", "basswma.dll", }, 
+                               { "0AB7D0E87F3843F8104B3670F5A9AF62", "pthreadVC2.dll", },
+                               { "38D7679D3B8B6D7F16A0AA9BF2A60043", "tags.dll", },
+                               { "309D860FC8137E5FE9E7056C33B4B8BE", "vea.dll", },
+                               { "0602F672BA595716E64EC4040E6DE376", "vog.dll", },
+                               { "B37D7DF4A1430DB65AD3EA84801F9EC3", "vvo.dll", },
+                               { "47FF3EE45DE53528F1AFD9F5982DF8C7", "vvof.dll", },
+                               { "ADFB6D7B61E301761C700652B6FE7CCD", "XInput9_1_0_mta.dll", }, };
+    for ( int i = 0 ; i < NUMELMS ( integrityCheckList ); i++ )
+    {
+        SString strMd5 = CMD5Hasher::CalculateHexString( PathJoin( strMTASAPath, "mta", integrityCheckList[i].szFilename ) );
+        if ( !strMd5.CompareI( integrityCheckList[i].szMd5 ) )
+        {
+            DisplayErrorMessageBox( _("Data files modified. Possible virus activity.\n\nSee online help if MTA does not work correctly."), _E("CL30"), "maybe-virus2" );
+            break;
         }    
     }
 

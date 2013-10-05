@@ -15,6 +15,9 @@
 #include <tchar.h>
 #include <strsafe.h>
 #include <Tlhelp32.h>
+#include <Softpub.h>
+#include <wintrust.h>
+#pragma comment (lib, "wintrust")
 #define BUFSIZE 512
 
 static bool bCancelPressed = false;
@@ -717,7 +720,7 @@ void DisplayErrorMessageBox ( const SString& strMessage, const SString& strError
     MessageBoxUTF8( 0, strMessage, _("Error! (CTRL+C to copy)")+strErrorCode, MB_ICONEXCLAMATION|MB_OK | MB_TOPMOST );
 
     if ( strTroubleType != "" )
-        BrowseToSolution ( strTroubleType, ASK_GO_ONLINE );
+        BrowseToSolution ( strTroubleType, ASK_GO_ONLINE | TERMINATE_IF_YES );
 }
 
 
@@ -2178,11 +2181,17 @@ bool CheckAndShowFileOpenFailureMessage ( void )
 // Load a library function
 //
 //////////////////////////////////////////////////////////
-void* LoadFunction( const char* c, const char* a, const char* b )
+void* LoadFunction( const char* szLibName, const char* c, const char* a, const char* b )
 {
-    static HMODULE hModule = LoadLibrary( "kernel32" );
+    static std::map < SString, HMODULE > libMap;
+    HMODULE* phModule = MapFind( libMap, szLibName );
+    if ( !phModule )
+    {
+        MapSet( libMap, szLibName, LoadLibrary( szLibName ) );
+        phModule = MapFind( libMap, szLibName );
+    }
     SString strFunctionName( "%s%s%s", a, b, c );
-    return static_cast < PVOID >( GetProcAddress( hModule, strFunctionName ) );
+    return static_cast < PVOID >( GetProcAddress( *phModule, strFunctionName ) );
 }
 
 
@@ -2269,6 +2278,34 @@ void BsodDetectionOnGameBegin( void )
 void BsodDetectionOnGameEnd( void )
 {
     SetApplicationSetting( "diagnostics", "game-begin-time", "" );
+}
+
+
+//////////////////////////////////////////////////////////
+//
+// VerifyEmbeddedSignature
+//
+// Check a file has been signed proper
+//
+//////////////////////////////////////////////////////////
+bool VerifyEmbeddedSignature( const WString& strFilename )
+{
+    WINTRUST_FILE_INFO FileData;
+    memset(&FileData, 0, sizeof(FileData));
+    FileData.cbStruct = sizeof(WINTRUST_FILE_INFO);
+    FileData.pcwszFilePath = *strFilename;
+
+    WINTRUST_DATA WinTrustData;
+    memset(&WinTrustData, 0, sizeof(WinTrustData));
+    WinTrustData.cbStruct = sizeof(WinTrustData);
+    WinTrustData.dwUIChoice = WTD_UI_NONE;
+    WinTrustData.fdwRevocationChecks = WTD_REVOKE_NONE; 
+    WinTrustData.dwUnionChoice = WTD_CHOICE_FILE;
+    WinTrustData.pFile = &FileData;
+
+    GUID WVTPolicyGUID = WINTRUST_ACTION_GENERIC_VERIFY_V2;
+    LONG lStatus = WinVerifyTrust( NULL, &WVTPolicyGUID, &WinTrustData );
+    return lStatus == ERROR_SUCCESS;
 }
 
 

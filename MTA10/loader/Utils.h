@@ -97,6 +97,7 @@ bool            CheckAndShowFileOpenFailureMessage  ( void );
 void            BsodDetectionPreLaunch              ( void );
 void            BsodDetectionOnGameBegin            ( void );
 void            BsodDetectionOnGameEnd              ( void );
+bool            VerifyEmbeddedSignature             ( const WString& strFilename );
 
 //
 // Determine if game process has gone wonky
@@ -233,33 +234,41 @@ public:
         __out_opt LPDWORD lpThreadId
         );
 
-    void* LoadFunction ( const char* c, const char* a, const char* b );
+    typedef
+    HRESULT
+    (STDAPICALLTYPE
+    *FUNC_WscGetSecurityProviderHealth)(DWORD Providers,
+                                    PWSC_SECURITY_PROVIDER_HEALTH pHealth);
 
-    #define _DEFFUNCTION( name, a,b,c ) \
+    void* LoadFunction ( const char* szLibName, const char* c, const char* a, const char* b );
+
+    #define _DEFFUNCTION( lib, name, a,b,c ) \
         inline FUNC_##name __##name ( void ) \
         { \
             static FUNC_##name pfn = NULL; \
             if ( !pfn ) \
-                pfn = (FUNC_##name)LoadFunction ( #c, #a, #b ); \
+                pfn = (FUNC_##name)LoadFunction ( lib, #c, #a, #b ); \
             return pfn; \
         }
 
-    #define DEFFUNCTION( a,b,c )    _DEFFUNCTION( a##b##c, a,b,c )
+    #define DEFFUNCTION( lib, a,b,c )    _DEFFUNCTION( lib, a##b##c, a,b,c )
 
-    #define _VirtualAllocEx         __VirtualAllocEx()
-    #define _VirtualProtectEx       __VirtualProtectEx()
-    #define _VirtualFreeEx          __VirtualFreeEx()
-    #define _ReadProcessMemory      __ReadProcessMemory()
-    #define _WriteProcessMemory     __WriteProcessMemory()
-    #define _CreateProcessA         __CreateProcessA()
-    #define _CreateRemoteThread     __CreateRemoteThread()
+    #define _VirtualAllocEx                 __VirtualAllocEx()
+    #define _VirtualProtectEx               __VirtualProtectEx()
+    #define _VirtualFreeEx                  __VirtualFreeEx()
+    #define _ReadProcessMemory              __ReadProcessMemory()
+    #define _WriteProcessMemory             __WriteProcessMemory()
+    #define _CreateProcessA                 __CreateProcessA()
+    #define _CreateRemoteThread             __CreateRemoteThread()
+    #define _WscGetSecurityProviderHealth   __WscGetSecurityProviderHealth()
 
-    DEFFUNCTION( Virt,ualAll,ocEx )
-    DEFFUNCTION( Virt,ualPro,tectEx )
-    DEFFUNCTION( Virt,ualFre,eEx )
-    DEFFUNCTION( Read,Proces,sMemory )
-    DEFFUNCTION( Writ,eProce,ssMemory )
-    DEFFUNCTION( Crea,teProc,essA )
-    DEFFUNCTION( Crea,teRemo,teThread )
+    DEFFUNCTION( "kernel32", Virt,ualAll,ocEx )
+    DEFFUNCTION( "kernel32", Virt,ualPro,tectEx )
+    DEFFUNCTION( "kernel32", Virt,ualFre,eEx )
+    DEFFUNCTION( "kernel32", Read,Proces,sMemory )
+    DEFFUNCTION( "kernel32", Writ,eProce,ssMemory )
+    DEFFUNCTION( "kernel32", Crea,teProc,essA )
+    DEFFUNCTION( "kernel32", Crea,teRemo,teThread )
+    DEFFUNCTION( "Wscapi", WscGetSecurityProviderHeal,t,h )
 
 #endif
