@@ -451,26 +451,32 @@ void ValidateGTAPath( void )
 //////////////////////////////////////////////////////////
 void CheckAntiVirusStatus( void )
 {
-    if ( _WscGetSecurityProviderHealth )
-    {
-        WSC_SECURITY_PROVIDER_HEALTH health;
-        if ( SUCCEEDED( _WscGetSecurityProviderHealth( WSC_SECURITY_PROVIDER_ANTIVIRUS, &health ) ) )
-        {
-            if ( health == WSC_SECURITY_PROVIDER_HEALTH_GOOD )
-                return;
-        }
-    }
-
-    // Fallback to getting data from WMI
+    // Get data from WMI
     std::vector < SString > enabledList;
     std::vector < SString > disabledList;
     GetWMIAntiVirusStatus( enabledList, disabledList );
 
-    if ( !enabledList.empty() )
-        return;
+    // Get status from WSC
+    WSC_SECURITY_PROVIDER_HEALTH health = (WSC_SECURITY_PROVIDER_HEALTH)-1;
+    if ( _WscGetSecurityProviderHealth )
+    {
+        _WscGetSecurityProviderHealth( WSC_SECURITY_PROVIDER_ANTIVIRUS, &health );
+    }
 
-    // No running anti-virus found
-    DisplayErrorMessageBox ( _("Warning: Could not detect anti-virus product.\n\nSee online help if MTA does not work correctly."), _E("CL31"), "no-anti-virus" );
+    // Dump results
+    SString strStatus( "AV health: %d", health );
+    for ( uint i = 0 ; i < enabledList.size() ; i++ )
+        strStatus += SString( " [Ena%d:%s]", i, enabledList[i] );
+    for ( uint i = 0 ; i < disabledList.size() ; i++ )
+        strStatus += SString( " [Dis%d:%s]", i, disabledList[i] );
+    WriteDebugEvent( strStatus ); 
+
+    // Maybe show dialog if av not found
+    if ( enabledList.empty() && health != WSC_SECURITY_PROVIDER_HEALTH_GOOD )
+    {
+        ShowNoAvDialog( g_hInstance, health == WSC_SECURITY_PROVIDER_HEALTH_NOTMONITORED );
+        HideNoAvDialog ();
+    }
 }
 
 

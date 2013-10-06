@@ -734,6 +734,8 @@ void CCore::ShowNetErrorMessageBox( const SString& strTitle, SString strMessage,
     uint uiErrorCode = CCore::GetSingleton ().GetNetwork ()->GetExtendedErrorCode ();
     if ( uiErrorCode != 0 )
     {
+        // Do anti-virus check soon
+        SetApplicationSettingInt( "noav-user-says-skip", 0 );
         strMessage += SString ( " \nCode: %08X", uiErrorCode );
         if ( !strTroubleLink.empty() )
             strTroubleLink += SString ( "&neterrorcode=%08X", uiErrorCode );
