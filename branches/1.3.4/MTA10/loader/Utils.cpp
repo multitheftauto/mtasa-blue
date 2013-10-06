@@ -727,8 +727,6 @@ void ResumeSplash ( void )
 }
 
 
-
-
 //
 // Return true if command line contains the string
 //
@@ -1375,7 +1373,14 @@ void HideOptimusDialog ( void )
 void ShowNoAvDialog( HINSTANCE hInstance, bool bWSCNotMonitoring )
 {
     uint uiTimeLastAsked = GetApplicationSettingInt( "noav-last-asked-time" );
-    bool bUserSaysNo = GetApplicationSettingInt( "noav-user-says-skip" );
+    bool bUserSaysNo = GetApplicationSettingInt( "noav-user-says-skip" ) != 0;
+
+    // Don't display dialog on first run
+    if ( uiTimeLastAsked == 0 )
+    {
+        SetApplicationSettingInt( "noav-last-asked-time", 1 );
+        return;
+    }
 
     // Time to ask again?
     uint uiAskHoursInterval;
@@ -1389,7 +1394,7 @@ void ShowNoAvDialog( HINSTANCE hInstance, bool bWSCNotMonitoring )
             uiAskHoursInterval = 24 * 365 * 1000;   // Once every 1000 years if ticked and WSC not monitoring
     }
 
-    uint uiTimeNow = time( NULL ) / 3600LL;
+    uint uiTimeNow = static_cast < uint >( time( NULL ) / 3600LL );
     uint uiHoursSinceLastAsked = uiTimeNow - uiTimeLastAsked;
     if ( uiHoursSinceLastAsked < uiAskHoursInterval )
         return;
