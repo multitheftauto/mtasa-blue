@@ -466,9 +466,9 @@ void CheckAntiVirusStatus( void )
     // Dump results
     SString strStatus( "AV health: %d", health );
     for ( uint i = 0 ; i < enabledList.size() ; i++ )
-        strStatus += SString( " [Ena%d:%s]", i, enabledList[i] );
+        strStatus += SString( " [Ena%d:%s]", i, *enabledList[i] );
     for ( uint i = 0 ; i < disabledList.size() ; i++ )
-        strStatus += SString( " [Dis%d:%s]", i, disabledList[i] );
+        strStatus += SString( " [Dis%d:%s]", i, *disabledList[i] );
     WriteDebugEvent( strStatus ); 
 
     // Maybe show dialog if av not found
