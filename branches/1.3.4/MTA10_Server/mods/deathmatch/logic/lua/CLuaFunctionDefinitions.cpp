@@ -11598,7 +11598,8 @@ int CLuaFunctionDefinitions::DbPoll ( lua_State* luaVM )
             lua_pop ( luaVM, 1 );                               // pop the inner table
         }
         lua_pushnumber ( luaVM, pJobData->result.uiNumAffectedRows );
-        return 2;
+        lua_pushnumber ( luaVM, pJobData->result.ullLastInsertId );
+        return 3;
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );

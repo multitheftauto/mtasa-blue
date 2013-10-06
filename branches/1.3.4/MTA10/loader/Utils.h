@@ -76,6 +76,9 @@ void            HideD3dDllDialog                    ( void );
 void            ShowOptimusDialog                   ( HINSTANCE hInstance );
 void            HideOptimusDialog                   ( void );
 
+void            ShowNoAvDialog                      ( HINSTANCE hInstance, bool bWSCNotMonitoring );
+void            HideNoAvDialog                      ( void );
+
 void            UpdateMTAVersionApplicationSetting  ( bool bQuiet = false );
 bool            Is32bitProcess                      ( DWORD processID );
 
@@ -98,6 +101,7 @@ void            BsodDetectionPreLaunch              ( void );
 void            BsodDetectionOnGameBegin            ( void );
 void            BsodDetectionOnGameEnd              ( void );
 bool            VerifyEmbeddedSignature             ( const WString& strFilename );
+SString         PadTextForCheckboxes                ( const SString& strText, uint uiNumSpaces = 1 );
 
 //
 // Determine if game process has gone wonky

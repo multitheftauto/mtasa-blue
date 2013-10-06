@@ -32,6 +32,7 @@ static SString g_strGTAPath;
 static HWND hwndCrashedDialog = NULL;
 static HWND hwndD3dDllDialog = NULL;
 static HWND hwndOptimusDialog = NULL;
+static HWND hwndNoAvDialog = NULL;
 static HANDLE g_hMutex = NULL;
 static HMODULE hLibraryModule = NULL;
 HINSTANCE g_hInstance = NULL;
@@ -685,6 +686,7 @@ void ShowSplash ( HINSTANCE hInstance )
     }
     SetForegroundWindow ( hwndSplash );
     SetWindowPos ( hwndSplash, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE );
+    ShowWindow( hwndSplash, SW_SHOW );
 #endif
 }
 
@@ -700,6 +702,31 @@ void HideSplash ( void )
         hwndSplash = NULL;
     }
 }
+
+//
+// Hide splash dialog temporarily
+//
+void SuspendSplash ( void )
+{
+    if ( hwndSplash )
+    {
+        ShowWindow( hwndSplash, SW_HIDE );
+    }
+}
+
+//
+// Show splash dialog if was previously suspended
+//
+void ResumeSplash ( void )
+{
+    if ( hwndSplash )
+    {
+        HideSplash();
+        ShowSplash( g_hInstance );
+    }
+}
+
+
 
 
 //
@@ -1109,7 +1136,7 @@ SString ShowCrashedDialog( HINSTANCE hInstance, const SString& strMessage )
 {
     if ( !hwndCrashedDialog )
     {
-        HideSplash ();
+        SuspendSplash ();
         bCancelPressed = false;
         bOkPressed = false;
         bOtherPressed = false;
@@ -1140,6 +1167,9 @@ SString ShowCrashedDialog( HINSTANCE hInstance, const SString& strMessage )
 
     if ( bCancelPressed )
         return "quit";
+
+    ResumeSplash();
+
     //if ( bOkPressed )
         return "ok";
 }
@@ -1185,7 +1215,7 @@ void ShowD3dDllDialog( HINSTANCE hInstance, const SString& strPath )
 	// Create and show dialog
     if ( !hwndD3dDllDialog )
     {
-        HideSplash ();
+        SuspendSplash ();
         bCancelPressed = false;
         bOkPressed = false;
         bOtherPressed = false;
@@ -1232,6 +1262,7 @@ void ShowD3dDllDialog( HINSTANCE hInstance, const SString& strPath )
 
         ExitProcess(0);
     }
+    ResumeSplash();
 }
 
 
@@ -1264,7 +1295,7 @@ void ShowOptimusDialog( HINSTANCE hInstance )
 	// Create and show dialog
     if ( !hwndOptimusDialog )
     {
-        HideSplash ();
+        SuspendSplash ();
         bCancelPressed = false;
         bOkPressed = false;
         bOtherPressed = false;
@@ -1320,6 +1351,7 @@ void ShowOptimusDialog( HINSTANCE hInstance )
         ShellExecuteNonBlocking( "open", PathJoin ( GetMTASAPath (), MTA_EXE_NAME ) );
         TerminateProcess( GetCurrentProcess(), 0 );
     }
+    ResumeSplash();
 }
 
 
@@ -1332,6 +1364,101 @@ void HideOptimusDialog ( void )
     }
 }
 
+
+///////////////////////////////////////////////////////////////
+//
+// No anti-virus dialog
+//
+//
+//
+///////////////////////////////////////////////////////////////
+void ShowNoAvDialog( HINSTANCE hInstance, bool bWSCNotMonitoring )
+{
+    uint uiTimeLastAsked = GetApplicationSettingInt( "noav-last-asked-time" );
+    bool bUserSaysNo = GetApplicationSettingInt( "noav-user-says-skip" );
+
+    // Time to ask again?
+    uint uiAskHoursInterval;
+    if ( !bUserSaysNo )
+        uiAskHoursInterval = 24;        // Once a day if box not ticked
+    else
+    {
+        if ( !bWSCNotMonitoring )
+            uiAskHoursInterval = 24 * 7;            // Once a week if ticked
+        else
+            uiAskHoursInterval = 24 * 365 * 1000;   // Once every 1000 years if ticked and WSC not monitoring
+    }
+
+    uint uiTimeNow = time( NULL ) / 3600LL;
+    uint uiHoursSinceLastAsked = uiTimeNow - uiTimeLastAsked;
+    if ( uiHoursSinceLastAsked < uiAskHoursInterval )
+        return;
+
+    SString strTitle( _("MTA San Andreas" ) );
+    SString strBody1( _("Warning: Could not detect anti-virus product") );
+    SString strBody2( _("MTA could not detect an anti-virus on your PC.\n\n"
+                        "Viruses interfere with MTA and degrade your gameplay experience.\n\n"
+                        "Press 'Help' for more information.") );
+    SString strOption1( _("I have already installed an anti-virus") );
+    SString strOption2( _("I will not install an anti-virus.\nI want my PC to lag and be part of a botnet.") );
+    SString strOption = bWSCNotMonitoring ? strOption1 : strOption2;
+
+	// Create and show dialog
+    if ( !hwndNoAvDialog )
+    {
+        SuspendSplash ();
+        bCancelPressed = false;
+        bOkPressed = false;
+        bOtherPressed = false;
+        iOtherCode = IDC_BUTTON_HELP;
+        hwndNoAvDialog = CreateDialog ( hInstance, MAKEINTRESOURCE(IDD_NOAV_DIALOG), 0, DialogProc );
+        SetWindowText ( hwndNoAvDialog, strTitle );
+        SetWindowText ( GetDlgItem( hwndNoAvDialog, IDC_STATIC_BODY1 ), strBody1 );
+        SetWindowText ( GetDlgItem( hwndNoAvDialog, IDC_STATIC_BODY2 ), strBody2 );
+        SetWindowText ( GetDlgItem( hwndNoAvDialog, IDC_CHECK_NOT_AGAIN ), PadTextForCheckboxes( strOption ) );
+    }
+    ShowWindow( hwndNoAvDialog, SW_SHOW );
+    SetForegroundWindow ( hwndNoAvDialog );
+    SetWindowPos ( hwndNoAvDialog, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE );
+
+	// Wait for input
+    while ( !bCancelPressed && !bOkPressed && !bOtherPressed )
+    {
+        MSG msg;
+        while( PeekMessage( &msg, NULL, 0, 0, PM_NOREMOVE ) )
+        {
+            if( GetMessage( &msg, NULL, 0, 0 ) )
+            {
+                TranslateMessage(&msg);
+                DispatchMessage(&msg);
+            }
+        }
+        Sleep( 10 );
+    }
+
+	// Process input
+    if ( bOtherPressed )
+    {
+        ShowWindow( hwndNoAvDialog, SW_HIDE );
+        BrowseToSolution ( "no-anti-virus", TERMINATE_PROCESS );
+    }
+
+    LRESULT res = SendMessageA( GetDlgItem( hwndNoAvDialog, IDC_CHECK_NOT_AGAIN ), BM_GETCHECK, 0, 0 );
+    SetApplicationSettingInt( "noav-last-asked-time", uiTimeNow );
+    SetApplicationSettingInt( "noav-user-says-skip", res ? 1 : 0 );
+
+    ResumeSplash();
+}
+
+
+void HideNoAvDialog ( void )
+{
+    if ( hwndNoAvDialog )
+    {
+        DestroyWindow ( hwndNoAvDialog );
+        hwndNoAvDialog = NULL;
+    }
+}
 
 
 ///////////////////////////////////////////////////////////////
@@ -2306,6 +2433,20 @@ bool VerifyEmbeddedSignature( const WString& strFilename )
     GUID WVTPolicyGUID = WINTRUST_ACTION_GENERIC_VERIFY_V2;
     LONG lStatus = WinVerifyTrust( NULL, &WVTPolicyGUID, &WinTrustData );
     return lStatus == ERROR_SUCCESS;
+}
+
+
+//////////////////////////////////////////////////////////
+//
+// PadTextForCheckboxes
+//
+// Add some spaces to make it look nicer
+//
+//////////////////////////////////////////////////////////
+SString PadTextForCheckboxes( const SString& strText, uint uiNumSpaces )
+{
+    SString strPad = std::string( uiNumSpaces, ' ' );
+    return strPad + strText.Replace( "\n", SStringX( "\n" ) + strPad );
 }
 
 

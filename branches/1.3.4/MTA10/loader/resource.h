@@ -8,6 +8,7 @@
 #define IDD_CRASHED_DIALOG              114
 #define IDD_D3DDLL_DIALOG               115
 #define IDD_OPTIMUS_DIALOG              116
+#define IDD_NOAV_DIALOG                 117
 #define IDC_PROGRESS_BAR                1001
 #define IDC_PROGRESS_STATIC             1002
 #define IDC_SEND_DUMP_CHECK             1004
@@ -27,14 +28,16 @@
 #define IDC_RADIO8                      1021
 #define IDC_BUTTON_HELP                 1022
 #define IDC_CHECK_FORCE_WINDOWED        1023
+#define IDC_STATIC_BODY1                1026
+#define IDC_STATIC_BODY2                1027
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        117
+#define _APS_NEXT_RESOURCE_VALUE        118
 #define _APS_NEXT_COMMAND_VALUE         40001
-#define _APS_NEXT_CONTROL_VALUE         1024
+#define _APS_NEXT_CONTROL_VALUE         1028
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif
