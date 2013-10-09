@@ -41,9 +41,6 @@ bool            IsGTARunning                        ( void );
 void            TerminateOtherMTAIfRunning          ( void );
 bool            IsOtherMTARunning                   ( void );
 
-void            ShowSplash                          ( HINSTANCE hInstance );
-void            HideSplash                          ( void );
-
 bool            CommandLineContains                 ( const SString& strText );
 void            DisplayErrorMessageBox              ( const SString& strMessage, const SString& strErrorCode = "", const SString& strTroubleType = "" );
 
@@ -53,31 +50,12 @@ ePathResult     DiscoverGTAPath                     ( bool bFindIfMissing );
 SString         GetGTAPath                          ( void );
 SString         GetMTASAModuleFileName              ( void );
 
-void            ShowProgressDialog                  ( HINSTANCE hInstance, const SString& strTitle, bool bAllowCancel = false );
-void            HideProgressDialog                  ( void );
-bool            UpdateProgress                      ( int iPos, int iMax, const SString& strMsg = "" );
-
 void            FindFilesRecursive                  ( const SString& strPathMatch, std::vector < SString >& outFileList, uint uiMaxDepth = 99 );
 SString         GetOSVersion                        ( void );
 SString         GetRealOSVersion                    ( void );
 bool            IsVistaOrHigher                     ( void );
 BOOL            IsUserAdmin                         ( void );
 bool            GetLibVersionInfo                   ( const char *szLibName, VS_FIXEDFILEINFO* pOutFileInfo );
-
-void            StartPseudoProgress                 ( HINSTANCE hInstance, const SString& strTitle, const SString& strMsg );
-void            StopPseudoProgress                  ( void );
-
-SString         ShowCrashedDialog                   ( HINSTANCE hInstance, const SString& strMessage );
-void            HideCrashedDialog                   ( void );
-
-void            ShowD3dDllDialog                    ( HINSTANCE hInstance, const SString& strPath );
-void            HideD3dDllDialog                    ( void );
-
-void            ShowOptimusDialog                   ( HINSTANCE hInstance );
-void            HideOptimusDialog                   ( void );
-
-void            ShowNoAvDialog                      ( HINSTANCE hInstance, bool bWSCNotMonitoring );
-void            HideNoAvDialog                      ( void );
 
 void            UpdateMTAVersionApplicationSetting  ( bool bQuiet = false );
 bool            Is32bitProcess                      ( DWORD processID );
@@ -101,7 +79,7 @@ void            BsodDetectionPreLaunch              ( void );
 void            BsodDetectionOnGameBegin            ( void );
 void            BsodDetectionOnGameEnd              ( void );
 bool            VerifyEmbeddedSignature             ( const WString& strFilename );
-SString         PadTextForCheckboxes                ( const SString& strText, uint uiNumSpaces = 1 );
+SString         PadLeft                             ( const SString& strText, uint uiNumSpaces, char cCharacter );
 
 //
 // Determine if game process has gone wonky

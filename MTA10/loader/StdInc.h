@@ -22,6 +22,7 @@ extern CLocalizationInterface* g_pLocalization;
 #include "MainFunctions.h"
 #include "Install.h"
 #include "Utils.h"
+#include "Dialogs.h"
 #include "..\version.h"
 #include "CInstallManager.h"
 #include "D3DStuff.h"

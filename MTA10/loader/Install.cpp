@@ -190,7 +190,7 @@ bool InstallFiles ( bool bSilent )
 {
     // Start progress bar
     if ( !bSilent )
-       StartPseudoProgress( g_hInstance, "MTA: San Andreas", "Installing update..." );
+       StartPseudoProgress( g_hInstance, "MTA: San Andreas", _("Installing update...") );
 
     bool bResult = DoInstallFiles ();
 
@@ -292,7 +292,7 @@ SString CheckOnRestartCommand ( void )
 
             // Start progress bar
             if ( strOperation != "silent" )
-               StartPseudoProgress( g_hInstance, "MTA: San Andreas", "Extracting files..." );
+               StartPseudoProgress( g_hInstance, "MTA: San Andreas", _("Extracting files...") );
 
             // Try to extract the files
             if ( !ExtractFiles ( strFile ) )

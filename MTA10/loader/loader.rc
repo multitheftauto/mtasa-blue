@@ -86,7 +86,7 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_UK
 //
 
 IDD_PROGRESS_DIALOG DIALOGEX 0, 0, 311, 103
-STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_VISIBLE | WS_CAPTION
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     PUSHBUTTON      "Cancel",IDCANCEL,130,82,50,14,NOT WS_VISIBLE
@@ -95,73 +95,75 @@ BEGIN
 END
 
 IDD_CRASHED_DIALOG DIALOGEX 0, 0, 385, 265
-STYLE DS_SETFONT | DS_MODALFRAME | DS_3DLOOK | DS_FIXEDSYS | DS_NOFAILCREATE | DS_CENTER | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+STYLE DS_SETFONT | DS_MODALFRAME | DS_3DLOOK | DS_FIXEDSYS | DS_NOFAILCREATE | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "MTA: San Andreas has encountered a problem"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "Yes",IDOK,134,244,50,14
     PUSHBUTTON      "No",IDCANCEL,204,244,50,14
     CONTROL         " Tick the check box to send this crash info to MTA devs using the 'internet'",IDC_SEND_DUMP_CHECK,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,61,174,259,13
-    CTEXT           "Doing so will increase the chance of this crash being fixed.",IDC_SEND_DESC_STATIC,74,189,232,11
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,61,174,299,13
+    CTEXT           "Doing so will increase the chance of this crash being fixed.",IDC_SEND_DESC_STATIC,21,189,336,14
     GROUPBOX        "",IDC_STATIC,15,161,348,51
-    GROUPBOX        "Crash information",IDC_STATIC,7,7,371,146,BS_CENTER
-    CTEXT           "Do you want to restart MTA: San Andreas ?",IDC_RESTART_QUESTION_STATIC,117,227,151,10
+    GROUPBOX        "Crash information",IDC_CRASH_HEAD,7,7,371,146,BS_CENTER
+    CTEXT           "Do you want to restart MTA: San Andreas ?",IDC_RESTART_QUESTION_STATIC,24,227,330,10
     EDITTEXT        IDC_CRASH_INFO_EDIT,39,22,304,118,ES_MULTILINE | ES_AUTOHSCROLL | ES_READONLY
 END
 
 IDD_D3DDLL_DIALOG DIALOGEX 0, 0, 373, 236
-STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "MTA: San Andreas - Warning"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "Play MTA:SA",IDOK,153,209,67,14
     PUSHBUTTON      "Quit",IDCANCEL,245,209,67,14
-    CTEXT           "Your Grand Theft Auto: San Andreas install directory contains a d3d9.dll file:",IDC_STATIC,31,26,310,17
+    CTEXT           "Your Grand Theft Auto: San Andreas install directory contains a d3d9.dll file:",IDC_D3DDLL_TEXT1,31,26,310,17
     EDITTEXT        IDC_EDIT_D3DDLL_PATH,31,46,310,14,ES_CENTER | ES_AUTOHSCROLL | ES_READONLY
-    CTEXT           "The file is not required and may interfere with the graphical features in this version of MTA:SA.\n\nIt is recommended that you remove or rename d3d9.dll",IDC_STATIC,31,81,310,30
+    CTEXT           "The file is not required and may interfere with the graphical features in this version of MTA:SA.\n\nIt is recommended that you remove or rename d3d9.dll",IDC_D3DDLL_TEXT2,14,81,345,33
     GROUPBOX        "",IDC_STATIC,7,7,359,122
     GROUPBOX        "",IDC_STATIC,25,142,324,43
     CONTROL         " Do not tell me about this d3d9.dll again",IDC_CHECK_NOT_AGAIN,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,115,161,143,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,115,161,228,10
     PUSHBUTTON      "Show me the file",IDC_BUTTON_SHOW_DIR,61,209,67,14
 END
 
 IDD_OPTIMUS_DIALOG DIALOGEX 0, 0, 238, 240
-STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "MTA: San Andreas - Confusing options"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,171,219,50,14
-    LTEXT           "NVidia Optimus detected!",IDC_STATIC,75,20,81,8,WS_DISABLED
-    CONTROL         " A - Standard NVidia",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,58,60,80,10
-    CONTROL         " B - Alternate NVidia",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,58,73,80,10
-    CONTROL         " C - Standard NVidia with exe rename",IDC_RADIO3,"Button",BS_AUTORADIOBUTTON,58,86,135,10
+    CTEXT           "NVidia Optimus detected!",IDC_OPTIMUS_TEXT1,19,19,196,9,WS_DISABLED
+    CONTROL         " A - Standard NVidia",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,58,60,151,10
+    CONTROL         " B - Alternate NVidia",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,58,73,151,10
+    CONTROL         " C - Standard NVidia with exe rename",IDC_RADIO3,"Button",BS_AUTORADIOBUTTON,58,86,155,10
     CONTROL         " D - Alternate NVidia with exe rename",IDC_RADIO4,
-                    "Button",BS_AUTORADIOBUTTON,58,99,136,10
-    CONTROL         " E - Standard Intel",IDC_RADIO5,"Button",BS_AUTORADIOBUTTON,58,112,75,10
-    CONTROL         " F - Alternate Intel",IDC_RADIO6,"Button",BS_AUTORADIOBUTTON,58,126,75,10
-    CONTROL         " G - Standard Intel with exe rename",IDC_RADIO7,"Button",BS_AUTORADIOBUTTON,58,139,131,10
-    CONTROL         " H - Alternate Intel with exe rename",IDC_RADIO8,"Button",BS_AUTORADIOBUTTON,58,152,131,10
+                    "Button",BS_AUTORADIOBUTTON,58,99,153,10
+    CONTROL         " E - Standard Intel",IDC_RADIO5,"Button",BS_AUTORADIOBUTTON,58,112,149,10
+    CONTROL         " F - Alternate Intel",IDC_RADIO6,"Button",BS_AUTORADIOBUTTON,58,126,151,10
+    CONTROL         " G - Standard Intel with exe rename",IDC_RADIO7,"Button",BS_AUTORADIOBUTTON,58,139,153,10
+    CONTROL         " H - Alternate Intel with exe rename",IDC_RADIO8,"Button",BS_AUTORADIOBUTTON,58,152,156,10
     PUSHBUTTON      "Help",IDC_BUTTON_HELP,15,219,50,14
-    CONTROL         "Try each option and see what works:",IDC_STATIC,"Static",SS_LEFTNOWORDWRAP | WS_GROUP,58,34,120,8
-    GROUPBOX        "",IDC_STATIC,38,50,163,119
-    LTEXT           "If you get desperate, this might help:",IDC_STATIC,59,180,120,8
-    CONTROL         " Force windowed mode",IDC_CHECK_FORCE_WINDOWED,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,75,193,87,10
+    CTEXT           "Try each option and see what works:",IDC_OPTIMUS_TEXT2,14,34,207,10
+    GROUPBOX        "",IDC_STATIC,22,50,195,119
+    CTEXT           "If you get desperate, this might help:",IDC_OPTIMUS_TEXT3,38,180,163,8
+    CONTROL         " Force windowed mode",IDC_CHECK_FORCE_WINDOWED,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,75,193,131,10
 END
 
 IDD_NOAV_DIALOG DIALOGEX 0, 0, 316, 183
-STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
-CAPTION "Dialog"
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "MTA: San Andreas"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,231,162,50,14
     PUSHBUTTON      "Help",IDC_BUTTON_HELP,38,162,50,14
-    CONTROL         "Not again",IDC_CHECK_NOT_AGAIN,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,75,123,218,26
-    CTEXT           "Blah blah",IDC_STATIC_BODY2,24,52,267,46
-    CTEXT           "Warning: End of world",IDC_STATIC_BODY1,7,15,302,18
+    CONTROL         "",IDC_CHECK_NOT_AGAIN,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,75,123,218,26
+    CTEXT           "MTA could not detect an anti-virus on your PC.\n\nViruses interfere with MTA and degrade your gameplay experience.\n\nPress 'Help' for more information.",IDC_NOAV_TEXT2,24,52,267,46
+    CTEXT           "Warning: Could not detect anti-virus product",IDC_NOAV_TEXT1,7,15,302,18
     GROUPBOX        "",IDC_STATIC,15,116,285,35
     GROUPBOX        "",IDC_STATIC,16,43,283,59
+    LTEXT           "I have already installed an anti-virus",IDC_NOAV_OPT_SKIP,89,131,118,8,NOT WS_VISIBLE
+    LTEXT           "I will not install an anti-virus.\nI want my PC to lag and be part of a botnet.",IDC_NOAV_OPT_BOTNET,89,127,206,20,NOT WS_VISIBLE
 END
 
 

@@ -11,28 +11,15 @@
 *****************************************************************************/
 
 #include "StdInc.h"
-#include <assert.h>
 #include <tchar.h>
 #include <strsafe.h>
 #include <Tlhelp32.h>
 #include <Softpub.h>
 #include <wintrust.h>
 #pragma comment (lib, "wintrust")
-#define BUFSIZE 512
 
-static bool bCancelPressed = false;
-static bool bOkPressed = false;
-static bool bOtherPressed = false;
-static int iOtherCode = 0;
-static HWND hwndSplash = NULL;
-static HWND hwndProgressDialog = NULL;
-static unsigned long ulProgressStartTime = 0;
 static SString g_strMTASAPath;
 static SString g_strGTAPath;
-static HWND hwndCrashedDialog = NULL;
-static HWND hwndD3dDllDialog = NULL;
-static HWND hwndOptimusDialog = NULL;
-static HWND hwndNoAvDialog = NULL;
 static HANDLE g_hMutex = NULL;
 static HMODULE hLibraryModule = NULL;
 HINSTANCE g_hInstance = NULL;
@@ -299,10 +286,10 @@ SString devicePathToWin32Path ( const SString& strDevicePath )
     pszFilename[MAX_PATH] = 0;
 
     // Translate path with device name to drive letters.
-    TCHAR szTemp[BUFSIZE];
+    TCHAR szTemp[1024];
     szTemp[0] = '\0';
 
-    if (GetLogicalDriveStrings(BUFSIZE-1, szTemp)) 
+    if (GetLogicalDriveStrings(NUMELMS(szTemp)-1, szTemp)) 
     {
         TCHAR szName[MAX_PATH];
         TCHAR szDrive[3] = TEXT(" :");
@@ -379,7 +366,7 @@ std::vector < SString > GetPossibleProcessPathFilenames ( DWORD processID )
             if ( hProcess )
             {
                 TCHAR szProcessName[MAX_PATH] = TEXT("");
-                DWORD dwSize = sizeof(szProcessName)/sizeof(TCHAR);
+                DWORD dwSize = NUMELMS(szProcessName);
                 DWORD bOk = fnQueryFullProcessImageNameA ( hProcess, 0, szProcessName, &dwSize );
                 CloseHandle( hProcess );
 
@@ -395,7 +382,7 @@ std::vector < SString > GetPossibleProcessPathFilenames ( DWORD processID )
         if ( hProcess )
         {
             TCHAR szProcessName[MAX_PATH] = TEXT("");
-            DWORD bOk = GetModuleFileNameEx ( hProcess, NULL, szProcessName, sizeof(szProcessName)/sizeof(TCHAR) );
+            DWORD bOk = GetModuleFileNameEx ( hProcess, NULL, szProcessName, NUMELMS(szProcessName) );
             CloseHandle ( hProcess );
 
             if ( bOk && strlen ( szProcessName ) > 0 )
@@ -410,7 +397,7 @@ std::vector < SString > GetPossibleProcessPathFilenames ( DWORD processID )
         if ( hProcess )
         {
             TCHAR szProcessName[MAX_PATH] = TEXT("");
-            DWORD bOk = GetProcessImageFileName ( hProcess, szProcessName, sizeof(szProcessName)/sizeof(TCHAR) );
+            DWORD bOk = GetProcessImageFileName ( hProcess, szProcessName, NUMELMS(szProcessName) );
             CloseHandle( hProcess );
 
             if ( bOk && strlen ( szProcessName ) > 0 )
@@ -649,83 +636,6 @@ void TerminateOtherMTAIfRunning ( void )
 }
 
 
-int CALLBACK DialogProc ( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
-{ 
-    switch (uMsg) 
-    { 
-        case WM_COMMAND: 
-            switch (LOWORD(wParam)) 
-            {  
-                case IDCANCEL:
-                    bCancelPressed = true;
-                    return TRUE; 
-                case IDOK:
-                    bOkPressed = true;
-                    return TRUE; 
-                default:
-                    if ( iOtherCode && iOtherCode == LOWORD(wParam) )
-                    {
-                        bOtherPressed = true;
-                        return TRUE; 
-                    }
-            } 
-    } 
-    return FALSE; 
-} 
-
-
-//
-// Show splash dialog
-//
-void ShowSplash ( HINSTANCE hInstance )
-{
-#ifndef MTA_DEBUG
-    if ( !hwndSplash )
-    {
-        hwndSplash = CreateDialog ( hInstance, MAKEINTRESOURCE(IDD_DIALOG1), 0, DialogProc );
-    }
-    SetForegroundWindow ( hwndSplash );
-    SetWindowPos ( hwndSplash, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE );
-    ShowWindow( hwndSplash, SW_SHOW );
-#endif
-}
-
-
-//
-// Hide splash dialog
-//
-void HideSplash ( void )
-{
-    if ( hwndSplash )
-    {
-        DestroyWindow ( hwndSplash );
-        hwndSplash = NULL;
-    }
-}
-
-//
-// Hide splash dialog temporarily
-//
-void SuspendSplash ( void )
-{
-    if ( hwndSplash )
-    {
-        ShowWindow( hwndSplash, SW_HIDE );
-    }
-}
-
-//
-// Show splash dialog if was previously suspended
-//
-void ResumeSplash ( void )
-{
-    if ( hwndSplash )
-    {
-        HideSplash();
-        ShowSplash( g_hInstance );
-    }
-}
-
 
 //
 // Return true if command line contains the string
@@ -753,7 +663,7 @@ SString GetMTASAModuleFileName ( void )
 {
     // Get current module full path
     char szBuffer[64000];
-    GetModuleFileName ( NULL, szBuffer, sizeof(szBuffer) - 1 );
+    GetModuleFileName ( NULL, szBuffer, NUMELMS(szBuffer) - 1 );
     return szBuffer;
 }
 
@@ -762,7 +672,7 @@ SString GetLaunchPath ( void )
 {
     // Get current module full path
     char szBuffer[64000];
-    GetModuleFileName ( NULL, szBuffer, sizeof(szBuffer) - 1 );
+    GetModuleFileName ( NULL, szBuffer, NUMELMS(szBuffer) - 1 );
 
     // Strip the module name out of the path.
     PathRemoveFileSpec ( szBuffer );
@@ -781,7 +691,7 @@ void SetMTASAPathSource ( bool bReadFromRegistry )
     {
         // Get current module full path
         char szBuffer[64000];
-        GetModuleFileName ( NULL, szBuffer, sizeof(szBuffer) - 1 );
+        GetModuleFileName ( NULL, szBuffer, NUMELMS(szBuffer) - 1 );
 
         SString strHash = "-";
         {
@@ -1022,447 +932,6 @@ SString GetGTAPath ( void )
     if ( g_strGTAPath == "" )
         DiscoverGTAPath( false );
     return g_strGTAPath;
-}
-
-
-///////////////////////////////////////////////////////////////
-//
-// Progress dialog
-//
-//
-//
-///////////////////////////////////////////////////////////////
-void ShowProgressDialog( HINSTANCE hInstance, const SString& strTitle, bool bAllowCancel )
-{
-    if ( !hwndProgressDialog )
-    {
-        HideSplash ();
-        bCancelPressed = false;
-        hwndProgressDialog = CreateDialog ( hInstance, MAKEINTRESOURCE(IDD_PROGRESS_DIALOG), 0, DialogProc );
-        SetWindowText ( hwndProgressDialog, strTitle );
-        HWND hwndButton = GetDlgItem( hwndProgressDialog, IDCANCEL );
-        ShowWindow( hwndButton, bAllowCancel ? SW_SHOW : SW_HIDE );
-        ulProgressStartTime = GetTickCount32 ();
-    }
-    SetForegroundWindow ( hwndProgressDialog );
-    SetWindowPos ( hwndProgressDialog, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE );
-}
-
-void HideProgressDialog ( void )
-{
-    if ( hwndProgressDialog )
-    {
-        // Show progress for at least two seconds
-        unsigned long ulTimeElapsed = GetTickCount32 () - ulProgressStartTime;
-        if ( ulTimeElapsed < 2000 )
-        {
-            UpdateProgress( 100, 100 );
-            Sleep ( 2000 - ulTimeElapsed );
-        }
-
-        DestroyWindow ( hwndProgressDialog );
-        hwndProgressDialog = NULL;
-    }
-}
-
-
-// returns true if canceled
-bool UpdateProgress( int iPos, int iMax, const SString& strMsg )
-{
-    if ( hwndProgressDialog)
-    {
-        HWND hwndText = GetDlgItem( hwndProgressDialog, IDC_PROGRESS_STATIC );
-        char buffer[ 1024 ] = "";
-        ::GetWindowText ( hwndText, buffer, sizeof(buffer) - 2 );
-        if ( strMsg.length () > 0 && strMsg != buffer )
-            SetWindowText ( hwndText, strMsg );
-        HWND hwndBar = GetDlgItem( hwndProgressDialog, IDC_PROGRESS_BAR );
-        PostMessage(hwndBar, PBM_SETPOS, iPos * 100 / Max ( 1, iMax ), 0 );
-        MSG msg;
-        while( PeekMessage( &msg, NULL, 0, 0, PM_NOREMOVE ) )
-        {
-            if( GetMessage( &msg, NULL, 0, 0 ) )
-            {
-                TranslateMessage(&msg);
-                DispatchMessage(&msg);
-            }
-        }
-        return bCancelPressed;
-    }
-    return false;
-}
-
-
-///////////////////////////////////////////////////////////////
-//
-// Progress
-//
-//
-//
-///////////////////////////////////////////////////////////////
-void StartPseudoProgress( HINSTANCE hInstance, const SString& strTitle, const SString& strMsg )
-{
-    ShowProgressDialog ( hInstance, strTitle );
-    UpdateProgress( 10, 100, strMsg );
-    Sleep ( 100 );
-    UpdateProgress( 30, 100 );
-}
-
-void StopPseudoProgress( void )
-{
-    if ( hwndProgressDialog )
-    {
-        UpdateProgress( 60, 100 );
-        Sleep ( 100 );
-        UpdateProgress( 90, 100 );
-        Sleep ( 100 );
-        HideProgressDialog ();
-    }
-}
-
-
-
-
-///////////////////////////////////////////////////////////////
-//
-// Crashed dialog
-//
-//
-//
-///////////////////////////////////////////////////////////////
-SString ShowCrashedDialog( HINSTANCE hInstance, const SString& strMessage )
-{
-    if ( !hwndCrashedDialog )
-    {
-        SuspendSplash ();
-        bCancelPressed = false;
-        bOkPressed = false;
-        bOtherPressed = false;
-        iOtherCode = 0;
-        hwndCrashedDialog = CreateDialog ( hInstance, MAKEINTRESOURCE(IDD_CRASHED_DIALOG), 0, DialogProc );
-        SetWindowText ( GetDlgItem( hwndCrashedDialog, IDC_CRASH_INFO_EDIT ), strMessage );
-        SendDlgItemMessage( hwndCrashedDialog, IDC_SEND_DUMP_CHECK, BM_SETCHECK, GetApplicationSetting ( "diagnostics", "send-dumps" ) != "no" ? BST_CHECKED : BST_UNCHECKED, 0 );
-    }
-    SetForegroundWindow ( hwndCrashedDialog );
-    SetWindowPos ( hwndCrashedDialog, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE );
-
-    while ( !bCancelPressed && !bOkPressed )
-    {
-        MSG msg;
-        while( PeekMessage( &msg, NULL, 0, 0, PM_NOREMOVE ) )
-        {
-            if( GetMessage( &msg, NULL, 0, 0 ) )
-            {
-                TranslateMessage(&msg);
-                DispatchMessage(&msg);
-            }
-        }
-        Sleep( 10 );
-    }
-
-    LRESULT res = SendMessageA( GetDlgItem( hwndCrashedDialog, IDC_SEND_DUMP_CHECK ), BM_GETCHECK, 0, 0 );
-    SetApplicationSetting ( "diagnostics", "send-dumps", res ? "yes" : "no" );
-
-    if ( bCancelPressed )
-        return "quit";
-
-    ResumeSplash();
-
-    //if ( bOkPressed )
-        return "ok";
-}
-
-
-void HideCrashedDialog ( void )
-{
-    if ( hwndCrashedDialog )
-    {
-        DestroyWindow ( hwndCrashedDialog );
-        hwndCrashedDialog = NULL;
-    }
-}
-
-
-///////////////////////////////////////////////////////////////
-//
-// d3d dll dialog
-//
-//
-//
-///////////////////////////////////////////////////////////////
-void ShowD3dDllDialog( HINSTANCE hInstance, const SString& strPath )
-{
-    // Calc hash of target file
-    SString strFileHash;
-    MD5 md5;
-    CMD5Hasher Hasher;
-    if ( Hasher.Calculate ( strPath, md5 ) )
-    {
-        char szHashResult[33];
-        Hasher.ConvertToHex ( md5, szHashResult );
-        strFileHash = szHashResult;
-    }
-
-	// Maybe skip dialog
-    if ( GetApplicationSetting ( "diagnostics", "d3d9-dll-last-hash" ) == strFileHash )
-    {
-        if ( GetApplicationSetting ( "diagnostics", "d3d9-dll-not-again" ) == "yes" )
-            return;
-    }
-
-	// Create and show dialog
-    if ( !hwndD3dDllDialog )
-    {
-        SuspendSplash ();
-        bCancelPressed = false;
-        bOkPressed = false;
-        bOtherPressed = false;
-        iOtherCode = IDC_BUTTON_SHOW_DIR;
-        hwndD3dDllDialog = CreateDialog ( hInstance, MAKEINTRESOURCE(IDD_D3DDLL_DIALOG), 0, DialogProc );
-        SetWindowText ( GetDlgItem( hwndD3dDllDialog, IDC_EDIT_D3DDLL_PATH ), strPath );
-    }
-    SetForegroundWindow ( hwndD3dDllDialog );
-    SetWindowPos ( hwndD3dDllDialog, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE );
-
-	// Wait for input
-    while ( !bCancelPressed && !bOkPressed && !bOtherPressed )
-    {
-        MSG msg;
-        while( PeekMessage( &msg, NULL, 0, 0, PM_NOREMOVE ) )
-        {
-            if( GetMessage( &msg, NULL, 0, 0 ) )
-            {
-                TranslateMessage(&msg);
-                DispatchMessage(&msg);
-            }
-        }
-        Sleep( 10 );
-    }
-
-	// Process input
-    LRESULT res = SendMessageA( GetDlgItem( hwndD3dDllDialog, IDC_CHECK_NOT_AGAIN ), BM_GETCHECK, 0, 0 );
-    SetApplicationSetting ( "diagnostics", "d3d9-dll-last-hash", strFileHash );
-    SetApplicationSetting ( "diagnostics", "d3d9-dll-not-again", res ? "yes" : "no" );
-
-    if ( bCancelPressed )
-    {
-        ExitProcess(0);
-    }
-    if ( bOtherPressed )
-    {
-        if ( ITEMIDLIST *pidl = ILCreateFromPath ( strPath ) )
-        {
-            SHOpenFolderAndSelectItems ( pidl, 0, 0, 0 );
-            ILFree ( pidl );
-        }
-        else
-            ShellExecuteNonBlocking ( "open", ExtractPath ( strPath ) );
-
-        ExitProcess(0);
-    }
-    ResumeSplash();
-}
-
-
-void HideD3dDllDialog ( void )
-{
-    if ( hwndD3dDllDialog )
-    {
-        DestroyWindow ( hwndD3dDllDialog );
-        hwndD3dDllDialog = NULL;
-    }
-}
-
-
-///////////////////////////////////////////////////////////////
-//
-// Optimus dialog
-//
-//
-//
-///////////////////////////////////////////////////////////////
-void ShowOptimusDialog( HINSTANCE hInstance )
-{
-    if ( GetApplicationSettingInt( "nvhacks", "optimus-dialog-skip" ) )
-    {
-        SetApplicationSettingInt( "nvhacks", "optimus-dialog-skip", 0 );
-        return;
-    }
-
-    uint RadioButtons[] = { IDC_RADIO1, IDC_RADIO2, IDC_RADIO3, IDC_RADIO4, IDC_RADIO5, IDC_RADIO6, IDC_RADIO7, IDC_RADIO8 };
-	// Create and show dialog
-    if ( !hwndOptimusDialog )
-    {
-        SuspendSplash ();
-        bCancelPressed = false;
-        bOkPressed = false;
-        bOtherPressed = false;
-        iOtherCode = IDC_BUTTON_HELP;
-        hwndOptimusDialog = CreateDialog ( hInstance, MAKEINTRESOURCE(IDD_OPTIMUS_DIALOG), 0, DialogProc );
-        uint uiStartupOption = GetApplicationSettingInt( "nvhacks", "optimus-startup-option" ) % NUMELMS( RadioButtons );
-        uint uiForceWindowed = GetApplicationSettingInt( "nvhacks", "optimus-force-windowed" );
-        CheckRadioButton( hwndOptimusDialog, IDC_RADIO1, IDC_RADIO8, RadioButtons[ uiStartupOption ] );
-        CheckDlgButton( hwndOptimusDialog, IDC_CHECK_FORCE_WINDOWED, uiForceWindowed );
-    }
-    SetForegroundWindow ( hwndOptimusDialog );
-    SetWindowPos ( hwndOptimusDialog, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE );
-
-	// Wait for input
-    while ( !bCancelPressed && !bOkPressed && !bOtherPressed )
-    {
-        MSG msg;
-        while( PeekMessage( &msg, NULL, 0, 0, PM_NOREMOVE ) )
-        {
-            if( GetMessage( &msg, NULL, 0, 0 ) )
-            {
-                TranslateMessage(&msg);
-                DispatchMessage(&msg);
-            }
-        }
-        Sleep( 10 );
-    }
-
-    if ( bOtherPressed )
-    {
-        BrowseToSolution ( "optimus-startup-option-help", TERMINATE_PROCESS );
-    }
-
-	// Process input
-    uint uiStartupOption = 0;
-    for ( ; uiStartupOption < NUMELMS( RadioButtons ) - 1 ; uiStartupOption++ )
-    {
-        if ( IsDlgButtonChecked( hwndOptimusDialog, RadioButtons[ uiStartupOption ] ) == BST_CHECKED )
-            break;
-    }
-    uint uiForceWindowed = ( IsDlgButtonChecked( hwndOptimusDialog, IDC_CHECK_FORCE_WINDOWED ) == BST_CHECKED ) ? 1 : 0;
-
-    SetApplicationSettingInt( "nvhacks", "optimus-startup-option", uiStartupOption );
-    SetApplicationSettingInt( "nvhacks", "optimus-alt-startup", ( uiStartupOption & 1 ) ? 1 : 0 );
-    SetApplicationSettingInt( "nvhacks", "optimus-rename-exe", ( uiStartupOption & 2 ) ? 1 : 0 );
-    SetApplicationSettingInt( "nvhacks", "optimus-export-enablement", ( uiStartupOption & 4 ) ? 0 : 1 );
-    SetApplicationSettingInt( "nvhacks", "optimus-force-windowed", uiForceWindowed );
-
-    if ( !GetInstallManager()->UpdateOptimusSymbolExport() )
-    {
-        // Restart required to apply change because of permissions
-        SetApplicationSettingInt( "nvhacks", "optimus-dialog-skip", 1 );
-        ShellExecuteNonBlocking( "open", PathJoin ( GetMTASAPath (), MTA_EXE_NAME ) );
-        TerminateProcess( GetCurrentProcess(), 0 );
-    }
-    ResumeSplash();
-}
-
-
-void HideOptimusDialog ( void )
-{
-    if ( hwndOptimusDialog )
-    {
-        DestroyWindow ( hwndOptimusDialog );
-        hwndOptimusDialog = NULL;
-    }
-}
-
-
-///////////////////////////////////////////////////////////////
-//
-// No anti-virus dialog
-//
-//
-//
-///////////////////////////////////////////////////////////////
-void ShowNoAvDialog( HINSTANCE hInstance, bool bWSCNotMonitoring )
-{
-    uint uiTimeLastAsked = GetApplicationSettingInt( "noav-last-asked-time" );
-    bool bUserSaysNo = GetApplicationSettingInt( "noav-user-says-skip" ) != 0;
-
-    // Don't display dialog on first run
-    if ( uiTimeLastAsked == 0 )
-    {
-        SetApplicationSettingInt( "noav-last-asked-time", 1 );
-        return;
-    }
-
-    // Time to ask again?
-    uint uiAskHoursInterval;
-    if ( !bUserSaysNo )
-        uiAskHoursInterval = 24;        // Once a day if box not ticked
-    else
-    {
-        if ( !bWSCNotMonitoring )
-            uiAskHoursInterval = 24 * 7;            // Once a week if ticked
-        else
-            uiAskHoursInterval = 24 * 365 * 1000;   // Once every 1000 years if ticked and WSC not monitoring
-    }
-
-    uint uiTimeNow = static_cast < uint >( time( NULL ) / 3600LL );
-    uint uiHoursSinceLastAsked = uiTimeNow - uiTimeLastAsked;
-    if ( uiHoursSinceLastAsked < uiAskHoursInterval )
-        return;
-
-    SString strTitle( _("MTA San Andreas" ) );
-    SString strBody1( _("Warning: Could not detect anti-virus product") );
-    SString strBody2( _("MTA could not detect an anti-virus on your PC.\n\n"
-                        "Viruses interfere with MTA and degrade your gameplay experience.\n\n"
-                        "Press 'Help' for more information.") );
-    SString strOption1( _("I have already installed an anti-virus") );
-    SString strOption2( _("I will not install an anti-virus.\nI want my PC to lag and be part of a botnet.") );
-    SString strOption = bWSCNotMonitoring ? strOption1 : strOption2;
-
-	// Create and show dialog
-    if ( !hwndNoAvDialog )
-    {
-        SuspendSplash ();
-        bCancelPressed = false;
-        bOkPressed = false;
-        bOtherPressed = false;
-        iOtherCode = IDC_BUTTON_HELP;
-        hwndNoAvDialog = CreateDialog ( hInstance, MAKEINTRESOURCE(IDD_NOAV_DIALOG), 0, DialogProc );
-        SetWindowText ( hwndNoAvDialog, strTitle );
-        SetWindowText ( GetDlgItem( hwndNoAvDialog, IDC_STATIC_BODY1 ), strBody1 );
-        SetWindowText ( GetDlgItem( hwndNoAvDialog, IDC_STATIC_BODY2 ), strBody2 );
-        SetWindowText ( GetDlgItem( hwndNoAvDialog, IDC_CHECK_NOT_AGAIN ), PadTextForCheckboxes( strOption ) );
-    }
-    ShowWindow( hwndNoAvDialog, SW_SHOW );
-    SetForegroundWindow ( hwndNoAvDialog );
-    SetWindowPos ( hwndNoAvDialog, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE );
-
-	// Wait for input
-    while ( !bCancelPressed && !bOkPressed && !bOtherPressed )
-    {
-        MSG msg;
-        while( PeekMessage( &msg, NULL, 0, 0, PM_NOREMOVE ) )
-        {
-            if( GetMessage( &msg, NULL, 0, 0 ) )
-            {
-                TranslateMessage(&msg);
-                DispatchMessage(&msg);
-            }
-        }
-        Sleep( 10 );
-    }
-
-	// Process input
-    if ( bOtherPressed )
-    {
-        ShowWindow( hwndNoAvDialog, SW_HIDE );
-        BrowseToSolution ( "no-anti-virus", TERMINATE_PROCESS );
-    }
-
-    LRESULT res = SendMessageA( GetDlgItem( hwndNoAvDialog, IDC_CHECK_NOT_AGAIN ), BM_GETCHECK, 0, 0 );
-    SetApplicationSettingInt( "noav-last-asked-time", uiTimeNow );
-    SetApplicationSettingInt( "noav-user-says-skip", res ? 1 : 0 );
-
-    ResumeSplash();
-}
-
-
-void HideNoAvDialog ( void )
-{
-    if ( hwndNoAvDialog )
-    {
-        DestroyWindow ( hwndNoAvDialog );
-        hwndNoAvDialog = NULL;
-    }
 }
 
 
@@ -2247,7 +1716,7 @@ void MaybeShowCopySettingsDialog ( void )
 
     // Show dialog
     SString strMessage;
-    strMessage += SString( g_pLocalization->Translate( "New installation of %s detected.\n"
+    strMessage += SString( _( "New installation of %s detected.\n"
                               "\n"
                               "Do you want to copy your settings from %s ?" ),
                                 *strCurrentVersion,
@@ -2443,14 +1912,14 @@ bool VerifyEmbeddedSignature( const WString& strFilename )
 
 //////////////////////////////////////////////////////////
 //
-// PadTextForCheckboxes
+// PadLeft
 //
 // Add some spaces to make it look nicer
 //
 //////////////////////////////////////////////////////////
-SString PadTextForCheckboxes( const SString& strText, uint uiNumSpaces )
+SString PadLeft( const SString& strText, uint uiNumSpaces, char cCharacter )
 {
-    SString strPad = std::string( uiNumSpaces, ' ' );
+    SString strPad = std::string( uiNumSpaces, cCharacter );
     return strPad + strText.Replace( "\n", SStringX( "\n" ) + strPad );
 }
 

@@ -9,7 +9,21 @@
 *****************************************************************************/
 
 #include "StdInc.h"
-CLocalizationInterface* g_pLocalization;
+
+class CLocalizationDummy : public CLocalizationInterface
+{
+public:
+    virtual SString             Translate                   ( const SString& strMessage ) { return strMessage; }
+    virtual SString             TranslateWithContext        ( const SString& strContext, const SString& strMessage ) { return strMessage; }
+    virtual SString             TranslatePlural             ( const SString& strSingular, const SString& strPlural, int iNum ) { return strPlural; }
+    virtual SString             TranslatePluralWithContext  ( const SString& strContext, const SString& strSingular, const SString& strPlural, int iNum ) { return strPlural; }
+
+    virtual std::map<SString,SString>   GetAvailableLanguages       ( void ) { return std::map<SString,SString>(); }
+    virtual bool                        IsLocalized                 ( void ) { return false; }
+    virtual SString                     GetLanguageDirectory        ( void ) { return ""; }
+};
+
+CLocalizationInterface* g_pLocalization = new CLocalizationDummy();
 
 //////////////////////////////////////////////////////////
 //
@@ -18,14 +32,20 @@ CLocalizationInterface* g_pLocalization;
 // Start localization thingmy
 //
 //////////////////////////////////////////////////////////
-void InitLocalization( void )
+void InitLocalization( bool bNoFail )
 {
+    static bool bDone = false;
+    if ( bDone )
+        return;
+
     const SString strMTASAPath = GetMTASAPath ();
 
     // Check for and load core.dll for localization
     SString strCoreDLL = PathJoin( strMTASAPath, "mta", MTA_DLL_NAME );
     if ( !FileExists ( strCoreDLL ) )
     {
+        if ( !bNoFail )
+            return;
         DisplayErrorMessageBox ( ("Load failed.  Please ensure that "
                             "the file core.dll is in the modules "
                             "directory within the MTA root directory."), _E("CL23"), "core-missing" ); // Core.dll missing
@@ -54,6 +74,8 @@ void InitLocalization( void )
     HMODULE hCoreModule = LoadLibrary( strCoreDLL );
     if ( hCoreModule == NULL )
     {
+        if ( !bNoFail )
+            return;
         DisplayErrorMessageBox ( ("Loading core failed.  Please ensure that \n"
                             "Microsoft Visual C++ 2008 SP1 Redistributable Package (x86) \n"
                             "and the latest DirectX is correctly installed."), _E("CL24"), "vc-redist-missing" );  // Core.dll load failed.  Ensure VC++ Redists and DX are installed
@@ -71,15 +93,26 @@ void InitLocalization( void )
 
     typedef CLocalizationInterface* (__cdecl *FUNC_CREATELOCALIZATIONFROMENVIRONMENT)(SString strLocale);
     FUNC_CREATELOCALIZATIONFROMENVIRONMENT pFunc = (FUNC_CREATELOCALIZATIONFROMENVIRONMENT)GetProcAddress ( hCoreModule, "L10n_CreateLocalization" );
-    g_pLocalization = pFunc(strLocale);
-    if ( g_pLocalization == NULL )
+    CLocalizationInterface* pLocalization = pFunc(strLocale);
+    if ( pLocalization == NULL )
     {
+        if ( !bNoFail )
+            return;
+
         DisplayErrorMessageBox ( ("Loading core failed.  Please ensure that \n"
                             "Microsoft Visual C++ 2008 SP1 Redistributable Package (x86) \n"
                             "and the latest DirectX is correctly installed."), _E("CL26"), "vc-redist-missing" );  // Core.dll load failed.  Ensure VC++ Redists and DX are installed
         FreeLibrary ( hCoreModule );
         return ExitProcess( EXIT_ERROR );
     }
+
+    SAFE_DELETE( g_pLocalization );
+    g_pLocalization = pLocalization;
+    bDone = true;
+
+#ifdef MTA_DEBUG
+    TestDialogs();
+#endif
 }
 
 
