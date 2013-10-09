@@ -29,7 +29,17 @@
 #define IDC_BUTTON_HELP                 1022
 #define IDC_CHECK_FORCE_WINDOWED        1023
 #define IDC_STATIC_BODY1                1026
+#define IDC_NOAV_TEXT1                  1026
 #define IDC_STATIC_BODY2                1027
+#define IDC_NOAV_TEXT2                  1027
+#define IDC_CRASH_HEAD                  1028
+#define IDC_D3DDLL_TEXT1                1029
+#define IDC_D3DDLL_TEXT2                1030
+#define IDC_OPTIMUS_TEXT1               1031
+#define IDC_OPTIMUS_TEXT2               1032
+#define IDC_OPTIMUS_TEXT3               1033
+#define IDC_NOAV_OPT_BOTNET             1034
+#define IDC_NOAV_OPT_SKIP               1035
 
 // Next default values for new objects
 // 
@@ -37,7 +47,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        118
 #define _APS_NEXT_COMMAND_VALUE         40001
-#define _APS_NEXT_CONTROL_VALUE         1028
+#define _APS_NEXT_CONTROL_VALUE         1036
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

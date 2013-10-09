@@ -19,6 +19,7 @@
 #include "MainFunctions.h"
 #include "Install.h"
 #include "Utils.h"
+#include "Dialogs.h"
 #include "..\version.h"
 #include "CInstallManager.h"
 #include "D3DStuff.h"
@@ -26,6 +27,7 @@
 
 // Things to make source easier to backport
 #define _ SStringX
+#define _td(x) x
 #define _E(code) SString()
 inline int MessageBoxUTF8 ( HWND hWnd, SString strText, SString strCaption, UINT uType )
 {

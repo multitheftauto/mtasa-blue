@@ -348,6 +348,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Dialogs.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\Install.cpp"
 				>
 			</File>
@@ -410,6 +414,10 @@
 			</File>
 			<File
 				RelativePath=".\D3DStuff.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Dialogs.h"
 				>
 			</File>
 			<File
