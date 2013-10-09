@@ -507,7 +507,47 @@ void CheckAntiVirusStatus( void )
     // Maybe show dialog if av not found
     if ( enabledList.empty() && health != WSC_SECURITY_PROVIDER_HEALTH_GOOD )
     {
-        ShowNoAvDialog( g_hInstance, health == WSC_SECURITY_PROVIDER_HEALTH_NOTMONITORED );
+        bool bEnableScaremongering = ( health != WSC_SECURITY_PROVIDER_HEALTH_NOTMONITORED );
+
+        if ( bEnableScaremongering )
+        {
+            // Check for anti-virus helper dlls before actual scaremongering
+            HMODULE aModules[1024];
+            DWORD cbNeeded;
+            if ( EnumProcessModules( GetCurrentProcess(), aModules, sizeof(aModules), &cbNeeded) )
+            {
+                const char* avProducts[] = { "antivirus", "anti-virus", "Avast", "AVG", "Avira", 
+                                             "NOD32", "F-Secure", "Faronics", "Kaspersky",
+                                             "McAfee", "Norton", "Symantec", "Panda", "Trend Micro", };
+
+                DWORD cModules = cbNeeded / sizeof(HMODULE);
+                for ( uint i = 0 ; i < cModules ; i++ )
+                {
+                    if( aModules[i] != 0 )
+                    {
+                        WCHAR szModulePathFileName[1024] = L"";
+                        GetModuleFileNameExW ( GetCurrentProcess(), aModules[i], szModulePathFileName, NUMELMS(szModulePathFileName) );
+                        SLibVersionInfo libVersionInfo;
+                        GetLibVersionInfo ( szModulePathFileName, &libVersionInfo );
+
+                        for( uint i = 0 ; i < NUMELMS( avProducts ) ; i++ )
+                        {
+                            if ( libVersionInfo.strCompanyName.ContainsI( avProducts[i] )
+                                 || libVersionInfo.strProductName.ContainsI( avProducts[i] ) )
+                            {
+                                bEnableScaremongering = false;
+                                WriteDebugEvent( SString( "AV Maybe found %s [%d](%s,%s)", *WStringX( szModulePathFileName ).ToAnsi(), i, *libVersionInfo.strCompanyName, *libVersionInfo.strProductName ) );
+                            }
+                        }
+                    }
+                }
+
+                if ( bEnableScaremongering )
+                    WriteDebugEvent( SString( "AV Searched %d dlls, but could not find av helper", cModules ) );
+            }
+        }
+
+        ShowNoAvDialog( g_hInstance, bEnableScaremongering );
         HideNoAvDialog ();
     }
 }

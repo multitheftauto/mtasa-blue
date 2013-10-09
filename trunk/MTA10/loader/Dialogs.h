@@ -27,7 +27,7 @@ void            HideD3dDllDialog                    ( void );
 void            ShowOptimusDialog                   ( HINSTANCE hInstance );
 void            HideOptimusDialog                   ( void );
 
-void            ShowNoAvDialog                      ( HINSTANCE hInstance, bool bWSCNotMonitoring );
+void            ShowNoAvDialog                      ( HINSTANCE hInstance, bool bEnableScaremongering );
 void            HideNoAvDialog                      ( void );
 
 #ifdef MTA_DEBUG

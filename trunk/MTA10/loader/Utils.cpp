@@ -1081,7 +1081,7 @@ SString GetRealOSVersion ( void )
 
     if ( uiMajor == 0 )
     {
-        VS_FIXEDFILEINFO fileInfo;
+        SLibVersionInfo fileInfo;
         if ( GetLibVersionInfo ( "ntdll.dll", &fileInfo ) )
         {
             uiMajor = HIWORD( fileInfo.dwFileVersionMS );
@@ -1100,10 +1100,10 @@ SString GetRealOSVersion ( void )
 // Get version info of a file
 //
 ///////////////////////////////////////////////////////////////
-bool GetLibVersionInfo( const char *szLibName, VS_FIXEDFILEINFO* pOutFileInfo )
+bool GetLibVersionInfo( const WString& strLibName, SLibVersionInfo* pOutLibVersionInfo )
 {
     DWORD dwHandle, dwLen;
-    dwLen = GetFileVersionInfoSize ( szLibName, &dwHandle );
+    dwLen = GetFileVersionInfoSizeW ( strLibName, &dwHandle );
     if (!dwLen) 
         return FALSE;
 
@@ -1112,7 +1112,7 @@ bool GetLibVersionInfo( const char *szLibName, VS_FIXEDFILEINFO* pOutFileInfo )
         return FALSE;
 
     SetLastError ( 0 );
-    if( !GetFileVersionInfo ( szLibName, dwHandle, dwLen, lpData ) )
+    if( !GetFileVersionInfoW ( strLibName, dwHandle, dwLen, lpData ) )
     {
         free (lpData);
         return FALSE;
@@ -1129,7 +1129,21 @@ bool GetLibVersionInfo( const char *szLibName, VS_FIXEDFILEINFO* pOutFileInfo )
     VS_FIXEDFILEINFO *pFileInfo;
     if( VerQueryValueA ( lpData, "\\", (LPVOID *) &pFileInfo, (PUINT)&BufLen ) ) 
     {
-        *pOutFileInfo = *pFileInfo;
+        *(VS_FIXEDFILEINFO*)pOutLibVersionInfo = *pFileInfo;
+
+        // Nab some strings as well
+        WORD* langInfo;
+        UINT cbLang;
+        if( VerQueryValueA (lpData, "\\VarFileInfo\\Translation", (LPVOID*)&langInfo, &cbLang) )
+        {
+            SString strFirstBit ( "\\StringFileInfo\\%04x%04x\\", langInfo[0], langInfo[1] );
+
+            LPVOID lpt;
+            UINT cbBufSize;
+            if ( VerQueryValueA (lpData, strFirstBit + "CompanyName", &lpt, &cbBufSize) )     pOutLibVersionInfo->strCompanyName = SStringX( (const char*)lpt ); 
+            if ( VerQueryValueA (lpData, strFirstBit + "ProductName", &lpt, &cbBufSize) )     pOutLibVersionInfo->strProductName = SStringX( (const char*)lpt ); 
+        }
+
         free (lpData);
         return true;
     }
