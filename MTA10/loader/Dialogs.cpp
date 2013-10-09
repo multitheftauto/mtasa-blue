@@ -580,7 +580,7 @@ void HideOptimusDialog ( void )
 //
 //
 ///////////////////////////////////////////////////////////////
-void ShowNoAvDialog( HINSTANCE hInstance, bool bWSCNotMonitoring )
+void ShowNoAvDialog( HINSTANCE hInstance, bool bEnableScaremongering )
 {
     uint uiTimeLastAsked = GetApplicationSettingInt( "noav-last-asked-time" );
     bool bUserSaysNo = GetApplicationSettingInt( "noav-user-says-skip" ) != 0;
@@ -598,7 +598,7 @@ void ShowNoAvDialog( HINSTANCE hInstance, bool bWSCNotMonitoring )
         uiAskHoursInterval = 24;        // Once a day if box not ticked
     else
     {
-        if ( !bWSCNotMonitoring )
+        if ( bEnableScaremongering )
             uiAskHoursInterval = 24 * 7;            // Once a week if ticked
         else
             uiAskHoursInterval = 24 * 365 * 1000;   // Once every 1000 years if ticked and WSC not monitoring
@@ -620,8 +620,8 @@ void ShowNoAvDialog( HINSTANCE hInstance, bool bWSCNotMonitoring )
         hwndNoAvDialog = CreateDialog ( hInstance, MAKEINTRESOURCE(IDD_NOAV_DIALOG), 0, DialogProc );
         dassert( ( GetWindowLong( hwndNoAvDialog, GWL_STYLE ) & WS_VISIBLE ) == 0 );    // Should be Visible: False
         InitDialogStrings( hwndNoAvDialog, g_NoAvDialogItems );
-        ShowWindow( GetDlgItem( hwndNoAvDialog, IDC_NOAV_OPT_SKIP ), bWSCNotMonitoring ? SW_SHOW : SW_HIDE );
-        ShowWindow( GetDlgItem( hwndNoAvDialog, IDC_NOAV_OPT_BOTNET ), bWSCNotMonitoring ? SW_HIDE : SW_SHOW );
+        ShowWindow( GetDlgItem( hwndNoAvDialog, IDC_NOAV_OPT_SKIP ), bEnableScaremongering ? SW_HIDE : SW_SHOW );
+        ShowWindow( GetDlgItem( hwndNoAvDialog, IDC_NOAV_OPT_BOTNET ), bEnableScaremongering ? SW_SHOW : SW_HIDE );
     }
     ShowWindow( hwndNoAvDialog, SW_SHOW );  // Show after all changes are complete
     SetForegroundWindow ( hwndNoAvDialog );
