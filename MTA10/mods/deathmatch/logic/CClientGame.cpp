@@ -4352,27 +4352,23 @@ void CClientGame::DeathHandler ( CPed* pKilledPedSA, unsigned char ucDeathReason
     if ( !pKilledPed )
         return;
 
+    // Not required for remote players. Local player is handled in DoPulses->DoWastedCheck
+    if ( IS_PLAYER ( pKilledPed ) )
+        return;
+
     // Set the health to zero (this is safe as GTA will do it anyway in a few ticks)
     pKilledPed->SetHealth(0.0f);
-    
-    if ( IS_PLAYER ( pKilledPed ) )
-    {
-        if ( pKilledPed == m_pLocalPlayer )
-            DoWastedCheck();
-    }
-    else
-    {
-        // Call Lua
-        CLuaArguments Arguments;
-        Arguments.PushBoolean(false);
-        Arguments.PushNumber(ucDeathReason);
-        Arguments.PushNumber(ucBodyPart);
 
-        pKilledPed->CallEvent("onClientPedWasted", Arguments, true);
-        
-        // Notify the server
-        SendPedWastedPacket ( pKilledPed, INVALID_ELEMENT_ID, ucDeathReason, ucBodyPart );
-    }
+    // Call Lua
+    CLuaArguments Arguments;
+    Arguments.PushBoolean(false);
+    Arguments.PushNumber(ucDeathReason);
+    Arguments.PushNumber(ucBodyPart);
+
+    pKilledPed->CallEvent("onClientPedWasted", Arguments, true);
+    
+    // Notify the server
+    SendPedWastedPacket ( pKilledPed, INVALID_ELEMENT_ID, ucDeathReason, ucBodyPart );
 }
 
 bool CClientGame::VehicleCollisionHandler ( CVehicleSAInterface* pCollidingVehicle, CEntitySAInterface* pCollidedWith, int iModelIndex, float fDamageImpulseMag, float fCollidingDamageImpulseMag, uint16 usPieceType, CVector vecCollisionPos, CVector vecCollisionVelocity )
