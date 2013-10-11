@@ -80,6 +80,7 @@ struct SIntegerSync : public ISyncStructure
 {
     bool Read ( NetBitStreamInterface& bitStream )
     {
+        data.value = 0;
         return bitStream.ReadBits ( reinterpret_cast < char* > ( &data ), bits );
     }
     void Write ( NetBitStreamInterface& bitStream ) const
@@ -1112,6 +1113,7 @@ struct SWeaponSlotSync : public ISyncStructure
 
     bool Read ( NetBitStreamInterface& bitStream )
     {
+        data.uiSlot = 0;
         return bitStream.ReadBits ( (char *)&data, BITCOUNT );
     }
     void Write ( NetBitStreamInterface& bitStream ) const
@@ -1281,6 +1283,7 @@ struct SBodypartSync : public ISyncStructure
 
     bool Read ( NetBitStreamInterface& bitStream )
     {
+        data.uiBodypart = 0;
         bool bStatus = bitStream.ReadBits ( (char *)&data, BITCOUNT );
         if ( bStatus )
             data.uiBodypart += 3;
@@ -1763,6 +1766,7 @@ struct SExplosionTypeSync : public ISyncStructure
 
     bool Read ( NetBitStreamInterface& bitStream )
     {
+        data.uiType = 0;
         return bitStream.ReadBits ( reinterpret_cast < char* > ( &data ), BITCOUNT );
     }
     void Write ( NetBitStreamInterface& bitStream ) const
@@ -1859,6 +1863,7 @@ struct SQuitReasonSync : public ISyncStructure
 
     bool Read ( NetBitStreamInterface& bitStream )
     {
+        data.uiQuitReason = 0;
         return bitStream.ReadBits ( reinterpret_cast < char* > ( &data ), BITCOUNT );
     }
     void Write ( NetBitStreamInterface& bitStream ) const
