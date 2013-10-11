@@ -11082,7 +11082,7 @@ int CLuaFunctionDefinitions::DbPoll ( lua_State* luaVM )
             lua_pop ( luaVM, 1 );                               // pop the inner table
         }
         lua_pushnumber ( luaVM, pJobData->result.uiNumAffectedRows );
-        lua_pushnumber ( luaVM, pJobData->result.ullLastInsertId );
+        lua_pushnumber ( luaVM, static_cast < double > ( pJobData->result.ullLastInsertId ) );
         return 3;
     }
     else
