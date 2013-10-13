@@ -1926,6 +1926,53 @@ bool VerifyEmbeddedSignature( const WString& strFilename )
 
 //////////////////////////////////////////////////////////
 //
+// LogSettings
+//
+// Dump some settings to the log file to help debugging
+//
+//////////////////////////////////////////////////////////
+void LogSettings( void )
+{
+    const char* szSettings[] = {
+                                "general", "aero-enabled",
+                                "general", "aero-changeable",
+                                "general", "driver-overrides-disabled",
+                                "general", "device-selection-disabled",
+                                "general", "customized-sa-files-using",
+                                "general", "times-connected",
+                                "general", "times-connected-editor",
+                                "nvhacks", "optimus-force-detection",
+                                "nvhacks", "optimus-export-enablement",
+                                "nvhacks", "optimus",
+                                "nvhacks", "optimus-rename-exe",
+                                "nvhacks", "optimus-alt-startup",
+                                "nvhacks", "optimus-force-windowed",
+                                "nvhacks", "optimus-dialog-skip",
+                                "nvhacks", "optimus-startup-option",
+                                "diagnostics", "send-dumps",
+                                "diagnostics", "last-minidump-time",
+                                "diagnostics", "user-confirmed-bsod-time",
+                                DIAG_MINIDUMP_DETECTED_COUNT,
+                                DIAG_MINIDUMP_CONFIRMED_COUNT,
+                                DIAG_PRELOAD_UPGRADES_LOWEST_UNSAFE,
+                                "general", "noav-user-says-skip",
+                                "general", "noav-last-asked-time",
+                            };
+
+    for ( uint i = 0 ; i < NUMELMS( szSettings ) ; i += 2 )
+    {
+        WriteDebugEvent( SString( "%s: %s", szSettings[i+1], *GetApplicationSetting( szSettings[i], szSettings[i+1] ) ) );
+    }
+
+    uint uiTimeLastAsked = GetApplicationSettingInt( "noav-last-asked-time" );
+    uint uiTimeNow = static_cast < uint >( time( NULL ) / 3600LL );
+    uint uiHoursSinceLastAsked = uiTimeNow - uiTimeLastAsked;
+    WriteDebugEvent( SString( "noav-last-asked-time-hours-delta: %d", uiHoursSinceLastAsked ) );
+}
+
+
+//////////////////////////////////////////////////////////
+//
 // PadLeft
 //
 // Add some spaces to make it look nicer
