@@ -246,7 +246,6 @@ void ShowProgressDialog( HINSTANCE hInstance, const SString& strTitle, bool bAll
         dassert( ( GetWindowLong( hwndProgressDialog, GWL_STYLE ) & WS_VISIBLE ) == 0 );    // Should be Visible: False
         InitDialogStrings( hwndProgressDialog, g_ProgressDialogItems );
         SetWindowText ( hwndProgressDialog, strTitle );
-        HWND hwndButton = GetDlgItem( hwndProgressDialog, IDCANCEL );
         ShowWindow( GetDlgItem( hwndProgressDialog, IDCANCEL ), bAllowCancel ? SW_SHOW : SW_HIDE );
         ulProgressStartTime = GetTickCount32 ();
     }
@@ -595,7 +594,7 @@ void ShowNoAvDialog( HINSTANCE hInstance, bool bEnableScaremongering )
     // Time to ask again?
     uint uiAskHoursInterval;
     if ( !bUserSaysNo )
-        uiAskHoursInterval = 24;        // Once a day if box not ticked
+        uiAskHoursInterval = 1;        // Once an hour if box not ticked
     else
     {
         if ( bEnableScaremongering )

@@ -10,6 +10,14 @@
 
 #include "StdInc.h"
 
+DECLARE_ENUM( WSC_SECURITY_PROVIDER_HEALTH )
+IMPLEMENT_ENUM_BEGIN( WSC_SECURITY_PROVIDER_HEALTH )
+        ADD_ENUM( WSC_SECURITY_PROVIDER_HEALTH_GOOD,        "good" )
+        ADD_ENUM( WSC_SECURITY_PROVIDER_HEALTH_NOTMONITORED,"not_monitored" )
+        ADD_ENUM( WSC_SECURITY_PROVIDER_HEALTH_POOR,        "poor" )
+        ADD_ENUM( WSC_SECURITY_PROVIDER_HEALTH_SNOOZE,      "snooze" )
+IMPLEMENT_ENUM_END( "wsc_health" )
+
 class CLocalizationDummy : public CLocalizationInterface
 {
 public:
@@ -497,7 +505,7 @@ void CheckAntiVirusStatus( void )
     }
 
     // Dump results
-    SString strStatus( "AV health: %d", health );
+    SString strStatus( "AV health: %s (%d)", *EnumToString( health ), health );
     for ( uint i = 0 ; i < enabledList.size() ; i++ )
         strStatus += SString( " [Ena%d:%s]", i, *enabledList[i] );
     for ( uint i = 0 ; i < disabledList.size() ; i++ )
@@ -711,6 +719,7 @@ int LaunchGame ( SString strCmdLine )
 
     // Do some D3D things
     BeginD3DStuff();
+    LogSettings();
 
     // Use renamed exe if required
     SString strGTAEXEPath = GetInstallManager()->MaybeRenameExe( strGTAPath );

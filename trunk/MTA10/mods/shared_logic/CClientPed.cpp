@@ -5135,7 +5135,13 @@ void CClientPed::UpdateUnderFloorFix ( const CVector& vecTargetPosition, const C
     if ( m_uiForceLocalCounter++ > 1 )
     {
         if ( bForceLocalZ )
+        {
             vecLocalPosition.fZ = vecTargetPosition.fZ;
+            CVector vecMoveSpeed;
+            GetMoveSpeed( vecMoveSpeed );
+            vecMoveSpeed.fZ = 0;
+            SetMoveSpeed( vecMoveSpeed );
+        }
         if ( bForceLocalXY )
         {
             vecLocalPosition.fX = vecTargetPosition.fX;
