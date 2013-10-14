@@ -275,7 +275,7 @@ PostVC90Check:
         Call NoteGTAWasPresent
 	${EndIf}
 
-    Call ReportPresentStatus
+    Call ReportWasPresentStatus
 
 	; Remove exe name from path
 	!insertmacro ReplaceSubStr $2 "gta_sa.exe" ""
@@ -1959,18 +1959,24 @@ FunctionEnd
 var PREV_INSTALL
 
 Function NoteMTAWasPresent
-    StrCpy $PREV_INSTALL "$PREV_INSTALL&m=1"
+    StrCpy $PREV_INSTALL "$PREV_INSTALL&pm=1"
 FunctionEnd
 
 Function NoteGTAWasPresent
-    StrCpy $PREV_INSTALL "$PREV_INSTALL&g=1"
+    StrCpy $PREV_INSTALL "$PREV_INSTALL&pg=1"
 FunctionEnd
 
-Function ReportPresentStatus
-    StrCpy $PREV_INSTALL "$PREV_INSTALL&x=0"
+Function ReportWasPresentStatus
     IfFileExists "$APPDATA\MTA San Andreas All" 0 skip
-        StrCpy $PREV_INSTALL "$PREV_INSTALL&p=1"
+        StrCpy $PREV_INSTALL "$PREV_INSTALL&pp=1"
     skip:
-	NSISdl::download_quiet /TIMEOUT=3000 "http://updatesa.multitheftauto.com/sa/install/1/?$PREV_INSTALL" "$TEMP\prev_install"
+    StrCpy $PREV_INSTALL "$PREV_INSTALL&ver=${0.0.0}"
+!ifndef LIGHTBUILD
+    StrCpy $PREV_INSTALL "$PREV_INSTALL&n=1"
+!endif
+!ifdef REVISION
+    StrCpy $PREV_INSTALL "$PREV_INSTALL&rev=${REVISION}"
+!endif
+	NSISdl::download_quiet /TIMEOUT=3000 "http://updatesa.multitheftauto.com/sa/install/1/?x=0$PREV_INSTALL" "$TEMP\prev_install"
     Pop $R0
 FunctionEnd
