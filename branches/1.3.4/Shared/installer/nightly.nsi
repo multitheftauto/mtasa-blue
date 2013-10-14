@@ -220,12 +220,16 @@ Function .onInit
 DontInstallVC9Redist:
 	StrCpy $RedistInstalled "1"
 PostVC90Check:
-	
+
 	; Try to find previously saved MTA:SA install path
 	ReadRegStr $Install_Dir HKLM "SOFTWARE\Multi Theft Auto: San Andreas All\${0.0}" "Last Install Location"
 	${If} $Install_Dir == "" 
 		ReadRegStr $Install_Dir HKLM "SOFTWARE\Multi Theft Auto: San Andreas ${0.0}" "Last Install Location"
 	${EndIf}
+	${If} $Install_Dir != "" 
+        Call NoteMTAWasPresent
+	${EndIf}
+
 	${If} $Install_Dir == "" 
 		strcpy $Install_Dir "$PROGRAMFILES\MTA San Andreas ${0.0}"
 	${EndIf}
@@ -265,6 +269,13 @@ PostVC90Check:
 	${If} $2 == "" 
 		ReadRegStr $2 HKCU "SOFTWARE\Multi Theft Auto: San Andreas ${0.0}" "GTA:SA Path Backup"
 	${EndIf}
+
+    ; Report previous install status
+	${If} $2 != "" 
+        Call NoteGTAWasPresent
+	${EndIf}
+
+    Call ReportPresentStatus
 
 	; Remove exe name from path
 	!insertmacro ReplaceSubStr $2 "gta_sa.exe" ""
@@ -1937,4 +1948,29 @@ Function un.DoServiceUninstall
             StrCpy $ServiceModified 2
         ${EndIf}
     ${EndIf}
+FunctionEnd
+
+
+;****************************************************************
+;
+; Report previous install status
+;
+;****************************************************************
+var PREV_INSTALL
+
+Function NoteMTAWasPresent
+    StrCpy $PREV_INSTALL "$PREV_INSTALL&m=1"
+FunctionEnd
+
+Function NoteGTAWasPresent
+    StrCpy $PREV_INSTALL "$PREV_INSTALL&g=1"
+FunctionEnd
+
+Function ReportPresentStatus
+    StrCpy $PREV_INSTALL "$PREV_INSTALL&x=0"
+    IfFileExists "$APPDATA\MTA San Andreas All" 0 skip
+        StrCpy $PREV_INSTALL "$PREV_INSTALL&p=1"
+    skip:
+	NSISdl::download_quiet /TIMEOUT=3000 "http://updatesa.multitheftauto.com/sa/install/1/?$PREV_INSTALL" "$TEMP\prev_install"
+    Pop $R0
 FunctionEnd
