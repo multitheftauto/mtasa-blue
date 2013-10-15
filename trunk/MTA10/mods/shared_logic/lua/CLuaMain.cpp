@@ -841,7 +841,8 @@ bool CLuaMain::LoadScriptFromBuffer ( const char* cpInBuffer, unsigned int uiInS
         else
         {
             ResetInstructionCount ();
-            int iret = this->PCall ( m_luaVM, 0, 0, 0 ) ;
+            int luaSavedTop = lua_gettop ( m_luaVM );
+            int iret = this->PCall ( m_luaVM, 0, LUA_MULTRET, 0 ) ;
             if ( iret == LUA_ERRRUN || iret == LUA_ERRMEM )
             {
                 SString strRes = lua_tostring( m_luaVM, -1 );
@@ -867,6 +868,9 @@ bool CLuaMain::LoadScriptFromBuffer ( const char* cpInBuffer, unsigned int uiInS
                     g_pClientGame->GetScriptDebugging()->LogError ( m_luaVM, "%s", strRes.c_str () );
                 }
             }
+            // Cleanup any return values
+            if ( lua_gettop ( m_luaVM ) > luaSavedTop )
+                lua_settop( m_luaVM, luaSavedTop );
             return true;
         }
     }
@@ -883,12 +887,16 @@ bool CLuaMain::LoadScript ( const char* szLUAScript )
         if ( !luaL_loadbuffer ( m_luaVM, szLUAScript, strlen(szLUAScript), NULL ) )
         {
             ResetInstructionCount ();
-            int iret = this->PCall ( m_luaVM, 0, 0, 0 ) ;
+            int luaSavedTop = lua_gettop ( m_luaVM );
+            int iret = this->PCall ( m_luaVM, 0, LUA_MULTRET, 0 ) ;
             if ( iret == LUA_ERRRUN || iret == LUA_ERRMEM )
             {
                 std::string strRes = ConformResourcePath ( lua_tostring( m_luaVM, -1 ) );
                 g_pClientGame->GetScriptDebugging()->LogError ( m_luaVM, "Executing in-line script failed: %s", strRes.c_str () );
             }
+            // Cleanup any return values
+            if ( lua_gettop ( m_luaVM ) > luaSavedTop )
+                lua_settop( m_luaVM, luaSavedTop );
         }
         else
         {
