@@ -127,6 +127,8 @@ Click Next to continue."
 !define MUI_PAGE_CUSTOMFUNCTION_SHOW "LicenseShowProc"
 !insertmacro MUI_PAGE_LICENSE					"eula.txt"
 
+Page custom CustomNetMessagePage CustomNetMessagePageLeave
+
 ; Components page
 !define MUI_PAGE_CUSTOMFUNCTION_SHOW "ComponentsShowProc"
 !insertmacro MUI_PAGE_COMPONENTS
@@ -195,6 +197,8 @@ Function .onInstFailed
 FunctionEnd
 
 Function .onInit
+    File /oname=$TEMP\image.bmp "connect.bmp"
+
 	; #############################################
 	; Remove old shortcuts put in rand(user,admin) startmenu by previous installers (shortcuts now go in all users)
 	SetShellVarContext current
@@ -274,8 +278,6 @@ PostVC90Check:
 	${If} $2 != "" 
         Call NoteGTAWasPresent
 	${EndIf}
-
-    Call ReportWasPresentStatus
 
 	; Remove exe name from path
 	!insertmacro ReplaceSubStr $2 "gta_sa.exe" ""
@@ -1769,7 +1771,6 @@ Function CustomDirectoryPageUpdateINSTDIR
     ${EndSwitch}
 FunctionEnd
 
-
 ;****************************************************************
 ;
 ; Keep track of temp directories created
@@ -1953,30 +1954,196 @@ FunctionEnd
 
 ;****************************************************************
 ;
-; Report previous install status
+; CustomNetMessagePage
+;
+; Show message to get user to unblock installer from firewall or similar
 ;
 ;****************************************************************
-var PREV_INSTALL
+Var NetDialog
+Var NetStatusLabel1
+Var NetStatusLabel2
+Var NetTryCount
+Var NetDone
+Var NetImage
+Var NetImageHandle
+Var NetMsgURL
+Var NetPrevInfo
+Var NetEnableNext
+Var NetOtherSuccessCount
+Var NetMirror
+!define NEXT_BUTTON_ID 1
+
+Function CustomNetMessagePage
+    # Initial try with blank page
+    Call TryToSendInfo
+    ${If} $NetDone == 1
+        # If it works, then skip this page
+        Return
+	${EndIf}
+
+    # Setup page
+	nsDialogs::Create 1018
+	Pop $NetDialog
+	${If} $NetDialog == error
+		Abort
+	${EndIf}
+
+    GetDlgItem $0 $HWNDPARENT 1037
+    ${NSD_SetText} $0 "Online update"
+
+    GetDlgItem $0 $HWNDPARENT 1038
+    ${NSD_SetText} $0 "Checking for update information"
+
+	${NSD_CreateLabel} 0 20 100% 15 "Checking for installer update information..."
+	Pop $NetStatusLabel1
+    ${NSD_AddStyle} $NetStatusLabel1 ${SS_CENTER}
+
+	${NSD_CreateLabel} 0 155 100% 15 "Please ensure your firewall is not blocking"
+	Pop $NetStatusLabel2
+    ${NSD_AddStyle} $NetStatusLabel2 ${SS_CENTER}
+
+	${NSD_CreateBitmap} 155 71 100% 100% ""
+	Pop $NetImage
+	${NSD_SetImage} $NetImage $TEMP\image.bmp $NetImageHandle
+
+    # Disable Next button maybe
+    ${If} $NetEnableNext != 1
+        GetDlgItem $0 $HWNDPARENT ${NEXT_BUTTON_ID}
+        EnableWindow $0 0
+    ${EndIf}
+
+    Call DirectoryShowProc
+    ${NSD_CreateTimer} NetFuncTimer 1000
+    nsDialogs::Show
+	${NSD_FreeImage} $NetImageHandle
+FunctionEnd
+
+Function CustomNetMessagePageLeave
+    ${NSD_KillTimer} NetFuncTimer
+    Call TryToSendInfo
+    Call DirectoryShowProc
+FunctionEnd
+
+Function NetFuncTimer
+    ${NSD_KillTimer} NetFuncTimer
+    IntOp $NetTryCount $NetTryCount + 1
+    Call TryToSendInfo
+
+    # Allow Next button after a number of tries
+    ${If} $NetTryCount > 3
+        StrCpy $NetEnableNext 1
+    ${EndIf}
+
+    ${If} $NetEnableNext == 1
+        GetDlgItem $0 $HWNDPARENT ${NEXT_BUTTON_ID}
+        EnableWindow $0 1
+    ${EndIf}
+
+    ${If} $NetDone == 1
+        # If it works now, then proceed to the next page
+        SendMessage $HWNDPARENT "0x408" "1" ""      # GotoNextPage
+    ${Else}
+        # Otherwise, try again in a second
+        ${NSD_CreateTimer} NetFuncTimer 1000
+    ${EndIf}
+FunctionEnd
+
+;--------------------------
+; Out $NetDone = result   (1 = success)
+Function TryToSendInfo
+    # Check if already done
+    ${If} $NetDone == 1
+        Return
+    ${EndIf}
+
+    # Do attempt
+    Call NetComposeURL
+    StrCpy $0 $NetMsgURL
+    StrCpy $1 3000
+    Call DoSendInfo
+
+    # Set result
+    ${If} $0 == 1
+        StrCpy $NetDone 1
+    ${Else}
+        # Check if anything else is contactable
+        StrCpy $0 "http://www.google.com/"
+        StrCpy $1 1000
+        Call DoSendInfo
+        ${If} $0 == 1
+            StrCpy $NetEnableNext 1
+            IntOp $NetOtherSuccessCount $NetOtherSuccessCount + 1
+            ${If} $NetOtherSuccessCount > 3
+                StrCpy $NetDone 1
+            ${EndIf}
+        ${EndIf}
+    ${EndIf}
+FunctionEnd
+
+;--------------------------
+; In $0 = URL
+; In $1 = Timeout
+; Out $0 = result   (1 = success)
+Function DoSendInfo
+    NSISdl::download_quiet /TIMEOUT=$1 "$0" "$TEMP\prev_install"
+    Pop $R0
+
+    # Allow for server errors #1
+    StrCpy $0 $R0 14
+    ${If} $0 == "Server did not"
+        StrCpy $R0 "success"
+    ${EndIf}
+
+    # Allow for server errors #2
+    StrCpy $0 $R0 4
+    ${If} $0 == "HTTP"
+        StrCpy $R0 "success"
+    ${EndIf}
+
+    # Set result
+    StrCpy $0 0
+    ${If} $R0 == "success"
+        StrCpy $0 1
+    ${EndIf}
+FunctionEnd
+
+;--------------------------
+; Out $NetMsgURL = URL
+Function NetComposeURL
+    ${If} $NetMsgURL == ""  
+        IfFileExists "$APPDATA\MTA San Andreas All" 0 skip
+            StrCpy $NetPrevInfo "$NetPrevInfo&pp=1"
+        skip:
+        StrCpy $NetPrevInfo "$NetPrevInfo&ver=${0.0.0}"
+    !ifndef LIGHTBUILD
+        StrCpy $NetPrevInfo "$NetPrevInfo&n=1"
+    !endif
+    !ifdef REVISION
+        StrCpy $NetPrevInfo "$NetPrevInfo&rev=${REVISION}"
+    !endif
+    ${EndIf}
+
+    IntOp $NetMirror $NetMirror + 1
+    IntOp $NetMirror $NetMirror % 2
+    ${Switch} $NetMirror
+        ${Case} 0
+            StrCpy $NetMsgURL "http://updatesa.multitheftauto.com/sa/install/1/?x=0"
+            ${Break}
+        ${Default}
+            StrCpy $NetMsgURL "http://updatesa.mtasa.com/sa/install/1/?x=0"
+            ${Break}
+    ${EndSwitch}
+    StrCpy $NetMsgURL "$NetMsgURL$NetPrevInfo"
+    StrCpy $NetMsgURL "$NetMsgURL&try=$NetTryCount"
+    StrCpy $NetMsgURL "$NetMsgURL&other=$NetOtherSuccessCount"
+    #MessageBox MB_OK $NetMsgURL
+FunctionEnd
 
 Function NoteMTAWasPresent
-    StrCpy $PREV_INSTALL "$PREV_INSTALL&pm=1"
+    StrCpy $NetPrevInfo "$NetPrevInfo&pm=1"
 FunctionEnd
 
 Function NoteGTAWasPresent
-    StrCpy $PREV_INSTALL "$PREV_INSTALL&pg=1"
+    StrCpy $NetPrevInfo "$NetPrevInfo&pg=1"
 FunctionEnd
 
-Function ReportWasPresentStatus
-    IfFileExists "$APPDATA\MTA San Andreas All" 0 skip
-        StrCpy $PREV_INSTALL "$PREV_INSTALL&pp=1"
-    skip:
-    StrCpy $PREV_INSTALL "$PREV_INSTALL&ver=${0.0.0}"
-!ifndef LIGHTBUILD
-    StrCpy $PREV_INSTALL "$PREV_INSTALL&n=1"
-!endif
-!ifdef REVISION
-    StrCpy $PREV_INSTALL "$PREV_INSTALL&rev=${REVISION}"
-!endif
-	NSISdl::download_quiet /TIMEOUT=3000 "http://updatesa.multitheftauto.com/sa/install/1/?x=0$PREV_INSTALL" "$TEMP\prev_install"
-    Pop $R0
-FunctionEnd
