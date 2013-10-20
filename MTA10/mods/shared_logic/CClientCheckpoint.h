@@ -63,7 +63,7 @@ public:
     void                            SetIcon                         ( unsigned int uiIcon );
     
     inline SColor                   GetColor                        ( void ) const                      { return m_Color; }
-    void                            SetColor                        ( const SColor color );
+    void                            SetColor                        ( const SColor& color );
 
     inline float                    GetSize                         ( void ) const                      { return m_fSize; };
     void                            SetSize                         ( float fSize );

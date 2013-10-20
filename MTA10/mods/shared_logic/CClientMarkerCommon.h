@@ -45,7 +45,7 @@ public:
     virtual void                SetVisible              ( bool bVisible ) = 0;
 
     virtual SColor              GetColor                ( void ) const = 0;
-    virtual void                SetColor                ( const SColor color ) = 0;
+    virtual void                SetColor                ( const SColor& color ) = 0;
 
     virtual void                GetPosition             ( CVector& vecPosition ) const = 0;
     virtual void                SetPosition             ( const CVector& vecPosition ) = 0;

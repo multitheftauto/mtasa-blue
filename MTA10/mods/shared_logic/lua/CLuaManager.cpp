@@ -651,6 +651,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "dxGetBlendMode", CLuaFunctionDefs::dxGetBlendMode );
     CLuaCFunctions::AddFunction ( "dxSetAspectRatioAdjustmentEnabled", CLuaFunctionDefs::dxSetAspectRatioAdjustmentEnabled );
     CLuaCFunctions::AddFunction ( "dxIsAspectRatioAdjustmentEnabled", CLuaFunctionDefs::dxIsAspectRatioAdjustmentEnabled );
+    CLuaCFunctions::AddFunction ( "dxSetTextureEdge", CLuaFunctionDefs::dxSetTextureEdge );
 
     // Audio funcs
     CLuaCFunctions::AddFunction ( "playSoundFrontEnd", CLuaFunctionDefs::PlaySoundFrontEnd );

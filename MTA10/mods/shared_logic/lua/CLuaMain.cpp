@@ -355,8 +355,8 @@ void CLuaMain::AddVehicleClass ( lua_State* luaVM )
     lua_classvariable ( luaVM, "handling", NULL, "getVehicleHandling" );
     lua_classvariable ( luaVM, "components", NULL, "getVehicleComponents" );
     
-    lua_classvariable ( luaVM, "towingVehicle", "getVehicleTowingVehicle" );
-    lua_classvariable ( luaVM, "towedByVehicle", "getVehicleTowedByVehicle" );    
+    lua_classvariable ( luaVM, "towingVehicle", NULL, "getVehicleTowingVehicle" );
+    lua_classvariable ( luaVM, "towedByVehicle", NULL, "getVehicleTowedByVehicle" );    
     
     lua_classvariable ( luaVM, "trainDirection", "setTrainDirection", "getTrainDirection" );
     lua_classvariable ( luaVM, "trainSpeed", "setTrainSpeed", "getTrainSpeed" );

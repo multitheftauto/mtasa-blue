@@ -334,11 +334,12 @@ CEffectWrap* NewEffectWrap ( CRenderItemManager* pManager, const SString& strFil
 class CMaterialItem : public CRenderItem
 {
     DECLARE_CLASS( CMaterialItem, CRenderItem )
-                    CMaterialItem           ( void ) : ClassInit ( this ), m_TextureAddress ( TADDRESS_WRAP ) {}
+                    CMaterialItem           ( void ) : ClassInit ( this ), m_TextureAddress ( TADDRESS_WRAP ), m_uiBorderColor(0) {}
 
     uint                m_uiSizeX;
     uint                m_uiSizeY;
     ETextureAddress     m_TextureAddress;
+    uint                m_uiBorderColor;
 };
 
 
