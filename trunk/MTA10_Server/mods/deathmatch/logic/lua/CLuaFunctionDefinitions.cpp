@@ -2286,7 +2286,7 @@ int CLuaFunctionDefinitions::GetAlivePlayers ( lua_State* luaVM )
         // Add all alive players
         unsigned int uiIndex = 0;
         list < CPlayer* > ::const_iterator iter = m_pPlayerManager->IterBegin ();
-        for ( ; iter != m_pPlayerManager->IterEnd () ; iter++ )
+        for ( ; iter != m_pPlayerManager->IterEnd () ; ++iter )
         {
             if ( (*iter)->IsSpawned () )
             {
@@ -2313,7 +2313,7 @@ int CLuaFunctionDefinitions::GetDeadPlayers ( lua_State* luaVM )
         // Add all alive players
         unsigned int uiIndex = 0;
         list < CPlayer* > ::const_iterator iter = m_pPlayerManager->IterBegin ();
-        for ( ; iter != m_pPlayerManager->IterEnd () ; iter++ )
+        for ( ; iter != m_pPlayerManager->IterEnd () ; ++iter )
         {
             if ( !(*iter)->IsSpawned () )
             {
@@ -4009,36 +4009,38 @@ int CLuaFunctionDefinitions::GetVehicleSirens( lua_State* luaVM )
                 lua_pushnumber ( luaVM, i+1 );
                 lua_newtable ( luaVM );
 
+                SSirenBeaconInfo info = tSirenInfo.m_tSirenInfo[i];
+
                 lua_pushstring( luaVM, "Min_Alpha" );
-                lua_pushnumber ( luaVM, tSirenInfo.m_tSirenInfo[i].m_dwMinSirenAlpha );
+                lua_pushnumber ( luaVM, info.m_dwMinSirenAlpha );
                 lua_settable ( luaVM, -3 ); // End of Min_Alpha property
 
                 lua_pushstring( luaVM, "Red" );
-                lua_pushnumber ( luaVM, tSirenInfo.m_tSirenInfo[i].m_RGBBeaconColour.R );
+                lua_pushnumber ( luaVM, info.m_RGBBeaconColour.R );
                 lua_settable ( luaVM, -3 ); // End of Red property
 
                 lua_pushstring( luaVM, "Green" );
-                lua_pushnumber ( luaVM, tSirenInfo.m_tSirenInfo[i].m_RGBBeaconColour.G );
+                lua_pushnumber ( luaVM, info.m_RGBBeaconColour.G );
                 lua_settable ( luaVM, -3 ); // End of Green property
 
                 lua_pushstring( luaVM, "Blue" );
-                lua_pushnumber ( luaVM, tSirenInfo.m_tSirenInfo[i].m_RGBBeaconColour.B );
+                lua_pushnumber ( luaVM, info.m_RGBBeaconColour.B );
                 lua_settable ( luaVM, -3 ); // End of Blue property
 
                 lua_pushstring( luaVM, "Alpha" );
-                lua_pushnumber ( luaVM, tSirenInfo.m_tSirenInfo[i].m_RGBBeaconColour.A );
+                lua_pushnumber ( luaVM, info.m_RGBBeaconColour.A );
                 lua_settable ( luaVM, -3 ); // End of Alpha property
 
                 lua_pushstring( luaVM, "x" );
-                lua_pushnumber ( luaVM, tSirenInfo.m_tSirenInfo[i].m_vecSirenPositions.fX );
+                lua_pushnumber ( luaVM, info.m_vecSirenPositions.fX );
                 lua_settable ( luaVM, -3 ); // End of X property
 
                 lua_pushstring( luaVM, "y" );
-                lua_pushnumber ( luaVM, tSirenInfo.m_tSirenInfo[i].m_vecSirenPositions.fY );
+                lua_pushnumber ( luaVM, info.m_vecSirenPositions.fY );
                 lua_settable ( luaVM, -3 ); // End of Y property
 
                 lua_pushstring( luaVM, "z" );
-                lua_pushnumber ( luaVM, tSirenInfo.m_tSirenInfo[i].m_vecSirenPositions.fZ );
+                lua_pushnumber ( luaVM, info.m_vecSirenPositions.fZ );
                 lua_settable ( luaVM, -3 ); // End of Z property
 
                 lua_settable ( luaVM, -3 ); // End of Table
@@ -7610,7 +7612,7 @@ int CLuaFunctionDefinitions::GetFunctionsBoundToKey ( lua_State* luaVM )
         // Add all the bound functions to it
         unsigned int uiIndex = 0;
         list < CKeyBind* > ::iterator iter = pPlayer->GetKeyBinds ()->IterBegin ();
-        for ( ; iter != pPlayer->GetKeyBinds ()->IterEnd (); iter++ )
+        for ( ; iter != pPlayer->GetKeyBinds ()->IterEnd (); ++iter )
         {
             CKeyBind* pKeyBind = *iter;
             if ( !pKeyBind->IsBeingDeleted () )
@@ -7682,7 +7684,7 @@ int CLuaFunctionDefinitions::GetKeyBoundToFunction ( lua_State* luaVM )
         iLuaFunction = luaM_toref ( luaVM, 2 );
 
         list < CKeyBind* > ::iterator iter = pPlayer->GetKeyBinds ()->IterBegin ();
-        for ( ; iter != pPlayer->GetKeyBinds ()->IterEnd (); iter++ )
+        for ( ; iter != pPlayer->GetKeyBinds ()->IterEnd (); ++iter )
         {
             CKeyBind* pKeyBind = *iter;
             if ( !pKeyBind->IsBeingDeleted () )
@@ -10046,7 +10048,7 @@ int CLuaFunctionDefinitions::GetTimers ( lua_State* luaVM )
             CTickCount llCurrentTime = CTickCount::Now ();
             unsigned int uiIndex = 0;
             CFastList < CLuaTimer* > ::const_iterator iter = pLuaTimerManager->IterBegin ();
-            for ( ; iter != pLuaTimerManager->IterEnd () ; iter++ )
+            for ( ; iter != pLuaTimerManager->IterEnd () ; ++iter )
             {
                 CLuaTimer* pLuaTimer = *iter;
 
@@ -12618,7 +12620,7 @@ int CLuaFunctionDefinitions::GetModuleInfo ( lua_State* luaVM )
         list < CLuaModule* > ::iterator iter = lua_LoadedModules.begin ();
         SString strAttribute = lua_tostring( luaVM, 2 );
         SString strModuleName = lua_tostring( luaVM, 1 );
-        for ( ; iter != lua_LoadedModules.end (); iter++ )
+        for ( ; iter != lua_LoadedModules.end (); ++iter )
         {
             if ( stricmp ( strModuleName, (*iter)->_GetName().c_str() ) == 0 ) {
                 lua_newtable ( luaVM );
@@ -12651,7 +12653,7 @@ int CLuaFunctionDefinitions::GetModules ( lua_State* luaVM )
     list < CLuaModule* > lua_LoadedModules = m_pLuaModuleManager->GetLoadedModules();
     list < CLuaModule* > ::iterator iter = lua_LoadedModules.begin ();
     unsigned int uiIndex = 1;
-    for ( ; iter != lua_LoadedModules.end (); iter++ )
+    for ( ; iter != lua_LoadedModules.end (); ++iter )
     {
         lua_pushnumber ( luaVM, uiIndex++ );
         lua_pushstring ( luaVM, (*iter)->_GetFunctions().szFileName );

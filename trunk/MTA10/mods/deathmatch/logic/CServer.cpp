@@ -78,7 +78,7 @@ void CServer::DoPulse ( void )
         {
             // Loop through our output queue and echo it to console
             std::list < std::string >::const_iterator iter = m_OutputQueue.begin ();
-            for ( ; iter != m_OutputQueue.end (); iter++ )
+            for ( ; iter != m_OutputQueue.end (); ++iter )
             {
                 // Echo it
                 const char* szString = iter->c_str ();

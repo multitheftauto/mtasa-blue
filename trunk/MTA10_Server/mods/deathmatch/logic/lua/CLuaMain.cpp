@@ -110,21 +110,21 @@ CLuaMain::~CLuaMain ( void )
 
     // Eventually delete the XML files the LUA script didn't
     list<CXMLFile *>::iterator iterXML = m_XMLFiles.begin ();
-    for ( ; iterXML != m_XMLFiles.end (); iterXML++ )
+    for ( ; iterXML != m_XMLFiles.end (); ++iterXML )
     {
         delete *iterXML;
     }
 
     // Eventually delete the text displays the LUA script didn't
     list<CTextDisplay *>::iterator iterDisplays = m_Displays.begin ();
-    for ( ; iterDisplays != m_Displays.end (); iterDisplays++ )
+    for ( ; iterDisplays != m_Displays.end (); ++iterDisplays )
     {
         delete *iterDisplays;
     }
 
     // Eventually delete the text items the LUA script didn't
     list<CTextItem *>::iterator iterItems = m_TextItems.begin ();
-    for ( ; iterItems != m_TextItems.end (); iterItems++ )
+    for ( ; iterItems != m_TextItems.end (); ++iterItems )
     {
         delete *iterItems;
     }
@@ -488,7 +488,7 @@ void CLuaMain::UnloadScript ( void )
 
     // Delete all keybinds
     list < CPlayer* > ::const_iterator iter = m_pPlayerManager->IterBegin ();
-    for ( ; iter != m_pPlayerManager->IterEnd (); iter++ )
+    for ( ; iter != m_pPlayerManager->IterEnd (); ++iter )
     {
         if ( (*iter)->IsJoined () )
             (*iter)->GetKeyBinds ()->RemoveAllKeys ( this );
@@ -528,7 +528,7 @@ void CLuaMain::DestroyXML ( CXMLFile * pFile )
 void CLuaMain::DestroyXML ( CXMLNode * pRootNode )
 {
     list<CXMLFile *>::iterator iter;
-    for ( iter = m_XMLFiles.begin(); iter != m_XMLFiles.end(); iter++ )
+    for ( iter = m_XMLFiles.begin(); iter != m_XMLFiles.end(); ++iter )
     {
         CXMLFile * file = (*iter);
         if ( file )
@@ -546,7 +546,7 @@ void CLuaMain::DestroyXML ( CXMLNode * pRootNode )
 void CLuaMain::SaveXML ( CXMLNode * pRootNode )
 {
     list<CXMLFile *>::iterator iter;
-    for ( iter = m_XMLFiles.begin(); iter != m_XMLFiles.end(); iter++ )
+    for ( iter = m_XMLFiles.begin(); iter != m_XMLFiles.end(); ++iter )
     {
         CXMLFile * file = (*iter);
         if ( file )
@@ -561,7 +561,7 @@ void CLuaMain::SaveXML ( CXMLNode * pRootNode )
     if ( m_pResource )
     {
         list < CResourceFile* > ::iterator iter = m_pResource->IterBegin ();
-        for ( ; iter != m_pResource->IterEnd () ; iter++ )
+        for ( ; iter != m_pResource->IterEnd () ; ++iter )
         {
             CResourceFile* pResourceFile = *iter;
             if ( pResourceFile->GetType () == CResourceFile::RESOURCE_FILE_TYPE_CONFIG )
@@ -585,8 +585,7 @@ void CLuaMain::SaveXML ( CXMLNode * pRootNode )
 CTextDisplay * CLuaMain::CreateDisplay ( )
 {
     CTextDisplay * pDisplay = new CTextDisplay;
-    if ( pDisplay )
-        m_Displays.push_back ( pDisplay );
+    m_Displays.push_back ( pDisplay );
     return pDisplay;
 }
 

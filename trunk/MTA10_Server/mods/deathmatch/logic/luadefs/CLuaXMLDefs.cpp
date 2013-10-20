@@ -433,7 +433,7 @@ int CLuaXMLDefs::xmlNodeGetChildren ( lua_State* luaVM )
         {
             lua_newtable ( luaVM );
             list < CXMLNode * > ::iterator iter = pNode->ChildrenBegin ();
-            for ( ; iter != pNode->ChildrenEnd () ; iter++ )
+            for ( ; iter != pNode->ChildrenEnd () ; ++iter )
             {
                 lua_pushnumber ( luaVM, ++uiIndex );
                 lua_pushxmlnode ( luaVM, *iter );
@@ -529,7 +529,7 @@ int CLuaXMLDefs::xmlNodeGetAttributes ( lua_State* luaVM )
     {
         lua_newtable ( luaVM );
         list < class CXMLAttribute * > ::iterator iter = pNode->GetAttributes().ListBegin();
-        for ( ; iter != pNode->GetAttributes().ListEnd() ; iter++ )
+        for ( ; iter != pNode->GetAttributes().ListEnd() ; ++iter )
         {
             lua_pushstring ( luaVM, ( *iter )->GetName().c_str () );
             lua_pushstring ( luaVM, ( *iter )->GetValue().c_str () );

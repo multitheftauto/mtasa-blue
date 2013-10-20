@@ -204,7 +204,7 @@ CPlayer* CUnoccupiedVehicleSync::FindPlayerCloseToVehicle ( CVehicle* pVehicle, 
     CPlayer* pLastPlayerSyncing = NULL;
     CPlayer* pPlayer = NULL;
     list < CPlayer* > ::const_iterator iter = m_pPlayerManager->IterBegin ();
-    for ( ; iter != m_pPlayerManager->IterEnd (); iter++ )
+    for ( ; iter != m_pPlayerManager->IterEnd (); ++iter )
     {
         pPlayer = *iter;
         // Is he joined?
@@ -239,7 +239,7 @@ void CUnoccupiedVehicleSync::Packet_UnoccupiedVehicleSync ( CUnoccupiedVehicleSy
     {
         // Apply the data for each vehicle in the packet
         vector < CUnoccupiedVehicleSyncPacket::SyncData > ::iterator iter = Packet.IterBegin ();
-        for ( ; iter != Packet.IterEnd (); iter++ )
+        for ( ; iter != Packet.IterEnd (); ++iter )
         {
             CUnoccupiedVehicleSyncPacket::SyncData& data = *iter;
             SUnoccupiedVehicleSync& vehicle = data.syncStructure;

@@ -1409,7 +1409,7 @@ void RemoveFxSystemPointer ( DWORD* pPointer )
 {
     // Look through our list for the pointer
     std::list < DWORD* > ::iterator iter = Pointers_FxSystem.begin ();
-    for ( ; iter != Pointers_FxSystem.end (); iter++ )
+    for ( ; iter != Pointers_FxSystem.end (); ++iter )
     {
         // It exists in our list?
         if ( *iter == pPointer )
@@ -5608,8 +5608,11 @@ bool CheckHasSuspensionChanged ( void )
     {
         // Check our suspension interface has a valid vehicle and return the suspension changed marker
         CVehicle* pVehicle = pSuspensionInterface->m_pVehicle;
+        if ( !pVehicle )
+            return false;
+
         CModelInfo* pModelInfo = pGameInterface->GetModelInfo ( pVehicle->GetModelIndex () );
-        if ( pVehicle && pModelInfo && ( pModelInfo->IsCar() || pModelInfo->IsMonsterTruck() ) )
+        if ( pModelInfo && ( pModelInfo->IsCar() || pModelInfo->IsMonsterTruck() ) )
             return pVehicle->GetHandlingData()->HasSuspensionChanged ( );
         else
             return false;

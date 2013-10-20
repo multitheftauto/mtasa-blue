@@ -48,7 +48,7 @@ bool CResourceStartPacket::Write ( NetBitStreamInterface& BitStream ) const
         if ( m_pResource->IsClientScriptsOn () == true )
         {
             list < CResourceFile* > ::iterator iter = m_pResource->IterBegin();
-            for ( ; iter != m_pResource->IterEnd (); iter++ )
+            for ( ; iter != m_pResource->IterEnd (); ++iter )
             {
                 if ( ( *iter )->GetType () == CResourceScriptItem::RESOURCE_FILE_TYPE_CLIENT_SCRIPT &&
                      static_cast<CResourceClientScriptItem*>(*iter)->IsNoClientCache() == true )

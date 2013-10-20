@@ -30,7 +30,7 @@ CLuaModuleManager::~CLuaModuleManager ( void )
 {
     // Shutdown all our modules
     list < CLuaModule* > ::iterator iter = m_Modules.begin ();
-    for ( ; iter != m_Modules.end (); iter++ )
+    for ( ; iter != m_Modules.end (); ++iter )
     {
         delete *iter;
     }
@@ -46,7 +46,7 @@ void CLuaModuleManager::SetScriptDebugging ( CScriptDebugging* pScriptDebugging 
 void CLuaModuleManager::RegisterFunctions ( lua_State * luaVM )
 {
     list < CLuaModule* > ::iterator iter = m_Modules.begin ();
-    for ( ; iter != m_Modules.end (); iter++ )
+    for ( ; iter != m_Modules.end (); ++iter )
     {
         (*iter)->_RegisterFunctions ( luaVM );
     }
@@ -73,7 +73,7 @@ int CLuaModuleManager::LoadModule ( const char *szShortFileName, const char *szF
 
     // Check if the module is already loaded
     list < CLuaModule* > ::iterator iter = m_Modules.begin ();
-    for ( ; iter != m_Modules.end (); iter++ )
+    for ( ; iter != m_Modules.end (); ++iter )
     {
         if ( strcmp ( (*iter)->_GetName().c_str(), szShortFileName ) == 0 )
         {
@@ -97,7 +97,7 @@ int CLuaModuleManager::LoadModule ( const char *szShortFileName, const char *szF
     if ( bLateLoad ) 
     {
         list < CLuaMain* > ::const_iterator iter = m_pLuaManager->IterBegin ();
-        for ( ; iter != m_pLuaManager->IterEnd (); iter++ )
+        for ( ; iter != m_pLuaManager->IterEnd (); ++iter )
         {
             lua_State* luaVM = (*iter)->GetVM ();
             pModule->_RegisterFunctions ( luaVM );
@@ -124,7 +124,7 @@ int CLuaModuleManager::ReloadModule ( const char *szShortFileName, const char *s
 int CLuaModuleManager::UnloadModule ( const char* szShortFileName )
 {   // 0 = Success, 9 = Can't find module by name
     list < CLuaModule* > ::iterator iter = m_Modules.begin ();
-    for ( ; iter != m_Modules.end (); iter++ )
+    for ( ; iter != m_Modules.end (); ++iter )
     {
         if ( strcmp ( (*iter)->_GetName().c_str(), szShortFileName ) == 0 )
         {
@@ -141,7 +141,7 @@ int CLuaModuleManager::UnloadModule ( const char* szShortFileName )
 void CLuaModuleManager::ResourceStopping ( lua_State * luaVM )
 {
     list < CLuaModule* > ::iterator iter = m_Modules.begin ();
-    for ( ; iter != m_Modules.end (); iter++ )
+    for ( ; iter != m_Modules.end (); ++iter )
     {
         (*iter)->_ResourceStopping ( luaVM );
     }
@@ -151,7 +151,7 @@ void CLuaModuleManager::ResourceStopping ( lua_State * luaVM )
 void CLuaModuleManager::ResourceStopped ( lua_State * luaVM )
 {
     list < CLuaModule* > ::iterator iter = m_Modules.begin ();
-    for ( ; iter != m_Modules.end (); iter++ )
+    for ( ; iter != m_Modules.end (); ++iter )
     {
         (*iter)->_ResourceStopped ( luaVM );
     }

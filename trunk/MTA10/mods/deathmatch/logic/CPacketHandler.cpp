@@ -262,7 +262,7 @@ void CPacketHandler::Packet_ServerConnected ( NetBitStreamInterface& bitStream )
 
 
     // Echo Connected to the chatbox
-    if ( strlen ( szVersionString ) > 0 )
+    if ( szVersionString[0] != '\0' )
     {
         g_pCore->ChatPrintfColor ( "* Connected! [%s]", false, CHATCOLOR_INFO, szVersionString );
     }
@@ -3922,7 +3922,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
 
     // Link the entity dependant stuff
     list < SEntityDependantStuff* > ::iterator iter = newEntitiesStuff.begin ();
-    for ( ; iter != newEntitiesStuff.end () ; iter++ )
+    for ( ; iter != newEntitiesStuff.end () ; ++iter )
     {
         SEntityDependantStuff* pEntityStuff = *iter;
         CClientEntity* pTempEntity = pEntityStuff->pEntity;

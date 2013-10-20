@@ -2665,7 +2665,7 @@ CClientPlayer * CClientGame::GetClosestRemotePlayer ( const CVector & vecPositio
     CVector vecTemp;
     CClientPlayer * pPlayer;
     vector < CClientPlayer * > ::const_iterator iter = m_pPlayerManager->IterBegin ();
-    for ( ; iter != m_pPlayerManager->IterEnd () ; iter++ )
+    for ( ; iter != m_pPlayerManager->IterEnd (); ++iter )
     {
         pPlayer = *iter;
         if ( !pPlayer->IsLocalPlayer () )
@@ -3201,7 +3201,7 @@ void CClientGame::UpdateMimics ( void )
             // Apply this to each of our mimic players
             unsigned int uiMimicIndex = 0;
             list < CClientPlayer* > ::const_iterator iterMimics = m_Mimics.begin ();
-            for ( ; iterMimics != m_Mimics.end (); iterMimics++, uiMimicIndex++ )
+            for ( ; iterMimics != m_Mimics.end (); ++iterMimics, ++uiMimicIndex )
             {
                 vecPosition.fX += 4.0f;
                 vecOrigin.fX += 4.0f;
@@ -3906,7 +3906,7 @@ bool CClientGame::ProcessCollisionHandler ( CEntitySAInterface* pThisInterface, 
         m_CachedCollisionMap.clear ();
 
         std::map < CClientEntity*, bool > ::iterator iter = m_AllDisabledCollisions.begin ();
-        for ( ; iter != m_AllDisabledCollisions.end () ; iter++ )
+        for ( ; iter != m_AllDisabledCollisions.end () ; ++iter )
         {
             CClientEntity* pEntity = iter->first;
             CEntity* pGameEntity = pEntity->GetGameEntity ();

@@ -392,7 +392,7 @@ bool ProcessVehicleSirenPosition ( )
                 return false;
             }
             // Does the vehicle have sirens and is the siren count greater than 0 
-            if ( pVehicle->DoesVehicleHaveSirens ( ) && pVehicle->GetVehicleSirenCount ( ) >= 0 )
+            if ( pVehicle->DoesVehicleHaveSirens ( ) && pVehicle->GetVehicleSirenCount ( ) > 0 )
             {
                 // Get our siren count
                 unsigned char ucVehicleSirenCount = pVehicle->GetVehicleSirenCount ( );
