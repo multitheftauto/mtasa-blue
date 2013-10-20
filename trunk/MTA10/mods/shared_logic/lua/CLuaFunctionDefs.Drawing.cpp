@@ -1323,3 +1323,28 @@ int CLuaFunctionDefs::dxIsAspectRatioAdjustmentEnabled ( lua_State* luaVM )
     lua_pushnumber ( luaVM, fSourceRatio );
     return 2;
 }
+
+
+int CLuaFunctionDefs::dxSetTextureEdge ( lua_State* luaVM )
+{
+//  bool dxSetTextureEdge ( texture theTexture, string textureEdge [, int border-color )
+    CClientTexture* pTexture; ETextureAddress textureAddress; unsigned int uiBorderColor;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pTexture );
+    argStream.ReadEnumString ( textureAddress );
+    argStream.ReadNumber ( uiBorderColor, 0 );
+
+    if ( !argStream.HasErrors () )
+    {
+        pTexture->GetMaterialItem ()->m_TextureAddress = textureAddress;
+        pTexture->GetMaterialItem ()->m_uiBorderColor = uiBorderColor;
+        lua_pushboolean ( luaVM, true );
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
