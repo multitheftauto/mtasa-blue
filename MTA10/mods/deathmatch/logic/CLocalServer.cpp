@@ -203,7 +203,7 @@ bool CLocalServer::Load ( void )
 
         // Read the startup resources
         list < CXMLNode* > ::const_iterator iter = pRoot->ChildrenBegin ();
-        for ( ; iter != pRoot->ChildrenEnd (); iter++ )
+        for ( ; iter != pRoot->ChildrenEnd (); ++iter )
         {
             CXMLNode* pNode = reinterpret_cast < CXMLNode* > ( *iter );
             if ( pNode->GetTagName ().compare ( "resource" ) == 0 )
@@ -353,7 +353,7 @@ bool CLocalServer::Save ( void )
         // Remove old resources from the config
         CXMLNode* pRoot = m_pConfig->GetRootNode();
         list < CXMLNode* > ::const_iterator iter = pRoot->ChildrenBegin ();
-        for ( ; iter != pRoot->ChildrenEnd (); iter++ )
+        for ( ; iter != pRoot->ChildrenEnd (); ++iter )
         {
             CXMLNode* pNode = reinterpret_cast < CXMLNode* > ( *iter );
             if ( pNode->GetTagName().compare ( "resource" ) == 0 )

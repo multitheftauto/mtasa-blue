@@ -630,7 +630,7 @@ void CVehicleManager::GetVehiclesOfType ( unsigned int uiModel, lua_State* luaVM
     // Add all the matching vehicles to the table
     unsigned int uiIndex = 0;
     list < CVehicle* > ::iterator iter = m_List.begin ();
-    for ( ; iter != m_List.end () ; iter++ )
+    for ( ; iter != m_List.end () ; ++iter )
     {
         // Add it to the table
         lua_pushnumber ( luaVM, ++uiIndex );

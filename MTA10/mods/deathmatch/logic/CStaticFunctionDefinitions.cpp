@@ -51,7 +51,7 @@ static CClientSoundManager*                         m_pSoundManager;
 // Used to run a function on all the children of the elements too
 #define RUN_CHILDREN \
     if ( Entity.CountChildren() ) \
-        for ( CChildListType::const_iterator iter = Entity.IterBegin () ; iter != Entity.IterEnd () ; iter++ )
+        for ( CChildListType::const_iterator iter = Entity.IterBegin () ; iter != Entity.IterEnd () ; ++iter )
 
 CStaticFunctionDefinitions::CStaticFunctionDefinitions (
     CLuaManager* pLuaManager,
@@ -98,7 +98,7 @@ bool CStaticFunctionDefinitions::AddEvent ( CLuaMain& LuaMain, const char* szNam
     assert ( szName );
 
     // Valid name?
-    if ( strlen ( szName ) > 0 )
+    if ( szName[0] != '\0' )
     {
         // Add our event to CEvents
         return m_pEvents->AddEvent ( szName, "", &LuaMain, bAllowRemoteTrigger );
@@ -878,7 +878,7 @@ CClientDummy* CStaticFunctionDefinitions::CreateElement ( CResource& Resource, c
     assert ( szID );
 
     // Long enough typename and not an internal one?
-    if ( strlen ( szTypeName ) > 0 && CClientEntity::GetTypeID ( szTypeName ) == CCLIENTUNKNOWN )
+    if ( szTypeName[0] != '\0' && CClientEntity::GetTypeID ( szTypeName ) == CCLIENTUNKNOWN )
     {
         CClientDummy* pDummy = new CClientDummy ( m_pManager, INVALID_ELEMENT_ID,  szTypeName );
         pDummy->SetName ( szID );

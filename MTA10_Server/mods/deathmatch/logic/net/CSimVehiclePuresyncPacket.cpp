@@ -329,7 +329,7 @@ bool CSimVehiclePuresyncPacket::Write ( NetBitStreamInterface& BitStream ) const
             // Write trailer chain
             if ( BitStream.Version () >= 0x42 )
             {
-                for ( std::vector< STrailerInfo >::const_iterator it = m_Cache.TrailerList.begin (); it != m_Cache.TrailerList.end (); it++ )
+                for ( std::vector< STrailerInfo >::const_iterator it = m_Cache.TrailerList.begin (); it != m_Cache.TrailerList.end (); ++it )
                 {
                     BitStream.WriteBit ( true );
 

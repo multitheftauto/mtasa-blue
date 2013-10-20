@@ -63,11 +63,11 @@ class CClientModelCacheManager;
 
 struct SVehExtrapolateSettings
 {
-    bool bEnabled;
     int iBaseMs;
     int iScalePercent;
     int iMaxMs;
     bool bUseAltPulseOrder;
+    bool bEnabled;
 };
 
 class CClientGame

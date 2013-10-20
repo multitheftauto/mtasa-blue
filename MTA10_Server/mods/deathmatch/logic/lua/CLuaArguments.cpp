@@ -73,7 +73,7 @@ void CLuaArguments::CopyRecursive ( const CLuaArguments& Arguments, CFastHashMap
 
     // Copy all the arguments
     vector < CLuaArgument* > ::const_iterator iter = Arguments.m_Arguments.begin ();
-    for ( ; iter != Arguments.m_Arguments.end (); iter++ )
+    for ( ; iter != Arguments.m_Arguments.end (); ++iter )
     {
         CLuaArgument* pArgument = new CLuaArgument ( **iter, pKnownTables );
         m_Arguments.push_back ( pArgument );
@@ -146,7 +146,7 @@ void CLuaArguments::PushArguments ( lua_State* luaVM ) const
 {
     // Push all our arguments
     vector < CLuaArgument* > ::const_iterator iter = m_Arguments.begin ();
-    for ( ; iter != m_Arguments.end (); iter++ )
+    for ( ; iter != m_Arguments.end (); ++iter )
     {
         (*iter)->Push ( luaVM );
     }
@@ -181,10 +181,10 @@ void CLuaArguments::PushAsTable ( lua_State* luaVM, CFastHashMap < CLuaArguments
     pKnownTables->insert ( std::make_pair ( (CLuaArguments *)this, size ) );
 
     vector < CLuaArgument* > ::const_iterator iter = m_Arguments.begin ();
-    for ( ; iter != m_Arguments.end () && (iter+1) != m_Arguments.end (); iter ++ )
+    for ( ; iter != m_Arguments.end () && (iter+1) != m_Arguments.end (); ++iter )
     {
         (*iter)->Push ( luaVM, pKnownTables ); // index
-        iter++;
+        ++iter;
         (*iter)->Push ( luaVM, pKnownTables ); // value
         lua_settable ( luaVM, -3 );
     }
@@ -202,7 +202,7 @@ void CLuaArguments::PushAsTable ( lua_State* luaVM, CFastHashMap < CLuaArguments
 void CLuaArguments::PushArguments ( CLuaArguments& Arguments )
 {
     vector < CLuaArgument* > ::const_iterator iter = Arguments.IterBegin ();
-    for ( ; iter != Arguments.IterEnd (); iter++ )
+    for ( ; iter != Arguments.IterEnd (); ++iter )
     {
         CLuaArgument* pArgument = new CLuaArgument ( **iter );
         m_Arguments.push_back ( pArgument );
@@ -332,7 +332,7 @@ bool CLuaArguments::CallGlobal ( CLuaMain* pLuaMain, const char* szFunction, CLu
 vector < char * > * CLuaArguments::WriteToCharVector ( vector < char * > * values )
 {
     vector < CLuaArgument* > ::const_iterator iter = m_Arguments.begin ();
-    for ( ; iter != m_Arguments.end () ; iter++ )
+    for ( ; iter != m_Arguments.end () ; ++iter )
     {
         switch ( (*iter)->GetType() )
         {
@@ -531,7 +531,7 @@ void CLuaArguments::DeleteArguments ( void )
 {
     // Delete each item
     vector < CLuaArgument* > ::iterator iter = m_Arguments.begin ();
-    for ( ; iter != m_Arguments.end (); iter++ )
+    for ( ; iter != m_Arguments.end (); ++iter )
     {
         delete *iter;
     }
@@ -567,12 +567,12 @@ void CLuaArguments::ValidateTableKeys ( void )
         else
         {
             // Skip second in pair
-            iter++;
+            ++iter;
             // Check if end
             if ( iter == m_Arguments.end () )
                 break;
 
-            iter++;
+            ++iter;
         }
     }
 }
@@ -618,7 +618,7 @@ bool CLuaArguments::WriteToBitStream ( NetBitStreamInterface& bitStream, CFastHa
     pKnownTables->insert ( make_pair ( (CLuaArguments *)this, pKnownTables->size () ) );
     bitStream.WriteCompressed ( static_cast < unsigned short > ( m_Arguments.size () ) );
     vector < CLuaArgument* > ::const_iterator iter = m_Arguments.begin ();
-    for ( ; iter != m_Arguments.end () ; iter++ )
+    for ( ; iter != m_Arguments.end () ; ++iter )
     {
         CLuaArgument* pArgument = *iter;
         if ( !pArgument->WriteToBitStream ( bitStream, pKnownTables ) )
@@ -650,7 +650,7 @@ json_object * CLuaArguments::WriteToJSONArray ( bool bSerialize )
 {
     json_object * my_array = json_object_new_array();
     vector < CLuaArgument* > ::const_iterator iter = m_Arguments.begin ();
-    for ( ; iter != m_Arguments.end () ; iter++ )
+    for ( ; iter != m_Arguments.end () ; ++iter )
     {
         CLuaArgument* pArgument = *iter;
         json_object * object = pArgument->WriteToJSONObject ( bSerialize );
@@ -713,7 +713,7 @@ json_object * CLuaArguments::WriteTableToJSONObject ( bool bSerialize, CFastHash
     {
         json_object * my_array = json_object_new_array();
         vector < CLuaArgument* > ::const_iterator iter = m_Arguments.begin ();
-        for ( ; iter != m_Arguments.end () ; iter++ ) 
+        for ( ; iter != m_Arguments.end () ; ++iter ) 
         {
             iter++; // skip the key values
             CLuaArgument* pArgument = *iter;
@@ -735,14 +735,14 @@ json_object * CLuaArguments::WriteTableToJSONObject ( bool bSerialize, CFastHash
     {
         json_object * my_object = json_object_new_object();
         iter = m_Arguments.begin ();
-        for ( ; iter != m_Arguments.end () ; iter++ )
+        for ( ; iter != m_Arguments.end () ; ++iter )
         {
             char szKey[255];
             szKey[0] = '\0';
             CLuaArgument* pArgument = *iter;
             if ( !pArgument->WriteToString(szKey, 255) ) // index
                 break;
-            iter++;
+            ++iter;
             pArgument = *iter;
             json_object * object = pArgument->WriteToJSONObject ( bSerialize, pKnownTables ); // value
 

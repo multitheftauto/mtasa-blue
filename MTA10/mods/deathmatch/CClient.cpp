@@ -137,7 +137,7 @@ int CClient::ClientInitialize ( const char* szArguments, CCoreInterface* pCore )
     #endif
 
     // Got any arguments?
-    if ( szArguments && strlen ( szArguments ) > 0 )
+    if ( szArguments && szArguments[0] != '\0' )
     {
         if ( stricmp ( szArguments, "playback" ) == 0 )
         {

@@ -272,7 +272,7 @@ void CRadarMap::DoRender ( void )
         unsigned short usDimension = m_pRadarAreaManager->GetDimension ();
         CClientRadarArea * pArea = NULL;
         list < CClientRadarArea* > ::const_iterator areaIter = m_pRadarAreaManager->IterBegin ();
-        for ( ; areaIter != m_pRadarAreaManager->IterEnd (); areaIter++ )
+        for ( ; areaIter != m_pRadarAreaManager->IterEnd (); ++areaIter )
         {
             pArea = *areaIter;
 
@@ -298,7 +298,7 @@ void CRadarMap::DoRender ( void )
         // Now loop our radar markers
         usDimension = m_pRadarMarkerManager->GetDimension();
         list < CClientRadarMarker* > ::const_iterator markerIter = m_pRadarMarkerManager->IterBegin ();
-        for ( ; markerIter != m_pRadarMarkerManager->IterEnd (); markerIter++ )
+        for ( ; markerIter != m_pRadarMarkerManager->IterEnd (); ++markerIter )
         {
             if ( (*markerIter)->IsVisible () && (*markerIter)->GetDimension() == usDimension )
             {

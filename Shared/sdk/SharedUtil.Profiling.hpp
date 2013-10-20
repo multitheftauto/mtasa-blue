@@ -295,14 +295,14 @@ namespace SharedUtil
 
         // For each FrameSection
         std::map <SString,SFrameSection> ::iterator itCollection = frameCollection.begin ();
-        for ( ; itCollection != frameCollection.end () ; itCollection++ )
+        for ( ; itCollection != frameCollection.end () ; ++itCollection )
         {
             const SString& strSectionName = itCollection->first;
             SFrameSection& frameSection  = itCollection->second;
 
             // For each FrameEventList
             std::map <SString,SFrameEventList> ::iterator itSection = frameSection.begin ();
-            for ( ; itSection != frameSection.end () ; itSection++ )
+            for ( ; itSection != frameSection.end () ; ++itSection )
             {
                 const SString& strItemName = itSection->first;
                 SFrameEventList& frameEvents  = itSection->second;
@@ -397,11 +397,11 @@ namespace SharedUtil
         }
 
         // Clear max time thing
-        for ( std::map < std::string, SStatResultSection > :: iterator itSection = collection.begin () ; itSection != collection.end () ; itSection++ )
+        for ( std::map < std::string, SStatResultSection > :: iterator itSection = collection.begin () ; itSection != collection.end () ; ++itSection )
         {
             SStatResultSection& section = itSection->second;
 
-            for ( std::map < std::string, SStatResultItem > :: iterator itItem = section.begin () ; itItem != section.end () ; itItem++ )
+            for ( std::map < std::string, SStatResultItem > :: iterator itItem = section.begin () ; itItem != section.end () ; ++itItem )
             {
                 SStatResultItem& item = itItem->second;
                 item.iCounter = 0;
@@ -428,7 +428,7 @@ namespace SharedUtil
             // Merge collections
 
             // Merge section maps
-            for ( std::map < std::string, SStatSection > :: const_iterator itSectionSrc = pCollectionSrc->begin () ; itSectionSrc != pCollectionSrc->end () ; itSectionSrc++ )
+            for ( std::map < std::string, SStatSection > :: const_iterator itSectionSrc = pCollectionSrc->begin () ; itSectionSrc != pCollectionSrc->end () ; ++itSectionSrc )
             {
                 const std::string& strSectionNameSrc = itSectionSrc->first;
                 const SStatSection& sectionSrc = itSectionSrc->second;
@@ -437,7 +437,7 @@ namespace SharedUtil
                 SStatResultSection& sectionCombo = MapGet ( m_CollectionCombo, strSectionNameSrc );
 
                 // Merge item maps
-                for ( std::map < std::string, SStatItem > :: const_iterator itItemSrc = sectionSrc.begin () ; itItemSrc != sectionSrc.end () ; itItemSrc++ )
+                for ( std::map < std::string, SStatItem > :: const_iterator itItemSrc = sectionSrc.begin () ; itItemSrc != sectionSrc.end () ; ++itItemSrc )
                 {
                     const std::string& strItemNameSrc = itItemSrc->first;
                     const SStatItem& itemSrc = itItemSrc->second;
@@ -451,11 +451,11 @@ namespace SharedUtil
         }
 
         // Update some counters and stuff
-        for ( std::map < std::string, SStatResultSection > :: iterator itSection = collection.begin () ; itSection != collection.end () ; itSection++ )
+        for ( std::map < std::string, SStatResultSection > :: iterator itSection = collection.begin () ; itSection != collection.end () ; ++itSection )
         {
             SStatResultSection& section = itSection->second;
 
-            for ( std::map < std::string, SStatResultItem > :: iterator itItem = section.begin () ; itItem != section.end () ; itItem++ )
+            for ( std::map < std::string, SStatResultItem > :: iterator itItem = section.begin () ; itItem != section.end () ; ++itItem )
             {
                 SStatResultItem& item = itItem->second;
                 item.fMsMaxNext         = Max ( item.fMsMaxNext, item.fMs );

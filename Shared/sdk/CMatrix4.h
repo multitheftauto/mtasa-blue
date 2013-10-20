@@ -83,7 +83,7 @@ public:
         m_cell[0] = m_cell[5] = m_cell[10] = m_cell[15] = 1.0f;
     }
 
-    void Translate ( CVector vec )
+    void Translate ( CVector& vec )
     {
         m_cell[3] += vec.fX;
         m_cell[7] += vec.fY;

@@ -65,7 +65,7 @@ CResource* CResourceManager::GetResourceFromNetID ( unsigned short usNetID )
     }
 
     list < CResource* > ::const_iterator iter = m_resources.begin ();
-    for ( ; iter != m_resources.end (); iter++ )
+    for ( ; iter != m_resources.end (); ++iter )
     {
         if ( ( *iter )->GetNetID() == usNetID )
         {
@@ -94,7 +94,7 @@ CResource* CResourceManager::GetResourceFromLuaState ( lua_State* luaVM )
 CResource* CResourceManager::GetResource ( const char* szResourceName )
 {
     list < CResource* > ::const_iterator iter = m_resources.begin ();
-    for ( ; iter != m_resources.end (); iter++ )
+    for ( ; iter != m_resources.end (); ++iter )
     {
         if ( stricmp ( ( *iter )->GetName(), szResourceName ) == 0 )
             return ( *iter );
@@ -106,7 +106,7 @@ CResource* CResourceManager::GetResource ( const char* szResourceName )
 void CResourceManager::LoadUnavailableResources ( CClientEntity *pRootEntity )
 {
     list < CResource* > ::const_iterator iter = m_resources.begin ();
-    for ( ; iter != m_resources.end (); iter++ )
+    for ( ; iter != m_resources.end (); ++iter )
     {
         if ( !( ( *iter )->GetActive () ) )
             ( *iter )->Load ( pRootEntity );

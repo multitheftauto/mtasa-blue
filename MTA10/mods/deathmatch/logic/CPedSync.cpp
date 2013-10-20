@@ -239,7 +239,7 @@ void CPedSync::Update ( void )
         {
             // Write each ped to it
             list < CClientPed* > ::const_iterator iter = m_List.begin ();
-            for ( ; iter != m_List.end (); iter++ )
+            for ( ; iter != m_List.end (); ++iter )
             {
                 WritePedInformation ( pBitStream, *iter );
             }

@@ -173,7 +173,7 @@ int CLuaACLDefs::aclList ( lua_State* luaVM )
     // Loop through ACL stuff
     unsigned int uiIndex = 0;
     list <CAccessControlList* > ::const_iterator iter = m_pACLManager->ACL_Begin ();
-    for ( ; iter != m_pACLManager->ACL_End (); iter++ )
+    for ( ; iter != m_pACLManager->ACL_End (); ++iter )
     {
         // Push onto the table
         lua_pushnumber ( luaVM, ++uiIndex );
@@ -366,7 +366,7 @@ int CLuaACLDefs::aclListRights ( lua_State* luaVM )
         CAccessControlListRight::ERightType eType;
         unsigned int uiIndex = 0;
         list <CAccessControlListRight* > ::const_iterator iter = pACL->IterBegin ();
-        for ( ; iter != pACL->IterEnd (); iter++ )
+        for ( ; iter != pACL->IterEnd (); ++iter )
         {
             // Type
             eType = (*iter)->GetRightType ();
@@ -566,7 +566,7 @@ int CLuaACLDefs::aclGroupList ( lua_State* luaVM )
     // Loop through ACL stuff
     unsigned int uiIndex = 0;
     list <CAccessControlListGroup* > ::const_iterator iter = m_pACLManager->Groups_Begin ();
-    for ( ; iter != m_pACLManager->Groups_End (); iter++ )
+    for ( ; iter != m_pACLManager->Groups_End (); ++iter )
     {
         // Push onto the table
         lua_pushnumber ( luaVM, ++uiIndex );
@@ -642,7 +642,7 @@ int CLuaACLDefs::aclGroupListACL ( lua_State* luaVM )
         // Loop through ACL stuff
         unsigned int uiIndex = 0;
         list <CAccessControlList* > ::const_iterator iter = pGroup->IterBeginACL ();
-        for ( ; iter != pGroup->IterEndACL (); iter++ )
+        for ( ; iter != pGroup->IterEndACL (); ++iter )
         {
             // Push onto the table
             lua_pushnumber ( luaVM, ++uiIndex );
@@ -752,7 +752,7 @@ int CLuaACLDefs::aclGroupListObjects ( lua_State* luaVM )
         char szBuffer [255];
         unsigned int uiIndex = 0;
         list <CAccessControlListGroupObject* > ::const_iterator iter = pGroup->IterBeginObjects ();
-        for ( ; iter != pGroup->IterEndObjects (); iter++ )
+        for ( ; iter != pGroup->IterEndObjects (); ++iter )
         {
             // Put the base type depending on the type
             switch ( (*iter)->GetObjectType () )

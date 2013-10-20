@@ -330,7 +330,7 @@ namespace SharedUtil
     template < class T >
     void ListRemoveIndex ( std::vector < T >& itemList, uint index )
     {
-        if ( index >=0 && index < itemList.size () )
+        if ( index < itemList.size () )
             itemList.erase ( itemList.begin () + index );
     }
 
