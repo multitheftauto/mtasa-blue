@@ -49,7 +49,7 @@ const char lua_ident[] =
 static TValue *index2adr (lua_State *L, int idx) {
   if (idx > 0) {
     TValue *o = L->base + (idx - 1);
-    api_check(L, idx <= L->ci->top - L->base);
+    //api_check(L, idx <= L->ci->top - L->base);    // Not needed for safety checks as returns nil if out of bounds
     if (o >= L->top) return cast(TValue *, luaO_nilobject);
     else return o;
   }

@@ -2799,6 +2799,8 @@ ResponseCode CResource::HandleRequestCall ( HttpRequest * ipoHttpRequest, HttpRe
 						headers.PushString ( (*iter).second.c_str() );
 					}
 
+                    LUA_CHECKSTACK ( m_pVM->GetVM(), 1 );   // Ensure some room
+
 					// cache old data
 					lua_getglobal ( m_pVM->GetVM(), "form" );
 					CLuaArgument OldForm ( m_pVM->GetVM(), -1 );

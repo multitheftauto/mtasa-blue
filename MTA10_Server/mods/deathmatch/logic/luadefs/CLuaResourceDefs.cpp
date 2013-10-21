@@ -1041,6 +1041,8 @@ int CLuaResourceDefs::call ( lua_State* luaVM )
                 args.ReadArguments ( luaVM, 3 );
                 CLuaArguments returns;
 
+                LUA_CHECKSTACK ( targetLuaVM, 1 );   // Ensure some room
+
                 //Lets grab the original hidden variables so we can restore them later
                 lua_getglobal ( targetLuaVM, "sourceResource" );
                 CLuaArgument OldResource ( luaVM, -1 );
