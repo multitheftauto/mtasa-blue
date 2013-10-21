@@ -164,6 +164,9 @@ bool CMapEventManager::Call ( const char* szName, const CLuaArguments& Arguments
                 {
                     // Grab the current VM
                     lua_State* pState = pMapEvent->GetVM ()->GetVM ();
+
+                    LUA_CHECKSTACK ( pState, 1 );   // Ensure some room
+
                     #if MTA_DEBUG
                         int luaStackPointer = lua_gettop ( pState );
                     #endif

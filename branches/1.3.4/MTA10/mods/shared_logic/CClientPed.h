@@ -103,6 +103,7 @@ struct SLastSyncedPedData
     CVector             vPosition;
     CVector             vVelocity;
     float               fRotation;
+    bool                bOnFire;
 };
 
 struct SRestoreWeaponItem
@@ -418,7 +419,7 @@ public:
     bool                        IsFootBloodEnabled      ( void );
     void                        SetFootBloodEnabled     ( bool bHasFootBlood );
 
-    inline bool                 IsOnFire                ( void )                                        { return m_bIsOnFire; }
+    bool                        IsOnFire                ( void );
     void                        SetOnFire               ( bool bOnFire );
 
     void                        GetVoice                ( short* psVoiceType, short* psVoiceID );

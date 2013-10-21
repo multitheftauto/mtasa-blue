@@ -55,9 +55,6 @@
 #define SCRIPT_VERIFY_COLSHAPE(colshape) (m_pColManager->Exists(colshape))
 #define SCRIPT_VERIFY_RESOURCE(resource) (m_pResourceManager->Exists(resource))
 
-#define argtype(number,type) (lua_type(luaVM,number) == type)
-#define argtype2(number,type,type2) (lua_type(luaVM,number) == type || lua_type(luaVM,number) == type2)
-
 
 class CLuaDefs
 {

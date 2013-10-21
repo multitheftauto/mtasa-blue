@@ -29,8 +29,8 @@ extern "C"
 
 inline void LUA_CHECKSTACK( lua_State *L, int size )
 {
-    if ( lua_getstackgap( L ) < size + 1 )
-        lua_checkstack( L, ( size + 2 ) * 3 );
+    if ( lua_getstackgap( L ) < size + 5 )
+        lua_checkstack( L, ( size + 2 ) * 3 + 4 );
 }
 
 class CAccessControlList;

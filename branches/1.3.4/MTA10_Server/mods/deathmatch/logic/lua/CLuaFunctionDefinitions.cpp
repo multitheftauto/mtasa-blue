@@ -46,7 +46,6 @@ static CColManager*                                     m_pColManager = NULL;
 static CResourceManager*                                m_pResourceManager = NULL;
 static CAccessControlListManager*                       m_pACLManager = NULL;
 static CLuaModuleManager*                               m_pLuaModuleManager = NULL;
-#define type(number,type) (lua_type(luaVM,number) == type)
 
 
 void CLuaFunctionDefinitions::SetBlipManager ( CBlipManager* pBlipManager )

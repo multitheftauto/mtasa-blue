@@ -270,6 +270,10 @@ void CClientProjectile::SetVelocity ( CVector & vecVelocity )
     m_pProjectile->SetMoveSpeed ( &vecVelocity );
 }
 
+unsigned short CClientProjectile::GetModel ( void )
+{
+    return m_pProjectile->GetModelIndex ();
+}
 
 void CClientProjectile::SetModel ( unsigned short usModel )
 {

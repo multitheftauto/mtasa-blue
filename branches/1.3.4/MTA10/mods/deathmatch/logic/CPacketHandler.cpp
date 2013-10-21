@@ -4206,6 +4206,14 @@ void CPacketHandler::Packet_ProjectileSync ( NetBitStreamInterface& bitStream )
     if ( !bitStream.Read ( &weaponTypeSync ) )
         return;
 
+    // Read the model
+    unsigned short usModel = 0;
+    if ( bitStream.Version () >= 0x4F )
+    {
+        if ( !bitStream.Read ( usModel ) )
+            return;
+    }
+
     CClientEntity* pCreator = NULL;
     if ( CreatorID != INVALID_ELEMENT_ID ) pCreator = CElementIDs::GetElement ( CreatorID );
     if ( OriginID != INVALID_ELEMENT_ID )
@@ -4306,7 +4314,7 @@ void CPacketHandler::Packet_ProjectileSync ( NetBitStreamInterface& bitStream )
             CClientProjectile * pProjectile = g_pClientGame->m_pManager->GetProjectileManager ()->Create ( pCreator, weaponType, origin.data.vecPosition, fForce, NULL, pTargetEntity );
             if ( pProjectile )
             {
-                pProjectile->Initiate ( &origin.data.vecPosition, pvecRotation, pvecVelocity, 0 );
+                pProjectile->Initiate ( &origin.data.vecPosition, pvecRotation, pvecVelocity, usModel );
             }
         }
     }
@@ -4668,6 +4676,10 @@ void CPacketHandler::Packet_ResourceClientScripts ( NetBitStreamInterface& bitSt
         {
             for ( unsigned int i = 0; i < usScriptCount; ++i )
             {
+                SString strFilename = "(unknown)";
+                if ( bitStream.Version() >= 0x50 )
+                    bitStream.ReadString( strFilename );
+
                 // Read the script compressed chunk
                 unsigned int len;
                 if ( !bitStream.Read ( len ) || len < 4 )
@@ -4689,7 +4701,7 @@ void CPacketHandler::Packet_ResourceClientScripts ( NetBitStreamInterface& bitSt
                 if ( uncompress ( (Bytef *)uncompressedBuffer, &originalLength, (const Bytef *)&data[4], len-4 ) == Z_OK )
                 {
                     // Load the script!
-                    pResource->LoadNoClientCacheScript ( uncompressedBuffer, originalLength );
+                    pResource->LoadNoClientCacheScript ( uncompressedBuffer, originalLength, strFilename );
                 }
 
                 memset ( uncompressedBuffer, 0, originalLength );
