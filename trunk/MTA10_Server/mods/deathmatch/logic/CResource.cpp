@@ -93,8 +93,9 @@ CResource::CResource ( CResourceManager * resourceManager, bool bIsZipped, const
     m_bDoneUpgradeWarnings = false;
     m_uiFunctionRightCacheRevision = 0;
 
-    Load ();
     m_bOOPEnabledInMetaXml = true;
+
+    Load ();
 }
 
 bool CResource::Load ( void )
