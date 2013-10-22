@@ -1737,7 +1737,7 @@ int CLuaFunctionDefs::SetElementVelocity ( lua_State* luaVM )
     argStream.ReadUserData ( pEntity );
     argStream.ReadVector3D ( vecVelocity );
     // previous code did this for some reason.
-    if ( pEntity && pEntity->GetType() != CCLIENTRADARAREA )
+    if ( pEntity && pEntity->GetType() == CCLIENTRADARAREA )
         vecVelocity.fZ = 0.0f;
 
     // Verify the arguments
