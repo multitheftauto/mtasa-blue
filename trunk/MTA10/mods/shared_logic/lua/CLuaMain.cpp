@@ -164,7 +164,7 @@ void CLuaMain::AddElementClass ( lua_State* luaVM )
 
     lua_classfunction ( luaVM, "attach", "attachElements" );
     lua_classfunction ( luaVM, "detach", "detachElements" );
-    lua_classfunction ( luaVM, "isElement", "isElementAttached" );
+    lua_classfunction ( luaVM, "isAttached", "isElementAttached" );
     lua_classfunction ( luaVM, "getAttachedElements", "getAttachedElements" );
     lua_classfunction ( luaVM, "getAttachedTo", "getElementAttachedTo" );
     lua_classfunction ( luaVM, "setAttachedOffsets", "setElementAttachedOffsets" );
@@ -230,10 +230,10 @@ void CLuaMain::AddVehicleClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "getMaxPassengers", "getVehicleMaxPassengers" );
     lua_classfunction ( luaVM, "getGear", "getVehicleCurrentGear" );
     lua_classfunction ( luaVM, "getController", "getVehicleController" );
-    lua_classfunction ( luaVM, "getColor", "getVehicleColor" );
+    lua_classfunction ( luaVM, "getColor", "getVehicleColor" ); // TODO: work with color class
     lua_classfunction ( luaVM, "getTowingVehicle", "getVehicleTowingVehicle" );
     lua_classfunction ( luaVM, "getTowedByVehicle", "getVehicleTowedByVehicle" );
-    lua_classfunction ( luaVM, "getGravity", "getVehicleGravity" );
+    lua_classfunction ( luaVM, "getGravity", "getVehicleGravity" ); // TODO: work with vector class
     lua_classfunction ( luaVM, "getOccupant", "getVehicleOccupant" );
     lua_classfunction ( luaVM, "getPlateText", "getVehiclePlateText" );
     lua_classfunction ( luaVM, "getOccupants", "getVehicleOccupants" );
@@ -258,13 +258,13 @@ void CLuaMain::AddVehicleClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "getPanelState", "getVehiclePanelState" );
     lua_classfunction ( luaVM, "getTurnVelocity", "getVehicleTurnVelocity" );
     lua_classfunction ( luaVM, "isTaxiLightOn", "isVehicleTaxiLightOn" );
-    lua_classfunction ( luaVM, "getHeadLightColor", "getVehicleHeadLightColor" );
+    lua_classfunction ( luaVM, "getHeadLightColor", "getVehicleHeadLightColor" ); // TODO: work with color class
     lua_classfunction ( luaVM, "getComponents", "getVehicleComponents" );
     //lua_classfunction ( luaVM, "getDoorsUndamageable", "getVehicleDoorsUndamageable" );
     //lua_classfunction ( luaVM, "getDirtLevel", "getVehicleDirtLevel" );
     
     lua_classfunction ( luaVM, "resetComponentPosition", "resetVehicleComponentPosition" );
-    lua_classfunction ( luaVM, "resetComponentRotation", "resetVehicleComponentRotattion" );
+    lua_classfunction ( luaVM, "resetComponentRotation", "resetVehicleComponentRotation" );
     lua_classfunction ( luaVM, "getComponentPosition", "getVehicleComponentPosition" );
     lua_classfunction ( luaVM, "getComponentVisible", "getVehicleComponentVisible" );
     lua_classfunction ( luaVM, "setComponentVisible", "setVehicleComponentVisible" );
@@ -272,11 +272,11 @@ void CLuaMain::AddVehicleClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "setComponentPosition", "setVehicleComponentPosition" );
     lua_classfunction ( luaVM, "setComponentRotation", "setVehicleComponentRotation" );
 
-    lua_classfunction ( luaVM, "setHeadLightColor", "setVehicleHeadLightColor" );    
+    lua_classfunction ( luaVM, "setHeadLightColor", "setVehicleHeadLightColor" ); // TODO: work with color class
     lua_classfunction ( luaVM, "setLocked", "setVehicleLocked" );
     lua_classfunction ( luaVM, "setDamageProof", "setVehicleDamageProof" );
-    lua_classfunction ( luaVM, "setColor", "setVehicleColor" );
-    lua_classfunction ( luaVM, "setGravity", "setVehicleGravity" );
+    lua_classfunction ( luaVM, "setColor", "setVehicleColor" ); // TODO: work with color class
+    lua_classfunction ( luaVM, "setGravity", "setVehicleGravity" ); // TODO: work with vector class
     lua_classfunction ( luaVM, "setHelicopterRotorSpeed", "setHelicopterRotorSpeed" );
     lua_classfunction ( luaVM, "setPaintjob", "setVehiclePaintjob" );
     lua_classfunction ( luaVM, "setTurretPosition", "setVehicleTurretPosition" );
@@ -392,8 +392,47 @@ void CLuaMain::AddPedClass ( lua_State* luaVM )
 void CLuaMain::AddPlayerClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
+    
+    lua_classfunction ( luaVM, "setNametagText", "setPlayerNametagText" );
+    lua_classfunction ( luaVM, "setNametagColor", "setPlayerNametagColor" );// TODO: work with color class
+    lua_classfunction ( luaVM, "setNametagShowing", "setPlayerNametagShowing" );
+
+    lua_classfunction ( luaVM, "getPing", "getPlayerPing" );
+    lua_classfunction ( luaVM, "getName", "getPlayerName" );
+    lua_classfunction ( luaVM, "getTeam", "getPlayerTeam" );
+    lua_classfunction ( luaVM, "getNametagText", "getPlayerNametagText" );
+    lua_classfunction ( luaVM, "getNametagColor", "getPlayerNametagColor" ); // TODO: work with color class
+    lua_classfunction ( luaVM, "isNametagShowing", "isPlayerNametagShowing" );
 
     lua_classvariable ( luaVM, "ping", NULL, "getPlayerPing" );
+    lua_classvariable ( luaVM, "name", NULL, "getPlayerName" );
+    lua_classvariable ( luaVM, "team", NULL, "getPlayerTeam" );
+    lua_classvariable ( luaVM, "nametagText", "setPlayerNametagText", "getPlayerNametagText" );
+    lua_classvariable ( luaVM, "nametagShowing", "setPlayerNametagShowing", "isPlayerNametagShowing" );
+
+    // TODO: Specialised functions
+    //lua_classvariable ( luaVM, "nametagColor", CLuaFunctionDefs::SetPlayerNametagColor, CLuaOOPDefs::GetPlayerNametagColor );
+    
+    // TODO: These functions/variables only work for the localPlayer and
+    //       they don't require the first argument to to be self.
+    //lua_classfunction ( luaVM, "getMoney", "getPlayerMoney" );
+    //lua_classfunction ( luaVM, "setMoney", "setPlayerMoney" );
+    //lua_classfunction ( luaVM, "getWantedLevel", "getPlayerWantedLevel" );
+    //lua_classfunction ( luaVM, "isMapForced", "isPlayerMapForced" );
+    //lua_classfunction ( luaVM, "isMapVisible", "isPlayerMapVisible" );
+    //lua_classfunction ( luaVM, "giveMoney", "givePlayerMoney" );
+    //lua_classfunction ( luaVM, "takeMoney", "takePlayerMoney" );
+    //lua_classfunction ( luaVM, "showHudComponent", "showPlayerHudComponent" );
+    //lua_classfunction ( luaVM, "isHudComponentVisible", "isPlayerHudComponentVisible" );
+    //lua_classfunction ( luaVM, "getMapBoundingBox", "getPlayerMapBoundingBox" ); // TODO: work with some vector class
+    //
+    //lua_classvariable ( luaVM, "mapForced", NULL, "isPlayerMapForced" );
+    //lua_classvariable ( luaVM, "mapVisible", NULL, "isPlayerMapVisible" );
+    //lua_classvariable ( luaVM, "money", "setPlayerMoney", "getPlayerMoney" );
+    //lua_classvariable ( luaVM, "wantedLevel", NULL, "getPlayerWantedLevel" );
+    //
+    // Specialised local only:
+    //lua_classvariable ( luaVM, "mapBoundingBox", NULL, "getPlayerMapBoundingBox" );
 
     lua_registerclass ( luaVM, "Player", "Ped" );
 }
