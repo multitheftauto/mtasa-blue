@@ -1392,6 +1392,7 @@ void CMultiplayerSA::InitHooks()
     InitHooks_LicensePlate ();
     InitHooks_Direct3D();
     InitHooks_FixLineOfSightArgs();
+    InitHooks_VehicleDamage();
 }
 
 
@@ -2087,6 +2088,7 @@ void CMultiplayerSA::SetVehicleCollisionHandler ( VehicleCollisionHandler * pHan
 {
     m_pVehicleCollisionHandler = pHandler;
 }
+
 
 void CMultiplayerSA::SetHeliKillHandler ( HeliKillHandler * pHandler )
 {
@@ -6083,19 +6085,23 @@ IsOnScreen_IsObject:
     }
 }
 CVehicleSAInterface * pCollisionVehicle = NULL;
-void TriggerVehicleDamageEvent ( )
+void TriggerVehicleCollisionEvent ( )
 {
+
     if ( pCollisionVehicle )
     {
         CEntitySAInterface * pEntity = pCollisionVehicle->m_pCollidedEntity;
         if ( pEntity )
         {
+        //OutputDebugLine( SString( "TriggerVehicleCollisionEvent:  pEntity:%08x"
+        //                , pEntity
+        //                ));
             // Not handled because it triggers too much
             //if ( pEntity->nType != ENTITY_TYPE_BUILDING )
             {
                 if ( m_pVehicleCollisionHandler )
                 {
-                    TIMING_CHECKPOINT( "+TriggerVehDamEvent" );
+                    TIMING_CHECKPOINT( "+TriggerVehColEvent" );
                     if ( pEntity->nType == ENTITY_TYPE_VEHICLE )
                     {
                         CVehicleSAInterface * pInterface = static_cast < CVehicleSAInterface* > ( pEntity );
@@ -6103,10 +6109,12 @@ void TriggerVehicleDamageEvent ( )
                     }
                     else
                     {
-                        m_pVehicleCollisionHandler ( pCollisionVehicle, pEntity, pEntity->m_nModelIndex, pCollisionVehicle->m_fDamageImpulseMagnitude, 0.0f, pCollisionVehicle->m_usPieceType, pCollisionVehicle->m_vecCollisionPosition, pCollisionVehicle->m_vecCollisionImpactVelocity );
+                        m_pVehicleCollisionHandler ( pCollisionVehicle, pEntity, pEntity->m_nModelIndex, pCollisionVehicle->m_fDamageImpulseMagnitude, 0.0f,                                  pCollisionVehicle->m_usPieceType, pCollisionVehicle->m_vecCollisionPosition, pCollisionVehicle->m_vecCollisionImpactVelocity );
                     }
-                    TIMING_CHECKPOINT( "-TriggerVehDamEvent" );
+                    TIMING_CHECKPOINT( "-TriggerVehColEvent" );
                 }
+
+
             }
         }
     }
@@ -6122,9 +6130,15 @@ void _declspec(naked) HOOK_CEventVehicleDamageCollision ( )
     _asm
     {
         pushad
+        lea edx, [esp+32+4*3]
+        mov eax, dword ptr[edx]
+        cmp eax, 0
+        jz lp1
+        mov eax, dword ptr[edx]
+lp1:
         mov pCollisionVehicle, ecx
     }
-    TriggerVehicleDamageEvent ( );
+    TriggerVehicleCollisionEvent ( );
     
     // do the replaced code and return back as if nothing happened.
     _asm
@@ -6148,7 +6162,7 @@ void _declspec(naked) HOOK_CEventVehicleDamageCollision_Plane ( )
         pushad
         mov pCollisionVehicle, ecx
     }
-    TriggerVehicleDamageEvent ( );
+    TriggerVehicleCollisionEvent ( );
 
     // do the replaced code and return back as if nothing happened.
     _asm
@@ -6171,7 +6185,7 @@ void _declspec(naked) HOOK_CEventVehicleDamageCollision_Bike ( )
         pushad
         mov pCollisionVehicle, ecx
     }
-    TriggerVehicleDamageEvent ( );
+    TriggerVehicleCollisionEvent ( );
 
     // do the replaced code and return back as if nothing happened.
     _asm

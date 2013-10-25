@@ -254,6 +254,7 @@ CClientGame::CClientGame ( bool bLocalPlay )
     g_pMultiplayer->SetBlendAnimationHandler ( CClientGame::StaticBlendAnimationHandler );
     g_pMultiplayer->SetProcessCollisionHandler ( CClientGame::StaticProcessCollisionHandler );
     g_pMultiplayer->SetVehicleCollisionHandler( CClientGame::StaticVehicleCollisionHandler );
+    g_pMultiplayer->SetVehicleDamageHandler ( CClientGame::StaticVehicleDamageHandler );
     g_pMultiplayer->SetHeliKillHandler ( CClientGame::StaticHeliKillHandler );
     g_pMultiplayer->SetObjectDamageHandler ( CClientGame::StaticObjectDamageHandler );
     g_pMultiplayer->SetObjectBreakHandler ( CClientGame::StaticObjectBreakHandler );
@@ -401,7 +402,10 @@ CClientGame::~CClientGame ( void )
     g_pMultiplayer->SetBlendAnimationHandler ( NULL );
     g_pMultiplayer->SetProcessCollisionHandler ( NULL );
     g_pMultiplayer->SetVehicleCollisionHandler( NULL );
+    g_pMultiplayer->SetVehicleDamageHandler( NULL );
     g_pMultiplayer->SetHeliKillHandler( NULL );
+    g_pMultiplayer->SetObjectDamageHandler ( NULL );
+    g_pMultiplayer->SetObjectBreakHandler ( NULL );
     g_pMultiplayer->SetWaterCannonHitHandler( NULL );
     g_pMultiplayer->SetGameObjectDestructHandler( NULL );
     g_pMultiplayer->SetGameVehicleDestructHandler( NULL );
@@ -2770,6 +2774,7 @@ void CClientGame::AddBuiltInEvents ( void )
     m_Events.AddEvent ( "onClientTrailerDetach", "towedBy", NULL, false );
     m_Events.AddEvent ( "onClientVehicleExplode", "", NULL, false );
     m_Events.AddEvent ( "onClientVehicleCollision", "collidedelement, damageImpulseMag, bodypart, x, y, z, velX, velY, velZ", NULL, false );
+    m_Events.AddEvent ( "onClientVehicleDamage", "attacker, weapon, loss, x, y, z, tyre", NULL, false );
     m_Events.AddEvent ( "onClientVehicleNitroStateChange", "activated", NULL, false );
 
     // GUI events
@@ -3662,6 +3667,11 @@ bool CClientGame::StaticVehicleCollisionHandler ( CVehicleSAInterface* pCollidin
     return g_pClientGame->VehicleCollisionHandler( pCollidingVehicle, pCollidedVehicle, iModelIndex, fDamageImpulseMag, fCollidingDamageImpulseMag, usPieceType, vecCollisionPos, vecCollisionVelocity );
 }
 
+bool CClientGame::StaticVehicleDamageHandler ( CEntitySAInterface* pVehicleInterface, float fLoss, CEntitySAInterface* pAttackerInterface, eWeaponType weaponType, const CVector& vecDamagePos, uchar ucTyre )
+{
+    return g_pClientGame->VehicleDamageHandler ( pVehicleInterface, fLoss, pAttackerInterface, weaponType, vecDamagePos, ucTyre );
+}
+
 bool CClientGame::StaticHeliKillHandler ( CVehicleSAInterface* pHeliInterface, CEntitySAInterface* pHitInterface )
 {
     return g_pClientGame->HeliKillHandler ( pHeliInterface, pHitInterface );
@@ -4527,6 +4537,43 @@ bool CClientGame::HeliKillHandler ( CVehicleSAInterface* pHeliInterface, CEntity
         }
     }
     return true;
+}
+
+bool CClientGame::VehicleDamageHandler ( CEntitySAInterface* pVehicleInterface, float fLoss, CEntitySAInterface* pAttackerInterface, eWeaponType weaponType, const CVector& vecDamagePos, uchar ucTyre )
+{
+    bool bAllowDamage = true;
+    CClientVehicle* pClientVehicle = GetGameEntityXRefManager()->FindClientVehicle( pVehicleInterface );
+    if ( pClientVehicle )
+    {
+        CClientEntity* pClientAttacker = GetGameEntityXRefManager()->FindClientEntity( pAttackerInterface );
+
+        // Compose arguments
+        // attacker, weapon, loss, damagepos, tyreIdx
+        CLuaArguments Arguments;
+        if ( pClientAttacker )
+            Arguments.PushElement( pClientAttacker );
+        else
+            Arguments.PushNil ( );
+        if ( weaponType != WEAPONTYPE_INVALID )
+            Arguments.PushNumber ( weaponType );
+        else
+            Arguments.PushNil();
+        Arguments.PushNumber( fLoss );
+        Arguments.PushNumber( vecDamagePos.fX );
+        Arguments.PushNumber( vecDamagePos.fY );
+        Arguments.PushNumber( vecDamagePos.fZ );
+        if ( ucTyre != UCHAR_INVALID_INDEX )
+            Arguments.PushNumber( ucTyre );
+        else
+            Arguments.PushNil();
+
+        if ( !pClientVehicle->CallEvent( "onClientVehicleDamage", Arguments, true ) )
+        {
+            bAllowDamage = false;
+        }
+    }
+
+    return bAllowDamage;
 }
 
 bool CClientGame::ObjectDamageHandler ( CObjectSAInterface* pObjectInterface, float fLoss, CEntitySAInterface* pAttackerInterface )

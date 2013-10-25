@@ -62,10 +62,11 @@ DWORD vecAltPos;
 CPedSAInterface * pShootingPed;
 EDamageReasonType g_GenerateDamageEventReason = EDamageReason::OTHER;
 
-static CPedSAInterface* pBulletImpactInitiator;
-static CEntitySAInterface* pBulletImpactVictim;
-static CVector* pBulletImpactStartPosition;
-static CVector* pBulletImpactEndPosition;
+CPedSAInterface* pBulletImpactInitiator;
+CEntitySAInterface* pBulletImpactVictim;
+CVector* pBulletImpactStartPosition;
+CVector* pBulletImpactEndPosition;
+CVector vecSavedBulletImpactEndPosition;
 
 extern PreWeaponFireHandler* m_pPreWeaponFireHandler;
 extern PostWeaponFireHandler* m_pPostWeaponFireHandler;
@@ -284,6 +285,7 @@ static void Event_BulletImpact ( void )
                 m_pBulletImpactHandler ( pInitiator, pVictim, pBulletImpactStartPosition, pBulletImpactEndPosition );
             }
         }
+        vecSavedBulletImpactEndPosition = *pBulletImpactEndPosition;    // Saved for vehicle damage event parameters
     }
 }
 

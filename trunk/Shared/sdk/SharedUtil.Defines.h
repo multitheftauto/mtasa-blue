@@ -147,3 +147,6 @@
 #else
     #define PRSinW  L"%s"       // i.e. WString ( L"name:" PRSinW,  "dave" );
 #endif
+
+// Generic way of showing a uchar index is not set
+#define UCHAR_INVALID_INDEX 0xFF

@@ -140,6 +140,7 @@ enum eWeaponType
 
     // Added by us
     WEAPONTYPE_TANK_GRENADE,
+    WEAPONTYPE_INVALID = 255,
 };
 enum eWeaponStats
 {

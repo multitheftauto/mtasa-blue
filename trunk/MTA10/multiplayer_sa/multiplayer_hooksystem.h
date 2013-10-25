@@ -20,6 +20,7 @@ VOID HookInstallMethod( DWORD dwInstallAddress, DWORD dwHookFunction );
 VOID HookInstallCall( DWORD dwInstallAddress, DWORD dwHookFunction );
 BOOL HookInstall( DWORD dwInstallAddress, DWORD dwHookHandler, int iJmpCodeSize );
 BYTE * CreateJump ( DWORD dwFrom, DWORD dwTo, BYTE * ByteArray );
+VOID HookCheckOriginalByte( DWORD dwInstallAddress, uchar ucExpectedValue );
 
 // Auto detect requirement of US/EU hook installation
 #define EZHookInstall(type) \
@@ -60,6 +61,26 @@ BYTE * CreateJump ( DWORD dwFrom, DWORD dwTo, BYTE * ByteArray );
         { \
             RETURN_##type##C_BOTH = RETURN_##type##C_##CO##; \
         }
+
+
+// Check original byte before hooking
+#define EZHookInstallChecked(type) \
+        __if_not_exists( RETURN_##type##_US ) \
+        { \
+            HookCheckOriginalByte( HOOKPOS_##type, HOOKCHECK_##type ); \
+        } \
+        __if_exists( RETURN_##type##_US ) \
+        { \
+            if ( pGameInterface->GetGameVersion () == VERSION_US_10 ) \
+            { \
+                HookCheckOriginalByte( HOOKPOS_##type##_US, HOOKCHECK_##type##_US ); \
+            } \
+            else \
+            { \
+                HookCheckOriginalByte( HOOKPOS_##type##_EU, HOOKCHECK_##type##_EU ); \
+            } \
+        } \
+        EZHookInstall( type )
 
 
 // Structure for holding hook info
