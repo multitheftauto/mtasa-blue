@@ -4421,6 +4421,9 @@ void CPacketHandler::Packet_ProjectileSync ( NetBitStreamInterface& bitStream )
             return;
     }
 
+    if ( bitStream.Version () < 0x52 )
+        usModel = 0;    // Fix possible error from 0x51 server 
+
     CClientEntity* pCreator = NULL;
     if ( CreatorID != INVALID_ELEMENT_ID ) pCreator = CElementIDs::GetElement ( CreatorID );
     if ( OriginID != INVALID_ELEMENT_ID )

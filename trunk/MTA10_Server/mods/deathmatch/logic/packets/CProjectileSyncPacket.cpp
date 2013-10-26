@@ -14,6 +14,7 @@
 
 CProjectileSyncPacket::CProjectileSyncPacket ( void )
 {
+    m_usModel = 0;
 }
 
 
