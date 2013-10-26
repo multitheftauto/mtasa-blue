@@ -38,16 +38,10 @@ bool CProjectileSyncPacket::Read ( NetBitStreamInterface& BitStream )
         return false;
     m_ucWeaponType = weaponType.data.ucWeaponType;
 
-    if ( m_pSourceElement )
+    if ( BitStream.Version () >= 0x4F )
     {
-        CPlayer* pSourcePlayer = static_cast < CPlayer* > ( m_pSourceElement );
-        if ( pSourcePlayer->GetBitStreamVersion () >= 0x4F )
-        {
-            unsigned short usModel;
-            if ( !BitStream.Read ( usModel ) )
-                return false;
-            m_usModel = usModel;
-        }
+        if ( !BitStream.Read ( m_usModel ) )
+            return false;
     }
 
     switch ( m_ucWeaponType )
@@ -134,11 +128,9 @@ bool CProjectileSyncPacket::Write ( NetBitStreamInterface& BitStream ) const
     weaponType.data.ucWeaponType = m_ucWeaponType;
     BitStream.Write ( &weaponType );
 
-    if ( m_pSourceElement )
+    if ( BitStream.Version () >= 0x4F )
     {
-        CPlayer* pSourcePlayer = static_cast < CPlayer* > ( m_pSourceElement );
-        if ( pSourcePlayer->GetBitStreamVersion () >= 0x4F )
-            BitStream.Write ( m_usModel );
+        BitStream.Write ( m_usModel );
     }
 
     switch ( m_ucWeaponType )

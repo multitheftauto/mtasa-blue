@@ -4417,8 +4417,9 @@ void CPacketHandler::Packet_ProjectileSync ( NetBitStreamInterface& bitStream )
     unsigned short usModel = 0;
     if ( bitStream.Version () >= 0x4F )
     {
-        if ( !bitStream.Read ( usModel ) )
-            return;
+        if ( bitStream.Version () >= 0x52 || bHasCreator )    // Fix possible error from 0x51 server 
+            if ( !bitStream.Read ( usModel ) )
+                return;
     }
 
     if ( bitStream.Version () < 0x52 )

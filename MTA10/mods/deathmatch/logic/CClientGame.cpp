@@ -5239,7 +5239,8 @@ void CClientGame::SendProjectileSync ( CClientProjectile * pProjectile )
 
         // Write the projectile's model
         if ( pBitStream->Version () >= 0x4F )
-            pBitStream->Write ( pProjectile->GetModel () );
+            if ( pBitStream->Version () >= 0x52 || pOriginSource )    // Fix possible error for 0x51 server 
+                pBitStream->Write ( pProjectile->GetModel () );
 
         switch ( weaponType )
         {
