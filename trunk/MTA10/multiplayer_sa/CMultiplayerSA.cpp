@@ -6093,9 +6093,6 @@ void TriggerVehicleCollisionEvent ( )
         CEntitySAInterface * pEntity = pCollisionVehicle->m_pCollidedEntity;
         if ( pEntity )
         {
-        //OutputDebugLine( SString( "TriggerVehicleCollisionEvent:  pEntity:%08x"
-        //                , pEntity
-        //                ));
             // Not handled because it triggers too much
             //if ( pEntity->nType != ENTITY_TYPE_BUILDING )
             {
@@ -6130,12 +6127,6 @@ void _declspec(naked) HOOK_CEventVehicleDamageCollision ( )
     _asm
     {
         pushad
-        lea edx, [esp+32+4*3]
-        mov eax, dword ptr[edx]
-        cmp eax, 0
-        jz lp1
-        mov eax, dword ptr[edx]
-lp1:
         mov pCollisionVehicle, ecx
     }
     TriggerVehicleCollisionEvent ( );
