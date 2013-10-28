@@ -984,6 +984,9 @@ void CRenderItemManager::PreDrawWorld ( void )
     // Create/destroy readable depth buffer depending on what is needed
     bool bRequireDepthBuffer = !m_ShadersUsingDepthBuffer.empty ();
 
+    // Readable depth buffer is not compatible with volumetric shadows
+    CCore::GetSingleton ().GetGame ()->GetSettings ()->SetVolumetricShadowsSuspended( bRequireDepthBuffer );
+
     if ( !bRequireDepthBuffer )
     {
         SAFE_RELEASE( pReadableDepthBuffer );
@@ -1008,7 +1011,7 @@ void CRenderItemManager::PreDrawWorld ( void )
                 //      1. Create a non-AA render target to pair with our readable depth buffer
                 //      2. Create second depth buffer for pairing with non-AA render target when readable depth buffer needs to be preserved
                 m_pDevice->CreateRenderTarget( m_uiDefaultViewportSizeX, m_uiDefaultViewportSizeY, pp.BackBufferFormat, D3DMULTISAMPLE_NONE, 0, false, &m_pNonAARenderTarget, NULL );
-                m_pDevice->CreateDepthStencilSurface( m_uiDefaultViewportSizeX, m_uiDefaultViewportSizeY, (D3DFORMAT)m_depthBufferFormat, D3DMULTISAMPLE_NONE, 0, true, &m_pNonAADepthSurface2, NULL );
+                m_pDevice->CreateDepthStencilSurface( m_uiDefaultViewportSizeX, m_uiDefaultViewportSizeY, pp.AutoDepthStencilFormat, D3DMULTISAMPLE_NONE, 0, true, &m_pNonAADepthSurface2, NULL );
             }
         }
     }

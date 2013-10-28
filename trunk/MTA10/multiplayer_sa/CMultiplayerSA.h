@@ -162,6 +162,7 @@ public:
     void                        SetBulletFireHandler        ( BulletFireHandler* pHandler );
     void                        SetDrawRadarAreasHandler    ( DrawRadarAreasHandler * pRadarAreasHandler );
     void                        SetRender3DStuffHandler     ( Render3DStuffHandler * pHandler );
+    void                        SetPreRenderSkyHandler      ( PreRenderSkyHandler * pHandler );
 
     void                        Reset                       ();
 
