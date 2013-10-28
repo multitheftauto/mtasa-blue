@@ -497,5 +497,5 @@ void CMultiplayerSA::InitHooks_Rendering ( void )
     EZHookInstall ( Check_NoOfVisibleEntities );
     EZHookInstall ( WinLoop );
     EZHookInstall ( psGrabScreen );
-    EZHookInstallChecked ( CClouds_RenderSkyPolys );
+    EZHookInstall ( CClouds_RenderSkyPolys );
 }
