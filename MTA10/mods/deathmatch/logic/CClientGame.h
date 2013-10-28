@@ -480,6 +480,7 @@ private:
     static bool                         StaticBreakTowLinkHandler       ( CVehicle* pTowedVehicle );
     static void                         StaticDrawRadarAreasHandler     ( void );
     static void                         StaticRender3DStuffHandler      ( void );
+    static void                         StaticPreRenderSkyHandler       ( void );
     static bool                         StaticChokingHandler            ( unsigned char ucWeaponType );
     static void                         StaticPreWorldProcessHandler    ( void );
     static void                         StaticPostWorldProcessHandler   ( void );
@@ -509,6 +510,7 @@ private:
     bool                                BreakTowLinkHandler             ( CVehicle* pTowedVehicle );
     void                                DrawRadarAreasHandler           ( void );
     void                                Render3DStuffHandler            ( void );
+    void                                PreRenderSkyHandler             ( void );
     bool                                ChokingHandler                  ( unsigned char ucWeaponType );
     void                                PreWorldProcessHandler          ( void );
     void                                PostWorldProcessHandler         ( void );

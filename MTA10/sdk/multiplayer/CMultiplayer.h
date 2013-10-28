@@ -55,6 +55,7 @@ typedef bool ( BreakTowLinkHandler ) ( class CVehicle * towingVehicle );
 typedef bool ( ProcessCamHandler ) ( class CCam* pCam );
 typedef void ( DrawRadarAreasHandler ) ( void );
 typedef void ( Render3DStuffHandler ) ( void );
+typedef void ( PreRenderSkyHandler ) ( void );
 typedef bool ( ChokingHandler ) ( unsigned char ucWeaponType );
 typedef void ( PreWorldProcessHandler ) ( void );
 typedef void ( PostWorldProcessHandler ) ( void );
@@ -243,6 +244,7 @@ public:
     virtual void                        SetBulletFireHandler        ( BulletFireHandler* pHandler ) = 0;
     virtual void                        SetDrawRadarAreasHandler    ( DrawRadarAreasHandler * pRadarAreasHandler ) = 0;
     virtual void                        SetRender3DStuffHandler     ( Render3DStuffHandler * pHandler ) = 0;
+    virtual void                        SetPreRenderSkyHandler      ( PreRenderSkyHandler * pHandler ) = 0;
 
     virtual void                        Reset                       () = 0;
 

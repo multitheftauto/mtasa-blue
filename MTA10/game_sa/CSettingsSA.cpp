@@ -35,6 +35,7 @@ CSettingsSA::CSettingsSA ( void )
     m_pInterface = (CSettingsSAInterface *)CLASS_CMenuManager;
     m_pInterface->bFrameLimiter = false;
     m_bVolumetricShadowsEnabled = false;
+    m_bVolumetricShadowsSuspended = false;
     SetAspectRatio ( ASPECT_RATIO_4_3 );
     HookInstall ( HOOKPOS_GetFxQuality, (DWORD)HOOK_GetFxQuality, 5 );
     HookInstall ( HOOKPOS_StoreShadowForVehicle, (DWORD)HOOK_StoreShadowForVehicle, 9 );
@@ -264,12 +265,17 @@ void CSettingsSA::Save ()
 
 bool CSettingsSA::IsVolumetricShadowsEnabled ( void )
 {
-    return m_bVolumetricShadowsEnabled;
+    return m_bVolumetricShadowsEnabled && !m_bVolumetricShadowsSuspended;
 }
 
 void CSettingsSA::SetVolumetricShadowsEnabled ( bool bEnable )
 {
     m_bVolumetricShadowsEnabled = bEnable;
+}
+
+void CSettingsSA::SetVolumetricShadowsSuspended ( bool bSuspended )
+{
+    m_bVolumetricShadowsSuspended = bSuspended;
 }
 
 //

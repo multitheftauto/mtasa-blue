@@ -11,6 +11,7 @@
 #include "StdInc.h"
 extern CCoreInterface* g_pCore;
 GameEntityRenderHandler* pGameEntityRenderHandler = NULL;
+PreRenderSkyHandler* pPreRenderSkyHandlerHandler = NULL;
 
 #define VAR_CCullZones_NumMirrorAttributeZones  0x0C87AC4   // int
 #define VAR_CMirrors_d3dRestored                0x0C7C729   // uchar
@@ -344,7 +345,6 @@ bool OnMY_psGrabScreen_ShouldUseRect( void )
     return bWindowed;
 }
 
-
 // Hook info
 #define HOOKPOS_psGrabScreen                        0x7452FC
 #define HOOKSIZE_psGrabScreen                       5
@@ -379,6 +379,38 @@ use_rect:
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
+// CClouds::RenderSkyPolys
+//
+// This is the first thing drawn by GTA
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+void OnMY_CClouds_RenderSkyPolys( void )
+{
+    if ( pPreRenderSkyHandlerHandler )
+        pPreRenderSkyHandlerHandler();
+}
+
+// Hook info
+#define HOOKCHECK_CClouds_RenderSkyPolys            0xA1
+#define HOOKPOS_CClouds_RenderSkyPolys              0x714650
+#define HOOKSIZE_CClouds_RenderSkyPolys             5
+DWORD RETURN_CClouds_RenderSkyPolys =               0x714655;
+void _declspec(naked) HOOK_CClouds_RenderSkyPolys ()
+{
+    _asm
+    {
+        pushad
+        call    OnMY_CClouds_RenderSkyPolys
+        popad
+
+        mov     eax, ds:0x0B6F03C
+        jmp     RETURN_CClouds_RenderSkyPolys
+    }
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
 // CMultiplayerSA::SetGameEntityRenderHandler
 //
 //
@@ -386,6 +418,18 @@ use_rect:
 void CMultiplayerSA::SetGameEntityRenderHandler ( GameEntityRenderHandler * pHandler )
 {
     pGameEntityRenderHandler = pHandler;
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+// CMultiplayerSA::SetPreRenderSkyHandler
+//
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+void CMultiplayerSA::SetPreRenderSkyHandler ( PreRenderSkyHandler * pHandler )
+{
+    pPreRenderSkyHandlerHandler = pHandler;
 }
 
 
@@ -453,4 +497,5 @@ void CMultiplayerSA::InitHooks_Rendering ( void )
     EZHookInstall ( Check_NoOfVisibleEntities );
     EZHookInstall ( WinLoop );
     EZHookInstall ( psGrabScreen );
+    EZHookInstallChecked ( CClouds_RenderSkyPolys );
 }
