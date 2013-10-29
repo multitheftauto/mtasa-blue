@@ -10,10 +10,20 @@
 *
 *****************************************************************************/
 
+#ifdef MTA_CLIENT
+
+#include "WinVer.h"
+
 namespace SharedUtil
 {
     struct SQueryWMIResult : public std::vector < std::vector < SString > >
     {
+    };
+
+    struct SLibVersionInfo : VS_FIXEDFILEINFO
+    {
+        SString strCompanyName;
+        SString strProductName;
     };
 
     bool        QueryWMI                        ( SQueryWMIResult& outResult, const SString& strQuery, const SString& strKeys, const SString& strNamespace = "CIMV2" );
@@ -21,4 +31,7 @@ namespace SharedUtil
     long long   GetWMIVideoAdapterMemorySize    ( const SString& strDisplay );
     long long   GetWMITotalPhysicalMemory       ( void );
     void        GetWMIAntiVirusStatus           ( std::vector < SString >& outEnabledList, std::vector < SString >& outDisabledList );
+    bool        GetLibVersionInfo               ( const WString& strLibName, SLibVersionInfo* pOutLibVersionInfo );
 }
+
+#endif

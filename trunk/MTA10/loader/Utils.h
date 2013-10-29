@@ -29,11 +29,6 @@ enum
     CHECK_SERVICE_PRE_CREATE = 6,
 };
 
-struct SLibVersionInfo : VS_FIXEDFILEINFO
-{
-    SString strCompanyName;
-    SString strProductName;
-};
 
 // Loads the given dll into hProcess. Returns 0 on failure or the handle to the
 // remote dll module on success.
@@ -61,7 +56,6 @@ SString         GetOSVersion                        ( void );
 SString         GetRealOSVersion                    ( void );
 bool            IsVistaOrHigher                     ( void );
 BOOL            IsUserAdmin                         ( void );
-bool            GetLibVersionInfo                   ( const WString& strLibName, SLibVersionInfo* pOutLibVersionInfo );
 
 void            UpdateMTAVersionApplicationSetting  ( bool bQuiet = false );
 bool            Is32bitProcess                      ( DWORD processID );

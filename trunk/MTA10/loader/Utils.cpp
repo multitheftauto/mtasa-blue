@@ -1095,66 +1095,6 @@ SString GetRealOSVersion ( void )
 
 ///////////////////////////////////////////////////////////////
 //
-// GetLibVersionInfo
-//
-// Get version info of a file
-//
-///////////////////////////////////////////////////////////////
-bool GetLibVersionInfo( const WString& strLibName, SLibVersionInfo* pOutLibVersionInfo )
-{
-    DWORD dwHandle, dwLen;
-    dwLen = GetFileVersionInfoSizeW ( strLibName, &dwHandle );
-    if (!dwLen) 
-        return FALSE;
-
-    LPTSTR lpData = (LPTSTR) malloc (dwLen);
-    if (!lpData) 
-        return FALSE;
-
-    SetLastError ( 0 );
-    if( !GetFileVersionInfoW ( strLibName, dwHandle, dwLen, lpData ) )
-    {
-        free (lpData);
-        return FALSE;
-    }
-
-    DWORD dwError = GetLastError ();
-    if ( dwError )
-    {
-        free (lpData);
-        return FALSE;
-    }
-
-    UINT BufLen;
-    VS_FIXEDFILEINFO *pFileInfo;
-    if( VerQueryValueA ( lpData, "\\", (LPVOID *) &pFileInfo, (PUINT)&BufLen ) ) 
-    {
-        *(VS_FIXEDFILEINFO*)pOutLibVersionInfo = *pFileInfo;
-
-        // Nab some strings as well
-        WORD* langInfo;
-        UINT cbLang;
-        if( VerQueryValueA (lpData, "\\VarFileInfo\\Translation", (LPVOID*)&langInfo, &cbLang) )
-        {
-            SString strFirstBit ( "\\StringFileInfo\\%04x%04x\\", langInfo[0], langInfo[1] );
-
-            LPVOID lpt;
-            UINT cbBufSize;
-            if ( VerQueryValueA (lpData, strFirstBit + "CompanyName", &lpt, &cbBufSize) )     pOutLibVersionInfo->strCompanyName = SStringX( (const char*)lpt ); 
-            if ( VerQueryValueA (lpData, strFirstBit + "ProductName", &lpt, &cbBufSize) )     pOutLibVersionInfo->strProductName = SStringX( (const char*)lpt ); 
-        }
-
-        free (lpData);
-        return true;
-    }
-
-    free (lpData);
-    return FALSE;
-}
-
-
-///////////////////////////////////////////////////////////////
-//
 // IsUserAdmin
 //
 //

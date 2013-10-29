@@ -85,7 +85,9 @@ typedef float               FLOAT;      //  32
 #include "SharedUtil.Math.h"
 #include "SharedUtil.ClassIdent.h"
 #include "SharedUtil.Hash.h"
-#include "SharedUtil.SysInfo.h"
+#if defined(SHARED_UTIL_WITH_SYS_INFO)
+    #include "SharedUtil.SysInfo.h"
+#endif
 #include "SharedUtil.Profiling.h"
 #include "SharedUtil.Logging.h"
 #include "CFastList.h"
