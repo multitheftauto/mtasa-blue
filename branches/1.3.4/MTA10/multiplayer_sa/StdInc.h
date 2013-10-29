@@ -7,6 +7,7 @@
 #define MTA_CLIENT
 #define SHARED_UTIL_WITH_HASH_MAP
 #define SHARED_UTIL_WITH_FAST_HASH_MAP
+#define SHARED_UTIL_WITH_SYS_INFO
 #include "SharedUtil.h"
 #include "SharedUtil.MemAccess.h"
 #include <stdio.h>
