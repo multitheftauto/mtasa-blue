@@ -106,4 +106,6 @@ protected:
     IDirect3DSurface9*                          m_pSavedSceneRenderTargetAA;
     IDirect3DSurface9*                          m_pNonAADepthSurface2;
     IDirect3DSurface9*                          m_pNonAARenderTarget;
+    IDirect3DTexture9*                          m_pNonAARenderTargetTexture;
+    bool                                        m_bIsSwiftShader;
 };
