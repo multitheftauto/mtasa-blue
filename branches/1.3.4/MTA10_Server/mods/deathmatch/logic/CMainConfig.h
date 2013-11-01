@@ -154,7 +154,7 @@ private:
     std::string                     m_strServerIP;
     std::string                     m_strServerName;
     unsigned short                  m_usServerPort;
-    unsigned int                    m_uiMaxPlayers;
+    unsigned int                    m_uiHardMaxPlayers;
     unsigned int                    m_uiSoftMaxPlayers;
     bool                            m_bHTTPEnabled;
     std::string                     m_strPassword;
