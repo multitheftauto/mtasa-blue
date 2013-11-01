@@ -68,7 +68,7 @@ CMainConfig::CMainConfig ( CConsole* pConsole, CLuaManager* pLuaMain ): CXMLConf
     m_pCommandLineParser = NULL;
 
     m_usServerPort = 0;
-    m_uiMaxPlayers = 0;
+    m_uiHardMaxPlayers = 0;
     m_bHTTPEnabled = true;
     m_iAseMode = 0;
     m_iUpdateCycleDatagramsLimit = 10000;
@@ -169,8 +169,8 @@ bool CMainConfig::Load ( void )
     iResult = GetInteger ( m_pRootNode, "maxplayers", iTemp, 1, MAX_PLAYER_COUNT );
     if ( iResult == IS_SUCCESS )
     {
-        m_uiMaxPlayers = iTemp;
-        m_uiSoftMaxPlayers = m_uiMaxPlayers;
+        m_uiHardMaxPlayers = iTemp;
+        m_uiSoftMaxPlayers = iTemp;
     }
     else
     {
@@ -894,6 +894,14 @@ void CMainConfig::RegisterCommand ( const char* szName, FCommandHandler* pFuncti
 void CMainConfig::SetCommandLineParser ( CCommandLineParser* pCommandLineParser )
 {
     m_pCommandLineParser = pCommandLineParser;
+
+    // Adjust max player limits for command line arguments
+    uint uiMaxPlayers;
+    if ( m_pCommandLineParser && m_pCommandLineParser->GetMaxPlayers ( uiMaxPlayers ) )
+    {
+        m_uiHardMaxPlayers = Clamp < uint > ( 1, uiMaxPlayers, MAX_PLAYER_COUNT );
+        m_uiSoftMaxPlayers = uiMaxPlayers;
+    }
 }
 
 std::string CMainConfig::GetServerIP ( void )
@@ -922,10 +930,7 @@ unsigned short CMainConfig::GetServerPort ( void )
 
 unsigned int CMainConfig::GetHardMaxPlayers ( void )
 {
-    unsigned int uiMaxPlayers;
-    if ( m_pCommandLineParser && m_pCommandLineParser->GetMaxPlayers ( uiMaxPlayers ) )
-        return uiMaxPlayers;
-    return m_uiMaxPlayers;
+    return m_uiHardMaxPlayers;
 }
 
 unsigned int CMainConfig::GetMaxPlayers ( void )
