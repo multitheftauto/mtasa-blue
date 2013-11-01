@@ -347,13 +347,13 @@ void CMarker::UpdateCollisionObject ( unsigned char ucOldType )
         if ( m_ucType == CMarker::TYPE_CHECKPOINT )
         {
             if ( m_pCollision )
-                g_pGame->GetElementDeleter()->Delete ( m_pCollision );
+                g_pGame->GetElementDeleter()->Delete ( m_pCollision, true, true, NULL, "UpdateCollisionObject:m_pCollision:1" );
             m_pCollision = new CColCircle ( m_pColManager, NULL, m_vecPosition, m_fSize, NULL, true );
         }
         else if ( ucOldType == CMarker::TYPE_CHECKPOINT )
         {
             if ( m_pCollision )
-                g_pGame->GetElementDeleter()->Delete ( m_pCollision );
+                g_pGame->GetElementDeleter()->Delete ( m_pCollision, true, true, NULL, "UpdateCollisionObject:m_pCollision:2" );
             m_pCollision = new CColSphere ( m_pColManager, NULL, m_vecPosition, m_fSize, NULL, true );
         }
 

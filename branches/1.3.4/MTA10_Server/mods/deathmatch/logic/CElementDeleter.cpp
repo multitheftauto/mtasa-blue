@@ -16,7 +16,7 @@
 
 extern CGame * g_pGame;
 
-void CElementDeleter::Delete ( class CElement* pElement, bool bUnlink, bool bUpdatePerPlayerEntities )
+void CElementDeleter::Delete ( class CElement* pElement, bool bUnlink, bool bUpdatePerPlayerEntities, CResource* pDebugResource, const char* szDebugText )
 {
     if ( pElement )
     {
@@ -24,6 +24,11 @@ void CElementDeleter::Delete ( class CElement* pElement, bool bUnlink, bool bUpd
         {
             // Before we do anything, fire the on-destroy event
             CLuaArguments Arguments;
+            if ( pDebugResource )
+                Arguments.PushResource( pDebugResource );
+            else
+                Arguments.PushNil();
+            Arguments.PushString( szDebugText );
             pElement->CallEvent ( "onElementDestroy", Arguments );
 
             // Add it to our list

@@ -153,7 +153,8 @@ int CLuaElementDefs::destroyElement ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        if ( CStaticFunctionDefinitions::DestroyElement ( pElement ) )
+        CResource* pResource = m_pResourceManager->GetResourceFromLuaState( luaVM );
+        if ( CStaticFunctionDefinitions::DestroyElement ( pElement, pResource, "destroyElement" ) )
         {
             lua_pushboolean ( luaVM, true );
             return 1;

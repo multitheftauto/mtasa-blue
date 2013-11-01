@@ -497,7 +497,7 @@ int CLuaFileDefs::fileClose ( lua_State* luaVM )
     {
         // Close the file and delete it
         pFile->Unload ();
-        m_pElementDeleter->Delete ( pFile );
+        m_pElementDeleter->Delete ( pFile, true, true, NULL, "fileClose" );
 
         // Success. Return true
         lua_pushboolean ( luaVM, true );

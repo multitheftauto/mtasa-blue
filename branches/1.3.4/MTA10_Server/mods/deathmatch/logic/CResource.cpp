@@ -880,14 +880,14 @@ bool CResource::Start ( list<CResource *> * dependents, bool bStartedManually, b
                     if ( m_pResourceElement )
                     {
                         removePacket.Add ( m_pResourceElement );
-                        g_pGame->GetElementDeleter()->Delete ( m_pResourceElement );
+                        g_pGame->GetElementDeleter()->Delete ( m_pResourceElement, true, true, NULL, SString( "%s:Start:ResourceElement", GetName().c_str() ) );
                         m_pResourceElement = NULL;
                     }
 
                     if ( m_pResourceDynamicElementRoot )
                     {
                         removePacket.Add ( m_pResourceDynamicElementRoot );
-                        g_pGame->GetElementDeleter()->Delete ( m_pResourceDynamicElementRoot );
+                        g_pGame->GetElementDeleter()->Delete ( m_pResourceDynamicElementRoot, true, true, NULL, SString( "%s:Start:ResourceDynamicElementRoot", GetName().c_str() ) );
                         m_pResourceDynamicElementRoot = NULL;
                     }
                     g_pGame->GetPlayerManager()->BroadcastOnlyJoined ( removePacket );
@@ -1085,7 +1085,7 @@ bool CResource::Stop ( bool bStopManually )
         if ( m_pResourceElement )
         {
             removePacket.Add ( m_pResourceElement );
-            g_pGame->GetElementDeleter()->Delete ( m_pResourceElement );
+            g_pGame->GetElementDeleter()->Delete ( m_pResourceElement, true, true, NULL, SString( "%s:Stop:pResourceElement", GetName().c_str() ) );
             m_pResourceElement = NULL;
         }
 
@@ -1093,7 +1093,7 @@ bool CResource::Stop ( bool bStopManually )
         if ( m_pResourceDynamicElementRoot )
         {
             removePacket.Add ( m_pResourceDynamicElementRoot );
-            g_pGame->GetElementDeleter()->Delete ( m_pResourceDynamicElementRoot );
+            g_pGame->GetElementDeleter()->Delete ( m_pResourceDynamicElementRoot, true, true, NULL, SString( "%s:Stop:pResourceDynamicElementRoot", GetName().c_str() ) );
             m_pResourceDynamicElementRoot = NULL;
         }
 

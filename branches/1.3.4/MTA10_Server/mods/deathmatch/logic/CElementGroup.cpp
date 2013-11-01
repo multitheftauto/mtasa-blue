@@ -68,7 +68,7 @@ CElementGroup::~CElementGroup()
             pElement = *iter;
             pElement->SetElementGroup ( NULL );
             pElement->DeleteAllEvents ();
-            deleter->Delete ( pElement, true, false );
+            deleter->Delete ( pElement, true, false, NULL, "~CElementGroup" );
         }
 
         // Do this at the end for speed

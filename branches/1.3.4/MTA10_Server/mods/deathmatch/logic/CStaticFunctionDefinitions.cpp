@@ -260,13 +260,13 @@ CDummy* CStaticFunctionDefinitions::CreateElement ( CResource* pResource, const 
 }
 
 
-bool CStaticFunctionDefinitions::DestroyElement ( CElement* pElement )
+bool CStaticFunctionDefinitions::DestroyElement ( CElement* pElement, CResource* pDebugResource, const char* szDebugText )
 {
     // Run us on all its children
     CChildListType ::const_iterator iter = pElement->IterBegin ();
     while ( iter != pElement->IterEnd () )
     {
-        if ( DestroyElement ( *iter ) )
+        if ( DestroyElement ( *iter, pDebugResource, szDebugText ) )
             iter = pElement->IterBegin ();
         else
             ++iter;
@@ -299,7 +299,7 @@ bool CStaticFunctionDefinitions::DestroyElement ( CElement* pElement )
     m_pPlayerManager->BroadcastOnlyJoined ( Packet );
 
     // Delete it
-    m_pElementDeleter->Delete ( pElement );
+    m_pElementDeleter->Delete ( pElement, true, true, pDebugResource, szDebugText );
     return true;
 }
 

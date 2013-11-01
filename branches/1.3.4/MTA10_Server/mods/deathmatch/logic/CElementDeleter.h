@@ -22,7 +22,7 @@ class CElementDeleter
 public:
     inline                          ~CElementDeleter        ( void )        { DoDeleteAll (); };
 
-    void                            Delete                  ( class CElement* pElement, bool bUnlink = true, bool bUpdatePerPlayerEntities = true );
+    void                            Delete                  ( class CElement* pElement, bool bUnlink = true, bool bUpdatePerPlayerEntities = true, CResource* pDebugResource = NULL, const char* szDebugText = "" );
     void                            DoDeleteAll             ( void );
 
     bool                            IsBeingDeleted          ( class CElement* pElement );

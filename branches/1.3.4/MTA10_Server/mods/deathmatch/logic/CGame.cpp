@@ -1366,7 +1366,7 @@ void CGame::QuitPlayer ( CPlayer& Player, CClient::eQuitReasons Reason, bool bSa
     GetLatentTransferManager ()->RemoveRemote ( Player.GetSocket () );
 
     // Delete it, don't unlink yet, we could be inside the player-manager's iteration
-    m_ElementDeleter.Delete ( &Player, false );
+    m_ElementDeleter.Delete ( &Player, false, true, NULL, "QuitPlayer" );
 
     // Unregister them from the lightweight sync manager
     m_lightsyncManager.UnregisterPlayer ( &Player );
