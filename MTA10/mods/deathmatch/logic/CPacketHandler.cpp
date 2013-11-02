@@ -4425,6 +4425,12 @@ void CPacketHandler::Packet_ProjectileSync ( NetBitStreamInterface& bitStream )
     if ( bitStream.Version () < 0x52 )
         usModel = 0;    // Fix possible error from 0x51 server 
 
+    // Crash fix - usModel is not valid for some clients
+    //              either because number is incorrect due to some mismatch in bitstream versions
+    //              or maybe model isn't loaded?
+    //              or something else
+    usModel = 0;
+
     CClientEntity* pCreator = NULL;
     if ( CreatorID != INVALID_ELEMENT_ID ) pCreator = CElementIDs::GetElement ( CreatorID );
     if ( OriginID != INVALID_ELEMENT_ID )
