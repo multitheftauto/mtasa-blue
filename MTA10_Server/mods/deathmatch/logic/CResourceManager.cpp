@@ -591,6 +591,13 @@ CResource* CResourceManager::GetResourceFromLuaState ( lua_State* luaVM )
     return NULL;
 }
 
+SString CResourceManager::GetResourceName ( lua_State* luaVM )
+{
+    CResource* pResource = GetResourceFromLuaState( luaVM );
+    if ( pResource )
+        return pResource->GetName();
+    return "";
+}
 
 bool CResourceManager::IsAResourceElement ( CElement* pElement )
 {

@@ -44,19 +44,17 @@ public:
 
     float Normalize ( void ) 
     { 
-        double t = sqrt(fX*fX + fY*fY + fZ*fZ);
+        float t = sqrt(fX*fX + fY*fY + fZ*fZ);
         if ( t > FLOAT_EPSILON )
         {
-            double fX2 = fX / t;
-            double fY2 = fY / t;
-            double fZ2 = fZ / t;
-            fX = (float)fX2;
-            fY = (float)fY2;
-            fZ = (float)fZ2;
+            float fRcpt = 1 / t;
+            fX *= fRcpt;
+            fY *= fRcpt;
+            fZ *= fRcpt;
         }
         else
             t = 0;
-        return static_cast < float > ( t );
+        return t;
     }
 
     float Length ( void ) const
@@ -120,7 +118,8 @@ public:
 
     CVector operator / ( float fRight ) const
     {
-        return CVector ( fX / fRight, fY / fRight, fZ / fRight );
+        float fRcpValue = 1 / fRight;
+        return CVector ( fX * fRcpValue, fY * fRcpValue, fZ * fRcpValue );
     }
 
     CVector operator - () const
@@ -172,9 +171,10 @@ public:
 
     void operator /= ( float fRight )
     {
-        fX /= fRight;
-        fY /= fRight;
-        fZ /= fRight;
+        float fRcpValue = 1 / fRight;
+        fX *= fRcpValue;
+        fY *= fRcpValue;
+        fZ *= fRcpValue;
     }
 
     void operator /= ( const CVector& vecRight )
