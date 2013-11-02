@@ -84,6 +84,12 @@ CResource* CResourceManager::GetResourceFromScriptID ( uint uiScriptID )
     return pResource;
 }
 
+CResource* CResourceManager::GetResourceFromLuaState ( lua_State* luaVM )
+{
+    CLuaMain* pLuaMain = g_pClientGame->GetLuaManager()->GetVirtualMachine ( luaVM );
+    CResource* pResource = pLuaMain ? pLuaMain->GetResource() : NULL;
+    return pResource;
+}
 
 SString CResourceManager::GetResourceName ( lua_State* luaVM )
 {
