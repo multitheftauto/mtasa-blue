@@ -965,7 +965,7 @@ bool CLuaMain::LoadScriptFromBuffer ( const char* cpInBuffer, unsigned int uiInS
     // Decrypt if required
     const char* cpBuffer;
     uint uiSize;
-    if ( !g_pNet->DecryptScript( cpInBuffer, uiInSize, &cpBuffer, &uiSize ) )
+    if ( !g_pNet->DecryptScript( cpInBuffer, uiInSize, &cpBuffer, &uiSize, strNiceFilename ) )
     {
         // Problems problems
 #if MTA_DM_VERSION < 0x135 

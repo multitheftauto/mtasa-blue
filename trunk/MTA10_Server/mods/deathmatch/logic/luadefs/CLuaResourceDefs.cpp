@@ -1219,7 +1219,7 @@ int CLuaResourceDefs::LoadString( lua_State* luaVM )
         // Decrypt if required
         const char* cpBuffer;
         uint uiSize;
-        if ( !g_pRealNetServer->DecryptScript( cpInBuffer, uiInSize, &cpBuffer, &uiSize ) )
+        if ( !g_pRealNetServer->DecryptScript( cpInBuffer, uiInSize, &cpBuffer, &uiSize, m_pResourceManager->GetResourceName( luaVM ) + "/loadstring" ) )
         {
             // Problems problems
     #if MTA_DM_VERSION < 0x135 
@@ -1298,7 +1298,7 @@ int CLuaResourceDefs::Load( lua_State* luaVM )
         // Decrypt if required
         const char* cpBuffer;
         uint uiSize;
-        if ( !g_pRealNetServer->DecryptScript( cpInBuffer, uiInSize, &cpBuffer, &uiSize ) )
+        if ( !g_pRealNetServer->DecryptScript( cpInBuffer, uiInSize, &cpBuffer, &uiSize, m_pResourceManager->GetResourceName( luaVM ) + "/load" ) )
         {
             // Problems problems
     #if MTA_DM_VERSION < 0x135 

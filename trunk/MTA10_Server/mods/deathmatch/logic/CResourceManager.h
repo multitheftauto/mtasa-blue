@@ -97,6 +97,7 @@ public:
     CResource*                  GetResourceFromNetID            ( unsigned short usNetID );
 
     CResource*                  GetResourceFromLuaState         ( struct lua_State* luaVM );
+    SString                     GetResourceName                 ( struct lua_State* luaVM );
 
     CResource*                  CreateResource                  ( const SString& strNewResourceName, const SString& strNewOrganizationalPath, SString& strOutStatus );
     CResource*                  CopyResource                    ( CResource* pSourceResource, const SString& strNewResourceName, const SString& strNewOrganizationalPath, SString& strOutStatus );
