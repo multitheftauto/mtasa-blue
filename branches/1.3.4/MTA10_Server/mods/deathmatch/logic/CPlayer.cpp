@@ -588,7 +588,7 @@ void CPlayer::RemoveNametagOverrideColor ( void )
 // Is it time to send a pure sync to every other player ?
 bool CPlayer::IsTimeForPuresyncFar ( void )
 {
-    long long llTime = GetTickCount64_ ();
+    long long llTime = GetModuleTickCount64 ();
     if ( llTime > m_llNextFarPuresyncTime )
     {
         int iSlowSyncRate = g_pBandwidthSettings->ZoneUpdateIntervals [ ZONE3 ];

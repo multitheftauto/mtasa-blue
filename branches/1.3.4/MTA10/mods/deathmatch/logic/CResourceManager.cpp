@@ -85,6 +85,14 @@ CResource* CResourceManager::GetResourceFromScriptID ( uint uiScriptID )
 }
 
 
+SString CResourceManager::GetResourceName ( lua_State* luaVM )
+{
+    CResource* pResource = GetResourceFromLuaState( luaVM );
+    if ( pResource )
+        return pResource->GetName();
+    return "";
+}
+
 CResource* CResourceManager::GetResource ( const char* szResourceName )
 {
     list < CResource* > ::const_iterator iter = m_resources.begin ();

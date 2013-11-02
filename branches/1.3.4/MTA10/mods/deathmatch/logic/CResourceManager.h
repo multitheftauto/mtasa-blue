@@ -42,6 +42,7 @@ public:
     CResource*                  GetResource                 ( const char* szResourceName );
     CResource*                  GetResourceFromNetID        ( unsigned short usNetID );
     CResource*                  GetResourceFromScriptID     ( uint uiScriptID );
+    SString                     GetResourceName             ( struct lua_State* luaVM );
     bool                        RemoveResource              ( unsigned short usID );
     void                        Remove                      ( CResource* pResource );
     bool                        Exists                      ( CResource* pResource );
