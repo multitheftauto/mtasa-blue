@@ -2161,6 +2161,9 @@ bool CStaticFunctionDefinitions::SetPedAimTarget ( CClientEntity & Entity, CVect
     {
         CClientPed& Ped = static_cast < CClientPed& > ( Entity );
 
+        if ( Ped.IsLocalPlayer() )
+            return false;
+
         CVector vecOrigin;
         Ped.GetPosition ( vecOrigin );
 
