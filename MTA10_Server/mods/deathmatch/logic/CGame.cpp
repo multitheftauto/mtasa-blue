@@ -850,7 +850,7 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
         m_pASE->SetRuleValue ( "SerialVerification", "yes" );
     ApplyAseSetting ();
     m_pMasterServerAnnouncer = new CMasterServerAnnouncer();
-    m_pMasterServerAnnouncer->Pulse( true );
+    m_pMasterServerAnnouncer->Pulse();
 
 
     // Now load the rest of the config
