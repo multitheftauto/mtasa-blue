@@ -138,7 +138,24 @@ namespace SharedUtil
     // See implementation for details
     bool            IsMainThread                    ( void );
 
+    // CPU stats
+    struct SThreadCPUTimes
+    {
+        uint uiProcessorNumber;
+        float fUserPercent;
+        float fKernelPercent;
+        float fTotalCPUPercent;
+    };
+    struct SThreadCPUTimesStore : SThreadCPUTimes
+    {
+        SThreadCPUTimesStore( void ) { ZERO_POD_STRUCT( this ); }
+        uint64 ullPrevCPUMeasureTimeMs;
+        uint64 ullPrevUserTimeUs;
+        uint64 ullPrevKernelTimeUs;
+    };
     DWORD           _GetCurrentProcessorNumber      ( void );
+    void            GetThreadCPUTimes               ( uint64& outUserTime, uint64& outKernelTime );
+    void            UpdateThreadCPUTimes            ( SThreadCPUTimesStore& store, long long* pllTickCount = NULL );
 
     SString         EscapeString                    ( const SString& strText, const SString& strDisallowedChars, char cSpecialChar = '#', uchar ucLowerLimit = 0, uchar ucUpperLimit = 255 );
     SString         UnescapeString                  ( const SString& strText, char cSpecialChar = '#' );
@@ -837,6 +854,21 @@ namespace SharedUtil
     bool ListContains ( const CMappedArray < U >& itemList, const T& item )
     {
         return itemList.Contains ( item );
+    }
+
+
+    // Remove first occurrence of item from itemList
+    template < class U, class T >
+    void ListRemove ( CMappedList < U >& itemList, const T& item )
+    {
+        itemList.remove ( item );
+    }
+
+    // Remove first occurrence of item from itemList
+    template < class U, class T >
+    void ListRemove ( CMappedArray < U >& itemList, const T& item )
+    {
+        itemList.remove ( item );
     }
 
 

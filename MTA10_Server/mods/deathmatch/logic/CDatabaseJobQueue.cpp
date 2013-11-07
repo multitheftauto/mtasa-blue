@@ -14,7 +14,7 @@
 #include "CDatabaseJobQueue.h"
 #include "SharedUtil.Thread.h"
 
-uint g_uiDatabaseThreadProcessorNumber = -1;
+SThreadCPUTimesStore g_DatabaseThreadCPUTimes;
 
 typedef CFastList < CDbJobData* > CJobQueueType;
 
@@ -525,10 +525,12 @@ void* CDatabaseJobQueueImpl::ThreadProc ( void )
     shared.m_Mutex.Lock ();
     while ( !shared.m_bTerminateThread )
     {
+        UpdateThreadCPUTimes( g_DatabaseThreadCPUTimes );
+
         // Is there a waiting command?
         if ( shared.m_CommandQueue.empty () )
         {
-            shared.m_Mutex.Wait ( -1 );
+            shared.m_Mutex.Wait ( 100 );
         }
         else
         {
@@ -539,8 +541,6 @@ void* CDatabaseJobQueueImpl::ThreadProc ( void )
 
             // Process command
             ProcessCommand ( pJobData );
-
-            g_uiDatabaseThreadProcessorNumber = _GetCurrentProcessorNumber ();
 
             // Store result
             shared.m_Mutex.Lock ();

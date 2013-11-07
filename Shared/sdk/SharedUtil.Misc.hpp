@@ -24,6 +24,8 @@
     # define _GNU_SOURCE    /* See feature_test_macros(7) */
     #endif
     #include <sched.h>
+    #include <sys/time.h>
+    #include <sys/resource.h>
 #endif
 
 CCriticalSection CRefCountable::ms_CS;
@@ -1427,6 +1429,84 @@ namespace SharedUtil
             dwProcessorNumber = LOCAL_FUNCTION::GetCurrentProcessorNumberXP();
         }
         return dwProcessorNumber;
+    }
+
+
+    ///////////////////////////////////////////////////////////////////////////
+    //
+    // GetThreadCPUTimes
+    //
+    // Returns time in microseconds used by this thread
+    //
+    ///////////////////////////////////////////////////////////////////////////
+    void GetThreadCPUTimes ( uint64& outUserTime, uint64& outKernelTime )
+    {
+        outUserTime = 0;
+        outKernelTime = 0;
+#ifdef WIN32
+        FILETIME CreationTime, ExitTime, KernelTime, UserTime;
+        if ( SUCCEEDED( GetThreadTimes( GetCurrentThread(), &CreationTime, &ExitTime, &KernelTime, &UserTime ) ) )
+        {
+            ((ULARGE_INTEGER*)&outUserTime)->LowPart = UserTime.dwLowDateTime;
+            ((ULARGE_INTEGER*)&outUserTime)->HighPart = UserTime.dwHighDateTime;
+            ((ULARGE_INTEGER*)&outKernelTime)->LowPart = KernelTime.dwLowDateTime;
+            ((ULARGE_INTEGER*)&outKernelTime)->HighPart = KernelTime.dwHighDateTime;
+            outUserTime /= 10;
+            outKernelTime /= 10;
+        }
+#else
+        rusage usage;
+        if ( getrusage( RUSAGE_THREAD, &usage ) == 0 )
+        {
+            outUserTime = (uint64)usage.ru_utime.tv_sec * 1000000ULL + (uint64)usage.ru_utime.tv_usec;
+            outKernelTime = (uint64)usage.ru_stime.tv_sec * 1000000ULL + (uint64)usage.ru_stime.tv_usec;
+        }
+#endif
+    }
+
+
+    ///////////////////////////////////////////////////////////////////////////
+    //
+    // UpdateThreadCPUTimes
+    //
+    // Updates struct with datum
+    //
+    ///////////////////////////////////////////////////////////////////////////
+    void UpdateThreadCPUTimes( SThreadCPUTimesStore& store, long long* pllTickCount )
+    {
+        // Use supplied tick count if present
+        uint64 ullCPUMeasureTimeMs;
+        if ( pllTickCount )
+            ullCPUMeasureTimeMs = *pllTickCount;
+        else
+            ullCPUMeasureTimeMs = GetTickCount64();
+
+        if ( ullCPUMeasureTimeMs - store.ullPrevCPUMeasureTimeMs > 1000 )
+        {
+            store.uiProcessorNumber = SharedUtil::_GetCurrentProcessorNumber ();
+            uint64 ullUserTimeUs, ullKernelTimeUs;
+            GetThreadCPUTimes( ullUserTimeUs, ullKernelTimeUs );
+
+            float fCPUMeasureTimeDeltaMs = (float)( ullCPUMeasureTimeMs - store.ullPrevCPUMeasureTimeMs );
+            float fUserTimeDeltaUs       = (float)( ullUserTimeUs - store.ullPrevUserTimeUs );
+            float fKernelTimeDeltaUs     = (float)( ullKernelTimeUs - store.ullPrevKernelTimeUs );
+            if ( fCPUMeasureTimeDeltaMs > 0 )
+            {
+                float fPercentScaler = 0.1f / fCPUMeasureTimeDeltaMs;
+                store.fUserPercent = fUserTimeDeltaUs * fPercentScaler;
+                store.fKernelPercent = fKernelTimeDeltaUs * fPercentScaler;
+                store.fTotalCPUPercent = ( fUserTimeDeltaUs + fKernelTimeDeltaUs ) * fPercentScaler;
+            }
+            else
+            {
+                store.fUserPercent = 0;
+                store.fKernelPercent = 0;
+                store.fTotalCPUPercent = 0;
+            }
+            store.ullPrevUserTimeUs = ullUserTimeUs;
+            store.ullPrevKernelTimeUs = ullKernelTimeUs;
+            store.ullPrevCPUMeasureTimeMs = ullCPUMeasureTimeMs;
+        }  
     }
 
 
