@@ -26,6 +26,9 @@
     #include <sched.h>
     #include <sys/time.h>
     #include <sys/resource.h>
+    #ifndef RUSAGE_THREAD
+        #define	RUSAGE_THREAD	1		/* only the calling thread */
+    #endif
 #endif
 
 CCriticalSection CRefCountable::ms_CS;
@@ -1479,7 +1482,7 @@ namespace SharedUtil
         if ( pllTickCount )
             ullCPUMeasureTimeMs = *pllTickCount;
         else
-            ullCPUMeasureTimeMs = GetTickCount64();
+            ullCPUMeasureTimeMs = GetTickCount64_();
 
         if ( ullCPUMeasureTimeMs - store.ullPrevCPUMeasureTimeMs > 1000 )
         {
