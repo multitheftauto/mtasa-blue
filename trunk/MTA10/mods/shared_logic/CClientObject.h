@@ -48,8 +48,6 @@ public:
     void                            SetPosition             ( const CVector& vecPosition );
     virtual CSphere                 GetWorldBoundingSphere  ( void );
 
-    void                            AttachTo                ( CClientEntity* pEntity );
-
     void                            GetRotationDegrees      ( CVector& vecRotation ) const;
     void                            GetRotationRadians      ( CVector& vecRotation ) const;
     void                            SetRotationDegrees      ( const CVector& vecRotation );
