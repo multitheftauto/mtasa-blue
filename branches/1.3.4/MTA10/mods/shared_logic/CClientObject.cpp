@@ -78,9 +78,7 @@ CClientObject::~CClientObject ( void )
 
 void CClientObject::Unlink ( void )
 {
-    m_pObjectManager->RemoveFromList ( this );
-    m_pObjectManager->m_Attached.remove ( this );
-    ListRemove ( m_pObjectManager->m_StreamedIn, this );
+    m_pObjectManager->RemoveFromLists ( this );
     g_pClientGame->GetObjectRespawner ()->Unreference ( this );
 
     // Remove LowLod refs in others
@@ -631,16 +629,6 @@ void CClientObject::StreamedInPulse ( void )
             UpdateStreamPosition ( m_vecPosition );
         }
     }
-}
-
-
-void CClientObject::AttachTo ( CClientEntity* pEntity )
-{
-    // Add/remove us to/from our managers attached list
-    if ( m_pAttachedToEntity && !pEntity ) m_pObjectManager->m_Attached.remove ( this );
-    else if ( !m_pAttachedToEntity && pEntity ) m_pObjectManager->m_Attached.push_back ( this );
-
-    CClientEntity::AttachTo ( pEntity );
 }
 
 

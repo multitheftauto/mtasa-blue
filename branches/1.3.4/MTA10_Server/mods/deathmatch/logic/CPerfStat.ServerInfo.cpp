@@ -19,8 +19,8 @@
     #include <fstream>
 #endif
 
-extern uint g_uiDatabaseThreadProcessorNumber;
-extern uint g_uiThreadnetProcessorNumber;
+extern SThreadCPUTimesStore g_SyncThreadCPUTimes;
+extern SThreadCPUTimesStore g_DatabaseThreadCPUTimes;
 
 namespace
 {
@@ -37,6 +37,15 @@ namespace
         SString strName;
         SString strValue;
     };
+
+    SString MakeCPUUsageString( const SThreadCPUTimes& info )
+    {
+        if ( info.fKernelPercent < 1 )
+            return SString( "%s%%", *CPerfStatManager::GetScaledFloatString( info.fTotalCPUPercent ) );
+    
+        return SString( "%s%% (Kernel:%s%%)", *CPerfStatManager::GetScaledFloatString( info.fTotalCPUPercent )
+                                            , *CPerfStatManager::GetScaledFloatString( info.fKernelPercent ) );
+    }
 
     #define UDP_PACKET_OVERHEAD (28LL)
 }
@@ -81,6 +90,7 @@ public:
     long long                   m_llDeltaGamePacketsRecvBlocked;
     long long                   m_llDeltaGameBytesResent;
     long long                   m_llDeltaGameMessagesResent;
+    SThreadCPUTimesStore        m_MainThreadCPUTimes;
     std::vector < StringPair >  m_InfoList;
     std::vector < StringPair >  m_StatusList;
     std::vector < StringPair >  m_OptionsList;
@@ -154,6 +164,8 @@ const SString& CPerfStatServerInfoImpl::GetCategoryName ( void )
 void CPerfStatServerInfoImpl::DoPulse ( void )
 {
     long long llTime = GetTickCount64_ ();
+
+    UpdateThreadCPUTimes( m_MainThreadCPUTimes, &llTime );
 
     // Record once every 5 seconds
     if ( llTime >= m_llNextRecordTime )
@@ -359,6 +371,11 @@ void CPerfStatServerInfoImpl::GetStats ( CPerfStatResult* pResult, const std::ma
     if ( defaultRates.iKeySyncAnalogMove != g_TickRateSettings.iNearListUpdate )
         m_OptionsList.push_back ( StringPair ( "Update near interval",      SString ( "%d", g_TickRateSettings.iNearListUpdate ) ) );
 
+    m_OptionsList.push_back ( StringPair ( "Main (Logic) thread CPU",    MakeCPUUsageString( m_MainThreadCPUTimes ) ) );
+    m_OptionsList.push_back ( StringPair ( "Threadnet (Sync) thread CPU",MakeCPUUsageString( g_SyncThreadCPUTimes ) ) );
+    m_OptionsList.push_back ( StringPair ( "Raknet thread CPU",          MakeCPUUsageString( m_PrevLiveStats.threadCPUTimes ) ) );
+    m_OptionsList.push_back ( StringPair ( "DB thread CPU",              MakeCPUUsageString( g_DatabaseThreadCPUTimes ) ) );
+
     if ( bIncludeDebugInfo )
     {
         m_StatusList.push_back ( StringPair ( "Bytes/sec outgoing resent",  CPerfStatManager::GetScaledByteString ( llOutgoingBytesResentPS ) ) );
@@ -367,10 +384,10 @@ void CPerfStatServerInfoImpl::GetStats ( CPerfStatResult* pResult, const std::ma
         m_StatusList.push_back ( StringPair ( "Packets/sec  blocked",       strIncomingPacketsPSBlocked ) );
         m_StatusList.push_back ( StringPair ( "Usage incl. blocked",        CPerfStatManager::GetScaledBitString ( llNetworkUsageBytesPSInclBlocked * 8LL ) + "/s" ) );
 
-        m_OptionsList.push_back ( StringPair ( "Main (Logic) core #",       SString ( "%d", _GetCurrentProcessorNumber () ) ) );
-        m_OptionsList.push_back ( StringPair ( "Threadnet (Sync) core #",   SString ( "%d", g_uiThreadnetProcessorNumber ) ) );
-        m_OptionsList.push_back ( StringPair ( "Raknet thread core #",      SString ( "%d", m_PrevLiveStats.uiNetworkUpdateLoopProcessorNumber ) ) );
-        m_OptionsList.push_back ( StringPair ( "DB thread core #",          SString ( "%d", g_uiDatabaseThreadProcessorNumber ) ) );
+        m_OptionsList.push_back ( StringPair ( "Main (Logic) core #",       SString ( "%d", m_MainThreadCPUTimes.uiProcessorNumber ) ) );
+        m_OptionsList.push_back ( StringPair ( "Threadnet (Sync) core #",   SString ( "%d", g_SyncThreadCPUTimes.uiProcessorNumber ) ) );
+        m_OptionsList.push_back ( StringPair ( "Raknet thread core #",      SString ( "%d", m_PrevLiveStats.threadCPUTimes.uiProcessorNumber ) ) );
+        m_OptionsList.push_back ( StringPair ( "DB thread core #",          SString ( "%d", g_DatabaseThreadCPUTimes.uiProcessorNumber ) ) );
 
         // Get net performance stats
         if ( m_NetPerformanceStatsUpdateTimer.Get() > 2000 )

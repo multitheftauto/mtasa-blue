@@ -10,7 +10,7 @@
 #include "StdInc.h"
 #include "SimHeaders.h"
 
-uint g_uiThreadnetProcessorNumber = -1;
+SThreadCPUTimesStore g_SyncThreadCPUTimes;
 uint g_uiNetSentByteCounter = 0;
 
 namespace
@@ -970,7 +970,7 @@ void* CNetServerBuffer::ThreadProc ( void )
         {
             shared.m_Mutex.Unlock ();
             m_pRealNetServer->DoPulse ();
-            g_uiThreadnetProcessorNumber = _GetCurrentProcessorNumber ();
+            UpdateThreadCPUTimes( g_SyncThreadCPUTimes );
             shared.m_Mutex.Lock ();
         }
 

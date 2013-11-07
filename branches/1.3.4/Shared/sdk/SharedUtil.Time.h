@@ -21,6 +21,7 @@ namespace SharedUtil
 
     // Forbid use of GetTickCount
     #define GetTickCount GetTickCount_has_been_replaced_with_GetTickCount32
+    #define GetTickCount64 GetTickCount64_wont_work_on_XP_you_IDIOT
 
     //
     // Retrieves the number of milliseconds that have elapsed since some arbitrary point in time.
