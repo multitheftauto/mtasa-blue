@@ -238,9 +238,7 @@ CClientVehicle::~CClientVehicle ( void )
 
 void CClientVehicle::Unlink ( void )
 {
-    m_pVehicleManager->RemoveFromList ( this );
-    m_pVehicleManager->m_Attached.remove ( this );
-    ListRemove( m_pVehicleManager->m_StreamedIn, this );
+    m_pVehicleManager->RemoveFromLists ( this );
 }
 
 
@@ -2290,16 +2288,6 @@ void CClientVehicle::StreamOut ( void )
     // had and don't do this it could create us when
     // we're not streamed in.
     m_pModelRequester->Cancel ( this, true );
-}
-
-
-void CClientVehicle::AttachTo ( CClientEntity* pEntity )
-{    
-    // Add/remove us to/from our managers attached list
-    if ( m_pAttachedToEntity && !pEntity ) m_pVehicleManager->m_Attached.remove ( this );
-    else if ( !m_pAttachedToEntity && pEntity ) m_pVehicleManager->m_Attached.push_back ( this );
-
-    CClientEntity::AttachTo ( pEntity );
 }
 
 

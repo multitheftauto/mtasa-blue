@@ -144,8 +144,6 @@ public:
     void                        SetRotationRadians      ( const CVector& vecRotation )      { SetRotationRadians ( vecRotation, true ); }
     void                        SetRotationRadians      ( const CVector& vecRotation, bool bResetInterpolation );
     
-    void                        AttachTo                ( CClientEntity * pEntity );
-
     float                       GetDistanceFromCentreOfMassToBaseOfModel ( void );
 
     bool                        GetMatrix               ( CMatrix& Matrix ) const;
