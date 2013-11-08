@@ -41,10 +41,10 @@ namespace
     SString MakeCPUUsageString( const SThreadCPUTimes& info )
     {
         if ( info.fKernelPercent < 1 )
-            return SString( "%s%%", *CPerfStatManager::GetScaledFloatString( info.fTotalCPUPercent ) );
+            return SString( "%s%%", *CPerfStatManager::GetScaledFloatString( info.fUserPercent ) );
     
-        return SString( "%s%% (Kernel:%s%%)", *CPerfStatManager::GetScaledFloatString( info.fTotalCPUPercent )
-                                            , *CPerfStatManager::GetScaledFloatString( info.fKernelPercent ) );
+        return SString( "%s%% (Sys: %d%%)", *CPerfStatManager::GetScaledFloatString( info.fUserPercent )
+                                          , (int)info.fKernelPercent );
     }
 
     #define UDP_PACKET_OVERHEAD (28LL)
@@ -371,10 +371,10 @@ void CPerfStatServerInfoImpl::GetStats ( CPerfStatResult* pResult, const std::ma
     if ( defaultRates.iKeySyncAnalogMove != g_TickRateSettings.iNearListUpdate )
         m_OptionsList.push_back ( StringPair ( "Update near interval",      SString ( "%d", g_TickRateSettings.iNearListUpdate ) ) );
 
-    m_OptionsList.push_back ( StringPair ( "Main (Logic) thread CPU",    MakeCPUUsageString( m_MainThreadCPUTimes ) ) );
-    m_OptionsList.push_back ( StringPair ( "Threadnet (Sync) thread CPU",MakeCPUUsageString( g_SyncThreadCPUTimes ) ) );
-    m_OptionsList.push_back ( StringPair ( "Raknet thread CPU",          MakeCPUUsageString( m_PrevLiveStats.threadCPUTimes ) ) );
-    m_OptionsList.push_back ( StringPair ( "DB thread CPU",              MakeCPUUsageString( g_DatabaseThreadCPUTimes ) ) );
+    m_OptionsList.push_back ( StringPair ( "Logic thread CPU",  MakeCPUUsageString( m_MainThreadCPUTimes ) ) );
+    m_OptionsList.push_back ( StringPair ( "Sync thread CPU",   MakeCPUUsageString( g_SyncThreadCPUTimes ) ) );
+    m_OptionsList.push_back ( StringPair ( "Raknet thread CPU", MakeCPUUsageString( m_PrevLiveStats.threadCPUTimes ) ) );
+    m_OptionsList.push_back ( StringPair ( "DB thread CPU",     MakeCPUUsageString( g_DatabaseThreadCPUTimes ) ) );
 
     if ( bIncludeDebugInfo )
     {
@@ -384,8 +384,8 @@ void CPerfStatServerInfoImpl::GetStats ( CPerfStatResult* pResult, const std::ma
         m_StatusList.push_back ( StringPair ( "Packets/sec  blocked",       strIncomingPacketsPSBlocked ) );
         m_StatusList.push_back ( StringPair ( "Usage incl. blocked",        CPerfStatManager::GetScaledBitString ( llNetworkUsageBytesPSInclBlocked * 8LL ) + "/s" ) );
 
-        m_OptionsList.push_back ( StringPair ( "Main (Logic) core #",       SString ( "%d", m_MainThreadCPUTimes.uiProcessorNumber ) ) );
-        m_OptionsList.push_back ( StringPair ( "Threadnet (Sync) core #",   SString ( "%d", g_SyncThreadCPUTimes.uiProcessorNumber ) ) );
+        m_OptionsList.push_back ( StringPair ( "Logic thread core #",       SString ( "%d", m_MainThreadCPUTimes.uiProcessorNumber ) ) );
+        m_OptionsList.push_back ( StringPair ( "Sync thread core #",        SString ( "%d", g_SyncThreadCPUTimes.uiProcessorNumber ) ) );
         m_OptionsList.push_back ( StringPair ( "Raknet thread core #",      SString ( "%d", m_PrevLiveStats.threadCPUTimes.uiProcessorNumber ) ) );
         m_OptionsList.push_back ( StringPair ( "DB thread core #",          SString ( "%d", g_DatabaseThreadCPUTimes.uiProcessorNumber ) ) );
 
