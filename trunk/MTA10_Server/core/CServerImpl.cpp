@@ -295,15 +295,17 @@ int CServerImpl::Run ( int iArgumentCount, char* szArguments [] )
     if ( m_NetworkLibrary.Load ( GetAbsolutePath ( szNetworkLibName ) ) )
     {
         // Network module compatibility check
-        typedef unsigned long (*PFNCHECKCOMPATIBILITY) ( unsigned long );
-    PFNCHECKCOMPATIBILITY pfnCheckCompatibility = reinterpret_cast< PFNCHECKCOMPATIBILITY > ( m_NetworkLibrary.GetProcedureAddress ( "CheckCompatibility" ) );
-        if ( !pfnCheckCompatibility || !pfnCheckCompatibility ( MTA_DM_SERVER_NET_MODULE_VERSION ) )
+        typedef unsigned long (*PFNCHECKCOMPATIBILITY) ( unsigned long, unsigned long* );
+        PFNCHECKCOMPATIBILITY pfnCheckCompatibility = reinterpret_cast< PFNCHECKCOMPATIBILITY > ( m_NetworkLibrary.GetProcedureAddress ( "CheckCompatibility" ) );
+        if ( !pfnCheckCompatibility || !pfnCheckCompatibility ( MTA_DM_SERVER_NET_MODULE_VERSION, NULL ) )
         {
             // net.dll doesn't like our version number
-            Print ( "Network module not compatible!\n" );
-            Print ( "Press Q to shut down the server!\n" );
-            Print ( "\n\n\n(If this is a custom build,\n" );
-            Print ( " check MTASA_VERSION_TYPE in version.h is set correctly)\n" );
+            ulong ulNetModuleVersion = 0;
+            pfnCheckCompatibility ( 1, &ulNetModuleVersion );
+            Print ( "Network module not compatible! (Expected 0x%x, got 0x%x)\n\r", MTA_DM_SERVER_NET_MODULE_VERSION, ulNetModuleVersion );
+            Print ( "Press Q to shut down the server!\n\r" );
+            Print ( "\n\r\n\r\n\r(If this is a custom build,\n\r" );
+            Print ( " check MTASA_VERSION_TYPE in version.h is set correctly)\n\r" );
             WaitForKey ( 'q' );
             DestroyWindow ( );
             return ERROR_NETWORK_LIBRARY_FAILED;
