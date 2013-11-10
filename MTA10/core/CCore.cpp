@@ -1000,12 +1000,15 @@ void CCore::CreateNetwork ( )
     m_pNet = CreateModule < CNet > ( m_NetModule, "Network", "netc", "InitNetInterface", this );
 
     // Network module compatibility check
-    typedef unsigned long (*PFNCHECKCOMPATIBILITY) ( unsigned long );
+    typedef unsigned long (*PFNCHECKCOMPATIBILITY) ( unsigned long, unsigned long* );
     PFNCHECKCOMPATIBILITY pfnCheckCompatibility = static_cast< PFNCHECKCOMPATIBILITY > ( m_NetModule.GetFunctionPointer ( "CheckCompatibility" ) );
-    if ( !pfnCheckCompatibility || !pfnCheckCompatibility ( MTA_DM_CLIENT_NET_MODULE_VERSION ) )
+    if ( !pfnCheckCompatibility || !pfnCheckCompatibility ( MTA_DM_CLIENT_NET_MODULE_VERSION, NULL ) )
     {
         // net.dll doesn't like our version number
-        BrowseToSolution ( "netc-not-compatible", ASK_GO_ONLINE | TERMINATE_PROCESS, "Network module not compatible!" );
+        ulong ulNetModuleVersion = 0;
+        pfnCheckCompatibility ( 1, &ulNetModuleVersion );
+        SString strMessage( "Network module not compatible! (Expected 0x%x, got 0x%x)", MTA_DM_CLIENT_NET_MODULE_VERSION, ulNetModuleVersion );
+        BrowseToSolution ( "netc-not-compatible", ASK_GO_ONLINE | TERMINATE_PROCESS, strMessage );
     }
 
     // Set mta version for report log here
