@@ -407,8 +407,8 @@ public:
     bool                                GetShowSound                    ( void )                        { return m_bShowSound; } 
 
     void                                TakePlayerScreenShot            ( uint uiSizeX, uint uiSizeY, const SString& strTag, uint uiQuality, uint uiMaxBandwidth, uint uiMaxPacketSize, const SString& strResourceName, uint uiServerSentTime );
-    static void                         StaticGottenPlayerScreenShot    ( const CBuffer& buffer, uint uiTimeSpentInQueue );
-    void                                GottenPlayerScreenShot          ( const CBuffer& buffer, uint uiTimeSpentInQueue );
+    static void                         StaticGottenPlayerScreenShot    ( const CBuffer& buffer, uint uiTimeSpentInQueue, const SString& strError );
+    void                                GottenPlayerScreenShot          ( const CBuffer& buffer, uint uiTimeSpentInQueue, const SString& strError );
     void                                ProcessDelayedSendList          ( void );
 
     void                                SetWeaponTypesUsingBulletSync   ( const std::set < eWeaponType >& weaponTypesUsingBulletSync );

@@ -18,7 +18,7 @@ public:
 
     bool                                    Read                        ( NetBitStreamInterface& BitStream );
 
-    uchar                                   m_ucStatus;                 // 1 = has image, 2 = minimized, 3 = disabled
+    uchar                                   m_ucStatus;                 // 1 = has image, 2 = minimized, 3 = disabled, 4 = error
 
     // With every packet if status is 1
     ushort                                  m_usScreenShotId;
@@ -31,4 +31,5 @@ public:
     ushort                                  m_usTotalParts;
     SString                                 m_strResourceName;
     SString                                 m_strTag;
+    SString                                 m_strError;
 };

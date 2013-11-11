@@ -19,3 +19,20 @@ namespace EEventPriority
 using EEventPriority::EEventPriorityType;
 
 DECLARE_ENUM( EEventPriority::EEventPriorityType )
+
+
+namespace EPlayerScreenShotResult
+{
+    enum EPlayerScreenShotResultType
+    {
+        NONE,
+        SUCCESS,
+        MINIMIZED,
+        DISABLED,
+        ERROR_,
+    };
+}
+using EPlayerScreenShotResult::EPlayerScreenShotResultType;
+
+DECLARE_ENUM( EPlayerScreenShotResult::EPlayerScreenShotResultType )
+

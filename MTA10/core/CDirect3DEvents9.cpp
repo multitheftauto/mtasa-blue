@@ -200,7 +200,8 @@ void CDirect3DEvents9::CheckForScreenShot ( void )
         SString strFileName = CScreenShot::PreScreenShot ();
 
         // Try to get the screen data
-        if ( CGraphics::GetSingleton ().GetScreenGrabber ()->GetBackBufferPixels ( uiWidth, uiHeight, ms_ScreenShotBuffer ) )
+        SString strError;
+        if ( CGraphics::GetSingleton ().GetScreenGrabber ()->GetBackBufferPixels ( uiWidth, uiHeight, ms_ScreenShotBuffer, strError ) )
         {
             // Validate data size
             uint uiDataSize = ms_ScreenShotBuffer.GetSize ();
@@ -219,7 +220,7 @@ void CDirect3DEvents9::CheckForScreenShot ( void )
         }
         else
         {
-            g_pCore->GetConsole()->Print ( _("Screenshot failed") );
+            g_pCore->GetConsole()->Print ( _("Screenshot failed") + SString( " (%s)", *strError ) );
             strFileName = "";
         }
 

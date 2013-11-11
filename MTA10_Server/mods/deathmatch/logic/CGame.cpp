@@ -3553,23 +3553,24 @@ void CGame::Packet_PlayerScreenShot ( CPlayerScreenShotPacket & Packet )
     CPlayer* pPlayer = Packet.GetSourcePlayer ();
     if ( pPlayer && pPlayer->IsJoined () )
     {
-        if ( Packet.m_ucStatus != 1 )
+        if ( Packet.m_ucStatus != EPlayerScreenShotResult::SUCCESS )
         {
-            // disabled or minimized
+            // disabled, minimized or error
             CResource* pResource = g_pGame->GetResourceManager ()->GetResource ( Packet.m_strResourceName );
             if ( pResource )
             {
                 CLuaArguments Arguments;
                 Arguments.PushResource ( pResource );
-                Arguments.PushString ( Packet.m_ucStatus == 2 ? "minimized" : "disabled" );
+                Arguments.PushString ( EnumToString( (EPlayerScreenShotResultType&)Packet.m_ucStatus ) );
                 Arguments.PushBoolean ( false );
                 Arguments.PushNumber ( static_cast < double > ( Packet.m_llServerGrabTime ) );
                 Arguments.PushString ( Packet.m_strTag );
+                Arguments.PushString ( Packet.m_strError );
                 pPlayer->CallEvent ( "onPlayerScreenShot", Arguments );
             }
         }
         else
-        if ( Packet.m_ucStatus == 1 )
+        if ( Packet.m_ucStatus == EPlayerScreenShotResult::SUCCESS )
         {
             // Get in-progress info
             SScreenShotInfo& info = pPlayer->GetScreenShotInfo ();

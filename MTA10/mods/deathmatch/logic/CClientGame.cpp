@@ -6020,9 +6020,9 @@ void CClientGame::TakePlayerScreenShot ( uint uiSizeX, uint uiSizeY, const SStri
         // If alt-tabbed or opt-out
         NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream ();
         if ( !bAllowScreenUploadEnabled )
-            pBitStream->Write ( (uchar)3 );
+            pBitStream->Write ( (uchar)EPlayerScreenShotResult::DISABLED );
         else
-            pBitStream->Write ( (uchar)2 );
+            pBitStream->Write ( (uchar)EPlayerScreenShotResult::MINIMIZED );
         pBitStream->Write ( uiServerSentTime );
         pBitStream->WriteString ( strResourceName );
         pBitStream->WriteString ( strTag );
@@ -6047,18 +6047,20 @@ void CClientGame::TakePlayerScreenShot ( uint uiSizeX, uint uiSizeY, const SStri
 //////////////////////////////////////////////////////////////////
 // Callback from TakePlayerScreendsShot
 //
-void CClientGame::StaticGottenPlayerScreenShot ( const CBuffer& buffer, uint uiTimeSpentInQueue )
+void CClientGame::StaticGottenPlayerScreenShot ( const CBuffer& buffer, uint uiTimeSpentInQueue, const SString& strError )
 {
     if ( g_pClientGame )
-        g_pClientGame->GottenPlayerScreenShot ( buffer, uiTimeSpentInQueue );
+        g_pClientGame->GottenPlayerScreenShot ( buffer, uiTimeSpentInQueue, strError );
 }
 
 
 //////////////////////////////////////////////////////////////////
 // Break data into packets and put into delayed send list
 //
-void CClientGame::GottenPlayerScreenShot ( const CBuffer& buffer, uint uiTimeSpentInQueue )
+void CClientGame::GottenPlayerScreenShot ( const CBuffer& buffer, uint uiTimeSpentInQueue, const SString& strInError )
 {
+    SString strError = strInError;
+
     // Pop saved args
     if ( m_ScreenShotArgList.empty () )
         return;
@@ -6072,8 +6074,26 @@ void CClientGame::GottenPlayerScreenShot ( const CBuffer& buffer, uint uiTimeSpe
     const uint uiServerGrabTime = screenShotArgs.uiServerSentTime + uiTimeSpentInQueue;
 
     // Validate buffer
-    if ( buffer.GetSize () == 0 )
+    if ( strError.empty() )
+    {
+        if ( buffer.GetSize () == 0 )
+            strError = "Buffer empty";
+    }
+
+    // Handle error
+    if ( !strError.empty() )
+    {
+        NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream ();
+        pBitStream->Write ( (uchar)EPlayerScreenShotResult::ERROR_ );
+        pBitStream->Write ( uiServerGrabTime );
+        pBitStream->WriteString ( strResourceName );
+        pBitStream->WriteString ( strTag );
+        if ( pBitStream->Version() >= 0x053 )
+            pBitStream->WriteString ( strError );
+        g_pNet->SendPacket ( PACKET_ID_PLAYER_SCREENSHOT, pBitStream, PACKET_PRIORITY_LOW, PACKET_RELIABILITY_RELIABLE_ORDERED, PACKET_ORDERING_DATA_TRANSFER );
+        g_pNet->DeallocateNetBitStream ( pBitStream );
         return;
+    }
 
     // Calc constants stuff
     const uint uiSendRate = Clamp < uint > ( 5, uiMaxBandwidth / uiMaxPacketSize, 20 );
@@ -6097,7 +6117,7 @@ void CClientGame::GottenPlayerScreenShot ( const CBuffer& buffer, uint uiTimeSpe
         ushort usBytesThisPart = Min ( uiBytesRemaining, uiBytesPerPart );
         assert ( usBytesThisPart != 0 );
 
-        pBitStream->Write ( (uchar)1 );
+        pBitStream->Write ( (uchar)EPlayerScreenShotResult::SUCCESS );
         pBitStream->Write ( m_usNextScreenShotId );
         pBitStream->Write ( usPartNumber );
         pBitStream->Write ( usBytesThisPart );

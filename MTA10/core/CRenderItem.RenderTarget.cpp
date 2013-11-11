@@ -187,10 +187,19 @@ void CRenderTargetItem::ReleaseUnderlyingData ( void )
 // Not very quick thing to do.
 //
 ////////////////////////////////////////////////////////////////
-bool CRenderTargetItem::ReadPixels ( CBuffer& outBuffer )
+bool CRenderTargetItem::ReadPixels ( CBuffer& outBuffer, SString& strOutError )
 {
+    HRESULT hr;
+
     D3DSURFACE_DESC Desc;  
-    m_pD3DRenderTargetSurface->GetDesc ( &Desc );  
+    m_pD3DRenderTargetSurface->GetDesc ( &Desc );
+
+    int iBitsPerPixel = CRenderItemManager::GetBitsPerPixel ( Desc.Format );
+    if ( iBitsPerPixel != 32 && iBitsPerPixel != 16 )
+    {
+        strOutError = "BitsPerPixel error";
+        return false;
+    }
 
     // Make sure we have an offscreen surface which is exactly the same as the render target
     if ( m_pD3DReadSurface )
@@ -204,17 +213,31 @@ bool CRenderTargetItem::ReadPixels ( CBuffer& outBuffer )
     }
 
     if ( !m_pD3DReadSurface )
-        if ( FAILED ( m_pDevice->CreateOffscreenPlainSurface ( Desc.Width, Desc.Height, Desc.Format, D3DPOOL_SYSTEMMEM, &m_pD3DReadSurface, NULL ) ) )
+    {
+        hr = m_pDevice->CreateOffscreenPlainSurface ( Desc.Width, Desc.Height, Desc.Format, D3DPOOL_SYSTEMMEM, &m_pD3DReadSurface, NULL );
+        if ( FAILED ( hr ) )
+        {
+            strOutError = SString( "CreateOffscreenPlainSurface failed (0x%08x)", hr );
             return false;
+        }
+    }
 
     // Copy render target to m_pD3DReadSurface
-    if ( FAILED ( m_pDevice->GetRenderTargetData ( m_pD3DRenderTargetSurface, m_pD3DReadSurface ) ) )
+    hr = m_pDevice->GetRenderTargetData ( m_pD3DRenderTargetSurface, m_pD3DReadSurface );
+    if ( FAILED ( hr ) )
+    {
+        strOutError = SString( "GetRenderTargetData failed (0x%08x)", hr );
         return false;
+    }
 
     // Get pixels from m_pD3DReadSurface
     D3DLOCKED_RECT LockedRect;
-    if ( FAILED ( m_pD3DReadSurface->LockRect ( &LockedRect, NULL, D3DLOCK_READONLY | D3DLOCK_NOSYSLOCK ) ) )
+    hr = m_pD3DReadSurface->LockRect ( &LockedRect, NULL, D3DLOCK_READONLY | D3DLOCK_NOSYSLOCK );
+    if ( FAILED ( hr ) )
+    {
+        strOutError = SString( "LockRect failed (0x%08x)", hr );
         return false;
+    }
 
     // Allocate 32 bit buffer
     uint ulScreenWidth = Desc.Width;
@@ -223,20 +246,34 @@ bool CRenderTargetItem::ReadPixels ( CBuffer& outBuffer )
     outBuffer.SetSize ( ulLineBytes * ulScreenHeight );
     char* pDest = outBuffer.GetData ();
 
+    // Copy lines into a buffer
     void* ms_pBits = LockedRect.pBits;
     uint ms_ulPitch = LockedRect.Pitch;
-    if ( CRenderItemManager::GetBitsPerPixel ( Desc.Format ) == 32 )
+    if ( iBitsPerPixel == 32 )
     {
-        // Copy lines into a buffer
+        // 32 bit source
         for ( unsigned int i = 0; i < ulScreenHeight; i++ )
             memcpy ( pDest + ulLineBytes * i, (BYTE*) ms_pBits + i * ms_ulPitch, ulLineBytes );
     }
     else
-    if ( CRenderItemManager::GetBitsPerPixel ( Desc.Format ) == 16 )
     {
-        // TODO
+        // 16 bit source
         for ( unsigned int i = 0; i < ulScreenHeight; i++ )
-            memset ( pDest + ulLineBytes * i, i < ulScreenHeight / 2 ? 0 : -1, ulLineBytes );
+        {
+            const WORD* pSrc16 = (WORD*)( (BYTE*) ms_pBits + i * ms_ulPitch );
+            DWORD* pDest32 = (DWORD*)( pDest + ulLineBytes * i );
+            for ( unsigned int x = 0; x < ulScreenWidth; x++ )
+            {
+                WORD r5g6b5 = pSrc16[x];
+                BYTE r = ( r5g6b5 & 0xF800 ) >> 11 << 3;
+                BYTE g = ( r5g6b5 & 0x7E0 ) >> 5 << 2;
+                BYTE b = ( r5g6b5 & 0x1F ) << 3;
+
+                DWORD x8r8g8b8 = (r << 16) | (g << 8) | b;
+                x8r8g8b8 |= 0xFF070307;
+                pDest32[x] = x8r8g8b8;
+            }
+        }
     }
 
     m_pD3DReadSurface->UnlockRect ();
