@@ -9,7 +9,7 @@
 *
 *****************************************************************************/
 
-typedef void (*PFN_SCREENSHOT_CALLBACK) ( const CBuffer& buffer, uint uiTimeSpentInQueue );
+typedef void (*PFN_SCREENSHOT_CALLBACK) ( const CBuffer& buffer, uint uiTimeSpentInQueue, const SString& strError );
 
 //
 // CScreenGrabberInterface
@@ -28,7 +28,7 @@ public:
     virtual void                DoPulse                         ( void ) = 0;
     virtual void                QueueScreenShot                 ( uint uiSizeX, uint uiSizeY, uint uiQuality, PFN_SCREENSHOT_CALLBACK pfnScreenShotCallback ) = 0;
     virtual void                ClearScreenShotQueue            ( void ) = 0;
-    virtual bool                GetBackBufferPixels             ( uint uiSizeX, uint uiSizeY, CBuffer& buffer ) = 0;
+    virtual bool                GetBackBufferPixels             ( uint uiSizeX, uint uiSizeY, CBuffer& buffer, SString& strOutError ) = 0;
 };
 
 CScreenGrabberInterface* NewScreenGrabber ( void );

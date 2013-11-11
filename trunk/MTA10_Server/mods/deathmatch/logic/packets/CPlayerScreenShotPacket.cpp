@@ -23,17 +23,21 @@ bool CPlayerScreenShotPacket::Read ( NetBitStreamInterface& BitStream )
     // Read status
     BitStream.Read ( m_ucStatus );
 
-    if ( m_ucStatus != 1 )
+    if ( m_ucStatus != EPlayerScreenShotResult::SUCCESS )
     {
-        // minimized or disabled
+        // minimized, disabled or error
         bHasGrabTime = true;
         BitStream.Read ( uiServerGrabTime );
         BitStream.ReadString ( m_strResourceName );
         if ( !BitStream.ReadString ( m_strTag ) )
             return false;
+
+        if ( BitStream.Version() >= 0x53 )
+            if ( !BitStream.ReadString ( m_strError ) )
+                return false;
     }
     else
-    if ( m_ucStatus == 1 )
+    if ( m_ucStatus == EPlayerScreenShotResult::SUCCESS )
     {
         // Read info
         BitStream.Read ( m_usScreenShotId );
