@@ -163,7 +163,10 @@ DWORD CScreenShot::ThreadProc ( LPVOID lpdwThreadParam )
         }
     }
 
+    MakeSureDirExists( ms_strFileName );
     FILE *file = fopen (ms_strFileName, "wb");
+    if ( file )
+    {
         png_struct* png_ptr = png_create_write_struct ( PNG_LIBPNG_VER_STRING, NULL, NULL, NULL );
         png_info* info_ptr = png_create_info_struct ( png_ptr );
         png_init_io ( png_ptr, file );
@@ -174,7 +177,12 @@ DWORD CScreenShot::ThreadProc ( LPVOID lpdwThreadParam )
         png_write_png ( png_ptr, info_ptr, PNG_TRANSFORM_BGR | PNG_TRANSFORM_STRIP_ALPHA, NULL );
         png_write_end ( png_ptr, info_ptr );
         png_destroy_write_struct ( &png_ptr, &info_ptr );
-    fclose(file);
+        fclose(file);
+    }
+    else
+    {
+        CCore::GetSingleton ().GetConsole ()->Printf ( "Could not create screenshot file '%s'", *ms_strFileName );
+    }
 
     // Clean up the screen data buffer
     if ( ppScreenData ) {

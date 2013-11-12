@@ -3046,7 +3046,7 @@ int CLuaFunctionDefinitions::TakePlayerScreenShot ( lua_State* luaVM )
         CResource * pResource = pLuaMain ? pLuaMain->GetResource() : NULL;
         if ( pResource )
         {
-            if ( CStaticFunctionDefinitions::TakePlayerScreenShot ( pElement, sizeX, sizeY, tag, quality, maxBandwidth, maxPacketSize, pResource->GetName () ) )
+            if ( CStaticFunctionDefinitions::TakePlayerScreenShot ( pElement, sizeX, sizeY, tag, quality, maxBandwidth, maxPacketSize, pResource ) )
             {
                 lua_pushboolean ( luaVM, true );
                 return 1;
@@ -11724,9 +11724,7 @@ int CLuaFunctionDefinitions::BanPlayer ( lua_State* luaVM )
     bool bIP;
     bool bUsername;
     bool bSerial;
-
     time_t tUnban;
-
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pPlayer);

@@ -198,7 +198,7 @@ public:
         uint uiMaxBandwidth;
         uint uiMaxPacketSize;
         uint uiServerSentTime;
-        SString strResourceName;
+        ushort usResourceNetId;
         SString strTag;
     };
     struct SDelayedPacketInfo
@@ -406,9 +406,9 @@ public:
     void                                SetShowSound                    ( bool bEnable )                { m_bShowSound = bEnable; } 
     bool                                GetShowSound                    ( void )                        { return m_bShowSound; } 
 
-    void                                TakePlayerScreenShot            ( uint uiSizeX, uint uiSizeY, const SString& strTag, uint uiQuality, uint uiMaxBandwidth, uint uiMaxPacketSize, const SString& strResourceName, uint uiServerSentTime );
-    static void                         StaticGottenPlayerScreenShot    ( const CBuffer& buffer, uint uiTimeSpentInQueue, const SString& strError );
-    void                                GottenPlayerScreenShot          ( const CBuffer& buffer, uint uiTimeSpentInQueue, const SString& strError );
+    void                                TakePlayerScreenShot            ( uint uiSizeX, uint uiSizeY, const SString& strTag, uint uiQuality, uint uiMaxBandwidth, uint uiMaxPacketSize, CResource* pResource, uint uiServerSentTime );
+    static void                         StaticGottenPlayerScreenShot    ( const CBuffer* pBuffer, uint uiTimeSpentInQueue, const SString& strError );
+    void                                GottenPlayerScreenShot          ( const CBuffer* pBuffer, uint uiTimeSpentInQueue, const SString& strError );
     void                                ProcessDelayedSendList          ( void );
 
     void                                SetWeaponTypesUsingBulletSync   ( const std::set < eWeaponType >& weaponTypesUsingBulletSync );

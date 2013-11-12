@@ -186,6 +186,14 @@ void CScreenGrabber::ProcessScreenShotQueue ( void )
     if ( m_ScreenShotQueue.empty ()  )
         return;
 
+    // Limit queue size
+    while( m_ScreenShotQueue.size() >= 20 )
+    {
+        SScreenShotQueueItem item = m_ScreenShotQueue.front ();
+        m_ScreenShotQueue.pop_front ();
+        item.pfnScreenShotCallback( NULL, 0, "Too many queued screenshots" );
+    }
+
     // Get new args
     SScreenShotQueueItem item = m_ScreenShotQueue.front ();
     uint uiSizeX = item.uiSizeX;
@@ -205,7 +213,7 @@ void CScreenGrabber::ProcessScreenShotQueue ( void )
     else
     {
         // Pass on error
-        pfnScreenShotCallback( buffer, 0, strError );
+        pfnScreenShotCallback( NULL, 0, strError );
     }
 }
 

@@ -3075,24 +3075,27 @@ bool CStaticFunctionDefinitions::ShowPlayerHudComponent ( CElement* pElement, eH
 }
 
 
-bool CStaticFunctionDefinitions::TakePlayerScreenShot ( CElement* pElement, uint uiSizeX, uint uiSizeY, const SString& strTag, uint uiQuality, uint uiMaxBandwidth, uint uiMaxPacketSize, const SString& strResourceName )
+bool CStaticFunctionDefinitions::TakePlayerScreenShot ( CElement* pElement, uint uiSizeX, uint uiSizeY, const SString& strTag, uint uiQuality, uint uiMaxBandwidth, uint uiMaxPacketSize, CResource* pResource )
 {
     assert ( pElement );
 
-    RUN_CHILDREN( TakePlayerScreenShot ( *iter, uiSizeX, uiSizeY, strTag, uiQuality, uiMaxBandwidth, uiMaxPacketSize, strResourceName ) )
+    RUN_CHILDREN( TakePlayerScreenShot ( *iter, uiSizeX, uiSizeY, strTag, uiQuality, uiMaxBandwidth, uiMaxPacketSize, pResource ) )
 
     if ( IS_PLAYER ( pElement ) )
     {
         CPlayer* pPlayer = static_cast < CPlayer* > ( pElement );
 
-        CBitStream BitStream;
+        CPlayerBitStream BitStream( pPlayer );
         BitStream.pBitStream->Write ( static_cast < ushort > ( uiSizeX ) );
         BitStream.pBitStream->Write ( static_cast < ushort > ( uiSizeY ) );
         BitStream.pBitStream->WriteString ( strTag );
         BitStream.pBitStream->Write ( static_cast < uchar > ( uiQuality ) );
         BitStream.pBitStream->Write ( uiMaxBandwidth );
         BitStream.pBitStream->Write ( static_cast < ushort > ( uiMaxPacketSize ) );
-        BitStream.pBitStream->WriteString ( strResourceName );
+        if ( BitStream.pBitStream->Version() >= 0x53 )
+            BitStream.pBitStream->Write ( pResource->GetNetID() );
+        else
+            BitStream.pBitStream->WriteString ( pResource->GetName() );
         BitStream.pBitStream->Write ( GetTickCount32 () );
         pPlayer->Send ( CLuaPacket ( TAKE_PLAYER_SCREEN_SHOT, *BitStream.pBitStream ) );
 

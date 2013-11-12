@@ -27,6 +27,7 @@
 #include <list>
 
 class CResource;
+#define INVALID_RESOURCE_NET_ID     0xFFFF
 
 class CResourceManager 
 {

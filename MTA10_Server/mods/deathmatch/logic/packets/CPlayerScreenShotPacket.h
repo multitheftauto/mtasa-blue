@@ -29,7 +29,7 @@ public:
     long long                               m_llServerGrabTime;
     uint                                    m_uiTotalBytes;
     ushort                                  m_usTotalParts;
-    SString                                 m_strResourceName;
+    CResource*                              m_pResource;
     SString                                 m_strTag;
     SString                                 m_strError;
 };
