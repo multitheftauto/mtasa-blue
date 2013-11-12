@@ -534,5 +534,5 @@ void CCompressJobData::ProcessCallback ( void )
 {
     assert ( HasCallback () );
     callback.bDone = true;
-    callback.pfnScreenShotCallback( result.buffer, callback.uiTimeSpentInQueue );
+    callback.pfnScreenShotCallback( &result.buffer, callback.uiTimeSpentInQueue, "" );
 }

@@ -3490,23 +3490,23 @@ void CGame::Packet_PlayerScreenShot ( CPlayerScreenShotPacket & Packet )
     CPlayer* pPlayer = Packet.GetSourcePlayer ();
     if ( pPlayer && pPlayer->IsJoined () )
     {
-        if ( Packet.m_ucStatus != 1 )
+        if ( Packet.m_ucStatus != EPlayerScreenShotResult::SUCCESS )
         {
-            // disabled or minimized
-            CResource* pResource = g_pGame->GetResourceManager ()->GetResource ( Packet.m_strResourceName );
-            if ( pResource )
+            // disabled, minimized or error
+            if ( Packet.m_pResource )
             {
                 CLuaArguments Arguments;
-                Arguments.PushResource ( pResource );
-                Arguments.PushString ( Packet.m_ucStatus == 2 ? "minimized" : "disabled" );
+                Arguments.PushResource ( Packet.m_pResource );
+                Arguments.PushString ( EnumToString( (EPlayerScreenShotResultType)Packet.m_ucStatus ) );
                 Arguments.PushBoolean ( false );
                 Arguments.PushNumber ( static_cast < double > ( Packet.m_llServerGrabTime ) );
                 Arguments.PushString ( Packet.m_strTag );
+                Arguments.PushString ( Packet.m_strError );
                 pPlayer->CallEvent ( "onPlayerScreenShot", Arguments );
             }
         }
         else
-        if ( Packet.m_ucStatus == 1 )
+        if ( Packet.m_ucStatus == EPlayerScreenShotResult::SUCCESS )
         {
             // Get in-progress info
             SScreenShotInfo& info = pPlayer->GetScreenShotInfo ();
@@ -3530,7 +3530,7 @@ void CGame::Packet_PlayerScreenShot ( CPlayerScreenShotPacket & Packet )
                     info.llTimeStamp = Packet.m_llServerGrabTime;
                     info.uiTotalBytes = Packet.m_uiTotalBytes;
                     info.usTotalParts = Packet.m_usTotalParts;
-                    info.strResourceName = Packet.m_strResourceName;
+                    info.usResourceNetId = Packet.m_pResource ? Packet.m_pResource->GetNetID() : INVALID_RESOURCE_NET_ID;
                     info.strTag = Packet.m_strTag;
                 }
             }
@@ -3544,7 +3544,7 @@ void CGame::Packet_PlayerScreenShot ( CPlayerScreenShotPacket & Packet )
                 // Finished?
                 if ( info.usNextPartNumber == info.usTotalParts )
                 {
-                    CResource* pResource = g_pGame->GetResourceManager ()->GetResource ( info.strResourceName );
+                    CResource* pResource = g_pGame->GetResourceManager ()->GetResourceFromNetID ( info.usResourceNetId );
                     if ( pResource && info.uiTotalBytes == info.buffer.GetSize () )
                     {
                         CLuaArguments Arguments;

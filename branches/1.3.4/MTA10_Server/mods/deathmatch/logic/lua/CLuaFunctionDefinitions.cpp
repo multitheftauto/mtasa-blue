@@ -3251,7 +3251,7 @@ int CLuaFunctionDefinitions::TakePlayerScreenShot ( lua_State* luaVM )
         CResource * pResource = pLuaMain ? pLuaMain->GetResource() : NULL;
         if ( pResource )
         {
-            if ( CStaticFunctionDefinitions::TakePlayerScreenShot ( pElement, sizeX, sizeY, tag, quality, maxBandwidth, maxPacketSize, pResource->GetName () ) )
+            if ( CStaticFunctionDefinitions::TakePlayerScreenShot ( pElement, sizeX, sizeY, tag, quality, maxBandwidth, maxPacketSize, pResource ) )
             {
                 lua_pushboolean ( luaVM, true );
                 return 1;
@@ -12226,7 +12226,6 @@ int CLuaFunctionDefinitions::BanPlayer ( lua_State* luaVM )
         CPlayer* pResponsible  = NULL;
         SString strResponsible = "Console";
         SString strReason      = "";
-
         bool bIP       = true;
         bool bUsername = false;
         bool bSerial   = false;

@@ -1154,3 +1154,14 @@ CPlayer* GetDeletedMapKey ( CPlayer** )
 {
     return (CPlayer*)2;
 }
+
+/////////////////////////////////////////////////////////////////
+//
+// CPlayerBitStream::CPlayerBitStream
+//
+//
+/////////////////////////////////////////////////////////////////
+CPlayerBitStream::CPlayerBitStream( CPlayer* pPlayer )
+{
+    pBitStream = g_pNetServer->AllocateNetServerBitStream ( pPlayer->GetBitStreamVersion() );
+}
