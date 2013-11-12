@@ -75,7 +75,7 @@ struct SScreenShotInfo
     long long   llTimeStamp;
     uint        uiTotalBytes;
     ushort      usTotalParts;
-    SString     strResourceName;
+    ushort      usResourceNetId;
     SString     strTag;
     CBuffer     buffer;
 };

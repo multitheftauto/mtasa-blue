@@ -150,17 +150,30 @@ void CPlayerRPCs::TakePlayerScreenShot ( NetBitStreamInterface& bitStream )
     uchar ucQuality;
     uint uiMaxBandwidth;
     ushort usMaxPacketSize;
-    SString strResourceName;
+    CResource* pResource;
     uint uiServerSentTime;
-    if ( bitStream.Read ( usSizeX ) &&
-         bitStream.Read ( usSizeY ) &&
-         bitStream.ReadString ( strTag ) &&
-         bitStream.Read ( ucQuality ) &&
-         bitStream.Read ( uiMaxBandwidth ) &&
-         bitStream.Read ( usMaxPacketSize ) &&
-         bitStream.ReadString ( strResourceName ) &&
-         bitStream.Read ( uiServerSentTime ) )
+
+    bitStream.Read ( usSizeX );
+    bitStream.Read ( usSizeY );
+    bitStream.ReadString ( strTag );
+    bitStream.Read ( ucQuality );
+    bitStream.Read ( uiMaxBandwidth );
+    bitStream.Read ( usMaxPacketSize );
+    if ( bitStream.Version() >= 0x53 )
     {
-        m_pClientGame->TakePlayerScreenShot ( usSizeX, usSizeY, strTag, ucQuality, uiMaxBandwidth, usMaxPacketSize, strResourceName, uiServerSentTime );        
+        ushort usResourceNetId;
+        bitStream.Read ( usResourceNetId );
+        pResource = g_pClientGame->GetResourceManager ()->GetResourceFromNetID ( usResourceNetId );
     }
+    else
+    {
+        SString strResourceName;
+        bitStream.ReadString ( strResourceName );
+        pResource = g_pClientGame->GetResourceManager ()->GetResource ( strResourceName );
+    }
+
+    if ( !bitStream.Read ( uiServerSentTime ) )
+        return;
+
+    m_pClientGame->TakePlayerScreenShot ( usSizeX, usSizeY, strTag, ucQuality, uiMaxBandwidth, usMaxPacketSize, pResource, uiServerSentTime );        
 }

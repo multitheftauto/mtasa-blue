@@ -9,7 +9,7 @@
 *
 *****************************************************************************/
 
-typedef void (*PFN_SCREENSHOT_CALLBACK) ( const CBuffer& buffer, uint uiTimeSpentInQueue, const SString& strError );
+typedef void (*PFN_SCREENSHOT_CALLBACK) ( const CBuffer* pBuffer, uint uiTimeSpentInQueue, const SString& strError );
 
 //
 // CScreenGrabberInterface

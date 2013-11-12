@@ -3556,12 +3556,11 @@ void CGame::Packet_PlayerScreenShot ( CPlayerScreenShotPacket & Packet )
         if ( Packet.m_ucStatus != EPlayerScreenShotResult::SUCCESS )
         {
             // disabled, minimized or error
-            CResource* pResource = g_pGame->GetResourceManager ()->GetResource ( Packet.m_strResourceName );
-            if ( pResource )
+            if ( Packet.m_pResource )
             {
                 CLuaArguments Arguments;
-                Arguments.PushResource ( pResource );
-                Arguments.PushString ( EnumToString( (EPlayerScreenShotResultType&)Packet.m_ucStatus ) );
+                Arguments.PushResource ( Packet.m_pResource );
+                Arguments.PushString ( EnumToString( (EPlayerScreenShotResultType)Packet.m_ucStatus ) );
                 Arguments.PushBoolean ( false );
                 Arguments.PushNumber ( static_cast < double > ( Packet.m_llServerGrabTime ) );
                 Arguments.PushString ( Packet.m_strTag );
@@ -3594,7 +3593,7 @@ void CGame::Packet_PlayerScreenShot ( CPlayerScreenShotPacket & Packet )
                     info.llTimeStamp = Packet.m_llServerGrabTime;
                     info.uiTotalBytes = Packet.m_uiTotalBytes;
                     info.usTotalParts = Packet.m_usTotalParts;
-                    info.strResourceName = Packet.m_strResourceName;
+                    info.usResourceNetId = Packet.m_pResource ? Packet.m_pResource->GetNetID() : INVALID_RESOURCE_NET_ID;
                     info.strTag = Packet.m_strTag;
                 }
             }
@@ -3608,7 +3607,7 @@ void CGame::Packet_PlayerScreenShot ( CPlayerScreenShotPacket & Packet )
                 // Finished?
                 if ( info.usNextPartNumber == info.usTotalParts )
                 {
-                    CResource* pResource = g_pGame->GetResourceManager ()->GetResource ( info.strResourceName );
+                    CResource* pResource = g_pGame->GetResourceManager ()->GetResourceFromNetID ( info.usResourceNetId );
                     if ( pResource && info.uiTotalBytes == info.buffer.GetSize () )
                     {
                         CLuaArguments Arguments;
