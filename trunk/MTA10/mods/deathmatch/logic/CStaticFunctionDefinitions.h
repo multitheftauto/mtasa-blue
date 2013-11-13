@@ -415,10 +415,10 @@ public:
     static void                         GUIEditSetReadOnly                  ( CClientEntity& Element, bool bFlag );
     static void                         GUIEditSetMasked                    ( CClientEntity& Element, bool bFlag );
     static void                         GUIEditSetMaxLength                 ( CClientEntity& Element, unsigned int iLength );
-    static void                         GUIEditSetCaratIndex                ( CClientEntity& Element, unsigned int iCarat );
+    static void                         GUIEditSetCaretIndex                ( CClientEntity& Element, unsigned int iCaret );
 
     static void                         GUIMemoSetReadOnly                  ( CClientEntity& Element, bool bFlag );
-    static void                         GUIMemoSetCaratIndex                ( CClientEntity& Element, unsigned int iCarat );
+    static void                         GUIMemoSetCaretIndex                ( CClientEntity& Element, unsigned int iCaret );
 
     static void                         GUIGridListSetSortingEnabled        ( CClientEntity& Element, bool bEnabled );
     static inline unsigned int          GUIGridListAddColumn                ( CClientGUIElement& GUIElement, const char *szTitle, float fWidth )                        { return static_cast < CGUIGridList* > ( GUIElement.GetCGUIElement () ) -> AddColumn ( szTitle, fWidth ); };

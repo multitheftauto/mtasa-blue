@@ -285,6 +285,7 @@ namespace
                 { false, "isPlayerDead",                   "isPedDead" },
                 // Edit
                 { false, "guiEditSetCaratIndex",           "guiEditSetCaretIndex" },
+                { false, "guiMemoSetCaratIndex",           "guiMemoSetCaretIndex" },
                 // XML
                 { false, "xmlNodeFindChild",               "xmlFindChild" },
             };

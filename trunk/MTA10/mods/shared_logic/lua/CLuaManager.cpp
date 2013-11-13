@@ -212,6 +212,8 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "xmlCreateSubNode", CLuaFunctionDefs::XMLCreateChild );
     CLuaCFunctions::AddFunction ( "xmlNodeFindChild", CLuaFunctionDefs::XMLNodeFindChild );
     CLuaCFunctions::AddFunction ( "isPlayerDead", CLuaFunctionDefs::IsPedDead );
+    CLuaCFunctions::AddFunction ( "guiEditSetCaratIndex", CLuaFunctionDefs::GUIEditSetCaretIndex );
+    CLuaCFunctions::AddFunction ( "guiMemoSetCaratIndex", CLuaFunctionDefs::GUIMemoSetCaretIndex );
     // ** END OF BACKWARDS COMPATIBILITY FUNCS. **
 
     // Resource funcs
@@ -852,14 +854,14 @@ void CLuaManager::LoadCFunctions ( void )
 
     CLuaCFunctions::AddFunction ( "guiGetScreenSize", CLuaFunctionDefs::GUIGetScreenSize );
 
-    CLuaCFunctions::AddFunction ( "guiEditSetCaretIndex", CLuaFunctionDefs::GUIEditSetCaratIndex );
-    CLuaCFunctions::AddFunction ( "guiEditSetCaratIndex", CLuaFunctionDefs::GUIEditSetCaratIndex );
+    CLuaCFunctions::AddFunction ( "guiEditSetCaretIndex", CLuaFunctionDefs::GUIEditSetCaretIndex );
+    CLuaCFunctions::AddFunction ( "guiEditGetCaretIndex", CLuaFunctionDefs::GUIEditGetCaretIndex );
     CLuaCFunctions::AddFunction ( "guiEditSetMasked", CLuaFunctionDefs::GUIEditSetMasked );
     CLuaCFunctions::AddFunction ( "guiEditSetMaxLength", CLuaFunctionDefs::GUIEditSetMaxLength );
     CLuaCFunctions::AddFunction ( "guiEditSetReadOnly", CLuaFunctionDefs::GUIEditSetReadOnly );
 
-    CLuaCFunctions::AddFunction ( "guiMemoSetCaretIndex", CLuaFunctionDefs::GUIMemoSetCaratIndex );
-    CLuaCFunctions::AddFunction ( "guiMemoSetCaratIndex", CLuaFunctionDefs::GUIMemoSetCaratIndex );
+    CLuaCFunctions::AddFunction ( "guiMemoSetCaretIndex", CLuaFunctionDefs::GUIMemoSetCaretIndex );
+    CLuaCFunctions::AddFunction ( "guiMemoGetCaretIndex", CLuaFunctionDefs::GUIMemoGetCaretIndex );
     CLuaCFunctions::AddFunction ( "guiMemoSetReadOnly", CLuaFunctionDefs::GUIMemoSetReadOnly );
 
     CLuaCFunctions::AddFunction ( "guiLabelSetColor", CLuaFunctionDefs::GUILabelSetColor );

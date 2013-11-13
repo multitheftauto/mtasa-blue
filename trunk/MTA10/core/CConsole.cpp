@@ -304,8 +304,8 @@ void CConsole::SetNextHistoryText ( void )
     if ( szItem )
     {      
         m_pInput->SetText ( szItem );
-        m_pInput->SetCaratAtStart(); // Resetting so it scrolls the input back after long text
-        m_pInput->SetCaratAtEnd ();
+        m_pInput->SetCaretAtStart(); // Resetting so it scrolls the input back after long text
+        m_pInput->SetCaretAtEnd ();
     }
     else
     {
@@ -346,8 +346,8 @@ void CConsole::SetPreviousHistoryText ( void )
     if ( szItem )
     {       
         m_pInput->SetText ( szItem );
-        m_pInput->SetCaratAtStart(); // Resetting so it scrolls the input back after long text
-        m_pInput->SetCaratAtEnd ();
+        m_pInput->SetCaretAtStart(); // Resetting so it scrolls the input back after long text
+        m_pInput->SetCaretAtEnd ();
         --m_iHistoryIndex;
     }
 }
@@ -406,8 +406,8 @@ void CConsole::SetNextAutoCompleteMatch ( void )
     if ( szItem )
     {       
         m_pInput->SetText ( szItem );
-        m_pInput->SetCaratAtStart (); // Resetting so it scrolls the input back after long text
-        m_pInput->SetCaratAtEnd ();
+        m_pInput->SetCaretAtStart (); // Resetting so it scrolls the input back after long text
+        m_pInput->SetCaretAtEnd ();
     }
 }
 

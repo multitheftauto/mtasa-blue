@@ -707,9 +707,11 @@ public:
     LUA_DECLARE ( GUIEditSetReadOnly );
     LUA_DECLARE ( GUIEditSetMasked );
     LUA_DECLARE ( GUIEditSetMaxLength );
-    LUA_DECLARE ( GUIEditSetCaratIndex );
+    LUA_DECLARE ( GUIEditSetCaretIndex );
+    LUA_DECLARE ( GUIEditGetCaretIndex );
     LUA_DECLARE ( GUIMemoSetReadOnly );
-    LUA_DECLARE ( GUIMemoSetCaratIndex );
+    LUA_DECLARE ( GUIMemoSetCaretIndex );
+    LUA_DECLARE ( GUIMemoGetCaretIndex );
     LUA_DECLARE ( GUIWindowSetMovable );
     LUA_DECLARE ( GUIWindowSetSizable );
     LUA_DECLARE ( GUIWindowGetMovable );
