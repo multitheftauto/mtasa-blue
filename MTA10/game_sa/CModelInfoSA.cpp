@@ -838,9 +838,12 @@ void CModelInfoSA::ResetAlphaTransparency ()
     m_pInterface = ppModelInfo [ m_dwModelID ];
     if(m_pInterface)
     {
-        BYTE bEnabled = *MapFind ( ms_ModelDefaultAlphaTransparencyMap, m_dwModelID );
-        m_pInterface->bAlphaTransparency = bEnabled;
-        MapRemove ( ms_ModelDefaultAlphaTransparencyMap, m_dwModelID );
+        BYTE* pbEnabled = MapFind ( ms_ModelDefaultAlphaTransparencyMap, m_dwModelID );
+        if ( pbEnabled )
+        {
+            m_pInterface->bAlphaTransparency = *pbEnabled;
+            MapRemove ( ms_ModelDefaultAlphaTransparencyMap, m_dwModelID );
+        }
     }
 }
 
