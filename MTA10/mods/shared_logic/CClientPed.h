@@ -310,7 +310,7 @@ public:
     void                        ResetToOutOfVehicleWeapon   ( void );
 
     void                        RebuildModel                ( bool bDelayChange = false );
-    void                        ProcessRebuildPlayer        ( void );
+    void                        ProcessRebuildPlayer        ( bool bNeedsClothesUpdate );
     void                        SetStat                     ( unsigned short usStat, float fValue );
     float                       GetStat                     ( unsigned short usStat );
     void                        ResetStats                  ( void );
