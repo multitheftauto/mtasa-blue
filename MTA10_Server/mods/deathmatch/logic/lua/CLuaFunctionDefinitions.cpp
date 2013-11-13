@@ -5165,7 +5165,7 @@ int CLuaFunctionDefinitions::SetVehicleColor ( lua_State* luaVM )
     int i = 0;
     for (; i < 12; ++i )
     {
-        if ( argStream.NextIsNumber ( ) )
+        if ( argStream.NextCouldBeNumber ( ) )
         {
             argStream.ReadNumber(ucParams[i]);
         }
@@ -6408,9 +6408,9 @@ int CLuaFunctionDefinitions::SetMarkerTarget ( lua_State* luaVM )
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData(pElement);
 
-    if ( argStream.NextIsNumber(0) &&
-         argStream.NextIsNumber(1) &&
-         argStream.NextIsNumber(2) )
+    if ( argStream.NextCouldBeNumber(0) &&
+         argStream.NextCouldBeNumber(1) &&
+         argStream.NextCouldBeNumber(2) )
     {
         argStream.ReadNumber(vecTarget.fX); 
         argStream.ReadNumber(vecTarget.fY); 
@@ -6539,10 +6539,9 @@ int CLuaFunctionDefinitions::CreateBlipAttachedTo ( lua_State* luaVM )
     else
         argStream.ReadUserData(pVisibleTo, m_pRootElement); 
     
-    CLuaMain* pLuaMain = g_pGame->GetLuaManager()->GetVirtualMachine ( luaVM );
-    if ( pLuaMain )
+    if ( !argStream.HasErrors() )
     {
-        CResource * resource = pLuaMain->GetResource();
+        CResource * resource = m_pResourceManager->GetResourceFromLuaState( luaVM );
         if ( resource )
         {
             // Create the blip
@@ -7331,7 +7330,7 @@ int CLuaFunctionDefinitions::PlayMissionAudio ( lua_State* luaVM )
     argStream.ReadUserData(pElement);
     argStream.ReadNumber(usSlot); 
 
-    if ( argStream.NextIsNumber() )
+    if ( argStream.NextCouldBeNumber() )
     {
         argStream.ReadNumber(vecPosition.fX); 
         argStream.ReadNumber(vecPosition.fY); 
@@ -8171,7 +8170,7 @@ int CLuaFunctionDefinitions::CreateWater ( lua_State* luaVM )
     argStream.ReadNumber(v3.fY); 
     argStream.ReadNumber(v3.fZ); 
 
-    if ( argStream.NextIsNumber () )
+    if ( argStream.NextCouldBeNumber () )
     {
         argStream.ReadNumber(v4.fX); 
         argStream.ReadNumber(v4.fY); 
@@ -9727,20 +9726,26 @@ int CLuaFunctionDefinitions::GetTickCount_ ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::GetCTime ( lua_State* luaVM )
 {
-    // Verify the argument
+    // table getRealTime( [int seconds = current] )
     time_t timer;
     time ( &timer );
     CScriptArgReader argStream ( luaVM );
 
-    if ( argStream.NextIsNumber ( ) )
+    if ( argStream.NextCouldBeNumber ( ) )
     {
         argStream.ReadNumber ( timer );
         if ( timer < 0 )
         {
-            lua_pushboolean ( luaVM, 0 );
-            return 1;
+            argStream.SetCustomError ( "seconds cannot be negative" );
         }
     }
+    if ( argStream.HasErrors () )
+    {
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+        lua_pushboolean ( luaVM, false );
+        return 1;
+    }
+
     tm * time = localtime ( &timer );
 
     CLuaArguments ret;
@@ -9775,22 +9780,21 @@ int CLuaFunctionDefinitions::Split ( lua_State* luaVM )
 {
     SString strInput = "";
     unsigned int uiDelimiter = 0;
+    SString strDelimiter;
     CScriptArgReader argStream ( luaVM );
     argStream.ReadString ( strInput );
 
+    if ( argStream.NextIsNumber ( ) )
+    {
+        argStream.ReadNumber ( uiDelimiter );
+        wchar_t wUNICODE[2] = { uiDelimiter, '\0' };
+        strDelimiter = UTF16ToMbUTF8(wUNICODE);
+    }
+    else  // It's already a string
+        argStream.ReadString ( strDelimiter );
 
     if ( !argStream.HasErrors ( ) )
     {
-        SString strDelimiter;
-        if ( argStream.NextIsNumber ( ) )
-        {
-            argStream.ReadNumber ( uiDelimiter );
-            wchar_t wUNICODE[2] = { uiDelimiter, '\0' };
-            strDelimiter = UTF16ToMbUTF8(wUNICODE);
-        }
-        else  // It's already a string
-            argStream.ReadString ( strDelimiter );
-
         // Copy the string
         char* strText = new char [ strInput.length ( ) + 1 ];
         strcpy ( strText, strInput );
@@ -9829,23 +9833,22 @@ int CLuaFunctionDefinitions::GetTok ( lua_State* luaVM )
     SString strInput = "";
     unsigned int uiToken = 0;
     unsigned int uiDelimiter = 0;
+    SString strDelimiter;
     CScriptArgReader argStream ( luaVM );
     argStream.ReadString ( strInput );
     argStream.ReadNumber ( uiToken );
 
+    if ( argStream.NextIsNumber ( ) )
+    {
+        argStream.ReadNumber ( uiDelimiter );
+        wchar_t wUNICODE[2] = { uiDelimiter, '\0' };
+        strDelimiter = UTF16ToMbUTF8(wUNICODE);
+    }
+    else  // It's already a string
+        argStream.ReadString ( strDelimiter );
 
     if ( !argStream.HasErrors ( ) )
     {
-        SString strDelimiter;
-        if ( argStream.NextIsNumber ( ) )
-        {
-            argStream.ReadNumber ( uiDelimiter );
-            wchar_t wUNICODE[2] = { uiDelimiter, '\0' };
-            strDelimiter = UTF16ToMbUTF8(wUNICODE);
-        }
-        else  // It's already a string
-            argStream.ReadString ( strDelimiter );
-
         if ( uiToken > 0 && uiToken < 1024 )
         {
             unsigned int uiCount = 1;
@@ -11678,9 +11681,10 @@ int CLuaFunctionDefinitions::KickPlayer ( lua_State* luaVM )
 
     if ( argStream.NextIsUserData() )
     {
-        CPlayer *pResp;
-        argStream.ReadUserData(pResp);
-        strResponsible = pResp->GetNick();
+        CPlayer* pResponsible;
+        argStream.ReadUserData( pResponsible, NULL );
+        if( !argStream.HasErrors() && pResponsible )
+            strResponsible = pResponsible->GetNick();
 
         argStream.ReadString(strReason, "");
     }
@@ -11751,6 +11755,9 @@ int CLuaFunctionDefinitions::BanPlayer ( lua_State* luaVM )
     else
         argStream.ReadNumber(tUnban, 0);
 
+    if ( tUnban > 0 )
+        tUnban += time ( NULL );
+
     if ( !argStream.HasErrors () )
     {
         CBan* pBan = NULL;
@@ -11804,7 +11811,8 @@ int CLuaFunctionDefinitions::AddBan ( lua_State* luaVM )
     else
         argStream.ReadNumber(tUnban, 0);
 
-
+    if ( tUnban > 0 )
+        tUnban += time ( NULL );
 
     if ( !argStream.HasErrors () )
     {

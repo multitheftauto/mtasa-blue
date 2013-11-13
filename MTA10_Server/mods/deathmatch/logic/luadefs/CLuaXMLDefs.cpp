@@ -580,10 +580,12 @@ int CLuaXMLDefs::xmlNodeSetAttribute ( lua_State* luaVM )
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pNode );
     argStream.ReadString ( strAttributeName );
+    argStream.ReadString( strAttributeValue, "" );
 
     if ( !argStream.HasErrors () )
     {
-        if ( argStream.NextIsString() )
+        // Are we going to set it to a value?
+        if ( argStream.NextCouldBeString( -1 ) )
         {
             // Write
             argStream.ReadString( strAttributeValue );
