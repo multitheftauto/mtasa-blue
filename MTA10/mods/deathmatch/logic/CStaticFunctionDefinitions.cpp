@@ -5349,9 +5349,9 @@ void CStaticFunctionDefinitions::GUIEditSetMaxLength ( CClientEntity& Entity, un
 }
 
 
-void CStaticFunctionDefinitions::GUIEditSetCaratIndex ( CClientEntity& Entity, unsigned int iCarat )
+void CStaticFunctionDefinitions::GUIEditSetCaretIndex ( CClientEntity& Entity, unsigned int iCaret )
 {
-    RUN_CHILDREN GUIEditSetCaratIndex ( **iter, iCarat );
+    RUN_CHILDREN GUIEditSetCaretIndex ( **iter, iCaret );
 
     // Are we a CGUI element?
     if ( IS_GUI ( &Entity ) )
@@ -5362,15 +5362,15 @@ void CStaticFunctionDefinitions::GUIEditSetCaratIndex ( CClientEntity& Entity, u
         if ( IS_CGUIELEMENT_EDIT ( &GUIElement ) )
         {
             // Set its carat index
-            static_cast < CGUIEdit* > ( GUIElement.GetCGUIElement () ) -> SetCaratIndex ( iCarat );
+            static_cast < CGUIEdit* > ( GUIElement.GetCGUIElement () ) -> SetCaretIndex ( iCaret );
         }
     }
 }
 
 
-void CStaticFunctionDefinitions::GUIMemoSetCaratIndex ( CClientEntity& Entity, unsigned int iCarat )
+void CStaticFunctionDefinitions::GUIMemoSetCaretIndex ( CClientEntity& Entity, unsigned int iCaret )
 {
-    RUN_CHILDREN GUIMemoSetCaratIndex ( **iter, iCarat );
+    RUN_CHILDREN GUIMemoSetCaretIndex ( **iter, iCaret );
 
     // Are we a CGUI element?
     if ( IS_GUI ( &Entity ) )
@@ -5381,7 +5381,7 @@ void CStaticFunctionDefinitions::GUIMemoSetCaratIndex ( CClientEntity& Entity, u
         if ( IS_CGUIELEMENT_MEMO ( &GUIElement ) )
         {
             // Set its carat index
-            static_cast < CGUIMemo* > ( GUIElement.GetCGUIElement () ) -> SetCaratIndex ( iCarat );
+            static_cast < CGUIMemo* > ( GUIElement.GetCGUIElement () ) -> SetCaretIndex ( iCaret );
         }
     }
 }

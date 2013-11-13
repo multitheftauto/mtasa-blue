@@ -262,7 +262,7 @@ bool CQuickConnect::OnHostChanged( CGUIElement *pElement )
             if ( strNewPort.length () > 0 )
             {
                 m_pEditPass->Activate ();
-                m_pEditPass->SetCaratAtEnd ();
+                m_pEditPass->SetCaretAtEnd ();
             }
         }
     }

@@ -129,25 +129,25 @@ unsigned int CGUIEdit_Impl::GetSelectionLength ( void )
 }
 
 
-void CGUIEdit_Impl::SetCaratIndex ( unsigned int uiIndex )
+void CGUIEdit_Impl::SetCaretIndex ( unsigned int uiIndex )
 {
     return reinterpret_cast < CEGUI::Editbox* > ( m_pWindow ) -> setCaratIndex ( uiIndex );
 }
 
 
-void CGUIEdit_Impl::SetCaratAtStart ( void )
+void CGUIEdit_Impl::SetCaretAtStart ( void )
 {
     reinterpret_cast < CEGUI::Editbox* > ( m_pWindow ) ->setCaratIndex ( 0 );
 }
 
 
-void CGUIEdit_Impl::SetCaratAtEnd ( void )
+void CGUIEdit_Impl::SetCaretAtEnd ( void )
 {
     reinterpret_cast < CEGUI::Editbox* > ( m_pWindow ) ->setCaratIndex ( GetText ().length () );
 }
 
 
-unsigned int CGUIEdit_Impl::GetCaratIndex ( void )
+unsigned int CGUIEdit_Impl::GetCaretIndex ( void )
 {
     return static_cast < unsigned int > ( reinterpret_cast < CEGUI::Editbox* > ( m_pWindow ) -> getCaratIndex () );
 }
@@ -171,7 +171,7 @@ bool CGUIEdit_Impl::ActivateOnTab ( void )
     if ( IsVisible () && !IsReadOnly () )
     {
         Activate ();
-        SetCaratIndex ( GetText ().length () );
+        SetCaretIndex ( GetText ().length () );
         return true;
     }
     return false;
