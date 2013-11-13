@@ -1512,7 +1512,7 @@ int CLuaFunctionDefs::SetVehicleColor ( lua_State* luaVM )
     int i;
     for ( i = 0 ; i < 12 ; i++ )
     {
-        if ( argStream.NextIsNumber ( ) )
+        if ( argStream.NextCouldBeNumber ( ) )
         {
             argStream.ReadNumber ( ucParams[i] );
         }

@@ -277,7 +277,7 @@ int CLuaFunctionDefs::XMLNodeSetAttribute ( lua_State* luaVM )
         if ( pNode )
         {
             // Are we going to set it to a value?
-            if ( strAttributeValue != "" )
+            if ( argStream.NextCouldBeString( -1 ) )
             {
                 // Write the node
                 CXMLAttribute* pAttribute = pNode->GetAttributes ().Create ( strAttributeName );

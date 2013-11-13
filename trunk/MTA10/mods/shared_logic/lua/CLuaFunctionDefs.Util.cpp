@@ -24,23 +24,22 @@ int CLuaFunctionDefs::GetTok ( lua_State* luaVM )
     SString strInput = "";
     unsigned int uiToken = 0;
     unsigned int uiDelimiter = 0;
+    SString strDelimiter;
     CScriptArgReader argStream ( luaVM );
     argStream.ReadString ( strInput );
     argStream.ReadNumber ( uiToken );
 
+    if ( argStream.NextIsNumber ( ) )
+    {
+        argStream.ReadNumber ( uiDelimiter );
+        wchar_t wUNICODE[2] = { uiDelimiter, '\0' };
+        strDelimiter = UTF16ToMbUTF8(wUNICODE);
+    }
+    else  // It's already a string
+        argStream.ReadString ( strDelimiter );
 
     if ( !argStream.HasErrors ( ) )
     {
-        SString strDelimiter;
-        if ( argStream.NextIsNumber ( ) )
-        {
-            argStream.ReadNumber ( uiDelimiter );
-            wchar_t wUNICODE[2] = { uiDelimiter, '\0' };
-            strDelimiter = UTF16ToMbUTF8(wUNICODE);
-        }
-        else  // It's already a string
-            argStream.ReadString ( strDelimiter );
-
         unsigned int uiCount = 0;
 
         if ( uiToken > 0 && uiToken < 1024 )
@@ -89,22 +88,21 @@ int CLuaFunctionDefs::Split ( lua_State* luaVM )
 {
     SString strInput = "";
     unsigned int uiDelimiter = 0;
+    SString strDelimiter;
     CScriptArgReader argStream ( luaVM );
     argStream.ReadString ( strInput );
 
+    if ( argStream.NextIsNumber ( ) )
+    {
+        argStream.ReadNumber ( uiDelimiter );
+        wchar_t wUNICODE[2] = { uiDelimiter, '\0' };
+        strDelimiter = UTF16ToMbUTF8(wUNICODE);
+    }
+    else  // It's already a string
+        argStream.ReadString ( strDelimiter );
 
     if ( !argStream.HasErrors ( ) )
     {
-        SString strDelimiter;
-        if ( argStream.NextIsNumber ( ) )
-        {
-            argStream.ReadNumber ( uiDelimiter );
-            wchar_t wUNICODE[2] = { uiDelimiter, '\0' };
-            strDelimiter = UTF16ToMbUTF8(wUNICODE);
-        }
-        else  // It's already a string
-            argStream.ReadString ( strDelimiter );
-
         // Copy the string
         char* strText = new char [ strInput.length ( ) + 1 ];
         strcpy ( strText, strInput );
@@ -337,15 +335,26 @@ int CLuaFunctionDefs::GetTickCount_ ( lua_State* luaVM )
 
 int CLuaFunctionDefs::GetCTime ( lua_State* luaVM )
 {
-    // Verify the argument
+    // table getRealTime( [int seconds = current] )
     time_t timer;
     time ( &timer );
     CScriptArgReader argStream ( luaVM );
 
-    if ( argStream.NextIsNumber ( ) )
+    if ( argStream.NextCouldBeNumber ( ) )
     {
         argStream.ReadNumber ( timer );
+        if ( timer < 0 )
+        {
+            argStream.SetCustomError ( "seconds cannot be negative" );
+        }
     }
+    if ( argStream.HasErrors () )
+    {
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+        lua_pushboolean ( luaVM, false );
+        return 1;
+    }
+
     tm * time = localtime ( &timer );
 
     CLuaArguments ret;
