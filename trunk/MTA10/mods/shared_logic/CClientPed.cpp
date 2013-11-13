@@ -2484,7 +2484,7 @@ void CClientPed::StreamedInPulse ( void )
         }
 
         if ( m_bPendingRebuildPlayer )
-            ProcessRebuildPlayer ();
+            ProcessRebuildPlayer ( true );
 
         CControllerState Current;
         GetControllerState ( Current );
@@ -3733,7 +3733,7 @@ void CClientPed::RebuildModel ( bool bDelayChange )
 
             // Apply immediately unless there is a chance more clothes states will change (e.g. via script)
             if ( !bDelayChange )
-                ProcessRebuildPlayer ();
+                ProcessRebuildPlayer ( false );
         }
     }
 }
@@ -3742,7 +3742,7 @@ void CClientPed::RebuildModel ( bool bDelayChange )
 //
 // Process any pending build but avoid rebuilding more than once a frame
 //
-void CClientPed::ProcessRebuildPlayer ( void )
+void CClientPed::ProcessRebuildPlayer ( bool bNeedsClothesUpdate )
 {
     assert ( m_pPlayerPed );
 
@@ -3750,6 +3750,9 @@ void CClientPed::ProcessRebuildPlayer ( void )
     {
         m_bPendingRebuildPlayer = false;
         m_uiFrameLastRebuildPlayer = g_pClientGame->GetFrameCount ();
+
+        if ( bNeedsClothesUpdate )
+            m_pClothes->AddAllToModel ();
 
         if ( m_bIsLocalPlayer )
         {
