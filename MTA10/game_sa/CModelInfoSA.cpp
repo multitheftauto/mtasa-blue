@@ -1228,8 +1228,8 @@ void CModelInfoSA::StaticSetHooks ( void )
 // Recursive RwFrame children searching function
 void CModelInfoSA::RwSetSupportedUpgrades ( RwFrame * parent, DWORD dwModel ) 
 {
-    RwFrame * ret = parent->child;
-    while ( ret != NULL ) { 
+    for( RwFrame* ret = parent->child ; ret != NULL ; ret = ret->next )
+    {
         // recurse into the child
         if ( ret->child != NULL ) {
             RwSetSupportedUpgrades ( ret, dwModel );
