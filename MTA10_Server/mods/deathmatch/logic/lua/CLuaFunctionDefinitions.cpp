@@ -9548,7 +9548,7 @@ int CLuaFunctionDefinitions::OutputDebugString ( lua_State* luaVM )
 
     if ( !argStream.HasErrors ( ) )
     {
-        if ( uiLevel < 0 || uiLevel > 3 )
+        if ( uiLevel > 3 )
         {
             m_pScriptDebugging->LogWarning ( luaVM, "Bad level argument sent to %s (0-3)", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ) );
 

@@ -345,7 +345,7 @@ public:
     void                            ResetSupportedUpgrades      ( void );
 
 private:
-    RwFrame *                       RwSetSupportedUpgrades      ( RwFrame * parent, DWORD dwModel );
+    void                            RwSetSupportedUpgrades      ( RwFrame * parent, DWORD dwModel );
 };
 
 #endif
