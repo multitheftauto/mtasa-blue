@@ -444,7 +444,7 @@ bool CVehicleManager::Exists ( CVehicle* pVehicle )
 
 bool CVehicleManager::IsValidModel ( unsigned int ulVehicleModel )
 {
-    return ulVehicleModel >= 400 && ulVehicleModel <= 611 && ulVehicleModel != 570;
+    return ulVehicleModel >= 400 && ulVehicleModel <= 611;
 }
 
 eVehicleType CVehicleManager::GetVehicleType ( unsigned short usModel )
