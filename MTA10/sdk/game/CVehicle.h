@@ -99,6 +99,7 @@ public:
     virtual void                SetNextTrainCarriage        ( CVehicle * next ) = 0;
     virtual CVehicle *          GetPreviousTrainCarriage    () = 0;
     virtual void                SetPreviousTrainCarriage    ( CVehicle * previous ) = 0;
+    virtual void                AttachTrainCarriage         ( CVehicle* pCarriage ) = 0;
 
     virtual bool                IsDerailed                  () = 0;
     virtual void                SetDerailed                 ( bool bDerailed ) = 0;

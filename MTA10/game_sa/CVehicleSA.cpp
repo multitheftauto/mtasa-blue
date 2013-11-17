@@ -443,6 +443,38 @@ CVehicle * CVehicleSA::GetPreviousTrainCarriage ( void )
 }
 
 
+void CVehicleSA::AttachTrainCarriage ( CVehicle* pCarriage )
+{
+    if ( !pCarriage )
+        return;
+
+    CVehicleSA* pCarriageSA = dynamic_cast < CVehicleSA* > ( pCarriage );
+    if ( !pCarriageSA )
+        return;
+
+    // Link both vehicles
+    SetNextTrainCarriage ( pCarriage );
+
+    if ( !GetPreviousCarriageInTrain () )
+    {
+        // It's the first vehicle --> it's the chain engine
+        CVehicleSAInterface* pInterface = GetVehicleInterface ();
+        pInterface->trainFlags.bIsTheChainEngine = true;
+        //pInterface->trainFlags.bIsDrivenByBrownSteak = false;
+    }
+
+    // Mark the carriage as non chain engine
+    CVehicleSAInterface* pCarriageInterface = pCarriage->GetVehicleInterface ();
+    pCarriageInterface->trainFlags.bIsTheChainEngine = false;
+    //pNextInterface->trainFlags.bIsDrivenByBrownSteak = true;
+            
+    CBoundingBox* pBoundingBox = pGame->GetModelInfo ( pCarriage->GetModelIndex() )->GetBoundingBox ();
+    if ( pCarriageInterface->trainFlags.bDirection )
+        pCarriageInterface->m_fDistanceToNextCarriage = -( pBoundingBox->vecBoundMax.fY - pBoundingBox->vecBoundMin.fY );
+    else
+        pCarriageInterface->m_fDistanceToNextCarriage = pBoundingBox->vecBoundMax.fY - pBoundingBox->vecBoundMin.fY;
+}
+
 bool CVehicleSA::IsDerailed ( void )
 {
     CVehicleSAInterface* pInterface = GetVehicleInterface ();

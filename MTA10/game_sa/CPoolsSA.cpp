@@ -929,14 +929,14 @@ CVehicle* CPoolsSA::AddTrain ( CVector * vecPosition, DWORD dwModels[], int iSiz
     {
         if ( dwModels[i] == 449 || dwModels[i] == 537 || 
             dwModels[i] == 538 || dwModels[i] == 569 || 
-            dwModels[i] == 590 )
+            dwModels[i] == 590 || dwModels[i] == 570 )
         {
             MemPutFast < DWORD > ( VAR_TrainModelArray + i * 4, dwModels[i] );
         }
     }
 
-    CVehicleSAInterface * trainBegining;
-    CVehicleSAInterface * trainEnd;
+    CVehicleSAInterface* pTrainBeginning = NULL;
+    CVehicleSAInterface* pTrainEnd = NULL;
 
     float fX = vecPosition->fX;
     float fY = vecPosition->fY;
@@ -951,9 +951,9 @@ CVehicle* CPoolsSA::AddTrain ( CVector * vecPosition, DWORD dwModels[], int iSiz
         push    0 // place as close to point as possible (rather than at node)? (maybe) (actually seems to have an effect on the speed, so changed from 1 to 0)
         push    0 // start finding closest from here 
         push    -1 // node to start at (-1 for closest node)
-        lea     ecx, trainEnd
+        lea     ecx, pTrainEnd
         push    ecx // end of train
-        lea     ecx, trainBegining 
+        lea     ecx, pTrainBeginning 
         push    ecx // begining of train
         push    0 // train type (always use 0 as thats where we're writing to)
         push    bDirection // direction 
@@ -968,14 +968,14 @@ CVehicle* CPoolsSA::AddTrain ( CVector * vecPosition, DWORD dwModels[], int iSiz
     m_bGetVehicleEnabled = true;
 
     CVehicleSA * trainHead = NULL;
-    if ( trainBegining )
+    if ( pTrainBeginning )
     {
         DWORD vehicleIndex = 0;
 
         if ( m_vehiclePool.ulCount < MAX_VEHICLES )
         {
-            trainHead = new CVehicleSA ( trainBegining );
-            if ( ! AddVehicleToPool ( trainHead ) )
+            trainHead = new CVehicleSA ( pTrainBeginning );
+            if ( !AddVehicleToPool ( trainHead ) )
             {
                 delete trainHead;
                 trainHead = NULL;

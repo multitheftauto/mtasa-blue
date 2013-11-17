@@ -457,7 +457,7 @@ public:
     CTrainFlags trainFlags;
 
     //1468
-    DWORD padding250[1];
+    unsigned int m_uiLastTimeUpdated;
 
     //1472
     BYTE m_ucRailTrackID;
@@ -548,6 +548,7 @@ public:
     CVehicleSAInterface *       GetPreviousCarriageInTrain      ();
     CVehicle *                  GetPreviousTrainCarriage        ();
     void                        SetPreviousTrainCarriage        ( CVehicle * pPrevious );
+    void                        AttachTrainCarriage             ( CVehicle* pCarriage );
 
     bool                        IsDerailed                      ();
     void                        SetDerailed                     ( bool bDerailed );

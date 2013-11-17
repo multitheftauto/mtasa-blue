@@ -2522,6 +2522,26 @@ void CClientVehicle::Create ( void )
             m_pTowedByVehicle->InternalSetTowLink ( this );
         }
 
+        // Train carriages
+        // DEBUG
+        if ( CClientVehicleManager::IsTrainModel ( m_usModel ) )
+            g_pCore->DebugPrintf ( "Creating train... trackId: %d", m_ucTrackID );
+
+        if ( m_pNextLink )
+        {
+            /*if ( !m_pNextLink->IsStreamedIn () && !m_pNextLink->GetGameVehicle () )
+                m_pNextLink->StreamIn ( true );*/
+
+            if ( m_pNextLink->GetGameVehicle () )
+                m_pVehicle->AttachTrainCarriage ( m_pNextLink->GetGameVehicle () );
+        }
+        if ( m_pPreviousLink )
+        {
+            if ( m_pPreviousLink && m_pPreviousLink->GetGameVehicle () )
+                m_pPreviousLink->GetGameVehicle ()->AttachTrainCarriage ( m_pVehicle );
+        }
+
+
         // Reattach to an entity + any entities attached to this
         ReattachEntities ();
 
@@ -2719,6 +2739,8 @@ void CClientVehicle::Destroy ( void )
             GetTowedVehicle ()->StreamOut ();
         }
 
+        m_ucTrackID = m_pVehicle->GetRailTrack ();
+
         // Remove XRef
         g_pClientGame->GetGameEntityXRefManager ()->RemoveEntityXRef ( this, m_pVehicle );
 
@@ -2796,6 +2818,25 @@ bool CClientVehicle::SetTowedVehicle ( CClientVehicle* pVehicle, const CVector* 
 {
     if ( pVehicle == m_pTowedVehicle )
         return true;
+
+    // Train carriages
+    if ( CClientVehicleManager::IsTrainModel ( GetModel () ) && CClientVehicleManager::IsTrainModel ( pVehicle->GetModel () ) )
+    {
+        CVehicle* pTowedGameVehicle = pVehicle->GetGameVehicle ();
+        SetNextTrainCarriage ( pVehicle );
+        if ( m_pVehicle && pTowedGameVehicle )
+        {
+            m_pVehicle->AttachTrainCarriage ( pTowedGameVehicle );
+        }
+
+        // Todo: Set m_pTowedVehicle etc., but ensure that it doesn't collide with the automobile trailer stuff
+        return true;
+    }
+    else
+    {
+        if ( CClientVehicleManager::IsTrainModel ( GetModel () ) || CClientVehicleManager::IsTrainModel ( pVehicle->GetModel () ) )
+            return false;
+    }
 
     // Do we already have a towed vehicle?
     if ( m_pTowedVehicle && pVehicle != m_pTowedVehicle )
