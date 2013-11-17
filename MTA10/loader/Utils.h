@@ -74,6 +74,7 @@ bool            CheckService                        ( uint uiStage );
 void            MaybeShowCopySettingsDialog         ( void );
 
 bool            CheckAndShowFileOpenFailureMessage  ( void );
+void            CheckAndShowMissingFileMessage      ( void );
 
 void            BsodDetectionPreLaunch              ( void );
 void            BsodDetectionOnGameBegin            ( void );

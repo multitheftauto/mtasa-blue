@@ -418,6 +418,9 @@ void SharedUtil::WatchDogClearCounter ( const SString& str )
     SetApplicationSettingInt ( "watchdog", str, 0 );
 }
 
+//
+// Unclean stop flag
+//
 static bool bWatchDogWasUncleanStopCached = false;
 static bool bWatchDogWasUncleanStopValue = false;
 
@@ -425,8 +428,8 @@ bool SharedUtil::WatchDogWasUncleanStop ( void )
 {
     if ( !bWatchDogWasUncleanStopCached )
     {
-        bWatchDogWasUncleanStopCached = true;
         bWatchDogWasUncleanStopValue = GetApplicationSettingInt ( "watchdog", "uncleanstop" ) != 0;
+        bWatchDogWasUncleanStopCached = true;
     }
     return bWatchDogWasUncleanStopValue;
 }
@@ -437,6 +440,30 @@ void SharedUtil::WatchDogSetUncleanStop ( bool bOn )
     bWatchDogWasUncleanStopCached = true;
     bWatchDogWasUncleanStopValue = bOn;
 }
+
+//
+// Crash flag
+//
+static bool bWatchDogWasLastRunCrashCached = false;
+static bool bWatchDogWasLastRunCrashValue = false;
+
+bool SharedUtil::WatchDogWasLastRunCrash( void )
+{
+    if ( !bWatchDogWasLastRunCrashCached )
+    {
+        bWatchDogWasLastRunCrashValue = GetApplicationSettingInt( "watchdog", "lastruncrash" ) != 0;
+        bWatchDogWasLastRunCrashCached = true;
+    }
+    return bWatchDogWasLastRunCrashValue;
+}
+
+void SharedUtil::WatchDogSetLastRunCrash( bool bOn )
+{
+    SetApplicationSettingInt( "watchdog", "lastruncrash", bOn );
+    bWatchDogWasLastRunCrashCached = true;
+    bWatchDogWasLastRunCrashValue = bOn;
+}
+
 
 
 void SharedUtil::SetClipboardText ( const SString& strText )

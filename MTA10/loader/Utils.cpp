@@ -1731,6 +1731,33 @@ bool CheckAndShowFileOpenFailureMessage ( void )
 
 //////////////////////////////////////////////////////////
 //
+// CheckAndShowMissingFileMessage
+//
+// Check for missing files that could cause a crash
+//
+//////////////////////////////////////////////////////////
+void CheckAndShowMissingFileMessage ( void )
+{
+    SString strFilename = PathJoin( "text", "american.gxt" );
+
+    const SString strGTAPathFilename = PathJoin( GetGTAPath(), strFilename );
+
+    if ( !FileExists( strGTAPathFilename ) )
+    {
+        SString strMsg ( _("GTA:SA is missing the file '%s'."), *strFilename );
+        strMsg += "\n\n";
+        strMsg += _("Do you want to see some online help?");
+        int iResponse = MessageBoxUTF8 ( NULL, strMsg, "MTA: San Andreas"+_E("CL31"), MB_YESNO | MB_ICONERROR | MB_TOPMOST );
+        if ( iResponse == IDYES )
+        {
+            BrowseToSolution ( SString( "gta-file-missing&name=%s", *strFilename ), TERMINATE_PROCESS );
+        }
+    }
+}
+
+
+//////////////////////////////////////////////////////////
+//
 // LoadFunction
 //
 // Load a library function
