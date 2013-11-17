@@ -203,9 +203,6 @@ bool SharedUtil::QueryWMI ( SQueryWMIResult& outResult, const SString& strQuery,
     // Step 7: -------------------------------------------------
     // Get the data from the query in step 6 -------------------
  
-    IWbemClassObject *pclsObj;
-    ULONG uReturn = 0;
-
     // Get list of keys to find values for
     std::vector < SString > vecKeys;
     SString ( strKeys ).Split ( ",", vecKeys );
@@ -216,7 +213,8 @@ bool SharedUtil::QueryWMI ( SQueryWMIResult& outResult, const SString& strQuery,
     // Fill each row
     while (pEnumerator)
     {
-        uReturn = 0;
+        IWbemClassObject *pclsObj = NULL;
+        ULONG uReturn = 0;
 
         HRESULT hr = CallNext(pEnumerator, WBEM_INFINITE, 1, 
             &pclsObj, &uReturn);
@@ -238,6 +236,12 @@ bool SharedUtil::QueryWMI ( SQueryWMIResult& outResult, const SString& strQuery,
             break;
         }
 
+        if( pclsObj == NULL )
+        {
+            AddReportLog( 9132, SString( "QueryWMI pclsObj == NULL returned %08x for %s", hr, *strQuery ) );
+            break;
+        }
+
         VARIANT vtProp;
 
         // Add result row
@@ -253,10 +257,17 @@ bool SharedUtil::QueryWMI ( SQueryWMIResult& outResult, const SString& strQuery,
             wstring wstrKey( strKey.begin (), strKey.end () );
             hr = pclsObj->Get ( wstrKey.c_str (), 0, &vtProp, 0, 0 );
 
-            VariantChangeType( &vtProp, &vtProp, 0, VT_BSTR );
-            if ( vtProp.vt == VT_BSTR )
-                strValue = _bstr_t ( vtProp.bstrVal );
-            VariantClear ( &vtProp );
+            if ( hr == WBEM_S_NO_ERROR )
+            {
+                VariantChangeType( &vtProp, &vtProp, 0, VT_BSTR );
+                if ( vtProp.vt == VT_BSTR )
+                    strValue = _bstr_t ( vtProp.bstrVal );
+                VariantClear ( &vtProp );
+            }
+            else
+            {
+                AddReportLog( 9133, SString( "QueryWMI pclsObj->Get returned %08x for key %d in %s", hr, i, *strQuery ) );
+            }
 
             outResult.back().insert ( outResult.back().end (), strValue );
         }
