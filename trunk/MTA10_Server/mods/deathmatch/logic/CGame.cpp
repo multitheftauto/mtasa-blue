@@ -270,9 +270,9 @@ CGame::~CGame ( void )
     SAFE_DELETE ( m_pObjectSync );
 #endif
     SAFE_DELETE ( m_pConsole );
+    SAFE_DELETE ( m_pLuaManager );
     SAFE_DELETE ( m_pMapManager );
     SAFE_DELETE ( m_pRemoteCalls );
-    SAFE_DELETE ( m_pLuaManager );
     SAFE_DELETE ( m_pPacketTranslator );
     SAFE_DELETE ( m_pMarkerManager );
     SAFE_DELETE ( m_pRadarAreaManager );

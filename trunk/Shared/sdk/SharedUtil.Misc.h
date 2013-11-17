@@ -109,6 +109,8 @@ namespace SharedUtil
     void            WatchDogCompletedSection        ( const SString& str );
     bool            WatchDogWasUncleanStop          ( void );
     void            WatchDogSetUncleanStop          ( bool bOn );
+    bool            WatchDogWasLastRunCrash         ( void );
+    void            WatchDogSetLastRunCrash         ( bool bOn );
 
     // BrowseToSolution flags
     enum

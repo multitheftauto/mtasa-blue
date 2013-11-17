@@ -267,6 +267,8 @@ void HandleResetSettings ( void )
     if ( CheckAndShowFileOpenFailureMessage () )
         return;
 
+    CheckAndShowMissingFileMessage();
+
     char szResult[MAX_PATH] = "";
     SHGetFolderPath( NULL, CSIDL_PERSONAL, NULL, 0, szResult );
     SString strSettingsFilename = PathJoin ( szResult, "GTA San Andreas User Files", "gta_sa.set" );
@@ -360,6 +362,15 @@ void PreLaunchWatchDogs ( void )
         WatchDogSetUncleanStop ( true );    // Flag to maybe do things differently if MTA exit code on last run was not 0
     else
         WatchDogSetUncleanStop ( false );
+
+    SString strCrashFlagFilename = CalcMTASAPath( "mta\\core.log.flag" );
+    if ( FileExists( strCrashFlagFilename ) )
+    {
+        FileDelete( strCrashFlagFilename );
+        WatchDogSetLastRunCrash( true );    // Flag to maybe do things differently if MTA crashed last run
+    }
+    else
+        WatchDogSetLastRunCrash( false );
 
     // Reset counter if gta game was run last time
     if ( !WatchDogIsSectionOpen ( "L1" ) )
