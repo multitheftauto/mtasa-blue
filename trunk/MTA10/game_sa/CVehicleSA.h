@@ -549,6 +549,9 @@ public:
     CVehicle *                  GetPreviousTrainCarriage        ();
     void                        SetPreviousTrainCarriage        ( CVehicle * pPrevious );
     void                        AttachTrainCarriage             ( CVehicle* pCarriage );
+    void                        DetachTrainCarriage             ( CVehicle* pCarriage );
+    bool                        IsChainEngine                   ( void );
+    void                        SetChainEngine                  ( bool bChainEngine = true );
 
     bool                        IsDerailed                      ();
     void                        SetDerailed                     ( bool bDerailed );

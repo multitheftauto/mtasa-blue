@@ -835,7 +835,12 @@ int CLuaFunctionDefs::GetVehicleTowedByVehicle ( lua_State* luaVM )
     {
         if ( pVehicle )
         {
-            CClientVehicle* pTowedVehicle = pVehicle->GetTowedVehicle ();
+            CClientVehicle* pTowedVehicle;
+            if ( pVehicle->GetVehicleType () == CLIENTVEHICLE_TRAIN )
+                pTowedVehicle = pVehicle->GetNextTrainCarriage ();
+            else
+                pTowedVehicle = pVehicle->GetTowedVehicle ();
+
             if ( pTowedVehicle )
             {
                 lua_pushelement ( luaVM, pTowedVehicle );
@@ -863,7 +868,12 @@ int CLuaFunctionDefs::GetVehicleTowingVehicle ( lua_State* luaVM )
     {
         if ( pVehicle )
         {
-            CClientVehicle* pTowedByVehicle = pVehicle->GetTowedByVehicle ();
+            CClientVehicle* pTowedByVehicle;
+            if ( pVehicle->GetVehicleType () == CLIENTVEHICLE_TRAIN )
+                pTowedByVehicle = pVehicle->GetPreviousTrainCarriage ();
+            else
+                pTowedByVehicle = pVehicle->GetTowedByVehicle ();
+
             if ( pTowedByVehicle )
             {
                 lua_pushelement ( luaVM, pTowedByVehicle );

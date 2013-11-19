@@ -296,6 +296,9 @@ public:
     CClientVehicle*             GetNextTrainCarriage    ( void );
     void                        SetPreviousTrainCarriage( CClientVehicle* pPrevious );
     void                        SetNextTrainCarriage    ( CClientVehicle* pNext );
+    inline bool                 IsChainEngine           ( void )                            { return m_bChainEngine; };
+    void                        SetIsChainEngine        ( bool bChainEngine = true );
+    CClientVehicle*             GetChainEngine          ( void );
 
     bool                        IsDerailed              ( void );
     void                        SetDerailed             ( bool bDerailed );
@@ -573,6 +576,7 @@ protected:
     const CHandlingEntry*       m_pOriginalHandlingEntry;
     CHandlingEntry*             m_pHandlingEntry;
 
+    bool                        m_bChainEngine;
     bool                        m_bIsDerailed;
     bool                        m_bIsDerailable;
     bool                        m_bTrainDirection;
