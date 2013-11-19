@@ -1011,6 +1011,9 @@ void CMultiplayerSA::InitHooks()
     
     // Prevent TRAINS spawning with PEDs
     MemPut < BYTE > ( 0x6F7865, 0xEB );
+    MemPut < BYTE > ( 0x6F8E7B, 0xE9 );
+    MemPut < DWORD > ( 0x6F8E7C, 0x109 ); // jmp to 0x6F8F89
+    MemPut < BYTE > ( 0x6F8E80, 0x90 );
 
     // DISABLE PLANES
     MemPut < BYTE > ( 0x6CD2F0, 0xC3 );

@@ -2882,14 +2882,25 @@ bool CStaticFunctionDefinitions::AttachTrailerToVehicle ( CClientVehicle& Vehicl
 
 bool CStaticFunctionDefinitions::DetachTrailerFromVehicle ( CClientVehicle& Vehicle, CClientVehicle* pTrailer )
 {
-    // Is there a trailer attached, and does it match this one
-    CClientVehicle* pTempTrailer = Vehicle.GetTowedVehicle ();
-    if ( pTempTrailer && ( !pTrailer || pTempTrailer == pTrailer ) )
+    if ( Vehicle.GetVehicleType () != CLIENTVEHICLE_TRAIN )
     {
-        // Detach them
-        Vehicle.SetTowedVehicle ( NULL );
-
-        return true;
+        // Is there a trailer attached, and does it match this one
+        CClientVehicle* pTempTrailer = Vehicle.GetTowedVehicle ();
+        if ( pTempTrailer && ( !pTrailer || pTempTrailer == pTrailer ) )
+        {
+            // Detach them
+            Vehicle.SetTowedVehicle ( NULL );
+            return true;
+        }
+    }
+    else
+    {
+        CClientVehicle* pTempCarriage = Vehicle.GetNextTrainCarriage ();
+        if ( pTempCarriage && ( !pTrailer || pTempCarriage == pTrailer ) )
+        {
+            Vehicle.SetTowedVehicle ( NULL );
+            return true;
+        }
     }
 
     return false;

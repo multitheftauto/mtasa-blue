@@ -1875,25 +1875,33 @@ void CClientVehicle::SetFrozenWaitingForGroundToLoad ( bool bFrozen )
 
 CClientVehicle* CClientVehicle::GetPreviousTrainCarriage ( void )
 {
-    return NULL;
+    if ( m_pVehicle )
+    {
+        return m_pVehicleManager->Get ( m_pVehicle->GetPreviousTrainCarriage (), false );
+    }
+    return m_pPreviousLink;
 }
 
 
 CClientVehicle* CClientVehicle::GetNextTrainCarriage ( void )
 {
-    return NULL;
+    if ( m_pVehicle )
+    {
+        return m_pVehicleManager->Get ( m_pVehicle->GetNextTrainCarriage (), false );
+    }
+    return m_pNextLink;
 }
 
 
 void CClientVehicle::SetPreviousTrainCarriage ( CClientVehicle* pPrevious )
 {
-     // Tell the given vehicle we're the previous link and save the given vehicle as the next link
-    m_pPreviousLink = pPrevious;
-    if ( pPrevious )
-    {
-        pPrevious->m_pNextLink = this;
-    }
+    if ( !pPrevious )
+        return;
 
+    // Tell the given vehicle we're the previous link and save the given vehicle as the next link
+    m_pPreviousLink = pPrevious;
+    pPrevious->m_pNextLink = this;
+    
     // If both vehicles are streamed in, do the link
     if ( m_pVehicle && pPrevious->m_pVehicle )
     {
@@ -1904,18 +1912,43 @@ void CClientVehicle::SetPreviousTrainCarriage ( CClientVehicle* pPrevious )
 
 void CClientVehicle::SetNextTrainCarriage ( CClientVehicle* pNext )
 {
+    if ( !pNext )
+        return;
+
     // Tell the given vehicle we're the previous link and save the given vehicle as the next link
     m_pNextLink = pNext;
-    if ( pNext )
-    {
-        pNext->m_pPreviousLink = this;
-    }
+    pNext->m_pPreviousLink = this;
 
     // If both vehicles are streamed in, do the link
     if ( m_pVehicle && pNext->m_pVehicle )
     {
         m_pVehicle->SetNextTrainCarriage ( pNext->m_pVehicle );
     }
+}
+
+
+void CClientVehicle::SetIsChainEngine ( bool bChainEngine )
+{
+    m_bChainEngine = bChainEngine;
+
+    if ( m_pVehicle )
+    {
+        m_pVehicle->SetChainEngine ( bChainEngine );
+    }
+}
+
+
+CClientVehicle* CClientVehicle::GetChainEngine ()
+{
+    CClientVehicle* pChainEngine = this;
+    while ( pChainEngine )
+    {
+        if ( !pChainEngine->m_pPreviousLink )
+            break;
+
+        pChainEngine = pChainEngine->m_pPreviousLink;
+    }
+    return pChainEngine;
 }
 
 
@@ -2416,6 +2449,23 @@ void CClientVehicle::Create ( void )
             {
                 m_pVehicle->SetRailTrack ( m_ucTrackID );
             }
+
+            if ( m_bChainEngine )
+                m_pVehicle->SetChainEngine ( true );
+
+            // Train carriages
+            if ( m_pNextLink )
+            {
+                m_pVehicle->SetNextTrainCarriage ( m_pNextLink->m_pVehicle );
+                if ( m_pNextLink->GetGameVehicle () )
+                    m_pVehicle->AttachTrainCarriage ( m_pNextLink->GetGameVehicle () );
+            }
+            if ( m_pPreviousLink )
+            {
+                m_pVehicle->SetPreviousTrainCarriage ( m_pPreviousLink->m_pVehicle );
+                if ( m_pPreviousLink->GetGameVehicle () )
+                    m_pPreviousLink->GetGameVehicle ()->AttachTrainCarriage ( m_pVehicle );
+            }
         }
 
         m_pVehicle->SetOverrideLights ( m_ucOverrideLights );
@@ -2449,17 +2499,6 @@ void CClientVehicle::Create ( void )
         if ( m_bColorSaved )
         {
             m_pVehicle->SetColor ( m_Color.GetRGBColor ( 0 ), m_Color.GetRGBColor ( 1 ), m_Color.GetRGBColor ( 2 ), m_Color.GetRGBColor ( 3 ), 0 );
-        }
-
-        // Link us with stored next and previous vehicles
-        if ( m_pPreviousLink && m_pPreviousLink->m_pVehicle )
-        {
-            m_pVehicle->SetPreviousTrainCarriage ( m_pPreviousLink->m_pVehicle );
-        }
-
-        if ( m_pNextLink && m_pNextLink->m_pVehicle )
-        {
-            m_pVehicle->SetNextTrainCarriage ( m_pNextLink->m_pVehicle );
         }
 
         // Restore turret rotation
@@ -2521,26 +2560,6 @@ void CClientVehicle::Create ( void )
         {
             m_pTowedByVehicle->InternalSetTowLink ( this );
         }
-
-        // Train carriages
-        // DEBUG
-        if ( CClientVehicleManager::IsTrainModel ( m_usModel ) )
-            g_pCore->DebugPrintf ( "Creating train... trackId: %d", m_ucTrackID );
-
-        if ( m_pNextLink )
-        {
-            /*if ( !m_pNextLink->IsStreamedIn () && !m_pNextLink->GetGameVehicle () )
-                m_pNextLink->StreamIn ( true );*/
-
-            if ( m_pNextLink->GetGameVehicle () )
-                m_pVehicle->AttachTrainCarriage ( m_pNextLink->GetGameVehicle () );
-        }
-        if ( m_pPreviousLink )
-        {
-            if ( m_pPreviousLink && m_pPreviousLink->GetGameVehicle () )
-                m_pPreviousLink->GetGameVehicle ()->AttachTrainCarriage ( m_pVehicle );
-        }
-
 
         // Reattach to an entity + any entities attached to this
         ReattachEntities ();
@@ -2670,7 +2689,6 @@ void CClientVehicle::Destroy ( void )
         m_usAdjustablePropertyValue = m_pVehicle->GetAdjustablePropertyValue ();
         m_bEngineOn = m_pVehicle->IsEngineOn ();
         m_bIsOnGround = IsOnGround ();
-        m_bIsDerailed = IsDerailed ();
         m_fHeliRotorSpeed = GetHeliRotorSpeed ();
         m_bHeliSearchLightVisible = IsHeliSearchLightVisible ();
         m_pHandlingEntry = m_pVehicle->GetHandlingData();
@@ -2739,7 +2757,28 @@ void CClientVehicle::Destroy ( void )
             GetTowedVehicle ()->StreamOut ();
         }
 
-        m_ucTrackID = m_pVehicle->GetRailTrack ();
+        if ( GetVehicleType () == CLIENTVEHICLE_TRAIN )
+        {
+            m_bIsDerailed = IsDerailed ();
+            m_ucTrackID = m_pVehicle->GetRailTrack ();
+            m_fTrainPosition = m_pVehicle->GetTrainPosition ();
+            m_fTrainSpeed = m_pVehicle->GetTrainSpeed ();
+
+            if ( IsChainEngine () )
+            {
+                // Detach all carriages temporally to obtain something like smooth fading out
+                CClientVehicle* pCarriage = this;
+                while ( pCarriage )
+                {
+                    if ( pCarriage->m_pVehicle && pCarriage->m_pNextLink && pCarriage->m_pNextLink->m_pVehicle )
+                    {
+                        pCarriage->m_pVehicle->DetachTrainCarriage ( pCarriage->m_pNextLink->m_pVehicle );
+                        pCarriage->m_pNextLink->m_pVehicle->SetTrainSpeed ( m_fTrainSpeed*1.5f );
+                    }
+                    pCarriage = pCarriage->m_pNextLink;
+                }
+            }
+        }
 
         // Remove XRef
         g_pClientGame->GetGameEntityXRefManager ()->RemoveEntityXRef ( this, m_pVehicle );
@@ -2816,14 +2855,31 @@ CClientVehicle* CClientVehicle::GetRealTowedVehicle ( void )
 
 bool CClientVehicle::SetTowedVehicle ( CClientVehicle* pVehicle, const CVector* vecRotationDegrees )
 {
-    if ( pVehicle == m_pTowedVehicle )
-        return true;
-
     // Train carriages
-    if ( CClientVehicleManager::IsTrainModel ( GetModel () ) && CClientVehicleManager::IsTrainModel ( pVehicle->GetModel () ) )
+    if ( this->GetVehicleType () == CLIENTVEHICLE_TRAIN && pVehicle == NULL )
     {
+        if ( m_pVehicle && m_pNextLink && m_pNextLink->GetGameVehicle () )
+            m_pVehicle->DetachTrainCarriage ( m_pNextLink->GetGameVehicle () );
+
+        SetNextTrainCarriage ( NULL );
+    }
+    else if ( this->GetVehicleType () == CLIENTVEHICLE_TRAIN && pVehicle->GetVehicleType () == CLIENTVEHICLE_TRAIN )
+    {
+        if ( !m_pPreviousLink )
+            SetIsChainEngine ( true );
+
+        CClientVehicle* pChainEngine = GetChainEngine ();
         CVehicle* pTowedGameVehicle = pVehicle->GetGameVehicle ();
         SetNextTrainCarriage ( pVehicle );
+
+        pVehicle->SetTrainTrack ( pChainEngine->GetTrainTrack () );
+        pVehicle->SetTrainPosition ( pChainEngine->GetTrainPosition () );
+        pVehicle->SetTrainDirection ( pChainEngine->GetTrainDirection () );
+
+        CVector vecPosition;
+        pChainEngine->GetPosition ( vecPosition );
+        pVehicle->SetPosition ( vecPosition );
+            
         if ( m_pVehicle && pTowedGameVehicle )
         {
             m_pVehicle->AttachTrainCarriage ( pTowedGameVehicle );
@@ -2832,11 +2888,13 @@ bool CClientVehicle::SetTowedVehicle ( CClientVehicle* pVehicle, const CVector* 
         // Todo: Set m_pTowedVehicle etc., but ensure that it doesn't collide with the automobile trailer stuff
         return true;
     }
-    else
+    else if ( this->GetVehicleType () == CLIENTVEHICLE_TRAIN || ( pVehicle && pVehicle->GetVehicleType () == CLIENTVEHICLE_TRAIN ) )
     {
-        if ( CClientVehicleManager::IsTrainModel ( GetModel () ) || CClientVehicleManager::IsTrainModel ( pVehicle->GetModel () ) )
-            return false;
+        return false;
     }
+
+    if ( pVehicle == m_pTowedVehicle )
+        return true;
 
     // Do we already have a towed vehicle?
     if ( m_pTowedVehicle && pVehicle != m_pTowedVehicle )
