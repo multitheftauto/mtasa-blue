@@ -1,4 +1,4 @@
-/*****************************************************************************
+﻿/*****************************************************************************
 *
 *  PROJECT:     Multi Theft Auto v1.0
 *  LICENSE:     See LICENSE in the top level directory
@@ -30,7 +30,7 @@ SString GetLaunchPath ( void )
 {
     // Get current module full path
     char szBuffer[64000];
-    GetModuleFileName ( NULL, szBuffer, sizeof(szBuffer) - 1 );
+    GetModuleFileName ( NULL, szBuffer, NUMELMS(szBuffer) - 1 );
 
     // Strip the module name out of the path.
     PathRemoveFileSpec ( szBuffer );
@@ -58,7 +58,15 @@ int WINAPI WinMain ( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     SString strMTASAPath = PathJoin ( GetLaunchPath (), "mta" );
     SString strLoaderDllPathFilename = PathJoin ( strMTASAPath, strLoaderDllFilename );
 
-    if ( strMTASAPath.Contains( "?" ) )
+    bool bUnicodeCharacters = strMTASAPath.Contains( "?" );
+    for( uint i = 0 ; i < strMTASAPath.size() ; i++ )
+    {
+        char c = strMTASAPath[i];
+        if ( c < 0 )
+            bUnicodeCharacters = true;
+    }
+
+    if ( bUnicodeCharacters )
     {
         SString strMessage = "WARNING: Install path contains unicode characters\n\n";
         strMessage += "If MTA fails to load, please reinstall with basic Latin characters.\n\n";
