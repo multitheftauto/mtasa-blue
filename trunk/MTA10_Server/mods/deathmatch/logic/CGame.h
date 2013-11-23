@@ -91,6 +91,7 @@ class CObjectManager;
 class CPacket;
 class CPacketTranslator;
 class CLatentTransferManager;
+class CDebugHookManager;
 class CPedManager;
 class CPickupManager;
 class CPlayer;
@@ -235,6 +236,7 @@ public:
     inline CEvents*                 GetEvents                   ( void )        { return &m_Events; }
     inline CColManager*             GetColManager               ( void )        { return m_pColManager; }
     inline CLatentTransferManager*  GetLatentTransferManager    ( void )        { return m_pLatentTransferManager; }
+    inline CDebugHookManager*       GetDebugHookManager         ( void )        { return m_pDebugHookManager; }
     inline CPedManager*             GetPedManager               ( void )        { return m_pPedManager; }
     inline CResourceManager*        GetResourceManager          ( void )        { return m_pResourceManager; }
     inline CMarkerManager*          GetMarkerManager            ( void )        { return m_pMarkerManager; }
@@ -474,6 +476,7 @@ private:
     CRegistry*                      m_pRegistry;
     CAccountManager*                m_pAccountManager;
     CLatentTransferManager*         m_pLatentTransferManager;
+    CDebugHookManager*              m_pDebugHookManager;
     CPedManager*                    m_pPedManager;
     CResourceManager*               m_pResourceManager;
     CAccessControlListManager*      m_pACLManager;

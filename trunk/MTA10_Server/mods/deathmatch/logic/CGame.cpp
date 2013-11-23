@@ -298,6 +298,7 @@ CGame::~CGame ( void )
     SAFE_DELETE ( m_pRegisteredCommands );
     SAFE_DELETE ( m_pPedManager );
     SAFE_DELETE ( m_pLatentTransferManager );
+    SAFE_DELETE ( m_pDebugHookManager );
     SAFE_DELETE ( m_pHTTPD );
     SAFE_DELETE ( m_pACLManager );
     SAFE_DELETE ( m_pGroups );
@@ -572,6 +573,7 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     // Create and start the HTTP server
     m_pHTTPD = new CHTTPD;
     m_pLatentTransferManager = new CLatentTransferManager ();
+    m_pDebugHookManager = new CDebugHookManager ();
 
     // Enable it if required
     if ( m_pMainConfig->IsHTTPEnabled () )

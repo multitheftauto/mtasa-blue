@@ -99,6 +99,7 @@ CLuaMain::~CLuaMain ( void )
     g_pGame->GetRemoteCalls()->Remove ( this );
     g_pGame->GetLuaCallbackManager ()->OnLuaMainDestroy ( this );
     g_pGame->GetLatentTransferManager ()->OnLuaMainDestroy ( this );
+    g_pGame->GetDebugHookManager()->OnLuaMainDestroy ( this );
     g_pGame->GetScriptDebugging()->OnLuaMainDestroy ( this );
 
     // Unload the current script

@@ -156,12 +156,14 @@ int CLuaDefs::CanUseFunction ( lua_CFunction f, lua_State* luaVM )
         pResource->UpdateFunctionRightCache( f, bAllowed );
     }
 
+    g_pGame->GetDebugHookManager()->OnPreFunction( f, luaVM, bAllowed );
+
     // If not allowed, do no more
     if ( !bAllowed )
         return false;
 
     // Check if function timing is active
-    if ( g_pStats->bFunctionTimingActive )
+    if ( g_pStats->bFunctionTimingActive || g_pGame->GetDebugHookManager()->HasPostFunctionHooks() )
     {
         // Check if hook needs applying
         if ( !ms_bRegisterdPostCallHook )
@@ -212,7 +214,7 @@ void CLuaDefs::DidUseFunction ( lua_CFunction f, lua_State* luaVM )
     }
 
     // Check if we should remove the hook
-    if ( !g_pStats->bFunctionTimingActive )
+    if ( !g_pStats->bFunctionTimingActive && !g_pGame->GetDebugHookManager()->HasPostFunctionHooks() )
     {
         ms_TimingFunctionStack.clear ();
         OutputDebugLine ( "[Lua] Removing PostCallHook" );
@@ -220,4 +222,6 @@ void CLuaDefs::DidUseFunction ( lua_CFunction f, lua_State* luaVM )
         ms_bRegisterdPostCallHook = false;
         lua_registerPostCallHook ( NULL );
     }
+
+    g_pGame->GetDebugHookManager()->OnPostFunction( f, luaVM );
 }
