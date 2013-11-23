@@ -362,3 +362,10 @@ void CScriptDebugging::OnLuaMainDestroy ( CLuaMain* pLuaMain )
     dassert ( !ListContains ( m_LuaMainStack, pLuaMain ) );
     ListRemove ( m_LuaMainStack, pLuaMain );
 }
+
+CLuaMain* CScriptDebugging::GetTopLuaMain ( void )
+{
+    if ( !m_LuaMainStack.empty () )
+        return m_LuaMainStack.back();
+    return NULL;
+}
