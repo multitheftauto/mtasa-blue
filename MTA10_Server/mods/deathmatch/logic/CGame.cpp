@@ -3948,7 +3948,18 @@ void CGame::SendPacketBatchBegin ( unsigned char ucPacketId, NetBitStreamInterfa
 bool CGame::SendPacket ( unsigned char ucPacketID, const NetServerPlayerID& playerID, NetBitStreamInterface* pBitStream, bool bBroadcast, NetServerPacketPriority packetPriority, NetServerPacketReliability packetReliability, ePacketOrdering packetOrdering )
 {
     if ( !m_bLatentSendsEnabled )
+    {
+        if ( ucPacketID == PACKET_ID_LUA_ELEMENT_RPC )
+        {
+            // Get the RPC number in an ugly way
+            pBitStream->ResetReadPointer();
+            uchar ucRpcId = 0;
+            pBitStream->Read( ucRpcId );
+            pBitStream->ResetReadPointer();
+            CPerfStatRPCPacketUsage::GetSingleton ()->UpdatePacketUsageOut( ucRpcId, pBitStream->GetNumberOfBytesUsed() );
+        }
         return g_pNetServer->SendPacket ( ucPacketID, playerID, pBitStream, bBroadcast, packetPriority, packetReliability, packetOrdering );
+    }
     else
         GetLatentTransferManager ()->AddSend ( playerID, pBitStream->Version (), m_iLatentSendsBandwidth, m_pLatentSendsLuaMain, m_usLatentSendsResourceNetId );
     return true;
