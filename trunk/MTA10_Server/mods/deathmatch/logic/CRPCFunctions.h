@@ -58,6 +58,7 @@ protected:
 
     std::vector < SRPCHandler * >   m_RPCHandlers;
 
+public:
     enum eRPCFunctions
     {
         PLAYER_INGAME_NOTICE,
