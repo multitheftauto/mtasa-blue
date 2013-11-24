@@ -212,6 +212,8 @@ namespace
                                          { "bitExtract",                "1.3.2" },
                                          { "bitReplace",                "1.3.2" },
                                          { "getPlayerACInfo",           "1.3.3" },
+                                         { "addDebugHook",              "1.3.4-9.05939" },
+                                         { "removeDebugHook",           "1.3.4-9.05939" },
                                         };
 
 
