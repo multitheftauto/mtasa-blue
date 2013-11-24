@@ -27,6 +27,7 @@ UTILS = \
 	../../../Shared/mods/deathmatch/logic/CLatentReceiver.cpp \
 	../../../Shared/mods/deathmatch/logic/CLatentSendQueue.cpp \
 	../../../Shared/mods/deathmatch/logic/CLatentTransferManager.cpp \
+	../../../Shared/mods/deathmatch/logic/CDebugHookManager.cpp \
 	../../../Shared/mods/deathmatch/logic/CLuaShared.cpp \
 	../../../Shared/mods/deathmatch/logic/CZoneNames.cpp \
 	../../../Shared/mods/deathmatch/logic/Enums.cpp \
