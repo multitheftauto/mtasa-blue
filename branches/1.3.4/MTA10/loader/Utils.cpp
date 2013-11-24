@@ -1954,6 +1954,33 @@ SString PadLeft( const SString& strText, uint uiNumSpaces, char cCharacter )
 
 //////////////////////////////////////////////////////////
 //
+// IsDeviceSelectionDialogOpen
+//
+// Check if device dialog is currently open in multi-monitor situation
+//
+//////////////////////////////////////////////////////////
+BOOL CALLBACK MyEnumThreadWndProc( HWND hwnd, LPARAM lParam )
+{
+    WINDOWINFO windowInfo;
+    if ( GetWindowInfo( hwnd, &windowInfo ) )
+    {
+        if ( windowInfo.atomWindowType == (WORD)WC_DIALOG )
+        {
+            SetWindowPos ( hwnd, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW );
+            return false;
+        }
+    }
+    return true;
+}
+
+bool IsDeviceSelectionDialogOpen( DWORD dwThreadId )
+{
+    return !EnumThreadWindows( dwThreadId, MyEnumThreadWndProc, 0 );
+}
+
+
+//////////////////////////////////////////////////////////
+//
 // DllMain
 //
 // Used to save handle to loader dll, so we can get at the resources

@@ -167,6 +167,8 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getLatentEventHandles", CLuaFunctionDefinitions::GetLatentEventHandles );
     CLuaCFunctions::AddFunction ( "getLatentEventStatus", CLuaFunctionDefinitions::GetLatentEventStatus );
     CLuaCFunctions::AddFunction ( "cancelLatentEvent", CLuaFunctionDefinitions::CancelLatentEvent );
+    CLuaCFunctions::AddFunction ( "addDebugHook", CLuaFunctionDefinitions::AddDebugHook );
+    CLuaCFunctions::AddFunction ( "removeDebugHook", CLuaFunctionDefinitions::RemoveDebugHook );
 
     // Ped funcs
     CLuaCFunctions::AddFunction ( "createPed", CLuaFunctionDefinitions::CreatePed );

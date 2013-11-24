@@ -73,6 +73,8 @@ public:
     static int      GetLatentEventHandles               ( lua_State* luaVM );
     static int      GetLatentEventStatus                ( lua_State* luaVM );
     static int      CancelLatentEvent                   ( lua_State* luaVM );
+    static int      AddDebugHook                        ( lua_State* luaVM );
+    static int      RemoveDebugHook                     ( lua_State* luaVM );
 
     // Player get functions
     static int      GetPlayerCount                      ( lua_State* luaVM );

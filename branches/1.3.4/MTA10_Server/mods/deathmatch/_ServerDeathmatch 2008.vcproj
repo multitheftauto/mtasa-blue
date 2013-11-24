@@ -1565,6 +1565,10 @@
 				Name="shared"
 				>
 				<File
+					RelativePath="..\..\..\Shared\mods\deathmatch\logic\CDebugHookManager.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\Shared\mods\deathmatch\logic\CIdArray.cpp"
 					>
 				</File>
@@ -2693,6 +2697,10 @@
 			<Filter
 				Name="shared"
 				>
+				<File
+					RelativePath="..\..\..\Shared\mods\deathmatch\logic\CDebugHookManager.h"
+					>
+				</File>
 				<File
 					RelativePath="..\..\..\Shared\mods\deathmatch\logic\CIdArray.h"
 					>

@@ -48,6 +48,7 @@ public:
     void                            PushLuaMain                     ( CLuaMain* pLuaMain );
     void                            PopLuaMain                      ( CLuaMain* pLuaMain );
     void                            OnLuaMainDestroy                ( CLuaMain* pLuaMain );
+    CLuaMain*                       GetTopLuaMain                   ( void );
 
 private:
     void                            LogString                       ( const char* szPrePend, lua_State* luaVM, const char* szMessage, unsigned int uiMinimumDebugLevelunsigned, unsigned char ucRed = 255, unsigned char ucGreen = 255, unsigned char ucBlue = 255 );
