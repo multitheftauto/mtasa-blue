@@ -76,6 +76,10 @@ public:
                 GetDownloadManager()->QueueFile( m_Definition.strURL, NULL, 0, "", 0, false, this, StaticProgressCallback, false, 1 );
             }
         }
+        else
+        {
+            m_Stage = ANNOUNCE_STAGE_INITIAL;
+        }
 
         // Do push?
         if ( g_pGame->GetConfig()->GetAseInternetPushEnabled() && m_Definition.bAcceptsPush )
