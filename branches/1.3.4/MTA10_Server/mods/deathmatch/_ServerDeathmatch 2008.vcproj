@@ -705,6 +705,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\logic\CPerfStat.RPCPacketUsage.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\logic\CPerfStat.ServerInfo.cpp"
 					>
 				</File>

@@ -72,6 +72,8 @@ void CRPCFunctions::ProcessPacket ( const NetServerPlayerID& Socket, NetBitStrea
         unsigned char ucFunctionID = 255;
         bitStream.Read ( ucFunctionID );
 
+        CPerfStatRPCPacketUsage::GetSingleton ()->UpdatePacketUsageIn( ucFunctionID, bitStream.GetNumberOfBytesUsed() );
+
         SRPCHandler * pHandler;
         vector < SRPCHandler * > ::iterator iter = m_RPCHandlers.begin ();
         for ( ; iter != m_RPCHandlers.end () ; iter++ )
