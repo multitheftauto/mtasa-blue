@@ -348,14 +348,17 @@ int CLuaFunctionDefs::GetCTime ( lua_State* luaVM )
             argStream.SetCustomError ( "seconds cannot be negative" );
         }
     }
+
+    tm * time = localtime ( &timer );
+    if ( time == NULL )
+        argStream.SetCustomError ( "seconds is out of range" );
+
     if ( argStream.HasErrors () )
     {
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
         lua_pushboolean ( luaVM, false );
         return 1;
     }
-
-    tm * time = localtime ( &timer );
 
     CLuaArguments ret;
     ret.PushString("second");
