@@ -530,15 +530,15 @@ void CheckAntiVirusStatus( void )
 
         if ( bEnableScaremongering )
         {
+            const char* avProducts[] = { "antivirus", "anti-virus", "Avast", "AVG", "Avira", 
+                                         "NOD32", "ESET", "F-Secure", "Faronics", "Kaspersky",
+                                         "McAfee", "Norton", "Symantec", "Panda", "Trend Micro", };
+
             // Check for anti-virus helper dlls before actual scaremongering
             HMODULE aModules[1024];
             DWORD cbNeeded;
             if ( EnumProcessModules( GetCurrentProcess(), aModules, sizeof(aModules), &cbNeeded) )
             {
-                const char* avProducts[] = { "antivirus", "anti-virus", "Avast", "AVG", "Avira", 
-                                             "NOD32", "F-Secure", "Faronics", "Kaspersky",
-                                             "McAfee", "Norton", "Symantec", "Panda", "Trend Micro", };
-
                 DWORD cModules = cbNeeded / sizeof(HMODULE);
                 for ( uint i = 0 ; i < cModules ; i++ )
                 {
@@ -555,7 +555,7 @@ void CheckAntiVirusStatus( void )
                                  || libVersionInfo.strProductName.ContainsI( avProducts[i] ) )
                             {
                                 bEnableScaremongering = false;
-                                WriteDebugEvent( SString( "AV Maybe found %s [%d](%s,%s)", *WStringX( szModulePathFileName ).ToAnsi(), i, *libVersionInfo.strCompanyName, *libVersionInfo.strProductName ) );
+                                WriteDebugEvent( SString( "AV (module) maybe found %s [%d](%s,%s)", *WStringX( szModulePathFileName ).ToAnsi(), i, *libVersionInfo.strCompanyName, *libVersionInfo.strProductName ) );
                             }
                         }
                     }
@@ -563,6 +563,39 @@ void CheckAntiVirusStatus( void )
 
                 if ( bEnableScaremongering )
                     WriteDebugEvent( SString( "AV Searched %d dlls, but could not find av helper", cModules ) );
+            }
+
+            if ( bEnableScaremongering )
+            {
+                std::vector < DWORD > processIdList = MyEnumProcesses();
+                for ( uint i = 0; i < processIdList.size (); i++ )
+                {
+                    DWORD processId = processIdList[i];
+                    // Skip 64 bit processes to avoid errors
+                    if ( !Is32bitProcess ( processId ) )
+                        continue;
+
+                    std::vector < WString > filenameList = GetPossibleProcessPathFilenames ( processId );
+                    for ( uint i = 0; i < filenameList.size (); i++ )
+                    {
+                        const WString& strProcessPathFileName = filenameList[i];
+                        SLibVersionInfo libVersionInfo;
+                        if ( GetLibVersionInfo ( strProcessPathFileName, &libVersionInfo ) )
+                        {
+                            for( uint i = 0 ; i < NUMELMS( avProducts ) ; i++ )
+                            {
+                                if ( libVersionInfo.strCompanyName.ContainsI( avProducts[i] )
+                                     || libVersionInfo.strProductName.ContainsI( avProducts[i] ) )
+                                {
+                                    bEnableScaremongering = false;
+                                    WriteDebugEvent( SString( "AV (process) maybe found %s [%d](%s,%s)", *strProcessPathFileName.ToAnsi(), i, *libVersionInfo.strCompanyName, *libVersionInfo.strProductName ) );
+                                }
+                            }
+                        }
+                    }
+                }
+                if ( bEnableScaremongering )
+                    WriteDebugEvent( SString( "AV Searched %d processes, but could not find av helper", processIdList.size() ) );
             }
         }
 

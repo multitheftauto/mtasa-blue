@@ -40,14 +40,6 @@ void CElementDeleter::Delete ( class CElement* pElement, bool bUnlink, bool bUpd
             if ( bUnlink )
                 pElement->Unlink ();
         }
-        else
-        {
-            if ( pElement->GetType ( ) == CElement::PLAYER )
-            {
-                // Tell the console
-                CLogger::LogPrint ( "URGENT: Report this error on bugs.mtasa.com error code: 6930-1\n" );
-            }
-        }
     }
 }
 

@@ -18,7 +18,6 @@ bool TerminateProcessFromPathFilename ( const SString& strPathFilename )
 {
     DWORD dwProcessIDs[250];
     DWORD pBytesReturned = 0;
-    unsigned int uiListSize = 50;
     if ( EnumProcesses ( dwProcessIDs, 250 * sizeof(DWORD), &pBytesReturned ) )
     {
         DWORD id1 = GetCurrentProcessId();
