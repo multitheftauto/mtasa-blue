@@ -180,6 +180,10 @@ void CDebugHookManager::OnPreFunction( lua_CFunction f, lua_State* luaVM, bool b
     if ( !pFunction )
         return;
 
+    // Don't trace add/removeDebugHook
+    if ( pFunction->GetName().EndsWith( "DebugHook" ) )
+        return;
+
     // Get file/line number
     const char* szFilename = "";
     int iLineNumber = 0;
@@ -222,6 +226,10 @@ void CDebugHookManager::OnPostFunction( lua_CFunction f, lua_State* luaVM )
     CLuaCFunction* pFunction = CLuaCFunctions::GetFunction( f );
     dassert( pFunction );
     if ( !pFunction )
+        return;
+
+    // Don't trace add/removeDebugHook
+    if ( pFunction->GetName().EndsWith( "DebugHook" ) )
         return;
 
     // Get file/line number

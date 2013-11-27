@@ -83,6 +83,8 @@ bool            VerifyEmbeddedSignature             ( const WString& strFilename
 void            LogSettings                         ( void );
 SString         PadLeft                             ( const SString& strText, uint uiNumSpaces, char cCharacter );
 bool            IsDeviceSelectionDialogOpen         ( DWORD dwThreadId );
+std::vector < DWORD > MyEnumProcesses               ( void );
+std::vector < WString > GetPossibleProcessPathFilenames ( DWORD processID );
 
 //
 // Determine if game process has gone wonky
