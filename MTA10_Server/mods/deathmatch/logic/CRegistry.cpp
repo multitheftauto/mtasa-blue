@@ -68,30 +68,63 @@ void CRegistry::Load ( const std::string& strFileName )
 
 bool CRegistry::IntegrityCheck ( void )
 {
-    // Do check
-    CRegistryResult result;
-    bool bOk = Query( &result, "PRAGMA integrity_check" );
-
-    // Get result as a string
-    SString strResult;
-    if ( result.nRows && result.nColumns )
+    // Check database integrity
     {
-        CRegistryResultCell& cell = result.Data[0][0];
-        if ( cell.nType == SQLITE_TEXT )
-            strResult = std::string ( (const char *)cell.pVal, cell.nLength - 1 );
+        CRegistryResult result;
+        bool bOk = Query( &result, "PRAGMA integrity_check" );
+
+        // Get result as a string
+        SString strResult;
+        if ( result.nRows && result.nColumns )
+        {
+            CRegistryResultCell& cell = result.Data[0][0];
+            if ( cell.nType == SQLITE_TEXT )
+                strResult = std::string ( (const char *)cell.pVal, cell.nLength - 1 );
+        }
+
+        // Process result
+        if ( !bOk || !strResult.BeginsWithI ( "ok" ) )
+        {
+            CLogger::ErrorPrintf ( "%s", *strResult );
+            CLogger::ErrorPrintf ( "%s\n", GetLastError ().c_str() );
+            CLogger::ErrorPrintf ( "Errors were encountered loading '%s' database\n", *ExtractFilename ( PathConform ( m_strFileName ) ) );
+            CLogger::ErrorPrintf ( "Maybe now is the perfect time to panic.\n" );
+            CLogger::ErrorPrintf ( "See - http://wiki.multitheftauto.com/wiki/fixdb\n" );
+            CLogger::ErrorPrintf ( "************************\n" );
+            return false;
+        }
     }
 
-    // Process result
-    if ( !bOk || !strResult.BeginsWithI ( "ok" ) )
+    // Do compact if required
+    if ( g_pGame->GetConfig()->ShouldCompactInternalDatabases() )
     {
-        CLogger::ErrorPrintf ( "%s", *strResult );
-        CLogger::ErrorPrintf ( "%s\n", GetLastError ().c_str() );
-        CLogger::ErrorPrintf ( "Errors were encountered loading '%s' database\n", *ExtractFilename ( PathConform ( m_strFileName ) ) );
-        CLogger::ErrorPrintf ( "Maybe now is the perfect time to panic.\n" );
-        CLogger::ErrorPrintf ( "See - http://wiki.multitheftauto.com/wiki/fixdb\n" );
-        CLogger::ErrorPrintf ( "************************\n" );
-        return false;
+        CLogger::LogPrintf ( "Compacting database '%s' ...\n", *ExtractFilename ( PathConform ( m_strFileName ) ) );
+
+        CRegistryResult result;
+        bool bOk = Query( &result, "VACUUM" );
+
+        // Get result as a string
+        SString strResult;
+        if ( result.nRows && result.nColumns )
+        {
+            CRegistryResultCell& cell = result.Data[0][0];
+            if ( cell.nType == SQLITE_TEXT )
+                strResult = std::string ( (const char *)cell.pVal, cell.nLength - 1 );
+        }
+
+        // Process result
+        if ( !bOk )
+        {
+            CLogger::ErrorPrintf ( "%s", *strResult );
+            CLogger::ErrorPrintf ( "%s\n", GetLastError ().c_str() );
+            CLogger::ErrorPrintf ( "Errors were encountered compacting '%s' database\n", *ExtractFilename ( PathConform ( m_strFileName ) ) );
+            CLogger::ErrorPrintf ( "Maybe now is the perfect time to panic.\n" );
+            CLogger::ErrorPrintf ( "See - http://wiki.multitheftauto.com/wiki/fixdb\n" );
+            CLogger::ErrorPrintf ( "************************\n" );
+            // Allow server to continue
+        }
     }
+
     return true;
 }
 
@@ -451,7 +484,10 @@ bool CRegistry::Query ( CRegistryResult* pResult, const char* szQuery, va_list v
         }
     }
     va_end ( vl );
-    BeginAutomaticTransaction ();
+    // VACUUM query does not work with transactions
+    if ( strParsedQuery.BeginsWithI( "VACUUM" ) )
+        EndAutomaticTransaction ();
+    else
+        BeginAutomaticTransaction ();
     return QueryInternal ( strParsedQuery.c_str (), pResult );
 }
-

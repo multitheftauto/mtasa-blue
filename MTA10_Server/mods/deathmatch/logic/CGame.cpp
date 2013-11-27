@@ -3866,6 +3866,8 @@ void CGame::HandleBackup ( void )
             return;     // No backup required
     }
 
+    m_pMainConfig->NotifyDidBackup();
+
     // Make target file name
     tm* tmp = gmtime ( &secondsNow );
     char outstr[200] = { 0 };

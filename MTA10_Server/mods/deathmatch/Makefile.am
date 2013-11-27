@@ -17,7 +17,6 @@ INCLUDES += -I$(ZIPDIR)/
 INCLUDES += -I$(LUADIR)/src
 INCLUDES += -I$(LUABDIR)/src
 INCLUDES += $(SPARSEHASH_CFLAGS)
-INCLUDES += $(SQLITE3_CFLAGS)
 # pcre headers used by pme which is used by ehs
 INCLUDES += $(PCRE_CFLAGS)
 
@@ -36,6 +35,7 @@ UTILS = \
 	./utils/CFunctionUseLogger.cpp \
 	$(srcdir)/../../../vendor/bob_withers/base64.cpp \
 	$(srcdir)/../../../vendor/bochs/bochs_internal/crc32.cpp \
+	$(srcdir)/../../../vendor/sqlite/sqlite3.c \
 	$(ZIPDIR)/ioapi.c \
 	$(ZIPDIR)/mztools.c \
 	$(ZIPDIR)/unzip.c \
@@ -321,8 +321,7 @@ deathmatch_la_LIBADD = \
 	$(top_builddir)/vendor/ehs/libehs.la \
 	$(LUABDIR)/src/liblua.la \
 	$(top_builddir)/vendor/json-c/libjson.la \
-	$(SPARSEHASH_LIBS) \
-	$(SQLITE3_LIBS)
+	$(SPARSEHASH_LIBS)
 
 deathmatch_la_LDFLAGS = \
 	-module -avoid-version -lz
