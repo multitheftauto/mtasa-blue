@@ -235,7 +235,11 @@ uint64 CDatabaseConnectionSqlite::GetLastInsertId ( void )
 ///////////////////////////////////////////////////////////////
 bool CDatabaseConnectionSqlite::Query ( const SString& strQuery, CRegistryResult& registryResult )
 {
-    BeginAutomaticTransaction ();
+    // VACUUM query does not work with transactions
+    if ( strQuery.BeginsWithI( "VACUUM" ) )
+        EndAutomaticTransaction ();
+    else
+        BeginAutomaticTransaction ();
     return QueryInternal ( strQuery, registryResult );
 }
 

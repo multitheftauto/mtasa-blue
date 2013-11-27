@@ -107,6 +107,8 @@ public:
     const SString&                  GetBackupPath                   ( void )                    { return m_strBackupPath; }
     int                             GetBackupInterval               ( void )                    { return m_iBackupInterval; }
     int                             GetBackupAmount                 ( void )                    { return m_iBackupAmount; }
+    void                            NotifyDidBackup                 ( void );
+    bool                            ShouldCompactInternalDatabases  ( void );
     inline unsigned short           GetFPSLimit                     ( void )                    { return m_usFPSLimit; };
     bool                            SetFPSLimit                     ( unsigned short usFPS, bool bSave );
     int                             GetPendingWorkToDoSleepTime     ( void );
@@ -190,6 +192,8 @@ private:
     SString                         m_strDbLogFilename;
     int                             m_iBackupInterval;
     int                             m_iBackupAmount;
+    int                             m_iCompactInternalDatabases;
+    bool                            m_bDidBackup;
     bool                            m_bNetworkEncryptionEnabled;
     SString                         m_strBandwidthReductionMode;
     int                             m_iPendingWorkToDoSleepTime;

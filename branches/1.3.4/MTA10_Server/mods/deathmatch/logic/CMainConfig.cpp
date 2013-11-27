@@ -988,6 +988,18 @@ int CMainConfig::GetNoWorkToDoSleepTime ( void )
 }
 
 
+void CMainConfig::NotifyDidBackup( void )
+{
+    m_bDidBackup = true;
+}
+
+
+bool CMainConfig::ShouldCompactInternalDatabases( void )
+{
+    return ( m_iCompactInternalDatabases == 1 && m_bDidBackup ) || m_iCompactInternalDatabases == 2;
+}
+
+
 //////////////////////////////////////////////////////////////////////
 //
 // Fetch multiple values for a named setting from the server config
@@ -1401,6 +1413,7 @@ const std::vector < SIntSetting >& CMainConfig::GetIntSettingList ( void )
             { true, true,   1,      5,      100,    "update_cycle_datagrams_limit",         &m_iUpdateCycleDatagramsLimit,              &CMainConfig::ApplyNetOptions },
             { true, true,   50,     100,    400,    "ped_syncer_distance",                  &g_TickRateSettings.iPedSyncerDistance,     &CMainConfig::OnTickRateChange },
             { true, true,   50,     100,    400,    "unoccupied_vehicle_syncer_distance",   &g_TickRateSettings.iUnoccupiedVehicleSyncerDistance,   &CMainConfig::OnTickRateChange },
+            { false, false, 0,      1,      2,      "compact_internal_databases",           &m_iCompactInternalDatabases,               NULL },
         };
 
     static std::vector < SIntSetting > settingsList;
