@@ -368,8 +368,12 @@ void CPerfStatServerInfoImpl::GetStats ( CPerfStatResult* pResult, const std::ma
         m_OptionsList.push_back ( StringPair ( "Keysync mouse sync interval",   SString ( "%d", g_TickRateSettings.iKeySyncRotation ) ) );
     if ( defaultRates.iKeySyncAnalogMove != g_TickRateSettings.iKeySyncAnalogMove )
         m_OptionsList.push_back ( StringPair ( "Keysync analog sync interval",  SString ( "%d", g_TickRateSettings.iKeySyncAnalogMove ) ) );
-    if ( defaultRates.iKeySyncAnalogMove != g_TickRateSettings.iNearListUpdate )
+    if ( defaultRates.iNearListUpdate != g_TickRateSettings.iNearListUpdate )
         m_OptionsList.push_back ( StringPair ( "Update near interval",      SString ( "%d", g_TickRateSettings.iNearListUpdate ) ) );
+    if ( defaultRates.iPedSyncerDistance != g_TickRateSettings.iPedSyncerDistance )
+        m_OptionsList.push_back ( StringPair ( "Ped syncer distance",      SString ( "%d", g_TickRateSettings.iPedSyncerDistance ) ) );
+    if ( defaultRates.iUnoccupiedVehicleSyncerDistance != g_TickRateSettings.iUnoccupiedVehicleSyncerDistance )
+        m_OptionsList.push_back ( StringPair ( "Unoccupied vehicle syncer distance",      SString ( "%d", g_TickRateSettings.iUnoccupiedVehicleSyncerDistance ) ) );
 
     m_OptionsList.push_back ( StringPair ( "Logic thread CPU",  MakeCPUUsageString( m_MainThreadCPUTimes ) ) );
     m_OptionsList.push_back ( StringPair ( "Sync thread CPU",   MakeCPUUsageString( g_SyncThreadCPUTimes ) ) );

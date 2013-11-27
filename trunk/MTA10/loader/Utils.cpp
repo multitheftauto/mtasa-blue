@@ -279,22 +279,22 @@ void ApplyLoadingCrashPatch( HANDLE hProcess )
 // Code from the merky depths of MSDN
 //
 ///////////////////////////////////////////////////////////////////////////
-SString devicePathToWin32Path ( const SString& strDevicePath ) 
+WString devicePathToWin32Path ( const WString& strDevicePath ) 
 {
-    TCHAR pszFilename[MAX_PATH+2];
-    strncpy ( pszFilename, strDevicePath, MAX_PATH );
+    WCHAR pszFilename[MAX_PATH+2];
+    wcsncpy ( pszFilename, strDevicePath, MAX_PATH );
     pszFilename[MAX_PATH] = 0;
 
     // Translate path with device name to drive letters.
-    TCHAR szTemp[1024];
+    WCHAR szTemp[1024];
     szTemp[0] = '\0';
 
-    if (GetLogicalDriveStrings(NUMELMS(szTemp)-1, szTemp)) 
+    if (GetLogicalDriveStringsW(NUMELMS(szTemp)-1, szTemp)) 
     {
-        TCHAR szName[MAX_PATH];
-        TCHAR szDrive[3] = TEXT(" :");
+        WCHAR szName[MAX_PATH];
+        WCHAR szDrive[3] = L" :";
         BOOL bFound = FALSE;
-        TCHAR* p = szTemp;
+        WCHAR* p = szTemp;
 
         do 
         {
@@ -302,25 +302,25 @@ SString devicePathToWin32Path ( const SString& strDevicePath )
             *szDrive = *p;
 
             // Look up each device name
-            if (QueryDosDevice(szDrive, szName, MAX_PATH))
+            if (QueryDosDeviceW(szDrive, szName, MAX_PATH))
             {
-                UINT uNameLen = _tcslen(szName);
+                UINT uNameLen = wcslen(szName);
 
                 if (uNameLen < MAX_PATH) 
                 {
-                    bFound = _tcsnicmp(pszFilename, szName, uNameLen) == 0;
+                    bFound = wcsnicmp(pszFilename, szName, uNameLen) == 0;
 
                     if (bFound && *(pszFilename + uNameLen) == _T('\\')) 
                     {
                         // Reconstruct pszFilename using szTempFile
                         // Replace device path with DOS path
-                        TCHAR szTempFile[MAX_PATH];
-                        StringCchPrintf(szTempFile,
+                        WCHAR szTempFile[MAX_PATH];
+                        StringCchPrintfW(szTempFile,
                         MAX_PATH,
-                        TEXT("%s%s"),
+                        L"%s%s",
                         szDrive,
                         pszFilename+uNameLen);
-                        StringCchCopyN(pszFilename, MAX_PATH+1, szTempFile, _tcslen(szTempFile));
+                        StringCchCopyNW(pszFilename, MAX_PATH+1, szTempFile, wcslen(szTempFile));
                     }
                 }
             }
@@ -333,7 +333,7 @@ SString devicePathToWin32Path ( const SString& strDevicePath )
 }
 
 
-typedef WINBASEAPI BOOL (WINAPI *LPFN_QueryFullProcessImageNameA)(__in HANDLE hProcess, __in DWORD dwFlags, __out_ecount_part(*lpdwSize, *lpdwSize) LPSTR lpExeName, __inout PDWORD lpdwSize);
+typedef WINBASEAPI BOOL (WINAPI *LPFN_QueryFullProcessImageNameW)(__in HANDLE hProcess, __in DWORD dwFlags, __out_ecount_part(*lpdwSize, *lpdwSize) LPWSTR lpExeName, __inout PDWORD lpdwSize);
 
 ///////////////////////////////////////////////////////////////////////////
 //
@@ -342,22 +342,22 @@ typedef WINBASEAPI BOOL (WINAPI *LPFN_QueryFullProcessImageNameA)(__in HANDLE hP
 // Get all image names for a processID
 //
 ///////////////////////////////////////////////////////////////////////////
-std::vector < SString > GetPossibleProcessPathFilenames ( DWORD processID )
+std::vector < WString > GetPossibleProcessPathFilenames ( DWORD processID )
 {
-    static LPFN_QueryFullProcessImageNameA fnQueryFullProcessImageNameA = NULL;
+    static LPFN_QueryFullProcessImageNameW fnQueryFullProcessImageNameW = NULL;
     static bool bDoneGetProcAddress = false;
 
-    std::vector < SString > result;
+    std::vector < WString > result;
 
     if ( !bDoneGetProcAddress )
     {
         // Find 'QueryFullProcessImageNameA'
         bDoneGetProcAddress = true;
         HMODULE hModule = GetModuleHandle ( "Kernel32.dll" );
-        fnQueryFullProcessImageNameA = static_cast < LPFN_QueryFullProcessImageNameA > ( static_cast < PVOID > ( GetProcAddress( hModule, "QueryFullProcessImageNameA" ) ) );
+        fnQueryFullProcessImageNameW = static_cast < LPFN_QueryFullProcessImageNameW > ( static_cast < PVOID > ( GetProcAddress( hModule, "QueryFullProcessImageNameW" ) ) );
     }
 
-    if ( fnQueryFullProcessImageNameA )
+    if ( fnQueryFullProcessImageNameW )
     {
         for ( int i = 0 ; i < 2 ; i++ )
         {
@@ -365,13 +365,13 @@ std::vector < SString > GetPossibleProcessPathFilenames ( DWORD processID )
 
             if ( hProcess )
             {
-                TCHAR szProcessName[MAX_PATH] = TEXT("");
+                WCHAR szProcessName[MAX_PATH] = L"";
                 DWORD dwSize = NUMELMS(szProcessName);
-                DWORD bOk = fnQueryFullProcessImageNameA ( hProcess, 0, szProcessName, &dwSize );
+                DWORD bOk = fnQueryFullProcessImageNameW ( hProcess, 0, szProcessName, &dwSize );
                 CloseHandle( hProcess );
 
-                if ( bOk && strlen ( szProcessName ) > 0 )
-                    ListAddUnique ( result, SString ( SStringX ( szProcessName ) ) );
+                if ( bOk && wcslen ( szProcessName ) > 0 )
+                    ListAddUnique ( result, WString ( WStringX ( szProcessName ) ) );
             }
         }
     }
@@ -381,12 +381,12 @@ std::vector < SString > GetPossibleProcessPathFilenames ( DWORD processID )
 
         if ( hProcess )
         {
-            TCHAR szProcessName[MAX_PATH] = TEXT("");
-            DWORD bOk = GetModuleFileNameEx ( hProcess, NULL, szProcessName, NUMELMS(szProcessName) );
+            WCHAR szProcessName[MAX_PATH] = L"";
+            DWORD bOk = GetModuleFileNameExW ( hProcess, NULL, szProcessName, NUMELMS(szProcessName) );
             CloseHandle ( hProcess );
 
-            if ( bOk && strlen ( szProcessName ) > 0 )
-                ListAddUnique ( result, SString ( SStringX ( szProcessName ) ) );
+            if ( bOk && wcslen ( szProcessName ) > 0 )
+                ListAddUnique ( result, WString ( WStringX ( szProcessName ) ) );
         }
     }
 
@@ -396,12 +396,12 @@ std::vector < SString > GetPossibleProcessPathFilenames ( DWORD processID )
 
         if ( hProcess )
         {
-            TCHAR szProcessName[MAX_PATH] = TEXT("");
-            DWORD bOk = GetProcessImageFileName ( hProcess, szProcessName, NUMELMS(szProcessName) );
+            WCHAR szProcessName[MAX_PATH] = L"";
+            DWORD bOk = GetProcessImageFileNameW ( hProcess, szProcessName, NUMELMS(szProcessName) );
             CloseHandle( hProcess );
 
-            if ( bOk && strlen ( szProcessName ) > 0 )
-                ListAddUnique ( result, SString ( SStringX ( devicePathToWin32Path ( szProcessName ) ) ) );
+            if ( bOk && wcslen ( szProcessName ) > 0 )
+                ListAddUnique ( result, WString ( WStringX ( devicePathToWin32Path ( szProcessName ) ) ) );
         }
     }
 
@@ -495,7 +495,7 @@ std::vector < DWORD > GetGTAProcessList ( void )
         if ( !Is32bitProcess ( processId ) )
             continue;
 
-        std::vector < SString > filenameList = GetPossibleProcessPathFilenames ( processId );
+        std::vector < WString > filenameList = GetPossibleProcessPathFilenames ( processId );
         for ( uint i = 0; i < filenameList.size (); i++ )
             if ( filenameList[i].EndsWith ( MTA_GTAEXE_NAME ) || filenameList[i].EndsWith ( MTA_HTAEXE_NAME ) )
                 ListAddUnique ( result, processId );
@@ -575,7 +575,7 @@ std::vector < DWORD > GetOtherMTAProcessList ( void )
         if ( !Is32bitProcess ( processId ) )
             continue;
 
-        std::vector < SString > filenameList = GetPossibleProcessPathFilenames ( processId );
+        std::vector < WString > filenameList = GetPossibleProcessPathFilenames ( processId );
         for ( uint i = 0; i < filenameList.size (); i++ )
             if ( filenameList[i].EndsWith ( MTA_EXE_NAME ) )
                 ListAddUnique ( result, processId );
@@ -745,12 +745,12 @@ bool LookForGtaProcess ( SString& strOutPathFilename )
     std::vector < DWORD > processIdList = GetGTAProcessList ();
     for ( uint i = 0 ; i < processIdList.size () ; i++ )
     {
-        std::vector < SString > filenameList = GetPossibleProcessPathFilenames ( processIdList[i] );
+        std::vector < WString > filenameList = GetPossibleProcessPathFilenames ( processIdList[i] );
         for ( uint i = 0 ; i < filenameList.size () ; i++ )
         {
-            if ( FileExists ( filenameList[i] ) )
+            if ( FileExists ( filenameList[i].ToAnsi() ) )
             {
-                strOutPathFilename = filenameList[i];
+                strOutPathFilename = filenameList[i].ToAnsi();
                 return true;
             }
         }
