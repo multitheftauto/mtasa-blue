@@ -10343,18 +10343,30 @@ int CLuaFunctionDefinitions::GetTickCount_ ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::GetCTime ( lua_State* luaVM )
 {
+    // table getRealTime( [int seconds = current] )
     time_t timer;
     time ( &timer );
-    if ( lua_type ( luaVM, 1 ) == LUA_TNUMBER || lua_type ( luaVM, 1 ) == LUA_TSTRING )
+    CScriptArgReader argStream ( luaVM );
+
+    if ( argStream.NextCouldBeNumber ( ) )
     {
-        timer = ( time_t ) lua_tonumber ( luaVM, 1 );
+        argStream.ReadNumber ( timer );
         if ( timer < 0 )
         {
-            lua_pushboolean ( luaVM, 0 );
-            return 1;
+            argStream.SetCustomError ( "seconds cannot be negative" );
         }
     }
+
     tm * time = localtime ( &timer );
+    if ( time == NULL )
+        argStream.SetCustomError ( "seconds is out of range" );
+
+    if ( argStream.HasErrors () )
+    {
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+        lua_pushboolean ( luaVM, false );
+        return 1;
+    }
 
     CLuaArguments ret;
     ret.PushString("second");
