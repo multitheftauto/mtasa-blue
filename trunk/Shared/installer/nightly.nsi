@@ -692,7 +692,6 @@ SectionGroup /e "$(INST_SEC_SERVER)" SECGSERVER
 		File "${SERVER_FILES_ROOT}\mods\deathmatch\deathmatch.dll"
 		File "${SERVER_FILES_ROOT}\mods\deathmatch\lua5.1.dll"
 		File "${SERVER_FILES_ROOT}\mods\deathmatch\pcre3.dll"
-		File "${SERVER_FILES_ROOT}\mods\deathmatch\sqlite3.dll"
 		File "${SERVER_FILES_ROOT}\mods\deathmatch\dbconmy.dll"
 		!ifndef LIGHTBUILD
             File "${SERVER_FILES_ROOT}\mods\deathmatch\libmysql.dll"

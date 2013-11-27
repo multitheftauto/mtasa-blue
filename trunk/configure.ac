@@ -113,7 +113,7 @@ CPPFLAGS="$save_CPPFLAGS"
 
 # sqlite3 (for mods/deathmatch)
 # bundled version seems to be for windows
-PKG_CHECK_MODULES([SQLITE3], [sqlite3])
+#PKG_CHECK_MODULES([SQLITE3], [sqlite3]) ** Compiling sqlite3.c now
 
 # curses (for MTA10_Server/{core,sdk})
 AC_ARG_VAR([CURSES_LIB], [linker flags for curses])

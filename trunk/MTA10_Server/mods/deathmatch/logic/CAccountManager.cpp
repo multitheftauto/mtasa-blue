@@ -546,46 +546,80 @@ bool CAccountManager::SaveSettings ()
 
 bool CAccountManager::IntegrityCheck ()
 {
-    CRegistryResult result;
-    //Select all our required information from the accounts database
-    bool bOk = m_pDatabaseManager->QueryWithResultf ( m_hDbConnection, &result, "PRAGMA integrity_check" );
-
-    // Get result as a string
-    SString strResult;
-    if ( result.nRows && result.nColumns )
+    // Check database integrity
     {
-        CRegistryResultCell& cell = result.Data[0][0];
-        if ( cell.nType == SQLITE_TEXT )
-            strResult = std::string ( (const char *)cell.pVal, cell.nLength - 1 );
-    }
+        CRegistryResult result;
+        bool bOk = m_pDatabaseManager->QueryWithResultf ( m_hDbConnection, &result, "PRAGMA integrity_check" );
 
-    // Process result
-    if ( !bOk || !strResult.BeginsWithI ( "ok" ) )
-    {
-        CLogger::ErrorPrintf ( "%s", *strResult );
-        CLogger::ErrorPrintf ( "%s\n", *m_pDatabaseManager->GetLastErrorMessage () );
-        CLogger::ErrorPrintf ( "Errors were encountered loading '%s' database\n", *ExtractFilename ( PathConform ( "internal.db" ) ) );
-        CLogger::ErrorPrintf ( "Maybe now is the perfect time to panic.\n" );
-        CLogger::ErrorPrintf ( "See - http://wiki.multitheftauto.com/wiki/fixdb\n" );
-        CLogger::ErrorPrintf ( "************************\n" );
-        return true;    // Allow server to continue
+        // Get result as a string
+        SString strResult;
+        if ( result.nRows && result.nColumns )
+        {
+            CRegistryResultCell& cell = result.Data[0][0];
+            if ( cell.nType == SQLITE_TEXT )
+                strResult = std::string ( (const char *)cell.pVal, cell.nLength - 1 );
+        }
+
+        // Process result
+        if ( !bOk || !strResult.BeginsWithI ( "ok" ) )
+        {
+            CLogger::ErrorPrintf ( "%s", *strResult );
+            CLogger::ErrorPrintf ( "%s\n", *m_pDatabaseManager->GetLastErrorMessage () );
+            CLogger::ErrorPrintf ( "Errors were encountered loading '%s' database\n", *ExtractFilename ( PathConform ( "internal.db" ) ) );
+            CLogger::ErrorPrintf ( "Maybe now is the perfect time to panic.\n" );
+            CLogger::ErrorPrintf ( "See - http://wiki.multitheftauto.com/wiki/fixdb\n" );
+            CLogger::ErrorPrintf ( "************************\n" );
+            // Allow server to continue
+        }
     }
 
     // Check can update file
-    m_pDatabaseManager->Execf ( m_hDbConnection, "DROP TABLE IF EXISTS write_test" );
-    m_pDatabaseManager->Execf ( m_hDbConnection, "CREATE TABLE IF NOT EXISTS write_test (id INTEGER PRIMARY KEY, value INTEGER)" );
-    m_pDatabaseManager->Execf ( m_hDbConnection, "INSERT OR IGNORE INTO write_test (id, value) VALUES(1,2)" ) ;
-    bOk = m_pDatabaseManager->QueryWithResultf ( m_hDbConnection, NULL, "UPDATE write_test SET value=3 WHERE id=1" );
-    if ( !bOk )
     {
-        CLogger::ErrorPrintf ( "%s\n", *m_pDatabaseManager->GetLastErrorMessage () );
-        CLogger::ErrorPrintf ( "Errors were encountered updating '%s' database\n", *ExtractFilename ( PathConform ( "internal.db" ) ) );
-        CLogger::ErrorPrintf ( "Database might be locked by another process, or damaged.\n" );
-        CLogger::ErrorPrintf ( "See - http://wiki.multitheftauto.com/wiki/fixdb\n" );
-        CLogger::ErrorPrintf ( "************************\n" );
-        return false;
+        m_pDatabaseManager->Execf ( m_hDbConnection, "DROP TABLE IF EXISTS write_test" );
+        m_pDatabaseManager->Execf ( m_hDbConnection, "CREATE TABLE IF NOT EXISTS write_test (id INTEGER PRIMARY KEY, value INTEGER)" );
+        m_pDatabaseManager->Execf ( m_hDbConnection, "INSERT OR IGNORE INTO write_test (id, value) VALUES(1,2)" ) ;
+        bool bOk = m_pDatabaseManager->QueryWithResultf ( m_hDbConnection, NULL, "UPDATE write_test SET value=3 WHERE id=1" );
+        if ( !bOk )
+        {
+            CLogger::ErrorPrintf ( "%s\n", *m_pDatabaseManager->GetLastErrorMessage () );
+            CLogger::ErrorPrintf ( "Errors were encountered updating '%s' database\n", *ExtractFilename ( PathConform ( "internal.db" ) ) );
+            CLogger::ErrorPrintf ( "Database might be locked by another process, or damaged.\n" );
+            CLogger::ErrorPrintf ( "See - http://wiki.multitheftauto.com/wiki/fixdb\n" );
+            CLogger::ErrorPrintf ( "************************\n" );
+            return false;
+        }
+        m_pDatabaseManager->Execf ( m_hDbConnection, "DROP TABLE write_test" );
     }
-    m_pDatabaseManager->Execf ( m_hDbConnection, "DROP TABLE write_test" );
+
+    // Do compact if required
+    if ( g_pGame->GetConfig()->ShouldCompactInternalDatabases() )
+    {
+        CLogger::LogPrintf ( "Compacting accounts database '%s' ...\n", *ExtractFilename ( PathConform ( "internal.db" ) ) );
+
+        CRegistryResult result;
+        bool bOk = m_pDatabaseManager->QueryWithResultf ( m_hDbConnection, &result, "VACUUM" );
+
+        // Get result as a string
+        SString strResult;
+        if ( result.nRows && result.nColumns )
+        {
+            CRegistryResultCell& cell = result.Data[0][0];
+            if ( cell.nType == SQLITE_TEXT )
+                strResult = std::string ( (const char *)cell.pVal, cell.nLength - 1 );
+        }
+
+        // Process result
+        if ( !bOk )
+        {
+            CLogger::ErrorPrintf ( "%s", *strResult );
+            CLogger::ErrorPrintf ( "%s\n", *m_pDatabaseManager->GetLastErrorMessage () );
+            CLogger::ErrorPrintf ( "Errors were encountered compacting '%s' database\n", *ExtractFilename ( PathConform ( "internal.db" ) ) );
+            CLogger::ErrorPrintf ( "Maybe now is the perfect time to panic.\n" );
+            CLogger::ErrorPrintf ( "See - http://wiki.multitheftauto.com/wiki/fixdb\n" );
+            CLogger::ErrorPrintf ( "************************\n" );
+            // Allow server to continue
+        }
+    }
     return true;
 }
 
