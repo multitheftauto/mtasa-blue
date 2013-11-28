@@ -432,10 +432,11 @@ void SharedUtil::GetWMIAntiVirusStatus( std::vector < SString >& outEnabledList,
         {
             const SString& displayName = result[i][0];
             uint uiProductState = atoi( result[i][1] );
+            SString strComboName( "%s[%05x]", *displayName, uiProductState );
             if ( uiProductState & 0x1000 )
-                outEnabledList.push_back( displayName );
+                outEnabledList.push_back( strComboName );
             else
-                outDisabledList.push_back( displayName );
+                outDisabledList.push_back( strComboName );
         }
     }
     else
@@ -447,10 +448,11 @@ void SharedUtil::GetWMIAntiVirusStatus( std::vector < SString >& outEnabledList,
         {
             const SString& displayName = result[i][0];
             const SString& onAccessScanningEnabled = result[i][1];
-            if ( onAccessScanningEnabled.CompareI( "True" ) )
-                outEnabledList.push_back( displayName );
+            SString strComboName( "%s[%s]", *displayName, *onAccessScanningEnabled );
+            if ( onAccessScanningEnabled != "0" )
+                outEnabledList.push_back( strComboName );
             else
-                outDisabledList.push_back( displayName );
+                outDisabledList.push_back( strComboName );
         }
     }
 }
