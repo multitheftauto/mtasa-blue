@@ -3589,7 +3589,9 @@ void CClientPed::_ChangeModel ( void )
                 m_pPlayerPed->RebuildPlayer ();
 
                 // ...and decrement the extra ref
+            #ifdef NO_CRASH_FIX_TEST2
                 m_pPlayerPed->RemoveGeometryRef ();
+            #endif
             }
             else
             {
