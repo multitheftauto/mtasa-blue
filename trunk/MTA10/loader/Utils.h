@@ -75,6 +75,8 @@ void            MaybeShowCopySettingsDialog         ( void );
 
 bool            CheckAndShowFileOpenFailureMessage  ( void );
 void            CheckAndShowMissingFileMessage      ( void );
+void            CheckAndShowModelProblems           ( void );
+void            CheckAndShowUpgradeProblems         ( void );
 
 void            BsodDetectionPreLaunch              ( void );
 void            BsodDetectionOnGameBegin            ( void );
