@@ -3008,7 +3008,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                             bitStream.Read ( PlayerID );
                             if ( PlayerID != INVALID_ELEMENT_ID )
                             {
-                                CClientPlayer * pOwner = static_cast < CClientPlayer * > ( CElementIDs::GetElement ( PlayerID ) );
+                                CClientPlayer * pOwner = DynamicCast < CClientPlayer > ( CElementIDs::GetElement ( PlayerID ) );
                                 pWeapon->SetOwner ( pOwner );
                             }
                             else

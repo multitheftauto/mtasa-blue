@@ -250,6 +250,20 @@ bool CheckWrappedUserDataType ( CElement*& pElement, SString& strErrorExpectedTy
     return false;
 }
 
+
+//
+// Get element from ID and ensure type is what is expected
+//
+template < class T >
+T* GetElementFromId( ElementID elementId )
+{
+    CElement* pElement = CElementIDs::GetElement ( elementId );
+    if ( !pElement || pElement->IsBeingDeleted () || ( pElement->GetType () != GetClassType ( (T*)0 ) && GetClassType ( (T*)0 ) != -1 ) )
+        return NULL;
+    return (T*)pElement;
+}
+
+
 class CScriptArgReader;
 SString GetUserDataClassName ( void* ptr, lua_State* luaVM );
 void MixedReadResourceString ( CScriptArgReader& argStream, SString& strOutResourceName );

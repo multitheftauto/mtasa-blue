@@ -325,14 +325,7 @@ void CUnoccupiedVehicleSync::Packet_UnoccupiedVehicleSync ( CUnoccupiedVehicleSy
 
                         if ( vehicle.data.bSyncTrailer )
                         {
-                            CVehicle* pTrailer = NULL;
-                            ElementID TrailerID = vehicle.data.trailer;
-                            if ( TrailerID != INVALID_ELEMENT_ID )
-                            {
-                                CElement* pElement = CElementIDs::GetElement ( TrailerID );
-                                if ( pElement )
-                                    pTrailer = static_cast < CVehicle* > ( pElement );
-                            }
+                            CVehicle* pTrailer = GetElementFromId < CVehicle >( vehicle.data.trailer );
                             // Trailer attach/detach
                             if ( pTrailer )
                             {

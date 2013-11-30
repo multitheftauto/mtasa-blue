@@ -1674,7 +1674,7 @@ void CClientGame::UpdateVehicleInOut ( void )
 
                             // Did we start jacking them?
                             bool bAlreadyStartedJacking = false;
-                            CClientVehicle* pVehicle = static_cast < CClientVehicle* > ( CElementIDs::GetElement ( m_VehicleInOutID ) );
+                            CClientVehicle* pVehicle = DynamicCast < CClientVehicle > ( CElementIDs::GetElement ( m_VehicleInOutID ) );
                             if ( pVehicle )
                             {
                                 CClientPed* pJackedPlayer = pVehicle->GetOccupant ();
@@ -1702,7 +1702,7 @@ void CClientGame::UpdateVehicleInOut ( void )
                         {
                             ucAction = static_cast < unsigned char > ( VEHICLE_NOTIFY_IN_ABORT );
                             pBitStream->WriteBits ( &ucAction, 4 );
-                            CClientVehicle* pVehicle = static_cast < CClientVehicle* > ( CElementIDs::GetElement ( m_VehicleInOutID ) );
+                            CClientVehicle* pVehicle = DynamicCast < CClientVehicle > ( CElementIDs::GetElement ( m_VehicleInOutID ) );
                             if ( pVehicle )
                             {
                                 unsigned char ucDoor = m_pLocalPlayer->m_ucEnteringDoor - 2;
@@ -3360,7 +3360,7 @@ void CClientGame::UpdateMimics ( void )
                         pTrailer->GetTurnSpeed ( vecTurnSpeed );
                         fHealth = pTrailer->GetHealth ();
 
-                        pMimicTrailer = static_cast < CClientVehicle* > ( CElementIDs::GetElement ( static_cast < ElementID > ( 450 + uiMimicIndex + uiTrailerLoop ) ) );
+                        pMimicTrailer = DynamicCast < CClientVehicle > ( CElementIDs::GetElement ( static_cast < ElementID > ( 450 + uiMimicIndex + uiTrailerLoop ) ) );
 
                         if ( pMimicTrailer && pMimicTrailer->GetModel () != uiModel )
                         {
