@@ -700,6 +700,9 @@ void CheckDataFiles( void )
 //////////////////////////////////////////////////////////
 int LaunchGame ( SString strCmdLine )
 {
+    CheckAndShowModelProblems();
+    CheckAndShowUpgradeProblems();
+
     const SString strGTAPath = GetGTAPath ();
     const SString strMTASAPath = GetMTASAPath ();
     SString strMtaDir = PathJoin( strMTASAPath, "mta" );
