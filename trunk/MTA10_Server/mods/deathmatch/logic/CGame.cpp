@@ -1830,8 +1830,7 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
 
 void CGame::Packet_PedWasted ( CPedWastedPacket& Packet )
 {
-    CElement * pElement = ( Packet.m_PedID != INVALID_ELEMENT_ID ) ? CElementIDs::GetElement ( Packet.m_PedID ) : NULL;
-    CPed* pPed = static_cast < CPed* > ( pElement );
+    CPed* pPed = GetElementFromId < CPed > ( Packet.m_PedID );
     if ( pPed && !pPed->IsDead() )
     {
         pPed->SetIsDead ( true );
@@ -3495,10 +3494,8 @@ void CGame::Packet_CameraSync ( CCameraSyncPacket & Packet )
         }
         else
         {
-            CElement * pTarget = CElementIDs::GetElement ( Packet.m_TargetID );
-
-            // Pre r4481 client could send incorrect element
-            if ( dynamic_cast < CPlayer* > ( pTarget ) == NULL )
+            CPlayer* pTarget = GetElementFromId < CPlayer > ( Packet.m_TargetID );
+            if ( !pTarget )
                 pTarget = pPlayer;
 
             pCamera->SetMode ( CAMERAMODE_PLAYER );

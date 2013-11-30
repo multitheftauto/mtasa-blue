@@ -2346,7 +2346,7 @@ void CNetAPI::ReadWeaponBulletsync ( CClientPlayer* pPlayer, NetBitStreamInterfa
     // Read the bulletsync data
     ElementID elementID;
     BitStream.Read ( elementID );
-    CClientWeapon * pWeapon = static_cast < CClientWeapon * > ( CElementIDs::GetElement ( elementID ) );
+    CClientWeapon * pWeapon = DynamicCast < CClientWeapon > ( CElementIDs::GetElement ( elementID ) );
 
     CVector vecStart, vecEnd;
     BitStream.Read ( (char*)&vecStart, sizeof ( CVector ) );

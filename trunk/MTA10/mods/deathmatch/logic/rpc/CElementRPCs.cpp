@@ -676,7 +676,7 @@ void CElementRPCs::SetWeaponOwner ( CClientEntity * pSource, NetBitStreamInterfa
             CClientPlayer * pPlayer = NULL;
             if ( PlayerID != INVALID_ELEMENT_ID )
             {
-                pPlayer = static_cast < CClientPlayer * > ( CElementIDs::GetElement ( PlayerID ) );
+                pPlayer = DynamicCast < CClientPlayer > ( CElementIDs::GetElement ( PlayerID ) );
             }
             else
                 pPlayer = NULL;
