@@ -1758,6 +1758,64 @@ void CheckAndShowMissingFileMessage ( void )
 
 //////////////////////////////////////////////////////////
 //
+// CheckAndShowModelProblems
+//
+// Check for flagged model problems
+//
+//////////////////////////////////////////////////////////
+void CheckAndShowModelProblems ( void )
+{
+    SString strReason;
+    int iModelId = 0;
+    CArgMap argMap;
+    argMap.SetFromString( GetApplicationSetting ( "diagnostics", "gta-model-fail" ) );
+    argMap.Get( "reason", strReason );
+    argMap.Get( "id", iModelId );
+    SetApplicationSetting( "diagnostics", "gta-model-fail", "" );
+
+    if ( iModelId )
+    {
+        SString strMsg;
+        strMsg += _("GTA:SA had trouble loading a model.");
+        strMsg += SString( " (%d)", iModelId );
+        strMsg += "\n\n";
+        strMsg += _("Try reinstalling GTA:SA to fix it");
+        BrowseToSolution( SString( "gta-model-fail&id=%d&reason=%s", iModelId, *strReason ), ASK_GO_ONLINE | TERMINATE_IF_YES, strMsg );
+    }
+}
+
+
+//////////////////////////////////////////////////////////
+//
+// CheckAndShowUpgradeProblems
+//
+// Check for flagged upgrade problems
+//
+//////////////////////////////////////////////////////////
+void CheckAndShowUpgradeProblems ( void )
+{
+    int iModelId = 0, iUpgradeId, iFrame;
+    CArgMap argMap;
+    argMap.SetFromString( GetApplicationSetting ( "diagnostics", "gta-upgrade-fail" ) );
+    argMap.Get( "vehid", iModelId );
+    argMap.Get( "upgid", iUpgradeId );
+    argMap.Get( "frame", iFrame );
+    SetApplicationSetting( "diagnostics", "gta-upgrade-fail", "" );
+
+    if ( iModelId )
+    {
+        SString strMsg;
+        strMsg += _("GTA:SA had trouble adding an upgrade to a vehicle.");
+        strMsg += SString( " (%d)", iModelId );
+        strMsg += "\n\n";
+        strMsg += _("Try reinstalling GTA:SA to fix it");
+        BrowseToSolution( SString( "gta-upgrade-fail&id=%d&upgid=%d&frame=%d", iModelId, iUpgradeId, iFrame ), ASK_GO_ONLINE | TERMINATE_IF_YES, strMsg );
+    }
+}
+
+
+//////////////////////////////////////////////////////////
+//
 // LoadFunction
 //
 // Load a library function

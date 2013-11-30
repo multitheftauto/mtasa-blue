@@ -74,9 +74,9 @@ bool GetDebugIdEnabled ( uint uiDebugId )
     return g_pCore->GetDebugIdEnabled ( uiDebugId );  
 }
 
-void LogEvent ( uint uiDebugId, const char* szType, const char* szContext, const char* szBody )
+void LogEvent ( uint uiDebugId, const char* szType, const char* szContext, const char* szBody, uint uiAddReportLogId )
 {
-    g_pCore->LogEvent ( uiDebugId, szType, szContext, szBody );  
+    g_pCore->LogEvent ( uiDebugId, szType, szContext, szBody, uiAddReportLogId );  
 }
 
 void CallGameEntityRenderHandler( CEntitySAInterface* pEntity )

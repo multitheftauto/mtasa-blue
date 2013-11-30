@@ -1062,6 +1062,118 @@ inner:
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
+// CEntity::GetBoundRect
+//
+// Check if crash will occur
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+void OnMY_CEntity_GetBoundRect( CEntitySAInterface* pEntity )
+{
+    ushort usModelId = pEntity->m_nModelIndex;
+    CBaseModelInfoSAInterface* pModelInfo = ((CBaseModelInfoSAInterface**)ARRAY_ModelInfo)[usModelId];
+    if ( !pModelInfo )
+    {
+        // Crash will occur at offset 00134131
+        LogEvent( 814, "Model info missing", "CEntity_GetBoundRect", SString( "No info for model:%d", usModelId ), 5414 );
+        CArgMap argMap;
+        argMap.Set( "id", usModelId );
+        argMap.Set( "reason", "info" );
+        SetApplicationSetting( "diagnostics", "gta-model-fail", argMap.ToString() );
+    }
+    else
+    {
+        CColModelSAInterface* pColModel = pModelInfo->pColModel;
+        if ( !pColModel )
+        {
+            // Crash will occur at offset 00134134
+            LogEvent( 815, "Model collision missing", "CEntity_GetBoundRect", SString( "No collision for model:%d", usModelId ), 5415 );
+            CArgMap argMap;
+            argMap.Set( "id", usModelId );
+            argMap.Set( "reason", "collision" );
+            SetApplicationSetting( "diagnostics", "gta-model-fail", argMap.ToString() );
+        }
+    }
+}
+
+// Hook info
+#define HOOKPOS_CEntity_GetBoundRect                      0x53412A
+#define HOOKSIZE_CEntity_GetBoundRect                     7
+#define HOOKCHECK_CEntity_GetBoundRect                    0x8B
+DWORD RETURN_CEntity_GetBoundRect =                       0x534131;
+void _declspec(naked) HOOK_CEntity_GetBoundRect()
+{
+    _asm
+    {
+        pushad
+        push    esi
+        call    OnMY_CEntity_GetBoundRect
+        add     esp, 4*1
+        popad
+
+        // Continue replaced code
+        mov     ecx,dword ptr [eax*4+0A9B0C8h] 
+        jmp     RETURN_CEntity_GetBoundRect
+    }
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+// CVehicle_AddUpgrade
+//
+// Record some variables in case crash occurs
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+void OnMY_CVehicle_AddUpgrade_Pre( CVehicleSAInterface* pVehicle, int iUpgradeId, int iFrame )
+{
+    CArgMap argMap;
+    argMap.Set( "vehid", pVehicle->m_nModelIndex );
+    argMap.Set( "upgid", iUpgradeId );
+    argMap.Set( "frame", iFrame );
+    SetApplicationSetting( "diagnostics", "gta-upgrade-fail", argMap.ToString() );
+}
+
+void OnMY_CVehicle_AddUpgrade_Post( void )
+{
+    SetApplicationSetting( "diagnostics", "gta-upgrade-fail", "" );
+}
+
+// Hook info
+#define HOOKPOS_CVehicle_AddUpgrade                      0x6DFA20
+#define HOOKSIZE_CVehicle_AddUpgrade                     6
+#define HOOKCHECK_CVehicle_AddUpgrade                    0x51
+DWORD RETURN_CVehicle_AddUpgrade =                       0x6DFA26;
+void _declspec(naked) HOOK_CVehicle_AddUpgrade()
+{
+    _asm
+    {
+        pushad
+        push    [esp+32+4*2]
+        push    [esp+32+4*2]
+        push    ecx
+        call    OnMY_CVehicle_AddUpgrade_Pre
+        add     esp, 4*3
+        popad
+
+        push    [esp+4*2]
+        push    [esp+4*2]
+        call inner
+
+        pushad
+        call    OnMY_CVehicle_AddUpgrade_Post
+        popad
+        retn    8
+inner:
+        push    ecx
+        push    ebx
+        mov     ebx, [esp+16]
+        jmp     RETURN_CVehicle_AddUpgrade
+    }
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
 // Setup hooks for CrashFixHacks
 //
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -1097,4 +1209,6 @@ void CMultiplayerSA::InitHooks_CrashFixHacks ( void )
     EZHookInstall ( CrashFix_Misc28 );
     EZHookInstall ( CrashFix_Misc29 );
     EZHookInstall ( CClumpModelInfo_GetFrameFromId );
+    EZHookInstall ( CEntity_GetBoundRect );
+    EZHookInstall ( CVehicle_AddUpgrade );
 }
