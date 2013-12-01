@@ -73,7 +73,8 @@ public:
     void                    SetPanEnabled           ( bool bPan )                                               { m_bPan = bPan; };
     void                    SetFxEffects            ( int* pEnabledEffects, uint iNumElements );
     SString                 GetMetaTags             ( const SString& strFormat );
-    bool                    IsFinished              ( void );
+    uint                    GetReachedEndCount      ( void );
+    bool                    IsFreed                 ( void );
     float                   GetPan                  ( void );
     void                    SetPan                  ( float fPan );
 
@@ -101,7 +102,7 @@ protected:
 
 public:
     SSoundThreadVariables*  m_pVars;
-    bool                    bEndSync;
+    uint                    uiEndSyncCount;
     bool                    bFreeSync;
 
 private:
