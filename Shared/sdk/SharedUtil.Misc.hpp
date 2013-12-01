@@ -1129,7 +1129,7 @@ std::wstring SharedUtil::ANSIToUTF16 ( const std::string& input )
         return L"?";
     wchar_t* wcsOutput = new wchar_t[len+1];
     mbstowcs ( wcsOutput, input.c_str(), input.length() );
-    wcsOutput[len] = NULL; //Null terminate the string
+    wcsOutput[len] = 0; //Null terminate the string
     std::wstring strOutput(wcsOutput);
     delete [] wcsOutput;
     return strOutput;
