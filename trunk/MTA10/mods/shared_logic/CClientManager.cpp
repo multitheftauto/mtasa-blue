@@ -181,7 +181,7 @@ CClientManager::~CClientManager ( void )
 }
 
 //
-// This function gets called twice.per game loop
+// This function gets called twice per game loop
 //
 void CClientManager::DoPulse ( bool bDoStandardPulses, bool bDoVehicleManagerPulse )
 {
@@ -207,7 +207,7 @@ void CClientManager::DoPulse ( bool bDoStandardPulses, bool bDoVehicleManagerPul
         {
             m_pPathManager->DoPulse ();
             m_pRadarMarkerManager->DoPulse ();
-            m_pPedManager->DoPulse ();
+            m_pPedManager->DoPulse ( true );
             m_pObjectManager->DoPulse ();
             m_pProjectileManager->DoPulse ();
             m_pSoundManager->DoPulse ();
@@ -215,6 +215,10 @@ void CClientManager::DoPulse ( bool bDoStandardPulses, bool bDoVehicleManagerPul
             m_pColManager->DoPulse ();
             m_pGUIManager->DoPulse ();
             m_pWeaponManager->DoPulse ();
+        }
+        else
+        {
+            m_pPedManager->DoPulse ( false );
         }
     }
 }
