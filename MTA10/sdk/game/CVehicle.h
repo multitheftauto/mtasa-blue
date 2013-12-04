@@ -115,7 +115,7 @@ public:
     virtual BYTE                GetRailTrack                () = 0;
     virtual void                SetRailTrack                ( BYTE ucTrackID ) = 0;
     virtual float               GetTrainPosition            ( void ) = 0;
-    virtual void                SetTrainPosition            ( float fPosition ) = 0;
+    virtual void                SetTrainPosition            ( float fPosition, bool bRecalcOnRailDistance = true ) = 0;
 
     virtual bool                CanPedEnterCar              () = 0;
     virtual bool                CanPedJumpOutCar            ( CPed* pPed ) = 0;

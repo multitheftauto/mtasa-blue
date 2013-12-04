@@ -601,13 +601,13 @@ float CVehicleSA::GetTrainPosition ()
 }
 
 
-void CVehicleSA::SetTrainPosition ( float fPosition )
+void CVehicleSA::SetTrainPosition ( float fPosition, bool bRecalcOnRailDistance )
 {
     CVehicleSAInterface* pInterface = GetVehicleInterface ();
     if ( pInterface->m_fTrainRailDistance <= fPosition - 0.1 || pInterface->m_fTrainRailDistance >= fPosition + 0.1 )
     {
         pInterface->m_fTrainRailDistance = fPosition;
-        if ( !IsDerailed () )
+        if ( bRecalcOnRailDistance && !IsDerailed () )
         {
             DWORD dwFunc = FUNC_CVehicle_RecalcOnRailDistance;
             _asm

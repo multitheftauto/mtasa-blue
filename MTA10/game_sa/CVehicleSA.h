@@ -564,7 +564,7 @@ public:
     BYTE                        GetRailTrack                    ();
     void                        SetRailTrack                    ( BYTE ucTrackID );
     float                       GetTrainPosition                ( void );
-    void                        SetTrainPosition                ( float fPosition );
+    void                        SetTrainPosition                ( float fPosition, bool bRecalcOnRailDistance = true );
 
     bool                        CanPedEnterCar                  ();
     bool                        CanPedJumpOutCar                ( CPed* pPed );

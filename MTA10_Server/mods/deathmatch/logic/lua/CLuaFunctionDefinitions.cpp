@@ -3727,7 +3727,10 @@ int CLuaFunctionDefinitions::GetVehicleType ( lua_State* luaVM )
     if ( !argStream.HasErrors ( ) )
     {   
         if ( ulModel >= 400 && ulModel < 610 )
+        {
             lua_pushstring ( luaVM, CVehicleNames::GetVehicleTypeName ( ulModel ) );
+            return 1;
+        }
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
