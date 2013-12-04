@@ -2046,11 +2046,11 @@ float CClientVehicle::GetTrainPosition ( void )
     return m_fTrainPosition;
 }
 
-void CClientVehicle::SetTrainPosition ( float fSpeed )
+void CClientVehicle::SetTrainPosition ( float fSpeed, bool bRecalcOnRailDistance )
 {
     if ( m_pVehicle && GetVehicleType() == CLIENTVEHICLE_TRAIN  )
     {
-        m_pVehicle->SetTrainPosition ( fSpeed );
+        m_pVehicle->SetTrainPosition ( fSpeed, bRecalcOnRailDistance );
     }
     m_fTrainPosition = fSpeed;
 }

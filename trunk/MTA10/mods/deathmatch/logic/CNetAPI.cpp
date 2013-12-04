@@ -1419,10 +1419,16 @@ void CNetAPI::ReadVehiclePuresync ( CClientPlayer* pPlayer, CClientVehicle* pVeh
             BitStream.ReadBit ( bDirection );
             BitStream.Read ( ucTrack );
             BitStream.Read ( fSpeed );
-            pVehicle->SetTrainPosition ( fPosition );
-            pVehicle->SetTrainDirection( bDirection );
+
+            if ( !pVehicle->IsStreamedIn () )
+                pVehicle->SetPosition ( position.data.vecPosition, true );
+
             pVehicle->SetTrainTrack ( ucTrack );
+            pVehicle->SetTrainPosition ( fPosition, false );
+            pVehicle->SetTrainDirection( bDirection );
             pVehicle->SetTrainSpeed ( fSpeed );
+
+            //g_pCore->DebugPrintf ( "[SYNC_READ] Train position: %f (%d)", fPosition, pVehicle->GetID ().Value() );
         }
 
         BitStream.Read ( &rotation );
@@ -1670,6 +1676,9 @@ void CNetAPI::WriteVehiclePuresync ( CClientPed* pPlayerModel, CClientVehicle* p
         BitStream.WriteBit ( bDirection );
         BitStream.Write ( ucTrack );
         BitStream.Write ( fSpeed );
+
+        //if ( pVehicle->IsChainEngine () )
+            //g_pCore->DebugPrintf ( "[WRITE_SYNC] Train position: %f (%d)", fPosition, pVehicle->GetID ().Value() );
     }
 
     // Write the camera orientation
