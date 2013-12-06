@@ -338,8 +338,8 @@ void CUnoccupiedVehicleSync::Packet_UnoccupiedVehicleSync ( CUnoccupiedVehicleSy
                                     if ( pCurrentTrailer )
                                     {
                                         // Tell everyone to detach them
-                                        CVehicleTrailerPacket AttachPacket ( pVehicle, pCurrentTrailer, false );
-                                        m_pPlayerManager->BroadcastOnlyJoined ( AttachPacket );
+                                        CVehicleTrailerPacket DetachPacket ( pVehicle, pCurrentTrailer, false );
+                                        m_pPlayerManager->BroadcastOnlyJoined ( DetachPacket );
 
                                         // Execute the attach trailer script function
                                         CLuaArguments Arguments;
@@ -355,8 +355,8 @@ void CUnoccupiedVehicleSync::Packet_UnoccupiedVehicleSync ( CUnoccupiedVehicleSy
                                     if ( pCurrentVehicle )
                                     {
                                         // Tell everyone to detach them
-                                        CVehicleTrailerPacket AttachPacket ( pCurrentVehicle, pTrailer, false );
-                                        m_pPlayerManager->BroadcastOnlyJoined ( AttachPacket );
+                                        CVehicleTrailerPacket DetachPacket ( pCurrentVehicle, pTrailer, false );
+                                        m_pPlayerManager->BroadcastOnlyJoined ( DetachPacket );
 
                                         // Execute the attach trailer script function
                                         CLuaArguments Arguments;
@@ -401,8 +401,8 @@ void CUnoccupiedVehicleSync::Packet_UnoccupiedVehicleSync ( CUnoccupiedVehicleSy
                                     pCurrentTrailer->SetTowedByVehicle ( NULL );
 
                                     // Tell everyone else to detach them
-                                    CVehicleTrailerPacket AttachPacket ( pVehicle, pCurrentTrailer, false );
-                                    m_pPlayerManager->BroadcastOnlyJoined ( AttachPacket );
+                                    CVehicleTrailerPacket DetachPacket ( pVehicle, pCurrentTrailer, false );
+                                    m_pPlayerManager->BroadcastOnlyJoined ( DetachPacket );
 
                                     // Execute the detach trailer script function
                                     CLuaArguments Arguments;
