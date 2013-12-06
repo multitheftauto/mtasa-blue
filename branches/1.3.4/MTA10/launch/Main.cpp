@@ -69,7 +69,7 @@ int WINAPI WinMain ( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     if ( bUnicodeCharacters )
     {
         SString strMessage = "WARNING: Install path contains unicode characters\n\n";
-        strMessage += "If MTA fails to load, please reinstall with basic Latin characters.\n\n";
+        strMessage += "If MTA:SA fails to load, please reinstall with basic Latin characters.\n\n";
         AddReportLog ( 5712, strMessage );
         BrowseToSolution ( "unicode-mta-path", ASK_GO_ONLINE | TERMINATE_IF_YES, strMessage );
     }
