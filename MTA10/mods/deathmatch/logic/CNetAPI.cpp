@@ -1427,8 +1427,6 @@ void CNetAPI::ReadVehiclePuresync ( CClientPlayer* pPlayer, CClientVehicle* pVeh
             pVehicle->SetTrainPosition ( fPosition, false );
             pVehicle->SetTrainDirection( bDirection );
             pVehicle->SetTrainSpeed ( fSpeed );
-
-            //g_pCore->DebugPrintf ( "[SYNC_READ] Train position: %f (%d)", fPosition, pVehicle->GetID ().Value() );
         }
 
         BitStream.Read ( &rotation );
@@ -1477,10 +1475,14 @@ void CNetAPI::ReadVehiclePuresync ( CClientPlayer* pPlayer, CClientVehicle* pVeh
                         SRotationDegreesSync trailerRotation;
                         BitStream.Read ( &trailerRotation );
 
-                        if ( !pTrailer->GetGameVehicle () )
+                        if ( pTrailer->GetVehicleType () != CLIENTVEHICLE_TRAIN && !pTrailer->GetGameVehicle () )
                         {
                             pTrailer->SetTargetPosition ( trailerPosition.data.vecPosition, TICK_RATE, true, velocity.data.vecVelocity.fZ );
                             pTrailer->SetTargetRotation ( trailerRotation.data.vecRotation, TICK_RATE );
+                        }
+                        else if ( pTrailer->GetVehicleType () == CLIENTVEHICLE_TRAIN )
+                        {
+                            pTrailer->SetPosition ( trailerPosition.data.vecPosition ); // Set position to fix streaming (setting the position doesn't influence the real train position since CTrain::ProcessControl recalculates it)
                         }
                     }
                 }
@@ -1676,9 +1678,6 @@ void CNetAPI::WriteVehiclePuresync ( CClientPed* pPlayerModel, CClientVehicle* p
         BitStream.WriteBit ( bDirection );
         BitStream.Write ( ucTrack );
         BitStream.Write ( fSpeed );
-
-        //if ( pVehicle->IsChainEngine () )
-            //g_pCore->DebugPrintf ( "[WRITE_SYNC] Train position: %f (%d)", fPosition, pVehicle->GetID ().Value() );
     }
 
     // Write the camera orientation
@@ -1720,7 +1719,7 @@ void CNetAPI::WriteVehiclePuresync ( CClientPed* pPlayerModel, CClientVehicle* p
         BitStream.Write ( &health );
 
         // Write the trailer chain
-        CClientVehicle* pTrailer = pVehicle->GetRealTowedVehicle ();
+        CClientVehicle* pTrailer = pVehicle->GetVehicleType () == CLIENTVEHICLE_TRAIN ? pVehicle->GetNextTrainCarriage () : pVehicle->GetRealTowedVehicle ();
         while ( pTrailer && !pTrailer->IsLocalEntity () )
         {
             BitStream.WriteBit ( true );
@@ -1742,7 +1741,7 @@ void CNetAPI::WriteVehiclePuresync ( CClientPed* pPlayerModel, CClientVehicle* p
             BitStream.Write ( &trailerRotation );
 
             // Get the next towed vehicle
-            pTrailer = pTrailer->GetTowedVehicle ();
+            pTrailer = pTrailer->GetVehicleType () == CLIENTVEHICLE_TRAIN ? pTrailer->GetNextTrainCarriage () : pTrailer->GetRealTowedVehicle ();
         }
 
         // End of our trailer chain

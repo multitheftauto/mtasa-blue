@@ -2457,12 +2457,14 @@ void CClientVehicle::Create ( void )
             if ( m_pNextLink )
             {
                 m_pVehicle->SetNextTrainCarriage ( m_pNextLink->m_pVehicle );
+                m_pNextLink->SetTrainTrack ( GetTrainTrack () );
                 if ( m_pNextLink->GetGameVehicle () )
                     m_pVehicle->AttachTrainCarriage ( m_pNextLink->GetGameVehicle () );
             }
             if ( m_pPreviousLink )
             {
                 m_pVehicle->SetPreviousTrainCarriage ( m_pPreviousLink->m_pVehicle );
+                this->SetTrainTrack ( m_pPreviousLink->GetTrainTrack () );
                 if ( m_pPreviousLink->GetGameVehicle () )
                     m_pPreviousLink->GetGameVehicle ()->AttachTrainCarriage ( m_pVehicle );
             }
