@@ -58,8 +58,17 @@ typedef float               FLOAT;      //  32
 #include <string.h>
 #include <string>
 #include <stdarg.h>
+
+// Things to make source easier to backport
+#define _ SStringX
+#define _td(x) x
+#define _tn(s,p,c) ( ( (c) == 1 ) ? s : p )
+
 #include "SString.h"
 #include "WString.h"
+
+#define _E(code) SString(" [%s]",code)
+
 #include "SharedUtil.Map.h"
 #if defined(SHARED_UTIL_WITH_HASH_MAP) || defined(SHARED_UTIL_WITH_FAST_HASH_MAP)
     #include "SharedUtil.HashMap.h"

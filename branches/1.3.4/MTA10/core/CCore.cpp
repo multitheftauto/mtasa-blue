@@ -709,13 +709,13 @@ void CCore::ShowErrorMessageBox( const SString& strTitle, SString strMessage, co
     else
     {
         strMessage += "\n\n";
-        strMessage += "Do you want to see some on-line help about this problem ?";
+        strMessage += _("Do you want to see some on-line help about this problem ?");
         CQuestionBox* pQuestionBox = CCore::GetSingleton ().GetLocalGUI ()->GetMainMenu ()->GetQuestionWindow ();
         pQuestionBox->Reset ();
         pQuestionBox->SetTitle ( strTitle );
         pQuestionBox->SetMessage ( strMessage );
-        pQuestionBox->SetButton ( 0, "No" );
-        pQuestionBox->SetButton ( 1, "Yes" );
+        pQuestionBox->SetButton ( 0, _("No") );
+        pQuestionBox->SetButton ( 1, _("Yes") );
         pQuestionBox->SetCallback ( CCore::ErrorMessageBoxCallBack, new SString( strTroubleLink ) );
         pQuestionBox->Show ();
     }
@@ -905,7 +905,7 @@ T* InitModule ( CModuleLoader& m_Loader, const SString& strName, const SString& 
 
     if ( pfnInit == NULL )
     {
-        MessageBox ( 0, strName + " module is incorrect!", "Error", MB_OK | MB_ICONEXCLAMATION | MB_TOPMOST  );
+        MessageBoxUTF8 ( 0, SString(_("%s module is incorrect!"),*strName), "Error"+_E("CC40"), MB_OK | MB_ICONEXCLAMATION | MB_TOPMOST  );
         TerminateProcess ( GetCurrentProcess (), 1 );
     }
 
@@ -1213,7 +1213,7 @@ void CCore::DoPostFramePulse ( )
                     // Run the connect command
                     if ( strArguments.length () > 0 && !m_pCommands->Execute ( strArguments ) )
                     {
-                        ShowMessageBox ( "Error", "Error executing URL", MB_BUTTON_OK | MB_ICON_ERROR );
+                        ShowMessageBox ( _("Error")+_E("CC41"), _("Error executing URL"), MB_BUTTON_OK | MB_ICON_ERROR );
                     }
                 }
                 else
@@ -1225,8 +1225,8 @@ void CCore::DoPostFramePulse ( )
                         // Try to load the mod
                         if ( !m_pModManager->Load ( szOptionValue, m_szCommandLineArgs ) )
                         {
-                            SString strTemp ( "Error running mod specified in command line ('%s')", szOptionValue );
-                            ShowMessageBox ( "Error", strTemp, MB_BUTTON_OK | MB_ICON_ERROR );
+                            SString strTemp ( _("Error running mod specified in command line ('%s')"), szOptionValue );
+                            ShowMessageBox ( _("Error")+_E("CC42"), strTemp, MB_BUTTON_OK | MB_ICON_ERROR ); // Command line Mod load failed
                         }
                     }
                     // We want to connect to a server?
@@ -1334,14 +1334,14 @@ void CCore::RegisterCommands ( )
 {
     //m_pCommands->Add ( "e", CCommandFuncs::Editor );
     //m_pCommands->Add ( "clear", CCommandFuncs::Clear );
-    m_pCommands->Add ( "help",              "this help screen",                 CCommandFuncs::Help );
-    m_pCommands->Add ( "exit",              "exits the application",            CCommandFuncs::Exit );
-    m_pCommands->Add ( "quit",              "exits the application",            CCommandFuncs::Exit );
-    m_pCommands->Add ( "ver",               "shows the version",                CCommandFuncs::Ver );
-    m_pCommands->Add ( "time",              "shows the time",                   CCommandFuncs::Time );
-    m_pCommands->Add ( "showhud",           "shows the hud",                    CCommandFuncs::HUD );
-    m_pCommands->Add ( "binds",             "shows all the binds",              CCommandFuncs::Binds );
-    m_pCommands->Add ( "serial",            "shows your serial",                CCommandFuncs::Serial );
+    m_pCommands->Add ( "help",              _("this help screen"),                 CCommandFuncs::Help );
+    m_pCommands->Add ( "exit",              _("exits the application"),            CCommandFuncs::Exit );
+    m_pCommands->Add ( "quit",              _("exits the application"),            CCommandFuncs::Exit );
+    m_pCommands->Add ( "ver",               _("shows the version"),                CCommandFuncs::Ver );
+    m_pCommands->Add ( "time",              _("shows the time"),                   CCommandFuncs::Time );
+    m_pCommands->Add ( "showhud",           _("shows the hud"),                    CCommandFuncs::HUD );
+    m_pCommands->Add ( "binds",             _("shows all the binds"),              CCommandFuncs::Binds );
+    m_pCommands->Add ( "serial",            _("shows your serial"),                CCommandFuncs::Serial );
 
 #if 0
     m_pCommands->Add ( "vid",               "changes the video settings (id)",  CCommandFuncs::Vid );
@@ -1350,23 +1350,23 @@ void CCore::RegisterCommands ( )
     m_pCommands->Add ( "unload",            "unloads a mod (name)",             CCommandFuncs::Unload );
 #endif
 
-    m_pCommands->Add ( "connect",           "connects to a server (host port nick pass)",   CCommandFuncs::Connect );
-    m_pCommands->Add ( "reconnect",         "connects to a previous server",    CCommandFuncs::Reconnect );
-    m_pCommands->Add ( "bind",              "binds a key (key control)",        CCommandFuncs::Bind );
-    m_pCommands->Add ( "unbind",            "unbinds a key (key)",              CCommandFuncs::Unbind );
-    m_pCommands->Add ( "copygtacontrols",   "copies the default gta controls",  CCommandFuncs::CopyGTAControls );
-    m_pCommands->Add ( "screenshot",        "outputs a screenshot",             CCommandFuncs::ScreenShot );
-    m_pCommands->Add ( "saveconfig",        "immediately saves the config",     CCommandFuncs::SaveConfig );
+    m_pCommands->Add ( "connect",           _("connects to a server (host port nick pass)"),   CCommandFuncs::Connect );
+    m_pCommands->Add ( "reconnect",         _("connects to a previous server"),    CCommandFuncs::Reconnect );
+    m_pCommands->Add ( "bind",              _("binds a key (key control)"),        CCommandFuncs::Bind );
+    m_pCommands->Add ( "unbind",            _("unbinds a key (key)"),              CCommandFuncs::Unbind );
+    m_pCommands->Add ( "copygtacontrols",   _("copies the default gta controls"),  CCommandFuncs::CopyGTAControls );
+    m_pCommands->Add ( "screenshot",        _("outputs a screenshot"),             CCommandFuncs::ScreenShot );
+    m_pCommands->Add ( "saveconfig",        _("immediately saves the config"),     CCommandFuncs::SaveConfig );
 
-    m_pCommands->Add ( "cleardebug",        "clears the debug view",            CCommandFuncs::DebugClear );
-    m_pCommands->Add ( "chatscrollup",      "scrolls the chatbox upwards",      CCommandFuncs::ChatScrollUp );
-    m_pCommands->Add ( "chatscrolldown",    "scrolls the chatbox downwards",    CCommandFuncs::ChatScrollDown );
-    m_pCommands->Add ( "debugscrollup",     "scrolls the debug view upwards",   CCommandFuncs::DebugScrollUp );
-    m_pCommands->Add ( "debugscrolldown",   "scrolls the debug view downwards", CCommandFuncs::DebugScrollDown );
+    m_pCommands->Add ( "cleardebug",        _("clears the debug view"),            CCommandFuncs::DebugClear );
+    m_pCommands->Add ( "chatscrollup",      _("scrolls the chatbox upwards"),      CCommandFuncs::ChatScrollUp );
+    m_pCommands->Add ( "chatscrolldown",    _("scrolls the chatbox downwards"),    CCommandFuncs::ChatScrollDown );
+    m_pCommands->Add ( "debugscrollup",     _("scrolls the debug view upwards"),   CCommandFuncs::DebugScrollUp );
+    m_pCommands->Add ( "debugscrolldown",   _("scrolls the debug view downwards"), CCommandFuncs::DebugScrollDown );
 
     m_pCommands->Add ( "test",              "",                                 CCommandFuncs::Test );
-    m_pCommands->Add ( "showmemstat",       "shows the memory statistics",      CCommandFuncs::ShowMemStat );
-    m_pCommands->Add ( "showframegraph",    "shows the frame timing graph",     CCommandFuncs::ShowFrameGraph );
+    m_pCommands->Add ( "showmemstat",       _("shows the memory statistics"),      CCommandFuncs::ShowMemStat );
+    m_pCommands->Add ( "showframegraph",    _("shows the frame timing graph"),     CCommandFuncs::ShowFrameGraph );
 
 #if defined(MTA_DEBUG) || defined(MTA_BETA)
     m_pCommands->Add ( "fakelag",           "",                                 CCommandFuncs::FakeLag );

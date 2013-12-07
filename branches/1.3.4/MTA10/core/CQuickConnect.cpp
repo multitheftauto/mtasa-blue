@@ -146,7 +146,7 @@ bool CQuickConnect::OnConnectButtonClick ( CGUIElement* pElement )
     const std::string& strHost = m_pEditHost->GetText ();
     if ( strHost.length () == 0 )
     {
-        CCore::GetSingleton ().ShowMessageBox ( "Error", "No host specified!", MB_BUTTON_OK | MB_ICON_INFO );
+        CCore::GetSingleton ().ShowMessageBox ( _("Error")+_E("CC60"), _("No host specified!"), MB_BUTTON_OK | MB_ICON_INFO );
         return true;
     }
 
@@ -155,12 +155,12 @@ bool CQuickConnect::OnConnectButtonClick ( CGUIElement* pElement )
     int iPort = atoi ( strPort.c_str () );
     if ( strPort.length () == 0 )
     {
-        CCore::GetSingleton ().ShowMessageBox ( "Error", "No port specified!", MB_BUTTON_OK | MB_ICON_INFO );
+        CCore::GetSingleton ().ShowMessageBox ( _("Error")+_E("CC61"), _("No port specified!"), MB_BUTTON_OK | MB_ICON_INFO );
         return true;
     }
     else if ( iPort == 0 || iPort > 0xFFFF )
     {
-        CCore::GetSingleton ().ShowMessageBox ( "Error", "Invalid port specified!", MB_BUTTON_OK | MB_ICON_INFO );
+        CCore::GetSingleton ().ShowMessageBox ( _("Error")+_E("CC62"), _("Invalid port specified!"), MB_BUTTON_OK | MB_ICON_INFO );
         return true;
     }
 
@@ -169,7 +169,7 @@ bool CQuickConnect::OnConnectButtonClick ( CGUIElement* pElement )
     CVARS_GET ( "nick", strNick );
     if ( !CCore::GetSingleton ().IsValidNick ( strNick.c_str () ) )
     {
-        CCore::GetSingleton ().ShowMessageBox ( "Error", "Invalid nickname! Please go to Settings and set a new!", MB_BUTTON_OK | MB_ICON_INFO );
+        CCore::GetSingleton ().ShowMessageBox ( _("Error")+_E("CC63"), _("Invalid nickname! Please go to Settings and set a new one!"), MB_BUTTON_OK | MB_ICON_INFO );
         return true;
     }
 

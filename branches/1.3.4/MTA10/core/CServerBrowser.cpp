@@ -92,7 +92,7 @@ CServerBrowser::CServerBrowser ( void )
     if ( bCreateFrame )
     {
         // Create the window
-        m_pFrame = reinterpret_cast < CGUIWindow* > ( pManager->CreateWnd ( NULL, "SERVER BROWSER" ) );
+        m_pFrame = reinterpret_cast < CGUIWindow* > ( pManager->CreateWnd ( NULL, _("SERVER BROWSER") ) );
         m_pTopWindow = m_pFrame;
         m_pFrame->SetCloseButtonEnabled ( true );
         m_pFrame->SetMovable ( true );
@@ -140,10 +140,10 @@ CServerBrowser::CServerBrowser ( void )
     }
 
     // Create the tabs
-    CreateTab ( ServerBrowserTypes::INTERNET, "Internet" );
-    CreateTab ( ServerBrowserTypes::LAN, "Local" );
-    CreateTab ( ServerBrowserTypes::FAVOURITES, "Favourites" );
-    CreateTab ( ServerBrowserTypes::RECENTLY_PLAYED, "Recent" );
+    CreateTab ( ServerBrowserTypes::INTERNET, _("Internet") );
+    CreateTab ( ServerBrowserTypes::LAN, _("Local") );
+    CreateTab ( ServerBrowserTypes::FAVOURITES, _("Favourites") );
+    CreateTab ( ServerBrowserTypes::RECENTLY_PLAYED, _("Recent") );
 
     // Login dialog
     m_pCommunityLogin.SetVisible ( false );
@@ -455,10 +455,10 @@ void CServerBrowser::CreateTab ( ServerBrowserType type, const char* szName )
     // Server List Columns
     m_hVersion [ type ] = m_pServerList [ type ]->AddColumn ( "", 0.2f );
     m_hLocked [ type ] = m_pServerList [ type ]->AddColumn ( "", 0.2f );
-    m_hName [ type ] = m_pServerList [ type ]->AddColumn ( "Name", 0.2f );
-    m_hPlayers [ type ] = m_pServerList [ type ]->AddColumn ( "Players", 0.2f );
-    m_hPing [ type ] = m_pServerList [ type ]->AddColumn ( "Ping", 0.2f );
-    m_hGame [ type ] = m_pServerList [ type ]->AddColumn ( "Gamemode", 0.2f );
+    m_hName [ type ] = m_pServerList [ type ]->AddColumn ( _("Name"), 0.2f );
+    m_hPlayers [ type ] = m_pServerList [ type ]->AddColumn ( _("Players"), 0.2f );
+    m_hPing [ type ] = m_pServerList [ type ]->AddColumn ( _("Ping"), 0.2f );
+    m_hGame [ type ] = m_pServerList [ type ]->AddColumn ( _("Gamemode"), 0.2f );
 
     // NB. SetColumnWidth seems to start from 0
     m_pServerList [ type ]->SetColumnWidth ( m_hVersion [ type ], 25, false );
@@ -480,7 +480,7 @@ void CServerBrowser::CreateTab ( ServerBrowserType type, const char* szName )
     m_pServerPlayerList [ type ]->SetSize ( CVector2D ( fPlayerListSizeX, fHeight ), false );
     m_pServerPlayerList [ type ]->SetIgnoreTextSpacer ( true );
     // Player List Columns
-    m_hPlayerName [ type ] = m_pServerPlayerList [ type ]->AddColumn ( "Player list", 0.75f );
+    m_hPlayerName [ type ] = m_pServerPlayerList [ type ]->AddColumn ( _("Player list"), 0.75f );
 
     // Filters
     float fLineHeight = SB_BACK_BUTTON_SIZE_Y/2;
@@ -725,7 +725,7 @@ void CServerBrowser::SetVisible ( bool bVisible )
             // Don't refresh Internet unless it's activated or needed.
             if ( i != ServerBrowserTypes::INTERNET || m_bFirstTimeBrowseServer || bAutoRefresh )
             {
-                m_pServerListStatus [ i ]->SetText ( "Loading..." );
+                m_pServerListStatus [ i ]->SetText ( _("Loading...") );
                 m_iSelectedServer [ i ] = -1;
                 GetServerList ( (ServerBrowserType)i )->Refresh ();
             }
@@ -1213,7 +1213,7 @@ bool CServerBrowser::OnConnectClick ( CGUIElement* pElement )
     // Ensure we have something entered
     if ( strURI.size() == 0 || strURI == "mtasa://" )
     {
-        CCore::GetSingleton ().ShowMessageBox ( "Error", "No address specified!", MB_BUTTON_OK | MB_ICON_INFO );
+        CCore::GetSingleton ().ShowMessageBox ( _("Error")+_E("CC70"), _("No address specified!"), MB_BUTTON_OK | MB_ICON_INFO );
         return true;
     }
 
@@ -1226,7 +1226,7 @@ bool CServerBrowser::OnConnectClick ( CGUIElement* pElement )
     }
     else if ( strURI.substr(0,iProtocolEnd) != "mtasa" )// Is it the mtasa:// protocol?  Don't want noobs trying http etc
     {
-        CCore::GetSingleton ().ShowMessageBox ( "Unknown protocol", "Please use the mtasa:// protocol!", MB_BUTTON_OK | MB_ICON_INFO );
+        CCore::GetSingleton ().ShowMessageBox ( _("Unknown protocol")+_E("CC71"), _("Please use the mtasa:// protocol!"), MB_BUTTON_OK | MB_ICON_INFO );
         return true;
     }
 
@@ -1235,7 +1235,7 @@ bool CServerBrowser::OnConnectClick ( CGUIElement* pElement )
     // Valid nick?
     if ( !CCore::GetSingleton ().IsValidNick ( strNick.c_str () ) )
     {
-        CCore::GetSingleton ().ShowMessageBox ( "Error", "Invalid nickname! Please go to Settings and set a new one!", MB_BUTTON_OK | MB_ICON_INFO );
+        CCore::GetSingleton ().ShowMessageBox ( _("Error")+_E("CC72"), _("Invalid nickname! Please go to Settings and set a new one!"), MB_BUTTON_OK | MB_ICON_INFO );
         return true;
     }
 
@@ -1293,7 +1293,7 @@ bool CServerBrowser::ConnectToSelectedServer ( void )
         // Valid nick?
         if ( !CCore::GetSingleton ().IsValidNick ( strNick.c_str () ) )
         {
-            CCore::GetSingleton ().ShowMessageBox ( "Error", "Invalid nickname! Please go to Settings and set a new!", MB_BUTTON_OK | MB_ICON_INFO );
+            CCore::GetSingleton ().ShowMessageBox ( _("Error")+_E("CC73"), _("Invalid nickname! Please go to Settings and set a new one!"), MB_BUTTON_OK | MB_ICON_INFO );
             return true;
         }
 
@@ -1315,7 +1315,7 @@ bool CServerBrowser::ConnectToSelectedServer ( void )
     }
     else
     {
-        CCore::GetSingleton ().ShowMessageBox ( "Information", "You have to select a server to connect to.", MB_BUTTON_OK | MB_ICON_INFO );
+        CCore::GetSingleton ().ShowMessageBox ( _("Information")+_E("CC74"), _("You have to select a server to connect to."), MB_BUTTON_OK | MB_ICON_INFO );
     }
     return false;
 }
@@ -1340,7 +1340,7 @@ bool CServerBrowser::OnInfoClick ( CGUIElement* pElement )
     // Ensure we have something entered
     if ( strURI.size() == 0 || strURI == "mtasa://" )
     {
-        CCore::GetSingleton ().ShowMessageBox ( "Error", "No address specified!", MB_BUTTON_OK | MB_ICON_INFO );
+        CCore::GetSingleton ().ShowMessageBox ( _("Error")+_E("CC75"), _("No address specified!"), MB_BUTTON_OK | MB_ICON_INFO );
         return true;
     }
 
@@ -1622,9 +1622,9 @@ bool CServerBrowser::OnSearchDefocused ( CGUIElement* pElement )
     {
         m_pLabelSearchDescription [ Type ]->SetVisible ( true );
         if ( m_pComboSearchType[ Type ]->GetSelectedItemIndex() == SearchTypes::SERVERS )
-            m_pLabelSearchDescription [ Type ]->SetText("Search servers...");
+            m_pLabelSearchDescription [ Type ]->SetText(_("Search servers..."));
         else if ( m_pComboSearchType[ Type ]->GetSelectedItemIndex() == SearchTypes::PLAYERS )
-            m_pLabelSearchDescription [ Type ]->SetText("Search players...");
+            m_pLabelSearchDescription [ Type ]->SetText(_("Search players..."));
     }
     return true;
 }

@@ -50,7 +50,7 @@ void CScreenShot::PostScreenShot ( const SString& strFileName )
 {
     // print a notice
     if ( !strFileName.empty () )
-        g_pCore->GetConsole()->Printf ( "Screenshot taken: '%s'", *strFileName );
+        g_pCore->GetConsole()->Printf ( _("Screenshot taken: '%s'"), *strFileName );
 
     // make the chat and debug windows visible again
     g_pCore->SetChatVisible ( bIsChatVisible );

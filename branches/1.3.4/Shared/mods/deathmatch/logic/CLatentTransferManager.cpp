@@ -371,7 +371,7 @@ bool DoStaticProcessPacket ( unsigned char ucPacketID, NetPlayerID remoteId, Net
 
 void DoDisconnectRemote ( NetPlayerID remoteId, const SString& strReason )
 {
-    g_pCore->ShowMessageBox ( "Error", strReason, MB_BUTTON_OK | MB_ICON_ERROR );
+    g_pCore->ShowMessageBox ( _("Error")+_E("CD61"), strReason, MB_BUTTON_OK | MB_ICON_ERROR ); // DoDisconnectRemote
     g_pCore->GetModManager ()->RequestUnload ();
 }
 

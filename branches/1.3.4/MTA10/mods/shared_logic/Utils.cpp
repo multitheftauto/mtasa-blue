@@ -163,9 +163,9 @@ void RaiseFatalError ( unsigned int uiCode )
 #endif
 
     // Populate the message and show the box
-    SString strBuffer ( "Fatal error (%u). If this problem persists, please check out mtasa.com for support.", uiCode );
+    SString strBuffer ( _("Fatal error (%u). If this problem persists, please check out mtasa.com for support."), uiCode );
     SString strTroubleLink( SString( "fatal-error&code=%d", uiCode ) );
-    g_pCore->ShowErrorMessageBox ( "Fatal error", strBuffer, strTroubleLink );
+    g_pCore->ShowErrorMessageBox ( _("Fatal error")+_E("CD62"), strBuffer, strTroubleLink );
 
     // Request the mod unload
     g_pCore->GetModManager ()->RequestUnload ();
@@ -179,9 +179,9 @@ void RaiseProtocolError ( unsigned int uiCode )
 //#endif
 
     // Populate the message and show the box
-    SString strBuffer ( "Protocol error (%u). If this problem persists, please check out mtasa.com for support.", uiCode );
+    SString strBuffer ( _("Protocol error (%u). If this problem persists, please check out mtasa.com for support."), uiCode );
     SString strTroubleLink( SString( "protocol-error&code=%d", uiCode ) );
-    g_pCore->ShowErrorMessageBox ( "Connection error", strBuffer, strTroubleLink ); // Protocol error
+    g_pCore->ShowErrorMessageBox ( _("Connection error")+_E("CD63"), strBuffer, strTroubleLink ); // Protocol error
 
     // Request the mod unload
     g_pCore->GetModManager ()->RequestUnload ();

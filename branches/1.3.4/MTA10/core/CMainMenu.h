@@ -82,7 +82,7 @@ public:
     void                AskUserIfHeWantsToDisconnect    ( uchar menuType );
 
 private:
-    sMenuItem*          CreateItem                      ( unsigned char menuType, const char* szFilePath, CVector2D vecRelPosition, CVector2D vecNativeSize );
+    sMenuItem*          CreateItem                      ( unsigned char menuType, const char* szFilename, CVector2D vecRelPosition );
     bool                SetItemHoverProgress            ( sMenuItem* pItem, float fProgress, bool bHovering );
 
     bool                OnMenuEnter                     ( CGUIElement* pElement );
