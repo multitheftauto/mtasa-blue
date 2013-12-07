@@ -45,22 +45,20 @@ namespace
     }
     
     // Recursive RwFrame children searching function
-    inline RwFrame * RwFrameDump ( RwFrame * parent, CVehicleSA * pVehicleSA ) {
-        RwFrame * ret = parent->child, * buf;
+    void RwFrameDump ( RwFrame * parent, CVehicleSA * pVehicleSA ) {
+        RwFrame * ret = parent->child;
         while ( ret != NULL ) {
             // recurse into the child
             if ( ret->child != NULL ) {         
-                buf = RwFrameDump ( ret, pVehicleSA );
-                if ( buf != NULL ) return buf;
+                RwFrameDump ( ret, pVehicleSA );
             }
             // don't re-add, check ret for validity, if it has an empty string at this point it isn't a variant or it's already added
-            if ( pVehicleSA->IsComponentPresent ( ret->szName ) == false && ret != NULL && ret->szName != "" )
+            if ( pVehicleSA->IsComponentPresent ( ret->szName ) == false && ret->szName != "" )
             {
                 pVehicleSA->AddComponent ( ret, true );
             }
             ret = ret->next;
         }
-        return NULL;
     }
 
     void VehicleDump ( CVehicleSA* pVehicleSA )

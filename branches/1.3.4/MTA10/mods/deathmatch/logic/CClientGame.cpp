@@ -513,7 +513,7 @@ void CClientGame::StartPlayback ( void )
 bool CClientGame::StartGame ( const char* szNick, const char* szPassword, eServerType Type )
 {
     m_ServerType = Type;
-    int dbg = _CrtSetDbgFlag ( _CRTDBG_REPORT_FLAG );
+    //int dbg = _CrtSetDbgFlag ( _CRTDBG_REPORT_FLAG );
     //dbg |= _CRTDBG_ALLOC_MEM_DF;
     //dbg |= _CRTDBG_CHECK_ALWAYS_DF;
     //dbg |= _CRTDBG_DELAY_FREE_MEM_DF;
@@ -5737,7 +5737,7 @@ bool CClientGame::OnFocusGain ( CGUIFocusEventArgs Args )
     
     if ( Args.pDeactivatedWindow )
     {
-        CClientGUIElement * pDeactivatedGUIElement = pDeactivatedGUIElement = CGUI_GET_CCLIENTGUIELEMENT ( Args.pDeactivatedWindow );
+        CClientGUIElement * pDeactivatedGUIElement = CGUI_GET_CCLIENTGUIELEMENT ( Args.pDeactivatedWindow );
         if ( GetGUIManager ()->Exists ( pDeactivatedGUIElement ) ) pDeactivatedGUIElement->CallEvent ( "onClientGUIBlur", Arguments, true );
     }
 
