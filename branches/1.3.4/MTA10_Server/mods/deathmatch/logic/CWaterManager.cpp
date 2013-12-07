@@ -57,7 +57,7 @@ void CWaterManager::SetElementWaterLevel ( CWater* pWater, float fLevel )
 void CWaterManager::SetAllElementWaterLevel ( float fLevel )
 {
     std::list < CWater* > ::const_iterator iter = m_List.begin ();
-    for ( ; iter != m_List.end (); iter++ )
+    for ( ; iter != m_List.end (); ++iter )
     {
         SetElementWaterLevel ( *iter, fLevel );
     }

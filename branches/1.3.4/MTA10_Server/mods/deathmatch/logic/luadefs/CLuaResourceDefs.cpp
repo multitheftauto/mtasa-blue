@@ -677,7 +677,7 @@ int CLuaResourceDefs::getResources ( lua_State* luaVM )
     unsigned int uiIndex = 0;
     lua_newtable ( luaVM );
     list < CResource* > ::const_iterator iter = m_pResourceManager->IterBegin ();
-    for ( ; iter != m_pResourceManager->IterEnd (); iter++ )
+    for ( ; iter != m_pResourceManager->IterEnd (); ++iter )
     {
         lua_pushnumber ( luaVM, ++uiIndex );
         lua_pushresource ( luaVM, *iter );
@@ -812,7 +812,7 @@ int CLuaResourceDefs::getResourceConfig ( lua_State* luaVM )
         {
             list<CResourceFile *> * resourceFileList = pResource->GetFiles();
             list<CResourceFile *>::iterator iterd = resourceFileList->begin();
-            for ( ; iterd != resourceFileList->end(); iterd++ )
+            for ( ; iterd != resourceFileList->end(); ++iterd )
             {
                 CResourceConfigItem* config = (CResourceConfigItem *)(*iterd);
 
@@ -1069,7 +1069,7 @@ int CLuaResourceDefs::getResourceExportedFunctions ( lua_State* luaVM )
         lua_newtable ( luaVM );
         unsigned int uiIndex = 0;
         list < CExportedFunction >::iterator iterd = resource->IterBeginExportedFunctions();
-        for ( ; iterd != resource->IterEndExportedFunctions(); iterd++ )
+        for ( ; iterd != resource->IterEndExportedFunctions(); ++iterd )
         {
             lua_pushnumber ( luaVM, ++uiIndex );
             lua_pushstring ( luaVM, iterd->GetFunctionName ().c_str () );

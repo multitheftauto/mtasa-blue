@@ -25,7 +25,7 @@ bool CPickupHideShowPacket::Write ( NetBitStreamInterface& BitStream ) const
         unsigned short usPickupModelID;
         CPickup* pPickup;
         vector < CPickup* > ::const_iterator iter = m_List.begin ();
-        for ( ; iter != m_List.end (); iter++ )
+        for ( ; iter != m_List.end (); ++iter )
         {
             pPickup = *iter;
             usPickupModelID = 0;

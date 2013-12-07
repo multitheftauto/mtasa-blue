@@ -115,7 +115,7 @@ void CScriptKeyBinds::Clear ( eScriptKeyBindType bindType )
                 continue;
             }
         }
-        iter++;
+        ++iter;
     }
 }
 
@@ -310,7 +310,7 @@ bool CScriptKeyBinds::RemoveKeyFunction ( const SScriptBindableKey* pKey, CLuaMa
                 }
             }
         }
-        iter++;
+        ++iter;
     }
     return bFound;
 }

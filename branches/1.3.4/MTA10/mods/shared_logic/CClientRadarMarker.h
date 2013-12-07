@@ -45,8 +45,6 @@ public:
 
     void                                DoPulse                         ( void );
 
-    inline bool                         IsVisible                       ( void )                        { return m_bIsVisible; }
-
     void                                SetPosition                     ( const CVector& vecPosition );
     void                                GetPosition                     ( CVector& vecPosition ) const;
 
@@ -59,7 +57,7 @@ public:
     inline unsigned long                GetSprite                       ( void ) const                  { return m_ulSprite; };
     void                                SetSprite                       ( unsigned long ulSprite );
 
-    inline bool                         IsVisible                       ( void ) const                  { return  m_pMarker != NULL; };
+    inline bool                         IsVisible                       ( void ) const                  { return m_pMarker != NULL && m_bIsVisible; };
     void                                SetVisible                      ( bool bVisible );
 
     void                                SetDimension                    ( unsigned short usDimension );

@@ -44,7 +44,7 @@ VOID CPopulationSA::AddPed ( CCivilianPed * ped )
     CEntitySAInterface* pPedSAInterface = pPedSA->GetInterface ();
 
     list < CCivilianPedSA* > ::iterator iter;
-    for ( iter = peds.begin (); iter != peds.end (); iter++ )
+    for ( iter = peds.begin (); iter != peds.end (); ++iter )
     {
         if ( (*iter)->GetInterface() == pPedSAInterface )
         {
@@ -59,7 +59,7 @@ VOID CPopulationSA::AddPed ( CCivilianPed * ped )
 VOID CPopulationSA::AddPed ( CPedSAInterface * ped )
 { 
     list < CCivilianPedSA* > ::iterator iter;
-    for ( iter = peds.begin (); iter != peds.end (); iter++ )
+    for ( iter = peds.begin (); iter != peds.end (); ++iter )
     {
         if ( (*iter)->GetInterface() == ped )
         {
@@ -99,7 +99,7 @@ VOID CPopulationSA::RemovePed ( CCivilianPed * ped )
 VOID CPopulationSA::RemovePed ( CPedSAInterface * ped )
 {
     list < CCivilianPedSA* > ::iterator iter;
-    for ( iter = peds.begin (); iter != peds.end (); iter++ )
+    for ( iter = peds.begin (); iter != peds.end (); ++iter )
     {
         if ( (*iter)->GetInterface() == ped )
         {
@@ -139,7 +139,7 @@ CCivilianPed * CPopulationSA::GetFirstPed ()
 
 CCivilianPed * CPopulationSA::GetNextPed ()
 {
-    ( pedIter )++;
+    ++( pedIter );
     if ( pedIter != peds.end () )
     {
         return *pedIter;

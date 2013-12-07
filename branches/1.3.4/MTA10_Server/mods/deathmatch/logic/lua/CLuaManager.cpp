@@ -52,7 +52,7 @@ CLuaManager::~CLuaManager ( void )
 {
     CLuaCFunctions::RemoveAllFunctions ();
     list<CLuaMain *>::iterator iter;
-    for ( iter = m_virtualMachines.begin(); iter != m_virtualMachines.end(); iter++ )
+    for ( iter = m_virtualMachines.begin(); iter != m_virtualMachines.end(); ++iter )
     {
         delete (*iter);
     }
@@ -111,7 +111,7 @@ void CLuaManager::OnLuaMainCloseVM( CLuaMain* pLuaMain, lua_State* luaVM )
 void CLuaManager::DoPulse ( void )
 {
     list<CLuaMain *>::iterator iter;
-    for ( iter = m_virtualMachines.begin(); iter != m_virtualMachines.end(); iter++ )
+    for ( iter = m_virtualMachines.begin(); iter != m_virtualMachines.end(); ++iter )
     {
         (*iter)->DoPulse();
     }
@@ -138,7 +138,7 @@ CLuaMain* CLuaManager::GetVirtualMachine ( lua_State* luaVM )
 
     // Find a matching VM in our list
     list < CLuaMain* >::const_iterator iter = m_virtualMachines.begin ();
-    for ( ; iter != m_virtualMachines.end (); iter++ )
+    for ( ; iter != m_virtualMachines.end (); ++iter )
     {
         if ( luaVM == (*iter)->GetVirtualMachine () )
         {

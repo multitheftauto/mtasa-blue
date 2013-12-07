@@ -25,7 +25,7 @@ CVehicleColor CVehicleColors::GetRandomColor ( void )
         // Grab the random color we got off the list
         unsigned int uiIndex = 0;
         list < CVehicleColor > ::iterator iter = m_Colors.begin ();
-        for ( ; iter != m_Colors.end (); iter++ )
+        for ( ; iter != m_Colors.end (); ++iter )
         {
             if ( uiIndex == uiRandomIndex )
             {

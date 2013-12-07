@@ -15,7 +15,7 @@
 CObjectSyncPacket::~CObjectSyncPacket ( void )
 {
     vector < SyncData* > ::const_iterator iter = m_Syncs.begin ();
-    for ( ; iter != m_Syncs.end (); iter++ )
+    for ( ; iter != m_Syncs.end (); ++iter )
     {
         delete *iter;
     }
@@ -86,7 +86,7 @@ bool CObjectSyncPacket::Write ( NetBitStreamInterface& BitStream ) const
     bool bSent = false;
     vector < SyncData* > ::const_iterator iter = m_Syncs.begin ();
     // Write syncs
-    for ( ; iter != m_Syncs.end (); iter++ )
+    for ( ; iter != m_Syncs.end (); ++iter )
     {
         SyncData* pData = *iter;
         // If we're not supposed to ignore the packet

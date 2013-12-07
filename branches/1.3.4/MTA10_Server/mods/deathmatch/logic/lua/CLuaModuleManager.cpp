@@ -31,7 +31,7 @@ CLuaModuleManager::~CLuaModuleManager ( void )
     // Shutdown all our modules
     DefaultModuleFunc pfnShutdownModule = NULL;
     vector < FunctionInfo > ::iterator iter = m_Functions.begin ();
-    for ( ; iter != m_Functions.end (); iter++ )
+    for ( ; iter != m_Functions.end (); ++iter )
     {
         pfnShutdownModule = iter->ShutdownModule;
         pfnShutdownModule ();
@@ -138,7 +138,7 @@ CChecksum CLuaModuleManager::GetResourceFileChecksum ( lua_State* luaVM, const c
             if ( pResource )
             {
                 list < CResourceFile* >::iterator iter = pResource->IterBegin();
-                for ( ; iter != pResource->IterEnd(); iter++ )
+                for ( ; iter != pResource->IterEnd(); ++iter )
                 {
                     if ( strcmp ( (*iter)->GetName (), szFile ) == 0 )
                         return (*iter)->GetLastChecksum ();
@@ -298,7 +298,7 @@ void CLuaModuleManager::_ResourceStopping ( lua_State * luaVM )
 {
     RegisterModuleFunc pfnResourceStopping = NULL;
     vector < FunctionInfo > ::iterator iter = m_Functions.begin ();
-    for ( ; iter != m_Functions.end (); iter++ )
+    for ( ; iter != m_Functions.end (); ++iter )
     {
         pfnResourceStopping = iter->ResourceStopping;
         if ( pfnResourceStopping )
@@ -311,7 +311,7 @@ void CLuaModuleManager::_ResourceStopped ( lua_State * luaVM )
 {
     RegisterModuleFunc pfnResourceStopped = NULL;
     vector < FunctionInfo > ::iterator iter = m_Functions.begin ();
-    for ( ; iter != m_Functions.end (); iter++ )
+    for ( ; iter != m_Functions.end (); ++iter )
     {
         pfnResourceStopped = iter->ResourceStopped;
         if ( pfnResourceStopped )
