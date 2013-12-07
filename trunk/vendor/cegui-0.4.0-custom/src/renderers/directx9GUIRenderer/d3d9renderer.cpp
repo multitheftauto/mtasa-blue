@@ -223,7 +223,12 @@ bool DirectX9Renderer::doRender(void)
 
 		if (!locked)
 		{
+            buffmem = NULL;
 			if (FAILED(d_buffer->Lock(0, 0, (void**)&buffmem, D3DLOCK_DISCARD)))
+			{
+				return false;
+			}
+            if ( buffmem == NULL )
 			{
 				return false;
 			}
