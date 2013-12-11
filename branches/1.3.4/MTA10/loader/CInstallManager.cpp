@@ -205,7 +205,7 @@ SString CInstallManager::Continue ( void )
     // Initial report line
     DWORD dwProcessId = GetCurrentProcessId();
     SString GotPathFrom = ( m_pSequencer->GetVariable ( INSTALL_LOCATION ) == "far" ) ? "registry" : "module location";
-    AddReportLog ( 1041, SString ( "* Launch * pid:%d '%s' MTASAPath set from %s '%s'", dwProcessId, GetMTASAModuleFileName ().c_str (), GotPathFrom.c_str (), GetMTASAPath ().c_str () ) );
+    AddReportLog ( 1041, SString ( "* Launch * pid:%d '%s' MTASAPath set from %s '%s'", dwProcessId, GetLaunchPathFilename ().c_str (), GotPathFrom.c_str (), GetMTASAPath ().c_str () ) );
 
     // Run sequencer
     for ( int i = 0 ; !m_pSequencer->AtEnd () && i < 1000 ; i++ )

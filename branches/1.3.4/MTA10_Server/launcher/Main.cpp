@@ -20,6 +20,8 @@ using namespace std;
 #ifdef WIN32
     #include <windows.h>
     #include <direct.h>
+    #include "Shlwapi.h"
+    #pragma comment(lib, "Shlwapi.lib")
 #else
     #include <string.h>
     #include <alloca.h>
@@ -90,7 +92,16 @@ int main ( int argc, char* argv [] )
     // If we are unable to access the core module, try changing to the directory of the launched file
     FILE* fh = fopen ( LIB_CORE, "r" );
     if ( !fh )
-        chdir ( szLaunchDirectory );
+    {
+        #ifdef WIN32
+            wchar_t szBuffer[64000];
+            GetModuleFileNameW( NULL, szBuffer, 64000 );
+            PathRemoveFileSpecW ( szBuffer );
+            SetCurrentDirectoryW( szBuffer );
+        #else
+            chdir ( szLaunchDirectory );
+        #endif
+    }
     else
         fclose ( fh );
 

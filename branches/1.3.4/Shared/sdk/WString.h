@@ -36,11 +36,7 @@ public:
         : std::wstring ( szText ? szText : L"" )
     { }
 
-    WString ( const char* szText )
-        : std::wstring ()
-    {
-        FromAnsi ( szText );
-    }
+    WString ( const char* szText );
 
     explicit WString ( const wchar_t* szFormat, ... )
         : std::wstring ()
@@ -121,7 +117,6 @@ public:
     void            AssignLeft          ( const wchar_t* szOther, uint uiMaxLength );
 
     SString         ToAnsi              ( void ) const;
-    void            FromAnsi            ( const char* szSrc );
 };
 
 

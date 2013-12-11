@@ -39,13 +39,8 @@ CResourceConfigItem::~CResourceConfigItem ( void )
 bool CResourceConfigItem::Start ( void )
 {
     // Does the file even exist?
-    WIN32_FIND_DATA fdInfo;
-    HANDLE hFind = FindFirstFile( m_strName, &fdInfo );
-    if ( INVALID_HANDLE_VALUE != hFind )
+    if ( FileExists( GetName() ) )
     {
-        // Close the find
-        FindClose ( hFind );
-
         // Already created?
         if ( m_pXMLFile )
         {

@@ -199,8 +199,6 @@ inline float GetSmallestWrapUnsigned ( float fValue, float fHigh )
     return fWrapped;
 }
 
-bool            DoesFileExist               ( const char* szFilename );
-
 // Misc utility functions
 char*           ReplaceAnyStringOccurrence  ( char* szBuffer, const char* szWhat, const char* szWith, size_t sizeMax );
 unsigned int    StripUnwantedCharacters     ( char* szText, unsigned char cReplace = ' ' );

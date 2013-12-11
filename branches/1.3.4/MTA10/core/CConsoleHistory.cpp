@@ -31,7 +31,7 @@ void CConsoleHistory::LoadFromFile ( void )
 
     // Load the history lines
     char szBuffer [256];
-    std::ifstream infile ( m_strFilename );
+    std::ifstream infile ( FromUTF8( m_strFilename ) );
     while( infile.getline ( szBuffer, 256 ) )
         if ( szBuffer[0] && !m_History.Contains ( szBuffer ) )
         {
@@ -67,7 +67,7 @@ void CConsoleHistory::Add ( const char* szLine )
         m_HistoryNotSaved.pop_back ();
 
     // Write the history, one per line
-    std::ofstream outfile ( m_strFilename );
+    std::ofstream outfile ( FromUTF8( m_strFilename ) );
     for ( std::list < SString > ::iterator iter = m_History.begin () ; iter != m_History.end (); iter++ )
         outfile << *iter << std::endl;
     outfile.close ();

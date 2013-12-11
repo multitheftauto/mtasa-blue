@@ -107,7 +107,7 @@ bool CExceptionInformation_Impl::GetModule ( char * szOutputBuffer, int nOutputN
    /*
     * Get kernel32.dll's HMODULE.
     */
-   HMODULE hKern32 = GetModuleHandle("kernel32.dll");
+   HMODULE hKern32 = GetModuleHandleA("kernel32.dll");
    if ( NULL == hKern32 )  
       return false;
 

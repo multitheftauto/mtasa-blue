@@ -37,10 +37,11 @@ bool TerminateProcessFromPathFilename ( const SString& strPathFilename )
                 DWORD cbNeeded;
                 if ( EnumProcessModules ( hProcess, &pModule, sizeof ( HMODULE ), &cbNeeded ) )
                 {
-                    char szModuleName[500];
-                    if ( GetModuleFileNameEx( hProcess, pModule, szModuleName, 500 ) )
+                    WCHAR szModuleName[MAX_PATH*2] = L"";
+                    if ( GetModuleFileNameExW( hProcess, pModule, szModuleName, NUMELMS(szModuleName) ) )
                     {
-                        if ( stricmp ( szModuleName, strPathFilename ) == 0 )
+                        SString strModuleName = ToUTF8( szModuleName );
+                        if ( stricmp ( strModuleName, strPathFilename ) == 0 )
                         {
                             TerminateProcess ( hProcess, 0 );
                             CloseHandle ( hProcess );
@@ -113,7 +114,7 @@ bool DoInstallFiles ( void )
     for ( unsigned int i = 0 ; i < itemList.size () ; i++ )
     {
         SString strFile = itemList[i].strDestPathFilename;
-        if ( strFile.ToLower ().substr ( Max < int > ( 0, strFile.length () - 4 ) ) == ".exe" )
+        if ( strFile.EndsWithI( ".exe" ) )
             TerminateProcessFromPathFilename ( strFile );
     }
 

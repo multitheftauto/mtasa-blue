@@ -457,7 +457,7 @@ void ShowD3dDllDialog( HINSTANCE hInstance, const SString& strPath )
     }
     if ( bOtherPressed )
     {
-        if ( ITEMIDLIST *pidl = ILCreateFromPath ( strPath ) )
+        if ( ITEMIDLIST *pidl = ILCreateFromPathW ( FromUTF8( strPath ) ) )
         {
             SHOpenFolderAndSelectItems ( pidl, 0, 0, 0 );
             ILFree ( pidl );

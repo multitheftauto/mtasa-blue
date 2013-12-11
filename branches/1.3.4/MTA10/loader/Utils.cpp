@@ -24,8 +24,11 @@ static HANDLE g_hMutex = NULL;
 static HMODULE hLibraryModule = NULL;
 HINSTANCE g_hInstance = NULL;
 
-HMODULE RemoteLoadLibrary(HANDLE hProcess, const char* szLibPath)
+HMODULE RemoteLoadLibrary(HANDLE hProcess, const WString& strLibPath)
 {
+    const wchar_t* szLibPath = *strLibPath;
+    size_t uiLibPathLength = strLibPath.length();
+    
     /* Called correctly? */
     if ( szLibPath == NULL )
     {
@@ -39,8 +42,9 @@ HMODULE RemoteLoadLibrary(HANDLE hProcess, const char* szLibPath)
     /* Allocate memory in the remote process for the library path */
     HANDLE hThread = 0;
     void* pLibPathRemote = NULL;
+    uint uiLibPathSize = ( uiLibPathLength + 1 ) * sizeof( wchar_t );
     HMODULE hKernel32 = GetModuleHandle( "Kernel32" );
-    pLibPathRemote = _VirtualAllocEx( hProcess, NULL, strlen ( szLibPath ) + 1, MEM_COMMIT, PAGE_READWRITE );
+    pLibPathRemote = _VirtualAllocEx( hProcess, NULL, uiLibPathSize, MEM_COMMIT, PAGE_READWRITE );
     
     if ( pLibPathRemote == NULL )
     {
@@ -52,9 +56,9 @@ HMODULE RemoteLoadLibrary(HANDLE hProcess, const char* szLibPath)
 
         /* Write the DLL library path to the remote allocation */
         DWORD byteswritten = 0;
-        _WriteProcessMemory ( hProcess, pLibPathRemote, (void*)szLibPath, strlen ( szLibPath ) + 1, &byteswritten );
+        _WriteProcessMemory ( hProcess, pLibPathRemote, (void*)szLibPath, uiLibPathSize, &byteswritten );
 
-        if ( byteswritten != strlen ( szLibPath ) + 1 )
+        if ( byteswritten != uiLibPathSize )
         {
             return 0;
         }
@@ -66,7 +70,7 @@ HMODULE RemoteLoadLibrary(HANDLE hProcess, const char* szLibPath)
         hThread = _CreateRemoteThread(   hProcess,
                                         NULL,
                                         0,
-                                        reinterpret_cast < LPTHREAD_START_ROUTINE > ( GetProcAddress ( hKernel32, "LoadLibraryA" ) ),
+                                        reinterpret_cast < LPTHREAD_START_ROUTINE > ( GetProcAddress ( hKernel32, "LoadLibraryW" ) ),
                                         pLibPathRemote,
                                         0,
                                         NULL);
@@ -78,7 +82,7 @@ HMODULE RemoteLoadLibrary(HANDLE hProcess, const char* szLibPath)
 
 
     } __finally {
-        _VirtualFreeEx( hProcess, pLibPathRemote, strlen ( szLibPath ) + 1, MEM_RELEASE );
+        _VirtualFreeEx( hProcess, pLibPathRemote, uiLibPathSize, MEM_RELEASE );
     }
 
     /*  We wait for the created remote thread to finish executing. When it's done, the DLL
@@ -95,7 +99,7 @@ HMODULE RemoteLoadLibrary(HANDLE hProcess, const char* szLibPath)
 
 
     /* Clean up the resources we used to inject the DLL */
-    _VirtualFreeEx (hProcess, pLibPathRemote, strlen ( szLibPath ) + 1, MEM_RELEASE );
+    _VirtualFreeEx (hProcess, pLibPathRemote, uiLibPathSize, MEM_RELEASE );
 
     // Allow GTA to continue
     RemoveWinMainBlock( hProcess );
@@ -310,16 +314,13 @@ WString devicePathToWin32Path ( const WString& strDevicePath )
                 {
                     bFound = wcsnicmp(pszFilename, szName, uNameLen) == 0;
 
-                    if (bFound && *(pszFilename + uNameLen) == _T('\\')) 
+                    if (bFound && *(pszFilename + uNameLen) == L'\\') 
                     {
                         // Reconstruct pszFilename using szTempFile
                         // Replace device path with DOS path
-                        WCHAR szTempFile[MAX_PATH];
-                        StringCchPrintfW(szTempFile,
-                        MAX_PATH,
-                        L"%s%s",
-                        szDrive,
-                        pszFilename+uNameLen);
+                        WCHAR szTempFile[MAX_PATH+2];
+                        StringCchPrintfW(szTempFile, MAX_PATH, L"%s%s", szDrive, pszFilename+uNameLen);
+                        szTempFile[MAX_PATH] = 0;
                         StringCchCopyNW(pszFilename, MAX_PATH+1, szTempFile, wcslen(szTempFile));
                     }
                 }
@@ -342,12 +343,12 @@ typedef WINBASEAPI BOOL (WINAPI *LPFN_QueryFullProcessImageNameW)(__in HANDLE hP
 // Get all image names for a processID
 //
 ///////////////////////////////////////////////////////////////////////////
-std::vector < WString > GetPossibleProcessPathFilenames ( DWORD processID )
+std::vector < SString > GetPossibleProcessPathFilenames ( DWORD processID )
 {
     static LPFN_QueryFullProcessImageNameW fnQueryFullProcessImageNameW = NULL;
     static bool bDoneGetProcAddress = false;
 
-    std::vector < WString > result;
+    std::vector < SString > result;
 
     if ( !bDoneGetProcAddress )
     {
@@ -371,7 +372,7 @@ std::vector < WString > GetPossibleProcessPathFilenames ( DWORD processID )
                 CloseHandle( hProcess );
 
                 if ( bOk && wcslen ( szProcessName ) > 0 )
-                    ListAddUnique ( result, WString ( WStringX ( szProcessName ) ) );
+                    ListAddUnique ( result, ToUTF8 ( szProcessName ) );
             }
         }
     }
@@ -386,7 +387,7 @@ std::vector < WString > GetPossibleProcessPathFilenames ( DWORD processID )
             CloseHandle ( hProcess );
 
             if ( bOk && wcslen ( szProcessName ) > 0 )
-                ListAddUnique ( result, WString ( WStringX ( szProcessName ) ) );
+                ListAddUnique ( result, ToUTF8 ( szProcessName ) );
         }
     }
 
@@ -401,7 +402,7 @@ std::vector < WString > GetPossibleProcessPathFilenames ( DWORD processID )
             CloseHandle( hProcess );
 
             if ( bOk && wcslen ( szProcessName ) > 0 )
-                ListAddUnique ( result, WString ( WStringX ( devicePathToWin32Path ( szProcessName ) ) ) );
+                ListAddUnique ( result, ToUTF8 ( devicePathToWin32Path ( szProcessName ) ) );
         }
     }
 
@@ -495,7 +496,7 @@ std::vector < DWORD > GetGTAProcessList ( void )
         if ( !Is32bitProcess ( processId ) )
             continue;
 
-        std::vector < WString > filenameList = GetPossibleProcessPathFilenames ( processId );
+        std::vector < SString > filenameList = GetPossibleProcessPathFilenames ( processId );
         for ( uint i = 0; i < filenameList.size (); i++ )
             if ( filenameList[i].EndsWith ( MTA_GTAEXE_NAME ) || filenameList[i].EndsWith ( MTA_HTAEXE_NAME ) )
                 ListAddUnique ( result, processId );
@@ -575,7 +576,7 @@ std::vector < DWORD > GetOtherMTAProcessList ( void )
         if ( !Is32bitProcess ( processId ) )
             continue;
 
-        std::vector < WString > filenameList = GetPossibleProcessPathFilenames ( processId );
+        std::vector < SString > filenameList = GetPossibleProcessPathFilenames ( processId );
         for ( uint i = 0; i < filenameList.size (); i++ )
             if ( filenameList[i].EndsWith ( MTA_EXE_NAME ) )
                 ListAddUnique ( result, processId );
@@ -659,28 +660,6 @@ void DisplayErrorMessageBox ( const SString& strMessage, const SString& strError
 }
 
 
-SString GetMTASAModuleFileName ( void )
-{
-    // Get current module full path
-    char szBuffer[64000];
-    GetModuleFileName ( NULL, szBuffer, NUMELMS(szBuffer) - 1 );
-    return szBuffer;
-}
-
-
-SString GetLaunchPath ( void )
-{
-    // Get current module full path
-    char szBuffer[64000];
-    GetModuleFileName ( NULL, szBuffer, NUMELMS(szBuffer) - 1 );
-
-    // Strip the module name out of the path.
-    PathRemoveFileSpec ( szBuffer );
-
-    return szBuffer;
-}
-
-
 void SetMTASAPathSource ( bool bReadFromRegistry )
 {
     if ( bReadFromRegistry )
@@ -690,14 +669,13 @@ void SetMTASAPathSource ( bool bReadFromRegistry )
     else
     {
         // Get current module full path
-        char szBuffer[64000];
-        GetModuleFileName ( NULL, szBuffer, NUMELMS(szBuffer) - 1 );
+        SString strLaunchPathFilename = GetLaunchPathFilename();
 
         SString strHash = "-";
         {
             MD5 md5;
             CMD5Hasher Hasher;
-            if ( Hasher.Calculate ( szBuffer, md5 ) )
+            if ( Hasher.Calculate ( strLaunchPathFilename, md5 ) )
             {
                 char szHashResult[33];
                 Hasher.ConvertToHex ( md5, szHashResult );
@@ -705,22 +683,22 @@ void SetMTASAPathSource ( bool bReadFromRegistry )
             }
         }
 
-        SetRegistryValue ( "", "Last Run Path", szBuffer );
+        SetRegistryValue ( "", "Last Run Path", strLaunchPathFilename );
         SetRegistryValue ( "", "Last Run Path Hash", strHash );
         SetRegistryValue ( "", "Last Run Path Version", MTA_DM_ASE_VERSION );
 
         // Also save for legacy 1.0 to see
         SString strThisVersion = SStringX ( MTA_DM_ASE_VERSION ).TrimEnd ( "n" );
-        SetVersionRegistryValueLegacy ( strThisVersion, "", "Last Run Path", szBuffer );
+        SetVersionRegistryValueLegacy ( strThisVersion, "", "Last Run Path", strLaunchPathFilename );
         SetVersionRegistryValueLegacy ( strThisVersion, "", "Last Run Path Hash", strHash );
         SetVersionRegistryValueLegacy ( strThisVersion, "", "Last Run Path Version", MTA_DM_ASE_VERSION );
 
         // Strip the module name out of the path.
-        PathRemoveFileSpec ( szBuffer );
+        SString strLaunchPath = GetLaunchPath();
 
         // Save to a temp registry key
-        SetRegistryValue ( "", "Last Run Location", szBuffer );
-        g_strMTASAPath = szBuffer;
+        SetRegistryValue ( "", "Last Run Location", strLaunchPath );
+        g_strMTASAPath = strLaunchPath;
     }
 }
 
@@ -745,12 +723,12 @@ bool LookForGtaProcess ( SString& strOutPathFilename )
     std::vector < DWORD > processIdList = GetGTAProcessList ();
     for ( uint i = 0 ; i < processIdList.size () ; i++ )
     {
-        std::vector < WString > filenameList = GetPossibleProcessPathFilenames ( processIdList[i] );
+        std::vector < SString > filenameList = GetPossibleProcessPathFilenames ( processIdList[i] );
         for ( uint i = 0 ; i < filenameList.size () ; i++ )
         {
-            if ( FileExists ( filenameList[i].ToAnsi() ) )
+            if ( FileExists ( filenameList[i] ) )
             {
-                strOutPathFilename = filenameList[i].ToAnsi();
+                strOutPathFilename = filenameList[i];
                 return true;
             }
         }
@@ -859,18 +837,18 @@ ePathResult GetGamePath ( SString& strOutResult, bool bFindIfMissing )
 
 
     // Ask user to browse for GTA
-    BROWSEINFO bi = { 0 };
-    SString strMessage = _("Select your Grand Theft Auto: San Andreas Installation Directory");
+    BROWSEINFOW bi = { 0 };
+    WString strMessage = _("Select your Grand Theft Auto: San Andreas Installation Directory");
     bi.lpszTitle = strMessage;
-    LPITEMIDLIST pidl = SHBrowseForFolder ( &bi );
+    LPITEMIDLIST pidl = SHBrowseForFolderW ( &bi );
 
     if ( pidl != 0 )
     {
-        char szBuffer[MAX_PATH];
+        wchar_t szBuffer[MAX_PATH];
         // get the name of the  folder
-        if ( SHGetPathFromIDListA ( pidl, szBuffer ) )
+        if ( SHGetPathFromIDListW ( pidl, szBuffer ) )
         {
-            strOutResult = szBuffer;
+            strOutResult = ToUTF8( szBuffer );
         }
 
         // free memory used
@@ -1450,8 +1428,8 @@ bool CheckService ( uint uiStage )
 ///////////////////////////////////////////////////////////////////////////
 int GetFileAge ( const SString& strPathFilename )
 {
-    WIN32_FIND_DATA findFileData;
-    HANDLE hFind = FindFirstFile ( strPathFilename, &findFileData );
+    WIN32_FIND_DATAW findFileData;
+    HANDLE hFind = FindFirstFileW ( FromUTF8( strPathFilename ), &findFileData );
     if ( hFind != INVALID_HANDLE_VALUE )
     {
         FindClose ( hFind );
@@ -1847,14 +1825,14 @@ void BsodDetectionPreLaunch( void )
     // Find latest system minidump file
     SString strMatch = PathJoin( GetSystemWindowsPath(), "MiniDump", "*" );
     SString strMinidumpTime;
-    WIN32_FIND_DATA findData;
-    HANDLE hFind = FindFirstFile( strMatch, &findData );
+    WIN32_FIND_DATAW findData;
+    HANDLE hFind = FindFirstFileW( FromUTF8( strMatch ), &findData );
     if( hFind != INVALID_HANDLE_VALUE )
     {
         do
         {
             if ( ( findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY ) == false )
-                if ( strcmp( findData.cFileName, "." ) && strcmp( findData.cFileName, ".." ) )
+                if ( wcscmp( findData.cFileName, L"." ) && wcscmp( findData.cFileName, L".." ) )
                 {
                     SYSTEMTIME s;
                     FileTimeToSystemTime( &findData.ftCreationTime, &s );
@@ -1863,7 +1841,7 @@ void BsodDetectionPreLaunch( void )
                         strMinidumpTime = strCreationTime;
                 }
         }
-        while( FindNextFile( hFind, &findData ) );
+        while( FindNextFileW( hFind, &findData ) );
         FindClose( hFind );
     }
 
@@ -1928,12 +1906,13 @@ void BsodDetectionOnGameEnd( void )
 // Check a file has been signed proper
 //
 //////////////////////////////////////////////////////////
-bool VerifyEmbeddedSignature( const WString& strFilename )
+bool VerifyEmbeddedSignature( const SString& strFilename )
 {
+    WString wstrFilename = FromUTF8( strFilename );
     WINTRUST_FILE_INFO FileData;
     memset(&FileData, 0, sizeof(FileData));
     FileData.cbStruct = sizeof(WINTRUST_FILE_INFO);
-    FileData.pcwszFilePath = *strFilename;
+    FileData.pcwszFilePath = *wstrFilename;
 
     WINTRUST_DATA WinTrustData;
     memset(&WinTrustData, 0, sizeof(WinTrustData));

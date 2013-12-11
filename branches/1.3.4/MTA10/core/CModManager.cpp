@@ -333,7 +333,7 @@ void CModManager::RefreshMods ( void )
 void CModManager::InitializeModList ( const char* szModFolderPath )
 {
     // Variables used to search the mod directory
-    WIN32_FIND_DATAA FindData;
+    WIN32_FIND_DATAW FindData;
     HANDLE hFind;
 
     // Allocate a string with length of path + 5 letters to store searchpath plus "\*.*"
@@ -344,18 +344,18 @@ void CModManager::InitializeModList ( const char* szModFolderPath )
     filePathTranslator.SetCurrentWorkingDirectory ( "mta" );
 
     // Create a search
-    hFind = FindFirstFile ( strPathWildchars, &FindData );
+    hFind = FindFirstFileW ( FromUTF8( strPathWildchars), &FindData );
 
     // If we found a first file ...
     if ( hFind != INVALID_HANDLE_VALUE )
     {
         // Add it to the list
-        VerifyAndAddEntry ( szModFolderPath, FindData.cFileName );
+        VerifyAndAddEntry ( szModFolderPath, ToUTF8( FindData.cFileName ) );
 
         // Search until there aren't any files left
-        while ( FindNextFile ( hFind, &FindData ) == TRUE )
+        while ( FindNextFileW ( hFind, &FindData ) == TRUE )
         {
-            VerifyAndAddEntry ( szModFolderPath, FindData.cFileName );
+            VerifyAndAddEntry ( szModFolderPath, ToUTF8( FindData.cFileName ) );
         }
 
         // End the search
