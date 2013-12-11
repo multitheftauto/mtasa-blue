@@ -269,10 +269,11 @@ void HandleResetSettings ( void )
 
     CheckAndShowMissingFileMessage();
 
-    char szResult[MAX_PATH] = "";
-    SHGetFolderPath( NULL, CSIDL_PERSONAL, NULL, 0, szResult );
-    SString strSettingsFilename = PathJoin ( szResult, "GTA San Andreas User Files", "gta_sa.set" );
-    SString strSettingsFilenameBak = PathJoin ( szResult, "GTA San Andreas User Files", "gta_sa_old.set" );
+    wchar_t szResult[MAX_PATH] = L"";
+    SHGetFolderPathW( NULL, CSIDL_PERSONAL, NULL, 0, szResult );
+    SString strResult = ToUTF8( szResult );
+    SString strSettingsFilename = PathJoin ( strResult, "GTA San Andreas User Files", "gta_sa.set" );
+    SString strSettingsFilenameBak = PathJoin ( strResult, "GTA San Andreas User Files", "gta_sa_old.set" );
 
     if ( FileExists ( strSettingsFilename ) )
     {
@@ -547,7 +548,7 @@ void CheckAntiVirusStatus( void )
                         WCHAR szModulePathFileName[1024] = L"";
                         GetModuleFileNameExW ( GetCurrentProcess(), aModules[i], szModulePathFileName, NUMELMS(szModulePathFileName) );
                         SLibVersionInfo libVersionInfo;
-                        GetLibVersionInfo ( szModulePathFileName, &libVersionInfo );
+                        GetLibVersionInfo ( ToUTF8( szModulePathFileName ), &libVersionInfo );
 
                         for( uint i = 0 ; i < NUMELMS( avProducts ) ; i++ )
                         {
@@ -575,10 +576,10 @@ void CheckAntiVirusStatus( void )
                     if ( !Is32bitProcess ( processId ) )
                         continue;
 
-                    std::vector < WString > filenameList = GetPossibleProcessPathFilenames ( processId );
+                    std::vector < SString > filenameList = GetPossibleProcessPathFilenames ( processId );
                     for ( uint i = 0; i < filenameList.size (); i++ )
                     {
-                        const WString& strProcessPathFileName = filenameList[i];
+                        const SString& strProcessPathFileName = filenameList[i];
                         SLibVersionInfo libVersionInfo;
                         if ( GetLibVersionInfo ( strProcessPathFileName, &libVersionInfo ) )
                         {
@@ -588,7 +589,7 @@ void CheckAntiVirusStatus( void )
                                      || libVersionInfo.strProductName.ContainsI( avProducts[i] ) )
                                 {
                                     bEnableScaremongering = false;
-                                    WriteDebugEvent( SString( "AV (process) maybe found %s [%d](%s,%s)", *strProcessPathFileName.ToAnsi(), i, *libVersionInfo.strCompanyName, *libVersionInfo.strProductName ) );
+                                    WriteDebugEvent( SString( "AV (process) maybe found %s [%d](%s,%s)", *strProcessPathFileName, i, *libVersionInfo.strCompanyName, *libVersionInfo.strProductName ) );
                                 }
                             }
                         }
@@ -680,7 +681,7 @@ void CheckDataFiles( void )
     }
 
     // Check for possible virus file changing activities
-    if ( !VerifyEmbeddedSignature( *PathJoin( strMTASAPath, MTA_EXE_NAME ) ) )
+    if ( !VerifyEmbeddedSignature( PathJoin( strMTASAPath, MTA_EXE_NAME ) ) )
     {
         SString strMessage( _("Main file is unsigned. Possible virus activity.\n\nSee online help if MTA does not work correctly.") );
         #if MTASA_VERSION_BUILD > 0 && defined(MTA_DM_CONNECT_TO_PUBLIC)
@@ -778,7 +779,7 @@ int LaunchGame ( SString strCmdLine )
     //
     // Launch GTA using CreateProcess
     PROCESS_INFORMATION piLoadee;
-    STARTUPINFO siLoadee;
+    STARTUPINFOW siLoadee;
     memset( &piLoadee, 0, sizeof ( PROCESS_INFORMATION ) );
     memset( &siLoadee, 0, sizeof ( STARTUPINFO ) );
     siLoadee.cb = sizeof ( STARTUPINFO );
@@ -789,16 +790,17 @@ int LaunchGame ( SString strCmdLine )
     // Extract 'done-admin' flag from command line
     bool bDoneAdmin = strCmdLine.Contains ( "/done-admin" );
     strCmdLine = strCmdLine.Replace ( " /done-admin", "" );
+    WString wstrCmdLine = FromUTF8( strCmdLine );
 
     // Start GTA
-    if ( 0 == _CreateProcessA( strGTAEXEPath,
-                              (LPSTR)*strCmdLine,
+    if ( 0 == _CreateProcessW( FromUTF8( strGTAEXEPath ),
+                              (LPWSTR)*wstrCmdLine,
                               NULL,
                               NULL,
                               FALSE,
                               CREATE_SUSPENDED,
                               NULL,
-                              strMtaDir,    //    strMTASAPath\mta is used so pthreadVC2.dll can be found
+                              FromUTF8( strMtaDir ),    //    strMTASAPath\mta is used so pthreadVC2.dll can be found
                               &siLoadee,
                               &piLoadee ) )
     {
@@ -828,7 +830,7 @@ int LaunchGame ( SString strCmdLine )
     // Inject the core into GTA
     SetDllDirectory( strMtaDir );
     SString strCoreDLL = PathJoin( strMTASAPath, "mta", MTA_DLL_NAME );
-    RemoteLoadLibrary ( piLoadee.hProcess, strCoreDLL );
+    RemoteLoadLibrary ( piLoadee.hProcess, FromUTF8( strCoreDLL ) );
     WriteDebugEvent( SString( "Loader - Core injected: %s", *strCoreDLL ) );
     
     // Clear previous on quit commands

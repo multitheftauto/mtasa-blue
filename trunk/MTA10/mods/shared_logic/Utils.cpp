@@ -20,22 +20,6 @@
 using namespace std;
 
 
-bool DoesFileExist ( const char* szFilename )
-{
-    // Check that the file exists
-    WIN32_FIND_DATA wFind;
-    HANDLE hFind = FindFirstFile ( szFilename, &wFind );
-    if ( hFind == INVALID_HANDLE_VALUE )
-    {
-        return false;
-    }
-
-    // Clean up
-    FindClose ( hFind );
-    return true;
-}
-
-
 char* ReplaceAnyStringOccurrence ( char* szBuffer, const char* szWhat, const char* szWith, size_t sizeMax )
 {
     // TODO: Check for max size

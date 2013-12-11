@@ -94,7 +94,7 @@ bool CAudioContainerSA::GetRawAudioData ( eAudioLookupIndex lookupIndex, int ban
         return false;
 
     // Get archive file size
-    std::ifstream archive ( GetAudioArchiveName ( lookupIndex ), std::ios::binary );
+    std::ifstream archive ( FromUTF8( GetAudioArchiveName ( lookupIndex ) ), std::ios::binary );
 
     SAudioLookupEntrySA* lookupEntry = m_pLookupTable->GetEntry ( lookupIndex, bankIndex );
     if ( !lookupEntry )
@@ -166,7 +166,7 @@ bool CAudioContainerSA::ValidateContainer ( eAudioLookupIndex lookupIndex )
 #endif
 
     // Open archive and place file pointer at the end
-    std::ifstream archive ( GetAudioArchiveName ( lookupIndex ), std::ios::binary );
+    std::ifstream archive ( FromUTF8( GetAudioArchiveName ( lookupIndex ) ), std::ios::binary );
 
     // Check if it does not exist
     if ( !archive )

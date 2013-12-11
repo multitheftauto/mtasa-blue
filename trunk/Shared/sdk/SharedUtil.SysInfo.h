@@ -31,7 +31,7 @@ namespace SharedUtil
     long long   GetWMIVideoAdapterMemorySize    ( const SString& strDisplay );
     long long   GetWMITotalPhysicalMemory       ( void );
     void        GetWMIAntiVirusStatus           ( std::vector < SString >& outEnabledList, std::vector < SString >& outDisabledList );
-    bool        GetLibVersionInfo               ( const WString& strLibName, SLibVersionInfo* pOutLibVersionInfo );
+    bool        GetLibVersionInfo               ( const SString& strLibName, SLibVersionInfo* pOutLibVersionInfo );
 }
 
 #endif

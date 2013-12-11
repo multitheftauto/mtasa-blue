@@ -15,7 +15,7 @@
 
 CAudioContainerLookupTableSA::CAudioContainerLookupTableSA( const SString& strPath )
 {
-    std::ifstream fileHandle ( strPath, std::ios::binary );
+    std::ifstream fileHandle ( FromUTF8( strPath ), std::ios::binary );
     if ( !fileHandle )
         return;
 

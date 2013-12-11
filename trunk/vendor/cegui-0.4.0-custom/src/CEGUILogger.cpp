@@ -144,7 +144,7 @@ namespace CEGUI
             d_ostream.close();
         }
 
-        d_ostream.open(filename.c_str(), std::ios_base::out | (append ? std::ios_base::app : std::ios_base::trunc));
+        d_ostream.open(filename.c_wstring().c_str(), std::ios_base::out | (append ? std::ios_base::app : std::ios_base::trunc));
 
         if (!d_ostream)
         {

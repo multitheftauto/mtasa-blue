@@ -141,10 +141,10 @@ void CConsoleLogger::CleanFile( const SString& strPathFilenameSource, const SStr
 {
     std::fstream fileSource;
     std::fstream fileDest;
-    fileSource.open ( strPathFilenameSource, ios::in );
+    fileSource.open ( FromUTF8( strPathFilenameSource ), ios::in );
     if ( !fileSource.good() )
         return;
-    fileDest.open ( strPathFilenameDest, ios::out );
+    fileDest.open ( FromUTF8( strPathFilenameDest ), ios::out );
     while ( fileSource.good() )
     {
         SString strLine;

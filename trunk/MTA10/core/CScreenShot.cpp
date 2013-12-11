@@ -69,16 +69,16 @@ int CScreenShot::GetScreenShots ( void )
 {
     int iNumberOfFiles = 0;
     HANDLE hFind;
-    WIN32_FIND_DATA fdFindData;
+    WIN32_FIND_DATAW fdFindData;
     //Create a search string
     SString strScreenShotName ( "%s\\mta-screen*.png", &szScreenShotPath[0] );
     // Find the first match
-    hFind = FindFirstFile(strScreenShotName, &fdFindData); 
+    hFind = FindFirstFileW(FromUTF8( strScreenShotName ), &fdFindData); 
     // Check if the first match failed
     if ( hFind != INVALID_HANDLE_VALUE) {
         iNumberOfFiles++;
         //Loop through and count the files
-        while (FindNextFile(hFind, &fdFindData)) { 
+        while (FindNextFileW(hFind, &fdFindData)) { 
             //Keep going until we find the last file
             iNumberOfFiles++;
         }
@@ -102,10 +102,10 @@ SString CScreenShot::GetScreenShotPath ( int iNumber )
     SString strScreenShotName ( "%s\\mta-screen*.png", &szScreenShotPath[0] );
     HANDLE hFind;
     SString strReturn = "";
-    WIN32_FIND_DATA fdFindData;
+    WIN32_FIND_DATAW fdFindData;
     int i = 1;
     //Find the first match
-    hFind = FindFirstFile(strScreenShotName, &fdFindData);
+    hFind = FindFirstFileW(FromUTF8( strScreenShotName ), &fdFindData);
     //Check if the first match failed
     if ( hFind != INVALID_HANDLE_VALUE) {
         if (iNumber == 1) {
@@ -115,7 +115,7 @@ SString CScreenShot::GetScreenShotPath ( int iNumber )
         else
         {
             //Loop through and find all occurences of the file
-            while (FindNextFile(hFind, &fdFindData)) { 
+            while (FindNextFileW(hFind, &fdFindData)) { 
                 //Keep going until we find the last file
                 i++;
                 if (iNumber == i) {

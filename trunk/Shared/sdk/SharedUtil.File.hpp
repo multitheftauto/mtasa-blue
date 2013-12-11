@@ -285,56 +285,63 @@ SString SharedUtil::PathMakeRelative ( const SString& strInBasePath, const SStri
 }
 
 
-#ifdef WIN32
-#ifdef MTA_CLIENT
 
 SString SharedUtil::GetSystemCurrentDirectory ( void )
 {
-    char szResult [ 1024 ] = "";
-    GetCurrentDirectory ( sizeof ( szResult ), szResult );
-    return szResult;
+#ifdef WIN32
+    wchar_t szResult [ 1024 ] = L"";
+    GetCurrentDirectoryW ( NUMELMS ( szResult ), szResult );
+    return ToUTF8( szResult );
+#else
+    char szBuffer[ MAX_PATH ];
+    getcwd ( szBuffer, MAX_PATH - 1 );
+    return szBuffer;
+#endif
 }
+
+#ifdef WIN32
+#ifdef MTA_CLIENT
 
 SString SharedUtil::GetSystemDllDirectory ( void )
 {
-    char szResult [ 1024 ] = "";
-    GetDllDirectory ( sizeof ( szResult ), szResult );
-    return szResult;
+    wchar_t szResult [ 1024 ] = L"";
+    GetDllDirectoryW ( NUMELMS ( szResult ), szResult );
+    return ToUTF8( szResult );
 }
 
 SString SharedUtil::GetSystemLocalAppDataPath ( void )
 {
-    char szResult[MAX_PATH] = "";
-    SHGetFolderPath( NULL, CSIDL_LOCAL_APPDATA, NULL, 0, szResult );
-    return szResult;
+    wchar_t szResult[MAX_PATH] = L"";
+    SHGetFolderPathW( NULL, CSIDL_LOCAL_APPDATA, NULL, 0, szResult );
+    return ToUTF8( szResult );
 }
 
 SString SharedUtil::GetSystemCommonAppDataPath ( void )
 {
-    char szResult[MAX_PATH] = "";
-    SHGetFolderPath( NULL, CSIDL_COMMON_APPDATA, NULL, 0, szResult );
-    return szResult;
+    wchar_t szResult[MAX_PATH] = L"";
+    SHGetFolderPathW( NULL, CSIDL_COMMON_APPDATA, NULL, 0, szResult );
+    return ToUTF8( szResult );
 }
 
 SString SharedUtil::GetSystemWindowsPath ( void )
 {
-    char szResult[MAX_PATH] = "";
-    SHGetFolderPath( NULL, CSIDL_WINDOWS, NULL, 0, szResult );
-    return szResult;
+    wchar_t szResult[MAX_PATH] = L"";
+    SHGetFolderPathW( NULL, CSIDL_WINDOWS, NULL, 0, szResult );
+    return ToUTF8( szResult );
 }
 
 SString SharedUtil::GetSystemSystemPath ( void )
 {
-    char szResult[MAX_PATH] = "";
-    SHGetFolderPath( NULL, CSIDL_SYSTEM, NULL, 0, szResult );
-    return szResult;
+    wchar_t szResult[MAX_PATH] = L"";
+    SHGetFolderPathW( NULL, CSIDL_SYSTEM, NULL, 0, szResult );
+    return ToUTF8( szResult );
 }
 
 SString SharedUtil::GetSystemTempPath ( void )
 {
-    char szResult[4030] = "";
-    GetTempPath( 4000, szResult );
-    return szResult;
+    wchar_t szResult[4030] = L"";
+    GetTempPathW( 4000, szResult );
+    return ToUTF8( szResult );
 }
 
 SString SharedUtil::GetMTADataPath ( void )
@@ -346,9 +353,72 @@ SString SharedUtil::GetMTATempPath ( void )
 {
     return PathJoin ( GetSystemTempPath(), "MTA" + GetMajorVersionString () );
 }
-#endif
+
+
+// C:\Program Files\gta_sa.exe
+SString SharedUtil::GetLaunchPathFilename( void )
+{
+    wchar_t szBuffer[64000];
+    GetModuleFileNameW( NULL, szBuffer, NUMELMS(szBuffer) - 1 );
+    return ToUTF8( szBuffer );
+}
+
+// C:\Program Files
+SString SharedUtil::GetLaunchPath( void )
+{
+    return ExtractPath( GetLaunchPathFilename() );
+}
+
+// gta_sa.exe
+SString SharedUtil::GetLaunchFilename( void )
+{
+    return ExtractFilename( GetLaunchPathFilename() );
+}
+
 #endif
 
+
+WString SharedUtil::FromUTF8( const SString& strPath )
+{
+#ifdef WIN32_TESTING   // This might be faster - Needs testing
+    const char* szSrc = strPath;
+    uint cCharacters = strlen ( szSrc ) + 1 ;
+    uint cbUnicode = cCharacters * 4;
+    wchar_t* Dest = (wchar_t*)alloca ( cbUnicode );
+
+    if ( MultiByteToWideChar ( CP_UTF8, 0, szSrc, -1, Dest, (int)cbUnicode ) == 0 )
+    {
+        return WString();
+    }
+    else
+    {
+        return Dest;
+    }
+#else
+    return MbUTF8ToUTF16( strPath );
+#endif
+}
+
+
+SString SharedUtil::ToUTF8( const WString& strPath )
+{
+#ifdef WIN32_TESTING   // This might be faster - Needs testing
+    const wchar_t* pszW = strPath;
+    uint cCharacters = wcslen(pszW)+1;
+    uint cbAnsi = cCharacters * 6;
+    char* pData = (char*)alloca ( cbAnsi );
+
+    if (0 == WideCharToMultiByte(CP_UTF8, 0, pszW, cCharacters, pData, cbAnsi, NULL, NULL))
+    {
+        return "";
+    }
+    return pData;
+#else
+    return UTF16ToMbUTF8( strPath );
+#endif
+}
+
+#endif
 
 
 #ifdef WIN32
@@ -362,25 +432,27 @@ SString SharedUtil::GetMTATempPath ( void )
 bool SharedUtil::DelTree ( const SString& strPath, const SString& strInsideHere )
 {
     // Safety: Make sure strPath is inside strInsideHere
-    if ( strPath.ToLower ().substr ( 0, strInsideHere.length () ) != strInsideHere.ToLower () )
+    WString wstrPath = FromUTF8( strPath );
+    WString wstrInsideHere = FromUTF8( strInsideHere );
+    if ( wstrPath.BeginsWithI( wstrInsideHere ) )
     {
         assert ( 0 );
         return false;
     }
 
-    DWORD dwBufferSize = strPath.length () + 3;
-    char *szBuffer = static_cast < char* > ( alloca ( dwBufferSize ) );
+    DWORD dwBufferSize = ( wstrPath.length() + 3 ) * sizeof( wchar_t );
+    wchar_t *szBuffer = static_cast < wchar_t* > ( alloca ( dwBufferSize ) );
     memset ( szBuffer, 0, dwBufferSize );
-    strncpy ( szBuffer, strPath, strPath.length () );
-    SHFILEOPSTRUCT sfos;
+    wcsncpy ( szBuffer, wstrPath, wstrPath.length() * sizeof( wchar_t ) );
+    SHFILEOPSTRUCTW sfos;
 
     sfos.hwnd = NULL;
     sfos.wFunc = FO_DELETE;
-    sfos.pFrom = szBuffer;
+    sfos.pFrom = szBuffer;  // Double NULL terminated
     sfos.pTo = NULL;
     sfos.fFlags = FOF_NOCONFIRMATION | FOF_NOERRORUI | FOF_SILENT | FOF_ALLOWUNDO;
 
-    int status = SHFileOperation(&sfos);
+    int status = SHFileOperationW(&sfos);
     return status == 0;
 }
 #endif
@@ -465,22 +537,22 @@ std::vector < SString > SharedUtil::FindFiles ( const SString& strInMatch, bool 
     if ( strMatch.Right ( 1 ) == PATH_SEPERATOR )
         strMatch += "*";
 
-    WIN32_FIND_DATA findData;
-    HANDLE hFind = FindFirstFile ( strMatch, &findData );
+    WIN32_FIND_DATAW findData;
+    HANDLE hFind = FindFirstFileW ( FromUTF8( strMatch ), &findData );
     if( hFind != INVALID_HANDLE_VALUE )
     {
         do
         {
             if ( ( findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY ) ? bDirectories : bFiles )
-                if ( strcmp ( findData.cFileName, "." ) && strcmp ( findData.cFileName, ".." ) )
+                if ( wcscmp ( findData.cFileName, L"." ) && wcscmp ( findData.cFileName, L".." ) )
                 {
                     if ( bSortByDate )
-                        MapInsert( sortMap, (uint64&)findData.ftLastWriteTime, SStringX( findData.cFileName ) );
+                        MapInsert( sortMap, (uint64&)findData.ftLastWriteTime, ToUTF8( findData.cFileName ) );
                     else
-                        strResult.push_back ( findData.cFileName );
+                        strResult.push_back ( ToUTF8( findData.cFileName ) );
                 }
         }
-        while( FindNextFile( hFind, &findData ) );
+        while( FindNextFileW( hFind, &findData ) );
         FindClose( hFind );
     }
 
@@ -636,5 +708,17 @@ SString SharedUtil::MakeUniquePath ( const SString& strInPathFilename )
 // Conform a path string for sorting
 SString SharedUtil::ConformPathForSorting ( const SString& strPathFilename )
 {
-    return PathConform ( strPathFilename ).ToLower ();
+    LOCAL_FUNCTION_START
+        static int mytolower( int c )
+        {
+            // Ignores locale and always does this:
+            if ( c >= 'A' && c <= 'Z' )
+                c = c - 'A' + 'a';
+            return c;
+        }
+    LOCAL_FUNCTION_END
+
+    SString strResult = strPathFilename;
+    std::transform ( strResult.begin(), strResult.end(), strResult.begin(), LOCAL_FUNCTION::mytolower );
+    return strResult;
 }
