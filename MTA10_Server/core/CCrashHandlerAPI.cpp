@@ -1332,7 +1332,7 @@ static DWORD __stdcall
 
     // This could blow the stack...
     char szBuff[ MAX_PATH + 1 ] ;
-    DWORD dwRet = GetModuleFileName ( hModule , szBuff , MAX_PATH ) ;
+    DWORD dwRet = GetModuleFileNameA ( hModule , szBuff , MAX_PATH ) ;
     ASSERT ( 0 != dwRet ) ;
     if ( 0 == dwRet )
     {
@@ -1426,7 +1426,7 @@ DWORD BUGSUTIL_DLLINTERFACE __stdcall
         for ( UINT uiCurr = 0 ; uiCurr < dwCount ; uiCurr++ )
         {
             // Get the module's filename.
-            if ( FALSE == GetModuleFileName ( paMods[ uiCurr ]     ,
+            if ( FALSE == GetModuleFileNameA ( paMods[ uiCurr ]     ,
                                               szModName            ,
                                               sizeof ( szModName )  ) )
             {

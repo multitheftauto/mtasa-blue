@@ -32,7 +32,7 @@ enum
 
 // Loads the given dll into hProcess. Returns 0 on failure or the handle to the
 // remote dll module on success.
-HMODULE         RemoteLoadLibrary                   ( HANDLE hProcess, const char* szLibPath );
+HMODULE         RemoteLoadLibrary                   ( HANDLE hProcess, const WString& strLibPath );
 void            InsertWinMainBlock                  ( HANDLE hProcess );
 void            RemoveWinMainBlock                  ( HANDLE hProcess );
 void            ApplyLoadingCrashPatch              ( HANDLE hProcess );
@@ -49,7 +49,6 @@ void            SetMTASAPathSource                  ( bool bReadFromRegistry );
 SString         GetMTASAPath                        ( void );
 ePathResult     DiscoverGTAPath                     ( bool bFindIfMissing );
 SString         GetGTAPath                          ( void );
-SString         GetMTASAModuleFileName              ( void );
 
 void            FindFilesRecursive                  ( const SString& strPathMatch, std::vector < SString >& outFileList, uint uiMaxDepth = 99 );
 SString         GetOSVersion                        ( void );
@@ -81,12 +80,12 @@ void            CheckAndShowUpgradeProblems         ( void );
 void            BsodDetectionPreLaunch              ( void );
 void            BsodDetectionOnGameBegin            ( void );
 void            BsodDetectionOnGameEnd              ( void );
-bool            VerifyEmbeddedSignature             ( const WString& strFilename );
+bool            VerifyEmbeddedSignature             ( const SString& strFilename );
 void            LogSettings                         ( void );
 SString         PadLeft                             ( const SString& strText, uint uiNumSpaces, char cCharacter );
 bool            IsDeviceSelectionDialogOpen         ( DWORD dwThreadId );
 std::vector < DWORD > MyEnumProcesses               ( void );
-std::vector < WString > GetPossibleProcessPathFilenames ( DWORD processID );
+std::vector < SString > GetPossibleProcessPathFilenames ( DWORD processID );
 
 //
 // Determine if game process has gone wonky
@@ -134,7 +133,7 @@ public:
     #define _VirtualFreeEx          VirtualFreeEx
     #define _ReadProcessMemory      ReadProcessMemory
     #define _WriteProcessMemory     WriteProcessMemory
-    #define _CreateProcess          CreateProcess
+    #define _CreateProcessW         CreateProcessW
     #define _CreateRemoteThread     CreateRemoteThread
 
 #else
@@ -197,16 +196,16 @@ public:
     typedef
     BOOL
     (WINAPI
-    *FUNC_CreateProcessA)(
-        __in_opt    LPCSTR lpApplicationName,
-        __inout_opt LPSTR lpCommandLine,
+    *FUNC_CreateProcessW)(
+        __in_opt    LPCWSTR lpApplicationName,
+        __inout_opt LPWSTR lpCommandLine,
         __in_opt    LPSECURITY_ATTRIBUTES lpProcessAttributes,
         __in_opt    LPSECURITY_ATTRIBUTES lpThreadAttributes,
         __in        BOOL bInheritHandles,
         __in        DWORD dwCreationFlags,
         __in_opt    LPVOID lpEnvironment,
-        __in_opt    LPCSTR lpCurrentDirectory,
-        __in        LPSTARTUPINFOA lpStartupInfo,
+        __in_opt    LPCWSTR lpCurrentDirectory,
+        __in        LPSTARTUPINFOW lpStartupInfo,
         __out       LPPROCESS_INFORMATION lpProcessInformation
         );
 
@@ -247,7 +246,7 @@ public:
     #define _VirtualFreeEx                  __VirtualFreeEx()
     #define _ReadProcessMemory              __ReadProcessMemory()
     #define _WriteProcessMemory             __WriteProcessMemory()
-    #define _CreateProcessA                 __CreateProcessA()
+    #define _CreateProcessW                 __CreateProcessW()
     #define _CreateRemoteThread             __CreateRemoteThread()
     #define _WscGetSecurityProviderHealth   __WscGetSecurityProviderHealth()
 
@@ -256,7 +255,7 @@ public:
     DEFFUNCTION( "kernel32", Virt,ualFre,eEx )
     DEFFUNCTION( "kernel32", Read,Proces,sMemory )
     DEFFUNCTION( "kernel32", Writ,eProce,ssMemory )
-    DEFFUNCTION( "kernel32", Crea,teProc,essA )
+    DEFFUNCTION( "kernel32", Crea,teProc,essW )
     DEFFUNCTION( "kernel32", Crea,teRemo,teThread )
     DEFFUNCTION( "Wscapi", WscGetSecurityProviderHeal,t,h )
 

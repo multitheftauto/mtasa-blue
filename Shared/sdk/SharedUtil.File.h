@@ -75,4 +75,11 @@ namespace SharedUtil
     SString         GetSystemTempPath               ( void );
     SString         GetMTADataPath                  ( void );
     SString         GetMTATempPath                  ( void );
+
+    SString         GetLaunchPathFilename           ( void );
+    SString         GetLaunchPath                   ( void );
+    SString         GetLaunchFilename               ( void );
+
+    WString         FromUTF8                        ( const SString& strPath );
+    SString         ToUTF8                          ( const WString& strPath );
 }

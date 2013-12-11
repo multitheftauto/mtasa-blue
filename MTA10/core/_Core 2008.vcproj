@@ -2169,6 +2169,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\Shared\sdk\SharedUtil.Win32Utf8FileHooks.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\Shared\sdk\SString.h"
 					>
 				</File>

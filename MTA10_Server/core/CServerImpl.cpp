@@ -270,9 +270,7 @@ int CServerImpl::Run ( int iArgumentCount, char* szArguments [] )
     // Did we find the path? If not, assume our current
     if ( m_strServerPath == "" )
     {
-        char szBuffer[ MAX_PATH ];
-        getcwd ( szBuffer, MAX_PATH - 1 );
-        m_strServerPath = szBuffer;
+        m_strServerPath = GetSystemCurrentDirectory();
     }
 
     // Convert all backslashes to forward slashes

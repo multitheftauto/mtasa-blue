@@ -465,10 +465,10 @@ void SharedUtil::GetWMIAntiVirusStatus( std::vector < SString >& outEnabledList,
 // Get version info of a file
 //
 ///////////////////////////////////////////////////////////////
-bool SharedUtil::GetLibVersionInfo( const WString& strLibName, SLibVersionInfo* pOutLibVersionInfo )
+bool SharedUtil::GetLibVersionInfo( const SString& strLibName, SLibVersionInfo* pOutLibVersionInfo )
 {
     DWORD dwHandle, dwLen;
-    dwLen = GetFileVersionInfoSizeW ( strLibName, &dwHandle );
+    dwLen = GetFileVersionInfoSizeW ( FromUTF8( strLibName ), &dwHandle );
     if (!dwLen) 
         return FALSE;
 
@@ -477,7 +477,7 @@ bool SharedUtil::GetLibVersionInfo( const WString& strLibName, SLibVersionInfo* 
         return FALSE;
 
     SetLastError ( 0 );
-    if( !GetFileVersionInfoW ( strLibName, dwHandle, dwLen, lpData ) )
+    if( !GetFileVersionInfoW ( FromUTF8( strLibName ), dwHandle, dwLen, lpData ) )
     {
         free (lpData);
         return FALSE;

@@ -13,6 +13,7 @@
 *****************************************************************************/
 
 #include "StdInc.h"
+#include "SharedUtil.Win32Utf8FileHooks.hpp"
 #if defined(_DEBUG) 
     #include "SharedUtil.Tests.hpp"
 #endif
@@ -32,6 +33,8 @@
 extern "C" _declspec(dllexport)
 int DoWinMain ( HINSTANCE hLauncherInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow )
 {
+    AddUtf8FileHooks();
+
 #if defined(_DEBUG) 
     SharedUtil_Tests ();
 #endif
@@ -116,5 +119,7 @@ int DoWinMain ( HINSTANCE hLauncherInstance, HINSTANCE hPrevInstance, LPSTR lpCm
     ProcessPendingBrowseToSolution();
 
     AddReportLog ( 1044, SString ( "* End (%d)* pid:%d",  iReturnCode, GetCurrentProcessId() ) );
+
+    RemoveUtf8FileHooks();
     return iReturnCode;
 }

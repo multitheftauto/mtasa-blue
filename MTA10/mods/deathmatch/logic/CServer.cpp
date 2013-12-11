@@ -118,7 +118,7 @@ bool CServer::Start ( const char* szConfig )
         m_strConfig = szConfig;
 
         // Check that the DLL exists
-        if ( !DoesFileExist ( m_strDLLFile ) )
+        if ( !FileExists ( m_strDLLFile ) )
         {
             g_pCore->GetConsole ()->Printf ( "Unable to find: '%s'", m_strDLLFile.c_str () );
             return false;
