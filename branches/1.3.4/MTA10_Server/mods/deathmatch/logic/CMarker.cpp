@@ -145,6 +145,10 @@ void CMarker::SetPosition ( const CVector& vecPosition )
             m_pCollision->SetPosition ( vecPosition );
         UpdateSpatialData ();
 
+        // If attached, client should handle the position correctly
+        if (  m_pAttachedTo )
+            return;
+
         // We need to make sure the time context is replaced 
         // before that so old packets don't arrive after this.
         GenerateSyncTimeContext ();
