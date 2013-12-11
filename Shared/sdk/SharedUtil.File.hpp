@@ -375,7 +375,8 @@ SString SharedUtil::GetLaunchFilename( void )
     return ExtractFilename( GetLaunchPathFilename() );
 }
 
-#endif
+#endif  // #ifdef MTA_CLIENT
+#endif  // #ifdef WIN_32
 
 
 WString SharedUtil::FromUTF8( const SString& strPath )
@@ -417,8 +418,6 @@ SString SharedUtil::ToUTF8( const WString& strPath )
     return UTF16ToMbUTF8( strPath );
 #endif
 }
-
-#endif
 
 
 #ifdef WIN32
