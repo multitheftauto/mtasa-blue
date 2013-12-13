@@ -721,3 +721,17 @@ SString SharedUtil::ConformPathForSorting ( const SString& strPathFilename )
     std::transform ( strResult.begin(), strResult.end(), strResult.begin(), LOCAL_FUNCTION::mytolower );
     return strResult;
 }
+
+// Return true if path is not relative
+bool SharedUtil::IsAbsolutePath ( const SString& strInPath )
+{
+    const SString strPath = PathConform ( strInPath );
+
+    if ( strPath.BeginsWith( PATH_SEPERATOR ) )
+        return true;
+#ifdef WIN32
+    if ( strPath.length() > 0 && strPath[1] == ':' )
+        return true;
+#endif
+    return false;
+}
