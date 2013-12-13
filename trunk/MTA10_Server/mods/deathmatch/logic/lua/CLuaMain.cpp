@@ -80,6 +80,8 @@ CLuaMain::CLuaMain ( CLuaManager* pLuaManager,
     m_bBeingDeleted = false;
     m_pLuaTimerManager = new CLuaTimerManager;
     m_FunctionEnterTimer.SetMaxIncrement ( 500 );
+    m_uiOpenFileCountWarnThresh = 10;
+    m_uiOpenXMLFileCountWarnThresh = 20;
 
     m_pObjectManager = pObjectManager;
     m_pPlayerManager = pPlayerManager;
@@ -511,12 +513,29 @@ void CLuaMain::DoPulse ( void )
     m_pLuaTimerManager->DoPulse ( this );
 }
 
+// Keep count of the number of open files in this resource and issue a warning if too high
+void CLuaMain::OnOpenFile( void )
+{
+    m_uiOpenFileCount++;
+    if ( m_uiOpenFileCount > m_uiOpenFileCountWarnThresh )
+    {
+        m_uiOpenFileCountWarnThresh = m_uiOpenFileCount * 2;
+        CLogger::LogPrintf ( "Notice: There are now %d open files in resource '%s'\n", m_uiOpenFileCount, GetScriptName() );
+    }
+}
 
 CXMLFile * CLuaMain::CreateXML ( const char * szFilename )
 {
     CXMLFile * pFile = g_pServerInterface->GetXML ()->CreateXML ( szFilename, true );
     if ( pFile )
+    {
         m_XMLFiles.push_back ( pFile );
+        if ( m_XMLFiles.size() > m_uiOpenXMLFileCountWarnThresh )
+        {
+            m_uiOpenXMLFileCountWarnThresh = m_XMLFiles.size() * 2;
+            CLogger::LogPrintf ( "Notice: There are now %d open XML files in resource '%s'\n", m_XMLFiles.size(), GetScriptName() );
+        }
+    }
     return pFile;
 }
 

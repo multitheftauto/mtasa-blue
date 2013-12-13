@@ -62,6 +62,8 @@ bool CScriptFile::Load ( eMode Mode )
         }
 
         // Return whether we successfully opened it or not
+        if ( m_pFile != NULL )
+            m_pResource->GetVirtualMachine()->OnOpenFile();
         return m_pFile != NULL;
     }
 
@@ -78,6 +80,7 @@ void CScriptFile::Unload ( void )
         // Close the file
         fclose ( m_pFile );
         m_pFile = NULL;
+        m_pResource->GetVirtualMachine()->OnCloseFile();
     }
 }
 

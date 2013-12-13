@@ -29,6 +29,7 @@ namespace
         int Current;
         int Max;
         int OpenXMLFiles;
+        int OpenFiles;
         int Refs;
         int TimerCount;
         int ElementCount;
@@ -180,6 +181,7 @@ void CPerfStatLuaMemoryImpl::UpdateLuaMemory ( CLuaMain* pLuaMain, int iMemUsed 
     pLuaMainMemory->Max = Max ( pLuaMainMemory->Max, pLuaMainMemory->Current );
 
     pLuaMainMemory->OpenXMLFiles = pLuaMain->GetXMLFileCount ();
+    pLuaMainMemory->OpenFiles = pLuaMain->GetOpenFileCount ();
     pLuaMainMemory->Refs = pLuaMain->m_CallbackTable.size ();
     pLuaMainMemory->TimerCount = pLuaMain->GetTimerCount ();
     pLuaMainMemory->ElementCount = pLuaMain->GetElementCount ();
@@ -262,6 +264,7 @@ void CPerfStatLuaMemoryImpl::GetLuaMemoryStats ( CPerfStatResult* pResult, const
     pResult->AddColumn ( "current" );
     pResult->AddColumn ( "max" );
     pResult->AddColumn ( "XMLFiles" );
+    pResult->AddColumn ( "OpenFiles" );
     pResult->AddColumn ( "refs" );
     pResult->AddColumn ( "Timers" );
     pResult->AddColumn ( "Elements" );
@@ -332,6 +335,7 @@ void CPerfStatLuaMemoryImpl::GetLuaMemoryStats ( CPerfStatResult* pResult, const
         row[c++] = SString ( "%d KB", LuaMainMemory.Current );
         row[c++] = SString ( "%d KB", LuaMainMemory.Max );
         row[c++] = !LuaMainMemory.OpenXMLFiles ? "-" : SString ( "%d", LuaMainMemory.OpenXMLFiles );
+        row[c++] = !LuaMainMemory.OpenFiles ? "-" : SString ( "%d", LuaMainMemory.OpenFiles );
         row[c++] = !LuaMainMemory.Refs ? "-" : SString ( "%d", LuaMainMemory.Refs );
         row[c++] = !LuaMainMemory.TimerCount ? "-" : SString ( "%d", LuaMainMemory.TimerCount );
         row[c++] = !LuaMainMemory.ElementCount ? "-" : SString ( "%d", LuaMainMemory.ElementCount );
