@@ -234,7 +234,7 @@ namespace SharedUtil
         {
             // Fixes for GTA not working with unicode path
             hResult = pfnCreateFileA( lpFileName, dwDesiredAccess, dwShareMode, lpSecurityAttributes, dwCreationDisposition, dwFlagsAndAttributes, hTemplateFile );
-            if ( hResult == INVALID_HANDLE_VALUE )
+            if ( hResult == INVALID_HANDLE_VALUE && IsAbsolutePath( lpFileName ) )
             {
                 // Try to fix broken path
                 for ( uint i = 1 ; i < 10 ; i++ )
@@ -292,7 +292,7 @@ namespace SharedUtil
         {
             // Fixes for GTA not working with unicode path
             bResult = pfnSetCurrentDirectoryA ( lpPathName );
-            if ( bResult == 0 )
+            if ( bResult == 0 && IsAbsolutePath( lpPathName ) )
             {
                 // Try to fix broken path
                 for ( uint i = 1 ; i < 10 ; i++ )

@@ -65,6 +65,7 @@ namespace SharedUtil
     std::vector < SString > FindFiles               ( const SString& strMatch, bool bFiles, bool bDirectories, bool bSortByDate = false );
     SString         MakeUniquePath                  ( const SString& strPathFilename );
     SString         ConformPathForSorting           ( const SString& strPathFilename );
+    bool            IsAbsolutePath                  ( const SString& strPath );
 
     SString         GetSystemCurrentDirectory       ( void );
     SString         GetSystemDllDirectory           ( void );
