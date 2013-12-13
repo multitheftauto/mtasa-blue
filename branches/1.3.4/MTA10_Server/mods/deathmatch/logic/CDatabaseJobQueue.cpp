@@ -307,10 +307,11 @@ void CDatabaseJobQueueImpl::UpdateDebugData ( void )
     shared.m_Mutex.Lock ();
 
     // Log to console if job count is creeping up
+    m_uiJobCount10sMin = Min( m_uiJobCount10sMin, m_ActiveJobHandles.size () );
     if ( m_uiJobCount10sMin > m_uiJobCountWarnThresh )
     {
         m_uiJobCountWarnThresh = m_uiJobCount10sMin * 2;
-        CLogger::LogPrintf ( "Notice: %d database query handles created in the last 10 seconds\n", m_uiJobCount10sMin );
+        CLogger::LogPrintf ( "Notice: %d database query handles active in the last 10 seconds\n", m_uiJobCount10sMin );
     }
     m_JobCountElpasedTime.Reset ();
     m_uiJobCount10sMin = m_ActiveJobHandles.size ();
