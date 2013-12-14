@@ -433,7 +433,7 @@ bool SharedUtil::DelTree ( const SString& strPath, const SString& strInsideHere 
     // Safety: Make sure strPath is inside strInsideHere
     WString wstrPath = FromUTF8( strPath );
     WString wstrInsideHere = FromUTF8( strInsideHere );
-    if ( wstrPath.BeginsWithI( wstrInsideHere ) )
+    if ( !wstrPath.BeginsWithI( wstrInsideHere ) )
     {
         assert ( 0 );
         return false;
