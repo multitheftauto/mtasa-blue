@@ -93,10 +93,13 @@ SString SharedUtil::CalcMTASAPath ( const SString& strPath )
 static void WriteRegistryStringValue ( HKEY hkRoot, const char* szSubKey, const char* szValue, const SString& strBuffer )
 {
     HKEY hkTemp;
-    RegCreateKeyEx ( hkRoot, szSubKey, 0, NULL, REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, NULL, &hkTemp, NULL );
+    WString wstrSubKey = FromUTF8( szSubKey );
+    WString wstrValue = FromUTF8( szValue );
+    WString wstrBuffer = FromUTF8( strBuffer );
+    RegCreateKeyExW ( hkRoot, wstrSubKey, 0, NULL, REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, NULL, &hkTemp, NULL );
     if ( hkTemp )
     {
-        RegSetValueEx ( hkTemp, szValue, NULL, REG_SZ, (LPBYTE)strBuffer.c_str (), strBuffer.length () + 1 );
+        RegSetValueExW ( hkTemp, wstrValue, NULL, REG_SZ, (LPBYTE)wstrBuffer.c_str (), ( wstrBuffer.length () + 1 ) * sizeof( wchar_t ) );
         RegCloseKey ( hkTemp );
     }
 }
@@ -111,15 +114,18 @@ static SString ReadRegistryStringValue ( HKEY hkRoot, const char* szSubKey, cons
 
     bool bResult = false;
     HKEY hkTemp = NULL;
-    if ( RegOpenKeyEx ( hkRoot, szSubKey, 0, KEY_READ, &hkTemp ) == ERROR_SUCCESS ) 
+    WString wstrSubKey = FromUTF8( szSubKey );
+    WString wstrValue = FromUTF8( szValue );
+    if ( RegOpenKeyExW ( hkRoot, wstrSubKey, 0, KEY_READ, &hkTemp ) == ERROR_SUCCESS ) 
     {
         DWORD dwBufferSize;
-        if ( RegQueryValueExA ( hkTemp, szValue, NULL, NULL, NULL, &dwBufferSize ) == ERROR_SUCCESS )
+        if ( RegQueryValueExW ( hkTemp, wstrValue, NULL, NULL, NULL, &dwBufferSize ) == ERROR_SUCCESS )
         {
-            char *szBuffer = static_cast < char* > ( alloca ( dwBufferSize + 1 ) );
-            if ( RegQueryValueExA ( hkTemp, szValue, NULL, NULL, (LPBYTE)szBuffer, &dwBufferSize ) == ERROR_SUCCESS )
+            wchar_t* szBuffer = static_cast < wchar_t* > ( alloca ( dwBufferSize + sizeof( wchar_t ) ) );
+            if ( RegQueryValueExW ( hkTemp, wstrValue, NULL, NULL, (LPBYTE)szBuffer, &dwBufferSize ) == ERROR_SUCCESS )
             {
-                strOutResult = szBuffer;
+                szBuffer[ dwBufferSize / sizeof( wchar_t ) ] = 0;
+                strOutResult = ToUTF8( szBuffer );
                 bResult = true;
             }
         }
