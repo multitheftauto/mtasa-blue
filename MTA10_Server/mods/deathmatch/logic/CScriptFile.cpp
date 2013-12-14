@@ -31,7 +31,7 @@ CScriptFile::~CScriptFile ( void )
 }
 
 
-bool CScriptFile::Load ( eMode Mode )
+bool CScriptFile::Load ( CResource* pResourceForFilePath, eMode Mode )
 {
     // If we haven't already got a file
     if ( !m_pFile )
@@ -42,27 +42,27 @@ bool CScriptFile::Load ( eMode Mode )
         {
             // Open file in read only binary mode
             case MODE_READ:
-                if ( m_pResource->GetFilePath ( m_strFilename.c_str(), strFilePath ) )
+                if ( pResourceForFilePath->GetFilePath ( m_strFilename.c_str(), strFilePath ) )
                     m_pFile = fopen ( strFilePath.c_str (), "rb" );
                 break;
 
             // Open file in read write binary mode.
             case MODE_READWRITE:
                 // Try to load the file in rw mode. Use existing content.
-                if ( m_pResource->GetFilePath ( m_strFilename.c_str(), strFilePath ) )
+                if ( pResourceForFilePath->GetFilePath ( m_strFilename.c_str(), strFilePath ) )
                     m_pFile = fopen ( strFilePath.c_str (), "rb+" );
                 break;
 
             // Open file in read write binary mode. Truncate size to 0.
             case MODE_CREATE:
-                strFilePath = m_pResource->GetResourceDirectoryPath () + m_strFilename;
+                strFilePath = pResourceForFilePath->GetResourceDirectoryPath () + m_strFilename;
                 MakeSureDirExists ( strFilePath.c_str () );
                 m_pFile = fopen ( strFilePath.c_str (), "wb+" );
                 break;
         }
 
         // Return whether we successfully opened it or not
-        if ( m_pFile != NULL )
+        if ( m_pFile != NULL && m_pResource->GetVirtualMachine() )
             m_pResource->GetVirtualMachine()->OnOpenFile();
         return m_pFile != NULL;
     }
@@ -80,7 +80,8 @@ void CScriptFile::Unload ( void )
         // Close the file
         fclose ( m_pFile );
         m_pFile = NULL;
-        m_pResource->GetVirtualMachine()->OnCloseFile();
+        if ( m_pResource->GetVirtualMachine() )
+            m_pResource->GetVirtualMachine()->OnCloseFile();
     }
 }
 
