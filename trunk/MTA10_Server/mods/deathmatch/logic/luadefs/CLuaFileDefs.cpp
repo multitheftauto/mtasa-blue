@@ -74,11 +74,11 @@ int CLuaFileDefs::fileCreate ( lua_State* luaVM )
                     MakeSureDirExists ( strAbsPath.c_str () );
                     
                     // Create the file to create
-                    CScriptFile* pFile = new CScriptFile ( pResource, strSubPath.c_str (), DEFAULT_MAX_FILESIZE );
+                    CScriptFile* pFile = new CScriptFile ( 1, pThisResource, strSubPath.c_str (), DEFAULT_MAX_FILESIZE );
                     assert ( pFile );
 
                     // Try to load it
-                    if ( pFile->Load ( CScriptFile::MODE_CREATE ) )
+                    if ( pFile->Load ( pResource, CScriptFile::MODE_CREATE ) )
                     {
                         // Add it to the scrpt resource element group
                         CElementGroup* pGroup = pThisResource->GetElementGroup ();
@@ -198,12 +198,12 @@ int CLuaFileDefs::fileOpen ( lua_State* luaVM )
                 {
 
                     // Create the file to create
-                    CScriptFile* pFile = new CScriptFile ( pResource, strSubPath.c_str (), DEFAULT_MAX_FILESIZE );
+                    CScriptFile* pFile = new CScriptFile ( 1, pThisResource, strSubPath.c_str (), DEFAULT_MAX_FILESIZE );
                     assert ( pFile );
 
                     // Try to load it
-                    if ( ( bReadOnly && pFile->Load ( CScriptFile::MODE_READ ) ) ||
-                        ( !bReadOnly && pFile->Load ( CScriptFile::MODE_READWRITE ) ) )
+                    if ( ( bReadOnly && pFile->Load ( pResource, CScriptFile::MODE_READ ) ) ||
+                        ( !bReadOnly && pFile->Load ( pResource, CScriptFile::MODE_READWRITE ) ) )
                     {
                         // Add it to the scrpt resource element group
                         CElementGroup* pGroup = pThisResource->GetElementGroup ();
