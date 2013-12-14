@@ -805,6 +805,9 @@ ePathResult GetGamePath ( SString& strOutResult, bool bFindIfMissing )
     SString strRegPath;
     for ( uint i = 0 ; i < pathList.size (); i++ )
     {
+        if ( pathList[i].empty() )
+            continue;
+
         if ( FileExists( PathJoin ( pathList[i], MTA_GTAEXE_NAME ) ) )
         {
             strRegPath = pathList[i];
@@ -910,6 +913,25 @@ SString GetGTAPath ( void )
     if ( g_strGTAPath == "" )
         DiscoverGTAPath( false );
     return g_strGTAPath;
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// HasGTAPath
+//
+// 
+//
+///////////////////////////////////////////////////////////////
+bool HasGTAPath ( void )
+{
+    SString strGTAPath = GetGTAPath();
+    if ( !strGTAPath.empty() )
+    {
+        SString strGTAEXEPath = PathJoin( strGTAPath, MTA_GTAEXE_NAME );
+        return FileExists( strGTAEXEPath );
+    }
+    return false;
 }
 
 
