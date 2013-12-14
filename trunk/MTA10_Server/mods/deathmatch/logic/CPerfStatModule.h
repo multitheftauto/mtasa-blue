@@ -317,6 +317,7 @@ public:
     virtual void                UpdateTiming        ( const SString& strResourceName, const char* szFunctionName, TIMEUS timeUs, uint uiDeltaBytes ) = 0;
 
     static CPerfStatFunctionTiming*  GetSingleton        ( void );
+    static TIMEUS               ms_PeakUsThresh;
 };
 
 

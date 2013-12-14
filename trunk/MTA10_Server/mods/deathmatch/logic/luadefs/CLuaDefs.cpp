@@ -198,7 +198,7 @@ void CLuaDefs::DidUseFunction ( lua_CFunction f, lua_State* luaVM )
             TIMEUS elapsedTime = GetTimeUs() - info.startTime;
             uint uiDeltaBytes = g_uiNetSentByteCounter - info.uiStartByteCount;
             // Record timing over a threshold
-            if ( elapsedTime > 1000 || uiDeltaBytes > 1000 )
+            if ( elapsedTime >= CPerfStatFunctionTiming::ms_PeakUsThresh || uiDeltaBytes > 1000 )
             {
                 CLuaCFunction* pFunction = CLuaCFunctions::GetFunction ( info.f );
                 if ( pFunction )

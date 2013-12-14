@@ -49,6 +49,7 @@ void            SetMTASAPathSource                  ( bool bReadFromRegistry );
 SString         GetMTASAPath                        ( void );
 ePathResult     DiscoverGTAPath                     ( bool bFindIfMissing );
 SString         GetGTAPath                          ( void );
+bool            HasGTAPath                          ( void );
 
 void            FindFilesRecursive                  ( const SString& strPathMatch, std::vector < SString >& outFileList, uint uiMaxDepth = 99 );
 SString         GetOSVersion                        ( void );

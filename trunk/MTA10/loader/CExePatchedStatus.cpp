@@ -65,14 +65,11 @@ bool SetExePatchedStatus( bool bUseExeCopy, const SExePatchedStatus& status )
     SString strGTAEXEPath = GetExePathFilename( bUseExeCopy );
 
     bool bReqAdmin = false;
-    if ( FileExists( strGTAEXEPath ) )
-    {
-        bReqAdmin |= UpdatePatchStatusTimestamp ( strGTAEXEPath, status.bTimestamp  ? PATCH_SET_ON : PATCH_SET_OFF ) == PATCH_SET_RESULT_REQ_ADMIN;
-        bReqAdmin |= UpdatePatchStatusLargeMem  ( strGTAEXEPath, status.bLargeMem   ? PATCH_SET_ON : PATCH_SET_OFF ) == PATCH_SET_RESULT_REQ_ADMIN;
-        bReqAdmin |= UpdatePatchStatusDep       ( strGTAEXEPath, status.bDep        ? PATCH_SET_ON : PATCH_SET_OFF ) == PATCH_SET_RESULT_REQ_ADMIN;
-        bReqAdmin |= UpdatePatchStatusNvightmare( strGTAEXEPath, status.bNvightmare ? PATCH_SET_ON : PATCH_SET_OFF ) == PATCH_SET_RESULT_REQ_ADMIN;
-        bReqAdmin |= UpdatePatchStatusAltModules( strGTAEXEPath, status.bAltModules ? PATCH_SET_ON : PATCH_SET_OFF ) == PATCH_SET_RESULT_REQ_ADMIN;
-    }
+    bReqAdmin |= UpdatePatchStatusTimestamp ( strGTAEXEPath, status.bTimestamp  ? PATCH_SET_ON : PATCH_SET_OFF ) == PATCH_SET_RESULT_REQ_ADMIN;
+    bReqAdmin |= UpdatePatchStatusLargeMem  ( strGTAEXEPath, status.bLargeMem   ? PATCH_SET_ON : PATCH_SET_OFF ) == PATCH_SET_RESULT_REQ_ADMIN;
+    bReqAdmin |= UpdatePatchStatusDep       ( strGTAEXEPath, status.bDep        ? PATCH_SET_ON : PATCH_SET_OFF ) == PATCH_SET_RESULT_REQ_ADMIN;
+    bReqAdmin |= UpdatePatchStatusNvightmare( strGTAEXEPath, status.bNvightmare ? PATCH_SET_ON : PATCH_SET_OFF ) == PATCH_SET_RESULT_REQ_ADMIN;
+    bReqAdmin |= UpdatePatchStatusAltModules( strGTAEXEPath, status.bAltModules ? PATCH_SET_ON : PATCH_SET_OFF ) == PATCH_SET_RESULT_REQ_ADMIN;
 
     return !bReqAdmin;
 }

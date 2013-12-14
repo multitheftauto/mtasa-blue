@@ -11,6 +11,7 @@
 
 #include "StdInc.h"
 #define DEFAULT_THRESH_MS 1
+TIMEUS CPerfStatFunctionTiming::ms_PeakUsThresh = DEFAULT_THRESH_MS * 1000;
 
 namespace
 {
@@ -116,7 +117,6 @@ public:
     CElapsedTime                                m_TimeSinceLastViewed;
     bool                                        m_bIsActive;
     CValueHistory                               m_PeakUsRequiredHistory;
-    TIMEUS                                      m_PeakUsThresh;
 
     CElapsedTime                                m_TimeSinceUpdate;
     std::map < SString, SFunctionTimingInfo >   m_TimingMap;
@@ -150,6 +150,7 @@ CPerfStatFunctionTiming* CPerfStatFunctionTiming::GetSingleton ()
 CPerfStatFunctionTimingImpl::CPerfStatFunctionTimingImpl ( void )
 {
     m_strCategoryName = "Function stats";
+    ms_PeakUsThresh = DEFAULT_THRESH_MS * 1000;
 }
 
 
@@ -271,7 +272,7 @@ void CPerfStatFunctionTimingImpl::DoPulse ( void )
     // Update PeakUs threshold
     //
     m_PeakUsRequiredHistory.RemoveOlderThan ( 10000 );
-    m_PeakUsThresh = m_PeakUsRequiredHistory.GetLowestValue ( DEFAULT_THRESH_MS * 1000 );
+    ms_PeakUsThresh = m_PeakUsRequiredHistory.GetLowestValue ( DEFAULT_THRESH_MS * 1000 );
 }
 
 
@@ -305,7 +306,7 @@ void CPerfStatFunctionTimingImpl::UpdateTiming ( const SString& strResourceName,
         return;
 
     // Ignore any single calls under lowest threshold from any viewer
-    if ( timeUs < m_PeakUsThresh )
+    if ( timeUs < ms_PeakUsThresh )
         return;
 
     float fTimeMs = timeUs * ( 1 / 1000.f );
@@ -349,8 +350,8 @@ void CPerfStatFunctionTimingImpl::GetStats ( CPerfStatResult* pResult, const std
     //
     bool bHelp = MapContains ( optionMap, "h" );
     uint uiPeakBytesThresh = 1000;
-    int iPeakMsThresh = optionMap.empty () ? 0 : atoi ( optionMap.begin ()->first );
-    if ( iPeakMsThresh < 1 )
+    int iPeakMsThresh = optionMap.empty () ? -1 : atoi ( optionMap.begin ()->first );
+    if ( iPeakMsThresh < 0 )
         iPeakMsThresh = DEFAULT_THRESH_MS;
     m_PeakUsRequiredHistory.AddValue ( iPeakMsThresh * 1000 );
 
@@ -361,7 +362,7 @@ void CPerfStatFunctionTimingImpl::GetStats ( CPerfStatResult* pResult, const std
     {
         pResult->AddColumn ( "Function timings help" );
         pResult->AddRow ()[0] = "Option h - This help";
-        pResult->AddRow ()[0] = "1-50 - Peak Ms threshold (defaults to 1)";
+        pResult->AddRow ()[0] = "0-50 - Peak Ms threshold (defaults to 1)";
         return;
     }
 
