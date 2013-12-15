@@ -20,7 +20,7 @@ The hooks in this file modify the following WinAPI functions to work correctly w
     SetDllDirectory
     SetCurrentDirectory
     AddFontResourceEx
-    RemoveFontResourceEx)
+    RemoveFontResourceEx
     RemoveDirectory
     GetDiskFreeSpaceEx
     GetFileAttributes
@@ -234,16 +234,20 @@ namespace SharedUtil
         {
             // Fixes for GTA not working with unicode path
             hResult = pfnCreateFileA( lpFileName, dwDesiredAccess, dwShareMode, lpSecurityAttributes, dwCreationDisposition, dwFlagsAndAttributes, hTemplateFile );
-            if ( hResult == INVALID_HANDLE_VALUE && IsAbsolutePath( lpFileName ) )
+            if ( hResult == INVALID_HANDLE_VALUE && IsAbsolutePath( lpFileName ) && IsGTAProcess() )
             {
-                // Try to fix broken path
-                for ( uint i = 1 ; i < 10 ; i++ )
+                if ( SStringX( lpFileName ).EndsWithI( "gta_sa.exe" )
+                    || SStringX( lpFileName ).EndsWithI( "proxy_sa.exe" ) )
                 {
-                    SString strPathEnd = SStringX( lpFileName ).SplitRight( "\\", NULL, i );
-                    SString strGuess = PathJoin( GetLaunchPath(), strPathEnd );
-                    hResult = CreateFileW( FromUTF8( strGuess ), dwDesiredAccess, dwShareMode, lpSecurityAttributes, dwCreationDisposition, dwFlagsAndAttributes, hTemplateFile );
-                    if ( hResult != INVALID_HANDLE_VALUE )
-                        break;
+                    // Try to fix broken path
+                    for ( uint i = 1 ; i < 10 ; i++ )
+                    {
+                        SString strPathEnd = SStringX( lpFileName ).SplitRight( "\\", NULL, i );
+                        SString strGuess = PathJoin( GetLaunchPath(), strPathEnd );
+                        hResult = CreateFileW( FromUTF8( strGuess ), dwDesiredAccess, dwShareMode, lpSecurityAttributes, dwCreationDisposition, dwFlagsAndAttributes, hTemplateFile );
+                        if ( hResult != INVALID_HANDLE_VALUE )
+                            break;
+                    }
                 }
             }
         }
@@ -292,7 +296,7 @@ namespace SharedUtil
         {
             // Fixes for GTA not working with unicode path
             bResult = pfnSetCurrentDirectoryA ( lpPathName );
-            if ( bResult == 0 && IsAbsolutePath( lpPathName ) )
+            if ( bResult == 0 && IsAbsolutePath( lpPathName ) && IsGTAProcess() )
             {
                 // Try to fix broken path
                 for ( uint i = 1 ; i < 10 ; i++ )

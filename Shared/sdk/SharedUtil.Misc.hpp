@@ -86,6 +86,17 @@ SString SharedUtil::CalcMTASAPath ( const SString& strPath )
     return PathJoin ( GetMTASABaseDir(), strPath );
 }
 
+//
+// Returns true if current process is GTA (i.e not MTA process)
+//
+bool SharedUtil::IsGTAProcess ( void )
+{
+    SString strLaunchPathFilename = GetLaunchPathFilename();
+    if ( strLaunchPathFilename.EndsWithI( "gta_sa.exe" )
+        || strLaunchPathFilename.EndsWithI( "proxy_sa.exe" ) )
+        return true;
+    return false;
+}
 
 //
 // Write a registry string value
