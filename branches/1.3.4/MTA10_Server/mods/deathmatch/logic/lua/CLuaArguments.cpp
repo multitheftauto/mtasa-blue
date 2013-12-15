@@ -329,65 +329,6 @@ bool CLuaArguments::CallGlobal ( CLuaMain* pLuaMain, const char* szFunction, CLu
 }
 
 
-vector < char * > * CLuaArguments::WriteToCharVector ( vector < char * > * values )
-{
-    vector < CLuaArgument* > ::const_iterator iter = m_Arguments.begin ();
-    for ( ; iter != m_Arguments.end () ; ++iter )
-    {
-        switch ( (*iter)->GetType() )
-        {
-        case LUA_TNUMBER:
-            {
-                char * szValue = new char [ 20 ];
-                itoa ( ( int ) (*iter)->GetNumber(), szValue, 10 );
-                values->push_back ( szValue );
-                break;
-            }
-        case LUA_TSTRING:
-            {
-                const char * szString = (*iter)->GetString().c_str ();
-                char * szValue = new char [ strlen ( szString ) + 1 ];
-                strcpy ( szValue, szString );
-                values->push_back ( szValue );
-                break;
-            }
-        case LUA_TBOOLEAN:
-            {
-                char * szValue = new char [ 6 ];
-                if ( (*iter)->GetBoolean() )
-                    values->push_back ( strcpy ( szValue, "true" ) );
-                else
-                    values->push_back ( strcpy ( szValue, "false" ) );
-                break;
-            }
-        case LUA_TLIGHTUSERDATA:
-            {
-                char * szValue = new char [10];
-                memset(szValue,0,10);
-                CElement* pElement = (*iter)->GetElement ();
-                if ( VERIFY_ELEMENT(pElement) )
-                {
-                    snprintf ( szValue, 9, "E#%d", (int)pElement->GetID().Value() );
-                }
-                else
-                {
-                    g_pGame->GetScriptDebugging()->LogError ( NULL, "Couldn't serialize argument list, invalid element specified. Passing empty string instead." );
-                }
-                values->push_back ( szValue );
-            }        
-        default:
-            {
-                char * szEmpty = new char [ 1 ];
-                szEmpty[0] = '\0';
-                values->push_back ( szEmpty );
-            }
-        }
-    }
-    return values;
-}
-
-
-
 CLuaArgument* CLuaArguments::PushNil ( void )
 {
     CLuaArgument* pArgument = new CLuaArgument;

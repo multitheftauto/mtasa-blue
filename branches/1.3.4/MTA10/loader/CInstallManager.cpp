@@ -667,6 +667,9 @@ SString CInstallManager::MaybeRenameExe( const SString& strGTAPath )
 //////////////////////////////////////////////////////////
 SString CInstallManager::_ProcessExePatchChecks ( void )
 {
+    if ( !HasGTAPath() )
+        return "ok";
+
     SExePatchedStatus reqStatus = GetExePatchRequirements();
 
     if ( !ShouldUseExeCopy() )

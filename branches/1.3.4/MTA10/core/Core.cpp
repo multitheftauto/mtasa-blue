@@ -17,7 +17,6 @@
 
 CCore* g_pCore = NULL;
 CGraphics* g_pGraphics = NULL;
-bool IsRealDeal ( void );
 
 int WINAPI DllMain(HINSTANCE hModule, DWORD dwReason, PVOID pvNothing)
 {
@@ -27,8 +26,10 @@ int WINAPI DllMain(HINSTANCE hModule, DWORD dwReason, PVOID pvNothing)
     if ( dwReason == DLL_PROCESS_ATTACH )
     {
         WriteDebugEvent( SString( "DLL_PROCESS_ATTACH %08x", pvNothing ) );
-        if ( IsRealDeal () )
+        if ( IsGTAProcess() )
         {
+            WriteDebugEvent( SString( "ModuleFileName: %s", *GetLaunchPathFilename() ) );
+
             AddUtf8FileHooks();
 
             FileTranslator.GetGTARootDirectory ( WorkingDirectory );
@@ -48,7 +49,7 @@ int WINAPI DllMain(HINSTANCE hModule, DWORD dwReason, PVOID pvNothing)
     else if (dwReason == DLL_PROCESS_DETACH)
     {
         WriteDebugEvent( SString( "DLL_PROCESS_DETACH %08x", pvNothing ) );
-        if ( IsRealDeal () )
+        if ( IsGTAProcess () )
         {
             RemoveUtf8FileHooks();
 
@@ -64,19 +65,4 @@ int WINAPI DllMain(HINSTANCE hModule, DWORD dwReason, PVOID pvNothing)
     }
 
     return TRUE;
-}
-
-
-//
-// Returns true if dll has been loaded with GTA.
-//
-bool IsRealDeal ( void )
-{
-    // Get current module full path
-    SString strLaunchPathFilename = GetLaunchPathFilename();
-    WriteDebugEvent( SString( "ModuleFileName: %s", *strLaunchPathFilename ) );
-    if ( strLaunchPathFilename.EndsWithI( "gta_sa.exe" )
-        || strLaunchPathFilename.EndsWithI( "proxy_sa.exe" ) )
-        return true;
-    return false;
 }
