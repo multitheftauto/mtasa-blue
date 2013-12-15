@@ -65,6 +65,9 @@ namespace SharedUtil
     //
     SString CalcMTASAPath ( const SString& strPath );
 
+    // Returns true if current process is GTA (i.e not MTA process)
+    bool IsGTAProcess ( void );
+
     //
     // Run ShellExecute with these parameters after exit
     //
