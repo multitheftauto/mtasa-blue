@@ -57,7 +57,7 @@ public:
     inline unsigned long                GetSprite                       ( void ) const                  { return m_ulSprite; };
     void                                SetSprite                       ( unsigned long ulSprite );
 
-    inline bool                         IsVisible                       ( void ) const                  { return m_pMarker != NULL && m_bIsVisible; };
+    inline bool                         IsVisible                       ( void ) const                  { return m_bIsVisible; };
     void                                SetVisible                      ( bool bVisible );
 
     void                                SetDimension                    ( unsigned short usDimension );
