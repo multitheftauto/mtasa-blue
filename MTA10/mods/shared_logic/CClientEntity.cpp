@@ -1182,6 +1182,7 @@ bool CClientEntity::IsAttachToable ( void )
         case CCLIENTPICKUP:
         case CCLIENTSOUND:
         case CCLIENTCOLSHAPE:
+        case CCLIENTCAMERA:
         {
             return true;
             break;

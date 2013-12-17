@@ -334,13 +334,13 @@ public:
     static bool                         SetMarkerIcon                       ( CClientEntity& Entity, const char* szIcon );
 
     // Camera get funcs
-    static bool                         GetCameraViewMode                       ( unsigned short& ucMode );
+    static bool                         GetCameraViewMode                   ( unsigned short& ucMode );
     static bool                         GetCameraMatrix                     ( CVector& vecPosition, CVector& vecLookAt, float& fRoll, float& fFOV );
     static CClientEntity *              GetCameraTarget                     ( void );
     static bool                         GetCameraInterior                   ( unsigned char & ucInterior );
 
     // Camera set funcs
-    static bool                         SetCameraMatrix                     ( CVector& vecPosition, CVector* pvecLookAt, float fRoll, float fFOV );
+    static bool                         SetCameraMatrix                     ( const CVector& vecPosition, const CVector& vecLookAt, float fRoll, float fFOV );
     static bool                         SetCameraTarget                     ( CClientEntity * pEntity );
     static bool                         SetCameraTarget                     ( const CVector& vecTarget );
     static bool                         SetCameraInterior                   ( unsigned char ucInterior );

@@ -495,6 +495,7 @@ public:
     LUA_DECLARE ( SetPickupType );
 
     // Cam get funcs
+    LUA_DECLARE ( GetCamera );
     LUA_DECLARE ( GetCameraViewMode );
     LUA_DECLARE ( GetCameraMatrix );
     LUA_DECLARE ( GetCameraTarget );

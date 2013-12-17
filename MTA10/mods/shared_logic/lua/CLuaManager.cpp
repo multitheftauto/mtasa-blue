@@ -723,6 +723,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "setPickupType", CLuaFunctionDefs::SetPickupType );
 
     // Cam get funcs
+    CLuaCFunctions::AddFunction ( "getCamera", CLuaFunctionDefs::GetCamera );
     CLuaCFunctions::AddFunction ( "getCameraViewMode", CLuaFunctionDefs::GetCameraViewMode );
     CLuaCFunctions::AddFunction ( "getCameraMatrix", CLuaFunctionDefs::GetCameraMatrix );
     CLuaCFunctions::AddFunction ( "getCameraTarget", CLuaFunctionDefs::GetCameraTarget );

@@ -140,10 +140,103 @@ public:
             vec.fX * vRight.fZ + vec.fY * vFront.fZ + vec.fZ * vUp.fZ + vPos.fZ );
     }
 
+    //
+    // Ensure matrix component axes are normalized and orthogonal to each other.
+    // Axis A direction is preserved, B is adjusted, the other is overwritten.
+    //
+    void OrthoNormalize( const uint A, const uint B )
+    {
+        // Deduce 3rd axis index
+        const uint C = 3 - A - B;
+
+        // Ensure indices are in range and unique
+        assert( A < 3 && B < 3 && C < 3 && A != B && C != A && C != B );
+
+        CVector& vPriAxis = GetAxis( A );
+        CVector& vSecAxis = GetAxis( B );
+        CVector& vLastAxis = GetAxis( C );
+
+        if ( vPriAxis.Normalize() == 0 )
+            vPriAxis = CVector( 0, 0, 1 );
+        vSecAxis.Normalize();
+
+        // Ensure vSecAxis is perpendicular to vPriAxis
+        float fDot = vPriAxis.DotProduct( &vSecAxis );
+        vSecAxis += vPriAxis * -fDot;
+        if ( vSecAxis.Normalize() == 0 )
+            vSecAxis = vPriAxis.GetOtherAxis();
+
+        // Do correct crossproduct calculation for the other axis
+        if ( ( ( C + 1 ) % 3 ) != A )
+        {
+            vLastAxis = vSecAxis;
+            vLastAxis.CrossProduct ( &vPriAxis );
+        }
+        else
+        {
+            vLastAxis = vPriAxis;
+            vLastAxis.CrossProduct ( &vSecAxis );
+        }
+    }
+
+    //
+    // Get reference to component axis by index
+    //
+    CVector& GetAxis( const uint uiIndex )
+    {
+        if ( uiIndex == AXIS_UP )
+            return vUp;
+        if ( uiIndex == AXIS_FRONT )
+            return vFront;
+        assert( uiIndex == AXIS_RIGHT );
+        return vRight;
+    }
+
+    enum EMatrixAxes
+    {
+        AXIS_RIGHT,
+        AXIS_FRONT,
+        AXIS_UP,
+    };
+
     CVector vRight;
     CVector vFront;
     CVector vUp;
     CVector vPos;
+};
+
+
+class CTranslationMatrix : public CMatrix
+{
+public:
+    CTranslationMatrix( const CVector& vecTranslation )
+    {
+        vPos = vecTranslation;
+    }
+};
+
+
+class CRotationMatrix : public CMatrix
+{
+public:
+    CRotationMatrix( const CVector& vecRotation )
+    {
+        float cosx = cos( vecRotation.fX );
+        float cosy = cos( vecRotation.fY );
+        float cosz = cos( vecRotation.fZ );
+        float sinx = sin( vecRotation.fX );
+        float siny = sin( vecRotation.fY );
+        float sinz = sin( vecRotation.fZ );
+	    vRight.fX = cosz * cosy - sinz * sinx * siny;
+	    vRight.fY = cosy * sinz + cosz * sinx * siny;
+	    vRight.fZ = -cosx * siny;
+	    vFront.fX = -cosx * sinz;
+	    vFront.fY = cosz * cosx;
+	    vFront.fZ = sinx;
+	    vUp.fX = cosz * siny + cosy * sinz * sinx;
+	    vUp.fY = sinz * siny - cosz * cosy * sinx;
+	    vUp.fZ = cosx * cosy;
+    }
 };
 
 #endif

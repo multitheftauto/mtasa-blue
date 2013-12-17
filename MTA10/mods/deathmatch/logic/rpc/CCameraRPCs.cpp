@@ -42,11 +42,11 @@ void CCameraRPCs::SetCameraMatrix ( NetBitStreamInterface& bitStream )
 
         // Put the camera there
         m_pCamera->SetPosition ( vecPosition );
-        m_pCamera->SetFixedTarget ( vecLookAt );
-        m_pCamera->SetRoll ( fRoll );
+        m_pCamera->SetFixedTarget ( vecLookAt, fRoll );
         m_pCamera->SetFOV ( fFOV );
     }
 }
+
 
 void CCameraRPCs::SetCameraTarget ( NetBitStreamInterface& bitStream )
 {
