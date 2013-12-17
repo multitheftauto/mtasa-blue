@@ -19,6 +19,20 @@
 
 #include "StdInc.h"
 
+
+int CLuaFunctionDefs::GetCamera ( lua_State* luaVM )
+{
+    CClientCamera* pCamera = g_pClientGame->GetManager ()->GetCamera ();
+    if ( pCamera )
+    {
+        lua_pushelement ( luaVM, pCamera );
+        return 1;
+    }
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
 int CLuaFunctionDefs::GetCameraViewMode ( lua_State* luaVM )
 {
     unsigned short ucMode;
@@ -102,24 +116,19 @@ int CLuaFunctionDefs::SetCameraMatrix ( lua_State* luaVM )
 {
     CVector vecPosition;
     CVector vecLookAt;
-    CVector * pvecLookAt = NULL;
     float fRoll = 0.0f;
     float fFOV = 70.0f;
     CScriptArgReader argStream ( luaVM );
     argStream.ReadVector3D ( vecPosition );
-    bool bHasVecLookAt = argStream.NextIsVector3D();
-    argStream.ReadVector3D ( vecLookAt, CVector() );
+    argStream.ReadVector3D ( vecLookAt );
     argStream.ReadNumber ( fRoll, 0.0f );
     argStream.ReadNumber ( fFOV, 70.0f );
     if ( fFOV <= 0.0f || fFOV >= 180.0f )
         fFOV = 70.0f;
 
-    if ( bHasVecLookAt )
-        pvecLookAt = &vecLookAt;
-
     if ( !argStream.HasErrors ( ) )
     {
-        if ( CStaticFunctionDefinitions::SetCameraMatrix ( vecPosition, pvecLookAt, fRoll, fFOV ) )
+        if ( CStaticFunctionDefinitions::SetCameraMatrix ( vecPosition, vecLookAt, fRoll, fFOV ) )
         {
             lua_pushboolean ( luaVM, true );
             return 1;
