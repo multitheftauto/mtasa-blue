@@ -1151,6 +1151,11 @@ bool CStaticFunctionDefinitions::SetElementParent ( CClientEntity& Entity, CClie
 {
     if ( &Entity != &Parent && !Entity.IsMyChild ( &Parent, true ) )
     {
+        if ( Entity.GetType () == CCLIENTCAMERA || Parent.GetType () == CCLIENTCAMERA )
+        {
+            return false;
+        }
+        else
         if ( Entity.GetType () == CCLIENTGUI )
         {
             if ( Parent.GetType () == CCLIENTGUI ||
