@@ -144,6 +144,7 @@ private:
     std::list < CXMLFile* >         m_XMLFiles;
 
     bool                            m_bEnableOOP;
+    static uint                     ms_uiCallDepth;
 public:
     std::map < const void*, CRefInfo >      m_CallbackTable;
     std::map < int, SString >               m_FunctionTagMap;
