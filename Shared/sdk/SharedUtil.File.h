@@ -71,6 +71,7 @@ namespace SharedUtil
     SString         GetSystemDllDirectory           ( void );
     SString         GetSystemLocalAppDataPath       ( void );
     SString         GetSystemCommonAppDataPath      ( void );
+    SString         GetSystemPersonalPath           ( void );
     SString         GetSystemWindowsPath            ( void );
     SString         GetSystemSystemPath             ( void );
     SString         GetSystemTempPath               ( void );

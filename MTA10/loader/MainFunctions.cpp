@@ -269,11 +269,9 @@ void HandleResetSettings ( void )
 
     CheckAndShowMissingFileMessage();
 
-    wchar_t szResult[MAX_PATH] = L"";
-    SHGetFolderPathW( NULL, CSIDL_PERSONAL, NULL, 0, szResult );
-    SString strResult = ToUTF8( szResult );
-    SString strSettingsFilename = PathJoin ( strResult, "GTA San Andreas User Files", "gta_sa.set" );
-    SString strSettingsFilenameBak = PathJoin ( strResult, "GTA San Andreas User Files", "gta_sa_old.set" );
+    SString strSaveFilePath = PathJoin ( GetSystemPersonalPath(), "GTA San Andreas User Files" );
+    SString strSettingsFilename = PathJoin ( strSaveFilePath, "gta_sa.set" );
+    SString strSettingsFilenameBak = PathJoin ( strSaveFilePath, "gta_sa_old.set" );
 
     if ( FileExists ( strSettingsFilename ) )
     {

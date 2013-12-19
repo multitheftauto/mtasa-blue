@@ -213,6 +213,36 @@ namespace SharedUtil
 
     /////////////////////////////////////////////////////////////
     //
+    // Return list of replacement path candidates
+    //
+    /////////////////////////////////////////////////////////////
+    std::vector < SString > GetPossibleFixedPaths( const SString& strOriginal )
+    {
+        std::vector < SString > resultList;
+
+        if ( strOriginal.Contains( "GTA San Andreas User Files" ) )
+        {
+            // Try to fix broken path to gta save files
+            SString strPathTail = strOriginal.SplitRight( "GTA San Andreas User Files" );
+            SString strGuess = PathJoin( GetSystemPersonalPath(), "GTA San Andreas User Files", strPathTail );
+            resultList.push_back( strGuess );
+        }
+        else
+        {
+            // Try to fix broken path to gta game files
+            for ( uint i = 1 ; i < 10 ; i++ )
+            {
+                SString strPathTail = strOriginal.SplitRight( "\\", NULL, i );
+                SString strGuess = PathJoin( GetLaunchPath(), strPathTail );
+                ListAddUnique( resultList, strGuess );
+            }
+        }
+
+        return resultList;
+    }
+
+    /////////////////////////////////////////////////////////////
+    //
     // Hook implementations
     //
     /////////////////////////////////////////////////////////////
@@ -237,14 +267,13 @@ namespace SharedUtil
             if ( hResult == INVALID_HANDLE_VALUE && IsAbsolutePath( lpFileName ) && IsGTAProcess() )
             {
                 if ( SStringX( lpFileName ).EndsWithI( "gta_sa.exe" )
-                    || SStringX( lpFileName ).EndsWithI( "proxy_sa.exe" ) )
+                    || SStringX( lpFileName ).EndsWithI( "proxy_sa.exe" )
+                    || SStringX( lpFileName ).Contains( "GTA San Andreas User Files" ) )
                 {
-                    // Try to fix broken path
-                    for ( uint i = 1 ; i < 10 ; i++ )
+                    std::vector < SString > guessList = GetPossibleFixedPaths( lpFileName );
+                    for( uint i = 0 ; i < guessList.size() ; i++ )
                     {
-                        SString strPathEnd = SStringX( lpFileName ).SplitRight( "\\", NULL, i );
-                        SString strGuess = PathJoin( GetLaunchPath(), strPathEnd );
-                        hResult = CreateFileW( FromUTF8( strGuess ), dwDesiredAccess, dwShareMode, lpSecurityAttributes, dwCreationDisposition, dwFlagsAndAttributes, hTemplateFile );
+                        hResult = CreateFileW( FromUTF8( guessList[i] ), dwDesiredAccess, dwShareMode, lpSecurityAttributes, dwCreationDisposition, dwFlagsAndAttributes, hTemplateFile );
                         if ( hResult != INVALID_HANDLE_VALUE )
                             break;
                     }
@@ -298,12 +327,10 @@ namespace SharedUtil
             bResult = pfnSetCurrentDirectoryA ( lpPathName );
             if ( bResult == 0 && IsAbsolutePath( lpPathName ) && IsGTAProcess() )
             {
-                // Try to fix broken path
-                for ( uint i = 1 ; i < 10 ; i++ )
+                std::vector < SString > guessList = GetPossibleFixedPaths( lpPathName );
+                for( uint i = 0 ; i < guessList.size() ; i++ )
                 {
-                    SString strPathEnd = SStringX( lpPathName ).SplitRight( "\\", NULL, i );
-                    SString strGuess = PathJoin( GetLaunchPath(), strPathEnd );
-                    bResult = SetCurrentDirectoryW( FromUTF8( strGuess ) );
+                    bResult = SetCurrentDirectoryW( FromUTF8( guessList[i] ) );
                     if ( bResult )
                         break;
                 }
@@ -376,7 +403,28 @@ namespace SharedUtil
         __in_opt LPSECURITY_ATTRIBUTES lpSecurityAttributes
         )
     {
-        return CreateDirectoryW( FromUTF8( lpPathName ), lpSecurityAttributes );
+        BOOL bResult = CreateDirectoryW( FromUTF8( lpPathName ), lpSecurityAttributes );
+#ifdef MTA_CLIENT
+        if ( bResult == 0 )
+        {
+            // Fixes for GTA not working with unicode path
+            bResult = pfnCreateDirectoryA ( lpPathName, lpSecurityAttributes );
+            if ( bResult == 0 && IsAbsolutePath( lpPathName ) && IsGTAProcess() )
+            {
+                if ( SStringX( lpPathName ).Contains( "GTA San Andreas User Files" ) )
+                {
+                    std::vector < SString > guessList = GetPossibleFixedPaths( lpPathName );
+                    for( uint i = 0 ; i < guessList.size() ; i++ )
+                    {
+                        bResult = CreateDirectoryW( FromUTF8( guessList[i] ), lpSecurityAttributes );
+                        if ( bResult )
+                            break;
+                    }
+                }
+            }
+        }
+#endif
+        return bResult;
     }
 
     BOOL
