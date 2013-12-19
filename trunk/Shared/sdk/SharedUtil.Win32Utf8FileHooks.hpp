@@ -211,6 +211,7 @@ namespace SharedUtil
     HOOKVAR( GetModuleHandleA )
 
 
+#ifdef MTA_CLIENT
     /////////////////////////////////////////////////////////////
     //
     // Return list of replacement path candidates
@@ -240,6 +241,7 @@ namespace SharedUtil
 
         return resultList;
     }
+#endif
 
     /////////////////////////////////////////////////////////////
     //
