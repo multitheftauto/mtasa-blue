@@ -323,6 +323,13 @@ SString SharedUtil::GetSystemCommonAppDataPath ( void )
     return ToUTF8( szResult );
 }
 
+SString SharedUtil::GetSystemPersonalPath ( void )
+{
+    wchar_t szResult[MAX_PATH] = L"";
+    SHGetFolderPathW( NULL, CSIDL_PERSONAL, NULL, 0, szResult );
+    return ToUTF8( szResult );
+}
+
 SString SharedUtil::GetSystemWindowsPath ( void )
 {
     wchar_t szResult[MAX_PATH] = L"";
