@@ -449,7 +449,7 @@ bool SharedUtil::DelTree ( const SString& strPath, const SString& strInsideHere 
     DWORD dwBufferSize = ( wstrPath.length() + 3 ) * sizeof( wchar_t );
     wchar_t *szBuffer = static_cast < wchar_t* > ( alloca ( dwBufferSize ) );
     memset ( szBuffer, 0, dwBufferSize );
-    wcsncpy ( szBuffer, wstrPath, wstrPath.length() * sizeof( wchar_t ) );
+    wcsncpy ( szBuffer, wstrPath, wstrPath.length() );
     SHFILEOPSTRUCTW sfos;
 
     sfos.hwnd = NULL;
