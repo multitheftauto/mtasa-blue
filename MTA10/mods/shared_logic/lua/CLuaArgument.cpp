@@ -470,9 +470,11 @@ bool CLuaArgument::ReadFromBitStream ( NetBitStreamInterface& bitStream, std::ve
                 bool bIsFloatingPoint;
                 if ( bitStream.ReadBit ( bIsFloatingPoint ) && bIsFloatingPoint )
                 {
+                    // Should be in high precision mode
+                    dassert( g_pClientGame->IsHighFloatPrecision() );
                     float fNum;
                     if ( bitStream.Read ( fNum ) )
-                        ReadNumber ( fNum );
+                        ReadNumber ( RoundFromFloatSource( fNum ) );
                 }
                 else
                 {
