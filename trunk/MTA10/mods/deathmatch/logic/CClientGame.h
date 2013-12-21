@@ -420,6 +420,8 @@ public:
     void                                OutputServerInfo                ( void );
     bool                                IsUsingExternalHTTPServer       ( void )                        { return m_ucHTTPDownloadType == HTTP_DOWNLOAD_ENABLED_URL; }
     void                                TellServerSomethingImportant    ( uint uiId, const SString& strMessage, bool bOnlyOnceForThisId );
+    void                                ChangeFloatPrecision            ( bool bHigh );
+    bool                                IsHighFloatPrecision            ( void ) const;
 
 private:
 
@@ -767,6 +769,7 @@ private:
 
     bool                                m_bLastKeyWasEscapeCancelled;
     std::set < SString >                m_AllowKeyUpMap;
+    uint                                m_uiPrecisionCallDepth;
 };
 
 extern CClientGame* g_pClientGame;

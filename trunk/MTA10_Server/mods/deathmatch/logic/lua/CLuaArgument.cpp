@@ -477,7 +477,7 @@ bool CLuaArgument::ReadFromBitStream ( NetBitStreamInterface& bitStream, std::ve
                 {
                     float fNum;
                     if ( bitStream.Read ( fNum ) )
-                        ReadNumber ( fNum );
+                        ReadNumber ( RoundFromFloatSource( fNum ) );
                 }
                 else
                 {
