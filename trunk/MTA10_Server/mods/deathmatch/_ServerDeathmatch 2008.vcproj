@@ -693,6 +693,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\logic\CPerfStat.EventPacketUsage.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\logic\CPerfStat.FunctionTiming.cpp"
 					>
 				</File>
