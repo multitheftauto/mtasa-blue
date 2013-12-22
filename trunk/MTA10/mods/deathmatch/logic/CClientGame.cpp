@@ -4337,7 +4337,7 @@ bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
                         pEvent->ComputeDeathAnim ( pDamagePed, true );
                         AssocGroupId animGroup = pEvent->GetAnimGroup ();
                         AnimationId animID = pEvent->GetAnimId ();
-                        pDamagedPed->Kill ( weaponUsed, m_ucDamageBodyPiece, false, false, animGroup, animID );
+                        pDamagedPed->Kill ( weaponUsed, hitZone, false, false, animGroup, animID );
                         return true;
                     }
                     if ( fPreviousHealth > 0.0f )
@@ -4351,7 +4351,7 @@ bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
                         if ( pInflictingEntity ) m_DamagerID = pInflictingEntity->GetID ();
 
                         // Check if we're dead
-                        SendPedWastedPacket ( pDamagedPed, m_DamagerID, m_ucDamageWeapon, m_ucDamageBodyPiece, animGroup, animID );
+                        SendPedWastedPacket ( pDamagedPed, m_DamagerID, weaponUsed, hitZone, animGroup, animID );
                     }
                 }
             }
