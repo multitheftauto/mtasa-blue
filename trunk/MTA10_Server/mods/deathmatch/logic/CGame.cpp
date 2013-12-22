@@ -2372,6 +2372,8 @@ void CGame::Packet_CustomData ( CCustomDataPacket& Packet )
             BitStream.pBitStream->Write ( szName, usNameLength );
             Value.WriteToBitStream ( *BitStream.pBitStream );
             m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pElement, SET_ELEMENT_DATA, *BitStream.pBitStream ), pSourcePlayer );
+
+            CPerfStatEventPacketUsage::GetSingleton ()->UpdateElementDataUsageRelayed ( szName, m_pPlayerManager->Count(), BitStream.pBitStream->GetNumberOfBytesUsed() );
         }
     }
 }
