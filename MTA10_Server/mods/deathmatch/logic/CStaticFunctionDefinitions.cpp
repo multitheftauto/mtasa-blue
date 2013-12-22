@@ -170,6 +170,8 @@ bool CStaticFunctionDefinitions::TriggerClientEvent ( const std::vector < CPlaye
     // Send packet to players
     CPlayerManager::Broadcast ( Packet, sendList );
 
+    CPerfStatEventPacketUsage::GetSingleton ()->UpdateEventUsageOut ( szName, sendList.size() );
+
     return true;
 }
 
@@ -189,6 +191,7 @@ bool CStaticFunctionDefinitions::TriggerLatentClientEvent ( const std::vector < 
     CPlayerManager::Broadcast ( Packet, sendList );
     g_pGame->EnableLatentSends ( false );
 
+    CPerfStatEventPacketUsage::GetSingleton ()->UpdateEventUsageOut ( szName, sendList.size() );
     return true;
 }
 
@@ -1067,6 +1070,8 @@ bool CStaticFunctionDefinitions::SetElementData ( CElement* pElement, const char
             BitStream.pBitStream->Write ( szName, usNameLength );
             Variable.WriteToBitStream ( *BitStream.pBitStream );
             m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pElement, SET_ELEMENT_DATA, *BitStream.pBitStream ) );
+
+            CPerfStatEventPacketUsage::GetSingleton ()->UpdateElementDataUsageOut ( szName, m_pPlayerManager->Count(), BitStream.pBitStream->GetNumberOfBytesUsed() );
         }
         return true;
     }
