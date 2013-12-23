@@ -1241,7 +1241,7 @@ void CGame::InitialDataStream ( CPlayer& Player )
     iter = m_pPlayerManager->IterBegin ();
     for ( ; iter != m_pPlayerManager->IterEnd (); iter++ )
     {
-        if ( &Player != *iter && (*iter)->IsJoined () && (*iter)->IsSpawned () )
+        if ( &Player != *iter && (*iter)->IsJoined () )
         {
             CPlayerStatsPacket PlayerStats = *(*iter)->GetPlayerStatsPacket ( );
             PlayerStats.SetSourceElement ( *iter );
