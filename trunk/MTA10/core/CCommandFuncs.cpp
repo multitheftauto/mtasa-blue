@@ -508,3 +508,8 @@ void CCommandFuncs::ShowFrameGraph ( const char* szParameters )
     bool bShow = ( iCmd == 1 ) ? true : ( iCmd == 0 ) ? false : !GetGraphStats ()->IsEnabled ();
     GetGraphStats ()->SetEnabled ( bShow );
 }
+
+void CCommandFuncs::JingleBells ( const char* szParameters )
+{
+    g_pCore->GetConsole ()->Print ( "Batman smells" );
+}
