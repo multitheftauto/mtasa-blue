@@ -1377,6 +1377,7 @@ void CCore::RegisterCommands ( )
     m_pCommands->Add ( "test",              "",                                 CCommandFuncs::Test );
     m_pCommands->Add ( "showmemstat",       _("shows the memory statistics"),      CCommandFuncs::ShowMemStat );
     m_pCommands->Add ( "showframegraph",    _("shows the frame timing graph"),     CCommandFuncs::ShowFrameGraph );
+    m_pCommands->Add ( "jinglebells",       "",                                    CCommandFuncs::JingleBells );
 
 #if defined(MTA_DEBUG) || defined(MTA_BETA)
     m_pCommands->Add ( "fakelag",           "",                                 CCommandFuncs::FakeLag );
