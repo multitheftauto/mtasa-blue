@@ -151,4 +151,7 @@ public:
 // MTA port tester URL
 #define PORT_TESTER_URL             "http://nightly.mtasa.com/ports/"
 
+// MTA minclientversion auto update and others
+#define HQCOMMS_URL                 "http://updatesa.multitheftauto.com/sa/server/hqcomms/"
+
 #endif

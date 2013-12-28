@@ -22,6 +22,7 @@
 #include "StdInc.h"
 #include "../utils/COpenPortsTester.h"
 #include "../utils/CMasterServerAnnouncer.h"
+#include "../utils/CHqComms.h"
 #include "../utils/CFunctionUseLogger.h"
 #include "net/SimHeaders.h"
 #include <signal.h>
@@ -313,6 +314,7 @@ CGame::~CGame ( void )
     SAFE_DELETE ( m_pFunctionUseLogger );
     SAFE_DELETE ( m_pOpenPortsTester );
     SAFE_DELETE ( m_pMasterServerAnnouncer );
+    SAFE_RELEASE ( m_pHqComms );
     CSimControl::Shutdown ();
 
     // Clear our global pointer
@@ -457,6 +459,9 @@ void CGame::DoPulse ( void )
     if ( m_pMasterServerAnnouncer )
         m_pMasterServerAnnouncer->Pulse ();
 
+    if ( m_pHqComms )
+        m_pHqComms->Pulse();
+
     CLOCK_CALL1( m_pFunctionUseLogger->Pulse (); );
     CLOCK_CALL1( m_lightsyncManager.DoPulse (); );
 
@@ -496,6 +501,7 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     m_pScriptDebugging = new CScriptDebugging ( m_pLuaManager );
     m_pMapManager = new CMapManager ( m_pBlipManager, m_pObjectManager, m_pPickupManager, m_pPlayerManager, m_pRadarAreaManager, m_pMarkerManager, m_pVehicleManager, m_pTeamManager, m_pPedManager, m_pColManager, m_pWaterManager, m_pClock, m_pLuaManager, m_pGroups, &m_Events, m_pScriptDebugging, &m_ElementDeleter );
     m_pACLManager = new CAccessControlListManager;
+    m_pHqComms = new CHqComms;
 
     m_pRegisteredCommands = new CRegisteredCommands ( m_pACLManager );
     m_pLuaManager = new CLuaManager ( m_pObjectManager, m_pPlayerManager, m_pVehicleManager, m_pBlipManager, m_pRadarAreaManager, m_pRegisteredCommands, m_pMapManager, &m_Events );
@@ -853,7 +859,6 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     ApplyAseSetting ();
     m_pMasterServerAnnouncer = new CMasterServerAnnouncer();
     m_pMasterServerAnnouncer->Pulse();
-
 
     // Now load the rest of the config
     if ( !m_pMainConfig->LoadExtended () )

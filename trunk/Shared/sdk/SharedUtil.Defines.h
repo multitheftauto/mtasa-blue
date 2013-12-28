@@ -150,3 +150,9 @@
 
 // Generic way of showing a uchar index is not set
 #define UCHAR_INVALID_INDEX 0xFF
+
+// Tick count conversions
+#define TICKS_FROM_SECONDS(m)   ((m)*1000)
+#define TICKS_FROM_MINUTES(m)   (TICKS_FROM_SECONDS(m)*60)
+#define TICKS_FROM_HOURS(m)     (TICKS_FROM_MINUTES(m)*60)
+#define TICKS_FROM_DAYS(m)      (TICKS_FROM_HOURS(m)*24)

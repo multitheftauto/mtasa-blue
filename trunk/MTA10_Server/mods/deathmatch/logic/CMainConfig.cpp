@@ -904,7 +904,7 @@ void CMainConfig::SetCommandLineParser ( CCommandLineParser* pCommandLineParser 
     }
 }
 
-std::string CMainConfig::GetServerIP ( void )
+SString CMainConfig::GetServerIP ( void )
 {
     std::string strServerIP;
     if ( m_pCommandLineParser && m_pCommandLineParser->GetIP ( strServerIP ) )
@@ -1414,6 +1414,7 @@ const std::vector < SIntSetting >& CMainConfig::GetIntSettingList ( void )
             { true, true,   50,     100,    400,    "ped_syncer_distance",                  &g_TickRateSettings.iPedSyncerDistance,     &CMainConfig::OnTickRateChange },
             { true, true,   50,     100,    400,    "unoccupied_vehicle_syncer_distance",   &g_TickRateSettings.iUnoccupiedVehicleSyncerDistance,   &CMainConfig::OnTickRateChange },
             { false, false, 0,      1,      2,      "compact_internal_databases",           &m_iCompactInternalDatabases,               NULL },
+            { true, true,   0,      1,      2,      "minclientversion_auto_update",         &m_iMinClientVersionAutoUpdate,             NULL },
         };
 
     static std::vector < SIntSetting > settingsList;
