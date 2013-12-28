@@ -45,6 +45,10 @@ public:
         m_uiPushInterval                 = 1000 * 60 * 10;       // 10 mins push interval
     }
 
+protected:
+    ~CMasterServer( void ) {}    // Must use Release()
+public:
+
     //
     // Pulse this master server
     //
@@ -123,9 +127,13 @@ public:
                 m_Stage = ANNOUNCE_STAGE_REMINDER;
                 if ( !m_Definition.bHideProblems || iError == 200 )
                 {
+                    CArgMap argMap;
+                    argMap.SetFromString( data );
+                    SString strOkMessage = argMap.Get( "ok_message" );
+
                     // Log successful initial announcement
                     if ( iError == 200 )
-                        CLogger::LogPrintf( "%s success!\n", *m_Definition.strDesc );
+                        CLogger::LogPrintf( "%s success! %s\n", *m_Definition.strDesc, *strOkMessage );
                     else
                         CLogger::LogPrintf( "%s successish! (%u %s)\n", *m_Definition.strDesc, iError, GetDownloadManager()->GetError() );
                 }

@@ -2738,6 +2738,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\utils\CHqComms.h"
+					>
+				</File>
+				<File
 					RelativePath=".\utils\CMasterServerAnnouncer.h"
 					>
 				</File>
