@@ -40,6 +40,7 @@ protected:
     SString         _ChangeToAdmin                  ( void );
     SString         _ShowCopyFailDialog             ( void );
     SString         _ProcessLayoutChecks            ( void );
+    SString         _ProcessLangFileChecks          ( void );
     SString         _ProcessExePatchChecks          ( void );
     SString         _ProcessServiceChecks           ( void );
     SString         _ChangeFromAdmin                ( void );
