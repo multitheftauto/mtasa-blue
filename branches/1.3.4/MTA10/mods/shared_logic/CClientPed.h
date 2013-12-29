@@ -453,7 +453,6 @@ protected:
 
     void                        Init                        ( CClientManager* pManager, unsigned long ulModelID, bool bIsLocalPlayer );
 
-    void                        Dump                        ( FILE* pFile, bool bDumpDetails, unsigned int uiIndex );
     void                        StreamedInPulse             ( bool bDoStandardPulses );
     void                        ApplyStrafeFix              ( CControllerState& Current );
 

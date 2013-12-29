@@ -57,7 +57,7 @@ public:
     bool                            Save                            ( void );
 
     inline const std::string&       GetServerName                   ( void )        { return m_strServerName; };
-    std::string                     GetServerIP                     ( void );
+    SString                         GetServerIP                     ( void );
     SString                         GetServerIPList                 ( void );
     unsigned short                  GetServerPort                   ( void );
     unsigned int                    GetMaxPlayers                   ( void );
@@ -98,6 +98,7 @@ public:
     bool                            IsEnableDiagnostic              ( const char* szTag )       { return MapContains ( m_EnableDiagnosticMap, szTag ); };
     SString                         GetMinClientVersion             ( void )                    { return m_strMinClientVersion; }
     const SString&                  GetRecommendedClientVersion     ( void )                    { return m_strRecommendedClientVersion; }
+    int                             GetMinClientVersionAutoUpdate   ( void )                    { return m_iMinClientVersionAutoUpdate; }
     inline bool                     IsAutoLoginEnabled              ( )                         { return m_bAutoLogin; }
     const SString&                  GetIdFile                       ( void )                    { return m_strIdFile; }
     bool                            GetNetworkEncryptionEnabled     ( void )                    { return m_bNetworkEncryptionEnabled; }
@@ -208,6 +209,7 @@ private:
     int                             m_bUseAltPulseOrder;
     int                             m_bNetAutoFilter;
     SString                         m_strLoadstringLogFilename;
+    int                             m_iMinClientVersionAutoUpdate;
 };
 
 #endif

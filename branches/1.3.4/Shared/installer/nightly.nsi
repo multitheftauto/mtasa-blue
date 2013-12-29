@@ -430,7 +430,23 @@ DontInstallRedist:
             DetailPrint "Updating permissions. This could take a few minutes..."
 
             # Fix permissions for MTA install directory
-            FastPerms::FullAccessPlox "$INSTDIR"
+            StrCpy $0 "$PROGRAMFILES\M"
+            StrLen $2 $0
+            StrCpy $1 "$INSTDIR" $2
+            ${If} $0 == $1
+                FastPerms::FullAccessPlox "$INSTDIR"
+            ${Else}
+                # More conservative permissions blat if install directory it too different from default
+                CreateDirectory "$INSTDIR\mods"
+                CreateDirectory "$INSTDIR\screenshots"
+                CreateDirectory "$INSTDIR\server"
+                CreateDirectory "$INSTDIR\skins"
+                FastPerms::FullAccessPlox "$INSTDIR\mods"
+                FastPerms::FullAccessPlox "$INSTDIR\MTA"
+                FastPerms::FullAccessPlox "$INSTDIR\screenshots"
+                FastPerms::FullAccessPlox "$INSTDIR\server"
+                FastPerms::FullAccessPlox "$INSTDIR\skins"
+            ${EndIf}
             FastPerms::FullAccessPlox "$APPDATA\MTA San Andreas All"
 
             # Remove MTA virtual store

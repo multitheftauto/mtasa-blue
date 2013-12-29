@@ -116,9 +116,10 @@ class CWaterManager;
 class CWeaponStatManager;
 class CBuildingRemovalManager;
 
-class CFunctionUseLogger;
 class COpenPortsTester;
 class CMasterServerAnnouncer;
+class CHqComms;
+class CFunctionUseLogger;
 
 // Packet forward declarations
 class CCommandPacket;
@@ -557,6 +558,7 @@ private:
 
     COpenPortsTester*           m_pOpenPortsTester;
     CMasterServerAnnouncer*     m_pMasterServerAnnouncer;
+    CHqComms*                   m_pHqComms;
 
     CLightsyncManager           m_lightsyncManager;
 

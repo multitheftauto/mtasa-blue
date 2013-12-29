@@ -124,7 +124,6 @@ bool CVehiclePuresyncPacket::Read ( NetBitStreamInterface& BitStream )
 
                 // Trailer chain
                 CVehicle* pTowedByVehicle = pVehicle;
-                CVehicle* pTrailer = NULL;
                 ElementID TrailerID;
                 bool bHasTrailer;
                 if ( !BitStream.ReadBit ( bHasTrailer ) )

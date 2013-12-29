@@ -122,6 +122,15 @@ void CInstallManager::InitSequencer ( void )
                 CR "            IF LastResult == ok GOTO newlayout_check: "
                 CR "newlayout_end: "                                ////// End of 'new layout check' //////
                 CR " "
+                CR "langfile_check: "                               ////// Start of 'Lang file fix' //////
+                CR "            CALL ProcessLangFileChecks "        // Make changes to comply with requirements
+                CR "            IF LastResult == ok GOTO langfile_end: "
+                CR " "
+                CR "            CALL ChangeToAdmin "                // If changes failed, try as admin
+                CR "            IF LastResult == ok GOTO langfile_check: "
+                CR " "
+                CR "langfile_end: "                                 ////// End of 'Lang file fix' //////
+                CR " "        
                 CR "exepatch_check: "                               ////// Start of 'Exe patch fix' //////
                 CR "            CALL ProcessExePatchChecks "        // Make changes to comply with requirements
                 CR "            IF LastResult == ok GOTO exepatch_end: "
@@ -162,6 +171,7 @@ void CInstallManager::InitSequencer ( void )
     m_pSequencer->AddFunction ( "ChangeToAdmin",           &CInstallManager::_ChangeToAdmin );
     m_pSequencer->AddFunction ( "ShowCopyFailDialog",      &CInstallManager::_ShowCopyFailDialog );
     m_pSequencer->AddFunction ( "ProcessLayoutChecks",     &CInstallManager::_ProcessLayoutChecks );
+    m_pSequencer->AddFunction ( "ProcessLangFileChecks",   &CInstallManager::_ProcessLangFileChecks );
     m_pSequencer->AddFunction ( "ProcessExePatchChecks",   &CInstallManager::_ProcessExePatchChecks );
     m_pSequencer->AddFunction ( "ProcessServiceChecks",    &CInstallManager::_ProcessServiceChecks );
     m_pSequencer->AddFunction ( "ChangeFromAdmin",         &CInstallManager::_ChangeFromAdmin );
@@ -610,6 +620,82 @@ SString CInstallManager::_ProcessLayoutChecks ( void )
                 SetApplicationSettingInt ( "aero-enabled", atoi ( strLegacyValue ) );
             else
                 SetApplicationSettingInt ( "aero-enabled", 1 );
+        }
+    }
+
+    return "ok";
+}
+
+
+//////////////////////////////////////////////////////////
+//
+// CInstallManager::_ProcessLangFileChecks
+//
+// Make sure required language files exist
+//
+//////////////////////////////////////////////////////////
+SString CInstallManager::_ProcessLangFileChecks( void )
+{
+    if ( !HasGTAPath() )
+        return "ok";
+
+    SString strTextFilePath = PathJoin( GetGTAPath(), "text" );
+    const char* langFileNames[] = { "american.gxt", "french.gxt", "german.gxt", "italian.gxt", "spanish.gxt" };
+
+    // Get language that will be used
+    SString strSettingsFilename = PathJoin( GetSystemPersonalPath(), "GTA San Andreas User Files", "gta_sa.set" );
+    FILE* fh = fopen( strSettingsFilename, "rb" );
+    if ( fh )
+    {
+        fseek( fh, 0xB3B, SEEK_SET );
+        char cLang = -1;
+        fread( &cLang, 1, 1, fh );
+        fclose( fh );
+        if ( cLang >= 0 && cLang < NUMELMS( langFileNames ) )
+        {
+            // Check the selected language file is present
+            SString strPathFilename = PathJoin( strTextFilePath, langFileNames[cLang] );
+            if ( FileSize( strPathFilename ) > 10000 )
+                return "ok";
+        }
+    }
+
+    // Apply fix if the selected language file is not present, or there is no gta_sa.set file 
+
+    // Find file to copy from
+    SString strSrcFile;
+    for( uint i = 0 ; i < NUMELMS( langFileNames ) ; i++ )
+    {
+        SString strPathFilename = PathJoin( strTextFilePath, langFileNames[i] );
+        if ( FileSize( strPathFilename ) > 10000 )
+        {
+            strSrcFile = strPathFilename;
+            break;
+        }
+    }
+
+    if ( strSrcFile.empty() )
+    {
+        SString strMessage =  _("Missing file:");
+        strMessage += "\n\n";
+        strMessage += PathJoin( strTextFilePath, langFileNames[0] );
+        strMessage += "\n\n";
+        strMessage +=  _("If MTA fails to load, please re-install GTA:SA");
+        MessageBoxUTF8( NULL, strMessage, "Multi Theft Auto: San Andreas", MB_OK | MB_TOPMOST  );
+        return "ok";
+    }
+
+    // Fix missing files by copying
+    for( uint i = 0 ; i < NUMELMS( langFileNames ) ; i++ )
+    {
+        SString strPathFilename = PathJoin( strTextFilePath, langFileNames[i] );
+        if ( FileSize( strPathFilename ) < 10000 )
+        {
+            if ( !FileCopy( strSrcFile, strPathFilename ) )
+            {
+                m_strAdminReason = "Update language files";
+                return "fail";
+            }
         }
     }
 
