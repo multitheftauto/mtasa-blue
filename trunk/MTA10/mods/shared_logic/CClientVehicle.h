@@ -375,10 +375,6 @@ public:
 
     void                        GetInitialDoorStates    ( SFixedArray < unsigned char, MAX_DOORS >& ucOutDoorStates );
 
-    void                        AddMatrix               ( CMatrix& Matrix, double dTime, unsigned short usTickRate );
-    void                        AddVelocity             ( CVector& vecVelocity );
-
-
     // Time dependent interpolation
     inline void                 GetTargetPosition       ( CVector& vecPosition )            { vecPosition = m_interp.pos.vecTarget; }
     void                        SetTargetPosition       ( const CVector& vecPosition, unsigned long ulDelay, bool bValidVelocityZ = false, float fVelocityZ = 0.f );
@@ -480,9 +476,6 @@ protected:
     void                        HandleWaitingForGroundToLoad ( void );
 
     void                        StreamedInPulse         ( void );
-    void                        Dump                    ( FILE* pFile, bool bDumpDetails, unsigned int uiIndex );
-    eVehicleComponent           ConvertStringToEnum     ( SString strInput );
-    SString                     ConvertEnumToString     ( eVehicleComponent strInput );
 
     class CClientObjectManager* m_pObjectManager;
     CClientVehicleManager*      m_pVehicleManager;
