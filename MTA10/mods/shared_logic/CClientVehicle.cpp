@@ -3335,40 +3335,6 @@ void CClientVehicle::ResetInterpolation ( void )
 }
 
 
-void CClientVehicle::AddMatrix ( CMatrix& Matrix, double dTime, unsigned short usTickRate )
-{
-    /*
-    // See if we need an update yet (since the rotation could have a lower tick rate)
-    if ( ( ( dTime - m_dLastRotationTime ) * 1000 ) >= usTickRate ) {
-        m_fLERP = LERP_FACTOR;
-
-        // Set the source quaternion to whatever we have right now
-        m_QuatA = m_QuatLERP;
-
-        // Set the destination quaternion to whatever we just received
-        m_QuatB = CQuat ( &Matrix );
-
-        // Store the matrix into the pure matrix
-        m_MatrixPure = Matrix;
-
-        // Debug stuff
-        #ifdef MTA_DEBUG_INTERPOLATION
-        g_pCore->GetGraphics()->DrawTextTTF(232,200,300,216,0xDDDDDDDD, "RENEW", 1.0f, 0);
-        #endif
-
-        // Store the time for this rotation
-        m_dLastRotationTime = dTime;
-    }
-    */
-}
-
-
-void CClientVehicle::AddVelocity ( CVector& vecVelocity )
-{
-    m_vecMoveSpeedInterpolate = vecVelocity;
-}
-
-
 void CClientVehicle::Interpolate ( void )
 {
     // Interpolate it if: It has a driver and it's not local and we're not syncing it or
