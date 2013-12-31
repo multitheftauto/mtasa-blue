@@ -98,7 +98,7 @@ bool CTeam::ReadSpecialData ( void )
 void CTeam::SetTeamName ( const char* szName )
 {
     if ( szName )
-        m_strTeamName = szName;
+        m_strTeamName.AssignLeft( szName, MAX_TEAM_NAME_LENGTH );
     else
         m_strTeamName = "";
 }

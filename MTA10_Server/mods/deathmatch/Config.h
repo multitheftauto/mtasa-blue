@@ -46,6 +46,8 @@ public:
 #define MIN_NAMETAG_LENGTH 1
 #define MAX_NAMETAG_LENGTH 22
 
+#define MAX_TEAM_NAME_LENGTH 255
+
 // Min and max number of characters in passwords
 #define MIN_PASSWORD_LENGTH 1
 #define MAX_PASSWORD_LENGTH 30

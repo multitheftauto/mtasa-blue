@@ -3565,7 +3565,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                 {
                     unsigned short usNameLength;
                     bitStream.ReadCompressed ( usNameLength );
-                    if (usNameLength > 255)
+                    if ( usNameLength > MAX_TEAM_NAME_LENGTH )
                     {
                         RaiseFatalError ( 12 );
                         return;
