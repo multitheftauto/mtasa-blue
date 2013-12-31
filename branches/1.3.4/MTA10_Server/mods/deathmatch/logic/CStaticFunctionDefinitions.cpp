@@ -8947,6 +8947,7 @@ bool CStaticFunctionDefinitions::SetTeamName ( CTeam* pTeam, const char* szTeamN
     {
         // Change it
         pTeam->SetTeamName ( szTeamName );
+        szTeamName = pTeam->GetTeamName ();
 
         // Tell everyone the new team name
         CBitStream BitStream;
