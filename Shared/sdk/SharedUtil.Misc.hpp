@@ -785,16 +785,20 @@ static bool MyShellExecute ( bool bBlocking, const SString& strAction, const SSt
 
     if ( bBlocking )
     {
-        SHELLEXECUTEINFO info;
+        WString wstrAction = FromUTF8( strAction );
+        WString wstrFile = FromUTF8( strFile );
+        WString wstrParameters = FromUTF8( strParameters );
+        WString wstrDirectory = FromUTF8( strDirectory );
+        SHELLEXECUTEINFOW info;
         memset( &info, 0, sizeof ( info ) );
         info.cbSize = sizeof ( info );
         info.fMask = SEE_MASK_NOCLOSEPROCESS;
-        info.lpVerb = strAction;
-        info.lpFile = strFile;
-        info.lpParameters = strParameters;
-        info.lpDirectory = strDirectory;
+        info.lpVerb = wstrAction;
+        info.lpFile = wstrFile;
+        info.lpParameters = wstrParameters;
+        info.lpDirectory = wstrDirectory;
         info.nShow = nShowCmd;
-        bool bResult = ShellExecuteExA( &info ) != FALSE;
+        bool bResult = ShellExecuteExW( &info ) != FALSE;
         if ( info.hProcess )
         {
             WaitForSingleObject ( info.hProcess, INFINITE );
