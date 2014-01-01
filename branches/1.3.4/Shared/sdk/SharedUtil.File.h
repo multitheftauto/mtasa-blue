@@ -76,6 +76,7 @@ namespace SharedUtil
     SString         GetSystemSystemPath             ( void );
     SString         GetSystemTempPath               ( void );
     SString         GetMTADataPath                  ( void );
+    SString         GetMTADataPathCommon            ( void );
     SString         GetMTATempPath                  ( void );
 
     SString         GetLaunchPathFilename           ( void );

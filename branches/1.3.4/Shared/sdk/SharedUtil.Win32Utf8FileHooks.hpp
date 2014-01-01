@@ -214,32 +214,32 @@ namespace SharedUtil
 #ifdef MTA_CLIENT
     /////////////////////////////////////////////////////////////
     //
-    // Return list of replacement path candidates
+    // Ensure codepage type characters have been utf8ified
     //
     /////////////////////////////////////////////////////////////
-    std::vector < SString > GetPossibleFixedPaths( const SString& strOriginal )
+    SString MakeSurePathIsUTF8( const SString& strOriginal )
     {
-        std::vector < SString > resultList;
-
         if ( strOriginal.Contains( "GTA San Andreas User Files" ) )
         {
-            // Try to fix broken path to gta save files
+            // Fix gta save path
             SString strPathTail = strOriginal.SplitRight( "GTA San Andreas User Files" );
-            SString strGuess = PathJoin( GetSystemPersonalPath(), "GTA San Andreas User Files", strPathTail );
-            resultList.push_back( strGuess );
+            SString strNewPathName = PathJoin( GetSystemPersonalPath(), "GTA San Andreas User Files", strPathTail );
+            return strNewPathName;
         }
         else
         {
-            // Try to fix broken path to gta game files
-            for ( uint i = 1 ; i < 10 ; i++ )
+            char szBuffer[64000];
+            GetModuleFileNameA( NULL, szBuffer, NUMELMS(szBuffer) - 1 );
+            SString LaunchPathA = ExtractPath( szBuffer );
+            if ( strOriginal.BeginsWithI( LaunchPathA ) )
             {
-                SString strPathTail = strOriginal.SplitRight( "\\", NULL, i );
-                SString strGuess = PathJoin( GetLaunchPath(), strPathTail );
-                ListAddUnique( resultList, strGuess );
+                // Fix gta install path
+                SString strPathTail = strOriginal.SubStr( LaunchPathA.length() );
+                SString strNewPathName = PathJoin( GetLaunchPath(), strPathTail );
+                return strNewPathName;
             }
         }
-
-        return resultList;
+        return strOriginal;
     }
 #endif
 
@@ -260,30 +260,12 @@ namespace SharedUtil
         __in_opt HANDLE hTemplateFile
         )
     {
-        HANDLE hResult = CreateFileW( FromUTF8( lpFileName ), dwDesiredAccess, dwShareMode, lpSecurityAttributes, dwCreationDisposition, dwFlagsAndAttributes, hTemplateFile );
+        SString strFileName = lpFileName;
 #ifdef MTA_CLIENT
-        if ( hResult == INVALID_HANDLE_VALUE )
-        {
-            // Fixes for GTA not working with unicode path
-            hResult = pfnCreateFileA( lpFileName, dwDesiredAccess, dwShareMode, lpSecurityAttributes, dwCreationDisposition, dwFlagsAndAttributes, hTemplateFile );
-            if ( hResult == INVALID_HANDLE_VALUE && IsAbsolutePath( lpFileName ) && IsGTAProcess() )
-            {
-                if ( SStringX( lpFileName ).EndsWithI( "gta_sa.exe" )
-                    || SStringX( lpFileName ).EndsWithI( "proxy_sa.exe" )
-                    || SStringX( lpFileName ).Contains( "GTA San Andreas User Files" ) )
-                {
-                    std::vector < SString > guessList = GetPossibleFixedPaths( lpFileName );
-                    for( uint i = 0 ; i < guessList.size() ; i++ )
-                    {
-                        hResult = CreateFileW( FromUTF8( guessList[i] ), dwDesiredAccess, dwShareMode, lpSecurityAttributes, dwCreationDisposition, dwFlagsAndAttributes, hTemplateFile );
-                        if ( hResult != INVALID_HANDLE_VALUE )
-                            break;
-                    }
-                }
-            }
-        }
+        if ( IsGTAProcess() )
+            strFileName = MakeSurePathIsUTF8( strFileName );
 #endif
-        return hResult;
+        return CreateFileW( FromUTF8( strFileName ), dwDesiredAccess, dwShareMode, lpSecurityAttributes, dwCreationDisposition, dwFlagsAndAttributes, hTemplateFile );
     }
 
     HMODULE
@@ -321,25 +303,12 @@ namespace SharedUtil
         __in LPCSTR lpPathName
         )
     {
-        BOOL bResult = SetCurrentDirectoryW( FromUTF8( lpPathName ) );
+        SString strPathName = lpPathName;
 #ifdef MTA_CLIENT
-        if ( bResult == 0 )
-        {
-            // Fixes for GTA not working with unicode path
-            bResult = pfnSetCurrentDirectoryA ( lpPathName );
-            if ( bResult == 0 && IsAbsolutePath( lpPathName ) && IsGTAProcess() )
-            {
-                std::vector < SString > guessList = GetPossibleFixedPaths( lpPathName );
-                for( uint i = 0 ; i < guessList.size() ; i++ )
-                {
-                    bResult = SetCurrentDirectoryW( FromUTF8( guessList[i] ) );
-                    if ( bResult )
-                        break;
-                }
-            }
-        }
+        if ( IsGTAProcess() )
+            strPathName = MakeSurePathIsUTF8( strPathName );
 #endif
-        return bResult;
+        return SetCurrentDirectoryW( FromUTF8( strPathName ) );
     }
 
     int  WINAPI MyAddFontResourceExA( __in LPCSTR name, __in DWORD fl, __reserved PVOID res        )
@@ -405,28 +374,12 @@ namespace SharedUtil
         __in_opt LPSECURITY_ATTRIBUTES lpSecurityAttributes
         )
     {
-        BOOL bResult = CreateDirectoryW( FromUTF8( lpPathName ), lpSecurityAttributes );
+        SString strPathName = lpPathName;
 #ifdef MTA_CLIENT
-        if ( bResult == 0 )
-        {
-            // Fixes for GTA not working with unicode path
-            bResult = pfnCreateDirectoryA ( lpPathName, lpSecurityAttributes );
-            if ( bResult == 0 && IsAbsolutePath( lpPathName ) && IsGTAProcess() )
-            {
-                if ( SStringX( lpPathName ).Contains( "GTA San Andreas User Files" ) )
-                {
-                    std::vector < SString > guessList = GetPossibleFixedPaths( lpPathName );
-                    for( uint i = 0 ; i < guessList.size() ; i++ )
-                    {
-                        bResult = CreateDirectoryW( FromUTF8( guessList[i] ), lpSecurityAttributes );
-                        if ( bResult )
-                            break;
-                    }
-                }
-            }
-        }
+        if ( IsGTAProcess() )
+            strPathName = MakeSurePathIsUTF8( strPathName );
 #endif
-        return bResult;
+        return CreateDirectoryW( FromUTF8( strPathName ), lpSecurityAttributes );
     }
 
     BOOL

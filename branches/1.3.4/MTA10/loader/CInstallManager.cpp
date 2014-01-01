@@ -542,21 +542,15 @@ SString CInstallManager::_ProcessLayoutChecks ( void )
     // Validation
     //
 
-    // Check data dir exists
+    // Check data dirs exists and writable
+    for ( uint i = 0 ; i < 2 ; i++ )
     {
-        if ( !DirectoryExists ( GetMTADataPath () ) )
+        SString strMTADataPath = i ? GetMTADataPathCommon() : GetMTADataPath();
+
+        if ( !DirectoryExists ( strMTADataPath ) )
             ShowLayoutError ( "[Data directory not present]" );   // Can't find directory
-    }
 
-    // Check reg key exists
-    {
-        if ( GetRegistryValue ( "", "Last Install Location" ).empty () )
-            ShowLayoutError ( "[Registry key not present]" );   // Can't find reg key
-    }
-
-    // Check data dir writable
-    {
-        SString strTestFilePath = PathJoin ( GetMTADataPath (), "testdir", "testfile.txt" );
+        SString strTestFilePath = PathJoin ( strMTADataPath, "testdir", "testfile.txt" );
 
         FileDelete ( strTestFilePath );
         RemoveDirectory ( ExtractPath ( strTestFilePath ) );
@@ -567,6 +561,12 @@ SString CInstallManager::_ProcessLayoutChecks ( void )
 
         FileDelete ( strTestFilePath );
         RemoveDirectory ( ExtractPath ( strTestFilePath ) );
+    }
+
+    // Check reg key exists
+    {
+        if ( GetRegistryValue ( "", "Last Install Location" ).empty () )
+            ShowLayoutError ( "[Registry key not present]" );   // Can't find reg key
     }
 
     // Check reg key writable
