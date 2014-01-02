@@ -5491,13 +5491,16 @@ void _cdecl SaveVehColors ( DWORD dwThis )
     {
         pVehicle->GetColor ( &vehColors[0], &vehColors[1], &vehColors[2], &vehColors[3], 0 );
 
-        // 0xFF00FF and 0x00FFFF both result in black for some reason
+        // Some colors result in black for some reason
         for ( uint i = 0 ; i < NUMELMS( vehColors ) ; i++ )
         {
-            if ( vehColors[i] == 0xFF00FF )
-                vehColors[i] = 0xFF01FF;
-            if ( vehColors[i] == 0x00FFFF )
-                vehColors[i] = 0x01FFFF;
+            const SColor color = vehColors[i];
+            if ( color == 0xFF00FF
+              || color == 0x00FFFF
+              || color == 0xFF00AF
+              || color == 0xFFAF00
+              || color == 0xFF3C00 )
+                vehColors[i].ulARGB |= 0x010101;
         }
     }
 }
