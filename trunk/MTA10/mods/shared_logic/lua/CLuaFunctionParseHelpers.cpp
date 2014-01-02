@@ -500,7 +500,11 @@ void MixedReadMaterialString ( CScriptArgReader& argStream, CClientMaterial*& pM
                     // Make it a child of the resource's file root ** CHECK  Should parent be pFileResource, and element added to pParentResource's ElementGroup? **
                     pMaterialElement->SetParent ( pParentResource->GetResourceDynamicEntity() );
                 }
+                else
+                    argStream.SetCustomError( strFilePath, "Error loading image" );
             }
+            else
+                argStream.SetCustomError( strFilePath, "Bad file path" );
         }
     }
 }

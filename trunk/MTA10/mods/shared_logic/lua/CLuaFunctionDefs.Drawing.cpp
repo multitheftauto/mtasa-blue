@@ -258,14 +258,6 @@ int CLuaFunctionDefs::dxDrawImage ( lua_State* luaVM )
             lua_pushboolean ( luaVM, true );
             return 1;
         }
-        else
-        {
-            SString strFilename;
-            argStream.m_iIndex = 4;
-            if ( argStream.NextIsString () )
-                argStream.ReadString ( strFilename );
-            argStream.SetCustomError( SString( "Can't load file %s", *strFilename ) );
-        }
     }
     if ( argStream.HasErrors () )
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
@@ -307,8 +299,6 @@ int CLuaFunctionDefs::dxDrawImageSection ( lua_State* luaVM )
             lua_pushboolean ( luaVM, true );
             return 1;
         }
-        else
-            argStream.SetCustomError( "Can't load file" );
     }
     if ( argStream.HasErrors () )
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
@@ -422,14 +412,7 @@ int CLuaFunctionDefs::dxCreateTexture ( lua_State* luaVM )
         argStream.ReadNumber ( width );
         argStream.ReadNumber ( height );
         argStream.ReadEnumString ( renderFormat, RFORMAT_UNKNOWN );
-        if ( argStream.NextIsEnumString ( textureType ) )
-        {
-           // r4019 to r4037 had incorrect argument order
-            m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), "invalid texture-edge type at argument 4" ) );
-            textureAddress = TADDRESS_WRAP;
-        }
-        else
-            argStream.ReadEnumString ( textureAddress, TADDRESS_WRAP );
+        argStream.ReadEnumString ( textureAddress, TADDRESS_WRAP );
         argStream.ReadEnumString ( textureType, TTYPE_TEXTURE );
         if ( textureType == TTYPE_VOLUMETEXTURE )
             argStream.ReadNumber ( depth );
@@ -461,10 +444,10 @@ int CLuaFunctionDefs::dxCreateTexture ( lua_State* luaVM )
                         return 1;
                     }
                     else
-                        m_pScriptDebugging->LogBadPointer ( luaVM, "file-path", 1 );
+                        argStream.SetCustomError( strFilePath, "File not found" );
                 }
                 else
-                    m_pScriptDebugging->LogBadPointer ( luaVM, "file-path", 1 );
+                    argStream.SetCustomError( strFilePath, "Bad file path" );
             }
             else
             if ( pixels.GetSize () )
@@ -491,7 +474,7 @@ int CLuaFunctionDefs::dxCreateTexture ( lua_State* luaVM )
             }
         }
     }
-    else
+    if ( argStream.HasErrors () )
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     // error: bad arguments
@@ -544,17 +527,17 @@ int CLuaFunctionDefs::dxCreateShader ( lua_State* luaVM )
                         // Replace any path in the error message with our own one
                         SString strRootPathWithoutResource = strRootPath.Left ( strRootPath.TrimEnd ( "\\" ).length () - SStringX ( pFileResource->GetName () ).length () ) ;
                         strStatus = strStatus.ReplaceI ( strRootPathWithoutResource, "" );
-                        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Problem @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *strStatus ) );
+                        argStream.SetCustomError( strFilePath, strStatus );
                     }
                 }
                 else
-                    m_pScriptDebugging->LogCustom ( luaVM, SString ( "Missing file @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *ConformResourcePath ( strPath, true ) ) );
+                    argStream.SetCustomError( strFilePath, "File not found" );
             }
             else
-                m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad file-path @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *strFilePath ) );
+                argStream.SetCustomError( strFilePath, "Bad file path" );
         }
     }
-    else
+    if ( argStream.HasErrors () )
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     // error: bad arguments
@@ -884,18 +867,19 @@ int CLuaFunctionDefs::dxCreateFont ( lua_State* luaVM )
                     {
                         // Make it a child of the resource's file root ** CHECK  Should parent be pFileResource, and element added to pParentResource's ElementGroup? **
                         pDxFont->SetParent ( pParentResource->GetResourceDynamicEntity () );
+                        lua_pushelement ( luaVM, pDxFont );
+                        return 1;
                     }
-                    lua_pushelement ( luaVM, pDxFont );
-                    return 1;
+                    argStream.SetCustomError( strFilePath, "Error creating font" );
                 }
                 else
-                    m_pScriptDebugging->LogBadPointer ( luaVM, "file-path", 1 );
+                    argStream.SetCustomError( strFilePath, "File not found" );
             }
             else
-                m_pScriptDebugging->LogBadPointer ( luaVM, "file-path", 1 );
+                argStream.SetCustomError( strFilePath, "Bad file path" );
         }
     }
-    else
+    if ( argStream.HasErrors () )
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     // error: bad arguments

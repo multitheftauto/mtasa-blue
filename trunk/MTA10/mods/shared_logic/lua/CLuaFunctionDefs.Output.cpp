@@ -149,10 +149,7 @@ int CLuaFunctionDefs::OutputClientDebugString ( lua_State* luaVM )
     // Too big level?
     if ( uiLevel > 3 )
     {
-        m_pScriptDebugging->LogWarning ( luaVM, "Bad level argument sent to %s (0-3)", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ) );
-
-        lua_pushboolean ( luaVM, false );
-        return 1;
+        argStream.SetCustomError( "Bad level argument" );
     }
 
     if ( !argStream.HasErrors ( ) )
@@ -183,7 +180,7 @@ int CLuaFunctionDefs::OutputClientDebugString ( lua_State* luaVM )
             return 1;
         }
     }
-    else
+    if ( argStream.HasErrors ( ) )
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     // Failed

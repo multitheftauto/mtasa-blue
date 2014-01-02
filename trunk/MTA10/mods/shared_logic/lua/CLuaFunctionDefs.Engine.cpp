@@ -61,15 +61,15 @@ int CLuaFunctionDefs::EngineLoadCOL ( lua_State* luaVM )
                     {
                         // Delete it again. We failed
                         delete pCol;
-                        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Load error @ '%s' [Unable to load '%s']", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *strFile ) );
+                        argStream.SetCustomError( strFile, "Error loading COL" );
                     }
                 }
                 else
-                    m_pScriptDebugging->LogBadType ( luaVM );
+                    argStream.SetCustomError( strFile, "Bad file path" );
             }
         }
     }
-    else
+    if ( argStream.HasErrors ( ) )
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     // We failed for some reason
@@ -119,15 +119,15 @@ int CLuaFunctionDefs::EngineLoadDFF ( lua_State* luaVM )
                     {
                         // Delete it again
                         delete pDFF;
-                        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Load error @ '%s' [Unable to load '%s']", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *strFile ) );
+                        argStream.SetCustomError( strFile, "Error loading DFF" );
                     }
                 }
                 else
-                    m_pScriptDebugging->LogBadPointer ( luaVM, "string", 1 );
+                    argStream.SetCustomError( strFile, "Bad file path" );
             }
         }
     }
-    else
+    if ( argStream.HasErrors ( ) )
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     // We failed
