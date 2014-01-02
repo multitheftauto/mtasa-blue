@@ -597,7 +597,7 @@ int CLuaFunctionDefs::GUIStaticImageLoadImage ( lua_State* luaVM )
                     return 1;
                 }
                 else
-                    argStream.SetCustomError( SString( "Problem loading image '%s'", *strPath ) );
+                    argStream.SetCustomError( strPath, "Error loading image" );
             }
             else
                 argStream.SetCustomError( strPath, "Bad file path" );
@@ -3066,12 +3066,13 @@ int CLuaFunctionDefs::GUICreateFont ( lua_State* luaVM )
                     {
                         // Make it a child of the resource's file root ** CHECK  Should parent be pFileResource, and element added to pParentResource's ElementGroup? **
                         pGuiFont->SetParent ( pParentResource->GetResourceDynamicEntity () );
+                        lua_pushelement ( luaVM, pGuiFont );
+                        return 1;
                     }
-                    lua_pushelement ( luaVM, pGuiFont );
-                    return 1;
+                    argStream.SetCustomError( strFilePath, "Error creating font" );
                 }
                 else
-                    argStream.SetCustomError( strFilePath, "Bad file path" );
+                    argStream.SetCustomError( strFilePath, "File not found" );
             }
             else
                 argStream.SetCustomError( strFilePath, "Bad file path" );
