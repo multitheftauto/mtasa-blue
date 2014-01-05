@@ -1503,6 +1503,33 @@ void CClientVehicle::SetWheelStatus ( unsigned char ucWheel, unsigned char ucSta
 }
 
 
+//
+// Returns true if wheel should be invisible because of its state
+//
+bool CClientVehicle::GetWheelMissing ( unsigned char ucWheel, const SString& strWheelName )
+{
+    // Use name if supplied
+    if ( strWheelName.BeginsWith( "wheel" ) )
+    {
+        if ( strWheelName == "wheel_lf_dummy" )         ucWheel = FRONT_LEFT_WHEEL;
+        else if ( strWheelName == "wheel_rf_dummy" )    ucWheel = FRONT_RIGHT_WHEEL;
+        else if ( strWheelName == "wheel_lb_dummy" )    ucWheel = REAR_LEFT_WHEEL;
+        else if ( strWheelName == "wheel_rb_dummy" )    ucWheel = REAR_RIGHT_WHEEL;
+    }
+
+    if ( ucWheel < MAX_WHEELS )
+    {
+        if ( HasDamageModel () )
+        {
+            // Check the wheel's invisibility
+            if ( m_ucWheelStates [ucWheel] == DT_WHEEL_MISSING )
+                return true;
+        }
+    }
+    return false;
+}
+
+
 void CClientVehicle::SetPanelStatus ( unsigned char ucPanel, unsigned char ucStatus )
 {
     if ( ucPanel < MAX_PANELS )
@@ -4383,6 +4410,10 @@ bool CClientVehicle::ResetComponentPosition ( SString vehicleComponent )
 
 bool CClientVehicle::SetComponentVisible ( SString vehicleComponent, bool bVisible )
 {
+    // Check if wheel invisibility override is in operation due to setting of wheel states
+    if ( bVisible && GetWheelMissing( UCHAR_INVALID_INDEX, vehicleComponent ) )
+        bVisible = false;
+
     if ( m_pVehicle )
     {
         if ( m_pVehicle->SetComponentVisible ( vehicleComponent, bVisible ) )

@@ -247,6 +247,7 @@ public:
     void                        SetWheelStatus          ( unsigned char ucWheel, unsigned char ucStatus, bool bSilent = true );
     void                        SetPanelStatus          ( unsigned char ucPanel, unsigned char ucStatus );
     void                        SetLightStatus          ( unsigned char ucLight, unsigned char ucStatus );
+    bool                        GetWheelMissing         ( unsigned char ucWheel, const SString& strWheelName = "" );
 
     // TODO: Make the class remember on virtualization
     float                       GetHeliRotorSpeed       ( void );
