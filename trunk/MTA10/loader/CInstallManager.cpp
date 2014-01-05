@@ -623,6 +623,16 @@ SString CInstallManager::_ProcessLayoutChecks ( void )
         }
     }
 
+    //
+    // Disk space check
+    //
+    SString strDriveWithNoSpace = GetDriveNameWithNotEnoughSpace();
+    if ( !strDriveWithNoSpace.empty() )
+    {
+        SString strMessage( _("MTA:SA cannot continue because drive %s does not have enough space."), *strDriveWithNoSpace.Left( 1 ) );
+        BrowseToSolution ( SString( "low-disk-space&drive=%s", *strDriveWithNoSpace ), ASK_GO_ONLINE | TERMINATE_PROCESS, strMessage );
+    }
+
     return "ok";
 }
 
