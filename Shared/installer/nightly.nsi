@@ -905,10 +905,14 @@ FunctionEnd
 
  
 LangString UNINST_REQUEST ${LANG_ENGLISH}	"Are you sure you want to completely remove $(^Name) and all of its components?"
+LangString UNINST_REQUEST_NOTE ${LANG_ENGLISH}	"Uninstalling before update?\
+$\r$\nIt is not necessary to uninstall before installing a new version of MTA:SA\
+$\r$\nRun the new installer to upgrade and preserve your settings."
+
 Function un.onInit
 	Call un.DoRightsElevation
 	SetShellVarContext all
-		MessageBox MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2 "$(UNINST_REQUEST)" IDYES +2
+		MessageBox MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2 "$(UNINST_REQUEST_NOTE)$\r$\n$\r$\n$\r$\n$(UNINST_REQUEST)" IDYES +2
 		Abort
 		
 	!insertmacro MUI_UNGETLANGUAGE

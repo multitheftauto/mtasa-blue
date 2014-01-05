@@ -83,6 +83,10 @@ namespace SharedUtil
     SString         GetLaunchPath                   ( void );
     SString         GetLaunchFilename               ( void );
 
+    SString         GetPathDriveName                ( const SString& strPath );
+    uint            GetPathFreeSpaceMB              ( const SString& strPath );
+    SString         GetDriveNameWithNotEnoughSpace  ( uint uiResourcesPathMinMB = 10, uint uiDataPathMinMB = 10 );
+
     WString         FromUTF8                        ( const SString& strPath );
     SString         ToUTF8                          ( const WString& strPath );
 }

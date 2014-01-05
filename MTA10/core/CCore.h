@@ -166,6 +166,7 @@ public:
     static void             ErrorMessageBoxCallBack         ( void* pData, uint uiButton );
     bool                    IsOfflineMod                    ( void ) { return m_bIsOfflineMod; }
     const char *            GetModInstallRoot               ( const char * szModName );
+    bool                    CheckDiskSpace                  ( uint uiResourcesPathMinMB = 10, uint uiDataPathMinMB = 10 );
 
 
     // Subsystems

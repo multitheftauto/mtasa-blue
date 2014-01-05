@@ -114,6 +114,7 @@ public:
     virtual bool                    ShouldUseInternalHTTPServer     ( void ) = 0;
 
     virtual const char *            GetModInstallRoot               ( const char * szModName )=0;
+    virtual bool                    CheckDiskSpace                  ( uint uiResourcesPathMinMB = 10, uint uiDataPathMinMB = 10 )=0;
 
     virtual void                    ShowServerInfo                  ( unsigned int WindowType ) = 0;
 

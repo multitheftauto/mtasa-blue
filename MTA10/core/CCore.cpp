@@ -764,6 +764,24 @@ void CCore::ErrorMessageBoxCallBack( void* pData, uint uiButton )
 }
 
 
+//
+// Check for disk space problems
+// Returns false if low disk space, and dialog is being shown
+//
+bool CCore::CheckDiskSpace( uint uiResourcesPathMinMB, uint uiDataPathMinMB )
+{
+    SString strDriveWithNoSpace = GetDriveNameWithNotEnoughSpace( uiResourcesPathMinMB, uiDataPathMinMB );
+    if ( !strDriveWithNoSpace.empty() )
+    {
+        SString strMessage( _("MTA:SA cannot continue because drive %s does not have enough space."), *strDriveWithNoSpace );
+        SString strTroubleLink( SString( "low-disk-space&drive=%s", *strDriveWithNoSpace.Left( 1 ) ) );
+        g_pCore->ShowErrorMessageBox ( _("Fatal error")+_E("CC43"), strMessage, strTroubleLink );
+        return false;
+    }
+    return true;
+}
+
+
 HWND CCore::GetHookedWindow ( void )
 {
     return CMessageLoopHook::GetSingleton ().GetHookedWindowHandle ();
