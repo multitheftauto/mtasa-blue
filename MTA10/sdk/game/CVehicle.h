@@ -96,13 +96,14 @@ public:
     virtual bool                IsBeingDriven               () = 0;
 
     virtual CVehicle *          GetNextTrainCarriage        () = 0;
-    virtual void                SetNextTrainCarriage        ( CVehicle * next ) = 0;
+    virtual void                SetNextTrainCarriage        ( CVehicle* pNext ) = 0;
     virtual CVehicle *          GetPreviousTrainCarriage    () = 0;
-    virtual void                SetPreviousTrainCarriage    ( CVehicle * previous ) = 0;
+    virtual void                SetPreviousTrainCarriage    ( CVehicle* pPrevious ) = 0;
+    virtual float               GetDistanceToCarriage       ( CVehicle* pCarriage ) = 0;
     virtual void                AttachTrainCarriage         ( CVehicle* pCarriage ) = 0;
     virtual void                DetachTrainCarriage         ( CVehicle* pCarriage ) = 0;
     virtual bool                IsChainEngine               ( void ) = 0;
-    virtual void                SetChainEngine              ( bool bChainEngine = true ) = 0;
+    virtual void                SetIsChainEngine            ( bool bChainEngine = true ) = 0;
 
     virtual bool                IsDerailed                  () = 0;
     virtual void                SetDerailed                 ( bool bDerailed ) = 0;

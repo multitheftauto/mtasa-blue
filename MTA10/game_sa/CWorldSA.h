@@ -29,6 +29,7 @@
 #define FUNC_RemoveReferencesToDeletedObject                0x565510 // ##SA##
 #define FUNC_COcclusion_ProcessBeforeRendering              0x7201C0
 #define VAR_COcclusion_NumActiveOccluders                   0xC73CC0
+#define FUNC_CWorld_FindPositionForTrackPosition            0x6F59E0
 
 // CCol...
 #define FUNC_CColLine_Constructor                           0x40EF50 // ##SA##
@@ -80,6 +81,7 @@ public:
     float       GetAircraftMaxVelocity    ( void );
     void        SetOcclusionsEnabled      ( bool bEnabled );
     bool        GetOcclusionsEnabled      ( void );
+    void        FindWorldPositionForRailTrackPosition ( float fRailTrackPosition, int iTrackId, CVector* pOutVecPosition );
 
     /**
      * \todo Add FindObjectsKindaColliding (see 0x430577)

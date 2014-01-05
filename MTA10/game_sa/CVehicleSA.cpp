@@ -371,12 +371,12 @@ VOID CVehicleSA::SetMoveSpeed ( CVector* vecMoveSpeed )
 #endif
 }
 
-CVehicleSAInterface * CVehicleSA::GetNextCarriageInTrain ( void )
+CVehicleSAInterface* CVehicleSA::GetNextCarriageInTrain ( void )
 {
     return (CVehicleSAInterface *)*(DWORD *)((DWORD)this->GetInterface() + 1492);
 }
 
-CVehicle * CVehicleSA::GetNextTrainCarriage ( void )
+CVehicle* CVehicleSA::GetNextTrainCarriage ( void )
 {
     CVehicleSAInterface * pVehicle = GetNextCarriageInTrain();
     if ( pVehicle )
@@ -390,11 +390,11 @@ bool CVehicleSA::AddProjectile ( eWeaponType eWeapon, CVector vecOrigin, float f
     return ((CProjectileInfoSA*)pGame->GetProjectileInfo())->AddProjectile ( (CEntitySA*)this, eWeapon, vecOrigin, fForce, target, targetEntity );
 }
 
-void CVehicleSA::SetNextTrainCarriage ( CVehicle * next )
+void CVehicleSA::SetNextTrainCarriage ( CVehicle* pNext )
 {
-    if ( next )
+    if ( pNext )
     {
-        CVehicleSA * pNextVehicle = dynamic_cast < CVehicleSA* > ( next );
+        CVehicleSA * pNextVehicle = dynamic_cast < CVehicleSA* > ( pNext );
         if ( pNextVehicle )
         {
             MemPutFast < DWORD > ( (DWORD)this->GetInterface () + 1492, (DWORD)pNextVehicle->GetInterface() );
@@ -414,11 +414,11 @@ CVehicleSAInterface * CVehicleSA::GetPreviousCarriageInTrain ( void )
     return (CVehicleSAInterface *)*(DWORD *)((DWORD)this->GetInterface() + 1488);
 }
 
-void CVehicleSA::SetPreviousTrainCarriage ( CVehicle * previous )
+void CVehicleSA::SetPreviousTrainCarriage ( CVehicle* pPrevious )
 {
-    if ( previous )
+    if ( pPrevious )
     {
-        CVehicleSA * pPreviousVehicle = dynamic_cast < CVehicleSA* > ( previous );
+        CVehicleSA * pPreviousVehicle = dynamic_cast < CVehicleSA* > ( pPrevious );
         if ( pPreviousVehicle )
         {
             MemPutFast < DWORD > ( (DWORD)this->GetInterface () + 1488, (DWORD)pPreviousVehicle->GetInterface() );
@@ -433,13 +433,29 @@ void CVehicleSA::SetPreviousTrainCarriage ( CVehicle * previous )
 }
 
 
-CVehicle * CVehicleSA::GetPreviousTrainCarriage ( void )
+CVehicle* CVehicleSA::GetPreviousTrainCarriage ( void )
 {
     CVehicleSAInterface * pVehicle = GetPreviousCarriageInTrain();
     if ( pVehicle )
         return pGame->GetPools()->GetVehicle ( (DWORD *)pVehicle );
     else
         return NULL;
+}
+
+
+float CVehicleSA::GetDistanceToCarriage ( CVehicle* pCarriage )
+{
+    CVehicleSAInterface* pCarriageInterface = pCarriage->GetVehicleInterface ();
+    if ( pCarriageInterface->trainFlags.bDirection )
+    {
+        CBoundingBox* pBoundingBox = pGame->GetModelInfo ( pCarriage->GetModelIndex() )->GetBoundingBox ();
+        return -( pBoundingBox->vecBoundMax.fY - pBoundingBox->vecBoundMin.fY );
+    }
+    else
+    {
+        CBoundingBox* pBoundingBox = pGame->GetModelInfo ( this->GetModelIndex() )->GetBoundingBox ();
+        return pBoundingBox->vecBoundMax.fY - pBoundingBox->vecBoundMin.fY;
+    }
 }
 
 
@@ -480,7 +496,7 @@ void CVehicleSA::DetachTrainCarriage ( CVehicle* pCarriage )
     if ( pCarriage )
     {
         pCarriage->SetPreviousTrainCarriage ( NULL );
-        pCarriage->SetChainEngine ( true );
+        pCarriage->SetIsChainEngine ( true );
     }
 }
 
@@ -491,7 +507,7 @@ bool CVehicleSA::IsChainEngine ( void )
 }
 
 
-void CVehicleSA::SetChainEngine ( bool bChainEngine )
+void CVehicleSA::SetIsChainEngine ( bool bChainEngine )
 {
     GetVehicleInterface ()->trainFlags.bIsTheChainEngine = bChainEngine;
 }

@@ -298,7 +298,7 @@ public:
     void                        SetPreviousTrainCarriage( CClientVehicle* pPrevious );
     void                        SetNextTrainCarriage    ( CClientVehicle* pNext );
     inline bool                 IsChainEngine           ( void )                            { return m_bChainEngine; };
-    void                        SetIsChainEngine        ( bool bChainEngine = true );
+    void                        SetIsChainEngine        ( bool bChainEngine = true, bool bTemporary = false );
     CClientVehicle*             GetChainEngine          ( void );
 
     bool                        IsDerailed              ( void );

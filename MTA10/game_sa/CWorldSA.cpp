@@ -522,6 +522,20 @@ bool CWorldSA::GetOcclusionsEnabled ( void )
     return false;
 }
 
+void CWorldSA::FindWorldPositionForRailTrackPosition ( float fRailTrackPosition, int iTrackId, CVector* pOutVecPosition )
+{
+    DWORD dwFunc = FUNC_CWorld_FindPositionForTrackPosition; // __cdecl
+    
+    _asm
+    {
+        push pOutVecPosition
+        push iTrackId
+        push fRailTrackPosition
+        call dwFunc
+        add  esp, 3*4
+    }
+}
+
 void CWorldSA::RemoveBuilding ( unsigned short usModelToRemove, float fRange, float fX, float fY, float fZ, char cInterior )
 {    
     // New building Removal
