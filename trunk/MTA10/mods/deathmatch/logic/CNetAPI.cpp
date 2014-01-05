@@ -1475,14 +1475,19 @@ void CNetAPI::ReadVehiclePuresync ( CClientPlayer* pPlayer, CClientVehicle* pVeh
                         SRotationDegreesSync trailerRotation;
                         BitStream.Read ( &trailerRotation );
 
-                        if ( pTrailer->GetVehicleType () != CLIENTVEHICLE_TRAIN && !pTrailer->GetGameVehicle () )
+                        if ( pTrailer->GetVehicleType () != CLIENTVEHICLE_TRAIN && !pTrailer->IsStreamedIn () )
                         {
                             pTrailer->SetTargetPosition ( trailerPosition.data.vecPosition, TICK_RATE, true, velocity.data.vecVelocity.fZ );
                             pTrailer->SetTargetRotation ( trailerRotation.data.vecRotation, TICK_RATE );
                         }
                         else if ( pTrailer->GetVehicleType () == CLIENTVEHICLE_TRAIN )
                         {
-                            pTrailer->SetPosition ( trailerPosition.data.vecPosition ); // Set position to fix streaming (setting the position doesn't influence the real train position since CTrain::ProcessControl recalculates it)
+                            // Set streaming position to fix streaming
+                            pTrailer->UpdatePedPositions ( trailerPosition.data.vecPosition );
+
+                            // Use the synced train speed as long as the chain engine isn't streamed in
+                            if ( !pVehicle->IsStreamedIn () )
+                                pTrailer->SetTrainSpeed ( pVehicle->GetTrainSpeed () );
                         }
                     }
                 }

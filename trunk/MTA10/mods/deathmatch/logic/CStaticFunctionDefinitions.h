@@ -204,6 +204,7 @@ public:
     static bool                         IsTrainDerailable                   ( CClientVehicle& Vehicle, bool& bIsDerailable );
     static bool                         GetTrainDirection                   ( CClientVehicle& Vehicle, bool& bDirection );
     static bool                         GetTrainSpeed                       ( CClientVehicle& Vehicle, float& fSpeed );
+    static bool                         IsTrainChainEngine                  ( CClientVehicle& Vehicle, bool& bChainEngine );
     static bool                         IsVehicleBlown                      ( CClientVehicle& Vehicle, bool& bBlown );
     static bool                         GetVehicleHeadLightColor            ( CClientVehicle& Vehicle, SColor& outColor );
     static bool                         GetVehicleCurrentGear               ( CClientVehicle& Vehicle, unsigned short& currentGear );

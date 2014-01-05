@@ -1243,6 +1243,28 @@ int CLuaFunctionDefs::GetTrainSpeed ( lua_State* luaVM )
 }
 
 
+int CLuaFunctionDefs::IsTrainChainEngine ( lua_State* luaVM )
+{
+    CClientVehicle* pVehicle = NULL;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pVehicle );
+
+    if ( !argStream.HasErrors () )
+    {
+        bool bChainEngine;
+        if ( CStaticFunctionDefinitions::IsTrainChainEngine ( *pVehicle, bChainEngine ) )
+        {
+            lua_pushboolean ( luaVM, bChainEngine );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
 int CLuaFunctionDefs::GetVehicleEngineState ( lua_State* luaVM )
 {
     CClientVehicle* pVehicle = NULL;

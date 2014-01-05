@@ -542,16 +542,17 @@ public:
 
     bool                        AddProjectile                   ( eWeaponType eWeapon, CVector vecOrigin, float fForce, CVector * target, CEntity * targetEntity );
 
-    CVehicleSAInterface *       GetNextCarriageInTrain          ();
-    CVehicle *                  GetNextTrainCarriage            ();
-    void                        SetNextTrainCarriage            ( CVehicle * next );
-    CVehicleSAInterface *       GetPreviousCarriageInTrain      ();
-    CVehicle *                  GetPreviousTrainCarriage        ();
-    void                        SetPreviousTrainCarriage        ( CVehicle * pPrevious );
+    CVehicleSAInterface*        GetNextCarriageInTrain          ();
+    CVehicle*                   GetNextTrainCarriage            ();
+    void                        SetNextTrainCarriage            ( CVehicle* pNext );
+    CVehicleSAInterface*        GetPreviousCarriageInTrain      ();
+    CVehicle*                   GetPreviousTrainCarriage        ();
+    void                        SetPreviousTrainCarriage        ( CVehicle* pPrevious );
+    float                       GetDistanceToCarriage           ( CVehicle* pCarriage );
     void                        AttachTrainCarriage             ( CVehicle* pCarriage );
     void                        DetachTrainCarriage             ( CVehicle* pCarriage );
     bool                        IsChainEngine                   ( void );
-    void                        SetChainEngine                  ( bool bChainEngine = true );
+    void                        SetIsChainEngine                ( bool bChainEngine = true );
 
     bool                        IsDerailed                      ();
     void                        SetDerailed                     ( bool bDerailed );
