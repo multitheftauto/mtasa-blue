@@ -926,7 +926,6 @@ void CClientVehicle::SetColor ( const CVehicleColor& color )
     {
         m_pVehicle->SetColor ( m_Color.GetRGBColor ( 0 ), m_Color.GetRGBColor ( 1 ), m_Color.GetRGBColor ( 2 ), m_Color.GetRGBColor ( 3 ), 0 );
     }
-    m_bColorSaved = true;
 }
 
 
@@ -2610,11 +2609,15 @@ void CClientVehicle::Create ( void )
 
         CalcAndUpdateCanBeDamagedFlag ();
 
-        // Restore the color
-        if ( m_bColorSaved )
+        if ( IsLocalEntity() && !m_bColorSaved )
         {
-            m_pVehicle->SetColor ( m_Color.GetRGBColor ( 0 ), m_Color.GetRGBColor ( 1 ), m_Color.GetRGBColor ( 2 ), m_Color.GetRGBColor ( 3 ), 0 );
+            // On first create of local vehicle, save color chosen by GTA
+            GetColor();
+            m_bColorSaved = true;
         }
+
+        // Restore the color
+        m_pVehicle->SetColor ( m_Color.GetRGBColor ( 0 ), m_Color.GetRGBColor ( 1 ), m_Color.GetRGBColor ( 2 ), m_Color.GetRGBColor ( 3 ), 0 );
 
         // Restore turret rotation
         if ( m_eVehicleType == CLIENTVEHICLE_CAR ||
@@ -3295,7 +3298,6 @@ void CClientVehicle::SetPaintjob ( unsigned char ucPaintjob )
             m_pVehicle->SetRemap ( static_cast < unsigned int > ( ucPaintjob ) );
         }
         m_ucPaintjob = ucPaintjob;
-        m_bColorSaved = false;
     }
 }
 

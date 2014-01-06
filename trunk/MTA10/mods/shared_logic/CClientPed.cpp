@@ -4913,14 +4913,10 @@ void CClientPed::Respawn ( CVector * pvecPosition, bool bRestoreState, bool bCam
         if ( m_pPlayerPed )
         {
             // Detach our attached entities
-            if ( !m_AttachedEntities.empty () )
+            for ( uint i = 0 ; i < m_AttachedEntities.size () ; i++ )
             {
-                list < CClientEntity* > ::iterator iter = m_AttachedEntities.begin ();
-                for ( ; iter != m_AttachedEntities.end () ; iter++ )
-                {
-                    CClientEntity* pEntity = *iter;
-                    pEntity->InternalAttachTo ( NULL );
-                }
+                CClientEntity* pEntity = m_AttachedEntities[i];
+                pEntity->InternalAttachTo ( NULL );
             }
             CVector vecPosition;
             if ( !pvecPosition )
@@ -4962,14 +4958,10 @@ void CClientPed::Respawn ( CVector * pvecPosition, bool bRestoreState, bool bCam
             g_pGame->GetWorld ()->SetCurrentArea ( ucCameraInterior );
 
             // Reattach our attached entities
-            if ( !m_AttachedEntities.empty () )
+            for ( uint i = 0 ; i < m_AttachedEntities.size () ; i++ )
             {
-                list < CClientEntity* > ::iterator iter = m_AttachedEntities.begin ();
-                for ( ; iter != m_AttachedEntities.end () ; iter++ )
-                {
-                    CClientEntity* pEntity = *iter;
-                    pEntity->InternalAttachTo ( this );
-                }
+                CClientEntity* pEntity = m_AttachedEntities[i];
+                pEntity->InternalAttachTo ( this );
             }
         }
     }
