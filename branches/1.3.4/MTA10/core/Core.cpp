@@ -17,9 +17,11 @@
 
 CCore* g_pCore = NULL;
 CGraphics* g_pGraphics = NULL;
+HINSTANCE g_hInstance = NULL;
 
 int WINAPI DllMain(HINSTANCE hModule, DWORD dwReason, PVOID pvNothing)
 {
+    g_hInstance = hModule;
     CFilePathTranslator     FileTranslator;
     std::string             WorkingDirectory;
 

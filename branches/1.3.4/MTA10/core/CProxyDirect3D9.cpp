@@ -233,8 +233,6 @@ SString GUIDToString ( const GUID& g );
 #define CREATE_DEVICE_RETRY_SUCCESS 2
 #define CREATE_DEVICE_SUCCESS       3
 
-namespace
-{
     // Debugging helpers
     SString ToString( UINT Adapter, D3DDEVTYPE DeviceType, HWND hFocusWindow, DWORD BehaviorFlags, const D3DPRESENT_PARAMETERS& pp )
     {
@@ -298,6 +296,8 @@ namespace
                     );
     }
 
+namespace
+{
     //
     // Hacky log interception
     //
