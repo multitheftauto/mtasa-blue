@@ -98,19 +98,15 @@ CClientEntity::~CClientEntity ( void )
         delete m_pCustomData;
     }
 
-    if ( m_pAttachedToEntity )
+    // Detach from everything
+    AttachTo( NULL );
+    while( m_AttachedEntities.size() )
     {
-        m_pAttachedToEntity->RemoveAttachedEntity ( this );
+        CClientEntity* pAttachedEntity = m_AttachedEntities.back();
+        pAttachedEntity->AttachTo( NULL );
     }
-
-    for ( list < CClientEntity* >::iterator iter = m_AttachedEntities.begin () ; iter != m_AttachedEntities.end () ; ++iter )
-    {
-        CClientEntity* pAttachedEntity = *iter;
-        if ( pAttachedEntity )
-        {
-            pAttachedEntity->m_pAttachedToEntity = NULL;
-        }
-    }
+    m_bDisallowAttaching = true;
+    assert( !m_pAttachedToEntity && m_AttachedEntities.empty() );
 
     RemoveAllCollisions ( true );
 
@@ -656,13 +652,35 @@ bool CClientEntity::IsOutOfBounds ( void )
 
 void CClientEntity::AttachTo ( CClientEntity* pEntity )
 {
+    // Handle attach attempt during entity destructor
+    if ( pEntity )
+    {
+        if ( m_bDisallowAttaching )
+        {
+            assert( !m_pAttachedToEntity && m_AttachedEntities.empty() );
+            return;
+        }
+
+        if ( pEntity->m_bDisallowAttaching )
+        {
+            assert( !pEntity->m_pAttachedToEntity && pEntity->m_AttachedEntities.empty() );
+            return;
+        }
+    }
+
     if ( m_pAttachedToEntity )
-        m_pAttachedToEntity->RemoveAttachedEntity ( this );
+    {
+        assert( ListContains( m_pAttachedToEntity->m_AttachedEntities, this ) );
+        ListRemove( m_pAttachedToEntity->m_AttachedEntities, this );
+    }    
 
     m_pAttachedToEntity = pEntity;
 
     if ( m_pAttachedToEntity )
-        m_pAttachedToEntity->AddAttachedEntity ( this );
+    {
+        assert( !ListContains( m_pAttachedToEntity->m_AttachedEntities, this ) );
+        m_pAttachedToEntity->m_AttachedEntities.push_back( this );
+    }
 
     InternalAttachTo ( pEntity );
 }
@@ -1115,7 +1133,7 @@ void CClientEntity::RemoveAllCollisions ( bool bNotify )
 
 bool CClientEntity::IsEntityAttached ( CClientEntity* pEntity )
 {
-    list < CClientEntity* > ::iterator iter = m_AttachedEntities.begin ();
+    std::vector < CClientEntity* > ::iterator iter = m_AttachedEntities.begin ();
     for ( ; iter != m_AttachedEntities.end (); iter++ )
     {
         if ( *iter == pEntity )
@@ -1136,10 +1154,9 @@ void CClientEntity::ReattachEntities ( void )
     }
 
     // Reattach any entities attached to us
-    list < CClientEntity* > ::iterator iter = m_AttachedEntities.begin ();
-    for ( ; iter != m_AttachedEntities.end (); iter++ )
+    for ( uint i = 0 ; i < m_AttachedEntities.size () ; ++i )
     {
-        (*iter)->InternalAttachTo ( this );
+        m_AttachedEntities[i]->InternalAttachTo ( this );
     }  
 }
 

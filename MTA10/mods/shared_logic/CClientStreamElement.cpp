@@ -46,10 +46,9 @@ void CClientStreamElement::UpdateStreamPosition ( const CVector & vecPosition )
     m_pManager->OnUpdateStreamPosition ( this );
 
     // Update attached elements stream position
-    list < CClientEntity* >::iterator i = m_AttachedEntities.begin();
-    for (; i != m_AttachedEntities.end(); i++)
+    for ( uint i = 0 ; i < m_AttachedEntities.size () ; i++ )
     {
-        CClientStreamElement* attachedElement = dynamic_cast< CClientStreamElement* > (*i);
+        CClientStreamElement* attachedElement = dynamic_cast< CClientStreamElement* > ( m_AttachedEntities[i] );
         if ( attachedElement )
         {
             attachedElement->UpdateStreamPosition( vecPosition + attachedElement->m_vecAttachedPosition );
@@ -77,14 +76,13 @@ void CClientStreamElement::InternalStreamOut ( void )
 
         // Stream out attached elements
         CClientObject* thisObject = DynamicCast < CClientObject > ( this );
-        list < CClientEntity* >::iterator i = m_AttachedEntities.begin();
-        for (; i != m_AttachedEntities.end(); i++)
+        for ( uint i = 0 ; i < m_AttachedEntities.size () ; i++ )
         {
-            CClientStreamElement* attachedElement = dynamic_cast< CClientStreamElement* > (*i);
+            CClientStreamElement* attachedElement = dynamic_cast< CClientStreamElement* > ( m_AttachedEntities[i] );
             if ( attachedElement )
             {
                 // Don't stream out low LOD version
-                CClientObject* attachedObject = DynamicCast < CClientObject > (*i);
+                CClientObject* attachedObject = DynamicCast < CClientObject > ( attachedElement );
                 if ( attachedObject && thisObject && attachedObject->IsLowLod () != thisObject->IsLowLod () )
                     continue;
                 attachedElement->InternalStreamOut();

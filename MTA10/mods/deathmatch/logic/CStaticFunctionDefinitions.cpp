@@ -587,10 +587,8 @@ CClientEntity* CStaticFunctionDefinitions::GetElementAttachedTo ( CClientEntity&
     CClientEntity* pEntityAttachedTo = Entity.GetAttachedTo();
     if ( pEntityAttachedTo )
     {        
-        if ( pEntityAttachedTo->IsEntityAttached ( &Entity ) )
-        {
-            return pEntityAttachedTo;
-        }
+        assert( pEntityAttachedTo->IsEntityAttached ( &Entity ) );
+        return pEntityAttachedTo;
     }
 
     return NULL;
