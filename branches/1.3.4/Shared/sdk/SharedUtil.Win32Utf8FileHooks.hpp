@@ -212,18 +212,46 @@ namespace SharedUtil
 
 
 #ifdef MTA_CLIENT
+    void LogPath( const SString& strText )
+    {
+        if ( !IsGTAProcess() )
+            return;
+
+        static int iRecurse = 0;
+
+        if ( iRecurse == 0 )
+        {
+            static uint uiMaxLineCount = 0;
+            if ( uiMaxLineCount++ > 200 )
+                return;
+
+            iRecurse++;
+            SString strFilename = CalcMTASAPath( "mta\\loading.log" );
+            if ( FileSize( strFilename ) > 200000 )
+            {
+                SString strContent;
+                FileLoad( strFilename, strContent );
+                FileSave( strFilename, strContent.Right( 100000 ) );
+            }
+            SString strMessage( "%s - %d - %s\n", *GetLocalTimeString(), GetCurrentProcessId(), *strText );
+            FileAppend( CalcMTASAPath( "mta\\loading.log" ), strMessage );
+            iRecurse--;
+        }
+    }
+
     /////////////////////////////////////////////////////////////
     //
     // Ensure codepage type characters have been utf8ified
     //
     /////////////////////////////////////////////////////////////
-    SString MakeSurePathIsUTF8( const SString& strOriginal )
+    SString MakeSurePathIsUTF8( const SString& strOriginal, const SString& strFunction )
     {
         if ( strOriginal.Contains( "GTA San Andreas User Files" ) )
         {
             // Fix gta save path
             SString strPathTail = strOriginal.SplitRight( "GTA San Andreas User Files" );
             SString strNewPathName = PathJoin( GetSystemPersonalPath(), "GTA San Andreas User Files", strPathTail );
+            LogPath( SString( "A %s [Orig:[%s] Tail:[%s] New:[%s]", *strFunction, *strOriginal, *strPathTail, *strNewPathName ) );
             return strNewPathName;
         }
         else
@@ -236,8 +264,10 @@ namespace SharedUtil
                 // Fix gta install path
                 SString strPathTail = strOriginal.SubStr( LaunchPathA.length() );
                 SString strNewPathName = PathJoin( GetLaunchPath(), strPathTail );
+                LogPath( SString( "B %s Orig:[%s] PathA:[%s] Tail:[%s] New:[%s]", *strFunction, *strOriginal, *LaunchPathA, *strPathTail, *strNewPathName ) );
                 return strNewPathName;
             }
+            LogPath( SString( "C %s [Orig:[%s] PathA:[%s]", *strFunction, *strOriginal, *LaunchPathA ) );
         }
         return strOriginal;
     }
@@ -263,9 +293,14 @@ namespace SharedUtil
         SString strFileName = lpFileName;
 #ifdef MTA_CLIENT
         if ( IsGTAProcess() )
-            strFileName = MakeSurePathIsUTF8( strFileName );
+            strFileName = MakeSurePathIsUTF8( strFileName, "MyCreateFileA" );
 #endif
-        return CreateFileW( FromUTF8( strFileName ), dwDesiredAccess, dwShareMode, lpSecurityAttributes, dwCreationDisposition, dwFlagsAndAttributes, hTemplateFile );
+        HANDLE hResult = CreateFileW( FromUTF8( strFileName ), dwDesiredAccess, dwShareMode, lpSecurityAttributes, dwCreationDisposition, dwFlagsAndAttributes, hTemplateFile );
+#ifdef MTA_CLIENT
+        if ( hResult == INVALID_HANDLE_VALUE )
+            LogPath( SString( "ERR MyCreateFileA result:%08x with '%s' (Dir:%s)", hResult, *strFileName, *GetSystemCurrentDirectory() ) );
+#endif
+        return hResult;
     }
 
     HMODULE
@@ -306,9 +341,14 @@ namespace SharedUtil
         SString strPathName = lpPathName;
 #ifdef MTA_CLIENT
         if ( IsGTAProcess() )
-            strPathName = MakeSurePathIsUTF8( strPathName );
+            strPathName = MakeSurePathIsUTF8( strPathName, "MySetCurrentDirectoryA" );
 #endif
-        return SetCurrentDirectoryW( FromUTF8( strPathName ) );
+        bool bResult = SetCurrentDirectoryW( FromUTF8( strPathName ) );
+#ifdef MTA_CLIENT
+        if ( !bResult )
+            LogPath( SString( "ERR MySetCurrentDirectoryA result:%d with '%s'", bResult, *strPathName ) );
+#endif
+        return bResult;
     }
 
     int  WINAPI MyAddFontResourceExA( __in LPCSTR name, __in DWORD fl, __reserved PVOID res        )
@@ -377,9 +417,14 @@ namespace SharedUtil
         SString strPathName = lpPathName;
 #ifdef MTA_CLIENT
         if ( IsGTAProcess() )
-            strPathName = MakeSurePathIsUTF8( strPathName );
+            strPathName = MakeSurePathIsUTF8( strPathName, "MyCreateDirectoryA" );
 #endif
-        return CreateDirectoryW( FromUTF8( strPathName ), lpSecurityAttributes );
+        bool bResult = CreateDirectoryW( FromUTF8( strPathName ), lpSecurityAttributes );
+#ifdef MTA_CLIENT
+        if ( !bResult )
+            LogPath( SString( "ERR MyCreateDirectoryA result:%d with '%s'", bResult, *strPathName ) );
+#endif
+        return bResult;
     }
 
     BOOL
