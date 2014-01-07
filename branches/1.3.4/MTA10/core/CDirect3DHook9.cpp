@@ -65,14 +65,19 @@ bool CDirect3DHook9::RemoveHook ( )
 extern HINSTANCE g_hInstance;
 SString ToString( const D3DADAPTER_IDENTIFIER9& a );
 SString ToString( const D3DCAPS9& a );
+HRESULT DoCreateDevice( IDirect3D9* pDirect3D, UINT Adapter, D3DDEVTYPE DeviceType, HWND hFocusWindow, DWORD BehaviorFlags, D3DPRESENT_PARAMETERS* pPresentationParameters, IDirect3DDevice9** ppReturnedDeviceInterface );
+SString GetByteDiffDesc( const void* pData1, const void* pData2, uint uiSize );
 
 namespace
 {
+    SString ms_strLogPrepend;
+
     //
     // Hacky log interception
     //
-    void WriteDebugEventTest( const SString& strText )
+    void WriteDebugEventTest( const SString& strInText )
     {
+        SString strText = ms_strLogPrepend + strInText;
         WriteDebugEvent ( strText );
         AddReportLog( 8762, strText.Replace( "\n", " " ) + "\n" );
     }
@@ -134,6 +139,7 @@ HWND CreateWindowForD3D( void )
 //
 IDirect3D9* GetAnotherThing( IDirect3D9* pInitialDirect3D9 )
 {
+    ms_strLogPrepend = "GetAnotherThing ";
     HWND hWnd = CreateWindowForD3D();
     uint Adapter = 0;
     HRESULT hr;
@@ -160,50 +166,92 @@ IDirect3D9* GetAnotherThing( IDirect3D9* pInitialDirect3D9 )
     do
     {
         hr = pInitialDirect3D9->CreateDevice( Adapter, D3DDEVTYPE_HAL, hWnd, BehaviorFlags, &pp, &pD3DDevice9 );
-        if ( FAILED( hr ) )
+        if ( hr != D3D_OK )
         {
-            WriteDebugEvent ( SString( "GetAnotherThing CreateDevice failed %08x", hr ) );
-            break;
+            // Handle failure of initial create device call
+            WriteDebugEvent ( SString( "CreateDevice failed #0: %08x", hr ) );
+
+            // Try create device again
+            hr = DoCreateDevice ( pInitialDirect3D9, Adapter, D3DDEVTYPE_HAL, hWnd, BehaviorFlags, &pp, &pD3DDevice9 );
+
+            // Handle retry result
+            if ( hr != D3D_OK )
+            {
+                WriteDebugEvent ( "--CreateDevice failed after retry" );
+                break;
+            }
+            else
+            {
+                WriteDebugEvent ( "++CreateDevice succeeded after retry" );
+            }
         }
 
         hr = pD3DDevice9->GetDirect3D( &pAnotherDirect3D9 );
         if ( FAILED( hr ) )
         {
-            WriteDebugEvent ( SString( "GetAnotherThing GetDirect3D failed %08x", hr ) );
+            WriteDebugEvent ( SString( "GetDirect3D failed %08x", hr ) );
             break;
         }
 
-        {
-            // Log graphic card name
-            D3DADAPTER_IDENTIFIER9 AdapterIdent1;
-            pInitialDirect3D9->GetAdapterIdentifier ( Adapter, 0, &AdapterIdent1 );
-            WriteDebugEvent ( "pInitialDirect3D9:" );
-            WriteDebugEvent ( ToString( AdapterIdent1 ) );
+        // Log graphic card name
+        D3DADAPTER_IDENTIFIER9 InitialAdapterIdent;
+        pInitialDirect3D9->GetAdapterIdentifier ( Adapter, 0, &InitialAdapterIdent );
+        WriteDebugEvent ( "pInitialDirect3D9:" );
+        WriteDebugEvent ( ToString( InitialAdapterIdent ) );
 
-            // Get caps from pInitialDirect3D9
-            D3DCAPS9 D3DCaps91;
-            hr = pInitialDirect3D9->GetDeviceCaps( Adapter, D3DDEVTYPE_HAL, &D3DCaps91 );
-            WriteDebugEvent( SString( "pInitialDirect3D9 CapsReport Caps9 - %s ", *ToString( D3DCaps91 ) ) );
-        }
+        // Get caps from pInitialDirect3D9
+        D3DCAPS9 InitialD3DCaps9;
+        hr = pInitialDirect3D9->GetDeviceCaps( Adapter, D3DDEVTYPE_HAL, &InitialD3DCaps9 );
+        WriteDebugEvent( SString( "pInitialDirect3D9 CapsReport Caps9 - %s ", *ToString( InitialD3DCaps9 ) ) );
 
         if ( pInitialDirect3D9 == pAnotherDirect3D9 )
         {
-            WriteDebugEvent( SString( "GetAnotherThing pAnotherDirect3D9 same: %x %x", pInitialDirect3D9, pAnotherDirect3D9 ) );
+            WriteDebugEvent( SString( "pAnotherDirect3D9 same: %x %x", pInitialDirect3D9, pAnotherDirect3D9 ) );
         }
         else
         {
-            WriteDebugEvent( SString( "GetAnotherThing pAnotherDirect3D9 differs: %x %x", pInitialDirect3D9, pAnotherDirect3D9 ) );
+            WriteDebugEvent( SString( "AnotherDirect3D9 differs: %x %x", pInitialDirect3D9, pAnotherDirect3D9 ) );
 
             // Log graphic card name
-            D3DADAPTER_IDENTIFIER9 AdapterIdent2;
-            pAnotherDirect3D9->GetAdapterIdentifier ( Adapter, 0, &AdapterIdent2 );
+            D3DADAPTER_IDENTIFIER9 AnotherAdapterIdent;
+            pAnotherDirect3D9->GetAdapterIdentifier ( Adapter, 0, &AnotherAdapterIdent );
             WriteDebugEvent ( "pAnotherDirect3D9:" );
-            WriteDebugEvent ( ToString( AdapterIdent2 ) );
+            WriteDebugEvent ( ToString( AnotherAdapterIdent ) );
 
             // Get caps from pAnotherDirect3D9
-            D3DCAPS9 D3DCaps92;
-            hr = pAnotherDirect3D9->GetDeviceCaps( Adapter, D3DDEVTYPE_HAL, &D3DCaps92 );
-            WriteDebugEvent( SString( "pAnotherDirect3D9 CapsReport Caps9 - %s ", *ToString( D3DCaps92 ) ) );
+            D3DCAPS9 AnotherD3DCaps9;
+            hr = pAnotherDirect3D9->GetDeviceCaps( Adapter, D3DDEVTYPE_HAL, &AnotherD3DCaps9 );
+            WriteDebugEvent( SString( "pAnotherDirect3D9 CapsReport Caps9 - %s ", *ToString( AnotherD3DCaps9 ) ) );
+
+            // Choose which device to use
+            // Use better caps
+            // Use NVidia over Intel
+
+            bool InitialCapsSameAsAnotherCaps = memcmp( &InitialD3DCaps9, &AnotherD3DCaps9, sizeof( D3DCAPS9 ) ) == 0;
+
+            WriteDebugEvent( SString( "InitialCaps==AnotherCaps:%d", InitialCapsSameAsAnotherCaps ) );
+
+            SString strDiffDesc = GetByteDiffDesc( &InitialD3DCaps9, &AnotherD3DCaps9, sizeof( D3DCAPS9 ) );
+            if ( !strDiffDesc.empty() )
+                WriteDebugEvent( SString( "InitialCaps==AnotherD3DCaps9 diff:%s", *strDiffDesc.Left( 500 ) ) );
+
+            if ( AnotherD3DCaps9.DeclTypes < InitialD3DCaps9.DeclTypes )
+            {
+                WriteDebugEvent( "Don't use pAnotherDirect3D9 as pInitialDirect3D9 Caps is better" );
+                SAFE_RELEASE( pAnotherDirect3D9 );
+            }
+            else
+            if ( ToString( InitialAdapterIdent ).ContainsI( "NVidia" ) )
+            {
+                WriteDebugEvent( "Don't use pAnotherDirect3D9 as pInitialDirect3D9 is NVidia" );
+                SAFE_RELEASE( pAnotherDirect3D9 );
+            }
+            else
+            if ( !ToString( AnotherAdapterIdent ).ContainsI( "NVidia" ) )
+            {
+                WriteDebugEvent( "Don't use pAnotherDirect3D9 as not NVidia" );
+                SAFE_RELEASE( pAnotherDirect3D9 );
+            }
         }
     }
     while( false );
@@ -211,6 +259,7 @@ IDirect3D9* GetAnotherThing( IDirect3D9* pInitialDirect3D9 )
     SAFE_RELEASE( pD3DDevice9 );
     DestroyWindow( hWnd );
 
+    ms_strLogPrepend = "";
     if ( pAnotherDirect3D9 )
         return pAnotherDirect3D9;
     return pInitialDirect3D9;
