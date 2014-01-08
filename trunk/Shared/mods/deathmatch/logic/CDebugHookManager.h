@@ -8,6 +8,11 @@
 *
 *****************************************************************************/
 
+#ifdef MTA_CLIENT
+    #define CElement CClientEntity
+    #define CPlayer CClientPlayer
+#endif
+
 struct SDebugHookCallInfo
 {
     CLuaFunctionRef functionRef;
