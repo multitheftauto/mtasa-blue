@@ -1201,6 +1201,23 @@ bool SharedUtil::IsValidVersionString ( const SString& strVersion )
     return true;
 }
 
+// Return build number as a 5 character sortable string
+SString SharedUtil::ExtractVersionStringBuildNumber( const SString& strVersion )
+{
+    return strVersion.SubStr( 8, 5 );
+}
+
+
+// Replace major/minor/type to match current configuration
+SString SharedUtil::ConformVersionStringToBaseVersion( const SString& strVersion, const SString& strBaseVersion )
+{
+    SString strResult = strVersion;
+    strResult[0] = strBaseVersion[0];  // Major
+    strResult[2] = strBaseVersion[2];  // Minor
+    strResult[6] = strBaseVersion[6];  // Type
+    return strResult;
+}
+
 
 //
 // Try to make a path relative to the 'resources/' directory

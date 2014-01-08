@@ -111,7 +111,7 @@ public:
     inline void                                 SetMTAVersion               ( unsigned short usMTAVersion )         { m_usMTAVersion = usMTAVersion; };
     inline unsigned short                       GetBitStreamVersion         ( void )                                { return m_usBitStreamVersion; };
     inline void                                 SetBitStreamVersion         ( unsigned short usBitStreamVersion )   { m_usBitStreamVersion = usBitStreamVersion; };
-    void                                        SetPlayerVersion            ( const SString& strPlayerVersion )     { m_strPlayerVersion = strPlayerVersion; };
+    void                                        SetPlayerVersion            ( const SString& strPlayerVersion );
     const SString&                              GetPlayerVersion            ( void )                                { return m_strPlayerVersion; };
 
     inline bool                                 IsMuted                     ( void )                                { return m_bIsMuted; };

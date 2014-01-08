@@ -1143,6 +1143,13 @@ float CPlayer::GetWeaponRangeFromSlot( uint uiSlot )
     return m_fWeaponRangeLast;
 }
 
+void CPlayer::SetPlayerVersion ( const SString& strPlayerVersion )
+{
+    m_strPlayerVersion = strPlayerVersion;
+    m_pPlayerManager->OnPlayerSetVersion( this );
+}
+
+
 /////////////////////////////////////////////////////////////////
 // For NearList/FarList hash maps
 CPlayer* GetEmptyMapKey ( CPlayer** )
@@ -1166,3 +1173,4 @@ CPlayerBitStream::CPlayerBitStream( CPlayer* pPlayer )
 {
     pBitStream = g_pNetServer->AllocateNetServerBitStream ( pPlayer->GetBitStreamVersion() );
 }
+

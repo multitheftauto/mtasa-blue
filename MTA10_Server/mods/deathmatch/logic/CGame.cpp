@@ -36,6 +36,7 @@
 #define VEH_EXTRAPOLATION_MIN_CLIENT_VERSION    "1.3.0-9.04460"
 #define ALT_PULSE_ORDER_MIN_CLIENT_VERSION      "1.3.1-9.04913"
 #define HIT_ANIM_CLIENT_VERSION                 "1.3.2"
+#define SNIPER_BULLET_SYNC_MIN_CLIENT_VERSION   "1.3.4-9.06040"
 
 CGame* g_pGame = NULL;
 
@@ -4015,7 +4016,7 @@ void CGame::SendSyncSettings ( CPlayer* pPlayer )
 
     if ( IsBulletSyncActive () )
     {
-        // List of weapons to enable bullet sync for. (Sniper rifle doesn't work and minigun causes too many packets)
+        // List of weapons to enable bullet sync for. (Minigun causes too many packets)
         eWeaponType weaponList[] = {    WEAPONTYPE_PISTOL,
                                         WEAPONTYPE_PISTOL_SILENCED,
                                         WEAPONTYPE_DESERT_EAGLE,
@@ -4031,6 +4032,10 @@ void CGame::SendSyncSettings ( CPlayer* pPlayer )
 
         for ( uint i = 0 ; i < NUMELMS( weaponList ) ; i++ )
             MapInsert ( weaponTypesUsingBulletSync, weaponList[i] );
+
+        // Add sniper if all clients can handle it
+        if ( ExtractVersionStringBuildNumber( m_pPlayerManager->GetLowestConnectedPlayerVersion() ) >= ExtractVersionStringBuildNumber( SNIPER_BULLET_SYNC_MIN_CLIENT_VERSION ) )
+            MapInsert ( weaponTypesUsingBulletSync, WEAPONTYPE_SNIPERRIFLE );
     }
 
     short sVehExtrapolateBaseMs = 5;
@@ -4082,6 +4087,7 @@ bool CGame::IsBelowRecommendedClient ( const SString& strVersion )
 //////////////////////////////////////////////////////////////////
 SString CGame::CalculateMinClientRequirement ( void )
 {
+    // Calc effective min client version
     SString strMinClientRequirementFromConfig = m_pMainConfig->GetMinClientVersion ();
     SString strMinClientRequirementFromResources = m_pResourceManager->GetMinClientRequirement ();
 
@@ -4114,6 +4120,7 @@ SString CGame::CalculateMinClientRequirement ( void )
             strNewMin = HIT_ANIM_CLIENT_VERSION;
     }
 
+    // Log effective min client version
     if ( strNewMin != m_strPrevMinClientConnectRequirement )
     {
         m_strPrevMinClientConnectRequirement = strNewMin;
@@ -4123,7 +4130,15 @@ SString CGame::CalculateMinClientRequirement ( void )
             CLogger::LogPrintf ( "Server minclientversion is now cleared\n" );
     }
 
-    // Do kick check as well
+    // Handle settings that change depending on the lowest connected player version
+    if ( m_strPrevLowestConnectedPlayerVersion != m_pPlayerManager->GetLowestConnectedPlayerVersion() )
+    {
+        m_strPrevLowestConnectedPlayerVersion = m_pPlayerManager->GetLowestConnectedPlayerVersion();
+        if ( IsBulletSyncActive () )
+            SendSyncSettings();   
+    }
+
+    // Do version based kick check as well
     {
         SString strKickMin;
 
