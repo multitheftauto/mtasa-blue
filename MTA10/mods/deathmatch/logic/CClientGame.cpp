@@ -162,6 +162,8 @@ CClientGame::CClientGame ( bool bLocalPlay )
     m_pRootEntity = new CClientDummy ( NULL, INVALID_ELEMENT_ID, "root" );
     m_pRootEntity->MakeSystemEntity ();
 
+    m_pDebugHookManager = new CDebugHookManager ();
+
     // Movings objects manager
     m_pMovingObjectsManager = new CMovingObjectsManager ();
 
@@ -468,6 +470,7 @@ CClientGame::~CClientGame ( void )
     SAFE_DELETE( m_pBigPacketTransferBox );
 
     SAFE_DELETE( m_pLocalServer );
+    SAFE_DELETE( m_pDebugHookManager );
 
     // Packet handler
     SAFE_DELETE( m_pPacketHandler );

@@ -1123,6 +1123,8 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getPerformanceStats", CLuaFunctionDefs::GetPerformanceStats );
     CLuaCFunctions::AddFunction ( "setDevelopmentMode", CLuaFunctionDefs::SetDevelopmentMode );
     CLuaCFunctions::AddFunction ( "getDevelopmentMode", CLuaFunctionDefs::GetDevelopmentMode );
+    CLuaCFunctions::AddFunction ( "addDebugHook", CLuaFunctionDefs::AddDebugHook );
+    CLuaCFunctions::AddFunction ( "removeDebugHook", CLuaFunctionDefs::RemoveDebugHook );
 
     // Version functions
     CLuaCFunctions::AddFunction ( "getVersion", CLuaFunctionDefs::GetVersion );

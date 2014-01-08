@@ -769,6 +769,8 @@ bool CClientEntity::AddEvent ( CLuaMain* pLuaMain, const char* szName, const CLu
 
 bool CClientEntity::CallEvent ( const char* szName, const CLuaArguments& Arguments, bool bCallOnChildren )
 {
+    g_pClientGame->GetDebugHookManager()->OnPreEvent( szName, Arguments, this, NULL );
+
     TIMEUS startTime = GetTimeUs ();
 
     CEvents* pEvents = g_pClientGame->GetEvents();
@@ -794,6 +796,8 @@ bool CClientEntity::CallEvent ( const char* szName, const CLuaArguments& Argumen
         if ( deltaTimeUs > 10000 )
             TIMING_DETAIL( SString ( "Event: %s [%d ms]", szName, deltaTimeUs / 1000 ) );
     }
+
+    g_pClientGame->GetDebugHookManager()->OnPostEvent( szName, Arguments, this, NULL );
 
     // Return whether it got cancelled or not
     return ( !pEvents->WasEventCancelled () );

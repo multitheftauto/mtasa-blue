@@ -26,6 +26,7 @@ public:
     ~CLuaFunctionRef ( void );
     CLuaFunctionRef& operator=( const CLuaFunctionRef& other );
     int ToInt ( void ) const;
+    lua_State* GetLuaVM ( void ) const;
     bool operator==( const CLuaFunctionRef& other ) const;
     bool operator!=( const CLuaFunctionRef& other ) const;
     static void RemoveLuaFunctionRefsForVM      ( lua_State *luaVM );

@@ -60,6 +60,7 @@
 #define MIN_PUSH_ANTISPAM_RATE 1500
 class CGameEntityXRefManager;
 class CClientModelCacheManager;
+class CDebugHookManager;
 
 struct SVehExtrapolateSettings
 {
@@ -286,6 +287,7 @@ public:
     inline CLatentTransferManager*      GetLatentTransferManager        ( void )        { return m_pLatentTransferManager; }
     inline CGameEntityXRefManager*      GetGameEntityXRefManager        ( void )        { return m_pGameEntityXRefManager; }
     inline CClientModelCacheManager*    GetModelCacheManager            ( void )        { return m_pModelCacheManager; }
+    inline CDebugHookManager*           GetDebugHookManager             ( void )        { return m_pDebugHookManager; }
 
     inline CElementDeleter*             GetElementDeleter               ( void )        { return &m_ElementDeleter; }
     inline CObjectRespawner*            GetObjectRespawner              ( void )        { return &m_ObjectRespawner; }
@@ -618,6 +620,7 @@ private:
     CSingularFileDownloadManager*       m_pSingularFileDownloadManager;
     CGameEntityXRefManager*             m_pGameEntityXRefManager;
     CClientModelCacheManager*           m_pModelCacheManager;
+    CDebugHookManager*                  m_pDebugHookManager;
     CRemoteCalls*                       m_pRemoteCalls;
 
     // Revised facilities
