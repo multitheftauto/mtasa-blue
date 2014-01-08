@@ -12,6 +12,8 @@
 
 #include "StdInc.h"
 #include "detours/include/detours.h"
+extern bool g_bOverrideCaps;
+extern D3DCAPS9 g_D3DCaps;
 
 template<> CDirect3DHook9 * CSingleton< CDirect3DHook9 >::m_pSingleton = NULL;
 
@@ -252,6 +254,23 @@ IDirect3D9* GetAnotherThing( IDirect3D9* pInitialDirect3D9 )
                 WriteDebugEvent( "Don't use pAnotherDirect3D9 as not NVidia" );
                 SAFE_RELEASE( pAnotherDirect3D9 );
             }
+        }
+
+        // Get caps from pD3DDevice9
+        D3DCAPS9 DeviceCaps9;
+        hr = pD3DDevice9->GetDeviceCaps( &DeviceCaps9 );
+        WriteDebugEvent( SString( "pD3DDevice9 CapsReport Caps9 - %s ", *ToString( DeviceCaps9 ) ) );
+
+        SString strDiffDesc = GetByteDiffDesc( &InitialD3DCaps9, &DeviceCaps9, sizeof( D3DCAPS9 ) );
+        if ( !strDiffDesc.empty() )
+            WriteDebugEvent( SString( "InitialCaps==DeviceCaps9 diff:%s", *strDiffDesc.Left( 500 ) ) );
+
+        // If device caps better, use them
+        if ( DeviceCaps9.DeclTypes > InitialD3DCaps9.DeclTypes )
+        {
+            WriteDebugEvent( "Using DeviceCaps as better" );
+            g_bOverrideCaps = true;
+            g_D3DCaps = DeviceCaps9;
         }
     }
     while( false );
