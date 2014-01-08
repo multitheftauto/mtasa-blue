@@ -387,6 +387,7 @@ void CPerfStatServerInfoImpl::GetStats ( CPerfStatResult* pResult, const std::ma
         m_StatusList.push_back ( StringPair ( "Bytes/sec blocked",          CPerfStatManager::GetScaledByteString ( llIncomingBytesPSBlocked ) ) );
         m_StatusList.push_back ( StringPair ( "Packets/sec  blocked",       strIncomingPacketsPSBlocked ) );
         m_StatusList.push_back ( StringPair ( "Usage incl. blocked",        CPerfStatManager::GetScaledBitString ( llNetworkUsageBytesPSInclBlocked * 8LL ) + "/s" ) );
+        m_StatusList.push_back ( StringPair ( "Lowest connected player version",  g_pGame->GetPlayerManager()->GetLowestConnectedPlayerVersion() ) );
 
         m_OptionsList.push_back ( StringPair ( "Logic thread core #",       SString ( "%d", m_MainThreadCPUTimes.uiProcessorNumber ) ) );
         m_OptionsList.push_back ( StringPair ( "Sync thread core #",        SString ( "%d", g_SyncThreadCPUTimes.uiProcessorNumber ) ) );

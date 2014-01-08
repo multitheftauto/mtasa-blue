@@ -578,6 +578,7 @@ private:
 
     SString                     m_strPrevMinClientKickRequirement;
     SString                     m_strPrevMinClientConnectRequirement;
+    SString                     m_strPrevLowestConnectedPlayerVersion;
 };
 
 #endif
