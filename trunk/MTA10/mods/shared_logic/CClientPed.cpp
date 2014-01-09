@@ -2772,6 +2772,27 @@ void CClientPed::StreamedInPulse ( bool bDoStandardPulses )
                     }
                 }
             }
+
+            // If crouching and aiming, don't allow uncrouch button if just pressed left/right
+            pTask = m_pTaskManager->GetTaskSecondary ( TASK_SECONDARY_ATTACK );
+            if ( pTask && pTask->GetTaskType () == TASK_SIMPLE_USE_GUN )
+            {
+                // Make sure crouching
+                pTask = m_pTaskManager->GetTaskSecondary ( TASK_SECONDARY_DUCK );
+                if ( pTask && pTask->GetTaskType () == TASK_SIMPLE_DUCK )
+                {
+                    // Check for left/right
+                    if ( Current.LeftStickX == 0 )
+                        m_ulLastTimePressedLeftOrRight = 0;
+                    else
+                    if ( m_ulLastTimePressedLeftOrRight == 0 )
+                        m_ulLastTimePressedLeftOrRight = ulNow;
+
+                    // Maybe cancel crouch
+                    if ( ulNow - m_ulLastTimePressedLeftOrRight < 500.f * fSpeedRatio )
+                        Current.ShockButtonL = 0; 
+                }
+            }
         }
 
         if ( bDoStrafeFixPulse )
