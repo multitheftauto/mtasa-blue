@@ -68,6 +68,18 @@ int CLuaDefs::CanUseFunction ( lua_CFunction f, lua_State* luaVM )
 
     g_pClientGame->GetDebugHookManager()->OnPreFunction( f, luaVM, true );
 
+    // Check if post function hook is required
+    if ( g_pClientGame->GetDebugHookManager()->HasPostFunctionHooks() )
+    {
+        // Check if hook needs applying
+        if ( !ms_bRegisterdPostCallHook )
+        {
+            OutputDebugLine ( "[Lua] Registering PostCallHook" );
+            ms_bRegisterdPostCallHook = true;
+            lua_registerPostCallHook ( CLuaDefs::DidUseFunction );
+        }
+    }
+
     // Cached enabled setting here as it doesn't usually change
     static bool bLogLuaFunctions = ( g_pCore->GetDiagnosticDebug () == EDiagnosticDebug::LUA_TRACE_0000 );
     if ( !bLogLuaFunctions )
@@ -86,17 +98,6 @@ int CLuaDefs::CanUseFunction ( lua_CFunction f, lua_State* luaVM )
         g_pCore->LogEvent ( 0, "LuaCFunction", strScriptName, pFunction->GetFunctionName () );
     }
 
-    // Check if post function hook is required
-    if ( g_pClientGame->GetDebugHookManager()->HasPostFunctionHooks() )
-    {
-        // Check if hook needs applying
-        if ( !ms_bRegisterdPostCallHook )
-        {
-            OutputDebugLine ( "[Lua] Registering PostCallHook" );
-            ms_bRegisterdPostCallHook = true;
-            lua_registerPostCallHook ( CLuaDefs::DidUseFunction );
-        }
-    }
     return true;
 }
 
@@ -106,7 +107,7 @@ int CLuaDefs::CanUseFunction ( lua_CFunction f, lua_State* luaVM )
 //
 void CLuaDefs::DidUseFunction ( lua_CFunction f, lua_State* luaVM )
 {
-    // Quick cull of unknown pointer range - Deals with calls from client dll (when the server has been loaded into the same process)
+    // Quick cull of unknown pointer range
     if ( CLuaCFunctions::IsNotFunction( f ) )
         return;
 
