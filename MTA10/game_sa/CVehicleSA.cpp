@@ -2380,6 +2380,14 @@ bool CVehicleSA::SetComponentPosition ( SString vehicleComponent, CVector vecPos
     if ( GetVehicleComponent ( vehicleComponent, Component ) && Component.pFrame != NULL && Component.bReadOnly == false )
     {
         RwFrame * pComponent = Component.pFrame;
+
+        // Remove offsets of parent frames
+        RwFrame* pParent = (RwFrame*)pComponent->object.parent;
+        for( ; pParent && pParent != pParent->root ; pParent = (RwFrame*)pParent->object.parent )
+        {
+            vecPosition -= CVector ( pParent->modelling.pos.x, pParent->modelling.pos.y, pParent->modelling.pos.z );
+        }
+
         // set our position (modelling is relative positions and ltm is world pos)
         pComponent->modelling.pos.x = vecPosition.fX;
         pComponent->modelling.pos.y = vecPosition.fY;
@@ -2398,6 +2406,14 @@ bool CVehicleSA::GetComponentPosition ( SString vehicleComponent, CVector &vecPo
         RwFrame * pComponent = Component.pFrame;
         // get our position (modelling is relative positions and ltm is world pos)
         vecPositionModelling = CVector ( pComponent->modelling.pos.x, pComponent->modelling.pos.y, pComponent->modelling.pos.z );
+
+        // Add offsets of parent frames
+        RwFrame* pParent = (RwFrame*)pComponent->object.parent;
+        for( ; pParent && pParent != pParent->root ; pParent = (RwFrame*)pParent->object.parent )
+        {
+            vecPositionModelling += CVector ( pParent->modelling.pos.x, pParent->modelling.pos.y, pParent->modelling.pos.z );
+        }
+
         return true;
     }
     return false;
