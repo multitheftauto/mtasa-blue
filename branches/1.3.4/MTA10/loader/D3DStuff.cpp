@@ -134,7 +134,12 @@ void BeginD3DStuff( void )
             )
         {
             bDetectedOptimus = true;
-            WriteDebugEvent( SString( "D3DStuff %d - Detected Optimus", i ) );
+            WriteDebugEvent( SString( "D3DStuff %d - Detected Optimus Combo", i ) );
+        }
+        if ( SStringX( Identifier.Driver ).ContainsI( "shim.dll" ) )
+        {
+            bDetectedOptimus = true;
+            WriteDebugEvent( SString( "D3DStuff %d - Detected Optimus shim", i ) );
         }
 
         WriteDebugEvent( SString( "D3DStuff %d Identifier - %s", i, *ToString( Identifier ) ) );

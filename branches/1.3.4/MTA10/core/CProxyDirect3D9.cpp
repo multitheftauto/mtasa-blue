@@ -768,8 +768,10 @@ HRESULT HandleCreateDeviceResult( HRESULT hResult, IDirect3D9* pDirect3D, UINT A
     if ( uiCurrentStatus == CREATE_DEVICE_FAIL )
         uiDiagnosticLogLevel = 2;   // Log and wait - If fail status
 
+    bool bDetectOptimus = SStringX( AdapterIdent.Driver ).ContainsI( "shim.dll" );
+
     bool bFixCaps = false;
-    if ( GetApplicationSettingInt( "nvhacks", "optimus" ) )
+    if ( GetApplicationSettingInt( "nvhacks", "optimus" ) || bDetectOptimus )
     {
         bFixCaps = true;
         if ( uiDiagnosticLogLevel == 0 )
@@ -964,9 +966,11 @@ HRESULT CCore::OnPostCreateDevice( HRESULT hResult, IDirect3D9* pDirect3D, UINT 
                                 ) );
     }
 
+    bool bDetectOptimus = SStringX( AdapterIdent.Driver ).ContainsI( "shim.dll" );
+
     // Calc log level to use
     uint uiDiagnosticLogLevel = 0;
-    if ( GetApplicationSettingInt( "nvhacks", "optimus" ) )
+    if ( GetApplicationSettingInt( "nvhacks", "optimus" ) || bDetectOptimus )
         uiDiagnosticLogLevel = 1;   // Log and continue
     if ( hResult != D3D_OK )
         uiDiagnosticLogLevel = 2;   // Log and wait - If fail status
