@@ -457,7 +457,7 @@ protected:
     void                        Init                        ( CClientManager* pManager, unsigned long ulModelID, bool bIsLocalPlayer );
 
     void                        StreamedInPulse             ( bool bDoStandardPulses );
-    void                        ApplyStrafeFix              ( CControllerState& Current );
+    void                        ApplyControllerStateFixes   ( CControllerState& Current );
 
     void                        Interpolate                 ( void );
     void                        UpdateKeysync               ( bool bCleanup = false );
