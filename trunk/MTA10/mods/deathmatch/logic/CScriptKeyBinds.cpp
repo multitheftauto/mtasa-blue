@@ -17,7 +17,7 @@
 
 using std::list;
 
-static const SFixedArray < SScriptBindableKey, 106 > g_bkKeys = 
+static const SFixedArray < SScriptBindableKey, 107 > g_bkKeys = 
 { {
     { "mouse1" }, { "mouse2" }, { "mouse3" }, { "mouse_wheel_up" }, { "mouse_wheel_down" },
     { "mouse4" }, { "mouse5" }, { "backspace" }, { "tab" }, { "lshift" }, { "rshift" },
@@ -29,7 +29,7 @@ static const SFixedArray < SScriptBindableKey, 106 > g_bkKeys =
     { "j" }, { "k" }, { "l" }, { "m" }, { "n" }, { "o" }, { "p" }, { "q" }, { "r" }, 
     { "s" }, { "t" }, { "u" }, { "v" }, { "w" }, { "x" }, { "y" }, { "z" }, { "num_0" }, 
     { "num_1" }, { "num_2" }, { "num_3" }, { "num_4" }, { "num_5" }, { "num_6" },
-    { "num_7" }, { "num_8" }, { "num_9" }, { "num_mul" }, { "num_add" },
+    { "num_7" }, { "num_8" }, { "num_9" }, { "num_mul" }, { "num_add" }, { "num_enter" },
     { "num_sep" }, { "num_sub" }, { "num_dec" }, { "num_div" }, { "F1" }, { "F2" }, 
     { "F3" }, { "F4" }, { "F5" }, { "F6" }, { "F7" }, /* { "F8" },  * Used for console */
     { "F9" }, { "F10" }, { "F11" }, { "F12" }, { "scroll" }, { ";" }, { "=" }, { "," }, { "-" },
