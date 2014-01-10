@@ -16,8 +16,6 @@
 #include "StdInc.h"
 HRESULT HandleCreateDeviceResult( HRESULT hResult, IDirect3D9* pDirect3D, UINT Adapter, D3DDEVTYPE DeviceType, HWND hFocusWindow, DWORD BehaviorFlags, D3DPRESENT_PARAMETERS* pPresentationParameters, IDirect3DDevice9** ppReturnedDeviceInterface );
 bool CreateDeviceSecondCallCheck( HRESULT& hOutResult, IDirect3D9* pDirect3D, UINT Adapter, D3DDEVTYPE DeviceType, HWND hFocusWindow, DWORD BehaviorFlags, D3DPRESENT_PARAMETERS* pPresentationParameters, IDirect3DDevice9** ppReturnedDeviceInterface );
-bool g_bOverrideCaps = false;
-D3DCAPS9 g_D3DCaps;
 
 CProxyDirect3D9::CProxyDirect3D9 ( IDirect3D9* pInterface )
 {
@@ -109,11 +107,6 @@ HRESULT    CProxyDirect3D9::CheckDeviceFormatConversion ( UINT Adapter, D3DDEVTY
 
 HRESULT    CProxyDirect3D9::GetDeviceCaps               ( UINT Adapter, D3DDEVTYPE DeviceType, D3DCAPS9* pCaps )
 {   
-    if ( g_bOverrideCaps )
-    {
-        *pCaps = g_D3DCaps;
-        return D3D_OK;
-    }
     return m_pDevice->GetDeviceCaps ( Adapter, DeviceType, pCaps );
 }
 

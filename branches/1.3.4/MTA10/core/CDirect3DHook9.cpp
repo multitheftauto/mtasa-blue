@@ -12,8 +12,6 @@
 
 #include "StdInc.h"
 #include "detours/include/detours.h"
-extern bool g_bOverrideCaps;
-extern D3DCAPS9 g_D3DCaps;
 
 template<> CDirect3DHook9 * CSingleton< CDirect3DHook9 >::m_pSingleton = NULL;
 
@@ -139,10 +137,8 @@ HWND CreateWindowForD3D( void )
 //
 // Get device using a different method
 //
-IDirect3D9* GetAnotherThing( IDirect3D9* pInitialDirect3D9 )
+IDirect3DDevice9* CreateDeviceForD3D( HWND hWnd, IDirect3D9* pInitialDirect3D9 )
 {
-    ms_strLogPrepend = "GetAnotherThing ";
-    HWND hWnd = CreateWindowForD3D();
     uint Adapter = 0;
     HRESULT hr;
 
@@ -268,20 +264,58 @@ IDirect3D9* GetAnotherThing( IDirect3D9* pInitialDirect3D9 )
         // If device caps better, use them
         if ( DeviceCaps9.DeclTypes > InitialD3DCaps9.DeclTypes )
         {
-            WriteDebugEvent( "Using DeviceCaps as better" );
-            g_bOverrideCaps = true;
-            g_D3DCaps = DeviceCaps9;
+            WriteDebugEvent( "Would use DeviceCaps as better" );
         }
+
     }
     while( false );
 
-    SAFE_RELEASE( pD3DDevice9 );
-    DestroyWindow( hWnd );
+    return pD3DDevice9;
+}
+
+
+//
+// Get device using a different method
+//
+IDirect3D9* GetAnotherThing( IDirect3D9* pInitialDirect3D9, UINT SDKVersion )
+{
+    static uint uiCallCount = 0;
+    uiCallCount += 1;
+    ms_strLogPrepend = SString( "GetAnotherThing(%d) ", uiCallCount );
+    uint Adapter = 0;
+    HRESULT hr;
+
+    // Log graphic card name
+    D3DADAPTER_IDENTIFIER9 InitialAdapterIdent;
+    pInitialDirect3D9->GetAdapterIdentifier ( Adapter, 0, &InitialAdapterIdent );
+    WriteDebugEvent ( "pInitialDirect3D9:" );
+    WriteDebugEvent ( ToString( InitialAdapterIdent ) );
+
+    // Get caps from pInitialDirect3D9
+    D3DCAPS9 InitialD3DCaps9;
+    hr = pInitialDirect3D9->GetDeviceCaps( Adapter, D3DDEVTYPE_HAL, &InitialD3DCaps9 );
+    WriteDebugEvent( SString( "pInitialDirect3D9 CapsReport Caps9 - %s ", *ToString( InitialD3DCaps9 ) ) );
+
+    SString strDriver = InitialAdapterIdent.Driver;
+    if ( !strDriver.ContainsI( "shim.dll" ) || uiCallCount != 1 )
+        return pInitialDirect3D9;
+
+    // Optimus tests only
+
+    ms_strLogPrepend = SString( "GetAnotherThing(%d)A ", uiCallCount );
+    HWND hWndA = CreateWindowForD3D();
+    IDirect3DDevice9* pD3DDevice9A = CreateDeviceForD3D( hWndA, pInitialDirect3D9 );
+
+    ms_strLogPrepend = SString( "GetAnotherThing(%d)B ", uiCallCount );
+    IDirect3D9* pDirect3D9B = CDirect3DHook9::GetSingleton().m_pfnDirect3DCreate9 ( D3D_SDK_VERSION );
+    HWND hWndB = CreateWindowForD3D();
+    IDirect3DDevice9* pD3DDevice9B = CreateDeviceForD3D( hWndB, pDirect3D9B );
+
+    DestroyWindow( hWndA );
+    DestroyWindow( hWndB );
 
     ms_strLogPrepend = "";
-    if ( pAnotherDirect3D9 )
-        return pAnotherDirect3D9;
-    return pInitialDirect3D9;
+    return pDirect3D9B;
 }
 
 
@@ -320,7 +354,7 @@ IDirect3D9* CDirect3DHook9::API_Direct3DCreate9 ( UINT SDKVersion )
         return NULL;
     }
 
-    pDirect3D9 = GetAnotherThing( pDirect3D9 );
+    pDirect3D9 = GetAnotherThing( pDirect3D9, SDKVersion );
 
     GetServerCache ();
 
