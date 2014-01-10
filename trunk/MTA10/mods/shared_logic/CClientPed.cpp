@@ -2468,18 +2468,18 @@ void CClientPed::StreamedInPulse ( bool bDoStandardPulses )
     if ( !m_pPlayerPed )
         return;
 
-    // Strafe fix is done at the same same as everything else unless using alt pulse order
-    bool bDoStrafeFixPulse = g_pClientGame->IsUsingAlternatePulseOrder() ? !bDoStandardPulses : bDoStandardPulses;
+    // ControllerState checks and fixes are done at the same same as everything else unless using alt pulse order
+    bool bDoControllerStateFixPulse = g_pClientGame->IsUsingAlternatePulseOrder() ? !bDoStandardPulses : bDoStandardPulses;
 
     if ( !bDoStandardPulses )
     {
-        if ( bDoStrafeFixPulse )
+        if ( bDoControllerStateFixPulse )
         {
-            // Strafe fix only
+            // ControllerState checks and fixes only
             CControllerState Current;
             GetControllerState ( Current );
 
-            ApplyStrafeFix( Current );
+            ApplyControllerStateFixes( Current );
 
             if ( m_bIsLocalPlayer )
                 m_pPad->SetCurrentControllerState ( &Current );
@@ -2514,289 +2514,8 @@ void CClientPed::StreamedInPulse ( bool bDoStandardPulses )
         CControllerState Current;
         GetControllerState ( Current );
 
-        if ( m_bIsLocalPlayer )
-        {
-            // Check if the ped got in fire without the script control
-            m_bIsOnFire = m_pPlayerPed->IsOnFire();
-
-            // Do our stealth aiming stuff
-            SetStealthAiming ( ShouldBeStealthAiming () );
-
-            // Process our scripted control settings
-            bool bOnFoot = pVehicle ? false : true;
-            CClientPad::ProcessAllToggledControls    ( Current, bOnFoot );
-            CClientPad::ProcessSetAnalogControlState ( Current, bOnFoot );
-        }
-
-        // Is the player stealth aiming?
-        if ( m_bStealthAiming )
-        {
-            // Grab our current anim
-            CAnimBlendAssociation * pAssoc = GetFirstAnimation ();
-            if ( pAssoc )
-            {
-                // Check we're not doing any important animations
-                AnimationId animId = pAssoc->GetAnimID ();
-                if ( animId == ANIM_ID_WALK_CIVI || animId == ANIM_ID_RUN_CIVI ||
-                     animId == ANIM_ID_IDLE_STANCE || animId == ANIM_ID_WEAPON_CROUCH ||
-                     animId == ANIM_ID_STEALTH_AIM )
-                {
-                    // Are our knife anims loaded?
-                    CAnimBlock * pBlock = g_pGame->GetAnimManager ()->GetAnimationBlock ( "KNIFE" );
-                    if ( pBlock->IsLoaded () )
-                    {
-                        // Force the animation
-                        BlendAnimation ( ANIM_GROUP_STEALTH_KN, ANIM_ID_STEALTH_AIM, 8.0f );
-                    }
-                }
-            }
-        }
-
-        // Is the player choking?
-        if ( m_bIsChoking )
-        {
-            // Grab the choking task
-            CTask* pTask = m_pTaskManager->GetTask ( TASK_PRIORITY_PHYSICAL_RESPONSE );
-            if ( pTask && pTask->GetTaskType () == TASK_SIMPLE_CHOKING )
-            {
-                // Update the task so he keeps on choking until we make him stop
-                CTaskSimpleChoking* pTaskChoking = dynamic_cast < CTaskSimpleChoking* > ( pTask );
-                pTaskChoking->UpdateChoke ( m_pPlayerPed, NULL, true );
-            }
-        }
-        
-        unsigned long ulNow = CClientTime::GetTime (); 
-        //MS checks must take into account the gamespeed
-        float fSpeedRatio = (1.0f/g_pGame->GetGameSpeed ()); 
-
-        // Remember when we started standing from crouching
-        if ( m_bWasDucked && m_bWasDucked != IsDucked() )
-        {
-            m_ulLastTimeBeganStand = ulNow;
-            m_bWasDucked = false;
-        }
-        
-        // Remember when we start aiming if we're aiming.
-        CTask* pTask = m_pTaskManager->GetTaskSecondary ( TASK_SECONDARY_ATTACK );
-        if ( pTask && pTask->GetTaskType () == TASK_SIMPLE_USE_GUN )
-        {
-            if ( m_ulLastTimeAimed == 0 )
-            {
-                m_ulLastTimeAimed = ulNow;
-            }
-            if ( m_ulLastTimeBeganStand >= ulNow - 200.0f*fSpeedRatio )
-            {
-                if ( !g_pClientGame->IsGlitchEnabled ( CClientGame::GLITCH_FASTMOVE ) )
-                {
-                    //Disable movement keys.  This stops an exploit where players can run
-                    //with guns shortly after standing
-                    Current.LeftStickX = 0;
-                    Current.LeftStickY = 0;
-                }
-            }
-
-            // Fix to disable the quick cutting of the post deagle shooting animation
-            // If we're USE_GUN, but aren't pressing the fire or aim keys we must be
-            // in a post-fire state where the player is preparing to move back to 
-            // a normal stance.  This can normally be cut using the crouch key, so block it
-            if ( !g_pClientGame->IsGlitchEnabled ( CClientGame::GLITCH_CROUCHBUG ) )
-            {
-                if ( Current.RightShoulder1 == 0 && Current.LeftShoulder1 == 0 && Current.ButtonCircle == 0 )
-                    Current.ShockButtonL = 0;
-            }
-        }
-        else
-        {
-            m_ulLastTimeAimed = 0;
-            // If we have the aim button pressed but aren't aiming, we're probably sprinting
-            // If we're sprinting with an MP5,Deagle,Fire Extinguisher,Spray can, we shouldnt be able to shoot 
-            // These weapons are weapons you can run with, but can't run with while aiming
-            // This fixes a weapon desync bug involving aiming and sprinting packets arriving simultaneously
-            eWeaponType iCurrentWeapon = GetCurrentWeaponType ();
-            if ( Current.RightShoulder1 != 0 && 
-             ( iCurrentWeapon == 29 || iCurrentWeapon == 24 || iCurrentWeapon == 23 || iCurrentWeapon == 41 || iCurrentWeapon == 42 ) )
-            { 
-                Current.ButtonCircle = 0;
-                Current.LeftShoulder1 = 0;
-            }
-        }
-
-        // Remember when we start the crouching if we're crouching.
-        pTask = m_pTaskManager->GetTaskSecondary ( TASK_SECONDARY_DUCK );
-        if ( pTask && pTask->GetTaskType () == TASK_SIMPLE_DUCK )
-        {
-            m_bWasDucked = true;
-            if ( m_ulLastTimeBeganCrouch == 0 )
-                m_ulLastTimeBeganCrouch = ulNow;
-                // No longer aiming if we're in the process of crouching
-                m_ulLastTimeAimed = 0;
-        }
-        else
-        {
-            m_bWasDucked = false;
-            m_ulLastTimeBeganCrouch = 0;
-        }
-
-        // If we started crouching less than some time ago, make sure we can't jump or sprint.
-        // This fixes the exploit both locally and remotly that enables players to abort
-        // the crouching animation and shoot quickly with slow shooting weapons. Also fixes
-        // the exploit making you able to get crouched without being able to move and shoot
-        // with infinite ammo for remote players.
-        if ( m_ulLastTimeBeganCrouch != 0 )
-        {
-            if ( m_ulLastTimeBeganCrouch >= ulNow - 600.0f*fSpeedRatio )
-            {
-                if ( !g_pClientGame->IsGlitchEnabled ( CClientGame::GLITCH_FASTFIRE ) )
-                {
-                    Current.ButtonSquare = 0;
-                    Current.ButtonCross = 0;
-                }
-                //Disable the fire keys whilst crouching as well
-                Current.ButtonCircle = 0;
-                Current.LeftShoulder1 = 0;
-                if ( m_ulLastTimeBeganCrouch >= ulNow - 400.0f*fSpeedRatio )
-                {
-                    //Disable double crouching (another anim cut)
-                    if ( g_pClientGame->IsUsingAlternatePulseOrder() )
-                        Current.ShockButtonL = 255;     // Do this differently if we have changed the pulse order
-                    else
-                        Current.ShockButtonL = 0;
-                }
-            }
-        }
-        // If we just started aiming, make sure they dont try and crouch
-        else if ( (m_ulLastTimeAimed != 0 &&
-                  m_ulLastTimeAimed >= ulNow - 300.0f*fSpeedRatio) || 
-                  (ulNow - m_ulLastTimeFired) <= 300.0f*fSpeedRatio )
-        {
-            if ( !g_pClientGame->IsGlitchEnabled (  CClientGame::GLITCH_FASTFIRE ) )
-            {
-                Current.ShockButtonL = 0;
-            }
-        }
-
-        // Are we working on entering a vehicle?
-        pTask = m_pTaskManager->GetTask ( TASK_PRIORITY_PRIMARY );
-        if ( pTask )
-        {
-            // Entering as driver or passenger?
-            int iTaskType = pTask->GetTaskType ();
-            if ( iTaskType == TASK_COMPLEX_ENTER_CAR_AS_DRIVER ||
-                 iTaskType == TASK_COMPLEX_ENTER_CAR_AS_PASSENGER ||
-                 iTaskType == TASK_COMPLEX_ENTER_BOAT_AS_DRIVER )
-            {
-                // Don't allow the aiming key (RightShoulder1)
-                // This fixes bug allowing you to run around in aim mode while
-                // entering a vehicle both locally and remotly.
-                Current.RightShoulder1 = 0;
-            }
-        }
-        //Fix for reloading aborting
-        if ( GetWeapon()->GetState() == WEAPONSTATE_RELOADING )
-        {
-            //Disable changing weapons
-            Current.DPadUp = 0;
-            Current.DPadDown = 0;
-            //Disable vehicle entry
-            Current.ButtonTriangle = 0;
-            //Disable jumping
-            Current.ButtonSquare = 0;
-            //if we are ducked disable movement (otherwise it will abort reloading)
-            if ( IsDucked() ) {
-                Current.LeftStickX = 0;
-                Current.LeftStickY = 0;
-            }
-        }
-        //Fix for crouching the end of animation aborting reload
-        CControllerState Previous;
-        GetLastControllerState ( Previous );
-        if ( IsDucked() && ( Current.LeftStickX == 0 || Current.LeftStickY == 0)) {
-            if (Previous.LeftStickY != 0 || Previous.LeftStickX != 0 ) 
-                m_ulLastTimeMovedWhileCrouched = ulNow;
-        }
-        // Is this the local player?
-        if ( m_bIsLocalPlayer )
-        {
-            // * Fix for weapons continuing to fire without any ammo (only needs to be applied locally)
-            // Do we have a weapon?
-            CWeapon * pWeapon = GetWeapon ();
-            if ( pWeapon )
-            {
-                // Weapon wielding slot?
-                eWeaponSlot slot = pWeapon->GetSlot ();
-                if ( slot != WEAPONSLOT_TYPE_UNARMED && slot != WEAPONSLOT_TYPE_MELEE )
-                {
-                    eWeaponType eWeapon = pWeapon->GetType ( );
-                    // No Ammo left?
-                    float fSkill = GetStat ( g_pGame->GetStats ()->GetSkillStatIndex ( eWeapon ) );
-                    CWeaponStat* pWeaponStat = g_pGame->GetWeaponStatManager ( )->GetWeaponStatsFromSkillLevel ( eWeapon, fSkill );
-                    if ( ( pWeapon->GetAmmoInClip ( ) == 0 && pWeaponStat->GetMaximumClipAmmo ( ) > 0 ) || pWeapon->GetAmmoTotal () == 0 )
-                    {
-                        // Make sure our fire key isn't pressed
-                        Current.ButtonCircle = 0;
-                        Current.LeftShoulder1 = 0;
-                    }
-                }
-            }
-
-
-            // * Fix for warp glitches when sprinting and blocking simultaneously
-            // This is applied locally, and prevents you using the backwards key while sprint-blocking
-            CTask * pTask = m_pTaskManager->GetSimplestActiveTask ();
-            if ( ( pTask && pTask->GetTaskType () == TASK_SIMPLE_PLAYER_ON_FOOT ) &&
-                 ( GetWeapon()->GetSlot() == WEAPONSLOT_TYPE_UNARMED ) &&
-                 ( Current.RightShoulder1 != 0 ) &&
-                 ( Current.ButtonSquare != 0 ) &&
-                 ( Current.ButtonCross != 0 ) )
-            {  // We are block jogging
-                if ( Current.LeftStickY > 0 )  
-                    // We're pressing target+jump+sprint+backwards.  Using the backwards key in this situation is prone to bugs, swap it with forwards
-                    Current.LeftStickY = -Current.LeftStickY;
-                else if ( Current.LeftStickY == 0 )
-                    // We're pressing target+jump+sprint 
-                    // This causes some sliding, so let's disable this glitchy animation
-                    Current.ButtonCross = 0;
-            }
-
-            // * Check for entering a vehicle whilst using a gun
-            pTask = m_pTaskManager->GetTask ( TASK_PRIORITY_PRIMARY );
-            if ( pTask )
-            {
-                int iTaskType = pTask->GetTaskType ();
-                if ( iTaskType == TASK_COMPLEX_ENTER_CAR_AS_DRIVER ||
-                    iTaskType == TASK_COMPLEX_ENTER_CAR_AS_PASSENGER )
-                {
-                    if ( IsUsingGun () )
-                    {
-                        pTask->MakeAbortable ( m_pPlayerPed, ABORT_PRIORITY_URGENT, NULL );
-                    }
-                }
-            }
-
-            // If crouching and aiming, don't allow uncrouch button if just pressed left/right
-            pTask = m_pTaskManager->GetTaskSecondary ( TASK_SECONDARY_ATTACK );
-            if ( pTask && pTask->GetTaskType () == TASK_SIMPLE_USE_GUN )
-            {
-                // Make sure crouching
-                pTask = m_pTaskManager->GetTaskSecondary ( TASK_SECONDARY_DUCK );
-                if ( pTask && pTask->GetTaskType () == TASK_SIMPLE_DUCK )
-                {
-                    // Check for left/right
-                    if ( Current.LeftStickX == 0 )
-                        m_ulLastTimePressedLeftOrRight = 0;
-                    else
-                    if ( m_ulLastTimePressedLeftOrRight == 0 )
-                        m_ulLastTimePressedLeftOrRight = ulNow;
-
-                    // Maybe cancel crouch
-                    if ( ulNow - m_ulLastTimePressedLeftOrRight < 500.f * fSpeedRatio )
-                        Current.ShockButtonL = 0; 
-                }
-            }
-        }
-
-        if ( bDoStrafeFixPulse )
-            ApplyStrafeFix( Current );
+        if ( bDoControllerStateFixPulse )
+            ApplyControllerStateFixes( Current );
 
         // Set the controller state we might've changed something in
         // We can't use SetControllerState as it will update the previous
@@ -2991,12 +2710,297 @@ void CClientPed::StreamedInPulse ( bool bDoStandardPulses )
     }
 }
 
-
-void CClientPed::ApplyStrafeFix ( CControllerState& Current )
+//
+// Do checks and modifications of controller state
+//
+void CClientPed::ApplyControllerStateFixes ( CControllerState& Current )
 {
+    CClientVehicle* pVehicle = GetOccupiedVehicle ();
+
+    if ( m_bIsLocalPlayer )
+    {
+        // Check if the ped got in fire without the script control
+        m_bIsOnFire = m_pPlayerPed->IsOnFire();
+
+        // Do our stealth aiming stuff
+        SetStealthAiming ( ShouldBeStealthAiming () );
+
+        // Process our scripted control settings
+        bool bOnFoot = pVehicle ? false : true;
+        CClientPad::ProcessAllToggledControls    ( Current, bOnFoot );
+        CClientPad::ProcessSetAnalogControlState ( Current, bOnFoot );
+    }
+
+    // Is the player stealth aiming?
+    if ( m_bStealthAiming )
+    {
+        // Grab our current anim
+        CAnimBlendAssociation * pAssoc = GetFirstAnimation ();
+        if ( pAssoc )
+        {
+            // Check we're not doing any important animations
+            AnimationId animId = pAssoc->GetAnimID ();
+            if ( animId == ANIM_ID_WALK_CIVI || animId == ANIM_ID_RUN_CIVI ||
+                 animId == ANIM_ID_IDLE_STANCE || animId == ANIM_ID_WEAPON_CROUCH ||
+                 animId == ANIM_ID_STEALTH_AIM )
+            {
+                // Are our knife anims loaded?
+                CAnimBlock * pBlock = g_pGame->GetAnimManager ()->GetAnimationBlock ( "KNIFE" );
+                if ( pBlock->IsLoaded () )
+                {
+                    // Force the animation
+                    BlendAnimation ( ANIM_GROUP_STEALTH_KN, ANIM_ID_STEALTH_AIM, 8.0f );
+                }
+            }
+        }
+    }
+
+    // Is the player choking?
+    if ( m_bIsChoking )
+    {
+        // Grab the choking task
+        CTask* pTask = m_pTaskManager->GetTask ( TASK_PRIORITY_PHYSICAL_RESPONSE );
+        if ( pTask && pTask->GetTaskType () == TASK_SIMPLE_CHOKING )
+        {
+            // Update the task so he keeps on choking until we make him stop
+            CTaskSimpleChoking* pTaskChoking = dynamic_cast < CTaskSimpleChoking* > ( pTask );
+            pTaskChoking->UpdateChoke ( m_pPlayerPed, NULL, true );
+        }
+    }
+    
+    unsigned long ulNow = CClientTime::GetTime (); 
+    //MS checks must take into account the gamespeed
+    float fSpeedRatio = (1.0f/g_pGame->GetGameSpeed ()); 
+
+    // Remember when we started standing from crouching
+    if ( m_bWasDucked && m_bWasDucked != IsDucked() )
+    {
+        m_ulLastTimeBeganStand = ulNow;
+        m_bWasDucked = false;
+    }
+    
+    // Remember when we start aiming if we're aiming.
+    CTask* pTask = m_pTaskManager->GetTaskSecondary ( TASK_SECONDARY_ATTACK );
+    if ( pTask && pTask->GetTaskType () == TASK_SIMPLE_USE_GUN )
+    {
+        if ( m_ulLastTimeAimed == 0 )
+        {
+            m_ulLastTimeAimed = ulNow;
+        }
+        if ( m_ulLastTimeBeganStand >= ulNow - 200.0f*fSpeedRatio )
+        {
+            if ( !g_pClientGame->IsGlitchEnabled ( CClientGame::GLITCH_FASTMOVE ) )
+            {
+                //Disable movement keys.  This stops an exploit where players can run
+                //with guns shortly after standing
+                Current.LeftStickX = 0;
+                Current.LeftStickY = 0;
+            }
+        }
+
+        // Fix to disable the quick cutting of the post deagle shooting animation
+        // If we're USE_GUN, but aren't pressing the fire or aim keys we must be
+        // in a post-fire state where the player is preparing to move back to 
+        // a normal stance.  This can normally be cut using the crouch key, so block it
+        if ( !g_pClientGame->IsGlitchEnabled ( CClientGame::GLITCH_CROUCHBUG ) )
+        {
+            if ( Current.RightShoulder1 == 0 && Current.LeftShoulder1 == 0 && Current.ButtonCircle == 0 )
+                Current.ShockButtonL = 0;
+        }
+    }
+    else
+    {
+        m_ulLastTimeAimed = 0;
+        // If we have the aim button pressed but aren't aiming, we're probably sprinting
+        // If we're sprinting with an MP5,Deagle,Fire Extinguisher,Spray can, we shouldnt be able to shoot 
+        // These weapons are weapons you can run with, but can't run with while aiming
+        // This fixes a weapon desync bug involving aiming and sprinting packets arriving simultaneously
+        eWeaponType iCurrentWeapon = GetCurrentWeaponType ();
+        if ( Current.RightShoulder1 != 0 && 
+         ( iCurrentWeapon == 29 || iCurrentWeapon == 24 || iCurrentWeapon == 23 || iCurrentWeapon == 41 || iCurrentWeapon == 42 ) )
+        { 
+            Current.ButtonCircle = 0;
+            Current.LeftShoulder1 = 0;
+        }
+    }
+
+    // Remember when we start the crouching if we're crouching.
+    pTask = m_pTaskManager->GetTaskSecondary ( TASK_SECONDARY_DUCK );
+    if ( pTask && pTask->GetTaskType () == TASK_SIMPLE_DUCK )
+    {
+        m_bWasDucked = true;
+        if ( m_ulLastTimeBeganCrouch == 0 )
+            m_ulLastTimeBeganCrouch = ulNow;
+            // No longer aiming if we're in the process of crouching
+            m_ulLastTimeAimed = 0;
+    }
+    else
+    {
+        m_bWasDucked = false;
+        m_ulLastTimeBeganCrouch = 0;
+    }
+
+    // If we started crouching less than some time ago, make sure we can't jump or sprint.
+    // This fixes the exploit both locally and remotly that enables players to abort
+    // the crouching animation and shoot quickly with slow shooting weapons. Also fixes
+    // the exploit making you able to get crouched without being able to move and shoot
+    // with infinite ammo for remote players.
+    if ( m_ulLastTimeBeganCrouch != 0 )
+    {
+        if ( m_ulLastTimeBeganCrouch >= ulNow - 600.0f*fSpeedRatio )
+        {
+            if ( !g_pClientGame->IsGlitchEnabled ( CClientGame::GLITCH_FASTFIRE ) )
+            {
+                Current.ButtonSquare = 0;
+                Current.ButtonCross = 0;
+            }
+            //Disable the fire keys whilst crouching as well
+            Current.ButtonCircle = 0;
+            Current.LeftShoulder1 = 0;
+            if ( m_ulLastTimeBeganCrouch >= ulNow - 400.0f*fSpeedRatio )
+            {
+                //Disable double crouching (another anim cut)
+                if ( g_pClientGame->IsUsingAlternatePulseOrder() )
+                    Current.ShockButtonL = 255;     // Do this differently if we have changed the pulse order
+                else
+                    Current.ShockButtonL = 0;
+            }
+        }
+    }
+    // If we just started aiming, make sure they dont try and crouch
+    else if ( (m_ulLastTimeAimed != 0 &&
+              m_ulLastTimeAimed >= ulNow - 300.0f*fSpeedRatio) || 
+              (ulNow - m_ulLastTimeFired) <= 300.0f*fSpeedRatio )
+    {
+        if ( !g_pClientGame->IsGlitchEnabled (  CClientGame::GLITCH_FASTFIRE ) )
+        {
+            Current.ShockButtonL = 0;
+        }
+    }
+
+    // Are we working on entering a vehicle?
+    pTask = m_pTaskManager->GetTask ( TASK_PRIORITY_PRIMARY );
+    if ( pTask )
+    {
+        // Entering as driver or passenger?
+        int iTaskType = pTask->GetTaskType ();
+        if ( iTaskType == TASK_COMPLEX_ENTER_CAR_AS_DRIVER ||
+             iTaskType == TASK_COMPLEX_ENTER_CAR_AS_PASSENGER ||
+             iTaskType == TASK_COMPLEX_ENTER_BOAT_AS_DRIVER )
+        {
+            // Don't allow the aiming key (RightShoulder1)
+            // This fixes bug allowing you to run around in aim mode while
+            // entering a vehicle both locally and remotly.
+            Current.RightShoulder1 = 0;
+        }
+    }
+    //Fix for reloading aborting
+    if ( GetWeapon()->GetState() == WEAPONSTATE_RELOADING )
+    {
+        //Disable changing weapons
+        Current.DPadUp = 0;
+        Current.DPadDown = 0;
+        //Disable vehicle entry
+        Current.ButtonTriangle = 0;
+        //Disable jumping
+        Current.ButtonSquare = 0;
+        //if we are ducked disable movement (otherwise it will abort reloading)
+        if ( IsDucked() ) {
+            Current.LeftStickX = 0;
+            Current.LeftStickY = 0;
+        }
+    }
+    //Fix for crouching the end of animation aborting reload
+    CControllerState Previous;
+    GetLastControllerState ( Previous );
+    if ( IsDucked() && ( Current.LeftStickX == 0 || Current.LeftStickY == 0)) {
+        if (Previous.LeftStickY != 0 || Previous.LeftStickX != 0 ) 
+            m_ulLastTimeMovedWhileCrouched = ulNow;
+    }
+    // Is this the local player?
+    if ( m_bIsLocalPlayer )
+    {
+        // * Fix for weapons continuing to fire without any ammo (only needs to be applied locally)
+        // Do we have a weapon?
+        CWeapon * pWeapon = GetWeapon ();
+        if ( pWeapon )
+        {
+            // Weapon wielding slot?
+            eWeaponSlot slot = pWeapon->GetSlot ();
+            if ( slot != WEAPONSLOT_TYPE_UNARMED && slot != WEAPONSLOT_TYPE_MELEE )
+            {
+                eWeaponType eWeapon = pWeapon->GetType ( );
+                // No Ammo left?
+                float fSkill = GetStat ( g_pGame->GetStats ()->GetSkillStatIndex ( eWeapon ) );
+                CWeaponStat* pWeaponStat = g_pGame->GetWeaponStatManager ( )->GetWeaponStatsFromSkillLevel ( eWeapon, fSkill );
+                if ( ( pWeapon->GetAmmoInClip ( ) == 0 && pWeaponStat->GetMaximumClipAmmo ( ) > 0 ) || pWeapon->GetAmmoTotal () == 0 )
+                {
+                    // Make sure our fire key isn't pressed
+                    Current.ButtonCircle = 0;
+                    Current.LeftShoulder1 = 0;
+                }
+            }
+        }
+
+
+        // * Fix for warp glitches when sprinting and blocking simultaneously
+        // This is applied locally, and prevents you using the backwards key while sprint-blocking
+        CTask * pTask = m_pTaskManager->GetSimplestActiveTask ();
+        if ( ( pTask && pTask->GetTaskType () == TASK_SIMPLE_PLAYER_ON_FOOT ) &&
+             ( GetWeapon()->GetSlot() == WEAPONSLOT_TYPE_UNARMED ) &&
+             ( Current.RightShoulder1 != 0 ) &&
+             ( Current.ButtonSquare != 0 ) &&
+             ( Current.ButtonCross != 0 ) )
+        {  // We are block jogging
+            if ( Current.LeftStickY > 0 )  
+                // We're pressing target+jump+sprint+backwards.  Using the backwards key in this situation is prone to bugs, swap it with forwards
+                Current.LeftStickY = -Current.LeftStickY;
+            else if ( Current.LeftStickY == 0 )
+                // We're pressing target+jump+sprint 
+                // This causes some sliding, so let's disable this glitchy animation
+                Current.ButtonCross = 0;
+        }
+
+        // * Check for entering a vehicle whilst using a gun
+        pTask = m_pTaskManager->GetTask ( TASK_PRIORITY_PRIMARY );
+        if ( pTask )
+        {
+            int iTaskType = pTask->GetTaskType ();
+            if ( iTaskType == TASK_COMPLEX_ENTER_CAR_AS_DRIVER ||
+                iTaskType == TASK_COMPLEX_ENTER_CAR_AS_PASSENGER )
+            {
+                if ( IsUsingGun () )
+                {
+                    pTask->MakeAbortable ( m_pPlayerPed, ABORT_PRIORITY_URGENT, NULL );
+                }
+            }
+        }
+
+        // If crouching and aiming, don't allow uncrouch button if just pressed left/right
+        pTask = m_pTaskManager->GetTaskSecondary ( TASK_SECONDARY_ATTACK );
+        if ( pTask && pTask->GetTaskType () == TASK_SIMPLE_USE_GUN )
+        {
+            // Make sure crouching
+            pTask = m_pTaskManager->GetTaskSecondary ( TASK_SECONDARY_DUCK );
+            if ( pTask && pTask->GetTaskType () == TASK_SIMPLE_DUCK )
+            {
+                // Check for left/right
+                if ( Current.LeftStickX == 0 )
+                    m_ulLastTimePressedLeftOrRight = 0;
+                else
+                if ( m_ulLastTimePressedLeftOrRight == 0 )
+                    m_ulLastTimePressedLeftOrRight = ulNow;
+
+                // Maybe cancel crouch
+                if ( ulNow - m_ulLastTimePressedLeftOrRight < 500.f * fSpeedRatio )
+                    Current.ShockButtonL = 0; 
+            }
+        }
+    }
+
     // Fix for stuck aim+move when FPS is greater than 45. This hack will raise the limit to 70 FPS
     // Fix works by applying a small input pulse on the other axis, at the start of movement
-    CTask* pTask = m_pTaskManager->GetTaskSecondary ( TASK_SECONDARY_ATTACK );
+    pTask = m_pTaskManager->GetTaskSecondary ( TASK_SECONDARY_ATTACK );
     if ( pTask && pTask->GetTaskType () == TASK_SIMPLE_USE_GUN )
     {
         // Make sure not crouching
