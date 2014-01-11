@@ -152,9 +152,11 @@ int CLuaFunctionDefs::dxDrawMaterialSectionLine3D ( lua_State* luaVM )
 int CLuaFunctionDefs::dxDrawText ( lua_State* luaVM )
 {
 //  bool dxDrawText ( string text, float left, float top [, float right=left, float bottom=top, int color=white, float scale=1, mixed font="default", 
-//      string alignX="left", string alignY="top", bool clip=false, bool wordBreak=false, bool postGUI=false, bool colorCoded=false, bool subPixelPositioning=false] )
+//      string alignX="left", string alignY="top", bool clip=false, bool wordBreak=false, bool postGUI=false, bool colorCoded=false, bool subPixelPositioning=false,
+//      float rotation=0, float rotationCenterX=(left+right)/2, float rotationCenterY=(top+bottom)/2] )
     SString strText; float fLeft; float fTop; float fRight; float fBottom; ulong ulColor; float fScaleX; float fScaleY; eFontType fontType; CClientDxFont* pDxFontElement;
     eDXHorizontalAlign alignX; eDXVerticalAlign alignY; bool bClip; bool bWordBreak; bool bPostGUI; bool bColorCoded; bool bSubPixelPositioning;
+    float fRotation; float fRotationCenterX; float fRotationCenterY;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadString ( strText );
@@ -176,6 +178,9 @@ int CLuaFunctionDefs::dxDrawText ( lua_State* luaVM )
     argStream.ReadBool ( bPostGUI, false );
     argStream.ReadBool ( bColorCoded, false );
     argStream.ReadBool ( bSubPixelPositioning, false );
+    argStream.ReadNumber ( fRotation, 0 );
+    argStream.ReadNumber ( fRotationCenterX, ( fLeft + fRight ) * 0.5f );
+    argStream.ReadNumber ( fRotationCenterY, ( fTop + fBottom ) * 0.5f );
 
     if ( !argStream.HasErrors () )
     {
@@ -188,7 +193,7 @@ int CLuaFunctionDefs::dxDrawText ( lua_State* luaVM )
         if ( bWordBreak )           ulFormat |= DT_WORDBREAK;
         if ( !bClip )               ulFormat |= DT_NOCLIP;
 
-        CStaticFunctionDefinitions::DrawText ( fLeft, fTop, fRight, fBottom, ulColor, strText, fScaleX, fScaleY, ulFormat, pD3DXFont, bPostGUI, bColorCoded, bSubPixelPositioning );
+        CStaticFunctionDefinitions::DrawText ( fLeft, fTop, fRight, fBottom, ulColor, strText, fScaleX, fScaleY, ulFormat, pD3DXFont, bPostGUI, bColorCoded, bSubPixelPositioning, fRotation, fRotationCenterX, fRotationCenterY );
 
         lua_pushboolean ( luaVM, true );
         return 1;

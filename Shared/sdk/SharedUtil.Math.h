@@ -34,4 +34,9 @@ namespace SharedUtil
         double dFactor = pow( 10.0, 7 - ceil( log10( fabs( dValue ) ) ) );
         return floor( dValue * dFactor + 0.5 ) / dFactor;
     }
+
+    inline float DegreesToRadians( float fValue )
+    {
+        return fValue * 0.017453292f;
+    }
 }
