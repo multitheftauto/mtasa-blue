@@ -319,7 +319,9 @@ namespace
                 { false, "setPedFrozen",                   "setElementFrozen" },
                 { false, "setVehicleFrozen",               "setElementFrozen" },
                 { false, "setObjectStatic",                "setElementFrozen" },
+#if MTA_DM_VERSION > 0x135
                 { false, "isPlayerDead",                   "isPedDead" },
+#endif
                 // Edit
                 { false, "guiEditSetCaratIndex",           "guiEditSetCaretIndex" },
                 { false, "guiMemoSetCaratIndex",           "guiMemoSetCaretIndex" },
