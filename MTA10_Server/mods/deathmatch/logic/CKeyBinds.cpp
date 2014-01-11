@@ -13,7 +13,7 @@
 
 #include "StdInc.h"
 
-static const SFixedArray < SBindableKey, 106 > g_bkKeys = 
+static const SFixedArray < SBindableKey, 105 > g_bkKeys = 
 { {
     { "mouse1" }, { "mouse2" }, { "mouse3" }, { "mouse_wheel_up" }, { "mouse_wheel_down" },
     { "mouse4" }, { "mouse5" }, { "backspace" }, { "tab" }, { "lshift" }, { "rshift" },
@@ -29,7 +29,7 @@ static const SFixedArray < SBindableKey, 106 > g_bkKeys =
     { "num_sep" }, { "num_sub" }, { "num_dec" }, { "num_div" }, { "F1" }, { "F2" }, 
     { "F3" }, { "F4" }, { "F5" }, { "F6" }, { "F7" }, /* { "F8" },  * Used for console */
     { "F9" }, { "F10" }, { "F11" }, { "F12" }, { "scroll" }, { ";" }, { "=" }, { "," }, { "-" },
-    { "." }, { "/" }, { "'" }, { "[" }, { "\\" }, { "]" },  { "#" },  { "num_enter" },
+    { "." }, { "/" }, { "'" }, { "[" }, { "\\" }, { "]" },  { "#" },
     { "" }
 } };
 
