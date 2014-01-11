@@ -916,6 +916,7 @@ Section Uninstall
 
 	Delete "$INSTDIR\mods\deathmatch\Client.dll"
 	Delete "$INSTDIR\mods\deathmatch\lua5.1c.dll"
+	Delete "$INSTDIR\mods\deathmatch\pcre3.dll"
 
 	RmDir /r "$INSTDIR\MTA\cgui"
 	RmDir /r "$INSTDIR\MTA\data"

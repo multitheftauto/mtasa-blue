@@ -22,6 +22,7 @@
 #include <cstdio>
 #include <cstring>
 
+#include <base64.h>
 #include <zlib.h>
 
 // SDK includes
@@ -45,6 +46,7 @@
 #include "Enums.h"
 #include "net/SyncStructures.h"
 #include "CIdArray.h"
+#include "pcrecpp.h"
 
 // Shared logic includes
 #include <Utils.h>
@@ -124,3 +126,5 @@
 #include "logic/CResource.h"
 #include "logic/CStaticFunctionDefinitions.h"
 #include "../../version.h"
+
+

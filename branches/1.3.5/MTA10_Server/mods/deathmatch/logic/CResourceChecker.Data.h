@@ -159,7 +159,21 @@ namespace
                                          { "getHeliBladeCollisionsEnabled",  "1.3.4-9.05764" },
                                          { "setHeliBladeCollisionsEnabled",  "1.3.4-9.05764" },
                                          { "onClientVehicleDamage",         "1.3.5" },
-                                        };
+                                         { "isPedDead",                     "1.3.5" },
+                                         { "getCamera",                     "1.3.5" },
+                                         { "dxSetTextureEdge",              "1.3.5" },
+                                         { "guiEditSetCaretIndex",          "1.3.5" },
+                                         { "guiMemoSetCaretIndex",          "1.3.5" },
+                                         { "addDebugHook",                  "1.3.5" },
+                                         { "removeDebugHook",               "1.3.5" },
+                                         { "teaEncode",                     "1.3.5" },
+                                         { "teaDecode",                     "1.3.5" },
+                                         { "base64encode",                  "1.3.5" },
+                                         { "base64decode",                  "1.3.5" },
+                                         { "pregFind",                      "1.3.5" },
+                                         { "pregReplace",                   "1.3.5" },
+                                         { "pregMatch",                     "1.3.5" },
+                                       };
 
     SVersionItem serverFunctionInitList[] = {
                                          { "onChatMessage",             "1.1.1-9.03316" },
@@ -228,6 +242,13 @@ namespace
                                          { "getEventHandlers",          "1.3.4" },
                                          { "addDebugHook",              "1.3.4-9.05939" },
                                          { "removeDebugHook",           "1.3.4-9.05939" },
+                                         { "teaEncode",                 "1.3.5" },
+                                         { "teaDecode",                 "1.3.5" },
+                                         { "base64encode",              "1.3.5" },
+                                         { "base64decode",              "1.3.5" },
+                                         { "pregFind",                  "1.3.5" },
+                                         { "pregReplace",               "1.3.5" },
+                                         { "pregMatch",                 "1.3.5" },
                                         };
 
 

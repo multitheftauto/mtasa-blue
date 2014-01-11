@@ -471,6 +471,11 @@ public:
     static int      UtfCode                             ( lua_State* luaVM );
     static int      GetValidPedModels                   ( lua_State* luaVM );
 
+    // PCRE functions
+    static int      PregFind                            ( lua_State* luaVM );
+    static int      PregReplace                         ( lua_State* luaVM );
+    static int      PregMatch                           ( lua_State* luaVM );
+
     // Loaded Map Functions
     static int      GetRootElement                      ( lua_State* luaVM );
     static int      LoadMapData                         ( lua_State* luaVM );
@@ -567,6 +572,10 @@ public:
     // Utility
     static int      Md5                                 ( lua_State* luaVM );
     static int      Sha256                              ( lua_State* luaVM );
+    static int      TeaEncode                           ( lua_State* luaVM );
+    static int      TeaDecode                           ( lua_State* luaVM );
+    static int      Base64encode                        ( lua_State* luaVM );
+    static int      Base64decode                        ( lua_State* luaVM );
     static int      GetNetworkUsageData                 ( lua_State* luaVM );
     static int      GetNetworkStats                     ( lua_State* luaVM );
     static int      GetVersion                          ( lua_State* luaVM );

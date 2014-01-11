@@ -1112,6 +1112,10 @@ void CLuaManager::LoadCFunctions ( void )
     // Utility
     CLuaCFunctions::AddFunction ( "md5", CLuaFunctionDefs::Md5 );
     CLuaCFunctions::AddFunction ( "sha256", CLuaFunctionDefs::Sha256 );
+    CLuaCFunctions::AddFunction ( "teaEncode", CLuaFunctionDefs::TeaEncode );
+    CLuaCFunctions::AddFunction ( "teaDecode", CLuaFunctionDefs::TeaDecode );
+    CLuaCFunctions::AddFunction ( "base64encode", CLuaFunctionDefs::Base64encode );
+    CLuaCFunctions::AddFunction ( "base64decode", CLuaFunctionDefs::Base64decode );
     CLuaCFunctions::AddFunction ( "getNetworkUsageData", CLuaFunctionDefs::GetNetworkUsageData );
     CLuaCFunctions::AddFunction ( "getNetworkStats", CLuaFunctionDefs::GetNetworkStats );
     CLuaCFunctions::AddFunction ( "getPerformanceStats", CLuaFunctionDefs::GetPerformanceStats );
@@ -1129,6 +1133,11 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "utfSub", CLuaFunctionDefs::UtfSub );
     CLuaCFunctions::AddFunction ( "utfChar", CLuaFunctionDefs::UtfChar );
     CLuaCFunctions::AddFunction ( "utfCode", CLuaFunctionDefs::UtfCode );
+
+    // PCRE functions
+    CLuaCFunctions::AddFunction ( "pregFind", CLuaFunctionDefs::PregFind );
+    CLuaCFunctions::AddFunction ( "pregReplace", CLuaFunctionDefs::PregReplace );
+    CLuaCFunctions::AddFunction ( "pregMatch", CLuaFunctionDefs::PregMatch );
 
     // Voice functions
     CLuaCFunctions::AddFunction ( "isVoiceEnabled", CLuaFunctionDefs::IsVoiceEnabled );

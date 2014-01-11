@@ -56,6 +56,12 @@ namespace SharedUtil
         unsigned char                   m_digest [16];
     };
 
+    void            encodeXtea                  ( unsigned int* v, unsigned int* w, unsigned int* k );
+    void            decodeXTea                  ( unsigned int* v, unsigned int* w, unsigned int* k );
+
+    void            TeaEncode                   ( const SString& str, const SString& key, SString* out );
+    void            TeaDecode                   ( const SString& str, const SString& key, SString* out );
+
     unsigned int    HashString                  ( const char* szString );
     unsigned int    HashString                  ( const char* szString, unsigned int length );
 
