@@ -331,13 +331,13 @@ public:
     static bool                         SetMarkerIcon                       ( CClientEntity& Entity, const char* szIcon );
 
     // Camera get funcs
-    static bool                         GetCameraViewMode                       ( unsigned short& ucMode );
+    static bool                         GetCameraViewMode                   ( unsigned short& ucMode );
     static bool                         GetCameraMatrix                     ( CVector& vecPosition, CVector& vecLookAt, float& fRoll, float& fFOV );
     static CClientEntity *              GetCameraTarget                     ( void );
     static bool                         GetCameraInterior                   ( unsigned char & ucInterior );
 
     // Camera set funcs
-    static bool                         SetCameraMatrix                     ( CVector& vecPosition, CVector* pvecLookAt, float fRoll, float fFOV );
+    static bool                         SetCameraMatrix                     ( const CVector& vecPosition, const CVector& vecLookAt, float fRoll, float fFOV );
     static bool                         SetCameraTarget                     ( CClientEntity * pEntity );
     static bool                         SetCameraTarget                     ( const CVector& vecTarget );
     static bool                         SetCameraInterior                   ( unsigned char ucInterior );
@@ -351,7 +351,7 @@ public:
     static bool                         SetCursorAlpha                      ( float fAlpha );
 
     // Drawing funcs
-    static void                         DrawText                            ( float fLeft, float fTop, float fRight, float fBottom, unsigned long dwColor, const char* szText, float fScaleX, float fScaleY, unsigned long ulFormat, ID3DXFont* pDXFont, bool bPostGUI, bool bColorCoded, bool bSubPixelPositioning );
+    static void                         DrawText                            ( float fLeft, float fTop, float fRight, float fBottom, unsigned long dwColor, const char* szText, float fScaleX, float fScaleY, unsigned long ulFormat, ID3DXFont* pDXFont, bool bPostGUI, bool bColorCoded, bool bSubPixelPositioning, float fRotation, float fRotationCenterX, float fRotationCenterY );
     static CClientDxFont*               CreateDxFont                        ( const SString& strFullFilePath, uint uiSize, bool bBold, const SString& strMetaPath, CResource* pResource );
     static CClientGuiFont*              CreateGuiFont                       ( const SString& strFullFilePath, uint uiSize, const SString& strMetaPath, CResource* pResource );
     static ID3DXFont*                   ResolveD3DXFont                     ( eFontType fontType, CClientDxFont* pDxFontElement );
@@ -412,10 +412,10 @@ public:
     static void                         GUIEditSetReadOnly                  ( CClientEntity& Element, bool bFlag );
     static void                         GUIEditSetMasked                    ( CClientEntity& Element, bool bFlag );
     static void                         GUIEditSetMaxLength                 ( CClientEntity& Element, unsigned int iLength );
-    static void                         GUIEditSetCaratIndex                ( CClientEntity& Element, unsigned int iCarat );
+    static void                         GUIEditSetCaretIndex                ( CClientEntity& Element, unsigned int iCaret );
 
     static void                         GUIMemoSetReadOnly                  ( CClientEntity& Element, bool bFlag );
-    static void                         GUIMemoSetCaratIndex                ( CClientEntity& Element, unsigned int iCarat );
+    static void                         GUIMemoSetCaretIndex                ( CClientEntity& Element, unsigned int iCaret );
 
     static void                         GUIGridListSetSortingEnabled        ( CClientEntity& Element, bool bEnabled );
     static inline unsigned int          GUIGridListAddColumn                ( CClientGUIElement& GUIElement, const char *szTitle, float fWidth )                        { return static_cast < CGUIGridList* > ( GUIElement.GetCGUIElement () ) -> AddColumn ( szTitle, fWidth ); };

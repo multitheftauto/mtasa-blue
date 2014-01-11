@@ -901,7 +901,6 @@ void CClientVehicle::SetColor ( const CVehicleColor& color )
     {
         m_pVehicle->SetColor ( m_Color.GetRGBColor ( 0 ), m_Color.GetRGBColor ( 1 ), m_Color.GetRGBColor ( 2 ), m_Color.GetRGBColor ( 3 ), 0 );
     }
-    m_bColorSaved = true;
 }
 
 
@@ -1478,6 +1477,33 @@ void CClientVehicle::SetWheelStatus ( unsigned char ucWheel, unsigned char ucSta
         }
         m_ucWheelStates [ucWheel] = ucStatus;
     }
+}
+
+
+//
+// Returns true if wheel should be invisible because of its state
+//
+bool CClientVehicle::GetWheelMissing ( unsigned char ucWheel, const SString& strWheelName )
+{
+    // Use name if supplied
+    if ( strWheelName.BeginsWith( "wheel" ) )
+    {
+        if ( strWheelName == "wheel_lf_dummy" )         ucWheel = FRONT_LEFT_WHEEL;
+        else if ( strWheelName == "wheel_rf_dummy" )    ucWheel = FRONT_RIGHT_WHEEL;
+        else if ( strWheelName == "wheel_lb_dummy" )    ucWheel = REAR_LEFT_WHEEL;
+        else if ( strWheelName == "wheel_rb_dummy" )    ucWheel = REAR_RIGHT_WHEEL;
+    }
+
+    if ( ucWheel < MAX_WHEELS )
+    {
+        if ( HasDamageModel () )
+        {
+            // Check the wheel's invisibility
+            if ( m_ucWheelStates [ucWheel] == DT_WHEEL_MISSING )
+                return true;
+        }
+    }
+    return false;
 }
 
 
@@ -2379,11 +2405,15 @@ void CClientVehicle::Create ( void )
 
         CalcAndUpdateCanBeDamagedFlag ();
 
-        // Restore the color
-        if ( m_bColorSaved )
+        if ( IsLocalEntity() && !m_bColorSaved )
         {
-            m_pVehicle->SetColor ( m_Color.GetRGBColor ( 0 ), m_Color.GetRGBColor ( 1 ), m_Color.GetRGBColor ( 2 ), m_Color.GetRGBColor ( 3 ), 0 );
+            // On first create of local vehicle, save color chosen by GTA
+            GetColor();
+            m_bColorSaved = true;
         }
+
+        // Restore the color
+        m_pVehicle->SetColor ( m_Color.GetRGBColor ( 0 ), m_Color.GetRGBColor ( 1 ), m_Color.GetRGBColor ( 2 ), m_Color.GetRGBColor ( 3 ), 0 );
 
         // Link us with stored next and previous vehicles
         if ( m_pPreviousLink && m_pPreviousLink->m_pVehicle )
@@ -3015,7 +3045,6 @@ void CClientVehicle::SetPaintjob ( unsigned char ucPaintjob )
             m_pVehicle->SetRemap ( static_cast < unsigned int > ( ucPaintjob ) );
         }
         m_ucPaintjob = ucPaintjob;
-        m_bColorSaved = false;
     }
 }
 
@@ -4216,6 +4245,10 @@ bool CClientVehicle::ResetComponentPosition ( SString vehicleComponent )
 
 bool CClientVehicle::SetComponentVisible ( SString vehicleComponent, bool bVisible )
 {
+    // Check if wheel invisibility override is in operation due to setting of wheel states
+    if ( bVisible && GetWheelMissing( UCHAR_INVALID_INDEX, vehicleComponent ) )
+        bVisible = false;
+
     if ( m_pVehicle )
     {
         if ( m_pVehicle->SetComponentVisible ( vehicleComponent, bVisible ) )

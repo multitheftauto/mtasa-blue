@@ -83,6 +83,7 @@ CLuaMain::CLuaMain ( CLuaManager* pLuaManager, CResource* pResourceOwner )
 CLuaMain::~CLuaMain ( void )
 {
     g_pClientGame->GetLatentTransferManager ()->OnLuaMainDestroy ( this );
+    g_pClientGame->GetDebugHookManager()->OnLuaMainDestroy ( this );
     g_pClientGame->GetScriptDebugging()->OnLuaMainDestroy ( this );
 
     // Unload the current script
@@ -532,9 +533,13 @@ const SString& CLuaMain::GetFunctionTag ( int iLuaFunction )
 int CLuaMain::PCall ( lua_State *L, int nargs, int nresults, int errfunc )
 {
     TIMING_CHECKPOINT( "+pcall" );
+
+    g_pClientGame->ChangeFloatPrecision( true );
     g_pClientGame->GetScriptDebugging()->PushLuaMain ( this );
     int iret = lua_pcall ( L, nargs, nresults, errfunc );
     g_pClientGame->GetScriptDebugging()->PopLuaMain ( this );
+    g_pClientGame->ChangeFloatPrecision( false );
+
     TIMING_CHECKPOINT( "-pcall" );
     return iret;
 }

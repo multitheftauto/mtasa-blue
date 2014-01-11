@@ -89,13 +89,13 @@ void CGUIMemo_Impl::EnsureCaratIsVisible ( void )
 }
 
 
-unsigned int CGUIMemo_Impl::GetCaratIndex ( void )
+unsigned int CGUIMemo_Impl::GetCaretIndex ( void )
 {
     return static_cast < unsigned int > ( reinterpret_cast < CEGUI::MultiLineEditbox* > ( m_pWindow )->getCaratIndex () );
 }
 
 
-void CGUIMemo_Impl::SetCaratIndex ( unsigned int uiIndex )
+void CGUIMemo_Impl::SetCaretIndex ( unsigned int uiIndex )
 {
     reinterpret_cast < CEGUI::MultiLineEditbox* > ( m_pWindow )->setCaratIndex ( uiIndex );
 }
@@ -153,7 +153,7 @@ bool CGUIMemo_Impl::ActivateOnTab ( void )
     if ( IsVisible () && !IsReadOnly () )
     {
         Activate ();
-        SetCaratIndex ( GetText().length () );
+        SetCaretIndex ( GetText().length () );
         return true;
     }
     return false;

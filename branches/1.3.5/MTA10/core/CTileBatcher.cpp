@@ -216,6 +216,9 @@ void CTileBatcher::Flush ( void )
         m_pDevice->SetSamplerState( 0, D3DSAMP_ADDRESSU, m_pCurrentMaterial->m_TextureAddress );
         m_pDevice->SetSamplerState( 0, D3DSAMP_ADDRESSV, m_pCurrentMaterial->m_TextureAddress );
 
+        if ( m_pCurrentMaterial->m_TextureAddress == TADDRESS_BORDER )
+            m_pDevice->SetSamplerState ( 0, D3DSAMP_BORDERCOLOR, m_pCurrentMaterial->m_uiBorderColor );
+
         // Draw
         if ( CTextureItem* pTextureItem = DynamicCast < CTextureItem > ( m_pCurrentMaterial ) )
         {

@@ -216,10 +216,9 @@ void CDeathmatchObject::UpdateContacting ( const CVector& vecCenterOfRotation, c
     }
 
     // Look in attached objects for more ped contacts
-    list < CClientEntity * > ::iterator itera = m_AttachedEntities.begin ();
-    for ( ; itera != m_AttachedEntities.end () ; ++itera )
+    for ( uint i = 0 ; i < m_AttachedEntities.size () ; ++i )
     {
-        CClientEntity* pEntity = *itera;
+        CClientEntity* pEntity = m_AttachedEntities[i];
         if ( IS_OBJECT ( pEntity ) )
         {
             CDeathmatchObject* pObject = static_cast < CDeathmatchObject* > ( pEntity );
@@ -227,11 +226,3 @@ void CDeathmatchObject::UpdateContacting ( const CVector& vecCenterOfRotation, c
         }
     }
 }
-
-
-
-
-
-
-
-

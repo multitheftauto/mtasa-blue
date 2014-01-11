@@ -1005,3 +1005,57 @@ int CLuaFunctionDefs::GetDevelopmentMode ( lua_State* luaVM )
     lua_pushboolean ( luaVM, bResult );
     return 1;
 }
+
+
+int CLuaFunctionDefs::AddDebugHook ( lua_State* luaVM )
+{
+//  bool AddDebugHook ( string hookType, function callback )
+    EDebugHookType hookType; CLuaFunctionRef callBack;
+
+    CScriptArgReader argStream( luaVM );
+    argStream.ReadEnumString( hookType );
+    argStream.ReadFunction( callBack );
+    argStream.ReadFunctionComplete ();
+
+    if ( !argStream.HasErrors() )
+    {
+        if ( g_pClientGame->GetDebugHookManager()->AddDebugHook( hookType, callBack ) )
+        {
+            lua_pushboolean( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom( luaVM, argStream.GetFullErrorMessage() );
+
+    // Failed
+    lua_pushboolean( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::RemoveDebugHook ( lua_State* luaVM )
+{
+//  bool RemoveDebugHook ( string hookType, function callback )
+    EDebugHookType hookType; CLuaFunctionRef callBack;
+
+    CScriptArgReader argStream( luaVM );
+    argStream.ReadEnumString( hookType );
+    argStream.ReadFunction( callBack );
+    argStream.ReadFunctionComplete();
+
+    if ( !argStream.HasErrors() )
+    {
+        if ( g_pClientGame->GetDebugHookManager()->RemoveDebugHook( hookType, callBack ) )
+        {
+            lua_pushboolean( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom( luaVM, argStream.GetFullErrorMessage() );
+
+    // Failed
+    lua_pushboolean( luaVM, false );
+    return 1;
+}

@@ -184,6 +184,7 @@ int CLuaFunctionDefs::GetElementMatrix ( lua_State* luaVM )
 {
     CClientEntity* pEntity = NULL;
     bool bBadSyntax;
+
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pEntity );
     argStream.ReadBool ( bBadSyntax, true );
@@ -829,28 +830,23 @@ int CLuaFunctionDefs::GetElementRadius ( lua_State* luaVM )
 
 int CLuaFunctionDefs::IsElementAttached ( lua_State* luaVM )
 {
-    // Correct type?
-    if ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) )
+    // Verify the argument
+    CClientEntity* pEntity;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pEntity );
+
+    if ( !argStream.HasErrors ( ) )
     {
-        // Grab the element
-        CClientEntity* pEntity = lua_toelement ( luaVM, 1 );
-        if ( pEntity )
+        CClientEntity* pEntityAttachedTo = pEntity->GetAttachedTo();
+        if ( pEntityAttachedTo )
         {
-            CClientEntity* pEntityAttachedTo = pEntity->GetAttachedTo();
-            if ( pEntityAttachedTo )
-            {
-                if ( pEntityAttachedTo->IsEntityAttached ( pEntity ) )
-                {
-                    lua_pushboolean ( luaVM, true );
-                    return 1;
-                }
-            }
+            assert( pEntityAttachedTo->IsEntityAttached ( pEntity ) );
+            lua_pushboolean ( luaVM, true );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     // Failed
     lua_pushnil ( luaVM );
@@ -860,34 +856,29 @@ int CLuaFunctionDefs::IsElementAttached ( lua_State* luaVM )
 
 int CLuaFunctionDefs::GetElementAttachedTo ( lua_State* luaVM )
 {
-    // Check types
-    if ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) )
-    {
-        // Grab the element to check
-        CClientEntity* pEntity = lua_toelement ( luaVM, 1 );
-        CClientEntity* pEntityAttachedTo = NULL;
+    // Verify the argument
+    CClientEntity* pEntity;
 
-        // Valid?
-        if ( pEntity )
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pEntity );
+
+    if ( !argStream.HasErrors ( ) )
+    {
+        // Grab the enity attached to it
+        CClientEntity* pEntityAttachedTo = CStaticFunctionDefinitions::GetElementAttachedTo ( *pEntity );
+        if ( pEntityAttachedTo )
         {
-            // Grab the enity attached to it
-            CClientEntity* pEntityAttachedTo = CStaticFunctionDefinitions::GetElementAttachedTo ( *pEntity );
-            if ( pEntityAttachedTo )
-            {
-                lua_pushelement ( luaVM, pEntityAttachedTo );
-                return 1;
-            }
-            else
-            {
-                lua_pushboolean ( luaVM, false );
-                return 1;
-            }
+            lua_pushelement ( luaVM, pEntityAttachedTo );
+            return 1;
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
+        {
+            lua_pushboolean ( luaVM, false );
+            return 1;
+        }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     // Failed
     lua_pushnil ( luaVM );
@@ -897,41 +888,35 @@ int CLuaFunctionDefs::GetElementAttachedTo ( lua_State* luaVM )
 
 int CLuaFunctionDefs::GetAttachedElements ( lua_State* luaVM )
 {
-    // Grab our VM
-    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
-    if ( pLuaMain )
-    {
-        // Correct type?
-        if ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) )
-        {
-            // Grab the element
-            CClientEntity* pEntity = lua_toelement ( luaVM, 1 );
-            if ( pEntity )
-            {
-                // Create a new table
-                lua_newtable ( luaVM );
+    // Verify the argument
+    CClientEntity* pEntity;
 
-                // Add All Attached Elements
-                unsigned int uiIndex = 0;
-                list < CClientEntity* > ::const_iterator iter = pEntity->AttachedEntitiesBegin ();
-                for ( ; iter != pEntity->AttachedEntitiesEnd () ; iter++ )
-                {
-                    CClientEntity * pAttached = *iter;
-                    if ( pAttached->GetAttachedTo () == pEntity )
-                    {
-                        lua_pushnumber ( luaVM, ++uiIndex );
-                        lua_pushelement ( luaVM, *iter );
-                        lua_settable ( luaVM, -3 );
-                    }
-                }
-                return 1;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pEntity );
+
+    if ( !argStream.HasErrors ( ) )
+    {
+        // Grab our VM
+        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+        if ( pLuaMain )
+        {
+            // Create a new table
+            lua_newtable ( luaVM );
+
+            // Add All Attached Elements
+            for ( uint i = 0 ; i < pEntity->GetAttachedEntityCount() ; i++ )
+            {
+                CClientEntity * pAttached = pEntity->GetAttachedEntity( i );
+                assert ( pAttached->GetAttachedTo () == pEntity );
+                lua_pushnumber ( luaVM, i + 1 );
+                lua_pushelement ( luaVM, pAttached );
+                lua_settable ( luaVM, -3 );
             }
-            else
-                m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadType ( luaVM );
     }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     // Failed
     lua_pushboolean ( luaVM, false );

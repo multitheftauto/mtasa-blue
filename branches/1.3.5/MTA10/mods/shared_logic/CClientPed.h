@@ -246,6 +246,7 @@ public:
 
     bool                        IsDying                     ( void );
     bool                        IsDead                      ( void );
+    inline void                 SetIsDead                   ( bool bDead ) { m_bDead = bDead; };
     void                        Kill                        ( eWeaponType weaponType, unsigned char ucBodypart, bool bStealth = false, bool bSetDirectlyDead = false, AssocGroupId animGroup = 0, AnimationId animID = 15 );
     void                        StealthKill                 ( CClientPed * pPed );
     void                        BeHit                       ( CClientPed* pClientPedAttacker, ePedPieceTypes hitBodyPart, int hitBodySide, int weaponId );
@@ -454,7 +455,7 @@ protected:
     void                        Init                        ( CClientManager* pManager, unsigned long ulModelID, bool bIsLocalPlayer );
 
     void                        StreamedInPulse             ( bool bDoStandardPulses );
-    void                        ApplyStrafeFix              ( CControllerState& Current );
+    void                        ApplyControllerStateFixes   ( CControllerState& Current );
 
     void                        Interpolate                 ( void );
     void                        UpdateKeysync               ( bool bCleanup = false );
@@ -518,6 +519,7 @@ public:
     unsigned long               m_ulLastTimeBeganCrouch;
     unsigned long               m_ulLastTimeBeganStand;
     unsigned long               m_ulLastTimeMovedWhileCrouched;
+    unsigned long               m_ulLastTimePressedLeftOrRight;
     CModelInfo*                 m_pLoadedModelInfo;
     eWeaponSlot                 m_pOutOfVehicleWeaponSlot;
     float                       m_fBeginAimX;
@@ -552,6 +554,7 @@ public:
     bool                        m_bUsesCollision;
     float                       m_fHealth;
     float                       m_fArmor;
+    bool                        m_bDead;
     bool                        m_bWorldIgnored;
     float                       m_fCurrentRotation;
     float                       m_fMoveSpeed;

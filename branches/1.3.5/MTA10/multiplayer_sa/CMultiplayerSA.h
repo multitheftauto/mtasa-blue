@@ -52,6 +52,7 @@ public:
     void                        InitHooks_Weapons ( void );
     void                        InitHooks_Rendering ( void );
     void                        InitHooks_LicensePlate ( void );
+    void                        InitHooks_VehicleDamage ( void );
     void                        InitHooks_Direct3D ( void );
     void                        InitHooks_FixLineOfSightArgs ( void );
     CRemoteDataStorage *        CreateRemoteDataStorage     ();
@@ -94,6 +95,7 @@ public:
     void                        SetBlendAnimationHandler    ( BlendAnimationHandler * pHandler );
     void                        SetProcessCollisionHandler  ( ProcessCollisionHandler * pHandler );
     void                        SetVehicleCollisionHandler  ( VehicleCollisionHandler * pHandler );
+    void                        SetVehicleDamageHandler     ( VehicleDamageHandler * pHandler );
     void                        SetHeliKillHandler          ( HeliKillHandler * pHandler );
     void                        SetObjectDamageHandler      ( ObjectDamageHandler * pHandler );
     void                        SetObjectBreakHandler       ( ObjectBreakHandler * pHandler );

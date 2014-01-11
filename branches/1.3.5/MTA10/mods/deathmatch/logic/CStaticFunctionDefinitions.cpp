@@ -419,6 +419,11 @@ bool CStaticFunctionDefinitions::GetElementRotation ( CClientEntity& Entity, CVe
             Projectile.GetRotationDegrees ( vecRotation );
             break;
         }
+        case CCLIENTCAMERA:
+        {
+            Entity.GetRotationDegrees( vecRotation );
+            break;
+        }
         default: return false;
     }
 
@@ -572,10 +577,8 @@ CClientEntity* CStaticFunctionDefinitions::GetElementAttachedTo ( CClientEntity&
     CClientEntity* pEntityAttachedTo = Entity.GetAttachedTo();
     if ( pEntityAttachedTo )
     {        
-        if ( pEntityAttachedTo->IsEntityAttached ( &Entity ) )
-        {
-            return pEntityAttachedTo;
-        }
+        assert( pEntityAttachedTo->IsEntityAttached ( &Entity ) );
+        return pEntityAttachedTo;
     }
 
     return NULL;
@@ -1073,7 +1076,11 @@ bool CStaticFunctionDefinitions::SetElementRotation ( CClientEntity& Entity, con
             Projectile.SetRotationDegrees ( const_cast < CVector& > ( vecRotation ) );
             break;
         }
-
+        case CCLIENTCAMERA:
+        {
+            Entity.SetRotationDegrees( vecRotation );
+            break;
+        }
         default: return false;
     }
 
@@ -1132,6 +1139,11 @@ bool CStaticFunctionDefinitions::SetElementParent ( CClientEntity& Entity, CClie
 {
     if ( &Entity != &Parent && !Entity.IsMyChild ( &Parent, true ) )
     {
+        if ( Entity.GetType () == CCLIENTCAMERA || Parent.GetType () == CCLIENTCAMERA )
+        {
+            return false;
+        }
+        else
         if ( Entity.GetType () == CCLIENTGUI )
         {
             if ( Parent.GetType () == CCLIENTGUI ||
@@ -4255,8 +4267,7 @@ bool CStaticFunctionDefinitions::SetMarkerIcon ( CClientEntity& Entity, const ch
 bool CStaticFunctionDefinitions::GetCameraMatrix ( CVector& vecPosition, CVector& vecLookAt, float& fRoll, float& fFOV )
 {
     m_pCamera->GetPosition ( vecPosition );
-    m_pCamera->GetFixedTarget ( vecLookAt );
-    fRoll = m_pCamera->GetRoll ();
+    m_pCamera->GetFixedTarget ( vecLookAt, &fRoll );
     fFOV = m_pCamera->GetFOV ();
     return true;
 }
@@ -4277,7 +4288,7 @@ bool CStaticFunctionDefinitions::GetCameraInterior ( unsigned char & ucInterior 
 }
 
 
-bool CStaticFunctionDefinitions::SetCameraMatrix ( CVector& vecPosition, CVector* pvecLookAt, float fRoll, float fFOV )
+bool CStaticFunctionDefinitions::SetCameraMatrix ( const CVector& vecPosition, const CVector& vecLookAt, float fRoll, float fFOV )
 {
     if ( !m_pCamera->IsInFixedMode () )        
     {
@@ -4286,9 +4297,7 @@ bool CStaticFunctionDefinitions::SetCameraMatrix ( CVector& vecPosition, CVector
 
     // Put the camera there
     m_pCamera->SetPosition ( vecPosition );
-    if ( pvecLookAt )
-        m_pCamera->SetFixedTarget ( *pvecLookAt );
-    m_pCamera->SetRoll ( fRoll );
+    m_pCamera->SetFixedTarget ( vecLookAt, fRoll );
     m_pCamera->SetFOV ( fFOV );
     return true;
 }
@@ -4330,7 +4339,7 @@ bool CStaticFunctionDefinitions::SetCameraTarget ( CClientEntity * pEntity )
 
 bool CStaticFunctionDefinitions::SetCameraTarget ( const CVector& vecTarget )
 {
-    m_pCamera->SetTarget ( vecTarget );
+    m_pCamera->SetOrbitTarget ( vecTarget );
     return true;
 }
 
@@ -4419,9 +4428,12 @@ void CStaticFunctionDefinitions::DrawText ( float fLeft, float fTop,
                                  ID3DXFont* pDXFont,
                                  bool bPostGUI,
                                  bool bColorCoded,
-                                 bool bSubPixelPositioning )
+                                 bool bSubPixelPositioning,
+                                 float fRotation,
+                                 float fRotationCenterX,
+                                 float fRotationCenterY )
 {
-    g_pCore->GetGraphics ()->DrawTextQueued ( fLeft, fTop, fRight, fBottom, dwColor, szText, fScaleX, fScaleY, ulFormat, pDXFont, bPostGUI, bColorCoded, bSubPixelPositioning );
+    g_pCore->GetGraphics ()->DrawTextQueued ( fLeft, fTop, fRight, fBottom, dwColor, szText, fScaleX, fScaleY, ulFormat, pDXFont, bPostGUI, bColorCoded, bSubPixelPositioning, fRotation, fRotationCenterX, fRotationCenterY );
 }
 
 
@@ -5339,9 +5351,9 @@ void CStaticFunctionDefinitions::GUIEditSetMaxLength ( CClientEntity& Entity, un
 }
 
 
-void CStaticFunctionDefinitions::GUIEditSetCaratIndex ( CClientEntity& Entity, unsigned int iCarat )
+void CStaticFunctionDefinitions::GUIEditSetCaretIndex ( CClientEntity& Entity, unsigned int iCaret )
 {
-    RUN_CHILDREN GUIEditSetCaratIndex ( **iter, iCarat );
+    RUN_CHILDREN GUIEditSetCaretIndex ( **iter, iCaret );
 
     // Are we a CGUI element?
     if ( IS_GUI ( &Entity ) )
@@ -5352,15 +5364,15 @@ void CStaticFunctionDefinitions::GUIEditSetCaratIndex ( CClientEntity& Entity, u
         if ( IS_CGUIELEMENT_EDIT ( &GUIElement ) )
         {
             // Set its carat index
-            static_cast < CGUIEdit* > ( GUIElement.GetCGUIElement () ) -> SetCaratIndex ( iCarat );
+            static_cast < CGUIEdit* > ( GUIElement.GetCGUIElement () ) -> SetCaretIndex ( iCaret );
         }
     }
 }
 
 
-void CStaticFunctionDefinitions::GUIMemoSetCaratIndex ( CClientEntity& Entity, unsigned int iCarat )
+void CStaticFunctionDefinitions::GUIMemoSetCaretIndex ( CClientEntity& Entity, unsigned int iCaret )
 {
-    RUN_CHILDREN GUIMemoSetCaratIndex ( **iter, iCarat );
+    RUN_CHILDREN GUIMemoSetCaretIndex ( **iter, iCaret );
 
     // Are we a CGUI element?
     if ( IS_GUI ( &Entity ) )
@@ -5371,7 +5383,7 @@ void CStaticFunctionDefinitions::GUIMemoSetCaratIndex ( CClientEntity& Entity, u
         if ( IS_CGUIELEMENT_MEMO ( &GUIElement ) )
         {
             // Set its carat index
-            static_cast < CGUIMemo* > ( GUIElement.GetCGUIElement () ) -> SetCaratIndex ( iCarat );
+            static_cast < CGUIMemo* > ( GUIElement.GetCGUIElement () ) -> SetCaretIndex ( iCaret );
         }
     }
 }

@@ -27,8 +27,8 @@ public:
     void        SetReadOnly             ( bool bReadOnly );
     bool        IsReadOnly              ( void );
 
-    size_t      GetCaratIndex           ( void );
-    void        SetCaratIndex           ( size_t Index );
+    size_t      GetCaretIndex           ( void );
+    void        SetCaretIndex           ( size_t Index );
 
     float       GetVerticalScrollPosition   ( void );
     void        SetVerticalScrollPosition   ( float fPosition );

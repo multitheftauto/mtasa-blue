@@ -21,48 +21,56 @@
 
 int CLuaFunctionDefs::EngineLoadCOL ( lua_State* luaVM )
 {
-    // Grab the lua main and the resource belonging to this script
-    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
-    if ( pLuaMain )
+    SString strFile = "";
+    CScriptArgReader argStream ( luaVM );
+    // Grab the COL filename
+    argStream.ReadString ( strFile );
+
+    if ( !argStream.HasErrors ( ) )
     {
-        // Get the resource we belong to
-        CResource* pResource = pLuaMain->GetResource ();
-        if ( pResource )
+        // Grab the lua main and the resource belonging to this script
+        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+        if ( pLuaMain )
         {
-            // Grab the filename
-            SString strFile = ( lua_istype ( luaVM, 1, LUA_TSTRING ) ? lua_tostring ( luaVM, 1 ) : "" );
-            
-            SString strPath;
-            // Is this a legal filepath?
-            if ( CResourceManager::ParseResourcePathInput( strFile, pResource, strPath ) )
+            // Get the resource we belong to
+            CResource* pResource = pLuaMain->GetResource ();
+            if ( pResource )
             {
-                // Grab the resource root entity
-                CClientEntity* pRoot = pResource->GetResourceCOLModelRoot ();
-
-                // Create the col model
-                CClientColModel* pCol = new CClientColModel ( m_pManager, INVALID_ELEMENT_ID );
-
-                // Attempt loading the file
-                if ( pCol->LoadCol ( strPath ) )
+                
+                SString strPath;
+                // Is this a legal filepath?
+                if ( CResourceManager::ParseResourcePathInput( strFile, pResource, strPath ) )
                 {
-                    // Success. Make it a child of the resource collision root
-                    pCol->SetParent ( pRoot );
+                    // Grab the resource root entity
+                    CClientEntity* pRoot = pResource->GetResourceCOLModelRoot ();
 
-                    // Return the created col model
-                    lua_pushelement ( luaVM, pCol );
-                    return 1;
+                    // Create the col model
+                    CClientColModel* pCol = new CClientColModel ( m_pManager, INVALID_ELEMENT_ID );
+
+                    // Attempt loading the file
+                    if ( pCol->LoadCol ( strPath ) )
+                    {
+                        // Success. Make it a child of the resource collision root
+                        pCol->SetParent ( pRoot );
+
+                        // Return the created col model
+                        lua_pushelement ( luaVM, pCol );
+                        return 1;
+                    }
+                    else
+                    {
+                        // Delete it again. We failed
+                        delete pCol;
+                        argStream.SetCustomError( strFile, "Error loading COL" );
+                    }
                 }
                 else
-                {
-                    // Delete it again. We failed
-                    delete pCol;
-                    m_pScriptDebugging->LogCustom ( luaVM, SString ( "Load error @ '%s' [Unable to load '%s']", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *strFile ) );
-                }
+                    argStream.SetCustomError( strFile, "Bad file path" );
             }
-            else
-                m_pScriptDebugging->LogBadType ( luaVM );
         }
     }
+    if ( argStream.HasErrors ( ) )
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     // We failed for some reason
     lua_pushboolean ( luaVM, false );
@@ -72,48 +80,55 @@ int CLuaFunctionDefs::EngineLoadCOL ( lua_State* luaVM )
 
 int CLuaFunctionDefs::EngineLoadDFF ( lua_State* luaVM )
 {
-    // Grab our virtual machine and grab our resource from that.
-    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
-    if ( pLuaMain )
+    SString strFile = "";
+    CScriptArgReader argStream ( luaVM );
+    // Grab the DFF filename (model ID ignored after 1.3.1)
+    argStream.ReadString ( strFile );
+
+    if ( !argStream.HasErrors ( ) )
     {
-        // Get this resource
-        CResource* pResource = pLuaMain->GetResource ();
-        if ( pResource )
+        // Grab our virtual machine and grab our resource from that.
+        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+        if ( pLuaMain )
         {
-            // Grab the filename
-            SString strFile = ( lua_istype ( luaVM, 1, LUA_TSTRING ) ? lua_tostring ( luaVM, 1 ) : "" );
-            
-            SString strPath;
-            // Is this a legal filepath?
-            if ( CResourceManager::ParseResourcePathInput( strFile, pResource, strPath ) )
+            // Get this resource
+            CResource* pResource = pLuaMain->GetResource ();
+            if ( pResource )
             {
-                // Grab the resource root entity
-                CClientEntity* pRoot = pResource->GetResourceDFFRoot ();
-
-                // Create a DFF element
-                CClientDFF* pDFF = new CClientDFF ( m_pManager, INVALID_ELEMENT_ID );
-
-                // Try to load the DFF file
-                if ( pDFF->LoadDFF ( strPath ) )
+                SString strPath;
+                // Is this a legal filepath?
+                if ( CResourceManager::ParseResourcePathInput( strFile, pResource, strPath ) )
                 {
-                    // Success loading the file. Set parent to DFF root
-                    pDFF->SetParent ( pRoot );
+                    // Grab the resource root entity
+                    CClientEntity* pRoot = pResource->GetResourceDFFRoot ();
 
-                    // Return the DFF
-                    lua_pushelement ( luaVM, pDFF );
-                    return 1;
+                    // Create a DFF element
+                    CClientDFF* pDFF = new CClientDFF ( m_pManager, INVALID_ELEMENT_ID );
+
+                    // Try to load the DFF file
+                    if ( pDFF->LoadDFF ( strPath ) )
+                    {
+                        // Success loading the file. Set parent to DFF root
+                        pDFF->SetParent ( pRoot );
+
+                        // Return the DFF
+                        lua_pushelement ( luaVM, pDFF );
+                        return 1;
+                    }
+                    else
+                    {
+                        // Delete it again
+                        delete pDFF;
+                        argStream.SetCustomError( strFile, "Error loading DFF" );
+                    }
                 }
                 else
-                {
-                    // Delete it again
-                    delete pDFF;
-                    m_pScriptDebugging->LogCustom ( luaVM, SString ( "Load error @ '%s' [Unable to load '%s']", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *strFile ) );
-                }
+                    argStream.SetCustomError( strFile, "Bad file path" );
             }
-            else
-                m_pScriptDebugging->LogBadPointer ( luaVM, "string", 1 );
         }
     }
+    if ( argStream.HasErrors ( ) )
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     // We failed
     lua_pushboolean ( luaVM, false );

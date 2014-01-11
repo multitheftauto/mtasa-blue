@@ -140,6 +140,11 @@ int CLuaFunctionRef::ToInt ( void ) const
     return m_iFunction;
 }
 
+lua_State* CLuaFunctionRef::GetLuaVM ( void ) const
+{
+    return m_luaVM;
+}
+
 bool CLuaFunctionRef::operator==( const CLuaFunctionRef& other ) const
 {
     return m_luaVM == other.m_luaVM

@@ -256,6 +256,9 @@ void CMaterialLine3DBatcher::DrawBatch ( const CVector& vecCameraPos, uint* pBat
         m_pDevice->SetSamplerState( 0, D3DSAMP_ADDRESSV, m_CurrentTextureAddress );
     }
 
+    if ( m_CurrentTextureAddress == TADDRESS_BORDER )
+        m_pDevice->SetSamplerState ( 0, D3DSAMP_BORDERCOLOR, pMaterial->m_uiBorderColor );
+
     // Draw
     if ( CTextureItem* pTextureItem = DynamicCast < CTextureItem > ( pMaterial ) )
     {

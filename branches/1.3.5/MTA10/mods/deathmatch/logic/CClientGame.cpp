@@ -162,6 +162,8 @@ CClientGame::CClientGame ( bool bLocalPlay )
     m_pRootEntity = new CClientDummy ( NULL, INVALID_ELEMENT_ID, "root" );
     m_pRootEntity->MakeSystemEntity ();
 
+    m_pDebugHookManager = new CDebugHookManager ();
+
     // Movings objects manager
     m_pMovingObjectsManager = new CMovingObjectsManager ();
 
@@ -252,6 +254,7 @@ CClientGame::CClientGame ( bool bLocalPlay )
     g_pMultiplayer->SetBlendAnimationHandler ( CClientGame::StaticBlendAnimationHandler );
     g_pMultiplayer->SetProcessCollisionHandler ( CClientGame::StaticProcessCollisionHandler );
     g_pMultiplayer->SetVehicleCollisionHandler( CClientGame::StaticVehicleCollisionHandler );
+    g_pMultiplayer->SetVehicleDamageHandler ( CClientGame::StaticVehicleDamageHandler );
     g_pMultiplayer->SetHeliKillHandler ( CClientGame::StaticHeliKillHandler );
     g_pMultiplayer->SetObjectDamageHandler ( CClientGame::StaticObjectDamageHandler );
     g_pMultiplayer->SetObjectBreakHandler ( CClientGame::StaticObjectBreakHandler );
@@ -396,7 +399,10 @@ CClientGame::~CClientGame ( void )
     g_pMultiplayer->SetBlendAnimationHandler ( NULL );
     g_pMultiplayer->SetProcessCollisionHandler ( NULL );
     g_pMultiplayer->SetVehicleCollisionHandler( NULL );
+    g_pMultiplayer->SetVehicleDamageHandler( NULL );
     g_pMultiplayer->SetHeliKillHandler( NULL );
+    g_pMultiplayer->SetObjectDamageHandler ( NULL );
+    g_pMultiplayer->SetObjectBreakHandler ( NULL );
     g_pMultiplayer->SetWaterCannonHitHandler( NULL );
     g_pMultiplayer->SetGameObjectDestructHandler( NULL );
     g_pMultiplayer->SetGameVehicleDestructHandler( NULL );
@@ -457,6 +463,7 @@ CClientGame::~CClientGame ( void )
     SAFE_DELETE( m_pBigPacketTransferBox );
 
     SAFE_DELETE( m_pLocalServer );
+    SAFE_DELETE( m_pDebugHookManager );
 
     // Packet handler
     SAFE_DELETE( m_pPacketHandler );
@@ -1317,10 +1324,18 @@ void CClientGame::DoPulses2 ( bool bCalledFromIdle )
 
     if ( bDoStandardPulses )
     {
+        // Change to high precision so arguments in element data and events can
+        // be rounded to look more like what is expected
+        ChangeFloatPrecision( true );
+
         // Pulse the network interface
         TIMING_CHECKPOINT( "+NetPulse" );
         g_pNet->DoPulse ();
         TIMING_CHECKPOINT( "-NetPulse" );
+
+        // Change precision back, and check we are in low precision mode 4 sure
+        ChangeFloatPrecision( false );
+        assert( !IsHighFloatPrecision() );
     }
 
     m_pManager->DoPulse( bDoStandardPulses, bDoVehicleManagerPulse );
@@ -2765,6 +2780,7 @@ void CClientGame::AddBuiltInEvents ( void )
     m_Events.AddEvent ( "onClientTrailerDetach", "towedBy", NULL, false );
     m_Events.AddEvent ( "onClientVehicleExplode", "", NULL, false );
     m_Events.AddEvent ( "onClientVehicleCollision", "collidedelement, damageImpulseMag, bodypart, x, y, z, velX, velY, velZ", NULL, false );
+    m_Events.AddEvent ( "onClientVehicleDamage", "attacker, weapon, loss, x, y, z, tyre", NULL, false );
     m_Events.AddEvent ( "onClientVehicleNitroStateChange", "activated", NULL, false );
 
     // GUI events
@@ -3659,6 +3675,11 @@ bool CClientGame::StaticVehicleCollisionHandler ( CVehicleSAInterface* pCollidin
     return g_pClientGame->VehicleCollisionHandler( pCollidingVehicle, pCollidedVehicle, iModelIndex, fDamageImpulseMag, fCollidingDamageImpulseMag, usPieceType, vecCollisionPos, vecCollisionVelocity );
 }
 
+bool CClientGame::StaticVehicleDamageHandler ( CEntitySAInterface* pVehicleInterface, float fLoss, CEntitySAInterface* pAttackerInterface, eWeaponType weaponType, const CVector& vecDamagePos, uchar ucTyre )
+{
+    return g_pClientGame->VehicleDamageHandler ( pVehicleInterface, fLoss, pAttackerInterface, weaponType, vecDamagePos, ucTyre );
+}
+
 bool CClientGame::StaticHeliKillHandler ( CVehicleSAInterface* pHeliInterface, CEntitySAInterface* pHitInterface )
 {
     return g_pClientGame->HeliKillHandler ( pHeliInterface, pHitInterface );
@@ -4500,6 +4521,43 @@ bool CClientGame::HeliKillHandler ( CVehicleSAInterface* pHeliInterface, CEntity
         }
     }
     return true;
+}
+
+bool CClientGame::VehicleDamageHandler ( CEntitySAInterface* pVehicleInterface, float fLoss, CEntitySAInterface* pAttackerInterface, eWeaponType weaponType, const CVector& vecDamagePos, uchar ucTyre )
+{
+    bool bAllowDamage = true;
+    CClientVehicle* pClientVehicle = GetGameEntityXRefManager()->FindClientVehicle( pVehicleInterface );
+    if ( pClientVehicle )
+    {
+        CClientEntity* pClientAttacker = GetGameEntityXRefManager()->FindClientEntity( pAttackerInterface );
+
+        // Compose arguments
+        // attacker, weapon, loss, damagepos, tyreIdx
+        CLuaArguments Arguments;
+        if ( pClientAttacker )
+            Arguments.PushElement( pClientAttacker );
+        else
+            Arguments.PushNil ( );
+        if ( weaponType != WEAPONTYPE_INVALID )
+            Arguments.PushNumber ( weaponType );
+        else
+            Arguments.PushNil();
+        Arguments.PushNumber( fLoss );
+        Arguments.PushNumber( vecDamagePos.fX );
+        Arguments.PushNumber( vecDamagePos.fY );
+        Arguments.PushNumber( vecDamagePos.fZ );
+        if ( ucTyre != UCHAR_INVALID_INDEX )
+            Arguments.PushNumber( ucTyre );
+        else
+            Arguments.PushNil();
+
+        if ( !pClientVehicle->CallEvent( "onClientVehicleDamage", Arguments, true ) )
+        {
+            bAllowDamage = false;
+        }
+    }
+
+    return bAllowDamage;
 }
 
 bool CClientGame::ObjectDamageHandler ( CObjectSAInterface* pObjectInterface, float fLoss, CEntitySAInterface* pAttackerInterface )
@@ -6328,4 +6386,34 @@ void CClientGame::TellServerSomethingImportant( uint uiId, const SString& strMes
     }
 
     g_pNet->DeallocateNetBitStream( pBitStream );
+}
+
+
+//////////////////////////////////////////////////////////////////
+//
+// CClientGame::ChangeFloatPrecision
+//
+// Manage the change to high floating point precision
+//
+//////////////////////////////////////////////////////////////////
+void CClientGame::ChangeFloatPrecision ( bool bHigh )
+{
+    if ( bHigh )
+    {
+        // Switch to 53 bit floating point precision on the first call
+        if ( m_uiPrecisionCallDepth++ == 0 )
+            _controlfp( _PC_53, MCW_PC );
+    }
+    else
+    {
+        assert( m_uiPrecisionCallDepth != 0 );
+        // Switch back to 24 bit floating point precision on the last call
+        if ( --m_uiPrecisionCallDepth == 0 )
+            _controlfp( _PC_24, MCW_PC );
+    }
+}
+
+bool CClientGame::IsHighFloatPrecision ( void ) const
+{
+    return m_uiPrecisionCallDepth != 0;
 }

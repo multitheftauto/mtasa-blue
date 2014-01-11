@@ -158,6 +158,7 @@ namespace
                                          { "playSFX3D",                     "1.3.4" },
                                          { "getHeliBladeCollisionsEnabled",  "1.3.4-9.05764" },
                                          { "setHeliBladeCollisionsEnabled",  "1.3.4-9.05764" },
+                                         { "onClientVehicleDamage",         "1.3.5" },
                                         };
 
     SVersionItem serverFunctionInitList[] = {
@@ -297,8 +298,10 @@ namespace
                 { false, "setPedFrozen",                   "setElementFrozen" },
                 { false, "setVehicleFrozen",               "setElementFrozen" },
                 { false, "setObjectStatic",                "setElementFrozen" },
+                { false, "isPlayerDead",                   "isPedDead" },
                 // Edit
                 { false, "guiEditSetCaratIndex",           "guiEditSetCaretIndex" },
+                { false, "guiMemoSetCaratIndex",           "guiMemoSetCaretIndex" },
                 // XML
                 { false, "xmlNodeFindChild",               "xmlFindChild" },
             };

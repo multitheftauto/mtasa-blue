@@ -59,6 +59,7 @@
 #define MIN_PUSH_ANTISPAM_RATE 1500
 class CGameEntityXRefManager;
 class CClientModelCacheManager;
+class CDebugHookManager;
 
 struct SVehExtrapolateSettings
 {
@@ -283,6 +284,7 @@ public:
     inline CLatentTransferManager*      GetLatentTransferManager        ( void )        { return m_pLatentTransferManager; }
     inline CGameEntityXRefManager*      GetGameEntityXRefManager        ( void )        { return m_pGameEntityXRefManager; }
     inline CClientModelCacheManager*    GetModelCacheManager            ( void )        { return m_pModelCacheManager; }
+    inline CDebugHookManager*           GetDebugHookManager             ( void )        { return m_pDebugHookManager; }
 
     inline CElementDeleter*             GetElementDeleter               ( void )        { return &m_ElementDeleter; }
     inline CObjectRespawner*            GetObjectRespawner              ( void )        { return &m_ObjectRespawner; }
@@ -416,6 +418,8 @@ public:
     void                                OutputServerInfo                ( void );
     bool                                IsUsingExternalHTTPServer       ( void )                        { return m_ucHTTPDownloadType == HTTP_DOWNLOAD_ENABLED_URL; }
     void                                TellServerSomethingImportant    ( uint uiId, const SString& strMessage, bool bOnlyOnceForThisId );
+    void                                ChangeFloatPrecision            ( bool bHigh );
+    bool                                IsHighFloatPrecision            ( void ) const;
 
 private:
 
@@ -485,6 +489,7 @@ private:
     static void                         StaticBlendAnimationHandler     ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID, float fBlendDelta );
     static bool                         StaticProcessCollisionHandler   ( CEntitySAInterface* pThisInterface, CEntitySAInterface* pOtherInterface );
     static bool                         StaticVehicleCollisionHandler   ( CVehicleSAInterface* pThisInterface, CEntitySAInterface* pOtherInterface, int iModelIndex, float fDamageImpulseMag, float fCollidingDamageImpulseMag, uint16 usPieceType, CVector vecCollisionPos, CVector vecCollisionVelocity  );
+    static bool                         StaticVehicleDamageHandler      ( CEntitySAInterface* pVehicleInterface, float fLoss, CEntitySAInterface* pAttackerInterface, eWeaponType weaponType, const CVector& vecDamagePos, uchar ucTyre );
     static bool                         StaticHeliKillHandler           ( CVehicleSAInterface* pHeli, CEntitySAInterface* pHitInterface );
     static bool                         StaticObjectDamageHandler       ( CObjectSAInterface* pObjectInterface, float fLoss, CEntitySAInterface* pAttackerInterface );
     static bool                         StaticObjectBreakHandler        ( CObjectSAInterface* pObjectInterface, CEntitySAInterface* pAttackerInterface );
@@ -512,6 +517,7 @@ private:
     void                                BlendAnimationHandler           ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID, float fBlendDelta );
     bool                                ProcessCollisionHandler         ( CEntitySAInterface* pThisInterface, CEntitySAInterface* pOtherInterface );
     bool                                VehicleCollisionHandler         ( CVehicleSAInterface* pCollidingVehicle, CEntitySAInterface* pCollidedVehicle, int iModelIndex, float fDamageImpulseMag, float fCollidingDamageImpulseMag, uint16 usPieceType, CVector vecCollisionPos, CVector vecCollisionVelocity  );
+    bool                                VehicleDamageHandler            ( CEntitySAInterface* pVehicleInterface, float fLoss, CEntitySAInterface* pAttackerInterface, eWeaponType weaponType, const CVector& vecDamagePos, uchar ucTyre );
     bool                                HeliKillHandler                 ( CVehicleSAInterface* pHeli, CEntitySAInterface* pHitInterface );
     bool                                ObjectDamageHandler             ( CObjectSAInterface* pObjectInterface, float fLoss, CEntitySAInterface* pAttackerInterface );
     bool                                ObjectBreakHandler              ( CObjectSAInterface* pObjectInterface, CEntitySAInterface* pAttackerInterface );
@@ -606,6 +612,7 @@ private:
     bool                                m_bHudAreaNameDisabled;
     CGameEntityXRefManager*             m_pGameEntityXRefManager;
     CClientModelCacheManager*           m_pModelCacheManager;
+    CDebugHookManager*                  m_pDebugHookManager;
     CRemoteCalls*                       m_pRemoteCalls;
 
     // Revised facilities
@@ -756,6 +763,7 @@ private:
 
     bool                                m_bLastKeyWasEscapeCancelled;
     std::set < SString >                m_AllowKeyUpMap;
+    uint                                m_uiPrecisionCallDepth;
 };
 
 extern CClientGame* g_pClientGame;

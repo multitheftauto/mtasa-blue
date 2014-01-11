@@ -149,95 +149,54 @@ int CLuaFunctionDefs::ShowChat ( lua_State* luaVM )
 
 int CLuaFunctionDefs::OutputClientDebugString ( lua_State* luaVM )
 {
-    // Grab our VM
-    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
-    if ( pLuaMain )
+    SString strText = "";
+    unsigned int uiLevel = 3;
+    unsigned char ucRed = 255;
+    unsigned char ucGreen = 255;
+    unsigned char ucBlue = 255;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadString ( strText );
+    argStream.ReadNumber ( uiLevel, 3 );
+    argStream.ReadNumber ( ucRed, 255 );
+    argStream.ReadNumber ( ucGreen, 255 );
+    argStream.ReadNumber ( ucBlue, 255 );
+
+    // Too big level?
+    if ( uiLevel > 3 )
     {
-        // Default level and color
-        unsigned int uiLevel = 3;
-        int iRed = 255;
-        int iGreen = 255;
-        int iBlue = 255;
+        argStream.SetCustomError( "Bad level argument" );
+    }
 
-        // Grab the level and color stuff
-        int iArgument2 = lua_type ( luaVM, 2 );
-        int iArgument3 = lua_type ( luaVM, 3 );
-        int iArgument4 = lua_type ( luaVM, 4 );
-        int iArgument5 = lua_type ( luaVM, 5 );
-        if ( iArgument2 == LUA_TNUMBER || iArgument2 == LUA_TSTRING )
+    if ( !argStream.HasErrors ( ) )
+    {
+        // Grab our VM
+        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+        if ( pLuaMain )
         {
-            // Level 0? Own color can be specified
-            uiLevel = static_cast < unsigned int > ( lua_tonumber ( luaVM, 2 ) );
-            if ( uiLevel == 0 )
-            {
-                // level 0 can specify its own color, check if they have
-                if ( iArgument3 != LUA_TNONE )
-                {
-                    // if they have, check that they've specified 3 potential numbers
-                    if ( ( iArgument3 == LUA_TNUMBER || iArgument3 == LUA_TSTRING ) &&
-                        ( iArgument4 == LUA_TNUMBER || iArgument4 == LUA_TSTRING ) &&
-                        ( iArgument5 == LUA_TNUMBER || iArgument5 == LUA_TSTRING ) )
-                    {
-                        // read out the numbers
-                        iRed = static_cast < unsigned int> ( lua_tonumber ( luaVM, 3 ) );
-                        iGreen = static_cast < unsigned int> ( lua_tonumber ( luaVM, 4 ) );
-                        iBlue = static_cast < unsigned int> ( lua_tonumber ( luaVM, 5 ) );
-
-                        // check they're in range
-                        if ( iRed > 255 || iRed < 0 ) 
-                            m_pScriptDebugging->LogWarning ( luaVM, "Specify a red value between 0 and 255" );
-                        else if ( iGreen > 255 || iGreen < 0 )
-                            m_pScriptDebugging->LogWarning ( luaVM, "Specify a green value between 0 and 255" );
-                        else if ( iBlue >  255 || iBlue <  0 )
-                            m_pScriptDebugging->LogWarning ( luaVM, "Specify a blue value between 0 and 255" );
-                    }
-                    else
-                    {
-                        // specified something as the 3rd argument, but it can't be a number
-                        m_pScriptDebugging->LogBadType ( luaVM );
-                    }
-                } // didn't spec a color
-            } // wasn't level 0
-
-            // Too big level?
-            if ( uiLevel > 3 )
-            {
-                m_pScriptDebugging->LogWarning ( luaVM, "Bad level argument sent to %s (0-3)", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ) );
-
-                lua_pushboolean ( luaVM, false );
-                return 1;
-            }
-        }
-
-        // Valid string?
-        if ( lua_type ( luaVM, 1 ) != LUA_TNONE )
-        {
-            // Output it
-            const char* szString = lua_makestring ( luaVM, 1 );
             if ( uiLevel == 1 )
             {
-                m_pScriptDebugging->LogError ( luaVM, "%s", szString );
+                m_pScriptDebugging->LogError ( luaVM, "%s", strText.c_str ( ) );
             }
             else if ( uiLevel == 2 )
             {
-                m_pScriptDebugging->LogWarning ( luaVM, "%s", szString );
+                m_pScriptDebugging->LogWarning ( luaVM, "%s", strText.c_str ( ) );
             }
             else if ( uiLevel == 3 )
             {
-                m_pScriptDebugging->LogInformation ( luaVM, "%s", szString );
+                m_pScriptDebugging->LogInformation ( luaVM, "%s", strText.c_str ( ) );
             }
             else if ( uiLevel == 0 )
             {
-                m_pScriptDebugging->LogCustom ( luaVM, iRed, iGreen, iBlue, "%s", szString );
+                m_pScriptDebugging->LogCustom ( luaVM, ucRed, ucGreen, ucBlue, "%s", strText.c_str ( ) );
             }
 
             // Success
             lua_pushboolean ( luaVM, true );
             return 1;
         }
-        else
-            m_pScriptDebugging->LogBadType ( luaVM );
     }
+    if ( argStream.HasErrors ( ) )
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     // Failed
     lua_pushboolean ( luaVM, false );

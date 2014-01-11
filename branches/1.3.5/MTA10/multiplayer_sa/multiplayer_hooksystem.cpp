@@ -60,3 +60,12 @@ BYTE * CreateJump ( DWORD dwFrom, DWORD dwTo, BYTE * ByteArray )
     return ByteArray;
 }
 
+////////////////////////////////////////////////////////////////////
+
+VOID HookCheckOriginalByte( DWORD dwInstallAddress, uchar ucExpectedValue )
+{
+    uchar ucValue = *(uchar*)dwInstallAddress;
+    dassert( ucValue == ucExpectedValue );
+    if ( ucValue != ucExpectedValue )
+        AddReportLog( 8423, SString( "HookCheckOriginalByte failed at %08x - Got %02x - expected %02x", dwInstallAddress, ucValue, ucExpectedValue ) );
+}

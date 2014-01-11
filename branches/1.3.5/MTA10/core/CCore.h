@@ -54,7 +54,7 @@ class CCore;
 #include <dinput.h>
 
 #define BLUE_VERSION_STRING     "Multi Theft Auto v" MTA_DM_BUILDTAG_LONG
-#define BLUE_COPYRIGHT_STRING    _td("Copyright (C) 2003 - 2013 Multi Theft Auto")
+#define BLUE_COPYRIGHT_STRING    _td("Copyright (C) 2003 - 2014 Multi Theft Auto")
 
 // Configuration file path (relative to Grand Theft Auto directory)
 #define MTA_CONFIG_PATH             "mta/coreconfig.xml"
@@ -164,6 +164,7 @@ public:
     static void             ErrorMessageBoxCallBack         ( void* pData, uint uiButton );
     bool                    IsOfflineMod                    ( void ) { return m_bIsOfflineMod; }
     const char *            GetModInstallRoot               ( const char * szModName );
+    bool                    CheckDiskSpace                  ( uint uiResourcesPathMinMB = 10, uint uiDataPathMinMB = 10 );
 
 
     // Subsystems

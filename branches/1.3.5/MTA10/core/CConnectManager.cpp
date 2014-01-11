@@ -112,6 +112,10 @@ bool CConnectManager::Connect ( const char* szHost, unsigned short usPort, const
         return false;
     }
 
+    // No connect if disk space is low
+    if ( !CCore::GetSingleton ().CheckDiskSpace () )
+        return false;
+
     // Set our packet handler
     pNet->RegisterPacketHandler ( CConnectManager::StaticProcessPacket );
 

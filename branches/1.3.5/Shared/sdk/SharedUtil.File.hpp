@@ -13,6 +13,8 @@
 #ifdef WIN32
     #include "shellapi.h"
     #include "shlobj.h"
+    #include <shlwapi.h>
+    #pragma comment(lib, "Shlwapi.lib")
 #else
     #include <dirent.h>
     #include <sys/stat.h>
@@ -386,6 +388,43 @@ SString SharedUtil::GetLaunchFilename( void )
 {
     return ExtractFilename( GetLaunchPathFilename() );
 }
+
+// Get drive root from path
+SString SharedUtil::GetPathDriveName( const SString& strPath )
+{
+    wchar_t szDrive[4] = L"";
+    int iDriveNumber = PathGetDriveNumberW( FromUTF8( strPath ) );
+    if ( iDriveNumber > -1 )
+        PathBuildRootW( szDrive, iDriveNumber );
+    return ToUTF8( szDrive );
+}
+
+// Get drive free bytes available to the current user
+uint SharedUtil::GetPathFreeSpaceMB( const SString& strPath )
+{
+    SString strDrive = GetPathDriveName( strPath );
+    if ( !strDrive.empty() )
+    {
+        ULARGE_INTEGER llUserFreeBytesAvailable;
+        if ( GetDiskFreeSpaceExW( FromUTF8( strDrive ), &llUserFreeBytesAvailable, NULL, NULL ) )
+        {
+            llUserFreeBytesAvailable.QuadPart /= 1048576UL;
+            if ( llUserFreeBytesAvailable.HighPart == 0 )
+                return llUserFreeBytesAvailable.LowPart;
+        }
+    }
+    return -1;
+}
+
+SString SharedUtil::GetDriveNameWithNotEnoughSpace( uint uiResourcesPathMinMB, uint uiDataPathMinMB )
+{
+    if ( GetPathFreeSpaceMB( GetMTASABaseDir() ) < uiResourcesPathMinMB )
+        return GetPathDriveName( GetMTASABaseDir() );
+    if ( GetPathFreeSpaceMB( GetSystemCommonAppDataPath() ) < uiDataPathMinMB )
+        return GetPathDriveName( GetSystemCommonAppDataPath() );
+   return ""; 
+}
+
 
 #endif  // #ifdef MTA_CLIENT
 #endif  // #ifdef WIN_32

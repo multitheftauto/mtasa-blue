@@ -16,6 +16,9 @@ public:
     virtual void                AddEntityXRef                       ( CClientEntity* pEntity, CEntity* pEntitySA ) = 0;
     virtual void                RemoveEntityXRef                    ( CClientEntity* pEntity, CEntity* pEntitySA ) = 0;
     virtual CClientEntity*      FindClientEntity                    ( CEntitySAInterface* pEntitySAInterface ) = 0;
+    virtual CClientObject*      FindClientObject                    ( CEntitySAInterface* pObjectSAInterface ) = 0;
+    virtual CClientPed*         FindClientPed                       ( CEntitySAInterface* pPedSAInterface ) = 0;
+    virtual CClientVehicle*     FindClientVehicle                   ( CEntitySAInterface* pVehicleSAInterface ) = 0;
     virtual CClientEntity*      FindClientEntity                    ( CEntity* pEntitySA ) = 0;
     virtual CClientObject*      FindClientObject                    ( CEntity* pObjectSA ) = 0;
     virtual CClientPed*         FindClientPed                       ( CEntity* pPedSA ) = 0;

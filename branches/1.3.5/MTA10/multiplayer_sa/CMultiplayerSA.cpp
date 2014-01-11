@@ -1392,6 +1392,7 @@ void CMultiplayerSA::InitHooks()
     InitHooks_LicensePlate ();
     InitHooks_Direct3D();
     InitHooks_FixLineOfSightArgs();
+    InitHooks_VehicleDamage();
 }
 
 
@@ -2087,6 +2088,7 @@ void CMultiplayerSA::SetVehicleCollisionHandler ( VehicleCollisionHandler * pHan
 {
     m_pVehicleCollisionHandler = pHandler;
 }
+
 
 void CMultiplayerSA::SetHeliKillHandler ( HeliKillHandler * pHandler )
 {
@@ -5486,13 +5488,16 @@ void _cdecl SaveVehColors ( DWORD dwThis )
     {
         pVehicle->GetColor ( &vehColors[0], &vehColors[1], &vehColors[2], &vehColors[3], 0 );
 
-        // 0xFF00FF and 0x00FFFF both result in black for some reason
+        // Some colors result in black for some reason
         for ( uint i = 0 ; i < NUMELMS( vehColors ) ; i++ )
         {
-            if ( vehColors[i] == 0xFF00FF )
-                vehColors[i] = 0xFF01FF;
-            if ( vehColors[i] == 0x00FFFF )
-                vehColors[i] = 0x01FFFF;
+            const SColor color = vehColors[i];
+            if ( color == 0xFF00FF
+              || color == 0x00FFFF
+              || color == 0xFF00AF
+              || color == 0xFFAF00
+              || color == 0xFF3C00 )
+                vehColors[i].ulARGB |= 0x010101;
         }
     }
 }
@@ -6083,19 +6088,23 @@ IsOnScreen_IsObject:
     }
 }
 CVehicleSAInterface * pCollisionVehicle = NULL;
-void TriggerVehicleDamageEvent ( )
+void TriggerVehicleCollisionEvent ( )
 {
+
     if ( pCollisionVehicle )
     {
         CEntitySAInterface * pEntity = pCollisionVehicle->m_pCollidedEntity;
         if ( pEntity )
         {
+        //OutputDebugLine( SString( "TriggerVehicleCollisionEvent:  pEntity:%08x"
+        //                , pEntity
+        //                ));
             // Not handled because it triggers too much
             //if ( pEntity->nType != ENTITY_TYPE_BUILDING )
             {
                 if ( m_pVehicleCollisionHandler )
                 {
-                    TIMING_CHECKPOINT( "+TriggerVehDamEvent" );
+                    TIMING_CHECKPOINT( "+TriggerVehColEvent" );
                     if ( pEntity->nType == ENTITY_TYPE_VEHICLE )
                     {
                         CVehicleSAInterface * pInterface = static_cast < CVehicleSAInterface* > ( pEntity );
@@ -6103,10 +6112,12 @@ void TriggerVehicleDamageEvent ( )
                     }
                     else
                     {
-                        m_pVehicleCollisionHandler ( pCollisionVehicle, pEntity, pEntity->m_nModelIndex, pCollisionVehicle->m_fDamageImpulseMagnitude, 0.0f, pCollisionVehicle->m_usPieceType, pCollisionVehicle->m_vecCollisionPosition, pCollisionVehicle->m_vecCollisionImpactVelocity );
+                        m_pVehicleCollisionHandler ( pCollisionVehicle, pEntity, pEntity->m_nModelIndex, pCollisionVehicle->m_fDamageImpulseMagnitude, 0.0f,                                  pCollisionVehicle->m_usPieceType, pCollisionVehicle->m_vecCollisionPosition, pCollisionVehicle->m_vecCollisionImpactVelocity );
                     }
-                    TIMING_CHECKPOINT( "-TriggerVehDamEvent" );
+                    TIMING_CHECKPOINT( "-TriggerVehColEvent" );
                 }
+
+
             }
         }
     }
@@ -6122,9 +6133,15 @@ void _declspec(naked) HOOK_CEventVehicleDamageCollision ( )
     _asm
     {
         pushad
+        lea edx, [esp+32+4*3]
+        mov eax, dword ptr[edx]
+        cmp eax, 0
+        jz lp1
+        mov eax, dword ptr[edx]
+lp1:
         mov pCollisionVehicle, ecx
     }
-    TriggerVehicleDamageEvent ( );
+    TriggerVehicleCollisionEvent ( );
     
     // do the replaced code and return back as if nothing happened.
     _asm
@@ -6148,7 +6165,7 @@ void _declspec(naked) HOOK_CEventVehicleDamageCollision_Plane ( )
         pushad
         mov pCollisionVehicle, ecx
     }
-    TriggerVehicleDamageEvent ( );
+    TriggerVehicleCollisionEvent ( );
 
     // do the replaced code and return back as if nothing happened.
     _asm
@@ -6171,7 +6188,7 @@ void _declspec(naked) HOOK_CEventVehicleDamageCollision_Bike ( )
         pushad
         mov pCollisionVehicle, ecx
     }
-    TriggerVehicleDamageEvent ( );
+    TriggerVehicleCollisionEvent ( );
 
     // do the replaced code and return back as if nothing happened.
     _asm

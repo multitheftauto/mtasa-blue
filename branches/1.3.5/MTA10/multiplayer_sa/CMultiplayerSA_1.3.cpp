@@ -91,6 +91,9 @@ DWORD RETURN_CWorld_RemoveFallenPeds_Cancel             =   0x565E6F;
 #define HOOKPOS_CVehicleModelInterface_SetClump             0x4C9606
 DWORD RETURN_CVehicleModelInterface_SetClump            =   0x4C9611;
 
+#define HOOKPOS_CBoat_ApplyDamage                           0x6F1C32
+DWORD RETURN_CBoat_ApplyDamage                          =   0x6F1C3E;
+
 void HOOK_CVehicle_ProcessStuff_TestSirenTypeSingle ( );
 void HOOK_CVehicle_ProcessStuff_PostPushSirenPositionSingle ( );
 void HOOK_CVehicle_ProcessStuff_TestSirenTypeDual ( );
@@ -114,6 +117,7 @@ void HOOK_CTaskSimpleJetpack_ProcessInputFixFPS2 ( );
 void HOOK_CObject_PreRender ( );
 void HOOK_CWorld_RemoveFallenPeds ( );
 void HOOK_CVehicleModelInterface_SetClump ( );
+void HOOK_CBoat_ApplyDamage ( );
 
 void CMultiplayerSA::Init_13 ( void )
 {
@@ -155,6 +159,8 @@ void CMultiplayerSA::InitHooks_13 ( void )
     HookInstall ( HOOKPOS_CWorld_RemoveFallenPeds, (DWORD)HOOK_CWorld_RemoveFallenPeds, 6 );
 
     HookInstall ( HOOKPOS_CVehicleModelInterface_SetClump, (DWORD)HOOK_CVehicleModelInterface_SetClump, 7 );
+
+    HookInstall ( HOOKPOS_CBoat_ApplyDamage, (DWORD)HOOK_CBoat_ApplyDamage, 12 );
     
     InitHooks_ClothesSpeedUp ();
     EnableHooks_ClothesMemFix ( true );
@@ -1422,5 +1428,25 @@ void _declspec(naked) HOOK_CVehicleModelInterface_SetClump ( )
         mov ecx, esi
         mov dword ptr [esp+14h], 0FFFFFFFFh
         jmp RETURN_CVehicleModelInterface_SetClump
+    }
+}
+
+void _declspec(naked) HOOK_CBoat_ApplyDamage ()
+{
+    _asm
+    {
+        push eax
+        // Check if vehicleFlags->bCanBeDamaged is set
+        mov  eax, [esi+42Ah]
+        test eax, 20h
+        jz   boatCanBeDamaged
+        fst  dword ptr [esi+4C0h]
+    }
+
+boatCanBeDamaged:
+    _asm
+    {
+        pop eax
+        jmp RETURN_CBoat_ApplyDamage
     }
 }

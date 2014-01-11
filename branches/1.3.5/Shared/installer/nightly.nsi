@@ -85,7 +85,7 @@ Var ShowLastUsed
     !endif
     !define VI_PRODUCT_NAME "MTA San Andreas"
     !define VI_COMPANY_NAME "Multi Theft Auto"
-    !define VI_LEGAL_COPYRIGHT "(C) 2003 - 2013 Multi Theft Auto"
+    !define VI_LEGAL_COPYRIGHT "(C) 2003 - 2014 Multi Theft Auto"
     !ifndef LIGHTBUILD
         !define VI_FILE_DESCRIPTION "Multi Theft Auto Full Installer"
     !else
@@ -859,11 +859,14 @@ Function un.OnUnInstFailed
 FunctionEnd
 
  
+LangString UNINST_REQUEST_NOTE ${LANG_ENGLISH}	"Uninstalling before update?\
+$\r$\nIt is not necessary to uninstall before installing a new version of MTA:SA\
+$\r$\nRun the new installer to upgrade and preserve your settings."
+
 Function un.onInit
 	Call un.DoRightsElevation
 	SetShellVarContext all
-
-		MessageBox MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2 "Are you sure you want to completely remove $(^Name) and all of its components?" IDYES +2
+		MessageBox MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2 "$(UNINST_REQUEST_NOTE)$\r$\n$\r$\n$\r$\n$(UNINST_REQUEST)" IDYES +2
 		Abort
 FunctionEnd
 
