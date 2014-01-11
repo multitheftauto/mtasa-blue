@@ -2247,7 +2247,8 @@ void CClientVehicle::StreamedInPulse ( void )
             RemoveTargetRotation ();
         }
 
-        if ( GetVehicleType () == CLIENTVEHICLE_TRAIN )
+        CClientPed* pControllingPed = GetControllingPlayer ();
+        if ( GetVehicleType () == CLIENTVEHICLE_TRAIN && ( !pControllingPed || pControllingPed->GetType () != CCLIENTPLAYER ) )
         {
             // Apply chain engine's speed on its carriages (if chain engine isn't streamed in)
             CClientVehicle* pChainEngine = GetChainEngine ();
@@ -2266,11 +2267,10 @@ void CClientVehicle::StreamedInPulse ( void )
             CClientVehicle* pCarriage = this;
             while ( pCarriage->m_pNextLink && !pCarriage->m_pNextLink->IsStreamedIn () )
             {
-                //float fCarriageDistance = pCarriage->GetDistanceToNextCarriage ();
                 float fNewTrainPosition = pCarriage->GetTrainPosition () + fCarriageDistance;
                 pCarriage->m_pNextLink->SetTrainPosition ( fNewTrainPosition );
                 g_pGame->GetWorld ()->FindWorldPositionForRailTrackPosition ( fNewTrainPosition, GetTrainTrack (), &vecPosition );
-                pCarriage->m_pNextLink->UpdateStreamPosition ( vecPosition );
+                pCarriage->m_pNextLink->UpdatePedPositions ( vecPosition );
 
                 pCarriage = pCarriage->m_pNextLink;
             }
@@ -2278,11 +2278,10 @@ void CClientVehicle::StreamedInPulse ( void )
             pCarriage = this;
             while ( pCarriage->m_pPreviousLink && !pCarriage->m_pPreviousLink->IsStreamedIn () )
             {
-                //float fCarriageDistance = pCarriage->GetDistanceToNextCarriage ();
                 float fNewTrainPosition = pCarriage->GetTrainPosition () - fCarriageDistance;
                 pCarriage->m_pPreviousLink->SetTrainPosition ( fNewTrainPosition );
                 g_pGame->GetWorld ()->FindWorldPositionForRailTrackPosition ( fNewTrainPosition, GetTrainTrack (), &vecPosition );
-                pCarriage->m_pPreviousLink->UpdateStreamPosition ( vecPosition );
+                pCarriage->m_pPreviousLink->UpdatePedPositions ( vecPosition );
 
                 pCarriage = pCarriage->m_pPreviousLink;
             }
