@@ -33,7 +33,7 @@ static const SFixedArray < SScriptBindableKey, 107 > g_bkKeys =
     { "num_sep" }, { "num_sub" }, { "num_dec" }, { "num_div" }, { "F1" }, { "F2" }, 
     { "F3" }, { "F4" }, { "F5" }, { "F6" }, { "F7" }, /* { "F8" },  * Used for console */
     { "F9" }, { "F10" }, { "F11" }, { "F12" }, { "scroll" }, { ";" }, { "=" }, { "," }, { "-" },
-    { "." }, { "/" }, { "'" }, { "[" }, { "\\" }, { "]" },  { "#" },
+    { "." }, { "/" }, { "'" }, { "[" }, { "\\" }, { "]" },  { "#" },  { "num_enter" },
     { "" }
 } };
 
