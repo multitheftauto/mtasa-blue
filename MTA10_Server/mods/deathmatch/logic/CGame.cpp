@@ -2638,6 +2638,11 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
                                         {
                                             unsigned char ucSeat = Packet.GetSeat ();
                                             unsigned char ucDoor = Packet.GetDoor();
+
+                                            // Temp fix: Disable driver seat for train carriages since the whole vehicle sync logic is based on the the player on the first seat being the vehicle syncer (Todo)
+                                            if ( pVehicle->GetVehicleType () == VEHICLE_TRAIN && ucSeat == 0 && pVehicle->GetTowedByVehicle () )
+                                                ucSeat++;
+
                                             // Going for driver?
                                             if ( ucSeat == 0 )
                                             {

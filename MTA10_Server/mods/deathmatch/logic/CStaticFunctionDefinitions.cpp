@@ -4026,7 +4026,8 @@ bool CStaticFunctionDefinitions::WarpPedIntoVehicle ( CPed* pPed, CVehicle* pVeh
     assert ( pVehicle );
 
     // Valid seat id for that vehicle?
-    if ( uiSeat <= pVehicle->GetMaxPassengers () )
+    // Temp fix: Disable driver seat for train carriages since the whole vehicle sync logic is based on the the player on the first seat being the vehicle syncer (Todo)
+    if ( uiSeat <= pVehicle->GetMaxPassengers () && ( pVehicle->GetVehicleType () != VEHICLE_TRAIN || !pVehicle->GetTowedByVehicle () ) )
     {
         if ( !pPed->IsDead () )
         {
