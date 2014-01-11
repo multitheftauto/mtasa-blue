@@ -125,10 +125,10 @@ void DirectX9Texture::loadFromMemory(const void* buffPtr, uint buffWidth, uint b
 		d_height	= (ushort)texdesc.Height;
 
 		// lock the D3D texture
-		D3DLOCKED_RECT	rect;
+		D3DLOCKED_RECT	rect = { 0, NULL };
 		hr = d_d3dtexture->LockRect(0, &rect, NULL, 0);
 
-		if (FAILED(hr))
+		if (FAILED(hr) || rect.pBits == NULL )
 		{
 			d_d3dtexture->Release();
 			d_d3dtexture = NULL;
