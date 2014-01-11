@@ -1297,7 +1297,7 @@ int CLuaResourceDefs::LoadString( lua_State* luaVM )
         if ( !g_pRealNetServer->DecryptScript( cpInBuffer, uiInSize, &cpBuffer, &uiSize, m_pResourceManager->GetResourceName( luaVM ) + "/loadstring" ) )
         {
             // Problems problems
-    #if MTA_DM_VERSION < 0x135 
+    #if MTA_DM_VERSION < 0x136 
             SString strMessage( "loadstring argument 1 is invalid and will not work in future versions. Please re-compile at http://luac.mtasa.com/", 0 ); 
             m_pScriptDebugging->LogCustom( luaVM, strMessage );
             // cpBuffer is always valid after call to DecryptScript
@@ -1376,7 +1376,7 @@ int CLuaResourceDefs::Load( lua_State* luaVM )
         if ( !g_pRealNetServer->DecryptScript( cpInBuffer, uiInSize, &cpBuffer, &uiSize, m_pResourceManager->GetResourceName( luaVM ) + "/load" ) )
         {
             // Problems problems
-    #if MTA_DM_VERSION < 0x135 
+    #if MTA_DM_VERSION < 0x136 
             SString strMessage( "loadstring argument 1 is invalid and will not work in future versions. Please re-compile at http://luac.mtasa.com/", 0 ); 
             m_pScriptDebugging->LogCustom( luaVM, strMessage );
             // cpBuffer is always valid after call to DecryptScript
