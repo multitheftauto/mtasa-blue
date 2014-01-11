@@ -494,11 +494,12 @@ void MixedReadMaterialString ( CScriptArgReader& argStream, CClientMaterial*& pM
                 SString strUniqueName = SString ( "%s*%s*%s", pParentResource->GetName (), pFileResource->GetName (), strMetaPath.c_str () ).Replace ( "\\", "/" );
                 pMaterialElement = g_pClientGame->GetManager ()->GetRenderElementManager ()->FindAutoTexture ( strPath, strUniqueName );
 
-                // Check if brand new
-                if ( pMaterialElement && !pMaterialElement->GetParent () )
+                if ( pMaterialElement )
                 {
-                    // Make it a child of the resource's file root ** CHECK  Should parent be pFileResource, and element added to pParentResource's ElementGroup? **
-                    pMaterialElement->SetParent ( pParentResource->GetResourceDynamicEntity() );
+                    // Check if brand new
+                    if ( !pMaterialElement->GetParent () )
+                        // Make it a child of the resource's file root ** CHECK  Should parent be pFileResource, and element added to pParentResource's ElementGroup? **
+                        pMaterialElement->SetParent ( pParentResource->GetResourceDynamicEntity() );
                 }
                 else
                     argStream.SetCustomError( strFilePath, "Error loading image" );
