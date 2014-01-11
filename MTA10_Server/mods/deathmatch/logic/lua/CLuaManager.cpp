@@ -719,8 +719,8 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "sha256", CLuaFunctionDefinitions::Sha256 );
     CLuaCFunctions::AddFunction ( "teaEncode", CLuaFunctionDefinitions::TeaEncode );
     CLuaCFunctions::AddFunction ( "teaDecode", CLuaFunctionDefinitions::TeaDecode );
-    CLuaCFunctions::AddFunction ( "base64encode", CLuaFunctionDefinitions::Base64encode );
-    CLuaCFunctions::AddFunction ( "base64decode", CLuaFunctionDefinitions::Base64decode );
+    CLuaCFunctions::AddFunction ( "base64Encode", CLuaFunctionDefinitions::Base64encode );
+    CLuaCFunctions::AddFunction ( "base64Decode", CLuaFunctionDefinitions::Base64decode );
     CLuaCFunctions::AddFunction ( "getVersion", CLuaFunctionDefinitions::GetVersion );
     CLuaCFunctions::AddFunction ( "getNetworkUsageData", CLuaFunctionDefinitions::GetNetworkUsageData );
     CLuaCFunctions::AddFunction ( "getNetworkStats", CLuaFunctionDefinitions::GetNetworkStats );
