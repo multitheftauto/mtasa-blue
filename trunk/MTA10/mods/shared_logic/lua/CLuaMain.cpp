@@ -414,24 +414,25 @@ void CLuaMain::AddPlayerClass ( lua_State* luaVM )
     // TODO: Specialised functions
     //lua_classvariable ( luaVM, "nametagColor", CLuaFunctionDefs::SetPlayerNametagColor, CLuaOOPDefs::GetPlayerNametagColor );
     
-    // TODO: These functions/variables only work for the localPlayer and
-    //       they don't require the first argument to to be self.
-    //lua_classfunction ( luaVM, "getMoney", "getPlayerMoney" );
-    //lua_classfunction ( luaVM, "setMoney", "setPlayerMoney" );
-    //lua_classfunction ( luaVM, "getWantedLevel", "getPlayerWantedLevel" );
-    //lua_classfunction ( luaVM, "isMapForced", "isPlayerMapForced" );
-    //lua_classfunction ( luaVM, "isMapVisible", "isPlayerMapVisible" );
-    //lua_classfunction ( luaVM, "giveMoney", "givePlayerMoney" );
-    //lua_classfunction ( luaVM, "takeMoney", "takePlayerMoney" );
-    //lua_classfunction ( luaVM, "showHudComponent", "showPlayerHudComponent" );
-    //lua_classfunction ( luaVM, "isHudComponentVisible", "isPlayerHudComponentVisible" );
-    //lua_classfunction ( luaVM, "getMapBoundingBox", "getPlayerMapBoundingBox" ); // TODO: work with some vector class
-    //
-    //lua_classvariable ( luaVM, "mapForced", NULL, "isPlayerMapForced" );
-    //lua_classvariable ( luaVM, "mapVisible", NULL, "isPlayerMapVisible" );
-    //lua_classvariable ( luaVM, "money", "setPlayerMoney", "getPlayerMoney" );
-    //lua_classvariable ( luaVM, "wantedLevel", NULL, "getPlayerWantedLevel" );
-    //
+    // These functions/variables only work for the localPlayer
+    lua_classfunction ( luaVM, "getMoney", "getPlayerMoney" );
+    lua_classfunction ( luaVM, "getSerial", "getPlayerSerial" );
+    lua_classfunction ( luaVM, "setMoney", "setPlayerMoney" );
+    lua_classfunction ( luaVM, "getWantedLevel", "getPlayerWantedLevel" );
+    lua_classfunction ( luaVM, "isMapForced", "isPlayerMapForced" );
+    lua_classfunction ( luaVM, "isMapVisible", "isPlayerMapVisible" );
+    lua_classfunction ( luaVM, "giveMoney", "givePlayerMoney" );
+    lua_classfunction ( luaVM, "takeMoney", "takePlayerMoney" );
+    lua_classfunction ( luaVM, "showHudComponent", "showPlayerHudComponent" );
+    lua_classfunction ( luaVM, "isHudComponentVisible", "isPlayerHudComponentVisible" );
+    lua_classfunction ( luaVM, "getMapBoundingBox", "getPlayerMapBoundingBox" ); // TODO: work with some vector class
+    
+    lua_classvariable ( luaVM, "mapForced", NULL, "isPlayerMapForced" );
+    lua_classvariable ( luaVM, "mapVisible", NULL, "isPlayerMapVisible" );
+    lua_classvariable ( luaVM, "money", "setPlayerMoney", "getPlayerMoney" );
+    lua_classvariable ( luaVM, "serial", NULL, "getPlayerSerial" );
+    lua_classvariable ( luaVM, "wantedLevel", NULL, "getPlayerWantedLevel" );
+    
     // Specialised local only:
     //lua_classvariable ( luaVM, "mapBoundingBox", NULL, "getPlayerMapBoundingBox" );
 
@@ -441,6 +442,25 @@ void CLuaMain::AddPlayerClass ( lua_State* luaVM )
 void CLuaMain::AddObjectClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
+    
+    lua_classfunction ( luaVM, "create", "createObject" );
+    lua_classfunction ( luaVM, "move", "moveObject" );
+    lua_classfunction ( luaVM, "stop", "stopObject" );
+    lua_classfunction ( luaVM, "break", "breakObject" );
+    lua_classfunction ( luaVM, "respawn", "respawnObject" );
+    lua_classfunction ( luaVM, "toggleObjectRespawn", "toggleObjectRespawn" );
+    
+    lua_classfunction ( luaVM, "getScale", "getObjectScale" );
+    lua_classfunction ( luaVM, "isBreakable", "isObjectBreakable" );
+    lua_classfunction ( luaVM, "getMass", "getObjectMass" );
+
+    lua_classfunction ( luaVM, "setScale", "setObjectScale" );
+    lua_classfunction ( luaVM, "setBreakable", "setObjectBreakable" );
+    lua_classfunction ( luaVM, "setMass", "setObjectMass" );
+    
+    lua_classvariable ( luaVM, "scale", "setObjectScale", "getObjectScale" );
+    lua_classvariable ( luaVM, "breakable", "setObjectBreakable", "isObjectBreakable" );
+    lua_classvariable ( luaVM, "mass", "setObjectMass", "getObjectMass" );
 
     lua_registerclass ( luaVM, "Object", "Element" );
 }
@@ -462,7 +482,19 @@ void CLuaMain::AddBlipClass( lua_State* luaVM )
 void CLuaMain::AddPickupClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
-
+    
+    lua_classfunction ( luaVM, "create", "createPickup" );
+    lua_classfunction ( luaVM, "getAmmo", "getPickupAmmo" );
+    lua_classfunction ( luaVM, "getAmount", "getPickupAmount" );
+    lua_classfunction ( luaVM, "getWeapon", "getPickupWeapon" );
+    lua_classfunction ( luaVM, "getType", "getPickupType" );
+    lua_classfunction ( luaVM, "setType", "setPickupType" );
+    
+    lua_classvariable ( luaVM, "ammo", NULL, "getPickupAmmo" );
+    lua_classvariable ( luaVM, "amount", NULL, "getPickupAmount" );
+    lua_classvariable ( luaVM, "weapon", NULL, "getPickupWeapon" );
+    lua_classvariable ( luaVM, "type", "setPickupType", "getPickupType" );
+    
     lua_registerclass ( luaVM, "Pickup", "Element" );
 }
 
@@ -470,6 +502,17 @@ void CLuaMain::AddColShapeClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
 
+    lua_classfunction ( luaVM, "createCircle", "createColCircle" );
+    lua_classfunction ( luaVM, "createCuboid", "createColCuboid" );
+    lua_classfunction ( luaVM, "createRectangle", "createColRectangle" );
+    lua_classfunction ( luaVM, "createSphere", "createColSphere" );
+    lua_classfunction ( luaVM, "createTube", "createColTube" );
+    lua_classfunction ( luaVM, "createPolygon", "createColPolygon" );
+    lua_classfunction ( luaVM, "getElementsWithin", "getElementsWithinColShape" );
+    //lua_classfunction ( luaVM, "isElementWithin", "isElementWithinColShape" ); TODO: swap args around.
+    
+    lua_classvariable ( luaVM, "elementsWithin", NULL, "getElementsWithinColShape" );    
+    
     lua_registerclass ( luaVM, "ColShape", "Element" );
 }
 
@@ -477,6 +520,20 @@ void CLuaMain::AddProjectileClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
 
+    lua_classfunction ( luaVM, "create", "createProjectile" );
+    lua_classfunction ( luaVM, "getCreator", "getProjectileCreator" );
+    lua_classfunction ( luaVM, "getForce", "getProjectileForce" );
+    lua_classfunction ( luaVM, "getTarget", "getProjectileTarget" );
+    lua_classfunction ( luaVM, "getType", "getProjectileType" );
+    lua_classfunction ( luaVM, "getCounter", "getProjectileCounter" );
+    lua_classfunction ( luaVM, "setCounter", "setProjectileCounter" );
+    
+    lua_classvariable ( luaVM, "creator", NULL, "getProjectileCreator" );
+    lua_classvariable ( luaVM, "force", NULL, "getProjectileForce" );
+    lua_classvariable ( luaVM, "target", NULL, "getProjectileTarget" );
+    lua_classvariable ( luaVM, "type", NULL, "getProjectileType" );
+    lua_classvariable ( luaVM, "counter", "setProjectileCounter", "getProjectileCounter" );
+    
     lua_registerclass ( luaVM, "Projectile", "Element" );
 }
 
@@ -491,6 +548,18 @@ void CLuaMain::AddTeamClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
 
+    lua_classfunction ( luaVM, "create", "getTeamFromName" );
+    lua_classfunction ( luaVM, "getFromName", "getTeamFromName" );
+    lua_classfunction ( luaVM, "countPlayers", "countPlayersInTeam" );
+    lua_classfunction ( luaVM, "getFriendlyFire", "getTeamFriendlyFire" );
+    lua_classfunction ( luaVM, "getName", "getTeamName" );
+    lua_classfunction ( luaVM, "getColor", "getTeamColor" );  // TODO: work with color class
+    
+    lua_classvariable ( luaVM, "playerCount", NULL, "countPlayersInTeam" );
+    lua_classvariable ( luaVM, "friendlyFire", NULL, "getTeamFriendlyFire" );
+    lua_classvariable ( luaVM, "name", NULL, "getTeamName" );
+    lua_classvariable ( luaVM, "color", NULL, "getTeamColor" ); // TODO: work with color class
+    
     lua_registerclass ( luaVM, "Team", "Element" );
 }
 
