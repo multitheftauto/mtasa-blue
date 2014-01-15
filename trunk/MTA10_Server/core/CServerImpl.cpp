@@ -264,6 +264,12 @@ int CServerImpl::Run ( int iArgumentCount, char* szArguments [] )
                 move ( 0, 0 );
             refresh ( );
         }
+        else
+        {
+            int oldf = fcntl(STDIN_FILENO, F_GETFL, 0);
+            fcntl(STDIN_FILENO, F_SETFL, oldf | O_NONBLOCK);
+        }
+
 #endif
     }
 
@@ -596,17 +602,7 @@ void CServerImpl::HandleInput ( void )
     }
     else
     {
-        struct termios oldattr, newattr;
-        int oldf;
-        tcgetattr( STDIN_FILENO, &oldattr );
-        newattr = oldattr;
-        newattr.c_lflag &= ~( ICANON | ECHO );
-        tcsetattr( STDIN_FILENO, TCSANOW, &newattr );
-        oldf = fcntl(STDIN_FILENO, F_GETFL, 0);
-        fcntl(STDIN_FILENO, F_SETFL, oldf | O_NONBLOCK);
         iStdIn = getwchar();
-        tcsetattr( STDIN_FILENO, TCSANOW, &oldattr );
-        fcntl(STDIN_FILENO, F_SETFL, oldf);
 
         if ( iStdIn == -1 )
             iStdIn = 0;
