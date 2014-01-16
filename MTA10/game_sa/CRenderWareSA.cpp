@@ -207,10 +207,10 @@ RwTexDictionary * CRenderWareSA::ReadTXD ( const char *szTXD )
     // TXD header id: 0x16
     // find our txd chunk (dff loads textures, so correct loading order is: txd, dff)
     if ( RwStreamFindChunk ( streamTexture, 0x16, NULL, NULL ) == false )
-	{
-		RwStreamClose ( streamTexture, NULL );
+    {
+        RwStreamClose ( streamTexture, NULL );
         return NULL;
-	}
+    }
 
     // read the texture dictionary from our model (txd)
     RwTexDictionary *pTex = RwTexDictionaryGtaStreamRead ( streamTexture );
@@ -248,10 +248,10 @@ RpClump * CRenderWareSA::ReadDFF ( const char *szDFF, unsigned short usModelID, 
     // DFF header id: 0x10
     // find our dff chunk
     if ( RwStreamFindChunk ( streamModel, 0x10, NULL, NULL ) == false )
-	{
-		RwStreamClose ( streamModel, NULL );
+    {
+        RwStreamClose ( streamModel, NULL );
         return NULL;
-	}
+    }
 
     // rockstar's collision hack: set the global particle emitter to the modelinfo pointer of this model
     if ( bLoadEmbeddedCollisions )
