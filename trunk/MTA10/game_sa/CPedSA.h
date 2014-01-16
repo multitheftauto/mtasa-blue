@@ -107,6 +107,7 @@ class CPedIntelligenceSAInterface;
 #define FUNC_WarpPedIntoCar             0x4EF8B0
 #define FUNC_DetachPedFromEntity        0x5E7EC0
 #define FUNC_CPed_RemoveBodyPart        0x5f0140
+#define FUNC_PreRenderAfterTest         0x5E65A0
 
 #define VAR_LocalPlayer                 0x94AD28
 
@@ -386,6 +387,7 @@ public:
 
     CVector *           GetBonePosition ( eBone bone, CVector * vecPosition );
     CVector *           GetTransformedBonePosition ( eBone bone, CVector * vecPosition );
+    void                ApplySwimAndSlopeRotations ( void );
 
     bool                IsDucking ( void );
     void                SetDucking ( bool bDuck );
@@ -444,6 +446,8 @@ public:
     void                AddWeaponAudioEvent     ( EPedWeaponAudioEventType audioEventType );
 
     virtual int         GetCustomMoveAnim       ( void );
+
+    static void         StaticSetHooks          ( void );
 };
 
 #endif
