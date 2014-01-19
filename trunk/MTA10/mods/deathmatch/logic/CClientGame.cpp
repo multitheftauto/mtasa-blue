@@ -343,6 +343,9 @@ CClientGame::~CClientGame ( void )
     // if a vehicle is destroyed while it explodes.
     g_pGame->GetExplosionManager ()->RemoveAllExplosions ();
 
+    // Reset camera shaking
+    g_pGame->GetCamera ()->SetShakeForce ( 0.0f );
+
     // Stop playing the continious sounds
     // if the game was loaded. This is done by
     // playing these special IDS.

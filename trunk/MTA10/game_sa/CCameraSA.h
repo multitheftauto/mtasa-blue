@@ -446,6 +446,8 @@ public:
     BYTE                        GetCameraViewMode ( void );
     VOID                        SetCameraViewMode ( BYTE dwCamMode );
     void                        RestoreLastGoodState ( void );
+    void                        SetShakeForce ( float fShakeForce );
+    float                       GetShakeForce ( void );
 private:
     static unsigned long        FUNC_RwFrameGetLTM;
 };
