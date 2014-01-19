@@ -12783,16 +12783,24 @@ int CLuaFunctionDefinitions::GetPerformanceStats ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::PregFind ( lua_State* luaVM )
 {
-//  bool pregFind ( string base, string pattern )
+//  bool pregFind ( string base, string pattern, uint flags )
     SString strBase, strPattern;
+    uint uiFlags = 0;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadString ( strBase );
     argStream.ReadString ( strPattern );
+    argStream.ReadNumber ( uiFlags );
 
     if ( !argStream.HasErrors () )
     {
-        pcrecpp::RE pPattern ( strPattern );
+        pcrecpp::RE_Options pOptions;
+        pOptions.set_caseless ( ( uiFlags & 1 ) != 0 );
+        pOptions.set_multiline ( ( uiFlags & 2 ) != 0 );
+        pOptions.set_dotall ( ( uiFlags & 4 ) != 0 );
+        pOptions.set_extended ( ( uiFlags & 8 ) != 0 );
+        
+        pcrecpp::RE pPattern ( strPattern, pOptions );
 
         if ( pPattern.PartialMatch ( strBase ) )
         {
@@ -12810,17 +12818,25 @@ int CLuaFunctionDefinitions::PregFind ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::PregReplace ( lua_State* luaVM )
 {
-//  string pregReplace ( string base, string pattern, string replace )
+//  string pregReplace ( string base, string pattern, string replace, uint flags )
     SString strBase, strPattern, strReplace;
+    uint uiFlags = 0;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadString ( strBase );
     argStream.ReadString ( strPattern );
     argStream.ReadString ( strReplace );
+    argStream.ReadNumber ( uiFlags );
 
     if ( !argStream.HasErrors () )
     {
-        pcrecpp::RE pPattern ( strPattern );
+        pcrecpp::RE_Options pOptions;
+        pOptions.set_caseless ( ( uiFlags & 1 ) != 0 );
+        pOptions.set_multiline ( ( uiFlags & 2 ) != 0 );
+        pOptions.set_dotall ( ( uiFlags & 4 ) != 0 );
+        pOptions.set_extended ( ( uiFlags & 8 ) != 0 );
+        
+        pcrecpp::RE pPattern ( strPattern, pOptions );
 
         string strNew = strBase;
         if ( pPattern.GlobalReplace ( strReplace, &strNew ) )
@@ -12839,18 +12855,27 @@ int CLuaFunctionDefinitions::PregReplace ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::PregMatch ( lua_State* luaVM )
 {
-//  table pregMatch ( string base, string pattern )
+//  table pregMatch ( string base, string pattern, uint flags )
     SString strBase, strPattern;
+    uint uiFlags = 0;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadString ( strBase );
     argStream.ReadString ( strPattern );
+    argStream.ReadNumber ( uiFlags );
 
     if ( !argStream.HasErrors () )
     {
         lua_newtable ( luaVM );
 
-        pcrecpp::RE pPattern ( strPattern );
+        pcrecpp::RE_Options pOptions;
+        pOptions.set_caseless ( ( uiFlags & 1 ) != 0 );
+        pOptions.set_multiline ( ( uiFlags & 2 ) != 0 );
+        pOptions.set_dotall ( ( uiFlags & 4 ) != 0 );
+        pOptions.set_extended ( ( uiFlags & 8 ) != 0 );
+
+        pcrecpp::RE pPattern ( strPattern, pOptions );
+
         pcrecpp::StringPiece strInput ( strBase );
 
         string strGet; int i = 1;
