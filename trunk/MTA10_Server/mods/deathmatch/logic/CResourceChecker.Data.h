@@ -152,7 +152,6 @@ namespace
                                          { "isPedDead",                     "1.3.5" },
                                          { "getCamera",                     "1.3.5" },
                                          { "dxSetTextureEdge",              "1.3.5" },
-                                         { "guiEditSetCaretIndex",          "1.3.5" },
                                          { "guiMemoSetCaretIndex",          "1.3.5" },
                                          { "addDebugHook",                  "1.3.5" },
                                          { "removeDebugHook",               "1.3.5" },
