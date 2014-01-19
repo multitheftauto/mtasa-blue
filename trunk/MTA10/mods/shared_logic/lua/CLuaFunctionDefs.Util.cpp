@@ -1167,14 +1167,14 @@ int CLuaFunctionDefs::DownloadFile ( lua_State* luaVM )
 
 int CLuaFunctionDefs::PregFind ( lua_State* luaVM )
 {
-//  bool pregFind ( string base, string pattern, uint flags )
+//  bool pregFind ( string base, string pattern, uint flags = 0 )
     SString strBase, strPattern;
     uint uiFlags = 0;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadString ( strBase );
     argStream.ReadString ( strPattern );
-    argStream.ReadNumber ( uiFlags );
+    argStream.ReadNumber ( uiFlags, 0 );
 
     if ( !argStream.HasErrors () )
     {
@@ -1202,7 +1202,7 @@ int CLuaFunctionDefs::PregFind ( lua_State* luaVM )
 
 int CLuaFunctionDefs::PregReplace ( lua_State* luaVM )
 {
-//  string pregReplace ( string base, string pattern, string replace, uint flags )
+//  string pregReplace ( string base, string pattern, string replace, uint flags = 0 )
     SString strBase, strPattern, strReplace;
     uint uiFlags = 0;
 
@@ -1210,7 +1210,7 @@ int CLuaFunctionDefs::PregReplace ( lua_State* luaVM )
     argStream.ReadString ( strBase );
     argStream.ReadString ( strPattern );
     argStream.ReadString ( strReplace );
-    argStream.ReadNumber ( uiFlags );
+    argStream.ReadNumber ( uiFlags, 0 );
 
     if ( !argStream.HasErrors () )
     {
@@ -1239,14 +1239,14 @@ int CLuaFunctionDefs::PregReplace ( lua_State* luaVM )
 
 int CLuaFunctionDefs::PregMatch ( lua_State* luaVM )
 {
-//  table pregMatch ( string base, string pattern, uint flags )
+//  table pregMatch ( string base, string pattern, uint flags = 0 )
     SString strBase, strPattern;
     uint uiFlags = 0;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadString ( strBase );
     argStream.ReadString ( strPattern );
-    argStream.ReadNumber ( uiFlags );
+    argStream.ReadNumber ( uiFlags, 0 );
 
     if ( !argStream.HasErrors () )
     {
