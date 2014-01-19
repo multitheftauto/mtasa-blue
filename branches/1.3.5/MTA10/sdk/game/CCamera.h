@@ -135,6 +135,8 @@ public:
     virtual void                        SetCameraClip ( bool bObjects, bool bVehicles )=0;
     virtual VOID                        SetCameraViewMode ( BYTE dwCamMode )=0;
     virtual BYTE                        GetCameraViewMode ( void )=0;
+    virtual void                        SetShakeForce ( float fShakeForce ) = 0;
+    virtual float                       GetShakeForce ( void ) = 0;
 };
 
 
