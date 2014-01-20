@@ -329,6 +329,12 @@ void CLocalGUI::SetConsoleVisible ( bool bVisible )
         
         // Set the visible state
         m_pConsole->SetVisible ( bVisible );
+
+        CGUI* pGUI = CCore::GetSingleton ().GetGUI ();
+        if ( bVisible )
+	        pGUI->SetCursorAlpha ( 1.0f );
+        else
+	        pGUI->SetCursorAlpha ( pGUI->GetCurrentServerCursorAlpha () );
     }
     else
     {
