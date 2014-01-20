@@ -2213,9 +2213,10 @@ void CClientVehicle::StreamedInPulse ( void )
         }
         else
         {
+            CVector vecPos = *m_pVehicle->GetPosition();
             // Cols been loaded for where the vehicle is? Only check this if it has no drivers.
             if ( m_pDriver ||
-                 ( g_pGame->GetWorld ()->HasCollisionBeenLoaded ( &m_matFrozen.vPos ) /*&&
+                 ( g_pGame->GetWorld ()->HasCollisionBeenLoaded ( &vecPos ) /*&&
                    m_pObjectManager->ObjectsAroundPointLoaded ( m_matFrozen.vPos, 200.0f, m_usDimension )*/ ) )
             {
                 // Remember the matrix
@@ -2224,10 +2225,13 @@ void CClientVehicle::StreamedInPulse ( void )
             else
             {
                 // Force the position to the last remembered matrix (..and make sure gravity doesn't pull it down)
-                m_pVehicle->SetMatrix ( &m_matFrozen );
-                CVector vec(0.0f, 0.0f, 0.0f);
-                m_pVehicle->SetMoveSpeed ( &vec );
 
+                if ( GetVehicleType() != CLIENTVEHICLE_TRAIN || IsDerailed() )
+                {
+                    m_pVehicle->SetMatrix ( &m_matFrozen );
+                    CVector vec(0.0f, 0.0f, 0.0f);
+                    m_pVehicle->SetMoveSpeed ( &vec );
+                }
                 // Added by ChrML 27. Nov: Shouldn't cause any problems
                 m_pVehicle->SetUsesCollision ( false );
             }
