@@ -11118,17 +11118,21 @@ int CLuaFunctionDefinitions::DbPoll ( lua_State* luaVM )
 
         // Make table!
         lua_newtable ( luaVM );
-        for ( int i = 0; i < Result.nRows; i++ ) {
+        //for ( int i = 0; i < Result->nRows; i++ ) {
+        int i = 0;
+        for ( CRegistryResultIterator iter = Result->begin() ; iter != Result->end() ; ++iter, ++i )
+        {
+            const CRegistryResultRow& row = *iter;
             lua_newtable ( luaVM );                             // new table
             lua_pushnumber ( luaVM, i+1 );                      // row index number (starting at 1, not 0)
             lua_pushvalue ( luaVM, -2 );                        // value
             lua_settable ( luaVM, -4 );                         // refer to the top level table
-            for ( int j = 0; j < Result.nColumns; j++ )
+            for ( int j = 0; j < Result->nColumns; j++ )
             {
-                const CRegistryResultCell& cell = Result.Data[i][j];
+                const CRegistryResultCell& cell = row[j];
 
                 // Push the column name
-                lua_pushlstring ( luaVM, Result.ColNames[j].c_str (), Result.ColNames[j].size () );
+                lua_pushlstring ( luaVM, Result->ColNames[j].c_str (), Result->ColNames[j].size () );
                 switch ( cell.nType )                           // push the value with the right type
                 {
                     case SQLITE_INTEGER:
@@ -11180,19 +11184,23 @@ int CLuaFunctionDefinitions::ExecuteSQLQuery ( lua_State* luaVM )
         CPerfStatSqliteTiming::GetSingleton ()->SetCurrentResource ( luaVM );
         if ( CStaticFunctionDefinitions::ExecuteSQLQuery ( strQuery, &Args, &Result ) ) {
             lua_newtable ( luaVM );
-            for ( int i = 0; i < Result.nRows; i++ ) {
+            int i = 0;
+            for ( CRegistryResultIterator iter = Result->begin() ; iter != Result->end() ; ++iter, ++i )
+            {
+                const CRegistryResultRow& row = *iter;
+            //for ( int i = 0; i < Result.nRows; i++ ) {
                 lua_newtable ( luaVM );                             // new table
                 lua_pushnumber ( luaVM, i+1 );                      // row index number (starting at 1, not 0)
                 lua_pushvalue ( luaVM, -2 );                        // value
                 lua_settable ( luaVM, -4 );                         // refer to the top level table
-                for ( int j = 0; j < Result.nColumns; j++ )
+                for ( int j = 0; j < Result->nColumns; j++ )
                 {
-                    CRegistryResultCell& cell = Result.Data[i][j];
+                    const CRegistryResultCell& cell = row[j];
                     if ( cell.nType == SQLITE_NULL )
                         continue;
 
                     // Push the column name
-                    lua_pushlstring ( luaVM, Result.ColNames[j].c_str (), Result.ColNames[j].size () );
+                    lua_pushlstring ( luaVM, Result->ColNames[j].c_str (), Result->ColNames[j].size () );
                     switch ( cell.nType )                           // push the value with the right type
                     {
                         case SQLITE_INTEGER:
@@ -11254,19 +11262,23 @@ int CLuaFunctionDefinitions::ExecuteSQLSelect ( lua_State* luaVM )
         if ( CStaticFunctionDefinitions::ExecuteSQLSelect ( strTable, strColumns, strWhere, uiLimit, &Result ) )
         {
             lua_newtable ( luaVM );
-            for ( int i = 0; i < Result.nRows; i++ ) {
+            int i = 0;
+            for ( CRegistryResultIterator iter = Result->begin() ; iter != Result->end() ; ++iter, ++i )
+            {
+                const CRegistryResultRow& row = *iter;
+//            for ( int i = 0; i < Result.nRows; i++ ) {
                 lua_newtable ( luaVM );                             // new table
                 lua_pushnumber ( luaVM, i+1 );                      // row index number (starting at 1, not 0)
                 lua_pushvalue ( luaVM, -2 );                        // value
                 lua_settable ( luaVM, -4 );                         // refer to the top level table
-                for ( int j = 0; j < Result.nColumns; j++ )
+                for ( int j = 0; j < Result->nColumns; j++ )
                 {
-                    CRegistryResultCell& cell = Result.Data[i][j];
+                    const CRegistryResultCell& cell = row[j];
                     if ( cell.nType == SQLITE_NULL )
                         continue;
 
                     // Push the column name
-                    lua_pushlstring ( luaVM, Result.ColNames[j].c_str (), Result.ColNames[j].size () );
+                    lua_pushlstring ( luaVM, Result->ColNames[j].c_str (), Result->ColNames[j].size () );
                     switch ( cell.nType )                           // push the value with the right type
                     {
                         case SQLITE_INTEGER:

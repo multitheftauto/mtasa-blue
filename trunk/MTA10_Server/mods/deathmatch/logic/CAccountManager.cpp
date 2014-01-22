@@ -32,7 +32,7 @@ CAccountManager::CAccountManager ( const char* szFileName, SString strBuffer ): 
     // Check if new installation
     CRegistryResult result;
 	m_pDatabaseManager->QueryWithResultf ( m_hDbConnection, &result, "SELECT name FROM sqlite_master WHERE type='table' AND name='accounts'" );
-    bool bNewInstallation = ( result.nRows == 0 );
+    bool bNewInstallation = ( result->nRows == 0 );
 
     //Create all our tables (Don't echo the results)
     m_pDatabaseManager->Execf ( m_hDbConnection, "CREATE TABLE IF NOT EXISTS accounts (id INTEGER PRIMARY KEY, name TEXT, password TEXT, ip TEXT, serial TEXT)" );
@@ -41,7 +41,7 @@ CAccountManager::CAccountManager ( const char* szFileName, SString strBuffer ): 
 
     // Check if unique index on accounts exists
 	m_pDatabaseManager->QueryWithResultf ( m_hDbConnection, &result, "SELECT name FROM sqlite_master WHERE type='index' AND name='IDX_ACCOUNTS_NAME_U'" );
-    if ( result.nRows == 0 )
+    if ( result->nRows == 0 )
     {
         // Need to add unique index on accounts
         if ( !bNewInstallation )
@@ -62,7 +62,7 @@ CAccountManager::CAccountManager ( const char* szFileName, SString strBuffer ): 
 
     // Check if unique index on userdata exists
 	m_pDatabaseManager->QueryWithResultf ( m_hDbConnection, &result, "SELECT name FROM sqlite_master WHERE type='index' AND name='IDX_USERDATA_USERID_KEY_U'" );
-    if ( result.nRows == 0 )
+    if ( result->nRows == 0 )
     {
         // Need to add unique index on userdata
         if ( !bNewInstallation )
@@ -90,7 +90,7 @@ CAccountManager::CAccountManager ( const char* szFileName, SString strBuffer ): 
     m_pDatabaseManager->QueryWithResultf ( m_hDbConnection, &result, "SELECT key, value from settings" );
 
     //Did we get any results
-    if ( result.nRows == 0 )
+    if ( result->nRows == 0 )
     {
         //Set our settings and clear the accounts/userdata tables just in case
         m_pDatabaseManager->Execf ( m_hDbConnection, "INSERT INTO settings (key, value) VALUES(?,?)", SQLITE_TEXT, "XMLParsed", SQLITE_INTEGER, 0 );
@@ -100,15 +100,16 @@ CAccountManager::CAccountManager ( const char* szFileName, SString strBuffer ): 
     else
     {
         bool bLoadXMLMissing = true;
-        for (int i = 0;i < result.nRows;i++) 
+        for ( CRegistryResultIterator iter = result->begin() ; iter != result->end() ; ++iter )
         {
-            SString strSetting = (const char *)result.Data[i][0].pVal;
+            const CRegistryResultRow& row = *iter;
+            SString strSetting = (const char *)row[0].pVal;
 
             //Do we have a result for XMLParsed
             if ( strSetting == "XMLParsed" ) 
             {
                 //Is XMLParsed zero
-                if ( result.Data[i][1].nVal == 0 ) 
+                if ( row[1].nVal == 0 ) 
                 {
                     //Tell the Server to load the xml file rather than the SQL
                     m_bLoadXML = true;
@@ -341,8 +342,6 @@ bool CAccountManager::Load( void )
     //Select all our required information from the accounts database
     m_pDatabaseManager->QueryWithResultf ( m_hDbConnection, &result, "SELECT id,name,password,ip,serial from accounts" );
 
-    //Work out how many rows we have
-    int iResults = result.nRows;
     //Initialize all our variables
     SString strName, strPassword, strSerial, strIP;
     int iUserID = 0;
@@ -351,11 +350,12 @@ bool CAccountManager::Load( void )
     CAccount* pAccount = NULL;
     CElapsedTime activityTimer;
     bool bOutputFeedback = false;
-    for ( int i = 0 ; i < iResults ; i++ )
+    for ( CRegistryResultIterator iter = result->begin() ; iter != result->end() ; ++iter )
     {
+        const CRegistryResultRow& row = *iter;
         //Fill User ID, Name & Password (Required data)
-        iUserID = static_cast < int > ( result.Data[i][0].nVal );
-        strName = (const char *)result.Data[i][1].pVal;
+        iUserID = static_cast < int > ( row[0].nVal );
+        strName = (const char *)row[1].pVal;
 
         // Check for overlong names and incorrect escapement
         bool bRemoveAccount = false;
@@ -392,17 +392,17 @@ bool CAccountManager::Load( void )
 
         strPassword = "";
         // If we have an password
-        if ( result.Data[i][2].pVal )
-            strPassword = (const char *)result.Data[i][2].pVal;
+        if ( row[2].pVal )
+            strPassword = (const char *)row[2].pVal;
 
         //if we have an IP
-        if ( result.Data[i][3].pVal ) {
+        if ( row[3].pVal ) {
             //Fill the IP variable
-            strIP = (const char *)result.Data[i][3].pVal;
+            strIP = (const char *)row[3].pVal;
             //If we have a Serial
-            if ( result.Data[i][4].pVal ) {
+            if ( row[4].pVal ) {
                 //Fill the serial variable
-                strSerial = (const char *)result.Data[i][4].pVal;
+                strSerial = (const char *)row[4].pVal;
                 //Create a new account with the specified information
                 pAccount = new CAccount ( this, true, strName, strPassword, strIP, iUserID, strSerial );
             }
@@ -423,7 +423,7 @@ bool CAccountManager::Load( void )
         {
             activityTimer.Reset();
             bOutputFeedback = true;
-            CLogger::LogPrintf ( "Reading accounts %d/%d\n", m_List.size(), iResults );
+            CLogger::LogPrintf ( "Reading accounts %d/%d\n", m_List.size(), result->nRows );
         }
     }
     if ( bOutputFeedback )
@@ -553,9 +553,9 @@ bool CAccountManager::IntegrityCheck ()
 
         // Get result as a string
         SString strResult;
-        if ( result.nRows && result.nColumns )
+        if ( result->nRows && result->nColumns )
         {
-            CRegistryResultCell& cell = result.Data[0][0];
+            CRegistryResultCell& cell = result->Data.front()[0];
             if ( cell.nType == SQLITE_TEXT )
                 strResult = std::string ( (const char *)cell.pVal, cell.nLength - 1 );
         }
@@ -601,9 +601,9 @@ bool CAccountManager::IntegrityCheck ()
 
         // Get result as a string
         SString strResult;
-        if ( result.nRows && result.nColumns )
+        if ( result->nRows && result->nColumns )
         {
-            CRegistryResultCell& cell = result.Data[0][0];
+            CRegistryResultCell& cell = result->Data.front()[0];
             if ( cell.nType == SQLITE_TEXT )
                 strResult = std::string ( (const char *)cell.pVal, cell.nLength - 1 );
         }
@@ -908,27 +908,26 @@ CLuaArgument* CAccountManager::GetAccountData( CAccount* pAccount, const char* s
     //Select the value and type from the database where the user is our user and the key is the required key
     m_pDatabaseManager->QueryWithResultf ( m_hDbConnection, &result, "SELECT value,type from userdata where userid=? and key=? LIMIT 1", SQLITE_INTEGER, iUserID, SQLITE_TEXT, szKey );
 
-    //Store the returned amount of rows
-    int iResults = result.nRows;
-
     // Default result is nil
     CLuaArgument* pResult = new CLuaArgument ();
 
     //Do we have any results?
-    if ( iResults > 0 )
+    if ( result->nRows > 0 )
     {
-        int iType = static_cast < int > ( result.Data[0][1].nVal );
+        const CRegistryResultRow& row = result->Data.front();
+
+        int iType = static_cast < int > ( row[1].nVal );
         //Account data is stored as text so we don't need to check what type it is just return it
         if ( iType == LUA_TBOOLEAN )
         {
-            SString strResult = (const char *)result.Data[0][0].pVal;
+            SString strResult = (const char *)row[0].pVal;
             pResult->ReadBool ( strResult == "true" );
         }
         else
         if ( iType == LUA_TNUMBER )
-            pResult->ReadNumber ( strtod ( (const char *)result.Data[0][0].pVal, NULL ) );
+            pResult->ReadNumber ( strtod ( (const char *)row[0].pVal, NULL ) );
         else
-            pResult->ReadString ( (const char *)result.Data[0][0].pVal );
+            pResult->ReadString ( (const char *)row[0].pVal );
     }
     else
     {
@@ -974,24 +973,22 @@ bool CAccountManager::CopyAccountData( CAccount* pFromAccount, CAccount* pToAcco
     //Select the key and value from the database where the user is our from account
     m_pDatabaseManager->QueryWithResultf ( m_hDbConnection, &result, "SELECT key,value,type from userdata where userid=? LIMIT 1", SQLITE_INTEGER, iUserID );
 
-    //Store the returned amount of rows
-    int iResults = result.nRows;
-
     //Do we have any results?
-    if ( iResults > 0 ) {
+    if ( result->nRows > 0 ) {
         //Loop through until i is the same as the number of rows
-        for ( int i = 0;i < iResults;i++ ) 
+        for ( CRegistryResultIterator iter = result->begin() ; iter != result->end() ; ++iter )
         {
+            const CRegistryResultRow& row = *iter;
             //Get our key
-            strKey = (const char *)result.Data[i][0].pVal;
+            strKey = (const char *)row[0].pVal;
             //Get our value
-            strValue = (const char *)result.Data[i][1].pVal;
-            int iType = static_cast < int > ( result.Data[i][2].nVal );
+            strValue = (const char *)row[1].pVal;
+            int iType = static_cast < int > ( row[2].nVal );
             //Select the id and userid where the user is the to account and the key is strKey
             CRegistryResult subResult;
             m_pDatabaseManager->QueryWithResultf ( m_hDbConnection, &subResult, "SELECT id,userid from userdata where userid=? and key=? LIMIT 1", SQLITE_INTEGER, iUserID, SQLITE_TEXT, strKey.c_str () );
             //If there is a key with this value update it otherwise insert it and store the return value in bRetVal
-            if ( subResult.nRows > 0 )
+            if ( subResult->nRows > 0 )
                 m_pDatabaseManager->Execf ( m_hDbConnection, "UPDATE userdata SET value=?, type=? WHERE userid=? AND key=?", SQLITE_TEXT, strValue.c_str (), SQLITE_INTEGER, iType, SQLITE_INTEGER, pToAccount->GetID (), SQLITE_TEXT, strKey.c_str () );
             else
                 m_pDatabaseManager->Execf ( m_hDbConnection, "INSERT INTO userdata (userid, key, value, type) VALUES(?,?,?,?)", SQLITE_INTEGER, pToAccount->GetID (), SQLITE_TEXT, strKey.c_str (), SQLITE_TEXT, strValue.c_str (), SQLITE_INTEGER, iType );
@@ -1017,19 +1014,17 @@ bool CAccountManager::GetAllAccountData( CAccount* pAccount, lua_State* pLua )
     //Select the value and type from the database where the user is our user and the key is the required key
     m_pDatabaseManager->QueryWithResultf ( m_hDbConnection, &result, "SELECT key,value,type from userdata where userid=?", SQLITE_INTEGER, iUserID );
 
-    //Store the returned amount of rows
-    int iResults = result.nRows;
-
     //Do we have any results?
-    if ( iResults > 0 ) 
+    if ( result->nRows > 0 ) 
     {
         //Loop through until i is the same as the number of rows
-        for ( int i = 0;i < iResults;i++ ) 
+        for ( CRegistryResultIterator iter = result->begin() ; iter != result->end() ; ++iter )
         {
+            const CRegistryResultRow& row = *iter;
             //Get our key
-            strKey = (const char *)result.Data[i][0].pVal;
+            strKey = (const char *)row[0].pVal;
             //Get our type
-            int iType = static_cast < int > ( result.Data[i][2].nVal );
+            int iType = static_cast < int > ( row[2].nVal );
             //Account data is stored as text so we don't need to check what type it is just return it
             if ( iType == LUA_TNIL )
             {
@@ -1039,7 +1034,7 @@ bool CAccountManager::GetAllAccountData( CAccount* pAccount, lua_State* pLua )
             }
             if ( iType == LUA_TBOOLEAN )
             {
-                SString strResult = (const char *)result.Data[i][1].pVal;
+                SString strResult = (const char *)row[1].pVal;
                 lua_pushstring ( pLua, strKey );
                 lua_pushboolean ( pLua, strResult == "true" ? true : false );
                 lua_settable ( pLua, -3 );
@@ -1047,13 +1042,13 @@ bool CAccountManager::GetAllAccountData( CAccount* pAccount, lua_State* pLua )
             if ( iType == LUA_TNUMBER )
             {
                 lua_pushstring ( pLua, strKey );
-                lua_pushnumber ( pLua, strtod ( (const char*)result.Data[i][1].pVal, NULL ) );
+                lua_pushnumber ( pLua, strtod ( (const char*)row[1].pVal, NULL ) );
                 lua_settable ( pLua, -3 );
             }
             else
             {
                 lua_pushstring ( pLua, strKey );
-                lua_pushstring ( pLua, ( (const char*)result.Data[i][1].pVal ) );
+                lua_pushstring ( pLua, ( (const char*)row[1].pVal ) );
                 lua_settable ( pLua, -3 );
             }
         }

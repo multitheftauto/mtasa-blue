@@ -1576,120 +1576,86 @@ namespace SharedUtil
 
 
     //
-    // Smart pointer with reference count.
-    // Based on code from:
-    // http://www.codeproject.com/Articles/15351/Implementing-a-simple-smart-pointer-in-c
+    // Pointer with reference count.
     //
-    class RC
+    template < typename T >
+    class CRefedPointer : public CRefCountable
     {
-        private:
-        int count; // Reference count
+    private:
+        T*  pData;      // Target
 
-        public:
-        RC ( void ) : count ( 0 ) {}
-        void AddRef()
+        virtual ~CRefedPointer( void )
         {
-            // Increment the reference count
-            count++;
+            SAFE_DELETE( pData );
+        }
+        CRefedPointer ( const CRefedPointer < T >& other );
+        CRefedPointer < T >& operator = ( const CRefedPointer < T >& other );
+    public:
+
+        CRefedPointer( void )
+        {
+            pData = new T();
         }
 
-        int Release()
+        T* GetData( void )
         {
-            // Decrement the reference count and
-            // return the reference count.
-            return --count;
+            return pData;
         }
     };
 
-    template < typename T > class SP
+    //
+    // Smart pointer with reference count.
+    //
+    template < typename T >
+    class CAutoRefedPointer
     {
     private:
-        T*    pData;       // pointer
-        RC* reference; // Reference count
-
+        CRefedPointer < T >* pPointer;
     public:
-        SP() : pData(0), reference(0) 
+        CAutoRefedPointer()
         {
-            // Create a new reference 
-            reference = new RC();
-            // Increment the reference count
-            reference->AddRef();
+            pPointer = new CRefedPointer < T >();
         }
 
-        SP(T* pValue) : pData(pValue), reference(0)
+        CAutoRefedPointer ( const CAutoRefedPointer < T >& other )
         {
-            // Create a new reference 
-            reference = new RC();
-            // Increment the reference count
-            reference->AddRef();
+            pPointer = other.pPointer;
+            pPointer->AddRef();
         }
 
-        SP(const SP<T>& sp) : pData(sp.pData), reference(sp.reference)
+        ~CAutoRefedPointer()
         {
-            // Copy constructor
-            // Copy the data and reference pointer
-            // and increment the reference count
-            reference->AddRef();
+            pPointer->Release();
         }
 
-        ~SP()
-        {
-            // Destructor
-            // Decrement the reference count
-            // if reference become zero delete the data
-            if(reference->Release() == 0)
-            {
-                delete pData;
-                delete reference;
-            }
-        }
-
-        T& operator* ()
-        {
-            return *pData;
-        }
-
-        const T& operator* () const
-        {
-            return *pData;
-        }
-
-        T* operator-> ()
-        {
-            return pData;
-        }
-
-        const T* operator-> () const
-        {
-            return pData;
-        }
-        
-        SP<T>& operator = (const SP<T>& sp)
+        CAutoRefedPointer < T >& operator = ( const CAutoRefedPointer < T >& other )
         {
             // Assignment operator
-            if (this != &sp) // Avoid self assignment
+            if ( this != &other ) // Avoid self assignment
             {
-                T*  pDataOld =  pData;
-                RC* referenceOld = reference;
+                CRefedPointer < T >* pOldPointer = pPointer;
 
                 // Copy the data and reference pointer
                 // and increment the reference count
-                pData = sp.pData;
-                reference = sp.reference;
-                reference->AddRef();
+                pPointer = other.pPointer;
+                pPointer->AddRef();
 
                 // Decrement the old reference count
-                // if reference become zero delete the old data
-                if(referenceOld->Release() == 0)
-                {
-                    delete pDataOld;
-                    delete referenceOld;
-                }
+                pOldPointer->Release();
             }
             return *this;
         }
-    };
 
+        T* operator->( void )
+        {
+            return pPointer->GetData();
+        }
+
+        const T* operator->( void ) const
+        {
+            return pPointer->GetData();
+        }
+    };
 };
 
 using namespace SharedUtil;

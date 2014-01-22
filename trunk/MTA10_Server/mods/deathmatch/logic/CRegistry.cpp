@@ -75,9 +75,9 @@ bool CRegistry::IntegrityCheck ( void )
 
         // Get result as a string
         SString strResult;
-        if ( result.nRows && result.nColumns )
+        if ( result->nRows && result->nColumns )
         {
-            CRegistryResultCell& cell = result.Data[0][0];
+            CRegistryResultCell& cell = result->Data.front()[0];
             if ( cell.nType == SQLITE_TEXT )
                 strResult = std::string ( (const char *)cell.pVal, cell.nLength - 1 );
         }
@@ -105,9 +105,9 @@ bool CRegistry::IntegrityCheck ( void )
 
         // Get result as a string
         SString strResult;
-        if ( result.nRows && result.nColumns )
+        if ( result->nRows && result->nColumns )
         {
-            CRegistryResultCell& cell = result.Data[0][0];
+            CRegistryResultCell& cell = result->Data.front()[0];
             if ( cell.nType == SQLITE_TEXT )
                 strResult = std::string ( (const char *)cell.pVal, cell.nLength - 1 );
         }
@@ -203,7 +203,7 @@ bool CRegistry::ExecInternal ( const char* szQuery )
 }
 
 
-bool CRegistry::QueryInternal ( const char* szQuery, CRegistryResult* pResult )
+bool CRegistry::QueryInternal ( const char* szQuery, CRegistryResult* ppResult )
 {
     TIMEUS startTime = GetTimeUs();
 
@@ -215,6 +215,7 @@ bool CRegistry::QueryInternal ( const char* szQuery, CRegistryResult* pResult )
         return false;
     }
 
+    CRegistryResult& pResult = *ppResult;
     // Get column names
     pResult->nColumns = sqlite3_column_count ( pStmt );
     pResult->ColNames.clear ();
@@ -230,7 +231,7 @@ bool CRegistry::QueryInternal ( const char* szQuery, CRegistryResult* pResult )
     while ( (status = sqlite3_step(pStmt)) == SQLITE_ROW )
     {
         pResult->Data.push_back ( vector < CRegistryResultCell > ( pResult->nColumns ) );
-        vector < CRegistryResultCell > & row = *(pResult->Data.end () - 1);
+        vector < CRegistryResultCell > & row = pResult->Data.back();
         for ( int i = 0; i < pResult->nColumns; i++ )
         {
             CRegistryResultCell& cell = row[i];
