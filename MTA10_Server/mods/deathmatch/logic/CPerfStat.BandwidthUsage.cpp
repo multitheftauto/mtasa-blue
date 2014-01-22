@@ -234,7 +234,7 @@ void CPerfStatBandwidthUsageImpl::LoadStats ( void )
     CRegistryResult result = pJobData->result.registryResult;
 
     // If data set is empty, try loading old data
-    if ( result.nRows == 0 )
+    if ( result->nRows == 0 )
     {
         CDbJobData* pJobData = pDatabaseManager->QueryStartf ( m_DatabaseConnection, "SELECT `type`,`idx`,`GameRecv`,`GameSent`,`HttpSent`,`GameRecvBlocked` from " BW_STATS_TABLE_NAME );
         pDatabaseManager->QueryPoll ( pJobData, -1 );
@@ -242,7 +242,7 @@ void CPerfStatBandwidthUsageImpl::LoadStats ( void )
     }
 
     // If data set is empty, try loading old data
-    if ( result.nRows == 0 )
+    if ( result->nRows == 0 )
     {
         pJobData = pDatabaseManager->QueryStartf ( m_DatabaseConnection, "SELECT `type`,`idx`,`GameRecv`,`GameSent`,`HttpSent` from " BW_STATS_TABLE_NAME );
         pDatabaseManager->QueryPoll ( pJobData, -1 );
@@ -250,24 +250,25 @@ void CPerfStatBandwidthUsageImpl::LoadStats ( void )
     }
 
     // If data set is empty, try loading old data
-    if ( result.nRows == 0 )
+    if ( result->nRows == 0 )
         g_pGame->GetRegistry ()->Query ( &result, "SELECT `type`,`idx`,`GameRecv`,`GameSent`,`HttpSent` from `_perfstats_bandwidth_usage`" );
 
-    if ( result.nRows > 0 && result.nColumns >= 5 )
+    if ( result->nRows > 0 && result->nColumns >= 5 )
     {
-        for ( int r = 0 ; r < result.nRows ; r++ )
+        for ( CRegistryResultIterator iter = result->begin() ; iter != result->end() ; ++iter )
         {
-            SString strType = (const char*)result.Data[r][0].pVal;
-            uint uiIndex = static_cast < uint > ( result.Data[r][1].nVal );
-            float GameRecv = Max ( 0.f, result.Data[r][2].fVal );
-            float GameSent = Max ( 0.f, result.Data[r][3].fVal );
-            float HttpSent = Max ( 0.f, result.Data[r][4].fVal );
+            const CRegistryResultRow& row = *iter;
+            SString strType = (const char*)row[0].pVal;
+            uint uiIndex = static_cast < uint > ( row[1].nVal );
+            float GameRecv = Max ( 0.f, row[2].fVal );
+            float GameSent = Max ( 0.f, row[3].fVal );
+            float HttpSent = Max ( 0.f, row[4].fVal );
             float GameRecvBlocked = 0;
-            if ( result.nColumns >= 6 )
-                GameRecvBlocked = Max ( 0.f, result.Data[r][5].fVal );
+            if ( result->nColumns >= 6 )
+                GameRecvBlocked = Max ( 0.f, row[5].fVal );
             float GameResent = 0;
-            if ( result.nColumns >= 7 )
-                GameResent = Max ( 0.f, result.Data[r][6].fVal );
+            if ( result->nColumns >= 7 )
+                GameResent = Max ( 0.f, row[6].fVal );
 
             uint uiType = BWStatNameToIndex ( strType );
 

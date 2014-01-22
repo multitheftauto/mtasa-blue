@@ -276,7 +276,7 @@ bool CDatabaseConnectionMySql::Query ( const SString& strQuery, CRegistryResult&
 ///////////////////////////////////////////////////////////////
 bool CDatabaseConnectionMySql::QueryInternal ( const SString& strQuery, CRegistryResult& registryResult )
 {
-    CRegistryResult* pResult = &registryResult;
+    CRegistryResult& pResult = registryResult;
 
     int status = mysql_real_query ( m_handle, strQuery, static_cast < unsigned long > ( strQuery.length () ) );
     if ( status )
@@ -317,7 +317,7 @@ bool CDatabaseConnectionMySql::QueryInternal ( const SString& strQuery, CRegistr
             ulong* inLengths = mysql_fetch_lengths ( res );
 
             pResult->Data.push_back ( vector < CRegistryResultCell > ( pResult->nColumns ) );
-            vector < CRegistryResultCell > & outRow = *(pResult->Data.end () - 1);
+            vector < CRegistryResultCell > & outRow = pResult->Data.back();
             for ( int i = 0; i < pResult->nColumns; i++ )
             {
                 CRegistryResultCell& cell = outRow[i];

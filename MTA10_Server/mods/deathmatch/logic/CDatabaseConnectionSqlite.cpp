@@ -255,7 +255,7 @@ bool CDatabaseConnectionSqlite::Query ( const SString& strQuery, CRegistryResult
 bool CDatabaseConnectionSqlite::QueryInternal ( const SString& strQuery, CRegistryResult& registryResult )
 {
     const char* szQuery = strQuery;
-    CRegistryResult* pResult = &registryResult;
+    CRegistryResult& pResult = registryResult;
 
     // Prepare the query
     sqlite3_stmt* pStmt;
@@ -280,7 +280,7 @@ bool CDatabaseConnectionSqlite::QueryInternal ( const SString& strQuery, CRegist
     while ( (status = sqlite3_step(pStmt)) == SQLITE_ROW )
     {
         pResult->Data.push_back ( vector < CRegistryResultCell > ( pResult->nColumns ) );
-        vector < CRegistryResultCell > & row = *(pResult->Data.end () - 1);
+        vector < CRegistryResultCell > & row = pResult->Data.back();
         for ( int i = 0; i < pResult->nColumns; i++ )
         {
             CRegistryResultCell& cell = row[i];

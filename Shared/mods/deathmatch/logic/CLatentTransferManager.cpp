@@ -119,9 +119,9 @@ void CLatentTransferManager::AddSendBatchBegin ( unsigned char ucPacketId, NetBi
     uint uiBitStreamBytesUsed = ( uiBitStreamBitsUsed + 7 ) >> 3;
 
     // Make a buffer containing enough info to recreate ucPacketId+BitStream at the other end
-    m_pBatchBufferRef = new CBufferRef ( new CBuffer () );
+    m_pBatchBufferRef = new CBufferRef ();
 
-    CBuffer& buffer = **m_pBatchBufferRef;
+    CBuffer& buffer = *m_pBatchBufferRef->operator->();
     CBufferWriteStream stream ( buffer );
     stream.Write ( ucPacketId );
     stream.Write ( uiBitStreamBitsUsed );
@@ -129,7 +129,7 @@ void CLatentTransferManager::AddSendBatchBegin ( unsigned char ucPacketId, NetBi
 
     // Copy data from bitstream into buffer
     buffer.SetSize ( uiHeadSize + uiBitStreamBytesUsed );
-    *(buffer.GetData () + buffer.GetSize () - 1) = 0;
+    *(buffer.GetData () + buffer.GetSize () - 1) = 0;   // Zero last byte of destination buffer
     pBitStream->ResetReadPointer ();
     pBitStream->ReadBits ( buffer.GetData () + uiHeadSize, uiBitStreamBitsUsed );
 
