@@ -388,7 +388,7 @@ void CLuaMain::AddPedClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "canBeKnockedOffBike", "canPedBeKnockedOffBike" );
     lua_classfunction ( luaVM, "doesHaveJetPack", "doesPedHaveJetPack" );
     lua_classfunction ( luaVM, "getAmmoInClip", "getPedAmmoInClip" );
-    lua_classfunction ( luaVM, "getAnalogControlState", "getPedAnalogControlState")
+    lua_classfunction ( luaVM, "getAnalogControlState", "getPedAnalogControlState");
     lua_classfunction ( luaVM, "getAnimation", "getPedAnimation" );
     lua_classfunction ( luaVM, "getAnimationData", "getPedAnimationData" );
     lua_classfunction ( luaVM, "getArmor", "getPedArmor" );
