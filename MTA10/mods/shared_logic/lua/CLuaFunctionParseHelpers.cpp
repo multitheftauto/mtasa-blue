@@ -582,3 +582,46 @@ void MinClientReqCheck ( CScriptArgReader& argStream, const char* szVersionReq, 
         }
     }
 }
+
+//
+// Read next as preg option flags
+//
+void ReadPregFlags( CScriptArgReader& argStream, pcrecpp::RE_Options& pOptions )
+{
+    if ( argStream.NextIsNumber() )
+    {
+        uint uiFlags = 0;
+        argStream.ReadNumber ( uiFlags );
+        pOptions.set_caseless ( ( uiFlags & 1 ) != 0 );
+        pOptions.set_multiline ( ( uiFlags & 2 ) != 0 );
+        pOptions.set_dotall ( ( uiFlags & 4 ) != 0 );
+        pOptions.set_extended ( ( uiFlags & 8 ) != 0 );
+    }
+    else
+    if ( argStream.NextIsString() )
+    {
+        SString strFlags;
+        argStream.ReadString ( strFlags );
+        for( uint i = 0 ; i < strFlags.length() ; i++ )
+        {
+            switch ( strFlags[i] )
+            {
+                case 'i':
+                    pOptions.set_caseless ( true );
+                    break;
+                case 'm':
+                    pOptions.set_multiline ( true );
+                    break;
+                case 'd':
+                    pOptions.set_dotall ( true );
+                    break;
+                case 'e':
+                    pOptions.set_extended ( true );
+                    break;
+                default:
+                    argStream.SetCustomError( "Flags all wrong" );
+                    return;       
+            }
+        }
+    }
+}

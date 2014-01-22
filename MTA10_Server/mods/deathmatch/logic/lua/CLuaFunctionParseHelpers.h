@@ -270,3 +270,4 @@ void MixedReadResourceString ( CScriptArgReader& argStream, SString& strOutResou
 void MixedReadResourceString ( CScriptArgReader& argStream, CResource*& pOutResource );
 bool StringToBool ( const SString& strText );
 void MinServerReqCheck ( CScriptArgReader& argStream, const char* szVersionReq, const char* szReason );
+void ReadPregFlags( CScriptArgReader& argStream, pcrecpp::RE_Options& pOptions );
