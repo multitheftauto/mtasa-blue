@@ -1097,16 +1097,18 @@ int CLuaFunctionDefs::GetDevelopmentMode ( lua_State* luaVM )
 
 int CLuaFunctionDefs::PregFind ( lua_State* luaVM )
 {
-//  bool pregFind ( string base, string pattern )
+//  bool pregFind ( string base, string pattern, uint/string flags = 0 )
     SString strBase, strPattern;
+    pcrecpp::RE_Options pOptions;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadString ( strBase );
     argStream.ReadString ( strPattern );
+    ReadPregFlags( argStream, pOptions );
 
     if ( !argStream.HasErrors () )
     {
-        pcrecpp::RE pPattern ( strPattern );
+        pcrecpp::RE pPattern ( strPattern, pOptions );
 
         if ( pPattern.PartialMatch ( strBase ) )
         {
@@ -1124,17 +1126,19 @@ int CLuaFunctionDefs::PregFind ( lua_State* luaVM )
 
 int CLuaFunctionDefs::PregReplace ( lua_State* luaVM )
 {
-//  string pregReplace ( string base, string pattern, string replace )
+//  string pregReplace ( string base, string pattern, string replace, uint/string flags = 0 )
     SString strBase, strPattern, strReplace;
+    pcrecpp::RE_Options pOptions;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadString ( strBase );
     argStream.ReadString ( strPattern );
     argStream.ReadString ( strReplace );
+    ReadPregFlags( argStream, pOptions );
 
     if ( !argStream.HasErrors () )
     {
-        pcrecpp::RE pPattern ( strPattern );
+        pcrecpp::RE pPattern ( strPattern, pOptions );
 
         string strNew = strBase;
         if ( pPattern.GlobalReplace ( strReplace, &strNew ) )
@@ -1153,18 +1157,21 @@ int CLuaFunctionDefs::PregReplace ( lua_State* luaVM )
 
 int CLuaFunctionDefs::PregMatch ( lua_State* luaVM )
 {
-//  table pregMatch ( string base, string pattern )
+//  table pregMatch ( string base, string pattern, uint/string flags = 0 )
     SString strBase, strPattern;
+    pcrecpp::RE_Options pOptions;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadString ( strBase );
     argStream.ReadString ( strPattern );
+    ReadPregFlags( argStream, pOptions );
 
     if ( !argStream.HasErrors () )
     {
         lua_newtable ( luaVM );
 
-        pcrecpp::RE pPattern ( strPattern );
+        pcrecpp::RE pPattern ( strPattern, pOptions );
+
         pcrecpp::StringPiece strInput ( strBase );
 
         string strGet; int i = 1;

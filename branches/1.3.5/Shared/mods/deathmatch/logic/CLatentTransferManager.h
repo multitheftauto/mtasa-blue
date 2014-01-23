@@ -9,7 +9,7 @@
 *****************************************************************************/
 
 typedef uint SSendHandle;
-typedef SP < CBuffer > CBufferRef;
+typedef CAutoRefedPointer < CBuffer > CBufferRef;
 
 namespace LatentTransfer
 {

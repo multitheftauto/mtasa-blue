@@ -11,7 +11,7 @@
 *
 *****************************************************************************/
 
-struct CRegistryResult;
+typedef CAutoRefedPointer < struct CRegistryResultData > CRegistryResult;
 
 #ifndef __CREGISTRY_H
 #define __CREGISTRY_H
@@ -122,17 +122,29 @@ struct CRegistryResultCell
     unsigned char*              pVal;
 };
 
-struct CRegistryResult
+typedef std::vector < CRegistryResultCell > CRegistryResultRow;
+typedef std::list < CRegistryResultRow >::const_iterator CRegistryResultIterator;
+
+struct CRegistryResultData
 {
-                                             CRegistryResult ( void )
+                                             CRegistryResultData ( void )
                                              {
                                                 nRows = 0;
                                                 nColumns = 0;
                                              }
-    vector < string >                        ColNames;
-    vector < vector<CRegistryResultCell> >   Data;
+    std::vector < SString >                  ColNames;
+    std::list < CRegistryResultRow >         Data;
     int                                      nRows;
     int                                      nColumns;
+
+    CRegistryResultIterator begin( void ) const
+    {
+        return Data.begin();
+    }
+    CRegistryResultIterator end( void ) const
+    {
+        return Data.end();
+    }
 };
 
 #endif

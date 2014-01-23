@@ -11631,17 +11631,21 @@ int CLuaFunctionDefinitions::DbPoll ( lua_State* luaVM )
 
         // Make table!
         lua_newtable ( luaVM );
-        for ( int i = 0; i < Result.nRows; i++ ) {
+        //for ( int i = 0; i < Result->nRows; i++ ) {
+        int i = 0;
+        for ( CRegistryResultIterator iter = Result->begin() ; iter != Result->end() ; ++iter, ++i )
+        {
+            const CRegistryResultRow& row = *iter;
             lua_newtable ( luaVM );                             // new table
             lua_pushnumber ( luaVM, i+1 );                      // row index number (starting at 1, not 0)
             lua_pushvalue ( luaVM, -2 );                        // value
             lua_settable ( luaVM, -4 );                         // refer to the top level table
-            for ( int j = 0; j < Result.nColumns; j++ )
+            for ( int j = 0; j < Result->nColumns; j++ )
             {
-                const CRegistryResultCell& cell = Result.Data[i][j];
+                const CRegistryResultCell& cell = row[j];
 
                 // Push the column name
-                lua_pushlstring ( luaVM, Result.ColNames[j].c_str (), Result.ColNames[j].size () );
+                lua_pushlstring ( luaVM, Result->ColNames[j].c_str (), Result->ColNames[j].size () );
                 switch ( cell.nType )                           // push the value with the right type
                 {
                     case SQLITE_INTEGER:
@@ -11689,19 +11693,23 @@ int CLuaFunctionDefinitions::ExecuteSQLQuery ( lua_State* luaVM )
         CPerfStatSqliteTiming::GetSingleton ()->SetCurrentResource ( luaVM );
         if ( CStaticFunctionDefinitions::ExecuteSQLQuery ( strQuery, &Args, &Result ) ) {
             lua_newtable ( luaVM );
-            for ( int i = 0; i < Result.nRows; i++ ) {
+            int i = 0;
+            for ( CRegistryResultIterator iter = Result->begin() ; iter != Result->end() ; ++iter, ++i )
+            {
+                const CRegistryResultRow& row = *iter;
+            //for ( int i = 0; i < Result.nRows; i++ ) {
                 lua_newtable ( luaVM );                             // new table
                 lua_pushnumber ( luaVM, i+1 );                      // row index number (starting at 1, not 0)
                 lua_pushvalue ( luaVM, -2 );                        // value
                 lua_settable ( luaVM, -4 );                         // refer to the top level table
-                for ( int j = 0; j < Result.nColumns; j++ )
+                for ( int j = 0; j < Result->nColumns; j++ )
                 {
-                    CRegistryResultCell& cell = Result.Data[i][j];
+                    const CRegistryResultCell& cell = row[j];
                     if ( cell.nType == SQLITE_NULL )
                         continue;
 
                     // Push the column name
-                    lua_pushlstring ( luaVM, Result.ColNames[j].c_str (), Result.ColNames[j].size () );
+                    lua_pushlstring ( luaVM, Result->ColNames[j].c_str (), Result->ColNames[j].size () );
                     switch ( cell.nType )                           // push the value with the right type
                     {
                         case SQLITE_INTEGER:
@@ -11759,19 +11767,23 @@ int CLuaFunctionDefinitions::ExecuteSQLSelect ( lua_State* luaVM )
         if ( CStaticFunctionDefinitions::ExecuteSQLSelect ( strTable, strColumns, strWhere, uiLimit, &Result ) )
         {
             lua_newtable ( luaVM );
-            for ( int i = 0; i < Result.nRows; i++ ) {
+            int i = 0;
+            for ( CRegistryResultIterator iter = Result->begin() ; iter != Result->end() ; ++iter, ++i )
+            {
+                const CRegistryResultRow& row = *iter;
+//            for ( int i = 0; i < Result.nRows; i++ ) {
                 lua_newtable ( luaVM );                             // new table
                 lua_pushnumber ( luaVM, i+1 );                      // row index number (starting at 1, not 0)
                 lua_pushvalue ( luaVM, -2 );                        // value
                 lua_settable ( luaVM, -4 );                         // refer to the top level table
-                for ( int j = 0; j < Result.nColumns; j++ )
+                for ( int j = 0; j < Result->nColumns; j++ )
                 {
-                    CRegistryResultCell& cell = Result.Data[i][j];
+                    const CRegistryResultCell& cell = row[j];
                     if ( cell.nType == SQLITE_NULL )
                         continue;
 
                     // Push the column name
-                    lua_pushlstring ( luaVM, Result.ColNames[j].c_str (), Result.ColNames[j].size () );
+                    lua_pushlstring ( luaVM, Result->ColNames[j].c_str (), Result->ColNames[j].size () );
                     switch ( cell.nType )                           // push the value with the right type
                     {
                         case SQLITE_INTEGER:
@@ -13315,16 +13327,18 @@ int CLuaFunctionDefinitions::GetPerformanceStats ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::PregFind ( lua_State* luaVM )
 {
-//  bool pregFind ( string base, string pattern )
+//  bool pregFind ( string base, string pattern, uint flags/string = 0 )
     SString strBase, strPattern;
+    pcrecpp::RE_Options pOptions;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadString ( strBase );
     argStream.ReadString ( strPattern );
+    ReadPregFlags( argStream, pOptions );
 
     if ( !argStream.HasErrors () )
     {
-        pcrecpp::RE pPattern ( strPattern );
+        pcrecpp::RE pPattern ( strPattern, pOptions );
 
         if ( pPattern.PartialMatch ( strBase ) )
         {
@@ -13342,17 +13356,19 @@ int CLuaFunctionDefinitions::PregFind ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::PregReplace ( lua_State* luaVM )
 {
-//  string pregReplace ( string base, string pattern, string replace )
+//  string pregReplace ( string base, string pattern, string replace, uint flags/string = 0 )
     SString strBase, strPattern, strReplace;
+    pcrecpp::RE_Options pOptions;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadString ( strBase );
     argStream.ReadString ( strPattern );
     argStream.ReadString ( strReplace );
+    ReadPregFlags( argStream, pOptions );
 
     if ( !argStream.HasErrors () )
     {
-        pcrecpp::RE pPattern ( strPattern );
+        pcrecpp::RE pPattern ( strPattern, pOptions );
 
         string strNew = strBase;
         if ( pPattern.GlobalReplace ( strReplace, &strNew ) )
@@ -13371,18 +13387,21 @@ int CLuaFunctionDefinitions::PregReplace ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::PregMatch ( lua_State* luaVM )
 {
-//  table pregMatch ( string base, string pattern )
+//  table pregMatch ( string base, string pattern, uint flags/string = 0 )
     SString strBase, strPattern;
+    pcrecpp::RE_Options pOptions;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadString ( strBase );
     argStream.ReadString ( strPattern );
+    ReadPregFlags( argStream, pOptions );
 
     if ( !argStream.HasErrors () )
     {
         lua_newtable ( luaVM );
 
-        pcrecpp::RE pPattern ( strPattern );
+        pcrecpp::RE pPattern ( strPattern, pOptions );
+
         pcrecpp::StringPiece strInput ( strBase );
 
         string strGet; int i = 1;
