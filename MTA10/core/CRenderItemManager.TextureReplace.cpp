@@ -30,31 +30,28 @@ void CRenderItemManager::GetVisibleTextureNames ( std::vector < SString >& outNa
 
     SString strTextureNameMatchLower = strTextureNameMatch.ToLower ();
 
-    std::set < SString > resultMap;
+    CFastHashSet < SString > resultMap;
 
     // For each texture that was used in the previous frame
-    for ( std::set < CD3DDUMMY* >::const_iterator iter = m_PrevFrameTextureUsage.begin () ; iter != m_PrevFrameTextureUsage.end () ; ++iter )
+    for ( CFastHashSet < CD3DDUMMY* >::const_iterator iter = m_PrevFrameTextureUsage.begin () ; iter != m_PrevFrameTextureUsage.end () ; ++iter )
     {
         // Get the texture name
-        SString strTextureName = m_pRenderWare->GetTextureName ( *iter );
-        SString strTextureNameLower = strTextureName.ToLower ();
-
-        if ( strTextureName.empty () )
-            continue;
+        const char* szTextureName = m_pRenderWare->GetTextureName ( *iter );
 
         // Filter by wildcard match
-        if ( !WildcardMatch ( strTextureNameMatchLower, strTextureNameLower ) )
+        if ( !WildcardMatchI ( strTextureNameMatchLower, szTextureName ) )
             continue;
 
         // Filter by model
         if ( usModelID )
-            if ( !MapContains ( modelTextureNameMap, strTextureNameLower ) )
+            if ( !MapContains ( modelTextureNameMap, SStringX( szTextureName ).ToLower () ) )
                 continue;
 
-        resultMap.insert ( strTextureName );
+        resultMap.insert ( szTextureName );
     }
 
-    for ( std::set < SString >::const_iterator iter = resultMap.begin () ; iter != resultMap.end () ; ++iter )
+    outNameList.reserve( resultMap.size() );
+    for ( CFastHashSet < SString >::const_iterator iter = resultMap.begin () ; iter != resultMap.end () ; ++iter )
     {
         outNameList.push_back ( *iter );
     }

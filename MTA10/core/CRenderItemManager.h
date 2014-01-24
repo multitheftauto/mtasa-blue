@@ -85,8 +85,8 @@ protected:
     CRenderTargetItem*                          m_pBackBufferCopy;
     bool                                        m_bBackBufferCopyMaybeNeedsResize;
     uint                                        m_uiBackBufferCopyRevision;
-    std::set < CD3DDUMMY* >                     m_FrameTextureUsage;
-    std::set < CD3DDUMMY* >                     m_PrevFrameTextureUsage;
+    CFastHashSet < CD3DDUMMY* >                 m_FrameTextureUsage;
+    CFastHashSet < CD3DDUMMY* >                 m_PrevFrameTextureUsage;
     class CRenderWare*                          m_pRenderWare;
     CEffectCloner*                              m_pEffectCloner;
     eDxTestMode                                 m_TestMode;
