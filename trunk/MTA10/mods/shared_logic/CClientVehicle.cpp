@@ -132,6 +132,7 @@ CClientVehicle::CClientVehicle ( CClientManager* pManager, ElementID ID, unsigne
     m_fTrainSpeed = 0.0f;
     m_fTrainPosition = -1.0f;
     m_ucTrackID = -1;
+    m_bChainEngine = false;
     m_bTaxiLightOn = false;
     m_vecGravity = CVector ( 0.0f, 0.0f, -1.0f );
     m_HeadLightColor = SColorRGBA ( 255, 255, 255, 255 );
@@ -1914,7 +1915,10 @@ void CClientVehicle::SetFrozenWaitingForGroundToLoad ( bool bFrozen )
 
 CClientVehicle* CClientVehicle::GetPreviousTrainCarriage ( void )
 {
-    if ( m_pVehicle )
+    if ( IsDerailed () )
+        return NULL;
+
+    if ( m_pVehicle && m_pVehicle->GetPreviousTrainCarriage () )
     {
         return m_pVehicleManager->Get ( m_pVehicle->GetPreviousTrainCarriage (), false );
     }
@@ -1924,7 +1928,10 @@ CClientVehicle* CClientVehicle::GetPreviousTrainCarriage ( void )
 
 CClientVehicle* CClientVehicle::GetNextTrainCarriage ( void )
 {
-    if ( m_pVehicle )
+    if ( IsDerailed () )
+        return NULL;
+
+    if ( m_pVehicle && m_pVehicle->GetNextTrainCarriage () )
     {
         return m_pVehicleManager->Get ( m_pVehicle->GetNextTrainCarriage (), false );
     }
