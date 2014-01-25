@@ -44,7 +44,6 @@ CProxyDirect3DDevice9::CProxyDirect3DDevice9 ( IDirect3DDevice9 * pDevice  )
     D3DADAPTER_IDENTIFIER9 adaptIdent;
     ZeroMemory( &adaptIdent, sizeof( D3DADAPTER_IDENTIFIER9 ) );
     pD3D9->GetAdapterIdentifier( iAdapter, 0, &adaptIdent );
-    SString strVideoCardName = adaptIdent.Description;
 
     int iVideoCardMemoryKBTotal = GetWMIVideoAdapterMemorySize ( adaptIdent.DeviceName ) / 1024;
 
@@ -73,6 +72,9 @@ CProxyDirect3DDevice9::CProxyDirect3DDevice9 ( IDirect3DDevice9 * pDevice  )
         while ( iLevel >>= 1 )
             g_pDeviceState->AdapterState.MaxAnisotropicSetting++;
     }
+
+    // Clipping is required for some graphic configurations
+    g_pDeviceState->AdapterState.bRequiresClipping = SStringX( adaptIdent.Description ).Contains( "Intel" );
 
     // Call event handler
     CDirect3DEvents9::OnDirect3DDeviceCreate ( pDevice );
