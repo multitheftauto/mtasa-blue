@@ -5248,9 +5248,9 @@ void CStaticFunctionDefinitions::GUIScrollBarSetScrollPosition ( CClientEntity& 
 }
 
 
-void CStaticFunctionDefinitions::GUIScrollPaneSetHorizontalScrollPosition ( CClientEntity& Entity, int iProgress )
+void CStaticFunctionDefinitions::GUIScrollPaneSetHorizontalScrollPosition ( CClientEntity& Entity, float fProgress )
 {
-    RUN_CHILDREN GUIScrollPaneSetHorizontalScrollPosition ( **iter, iProgress );
+    RUN_CHILDREN GUIScrollPaneSetHorizontalScrollPosition ( **iter, fProgress );
 
     // Are we a CGUI element?
     if ( IS_GUI ( &Entity ) )
@@ -5261,7 +5261,7 @@ void CStaticFunctionDefinitions::GUIScrollPaneSetHorizontalScrollPosition ( CCli
         if ( IS_CGUIELEMENT_SCROLLPANE ( &GUIElement ) )
         {
             // Set the progress
-            static_cast < CGUIScrollPane* > ( GUIElement.GetCGUIElement () ) -> SetHorizontalScrollPosition ( ( float ) ( iProgress / 100.0f ) );
+            static_cast < CGUIScrollPane* > ( GUIElement.GetCGUIElement () ) -> SetHorizontalScrollPosition ( fProgress / 100.0f );
         }
     }
 }
@@ -5287,9 +5287,9 @@ void CStaticFunctionDefinitions::GUIScrollPaneSetScrollBars ( CClientEntity& Ent
 }
 
 
-void CStaticFunctionDefinitions::GUIScrollPaneSetVerticalScrollPosition ( CClientEntity& Entity, int iProgress )
+void CStaticFunctionDefinitions::GUIScrollPaneSetVerticalScrollPosition ( CClientEntity& Entity, float fProgress )
 {
-    RUN_CHILDREN GUIScrollPaneSetVerticalScrollPosition ( **iter, iProgress );
+    RUN_CHILDREN GUIScrollPaneSetVerticalScrollPosition ( **iter, fProgress );
 
     // Are we a CGUI element?
     if ( IS_GUI ( &Entity ) )
@@ -5300,7 +5300,7 @@ void CStaticFunctionDefinitions::GUIScrollPaneSetVerticalScrollPosition ( CClien
         if ( IS_CGUIELEMENT_SCROLLPANE ( &GUIElement ) )
         {
             // Set the progress
-            static_cast < CGUIScrollPane* > ( GUIElement.GetCGUIElement () ) -> SetVerticalScrollPosition ( ( float ) ( iProgress / 100.0f ) );
+            static_cast < CGUIScrollPane* > ( GUIElement.GetCGUIElement () ) -> SetVerticalScrollPosition ( fProgress / 100.0f );
         }
     }
 }

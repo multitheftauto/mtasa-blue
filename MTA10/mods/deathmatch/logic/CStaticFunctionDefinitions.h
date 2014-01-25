@@ -408,8 +408,8 @@ public:
 
     static void                         GUIScrollBarSetScrollPosition       ( CClientEntity& Element, int iProgress );
 
-    static void                         GUIScrollPaneSetHorizontalScrollPosition    ( CClientEntity& Element, int iProgress );
-    static void                         GUIScrollPaneSetVerticalScrollPosition      ( CClientEntity& Element, int iProgress );
+    static void                         GUIScrollPaneSetHorizontalScrollPosition    ( CClientEntity& Element, float fProgress );
+    static void                         GUIScrollPaneSetVerticalScrollPosition      ( CClientEntity& Element, float fProgress );
 
     static inline const CVector2D       GUIGetScreenSize                    ( void )                                                                                    { return g_pCore->GetGUI()->GetResolution (); };
     
