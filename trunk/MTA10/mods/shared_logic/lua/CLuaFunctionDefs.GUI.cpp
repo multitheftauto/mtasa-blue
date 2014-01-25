@@ -992,7 +992,7 @@ int CLuaFunctionDefs::GUIScrollPaneSetHorizontalScrollPosition ( lua_State* luaV
 
     if ( !argStream.HasErrors () )
     {
-        CStaticFunctionDefinitions::GUIScrollPaneSetHorizontalScrollPosition ( *theScrollPane, static_cast < int > ( amount ) );
+        CStaticFunctionDefinitions::GUIScrollPaneSetHorizontalScrollPosition ( *theScrollPane, amount );
         lua_pushboolean ( luaVM, true );
         return 1;
     }
@@ -1016,7 +1016,7 @@ int CLuaFunctionDefs::GUIScrollPaneSetVerticalScrollPosition ( lua_State* luaVM 
 
     if ( !argStream.HasErrors () )
     {
-        CStaticFunctionDefinitions::GUIScrollPaneSetVerticalScrollPosition ( *theScrollPane, static_cast < int > ( amount ) );
+        CStaticFunctionDefinitions::GUIScrollPaneSetVerticalScrollPosition ( *theScrollPane, amount );
         lua_pushboolean ( luaVM, true );
         return 1;
     }
