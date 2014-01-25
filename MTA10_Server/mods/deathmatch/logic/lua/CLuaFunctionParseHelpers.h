@@ -238,6 +238,23 @@ CPed* UserDataCast ( CPed*, void* ptr, lua_State* )
     return (CPed*)pElement;
 }
 
+
+//
+// CPlayer from userdata
+//
+// Disallows conversion of CPeds to CPlayers
+// 
+template < class T >
+CPlayer* UserDataCast ( CPlayer*, void* ptr, lua_State* )
+{
+    ElementID ID = TO_ELEMENTID ( ptr );
+    CElement* pElement = CElementIDs::GetElement ( ID );
+    if ( !pElement || pElement->IsBeingDeleted () || ( pElement->GetType() != CElement::PLAYER ) )
+        return NULL;
+    return (CPlayer*)pElement;
+}
+
+
 //
 // CElement ( something )
 //
