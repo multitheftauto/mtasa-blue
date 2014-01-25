@@ -144,13 +144,9 @@ void CTileBatcher::Flush ( void )
             m_bZBufferDirty = false;
         }
 
-        // Save state
-        LPDIRECT3DSTATEBLOCK9   m_pDeviceState = NULL;
-#if 0   // Creating a state block here may not be necessary
-        m_pDevice->CreateStateBlock ( D3DSBT_ALL, &m_pDeviceState );
-#endif
-
         // Set states
+        if ( g_pDeviceState->AdapterState.bRequiresClipping )
+            m_pDevice->SetRenderState ( D3DRS_CLIPPING, TRUE );
         m_pDevice->SetRenderState ( D3DRS_ZENABLE, m_bUseCustomMatrices ? D3DZB_TRUE : D3DZB_FALSE );
         m_pDevice->SetRenderState ( D3DRS_CULLMODE, D3DCULL_NONE );
         m_pDevice->SetRenderState ( D3DRS_SHADEMODE, D3DSHADE_GOURAUD );
@@ -269,13 +265,8 @@ void CTileBatcher::Flush ( void )
         m_fCurrentRotCenX = 0;
         m_fCurrentRotCenY = 0;
 
-        // Restore state
-        if ( m_pDeviceState )
-        {
-            m_pDeviceState->Apply ( );
-            m_pDeviceState->Release ( );
-            m_pDeviceState = NULL;
-        }
+        if ( g_pDeviceState->AdapterState.bRequiresClipping )
+            m_pDevice->SetRenderState ( D3DRS_CLIPPING, FALSE );
     }
 }
 

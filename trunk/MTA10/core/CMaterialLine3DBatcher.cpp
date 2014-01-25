@@ -83,6 +83,8 @@ void CMaterialLine3DBatcher::Flush ( void )
     m_pDevice->SetTransform ( D3DTS_PROJECTION, &matProjection );
 
     // Set render states
+    if ( g_pDeviceState->AdapterState.bRequiresClipping )
+        m_pDevice->SetRenderState ( D3DRS_CLIPPING, TRUE );
     m_pDevice->SetRenderState ( D3DRS_ZENABLE,          D3DZB_TRUE );
     m_pDevice->SetRenderState ( D3DRS_ZFUNC,            D3DCMP_LESSEQUAL );
     m_pDevice->SetRenderState ( D3DRS_ZWRITEENABLE,     FALSE );
@@ -182,6 +184,9 @@ void CMaterialLine3DBatcher::Flush ( void )
         m_LineList [ i ].pMaterial->Release ();
 
     ListClearAndReserve ( m_LineList );
+
+    if ( g_pDeviceState->AdapterState.bRequiresClipping )
+        m_pDevice->SetRenderState ( D3DRS_CLIPPING, FALSE );
 }
 
 
