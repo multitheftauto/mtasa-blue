@@ -35,6 +35,9 @@ bool CResourceClientScriptsPacket::Write ( NetBitStreamInterface& BitStream ) co
           iter != m_vecItems.end();
           ++iter )
     {
+        if ( BitStream.Version() >= 0x50 )
+            BitStream.WriteString( (*iter)->GetName() );
+
         const SString& data = (*iter)->GetSourceCode ();
         unsigned int len = data.length ();
         BitStream.Write ( len );

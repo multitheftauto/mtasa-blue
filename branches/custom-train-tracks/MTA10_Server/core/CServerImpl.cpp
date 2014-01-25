@@ -24,6 +24,13 @@
 #include <signal.h>
 #ifdef WIN32
     #include <Mmsystem.h>
+#else
+    #include <termios.h>
+    #include <unistd.h>
+
+    // This is probably safer than changing MTAPlatform.h against compatibility issues
+    #undef Printf
+    #define Print printf
 #endif
 
 // Define libraries
@@ -33,6 +40,7 @@ char szXMLLibName[] = "xmll" MTA_LIB_SUFFIX MTA_LIB_EXTENSION;
 using namespace std;
 
 bool g_bSilent = false;
+bool g_bNoCurses = false;
 bool g_bNoTopBar = false;
 #ifndef WIN32
 bool g_bDaemonized = false;
@@ -61,13 +69,6 @@ CServerImpl::CServerImpl ( void )
     memset(&m_szTag, 0, sizeof ( m_szTag ) * sizeof ( char ) );
     m_uiInputCount = 0;
 
-    // Create the TCP interface
-    m_pTCP = new CTCPImpl;
-    if ( !m_pTCP->Initialize () )
-    {
-        Print ( "WARNING: Initializing TCP failed ('%s')\n", m_pTCP->GetLastError () );
-    }
-
     // Create our stuff
     m_pModManager = new CModManagerImpl ( this );
 }
@@ -77,7 +78,6 @@ CServerImpl::~CServerImpl ( void )
 {
     // Destroy our stuff
     delete m_pModManager;
-    delete m_pTCP;
 }
 
 
@@ -90,12 +90,6 @@ CNetServer* CServerImpl::GetNetwork ( void )
 CModManager* CServerImpl::GetModManager ( void )
 {
     return m_pModManager;
-}
-
-
-CTCP* CServerImpl::GetTCP ( void )
-{
-    return m_pTCP;
 }
 
 
@@ -121,7 +115,10 @@ void CServerImpl::Printf ( const char* szFormat, ... )
 #ifdef WIN32
         vprintf ( szFormat, ap );
 #else
-        vwprintw ( stdscr, szFormat, ap );
+        if(!g_bNoCurses)
+            vwprintw ( stdscr, szFormat, ap );
+        else
+            vprintf ( szFormat, ap );
 #endif
     }
 
@@ -219,58 +216,67 @@ int CServerImpl::Run ( int iArgumentCount, char* szArguments [] )
         assert ( strcoll( "a", "B" ) > 0 );
 
         // Initialize the window and any necessary curses options
-        initscr ( );
-        keypad ( stdscr, TRUE );
-        nonl ( );
-        cbreak ( );
-        noecho ( );
-        nodelay ( stdscr, TRUE );
-        idlok ( stdscr, FALSE );
-        scrollok ( stdscr, TRUE );
-        if ( !g_bNoTopBar )
-            setscrreg ( 1, LINES - 1 );
-        else
-            setscrreg ( 0, LINES - 1 );
-
-        // Initialize the colors
-        if ( has_colors ( ) )
+        if( !g_bNoCurses )
         {
-            start_color ( );
+            initscr ( );
+            keypad ( stdscr, TRUE );
+            nonl ( );
+            cbreak ( );
+            noecho ( );
+            nodelay ( stdscr, TRUE );
+            idlok ( stdscr, FALSE );
+            scrollok ( stdscr, TRUE );
 
-            init_pair ( 1, COLOR_BLACK, COLOR_WHITE );
-            init_pair ( 2, COLOR_BLACK, COLOR_GREEN );
-            init_pair ( 3, COLOR_WHITE, COLOR_WHITE );
-            init_pair ( 4, COLOR_RED, COLOR_WHITE );
-            init_pair ( 5, COLOR_GREEN, COLOR_WHITE );
-            init_pair ( 6, COLOR_BLUE, COLOR_WHITE );
+            if ( !g_bNoTopBar )
+                setscrreg ( 1, LINES - 1 );
+            else
+                setscrreg ( 0, LINES - 1 );
+
+            // Initialize the colors
+            if ( has_colors ( ) )
+            {
+                start_color ( );
+
+                init_pair ( 1, COLOR_BLACK, COLOR_WHITE );
+                init_pair ( 2, COLOR_BLACK, COLOR_GREEN );
+                init_pair ( 3, COLOR_WHITE, COLOR_WHITE );
+                init_pair ( 4, COLOR_RED, COLOR_WHITE );
+                init_pair ( 5, COLOR_GREEN, COLOR_WHITE );
+                init_pair ( 6, COLOR_BLUE, COLOR_WHITE );
+            }
+            // Create the input window
+            m_wndInput = subwin ( stdscr, 1, COLS, LINES - 1, 0 );
+            scrollok ( m_wndInput, TRUE );
+            wbkgd ( m_wndInput, COLOR_PAIR ( 2 ) );
+
+            // Create the menu window
+            if ( !g_bNoTopBar )
+            {
+                m_wndMenu = subwin ( stdscr, 1, COLS, 0, 0 );
+                wbkgd ( m_wndMenu, COLOR_PAIR ( 1 ) );
+            }
+
+            // Position the cursor and refresh the physical screen
+
+            if ( !g_bNoTopBar)
+                move ( 1, 0 );
+            else
+                move ( 0, 0 );
+            refresh ( );
         }
-        // Create the input window
-        m_wndInput = subwin ( stdscr, 1, COLS, LINES - 1, 0 );
-        scrollok ( m_wndInput, TRUE );
-        wbkgd ( m_wndInput, COLOR_PAIR ( 2 ) );
-
-        // Create the menu window
-        if ( !g_bNoTopBar )
-        {
-            m_wndMenu = subwin ( stdscr, 1, COLS, 0, 0 );
-            wbkgd ( m_wndMenu, COLOR_PAIR ( 1 ) );
-        }
-
-        // Position the cursor and refresh the physical screen
-        if ( !g_bNoTopBar )
-            move ( 1, 0 );
         else
-            move ( 0, 0 );
-        refresh ( );
+        {
+            int oldf = fcntl(STDIN_FILENO, F_GETFL, 0);
+            fcntl(STDIN_FILENO, F_SETFL, oldf | O_NONBLOCK);
+        }
+
 #endif
     }
 
     // Did we find the path? If not, assume our current
     if ( m_strServerPath == "" )
     {
-        char szBuffer[ MAX_PATH ];
-        getcwd ( szBuffer, MAX_PATH - 1 );
-        m_strServerPath = szBuffer;
+        m_strServerPath = GetSystemCurrentDirectory();
     }
 
     // Convert all backslashes to forward slashes
@@ -293,15 +299,17 @@ int CServerImpl::Run ( int iArgumentCount, char* szArguments [] )
     if ( m_NetworkLibrary.Load ( GetAbsolutePath ( szNetworkLibName ) ) )
     {
         // Network module compatibility check
-        typedef unsigned long (*PFNCHECKCOMPATIBILITY) ( unsigned long );
-    PFNCHECKCOMPATIBILITY pfnCheckCompatibility = reinterpret_cast< PFNCHECKCOMPATIBILITY > ( m_NetworkLibrary.GetProcedureAddress ( "CheckCompatibility" ) );
-        if ( !pfnCheckCompatibility || !pfnCheckCompatibility ( MTA_DM_SERVER_NET_MODULE_VERSION ) )
+        typedef unsigned long (*PFNCHECKCOMPATIBILITY) ( unsigned long, unsigned long* );
+        PFNCHECKCOMPATIBILITY pfnCheckCompatibility = reinterpret_cast< PFNCHECKCOMPATIBILITY > ( m_NetworkLibrary.GetProcedureAddress ( "CheckCompatibility" ) );
+        if ( !pfnCheckCompatibility || !pfnCheckCompatibility ( MTA_DM_SERVER_NET_MODULE_VERSION, NULL ) )
         {
             // net.dll doesn't like our version number
-            Print ( "Network module not compatible!\n" );
-            Print ( "Press Q to shut down the server!\n" );
-            Print ( "\n\n\n(If this is a custom build,\n" );
-            Print ( " check MTASA_VERSION_TYPE in version.h is set correctly)\n" );
+            ulong ulNetModuleVersion = 0;
+            pfnCheckCompatibility ( 1, &ulNetModuleVersion );
+            Print ( "Network module not compatible! (Expected 0x%x, got 0x%x)\n\r", MTA_DM_SERVER_NET_MODULE_VERSION, ulNetModuleVersion );
+            Print ( "Press Q to shut down the server!\n\r" );
+            Print ( "\n\r\n\r\n\r(If this is a custom build,\n\r" );
+            Print ( " check MTASA_VERSION_TYPE in version.h is set correctly)\n\r" );
             WaitForKey ( 'q' );
             DestroyWindow ( );
             return ERROR_NETWORK_LIBRARY_FAILED;
@@ -407,7 +415,7 @@ void CServerImpl::MainLoop ( void )
     while ( !m_bRequestedQuit )
     {
 #ifndef WIN32
-        if ( !g_bSilent )
+        if ( !g_bSilent && !g_bNoCurses )
         {
             // Update all the windows, and the physical screen in one burst
             if ( m_wndMenu )
@@ -417,7 +425,7 @@ void CServerImpl::MainLoop ( void )
             wbkgd ( m_wndInput, COLOR_PAIR ( 2 ) );
         }
 #endif
-        if ( !g_bSilent && !g_bNoTopBar )
+        if ( !g_bSilent && !g_bNoTopBar && !g_bNoCurses )
         {
             // Show the info tag, 80 is a fixed length
             char szInfoTag[80] = { '\0' };
@@ -486,7 +494,7 @@ void CServerImpl::MainLoop ( void )
 /*************************/
 void CServerImpl::ShowInfoTag ( char* szTag )
 {
-    if ( g_bSilent || g_bNoTopBar )
+    if ( g_bSilent || g_bNoTopBar || g_bNoCurses )
         return;
 #ifdef WIN32
     // Windows console code
@@ -587,8 +595,18 @@ void CServerImpl::HandleInput ( void )
         iStdIn = _getwch();
     }
 #else
-    if ( get_wch(&iStdIn) == ERR )
-        iStdIn = 0;
+    if( !g_bNoCurses )
+    {
+        if ( get_wch(&iStdIn) == ERR )
+            iStdIn = 0;
+    }
+    else
+    {
+        iStdIn = getwchar();
+
+        if ( iStdIn == -1 )
+            iStdIn = 0;
+    }
 #endif
 
     if ( iStdIn == 0 )
@@ -605,7 +623,7 @@ void CServerImpl::HandleInput ( void )
             // set string termination (required for compare/string functions
             m_szInputBuffer[m_uiInputCount] = 0;
 
-            if ( !g_bSilent )
+            if ( !g_bSilent && !g_bNoCurses )
             {
                 // Clear the input window
                 wclear ( m_wndInput );
@@ -655,7 +673,7 @@ void CServerImpl::HandleInput ( void )
 #ifdef WIN32
             Printf ( "%c %c", 0x08, 0x08 );
 #else
-            if ( !g_bSilent )
+            if ( !g_bSilent && !g_bNoCurses )
                 wprintw ( m_wndInput, "%c %c", 0x08, 0x08 );
 #endif
             m_uiInputCount--;
@@ -691,7 +709,7 @@ void CServerImpl::HandleInput ( void )
 
             Printf ( "\r%s", UTF16ToMbUTF8(szBuffer).c_str() );
 #else
-            if ( !g_bSilent )
+            if ( !g_bSilent && !g_bNoCurses )
                 wmove ( m_wndInput, 0, --m_uiInputCount );
 #endif
             break;
@@ -714,7 +732,7 @@ void CServerImpl::HandleInput ( void )
 
             Printf ( "\r%s", UTF16ToMbUTF8(szBuffer).c_str() );
 #else
-            if ( !g_bSilent )
+            if ( !g_bSilent && !g_bNoCurses )
                 wmove ( m_wndInput, 0, ++m_uiInputCount );
 #endif
             break;
@@ -752,7 +770,7 @@ void CServerImpl::HandleInput ( void )
             Printf ( "%s", UTF16ToMbUTF8(wUNICODE).c_str() );
 #else
             wchar_t wUNICODE[2] = { iStdIn, 0 };
-            if ( !g_bSilent )
+            if ( !g_bSilent && !g_bNoCurses )
                 wprintw ( m_wndInput, "%s", UTF16ToMbUTF8(wUNICODE).c_str() );
 #endif
 
@@ -820,6 +838,11 @@ bool CServerImpl::ParseArguments ( int iArgumentCount, char* szArguments [] )
                 {
                     g_bDaemonized = true;
                 }
+                else if ( strcmp ( szArguments [i], "-n" ) == 0 )
+                {
+                    g_bNoTopBar = true;
+                    g_bNoCurses = true;
+                }
 #endif
                 else if ( strcmp ( szArguments [i], "-t" ) == 0 )
                 {
@@ -865,7 +888,7 @@ bool IsKeyPressed ( int iKey )
 void CServerImpl::DestroyWindow ( void )
 {
 #ifndef WIN32
-    if ( !g_bSilent )
+    if ( !g_bSilent  || !g_bNoCurses )
     {
         if ( m_wndMenu )
             delwin ( m_wndMenu );

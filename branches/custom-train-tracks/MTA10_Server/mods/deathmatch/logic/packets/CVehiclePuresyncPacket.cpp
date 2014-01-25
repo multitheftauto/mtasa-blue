@@ -141,7 +141,6 @@ bool CVehiclePuresyncPacket::Read ( NetBitStreamInterface& BitStream )
 
                 // Trailer chain
                 CVehicle* pTowedByVehicle = pVehicle;
-                CVehicle* pTrailer = NULL;
                 ElementID TrailerID;
                 bool bHasTrailer;
                 if ( !BitStream.ReadBit ( bHasTrailer ) )
@@ -150,9 +149,7 @@ bool CVehiclePuresyncPacket::Read ( NetBitStreamInterface& BitStream )
                 while ( bHasTrailer )
                 {
                     BitStream.Read ( TrailerID );
-                    CElement* pElement = CElementIDs::GetElement ( TrailerID );
-                    if ( pElement )
-                        pTrailer = dynamic_cast < CVehicle* > ( pElement );  // Uses dynamic_cast as pre r4481 client could send as incorrect element
+                    CVehicle* pTrailer = GetElementFromId < CVehicle > ( TrailerID );
                     
                     // Read out the trailer position and rotation
                     SPositionSync trailerPosition ( false );
@@ -181,8 +178,8 @@ bool CVehiclePuresyncPacket::Read ( NetBitStreamInterface& BitStream )
                                 pCurrentTrailer->SetTowedByVehicle ( NULL );
 
                                 // Tell everyone to detach them
-                                CVehicleTrailerPacket AttachPacket ( pTowedByVehicle, pCurrentTrailer, false );
-                                g_pGame->GetPlayerManager ()->BroadcastOnlyJoined ( AttachPacket );
+                                CVehicleTrailerPacket DetachPacket ( pTowedByVehicle, pCurrentTrailer, false );
+                                g_pGame->GetPlayerManager ()->BroadcastOnlyJoined ( DetachPacket );
 
                                 // Execute the attach trailer script function
                                 CLuaArguments Arguments;
@@ -198,8 +195,8 @@ bool CVehiclePuresyncPacket::Read ( NetBitStreamInterface& BitStream )
                                 pTrailer->SetTowedByVehicle ( NULL );
 
                                 // Tell everyone to detach them
-                                CVehicleTrailerPacket AttachPacket ( pCurrentVehicle, pTrailer, false );
-                                g_pGame->GetPlayerManager ()->BroadcastOnlyJoined ( AttachPacket );
+                                CVehicleTrailerPacket DetachPacket ( pCurrentVehicle, pTrailer, false );
+                                g_pGame->GetPlayerManager ()->BroadcastOnlyJoined ( DetachPacket );
 
                                 // Execute the attach trailer script function
                                 CLuaArguments Arguments;
@@ -237,13 +234,13 @@ bool CVehiclePuresyncPacket::Read ( NetBitStreamInterface& BitStream )
                     pCurrentTrailer->SetTowedByVehicle ( NULL );
 
                     // Tell everyone else to detach them
-                    CVehicleTrailerPacket AttachPacket ( pTowedByVehicle, pCurrentTrailer, false );
-                    g_pGame->GetPlayerManager ()->BroadcastOnlyJoined ( AttachPacket );
+                    CVehicleTrailerPacket DetachPacket ( pTowedByVehicle, pCurrentTrailer, false );
+                    g_pGame->GetPlayerManager ()->BroadcastOnlyJoined ( DetachPacket );
 
                     // Execute the detach trailer script function
                     CLuaArguments Arguments;
                     Arguments.PushElement ( pTowedByVehicle );
-                    pCurrentTrailer->CallEvent ( "onTrailerDetach", Arguments );                    
+                    pCurrentTrailer->CallEvent ( "onTrailerDetach", Arguments );
                 }
             }
 
@@ -367,11 +364,11 @@ bool CVehiclePuresyncPacket::Read ( NetBitStreamInterface& BitStream )
                     float fWeaponRange = pSourcePlayer->GetWeaponRangeFromSlot ( slot.data.uiSlot );
 
                     // Read the ammo states
-                    SWeaponAmmoSync ammo ( pSourcePlayer->GetWeaponType (), pSourcePlayer->GetBitStreamVersion () >= 0x44, true );
+                    SWeaponAmmoSync ammo ( pSourcePlayer->GetWeaponType (), BitStream.Version () >= 0x44, true );
                     if ( !BitStream.Read ( &ammo ) )
                         return false;
                     pSourcePlayer->SetWeaponAmmoInClip ( ammo.data.usAmmoInClip );
-                    if ( pSourcePlayer->GetBitStreamVersion () >= 0x44 )
+                    if ( BitStream.Version () >= 0x44 )
                         pSourcePlayer->SetWeaponTotalAmmo ( ammo.data.usTotalAmmo );
 
                     // Read aim data
@@ -568,7 +565,7 @@ bool CVehiclePuresyncPacket::Write ( NetBitStreamInterface& BitStream ) const
                 if ( flags.data.bIsDoingGangDriveby && CWeaponNames::DoesSlotHaveAmmo ( slot.data.uiSlot ) )
                 {
                     // Write the ammo states
-                    SWeaponAmmoSync ammo ( ucWeaponType, pSourcePlayer->GetBitStreamVersion () >= 0x44, true );
+                    SWeaponAmmoSync ammo ( ucWeaponType, BitStream.Version () >= 0x44, true );
                     ammo.data.usAmmoInClip = pSourcePlayer->GetWeaponAmmoInClip ();
                     ammo.data.usTotalAmmo = pSourcePlayer->GetWeaponTotalAmmo ();
                     BitStream.Write ( &ammo );

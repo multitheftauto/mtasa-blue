@@ -89,7 +89,7 @@ void CSimPlayerManager::RemoveSimPlayer ( CPlayer* pPlayer )
     MapRemove ( m_SocketSimMap, pSim->m_PlayerSocket );
 
     // Remove outgoing sim from all dist lists
-    for ( std::set < CSimPlayer* > ::const_iterator iter = m_AllSimPlayerMap.begin () ; iter != m_AllSimPlayerMap.end (); iter++ )
+    for ( std::set < CSimPlayer* > ::const_iterator iter = m_AllSimPlayerMap.begin () ; iter != m_AllSimPlayerMap.end (); ++iter )
     {
         CSimPlayer* pOtherSim = *iter;
         ListRemove ( pOtherSim->m_PuresyncSendListFlat, pSim );

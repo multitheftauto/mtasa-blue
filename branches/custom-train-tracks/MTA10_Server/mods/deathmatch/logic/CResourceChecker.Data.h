@@ -143,7 +143,27 @@ namespace
                                          { "bitReplace",                    "1.3.2" },
                                          { "dxSetAspectRatioAdjustmentEnabled", "1.3.3-9.05546" },
                                          { "dxIsAspectRatioAdjustmentEnabled",  "1.3.3-9.05546" },
-                                        };
+                                         { "getEventHandlers",              "1.3.4" },
+                                         { "playSFX",                       "1.3.4" },
+                                         { "playSFX3D",                     "1.3.4" },
+                                         { "getHeliBladeCollisionsEnabled",  "1.3.4-9.05764" },
+                                         { "setHeliBladeCollisionsEnabled",  "1.3.4-9.05764" },
+                                         { "onClientVehicleDamage",         "1.3.5" },
+                                         { "isPedDead",                     "1.3.5" },
+                                         { "getCamera",                     "1.3.5" },
+                                         { "dxSetTextureEdge",              "1.3.5" },
+                                         { "guiEditGetCaretIndex",          "1.3.5" },
+                                         { "guiMemoGetCaretIndex",          "1.3.5" },
+                                         { "addDebugHook",                  "1.3.5" },
+                                         { "removeDebugHook",               "1.3.5" },
+                                         { "teaEncode",                     "1.3.5" },
+                                         { "teaDecode",                     "1.3.5" },
+                                         { "base64Encode",                  "1.3.5" },
+                                         { "base64Decode",                  "1.3.5" },
+                                         { "pregFind",                      "1.3.5" },
+                                         { "pregReplace",                   "1.3.5" },
+                                         { "pregMatch",                     "1.3.5" },
+                                       };
 
     SVersionItem serverFunctionInitList[] = {
                                          { "onChatMessage",             "1.1.1-9.03316" },
@@ -206,6 +226,15 @@ namespace
                                          { "bitExtract",                "1.3.2" },
                                          { "bitReplace",                "1.3.2" },
                                          { "getPlayerACInfo",           "1.3.3" },
+                                         { "addDebugHook",              "1.3.4-9.05939" },
+                                         { "removeDebugHook",           "1.3.4-9.05939" },
+                                         { "teaEncode",                 "1.3.5" },
+                                         { "teaDecode",                 "1.3.5" },
+                                         { "base64Encode",              "1.3.5" },
+                                         { "base64Decode",              "1.3.5" },
+                                         { "pregFind",                  "1.3.5" },
+                                         { "pregReplace",               "1.3.5" },
+                                         { "pregMatch",                 "1.3.5" },
                                         };
 
 
@@ -276,8 +305,10 @@ namespace
                 { false, "setPedFrozen",                   "setElementFrozen" },
                 { false, "setVehicleFrozen",               "setElementFrozen" },
                 { false, "setObjectStatic",                "setElementFrozen" },
+                { false, "isPlayerDead",                   "isPedDead" },
                 // Edit
                 { false, "guiEditSetCaratIndex",           "guiEditSetCaretIndex" },
+                { false, "guiMemoSetCaratIndex",           "guiMemoSetCaretIndex" },
                 // XML
                 { false, "xmlNodeFindChild",               "xmlFindChild" },
             };

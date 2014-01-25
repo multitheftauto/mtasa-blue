@@ -838,9 +838,12 @@ void CModelInfoSA::ResetAlphaTransparency ()
     m_pInterface = ppModelInfo [ m_dwModelID ];
     if(m_pInterface)
     {
-        BYTE bEnabled = *MapFind ( ms_ModelDefaultAlphaTransparencyMap, m_dwModelID );
-        m_pInterface->bAlphaTransparency = bEnabled;
-        MapRemove ( ms_ModelDefaultAlphaTransparencyMap, m_dwModelID );
+        BYTE* pbEnabled = MapFind ( ms_ModelDefaultAlphaTransparencyMap, m_dwModelID );
+        if ( pbEnabled )
+        {
+            m_pInterface->bAlphaTransparency = *pbEnabled;
+            MapRemove ( ms_ModelDefaultAlphaTransparencyMap, m_dwModelID );
+        }
     }
 }
 
@@ -952,7 +955,7 @@ void CModelInfoSA::SetCustomModel ( RpClump* pClump )
         {
             pGame->GetRenderWare ()->ReplaceVehicleModel ( pClump, static_cast < unsigned short > ( m_dwModelID ) );
         }
-        else if ( m_dwModelID >= 331 && m_dwModelID <= 369 )
+        else if ( ( m_dwModelID >= 331 && m_dwModelID <= 369 ) || m_dwModelID == 372 )
         {
             // We are a weapon.
             pGame->GetRenderWare ()->ReplaceWeaponModel ( pClump, static_cast < unsigned short > ( m_dwModelID ) );
@@ -1223,108 +1226,100 @@ void CModelInfoSA::StaticSetHooks ( void )
 }
 
 // Recursive RwFrame children searching function
-inline RwFrame * CModelInfoSA::RwSetSupportedUpgrades ( RwFrame * parent, DWORD dwModel ) 
+void CModelInfoSA::RwSetSupportedUpgrades ( RwFrame * parent, DWORD dwModel ) 
 {
-    RwFrame * ret = parent->child, * buf;
-    while ( ret != NULL ) { 
+    for( RwFrame* ret = parent->child ; ret != NULL ; ret = ret->next )
+    {
         // recurse into the child
         if ( ret->child != NULL ) {
-            buf = RwSetSupportedUpgrades ( ret, dwModel );
-            if ( buf != NULL ) return buf;
+            RwSetSupportedUpgrades ( ret, dwModel );
         }
-        // don't re-add, check ret for validity, if it has an empty string at this point it isn't a variant or it's already added
-        if ( ret != NULL )
+        SString strName = ret->szName;
+        // Spoiler
+        if ( strName == "ug_bonnet" )
         {
-            SString strName = ret->szName;
-            g_pCore->GetConsole ( )->Printf ( "model: %s", ret->szName );
-            // Spoiler
-            if ( strName == "ug_bonnet" )
-            {
-                m_ModelSupportedUpgrades.m_bBonnet = true;
-            }
-            else if ( strName == "ug_bonnet_left" )
-            {
-                m_ModelSupportedUpgrades.m_bBonnet_Left = true;
-            }
-            else if ( strName == "ug_bonnet_left_dam" )
-            {
-                m_ModelSupportedUpgrades.m_bBonnet_Left_dam = true;
-            }
-            else if ( strName == "ug_bonnet_right" )
-            {
-                m_ModelSupportedUpgrades.m_bBonnet_Right = true;
-            }
-            else if ( strName == "ug_bonnet_right_dam" )
-            {
-                m_ModelSupportedUpgrades.m_bBonnet_Right_dam = true;
-            }
-            // Spoiler
-            else if ( strName == "ug_spoiler" )
-            {
-                m_ModelSupportedUpgrades.m_bSpoiler = true;
-            }
-            else if ( strName == "ug_spoiler_dam" )
-            {
-                m_ModelSupportedUpgrades.m_bSpoiler_dam = true;
-            }
-            // Bonnet
-            else if ( strName == "ug_lights" )
-            {
-                m_ModelSupportedUpgrades.m_bLamps = true;
-            }
-            else if ( strName == "ug_lights_dam" )
-            {
-                m_ModelSupportedUpgrades.m_bLamps_dam = true;
-            }
-            // Roof
-            else if ( strName == "ug_roof" )
-            {
-                m_ModelSupportedUpgrades.m_bRoof = true;
-            }
-            // Side Skirt
-            else if ( strName == "ug_wing_right" )
-            {
-                m_ModelSupportedUpgrades.m_bSideSkirt_Right = true;
-            }
-            // Side Skirt
-            else if ( strName == "ug_wing_left" )
-            {
-                m_ModelSupportedUpgrades.m_bSideSkirt_Left = true;
-            }
-            // Exhaust
-            else if ( strName == "exhaust_ok" )
-            {
-                m_ModelSupportedUpgrades.m_bExhaust = true;
-            }
-            // Front bullbars
-            else if ( strName == "ug_frontbullbar" )
-            {
-                m_ModelSupportedUpgrades.m_bFrontBullbars = true;
-            }
-            // rear bullbars
-            else if ( strName == "ug_backbullbar" )
-            {
-                m_ModelSupportedUpgrades.m_bRearBullbars = true;
-            }
-            // Front bumper
-            else if ( strName == "bump_front_dummy" )
-            {
-                m_ModelSupportedUpgrades.m_bFrontBumper = true;
-            }
-            // Rear bumper
-            else if ( strName == "bump_rear_dummy" )
-            {   
-                m_ModelSupportedUpgrades.m_bRearBumper = true;
-            }
-            // Rear bumper
-            else if ( strName == "misc_c" )
-            {   
-                m_ModelSupportedUpgrades.m_bMisc = true;
-            }
+            m_ModelSupportedUpgrades.m_bBonnet = true;
         }
-        ret = ret->next;
+        else if ( strName == "ug_bonnet_left" )
+        {
+            m_ModelSupportedUpgrades.m_bBonnet_Left = true;
+        }
+        else if ( strName == "ug_bonnet_left_dam" )
+        {
+            m_ModelSupportedUpgrades.m_bBonnet_Left_dam = true;
+        }
+        else if ( strName == "ug_bonnet_right" )
+        {
+            m_ModelSupportedUpgrades.m_bBonnet_Right = true;
+        }
+        else if ( strName == "ug_bonnet_right_dam" )
+        {
+            m_ModelSupportedUpgrades.m_bBonnet_Right_dam = true;
+        }
+        // Spoiler
+        else if ( strName == "ug_spoiler" )
+        {
+            m_ModelSupportedUpgrades.m_bSpoiler = true;
+        }
+        else if ( strName == "ug_spoiler_dam" )
+        {
+            m_ModelSupportedUpgrades.m_bSpoiler_dam = true;
+        }
+        // Bonnet
+        else if ( strName == "ug_lights" )
+        {
+            m_ModelSupportedUpgrades.m_bLamps = true;
+        }
+        else if ( strName == "ug_lights_dam" )
+        {
+            m_ModelSupportedUpgrades.m_bLamps_dam = true;
+        }
+        // Roof
+        else if ( strName == "ug_roof" )
+        {
+            m_ModelSupportedUpgrades.m_bRoof = true;
+        }
+        // Side Skirt
+        else if ( strName == "ug_wing_right" )
+        {
+            m_ModelSupportedUpgrades.m_bSideSkirt_Right = true;
+        }
+        // Side Skirt
+        else if ( strName == "ug_wing_left" )
+        {
+            m_ModelSupportedUpgrades.m_bSideSkirt_Left = true;
+        }
+        // Exhaust
+        else if ( strName == "exhaust_ok" )
+        {
+            m_ModelSupportedUpgrades.m_bExhaust = true;
+        }
+        // Front bullbars
+        else if ( strName == "ug_frontbullbar" )
+        {
+            m_ModelSupportedUpgrades.m_bFrontBullbars = true;
+        }
+        // rear bullbars
+        else if ( strName == "ug_backbullbar" )
+        {
+            m_ModelSupportedUpgrades.m_bRearBullbars = true;
+        }
+        // Front bumper
+        else if ( strName == "bump_front_dummy" )
+        {
+            m_ModelSupportedUpgrades.m_bFrontBumper = true;
+        }
+        // Rear bumper
+        else if ( strName == "bump_rear_dummy" )
+        {   
+            m_ModelSupportedUpgrades.m_bRearBumper = true;
+        }
+        // Rear bumper
+        else if ( strName == "misc_c" )
+        {   
+            m_ModelSupportedUpgrades.m_bMisc = true;
+        }
     }
-    return NULL;
 }
 
 void CModelInfoSA::InitialiseSupportedUpgrades ( RpClump * pClump )

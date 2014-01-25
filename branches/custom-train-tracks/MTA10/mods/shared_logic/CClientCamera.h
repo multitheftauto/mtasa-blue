@@ -23,10 +23,16 @@ class CClientManager;
 class CClientPlayer;
 class CClientPlayerManager;
 
-enum eClientCameraAttachMode
+namespace EFixedCameraMode
 {
-    CLIENTCAMERA_3RDPERSON,
-};
+    enum EFixedCameraModeType
+    {
+        ROTATION,
+        TARGET,
+        MATRIX,
+    };
+}
+using EFixedCameraMode::EFixedCameraModeType;
 
 class CClientCamera : public CClientEntity
 {
@@ -39,18 +45,17 @@ public:
 
     inline eClientEntityType    GetType                     ( void ) const                  { return CCLIENTCAMERA; };
 
+    bool                        SetMatrix                   ( const CMatrix& Matrix );
     bool                        GetMatrix                   ( CMatrix& Matrix ) const;
     void                        GetPosition                 ( CVector& vecPosition ) const;
     void                        SetPosition                 ( const CVector& vecPosition );
     void                        GetRotationDegrees          ( CVector& vecRotation ) const;
     void                        SetRotationRadians          ( const CVector& vecRotation );
-    void                        GetFixedTarget              ( CVector& vecTarget ) const;
-    void                        SetFixedTarget              ( const CVector& vecPosition );
-    float                       GetRoll                     ()                              { return m_fRoll; }
-    void                        SetRoll                     ( float fRoll );
+    void                        GetFixedTarget              ( CVector& vecTarget, float* pfRoll = NULL ) const;
+    void                        SetFixedTarget              ( const CVector& vecPosition, float fRoll = 0 );
     float                       GetFOV                      ()                              { return m_fFOV; }
     void                        SetFOV                      ( float fFOV )                  { m_fFOV = fFOV; }
-    void                        SetTarget                   ( const CVector& vecPosition );
+    void                        SetOrbitTarget              ( const CVector& vecPosition );
 
     void                        FadeIn                      ( float fTime );
     void                        FadeOut                     ( float fTime, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue );
@@ -58,7 +63,6 @@ public:
     inline CClientPlayer*       GetFocusedPlayer            ( void )                        { return m_pFocusedPlayer; };
     void                        SetFocus                    ( CClientEntity* pEntity, eCamMode eMode, bool bSmoothTransition = false );
     void                        SetFocus                    ( CClientPlayer* pPlayer, eCamMode eMode, bool bSmoothTransition = false );
-    void                        SetFocus                    ( CVector * vecTarget, bool bSmoothTransition );
     void                        SetFocusToLocalPlayer       ( void );
 
     void                        SetCameraViewMode               ( eVehicleCamMode eMode );
@@ -77,7 +81,11 @@ private:
                                 CClientCamera               ( CClientManager* pManager );
                                 ~CClientCamera              ( void );
 
-    static bool                 ProcessFixedCamera          ( CCam* pCam );
+    static bool                 StaticProcessFixedCamera    ( CCam* pCam );
+    bool                        ProcessFixedCamera          ( CCam* pCam );
+    void                        SetFocus                    ( CVector * vecTarget, bool bSmoothTransition );
+    CMatrix                     GetGtaMatrix                ( void ) const;
+    void                        SetGtaMatrix                ( const CMatrix& matInNew, CCam* pCam = NULL ) const;
 
     void                        SetFocusToLocalPlayerImpl   ( void );
 
@@ -93,13 +101,11 @@ private:
     bool                        m_bInvalidated;
 
     bool                        m_bFixed;
-    CVector                     m_vecFixedPosition;
+    EFixedCameraModeType        m_FixedCameraMode;
     CVector                     m_vecFixedTarget;
     float                       m_fRoll;
     float                       m_fFOV;
-
-    bool                        m_bPreferFixedRotation;
-    CVector                     m_vecFixedRotation;
+    CMatrix                     m_matFixedMatrix;
 
     CCamera*                    m_pCamera;
 };

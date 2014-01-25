@@ -207,7 +207,10 @@ RwTexDictionary * CRenderWareSA::ReadTXD ( const char *szTXD )
     // TXD header id: 0x16
     // find our txd chunk (dff loads textures, so correct loading order is: txd, dff)
     if ( RwStreamFindChunk ( streamTexture, 0x16, NULL, NULL ) == false )
+    {
+        RwStreamClose ( streamTexture, NULL );
         return NULL;
+    }
 
     // read the texture dictionary from our model (txd)
     RwTexDictionary *pTex = RwTexDictionaryGtaStreamRead ( streamTexture );
@@ -245,7 +248,10 @@ RpClump * CRenderWareSA::ReadDFF ( const char *szDFF, unsigned short usModelID, 
     // DFF header id: 0x10
     // find our dff chunk
     if ( RwStreamFindChunk ( streamModel, 0x10, NULL, NULL ) == false )
+    {
+        RwStreamClose ( streamModel, NULL );
         return NULL;
+    }
 
     // rockstar's collision hack: set the global particle emitter to the modelinfo pointer of this model
     if ( bLoadEmbeddedCollisions )
@@ -344,6 +350,26 @@ void CRenderWareSA::ReplaceModel ( RpClump* pNew, unsigned short usModelID, DWOR
             RpClump* pTemp = RpClumpClone ( pNew );
             RpClump* pNewClone = RpClumpClone ( pTemp );
             RpClumpDestroy ( pTemp );
+
+            // Calling CVehicleModelInfo::SetClump() allocates a new CVehicleStructure.
+            // So let's delete the old one first to avoid CPool<CVehicleStructure> depletion.
+            if ( dwFunc == FUNC_LoadVehicleModel )
+            {
+                CVehicleModelInfoSAInterface* pVehicleModelInfoInterface = (CVehicleModelInfoSAInterface*)pModelInfo->GetInterface ();
+                if ( pVehicleModelInfoInterface->pSomeInfo )
+                {
+                    DWORD dwDeleteFunc = FUNC_CVehicleStructure_delete;
+                    CVehicleStructure* pSomeInfo = pVehicleModelInfoInterface->pSomeInfo;
+                    __asm
+                    {
+                        mov     eax, pSomeInfo
+                        push    eax
+                        call    dwDeleteFunc
+                        add     esp, 4
+                    }
+                    pVehicleModelInfoInterface->pSomeInfo = NULL;
+                }
+            }
 
             // ModelInfo::SetClump
             CBaseModelInfoSAInterface* pModelInfoInterface = pModelInfo->GetInterface ();

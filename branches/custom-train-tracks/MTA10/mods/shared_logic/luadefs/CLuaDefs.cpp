@@ -30,6 +30,7 @@ CClientPickupManager* CLuaDefs::m_pPickupManager = NULL;
 CClientDFFManager* CLuaDefs::m_pDFFManager = NULL;
 CClientColModelManager* CLuaDefs::m_pColModelManager = NULL;
 CRegisteredCommands* CLuaDefs::m_pRegisteredCommands = NULL;
+bool ms_bRegisterdPostCallHook = false;
 
 void CLuaDefs::Initialize ( CClientGame* pClientGame,
                             CLuaManager* pLuaManager,
@@ -65,8 +66,22 @@ int CLuaDefs::CanUseFunction ( lua_CFunction f, lua_State* luaVM )
 
     g_pCore->UpdateDummyProgress();
 
+    g_pClientGame->GetDebugHookManager()->OnPreFunction( f, luaVM, true );
+
+    // Check if post function hook is required
+    if ( g_pClientGame->GetDebugHookManager()->HasPostFunctionHooks() )
+    {
+        // Check if hook needs applying
+        if ( !ms_bRegisterdPostCallHook )
+        {
+            OutputDebugLine ( "[Lua] Registering PostCallHook" );
+            ms_bRegisterdPostCallHook = true;
+            lua_registerPostCallHook ( CLuaDefs::DidUseFunction );
+        }
+    }
+
     // Cached enabled setting here as it doesn't usually change
-    static bool bLogLuaFunctions = g_pCore->GetDebugIdEnabled ( 401 );
+    static bool bLogLuaFunctions = ( g_pCore->GetDiagnosticDebug () == EDiagnosticDebug::LUA_TRACE_0000 );
     if ( !bLogLuaFunctions )
         return true;
 
@@ -80,9 +95,30 @@ int CLuaDefs::CanUseFunction ( lua_CFunction f, lua_State* luaVM )
             strScriptName = pLuaMain->GetScriptName ();
 
         // Record for the crash dump file
-        g_pCore->LogEvent ( 404, "LuaCFunction", strScriptName, pFunction->GetFunctionName () );
+        g_pCore->LogEvent ( 0, "LuaCFunction", strScriptName, pFunction->GetFunctionName () );
     }
 
-    // Everything is allowed on the client
     return true;
+}
+
+
+//
+// Called after a Lua function if post call hook has been installed
+//
+void CLuaDefs::DidUseFunction ( lua_CFunction f, lua_State* luaVM )
+{
+    // Quick cull of unknown pointer range
+    if ( CLuaCFunctions::IsNotFunction( f ) )
+        return;
+
+    // Check if we should remove the hook
+    if ( !g_pClientGame->GetDebugHookManager()->HasPostFunctionHooks() )
+    {
+        OutputDebugLine ( "[Lua] Removing PostCallHook" );
+        assert ( ms_bRegisterdPostCallHook );
+        ms_bRegisterdPostCallHook = false;
+        lua_registerPostCallHook ( NULL );
+    }
+
+    g_pClientGame->GetDebugHookManager()->OnPostFunction( f, luaVM );
 }

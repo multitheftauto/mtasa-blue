@@ -38,6 +38,18 @@ CBassAudio::CBassAudio ( bool bStream, const SString& strPath, bool bLoop, bool 
 }
 
 
+CBassAudio::CBassAudio ( void* pBuffer, unsigned int uiBufferLength, bool bLoop, bool b3D ) : m_bStream ( false ), m_pBuffer ( pBuffer ), m_uiBufferLength ( uiBufferLength ), m_bLoop ( bLoop ), m_b3D ( b3D )
+{
+    m_fVolume = 1.0f;
+    m_fDefaultFrequency = 44100.0f;
+    m_fMinDistance = 5.0f;
+    m_fMaxDistance = 20.0f;
+    m_fPlaybackSpeed = 1.0f;
+    m_bPaused = false;
+    m_bPan = true;
+}
+
+
 CBassAudio::~CBassAudio ( void )
 {
     if ( m_pSound )
@@ -120,11 +132,20 @@ bool CBassAudio::BeginLoadingMedia ( void )
         */
         long lCreateFlags = BASS_MUSIC_PRESCAN|BASS_STREAM_DECODE;
 
-        m_pSound = BASS_StreamCreateFile ( false, m_strPath, 0, 0, lCreateFlags );
-        if ( !m_pSound )
-            m_pSound = BASS_MusicLoad ( false, m_strPath, 0, 0, BASS_MUSIC_RAMP|BASS_MUSIC_PRESCAN|BASS_STREAM_DECODE, 0 );  // Try again
-        if ( !m_pSound && m_b3D )
-            m_pSound = ConvertFileToMono ( m_strPath );                       // Last try if 3D
+        if ( !m_pBuffer )
+        {
+            m_pSound = BASS_StreamCreateFile ( false, m_strPath, 0, 0, lCreateFlags );
+            if ( !m_pSound )
+                m_pSound = BASS_MusicLoad ( false, m_strPath, 0, 0, BASS_MUSIC_RAMP|BASS_MUSIC_PRESCAN|BASS_STREAM_DECODE, 0 );  // Try again
+            if ( !m_pSound && m_b3D )
+                m_pSound = ConvertFileToMono ( m_strPath );                       // Last try if 3D
+        }
+        else
+        {
+            m_pSound = BASS_StreamCreateFile ( true, m_pBuffer, 0, m_uiBufferLength, lCreateFlags );
+            if ( !m_pSound )
+                m_pSound = BASS_MusicLoad ( true, m_pBuffer, 0, m_uiBufferLength, lCreateFlags, 0 );
+        }
 
         // Failed to load ?
         if ( !m_pSound )
@@ -360,7 +381,7 @@ void CBassAudio::CompleteStreamConnect ( HSTREAM pSound )
 void CALLBACK EndSync ( HSYNC handle, DWORD channel, DWORD data, void* user )
 {
     CBassAudio* pBassAudio = static_cast <CBassAudio*> ( user );
-    pBassAudio->bEndSync = true;
+    pBassAudio->uiEndSyncCount++;
 }
 
 void CALLBACK FreeSync ( HSYNC handle, DWORD channel, DWORD data, void* user )
@@ -378,14 +399,23 @@ void CBassAudio::SetFinishedCallbacks ( void )
 
 
 //
-// CBassAudio::IsFinished
+// CBassAudio::GetReachedEndCount
 //
-bool CBassAudio::IsFinished ( void )
+uint CBassAudio::GetReachedEndCount( void )
 {
-    // Sound is determined finished if BASS has freed the sound handle
-    if ( bFreeSync )
-        return true;
-    return false;
+    // Return the number of times the sound has gotten to the end
+    return uiEndSyncCount;
+}
+
+
+//
+// CBassAudio::IsFreed
+//
+bool CBassAudio::IsFreed( void )
+{
+    // Check if BASS has freed the sound handle.
+    // This could be some time after the actual sound has stopped.
+    return bFreeSync;
 }
 
 

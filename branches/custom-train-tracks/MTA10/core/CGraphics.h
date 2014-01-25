@@ -173,7 +173,10 @@ public:
                                                   ID3DXFont * pDXFont = NULL,
                                                   bool bPostGUI = false,
                                                   bool bColorCoded = false,
-                                                  bool bSubPixelPositioning = false );
+                                                  bool bSubPixelPositioning = false,
+                                                  float fRotation = 0,
+                                                  float fRotationCenterX = 0,
+                                                  float fRotationCenterY = 0 );
 
     void                OnChangingRenderTarget  ( uint uiNewViewportSizeX, uint uiNewViewportSizeY );
 
@@ -208,7 +211,8 @@ private:
     ID3DXFont*          MaybeGetBigFont         ( ID3DXFont* pDXFont, float& fScaleX, float& fScaleY );
     void                CheckModes              ( EDrawModeType newDrawMode, EBlendModeType newBlendMode = EBlendMode::NONE );
     void                DrawColorCodedTextLine  ( float fLeft, float fRight, float fY, SColor& currentColor, const wchar_t* wszText,
-                                                  float fScaleX, float fScaleY, unsigned long ulFormat, ID3DXFont* pDXFont, bool bPostGUI, bool bSubPixelPositioning );
+                                                  float fScaleX, float fScaleY, unsigned long ulFormat, ID3DXFont* pDXFont, bool bPostGUI, bool bSubPixelPositioning,
+                                                  float fRotation, float fRotationCenterX, float fRotationCenterY );
 
     CLocalGUI*          m_pGUI;
 
@@ -272,6 +276,9 @@ private:
         float           fScaleY;
         unsigned long   ulFormat;
         ID3DXFont*      pDXFont;
+        float           fRotation;
+        float           fRotationCenterX;
+        float           fRotationCenterY;
     };
 
     struct sDrawQueueRect
@@ -345,6 +352,7 @@ private:
     IDirect3DStateBlock9*               m_pSavedStateBlock;
     CElapsedTime                        m_LastRenderedSceneTimer;
     IDirect3DSurface9*                  m_pSavedFrontBufferData;
+    CRenderTargetItem*                  m_pTempBackBufferData;
     CTextureItem*                       m_ProgressSpinnerTexture;
     SString                             m_strProgressMessage;
     CElapsedTime                        m_FirstDrawnProgressTimer;

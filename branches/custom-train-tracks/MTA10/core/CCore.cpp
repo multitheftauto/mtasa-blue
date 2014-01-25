@@ -535,9 +535,7 @@ void CCore::EnableChatInput ( char* szCommand, DWORD dwColor )
         {
             CChat* pChat = m_pLocalGUI->GetChat ();
             pChat->SetCommand ( szCommand );
-            //pChat->SetInputColor ( dwColor );
             m_pLocalGUI->SetChatBoxInputEnabled ( true );
-            m_pLocalGUI->SetVisibleWindows ( true );
         }
     }
 }
@@ -701,6 +699,86 @@ void CCore::RemoveMessageBox ( bool bNextFrame )
             m_pMessageBox = NULL;
         }
     }
+}
+
+//
+// Show message box with possibility of on-line help
+//
+void CCore::ShowErrorMessageBox( const SString& strTitle, SString strMessage, const SString& strTroubleLink )
+{
+    if ( strTroubleLink.empty() )
+    {
+        CCore::GetSingleton ().ShowMessageBox ( strTitle, strMessage, MB_BUTTON_OK | MB_ICON_ERROR );
+    }
+    else
+    {
+        strMessage += "\n\n";
+        strMessage += _("Do you want to see some on-line help about this problem ?");
+        CQuestionBox* pQuestionBox = CCore::GetSingleton ().GetLocalGUI ()->GetMainMenu ()->GetQuestionWindow ();
+        pQuestionBox->Reset ();
+        pQuestionBox->SetTitle ( strTitle );
+        pQuestionBox->SetMessage ( strMessage );
+        pQuestionBox->SetButton ( 0, _("No") );
+        pQuestionBox->SetButton ( 1, _("Yes") );
+        pQuestionBox->SetCallback ( CCore::ErrorMessageBoxCallBack, new SString( strTroubleLink ) );
+        pQuestionBox->Show ();
+    }
+}
+
+//
+// Show message box with possibility of on-line help
+//  + with net error code appended to message and trouble link
+//
+void CCore::ShowNetErrorMessageBox( const SString& strTitle, SString strMessage, SString strTroubleLink, bool bLinkRequiresErrorCode )
+{
+    uint uiErrorCode = CCore::GetSingleton ().GetNetwork ()->GetExtendedErrorCode ();
+    if ( uiErrorCode != 0 )
+    {
+        // Do anti-virus check soon
+        SetApplicationSettingInt( "noav-user-says-skip", 1 );
+        strMessage += SString ( " \nCode: %08X", uiErrorCode );
+        if ( !strTroubleLink.empty() )
+            strTroubleLink += SString ( "&neterrorcode=%08X", uiErrorCode );
+    }
+    else
+    if ( bLinkRequiresErrorCode )
+        strTroubleLink = "";        // No link if no error code
+
+    ShowErrorMessageBox( strTitle, strMessage, strTroubleLink );
+}
+
+//
+// Callback used in CCore::ShowErrorMessageBox
+//
+void CCore::ErrorMessageBoxCallBack( void* pData, uint uiButton )
+{
+    CCore::GetSingleton ().GetLocalGUI ()->GetMainMenu ()->GetQuestionWindow ()->Reset ();
+
+    SString* pstrTroubleLink = (SString*)pData;
+    if ( uiButton == 1 )
+    {
+        uint uiErrorCode = (uint)pData;
+        BrowseToSolution ( *pstrTroubleLink, EXIT_GAME_FIRST );
+    }
+    delete pstrTroubleLink;
+}
+
+
+//
+// Check for disk space problems
+// Returns false if low disk space, and dialog is being shown
+//
+bool CCore::CheckDiskSpace( uint uiResourcesPathMinMB, uint uiDataPathMinMB )
+{
+    SString strDriveWithNoSpace = GetDriveNameWithNotEnoughSpace( uiResourcesPathMinMB, uiDataPathMinMB );
+    if ( !strDriveWithNoSpace.empty() )
+    {
+        SString strMessage( _("MTA:SA cannot continue because drive %s does not have enough space."), *strDriveWithNoSpace );
+        SString strTroubleLink( SString( "low-disk-space&drive=%s", *strDriveWithNoSpace.Left( 1 ) ) );
+        g_pCore->ShowErrorMessageBox ( _("Fatal error")+_E("CC43"), strMessage, strTroubleLink );
+        return false;
+    }
+    return true;
 }
 
 
@@ -940,12 +1018,15 @@ void CCore::CreateNetwork ( )
     m_pNet = CreateModule < CNet > ( m_NetModule, "Network", "netc", "InitNetInterface", this );
 
     // Network module compatibility check
-    typedef unsigned long (*PFNCHECKCOMPATIBILITY) ( unsigned long );
+    typedef unsigned long (*PFNCHECKCOMPATIBILITY) ( unsigned long, unsigned long* );
     PFNCHECKCOMPATIBILITY pfnCheckCompatibility = static_cast< PFNCHECKCOMPATIBILITY > ( m_NetModule.GetFunctionPointer ( "CheckCompatibility" ) );
-    if ( !pfnCheckCompatibility || !pfnCheckCompatibility ( MTA_DM_CLIENT_NET_MODULE_VERSION ) )
+    if ( !pfnCheckCompatibility || !pfnCheckCompatibility ( MTA_DM_CLIENT_NET_MODULE_VERSION, NULL ) )
     {
         // net.dll doesn't like our version number
-        BrowseToSolution ( "netc-not-compatible", ASK_GO_ONLINE | TERMINATE_PROCESS, "Network module not compatible!" );
+        ulong ulNetModuleVersion = 0;
+        pfnCheckCompatibility ( 1, &ulNetModuleVersion );
+        SString strMessage( "Network module not compatible! (Expected 0x%x, got 0x%x)", MTA_DM_CLIENT_NET_MODULE_VERSION, ulNetModuleVersion );
+        BrowseToSolution ( "netc-not-compatible", ASK_GO_ONLINE | TERMINATE_PROCESS, strMessage );
     }
 
     // Set mta version for report log here
@@ -1314,6 +1395,7 @@ void CCore::RegisterCommands ( )
     m_pCommands->Add ( "test",              "",                                 CCommandFuncs::Test );
     m_pCommands->Add ( "showmemstat",       _("shows the memory statistics"),      CCommandFuncs::ShowMemStat );
     m_pCommands->Add ( "showframegraph",    _("shows the frame timing graph"),     CCommandFuncs::ShowFrameGraph );
+    m_pCommands->Add ( "jinglebells",       "",                                    CCommandFuncs::JingleBells );
 
 #if defined(MTA_DEBUG) || defined(MTA_BETA)
     m_pCommands->Add ( "fakelag",           "",                                 CCommandFuncs::FakeLag );
@@ -2048,8 +2130,11 @@ void CCore::OnCrashAverted ( uint uiId )
 //
 // LogEvent
 // 
-void CCore::LogEvent ( uint uiDebugId, const char* szType, const char* szContext, const char* szBody )
+void CCore::LogEvent ( uint uiDebugId, const char* szType, const char* szContext, const char* szBody, uint uiAddReportLogId )
 {
+    if ( uiAddReportLogId )
+        AddReportLog ( uiAddReportLogId, SString ( "%s - %s", szContext, szBody ) );
+
     if ( GetDebugIdEnabled ( uiDebugId ) )
     {
         CCrashDumpWriter::LogEvent ( szType, szContext, szBody );
@@ -2064,7 +2149,7 @@ void CCore::LogEvent ( uint uiDebugId, const char* szType, const char* szContext
 bool CCore::GetDebugIdEnabled ( uint uiDebugId )
 {
     static CFilterMap debugIdFilterMap ( GetVersionUpdater ()->GetDebugFilterString () );
-    return !debugIdFilterMap.IsFiltered ( uiDebugId );
+    return ( uiDebugId == 0 ) || !debugIdFilterMap.IsFiltered ( uiDebugId );
 }
 
 EDiagnosticDebugType CCore::GetDiagnosticDebug ( void )

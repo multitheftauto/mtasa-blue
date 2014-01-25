@@ -446,7 +446,7 @@ public:
     CTrainFlags trainFlags;
 
     //1468
-    DWORD padding250[1];
+    unsigned int m_uiLastTimeUpdated;
 
     //1472
     BYTE m_ucRailTrackID;
@@ -531,12 +531,17 @@ public:
 
     bool                        AddProjectile                   ( eWeaponType eWeapon, CVector vecOrigin, float fForce, CVector * target, CEntity * targetEntity );
 
-    CVehicleSAInterface *       GetNextCarriageInTrain          ();
-    CVehicle *                  GetNextTrainCarriage            ();
-    void                        SetNextTrainCarriage            ( CVehicle * next );
-    CVehicleSAInterface *       GetPreviousCarriageInTrain      ();
-    CVehicle *                  GetPreviousTrainCarriage        ();
-    void                        SetPreviousTrainCarriage        ( CVehicle * pPrevious );
+    CVehicleSAInterface*        GetNextCarriageInTrain          ();
+    CVehicle*                   GetNextTrainCarriage            ();
+    void                        SetNextTrainCarriage            ( CVehicle* pNext );
+    CVehicleSAInterface*        GetPreviousCarriageInTrain      ();
+    CVehicle*                   GetPreviousTrainCarriage        ();
+    void                        SetPreviousTrainCarriage        ( CVehicle* pPrevious );
+    float                       GetDistanceToCarriage           ( CVehicle* pCarriage );
+    void                        AttachTrainCarriage             ( CVehicle* pCarriage );
+    void                        DetachTrainCarriage             ( CVehicle* pCarriage );
+    bool                        IsChainEngine                   ( void );
+    void                        SetIsChainEngine                ( bool bChainEngine = true );
 
     bool                        IsDerailed                      ();
     void                        SetDerailed                     ( bool bDerailed );
@@ -549,7 +554,7 @@ public:
     BYTE                        GetRailTrack                    ();
     void                        SetRailTrack                    ( BYTE ucTrackID );
     float                       GetTrainPosition                ( void );
-    void                        SetTrainPosition                ( float fPosition );
+    void                        SetTrainPosition                ( float fPosition, bool bRecalcOnRailDistance = true );
 
     bool                        CanPedEnterCar                  ();
     bool                        CanPedJumpOutCar                ( CPed* pPed );

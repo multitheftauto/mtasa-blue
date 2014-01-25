@@ -254,9 +254,9 @@ void CCommandFuncs::Connect ( const char* szParameters )
     if ( !CModManager::GetSingleton ().GetCurrentMod () )
     {
         // Parse the arguments (host port nick pass)
-        char szBuffer [256];
-        strncpy ( szBuffer, szParameters, 256 );
-        szBuffer [255] = 0;
+        char szBuffer [256] = "";
+        if ( szParameters )
+            STRNCPY( szBuffer, szParameters, NUMELMS( szBuffer ) );
 
         if ( !strncmp( szBuffer, "mtasa://", 8 ) )
         {
@@ -507,4 +507,9 @@ void CCommandFuncs::ShowFrameGraph ( const char* szParameters )
     int iCmd = ( szParameters && szParameters [ 0 ] ) ? atoi ( szParameters ) : -1;
     bool bShow = ( iCmd == 1 ) ? true : ( iCmd == 0 ) ? false : !GetGraphStats ()->IsEnabled ();
     GetGraphStats ()->SetEnabled ( bShow );
+}
+
+void CCommandFuncs::JingleBells ( const char* szParameters )
+{
+    g_pCore->GetConsole ()->Print ( "Batman smells" );
 }

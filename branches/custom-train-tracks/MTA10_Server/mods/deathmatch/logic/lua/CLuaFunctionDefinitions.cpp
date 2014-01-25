@@ -23,6 +23,7 @@
 #include "StdInc.h"
 #define MIN_SERVER_REQ_CALLREMOTE_CONNECTION_ATTEMPTS       "1.3.0-9.04563"
 #define MIN_SERVER_REQ_TRIGGERCLIENTEVENT_SENDLIST          "1.3.0-9.04570"
+#define MIN_SERVER_REQ_CALLREMOTE_CONNECT_TIMEOUT           "1.3.5"
 
 extern CGame* g_pGame;
 
@@ -45,7 +46,6 @@ static CColManager*                                     m_pColManager = NULL;
 static CResourceManager*                                m_pResourceManager = NULL;
 static CAccessControlListManager*                       m_pACLManager = NULL;
 static CLuaModuleManager*                               m_pLuaModuleManager = NULL;
-#define type(number,type) (lua_type(luaVM,number) == type)
 
 
 void CLuaFunctionDefinitions::SetBlipManager ( CBlipManager* pBlipManager )
@@ -160,13 +160,16 @@ int CLuaFunctionDefinitions::CallRemote ( lua_State* luaVM )
     if ( !argStream.NextIsFunction ( 1 ) && !argStream.NextIsFunction ( 2 ) )
     {
         // Call type 1
-        //  bool callRemote ( string host [, int connectionAttempts = 10 ], string resourceName, string functionName, callback callbackFunction, [ arguments... ] )
-        SString strHost; uint uiConnectionAttempts; SString strResourceName; SString strFunctionName; CLuaFunctionRef iLuaFunction; CLuaArguments args;
+        //  bool callRemote ( string host [, int connectionAttempts = 10, int connectTimeout = 10000 ], string resourceName, string functionName, callback callbackFunction, [ arguments... ] )
+        SString strHost; uint uiConnectionAttempts; uint uiConnectTimeoutMs; SString strResourceName; SString strFunctionName; CLuaFunctionRef iLuaFunction; CLuaArguments args;
 
         argStream.ReadString ( strHost );
         if ( argStream.NextIsNumber () )
             MinServerReqCheck ( argStream, MIN_SERVER_REQ_CALLREMOTE_CONNECTION_ATTEMPTS, "'connection attempts' is being used" );
         argStream.ReadIfNextIsNumber ( uiConnectionAttempts, 10 );
+        if ( argStream.NextIsNumber () )
+            MinServerReqCheck ( argStream, MIN_SERVER_REQ_CALLREMOTE_CONNECT_TIMEOUT, "'connect timeout' is being used" );
+        argStream.ReadIfNextIsNumber ( uiConnectTimeoutMs, 10000 );
         argStream.ReadString ( strResourceName );
         argStream.ReadString ( strFunctionName );
         argStream.ReadFunction ( iLuaFunction );
@@ -178,7 +181,7 @@ int CLuaFunctionDefinitions::CallRemote ( lua_State* luaVM )
             CLuaMain * luaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
             if ( luaMain )
             {
-                g_pGame->GetRemoteCalls()->Call ( strHost, strResourceName, strFunctionName, &args, luaMain, iLuaFunction, uiConnectionAttempts );
+                g_pGame->GetRemoteCalls()->Call ( strHost, strResourceName, strFunctionName, &args, luaMain, iLuaFunction, uiConnectionAttempts, uiConnectTimeoutMs );
                 lua_pushboolean ( luaVM, true );
                 return 1;
             }
@@ -187,13 +190,16 @@ int CLuaFunctionDefinitions::CallRemote ( lua_State* luaVM )
     else
     {
         // Call type 2
-        //  bool callRemote ( string URL [, int connectionAttempts = 10 ], callback callbackFunction, [ arguments... ] )
-        SString strURL; uint uiConnectionAttempts; CLuaFunctionRef iLuaFunction; CLuaArguments args;
+        //  bool callRemote ( string URL [, int connectionAttempts = 10, int connectTimeout = 10000 ], callback callbackFunction, [ arguments... ] )
+        SString strURL; uint uiConnectionAttempts; uint uiConnectTimeoutMs; CLuaFunctionRef iLuaFunction; CLuaArguments args;
 
         argStream.ReadString ( strURL );
         if ( argStream.NextIsNumber () )
             MinServerReqCheck ( argStream, MIN_SERVER_REQ_CALLREMOTE_CONNECTION_ATTEMPTS, "'connection attempts' is being used" );
         argStream.ReadIfNextIsNumber ( uiConnectionAttempts, 10 );
+        if ( argStream.NextIsNumber () )
+            MinServerReqCheck ( argStream, MIN_SERVER_REQ_CALLREMOTE_CONNECT_TIMEOUT, "'connect timeout' is being used" );
+        argStream.ReadIfNextIsNumber ( uiConnectTimeoutMs, 10000 );
         argStream.ReadFunction ( iLuaFunction );
         argStream.ReadLuaArguments ( args );
         argStream.ReadFunctionComplete ();
@@ -203,7 +209,7 @@ int CLuaFunctionDefinitions::CallRemote ( lua_State* luaVM )
             CLuaMain * luaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
             if ( luaMain )
             {
-                g_pGame->GetRemoteCalls()->Call ( strURL, &args, luaMain, iLuaFunction, uiConnectionAttempts );
+                g_pGame->GetRemoteCalls()->Call ( strURL, &args, luaMain, iLuaFunction, uiConnectionAttempts, uiConnectTimeoutMs );
                 lua_pushboolean ( luaVM, true );
                 return 1;
             }
@@ -221,14 +227,17 @@ int CLuaFunctionDefinitions::CallRemote ( lua_State* luaVM )
 // Call a function on a remote server
 int CLuaFunctionDefinitions::FetchRemote ( lua_State* luaVM )
 {
-//  bool fetchRemote ( string URL [, int connectionAttempts = 10 ], callback callbackFunction, [ string postData, bool bPostBinary, arguments... ] )
+//  bool fetchRemote ( string URL [, int connectionAttempts = 10, int connectTimeout = 10000 ], callback callbackFunction, [ string postData, bool bPostBinary, arguments... ] )
     CScriptArgReader argStream ( luaVM );
-    SString strURL; CLuaFunctionRef iLuaFunction; SString strPostData; bool bPostBinary; CLuaArguments args; uint uiConnectionAttempts;
+    SString strURL; CLuaFunctionRef iLuaFunction; SString strPostData; bool bPostBinary; CLuaArguments args; uint uiConnectionAttempts; uint uiConnectTimeoutMs;
 
     argStream.ReadString ( strURL );
     if ( argStream.NextIsNumber () )
         MinServerReqCheck ( argStream, MIN_SERVER_REQ_CALLREMOTE_CONNECTION_ATTEMPTS, "'connection attempts' is being used" );
     argStream.ReadIfNextIsNumber ( uiConnectionAttempts, 10 );
+    if ( argStream.NextIsNumber () )
+        MinServerReqCheck ( argStream, MIN_SERVER_REQ_CALLREMOTE_CONNECT_TIMEOUT, "'connect timeout' is being used" );
+    argStream.ReadIfNextIsNumber ( uiConnectTimeoutMs, 10000 );
     argStream.ReadFunction ( iLuaFunction );
     argStream.ReadString ( strPostData, "" );
     argStream.ReadBool ( bPostBinary, false );
@@ -240,7 +249,7 @@ int CLuaFunctionDefinitions::FetchRemote ( lua_State* luaVM )
         CLuaMain * luaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
         if ( luaMain )
         {
-            g_pGame->GetRemoteCalls()->Call ( strURL, &args, strPostData, bPostBinary, luaMain, iLuaFunction, uiConnectionAttempts );
+            g_pGame->GetRemoteCalls()->Call ( strURL, &args, strPostData, bPostBinary, luaMain, iLuaFunction, uiConnectionAttempts, uiConnectTimeoutMs );
             lua_pushboolean ( luaVM, true );
             return 1;
         }
@@ -718,17 +727,16 @@ int CLuaFunctionDefinitions::GetLatentEventHandles ( lua_State* luaVM )
     if ( !argStream.HasErrors () )
     {
         std::vector < uint > resultList;
-        if ( g_pGame->GetLatentTransferManager ()->GetSendHandles ( pPlayer->GetSocket (), resultList ) )
+        g_pGame->GetLatentTransferManager ()->GetSendHandles ( pPlayer->GetSocket (), resultList );
+
+        lua_createtable ( luaVM, 0, resultList.size () );
+        for ( uint i = 0 ; i < resultList.size () ; i++ )
         {
-            lua_createtable ( luaVM, 0, resultList.size () );
-            for ( uint i = 0 ; i < resultList.size () ; i++ )
-            {
-                lua_pushnumber ( luaVM, i + 1 );
-                lua_pushnumber ( luaVM, resultList[i] );
-                lua_settable   ( luaVM, -3 );
-            }
-            return 1;
+            lua_pushnumber ( luaVM, i + 1 );
+            lua_pushnumber ( luaVM, resultList[i] );
+            lua_settable   ( luaVM, -3 );
         }
+        return 1;
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
@@ -804,6 +812,60 @@ int CLuaFunctionDefinitions::CancelLatentEvent ( lua_State* luaVM )
 
     // Failed
     lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefinitions::AddDebugHook ( lua_State* luaVM )
+{
+//  bool AddDebugHook ( string hookType, function callback )
+    EDebugHookType hookType; CLuaFunctionRef callBack;
+
+    CScriptArgReader argStream( luaVM );
+    argStream.ReadEnumString( hookType );
+    argStream.ReadFunction( callBack );
+    argStream.ReadFunctionComplete ();
+
+    if ( !argStream.HasErrors() )
+    {
+        if ( g_pGame->GetDebugHookManager()->AddDebugHook( hookType, callBack ) )
+        {
+            lua_pushboolean( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom( luaVM, argStream.GetFullErrorMessage() );
+
+    // Failed
+    lua_pushboolean( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefinitions::RemoveDebugHook ( lua_State* luaVM )
+{
+//  bool RemoveDebugHook ( string hookType, function callback )
+    EDebugHookType hookType; CLuaFunctionRef callBack;
+
+    CScriptArgReader argStream( luaVM );
+    argStream.ReadEnumString( hookType );
+    argStream.ReadFunction( callBack );
+    argStream.ReadFunctionComplete();
+
+    if ( !argStream.HasErrors() )
+    {
+        if ( g_pGame->GetDebugHookManager()->RemoveDebugHook( hookType, callBack ) )
+        {
+            lua_pushboolean( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom( luaVM, argStream.GetFullErrorMessage() );
+
+    // Failed
+    lua_pushboolean( luaVM, false );
     return 1;
 }
 
@@ -1482,16 +1544,27 @@ int CLuaFunctionDefinitions::IsPedFrozen ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::SetPedAnimation ( lua_State* luaVM )
 {
+// bool setPedAnimation ( ped thePed [, string block=nil, string anim=nil, int time=-1, bool loop=true, bool updatePosition=true, bool interruptable=true, bool freezeLastFrame = true] )
     CElement * pPed;
     SString strBlockName, strAnimName;
     int iTime;
     bool bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame;
+    bool bDummy;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData(pPed);
-    argStream.ReadString(strBlockName, "");
+    if ( argStream.NextIsBool() )
+        argStream.ReadBool ( bDummy );      // Wiki used setPedAnimation(source,false) as an example
+    else
+    if ( argStream.NextIsNil() )
+        argStream.m_iIndex++;               // Wiki docs said blockName could be nil
+    else
+        argStream.ReadString ( strBlockName, "" );
     argStream.ReadString(strAnimName, "");
-    argStream.ReadNumber(iTime, -1);
+    if ( argStream.NextCouldBeNumber() )    // Freeroam skips the time arg sometimes
+        argStream.ReadNumber(iTime, -1);
+    else
+        iTime = -1;
     argStream.ReadBool(bLoop, true);
     argStream.ReadBool(bUpdatePosition, true);
     argStream.ReadBool(bInterruptable, true);
@@ -1652,7 +1725,7 @@ int CLuaFunctionDefinitions::SetPedFrozen ( lua_State* luaVM )
 int CLuaFunctionDefinitions::GetPedAmmoInClip ( lua_State* luaVM )
 {
     CPed* pPed;
-    unsigned char ucSlot;
+    unsigned char ucSlot = 0;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData(pPed);
@@ -1681,7 +1754,7 @@ int CLuaFunctionDefinitions::GetPedAmmoInClip ( lua_State* luaVM )
 int CLuaFunctionDefinitions::GetPedTotalAmmo ( lua_State* luaVM )
 {
     CPed* pPed;
-    unsigned char ucSlot;
+    unsigned char ucSlot = 0;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData(pPed);
@@ -2266,7 +2339,7 @@ int CLuaFunctionDefinitions::GetAlivePlayers ( lua_State* luaVM )
         // Add all alive players
         unsigned int uiIndex = 0;
         list < CPlayer* > ::const_iterator iter = m_pPlayerManager->IterBegin ();
-        for ( ; iter != m_pPlayerManager->IterEnd () ; iter++ )
+        for ( ; iter != m_pPlayerManager->IterEnd () ; ++iter )
         {
             if ( (*iter)->IsSpawned () )
             {
@@ -2293,7 +2366,7 @@ int CLuaFunctionDefinitions::GetDeadPlayers ( lua_State* luaVM )
         // Add all alive players
         unsigned int uiIndex = 0;
         list < CPlayer* > ::const_iterator iter = m_pPlayerManager->IterBegin ();
-        for ( ; iter != m_pPlayerManager->IterEnd () ; iter++ )
+        for ( ; iter != m_pPlayerManager->IterEnd () ; ++iter )
         {
             if ( !(*iter)->IsSpawned () )
             {
@@ -2534,14 +2607,15 @@ int CLuaFunctionDefinitions::GetPedGravity ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::GetPlayerSerial ( lua_State* luaVM )
 {
-    CPlayer* pPlayer;
+    CPlayer* pPlayer; uint uiIndex;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData(pPlayer);
+    argStream.ReadUserData( pPlayer );
+    argStream.ReadNumber( uiIndex, 0 );
 
     if ( !argStream.HasErrors ( ) )
     {
-        SString strSerial = CStaticFunctionDefinitions::GetPlayerSerial ( pPlayer );
+        SString strSerial = CStaticFunctionDefinitions::GetPlayerSerial ( pPlayer, uiIndex );
         if ( !strSerial.empty () )
         {
             lua_pushstring ( luaVM, strSerial );
@@ -3026,7 +3100,7 @@ int CLuaFunctionDefinitions::TakePlayerScreenShot ( lua_State* luaVM )
         CResource * pResource = pLuaMain ? pLuaMain->GetResource() : NULL;
         if ( pResource )
         {
-            if ( CStaticFunctionDefinitions::TakePlayerScreenShot ( pElement, sizeX, sizeY, tag, quality, maxBandwidth, maxPacketSize, pResource->GetName () ) )
+            if ( CStaticFunctionDefinitions::TakePlayerScreenShot ( pElement, sizeX, sizeY, tag, quality, maxBandwidth, maxPacketSize, pResource ) )
             {
                 lua_pushboolean ( luaVM, true );
                 return 1;
@@ -3607,18 +3681,23 @@ int CLuaFunctionDefinitions::CreateVehicle ( lua_State* luaVM )
             CResource * pResource = pLuaMain->GetResource();
             if ( pResource )
             {
-                // Create the vehicle and return its handle
-                CVehicle* pVehicle = CStaticFunctionDefinitions::CreateVehicle ( pResource, usModel, vecPosition, vecRotation, strNumberPlate, ucVariant, ucVariant2 );
-                if ( pVehicle )
+                //if ( usModel != 570 || m_pResourceManager->GetMinClientRequirement () > "1.3.2-xx" ) // Todo: On merge: Please insert the revision
                 {
-                    CElementGroup * pGroup = pResource->GetElementGroup();
-                    if ( pGroup )
+                    // Create the vehicle and return its handle
+                    CVehicle* pVehicle = CStaticFunctionDefinitions::CreateVehicle ( pResource, usModel, vecPosition, vecRotation, strNumberPlate, ucVariant, ucVariant2 );
+                    if ( pVehicle )
                     {
-                        pGroup->Add ( pVehicle );
+                        CElementGroup * pGroup = pResource->GetElementGroup();
+                        if ( pGroup )
+                        {
+                            pGroup->Add ( pVehicle );
+                        }
+                        lua_pushelement ( luaVM, pVehicle );
+                        return 1;
                     }
-                    lua_pushelement ( luaVM, pVehicle );
-                    return 1;
                 }
+                /*else
+                    m_pScriptDebugging->LogCustom ( luaVM, "Please set min_mta_version to xxx" ); // Todo*/
             }
         }
     }
@@ -3648,7 +3727,10 @@ int CLuaFunctionDefinitions::GetVehicleType ( lua_State* luaVM )
     if ( !argStream.HasErrors ( ) )
     {   
         if ( ulModel >= 400 && ulModel < 610 )
+        {
             lua_pushstring ( luaVM, CVehicleNames::GetVehicleTypeName ( ulModel ) );
+            return 1;
+        }
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
@@ -3988,36 +4070,38 @@ int CLuaFunctionDefinitions::GetVehicleSirens( lua_State* luaVM )
                 lua_pushnumber ( luaVM, i+1 );
                 lua_newtable ( luaVM );
 
+                SSirenBeaconInfo info = tSirenInfo.m_tSirenInfo[i];
+
                 lua_pushstring( luaVM, "Min_Alpha" );
-                lua_pushnumber ( luaVM, tSirenInfo.m_tSirenInfo[i].m_dwMinSirenAlpha );
+                lua_pushnumber ( luaVM, info.m_dwMinSirenAlpha );
                 lua_settable ( luaVM, -3 ); // End of Min_Alpha property
 
                 lua_pushstring( luaVM, "Red" );
-                lua_pushnumber ( luaVM, tSirenInfo.m_tSirenInfo[i].m_RGBBeaconColour.R );
+                lua_pushnumber ( luaVM, info.m_RGBBeaconColour.R );
                 lua_settable ( luaVM, -3 ); // End of Red property
 
                 lua_pushstring( luaVM, "Green" );
-                lua_pushnumber ( luaVM, tSirenInfo.m_tSirenInfo[i].m_RGBBeaconColour.G );
+                lua_pushnumber ( luaVM, info.m_RGBBeaconColour.G );
                 lua_settable ( luaVM, -3 ); // End of Green property
 
                 lua_pushstring( luaVM, "Blue" );
-                lua_pushnumber ( luaVM, tSirenInfo.m_tSirenInfo[i].m_RGBBeaconColour.B );
+                lua_pushnumber ( luaVM, info.m_RGBBeaconColour.B );
                 lua_settable ( luaVM, -3 ); // End of Blue property
 
                 lua_pushstring( luaVM, "Alpha" );
-                lua_pushnumber ( luaVM, tSirenInfo.m_tSirenInfo[i].m_RGBBeaconColour.A );
+                lua_pushnumber ( luaVM, info.m_RGBBeaconColour.A );
                 lua_settable ( luaVM, -3 ); // End of Alpha property
 
                 lua_pushstring( luaVM, "x" );
-                lua_pushnumber ( luaVM, tSirenInfo.m_tSirenInfo[i].m_vecSirenPositions.fX );
+                lua_pushnumber ( luaVM, info.m_vecSirenPositions.fX );
                 lua_settable ( luaVM, -3 ); // End of X property
 
                 lua_pushstring( luaVM, "y" );
-                lua_pushnumber ( luaVM, tSirenInfo.m_tSirenInfo[i].m_vecSirenPositions.fY );
+                lua_pushnumber ( luaVM, info.m_vecSirenPositions.fY );
                 lua_settable ( luaVM, -3 ); // End of Y property
 
                 lua_pushstring( luaVM, "z" );
-                lua_pushnumber ( luaVM, tSirenInfo.m_tSirenInfo[i].m_vecSirenPositions.fZ );
+                lua_pushnumber ( luaVM, info.m_vecSirenPositions.fZ );
                 lua_settable ( luaVM, -3 ); // End of Z property
 
                 lua_settable ( luaVM, -3 ); // End of Table
@@ -4078,7 +4162,7 @@ int CLuaFunctionDefinitions::GiveVehicleSirens ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::GetVehicleMaxPassengers ( lua_State* luaVM )
 {
-    unsigned int uiModel; 
+    unsigned int uiModel = 0; 
     
     CScriptArgReader argStream ( luaVM );
     
@@ -4431,26 +4515,26 @@ int CLuaFunctionDefinitions::GetVehicleUpgradeOnSlot ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::GetVehicleUpgradeSlotName ( lua_State* luaVM )
 {
-    unsigned char ucNumber; 
+    unsigned short usNumber; 
     
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadNumber(ucNumber); 
+    argStream.ReadNumber(usNumber); 
     
     if ( !argStream.HasErrors ( ) )
     {
-        if ( ucNumber < 17 )
+        if ( usNumber < 17 )
         {
             SString strUpgradeName;
-            if ( CStaticFunctionDefinitions::GetVehicleUpgradeSlotName ( static_cast < unsigned char >( ucNumber ), strUpgradeName ) )
+            if ( CStaticFunctionDefinitions::GetVehicleUpgradeSlotName ( static_cast < unsigned char >( usNumber ), strUpgradeName ) )
             {
                 lua_pushstring ( luaVM, strUpgradeName );
                 return 1;
             }
         }
-        else if ( ucNumber >= 1000 && ucNumber <= 1193 )
+        else if ( usNumber >= 1000 && usNumber <= 1193 )
         {
             SString strUpgradeName;
-            if ( CStaticFunctionDefinitions::GetVehicleUpgradeSlotName ( static_cast < unsigned short >( ucNumber ), strUpgradeName )  )
+            if ( CStaticFunctionDefinitions::GetVehicleUpgradeSlotName ( usNumber, strUpgradeName )  )
             {
                 lua_pushstring ( luaVM, strUpgradeName );
                 return 1;
@@ -5143,7 +5227,7 @@ int CLuaFunctionDefinitions::SetVehicleColor ( lua_State* luaVM )
     int i = 0;
     for (; i < 12; ++i )
     {
-        if ( argStream.NextIsNumber ( ) )
+        if ( argStream.NextCouldBeNumber ( ) )
         {
             argStream.ReadNumber(ucParams[i]);
         }
@@ -6386,9 +6470,9 @@ int CLuaFunctionDefinitions::SetMarkerTarget ( lua_State* luaVM )
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData(pElement);
 
-    if ( argStream.NextIsNumber(0) &&
-         argStream.NextIsNumber(1) &&
-         argStream.NextIsNumber(2) )
+    if ( argStream.NextCouldBeNumber(0) &&
+         argStream.NextCouldBeNumber(1) &&
+         argStream.NextCouldBeNumber(2) )
     {
         argStream.ReadNumber(vecTarget.fX); 
         argStream.ReadNumber(vecTarget.fY); 
@@ -6517,10 +6601,9 @@ int CLuaFunctionDefinitions::CreateBlipAttachedTo ( lua_State* luaVM )
     else
         argStream.ReadUserData(pVisibleTo, m_pRootElement); 
     
-    CLuaMain* pLuaMain = g_pGame->GetLuaManager()->GetVirtualMachine ( luaVM );
-    if ( pLuaMain )
+    if ( !argStream.HasErrors() )
     {
-        CResource * resource = pLuaMain->GetResource();
+        CResource * resource = m_pResourceManager->GetResourceFromLuaState( luaVM );
         if ( resource )
         {
             // Create the blip
@@ -7309,7 +7392,7 @@ int CLuaFunctionDefinitions::PlayMissionAudio ( lua_State* luaVM )
     argStream.ReadUserData(pElement);
     argStream.ReadNumber(usSlot); 
 
-    if ( argStream.NextIsNumber() )
+    if ( argStream.NextCouldBeNumber() )
     {
         argStream.ReadNumber(vecPosition.fX); 
         argStream.ReadNumber(vecPosition.fY); 
@@ -7589,7 +7672,7 @@ int CLuaFunctionDefinitions::GetFunctionsBoundToKey ( lua_State* luaVM )
         // Add all the bound functions to it
         unsigned int uiIndex = 0;
         list < CKeyBind* > ::iterator iter = pPlayer->GetKeyBinds ()->IterBegin ();
-        for ( ; iter != pPlayer->GetKeyBinds ()->IterEnd (); iter++ )
+        for ( ; iter != pPlayer->GetKeyBinds ()->IterEnd (); ++iter )
         {
             CKeyBind* pKeyBind = *iter;
             if ( !pKeyBind->IsBeingDeleted () )
@@ -7661,7 +7744,7 @@ int CLuaFunctionDefinitions::GetKeyBoundToFunction ( lua_State* luaVM )
         iLuaFunction = luaM_toref ( luaVM, 2 );
 
         list < CKeyBind* > ::iterator iter = pPlayer->GetKeyBinds ()->IterBegin ();
-        for ( ; iter != pPlayer->GetKeyBinds ()->IterEnd (); iter++ )
+        for ( ; iter != pPlayer->GetKeyBinds ()->IterEnd (); ++iter )
         {
             CKeyBind* pKeyBind = *iter;
             if ( !pKeyBind->IsBeingDeleted () )
@@ -8149,7 +8232,7 @@ int CLuaFunctionDefinitions::CreateWater ( lua_State* luaVM )
     argStream.ReadNumber(v3.fY); 
     argStream.ReadNumber(v3.fZ); 
 
-    if ( argStream.NextIsNumber () )
+    if ( argStream.NextCouldBeNumber () )
     {
         argStream.ReadNumber(v4.fX); 
         argStream.ReadNumber(v4.fY); 
@@ -8546,13 +8629,19 @@ int CLuaFunctionDefinitions::CreateColRectangle ( lua_State* luaVM )
 }
 
 int CLuaFunctionDefinitions::CreateColPolygon ( lua_State* luaVM )
-{ 
-    CVector2D vecPoint; 
+{
+//  colshape createColPolygon ( float fX, float fY, float fX1, float fY1, float fX2, float fY2, float fX3, float fY3, ... )
+    std::vector < CVector2D > vecPointList; 
     
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadNumber(vecPoint.fX); 
-    argStream.ReadNumber(vecPoint.fY); 
-    
+    for( uint i = 0 ; i < 4 || argStream.NextCouldBeNumber() ; i++ )
+    {
+        CVector2D vecPoint;
+        argStream.ReadNumber( vecPoint.fX ); 
+        argStream.ReadNumber( vecPoint.fY );
+        vecPointList.push_back( vecPoint );
+    }
+
     if ( !argStream.HasErrors ( ) )
     {  
         CLuaMain* pLuaMain = g_pGame->GetLuaManager()->GetVirtualMachine ( luaVM );
@@ -8561,29 +8650,9 @@ int CLuaFunctionDefinitions::CreateColPolygon ( lua_State* luaVM )
             CResource* pResource = pLuaMain->GetResource();
             if ( pResource )
             {
-                // Create it and return it
-                CVector vecPos;
-                vecPos.fX = vecPoint.fX;
-                vecPos.fY = vecPoint.fY;
-
-                CColPolygon* pShape = CStaticFunctionDefinitions::CreateColPolygon ( pResource, vecPos );
+                CColPolygon* pShape = CStaticFunctionDefinitions::CreateColPolygon ( pResource, vecPointList );
                 if ( pShape )
                 {
-                    while ( argStream.NextIsNumber ( ) )
-                    {
-                        argStream.ReadNumber(vecPoint.fX); 
-                        argStream.ReadNumber(vecPoint.fY); 
-                        if ( argStream.HasErrors ( ) ) 
-                        {
-                            m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
-
-                            lua_pushboolean ( luaVM, false );
-                            return 1;
-                        }
-                        pShape->AddPoint(vecPoint);
-                    }
-
-
                     CElementGroup * pGroup = pResource->GetElementGroup();
                     if ( pGroup )
                     {
@@ -9423,7 +9492,7 @@ int CLuaFunctionDefinitions::fromJSON ( lua_State* luaVM )
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
-    lua_pushboolean ( luaVM, false );
+    lua_pushnil ( luaVM );
     return 1;
 }
 
@@ -9541,7 +9610,7 @@ int CLuaFunctionDefinitions::OutputDebugString ( lua_State* luaVM )
 
     if ( !argStream.HasErrors ( ) )
     {
-        if ( uiLevel < 0 || uiLevel > 3 )
+        if ( uiLevel > 3 )
         {
             m_pScriptDebugging->LogWarning ( luaVM, "Bad level argument sent to %s (0-3)", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ) );
 
@@ -9719,21 +9788,30 @@ int CLuaFunctionDefinitions::GetTickCount_ ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::GetCTime ( lua_State* luaVM )
 {
-    // Verify the argument
+    // table getRealTime( [int seconds = current] )
     time_t timer;
     time ( &timer );
     CScriptArgReader argStream ( luaVM );
 
-    if ( argStream.NextIsNumber ( ) )
+    if ( argStream.NextCouldBeNumber ( ) )
     {
         argStream.ReadNumber ( timer );
         if ( timer < 0 )
         {
-            lua_pushboolean ( luaVM, 0 );
-            return 1;
+            argStream.SetCustomError ( "seconds cannot be negative" );
         }
     }
+
     tm * time = localtime ( &timer );
+    if ( time == NULL )
+        argStream.SetCustomError ( "seconds is out of range" );
+
+    if ( argStream.HasErrors () )
+    {
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+        lua_pushboolean ( luaVM, false );
+        return 1;
+    }
 
     CLuaArguments ret;
     ret.PushString("second");
@@ -9767,22 +9845,21 @@ int CLuaFunctionDefinitions::Split ( lua_State* luaVM )
 {
     SString strInput = "";
     unsigned int uiDelimiter = 0;
+    SString strDelimiter;
     CScriptArgReader argStream ( luaVM );
     argStream.ReadString ( strInput );
 
+    if ( argStream.NextIsNumber ( ) )
+    {
+        argStream.ReadNumber ( uiDelimiter );
+        wchar_t wUNICODE[2] = { uiDelimiter, '\0' };
+        strDelimiter = UTF16ToMbUTF8(wUNICODE);
+    }
+    else  // It's already a string
+        argStream.ReadString ( strDelimiter );
 
     if ( !argStream.HasErrors ( ) )
     {
-        SString strDelimiter;
-        if ( argStream.NextIsNumber ( ) )
-        {
-            argStream.ReadNumber ( uiDelimiter );
-            wchar_t wUNICODE[2] = { uiDelimiter, '\0' };
-            strDelimiter = UTF16ToMbUTF8(wUNICODE);
-        }
-        else  // It's already a string
-            argStream.ReadString ( strDelimiter );
-
         // Copy the string
         char* strText = new char [ strInput.length ( ) + 1 ];
         strcpy ( strText, strInput );
@@ -9821,23 +9898,22 @@ int CLuaFunctionDefinitions::GetTok ( lua_State* luaVM )
     SString strInput = "";
     unsigned int uiToken = 0;
     unsigned int uiDelimiter = 0;
+    SString strDelimiter;
     CScriptArgReader argStream ( luaVM );
     argStream.ReadString ( strInput );
     argStream.ReadNumber ( uiToken );
 
+    if ( argStream.NextIsNumber ( ) )
+    {
+        argStream.ReadNumber ( uiDelimiter );
+        wchar_t wUNICODE[2] = { uiDelimiter, '\0' };
+        strDelimiter = UTF16ToMbUTF8(wUNICODE);
+    }
+    else  // It's already a string
+        argStream.ReadString ( strDelimiter );
 
     if ( !argStream.HasErrors ( ) )
     {
-        SString strDelimiter;
-        if ( argStream.NextIsNumber ( ) )
-        {
-            argStream.ReadNumber ( uiDelimiter );
-            wchar_t wUNICODE[2] = { uiDelimiter, '\0' };
-            strDelimiter = UTF16ToMbUTF8(wUNICODE);
-        }
-        else  // It's already a string
-            argStream.ReadString ( strDelimiter );
-
         if ( uiToken > 0 && uiToken < 1024 )
         {
             unsigned int uiCount = 1;
@@ -10039,7 +10115,7 @@ int CLuaFunctionDefinitions::GetTimers ( lua_State* luaVM )
             CTickCount llCurrentTime = CTickCount::Now ();
             unsigned int uiIndex = 0;
             CFastList < CLuaTimer* > ::const_iterator iter = pLuaTimerManager->IterBegin ();
-            for ( ; iter != pLuaTimerManager->IterEnd () ; iter++ )
+            for ( ; iter != pLuaTimerManager->IterEnd () ; ++iter )
             {
                 CLuaTimer* pLuaTimer = *iter;
 
@@ -11012,6 +11088,15 @@ int CLuaFunctionDefinitions::DbPoll ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
+        // Extra input validation
+        if ( pJobData->stage > EJobStage::RESULT )
+            argStream.SetCustomError( "Previous dbPoll already returned result" );
+        if ( pJobData->result.bIgnoreResult )
+            argStream.SetCustomError( "Cannot call dbPoll after dbFree" );
+    }
+
+    if ( !argStream.HasErrors () )
+    {
         if ( !g_pGame->GetDatabaseManager ()->QueryPoll ( pJobData, uiTimeout ) )
         {
             // Not ready yet
@@ -11033,17 +11118,21 @@ int CLuaFunctionDefinitions::DbPoll ( lua_State* luaVM )
 
         // Make table!
         lua_newtable ( luaVM );
-        for ( int i = 0; i < Result.nRows; i++ ) {
+        //for ( int i = 0; i < Result->nRows; i++ ) {
+        int i = 0;
+        for ( CRegistryResultIterator iter = Result->begin() ; iter != Result->end() ; ++iter, ++i )
+        {
+            const CRegistryResultRow& row = *iter;
             lua_newtable ( luaVM );                             // new table
             lua_pushnumber ( luaVM, i+1 );                      // row index number (starting at 1, not 0)
             lua_pushvalue ( luaVM, -2 );                        // value
             lua_settable ( luaVM, -4 );                         // refer to the top level table
-            for ( int j = 0; j < Result.nColumns; j++ )
+            for ( int j = 0; j < Result->nColumns; j++ )
             {
-                const CRegistryResultCell& cell = Result.Data[i][j];
+                const CRegistryResultCell& cell = row[j];
 
                 // Push the column name
-                lua_pushlstring ( luaVM, Result.ColNames[j].c_str (), Result.ColNames[j].size () );
+                lua_pushlstring ( luaVM, Result->ColNames[j].c_str (), Result->ColNames[j].size () );
                 switch ( cell.nType )                           // push the value with the right type
                 {
                     case SQLITE_INTEGER:
@@ -11066,7 +11155,8 @@ int CLuaFunctionDefinitions::DbPoll ( lua_State* luaVM )
             lua_pop ( luaVM, 1 );                               // pop the inner table
         }
         lua_pushnumber ( luaVM, pJobData->result.uiNumAffectedRows );
-        return 2;
+        lua_pushnumber ( luaVM, static_cast < double > ( pJobData->result.ullLastInsertId ) );
+        return 3;
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
@@ -11094,19 +11184,23 @@ int CLuaFunctionDefinitions::ExecuteSQLQuery ( lua_State* luaVM )
         CPerfStatSqliteTiming::GetSingleton ()->SetCurrentResource ( luaVM );
         if ( CStaticFunctionDefinitions::ExecuteSQLQuery ( strQuery, &Args, &Result ) ) {
             lua_newtable ( luaVM );
-            for ( int i = 0; i < Result.nRows; i++ ) {
+            int i = 0;
+            for ( CRegistryResultIterator iter = Result->begin() ; iter != Result->end() ; ++iter, ++i )
+            {
+                const CRegistryResultRow& row = *iter;
+            //for ( int i = 0; i < Result.nRows; i++ ) {
                 lua_newtable ( luaVM );                             // new table
                 lua_pushnumber ( luaVM, i+1 );                      // row index number (starting at 1, not 0)
                 lua_pushvalue ( luaVM, -2 );                        // value
                 lua_settable ( luaVM, -4 );                         // refer to the top level table
-                for ( int j = 0; j < Result.nColumns; j++ )
+                for ( int j = 0; j < Result->nColumns; j++ )
                 {
-                    CRegistryResultCell& cell = Result.Data[i][j];
+                    const CRegistryResultCell& cell = row[j];
                     if ( cell.nType == SQLITE_NULL )
                         continue;
 
                     // Push the column name
-                    lua_pushlstring ( luaVM, Result.ColNames[j].c_str (), Result.ColNames[j].size () );
+                    lua_pushlstring ( luaVM, Result->ColNames[j].c_str (), Result->ColNames[j].size () );
                     switch ( cell.nType )                           // push the value with the right type
                     {
                         case SQLITE_INTEGER:
@@ -11168,19 +11262,23 @@ int CLuaFunctionDefinitions::ExecuteSQLSelect ( lua_State* luaVM )
         if ( CStaticFunctionDefinitions::ExecuteSQLSelect ( strTable, strColumns, strWhere, uiLimit, &Result ) )
         {
             lua_newtable ( luaVM );
-            for ( int i = 0; i < Result.nRows; i++ ) {
+            int i = 0;
+            for ( CRegistryResultIterator iter = Result->begin() ; iter != Result->end() ; ++iter, ++i )
+            {
+                const CRegistryResultRow& row = *iter;
+//            for ( int i = 0; i < Result.nRows; i++ ) {
                 lua_newtable ( luaVM );                             // new table
                 lua_pushnumber ( luaVM, i+1 );                      // row index number (starting at 1, not 0)
                 lua_pushvalue ( luaVM, -2 );                        // value
                 lua_settable ( luaVM, -4 );                         // refer to the top level table
-                for ( int j = 0; j < Result.nColumns; j++ )
+                for ( int j = 0; j < Result->nColumns; j++ )
                 {
-                    CRegistryResultCell& cell = Result.Data[i][j];
+                    const CRegistryResultCell& cell = row[j];
                     if ( cell.nType == SQLITE_NULL )
                         continue;
 
                     // Push the column name
-                    lua_pushlstring ( luaVM, Result.ColNames[j].c_str (), Result.ColNames[j].size () );
+                    lua_pushlstring ( luaVM, Result->ColNames[j].c_str (), Result->ColNames[j].size () );
                     switch ( cell.nType )                           // push the value with the right type
                     {
                         case SQLITE_INTEGER:
@@ -11660,9 +11758,10 @@ int CLuaFunctionDefinitions::KickPlayer ( lua_State* luaVM )
 
     if ( argStream.NextIsUserData() )
     {
-        CPlayer *pResp;
-        argStream.ReadUserData(pResp);
-        strResponsible = pResp->GetNick();
+        CPlayer* pResponsible;
+        argStream.ReadUserData( pResponsible, NULL );
+        if( !argStream.HasErrors() && pResponsible )
+            strResponsible = pResponsible->GetNick();
 
         argStream.ReadString(strReason, "");
     }
@@ -11701,14 +11800,12 @@ int CLuaFunctionDefinitions::BanPlayer ( lua_State* luaVM )
     CPlayer* pPlayer;
     SString strResponsible;
     SString strReason;
-    CPlayer* pResponsible;
+    CPlayer* pResponsible = NULL;
     
     bool bIP;
     bool bUsername;
     bool bSerial;
-
     time_t tUnban;
-
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pPlayer);
@@ -11725,9 +11822,18 @@ int CLuaFunctionDefinitions::BanPlayer ( lua_State* luaVM )
         argStream.ReadString(strResponsible, "Console");
 
     argStream.ReadString(strReason, "");
-    argStream.ReadNumber(tUnban, 0);
 
+    if ( argStream.NextIsString() )
+    {
+        SString strTime;
+        argStream.ReadString(strTime);
+        tUnban = atoi(strTime);
+    }
+    else
+        argStream.ReadNumber(tUnban, 0);
 
+    if ( tUnban > 0 )
+        tUnban += time ( NULL );
 
     if ( !argStream.HasErrors () )
     {
@@ -11753,10 +11859,8 @@ int CLuaFunctionDefinitions::AddBan ( lua_State* luaVM )
     SString strUsername    = "";
     SString strSerial      = "";
     SString strResponsible = "Console";
-    CPlayer * pResponsible; 
+    CPlayer * pResponsible = NULL; 
     SString strReason      = "";
-
-
     time_t tUnban;
 
 
@@ -11764,7 +11868,6 @@ int CLuaFunctionDefinitions::AddBan ( lua_State* luaVM )
     argStream.ReadString(strIP, "");
     argStream.ReadString(strUsername, "");
     argStream.ReadString(strSerial, "");
-    argStream.ReadString(strIP, "");
     if (argStream.NextIsUserData())
     {
         argStream.ReadUserData(pResponsible, NULL);
@@ -11775,9 +11878,18 @@ int CLuaFunctionDefinitions::AddBan ( lua_State* luaVM )
         argStream.ReadString(strResponsible, "Console");
 
     argStream.ReadString(strReason, "");
-    argStream.ReadNumber(tUnban, 0);
 
+    if ( argStream.NextIsString() )
+    {
+        SString strTime;
+        argStream.ReadString(strTime);
+        tUnban = atoi(strTime);
+    }
+    else
+        argStream.ReadNumber(tUnban, 0);
 
+    if ( tUnban > 0 )
+        tUnban += time ( NULL );
 
     if ( !argStream.HasErrors () )
     {
@@ -12590,7 +12702,7 @@ int CLuaFunctionDefinitions::GetModuleInfo ( lua_State* luaVM )
         list < CLuaModule* > ::iterator iter = lua_LoadedModules.begin ();
         SString strAttribute = lua_tostring( luaVM, 2 );
         SString strModuleName = lua_tostring( luaVM, 1 );
-        for ( ; iter != lua_LoadedModules.end (); iter++ )
+        for ( ; iter != lua_LoadedModules.end (); ++iter )
         {
             if ( stricmp ( strModuleName, (*iter)->_GetName().c_str() ) == 0 ) {
                 lua_newtable ( luaVM );
@@ -12623,7 +12735,7 @@ int CLuaFunctionDefinitions::GetModules ( lua_State* luaVM )
     list < CLuaModule* > lua_LoadedModules = m_pLuaModuleManager->GetLoadedModules();
     list < CLuaModule* > ::iterator iter = lua_LoadedModules.begin ();
     unsigned int uiIndex = 1;
-    for ( ; iter != lua_LoadedModules.end (); iter++ )
+    for ( ; iter != lua_LoadedModules.end (); ++iter )
     {
         lua_pushnumber ( luaVM, uiIndex++ );
         lua_pushstring ( luaVM, (*iter)->_GetFunctions().szFileName );
@@ -12683,16 +12795,18 @@ int CLuaFunctionDefinitions::GetPerformanceStats ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::PregFind ( lua_State* luaVM )
 {
-//  bool pregFind ( string base, string pattern )
+//  bool pregFind ( string base, string pattern, uint flags/string = 0 )
     SString strBase, strPattern;
+    pcrecpp::RE_Options pOptions;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadString ( strBase );
     argStream.ReadString ( strPattern );
+    ReadPregFlags( argStream, pOptions );
 
     if ( !argStream.HasErrors () )
     {
-        pcrecpp::RE pPattern ( strPattern );
+        pcrecpp::RE pPattern ( strPattern, pOptions );
 
         if ( pPattern.PartialMatch ( strBase ) )
         {
@@ -12710,17 +12824,19 @@ int CLuaFunctionDefinitions::PregFind ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::PregReplace ( lua_State* luaVM )
 {
-//  string pregReplace ( string base, string pattern, string replace )
+//  string pregReplace ( string base, string pattern, string replace, uint flags/string = 0 )
     SString strBase, strPattern, strReplace;
+    pcrecpp::RE_Options pOptions;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadString ( strBase );
     argStream.ReadString ( strPattern );
     argStream.ReadString ( strReplace );
+    ReadPregFlags( argStream, pOptions );
 
     if ( !argStream.HasErrors () )
     {
-        pcrecpp::RE pPattern ( strPattern );
+        pcrecpp::RE pPattern ( strPattern, pOptions );
 
         string strNew = strBase;
         if ( pPattern.GlobalReplace ( strReplace, &strNew ) )
@@ -12949,18 +13065,21 @@ int CLuaFunctionDefinitions::GetTrainTrackID ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::PregMatch ( lua_State* luaVM )
 {
-//  table pregMatch ( string base, string pattern )
+//  table pregMatch ( string base, string pattern, uint flags/string = 0 )
     SString strBase, strPattern;
+    pcrecpp::RE_Options pOptions;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadString ( strBase );
     argStream.ReadString ( strPattern );
+    ReadPregFlags( argStream, pOptions );
 
     if ( !argStream.HasErrors () )
     {
         lua_newtable ( luaVM );
 
-        pcrecpp::RE pPattern ( strPattern );
+        pcrecpp::RE pPattern ( strPattern, pOptions );
+
         pcrecpp::StringPiece strInput ( strBase );
 
         string strGet; int i = 1;

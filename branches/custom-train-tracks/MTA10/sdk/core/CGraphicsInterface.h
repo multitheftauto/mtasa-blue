@@ -136,7 +136,10 @@ public:
                                                           ID3DXFont * pDXFont,
                                                           bool bPostGUI,
                                                           bool bColorCoded = false,
-                                                          bool bSubPixelPositioning = false ) = 0;
+                                                          bool bSubPixelPositioning = false,
+                                                          float fRotation = 0,
+                                                          float fRotationCenterX = 0,
+                                                          float fRotationCenterY = 0 ) = 0;
 
     // Subsystems
     virtual CRenderItemManagerInterface*   GetRenderItemManager  ( void ) = 0;

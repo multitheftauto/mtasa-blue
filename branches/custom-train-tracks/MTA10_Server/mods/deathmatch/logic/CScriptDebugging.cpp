@@ -280,7 +280,7 @@ void CScriptDebugging::LogString ( const char* szPrePend, lua_State * luaVM, con
         if ( debugInfo.source[0] == '@' )
         {
             // Get and store the location of the debug message
-            strFile = ConformResourcePath ( debugInfo.source );
+            strFile = debugInfo.source + 1;
             iLine   = debugInfo.currentline;
 
             // Populate a message to print/send (unless "info" type)
@@ -418,4 +418,11 @@ void CScriptDebugging::OnLuaMainDestroy ( CLuaMain* pLuaMain )
 {
     dassert ( !ListContains ( m_LuaMainStack, pLuaMain ) );
     ListRemove ( m_LuaMainStack, pLuaMain );
+}
+
+CLuaMain* CScriptDebugging::GetTopLuaMain ( void )
+{
+    if ( !m_LuaMainStack.empty () )
+        return m_LuaMainStack.back();
+    return NULL;
 }

@@ -449,7 +449,7 @@ LPCTSTR __stdcall GetFaultReason ( EXCEPTION_POINTERS * pExPtrs )
         {
             iCurr += (FormatMessage( FORMAT_MESSAGE_IGNORE_INSERTS |
                                             FORMAT_MESSAGE_FROM_HMODULE,
-                                     GetModuleHandle (_T("NTDLL.DLL")) ,
+                                     GetModuleHandleA (_T("NTDLL.DLL")) ,
                                      pExPtrs->ExceptionRecord->
                                                           ExceptionCode,
                                      0                                 ,
@@ -496,7 +496,7 @@ LPCTSTR __stdcall GetFaultReason ( EXCEPTION_POINTERS * pExPtrs )
 
         // Start looking up the exception address.
         PIMAGEHLP_SYMBOL pSym = (PIMAGEHLP_SYMBOL)&g_stSymbol ;
-        FillMemory ( pSym , NULL , SYM_BUFF_SIZE ) ;
+        FillMemory ( pSym, SYM_BUFF_SIZE , NULL  ) ;
         pSym->SizeOfStruct = sizeof ( IMAGEHLP_SYMBOL ) ;
         pSym->MaxNameLength = SYM_BUFF_SIZE - sizeof ( IMAGEHLP_SYMBOL);
 
@@ -1328,7 +1328,7 @@ static DWORD __stdcall
 
     // This could blow the stack...
     char szBuff[ MAX_PATH + 1 ] ;
-    DWORD dwRet = GetModuleFileName ( hModule , szBuff , MAX_PATH ) ;
+    DWORD dwRet = GetModuleFileNameA ( hModule , szBuff , MAX_PATH ) ;
     ASSERT ( 0 != dwRet ) ;
     if ( 0 == dwRet )
     {
@@ -1422,7 +1422,7 @@ DWORD BUGSUTIL_DLLINTERFACE __stdcall
         for ( UINT uiCurr = 0 ; uiCurr < dwCount ; uiCurr++ )
         {
             // Get the module's filename.
-            if ( FALSE == GetModuleFileName ( paMods[ uiCurr ]     ,
+            if ( FALSE == GetModuleFileNameA ( paMods[ uiCurr ]     ,
                                               szModName            ,
                                               sizeof ( szModName )  ) )
             {

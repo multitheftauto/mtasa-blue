@@ -29,7 +29,7 @@ CEntitySA::CEntitySA ( void )
     BeingDeleted = false;
     DoNotRemoveFromGame = false;
     m_pStoredPointer = NULL;
-    m_ulArrayID = 0;
+    m_ulArrayID = INVALID_POOL_ARRAY_ID;
 }
 
 /*VOID CEntitySA::SetModelAlpha ( int iAlpha )
@@ -320,12 +320,7 @@ CMatrix * CEntitySA::GetMatrixInternal ( CMatrix * matrix )
 VOID CEntitySA::SetMatrix ( CMatrix * matrix )
 {
     DEBUG_TRACE("VOID CEntitySA::SetMatrix ( CMatrix * matrix )");
-    if ( (DWORD)m_pInterface->vtbl == VTBL_CPlaceable )
-    {
-        #pragma message(__LOC__ "(Cazomino05) Delete before release.")
-        CEntitySAInterface * pInterface = NULL;
-        pInterface->SetIsLowLodEntity();
-    }
+
     if ( m_pInterface->Placeable.matrix && matrix )
     {
         OnChangingPosition ( matrix->vPos );

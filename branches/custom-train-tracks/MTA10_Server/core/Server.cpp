@@ -15,6 +15,9 @@
 #define ALLOC_STATS_MODULE_NAME "core"
 #include "SharedUtil.hpp"
 #include "SharedUtil.Tests.hpp"
+#ifdef WIN32
+    #include "SharedUtil.Win32Utf8FileHooks.hpp"
+#endif
 
 #if WIN32
     #define MTAEXPORT extern "C" __declspec(dllexport)
@@ -33,6 +36,13 @@ MTAEXPORT int Run ( int iArgumentCount, char* szArguments [] )
     #ifdef WIN32
         // Disable critical error message boxes
         SetErrorMode ( SEM_FAILCRITICALERRORS );
+
+        // Apply file hooks if not already done by the client
+        bool bSkipFileHooks = false;
+        for( int i = 1 ; i < iArgumentCount ; i++ )
+            bSkipFileHooks |= SStringX( szArguments[i] ).Contains( "--clientfeedback" );
+        if( !bSkipFileHooks )
+            AddUtf8FileHooks();
     #endif
 
     // Create the server
@@ -51,6 +61,10 @@ MTAEXPORT int Run ( int iArgumentCount, char* szArguments [] )
     while ( iReturn == SERVER_RESET_RETURN );
 
     // Done
+    #ifdef WIN32
+        RemoveUtf8FileHooks();
+    #endif
+
     return iReturn;
 }
 

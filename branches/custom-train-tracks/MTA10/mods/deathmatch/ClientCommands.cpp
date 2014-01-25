@@ -393,7 +393,7 @@ void COMMAND_RadarHelp ( const char* szCmdLine )
 
 void COMMAND_MessageTarget ( const char* szCmdLine )
 {
-    if ( !(szCmdLine || szCmdLine[0]) )
+    if ( !(szCmdLine && szCmdLine[0]) )
         return;
 
     CClientPlayer* pTarget = g_pClientGame->GetTargetedPlayer ();

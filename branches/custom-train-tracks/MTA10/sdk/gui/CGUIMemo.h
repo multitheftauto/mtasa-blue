@@ -23,8 +23,8 @@ public:
     virtual void            SetReadOnly             ( bool bReadOnly ) = 0;
     virtual bool            IsReadOnly              ( void ) = 0;
 
-    virtual unsigned int    GetCaratIndex           ( void ) = 0;
-    virtual void            SetCaratIndex           ( unsigned int uiIndex ) = 0;
+    virtual unsigned int    GetCaretIndex           ( void ) = 0;
+    virtual void            SetCaretIndex           ( unsigned int uiIndex ) = 0;
 
     virtual float           GetVerticalScrollPosition   ( void ) = 0;
     virtual void            SetVerticalScrollPosition   ( float fPosition ) = 0;

@@ -119,7 +119,6 @@ public:
     CVector                         m_vecPrevBulletSyncStart;
     CVector                         m_vecPrevBulletSyncEnd;
     uchar                           m_ucPrevBulletSyncOrderCounter;
-    bool                            m_bMessageShown;
 private:
     bool                            m_bIsLocalPlayer;
     SString                         m_strNick;

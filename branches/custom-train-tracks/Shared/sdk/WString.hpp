@@ -432,55 +432,12 @@ void WString::AssignLeft ( const wchar_t* szOther, uint uiMaxLength )
     assign ( WStringX ( szOther ).Left ( uiMaxLength ) );
 }
 
-
-//
-// To/From char string
-//
-SString WString::ToAnsi ( void ) const
+WString::WString ( const char* szText )
 {
-    const wchar_t* pszW = c_str ();
-
-    uint cCharacters = wcslen(pszW)+1;
-    // Determine number of bytes to be allocated for ANSI string. An
-    // ANSI string can have at most 2 bytes per character (for Double
-    // Byte Character Strings.)
-    uint cbAnsi = cCharacters*2;
-
-    // Use of the OLE allocator is not required because the resultant
-    // ANSI  string will never be passed to another COM component. You
-    // can use your own allocator.
-    char* pData = (char*)alloca ( cbAnsi );
-
-    // Convert to ANSI.
-#ifdef WIN32
-    if (0 == WideCharToMultiByte(CP_ACP, 0, pszW, cCharacters, pData, cbAnsi, NULL, NULL))
-#else
-    size_t ret = wcstombs ( pData, pszW, cbAnsi );
-    if ( ret == 0 || ret == (size_t)-1 )
-#endif
-    {
-        return "";
-    }
-    return pData;
+    *this = FromUTF8( szText );
 }
 
-void WString::FromAnsi ( const char* szSrc )
+SString WString::ToAnsi ( void ) const
 {
-    uint cCharacters = strlen ( szSrc ) + 1 ;
-    uint cbUnicode = cCharacters * 4;
-    wchar_t* Dest = (wchar_t*)alloca ( cbUnicode );
-
-#ifdef WIN32
-    if ( MultiByteToWideChar ( CP_ACP, 0, szSrc, -1, Dest, (int)cbUnicode ) == 0 )
-#else
-    size_t ret = mbstowcs ( Dest, szSrc, cCharacters );
-    if ( ret == 0 || ret == (size_t)-1 )
-#endif
-    {
-        clear();
-    }
-    else
-    {
-        *this = Dest;
-    }
+    return ToUTF8( *this );
 }

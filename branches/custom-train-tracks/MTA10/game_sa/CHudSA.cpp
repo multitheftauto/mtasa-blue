@@ -297,12 +297,11 @@ void CHudSA::AdjustComponents ( float fAspectRatio )
     // 0x859524: GTA multiplies all HUD and menu transformation variables by this floating point value. It is equal to 1/448, so just translate it to 16/10 / 16/9
     MemPut < float > ( m_pfAspectRatioMultiplicator, 0.002232143f / (4.0f/3.0f) * fAspectRatio );
 
-    // Set the sniper crosshair scale (fix for #7659) | formular (re)produced by maximum scales (there's no exact clue to calculate these scales)
-    m_fSniperCrosshairScale = -39.375f * pow(fAspectRatio, 2) + 28.0f * fAspectRatio + 242.6666666666f;
+    // Set the sniper crosshair scale (fix for #7659)
+    m_fSniperCrosshairScale = 210.0f * (4.0f/3.0f) / fAspectRatio;
 
     // Set the camera crosshair scale (same display flaw as in #7659)
-    MemPut < float > ( m_pfCameraCrosshairScale, -36.0f * pow(fAspectRatio, 2) + 25.6f * fAspectRatio  + 221.866666666f );
-
+    MemPut < float > ( m_pfCameraCrosshairScale, 192.0f * (4.0f/3.0f) / fAspectRatio );
 }
 
 //

@@ -36,7 +36,7 @@ public:
     inline void                     SetVisible                          ( bool bVisible )                   { m_bVisible = bVisible; };
 
     inline SColor                   GetColor                            ( void ) const                      { return m_Color; }
-    inline void                     SetColor                            ( const SColor color )              { m_Color = color; }
+    inline void                     SetColor                            ( const SColor& color )             { m_Color = color; }
 
     inline float                    GetSize                             ( void ) const                      { return m_fSize; };
     inline void                     SetSize                             ( float fSize )                     { m_fSize = fSize; };

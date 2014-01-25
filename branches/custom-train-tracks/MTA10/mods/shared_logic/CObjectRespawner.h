@@ -26,6 +26,7 @@ public:
     void                        DoRespawnAll            ( void );
 
     bool                        IsBeingRespawned        ( CClientObject* pObject );
+    void                        Unreference             ( CClientObject* pObject );
 
 private:
     std::vector < CClientObject* >                      m_List;

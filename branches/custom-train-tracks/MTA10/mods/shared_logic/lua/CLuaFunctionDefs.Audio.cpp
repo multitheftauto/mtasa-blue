@@ -1230,34 +1230,6 @@ int CLuaFunctionDefs::GetSoundEffects ( lua_State* luaVM )
 }
 
 
-int CLuaFunctionDefs::PlayMissionAudio ( lua_State* luaVM )
-{
-    CClientSound* pSound = NULL;
-    CVector vecPosition;
-    unsigned short usSound = 0;
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadNumber ( vecPosition.fX );
-    argStream.ReadNumber ( vecPosition.fY );
-    argStream.ReadNumber ( vecPosition.fZ );
-    argStream.ReadNumber ( usSound );
-
-    if ( !argStream.HasErrors() )
-    {
-        // Play the sound
-        if ( CStaticFunctionDefinitions::PlayMissionAudio ( vecPosition, usSound ) )
-        {
-            lua_pushboolean ( luaVM, true );
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
-
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-
 int CLuaFunctionDefs::PlaySoundFrontEnd ( lua_State* luaVM )
 {
     CClientSound* pSound = NULL;
@@ -1278,32 +1250,6 @@ int CLuaFunctionDefs::PlaySoundFrontEnd ( lua_State* luaVM )
         }
         else
             m_pScriptDebugging->LogError ( luaVM, "Invalid sound ID specified. Valid sound IDs are 0 - 101." );
-    }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
-
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-
-int CLuaFunctionDefs::PreloadMissionAudio ( lua_State* luaVM )
-{
-    CClientSound* pSound = NULL;
-    CVector vecPosition;
-    unsigned short usSound = 0;
-    unsigned short usSlot = 0;
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadNumber ( usSound );
-    argStream.ReadNumber ( usSlot );
-
-    if ( !argStream.HasErrors() )
-    {
-        if ( CStaticFunctionDefinitions::PreloadMissionAudio ( usSound, usSlot ) )
-        {
-            lua_pushboolean ( luaVM, true );
-            return 1;
-        }
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
@@ -1443,6 +1389,106 @@ int CLuaFunctionDefs::ResetWorldSounds ( lua_State* luaVM )
     return 1;
 }
 
+
+int CLuaFunctionDefs::PlaySFX ( lua_State* luaVM )
+{
+//  sound playSFX ( string audioContainer, int bankIndex, int audioIndex [, loop = false ] )
+    eAudioLookupIndex containerIndex; int iBankIndex; int iAudioIndex; bool bLoop;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadEnumString ( containerIndex );
+    argStream.ReadNumber ( iBankIndex );
+    argStream.ReadNumber ( iAudioIndex );
+    argStream.ReadBool ( bLoop, false );
+
+    if ( !argStream.HasErrors () )
+    {
+        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+        if ( pLuaMain )
+        {
+            CResource* pResource = pLuaMain->GetResource ();
+            if ( pResource )
+            {
+                CClientSound* pSound;
+                if ( CStaticFunctionDefinitions::PlaySFX ( pResource, containerIndex, iBankIndex, iAudioIndex, bLoop, pSound ) )
+                {
+                    lua_pushelement ( luaVM, pSound );
+                    return 1;
+                }
+            }
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::PlaySFX3D ( lua_State* luaVM )
+{
+//  sound playSFX3D ( string audioContainer, int bankIndex, int audioIndex, float posX, float posY, float posZ [, loop = false ] )
+    eAudioLookupIndex containerIndex; int iBankIndex; int iAudioIndex; CVector vecPosition; bool bLoop;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadEnumString ( containerIndex );
+    argStream.ReadNumber ( iBankIndex );
+    argStream.ReadNumber ( iAudioIndex );
+    argStream.ReadNumber ( vecPosition.fX );
+    argStream.ReadNumber ( vecPosition.fY );
+    argStream.ReadNumber ( vecPosition.fZ );
+    argStream.ReadBool ( bLoop, false );
+
+    if ( !argStream.HasErrors () )
+    {
+        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+        if ( pLuaMain )
+        {
+            CResource* pResource = pLuaMain->GetResource ();
+            if ( pResource )
+            {
+                CClientSound* pSound;
+                if ( CStaticFunctionDefinitions::PlaySFX3D ( pResource, containerIndex, iBankIndex, iAudioIndex, vecPosition, bLoop, pSound ) )
+                {
+                    lua_pushelement ( luaVM, pSound );
+                    return 1;
+                }
+            }
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::GetSFXStatus ( lua_State* luaVM )
+{
+//  bool getSFXStatus ( string audioContainer )
+    eAudioLookupIndex containerIndex;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadEnumString ( containerIndex );
+
+    if ( !argStream.HasErrors () )
+    {
+        bool bNotCut;
+        if ( CStaticFunctionDefinitions::GetSFXStatus ( containerIndex, bNotCut ) )
+        {
+            lua_pushboolean ( luaVM, bNotCut );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    lua_pushnil ( luaVM );
+    return 1;
+}
+        
 
 int CLuaFunctionDefs::SetSoundPan ( lua_State* luaVM )
 {

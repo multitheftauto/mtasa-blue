@@ -835,7 +835,12 @@ int CLuaFunctionDefs::GetVehicleTowedByVehicle ( lua_State* luaVM )
     {
         if ( pVehicle )
         {
-            CClientVehicle* pTowedVehicle = pVehicle->GetTowedVehicle ();
+            CClientVehicle* pTowedVehicle;
+            if ( pVehicle->GetVehicleType () == CLIENTVEHICLE_TRAIN )
+                pTowedVehicle = pVehicle->GetNextTrainCarriage ();
+            else
+                pTowedVehicle = pVehicle->GetTowedVehicle ();
+
             if ( pTowedVehicle )
             {
                 lua_pushelement ( luaVM, pTowedVehicle );
@@ -863,7 +868,12 @@ int CLuaFunctionDefs::GetVehicleTowingVehicle ( lua_State* luaVM )
     {
         if ( pVehicle )
         {
-            CClientVehicle* pTowedByVehicle = pVehicle->GetTowedByVehicle ();
+            CClientVehicle* pTowedByVehicle;
+            if ( pVehicle->GetVehicleType () == CLIENTVEHICLE_TRAIN )
+                pTowedByVehicle = pVehicle->GetPreviousTrainCarriage ();
+            else
+                pTowedByVehicle = pVehicle->GetTowedByVehicle ();
+
             if ( pTowedByVehicle )
             {
                 lua_pushelement ( luaVM, pTowedByVehicle );
@@ -1233,6 +1243,28 @@ int CLuaFunctionDefs::GetTrainSpeed ( lua_State* luaVM )
 }
 
 
+int CLuaFunctionDefs::IsTrainChainEngine ( lua_State* luaVM )
+{
+    CClientVehicle* pVehicle = NULL;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pVehicle );
+
+    if ( !argStream.HasErrors () )
+    {
+        bool bChainEngine;
+        if ( CStaticFunctionDefinitions::IsTrainChainEngine ( *pVehicle, bChainEngine ) )
+        {
+            lua_pushboolean ( luaVM, bChainEngine );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
 int CLuaFunctionDefs::GetVehicleEngineState ( lua_State* luaVM )
 {
     CClientVehicle* pVehicle = NULL;
@@ -1512,7 +1544,7 @@ int CLuaFunctionDefs::SetVehicleColor ( lua_State* luaVM )
     int i;
     for ( i = 0 ; i < 12 ; i++ )
     {
-        if ( argStream.NextIsNumber ( ) )
+        if ( argStream.NextCouldBeNumber ( ) )
         {
             argStream.ReadNumber ( ucParams[i] );
         }

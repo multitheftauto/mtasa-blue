@@ -433,7 +433,7 @@ int CLuaXMLDefs::xmlNodeGetChildren ( lua_State* luaVM )
         {
             lua_newtable ( luaVM );
             list < CXMLNode * > ::iterator iter = pNode->ChildrenBegin ();
-            for ( ; iter != pNode->ChildrenEnd () ; iter++ )
+            for ( ; iter != pNode->ChildrenEnd () ; ++iter )
             {
                 lua_pushnumber ( luaVM, ++uiIndex );
                 lua_pushxmlnode ( luaVM, *iter );
@@ -529,7 +529,7 @@ int CLuaXMLDefs::xmlNodeGetAttributes ( lua_State* luaVM )
     {
         lua_newtable ( luaVM );
         list < class CXMLAttribute * > ::iterator iter = pNode->GetAttributes().ListBegin();
-        for ( ; iter != pNode->GetAttributes().ListEnd() ; iter++ )
+        for ( ; iter != pNode->GetAttributes().ListEnd() ; ++iter )
         {
             lua_pushstring ( luaVM, ( *iter )->GetName().c_str () );
             lua_pushstring ( luaVM, ( *iter )->GetValue().c_str () );
@@ -556,8 +556,12 @@ int CLuaXMLDefs::xmlNodeGetAttribute ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        lua_pushstring(luaVM, pNode->GetAttributeValue(strAttributeName));
-        return 1;
+        CXMLAttribute* pAttribute = pNode->GetAttributes().Find( strAttributeName );
+        if ( pAttribute )
+        {
+            lua_pushstring( luaVM, pAttribute->GetValue().c_str () );
+            return 1;
+        }
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
@@ -576,14 +580,13 @@ int CLuaXMLDefs::xmlNodeSetAttribute ( lua_State* luaVM )
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pNode );
     argStream.ReadString ( strAttributeName );
+    argStream.ReadString( strAttributeValue, "" );
 
     if ( !argStream.HasErrors () )
     {
-        if ( argStream.NextIsString() )
+        // Are we going to set it to a value?
+        if ( argStream.NextCouldBeString( -1 ) )
         {
-            // Write
-            argStream.ReadString( strAttributeValue );
-            
             CXMLAttribute* pAttribute = pNode->GetAttributes ().Create ( strAttributeName );
             if ( pAttribute )
             {

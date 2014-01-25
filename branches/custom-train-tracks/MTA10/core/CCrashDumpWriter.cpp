@@ -145,6 +145,9 @@ long WINAPI CCrashDumpWriter::HandleExceptionGlobal ( _EXCEPTION_POINTERS* pExce
 
 void CCrashDumpWriter::DumpCoreLog ( CExceptionInformation* pExceptionInformation )
 {
+    // Write crash flag for next launch (Simple flag in case of double faults later)
+    fclose( fopen ( CalcMTASAPath ( "mta\\core.log.flag" ), "w" ) );
+
     // Write a log with the generic exception information
     FILE* pFile = fopen ( CalcMTASAPath ( "mta\\core.log" ), "a+" );
     if ( pFile )
@@ -210,7 +213,7 @@ void CCrashDumpWriter::DumpMiniDump ( _EXCEPTION_POINTERS* pException, CExceptio
     // Try to load the DLL in our directory
     HMODULE hDll = NULL;
     char szDbgHelpPath [MAX_PATH];
-    if ( GetModuleFileName ( NULL, szDbgHelpPath, MAX_PATH ) )
+    if ( GetModuleFileNameA ( NULL, szDbgHelpPath, MAX_PATH ) )
     {
         char* pSlash = _tcsrchr ( szDbgHelpPath, '\\' );
         if ( pSlash )
@@ -633,7 +636,7 @@ void CCrashDumpWriter::GetD3DInfo ( CBuffer& buffer )
     // Try to get CRenderWare pointer
     CCore* pCore = CCore::GetSingletonPtr ();
     CGame* pGame = pCore ? pCore->GetGame () : NULL;
-    CRenderWare* pRenderWare = pGame->GetRenderWare ();
+    CRenderWare* pRenderWare = pGame ? pGame->GetRenderWare () : NULL;
     // Write on how we got on with doing that
     stream.Write ( (uchar)( pCore ? 1 : 0 ) );
     stream.Write ( (uchar)( pGame ? 1 : 0 ) );

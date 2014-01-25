@@ -425,6 +425,7 @@ public:
         SFixedString < 128 > Name;
         int InstalledMemoryKB;
         int MaxAnisotropicSetting;
+        bool bRequiresClipping;
     };
 
     struct SCallState

@@ -52,7 +52,7 @@ CLuaManager::~CLuaManager ( void )
 {
     CLuaCFunctions::RemoveAllFunctions ();
     list<CLuaMain *>::iterator iter;
-    for ( iter = m_virtualMachines.begin(); iter != m_virtualMachines.end(); iter++ )
+    for ( iter = m_virtualMachines.begin(); iter != m_virtualMachines.end(); ++iter )
     {
         delete (*iter);
     }
@@ -61,58 +61,34 @@ CLuaManager::~CLuaManager ( void )
     delete m_pLuaModuleManager;
 }
 
-void CLuaManager::StopScriptsOwnedBy ( int iOwner )
-{
-    // Delete all the scripts by the given owner
-    CLuaMain* pLuaMain = NULL;
-    list < CLuaMain* > ::iterator iter = m_virtualMachines.begin ();
-    for ( ; iter != m_virtualMachines.end (); iter++ )
-    {
-        pLuaMain = *iter;
-        if ( pLuaMain->GetOwner () == iOwner )
-        {
-            // Delete the object
-            delete pLuaMain;
-
-            // Remove from list
-            m_virtualMachines.erase ( iter );
-
-            // Continue from the beginning, unless the list is empty
-            if ( m_virtualMachines.empty () ) break;
-            iter = m_virtualMachines.begin ();
-        }
-    }
-}
-
 CLuaMain * CLuaManager::CreateVirtualMachine ( CResource* pResourceOwner )
 {
     // Create it and add it to the list over VM's
-    CLuaMain * vm = new CLuaMain ( this, m_pObjectManager, m_pPlayerManager, m_pVehicleManager, m_pBlipManager, m_pRadarAreaManager, m_pMapManager, pResourceOwner );
-    m_virtualMachines.push_back ( vm );
-    vm->InitVM ();
+    CLuaMain * pLuaMain = new CLuaMain ( this, m_pObjectManager, m_pPlayerManager, m_pVehicleManager, m_pBlipManager, m_pRadarAreaManager, m_pMapManager, pResourceOwner );
+    m_virtualMachines.push_back ( pLuaMain );
+    pLuaMain->InitVM ();
 
-    m_pLuaModuleManager->RegisterFunctions ( vm->GetVirtualMachine() );
+    m_pLuaModuleManager->RegisterFunctions ( pLuaMain->GetVirtualMachine() );
 
-    return vm;
+    return pLuaMain;
 }
 
-bool CLuaManager::RemoveVirtualMachine ( CLuaMain * vm )
+bool CLuaManager::RemoveVirtualMachine ( CLuaMain * pLuaMain )
 {
-    if ( vm )
+    if ( pLuaMain )
     {
         // Remove all events registered by it and all commands added
-        m_pEvents->RemoveAllEvents ( vm );
-        m_pRegisteredCommands->CleanUpForVM ( vm );
+        m_pEvents->RemoveAllEvents ( pLuaMain );
+        m_pRegisteredCommands->CleanUpForVM ( pLuaMain );
 
         // Delete it unless it is already
-        if ( !vm->BeingDeleted () )
+        if ( !pLuaMain->BeingDeleted () )
         {
-            delete vm;
+            delete pLuaMain;
         }
 
         // Remove it from our list
-        m_virtualMachines.remove ( vm );
-
+        m_virtualMachines.remove ( pLuaMain );
         return true;
     }
 
@@ -120,10 +96,22 @@ bool CLuaManager::RemoveVirtualMachine ( CLuaMain * vm )
 }
 
 
+void CLuaManager::OnLuaMainOpenVM( CLuaMain* pLuaMain, lua_State* luaVM )
+{
+    MapSet( m_VirtualMachineMap, pLuaMain->GetVirtualMachine(), pLuaMain );
+}
+
+
+void CLuaManager::OnLuaMainCloseVM( CLuaMain* pLuaMain, lua_State* luaVM )
+{
+    MapRemove( m_VirtualMachineMap, pLuaMain->GetVirtualMachine() );
+}
+
+
 void CLuaManager::DoPulse ( void )
 {
     list<CLuaMain *>::iterator iter;
-    for ( iter = m_virtualMachines.begin(); iter != m_virtualMachines.end(); iter++ )
+    for ( iter = m_virtualMachines.begin(); iter != m_virtualMachines.end(); ++iter )
     {
         (*iter)->DoPulse();
     }
@@ -132,6 +120,9 @@ void CLuaManager::DoPulse ( void )
 
 CLuaMain* CLuaManager::GetVirtualMachine ( lua_State* luaVM )
 {
+    if ( !luaVM )
+        return NULL;
+
     // Grab the main virtual state because the one we've got passed might be a coroutine state
     // and only the main state is in our list.
     lua_State* main = lua_getmainstate ( luaVM );
@@ -140,12 +131,18 @@ CLuaMain* CLuaManager::GetVirtualMachine ( lua_State* luaVM )
         luaVM = main;
     }
 
+    // Find a matching VM in our map
+    CLuaMain* pLuaMain = MapFindRef( m_VirtualMachineMap, luaVM );
+    if ( pLuaMain )
+        return pLuaMain;
+
     // Find a matching VM in our list
     list < CLuaMain* >::const_iterator iter = m_virtualMachines.begin ();
-    for ( ; iter != m_virtualMachines.end (); iter++ )
+    for ( ; iter != m_virtualMachines.end (); ++iter )
     {
         if ( luaVM == (*iter)->GetVirtualMachine () )
         {
+            dassert( 0 );   // Why not in map?
             return *iter;
         }
     }
@@ -170,6 +167,8 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getLatentEventHandles", CLuaFunctionDefinitions::GetLatentEventHandles );
     CLuaCFunctions::AddFunction ( "getLatentEventStatus", CLuaFunctionDefinitions::GetLatentEventStatus );
     CLuaCFunctions::AddFunction ( "cancelLatentEvent", CLuaFunctionDefinitions::CancelLatentEvent );
+    CLuaCFunctions::AddFunction ( "addDebugHook", CLuaFunctionDefinitions::AddDebugHook );
+    CLuaCFunctions::AddFunction ( "removeDebugHook", CLuaFunctionDefinitions::RemoveDebugHook );
 
     // Ped funcs
     CLuaCFunctions::AddFunction ( "createPed", CLuaFunctionDefinitions::CreatePed );
@@ -720,8 +719,8 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "sha256", CLuaFunctionDefinitions::Sha256 );
     CLuaCFunctions::AddFunction ( "teaEncode", CLuaFunctionDefinitions::TeaEncode );
     CLuaCFunctions::AddFunction ( "teaDecode", CLuaFunctionDefinitions::TeaDecode );
-    CLuaCFunctions::AddFunction ( "base64encode", CLuaFunctionDefinitions::Base64encode );
-    CLuaCFunctions::AddFunction ( "base64decode", CLuaFunctionDefinitions::Base64decode );
+    CLuaCFunctions::AddFunction ( "base64Encode", CLuaFunctionDefinitions::Base64encode );
+    CLuaCFunctions::AddFunction ( "base64Decode", CLuaFunctionDefinitions::Base64decode );
     CLuaCFunctions::AddFunction ( "getVersion", CLuaFunctionDefinitions::GetVersion );
     CLuaCFunctions::AddFunction ( "getNetworkUsageData", CLuaFunctionDefinitions::GetNetworkUsageData );
     CLuaCFunctions::AddFunction ( "getNetworkStats", CLuaFunctionDefinitions::GetNetworkStats );

@@ -235,46 +235,6 @@ bool CConsoleCommands::StopAllResources ( CConsole* pConsole, const char* szArgu
 }
 
 
-bool CConsoleCommands::InstallResource ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
-{
-    return false;
-
-    COPY_CSTR_TO_TEMP_BUFFER( szBuffer, szArguments, 256 );
-
-    char* szURL = strtok ( szBuffer, " " );
-    char* szName = strtok ( NULL, "\0" );
-    if ( strlen ( szURL ) < 150 && strlen ( szURL ) > 1 )
-    {
-        if ( szName && strncmp(szURL, "http://", 7 ) == 0 )
-        {
-            if ( strlen ( szName ) < 100 && strlen ( szName ) > 1 )
-            {
-                if ( g_pGame->GetResourceManager()->Install ( szURL, szName ) )
-                {
-                    char szOutput[512];
-                    snprintf ( szOutput, 511, "Resource %s from %s installed succesfully.", szName, szURL );
-                    pEchoClient->SendConsole ( szOutput );
-                    g_pGame->GetResourceManager()->Refresh();
-                }
-            }
-        }
-        else
-        {
-            char szNewURL[250];
-            szNewURL[249] = '\0';
-            snprintf ( szNewURL, 249, "http://development.mtasa.com/%s.zip", szURL );
-            if ( g_pGame->GetResourceManager()->Install ( szNewURL, szURL ) )
-            {
-                char szOutput[512];
-                snprintf ( szOutput, 511, "Resource %s installed succesfully.", szURL );
-                pEchoClient->SendConsole ( szOutput );
-                g_pGame->GetResourceManager()->Refresh();
-            }
-        }
-    }
-    return true;
-}
-
 bool CConsoleCommands::UpgradeResources ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
 {
     // To work on remote clients, 'upgrade' needs ACL entry + console capture
@@ -1072,7 +1032,7 @@ bool CConsoleCommands::LogIn ( CConsole* pConsole, const char* szArguments, CCli
             szPassword = szTempPassword;
         }
 
-        if ( szNick && szPassword )
+        if ( CAccountManager::IsValidAccountName( szNick ) && CAccountManager::IsValidPassword( szPassword ) )
         {
             return g_pGame->GetAccountManager ()->LogIn ( pClient, pEchoClient, szNick, szPassword );
         }
@@ -1116,7 +1076,7 @@ bool CConsoleCommands::ChgMyPass ( CConsole* pConsole, const char* szArguments, 
             // Split it up into nick and password
             char* szOldPassword = strtok ( szBuffer, " " );
             char* szNewPassword = strtok ( NULL, "\0" );
-            if ( szOldPassword && szNewPassword && strlen ( szOldPassword ) > 0 && strlen ( szNewPassword ) > 0 )
+            if ( CAccountManager::IsValidPassword( szOldPassword ) && CAccountManager::IsValidNewPassword( szNewPassword ) )
             {
                 // Grab the account with that nick
                 CAccount* pAccount = pClient->GetAccount ();
@@ -1181,7 +1141,7 @@ bool CConsoleCommands::AddAccount ( CConsole* pConsole, const char* szArguments,
         if ( szNick && szPassword )
         {
             // Long enough strings?
-            if ( strlen ( szNick ) > 0 && strlen ( szPassword ) > MIN_PASSWORD_LENGTH && strlen ( szPassword ) <= MAX_PASSWORD_LENGTH )
+            if ( CAccountManager::IsValidNewAccountName( szNick ) && CAccountManager::IsValidNewPassword( szPassword ) )
             {
                 // Try creating the account
                 if ( !g_pGame->GetAccountManager ()->Get ( szNick ) )
@@ -1285,7 +1245,7 @@ bool CConsoleCommands::ChgPass ( CConsole* pConsole, const char* szArguments, CC
         // Split it up into nick and password
         char* szNick = strtok ( szBuffer, " " );
         char* szPassword = strtok ( NULL, "\0" );
-        if ( szNick && szPassword && strlen ( szNick ) > 0 && strlen ( szPassword ) > 0 )
+        if ( CAccountManager::IsValidAccountName( szNick ) && CAccountManager::IsValidNewPassword( szPassword ) )
         {
             // Grab the account with that nick
             CAccount* pAccount = g_pGame->GetAccountManager ()->Get ( szNick );

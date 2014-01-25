@@ -26,14 +26,14 @@ public:
 
     lua_CFunction               GetAddress          ( void )                    { return m_Function; }
 
-    const std::string&          GetName             ( void )                    { return m_strName; }
+    const SString&              GetName             ( void )                    { return m_strName; }
     void                        SetName             ( std::string& strName )    { m_strName = strName; }
 
     bool                        IsRestricted        ( void )                    { return m_bRestricted; }
 
 private:
     lua_CFunction               m_Function;
-    std::string                 m_strName;
+    SString                     m_strName;
     bool                        m_bRestricted;
 
 };

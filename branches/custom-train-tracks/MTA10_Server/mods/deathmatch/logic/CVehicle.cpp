@@ -74,7 +74,7 @@ CVehicle::CVehicle ( CVehicleManager* pVehicleManager, CElement* pParent, CXMLNo
     m_fTrainPosition = 0.0f;
     m_ucTrackID = 0;
     m_bTaxiLightState = false;
-    m_bTrainDirection = true;
+    m_bTrainDirection = false;
     m_HeadLightColor = SColorRGBA ( 255, 255, 255, 255 );
     m_bHeliSearchLightVisible = false;
     m_bCollisionsEnabled = true;

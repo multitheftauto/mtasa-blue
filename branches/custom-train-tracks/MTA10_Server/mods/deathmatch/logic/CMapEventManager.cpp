@@ -164,6 +164,9 @@ bool CMapEventManager::Call ( const char* szName, const CLuaArguments& Arguments
                 {
                     // Grab the current VM
                     lua_State* pState = pMapEvent->GetVM ()->GetVM ();
+
+                    LUA_CHECKSTACK ( pState, 1 );   // Ensure some room
+
                     #if MTA_DEBUG
                         int luaStackPointer = lua_gettop ( pState );
                     #endif
@@ -202,11 +205,24 @@ bool CMapEventManager::Call ( const char* szName, const CLuaArguments& Arguments
                     lua_pushelement ( pState, pThis );
                     lua_setglobal ( pState, "this" );
 
-                    lua_pushresource ( pState, pMapEvent->GetVM()->GetResource() );     // This is not correct
-                    lua_setglobal ( pState, "sourceResource" );
+                    CLuaMain* pLuaMain = g_pGame->GetScriptDebugging()->GetTopLuaMain();
+                    CResource* pSourceResource = pLuaMain ? pLuaMain->GetResource() : NULL;
+                    if ( pSourceResource )
+                    {
+                        lua_pushresource ( pState, pSourceResource );
+                        lua_setglobal ( pState, "sourceResource" );
 
-                    lua_pushelement ( pState, pMapEvent->GetVM()->GetResource()->GetResourceRootElement() );     // This is not correct
-                    lua_setglobal ( pState, "sourceResourceRoot" );
+                        lua_pushelement ( pState, pSourceResource->GetResourceRootElement() );
+                        lua_setglobal ( pState, "sourceResourceRoot" );
+                    }
+                    else
+                    {
+                        lua_pushnil ( pState );
+                        lua_setglobal ( pState, "sourceResource" );
+
+                        lua_pushnil ( pState );
+                        lua_setglobal ( pState, "sourceResourceRoot" );
+                    }
 
                     lua_pushstring ( pState, szName );
                     lua_setglobal ( pState, "eventName" );

@@ -78,10 +78,10 @@ SColor CCheckpointSA::GetColor()
     // From ABGR
     unsigned long ulABGR = this->GetInterface()->rwColour;
     SColor color;
-    color.A = ( ulABGR >> 24 ) && 0xff;
-    color.B = ( ulABGR >> 16 ) && 0xff;
-    color.G = ( ulABGR >> 8 ) && 0xff;
-    color.R = ulABGR && 0xff;
+    color.A = ( ulABGR >> 24 ) & 0xff;
+    color.B = ( ulABGR >> 16 ) & 0xff;
+    color.G = ( ulABGR >> 8 ) & 0xff;
+    color.R = ulABGR & 0xff;
     return color;
 }
 

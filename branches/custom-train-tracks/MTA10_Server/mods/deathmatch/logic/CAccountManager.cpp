@@ -32,7 +32,7 @@ CAccountManager::CAccountManager ( const char* szFileName, SString strBuffer ): 
     // Check if new installation
     CRegistryResult result;
 	m_pDatabaseManager->QueryWithResultf ( m_hDbConnection, &result, "SELECT name FROM sqlite_master WHERE type='table' AND name='accounts'" );
-    bool bNewInstallation = ( result.nRows == 0 );
+    bool bNewInstallation = ( result->nRows == 0 );
 
     //Create all our tables (Don't echo the results)
     m_pDatabaseManager->Execf ( m_hDbConnection, "CREATE TABLE IF NOT EXISTS accounts (id INTEGER PRIMARY KEY, name TEXT, password TEXT, ip TEXT, serial TEXT)" );
@@ -41,7 +41,7 @@ CAccountManager::CAccountManager ( const char* szFileName, SString strBuffer ): 
 
     // Check if unique index on accounts exists
 	m_pDatabaseManager->QueryWithResultf ( m_hDbConnection, &result, "SELECT name FROM sqlite_master WHERE type='index' AND name='IDX_ACCOUNTS_NAME_U'" );
-    if ( result.nRows == 0 )
+    if ( result->nRows == 0 )
     {
         // Need to add unique index on accounts
         if ( !bNewInstallation )
@@ -62,7 +62,7 @@ CAccountManager::CAccountManager ( const char* szFileName, SString strBuffer ): 
 
     // Check if unique index on userdata exists
 	m_pDatabaseManager->QueryWithResultf ( m_hDbConnection, &result, "SELECT name FROM sqlite_master WHERE type='index' AND name='IDX_USERDATA_USERID_KEY_U'" );
-    if ( result.nRows == 0 )
+    if ( result->nRows == 0 )
     {
         // Need to add unique index on userdata
         if ( !bNewInstallation )
@@ -90,7 +90,7 @@ CAccountManager::CAccountManager ( const char* szFileName, SString strBuffer ): 
     m_pDatabaseManager->QueryWithResultf ( m_hDbConnection, &result, "SELECT key, value from settings" );
 
     //Did we get any results
-    if ( result.nRows == 0 )
+    if ( result->nRows == 0 )
     {
         //Set our settings and clear the accounts/userdata tables just in case
         m_pDatabaseManager->Execf ( m_hDbConnection, "INSERT INTO settings (key, value) VALUES(?,?)", SQLITE_TEXT, "XMLParsed", SQLITE_INTEGER, 0 );
@@ -100,15 +100,16 @@ CAccountManager::CAccountManager ( const char* szFileName, SString strBuffer ): 
     else
     {
         bool bLoadXMLMissing = true;
-        for (int i = 0;i < result.nRows;i++) 
+        for ( CRegistryResultIterator iter = result->begin() ; iter != result->end() ; ++iter )
         {
-            SString strSetting = (const char *)result.Data[i][0].pVal;
+            const CRegistryResultRow& row = *iter;
+            SString strSetting = (const char *)row[0].pVal;
 
             //Do we have a result for XMLParsed
             if ( strSetting == "XMLParsed" ) 
             {
                 //Is XMLParsed zero
-                if ( result.Data[i][1].nVal == 0 ) 
+                if ( row[1].nVal == 0 ) 
                 {
                     //Tell the Server to load the xml file rather than the SQL
                     m_bLoadXML = true;
@@ -208,7 +209,7 @@ bool CAccountManager::LoadXML ( CXMLNode* pParent )
     //##Keep for backwards compatability with accounts.xml##
     #define ACCOUNT_VALUE_LENGTH 128
 
-    std::string strBuffer, strName, strPassword, strLevel, strIP, strDataKey, strDataValue;
+    std::string strBuffer, strName, strPassword, strIP, strDataKey, strDataValue;
 
     if ( pParent )
     {
@@ -341,8 +342,6 @@ bool CAccountManager::Load( void )
     //Select all our required information from the accounts database
     m_pDatabaseManager->QueryWithResultf ( m_hDbConnection, &result, "SELECT id,name,password,ip,serial from accounts" );
 
-    //Work out how many rows we have
-    int iResults = result.nRows;
     //Initialize all our variables
     SString strName, strPassword, strSerial, strIP;
     int iUserID = 0;
@@ -351,13 +350,15 @@ bool CAccountManager::Load( void )
     CAccount* pAccount = NULL;
     CElapsedTime activityTimer;
     bool bOutputFeedback = false;
-    for ( int i = 0 ; i < iResults ; i++ )
+    for ( CRegistryResultIterator iter = result->begin() ; iter != result->end() ; ++iter )
     {
+        const CRegistryResultRow& row = *iter;
         //Fill User ID, Name & Password (Required data)
-        iUserID = static_cast < int > ( result.Data[i][0].nVal );
-        strName = (const char *)result.Data[i][1].pVal;
+        iUserID = static_cast < int > ( row[0].nVal );
+        strName = (const char *)row[1].pVal;
 
         // Check for overlong names and incorrect escapement
+        bool bRemoveAccount = false;
         bool bChanged = false;
         if ( strName.length () > 64 )
         {
@@ -371,27 +372,37 @@ bool CAccountManager::Load( void )
             // If name gone doolally or account with this name already exists, remove account
             if ( strName.length () > 256 || Get ( strName, true ) )
             {
-                m_pDatabaseManager->Execf ( m_hDbConnection, "DELETE FROM accounts WHERE id=?", SQLITE_INTEGER, iUserID );
-                m_pDatabaseManager->Execf ( m_hDbConnection, "DELETE FROM userdata WHERE userid=?", SQLITE_INTEGER, iUserID );
                 bNeedsVacuum = true;
+                bRemoveAccount = true;
                 CLogger::LogPrintf ( "Removed duplicate or damaged account for %s\n", strName.substr ( 0, 64 ).c_str() );
-                continue;
             }
+        }
+
+        // Check for disallowed account names
+        if ( strName == "*****" )
+            bRemoveAccount = true;
+
+        // Do account remove if required
+        if ( bRemoveAccount )
+        {
+            m_pDatabaseManager->Execf ( m_hDbConnection, "DELETE FROM accounts WHERE id=?", SQLITE_INTEGER, iUserID );
+            m_pDatabaseManager->Execf ( m_hDbConnection, "DELETE FROM userdata WHERE userid=?", SQLITE_INTEGER, iUserID );
+            continue;
         }
 
         strPassword = "";
         // If we have an password
-        if ( result.Data[i][2].pVal )
-            strPassword = (const char *)result.Data[i][2].pVal;
+        if ( row[2].pVal )
+            strPassword = (const char *)row[2].pVal;
 
         //if we have an IP
-        if ( result.Data[i][3].pVal ) {
+        if ( row[3].pVal ) {
             //Fill the IP variable
-            strIP = (const char *)result.Data[i][3].pVal;
+            strIP = (const char *)row[3].pVal;
             //If we have a Serial
-            if ( result.Data[i][4].pVal ) {
+            if ( row[4].pVal ) {
                 //Fill the serial variable
-                strSerial = (const char *)result.Data[i][4].pVal;
+                strSerial = (const char *)row[4].pVal;
                 //Create a new account with the specified information
                 pAccount = new CAccount ( this, true, strName, strPassword, strIP, iUserID, strSerial );
             }
@@ -412,7 +423,7 @@ bool CAccountManager::Load( void )
         {
             activityTimer.Reset();
             bOutputFeedback = true;
-            CLogger::LogPrintf ( "Reading accounts %d/%d\n", m_List.size(), iResults );
+            CLogger::LogPrintf ( "Reading accounts %d/%d\n", m_List.size(), result->nRows );
         }
     }
     if ( bOutputFeedback )
@@ -535,29 +546,79 @@ bool CAccountManager::SaveSettings ()
 
 bool CAccountManager::IntegrityCheck ()
 {
-    CRegistryResult result;
-    //Select all our required information from the accounts database
-    bool bOk = m_pDatabaseManager->QueryWithResultf ( m_hDbConnection, &result, "PRAGMA integrity_check" );
-
-    // Get result as a string
-    SString strResult;
-    if ( result.nRows && result.nColumns )
+    // Check database integrity
     {
-        CRegistryResultCell& cell = result.Data[0][0];
-        if ( cell.nType == SQLITE_TEXT )
-            strResult = std::string ( (const char *)cell.pVal, cell.nLength - 1 );
+        CRegistryResult result;
+        bool bOk = m_pDatabaseManager->QueryWithResultf ( m_hDbConnection, &result, "PRAGMA integrity_check" );
+
+        // Get result as a string
+        SString strResult;
+        if ( result->nRows && result->nColumns )
+        {
+            CRegistryResultCell& cell = result->Data.front()[0];
+            if ( cell.nType == SQLITE_TEXT )
+                strResult = std::string ( (const char *)cell.pVal, cell.nLength - 1 );
+        }
+
+        // Process result
+        if ( !bOk || !strResult.BeginsWithI ( "ok" ) )
+        {
+            CLogger::ErrorPrintf ( "%s", *strResult );
+            CLogger::ErrorPrintf ( "%s\n", *m_pDatabaseManager->GetLastErrorMessage () );
+            CLogger::ErrorPrintf ( "Errors were encountered loading '%s' database\n", *ExtractFilename ( PathConform ( "internal.db" ) ) );
+            CLogger::ErrorPrintf ( "Maybe now is the perfect time to panic.\n" );
+            CLogger::ErrorPrintf ( "See - http://wiki.multitheftauto.com/wiki/fixdb\n" );
+            CLogger::ErrorPrintf ( "************************\n" );
+            // Allow server to continue
+        }
     }
 
-    // Process result
-    if ( !bOk || !strResult.BeginsWithI ( "ok" ) )
+    // Check can update file
     {
-        CLogger::ErrorPrintf ( "%s", *strResult );
-        CLogger::ErrorPrintf ( "%s\n", *m_pDatabaseManager->GetLastErrorMessage () );
-        CLogger::ErrorPrintf ( "Errors were encountered loading '%s' database\n", *ExtractFilename ( PathConform ( "internal.db" ) ) );
-        CLogger::ErrorPrintf ( "Maybe now is the perfect time to panic.\n" );
-        CLogger::ErrorPrintf ( "See - http://wiki.multitheftauto.com/wiki/fixdb\n" );
-        CLogger::ErrorPrintf ( "************************\n" );
-        return false;
+        m_pDatabaseManager->Execf ( m_hDbConnection, "DROP TABLE IF EXISTS write_test" );
+        m_pDatabaseManager->Execf ( m_hDbConnection, "CREATE TABLE IF NOT EXISTS write_test (id INTEGER PRIMARY KEY, value INTEGER)" );
+        m_pDatabaseManager->Execf ( m_hDbConnection, "INSERT OR IGNORE INTO write_test (id, value) VALUES(1,2)" ) ;
+        bool bOk = m_pDatabaseManager->QueryWithResultf ( m_hDbConnection, NULL, "UPDATE write_test SET value=3 WHERE id=1" );
+        if ( !bOk )
+        {
+            CLogger::ErrorPrintf ( "%s\n", *m_pDatabaseManager->GetLastErrorMessage () );
+            CLogger::ErrorPrintf ( "Errors were encountered updating '%s' database\n", *ExtractFilename ( PathConform ( "internal.db" ) ) );
+            CLogger::ErrorPrintf ( "Database might be locked by another process, or damaged.\n" );
+            CLogger::ErrorPrintf ( "See - http://wiki.multitheftauto.com/wiki/fixdb\n" );
+            CLogger::ErrorPrintf ( "************************\n" );
+            return false;
+        }
+        m_pDatabaseManager->Execf ( m_hDbConnection, "DROP TABLE write_test" );
+    }
+
+    // Do compact if required
+    if ( g_pGame->GetConfig()->ShouldCompactInternalDatabases() )
+    {
+        CLogger::LogPrintf ( "Compacting accounts database '%s' ...\n", *ExtractFilename ( PathConform ( "internal.db" ) ) );
+
+        CRegistryResult result;
+        bool bOk = m_pDatabaseManager->QueryWithResultf ( m_hDbConnection, &result, "VACUUM" );
+
+        // Get result as a string
+        SString strResult;
+        if ( result->nRows && result->nColumns )
+        {
+            CRegistryResultCell& cell = result->Data.front()[0];
+            if ( cell.nType == SQLITE_TEXT )
+                strResult = std::string ( (const char *)cell.pVal, cell.nLength - 1 );
+        }
+
+        // Process result
+        if ( !bOk )
+        {
+            CLogger::ErrorPrintf ( "%s", *strResult );
+            CLogger::ErrorPrintf ( "%s\n", *m_pDatabaseManager->GetLastErrorMessage () );
+            CLogger::ErrorPrintf ( "Errors were encountered compacting '%s' database\n", *ExtractFilename ( PathConform ( "internal.db" ) ) );
+            CLogger::ErrorPrintf ( "Maybe now is the perfect time to panic.\n" );
+            CLogger::ErrorPrintf ( "See - http://wiki.multitheftauto.com/wiki/fixdb\n" );
+            CLogger::ErrorPrintf ( "************************\n" );
+            // Allow server to continue
+        }
     }
     return true;
 }
@@ -676,7 +737,7 @@ bool CAccountManager::LogIn ( CClient* pClient, CClient* pEchoClient, const char
         if ( pEchoClient ) pEchoClient->SendEcho ( SString( "login: Account for '%s' is already in use", szNick ).c_str() );
         return false;
     }
-    if ( strlen ( szPassword ) <= MIN_PASSWORD_LENGTH || strlen ( szPassword ) > MAX_PASSWORD_LENGTH || !pAccount->IsPassword ( szPassword ) )
+    if ( !IsValidPassword( szPassword ) || !pAccount->IsPassword ( szPassword ) )
     {
         if ( pEchoClient ) pEchoClient->SendEcho ( SString( "login: Invalid password for account '%s'", szNick ).c_str() );
         CLogger::AuthPrintf ( "LOGIN: %s tried to log in as '%s' with an invalid password (IP: %s  Serial: %s)\n", strPlayerName.c_str (), szNick, strPlayerIP.c_str (), strPlayerSerial.c_str () );
@@ -847,27 +908,26 @@ CLuaArgument* CAccountManager::GetAccountData( CAccount* pAccount, const char* s
     //Select the value and type from the database where the user is our user and the key is the required key
     m_pDatabaseManager->QueryWithResultf ( m_hDbConnection, &result, "SELECT value,type from userdata where userid=? and key=? LIMIT 1", SQLITE_INTEGER, iUserID, SQLITE_TEXT, szKey );
 
-    //Store the returned amount of rows
-    int iResults = result.nRows;
-
     // Default result is nil
     CLuaArgument* pResult = new CLuaArgument ();
 
     //Do we have any results?
-    if ( iResults > 0 )
+    if ( result->nRows > 0 )
     {
-        int iType = static_cast < int > ( result.Data[0][1].nVal );
+        const CRegistryResultRow& row = result->Data.front();
+
+        int iType = static_cast < int > ( row[1].nVal );
         //Account data is stored as text so we don't need to check what type it is just return it
         if ( iType == LUA_TBOOLEAN )
         {
-            SString strResult = (const char *)result.Data[0][0].pVal;
+            SString strResult = (const char *)row[0].pVal;
             pResult->ReadBool ( strResult == "true" );
         }
         else
         if ( iType == LUA_TNUMBER )
-            pResult->ReadNumber ( strtod ( (const char *)result.Data[0][0].pVal, NULL ) );
+            pResult->ReadNumber ( strtod ( (const char *)row[0].pVal, NULL ) );
         else
-            pResult->ReadString ( (const char *)result.Data[0][0].pVal );
+            pResult->ReadString ( (const char *)row[0].pVal );
     }
     else
     {
@@ -913,24 +973,22 @@ bool CAccountManager::CopyAccountData( CAccount* pFromAccount, CAccount* pToAcco
     //Select the key and value from the database where the user is our from account
     m_pDatabaseManager->QueryWithResultf ( m_hDbConnection, &result, "SELECT key,value,type from userdata where userid=? LIMIT 1", SQLITE_INTEGER, iUserID );
 
-    //Store the returned amount of rows
-    int iResults = result.nRows;
-
     //Do we have any results?
-    if ( iResults > 0 ) {
+    if ( result->nRows > 0 ) {
         //Loop through until i is the same as the number of rows
-        for ( int i = 0;i < iResults;i++ ) 
+        for ( CRegistryResultIterator iter = result->begin() ; iter != result->end() ; ++iter )
         {
+            const CRegistryResultRow& row = *iter;
             //Get our key
-            strKey = (const char *)result.Data[i][0].pVal;
+            strKey = (const char *)row[0].pVal;
             //Get our value
-            strValue = (const char *)result.Data[i][1].pVal;
-            int iType = static_cast < int > ( result.Data[i][2].nVal );
+            strValue = (const char *)row[1].pVal;
+            int iType = static_cast < int > ( row[2].nVal );
             //Select the id and userid where the user is the to account and the key is strKey
             CRegistryResult subResult;
             m_pDatabaseManager->QueryWithResultf ( m_hDbConnection, &subResult, "SELECT id,userid from userdata where userid=? and key=? LIMIT 1", SQLITE_INTEGER, iUserID, SQLITE_TEXT, strKey.c_str () );
             //If there is a key with this value update it otherwise insert it and store the return value in bRetVal
-            if ( subResult.nRows > 0 )
+            if ( subResult->nRows > 0 )
                 m_pDatabaseManager->Execf ( m_hDbConnection, "UPDATE userdata SET value=?, type=? WHERE userid=? AND key=?", SQLITE_TEXT, strValue.c_str (), SQLITE_INTEGER, iType, SQLITE_INTEGER, pToAccount->GetID (), SQLITE_TEXT, strKey.c_str () );
             else
                 m_pDatabaseManager->Execf ( m_hDbConnection, "INSERT INTO userdata (userid, key, value, type) VALUES(?,?,?,?)", SQLITE_INTEGER, pToAccount->GetID (), SQLITE_TEXT, strKey.c_str (), SQLITE_TEXT, strValue.c_str (), SQLITE_INTEGER, iType );
@@ -956,19 +1014,17 @@ bool CAccountManager::GetAllAccountData( CAccount* pAccount, lua_State* pLua )
     //Select the value and type from the database where the user is our user and the key is the required key
     m_pDatabaseManager->QueryWithResultf ( m_hDbConnection, &result, "SELECT key,value,type from userdata where userid=?", SQLITE_INTEGER, iUserID );
 
-    //Store the returned amount of rows
-    int iResults = result.nRows;
-
     //Do we have any results?
-    if ( iResults > 0 ) 
+    if ( result->nRows > 0 ) 
     {
         //Loop through until i is the same as the number of rows
-        for ( int i = 0;i < iResults;i++ ) 
+        for ( CRegistryResultIterator iter = result->begin() ; iter != result->end() ; ++iter )
         {
+            const CRegistryResultRow& row = *iter;
             //Get our key
-            strKey = (const char *)result.Data[i][0].pVal;
+            strKey = (const char *)row[0].pVal;
             //Get our type
-            int iType = static_cast < int > ( result.Data[i][2].nVal );
+            int iType = static_cast < int > ( row[2].nVal );
             //Account data is stored as text so we don't need to check what type it is just return it
             if ( iType == LUA_TNIL )
             {
@@ -978,7 +1034,7 @@ bool CAccountManager::GetAllAccountData( CAccount* pAccount, lua_State* pLua )
             }
             if ( iType == LUA_TBOOLEAN )
             {
-                SString strResult = (const char *)result.Data[i][1].pVal;
+                SString strResult = (const char *)row[1].pVal;
                 lua_pushstring ( pLua, strKey );
                 lua_pushboolean ( pLua, strResult == "true" ? true : false );
                 lua_settable ( pLua, -3 );
@@ -986,13 +1042,13 @@ bool CAccountManager::GetAllAccountData( CAccount* pAccount, lua_State* pLua )
             if ( iType == LUA_TNUMBER )
             {
                 lua_pushstring ( pLua, strKey );
-                lua_pushnumber ( pLua, strtod ( (const char*)result.Data[i][1].pVal, NULL ) );
+                lua_pushnumber ( pLua, strtod ( (const char*)row[1].pVal, NULL ) );
                 lua_settable ( pLua, -3 );
             }
             else
             {
                 lua_pushstring ( pLua, strKey );
-                lua_pushstring ( pLua, ( (const char*)result.Data[i][1].pVal ) );
+                lua_pushstring ( pLua, ( (const char*)row[1].pVal ) );
                 lua_settable ( pLua, -3 );
             }
         }
@@ -1062,4 +1118,54 @@ void CAccountManager::DbCallback ( CDbJobData* pJobData )
     {
         CLogger::LogPrintf ( "ERROR: Something worrying happened in DbCallback '%s': %s.\n", *pJobData->command.strData, *pJobData->result.strReason );
     }
+}
+
+//
+// Check name is legal for an existing account
+//
+bool CAccountManager::IsValidAccountName( const SString& strName )
+{
+    if ( strName.length() < 1 )
+        return false;
+    return true;
+}
+
+//
+// Check password is legal for an existing account
+//
+bool CAccountManager::IsValidPassword( const SString& strPassword )
+{
+    if ( strPassword.length() < MIN_PASSWORD_LENGTH || strPassword.length() > MAX_PASSWORD_LENGTH )
+        return false;
+    return true;
+}
+
+//
+// Check name is legal for a new account
+//
+bool CAccountManager::IsValidNewAccountName( const SString& strName )
+{
+    if ( !IsValidAccountName( strName ) )
+        return false;
+
+    // Extra restrictions for new account names
+    if ( strName == "*****" )
+        return false;
+
+    return true;
+}
+
+//
+// Check password is legal for a new account/password
+//
+bool CAccountManager::IsValidNewPassword( const SString& strPassword )
+{
+    if ( !IsValidPassword( strPassword ) )
+        return false;
+
+    // Extra restrictions for new account passwords
+    if ( strPassword == "*****" )
+        return false;
+
+    return true;
 }

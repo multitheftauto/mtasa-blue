@@ -17,7 +17,6 @@ INCLUDES += -I$(ZIPDIR)/
 INCLUDES += -I$(LUADIR)/src
 INCLUDES += -I$(LUABDIR)/src
 INCLUDES += $(SPARSEHASH_CFLAGS)
-INCLUDES += $(SQLITE3_CFLAGS)
 # pcre headers used by pme which is used by ehs
 INCLUDES += $(PCRE_CFLAGS)
 
@@ -27,16 +26,16 @@ UTILS = \
 	../../../Shared/mods/deathmatch/logic/CLatentReceiver.cpp \
 	../../../Shared/mods/deathmatch/logic/CLatentSendQueue.cpp \
 	../../../Shared/mods/deathmatch/logic/CLatentTransferManager.cpp \
+	../../../Shared/mods/deathmatch/logic/CDebugHookManager.cpp \
+	../../../Shared/mods/deathmatch/logic/CLuaShared.cpp \
 	../../../Shared/mods/deathmatch/logic/CZoneNames.cpp \
 	../../../Shared/mods/deathmatch/logic/Enums.cpp \
 	../../../Shared/mods/deathmatch/logic/CIdArray.cpp \
-	./utils/CHTTPClient.cpp ./utils/CHTTPRequest.cpp \
-	./utils/CHTTPResponse.cpp \
-	./utils/CTCPClientSocketImpl.cpp \
-	./utils/CTCPImpl.cpp \
 	./utils/CZipMaker.cpp \
+	./utils/CFunctionUseLogger.cpp \
 	$(srcdir)/../../../vendor/bob_withers/base64.cpp \
 	$(srcdir)/../../../vendor/bochs/bochs_internal/crc32.cpp \
+	$(srcdir)/../../../vendor/sqlite/sqlite3.c \
 	$(ZIPDIR)/ioapi.c \
 	$(ZIPDIR)/mztools.c \
 	$(ZIPDIR)/unzip.c \
@@ -124,6 +123,8 @@ LOGIC = \
 ./logic/CPerfStat.LuaMemory.cpp \
 ./logic/CPerfStat.LuaTiming.cpp \
 ./logic/CPerfStat.PacketUsage.cpp \
+./logic/CPerfStat.RPCPacketUsage.cpp \
+./logic/CPerfStat.EventPacketUsage.cpp \
 ./logic/CPerfStat.ServerInfo.cpp \
 ./logic/CPerfStat.ServerTiming.cpp \
 ./logic/CPerfStat.SqliteTiming.cpp \
@@ -321,8 +322,7 @@ deathmatch_la_LIBADD = \
 	$(top_builddir)/vendor/ehs/libehs.la \
 	$(LUABDIR)/src/liblua.la \
 	$(top_builddir)/vendor/json-c/libjson.la \
-	$(SPARSEHASH_LIBS) \
-	$(SQLITE3_LIBS)
+	$(SPARSEHASH_LIBS)
 
 deathmatch_la_LDFLAGS = \
 	-module -avoid-version -lz

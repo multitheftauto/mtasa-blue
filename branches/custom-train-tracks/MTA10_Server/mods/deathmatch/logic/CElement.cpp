@@ -42,6 +42,8 @@ CElement::CElement ( CElement* pParent, CXMLNode* pNode )
     m_ucInterior = 0;
     m_bDoubleSided = false;
     m_bUpdatingSpatialData = false;
+    m_pChildrenListSnapshot = NULL;
+    m_uiChildrenListSnapshotRevision = 0;
 
     // Store the line
     if ( m_pXMLNode )
@@ -134,6 +136,7 @@ CElement::~CElement ( void )
     assert ( m_pParent == NULL );
 
     CElementRefManager::OnElementDelete ( this );
+    SAFE_RELEASE( m_pChildrenListSnapshot );
 }
 
 
@@ -433,6 +436,8 @@ bool CElement::AddEvent ( CLuaMain* pLuaMain, const char* szName, const CLuaFunc
 
 bool CElement::CallEvent ( const char* szName, const CLuaArguments& Arguments, CPlayer* pCaller )
 {
+    g_pGame->GetDebugHookManager()->OnPreEvent( szName, Arguments, this, pCaller );
+
     CEvents* pEvents = g_pGame->GetEvents();
 
     // Make sure our event-manager knows we're about to call an event
@@ -446,6 +451,8 @@ bool CElement::CallEvent ( const char* szName, const CLuaArguments& Arguments, C
 
     // Tell the event manager that we're done calling the event
     pEvents->PostEventPulse ();
+
+    g_pGame->GetDebugHookManager()->OnPostEvent( szName, Arguments, this, pCaller );
 
     // Return whether our event was cancelled or not
     return ( !pEvents->WasEventCancelled () );
@@ -1524,4 +1531,31 @@ void CElement::UpdateSpatialData ( void )
         }
         m_bUpdatingSpatialData = false;
     }
+}
+
+//
+// Ensure children list snapshot is up to date and return it
+//
+CElementListSnapshot* CElement::GetChildrenListSnapshot( void )
+{
+    // See if list needs updating
+    if ( m_Children.GetRevision() != m_uiChildrenListSnapshotRevision || m_pChildrenListSnapshot == NULL )
+    {
+        m_uiChildrenListSnapshotRevision = m_Children.GetRevision();
+
+        // Detach old
+        SAFE_RELEASE( m_pChildrenListSnapshot );
+
+        // Make new
+        m_pChildrenListSnapshot = new CElementListSnapshot();
+
+        // Fill it up
+        m_pChildrenListSnapshot->reserve( m_Children.size() );
+        for ( CChildListType::const_iterator iter = m_Children.begin() ; iter != m_Children.end() ; iter++ )
+        {
+            m_pChildrenListSnapshot->push_back( *iter );
+        }
+    }
+
+    return m_pChildrenListSnapshot;
 }

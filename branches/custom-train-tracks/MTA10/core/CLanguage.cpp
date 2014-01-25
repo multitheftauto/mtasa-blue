@@ -20,7 +20,7 @@ CLanguage::CLanguage ( Dictionary Dict )
 
 CLanguage::CLanguage ( const SString& strPOPath )
 { 
-    std::ifstream in( strPOPath );
+    std::ifstream in( FromUTF8( strPOPath ) );
     POParser::parse( strPOPath, in, m_Dict );
     in.close();
 }

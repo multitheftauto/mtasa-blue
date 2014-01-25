@@ -13,11 +13,11 @@
 #include "StdInc.h"
 #define DECLARE_PROFILER_SECTION_Core
 #include "profiler/SharedUtil.Profiler.h"
+#include "SharedUtil.Win32Utf8FileHooks.hpp"
 
 CCore* g_pCore = NULL;
 CGraphics* g_pGraphics = NULL;
 CLocalization* g_pLocalization = NULL;
-bool IsRealDeal ( void );
 
 int WINAPI DllMain(HINSTANCE hModule, DWORD dwReason, PVOID pvNothing)
 {
@@ -27,8 +27,12 @@ int WINAPI DllMain(HINSTANCE hModule, DWORD dwReason, PVOID pvNothing)
     if ( dwReason == DLL_PROCESS_ATTACH )
     {
         WriteDebugEvent( SString( "DLL_PROCESS_ATTACH %08x", pvNothing ) );
-        if ( IsRealDeal () )
+        if ( IsGTAProcess() )
         {
+            WriteDebugEvent( SString( "ModuleFileName: %s", *GetLaunchPathFilename() ) );
+
+            AddUtf8FileHooks();
+
             FileTranslator.GetGTARootDirectory ( WorkingDirectory );
             SetCurrentDirectory ( WorkingDirectory.c_str ( ) );
 
@@ -46,8 +50,10 @@ int WINAPI DllMain(HINSTANCE hModule, DWORD dwReason, PVOID pvNothing)
     else if (dwReason == DLL_PROCESS_DETACH)
     {
         WriteDebugEvent( SString( "DLL_PROCESS_DETACH %08x", pvNothing ) );
-        if ( IsRealDeal () )
+        if ( IsGTAProcess () )
         {
+            RemoveUtf8FileHooks();
+
             // For now, TerminateProcess if any destruction is attempted (or we'll crash)
             TerminateProcess ( GetCurrentProcess (), 0 );
 
@@ -60,20 +66,4 @@ int WINAPI DllMain(HINSTANCE hModule, DWORD dwReason, PVOID pvNothing)
     }
 
     return TRUE;
-}
-
-
-//
-// Returns true if dll has been loaded with GTA.
-//
-bool IsRealDeal ( void )
-{
-    // Get current module full path
-    char szBuffer[64000];
-    GetModuleFileName ( NULL, szBuffer, sizeof(szBuffer) - 1 );
-    WriteDebugEvent( SString( "ModuleFileName: %s", szBuffer ) );
-    if ( SStringX( szBuffer ).EndsWithI( "gta_sa.exe" )
-        || SStringX( szBuffer ).EndsWithI( "proxy_sa.exe" ) )
-        return true;
-    return false;
 }

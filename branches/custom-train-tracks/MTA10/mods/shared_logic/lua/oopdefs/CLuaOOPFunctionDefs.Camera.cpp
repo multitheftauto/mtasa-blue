@@ -14,9 +14,6 @@
 int CLuaOOPDefs::GetCameraMatrix ( lua_State* luaVM )
 {
     CMatrix matrix;
-
-    // camera has it different
-    matrix.vRight = -matrix.vRight;
     m_pManager->GetCamera ()->GetMatrix ( matrix );
 
     lua_pushmatrix ( luaVM, matrix );

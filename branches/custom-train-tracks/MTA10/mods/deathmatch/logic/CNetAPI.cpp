@@ -52,13 +52,8 @@ bool CNetAPI::ProcessPacket ( unsigned char bytePacketID, NetBitStreamInterface&
             {
                 // Grab the player
                 CClientPlayer* pPlayer = m_pPlayerManager->Get ( PlayerID );
-                if ( pPlayer )
-                {
-                    // Read out and apply the lightsync data
-                    ReadLightweightSync ( pPlayer, BitStream );
-                }
-                else
-                    OutputDebugLine ( "[Sync] Player not found" );
+                // Read out the lightsync data (and apply if the player exists on the client)
+                ReadLightweightSync ( pPlayer, BitStream );
             }
             return true;
         }
@@ -1424,9 +1419,13 @@ void CNetAPI::ReadVehiclePuresync ( CClientPlayer* pPlayer, CClientVehicle* pVeh
             BitStream.ReadBit ( bDirection );
             BitStream.Read ( ucTrack );
             BitStream.Read ( fSpeed );
-            pVehicle->SetTrainPosition ( fPosition );
-            pVehicle->SetTrainDirection( bDirection );
+
+            if ( !pVehicle->IsStreamedIn () )
+                pVehicle->SetPosition ( position.data.vecPosition, true );
+
             pVehicle->SetTrainTrack ( ucTrack );
+            pVehicle->SetTrainPosition ( fPosition, false );
+            pVehicle->SetTrainDirection( bDirection );
             pVehicle->SetTrainSpeed ( fSpeed );
         }
 
@@ -1476,10 +1475,19 @@ void CNetAPI::ReadVehiclePuresync ( CClientPlayer* pPlayer, CClientVehicle* pVeh
                         SRotationDegreesSync trailerRotation;
                         BitStream.Read ( &trailerRotation );
 
-                        if ( !pTrailer->GetGameVehicle () )
+                        if ( pTrailer->GetVehicleType () != CLIENTVEHICLE_TRAIN && !pTrailer->IsStreamedIn () )
                         {
                             pTrailer->SetTargetPosition ( trailerPosition.data.vecPosition, TICK_RATE, true, velocity.data.vecVelocity.fZ );
                             pTrailer->SetTargetRotation ( trailerRotation.data.vecRotation, TICK_RATE );
+                        }
+                        else if ( pTrailer->GetVehicleType () == CLIENTVEHICLE_TRAIN )
+                        {
+                            // Set streaming position to fix streaming
+                            pTrailer->UpdatePedPositions ( trailerPosition.data.vecPosition );
+
+                            // Use the synced train speed as long as the chain engine isn't streamed in
+                            if ( !pVehicle->IsStreamedIn () )
+                                pTrailer->SetTrainSpeed ( pVehicle->GetTrainSpeed () );
                         }
                     }
                 }
@@ -1716,7 +1724,7 @@ void CNetAPI::WriteVehiclePuresync ( CClientPed* pPlayerModel, CClientVehicle* p
         BitStream.Write ( &health );
 
         // Write the trailer chain
-        CClientVehicle* pTrailer = pVehicle->GetRealTowedVehicle ();
+        CClientVehicle* pTrailer = pVehicle->GetVehicleType () == CLIENTVEHICLE_TRAIN ? pVehicle->GetNextTrainCarriage () : pVehicle->GetRealTowedVehicle ();
         while ( pTrailer && !pTrailer->IsLocalEntity () )
         {
             BitStream.WriteBit ( true );
@@ -1738,7 +1746,7 @@ void CNetAPI::WriteVehiclePuresync ( CClientPed* pPlayerModel, CClientVehicle* p
             BitStream.Write ( &trailerRotation );
 
             // Get the next towed vehicle
-            pTrailer = pTrailer->GetTowedVehicle ();
+            pTrailer = pTrailer->GetVehicleType () == CLIENTVEHICLE_TRAIN ? pTrailer->GetNextTrainCarriage () : pTrailer->GetRealTowedVehicle ();
         }
 
         // End of our trailer chain
@@ -2173,6 +2181,13 @@ void CNetAPI::ReadLightweightSync ( CClientPlayer* pPlayer, NetBitStreamInterfac
         }
     }
 
+    // Don't do anything beyond reading the data if the player does not exist on the client
+    if ( !pPlayer )
+    {
+        OutputDebugLine ( "[Sync] Player not found" );
+        return;
+    }
+
     // Only update the sync if this packet is from the same context.
     if ( !pPlayer->CanUpdateSync ( ucSyncTimeContext ) )
     {
@@ -2344,7 +2359,7 @@ void CNetAPI::ReadWeaponBulletsync ( CClientPlayer* pPlayer, NetBitStreamInterfa
     // Read the bulletsync data
     ElementID elementID;
     BitStream.Read ( elementID );
-    CClientWeapon * pWeapon = static_cast < CClientWeapon * > ( CElementIDs::GetElement ( elementID ) );
+    CClientWeapon * pWeapon = DynamicCast < CClientWeapon > ( CElementIDs::GetElement ( elementID ) );
 
     CVector vecStart, vecEnd;
     BitStream.Read ( (char*)&vecStart, sizeof ( CVector ) );

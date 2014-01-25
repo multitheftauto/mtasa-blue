@@ -55,6 +55,7 @@ typedef bool ( BreakTowLinkHandler ) ( class CVehicle * towingVehicle );
 typedef bool ( ProcessCamHandler ) ( class CCam* pCam );
 typedef void ( DrawRadarAreasHandler ) ( void );
 typedef void ( Render3DStuffHandler ) ( void );
+typedef void ( PreRenderSkyHandler ) ( void );
 typedef bool ( ChokingHandler ) ( unsigned char ucWeaponType );
 typedef void ( PreWorldProcessHandler ) ( void );
 typedef void ( PostWorldProcessHandler ) ( void );
@@ -65,6 +66,7 @@ typedef void ( AddAnimationHandler ) ( RpClump * pClump, AssocGroupId animGroup,
 typedef void ( BlendAnimationHandler ) ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID, float fBlendDelta );
 typedef bool ( ProcessCollisionHandler ) ( class CEntitySAInterface* pThisInterface, class CEntitySAInterface* pOtherInterface );
 typedef bool ( VehicleCollisionHandler ) ( class CVehicleSAInterface* pCollidingVehicle, class CEntitySAInterface* pCollidedVehicle, int iModelIndex, float fDamageImpulseMag, float fCollidingDamageImpulseMag, uint16 usPieceType, CVector vecCollisionPos, CVector vecCollisionVelocity );
+typedef bool ( VehicleDamageHandler ) ( CEntitySAInterface* pVehicle, float fLoss, CEntitySAInterface* pAttacker, eWeaponType weaponType, const CVector& vecDamagePos, uchar ucTyre );
 typedef bool ( HeliKillHandler ) ( class CVehicleSAInterface* pVehicle, class CEntitySAInterface* pHitInterface );
 typedef bool ( ObjectDamageHandler ) ( class CObjectSAInterface* pObject, float fLoss, class CEntitySAInterface* pAttacker );
 typedef bool ( ObjectBreakHandler ) ( class CObjectSAInterface* pObject, class CEntitySAInterface* pAttacker );
@@ -72,6 +74,7 @@ typedef bool ( WaterCannonHitHandler ) ( class CVehicleSAInterface* pCannonVehic
 typedef void ( GameObjectDestructHandler ) ( CEntitySAInterface* pObject );
 typedef void ( GameVehicleDestructHandler ) ( CEntitySAInterface* pVehicle );
 typedef void ( GamePlayerDestructHandler ) ( CEntitySAInterface* pPlayer );
+typedef void ( GameProjectileDestructHandler ) ( CEntitySAInterface* pProjectile );
 typedef void ( GameModelRemoveHandler ) ( ushort usModelId );
 typedef void ( GameEntityRenderHandler ) ( CEntitySAInterface* pEntity );
 
@@ -172,6 +175,7 @@ public:
     virtual void                        SetBlendAnimationHandler    ( BlendAnimationHandler * pHandler ) = 0;
     virtual void                        SetProcessCollisionHandler  ( ProcessCollisionHandler * pHandler ) = 0;
     virtual void                        SetVehicleCollisionHandler  ( VehicleCollisionHandler * pHandler ) = 0;
+    virtual void                        SetVehicleDamageHandler     ( VehicleDamageHandler * pHandler ) = 0;
     virtual void                        SetHeliKillHandler          ( HeliKillHandler * pHandler ) = 0;
     virtual void                        SetObjectDamageHandler      ( ObjectDamageHandler * pHandler ) = 0;
     virtual void                        SetObjectBreakHandler       ( ObjectBreakHandler * pHandler ) = 0;
@@ -179,6 +183,7 @@ public:
     virtual void                        SetGameObjectDestructHandler    ( GameObjectDestructHandler * pHandler ) = 0;
     virtual void                        SetGameVehicleDestructHandler   ( GameVehicleDestructHandler * pHandler ) = 0;
     virtual void                        SetGamePlayerDestructHandler    ( GamePlayerDestructHandler * pHandler ) = 0;
+    virtual void                        SetGameProjectileDestructHandler( GameProjectileDestructHandler * pHandler ) = 0;
     virtual void                        SetGameModelRemoveHandler       ( GameModelRemoveHandler * pHandler ) = 0;
     virtual void                        SetGameEntityRenderHandler      ( GameEntityRenderHandler * pHandler ) = 0;
 
@@ -239,6 +244,7 @@ public:
     virtual void                        SetBulletFireHandler        ( BulletFireHandler* pHandler ) = 0;
     virtual void                        SetDrawRadarAreasHandler    ( DrawRadarAreasHandler * pRadarAreasHandler ) = 0;
     virtual void                        SetRender3DStuffHandler     ( Render3DStuffHandler * pHandler ) = 0;
+    virtual void                        SetPreRenderSkyHandler      ( PreRenderSkyHandler * pHandler ) = 0;
 
     virtual void                        Reset                       () = 0;
 

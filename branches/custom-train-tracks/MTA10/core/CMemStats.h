@@ -35,7 +35,7 @@ struct SMemStatsInfo
     SModelCacheStats modelCacheStats;
 
     union {
-        uint uiArray[];
+        uint uiArray[14];
         struct
         {
             uint uiPlayerModels_0_312;

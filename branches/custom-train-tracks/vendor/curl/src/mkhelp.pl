@@ -1,4 +1,25 @@
 #!/usr/local/bin/perl
+#***************************************************************************
+#                                  _   _ ____  _
+#  Project                     ___| | | |  _ \| |
+#                             / __| | | | |_) | |
+#                            | (__| |_| |  _ <| |___
+#                             \___|\___/|_| \_\_____|
+#
+# Copyright (C) 1998 - 2011, Daniel Stenberg, <daniel@haxx.se>, et al.
+#
+# This software is licensed as described in the file COPYING, which
+# you should have received as part of this distribution. The terms
+# are also available at http://curl.haxx.se/docs/copyright.html.
+#
+# You may opt to use, copy, modify, merge, publish, distribute and/or sell
+# copies of the Software, and permit persons to whom the Software is
+# furnished to do so, under the terms of the COPYING file.
+#
+# This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+# KIND, either express or implied.
+#
+###########################################################################
 
 # Yeah, I know, probably 1000 other persons already wrote a script like
 # this, but I'll tell ya:
@@ -20,10 +41,10 @@ if($README eq "") {
 }
 
 
-push @out, "                                  _   _ ____  _     \n";
-push @out, "  Project                     ___| | | |  _ \\| |    \n";
-push @out, "                             / __| | | | |_) | |    \n";
-push @out, "                            | (__| |_| |  _ <| |___ \n";
+push @out, "                                  _   _ ____  _\n";
+push @out, "  Project                     ___| | | |  _ \\| |\n";
+push @out, "                             / __| | | | |_) | |\n";
+push @out, "                            | (__| |_| |  _ <| |___\n";
 push @out, "                             \\___|\\___/|_| \\_\\_____|\n";
 
 my $olen=0;
@@ -35,12 +56,12 @@ while (<STDIN>) {
 
     if($line =~ /^([ \t]*\n|curl)/i) {
         # cut off headers and empty lines
-	$wline++; # count number of cut off lines
-	next;
+        $wline++; # count number of cut off lines
+        next;
     }
 
     my $text = $line;
-    $text =~ s/^\s+//g; # cut off preceeding...
+    $text =~ s/^\s+//g; # cut off preceding...
     $text =~ s/\s+$//g; # and trailing whitespaces
 
     $tlen = length($text);
@@ -57,8 +78,8 @@ while (<STDIN>) {
     $olen = $tlen;
 
     if($wline) {
-	# we only make one empty line max
-	$wline = 0;
+        # we only make one empty line max
+        $wline = 0;
         push @out, "\n";
     }
     push @out, $line;
@@ -87,7 +108,7 @@ if($c) {
         close(GZIP);
 
         system("gzip --best --no-name dumpit");
-        
+
         open(GZIP, "<dumpit.gz") ||
              die "can't read the dumpit.gz file, try without -c";
         binmode GZIP;
@@ -112,16 +133,14 @@ print <<HEAD
  * NEVER EVER edit this manually, fix the mkhelp.pl script instead!
  * Generation time: $now
  */
-#include "setup.h"
 #ifdef USE_MANUAL
-#include "hugehelp.h"
-#include <stdio.h>
+#include "tool_hugehelp.h"
 HEAD
     ;
 if($c) {
     print <<HEAD
-#include <stdlib.h>
 #include <zlib.h>
+#include "memdebug.h" /* keep this as LAST include */
 static const unsigned char hugehelpgz[] = {
   /* This mumbo-jumbo is the huge help text compressed with gzip.
      Thanks to this operation, the size of this data shrunk from $gzip
@@ -146,6 +165,17 @@ HEAD
 
     print <<EOF
 #define BUF_SIZE 0x10000
+static voidpf zalloc_func(voidpf opaque, unsigned int items, unsigned int size)
+{
+  (void) opaque;
+  /* not a typo, keep it calloc() */
+  return (voidpf) calloc(items, size);
+}
+static void zfree_func(voidpf opaque, voidpf ptr)
+{
+  (void) opaque;
+  free(ptr);
+}
 /* Decompress and send to stdout a gzip-compressed buffer */
 void hugehelp(void)
 {
@@ -158,11 +188,11 @@ void hugehelp(void)
     return;
 
   headerlen = 10;
+  memset(&z, 0, sizeof(z_stream));
+  z.zalloc = (alloc_func)zalloc_func;
+  z.zfree = (free_func)zfree_func;
   z.avail_in = (unsigned int)(sizeof(hugehelpgz) - headerlen);
   z.next_in = (unsigned char *)hugehelpgz + headerlen;
-  z.zalloc = (alloc_func)Z_NULL;
-  z.zfree = (free_func)Z_NULL;
-  z.opaque = 0;
 
   if (inflateInit2(&z, -MAX_WBITS) != Z_OK)
     return;
@@ -174,12 +204,12 @@ void hugehelp(void)
       z.next_out = buf;
       status = inflate(&z, Z_SYNC_FLUSH);
       if (status == Z_OK || status == Z_STREAM_END) {
-	fwrite(buf, BUF_SIZE - z.avail_out, 1, stdout);
-	if (status == Z_STREAM_END)
-	   break;
+        fwrite(buf, BUF_SIZE - z.avail_out, 1, stdout);
+        if (status == Z_STREAM_END)
+          break;
       }
-       else
-	break;    /* Error */
+      else
+        break;    /* Error */
     }
     free(buf);
   }

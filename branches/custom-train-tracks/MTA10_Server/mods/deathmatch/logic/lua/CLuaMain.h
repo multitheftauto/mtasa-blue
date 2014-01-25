@@ -42,13 +42,7 @@ struct CRefInfo
 class CLuaMain //: public CClient
 {
 public:
-    enum
-    {
-        OWNER_SERVER,
-        OWNER_MAP,
-    };
-
-public:
+    ZERO_ON_NEW
                                     CLuaMain                ( class CLuaManager* pLuaManager,
                                                               CObjectManager* pObjectManager,
                                                               CPlayerManager* pPlayerManager,
@@ -59,15 +53,9 @@ public:
                                                               CResource* pResourceOwner );
                                     ~CLuaMain               ( void );
 
-    inline int                      GetOwner                ( void )                        { return m_iOwner; };
-    inline void                     SetOwner                ( int iOwner )                  { m_iOwner = iOwner; };
-
-    bool                            LoadScriptFromFile      ( const char* szLUAScript );
-    bool                            LoadScriptFromBuffer    ( const char* cpBuffer, unsigned int uiSize, const char* szFileName, bool bUTF8 );
+    bool                            LoadScriptFromBuffer    ( const char* cpBuffer, unsigned int uiSize, const char* szFileName );
     bool                            LoadScript              ( const char* szLUAScript );
     void                            UnloadScript            ( void );
-    bool                            CompileScriptFromBuffer ( const char* cpBuffer, unsigned int uiSize, const char* szFileName, bool bUTF8, SString* pDest );
-    bool                            CompileScriptFromFile   ( const char* szFile, SString* pDest );
 
     void                            Start                   ( void );
 
@@ -93,10 +81,13 @@ public:
     void                            SaveXML                 ( CXMLNode * pRootNode );
     bool                            XMLExists               ( CXMLFile* pFile );
     unsigned long                   GetXMLFileCount         ( void ) const                  { return m_XMLFiles.size (); };
+    unsigned long                   GetOpenFileCount        ( void ) const                  { return m_uiOpenFileCount; };
     unsigned long                   GetTimerCount           ( void ) const                  { return m_pLuaTimerManager ? m_pLuaTimerManager->GetTimerCount () : 0; };
     unsigned long                   GetElementCount         ( void ) const                  { return m_pResource && m_pResource->GetElementGroup () ? m_pResource->GetElementGroup ()->GetCount () : 0; };
     unsigned long                   GetTextDisplayCount     ( void ) const                  { return m_Displays.size (); };
     unsigned long                   GetTextItemCount        ( void ) const                  { return m_TextItems.size (); };
+    void                            OnOpenFile              ( void );
+    void                            OnCloseFile             ( void )                        { m_uiOpenFileCount--; }
 
     CTextDisplay *                  CreateDisplay           ( void );
     void                            DestroyDisplay          ( CTextDisplay * pDisplay );
@@ -129,7 +120,6 @@ private:
     static void                     InstructionCountHook    ( lua_State* luaVM, lua_Debug* pDebug );
 
     SString                         m_strScriptName;
-    int                             m_iOwner;
 
     lua_State*                      m_luaVM;
     CLuaTimerManager*               m_pLuaTimerManager;
@@ -150,6 +140,10 @@ private:
     bool                            m_bBeingDeleted; // prevent it being deleted twice
 
     CElapsedTime                    m_FunctionEnterTimer;
+    uint                            m_uiOpenFileCount;
+    uint                            m_uiOpenFileCountWarnThresh;
+    uint                            m_uiOpenXMLFileCountWarnThresh;
+
 public:
     std::map < const void*, CRefInfo >      m_CallbackTable;
     std::map < int, SString >       m_FunctionTagMap;

@@ -144,8 +144,6 @@ public:
     void                        SetRotationRadians      ( const CVector& vecRotation )      { SetRotationRadians ( vecRotation, true ); }
     void                        SetRotationRadians      ( const CVector& vecRotation, bool bResetInterpolation );
     
-    void                        AttachTo                ( CClientEntity * pEntity );
-
     float                       GetDistanceFromCentreOfMassToBaseOfModel ( void );
 
     bool                        GetMatrix               ( CMatrix& Matrix ) const;
@@ -165,7 +163,7 @@ public:
     float                       GetDoorOpenRatio        ( unsigned char ucDoor );
     void                        SetSwingingDoorsAllowed ( bool bAllowed );
     bool                        AreSwingingDoorsAllowed () const;
-    void                        AllowDoorRatioSetting   ( unsigned char ucDoor, bool bAllow );
+    void                        AllowDoorRatioSetting   ( unsigned char ucDoor, bool bAllow, bool bAutoReallowAfterDelay = true );
     bool                        AreDoorsLocked          ( void );
     void                        SetDoorsLocked          ( bool bLocked );
 
@@ -249,6 +247,7 @@ public:
     void                        SetWheelStatus          ( unsigned char ucWheel, unsigned char ucStatus, bool bSilent = true );
     void                        SetPanelStatus          ( unsigned char ucPanel, unsigned char ucStatus );
     void                        SetLightStatus          ( unsigned char ucLight, unsigned char ucStatus );
+    bool                        GetWheelMissing         ( unsigned char ucWheel, const SString& strWheelName = "" );
 
     // TODO: Make the class remember on virtualization
     float                       GetHeliRotorSpeed       ( void );
@@ -298,6 +297,9 @@ public:
     CClientVehicle*             GetNextTrainCarriage    ( void );
     void                        SetPreviousTrainCarriage( CClientVehicle* pPrevious );
     void                        SetNextTrainCarriage    ( CClientVehicle* pNext );
+    inline bool                 IsChainEngine           ( void )                            { return m_bChainEngine; };
+    void                        SetIsChainEngine        ( bool bChainEngine = true, bool bTemporary = false );
+    CClientVehicle*             GetChainEngine          ( void );
 
     bool                        IsDerailed              ( void );
     void                        SetDerailed             ( bool bDerailed );
@@ -311,7 +313,7 @@ public:
     void                        SetTrainSpeed           ( float fSpeed );
 
     float                       GetTrainPosition        ( void );
-    void                        SetTrainPosition        ( float fPosition );
+    void                        SetTrainPosition        ( float fPosition, bool bRecalcOnRailDistance = true );
 
     uchar                       GetTrainTrack           ( void );
     void                        SetTrainTrack           ( uchar ucTrack );
@@ -373,10 +375,6 @@ public:
     void                        UpdateKeysync           ( void );
 
     void                        GetInitialDoorStates    ( SFixedArray < unsigned char, MAX_DOORS >& ucOutDoorStates );
-
-    void                        AddMatrix               ( CMatrix& Matrix, double dTime, unsigned short usTickRate );
-    void                        AddVelocity             ( CVector& vecVelocity );
-
 
     // Time dependent interpolation
     inline void                 GetTargetPosition       ( CVector& vecPosition )            { vecPosition = m_interp.pos.vecTarget; }
@@ -479,9 +477,6 @@ protected:
     void                        HandleWaitingForGroundToLoad ( void );
 
     void                        StreamedInPulse         ( void );
-    void                        Dump                    ( FILE* pFile, bool bDumpDetails, unsigned int uiIndex );
-    eVehicleComponent           ConvertStringToEnum     ( SString strInput );
-    SString                     ConvertEnumToString     ( eVehicleComponent strInput );
 
     class CClientObjectManager* m_pObjectManager;
     CClientVehicleManager*      m_pVehicleManager;
@@ -520,6 +515,7 @@ protected:
     bool                        m_bLandingGearDown;
     bool                        m_bHasAdjustableProperty;
     unsigned short              m_usAdjustablePropertyValue;
+    std::map < eDoors, CTickCount > m_AutoReallowDoorRatioMap;
     SFixedArray < bool, 6 >     m_bAllowDoorRatioSetting;
     SFixedArray < float, 6 >    m_fDoorOpenRatio;
     struct
@@ -574,6 +570,7 @@ protected:
     const CHandlingEntry*       m_pOriginalHandlingEntry;
     CHandlingEntry*             m_pHandlingEntry;
 
+    bool                        m_bChainEngine;
     bool                        m_bIsDerailed;
     bool                        m_bIsDerailable;
     bool                        m_bTrainDirection;

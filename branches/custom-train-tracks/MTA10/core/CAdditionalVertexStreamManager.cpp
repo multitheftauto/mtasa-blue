@@ -143,8 +143,8 @@ void CAdditionalVertexStreamManager::SetAdditionalVertexStream ( SCurrentStateIn
     uint StrideN = 12;
 
     // Calc area we are going to use
-    WORD viMinBased = state.args.MinVertexIndex + state.args.BaseVertexIndex;
-    WORD viMaxBased = state.args.MinVertexIndex + state.args.NumVertices + state.args.BaseVertexIndex;
+    uint viMinBased = state.args.MinVertexIndex + state.args.BaseVertexIndex;
+    uint viMaxBased = state.args.MinVertexIndex + state.args.NumVertices + state.args.BaseVertexIndex;
 
     uint ReadOffsetStart = viMinBased * StridePT + state.stream1.OffsetInBytes;
     uint ReadOffsetSize = ( viMaxBased - viMinBased ) * StridePT;

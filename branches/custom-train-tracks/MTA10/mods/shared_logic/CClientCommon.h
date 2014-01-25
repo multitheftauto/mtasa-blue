@@ -20,9 +20,6 @@
 // Defines the maximum amount of players inside the game (includes mimics)
 #define MAX_NET_PLAYERS                 (MAX_NET_PLAYERS_REAL + MAX_MIMICS)
 
-// Defines the maximum size for a nametag string
-#define MAX_NAMETAG_LENGTH              64
-
 // Defines the min/max size for the player nick (who the hell came up with 22?)
 #define MIN_PLAYER_NICK_LENGTH          1
 #define MAX_PLAYER_NICK_LENGTH          22
@@ -31,6 +28,7 @@
 #define MIN_PLAYER_NAMETAG_LENGTH          1
 #define MAX_PLAYER_NAMETAG_LENGTH          22
 
+#define MAX_TEAM_NAME_LENGTH            255
 
 // Defines the minimum fade time for a transfer
 #define MIN_TRANSFER_TIME               1500

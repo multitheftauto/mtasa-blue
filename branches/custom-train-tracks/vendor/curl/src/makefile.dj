@@ -1,19 +1,16 @@
 #
-# $Id: makefile.dj,v 1.11 2007-02-27 15:44:25 giva Exp $
-#
 #  Adapted for djgpp2 / Watt-32 / DOS by
-#  Gisle Vanem <giva@bgnett.no>
+#  Gisle Vanem <gvanem@broadpark.no>
 #
 
-DEPEND_PREREQ = config.h hugehelp.c
+DEPEND_PREREQ = # tool_hugehelp.c
 
-top_srcdir = ..
 TOPDIR = ..
 
 include ../packages/DOS/common.dj
 include Makefile.inc
 
-CSOURCES = $(CURL_SOURCES)
+CSOURCES = $(CURL_CFILES)
 
 ifeq ($(USE_SSL),1)
   EX_LIBS += $(OPENSSL_ROOT)/lib/libssl.a $(OPENSSL_ROOT)/lib/libcrypt.a
@@ -39,27 +36,39 @@ CFLAGS += -DUSE_ENVIRONMENT
 PROGRAM  = curl.exe
 OBJECTS += $(addprefix $(OBJ_DIR)/, $(CSOURCES:.c=.o))
 
-all: $(OBJ_DIR) config.h $(PROGRAM)
+all: $(OBJ_DIR) $(PROGRAM)
 	@echo Welcome to cURL
 
 $(PROGRAM): $(OBJECTS) ../lib/libcurl.a
 	$(CC) -o $@ $^ $(LDFLAGS) $(EX_LIBS)
 
-config.h:
-	@echo '#include "../lib/config.dos"' > $@
-
 #
 # groff 1.18+ requires "-P -c"
 #
-hugehelp.c: ../docs/MANUAL ../docs/curl.1 mkhelp.pl
+tool_hugehelp.c: ../docs/MANUAL ../docs/curl.1 mkhelp.pl
 	groff -Tascii -man ../docs/curl.1 | \
 	perl -w mkhelp.pl ../docs/MANUAL > $@
 
-clean:
-	- rm -f $(OBJECTS) config.h
+# clean generated files
+#
+genclean:
+	- $(DELETE) tool_hugehelp.c
 
+# clean object files and subdir
+#
+objclean: genclean
+	- $(DELETE) $(OBJ_DIR)$(DS)*.o
+	- $(RMDIR) $(OBJ_DIR)
+
+# clean without removing built program
+#
+clean: objclean
+	- $(DELETE) depend.dj
+
+# clean everything
+#
 realclean vclean: clean
-	- rm -f $(PROGRAM) hugehelp.c depend.dj
+	- $(DELETE) $(PROGRAM)
 
 -include depend.dj
 

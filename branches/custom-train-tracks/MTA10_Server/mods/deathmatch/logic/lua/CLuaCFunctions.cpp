@@ -104,7 +104,7 @@ void CLuaCFunctions::RegisterFunctionsWithVM ( lua_State* luaVM )
 {
     // Register all our functions to a lua VM
     CFastHashMap < SString, CLuaCFunction* >::iterator it;
-    for ( it = ms_FunctionsByName.begin (); it != ms_FunctionsByName.end (); it++ )
+    for ( it = ms_FunctionsByName.begin (); it != ms_FunctionsByName.end (); ++it )
     {
         lua_pushstring ( luaVM, it->first.c_str () );
         lua_pushcclosure ( luaVM, it->second->GetAddress (), 1 );
@@ -117,7 +117,7 @@ void CLuaCFunctions::RemoveAllFunctions ( void )
 {
     // Delete all functions
     CFastHashMap < lua_CFunction, CLuaCFunction* >::iterator it;
-    for ( it = ms_Functions.begin (); it != ms_Functions.end (); it++ )
+    for ( it = ms_Functions.begin (); it != ms_Functions.end (); ++it )
     {
         delete it->second;
     }

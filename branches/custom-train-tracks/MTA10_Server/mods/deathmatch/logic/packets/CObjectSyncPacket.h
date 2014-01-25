@@ -22,13 +22,13 @@ class CObjectSyncPacket : public CPacket
 public:
     struct SyncData
     {
-        bool                    bSend;
         ElementID               ID;
-        unsigned char           ucSyncTimeContext;
-        unsigned char           ucFlags;
         CVector                 vecPosition;
         CVector                 vecRotation;
         float                   fHealth;
+        unsigned char           ucSyncTimeContext;
+        unsigned char           ucFlags;
+        bool                    bSend;
     };
 
 public:

@@ -31,7 +31,7 @@ bool CCustomWeaponBulletSyncPacket::Read ( NetBitStreamInterface& BitStream )
 
         ElementID WeaponID = INVALID_ELEMENT_ID;
         bOk |= BitStream.Read ( WeaponID );
-        m_pWeapon = static_cast < CCustomWeapon * > ( CElementIDs::GetElement ( WeaponID ) );
+        m_pWeapon = GetElementFromId < CCustomWeapon > ( WeaponID );
 
         bOk |= BitStream.Read ( (char *)&m_vecStart, sizeof ( CVector ) );
         bOk |= BitStream.Read ( (char *)&m_vecEnd, sizeof ( CVector ) );

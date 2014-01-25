@@ -1855,7 +1855,8 @@ float Window::windowToScreenY(const UDim& y) const
 *************************************************************************/
 Vector2 Window::windowToScreen(const UVector2& vec) const
 {
-    Vector2 base = d_parent ? d_parent->windowToScreen(base) + getAbsolutePosition() : getAbsolutePosition();
+    Vector2 base(0, 0);
+    base = d_parent ? d_parent->windowToScreen(base) + getAbsolutePosition() : getAbsolutePosition();
 
     switch(d_horzAlign)
     {
@@ -1889,7 +1890,8 @@ Vector2 Window::windowToScreen(const UVector2& vec) const
 *************************************************************************/
 Rect Window::windowToScreen(const URect& rect) const
 {
-    Vector2 base = d_parent ? d_parent->windowToScreen(base) + getAbsolutePosition() : getAbsolutePosition();
+    Vector2 base(0, 0);
+    base = d_parent ? d_parent->windowToScreen(base) + getAbsolutePosition() : getAbsolutePosition();
 
     switch(d_horzAlign)
     {

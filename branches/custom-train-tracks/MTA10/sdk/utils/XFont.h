@@ -183,7 +183,12 @@ BOOL GetFontProperties(LPCTSTR lpszFilePath, FONT_PROPERTIES * lpFontPropsX)
 
 	//check is this is a true type font and the version is 1.0
 	if (ttOffsetTable.uMajorVersion != 1 || ttOffsetTable.uMinorVersion != 0)
+    {
+	    ::UnmapViewOfFile(lpMapAddress);
+	    ::CloseHandle(hMappedFile);
+	    ::CloseHandle(hFile);
 		return bRetVal;
+    }
 
 	TT_TABLE_DIRECTORY tblDir;
 	memset(&tblDir, 0, sizeof(TT_TABLE_DIRECTORY));
@@ -239,7 +244,7 @@ BOOL GetFontProperties(LPCTSTR lpszFilePath, FONT_PROPERTIES * lpFontPropsX)
 			ttRecord.uStringLength = SWAPWORD(ttRecord.uStringLength);
 			ttRecord.uStringOffset = SWAPWORD(ttRecord.uStringOffset);
 
-			if (ttRecord.uNameID == 1 || ttRecord.uNameID == 0 || ttRecord.uNameID == 7)
+			if (ttRecord.uNameID == 1 || ttRecord.uNameID == 0 || ttRecord.uNameID == 4 || ttRecord.uNameID == 7)
 			{
 				int nPos = index; //f.GetPosition();
 

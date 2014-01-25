@@ -10,7 +10,6 @@
 *
 *****************************************************************************/
 
-#ifdef WIN32
 #ifdef MTA_CLIENT
 
 #define _WIN32_DCOM
@@ -19,10 +18,32 @@ using namespace std;
 #include <Wbemidl.h>
 
 # pragma comment(lib, "wbemuuid.lib")
+#pragma comment(lib, "Version.lib")
 
 
 namespace
 {
+    HRESULT CallConnectServer( IWbemLocator *pLoc,
+            /* [in] */ const BSTR strNetworkResource,
+            /* [in] */ const BSTR strUser,
+            /* [in] */ const BSTR strPassword,
+            /* [in] */ const BSTR strLocale,
+            /* [in] */ long lSecurityFlags,
+            /* [in] */ const BSTR strAuthority,
+            /* [in] */ IWbemContext *pCtx,
+            /* [out] */ IWbemServices **ppNamespace)
+    {
+        __try
+        {
+            return pLoc->ConnectServer(strNetworkResource, strUser, strPassword, strLocale, lSecurityFlags, strAuthority, pCtx, ppNamespace );
+        }
+        __except( GetExceptionCode() == 0xC000041D )
+        {
+            *ppNamespace = NULL;
+            return 0xC000041D;
+        }
+    }
+
     HRESULT CallNext( IEnumWbemClassObject* pEnumerator,
             /* [in] */ long lTimeout,
             /* [in] */ ULONG uCount,
@@ -49,7 +70,7 @@ namespace
 //
 //
 /////////////////////////////////////////////////////////////////////
-bool SharedUtil::QueryWMI ( SQueryWMIResult& outResult, const SString& strQuery, const SString& strKeys )
+bool SharedUtil::QueryWMI ( SQueryWMIResult& outResult, const SString& strQuery, const SString& strKeys, const SString& strNamespace )
 {
     HRESULT hres;
 
@@ -121,8 +142,8 @@ bool SharedUtil::QueryWMI ( SQueryWMIResult& outResult, const SString& strQuery,
     // Connect to the root\cimv2 namespace with
     // the current user and obtain pointer pSvc
     // to make IWbemServices calls.
-    hres = pLoc->ConnectServer(
-         _bstr_t( "ROOT\\CIMV2" ), // Object path of WMI namespace
+    hres = CallConnectServer( pLoc,
+         _bstr_t( SStringX( "ROOT\\" ) + strNamespace ), // Object path of WMI namespace
          NULL,                    // User name. NULL = current user
          NULL,                    // User password. NULL = current
          0,                       // Locale. NULL indicates current
@@ -182,9 +203,6 @@ bool SharedUtil::QueryWMI ( SQueryWMIResult& outResult, const SString& strQuery,
     // Step 7: -------------------------------------------------
     // Get the data from the query in step 6 -------------------
  
-    IWbemClassObject *pclsObj;
-    ULONG uReturn = 0;
-
     // Get list of keys to find values for
     std::vector < SString > vecKeys;
     SString ( strKeys ).Split ( ",", vecKeys );
@@ -195,7 +213,8 @@ bool SharedUtil::QueryWMI ( SQueryWMIResult& outResult, const SString& strQuery,
     // Fill each row
     while (pEnumerator)
     {
-        uReturn = 0;
+        IWbemClassObject *pclsObj = NULL;
+        ULONG uReturn = 0;
 
         HRESULT hr = CallNext(pEnumerator, WBEM_INFINITE, 1, 
             &pclsObj, &uReturn);
@@ -217,6 +236,12 @@ bool SharedUtil::QueryWMI ( SQueryWMIResult& outResult, const SString& strQuery,
             break;
         }
 
+        if( pclsObj == NULL )
+        {
+            AddReportLog( 9132, SString( "QueryWMI pclsObj == NULL returned %08x for %s", hr, *strQuery ) );
+            break;
+        }
+
         VARIANT vtProp;
 
         // Add result row
@@ -232,10 +257,17 @@ bool SharedUtil::QueryWMI ( SQueryWMIResult& outResult, const SString& strQuery,
             wstring wstrKey( strKey.begin (), strKey.end () );
             hr = pclsObj->Get ( wstrKey.c_str (), 0, &vtProp, 0, 0 );
 
-            VariantChangeType( &vtProp, &vtProp, 0, VT_BSTR );
-            if ( vtProp.vt == VT_BSTR )
-                strValue = _bstr_t ( vtProp.bstrVal );
-            VariantClear ( &vtProp );
+            if ( hr == WBEM_S_NO_ERROR )
+            {
+                VariantChangeType( &vtProp, &vtProp, 0, VT_BSTR );
+                if ( vtProp.vt == VT_BSTR )
+                    strValue = _bstr_t ( vtProp.bstrVal );
+                VariantClear ( &vtProp );
+            }
+            else
+            {
+                AddReportLog( 9133, SString( "QueryWMI pclsObj->Get returned %08x for key %d in %s", hr, i, *strQuery ) );
+            }
 
             outResult.back().insert ( outResult.back().end (), strValue );
         }
@@ -379,5 +411,110 @@ long long SharedUtil::GetWMIVideoAdapterMemorySize ( const SString& strDisplay )
     return llResult;
 }
 
-#endif
+
+/////////////////////////////////////////////////////////////////////
+//
+// GetWMIAntiVirusStatus
+//
+// Returns a list of enabled AVs and disabled AVs
+//
+/////////////////////////////////////////////////////////////////////
+void SharedUtil::GetWMIAntiVirusStatus( std::vector < SString >& outEnabledList, std::vector < SString >& outDisabledList )
+{
+    SQueryWMIResult result;
+
+    QueryWMI ( result, "AntiVirusProduct", "displayName,productState", "SecurityCenter2" );
+
+    if ( !result.empty () )
+    {
+        // Vista and up
+        for ( uint i = 0 ; i < result.size () ; i++ )
+        {
+            const SString& displayName = result[i][0];
+            uint uiProductState = atoi( result[i][1] );
+            SString strComboName( "%s[%05x]", *displayName, uiProductState );
+            if ( uiProductState & 0x1000 )
+                outEnabledList.push_back( strComboName );
+            else
+                outDisabledList.push_back( strComboName );
+        }
+    }
+    else
+    {
+        // XP
+        QueryWMI ( result, "AntiVirusProduct", "displayName,onAccessScanningEnabled", "SecurityCenter" );
+
+        for ( uint i = 0 ; i < result.size () ; i++ )
+        {
+            const SString& displayName = result[i][0];
+            const SString& onAccessScanningEnabled = result[i][1];
+            SString strComboName( "%s[%s]", *displayName, *onAccessScanningEnabled );
+            if ( onAccessScanningEnabled != "0" )
+                outEnabledList.push_back( strComboName );
+            else
+                outDisabledList.push_back( strComboName );
+        }
+    }
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// GetLibVersionInfo
+//
+// Get version info of a file
+//
+///////////////////////////////////////////////////////////////
+bool SharedUtil::GetLibVersionInfo( const SString& strLibName, SLibVersionInfo* pOutLibVersionInfo )
+{
+    DWORD dwHandle, dwLen;
+    dwLen = GetFileVersionInfoSizeW ( FromUTF8( strLibName ), &dwHandle );
+    if (!dwLen) 
+        return FALSE;
+
+    LPTSTR lpData = (LPTSTR) malloc (dwLen);
+    if (!lpData) 
+        return FALSE;
+
+    SetLastError ( 0 );
+    if( !GetFileVersionInfoW ( FromUTF8( strLibName ), dwHandle, dwLen, lpData ) )
+    {
+        free (lpData);
+        return FALSE;
+    }
+
+    DWORD dwError = GetLastError ();
+    if ( dwError )
+    {
+        free (lpData);
+        return FALSE;
+    }
+
+    UINT BufLen;
+    VS_FIXEDFILEINFO *pFileInfo;
+    if( VerQueryValueA ( lpData, "\\", (LPVOID *) &pFileInfo, (PUINT)&BufLen ) ) 
+    {
+        *(VS_FIXEDFILEINFO*)pOutLibVersionInfo = *pFileInfo;
+
+        // Nab some strings as well
+        WORD* langInfo;
+        UINT cbLang;
+        if( VerQueryValueA (lpData, "\\VarFileInfo\\Translation", (LPVOID*)&langInfo, &cbLang) )
+        {
+            SString strFirstBit ( "\\StringFileInfo\\%04x%04x\\", langInfo[0], langInfo[1] );
+
+            LPVOID lpt;
+            UINT cbBufSize;
+            if ( VerQueryValueA (lpData, strFirstBit + "CompanyName", &lpt, &cbBufSize) )     pOutLibVersionInfo->strCompanyName = SStringX( (const char*)lpt ); 
+            if ( VerQueryValueA (lpData, strFirstBit + "ProductName", &lpt, &cbBufSize) )     pOutLibVersionInfo->strProductName = SStringX( (const char*)lpt ); 
+        }
+
+        free (lpData);
+        return true;
+    }
+
+    free (lpData);
+    return FALSE;
+}
+
 #endif

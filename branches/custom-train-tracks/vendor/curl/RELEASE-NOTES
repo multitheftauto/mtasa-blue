@@ -1,57 +1,69 @@
-Curl and libcurl 7.19.4
+Curl and libcurl 7.32.0
 
- Public curl releases:         110
- Command line options:         132
- curl_easy_setopt() options:   163
+ Public curl releases:         134
+ Command line options:         152
+ curl_easy_setopt() options:   199
  Public functions in libcurl:  58
- Known libcurl bindings:       38
- Contributors:                 700
+ Known libcurl bindings:       42
+ Contributors:                 1049
 
-This release includes the following security-related fix:
-
- o CVE-2009-0037 with the curl advisory here:
-   http://curl.haxx.se/docs/adv_20090303.html
+***
+  krb4 support is up for removal. If you care about it at all, speak up
+  on the curl-library list asap!
+***
 
 This release includes the following changes:
 
- o Added CURLOPT_NOPROXY and the corresponding --noproxy
- o the OpenSSL-specific code disables TICKET (rfc5077) which is enabled by
-   default in openssl 0.9.8j
- o Added CURLOPT_TFTP_BLKSIZE
- o Added CURLOPT_SOCKS5_GSSAPI_SERVICE and CURLOPT_SOCKS5_GSSAPI_NEC - with
-   the corresponding curl options --socks5-gssapi-service and
-   --socks5-gssapi-nec
- o Improved IPv6 support when built with with c-ares >= 1.6.1
- o Added CURLPROXY_HTTP_1_0 and --proxy1.0
- o Added docs/libcurl/symbols-in-versions
- o Added CURLINFO_CONDITION_UNMET
- o Added support for Digest and NTLM authentication using GnuTLS
- o CURLOPT_FTP_CREATE_MISSING_DIRS can now be set to 2 to retry the CWD even
-   when MKD fails
- o GnuTLS initing moved to curl_global_init()
- o Added CURLOPT_REDIR_PROTOCOLS and CURLOPT_PROTOCOLS
+ o curl: allow timeouts to accept decimal values
+ o OS400: add slist and certinfo EBCDIC support
+ o OS400: new SSL backend GSKit
+ o CURLOPT_XFERINFOFUNCTION: introducing a new progress callback
+ o LIBCURL-STRUCTS: new document
 
 This release includes the following bugfixes:
 
- o missing ssh.obj in VS makefiles
- o FTP ;type=i URLs now work with CURLOPT_PROXY_TRANSFER_MODE in Turkish
-   locale 
- o realms with quoted quotation marks in HTTP Digest headers
- o VC9 makefiles are now really included
- o multi interface memory leak with CURLMOPT_MAXCONNECTS set
- o CURLINFO_CONTENT_LENGTH_DOWNLOAD size from file:// "transfers" with
-   CURLOPT_NOBODY set true
- o memory leak on some libz errors for content encodings
- o NSS-enabled build is repaired
- o superfluous wait in SFTP downloads removed
- o FTP with the multi interface no longer kills the control connection as
-   easily on transfer failures
- o compilation halting when using VS2008 to build a Windows 2000 target
- o ease creation of libcurl Mac OS X Framework
- o CURLINFO_CONTENT_LENGTH_DOWNLOAD and CURLINFO_CONTENT_LENGTH_UPLOAD are -1
-   if unknown
- o Negotiate proxy authentication
- o CURLOPT_INTERFACE and CURLOPT_LOCALPORT used together
+ o dotdot: introducing dot file path cleanup [1]
+ o docs: fix typo in curl_easy_getinfo manpage
+ o test1230: avoid using hard-wired port number
+ o test1396: invoke the correct test tool
+ o SIGPIPE: ignored while inside the library [2]
+ o darwinssl: fix crash that started happening in Lion
+ o OpenSSL: check for read errors, don't assume [3]
+ o c-ares: improve error message on failed resolve [4]
+ o printf: make sure %x are treated unsigned
+ o formpost: better random boundaries [5]
+ o url: restore the functionality of 'curl -u :' [6]
+ o curl.1: fix typo in --xattr description [7]
+ o digest: improve nonce generation
+ o configure: automake 1.14 compatibility tweak
+ o curl.1: document the --post303 option in the man page
+ o curl.1: document the --sasl-ir option in the man page
+ o setup-vms.h: sk_pop symbol tweak
+ o tool_paramhlp: try harder to catch negatives
+ o cmake: Fix for MSVC2010 project generation [8]
+ o asyn-ares: Don't blank ares servers if none configured
+ o curl_multi_wait: set revents for extra fds
+ o Reinstate "WIN32 MemoryTracking: track wcsdup() _wcsdup() and _tcsdup()
+ o ftp_do_more: consider DO_MORE complete when server connects back [9]
+ o curl_easy_perform: gradually increase the delay time [10]
+ o curl: fix symbolic names for CURLUSESSL_* enum in --libcurl output
+ o curl: fix upload of a zip file in OpenVMS [11]
+ o build: fix linking on Solaris 10 [12]
+ o curl_formadd: CURLFORM_FILECONTENT wrongly rejected some option combos [13]
+ o curl_formadd: fix file upload on VMS [14]
+ o curl_easy_pause: on unpause, trigger mulit-socket handling [15]
+ o md5 & metalink: use better build macros on Apple operating systems [16]
+ o darwinssl: fix build error in crypto authentication under Snow Leopard [16]
+ o curl: make --progress-bar update the line less frequently [17]
+ o configure: don't error out on variable confusions (CFLAGS, LDFLAGS etc)
+ o mk-ca-bundle: skip more untrusted certificates
+ o formadd: wrong pointer for file name when CURLFORM_BUFFERPTR used [18]
+ o FTP: when EPSV gets a 229 but fails to connect, retry with PASV
+ o mk-ca-bundle.1: don't install on make install [19]
+ o VMS: lots of updates and fixes of the build procedure
+ o global dns cache: didn't work (regression)
+ o global dns cache: fix memory leak
+ o 
 
 This release includes the following known bugs:
 
@@ -60,11 +72,34 @@ This release includes the following known bugs:
 This release would not have looked like this without help, code, reports and
 advice from friends like these:
 
- Lisa Xu, Daniel Fandrich, Craig A West, Alexey Borzov, Sharad Gupta,
- Peter Sylvester, Chad Monroe, Markus Moeller, Yang Tse, Scott Cantor,
- Patrick Scott, Hidemoto Nakada, Jocelyn Jaubert, Andre Guibert de Bruet,
- Kamil Dudka, Patrik Thunstrom, Linus Nielsen Feltzing, Mark Incley,
- Daniel Johnson, James Cheng, Brian J. Murrell, Senthil Raja Velu,
- Markus Koetter, David Kierznowski, Michal Marek
+ Alex Vinnik, Alessandro Ghedini, Nick Zitzmann, Kamil Dudka,
+ Lluis Batlle i Rossell, Nach M. S., Kim Vandry, Ben Greear, Dan Fandrich,
+ Dave Reisner, Evgeny Turnaev, Guenter Knauf, John E. Malmberg, Marc Hoersken,
+ Patrick Monnerat, Sergei Nikulov, Yang Tse, Andreas Malzahn, Clemens Gruber,
+ Jean-Noel Rouvignac, Markus Moeller, Fabian Keil, Dagobert Michelsen,
+ Byrial Jensen, Justin Karneges, Edward Rudd, Marc Doughty, Konstantin Isakov,
+ 
 
         Thanks! (and sorry if I forgot to mention someone)
+
+References to bug reports and discussions on issues:
+
+ [1] = http://curl.haxx.se/bug/view.cgi?id=1200
+ [2] = http://curl.haxx.se/bug/view.cgi?id=1180
+ [3] = http://curl.haxx.se/bug/view.cgi?id=1249
+ [4] = http://curl.haxx.se/bug/view.cgi?id=1191
+ [5] = http://curl.haxx.se/bug/view.cgi?id=1251
+ [6] = http://curl.haxx.se/mail/archive-2013-06/0052.html
+ [7] = http://curl.haxx.se/bug/view.cgi?id=1252
+ [8] = http://curl.haxx.se/mail/lib-2013-07/0046.html
+ [9] = http://curl.haxx.se/mail/lib-2013-07/0115.html
+ [10] = http://curl.haxx.se/mail/lib-2013-07/0103.html
+ [11] = http://curl.haxx.se/bug/view.cgi?id=496
+ [12] = http://curl.haxx.se/bug/view.cgi?id=1217
+ [13] = http://curl.haxx.se/mail/lib-2013-07/0258.html
+ [14] = http://curl.haxx.se/bug/view.cgi?id=758
+ [15] = http://curl.haxx.se/mail/lib-2013-07/0239.html
+ [16] = http://curl.haxx.se/bug/view.cgi?id=1255
+ [17] = http://curl.haxx.se/mail/archive-2013-07/0031.html
+ [18] = http://curl.haxx.se/bug/view.cgi?id=1262
+ [19] = http://curl.haxx.se/mail/lib-2013-08/0057.html

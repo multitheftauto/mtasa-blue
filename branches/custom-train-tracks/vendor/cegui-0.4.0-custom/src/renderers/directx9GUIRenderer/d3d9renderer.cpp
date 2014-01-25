@@ -223,7 +223,12 @@ bool DirectX9Renderer::doRender(void)
 
 		if (!locked)
 		{
+            buffmem = NULL;
 			if (FAILED(d_buffer->Lock(0, 0, (void**)&buffmem, D3DLOCK_DISCARD)))
+			{
+				return false;
+			}
+            if ( buffmem == NULL )
 			{
 				return false;
 			}
@@ -518,12 +523,12 @@ void DirectX9Renderer::renderQuadDirect(const Rect& dest_rect, float z, const Te
 	Rect final_rect(dest_rect);
 	final_rect.offset(Point(-0.5f, -0.5f));
 
-	QuadVertex*	buffmem;
+	QuadVertex*	buffmem = NULL;
 
 	initPerFrameStates();
 	d_device->SetTexture(0, ((DirectX9Texture*)tex)->getD3DTexture());
 
-	if (SUCCEEDED(d_buffer->Lock(0, VERTEX_PER_QUAD * sizeof(QuadVertex), (void**)&buffmem, D3DLOCK_DISCARD)))
+	if (SUCCEEDED(d_buffer->Lock(0, VERTEX_PER_QUAD * sizeof(QuadVertex), (void**)&buffmem, D3DLOCK_DISCARD)) && buffmem )
 	{
 		// setup Vertex 1...
 		buffmem->x = final_rect.d_left;

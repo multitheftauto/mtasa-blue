@@ -96,9 +96,14 @@ public:
     virtual bool                IsBeingDriven               () = 0;
 
     virtual CVehicle *          GetNextTrainCarriage        () = 0;
-    virtual void                SetNextTrainCarriage        ( CVehicle * next ) = 0;
+    virtual void                SetNextTrainCarriage        ( CVehicle* pNext ) = 0;
     virtual CVehicle *          GetPreviousTrainCarriage    () = 0;
-    virtual void                SetPreviousTrainCarriage    ( CVehicle * previous ) = 0;
+    virtual void                SetPreviousTrainCarriage    ( CVehicle* pPrevious ) = 0;
+    virtual float               GetDistanceToCarriage       ( CVehicle* pCarriage ) = 0;
+    virtual void                AttachTrainCarriage         ( CVehicle* pCarriage ) = 0;
+    virtual void                DetachTrainCarriage         ( CVehicle* pCarriage ) = 0;
+    virtual bool                IsChainEngine               ( void ) = 0;
+    virtual void                SetIsChainEngine            ( bool bChainEngine = true ) = 0;
 
     virtual bool                IsDerailed                  () = 0;
     virtual void                SetDerailed                 ( bool bDerailed ) = 0;
@@ -111,7 +116,7 @@ public:
     virtual BYTE                GetRailTrack                () = 0;
     virtual void                SetRailTrack                ( BYTE ucTrackID ) = 0;
     virtual float               GetTrainPosition            ( void ) = 0;
-    virtual void                SetTrainPosition            ( float fPosition ) = 0;
+    virtual void                SetTrainPosition            ( float fPosition, bool bRecalcOnRailDistance = true ) = 0;
 
     virtual bool                CanPedEnterCar              () = 0;
     virtual bool                CanPedJumpOutCar            ( CPed* pPed ) = 0;

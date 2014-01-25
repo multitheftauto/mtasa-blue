@@ -68,6 +68,9 @@ public:
 
     static int      getResourceACLRequests              ( lua_State* luaVM );
     static int      updateResourceACLRequest            ( lua_State* luaVM );
+
+    static int      LoadString                          ( lua_State* luaVM );
+    static int      Load                                ( lua_State* luaVM );
 };
 
 #endif

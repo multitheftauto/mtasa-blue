@@ -146,21 +146,10 @@ int CLuaFunctionDefs::OutputClientDebugString ( lua_State* luaVM )
     argStream.ReadNumber ( ucGreen, 255 );
     argStream.ReadNumber ( ucBlue, 255 );
 
-    // check they're in range
-    if ( ucRed > 255 || ucRed < 0 ) 
-        m_pScriptDebugging->LogWarning ( luaVM, "Specify a red value between 0 and 255" );
-    else if ( ucGreen > 255 || ucGreen < 0 )
-        m_pScriptDebugging->LogWarning ( luaVM, "Specify a green value between 0 and 255" );
-    else if ( ucBlue >  255 || ucBlue <  0 )
-        m_pScriptDebugging->LogWarning ( luaVM, "Specify a blue value between 0 and 255" );
-
     // Too big level?
     if ( uiLevel > 3 )
     {
-        m_pScriptDebugging->LogWarning ( luaVM, "Bad level argument sent to %s (0-3)", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ) );
-
-        lua_pushboolean ( luaVM, false );
-        return 1;
+        argStream.SetCustomError( "Bad level argument" );
     }
 
     if ( !argStream.HasErrors ( ) )
@@ -191,7 +180,7 @@ int CLuaFunctionDefs::OutputClientDebugString ( lua_State* luaVM )
             return 1;
         }
     }
-    else
+    if ( argStream.HasErrors ( ) )
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     // Failed

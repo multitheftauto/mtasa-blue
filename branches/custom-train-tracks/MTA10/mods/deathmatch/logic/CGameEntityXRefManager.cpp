@@ -26,6 +26,9 @@ public:
     virtual void                AddEntityXRef                       ( CClientEntity* pEntity, CEntity* pEntitySA );
     virtual void                RemoveEntityXRef                    ( CClientEntity* pEntity, CEntity* pEntitySA );
     virtual CClientEntity*      FindClientEntity                    ( CEntitySAInterface* pEntitySAInterface );
+    virtual CClientObject*      FindClientObject                    ( CEntitySAInterface* pObjectSAInterface );
+    virtual CClientPed*         FindClientPed                       ( CEntitySAInterface* pPedSAInterface );
+    virtual CClientVehicle*     FindClientVehicle                   ( CEntitySAInterface* pVehicleSAInterface );
     virtual CClientEntity*      FindClientEntity                    ( CEntity* pEntitySA );
     virtual CClientObject*      FindClientObject                    ( CEntity* pObjectSA );
     virtual CClientPed*         FindClientPed                       ( CEntity* pPedSA );
@@ -136,6 +139,21 @@ CClientEntity* CGameEntityXRefManagerImpl::FindClientEntity ( CEntitySAInterface
     return MapFindRef ( m_InterfaceToClientMap, pEntitySAInterface );
 }
 
+CClientObject* CGameEntityXRefManagerImpl::FindClientObject ( CEntitySAInterface* pObjectSAInterface )
+{
+    return DynamicCast < CClientObject > ( FindClientEntity ( pObjectSAInterface ) );
+}
+
+CClientPed* CGameEntityXRefManagerImpl::FindClientPed ( CEntitySAInterface* pPedSAInterface )
+{
+    return DynamicCast < CClientPed > ( FindClientEntity ( pPedSAInterface ) );
+}
+
+CClientVehicle* CGameEntityXRefManagerImpl::FindClientVehicle ( CEntitySAInterface* pVehicleSAInterface )
+{
+    return DynamicCast < CClientVehicle > ( FindClientEntity ( pVehicleSAInterface ) );
+}
+
 
 ///////////////////////////////////////////////////////////////
 //
@@ -149,40 +167,16 @@ CClientEntity* CGameEntityXRefManagerImpl::FindClientEntity ( CEntity* pEntitySA
     return MapFindRef ( m_GameToClientMap, pEntitySA );
 }
 
-
-///////////////////////////////////////////////////////////////
-//
-// CGameEntityXRefManagerImpl::FindClientObject
-//
-// Find the client object that is using the supplied game entity
-//
-///////////////////////////////////////////////////////////////
 CClientObject* CGameEntityXRefManagerImpl::FindClientObject ( CEntity* pObjectSA )
 {
     return DynamicCast < CClientObject > ( FindClientEntity ( pObjectSA ) );
 }
 
-
-///////////////////////////////////////////////////////////////
-//
-// CGameEntityXRefManagerImpl::FindClientPed
-//
-// Find the client ped that is using the supplied game entity
-//
-///////////////////////////////////////////////////////////////
 CClientPed* CGameEntityXRefManagerImpl::FindClientPed ( CEntity* pPedSA )
 {
     return DynamicCast < CClientPed > ( FindClientEntity ( pPedSA ) );
 }
 
-
-///////////////////////////////////////////////////////////////
-//
-// CGameEntityXRefManagerImpl::FindClientVehicle
-//
-// Find the client vehicle that is using the supplied game entity
-//
-///////////////////////////////////////////////////////////////
 CClientVehicle* CGameEntityXRefManagerImpl::FindClientVehicle ( CEntity* pVehicleSA )
 {
     return DynamicCast < CClientVehicle > ( FindClientEntity ( pVehicleSA ) );

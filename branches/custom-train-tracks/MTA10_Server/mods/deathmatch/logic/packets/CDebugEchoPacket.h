@@ -36,14 +36,6 @@ public:
 
     bool                    Write                       ( NetBitStreamInterface& BitStream ) const;
 
-    inline const char*      GetMessage                  ( void )                    { return m_strMessage; };
-    void                    SetMessage                  ( const char* szMessage )   { m_strMessage.AssignLeft( szMessage, MAX_CHATECHO_LENGTH ); }
-    inline unsigned int     GetLevel                    ( void )                    { return m_uiLevel; }
-    inline void             SetLevel                    ( unsigned int uiLevel )    { m_uiLevel = uiLevel; }
-    inline void             SetColor                    ( unsigned char ucRed,
-                                                          unsigned char ucGreen,
-                                                          unsigned char ucBlue )    { m_ucRed = ucRed; m_ucGreen = ucGreen; m_ucRed = ucRed; };
-
 private:
     unsigned char           m_ucRed;
     unsigned char           m_ucGreen;

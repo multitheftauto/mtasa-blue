@@ -666,7 +666,7 @@ void CServerBrowser::Update ( void )
         m_bFocusTextEdit = false;
         // Focus the text edit
         m_pEditAddress [ Type ]->Activate ();
-        m_pEditAddress [ Type ]->SetCaratAtEnd ();
+        m_pEditAddress [ Type ]->SetCaretAtEnd ();
     }
 
     // Update the current server list class
@@ -753,7 +753,7 @@ void CServerBrowser::SetVisible ( bool bVisible )
         // Focus the address bar for power users
         ServerBrowserType Type = GetCurrentServerBrowserType();
         m_pEditAddress [ Type ]->Activate();
-        m_pEditAddress [ Type ]->SetCaratAtEnd();
+        m_pEditAddress [ Type ]->SetCaretAtEnd();
 
         // Flash search box if it is not empty
         for ( uint i = 0; i < SERVER_BROWSER_TYPE_COUNT; i++ )
@@ -2192,7 +2192,7 @@ void CServerBrowser::SetNextHistoryText ( bool bDown )
             // Ensure we're in range
             i = Clamp<int>(0, i, pServerList->GetItemCount()-1);
             SetAddressBarText ( std::string("mtasa://") + (const char*)pServerList->GetItemByIndex(i)->GetData() );
-            m_pEditAddress[ Type ]->SetCaratAtEnd();
+            m_pEditAddress[ Type ]->SetCaretAtEnd();
             return;
         }
     }

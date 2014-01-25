@@ -219,7 +219,7 @@ void CNametags::DrawFromAim ( void )
             CClientPlayer* pPlayer;
             CClientStreamElement * pElement;
             list < CClientStreamElement* > ::const_iterator iter = m_pPlayerStreamer->ActiveElementsBegin ();
-            for ( ; iter != m_pPlayerStreamer->ActiveElementsEnd (); iter++ )
+            for ( ; iter != m_pPlayerStreamer->ActiveElementsEnd (); ++iter )
             {
                 pElement = *iter;
                 if ( !pElement->IsStreamedIn () ) continue;
@@ -357,7 +357,7 @@ void CNametags::DrawDefault ( void )
     CClientPlayer* pPlayer;
     CClientStreamElement * pElement;
     list < CClientStreamElement* > ::const_iterator iter = m_pPlayerStreamer->ActiveElementsBegin ();
-    for ( ; iter != m_pPlayerStreamer->ActiveElementsEnd (); iter++ )
+    for ( ; iter != m_pPlayerStreamer->ActiveElementsEnd (); ++iter )
     {
         pElement = *iter;
         if ( !pElement->IsStreamedIn () ) continue;
@@ -405,7 +405,7 @@ void CNametags::DrawDefault ( void )
     unsigned char ucAlpha;
     float fDistance;
     list < CClientPlayer * > ::iterator iterTags = playerTags.begin ();
-    for ( ; iterTags != playerTags.end () ; iterTags++ )
+    for ( ; iterTags != playerTags.end () ; ++iterTags )
     {
         pPlayer = *iterTags;
         fDistance = pPlayer->GetNametagDistance ();

@@ -91,6 +91,7 @@ class CObjectManager;
 class CPacket;
 class CPacketTranslator;
 class CLatentTransferManager;
+class CDebugHookManager;
 class CPedManager;
 class CPickupManager;
 class CPlayer;
@@ -118,6 +119,10 @@ class CWeaponStatManager;
 class CBuildingRemovalManager;
 
 class CCustomWeaponManager;
+class COpenPortsTester;
+class CMasterServerAnnouncer;
+class CHqComms;
+class CFunctionUseLogger;
 
 class CTrainTrackManager;
 
@@ -234,6 +239,7 @@ public:
     inline CEvents*                 GetEvents                   ( void )        { return &m_Events; }
     inline CColManager*             GetColManager               ( void )        { return m_pColManager; }
     inline CLatentTransferManager*  GetLatentTransferManager    ( void )        { return m_pLatentTransferManager; }
+    inline CDebugHookManager*       GetDebugHookManager         ( void )        { return m_pDebugHookManager; }
     inline CPedManager*             GetPedManager               ( void )        { return m_pPedManager; }
     inline CResourceManager*        GetResourceManager          ( void )        { return m_pResourceManager; }
     inline CMarkerManager*          GetMarkerManager            ( void )        { return m_pMarkerManager; }
@@ -255,6 +261,7 @@ public:
     inline CWeaponStatManager*      GetWeaponStatManager        ( void )        { return m_pWeaponStatsManager; }
     inline CBuildingRemovalManager* GetBuildingRemovalManager   ( void )        { return m_pBuildingRemovalManager; }
     inline CCustomWeaponManager*    GetCustomWeaponManager      ( void )        { return m_pCustomWeaponManager; }
+    inline CFunctionUseLogger*      GetFunctionUseLogger        ( void )        { return m_pFunctionUseLogger; }
     inline CTrainTrackManager*      GetTrainTrackManager        ( void )        { return m_pTrainTrackManager; }
 
     void                        JoinPlayer                  ( CPlayer& Player );
@@ -370,7 +377,6 @@ public:
     inline int                  GetMoonSize                  ( void )        { return m_iMoonSize; }
     inline void                 SetMoonSize                  ( int iMoonSize ) { m_iMoonSize = iMoonSize; }
 
-    void                        PulseMasterServerAnnounce   ( bool bIsInitialAnnounce = false );
     void                        StartOpenPortsTest          ( void );
 
     bool                        IsServerFullyUp             ( void )        { return m_bServerFullyUp; }
@@ -430,6 +436,7 @@ private:
     void                        Packet_PlayerDiagnostic     ( class CPlayerDiagnosticPacket& Packet );
     void                        Packet_PlayerModInfo        ( class CPlayerModInfoPacket & Packet );
     void                        Packet_PlayerScreenShot     ( class CPlayerScreenShotPacket & Packet );
+    void                        Packet_PlayerNoSocket       ( class CPlayerNoSocketPacket & Packet );
 
     static void                 PlayerCompleteConnect       ( CPlayer* pPlayer, bool bSuccess, const char* szError );
 
@@ -473,6 +480,7 @@ private:
     CRegistry*                      m_pRegistry;
     CAccountManager*                m_pAccountManager;
     CLatentTransferManager*         m_pLatentTransferManager;
+    CDebugHookManager*              m_pDebugHookManager;
     CPedManager*                    m_pPedManager;
     CResourceManager*               m_pResourceManager;
     CAccessControlListManager*      m_pACLManager;
@@ -488,6 +496,7 @@ private:
     CBuildingRemovalManager*        m_pBuildingRemovalManager;
 
     CCustomWeaponManager*           m_pCustomWeaponManager;
+    CFunctionUseLogger*             m_pFunctionUseLogger;
 
     CTrainTrackManager*             m_pTrainTrackManager;
 
@@ -559,9 +568,9 @@ private:
     //Clouds Enabled
     bool                        m_bCloudsEnabled;
 
-    long long                   m_llLastAnnounceTime;
-    long long                   m_llLastPushTime;
-    class COpenPortsTester*     m_pOpenPortsTester;
+    COpenPortsTester*           m_pOpenPortsTester;
+    CMasterServerAnnouncer*     m_pMasterServerAnnouncer;
+    CHqComms*                   m_pHqComms;
 
     CLightsyncManager           m_lightsyncManager;
 
@@ -574,6 +583,7 @@ private:
 
     SString                     m_strPrevMinClientKickRequirement;
     SString                     m_strPrevMinClientConnectRequirement;
+    SString                     m_strPrevLowestConnectedPlayerVersion;
 };
 
 #endif

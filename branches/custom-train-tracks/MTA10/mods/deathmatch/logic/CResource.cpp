@@ -125,26 +125,26 @@ CResource::~CResource ( void )
     m_pResourceEntity = NULL;
 
     list < CResourceFile* >::iterator iter = m_ResourceFiles.begin ();
-    for ( ; iter != m_ResourceFiles.end (); iter++ )
+    for ( ; iter != m_ResourceFiles.end (); ++iter )
     {
         delete ( *iter );
     }
-    m_ResourceFiles.empty ();
+    m_ResourceFiles.clear ();
 
     list < CResourceConfigItem* >::iterator iterc = m_ConfigFiles.begin ();
-    for ( ; iterc != m_ConfigFiles.end (); iterc++ )
+    for ( ; iterc != m_ConfigFiles.end (); ++iterc )
     {
         delete ( *iterc );
     }
-    m_ConfigFiles.empty ();
+    m_ConfigFiles.clear ();
 
     // Delete the exported functions
     list < CExportedFunction* >::iterator iterExportedFunction = m_exportedFunctions.begin();
-    for ( ; iterExportedFunction != m_exportedFunctions.end(); iterExportedFunction++ )
+    for ( ; iterExportedFunction != m_exportedFunctions.end(); ++iterExportedFunction )
     {
         delete ( *iterExportedFunction );
     }
-    m_exportedFunctions.empty();
+    m_exportedFunctions.clear();
 }
 
 CDownloadableResource* CResource::QueueFile ( CDownloadableResource::eResourceType resourceType, const char *szFileName, CChecksum serverChecksum, bool bAutoDownload )
@@ -184,7 +184,7 @@ void CResource::AddExportedFunction ( const char *szFunctionName )
 bool CResource::CallExportedFunction ( const char * szFunctionName, CLuaArguments& args, CLuaArguments& returns, CResource& caller )
 {
     list < CExportedFunction* > ::iterator iter =  m_exportedFunctions.begin ();
-    for ( ; iter != m_exportedFunctions.end (); iter++ )
+    for ( ; iter != m_exportedFunctions.end (); ++iter )
     {
         if ( strcmp ( (*iter)->GetFunctionName(), szFunctionName ) == 0 )
         {
@@ -286,9 +286,8 @@ void CResource::Load ( CClientEntity *pRootEntity )
 
     CLogger::LogPrintf ( "> Starting resource '%s'", *m_strResourceName );
 
-    char szBuffer [ MAX_PATH ] = { 0 };
     list < CResourceConfigItem* >::iterator iterc = m_ConfigFiles.begin ();
-    for ( ; iterc != m_ConfigFiles.end (); iterc++ )
+    for ( ; iterc != m_ConfigFiles.end (); ++iterc )
     {
         if ( !(*iterc)->Start() )
         {
@@ -298,7 +297,7 @@ void CResource::Load ( CClientEntity *pRootEntity )
 
     // Load the files that are queued in the list "to be loaded"
     list < CResourceFile* > ::iterator iter = m_ResourceFiles.begin ();
-    for ( ; iter != m_ResourceFiles.end (); iter++ )
+    for ( ; iter != m_ResourceFiles.end (); ++iter )
     {
         CResourceFile* pResourceFile = *iter;
         // Only load the resource file if it is a client script
@@ -405,20 +404,18 @@ SString CResource::GetResourceDirectoryPath ( eAccessType accessType, const SStr
                 }
             }
         }
-    }
-
-    if ( accessType == ACCESS_PRIVATE )
         return PathJoin ( m_strResourcePrivateDirectoryPath, strMetaPath );
+    }
     return PathJoin ( m_strResourceDirectoryPath, strMetaPath );
 }
 
 
-void CResource::LoadNoClientCacheScript ( const char* chunk, unsigned int len )
+void CResource::LoadNoClientCacheScript ( const char* chunk, unsigned int len, const SString& strFilename )
 {
     if ( m_usRemainingNoClientCacheScripts > 0 )
     {
         --m_usRemainingNoClientCacheScripts;
-        GetVM()->LoadScriptFromBuffer ( chunk, len, "(unknown)" );
+        GetVM()->LoadScriptFromBuffer ( chunk, len, strFilename );
 
         if ( m_usRemainingNoClientCacheScripts == 0 && m_bLoadAfterReceivingNoClientCacheScripts )
         {

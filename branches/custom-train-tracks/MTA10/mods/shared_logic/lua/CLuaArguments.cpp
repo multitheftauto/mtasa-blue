@@ -200,7 +200,7 @@ void CLuaArguments::PushAsTable ( lua_State* luaVM, CFastHashMap < CLuaArguments
 }
 
 
-void CLuaArguments::PushArguments ( CLuaArguments& Arguments )
+void CLuaArguments::PushArguments ( const CLuaArguments& Arguments )
 {
     vector < CLuaArgument* > ::const_iterator iter = Arguments.IterBegin ();
     for ( ; iter != Arguments.IterEnd (); iter++ )
@@ -274,7 +274,7 @@ bool CLuaArguments::Call ( CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFuncti
             lua_pop ( luaVM, 1 );
     }
         
-    CClientPerfStatLuaTiming::GetSingleton ()->UpdateLuaTiming ( pLuaMain, pLuaMain->GetFunctionTag ( iLuaFunction.m_iFunction ), GetTimeUs() - startTime );
+    CClientPerfStatLuaTiming::GetSingleton ()->UpdateLuaTiming ( pLuaMain, pLuaMain->GetFunctionTag ( iLuaFunction.ToInt() ), GetTimeUs() - startTime );
     return true;
 }
 

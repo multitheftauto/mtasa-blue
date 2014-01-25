@@ -223,7 +223,7 @@ void CAccessControlListGroup::WriteToXMLNode ( CXMLNode* pNode )
 
         // Append a dot append the name of the node
         strcat ( szObjectType, "." );
-        strncat ( szObjectType, pObject->GetObjectName (), 255 );
+        strncat ( szObjectType, pObject->GetObjectName (), NUMELMS( szObjectType ) - 1 );
 
         // Create the subnode for this object and write the name attribute we generated
         CXMLNode* pObjectNode = pSubNode->CreateSubNode ( "object" );

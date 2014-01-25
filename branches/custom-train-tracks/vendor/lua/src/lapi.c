@@ -49,7 +49,7 @@ const char lua_ident[] =
 static TValue *index2adr (lua_State *L, int idx) {
   if (idx > 0) {
     TValue *o = L->base + (idx - 1);
-    api_check(L, idx <= L->ci->top - L->base);
+    //api_check(L, idx <= L->ci->top - L->base);    // Not needed for safety checks as returns nil if out of bounds
     if (o >= L->top) return cast(TValue *, luaO_nilobject);
     else return o;
   }
@@ -106,6 +106,16 @@ LUA_API int lua_checkstack (lua_State *L, int size) {
   return res;
 }
 
+// MTA addition - Return stack space
+LUA_API int lua_getstackgap (lua_State *L) {
+  int res, gap1, gap2; 
+  lua_lock(L);
+  gap1 = ( (char *)L->stack_last - (char *)L->top ) / (int)sizeof(TValue);
+  gap2 = L->ci->top - L->top;
+  res = gap1 < gap2 ? gap1 : gap2;
+  lua_unlock(L);
+  return res;
+}
 
 LUA_API void lua_xmove (lua_State *from, lua_State *to, int n) {
   int i;
@@ -1101,3 +1111,15 @@ LUA_API const char *lua_setupvalue (lua_State *L, int funcindex, int n) {
   return name;
 }
 
+// MTA addition to validate inclusion of working apichecks
+#if defined(LUA_USE_APICHECK)
+LUA_API int luaX_is_apicheck_enabled()
+{
+    #if defined(LUA_USE_APICHECK)
+        #ifndef NDEBUG
+            return 1;
+        #endif
+    #endif
+    return 0;
+}
+#endif

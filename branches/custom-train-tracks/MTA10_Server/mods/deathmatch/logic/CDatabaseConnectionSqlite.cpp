@@ -31,6 +31,7 @@ public:
     virtual const SString&  GetLastErrorMessage     ( void );
     virtual uint            GetLastErrorCode        ( void );
     virtual uint            GetNumAffectedRows      ( void );
+    virtual uint64          GetLastInsertId         ( void );
     virtual void            AddRef                  ( void );
     virtual void            Release                 ( void );
     virtual bool            Query                   ( const SString& strQuery, CRegistryResult& registryResult );
@@ -50,6 +51,7 @@ public:
     SString                 m_strLastErrorMessage;
     uint                    m_uiLastErrorCode;
     uint                    m_uiNumAffectedRows;
+    uint64                  m_ullLastInsertId;
     bool                    m_bAutomaticTransactionsEnabled;
     bool                    m_bInAutomaticTransaction;
     CTickCount              m_AutomaticTransactionStartTime;
@@ -213,6 +215,19 @@ uint CDatabaseConnectionSqlite::GetNumAffectedRows ( void )
 
 ///////////////////////////////////////////////////////////////
 //
+// CDatabaseConnectionSqlite::GetLastInsertId
+//
+// Only valid when Query() returns true
+//
+///////////////////////////////////////////////////////////////
+uint64 CDatabaseConnectionSqlite::GetLastInsertId ( void )
+{
+    return m_ullLastInsertId;
+}
+
+
+///////////////////////////////////////////////////////////////
+//
 // CDatabaseConnectionSqlite::Query
 //
 //
@@ -220,7 +235,11 @@ uint CDatabaseConnectionSqlite::GetNumAffectedRows ( void )
 ///////////////////////////////////////////////////////////////
 bool CDatabaseConnectionSqlite::Query ( const SString& strQuery, CRegistryResult& registryResult )
 {
-    BeginAutomaticTransaction ();
+    // VACUUM query does not work with transactions
+    if ( strQuery.BeginsWithI( "VACUUM" ) )
+        EndAutomaticTransaction ();
+    else
+        BeginAutomaticTransaction ();
     return QueryInternal ( strQuery, registryResult );
 }
 
@@ -236,7 +255,7 @@ bool CDatabaseConnectionSqlite::Query ( const SString& strQuery, CRegistryResult
 bool CDatabaseConnectionSqlite::QueryInternal ( const SString& strQuery, CRegistryResult& registryResult )
 {
     const char* szQuery = strQuery;
-    CRegistryResult* pResult = &registryResult;
+    CRegistryResult& pResult = registryResult;
 
     // Prepare the query
     sqlite3_stmt* pStmt;
@@ -261,7 +280,7 @@ bool CDatabaseConnectionSqlite::QueryInternal ( const SString& strQuery, CRegist
     while ( (status = sqlite3_step(pStmt)) == SQLITE_ROW )
     {
         pResult->Data.push_back ( vector < CRegistryResultCell > ( pResult->nColumns ) );
-        vector < CRegistryResultCell > & row = *(pResult->Data.end () - 1);
+        vector < CRegistryResultCell > & row = pResult->Data.back();
         for ( int i = 0; i < pResult->nColumns; i++ )
         {
             CRegistryResultCell& cell = row[i];
@@ -311,6 +330,9 @@ bool CDatabaseConnectionSqlite::QueryInternal ( const SString& strQuery, CRegist
 
     // Number of affects rows/num of rows like MySql
     m_uiNumAffectedRows = pResult->nRows ? pResult->nRows : sqlite3_changes ( m_handle );
+
+    // Last insert id
+    m_ullLastInsertId = sqlite3_last_insert_rowid( m_handle );
 
     return true;
 }
@@ -467,7 +489,7 @@ SString InsertQueryArgumentsSqlite ( const SString& strQuery, CLuaArguments* pAr
 SString InsertQueryArgumentsSqlite ( const char* szQuery, va_list vl )
 {
     SString strParsedQuery;
-    for ( unsigned int i = 0 ; i < strlen ( szQuery ) ; i++ )
+    for( unsigned int i = 0 ; szQuery[i] != '\0' ; i++ )
     {
         if ( szQuery[i] != SQL_VARIABLE_PLACEHOLDER )
         {

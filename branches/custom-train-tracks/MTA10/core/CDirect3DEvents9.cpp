@@ -200,7 +200,8 @@ void CDirect3DEvents9::CheckForScreenShot ( void )
         SString strFileName = CScreenShot::PreScreenShot ();
 
         // Try to get the screen data
-        if ( CGraphics::GetSingleton ().GetScreenGrabber ()->GetBackBufferPixels ( uiWidth, uiHeight, ms_ScreenShotBuffer ) )
+        SString strError;
+        if ( CGraphics::GetSingleton ().GetScreenGrabber ()->GetBackBufferPixels ( uiWidth, uiHeight, ms_ScreenShotBuffer, strError ) )
         {
             // Validate data size
             uint uiDataSize = ms_ScreenShotBuffer.GetSize ();
@@ -219,7 +220,7 @@ void CDirect3DEvents9::CheckForScreenShot ( void )
         }
         else
         {
-            g_pCore->GetConsole()->Print ( _("Screenshot failed") );
+            g_pCore->GetConsole()->Print ( _("Screenshot failed") + SString( " (%s)", *strError ) );
             strFileName = "";
         }
 
@@ -552,7 +553,7 @@ HRESULT CDirect3DEvents9::DrawIndexedPrimitiveShader ( IDirect3DDevice9 *pDevice
 // This function checks the sizes are valid
 //
 /////////////////////////////////////////////////////////////
-bool AreVertexStreamsAreBigEnough ( IDirect3DDevice9* pDevice, WORD viMinBased, WORD viMaxBased )
+bool AreVertexStreamsAreBigEnough ( IDirect3DDevice9* pDevice, uint viMinBased, uint viMaxBased )
 {
     // Check each stream used
     for ( uint i = 0 ; i < NUMELMS( g_pDeviceState->VertexDeclState.bUsesStreamAtIndex ) ; i++ )
@@ -587,6 +588,25 @@ bool AreVertexStreamsAreBigEnough ( IDirect3DDevice9* pDevice, WORD viMinBased, 
 
 /////////////////////////////////////////////////////////////
 //
+// FilerException
+//
+// Check if exception should be handled by us
+//
+/////////////////////////////////////////////////////////////
+uint uiLastExceptionCode = 0;
+int FilerException( uint ExceptionCode )
+{
+    uiLastExceptionCode = ExceptionCode;
+    if ( ExceptionCode == EXCEPTION_ACCESS_VIOLATION )
+        return EXCEPTION_EXECUTE_HANDLER;
+    if ( ExceptionCode == 0xE06D7363 )
+        return EXCEPTION_EXECUTE_HANDLER;
+    return EXCEPTION_CONTINUE_SEARCH;
+}
+
+
+/////////////////////////////////////////////////////////////
+//
 // DrawPrimitiveGuarded
 //
 // Catch access violations
@@ -606,8 +626,8 @@ HRESULT CDirect3DEvents9::DrawPrimitiveGuarded ( IDirect3DDevice9 *pDevice, D3DP
         if ( PrimitiveType == D3DPT_TRIANGLELIST )
             NumVertices = PrimitiveCount * 3;
 
-        WORD viMinBased = StartVertex;
-        WORD viMaxBased = NumVertices + StartVertex;
+        uint viMinBased = StartVertex;
+        uint viMaxBased = NumVertices + StartVertex;
 
         if ( !AreVertexStreamsAreBigEnough ( pDevice, viMinBased, viMaxBased ) )
             return hr;
@@ -617,9 +637,9 @@ HRESULT CDirect3DEvents9::DrawPrimitiveGuarded ( IDirect3DDevice9 *pDevice, D3DP
     {
         hr = pDevice->DrawPrimitive ( PrimitiveType, StartVertex, PrimitiveCount );
     }
-    __except( GetExceptionCode() == EXCEPTION_ACCESS_VIOLATION )
+    __except( FilerException( GetExceptionCode() ) )
     {
-        CCore::GetSingleton ().OnCrashAverted ( 100 );
+        CCore::GetSingleton ().OnCrashAverted ( ( uiLastExceptionCode & 0xFFFF ) + 1 * 1000000 );
     }
     return hr;
 }
@@ -640,8 +660,8 @@ HRESULT CDirect3DEvents9::DrawIndexedPrimitiveGuarded ( IDirect3DDevice9 *pDevic
     HRESULT hr = D3D_OK;
 
     // Check vertices used will be within the supplied vertex buffer bounds
-    WORD viMinBased = MinVertexIndex + BaseVertexIndex;
-    WORD viMaxBased = MinVertexIndex + NumVertices + BaseVertexIndex;
+    uint viMinBased = MinVertexIndex + BaseVertexIndex;
+    uint viMaxBased = MinVertexIndex + NumVertices + BaseVertexIndex;
 
     if ( !AreVertexStreamsAreBigEnough ( pDevice, viMinBased, viMaxBased ) )
         return hr;
@@ -650,9 +670,9 @@ HRESULT CDirect3DEvents9::DrawIndexedPrimitiveGuarded ( IDirect3DDevice9 *pDevic
     {
         hr = pDevice->DrawIndexedPrimitive ( PrimitiveType, BaseVertexIndex, MinVertexIndex, NumVertices, startIndex, primCount );
     }
-    __except( GetExceptionCode() == EXCEPTION_ACCESS_VIOLATION )
+    __except( FilerException( GetExceptionCode() ) )
     {
-        CCore::GetSingleton ().OnCrashAverted ( 101 );
+        CCore::GetSingleton ().OnCrashAverted ( ( uiLastExceptionCode & 0xFFFF ) + 2 * 1000000 );
     }
     return hr;
 }

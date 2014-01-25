@@ -44,7 +44,6 @@ CProxyDirect3DDevice9::CProxyDirect3DDevice9 ( IDirect3DDevice9 * pDevice  )
     D3DADAPTER_IDENTIFIER9 adaptIdent;
     ZeroMemory( &adaptIdent, sizeof( D3DADAPTER_IDENTIFIER9 ) );
     pD3D9->GetAdapterIdentifier( iAdapter, 0, &adaptIdent );
-    SString strVideoCardName = adaptIdent.Description;
 
     int iVideoCardMemoryKBTotal = GetWMIVideoAdapterMemorySize ( adaptIdent.DeviceName ) / 1024;
 
@@ -73,6 +72,9 @@ CProxyDirect3DDevice9::CProxyDirect3DDevice9 ( IDirect3DDevice9 * pDevice  )
         while ( iLevel >>= 1 )
             g_pDeviceState->AdapterState.MaxAnisotropicSetting++;
     }
+
+    // Clipping is required for some graphic configurations
+    g_pDeviceState->AdapterState.bRequiresClipping = SStringX( adaptIdent.Description ).Contains( "Intel" );
 
     // Call event handler
     CDirect3DEvents9::OnDirect3DDeviceCreate ( pDevice );
@@ -252,6 +254,18 @@ HRESULT DoResetDevice( IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS* pPresen
 
                 // Prevent statup warning in loader
                 WatchDogCompletedSection ( "L3" );
+
+                // Try removing anti-aliasing for next time
+                if ( CGame* pGame = g_pCore->GetGame() )
+                {
+                    CGameSettings* pGameSettings = pGame->GetSettings ();
+                    int iAntiAliasing = pGameSettings->GetAntiAliasing();
+                    if ( iAntiAliasing > 1 )
+                    {
+                        pGameSettings->SetAntiAliasing( 1, true );
+                        pGameSettings->Save();
+                    }
+                }
 
                 // Handle fatal error
                 SString strMessage;
@@ -517,7 +531,7 @@ HRESULT CProxyDirect3DDevice9::EndScene                       ( VOID )
 HRESULT CProxyDirect3DDevice9::Clear                          ( DWORD Count,CONST D3DRECT* pRects,DWORD Flags,D3DCOLOR Color,float Z,DWORD Stencil )
 {
     // If clearing z buffer, make sure we save it first
-    if ( Flags | D3DCLEAR_ZBUFFER )
+    if ( Flags & D3DCLEAR_ZBUFFER )
         CGraphics::GetSingleton ().GetRenderItemManager ()->SaveReadableDepthBuffer ();
 
     return m_pDevice->Clear ( Count, pRects, Flags, Color, Z, Stencil );

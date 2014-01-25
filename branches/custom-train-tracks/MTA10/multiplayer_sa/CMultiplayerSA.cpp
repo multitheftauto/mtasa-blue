@@ -1011,6 +1011,9 @@ void CMultiplayerSA::InitHooks()
     
     // Prevent TRAINS spawning with PEDs
     MemPut < BYTE > ( 0x6F7865, 0xEB );
+    MemPut < BYTE > ( 0x6F8E7B, 0xE9 );
+    MemPut < DWORD > ( 0x6F8E7C, 0x109 ); // jmp to 0x6F8F89
+    MemPut < BYTE > ( 0x6F8E80, 0x90 );
 
     // DISABLE PLANES
     MemPut < BYTE > ( 0x6CD2F0, 0xC3 );
@@ -1391,6 +1394,8 @@ void CMultiplayerSA::InitHooks()
     Init_13 ();
     InitHooks_LicensePlate ();
     InitHooks_Direct3D();
+    InitHooks_FixLineOfSightArgs();
+    InitHooks_VehicleDamage();
 }
 
 
@@ -1408,7 +1413,7 @@ void RemoveFxSystemPointer ( DWORD* pPointer )
 {
     // Look through our list for the pointer
     std::list < DWORD* > ::iterator iter = Pointers_FxSystem.begin ();
-    for ( ; iter != Pointers_FxSystem.end (); iter++ )
+    for ( ; iter != Pointers_FxSystem.end (); ++iter )
     {
         // It exists in our list?
         if ( *iter == pPointer )
@@ -2086,6 +2091,7 @@ void CMultiplayerSA::SetVehicleCollisionHandler ( VehicleCollisionHandler * pHan
 {
     m_pVehicleCollisionHandler = pHandler;
 }
+
 
 void CMultiplayerSA::SetHeliKillHandler ( HeliKillHandler * pHandler )
 {
@@ -5403,31 +5409,55 @@ void _declspec(naked) HOOK_CPhysical_ProcessCollisionSectorList ()
     }
 }
 
-
-// If matrix looks bad, fix it
+// Ped animation matrix array gets corrupted sometimes by unknown thing
+// Hack fix for now is to validate each matrix before it is used
 void _cdecl CheckMatrix ( float* pMatrix )
 {
-    if ( abs ( pMatrix[0] ) < 1.1f )
-        return;
+    // Peek at IEEE 754 float data to quickly check if any element is outside range of -2 to 2 or is NaN
+    int* p = (int*)pMatrix;
+    int RotBits = p[0] | p[1] | p[2]
+                | p[4] | p[5] | p[6]
+                | p[8] | p[9] | p[10];
 
-    float scale = 0.0f;
+    int PosBits = p[12] | p[13] | p[14];
 
-    pMatrix[0] = scale;
-    pMatrix[1] = 0;
-    pMatrix[2] = 0;
+    // If rotational part is outside -2 to 2 range, then flag fix
+    bool bFix = ( RotBits & 0x40000000 ) != 0;
+  
+    // If positional part is outside -2 to 2 range, then do further check for -10 to 10 range
+    if ( PosBits & 0x40000000 )
+    {
+        for ( uint i = 12 ; i < 15 ; i++ )
+        {
+            float f = pMatrix[i];
+            if ( f < -10 || f > 10 || _isnan( f ) )
+                bFix = true;
+        }
+    }
 
-    pMatrix[4] = 0;
-    pMatrix[5] = scale;
-    pMatrix[6] = 0;
+    // Fix if required
+    if ( bFix )
+    {
+        float scale = 0.0f;
 
-    pMatrix[7] = 0;
-    pMatrix[8] = 0;
-    pMatrix[10] = scale;
+        pMatrix[0] = scale;
+        pMatrix[1] = 0;
+        pMatrix[2] = 0;
 
-    pMatrix[12] = 0;
-    pMatrix[13] = 0;
-    pMatrix[14] = 1;
+        pMatrix[4] = 0;
+        pMatrix[5] = scale;
+        pMatrix[6] = 0;
+
+        pMatrix[7] = 0;
+        pMatrix[8] = 0;
+        pMatrix[10] = scale;
+
+        pMatrix[12] = 0;
+        pMatrix[13] = 0;
+        pMatrix[14] = 1;
+    }
 }
+
 
 // hooked at 7C5A5C/7C5A9C 5 bytes
 void _declspec(naked) HOOK_CheckAnimMatrix ()
@@ -5461,13 +5491,16 @@ void _cdecl SaveVehColors ( DWORD dwThis )
     {
         pVehicle->GetColor ( &vehColors[0], &vehColors[1], &vehColors[2], &vehColors[3], 0 );
 
-        // 0xFF00FF and 0x00FFFF both result in black for some reason
+        // Some colors result in black for some reason
         for ( uint i = 0 ; i < NUMELMS( vehColors ) ; i++ )
         {
-            if ( vehColors[i] == 0xFF00FF )
-                vehColors[i] = 0xFF01FF;
-            if ( vehColors[i] == 0x00FFFF )
-                vehColors[i] = 0x01FFFF;
+            const SColor color = vehColors[i];
+            if ( color == 0xFF00FF
+              || color == 0x00FFFF
+              || color == 0xFF00AF
+              || color == 0xFFAF00
+              || color == 0xFF3C00 )
+                vehColors[i].ulARGB |= 0x010101;
         }
     }
 }
@@ -5583,8 +5616,11 @@ bool CheckHasSuspensionChanged ( void )
     {
         // Check our suspension interface has a valid vehicle and return the suspension changed marker
         CVehicle* pVehicle = pSuspensionInterface->m_pVehicle;
+        if ( !pVehicle )
+            return false;
+
         CModelInfo* pModelInfo = pGameInterface->GetModelInfo ( pVehicle->GetModelIndex () );
-        if ( pVehicle && pModelInfo && ( pModelInfo->IsCar() || pModelInfo->IsMonsterTruck() ) )
+        if ( pModelInfo && ( pModelInfo->IsCar() || pModelInfo->IsMonsterTruck() ) )
             return pVehicle->GetHandlingData()->HasSuspensionChanged ( );
         else
             return false;
@@ -6055,8 +6091,9 @@ IsOnScreen_IsObject:
     }
 }
 CVehicleSAInterface * pCollisionVehicle = NULL;
-void TriggerVehicleDamageEvent ( )
+void TriggerVehicleCollisionEvent ( )
 {
+
     if ( pCollisionVehicle )
     {
         CEntitySAInterface * pEntity = pCollisionVehicle->m_pCollidedEntity;
@@ -6067,7 +6104,7 @@ void TriggerVehicleDamageEvent ( )
             {
                 if ( m_pVehicleCollisionHandler )
                 {
-                    TIMING_CHECKPOINT( "+TriggerVehDamEvent" );
+                    TIMING_CHECKPOINT( "+TriggerVehColEvent" );
                     if ( pEntity->nType == ENTITY_TYPE_VEHICLE )
                     {
                         CVehicleSAInterface * pInterface = static_cast < CVehicleSAInterface* > ( pEntity );
@@ -6075,10 +6112,12 @@ void TriggerVehicleDamageEvent ( )
                     }
                     else
                     {
-                        m_pVehicleCollisionHandler ( pCollisionVehicle, pEntity, pEntity->m_nModelIndex, pCollisionVehicle->m_fDamageImpulseMagnitude, 0.0f, pCollisionVehicle->m_usPieceType, pCollisionVehicle->m_vecCollisionPosition, pCollisionVehicle->m_vecCollisionImpactVelocity );
+                        m_pVehicleCollisionHandler ( pCollisionVehicle, pEntity, pEntity->m_nModelIndex, pCollisionVehicle->m_fDamageImpulseMagnitude, 0.0f,                                  pCollisionVehicle->m_usPieceType, pCollisionVehicle->m_vecCollisionPosition, pCollisionVehicle->m_vecCollisionImpactVelocity );
                     }
-                    TIMING_CHECKPOINT( "-TriggerVehDamEvent" );
+                    TIMING_CHECKPOINT( "-TriggerVehColEvent" );
                 }
+
+
             }
         }
     }
@@ -6096,7 +6135,7 @@ void _declspec(naked) HOOK_CEventVehicleDamageCollision ( )
         pushad
         mov pCollisionVehicle, ecx
     }
-    TriggerVehicleDamageEvent ( );
+    TriggerVehicleCollisionEvent ( );
     
     // do the replaced code and return back as if nothing happened.
     _asm
@@ -6120,7 +6159,7 @@ void _declspec(naked) HOOK_CEventVehicleDamageCollision_Plane ( )
         pushad
         mov pCollisionVehicle, ecx
     }
-    TriggerVehicleDamageEvent ( );
+    TriggerVehicleCollisionEvent ( );
 
     // do the replaced code and return back as if nothing happened.
     _asm
@@ -6143,7 +6182,7 @@ void _declspec(naked) HOOK_CEventVehicleDamageCollision_Bike ( )
         pushad
         mov pCollisionVehicle, ecx
     }
-    TriggerVehicleDamageEvent ( );
+    TriggerVehicleCollisionEvent ( );
 
     // do the replaced code and return back as if nothing happened.
     _asm

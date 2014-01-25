@@ -19,6 +19,8 @@
 
 #include "StdInc.h"
 
+#define MIN_CLIENT_REQ_FETCHREMOTE_CONNECT_TIMEOUT          "1.3.5"
+
 int CLuaFunctionDefs::CreateExplosion ( lua_State* luaVM )
 {
 //  bool createExplosion ( float x, float y, float z, int type [, bool makeSound = true, float camShake = -1.0, bool damaging = true ] )
@@ -2088,12 +2090,15 @@ int CLuaFunctionDefs::GetFPSLimit ( lua_State* luaVM )
 // Call a function on a remote server
 int CLuaFunctionDefs::FetchRemote ( lua_State* luaVM )
 {
-//  bool fetchRemote ( string URL [, int connectionAttempts = 10 ], callback callbackFunction, [ string postData, bool bPostBinary, arguments... ] )
+//  bool fetchRemote ( string URL [, int connectionAttempts = 10, int connectTimeout = 10000 ], callback callbackFunction, [ string postData, bool bPostBinary, arguments... ] )
     CScriptArgReader argStream ( luaVM );
-    SString strURL; CLuaFunctionRef iLuaFunction; SString strPostData; bool bPostBinary; CLuaArguments args; uint uiConnectionAttempts;
+    SString strURL; CLuaFunctionRef iLuaFunction; SString strPostData; bool bPostBinary; CLuaArguments args; uint uiConnectionAttempts; uint uiConnectTimeoutMs;
 
     argStream.ReadString ( strURL );
     argStream.ReadIfNextIsNumber ( uiConnectionAttempts, 10 );
+    if ( argStream.NextIsNumber () )
+        MinClientReqCheck ( argStream, MIN_CLIENT_REQ_FETCHREMOTE_CONNECT_TIMEOUT, "'connect timeout' is being used" );
+    argStream.ReadIfNextIsNumber ( uiConnectTimeoutMs, 10000 );
     argStream.ReadFunction ( iLuaFunction );
     argStream.ReadString ( strPostData, "" );
     argStream.ReadBool ( bPostBinary, false );
@@ -2105,7 +2110,7 @@ int CLuaFunctionDefs::FetchRemote ( lua_State* luaVM )
         CLuaMain * luaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
         if ( luaMain )
         {
-            g_pClientGame->GetRemoteCalls()->Call ( strURL, &args, strPostData, bPostBinary, luaMain, iLuaFunction, uiConnectionAttempts );
+            g_pClientGame->GetRemoteCalls()->Call ( strURL, &args, strPostData, bPostBinary, luaMain, iLuaFunction, uiConnectionAttempts, uiConnectTimeoutMs );
             lua_pushboolean ( luaVM, true );
             return 1;
         }

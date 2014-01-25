@@ -15,7 +15,7 @@
 
 #pragma once
 
-enum eRPCFunctions
+enum eElementRPCFunctions
 {
     DONT_USE_0 = 0,
     SET_TIME,

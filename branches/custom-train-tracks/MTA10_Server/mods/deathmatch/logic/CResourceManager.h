@@ -27,6 +27,7 @@
 #include <list>
 
 class CResource;
+#define INVALID_RESOURCE_NET_ID     0xFFFF
 
 class CResourceManager 
 {
@@ -97,7 +98,7 @@ public:
     CResource*                  GetResourceFromNetID            ( unsigned short usNetID );
 
     CResource*                  GetResourceFromLuaState         ( struct lua_State* luaVM );
-    bool                        Install                         ( char * szURL, char * szName );
+    SString                     GetResourceName                 ( struct lua_State* luaVM );
 
     CResource*                  CreateResource                  ( const SString& strNewResourceName, const SString& strNewOrganizationalPath, SString& strOutStatus );
     CResource*                  CopyResource                    ( CResource* pSourceResource, const SString& strNewResourceName, const SString& strNewOrganizationalPath, SString& strOutStatus );
@@ -137,6 +138,7 @@ private:
     CFastHashMap < CResource*, lua_State* > m_ResourceLuaStateMap;
     CFastHashMap < lua_State*, CResource* > m_LuaStateResourceMap;
     CFastHashMap < SString, CResource* >    m_NameResourceMap;
+    std::map < ushort, CResource* >         m_NetIdResourceMap;
 
     list<sResourceQueue>        m_resourceQueue;
 

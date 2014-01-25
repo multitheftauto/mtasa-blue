@@ -51,6 +51,8 @@ public:
     LUA_DECLARE ( GetResourceGUIElement );
     LUA_DECLARE ( GetResourceDynamicElementRoot );
     LUA_DECLARE ( GetResourceExportedFunctions );
+    LUA_DECLARE ( LoadString );
+    LUA_DECLARE ( Load );
 
     // Event functions
     LUA_DECLARE ( AddEvent );
@@ -195,7 +197,6 @@ public:
     LUA_DECLARE ( IsPlayerNametagShowing );
     LUA_DECLARE ( GetPlayerPing );
     LUA_DECLARE ( GetPlayerTeam );
-    LUA_DECLARE ( IsPlayerDead );
     LUA_DECLARE ( GetPlayerMoney );
     LUA_DECLARE ( GetPlayerWantedLevel );
     
@@ -257,6 +258,7 @@ public:
     LUA_DECLARE ( GetWeaponProperty );
     LUA_DECLARE ( GetOriginalWeaponProperty );
     LUA_DECLARE ( GetPedOxygenLevel );
+    LUA_DECLARE ( IsPedDead );
 
     LUA_DECLARE ( SetPedRotation );
     LUA_DECLARE ( SetPedCanBeKnockedOffBike );
@@ -331,6 +333,7 @@ public:
     LUA_DECLARE ( IsTrainDerailable );
     LUA_DECLARE ( GetTrainDirection );
     LUA_DECLARE ( GetTrainSpeed );
+    LUA_DECLARE ( IsTrainChainEngine );
     LUA_DECLARE ( GetVehicleGravity );
     LUA_DECLARE ( IsVehicleBlown );
     LUA_DECLARE ( GetVehicleHeadLightColor );
@@ -428,15 +431,16 @@ public:
     LUA_DECLARE ( CreateFire );
 
     // Audio funcs
-    LUA_DECLARE ( PlayMissionAudio );
     LUA_DECLARE ( PlaySoundFrontEnd );
-    LUA_DECLARE ( PreloadMissionAudio );
     LUA_DECLARE ( SetAmbientSoundEnabled );
     LUA_DECLARE ( IsAmbientSoundEnabled );
     LUA_DECLARE ( ResetAmbientSounds );
     LUA_DECLARE ( SetWorldSoundEnabled );
     LUA_DECLARE ( IsWorldSoundEnabled );
     LUA_DECLARE ( ResetWorldSounds );
+    LUA_DECLARE ( PlaySFX );
+    LUA_DECLARE ( PlaySFX3D );
+    LUA_DECLARE ( GetSFXStatus );
 
     // Blip funcs
     LUA_DECLARE ( CreateBlip );
@@ -494,6 +498,7 @@ public:
     LUA_DECLARE ( SetPickupType );
 
     // Cam get funcs
+    LUA_DECLARE ( GetCamera );
     LUA_DECLARE ( GetCameraViewMode );
     LUA_DECLARE ( GetCameraMatrix );
     LUA_DECLARE ( GetCameraTarget );
@@ -587,6 +592,7 @@ public:
     LUA_DECLARE ( dxGetBlendMode );
     LUA_DECLARE ( dxSetAspectRatioAdjustmentEnabled );
     LUA_DECLARE ( dxIsAspectRatioAdjustmentEnabled );
+    LUA_DECLARE ( dxSetTextureEdge );
 
     // Util functions to make scripting easier for the end user
     // Some of these are based on standard mIRC script funcs as a lot of people will be used to them
@@ -705,9 +711,11 @@ public:
     LUA_DECLARE ( GUIEditSetReadOnly );
     LUA_DECLARE ( GUIEditSetMasked );
     LUA_DECLARE ( GUIEditSetMaxLength );
-    LUA_DECLARE ( GUIEditSetCaratIndex );
+    LUA_DECLARE ( GUIEditSetCaretIndex );
+    LUA_DECLARE ( GUIEditGetCaretIndex );
     LUA_DECLARE ( GUIMemoSetReadOnly );
-    LUA_DECLARE ( GUIMemoSetCaratIndex );
+    LUA_DECLARE ( GUIMemoSetCaretIndex );
+    LUA_DECLARE ( GUIMemoGetCaretIndex );
     LUA_DECLARE ( GUIWindowSetMovable );
     LUA_DECLARE ( GUIWindowSetSizable );
     LUA_DECLARE ( GUIWindowGetMovable );
@@ -949,6 +957,8 @@ public:
     LUA_DECLARE ( GetNetworkUsageData );
     LUA_DECLARE ( GetNetworkStats );
     LUA_DECLARE ( GetPerformanceStats );
+    LUA_DECLARE ( AddDebugHook );
+    LUA_DECLARE ( RemoveDebugHook );
 
     LUA_DECLARE ( GetVersion );
 

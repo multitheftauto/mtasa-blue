@@ -26,7 +26,8 @@ void CLuaTimerManager::DoPulse ( CLuaMain* pLuaMain )
     CTickCount llCurrentTime = CTickCount::Now ();
 
     // Use a separate queue to avoid trouble
-    for ( CFastList < CLuaTimer* > ::const_iterator iter = m_TimerList.begin () ; iter != m_TimerList.end () ; iter++ )
+    // What kind of problems are we trying to avoid? Doing a copy each frame isn't quite efficient
+    for ( CFastList < CLuaTimer* > ::const_iterator iter = m_TimerList.begin () ; iter != m_TimerList.end () ; ++iter )
         m_ProcessQueue.push_back ( *iter );
 
     while ( !m_ProcessQueue.empty () )
@@ -104,7 +105,7 @@ void CLuaTimerManager::RemoveAllTimers ( void )
 {
     // Delete all the timers
     CFastList < CLuaTimer* > ::const_iterator iter = m_TimerList.begin ();
-    for ( ; iter != m_TimerList.end (); iter++ )
+    for ( ; iter != m_TimerList.end (); ++iter )
     {
         delete *iter;
     }
@@ -155,5 +156,5 @@ CLuaTimer* CLuaTimerManager::AddTimer ( const CLuaFunctionRef& iLuaFunction, CTi
         return pLuaTimer;
     }
 
-    return false;
+    return NULL;
 }

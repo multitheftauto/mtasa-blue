@@ -10,8 +10,6 @@
 *
 *****************************************************************************/
 
-class CLuaTimer;
-
 #ifndef __CLUAVECTOR_H
 #define __CLUAVECTOR_H
 

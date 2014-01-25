@@ -114,6 +114,7 @@ public:
     virtual bool                    ShouldUseInternalHTTPServer     ( void ) = 0;
 
     virtual const char *            GetModInstallRoot               ( const char * szModName )=0;
+    virtual bool                    CheckDiskSpace                  ( uint uiResourcesPathMinMB = 10, uint uiDataPathMinMB = 10 )=0;
 
     virtual void                    ShowServerInfo                  ( unsigned int WindowType ) = 0;
 
@@ -121,6 +122,8 @@ public:
     virtual void                    SetMessageProcessor             ( pfnProcessMessage pfnMessageProcessor ) = 0;
     virtual void                    ShowMessageBox                  ( const char* szTitle, const char* szText, unsigned int uiFlags, GUI_CALLBACK * ResponseHandler = NULL ) = 0;
     virtual void                    RemoveMessageBox                ( bool bNextFrame = false ) = 0;
+    virtual void                    ShowErrorMessageBox             ( const SString& strTitle, SString strMessage, const SString& strTroubleLink = "" ) = 0;
+    virtual void                    ShowNetErrorMessageBox          ( const SString& strTitle, SString strMessage, SString strTroubleLink = "", bool bLinkRequiresErrorCode = false ) = 0;
     virtual void                    HideMainMenu                    ( void ) = 0;
     virtual HWND                    GetHookedWindow                 ( void ) = 0;
     virtual bool                    IsFocused                       ( void ) = 0;
@@ -151,7 +154,7 @@ public:
     virtual uint                    GetMinStreamingMemory           ( void ) = 0;
     virtual uint                    GetMaxStreamingMemory           ( void ) = 0;
     virtual void                    OnCrashAverted                  ( uint uiId ) = 0;
-    virtual void                    LogEvent                        ( uint uiDebugId, const char* szType, const char* szContext, const char* szBody ) = 0;
+    virtual void                    LogEvent                        ( uint uiDebugId, const char* szType, const char* szContext, const char* szBody, uint uiAddReportLogId = 0 ) = 0;
     virtual bool                    GetDebugIdEnabled               ( uint uiDebugId ) = 0;
     virtual EDiagnosticDebugType    GetDiagnosticDebug              ( void ) = 0;
     virtual void                    SetDiagnosticDebug              ( EDiagnosticDebugType value ) = 0;

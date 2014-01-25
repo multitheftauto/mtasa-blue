@@ -69,16 +69,16 @@ int CScreenShot::GetScreenShots ( void )
 {
     int iNumberOfFiles = 0;
     HANDLE hFind;
-    WIN32_FIND_DATA fdFindData;
+    WIN32_FIND_DATAW fdFindData;
     //Create a search string
     SString strScreenShotName ( "%s\\mta-screen*.png", &szScreenShotPath[0] );
     // Find the first match
-    hFind = FindFirstFile(strScreenShotName, &fdFindData); 
+    hFind = FindFirstFileW(FromUTF8( strScreenShotName ), &fdFindData); 
     // Check if the first match failed
     if ( hFind != INVALID_HANDLE_VALUE) {
         iNumberOfFiles++;
         //Loop through and count the files
-        while (FindNextFile(hFind, &fdFindData)) { 
+        while (FindNextFileW(hFind, &fdFindData)) { 
             //Keep going until we find the last file
             iNumberOfFiles++;
         }
@@ -102,10 +102,10 @@ SString CScreenShot::GetScreenShotPath ( int iNumber )
     SString strScreenShotName ( "%s\\mta-screen*.png", &szScreenShotPath[0] );
     HANDLE hFind;
     SString strReturn = "";
-    WIN32_FIND_DATA fdFindData;
+    WIN32_FIND_DATAW fdFindData;
     int i = 1;
     //Find the first match
-    hFind = FindFirstFile(strScreenShotName, &fdFindData);
+    hFind = FindFirstFileW(FromUTF8( strScreenShotName ), &fdFindData);
     //Check if the first match failed
     if ( hFind != INVALID_HANDLE_VALUE) {
         if (iNumber == 1) {
@@ -115,7 +115,7 @@ SString CScreenShot::GetScreenShotPath ( int iNumber )
         else
         {
             //Loop through and find all occurences of the file
-            while (FindNextFile(hFind, &fdFindData)) { 
+            while (FindNextFileW(hFind, &fdFindData)) { 
                 //Keep going until we find the last file
                 i++;
                 if (iNumber == i) {
@@ -163,7 +163,10 @@ DWORD CScreenShot::ThreadProc ( LPVOID lpdwThreadParam )
         }
     }
 
+    MakeSureDirExists( ms_strFileName );
     FILE *file = fopen (ms_strFileName, "wb");
+    if ( file )
+    {
         png_struct* png_ptr = png_create_write_struct ( PNG_LIBPNG_VER_STRING, NULL, NULL, NULL );
         png_info* info_ptr = png_create_info_struct ( png_ptr );
         png_init_io ( png_ptr, file );
@@ -174,7 +177,12 @@ DWORD CScreenShot::ThreadProc ( LPVOID lpdwThreadParam )
         png_write_png ( png_ptr, info_ptr, PNG_TRANSFORM_BGR | PNG_TRANSFORM_STRIP_ALPHA, NULL );
         png_write_end ( png_ptr, info_ptr );
         png_destroy_write_struct ( &png_ptr, &info_ptr );
-    fclose(file);
+        fclose(file);
+    }
+    else
+    {
+        CCore::GetSingleton ().GetConsole ()->Printf ( "Could not create screenshot file '%s'", *ms_strFileName );
+    }
 
     // Clean up the screen data buffer
     if ( ppScreenData ) {

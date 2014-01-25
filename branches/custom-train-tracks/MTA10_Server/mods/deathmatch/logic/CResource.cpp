@@ -93,8 +93,9 @@ CResource::CResource ( CResourceManager * resourceManager, bool bIsZipped, const
     m_bDoneUpgradeWarnings = false;
     m_uiFunctionRightCacheRevision = 0;
 
-    Load ();
     m_bOOPEnabledInMetaXml = true;
+
+    Load ();
 }
 
 bool CResource::Load ( void )
@@ -416,6 +417,15 @@ CResource::~CResource ( )
     CIdArray::PushUniqueId ( this, EIdClass::RESOURCE, m_uiScriptID );
     Unload ();
 
+    // Overkill, but easiest way to stop crashes:
+    // Go through all other resources and make sure we are not in m_includedResources, m_dependents and m_temporaryIncludes
+    std::list < CResource* > ::const_iterator iter = m_resourceManager->IterBegin ();
+    for ( ; iter != m_resourceManager->IterEnd (); iter++ )
+    {
+        if ( *iter != this )
+            (*iter)->InvalidateIncludedResourceReference ( this );
+    }
+
     m_strResourceName = "";
 
     m_bDestroyed = true;
@@ -455,15 +465,6 @@ void CResource::TidyUp ( void )
         (*iterc)->InvalidateIncludedResourceReference ( this );
     }
 
-    // Overkill, but easiest way to stop crashes:
-    // Go through all other resources and make sure we are not in m_includedResources, m_dependents and m_temporaryIncludes
-    std::list < CResource* > ::const_iterator iter = m_resourceManager->IterBegin ();
-    for ( ; iter != m_resourceManager->IterEnd (); iter++ )
-    {
-        if ( *iter != this )
-            (*iter)->InvalidateIncludedResourceReference ( this );
-    }
-    
     this->UnregisterEHS("call");
     g_pGame->GetHTTPD()->UnregisterEHS ( m_strResourceName.c_str () );
 
@@ -2798,6 +2799,8 @@ ResponseCode CResource::HandleRequestCall ( HttpRequest * ipoHttpRequest, HttpRe
 						headers.PushString ( (*iter).first.c_str() );
 						headers.PushString ( (*iter).second.c_str() );
 					}
+
+                    LUA_CHECKSTACK ( m_pVM->GetVM(), 1 );   // Ensure some room
 
 					// cache old data
 					lua_getglobal ( m_pVM->GetVM(), "form" );

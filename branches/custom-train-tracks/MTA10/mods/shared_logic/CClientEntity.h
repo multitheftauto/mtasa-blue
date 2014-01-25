@@ -91,6 +91,11 @@ class CLuaMain;
 class CMapEventManager;
 typedef CFastList < CClientEntity* > CChildListType;
 
+// List of elements which is auto deleted when the last user calls Release()
+class CElementListSnapshot : public std::vector < CClientEntity* >, public CRefCountableST
+{
+};
+
 enum eCClientEntityClassTypes
 {
     CLASS_CClientEntity,
@@ -185,6 +190,7 @@ public:
 
     CChildListType ::const_iterator             IterBegin               ( void )                    { return m_Children.begin (); }
     CChildListType ::const_iterator             IterEnd                 ( void )                    { return m_Children.end (); }
+    CElementListSnapshot*                       GetChildrenListSnapshot ( void );
 
     inline ElementID                            GetID                   ( void )                    { return m_ID; };
     void                                        SetID                   ( ElementID ID );
@@ -225,11 +231,9 @@ public:
     virtual void                                AttachTo                ( CClientEntity * pEntity );
     virtual void                                GetAttachedOffsets      ( CVector & vecPosition, CVector & vecRotation );
     virtual void                                SetAttachedOffsets      ( CVector & vecPosition, CVector & vecRotation );
-    inline void                                 AddAttachedEntity       ( CClientEntity* pEntity )      { m_AttachedEntities.push_back ( pEntity ); }
-    inline void                                 RemoveAttachedEntity    ( CClientEntity* pEntity )      { if ( !m_AttachedEntities.empty() ) m_AttachedEntities.remove ( pEntity ); }
     bool                                        IsEntityAttached        ( CClientEntity* pEntity );
-    std::list < CClientEntity* > ::const_iterator AttachedEntitiesBegin ( void )                        { return m_AttachedEntities.begin (); }
-    std::list < CClientEntity* > ::const_iterator AttachedEntitiesEnd   ( void )                        { return m_AttachedEntities.end (); }
+    uint                                        GetAttachedEntityCount  ( void )                        { return m_AttachedEntities.size(); }
+    CClientEntity*                              GetAttachedEntity       ( uint uiIndex )                { return m_AttachedEntities[ uiIndex ]; }
     void                                        ReattachEntities        ( void );
     virtual bool                                IsAttachable            ( void );
     virtual bool                                IsAttachToable          ( void );
@@ -314,6 +318,8 @@ protected:
     CClientManager*                             m_pManager;
     CClientEntity*                              m_pParent;
     CChildListType                              m_Children;
+    CElementListSnapshot*                       m_pChildrenListSnapshot;
+    uint                                        m_uiChildrenListSnapshotRevision;
 
     CCustomData*                                m_pCustomData;
 
@@ -335,7 +341,8 @@ protected:
     CClientEntity*                              m_pAttachedToEntity;
     CVector                                     m_vecAttachedPosition;
     CVector                                     m_vecAttachedRotation;
-    std::list < CClientEntity* >                m_AttachedEntities;
+    std::vector < CClientEntity* >              m_AttachedEntities;
+    bool                                        m_bDisallowAttaching;  // Protect against attaching in destructor
 
     bool                                        m_bBeingDeleted;
     bool                                        m_bSystemEntity;

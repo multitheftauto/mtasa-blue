@@ -20,22 +20,6 @@
 using namespace std;
 
 
-bool DoesFileExist ( const char* szFilename )
-{
-    // Check that the file exists
-    WIN32_FIND_DATA wFind;
-    HANDLE hFind = FindFirstFile ( szFilename, &wFind );
-    if ( hFind == INVALID_HANDLE_VALUE )
-    {
-        return false;
-    }
-
-    // Clean up
-    FindClose ( hFind );
-    return true;
-}
-
-
 char* ReplaceAnyStringOccurrence ( char* szBuffer, const char* szWhat, const char* szWith, size_t sizeMax )
 {
     // TODO: Check for max size
@@ -164,7 +148,8 @@ void RaiseFatalError ( unsigned int uiCode )
 
     // Populate the message and show the box
     SString strBuffer ( _("Fatal error (%u). If this problem persists, please check out mtasa.com for support."), uiCode );
-    g_pCore->ShowMessageBox ( _("Fatal error")+_E("CD62"), strBuffer, MB_BUTTON_OK | MB_ICON_ERROR );
+    SString strTroubleLink( SString( "fatal-error&code=%d", uiCode ) );
+    g_pCore->ShowErrorMessageBox ( _("Fatal error")+_E("CD62"), strBuffer, strTroubleLink );
 
     // Request the mod unload
     g_pCore->GetModManager ()->RequestUnload ();
@@ -179,7 +164,8 @@ void RaiseProtocolError ( unsigned int uiCode )
 
     // Populate the message and show the box
     SString strBuffer ( _("Protocol error (%u). If this problem persists, please check out mtasa.com for support."), uiCode );
-    g_pCore->ShowMessageBox ( _("Connection error")+_E("CD63"), strBuffer, MB_BUTTON_OK | MB_ICON_ERROR ); // Protocol error
+    SString strTroubleLink( SString( "protocol-error&code=%d", uiCode ) );
+    g_pCore->ShowErrorMessageBox ( _("Connection error")+_E("CD63"), strBuffer, strTroubleLink ); // Protocol error
 
     // Request the mod unload
     g_pCore->GetModManager ()->RequestUnload ();
@@ -215,19 +201,11 @@ void RotateVector ( CVector& vecLine, const CVector& vecRotation )
     vecLine.fX = cos ( vecRotation.fZ ) * fLineX  + sin ( vecRotation.fZ ) * vecLine.fY;
     vecLine.fY = -sin ( vecRotation.fZ ) * fLineX + cos ( vecRotation.fZ ) * vecLine.fY;
 }
-void AttachedMatrix ( CMatrix & matrix, CMatrix & returnMatrix, CVector vecDirection, CVector vecRotation )
-{    
-    CVector vecMatRotation;
-    g_pMultiplayer->ConvertMatrixToEulerAngles ( matrix, vecMatRotation );
 
-    RotateVector ( vecDirection, vecMatRotation );
-
-    returnMatrix.vPos = matrix.vPos + vecDirection;
-   
-    vecMatRotation += vecRotation;
-    g_pMultiplayer->ConvertEulerAnglesToMatrix ( returnMatrix, vecMatRotation );
+void AttachedMatrix ( const CMatrix& matrix, CMatrix& returnMatrix, const CVector& vecPosition, const CVector& vecRotation )
+{
+    returnMatrix = CRotationMatrix( vecRotation ) * CTranslationMatrix( vecPosition ) * matrix;
 }
-
 
 void LongToDottedIP ( unsigned long ulIP, char* szDottedIP )
 {

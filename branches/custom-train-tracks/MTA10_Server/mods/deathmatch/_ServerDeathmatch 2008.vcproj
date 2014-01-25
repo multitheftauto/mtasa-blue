@@ -83,11 +83,11 @@
 			<Tool
 				Name="VCLinkerTool"
 				LinkLibraryDependencies="false"
-				AdditionalDependencies="lua5.1.lib wsock32.lib sqlite3.lib zlib_2008.lib ehs_2008.lib pthreadVC2.lib pme_2008.lib pcre_2008.lib json2008.lib psapi.lib"
+				AdditionalDependencies="lua5.1s.lib wsock32.lib zlib_2008.lib ehs_2008.lib pthreadVC2.lib pme_2008.lib pcre_2008.lib json2008.lib psapi.lib"
 				OutputFile="C:\Program Files\MTA San Andreas 1.4\server/mods/deathmatch/deathmatch.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="logic/lib;../../../vendor/lua/lib;&quot;../../../vendor/json-c/lib&quot;;../../../vendor/ehs/lib;../../../vendor/pme/lib;../../../vendor/pcre/lib;../../../vendor/pthreads/lib;../../../vendor/sqlite/lib;../../../vendor/zlib/lib"
+				AdditionalLibraryDirectories="logic/lib;../../../vendor/lua/lib/lua5.1s_dll;&quot;../../../vendor/json-c/lib&quot;;../../../vendor/ehs/lib;../../../vendor/pme/lib;../../../vendor/pcre/lib;../../../vendor/pthreads/lib;../../../vendor/zlib/lib"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="../../../symbols/$(ConfigurationName)_$(SafeParentName).pdb"
 				GenerateMapFile="true"
@@ -188,11 +188,11 @@
 			<Tool
 				Name="VCLinkerTool"
 				LinkLibraryDependencies="false"
-				AdditionalDependencies="lua5.1d.lib wsock32.lib sqlite3d.lib zlibd_2008.lib ehsd_2008.lib pthreadVC2.lib pmed_2008.lib pcred_2008.lib jsonD2008.lib psapi.lib"
+				AdditionalDependencies="lua5.1s_d.lib wsock32.lib zlibd_2008.lib ehsd_2008.lib pthreadVC2.lib pmed_2008.lib pcred_2008.lib jsonD2008.lib psapi.lib"
 				OutputFile="C:\Program Files\MTA San Andreas 1.4\server/mods/deathmatch/deathmatch_d.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="logic/lib;../../../vendor/lua/lib;&quot;../../../vendor/json-c/lib&quot;;../../../vendor/ehs/lib;../../../vendor/pme/lib;../../../vendor/pcre/lib;../../../vendor/pthreads/lib;../../../vendor/sqlite/lib;../../../vendor/zlib/lib"
+				AdditionalLibraryDirectories="logic/lib;../../../vendor/lua/lib/lua5.1s_dll;&quot;../../../vendor/json-c/lib&quot;;../../../vendor/ehs/lib;../../../vendor/pme/lib;../../../vendor/pcre/lib;../../../vendor/pthreads/lib;../../../vendor/zlib/lib"
 				IgnoreDefaultLibraryNames="MSVCRT"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\Debug/client_d.pdb"
@@ -291,11 +291,11 @@
 			<Tool
 				Name="VCLinkerTool"
 				LinkLibraryDependencies="false"
-				AdditionalDependencies="lua5.1.lib wsock32.lib sqlite3.lib zlib_2008.lib ehs_2008.lib pthreadVC2.lib pme_2008.lib pcre_2008.lib json2008.lib psapi.lib"
+				AdditionalDependencies="lua5.1s.lib wsock32.lib zlib_2008.lib ehs_2008.lib pthreadVC2.lib pme_2008.lib pcre_2008.lib json2008.lib psapi.lib"
 				OutputFile="../../../output/MTA San Andreas/server/mods/deathmatch/deathmatch.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="logic/lib;../../../vendor/lua/lib;&quot;../../../vendor/json-c/lib&quot;;../../../vendor/ehs/lib;../../../vendor/pme/lib;../../../vendor/pcre/lib;../../../vendor/pthreads/lib;../../../vendor/sqlite/lib;../../../vendor/zlib/lib"
+				AdditionalLibraryDirectories="logic/lib;../../../vendor/lua/lib/lua5.1s_dll;&quot;../../../vendor/json-c/lib&quot;;../../../vendor/ehs/lib;../../../vendor/pme/lib;../../../vendor/pcre/lib;../../../vendor/pthreads/lib;../../../vendor/zlib/lib"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="../../../symbols/$(ConfigurationName)_$(SafeParentName).pdb"
 				GenerateMapFile="true"
@@ -693,6 +693,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\logic\CPerfStat.EventPacketUsage.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\logic\CPerfStat.FunctionTiming.cpp"
 					>
 				</File>
@@ -710,6 +714,10 @@
 				</File>
 				<File
 					RelativePath=".\logic\CPerfStat.PacketUsage.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\logic\CPerfStat.RPCPacketUsage.cpp"
 					>
 				</File>
 				<File
@@ -1413,11 +1421,7 @@
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath=".\utils\CHTTPRequest.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\utils\CHTTPResponse.cpp"
+					RelativePath=".\utils\CFunctionUseLogger.cpp"
 					>
 				</File>
 				<File
@@ -1449,16 +1453,36 @@
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath=".\utils\CTCPClientSocketImpl.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\utils\CTCPImpl.cpp"
-					>
-				</File>
-				<File
 					RelativePath=".\utils\CZipMaker.cpp"
 					>
+				</File>
+				<File
+					RelativePath="..\..\..\vendor\sqlite\sqlite3.c"
+					>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							UsePrecompiledHeader="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							UsePrecompiledHeader="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Nightly|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							UsePrecompiledHeader="0"
+						/>
+					</FileConfiguration>
 				</File>
 				<Filter
 					Name="zip"
@@ -1609,6 +1633,10 @@
 				Name="shared"
 				>
 				<File
+					RelativePath="..\..\..\Shared\mods\deathmatch\logic\CDebugHookManager.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\Shared\mods\deathmatch\logic\CIdArray.cpp"
 					>
 				</File>
@@ -1622,6 +1650,10 @@
 				</File>
 				<File
 					RelativePath="..\..\..\Shared\mods\deathmatch\logic\CLatentTransferManager.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\Shared\mods\deathmatch\logic\CLuaShared.cpp"
 					>
 				</File>
 				<File
@@ -2401,6 +2433,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\logic\packets\CPlayerNoSocketPacket.h"
+						>
+					</File>
+					<File
 						RelativePath=".\logic\packets\CPlayerPuresyncPacket.h"
 						>
 					</File>
@@ -2714,7 +2750,15 @@
 					>
 				</File>
 				<File
-					RelativePath=".\utils\CHTTPResponse.h"
+					RelativePath=".\utils\CFunctionUseLogger.h"
+					>
+				</File>
+				<File
+					RelativePath=".\utils\CHqComms.h"
+					>
+				</File>
+				<File
+					RelativePath=".\utils\CMasterServerAnnouncer.h"
 					>
 				</File>
 				<File
@@ -2758,11 +2802,19 @@
 				Name="shared"
 				>
 				<File
+					RelativePath="..\..\..\Shared\mods\deathmatch\logic\CDebugHookManager.h"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\Shared\mods\deathmatch\logic\CIdArray.h"
 					>
 				</File>
 				<File
 					RelativePath="..\..\..\Shared\mods\deathmatch\logic\CLatentTransferManager.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\Shared\mods\deathmatch\logic\CLuaShared.h"
 					>
 				</File>
 				<File

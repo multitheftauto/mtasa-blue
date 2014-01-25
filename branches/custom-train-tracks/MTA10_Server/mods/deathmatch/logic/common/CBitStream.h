@@ -24,4 +24,15 @@ public:
     NetBitStreamInterfaceNoVersion* pBitStream;
 };
 
+// Use this if Version() is required - Make sure the player is the once receiving/sending the data
+class CPlayerBitStream
+{
+public:
+                                    CPlayerBitStream  ( class CPlayer* pPlayer );//  { pBitStream = g_pNetServer->AllocateNetServerBitStream ( pPlayer->GetBitStreamVersion() ); };
+    inline                          ~CPlayerBitStream ( void )              { g_pNetServer->DeallocateNetServerBitStream ( (NetBitStreamInterface*)pBitStream ); };
+
+    NetBitStreamInterface* pBitStream;
+};
+
+
 #endif

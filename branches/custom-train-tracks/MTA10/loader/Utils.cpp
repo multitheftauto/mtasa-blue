@@ -11,28 +11,24 @@
 *****************************************************************************/
 
 #include "StdInc.h"
-#include <assert.h>
 #include <tchar.h>
 #include <strsafe.h>
 #include <Tlhelp32.h>
-#define BUFSIZE 512
+#include <Softpub.h>
+#include <wintrust.h>
+#pragma comment (lib, "wintrust")
 
-static bool bCancelPressed = false;
-static bool bOkPressed = false;
-static bool bOtherPressed = false;
-static int iOtherCode = 0;
-static HWND hwndSplash = NULL;
-static HWND hwndProgressDialog = NULL;
-static unsigned long ulProgressStartTime = 0;
 static SString g_strMTASAPath;
-static HWND hwndCrashedDialog = NULL;
-static HWND hwndD3dDllDialog = NULL;
-static HWND hwndOptimusDialog = NULL;
-HANDLE g_hMutex = NULL;
-HMODULE hLibraryModule = NULL;
+static SString g_strGTAPath;
+static HANDLE g_hMutex = NULL;
+static HMODULE hLibraryModule = NULL;
+HINSTANCE g_hInstance = NULL;
 
-HMODULE RemoteLoadLibrary(HANDLE hProcess, const char* szLibPath)
+HMODULE RemoteLoadLibrary(HANDLE hProcess, const WString& strLibPath)
 {
+    const wchar_t* szLibPath = *strLibPath;
+    size_t uiLibPathLength = strLibPath.length();
+    
     /* Called correctly? */
     if ( szLibPath == NULL )
     {
@@ -46,8 +42,9 @@ HMODULE RemoteLoadLibrary(HANDLE hProcess, const char* szLibPath)
     /* Allocate memory in the remote process for the library path */
     HANDLE hThread = 0;
     void* pLibPathRemote = NULL;
+    uint uiLibPathSize = ( uiLibPathLength + 1 ) * sizeof( wchar_t );
     HMODULE hKernel32 = GetModuleHandle( "Kernel32" );
-    pLibPathRemote = _VirtualAllocEx( hProcess, NULL, strlen ( szLibPath ) + 1, MEM_COMMIT, PAGE_READWRITE );
+    pLibPathRemote = _VirtualAllocEx( hProcess, NULL, uiLibPathSize, MEM_COMMIT, PAGE_READWRITE );
     
     if ( pLibPathRemote == NULL )
     {
@@ -59,9 +56,9 @@ HMODULE RemoteLoadLibrary(HANDLE hProcess, const char* szLibPath)
 
         /* Write the DLL library path to the remote allocation */
         DWORD byteswritten = 0;
-        _WriteProcessMemory ( hProcess, pLibPathRemote, (void*)szLibPath, strlen ( szLibPath ) + 1, &byteswritten );
+        _WriteProcessMemory ( hProcess, pLibPathRemote, (void*)szLibPath, uiLibPathSize, &byteswritten );
 
-        if ( byteswritten != strlen ( szLibPath ) + 1 )
+        if ( byteswritten != uiLibPathSize )
         {
             return 0;
         }
@@ -73,7 +70,7 @@ HMODULE RemoteLoadLibrary(HANDLE hProcess, const char* szLibPath)
         hThread = _CreateRemoteThread(   hProcess,
                                         NULL,
                                         0,
-                                        reinterpret_cast < LPTHREAD_START_ROUTINE > ( GetProcAddress ( hKernel32, "LoadLibraryA" ) ),
+                                        reinterpret_cast < LPTHREAD_START_ROUTINE > ( GetProcAddress ( hKernel32, "LoadLibraryW" ) ),
                                         pLibPathRemote,
                                         0,
                                         NULL);
@@ -85,7 +82,7 @@ HMODULE RemoteLoadLibrary(HANDLE hProcess, const char* szLibPath)
 
 
     } __finally {
-        _VirtualFreeEx( hProcess, pLibPathRemote, strlen ( szLibPath ) + 1, MEM_RELEASE );
+        _VirtualFreeEx( hProcess, pLibPathRemote, uiLibPathSize, MEM_RELEASE );
     }
 
     /*  We wait for the created remote thread to finish executing. When it's done, the DLL
@@ -102,7 +99,7 @@ HMODULE RemoteLoadLibrary(HANDLE hProcess, const char* szLibPath)
 
 
     /* Clean up the resources we used to inject the DLL */
-    _VirtualFreeEx (hProcess, pLibPathRemote, strlen ( szLibPath ) + 1, MEM_RELEASE );
+    _VirtualFreeEx (hProcess, pLibPathRemote, uiLibPathSize, MEM_RELEASE );
 
     // Allow GTA to continue
     RemoveWinMainBlock( hProcess );
@@ -286,22 +283,22 @@ void ApplyLoadingCrashPatch( HANDLE hProcess )
 // Code from the merky depths of MSDN
 //
 ///////////////////////////////////////////////////////////////////////////
-SString devicePathToWin32Path ( const SString& strDevicePath ) 
+WString devicePathToWin32Path ( const WString& strDevicePath ) 
 {
-    TCHAR pszFilename[MAX_PATH+2];
-    strncpy ( pszFilename, strDevicePath, MAX_PATH );
+    WCHAR pszFilename[MAX_PATH+2];
+    wcsncpy ( pszFilename, strDevicePath, MAX_PATH );
     pszFilename[MAX_PATH] = 0;
 
     // Translate path with device name to drive letters.
-    TCHAR szTemp[BUFSIZE];
+    WCHAR szTemp[1024];
     szTemp[0] = '\0';
 
-    if (GetLogicalDriveStrings(BUFSIZE-1, szTemp)) 
+    if (GetLogicalDriveStringsW(NUMELMS(szTemp)-1, szTemp)) 
     {
-        TCHAR szName[MAX_PATH];
-        TCHAR szDrive[3] = TEXT(" :");
+        WCHAR szName[MAX_PATH];
+        WCHAR szDrive[3] = L" :";
         BOOL bFound = FALSE;
-        TCHAR* p = szTemp;
+        WCHAR* p = szTemp;
 
         do 
         {
@@ -309,25 +306,22 @@ SString devicePathToWin32Path ( const SString& strDevicePath )
             *szDrive = *p;
 
             // Look up each device name
-            if (QueryDosDevice(szDrive, szName, MAX_PATH))
+            if (QueryDosDeviceW(szDrive, szName, MAX_PATH))
             {
-                UINT uNameLen = _tcslen(szName);
+                UINT uNameLen = wcslen(szName);
 
                 if (uNameLen < MAX_PATH) 
                 {
-                    bFound = _tcsnicmp(pszFilename, szName, uNameLen) == 0;
+                    bFound = wcsnicmp(pszFilename, szName, uNameLen) == 0;
 
-                    if (bFound && *(pszFilename + uNameLen) == _T('\\')) 
+                    if (bFound && *(pszFilename + uNameLen) == L'\\') 
                     {
                         // Reconstruct pszFilename using szTempFile
                         // Replace device path with DOS path
-                        TCHAR szTempFile[MAX_PATH];
-                        StringCchPrintf(szTempFile,
-                        MAX_PATH,
-                        TEXT("%s%s"),
-                        szDrive,
-                        pszFilename+uNameLen);
-                        StringCchCopyN(pszFilename, MAX_PATH+1, szTempFile, _tcslen(szTempFile));
+                        WCHAR szTempFile[MAX_PATH+2];
+                        StringCchPrintfW(szTempFile, MAX_PATH, L"%s%s", szDrive, pszFilename+uNameLen);
+                        szTempFile[MAX_PATH] = 0;
+                        StringCchCopyNW(pszFilename, MAX_PATH+1, szTempFile, wcslen(szTempFile));
                     }
                 }
             }
@@ -340,7 +334,7 @@ SString devicePathToWin32Path ( const SString& strDevicePath )
 }
 
 
-typedef WINBASEAPI BOOL (WINAPI *LPFN_QueryFullProcessImageNameA)(__in HANDLE hProcess, __in DWORD dwFlags, __out_ecount_part(*lpdwSize, *lpdwSize) LPSTR lpExeName, __inout PDWORD lpdwSize);
+typedef WINBASEAPI BOOL (WINAPI *LPFN_QueryFullProcessImageNameW)(__in HANDLE hProcess, __in DWORD dwFlags, __out_ecount_part(*lpdwSize, *lpdwSize) LPWSTR lpExeName, __inout PDWORD lpdwSize);
 
 ///////////////////////////////////////////////////////////////////////////
 //
@@ -351,7 +345,7 @@ typedef WINBASEAPI BOOL (WINAPI *LPFN_QueryFullProcessImageNameA)(__in HANDLE hP
 ///////////////////////////////////////////////////////////////////////////
 std::vector < SString > GetPossibleProcessPathFilenames ( DWORD processID )
 {
-    static LPFN_QueryFullProcessImageNameA fnQueryFullProcessImageNameA = NULL;
+    static LPFN_QueryFullProcessImageNameW fnQueryFullProcessImageNameW = NULL;
     static bool bDoneGetProcAddress = false;
 
     std::vector < SString > result;
@@ -361,10 +355,10 @@ std::vector < SString > GetPossibleProcessPathFilenames ( DWORD processID )
         // Find 'QueryFullProcessImageNameA'
         bDoneGetProcAddress = true;
         HMODULE hModule = GetModuleHandle ( "Kernel32.dll" );
-        fnQueryFullProcessImageNameA = static_cast < LPFN_QueryFullProcessImageNameA > ( static_cast < PVOID > ( GetProcAddress( hModule, "QueryFullProcessImageNameA" ) ) );
+        fnQueryFullProcessImageNameW = static_cast < LPFN_QueryFullProcessImageNameW > ( static_cast < PVOID > ( GetProcAddress( hModule, "QueryFullProcessImageNameW" ) ) );
     }
 
-    if ( fnQueryFullProcessImageNameA )
+    if ( fnQueryFullProcessImageNameW )
     {
         for ( int i = 0 ; i < 2 ; i++ )
         {
@@ -372,13 +366,13 @@ std::vector < SString > GetPossibleProcessPathFilenames ( DWORD processID )
 
             if ( hProcess )
             {
-                TCHAR szProcessName[MAX_PATH] = TEXT("");
-                DWORD dwSize = sizeof(szProcessName)/sizeof(TCHAR);
-                DWORD bOk = fnQueryFullProcessImageNameA ( hProcess, 0, szProcessName, &dwSize );
+                WCHAR szProcessName[MAX_PATH] = L"";
+                DWORD dwSize = NUMELMS(szProcessName);
+                DWORD bOk = fnQueryFullProcessImageNameW ( hProcess, 0, szProcessName, &dwSize );
                 CloseHandle( hProcess );
 
-                if ( bOk && strlen ( szProcessName ) > 0 )
-                    ListAddUnique ( result, SString ( SStringX ( szProcessName ) ) );
+                if ( bOk && wcslen ( szProcessName ) > 0 )
+                    ListAddUnique ( result, ToUTF8 ( szProcessName ) );
             }
         }
     }
@@ -388,12 +382,12 @@ std::vector < SString > GetPossibleProcessPathFilenames ( DWORD processID )
 
         if ( hProcess )
         {
-            TCHAR szProcessName[MAX_PATH] = TEXT("");
-            DWORD bOk = GetModuleFileNameEx ( hProcess, NULL, szProcessName, sizeof(szProcessName)/sizeof(TCHAR) );
+            WCHAR szProcessName[MAX_PATH] = L"";
+            DWORD bOk = GetModuleFileNameExW ( hProcess, NULL, szProcessName, NUMELMS(szProcessName) );
             CloseHandle ( hProcess );
 
-            if ( bOk && strlen ( szProcessName ) > 0 )
-                ListAddUnique ( result, SString ( SStringX ( szProcessName ) ) );
+            if ( bOk && wcslen ( szProcessName ) > 0 )
+                ListAddUnique ( result, ToUTF8 ( szProcessName ) );
         }
     }
 
@@ -403,12 +397,12 @@ std::vector < SString > GetPossibleProcessPathFilenames ( DWORD processID )
 
         if ( hProcess )
         {
-            TCHAR szProcessName[MAX_PATH] = TEXT("");
-            DWORD bOk = GetProcessImageFileName ( hProcess, szProcessName, sizeof(szProcessName)/sizeof(TCHAR) );
+            WCHAR szProcessName[MAX_PATH] = L"";
+            DWORD bOk = GetProcessImageFileNameW ( hProcess, szProcessName, NUMELMS(szProcessName) );
             CloseHandle( hProcess );
 
-            if ( bOk && strlen ( szProcessName ) > 0 )
-                ListAddUnique ( result, SString ( SStringX ( devicePathToWin32Path ( szProcessName ) ) ) );
+            if ( bOk && wcslen ( szProcessName ) > 0 )
+                ListAddUnique ( result, ToUTF8 ( devicePathToWin32Path ( szProcessName ) ) );
         }
     }
 
@@ -643,59 +637,6 @@ void TerminateOtherMTAIfRunning ( void )
 }
 
 
-int CALLBACK DialogProc ( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
-{ 
-    switch (uMsg) 
-    { 
-        case WM_COMMAND: 
-            switch (LOWORD(wParam)) 
-            {  
-                case IDCANCEL:
-                    bCancelPressed = true;
-                    return TRUE; 
-                case IDOK:
-                    bOkPressed = true;
-                    return TRUE; 
-                default:
-                    if ( iOtherCode && iOtherCode == LOWORD(wParam) )
-                    {
-                        bOtherPressed = true;
-                        return TRUE; 
-                    }
-            } 
-    } 
-    return FALSE; 
-} 
-
-
-//
-// Show splash dialog
-//
-void ShowSplash ( HINSTANCE hInstance )
-{
-#ifndef MTA_DEBUG
-    if ( !hwndSplash )
-    {
-        hwndSplash = CreateDialog ( hInstance, MAKEINTRESOURCE(IDD_DIALOG1), 0, DialogProc );
-    }
-    SetForegroundWindow ( hwndSplash );
-    SetWindowPos ( hwndSplash, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE );
-#endif
-}
-
-
-//
-// Hide splash dialog
-//
-void HideSplash ( void )
-{
-    if ( hwndSplash )
-    {
-        DestroyWindow ( hwndSplash );
-        hwndSplash = NULL;
-    }
-}
-
 
 //
 // Return true if command line contains the string
@@ -709,36 +650,13 @@ bool CommandLineContains( const SString& strText )
 //
 // General error message box
 //
-long DisplayErrorMessageBox ( const SString& strMessage, const SString& strErrorCode, const SString& strTroubleType )
+void DisplayErrorMessageBox ( const SString& strMessage, const SString& strErrorCode, const SString& strTroubleType )
 {
     HideSplash ();
     MessageBoxUTF8( 0, strMessage, _("Error! (CTRL+C to copy)")+strErrorCode, MB_ICONEXCLAMATION|MB_OK | MB_TOPMOST );
 
     if ( strTroubleType != "" )
-        BrowseToSolution ( strTroubleType, ASK_GO_ONLINE );
-    return 1;
-}
-
-
-SString GetMTASAModuleFileName ( void )
-{
-    // Get current module full path
-    char szBuffer[64000];
-    GetModuleFileName ( NULL, szBuffer, sizeof(szBuffer) - 1 );
-    return szBuffer;
-}
-
-
-SString GetLaunchPath ( void )
-{
-    // Get current module full path
-    char szBuffer[64000];
-    GetModuleFileName ( NULL, szBuffer, sizeof(szBuffer) - 1 );
-
-    // Strip the module name out of the path.
-    PathRemoveFileSpec ( szBuffer );
-
-    return szBuffer;
+        BrowseToSolution ( strTroubleType, ASK_GO_ONLINE | TERMINATE_IF_YES );
 }
 
 
@@ -751,14 +669,13 @@ void SetMTASAPathSource ( bool bReadFromRegistry )
     else
     {
         // Get current module full path
-        char szBuffer[64000];
-        GetModuleFileName ( NULL, szBuffer, sizeof(szBuffer) - 1 );
+        SString strLaunchPathFilename = GetLaunchPathFilename();
 
         SString strHash = "-";
         {
             MD5 md5;
             CMD5Hasher Hasher;
-            if ( Hasher.Calculate ( szBuffer, md5 ) )
+            if ( Hasher.Calculate ( strLaunchPathFilename, md5 ) )
             {
                 char szHashResult[33];
                 Hasher.ConvertToHex ( md5, szHashResult );
@@ -766,30 +683,30 @@ void SetMTASAPathSource ( bool bReadFromRegistry )
             }
         }
 
-        SetRegistryValue ( "", "Last Run Path", szBuffer );
+        SetRegistryValue ( "", "Last Run Path", strLaunchPathFilename );
         SetRegistryValue ( "", "Last Run Path Hash", strHash );
         SetRegistryValue ( "", "Last Run Path Version", MTA_DM_ASE_VERSION );
 
         // Also save for legacy 1.0 to see
         SString strThisVersion = SStringX ( MTA_DM_ASE_VERSION ).TrimEnd ( "n" );
-        SetVersionRegistryValueLegacy ( strThisVersion, "", "Last Run Path", szBuffer );
+        SetVersionRegistryValueLegacy ( strThisVersion, "", "Last Run Path", strLaunchPathFilename );
         SetVersionRegistryValueLegacy ( strThisVersion, "", "Last Run Path Hash", strHash );
         SetVersionRegistryValueLegacy ( strThisVersion, "", "Last Run Path Version", MTA_DM_ASE_VERSION );
 
         // Strip the module name out of the path.
-        PathRemoveFileSpec ( szBuffer );
+        SString strLaunchPath = GetLaunchPath();
 
         // Save to a temp registry key
-        SetRegistryValue ( "", "Last Run Location", szBuffer );
-        g_strMTASAPath = szBuffer;
+        SetRegistryValue ( "", "Last Run Location", strLaunchPath );
+        g_strMTASAPath = strLaunchPath;
     }
 }
 
 
-SString GetMTASAPath ( bool bReadFromRegistry )
+SString GetMTASAPath ( void )
 {
     if ( g_strMTASAPath == "" )
-        SetMTASAPathSource ( bReadFromRegistry );
+        SetMTASAPathSource ( false );
     return g_strMTASAPath;
 }
 
@@ -888,6 +805,9 @@ ePathResult GetGamePath ( SString& strOutResult, bool bFindIfMissing )
     SString strRegPath;
     for ( uint i = 0 ; i < pathList.size (); i++ )
     {
+        if ( pathList[i].empty() )
+            continue;
+
         if ( FileExists( PathJoin ( pathList[i], MTA_GTAEXE_NAME ) ) )
         {
             strRegPath = pathList[i];
@@ -920,17 +840,18 @@ ePathResult GetGamePath ( SString& strOutResult, bool bFindIfMissing )
 
 
     // Ask user to browse for GTA
-    BROWSEINFO bi = { 0 };
-    bi.lpszTitle = _("Select your Grand Theft Auto: San Andreas Installation Directory").c_str();
-    LPITEMIDLIST pidl = SHBrowseForFolder ( &bi );
+    BROWSEINFOW bi = { 0 };
+    WString strMessage = _("Select your Grand Theft Auto: San Andreas Installation Directory");
+    bi.lpszTitle = strMessage;
+    LPITEMIDLIST pidl = SHBrowseForFolderW ( &bi );
 
     if ( pidl != 0 )
     {
-        char szBuffer[MAX_PATH];
+        wchar_t szBuffer[MAX_PATH];
         // get the name of the  folder
-        if ( SHGetPathFromIDListA ( pidl, szBuffer ) )
+        if ( SHGetPathFromIDListW ( pidl, szBuffer ) )
         {
-            strOutResult = szBuffer;
+            strOutResult = ToUTF8( szBuffer );
         }
 
         // free memory used
@@ -969,317 +890,49 @@ ePathResult GetGamePath ( SString& strOutResult, bool bFindIfMissing )
 
 ///////////////////////////////////////////////////////////////
 //
-// Progress dialog
+// DiscoverGTAPath
 //
-//
+// Find and cache GTA path
 //
 ///////////////////////////////////////////////////////////////
-void ShowProgressDialog( HINSTANCE hInstance, const SString& strTitle, bool bAllowCancel )
+ePathResult DiscoverGTAPath ( bool bFindIfMissing )
 {
-    if ( !hwndProgressDialog )
-    {
-        HideSplash ();
-        bCancelPressed = false;
-        hwndProgressDialog = CreateDialog ( hInstance, MAKEINTRESOURCE(IDD_PROGRESS_DIALOG), 0, DialogProc );
-        SetWindowText ( hwndProgressDialog, strTitle );
-        HWND hwndButton = GetDlgItem( hwndProgressDialog, IDCANCEL );
-        ShowWindow( hwndButton, bAllowCancel ? SW_SHOW : SW_HIDE );
-        ulProgressStartTime = GetTickCount32 ();
-    }
-    SetForegroundWindow ( hwndProgressDialog );
-    SetWindowPos ( hwndProgressDialog, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE );
-}
-
-void HideProgressDialog ( void )
-{
-    if ( hwndProgressDialog )
-    {
-        // Show progress for at least two seconds
-        unsigned long ulTimeElapsed = GetTickCount32 () - ulProgressStartTime;
-        if ( ulTimeElapsed < 2000 )
-        {
-            UpdateProgress( 100, 100 );
-            Sleep ( 2000 - ulTimeElapsed );
-        }
-
-        DestroyWindow ( hwndProgressDialog );
-        hwndProgressDialog = NULL;
-    }
+    return GetGamePath ( g_strGTAPath, bFindIfMissing );
 }
 
 
-// returns true if canceled
-bool UpdateProgress( int iPos, int iMax, const SString& strMsg )
+///////////////////////////////////////////////////////////////
+//
+// GetGTAPath
+//
+// 
+//
+///////////////////////////////////////////////////////////////
+SString GetGTAPath ( void )
 {
-    if ( hwndProgressDialog)
+    if ( g_strGTAPath == "" )
+        DiscoverGTAPath( false );
+    return g_strGTAPath;
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// HasGTAPath
+//
+// 
+//
+///////////////////////////////////////////////////////////////
+bool HasGTAPath ( void )
+{
+    SString strGTAPath = GetGTAPath();
+    if ( !strGTAPath.empty() )
     {
-        HWND hwndText = GetDlgItem( hwndProgressDialog, IDC_PROGRESS_STATIC );
-        char buffer[ 1024 ] = "";
-        ::GetWindowText ( hwndText, buffer, sizeof(buffer) - 2 );
-        if ( strMsg.length () > 0 && strMsg != buffer )
-            SetWindowText ( hwndText, strMsg );
-        HWND hwndBar = GetDlgItem( hwndProgressDialog, IDC_PROGRESS_BAR );
-        PostMessage(hwndBar, PBM_SETPOS, iPos * 100 / Max ( 1, iMax ), 0 );
-        MSG msg;
-        while( PeekMessage( &msg, NULL, 0, 0, PM_NOREMOVE ) )
-        {
-            if( GetMessage( &msg, NULL, 0, 0 ) )
-            {
-                TranslateMessage(&msg);
-                DispatchMessage(&msg);
-            }
-        }
-        return bCancelPressed;
+        SString strGTAEXEPath = PathJoin( strGTAPath, MTA_GTAEXE_NAME );
+        return FileExists( strGTAEXEPath );
     }
     return false;
 }
-
-
-///////////////////////////////////////////////////////////////
-//
-// Progress
-//
-//
-//
-///////////////////////////////////////////////////////////////
-void StartPseudoProgress( HINSTANCE hInstance, const SString& strTitle, const SString& strMsg )
-{
-    ShowProgressDialog ( hInstance, strTitle );
-    UpdateProgress( 10, 100, strMsg );
-    Sleep ( 100 );
-    UpdateProgress( 30, 100 );
-}
-
-void StopPseudoProgress( void )
-{
-    if ( hwndProgressDialog )
-    {
-        UpdateProgress( 60, 100 );
-        Sleep ( 100 );
-        UpdateProgress( 90, 100 );
-        Sleep ( 100 );
-        HideProgressDialog ();
-    }
-}
-
-
-
-
-///////////////////////////////////////////////////////////////
-//
-// Crashed dialog
-//
-//
-//
-///////////////////////////////////////////////////////////////
-SString ShowCrashedDialog( HINSTANCE hInstance, const SString& strMessage )
-{
-    if ( !hwndCrashedDialog )
-    {
-        HideSplash ();
-        bCancelPressed = false;
-        bOkPressed = false;
-        bOtherPressed = false;
-        iOtherCode = 0;
-        hwndCrashedDialog = CreateDialog ( hInstance, MAKEINTRESOURCE(IDD_CRASHED_DIALOG), 0, DialogProc );
-        SetWindowText ( GetDlgItem( hwndCrashedDialog, IDC_CRASH_INFO_EDIT ), strMessage );
-        SendDlgItemMessage( hwndCrashedDialog, IDC_SEND_DUMP_CHECK, BM_SETCHECK, GetApplicationSetting ( "diagnostics", "send-dumps" ) != "no" ? BST_CHECKED : BST_UNCHECKED, 0 );
-    }
-    SetForegroundWindow ( hwndCrashedDialog );
-    SetWindowPos ( hwndCrashedDialog, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE );
-
-    while ( !bCancelPressed && !bOkPressed )
-    {
-        MSG msg;
-        while( PeekMessage( &msg, NULL, 0, 0, PM_NOREMOVE ) )
-        {
-            if( GetMessage( &msg, NULL, 0, 0 ) )
-            {
-                TranslateMessage(&msg);
-                DispatchMessage(&msg);
-            }
-        }
-        Sleep( 10 );
-    }
-
-    LRESULT res = SendMessageA( GetDlgItem( hwndCrashedDialog, IDC_SEND_DUMP_CHECK ), BM_GETCHECK, 0, 0 );
-    SetApplicationSetting ( "diagnostics", "send-dumps", res ? "yes" : "no" );
-
-    if ( bCancelPressed )
-        return "quit";
-    //if ( bOkPressed )
-        return "ok";
-}
-
-
-void HideCrashedDialog ( void )
-{
-    if ( hwndCrashedDialog )
-    {
-        DestroyWindow ( hwndCrashedDialog );
-        hwndCrashedDialog = NULL;
-    }
-}
-
-
-///////////////////////////////////////////////////////////////
-//
-// d3d dll dialog
-//
-//
-//
-///////////////////////////////////////////////////////////////
-void ShowD3dDllDialog( HINSTANCE hInstance, const SString& strPath )
-{
-    // Calc hash of target file
-    SString strFileHash;
-    MD5 md5;
-    CMD5Hasher Hasher;
-    if ( Hasher.Calculate ( strPath, md5 ) )
-    {
-        char szHashResult[33];
-        Hasher.ConvertToHex ( md5, szHashResult );
-        strFileHash = szHashResult;
-    }
-
-	// Maybe skip dialog
-    if ( GetApplicationSetting ( "diagnostics", "d3d9-dll-last-hash" ) == strFileHash )
-    {
-        if ( GetApplicationSetting ( "diagnostics", "d3d9-dll-not-again" ) == "yes" )
-            return;
-    }
-
-	// Create and show dialog
-    if ( !hwndD3dDllDialog )
-    {
-        HideSplash ();
-        bCancelPressed = false;
-        bOkPressed = false;
-        bOtherPressed = false;
-        iOtherCode = IDC_BUTTON_SHOW_DIR;
-        hwndD3dDllDialog = CreateDialog ( hInstance, MAKEINTRESOURCE(IDD_D3DDLL_DIALOG), 0, DialogProc );
-        SetWindowText ( GetDlgItem( hwndD3dDllDialog, IDC_EDIT_D3DDLL_PATH ), strPath );
-    }
-    SetForegroundWindow ( hwndD3dDllDialog );
-    SetWindowPos ( hwndD3dDllDialog, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE );
-
-	// Wait for input
-    while ( !bCancelPressed && !bOkPressed && !bOtherPressed )
-    {
-        MSG msg;
-        while( PeekMessage( &msg, NULL, 0, 0, PM_NOREMOVE ) )
-        {
-            if( GetMessage( &msg, NULL, 0, 0 ) )
-            {
-                TranslateMessage(&msg);
-                DispatchMessage(&msg);
-            }
-        }
-        Sleep( 10 );
-    }
-
-	// Process input
-    LRESULT res = SendMessageA( GetDlgItem( hwndD3dDllDialog, IDC_CHECK_NOT_AGAIN ), BM_GETCHECK, 0, 0 );
-    SetApplicationSetting ( "diagnostics", "d3d9-dll-last-hash", strFileHash );
-    SetApplicationSetting ( "diagnostics", "d3d9-dll-not-again", res ? "yes" : "no" );
-
-    if ( bCancelPressed )
-    {
-        ExitProcess(0);
-    }
-    if ( bOtherPressed )
-    {
-        if ( ITEMIDLIST *pidl = ILCreateFromPath ( strPath ) )
-        {
-            SHOpenFolderAndSelectItems ( pidl, 0, 0, 0 );
-            ILFree ( pidl );
-        }
-        else
-            ShellExecuteNonBlocking ( "open", ExtractPath ( strPath ) );
-
-        ExitProcess(0);
-    }
-}
-
-
-void HideD3dDllDialog ( void )
-{
-    if ( hwndD3dDllDialog )
-    {
-        DestroyWindow ( hwndD3dDllDialog );
-        hwndD3dDllDialog = NULL;
-    }
-}
-
-
-///////////////////////////////////////////////////////////////
-//
-// Optimus dialog
-//
-//
-//
-///////////////////////////////////////////////////////////////
-void ShowOptimusDialog( HINSTANCE hInstance )
-{
-    uint RadioButtons[] = { IDC_RADIO1, IDC_RADIO2, IDC_RADIO3, IDC_RADIO4 };
-	// Create and show dialog
-    if ( !hwndOptimusDialog )
-    {
-        HideSplash ();
-        bCancelPressed = false;
-        bOkPressed = false;
-        bOtherPressed = false;
-        iOtherCode = IDC_BUTTON_HELP;
-        hwndOptimusDialog = CreateDialog ( hInstance, MAKEINTRESOURCE(IDD_OPTIMUS_DIALOG), 0, DialogProc );
-        uint uiStartupOption = GetApplicationSettingInt( "nvhacks", "optimus-startup-option" ) % NUMELMS( RadioButtons );
-        CheckRadioButton( hwndOptimusDialog, IDC_RADIO1, IDC_RADIO4, RadioButtons[ uiStartupOption ] );
-    }
-    SetForegroundWindow ( hwndOptimusDialog );
-    SetWindowPos ( hwndOptimusDialog, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE );
-
-	// Wait for input
-    while ( !bCancelPressed && !bOkPressed && !bOtherPressed )
-    {
-        MSG msg;
-        while( PeekMessage( &msg, NULL, 0, 0, PM_NOREMOVE ) )
-        {
-            if( GetMessage( &msg, NULL, 0, 0 ) )
-            {
-                TranslateMessage(&msg);
-                DispatchMessage(&msg);
-            }
-        }
-        Sleep( 10 );
-    }
-
-	// Process input
-    uint uiStartupOption = 0;
-    for ( ; uiStartupOption < NUMELMS( RadioButtons ) - 1 ; uiStartupOption++ )
-    {
-        if ( IsDlgButtonChecked( hwndOptimusDialog, RadioButtons[ uiStartupOption ] ) == BST_CHECKED )
-            break;
-    }
-
-    SetApplicationSettingInt( "nvhacks", "optimus-startup-option", uiStartupOption );
-    SetApplicationSettingInt( "nvhacks", "optimus-alt-startup", ( uiStartupOption & 1 ) ? 1 : 0 );
-    SetApplicationSettingInt( "nvhacks", "optimus-rename-exe", ( uiStartupOption & 2 ) ? 1 : 0 );
-
-    if ( bOtherPressed )
-    {
-        BrowseToSolution ( "optimus-startup-option-help", TERMINATE_PROCESS );
-    }
-}
-
-
-void HideOptimusDialog ( void )
-{
-    if ( hwndOptimusDialog )
-    {
-        DestroyWindow ( hwndOptimusDialog );
-        hwndOptimusDialog = NULL;
-    }
-}
-
 
 
 ///////////////////////////////////////////////////////////////
@@ -1428,7 +1081,7 @@ SString GetRealOSVersion ( void )
 
     if ( uiMajor == 0 )
     {
-        VS_FIXEDFILEINFO fileInfo;
+        SLibVersionInfo fileInfo;
         if ( GetLibVersionInfo ( "ntdll.dll", &fileInfo ) )
         {
             uiMajor = HIWORD( fileInfo.dwFileVersionMS );
@@ -1437,52 +1090,6 @@ SString GetRealOSVersion ( void )
     }
 
     return SString ( "%u.%u", uiMajor, uiMinor );
-}
-
-
-///////////////////////////////////////////////////////////////
-//
-// GetLibVersionInfo
-//
-// Get version info of a file
-//
-///////////////////////////////////////////////////////////////
-bool GetLibVersionInfo( const char *szLibName, VS_FIXEDFILEINFO* pOutFileInfo )
-{
-    DWORD dwHandle, dwLen;
-    dwLen = GetFileVersionInfoSize ( szLibName, &dwHandle );
-    if (!dwLen) 
-        return FALSE;
-
-    LPTSTR lpData = (LPTSTR) malloc (dwLen);
-    if (!lpData) 
-        return FALSE;
-
-    SetLastError ( 0 );
-    if( !GetFileVersionInfo ( szLibName, dwHandle, dwLen, lpData ) )
-    {
-        free (lpData);
-        return FALSE;
-    }
-
-    DWORD dwError = GetLastError ();
-    if ( dwError )
-    {
-        free (lpData);
-        return FALSE;
-    }
-
-    UINT BufLen;
-    VS_FIXEDFILEINFO *pFileInfo;
-    if( VerQueryValueA ( lpData, "\\", (LPVOID *) &pFileInfo, (PUINT)&BufLen ) ) 
-    {
-        *pOutFileInfo = *pFileInfo;
-        free (lpData);
-        return true;
-    }
-
-    free (lpData);
-    return FALSE;
 }
 
 
@@ -1843,8 +1450,8 @@ bool CheckService ( uint uiStage )
 ///////////////////////////////////////////////////////////////////////////
 int GetFileAge ( const SString& strPathFilename )
 {
-    WIN32_FIND_DATA findFileData;
-    HANDLE hFind = FindFirstFile ( strPathFilename, &findFileData );
+    WIN32_FIND_DATAW findFileData;
+    HANDLE hFind = FindFirstFileW ( FromUTF8( strPathFilename ), &findFileData );
     if ( hFind != INVALID_HANDLE_VALUE )
     {
         FindClose ( hFind );
@@ -2063,7 +1670,7 @@ void MaybeShowCopySettingsDialog ( void )
 
     // Show dialog
     SString strMessage;
-    strMessage += SString( g_pLocalization->Translate( "New installation of %s detected.\n"
+    strMessage += SString( _( "New installation of %s detected.\n"
                               "\n"
                               "Do you want to copy your settings from %s ?" ),
                                 *strCurrentVersion,
@@ -2115,10 +1722,95 @@ bool CheckAndShowFileOpenFailureMessage ( void )
     {
         //SetApplicationSetting ( "diagnostics", "gta-fopen-fail", "" );
         SString strMsg ( _("GTA:SA had trouble opening the file '%s'\n\nTry reinstalling GTA:SA to fix it"), *strFilename );
-        MessageBoxUTF8 ( NULL, strMsg, "MTA: San Andreas"+_E("CL26"), MB_OK | MB_ICONERROR | MB_TOPMOST );
+        MessageBoxUTF8 ( NULL, strMsg, "MTA: San Andreas"+_E("CL27"), MB_OK | MB_ICONERROR | MB_TOPMOST );
         return true;
     }
     return false;
+}
+
+
+//////////////////////////////////////////////////////////
+//
+// CheckAndShowMissingFileMessage
+//
+// Check for missing files that could cause a crash
+//
+//////////////////////////////////////////////////////////
+void CheckAndShowMissingFileMessage ( void )
+{
+    SString strFilename = PathJoin( "text", "american.gxt" );
+
+    const SString strGTAPathFilename = PathJoin( GetGTAPath(), strFilename );
+
+    if ( !FileExists( strGTAPathFilename ) )
+    {
+        SString strMsg ( _("GTA:SA is missing the file '%s'."), *strFilename );
+        strMsg += "\n\n";
+        strMsg += _("Do you want to see some online help?");
+        int iResponse = MessageBoxUTF8 ( NULL, strMsg, "MTA: San Andreas"+_E("CL31"), MB_YESNO | MB_ICONERROR | MB_TOPMOST );
+        if ( iResponse == IDYES )
+        {
+            BrowseToSolution ( SString( "gta-file-missing&name=%s", *strFilename ), TERMINATE_PROCESS );
+        }
+    }
+}
+
+
+//////////////////////////////////////////////////////////
+//
+// CheckAndShowModelProblems
+//
+// Check for flagged model problems
+//
+//////////////////////////////////////////////////////////
+void CheckAndShowModelProblems ( void )
+{
+    SString strReason;
+    int iModelId = 0;
+    CArgMap argMap;
+    argMap.SetFromString( GetApplicationSetting ( "diagnostics", "gta-model-fail" ) );
+    argMap.Get( "reason", strReason );
+    argMap.Get( "id", iModelId );
+    SetApplicationSetting( "diagnostics", "gta-model-fail", "" );
+
+    if ( iModelId )
+    {
+        SString strMsg;
+        strMsg += _("GTA:SA had trouble loading a model.");
+        strMsg += SString( " (%d)", iModelId );
+        strMsg += "\n\n";
+        strMsg += _("Try reinstalling GTA:SA to fix it");
+        BrowseToSolution( SString( "gta-model-fail&id=%d&reason=%s", iModelId, *strReason ), ASK_GO_ONLINE | TERMINATE_IF_YES, strMsg );
+    }
+}
+
+
+//////////////////////////////////////////////////////////
+//
+// CheckAndShowUpgradeProblems
+//
+// Check for flagged upgrade problems
+//
+//////////////////////////////////////////////////////////
+void CheckAndShowUpgradeProblems ( void )
+{
+    int iModelId = 0, iUpgradeId, iFrame;
+    CArgMap argMap;
+    argMap.SetFromString( GetApplicationSetting ( "diagnostics", "gta-upgrade-fail" ) );
+    argMap.Get( "vehid", iModelId );
+    argMap.Get( "upgid", iUpgradeId );
+    argMap.Get( "frame", iFrame );
+    SetApplicationSetting( "diagnostics", "gta-upgrade-fail", "" );
+
+    if ( iModelId )
+    {
+        SString strMsg;
+        strMsg += _("GTA:SA had trouble adding an upgrade to a vehicle.");
+        strMsg += SString( " (%d)", iModelId );
+        strMsg += "\n\n";
+        strMsg += _("Try reinstalling GTA:SA to fix it");
+        BrowseToSolution( SString( "gta-upgrade-fail&id=%d&upgid=%d&frame=%d", iModelId, iUpgradeId, iFrame ), ASK_GO_ONLINE | TERMINATE_IF_YES, strMsg );
+    }
 }
 
 
@@ -2129,49 +1821,232 @@ bool CheckAndShowFileOpenFailureMessage ( void )
 // Load a library function
 //
 //////////////////////////////////////////////////////////
-void* LoadFunction( const char* c, const char* a, const char* b )
+void* LoadFunction( const char* szLibName, const char* c, const char* a, const char* b )
 {
-    static HMODULE hModule = LoadLibrary( "kernel32" );
+    static std::map < SString, HMODULE > libMap;
+    HMODULE* phModule = MapFind( libMap, szLibName );
+    if ( !phModule )
+    {
+        MapSet( libMap, szLibName, LoadLibrary( szLibName ) );
+        phModule = MapFind( libMap, szLibName );
+    }
     SString strFunctionName( "%s%s%s", a, b, c );
-    return static_cast < PVOID >( GetProcAddress( hModule, strFunctionName ) );
+    return static_cast < PVOID >( GetProcAddress( *phModule, strFunctionName ) );
 }
 
 
 //////////////////////////////////////////////////////////
 //
-// MaybeRenameExe
+// BsodDetectionPreLaunch
 //
-// Figure out whether to use a renamed exe, and return filename to use.
-// Also tries file copy if required.
+// Possible BSOD situation if a new mini-dump file was created after the last game was started
 //
 //////////////////////////////////////////////////////////
-SString MaybeRenameExe( const SString& strGTAPath, bool* pbCopyFailed )
+void BsodDetectionPreLaunch( void )
 {
-    SString strGTAEXEPath = PathJoin( strGTAPath, MTA_GTAEXE_NAME );
-    if ( pbCopyFailed )
-        *pbCopyFailed = false;
-
-    int iDoRename;
-    if ( GetApplicationSettingInt( "nvhacks", "optimus" ) )
-        iDoRename = GetApplicationSettingInt( "nvhacks", "optimus-rename-exe" );
-    else
-        iDoRename = GetApplicationSettingInt( "driver-overrides-disabled" );
-
-    if ( iDoRename )
+    // Find latest system minidump file
+    SString strMatch = PathJoin( GetSystemWindowsPath(), "MiniDump", "*" );
+    SString strMinidumpTime;
+    WIN32_FIND_DATAW findData;
+    HANDLE hFind = FindFirstFileW( FromUTF8( strMatch ), &findData );
+    if( hFind != INVALID_HANDLE_VALUE )
     {
-        SString strHTAEXEPath = PathJoin( strGTAPath, MTA_HTAEXE_NAME );
-        SString strGTAMd5 = CMD5Hasher::CalculateHexString( strGTAEXEPath );
-        SString strHTAMd5 = CMD5Hasher::CalculateHexString( strHTAEXEPath );
-        if ( strGTAMd5 != strHTAMd5 )
+        do
         {
-            if ( !FileCopy( strGTAEXEPath, strHTAEXEPath ) )
-                if ( pbCopyFailed )
-                    *pbCopyFailed = true;
-            strGTAMd5 = CMD5Hasher::CalculateHexString( strGTAEXEPath );
-            strHTAMd5 = CMD5Hasher::CalculateHexString( strHTAEXEPath );
+            if ( ( findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY ) == false )
+                if ( wcscmp( findData.cFileName, L"." ) && wcscmp( findData.cFileName, L".." ) )
+                {
+                    SYSTEMTIME s;
+                    FileTimeToSystemTime( &findData.ftCreationTime, &s );
+                    SString strCreationTime( "%02d-%02d-%02d %02d:%02d:%02d", s.wYear, s.wMonth, s.wDay, s.wHour, s.wMinute, s.wSecond );
+                    if ( strCreationTime > strMinidumpTime )
+                        strMinidumpTime = strCreationTime;
+                }
         }
-        if ( strGTAMd5 == strHTAMd5 )
-            strGTAEXEPath = strHTAEXEPath;
+        while( FindNextFileW( hFind, &findData ) );
+        FindClose( hFind );
     }
-    return strGTAEXEPath;
+
+    // Is it a new file?
+    SString strLastMinidumpTime = GetApplicationSetting( "diagnostics", "last-minidump-time" );
+    if ( strMinidumpTime > strLastMinidumpTime )
+    {
+        SetApplicationSetting( "diagnostics", "last-minidump-time", strMinidumpTime );
+        IncApplicationSettingInt( DIAG_MINIDUMP_DETECTED_COUNT );
+
+        // Was it created during the game?
+        SString strGameBeginTime = GetApplicationSetting( "diagnostics", "game-begin-time" );
+        if ( strMinidumpTime > strGameBeginTime && !strGameBeginTime.empty() )
+        {
+            // Ask user to confirm
+            int iResponse = MessageBoxUTF8 ( NULL, _("Did your computer restart when playing MTA:SA?"), "MTA: San Andreas", MB_YESNO | MB_ICONERROR | MB_TOPMOST );
+            if ( iResponse == IDYES )
+            {
+                SetApplicationSetting( "diagnostics", "user-confirmed-bsod-time", strMinidumpTime );
+                IncApplicationSettingInt( DIAG_MINIDUMP_CONFIRMED_COUNT );
+            }
+        }
+    }
+
+    // Log BSOD status
+    SString strBsodTime = GetApplicationSetting( "diagnostics", "user-confirmed-bsod-time" );
+    if ( !strBsodTime.empty() )
+        WriteDebugEvent( SString( "User confirmed bsod time: %s", *strBsodTime ) );
+}
+
+
+//////////////////////////////////////////////////////////
+//
+// BsodDetectionOnGameBegin
+//
+// Record game start time
+//
+//////////////////////////////////////////////////////////
+void BsodDetectionOnGameBegin( void )
+{
+    SetApplicationSetting( "diagnostics", "game-begin-time", GetTimeString( true ) );
+}
+
+
+//////////////////////////////////////////////////////////
+//
+// BsodDetectionOnGameEnd
+//
+// Unrecord game start time
+//
+//////////////////////////////////////////////////////////
+void BsodDetectionOnGameEnd( void )
+{
+    SetApplicationSetting( "diagnostics", "game-begin-time", "" );
+}
+
+
+//////////////////////////////////////////////////////////
+//
+// VerifyEmbeddedSignature
+//
+// Check a file has been signed proper
+//
+//////////////////////////////////////////////////////////
+bool VerifyEmbeddedSignature( const SString& strFilename )
+{
+    WString wstrFilename = FromUTF8( strFilename );
+    WINTRUST_FILE_INFO FileData;
+    memset(&FileData, 0, sizeof(FileData));
+    FileData.cbStruct = sizeof(WINTRUST_FILE_INFO);
+    FileData.pcwszFilePath = *wstrFilename;
+
+    WINTRUST_DATA WinTrustData;
+    memset(&WinTrustData, 0, sizeof(WinTrustData));
+    WinTrustData.cbStruct = sizeof(WinTrustData);
+    WinTrustData.dwUIChoice = WTD_UI_NONE;
+    WinTrustData.fdwRevocationChecks = WTD_REVOKE_NONE; 
+    WinTrustData.dwUnionChoice = WTD_CHOICE_FILE;
+    WinTrustData.pFile = &FileData;
+
+    GUID WVTPolicyGUID = WINTRUST_ACTION_GENERIC_VERIFY_V2;
+    LONG lStatus = WinVerifyTrust( NULL, &WVTPolicyGUID, &WinTrustData );
+    return lStatus == ERROR_SUCCESS;
+}
+
+
+//////////////////////////////////////////////////////////
+//
+// LogSettings
+//
+// Dump some settings to the log file to help debugging
+//
+//////////////////////////////////////////////////////////
+void LogSettings( void )
+{
+    const char* szSettings[] = {
+                                "general", "aero-enabled",
+                                "general", "aero-changeable",
+                                "general", "driver-overrides-disabled",
+                                "general", "device-selection-disabled",
+                                "general", "customized-sa-files-using",
+                                "general", "times-connected",
+                                "general", "times-connected-editor",
+                                "nvhacks", "optimus-force-detection",
+                                "nvhacks", "optimus-export-enablement",
+                                "nvhacks", "optimus",
+                                "nvhacks", "optimus-rename-exe",
+                                "nvhacks", "optimus-alt-startup",
+                                "nvhacks", "optimus-force-windowed",
+                                "nvhacks", "optimus-dialog-skip",
+                                "nvhacks", "optimus-startup-option",
+                                "diagnostics", "send-dumps",
+                                "diagnostics", "last-minidump-time",
+                                "diagnostics", "user-confirmed-bsod-time",
+                                DIAG_MINIDUMP_DETECTED_COUNT,
+                                DIAG_MINIDUMP_CONFIRMED_COUNT,
+                                DIAG_PRELOAD_UPGRADES_LOWEST_UNSAFE,
+                                "general", "noav-user-says-skip",
+                                "general", "noav-last-asked-time",
+                            };
+
+    for ( uint i = 0 ; i < NUMELMS( szSettings ) ; i += 2 )
+    {
+        WriteDebugEvent( SString( "%s: %s", szSettings[i+1], *GetApplicationSetting( szSettings[i], szSettings[i+1] ) ) );
+    }
+
+    uint uiTimeLastAsked = GetApplicationSettingInt( "noav-last-asked-time" );
+    uint uiTimeNow = static_cast < uint >( time( NULL ) / 3600LL );
+    uint uiHoursSinceLastAsked = uiTimeNow - uiTimeLastAsked;
+    WriteDebugEvent( SString( "noav-last-asked-time-hours-delta: %d", uiHoursSinceLastAsked ) );
+}
+
+
+//////////////////////////////////////////////////////////
+//
+// PadLeft
+//
+// Add some spaces to make it look nicer
+//
+//////////////////////////////////////////////////////////
+SString PadLeft( const SString& strText, uint uiNumSpaces, char cCharacter )
+{
+    SString strPad = std::string( uiNumSpaces, cCharacter );
+    return strPad + strText.Replace( "\n", SStringX( "\n" ) + strPad );
+}
+
+
+//////////////////////////////////////////////////////////
+//
+// IsDeviceSelectionDialogOpen
+//
+// Check if device dialog is currently open in multi-monitor situation
+//
+//////////////////////////////////////////////////////////
+BOOL CALLBACK MyEnumThreadWndProc( HWND hwnd, LPARAM lParam )
+{
+    WINDOWINFO windowInfo;
+    if ( GetWindowInfo( hwnd, &windowInfo ) )
+    {
+        if ( windowInfo.atomWindowType == (WORD)WC_DIALOG )
+        {
+            SetWindowPos ( hwnd, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW );
+            return false;
+        }
+    }
+    return true;
+}
+
+bool IsDeviceSelectionDialogOpen( DWORD dwThreadId )
+{
+    return !EnumThreadWindows( dwThreadId, MyEnumThreadWndProc, 0 );
+}
+
+
+//////////////////////////////////////////////////////////
+//
+// DllMain
+//
+// Used to save handle to loader dll, so we can get at the resources
+//
+//////////////////////////////////////////////////////////
+int WINAPI DllMain(HINSTANCE hModule, DWORD dwReason, PVOID pvNothing)
+{
+    g_hInstance = hModule;
+    return TRUE;
 }

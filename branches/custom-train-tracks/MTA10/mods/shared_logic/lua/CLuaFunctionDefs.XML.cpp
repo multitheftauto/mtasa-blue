@@ -159,14 +159,8 @@ int CLuaFunctionDefs::XMLNodeGetName ( lua_State* luaVM )
 
     if ( !argStream.HasErrors ( ) )
     {
-        if ( pNode )
-        {
-            if ( pNode )
-            {
-                lua_pushstring ( luaVM, pNode->GetTagName ().c_str () );
-                return 1;
-            }
-        }
+        lua_pushstring ( luaVM, pNode->GetTagName ().c_str () );
+        return 1;
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
@@ -283,7 +277,7 @@ int CLuaFunctionDefs::XMLNodeSetAttribute ( lua_State* luaVM )
         if ( pNode )
         {
             // Are we going to set it to a value?
-            if ( strAttributeValue != "" )
+            if ( argStream.NextCouldBeString( -1 ) )
             {
                 // Write the node
                 CXMLAttribute* pAttribute = pNode->GetAttributes ().Create ( strAttributeName );

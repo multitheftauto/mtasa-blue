@@ -18,7 +18,6 @@ bool TerminateProcessFromPathFilename ( const SString& strPathFilename )
 {
     DWORD dwProcessIDs[250];
     DWORD pBytesReturned = 0;
-    unsigned int uiListSize = 50;
     if ( EnumProcesses ( dwProcessIDs, 250 * sizeof(DWORD), &pBytesReturned ) )
     {
         DWORD id1 = GetCurrentProcessId();
@@ -38,10 +37,11 @@ bool TerminateProcessFromPathFilename ( const SString& strPathFilename )
                 DWORD cbNeeded;
                 if ( EnumProcessModules ( hProcess, &pModule, sizeof ( HMODULE ), &cbNeeded ) )
                 {
-                    char szModuleName[500];
-                    if ( GetModuleFileNameEx( hProcess, pModule, szModuleName, 500 ) )
+                    WCHAR szModuleName[MAX_PATH*2] = L"";
+                    if ( GetModuleFileNameExW( hProcess, pModule, szModuleName, NUMELMS(szModuleName) ) )
                     {
-                        if ( stricmp ( szModuleName, strPathFilename ) == 0 )
+                        SString strModuleName = ToUTF8( szModuleName );
+                        if ( stricmp ( strModuleName, strPathFilename ) == 0 )
                         {
                             TerminateProcess ( hProcess, 0 );
                             CloseHandle ( hProcess );
@@ -114,7 +114,7 @@ bool DoInstallFiles ( void )
     for ( unsigned int i = 0 ; i < itemList.size () ; i++ )
     {
         SString strFile = itemList[i].strDestPathFilename;
-        if ( strFile.ToLower ().substr ( Max < int > ( 0, strFile.length () - 4 ) ) == ".exe" )
+        if ( strFile.EndsWithI( ".exe" ) )
             TerminateProcessFromPathFilename ( strFile );
     }
 
@@ -190,7 +190,7 @@ bool InstallFiles ( bool bSilent )
 {
     // Start progress bar
     if ( !bSilent )
-       StartPseudoProgress( g_hInstance, "MTA: San Andreas", "Installing update..." );
+       StartPseudoProgress( g_hInstance, "MTA: San Andreas", _("Installing update...") );
 
     bool bResult = DoInstallFiles ();
 
@@ -292,7 +292,7 @@ SString CheckOnRestartCommand ( void )
 
             // Start progress bar
             if ( strOperation != "silent" )
-               StartPseudoProgress( g_hInstance, "MTA: San Andreas", "Extracting files..." );
+               StartPseudoProgress( g_hInstance, "MTA: San Andreas", _("Extracting files...") );
 
             // Try to extract the files
             if ( !ExtractFiles ( strFile ) )

@@ -105,6 +105,8 @@ CPlayer::CPlayer ( CPlayerManager* pPlayerManager, class CScriptDebugging* pScri
     CSimControl::AddSimPlayer ( this );
 
     m_pPlayerStatsPacket = new CPlayerStatsPacket ( );
+
+    m_LastReceivedSyncTimer.SetMaxIncrement( 2000, true );
 }
 
 
@@ -272,7 +274,7 @@ uint CPlayer::Send ( const CPacket& Packet )
         if ( Packet.Write ( *pBitStream ) )
         {
             uiBitsSent = pBitStream->GetNumberOfBitsUsed ();
-            g_pNetServer->SendPacket ( Packet.GetPacketID (), m_PlayerSocket, pBitStream, FALSE, packetPriority, Reliability, Packet.GetPacketOrdering() );
+            g_pGame->SendPacket ( Packet.GetPacketID (), m_PlayerSocket, pBitStream, FALSE, packetPriority, Reliability, Packet.GetPacketOrdering() );
         }
 
         // Destroy the bitstream
@@ -586,7 +588,7 @@ void CPlayer::RemoveNametagOverrideColor ( void )
 // Is it time to send a pure sync to every other player ?
 bool CPlayer::IsTimeForPuresyncFar ( void )
 {
-    long long llTime = GetTickCount64_ ();
+    long long llTime = GetModuleTickCount64 ();
     if ( llTime > m_llNextFarPuresyncTime )
     {
         int iSlowSyncRate = g_pBandwidthSettings->ZoneUpdateIntervals [ ZONE3 ];
@@ -1141,6 +1143,13 @@ float CPlayer::GetWeaponRangeFromSlot( uint uiSlot )
     return m_fWeaponRangeLast;
 }
 
+void CPlayer::SetPlayerVersion ( const SString& strPlayerVersion )
+{
+    m_strPlayerVersion = strPlayerVersion;
+    m_pPlayerManager->OnPlayerSetVersion( this );
+}
+
+
 /////////////////////////////////////////////////////////////////
 // For NearList/FarList hash maps
 CPlayer* GetEmptyMapKey ( CPlayer** )
@@ -1152,3 +1161,16 @@ CPlayer* GetDeletedMapKey ( CPlayer** )
 {
     return (CPlayer*)2;
 }
+
+
+/////////////////////////////////////////////////////////////////
+//
+// CPlayerBitStream::CPlayerBitStream
+//
+//
+/////////////////////////////////////////////////////////////////
+CPlayerBitStream::CPlayerBitStream( CPlayer* pPlayer )
+{
+    pBitStream = g_pNetServer->AllocateNetServerBitStream ( pPlayer->GetBitStreamVersion() );
+}
+

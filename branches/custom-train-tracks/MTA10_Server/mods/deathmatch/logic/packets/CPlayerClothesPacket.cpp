@@ -15,7 +15,7 @@
 CPlayerClothesPacket::~CPlayerClothesPacket ( void )
 {
     vector < SPlayerClothes* > ::iterator iter = m_List.begin ();
-    for ( ; iter != m_List.end () ; iter++ )
+    for ( ; iter != m_List.end () ; ++iter )
     {
         delete [] (*iter)->szTexture;
         delete [] (*iter)->szModel;
@@ -38,7 +38,7 @@ bool CPlayerClothesPacket::Write ( NetBitStreamInterface& BitStream ) const
         BitStream.Write ( usNumClothes );
 
         vector < SPlayerClothes* > ::const_iterator iter = m_List.begin ();
-        for ( ; iter != m_List.end () ; iter++ )
+        for ( ; iter != m_List.end () ; ++iter )
         {
             char* szTexture = (*iter)->szTexture;
             char* szModel = (*iter)->szModel;

@@ -28,6 +28,8 @@ public:
     virtual void        SetVisible      ( bool bVisible ) = 0;
     virtual void        Show            ( void ) = 0;
     virtual void        Hide            ( void ) = 0;
+    virtual bool        IsInputActive   ( void ) = 0;
+    virtual void        ActivateInput   ( void ) = 0;
 };
 
 #endif

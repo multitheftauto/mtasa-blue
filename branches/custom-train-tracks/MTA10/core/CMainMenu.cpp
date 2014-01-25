@@ -1056,7 +1056,7 @@ void CMainMenu::SetNewsHeadline ( int iIndex, const SString& strHeadline, const 
     if ( pItem->GetSize(false).fX < pItem->GetTextExtent() )
     {
         const char* szFontName = "default-bold-small";
-        for ( char i=0; i <= CORE_MTA_NEWS_ITEMS; i++ )
+        for ( char i=0; i < CORE_MTA_NEWS_ITEMS; i++ )
         {
             // Try default-bold-small first, if that's too big use default-small
             m_pNewsItemLabels[ i ]->SetFont ( szFontName );

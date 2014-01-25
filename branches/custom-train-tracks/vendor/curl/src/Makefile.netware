@@ -1,10 +1,9 @@
 #################################################################
-# $Id: Makefile.netware,v 1.97 2008-12-30 08:16:24 gknauf Exp $
 #
 ## Makefile for building curl.nlm (NetWare version - gnu make)
 ## Use: make -f Makefile.netware
 ##
-## Comments to: Guenter Knauf http://www.gknw.de/phpbb
+## Comments to: Guenter Knauf http://www.gknw.net/phpbb
 #
 #################################################################
 
@@ -15,22 +14,57 @@ endif
 
 # Edit the path below to point to the base of your Zlib sources.
 ifndef ZLIB_PATH
-ZLIB_PATH = ../../zlib-1.2.3
+ZLIB_PATH = ../../zlib-1.2.8
 endif
 
 # Edit the path below to point to the base of your OpenSSL package.
 ifndef OPENSSL_PATH
-OPENSSL_PATH = ../../openssl-0.9.8i
+OPENSSL_PATH = ../../openssl-0.9.8y
 endif
 
 # Edit the path below to point to the base of your LibSSH2 package.
 ifndef LIBSSH2_PATH
-LIBSSH2_PATH = ../../libssh2-0.18
+LIBSSH2_PATH = ../../libssh2-1.4.3
+endif
+
+# Edit the path below to point to the base of your axTLS package.
+ifndef AXTLS_PATH
+AXTLS_PATH = ../../axTLS-1.2.7
 endif
 
 # Edit the path below to point to the base of your libidn package.
 ifndef LIBIDN_PATH
-LIBIDN_PATH = ../../libidn-1.11
+LIBIDN_PATH = ../../libidn-1.18
+endif
+
+# Edit the path below to point to the base of your librtmp package.
+ifndef LIBRTMP_PATH
+LIBRTMP_PATH = ../../librtmp-2.3
+endif
+
+# Edit the path below to point to the base of your fbopenssl package.
+ifndef FBOPENSSL_PATH
+FBOPENSSL_PATH = ../../fbopenssl-0.4
+endif
+
+# Edit the path below to point to the base of your libmetalink package.
+ifndef LIBMETALINK_PATH
+LIBMETALINK_PATH = ../../libmetalink-0.1.2
+endif
+
+# Edit the path below to point to the base of your libexpat package.
+ifndef LIBEXPAT_PATH
+LIBEXPAT_PATH = ../../expat-2.1.0
+endif
+
+# Edit the path below to point to the base of your libXML2 package.
+ifndef LIBXML2_PATH
+LIBXML2_PATH = ../../libxml2-2.8.0
+endif
+
+# Edit the path below to point to the base of your c-ares package.
+ifndef LIBCARES_PATH
+LIBCARES_PATH = ../ares
 endif
 
 ifndef INSTDIR
@@ -81,13 +115,13 @@ else
 	CC = gcc
 endif
 PERL	= perl
-# a native win32 awk can be downloaded from here:
-# http://www.gknw.net/development/prgtools/awk-20070501.zip
+# Here you can find a native Win32 binary of the original awk:
+# http://www.gknw.net/development/prgtools/awk-20100523.zip
 AWK	= awk
 CP	= cp -afv
 MKDIR	= mkdir
 # RM	= rm -f
-# if you want to mark the target as MTSAFE you will need a tool for
+# If you want to mark the target as MTSAFE you will need a tool for
 # generating the xdc data for the linker; here's a minimal tool:
 # http://www.gknw.net/development/prgtools/mkxdc.zip
 MPKXDC	= mkxdc
@@ -110,13 +144,13 @@ CFLAGS	+= -relax_pointers
 #CFLAGS	+= -w on
 ifeq ($(LIBARCH),LIBC)
 ifeq ($(POSIXFL),1)
-	PRELUDE = $(SDK_LIBC)/imports/posixpre.o
+	PRELUDE = $(NDK_LIBC)/imports/posixpre.o
 else
-	PRELUDE = $(SDK_LIBC)/imports/libcpre.o
+	PRELUDE = $(NDK_LIBC)/imports/libcpre.o
 endif
 	CFLAGS += -align 4
 else
-	# PRELUDE = $(SDK_CLIB)/imports/clibpre.o
+	# PRELUDE = $(NDK_CLIB)/imports/clibpre.o
 	# to avoid the __init_* / __deinit_* whoes dont use prelude from NDK
 	PRELUDE = "$(MWCW_PATH)/libraries/runtime/prelude.obj"
 	# CFLAGS += -include "$(MWCW_PATH)/headers/nlm_clib_prefix.h"
@@ -126,16 +160,20 @@ else
 LD	= nlmconv
 LDFLAGS	= -T
 LIBEXT	= a
-CFLAGS	+= -fno-builtin -fpcc-struct-return -fno-strict-aliasing
+CFLAGS	+= -m32
+CFLAGS  += -fno-builtin -fno-strict-aliasing
+ifeq ($(findstring gcc,$(CC)),gcc)
+CFLAGS  += -fpcc-struct-return
+endif
 CFLAGS	+= -Wall # -pedantic
 ifeq ($(LIBARCH),LIBC)
 ifeq ($(POSIXFL),1)
-	PRELUDE = $(SDK_LIBC)/imports/posixpre.gcc.o
+	PRELUDE = $(NDK_LIBC)/imports/posixpre.gcc.o
 else
-	PRELUDE = $(SDK_LIBC)/imports/libcpre.gcc.o
+	PRELUDE = $(NDK_LIBC)/imports/libcpre.gcc.o
 endif
 else
-	# PRELUDE = $(SDK_CLIB)/imports/clibpre.gcc.o
+	# PRELUDE = $(NDK_CLIB)/imports/clibpre.gcc.o
 	# to avoid the __init_* / __deinit_* whoes dont use prelude from NDK
 	# http://www.gknw.net/development/mk_nlm/gcc_pre.zip
 	PRELUDE = $(NDK_ROOT)/pre/prelude.o
@@ -144,26 +182,73 @@ endif
 endif
 
 NDK_ROOT = $(NDKBASE)/ndk
-SDK_CLIB = $(NDK_ROOT)/nwsdk
-SDK_LIBC = $(NDK_ROOT)/libc
-SDK_LDAP = $(NDK_ROOT)/cldapsdk/netware
+ifndef NDK_CLIB
+NDK_CLIB = $(NDK_ROOT)/nwsdk
+endif
+ifndef NDK_LIBC
+NDK_LIBC = $(NDK_ROOT)/libc
+endif
+ifndef NDK_LDAP
+NDK_LDAP = $(NDK_ROOT)/cldapsdk/netware
+endif
 CURL_INC = ../include
 CURL_LIB = ../lib
-ARES_LIB = ../ares
 
 INCLUDES = -I$(CURL_INC) -I$(CURL_LIB)
+
+ifeq ($(findstring -static,$(CFG)),-static)
+LINK_STATIC = 1
+endif
+ifeq ($(findstring -ares,$(CFG)),-ares)
+WITH_ARES = 1
+endif
+ifeq ($(findstring -rtmp,$(CFG)),-rtmp)
+WITH_RTMP = 1
+WITH_SSL = 1
+WITH_ZLIB = 1
+endif
+ifeq ($(findstring -ssh2,$(CFG)),-ssh2)
+WITH_SSH2 = 1
+WITH_SSL = 1
+WITH_ZLIB = 1
+endif
+ifeq ($(findstring -axtls,$(CFG)),-axtls)
+WITH_AXTLS = 1
+WITH_SSL =
+else
+ifeq ($(findstring -ssl,$(CFG)),-ssl)
+WITH_SSL = 1
+endif
+endif
+ifeq ($(findstring -zlib,$(CFG)),-zlib)
+WITH_ZLIB = 1
+endif
+ifeq ($(findstring -idn,$(CFG)),-idn)
+WITH_IDN = 1
+endif
+ifeq ($(findstring -spnego,$(CFG)),-spnego)
+WITH_SPNEGO = 1
+WITH_SSL = 1
+endif
+ifeq ($(findstring -metalink,$(CFG)),-metalink)
+WITH_METALINK = 1
+WITH_SSL = 1
+endif
+ifeq ($(findstring -ipv6,$(CFG)),-ipv6)
+ENABLE_IPV6 = 1
+endif
 
 ifdef LINK_STATIC
 	LDLIBS	= $(CURL_LIB)/libcurl.$(LIBEXT)
 ifdef WITH_ARES
-	LDLIBS += $(ARES_LIB)/libcares.$(LIBEXT)
+	LDLIBS += $(LIBCARES_PATH)/libcares.$(LIBEXT)
 endif
 else
 	MODULES	= libcurl.nlm
 	IMPORTS	= @$(CURL_LIB)/libcurl.imp
 endif
 ifdef WITH_SSH2
-	INCLUDES += -I$(LIBSSH2_PATH)/include
+	# INCLUDES += -I$(LIBSSH2_PATH)/include
 ifdef LINK_STATIC
 	LDLIBS += $(LIBSSH2_PATH)/nw/libssh2.$(LIBEXT)
 else
@@ -171,11 +256,31 @@ else
 	IMPORTS += @$(LIBSSH2_PATH)/nw/libssh2.imp
 endif
 endif
+ifdef WITH_RTMP
+	# INCLUDES += -I$(LIBRTMP_PATH)
+ifdef LINK_STATIC
+	LDLIBS += $(LIBRTMP_PATH)/librtmp/librtmp.$(LIBEXT)
+endif
+endif
 ifdef WITH_SSL
-	INCLUDES += -I$(OPENSSL_PATH)/outinc_nw_$(LIBARCH_L)
+	# INCLUDES += -I$(OPENSSL_PATH)/outinc_nw_$(LIBARCH_L)
 	LDLIBS += $(OPENSSL_PATH)/out_nw_$(LIBARCH_L)/ssl.$(LIBEXT)
 	LDLIBS += $(OPENSSL_PATH)/out_nw_$(LIBARCH_L)/crypto.$(LIBEXT)
 	IMPORTS += GetProcessSwitchCount RunningProcess
+ifdef WITH_SPNEGO
+	# INCLUDES += -I$(FBOPENSSL_PATH)/include
+	LDLIBS += $(FBOPENSSL_PATH)/nw/fbopenssl.$(LIBEXT)
+endif
+else
+ifdef WITH_AXTLS
+	# INCLUDES += -I$(AXTLS_PATH)/inc
+ifdef LINK_STATIC
+	LDLIBS += $(AXTLS_PATH)/lib/libaxtls.$(LIBEXT)
+else
+	MODULES += libaxtls.nlm
+	IMPORTS += $(AXTLS_PATH)/lib/libaxtls.imp
+endif
+endif
 endif
 ifdef WITH_ZLIB
 	INCLUDES += -I$(ZLIB_PATH)
@@ -190,18 +295,38 @@ ifdef WITH_IDN
 	# INCLUDES += -I$(LIBIDN_PATH)/include
 	LDLIBS += $(LIBIDN_PATH)/lib/libidn.$(LIBEXT)
 endif
+ifdef WITH_METALINK
+	CFLAGS += -DUSE_METALINK
+	INCLUDES += -I$(OPENSSL_PATH)/outinc_nw_$(LIBARCH_L)
+	INCLUDES += -I$(LIBMETALINK_PATH)/include
+	LDLIBS += $(LIBMETALINK_PATH)/lib/libmetalink.$(LIBEXT)
+ifdef WITH_LIBEXPAT
+	ifeq ($(LIBARCH),LIBC)
+		IMPORTS += @$(LIBEXPAT_PATH)/imports/expatlbc.imp
+		MODULES += expatlbc
+	else
+		IMPORTS += @$(LIBEXPAT_PATH)/imports/expatlib.imp
+		MODULES += expatlib
+	endif
+else
+ifdef WITH_LIBXML2
+	IMPORTS += @$(LIBXML2_PATH)/lib/libxml2.imp
+	MODULES += libxml2
+endif
+endif
+endif
 
 ifeq ($(LIBARCH),LIBC)
-	INCLUDES += -I$(SDK_LIBC)/include
-	# INCLUDES += -I$(SDK_LIBC)/include/nks
-	# INCLUDES += -I$(SDK_LIBC)/include/winsock
+	INCLUDES += -I$(NDK_LIBC)/include
+	# INCLUDES += -I$(NDK_LIBC)/include/nks
+	# INCLUDES += -I$(NDK_LIBC)/include/winsock
 	CFLAGS += -D_POSIX_SOURCE
 else
-	INCLUDES += -I$(SDK_CLIB)/include/nlm
-	# INCLUDES += -I$(SDK_CLIB)/include
+	INCLUDES += -I$(NDK_CLIB)/include/nlm
+	# INCLUDES += -I$(NDK_CLIB)/include
 endif
 ifndef DISABLE_LDAP
-	# INCLUDES += -I$(SDK_LDAP)/$(LIBARCH_L)/inc
+	# INCLUDES += -I$(NDK_LDAP)/$(LIBARCH_L)/inc
 endif
 CFLAGS	+= $(INCLUDES)
 
@@ -215,7 +340,7 @@ ifdef XDCOPT
 	XDCDATA = $(OBJDIR)/$(TARGET).xdc
 endif
 
-ifeq ($(findstring linux,$(OSTYPE)),linux)
+ifeq ($(findstring /sh,$(SHELL)),/sh)
 DL	= '
 DS	= /
 PCT	= %
@@ -229,13 +354,16 @@ endif
 include Makefile.inc
 
 OBJX	:= $(patsubst %.c,$(OBJDIR)/%.o,$(notdir $(strip $(CURLX_ONES))))
-OBJS	:= $(patsubst %.c,$(OBJDIR)/%.o,$(strip $(CURL_SOURCES))) $(OBJX)
+OBJS	:= $(patsubst %.c,$(OBJDIR)/%.o,$(strip $(CURL_CFILES)))
+ifndef LINK_STATIC
+OBJS	+= $(OBJX)
+endif
 
 vpath %.c $(CURL_LIB)
 
 all: prebuild $(TARGET).nlm
 
-prebuild: $(OBJDIR) $(OBJDIR)/version.inc config.h
+prebuild: $(OBJDIR) $(OBJDIR)/version.inc
 
 $(OBJDIR)/%.o: %.c
 #	@echo Compiling $<
@@ -251,13 +379,12 @@ install: $(INSTDIR) all
 	@$(CP) $(TARGET).nlm $(INSTDIR)
 
 clean:
-ifeq "$(wildcard hugehelp.c.cvs)" "hugehelp.c.cvs"
-	-$(RM) hugehelp.c
+ifeq "$(wildcard tool_hugehelp.c.cvs)" "tool_hugehelp.c.cvs"
+	-$(RM) tool_hugehelp.c
 endif
-	-$(RM) config.h
 	-$(RM) -r $(OBJDIR)
 
-distclean: clean
+distclean vclean: clean
 	-$(RM) $(TARGET).nlm
 
 $(OBJDIR) $(INSTDIR):
@@ -307,15 +434,15 @@ endif
 ifeq ($(LIBARCH),CLIB)
 	@echo $(DL)start _Prelude$(DL) >> $@
 	@echo $(DL)exit _Stop$(DL) >> $@
-	@echo $(DL)import @$(SDK_CLIB)/imports/clib.imp$(DL) >> $@
-	@echo $(DL)import @$(SDK_CLIB)/imports/threads.imp$(DL) >> $@
-	@echo $(DL)import @$(SDK_CLIB)/imports/nlmlib.imp$(DL) >> $@
-	@echo $(DL)import @$(SDK_CLIB)/imports/socklib.imp$(DL) >> $@
+	@echo $(DL)import @$(NDK_CLIB)/imports/clib.imp$(DL) >> $@
+	@echo $(DL)import @$(NDK_CLIB)/imports/threads.imp$(DL) >> $@
+	@echo $(DL)import @$(NDK_CLIB)/imports/nlmlib.imp$(DL) >> $@
+	@echo $(DL)import @$(NDK_CLIB)/imports/socklib.imp$(DL) >> $@
 	@echo $(DL)module clib$(DL) >> $@
 ifndef DISABLE_LDAP
-	@echo $(DL)import @$(SDK_LDAP)/clib/imports/ldapsdk.imp$(DL) >> $@
-	@echo $(DL)import @$(SDK_LDAP)/clib/imports/ldapssl.imp$(DL) >> $@
-#	@echo $(DL)import @$(SDK_LDAP)/clib/imports/ldapx.imp$(DL) >> $@
+	@echo $(DL)import @$(NDK_LDAP)/clib/imports/ldapsdk.imp$(DL) >> $@
+	@echo $(DL)import @$(NDK_LDAP)/clib/imports/ldapssl.imp$(DL) >> $@
+#	@echo $(DL)import @$(NDK_LDAP)/clib/imports/ldapx.imp$(DL) >> $@
 	@echo $(DL)module ldapsdk ldapssl$(DL) >> $@
 endif
 else
@@ -333,13 +460,13 @@ else
 	@echo $(DL)exit _LibCPostlude$(DL) >> $@
 	@echo $(DL)check _LibCCheckUnload$(DL) >> $@
 endif
-	@echo $(DL)import @$(SDK_LIBC)/imports/libc.imp$(DL) >> $@
-	@echo $(DL)import @$(SDK_LIBC)/imports/netware.imp$(DL) >> $@
+	@echo $(DL)import @$(NDK_LIBC)/imports/libc.imp$(DL) >> $@
+	@echo $(DL)import @$(NDK_LIBC)/imports/netware.imp$(DL) >> $@
 	@echo $(DL)module libc$(DL) >> $@
 ifndef DISABLE_LDAP
-	@echo $(DL)import @$(SDK_LDAP)/libc/imports/lldapsdk.imp$(DL) >> $@
-	@echo $(DL)import @$(SDK_LDAP)/libc/imports/lldapssl.imp$(DL) >> $@
-#	@echo $(DL)import @$(SDK_LDAP)/libc/imports/lldapx.imp$(DL) >> $@
+	@echo $(DL)import @$(NDK_LDAP)/libc/imports/lldapsdk.imp$(DL) >> $@
+	@echo $(DL)import @$(NDK_LDAP)/libc/imports/lldapssl.imp$(DL) >> $@
+#	@echo $(DL)import @$(NDK_LDAP)/libc/imports/lldapx.imp$(DL) >> $@
 	@echo $(DL)module lldapsdk lldapssl$(DL) >> $@
 endif
 endif
@@ -361,204 +488,11 @@ endif
 	@echo $(DL)output $(TARGET).nlm$(DL) >> $@
 endif
 
-config.h: Makefile.netware
+tool_hugehelp.c:
 	@echo Creating $@
-	@echo $(DL)/* $@ for NetWare target.$(DL) > $@
-	@echo $(DL)** Do not edit this file - it is created by make!$(DL) >> $@
-	@echo $(DL)** All your changes will be lost!!$(DL) >> $@
-	@echo $(DL)*/$(DL) >> $@
-	@echo $(DL)#ifndef NETWARE$(DL) >> $@
-	@echo $(DL)#error This $(notdir $@) is created for NetWare platform!$(DL) >> $@
-	@echo $(DL)#endif$(DL) >> $@
-	@echo $(DL)#define VERSION "$(LIBCURL_VERSION_STR)"$(DL) >> $@
-	@echo $(DL)#define PACKAGE_BUGREPORT "a suitable curl mailing list => http://curl.haxx.se/mail/"$(DL) >> $@
-ifeq ($(LIBARCH),CLIB)
-	@echo $(DL)#define OS "i586-pc-clib-NetWare"$(DL) >> $@
-	@echo $(DL)#define NETDB_USE_INTERNET 1$(DL) >> $@
-	@echo $(DL)#define HAVE_STRICMP 1$(DL) >> $@
-	@echo $(DL)#define HAVE_STRNICMP 1$(DL) >> $@
-	@echo $(DL)#define RECV_TYPE_ARG1 int$(DL) >> $@
-	@echo $(DL)#define RECV_TYPE_ARG2 char *$(DL) >> $@
-	@echo $(DL)#define RECV_TYPE_ARG3 int$(DL) >> $@
-	@echo $(DL)#define RECV_TYPE_ARG4 int$(DL) >> $@
-	@echo $(DL)#define RECV_TYPE_RETV int$(DL) >> $@
-	@echo $(DL)#define RECVFROM_TYPE_ARG1 int$(DL) >> $@
-	@echo $(DL)#define RECVFROM_TYPE_ARG2 char$(DL) >> $@
-	@echo $(DL)#define RECVFROM_TYPE_ARG3 int$(DL) >> $@
-	@echo $(DL)#define RECVFROM_TYPE_ARG4 int$(DL) >> $@
-	@echo $(DL)#define RECVFROM_TYPE_ARG5 struct sockaddr$(DL) >> $@
-	@echo $(DL)#define RECVFROM_TYPE_ARG6 int$(DL) >> $@
-	@echo $(DL)#define RECVFROM_TYPE_RETV int$(DL) >> $@
-	@echo $(DL)#define SEND_QUAL_ARG2$(DL) >> $@
-	@echo $(DL)#define SEND_TYPE_ARG1 int$(DL) >> $@
-	@echo $(DL)#define SEND_TYPE_ARG2 char *$(DL) >> $@
-	@echo $(DL)#define SEND_TYPE_ARG3 int$(DL) >> $@
-	@echo $(DL)#define SEND_TYPE_ARG4 int$(DL) >> $@
-	@echo $(DL)#define SEND_TYPE_RETV int$(DL) >> $@
-	@echo $(DL)#define socklen_t int$(DL) >> $@
-	@echo $(DL)#define pressanykey PressAnyKeyToContinue$(DL) >> $@
-else
-	@echo $(DL)#define OS "i586-pc-libc-NetWare"$(DL) >> $@
-	@echo $(DL)#define HAVE_FTRUNCATE 1$(DL) >> $@
-	@echo $(DL)#define HAVE_GETTIMEOFDAY 1$(DL) >> $@
-	@echo $(DL)#define HAVE_INTTYPES_H 1$(DL) >> $@
-	@echo $(DL)#define HAVE_LIMITS_H 1$(DL) >> $@
-	@echo $(DL)#define HAVE_LONGLONG 1$(DL) >> $@
-	@echo $(DL)#define HAVE_STDINT_H 1$(DL) >> $@
-	@echo $(DL)#define HAVE_STRCASECMP 1$(DL) >> $@
-	@echo $(DL)#define HAVE_STRLCAT 1$(DL) >> $@
-	@echo $(DL)#define HAVE_STRLCPY 1$(DL) >> $@
-	@echo $(DL)#define HAVE_STRTOLL 1$(DL) >> $@
-	@echo $(DL)#define HAVE_SYS_PARAM_H 1$(DL) >> $@
-	@echo $(DL)#define HAVE_SYS_SELECT_H 1$(DL) >> $@
-	@echo $(DL)#define HAVE_TERMIOS_H 1$(DL) >> $@
-	@echo $(DL)#define HAVE_AF_INET6 1$(DL) >> $@
-	@echo $(DL)#define HAVE_PF_INET6 1$(DL) >> $@
-	@echo $(DL)#define HAVE_FREEADDRINFO 1$(DL) >> $@
-	@echo $(DL)#define HAVE_GETADDRINFO 1$(DL) >> $@
-	@echo $(DL)#define HAVE_SOCKADDR_IN6_SIN6_SCOPE_ID 1$(DL) >> $@
-	@echo $(DL)#define HAVE_STRUCT_IN6_ADDR 1$(DL) >> $@
-	@echo $(DL)#define HAVE_STRUCT_SOCKADDR_IN6 1$(DL) >> $@
-	@echo $(DL)#define RECV_TYPE_ARG1 int$(DL) >> $@
-	@echo $(DL)#define RECV_TYPE_ARG2 void *$(DL) >> $@
-	@echo $(DL)#define RECV_TYPE_ARG3 size_t$(DL) >> $@
-	@echo $(DL)#define RECV_TYPE_ARG4 int$(DL) >> $@
-	@echo $(DL)#define RECV_TYPE_RETV ssize_t$(DL) >> $@
-	@echo $(DL)#define RECVFROM_TYPE_ARG1 int$(DL) >> $@
-	@echo $(DL)#define RECVFROM_TYPE_ARG2 void$(DL) >> $@
-	@echo $(DL)#define RECVFROM_TYPE_ARG3 size_t$(DL) >> $@
-	@echo $(DL)#define RECVFROM_TYPE_ARG4 int$(DL) >> $@
-	@echo $(DL)#define RECVFROM_TYPE_ARG5 struct sockaddr$(DL) >> $@
-	@echo $(DL)#define RECVFROM_TYPE_ARG6 size_t$(DL) >> $@
-	@echo $(DL)#define RECVFROM_TYPE_RETV ssize_t$(DL) >> $@
-	@echo $(DL)#define RECVFROM_TYPE_ARG2_IS_VOID 1$(DL) >> $@
-	@echo $(DL)#define SEND_QUAL_ARG2$(DL) >> $@
-	@echo $(DL)#define SEND_TYPE_ARG1 int$(DL) >> $@
-	@echo $(DL)#define SEND_TYPE_ARG2 void *$(DL) >> $@
-	@echo $(DL)#define SEND_TYPE_ARG3 size_t$(DL) >> $@
-	@echo $(DL)#define SEND_TYPE_ARG4 int$(DL) >> $@
-	@echo $(DL)#define SEND_TYPE_RETV ssize_t$(DL) >> $@
-	@echo $(DL)#define SIZEOF_STRUCT_IN6_ADDR 16$(DL) >> $@
-	@echo $(DL)#define SIZEOF_OFF_T 8$(DL) >> $@
-	@echo $(DL)#define _LARGEFILE 1$(DL) >> $@
-ifdef ENABLE_IPV6
-	@echo $(DL)#define ENABLE_IPV6 1$(DL) >> $@
-endif
-endif
-	@echo $(DL)#define USE_MANUAL 1$(DL) >> $@
-	@echo $(DL)#define HAVE_ARPA_INET_H 1$(DL) >> $@
-	@echo $(DL)#define HAVE_ASSERT_H 1$(DL) >> $@
-	@echo $(DL)#define HAVE_ERR_H 1$(DL) >> $@
-	@echo $(DL)#define HAVE_FCNTL_H 1$(DL) >> $@
-	@echo $(DL)#define HAVE_GETHOSTBYADDR 1$(DL) >> $@
-	@echo $(DL)#define HAVE_GETHOSTBYNAME 1$(DL) >> $@
-	@echo $(DL)#define HAVE_GETPROTOBYNAME 1$(DL) >> $@
-	@echo $(DL)#define HAVE_GMTIME_R 1$(DL) >> $@
-	@echo $(DL)#define HAVE_INET_ADDR 1$(DL) >> $@
-	@echo $(DL)#define HAVE_IOCTL 1$(DL) >> $@
-	@echo $(DL)#define HAVE_IOCTL_FIONBIO 1$(DL) >> $@
-	@echo $(DL)#define HAVE_LL 1$(DL) >> $@
-	@echo $(DL)#define HAVE_LOCALE_H 1$(DL) >> $@
-	@echo $(DL)#define HAVE_LOCALTIME_R 1$(DL) >> $@
-	@echo $(DL)#define HAVE_MALLOC_H 1$(DL) >> $@
-	@echo $(DL)#define HAVE_NETINET_IN_H 1$(DL) >> $@
-	@echo $(DL)#define HAVE_RECV 1$(DL) >> $@
-	@echo $(DL)#define HAVE_RECVFROM 1$(DL) >> $@
-	@echo $(DL)#define HAVE_SELECT 1$(DL) >> $@
-	@echo $(DL)#define HAVE_SEND 1$(DL) >> $@
-	@echo $(DL)#define HAVE_SETJMP_H 1$(DL) >> $@
-	@echo $(DL)#define HAVE_SETLOCALE 1$(DL) >> $@
-	@echo $(DL)#define HAVE_SIGNAL 1$(DL) >> $@
-	@echo $(DL)#define HAVE_SIGNAL_H 1$(DL) >> $@
-	@echo $(DL)#define HAVE_SIG_ATOMIC_T 1$(DL) >> $@
-	@echo $(DL)#define HAVE_SOCKET 1$(DL) >> $@
-	@echo $(DL)#define HAVE_STDLIB_H 1$(DL) >> $@
-	@echo $(DL)#define HAVE_STRDUP 1$(DL) >> $@
-	@echo $(DL)#define HAVE_STRFTIME 1$(DL) >> $@
-	@echo $(DL)#define HAVE_STRING_H 1$(DL) >> $@
-	@echo $(DL)#define HAVE_STRSTR 1$(DL) >> $@
-	@echo $(DL)#define HAVE_STRUCT_ADDRINFO 1$(DL) >> $@
-	@echo $(DL)#define HAVE_STRUCT_TIMEVAL 1$(DL) >> $@
-	@echo $(DL)#define HAVE_SYS_IOCTL_H 1$(DL) >> $@
-	@echo $(DL)#define HAVE_SYS_STAT_H 1$(DL) >> $@
-	@echo $(DL)#define HAVE_SYS_TIME_H 1$(DL) >> $@
-	@echo $(DL)#define HAVE_TIME_H 1$(DL) >> $@
-	@echo $(DL)#define HAVE_UNAME 1$(DL) >> $@
-	@echo $(DL)#define HAVE_UNISTD_H 1$(DL) >> $@
-	@echo $(DL)#define HAVE_UTIME 1$(DL) >> $@
-	@echo $(DL)#define HAVE_UTIME_H 1$(DL) >> $@
-	@echo $(DL)#define HAVE_WRITEV 1$(DL) >> $@
-	@echo $(DL)#define RETSIGTYPE void$(DL) >> $@
-	@echo $(DL)#define SIZEOF_STRUCT_IN_ADDR 4$(DL) >> $@
-	@echo $(DL)#define STDC_HEADERS 1$(DL) >> $@
-	@echo $(DL)#define TIME_WITH_SYS_TIME 1$(DL) >> $@
-ifdef DISABLE_LDAP
-	@echo $(DL)#define CURL_DISABLE_LDAP 1$(DL) >> $@
-else
-	@echo $(DL)#define CURL_HAS_NOVELL_LDAPSDK 1$(DL) >> $@
-ifndef DISABLE_LDAPS
-	@echo $(DL)#define HAVE_LDAP_SSL 1$(DL) >> $@
-endif
-	@echo $(DL)#define HAVE_LDAP_SSL_H 1$(DL) >> $@
-	@echo $(DL)#define HAVE_LDAP_URL_PARSE 1$(DL) >> $@
-endif
-ifdef NW_WINSOCK
-	@echo $(DL)#define HAVE_CLOSESOCKET 1$(DL) >> $@
-else
-	@echo $(DL)#define USE_BSD_SOCKETS 1$(DL) >> $@
-	@echo $(DL)#define HAVE_SYS_TYPES_H 1$(DL) >> $@
-	@echo $(DL)#define HAVE_SYS_SOCKET_H 1$(DL) >> $@
-	@echo $(DL)#define HAVE_SYS_SOCKIO_H 1$(DL) >> $@
-	@echo $(DL)#define HAVE_NETDB_H 1$(DL) >> $@
-endif
-ifdef WITH_ARES
-	@echo $(DL)#define USE_ARES 1$(DL) >> $@
-endif
-ifdef WITH_ZLIB
-	@echo $(DL)#define HAVE_ZLIB_H 1$(DL) >> $@
-	@echo $(DL)#define HAVE_LIBZ 1$(DL) >> $@
-endif
-ifdef WITH_SSL
-	@echo $(DL)#define USE_SSLEAY 1$(DL) >> $@
-	@echo $(DL)#define USE_OPENSSL 1$(DL) >> $@
-	@echo $(DL)#define HAVE_OPENSSL_X509_H 1$(DL) >> $@
-	@echo $(DL)#define HAVE_OPENSSL_SSL_H 1$(DL) >> $@
-	@echo $(DL)#define HAVE_OPENSSL_RSA_H 1$(DL) >> $@
-	@echo $(DL)#define HAVE_OPENSSL_PEM_H 1$(DL) >> $@
-	@echo $(DL)#define HAVE_OPENSSL_ERR_H 1$(DL) >> $@
-	@echo $(DL)#define HAVE_OPENSSL_CRYPTO_H 1$(DL) >> $@
-	@echo $(DL)#define HAVE_OPENSSL_ENGINE_H 1$(DL) >> $@
-	@echo $(DL)#define HAVE_LIBSSL 1$(DL) >> $@
-	@echo $(DL)#define HAVE_LIBCRYPTO 1$(DL) >> $@
-	@echo $(DL)#define OPENSSL_NO_KRB5 1$(DL) >> $@
-endif
-ifdef WITH_SSH2
-	@echo $(DL)#define USE_LIBSSH2 1$(DL) >> $@
-	@echo $(DL)#define HAVE_LIBSSH2_H 1$(DL) >> $@
-endif
-ifdef WITH_IDN
-	@echo $(DL)#define HAVE_LIBIDN 1$(DL) >> $@
-	@echo $(DL)#define HAVE_TLD_H 1$(DL) >> $@
-endif
-	@echo $(DL)#ifdef __GNUC__$(DL) >> $@
-	@echo $(DL)#define HAVE_VARIADIC_MACROS_GCC 1$(DL) >> $@
-	@echo $(DL)#else$(DL) >> $@
-	@echo $(DL)#define HAVE_VARIADIC_MACROS_C99 1$(DL) >> $@
-	@echo $(DL)#endif$(DL) >> $@
-ifdef OLD_NOVELLSDK
-	@echo $(DL)#define socklen_t int$(DL) >> $@
-endif
-ifdef CABUNDLE
-	@echo $(DL)#define CURL_CA_BUNDLE "$(CABUNDLE)"$(DL) >> $@
-else
-	@echo $(DL)#define CURL_CA_BUNDLE getenv("CURL_CA_BUNDLE")$(DL) >> $@
-endif
+	@$(CP) tool_hugehelp.c.cvs $@
 
-hugehelp.c:
-	@echo Creating $@
-	@$(CP) hugehelp.c.cvs $@
-
-$(ARES_LIB)/libcares.$(LIBEXT):
-	$(MAKE) -C $(ARES_LIB) -f Makefile.netware lib
+$(LIBCARES_PATH)/libcares.$(LIBEXT):
+	$(MAKE) -C $(LIBCARES_PATH) -f Makefile.netware lib
 
 

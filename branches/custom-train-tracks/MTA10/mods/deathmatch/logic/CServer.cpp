@@ -78,7 +78,7 @@ void CServer::DoPulse ( void )
         {
             // Loop through our output queue and echo it to console
             std::list < std::string >::const_iterator iter = m_OutputQueue.begin ();
-            for ( ; iter != m_OutputQueue.end (); iter++ )
+            for ( ; iter != m_OutputQueue.end (); ++iter )
             {
                 // Echo it
                 const char* szString = iter->c_str ();
@@ -118,7 +118,7 @@ bool CServer::Start ( const char* szConfig )
         m_strConfig = szConfig;
 
         // Check that the DLL exists
-        if ( !DoesFileExist ( m_strDLLFile ) )
+        if ( !FileExists ( m_strDLLFile ) )
         {
             g_pCore->GetConsole ()->Printf ( "Unable to find: '%s'", m_strDLLFile.c_str () );
             return false;

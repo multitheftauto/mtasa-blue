@@ -36,6 +36,8 @@ DECLARE_ENUM( eWeaponState );
 DECLARE_ENUM( eWeaponFlags );
 DECLARE_ENUM( eVehicleComponent );
 DECLARE_ENUM( eFontType );
+DECLARE_ENUM( eAudioLookupIndex );
+DECLARE_ENUM( eAspectRatio );
 
 enum eDXHorizontalAlign
 {
@@ -225,3 +227,4 @@ void MixedReadGuiFontString ( CScriptArgReader& argStream, SString& strFontName,
 void MixedReadMaterialString ( CScriptArgReader& argStream, CClientMaterial*& pMaterialElement );
 bool ReadMatrix ( lua_State* luaVM, uint uiArgIndex, CMatrix& outMatrix );
 void MinClientReqCheck ( CScriptArgReader& argStream, const char* szVersionReq, const char* szReason );
+void ReadPregFlags( CScriptArgReader& argStream, pcrecpp::RE_Options& pOptions );

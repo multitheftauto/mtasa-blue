@@ -59,6 +59,7 @@
 #include "CPedSA.h"
 #include "CPedSoundSA.h"
 #include "CAudioEngineSA.h"
+#include "CAudioContainerSA.h"
 #include "CPlayerInfoSA.h"
 #include "CPopulationSA.h"
 #include "CSettingsSA.h"

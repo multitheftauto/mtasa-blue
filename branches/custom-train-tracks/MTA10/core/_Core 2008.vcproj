@@ -1548,6 +1548,10 @@
 						>
 					</File>
 					<File
+						RelativePath="..\..\MTA10\sdk\game\CAudioContainer.h"
+						>
+					</File>
+					<File
 						RelativePath="..\..\MTA10\sdk\game\CAutomobile.h"
 						>
 					</File>
@@ -2162,6 +2166,10 @@
 				</File>
 				<File
 					RelativePath="..\..\Shared\sdk\SharedUtil.Time.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Shared\sdk\SharedUtil.Win32Utf8FileHooks.hpp"
 					>
 				</File>
 				<File

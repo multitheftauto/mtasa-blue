@@ -373,7 +373,10 @@ CClientEntity* CLuaArgument::GetElement ( void ) const
 
 void CLuaArgument::Push ( lua_State* luaVM, CFastHashMap < CLuaArguments*, int > * pKnownTables ) const
 {
-    // Got any type?
+    // WARNING:
+    // Stuff using this function is kinda unsafe, we expect
+    // it to successfully push something, when it actually may not,
+    // corrupting the Lua stack
     if ( m_iType != LUA_TNONE )
     {
         // Make sure the stack has enough room
@@ -395,6 +398,7 @@ void CLuaArgument::Push ( lua_State* luaVM, CFastHashMap < CLuaArguments*, int >
             }
 
             case LUA_TUSERDATA:
+            case LUA_TLIGHTUSERDATA:
             {
                 lua_pushuserdata ( luaVM, m_pUserData );
                 break;
@@ -466,9 +470,11 @@ bool CLuaArgument::ReadFromBitStream ( NetBitStreamInterface& bitStream, std::ve
                 bool bIsFloatingPoint;
                 if ( bitStream.ReadBit ( bIsFloatingPoint ) && bIsFloatingPoint )
                 {
+                    // Should be in high precision mode
+                    dassert( g_pClientGame->IsHighFloatPrecision() );
                     float fNum;
                     if ( bitStream.Read ( fNum ) )
-                        ReadNumber ( fNum );
+                        ReadNumber ( RoundFromFloatSource( fNum ) );
                 }
                 else
                 {
@@ -1022,7 +1028,7 @@ bool CLuaArgument::ReadFromJSONObject ( json_object* object, std::vector < CLuaA
                         case 'T':   // Table reference
                         {
                             unsigned long ulTableID = static_cast < unsigned long > ( atol ( szString + 3 ) );
-                            if ( pKnownTables && ulTableID >= 0 && ulTableID < pKnownTables->size () )
+                            if ( pKnownTables && ulTableID < pKnownTables->size () )
                             {
                                 m_pTableData = pKnownTables->at ( ulTableID );
                                 m_bWeakTableRef = true;

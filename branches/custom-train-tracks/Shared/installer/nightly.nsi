@@ -87,7 +87,7 @@ Var ShowLastUsed
     !endif
     !define VI_PRODUCT_NAME "MTA San Andreas"
     !define VI_COMPANY_NAME "Multi Theft Auto"
-    !define VI_LEGAL_COPYRIGHT "(C) 2003 - 2013 Multi Theft Auto"
+    !define VI_LEGAL_COPYRIGHT "(C) 2003 - 2014 Multi Theft Auto"
     !ifndef LIGHTBUILD
         !define VI_FILE_DESCRIPTION "Multi Theft Auto Full Installer"
     !else
@@ -464,7 +464,23 @@ DontInstallRedist:
             DetailPrint "$(INFO_UPDATE_PERMISSIONS)"
 
             # Fix permissions for MTA install directory
-            FastPerms::FullAccessPlox "$INSTDIR"
+            StrCpy $0 "$PROGRAMFILES\M"
+            StrLen $2 $0
+            StrCpy $1 "$INSTDIR" $2
+            ${If} $0 == $1
+                FastPerms::FullAccessPlox "$INSTDIR"
+            ${Else}
+                # More conservative permissions blat if install directory it too different from default
+                CreateDirectory "$INSTDIR\mods"
+                CreateDirectory "$INSTDIR\screenshots"
+                CreateDirectory "$INSTDIR\server"
+                CreateDirectory "$INSTDIR\skins"
+                FastPerms::FullAccessPlox "$INSTDIR\mods"
+                FastPerms::FullAccessPlox "$INSTDIR\MTA"
+                FastPerms::FullAccessPlox "$INSTDIR\screenshots"
+                FastPerms::FullAccessPlox "$INSTDIR\server"
+                FastPerms::FullAccessPlox "$INSTDIR\skins"
+            ${EndIf}
             FastPerms::FullAccessPlox "$APPDATA\MTA San Andreas All"
 
             # Remove MTA virtual store
@@ -559,8 +575,13 @@ DontInstallRedist:
         File "${FILES_ROOT}\MTA San Andreas\mta\tags.dll"
 		File "${SERVER_FILES_ROOT}\pthreadVC2.dll"
         File "${FILES_ROOT}\MTA San Andreas\mta\XInput9_1_0_mta.dll"
+        File "${FILES_ROOT}\MTA San Andreas\mta\vea.dll"
+        File "${FILES_ROOT}\MTA San Andreas\mta\vog.dll"
+        File "${FILES_ROOT}\MTA San Andreas\mta\vvo.dll"
+        File "${FILES_ROOT}\MTA San Andreas\mta\vvof.dll"
         SetOutPath "$INSTDIR\MTA\cgui\images"
         File "${FILES_ROOT}\MTA San Andreas\mta\cgui\images\busy_spinner.png"
+
 
 		${If} "$(LANGUAGE_CODE)" != ""
 			# Write our language to registry
@@ -653,7 +674,7 @@ DontInstallRedist:
 		SectionIn 1 RO
 		SetOutPath "$INSTDIR\mods\deathmatch"
 		File "${FILES_ROOT}\MTA San Andreas\mods\deathmatch\Client.dll"
-		File "${SERVER_FILES_ROOT}\mods\deathmatch\lua5.1.dll"
+		File "${FILES_ROOT}\MTA San Andreas\mods\deathmatch\lua5.1c.dll"
 		File "${SERVER_FILES_ROOT}\mods\deathmatch\pcre3.dll"
 		SetOutPath "$INSTDIR\mods\deathmatch\resources"
 	SectionEnd
@@ -687,7 +708,6 @@ SectionGroup /e "$(INST_SEC_SERVER)" SECGSERVER
 		File "${SERVER_FILES_ROOT}\mods\deathmatch\deathmatch.dll"
 		File "${SERVER_FILES_ROOT}\mods\deathmatch\lua5.1.dll"
 		File "${SERVER_FILES_ROOT}\mods\deathmatch\pcre3.dll"
-		File "${SERVER_FILES_ROOT}\mods\deathmatch\sqlite3.dll"
 		File "${SERVER_FILES_ROOT}\mods\deathmatch\dbconmy.dll"
 		!ifndef LIGHTBUILD
             File "${SERVER_FILES_ROOT}\mods\deathmatch\libmysql.dll"
@@ -885,10 +905,14 @@ FunctionEnd
 
  
 LangString UNINST_REQUEST ${LANG_ENGLISH}	"Are you sure you want to completely remove $(^Name) and all of its components?"
+LangString UNINST_REQUEST_NOTE ${LANG_ENGLISH}	"Uninstalling before update?\
+$\r$\nIt is not necessary to uninstall before installing a new version of MTA:SA\
+$\r$\nRun the new installer to upgrade and preserve your settings."
+
 Function un.onInit
 	Call un.DoRightsElevation
 	SetShellVarContext all
-		MessageBox MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2 "$(UNINST_REQUEST)" IDYES +2
+		MessageBox MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2 "$(UNINST_REQUEST_NOTE)$\r$\n$\r$\n$\r$\n$(UNINST_REQUEST)" IDYES +2
 		Abort
 		
 	!insertmacro MUI_UNGETLANGUAGE
@@ -940,6 +964,8 @@ Section Uninstall
 	Delete "$INSTDIR\Uninstall.exe"
 
 	Delete "$INSTDIR\mods\deathmatch\Client.dll"
+	Delete "$INSTDIR\mods\deathmatch\lua5.1c.dll"
+	Delete "$INSTDIR\mods\deathmatch\pcre3.dll"
 
 	RmDir /r "$INSTDIR\MTA\cgui"
 	RmDir /r "$INSTDIR\MTA\data"

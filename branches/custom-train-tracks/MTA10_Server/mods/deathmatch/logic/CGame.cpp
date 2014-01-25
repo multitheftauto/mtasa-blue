@@ -21,6 +21,9 @@
 
 #include "StdInc.h"
 #include "../utils/COpenPortsTester.h"
+#include "../utils/CMasterServerAnnouncer.h"
+#include "../utils/CHqComms.h"
+#include "../utils/CFunctionUseLogger.h"
 #include "net/SimHeaders.h"
 #include <signal.h>
 
@@ -33,6 +36,7 @@
 #define VEH_EXTRAPOLATION_MIN_CLIENT_VERSION    "1.3.0-9.04460"
 #define ALT_PULSE_ORDER_MIN_CLIENT_VERSION      "1.3.1-9.04913"
 #define HIT_ANIM_CLIENT_VERSION                 "1.3.2"
+#define SNIPER_BULLET_SYNC_MIN_CLIENT_VERSION   "1.3.4-9.06040"
 
 CGame* g_pGame = NULL;
 
@@ -141,6 +145,7 @@ CGame::CGame ( void )
     m_pWeaponStatsManager = NULL;
     m_pBuildingRemovalManager = NULL;
     m_pCustomWeaponManager = NULL;
+    m_pFunctionUseLogger = NULL;
     m_pTrainTrackManager = NULL;
 #ifdef WITH_OBJECT_SYNC
     m_pObjectSync = NULL;
@@ -187,8 +192,6 @@ CGame::CGame ( void )
 
     m_bCloudsEnabled = true;
 
-    m_llLastAnnounceTime = 0;
-    m_llLastPushTime = 0;
     m_pOpenPortsTester = NULL;
 
     m_bTrafficLightsLocked = false;
@@ -270,9 +273,9 @@ CGame::~CGame ( void )
     SAFE_DELETE ( m_pObjectSync );
 #endif
     SAFE_DELETE ( m_pConsole );
+    SAFE_DELETE ( m_pLuaManager );
     SAFE_DELETE ( m_pMapManager );
     SAFE_DELETE ( m_pRemoteCalls );
-    SAFE_DELETE ( m_pLuaManager );
     SAFE_DELETE ( m_pPacketTranslator );
     SAFE_DELETE ( m_pMarkerManager );
     SAFE_DELETE ( m_pRadarAreaManager );
@@ -298,6 +301,7 @@ CGame::~CGame ( void )
     SAFE_DELETE ( m_pRegisteredCommands );
     SAFE_DELETE ( m_pPedManager );
     SAFE_DELETE ( m_pLatentTransferManager );
+    SAFE_DELETE ( m_pDebugHookManager );
     SAFE_DELETE ( m_pHTTPD );
     SAFE_DELETE ( m_pACLManager );
     SAFE_DELETE ( m_pGroups );
@@ -309,8 +313,11 @@ CGame::~CGame ( void )
     SAFE_DELETE ( m_pWeaponStatsManager );
     SAFE_DELETE ( m_pBuildingRemovalManager );
     SAFE_DELETE ( m_pCustomWeaponManager );
+    SAFE_DELETE ( m_pFunctionUseLogger );
     SAFE_DELETE ( m_pTrainTrackManager );
     SAFE_DELETE ( m_pOpenPortsTester );
+    SAFE_DELETE ( m_pMasterServerAnnouncer );
+    SAFE_RELEASE ( m_pHqComms );
     CSimControl::Shutdown ();
 
     // Clear our global pointer
@@ -452,11 +459,13 @@ void CGame::DoPulse ( void )
 
     CLOCK_CALL1( CPerfStatManager::GetSingleton ()->DoPulse (); );
 
-    PulseMasterServerAnnounce ();
+    if ( m_pMasterServerAnnouncer )
+        m_pMasterServerAnnouncer->Pulse ();
 
-    if ( m_pOpenPortsTester )
-        m_pOpenPortsTester->Poll ();
+    if ( m_pHqComms )
+        m_pHqComms->Pulse();
 
+    CLOCK_CALL1( m_pFunctionUseLogger->Pulse (); );
     CLOCK_CALL1( m_lightsyncManager.DoPulse (); );
 
     CLOCK_CALL1( m_pLatentTransferManager->DoPulse (); );
@@ -495,6 +504,7 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     m_pScriptDebugging = new CScriptDebugging ( m_pLuaManager );
     m_pMapManager = new CMapManager ( m_pBlipManager, m_pObjectManager, m_pPickupManager, m_pPlayerManager, m_pRadarAreaManager, m_pMarkerManager, m_pVehicleManager, m_pTeamManager, m_pPedManager, m_pColManager, m_pWaterManager, m_pClock, m_pLuaManager, m_pGroups, &m_Events, m_pScriptDebugging, &m_ElementDeleter );
     m_pACLManager = new CAccessControlListManager;
+    m_pHqComms = new CHqComms;
 
     m_pRegisteredCommands = new CRegisteredCommands ( m_pACLManager );
     m_pLuaManager = new CLuaManager ( m_pObjectManager, m_pPlayerManager, m_pVehicleManager, m_pBlipManager, m_pRadarAreaManager, m_pRegisteredCommands, m_pMapManager, &m_Events );
@@ -542,6 +552,21 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     // Encrypt crash dumps for uploading
     HandleCrashDumpEncryption();
 
+    // Check Windows server is using correctly compiled Lua dll
+    #ifndef MTA_DEBUG
+        #ifdef WIN32
+            HMODULE hModule = LoadLibrary( "lua5.1.dll" );
+            // Release server should not have this function
+            PVOID pFunc = static_cast < PVOID > ( GetProcAddress ( hModule, "luaX_is_apicheck_enabled" ) );
+            FreeLibrary( hModule );
+            if ( pFunc )
+            {
+                CLogger::ErrorPrintf( "Problem with Lua dll\n" );
+                return false;
+            }
+        #endif
+    #endif
+
     // Read some settings
     m_pACLManager->SetFileName ( m_pMainConfig->GetAccessControlListFile ().c_str () );
     const SString strServerIP = m_pMainConfig->GetServerIP ();
@@ -559,6 +584,7 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     // Create and start the HTTP server
     m_pHTTPD = new CHTTPD;
     m_pLatentTransferManager = new CLatentTransferManager ();
+    m_pDebugHookManager = new CDebugHookManager ();
 
     // Enable it if required
     if ( m_pMainConfig->IsHTTPEnabled () )
@@ -569,6 +595,8 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
             return false;
         }
     }
+
+    m_pFunctionUseLogger = new CFunctionUseLogger( m_pMainConfig->GetLoadstringLogFilename() );
 
     // Setup server id
     if ( !g_pNetServer->InitServerId ( m_pMainConfig->GetIdFile () ) )
@@ -645,7 +673,8 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
         CLogger::ErrorPrintf ( "Unable to save logfile to '%s'\n", m_pMainConfig->GetLogFile ().c_str () );
 
     // Check accounts database and print message if there is a problem
-    m_pAccountManager->IntegrityCheck ();
+    if ( !m_pAccountManager->IntegrityCheck () )
+        return false;
 
     // Setup resource-cache directory
     {
@@ -833,8 +862,8 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     if ( m_pMainConfig->GetSerialVerificationEnabled () )
         m_pASE->SetRuleValue ( "SerialVerification", "yes" );
     ApplyAseSetting ();
-    PulseMasterServerAnnounce ( true );
-
+    m_pMasterServerAnnouncer = new CMasterServerAnnouncer();
+    m_pMasterServerAnnouncer->Pulse();
 
     // Now load the rest of the config
     if ( !m_pMainConfig->LoadExtended () )
@@ -858,6 +887,9 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
         CLogger::LogPrintf ( "autoexec.conf file found! Executing...\n" );
         Autoexec.Run ();
     }
+
+    // Flush any pending master server announce messages
+    g_pNetServer->GetHTTPDownloadManager ( EDownloadMode::ASE )->ProcessQueuedFiles ();
 
     // Done
     // If you're ever going to change this message, update the "server ready" determination
@@ -896,111 +928,6 @@ void CGame::StartOpenPortsTest ( void )
 {
     if ( m_pOpenPortsTester )
         m_pOpenPortsTester->Start ();
-}
-
-
-// Remind master server once every 24 hrs
-void CGame::PulseMasterServerAnnounce ( bool bIsInitialAnnounce )
-{
-    long long llTickCountNow = GetTickCount64_ ();
-    bool bIsTimeForAnnounce = false;
-    bool bIsTimeForPush = false;
-
-    if ( m_pMainConfig->GetAseInternetListenEnabled() &&
-        ( bIsInitialAnnounce || m_llLastAnnounceTime == 0 || llTickCountNow - m_llLastAnnounceTime > 1000 * 60 * 60 * 24 ) )   // 24 hrs
-    {
-        bIsTimeForAnnounce = true;
-        m_llLastAnnounceTime = llTickCountNow;
-    }
-    else
-    if ( m_pMainConfig->GetAseInternetPushEnabled() &&
-        ( m_llLastPushTime == 0 || llTickCountNow - m_llLastPushTime > 1000 * 60 * 10 ) ) // 10 mins
-    {
-        bIsTimeForPush = true;
-        m_llLastPushTime = llTickCountNow;
-    }
-    else
-        return;
-
-
-    const SString strServerIP = m_pMainConfig->GetServerIP ();
-    unsigned short usServerPort = m_pMainConfig->GetServerPort ();
-    unsigned short usHTTPPort = m_pMainConfig->GetHTTPPort ();
-    uint uiPlayerCount = m_pPlayerManager->Count ();
-    uint uiMaxPlayerCount = m_pMainConfig->GetMaxPlayers();
-    bool bPassworded = m_pMainConfig->HasPassword ();
-    SString strAseMode = m_pMainConfig->GetSetting( "ase" );
-    bool bAseLanListen = m_pMainConfig->GetAseLanListenEnabled();
-
-    SString strVersion ( "%d.%d.%d-%d.%05d", MTASA_VERSION_MAJOR, MTASA_VERSION_MINOR, MTASA_VERSION_MAINTENANCE, MTASA_VERSION_TYPE, MTASA_VERSION_BUILD );
-    SString strExtra ( "%d_%d_%d_%s_%d", uiPlayerCount, uiMaxPlayerCount, bPassworded, *strAseMode, bAseLanListen );
-
-    struct {
-        SString strDesc;
-        SString strURL;
-        bool bAcceptsPush;
-        bool bDoReminders;
-    } masterServerList[] = {
-                             { "Querying game-monitor.com master server... ", SString ( QUERY_URL_GAME_MONITOR, usServerPort + 123 ), false, false },
-                             { "Querying backup master server... ", SString ( "h" "ttp://master.mtasa.com/ase/add.php?g=%u&a=%u&h=%u&v=%s&x=%s&ip=%s", usServerPort, usServerPort + 123, usHTTPPort, *strVersion, *strExtra, *strServerIP ), true, true },
-                           };
-
-    for ( uint i = 0 ; i < NUMELMS( masterServerList ) ; i++ )
-    {
-        const SString& strDesc = masterServerList[i].strDesc;
-        const SString& strURL = masterServerList[i].strURL;
-        bool bServerAcceptsPush = masterServerList[i].bAcceptsPush;
-        bool bServerAcceptsReminders = masterServerList[i].bDoReminders;
-
-        if ( bIsTimeForAnnounce )
-        {
-            // Only log on first pass
-            if ( bIsInitialAnnounce )
-                CLogger::LogPrint ( strDesc );
-
-            // Don't repeat announce for some servers
-            if ( !bIsInitialAnnounce && !bServerAcceptsReminders )
-                continue;
-
-            // Send request
-            CTCPImpl * pTCP = new CTCPImpl ();
-            pTCP->Initialize ();
-            CHTTPRequest * request = new CHTTPRequest ( strURL );
-            request->SetLocalIP ( strServerIP );
-            CHTTPResponse * response = request->Send ( pTCP );
-
-            // Only log on first pass
-            if ( bIsInitialAnnounce )
-            {
-                if ( !response )
-                    CLogger::LogPrintfNoStamp ( "failed! (Not available)\n" );
-                else if ( response->GetErrorCode () != 200 )
-                {
-                    if ( response->GetErrorCode () == 500 && strDesc.ContainsI ( "game-monitor" ) )
-                        CLogger::LogPrintfNoStamp ( "maybe!\n" );
-                    else
-                        CLogger::LogPrintfNoStamp ( "failed! (%u: %s)\n", response->GetErrorCode (), response->GetErrorDescription () );
-                }
-                else
-                    CLogger::LogPrintfNoStamp ( "success!\n");
-            }
-
-            if ( response )
-                delete response;
-            delete pTCP;
-            delete request;
-        }
-
-        // Send extra data if required
-        if ( bIsTimeForPush && bServerAcceptsPush )
-        {
-            SString strPostContent = m_pASE->QueryLight ();
-            bool bPostContentBinary = true;
-
-            CNetHTTPDownloadManagerInterface * downloadManager = g_pNetServer->GetHTTPDownloadManager ( EDownloadMode::ASE );
-            downloadManager->QueueFile ( strURL, NULL, 0, &strPostContent.at ( 0 ), strPostContent.length (), bPostContentBinary, NULL, NULL, false, 1 );
-        }
-    }
 }
 
 
@@ -1208,6 +1135,12 @@ bool CGame::ProcessPacket ( CPacket& Packet )
             return true;
         }
 
+        case PACKET_ID_PLAYER_NO_SOCKET:
+        {
+            Packet_PlayerNoSocket ( static_cast < CPlayerNoSocketPacket& > ( Packet ) );
+            return true;
+        }
+
         default:
             break;
     }
@@ -1333,7 +1266,7 @@ void CGame::InitialDataStream ( CPlayer& Player )
     iter = m_pPlayerManager->IterBegin ();
     for ( ; iter != m_pPlayerManager->IterEnd (); iter++ )
     {
-        if ( &Player != *iter && (*iter)->IsJoined () && (*iter)->IsSpawned () )
+        if ( &Player != *iter && (*iter)->IsJoined () )
         {
             CPlayerStatsPacket PlayerStats = *(*iter)->GetPlayerStatsPacket ( );
             PlayerStats.SetSourceElement ( *iter );
@@ -1658,12 +1591,15 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
             // Get the serial number from the packet source
             NetServerPlayerID p = Packet.GetSourceSocket ();
             SString strSerial;
+            SString strExtra;
             SString strPlayerVersion;
             {
                 SFixedString < 32 > strSerialTemp;
+                SFixedString < 64 > strExtraTemp;
                 SFixedString < 32 > strPlayerVersionTemp;
-                g_pNetServer->GetClientSerialAndVersion ( p, strSerialTemp, strPlayerVersionTemp );
+                g_pNetServer->GetClientSerialAndVersion ( p, strSerialTemp, strExtraTemp, strPlayerVersionTemp );
                 strSerial = SStringX ( strSerialTemp );
+                strExtra = SStringX ( strExtraTemp );
                 strPlayerVersion = SStringX ( strPlayerVersionTemp );
             }
 
@@ -1717,7 +1653,8 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
                                 pPlayer->SetGameVersion ( Packet.GetGameVersion () );
                                 pPlayer->SetMTAVersion ( Packet.GetMTAVersion () );
                                 pPlayer->SetSerialUser ( Packet.GetSerialUser () );
-                                pPlayer->SetSerial ( strSerial );
+                                pPlayer->SetSerial ( strSerial, 0 );
+                                pPlayer->SetSerial ( strExtra, 1 );
                                 pPlayer->SetPlayerVersion ( strPlayerVersion );
 
                                 // Check if client must update
@@ -1896,21 +1833,14 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
         else
         {
             // Tell the console
-            CLogger::LogPrintf ( "CONNECT: %s failed to connect (Player Element Could not be created.)\n", pPlayer->GetSourceIP () );
-
-            // Tell the console
-            CLogger::LogPrint ( "URGENT: Report this error on bugs.mtasa.com error code: 6930-2\n" );
-
-            // Tell the player the problem
-            DisconnectPlayer ( this, *pPlayer, CPlayerDisconnectedPacket::ELEMENT_FAILURE );
+            CLogger::LogPrintf ( "CONNECT: %s failed to connect (Player Element Could not be created.)\n", szNick );
         }
     }
 }
 
 void CGame::Packet_PedWasted ( CPedWastedPacket& Packet )
 {
-    CElement * pElement = ( Packet.m_PedID != INVALID_ELEMENT_ID ) ? CElementIDs::GetElement ( Packet.m_PedID ) : NULL;
-    CPed* pPed = static_cast < CPed* > ( pElement );
+    CPed* pPed = GetElementFromId < CPed > ( Packet.m_PedID );
     if ( pPed && !pPed->IsDead() )
     {
         pPed->SetIsDead ( true );
@@ -2452,6 +2382,8 @@ void CGame::Packet_CustomData ( CCustomDataPacket& Packet )
             BitStream.pBitStream->Write ( szName, usNameLength );
             Value.WriteToBitStream ( *BitStream.pBitStream );
             m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pElement, SET_ELEMENT_DATA, *BitStream.pBitStream ), pSourcePlayer );
+
+            CPerfStatEventPacketUsage::GetSingleton ()->UpdateElementDataUsageRelayed ( szName, m_pPlayerManager->Count(), BitStream.pBitStream->GetNumberOfBytesUsed() );
         }
     }
 }
@@ -2710,6 +2642,11 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
                                         {
                                             unsigned char ucSeat = Packet.GetSeat ();
                                             unsigned char ucDoor = Packet.GetDoor();
+
+                                            // Temp fix: Disable driver seat for train carriages since the whole vehicle sync logic is based on the the player on the first seat being the vehicle syncer (Todo)
+                                            if ( pVehicle->GetVehicleType () == VEHICLE_TRAIN && ucSeat == 0 && pVehicle->GetTowedByVehicle () )
+                                                ucSeat++;
+
                                             // Going for driver?
                                             if ( ucSeat == 0 )
                                             {
@@ -3574,10 +3511,8 @@ void CGame::Packet_CameraSync ( CCameraSyncPacket & Packet )
         }
         else
         {
-            CElement * pTarget = CElementIDs::GetElement ( Packet.m_TargetID );
-
-            // Pre r4481 client could send incorrect element
-            if ( dynamic_cast < CPlayer* > ( pTarget ) == NULL )
+            CPlayer* pTarget = GetElementFromId < CPlayer > ( Packet.m_TargetID );
+            if ( !pTarget )
                 pTarget = pPlayer;
 
             pCamera->SetMode ( CAMERAMODE_PLAYER );
@@ -3634,23 +3569,23 @@ void CGame::Packet_PlayerScreenShot ( CPlayerScreenShotPacket & Packet )
     CPlayer* pPlayer = Packet.GetSourcePlayer ();
     if ( pPlayer && pPlayer->IsJoined () )
     {
-        if ( Packet.m_ucStatus != 1 )
+        if ( Packet.m_ucStatus != EPlayerScreenShotResult::SUCCESS )
         {
-            // disabled or minimized
-            CResource* pResource = g_pGame->GetResourceManager ()->GetResource ( Packet.m_strResourceName );
-            if ( pResource )
+            // disabled, minimized or error
+            if ( Packet.m_pResource )
             {
                 CLuaArguments Arguments;
-                Arguments.PushResource ( pResource );
-                Arguments.PushString ( Packet.m_ucStatus == 2 ? "minimized" : "disabled" );
+                Arguments.PushResource ( Packet.m_pResource );
+                Arguments.PushString ( EnumToString( (EPlayerScreenShotResultType)Packet.m_ucStatus ) );
                 Arguments.PushBoolean ( false );
                 Arguments.PushNumber ( static_cast < double > ( Packet.m_llServerGrabTime ) );
                 Arguments.PushString ( Packet.m_strTag );
+                Arguments.PushString ( Packet.m_strError );
                 pPlayer->CallEvent ( "onPlayerScreenShot", Arguments );
             }
         }
         else
-        if ( Packet.m_ucStatus == 1 )
+        if ( Packet.m_ucStatus == EPlayerScreenShotResult::SUCCESS )
         {
             // Get in-progress info
             SScreenShotInfo& info = pPlayer->GetScreenShotInfo ();
@@ -3674,7 +3609,7 @@ void CGame::Packet_PlayerScreenShot ( CPlayerScreenShotPacket & Packet )
                     info.llTimeStamp = Packet.m_llServerGrabTime;
                     info.uiTotalBytes = Packet.m_uiTotalBytes;
                     info.usTotalParts = Packet.m_usTotalParts;
-                    info.strResourceName = Packet.m_strResourceName;
+                    info.usResourceNetId = Packet.m_pResource ? Packet.m_pResource->GetNetID() : INVALID_RESOURCE_NET_ID;
                     info.strTag = Packet.m_strTag;
                 }
             }
@@ -3688,7 +3623,7 @@ void CGame::Packet_PlayerScreenShot ( CPlayerScreenShotPacket & Packet )
                 // Finished?
                 if ( info.usNextPartNumber == info.usTotalParts )
                 {
-                    CResource* pResource = g_pGame->GetResourceManager ()->GetResource ( info.strResourceName );
+                    CResource* pResource = g_pGame->GetResourceManager ()->GetResourceFromNetID ( info.usResourceNetId );
                     if ( pResource && info.uiTotalBytes == info.buffer.GetSize () )
                     {
                         CLuaArguments Arguments;
@@ -3707,6 +3642,23 @@ void CGame::Packet_PlayerScreenShot ( CPlayerScreenShotPacket & Packet )
         }
     }
 }
+
+
+void CGame::Packet_PlayerNoSocket ( CPlayerNoSocketPacket & Packet )
+{
+    CPlayer* pPlayer = Packet.GetSourcePlayer ();
+    if ( pPlayer )
+    {
+        // If we are getting 'no socket' warnings from the network layer, and sync has not been received for ages, assume some sort of problem and quit the player
+        if ( pPlayer->GetTimeSinceReceivedSync() > 20000 )
+        {
+            CLogger::LogPrintf ( "INFO: Dead connection detected for %s\n", pPlayer->GetNick() );
+            pPlayer->Send ( CPlayerDisconnectedPacket ( CPlayerDisconnectedPacket::KICK, "Worrying message" ) );
+            g_pGame->QuitPlayer ( *pPlayer, CClient::QUIT_TIMEOUT );
+        }
+    }
+}
+
 
 void CGame::Packet_PlayerModInfo ( CPlayerModInfoPacket & Packet )
 {
@@ -3928,6 +3880,8 @@ void CGame::HandleBackup ( void )
             return;     // No backup required
     }
 
+    m_pMainConfig->NotifyDidBackup();
+
     // Make target file name
     tm* tmp = gmtime ( &secondsNow );
     char outstr[200] = { 0 };
@@ -4010,7 +3964,18 @@ void CGame::SendPacketBatchBegin ( unsigned char ucPacketId, NetBitStreamInterfa
 bool CGame::SendPacket ( unsigned char ucPacketID, const NetServerPlayerID& playerID, NetBitStreamInterface* pBitStream, bool bBroadcast, NetServerPacketPriority packetPriority, NetServerPacketReliability packetReliability, ePacketOrdering packetOrdering )
 {
     if ( !m_bLatentSendsEnabled )
+    {
+        if ( ucPacketID == PACKET_ID_LUA_ELEMENT_RPC )
+        {
+            // Get the RPC number in an ugly way
+            pBitStream->ResetReadPointer();
+            uchar ucRpcId = 0;
+            pBitStream->Read( ucRpcId );
+            pBitStream->ResetReadPointer();
+            CPerfStatRPCPacketUsage::GetSingleton ()->UpdatePacketUsageOut( ucRpcId, pBitStream->GetNumberOfBytesUsed() );
+        }
         return g_pNetServer->SendPacket ( ucPacketID, playerID, pBitStream, bBroadcast, packetPriority, packetReliability, packetOrdering );
+    }
     else
         GetLatentTransferManager ()->AddSend ( playerID, pBitStream->Version (), m_iLatentSendsBandwidth, m_pLatentSendsLuaMain, m_usLatentSendsResourceNetId );
     return true;
@@ -4060,7 +4025,7 @@ void CGame::SendSyncSettings ( CPlayer* pPlayer )
 
     if ( IsBulletSyncActive () )
     {
-        // List of weapons to enable bullet sync for. (Sniper rifle doesn't work and minigun causes too many packets)
+        // List of weapons to enable bullet sync for. (Minigun causes too many packets)
         eWeaponType weaponList[] = {    WEAPONTYPE_PISTOL,
                                         WEAPONTYPE_PISTOL_SILENCED,
                                         WEAPONTYPE_DESERT_EAGLE,
@@ -4076,6 +4041,10 @@ void CGame::SendSyncSettings ( CPlayer* pPlayer )
 
         for ( uint i = 0 ; i < NUMELMS( weaponList ) ; i++ )
             MapInsert ( weaponTypesUsingBulletSync, weaponList[i] );
+
+        // Add sniper if all clients can handle it
+        if ( ExtractVersionStringBuildNumber( m_pPlayerManager->GetLowestConnectedPlayerVersion() ) >= ExtractVersionStringBuildNumber( SNIPER_BULLET_SYNC_MIN_CLIENT_VERSION ) )
+            MapInsert ( weaponTypesUsingBulletSync, WEAPONTYPE_SNIPERRIFLE );
     }
 
     short sVehExtrapolateBaseMs = 5;
@@ -4127,6 +4096,7 @@ bool CGame::IsBelowRecommendedClient ( const SString& strVersion )
 //////////////////////////////////////////////////////////////////
 SString CGame::CalculateMinClientRequirement ( void )
 {
+    // Calc effective min client version
     SString strMinClientRequirementFromConfig = m_pMainConfig->GetMinClientVersion ();
     SString strMinClientRequirementFromResources = m_pResourceManager->GetMinClientRequirement ();
 
@@ -4159,6 +4129,7 @@ SString CGame::CalculateMinClientRequirement ( void )
             strNewMin = HIT_ANIM_CLIENT_VERSION;
     }
 
+    // Log effective min client version
     if ( strNewMin != m_strPrevMinClientConnectRequirement )
     {
         m_strPrevMinClientConnectRequirement = strNewMin;
@@ -4168,7 +4139,15 @@ SString CGame::CalculateMinClientRequirement ( void )
             CLogger::LogPrintf ( "Server minclientversion is now cleared\n" );
     }
 
-    // Do kick check as well
+    // Handle settings that change depending on the lowest connected player version
+    if ( m_strPrevLowestConnectedPlayerVersion != m_pPlayerManager->GetLowestConnectedPlayerVersion() )
+    {
+        m_strPrevLowestConnectedPlayerVersion = m_pPlayerManager->GetLowestConnectedPlayerVersion();
+        if ( IsBulletSyncActive () )
+            SendSyncSettings();   
+    }
+
+    // Do version based kick check as well
     {
         SString strKickMin;
 

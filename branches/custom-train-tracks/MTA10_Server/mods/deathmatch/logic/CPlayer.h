@@ -75,7 +75,7 @@ struct SScreenShotInfo
     long long   llTimeStamp;
     uint        uiTotalBytes;
     ushort      usTotalParts;
-    SString     strResourceName;
+    ushort      usResourceNetId;
     SString     strTag;
     CBuffer     buffer;
 };
@@ -111,7 +111,7 @@ public:
     inline void                                 SetMTAVersion               ( unsigned short usMTAVersion )         { m_usMTAVersion = usMTAVersion; };
     inline unsigned short                       GetBitStreamVersion         ( void )                                { return m_usBitStreamVersion; };
     inline void                                 SetBitStreamVersion         ( unsigned short usBitStreamVersion )   { m_usBitStreamVersion = usBitStreamVersion; };
-    void                                        SetPlayerVersion            ( const SString& strPlayerVersion )     { m_strPlayerVersion = strPlayerVersion; };
+    void                                        SetPlayerVersion            ( const SString& strPlayerVersion );
     const SString&                              GetPlayerVersion            ( void )                                { return m_strPlayerVersion; };
 
     inline bool                                 IsMuted                     ( void )                                { return m_bIsMuted; };
@@ -225,8 +225,8 @@ public:
     inline bool                                 IsNametagShowing            ( void )                        { return m_bNametagShowing; }
     inline void                                 SetNametagShowing           ( bool bShowing )               { m_bNametagShowing = bShowing; }
 
-    inline const std::string&                   GetSerial                   ( void )                        { return m_strSerial; }
-    inline void                                 SetSerial                   ( const std::string& strSerial ){ m_strSerial = strSerial; };
+    inline const std::string&                   GetSerial                   ( uint uiIndex = 0 )            { return m_strSerials[ uiIndex % NUMELMS( m_strSerials ) ]; }
+    inline void                                 SetSerial                   ( const std::string& strSerial, uint uiIndex ) { m_strSerials[ uiIndex % NUMELMS( m_strSerials ) ] = strSerial; }
 
     inline const std::string&                   GetSerialUser               ( void )                        { return m_strSerialUser; };
     inline void                                 SetSerialUser               ( const std::string& strUser )  { m_strSerialUser = strUser; };
@@ -245,8 +245,9 @@ public:
     inline void                                 IncrementPuresync           ( void )                        { m_uiPuresyncPackets++; }
     inline unsigned int                         GetPuresyncCount            ( void ) const                  { return m_uiPuresyncPackets; }
 
-    void                                        NotifyReceivedSync          ( void )                        { m_lastReceivedSyncTime = CTickCount::Now ( true ); }
-    bool                                        UhOhNetworkTrouble          ( void )                        { return ( CTickCount::Now ( true ) - m_lastReceivedSyncTime ).ToLongLong () > 5000; }
+    void                                        NotifyReceivedSync          ( void )                        { m_LastReceivedSyncTimer.Reset(); }
+    unsigned long long                          GetTimeSinceReceivedSync    ( void )                        { return m_LastReceivedSyncTimer.Get(); }
+    bool                                        UhOhNetworkTrouble          ( void )                        { return GetTimeSinceReceivedSync() > 5000; }
 
     const std::string&                          GetAnnounceValue            ( const std::string& strKey ) const;
     void                                        SetAnnounceValue            ( const std::string& strKey, const std::string& strValue );
@@ -417,7 +418,7 @@ private:
     unsigned char                               m_ucNametagB;
     bool                                        m_bNametagShowing;       
 
-    std::string                                 m_strSerial;
+    std::string                                 m_strSerials[ 2 ];
     std::string                                 m_strSerialUser;
     std::string                                 m_strCommunityID;
 
@@ -434,7 +435,7 @@ private:
     bool                                        m_bSyncingVelocity;
     unsigned int                                m_uiPuresyncPackets;
 
-    CTickCount                                  m_lastReceivedSyncTime;
+    CElapsedTime                                m_LastReceivedSyncTimer;
 
     std::map < std::string, std::string >       m_AnnounceValues;
 

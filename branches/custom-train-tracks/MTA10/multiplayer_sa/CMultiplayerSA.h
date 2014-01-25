@@ -52,7 +52,9 @@ public:
     void                        InitHooks_Weapons ( void );
     void                        InitHooks_Rendering ( void );
     void                        InitHooks_LicensePlate ( void );
+    void                        InitHooks_VehicleDamage ( void );
     void                        InitHooks_Direct3D ( void );
+    void                        InitHooks_FixLineOfSightArgs ( void );
     CRemoteDataStorage *        CreateRemoteDataStorage     ();
     void                        DestroyRemoteDataStorage    ( CRemoteDataStorage* pData );
     void                        AddRemoteDataStorage        ( CPlayerPed* pPed, CRemoteDataStorage* pData );
@@ -93,6 +95,7 @@ public:
     void                        SetBlendAnimationHandler    ( BlendAnimationHandler * pHandler );
     void                        SetProcessCollisionHandler  ( ProcessCollisionHandler * pHandler );
     void                        SetVehicleCollisionHandler  ( VehicleCollisionHandler * pHandler );
+    void                        SetVehicleDamageHandler     ( VehicleDamageHandler * pHandler );
     void                        SetHeliKillHandler          ( HeliKillHandler * pHandler );
     void                        SetObjectDamageHandler      ( ObjectDamageHandler * pHandler );
     void                        SetObjectBreakHandler       ( ObjectBreakHandler * pHandler );
@@ -100,6 +103,7 @@ public:
     void                        SetGameObjectDestructHandler    ( GameObjectDestructHandler * pHandler );
     void                        SetGameVehicleDestructHandler   ( GameVehicleDestructHandler * pHandler );
     void                        SetGamePlayerDestructHandler    ( GamePlayerDestructHandler * pHandler );
+    void                        SetGameProjectileDestructHandler( GameProjectileDestructHandler * pHandler );
     void                        SetGameModelRemoveHandler       ( GameModelRemoveHandler * pHandler );
     void                        SetGameEntityRenderHandler  ( GameEntityRenderHandler * pHandler );
 
@@ -158,6 +162,7 @@ public:
     void                        SetBulletFireHandler        ( BulletFireHandler* pHandler );
     void                        SetDrawRadarAreasHandler    ( DrawRadarAreasHandler * pRadarAreasHandler );
     void                        SetRender3DStuffHandler     ( Render3DStuffHandler * pHandler );
+    void                        SetPreRenderSkyHandler      ( PreRenderSkyHandler * pHandler );
 
     void                        Reset                       ();
 

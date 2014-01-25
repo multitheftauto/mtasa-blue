@@ -68,7 +68,7 @@ CMainConfig::CMainConfig ( CConsole* pConsole, CLuaManager* pLuaMain ): CXMLConf
     m_pCommandLineParser = NULL;
 
     m_usServerPort = 0;
-    m_uiMaxPlayers = 0;
+    m_uiHardMaxPlayers = 0;
     m_bHTTPEnabled = true;
     m_iAseMode = 0;
     m_iUpdateCycleDatagramsLimit = 10000;
@@ -169,8 +169,8 @@ bool CMainConfig::Load ( void )
     iResult = GetInteger ( m_pRootNode, "maxplayers", iTemp, 1, MAX_PLAYER_COUNT );
     if ( iResult == IS_SUCCESS )
     {
-        m_uiMaxPlayers = iTemp;
-        m_uiSoftMaxPlayers = m_uiMaxPlayers;
+        m_uiHardMaxPlayers = iTemp;
+        m_uiSoftMaxPlayers = iTemp;
     }
     else
     {
@@ -299,13 +299,14 @@ bool CMainConfig::Load ( void )
                 }
         }
 
-        // Add support for SD #12, #14, #15, #16, #20 and #22 (defaults to disabled)
+        // Add support for SD #12, #14, #15, #16, #20, #22 and #28 (defaults to disabled)
         MapInsert ( m_DisableComboACMap, "12" );
         MapInsert ( m_DisableComboACMap, "14" );
         MapInsert ( m_DisableComboACMap, "15" );
         MapInsert ( m_DisableComboACMap, "16" );
         MapInsert ( m_DisableComboACMap, "20" );
         MapInsert ( m_DisableComboACMap, "22" );
+        MapInsert ( m_DisableComboACMap, "28" );
 
         {
             SString strEnableSD;
@@ -422,6 +423,8 @@ bool CMainConfig::Load ( void )
     else
         m_strDbLogFilename = g_pServerInterface->GetModManager ()->GetAbsolutePath ( "logs/db.log" );
 
+    if ( GetString ( m_pRootNode, "loadstringfile", strBuffer, 1 ) == IS_SUCCESS )
+        m_strLoadstringLogFilename = g_pServerInterface->GetModManager ()->GetAbsolutePath ( strBuffer.c_str () );
 
     // Grab the server access control list
     if ( GetString ( m_pRootNode, "acl", strBuffer, 1, 255 ) == IS_SUCCESS )
@@ -757,7 +760,6 @@ bool CMainConfig::LoadExtended ( void )
     RegisterCommand ( "refreshall", CConsoleCommands::RefreshAllResources, false );
     RegisterCommand ( "list", CConsoleCommands::ListResources, false );
     RegisterCommand ( "info", CConsoleCommands::ResourceInfo, false );
-    RegisterCommand ( "install", CConsoleCommands::InstallResource, false );
     RegisterCommand ( "upgrade", CConsoleCommands::UpgradeResources, false );
     RegisterCommand ( "check", CConsoleCommands::CheckResources, false );
 
@@ -892,9 +894,17 @@ void CMainConfig::RegisterCommand ( const char* szName, FCommandHandler* pFuncti
 void CMainConfig::SetCommandLineParser ( CCommandLineParser* pCommandLineParser )
 {
     m_pCommandLineParser = pCommandLineParser;
+
+    // Adjust max player limits for command line arguments
+    uint uiMaxPlayers;
+    if ( m_pCommandLineParser && m_pCommandLineParser->GetMaxPlayers ( uiMaxPlayers ) )
+    {
+        m_uiHardMaxPlayers = Clamp < uint > ( 1, uiMaxPlayers, MAX_PLAYER_COUNT );
+        m_uiSoftMaxPlayers = uiMaxPlayers;
+    }
 }
 
-std::string CMainConfig::GetServerIP ( void )
+SString CMainConfig::GetServerIP ( void )
 {
     std::string strServerIP;
     if ( m_pCommandLineParser && m_pCommandLineParser->GetIP ( strServerIP ) )
@@ -920,10 +930,7 @@ unsigned short CMainConfig::GetServerPort ( void )
 
 unsigned int CMainConfig::GetHardMaxPlayers ( void )
 {
-    unsigned int uiMaxPlayers;
-    if ( m_pCommandLineParser && m_pCommandLineParser->GetMaxPlayers ( uiMaxPlayers ) )
-        return uiMaxPlayers;
-    return m_uiMaxPlayers;
+    return m_uiHardMaxPlayers;
 }
 
 unsigned int CMainConfig::GetMaxPlayers ( void )
@@ -978,6 +985,18 @@ int CMainConfig::GetNoWorkToDoSleepTime ( void )
         return 40;
     else
         return 10;
+}
+
+
+void CMainConfig::NotifyDidBackup( void )
+{
+    m_bDidBackup = true;
+}
+
+
+bool CMainConfig::ShouldCompactInternalDatabases( void )
+{
+    return ( m_iCompactInternalDatabases == 1 && m_bDidBackup ) || m_iCompactInternalDatabases == 2;
 }
 
 
@@ -1393,7 +1412,9 @@ const std::vector < SIntSetting >& CMainConfig::GetIntSettingList ( void )
             { true, true,   0,      1,      1,      "net_auto_filter",                      &m_bNetAutoFilter,                          &CMainConfig::ApplyNetOptions },
             { true, true,   1,      5,      100,    "update_cycle_datagrams_limit",         &m_iUpdateCycleDatagramsLimit,              &CMainConfig::ApplyNetOptions },
             { true, true,   50,     100,    400,    "ped_syncer_distance",                  &g_TickRateSettings.iPedSyncerDistance,     &CMainConfig::OnTickRateChange },
-            { true, true,   50,     100,    400,    "unoccupied_vehicle_syncer_distance",   &g_TickRateSettings.iUnoccupiedVehicleSyncerDistance,   &CMainConfig::OnTickRateChange },
+            { true, true,   50,     100,    10000,  "unoccupied_vehicle_syncer_distance",   &g_TickRateSettings.iUnoccupiedVehicleSyncerDistance,   &CMainConfig::OnTickRateChange },
+            { false, false, 0,      1,      2,      "compact_internal_databases",           &m_iCompactInternalDatabases,               NULL },
+            { true, true,   0,      1,      2,      "minclientversion_auto_update",         &m_iMinClientVersionAutoUpdate,             NULL },
         };
 
     static std::vector < SIntSetting > settingsList;

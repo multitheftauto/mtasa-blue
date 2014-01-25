@@ -199,8 +199,6 @@ inline float GetSmallestWrapUnsigned ( float fValue, float fHigh )
     return fWrapped;
 }
 
-bool            DoesFileExist               ( const char* szFilename );
-
 // Misc utility functions
 char*           ReplaceAnyStringOccurrence  ( char* szBuffer, const char* szWhat, const char* szWith, size_t sizeMax );
 unsigned int    StripUnwantedCharacters     ( char* szText, unsigned char cReplace = ' ' );
@@ -214,7 +212,7 @@ void            RaiseFatalError             ( unsigned int uiCode );
 void            RaiseProtocolError          ( unsigned int uiCode );
 
 void            RotateVector                ( CVector& vecLine, const CVector& vecRotation );
-void            AttachedMatrix              ( CMatrix & matrix, CMatrix & returnMatrix, CVector vecDirection, CVector vecRotation );
+void            AttachedMatrix              ( const CMatrix& matrix, CMatrix& returnMatrix, const CVector& vecPosition, const CVector& vecRotation );
 
 unsigned int    GetRandom                   ( unsigned int uiLow, unsigned int uiHigh );
 double          GetRandomDouble             ( void );

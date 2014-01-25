@@ -65,6 +65,9 @@ namespace SharedUtil
     //
     SString CalcMTASAPath ( const SString& strPath );
 
+    // Returns true if current process is GTA (i.e not MTA process)
+    bool IsGTAProcess ( void );
+
     //
     // Run ShellExecute with these parameters after exit
     //
@@ -84,6 +87,7 @@ namespace SharedUtil
     SString         GetReportLogContents            ( void );
     void            WriteDebugEvent                 ( const SString& strText );
     void            WriteErrorEvent                 ( const SString& strText );
+    void            BeginEventLog                   ( void );
     void            CycleEventLog                   ( void );
 
     void            SetApplicationSetting           ( const SString& strPath, const SString& strName, const SString& strValue );
@@ -91,11 +95,13 @@ namespace SharedUtil
     bool            RemoveApplicationSettingKey     ( const SString& strPath );
     void            SetApplicationSettingInt        ( const SString& strPath, const SString& strName, int iValue );
     int             GetApplicationSettingInt        ( const SString& strPath, const SString& strName );
+    int             IncApplicationSettingInt        ( const SString& strPath, const SString& strName );
 
     void            SetApplicationSetting           ( const SString& strName, const SString& strValue );
     SString         GetApplicationSetting           ( const SString& strName );
     void            SetApplicationSettingInt        ( const SString& strName, int iValue );
     int             GetApplicationSettingInt        ( const SString& strName );
+    int             IncApplicationSettingInt        ( const SString& strName );
 
     void            WatchDogReset                   ( void );
     bool            WatchDogIsSectionOpen           ( const SString& str );
@@ -106,6 +112,8 @@ namespace SharedUtil
     void            WatchDogCompletedSection        ( const SString& str );
     bool            WatchDogWasUncleanStop          ( void );
     void            WatchDogSetUncleanStop          ( bool bOn );
+    bool            WatchDogWasLastRunCrash         ( void );
+    void            WatchDogSetLastRunCrash         ( bool bOn );
 
     // BrowseToSolution flags
     enum
@@ -135,7 +143,24 @@ namespace SharedUtil
     // See implementation for details
     bool            IsMainThread                    ( void );
 
+    // CPU stats
+    struct SThreadCPUTimes
+    {
+        uint uiProcessorNumber;
+        float fUserPercent;
+        float fKernelPercent;
+        float fTotalCPUPercent;
+    };
+    struct SThreadCPUTimesStore : SThreadCPUTimes
+    {
+        SThreadCPUTimesStore( void ) { ZERO_POD_STRUCT( this ); }
+        uint64 ullPrevCPUMeasureTimeMs;
+        uint64 ullPrevUserTimeUs;
+        uint64 ullPrevKernelTimeUs;
+    };
     DWORD           _GetCurrentProcessorNumber      ( void );
+    void            GetThreadCPUTimes               ( uint64& outUserTime, uint64& outKernelTime );
+    void            UpdateThreadCPUTimes            ( SThreadCPUTimesStore& store, long long* pllTickCount = NULL );
 
     SString         EscapeString                    ( const SString& strText, const SString& strDisallowedChars, char cSpecialChar = '#', uchar ucLowerLimit = 0, uchar ucUpperLimit = 255 );
     SString         UnescapeString                  ( const SString& strText, char cSpecialChar = '#' );
@@ -143,10 +168,10 @@ namespace SharedUtil
 
     SString         ExpandEnvString                 ( const SString& strInput );
 
-    //
-    // Return true if supplied string adheres to the new version format
-    //
-    bool IsValidVersionString ( const SString& strVersion );
+    // Version string things
+    bool        IsValidVersionString                ( const SString& strVersion );
+    SString     ExtractVersionStringBuildNumber     ( const SString& strVersion );
+    SString     ConformVersionStringToBaseVersion   ( const SString& strVersion, const SString& strBaseVersion );
 
     //
     // Try to make a path relative to the 'resources/' directory
@@ -169,6 +194,9 @@ namespace SharedUtil
 
     bool IsUTF8BOM( const void* pData, uint uiLength );
 
+    // Buffer identification
+    bool IsLuaCompiledScript( const void* pData, uint uiLength );
+    bool IsLuaEncryptedScript( const void* pData, uint uiLength );
 
     //
     // Some templates
@@ -324,7 +352,7 @@ namespace SharedUtil
     template < class T >
     void ListRemoveIndex ( std::vector < T >& itemList, uint index )
     {
-        if ( index >=0 && index < itemList.size () )
+        if ( index < itemList.size () )
             itemList.erase ( itemList.begin () + index );
     }
 
@@ -834,6 +862,21 @@ namespace SharedUtil
     }
 
 
+    // Remove first occurrence of item from itemList
+    template < class U, class T >
+    void ListRemove ( CMappedList < U >& itemList, const T& item )
+    {
+        itemList.remove ( item );
+    }
+
+    // Remove first occurrence of item from itemList
+    template < class U, class T >
+    void ListRemove ( CMappedArray < U >& itemList, const T& item )
+    {
+        itemList.remove ( item );
+    }
+
+
     ///////////////////////////////////////////////////////////////
     //
     // CIntrusiveListNode
@@ -1313,6 +1356,47 @@ namespace SharedUtil
     }
 
 
+    //
+    // Fast wildcard matching (case insensitive)
+    //
+    inline
+    bool WildcardMatchI(const char *wild, const char *string) {
+      // Written by Jack Handy - jakkhandy@hotmail.com
+      assert ( wild && string );
+
+      const char *cp = NULL, *mp = NULL;
+
+      while ((*string) && (*wild != '*')) {
+        if ( (SharedUtil::tolower(*wild) != SharedUtil::tolower(*string) ) && (*wild != '?')) {
+          return 0;
+        }
+        wild++;
+        string++;
+      }
+
+      while (*string) {
+        if (*wild == '*') {
+          if (!*++wild) {
+            return 1;
+          }
+          mp = wild;
+          cp = string+1;
+        } else if ( (SharedUtil::tolower(*wild) == SharedUtil::tolower(*string) ) || (*wild == '?')) {
+          wild++;
+          string++;
+        } else {
+          wild = mp;
+          string = cp++;
+        }
+      }
+
+      while (*wild == '*') {
+        wild++;
+      }
+      return !*wild;
+    }
+
+
     ///////////////////////////////////////////////////////////////
     //
     // CFilterMap
@@ -1389,6 +1473,40 @@ namespace SharedUtil
 
         std::map < uint, bool >     idMap;
         char                        cDefaultType;
+    };
+
+
+    ///////////////////////////////////////////////////////////////
+    //
+    // CRefCountableST
+    //
+    // Reference counting base class
+    //
+    ///////////////////////////////////////////////////////////////
+    class CRefCountableST
+    {
+        int                     m_iRefCount;
+    protected:
+        virtual ~CRefCountableST  ( void ) {}
+    public:
+
+        CRefCountableST ( void ) : m_iRefCount ( 1 ) {}
+
+        void AddRef ( void )
+        {
+            ++m_iRefCount;
+        }
+
+        void Release ( void )
+        {
+            assert ( m_iRefCount > 0 );
+            bool bLastRef = --m_iRefCount == 0;
+
+            if ( !bLastRef )
+                return;
+
+            delete this;
+        }
     };
 
 
@@ -1499,120 +1617,86 @@ namespace SharedUtil
 
 
     //
-    // Smart pointer with reference count.
-    // Based on code from:
-    // http://www.codeproject.com/Articles/15351/Implementing-a-simple-smart-pointer-in-c
+    // Pointer with reference count.
     //
-    class RC
+    template < typename T >
+    class CRefedPointer : public CRefCountable
     {
-        private:
-        int count; // Reference count
+    private:
+        T*  pData;      // Target
 
-        public:
-        RC ( void ) : count ( 0 ) {}
-        void AddRef()
+        virtual ~CRefedPointer( void )
         {
-            // Increment the reference count
-            count++;
+            SAFE_DELETE( pData );
+        }
+        CRefedPointer ( const CRefedPointer < T >& other );
+        CRefedPointer < T >& operator = ( const CRefedPointer < T >& other );
+    public:
+
+        CRefedPointer( void )
+        {
+            pData = new T();
         }
 
-        int Release()
+        T* GetData( void )
         {
-            // Decrement the reference count and
-            // return the reference count.
-            return --count;
+            return pData;
         }
     };
 
-    template < typename T > class SP
+    //
+    // Smart pointer with reference count.
+    //
+    template < typename T >
+    class CAutoRefedPointer
     {
     private:
-        T*    pData;       // pointer
-        RC* reference; // Reference count
-
+        CRefedPointer < T >* pPointer;
     public:
-        SP() : pData(0), reference(0) 
+        CAutoRefedPointer()
         {
-            // Create a new reference 
-            reference = new RC();
-            // Increment the reference count
-            reference->AddRef();
+            pPointer = new CRefedPointer < T >();
         }
 
-        SP(T* pValue) : pData(pValue), reference(0)
+        CAutoRefedPointer ( const CAutoRefedPointer < T >& other )
         {
-            // Create a new reference 
-            reference = new RC();
-            // Increment the reference count
-            reference->AddRef();
+            pPointer = other.pPointer;
+            pPointer->AddRef();
         }
 
-        SP(const SP<T>& sp) : pData(sp.pData), reference(sp.reference)
+        ~CAutoRefedPointer()
         {
-            // Copy constructor
-            // Copy the data and reference pointer
-            // and increment the reference count
-            reference->AddRef();
+            pPointer->Release();
         }
 
-        ~SP()
-        {
-            // Destructor
-            // Decrement the reference count
-            // if reference become zero delete the data
-            if(reference->Release() == 0)
-            {
-                delete pData;
-                delete reference;
-            }
-        }
-
-        T& operator* ()
-        {
-            return *pData;
-        }
-
-        const T& operator* () const
-        {
-            return *pData;
-        }
-
-        T* operator-> ()
-        {
-            return pData;
-        }
-
-        const T* operator-> () const
-        {
-            return pData;
-        }
-        
-        SP<T>& operator = (const SP<T>& sp)
+        CAutoRefedPointer < T >& operator = ( const CAutoRefedPointer < T >& other )
         {
             // Assignment operator
-            if (this != &sp) // Avoid self assignment
+            if ( this != &other ) // Avoid self assignment
             {
-                T*  pDataOld =  pData;
-                RC* referenceOld = reference;
+                CRefedPointer < T >* pOldPointer = pPointer;
 
                 // Copy the data and reference pointer
                 // and increment the reference count
-                pData = sp.pData;
-                reference = sp.reference;
-                reference->AddRef();
+                pPointer = other.pPointer;
+                pPointer->AddRef();
 
                 // Decrement the old reference count
-                // if reference become zero delete the old data
-                if(referenceOld->Release() == 0)
-                {
-                    delete pDataOld;
-                    delete referenceOld;
-                }
+                pOldPointer->Release();
             }
             return *this;
         }
-    };
 
+        T* operator->( void )
+        {
+            return pPointer->GetData();
+        }
+
+        const T* operator->( void ) const
+        {
+            return pPointer->GetData();
+        }
+    };
 };
 
 using namespace SharedUtil;

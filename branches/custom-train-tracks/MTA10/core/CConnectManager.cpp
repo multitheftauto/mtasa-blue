@@ -112,6 +112,10 @@ bool CConnectManager::Connect ( const char* szHost, unsigned short usPort, const
         return false;
     }
 
+    // No connect if disk space is low
+    if ( !CCore::GetSingleton ().CheckDiskSpace () )
+        return false;
+
     // Set our packet handler
     pNet->RegisterPacketHandler ( CConnectManager::StaticProcessPacket );
 
@@ -140,6 +144,7 @@ bool CConnectManager::Connect ( const char* szHost, unsigned short usPort, const
     // Display the status box
     SString strBuffer ( _("Connecting to %s:%u ..."), m_strHost.c_str(), m_usPort );
     CCore::GetSingleton ().ShowMessageBox ( _("CONNECTING"), strBuffer, MB_BUTTON_CANCEL | MB_ICON_INFO, m_pOnCancelClick );
+    WriteDebugEvent( SString( "Connecting to %s:%u ...", m_strHost.c_str(), m_usPort ) );
     return true;
 }
 
@@ -216,15 +221,6 @@ bool CConnectManager::Abort ( void )
 }
 
 
-static SString AppendNetErrorCode ( const SString& strText )
-{
-    uint uiErrorCode = CCore::GetSingleton ().GetNetwork ()->GetExtendedErrorCode ();
-    if ( uiErrorCode != 0 )
-        return strText + SString ( " \nCode: %08X", uiErrorCode );
-    return strText;
-}
-
-
 void CConnectManager::DoPulse ( void )
 {
     // Are we connecting?
@@ -255,7 +251,7 @@ void CConnectManager::DoPulse ( void )
         if ( time ( NULL ) >= m_tConnectStarted + 8 )
         {
             // Show a message that the connection timed out and abort
-            CCore::GetSingleton ().ShowMessageBox ( _("Error")+_E("CC23"), AppendNetErrorCode ( _("Connection timed out") ), MB_BUTTON_OK | MB_ICON_ERROR );
+            g_pCore->ShowNetErrorMessageBox ( _("Error")+_E("CC23"), _("Connection timed out"), "connect-timed-out", true );
             Abort ();
         }
         else
@@ -302,7 +298,7 @@ void CConnectManager::DoPulse ( void )
                 // Only display the error if we set one
                 if ( strError.length() > 0 )
                 {
-                    CCore::GetSingleton ().ShowMessageBox ( _("Error")+strErrorCode, AppendNetErrorCode ( strError ), MB_BUTTON_OK | MB_ICON_ERROR );
+                    CCore::GetSingleton ().ShowNetErrorMessageBox ( _("Error")+strErrorCode, strError );
                 }
                 else // Otherwise, remove the message box and hide quick connect
                 {
@@ -311,7 +307,6 @@ void CConnectManager::DoPulse ( void )
                 }
 
                 CCore::GetSingleton ().GetNetwork ()->SetConnectionError ( 0 );
-                CCore::GetSingleton ().GetNetwork ()->SetImmediateError ( 0 );
                 Abort ();
             }
         }
@@ -404,7 +399,7 @@ bool CConnectManager::StaticProcessPacket ( unsigned char ucPacketID, NetBitStre
             else
             {
                 // Show failed message and abort the attempt
-                CCore::GetSingleton ().ShowMessageBox ( _("Error")+_E("CC32"), AppendNetErrorCode ( _("Bad server response (2)") ), MB_BUTTON_OK | MB_ICON_ERROR );
+                CCore::GetSingleton ().ShowNetErrorMessageBox ( _("Error")+_E("CC32"), _("Bad server response (2)") );
                 g_pConnectManager->Abort ();
             }
         }
@@ -414,7 +409,7 @@ bool CConnectManager::StaticProcessPacket ( unsigned char ucPacketID, NetBitStre
             if ( ucPacketID != PACKET_ID_SERVER_JOIN && ucPacketID != PACKET_ID_SERVER_JOIN_DATA )
             {
                 // Show failed message and abort the attempt
-                CCore::GetSingleton ().ShowMessageBox ( _("Error")+_E("CC33"), AppendNetErrorCode ( _("Bad server response (1)") ), MB_BUTTON_OK | MB_ICON_ERROR );
+                CCore::GetSingleton ().ShowNetErrorMessageBox ( _("Error")+_E("CC33"), _("Bad server response (1)") );
                 g_pConnectManager->Abort ();
             }
         }

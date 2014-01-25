@@ -24,23 +24,22 @@ int CLuaFunctionDefs::GetTok ( lua_State* luaVM )
     SString strInput = "";
     unsigned int uiToken = 0;
     unsigned int uiDelimiter = 0;
+    SString strDelimiter;
     CScriptArgReader argStream ( luaVM );
     argStream.ReadString ( strInput );
     argStream.ReadNumber ( uiToken );
 
+    if ( argStream.NextIsNumber ( ) )
+    {
+        argStream.ReadNumber ( uiDelimiter );
+        wchar_t wUNICODE[2] = { uiDelimiter, '\0' };
+        strDelimiter = UTF16ToMbUTF8(wUNICODE);
+    }
+    else  // It's already a string
+        argStream.ReadString ( strDelimiter );
 
     if ( !argStream.HasErrors ( ) )
     {
-        SString strDelimiter;
-        if ( argStream.NextIsNumber ( ) )
-        {
-            argStream.ReadNumber ( uiDelimiter );
-            wchar_t wUNICODE[2] = { uiDelimiter, '\0' };
-            strDelimiter = UTF16ToMbUTF8(wUNICODE);
-        }
-        else  // It's already a string
-            argStream.ReadString ( strDelimiter );
-
         unsigned int uiCount = 0;
 
         if ( uiToken > 0 && uiToken < 1024 )
@@ -89,22 +88,21 @@ int CLuaFunctionDefs::Split ( lua_State* luaVM )
 {
     SString strInput = "";
     unsigned int uiDelimiter = 0;
+    SString strDelimiter;
     CScriptArgReader argStream ( luaVM );
     argStream.ReadString ( strInput );
 
+    if ( argStream.NextIsNumber ( ) )
+    {
+        argStream.ReadNumber ( uiDelimiter );
+        wchar_t wUNICODE[2] = { uiDelimiter, '\0' };
+        strDelimiter = UTF16ToMbUTF8(wUNICODE);
+    }
+    else  // It's already a string
+        argStream.ReadString ( strDelimiter );
 
     if ( !argStream.HasErrors ( ) )
     {
-        SString strDelimiter;
-        if ( argStream.NextIsNumber ( ) )
-        {
-            argStream.ReadNumber ( uiDelimiter );
-            wchar_t wUNICODE[2] = { uiDelimiter, '\0' };
-            strDelimiter = UTF16ToMbUTF8(wUNICODE);
-        }
-        else  // It's already a string
-            argStream.ReadString ( strDelimiter );
-
         // Copy the string
         char* strText = new char [ strInput.length ( ) + 1 ];
         strcpy ( strText, strInput );
@@ -337,16 +335,30 @@ int CLuaFunctionDefs::GetTickCount_ ( lua_State* luaVM )
 
 int CLuaFunctionDefs::GetCTime ( lua_State* luaVM )
 {
-    // Verify the argument
+    // table getRealTime( [int seconds = current] )
     time_t timer;
     time ( &timer );
     CScriptArgReader argStream ( luaVM );
 
-    if ( argStream.NextIsNumber ( ) )
+    if ( argStream.NextCouldBeNumber ( ) )
     {
         argStream.ReadNumber ( timer );
+        if ( timer < 0 )
+        {
+            argStream.SetCustomError ( "seconds cannot be negative" );
+        }
     }
+
     tm * time = localtime ( &timer );
+    if ( time == NULL )
+        argStream.SetCustomError ( "seconds is out of range" );
+
+    if ( argStream.HasErrors () )
+    {
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+        lua_pushboolean ( luaVM, false );
+        return 1;
+    }
 
     CLuaArguments ret;
     ret.PushString("second");
@@ -1155,16 +1167,18 @@ int CLuaFunctionDefs::DownloadFile ( lua_State* luaVM )
 
 int CLuaFunctionDefs::PregFind ( lua_State* luaVM )
 {
-//  bool pregFind ( string base, string pattern )
+//  bool pregFind ( string base, string pattern, uint/string flags = 0 )
     SString strBase, strPattern;
+    pcrecpp::RE_Options pOptions;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadString ( strBase );
     argStream.ReadString ( strPattern );
+    ReadPregFlags( argStream, pOptions );
 
     if ( !argStream.HasErrors () )
     {
-        pcrecpp::RE pPattern ( strPattern );
+        pcrecpp::RE pPattern ( strPattern, pOptions );
 
         if ( pPattern.PartialMatch ( strBase ) )
         {
@@ -1182,17 +1196,19 @@ int CLuaFunctionDefs::PregFind ( lua_State* luaVM )
 
 int CLuaFunctionDefs::PregReplace ( lua_State* luaVM )
 {
-//  string pregReplace ( string base, string pattern, string replace )
+//  string pregReplace ( string base, string pattern, string replace, uint/string flags = 0 )
     SString strBase, strPattern, strReplace;
+    pcrecpp::RE_Options pOptions;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadString ( strBase );
     argStream.ReadString ( strPattern );
     argStream.ReadString ( strReplace );
+    ReadPregFlags( argStream, pOptions );
 
     if ( !argStream.HasErrors () )
     {
-        pcrecpp::RE pPattern ( strPattern );
+        pcrecpp::RE pPattern ( strPattern, pOptions );
 
         string strNew = strBase;
         if ( pPattern.GlobalReplace ( strReplace, &strNew ) )
@@ -1211,18 +1227,21 @@ int CLuaFunctionDefs::PregReplace ( lua_State* luaVM )
 
 int CLuaFunctionDefs::PregMatch ( lua_State* luaVM )
 {
-//  table pregMatch ( string base, string pattern )
+//  table pregMatch ( string base, string pattern, uint/string flags = 0 )
     SString strBase, strPattern;
+    pcrecpp::RE_Options pOptions;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadString ( strBase );
     argStream.ReadString ( strPattern );
+    ReadPregFlags( argStream, pOptions );
 
     if ( !argStream.HasErrors () )
     {
         lua_newtable ( luaVM );
 
-        pcrecpp::RE pPattern ( strPattern );
+        pcrecpp::RE pPattern ( strPattern, pOptions );
+
         pcrecpp::StringPiece strInput ( strBase );
 
         string strGet; int i = 1;
@@ -1240,5 +1259,59 @@ int CLuaFunctionDefs::PregMatch ( lua_State* luaVM )
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::AddDebugHook ( lua_State* luaVM )
+{
+//  bool AddDebugHook ( string hookType, function callback )
+    EDebugHookType hookType; CLuaFunctionRef callBack;
+
+    CScriptArgReader argStream( luaVM );
+    argStream.ReadEnumString( hookType );
+    argStream.ReadFunction( callBack );
+    argStream.ReadFunctionComplete ();
+
+    if ( !argStream.HasErrors() )
+    {
+        if ( g_pClientGame->GetDebugHookManager()->AddDebugHook( hookType, callBack ) )
+        {
+            lua_pushboolean( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom( luaVM, argStream.GetFullErrorMessage() );
+
+    // Failed
+    lua_pushboolean( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::RemoveDebugHook ( lua_State* luaVM )
+{
+//  bool RemoveDebugHook ( string hookType, function callback )
+    EDebugHookType hookType; CLuaFunctionRef callBack;
+
+    CScriptArgReader argStream( luaVM );
+    argStream.ReadEnumString( hookType );
+    argStream.ReadFunction( callBack );
+    argStream.ReadFunctionComplete();
+
+    if ( !argStream.HasErrors() )
+    {
+        if ( g_pClientGame->GetDebugHookManager()->RemoveDebugHook( hookType, callBack ) )
+        {
+            lua_pushboolean( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom( luaVM, argStream.GetFullErrorMessage() );
+
+    // Failed
+    lua_pushboolean( luaVM, false );
     return 1;
 }

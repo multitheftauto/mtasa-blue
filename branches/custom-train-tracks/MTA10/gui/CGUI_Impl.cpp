@@ -152,8 +152,8 @@ void CGUI_Impl::SetSkin ( const char* szName )
 
     SubscribeToMouseEvents();
 
-    // Disallow input routing to the GUI
-    m_eInputMode = INPUTMODE_ALLOW_BINDS;
+    // Disallow input routing to the GUI unless edit box has focus
+    m_eInputMode = INPUTMODE_NO_BINDS_ON_EDIT;
 
     // The transfer box is not visible by default
     m_bTransferBoxVisible = false;
@@ -1691,7 +1691,11 @@ CEGUI::Window* CGUI_Impl::GetMasterWindow ( CEGUI::Window* wnd )
 {
     // A titlebar should always return the parent (i.e. the frame window)
     if ( wnd->testClassName ( CEGUI::Titlebar::EventNamespace ) )
-         return wnd->getParent ();
+    {
+        if ( wnd->getParent () )
+            return wnd->getParent ();
+        return wnd;
+    }
 
     // if there's no CEGUI userdata, we deduce that it's not an MTA gui element
     if ( !wnd->getUserData() )

@@ -81,6 +81,7 @@ struct SAclRequest;
 #include "packets/CPlayerJoinPacket.h"
 #include "packets/CPlayerListPacket.h"
 #include "packets/CPlayerPuresyncPacket.h"
+#include "packets/CPlayerNoSocketPacket.h"
 #include "packets/CPlayerQuitPacket.h"
 #include "packets/CPlayerSpawnPacket.h"
 #include "packets/CPlayerStatsPacket.h"
@@ -149,6 +150,8 @@ struct SAclRequest;
 #include "TInterpolation.h"
 #include "CPositionRotationAnimation.h"
 #include "CLatentTransferManager.h"
+#include "CDebugHookManager.h"
+#include "CLuaShared.h"
 
 // Logic includes
 #include "ASE.h"
@@ -281,17 +284,6 @@ struct SAclRequest;
 #include "CStaticFunctionDefinitions.h"
 
 // Utility includes
-#include "utils/CHTTPClient.h"
-#include "utils/CHTTPRequest.h"
-#include "utils/CHTTPResponse.h"
-#include "utils/CTCP.h"
-#include "utils/CTCPClientSocket.h"
-#include "utils/CTCPClientSocketImpl.h"
-#include "utils/CTCPImpl.h"
-#include "utils/CTCPServerSocket.h"
-#include "utils/CTCPServerSocketImpl.h"
-#include "utils/CTCPSocket.h"
-#include "utils/CTCPSocketImpl.h"
 #include "utils/CZipMaker.h"
 #include <base64.h>
 

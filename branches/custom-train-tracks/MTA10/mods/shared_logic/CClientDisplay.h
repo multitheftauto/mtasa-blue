@@ -40,7 +40,7 @@ public:
     virtual void                SetPosition             ( const CVector& vecPosition )          { m_vecPosition = vecPosition; };
 
     virtual SColor              GetColor                ( void ) const                          { return m_Color; }
-    virtual void                SetColor                ( const SColor color )                  { m_Color = color; }
+    virtual void                SetColor                ( const SColor& color )                 { m_Color = color; }
     virtual void                SetColorAlpha           ( unsigned char ucAlpha );
 
     virtual bool                IsVisible               ( void )                                { return m_bVisible; };

@@ -408,6 +408,13 @@ void CVideoModeManager::LoadCVars ( void )
         CVARS_SET ( "display_fullscreen_style", FULLSCREEN_BORDERLESS );
     }
 
+    // Apply override
+    if ( GetApplicationSettingInt( "nvhacks", "optimus-force-windowed" ) )
+    {
+        SetApplicationSettingInt( "nvhacks", "optimus-force-windowed", 0 );
+        CVARS_SET ( "display_windowed", true );
+    }
+
     m_iCurrentVideoMode = m_pGameSettings->GetCurrentVideoMode ();
     CVARS_GET ( "display_windowed",             m_bCurrentWindowed );
     CVARS_GET ( "display_fullscreen_style",     m_iCurrentFullscreenStyle );
