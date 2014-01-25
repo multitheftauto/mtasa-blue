@@ -118,6 +118,8 @@ void CLine3DBatcher::Flush ( void )
     }
 
     // Set states
+    if ( g_pDeviceState->AdapterState.bRequiresClipping )
+        m_pDevice->SetRenderState ( D3DRS_CLIPPING, TRUE );
     m_pDevice->SetRenderState ( D3DRS_ZENABLE, m_bZTest ? D3DZB_TRUE : D3DZB_FALSE );
     m_pDevice->SetRenderState ( D3DRS_ZFUNC, D3DCMP_LESSEQUAL );
     m_pDevice->SetRenderState ( D3DRS_ZWRITEENABLE, FALSE );
@@ -156,6 +158,9 @@ void CLine3DBatcher::Flush ( void )
     size_t prevSize = m_LineList.size ();
     m_LineList.clear ();
     m_LineList.reserve ( prevSize );
+
+    if ( g_pDeviceState->AdapterState.bRequiresClipping )
+        m_pDevice->SetRenderState ( D3DRS_CLIPPING, FALSE );
 }
 
 
