@@ -179,6 +179,37 @@ CElement* UserDataCast ( CElement*, void* ptr, lua_State* )
 
 
 //
+// CPed from userdata
+//
+// Will now properly convert CPlayers to CPeds
+template < class T >
+CPed* UserDataCast ( CPed*, void* ptr, lua_State* )
+{
+    ElementID ID = TO_ELEMENTID ( ptr );
+    CElement* pElement = CElementIDs::GetElement ( ID );
+    if ( !pElement || pElement->IsBeingDeleted () || ( pElement->GetType () != CElement::PED && pElement->GetType() != CElement::PLAYER ) )
+        return NULL;
+    return (CPed*)pElement;
+}
+
+
+//
+// CPlayer from userdata
+//
+// Disallows conversion of CPeds to CPlayers
+// 
+template < class T >
+CPlayer* UserDataCast ( CPlayer*, void* ptr, lua_State* )
+{
+    ElementID ID = TO_ELEMENTID ( ptr );
+    CElement* pElement = CElementIDs::GetElement ( ID );
+    if ( !pElement || pElement->IsBeingDeleted () || ( pElement->GetType() != CElement::PLAYER ) )
+        return NULL;
+    return (CPlayer*)pElement;
+}
+
+
+//
 // CElement ( something )
 //
 // Returns true if T is the same class as the one wrapped by pElement

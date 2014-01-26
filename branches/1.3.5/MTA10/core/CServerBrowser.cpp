@@ -1208,7 +1208,10 @@ bool CServerBrowser::OnConnectClick ( CGUIElement* pElement )
 {   
     unsigned short usPort;
     std::string strHost, strNick, strPassword;
-    std::string strURI = m_pEditAddress [ GetCurrentServerBrowserType() ]->GetText();
+    SString strURI = m_pEditAddress [ GetCurrentServerBrowserType() ]->GetText();
+    
+    // Trim leading spaces from the URI
+    strURI = strURI.TrimStart(" ");
 
     // Ensure we have something entered
     if ( strURI.size() == 0 || strURI == "mtasa://" )
@@ -1335,7 +1338,10 @@ bool CServerBrowser::OnInfoClick ( CGUIElement* pElement )
 {
     unsigned short usPort;
     std::string strHost, strNick, strPassword;
-    std::string strURI = m_pEditAddress [ GetCurrentServerBrowserType() ]->GetText();
+    SString strURI = m_pEditAddress [ GetCurrentServerBrowserType() ]->GetText();
+     
+    // Trim leading spaces from the URI
+    strURI = strURI.TrimStart(" ");
 
     // Ensure we have something entered
     if ( strURI.size() == 0 || strURI == "mtasa://" )
