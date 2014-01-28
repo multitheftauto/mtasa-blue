@@ -1736,6 +1736,54 @@ int CLuaFunctionDefs::SetInteriorSoundsEnabled ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaFunctionDefs::GetInteriorFurnitureEnabled ( lua_State* luaVM )
+{
+//  bool getInteriorFurnitureEnabled ( int roomId )
+    char cRoomId;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadNumber ( cRoomId );
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( cRoomId >= 0 && cRoomId <= 4 )
+        {
+            lua_pushboolean ( luaVM, g_pMultiplayer->GetInteriorFurnitureEnabled ( cRoomId ) );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    lua_pushnil ( luaVM );
+    return 1;
+}
+
+int CLuaFunctionDefs::SetInteriorFurnitureEnabled ( lua_State* luaVM )
+{
+//  bool setInteriorFurnitureEnabled ( int roomId, bool enabled )
+    char cRoomId; bool bEnabled;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadNumber ( cRoomId );
+    argStream.ReadBool ( bEnabled );
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( cRoomId >= 0 && cRoomId <= 4 )
+        {
+            g_pMultiplayer->SetInteriorFurnitureEnabled ( cRoomId, bEnabled );
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
 int CLuaFunctionDefs::GetRainLevel ( lua_State* luaVM )
 {
     lua_pushnumber ( luaVM, g_pGame->GetWeather ()->GetAmountOfRain ());

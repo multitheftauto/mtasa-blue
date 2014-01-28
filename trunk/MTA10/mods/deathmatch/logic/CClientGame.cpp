@@ -5397,8 +5397,10 @@ void CClientGame::ResetMapInfo ( void )
 	// Water
     GetManager ()->GetWaterManager ()->ResetWorldWaterLevel ();
 
-    // Re-enable interior sounds
+    // Re-enable interior sounds and furniture
     g_pMultiplayer->SetInteriorSoundsEnabled ( true );
+    for ( int i = 0; i <= 4; ++i )
+        g_pMultiplayer->SetInteriorFurnitureEnabled ( i, true );
 
      // Clouds
     g_pMultiplayer->SetCloudsEnabled ( true );

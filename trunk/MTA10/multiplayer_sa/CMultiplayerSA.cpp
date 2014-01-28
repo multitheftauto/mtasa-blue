@@ -300,6 +300,7 @@ bool bCustomCameraRotation = false;
 unsigned char ucTrafficLightState = 0;
 bool bTrafficLightsBlocked = false;
 bool bInteriorSoundsEnabled = true;
+bool bInteriorFurnitureStates[5] = {true, true, true, true, true};
 
 bool bUsingCustomSkyGradient = false;
 BYTE ucSkyGradientTopR = 0;
@@ -1657,6 +1658,44 @@ void CMultiplayerSA::SetInteriorSoundsEnabled ( bool bEnabled )
 
     // If we just store it, we can always return the on/off state later on
     bInteriorSoundsEnabled = bEnabled;
+}
+
+bool CMultiplayerSA::GetInteriorFurnitureEnabled ( char cRoomId )
+{
+    assert ( cRoomId >= 0 && cRoomId <= 4 );
+    return bInteriorFurnitureStates[cRoomId];
+}
+
+void CMultiplayerSA::SetInteriorFurnitureEnabled ( char cRoomId, bool bEnabled )
+{
+    assert ( cRoomId >= 0 && cRoomId <= 4 );
+
+    // 0 = Shop; 1 = Office; 2 = Lounge; 3 = Bedroom; 4 = Kitchen
+    DWORD originalCodeAddresses[] = {0x593D00, 0x593D0E, 0x593D1C, 0x593D2A, 0x593D38};
+    BYTE originalCodes[][5] = {
+        {0xE8, 0x8B, 0x6A, 0x0, 0x0},
+        {0xE8, 0xDD, 0x5D, 0x0, 0x0},
+        {0xE8, 0x1F, 0x3A, 0x0, 0x0},
+        {0xE8, 0x91, 0x2, 0x0, 0x0},
+        {0xE8, 0x73, 0x33, 0x0, 0x0}
+    };
+
+    if ( bEnabled )
+    {
+        MemCpy ( (void*)originalCodeAddresses[cRoomId], &originalCodes[cRoomId], 5 );
+
+        if ( cRoomId == 0 )
+            MemPut < BYTE > ( 0x593CFD, 0x50 );
+    }
+    else
+    {
+        MemSet ( (void*)originalCodeAddresses[cRoomId], 0x90, 5 );
+        
+        if ( cRoomId == 0 )
+            MemPut < BYTE > ( 0x593CFD, 0x90 );
+    }
+
+    bInteriorFurnitureStates[cRoomId] = bEnabled;
 }
 
 void CMultiplayerSA::SetWindVelocity ( float fX, float fY, float fZ )

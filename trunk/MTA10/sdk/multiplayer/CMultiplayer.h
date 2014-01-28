@@ -204,6 +204,8 @@ public:
     virtual void                        SetCloudsEnabled            ( bool bDisabled ) = 0;
     virtual bool                        GetInteriorSoundsEnabled    () = 0;
     virtual void                        SetInteriorSoundsEnabled    ( bool bEnabled ) = 0;
+    virtual bool                        GetInteriorFurnitureEnabled ( char cRoomId ) = 0;
+    virtual void                        SetInteriorFurnitureEnabled ( char cRoomId, bool bEnabled ) = 0;
     virtual void                        SetWindVelocity             ( float fX, float fY, float fZ ) = 0;
     virtual void                        GetWindVelocity             ( float& fX, float& fY, float& fZ ) = 0;
     virtual void                        RestoreWindVelocity         ( void ) = 0;
