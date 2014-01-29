@@ -456,10 +456,10 @@ EPatchResult UpdatePatchStatusNvightmare( const SString& strGTAEXEPath, EPatchMo
     }
 
     if ( bFileError )
-        WriteDebugEvent( "Nvightmare patch: Can not apply due to unknown file error" );
+        WriteDebugEventAndReport( 9801, "Nvightmare patch: Can not apply due to unknown file error" );
     else
     if ( bUnknownBytes )
-        WriteDebugEvent( "Nvightmare patch: Can not apply due to unknown file bytes" );
+        WriteDebugEventAndReport( 9802, "Nvightmare patch: Can not apply due to unknown file bytes" );
     else
     {
         // Determine if change required
@@ -508,7 +508,7 @@ EPatchResult UpdatePatchStatusNvightmare( const SString& strGTAEXEPath, EPatchMo
 
             fclose ( fh );
             if ( bFileError )
-                WriteDebugEvent( "Nvightmare patch: File update completed with file errors" );
+                WriteDebugEventAndReport( 9803, "Nvightmare patch: File update completed with file errors" );
             else
                 WriteDebugEvent( "Nvightmare patch: File update completed" );
         }
@@ -643,7 +643,7 @@ EPatchResult UpdatePatchStatusAltModules( const SString& strGTAEXEPath, EPatchMo
 
     if ( uiNumOldNames + uiNumNewNames != 4 )
     {
-        WriteDebugEvent( SString ( "UpdatePatchStatusAltModules: Can't find module names (%d,%d)", uiNumOldNames, uiNumNewNames ) );
+        WriteDebugEventAndReport( 9804, SString ( "UpdatePatchStatusAltModules: Can't find module names (%d,%d)", uiNumOldNames, uiNumNewNames ) );
     }
 
     if ( ( mode == PATCH_SET_ON && uiNumOldNames > 0 )
