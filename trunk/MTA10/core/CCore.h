@@ -261,7 +261,9 @@ public:
     void                    HandleIdlePulse                 ( void );
     void                    SetModulesLoaded                ( bool bLoaded );
     bool                    AreModulesLoaded                ( void );
-    void                    UpdateDummyProgress             ( int iPercent = -1 );
+    void                    UpdateDummyProgress             ( int iValue = -1, const char* szType = "" );
+    void                    SetDummyProgressUpdateAlways    ( bool bAlways )        { m_bDummyProgressUpdateAlways = bAlways; }
+    bool                    GetDummyProgressUpdateAlways    ( void )                { return m_bDummyProgressUpdateAlways; }
 
     void                    OnPreCreateDevice               ( IDirect3D9* pDirect3D, UINT Adapter, D3DDEVTYPE DeviceType, HWND hFocusWindow, DWORD& BehaviorFlags, D3DPRESENT_PARAMETERS* pPresentationParameters );
     HRESULT                 OnPostCreateDevice              ( HRESULT hResult, IDirect3D9* pDirect3D, UINT Adapter, D3DDEVTYPE DeviceType, HWND hFocusWindow, DWORD BehaviorFlags, D3DPRESENT_PARAMETERS* pPresentationParameters, IDirect3DDevice9** ppReturnedDeviceInterface );
@@ -351,8 +353,10 @@ private:
     bool                        m_bGettingIdleCallsFromMultiplayer;
     bool                        m_bWindowsTimerEnabled;
     bool                        m_bModulesLoaded;
-    int                         m_iDummyProgressPercent;
+    int                         m_iDummyProgressValue;
     HANDLE                      m_DummyProgressTimerHandle;
+    SString                     m_strDummyProgressType;
+    bool                        m_bDummyProgressUpdateAlways;
 
     // Command line
     static void                 ParseCommandLine                ( std::map < std::string, std::string > & options, const char*& szArgs, const char** pszNoValOptions = NULL );

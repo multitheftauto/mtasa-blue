@@ -819,12 +819,13 @@ void CClientGame::DoPulsePostFrame ( void )
             DrawFPS ();
         }
 
+        CGraphicsInterface* pGraphics = g_pCore->GetGraphics ();
+        unsigned int uiHeight = pGraphics->GetViewportHeight ();
+        unsigned int uiWidth = pGraphics->GetViewportWidth ();
+
         // Draw a little star in the corner if async is on
         if ( g_pGame->IsASyncLoadingEnabled ( true ) )
         {
-            CGraphicsInterface* pGraphics = g_pCore->GetGraphics ();
-            unsigned int uiHeight = pGraphics->GetViewportHeight ();
-            unsigned int uiWidth = pGraphics->GetViewportWidth ();
             unsigned int uiPosY = g_pGame->IsASyncLoadingEnabled () ? uiHeight - 7 : uiHeight - 12;
             pGraphics->DrawText ( uiWidth - 5, uiPosY, 0x80ffffff, 1, "*" );
         }
@@ -832,9 +833,6 @@ void CClientGame::DoPulsePostFrame ( void )
         // Draw notice text if dx test mode is enabled
         if ( g_pCore->GetGraphics ()->GetRenderItemManager ()->GetTestMode () )
         {
-            CGraphicsInterface* pGraphics = g_pCore->GetGraphics ();
-            unsigned int uiHeight = pGraphics->GetViewportHeight ();
-            unsigned int uiWidth = pGraphics->GetViewportWidth ();
             unsigned int uiPosY = uiHeight - 30;
             pGraphics->DrawText ( uiWidth - 155, uiPosY, 0x40ffffff, 1, "dx test mode enabled" );
         }
@@ -843,11 +841,16 @@ void CClientGame::DoPulsePostFrame ( void )
         EDiagnosticDebugType diagnosticDebug = g_pCore->GetDiagnosticDebug ();
         if ( diagnosticDebug == EDiagnosticDebug::LOG_TIMING_0000 )
         {
-            CGraphicsInterface* pGraphics = g_pCore->GetGraphics ();
-            unsigned int uiHeight = pGraphics->GetViewportHeight ();
-            unsigned int uiWidth = pGraphics->GetViewportWidth ();
             unsigned int uiPosY = uiHeight - 30;
             pGraphics->DrawText ( uiWidth - 185, uiPosY, 0xffffff00, 1, "Debug setting: #0000 Log timing" );
+        }
+
+        // Draw network trouble message if required
+        if ( m_pNetAPI->IsNetworkTrouble() )
+        {
+            int iPosX = uiWidth / 2;             // Half way across
+            int iPosY = uiHeight * 45 / 100;     // 45/100 down
+            g_pCore->GetGraphics ()->DrawText ( iPosX, iPosY, iPosX, iPosY, COLOR_ARGB ( 255, 255, 0, 0 ), "*** NETWORK TROUBLE ***", 2.0f, 2.0f, DT_NOCLIP | DT_CENTER );
         }
 
         // Adjust the streaming memory limit.
@@ -3903,8 +3906,13 @@ void CClientGame::IdleHandler ( void )
         }
     }
 
+    // Ensure dummy progress graphic will be displayed when using alt pulse order
+    g_pCore->SetDummyProgressUpdateAlways( true );
+
     // Extrapolation test - Change the pulse order to reduce latency (Has side effects for peds)
     DoPulses2( true );
+
+    g_pCore->SetDummyProgressUpdateAlways( false );
 }
 
 

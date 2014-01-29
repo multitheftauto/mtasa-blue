@@ -2670,7 +2670,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
 
     for ( uint EntityIndex = 0 ; EntityIndex < NumEntities ; EntityIndex++ )
     {
-        g_pCore->UpdateDummyProgress( EntityIndex * 100 / NumEntities );
+        g_pCore->UpdateDummyProgress( EntityIndex * 100 / NumEntities, "%" );
 
         // Read out the entity type id and the entity id
         ElementID EntityID;
@@ -4658,6 +4658,12 @@ void CPacketHandler::Packet_LuaEvent ( NetBitStreamInterface& bitStream )
 
 void CPacketHandler::Packet_ResourceStart ( NetBitStreamInterface& bitStream )
 {
+    // Used for dummy progress when a server has over 50MB of client files to process
+    static uint uiTotalSizeProcessed = 0;
+    static CElapsedTime totalSizeProcessedResetTimer;
+    if ( totalSizeProcessedResetTimer.Get() > 5000 )
+        uiTotalSizeProcessed = 0;
+
     /*
     * unsigned char (1)   - resource name size
     * unsigned char (x)    - resource name
@@ -4783,6 +4789,10 @@ void CPacketHandler::Packet_ResourceStart ( NetBitStreamInterface& bitStream )
                     bitStream.Read ( (char*)chunkChecksum.mD5, sizeof ( chunkChecksum.mD5 ) );
                     bitStream.Read ( dChunkDataSize );
 
+                    uiTotalSizeProcessed += dChunkDataSize;
+                    if ( uiTotalSizeProcessed / 1024 / 1024 > 50 )
+                        g_pCore->UpdateDummyProgress( uiTotalSizeProcessed / 1024 / 1024, " MB" );
+
                     // Don't bother with empty files
                     if ( dChunkDataSize > 0 )
                     {
@@ -4865,6 +4875,9 @@ void CPacketHandler::Packet_ResourceStart ( NetBitStreamInterface& bitStream )
 
     delete [] szResourceName;
     szResourceName = NULL;
+
+    g_pCore->UpdateDummyProgress( 0 );
+    totalSizeProcessedResetTimer.Reset();
 }
 
 void CPacketHandler::Packet_ResourceStop ( NetBitStreamInterface& bitStream )

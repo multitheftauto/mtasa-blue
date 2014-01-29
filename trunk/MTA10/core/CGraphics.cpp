@@ -1724,11 +1724,12 @@ void CGraphics::DrawProgressMessage( bool bPreserveBackbuffer )
     if ( m_LastLostDeviceTimer.Get() < 1000 )
         return;
 
-    // Must be in a scene
-    if ( !g_bInGTAScene && !g_bInMTAScene )
+    const bool bWasInScene = g_bInGTAScene || g_bInMTAScene;
+    bool bInScene = bWasInScene;
+
+    // Skip of not in a scene and not forced with always flag
+    if ( !bInScene && !g_pCore->GetDummyProgressUpdateAlways() )
         return;
-    const bool bWasInScene = true;
-    bool bInScene = true;
 
     // Check if disabled
     static bool bDisabled = !GetApplicationSetting( "diagnostics", "user-confirmed-bsod-time" ).empty();
@@ -1810,7 +1811,10 @@ void CGraphics::DrawProgressMessage( bool bPreserveBackbuffer )
             hr = D3DXLoadSurfaceFromSurface( pD3DBackBufferSurface, NULL, NULL, m_pSavedFrontBufferData, NULL, NULL, D3DX_FILTER_NONE, 0 );
             if ( FAILED( hr ) )
                 break;
+        }
 
+        if ( !bInScene )
+        {
             m_pDevice->BeginScene();
             bInScene = true;
         }

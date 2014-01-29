@@ -61,6 +61,7 @@ public:
     bool                    GetInterpolation                ( CVector& vecPosition, unsigned short usLatency );
     void                    SendBulletSyncFire              ( eWeaponType weaponType, const CVector& vecStart, const CVector& vecEnd );
     void                    SendBulletSyncCustomWeaponFire  ( CClientWeapon * pWeapon, const CVector& vecStart, const CVector& vecEnd );
+    bool                    IsNetworkTrouble                ( void )            { return m_bIsNetworkTrouble; }
 
     static bool             IsWeaponIDAkimbo                ( unsigned char ucWeaponID );
     static bool             IsDriveByWeapon                 ( unsigned char ucWeaponID );
@@ -125,6 +126,7 @@ private:
 
     CInterpolator<CVector>  m_Interpolator;
 
+    bool                    m_bIsNetworkTrouble;
     bool                    m_bIncreaseTimeoutTime;
     CElapsedTime            m_IncreaseTimeoutTimeTimer;
 
