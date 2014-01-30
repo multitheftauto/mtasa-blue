@@ -173,6 +173,7 @@ void CClientPed::Init ( CClientManager* pManager, unsigned long ulModelID, bool 
     m_fObjectsAroundTolerance = 0.f;
     m_iLoadAllModelsCounter = 0;
     m_bIsOnFire = false;
+    m_bIsInWater = false;
     m_LastSyncedData = new SLastSyncedPedData;
     m_bSpeechEnabled = true;
     m_bStealthAiming = false;
@@ -4339,7 +4340,6 @@ bool CClientPed::HasJetPack ( void )
     return m_bHasJetPack;
 }
 
-
 bool CClientPed::IsInWater ( void )
 {
     if ( m_pPlayerPed )
@@ -4352,8 +4352,9 @@ bool CClientPed::IsInWater ( void )
                 return true;
             }
         }
+        return false;
     }
-    return false;
+    return m_bIsInWater;
 }
 
 
