@@ -185,6 +185,7 @@ void CPedSync::Packet_PedSync ( NetBitStreamInterface& BitStream )
             CVector vecPosition, vecMoveSpeed;
             float fRotation, fHealth, fArmor;
             bool bOnFire;
+            bool bIsInWater;
 
             // Read out the position
             if ( ucFlags & 0x01 )
@@ -210,7 +211,10 @@ void CPedSync::Packet_PedSync ( NetBitStreamInterface& BitStream )
             if ( ucFlags & 0x10 ) BitStream.Read ( fArmor );
 
             // And the burning state
-            if (BitStream.Version() >= 0x04E && ucFlags & 0x20) BitStream.ReadBit( bOnFire );            
+            if ( BitStream.Version() >= 0x04E && ucFlags & 0x20 ) BitStream.ReadBit ( bOnFire );  
+
+            // And the in water state
+            if ( BitStream.Version() >= 0x55 && ucFlags & 0x40 ) BitStream.ReadBit ( bIsInWater ); 
 
             // Grab the ped. Only update the sync if this packet is from the same context.
             CClientPed* pPed = m_pPedManager->Get ( ID );
@@ -222,6 +226,7 @@ void CPedSync::Packet_PedSync ( NetBitStreamInterface& BitStream )
                 if ( ucFlags & 0x08 ) pPed->LockHealth ( fHealth );
                 if ( ucFlags & 0x10 ) pPed->LockArmor ( fArmor );
                 if ( BitStream.Version() >= 0x04E && ucFlags & 0x20 ) pPed->SetOnFire ( bOnFire );
+                if ( BitStream.Version() >= 0x55 && ucFlags & 0x40 ) pPed->SetInWater ( bIsInWater );
             }
         }
     }
@@ -266,6 +271,7 @@ void CPedSync::WritePedInformation ( NetBitStreamInterface* pBitStream, CClientP
     if ( pPed->GetHealth() != pPed->m_LastSyncedData->fHealth ) ucFlags |= 0x08;
     if ( pPed->GetArmor() != pPed->m_LastSyncedData->fArmour ) ucFlags |= 0x10;
     if ( pPed->IsOnFire() != pPed->m_LastSyncedData->bOnFire ) ucFlags |= 0x20;
+    if ( pPed->IsInWater() != pPed->m_LastSyncedData->bIsInWater ) ucFlags |= 0x40;
 
     // Do we really have to sync this ped?
     if ( ucFlags == 0 ) return;
@@ -315,9 +321,15 @@ void CPedSync::WritePedInformation ( NetBitStreamInterface* pBitStream, CClientP
         pPed->m_LastSyncedData->fArmour = pPed->GetArmor ();
     }
 
-    if ( ucFlags & 0x20 && pBitStream->Version() >= 0x04E)
+    if ( ucFlags & 0x20 && pBitStream->Version() >= 0x04E )
     {
-        pBitStream->WriteBit ( pPed->IsOnFire() );
-        pPed->m_LastSyncedData->bOnFire = pPed->IsOnFire();
+        pBitStream->WriteBit ( pPed->IsOnFire () );
+        pPed->m_LastSyncedData->bOnFire = pPed->IsOnFire ();
+    }
+
+    if ( ucFlags & 0x40 && pBitStream->Version() >= 0x55 )
+    {
+        pBitStream->WriteBit ( pPed->IsInWater () );
+        pPed->m_LastSyncedData->bIsInWater = pPed->IsInWater ();
     }
 }
