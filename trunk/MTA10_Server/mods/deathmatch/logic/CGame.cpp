@@ -36,7 +36,7 @@
 #define VEH_EXTRAPOLATION_MIN_CLIENT_VERSION    "1.3.0-9.04460"
 #define ALT_PULSE_ORDER_MIN_CLIENT_VERSION      "1.3.1-9.04913"
 #define HIT_ANIM_CLIENT_VERSION                 "1.3.2"
-#define SNIPER_BULLET_SYNC_MIN_CLIENT_VERSION   "1.3.4-9.06040"
+#define SNIPER_BULLET_SYNC_MIN_CLIENT_VERSION   "1.3.5-9.06054"
 
 CGame* g_pGame = NULL;
 
@@ -2347,6 +2347,7 @@ void CGame::Packet_LuaEvent ( CLuaEventPacket& Packet )
             m_pScriptDebugging->LogError ( NULL, "Client (%s) triggered serverside event %s, but event is not added serverside", pCaller->GetNick(), szName );
     }
 }
+
 
 void CGame::Packet_CustomData ( CCustomDataPacket& Packet )
 {
