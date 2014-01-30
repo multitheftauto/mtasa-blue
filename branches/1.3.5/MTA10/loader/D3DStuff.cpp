@@ -74,15 +74,6 @@ namespace
     IDirect3D9* pD3D9 = NULL;
     IDirect3DDevice9* pD3DDevice9 = NULL;
     IDirect3DVertexDeclaration9* pD3DVertexDeclarations[ 20 ] = { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 };
-
-    // Hacky log redirection
-    void _WriteDebugEvent( const SString& strText )
-    {
-        if ( bDetectedOptimus )
-            AddReportLog( 9800, strText );
-        WriteDebugEvent( strText );
-    }
-    #define WriteDebugEvent _WriteDebugEvent
 }
 
 
