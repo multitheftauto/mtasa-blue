@@ -163,6 +163,8 @@ namespace
                                          { "pregFind",                      "1.3.5" },
                                          { "pregReplace",                   "1.3.5" },
                                          { "pregMatch",                     "1.3.5" },
+                                         { "setInteriorFurnitureEnabled",   "1.3.5-9.06101" },
+                                         { "getInteriorFurnitureEnabled",   "1.3.5-9.06101" },
                                        };
 
     SVersionItem serverFunctionInitList[] = {
