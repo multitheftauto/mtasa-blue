@@ -1202,6 +1202,7 @@ void CGame::InitialDataStream ( CPlayer& Player )
 
     // He's joined now
     Player.SetStatus ( STATUS_JOINED );
+    m_pPlayerManager->OnPlayerJoin( &Player );
 
     // Console
     CLogger::LogPrintf ( "JOIN: %s joined the game (IP: %s)\n", Player.GetNick (), Player.GetSourceIP () );
