@@ -11723,6 +11723,7 @@ CTrainTrackManagerSA::~CTrainTrackManagerSA ( )
     {
         // there are 4 train tracks so delete them all
         delete m_pTrainTracks[i];
+        m_pTrainTracks[i] = NULL;
     }
 }
 
@@ -11786,6 +11787,7 @@ void CTrainTrackManagerSA::Initialise ( )
         MemPut <DWORD> ( 0x6F5C32, (DWORD)&m_fRailTrackLengths ); // 4
         MemPut <DWORD> ( 0x6F745D, (DWORD)&m_fRailTrackLengths ); // 5
         MemPut <DWORD> ( 0x6F8712, (DWORD)&m_fRailTrackLengths ); // 6
+        MemPut <DWORD> ( 0x6F6FE8, (DWORD)&m_fRailTrackLengths ); // 7
 
         // iNumberOfTrackNodes 0xC38014
         MemPut <DWORD> ( 0x6F59EB, (DWORD)&m_dwNumberOfTrackNodes ); // 1
@@ -11945,6 +11947,12 @@ bool CTrainTrackManagerSA::Reallocate ( CTrainTrackSA * pTrainTrack, unsigned in
         // Initialise our track with the main line positions
         SRailNodeSA * pRailNode = NULL;
         GetOriginalRailNode ( 0, i, pNode );
+    }
+
+    // Fill gaps with zeroes
+    for ( unsigned int i = uiNodes; i < MAX_TOTAL_TRACKS; ++i )
+    {
+        m_pRailNodePointers[i] = NULL;
     }
 
     // If there was a previous allocation delete it

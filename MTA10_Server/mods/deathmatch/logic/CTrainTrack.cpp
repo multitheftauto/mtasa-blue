@@ -31,6 +31,11 @@ CTrainTrack::CTrainTrack( unsigned char ucTrackID, CTrainTrackManager * pManager
     SetTypeName ( "train-track" );
 }
 
+CTrainTrack::~CTrainTrack ( void )
+{
+    m_pManager->UnreferenceTrainTrack ( m_ucTrackID );
+}
+
 SRailNode * CTrainTrack::GetRailNode ( unsigned int uiNode )
 {
     // Make sure we are within the realm of possibility

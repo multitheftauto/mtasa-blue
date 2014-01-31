@@ -2696,7 +2696,7 @@ void CClientVehicle::Create ( void )
             m_pVehicle->SetDerailable ( m_bIsDerailable );
             m_pVehicle->SetTrainDirection ( m_bTrainDirection );
             m_pVehicle->SetTrainSpeed ( m_fTrainSpeed );
-            if ( m_ucTrackID >= 0 )
+            if ( m_ucTrackID != 0xFF )
                 m_pVehicle->SetRailTrack ( m_ucTrackID );
 
             if ( m_fTrainPosition >= 0 && !m_bIsDerailed )

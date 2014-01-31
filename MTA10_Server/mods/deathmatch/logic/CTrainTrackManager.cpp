@@ -11734,6 +11734,7 @@ CTrainTrackManager::~CTrainTrackManager ( )
     {
         // there are 4 train tracks so delete them all
         delete m_pTrainTracks[i];
+        m_pTrainTracks[i] = NULL;
     }
 }
 
@@ -11760,7 +11761,7 @@ void CTrainTrackManager::Initialise ( )
             else
             {
                 m_pTrainTracks[i] = NULL;
-                DestroyTrainTrack ( i );
+                UnreferenceTrainTrack ( i );
             }
         }
 
@@ -11816,7 +11817,7 @@ CTrainTrack * CTrainTrackManager::CreateTrainTrack ( unsigned int uiNodes, CElem
     return NULL;
 }
 
-bool CTrainTrackManager::DestroyTrainTrack ( DWORD dwTrackID )
+bool CTrainTrackManager::UnreferenceTrainTrack ( DWORD dwTrackID )
 {
     if ( dwTrackID < MAX_TOTAL_TRACKS )
     {
@@ -11824,12 +11825,7 @@ bool CTrainTrackManager::DestroyTrainTrack ( DWORD dwTrackID )
         m_fRailTrackLengths[dwTrackID]      = 0;
         m_dwNumberOfTrackNodes[dwTrackID]   = 1;
 
-        // Delete our train track
-        if ( m_pTrainTracks[dwTrackID] != NULL )
-        {
-            delete m_pTrainTracks[dwTrackID];
-        }
-
+        // Unreference our train track
         m_pTrainTracks[dwTrackID] = NULL;
 
         return true;

@@ -37,6 +37,7 @@ class CTrainTrack : public CElement
     friend class CTrainTrackManager;
 public:
                     CTrainTrack                     ( unsigned char ucTrackID, CTrainTrackManager * pManager, CElement * pParent, CXMLNode * pNode );
+                    ~CTrainTrack                    ( void );
 
 private:
     void            Recalculate                     ( );
