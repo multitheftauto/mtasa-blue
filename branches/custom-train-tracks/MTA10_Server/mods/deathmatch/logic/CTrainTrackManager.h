@@ -36,7 +36,7 @@ public:
     CTrainTrack *       CreateTrainTrack                ( unsigned int uiNodes, CElement * pParent, CXMLNode * pNode );
 
 
-    bool                DestroyTrainTrack               ( DWORD dwTrackID );
+    bool                UnreferenceTrainTrack           ( DWORD dwTrackID );
 
 private:
     bool                Reallocate                      ( CTrainTrack * pTrainTrack, unsigned int uiNodes );

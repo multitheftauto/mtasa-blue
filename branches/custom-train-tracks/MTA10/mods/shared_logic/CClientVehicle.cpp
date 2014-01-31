@@ -131,7 +131,7 @@ CClientVehicle::CClientVehicle ( CClientManager* pManager, ElementID ID, unsigne
     m_bTrainDirection = false;
     m_fTrainSpeed = 0.0f;
     m_fTrainPosition = -1.0f;
-    m_ucTrackID = -1;
+    m_ucTrackID = 0xFF;
     m_bChainEngine = false;
     m_bTaxiLightOn = false;
     m_vecGravity = CVector ( 0.0f, 0.0f, -1.0f );
@@ -2561,10 +2561,10 @@ void CClientVehicle::Create ( void )
             m_pVehicle->SetDerailable ( m_bIsDerailable );
             m_pVehicle->SetTrainDirection ( m_bTrainDirection );
             m_pVehicle->SetTrainSpeed ( m_fTrainSpeed );
-            if ( m_ucTrackID >= 0 )
+            if ( m_ucTrackID != 0xFF )
                 m_pVehicle->SetRailTrack ( m_ucTrackID );
 
-            if ( m_fTrainPosition >= 0 )
+            if ( m_fTrainPosition >= 0.0f )
                 m_pVehicle->SetTrainPosition ( m_fTrainPosition, false );
 
             if ( m_bChainEngine )
