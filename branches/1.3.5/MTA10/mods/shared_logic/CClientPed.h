@@ -104,6 +104,7 @@ struct SLastSyncedPedData
     CVector             vVelocity;
     float               fRotation;
     bool                bOnFire;
+    bool                bIsInWater;
 };
 
 struct SRestoreWeaponItem
@@ -327,6 +328,7 @@ public:
 
     float                       GetDistanceFromGround       ( void );
 
+    void                        SetInWater                  ( bool bIsInWater ) { m_bIsInWater = bIsInWater; };
     bool                        IsInWater                   ( void );
     bool                        IsOnGround                  ( void );
 
@@ -593,6 +595,7 @@ public:
     float                       m_fObjectsAroundTolerance;
     int                         m_iLoadAllModelsCounter;
     bool                        m_bIsOnFire;
+    bool                        m_bIsInWater;
     SLastSyncedPedData*         m_LastSyncedData;
     bool                        m_bSpeechEnabled;
     bool                        m_bStealthAiming;

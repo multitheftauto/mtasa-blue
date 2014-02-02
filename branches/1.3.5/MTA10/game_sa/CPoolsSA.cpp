@@ -220,12 +220,18 @@ CVehicle* CPoolsSA::GetVehicle ( DWORD* pGameInterface )
     {
         CVehicleSAInterface* pInterface = reinterpret_cast < CVehicleSAInterface* > ( pGameInterface );
 
+#ifndef MTA_DEBUG
+        return pInterface->m_pVehicle;
+#else
         // Lookup in the pool map for the vehicle related to this interface.
         vehiclePool_t::mapType::iterator iter = m_vehiclePool.map.find ( pInterface );
         if ( iter != m_vehiclePool.map.end () )
         {
+            dassert( pInterface->m_pVehicle == (*iter).second );
             return (*iter).second;
         }
+        dassert( pInterface->m_pVehicle == NULL );
+#endif
     }
 
     return NULL;

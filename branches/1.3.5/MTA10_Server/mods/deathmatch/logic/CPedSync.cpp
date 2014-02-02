@@ -257,8 +257,11 @@ void CPedSync::Packet_PedSync ( CPedSyncPacket& Packet )
 
                     if ( pData->ucFlags & 0x10 ) pPed->SetArmor ( pData->fArmor );
                     
-                    if ( pPlayer->GetBitStreamVersion() >= 0x04E )
-                        pPed->SetOnFire(pData->bOnFire);
+                    if ( pData->ucFlags & 0x20 && pPlayer->GetBitStreamVersion() >= 0x04E )
+                        pPed->SetOnFire ( pData->bOnFire );
+
+                    if ( pData->ucFlags & 0x40 && pPlayer->GetBitStreamVersion() >= 0x55 )
+                        pPed->SetInWater ( pData->bIsInWater );
 
                     // Send this sync
                     pData->bSend = true;

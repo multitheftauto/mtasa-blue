@@ -42,10 +42,10 @@ public:
                                 CGameEntityXRefManagerImpl          ( void );
                                 ~CGameEntityXRefManagerImpl         ( void );
 protected:
-    std::map < CClientEntity*, CEntity* >               m_ClientToGameMap;
-    std::map < CEntity*, CClientEntity* >               m_GameToClientMap;
-    std::map < CEntitySAInterface*, CClientEntity* >    m_InterfaceToClientMap;
-    std::set < CClientEntity* >                         m_ValidClientEntityMap;
+    CFastHashMap < CClientEntity*, CEntity* >               m_ClientToGameMap;
+    CFastHashMap < CEntity*, CClientEntity* >               m_GameToClientMap;
+    CFastHashMap < CEntitySAInterface*, CClientEntity* >    m_InterfaceToClientMap;
+    CFastHashSet < CClientEntity* >                         m_ValidClientEntityMap;
 };
 
 

@@ -24,6 +24,7 @@ public:
         iNearListUpdate = 100;
         iPedSyncerDistance = 100;
         iUnoccupiedVehicleSyncerDistance = 130;
+        bAltVehPartsStateSync = false;
     }
 
     int iPureSync;
@@ -37,6 +38,7 @@ public:
     int iNearListUpdate;
     int iPedSyncerDistance;
     int iUnoccupiedVehicleSyncerDistance;
+    int bAltVehPartsStateSync;
 };
 
 extern CTickRateSettings g_TickRateSettings;
