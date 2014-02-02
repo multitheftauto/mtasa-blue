@@ -29,6 +29,8 @@ public:
     bool                            Read                        ( NetBitStreamInterface& BitStream );
     bool                            Write                       ( NetBitStreamInterface& BitStream ) const;
 
+    void                            SetFromVehicle              ( CVehicle* pVehicle );
+
     ElementID                       m_Vehicle;
     SVehicleDamageSync              m_damage;
 };
