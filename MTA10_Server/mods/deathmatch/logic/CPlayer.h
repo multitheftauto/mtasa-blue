@@ -340,6 +340,7 @@ public:
     int                                         GetApproxPuresyncPacketSize ( void );
     const CVector&                              GetCamPosition              ( void )            { return m_vecCamPosition; };
     const CVector&                              GetCamFwd                   ( void )            { return m_vecCamFwd; };
+    void                                        UpdateFarVehiclePartsStateSync ( void );
 
     CFastHashSet < CPlayer* >                   m_PureSyncSimSendList;
     bool                                        m_bPureSyncSimSendListDirty;
@@ -347,7 +348,10 @@ public:
     SString                                     m_strDetectedAC;
     uint                                        m_uiD3d9Size;
     SString                                     m_strD3d9Md5;
+    std::set < ElementID >                      m_VehiclesWithPartsStateSyncDirty;
 private:
+    CElapsedTime                                m_VehiclePartsStateSyncTimer;
+    CElapsedTime                                m_FarVehiclePartsStateSyncTimer;
     SLightweightSyncData                        m_lightweightSyncData;
 
     void                                        WriteCameraModePacket       ( void );

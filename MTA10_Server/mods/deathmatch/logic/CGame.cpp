@@ -2175,8 +2175,43 @@ void CGame::Packet_VehicleDamageSync ( CVehicleDamageSyncPacket& Packet )
                         pVehicle->m_ucLightStates [ i ] = Packet.m_damage.data.ucLightStates [ i ];
                 }
 
-                // Broadcast the packet to everyone
-                m_pPlayerManager->BroadcastOnlyJoined ( Packet, pPlayer );
+                if ( !g_TickRateSettings.bAltVehPartsStateSync )
+                {
+                    // Broadcast the packet to everyone
+                    m_pPlayerManager->BroadcastOnlyJoined ( Packet, pPlayer );
+                }
+                else
+                {
+                    // Remember far players that will need sync later
+                    SViewerMapType& farList = pPlayer->GetFarPlayerList ();
+                    for ( SViewerMapType ::iterator it = farList.begin (); it != farList.end (); ++it )
+                    {
+                        CPlayer* pFarPlayer = it->first;
+                        MapInsert( pFarPlayer->m_VehiclesWithPartsStateSyncDirty, Packet.m_Vehicle );
+                    }
+
+                    // Send to near players
+                    SViewerMapType& nearList = pPlayer->GetNearPlayerList ();
+                    CSendList sendList;
+                    for ( SViewerMapType ::iterator it = farList.begin (); it != farList.end (); ++it )
+                    {
+                        CPlayer* pNearPlayer = it->first;
+                        if ( MapContains( pNearPlayer->m_VehiclesWithPartsStateSyncDirty, Packet.m_Vehicle ) )
+                        {
+                            // Flush full update for this player if has pending damage info for vehicle
+                            CVehicleDamageSyncPacket Packet;
+                            Packet.SetFromVehicle( pVehicle );
+                            pNearPlayer->Send( Packet );
+                            MapRemove( pNearPlayer->m_VehiclesWithPartsStateSyncDirty, Packet.m_Vehicle );
+                        }
+                        else
+                        {
+                            sendList.push_back ( pNearPlayer );
+                        }
+                    }
+
+                    CPlayerManager::Broadcast ( Packet, sendList );
+                }
             }
         }
     }
