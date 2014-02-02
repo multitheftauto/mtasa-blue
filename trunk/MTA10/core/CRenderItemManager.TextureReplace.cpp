@@ -30,7 +30,7 @@ void CRenderItemManager::GetVisibleTextureNames ( std::vector < SString >& outNa
 
     SString strTextureNameMatchLower = strTextureNameMatch.ToLower ();
 
-    CFastHashSet < SString > resultMap;
+    std::set < SString > resultMap;
 
     // For each texture that was used in the previous frame
     for ( CFastHashSet < CD3DDUMMY* >::const_iterator iter = m_PrevFrameTextureUsage.begin () ; iter != m_PrevFrameTextureUsage.end () ; ++iter )
@@ -51,7 +51,7 @@ void CRenderItemManager::GetVisibleTextureNames ( std::vector < SString >& outNa
     }
 
     outNameList.reserve( resultMap.size() );
-    for ( CFastHashSet < SString >::const_iterator iter = resultMap.begin () ; iter != resultMap.end () ; ++iter )
+    for ( std::set < SString >::const_iterator iter = resultMap.begin () ; iter != resultMap.end () ; ++iter )
     {
         outNameList.push_back ( *iter );
     }
