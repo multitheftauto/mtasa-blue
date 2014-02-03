@@ -163,6 +163,7 @@ private:
     std::string                     m_strPassword;
     int                             m_iAseMode;
     int                             m_iUpdateCycleDatagramsLimit;
+    int                             m_iUpdateCycleMessagesLimit;
     unsigned short                  m_usHTTPPort;
     eHTTPDownloadType               m_ucHTTPDownloadType;
     std::string                     m_strHTTPDownloadURL;
