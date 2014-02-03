@@ -1701,6 +1701,8 @@ void CGraphics::SetProgressMessage( const SString& strMessage )
     m_strProgressMessage = strMessage;
     DrawProgressMessage();
 
+    CMessageLoopHook::GetSingleton ().MaybeRefreshMsgQueue();
+
     m_LastDrawnProgressTimer.Reset();
 }
 
