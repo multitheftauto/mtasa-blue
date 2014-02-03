@@ -405,7 +405,9 @@ void CPerfStatServerInfoImpl::GetStats ( CPerfStatResult* pResult, const std::ma
         m_OptionsList.push_back ( StringPair ( "Update cycle prep time max",        SString ( "%s ms (Avg %s ms)", *CPerfStatManager::GetScaledFloatString( m_NetPerformanceStats.uiUpdateCyclePrepTimeMaxUs / 1000.f ), *CPerfStatManager::GetScaledFloatString( m_NetPerformanceStats.uiUpdateCyclePrepTimeAvgUs / 1000.f ) ) ) );
         m_OptionsList.push_back ( StringPair ( "Update cycle process time max",     SString ( "%s ms (Avg %s ms)", *CPerfStatManager::GetScaledFloatString( m_NetPerformanceStats.uiUpdateCycleProcessTimeMaxUs / 1000.f ), *CPerfStatManager::GetScaledFloatString( m_NetPerformanceStats.uiUpdateCycleProcessTimeAvgUs / 1000.f ) ) ) );
         m_OptionsList.push_back ( StringPair ( "Update cycle datagrams max",        SString ( "%d (Avg %s)", m_NetPerformanceStats.uiUpdateCycleDatagramsMax, *CPerfStatManager::GetScaledFloatString( m_NetPerformanceStats.fUpdateCycleDatagramsAvg ) ) ) );
+        m_OptionsList.push_back ( StringPair ( "Update cycle messages max",         SString ( "%d (Avg %s)", m_NetPerformanceStats.uiUpdateCycleMessagesMax, *CPerfStatManager::GetScaledFloatString( m_NetPerformanceStats.fUpdateCycleMessagesAvg ) ) ) );
         m_OptionsList.push_back ( StringPair ( "Update cycle datagrams limit",      SString ( "%d", m_NetPerformanceStats.uiUpdateCycleDatagramsLimit ) ) );
+        m_OptionsList.push_back ( StringPair ( "Update cycle messages limit",       SString ( "%d", m_NetPerformanceStats.uiUpdateCycleMessagesLimit ) ) );
         m_OptionsList.push_back ( StringPair ( "Update cycle sends limited",        SString ( "%d (%s %%)", m_NetPerformanceStats.uiUpdateCycleSendsLimitedTotal, *CPerfStatManager::GetScaledFloatString( m_NetPerformanceStats.fUpdateCycleSendsLimitedPercent ) ) ) );
     }
 

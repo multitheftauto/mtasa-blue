@@ -135,6 +135,9 @@ struct SNetPerformanceStatistics
     float fUpdateCycleDatagramsAvg;
     uint uiUpdateCycleDatagramsMax;
     uint uiUpdateCycleDatagramsLimit;
+    float fUpdateCycleMessagesAvg;
+    uint uiUpdateCycleMessagesMax;
+    uint uiUpdateCycleMessagesLimit;
     uint uiUpdateCycleSendsLimitedTotal;
     float fUpdateCycleSendsLimitedPercent;
 };

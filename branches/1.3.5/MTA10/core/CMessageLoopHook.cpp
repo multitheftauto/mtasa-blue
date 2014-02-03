@@ -69,6 +69,31 @@ void CMessageLoopHook::RemoveHook ( )
     }
 }
 
+
+// Process one message every 5 seconds during busy periods to stop Windows 'Not responding' stuff
+void CMessageLoopHook::MaybeRefreshMsgQueue( void )
+{
+    if ( m_ProcessMessageTimer.Get() < 5000 )
+        return;
+    m_ProcessMessageTimer.Reset();
+
+    MSG msg;
+    if ( PeekMessage ( &msg, NULL, 0, 0,PM_NOREMOVE ) )
+    	if ( msg.message == WM_QUIT
+    	  || msg.message == WM_CLOSE
+    	  || msg.message == WM_DESTROY
+    	  || msg.message == WM_NCDESTROY
+    	  || msg.message == WM_HSCROLL
+    	  || msg.message == WM_VSCROLL
+    	  ) 
+    	  return; 
+    if ( PeekMessage( &msg, NULL, 0, 0,PM_REMOVE ) )
+    {
+    	TranslateMessage( &msg );
+    	DispatchMessage( &msg );
+    }
+}
+
 LRESULT CALLBACK CMessageLoopHook::ProcessMessage ( HWND hwnd, 
                                                     UINT uMsg, 
                                                     WPARAM wParam, 
@@ -78,6 +103,9 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage ( HWND hwnd,
 
     // Get a pointer to ourself.
     pThis = CMessageLoopHook::GetSingletonPtr ( );
+
+    if ( pThis )
+        pThis->m_ProcessMessageTimer.Reset();
 
     // Alternate alt-tab system
     if ( pThis && hwnd == pThis->GetHookedWindowHandle () )

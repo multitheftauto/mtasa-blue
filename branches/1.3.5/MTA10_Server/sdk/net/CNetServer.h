@@ -70,6 +70,7 @@ struct SNetOptions
     struct {
         bool bValid;
         int iUpdateCycleDatagramsLimit;
+        int iUpdateCycleMessagesLimit;
     } netOptimize;
 };
 
