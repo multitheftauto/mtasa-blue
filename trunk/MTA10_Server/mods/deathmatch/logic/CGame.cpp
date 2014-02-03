@@ -2193,7 +2193,7 @@ void CGame::Packet_VehicleDamageSync ( CVehicleDamageSyncPacket& Packet )
                     // Send to near players
                     SViewerMapType& nearList = pPlayer->GetNearPlayerList ();
                     CSendList sendList;
-                    for ( SViewerMapType ::iterator it = farList.begin (); it != farList.end (); ++it )
+                    for ( SViewerMapType ::iterator it = nearList.begin (); it != nearList.end (); ++it )
                     {
                         CPlayer* pNearPlayer = it->first;
                         if ( MapContains( pNearPlayer->m_VehiclesWithPartsStateSyncDirty, Packet.m_Vehicle ) )
