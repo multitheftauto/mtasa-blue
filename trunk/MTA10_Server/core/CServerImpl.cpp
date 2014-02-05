@@ -296,7 +296,7 @@ int CServerImpl::Run ( int iArgumentCount, char* szArguments [] )
         Print ( "MTA:BLUE Server for MTA:SA\r\n\r\n" );
 
     // Load the network DLL
-    if ( m_NetworkLibrary.Load ( GetAbsolutePath ( szNetworkLibName ) ) )
+    if ( m_NetworkLibrary.Load ( PathJoin ( m_strServerPath, SERVER_BIN_PATH, szNetworkLibName ) ) )
     {
         // Network module compatibility check
         typedef unsigned long (*PFNCHECKCOMPATIBILITY) ( unsigned long, unsigned long* );
@@ -315,7 +315,7 @@ int CServerImpl::Run ( int iArgumentCount, char* szArguments [] )
             return ERROR_NETWORK_LIBRARY_FAILED;
         }
 
-        if ( m_XMLLibrary.Load ( GetAbsolutePath ( szXMLLibName ) ) )
+        if ( m_XMLLibrary.Load ( PathJoin ( m_strServerPath, SERVER_BIN_PATH, szXMLLibName ) ) )
         {
             // Grab the network interface
             InitNetServerInterface pfnInitNetServerInterface = (InitNetServerInterface) ( m_NetworkLibrary.GetProcedureAddress ( "InitNetServerInterface" ) );

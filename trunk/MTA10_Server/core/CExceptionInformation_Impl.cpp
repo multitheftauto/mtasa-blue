@@ -51,6 +51,7 @@ void CExceptionInformation_Impl::Set ( unsigned int iCode, _EXCEPTION_POINTERS* 
 {
     m_uiCode = iCode;
     m_pAddress = pException->ExceptionRecord->ExceptionAddress;
+#ifdef WIN_x86
     m_ulEAX = pException->ContextRecord->Eax;
     m_ulEBX = pException->ContextRecord->Ebx;
     m_ulECX = pException->ContextRecord->Ecx;
@@ -67,6 +68,7 @@ void CExceptionInformation_Impl::Set ( unsigned int iCode, _EXCEPTION_POINTERS* 
     m_ulGS = pException->ContextRecord->SegGs;
     m_ulSS = pException->ContextRecord->SegSs;
     m_ulEFlags = pException->ContextRecord->EFlags;
+#endif
 
 
     void* pModuleBaseAddress = NULL;

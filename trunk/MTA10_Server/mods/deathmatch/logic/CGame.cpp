@@ -655,8 +655,11 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
                                 "= Bandwidth saving : %s\n" \
                                 "==================================================================\n",
 
-                                MTA_DM_BUILDTAG_SHORT,
-                                m_pMainConfig->GetServerName ().c_str (),
+                                MTA_DM_BUILDTAG_SHORT
+#ifdef ANY_x64
+                                " [64 bit]"
+#endif
+                                ,m_pMainConfig->GetServerName ().c_str (),
                                 strServerIPList.c_str (),
                                 usServerPort,
                                 pszLogFileName,
@@ -664,6 +667,17 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
                                 m_pMainConfig->IsHTTPEnabled () ? m_pMainConfig->GetHTTPPort () : 0,
                                 strVoice.c_str(),
                                 *strBandwidthSaving );
+
+#ifdef ANY_x64
+    CLogger::LogPrintfNoStamp ( "\n" );
+    CLogger::LogPrintfNoStamp ( "*********** WARNING *** WARNING *** WARNING *** WARNING **********\n" );
+    CLogger::LogPrintfNoStamp ( "\n" );
+    CLogger::LogPrintfNoStamp ( "                     Experimental 64 bit server\n" );
+    CLogger::LogPrintfNoStamp ( "\n" );
+    CLogger::LogPrintfNoStamp ( "                            DO NOT USE!\n" );
+    CLogger::LogPrintfNoStamp ( "\n");
+    CLogger::LogPrintfNoStamp ( "==================================================================\n" );
+#endif
 
     if ( !bLogFile )
         CLogger::ErrorPrintf ( "Unable to save logfile to '%s'\n", m_pMainConfig->GetLogFile ().c_str () );

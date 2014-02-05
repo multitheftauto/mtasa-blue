@@ -1483,11 +1483,15 @@ namespace SharedUtil
                 static DWORD GetCurrentProcessorNumberXP(void)
                 {
 #ifdef WIN32
+    #ifdef WIN_x64
+                    return 0;
+    #else
                     // This should work on XP
                     _asm {mov eax, 1}
                     _asm {cpuid}
                     _asm {shr ebx, 24}
                     _asm {mov eax, ebx}
+    #endif
 #else
                     // This should work on Linux
                     return sched_getcpu();

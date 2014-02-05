@@ -81,7 +81,7 @@ PME::clone_re(pcre * re ///< PME object to clone
 {
 	if ( !re )
 		return 0;
-	size_t size;
+	int size;
 	pcre_fullinfo(re, 0, PCRE_INFO_SIZE, &size);
 	pcre * newre = (pcre *) new char[size];
 
@@ -184,7 +184,7 @@ PME::match(const std::string & s, ///< s String to match against
 			 unsigned offset ///< offset Offset at which to start matching
 			 )
 {
-	size_t msize;
+	int msize;
 	pcre_fullinfo(re, 0, PCRE_INFO_CAPTURECOUNT, &msize);
 	msize = 3*(msize+1);
 	int *m = new int[msize];

@@ -30,7 +30,12 @@
     // Type, function and normal defines
     typedef int socklen_t;
 
-    #define MTA_OS_STRING "Windows"
+    #ifdef WIN_x86
+        #define MTA_OS_STRING "Windows"
+    #endif
+    #ifdef WIN_x64
+        #define MTA_OS_STRING "Windows x64"
+    #endif
 #else
     /* POSIX-compatible */
 
@@ -71,8 +76,11 @@
     #define strnicmp(x, y, z) strncasecmp(x, y, z)
     #endif
 
-    #ifdef LINUX
+    #ifdef LINUX_x86
         #define MTA_OS_STRING "Linux"
+    #endif
+    #ifdef LINUX_x64
+        #define MTA_OS_STRING "Linux x64"
     #endif
 
     #ifdef FREEBSD

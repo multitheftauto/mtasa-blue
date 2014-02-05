@@ -109,9 +109,9 @@ public:
     bool            Contains            ( const SString& strOther ) const;
     bool            ContainsI           ( const SString& strOther ) const;
     bool            CompareI            ( const SString& strOther ) const;
-    SString         SubStr              ( int iPos, int iCount = 0x3fffffff ) const;
-    SString         Left                ( int iCount ) const;
-    SString         Right               ( int iCount ) const;
+    SString         SubStr              ( size_t iPos, int iCount = 0x3fffffff ) const;
+    SString         Left                ( size_t iCount ) const;
+    SString         Right               ( size_t iCount ) const;
     bool            EndsWith            ( const SString& strOther ) const;
     bool            EndsWithI           ( const SString& strOther ) const;
     bool            BeginsWith          ( const SString& strOther ) const;
@@ -172,10 +172,10 @@ public:
         this->reserve ( 16U < uiMaxAmount ? 16U : uiMaxAmount );
 
         // Split into pointers
-        unsigned long ulCurrentPoint = 0;
+        size_t ulCurrentPoint = 0;
         while ( true )
         {
-            unsigned long ulPos = strInput.find ( strDelim, ulCurrentPoint );
+            size_t ulPos = strInput.find ( strDelim, ulCurrentPoint );
             if ( ulPos == STRING_TYPE::npos || ( uiMaxAmount > 0 && uiMaxAmount <= this->size () + 1 ) )
             {
                 if ( ulCurrentPoint <= strInput.length () )

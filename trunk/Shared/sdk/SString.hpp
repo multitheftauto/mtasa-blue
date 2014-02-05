@@ -121,11 +121,11 @@ SString& SString::vFormat ( const char* szFormat, va_list vl )
 void SString::Split ( const SString& strDelim, std::vector < SString >& outResult, unsigned int uiMaxAmount, unsigned int uiMinAmount ) const
 {
     outResult.clear ();
-    unsigned long ulStartPoint = 0;
+    size_t ulStartPoint = 0;
 
     while ( true )
     {
-        unsigned long ulPos = find ( strDelim, ulStartPoint );
+        size_t ulPos = find ( strDelim, ulStartPoint );
 
         if ( ulPos == npos || ( uiMaxAmount > 0 && uiMaxAmount <= outResult.size () + 1 ) )
         {
@@ -157,7 +157,7 @@ bool SString::Split ( const SString& strDelim, SString* pstrLeft, SString* pstrR
 
     assert ( iIndex );
     bool bFromEnd = iIndex < 0;
-    unsigned long ulPos;
+    size_t ulPos;
     if ( !bFromEnd )
     {
         ulPos = 0;
@@ -365,7 +365,7 @@ bool SString::CompareI ( const SString& strOther ) const
 }
 
 // Fault tolerant version of substr
-SString SString::SubStr ( int iPos, int iCount ) const
+SString SString::SubStr ( size_t iPos, int iCount ) const
 {
     if ( iPos < 0 )
     {
@@ -383,13 +383,13 @@ SString SString::SubStr ( int iPos, int iCount ) const
 }
 
 // Left most number of characters
-SString SString::Left ( int iCount ) const
+SString SString::Left ( size_t iCount ) const
 {
     return SubStr ( 0, iCount );
 }
 
 // Right most number of characters
-SString SString::Right ( int iCount ) const
+SString SString::Right ( size_t iCount ) const
 {
     return SubStr ( length () - iCount, iCount );
 }

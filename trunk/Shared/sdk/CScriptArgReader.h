@@ -371,7 +371,7 @@ public:
             }
 
             // If will be coercing a string to an enum, make sure string contains only digits
-            uint uiPos = strValue.find_first_not_of ( "0123456789" );
+            size_t uiPos = strValue.find_first_not_of ( "0123456789" );
             if ( uiPos != SString::npos || strValue.empty () )
                 iArgument = LUA_TNONE;  //  Force error
         }
