@@ -4,7 +4,7 @@
 	Version="9.00"
 	Name="jpeg"
 	ProjectGUID="{5997CB54-C80C-4422-89AA-81B6ADFA7F86}"
-	RootNamespace="jpegx"
+	RootNamespace="jpeg"
 	TargetFrameworkVersion="196613"
 	>
 	<Platforms>
@@ -17,8 +17,8 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="..\lib"
-			IntermediateDirectory="$(ConfigurationName)"
+			OutputDirectory="..\x86\$(ConfigurationName)"
+			IntermediateDirectory="..\x86\$(ConfigurationName)"
 			ConfigurationType="4"
 			CharacterSet="1"
 			>
@@ -58,7 +58,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="$(OutDir)/jpegd.lib"
+				OutputFile="$(OutDir)\jpeg_d.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -78,8 +78,8 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="..\lib"
-			IntermediateDirectory="$(ConfigurationName)"
+			OutputDirectory="..\x86\$(ConfigurationName)"
+			IntermediateDirectory="..\x86\$(ConfigurationName)"
 			ConfigurationType="4"
 			CharacterSet="1"
 			WholeProgramOptimization="1"
@@ -123,7 +123,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="$(OutDir)/jpeg.lib"
+				OutputFile="$(OutDir)\jpeg.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -143,8 +143,8 @@
 		</Configuration>
 		<Configuration
 			Name="Nightly|Win32"
-			OutputDirectory="..\lib"
-			IntermediateDirectory="$(ConfigurationName)"
+			OutputDirectory="..\x86\$(ConfigurationName)"
+			IntermediateDirectory="..\..\..\obj\x86\$(ConfigurationName)\vendor\$(SafeRootNamespace)"
 			ConfigurationType="4"
 			CharacterSet="1"
 			WholeProgramOptimization="1"
@@ -188,7 +188,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="$(OutDir)/jpeg.lib"
+				OutputFile="$(OutDir)\jpeg.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"

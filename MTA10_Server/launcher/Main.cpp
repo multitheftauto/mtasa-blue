@@ -12,6 +12,8 @@
 
 #include "CDynamicLibrary.h"
 #include "../version.h"
+#include "../../Shared/sdk/SharedUtil.defines.h"
+#include "../sdk/MTAPlatform.h"
 #include <cstdio>
 #include <iostream>
 
@@ -29,15 +31,15 @@ using namespace std;
 
 #ifdef WIN32
     #ifdef MTA_DEBUG
-        #define LIB_CORE "core_d.dll"
+        #define LIB_CORE SERVER_BIN_PATH "core_d.dll"
     #else
-        #define LIB_CORE "core.dll"
+        #define LIB_CORE SERVER_BIN_PATH "core.dll"
     #endif
 #else
     #ifdef MTA_DEBUG
-        #define LIB_CORE "./core_d.so"
+        #define LIB_CORE "./" SERVER_BIN_PATH "core_d.so"
     #else
-        #define LIB_CORE "./core.so"
+        #define LIB_CORE "./" SERVER_BIN_PATH "core.so"
     #endif
 #endif
 

@@ -122,7 +122,7 @@ void WString::Split ( const WString& strDelim, std::vector < WString >& outResul
 
     while ( true )
     {
-        unsigned long ulPos = find ( strDelim, ulStartPoint );
+        size_t ulPos = find ( strDelim, ulStartPoint );
 
         if ( ulPos == npos || ( uiMaxAmount > 0 && uiMaxAmount <= outResult.size () + 1 ) )
         {
@@ -154,7 +154,7 @@ bool WString::Split ( const WString& strDelim, WString* pstrLeft, WString* pstrR
 
     assert ( iIndex );
     bool bFromEnd = iIndex < 0;
-    unsigned long ulPos;
+    size_t ulPos;
     if ( !bFromEnd )
     {
         ulPos = 0;
@@ -362,7 +362,7 @@ bool WString::CompareI ( const WString& strOther ) const
 }
 
 // Fault tolerant version of substr
-WString WString::SubStr ( int iPos, int iCount ) const
+WString WString::SubStr ( size_t iPos, int iCount ) const
 {
     if ( iPos < 0 )
     {
@@ -380,13 +380,13 @@ WString WString::SubStr ( int iPos, int iCount ) const
 }
 
 // Left most number of characters
-WString WString::Left ( int iCount ) const
+WString WString::Left ( size_t iCount ) const
 {
     return SubStr ( 0, iCount );
 }
 
 // Right most number of characters
-WString WString::Right ( int iCount ) const
+WString WString::Right ( size_t iCount ) const
 {
     return SubStr ( length () - iCount, iCount );
 }

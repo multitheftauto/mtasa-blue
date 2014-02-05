@@ -35,6 +35,7 @@ public:
 
     bool                RequestLoad             ( const char* szModName );
 
+    const char*         GetServerPath           ( void )                    { return m_strServerPath; };
     inline const char*  GetModPath              ( void )                    { return m_strModPath; };
     virtual SString     GetAbsolutePath         ( const char* szRelative );
 
@@ -59,8 +60,8 @@ private:
 
     CServerBase*        m_pBase;
     CDynamicLibrary     m_Library;
-    SString             m_strServerPath;
-    SString             m_strModPath;
+    SString             m_strServerPath;    // Root path
+    SString             m_strModPath;       // root/mods/deathmatch
 };
 
 #endif

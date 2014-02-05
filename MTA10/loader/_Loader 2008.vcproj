@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="Windows-1252"?>
+<?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
@@ -17,8 +17,8 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory=".\Debug"
-			IntermediateDirectory=".\Debug"
+			OutputDirectory="x86\$(ConfigurationName)"
+			IntermediateDirectory="x86\$(ConfigurationName)"
 			ConfigurationType="2"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			UseOfMFC="0"
@@ -58,9 +58,6 @@
 				UsePrecompiledHeader="2"
 				PrecompiledHeaderThrough="StdInc.h"
 				PrecompiledHeaderFile="$(IntDir)\$(TargetName).pch"
-				AssemblerListingLocation=".\Debug/"
-				ObjectFile=".\Debug/"
-				ProgramDataBaseFileName=".\Debug/"
 				WarningLevel="3"
 				SuppressStartupBanner="true"
 				DebugInformationFormat="4"
@@ -85,10 +82,11 @@
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="&quot;..\..\vendor\unrar\build\unrardll32\$(ConfigurationName)&quot;;../../vendor/detours/lib"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile=".\Debug/Loader_d.pdb"
+				ProgramDatabaseFile="$(IntDir)\$(TargetName).pdb"
 				SubSystem="2"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="0"
+				ImportLibrary="$(OutDir)\$(TargetName).lib"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -115,8 +113,8 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory=".\Release"
-			IntermediateDirectory=".\Release"
+			OutputDirectory="x86\$(ConfigurationName)"
+			IntermediateDirectory="x86\$(ConfigurationName)"
 			ConfigurationType="2"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			UseOfMFC="0"
@@ -160,9 +158,6 @@
 				UsePrecompiledHeader="2"
 				PrecompiledHeaderThrough="StdInc.h"
 				PrecompiledHeaderFile="$(IntDir)\$(TargetName).pch"
-				AssemblerListingLocation=".\Release/"
-				ObjectFile=".\Release/"
-				ProgramDataBaseFileName=".\Release/"
 				WarningLevel="3"
 				SuppressStartupBanner="true"
 				DebugInformationFormat="3"
@@ -188,14 +183,13 @@
 				AdditionalLibraryDirectories="&quot;..\..\vendor\unrar\build\unrardll32\$(ConfigurationName)&quot;;../../vendor/detours/lib"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="../../symbols/$(ConfigurationName)_$(SafeParentName).pdb"
-				GenerateMapFile="true"
-				MapFileName="../../symbols/$(ConfigurationName)_$(SafeParentName).map"
-				MapExports="true"
+				MapFileName=""
 				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="0"
+				ImportLibrary="$(OutDir)\$(TargetName).lib"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -222,8 +216,8 @@
 		</Configuration>
 		<Configuration
 			Name="Nightly|Win32"
-			OutputDirectory="..\..\obj\client\loader"
-			IntermediateDirectory="..\..\obj\client\loader"
+			OutputDirectory="x86\$(ConfigurationName)"
+			IntermediateDirectory="..\..\obj\x86\$(ConfigurationName)\$(SafeRootNamespace)"
 			ConfigurationType="2"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			UseOfMFC="0"
@@ -267,9 +261,6 @@
 				UsePrecompiledHeader="2"
 				PrecompiledHeaderThrough="StdInc.h"
 				PrecompiledHeaderFile="$(IntDir)\$(TargetName).pch"
-				AssemblerListingLocation=""
-				ObjectFile="$(IntDir)/"
-				ProgramDataBaseFileName="$(IntDir)/vc70.pdb"
 				WarningLevel="3"
 				SuppressStartupBanner="true"
 				DebugInformationFormat="3"
@@ -295,14 +286,13 @@
 				AdditionalLibraryDirectories="&quot;..\..\vendor\unrar\build\unrardll32\$(ConfigurationName)&quot;;../../vendor/detours/lib"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="../../symbols/$(ConfigurationName)_$(SafeParentName).pdb"
-				GenerateMapFile="true"
-				MapFileName="../../symbols/$(ConfigurationName)_$(SafeParentName).map"
-				MapExports="true"
+				MapFileName=""
 				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="0"
+				ImportLibrary="$(OutDir)\$(TargetName).lib"
 				TargetMachine="1"
 			/>
 			<Tool

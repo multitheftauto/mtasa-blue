@@ -64,7 +64,7 @@ namespace SharedUtil
         // Status
         void SetSize ( uint uiSize, bool bZeroPad = false )
         {
-            uint uiOldSize = size ();
+            uint uiOldSize = (uint)size ();
             resize ( uiSize );
             if ( bZeroPad && uiSize > uiOldSize )
                 memset ( GetData () + uiOldSize, 0, uiSize - uiOldSize );
@@ -72,7 +72,7 @@ namespace SharedUtil
 
         uint GetSize ( void ) const
         {
-            return size ();
+            return (uint)size ();
         }
 
         // Access
@@ -336,7 +336,7 @@ namespace SharedUtil
         void Write ( const CBuffer& );     // Not defined as it won't work
         void WriteString ( const SString& str, bool bByteLength = false, bool bDoesLengthIncludeLengthOfLength = false )
         {
-            ushort usLength = str.length ();
+            ushort usLength = (ushort)str.length ();
             if ( bDoesLengthIncludeLengthOfLength && usLength )
                 usLength += bByteLength ? 1 : 2;
 
@@ -352,7 +352,7 @@ namespace SharedUtil
         void WriteBuffer ( const CBuffer& inBuffer )
         {
             // Write the length
-            uint uiLength = inBuffer.GetSize ();
+            uint uiLength = (uint)inBuffer.GetSize ();
             if ( uiLength > 65534 )
             {
                 Write ( (ushort)65535 );

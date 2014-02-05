@@ -67,11 +67,8 @@ bool CModManagerImpl::Load ( const char* szModName, int iArgumentCount, char* sz
     // Make the string path to the mod library
     m_strModPath = SString ( "%s/mods/%s", m_strServerPath.c_str (), szModName );
 
-    #if defined( WIN32 ) && defined( _DEBUG )
-        SString strFilename ( "%s/%s_d%s", m_strModPath.c_str (), szModName, MTA_LIB_EXTENSION );
-    #else
-        SString strFilename ( "%s/%s%s", m_strModPath.c_str (), szModName, MTA_LIB_EXTENSION );
-    #endif
+    SString strLibFilename( "%s%s", szModName, MTA_LIB_SUFFIX MTA_LIB_EXTENSION );
+    SString strFilename = PathJoin( m_strServerPath, SERVER_BIN_PATH_MOD, strLibFilename );
 
     // Attempt to load it
     if ( !m_Library.Load ( strFilename ) )

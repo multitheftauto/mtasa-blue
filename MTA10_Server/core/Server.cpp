@@ -15,7 +15,8 @@
 #define ALLOC_STATS_MODULE_NAME "core"
 #include "SharedUtil.hpp"
 #include "SharedUtil.Tests.hpp"
-#ifdef WIN32
+#ifdef WIN_x86
+    // TODO - 64 bit file hooks
     #include "SharedUtil.Win32Utf8FileHooks.hpp"
 #endif
 
@@ -36,7 +37,9 @@ MTAEXPORT int Run ( int iArgumentCount, char* szArguments [] )
     #ifdef WIN32
         // Disable critical error message boxes
         SetErrorMode ( SEM_FAILCRITICALERRORS );
+    #endif
 
+    #ifdef WIN_x86
         // Apply file hooks if not already done by the client
         bool bSkipFileHooks = false;
         for( int i = 1 ; i < iArgumentCount ; i++ )
@@ -61,7 +64,7 @@ MTAEXPORT int Run ( int iArgumentCount, char* szArguments [] )
     while ( iReturn == SERVER_RESET_RETURN );
 
     // Done
-    #ifdef WIN32
+    #ifdef WIN_x86
         RemoveUtf8FileHooks();
     #endif
 
