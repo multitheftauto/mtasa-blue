@@ -164,7 +164,7 @@ public:
         WriteCompressed( (int)e );
     }
 
-#ifdef ANY_x64
+#ifdef WIN_x64
     void        Write                       ( const size_t& input );
     void        WriteCompressed             ( const size_t& input );
     bool        Read                        ( size_t& output );

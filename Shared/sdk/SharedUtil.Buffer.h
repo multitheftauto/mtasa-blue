@@ -317,6 +317,7 @@ namespace SharedUtil
             e = temp;
             return bResult;
         }
+    #ifdef WIN_x64
         bool Read( size_t& e )
         {
             uint temp;
@@ -324,6 +325,7 @@ namespace SharedUtil
             e = temp;
             return bResult;
         }
+    #endif
 #endif
     };
 
@@ -409,10 +411,12 @@ namespace SharedUtil
         {
             Write( (int)e );
         }
+    #ifdef WIN_x64
         void Write( size_t e )
         {
             Write( (uint)e );
         }
+    #endif
 #endif
     };
 
