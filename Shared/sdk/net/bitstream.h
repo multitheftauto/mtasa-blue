@@ -38,8 +38,6 @@ public:
     virtual void        Write                       ( const short& input ) = 0;
     virtual void        Write                       ( const unsigned int& input ) = 0;
     virtual void        Write                       ( const int& input ) = 0;
-    virtual void        Write                       ( const unsigned long& input ) = 0;
-    virtual void        Write                       ( const long& input ) = 0;
     virtual void        Write                       ( const float& input ) = 0;
     virtual void        Write                       ( const double& input ) = 0;
     virtual void        Write                       ( const char* input, int numberOfBytes ) = 0;
@@ -53,8 +51,6 @@ public:
     virtual void        WriteCompressed             ( const short& input ) = 0;
     virtual void        WriteCompressed             ( const unsigned int& input ) = 0;
     virtual void        WriteCompressed             ( const int& input ) = 0;
-    virtual void        WriteCompressed             ( const unsigned long& input ) = 0;
-    virtual void        WriteCompressed             ( const long& input ) = 0;
 private:    // Float functions not used because they only cover -1 to +1 and are lossy
     virtual void        WriteCompressed             ( const float& input ) = 0;
     virtual void        WriteCompressed             ( const double& input ) = 0;
@@ -84,8 +80,6 @@ public:
     virtual bool        Read                        ( short& output ) = 0;
     virtual bool        Read                        ( unsigned int& output ) = 0;
     virtual bool        Read                        ( int& output ) = 0;
-    virtual bool        Read                        ( unsigned long& output ) = 0;
-    virtual bool        Read                        ( long& output ) = 0;
     virtual bool        Read                        ( float& output ) = 0;
     virtual bool        Read                        ( double& output ) = 0;
     virtual bool        Read                        ( char* output, int numberOfBytes ) = 0;
@@ -99,8 +93,6 @@ public:
     virtual bool        ReadCompressed              ( short& output ) = 0;
     virtual bool        ReadCompressed              ( unsigned int& output ) = 0;
     virtual bool        ReadCompressed              ( int& output ) = 0;
-    virtual bool        ReadCompressed              ( unsigned long& output ) = 0;
-    virtual bool        ReadCompressed              ( long& output ) = 0;
 private:    // Float functions not used because they only cover -1 to +1 and are lossy
     virtual bool        ReadCompressed              ( float& output ) = 0;
     virtual bool        ReadCompressed              ( double& output ) = 0;
@@ -124,6 +116,60 @@ public:
 
     virtual void        AlignWriteToByteBoundary    ( void ) const = 0;
     virtual void        AlignReadToByteBoundary     ( void ) const = 0;
+
+    // Force long types to use 4 bytes
+    bool Read( unsigned long& e )
+    {
+        uint temp;
+        bool bResult = Read( temp );
+        e = temp;
+        return bResult;
+    }
+    bool Read( long& e )
+    {
+        int temp;
+        bool bResult = Read( temp );
+        e = temp;
+        return bResult;
+    }
+    bool ReadCompressed( unsigned long& e )
+    {
+        uint temp;
+        bool bResult = ReadCompressed( temp );
+        e = temp;
+        return bResult;
+    }
+    bool ReadCompressed( long& e )
+    {
+        int temp;
+        bool bResult = ReadCompressed( temp );
+        e = temp;
+        return bResult;
+    }
+
+    void Write( unsigned long e )
+    {
+        Write( (uint)e );
+    }
+    void Write( long e )
+    {
+        Write( (int)e );
+    }
+    void WriteCompressed( unsigned long e )
+    {
+        WriteCompressed( (uint)e );
+    }
+    void WriteCompressed( long e )
+    {
+        WriteCompressed( (int)e );
+    }
+
+#ifdef ANY_x64
+    void        Write                       ( const size_t& input );
+    void        WriteCompressed             ( const size_t& input );
+    bool        Read                        ( size_t& output );
+    bool        ReadCompressed              ( size_t& output );
+#endif
 
     // Helper template methods that are not actually part
     // of the interface but get inline compiled.

@@ -306,7 +306,7 @@ int CServerImpl::Run ( int iArgumentCount, char* szArguments [] )
             // net.dll doesn't like our version number
             ulong ulNetModuleVersion = 0;
             pfnCheckCompatibility ( 1, &ulNetModuleVersion );
-            Print ( "Network module not compatible! (Expected 0x%x, got 0x%x)\n\r", MTA_DM_SERVER_NET_MODULE_VERSION, ulNetModuleVersion );
+            Print ( "Network module not compatible! (Expected 0x%x, got 0x%x)\n\r", MTA_DM_SERVER_NET_MODULE_VERSION, (uint)ulNetModuleVersion );
             Print ( "Press Q to shut down the server!\n\r" );
             Print ( "\n\r\n\r\n\r(If this is a custom build,\n\r" );
             Print ( " check MTASA_VERSION_TYPE in version.h is set correctly)\n\r" );
@@ -604,7 +604,7 @@ void CServerImpl::HandleInput ( void )
     {
         iStdIn = getwchar();
 
-        if ( iStdIn == -1 )
+        if ( iStdIn == WEOF )
             iStdIn = 0;
     }
 #endif

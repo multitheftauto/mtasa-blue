@@ -12,8 +12,7 @@
 
 #include "CDynamicLibrary.h"
 #include "../version.h"
-#include "../../Shared/sdk/SharedUtil.defines.h"
-#include "../sdk/MTAPlatform.h"
+#include "../../Shared/sdk/SharedUtil.Defines.h"
 #include <cstdio>
 #include <iostream>
 

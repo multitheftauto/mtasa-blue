@@ -21,7 +21,7 @@ typedef CAutoRefedPointer < struct CRegistryResultData > CRegistryResult;
 #include <list>
 #include <vector>
 #include <string>
-#include <sqlite3.h>
+#include "../../../vendor/sqlite/sqlite3.h"
 
 class CRegistry
 {

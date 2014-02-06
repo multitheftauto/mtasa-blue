@@ -1165,13 +1165,13 @@ void CPlayer::SetPlayerVersion ( const SString& strPlayerVersion )
 void CPlayer::UpdateFarVehiclePartsStateSync ( void )
 {
     // Check list once every 200ms
-    if ( m_VehiclePartsStateSyncTimer.Get() < g_TickRateSettings.iPureSync + 100 )
+    if ( m_VehiclePartsStateSyncTimer.Get() < (uint)g_TickRateSettings.iPureSync + 100 )
         return;
     m_VehiclePartsStateSyncTimer.Reset();
 
     // Force far sync every 2000ms
     bool bDoFarSync = false;
-    if ( m_FarVehiclePartsStateSyncTimer.Get() > Max( g_TickRateSettings.iLightSync, 2000 ) )
+    if ( m_FarVehiclePartsStateSyncTimer.Get() > (uint)Max( g_TickRateSettings.iLightSync, 2000 ) )
     {
         bDoFarSync = true;
         m_FarVehiclePartsStateSyncTimer.Reset();
