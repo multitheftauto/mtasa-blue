@@ -1431,7 +1431,7 @@ namespace SharedUtil
                 const SString& part = partList [ i ];
                 char cType = part.Left ( 1 )[0];
 
-                SString strRest = part.Right ( part.length () - 1 );
+                SString strRest = part.Right ( (int)part.length () - 1 );
                 strRest = strRest.Replace ( "{", "" ).Replace ( "}", "" );
 
                 SString strFrom, strTo;

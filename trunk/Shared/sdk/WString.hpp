@@ -362,7 +362,7 @@ bool WString::CompareI ( const WString& strOther ) const
 }
 
 // Fault tolerant version of substr
-WString WString::SubStr ( size_t iPos, int iCount ) const
+WString WString::SubStr ( int iPos, int iCount ) const
 {
     if ( iPos < 0 )
     {
@@ -380,36 +380,36 @@ WString WString::SubStr ( size_t iPos, int iCount ) const
 }
 
 // Left most number of characters
-WString WString::Left ( size_t iCount ) const
+WString WString::Left ( int iCount ) const
 {
     return SubStr ( 0, iCount );
 }
 
 // Right most number of characters
-WString WString::Right ( size_t iCount ) const
+WString WString::Right ( int iCount ) const
 {
-    return SubStr ( length () - iCount, iCount );
+    return SubStr ( (int)length () - iCount, iCount );
 }
 
 
 bool WString::EndsWith ( const WString& strOther ) const
 {
-    return Right ( strOther.length () ) == strOther;
+    return Right ( (int)strOther.length () ) == strOther;
 }
 
 bool WString::EndsWithI ( const WString& strOther ) const
 {
-    return wcsicmp ( Right ( strOther.length () ), strOther ) == 0;
+    return wcsicmp ( Right ( (int)strOther.length () ), strOther ) == 0;
 }
 
 bool WString::BeginsWith ( const WString& strOther ) const
 {
-    return Left ( strOther.length () ) == strOther;
+    return Left ( (int)strOther.length () ) == strOther;
 }
 
 bool WString::BeginsWithI ( const WString& strOther ) const
 {
-    return wcsicmp ( Left ( strOther.length () ), strOther ) == 0;
+    return wcsicmp ( Left ( (int)strOther.length () ), strOther ) == 0;
 }
 
 // Static function

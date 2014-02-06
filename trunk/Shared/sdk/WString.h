@@ -110,9 +110,9 @@ public:
     bool            Contains            ( const WString& strOther ) const;
     bool            ContainsI           ( const WString& strOther ) const;
     bool            CompareI            ( const WString& strOther ) const;
-    WString         SubStr              ( size_t iPos, int iCount = 0x3fffffff ) const;
-    WString         Left                ( size_t iCount ) const;
-    WString         Right               ( size_t iCount ) const;
+    WString         SubStr              ( int iPos, int iCount = 0x3fffffff ) const;
+    WString         Left                ( int iCount ) const;
+    WString         Right               ( int iCount ) const;
     bool            EndsWith            ( const WString& strOther ) const;
     bool            EndsWithI           ( const WString& strOther ) const;
     bool            BeginsWith          ( const WString& strOther ) const;

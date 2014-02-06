@@ -11,7 +11,9 @@
 *****************************************************************************/
 
 #include "StdInc.h"
-#pragma warning( disable : 4355 )   // warning C4355: 'this' : used in base member initializer list
+#ifdef WIN32
+    #pragma warning( disable : 4355 )   // warning C4355: 'this' : used in base member initializer list
+#endif
 
 CIntrusiveList < CLuaFunctionRef > CLuaFunctionRef::ms_AllRefList ( &CLuaFunctionRef::m_ListNode );
 

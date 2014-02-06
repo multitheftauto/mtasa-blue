@@ -109,9 +109,9 @@ public:
     bool            Contains            ( const SString& strOther ) const;
     bool            ContainsI           ( const SString& strOther ) const;
     bool            CompareI            ( const SString& strOther ) const;
-    SString         SubStr              ( size_t iPos, int iCount = 0x3fffffff ) const;
-    SString         Left                ( size_t iCount ) const;
-    SString         Right               ( size_t iCount ) const;
+    SString         SubStr              ( int iPos, int iCount = 0x3fffffff ) const;
+    SString         Left                ( int iCount ) const;
+    SString         Right               ( int iCount ) const;
     bool            EndsWith            ( const SString& strOther ) const;
     bool            EndsWithI           ( const SString& strOther ) const;
     bool            BeginsWith          ( const SString& strOther ) const;

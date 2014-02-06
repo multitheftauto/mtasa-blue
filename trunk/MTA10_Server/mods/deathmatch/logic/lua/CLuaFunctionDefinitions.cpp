@@ -9876,7 +9876,7 @@ int CLuaFunctionDefinitions::Split ( lua_State* luaVM )
         lua_settable ( luaVM, -3 );
 
         // strtok until we're out of tokens
-        while ( szToken = strtok ( NULL, strDelimiter ) )
+        while ( ( szToken = strtok ( NULL, strDelimiter ) ) )
         {
             // Add the token to the table
             lua_pushnumber ( luaVM, ++uiCount );

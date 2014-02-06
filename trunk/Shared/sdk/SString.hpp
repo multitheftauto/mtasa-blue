@@ -365,7 +365,7 @@ bool SString::CompareI ( const SString& strOther ) const
 }
 
 // Fault tolerant version of substr
-SString SString::SubStr ( size_t iPos, int iCount ) const
+SString SString::SubStr ( int iPos, int iCount ) const
 {
     if ( iPos < 0 )
     {
@@ -383,36 +383,36 @@ SString SString::SubStr ( size_t iPos, int iCount ) const
 }
 
 // Left most number of characters
-SString SString::Left ( size_t iCount ) const
+SString SString::Left ( int iCount ) const
 {
     return SubStr ( 0, iCount );
 }
 
 // Right most number of characters
-SString SString::Right ( size_t iCount ) const
+SString SString::Right ( int iCount ) const
 {
-    return SubStr ( length () - iCount, iCount );
+    return SubStr ( (int)length () - iCount, iCount );
 }
 
 
 bool SString::EndsWith ( const SString& strOther ) const
 {
-    return Right ( strOther.length () ) == strOther;
+    return Right ( (int)strOther.length () ) == strOther;
 }
 
 bool SString::EndsWithI ( const SString& strOther ) const
 {
-    return stricmp ( Right ( strOther.length () ), strOther ) == 0;
+    return stricmp ( Right ( (int)strOther.length () ), strOther ) == 0;
 }
 
 bool SString::BeginsWith ( const SString& strOther ) const
 {
-    return Left ( strOther.length () ) == strOther;
+    return Left ( (int)strOther.length () ) == strOther;
 }
 
 bool SString::BeginsWithI ( const SString& strOther ) const
 {
-    return stricmp ( Left ( strOther.length () ), strOther ) == 0;
+    return stricmp ( Left ( (int)strOther.length () ), strOther ) == 0;
 }
 
 // Static function

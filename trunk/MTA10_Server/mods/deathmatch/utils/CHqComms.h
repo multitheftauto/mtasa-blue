@@ -37,7 +37,7 @@ public:
     void Pulse( void )
     {
         // Check for min client version info
-        if ( m_Stage == HQCOMMS_STAGE_NONE || ( m_Stage == HQCOMMS_STAGE_TIMER && m_CheckTimer.Get() > m_iPollInterval ) )
+        if ( m_Stage == HQCOMMS_STAGE_NONE || ( m_Stage == HQCOMMS_STAGE_TIMER && m_CheckTimer.Get() > (uint)m_iPollInterval ) )
         {
             m_CheckTimer.Reset();
             m_Stage = HQCOMMS_STAGE_QUERY;
