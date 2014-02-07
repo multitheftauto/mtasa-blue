@@ -50,7 +50,7 @@ static CClientSoundManager*                         m_pSoundManager;
 
 // Used to run a function on all the children of the elements too
 #define RUN_CHILDREN \
-    if ( Entity.CountChildren() ) \
+    if ( Entity.CountChildren() && Entity.IsCallPropagationEnabled() ) \
         for ( CChildListType::const_iterator iter = Entity.IterBegin () ; iter != Entity.IterEnd () ; ++iter )
 
 CStaticFunctionDefinitions::CStaticFunctionDefinitions (
@@ -3453,6 +3453,28 @@ bool CStaticFunctionDefinitions::IsElementLowLod ( CClientEntity& Entity, bool& 
     }
 
     return true;
+}
+
+
+bool CStaticFunctionDefinitions::IsElementCallPropagationEnabled ( CClientEntity& Entity, bool& bOutEnabled )
+{
+    bOutEnabled = Entity.IsCallPropagationEnabled();
+    return true;
+}
+
+
+bool CStaticFunctionDefinitions::SetElementCallPropagationEnabled ( CClientEntity& Entity, bool bEnabled )
+{
+    if ( Entity.IsCallPropagationEnabled() != bEnabled && Entity.IsLocalEntity () )
+    {
+        // Disallow being set on root
+        if ( &Entity != GetRootElement() )
+        {
+            Entity.SetCallPropagationEnabled( bEnabled );
+            return true;
+        }
+    }
+    return false;
 }
 
 

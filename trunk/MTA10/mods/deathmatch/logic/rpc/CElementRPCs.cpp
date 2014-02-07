@@ -47,10 +47,11 @@ void CElementRPCs::LoadFunctions ( void )
     AddHandler ( RESET_CUSTOM_WEAPON_FIRING_RATE,ResetCustomWeaponFiringRate, "resetWeaponFiringRate" );
     AddHandler ( SET_WEAPON_OWNER,               SetWeaponOwner,              "setWeaponOwner" );
     AddHandler ( SET_CUSTOM_WEAPON_FLAGS,        SetWeaponConfig,             "setWeaponFlags" );
+    AddHandler ( SET_PROPAGATE_CALLS_ENABLED,    SetCallPropagationEnabled,   "setCallPropagationEnabled" );
 }
 
 #define RUN_CHILDREN_SERVER( func ) \
-    if ( pSource->CountChildren () ) \
+    if ( pSource->CountChildren () && pSource->IsCallPropagationEnabled() ) \
     { \
         CElementListSnapshot* pList = pSource->GetChildrenListSnapshot(); \
         pList->AddRef();    /* Keep list alive during use */ \
@@ -709,5 +710,14 @@ void CElementRPCs::SetWeaponConfig ( CClientEntity * pSource, NetBitStreamInterf
         {
             pWeapon->SetFlags ( weaponConfig );
         }
+    }
+}
+
+void CElementRPCs::SetCallPropagationEnabled ( CClientEntity * pSource, NetBitStreamInterface& bitStream )
+{
+    bool bEnabled;
+    if ( bitStream.ReadBit ( bEnabled ) )
+    {
+        pSource->SetCallPropagationEnabled ( bEnabled );
     }
 }
