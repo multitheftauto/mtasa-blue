@@ -129,7 +129,10 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
             }
 
             BitStream.WriteBit ( bCollisionsEnabled );
-            
+
+            if ( BitStream.Version() >= 0x56 )
+                BitStream.WriteBit ( pElement->IsCallPropagationEnabled() );
+
             // Write custom data
             CCustomData* pCustomData = pElement->GetCustomDataPointer ();
             assert ( pCustomData );
