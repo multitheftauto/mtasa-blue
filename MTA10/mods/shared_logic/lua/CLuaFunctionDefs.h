@@ -156,6 +156,7 @@ public:
     LUA_DECLARE ( IsElementFrozen );
     LUA_DECLARE ( GetLowLodElement );
     LUA_DECLARE ( IsElementLowLod );
+    LUA_DECLARE ( IsElementCallPropagationEnabled );
 
     // Element set funcs
     LUA_DECLARE ( CreateElement );
@@ -182,6 +183,7 @@ public:
     LUA_DECLARE ( SetElementDoubleSided );
     LUA_DECLARE ( SetElementFrozen );
     LUA_DECLARE ( SetLowLodElement );
+    LUA_DECLARE ( SetElementCallPropagationEnabled );
 
     // Radio functions
     LUA_DECLARE ( SetRadioChannel );

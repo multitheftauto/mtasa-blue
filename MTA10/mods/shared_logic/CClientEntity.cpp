@@ -35,6 +35,7 @@ CClientEntity::CClientEntity ( ElementID ID )
     m_ucInterior = 0;
     m_bDoubleSided = false;
     m_bDoubleSidedInit = false;
+    m_bCallPropagationEnabled = true;
 
     // Need to generate a clientside ID?
     if ( ID == INVALID_ELEMENT_ID )

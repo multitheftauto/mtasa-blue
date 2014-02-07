@@ -83,6 +83,7 @@ public:
     static bool                         IsElementFrozen                     ( CClientEntity& Entity, bool& bFrozen );
     static bool                         GetLowLodElement                    ( CClientEntity& Entity, CClientEntity*& pOutLowLodEntity );
     static bool                         IsElementLowLod                     ( CClientEntity& Entity, bool& bOutIsLowLod );
+    static bool                         IsElementCallPropagationEnabled     ( CClientEntity& Entity, bool& bOutEnabled );
 
     // Element set funcs
     static CClientDummy*                CreateElement                       ( CResource& Resource, const char* szTypeName, const char* szID );
@@ -107,6 +108,7 @@ public:
     static bool                         SetElementCollidableWith            ( CClientEntity& Entity, CClientEntity& ThisEntity, bool bCanCollide );
     static bool                         SetElementFrozen                    ( CClientEntity& Entity, bool bFrozen );
     static bool                         SetLowLodElement                    ( CClientEntity& Entity, CClientEntity* pLowLodEntity );
+    static bool                         SetElementCallPropagationEnabled    ( CClientEntity& Entity, bool bEnabled );
 
     // Radio funcs
     static bool                         SetRadioChannel                     ( unsigned char& ucChannel );

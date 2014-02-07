@@ -35,6 +35,8 @@ void CLuaElementDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "isElementInWater", CLuaElementDefs::isElementInWater );
     CLuaCFunctions::AddFunction ( "isElementFrozen", CLuaElementDefs::isElementFrozen );
     CLuaCFunctions::AddFunction ( "isElementLowLOD", CLuaElementDefs::isElementLowLOD );
+    CLuaCFunctions::AddFunction ( "setElementCallPropagationEnabled", CLuaElementDefs::setElementCallPropagationEnabled );
+    CLuaCFunctions::AddFunction ( "isElementCallPropagationEnabled", CLuaElementDefs::isElementCallPropagationEnabled );
 
     CLuaCFunctions::AddFunction ( "getElementByID", CLuaElementDefs::getElementByID );
     CLuaCFunctions::AddFunction ( "getElementByIndex", CLuaElementDefs::getElementByIndex );
@@ -1784,6 +1786,56 @@ int CLuaElementDefs::isElementLowLOD ( lua_State* luaVM )
         if ( CStaticFunctionDefinitions::IsElementLowLod ( pEntity, bIsLowLod ) )
         {
             lua_pushboolean ( luaVM, bIsLowLod );
+            return 1;
+        }        
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaElementDefs::setElementCallPropagationEnabled ( lua_State* luaVM )
+{
+//  bool setElementCallPropagationEnabled ( element theElement, bool enable )
+    CElement* pEntity; bool bEnable;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pEntity );
+    argStream.ReadBool ( bEnable );
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( CStaticFunctionDefinitions::SetElementCallPropagationEnabled ( pEntity, bEnable ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaElementDefs::isElementCallPropagationEnabled ( lua_State* luaVM )
+{
+//  bool isElementCallPropagationEnabled ( element theElement )
+    CElement* pEntity;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pEntity );
+
+    if ( !argStream.HasErrors () )
+    {
+        bool bEnabled;
+        if ( CStaticFunctionDefinitions::IsElementCallPropagationEnabled ( pEntity, bEnabled ) )
+        {
+            lua_pushboolean ( luaVM, bEnabled );
             return 1;
         }        
     }

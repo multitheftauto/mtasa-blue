@@ -32,6 +32,7 @@ CElement::CElement ( CElement* pParent, CXMLNode* pNode )
     m_pParent = pParent;
     m_pXMLNode = pNode;
     m_pElementGroup = NULL;
+    m_bCallPropagationEnabled = true;
 
     m_iType = CElement::UNKNOWN;
     m_strName = "";
