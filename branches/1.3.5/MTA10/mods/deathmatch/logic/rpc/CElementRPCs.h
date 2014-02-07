@@ -38,6 +38,7 @@ public:
     DECLARE_ELEMENT_RPC ( SetElementCollisionsEnabled );
     DECLARE_ELEMENT_RPC ( SetElementFrozen );
     DECLARE_ELEMENT_RPC ( SetLowLodElement );
+    DECLARE_ELEMENT_RPC ( SetCallPropagationEnabled );
 };
 
 #endif

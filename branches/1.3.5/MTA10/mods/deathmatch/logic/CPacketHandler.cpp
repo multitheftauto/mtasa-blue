@@ -2587,6 +2587,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
         unsigned char ucInterior;
         unsigned short usDimension;
         bool bCollisonsEnabled;
+        bool bCallPropagationEnabled;
 
         if ( bitStream.Read ( EntityID ) &&
              bitStream.Read ( ucEntityTypeID ) &&
@@ -2605,6 +2606,11 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
 
             // Check element collisions enabled ( for use later on )
             bitStream.ReadBit ( bCollisonsEnabled );
+
+            if ( bitStream.Version() >= 0x56 )
+                bitStream.ReadBit ( bCallPropagationEnabled );
+            else
+                bCallPropagationEnabled = true;
 
             // Read custom data
             CCustomData* pCustomData = new CCustomData;
@@ -3692,6 +3698,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                 }
                 pEntity->SetSyncTimeContext ( ucSyncTimeContext );
                 pEntity->GetCustomDataPointer ()->Copy ( pCustomData );
+                pEntity->SetCallPropagationEnabled ( bCallPropagationEnabled );
 
                 // Save any entity-dependant stuff for later
                 SEntityDependantStuff* pStuff = new SEntityDependantStuff;

@@ -47,7 +47,7 @@ static CWaterManager*                               m_pWaterManager;
 
 // Used to run a function on all the children of the elements too
 #define RUN_CHILDREN( func ) \
-    if ( pElement->CountChildren () ) \
+    if ( pElement->CountChildren () && pElement->IsCallPropagationEnabled() ) \
     { \
         CElementListSnapshot* pList = pElement->GetChildrenListSnapshot(); \
         pList->AddRef();    /* Keep list alive during use */ \
@@ -1024,6 +1024,31 @@ bool CStaticFunctionDefinitions::IsElementInWater ( CElement* pElement, bool & b
     }
 
     return true;
+}
+
+
+bool CStaticFunctionDefinitions::IsElementCallPropagationEnabled ( CElement* pElement, bool& bOutEnabled )
+{
+    bOutEnabled = pElement->IsCallPropagationEnabled();
+    return true;
+}
+
+
+bool CStaticFunctionDefinitions::SetElementCallPropagationEnabled ( CElement* pElement, bool bEnable )
+{
+    if ( bEnable != pElement->IsCallPropagationEnabled() )
+    {
+        // Disallow being set on root
+        if ( pElement != GetRootElement() )
+        {
+            pElement->SetCallPropagationEnabled( bEnable );
+            CBitStream BitStream;
+            BitStream.pBitStream->Write ( bEnable );
+            m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pElement, SET_PROPAGATE_CALLS_ENABLED, *BitStream.pBitStream ) );
+            return true;
+        }
+    }
+    return false;
 }
 
 

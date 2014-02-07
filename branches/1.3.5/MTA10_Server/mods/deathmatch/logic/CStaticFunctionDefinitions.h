@@ -81,6 +81,7 @@ public:
     static bool                 IsElementFrozen                     ( CElement* pElement, bool& bFrozen );
     static bool                 GetLowLodElement                    ( CElement* pElement, CElement*& pOutLowLodElement );
     static bool                 IsElementLowLod                     ( CElement* pElement, bool& bOutLowLod );
+    static bool                 IsElementCallPropagationEnabled     ( CElement* pElement, bool& bOutEnabled );
 
     // Element set funcs
     static bool                 ClearElementVisibleTo               ( CElement* pElement );
@@ -105,6 +106,7 @@ public:
     static bool                 SetElementCollisionsEnabled         ( CElement* pElement, bool bEnable );
     static bool                 SetElementFrozen                    ( CElement* pElement, bool bFrozen );
     static bool                 SetLowLodElement                    ( CElement* pElement, CElement* pLowLodElement );
+    static bool                 SetElementCallPropagationEnabled    ( CElement* pElement, bool bEnable );
 
     // Scoreboard
     static bool                 AddScoreboardColumn                 ( const char* szID, const char* szName, float fWidth );

@@ -312,6 +312,9 @@ public:
 
     float                                       GetDistanceBetweenBoundingSpheres   ( CClientEntity* pOther );
 
+    bool                                        IsCallPropagationEnabled    ( void )                { return m_bCallPropagationEnabled; }
+    void                                        SetCallPropagationEnabled   ( bool bEnabled )       { m_bCallPropagationEnabled = bEnabled; }
+
 protected:
     CClientManager*                             m_pManager;
     CClientEntity*                              m_pParent;
@@ -355,6 +358,7 @@ protected:
     bool                                        m_bDoubleSided;
     bool                                        m_bDoubleSidedInit;
     bool                                        m_bWorldIgnored;
+    bool                                        m_bCallPropagationEnabled;
 
 public:
     // Optimization for getElementsByType starting at root

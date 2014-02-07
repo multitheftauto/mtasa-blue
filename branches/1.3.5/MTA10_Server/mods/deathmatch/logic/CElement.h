@@ -225,6 +225,9 @@ public:
     virtual CSphere                             GetWorldBoundingSphere      ( void );
     virtual void                                UpdateSpatialData           ( void );
 
+    bool                                        IsCallPropagationEnabled    ( void )                        { return m_bCallPropagationEnabled; }
+    void                                        SetCallPropagationEnabled   ( bool bEnabled )               { m_bCallPropagationEnabled = bEnabled; }
+
 protected:
     CElement*                                   GetRootElement              ( void );
     virtual bool                                ReadSpecialData             ( void ) = 0;
@@ -275,6 +278,7 @@ protected:
     unsigned char                               m_ucInterior;
     bool                                        m_bDoubleSided;
     bool                                        m_bUpdatingSpatialData;
+    bool                                        m_bCallPropagationEnabled;
 
     // Optimization for getElementsByType starting at root
 public:

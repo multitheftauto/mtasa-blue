@@ -36,6 +36,7 @@ void CElementRPCs::LoadFunctions ( void )
     AddHandler ( SET_ELEMENT_COLLISIONS_ENABLED, SetElementCollisionsEnabled, "SetElementCollisionsEnabled" );
     AddHandler ( SET_ELEMENT_FROZEN,             SetElementFrozen,            "SetElementFrozen" );
     AddHandler ( SET_LOW_LOD_ELEMENT,            SetLowLodElement,            "SetLowLodElement" );
+    AddHandler ( SET_PROPAGATE_CALLS_ENABLED,    SetCallPropagationEnabled,   "setCallPropagationEnabled" );
 }
 
 
@@ -522,5 +523,15 @@ void CElementRPCs::SetLowLodElement ( CClientEntity* pSource, NetBitStreamInterf
                 break;
             }
         }
+    }
+}
+
+
+void CElementRPCs::SetCallPropagationEnabled ( CClientEntity * pSource, NetBitStreamInterface& bitStream )
+{
+    bool bEnabled;
+    if ( bitStream.ReadBit ( bEnabled ) )
+    {
+        pSource->SetCallPropagationEnabled ( bEnabled );
     }
 }
