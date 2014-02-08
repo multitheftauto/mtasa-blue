@@ -106,6 +106,8 @@ CClientBase* CModManager::Load ( const char* szName, const char* szArguments )
     // Make sure we haven't already loaded a mod
     Unload ();
 
+    CMessageLoopHook::GetSingleton ().SetRefreshMsgQueueEnabled( false );
+
     // Get the entry for the given name
     std::map < std::string, std::string >::iterator itMod = m_ModDLLFiles.find ( szName );
     if ( itMod == m_ModDLLFiles.end () )
@@ -175,7 +177,9 @@ CClientBase* CModManager::Load ( const char* szName, const char* szArguments )
 
     // Tell chat to start handling input
     CLocalGUI::GetSingleton ().GetChat ()->OnModLoad ();
- 
+
+    CMessageLoopHook::GetSingleton ().SetRefreshMsgQueueEnabled( true );
+
     // Return the interface
     return m_pClientBase;
 }
@@ -183,6 +187,8 @@ CClientBase* CModManager::Load ( const char* szName, const char* szArguments )
 
 void CModManager::Unload ( void )
 {
+    CMessageLoopHook::GetSingleton ().SetRefreshMsgQueueEnabled( false );
+
     // If a mod is loaded, we call m_pClientBase->ClientShutdown and then free the library
     if ( m_hClientDLL != NULL )
     {
@@ -244,6 +250,7 @@ void CModManager::Unload ( void )
             XfireSetCustomGameData ( 0, NULL, NULL ); 
         }
     }
+    CMessageLoopHook::GetSingleton ().SetRefreshMsgQueueEnabled( true );
 }
 
 
