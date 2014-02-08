@@ -29,6 +29,7 @@ CMessageLoopHook::CMessageLoopHook ( )
     WriteDebugEvent ( "CMessageLoopHook::CMessageLoopHook" );
     m_HookedWindowProc      = NULL;
     m_HookedWindowHandle    = NULL;
+    m_bRefreshMsgQueueEnabled = true;
 }
 
 
@@ -70,12 +71,22 @@ void CMessageLoopHook::RemoveHook ( )
 }
 
 
+// Disable RefreshMsgQueue when calls inside CMessageLoopHook::ProcessMessage could cause trouble
+void CMessageLoopHook::SetRefreshMsgQueueEnabled( bool bEnable )
+{
+    m_bRefreshMsgQueueEnabled = bEnable;
+}
+
+
 // Process one message every 5 seconds during busy periods to stop Windows 'Not responding' stuff
 void CMessageLoopHook::MaybeRefreshMsgQueue( void )
 {
     if ( m_ProcessMessageTimer.Get() < 5000 )
         return;
     m_ProcessMessageTimer.Reset();
+
+    if ( !m_bRefreshMsgQueueEnabled )
+        return;
 
     MSG msg;
     if ( PeekMessage ( &msg, NULL, 0, 0,PM_NOREMOVE ) )
