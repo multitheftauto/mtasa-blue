@@ -209,7 +209,7 @@ void CNetBufferWatchDog::UpdateQueueInfo ( CQueueInfo& queueInfo, int iQueueSize
         //      stop related queue until it is below 100,000
         if ( queueInfo.m_SizeHistory.GetLowestPointSince( 5 ) > iThreshLevel2 )
         {
-            CLogger::LogPrintf ( "%s > %d pkts. This is due to server overload or another problem\n", szTag, iThreshLevel2 );
+            CLogger::LogPrintf ( "%s > %d msgs. This is due to server overload or script freeze\n", szTag, iThreshLevel2 );
             queueInfo.status = EQueueStatus::SUSPEND_SYNC;
         }
     }
@@ -227,7 +227,7 @@ void CNetBufferWatchDog::UpdateQueueInfo ( CQueueInfo& queueInfo, int iQueueSize
         //      terminate threadnet
         if ( queueInfo.m_SizeHistory.GetLowestPointSince( 30 ) > iThreshLevel3 )
         {
-            CLogger::ErrorPrintf ( "%s > %d pkts for 30 seconds\n", szTag, iThreshLevel3 );
+            CLogger::ErrorPrintf ( "%s > %d msgs for 30 seconds\n", szTag, iThreshLevel3 );
             CLogger::ErrorPrintf ( "Something is wrong - Switching from threaded sync mode\n" );
             queueInfo.status = EQueueStatus::STOP_THREAD_NET;
             ms_bCriticalStopThreadNet = true;
@@ -240,7 +240,7 @@ void CNetBufferWatchDog::UpdateQueueInfo ( CQueueInfo& queueInfo, int iQueueSize
         //      shutdown
         if ( queueInfo.m_SizeHistory.GetLowestPointSince( 60 ) > iThreshLevel4 )
         {
-            CLogger::ErrorPrintf ( "%s > %d pkts for 60 seconds\n", szTag, iThreshLevel4 );
+            CLogger::ErrorPrintf ( "%s > %d msgs for 60 seconds\n", szTag, iThreshLevel4 );
             CLogger::ErrorPrintf ( "Something is very wrong - Shutting down server\n" );
             queueInfo.status = EQueueStatus::SHUTDOWN;
             g_pGame->SetIsFinished ( true );
@@ -253,7 +253,7 @@ void CNetBufferWatchDog::UpdateQueueInfo ( CQueueInfo& queueInfo, int iQueueSize
         //      terminate server
         if ( queueInfo.m_SizeHistory.GetLowestPointSince( 90 ) > iThreshLevel5 )
         {
-            CLogger::ErrorPrintf ( "%s > %d pkts for 90 seconds\n", szTag, iThreshLevel5 );
+            CLogger::ErrorPrintf ( "%s > %d msgs for 90 seconds\n", szTag, iThreshLevel5 );
             CLogger::ErrorPrintf ( "Something is badly wrong right here - Terminating server\n" );
             queueInfo.status = EQueueStatus::TERMINATE;
 #ifdef WIN32
