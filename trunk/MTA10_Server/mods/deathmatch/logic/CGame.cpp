@@ -4143,6 +4143,9 @@ bool CGame::IsBelowRecommendedClient ( const SString& strVersion )
 //////////////////////////////////////////////////////////////////
 SString CGame::CalculateMinClientRequirement ( void )
 {
+    if ( g_pGame->IsBeingDeleted() )
+        return "";
+
     // Calc effective min client version
     SString strMinClientRequirementFromConfig = m_pMainConfig->GetMinClientVersion ();
     SString strMinClientRequirementFromResources = m_pResourceManager->GetMinClientRequirement ();
