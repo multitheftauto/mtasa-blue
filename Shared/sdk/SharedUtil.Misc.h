@@ -1536,17 +1536,16 @@ namespace SharedUtil
             m_pCS->Unlock ();
         }
 
-        void Release ( void )
+        int Release ( void )
         {
             m_pCS->Lock ();
             assert ( m_iRefCount > 0 );
-            bool bLastRef = --m_iRefCount == 0;
+            int iNewRefCount = --m_iRefCount;
             m_pCS->Unlock ();
 
-            if ( !bLastRef )
-                return;
-
-            delete this;
+            if ( iNewRefCount == 0 )
+                delete this;
+            return iNewRefCount;
         }
     };
 

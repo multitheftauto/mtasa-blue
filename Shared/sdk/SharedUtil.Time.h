@@ -150,6 +150,75 @@ namespace SharedUtil
 
 
     //
+    // Like CElapsedTime except it is not as accurate.
+    // Has a lot better Get() performance than CElapsedTime as counting is done in another thread.
+    //
+    class CElapsedTimeApprox
+    {
+    public:
+
+        CElapsedTimeApprox( void )
+        {
+            m_bInitialized = false;
+            m_uiMaxIncrement = INT_MAX;
+            m_pucCounterValue = NULL;
+            m_ppIntervalCounter = NULL;
+            m_ucUpdateCount = 0;
+            m_uiElapsedTime = 0;
+    #ifndef SHARED_UTIL_MANUAL_TIMER_INITIALIZATION
+            StaticInitialize( this );
+    #endif
+        }
+
+        ~CElapsedTimeApprox( void )
+        {
+            if ( m_ppIntervalCounter && *m_ppIntervalCounter )
+                if ( (*m_ppIntervalCounter)->Release() == 0 )
+                    *m_ppIntervalCounter = NULL;
+        }
+
+        void SetMaxIncrement( uint uiMaxIncrement )
+        {
+            m_uiMaxIncrement = uiMaxIncrement;
+        }
+
+        void Reset( void )
+        {
+            dassert( m_bInitialized );
+            m_ucUpdateCount = DoGetCount();
+            m_uiElapsedTime = 0;
+        }
+
+        // This will wrap if gap between calls is over 25.5 seconds
+        uint Get( void )
+        {
+            dassert( m_bInitialized );
+            uchar ucCount = DoGetCount();
+            uint uiTimeDelta = ( ucCount - m_ucUpdateCount ) * 100U;
+            m_ucUpdateCount = ucCount;
+            m_uiElapsedTime += Min( uiTimeDelta, m_uiMaxIncrement );
+            return m_uiElapsedTime;
+        }
+
+        static void StaticInitialize( CElapsedTimeApprox* pTimer );
+    protected:
+        CElapsedTimeApprox( const CElapsedTimeApprox& );    // Not implemented
+
+        uchar DoGetCount( void )
+        {
+            return *m_pucCounterValue;
+        }
+
+        bool            m_bInitialized;
+        uchar           m_ucUpdateCount;
+        uint            m_uiMaxIncrement;
+        uint            m_uiElapsedTime;
+        uchar*          m_pucCounterValue;
+        CRefCountable** m_ppIntervalCounter;
+    };
+
+
+    //
     // Timing sections of code
     //
     template < int RESERVE_NUM_ITEMS = 20 >
