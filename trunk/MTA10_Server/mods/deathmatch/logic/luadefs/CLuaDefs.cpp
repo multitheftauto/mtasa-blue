@@ -130,6 +130,9 @@ int CLuaDefs::CanUseFunction ( lua_CFunction f, lua_State* luaVM )
     if ( !pResource )
         return true;
 
+    // Update execution time check
+    pResource->GetVirtualMachine()->CheckExecutionTime();
+
     // Check function right cache in resource
     bool bAllowed;
     if ( pResource->CheckFunctionRightCache( f, &bAllowed ) )

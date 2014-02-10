@@ -1231,7 +1231,7 @@ bool CLuaMain::LoadScriptFromBuffer ( const char* cpInBuffer, unsigned int uiInS
     {
         // Are we not marked as UTF-8 already, and not precompiled?
         std::string strUTFScript;
-        if ( !bUTF8 && ( uiSize < 5 || cpBuffer[0] != 27 || cpBuffer[1] != 'L' || cpBuffer[2] != 'u' || cpBuffer[3] != 'a' || cpBuffer[4] != 'Q' ) )
+        if ( !bUTF8 && !IsLuaCompiledScript( cpBuffer, uiSize ) )
         {
             std::string strBuffer = std::string(cpBuffer, uiSize);
             strUTFScript = UTF16ToMbUTF8(ANSIToUTF16( strBuffer ));

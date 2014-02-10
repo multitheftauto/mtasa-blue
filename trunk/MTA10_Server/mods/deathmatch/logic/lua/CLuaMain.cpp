@@ -80,6 +80,7 @@ CLuaMain::CLuaMain ( CLuaManager* pLuaManager,
     m_bBeingDeleted = false;
     m_pLuaTimerManager = new CLuaTimerManager;
     m_FunctionEnterTimer.SetMaxIncrement ( 500 );
+    m_WarningTimer.SetMaxIncrement ( 1000 );
     m_uiOpenFileCountWarnThresh = 10;
     m_uiOpenXMLFileCountWarnThresh = 20;
 
@@ -716,8 +717,36 @@ const SString& CLuaMain::GetFunctionTag ( int iLuaFunction )
 ///////////////////////////////////////////////////////////////
 int CLuaMain::PCall ( lua_State *L, int nargs, int nresults, int errfunc )
 {
+    if ( m_uiPCallDepth++ == 0 )
+        m_WarningTimer.Reset();   // Only restart timer if initial call
+
     g_pGame->GetScriptDebugging()->PushLuaMain ( this );
     int iret = lua_pcall ( L, nargs, nresults, errfunc );
     g_pGame->GetScriptDebugging()->PopLuaMain ( this );
+
+    --m_uiPCallDepth;
     return iret;
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CLuaMain::CheckExecutionTime
+//
+// Issue warning if execution time is too long
+//
+///////////////////////////////////////////////////////////////
+void CLuaMain::CheckExecutionTime( void )
+{
+    // Do time check
+    if ( m_WarningTimer.Get() < 5000 )
+        return;
+    m_WarningTimer.Reset();
+
+    // No warning if no players
+    if ( g_pGame->GetPlayerManager()->Count() == 0 )
+        return;
+
+    // Issue warning about script execution time
+    CLogger::LogPrintf ( "WARNING: Long execution (%s)\n", GetScriptName () );
 }
