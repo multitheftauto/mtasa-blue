@@ -48,11 +48,11 @@ bool CDynamicLibrary::Load ( const char* szFilename )
     #else
         m_hModule = dlopen ( szFilename, RTLD_NOW );
     
-    // Output error if needed
-    if ( !m_hModule )
-    {
-        Print ( "%s\n", dlerror( ) );
-    }
+        // Output error if needed
+        if ( !m_hModule )
+        {
+            CLogger::ErrorPrintf ( "Could not load %s - %s", szFilename, dlerror( ) );
+        }
     #endif
 
     // Return whether we succeeded or not

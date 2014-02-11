@@ -4582,7 +4582,7 @@ void CPacketHandler::Packet_ResourceStart ( NetBitStreamInterface& bitStream )
                     bitStream.Read ( (char*)chunkChecksum.mD5, sizeof ( chunkChecksum.mD5 ) );
                     bitStream.Read ( dChunkDataSize );
 
-                    uiTotalSizeProcessed += dChunkDataSize;
+                    uiTotalSizeProcessed += (uint)dChunkDataSize;
                     if ( uiTotalSizeProcessed / 1024 / 1024 > 50 )
                         g_pCore->UpdateDummyProgress( uiTotalSizeProcessed / 1024 / 1024, " MB" );
 
