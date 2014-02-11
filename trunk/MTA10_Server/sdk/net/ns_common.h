@@ -128,16 +128,23 @@ struct SBandwidthStatistics
 
 struct SNetPerformanceStatistics
 {
+    uint uiUpdateCycleRecvTimeAvgUs;
     uint uiUpdateCyclePrepTimeAvgUs;
     uint uiUpdateCycleProcessTimeAvgUs;
+    uint uiUpdateCycleRecvTimeMaxUs;
     uint uiUpdateCyclePrepTimeMaxUs;
     uint uiUpdateCycleProcessTimeMaxUs;
+    float fUpdateCycleRecvDatagramsAvg;
+    uint uiUpdateCycleRecvDatagramsMax;
+    uint uiUpdateCycleRecvDatagramsLimit;
     float fUpdateCycleDatagramsAvg;
     uint uiUpdateCycleDatagramsMax;
     uint uiUpdateCycleDatagramsLimit;
     float fUpdateCycleMessagesAvg;
     uint uiUpdateCycleMessagesMax;
     uint uiUpdateCycleMessagesLimit;
+    uint uiUpdateCycleRecvsLimitedTotal;
+    float fUpdateCycleRecvsLimitedPercent;
     uint uiUpdateCycleSendsLimitedTotal;
     float fUpdateCycleSendsLimitedPercent;
 };
