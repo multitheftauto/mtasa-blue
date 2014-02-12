@@ -1415,7 +1415,7 @@ const std::vector < SIntSetting >& CMainConfig::GetIntSettingList ( void )
             { true, true,   1,      4,      100,    "update_cycle_datagrams_limit",         &m_iUpdateCycleDatagramsLimit,              &CMainConfig::ApplyNetOptions },
             { true, true,   10,     50,     1000,   "update_cycle_messages_limit",          &m_iUpdateCycleMessagesLimit,               &CMainConfig::ApplyNetOptions },
             { true, true,   50,     100,    400,    "ped_syncer_distance",                  &g_TickRateSettings.iPedSyncerDistance,     &CMainConfig::OnTickRateChange },
-            { true, true,   50,     130,    10000,  "unoccupied_vehicle_syncer_distance",   &g_TickRateSettings.iUnoccupiedVehicleSyncerDistance,   &CMainConfig::OnTickRateChange },
+            { true, true,   50,     130,    400,    "unoccupied_vehicle_syncer_distance",   &g_TickRateSettings.iUnoccupiedVehicleSyncerDistance,   &CMainConfig::OnTickRateChange },
             { false, false, 0,      1,      2,      "compact_internal_databases",           &m_iCompactInternalDatabases,               NULL },
             { true, true,   0,      1,      2,      "minclientversion_auto_update",         &m_iMinClientVersionAutoUpdate,             NULL },
             { true, true,   0,      0,      1,      "alt_veh_parts_state_sync",             &g_TickRateSettings.bAltVehPartsStateSync,  NULL },
