@@ -69,7 +69,6 @@ struct SNetOptions
 
     struct {
         bool bValid;
-        int iUpdateCycleRecvDatagramsLimit;
         int iUpdateCycleDatagramsLimit;
         int iUpdateCycleMessagesLimit;
     } netOptimize;
@@ -105,6 +104,7 @@ public:
     virtual bool                            GetBandwidthStatistics          ( SBandwidthStatistics* pDest ) = 0;
     virtual bool                            GetNetPerformanceStatistics     ( SNetPerformanceStatistics* pDest, bool bResetCounters ) = 0;
     virtual void                            GetPingStatus                   ( SFixedString < 32 >* pstrStatus ) = 0;
+    virtual bool                            GetSyncThreadStatistics         ( SSyncThreadStatistics* pDest, bool bResetCounters ) = 0;
 
     virtual NetBitStreamInterface*          AllocateNetServerBitStream      ( unsigned short usBitStreamVersion ) = 0;
     virtual void                            DeallocateNetServerBitStream    ( NetBitStreamInterface* bitStream ) = 0;
