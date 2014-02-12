@@ -313,7 +313,7 @@ public:
     void                        SetTrainSpeed           ( float fSpeed );
 
     float                       GetTrainPosition        ( void );
-    void                        SetTrainPosition        ( float fPosition, bool bRecalcOnRailDistance = true );
+    void                        SetTrainPosition        ( float fTrainPosition, bool bRecalcOnRailDistance = true );
 
     uchar                       GetTrainTrack           ( void );
     void                        SetTrainTrack           ( uchar ucTrack );
