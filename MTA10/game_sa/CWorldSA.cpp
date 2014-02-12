@@ -536,6 +536,33 @@ void CWorldSA::FindWorldPositionForRailTrackPosition ( float fRailTrackPosition,
     }
 }
 
+int CWorldSA::FindClosestRailTrackNode ( const CVector& vecPosition, int* pOutTrackId, float& fOutRailDistance )
+{
+    DWORD dwFunc = FUNC_GetTrainNodeNearPoint; // __cdecl
+    int iNodeId;
+    *pOutTrackId = 0;
+    float fX = vecPosition.fX;
+    float fY = vecPosition.fY;
+    float fZ = vecPosition.fZ;
+
+    _asm
+    {
+        push pOutTrackId
+        push fZ
+        push fY
+        push fZ
+        call dwFunc
+        mov iNodeId, eax
+        add esp, 4*4
+    }
+
+    // Read rail distance
+    SRailNodeSA** aRailNodes = (SRailNodeSA**) ARRAY_RailTrackNodePointers;
+    fOutRailDistance = aRailNodes[*pOutTrackId][iNodeId].sRailDistance * 3.33333334f;
+    
+    return iNodeId;
+}
+
 void CWorldSA::RemoveBuilding ( unsigned short usModelToRemove, float fRange, float fX, float fY, float fZ, char cInterior )
 {    
     // New building Removal

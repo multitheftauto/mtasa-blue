@@ -173,7 +173,7 @@ typedef struct
     short sX;               // x coordinate times 8
     short sY;               // y coordinate times 8
     short sZ;               // z coordinate times 8
-    WORD  sRailDistance;    // on-rail distance times 3
+    WORD  sRailDistance;    // on-rail distance times 3.33333334
     WORD  padding;
 } SRailNodeSA;
 
