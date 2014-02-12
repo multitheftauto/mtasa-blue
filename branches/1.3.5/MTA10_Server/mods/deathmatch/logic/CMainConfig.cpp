@@ -557,7 +557,6 @@ void CMainConfig::ApplyNetOptions ( void )
     m_NetOptions.netFilter.bAutoFilter = m_bNetAutoFilter != 0;
 
     m_NetOptions.netOptimize.bValid = true;
-    m_NetOptions.netOptimize.iUpdateCycleRecvDatagramsLimit = m_iUpdateCycleDatagramsLimit;
     m_NetOptions.netOptimize.iUpdateCycleDatagramsLimit = m_iUpdateCycleDatagramsLimit;
     m_NetOptions.netOptimize.iUpdateCycleMessagesLimit = m_iUpdateCycleMessagesLimit;
 
