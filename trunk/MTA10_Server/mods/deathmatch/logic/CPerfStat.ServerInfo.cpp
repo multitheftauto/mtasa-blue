@@ -80,6 +80,7 @@ public:
     long long                   m_llNextRecordTime;
     SBandwidthStatistics        m_PrevLiveStats;
     SNetPerformanceStatistics   m_NetPerformanceStats;
+    SSyncThreadStatistics       m_SyncThreadStats;
     CTickCount                  m_PrevTickCount;
     CTickCount                  m_DeltaTickCount;
     long long                   m_llDeltaGameBytesSent;
@@ -377,17 +378,15 @@ void CPerfStatServerInfoImpl::GetStats ( CPerfStatResult* pResult, const std::ma
     {
         if ( pConfig->GetThreadNetEnabled () )
         {
-            m_StatusList.push_back ( StringPair ( "Msg queue incoming",       SString ( "%d", CNetBufferWatchDog::ms_uiInResultQueueSize ) ) );
-            m_StatusList.push_back ( StringPair ( "       finished incoming",       SString ( "%d", CNetBufferWatchDog::ms_uiFinishedListSize ) ) );
-            m_StatusList.push_back ( StringPair ( "Msg queue outgoing",       SString ( "%d", CNetBufferWatchDog::ms_uiOutCommandQueueSize ) ) );
-            m_StatusList.push_back ( StringPair ( "       finished outgoing",       SString ( "%d", CNetBufferWatchDog::ms_uiOutResultQueueSize ) ) );
+            m_StatusList.push_back ( StringPair ( "Msg queue incoming (finished)",       SString ( "%d (%d)", CNetBufferWatchDog::ms_uiInResultQueueSize, CNetBufferWatchDog::ms_uiFinishedListSize ) ) );
+            m_StatusList.push_back ( StringPair ( "Msg queue outgoing (finished)",       SString ( "%d (%d)", CNetBufferWatchDog::ms_uiOutCommandQueueSize, CNetBufferWatchDog::ms_uiOutResultQueueSize  ) ) );
         }
 
         m_StatusList.push_back ( StringPair ( "Bytes/sec outgoing resent",  CPerfStatManager::GetScaledByteString ( llOutgoingBytesResentPS ) ) );
         m_StatusList.push_back ( StringPair ( "Msgs/sec outgoing resent",   strOutgoingMessagesResentPS ) );
-        m_StatusList.push_back ( StringPair ( "Bytes/sec blocked",          CPerfStatManager::GetScaledByteString ( llIncomingBytesPSBlocked ) ) );
-        m_StatusList.push_back ( StringPair ( "Packets/sec  blocked",       strIncomingPacketsPSBlocked ) );
-        m_StatusList.push_back ( StringPair ( "Usage incl. blocked",        CPerfStatManager::GetScaledBitString ( llNetworkUsageBytesPSInclBlocked * 8LL ) + "/s" ) );
+        //m_StatusList.push_back ( StringPair ( "Bytes/sec blocked",          CPerfStatManager::GetScaledByteString ( llIncomingBytesPSBlocked ) ) );
+        //m_StatusList.push_back ( StringPair ( "Packets/sec  blocked",       strIncomingPacketsPSBlocked ) );
+        //m_StatusList.push_back ( StringPair ( "Usage incl. blocked",        CPerfStatManager::GetScaledBitString ( llNetworkUsageBytesPSInclBlocked * 8LL ) + "/s" ) );
 
         m_InfoList.push_back ( StringPair ( "Logic thread core #",       SString ( "%d", m_MainThreadCPUTimes.uiProcessorNumber ) ) );
         m_InfoList.push_back ( StringPair ( "Sync thread core #",        SString ( "%d", g_SyncThreadCPUTimes.uiProcessorNumber ) ) );
@@ -401,19 +400,21 @@ void CPerfStatServerInfoImpl::GetStats ( CPerfStatResult* pResult, const std::ma
         {
             m_NetPerformanceStatsUpdateTimer.Reset();
             g_pNetServer->GetNetPerformanceStatistics ( &m_NetPerformanceStats, true );
+            g_pNetServer->GetSyncThreadStatistics ( &m_SyncThreadStats, true );
         }
 
-        m_OptionsList.push_back ( StringPair ( "Recv datagrams limit",      SString ( "%d", m_NetPerformanceStats.uiUpdateCycleRecvDatagramsLimit ) ) );
         m_OptionsList.push_back ( StringPair ( "Send datagrams limit",      SString ( "%d", m_NetPerformanceStats.uiUpdateCycleDatagramsLimit ) ) );
         m_OptionsList.push_back ( StringPair ( "Send messages limit",       SString ( "%d", m_NetPerformanceStats.uiUpdateCycleMessagesLimit ) ) );
-        m_StatusList.push_back ( StringPair ( "Recv process time max",      SString ( "%s ms (Avg %s ms)", *CPerfStatManager::GetScaledFloatString( m_NetPerformanceStats.uiUpdateCycleRecvTimeMaxUs / 1000.f ), *CPerfStatManager::GetScaledFloatString( m_NetPerformanceStats.uiUpdateCycleRecvTimeAvgUs / 1000.f ) ) ) );
-        m_StatusList.push_back ( StringPair ( "Recv datagrams max",         SString ( "%d (Avg %s)", m_NetPerformanceStats.uiUpdateCycleRecvDatagramsMax, *CPerfStatManager::GetScaledFloatString( m_NetPerformanceStats.fUpdateCycleRecvDatagramsAvg ) ) ) );
-        m_StatusList.push_back ( StringPair ( "Recvs limited",              SString ( "%d (%s %%)", m_NetPerformanceStats.uiUpdateCycleRecvsLimitedTotal, *CPerfStatManager::GetScaledFloatString( m_NetPerformanceStats.fUpdateCycleRecvsLimitedPercent ) ) ) );
-        m_StatusList.push_back ( StringPair ( "Send prep time max",         SString ( "%s ms (Avg %s ms)", *CPerfStatManager::GetScaledFloatString( m_NetPerformanceStats.uiUpdateCyclePrepTimeMaxUs / 1000.f ), *CPerfStatManager::GetScaledFloatString( m_NetPerformanceStats.uiUpdateCyclePrepTimeAvgUs / 1000.f ) ) ) );
-        m_StatusList.push_back ( StringPair ( "Send process time max",      SString ( "%s ms (Avg %s ms)", *CPerfStatManager::GetScaledFloatString( m_NetPerformanceStats.uiUpdateCycleProcessTimeMaxUs / 1000.f ), *CPerfStatManager::GetScaledFloatString( m_NetPerformanceStats.uiUpdateCycleProcessTimeAvgUs / 1000.f ) ) ) );
-        m_StatusList.push_back ( StringPair ( "Send datagrams max",         SString ( "%d (Avg %s)", m_NetPerformanceStats.uiUpdateCycleDatagramsMax, *CPerfStatManager::GetScaledFloatString( m_NetPerformanceStats.fUpdateCycleDatagramsAvg ) ) ) );
-        m_StatusList.push_back ( StringPair ( "Send messages max",          SString ( "%d (Avg %s)", m_NetPerformanceStats.uiUpdateCycleMessagesMax, *CPerfStatManager::GetScaledFloatString( m_NetPerformanceStats.fUpdateCycleMessagesAvg ) ) ) );
-        m_StatusList.push_back ( StringPair ( "Sends limited",              SString ( "%d (%s %%)", m_NetPerformanceStats.uiUpdateCycleSendsLimitedTotal, *CPerfStatManager::GetScaledFloatString( m_NetPerformanceStats.fUpdateCycleSendsLimitedPercent ) ) ) );
+        m_StatusList.push_back ( StringPair ( "Raknet Recv time max",       SString ( "%s ms (Avg %s ms)", *CPerfStatManager::GetScaledFloatString( m_NetPerformanceStats.uiUpdateCycleRecvTimeMaxUs / 1000.f ), *CPerfStatManager::GetScaledFloatString( m_NetPerformanceStats.uiUpdateCycleRecvTimeAvgUs / 1000.f ) ) ) );
+        m_StatusList.push_back ( StringPair ( "Raknet Send time max",       SString ( "%s ms (Avg %s ms)", *CPerfStatManager::GetScaledFloatString( m_NetPerformanceStats.uiUpdateCycleSendTimeMaxUs / 1000.f ), *CPerfStatManager::GetScaledFloatString( m_NetPerformanceStats.uiUpdateCycleSendTimeAvgUs / 1000.f ) ) ) );
+        m_StatusList.push_back ( StringPair ( "Raknet Recv datagrams max",  SString ( "%d (Avg %s)", m_NetPerformanceStats.uiUpdateCycleRecvDatagramsMax, *CPerfStatManager::GetScaledFloatString( m_NetPerformanceStats.fUpdateCycleRecvDatagramsAvg ) ) ) );
+        m_StatusList.push_back ( StringPair ( "Raknet Send datagrams max",  SString ( "%d (Avg %s)", m_NetPerformanceStats.uiUpdateCycleDatagramsMax, *CPerfStatManager::GetScaledFloatString( m_NetPerformanceStats.fUpdateCycleDatagramsAvg ) ) ) );
+        m_StatusList.push_back ( StringPair ( "Raknet Send messages max",   SString ( "%d (Avg %s)", m_NetPerformanceStats.uiUpdateCycleMessagesMax, *CPerfStatManager::GetScaledFloatString( m_NetPerformanceStats.fUpdateCycleMessagesAvg ) ) ) );
+        m_StatusList.push_back ( StringPair ( "Raknet Sends limited",       SString ( "%d (%s %%)", m_NetPerformanceStats.uiUpdateCycleSendsLimitedTotal, *CPerfStatManager::GetScaledFloatString( m_NetPerformanceStats.fUpdateCycleSendsLimitedPercent ) ) ) );
+        m_StatusList.push_back ( StringPair ( "Sync Recv time max",         SString ( "%s ms (Avg %s ms)", *CPerfStatManager::GetScaledFloatString( m_SyncThreadStats.uiRecvTimeMaxUs / 1000.f ), *CPerfStatManager::GetScaledFloatString( m_SyncThreadStats.uiRecvTimeAvgUs / 1000.f ) ) ) );
+        m_StatusList.push_back ( StringPair ( "Sync Send time max",         SString ( "%s ms (Avg %s ms)", *CPerfStatManager::GetScaledFloatString( m_SyncThreadStats.uiSendTimeMaxUs / 1000.f ), *CPerfStatManager::GetScaledFloatString( m_SyncThreadStats.uiSendTimeAvgUs / 1000.f ) ) ) );
+        m_StatusList.push_back ( StringPair ( "Sync Recv msgs max",         SString ( "%d (Avg %s)", m_SyncThreadStats.uiRecvMsgsMax, *CPerfStatManager::GetScaledFloatString( m_SyncThreadStats.fRecvMsgsAvg ) ) ) );
+        m_StatusList.push_back ( StringPair ( "Sync Send cmds max",         SString ( "%d (Avg %s)", m_SyncThreadStats.uiSendCmdsMax, *CPerfStatManager::GetScaledFloatString( m_SyncThreadStats.fSendCmdsAvg ) ) ) );
     }
 
     // Add columns

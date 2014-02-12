@@ -129,24 +129,31 @@ struct SBandwidthStatistics
 struct SNetPerformanceStatistics
 {
     uint uiUpdateCycleRecvTimeAvgUs;
-    uint uiUpdateCyclePrepTimeAvgUs;
-    uint uiUpdateCycleProcessTimeAvgUs;
+    uint uiUpdateCycleSendTimeAvgUs;
     uint uiUpdateCycleRecvTimeMaxUs;
-    uint uiUpdateCyclePrepTimeMaxUs;
-    uint uiUpdateCycleProcessTimeMaxUs;
+    uint uiUpdateCycleSendTimeMaxUs;
     float fUpdateCycleRecvDatagramsAvg;
     uint uiUpdateCycleRecvDatagramsMax;
-    uint uiUpdateCycleRecvDatagramsLimit;
     float fUpdateCycleDatagramsAvg;
     uint uiUpdateCycleDatagramsMax;
     uint uiUpdateCycleDatagramsLimit;
     float fUpdateCycleMessagesAvg;
     uint uiUpdateCycleMessagesMax;
     uint uiUpdateCycleMessagesLimit;
-    uint uiUpdateCycleRecvsLimitedTotal;
-    float fUpdateCycleRecvsLimitedPercent;
     uint uiUpdateCycleSendsLimitedTotal;
     float fUpdateCycleSendsLimitedPercent;
+};
+
+struct SSyncThreadStatistics
+{
+    uint uiRecvTimeAvgUs;
+    uint uiSendTimeAvgUs;
+    uint uiRecvTimeMaxUs;
+    uint uiSendTimeMaxUs;
+    float fRecvMsgsAvg;
+    uint uiRecvMsgsMax;
+    float fSendCmdsAvg;
+    uint uiSendCmdsMax;
 };
 
 enum ePacketOrdering
