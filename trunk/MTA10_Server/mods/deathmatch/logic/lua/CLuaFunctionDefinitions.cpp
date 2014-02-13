@@ -3792,12 +3792,13 @@ int CLuaFunctionDefinitions::GetVehicleVariant ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::GetVehicleColor ( lua_State* luaVM )
 {
+//  getVehicleColor ( vehicle theVehicle[, bool bRGB ] )
     CVehicle* pVehicle; 
     bool bRGB; 
     
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData(pVehicle); 
-    argStream.ReadBool(bRGB); 
+    argStream.ReadBool(bRGB,false); 
     
     if ( !argStream.HasErrors ( ) )
     {
