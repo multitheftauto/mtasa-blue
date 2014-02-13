@@ -1101,7 +1101,7 @@ int CLuaFunctionDefinitions::SetWeaponProperty ( lua_State* luaVM )
             case WEAPON_MAX_CLIP_AMMO:
             case WEAPON_FLAGS:
                 {
-                    short sWeaponInfo = 0;
+                    int sWeaponInfo = 0;
                     argStream.ReadNumber ( sWeaponInfo );
                     if ( !argStream.HasErrors () )
                     {
@@ -1185,7 +1185,7 @@ int CLuaFunctionDefinitions::GetWeaponProperty ( lua_State* luaVM )
         case WEAPON_DEFAULT_COMBO:
         case WEAPON_COMBOS_AVAILABLE:
             {
-                short sWeaponInfo = 0;
+                int sWeaponInfo = 0;
 
                 if ( CStaticFunctionDefinitions::GetWeaponProperty ( eProp, eWep, eWepSkill, sWeaponInfo ) )
                 {
@@ -1277,7 +1277,7 @@ int CLuaFunctionDefinitions::GetOriginalWeaponProperty ( lua_State* luaVM )
         case WEAPON_DEFAULT_COMBO:
         case WEAPON_COMBOS_AVAILABLE:
             {
-                short sWeaponInfo = 0;
+                int sWeaponInfo = 0;
 
                 if ( CStaticFunctionDefinitions::GetOriginalWeaponProperty ( eProp, eWep, eWepSkill, sWeaponInfo ) )
                 {

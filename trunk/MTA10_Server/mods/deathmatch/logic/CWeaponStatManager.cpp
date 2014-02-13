@@ -524,7 +524,7 @@ void CWeaponStatManager::Init ( void )
     OriginalNormalWeaponData[33].spread = 0.0f;
     OriginalNormalWeaponData[33].maximum_clip_ammo = 1;
     OriginalNormalWeaponData[33].move_speed = 1.2000000476837f;
-    OriginalNormalWeaponData[33].flags = -24568;
+    OriginalNormalWeaponData[33].flags = 40968;
     OriginalNormalWeaponData[33].anim_group = 27;
     OriginalNormalWeaponData[33].fire_type = (eFireType) 1;
     OriginalNormalWeaponData[33].model = 357;
@@ -545,8 +545,8 @@ void CWeaponStatManager::Init ( void )
     OriginalNormalWeaponData[33].default_combo = 4;
     OriginalNormalWeaponData[33].combos_available = 1;
     // 34 - Sniper
-    OriginalNormalWeaponData[34].weapon_range = 300.0f;
-    OriginalNormalWeaponData[34].target_range = 250.0f;
+    OriginalNormalWeaponData[34].weapon_range = 300.0f;     // Default is actually 100;
+    OriginalNormalWeaponData[34].target_range = 250.0f;     // Default is actually 50;
     OriginalNormalWeaponData[34].accuracy = 1.0f;
     OriginalNormalWeaponData[34].damage = 125;
     OriginalNormalWeaponData[34].life_span = 0.0f;
@@ -554,7 +554,7 @@ void CWeaponStatManager::Init ( void )
     OriginalNormalWeaponData[34].spread = 0.0f;
     OriginalNormalWeaponData[34].maximum_clip_ammo = 1;
     OriginalNormalWeaponData[34].move_speed = 1.0f;
-    OriginalNormalWeaponData[34].flags = -24556;
+    OriginalNormalWeaponData[34].flags = 40980;
     OriginalNormalWeaponData[34].anim_group = 27;
     OriginalNormalWeaponData[34].fire_type = (eFireType) 1;
     OriginalNormalWeaponData[34].model = 358;
@@ -584,7 +584,7 @@ void CWeaponStatManager::Init ( void )
     OriginalNormalWeaponData[35].spread = 0.0f;
     OriginalNormalWeaponData[35].maximum_clip_ammo = 1;
     OriginalNormalWeaponData[35].move_speed = 1.0f;
-    OriginalNormalWeaponData[35].flags = -32236;
+    OriginalNormalWeaponData[35].flags = 295444;
     OriginalNormalWeaponData[35].anim_group = 30;
     OriginalNormalWeaponData[35].fire_type = (eFireType) 2;
     OriginalNormalWeaponData[35].model = 359;
@@ -614,7 +614,7 @@ void CWeaponStatManager::Init ( void )
     OriginalNormalWeaponData[36].spread = 0.0f;
     OriginalNormalWeaponData[36].maximum_clip_ammo = 1;
     OriginalNormalWeaponData[36].move_speed = 1.0f;
-    OriginalNormalWeaponData[36].flags = -32236;
+    OriginalNormalWeaponData[36].flags = 295444;
     OriginalNormalWeaponData[36].anim_group = 30;
     OriginalNormalWeaponData[36].fire_type = (eFireType) 2;
     OriginalNormalWeaponData[36].model = 360;
@@ -644,7 +644,7 @@ void CWeaponStatManager::Init ( void )
     OriginalNormalWeaponData[37].spread = 2.0f;
     OriginalNormalWeaponData[37].maximum_clip_ammo = 500;
     OriginalNormalWeaponData[37].move_speed = 1.0f;
-    OriginalNormalWeaponData[37].flags = 568;
+    OriginalNormalWeaponData[37].flags = 197176;
     OriginalNormalWeaponData[37].anim_group = 29;
     OriginalNormalWeaponData[37].fire_type = (eFireType) 3;
     OriginalNormalWeaponData[37].model = 361;

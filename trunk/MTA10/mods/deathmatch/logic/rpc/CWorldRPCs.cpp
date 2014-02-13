@@ -533,10 +533,18 @@ void CWorldRPCs::SetWeaponProperty ( NetBitStreamInterface& bitStream )
                 }
             case WEAPON_FLAGS:
                 {
-                    bitStream.Read ( sData );
-                    if ( pWeaponInfo->IsFlagSet ( sData ) )
+                    int iData = 0;
+                    if ( bitStream.Version() < 0x57 )
                     {
-                        if ( sData == 0x800 )
+                        bitStream.Read ( sData );
+                        iData = sData;
+                    }
+                    else
+                        bitStream.Read ( iData );
+
+                    if ( pWeaponInfo->IsFlagSet ( iData ) )
+                    {
+                        if ( iData == 0x800 )
                         {
                             // if it can support this anim group
                             if ( ( ucWeapon >= WEAPONTYPE_PISTOL && ucWeapon <= WEAPONTYPE_SNIPERRIFLE ) || ucWeapon == WEAPONTYPE_MINIGUN )
@@ -545,11 +553,11 @@ void CWorldRPCs::SetWeaponProperty ( NetBitStreamInterface& bitStream )
                                 pWeaponInfo->SetAnimGroup ( pOriginalWeaponInfo->GetAnimGroup ( ) );
                             }
                         }
-                        pWeaponInfo->ClearFlag ( sData );
+                        pWeaponInfo->ClearFlag ( iData );
                     }
                     else
                     {
-                        if ( sData == 0x800 )
+                        if ( iData == 0x800 )
                         {
                             // if it can support this anim group
                             if ( ( ucWeapon >= WEAPONTYPE_PISTOL && ucWeapon <= WEAPONTYPE_SNIPERRIFLE ) || ucWeapon == WEAPONTYPE_MINIGUN )
@@ -558,7 +566,7 @@ void CWorldRPCs::SetWeaponProperty ( NetBitStreamInterface& bitStream )
                                 pWeaponInfo->SetAnimGroup ( 17 );
                             }
                         }
-                        pWeaponInfo->SetFlag ( sData );
+                        pWeaponInfo->SetFlag ( iData );
                     }
 
                     break;
