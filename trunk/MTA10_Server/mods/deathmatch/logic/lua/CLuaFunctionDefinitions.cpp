@@ -24,6 +24,7 @@
 #define MIN_SERVER_REQ_CALLREMOTE_CONNECTION_ATTEMPTS       "1.3.0-9.04563"
 #define MIN_SERVER_REQ_TRIGGERCLIENTEVENT_SENDLIST          "1.3.0-9.04570"
 #define MIN_SERVER_REQ_CALLREMOTE_CONNECT_TIMEOUT           "1.3.5"
+#define MIN_SERVER_REQ_WEAPON_PROPERTY_FLAG                 "1.3.5-9.06139"
 
 extern CGame* g_pGame;
 
@@ -1114,6 +1115,39 @@ int CLuaFunctionDefinitions::SetWeaponProperty ( lua_State* luaVM )
                     }
                     break;
                 }
+            case WEAPON_FLAG_AIM_NO_AUTO:
+            case WEAPON_FLAG_AIM_ARM:
+            case WEAPON_FLAG_AIM_1ST_PERSON:
+            case WEAPON_FLAG_AIM_FREE:
+            case WEAPON_FLAG_MOVE_AND_AIM:
+            case WEAPON_FLAG_MOVE_AND_SHOOT:
+            case WEAPON_FLAG_TYPE_THROW:
+            case WEAPON_FLAG_TYPE_HEAVY:
+            case WEAPON_FLAG_TYPE_CONSTANT:
+            case WEAPON_FLAG_TYPE_DUAL:
+            case WEAPON_FLAG_ANIM_RELOAD:
+            case WEAPON_FLAG_ANIM_CROUCH:
+            case WEAPON_FLAG_ANIM_RELOAD_LOOP:
+            case WEAPON_FLAG_ANIM_RELOAD_LONG:
+            case WEAPON_FLAG_SHOT_SLOWS:
+            case WEAPON_FLAG_SHOT_RAND_SPEED:
+            case WEAPON_FLAG_SHOT_ANIM_ABRUPT:
+            case WEAPON_FLAG_SHOT_EXPANDS:
+                {
+                    MinServerReqCheck ( argStream, MIN_SERVER_REQ_WEAPON_PROPERTY_FLAG, "flag name is being used" );
+                    bool bEnable;
+                    argStream.ReadBool ( bEnable );
+                    if ( !argStream.HasErrors () )
+                    {
+                        if ( CStaticFunctionDefinitions::SetWeaponPropertyFlag ( eProp, eWep, eWepSkill, bEnable ) )
+                        {
+                            lua_pushboolean ( luaVM, true );
+                            return 1;
+                        }
+                    }
+                    break;
+                }
+
             default:
                 {
                     argStream.SetCustomError( "unsupported weapon property at argument 3" );
@@ -1205,6 +1239,37 @@ int CLuaFunctionDefinitions::GetWeaponProperty ( lua_State* luaVM )
                     lua_pushnumber ( luaVM, vecWeaponInfo.fY );
                     lua_pushnumber ( luaVM, vecWeaponInfo.fZ );
                     return 3;
+                }
+                break;
+            }
+        case WEAPON_FLAG_AIM_NO_AUTO:
+        case WEAPON_FLAG_AIM_ARM:
+        case WEAPON_FLAG_AIM_1ST_PERSON:
+        case WEAPON_FLAG_AIM_FREE:
+        case WEAPON_FLAG_MOVE_AND_AIM:
+        case WEAPON_FLAG_MOVE_AND_SHOOT:
+        case WEAPON_FLAG_TYPE_THROW:
+        case WEAPON_FLAG_TYPE_HEAVY:
+        case WEAPON_FLAG_TYPE_CONSTANT:
+        case WEAPON_FLAG_TYPE_DUAL:
+        case WEAPON_FLAG_ANIM_RELOAD:
+        case WEAPON_FLAG_ANIM_CROUCH:
+        case WEAPON_FLAG_ANIM_RELOAD_LOOP:
+        case WEAPON_FLAG_ANIM_RELOAD_LONG:
+        case WEAPON_FLAG_SHOT_SLOWS:
+        case WEAPON_FLAG_SHOT_RAND_SPEED:
+        case WEAPON_FLAG_SHOT_ANIM_ABRUPT:
+        case WEAPON_FLAG_SHOT_EXPANDS:
+            {
+                MinServerReqCheck ( argStream, MIN_SERVER_REQ_WEAPON_PROPERTY_FLAG, "flag name is being used" );
+                if ( !argStream.HasErrors () )
+                {
+                    bool bEnable;
+                    if ( CStaticFunctionDefinitions::GetWeaponPropertyFlag ( eProp, eWep, eWepSkill, bEnable ) )
+                    {
+                        lua_pushboolean ( luaVM, bEnable );
+                        return 1;
+                    }
                 }
                 break;
             }
@@ -1300,6 +1365,37 @@ int CLuaFunctionDefinitions::GetOriginalWeaponProperty ( lua_State* luaVM )
                 }
                 break;
             }
+        case WEAPON_FLAG_AIM_NO_AUTO:
+        case WEAPON_FLAG_AIM_ARM:
+        case WEAPON_FLAG_AIM_1ST_PERSON:
+        case WEAPON_FLAG_AIM_FREE:
+        case WEAPON_FLAG_MOVE_AND_AIM:
+        case WEAPON_FLAG_MOVE_AND_SHOOT:
+        case WEAPON_FLAG_TYPE_THROW:
+        case WEAPON_FLAG_TYPE_HEAVY:
+        case WEAPON_FLAG_TYPE_CONSTANT:
+        case WEAPON_FLAG_TYPE_DUAL:
+        case WEAPON_FLAG_ANIM_RELOAD:
+        case WEAPON_FLAG_ANIM_CROUCH:
+        case WEAPON_FLAG_ANIM_RELOAD_LOOP:
+        case WEAPON_FLAG_ANIM_RELOAD_LONG:
+        case WEAPON_FLAG_SHOT_SLOWS:
+        case WEAPON_FLAG_SHOT_RAND_SPEED:
+        case WEAPON_FLAG_SHOT_ANIM_ABRUPT:
+        case WEAPON_FLAG_SHOT_EXPANDS:
+            {
+                MinServerReqCheck ( argStream, MIN_SERVER_REQ_WEAPON_PROPERTY_FLAG, "flag name is being used" );
+                if ( !argStream.HasErrors () )
+                {
+                    bool bEnable;
+                    if ( CStaticFunctionDefinitions::GetOriginalWeaponPropertyFlag ( eProp, eWep, eWepSkill, bEnable ) )
+                    {
+                        lua_pushboolean ( luaVM, bEnable );
+                        return 1;
+                    }
+                }
+                break;
+            }
         default:
             {
                 argStream.SetCustomError( "unsupported weapon property at argument 3" );
@@ -1307,9 +1403,8 @@ int CLuaFunctionDefinitions::GetOriginalWeaponProperty ( lua_State* luaVM )
             }
         }
     }
-    else
+    if ( !argStream.HasErrors () )
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
-
 
     // Failed
     lua_pushboolean ( luaVM, false );

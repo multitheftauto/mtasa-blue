@@ -436,7 +436,6 @@ void CWorldRPCs::SetWeaponProperty ( NetBitStreamInterface& bitStream )
     if ( bitStream.Read ( ucWeapon ) && bitStream.Read ( ucProperty ) && bitStream.Read ( ucWeaponSkill ) )
     {
         CWeaponStat* pWeaponInfo = g_pGame->GetWeaponStatManager()->GetWeaponStats( static_cast < eWeaponType > ( ucWeapon ), static_cast < eWeaponSkill > ( ucWeaponSkill ) );
-        CWeaponStat* pOriginalWeaponInfo = g_pGame->GetWeaponStatManager()->GetOriginalWeaponStats( static_cast < eWeaponType > ( ucWeapon ), static_cast < eWeaponSkill > ( ucWeaponSkill ) );
         switch ( ucProperty )
         {
             case WEAPON_WEAPON_RANGE:
@@ -542,39 +541,41 @@ void CWorldRPCs::SetWeaponProperty ( NetBitStreamInterface& bitStream )
                     else
                         bitStream.Read ( iData );
 
-                    if ( pWeaponInfo->IsFlagSet ( iData ) )
-                    {
-                        if ( iData == 0x800 )
-                        {
-                            // if it can support this anim group
-                            if ( ( ucWeapon >= WEAPONTYPE_PISTOL && ucWeapon <= WEAPONTYPE_SNIPERRIFLE ) || ucWeapon == WEAPONTYPE_MINIGUN )
-                            {
-                                // Revert anim group to default
-                                pWeaponInfo->SetAnimGroup ( pOriginalWeaponInfo->GetAnimGroup ( ) );
-                            }
-                        }
-                        pWeaponInfo->ClearFlag ( iData );
-                    }
-                    else
-                    {
-                        if ( iData == 0x800 )
-                        {
-                            // if it can support this anim group
-                            if ( ( ucWeapon >= WEAPONTYPE_PISTOL && ucWeapon <= WEAPONTYPE_SNIPERRIFLE ) || ucWeapon == WEAPONTYPE_MINIGUN )
-                            {
-                                // sawn off shotgun anim group
-                                pWeaponInfo->SetAnimGroup ( 17 );
-                            }
-                        }
-                        pWeaponInfo->SetFlag ( iData );
-                    }
-
+                    pWeaponInfo->ToggleFlagBits( iData );
                     break;
                 }
             case WEAPON_ANIM_GROUP:
                 {
                     bitStream.Read ( sData );
                     pWeaponInfo->SetAnimGroup ( sData );
+                    break;
+                }
+            case WEAPON_FLAG_AIM_NO_AUTO:
+            case WEAPON_FLAG_AIM_ARM:
+            case WEAPON_FLAG_AIM_1ST_PERSON:
+            case WEAPON_FLAG_AIM_FREE:
+            case WEAPON_FLAG_MOVE_AND_AIM:
+            case WEAPON_FLAG_MOVE_AND_SHOOT:
+            case WEAPON_FLAG_TYPE_THROW:
+            case WEAPON_FLAG_TYPE_HEAVY:
+            case WEAPON_FLAG_TYPE_CONSTANT:
+            case WEAPON_FLAG_TYPE_DUAL:
+            case WEAPON_FLAG_ANIM_RELOAD:
+            case WEAPON_FLAG_ANIM_CROUCH:
+            case WEAPON_FLAG_ANIM_RELOAD_LOOP:
+            case WEAPON_FLAG_ANIM_RELOAD_LONG:
+            case WEAPON_FLAG_SHOT_SLOWS:
+            case WEAPON_FLAG_SHOT_RAND_SPEED:
+            case WEAPON_FLAG_SHOT_ANIM_ABRUPT:
+            case WEAPON_FLAG_SHOT_EXPANDS:
+                {
+                    bool bEnable;
+                    bitStream.ReadBit ( bEnable );
+                    uint uiFlagBit = GetWeaponPropertyFlagBit( (eWeaponProperty)ucProperty );
+                    if ( bEnable )
+                        pWeaponInfo->SetFlagBits ( uiFlagBit );
+                    else
+                        pWeaponInfo->ClearFlagBits ( uiFlagBit );
                     break;
                 }
         }

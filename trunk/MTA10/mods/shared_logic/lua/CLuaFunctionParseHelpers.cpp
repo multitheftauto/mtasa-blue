@@ -263,6 +263,25 @@ IMPLEMENT_ENUM_BEGIN( eWeaponProperty )
 
     ADD_ENUM ( WEAPON_DEFAULT_COMBO,                    "default_combo" ) 
     ADD_ENUM ( WEAPON_COMBOS_AVAILABLE,                 "combos_available" ) 
+
+    ADD_ENUM ( WEAPON_FLAG_AIM_NO_AUTO,                 "flag_aim_no_auto" ) 
+    ADD_ENUM ( WEAPON_FLAG_AIM_ARM,                     "flag_aim_arm" ) 
+    ADD_ENUM ( WEAPON_FLAG_AIM_1ST_PERSON,              "flag_aim_1st_person" ) 
+    ADD_ENUM ( WEAPON_FLAG_AIM_FREE,                    "flag_aim_free" ) 
+    ADD_ENUM ( WEAPON_FLAG_MOVE_AND_AIM,                "flag_move_and_aim" ) 
+    ADD_ENUM ( WEAPON_FLAG_MOVE_AND_SHOOT,              "flag_move_and_shoot" ) 
+    ADD_ENUM ( WEAPON_FLAG_TYPE_THROW,                  "flag_type_throw" ) 
+    ADD_ENUM ( WEAPON_FLAG_TYPE_HEAVY,                  "flag_type_heavy" ) 
+    ADD_ENUM ( WEAPON_FLAG_TYPE_CONSTANT,               "flag_type_constant" ) 
+    ADD_ENUM ( WEAPON_FLAG_TYPE_DUAL,                   "flag_type_dual" ) 
+    ADD_ENUM ( WEAPON_FLAG_ANIM_RELOAD,                 "flag_anim_reload" ) 
+    ADD_ENUM ( WEAPON_FLAG_ANIM_CROUCH,                 "flag_anim_crouch" ) 
+    ADD_ENUM ( WEAPON_FLAG_ANIM_RELOAD_LOOP,            "flag_anim_reload_loop" ) 
+    ADD_ENUM ( WEAPON_FLAG_ANIM_RELOAD_LONG,            "flag_anim_reload_long" ) 
+    ADD_ENUM ( WEAPON_FLAG_SHOT_SLOWS,                  "flag_shot_slows" ) 
+    ADD_ENUM ( WEAPON_FLAG_SHOT_RAND_SPEED,             "flag_shot_rand_speed" ) 
+    ADD_ENUM ( WEAPON_FLAG_SHOT_ANIM_ABRUPT,            "flag_shot_anim_abrupt" ) 
+    ADD_ENUM ( WEAPON_FLAG_SHOT_EXPANDS,                "flag_shot_expands" ) 
 IMPLEMENT_ENUM_END( "weapon-property" )
 
 IMPLEMENT_ENUM_BEGIN( eWeaponSkill )
@@ -624,4 +643,30 @@ void ReadPregFlags( CScriptArgReader& argStream, pcrecpp::RE_Options& pOptions )
             }
         }
     }
+}
+
+
+//
+// Return true if weapon property is a flag type
+//
+bool IsWeaponPropertyFlag( eWeaponProperty weaponProperty )
+{
+    return ( weaponProperty >= WEAPON_FLAG_FIRST && weaponProperty <= WEAPON_FLAG_LAST );
+}
+
+
+//
+// Get bit pattern for a weapon property flag enum
+//
+uint GetWeaponPropertyFlagBit( eWeaponProperty weaponProperty )
+{
+    if ( !IsWeaponPropertyFlag( weaponProperty ) )
+        return 0;
+
+    // Check 20 bits from first to last
+    dassert( WEAPON_FLAG_LAST + 1 - WEAPON_FLAG_FIRST == 20 );
+
+    uint uiFlagIndex = ( weaponProperty - WEAPON_FLAG_FIRST );
+    uint uiFlagBit = 1 << uiFlagIndex;
+    return uiFlagBit;
 }
