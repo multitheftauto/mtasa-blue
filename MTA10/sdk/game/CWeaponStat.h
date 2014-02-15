@@ -26,12 +26,12 @@ public:
         //
         // Interface Sets and Gets
         //
-        
-        virtual void                        SetFlag                     ( DWORD flag )=0;
-        // DO NOT USE.
+
+        virtual void                        ToggleFlagBits              ( DWORD flagBits )=0;
+        virtual void                        SetFlagBits                 ( DWORD flagBits )=0;
+        virtual void                        ClearFlagBits               ( DWORD flagBits )=0;
+        // For initialization only
         virtual void                        SetFlags                    ( int iFlags )=0;
-        // END
-        virtual void                        ClearFlag                   ( DWORD flag )=0;
         virtual bool                        IsFlagSet                   ( DWORD flag )=0;
         virtual int                         GetFlags                    ( void )=0;
 

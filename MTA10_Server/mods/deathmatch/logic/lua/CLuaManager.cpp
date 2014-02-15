@@ -517,7 +517,6 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getWeaponNameFromID", CLuaFunctionDefinitions::GetWeaponNameFromID );
     CLuaCFunctions::AddFunction ( "getWeaponIDFromName", CLuaFunctionDefinitions::GetWeaponIDFromName );
     CLuaCFunctions::AddFunction ( "createWeapon", CLuaFunctionDefinitions::CreateWeapon );
-    CLuaCFunctions::AddFunction ( "setWeaponProperty", CLuaFunctionDefinitions::SetWeaponProperty );
     CLuaCFunctions::AddFunction ( "fireWeapon", CLuaFunctionDefinitions::FireWeapon );
     CLuaCFunctions::AddFunction ( "setWeaponState", CLuaFunctionDefinitions::SetWeaponState );
     CLuaCFunctions::AddFunction ( "getWeaponState", CLuaFunctionDefinitions::GetWeaponState );
