@@ -2721,10 +2721,23 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
 
                                                             if ( bWarpIn )
                                                             {
-                                                                if ( pOccupant == pPlayer )
+                                                                // Unmark him as entering the vehicle so WarpPedIntoVehicle will work
+                                                                if ( !pVehicle->m_bOccupantChanged )
+                                                                {
+                                                                    pPlayer->SetOccupiedVehicle ( NULL, 0 );
                                                                     pVehicle->SetOccupant ( NULL, 0 );
+                                                                }
 
-                                                                CStaticFunctionDefinitions::WarpPedIntoVehicle ( pPlayer, pVehicle, 0 );
+                                                                if ( CStaticFunctionDefinitions::WarpPedIntoVehicle ( pPlayer, pVehicle, 0 ) )
+                                                                {
+                                                                    bFailed = false;
+                                                                }
+                                                                else
+                                                                {
+                                                                    // Warp failed
+                                                                    pPlayer->SetVehicleAction ( CPlayer::VEHICLEACTION_NONE );
+                                                                    failReason = FAIL_SCRIPT;
+                                                                }
                                                             }
                                                             else
                                                             {
@@ -2732,8 +2745,8 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
                                                                 CVehicleInOutPacket Reply ( ID, 0, VEHICLE_REQUEST_IN_CONFIRMED, ucDoor );
                                                                 Reply.SetSourceElement ( pPlayer );
                                                                 m_pPlayerManager->BroadcastOnlyJoined ( Reply );
+                                                                bFailed = false;
                                                             }
-                                                            bFailed = false;
                                                         }
                                                     }
                                                     else
@@ -2834,7 +2847,23 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
                                                         {
                                                             if ( bWarpIn )
                                                             {
-                                                                CStaticFunctionDefinitions::WarpPedIntoVehicle ( pPlayer, pVehicle, ucSeat );
+                                                                // Unmark him as entering the vehicle so WarpPedIntoVehicle will work
+                                                                if ( !pVehicle->m_bOccupantChanged )
+                                                                {
+                                                                    pPlayer->SetOccupiedVehicle ( NULL, 0 );
+                                                                    pVehicle->SetOccupant ( NULL, ucSeat );
+                                                                }
+
+                                                                if ( CStaticFunctionDefinitions::WarpPedIntoVehicle ( pPlayer, pVehicle, ucSeat ) )
+                                                                {
+                                                                    bFailed = false;
+                                                                }
+                                                                else
+                                                                {
+                                                                    // Warp failed
+                                                                    pPlayer->SetVehicleAction ( CPlayer::VEHICLEACTION_NONE );
+                                                                    failReason = FAIL_SCRIPT;
+                                                                }
                                                             }
                                                             else
                                                             {
@@ -2842,8 +2871,8 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
                                                                 CVehicleInOutPacket Reply ( ID, ucSeat, VEHICLE_REQUEST_IN_CONFIRMED, ucDoor );
                                                                 Reply.SetSourceElement ( pPlayer );
                                                                 m_pPlayerManager->BroadcastOnlyJoined ( Reply );
+                                                                bFailed = false;
                                                             }
-                                                            bFailed = false;
                                                         }
                                                     }
                                                     else
