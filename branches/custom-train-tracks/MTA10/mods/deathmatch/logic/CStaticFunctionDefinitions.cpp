@@ -50,7 +50,7 @@ static CClientSoundManager*                         m_pSoundManager;
 
 // Used to run a function on all the children of the elements too
 #define RUN_CHILDREN \
-    if ( Entity.CountChildren() ) \
+    if ( Entity.CountChildren() && Entity.IsCallPropagationEnabled() ) \
         for ( CChildListType::const_iterator iter = Entity.IterBegin () ; iter != Entity.IterEnd () ; ++iter )
 
 CStaticFunctionDefinitions::CStaticFunctionDefinitions (
@@ -3456,6 +3456,28 @@ bool CStaticFunctionDefinitions::IsElementLowLod ( CClientEntity& Entity, bool& 
 }
 
 
+bool CStaticFunctionDefinitions::IsElementCallPropagationEnabled ( CClientEntity& Entity, bool& bOutEnabled )
+{
+    bOutEnabled = Entity.IsCallPropagationEnabled();
+    return true;
+}
+
+
+bool CStaticFunctionDefinitions::SetElementCallPropagationEnabled ( CClientEntity& Entity, bool bEnabled )
+{
+    if ( Entity.IsCallPropagationEnabled() != bEnabled && Entity.IsLocalEntity () )
+    {
+        // Disallow being set on root
+        if ( &Entity != GetRootElement() )
+        {
+            Entity.SetCallPropagationEnabled( bEnabled );
+            return true;
+        }
+    }
+    return false;
+}
+
+
 CClientObject* CStaticFunctionDefinitions::CreateObject ( CResource& Resource, unsigned short usModelID, const CVector& vecPosition, const CVector& vecRotation, bool bLowLod )
 {
     if ( CClientObjectManager::IsValidModel ( usModelID ) )
@@ -5248,9 +5270,9 @@ void CStaticFunctionDefinitions::GUIScrollBarSetScrollPosition ( CClientEntity& 
 }
 
 
-void CStaticFunctionDefinitions::GUIScrollPaneSetHorizontalScrollPosition ( CClientEntity& Entity, int iProgress )
+void CStaticFunctionDefinitions::GUIScrollPaneSetHorizontalScrollPosition ( CClientEntity& Entity, float fProgress )
 {
-    RUN_CHILDREN GUIScrollPaneSetHorizontalScrollPosition ( **iter, iProgress );
+    RUN_CHILDREN GUIScrollPaneSetHorizontalScrollPosition ( **iter, fProgress );
 
     // Are we a CGUI element?
     if ( IS_GUI ( &Entity ) )
@@ -5261,7 +5283,7 @@ void CStaticFunctionDefinitions::GUIScrollPaneSetHorizontalScrollPosition ( CCli
         if ( IS_CGUIELEMENT_SCROLLPANE ( &GUIElement ) )
         {
             // Set the progress
-            static_cast < CGUIScrollPane* > ( GUIElement.GetCGUIElement () ) -> SetHorizontalScrollPosition ( ( float ) ( iProgress / 100.0f ) );
+            static_cast < CGUIScrollPane* > ( GUIElement.GetCGUIElement () ) -> SetHorizontalScrollPosition ( fProgress / 100.0f );
         }
     }
 }
@@ -5287,9 +5309,9 @@ void CStaticFunctionDefinitions::GUIScrollPaneSetScrollBars ( CClientEntity& Ent
 }
 
 
-void CStaticFunctionDefinitions::GUIScrollPaneSetVerticalScrollPosition ( CClientEntity& Entity, int iProgress )
+void CStaticFunctionDefinitions::GUIScrollPaneSetVerticalScrollPosition ( CClientEntity& Entity, float fProgress )
 {
-    RUN_CHILDREN GUIScrollPaneSetVerticalScrollPosition ( **iter, iProgress );
+    RUN_CHILDREN GUIScrollPaneSetVerticalScrollPosition ( **iter, fProgress );
 
     // Are we a CGUI element?
     if ( IS_GUI ( &Entity ) )
@@ -5300,7 +5322,7 @@ void CStaticFunctionDefinitions::GUIScrollPaneSetVerticalScrollPosition ( CClien
         if ( IS_CGUIELEMENT_SCROLLPANE ( &GUIElement ) )
         {
             // Set the progress
-            static_cast < CGUIScrollPane* > ( GUIElement.GetCGUIElement () ) -> SetVerticalScrollPosition ( ( float ) ( iProgress / 100.0f ) );
+            static_cast < CGUIScrollPane* > ( GUIElement.GetCGUIElement () ) -> SetVerticalScrollPosition ( fProgress / 100.0f );
         }
     }
 }
@@ -7967,7 +7989,7 @@ bool CStaticFunctionDefinitions::GetWeaponProperty ( eWeaponProperty eProperty, 
     return true;
 }
 
-bool CStaticFunctionDefinitions::GetWeaponProperty ( eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, short & sData )
+bool CStaticFunctionDefinitions::GetWeaponProperty ( eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, int & sData )
 {
     if ( eProperty == WEAPON_INVALID_PROPERTY )
         return false;
@@ -8182,7 +8204,7 @@ bool CStaticFunctionDefinitions::GetOriginalWeaponProperty ( eWeaponProperty ePr
     return true;
 }
 
-bool CStaticFunctionDefinitions::GetOriginalWeaponProperty ( eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, short & sData )
+bool CStaticFunctionDefinitions::GetOriginalWeaponProperty ( eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, int & sData )
 {
     if ( eProperty == WEAPON_INVALID_PROPERTY )
         return false;

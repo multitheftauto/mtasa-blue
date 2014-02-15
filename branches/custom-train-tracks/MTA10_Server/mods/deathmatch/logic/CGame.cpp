@@ -36,7 +36,7 @@
 #define VEH_EXTRAPOLATION_MIN_CLIENT_VERSION    "1.3.0-9.04460"
 #define ALT_PULSE_ORDER_MIN_CLIENT_VERSION      "1.3.1-9.04913"
 #define HIT_ANIM_CLIENT_VERSION                 "1.3.2"
-#define SNIPER_BULLET_SYNC_MIN_CLIENT_VERSION   "1.3.4-9.06040"
+#define SNIPER_BULLET_SYNC_MIN_CLIENT_VERSION   "1.3.5-9.06054"
 
 CGame* g_pGame = NULL;
 
@@ -659,8 +659,11 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
                                 "= Bandwidth saving : %s\n" \
                                 "==================================================================\n",
 
-                                MTA_DM_BUILDTAG_SHORT,
-                                m_pMainConfig->GetServerName ().c_str (),
+                                MTA_DM_BUILDTAG_SHORT
+#ifdef ANY_x64
+                                " [64 bit]"
+#endif
+                                ,m_pMainConfig->GetServerName ().c_str (),
                                 strServerIPList.c_str (),
                                 usServerPort,
                                 pszLogFileName,
@@ -668,6 +671,17 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
                                 m_pMainConfig->IsHTTPEnabled () ? m_pMainConfig->GetHTTPPort () : 0,
                                 strVoice.c_str(),
                                 *strBandwidthSaving );
+
+#ifdef ANY_x64
+    CLogger::LogPrintfNoStamp ( "\n" );
+    CLogger::LogPrintfNoStamp ( "*********** WARNING *** WARNING *** WARNING *** WARNING **********\n" );
+    CLogger::LogPrintfNoStamp ( "\n" );
+    CLogger::LogPrintfNoStamp ( "                     Experimental 64 bit server\n" );
+    CLogger::LogPrintfNoStamp ( "\n" );
+    CLogger::LogPrintfNoStamp ( "                            DO NOT USE!\n" );
+    CLogger::LogPrintfNoStamp ( "\n");
+    CLogger::LogPrintfNoStamp ( "==================================================================\n" );
+#endif
 
     if ( !bLogFile )
         CLogger::ErrorPrintf ( "Unable to save logfile to '%s'\n", m_pMainConfig->GetLogFile ().c_str () );
@@ -1206,6 +1220,7 @@ void CGame::InitialDataStream ( CPlayer& Player )
 
     // He's joined now
     Player.SetStatus ( STATUS_JOINED );
+    m_pPlayerManager->OnPlayerJoin( &Player );
 
     // Console
     CLogger::LogPrintf ( "JOIN: %s joined the game (IP: %s)\n", Player.GetNick (), Player.GetSourceIP () );
@@ -2178,8 +2193,43 @@ void CGame::Packet_VehicleDamageSync ( CVehicleDamageSyncPacket& Packet )
                         pVehicle->m_ucLightStates [ i ] = Packet.m_damage.data.ucLightStates [ i ];
                 }
 
-                // Broadcast the packet to everyone
-                m_pPlayerManager->BroadcastOnlyJoined ( Packet, pPlayer );
+                if ( !g_TickRateSettings.bAltVehPartsStateSync )
+                {
+                    // Broadcast the packet to everyone
+                    m_pPlayerManager->BroadcastOnlyJoined ( Packet, pPlayer );
+                }
+                else
+                {
+                    // Remember far players that will need sync later
+                    SViewerMapType& farList = pPlayer->GetFarPlayerList ();
+                    for ( SViewerMapType ::iterator it = farList.begin (); it != farList.end (); ++it )
+                    {
+                        CPlayer* pFarPlayer = it->first;
+                        MapInsert( pFarPlayer->m_VehiclesWithPartsStateSyncDirty, Packet.m_Vehicle );
+                    }
+
+                    // Send to near players
+                    SViewerMapType& nearList = pPlayer->GetNearPlayerList ();
+                    CSendList sendList;
+                    for ( SViewerMapType ::iterator it = nearList.begin (); it != nearList.end (); ++it )
+                    {
+                        CPlayer* pNearPlayer = it->first;
+                        if ( MapContains( pNearPlayer->m_VehiclesWithPartsStateSyncDirty, Packet.m_Vehicle ) )
+                        {
+                            // Flush full update for this player if has pending damage info for vehicle
+                            CVehicleDamageSyncPacket Packet;
+                            Packet.SetFromVehicle( pVehicle );
+                            pNearPlayer->Send( Packet );
+                            MapRemove( pNearPlayer->m_VehiclesWithPartsStateSyncDirty, Packet.m_Vehicle );
+                        }
+                        else
+                        {
+                            sendList.push_back ( pNearPlayer );
+                        }
+                    }
+
+                    CPlayerManager::Broadcast ( Packet, sendList );
+                }
             }
         }
     }
@@ -2351,6 +2401,7 @@ void CGame::Packet_LuaEvent ( CLuaEventPacket& Packet )
             m_pScriptDebugging->LogError ( NULL, "Client (%s) triggered serverside event %s, but event is not added serverside", pCaller->GetNick(), szName );
     }
 }
+
 
 void CGame::Packet_CustomData ( CCustomDataPacket& Packet )
 {
@@ -4096,6 +4147,9 @@ bool CGame::IsBelowRecommendedClient ( const SString& strVersion )
 //////////////////////////////////////////////////////////////////
 SString CGame::CalculateMinClientRequirement ( void )
 {
+    if ( g_pGame->IsBeingDeleted() )
+        return "";
+
     // Calc effective min client version
     SString strMinClientRequirementFromConfig = m_pMainConfig->GetMinClientVersion ();
     SString strMinClientRequirementFromResources = m_pResourceManager->GetMinClientRequirement ();

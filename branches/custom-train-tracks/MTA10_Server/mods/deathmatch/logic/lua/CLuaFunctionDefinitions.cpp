@@ -470,7 +470,7 @@ int CLuaFunctionDefinitions::AddEventHandler ( lua_State* luaVM )
     float fPriorityMod = 0;
     EEventPriorityType eventPriority;
     {
-        uint iPos = strPriority.find_first_of ( "-+" );
+        size_t iPos = strPriority.find_first_of ( "-+" );
         if ( iPos != SString::npos )
         {
             fPriorityMod = static_cast < float > ( atof ( strPriority.SubStr ( iPos ) ) );
@@ -818,17 +818,18 @@ int CLuaFunctionDefinitions::CancelLatentEvent ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::AddDebugHook ( lua_State* luaVM )
 {
-//  bool AddDebugHook ( string hookType, function callback )
-    EDebugHookType hookType; CLuaFunctionRef callBack;
+//  bool AddDebugHook ( string hookType, function callback[, table allowedNames ] )
+    EDebugHookType hookType; CLuaFunctionRef callBack; std::vector < SString > allowedNames;
 
     CScriptArgReader argStream( luaVM );
     argStream.ReadEnumString( hookType );
     argStream.ReadFunction( callBack );
+    argStream.ReadStringTable( allowedNames, true );
     argStream.ReadFunctionComplete ();
 
     if ( !argStream.HasErrors() )
     {
-        if ( g_pGame->GetDebugHookManager()->AddDebugHook( hookType, callBack ) )
+        if ( g_pGame->GetDebugHookManager()->AddDebugHook( hookType, callBack, allowedNames ) )
         {
             lua_pushboolean( luaVM, true );
             return 1;
@@ -1101,7 +1102,7 @@ int CLuaFunctionDefinitions::SetWeaponProperty ( lua_State* luaVM )
             case WEAPON_MAX_CLIP_AMMO:
             case WEAPON_FLAGS:
                 {
-                    short sWeaponInfo = 0;
+                    int sWeaponInfo = 0;
                     argStream.ReadNumber ( sWeaponInfo );
                     if ( !argStream.HasErrors () )
                     {
@@ -1185,7 +1186,7 @@ int CLuaFunctionDefinitions::GetWeaponProperty ( lua_State* luaVM )
         case WEAPON_DEFAULT_COMBO:
         case WEAPON_COMBOS_AVAILABLE:
             {
-                short sWeaponInfo = 0;
+                int sWeaponInfo = 0;
 
                 if ( CStaticFunctionDefinitions::GetWeaponProperty ( eProp, eWep, eWepSkill, sWeaponInfo ) )
                 {
@@ -1277,7 +1278,7 @@ int CLuaFunctionDefinitions::GetOriginalWeaponProperty ( lua_State* luaVM )
         case WEAPON_DEFAULT_COMBO:
         case WEAPON_COMBOS_AVAILABLE:
             {
-                short sWeaponInfo = 0;
+                int sWeaponInfo = 0;
 
                 if ( CStaticFunctionDefinitions::GetOriginalWeaponProperty ( eProp, eWep, eWepSkill, sWeaponInfo ) )
                 {
@@ -3792,12 +3793,13 @@ int CLuaFunctionDefinitions::GetVehicleVariant ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::GetVehicleColor ( lua_State* luaVM )
 {
+//  getVehicleColor ( vehicle theVehicle[, bool bRGB ] )
     CVehicle* pVehicle; 
     bool bRGB; 
     
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData(pVehicle); 
-    argStream.ReadBool(bRGB); 
+    argStream.ReadBool(bRGB,false); 
     
     if ( !argStream.HasErrors ( ) )
     {
@@ -9876,7 +9878,7 @@ int CLuaFunctionDefinitions::Split ( lua_State* luaVM )
         lua_settable ( luaVM, -3 );
 
         // strtok until we're out of tokens
-        while ( szToken = strtok ( NULL, strDelimiter ) )
+        while ( ( szToken = strtok ( NULL, strDelimiter ) ) )
         {
             // Add the token to the table
             lua_pushnumber ( luaVM, ++uiCount );

@@ -126,6 +126,8 @@ public:
     void                        RebuildMultiplayerPlayer    ( CPed * player );
     bool                        GetInteriorSoundsEnabled    ();
     void                        SetInteriorSoundsEnabled    ( bool bEnabled );
+    bool                        GetInteriorFurnitureEnabled ( char cRoomId );
+    void                        SetInteriorFurnitureEnabled ( char cRoomId, bool bEnabled );
     void                        SetWindVelocity             ( float fX, float fY, float fZ );
     void                        GetWindVelocity             ( float& fX, float& fY, float& fZ );
     void                        RestoreWindVelocity         ( void );

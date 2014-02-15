@@ -81,6 +81,7 @@ public:
     static bool                 IsElementFrozen                     ( CElement* pElement, bool& bFrozen );
     static bool                 GetLowLodElement                    ( CElement* pElement, CElement*& pOutLowLodElement );
     static bool                 IsElementLowLod                     ( CElement* pElement, bool& bOutLowLod );
+    static bool                 IsElementCallPropagationEnabled     ( CElement* pElement, bool& bOutEnabled );
 
     // Element set funcs
     static bool                 ClearElementVisibleTo               ( CElement* pElement );
@@ -105,6 +106,7 @@ public:
     static bool                 SetElementCollisionsEnabled         ( CElement* pElement, bool bEnable );
     static bool                 SetElementFrozen                    ( CElement* pElement, bool bFrozen );
     static bool                 SetLowLodElement                    ( CElement* pElement, CElement* pLowLodElement );
+    static bool                 SetElementCallPropagationEnabled    ( CElement* pElement, bool bEnable );
 
     // Scoreboard
     static bool                 AddScoreboardColumn                 ( const char* szID, const char* szName, float fWidth );
@@ -179,10 +181,10 @@ public:
     static CVehicle*            GetPedOccupiedVehicle               ( CPed* pPed );
     static bool                 GetPedOccupiedVehicleSeat           ( CPed* pPed, unsigned int& uiSeat );
     static bool                 GetWeaponProperty                   ( eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, float & fData );
-    static bool                 GetWeaponProperty                   ( eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, short & sData );
+    static bool                 GetWeaponProperty                   ( eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, int & sData );
     static bool                 GetWeaponProperty                   ( eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, CVector & vecData );
     static bool                 GetOriginalWeaponProperty           ( eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, float & fData );
-    static bool                 GetOriginalWeaponProperty           ( eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, short & sData );
+    static bool                 GetOriginalWeaponProperty           ( eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, int & sData );
     static bool                 GetOriginalWeaponProperty           ( eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, CVector & vecData );
 
     // Ped set funcs
@@ -209,7 +211,7 @@ public:
     static bool                 SetPedFrozen                        ( CElement * pElement, bool bIsFrozen );
     static bool                 reloadPedWeapon                     ( CElement * pElement );
     static bool                 SetWeaponProperty                   ( eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, float fData );
-    static bool                 SetWeaponProperty                   ( eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, short sData );
+    static bool                 SetWeaponProperty                   ( eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, int sData );
 
     // Camera get functions
     static bool                 GetCameraMatrix                     ( CPlayer * pPlayer, CVector& vecPosition, CVector& vecLookAt, float& fRoll, float& fFOV );

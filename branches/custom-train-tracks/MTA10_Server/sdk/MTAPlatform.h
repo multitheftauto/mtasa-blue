@@ -17,7 +17,12 @@ extern "C" bool g_bNoTopBar;
 
 /** Operating system identifiers **/
 #if defined(WIN32)
-    #define MTA_OS_STRING       "Windows"
+    #ifdef _WIN64
+        #define MTA_OS_STRING   "Windows x64"
+    #else
+        #define MTA_OS_STRING   "Windows"
+    #endif
+
     #define MTA_LIB_EXTENSION   ".dll"
     #if defined(_DEBUG)
         #define MTA_LIB_SUFFIX  "_d"
@@ -25,7 +30,11 @@ extern "C" bool g_bNoTopBar;
         #define MTA_LIB_SUFFIX
     #endif
 #elif defined(__linux__)
-    #define MTA_OS_STRING       "GNU/Linux"
+    #ifdef __x86_64__
+        #define MTA_OS_STRING   "GNU/Linux x64"
+    #else
+        #define MTA_OS_STRING   "GNU/Linux"
+    #endif
     #define MTA_LIB_EXTENSION   ".so"
     #define MTA_LIB_SUFFIX
 #elif defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)

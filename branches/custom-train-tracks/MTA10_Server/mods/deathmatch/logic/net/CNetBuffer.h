@@ -75,6 +75,7 @@ public:
     virtual bool                            GetBandwidthStatistics          ( SBandwidthStatistics* pDest );
     virtual bool                            GetNetPerformanceStatistics     ( SNetPerformanceStatistics* pDest, bool bResetCounters );
     virtual void                            GetPingStatus                   ( SFixedString < 32 >* pstrStatus );
+    virtual bool                            GetSyncThreadStatistics         ( SSyncThreadStatistics* pDest, bool bResetCounters );
 
     virtual NetBitStreamInterface*          AllocateNetServerBitStream      ( unsigned short usBitStreamVersion );
     virtual void                            DeallocateNetServerBitStream    ( NetBitStreamInterface* bitStream );
@@ -137,6 +138,7 @@ public:
     DECLARE_FUNC_ARGS0R( const SPacketStat*,    GetPacketStats                  );
     DECLARE_FUNC_ARGS1R( bool,                  GetBandwidthStatistics          , SBandwidthStatistics*, pDest );
     DECLARE_FUNC_ARGS2R( bool,                  GetNetPerformanceStatistics     , SNetPerformanceStatistics*, pDest, bool, bResetCounters );
+    DECLARE_FUNC_ARGS2R( bool,                  GetSyncThreadStatistics         , SSyncThreadStatistics*, pDest, bool, bResetCounters );
     DECLARE_FUNC_ARGS1 (                        GetPingStatus                   , SFixedString < 32 >*, pstrStatus );
     DECLARE_FUNC_ARGS7R( bool,                  SendPacket                      , unsigned char, ucPacketID, const NetServerPlayerIDRef, playerID, NetBitStreamInterface*, bitStream, bool, bBroadcast, NetServerPacketPriority, packetPriority, NetServerPacketReliability, packetReliability, ePacketOrdering, packetOrdering );
     DECLARE_FUNC_ARGS3 (                        GetPlayerIP                     , const NetServerPlayerIDRef, playerID, char*, strIP, unsigned short*, usPort );

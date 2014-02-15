@@ -32,3 +32,21 @@ bool CVehicleDamageSyncPacket::Write ( NetBitStreamInterface& BitStream ) const
 
     return true;
 }
+
+void CVehicleDamageSyncPacket::SetFromVehicle ( CVehicle* pVehicle )
+{
+    m_Vehicle = pVehicle->GetID();
+    m_damage.data.ucDoorStates = pVehicle->m_ucDoorStates;
+    m_damage.data.ucWheelStates = pVehicle->m_ucWheelStates;
+    m_damage.data.ucPanelStates = pVehicle->m_ucPanelStates;
+    m_damage.data.ucLightStates = pVehicle->m_ucLightStates;
+    for ( unsigned int i = 0; i < MAX_DOORS; ++i )
+        m_damage.data.bDoorStatesChanged [ i ] = true;
+    for ( unsigned int i = 0; i < MAX_WHEELS; ++i )
+        m_damage.data.bWheelStatesChanged [ i ] = true;
+    for ( unsigned int i = 0; i < MAX_PANELS; ++i )
+        m_damage.data.bPanelStatesChanged [ i ] = true;
+    for ( unsigned int i = 0; i < MAX_LIGHTS; ++i )
+        m_damage.data.bLightStatesChanged [ i ] = true;
+}
+

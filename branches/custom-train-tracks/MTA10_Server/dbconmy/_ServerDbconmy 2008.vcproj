@@ -4,12 +4,15 @@
 	Version="9.00"
 	Name="Server - Dbconmy"
 	ProjectGUID="{74BA3D0E-374F-419D-A313-977DFA863D2A}"
-	RootNamespace="dbmysql"
+	RootNamespace="Server - Dbconmy"
 	TargetFrameworkVersion="196613"
 	>
 	<Platforms>
 		<Platform
 			Name="Win32"
+		/>
+		<Platform
+			Name="x64"
 		/>
 	</Platforms>
 	<ToolFiles>
@@ -17,8 +20,8 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory=".\Debug"
-			IntermediateDirectory=".\Debug"
+			OutputDirectory="x86\$(ConfigurationName)"
+			IntermediateDirectory="x86\$(ConfigurationName)"
 			ConfigurationType="2"
 			CharacterSet="2"
 			>
@@ -47,9 +50,6 @@
 				RuntimeLibrary="3"
 				UsePrecompiledHeader="2"
 				PrecompiledHeaderThrough="StdInc.h"
-				AssemblerListingLocation=".\Debug/"
-				ObjectFile=".\Debug/"
-				ProgramDataBaseFileName=".\Debug/"
 				WarningLevel="3"
 				DebugInformationFormat="4"
 				DisableSpecificWarnings="4996"
@@ -70,10 +70,10 @@
 				AdditionalLibraryDirectories="../../vendor/mysql/lib/opt"
 				IgnoreDefaultLibraryNames=""
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile=".\Debug/dbconmy_d.pdb"
+				ProgramDatabaseFile="$(IntDir)\$(TargetName).pdb"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="0"
-				ImportLibrary=".\Debug/dbconmy_d.lib"
+				ImportLibrary="$(OutDir)\$(TargetFileName).lib"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -99,9 +99,90 @@
 			/>
 		</Configuration>
 		<Configuration
+			Name="Debug|x64"
+			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
+			ConfigurationType="2"
+			CharacterSet="2"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+				TargetEnvironment="3"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="0"
+				AdditionalIncludeDirectories=".;./logic;../../vendor;../../vendor/sqlite;../../vendor/zlib/;../../vendor/pcre;../../vendor/pme;../../vendor/pthreads/include;../../Shared/publicsdk/include;logic/common;../../vendor/zlib;&quot;../../vendor/json-c&quot;;../sdk;../../Shared/sdk;../../vendor/sparsehash/current/src;../../vendor/sparsehash/current/src/windows;../../Shared/animation;../../vendor/bochs;../../vendor/bob_withers;../../vendor/zip;../../vendor/lua/src;../../vendor/pcre/shipped_for_mta;&quot;../../vendor/json-c/shipped_for_mta&quot;;../../vendor/mysql/include"
+				PreprocessorDefinitions="WIN32;_DEBUG;MTA_DEBUG;_CRT_SECURE_NO_WARNINGS"
+				StringPooling="true"
+				BasicRuntimeChecks="3"
+				RuntimeLibrary="3"
+				UsePrecompiledHeader="2"
+				PrecompiledHeaderThrough="StdInc.h"
+				WarningLevel="3"
+				DebugInformationFormat="3"
+				DisableSpecificWarnings="4996,4267"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalDependencies="libmysql.lib"
+				OutputFile="C:\Program Files\MTA San Andreas 1.4\server\$(PlatformName)\dbconmy_d.dll"
+				AdditionalLibraryDirectories="../../vendor/mysql/lib/$(PlatformName)"
+				IgnoreDefaultLibraryNames=""
+				GenerateDebugInformation="true"
+				ProgramDatabaseFile="$(IntDir)\$(TargetName).pdb"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
+				ImportLibrary="$(OutDir)\$(TargetFileName).lib"
+				TargetMachine="17"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
+		</Configuration>
+		<Configuration
 			Name="Release|Win32"
-			OutputDirectory=".\Release"
-			IntermediateDirectory=".\Release"
+			OutputDirectory="x86\$(ConfigurationName)"
+			IntermediateDirectory="x86\$(ConfigurationName)"
 			ConfigurationType="2"
 			CharacterSet="2"
 			WholeProgramOptimization="1"
@@ -134,9 +215,6 @@
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="2"
 				PrecompiledHeaderThrough="StdInc.h"
-				AssemblerListingLocation=".\Release/"
-				ObjectFile=".\Release/"
-				ProgramDataBaseFileName=".\Release/"
 				WarningLevel="3"
 				DebugInformationFormat="3"
 				DisableSpecificWarnings="4996"
@@ -157,12 +235,10 @@
 				AdditionalLibraryDirectories="../../vendor/mysql/lib/opt"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="../../symbols/$(ConfigurationName)_$(SafeParentName).pdb"
-				GenerateMapFile="true"
-				MapFileName="../../symbols/$(ConfigurationName)_$(SafeParentName).map"
-				MapExports="true"
+				MapFileName=""
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
-				ImportLibrary=".\Release/dbconmy.lib"
+				ImportLibrary="$(OutDir)\$(TargetFileName).lib"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -188,9 +264,94 @@
 			/>
 		</Configuration>
 		<Configuration
+			Name="Release|x64"
+			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
+			ConfigurationType="2"
+			CharacterSet="2"
+			WholeProgramOptimization="1"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+				TargetEnvironment="3"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="2"
+				InlineFunctionExpansion="2"
+				EnableIntrinsicFunctions="true"
+				FavorSizeOrSpeed="1"
+				OmitFramePointers="true"
+				AdditionalIncludeDirectories=".;./logic;../../vendor;../../vendor/sqlite;../../vendor/zlib/;../../vendor/pcre;../../vendor/pme;../../vendor/pthreads/include;../../Shared/publicsdk/include;logic/common;../../vendor/zlib;&quot;../../vendor/json-c&quot;;../sdk;../../Shared/sdk;../../vendor/sparsehash/current/src;../../vendor/sparsehash/current/src/windows;../../Shared/animation;../../vendor/bochs;../../vendor/bob_withers;../../vendor/zip;../../vendor/lua/src;../../vendor/pcre/shipped_for_mta;&quot;../../vendor/json-c/shipped_for_mta&quot;;../../vendor/mysql/include"
+				PreprocessorDefinitions="WIN32;_CRT_SECURE_NO_WARNINGS"
+				StringPooling="true"
+				RuntimeLibrary="2"
+				UsePrecompiledHeader="2"
+				PrecompiledHeaderThrough="StdInc.h"
+				WarningLevel="3"
+				DebugInformationFormat="3"
+				DisableSpecificWarnings="4996,4267"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalDependencies="libmysql.lib"
+				OutputFile="C:\Program Files\MTA San Andreas 1.4\server/$(PlatformName)/dbconmy.dll"
+				AdditionalLibraryDirectories="../../vendor/mysql/lib/$(PlatformName)"
+				GenerateDebugInformation="true"
+				ProgramDatabaseFile="../../symbols/$(ConfigurationName)_$(PlatformName)_$(SafeParentName).pdb"
+				MapFileName=""
+				OptimizeReferences="2"
+				EnableCOMDATFolding="2"
+				ImportLibrary="$(OutDir)\$(TargetFileName).lib"
+				TargetMachine="17"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
+		</Configuration>
+		<Configuration
 			Name="Nightly|Win32"
-			OutputDirectory="..\..\obj\server\dbconmy"
-			IntermediateDirectory="..\..\obj\server\dbconmy"
+			OutputDirectory="x86\$(ConfigurationName)"
+			IntermediateDirectory="..\..\obj\x86\$(ConfigurationName)\$(SafeRootNamespace)"
 			ConfigurationType="2"
 			CharacterSet="2"
 			WholeProgramOptimization="1"
@@ -245,15 +406,102 @@
 				AdditionalLibraryDirectories="../../vendor/mysql/lib/opt"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="../../symbols/$(ConfigurationName)_$(SafeParentName).pdb"
-				GenerateMapFile="true"
-				MapFileName="../../symbols/$(ConfigurationName)_$(SafeParentName).map"
-				MapExports="true"
+				MapFileName=""
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="0"
-				ImportLibrary=".\Release/dbconmy.lib"
+				ImportLibrary="$(OutDir)\$(TargetFileName).lib"
 				TargetMachine="1"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
+		</Configuration>
+		<Configuration
+			Name="Nightly|x64"
+			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="..\..\obj\$(PlatformName)\$(ConfigurationName)\$(SafeRootNamespace)"
+			ConfigurationType="2"
+			CharacterSet="2"
+			WholeProgramOptimization="1"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+				TargetEnvironment="3"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="2"
+				InlineFunctionExpansion="2"
+				EnableIntrinsicFunctions="true"
+				FavorSizeOrSpeed="1"
+				OmitFramePointers="true"
+				AdditionalIncludeDirectories=".;./logic;../../vendor;../../vendor/sqlite;../../vendor/zlib/;../../vendor/pcre;../../vendor/pme;../../vendor/pthreads/include;../../Shared/publicsdk/include;logic/common;../../vendor/zlib;&quot;../../vendor/json-c&quot;;../sdk;../../Shared/sdk;../../vendor/sparsehash/current/src;../../vendor/sparsehash/current/src/windows;../../Shared/animation;../../vendor/bochs;../../vendor/bob_withers;../../vendor/zip;../../vendor/lua/src;../../vendor/pcre/shipped_for_mta;&quot;../../vendor/json-c/shipped_for_mta&quot;;../../vendor/mysql/include"
+				PreprocessorDefinitions="WIN32;_CRT_SECURE_NO_WARNINGS"
+				StringPooling="true"
+				RuntimeLibrary="2"
+				EnableFunctionLevelLinking="true"
+				UsePrecompiledHeader="2"
+				PrecompiledHeaderThrough="StdInc.h"
+				WarningLevel="3"
+				DebugInformationFormat="3"
+				DisableSpecificWarnings="4996,4267"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalDependencies="libmysql.lib"
+				OutputFile="../../output/MTA San Andreas/server/$(PlatformName)/dbconmy.dll"
+				LinkIncremental="1"
+				AdditionalLibraryDirectories="../../vendor/mysql/lib/$(PlatformName)"
+				GenerateDebugInformation="true"
+				ProgramDatabaseFile="../../symbols/$(ConfigurationName)_$(PlatformName)_$(SafeParentName).pdb"
+				MapFileName=""
+				OptimizeReferences="2"
+				EnableCOMDATFolding="2"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
+				ImportLibrary="$(OutDir)\$(TargetFileName).lib"
+				TargetMachine="17"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -302,6 +550,14 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="1"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
 					Name="Release|Win32"
 					>
 					<Tool
@@ -310,7 +566,23 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="1"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
 					Name="Nightly|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="1"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Nightly|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"

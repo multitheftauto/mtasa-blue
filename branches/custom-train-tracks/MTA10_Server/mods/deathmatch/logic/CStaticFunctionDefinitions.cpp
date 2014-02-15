@@ -48,7 +48,7 @@ static CCustomWeaponManager *                       m_pCustomWeaponManager;
 
 // Used to run a function on all the children of the elements too
 #define RUN_CHILDREN( func ) \
-    if ( pElement->CountChildren () ) \
+    if ( pElement->CountChildren () && pElement->IsCallPropagationEnabled() ) \
     { \
         CElementListSnapshot* pList = pElement->GetChildrenListSnapshot(); \
         pList->AddRef();    /* Keep list alive during use */ \
@@ -1026,6 +1026,31 @@ bool CStaticFunctionDefinitions::IsElementInWater ( CElement* pElement, bool & b
     }
 
     return true;
+}
+
+
+bool CStaticFunctionDefinitions::IsElementCallPropagationEnabled ( CElement* pElement, bool& bOutEnabled )
+{
+    bOutEnabled = pElement->IsCallPropagationEnabled();
+    return true;
+}
+
+
+bool CStaticFunctionDefinitions::SetElementCallPropagationEnabled ( CElement* pElement, bool bEnable )
+{
+    if ( bEnable != pElement->IsCallPropagationEnabled() )
+    {
+        // Disallow being set on root
+        if ( pElement != GetRootElement() )
+        {
+            pElement->SetCallPropagationEnabled( bEnable );
+            CBitStream BitStream;
+            BitStream.pBitStream->Write ( bEnable );
+            m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pElement, SET_PROPAGATE_CALLS_ENABLED, *BitStream.pBitStream ) );
+            return true;
+        }
+    }
+    return false;
 }
 
 
@@ -2256,7 +2281,7 @@ bool CStaticFunctionDefinitions::SetWeaponProperty ( eWeaponProperty eProperty, 
     return true;
 }
 
-bool CStaticFunctionDefinitions::SetWeaponProperty ( eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, short sData )
+bool CStaticFunctionDefinitions::SetWeaponProperty ( eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, int sData )
 {
     if ( eProperty == WEAPON_INVALID_PROPERTY )
         return false;
@@ -2327,7 +2352,10 @@ bool CStaticFunctionDefinitions::SetWeaponProperty ( eWeaponProperty eProperty, 
     BitStream.pBitStream->Write ( static_cast < unsigned  char > ( eWeapon ) );
     BitStream.pBitStream->Write ( static_cast < unsigned  char > ( eProperty ) );
     BitStream.pBitStream->Write ( static_cast < unsigned  char > ( eSkillLevel ) );
-    BitStream.pBitStream->Write ( sData );
+    if ( eProperty == WEAPON_FLAGS )
+        BitStream.pBitStream->Write ( sData );  // Backward compat because sent little end first
+    else
+        BitStream.pBitStream->Write ( (short)sData );
     m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_WEAPON_PROPERTY, *BitStream.pBitStream ) );
 
     return true;
@@ -2439,7 +2467,7 @@ bool CStaticFunctionDefinitions::GetWeaponProperty ( eWeaponProperty eProperty, 
     return true;
 }
 
-bool CStaticFunctionDefinitions::GetWeaponProperty ( eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, short & sData )
+bool CStaticFunctionDefinitions::GetWeaponProperty ( eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, int & sData )
 {
     if ( eProperty == WEAPON_INVALID_PROPERTY )
         return false;
@@ -2653,7 +2681,7 @@ bool CStaticFunctionDefinitions::GetOriginalWeaponProperty ( eWeaponProperty ePr
     return true;
 }
 
-bool CStaticFunctionDefinitions::GetOriginalWeaponProperty ( eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, short & sData )
+bool CStaticFunctionDefinitions::GetOriginalWeaponProperty ( eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, int & sData )
 {
     if ( eProperty == WEAPON_INVALID_PROPERTY )
         return false;

@@ -121,7 +121,7 @@ void CConnectHistory::RemoveExpired ( void )
         JoinTimesMap ::iterator timesIt = historyItem.joinTimes.begin ();
         for ( ; timesIt < historyItem.joinTimes.end () ; ++timesIt )
         {
-            if ( *timesIt > llCurrentTime - m_ulSamplePeriod )
+            if ( *timesIt > llCurrentTime - (long long)m_ulSamplePeriod )
                 break;
         }
 

@@ -296,16 +296,26 @@ void CPerfStatPacketUsageImpl::GetStats ( CPerfStatResult* pResult, const std::m
 
     // Add columns
     pResult->AddColumn ( "Packet type" );
-    pResult->AddColumn ( "Incoming.pkt/sec" );
+    pResult->AddColumn ( "Incoming.msgs/sec" );
     pResult->AddColumn ( "Incoming.bytes/sec" );
-    pResult->AddColumn ( "Incoming.cpu" );
-    pResult->AddColumn ( "Outgoing.pkt/sec" );
+    pResult->AddColumn ( "Incoming.logic cpu" );
+    pResult->AddColumn ( "Outgoing.msgs/sec" );
     pResult->AddColumn ( "Outgoing.bytes/sec" );
-    pResult->AddColumn ( "Outgoing.cpu" );
+    pResult->AddColumn ( "Outgoing.msgs share" );
 
     if ( m_iStatsCleared )
     {
         pResult->AddRow ()[0] ="Sampling... Please wait";
+    }
+
+
+    // Calc msgs grand total for percent calculation
+    int iOutDeltaCountTotal = 0;
+    for ( uint i = 0 ; i < 256 ; i++ )
+    {
+        const SPacketStat& statOutPrev = m_PrevPacketStats [ CNetServer::STATS_OUTGOING_TRAFFIC ] [ i ];
+        const SPacketStat& statOutNow = m_PacketStats [ CNetServer::STATS_OUTGOING_TRAFFIC ] [ i ];
+        iOutDeltaCountTotal += statOutNow.iCount - statOutPrev.iCount;
     }
 
     long long llTickCountNow = CTickCount::Now ().ToLongLong ();
@@ -367,8 +377,7 @@ void CPerfStatPacketUsageImpl::GetStats ( CPerfStatResult* pResult, const std::m
         {
             row[c++] = SString ( "%d", ( statOutDelta.iCount + 4 ) / 5 );
             row[c++] = CPerfStatManager::GetScaledByteString ( ( statOutDelta.iTotalBytes + 4 ) / 5 );
-            //row[c++] = SString ( "%2.2f%%", statOutDelta.totalTime / 50000.f );
-            row[c++] = "n/a";
+            row[c++] = SString ( "%d%%", (int)( statOutDelta.iCount * 100 / iOutDeltaCountTotal ) );
         }
         else
         {

@@ -2670,7 +2670,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
 
     for ( uint EntityIndex = 0 ; EntityIndex < NumEntities ; EntityIndex++ )
     {
-        g_pCore->UpdateDummyProgress( EntityIndex * 100 / NumEntities );
+        g_pCore->UpdateDummyProgress( EntityIndex * 100 / NumEntities, "%" );
 
         // Read out the entity type id and the entity id
         ElementID EntityID;
@@ -2679,6 +2679,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
         unsigned char ucInterior;
         unsigned short usDimension;
         bool bCollisonsEnabled;
+        bool bCallPropagationEnabled;
 
         if ( bitStream.Read ( EntityID ) &&
              bitStream.Read ( ucEntityTypeID ) &&
@@ -2697,6 +2698,11 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
 
             // Check element collisions enabled ( for use later on )
             bitStream.ReadBit ( bCollisonsEnabled );
+
+            if ( bitStream.Version() >= 0x56 )
+                bitStream.ReadBit ( bCallPropagationEnabled );
+            else
+                bCallPropagationEnabled = true;
 
             // Read custom data
             CCustomData* pCustomData = new CCustomData;
@@ -3921,6 +3927,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                 }
                 pEntity->SetSyncTimeContext ( ucSyncTimeContext );
                 pEntity->GetCustomDataPointer ()->Copy ( pCustomData );
+                pEntity->SetCallPropagationEnabled ( bCallPropagationEnabled );
 
                 // Save any entity-dependant stuff for later
                 SEntityDependantStuff* pStuff = new SEntityDependantStuff;
@@ -4680,6 +4687,12 @@ void CPacketHandler::Packet_LuaEvent ( NetBitStreamInterface& bitStream )
 
 void CPacketHandler::Packet_ResourceStart ( NetBitStreamInterface& bitStream )
 {
+    // Used for dummy progress when a server has over 50MB of client files to process
+    static uint uiTotalSizeProcessed = 0;
+    static CElapsedTime totalSizeProcessedResetTimer;
+    if ( totalSizeProcessedResetTimer.Get() > 5000 )
+        uiTotalSizeProcessed = 0;
+
     /*
     * unsigned char (1)   - resource name size
     * unsigned char (x)    - resource name
@@ -4802,8 +4815,12 @@ void CPacketHandler::Packet_ResourceStart ( NetBitStreamInterface& bitStream )
 
                     bitStream.Read ( ucChunkSubType );
                     bitStream.Read ( chunkChecksum.ulCRC );
-                    bitStream.Read ( (char*)chunkChecksum.mD5, sizeof ( chunkChecksum.mD5 ) );
+                    bitStream.Read ( (char*)chunkChecksum.md5.data, sizeof ( chunkChecksum.md5.data ) );
                     bitStream.Read ( dChunkDataSize );
+
+                    uiTotalSizeProcessed += (uint)dChunkDataSize;
+                    if ( uiTotalSizeProcessed / 1024 / 1024 > 50 )
+                        g_pCore->UpdateDummyProgress( uiTotalSizeProcessed / 1024 / 1024, " MB" );
 
                     // Don't bother with empty files
                     if ( dChunkDataSize > 0 )
@@ -4887,6 +4904,9 @@ void CPacketHandler::Packet_ResourceStart ( NetBitStreamInterface& bitStream )
 
     delete [] szResourceName;
     szResourceName = NULL;
+
+    g_pCore->UpdateDummyProgress( 0 );
+    totalSizeProcessedResetTimer.Reset();
 }
 
 void CPacketHandler::Packet_ResourceStop ( NetBitStreamInterface& bitStream )

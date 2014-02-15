@@ -28,6 +28,77 @@ namespace
     SFixedString < 32 >     ms_PingStatusLastSaved;
     bool                    ms_bNetRouteLastSavedValid = false;
     SFixedString < 32 >     ms_NetRouteLastSaved;
+
+    // Sync thread stats
+    uint                    ms_StatsResetCounters;
+    int                     ms_StatsLoopCount;
+    TIMEUS                  ms_StatsRecvTimeTotalUs;
+    TIMEUS                  ms_StatsRecvTimeMaxUs;
+    TIMEUS                  ms_StatsSendTimeTotalUs;
+    TIMEUS                  ms_StatsSendTimeMaxUs;
+    uint                    ms_StatsRecvMsgsTotal;
+    uint                    ms_StatsRecvMsgsMax;
+    uint                    ms_StatsSendCmdsTotal;
+    uint                    ms_StatsSendCmdsMax;
+    uint                    ms_StatsRecvNumMessages;
+    uint                    ms_StatsSendNumCommands;
+    TIMEUS                  ms_StatsTimePoint1;
+    TIMEUS                  ms_StatsTimePoint2;
+    TIMEUS                  ms_StatsTimePoint3;
+
+    // Sync thread stats helper functions
+    void UpdateStatsPreDoPulse ( void )
+    {
+        ms_StatsTimePoint1 = GetTimeUs();
+        ms_StatsRecvNumMessages = 0;
+    }
+
+    void UpdateStatsPreCommands ( int uiNumCommands )
+    {
+        ms_StatsTimePoint2 = GetTimeUs();
+        ms_StatsTimePoint3 = ms_StatsTimePoint2;
+        ms_StatsSendNumCommands = uiNumCommands;
+    }
+
+    void UpdateStatsFinish ( void )
+    {
+        if ( ms_StatsSendNumCommands != 0 )
+            ms_StatsTimePoint3 = GetTimeUs();
+
+        static CElapsedTime lastStatsResetTime;
+        static uint uiLastResetValue = 10;
+        // Do reset if requested from other thread, or it's been a little while
+        if ( ms_StatsResetCounters != uiLastResetValue || lastStatsResetTime.Get() > 20000 )
+        {
+            lastStatsResetTime.Reset();
+            uiLastResetValue = ms_StatsResetCounters;
+            ms_StatsLoopCount = 0;
+            ms_StatsRecvTimeTotalUs = 0;
+            ms_StatsRecvTimeMaxUs = 0;
+            ms_StatsRecvMsgsTotal = 0;
+            ms_StatsRecvMsgsMax = 0;
+            ms_StatsSendTimeTotalUs = 0;
+            ms_StatsSendTimeMaxUs = 0;
+            ms_StatsSendCmdsTotal = 0;
+            ms_StatsSendCmdsMax = 0;
+        }
+
+        ms_StatsLoopCount++;
+
+        TIMEUS llRecvTimeUs = ms_StatsTimePoint2 - ms_StatsTimePoint1;
+        ms_StatsRecvTimeTotalUs += llRecvTimeUs;
+        ms_StatsRecvTimeMaxUs = Max( ms_StatsRecvTimeMaxUs, llRecvTimeUs );
+
+        TIMEUS llSendTimeUs = ms_StatsTimePoint3 - ms_StatsTimePoint2;
+        ms_StatsSendTimeTotalUs += llSendTimeUs;
+        ms_StatsSendTimeMaxUs = Max( ms_StatsSendTimeMaxUs, llSendTimeUs );
+
+        ms_StatsRecvMsgsTotal += ms_StatsRecvNumMessages;
+        ms_StatsRecvMsgsMax = Max( ms_StatsRecvMsgsMax, ms_StatsRecvNumMessages );
+
+        ms_StatsSendCmdsTotal += ms_StatsSendNumCommands;
+        ms_StatsSendCmdsMax = Max( ms_StatsSendCmdsMax, ms_StatsSendNumCommands );
+    }
 }
 
 
@@ -337,6 +408,38 @@ bool CNetServerBuffer::GetBandwidthStatistics ( SBandwidthStatistics* pDest )
 bool CNetServerBuffer::GetNetPerformanceStatistics ( SNetPerformanceStatistics* pDest, bool bResetCounters )
 {
     return m_pRealNetServer->GetNetPerformanceStatistics ( pDest, bResetCounters );
+}
+
+
+///////////////////////////////////////////////////////////////////////////
+//
+// CNetServerBuffer::GetSyncThreadStatistics
+//
+// Thread safe, but numbers could be wrong
+//
+///////////////////////////////////////////////////////////////////////////
+bool CNetServerBuffer::GetSyncThreadStatistics ( SSyncThreadStatistics* pDest, bool bResetCounters )
+{
+    if ( !pDest )
+        return false;
+
+    int iNumActiveRemoteSystems = Max( 1U, g_pGame->GetPlayerManager()->Count() );
+    int iLoopCount = Max( 1, ms_StatsLoopCount );
+    pDest->uiRecvTimeAvgUs = (uint)( ms_StatsRecvTimeTotalUs / iLoopCount );
+    pDest->uiSendTimeAvgUs = (uint)( ms_StatsSendTimeTotalUs / iLoopCount );
+
+    pDest->uiRecvTimeMaxUs = (uint)( ms_StatsRecvTimeMaxUs );
+    pDest->uiSendTimeMaxUs = (uint)( ms_StatsSendTimeMaxUs );
+
+    pDest->fRecvMsgsAvg = ms_StatsRecvMsgsTotal / (float)iNumActiveRemoteSystems / (float)iLoopCount;
+    pDest->uiRecvMsgsMax = ms_StatsRecvMsgsMax / iNumActiveRemoteSystems;
+    pDest->fSendCmdsAvg = ms_StatsSendCmdsTotal / (float)iNumActiveRemoteSystems / (float)iLoopCount;
+    pDest->uiSendCmdsMax = ms_StatsSendCmdsMax / iNumActiveRemoteSystems;
+
+    if ( bResetCounters )
+        ms_StatsResetCounters++;
+
+    return true;
 }
 
 
@@ -965,6 +1068,7 @@ void* CNetServerBuffer::ThreadProc ( void )
     while ( !shared.m_bTerminateThread )
     {
         shared.m_iThreadFrameCount++;
+        UpdateStatsPreDoPulse();
 
         if ( shared.m_bAutoPulse )
         {
@@ -973,6 +1077,8 @@ void* CNetServerBuffer::ThreadProc ( void )
             UpdateThreadCPUTimes( g_SyncThreadCPUTimes );
             shared.m_Mutex.Lock ();
         }
+
+        UpdateStatsPreCommands( shared.m_OutCommandQueue.size() );
 
         // Is there a waiting command?
         if ( shared.m_OutCommandQueue.empty () )
@@ -1011,6 +1117,8 @@ void* CNetServerBuffer::ThreadProc ( void )
                 shared.m_Mutex.Signal ();
             }
         }
+
+        UpdateStatsFinish();
     }
 
     shared.m_bThreadTerminated = true;
@@ -1070,6 +1178,7 @@ void CNetServerBuffer::ProcessCommand ( CNetJobData* pJobData )
         CALLREALNET0R( const SPacketStat*,  GetPacketStats                  )
         CALLREALNET1R( bool,                GetBandwidthStatistics          , SBandwidthStatistics*, pDest )
         CALLREALNET2R( bool,                GetNetPerformanceStatistics     , SNetPerformanceStatistics*, pDest, bool, bResetCounters )
+        CALLREALNET2R( bool,                GetSyncThreadStatistics         , SSyncThreadStatistics*, pDest, bool, bResetCounters )
         CALLREALNET1 (                      GetPingStatus                   , SFixedString < 32 >*, pstrStatus )
         CALLREALNET7R( bool,                SendPacket                      , unsigned char, ucPacketID, const NetServerPlayerID&, playerID, NetBitStreamInterface*, bitStream, bool, bBroadcast, NetServerPacketPriority, packetPriority, NetServerPacketReliability, packetReliability, ePacketOrdering, packetOrdering )
         CALLREALNET3 (                      GetPlayerIP                     , const NetServerPlayerID&, playerID, char*, strIP, unsigned short*, usPort )
@@ -1178,6 +1287,8 @@ void CNetServerBuffer::ProcessPacket ( unsigned char ucPacketID, const NetServer
         // Reset bitstream pointer so game can also read the packet data
         BitStream->ResetReadPointer ();
     }
+
+    ms_StatsRecvNumMessages++;
 
     if ( !CNetBufferWatchDog::CanReceivePacket ( ucPacketID ) )
        return;

@@ -32,6 +32,7 @@ public:
         float                   fHealth;
         float                   fArmor;
         bool                    bOnFire;
+        bool                    bIsInWater;
     };
 
 public:

@@ -229,7 +229,6 @@ private:
     void                    TidyUp ( void );
     ResponseCode            HandleRequestActive ( HttpRequest * ipoHttpRequest, HttpResponse * ipoHttpResponse, class CAccount* account );
     ResponseCode            HandleRequestCall ( HttpRequest * ipoHttpRequest, HttpResponse * ipoHttpResponse, class CAccount* account );
-    ResponseCode            HandleRequestInfo ( HttpRequest * ipoHttpRequest, HttpResponse * ipoHttpResponse );
     
     pthread_mutex_t         m_mutex;
     bool                    m_bDestroyed;
@@ -341,7 +340,6 @@ public:
     bool                    CheckIfStartable ( void );
     inline unsigned int     GetFileCount ( void ) { return m_resourceFiles.size(); }
     void                    DisplayInfo ( void );
-    char *                  DisplayInfoHTML ( char * info, size_t length );
     list<CResourceFile *>*  GetFiles ( void ) { return &m_resourceFiles; }
     CElementGroup *         GetElementGroup ( void ) { return m_pDefaultElementGroup; }
     inline time_t           GetTimeStarted ( void ) { return m_timeStarted; }

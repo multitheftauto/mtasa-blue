@@ -2315,10 +2315,13 @@ void CALLBACK TimerProc( void* lpParametar, BOOLEAN TimerOrWaitFired )
 //
 // Refresh progress output
 //
-void CCore::UpdateDummyProgress( int iPercent )
+void CCore::UpdateDummyProgress( int iValue, const char* szType )
 {
-    if ( iPercent != -1 )
-        m_iDummyProgressPercent = iPercent;
+    if ( iValue != -1 )
+    {
+        m_iDummyProgressValue = iValue;
+        m_strDummyProgressType = szType;
+    }
 
     if ( m_DummyProgressTimerHandle == NULL )
     {
@@ -2332,8 +2335,8 @@ void CCore::UpdateDummyProgress( int iPercent )
 
     // Compose message with amount
     SString strMessage;
-    if ( m_iDummyProgressPercent )
-        strMessage = SString( "%d%%", m_iDummyProgressPercent );
+    if ( m_iDummyProgressValue )
+        strMessage = SString( "%d%s", m_iDummyProgressValue, *m_strDummyProgressType );
 
     CGraphics::GetSingleton().SetProgressMessage( strMessage );
 }

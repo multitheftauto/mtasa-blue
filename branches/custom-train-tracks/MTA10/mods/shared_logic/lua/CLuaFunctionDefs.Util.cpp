@@ -1265,17 +1265,18 @@ int CLuaFunctionDefs::PregMatch ( lua_State* luaVM )
 
 int CLuaFunctionDefs::AddDebugHook ( lua_State* luaVM )
 {
-//  bool AddDebugHook ( string hookType, function callback )
-    EDebugHookType hookType; CLuaFunctionRef callBack;
+//  bool AddDebugHook ( string hookType, function callback[, table allowedNames ] )
+    EDebugHookType hookType; CLuaFunctionRef callBack; std::vector < SString > allowedNames;
 
     CScriptArgReader argStream( luaVM );
     argStream.ReadEnumString( hookType );
     argStream.ReadFunction( callBack );
+    argStream.ReadStringTable( allowedNames, true );
     argStream.ReadFunctionComplete ();
 
     if ( !argStream.HasErrors() )
     {
-        if ( g_pClientGame->GetDebugHookManager()->AddDebugHook( hookType, callBack ) )
+        if ( g_pClientGame->GetDebugHookManager()->AddDebugHook( hookType, callBack, allowedNames ) )
         {
             lua_pushboolean( luaVM, true );
             return 1;

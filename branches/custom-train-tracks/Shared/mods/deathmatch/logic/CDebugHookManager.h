@@ -17,6 +17,7 @@ struct SDebugHookCallInfo
 {
     CLuaFunctionRef functionRef;
     CLuaMain* pLuaMain;
+    CFastHashSet < SString > allowedNameMap;
 };
 
 ///////////////////////////////////////////////////////////////
@@ -32,7 +33,7 @@ public:
     ZERO_ON_NEW
                         CDebugHookManager           ( void );
                         ~CDebugHookManager          ( void );
-    bool                AddDebugHook                ( EDebugHookType hookType, const CLuaFunctionRef& functionRef );
+    bool                AddDebugHook                ( EDebugHookType hookType, const CLuaFunctionRef& functionRef, const std::vector < SString >& allowedNameList );
     bool                RemoveDebugHook             ( EDebugHookType hookType, const CLuaFunctionRef& functionRef );
     void                OnLuaMainDestroy            ( CLuaMain* pLuaMain );
 
@@ -45,7 +46,8 @@ public:
 
 protected:
     std::vector < SDebugHookCallInfo >& GetHookInfoListForType ( EDebugHookType hookType );
-    void                CallHook                    ( const std::vector < SDebugHookCallInfo >& eventHookList, const CLuaArguments& Arguments );
+    void                CallHook                    ( const char* szName, const std::vector < SDebugHookCallInfo >& eventHookList, const CLuaArguments& Arguments );
+    bool                IsNameAllowed               ( const char* szName, const std::vector < SDebugHookCallInfo >& eventHookList );
 
     std::vector < SDebugHookCallInfo >  m_PreEventHookList;
     std::vector < SDebugHookCallInfo >  m_PostEventHookList;

@@ -11,14 +11,17 @@
 		<Platform
 			Name="Win32"
 		/>
+		<Platform
+			Name="x64"
+		/>
 	</Platforms>
 	<ToolFiles>
 	</ToolFiles>
 	<Configurations>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="../../"
-			IntermediateDirectory=".\Release"
+			OutputDirectory="..\x86\$(ConfigurationName)"
+			IntermediateDirectory="..\x86\$(ConfigurationName)"
 			ConfigurationType="4"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			UseOfMFC="0"
@@ -53,9 +56,6 @@
 				UsePrecompiledHeader="1"
 				PrecompiledHeaderThrough=""
 				PrecompiledHeaderFile=".\Release/pme.pch"
-				AssemblerListingLocation=".\Release/"
-				ObjectFile=".\Release/"
-				ProgramDataBaseFileName=".\Release/"
 				WarningLevel="3"
 				SuppressStartupBanner="true"
 				DebugInformationFormat="3"
@@ -74,7 +74,85 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="../lib/pme_2008.lib"
+				OutputFile="$(OutDir)\pme.lib"
+				SuppressStartupBanner="true"
+				IgnoreAllDefaultLibraries="true"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
+		</Configuration>
+		<Configuration
+			Name="Release|x64"
+			OutputDirectory="..\$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="..\$(PlatformName)\$(ConfigurationName)"
+			ConfigurationType="4"
+			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
+			UseOfMFC="0"
+			ATLMinimizesCRunTimeLibraryUsage="false"
+			CharacterSet="2"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+				TargetEnvironment="3"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="2"
+				InlineFunctionExpansion="1"
+				AdditionalIncludeDirectories="..\..\pcre;..\..\pcre\shipped_for_mta"
+				PreprocessorDefinitions="WIN32_LEAN_AND_MEAN;WIN32;NDEBUG;_LIB"
+				StringPooling="true"
+				RuntimeLibrary="2"
+				BufferSecurityCheck="false"
+				EnableFunctionLevelLinking="true"
+				UsePrecompiledHeader="1"
+				PrecompiledHeaderThrough=""
+				PrecompiledHeaderFile=".\Release/pme.pch"
+				WarningLevel="3"
+				SuppressStartupBanner="true"
+				DebugInformationFormat="3"
+				CompileAs="0"
+				DisableSpecificWarnings="4244,4267"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="NDEBUG"
+				Culture="1033"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLibrarianTool"
+				OutputFile="$(OutDir)\pme.lib"
 				SuppressStartupBanner="true"
 				IgnoreAllDefaultLibraries="true"
 			/>
@@ -96,8 +174,8 @@
 		</Configuration>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="../../"
-			IntermediateDirectory=".\Debug"
+			OutputDirectory="..\x86\$(ConfigurationName)"
+			IntermediateDirectory="..\x86\$(ConfigurationName)"
 			ConfigurationType="4"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			UseOfMFC="0"
@@ -129,9 +207,6 @@
 				RuntimeLibrary="3"
 				UsePrecompiledHeader="0"
 				PrecompiledHeaderFile=".\Debug/pme.pch"
-				AssemblerListingLocation=".\Debug/"
-				ObjectFile=".\Debug/"
-				ProgramDataBaseFileName=".\Debug/"
 				WarningLevel="3"
 				SuppressStartupBanner="true"
 				DebugInformationFormat="4"
@@ -150,7 +225,82 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="../lib/pmed_2008.lib"
+				OutputFile="$(OutDir)\pme_d.lib"
+				SuppressStartupBanner="true"
+				IgnoreAllDefaultLibraries="true"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
+		</Configuration>
+		<Configuration
+			Name="Debug|x64"
+			OutputDirectory="..\$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="..\$(PlatformName)\$(ConfigurationName)"
+			ConfigurationType="4"
+			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
+			UseOfMFC="0"
+			ATLMinimizesCRunTimeLibraryUsage="false"
+			CharacterSet="2"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+				TargetEnvironment="3"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="0"
+				AdditionalIncludeDirectories="..\..\pcre;..\..\pcre\shipped_for_mta"
+				PreprocessorDefinitions="WIN32;_DEBUG;_LIB"
+				StringPooling="true"
+				BasicRuntimeChecks="3"
+				RuntimeLibrary="3"
+				UsePrecompiledHeader="0"
+				PrecompiledHeaderFile=".\Debug/pme.pch"
+				WarningLevel="3"
+				SuppressStartupBanner="true"
+				DebugInformationFormat="3"
+				CompileAs="0"
+				DisableSpecificWarnings="4244,4267"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="_DEBUG"
+				Culture="1033"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLibrarianTool"
+				OutputFile="$(OutDir)\pme_d.lib"
 				SuppressStartupBanner="true"
 				IgnoreAllDefaultLibraries="true"
 			/>
@@ -172,8 +322,8 @@
 		</Configuration>
 		<Configuration
 			Name="Nightly|Win32"
-			OutputDirectory="../../"
-			IntermediateDirectory="..\..\..\obj\vendor\pme"
+			OutputDirectory="..\x86\$(ConfigurationName)"
+			IntermediateDirectory="..\..\..\obj\x86\$(ConfigurationName)\vendor\$(SafeRootNamespace)"
 			ConfigurationType="4"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			UseOfMFC="0"
@@ -224,7 +374,83 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="../lib/pme_2008.lib"
+				OutputFile="$(OutDir)\pme.lib"
+				SuppressStartupBanner="true"
+				IgnoreAllDefaultLibraries="true"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
+		</Configuration>
+		<Configuration
+			Name="Nightly|x64"
+			OutputDirectory="..\$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="..\..\..\obj\$(PlatformName)\$(ConfigurationName)\vendor\$(SafeRootNamespace)"
+			ConfigurationType="4"
+			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
+			UseOfMFC="0"
+			ATLMinimizesCRunTimeLibraryUsage="false"
+			CharacterSet="2"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+				TargetEnvironment="3"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="2"
+				InlineFunctionExpansion="1"
+				AdditionalIncludeDirectories="..\..\pcre;..\..\pcre\shipped_for_mta"
+				PreprocessorDefinitions="WIN32_LEAN_AND_MEAN;WIN32;NDEBUG;_LIB"
+				StringPooling="true"
+				RuntimeLibrary="2"
+				BufferSecurityCheck="false"
+				EnableFunctionLevelLinking="true"
+				PrecompiledHeaderThrough=""
+				WarningLevel="3"
+				SuppressStartupBanner="true"
+				DebugInformationFormat="3"
+				CompileAs="0"
+				DisableSpecificWarnings="4244,4267"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="NDEBUG"
+				Culture="1033"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLibrarianTool"
+				OutputFile="$(OutDir)\pme.lib"
 				SuppressStartupBanner="true"
 				IgnoreAllDefaultLibraries="true"
 			/>
@@ -266,6 +492,16 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="2"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
 					Name="Debug|Win32"
 					>
 					<Tool
@@ -277,7 +513,28 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+						BasicRuntimeChecks="3"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
 					Name="Nightly|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="2"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Nightly|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"

@@ -2135,7 +2135,7 @@ int CLuaFunctionDefs::GetWeaponProperty ( lua_State* luaVM )
             case WEAPON_DEFAULT_COMBO:
             case WEAPON_COMBOS_AVAILABLE:
             {
-                short sWeaponInfo = 0;
+                int sWeaponInfo = 0;
 
                 if ( CStaticFunctionDefinitions::GetWeaponProperty ( eProp, eWep, eWepSkill, sWeaponInfo ) )
                 {
@@ -2227,7 +2227,7 @@ int CLuaFunctionDefs::GetOriginalWeaponProperty ( lua_State* luaVM )
         case WEAPON_DEFAULT_COMBO:
         case WEAPON_COMBOS_AVAILABLE:
             {
-                short sWeaponInfo = 0;
+                int sWeaponInfo = 0;
 
                 if ( CStaticFunctionDefinitions::GetOriginalWeaponProperty ( eProp, eWep, eWepSkill, sWeaponInfo ) )
                 {

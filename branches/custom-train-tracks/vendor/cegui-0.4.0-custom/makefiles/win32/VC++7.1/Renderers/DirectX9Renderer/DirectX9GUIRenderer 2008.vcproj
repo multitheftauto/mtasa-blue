@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9,00"
+	Version="9.00"
 	Name="CEGUI - DirectX9GUIRenderer"
 	ProjectGUID="{7582B608-D92F-4FCB-B682-2214B48D1596}"
 	RootNamespace="CEGUI - DirectX9GUIRenderer"
@@ -18,8 +18,8 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
+			OutputDirectory="..\..\..\..\..\x86\$(ConfigurationName)"
+			IntermediateDirectory="x86\$(ConfigurationName)"
 			ConfigurationType="4"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			CharacterSet="2"
@@ -66,7 +66,7 @@
 			<Tool
 				Name="VCLibrarianTool"
 				AdditionalOptions="/IGNORE:4006"
-				OutputFile="..\..\..\..\..\lib\DirectX9GUIRenderer_d_2008.lib"
+				OutputFile="$(OutDir)\DirectX9GUIRenderer_d.lib"
 				IgnoreAllDefaultLibraries="true"
 			/>
 			<Tool
@@ -87,8 +87,8 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
+			OutputDirectory="..\..\..\..\..\x86\$(ConfigurationName)"
+			IntermediateDirectory="x86\$(ConfigurationName)"
 			ConfigurationType="4"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			CharacterSet="2"
@@ -139,7 +139,7 @@
 			<Tool
 				Name="VCLibrarianTool"
 				AdditionalOptions="/IGNORE:4006"
-				OutputFile="..\..\..\..\..\lib\DirectX9GUIRenderer_2008.lib"
+				OutputFile="$(OutDir)\DirectX9GUIRenderer.lib"
 				IgnoreAllDefaultLibraries="true"
 			/>
 			<Tool
@@ -160,8 +160,8 @@
 		</Configuration>
 		<Configuration
 			Name="Nightly|Win32"
-			OutputDirectory="$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
+			OutputDirectory="..\..\..\..\..\x86\$(ConfigurationName)"
+			IntermediateDirectory="..\..\..\..\..\..\..\obj\x86\$(ConfigurationName)\vendor\$(SafeRootNamespace)"
 			ConfigurationType="4"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			CharacterSet="2"
@@ -212,7 +212,7 @@
 			<Tool
 				Name="VCLibrarianTool"
 				AdditionalOptions="/IGNORE:4006"
-				OutputFile="..\..\..\..\..\lib\DirectX9GUIRenderer_2008.lib"
+				OutputFile="$(OutDir)\DirectX9GUIRenderer.lib"
 				IgnoreAllDefaultLibraries="true"
 			/>
 			<Tool

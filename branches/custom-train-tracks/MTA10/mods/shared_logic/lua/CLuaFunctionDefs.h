@@ -156,6 +156,7 @@ public:
     LUA_DECLARE ( IsElementFrozen );
     LUA_DECLARE ( GetLowLodElement );
     LUA_DECLARE ( IsElementLowLod );
+    LUA_DECLARE ( IsElementCallPropagationEnabled );
 
     // Element set funcs
     LUA_DECLARE ( CreateElement );
@@ -182,6 +183,7 @@ public:
     LUA_DECLARE ( SetElementDoubleSided );
     LUA_DECLARE ( SetElementFrozen );
     LUA_DECLARE ( SetLowLodElement );
+    LUA_DECLARE ( SetElementCallPropagationEnabled );
 
     // Radio functions
     LUA_DECLARE ( SetRadioChannel );
@@ -802,6 +804,8 @@ public:
     LUA_DECLARE ( ResetWindVelocity );
     LUA_DECLARE ( GetInteriorSoundsEnabled );
     LUA_DECLARE ( SetInteriorSoundsEnabled );
+    LUA_DECLARE ( GetInteriorFurnitureEnabled );
+    LUA_DECLARE ( SetInteriorFurnitureEnabled );
     LUA_DECLARE ( GetRainLevel );
     LUA_DECLARE ( SetRainLevel );
     LUA_DECLARE ( ResetRainLevel );

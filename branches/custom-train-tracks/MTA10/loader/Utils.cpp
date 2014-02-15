@@ -1999,6 +1999,20 @@ void LogSettings( void )
 
 //////////////////////////////////////////////////////////
 //
+// WriteDebugEventAndReport
+//
+// Write to logile.txt and report.log
+//
+//////////////////////////////////////////////////////////
+void WriteDebugEventAndReport( uint uiId, const SString& strText )
+{
+    WriteDebugEvent( strText );
+    AddReportLog( uiId, strText );
+}
+
+
+//////////////////////////////////////////////////////////
+//
 // PadLeft
 //
 // Add some spaces to make it look nicer

@@ -26,7 +26,15 @@ CONDITIONAL COMPILATION :
 #include "StdInc.h"
 #include "CCrashHandlerAPI.h"
 
-#ifdef WIN32
+#ifdef WIN_x64
+// TODO - Windows 64 bit crash dumps 
+BOOL __stdcall SetCrashHandlerFilter ( PFNCHFILTFN pFn )
+{
+    return 0;
+}
+#endif
+
+#ifdef WIN_x86 
 
 #include <cstdlib>
 #include <tchar.h>

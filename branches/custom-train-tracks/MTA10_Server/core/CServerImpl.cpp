@@ -296,7 +296,7 @@ int CServerImpl::Run ( int iArgumentCount, char* szArguments [] )
         Print ( "MTA:BLUE Server for MTA:SA\r\n\r\n" );
 
     // Load the network DLL
-    if ( m_NetworkLibrary.Load ( GetAbsolutePath ( szNetworkLibName ) ) )
+    if ( m_NetworkLibrary.Load ( PathJoin ( m_strServerPath, SERVER_BIN_PATH, szNetworkLibName ) ) )
     {
         // Network module compatibility check
         typedef unsigned long (*PFNCHECKCOMPATIBILITY) ( unsigned long, unsigned long* );
@@ -306,7 +306,7 @@ int CServerImpl::Run ( int iArgumentCount, char* szArguments [] )
             // net.dll doesn't like our version number
             ulong ulNetModuleVersion = 0;
             pfnCheckCompatibility ( 1, &ulNetModuleVersion );
-            Print ( "Network module not compatible! (Expected 0x%x, got 0x%x)\n\r", MTA_DM_SERVER_NET_MODULE_VERSION, ulNetModuleVersion );
+            Print ( "Network module not compatible! (Expected 0x%x, got 0x%x)\n\r", MTA_DM_SERVER_NET_MODULE_VERSION, (uint)ulNetModuleVersion );
             Print ( "Press Q to shut down the server!\n\r" );
             Print ( "\n\r\n\r\n\r(If this is a custom build,\n\r" );
             Print ( " check MTASA_VERSION_TYPE in version.h is set correctly)\n\r" );
@@ -315,7 +315,7 @@ int CServerImpl::Run ( int iArgumentCount, char* szArguments [] )
             return ERROR_NETWORK_LIBRARY_FAILED;
         }
 
-        if ( m_XMLLibrary.Load ( GetAbsolutePath ( szXMLLibName ) ) )
+        if ( m_XMLLibrary.Load ( PathJoin ( m_strServerPath, SERVER_BIN_PATH, szXMLLibName ) ) )
         {
             // Grab the network interface
             InitNetServerInterface pfnInitNetServerInterface = (InitNetServerInterface) ( m_NetworkLibrary.GetProcedureAddress ( "InitNetServerInterface" ) );
@@ -604,7 +604,7 @@ void CServerImpl::HandleInput ( void )
     {
         iStdIn = getwchar();
 
-        if ( iStdIn == -1 )
+        if ( iStdIn == WEOF )
             iStdIn = 0;
     }
 #endif

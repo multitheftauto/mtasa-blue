@@ -172,10 +172,10 @@ public:
         this->reserve ( 16U < uiMaxAmount ? 16U : uiMaxAmount );
 
         // Split into pointers
-        unsigned long ulCurrentPoint = 0;
+        size_t ulCurrentPoint = 0;
         while ( true )
         {
-            unsigned long ulPos = strInput.find ( strDelim, ulCurrentPoint );
+            size_t ulPos = strInput.find ( strDelim, ulCurrentPoint );
             if ( ulPos == STRING_TYPE::npos || ( uiMaxAmount > 0 && uiMaxAmount <= this->size () + 1 ) )
             {
                 if ( ulCurrentPoint <= strInput.length () )

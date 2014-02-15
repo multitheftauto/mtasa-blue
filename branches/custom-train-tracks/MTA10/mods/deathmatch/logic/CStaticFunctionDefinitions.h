@@ -83,6 +83,7 @@ public:
     static bool                         IsElementFrozen                     ( CClientEntity& Entity, bool& bFrozen );
     static bool                         GetLowLodElement                    ( CClientEntity& Entity, CClientEntity*& pOutLowLodEntity );
     static bool                         IsElementLowLod                     ( CClientEntity& Entity, bool& bOutIsLowLod );
+    static bool                         IsElementCallPropagationEnabled     ( CClientEntity& Entity, bool& bOutEnabled );
 
     // Element set funcs
     static CClientDummy*                CreateElement                       ( CResource& Resource, const char* szTypeName, const char* szID );
@@ -107,6 +108,7 @@ public:
     static bool                         SetElementCollidableWith            ( CClientEntity& Entity, CClientEntity& ThisEntity, bool bCanCollide );
     static bool                         SetElementFrozen                    ( CClientEntity& Entity, bool bFrozen );
     static bool                         SetLowLodElement                    ( CClientEntity& Entity, CClientEntity* pLowLodEntity );
+    static bool                         SetElementCallPropagationEnabled    ( CClientEntity& Entity, bool bEnabled );
 
     // Radio funcs
     static bool                         SetRadioChannel                     ( unsigned char& ucChannel );
@@ -154,10 +156,10 @@ public:
     static bool                         IsPedOnFire                         ( CClientPed& Ped, bool & bOnFire );
     static bool                         IsPedInVehicle                      ( CClientPed& Ped, bool & bInVehicle );
     static bool                         GetWeaponProperty                   ( eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, float & fData );
-    static bool                         GetWeaponProperty                   ( eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, short & sData );
+    static bool                         GetWeaponProperty                   ( eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, int & sData );
     static bool                         GetWeaponProperty                   ( eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, CVector & vecData );
     static bool                         GetOriginalWeaponProperty           ( eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, float & fData );
-    static bool                         GetOriginalWeaponProperty           ( eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, short & sData );
+    static bool                         GetOriginalWeaponProperty           ( eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, int & sData );
     static bool                         GetOriginalWeaponProperty           ( eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, CVector & vecData );
     static bool                         GetPedOxygenLevel                   ( CClientPed& Ped, float& fOxygen );
     
@@ -410,8 +412,8 @@ public:
 
     static void                         GUIScrollBarSetScrollPosition       ( CClientEntity& Element, int iProgress );
 
-    static void                         GUIScrollPaneSetHorizontalScrollPosition    ( CClientEntity& Element, int iProgress );
-    static void                         GUIScrollPaneSetVerticalScrollPosition      ( CClientEntity& Element, int iProgress );
+    static void                         GUIScrollPaneSetHorizontalScrollPosition    ( CClientEntity& Element, float fProgress );
+    static void                         GUIScrollPaneSetVerticalScrollPosition      ( CClientEntity& Element, float fProgress );
 
     static inline const CVector2D       GUIGetScreenSize                    ( void )                                                                                    { return g_pCore->GetGUI()->GetResolution (); };
     

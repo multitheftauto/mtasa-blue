@@ -296,6 +296,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "isElementFrozen", CLuaFunctionDefs::IsElementFrozen );
     CLuaCFunctions::AddFunction ( "getLowLODElement", CLuaFunctionDefs::GetLowLodElement );
     CLuaCFunctions::AddFunction ( "isElementLowLOD", CLuaFunctionDefs::IsElementLowLod );
+    CLuaCFunctions::AddFunction ( "isElementCallPropagationEnabled", CLuaFunctionDefs::IsElementCallPropagationEnabled );
 
     // Element set funcs
     CLuaCFunctions::AddFunction ( "createElement", CLuaFunctionDefs::CreateElement );
@@ -322,6 +323,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "setElementDoubleSided", CLuaFunctionDefs::SetElementDoubleSided );
     CLuaCFunctions::AddFunction ( "setElementFrozen", CLuaFunctionDefs::SetElementFrozen );
     CLuaCFunctions::AddFunction ( "setLowLODElement", CLuaFunctionDefs::SetLowLodElement );
+    CLuaCFunctions::AddFunction ( "setElementCallPropagationEnabled", CLuaFunctionDefs::SetElementCallPropagationEnabled );
 
     // Sound effects and synth funcs
     CLuaCFunctions::AddFunction ( "playSound", CLuaFunctionDefs::PlaySound );
@@ -938,6 +940,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getJetpackMaxHeight", CLuaFunctionDefs::GetJetpackMaxHeight );
     CLuaCFunctions::AddFunction ( "getWindVelocity", CLuaFunctionDefs::GetWindVelocity );
     CLuaCFunctions::AddFunction ( "getInteriorSoundsEnabled", CLuaFunctionDefs::GetInteriorSoundsEnabled );
+    CLuaCFunctions::AddFunction ( "getInteriorFurnitureEnabled", CLuaFunctionDefs::GetInteriorFurnitureEnabled );
     CLuaCFunctions::AddFunction ( "getFarClipDistance", CLuaFunctionDefs::GetFarClipDistance );
     CLuaCFunctions::AddFunction ( "getFogDistance", CLuaFunctionDefs::GetFogDistance );
     CLuaCFunctions::AddFunction ( "getSunColor", CLuaFunctionDefs::GetSunColor );
@@ -984,6 +987,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "setWindVelocity", CLuaFunctionDefs::SetWindVelocity );
     CLuaCFunctions::AddFunction ( "resetWindVelocity", CLuaFunctionDefs::ResetWindVelocity );
     CLuaCFunctions::AddFunction ( "setInteriorSoundsEnabled", CLuaFunctionDefs::SetInteriorSoundsEnabled );
+    CLuaCFunctions::AddFunction ( "setInteriorFurnitureEnabled", CLuaFunctionDefs::SetInteriorFurnitureEnabled );
     CLuaCFunctions::AddFunction ( "setRainLevel", CLuaFunctionDefs::SetRainLevel );
     CLuaCFunctions::AddFunction ( "resetRainLevel", CLuaFunctionDefs::ResetRainLevel );
     CLuaCFunctions::AddFunction ( "setFarClipDistance", CLuaFunctionDefs::SetFarClipDistance );

@@ -25,6 +25,36 @@
 #endif
 
 //
+// Architecture
+//
+#if defined( _M_X64 ) || defined( __x86_64__ ) || defined( _M_AMD64 )
+    #define ANY_x64
+    #ifdef _WIN64
+        #define WIN_x64
+    #else
+        #define LINUX_x64
+    #endif
+#else
+    #define ANY_x86
+    #ifdef WIN32
+        #define WIN_x86
+    #else
+        #define LINUX_x86
+    #endif
+#endif
+
+//
+// Location of server binaries
+//
+#ifdef ANY_x86
+    #define SERVER_BIN_PATH     ""
+    #define SERVER_BIN_PATH_MOD "mods/deathmatch/"
+#else
+    #define SERVER_BIN_PATH     "x64/"
+    #define SERVER_BIN_PATH_MOD "x64/"
+#endif
+
+//
 // vsnprintf with buffer full check
 //
 #define VSNPRINTF( buffer, count, format, argptr ) \

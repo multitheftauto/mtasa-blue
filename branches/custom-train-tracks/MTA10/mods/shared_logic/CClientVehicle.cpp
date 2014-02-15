@@ -2122,13 +2122,13 @@ float CClientVehicle::GetTrainPosition ( void )
     return m_fTrainPosition;
 }
 
-void CClientVehicle::SetTrainPosition ( float fSpeed, bool bRecalcOnRailDistance )
+void CClientVehicle::SetTrainPosition ( float fTrainPosition, bool bRecalcOnRailDistance )
 {
     if ( m_pVehicle && GetVehicleType() == CLIENTVEHICLE_TRAIN  )
     {
-        m_pVehicle->SetTrainPosition ( fSpeed, bRecalcOnRailDistance );
+        m_pVehicle->SetTrainPosition ( fTrainPosition, bRecalcOnRailDistance );
     }
-    m_fTrainPosition = fSpeed;
+    m_fTrainPosition = fTrainPosition;
 }
 
 uchar CClientVehicle::GetTrainTrack ( void )
@@ -2488,7 +2488,7 @@ void CClientVehicle::Create ( void )
         {
             DWORD dwModels [1];
             dwModels [0] = m_usModel;
-            m_pVehicle = g_pGame->GetPools ()->AddTrain ( &m_Matrix.vPos, dwModels, 1, m_bTrainDirection );
+            m_pVehicle = g_pGame->GetPools ()->AddTrain ( &m_Matrix.vPos, dwModels, 1, m_bTrainDirection, m_ucTrackID );
         }
         else
         {            
@@ -2565,7 +2565,7 @@ void CClientVehicle::Create ( void )
                 m_pVehicle->SetRailTrack ( m_ucTrackID );
 
             if ( m_fTrainPosition >= 0.0f )
-                m_pVehicle->SetTrainPosition ( m_fTrainPosition, false );
+                m_pVehicle->SetTrainPosition ( m_fTrainPosition, true );
 
             if ( m_bChainEngine )
                 SetIsChainEngine ( true );
