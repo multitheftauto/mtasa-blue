@@ -7958,7 +7958,7 @@ bool CStaticFunctionDefinitions::GetWeaponProperty ( eWeaponProperty eProperty, 
     return true;
 }
 
-bool CStaticFunctionDefinitions::GetWeaponProperty ( eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, short & sData )
+bool CStaticFunctionDefinitions::GetWeaponProperty ( eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, int & sData )
 {
     if ( eProperty == WEAPON_INVALID_PROPERTY )
         return false;
@@ -8061,6 +8061,22 @@ bool CStaticFunctionDefinitions::GetWeaponProperty ( eWeaponProperty eProperty, 
     }
     else
         return false;
+
+    return true;
+}
+
+bool CStaticFunctionDefinitions::GetWeaponPropertyFlag ( eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, bool& bEnable )
+{
+    CWeaponStat* pWeaponInfo = g_pGame->GetWeaponStatManager()->GetWeaponStats( eWeapon, eSkillLevel );        
+    if ( !pWeaponInfo )
+        return false;
+
+    if ( !IsWeaponPropertyFlag( eProperty ) )
+        return false;
+
+    // Get bit
+    uint uiFlagBit = GetWeaponPropertyFlagBit( eProperty );
+    bEnable = pWeaponInfo->IsFlagSet ( uiFlagBit );
 
     return true;
 }
@@ -8173,7 +8189,7 @@ bool CStaticFunctionDefinitions::GetOriginalWeaponProperty ( eWeaponProperty ePr
     return true;
 }
 
-bool CStaticFunctionDefinitions::GetOriginalWeaponProperty ( eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, short & sData )
+bool CStaticFunctionDefinitions::GetOriginalWeaponProperty ( eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, int & sData )
 {
     if ( eProperty == WEAPON_INVALID_PROPERTY )
         return false;
@@ -8276,6 +8292,23 @@ bool CStaticFunctionDefinitions::GetOriginalWeaponProperty ( eWeaponProperty ePr
     }
     else
         return false;
+
+    return true;
+}
+
+
+bool CStaticFunctionDefinitions::GetOriginalWeaponPropertyFlag ( eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, bool& bEnable )
+{
+    CWeaponStat* pWeaponInfo = g_pGame->GetWeaponStatManager()->GetOriginalWeaponStats( eWeapon, eSkillLevel );        
+    if ( !pWeaponInfo )
+        return false;
+
+    if ( !IsWeaponPropertyFlag( eProperty ) )
+        return false;
+
+    // Get bit
+    uint uiFlagBit = GetWeaponPropertyFlagBit( eProperty );
+    bEnable = pWeaponInfo->IsFlagSet ( uiFlagBit );
 
     return true;
 }
