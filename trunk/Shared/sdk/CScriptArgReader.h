@@ -574,6 +574,40 @@ public:
 
 
     //
+    // Read a table of strings
+    //
+    void ReadStringTable ( std::vector < SString >& outList, bool bDefaultEmpty = false )
+    {
+        outList.clear();
+
+        int iArgument = lua_type ( m_luaVM, m_iIndex );
+        if ( iArgument == LUA_TTABLE )
+        {
+            for ( lua_pushnil ( m_luaVM ) ; lua_next ( m_luaVM, m_iIndex ) != 0 ; lua_pop ( m_luaVM, 1 ) )
+            {
+                int iArgument = lua_type ( m_luaVM, -1 );
+                if ( iArgument == LUA_TSTRING || iArgument == LUA_TNUMBER )
+                {
+                    uint uiLength = lua_strlen ( m_luaVM, -1 );
+                    outList.push_back ( SStringX( lua_tostring ( m_luaVM, -1 ), uiLength ) );
+                }
+            }
+            m_iIndex++;
+            return;
+        }
+        else
+        if ( bDefaultEmpty && ( iArgument == LUA_TNONE || iArgument == LUA_TNIL ) )
+        {
+            m_iIndex++;
+            return;
+        }
+
+        SetTypeError ( "table" );
+        m_iIndex++;
+    }
+
+
+    //
     // Read a function, but don't do it yet due to Lua stack issues
     //
     void ReadFunction ( CLuaFunctionRef& outValue, int defaultValue = -2 )
