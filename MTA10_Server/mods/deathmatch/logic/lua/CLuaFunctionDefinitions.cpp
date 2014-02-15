@@ -1403,7 +1403,7 @@ int CLuaFunctionDefinitions::GetOriginalWeaponProperty ( lua_State* luaVM )
             }
         }
     }
-    if ( !argStream.HasErrors () )
+    if ( argStream.HasErrors () )
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     // Failed
