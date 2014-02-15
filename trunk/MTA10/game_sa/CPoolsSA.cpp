@@ -923,7 +923,7 @@ CBuilding * CPoolsSA::AddBuilding ( DWORD dwModelID )
 }
 
 
-CVehicle* CPoolsSA::AddTrain ( CVector * vecPosition, DWORD dwModels[], int iSize, bool bDirection )
+CVehicle* CPoolsSA::AddTrain ( CVector * vecPosition, DWORD dwModels[], int iSize, bool bDirection, uchar ucTrackId )
 {
     DEBUG_TRACE("CVehicle* CPoolsSA::AddTrain ( CVector * vecPosition, DWORD dwModels[], int iSize, bool bDirection )");
 
@@ -951,12 +951,17 @@ CVehicle* CPoolsSA::AddTrain ( CVector * vecPosition, DWORD dwModels[], int iSiz
     // Disable GetVehicle because CreateMissionTrain calls it before our CVehicleSA instance is inited
     m_bGetVehicleEnabled = false;
 
+    // Find closest track node
+    float fRailDistance;
+    int iNodeId = pGame->GetWorld ()->FindClosestRailTrackNode ( *vecPosition, ucTrackId, fRailDistance );
+    int iDesiredTrackId = ucTrackId;
+
     DWORD dwFunc = FUNC_CTrain_CreateMissionTrain;
     _asm
     {
         push    0 // place as close to point as possible (rather than at node)? (maybe) (actually seems to have an effect on the speed, so changed from 1 to 0)
-        push    0 // start finding closest from here 
-        push    -1 // node to start at (-1 for closest node)
+        push    iDesiredTrackId // track ID
+        push    iNodeId // node to start at (-1 for closest node)
         lea     ecx, pTrainEnd
         push    ecx // end of train
         lea     ecx, pTrainBeginning 

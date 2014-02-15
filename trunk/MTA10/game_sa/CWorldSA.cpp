@@ -536,9 +536,40 @@ void CWorldSA::FindWorldPositionForRailTrackPosition ( float fRailTrackPosition,
     }
 }
 
-int CWorldSA::FindClosestRailTrackNode ( const CVector& vecPosition, int* pOutTrackId, float& fOutRailDistance )
+int CWorldSA::FindClosestRailTrackNode ( const CVector& vecPosition, uchar& ucOutTrackId, float& fOutRailDistance )
 {
-    DWORD dwFunc = FUNC_GetTrainNodeNearPoint; // __cdecl
+    // Original function @ 0x6F7550
+    int iNodeId = -1;
+    float fMinDistance = 99999.898f;
+    int* aNumTrackNodes = (int*)ARRAY_NumRailTrackNodes;
+    SRailNodeSA** aTrackNodes = (SRailNodeSA**)ARRAY_RailTrackNodePointers;
+    uchar ucDesiredTrackId = ucOutTrackId;
+
+    for ( uchar ucTrackId = 0; ucTrackId < NUM_RAILTRACKS; ++ucTrackId )
+    {
+        if ( ( ucDesiredTrackId == 0xFF || ucTrackId == ucDesiredTrackId ) && aNumTrackNodes[ucTrackId] > 0 )
+        {
+            for ( int i = 0; i < aNumTrackNodes[ucTrackId]; ++i )
+            {
+                SRailNodeSA pRailNode = aTrackNodes[ucTrackId][i];
+
+                float fDistance = sqrt ( pow(vecPosition.fZ - pRailNode.sZ * 0.125f, 2) + pow(vecPosition.fY - pRailNode.sY * 0.125f, 2) + pow(vecPosition.fX - pRailNode.sX * 0.125f, 2) );
+                if ( fDistance < fMinDistance )
+                {
+                    fMinDistance = fDistance;
+                    iNodeId = i;
+                    ucOutTrackId = ucTrackId;
+                }
+            }
+        }
+    }
+
+    // Read rail distance
+    fOutRailDistance = aTrackNodes[ucOutTrackId][iNodeId].sRailDistance * 3.33333334f;
+    
+    return iNodeId;
+    
+    /*DWORD dwFunc = FUNC_GetTrainNodeNearPoint; // __cdecl
     int iNodeId;
     *pOutTrackId = 0;
     float fX = vecPosition.fX;
@@ -555,12 +586,8 @@ int CWorldSA::FindClosestRailTrackNode ( const CVector& vecPosition, int* pOutTr
         mov iNodeId, eax
         add esp, 4*4
     }
-
-    // Read rail distance
-    SRailNodeSA** aRailNodes = (SRailNodeSA**) ARRAY_RailTrackNodePointers;
-    fOutRailDistance = aRailNodes[*pOutTrackId][iNodeId].sRailDistance * 3.33333334f;
     
-    return iNodeId;
+    return iNodeId;*/
 }
 
 void CWorldSA::RemoveBuilding ( unsigned short usModelToRemove, float fRange, float fX, float fY, float fZ, char cInterior )
