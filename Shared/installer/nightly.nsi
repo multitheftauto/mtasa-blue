@@ -507,6 +507,9 @@ DontInstallRedist:
 		# Patch our San Andreas .exe if it is required
 			
 		IfFileExists $GTA_DIR\gta_sa.exe 0 TrySteamExe
+            # Check gta_sa.exe is greater than 1MB (Previous Steam patching may have failed)
+            ${GetSize} "$GTA_DIR" "/M=gta_sa.exe /S=0M /G=0" $0 $1 $2
+            StrCmp "$0" "0" TrySteamExe
 			!insertmacro GetMD5 $GTA_DIR\gta_sa.exe $ExeMD5
 			DetailPrint "gta_sa.exe successfully detected ($ExeMD5)"
 			${Switch} $ExeMD5
@@ -533,28 +536,33 @@ DontInstallRedist:
 					${Break}
 			${EndSwitch}
 		TrySteamExe:
-			IfFileExists $GTA_DIR\gta-sa.exe 0 NoExeFound
-			!insertmacro GetMD5 $GTA_DIR\gta-sa.exe $ExeMD5
-			DetailPrint "gta-sa.exe successfully detected ($ExeMD5)"
-			${Switch} $ExeMD5
-				${Case} "0fd315d1af41e26e536a78b4d4556488" #EU 3.00 Steam
-					#Copy gta-sa.exe to gta_sa.exe and commence patching process
-					CopyFiles "$GTA_DIR\gta-sa.exe" "$GTA_DIR\gta_sa.exe.bak"
-					Call InstallPatch
-					${If} $PatchInstalled == "1"
-						Goto CompletePatchProc
-					${EndIf}
-					Goto NoExeFound
-					${Break}
-				${Default}
-					Goto NoExeFound
-					${Break}
-			${EndSwitch}					
-			
+            # Try with gta-sa.exe, then testapp.exe
+            nsArray::SetList array "gta-sa.exe" "testapp.exe" /end
+            ${ForEachIn} array $0 $1
+                IfFileExists $GTA_DIR\$1 0 TrySteamNext
+                !insertmacro GetMD5 $GTA_DIR\$1 $ExeMD5
+                DetailPrint "$1 successfully detected ($ExeMD5)"
+                ${Switch} $ExeMD5
+                    ${Case} "0fd315d1af41e26e536a78b4d4556488" #EU 3.00 Steam
+                        #Copy gta-sa.exe to gta_sa.exe and commence patching process
+                        CopyFiles "$GTA_DIR\$1" "$GTA_DIR\gta_sa.exe.bak"
+                        Call InstallPatch
+                        ${If} $PatchInstalled == "1"
+                            Goto CompletePatchProc
+                        ${EndIf}
+                        Goto TrySteamNext
+                        ${Break}
+                    ${Default}
+                        Goto TrySteamNext
+                        ${Break}
+                ${EndSwitch}
+            TrySteamNext:
+            ${Next}
+
 		NoExeFound:
 			MessageBox MB_ICONSTOP "$(MSGBOX_INVALID_GTASA)"
 		CompletePatchProc:
-		
+
 		SetOutPath "$INSTDIR\MTA"
 		SetOverwrite on
 
