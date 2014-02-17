@@ -722,13 +722,13 @@ SString SharedUtil::GetSystemErrorMessage ( uint uiError, bool bRemoveNewlines, 
 {
     SString strResult;
 
-    LPSTR szErrorText = NULL;
-    FormatMessageA ( FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_IGNORE_INSERTS,
-                    NULL, uiError, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR)&szErrorText, 0, NULL );
+    LPWSTR szErrorText = NULL;
+    FormatMessageW ( FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_IGNORE_INSERTS,
+                    NULL, uiError, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPWSTR)&szErrorText, 0, NULL );
 
     if ( szErrorText )
     {
-        strResult = szErrorText;
+        strResult = UTF16ToMbUTF8(szErrorText);
         LocalFree ( szErrorText );
         szErrorText = NULL;
     }
