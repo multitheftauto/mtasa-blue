@@ -1171,7 +1171,7 @@ static SString HashBuffer ( char* pData, uint uiLength )
 //
 //
 /////////////////////////////////////////////////////////////////////
-HMODULE GetLibraryHandle ( const SString& strFilename )
+HMODULE GetLibraryHandle ( const SString& strFilename, DWORD* pdwOutLastError )
 {
     if ( !hLibraryModule )
     {
@@ -1184,6 +1184,8 @@ HMODULE GetLibraryHandle ( const SString& strFilename )
         SetDllDirectory( strLibPath );
 
         hLibraryModule = LoadLibrary ( strLibPathFilename );
+        if ( pdwOutLastError )
+            *pdwOutLastError = GetLastError ();
 
         SetCurrentDirectory ( strPrevCurDir );
         SetDllDirectory( strPrevCurDir );
@@ -1240,7 +1242,8 @@ void UpdateMTAVersionApplicationSetting ( bool bQuiet )
         usNetRel = atoi ( parts[5] );
     }
 
-    HMODULE hModule = GetLibraryHandle ( strFilename );
+    DWORD dwLastError = 0;
+    HMODULE hModule = GetLibraryHandle ( strFilename, &dwLastError );
     if ( hModule )
     {
         typedef unsigned short (*PFNGETNETREV) ( void );
@@ -1254,7 +1257,7 @@ void UpdateMTAVersionApplicationSetting ( bool bQuiet )
     else
     if ( !bQuiet )
     {
-        SString strError = GetSystemErrorMessage ( GetLastError () );            
+        SString strError = GetSystemErrorMessage ( dwLastError );            
         SString strMessage( _("Error loading %s module! (%s)"), *strFilename.ToLower (), *strError );
         BrowseToSolution ( strFilename + "-not-loadable", ASK_GO_ONLINE | TERMINATE_PROCESS, strMessage );
     }

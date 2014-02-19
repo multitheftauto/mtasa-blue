@@ -635,17 +635,17 @@ void CServerImpl::HandleInput ( void )
             {
                 // Check for the most important command: quit
 #ifdef WIN32
-                if ( !_wcsicmp ( m_szInputBuffer, MbUTF8ToUTF16("quit").c_str() ) || !_wcsicmp ( m_szInputBuffer, MbUTF8ToUTF16("exit").c_str() ) )
+                if ( !_wcsicmp ( m_szInputBuffer, L"quit" ) || !_wcsicmp ( m_szInputBuffer, L"exit" ) )
 #else
-                if ( !wcscasecmp ( m_szInputBuffer, MbUTF8ToUTF16("quit").c_str() ) || !wcscasecmp ( m_szInputBuffer, MbUTF8ToUTF16("exit").c_str() ) )
+                if ( !wcscasecmp ( m_szInputBuffer, L"quit" ) || !wcscasecmp ( m_szInputBuffer, L"exit" ) )
 #endif
                 {
                     m_bRequestedQuit = true;
                 }
 #ifdef WIN32
-                else if ( !_wcsicmp ( m_szInputBuffer, MbUTF8ToUTF16("reset").c_str() ) )
+                else if ( !_wcsicmp ( m_szInputBuffer, L"reset" ) )
 #else
-                else if ( !wcscasecmp ( m_szInputBuffer, MbUTF8ToUTF16("reset").c_str() ) )
+                else if ( !wcscasecmp ( m_szInputBuffer, L"reset" ) )
 #endif
                 {
                     m_bRequestedReset = true;

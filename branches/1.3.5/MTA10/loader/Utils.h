@@ -66,7 +66,7 @@ void            ReleaseSingleInstanceMutex          ( void );
 SString         CheckOnRestartCommand               ( void );
 void            CleanDownloadCache                  ( void );
 
-HMODULE         GetLibraryHandle                    ( const SString& strFilename );
+HMODULE         GetLibraryHandle                    ( const SString& strFilename, DWORD* pdwOutLastError = NULL );
 void            FreeLibraryHandle                   ( void );
 uint            WaitForObject                       ( HANDLE hProcess, HANDLE hThread, DWORD dwMilliseconds, HANDLE hMutex );
 bool            CheckService                        ( uint uiStage );
