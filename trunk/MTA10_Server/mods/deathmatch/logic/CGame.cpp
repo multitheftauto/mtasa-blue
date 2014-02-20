@@ -3442,6 +3442,7 @@ void CGame::Packet_Voice_Data ( CVoiceDataPacket& Packet )
 
                     if ( !bEventTriggered ) // Was the event cancelled?
                     {
+                        pPlayer->SetVoiceState ( VOICESTATE_TRANSMITTING_IGNORED );
                         return;
                     }
 
