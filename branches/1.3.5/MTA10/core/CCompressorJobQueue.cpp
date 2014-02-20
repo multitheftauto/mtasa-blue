@@ -401,8 +401,16 @@ void* CCompressorJobQueueImpl::ThreadProc ( void )
     while ( !shared.m_bTerminateThread )
     {
         // Temp debug code to cause crash with key combo
+        static bool bEnableKeyCrash2 = false;
+        static bool bEnableKeyCrash2Init = false;
+        if ( !bEnableKeyCrash2Init )
+        {
+            bEnableKeyCrash2Init = true;
+            bEnableKeyCrash2 = FileExists( CalcMTASAPath( "debug.txt" ) );
+        }
+
         bool bEnableKeyCrash = ( g_pCore && g_pCore->GetDiagnosticDebug () == EDiagnosticDebug::LUA_TRACE_0000 );
-        if ( bEnableKeyCrash )
+        if ( bEnableKeyCrash || bEnableKeyCrash2 )
         {
             bool bHoldingCtrlL = ( GetAsyncKeyState ( VK_LCONTROL ) & 0x8000 ) != 0;
             bool bHoldingCtrlR = ( GetAsyncKeyState ( VK_RCONTROL ) & 0x8000 ) != 0;
