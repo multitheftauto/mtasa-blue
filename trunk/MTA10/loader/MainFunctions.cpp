@@ -668,7 +668,7 @@ void CheckDataFiles( void )
     }
 
     // Make sure important dll's do not exist in the wrong place
-    const char* dllCheckList[] = { "xmll.dll", "cgui.dll", "netc.dll", "libcurl.dll" };
+    const char* dllCheckList[] = { "xmll.dll", "cgui.dll", "netc.dll", "libcurl.dll", "pthreadVC2.dll" };
     for ( int i = 0 ; i < NUMELMS ( dllCheckList ); i++ )
     {
         if ( FileExists( PathJoin( strGTAPath, dllCheckList[i] ) ) )

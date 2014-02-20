@@ -24,20 +24,17 @@ static HANDLE g_hMutex = NULL;
 static HMODULE hLibraryModule = NULL;
 HINSTANCE g_hInstance = NULL;
 
-HMODULE RemoteLoadLibrary(HANDLE hProcess, const WString& strLibPath)
+///////////////////////////////////////////////////////////////////////////
+//
+// CallRemoteFunction
+//
+// Call a Kernel32 function in a remote process
+//
+///////////////////////////////////////////////////////////////////////////
+bool CallRemoteFunction( HANDLE hProcess, const SString& strFunctionName, const WString& strLibPath )
 {
     const wchar_t* szLibPath = *strLibPath;
     size_t uiLibPathLength = strLibPath.length();
-    
-    /* Called correctly? */
-    if ( szLibPath == NULL )
-    {
-        return 0;
-    }
-
-    // Stop GTA from starting prematurely (Some driver dlls can inadvertently resume the thread before we are ready)
-    InsertWinMainBlock( hProcess );
-    ApplyLoadingCrashPatch( hProcess );
 
     /* Allocate memory in the remote process for the library path */
     HANDLE hThread = 0;
@@ -67,10 +64,14 @@ HMODULE RemoteLoadLibrary(HANDLE hProcess, const WString& strLibPath)
            remotly allocated path buffer as an argument to that thread (and also to LoadLibraryA)
            will make the remote process load the DLL into it's userspace (giving the DLL full
            access to the game executable).*/
+        LPTHREAD_START_ROUTINE pFunc = reinterpret_cast < LPTHREAD_START_ROUTINE > ( GetProcAddress ( hKernel32, strFunctionName ) );
+        if ( !pFunc )
+            return 0;
+
         hThread = _CreateRemoteThread(   hProcess,
                                         NULL,
                                         0,
-                                        reinterpret_cast < LPTHREAD_START_ROUTINE > ( GetProcAddress ( hKernel32, "LoadLibraryW" ) ),
+                                        pFunc,
                                         pLibPathRemote,
                                         0,
                                         NULL);
@@ -100,6 +101,19 @@ HMODULE RemoteLoadLibrary(HANDLE hProcess, const WString& strLibPath)
 
     /* Clean up the resources we used to inject the DLL */
     _VirtualFreeEx (hProcess, pLibPathRemote, uiLibPathSize, MEM_RELEASE );
+    return 1;
+}
+
+
+HMODULE RemoteLoadLibrary(HANDLE hProcess, const WString& strLibPath)
+{
+    // Stop GTA from starting prematurely (Some driver dlls can inadvertently resume the thread before we are ready)
+    InsertWinMainBlock( hProcess );
+    ApplyLoadingCrashPatch( hProcess );
+
+    // Ensure correct pthreadVC2.dll is gotted
+    CallRemoteFunction( hProcess, "SetDllDirectoryW", FromUTF8( ExtractPath( ToUTF8( strLibPath ) ) ) );
+    CallRemoteFunction( hProcess, "LoadLibraryW", strLibPath );
 
     // Allow GTA to continue
     RemoveWinMainBlock( hProcess );
