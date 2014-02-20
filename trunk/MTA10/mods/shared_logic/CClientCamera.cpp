@@ -296,6 +296,19 @@ void CClientCamera::SetOrbitTarget ( const CVector& vecPosition )
 }
 
 
+void CClientCamera::AttachTo ( CElement* pElement )
+{
+    if ( pElement )
+    {
+        // Switch to fixed mode if required
+        if ( !IsInFixedMode () )        
+            ToggleCameraFixedMode ( true );
+    }
+
+    CClientEntity::AttachTo( pElement );
+}
+
+
 void CClientCamera::FadeIn ( float fTime )
 {
     m_pCamera->Fade ( fTime, FADE_IN );
