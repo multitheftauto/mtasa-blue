@@ -26,6 +26,7 @@
 
 #define MAX_RESOURCE_NAME_LENGTH    255
 #define MAX_FUNCTION_NAME_LENGTH    50
+#define INVALID_COMPILED_SCRIPT_CUTOFF_DATE     "2014-08-31"
 
 class CExportedFunction
 {
