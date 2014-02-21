@@ -255,27 +255,27 @@ int CLuaFunctionDefs::GetResourceRootElement ( lua_State* luaVM )
     argStream.ReadUserData ( pResource, NULL );
 
     // No resource given, get this resource's root
-    if ( pResource == NULL )
-    {
+        if ( pResource == NULL )
+        {
         // Find our vm and get the root
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
-        if ( pLuaMain )
-        {
-            pResource = pLuaMain->GetResource ();
+            CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+            if ( pLuaMain )
+            {
+                pResource = pLuaMain->GetResource ();
+            }
         }
-    }
 
-    // Did we find a resource?
-    if ( pResource )
-    {
-        // Grab the root element of it and return it if it existed
-        CClientEntity* pEntity = pResource->GetResourceEntity ();
-        if ( pEntity )
+        // Did we find a resource?
+        if ( pResource )
         {
-            lua_pushelement ( luaVM, pEntity );
-            return 1;
+            // Grab the root element of it and return it if it existed
+            CClientEntity* pEntity = pResource->GetResourceEntity ();
+            if ( pEntity )
+            {
+                lua_pushelement ( luaVM, pEntity );
+                return 1;
+            }
         }
-    }
     else
         m_pScriptDebugging->LogBadType ( luaVM );
 
@@ -293,27 +293,27 @@ int CLuaFunctionDefs::GetResourceGUIElement ( lua_State* luaVM )
     argStream.ReadUserData ( pResource, NULL );
 
     // No resource given, get this resource's root
-    if ( pResource == NULL )
-    {
+        if ( pResource == NULL )
+        {
         // Find our vm and get the root
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
-        if ( pLuaMain )
-        {
-            pResource = pLuaMain->GetResource ();
+            CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+            if ( pLuaMain )
+            {
+                pResource = pLuaMain->GetResource ();
+            }
         }
-    }
 
-    // Did we get a resource?
-    if ( pResource )
-    {
-        // Grab the gui entity. If it exists, return it
-        CClientEntity* pEntity = pResource->GetResourceGUIEntity ();
-        if ( pEntity )
+        // Did we get a resource?
+        if ( pResource )
         {
-            lua_pushelement ( luaVM, pEntity );
-            return 1;
+            // Grab the gui entity. If it exists, return it
+            CClientEntity* pEntity = pResource->GetResourceGUIEntity ();
+            if ( pEntity )
+            {
+                lua_pushelement ( luaVM, pEntity );
+                return 1;
+            }
         }
-    }
     else
         m_pScriptDebugging->LogBadType ( luaVM );
 
@@ -356,32 +356,32 @@ int CLuaFunctionDefs::GetResourceExportedFunctions ( lua_State *luaVM )
     CResource* pResource = NULL;
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pResource, NULL );
-    
-    // No resource given, get this resource's root
-    if ( pResource == NULL )
-    {
-        // Find our vm and get the root
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
-        if ( pLuaMain )
-        {
-            pResource = pLuaMain->GetResource ();
-        }
-    }
 
-    if ( pResource )
-    {
-        lua_newtable ( luaVM );
-        unsigned int uiIndex = 0;
-        list<CExportedFunction *>::iterator iterd = pResource->IterBeginExportedFunctions();
-        for ( ; iterd != pResource->IterEndExportedFunctions(); iterd++ )
+    // No resource given, get this resource's root
+        if ( pResource == NULL )
         {
-            lua_pushnumber ( luaVM, ++uiIndex );
-            lua_pushstring ( luaVM, (*iterd)->GetFunctionName () );
-            lua_settable ( luaVM, -3 );
+        // Find our vm and get the root
+            CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+            if ( pLuaMain )
+            {
+                pResource = pLuaMain->GetResource ();
+            }
         }
-        return 1;
-    }
-    
+
+        if ( pResource )
+        {
+            lua_newtable ( luaVM );
+            unsigned int uiIndex = 0;
+            list<CExportedFunction *>::iterator iterd = pResource->IterBeginExportedFunctions();
+            for ( ; iterd != pResource->IterEndExportedFunctions(); iterd++ )
+            {
+                lua_pushnumber ( luaVM, ++uiIndex );
+                lua_pushstring ( luaVM, (*iterd)->GetFunctionName () );
+                lua_settable ( luaVM, -3 );
+            }
+            return 1;
+        }
+
     m_pScriptDebugging->LogBadType ( luaVM );
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -409,15 +409,18 @@ int CLuaFunctionDefs::LoadString( lua_State* luaVM )
         if ( !g_pNet->DecryptScript( cpInBuffer, uiInSize, &cpBuffer, &uiSize, m_pResourceManager->GetResourceName( luaVM ) + "/loadstring" ) )
         {
             // Problems problems
-    #if MTA_DM_VERSION < 0x135 
-            SString strMessage( "loadstring argument 1 is invalid and will not work in future versions. Please re-compile at http://luac.mtasa.com/", 0 ); 
-            m_pScriptDebugging->LogCustom( luaVM, strMessage );
-            // cpBuffer is always valid after call to DecryptScript
-    #else
-            SString strMessage( "argument 1 is invalid. Please re-compile at http://luac.mtasa.com/", 0 ); 
-            argStream.SetCustomError( strMessage );
-            cpBuffer = NULL;
-    #endif
+            if ( GetTimeString( true ) <= INVALID_COMPILED_SCRIPT_CUTOFF_DATE )
+            {
+                SString strMessage( "loadstring argument 1 is invalid and will not work after %s. Please re-compile at http://luac.mtasa.com/", INVALID_COMPILED_SCRIPT_CUTOFF_DATE ); 
+                m_pScriptDebugging->LogCustom( luaVM, strMessage );
+                // cpBuffer is always valid after call to DecryptScript
+            }
+            else
+            {
+                SString strMessage( "argument 1 is invalid. Please re-compile at http://luac.mtasa.com/", 0 ); 
+                argStream.SetCustomError( strMessage );
+                cpBuffer = NULL;
+            }
             g_pClientGame->TellServerSomethingImportant( 1004, argStream.GetFullErrorMessage(), true );
         }
 
@@ -487,15 +490,18 @@ int CLuaFunctionDefs::Load( lua_State* luaVM )
         if ( !g_pNet->DecryptScript( cpInBuffer, uiInSize, &cpBuffer, &uiSize, m_pResourceManager->GetResourceName( luaVM ) + "/load" ) )
         {
             // Problems problems
-    #if MTA_DM_VERSION < 0x135 
-            SString strMessage( "loadstring argument 1 is invalid and will not work in future versions. Please re-compile at http://luac.mtasa.com/", 0 ); 
-            m_pScriptDebugging->LogCustom( luaVM, strMessage );
-            // cpBuffer is always valid after call to DecryptScript
-    #else
-            SString strMessage( "argument 1 is invalid. Please re-compile at http://luac.mtasa.com/", 0 ); 
-            argStream.SetCustomError( strMessage );
-            cpBuffer = NULL;
-    #endif
+            if ( GetTimeString( true ) <= INVALID_COMPILED_SCRIPT_CUTOFF_DATE )
+            {
+                SString strMessage( "load argument 2 is invalid and will not work after %s. Please re-compile at http://luac.mtasa.com/", INVALID_COMPILED_SCRIPT_CUTOFF_DATE ); 
+                m_pScriptDebugging->LogCustom( luaVM, strMessage );
+                // cpBuffer is always valid after call to DecryptScript
+            }
+            else
+            {
+                SString strMessage( "argument 2 is invalid. Please re-compile at http://luac.mtasa.com/", 0 ); 
+                argStream.SetCustomError( strMessage );
+                cpBuffer = NULL;
+            }
             g_pClientGame->TellServerSomethingImportant( 1005, argStream.GetFullErrorMessage(), true );
         }
 
