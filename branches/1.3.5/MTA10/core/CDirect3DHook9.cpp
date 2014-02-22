@@ -255,7 +255,7 @@ IDirect3DDevice9* CreateDeviceForD3D( HWND hWnd, IDirect3D9* pInitialDirect3D9 )
         // Get caps from pD3DDevice9
         D3DCAPS9 DeviceCaps9;
         hr = pD3DDevice9->GetDeviceCaps( &DeviceCaps9 );
-        WriteDebugEvent( SString( "pD3DDevice9 CapsReport Caps9 - %s ", *ToString( DeviceCaps9 ) ) );
+        WriteDebugEvent( SString( "pD3DDevice9 CapsReport Caps9 - %s", *ToString( DeviceCaps9 ) ) );
 
         SString strDiffDesc = GetByteDiffDesc( &InitialD3DCaps9, &DeviceCaps9, sizeof( D3DCAPS9 ) );
         if ( !strDiffDesc.empty() )
