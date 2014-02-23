@@ -1434,6 +1434,7 @@ void CSettings::UpdateVideoTab ( void )
 
     // Customized sa files
     m_pCheckBoxCustomizedSAFiles->SetSelected ( GetApplicationSettingInt ( "customized-sa-files-request" ) != 0 );
+	m_pCheckBoxCustomizedSAFiles->SetVisible ( GetApplicationSettingInt ( "customized-sa-files-show" ) != 0 );
 
     // Grass
     bool bGrassEnabled;
