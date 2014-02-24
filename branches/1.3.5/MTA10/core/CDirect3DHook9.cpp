@@ -200,7 +200,7 @@ IDirect3DDevice9* CreateDeviceForD3D( HWND hWnd, IDirect3D9* pInitialDirect3D9 )
         // Get caps from pInitialDirect3D9
         D3DCAPS9 InitialD3DCaps9;
         hr = pInitialDirect3D9->GetDeviceCaps( Adapter, D3DDEVTYPE_HAL, &InitialD3DCaps9 );
-        WriteDebugEvent( SString( "pInitialDirect3D9 CapsReport Caps9 - %s ", *ToString( InitialD3DCaps9 ) ) );
+        WriteDebugEvent( SString( "pInitialDirect3D9 CapsReport Caps9 - %s", *ToString( InitialD3DCaps9 ) ) );
 
         if ( pInitialDirect3D9 == pAnotherDirect3D9 )
         {
