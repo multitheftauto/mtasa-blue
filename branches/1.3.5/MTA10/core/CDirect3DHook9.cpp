@@ -175,12 +175,12 @@ IDirect3DDevice9* CreateDeviceForD3D( HWND hWnd, IDirect3D9* pInitialDirect3D9 )
             // Handle retry result
             if ( hr != D3D_OK )
             {
-                WriteDebugEvent ( "--CreateDevice failed after retry" );
+                WriteDebugEvent ( "-- CreateDevice failed after retry" );
                 break;
             }
             else
             {
-                WriteDebugEvent ( "++CreateDevice succeeded after retry" );
+                WriteDebugEvent ( "++ CreateDevice succeeded after retry" );
             }
         }
 
