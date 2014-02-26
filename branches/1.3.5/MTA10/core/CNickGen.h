@@ -22,6 +22,4 @@ class CNickGen
         static SString                     GetRandomNickname    ( void );
 };
 
-#include "CNickGen.cpp"
-
 #endif

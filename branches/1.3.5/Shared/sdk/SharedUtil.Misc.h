@@ -178,8 +178,6 @@ namespace SharedUtil
     //
     SString ConformResourcePath ( const char* szRes, bool bConvertToUnixPathSep = false );
 
-    SString GenerateNickname ( void );
-
     //
     // string stuff
     //

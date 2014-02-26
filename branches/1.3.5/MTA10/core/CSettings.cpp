@@ -2246,7 +2246,7 @@ void CSettings::LoadData ( void )
     }
     else
     {
-        m_pEditNick->SetText ( GenerateNickname() );
+        m_pEditNick->SetText ( CNickGen::GetRandomNickname() );
     }
 
     // Save server password
