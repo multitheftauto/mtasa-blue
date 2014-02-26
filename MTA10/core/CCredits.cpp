@@ -61,7 +61,8 @@ CCredits::CCredits ( void )
                               "Iztas\n"
                               "impulze\n"
                               "JoeBullet\n"
-                              "\n"
+                              "sbx320\n"
+                              "Jusonex\n"
                               "\n";
 
     m_strCredits +=           _("Game Design / Scripting");
@@ -105,6 +106,24 @@ CCredits::CCredits ( void )
                               "tvc\n"
                               "Audifire\n"
                               "Kayl\n"
+                              "mickdermack\n"
+                              "Fabio(GNR)\n"
+                              "LarSoWiTsH\n"
+                              "qaisjp\n"
+                              "dvarnai\n"
+                              "Looop\n"
+                              "Lex128\n"
+                              "x0rh4x\n"
+                              "guix\n"
+                              "[GP_A]XetaQuake\n"
+                              "volk-rus\n"
+                              "asturel\n"
+                              "FrankZZ\n"
+                              "GA_Justus\n"
+                              "John_Michael\n"
+                              "SHC//Sniper\n"
+                              "W\n"
+                              "TheKiller101\n"
                               "\n"
                               "\n";
 
