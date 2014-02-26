@@ -13,7 +13,6 @@
 *****************************************************************************/
 
 #include "UTF8.h"
-#include "CNickGen.h"
 #include "UTF8Detect.cpp"
 #ifdef WIN32
     #include <direct.h>
@@ -1275,12 +1274,6 @@ SString SharedUtil::ConformResourcePath ( const char* szRes, bool bConvertToUnix
 
     return strText;
 }
-
-SString SharedUtil::GenerateNickname ( void )
-{
-    return CNickGen::GetRandomNickname();
-}
-
 
 namespace SharedUtil
 {

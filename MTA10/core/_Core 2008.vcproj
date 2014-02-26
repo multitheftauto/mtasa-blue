@@ -519,6 +519,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CNickGen.cpp"
+				>
+			</File>
+			<File
 				RelativePath="Core.cpp"
 				>
 			</File>
@@ -1209,6 +1213,10 @@
 			</File>
 			<File
 				RelativePath=".\CNewsBrowser.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CNickGen.h"
 				>
 			</File>
 			<File
