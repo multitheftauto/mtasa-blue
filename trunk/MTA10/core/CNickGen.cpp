@@ -8,6 +8,7 @@
 *
 *****************************************************************************/
 
+#include "StdInc.h"
 #include "time.h"
 
 // These words are of a maximum length of 10 characters, capitalized, and stripped of whitespace
