@@ -151,8 +151,9 @@ CCredits::CCredits ( void )
                               "Pugwipe\n"
                               "The_GTA\n"
                               "Phatlooser\n"
-                              "Woovie\n"
-                              "diegofkda\n"
+                              "Dwayne 'The 'Woovie' Rock' Johnson\n"
+                              "max 'Hobo Pie' Power\n"
+                              "Rob 'Sugar Daddy' Pooley\n"
                               "\n"
                               "\n"
                              
