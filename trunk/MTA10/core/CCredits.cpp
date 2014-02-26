@@ -151,6 +151,8 @@ CCredits::CCredits ( void )
                               "Pugwipe\n"
                               "The_GTA\n"
                               "Phatlooser\n"
+                              "Woovie\n"
+                              "diegofkda\n"
                               "\n"
                               "\n"
                              
