@@ -7400,7 +7400,7 @@ bool CStaticFunctionDefinitions::ResetVehicleHandlingProperty ( CVehicle* pVehic
             BitStream.pBitStream->Write ( static_cast < unsigned char > ( eProperty ) );
 
             SetEntryHandling ( pEntry, eProperty, strValue );
-            ucValue = GetEntryHandling( pEntry, eProperty, strValue );
+            GetEntryHandling( pEntry, eProperty, ucValue );
 
             BitStream.pBitStream->Write ( ucValue );
         }
