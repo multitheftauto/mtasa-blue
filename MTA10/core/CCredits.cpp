@@ -123,7 +123,7 @@ CCredits::CCredits ( void )
                               "John_Michael\n"
                               "SHC//Sniper\n"
                               "W\n"
-                              "TheKiller101\n"
+                              "TheKiller 'Dutchman' 101\n"
                               "\n"
                               "\n";
 
@@ -154,6 +154,8 @@ CCredits::CCredits ( void )
                               "Dwayne 'The 'Woovie' Rock' Johnson\n"
                               "max 'Hobo Pie' Power\n"
                               "Rob 'Sugar Daddy' Pooley\n"
+                              "diegofkda\n"
+                              "Ren712\n"
                               "\n"
                               "\n"
                              
