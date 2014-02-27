@@ -111,20 +111,20 @@ CCredits::CCredits ( void )
                               "LarSoWiTsH\n"
                               "qaisjp\n"
                               "dvarnai\n"
-                              "Looop\n"
+                              "Loooop\n"
                               "Lex128\n"
                               "x0rh4x\n"
                               "guix\n"
                               "[GP_A]XetaQuake\n"
-                              "volk-rus\n"
                               "asturel\n"
                               "FrankZZ\n"
                               "GA_Justus\n"
                               "John_Michael\n"
-                              "SHC//Sniper\n"
+                              "-ffs-Sniper\n"
                               "W\n"
                               "TheKiller 'Dutchman' 101\n"
-                              "\n"
+                              "Fedor Sinev\n"
+                              "\n";
                               "\n";
 
     if ( g_pLocalization->IsLocalized() && !g_pLocalization->GetTranslators().empty() ) 
