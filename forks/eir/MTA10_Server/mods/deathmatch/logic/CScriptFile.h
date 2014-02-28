@@ -35,7 +35,7 @@ public:
     bool                    ReadSpecialData         ( void )    { return true; };
 
     // Load and unload routines
-    bool                    Load                    ( eMode Mode );
+    bool                    Load                    ( CResource* pResourceForFilePath, eMode Mode );
     void                    Unload                  ( void );
     bool                    IsLoaded                ( void )    { return m_pFile != NULL; };
 

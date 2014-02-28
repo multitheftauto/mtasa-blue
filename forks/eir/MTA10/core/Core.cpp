@@ -11,24 +11,28 @@
 *****************************************************************************/
 
 #include "StdInc.h"
-
-using std::string;
+#define DECLARE_PROFILER_SECTION_Core
+#include "profiler/SharedUtil.Profiler.h"
+#include "SharedUtil.Win32Utf8FileHooks.hpp"
 
 CCore* g_pCore = NULL;
 CGraphics* g_pGraphics = NULL;
-bool IsRealDeal ( void );
+CLocalization* g_pLocalization = NULL;
 
 int WINAPI DllMain(HINSTANCE hModule, DWORD dwReason, PVOID pvNothing)
 {
     CFilePathTranslator     FileTranslator;
-    string                  WorkingDirectory;
-
+    std::string             WorkingDirectory;
 
     if ( dwReason == DLL_PROCESS_ATTACH )
     {
-        WriteDebugEvent( "DLL_PROCESS_ATTACH" );
-        if ( IsRealDeal () )
+        WriteDebugEvent( SString( "DLL_PROCESS_ATTACH %08x", pvNothing ) );
+        if ( IsGTAProcess() )
         {
+            WriteDebugEvent( SString( "ModuleFileName: %s", *GetLaunchPathFilename() ) );
+
+            AddUtf8FileHooks();
+
             FileTranslator.GetGTARootDirectory ( WorkingDirectory );
             SetCurrentDirectory ( WorkingDirectory.c_str ( ) );
 
@@ -45,9 +49,11 @@ int WINAPI DllMain(HINSTANCE hModule, DWORD dwReason, PVOID pvNothing)
     } 
     else if (dwReason == DLL_PROCESS_DETACH)
     {
-        WriteDebugEvent( "DLL_PROCESS_DETACH" );
-        if ( IsRealDeal () )
+        WriteDebugEvent( SString( "DLL_PROCESS_DETACH %08x", pvNothing ) );
+        if ( IsGTAProcess () )
         {
+            RemoveUtf8FileHooks();
+
             // For now, TerminateProcess if any destruction is attempted (or we'll crash)
             TerminateProcess ( GetCurrentProcess (), 0 );
 
@@ -60,19 +66,4 @@ int WINAPI DllMain(HINSTANCE hModule, DWORD dwReason, PVOID pvNothing)
     }
 
     return TRUE;
-}
-
-
-//
-// Returns true if dll has been loaded with GTA.
-//
-bool IsRealDeal ( void )
-{
-    // Get current module full path
-    char szBuffer[64000];
-    GetModuleFileName ( NULL, szBuffer, sizeof(szBuffer) - 1 );
-    WriteDebugEvent( SString( "ModuleFileName: %s", szBuffer ) );
-    if ( SStringX( szBuffer ).EndsWithI( "gta_sa.exe" ) )
-        return true;
-    return false;
 }

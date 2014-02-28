@@ -257,6 +257,7 @@ public:
 	uint		sysKeys;		//!< current state of the system keys and mouse buttons.
 	float		wheelChange;	//!< Holds the amount the scroll wheel has changed.
 	uint        clickCount;     //!< Holds number of mouse button down events currently counted in a multi-click sequence (for button inputs only).
+    Window*     switchedWindow; //!< Holds the possible destination/previous window
 };
 
 

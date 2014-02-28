@@ -73,8 +73,8 @@ public:
     void                                SizeChanged                     ( void );
 protected:
     CVector                             m_vecPosition;
-    CClientMarker *                     m_pOwningMarker;
-    CClientPickup *                     m_pOwningPickup;
+    CClientMarkerPtr                    m_pOwningMarker;
+    CClientPickupPtr                    m_pOwningPickup;
 
 private:
     bool                                m_bIsEnabled;

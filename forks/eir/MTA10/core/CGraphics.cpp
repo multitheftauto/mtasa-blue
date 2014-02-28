@@ -17,7 +17,10 @@
 #include "CTileBatcher.h"
 #include "CLine3DBatcher.h"
 #include "CMaterialLine3DBatcher.h"
+#include "CAspectRatioConverter.h"
 extern CCore* g_pCore;
+extern bool g_bInGTAScene;
+extern bool g_bInMTAScene;
 
 using namespace std;
 
@@ -51,6 +54,8 @@ CGraphics::CGraphics ( CLocalGUI* pGUI )
 
     m_pScreenGrabber = NewScreenGrabber ();
     m_pPixelsManager = NewPixelsManager ();
+    m_LastLostDeviceTimer.SetMaxIncrement( 250 );
+    m_pAspectRatioConverter = new CAspectRatioConverter();
 }
 
 
@@ -61,6 +66,7 @@ CGraphics::~CGraphics ( void )
 
     DestroyStandardDXFonts ();
 
+    SAFE_RELEASE ( m_ProgressSpinnerTexture );
     SAFE_DELETE ( m_pRenderItemManager );
     SAFE_DELETE ( m_pTileBatcher );
     SAFE_DELETE ( m_pLine3DBatcherPreGUI );
@@ -68,11 +74,15 @@ CGraphics::~CGraphics ( void )
     SAFE_DELETE ( m_pMaterialLine3DBatcher );
     SAFE_DELETE ( m_pScreenGrabber );
     SAFE_DELETE ( m_pPixelsManager );
+    SAFE_DELETE ( m_pAspectRatioConverter );
 }
 
 
 void CGraphics::DrawText ( int uiLeft, int uiTop, int uiRight, int uiBottom, unsigned long ulColor, const char* szText, float fScaleX, float fScaleY, unsigned long ulFormat, LPD3DXFONT pDXFont )
 {   
+    if ( g_pCore->IsWindowMinimized () )
+        return;
+
     // Do not accept NULL text strings or invalid sprites
     if ( !szText || !m_pDXSprite )
         return;
@@ -133,7 +143,10 @@ void CGraphics::DrawLine3D ( const CVector& vecBegin, const CVector& vecEnd, uns
 
 
 void CGraphics::DrawRectangle ( float fX, float fY, float fWidth, float fHeight, unsigned long ulColor )
-{      
+{
+    if ( g_pCore->IsWindowMinimized () )
+        return;
+      
     BeginDrawBatch ();
     D3DXMATRIX matrix;
     D3DXVECTOR2 scalingCentre ( 0.5f, 0.5f );
@@ -144,6 +157,41 @@ void CGraphics::DrawRectangle ( float fX, float fY, float fWidth, float fHeight,
     m_pDXSprite->SetTransform ( &matrix );
     m_pDXSprite->Draw ( m_pDXPixelTexture, NULL, NULL, NULL, ulColor );
     EndDrawBatch ();
+}
+
+
+//
+// Aspect ratio compensation malarky
+// 
+void CGraphics::SetAspectRatioAdjustmentEnabled( bool bEnabled, float fSourceRatio )
+{
+    m_pAspectRatioConverter->SetSourceRatioValue( bEnabled ? fSourceRatio : 0 );
+}
+
+bool CGraphics::IsAspectRatioAdjustmentEnabled( void )
+{
+    return m_pAspectRatioConverter->IsEnabled();
+}
+
+float CGraphics::GetAspectRatioAdjustmentSourceRatio( void )
+{
+    return m_pAspectRatioConverter->GetSourceRatioValue();
+}
+
+void CGraphics::SetAspectRatioAdjustmentSuspended( bool bSuspended )
+{
+    m_pAspectRatioConverter->SetSuspended( bSuspended );
+}
+
+
+float CGraphics::ConvertPositionForAspectRatio( float fY )
+{
+    return m_pAspectRatioConverter->ConvertPositionForAspectRatio( fY );
+}
+
+void CGraphics::ConvertSideForAspectRatio( float* pfY, float* pfHeight )
+{
+    m_pAspectRatioConverter->ConvertSideForAspectRatio( pfY, pfHeight );
 }
 
 
@@ -515,8 +563,45 @@ float CGraphics::GetDXTextExtentW ( const wchar_t* wszText, float fScale, LPD3DX
 }
 
 
-ID3DXFont * CGraphics::GetFont ( eFontType fontType )
+ID3DXFont * CGraphics::GetFont ( eFontType fontType, float* pfOutScaleUsed, float fRequestedScale, const char* szCustomScaleUser )
 {
+    if ( pfOutScaleUsed )
+        *pfOutScaleUsed = fRequestedScale;
+
+    if ( szCustomScaleUser )
+    {
+        // Try for a custom scale
+        SCustomScaleFontInfo& info = MapGet( m_CustomScaleFontMap, szCustomScaleUser );
+
+        // Already have font?
+        if ( info.pFont )
+        {
+            // Can keep old font?
+            if ( fontType == info.fontType && fRequestedScale == info.fScale )
+                return info.pFont;
+
+            // Otherwise delete old font
+            SAFE_RELEASE( info.pFont );
+            info.fScale = 0;
+            info.fontType = FONT_DEFAULT;
+        }
+
+        // Need to create new font?     
+        if ( fRequestedScale != 1 )
+        {
+            if ( CreateStandardDXFontWithCustomScale( fontType, fRequestedScale, &info.pFont ) )
+            {
+                info.fScale = fRequestedScale;
+                info.fontType = fontType;
+                return info.pFont;
+            }
+        }
+    }
+
+    // Didn't / couldn't do custom scale
+    if ( pfOutScaleUsed )
+        *pfOutScaleUsed = 1;
+
     if ( fontType < 0 || fontType >= NUM_FONTS )
         return m_pDXFonts [ FONT_DEFAULT ];
 
@@ -536,6 +621,9 @@ void CGraphics::DrawLineQueued ( float fX1, float fY1,
                                  unsigned long ulColor,
                                  bool bPostGUI )
 {
+    fY1 = m_pAspectRatioConverter->ConvertPositionForAspectRatio( fY1 );
+    fY2 = m_pAspectRatioConverter->ConvertPositionForAspectRatio( fY2 );
+
     // Set up a queue item
     sDrawQueueItem Item;
     Item.eType = QUEUE_LINE;
@@ -599,6 +687,8 @@ void CGraphics::DrawRectQueued ( float fX, float fY,
                                  unsigned long ulColor,
                                  bool bPostGUI )
 {
+    m_pAspectRatioConverter->ConvertSideForAspectRatio( &fY, &fHeight );
+
     // Set up a queue item
     sDrawQueueItem Item;
     Item.eType = QUEUE_RECT;
@@ -626,6 +716,7 @@ void CGraphics::DrawTextureQueued ( float fX, float fY,
                                  unsigned long ulColor,
                                  bool bPostGUI )
 {
+    m_pAspectRatioConverter->ConvertSideForAspectRatio( &fY, &fHeight );
 
     // Set up a queue item
     sDrawQueueItem Item;
@@ -680,7 +771,10 @@ void CGraphics::DrawTextQueued ( float fLeft, float fTop,
                                  ID3DXFont * pDXFont,
                                  bool bPostGUI,
                                  bool bColorCoded,
-                                 bool bSubPixelPositioning )
+                                 bool bSubPixelPositioning,
+                                 float fRotation,
+                                 float fRotationCenterX,
+                                 float fRotationCenterY )
 {
     if ( !szText || !m_pDXSprite )
         return;
@@ -692,6 +786,9 @@ void CGraphics::DrawTextQueued ( float fLeft, float fTop,
 
     if ( !pDXFont )
         return;
+
+    fTop = m_pAspectRatioConverter->ConvertPositionForAspectRatio( fTop );
+    fBottom = m_pAspectRatioConverter->ConvertPositionForAspectRatio( fBottom );
 
     if ( !bColorCoded )
     {
@@ -730,6 +827,9 @@ void CGraphics::DrawTextQueued ( float fLeft, float fTop,
         Item.Text.fScaleY = fScaleY;
         Item.Text.ulFormat = ulFormat;
         Item.Text.pDXFont = pDXFont;
+        Item.Text.fRotation = fRotation;
+        Item.Text.fRotationCenterX = fRotationCenterX;
+        Item.Text.fRotationCenterY = fRotationCenterY;
 
         // Convert to wstring        
         Item.wstrText = MbUTF8ToUTF16 ( szText );
@@ -771,7 +871,7 @@ void CGraphics::DrawTextQueued ( float fLeft, float fTop,
         SColor currentColor = dwColor;
         for ( uint i = 0 ; i < splitLines.size () ; i++ )
         {
-            DrawColorCodedTextLine ( fLeft, fRight, fY, currentColor, splitLines[i], fScaleX, fScaleY, ulFormat, pDXFont, bPostGUI, bSubPixelPositioning );
+            DrawColorCodedTextLine ( fLeft, fRight, fY, currentColor, splitLines[i], fScaleX, fScaleY, ulFormat, pDXFont, bPostGUI, bSubPixelPositioning, fRotation, fRotationCenterX, fRotationCenterY );
             fY += fLineHeight;
         }
     }
@@ -779,7 +879,8 @@ void CGraphics::DrawTextQueued ( float fLeft, float fTop,
 
 
 void CGraphics::DrawColorCodedTextLine ( float fLeft, float fRight, float fY, SColor& currentColor, const wchar_t* wszText,
-                                         float fScaleX, float fScaleY, unsigned long ulFormat, ID3DXFont* pDXFont, bool bPostGUI, bool bSubPixelPositioning )
+                                         float fScaleX, float fScaleY, unsigned long ulFormat, ID3DXFont* pDXFont, bool bPostGUI, bool bSubPixelPositioning,
+                                         float fRotation, float fRotationCenterX, float fRotationCenterY )
 {
     struct STextSection
     {
@@ -889,6 +990,9 @@ void CGraphics::DrawColorCodedTextLine ( float fLeft, float fRight, float fY, SC
         Item.Text.fScaleY = fScaleY;
         Item.Text.ulFormat = DT_NOCLIP;
         Item.Text.pDXFont = pDXFont;
+        Item.Text.fRotation = fRotation;
+        Item.Text.fRotationCenterX = fRotationCenterX;
+        Item.Text.fRotationCenterY = fRotationCenterY;
 
         Item.wstrText = section.wstrText;
 
@@ -902,6 +1006,19 @@ void CGraphics::DrawColorCodedTextLine ( float fLeft, float fRight, float fY, SC
     }
 }
 
+
+static const sFontInfo fontInfos[] = {
+    { "tahoma",               15, FW_NORMAL },
+    { "tahomabd",             15, FW_BOLD   },
+    { "verdana",              15, FW_NORMAL },
+    { "arial",                15, FW_NORMAL },
+    { "microsoft sans serif", 15, FW_BOLD   },
+    { "pricedown",            30, FW_NORMAL },
+    { "bankgothic md bt",     30, FW_NORMAL },
+    { "diploma",              30, FW_NORMAL },
+    { "beckett",              30, FW_NORMAL },
+    { "unifont",              14, FW_NORMAL }
+};
 
 bool CGraphics::LoadStandardDXFonts ( void )
 {
@@ -924,19 +1041,6 @@ bool CGraphics::LoadStandardDXFonts ( void )
     }
 
     // Create DirectX font and sprite objects
-    static const sFontInfo fontInfos[] = {
-        { "tahoma",               15, FW_NORMAL },
-        { "tahomabd",             15, FW_BOLD   },
-        { "verdana",              15, FW_NORMAL },
-        { "arial",                15, FW_NORMAL },
-        { "microsoft sans serif", 15, FW_BOLD   },
-        { "pricedown",            30, FW_NORMAL },
-        { "bankgothic md bt",     30, FW_NORMAL },
-        { "diploma",              30, FW_NORMAL },
-        { "beckett",              30, FW_NORMAL },
-        { "unifont",              14, FW_NORMAL }
-    };
-
     for ( int i = 0; i < NUM_FONTS; i++ )
     {
         m_pDXFonts[i] = m_pBigDXFonts[i] = NULL;
@@ -967,6 +1071,25 @@ bool CGraphics::LoadStandardDXFonts ( void )
 
     return true;
 }
+
+
+bool CGraphics::CreateStandardDXFontWithCustomScale ( eFontType fontType, float fScale, ID3DXFont** ppD3DXFont )
+{
+    if ( fontType < 0 || fontType >= NUMELMS( fontInfos ) )
+        return false;
+
+    const sFontInfo& info = fontInfos[ fontType ];
+
+    if( FAILED ( D3DXCreateFont ( m_pDevice, info.uiHeight * fScale, 0, info.uiWeight, 1,
+        FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, info.szName,
+        ppD3DXFont ) ) )
+    {
+        return false;
+    }
+
+    return true;
+}
+
 
 bool CGraphics::LoadAdditionalDXFont ( std::string strFontPath, std::string strFontName, unsigned int uiHeight, bool bBold, ID3DXFont** ppD3DXFont )
 {
@@ -1003,18 +1126,25 @@ bool CGraphics::DestroyStandardDXFonts ( void )
         RemoveFontResourceEx ( CalcMTASAPath ( "MTA\\cgui\\" + m_FontResourceNames[i] ), FR_PRIVATE, 0 );
     }
 
+    // Release 
     for ( int i = 0; i < NUM_FONTS; i++ )
     {
         SAFE_RELEASE( m_pDXFonts[i] );
         SAFE_RELEASE( m_pBigDXFonts[i] );
     }
 
-    // Release 
+    // Release custom scale versions of standard fonts as well
+    for ( std::map < SString, SCustomScaleFontInfo >::iterator iter = m_CustomScaleFontMap.begin() ; iter != m_CustomScaleFontMap.end() ; ++iter )
+        SAFE_RELEASE( iter->second.pFont );
+
     return true;
 }
 
-void CGraphics::DrawTexture ( CTextureItem* pTexture, float fX, float fY, float fScaleX, float fScaleY, float fRotation, float fCenterX, float fCenterY, DWORD dwColor )
+void CGraphics::DrawTexture ( CTextureItem* pTexture, float fX, float fY, float fScaleX, float fScaleY, float fRotation, float fCenterX, float fCenterY, DWORD dwColor, float fU, float fV, float fSizeU, float fSizeV, bool bRelativeUV )
 {
+    if ( g_pCore->IsWindowMinimized () )
+        return;
+
     if ( !pTexture )
         return;
 
@@ -1024,14 +1154,24 @@ void CGraphics::DrawTexture ( CTextureItem* pTexture, float fX, float fY, float 
     const float fFileHeight    = pTexture->m_uiSizeY;
 
     BeginDrawBatch ();
+    RECT cutImagePos;
+    const float fMultU = ( bRelativeUV ? fSurfaceWidth  : fSurfaceWidth  / fFileWidth );
+    const float fMultV = ( bRelativeUV ? fSurfaceHeight : fSurfaceHeight / fFileHeight );
+    cutImagePos.left    = ( fU )          * fMultU;
+    cutImagePos.right   = ( fU + fSizeU ) * fMultU;
+    cutImagePos.top     = ( fV )          * fMultV;
+    cutImagePos.bottom  = ( fV + fSizeV ) * fMultV;
+    const float fCutWidth  = cutImagePos.right - cutImagePos.left;
+    const float fCutHeight = cutImagePos.bottom - cutImagePos.top;
+
     D3DXMATRIX matrix;
-    D3DXVECTOR2 scaling ( fScaleX * fFileWidth / fSurfaceWidth, fScaleY * fFileHeight / fSurfaceHeight );
+    D3DXVECTOR2 scaling ( fScaleX * fFileWidth / fCutWidth, fScaleY * fFileHeight / fCutHeight );
     D3DXVECTOR2 rotationCenter  ( fFileWidth * fScaleX * fCenterX, fFileHeight * fScaleX * fCenterY );
     D3DXVECTOR2 position ( fX - fFileWidth * fScaleX * fCenterX, fY - fFileHeight * fScaleY * fCenterY );
-    D3DXMatrixTransformation2D ( &matrix, NULL, NULL, &scaling, &rotationCenter, fRotation * 6.2832f / 360.f, &position );
+    D3DXMatrixTransformation2D ( &matrix, NULL, NULL, &scaling, &rotationCenter, DegreesToRadians( fRotation ), &position );
     CheckModes ( EDrawMode::DX_SPRITE, m_ActiveBlendMode );
     m_pDXSprite->SetTransform ( &matrix );
-    m_pDXSprite->Draw ( (IDirect3DTexture9*)pTexture->m_pD3DTexture, NULL, NULL, NULL, /*ModifyColorForBlendMode (*/ dwColor/*, blendMode )*/ );
+    m_pDXSprite->Draw ( (IDirect3DTexture9*)pTexture->m_pD3DTexture, &cutImagePos, NULL, NULL, /*ModifyColorForBlendMode (*/ dwColor/*, blendMode )*/ );
     EndDrawBatch ();
 }
 
@@ -1052,6 +1192,8 @@ void CGraphics::OnDeviceCreate ( IDirect3DDevice9 * pDevice )
     m_pRenderItemManager->OnDeviceCreate ( pDevice, GetViewportWidth (), GetViewportHeight () );
     m_pScreenGrabber->OnDeviceCreate ( pDevice );
     m_pPixelsManager->OnDeviceCreate ( pDevice );
+    m_ProgressSpinnerTexture = GetRenderItemManager ()->CreateTexture ( CalcMTASAPath( "MTA\\cgui\\images\\busy_spinner.png" ), NULL, false, -1, -1, RFORMAT_DXT3, TADDRESS_CLAMP );
+    m_pAspectRatioConverter->Init( GetViewportHeight () );
 }
 
 
@@ -1063,6 +1205,10 @@ void CGraphics::OnDeviceInvalidate ( IDirect3DDevice9 * pDevice )
         if( m_pBigDXFonts[i] ) m_pBigDXFonts[i]->OnLostDevice ();
     }
 
+    for ( std::map < SString, SCustomScaleFontInfo >::iterator iter = m_CustomScaleFontMap.begin() ; iter != m_CustomScaleFontMap.end() ; ++iter )
+        if ( iter->second.pFont )
+            iter->second.pFont->OnLostDevice();
+
     if ( m_pDXSprite )
         m_pDXSprite->OnLostDevice ();
 
@@ -1071,6 +1217,8 @@ void CGraphics::OnDeviceInvalidate ( IDirect3DDevice9 * pDevice )
 
     m_pRenderItemManager->OnLostDevice ();
     m_pScreenGrabber->OnLostDevice ();
+    SAFE_RELEASE( m_pSavedFrontBufferData );
+    SAFE_RELEASE( m_pTempBackBufferData );
 }
 
 
@@ -1081,6 +1229,10 @@ void CGraphics::OnDeviceRestore ( IDirect3DDevice9 * pDevice )
         if( m_pDXFonts[i] ) m_pDXFonts[i]->OnResetDevice ();
         if( m_pBigDXFonts[i] ) m_pBigDXFonts[i]->OnResetDevice ();
     }
+
+    for ( std::map < SString, SCustomScaleFontInfo >::iterator iter = m_CustomScaleFontMap.begin() ; iter != m_CustomScaleFontMap.end() ; ++iter )
+        if ( iter->second.pFont )
+            iter->second.pFont->OnResetDevice();
 
     if ( m_pDXSprite )
         m_pDXSprite->OnResetDevice ();
@@ -1205,7 +1357,6 @@ void CGraphics::DrawQueueItem ( const sDrawQueueItem& Item )
         case QUEUE_RECT:
         {
             D3DXMATRIX matrix;
-            D3DXVECTOR2 scalingCentre ( 0.5f, 0.5f );
             D3DXVECTOR2 scaling ( Item.Rect.fWidth, Item.Rect.fHeight );
             D3DXVECTOR2 position ( Item.Rect.fX, Item.Rect.fY );
             D3DXMatrixTransformation2D ( &matrix, NULL, 0.0f, &scaling, NULL, 0.0f, &position );
@@ -1221,10 +1372,11 @@ void CGraphics::DrawQueueItem ( const sDrawQueueItem& Item )
             const float fPosFracX = Item.Text.fLeft - rect.left;
             const float fPosFracY = Item.Text.fTop - rect.top;
             D3DXMATRIX matrix;
-            D3DXVECTOR2 scalingCentre ( 0.5f, 0.5f );
             D3DXVECTOR2 scaling ( Item.Text.fScaleX, Item.Text.fScaleY );
             D3DXVECTOR2 translation ( fPosFracX * Item.Text.fScaleX, fPosFracY * Item.Text.fScaleY );   // Sub-pixel positioning
-            D3DXMatrixTransformation2D ( &matrix, NULL, 0.0f, &scaling, NULL, 0.0f, &translation );
+            D3DXVECTOR2 rotcenter ( Item.Text.fRotationCenterX, Item.Text.fRotationCenterY );
+            D3DXVECTOR2* pRotcenter = Item.Text.fRotation ? &rotcenter : NULL;
+            D3DXMatrixTransformation2D ( &matrix, NULL, 0.0f, &scaling, pRotcenter, DegreesToRadians( Item.Text.fRotation ), &translation );
             CheckModes ( EDrawMode::DX_SPRITE, Item.blendMode );
             m_pDXSprite->SetTransform ( &matrix );        
             Item.Text.pDXFont->DrawTextW ( m_pDXSprite, Item.wstrText.c_str (), -1, &rect, Item.Text.ulFormat, /*ModifyColorForBlendMode (*/ Item.Text.ulColor/*, Item.blendMode )*/ );
@@ -1250,9 +1402,9 @@ void CGraphics::DrawQueueItem ( const sDrawQueueItem& Item )
                 const D3DXVECTOR2 scaling         ( Item.Texture.fWidth / fCutWidth, Item.Texture.fHeight / fCutHeight );
                 const D3DXVECTOR2 rotationCenter  ( Item.Texture.fWidth * 0.5f + Item.Texture.fRotCenOffX, Item.Texture.fHeight * 0.5f + Item.Texture.fRotCenOffY );
                 const D3DXVECTOR2 position        ( Item.Texture.fX, Item.Texture.fY );
-                const float fRotationRad  = Item.Texture.fRotation * (6.2832f/360.f);
+                const D3DXVECTOR2* pRotationCenter = Item.Texture.fRotation ? &rotationCenter : NULL;
                 D3DXMATRIX matrix;
-                D3DXMatrixTransformation2D  ( &matrix, NULL, 0.0f, &scaling, &rotationCenter, fRotationRad, &position );
+                D3DXMatrixTransformation2D  ( &matrix, NULL, 0.0f, &scaling, pRotationCenter, DegreesToRadians( Item.Texture.fRotation ), &position );
                 CheckModes ( EDrawMode::DX_SPRITE, Item.blendMode );
                 m_pDXSprite->SetTransform ( &matrix );
                 m_pDXSprite->Draw ( (IDirect3DTexture9*)pTexture->m_pD3DTexture, &cutImagePos, NULL, NULL, /*ModifyColorForBlendMode (*/ Item.Texture.ulColor/*, Item.blendMode )*/ );
@@ -1361,4 +1513,388 @@ void CGraphics::OnChangingRenderTarget ( uint uiNewViewportSizeX, uint uiNewView
     DrawPreGUIQueue ();
     // Inform tile batcher
     m_pTileBatcher->OnChangingRenderTarget ( uiNewViewportSizeX, uiNewViewportSizeY );
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// CGraphics::EnteringMTARenderZone
+//
+// Called when entering known areas of MTA rendering activity
+//
+////////////////////////////////////////////////////////////////
+void CGraphics::EnteringMTARenderZone( void )
+{
+    SaveGTARenderStates();
+    m_MTARenderZone = MTA_RZONE_MAIN;
+    m_iOutsideZoneCount = 0;
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// CGraphics::LeavingMTARenderZone
+//
+// Called when leaving known areas of MTA rendering activity
+//
+////////////////////////////////////////////////////////////////
+void CGraphics::LeavingMTARenderZone( void )
+{
+    RestoreGTARenderStates();
+    m_MTARenderZone = MTA_RZONE_NONE;
+    m_iOutsideZoneCount = 0;
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// CGraphics::MaybeEnteringMTARenderZone
+//
+// Should be called before MTA rendering activity, if there is a chance it will be outside the known areas
+//
+////////////////////////////////////////////////////////////////
+void CGraphics::MaybeEnteringMTARenderZone( void )
+{
+    if ( m_MTARenderZone == MTA_RZONE_OUTSIDE )
+    {
+        // Handle stacking if already outside
+        m_iOutsideZoneCount++;
+    }
+    else
+    if ( m_MTARenderZone == MTA_RZONE_NONE )
+    {
+        assert( !m_pSavedStateBlock );
+        assert( m_iOutsideZoneCount == 0 );
+
+        // Save states if moving from unknown area
+        SaveGTARenderStates();
+        m_iOutsideZoneCount = 1;
+        m_MTARenderZone = MTA_RZONE_OUTSIDE;
+    }
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// CGraphics::MaybeLeavingMTARenderZone
+//
+// Should be called sometime after MaybeEnteringMTARenderZone
+//
+////////////////////////////////////////////////////////////////
+void CGraphics::MaybeLeavingMTARenderZone( void )
+{
+    if ( m_MTARenderZone == MTA_RZONE_OUTSIDE )
+    {
+        // Handle unstacking multiple calls
+        m_iOutsideZoneCount--;
+        if ( m_iOutsideZoneCount == 0 )
+        {
+            // Do restore on final call
+            RestoreGTARenderStates();
+            m_MTARenderZone = MTA_RZONE_NONE;
+        }
+    }
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// CGraphics::SaveGTARenderStates
+//
+// Handle moving into MTA controlled rendering
+//
+////////////////////////////////////////////////////////////////
+void CGraphics::SaveGTARenderStates( void )
+{
+    SAFE_RELEASE( m_pSavedStateBlock );
+    // Create a state block.
+    m_pDevice->CreateStateBlock ( D3DSBT_ALL, &m_pSavedStateBlock );
+
+    // Make sure linear sampling is enabled
+    m_pDevice->SetSamplerState ( 0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR );
+    m_pDevice->SetSamplerState ( 0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR );
+    m_pDevice->SetSamplerState ( 0, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR );
+
+    // Make sure stencil is off to avoid problems with flame effects
+    m_pDevice->SetRenderState ( D3DRS_STENCILENABLE, FALSE );
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// CGraphics::RestoreGTARenderStates
+//
+// Handle moving out of MTA controlled rendering
+//
+////////////////////////////////////////////////////////////////
+void CGraphics::RestoreGTARenderStates( void )
+{
+    // Restore these transforms to fix various weird stuff
+    m_pDevice->SetTransform ( D3DTS_PROJECTION, &g_pDeviceState->TransformState.PROJECTION );
+    m_pDevice->SetTransform ( D3DTS_WORLD, &g_pDeviceState->TransformState.WORLD );
+    m_pDevice->SetTransform ( D3DTS_VIEW, &g_pDeviceState->TransformState.VIEW );
+
+    // Restore the render states
+    if ( m_pSavedStateBlock )
+    {
+        m_pSavedStateBlock->Apply ( );
+        SAFE_RELEASE( m_pSavedStateBlock );
+    }
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// CGraphics::DidRenderScene
+//
+// Notify that scene rendering is working
+//
+////////////////////////////////////////////////////////////////
+void CGraphics::DidRenderScene( void )
+{
+    if ( m_bProgressVisible )
+    {
+        // Min display time before turning off spinner
+        if ( m_FirstDrawnProgressTimer.Get() > DUMMY_PROGRESS_MIN_DISPLAY_TIME )
+            m_bProgressVisible = false;
+        else
+            DrawProgressMessage( false );
+    }
+    SAFE_RELEASE( m_pSavedFrontBufferData );
+    SAFE_RELEASE( m_pTempBackBufferData );
+    m_LastRenderedSceneTimer.Reset();
+    float fTargetAspectRatioValue = 0;
+    if ( CVARS_GET_VALUE < bool > ( "hud_match_aspect_ratio" ) )
+        fTargetAspectRatioValue = CCore::GetSingleton ().GetGame ()->GetSettings ()->GetAspectRatioValue();
+    m_pAspectRatioConverter->Pulse( fTargetAspectRatioValue );
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// CGraphics::SetProgressMessage
+//
+// Set (and maybe show) status message used when scene rendering is stalled
+//
+////////////////////////////////////////////////////////////////
+void CGraphics::SetProgressMessage( const SString& strMessage )
+{
+    if ( !m_bProgressVisible )
+    {
+        if ( m_LastRenderedSceneTimer.Get() < DUMMY_PROGRESS_INITIAL_DELAY )
+            return;
+
+        // Enable progress drawing
+        m_bProgressVisible = true;
+        m_FirstDrawnProgressTimer.Reset();
+    }
+
+    if ( g_pCore->IsWindowMinimized() )
+        return;
+
+    if ( !m_pRenderItemManager->IsUsingDefaultRenderTarget() )
+        return;
+
+    if ( m_LastDrawnProgressTimer.Get() < 100 )
+        return;
+
+    m_strProgressMessage = strMessage;
+    DrawProgressMessage();
+
+    m_LastDrawnProgressTimer.Reset();
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// CGraphics::DrawProgressMessage
+//
+// Do clever things to draw and show message without changing the backbuffer contents (if required)
+//
+////////////////////////////////////////////////////////////////
+void CGraphics::DrawProgressMessage( bool bPreserveBackbuffer )
+{
+    // Check d3d device is usable for at least 1 second and 4 calls
+    if ( IsIconic( g_pCore->GetHookedWindow() ) || m_pDevice->TestCooperativeLevel() != D3D_OK )
+    {
+        m_LastLostDeviceTimer.Reset();
+        return;
+    }
+
+    if ( m_LastLostDeviceTimer.Get() < 1000 )
+        return;
+
+    // Must be in a scene
+    if ( !g_bInGTAScene && !g_bInMTAScene )
+        return;
+    const bool bWasInScene = true;
+    bool bInScene = true;
+
+    // Check if disabled
+    static bool bDisabled = !GetApplicationSetting( "diagnostics", "user-confirmed-bsod-time" ).empty();
+    if ( bDisabled )
+        return;
+
+    //
+    // Save stuff
+    //
+    if ( m_iDrawBatchRefCount )
+        CheckModes( EDrawMode::NONE, EBlendMode::BLEND );
+    EBlendModeType savedBlendMode = m_ActiveBlendMode;
+
+    HRESULT hr;
+    IDirect3DStateBlock9* pSavedStateBlock = NULL;
+    m_pDevice->CreateStateBlock( D3DSBT_ALL, &pSavedStateBlock );
+
+    //
+    // Do stuff
+    //
+    IDirect3DSurface9* pD3DBackBufferSurface = NULL;
+    IDirect3DSurface9* pTempFrontBufferData = NULL;
+    do
+    {
+        if ( bPreserveBackbuffer )
+        {
+            if ( bInScene )
+            {
+                m_pDevice->EndScene();
+                bInScene = false;
+            }
+
+            // Get backbuffer surface
+            hr = m_pDevice->GetBackBuffer( 0, 0, D3DBACKBUFFER_TYPE_MONO, &pD3DBackBufferSurface );
+            if ( FAILED( hr ) )
+                break;
+            D3DSURFACE_DESC BackBufferDesc;
+            hr = pD3DBackBufferSurface->GetDesc( &BackBufferDesc );
+            if ( FAILED( hr ) )
+                break;
+
+            // Maybe save frontbuffer pixels
+            if ( !m_pSavedFrontBufferData )
+            {
+                D3DDISPLAYMODE displayMode;
+                hr = m_pDevice->GetDisplayMode( 0, &displayMode );
+                if ( FAILED( hr ) )
+                    break;
+                hr = m_pDevice->CreateOffscreenPlainSurface( displayMode.Width, displayMode.Height, D3DFMT_A8R8G8B8, D3DPOOL_SYSTEMMEM, &pTempFrontBufferData, NULL );
+                if ( FAILED( hr ) )
+                    break;
+                hr = m_pDevice->GetFrontBufferData( 0, pTempFrontBufferData );
+                if ( FAILED( hr ) )
+                    break;
+
+                HWND hwnd = g_pCore->GetHookedWindow();
+                RECT clientRect;
+                GetClientRect( hwnd, &clientRect );
+                MapWindowPoints(hwnd, NULL, (LPPOINT)(&clientRect), (sizeof(clientRect)/sizeof(POINT)) );
+                hr = m_pDevice->CreateOffscreenPlainSurface( BackBufferDesc.Width, BackBufferDesc.Height, BackBufferDesc.Format, D3DPOOL_SYSTEMMEM, &m_pSavedFrontBufferData, NULL );
+                if ( FAILED( hr ) )
+                    break;
+                hr = D3DXLoadSurfaceFromSurface( m_pSavedFrontBufferData, NULL, NULL, pTempFrontBufferData, NULL, &clientRect, D3DX_FILTER_NONE, 0 );
+                if ( FAILED( hr ) )
+                    break;
+                SAFE_RELEASE( pTempFrontBufferData );
+            }
+
+            // Save backbuffer pixels
+            if ( !m_pTempBackBufferData)
+                m_pTempBackBufferData = CGraphics::GetSingleton().GetRenderItemManager()->CreateRenderTarget( BackBufferDesc.Width, BackBufferDesc.Height, true, true );
+            if ( !m_pTempBackBufferData )
+                break;
+            hr = m_pDevice->StretchRect( pD3DBackBufferSurface, NULL, m_pTempBackBufferData->m_pD3DRenderTargetSurface, NULL, D3DTEXF_POINT );
+            if ( FAILED( hr ) )
+                break;
+
+            // Copy saved frontbuffer pixels onto backbuffer surface
+            hr = D3DXLoadSurfaceFromSurface( pD3DBackBufferSurface, NULL, NULL, m_pSavedFrontBufferData, NULL, NULL, D3DX_FILTER_NONE, 0 );
+            if ( FAILED( hr ) )
+                break;
+
+            m_pDevice->BeginScene();
+            bInScene = true;
+        }
+
+        // Draw progress graphics on backbuffer surface
+        {
+            m_ActiveBlendMode = EBlendMode::MODULATE_ADD;
+
+            const uint uiViewportHeight = GetViewportHeight();
+            const uint uiViewportWidth = GetViewportWidth();
+
+            if ( !m_strProgressMessage.empty() )
+            {
+                const uint uiMessageWidth = GetDXTextExtent( m_strProgressMessage );
+                const uint uiMessagePosX = uiViewportWidth / 2 - uiMessageWidth / 2;
+                const DWORD dwMessageColor = 0xA0FFFFFF;
+                DrawText( uiMessagePosX, uiViewportHeight - 57, dwMessageColor, 1, "%s", *m_strProgressMessage );
+            }
+
+            if ( m_ProgressSpinnerTexture )
+            {
+                const uint uiNumFrames = 12;
+                const uint uiFrameWidth = m_ProgressSpinnerTexture->m_uiSizeX / uiNumFrames;
+                const uint uiFrameHeight = m_ProgressSpinnerTexture->m_uiSizeY;
+                const uint uiSpinnerPosX = uiViewportWidth / 2 - uiFrameWidth / 2;
+                const float fScaleX = 1.f / uiNumFrames;
+                const DWORD dwSpinnerColor = 0x90FFFFFF;
+
+                if ( m_ProgressAnimTimer.Get() > DUMMY_PROGRESS_ANIMATION_INTERVAL )
+                {
+                    m_ProgressAnimTimer.Reset();
+                    m_uiProgressAnimFrame = ( m_uiProgressAnimFrame + 1 ) % uiNumFrames;
+                }
+                DrawTexture( m_ProgressSpinnerTexture, uiSpinnerPosX, uiViewportHeight - 40, fScaleX, 1, 0, 0, 0, dwSpinnerColor, m_uiProgressAnimFrame * uiFrameWidth, 0, uiFrameWidth, uiFrameHeight, false );
+            }
+
+            CheckModes( EDrawMode::NONE, EBlendMode::BLEND );
+        }
+
+        if ( bPreserveBackbuffer )
+        {
+            m_pDevice->EndScene();
+            bInScene = false;
+
+            // Flip backbuffer onto front buffer
+            SAFE_RELEASE( pD3DBackBufferSurface );
+            hr = m_pDevice->Present( NULL, NULL, NULL, NULL );
+            if ( FAILED( hr ) )
+                break;
+
+            // Restore backbuffer surface
+            hr = m_pDevice->GetBackBuffer( 0, 0, D3DBACKBUFFER_TYPE_MONO, &pD3DBackBufferSurface );
+            if ( FAILED( hr ) )
+                break;
+            hr = m_pDevice->StretchRect( m_pTempBackBufferData->m_pD3DRenderTargetSurface, NULL, pD3DBackBufferSurface, NULL, D3DTEXF_POINT );
+
+            m_pDevice->BeginScene();
+            bInScene = true;
+        }
+    }
+    while( false );
+
+    // Tidy
+    SAFE_RELEASE( pTempFrontBufferData );
+    SAFE_RELEASE( pD3DBackBufferSurface );
+
+    // Ensure scene status is restored
+    if ( bInScene != bWasInScene )
+    {
+        if ( bWasInScene )
+            m_pDevice->BeginScene();
+        else
+            m_pDevice->EndScene();
+        bInScene = bWasInScene;
+    }
+
+    //
+    // Restore stuff
+    //
+    if ( pSavedStateBlock )
+    {
+        pSavedStateBlock->Apply();
+        SAFE_RELEASE( pSavedStateBlock );
+    }
+
+    m_ActiveBlendMode = savedBlendMode;
 }

@@ -66,7 +66,6 @@ private:
 
 // Server game to query port offset (gameport + offset = queryport)
 #define SERVER_LIST_QUERY_PORT_OFFSET       123
-#define SERVER_LIST_QUERY_PORT_OFFSET_LAN   234
 
 // LAN packet broadcasting string
 #define SERVER_LIST_CLIENT_BROADCAST_STR    "MTA-CLIENT"

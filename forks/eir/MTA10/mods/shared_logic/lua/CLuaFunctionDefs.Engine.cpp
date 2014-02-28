@@ -21,48 +21,56 @@
 
 int CLuaFunctionDefs::EngineLoadCOL ( lua_State* luaVM )
 {
-    // Grab the lua main and the resource belonging to this script
-    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
-    if ( pLuaMain )
+    SString strFile = "";
+    CScriptArgReader argStream ( luaVM );
+    // Grab the COL filename
+    argStream.ReadString ( strFile );
+
+    if ( !argStream.HasErrors ( ) )
     {
-        // Get the resource we belong to
-        CResource* pResource = pLuaMain->GetResource ();
-        if ( pResource )
+        // Grab the lua main and the resource belonging to this script
+        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+        if ( pLuaMain )
         {
-            // Grab the filename
-            SString strFile = ( lua_istype ( luaVM, 1, LUA_TSTRING ) ? lua_tostring ( luaVM, 1 ) : "" );
-            
-            SString strPath;
-            // Is this a legal filepath?
-            if ( CResourceManager::ParseResourcePathInput( strFile, pResource, strPath ) )
+            // Get the resource we belong to
+            CResource* pResource = pLuaMain->GetResource ();
+            if ( pResource )
             {
-                // Grab the resource root entity
-                CClientEntity* pRoot = pResource->GetResourceCOLModelRoot ();
-
-                // Create the col model
-                CClientColModel* pCol = new CClientColModel ( m_pManager, INVALID_ELEMENT_ID );
-
-                // Attempt loading the file
-                if ( pCol->LoadCol ( strPath ) )
+                
+                SString strPath;
+                // Is this a legal filepath?
+                if ( CResourceManager::ParseResourcePathInput( strFile, pResource, strPath ) )
                 {
-                    // Success. Make it a child of the resource collision root
-                    pCol->SetParent ( pRoot );
+                    // Grab the resource root entity
+                    CClientEntity* pRoot = pResource->GetResourceCOLModelRoot ();
 
-                    // Return the created col model
-                    lua_pushelement ( luaVM, pCol );
-                    return 1;
+                    // Create the col model
+                    CClientColModel* pCol = new CClientColModel ( m_pManager, INVALID_ELEMENT_ID );
+
+                    // Attempt loading the file
+                    if ( pCol->LoadCol ( strPath ) )
+                    {
+                        // Success. Make it a child of the resource collision root
+                        pCol->SetParent ( pRoot );
+
+                        // Return the created col model
+                        lua_pushelement ( luaVM, pCol );
+                        return 1;
+                    }
+                    else
+                    {
+                        // Delete it again. We failed
+                        delete pCol;
+                        argStream.SetCustomError( strFile, "Error loading COL" );
+                    }
                 }
                 else
-                {
-                    // Delete it again. We failed
-                    delete pCol;
-                    m_pScriptDebugging->LogCustom ( luaVM, SString ( "Load error @ '%s' [Unable to load '%s']", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *strFile ) );
-                }
+                    argStream.SetCustomError( strFile, "Bad file path" );
             }
-            else
-                m_pScriptDebugging->LogBadType ( luaVM );
         }
     }
+    if ( argStream.HasErrors ( ) )
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     // We failed for some reason
     lua_pushboolean ( luaVM, false );
@@ -72,48 +80,55 @@ int CLuaFunctionDefs::EngineLoadCOL ( lua_State* luaVM )
 
 int CLuaFunctionDefs::EngineLoadDFF ( lua_State* luaVM )
 {
-    // Grab our virtual machine and grab our resource from that.
-    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
-    if ( pLuaMain )
+    SString strFile = "";
+    CScriptArgReader argStream ( luaVM );
+    // Grab the DFF filename (model ID ignored after 1.3.1)
+    argStream.ReadString ( strFile );
+
+    if ( !argStream.HasErrors ( ) )
     {
-        // Get this resource
-        CResource* pResource = pLuaMain->GetResource ();
-        if ( pResource )
+        // Grab our virtual machine and grab our resource from that.
+        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+        if ( pLuaMain )
         {
-            // Grab the filename
-            SString strFile = ( lua_istype ( luaVM, 1, LUA_TSTRING ) ? lua_tostring ( luaVM, 1 ) : "" );
-            
-            SString strPath;
-            // Is this a legal filepath?
-            if ( CResourceManager::ParseResourcePathInput( strFile, pResource, strPath ) )
+            // Get this resource
+            CResource* pResource = pLuaMain->GetResource ();
+            if ( pResource )
             {
-                // Grab the resource root entity
-                CClientEntity* pRoot = pResource->GetResourceDFFRoot ();
-
-                // Create a DFF element
-                CClientDFF* pDFF = new CClientDFF ( m_pManager, INVALID_ELEMENT_ID );
-
-                // Try to load the DFF file
-                if ( pDFF->LoadDFF ( strPath ) )
+                SString strPath;
+                // Is this a legal filepath?
+                if ( CResourceManager::ParseResourcePathInput( strFile, pResource, strPath ) )
                 {
-                    // Success loading the file. Set parent to DFF root
-                    pDFF->SetParent ( pRoot );
+                    // Grab the resource root entity
+                    CClientEntity* pRoot = pResource->GetResourceDFFRoot ();
 
-                    // Return the DFF
-                    lua_pushelement ( luaVM, pDFF );
-                    return 1;
+                    // Create a DFF element
+                    CClientDFF* pDFF = new CClientDFF ( m_pManager, INVALID_ELEMENT_ID );
+
+                    // Try to load the DFF file
+                    if ( pDFF->LoadDFF ( strPath ) )
+                    {
+                        // Success loading the file. Set parent to DFF root
+                        pDFF->SetParent ( pRoot );
+
+                        // Return the DFF
+                        lua_pushelement ( luaVM, pDFF );
+                        return 1;
+                    }
+                    else
+                    {
+                        // Delete it again
+                        delete pDFF;
+                        argStream.SetCustomError( strFile, "Error loading DFF" );
+                    }
                 }
                 else
-                {
-                    // Delete it again
-                    delete pDFF;
-                    m_pScriptDebugging->LogCustom ( luaVM, SString ( "Load error @ '%s' [Unable to load '%s']", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *strFile ) );
-                }
+                    argStream.SetCustomError( strFile, "Bad file path" );
             }
-            else
-                m_pScriptDebugging->LogBadPointer ( luaVM, "string", 1 );
         }
     }
+    if ( argStream.HasErrors ( ) )
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     // We failed
     lua_pushboolean ( luaVM, false );
@@ -123,53 +138,58 @@ int CLuaFunctionDefs::EngineLoadDFF ( lua_State* luaVM )
 
 int CLuaFunctionDefs::EngineLoadTXD ( lua_State* luaVM )
 {
-    // Grab our virtual machine and grab our resource from that.
-    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
-    if ( pLuaMain )
+    SString strFile = "";
+    bool bFilteringEnabled = true;
+    CScriptArgReader argStream ( luaVM );
+    // Grab the TXD filename
+    argStream.ReadString ( strFile );
+    if ( argStream.NextIsBool() )   // Some scripts have a number here (in error)
+        argStream.ReadBool ( bFilteringEnabled, true );
+
+    if ( !argStream.HasErrors ( ) )
     {
-        // Grab this resource
-        CResource* pResource = pLuaMain->GetResource ();
-        if ( pResource )
+        // Grab our virtual machine and grab our resource from that.
+        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+        if ( pLuaMain )
         {
-            bool bFilteringEnabled = true;
-
-            if ( lua_type ( luaVM, 2 ) == LUA_TBOOLEAN )
-                bFilteringEnabled = ( lua_toboolean ( luaVM, 2 ) ) ? true:false;
-
-            // Grab the filename
-            SString strFile = ( lua_istype ( luaVM, 1, LUA_TSTRING ) ? lua_tostring ( luaVM, 1 ) : "" );
-            
-            SString strPath;
-            // Is this a legal filepath?
-            if ( CResourceManager::ParseResourcePathInput( strFile, pResource, strPath ) )
+            // Grab this resource
+            CResource* pResource = pLuaMain->GetResource ();
+            if ( pResource )
             {
-                // Grab the resource root entity
-                CClientEntity* pRoot = pResource->GetResourceTXDRoot ();
-
-                // Create a TXD element
-                CClientTXD* pTXD = new CClientTXD ( m_pManager, INVALID_ELEMENT_ID );
-
-                // Try to load the TXD file
-                if ( pTXD->LoadTXD ( strPath, bFilteringEnabled ) )
+                SString strPath;
+                // Is this a legal filepath?
+                if ( CResourceManager::ParseResourcePathInput( strFile, pResource, strPath ) )
                 {
-                    // Success loading the file. Set parent to TXD root
-                    pTXD->SetParent ( pRoot );
+                    // Grab the resource root entity
+                    CClientEntity* pRoot = pResource->GetResourceTXDRoot ();
 
-                    // Return the TXD
-                    lua_pushelement ( luaVM, pTXD );
-                    return 1;
+                    // Create a TXD element
+                    CClientTXD* pTXD = new CClientTXD ( m_pManager, INVALID_ELEMENT_ID );
+
+                    // Try to load the TXD file
+                    if ( pTXD->LoadTXD ( strPath, bFilteringEnabled ) )
+                    {
+                        // Success loading the file. Set parent to TXD root
+                        pTXD->SetParent ( pRoot );
+
+                        // Return the TXD
+                        lua_pushelement ( luaVM, pTXD );
+                        return 1;
+                    }
+                    else
+                    {
+                        // Delete it again
+                        delete pTXD;
+                        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Load error @ '%s' [Unable to load '%s']", "engineLoadTXD", *strFile ) );
+                    }
                 }
                 else
-                {
-                    // Delete it again
-                    delete pTXD;
-                    m_pScriptDebugging->LogCustom ( luaVM, SString ( "Load error @ '%s' [Unable to load '%s']", "engineLoadTXD", *strFile ) );
-                }
+                    m_pScriptDebugging->LogBadPointer ( luaVM, "string", 1 );
             }
-            else
-                m_pScriptDebugging->LogBadPointer ( luaVM, "string", 1 );
         }
     }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     // We failed
     lua_pushboolean ( luaVM, false );
@@ -179,28 +199,36 @@ int CLuaFunctionDefs::EngineLoadTXD ( lua_State* luaVM )
 
 int CLuaFunctionDefs::EngineReplaceCOL ( lua_State* luaVM )
 {
-    // Grab the DFF and model ID
-    CClientColModel* pCol = ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) ? lua_tocolmodel ( luaVM, 1 ) : NULL );
-    unsigned short usModel = CModelNames::ResolveModelID ( lua_tostring ( luaVM, 2 ) );
+    CClientColModel* pCol = NULL;
+    unsigned short usModel = 0;
+    CScriptArgReader argStream ( luaVM );
+    // Grab the COL and model ID
+    argStream.ReadUserData ( pCol );
+    argStream.ReadNumber ( usModel );
 
-    // Valid collision model?
-    if ( pCol )
+    if ( !argStream.HasErrors ( ) )
     {
-        // Valid client DFF and model?
-        if ( CClientColModelManager::IsReplacableModel ( usModel ) )
+        // Valid collision model?
+        if ( pCol )
         {
-            // Replace the colmodel
-            if ( pCol->Replace ( usModel ) )
+            // Valid client DFF and model?
+            if ( CClientColModelManager::IsReplacableModel ( usModel ) )
             {
-                lua_pushboolean ( luaVM, true );
-                return 1;
+                // Replace the colmodel
+                if ( pCol->Replace ( usModel ) )
+                {
+                    lua_pushboolean ( luaVM, true );
+                    return 1;
+                }
             }
+            else
+                m_pScriptDebugging->LogBadPointer ( luaVM, "number", 2 );
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "number", 2 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "col", 1 );
     }
     else
-        m_pScriptDebugging->LogBadPointer ( luaVM, "col", 1 );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -210,11 +238,13 @@ int CLuaFunctionDefs::EngineReplaceCOL ( lua_State* luaVM )
 
 int CLuaFunctionDefs::EngineRestoreCOL ( lua_State* luaVM )
 {
-    // Grab the model ID we're going to restore
-    int iArgument1 = lua_type ( luaVM, 1 );
-    if ( iArgument1 == LUA_TNUMBER || iArgument1 == LUA_TSTRING )
+    SString strModelName = "";
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadString ( strModelName );
+
+    if ( !argStream.HasErrors ( ) )
     {
-        unsigned short usModelID = CModelNames::ResolveModelID ( lua_tostring ( luaVM, 1 ) );
+        unsigned short usModelID = CModelNames::ResolveModelID ( strModelName );
 
         if ( m_pColModelManager->RestoreModel ( usModelID ) )
         {
@@ -224,7 +254,7 @@ int CLuaFunctionDefs::EngineRestoreCOL ( lua_State* luaVM )
         }  
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     // Failed.
     lua_pushboolean ( luaVM, false );
@@ -234,29 +264,39 @@ int CLuaFunctionDefs::EngineRestoreCOL ( lua_State* luaVM )
 
 int CLuaFunctionDefs::EngineImportTXD ( lua_State* luaVM )
 {
-    // Grab the TXD and the model ID
-    CClientTXD* pTXD = ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) ? lua_totxd ( luaVM, 1 ) : NULL );
-    unsigned short usModelID = CModelNames::ResolveModelID ( lua_tostring ( luaVM, 2 ) );
+    CClientTXD* pTXD = NULL;
+    SString strModelName;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pTXD );
+    argStream.ReadString ( strModelName );
 
-    // Valid txd?
-    if ( pTXD )
+    if ( !argStream.HasErrors ( ) )
     {
-        // Valid importable model?
-        if ( CClientTXD::IsImportableModel ( usModelID ) )
+        // Valid txd?
+        if ( pTXD )
         {
-            // Try to import
-            if ( pTXD->Import ( usModelID ) )
+            // Valid importable model?
+            ushort usModelID = CModelNames::ResolveModelID ( strModelName );
+            if ( usModelID == INVALID_MODEL_ID )
+                usModelID = CModelNames::ResolveClothesTexID ( strModelName );
+            if ( CClientTXD::IsImportableModel ( usModelID ) )
             {
-                // Success
-                lua_pushboolean ( luaVM, true );
-                return 1;
+                // Try to import
+                if ( pTXD->Import ( usModelID ) )
+                {
+                    // Success
+                    lua_pushboolean ( luaVM, true );
+                    return 1;
+                }
             }
+            else
+                m_pScriptDebugging->LogBadPointer ( luaVM, "number", 2 );
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "number", 2 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "txd", 1 );
     }
     else
-        m_pScriptDebugging->LogBadPointer ( luaVM, "txd", 1 );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -278,12 +318,15 @@ int CLuaFunctionDefs::EngineReplaceModel ( lua_State* luaVM )
     if ( !argStream.HasErrors () )
     {
         ushort usModelID = CModelNames::ResolveModelID ( strModelName );
-        if ( usModelID != INVALID_MODEL_ID || strModelName == "" )
+        if ( usModelID != INVALID_MODEL_ID )
         {
-            pDFF->ReplaceModel ( usModelID, bAlphaTransparency );
-
-            lua_pushboolean ( luaVM, true );
-            return 1;
+            if ( pDFF->ReplaceModel ( usModelID, bAlphaTransparency ) )
+            {
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }
+            else
+                argStream.SetCustomError( SString( "Model ID %d replace failed", usModelID ) );
         }
         else
             argStream.SetCustomError( "Expected valid model ID or name at argument 2" );
@@ -353,13 +396,15 @@ int CLuaFunctionDefs::EngineGetModelLODDistance ( lua_State* luaVM )
 
 int CLuaFunctionDefs::EngineSetModelLODDistance ( lua_State* luaVM )
 {
-    int iArgument1 = lua_type ( luaVM, 1 );
-    int iArgument2 = lua_type ( luaVM, 2 );
-    if ( ( iArgument1 == LUA_TNUMBER || iArgument2 == LUA_TSTRING ) &&
-        ( iArgument2 == LUA_TNUMBER || iArgument2 == LUA_TSTRING ) )
+    SString strModel = "";
+    float fDistance = 0.0;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadString ( strModel );
+    argStream.ReadNumber ( fDistance );
+
+    if ( !argStream.HasErrors () )
     {
-        unsigned short usModelID = CModelNames::ResolveModelID ( lua_tostring ( luaVM, 1 )  );
-        float fDistance = static_cast < float > ( lua_tonumber ( luaVM, 2 ) );
+        unsigned short usModelID = CModelNames::ResolveModelID ( strModel );
         CModelInfo* pModelInfo = g_pGame->GetModelInfo ( usModelID );
         if ( pModelInfo && fDistance > 0.0f )
         {
@@ -368,6 +413,8 @@ int CLuaFunctionDefs::EngineSetModelLODDistance ( lua_State* luaVM )
             return 1;
         }
     }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -376,13 +423,14 @@ int CLuaFunctionDefs::EngineSetModelLODDistance ( lua_State* luaVM )
 
 int CLuaFunctionDefs::EngineSetAsynchronousLoading ( lua_State* luaVM )
 {
-    int iArgument1 = lua_type ( luaVM, 1 );
-    int iArgument2 = lua_type ( luaVM, 2 );
-    if ( ( iArgument1 == LUA_TBOOLEAN ) &&
-        ( iArgument2 == LUA_TBOOLEAN || iArgument2 == LUA_TNONE ) )
+    bool bEnabled = false;
+    bool bForced = false;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadBool ( bEnabled );
+    argStream.ReadBool ( bForced, false );
+
+    if ( !argStream.HasErrors () )
     {
-        bool bEnabled = lua_toboolean ( luaVM, 1 ) ? true : false;
-        bool bForced = iArgument2 == LUA_TBOOLEAN && lua_toboolean ( luaVM, 2 );
         g_pGame->SetAsyncLoadingFromScript ( bEnabled, bForced );
         lua_pushboolean ( luaVM, true );
         return 1;

@@ -25,7 +25,7 @@ CClientProjectile::CClientProjectile ( class CClientManager* pManager, CProjecti
     m_pManager = pManager;
     m_pProjectileManager = pManager->GetProjectileManager ();
     m_pProjectile = pProjectile;
-    m_pProjectileInfo = pProjectileInfo;   
+    m_pProjectileInfo = pProjectileInfo;
 
     SetTypeName ( "projectile" );
 
@@ -64,10 +64,7 @@ CClientProjectile::CClientProjectile ( class CClientManager* pManager, CProjecti
 
 
 CClientProjectile::~CClientProjectile ( void )
-{   
-    // Make sure we're destroyed
-    Destroy ();
-
+{
     // If our creator is getting destroyed, this should be null
     if ( m_pCreator )
     {
@@ -75,10 +72,10 @@ CClientProjectile::~CClientProjectile ( void )
         {
             case CCLIENTPLAYER:
             case CCLIENTPED:
-                static_cast < CClientPed * > ( m_pCreator )->RemoveProjectile ( this );
+                static_cast < CClientPed * > ( (CClientEntity*)m_pCreator )->RemoveProjectile ( this );
                 break;
             case CCLIENTVEHICLE:
-                static_cast < CClientVehicle * > ( m_pCreator )->RemoveProjectile ( this );
+                static_cast < CClientVehicle * > ( (CClientEntity*)m_pCreator )->RemoveProjectile ( this );
                 break;
             default: break;
         }
@@ -91,6 +88,14 @@ CClientProjectile::~CClientProjectile ( void )
 
     Unlink ();
 
+    if ( m_pProjectile )
+    {
+        // Make sure we're destroyed
+        delete m_pProjectile;
+
+        m_pProjectile = NULL;
+    }
+
     CClientEntityRefManager::RemoveEntityRefs ( 0, &m_pCreator, &m_pTarget, NULL );
 }
 
@@ -102,6 +107,13 @@ void CClientProjectile::Unlink ( void )
     {
         m_pProjectileManager->RemoveFromList ( this ); 
         m_bLinked = false;
+        if ( m_pProjectile )
+        {
+            // Make sure we're destroyed
+            delete m_pProjectile;
+
+            m_pProjectile = NULL;
+        }
     }
 }
 
@@ -153,7 +165,6 @@ void CClientProjectile::Destroy ( void )
     if ( m_pProjectile )
     {
         m_pProjectile->Destroy ();
-        m_pProjectile = NULL;
     }
 }
 
@@ -259,6 +270,10 @@ void CClientProjectile::SetVelocity ( CVector & vecVelocity )
     m_pProjectile->SetMoveSpeed ( &vecVelocity );
 }
 
+unsigned short CClientProjectile::GetModel ( void )
+{
+    return m_pProjectile->GetModelIndex ();
+}
 
 void CClientProjectile::SetModel ( unsigned short usModel )
 {

@@ -53,10 +53,15 @@ CClientPlayer::CClientPlayer ( CClientManager* pManager, ElementID ID, bool bIsL
         {
             pManager->GetPlayerManager ()->SetLocalPlayer ( this );
         }
-        #ifdef VOICE_DEBUG_LOCAL_PLAYBACK
-        if ( g_pClientGame->GetVoiceRecorder()->IsEnabled() )
-            m_voice = new CClientPlayerVoice ( this, g_pClientGame->GetVoiceRecorder() );
-        #endif
+
+        CClientPlayer * pLocalPlayer = this;
+        // Enable voice playback for local player
+        if ( pLocalPlayer->GetVoice() == NULL )
+        {
+            //If voice is enabled
+            CClientPlayerVoice * pVoice = new CClientPlayerVoice ( this, g_pClientGame->GetVoiceRecorder() );
+            pLocalPlayer->SetPlayerVoice ( pVoice );
+        }
     }
     else
     {

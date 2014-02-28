@@ -10,7 +10,7 @@
 *****************************************************************************/
 
 typedef uint SDbConnectionId;
-typedef uint SDbJobId;
+typedef intptr_t SDbJobId;
 typedef SDbConnectionId SConnectionHandle;
 #define INVALID_DB_HANDLE (0)
 
@@ -111,6 +111,7 @@ public:
         bool                bErrorSuppressed;
         SConnectionHandle   connectionHandle;
         uint                uiNumAffectedRows;
+        uint64              ullLastInsertId;
         CRegistryResult     registryResult;
         CTickCount          timeReady;
         bool                bLoggedWarning;

@@ -28,21 +28,53 @@ CClientTXD::~CClientTXD ( void )
     {
         Restream ( m_ReplacementTextures.usedInModelIds[i] );
     }
+
+    // Remove us from all the clothes replacement doo dah
+    g_pGame->GetRenderWare ()->ClothesRemoveReplacementTxd( m_FileData.GetData() );
 }
 
 
 bool CClientTXD::LoadTXD ( const char* szFile, bool bFilteringEnabled )
 {
-    return g_pGame->GetRenderWare ()->ModelInfoTXDLoadTextures ( &m_ReplacementTextures, szFile, bFilteringEnabled );
+    // Do load here to check for errors.
+    m_strFilename = szFile;
+    m_bFilteringEnabled = bFilteringEnabled;
+    return g_pGame->GetRenderWare ()->ModelInfoTXDLoadTextures ( &m_ReplacementTextures, m_strFilename, m_bFilteringEnabled );
 }
 
 bool CClientTXD::Import ( unsigned short usModelID )
 {
-    // Have we got textures and haven't already imported into this model?
-    if ( g_pGame->GetRenderWare ()->ModelInfoTXDAddTextures ( &m_ReplacementTextures, usModelID ) )
+    if ( usModelID >= CLOTHES_TEX_ID_FIRST && usModelID <= CLOTHES_TEX_ID_LAST )
     {
-        Restream ( usModelID );
+        // If using for clothes only, unload 'replacing model textures' stuff to save memory
+        if ( !m_ReplacementTextures.textures.empty() && m_ReplacementTextures.usedInModelIds.empty() )
+        {
+            g_pGame->GetRenderWare ()->ModelInfoTXDRemoveTextures ( &m_ReplacementTextures );
+            m_ReplacementTextures = SReplacementTextures();
+        }
+        // Load txd file data if not already done
+        if ( m_FileData.IsEmpty() )
+        {
+            if ( !g_pCore->GetNetwork ()->CheckFile ( "txd", m_strFilename ) )
+                return false;
+            m_FileData.LoadFromFile( m_strFilename );
+        }
+        g_pGame->GetRenderWare ()->ClothesAddReplacementTxd( m_FileData.GetData(), usModelID - CLOTHES_MODEL_ID_FIRST );
         return true;
+    }
+    else
+    {
+        // Ensure loaded for replacing model textures
+        g_pGame->GetRenderWare ()->ModelInfoTXDLoadTextures ( &m_ReplacementTextures, m_strFilename, m_bFilteringEnabled );
+        if ( m_ReplacementTextures.textures.empty () )
+            return false;
+
+        // Have we got textures and haven't already imported into this model?
+        if ( g_pGame->GetRenderWare ()->ModelInfoTXDAddTextures ( &m_ReplacementTextures, usModelID ) )
+        {
+            Restream ( usModelID );
+            return true;
+        }
     }
 
     return false;
@@ -53,7 +85,8 @@ bool CClientTXD::IsImportableModel ( unsigned short usModelID )
     // Currently we work on vehicles and objects
     return CClientObjectManager::IsValidModel ( usModelID ) ||
            CClientVehicleManager::IsValidModel ( usModelID ) ||
-           CClientPlayerManager::IsValidModel( usModelID );
+           CClientPlayerManager::IsValidModel( usModelID ) ||
+            ( usModelID >= CLOTHES_TEX_ID_FIRST && usModelID <= CLOTHES_TEX_ID_LAST );
 }
 
 void CClientTXD::Restream ( unsigned short usModelID )

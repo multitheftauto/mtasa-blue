@@ -132,6 +132,13 @@ void CFileTextureItem::CreateUnderlyingData ( const SString& strFilename, bool b
     else
     {
         // It's none of the above!
+
+        // If size not specified, try to use exact image size to prevent blurring
+        if ( uiSizeX == D3DX_DEFAULT )
+            uiSizeX = D3DX_DEFAULT_NONPOW2;
+        if ( uiSizeY == D3DX_DEFAULT )
+            uiSizeY = D3DX_DEFAULT_NONPOW2;
+
         if ( FAILED( D3DXCreateTextureFromFileEx ( m_pDevice, strFilename, uiSizeX, uiSizeY, iMipMaps, 0, D3DFormat, D3DPOOL_MANAGED, D3DX_DEFAULT, D3DX_DEFAULT, 0, NULL, NULL, (IDirect3DTexture9**)&m_pD3DTexture ) ) )
             return;
 

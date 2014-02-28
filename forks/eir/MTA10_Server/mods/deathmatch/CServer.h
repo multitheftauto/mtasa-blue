@@ -31,7 +31,8 @@ public:
     void                HandleInput         ( char* szCommand );
 
     bool                IsFinished          ( void );
-    bool                PendingWorkToDo     ( int& iSleepMs );
+    bool                PendingWorkToDo     ( void );
+    bool                GetSleepIntervals   ( int& iSleepBusyMs, int& iSleepIdleMs );
 
 private:
     CServerInterface*   m_pServerInterface;

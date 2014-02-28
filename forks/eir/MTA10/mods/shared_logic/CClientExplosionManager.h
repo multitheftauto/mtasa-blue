@@ -31,7 +31,7 @@ public:
     CExplosion *            Create                          ( eExplosionType explosionType, CVector & vecPosition, CClientEntity * pCreator = NULL, bool bMakeSound = true, float fCamShake = -1.0f, bool bNoDamage = false, eWeaponType responsibleWeapon = WEAPONTYPE_UNARMED );
 
     eWeaponType             m_LastWeaponType;
-    CClientEntity *         m_pLastCreator;
+    CClientEntityPtr        m_pLastCreator;
 
 private:
     CClientManager *        m_pManager;

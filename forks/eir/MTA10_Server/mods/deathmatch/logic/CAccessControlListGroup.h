@@ -17,7 +17,6 @@ class CAccessControlListGroup;
 #define __CACCESSCONTROLLISTGROUP_H
 
 #include "../Config.h"
-#include "Utils.h"
 #include <xml/CXMLNode.h>
 #include <list>
 
@@ -91,7 +90,7 @@ private:
     typedef std::list < class CAccessControlListGroupObject* >
                                                     ObjectList;
 
-    typedef google::dense_hash_map < unsigned int, class CAccessControlListGroupObject* >
+    typedef CFastHashMap < unsigned int, class CAccessControlListGroupObject* >
                                                     ObjectMap;
 
     SString                                         m_strGroupName;

@@ -33,10 +33,10 @@ public:
     virtual unsigned int        GetSelectionEnd         ( void ) = 0;
     virtual unsigned int        GetSelectionLength      ( void ) = 0;
 
-    virtual void                SetCaratIndex           ( unsigned int uiIndex ) = 0;
-    virtual void                SetCaratAtStart         ( void ) = 0;
-    virtual void                SetCaratAtEnd           ( void ) = 0;
-    virtual unsigned int        GetCaratIndex           ( void ) = 0;
+    virtual void                SetCaretIndex           ( unsigned int uiIndex ) = 0;
+    virtual void                SetCaretAtStart         ( void ) = 0;
+    virtual void                SetCaretAtEnd           ( void ) = 0;
+    virtual unsigned int        GetCaretIndex           ( void ) = 0;
 
     virtual void                SetTextAcceptedHandler  ( GUI_CALLBACK Callback ) = 0;
     virtual void                SetTextChangedHandler   ( GUI_CALLBACK Callback ) = 0;

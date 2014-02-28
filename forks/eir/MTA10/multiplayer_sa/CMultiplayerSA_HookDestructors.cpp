@@ -14,10 +14,11 @@
 
 namespace
 {
-    GameObjectDestructHandler*  pGameObjectDestructHandler  = NULL;
-    GameVehicleDestructHandler* pGameVehicleDestructHandler = NULL;
-    GamePlayerDestructHandler*  pGamePlayerDestructHandler  = NULL;
-    GameModelRemoveHandler*     pGameModelRemoveHandler     = NULL;
+    GameObjectDestructHandler*      pGameObjectDestructHandler      = NULL;
+    GameVehicleDestructHandler*     pGameVehicleDestructHandler     = NULL;
+    GamePlayerDestructHandler*      pGamePlayerDestructHandler      = NULL;
+    GameProjectileDestructHandler*  pGameProjectileDestructHandler  = NULL;
+    GameModelRemoveHandler*         pGameModelRemoveHandler         = NULL;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -113,6 +114,66 @@ void _declspec(naked) HOOK_CPlayerPedDestructor()
     }
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////
+//
+void _cdecl OnCProjectileDestructor ( DWORD calledFrom, CEntitySAInterface* pProjectile )
+{
+    // Tell client to check for things going away
+    if ( pGameProjectileDestructHandler )
+        pGameProjectileDestructHandler ( pProjectile );
+}
+
+// Hook info
+#define HOOKPOS_CProjectileDestructor        0x5A40E0
+#define HOOKSIZE_CProjectileDestructor       6
+DWORD RETURN_CProjectileDestructor =         0x5A40E6;
+void _declspec(naked) HOOK_CProjectileDestructor()
+{
+    _asm
+    {
+        pushad
+        push    ecx
+        push    [esp+32+4*1]
+        call    OnCProjectileDestructor
+        add     esp, 4*2
+        popad
+
+        mov     dword ptr [ecx], 867030h
+        jmp     RETURN_CProjectileDestructor
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////
+//
+void _cdecl OnCStreamingRemoveModel ( DWORD calledFrom, ushort usModelId )
+{
+    // Tell client to check for things going away
+    if ( pGameModelRemoveHandler )
+        pGameModelRemoveHandler ( usModelId );
+}
+
+// Hook info
+#define HOOKPOS_CStreamingRemoveModel        0x4089A0
+#define HOOKSIZE_CStreamingRemoveModel       5
+DWORD RETURN_CStreamingRemoveModel =         0x4089A5;
+void _declspec(naked) HOOK_CStreamingRemoveModel()
+{
+    _asm
+    {
+        pushad
+        push    [esp+32+4*1]
+        push    [esp+32+4*1]
+        call    OnCStreamingRemoveModel
+        add     esp, 4*2
+        popad
+
+        push    esi
+        mov     esi, [esp+8]
+        jmp     RETURN_CStreamingRemoveModel
+    }
+}
+
+
 //////////////////////////////////////////////////////////////////////////////////////////
 //
 // Set handlers
@@ -133,6 +194,10 @@ void CMultiplayerSA::SetGamePlayerDestructHandler ( GamePlayerDestructHandler * 
     pGamePlayerDestructHandler = pHandler;
 }
 
+void CMultiplayerSA::SetGameProjectileDestructHandler ( GameProjectileDestructHandler * pHandler )
+{
+    pGameProjectileDestructHandler = pHandler;
+}
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -143,5 +208,6 @@ void CMultiplayerSA::InitHooks_HookDestructors ( void )
 {
    EZHookInstall ( CObjectDestructor );
    EZHookInstall ( CVehicleDestructor );
+   EZHookInstall ( CProjectileDestructor );
    EZHookInstall ( CPlayerPedDestructor );
 }

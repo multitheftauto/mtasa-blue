@@ -1041,7 +1041,7 @@ static bool RwAtomicRegisterDefaultVehicle( RpAtomic *child, int )
 =========================================================*/
 void CVehicleModelInfoSAInterface::RegisterRenderCallbacks( void )
 {
-    switch( m_vehicleType )
+    switch( GetVehicleType() )
     {
     case VEHICLE_TRAIN:
         GetRwObject()->ForAllAtomics( RwAtomicRegisterTrain, 0 );
@@ -1083,10 +1083,10 @@ void CVehicleModelInfoSAInterface::SetRenderColor( unsigned char color1, unsigne
     _vehColor4 = color4;
 
     // Also store it in the vehicle model info
-    m_color1 = color1;
-    m_color2 = color2;
-    m_color3 = color3;
-    m_color4 = color4;
+    this->color1 = color1;
+    this->color2 = color2;
+    this->color3 = color3;
+    this->color4 = color4;
 }
 
 /*=========================================================

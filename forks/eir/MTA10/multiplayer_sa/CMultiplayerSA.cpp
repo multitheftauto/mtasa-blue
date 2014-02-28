@@ -315,6 +315,7 @@ PostWeaponFireHandler* m_pPostWeaponFireHandler = NULL;
 BulletImpactHandler* m_pBulletImpactHandler = NULL;
 BulletFireHandler* m_pBulletFireHandler = NULL;
 DamageHandler* m_pDamageHandler = NULL;
+DeathHandler* m_pDeathHandler = NULL;
 FireHandler* m_pFireHandler = NULL;
 ProjectileHandler* m_pProjectileHandler = NULL;
 ProjectileStopHandler* m_pProjectileStopHandler = NULL;
@@ -472,8 +473,7 @@ void HOOK_CObject_ProcessCollision ();
 CMultiplayerSA::CMultiplayerSA()
 {
     // Unprotect all of the GTASA code at once and leave it that way
-    DWORD oldProt;
-    VirtualProtect((LPVOID)0x401000, 0x4A3000, PAGE_EXECUTE_READWRITE, &oldProt);
+    SetInitialVirtualProtect();
 
     // Initialize the offsets
     eGameVersion version = pGameInterface->GetGameVersion ();
@@ -975,6 +975,9 @@ void CMultiplayerSA::InitHooks()
     
     // Prevent TRAINS spawning with PEDs
     MemPut < BYTE > ( 0x6F7865, 0xEB );
+    MemPut < BYTE > ( 0x6F8E7B, 0xE9 );
+    MemPut < DWORD > ( 0x6F8E7C, 0x109 ); // jmp to 0x6F8F89
+    MemPut < BYTE > ( 0x6F8E80, 0x90 );
 
     // DISABLE PLANES
     MemPut < BYTE > ( 0x6CD2F0, 0xC3 );
@@ -1347,6 +1350,10 @@ void CMultiplayerSA::InitHooks()
 
     // Init our 1.3 hooks.
     Init_13 ();
+    //InitHooks_LicensePlate (); MOVED TO CGameSA
+    InitHooks_Direct3D();
+    InitHooks_FixLineOfSightArgs();
+    InitHooks_VehicleDamage();
 }
 
 
@@ -1364,7 +1371,7 @@ void RemoveFxSystemPointer ( DWORD* pPointer )
 {
     // Look through our list for the pointer
     std::list < DWORD* > ::iterator iter = Pointers_FxSystem.begin ();
-    for ( ; iter != Pointers_FxSystem.end (); iter++ )
+    for ( ; iter != Pointers_FxSystem.end (); ++iter )
     {
         // It exists in our list?
         if ( *iter == pPointer )
@@ -1978,6 +1985,11 @@ void CMultiplayerSA::SetDamageHandler ( DamageHandler * pDamageHandler )
     m_pDamageHandler = pDamageHandler;
 }
 
+void CMultiplayerSA::SetDeathHandler ( DeathHandler * pDeathHandler )
+{
+    m_pDeathHandler = pDeathHandler;
+}
+
 void CMultiplayerSA::SetFireHandler ( FireHandler * pFireHandler )
 {
     m_pFireHandler = pFireHandler;
@@ -2037,6 +2049,7 @@ void CMultiplayerSA::SetVehicleCollisionHandler ( VehicleCollisionHandler * pHan
 {
     m_pVehicleCollisionHandler = pHandler;
 }
+
 
 void CMultiplayerSA::SetHeliKillHandler ( HeliKillHandler * pHandler )
 {
@@ -3075,7 +3088,7 @@ train_would_derail:
 static DWORD dwAlphaEntity = 0;
 static bool bEntityHasAlpha = false;
 static unsigned char ucCurrentAlpha [ 1024 ];
-static unsigned char* pCurAlpha = ucCurrentAlpha;
+static uint uiAlphaIdx = 0;
 
 static void SetEntityAlphaHooked ( DWORD dwEntity, DWORD dwCallback, DWORD dwAlpha )
 {
@@ -3105,8 +3118,8 @@ static void SetEntityAlphaHooked ( DWORD dwEntity, DWORD dwCallback, DWORD dwAlp
 
 static RpMaterial* HOOK_GetAlphaValues ( RpMaterial* pMaterial, unsigned char ucAlpha )
 {
-    *pCurAlpha = pMaterial->color.a;
-    pCurAlpha++;
+    ucCurrentAlpha[ uiAlphaIdx ] = pMaterial->color.a;
+    uiAlphaIdx = Min( uiAlphaIdx + 1, NUMELMS( ucCurrentAlpha ) - 1 );
 
     return pMaterial;
 }
@@ -3118,8 +3131,8 @@ static RpMaterial* HOOK_SetAlphaValues ( RpMaterial* pMaterial, unsigned char uc
 }
 static RpMaterial* HOOK_RestoreAlphaValues ( RpMaterial* pMaterial, unsigned char ucAlpha )
 {
-    pMaterial->color.a = *pCurAlpha;
-    pCurAlpha++;
+    pMaterial->color.a = ucCurrentAlpha[ uiAlphaIdx ];
+    uiAlphaIdx = Min( uiAlphaIdx + 1, NUMELMS( ucCurrentAlpha ) - 1 );
 
     return pMaterial;
 }
@@ -3129,7 +3142,7 @@ static void GetAlphaAndSetNewValues ( unsigned char ucAlpha )
     if ( ucAlpha < 255 )
     {
         bEntityHasAlpha = true;
-        pCurAlpha = ucCurrentAlpha;
+        uiAlphaIdx = 0;
         SetEntityAlphaHooked ( dwAlphaEntity, (DWORD)HOOK_GetAlphaValues, 0 );
         SetEntityAlphaHooked ( dwAlphaEntity, (DWORD)HOOK_SetAlphaValues, ucAlpha );
     }
@@ -3140,7 +3153,7 @@ static void RestoreAlphaValues ()
 {
     if ( bEntityHasAlpha )
     {
-        pCurAlpha = ucCurrentAlpha;
+        uiAlphaIdx = 0;
         SetEntityAlphaHooked ( dwAlphaEntity, (DWORD)HOOK_RestoreAlphaValues, 0 );
     }
 }
@@ -3183,7 +3196,7 @@ static void SetVehicleAlpha ( )
     else if ( dwEAEG && pInterface->m_pVehicle->GetModelIndex() == 0x20A )
     {
         bEntityHasAlpha = true;
-        pCurAlpha = ucCurrentAlpha;
+        uiAlphaIdx = 0;
         SetEntityAlphaHooked ( dwAlphaEntity, (DWORD)HOOK_GetAlphaValues, 0 );
         MemPutFast < DWORD > ( 0x5332D6, (DWORD)CVehicle_EAEG );
         SetEntityAlphaHooked ( dwAlphaEntity, (DWORD)HOOK_SetAlphaValues, 0 );
@@ -3556,6 +3569,7 @@ void CMultiplayerSA::Reset ( void )
     m_pDrawRadarAreasHandler = NULL;
     DisableAllVehicleWeapons ( false );
     m_pDamageHandler = NULL;
+    m_pDeathHandler = NULL;
     m_pFireHandler = NULL;
     m_pRender3DStuffHandler = NULL;
 }
@@ -5223,31 +5237,55 @@ void _declspec(naked) HOOK_CPhysical_ProcessCollisionSectorList ()
     }
 }
 
-
-// If matrix looks bad, fix it
+// Ped animation matrix array gets corrupted sometimes by unknown thing
+// Hack fix for now is to validate each matrix before it is used
 void _cdecl CheckMatrix ( float* pMatrix )
 {
-    if ( abs ( pMatrix[0] ) < 1.1f )
-        return;
+    // Peek at IEEE 754 float data to quickly check if any element is outside range of -2 to 2 or is NaN
+    int* p = (int*)pMatrix;
+    int RotBits = p[0] | p[1] | p[2]
+                | p[4] | p[5] | p[6]
+                | p[8] | p[9] | p[10];
 
-    float scale = 0.0f;
+    int PosBits = p[12] | p[13] | p[14];
 
-    pMatrix[0] = scale;
-    pMatrix[1] = 0;
-    pMatrix[2] = 0;
+    // If rotational part is outside -2 to 2 range, then flag fix
+    bool bFix = ( RotBits & 0x40000000 ) != 0;
+  
+    // If positional part is outside -2 to 2 range, then do further check for -10 to 10 range
+    if ( PosBits & 0x40000000 )
+    {
+        for ( uint i = 12 ; i < 15 ; i++ )
+        {
+            float f = pMatrix[i];
+            if ( f < -10 || f > 10 || _isnan( f ) )
+                bFix = true;
+        }
+    }
 
-    pMatrix[4] = 0;
-    pMatrix[5] = scale;
-    pMatrix[6] = 0;
+    // Fix if required
+    if ( bFix )
+    {
+        float scale = 0.0f;
 
-    pMatrix[7] = 0;
-    pMatrix[8] = 0;
-    pMatrix[10] = scale;
+        pMatrix[0] = scale;
+        pMatrix[1] = 0;
+        pMatrix[2] = 0;
 
-    pMatrix[12] = 0;
-    pMatrix[13] = 0;
-    pMatrix[14] = 1;
+        pMatrix[4] = 0;
+        pMatrix[5] = scale;
+        pMatrix[6] = 0;
+
+        pMatrix[7] = 0;
+        pMatrix[8] = 0;
+        pMatrix[10] = scale;
+
+        pMatrix[12] = 0;
+        pMatrix[13] = 0;
+        pMatrix[14] = 1;
+    }
 }
+
 
 // hooked at 7C5A5C/7C5A9C 5 bytes
 void _declspec(naked) HOOK_CheckAnimMatrix ()
@@ -5335,8 +5373,11 @@ bool CheckHasSuspensionChanged ( void )
     {
         // Check our suspension interface has a valid vehicle and return the suspension changed marker
         CVehicle* pVehicle = pSuspensionInterface->m_pVehicle;
+        if ( !pVehicle )
+            return false;
+
         CModelInfo* pModelInfo = pGameInterface->GetModelInfo ( pVehicle->GetModelIndex () );
-        if ( pVehicle && pModelInfo && ( pModelInfo->IsCar() || pModelInfo->IsMonsterTruck() ) )
+        if ( pModelInfo && ( pModelInfo->IsCar() || pModelInfo->IsMonsterTruck() ) )
             return pVehicle->GetHandlingData()->HasSuspensionChanged ( );
         else
             return false;
@@ -5807,8 +5848,9 @@ IsOnScreen_IsObject:
     }
 }
 CVehicleSAInterface * pCollisionVehicle = NULL;
-void TriggerVehicleDamageEvent ( )
+void TriggerVehicleCollisionEvent ( )
 {
+
     if ( pCollisionVehicle )
     {
         CEntitySAInterface * pEntity = pCollisionVehicle->m_pCollidedEntity;
@@ -5819,7 +5861,7 @@ void TriggerVehicleDamageEvent ( )
             {
                 if ( m_pVehicleCollisionHandler )
                 {
-                    TIMING_CHECKPOINT( "+TriggerVehDamEvent" );
+                    TIMING_CHECKPOINT( "+TriggerVehColEvent" );
                     if ( pEntity->nType == ENTITY_TYPE_VEHICLE )
                     {
                         CVehicleSAInterface * pInterface = static_cast < CVehicleSAInterface* > ( pEntity );
@@ -5827,10 +5869,12 @@ void TriggerVehicleDamageEvent ( )
                     }
                     else
                     {
-                        m_pVehicleCollisionHandler ( pCollisionVehicle, pEntity, pEntity->m_nModelIndex, pCollisionVehicle->m_fDamageImpulseMagnitude, 0.0f, pCollisionVehicle->m_usPieceType, pCollisionVehicle->m_vecCollisionPosition, pCollisionVehicle->m_vecCollisionImpactVelocity );
+                        m_pVehicleCollisionHandler ( pCollisionVehicle, pEntity, pEntity->m_nModelIndex, pCollisionVehicle->m_fDamageImpulseMagnitude, 0.0f,                                  pCollisionVehicle->m_usPieceType, pCollisionVehicle->m_vecCollisionPosition, pCollisionVehicle->m_vecCollisionImpactVelocity );
                     }
-                    TIMING_CHECKPOINT( "-TriggerVehDamEvent" );
+                    TIMING_CHECKPOINT( "-TriggerVehColEvent" );
                 }
+
+
             }
         }
     }
@@ -5848,7 +5892,7 @@ void _declspec(naked) HOOK_CEventVehicleDamageCollision ( )
         pushad
         mov pCollisionVehicle, ecx
     }
-    TriggerVehicleDamageEvent ( );
+    TriggerVehicleCollisionEvent ( );
     
     // do the replaced code and return back as if nothing happened.
     _asm
@@ -5872,7 +5916,7 @@ void _declspec(naked) HOOK_CEventVehicleDamageCollision_Plane ( )
         pushad
         mov pCollisionVehicle, ecx
     }
-    TriggerVehicleDamageEvent ( );
+    TriggerVehicleCollisionEvent ( );
 
     // do the replaced code and return back as if nothing happened.
     _asm
@@ -5895,7 +5939,7 @@ void _declspec(naked) HOOK_CEventVehicleDamageCollision_Bike ( )
         pushad
         mov pCollisionVehicle, ecx
     }
-    TriggerVehicleDamageEvent ( );
+    TriggerVehicleCollisionEvent ( );
 
     // do the replaced code and return back as if nothing happened.
     _asm
@@ -5949,21 +5993,21 @@ void CMultiplayerSA::SetAutomaticVehicleStartupOnPedEnter ( bool bSet )
         MemCpyFast ( &originalCode[0], (const void *)0x64BC0D, 6 );
 
     if ( bSet )
-        MemCpyFast ( (char *)0x64BC0D, originalCode, 6 );
+        MemCpy ( (char *)0x64BC0D, originalCode, 6 );
     else
-        MemSetFast ( (char *)0x64BC0D, 0x90, 6 );
+        MemSet ( (char *)0x64BC0D, 0x90, 6 );
 }
 
 // Storage
 CVehicleSAInterface * pHeliKiller = NULL;
-CPedSAInterface * pPedKilledByHeli = NULL;
+CEntitySAInterface * pHitByHeli = NULL;
 bool CallHeliKillEvent ( )
 {
     // Is our handler alive
     if ( m_pHeliKillHandler )
     {
         // Return our handlers return
-        return m_pHeliKillHandler ( pHeliKiller, pPedKilledByHeli );
+        return m_pHeliKillHandler ( pHeliKiller, pHitByHeli );
     }
     // Return true else
     return true;
@@ -5983,7 +6027,7 @@ void _declspec(naked) HOOK_CHeli_ProcessHeliKill ( )
         pushfd
         pushad
         mov pHeliKiller, esi
-        mov pPedKilledByHeli, edi
+        mov pHitByHeli, edi
     }
     // Call our event
     if ( CallHeliKillEvent ( ) == false )

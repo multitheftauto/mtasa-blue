@@ -197,7 +197,10 @@ utf8_mbstowcs (const std::string & str)
     if ( length < SMALL_STRING_LIMIT )
     {
         // Faster but limited size
-        static wchar_t buffer[SMALL_STRING_LIMIT];
+        uint cCharacters = length + 1;
+        uint cBytes = ( cCharacters ) * sizeof( wchar_t );
+
+        wchar_t* buffer = (wchar_t*)alloca ( cBytes );
         wchar_t* ptr = buffer;
         wchar_t wc;
         unsigned int sn = 0;
@@ -210,7 +213,7 @@ utf8_mbstowcs (const std::string & str)
             sn += un;
         }
         unsigned int usedsize = ptr - buffer;
-        dassert ( usedsize <= SMALL_STRING_LIMIT );
+        dassert ( usedsize < cCharacters );
         return std::wstring( buffer, usedsize );
     }
     else
@@ -241,14 +244,15 @@ utf8_wcstombs (const std::wstring & wstr)
     if ( size < SMALL_STRING_LIMIT )
     {
         // Faster but limited size
-        static char buffer[SMALL_STRING_LIMIT * 6];
+        uint cBytes = ( size + 1 ) * 6;
+        char* buffer = (char*)alloca ( cBytes );
         char* ptr = buffer;
         for (unsigned int i = 0; i<size ; ++i)
         {
             ptr += utf8_wctomb ((unsigned char*)ptr, wstr [i], 6 );
         }
         unsigned int usedsize = ptr - buffer;
-        dassert ( usedsize <= SMALL_STRING_LIMIT * 6 );
+        dassert ( usedsize < cBytes );
         return std::string( buffer, usedsize );
     }
     else

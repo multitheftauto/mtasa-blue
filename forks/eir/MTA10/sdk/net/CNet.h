@@ -22,9 +22,11 @@ namespace EDownloadMode
     enum EDownloadModeType
     {
         NONE,
+        CORE_ASE_LIST,
         CORE_UPDATER,
         RESOURCE_INITIAL_FILES,
         RESOURCE_SINGULAR_FILES,
+        CALL_REMOTE,
     };
 }
 using EDownloadMode::EDownloadModeType;
@@ -69,6 +71,7 @@ public:
     virtual bool                        IsConnected                 ( void ) = 0;
 
     virtual void                        DoPulse                     ( void ) = 0;
+    virtual void                        Shutdown                    ( void ) = 0;
 
     virtual void                        RegisterPacketHandler       ( PPACKETHANDLER pfnPacketHandler ) = 0;
 
@@ -122,6 +125,8 @@ public:
 
     virtual bool                        ValidateBinaryFileName      ( const char* szFilename ) = 0;
     virtual CBinaryFileInterface*       AllocateBinaryFile          ( void ) = 0;
+    virtual bool                        EncryptDumpfile             ( const char* szClearPathFilename, const char* szEncryptedPathFilename ) = 0;
+    virtual bool                        DecryptScript               ( const char* cpInBuffer, uint uiInSize, const char** pcpOutBuffer, uint* puiOutSize, const char* szScriptName ) = 0;
 };
 
 #endif

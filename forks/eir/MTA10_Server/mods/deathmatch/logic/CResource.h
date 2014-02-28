@@ -212,6 +212,10 @@ private:
     bool                    m_bProtected;
     bool                    m_bStartedManually;
 
+    bool                    m_bOOPEnabledInMetaXml;
+    uint                    m_uiFunctionRightCacheRevision;
+    CFastHashMap < lua_CFunction, bool > m_FunctionRightCacheMap;
+
     bool                    CheckState ( void ); // if the resource has no Dependents, stop it, if it has, start it. returns true if the resource is started.
     bool                    ReadIncludedResources ( class CXMLNode * root );
     bool                    ReadIncludedMaps ( CXMLNode * root );
@@ -346,7 +350,7 @@ public:
     unsigned short          GetNetID ( void ) { return m_usNetID; }
     uint                    GetScriptID ( void ) const { return m_uiScriptID; }
     void                    OnPlayerJoin ( CPlayer& Player );
-    void                    SendProtectedScripts ( CPlayer* player = 0 );
+    void                    SendNoClientCacheScripts ( CPlayer* pPlayer = NULL );
     CDummy*                 GetResourceRootElement ( void ) { return m_pResourceElement; };
     CDummy*                 GetDynamicElementRoot ( void ) { return m_pResourceDynamicElementRoot; };
 
@@ -372,6 +376,9 @@ public:
     bool                HandleAclRequestChange          ( const CAclRightName& strRightName, bool bAccess, const SString& strWho );
     const SString&      GetMinServerReqFromMetaXml      ( void )                                { return m_strMinServerReqFromMetaXml; }
     const SString&      GetMinClientReqFromMetaXml      ( void )                                { return m_strMinClientReqFromMetaXml; }
+    bool                IsOOPEnabledInMetaXml           ( void )                                { return m_bOOPEnabledInMetaXml; }
+    bool                CheckFunctionRightCache         ( lua_CFunction f, bool* pbOutAllowed );
+    void                UpdateFunctionRightCache        ( lua_CFunction f, bool bAllowed );
 
 protected:
     SString             GetAutoGroupName                ( void );

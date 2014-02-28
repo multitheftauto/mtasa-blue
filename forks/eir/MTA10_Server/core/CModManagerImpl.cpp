@@ -169,11 +169,26 @@ bool CModManagerImpl::IsFinished ( void )
     return true;
 }
 
-bool CModManagerImpl::PendingWorkToDo ( int& iSleepMs )
+
+bool CModManagerImpl::PendingWorkToDo ( void )
 {
     if ( m_pBase )
     {
-        return m_pBase->PendingWorkToDo ( iSleepMs );
+        return m_pBase->PendingWorkToDo ();
+    }
+
+    return false;
+}
+
+
+bool CModManagerImpl::GetSleepIntervals( int& iSleepBusyMs, int& iSleepIdleMs )
+{
+    iSleepBusyMs = 20;
+    iSleepIdleMs = 40;
+
+    if ( m_pBase )
+    {
+        return m_pBase->GetSleepIntervals( iSleepBusyMs, iSleepIdleMs );
     }
 
     return false;

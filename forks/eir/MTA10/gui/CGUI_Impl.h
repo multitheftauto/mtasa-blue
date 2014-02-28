@@ -142,6 +142,8 @@ public:
 
     void                            SetCursorEnabled            ( bool bEnabled );
     bool                            IsCursorEnabled             ( void );
+    void                            SetCursorAlpha              ( float fAlpha, bool bOnlyCurrentServer = false );
+    float                           GetCurrentServerCursorAlpha ( void );
 
     void                            AddChild                    ( CGUIElement_Impl* pChild );
     CEGUI::FontManager*             GetFontManager              ( void );
@@ -151,6 +153,7 @@ public:
     CEGUI::SchemeManager*           GetSchemeManager            ( void );
     CEGUI::WindowManager*           GetWindowManager            ( void );
     void                            GetUniqueName               ( char* pBuf );
+    CEGUI::Window*                  GetMasterWindow             ( CEGUI::Window* Window );
 
     CVector2D                       GetResolution               ( void );
     void                            SetResolution               ( float fWidth, float fHeight );
@@ -163,6 +166,9 @@ public:
     CGUIFont*                       GetSAGothicFont             ( void );
     CGUIFont*                       GetSansFont                 ( void );
     bool                            IsFontPresent               ( const char* szFont ) { return m_pFontManager->isFontPresent(szFont); }
+
+    float                           GetTextExtent               ( const char* szText, const char* szFont = "default-normal" );
+    float                           GetMaxTextExtent            ( SString strFont, SString arg, ... );
 
     const SString&                  GetGuiWorkingDirectory         ( void ) const;
     void                            SetDefaultGuiWorkingDirectory  ( const SString& strDir );
@@ -244,6 +250,7 @@ private:
 
     CEGUI::DefaultWindow*           m_pTop;
     const CEGUI::Image*             m_pCursor;
+    float                           m_fCurrentServerCursorAlpha;
 
     CGUIFont_Impl*                  m_pDefaultFont;
     CGUIFont_Impl*                  m_pSmallFont;
@@ -252,6 +259,7 @@ private:
     CGUIFont_Impl*                  m_pSAHeaderFont;
     CGUIFont_Impl*                  m_pSAGothicFont;
     CGUIFont_Impl*                  m_pSansFont;
+    CGUIFont_Impl*                  m_pUniFont;
                 
     std::list < CGUIElement* >      m_RedrawQueue;
 
@@ -282,6 +290,7 @@ private:
 
     bool                            m_HasSchemeLoaded;
     SString                         m_CurrentSchemeName;
+    CElapsedTime                    m_RenderOkTimer;
 };
 
 #endif

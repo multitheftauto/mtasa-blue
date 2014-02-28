@@ -102,20 +102,25 @@ bool CServer::IsFinished ()
     return false;
 }
 
-bool CServer::PendingWorkToDo ( int& iSleepMs )
+bool CServer::PendingWorkToDo ( void )
 {
     if ( m_pGame && g_pNetServer )
     {
         if ( g_pNetServer->GetPendingPacketCount () > 0 )
         {
-            iSleepMs = m_pGame->GetConfig ()->GetPendingWorkToDoSleepTime ();
             return true;
         }
-        else
-        {
-            iSleepMs = m_pGame->GetConfig ()->GetNoWorkToDoSleepTime ();
-            return true;
-        }
+    }
+    return false;
+}
+
+bool CServer::GetSleepIntervals ( int& iSleepBusyMs, int& iSleepIdleMs )
+{
+    if ( m_pGame && g_pNetServer )
+    {
+        iSleepBusyMs = m_pGame->GetConfig ()->GetPendingWorkToDoSleepTime ();
+        iSleepIdleMs = m_pGame->GetConfig ()->GetNoWorkToDoSleepTime ();
+        return true;
     }
     return false;
 }

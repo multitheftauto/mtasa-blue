@@ -197,6 +197,45 @@ public:
 
 
 //
+// CPerfStatRPCPacketUsage
+//
+class CPerfStatRPCPacketUsage : public CPerfStatModule
+{
+public:
+    // CPerfStatModule
+    virtual const SString&      GetCategoryName     ( void ) = 0;
+    virtual void                DoPulse             ( void ) = 0;
+    virtual void                GetStats            ( CPerfStatResult* pOutResult, const std::map < SString, int >& optionMap, const SString& strFilter ) = 0;
+
+    // CPerfStatRPCPacketUsage
+    virtual void                UpdatePacketUsageIn ( uchar ucRpcId, uint uiSize ) = 0;
+    virtual void                UpdatePacketUsageOut( uchar ucRpcId, uint uiSize ) = 0;
+
+    static CPerfStatRPCPacketUsage*  GetSingleton   ( void );
+};
+
+
+//
+// CPerfStatEventPacketUsage
+//
+class CPerfStatEventPacketUsage : public CPerfStatModule
+{
+public:
+    // CPerfStatModule
+    virtual const SString&      GetCategoryName     ( void ) = 0;
+    virtual void                DoPulse             ( void ) = 0;
+    virtual void                GetStats            ( CPerfStatResult* pOutResult, const std::map < SString, int >& optionMap, const SString& strFilter ) = 0;
+
+    // CPerfStatRPCPacketUsage
+    virtual void                UpdateElementDataUsageOut       ( const char* szName, uint uiNumPlayers, uint uiSize ) = 0;
+    virtual void                UpdateElementDataUsageRelayed   ( const char* szName, uint uiNumPlayers, uint uiSize ) = 0;
+    virtual void                UpdateEventUsageOut             ( const char* szName, uint uiNumPlayers ) = 0;
+
+    static CPerfStatEventPacketUsage*  GetSingleton   ( void );
+};
+
+
+//
 // CPerfStatBandwidthUsage
 //
 class CPerfStatBandwidthUsage : public CPerfStatModule
@@ -298,6 +337,7 @@ public:
     virtual void                UpdateTiming        ( const SString& strResourceName, const char* szFunctionName, TIMEUS timeUs, uint uiDeltaBytes ) = 0;
 
     static CPerfStatFunctionTiming*  GetSingleton        ( void );
+    static TIMEUS               ms_PeakUsThresh;
 };
 
 

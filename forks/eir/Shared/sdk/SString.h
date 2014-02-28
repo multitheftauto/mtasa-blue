@@ -142,7 +142,7 @@ struct SCharStringRef
 {
     SCharStringRef ( void ) : pData ( NULL ),  uiSize ( 0 ) {}
     char* pData;
-    uint uiSize;
+    size_t uiSize;
 };
 
 

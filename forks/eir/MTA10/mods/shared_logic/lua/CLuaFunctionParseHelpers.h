@@ -36,6 +36,8 @@ DECLARE_ENUM( eWeaponState );
 DECLARE_ENUM( eWeaponFlags );
 DECLARE_ENUM( eVehicleComponent );
 DECLARE_ENUM( eFontType );
+DECLARE_ENUM( eAudioLookupIndex );
+DECLARE_ENUM( eAspectRatio );
 
 enum eDXHorizontalAlign
 {
@@ -124,6 +126,8 @@ inline SString GetClassTypeName ( CResource* )              { return "resource-d
 inline SString GetClassTypeName ( CXMLNode* )               { return "xml-node"; }
 inline SString GetClassTypeName ( CLuaTimer* )              { return "lua-timer"; }
 inline SString GetClassTypeName ( CEntity* )                { return "entity"; }
+inline SString GetClassTypeName ( CLuaVector3D* )           { return "vector3"; }
+inline SString GetClassTypeName ( CLuaMatrix* )             { return "matrix"; }
 
 
 //
@@ -163,6 +167,26 @@ CLuaTimer* UserDataCast ( CLuaTimer*, void* ptr, lua_State* luaVM )
 
 
 //
+// CLuaVector3D from userdata
+//
+template < class T >
+CLuaVector3D* UserDataCast ( CLuaVector3D*, void* ptr, lua_State* luaVM )
+{
+    return CLuaVector3D::GetFromScriptID ( reinterpret_cast < unsigned int > ( ptr ) );
+}
+
+
+//
+// CLuaMatrix from userdata
+//
+template < class T >
+CLuaMatrix* UserDataCast ( CLuaMatrix*, void* ptr, lua_State* luaVM )
+{
+    return CLuaMatrix::GetFromScriptID ( reinterpret_cast < unsigned int > ( ptr ) );
+}
+
+
+//
 // CClientEntity from userdata
 //
 template < class T >
@@ -190,36 +214,6 @@ bool CheckWrappedUserDataType ( CClientGUIElement*& pGuiElement, SString& strErr
 }
 
 
-//
-// CEntity from userdata
-//
-template < class T >
-CEntity* UserDataCast ( CEntity*, void* ptr, lua_State* )
-{
-    // Get the client element
-    CClientEntity* pClientElement = UserDataCast < CClientEntity > ( (CClientEntity*)NULL, ptr, NULL );
-
-    // Get its game entity
-    CEntity* pEntity = NULL;
-    if ( pClientElement )
-    {
-        switch ( pClientElement->GetType () )
-        {
-            case CCLIENTPED:
-            case CCLIENTPLAYER:
-                pEntity = static_cast < CClientPed* > ( pClientElement )->GetGamePlayer ();
-                break;
-            case CCLIENTVEHICLE:
-                pEntity = static_cast < CClientVehicle* > ( pClientElement )->GetGameVehicle ();
-                break;
-            case CCLIENTOBJECT:
-                pEntity = static_cast < CClientObject* > ( pClientElement )->GetGameObject ();
-                break;
-        }
-    }
-    return pEntity;
-}
-
 SString GetUserDataClassName ( void* ptr, lua_State* luaVM );
 
 
@@ -232,3 +226,4 @@ void MixedReadGuiFontString ( CScriptArgReader& argStream, SString& strFontName,
 void MixedReadMaterialString ( CScriptArgReader& argStream, CClientMaterial*& pMaterialElement );
 bool ReadMatrix ( lua_State* luaVM, uint uiArgIndex, CMatrix& outMatrix );
 void MinClientReqCheck ( CScriptArgReader& argStream, const char* szVersionReq, const char* szReason );
+void ReadPregFlags( CScriptArgReader& argStream, pcrecpp::RE_Options& pOptions );

@@ -4,7 +4,6 @@
 *  LICENSE:     See LICENSE in the top level directory
 *  FILE:        Shared/core/CFileSystemInterface.h
 *  PURPOSE:     File management
-*  DEVELOPERS:  Martin Turski <quiret@gmx.de>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -12,6 +11,18 @@
 
 #ifndef _CFileSystemInterface_
 #define _CFileSystemInterface_
+
+// Compiler compatibility
+#ifndef _MSC_VER
+#define abstract
+#endif //_MSC:VER
+
+#ifdef __linux__
+#include <sys/stat.h>
+
+#define _strdup strdup
+#define _vsnprintf vsnprintf
+#endif //__linux__
 
 typedef std::vector <filePath> dirTree;
 
@@ -21,12 +32,13 @@ enum eFileException
 };
 
 /*===================================================
-    CFile
+    CFile (stream class)
 
     This is a the access interface to files/streams. You can read,
     write to and obtain information from this. Once destroyed, the
     connection is unlinked. During class life-time, the file is locked
-    for deletion. Other locks depend on the nature of the stream.
+    for deletion. Locks depend on the nature of the stream and of
+    the OS/environment.
 ===================================================*/
 class CFile abstract
 {
@@ -77,7 +89,7 @@ public:
         Purpose:
             Returns the absolute file/stream location.
     ===================================================*/
-    virtual	long            Tell() const = 0;
+    virtual	long            Tell( void ) const = 0;
 
     /*===================================================
         CFile::IsEOF
@@ -169,57 +181,25 @@ public:
     virtual bool            IsWriteable( void ) const = 0;
 
     // Utility definitions, mostly self-explanatory
-    virtual	int             ReadInt( void )
-    {
-        int i;
+    virtual	bool            ReadInt( int& out_i )               { return ReadStruct( out_i ); }
+    virtual bool            ReadUInt( unsigned int& out_ui )    { return ReadStruct( out_ui ); }
+    virtual	bool            ReadShort( short& out_s )           { return ReadStruct( out_s ); }
+    virtual bool            ReadUShort( unsigned short& out_us ){ return ReadStruct( out_us ); }
+    virtual	bool            ReadByte( char& out_b )             { return ReadStruct( out_b ); }
+    virtual bool            ReadByte( unsigned char& out_b )    { return ReadStruct( out_b ); }
+    virtual	bool            ReadFloat( float& out_f )           { return ReadStruct( out_f ); }
+    virtual bool            ReadDouble( double& out_d )         { return ReadStruct( out_d ); }
+    virtual bool            ReadBool( bool& out_b )             { return ReadStruct( out_b ); }
 
-        Read( &i, sizeof(int), 1 );
-        return i;
-    }
-
-    virtual	short           ReadShort( void )
-    {
-        short i;
-
-        Read( &i, sizeof(short), 1 );
-        return i;
-    }
-
-    virtual	char            ReadByte( void )
-    {
-        char i;
-
-        Read( &i, sizeof(char), 1 );
-        return i;
-    }
-
-    virtual	float           ReadFloat( void )
-    {
-        float f;
-
-        Read( &f, sizeof(float), 1 );
-        return f;
-    }
-
-    virtual	size_t          WriteInt( int iInt )
-    {
-        return Write( &iInt, sizeof(int), 1 );
-    }
-
-    virtual size_t          WriteShort( unsigned short iShort )
-    {
-        return Write( &iShort, sizeof(short), 1 );
-    }
-
-    virtual size_t          WriteByte( unsigned char cByte )
-    {
-        return Write( &cByte, sizeof(char), 1 );
-    }
-
-    virtual size_t          WriteFloat( float fFloat )
-    {
-        return Write( &fFloat, sizeof(float), 1 );
-    }
+    virtual	size_t          WriteInt( int iInt )                { return WriteStruct( iInt ); }
+    virtual size_t          WriteUInt( unsigned int uiInt )     { return WriteStruct( uiInt ); }
+    virtual size_t          WriteShort( short iShort )          { return WriteStruct( iShort ); }
+    virtual size_t          WriteUShort( unsigned short uShort ){ return WriteStruct( uShort ); }
+    virtual size_t          WriteByte( char cByte )             { return WriteStruct( cByte ); }
+    virtual size_t          WriteByte( unsigned char ucByte )   { return WriteStruct( ucByte ); }
+    virtual size_t          WriteFloat( float fFloat )          { return WriteStruct( fFloat ); }
+    virtual size_t          WriteDouble( double dDouble )       { return WriteStruct( dDouble ); }
+    virtual size_t          WriteBool( bool bBool )             { return WriteStruct( bBool ); }
 
     /*===================================================
         CFile::Printf
@@ -265,9 +245,11 @@ public:
 
         do
         {
-            unsigned char c = ReadByte();
+            char c;
 
-            if ( !c || c == '\n' )
+            bool successful = ReadByte( c );
+
+            if ( !successful || !c || c == '\n' )
                 return true;
 
             output += c;
@@ -297,9 +279,11 @@ public:
 
         do
         {
-            unsigned char c = ReadByte();
+            char c;
 
-            if ( !c || c == '\n' )
+            bool successful = ReadByte( c );
+
+            if ( !successful || !c || c == '\n' )
                 goto finish;
 
             buf[n++] = c;
@@ -625,9 +609,9 @@ public:
             The callback is passed the full path of the found resource
             and the userdata.
     ===================================================*/
-    virtual void            ScanDirectory( const char *directory, const char *wildcard, bool recurse, 
-                                pathCallback_t dirCallback, 
-                                pathCallback_t fileCallback, 
+    virtual void            ScanDirectory( const char *directory, const char *wildcard, bool recurse,
+                                pathCallback_t dirCallback,
+                                pathCallback_t fileCallback,
                                 void *userdata ) const = 0;
 
     // These functions are easy helpers for ScanDirectory.
@@ -708,7 +692,7 @@ namespace FileSystem
         size_t toRead;
         char buf[8096];
 
-        while ( ( toRead = min( sizeof( buf ), cnt ) ) != 0 )
+        while ( ( toRead = std::min( sizeof( buf ), cnt ) ) != 0 )
         {
             size_t rb = src.Read( buf, 1, toRead );
 
@@ -724,7 +708,7 @@ namespace FileSystem
     // an appropriate dst representation. It reads the src stream
     // into a temporary buffer and the callback structure may modify it.
     template <class cb>
-    inline void StreamParser( CFile& src, CFile& dst, cb& f )
+    inline void StreamParser( CFile& src, CFile& dst, cb f )
     {
         char buf[8096];
         char outBuf[16192];
@@ -756,7 +740,7 @@ namespace FileSystem
     // Parses the stream same as StreamParser, but limited to 'cnt' bytes of the
     // source stream.
     template <class cb>
-    inline void StreamParserCount( CFile& src, CFile& dst, size_t cnt, cb& f )
+    inline void StreamParserCount( CFile& src, CFile& dst, size_t cnt, cb f )
     {
         char buf[8096];
         char outBuf[16192];
@@ -786,17 +770,17 @@ namespace FileSystem
 
             for (;;)
             {
-                bool cnt = f.parse( outBuf, sizeof( outBuf ), outSize );
+                bool continu = f.parse( outBuf, sizeof( outBuf ), outSize );
                 dst.Write( outBuf, 1, outSize );
 
-                if ( !cnt )
+                if ( !continu )
                     break;
             }
 
             if ( eof )
                 break;
         }
-        
+
         dst.SetSeekEnd();
     }
 }

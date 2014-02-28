@@ -29,6 +29,7 @@ public:
 
     bool                        LoadFromFile            ( const char* szFilename );
     bool                        LoadFromTexture         ( CGUITexture* pTexture );
+    bool                        GetNativeSize           ( CVector2D &vecSize );
     void                        Clear                   ( void );
 
     void                        SetFrameEnabled         ( bool bFrameEnabled );

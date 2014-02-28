@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="Windows-1252"?>
+﻿<?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9,00"
@@ -49,7 +49,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../../Shared/sdk"
+				AdditionalIncludeDirectories="../../Shared/sdk;../../vendor"
 				PreprocessorDefinitions="WIN32;_DEBUG;MTA_DEBUG;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="true"
 				BasicRuntimeChecks="3"
@@ -79,11 +79,11 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="shlwapi.lib psapi.lib UnRAR.lib Version.lib"
+				AdditionalDependencies="shlwapi.lib psapi.lib UnRAR.lib Version.lib d3d9.lib"
 				OutputFile="C:/Program Files/MTA San Andreas 1.4/mta/loader_d.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="..\..\vendor\unrar\build\unrardll32\$(ConfigurationName)"
+				AdditionalLibraryDirectories="&quot;..\..\vendor\unrar\build\unrardll32\$(ConfigurationName)&quot;;../../vendor/detours/lib"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\Debug/Loader_d.pdb"
 				SubSystem="2"
@@ -152,7 +152,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories="../../Shared/sdk"
+				AdditionalIncludeDirectories="../../Shared/sdk;../../vendor"
 				PreprocessorDefinitions="WIN32;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -181,11 +181,11 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="shlwapi.lib psapi.lib UnRAR.lib Version.lib"
+				AdditionalDependencies="shlwapi.lib psapi.lib UnRAR.lib Version.lib d3d9.lib"
 				OutputFile="c:\program files\MTA San Andreas 1.4\mta\loader.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="..\..\vendor\unrar\build\unrardll32\$(ConfigurationName)"
+				AdditionalLibraryDirectories="&quot;..\..\vendor\unrar\build\unrardll32\$(ConfigurationName)&quot;;../../vendor/detours/lib"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="../../symbols/$(ConfigurationName)_$(SafeParentName).pdb"
 				GenerateMapFile="true"
@@ -259,7 +259,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories="../../Shared/sdk"
+				AdditionalIncludeDirectories="../../Shared/sdk;../../vendor"
 				PreprocessorDefinitions="WIN32;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -288,11 +288,11 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="shlwapi.lib psapi.lib UnRAR.lib Version.lib"
+				AdditionalDependencies="shlwapi.lib psapi.lib UnRAR.lib Version.lib d3d9.lib"
 				OutputFile="..\..\output\MTA San Andreas\mta\loader.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="..\..\vendor\unrar\build\unrardll32\$(ConfigurationName)"
+				AdditionalLibraryDirectories="&quot;..\..\vendor\unrar\build\unrardll32\$(ConfigurationName)&quot;;../../vendor/detours/lib"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="../../symbols/$(ConfigurationName)_$(SafeParentName).pdb"
 				GenerateMapFile="true"
@@ -336,7 +336,19 @@
 			Filter="cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 			>
 			<File
+				RelativePath=".\CExePatchedStatus.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\CInstallManager.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\D3DStuff.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Dialogs.cpp"
 				>
 			</File>
 			<File
@@ -345,6 +357,10 @@
 			</File>
 			<File
 				RelativePath=".\Main.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\MainFunctions.cpp"
 				>
 			</File>
 			<File
@@ -385,6 +401,10 @@
 			Filter="h;hpp;hxx;hm;inl"
 			>
 			<File
+				RelativePath=".\CExePatchedStatus.h"
+				>
+			</File>
+			<File
 				RelativePath=".\CInstallManager.h"
 				>
 			</File>
@@ -393,11 +413,23 @@
 				>
 			</File>
 			<File
+				RelativePath=".\D3DStuff.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Dialogs.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Install.h"
 				>
 			</File>
 			<File
 				RelativePath=".\Main.h"
+				>
+			</File>
+			<File
+				RelativePath=".\MainFunctions.h"
 				>
 			</File>
 			<File

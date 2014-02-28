@@ -25,6 +25,7 @@ public:
     inline                                  CKeysyncPacket              ( void )                        {};
                                             CKeysyncPacket              ( class CPlayer* pPlayer );
 
+    bool                                    HasSimHandler               ( void ) const                  { return true; }
     inline ePacketID                        GetPacketID                 ( void ) const                  { return PACKET_ID_PLAYER_KEYSYNC; };
     unsigned long                           GetFlags                    ( void ) const                  { return PACKET_MEDIUM_PRIORITY | PACKET_SEQUENCED; };
 

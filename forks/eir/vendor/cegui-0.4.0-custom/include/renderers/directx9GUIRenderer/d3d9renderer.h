@@ -92,7 +92,7 @@ public:
 	virtual	void	addQuad(const Rect& dest_rect, float z, const Texture* tex, const Rect& texture_rect, const ColourRect& colours, QuadSplitMode quad_split_mode, const Image* image = NULL );
 
 	// perform final rendering for all queued renderable quads.
-	virtual	void	doRender(void);
+	virtual	bool	doRender(void);
 
 	// clear the queue
 	virtual	void	clearRenderList(void);

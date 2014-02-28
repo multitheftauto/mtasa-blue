@@ -4,7 +4,7 @@
 *  LICENSE:     See LICENSE in the top level directory
 *  FILE:        Shared/core/CFileSystem.cpp
 *  PURPOSE:     File management
-*  DEVELOPERS:  S2Games <http://savage.s2games.com> (historical entry)
+*  DEVELOPERS:  S2 Games <http://savage.s2games.com> (historical entry)
 *               Martin Turski <quiret@gmx.de>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
@@ -12,11 +12,18 @@
 *****************************************************************************/
 
 #include <StdInc.h>
+#include <sys/stat.h>
+
+#ifdef __linux__
+#include <utime.h>
+#include <fcntl.h>
+#include <sys/sendfile.h>
+#endif //__linux__
 
 std::list <CFile*> *openFiles;
 
-CFileSystem *fileSystem;
-CFileTranslator *fileRoot;
+CFileSystem *fileSystem = NULL;
+CFileTranslator *fileRoot = NULL;
 
 #include "CFileSystem.Utils.hxx"
 
@@ -39,6 +46,13 @@ static inline bool File_IsDirectoryAbsolute( const char *pPath )
         return false;
 
     return (dwAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0;
+#elif defined(__linux__)
+    struct stat dirInfo;
+
+    if ( stat( pPath, &dirInfo ) != 0 )
+        return false;
+
+    return ( dirInfo.st_mode & S_IFDIR ) != 0;
 #else
     return false;
 #endif
@@ -53,11 +67,13 @@ static inline bool File_IsDirectoryAbsolute( const char *pPath )
     fixme: Port to unix and mac
 ===================================================*/
 
-CRawFile::~CRawFile()
+CRawFile::~CRawFile( void )
 {
 #ifdef _WIN32
     CloseHandle( m_file );
-#endif
+#elif defined(__linux__)
+    fclose( m_file );
+#endif //OS DEPENDANT CODE
 
     openFiles->remove( this );
 }
@@ -72,7 +88,11 @@ size_t CRawFile::Read( void *pBuffer, size_t sElement, unsigned long iNumElement
 
     ReadFile(m_file, pBuffer, sElement * iNumElements, &dwBytesRead, NULL);
     return dwBytesRead / sElement;
-#endif
+#elif defined(__linux__)
+    return fread( pBuffer, sElement, iNumElements, m_file );
+#else
+    return 0;
+#endif //OS DEPENDANT CODE
 }
 
 size_t CRawFile::Write( const void *pBuffer, size_t sElement, unsigned long iNumElements )
@@ -85,7 +105,11 @@ size_t CRawFile::Write( const void *pBuffer, size_t sElement, unsigned long iNum
 
     WriteFile(m_file, pBuffer, sElement * iNumElements, &dwBytesWritten, NULL);
     return dwBytesWritten / sElement;
-#endif
+#elif defined(__linux__)
+    return fwrite( pBuffer, sElement, iNumElements, m_file );
+#else
+    return 0;
+#endif //OS DEPENDANT CODE
 }
 
 int CRawFile::Seek( long iOffset, int iType )
@@ -94,21 +118,33 @@ int CRawFile::Seek( long iOffset, int iType )
     if (SetFilePointer(m_file, iOffset, NULL, iType) == INVALID_SET_FILE_POINTER)
         return -1;
     return 0;
-#endif
+#elif defined(__linux__)
+    return fseek( m_file, iOffset, iType );
+#else
+    return -1;
+#endif //OS DEPENDANT CODE
 }
 
-long CRawFile::Tell() const
+long CRawFile::Tell( void ) const
 {
 #ifdef _WIN32
     return SetFilePointer( m_file, 0, NULL, FILE_CURRENT );
-#endif
+#elif defined(__linux__)
+    return ftell( m_file );
+#else
+    return -1;
+#endif //OS DEPENDANT CODE
 }
 
 bool CRawFile::IsEOF() const
 {
 #ifdef _WIN32
     return ( SetFilePointer( m_file, 0, NULL, FILE_CURRENT ) >= GetFileSize( m_file, NULL ) );
-#endif
+#elif defined(__linux__)
+    return feof( m_file );
+#else
+    return false;
+#endif //OS DEPENDANT CODE
 }
 
 bool CRawFile::Stat( struct stat *pFileStats ) const
@@ -130,15 +166,21 @@ bool CRawFile::Stat( struct stat *pFileStats ) const
     pFileStats->st_rdev = 0;
     pFileStats->st_gid = 0;
     return true;
-#endif
+#elif __linux
+    return fstat( fileno( m_file ), pFileStats ) != 0;
+#else
+    return false;
+#endif //OS DEPENDANT CODE
 }
 
+#ifdef _WIN32
 inline static void TimetToFileTime( time_t t, LPFILETIME pft )
 {
     LONGLONG ll = Int32x32To64(t, 10000000) + 116444736000000000;
     pft->dwLowDateTime = (DWORD) ll;
     pft->dwHighDateTime = ll >>32;
 }
+#endif //_WIN32
 
 void CRawFile::PushStat( const struct stat *stats )
 {
@@ -152,21 +194,36 @@ void CRawFile::PushStat( const struct stat *stats )
     TimetToFileTime( stats->st_mtime, &mtime );
 
     SetFileTime( m_file, &ctime, &atime, &mtime );
-#endif //_WIN32
+#elif defined(__linux__)
+    struct utimbuf timeBuf;
+    timeBuf.actime = stats->st_atime;
+    timeBuf.modtime = stats->st_mtime;
+
+    utime( m_path.c_str(), &timeBuf );
+#endif //OS DEPENDANT CODE
 }
 
-void CRawFile::SetSeekEnd()
+void CRawFile::SetSeekEnd( void )
 {
 #ifdef _WIN32
     SetEndOfFile( m_file );
-#endif //_WIN32
+#elif defined(__linux__)
+    ftruncate64( fileno( m_file ), ftello64( m_file ) );
+#endif //OS DEPENDANT CODE
 }
 
-size_t CRawFile::GetSize() const
+size_t CRawFile::GetSize( void ) const
 {
 #ifdef _WIN32
     return GetFileSize( m_file, NULL );
-#endif
+#elif defined(__linux__)
+    struct stat fileInfo;
+    fstat( fileno( m_file ), &fileInfo );
+
+    return fileInfo.st_size;
+#else
+    return 0;
+#endif //OS DEPENDANT CODE
 }
 
 void CRawFile::SetSize( size_t size )
@@ -175,33 +232,33 @@ void CRawFile::SetSize( size_t size )
     SetFilePointer( m_file, size, NULL, SEEK_SET );
 
     SetEndOfFile( m_file );
-#endif
+#elif defined(__linux__)
+    ftruncate64( fileno( m_file ), size );
+#endif //OS DEPENDANT CODE
 }
 
-void CRawFile::Flush()
+void CRawFile::Flush( void )
 {
 #ifdef _WIN32
     FlushFileBuffers( m_file );
-#endif
+#elif defined(__linux__)
+    fflush( m_file );
+#endif //OS DEPENDANT CODE
 }
 
-const filePath& CRawFile::GetPath() const
+const filePath& CRawFile::GetPath( void ) const
 {
     return m_path;
 }
 
-bool CRawFile::IsReadable() const
+bool CRawFile::IsReadable( void ) const
 {
-#ifdef _WIN32
-    return ( m_access & GENERIC_READ ) != 0;
-#endif
+    return ( m_access & FILE_ACCESS_READ ) != 0;
 }
 
-bool CRawFile::IsWriteable() const
+bool CRawFile::IsWriteable( void ) const
 {
-#ifdef _WIN32
-    return ( m_access & GENERIC_WRITE ) != 0;
-#endif
+    return ( m_access & FILE_ACCESS_WRITE ) != 0;
 }
 
 /*=========================================
@@ -210,13 +267,14 @@ bool CRawFile::IsWriteable() const
     Loads a file at open and keeps it in a managed buffer.
 =========================================*/
 
-CBufferedFile::~CBufferedFile()
+CBufferedFile::~CBufferedFile( void )
 {
+    return;
 }
 
 size_t CBufferedFile::Read( void *pBuffer, size_t sElement, unsigned long iNumElements )
 {
-    long iReadElements = min( ( m_sSize - m_iSeek ) / sElement, iNumElements );
+    long iReadElements = std::min( ( m_sSize - m_iSeek ) / sElement, iNumElements );
     size_t sRead = iReadElements * sElement;
 
     if ( iNumElements == 0 )
@@ -244,18 +302,18 @@ int CBufferedFile::Seek( long iOffset, int iType )
         break;
     }
 
-    m_iSeek = max( 0, min( m_iSeek + iOffset, (long)m_sSize ) );
+    m_iSeek = std::max( 0l, std::min( m_iSeek + iOffset, (long)m_sSize ) );
     return 0;
 }
 
-long CBufferedFile::Tell() const
+long CBufferedFile::Tell( void ) const
 {
     return m_iSeek;
 }
 
-bool CBufferedFile::IsEOF() const
+bool CBufferedFile::IsEOF( void ) const
 {
-    return ( m_iSeek == m_sSize );
+    return ( (size_t)m_iSeek == m_sSize );
 }
 
 bool CBufferedFile::Stat( struct stat *stats ) const
@@ -276,30 +334,31 @@ bool CBufferedFile::Stat( struct stat *stats ) const
 
 void CBufferedFile::PushStat( const struct stat *stats )
 {
-
+    // Does not do anything.
+    return;
 }
 
-size_t CBufferedFile::GetSize() const
+size_t CBufferedFile::GetSize( void ) const
 {
     return m_sSize;
 }
 
-void CBufferedFile::SetSeekEnd()
-{
-
-}
-
-void CBufferedFile::Flush()
+void CBufferedFile::SetSeekEnd( void )
 {
     return;
 }
 
-const filePath& CBufferedFile::GetPath() const
+void CBufferedFile::Flush( void )
+{
+    return;
+}
+
+const filePath& CBufferedFile::GetPath( void ) const
 {
     return m_path;
 }
 
-int CBufferedFile::ReadInt()
+int CBufferedFile::ReadInt( void )
 {
     int iResult;
 
@@ -311,7 +370,7 @@ int CBufferedFile::ReadInt()
     return iResult;
 }
 
-short CBufferedFile::ReadShort()
+short CBufferedFile::ReadShort( void )
 {
     short iResult;
 
@@ -323,20 +382,20 @@ short CBufferedFile::ReadShort()
     return iResult;
 }
 
-char CBufferedFile::ReadByte()
+char CBufferedFile::ReadByte( void )
 {
-    if ( m_sSize == m_iSeek )
+    if ( m_sSize == (size_t)m_iSeek )
         return 0;
 
     return *(m_pBuffer + m_iSeek++);
 }
 
-bool CBufferedFile::IsReadable() const
+bool CBufferedFile::IsReadable( void ) const
 {
     return true;
 }
 
-bool CBufferedFile::IsWriteable() const
+bool CBufferedFile::IsWriteable( void ) const
 {
     return false;
 }
@@ -346,6 +405,11 @@ bool CBufferedFile::IsWriteable() const
 
     Filesystem path translation utility
 =======================================*/
+
+CSystemPathTranslator::CSystemPathTranslator( bool isSystemPath )
+{
+    m_isSystemPath = isSystemPath;
+}
 
 void CSystemPathTranslator::GetDirectory( filePath& output ) const
 {
@@ -387,7 +451,7 @@ bool CSystemPathTranslator::GetFullPathTree( const char *path, dirTree& tree, bo
     dirTree output;
     tree = m_rootTree;
 
-    if ( *path == '/' )
+    if ( IsTranslatorRootDescriptor( *path ) )
     {
         if ( !_File_ParseRelativePath( path + 1, output, file ) )
             return false;
@@ -395,7 +459,7 @@ bool CSystemPathTranslator::GetFullPathTree( const char *path, dirTree& tree, bo
     else
     {
         output = m_curDirTree;
-        
+
         if ( !_File_ParseRelativePath( path, output, file ) )
             return false;
     }
@@ -406,7 +470,7 @@ bool CSystemPathTranslator::GetFullPathTree( const char *path, dirTree& tree, bo
 
 bool CSystemPathTranslator::GetRelativePathTreeFromRoot( const char *path, dirTree& tree, bool& file ) const
 {
-    if ( *path == '/' )
+    if ( IsTranslatorRootDescriptor( *path ) )
         return _File_ParseRelativePath( path + 1, tree, file );
 
     tree = m_curDirTree;
@@ -415,7 +479,7 @@ bool CSystemPathTranslator::GetRelativePathTreeFromRoot( const char *path, dirTr
 
 bool CSystemPathTranslator::GetRelativePathTree( const char *path, dirTree& tree, bool& file ) const
 {
-    if ( *path == '/' )
+    if ( IsTranslatorRootDescriptor( *path ) )
     {
         dirTree relTree;
 
@@ -499,7 +563,10 @@ bool CSystemPathTranslator::GetRelativePath( const char *path, bool allowFile, f
 
 static inline bool _File_IsAbsolutePath( const char *path )
 {
-    switch( *path )
+    char character = *path;
+
+#ifdef _WIN32
+    switch( character )
     {
     // Drive letters
     case 'a': case 'b': case 'c': case 'd': case 'e': case 'f': case 'g': case 'h': case 'i': case 'j': case 'k': case 'l': case 'm': case 'n':
@@ -508,24 +575,35 @@ static inline bool _File_IsAbsolutePath( const char *path )
     case 'O': case 'P': case 'Q': case 'R': case 'S': case 'T': case 'U': case 'V': case 'W': case 'X': case 'Y': case 'Z':
         return ( path[1] == ':' && path[2] != 0 );
     }
+#elif defined(__linux__)
+    switch( character )
+    {
+    case '/':
+    case '\\':
+        return true;
+    }
+#endif //OS DEPENDANT CODE
 
     return false;
 }
 
-CSystemFileTranslator::~CSystemFileTranslator()
+CSystemFileTranslator::~CSystemFileTranslator( void )
 {
 #ifdef _WIN32
     if ( m_curDirHandle )
         CloseHandle( m_curDirHandle );
 
     CloseHandle( m_rootHandle );
-#endif
+#elif defined(__linux__)
+    if ( m_curDirHandle )
+        closedir( m_curDirHandle );
+
+    closedir( m_rootHandle );
+#endif //OS DEPENDANT CODE
 }
 
 bool CSystemFileTranslator::WriteData( const char *path, const char *buffer, size_t size )
 {
-#ifdef _WIN32
-    HANDLE file;
     filePath output = m_root;
     dirTree tree;
     bool isFile;
@@ -539,6 +617,9 @@ bool CSystemFileTranslator::WriteData( const char *path, const char *buffer, siz
     tree.pop_back();
     _CreateDirTree( tree );
 
+#ifdef _WIN32
+    HANDLE file;
+
     if ( (file = CreateFile( output.c_str(), GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, 0, NULL )) == INVALID_HANDLE_VALUE )
         return false;
 
@@ -548,7 +629,19 @@ bool CSystemFileTranslator::WriteData( const char *path, const char *buffer, siz
 
     CloseHandle( file );
     return numWritten == size;
-#endif
+#elif defined(__linux__)
+    int fileToken = open( output.c_str(), O_CREAT | O_WRONLY, FILE_ACCESS_FLAG );
+
+    if ( fileToken == -1 )
+        return false;
+
+    ssize_t numWritten = write( fileToken, buffer, size );
+
+    close( fileToken );
+    return numWritten == size;
+#else
+    return 0;
+#endif //OS DEPENDANT CODE
 }
 
 void CSystemFileTranslator::_CreateDirTree( const dirTree& tree )
@@ -556,7 +649,7 @@ void CSystemFileTranslator::_CreateDirTree( const dirTree& tree )
     dirTree::const_iterator iter;
     filePath path = m_root;
 
-    for ( iter = tree.begin(); iter != tree.end(); iter++ )
+    for ( iter = tree.begin(); iter != tree.end(); ++iter )
     {
         path += *iter;
         path += '/';
@@ -564,8 +657,8 @@ void CSystemFileTranslator::_CreateDirTree( const dirTree& tree )
 #ifdef _WIN32
         CreateDirectory( path.c_str(), NULL );
 #else
-        mkdir( path.c_str() );
-#endif
+        mkdir( path.c_str(), FILE_ACCESS_FLAG );
+#endif //OS DEPENDANT CODE
     }
 }
 
@@ -589,9 +682,8 @@ CFile* CSystemFileTranslator::OpenEx( const char *path, const char *mode, unsign
     dirTree tree;
     filePath output = m_root;
     CRawFile *pFile;
-    DWORD dwAccess = 0;
-    DWORD dwCreate = 0;
-    HANDLE sysHandle;
+    unsigned int dwAccess = 0;
+    unsigned int dwCreate = 0;
     bool file;
 
     if ( !GetRelativePathTreeFromRoot( path, tree, file ) )
@@ -603,11 +695,11 @@ CFile* CSystemFileTranslator::OpenEx( const char *path, const char *mode, unsign
 
     _File_OutputPathTree( tree, true, output );
 
-    if ( !_File_ParseMode( *this, path, mode, (unsigned int&)dwAccess, (unsigned int&)dwCreate ) )
+    if ( !_File_ParseMode( *this, path, mode, dwAccess, dwCreate ) )
         return NULL;
 
     // Creation requires the dir tree!
-    if ( dwCreate == CREATE_ALWAYS )
+    if ( dwCreate == FILE_MODE_CREATE )
     {
         tree.pop_back();
 
@@ -623,16 +715,49 @@ CFile* CSystemFileTranslator::OpenEx( const char *path, const char *mode, unsign
     if ( flags & FILE_FLAG_UNBUFFERED )
         flagAttr |= FILE_FLAG_NO_BUFFERING | FILE_FLAG_WRITE_THROUGH;
 
-    sysHandle = CreateFile( output.c_str(), dwAccess, (flags & FILE_FLAG_WRITESHARE) != 0 ? FILE_SHARE_READ | FILE_SHARE_WRITE : FILE_SHARE_READ, NULL, dwCreate, flagAttr, NULL );
+    HANDLE sysHandle = CreateFile( output.c_str(), dwAccess, (flags & FILE_FLAG_WRITESHARE) != 0 ? FILE_SHARE_READ | FILE_SHARE_WRITE : FILE_SHARE_READ, NULL, dwCreate, flagAttr, NULL );
 
     if ( sysHandle == INVALID_HANDLE_VALUE )
         return NULL;
 
     pFile = new CRawFile();
     pFile->m_file = sysHandle;
+#elif defined(__linux__)
+    const char *openMode;
+
+    // TODO: support flags parameter.
+
+    if ( dwCreate == FILE_MODE_CREATE )
+    {
+        if ( dwAccess & FILE_ACCESS_READ )
+            openMode = "w+";
+        else
+            openMode = "w";
+    }
+    else if ( dwCreate == FILE_MODE_OPEN )
+    {
+        if ( dwAccess & FILE_ACCESS_WRITE )
+            openMode = "r+";
+        else
+            openMode = "r";
+    }
+    else
+        return NULL;
+
+    FILE *filePtr = fopen( output.c_str(), openMode );
+
+    if ( !filePtr )
+        return NULL;
+
+    pFile = new CRawFile();
+    pFile->m_file = filePtr;
+#else
+    return NULL;
+#endif //OS DEPENDANT CODE
+
+    // Write shared file properties.
     pFile->m_access = dwAccess;
     pFile->m_path = output;
-#endif //_WIN32
 
     if ( *mode == 'a' )
         pFile->Seek( 0, SEEK_END );
@@ -663,20 +788,39 @@ bool CSystemFileTranslator::Exists( const char *path ) const
     return stat( output.c_str(), &tmp ) == 0;
 }
 
-static void _deleteFileCallback( const filePath& path, void *ud )
+inline bool _deleteFile( const char *path )
 {
 #ifdef _WIN32
-    DeleteFile( path );
-#endif
+    return DeleteFile( path ) != FALSE;
+#elif defined(__linux__)
+    return unlink( path ) == 0;
+#else
+    return false;
+#endif //OS DEPENDANT CODE
+}
+
+static void _deleteFileCallback( const filePath& path, void *ud )
+{
+    _deleteFile( path.c_str() );
+}
+
+inline bool _deleteDir( const char *path )
+{
+#ifdef _WIN32
+    return RemoveDirectory( path ) != FALSE;
+#elif defined(__linux__)
+    return rmdir( path ) == 0;
+#else
+    return false;
+#endif //OS DEPENDANT CODE
 }
 
 static void _deleteDirCallback( const filePath& path, void *ud )
 {
+    // Delete all subdirectories too.
     ((CSystemFileTranslator*)ud)->ScanDirectory( path, "*", false, _deleteDirCallback, _deleteFileCallback, ud );
 
-#ifdef _WIN32
-    RemoveDirectory( path );
-#endif
+    _deleteDir( path.c_str() );
 }
 
 bool CSystemFileTranslator::Delete( const char *path )
@@ -686,7 +830,6 @@ bool CSystemFileTranslator::Delete( const char *path )
     if ( !GetFullPath( path, true, output ) )
         return false;
 
-#ifdef _WIN32
     if ( output.at( output.size() - 1 ) == '/' )
     {
         if ( !File_IsDirectoryAbsolute( output.c_str() ) )
@@ -694,11 +837,43 @@ bool CSystemFileTranslator::Delete( const char *path )
 
         // Remove all files and directories inside
         ScanDirectory( output.c_str(), "*", false, _deleteDirCallback, _deleteFileCallback, this );
-        return RemoveDirectory( output.c_str() ) != FALSE;
+        return _deleteDir( output.c_str() );
     }
 
-    return DeleteFile( output.c_str() ) != FALSE;
-#endif
+    return _deleteFile( output.c_str() );
+}
+
+inline bool _File_Copy( const char *src, const char *dst )
+{
+#ifdef _WIN32
+    return CopyFile( src, dst, false ) != FALSE;
+#elif defined(__linux__)
+    int iReadFile = open( src, O_RDONLY, 0 );
+
+    if ( iReadFile == -1 )
+        return false;
+
+    int iWriteFile = open( dst, O_CREAT | O_WRONLY | O_ASYNC, FILE_ACCESS_FLAG );
+
+    if ( iWriteFile == -1 )
+        return false;
+
+    struct stat read_info;
+    if ( fstat( iReadFile, &read_info ) != 0 )
+    {
+        close( iReadFile );
+        close( iWriteFile );
+        return false;
+    }
+
+    sendfile( iWriteFile, iReadFile, NULL, read_info.st_size );
+
+    close( iReadFile );
+    close( iWriteFile );
+    return true;
+#else
+    return false;
+#endif //OS DEPENDANT CODE
 }
 
 bool CSystemFileTranslator::Copy( const char *src, const char *dst )
@@ -720,9 +895,8 @@ bool CSystemFileTranslator::Copy( const char *src, const char *dst )
     dstTree.pop_back();
     _CreateDirTree( dstTree );
 
-#ifdef _WIN32
-    return CopyFile( source.c_str(), target.c_str(), false ) != FALSE;
-#endif
+    // Copy data using quick kernel calls.
+    return _File_Copy( source.c_str(), target.c_str() );
 }
 
 bool CSystemFileTranslator::Rename( const char *src, const char *dst )
@@ -746,13 +920,17 @@ bool CSystemFileTranslator::Rename( const char *src, const char *dst )
 
 #ifdef _WIN32
     return MoveFile( source.c_str(), target.c_str() ) != FALSE;
-#endif
+#elif defined(__linux__)
+    return rename( source.c_str(), target.c_str() ) == 0;
+#else
+    return false;
+#endif //OS DEPENDANT CODE
 }
 
 bool CSystemFileTranslator::Stat( const char *path, struct stat *stats ) const
 {
     filePath output;
-    
+
     if ( !GetFullPath( path, true, output ) )
         return false;
 
@@ -779,16 +957,20 @@ bool CSystemFileTranslator::ReadToBuffer( const char *path, std::vector <char>& 
     return fileSystem->ReadToBuffer( sysPath.c_str(), output );
 }
 
-#ifdef _WIN32
+// Handle absolute paths.
 
 bool CSystemFileTranslator::GetRelativePathTreeFromRoot( const char *path, dirTree& tree, bool& file ) const
 {
     if ( _File_IsAbsolutePath( path ) )
     {
+#ifdef _WIN32
         if ( !_File_PathCharComp( path[0], m_root[0] ) )
             return false;   // drive mismatch
-        
+
         return _File_ParseRelativeTree( path + 3, m_rootTree, tree, file );
+#else
+        return _File_ParseRelativeTree( path + 1, m_rootTree, tree, file );
+#endif //OS DEPENDANT CODE
     }
 
     return CSystemPathTranslator::GetRelativePathTreeFromRoot( path, tree, file );
@@ -798,10 +980,14 @@ bool CSystemFileTranslator::GetRelativePathTree( const char *path, dirTree& tree
 {
     if ( _File_IsAbsolutePath( path ) )
     {
+#ifdef _WIN32
         if ( !_File_PathCharComp( path[0], m_root[0] ) )
             return false;   // drive mismatch
-        
+
         return _File_ParseRelativeTreeDeriviate( path + 3, m_rootTree, m_curDirTree, tree, file );
+#else
+        return _File_ParseRelativeTreeDeriviate( path + 1, m_rootTree, m_curDirTree, tree, file );
+#endif //OS DEPENDANT CODE
     }
 
     return CSystemPathTranslator::GetRelativePathTree( path, tree, file );
@@ -811,11 +997,16 @@ bool CSystemFileTranslator::GetFullPathTree( const char *path, dirTree& tree, bo
 {
     if ( _File_IsAbsolutePath( path ) )
     {
+#ifdef _WIN32
         if ( !_File_PathCharComp( path[0], m_root[0] ) )
             return false;   // drive mismatch
 
         tree = m_rootTree;
         return _File_ParseRelativeTree( path + 3, m_rootTree, tree, file );
+#else
+        tree = m_rootTree;
+        return _File_ParseRelativeTree( path + 1, m_rootTree, tree, file );
+#endif //OS DEPENDANT CODE
     }
 
     return CSystemPathTranslator::GetFullPathTree( path, tree, file );
@@ -826,11 +1017,13 @@ bool CSystemFileTranslator::GetFullPath( const char *path, bool allowFile, fileP
     if ( !CSystemPathTranslator::GetFullPath( path, allowFile, output ) )
         return false;
 
+#ifdef _WIN32
     output.insert( 0, m_root.c_str(), 3 );
+#else
+    output.insert( 0, "/", 1 );
+#endif //_WIN32
     return true;
 }
-
-#endif //_WIN32
 
 bool CSystemFileTranslator::ChangeDirectory( const char *path )
 {
@@ -857,10 +1050,20 @@ bool CSystemFileTranslator::ChangeDirectory( const char *path )
         CloseHandle( m_curDirHandle );
 
     m_curDirHandle = dir;
+#elif defined(__linux__)
+    DIR *dir = opendir( absPath.c_str() );
+
+    if ( dir == NULL )
+        return false;
+
+    if ( m_curDirHandle )
+        closedir( m_curDirHandle );
+
+    m_curDirHandle = dir;
 #else
     if ( !File_IsDirectoryAbsolute( absPath.c_str() ) )
         return false;
-#endif //_WIN32
+#endif //OS DEPENDANT CODE
 
     m_currentDir.clear();
     _File_OutputPathTree( tree, false, m_currentDir );
@@ -869,16 +1072,12 @@ bool CSystemFileTranslator::ChangeDirectory( const char *path )
     return true;
 }
 
-void CSystemFileTranslator::ScanDirectory( const char *directory, const char *wildcard, bool recurse, 
-                                            pathCallback_t dirCallback, 
-                                            pathCallback_t fileCallback, 
+void CSystemFileTranslator::ScanDirectory( const char *directory, const char *wildcard, bool recurse,
+                                            pathCallback_t dirCallback,
+                                            pathCallback_t fileCallback,
                                             void *userdata ) const
 {
-#ifdef _WIN32
-    WIN32_FIND_DATA		finddata;
-    HANDLE				handle;
     filePath            output;
-    std::string         query;
     char				wcard[256];
 
     if ( !GetFullPath( directory, false, output ) )
@@ -889,12 +1088,16 @@ void CSystemFileTranslator::ScanDirectory( const char *directory, const char *wi
     else
         strncpy(wcard, wildcard, 255);
 
+#ifdef _WIN32
+    WIN32_FIND_DATA		finddata;
+    HANDLE				handle;
+
     try
     {
         //first search for files only
         if ( fileCallback )
         {
-            query = std::string( output.c_str(), output.size() );
+            std::string query = std::string( output.c_str(), output.size() );
             query += wcard;
 
             // I am unsure whether ".." could turn dangerous here (wcard)
@@ -912,7 +1115,7 @@ void CSystemFileTranslator::ScanDirectory( const char *directory, const char *wi
                     filePath filename = output;
                     filename += finddata.cFileName;
 
-                    fileCallback( filename.c_str(), userdata );		
+                    fileCallback( filename.c_str(), userdata );
 
                 } while ( FindNextFile(handle, &finddata) );
 
@@ -921,16 +1124,16 @@ void CSystemFileTranslator::ScanDirectory( const char *directory, const char *wi
         }
 
         if ( !dirCallback && !recurse )
-            return;
+            goto endJump;
 
         //next search for subdirectories only
-        query = std::string( output.c_str(), output.size() );
+        std::string query = std::string( output.c_str(), output.size() );
         query += '*';
 
         handle = FindFirstFile( query.c_str(), &finddata );
 
         if ( handle == INVALID_HANDLE_VALUE )
-            return;
+            goto endJump;
 
         do
         {
@@ -939,9 +1142,9 @@ void CSystemFileTranslator::ScanDirectory( const char *directory, const char *wi
 
             if ( !(finddata.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) )
                 continue;
-    		
+
             // Optimization :)
-            if ( *(unsigned short*)finddata.cFileName == 0x002E || (*(unsigned short*)finddata.cFileName == 0x2E2E && *(unsigned char*)(finddata.cFileName + 2) == 0x00) )
+            if ( _File_IgnoreDirectoryScanEntry( finddata.cFileName ) )
                 continue;
 
             filePath target = output;
@@ -963,8 +1166,83 @@ void CSystemFileTranslator::ScanDirectory( const char *directory, const char *wi
         throw;
     }
 
+endJump:
     FindClose( handle );
-#endif
+#elif defined(__linux__)
+    DIR *findDir = opendir( output.c_str() );
+
+    if ( !findDir )
+        return;
+
+    filePattern_t *pattern = _File_CreatePattern( wildcard );
+
+    try
+    {
+        //first search for files only
+        if ( fileCallback )
+        {
+            while ( struct dirent *entry = readdir( findDir ) )
+            {
+                filePath path = output;
+                path += entry->d_name;
+
+                struct stat entry_stats;
+
+                if ( stat( path.c_str(), &entry_stats ) == 0 )
+                {
+                    if ( !( S_ISDIR( entry_stats.st_mode ) ) && _File_MatchPattern( entry->d_name, pattern ) )
+                    {
+                        fileCallback( path.c_str(), userdata );
+                    }
+                }
+            }
+        }
+
+        rewinddir( findDir );
+
+        if ( dirCallback || recurse )
+        {
+            //next search for subdirectories only
+            while ( struct dirent *entry = readdir( findDir ) )
+            {
+                const char *name = entry->d_name;
+
+                if ( _File_IgnoreDirectoryScanEntry( name ) )
+                    continue;
+
+                filePath path = output;
+                path += name;
+                path += '/';
+
+                struct stat entry_info;
+
+                if ( stat( path.c_str(), &entry_info ) == 0 && S_ISDIR( entry_info.st_mode ) )
+                {
+                    if ( dirCallback && _File_MatchPattern( entry->d_name, pattern ) )
+                    {
+                        dirCallback( path.c_str(), userdata );
+                    }
+
+                    // TODO: this can be optimized by reusing the pattern structure.
+                    if ( recurse )
+                        ScanDirectory( path.c_str(), wcard, recurse, dirCallback, fileCallback, userdata );
+                }
+            }
+        }
+    }
+    catch( ... )
+    {
+        // Callbacks may throw exceptions
+        _File_DestroyPattern( pattern );
+
+        closedir( findDir );
+        throw;
+    }
+
+    _File_DestroyPattern( pattern );
+
+    closedir( findDir );
+#endif //OS DEPENDANT CODE
 }
 
 static void _scanFindCallback( const filePath& path, std::vector <filePath> *output )
@@ -985,7 +1263,10 @@ void CSystemFileTranslator::GetFiles( const char *path, const char *wildcard, bo
 /*=======================================
     CFileSystem
 
-    Management class
+    Management class with root-access functions.
+    These methods are root-access. Exposing them
+    to a security-critical user-space context is
+    not viable.
 =======================================*/
 
 #ifdef _WIN32
@@ -996,10 +1277,12 @@ struct MySecurityAttributes
     LUID_AND_ATTRIBUTES attr[2];
 };
 
-#endif
+#endif //_WIN32
 
-CFileSystem::CFileSystem()
+CFileSystem::CFileSystem( void )
 {
+    // We should set special priviledges for the application if
+    // running under Win32.
 #ifdef _WIN32
     HANDLE token;
     MySecurityAttributes priv;
@@ -1024,7 +1307,7 @@ CFileSystem::CFileSystem()
         throw std::exception( "lacking administrator privileges for fileSystem" );
 
     CloseHandle( token );
-#endif
+#endif //_WIN32
 
     char cwd[1024];
     getcwd( cwd, 1023 );
@@ -1044,7 +1327,7 @@ CFileSystem::CFileSystem()
     fileSystem = this;
 }
 
-CFileSystem::~CFileSystem()
+CFileSystem::~CFileSystem( void )
 {
     DestroyZIP();
 
@@ -1058,9 +1341,7 @@ CFileTranslator* CFileSystem::CreateTranslator( const char *path )
     dirTree tree;
     bool bFile;
 
-    if ( !*path )
-        return NULL;
-
+#ifdef _WIN32
     // We have to handle absolute path, too
     if ( _File_IsAbsolutePath( path ) )
     {
@@ -1070,20 +1351,36 @@ CFileTranslator* CFileSystem::CreateTranslator( const char *path )
         root += path[0];
         root += ":/";
     }
+#elif defined(__linux__)
+    if ( *path == '/' || *path == '\\' )
+    {
+        if (!_File_ParseRelativePath( path + 1, tree, bFile ))
+            return NULL;
+
+        root = "/";
+    }
+#endif //OS DEPENDANT CODE
     else
     {
         char pathBuffer[1024];
-        GetCurrentDirectory( 1024, pathBuffer );
+        getcwd( pathBuffer, sizeof(pathBuffer) );
 
         root = pathBuffer;
         root += "\\";
         root += path;
 
+#ifdef _WIN32
         if (!_File_ParseRelativePath( root.c_str() + 3, tree, bFile ))
             return NULL;
 
         root.resize( 2 );
         root += "/";
+#elif defined(__linux__)
+        if (!_File_ParseRelativePath( root.c_str() + 1, tree, bFile ))
+            return NULL;
+
+        root = "/";
+#endif //OS DEPENDANT CODE
     }
 
     if ( bFile )
@@ -1096,10 +1393,15 @@ CFileTranslator* CFileSystem::CreateTranslator( const char *path )
 
     if ( dir == INVALID_HANDLE_VALUE )
         return NULL;
+#elif defined(__linux__)
+    DIR *dir = opendir( root.c_str() );
+
+    if ( dir == NULL )
+        return NULL;
 #else
     if ( !IsDirectory( root.c_str() ) )
         return NULL;
-#endif //_WIN32
+#endif //OS DEPENDANT CODE
 
     pTranslator = new CSystemFileTranslator();
     pTranslator->m_root = root;
@@ -1108,7 +1410,10 @@ CFileTranslator* CFileSystem::CreateTranslator( const char *path )
 #ifdef _WIN32
     pTranslator->m_rootHandle = dir;
     pTranslator->m_curDirHandle = NULL;
-#endif
+#elif defined(__linux__)
+    pTranslator->m_rootHandle = dir;
+    pTranslator->m_curDirHandle = NULL;
+#endif //OS DEPENDANT CODE
 
     return pTranslator;
 }
@@ -1118,10 +1423,14 @@ bool CFileSystem::IsDirectory( const char *path )
     return File_IsDirectoryAbsolute( path );
 }
 
-#if 0
+#ifdef _WIN32
+
+// By definition, crash dumps are OS dependant.
+// Currently we only support crash dumps on Windows OS.
+
 bool CFileSystem::WriteMiniDump( const char *path, _EXCEPTION_POINTERS *except )
 {
-#ifdef _WIN32
+#if 0
     CRawFile *file = (CRawFile*)fileRoot->Open( path, "wb" );
     MINIDUMP_EXCEPTION_INFORMATION info;
 
@@ -1137,11 +1446,11 @@ bool CFileSystem::WriteMiniDump( const char *path, _EXCEPTION_POINTERS *except )
     MiniDumpWriteDump( GetCurrentProcess(), GetCurrentProcessId(), file->m_file, MiniDumpNormal, &info, NULL, NULL );
 
     delete file;
-
 #endif
+
     return true;
 }
-#endif
+#endif //_WIN32
 
 bool CFileSystem::Exists( const char *path )
 {
@@ -1160,22 +1469,24 @@ size_t CFileSystem::Size( const char *path )
     return stats.st_size;
 }
 
+// Utility to quickly load data from files on the local filesystem.
+// Do not export it into user-space since this function has no security restrictions.
 bool CFileSystem::ReadToBuffer( const char *path, std::vector <char>& output )
 {
 #ifdef _WIN32
     HANDLE file = CreateFile( path, GENERIC_READ, 0, NULL, OPEN_EXISTING, 0, NULL );
-    size_t size;
-    DWORD _pf;
 
     if ( file == INVALID_HANDLE_VALUE )
         return false;
 
-    size = GetFileSize( file, NULL );
+    size_t size = GetFileSize( file, NULL );
 
     if ( size != 0 )
     {
         output.resize( size );
         output.reserve( size );
+
+        DWORD _pf;
 
         ReadFile( file, &output[0], size, &_pf, NULL );
     }
@@ -1184,5 +1495,39 @@ bool CFileSystem::ReadToBuffer( const char *path, std::vector <char>& output )
 
     CloseHandle( file );
     return true;
-#endif
+#elif defined(__linux__)
+    int iReadFile = open( path, O_RDONLY, 0 );
+
+    if ( iReadFile == -1 )
+        return false;
+
+    struct stat read_info;
+
+    if ( fstat( iReadFile, &read_info ) != 0 )
+        return false;
+
+    if ( read_info.st_size != 0 )
+    {
+        output.resize( read_info.st_size );
+        output.reserve( read_info.st_size );
+
+        ssize_t numRead = read( iReadFile, &output[0], read_info.st_size );
+
+        if ( numRead == 0 )
+        {
+            close( iReadFile );
+            return false;
+        }
+
+        if ( numRead != read_info.st_size )
+            output.resize( numRead );
+    }
+    else
+        output.clear();
+
+    close( iReadFile );
+    return true;
+#else
+    return false;
+#endif //OS DEPENDANT CODE
 }

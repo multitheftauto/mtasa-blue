@@ -329,7 +329,7 @@ static size_t RwTranslatedStreamWrite( void *file, const void *buffer, size_t le
 static void* RwTranslatedStreamSeek( void *file, unsigned int offset )
 {
     size_t endOff = ((CFile*)file)->GetSize() - (size_t)((CFile*)file)->Tell();
-    unsigned int roff = min( offset, endOff );
+    unsigned int roff = std::min( offset, endOff );
 
     if ( roff == 0 )
         return NULL;

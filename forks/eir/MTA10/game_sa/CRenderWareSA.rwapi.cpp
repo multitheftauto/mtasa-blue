@@ -1278,7 +1278,7 @@ RwLinkedMaterial* RwLinkedMaterials::Get( unsigned int index )
 =========================================================*/
 void RpLight::SetLightIndex( unsigned int idx )
 {
-    lightIndex = min( idx, 8 );
+    lightIndex = std::min( idx, 7u );
 }
 
 /*=========================================================

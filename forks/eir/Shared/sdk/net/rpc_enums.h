@@ -15,7 +15,7 @@
 
 #pragma once
 
-enum eRPCFunctions
+enum eElementRPCFunctions
 {
     DONT_USE_0 = 0,
     SET_TIME,
@@ -246,6 +246,8 @@ enum eRPCFunctions
     
     RESET_MOON_SIZE,
     SET_MOON_SIZE,
+
+    SET_VEHICLE_PLATE_TEXT,
 
     NUM_RPC_FUNCS
 };

@@ -14,15 +14,11 @@
 
 #include "StdInc.h"
 
-using namespace google;
-
 #define CGUICOMBOBOX_NAME "CGUI/Combobox"
 
 CGUIComboBox_Impl::CGUIComboBox_Impl ( CGUI_Impl* pGUI, CGUIElement* pParent, const char* szCaption )
 {
     m_pManager = pGUI;
-    m_Items.set_deleted_key ( (CEGUI::ListboxItem *)0xFFFFFFFF );
-    m_Items.set_empty_key ( (CEGUI::ListboxItem *)0x00000000 );
 
     // Get an unique identifier for CEGUI (gah, there's gotta be an another way)
     char szUnique [CGUI_CHAR_SIZE];
@@ -114,7 +110,7 @@ CGUIListItem* CGUIComboBox_Impl::GetSelectedItem ( void )
 int CGUIComboBox_Impl::GetSelectedItemIndex( void )
 {
     CEGUI::ListboxItem* pItem = reinterpret_cast < CEGUI::Combobox* > ( m_pWindow ) -> getSelectedItem ();
-    dense_hash_map < CEGUI::ListboxItem*, CGUIListItem_Impl* >::iterator it;
+    CFastHashMap < CEGUI::ListboxItem*, CGUIListItem_Impl* >::iterator it;
     it = m_Items.find ( pItem );
     if ( it == m_Items.end () )
         return -1;
@@ -131,7 +127,7 @@ int CGUIComboBox_Impl::GetSelectedItemIndex( void )
 
 int CGUIComboBox_Impl::GetItemIndex( CGUIListItem* pItem )
 {
-    dense_hash_map < CEGUI::ListboxItem*, CGUIListItem_Impl* >::iterator it;
+    CFastHashMap < CEGUI::ListboxItem*, CGUIListItem_Impl* >::iterator it;
     bool found;
     
     for ( it = m_Items.begin (); it != m_Items.end (); it++ )
@@ -241,7 +237,7 @@ void CGUIComboBox_Impl::Clear ( void )
 {
     reinterpret_cast < CEGUI::Combobox* > ( m_pWindow ) -> getDropList () -> resetList ();
 
-    dense_hash_map < CEGUI::ListboxItem*, CGUIListItem_Impl* >::iterator it;
+    CFastHashMap < CEGUI::ListboxItem*, CGUIListItem_Impl* >::iterator it;
     for ( it = m_Items.begin (); it != m_Items.end (); it++ )
     {
         delete it->second;
@@ -259,7 +255,7 @@ void CGUIComboBox_Impl::SetReadOnly ( bool bReadonly )
 
 CGUIListItem_Impl* CGUIComboBox_Impl::GetListItem ( CEGUI::ListboxItem* pItem )
 {
-    dense_hash_map < CEGUI::ListboxItem*, CGUIListItem_Impl* >::iterator it;
+    CFastHashMap < CEGUI::ListboxItem*, CGUIListItem_Impl* >::iterator it;
     it = m_Items.find ( pItem );
     if ( it == m_Items.end () )
         return NULL;

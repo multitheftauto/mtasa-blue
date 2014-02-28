@@ -29,6 +29,7 @@ public:
     void                            DoPulse                             ( void );
     void                            RemoveAll                           ( void );
     bool                            Exists                              ( CClientProjectile * pProjectile );
+    CClientProjectile*              Get                                 ( CEntitySAInterface * pProjectile );
 
     inline unsigned int             Count                               ( void )                                    { return static_cast < unsigned int > ( m_List.size () ); }
 
@@ -49,10 +50,10 @@ private:
     std::list < CClientProjectile* >    m_List;
 
     bool                                m_bIsLocal;
-    CClientEntity *                     m_pCreator;
+    CClientEntityPtr                    m_pCreator;
 
     bool                                m_bCreating;
-    CClientProjectile *                 m_pLastCreated;
+    CClientProjectilePtr                m_pLastCreated;
 };
 
 #endif

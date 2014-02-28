@@ -1690,8 +1690,113 @@ struct {
     10012, "cables4",
     };
 
+static const char* playerClothesModel[] = {
+    "afro","afrobeard","afrotash","balaclava","bandana","bandknots",
+    "bandmask","barefeet","baseball","bask1","baskball","bbjack",
+    "beret","biker","bikerhelmet","boater","bowler","boxingcap",
+    "boxingshoe","boxingshort","cap","capandband","capback","capknit",
+    "capover","capovereye","cappolice","caprimup","capside","captruck",
+    "chinos","chinosb","chonger","chucks","coach","conv",
+    "cornrows","country","countrytr","cowboy","cs_afro","cs_afrobeard",
+    "cs_afrotash","cs_bandana","cs_bandknots","cs_bandmask","cs_bikerhelmet","cs_cornrows",
+    "cs_elvishair","cs_flatears","cs_flattop","cs_gimpmask","cs_groovecut","cs_hands",
+    "cs_head","cs_highafro","cs_jheri","cs_mohawk","cs_slope","cs_tramline",
+    "cs_wedge","cs_zorro","denim","elvishair","eyepatch","feet",
+    "field","flatears","flattop","flipflop","garagetop","garagetr",
+    "gimpfeet","gimphands","gimpleg","gimpmask","gimptorso","glasses01",
+    "glasses03","glasses04","glassesx","groovecut","grouchos","hands",
+    "hatmanc","hattiger","hawaii","head","helmet","highafro",
+    "hitop","hockeymask","hoodjack","hoodya","hoodyb","jeans",
+    "jheri","leather","leathertr","legs","legspants","medictr",
+    "mohawk","moto","neck","neck2","neck2_bb","neck2_field",
+    "neck2_hoodya","neck2_pimp","neck2_shirt","neck_bb","neck_field","neck_hoodya",
+    "neck_pimp","neck_shirt","neck_tracky","painter","pimp","pimpshoe",
+    "pimptr","policeshirt","policetr","shirta","shirtb","shoe",
+    "shorts","skullycap","sleevt","slope","sneaker","suit1",
+    "suit1tr","suit2","sweat","timber","torso","tracktr",
+    "trackytop1","tramline","trilby","tshirt","tshirt2","valet",
+    "vest","watch","watch_hoody","wcoat","wedge","worktr",
+    "worktrboot","zorromask"
+    };
+
+static const char* playerClothesTex[] = {
+    "10ls","10ls2","10ls3","10ls4",
+    "10ls5","10og","10weed","11dice","11dice2","11godsgift",
+    "11grove","11grove2","11grove3","11jail","12angels","12bandit",
+    "12cross7","12dagger","12mayabird","12mayaface","4nation","4rip",
+    "4spider","4weed","5cross","5cross2","5cross3","5gun",
+    "6africa","6aztec","6clown","6crown","7cross","7cross2",
+    "7cross3","7mary","8gun","8poker","8sa","8sa2",
+    "8sa3","8santos","8westside","9bullet","9crown","9gun",
+    "9gun2","9homeboy","9rasta","afro","afrobeard","afroblond",
+    "afrogoatee","afrotash","balaclava","bald","baldbeard","baldgoatee",
+    "baldtash","bandanablu","bandanaflag","bandanagang","bandanaleaf","bandanared",
+    "bandanaskull","bandblack","bandblack2","bandblack3","bandblue","bandblue2",
+    "bandblue3","bandgang","bandgang2","bandgang3","bandgang4","bandits",
+    "bandred","bandred2","bandred3","bask1eris","bask1problk","bask1prowht",
+    "bask2heatband","bask2heatwht","bask2semi","baskballdrib","baskballloc","baskballrim",
+    "bballjackrstar","bbjack","bbjackrim","bbjersey","bbshortred","bbshortwht",
+    "beard","beretblk","beretred","biegetr","biker","bikerhelmet",
+    "boater","boaterblk","bowler","bowlerblue","bowlergang","bowlerred",
+    "bowleryellow","bowling","boxingcap","boxingshoe","boxshort","capblk",
+    "capblkback","capblkover","capblkside","capblkup","capblue","capblueback",
+    "capblueover","capblueside","capblueup","capgang","capgangback","capgangover",
+    "capgangside","capgangup","capgrey","capgreyback","capgreyup","capknitblk",
+    "capknitgrn","capnband","capnbandgang","capovergang","capoverred","cappolice",
+    "capred","capredback","capredover","capredside","capredup","captruck",
+    "capzip","capzipback","capzipover","capzipside","capzipup","chinosbiege",
+    "chinosblack","chinosblue","chinoskhaki","chongerblue","chongergang","chongergrey",
+    "chongerred","chucksblack","coach","coachsemi","convheatblk","convheatorn",
+    "convheatred","convproblk","convproblu","convprogrn","cornrows","cornrowsb",
+    "country","countrytr","cowboy","cowboyboot","cowboyboot2","croupier",
+    "cutoffchinos","cutoffchinosblue","cutoffdenims","denimfade","denimsgang","denimsred",
+    "dogtag","dustmask","elvishair","eyepatch","feet","fez",
+    "field","flattop","flipflop","foot","garageleg","garagetop",
+    "gimp","gimpleg","gimpmask","gimpshoe","glasses01","glasses01dark",
+    "glasses03","glasses03blue","glasses03dark","glasses03red","glasses04","glasses04dark",
+    "glasses05","glasses05dark","glassesx","goatee","groovecut","groucho",
+    "hairblond","hairblue","hairgreen","hairpink","hairred","hands",
+    "hatmancblk","hatmancplaid","hattiger","hawaiired","hawaiiwht","head",
+    "helmet","highafro","highfade","hitop","hockey","hockeytop",
+    "hoodjackbeige","hoodyabase5","hoodyablack","hoodyablue","hoodyagreen","hoodyamerc",
+    "hoodyarockstar","hoodyb","jeansdenim","jhericurl","leather","leathertr",
+    "leathertrchaps","legs","legsblack","legsboxerswht","legsheart","legspantsgrey",
+    "letter","medic","medictr","mohawk","mohawkbeard","mohawkblond",
+    "mohawkpink","moto","neckafrica","neckcross","neckdollar","neckgold",
+    "neckhash","neckls","neckropeg","neckropes","necksaints","necksilver",
+    "painter","pimp","pimpshoe","pimptr","player_face","player_feet",
+    "player_legs","player_torso","policeshirt","policetr","sandal","sandalsock",
+    "shadesblk","shellsuit","shellsuittr","shirtablue","shirtagrey","shirtayellow",
+    "shirtbblue","shirtbcheck","shirtbgang","shirtbplaid","shoedressblk","shoedressbrn",
+    "shoesandal","shoespatz","shortsgang","shortsgrey","shortskhaki","sixtyniners",
+    "skullyblk","skullygrn","sleevtbrown","slope","snakeskin","sneakerbincblk",
+    "sneakerbincblu","sneakerbincgang","sneakerheatblk","sneakerheatgry","sneakerheatwht","sneakerproblu",
+    "sneakerprored","sneakerprowht","sportjack","stopwatch","suit1blk","suit1blue",
+    "suit1gang","suit1grey","suit1red","suit1trblk","suit1trblk2","suit1trblue",
+    "suit1trgang","suit1trgreen","suit1trgrey","suit1trred","suit1tryellow","suit1yellow",
+    "suit2grn","sweatrstar","tash","timberfawn","timbergrey","timberhike",
+    "timberred","torso","tracktr","tracktrblue","tracktrblustr","tracktreris",
+    "tracktrgang","tracktrpro","tracktrwhstr","trackytop1pro","trackytop2eris","tramline",
+    "trilbydrk","trilbylght","tshirt","tshirt2","tshirt2horiz","tshirtbase5",
+    "tshirtblunts","tshirtbobomonk","tshirtbobored","tshirterisorn","tshirterisyell","tshirtheatwht",
+    "tshirtilovels","tshirtlocgrey","tshirtmaddgrey","tshirtmaddgrn","tshirtmercgry","tshirtmercred",
+    "tshirtmercwht","tshirtproblk","tshirtprored","tshirtprowh","tshirtsuburb","tshirtwhite",
+    "tshirtzipcrm","tshirtzipgry","tuxedo","valet","vest","vestblack",
+    "visor","watchcro","watchcro2","watchgno","watchgno2","watchpink",
+    "watchpro","watchpro2","watchsub1","watchsub2","watchyellow","watchzip1",
+    "watchzip2","wcoatblue","wedge","worktrcamogrn","worktrcamogry","worktrgrey",
+    "worktrkhaki","zorro",
+    };
+
+
 std::map < ushort, const char* >     CModelNames::ms_ModelIDNameMap;
 std::map < SString, ushort >         CModelNames::ms_NameModelIDMap;
+
+std::map < ushort, const char* >     CModelNames::ms_ClothesModelIDNameMap;
+std::map < SString, ushort >         CModelNames::ms_NameClothesModelIDMap;
+
+std::map < ushort, const char* >     CModelNames::ms_ClothesTexIDNameMap;
+std::map < SString, ushort >         CModelNames::ms_NameClothesTexIDMap;
 
 
 //
@@ -1701,6 +1806,19 @@ ushort CModelNames::GetModelID ( const SString& strName )
 {
     InitializeMaps ();
     ushort* pusModelID = MapFind ( ms_NameModelIDMap, strName.ToLower () );
+    if ( pusModelID )
+        return *pusModelID;
+    return INVALID_MODEL_ID;
+}
+
+
+//
+// Get a clothes texture ID from its name (case insensitive)
+//
+ushort CModelNames::GetClothesTexID ( const SString& strName )
+{
+    InitializeMaps ();
+    ushort* pusModelID = MapFind ( ms_NameClothesTexIDMap, strName.ToLower () );
     if ( pusModelID )
         return *pusModelID;
     return INVALID_MODEL_ID;
@@ -1749,6 +1867,21 @@ ushort CModelNames::ResolveModelID ( const SString& strModelName )
 
 
 //
+// Get a file ID in player.img from a string which could be a name or a number.
+//
+ushort CModelNames::ResolveClothesTexID( const SString& strTexNameOrNumber )
+{
+    // Check if it's a number
+    uint bHasOnlyDigits = ( !strTexNameOrNumber.empty() && strTexNameOrNumber.find_first_not_of( "0123456789" ) == SString::npos );
+    if ( bHasOnlyDigits )
+        return atoi( strTexNameOrNumber );
+
+    // Now search for the name
+    return GetClothesTexID( strTexNameOrNumber );
+}
+
+
+//
 // Initialize id <-> name maps
 //
 void CModelNames::InitializeMaps ( void )
@@ -1771,5 +1904,25 @@ void CModelNames::InitializeMaps ( void )
         const char* szName = CVehicleNames::GetVehicleName ( i );
         MapSet ( ms_ModelIDNameMap, usID, szName );
         MapSet ( ms_NameModelIDMap, SStringX ( szName ).ToLower (), usID );
+    }
+
+    assert( NUMELMS( playerClothesModel ) == CLOTHES_MODEL_ID_LAST - CLOTHES_MODEL_ID_FIRST + 1 );
+    assert( NUMELMS( playerClothesTex ) == CLOTHES_TEX_ID_LAST - CLOTHES_TEX_ID_FIRST + 1 );
+
+    // Make clothes maps
+    for ( uint i = 0 ; i < NUMELMS( playerClothesModel ) ; i++ )
+    {
+        ushort usID = CLOTHES_MODEL_ID_FIRST + i;
+        const char* szName = playerClothesModel[i];
+        MapSet ( ms_ClothesModelIDNameMap, usID, szName );
+        MapSet ( ms_NameClothesModelIDMap, SStringX ( szName ).ToLower (), usID );
+    }
+
+    for ( uint i = 0 ; i < NUMELMS( playerClothesTex ) ; i++ )
+    {
+        ushort usID = CLOTHES_TEX_ID_FIRST + i;
+        const char* szName = playerClothesTex[i];
+        MapSet ( ms_ClothesTexIDNameMap, usID, szName );
+        MapSet ( ms_NameClothesTexIDMap, SStringX ( szName ).ToLower (), usID );
     }
 }

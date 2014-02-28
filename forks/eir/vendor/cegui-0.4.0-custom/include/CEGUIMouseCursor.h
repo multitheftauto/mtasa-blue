@@ -177,6 +177,18 @@ public:
 	void	offsetPosition(const Point& offset);
 
 
+    /*!
+    \brief
+        Set the mouse cursor's alpha
+
+    \param alpha
+        The cursor's alpha
+
+    \return
+        Nothing.
+    */
+    void    setAlpha(float alpha);
+
 	/*!
 	\brief
 		Set the area that the mouse cursor is constrained to.
@@ -318,6 +330,7 @@ private:
 	Vector3	d_position;					//!< Current location of the cursor
 	bool	d_visible;					//!< true if the cursor will be drawn, else false.
 	URect	d_constraints;				//!< Specifies the area (in screen pixels) that the mouse can move around in.
+    ColourRect      d_colourRect;       //!< the cursor's colour rect
 };
 
 } // End of  CEGUI namespace section

@@ -204,9 +204,11 @@ void IMG_Initialize( void )
 
     // 'Lazy' patches, for now (even though they are combined with important routines..!)
     // Let's make sure we analyze them at some point ;)
-    *(unsigned int*)0x00409D5A = *(unsigned int*)0x00408FDC = *(unsigned int*)0x0040CC54 = *(unsigned int*)0x0040CCC7 =
-    *(unsigned int*)0x01560E68 =
-        (unsigned int)imgArchives + offsetof(IMGFile, handle);
+    MemPut <unsigned int> ( (unsigned int*)0x00409D5A, (unsigned int)imgArchives + offsetof(IMGFile, handle) );
+    MemPut <unsigned int> ( (unsigned int*)0x00408FDC, (unsigned int)imgArchives + offsetof(IMGFile, handle) );
+    MemPut <unsigned int> ( (unsigned int*)0x0040CC54, (unsigned int)imgArchives + offsetof(IMGFile, handle) );
+    MemPut <unsigned int> ( (unsigned int*)0x0040CCC7, (unsigned int)imgArchives + offsetof(IMGFile, handle) );
+    MemPutFast <unsigned int> ( (unsigned int*)0x01560E68, (unsigned int)imgArchives + offsetof(IMGFile, handle) );
 }
 
 void IMG_Shutdown( void )

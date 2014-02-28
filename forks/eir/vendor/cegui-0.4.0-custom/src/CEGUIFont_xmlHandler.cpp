@@ -91,12 +91,13 @@ void Font_xmlHandler::elementStart(const String& element, const XMLAttributes& a
             int horzAdvance = attributes.getValueAsInteger(MappingHorzAdvanceAttribute, -1);
 
 			Font::glyphDat	mapDat;
-			mapDat.d_image = &d_font->d_glyph_images->getImage(image_name);
+			// Disable this for now
+            // mapDat.d_image = &d_font->d_glyph_images->getImage(image_name);
 
 			// calculate advance width if it was not specified
 			if (horzAdvance == AutoGenerateHorzAdvance)
 			{
-				horzAdvance = (int)(mapDat.d_image->getWidth() + mapDat.d_image->getOffsetX());
+				//horzAdvance = (int)(mapDat.d_image->getWidth() + mapDat.d_image->getOffsetX());
 			}
 
 			mapDat.d_horz_advance_unscaled = horzAdvance;
@@ -174,7 +175,7 @@ void Font_xmlHandler::elementStart(const String& element, const XMLAttributes& a
 			d_font->d_freetype = false;
 
 			// load the Imageset
-			d_font->d_glyph_images = ImagesetManager::getSingleton().createImageset(filename, resourceGroup);
+			//d_font->d_glyph_images = ImagesetManager::getSingleton().createImageset(filename, resourceGroup);
 
 			d_font->setNativeResolution(Size(hres, vres));
 			d_font->setAutoScalingEnabled(auto_scale);
@@ -265,7 +266,7 @@ void Font_xmlHandler::elementEnd(const String& element)
 		// if this is a freetype based font, perform glyph definition
 		if (d_font->d_freetype)
 		{
-			d_font->defineFontGlyphs(d_glyphSet);
+			//d_font->defineFontGlyphs(d_glyphSet);
 		}
 
 		Logger::getSingleton().logEvent("Finished creation of Font '" + d_font->d_name + "' via XML file.", Informative);

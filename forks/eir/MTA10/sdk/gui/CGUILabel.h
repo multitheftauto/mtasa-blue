@@ -20,7 +20,6 @@ public:
     virtual                         ~CGUILabel                  ( void ) {};
 
     virtual void                    SetText                     ( const char *Text ) = 0;
-    virtual void                    AutoSize                    ( const char* szText ) = 0;
 
     virtual void                    SetVerticalAlign            ( CGUIVerticalAlign eAlign ) = 0;
     virtual CGUIVerticalAlign       GetVerticalAlign            ( void ) = 0;

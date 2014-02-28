@@ -26,12 +26,13 @@ public:
 
     inline const char*      GetFunctionName     ( void ) const              { return m_strName.c_str (); };
     void                    SetFunctionName     ( const char* szName )      { m_strName = szName ? szName : ""; };
+    const SString&          GetName             ( void )                    { return m_strName; }
 
     bool                    IsRestricted        ( void )                    { return m_bRestricted; };
 
 private:
     lua_CFunction           m_Function;
-    std::string             m_strName;
+    SString                 m_strName;
     bool                    m_bRestricted;
 
 };
@@ -42,8 +43,10 @@ public:
     static CLuaCFunction*               AddFunction                 ( const char* szName, lua_CFunction f, bool bRestricted = false );
 
     static CLuaCFunction*               GetFunction                 ( const char* szName, lua_CFunction f );
+    static CLuaCFunction*               GetFunction                 ( const char* szName );
     static CLuaCFunction*               GetFunction                 ( lua_CFunction f );
     static const char*                  GetFunctionName             ( lua_CFunction f, bool& bRestricted );
+    static bool                         IsNotFunction               ( lua_CFunction f );
 
     static bool                         IsRestricted                ( const char* szName );
 

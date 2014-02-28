@@ -200,7 +200,7 @@ void CLuaArguments::PushAsTable ( lua_State* luaVM, CFastHashMap < CLuaArguments
 }
 
 
-void CLuaArguments::PushArguments ( CLuaArguments& Arguments )
+void CLuaArguments::PushArguments ( const CLuaArguments& Arguments )
 {
     vector < CLuaArgument* > ::const_iterator iter = Arguments.IterBegin ();
     for ( ; iter != Arguments.IterEnd (); iter++ )
@@ -219,7 +219,7 @@ bool CLuaArguments::Call ( CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFuncti
     // Add the function name to the stack and get the event from the table
     lua_State* luaVM = pLuaMain->GetVirtualMachine ();
     assert ( luaVM );
-    LUA_CHECKSTACK ( luaVM, 1 );
+    LUA_CHECKSTACK ( luaVM, 2 );
     int luaStackPointer = lua_gettop ( luaVM );
     lua_getref ( luaVM, iLuaFunction.ToInt () );
 
@@ -274,7 +274,7 @@ bool CLuaArguments::Call ( CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFuncti
             lua_pop ( luaVM, 1 );
     }
         
-    CClientPerfStatLuaTiming::GetSingleton ()->UpdateLuaTiming ( pLuaMain, pLuaMain->GetFunctionTag ( iLuaFunction.m_iFunction ), GetTimeUs() - startTime );
+    CClientPerfStatLuaTiming::GetSingleton ()->UpdateLuaTiming ( pLuaMain, pLuaMain->GetFunctionTag ( iLuaFunction.ToInt() ), GetTimeUs() - startTime );
     return true;
 }
 

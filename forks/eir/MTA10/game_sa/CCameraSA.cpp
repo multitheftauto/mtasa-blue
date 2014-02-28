@@ -232,8 +232,8 @@ void CCameraSA::RestoreLastGoodState ( void )
         pCamInterface->m_fBetaSpeedOverOneFrame = 0;
         pCamInterface->m_fTrueBeta = 1;
         pCamInterface->m_fTrueAlpha = 1;
-        pCamInterface->Alpha = 1;
-        pCamInterface->Beta = 1;
+        pCamInterface->m_fVerticalAngle = 1;
+        pCamInterface->m_fHorizontalAngle = 1;
         pCamInterface->BetaSpeed = 0;
         pCamInterface->SpeedVar = 0;
 
@@ -600,5 +600,17 @@ BYTE CCameraSA::GetCameraViewMode ( void )
 
 VOID CCameraSA::SetCameraViewMode ( BYTE dwCamMode )
 {
-    MemPut < BYTE > ( VAR_VehicleCameraView, dwCamMode );
+    MemPutFast < BYTE > ( VAR_VehicleCameraView, dwCamMode );
+}
+
+void CCameraSA::SetShakeForce ( float fShakeForce )
+{
+    CCameraSAInterface* pCameraInterface = GetInterface ();
+    pCameraInterface->m_fCamShakeForce = fShakeForce;
+}
+
+float CCameraSA::GetShakeForce ( void )
+{
+    CCameraSAInterface* pCameraInterface = GetInterface ();
+    return pCameraInterface->m_fCamShakeForce;
 }

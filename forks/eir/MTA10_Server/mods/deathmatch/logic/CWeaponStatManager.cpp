@@ -57,13 +57,13 @@ CWeaponStatManager::CWeaponStatManager ( )
 
 CWeaponStatManager::~CWeaponStatManager ( )
 {
-    for ( std::list < CWeaponStat* >::iterator iter = m_OriginalWeaponData.begin (); iter != m_OriginalWeaponData.end ();iter++ )
+    for ( std::list < CWeaponStat* >::iterator iter = m_OriginalWeaponData.begin (); iter != m_OriginalWeaponData.end (); ++iter )
     {
         if ( (*iter ) )
             delete (*iter);
     }
 
-    for ( std::list < CWeaponStat* >::iterator iter = m_WeaponData.begin (); iter != m_WeaponData.end ();iter++ )
+    for ( std::list < CWeaponStat* >::iterator iter = m_WeaponData.begin (); iter != m_WeaponData.end (); ++iter )
     {
         if ( (*iter ) )
             delete (*iter);
@@ -73,7 +73,7 @@ CWeaponStatManager::~CWeaponStatManager ( )
 
 CWeaponStat* CWeaponStatManager::GetWeaponStats ( eWeaponType type, eWeaponSkill skill )
 {
-    for ( std::list < CWeaponStat* >::iterator iter = m_WeaponData.begin (); iter != m_WeaponData.end ();iter++ )
+    for ( std::list < CWeaponStat* >::iterator iter = m_WeaponData.begin (); iter != m_WeaponData.end (); ++iter )
     {
         if ( ( (*iter)->GetWeaponSkillLevel() == skill || type > WEAPONTYPE_TEC9 ) && 
             (*iter)->GetWeaponType () == type )
@@ -105,7 +105,7 @@ CWeaponStat* CWeaponStatManager::GetWeaponStatsFromSkillLevel ( eWeaponType type
 
 CWeaponStat* CWeaponStatManager::GetOriginalWeaponStats ( eWeaponType type, eWeaponSkill skill )
 {
-    for ( std::list < CWeaponStat* >::iterator iter = m_OriginalWeaponData.begin (); iter != m_OriginalWeaponData.end ();iter++ )
+    for ( std::list < CWeaponStat* >::iterator iter = m_OriginalWeaponData.begin (); iter != m_OriginalWeaponData.end (); ++iter )
     {
         if ( ( (*iter)->GetWeaponSkillLevel() == skill || type > WEAPONTYPE_TEC9 ) && 
             (*iter)->GetWeaponType () == type )

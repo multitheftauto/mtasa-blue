@@ -70,8 +70,11 @@ CVehicle::CVehicle ( CVehicleManager* pVehicleManager, CElement* pParent, CXMLNo
     m_bInWater = false;
     m_bDerailed = false;
     m_bIsDerailable = true;
+    m_fTrainSpeed = 0.0f;
+    m_fTrainPosition = 0.0f;
+    m_ucTrackID = 0;
     m_bTaxiLightState = false;
-    m_bTrainDirection = true;
+    m_bTrainDirection = false;
     m_HeadLightColor = SColorRGBA ( 255, 255, 255, 255 );
     m_bHeliSearchLightVisible = false;
     m_bCollisionsEnabled = true;
@@ -96,6 +99,9 @@ CVehicle::CVehicle ( CVehicleManager* pVehicleManager, CElement* pParent, CXMLNo
 
     // Generate the handling data
     GenerateHandlingData ();
+
+    // Prepare the sirens
+    RemoveVehicleSirens();
     m_tSirenBeaconInfo.m_bOverrideSirens = false;
 }
 
@@ -689,7 +695,7 @@ void CVehicle::SetRegPlate ( const char* szRegPlate )
 {
     // Copy the text and make sure non-used chars are nulled.
     memset ( m_szRegPlate, 0, 9 );
-    strncpy ( m_szRegPlate, szRegPlate, 9 );
+    STRNCPY ( m_szRegPlate, szRegPlate, 9 );
 }
 
 
@@ -797,6 +803,8 @@ void CVehicle::RemoveVehicleSirens ( void )
         SetVehicleSirenMinimumAlpha( i, 0 );
         SetVehicleSirenColour( i, SColor ( ) );
     }
+
+    m_tSirenBeaconInfo.m_ucSirenCount = 0;
 }
 
 

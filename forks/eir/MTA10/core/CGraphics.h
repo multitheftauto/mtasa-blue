@@ -24,9 +24,14 @@ class CGraphics;
 #include "CSingleton.h"
 #include <CRenderItemManager.h>
 
+#define DUMMY_PROGRESS_INITIAL_DELAY        1000    // Game stall time before spinner is displayed
+#define DUMMY_PROGRESS_MIN_DISPLAY_TIME     1000    // Minimum time spinner is drawn (to prevent flicker)
+#define DUMMY_PROGRESS_ANIMATION_INTERVAL   100     // Animation speed
+
 class CTileBatcher;
 class CLine3DBatcher;
 class CMaterialLine3DBatcher;
+class CAspectRatioConverter;
 struct IDirect3DDevice9;
 struct IDirect3DSurface9;
 
@@ -42,6 +47,20 @@ namespace EDrawMode
 }
 using EDrawMode::EDrawModeType;
 
+struct SCustomScaleFontInfo
+{
+    SCustomScaleFontInfo( void ) : fScale( 0 ), fontType( FONT_DEFAULT ), pFont( NULL ) {}
+    float fScale;
+    eFontType fontType;
+    ID3DXFont* pFont;
+};
+
+struct sFontInfo
+{
+    const char* szName;
+    unsigned int uiHeight;
+    unsigned int uiWeight;
+};
 
 class CGraphics : public CGraphicsInterface, public CSingleton < CGraphics >
 {
@@ -74,11 +93,19 @@ public:
     unsigned int        GetViewportWidth        ( void );
     unsigned int        GetViewportHeight       ( void );
 
+    void                SetAspectRatioAdjustmentEnabled     ( bool bEnabled, float fSourceRatio = 4/3.f );
+    bool                IsAspectRatioAdjustmentEnabled      ( void );
+    float               GetAspectRatioAdjustmentSourceRatio ( void );
+    void                SetAspectRatioAdjustmentSuspended   ( bool bSuspended );
+    float               ConvertPositionForAspectRatio       ( float fY );
+    void                ConvertSideForAspectRatio           ( float* pfY, float* pfHeight );
+
     // DirectX font functions
-    ID3DXFont *         GetFont                 ( eFontType fontType = FONT_DEFAULT );
+    ID3DXFont *         GetFont                 ( eFontType fontType = FONT_DEFAULT, float* pfOutScaleUsed = NULL, float fRequestedScale = 1, const char* szCustomScaleUser = NULL );
 
     bool                LoadStandardDXFonts     ( void );
     bool                DestroyStandardDXFonts  ( void );
+    bool                CreateStandardDXFontWithCustomScale ( eFontType fontType, float fScale, ID3DXFont** ppD3DXFont );
 
     bool                LoadAdditionalDXFont    ( std::string strFontPath, std::string strFontName, unsigned int uiHeight, bool bBold, ID3DXFont** ppD3DXFont );
     bool                DestroyAdditionalDXFont ( std::string strFontPath, ID3DXFont* pD3DXFont );
@@ -89,7 +116,7 @@ public:
     float               GetDXTextExtentW        ( const wchar_t* wszText, float fScale = 1.0f, LPD3DXFONT pDXFont = NULL );
 
     // Textures
-    void                DrawTexture             ( CTextureItem* texture, float fX, float fY, float fScaleX = 1.0f, float fScaleY = 1.0f, float fRotation = 0.0f, float fCenterX = 0.0f, float fCenterY = 0.0f, DWORD dwColor = 0xFFFFFFFF );
+    void                DrawTexture             ( CTextureItem* texture, float fX, float fY, float fScaleX = 1.0f, float fScaleY = 1.0f, float fRotation = 0.0f, float fCenterX = 0.0f, float fCenterY = 0.0f, DWORD dwColor = 0xFFFFFFFF, float fU = 0, float fV = 0, float fSizeU = 1, float fSizeV = 1, bool bRelativeUV = true );
 
     // Interface functions
     void                SetCursorPosition       ( int iX, int iY, DWORD Flags );
@@ -146,7 +173,10 @@ public:
                                                   ID3DXFont * pDXFont = NULL,
                                                   bool bPostGUI = false,
                                                   bool bColorCoded = false,
-                                                  bool bSubPixelPositioning = false );
+                                                  bool bSubPixelPositioning = false,
+                                                  float fRotation = 0,
+                                                  float fRotationCenterX = 0,
+                                                  float fRotationCenterY = 0 );
 
     void                OnChangingRenderTarget  ( uint uiNewViewportSizeX, uint uiNewViewportSizeY );
 
@@ -155,11 +185,23 @@ public:
     CScreenGrabberInterface*     GetScreenGrabber       ( void )        { return m_pScreenGrabber; }
     CPixelsManagerInterface*     GetPixelsManager       ( void )        { return m_pPixelsManager; }
 
+    // Transition between GTA and MTA controlled rendering
+    virtual void                            EnteringMTARenderZone       ( void );
+    virtual void                            LeavingMTARenderZone        ( void );
+    virtual void                            MaybeEnteringMTARenderZone  ( void );
+    virtual void                            MaybeLeavingMTARenderZone   ( void );
+    void                                    SaveGTARenderStates         ( void );
+    void                                    RestoreGTARenderStates      ( void );
+
     // To draw queued up drawings
     void                DrawPreGUIQueue         ( void );
     void                DrawPostGUIQueue        ( void );
     void                DrawMaterialLine3DQueue ( void );
     bool                HasMaterialLine3DQueueItems ( void );
+
+    void                DidRenderScene          ( void );
+    void                SetProgressMessage      ( const SString& strMessage );
+    void                DrawProgressMessage     ( bool bPreserveBackbuffer = true );
 
 private:
     void                OnDeviceCreate          ( IDirect3DDevice9 * pDevice );
@@ -169,7 +211,8 @@ private:
     ID3DXFont*          MaybeGetBigFont         ( ID3DXFont* pDXFont, float& fScaleX, float& fScaleY );
     void                CheckModes              ( EDrawModeType newDrawMode, EBlendModeType newBlendMode = EBlendMode::NONE );
     void                DrawColorCodedTextLine  ( float fLeft, float fRight, float fY, SColor& currentColor, const wchar_t* wszText,
-                                                  float fScaleX, float fScaleY, unsigned long ulFormat, ID3DXFont* pDXFont, bool bPostGUI, bool bSubPixelPositioning );
+                                                  float fScaleX, float fScaleY, unsigned long ulFormat, ID3DXFont* pDXFont, bool bPostGUI, bool bSubPixelPositioning,
+                                                  float fRotation, float fRotationCenterX, float fRotationCenterY );
 
     CLocalGUI*          m_pGUI;
 
@@ -191,6 +234,7 @@ private:
     CLine3DBatcher*             m_pLine3DBatcherPreGUI;
     CLine3DBatcher*             m_pLine3DBatcherPostGUI;
     CMaterialLine3DBatcher*     m_pMaterialLine3DBatcher;
+    CAspectRatioConverter*      m_pAspectRatioConverter;
 
     // Fonts
     ID3DXFont*          m_pDXFonts [ NUM_FONTS ];
@@ -232,6 +276,9 @@ private:
         float           fScaleY;
         unsigned long   ulFormat;
         ID3DXFont*      pDXFont;
+        float           fRotation;
+        float           fRotationCenterX;
+        float           fRotationCenterY;
     };
 
     struct sDrawQueueRect
@@ -277,14 +324,6 @@ private:
         };
     };
 
-
-    struct sFontInfo
-    {
-        const char* szName;
-        unsigned int uiHeight;
-        unsigned int uiWeight;
-    };
-
     // Drawing queues
     std::vector < sDrawQueueItem >      m_PreGUIQueue;
     std::vector < sDrawQueueItem >      m_PostGUIQueue;
@@ -300,6 +339,29 @@ private:
 
     // Drawing types
     struct ID3DXLine*                   m_pLineInterface;
+
+    enum EMTARenderZone
+    {
+        MTA_RZONE_NONE,
+        MTA_RZONE_MAIN,     // MTA rendering inside known areas.
+        MTA_RZONE_OUTSIDE,  // MTA rendering outside known areas. i.e. During a keypress or GTA callback
+    };
+
+    EMTARenderZone                      m_MTARenderZone;
+    int                                 m_iOutsideZoneCount;
+    IDirect3DStateBlock9*               m_pSavedStateBlock;
+    CElapsedTime                        m_LastRenderedSceneTimer;
+    IDirect3DSurface9*                  m_pSavedFrontBufferData;
+    CRenderTargetItem*                  m_pTempBackBufferData;
+    CTextureItem*                       m_ProgressSpinnerTexture;
+    SString                             m_strProgressMessage;
+    CElapsedTime                        m_FirstDrawnProgressTimer;
+    CElapsedTime                        m_LastDrawnProgressTimer;
+    CElapsedTime                        m_LastLostDeviceTimer;
+    bool                                m_bProgressVisible;
+    CElapsedTime                        m_ProgressAnimTimer;
+    uint                                m_uiProgressAnimFrame;
+    std::map < SString, SCustomScaleFontInfo > m_CustomScaleFontMap;
 };
 
 #endif

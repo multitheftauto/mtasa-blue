@@ -63,7 +63,7 @@ AC_ARG_ENABLE([system-pcre],
 AC_DEFUN([USE_BUNDLED_PCRE], [
 	HAVE_BUNDLED_PCRE=yes
 	PCRE_CFLAGS="-I\$(top_builddir)/vendor/pcre"
-	PCRE_LIBS="\$(top_builddir)/vendor/pcre/libpcre.la"
+	PCRE_LIBS="\$(top_builddir)/vendor/pcre/libpcrecpp.la"
 ])
 
 if test "x$enable_system_pcre" != "xno" ; then
@@ -113,7 +113,7 @@ CPPFLAGS="$save_CPPFLAGS"
 
 # sqlite3 (for mods/deathmatch)
 # bundled version seems to be for windows
-PKG_CHECK_MODULES([SQLITE3], [sqlite3])
+#PKG_CHECK_MODULES([SQLITE3], [sqlite3]) ** Compiling sqlite3.c now
 
 # curses (for MTA10_Server/{core,sdk})
 AC_ARG_VAR([CURSES_LIB], [linker flags for curses])

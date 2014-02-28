@@ -147,6 +147,7 @@ struct SGTAControlState
 };
 
 #define NUM_CONTROL_STATES 45
+#define NUM_MTA_CONTROL_STATES 19
 
 class CPad
 {
@@ -165,7 +166,8 @@ public:
     bool                        IsControlEnabled                ( const char* szControl, bool& bEnabled );
     bool                        SetControlEnabled               ( const char* szControl, bool bEnabled );
 
-    void                        SetAllControlsEnabled           ( bool bEnabled );
+    void                        SetAllGTAControlsEnabled        ( bool bEnabled );
+    void                        SetAllMTAControlsEnabled        ( bool bEnabled );
 
 protected:
     void                        UpdateKeys                      ( void );
@@ -174,7 +176,8 @@ protected:
 
     CControllerState            m_csCurrentState;
 
-    SFixedArray < SGTAControlState, NUM_CONTROL_STATES >   m_ControlStates;
+    SFixedArray < SGTAControlState, NUM_CONTROL_STATES >    m_ControlStates;
+    SFixedArray < bool, NUM_MTA_CONTROL_STATES >            m_MTAEnabledControls;
     bool                        m_bUpdatedKeys;
 };
 

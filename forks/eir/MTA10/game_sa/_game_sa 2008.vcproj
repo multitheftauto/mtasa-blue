@@ -380,6 +380,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CAudioContainerLookupTableSA.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CAudioContainerSA.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\CAudioEngineSA.cpp"
 				>
 			</File>
@@ -437,6 +445,10 @@
 			</File>
 			<File
 				RelativePath="CClockSA.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CClothesBuilder.cache.cpp"
 				>
 			</File>
 			<File
@@ -712,6 +724,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CRenderWareSA.ClothesReplacing.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\CRenderWareSA.cpp"
 				>
 			</File>
@@ -841,6 +857,10 @@
 			</File>
 			<File
 				RelativePath="CVehicleSA.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CVehicleSA.customplate.cpp"
 				>
 			</File>
 			<File
@@ -1033,6 +1053,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CAudioContainerLookupTableSA.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CAudioContainerSA.h"
+				>
+			</File>
+			<File
 				RelativePath=".\CAudioEngineSA.h"
 				>
 			</File>
@@ -1094,6 +1122,10 @@
 			</File>
 			<File
 				RelativePath="CClockSA.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CClothesBuilder.cache.h"
 				>
 			</File>
 			<File
@@ -1522,6 +1554,10 @@
 			</File>
 			<File
 				RelativePath=".\CVehicleModelInfoSA.render.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CVehicleSA.customplate.h"
 				>
 			</File>
 			<File

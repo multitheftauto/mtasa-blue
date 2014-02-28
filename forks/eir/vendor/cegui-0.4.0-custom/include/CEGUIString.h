@@ -624,12 +624,13 @@ public:
 
 	\exception std::length_error	Thrown if resulting String object would be too big.
 	*/
+#if 0   // Disabled as messes up utf8 characters
 	String(const char* chars, size_type chars_len)
 	{
 		init();
 		assign(chars, chars_len);
 	}
-
+#endif
 
 	//////////////////////////////////////////////////////////////////////////
 	// Size operations
@@ -1377,6 +1378,14 @@ public:
 	\exception std::out_of_range	Thrown if \a str_idx is invalid for \a std_str
 	\exception std::length_error	Thrown if the resulting String would have been too large.
 	*/
+
+	String&	assign(const std::string& std_str)
+	{
+        assign(std_str.c_str());
+		return *this;
+	}
+
+#if 0   // Disabled as messes up utf8 characters
 	String&	assign(const std::string& std_str, size_type str_idx = 0, size_type str_num = npos)
 	{
 		if (std_str.size() < str_idx)
@@ -1395,7 +1404,7 @@ public:
 
 		return *this;
 	}
-
+#endif
 	/*!
 	\brief
 		Assign to this String the string value represented by the given null-terminated utf8 encoded data
@@ -1536,7 +1545,8 @@ public:
 	*/
 	String&	operator=(const char* cstr)
 	{
-		return assign(cstr, strlen(cstr));
+        // Redirected to preserve utf8 characters
+		return assign((const utf8*)cstr);
 	}
 
 
@@ -1554,7 +1564,8 @@ public:
 	*/
 	String&	assign(const char* cstr)
 	{
-		return assign(cstr, strlen(cstr));
+        // Redirected to preserve utf8 characters
+		return assign((const utf8*)cstr);
 	}
 
 
@@ -1573,6 +1584,7 @@ public:
 
 	\exception std::length_error	Thrown if the resulting String would have been too large.
 	*/
+#if 0   // Disabled as messes up utf8 characters
 	String&	assign(const char* chars, size_type chars_len)
 	{
 		grow(chars_len);
@@ -1586,7 +1598,7 @@ public:
 		setlen(chars_len);
 		return *this;
 	}
-
+#endif
 
 	/*!
 	\brief

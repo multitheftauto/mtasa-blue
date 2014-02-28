@@ -24,15 +24,24 @@
 ///////////////////////////////////////////////////////////////
 bool IsJpeg ( const void* pData, uint uiDataSize )
 {
-    static uchar JpegHeader[] = { 0xFF, 0xD8, 0xFF, 0xE0, 0x00, 0x10, 0x4A, 0x46, 0x49, 0x46 };
+    static uchar JpegHeader[] = { 0xFF, 0xD8, 0xFF };
     static uchar JpegTail[] = { 0xFF, 0xD9 };
 
-    if ( uiDataSize >= sizeof ( JpegHeader ) )
+    if ( uiDataSize >= sizeof ( JpegHeader ) + sizeof ( JpegTail ) )
     {
         if ( memcmp ( pData, JpegHeader, sizeof ( JpegHeader ) ) == 0 &&
              memcmp ( (BYTE*)pData + uiDataSize - sizeof ( JpegTail ), JpegTail, sizeof ( JpegTail ) ) == 0 )
         {
-            return true;
+            // Size of first segment
+            uint uiSeg1Size = *((BYTE*)pData + 4) * 256;
+            uiSeg1Size += *((BYTE*)pData + 5);
+            if ( uiSeg1Size + 5 < uiDataSize )
+            {
+                // Check first byte of second segement
+                uchar ucSeg2Marker = *((BYTE*)pData + 4 + uiSeg1Size);
+                if ( ucSeg2Marker == 0xFF )
+                    return true;
+            }
         }
     }
     return false;

@@ -405,13 +405,7 @@ inline bool CSettings::HasResourceName ( const char *szSetting ) {
 // Parses the name and returns the actual name of the variable
 inline const char* CSettings::GetName ( const char *szSetting, unsigned int uiResourceLength ) {
     // Only calculate the resource length if it's not already specified
-    if ( uiResourceLength < 0 ) {
-        char szBuffer[MAX_RESOURCE_LENGTH] = {0};
-        uiResourceLength = ( GetResourceName ( szSetting, szBuffer, MAX_RESOURCE_LENGTH - 1 ) != NULL ) ? 0 : strlen ( szBuffer ) + 1;
-    } else {
-        // Make sure the prefix is stripped off
-        if ( HasPrefix ( szSetting[0] ) ) szSetting++;
-    }
+    if ( HasPrefix ( szSetting[0] ) ) szSetting++;
 
     // Since we know the resource length, we just return the pointer to whereever the resource part ends (and the name begins)
     const char * szName = ( szSetting + uiResourceLength );

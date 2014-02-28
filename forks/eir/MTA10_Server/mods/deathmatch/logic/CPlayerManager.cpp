@@ -136,7 +136,7 @@ void CPlayerManager::DeleteAll ( void )
 void CPlayerManager::BroadcastOnlyJoined ( const CPacket& Packet, CPlayer* pSkip )
 {
     // Make a list of players to send this packet to
-    std::vector < CPlayer* > sendList;
+    CSendList sendList;
 
     // Send the packet to each ingame player on the server except the skipped one
     list < CPlayer* > ::const_iterator iter = m_Players.begin ();
@@ -153,9 +153,8 @@ void CPlayerManager::BroadcastOnlyJoined ( const CPacket& Packet, CPlayer* pSkip
 }
 
 
-// Send one packet to a list of players
-template < class T >
-static void DoBroadcast ( const CPacket& Packet, const T& sendList )
+// Send one packet to a list of players, grouped by bitstream version
+static void DoBroadcast( const CPacket& Packet, const std::multimap < ushort, CPlayer* >& groupMap )
 {
     if ( !CNetBufferWatchDog::CanSendPacket ( Packet.GetPacketID () ) )
         return; 
@@ -195,16 +194,8 @@ static void DoBroadcast ( const CPacket& Packet, const T& sendList )
         packetPriority = PACKET_PRIORITY_LOW;
     }
 
-    // Group players by bitstream version
-    std::multimap < ushort, CPlayer* > groupMap;
-    for ( typename T::const_iterator iter = sendList.begin () ; iter != sendList.end () ; ++iter )
-    {
-        CPlayer* pPlayer = *iter;
-        MapInsert ( groupMap, pPlayer->GetBitStreamVersion (), pPlayer );
-    }
-
     // For each bitstream version, make and send a packet
-    typedef std::multimap < ushort, CPlayer* > ::iterator mapIter;
+    typedef std::multimap < ushort, CPlayer* > ::const_iterator mapIter;
     mapIter m_it, s_it;
     for ( m_it = groupMap.begin () ; m_it != groupMap.end () ; m_it = s_it )
     {
@@ -219,7 +210,7 @@ static void DoBroadcast ( const CPacket& Packet, const T& sendList )
             g_pGame->SendPacketBatchBegin ( Packet.GetPacketID (), pBitStream );
 
             // For each player, send the packet
-            pair < mapIter , mapIter > keyRange = groupMap.equal_range ( usBitStreamVersion );
+            const pair < mapIter , mapIter > keyRange = groupMap.equal_range ( usBitStreamVersion );
             for ( s_it = keyRange.first ; s_it != keyRange.second ; ++s_it )
             {
                 CPlayer* pPlayer = s_it->second;
@@ -232,7 +223,7 @@ static void DoBroadcast ( const CPacket& Packet, const T& sendList )
         else
         {
             // Skip
-            pair < mapIter , mapIter > keyRange = groupMap.equal_range ( usBitStreamVersion );
+            const pair < mapIter , mapIter > keyRange = groupMap.equal_range ( usBitStreamVersion );
             for ( s_it = keyRange.first ; s_it != keyRange.second ; ++s_it )
             {}
         }
@@ -241,6 +232,23 @@ static void DoBroadcast ( const CPacket& Packet, const T& sendList )
         g_pNetServer->DeallocateNetServerBitStream ( pBitStream );
     }
 }
+
+
+// Send one packet to a list of players
+template < class T >
+static void DoBroadcast ( const CPacket& Packet, const T& sendList )
+{
+    // Group players by bitstream version
+    std::multimap < ushort, CPlayer* > groupMap;
+    for ( typename T::const_iterator iter = sendList.begin () ; iter != sendList.end () ; ++iter )
+    {
+        CPlayer* pPlayer = *iter;
+        MapInsert ( groupMap, pPlayer->GetBitStreamVersion (), pPlayer );
+    }
+
+    DoBroadcast( Packet, groupMap );
+}
+
 
 
 // Send one packet to a list of players
@@ -259,6 +267,12 @@ void CPlayerManager::Broadcast ( const CPacket& Packet, const std::list < CPlaye
 void CPlayerManager::Broadcast ( const CPacket& Packet, const std::vector < CPlayer* >& sendList )
 {
     DoBroadcast ( Packet, sendList );
+}
+
+// Send one packet to a list of players
+void CPlayerManager::Broadcast ( const CPacket& Packet, const std::multimap < ushort, CPlayer* >& groupMap )
+{
+    DoBroadcast ( Packet, groupMap );
 }
 
 
@@ -305,6 +319,7 @@ void CPlayerManager::AddToList ( CPlayer* pPlayer )
         (*iter)->AddPlayerToDistLists ( pPlayer );
     }
 
+    assert( !m_Players.Contains( pPlayer ) );
     m_Players.push_back ( pPlayer );
     MapSet ( m_SocketPlayerMap, pPlayer->GetSocket (), pPlayer );
     assert ( m_Players.size () == m_SocketPlayerMap.size () );
@@ -315,11 +330,23 @@ void CPlayerManager::RemoveFromList ( CPlayer* pPlayer )
 {
     m_Players.remove ( pPlayer );
     MapRemove ( m_SocketPlayerMap, pPlayer->GetSocket () );
+    assert( !m_Players.Contains( pPlayer ) );
     assert ( m_Players.size () == m_SocketPlayerMap.size () );
 
-    // Remove from other players near/far lists
+    m_strLowestConnectedPlayerVersion.clear();
     for ( std::list < CPlayer* > ::const_iterator iter = m_Players.begin () ; iter != m_Players.end (); iter++ )
     {
+        // Remove from other players near/far lists
         (*iter)->RemovePlayerFromDistLists ( pPlayer );
+
+        // Update lowest player version
+        if ( (*iter)->GetPlayerVersion() < m_strLowestConnectedPlayerVersion || m_strLowestConnectedPlayerVersion.empty() )
+            m_strLowestConnectedPlayerVersion = (*iter)->GetPlayerVersion();
     }
+}
+
+void CPlayerManager::OnPlayerSetVersion ( CPlayer* pPlayer )
+{
+    if ( pPlayer->GetPlayerVersion() < m_strLowestConnectedPlayerVersion || m_strLowestConnectedPlayerVersion.empty() )
+        m_strLowestConnectedPlayerVersion = pPlayer->GetPlayerVersion();
 }

@@ -19,7 +19,15 @@
 #include <CMatrix_Pad.h>
 #include "Common.h"
 
+#ifdef GTASA_30
+
+#define FUNC_DeleteMarkerObject         0x753CD0
+
+#else
+
 #define FUNC_DeleteMarkerObject         0x722390
+
+#endif
 
 class C3DMarkerSAInterface
 {

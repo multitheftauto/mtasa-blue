@@ -1252,8 +1252,16 @@ void Window::releaseInput(void)
 		d_captureWindow = NULL;
 	}
 
-    WindowEventArgs args(this);
-	onCaptureLost(args);
+    try
+    {
+        WindowEventArgs args(this);
+	    onCaptureLost(args);
+    }
+    catch (UnknownObjectException)
+    {
+        // Guess fix for scrollbar throwing UnknownObjectException("WindowManager::getWindow ...") inside FalagardScrollbar::getValueFromThumb()
+        // (When called from Window::destroy())
+    }
 }
 
 
@@ -1847,7 +1855,8 @@ float Window::windowToScreenY(const UDim& y) const
 *************************************************************************/
 Vector2 Window::windowToScreen(const UVector2& vec) const
 {
-    Vector2 base = d_parent ? d_parent->windowToScreen(base) + getAbsolutePosition() : getAbsolutePosition();
+    Vector2 base(0, 0);
+    base = d_parent ? d_parent->windowToScreen(base) + getAbsolutePosition() : getAbsolutePosition();
 
     switch(d_horzAlign)
     {
@@ -1881,7 +1890,8 @@ Vector2 Window::windowToScreen(const UVector2& vec) const
 *************************************************************************/
 Rect Window::windowToScreen(const URect& rect) const
 {
-    Vector2 base = d_parent ? d_parent->windowToScreen(base) + getAbsolutePosition() : getAbsolutePosition();
+    Vector2 base(0, 0);
+    base = d_parent ? d_parent->windowToScreen(base) + getAbsolutePosition() : getAbsolutePosition();
 
     switch(d_horzAlign)
     {

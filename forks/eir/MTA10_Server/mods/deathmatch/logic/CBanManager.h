@@ -42,6 +42,7 @@ public:
     bool                IsSpecificallyBanned    ( const char* szIP );
     bool                IsSerialBanned          ( const char* szSerial );
     bool                IsAccountBanned         ( const char* szAccount );
+    CBan*               GetBanFromAccount       ( const char* szAccount );
     void                RemoveBan               ( CBan* pBan );
     void                RemoveAllBans           ( bool bPermanentDelete = false );
 

@@ -16,7 +16,7 @@ public:
     // Main thread methods
     void            AddSimPlayer            ( CPlayer* pPlayer );
     void            RemoveSimPlayer         ( CPlayer* pPlayer );
-    void            UpdateSimPlayer         ( CPlayer* pPlayer, const std::set < CPlayer* >* pPuresyncSendList, const std::set < CPlayer* >* pKeysyncSendList, const std::set < CPlayer* >* pBulletsyncSendList );
+    void            UpdateSimPlayer         ( CPlayer* pPlayer );
 
     // Any thread methods
     void            LockSimSystem           ( void );
@@ -27,8 +27,9 @@ public:
     bool            HandleVehiclePureSync   ( const NetServerPlayerID& Socket, NetBitStreamInterface* BitStream );
     bool            HandleKeySync           ( const NetServerPlayerID& Socket, NetBitStreamInterface* BitStream );
     bool            HandleBulletSync        ( const NetServerPlayerID& Socket, NetBitStreamInterface* BitStream );
+    bool            HandlePedTaskPacket     ( const NetServerPlayerID& Socket, NetBitStreamInterface* BitStream );
     CSimPlayer*     Get                     ( const NetServerPlayerID& PlayerSocket );
-    void            Broadcast               ( const CSimPacket& Packet, const std::vector < CSimPlayer* >& sendList );
+    void            Broadcast               ( const CSimPacket& Packet, const std::multimap < ushort, CSimPlayer* >& sendList );
 
 protected:
     // Shared variables

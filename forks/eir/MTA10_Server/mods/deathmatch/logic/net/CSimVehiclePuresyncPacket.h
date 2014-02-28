@@ -85,6 +85,7 @@ private:
         uchar           ucWeaponSlot;
 
         ushort          usAmmoInClip;
+        ushort          usTotalAmmo;
 
         float           fAimDirection;
         CVector         vecSniperSource;
@@ -95,6 +96,11 @@ private:
         float           fTurretX;
         float           fTurretY;
         ushort          usAdjustableProperty;
+
+        float           fRailPosition;
+        uchar           ucRailTrack;
+        bool            bRailDirection;
+        float           fRailSpeed;
 
         SFixedArray < float, 4 >    fDoorOpenRatio;
     } m_Cache;

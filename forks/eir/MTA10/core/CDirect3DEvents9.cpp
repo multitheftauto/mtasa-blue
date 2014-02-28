@@ -22,7 +22,7 @@
 #include "CVertexStreamBoundingBoxManager.h"
 #include "CProxyDirect3DVertexDeclaration.h"
 
-#include <stdexcept>
+bool g_bInMTAScene = false;
 
 // Variables used for screen shot saving
 static CBuffer             ms_ScreenShotBuffer;
@@ -108,7 +108,8 @@ void CDirect3DEvents9::OnPresent ( IDirect3DDevice9 *pDevice )
     // Start a new scene. This isn't ideal and is not really recommended by MSDN.
     // I tried disabling EndScene from GTA and just end it after this code ourselves
     // before present, but that caused graphical issues randomly with the sky.
-    pDevice->BeginScene ();
+    if ( pDevice->BeginScene() == D3D_OK )
+        g_bInMTAScene = true;
 
     // Reset samplers on first call
     static bool bDoneReset = false;
@@ -123,17 +124,7 @@ void CDirect3DEvents9::OnPresent ( IDirect3DDevice9 *pDevice )
         }
     }
 
-    // Create a state block.
-    IDirect3DStateBlock9 * pDeviceState = NULL;
-    pDevice->CreateStateBlock ( D3DSBT_ALL, &pDeviceState );
-
-    // Make sure linear sampling is enabled
-    pDevice->SetSamplerState ( 0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR );
-    pDevice->SetSamplerState ( 0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR );
-    pDevice->SetSamplerState ( 0, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR );
-
-    // Make sure stencil is off to avoid problems with flame effects
-    pDevice->SetRenderState ( D3DRS_STENCILENABLE, FALSE );
+    CGraphics::GetSingleton ().EnteringMTARenderZone();
 
     // Tell everyone that the zbuffer will need clearing before use
     CGraphics::GetSingleton ().OnZBufferModified ();
@@ -161,15 +152,13 @@ void CDirect3DEvents9::OnPresent ( IDirect3DDevice9 *pDevice )
     // Redraw the mouse cursor so it will always be over other elements
     CLocalGUI::GetSingleton().DrawMouseCursor();
 
-    // Restore the render states
-    if ( pDeviceState )
-    {
-        pDeviceState->Apply ( );
-        pDeviceState->Release ( );
-    }
-    
+    CGraphics::GetSingleton().DidRenderScene();
+
+    CGraphics::GetSingleton ().LeavingMTARenderZone();
+
     // End the scene that we started.
     pDevice->EndScene ();
+    g_bInMTAScene = false;
 
     // Update incase settings changed
     int iAnisotropic;
@@ -211,7 +200,8 @@ void CDirect3DEvents9::CheckForScreenShot ( void )
         SString strFileName = CScreenShot::PreScreenShot ();
 
         // Try to get the screen data
-        if ( CGraphics::GetSingleton ().GetScreenGrabber ()->GetBackBufferPixels ( uiWidth, uiHeight, ms_ScreenShotBuffer ) )
+        SString strError;
+        if ( CGraphics::GetSingleton ().GetScreenGrabber ()->GetBackBufferPixels ( uiWidth, uiHeight, ms_ScreenShotBuffer, strError ) )
         {
             // Validate data size
             uint uiDataSize = ms_ScreenShotBuffer.GetSize ();
@@ -224,13 +214,13 @@ void CDirect3DEvents9::CheckForScreenShot ( void )
             }
             else
             {
-                g_pCore->GetConsole()->Printf ( "Screenshot got %d bytes, but expected %d", uiDataSize, uiReqDataSize );
+                g_pCore->GetConsole()->Printf ( _("Screenshot got %d bytes, but expected %d"), uiDataSize, uiReqDataSize );
                 strFileName = "";
             }
         }
         else
         {
-            g_pCore->GetConsole()->Print ( "Screenshot failed" );
+            g_pCore->GetConsole()->Print ( _("Screenshot failed") + SString( " (%s)", *strError ) );
             strFileName = "";
         }
 
@@ -563,7 +553,7 @@ HRESULT CDirect3DEvents9::DrawIndexedPrimitiveShader ( IDirect3DDevice9 *pDevice
 // This function checks the sizes are valid
 //
 /////////////////////////////////////////////////////////////
-bool AreVertexStreamsAreBigEnough ( IDirect3DDevice9* pDevice, WORD viMinBased, WORD viMaxBased )
+bool AreVertexStreamsAreBigEnough ( IDirect3DDevice9* pDevice, uint viMinBased, uint viMaxBased )
 {
     // Check each stream used
     for ( uint i = 0 ; i < NUMELMS( g_pDeviceState->VertexDeclState.bUsesStreamAtIndex ) ; i++ )
@@ -598,6 +588,25 @@ bool AreVertexStreamsAreBigEnough ( IDirect3DDevice9* pDevice, WORD viMinBased, 
 
 /////////////////////////////////////////////////////////////
 //
+// FilerException
+//
+// Check if exception should be handled by us
+//
+/////////////////////////////////////////////////////////////
+uint uiLastExceptionCode = 0;
+int FilerException( uint ExceptionCode )
+{
+    uiLastExceptionCode = ExceptionCode;
+    if ( ExceptionCode == EXCEPTION_ACCESS_VIOLATION )
+        return EXCEPTION_EXECUTE_HANDLER;
+    if ( ExceptionCode == 0xE06D7363 )
+        return EXCEPTION_EXECUTE_HANDLER;
+    return EXCEPTION_CONTINUE_SEARCH;
+}
+
+
+/////////////////////////////////////////////////////////////
+//
 // DrawPrimitiveGuarded
 //
 // Catch access violations
@@ -617,8 +626,8 @@ HRESULT CDirect3DEvents9::DrawPrimitiveGuarded ( IDirect3DDevice9 *pDevice, D3DP
         if ( PrimitiveType == D3DPT_TRIANGLELIST )
             NumVertices = PrimitiveCount * 3;
 
-        WORD viMinBased = StartVertex;
-        WORD viMaxBased = NumVertices + StartVertex;
+        uint viMinBased = StartVertex;
+        uint viMaxBased = NumVertices + StartVertex;
 
         if ( !AreVertexStreamsAreBigEnough ( pDevice, viMinBased, viMaxBased ) )
             return hr;
@@ -628,9 +637,9 @@ HRESULT CDirect3DEvents9::DrawPrimitiveGuarded ( IDirect3DDevice9 *pDevice, D3DP
     {
         hr = pDevice->DrawPrimitive ( PrimitiveType, StartVertex, PrimitiveCount );
     }
-    __except( GetExceptionCode() == EXCEPTION_ACCESS_VIOLATION )
+    __except( FilerException( GetExceptionCode() ) )
     {
-        CCore::GetSingleton ().OnCrashAverted ( 100 );
+        CCore::GetSingleton ().OnCrashAverted ( ( uiLastExceptionCode & 0xFFFF ) + 1 * 1000000 );
     }
     return hr;
 }
@@ -651,8 +660,8 @@ HRESULT CDirect3DEvents9::DrawIndexedPrimitiveGuarded ( IDirect3DDevice9 *pDevic
     HRESULT hr = D3D_OK;
 
     // Check vertices used will be within the supplied vertex buffer bounds
-    WORD viMinBased = MinVertexIndex + BaseVertexIndex;
-    WORD viMaxBased = MinVertexIndex + NumVertices + BaseVertexIndex;
+    uint viMinBased = MinVertexIndex + BaseVertexIndex;
+    uint viMaxBased = MinVertexIndex + NumVertices + BaseVertexIndex;
 
     if ( !AreVertexStreamsAreBigEnough ( pDevice, viMinBased, viMaxBased ) )
         return hr;
@@ -661,9 +670,9 @@ HRESULT CDirect3DEvents9::DrawIndexedPrimitiveGuarded ( IDirect3DDevice9 *pDevic
     {
         hr = pDevice->DrawIndexedPrimitive ( PrimitiveType, BaseVertexIndex, MinVertexIndex, NumVertices, startIndex, primCount );
     }
-    __except( GetExceptionCode() == EXCEPTION_ACCESS_VIOLATION )
+    __except( FilerException( GetExceptionCode() ) )
     {
-        CCore::GetSingleton ().OnCrashAverted ( 101 );
+        CCore::GetSingleton ().OnCrashAverted ( ( uiLastExceptionCode & 0xFFFF ) + 2 * 1000000 );
     }
     return hr;
 }
@@ -692,7 +701,10 @@ HRESULT CDirect3DEvents9::CreateVertexBuffer ( IDirect3DDevice9 *pDevice, UINT L
 
         if ( hr != D3DERR_OUTOFVIDEOMEMORY || i > 0 )
         {
-            CCore::GetSingleton ().LogEvent ( 610, "CreateVertexBuffer", "", SString ( "hr:%x Length:%x Usage:%x FVF:%x Pool:%x", hr, Length, Usage, FVF, Pool ) );
+            SString strMessage( "CreateVertexBuffer fail: hr:%x Length:%x Usage:%x FVF:%x Pool:%x", hr, Length, Usage, FVF, Pool );
+            WriteDebugEvent( strMessage );
+            AddReportLog( 8610, strMessage );
+            CCore::GetSingleton ().LogEvent ( 610, "CreateVertexBuffer", "", strMessage );
             return hr;
         }
 
@@ -724,7 +736,10 @@ HRESULT CDirect3DEvents9::CreateIndexBuffer ( IDirect3DDevice9 *pDevice, UINT Le
 
         if ( hr != D3DERR_OUTOFVIDEOMEMORY || i > 0 )
         {
-            CCore::GetSingleton ().LogEvent ( 611, "CreateIndexBuffer", "", SString ( "hr:%x Length:%x Usage:%x Format:%x Pool:%x", hr, Length, Usage, Format, Pool ) );
+            SString strMessage( "CreateIndexBuffer fail: hr:%x Length:%x Usage:%x Format:%x Pool:%x", hr, Length, Usage, Format, Pool );
+            WriteDebugEvent( strMessage );
+            AddReportLog( 8611, strMessage );
+            CCore::GetSingleton ().LogEvent ( 611, "CreateIndexBuffer", "", strMessage );
             return hr;
         }
 
@@ -756,7 +771,10 @@ HRESULT CDirect3DEvents9::CreateTexture ( IDirect3DDevice9 *pDevice, UINT Width,
 
         if ( hr != D3DERR_OUTOFVIDEOMEMORY || i > 0 )
         {
-            CCore::GetSingleton ().LogEvent ( 612, "CreateTexture", "", SString ( "hr:%x W:%x H:%x L:%x Usage:%x Format:%x Pool:%x", hr, Width, Height, Levels, Usage, Format, Pool ) );
+            SString strMessage( "CreateTexture fail: hr:%x W:%x H:%x L:%x Usage:%x Format:%x Pool:%x", hr, Width, Height, Levels, Usage, Format, Pool );
+            WriteDebugEvent( strMessage );
+            AddReportLog( 8612, strMessage );
+            CCore::GetSingleton ().LogEvent ( 612, "CreateTexture", "", strMessage );
             return hr;
         }
 
@@ -852,7 +870,31 @@ HRESULT CDirect3DEvents9::CreateVertexDeclaration ( IDirect3DDevice9 *pDevice, C
 
     hr = pDevice->CreateVertexDeclaration ( pVertexElements, ppDecl );
     if ( FAILED(hr) )
+    {
+        SString strStatus;
+        // Make a string with decl info
+        for ( uint i = 0 ; i < MAXD3DDECLLENGTH ; i++ )
+        {
+            const D3DVERTEXELEMENT9& element = pVertexElements[ i ];
+            if ( element.Stream == 0xFF )
+                break;
+
+            strStatus += SString( "[%d,%d,%d,%d,%d,%d]"
+                                    ,element.Stream
+                                    ,element.Offset
+                                    ,element.Type
+                                    ,element.Method
+                                    ,element.Usage
+                                    ,element.UsageIndex
+                                    );
+        }
+
+        SString strMessage( "CreateVertexDecl fail: hr:%x %s", hr, *strStatus );
+        WriteDebugEvent( strMessage );
+        AddReportLog( 8613, strMessage );
+        CCore::GetSingleton ().LogEvent ( 613, "CreateVertexDecl", "", strMessage );
         return hr;
+    }
 
     // Create proxy
 	*ppDecl = new CProxyDirect3DVertexDeclaration ( pDevice, *ppDecl, pVertexElements );

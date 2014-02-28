@@ -33,6 +33,15 @@ public:
     virtual void    Set                     ( const std::string& strVariable, int val ) = 0;
     virtual void    Set                     ( const std::string& strVariable, unsigned int val ) = 0;
     virtual void    Set                     ( const std::string& strVariable, float val ) = 0;
+
+    // Get without needing caller temp variable
+    template < class T >
+    T GetValue( const std::string& strVariable, const T& defaultValue = 0 )
+    {
+        T value = defaultValue;
+        Get( strVariable, value );
+        return value;
+    }
 };
 
 #endif

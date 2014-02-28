@@ -29,7 +29,7 @@ CElementGroup::~CElementGroup()
     CElementDeleter * deleter = g_pClientGame->GetElementDeleter();
 
     CFastList < CClientEntity* > ::iterator iter = m_elements.begin ();
-    for ( ; iter != m_elements.end (); iter++ )
+    for ( ; iter != m_elements.end (); ++iter )
     {
         ( *iter )->SetElementGroup ( NULL );
         ( *iter )->DeleteAllEvents ();

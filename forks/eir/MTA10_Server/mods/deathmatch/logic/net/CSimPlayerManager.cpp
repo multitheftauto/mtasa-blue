@@ -89,12 +89,11 @@ void CSimPlayerManager::RemoveSimPlayer ( CPlayer* pPlayer )
     MapRemove ( m_SocketSimMap, pSim->m_PlayerSocket );
 
     // Remove outgoing sim from all dist lists
-    for ( std::set < CSimPlayer* > ::const_iterator iter = m_AllSimPlayerMap.begin () ; iter != m_AllSimPlayerMap.end (); iter++ )
+    for ( std::set < CSimPlayer* > ::const_iterator iter = m_AllSimPlayerMap.begin () ; iter != m_AllSimPlayerMap.end (); ++iter )
     {
         CSimPlayer* pOtherSim = *iter;
-        ListRemove ( pOtherSim->m_PuresyncSendList, pSim );
-        ListRemove ( pOtherSim->m_KeysyncSendList, pSim );
-        ListRemove ( pOtherSim->m_BulletsyncSendList, pSim );
+        ListRemove ( pOtherSim->m_PuresyncSendListFlat, pSim );
+        pOtherSim->m_bSendListChanged = true;
     }
 
     SAFE_DELETE( pSim );
@@ -112,7 +111,7 @@ void CSimPlayerManager::RemoveSimPlayer ( CPlayer* pPlayer )
 // Update matching sim player object with new datum
 //
 ///////////////////////////////////////////////////////////////////////////
-void CSimPlayerManager::UpdateSimPlayer ( CPlayer* pPlayer, const std::set < CPlayer* >* pPuresyncSendList, const std::set < CPlayer* >* pKeysyncSendList, const std::set < CPlayer* >* pBulletsyncSendList )
+void CSimPlayerManager::UpdateSimPlayer ( CPlayer* pPlayer )
 {
     LockSimSystem ();     // TODO - only lock the CSimPlayer
 
@@ -131,11 +130,6 @@ void CSimPlayerManager::UpdateSimPlayer ( CPlayer* pPlayer, const std::set < CPl
     //
     CVehicle* pVehicle = pPlayer->GetOccupiedVehicle ();
 
-    // Work out our weapon range.
-    eWeaponType eWeapon = static_cast < eWeaponType > ( pPlayer->GetWeaponType ( ) );
-    float fSkill = pPlayer->GetPlayerStat ( CWeaponStatManager::GetSkillStatIndex ( eWeapon ) );
-    float fWeaponRange = g_pGame->GetWeaponStatManager ( )->GetWeaponRangeFromSkillLevel ( eWeapon, fSkill );
-
     pSim->m_iStatus                 = pPlayer->GetStatus ();
     pSim->m_usBitStreamVersion      = pPlayer->GetBitStreamVersion ();
     pSim->m_bHasOccupiedVehicle     = pVehicle != NULL;
@@ -145,7 +139,7 @@ void CSimPlayerManager::UpdateSimPlayer ( CPlayer* pPlayer, const std::set < CPl
     pSim->m_usVehicleModel          = pVehicle ? pVehicle->GetModel () : 0;
     pSim->m_ucSyncTimeContext       = pPlayer->GetSyncTimeContext ();
     pSim->m_ucOccupiedVehicleSeat   = pPlayer->GetOccupiedVehicleSeat ();
-    pSim->m_fWeaponRange            = fWeaponRange;
+    pSim->m_fWeaponRange            = pPlayer->GetWeaponRangeFromSlot();
     pSim->m_bVehicleHasHydraulics   = pVehicle ? pVehicle->GetUpgrades ()->HasUpgrade ( 1087 ) : false;
     pSim->m_bVehicleIsPlaneOrHeli   = pVehicle ? pVehicle->GetVehicleType () == VEHICLE_PLANE || pVehicle->GetVehicleType () == VEHICLE_HELI : false;
     pSim->m_sharedControllerState.Copy ( pPlayer->GetPad ()->GetCurrentControllerState () );
@@ -153,39 +147,18 @@ void CSimPlayerManager::UpdateSimPlayer ( CPlayer* pPlayer, const std::set < CPl
     pSim->m_fPlayerRotation         = pPlayer->GetRotation ();
 
     // Update Puresync send list
-    if ( pPuresyncSendList )
+    if ( pPlayer->m_bPureSyncSimSendListDirty )
     {
-        pSim->m_PuresyncSendList.clear ();
-        for ( std::set < CPlayer* > ::const_iterator iter = pPuresyncSendList->begin (); iter != pPuresyncSendList->end (); ++iter )
+        pPlayer->m_bPureSyncSimSendListDirty = false;
+        pSim->m_PuresyncSendListFlat.clear ();
+        pSim->m_bSendListChanged = true;
+        for ( CFastHashSet < CPlayer* > ::const_iterator iter = pPlayer->m_PureSyncSimSendList.begin (); iter != pPlayer->m_PureSyncSimSendList.end (); ++iter )
         {
             CSimPlayer* pSendSimPlayer = (*iter)->m_pSimPlayer;
             if ( pSendSimPlayer && pSendSimPlayer->m_bDoneFirstUpdate )
-                pSim->m_PuresyncSendList.push_back ( pSendSimPlayer );
-        }
-
-    }
-
-    // Update Keysync send list
-    if ( pKeysyncSendList )
-    {
-        pSim->m_KeysyncSendList.clear ();
-        for ( std::set < CPlayer* > ::const_iterator iter = pKeysyncSendList->begin (); iter != pKeysyncSendList->end (); ++iter )
-        {
-            CSimPlayer* pSendSimPlayer = (*iter)->m_pSimPlayer;
-            if ( pSendSimPlayer && pSendSimPlayer->m_bDoneFirstUpdate )
-                pSim->m_KeysyncSendList.push_back ( pSendSimPlayer );
-        }
-    }
-
-    // Update Bulletsync send list
-    if ( pBulletsyncSendList )
-    {
-        pSim->m_BulletsyncSendList.clear ();
-        for ( std::set < CPlayer* > ::const_iterator iter = pBulletsyncSendList->begin (); iter != pBulletsyncSendList->end (); ++iter )
-        {
-            CSimPlayer* pSendSimPlayer = (*iter)->m_pSimPlayer;
-            if ( pSendSimPlayer && pSendSimPlayer->m_bDoneFirstUpdate )
-                pSim->m_BulletsyncSendList.push_back ( pSendSimPlayer );
+                pSim->m_PuresyncSendListFlat.push_back ( pSendSimPlayer );
+            else
+                pPlayer->m_bPureSyncSimSendListDirty = true;    // Retry next time
         }
     }
 
@@ -367,7 +340,7 @@ bool CSimPlayerManager::HandleKeySync ( const NetServerPlayerID& Socket, NetBitS
         if ( pPacket->Read ( *BitStream ) )
         {
             // Relay it to nearbyers
-            Broadcast ( *pPacket, pSourceSimPlayer->GetKeysyncSendList () );
+            Broadcast ( *pPacket, pSourceSimPlayer->GetPuresyncSendList () );
         }
 
         delete pPacket;
@@ -405,7 +378,45 @@ bool CSimPlayerManager::HandleBulletSync ( const NetServerPlayerID& Socket, NetB
         if ( pPacket->Read ( *BitStream ) )
         {
             // Relay it to nearbyers
-            Broadcast ( *pPacket, pSourceSimPlayer->GetBulletsyncSendList () );
+            Broadcast ( *pPacket, pSourceSimPlayer->GetPuresyncSendList () );
+        }
+
+        delete pPacket;
+    }
+
+    UnlockSimSystem ();
+    return true;
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CSimPlayerManager::HandlePedTaskPacket
+//
+// Thread:              sync
+// CS should be locked: no
+//
+///////////////////////////////////////////////////////////////
+bool CSimPlayerManager::HandlePedTaskPacket ( const NetServerPlayerID& Socket, NetBitStreamInterface* BitStream )
+{
+    if ( !CNetBufferWatchDog::CanSendPacket ( PACKET_ID_PED_TASK ) )
+        return true;
+
+    LockSimSystem ();     // Prevent player additions and deletions
+
+    // Grab the source player
+    CSimPlayer* pSourceSimPlayer = Get ( Socket );
+
+    // Check is good for ped task sync
+    if ( pSourceSimPlayer && pSourceSimPlayer->IsJoined () )
+    {
+        // Read the incoming packet data
+        CSimPedTaskPacket* pPacket = new CSimPedTaskPacket ( pSourceSimPlayer->m_PlayerID );
+
+        if ( pPacket->Read ( *BitStream ) )
+        {
+            // Relay it to nearbyers
+            Broadcast ( *pPacket, pSourceSimPlayer->GetPuresyncSendList () );
         }
 
         delete pPacket;
@@ -443,7 +454,7 @@ CSimPlayer* CSimPlayerManager::Get ( const NetServerPlayerID& PlayerSocket )
 // Send one packet to a list of players
 //
 ///////////////////////////////////////////////////////////////////////////
-void CSimPlayerManager::Broadcast ( const CSimPacket& Packet, const std::vector < CSimPlayer* >& sendList )
+void CSimPlayerManager::Broadcast ( const CSimPacket& Packet, const std::multimap < ushort, CSimPlayer* >& groupMap )
 {
     dassert ( m_bIsLocked );
 
@@ -486,16 +497,8 @@ void CSimPlayerManager::Broadcast ( const CSimPacket& Packet, const std::vector 
         packetPriority = PACKET_PRIORITY_LOW;
     }
 
-    // Group players by bitstream version
-    std::multimap < ushort, CSimPlayer* > groupMap;
-    for ( std::vector < CSimPlayer* >::const_iterator iter = sendList.begin () ; iter != sendList.end () ; ++iter )
-    {
-        CSimPlayer* pPlayer = *iter;
-        MapInsert ( groupMap, pPlayer->GetBitStreamVersion (), pPlayer );
-    }
-
     // For each bitstream version, make and send a packet
-    typedef std::multimap < ushort, CSimPlayer* > ::iterator mapIter;
+    typedef std::multimap < ushort, CSimPlayer* > ::const_iterator mapIter;
     mapIter m_it, s_it;
     for ( m_it = groupMap.begin () ; m_it != groupMap.end () ; m_it = s_it )
     {
@@ -508,7 +511,7 @@ void CSimPlayerManager::Broadcast ( const CSimPacket& Packet, const std::vector 
         if ( Packet.Write ( *pBitStream ) )
         {
             // For each player, send the packet
-            pair < mapIter , mapIter > keyRange = groupMap.equal_range ( usBitStreamVersion );
+            const pair < mapIter , mapIter > keyRange = groupMap.equal_range ( usBitStreamVersion );
             for ( s_it = keyRange.first ; s_it != keyRange.second ; ++s_it )
             {
                 CSimPlayer* pPlayer = s_it->second;
@@ -519,7 +522,7 @@ void CSimPlayerManager::Broadcast ( const CSimPacket& Packet, const std::vector 
         else
         {
             // Skip
-            pair < mapIter , mapIter > keyRange = groupMap.equal_range ( usBitStreamVersion );
+            const pair < mapIter , mapIter > keyRange = groupMap.equal_range ( usBitStreamVersion );
             for ( s_it = keyRange.first ; s_it != keyRange.second ; ++s_it )
             {}
         }
@@ -527,4 +530,30 @@ void CSimPlayerManager::Broadcast ( const CSimPacket& Packet, const std::vector 
         // Destroy the bitstream
         g_pRealNetServer->DeallocateNetServerBitStream ( pBitStream );
     }
+}
+
+
+///////////////////////////////////////////////////////////////////////////
+//
+// CSimPlayer::GetPuresyncSendList
+//
+// Returns list of players, grouped by bitstream version
+//
+///////////////////////////////////////////////////////////////////////////
+const std::multimap < ushort, CSimPlayer* >& CSimPlayer::GetPuresyncSendList ( void )
+{
+    if ( m_bSendListChanged )
+    {
+        m_bSendListChanged = false;
+        // Group players by bitstream version
+        m_PuresyncSendListGrouped.clear();
+        for ( std::vector < CSimPlayer* >::const_iterator iter = m_PuresyncSendListFlat.begin () ; iter != m_PuresyncSendListFlat.end () ; ++iter )
+        {
+            CSimPlayer* pPlayer = *iter;
+            MapInsert ( m_PuresyncSendListGrouped, pPlayer->GetBitStreamVersion (), pPlayer );
+        }
+    }
+
+    dassert( m_PuresyncSendListFlat.size() == m_PuresyncSendListGrouped.size() );
+    return m_PuresyncSendListGrouped;
 }

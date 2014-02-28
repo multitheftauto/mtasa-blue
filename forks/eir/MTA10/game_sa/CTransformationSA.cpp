@@ -36,7 +36,7 @@ CTransformationSAInterface *const pTransform = (CTransformationSAInterface*)CLAS
 void Transformation_Init( void )
 {
     // Block the original transformation init
-    *(unsigned char*)FUNC_InitTransformation = 0xC3;
+    MemPut( (unsigned char*)FUNC_InitTransformation, 0xC3 );
 
     // Allocate enough matrices for everybody
     new (pTransform) CTransformationSAInterface( 20000 );

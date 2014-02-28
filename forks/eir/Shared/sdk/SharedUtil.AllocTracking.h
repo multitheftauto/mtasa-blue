@@ -67,6 +67,7 @@
     #include <list>
     #include <vector>
     #include <map>
+    #include <set>
     #include <deque>
     #include <algorithm>
     #include <limits>
@@ -144,6 +145,8 @@
             CArray ( void ) : std::vector < _Ty, Allocator < _Ty > > () {}
             CArray ( int size ) : std::vector < _Ty, Allocator < _Ty > > ( size ) {}
             CArray ( int size, int fill ) : std::vector < _Ty, Allocator < _Ty > > ( size, fill ) {}
+	        template<class _Iter>
+            CArray ( _Iter _First, _Iter _Last ) : std::vector < _Ty, Allocator < _Ty > > ( _First, _Last ) {}
         };
 
         template < class _Ty >
@@ -156,6 +159,18 @@
         class CMap : public std::map < _Kty, _Ty, _Pr, Allocator < std::pair<const _Kty, _Ty> > >
         {
         public:
+            CMap ( void ) : std::map < _Kty, _Ty, _Pr, Allocator < std::pair<const _Kty, _Ty> > > () {}
+            CMap ( uint uiInitialSize )
+                : std::map < _Kty, _Ty, _Pr, Allocator < std::pair<const _Kty, _Ty> > > () {}
+        };
+
+        template < class _Kty, class _Pr = std::less<_Kty> >
+        class CSet : public std::set < _Kty, _Pr, Allocator < _Kty > >
+        {
+        public:
+            CSet ( void ) : std::set < _Kty, _Pr, Allocator < _Kty > > () {}
+	        template<class _Iter>
+            CSet ( _Iter _First, _Iter _Last ) : std::set < _Kty, _Pr, Allocator < _Kty > > ( _First, _Last ) {}
         };
 
         template < class _Ty >
@@ -170,6 +185,7 @@
     #define vector  CArray
     #define list    CList
     #define map     CMap
+    #define set     CSet
     #define deque   CDeque
 
 #else
@@ -180,3 +196,10 @@
     #define myFree              free
 
 #endif  // WITH_ALLOC_TRACKING
+
+struct SAllocTrackingTagInfo
+{
+    int countAllocs;
+    int size;
+    char tag[24];
+};

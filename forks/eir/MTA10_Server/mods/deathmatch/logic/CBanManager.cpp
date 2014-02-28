@@ -233,6 +233,21 @@ bool CBanManager::IsAccountBanned ( const char* szAccount )
     return false;
 }
 
+CBan* CBanManager::GetBanFromAccount ( const char* szAccount )
+{
+    list < CBan* >::const_iterator iter = m_BanManager.begin ();
+    for ( ; iter != m_BanManager.end (); iter++ )
+    {
+        if ( (*iter)->GetAccount () == szAccount )
+        {
+            return (*iter);
+        }
+    }
+
+    return NULL;
+}
+
+
 
 void CBanManager::RemoveBan ( CBan* pBan )
 {

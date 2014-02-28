@@ -15,9 +15,8 @@
 
 #include "StdInc.h"
 
-#define VALID_POSITION_LIMIT 100000
-
 extern CGameSA* pGame;
+int g_bOnlyUpdateRotations = false;
 
 CPedSA::CPedSA (  ): m_pPedIntelligence ( NULL ), m_pPedInterface ( NULL ), m_pPedSound ( NULL ), m_iCustomMoveAnim( 0 )
 {
@@ -585,6 +584,7 @@ void CPedSA::SetCurrentWeaponSlot ( eWeaponSlot weaponSlot )
 
 CVector * CPedSA::GetBonePosition ( eBone bone, CVector * vecPosition )
 {
+    ApplySwimAndSlopeRotations();
     DWORD dwFunc = FUNC_GetBonePosition;
     DWORD dwThis = (DWORD)this->GetInterface();
     _asm
@@ -596,11 +596,17 @@ CVector * CPedSA::GetBonePosition ( eBone bone, CVector * vecPosition )
         call    dwFunc
     }
 
+    // Clamp to a sane range as this function can occasionally return massive values,
+    // which causes ProcessLineOfSight to effectively freeze
+    if ( !IsValidPosition( *vecPosition ) )
+        *vecPosition = *GetPosition();
+
     return vecPosition;
 }
 
 CVector * CPedSA::GetTransformedBonePosition ( eBone bone, CVector * vecPosition )
 {
+    ApplySwimAndSlopeRotations();
     DWORD dwFunc = FUNC_GetTransformedBonePosition;
     DWORD dwThis = (DWORD)this->GetInterface();
     _asm
@@ -614,11 +620,32 @@ CVector * CPedSA::GetTransformedBonePosition ( eBone bone, CVector * vecPosition
 
     // Clamp to a sane range as this function can occasionally return massive values,
     // which causes ProcessLineOfSight to effectively freeze
-    vecPosition->fX = Clamp < float > ( -VALID_POSITION_LIMIT, vecPosition->fX, VALID_POSITION_LIMIT );
-    vecPosition->fY = Clamp < float > ( -VALID_POSITION_LIMIT, vecPosition->fY, VALID_POSITION_LIMIT );
-    vecPosition->fZ = Clamp < float > ( -VALID_POSITION_LIMIT, vecPosition->fZ, VALID_POSITION_LIMIT );
+    if ( !IsValidPosition( *vecPosition ) )
+        *vecPosition = *GetPosition();
 
     return vecPosition;
+}
+
+//
+// Apply the extra ped rotations for slope pitch and swimming.
+// Achieved by calling the code at the start of CPed::PreRenderAfterTest
+//
+void CPedSA::ApplySwimAndSlopeRotations ( void )
+{
+    CPedSAInterface* pPedInterface = GetPedInterface();
+    if ( pPedInterface->pedFlags.bCalledPreRender )
+        return;
+
+    g_bOnlyUpdateRotations = true;
+
+    DWORD dwFunc = FUNC_PreRenderAfterTest;
+    _asm
+    {
+        mov     ecx, pPedInterface
+        call    dwFunc
+    }
+
+    g_bOnlyUpdateRotations = false;
 }
 
 bool CPedSA::IsDucking ( void )
@@ -1746,3 +1773,106 @@ ePedState CPedSA::GetPedState()
 {
     return (ePedState)((CPedSAInterface *)this->GetInterface())->PedState;
 }*/
+
+
+////////////////////////////////////////////////////////////////
+//
+// CPed_PreRenderAfterTest
+//
+// Code at start of CPed::PreRenderAfterTest applies extra rotations for slope pitch and swimming.
+// Check if they have already been applied.
+//
+////////////////////////////////////////////////////////////////
+int _cdecl OnCPed_PreRenderAfterTest( CPedSAInterface* pPedInterface )
+{
+    if ( pPedInterface->pedFlags.bCalledPreRender )
+        return 1;   // Skip slope and swim rotations
+    return 0;
+}
+
+// Hook info
+#define HOOKPOS_CPed_PreRenderAfterTest        0x05E65A0
+#define HOOKSIZE_CPed_PreRenderAfterTest       15
+DWORD RETURN_CPed_PreRenderAfterTest =         0x05E65AF;
+DWORD RETURN_CPed_PreRenderAfterTestSkip =     0x05E6658;
+void _declspec(naked) HOOK_CPed_PreRenderAfterTest()
+{
+    _asm
+    {
+        pushad
+        push    ecx                 // this
+        call    OnCPed_PreRenderAfterTest
+        mov     [esp+0],eax         // Put result temp
+        add     esp, 4*1
+        popad
+
+        mov     eax,[esp-32-4*1]    // Get result temp
+
+        // Replaced code
+        sub         esp,70h 
+        push        ebx  
+        push        ebp
+        push        esi  
+        mov         ebp,ecx 
+        mov         ecx,dword ptr [ebp+47Ch] 
+        push        edi 
+ 
+        // Check what to do
+        cmp     eax,0
+        jnz     skip_rotation_update
+
+        // Run code at start of CPed::PreRenderAfterTest
+        jmp     RETURN_CPed_PreRenderAfterTest
+
+skip_rotation_update:
+        // Skip code at start of CPed::PreRenderAfterTest
+        jmp     RETURN_CPed_PreRenderAfterTestSkip
+    }
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// CPed_PreRenderAfterTest_Mid
+//
+// Code at mid of CPed::PreRenderAfterTest does all sorts of stuff
+// Check if it should not be called because we only wanted to do the extra rotations
+//
+////////////////////////////////////////////////////////////////
+
+// Hook info
+#define HOOKPOS_CPed_PreRenderAfterTest_Mid        0x05E6669
+#define HOOKSIZE_CPed_PreRenderAfterTest_Mid       5
+DWORD RETURN_CPed_PreRenderAfterTest_Mid =         0x05E666E;
+DWORD RETURN_CPed_PreRenderAfterTest_MidSkip =     0x05E766F;
+void _declspec(naked) HOOK_CPed_PreRenderAfterTest_Mid()
+{
+    _asm
+    {
+        // Check what to do
+        mov     eax, g_bOnlyUpdateRotations
+        cmp     eax,0
+        jnz     skip_tail
+
+        // Replaced code
+        mov     al,byte ptr ds:[00B7CB89h]
+        // Run code at mid of CPed::PreRenderAfterTest
+        jmp     RETURN_CPed_PreRenderAfterTest_Mid
+
+skip_tail:
+        // Skip code at mid of CPed::PreRenderAfterTest
+        jmp     RETURN_CPed_PreRenderAfterTest_MidSkip
+    }
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+// Setup hooks
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+void CPedSA::StaticSetHooks( void )
+{
+   EZHookInstall( CPed_PreRenderAfterTest );
+   EZHookInstall( CPed_PreRenderAfterTest_Mid );
+}

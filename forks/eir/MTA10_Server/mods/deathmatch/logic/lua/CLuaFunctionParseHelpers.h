@@ -89,6 +89,9 @@ inline SString GetClassTypeName ( CDbJobData* )     { return "db-query"; }
 inline SString GetClassTypeName ( CAccessControlList* )         { return "acl"; }
 inline SString GetClassTypeName ( CAccessControlListGroup* )    { return "acl-group"; }
 inline SString GetClassTypeName ( CCustomWeapon* )    { return "weapon"; }
+inline SString GetClassTypeName ( CBan* )    { return "ban"; }
+inline SString GetClassTypeName ( CTextItem* )    { return "text-item"; }
+inline SString GetClassTypeName ( CTextDisplay* )    { return "text-display"; }
 
 
 
@@ -166,6 +169,46 @@ CAccessControlListGroup* UserDataCast ( CAccessControlListGroup*, void* ptr, lua
     return g_pGame->GetACLManager ()->GetGroupFromScriptID ( reinterpret_cast < unsigned long > ( ptr ) );
 }
 
+//
+// CTextItem from userdata
+//
+template < class T >
+CTextItem* UserDataCast ( CTextItem*, void* ptr, lua_State* luaVM )
+{
+    CLuaMain* pLuaMain = g_pGame->GetLuaManager ()->GetVirtualMachine ( luaVM );
+    if ( pLuaMain )
+    {
+        return pLuaMain->GetTextItemFromScriptID ( reinterpret_cast < unsigned long > ( ptr ) );
+    }
+    return NULL;
+}
+
+
+//
+// CTextDisplay from userdata
+//
+template < class T >
+CTextDisplay* UserDataCast ( CTextDisplay*, void* ptr, lua_State* luaVM)
+{
+    CLuaMain* pLuaMain = g_pGame->GetLuaManager ()->GetVirtualMachine ( luaVM );
+    if ( pLuaMain )
+    {
+        return pLuaMain->GetTextDisplayFromScriptID ( reinterpret_cast < unsigned long > ( ptr ) );
+    }
+    return NULL;
+}
+
+
+
+//
+// CBan from userdata
+//
+template < class T >
+CBan* UserDataCast ( CBan*, void* ptr, lua_State* )
+{
+    return g_pGame->GetBanManager()->GetBanFromScriptID ( reinterpret_cast < unsigned long > ( ptr ) );
+}
+
 
 //
 // CElement from userdata
@@ -182,6 +225,37 @@ CElement* UserDataCast ( CElement*, void* ptr, lua_State* )
 
 
 //
+// CPed from userdata
+//
+// Will now properly convert CPlayers to CPeds
+template < class T >
+CPed* UserDataCast ( CPed*, void* ptr, lua_State* )
+{
+    ElementID ID = TO_ELEMENTID ( ptr );
+    CElement* pElement = CElementIDs::GetElement ( ID );
+    if ( !pElement || pElement->IsBeingDeleted () || ( pElement->GetType () != CElement::PED && pElement->GetType() != CElement::PLAYER ) )
+        return NULL;
+    return (CPed*)pElement;
+}
+
+
+//
+// CPlayer from userdata
+//
+// Disallows conversion of CPeds to CPlayers
+// 
+template < class T >
+CPlayer* UserDataCast ( CPlayer*, void* ptr, lua_State* )
+{
+    ElementID ID = TO_ELEMENTID ( ptr );
+    CElement* pElement = CElementIDs::GetElement ( ID );
+    if ( !pElement || pElement->IsBeingDeleted () || ( pElement->GetType() != CElement::PLAYER ) )
+        return NULL;
+    return (CPlayer*)pElement;
+}
+
+
+//
 // CElement ( something )
 //
 // Returns true if T is the same class as the one wrapped by pElement
@@ -193,9 +267,24 @@ bool CheckWrappedUserDataType ( CElement*& pElement, SString& strErrorExpectedTy
     return false;
 }
 
+
+//
+// Get element from ID and ensure type is what is expected
+//
+template < class T >
+T* GetElementFromId( ElementID elementId )
+{
+    CElement* pElement = CElementIDs::GetElement ( elementId );
+    if ( !pElement || pElement->IsBeingDeleted () || ( pElement->GetType () != GetClassType ( (T*)0 ) && GetClassType ( (T*)0 ) != -1 ) )
+        return NULL;
+    return (T*)pElement;
+}
+
+
 class CScriptArgReader;
 SString GetUserDataClassName ( void* ptr, lua_State* luaVM );
 void MixedReadResourceString ( CScriptArgReader& argStream, SString& strOutResourceName );
 void MixedReadResourceString ( CScriptArgReader& argStream, CResource*& pOutResource );
 bool StringToBool ( const SString& strText );
 void MinServerReqCheck ( CScriptArgReader& argStream, const char* szVersionReq, const char* szReason );
+void ReadPregFlags( CScriptArgReader& argStream, pcrecpp::RE_Options& pOptions );

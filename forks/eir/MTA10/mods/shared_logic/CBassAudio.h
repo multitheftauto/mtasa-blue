@@ -51,6 +51,7 @@ class CBassAudio
 public:
     ZERO_ON_NEW
                             CBassAudio              ( bool bStream, const SString& strPath, bool bLoop, bool b3D );
+                            CBassAudio              ( void* pBuffer, unsigned int uiBufferLength, bool bLoop, bool b3D );
     void                    Destroy                 ( void );
 
     bool                    BeginLoadingMedia       ( void );
@@ -72,7 +73,8 @@ public:
     void                    SetPanEnabled           ( bool bPan )                                               { m_bPan = bPan; };
     void                    SetFxEffects            ( int* pEnabledEffects, uint iNumElements );
     SString                 GetMetaTags             ( const SString& strFormat );
-    bool                    IsFinished              ( void );
+    uint                    GetReachedEndCount      ( void );
+    bool                    IsFreed                 ( void );
     float                   GetPan                  ( void );
     void                    SetPan                  ( float fPan );
 
@@ -100,7 +102,7 @@ protected:
 
 public:
     SSoundThreadVariables*  m_pVars;
-    bool                    bEndSync;
+    uint                    uiEndSyncCount;
     bool                    bFreeSync;
 
 private:
@@ -108,6 +110,8 @@ private:
     const SString           m_strPath;
     const bool              m_b3D;
     const bool              m_bLoop;
+    void*                   m_pBuffer;
+    unsigned int            m_uiBufferLength;
 
     bool                    m_bPendingPlay;
     DWORD                   m_pSound;

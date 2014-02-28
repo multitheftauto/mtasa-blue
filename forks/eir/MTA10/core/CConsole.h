@@ -43,6 +43,7 @@ public:
     void                SetVisible                      ( bool bVisible );
     void                Show                            ( void );
     void                Hide                            ( void );
+    bool                IsInputActive                   ( void );
     void                ActivateInput                   ( void );
 
     void                HandleTextAccepted              ( bool bHandled );

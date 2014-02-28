@@ -31,7 +31,6 @@ public:
     virtual bool                    IsActive ( void ) = 0;
 
     virtual void                    SetCounter ( DWORD dwCounter ) = 0;
-
     virtual DWORD                   GetCounter ( void ) = 0;
 };
 

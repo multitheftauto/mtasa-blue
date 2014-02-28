@@ -32,9 +32,6 @@ class CRenderWare;
 class CResourceManager;
 class CScriptDebugging;
 
-#define argtype(number,type) (lua_type(luaVM,number) == type)
-#define argtype2(number,type,type2) (lua_type(luaVM,number) == type || lua_type(luaVM,number) == type2)
-
 class CLuaDefs
 {
 public:
@@ -43,6 +40,7 @@ public:
                                                           CScriptDebugging* pScriptDebugging );
 
     static int                          CanUseFunction ( lua_CFunction f, lua_State* luaVM );
+    static void                         DidUseFunction ( lua_CFunction f, lua_State* luaVM );
 
 // This is just for the LUA funcs. Please don't public this and use it other
 // places in the client.

@@ -26,12 +26,19 @@ public:
     ~CLuaFunctionRef ( void );
     CLuaFunctionRef& operator=( const CLuaFunctionRef& other );
     int ToInt ( void ) const;
+    lua_State* GetLuaVM ( void ) const;
     bool operator==( const CLuaFunctionRef& other ) const;
     bool operator!=( const CLuaFunctionRef& other ) const;
+    static void RemoveLuaFunctionRefsForVM      ( lua_State *luaVM );
 
+protected:
     lua_State *     m_luaVM;
     int             m_iFunction;
     const void*     m_pFuncPtr;
+    CIntrusiveListNode < CLuaFunctionRef > m_ListNode;
+
+    // Global list to track function refs and make sure they can't be used after a VM has closed
+    static CIntrusiveList < CLuaFunctionRef >   ms_AllRefList;
 };
 
 

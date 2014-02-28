@@ -33,6 +33,7 @@ class CMultiplayer;
 class CNet;
 class CGame;
 class CModelCacheManager;
+class CLocalizationInterface;
 
 namespace ChatFonts
 {
@@ -81,6 +82,7 @@ public:
     virtual CXMLNode*                   GetConfig                       ( void ) = 0;
     virtual CCVarsInterface*            GetCVars                        ( void ) = 0;
     virtual CCommunityInterface*        GetCommunity                    ( void ) = 0;
+    virtual CLocalizationInterface*     GetLocalization                 ( void ) = 0;
     
 
     // Temporary functions for r1
@@ -108,11 +110,14 @@ public:
 
     virtual void                    SetConnected                    ( bool bConnected ) = 0;
     virtual void                    SetOfflineMod                   ( bool bOffline ) = 0;
+    virtual void                    ApplyHooks3                     ( bool bEnable ) = 0;
 
     virtual bool                    IsConnected                     ( void ) = 0;
-    virtual bool                    Reconnect                       ( const char* szHost, unsigned short usPort, const char* szPassword, bool bSave = true ) = 0;
+    virtual bool                    Reconnect                       ( const char* szHost, unsigned short usPort, const char* szPassword, bool bSave = true, bool bForceInternalHTTPServer = false ) = 0;
+    virtual bool                    ShouldUseInternalHTTPServer     ( void ) = 0;
 
     virtual const char *            GetModInstallRoot               ( const char * szModName )=0;
+    virtual bool                    CheckDiskSpace                  ( uint uiResourcesPathMinMB = 10, uint uiDataPathMinMB = 10 )=0;
 
     virtual void                    ShowServerInfo                  ( unsigned int WindowType ) = 0;
 
@@ -120,6 +125,8 @@ public:
     virtual void                    SetMessageProcessor             ( pfnProcessMessage pfnMessageProcessor ) = 0;
     virtual void                    ShowMessageBox                  ( const char* szTitle, const char* szText, unsigned int uiFlags, GUI_CALLBACK * ResponseHandler = NULL ) = 0;
     virtual void                    RemoveMessageBox                ( bool bNextFrame = false ) = 0;
+    virtual void                    ShowErrorMessageBox             ( const SString& strTitle, SString strMessage, const SString& strTroubleLink = "" ) = 0;
+    virtual void                    ShowNetErrorMessageBox          ( const SString& strTitle, SString strMessage, SString strTroubleLink = "", bool bLinkRequiresErrorCode = false ) = 0;
     virtual void                    HideMainMenu                    ( void ) = 0;
     virtual HWND                    GetHookedWindow                 ( void ) = 0;
     virtual bool                    IsFocused                       ( void ) = 0;
@@ -134,31 +141,32 @@ public:
     virtual void                    OnTimingCheckpoint              ( const char* szTag ) = 0;
     virtual void                    OnTimingDetail                  ( const char* szTag ) = 0;
 
-    // CGUI Callbacks
-    virtual bool                    OnMouseClick                    ( CGUIMouseEventArgs Args ) = 0;
-    virtual bool                    OnMouseDoubleClick              ( CGUIMouseEventArgs Args ) = 0;
-
     virtual void                    Quit                            ( bool bInstantly = true) = 0;
     virtual void                    InitiateUpdate                  ( const char* szType, const char* szData, const char* szHost ) = 0;
     virtual bool                    IsOptionalUpdateInfoRequired    ( const char* szHost ) = 0;
     virtual void                    InitiateDataFilesFix            ( void ) = 0;
 
     virtual uint                    GetFrameRateLimit               ( void ) = 0;
-    virtual void                    RecalculateFrameRateLimit       ( uint uiServerFrameRateLimit = -1 ) = 0;
+    virtual void                    RecalculateFrameRateLimit       ( uint uiServerFrameRateLimit = -1, bool bLogToConsole = true ) = 0;
     virtual void                    ApplyFrameRateLimit             ( uint uiOverrideRate = -1 ) = 0;
     virtual void                    EnsureFrameRateLimitApplied     ( void ) = 0;
+    virtual void                    SetClientScriptFrameRateLimit   ( uint uiClientScriptFrameRateLimit ) = 0;
 
     virtual void                    OnPreFxRender                   ( void ) = 0;
     virtual void                    OnPreHUDRender                  ( void ) = 0;
     virtual uint                    GetMinStreamingMemory           ( void ) = 0;
     virtual uint                    GetMaxStreamingMemory           ( void ) = 0;
     virtual void                    OnCrashAverted                  ( uint uiId ) = 0;
-    virtual void                    LogEvent                        ( uint uiDebugId, const char* szType, const char* szContext, const char* szBody ) = 0;
+    virtual void                    LogEvent                        ( uint uiDebugId, const char* szType, const char* szContext, const char* szBody, uint uiAddReportLogId = 0 ) = 0;
     virtual bool                    GetDebugIdEnabled               ( uint uiDebugId ) = 0;
     virtual EDiagnosticDebugType    GetDiagnosticDebug              ( void ) = 0;
     virtual void                    SetDiagnosticDebug              ( EDiagnosticDebugType value ) = 0;
     virtual CModelCacheManager*     GetModelCacheManager            ( void ) = 0;
     virtual void                    AddModelToPersistentCache       ( ushort usModelId ) = 0;
+    virtual void                    UpdateDummyProgress             ( int iPercent = -1 ) = 0;
+
+    virtual void                    OnPreCreateDevice               ( IDirect3D9* pDirect3D, UINT Adapter, D3DDEVTYPE DeviceType, HWND hFocusWindow, DWORD& BehaviorFlags, D3DPRESENT_PARAMETERS* pPresentationParameters ) = 0;
+    virtual HRESULT                 OnPostCreateDevice              ( HRESULT hResult, IDirect3D9* pDirect3D, UINT Adapter, D3DDEVTYPE DeviceType, HWND hFocusWindow, DWORD BehaviorFlags, D3DPRESENT_PARAMETERS* pPresentationParameters, IDirect3DDevice9** ppReturnedDeviceInterface ) = 0;
 };
 
 class CClientTime

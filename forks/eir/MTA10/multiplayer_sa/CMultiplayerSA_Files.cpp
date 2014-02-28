@@ -20,6 +20,10 @@
 //////////////////////////////////////////////////////////////////////////////////////////
 void OnMY_Rtl_fopen_Post ( FILE* fh, DWORD calledFrom, const char* szFilename, const char* szMode )
 {
+    // Note filename in case of crash
+    if ( fh )
+        SetApplicationSetting ( "diagnostics", "gta-fopen-last", szFilename );
+
     // Check for file open error
     if ( !fh )
     {
@@ -85,6 +89,45 @@ inner:
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
+// fclose
+//
+// Record problematic fclose failures
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+void OnMY_Rtl_fclose ( DWORD calledFrom, FILE* fh )
+{
+    // Un-note filename
+    SetApplicationSetting ( "diagnostics", "gta-fopen-last", "" );
+}
+
+// Hook info
+#define HOOKPOS_Rtl_fclose_US                         0x82318B
+#define HOOKSIZE_Rtl_fclose_US                        6
+#define HOOKPOS_Rtl_fclose_EU                         0x8231CB
+#define HOOKSIZE_Rtl_fclose_EU                        6
+DWORD RETURN_Rtl_fclose_US =                          0x823192;
+DWORD RETURN_Rtl_fclose_EU =                          0x8231D2;
+DWORD RETURN_Rtl_fclose_BOTH =                        0;
+void _declspec(naked) HOOK_Rtl_fclose()
+{
+    _asm
+    {
+        pushad
+        push    [esp+32+4*1]
+        push    [esp+32+4*1]
+        call    OnMY_Rtl_fclose
+        add     esp, 4*1 + 4
+        popad
+
+        push    0Ch
+        push    0x887EC8 
+        jmp     RETURN_Rtl_fclose_BOTH
+    }
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
 // CMultiplayerSA::InitHooks_Files
 //
 // Setup hooks
@@ -93,4 +136,5 @@ inner:
 void CMultiplayerSA::InitHooks_Files ( void )
 {
     EZHookInstall ( Rtl_fopen );
+    EZHookInstall ( Rtl_fclose );
 }

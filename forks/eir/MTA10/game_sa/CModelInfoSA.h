@@ -23,6 +23,10 @@
 class CPedModelInfoSA;
 class CPedModelInfoSAInterface;
 
+#define     RpGetFrame(__c)                 ((RwFrame*)(((RwObject *)(__c))->parent))
+
+#define     ARRAY_ModelLoaded               0x8E4CD0 // ##SA##
+
 #define     FUNC_CStreaming__HasModelLoaded 0x4044C0
 
 #define     ARRAY_ModelInfo                 0xA9B0C8
@@ -40,6 +44,7 @@ class CPedModelInfoSAInterface;
 #define     FUNC_RequestVehicleUpgrade      0x408C70
 
 #define     FUNC_CVehicleModelInfo__GetNumRemaps        0x4C86B0
+#define     FUNC_CVehicleStructure_delete   0x4C9580
 
 #define     FUNC_SetColModel                0x4C4BC0
 #define     FUNC_AddPedModel                0x4c67a0
@@ -59,7 +64,6 @@ void    ModelInfo_Shutdown( void );
  * \todo Someone move GetLevelFromPosition out of here or delete it entirely please
  */
 
-
 class CModelInfoSA : public CModelInfo
 {
 protected:
@@ -74,6 +78,7 @@ protected:
     static std::map < DWORD, float > ms_ModelDefaultLodDistanceMap;
     static std::map < DWORD, BYTE > ms_ModelDefaultAlphaTransparencyMap;
     bool                            m_bAddedRefForCollision;
+    SVehicleSupportedUpgrades       m_ModelSupportedUpgrades;
 public:
     static std::set < uint >        ms_ReplacedColModels;
 
@@ -159,6 +164,13 @@ public:
     // CModelInfoSA methods
     void                            MakePedModel            ( char * szTexture );
 
+    SVehicleSupportedUpgrades       GetVehicleSupportedUpgrades ( void ) { return m_ModelSupportedUpgrades; }
+
+    void                            InitialiseSupportedUpgrades ( RpClump * pClump );
+    void                            ResetSupportedUpgrades      ( void );
+
+private:
+    void                            RwSetSupportedUpgrades      ( RwFrame * parent, DWORD dwModel );
 };
 
 #endif

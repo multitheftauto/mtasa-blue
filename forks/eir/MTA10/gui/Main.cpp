@@ -11,6 +11,7 @@
 *****************************************************************************/
 
 #include "StdInc.h"
+#define ALLOC_STATS_MODULE_NAME "cgui"
 #include "SharedUtil.hpp"
 
 CGUI_Impl* g_pGUI = NULL;

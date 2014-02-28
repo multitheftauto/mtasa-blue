@@ -38,6 +38,8 @@ struct CGUIMouseEventArgs
     CGUIMouse::MouseButton      button;
     unsigned int                sysKeys;
     float                       wheelChange;
+    unsigned int                clickCount;
+    CGUIElement*                pSwitchedWindow;
 };
 
 struct CGUIFocusEventArgs

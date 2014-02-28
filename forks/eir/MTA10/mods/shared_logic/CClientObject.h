@@ -48,8 +48,6 @@ public:
     void                            SetPosition             ( const CVector& vecPosition );
     virtual CSphere                 GetWorldBoundingSphere  ( void );
 
-    void                            AttachTo                ( CClientEntity* pEntity );
-
     void                            GetRotationDegrees      ( CVector& vecRotation ) const;
     void                            GetRotationRadians      ( CVector& vecRotation ) const;
     void                            SetRotationDegrees      ( const CVector& vecRotation );
@@ -91,11 +89,14 @@ public:
     float                           GetHealth               ( void );
     void                            SetHealth               ( float fHealth );
 
-    inline bool                     IsBreakable             ( void )                            { return m_bBreakable; };
+    bool                            IsBreakable             ( void );
     bool                            SetBreakable            ( bool bBreakable );
     bool                            Break                   ( void );
     inline bool                     IsRespawnEnabled        ( void )                            { return m_bRespawnEnabled; };
     inline void                     SetRespawnEnabled       ( bool bRespawnEnabled )            { m_bRespawnEnabled = bRespawnEnabled; };
+
+    float                           GetMass                 ( void );
+    void                            SetMass                 ( float fMass );
 
     void                            ReCreate                ( void );
     void                            UpdateVisibility        ( void );
@@ -129,9 +130,10 @@ protected:
     unsigned char                       m_ucAlpha;
     CVector                             m_vecScale;
     float                               m_fHealth;
-    bool                                m_bBreakable;
+    bool                                m_bBreakingDisabled;
     bool                                m_bBeingRespawned;
     bool                                m_bRespawnEnabled;
+    float                               m_fMass;
 
     CVector                             m_vecMoveSpeed;
 

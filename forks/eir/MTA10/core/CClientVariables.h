@@ -24,8 +24,9 @@
 #include "CChat.h"
 
 // Macros
-#define CVARS_GET   CClientVariables::GetSingleton().Get
-#define CVARS_SET   CClientVariables::GetSingleton().Set
+#define CVARS_GET       CClientVariables::GetSingleton().Get
+#define CVARS_SET       CClientVariables::GetSingleton().Set
+#define CVARS_GET_VALUE CClientVariables::GetSingleton().GetValue
 
 class CClientVariables : public CCVarsInterface, public CSingleton < CClientVariables >
 {
@@ -39,7 +40,7 @@ public:
 
     // Get queries
     bool            Get                     ( const std::string& strVariable, bool &val )                    { SANGET; Node(strVariable)->GetTagContent ( val ); return true; };
-    bool            Get                     ( const std::string& strVariable, std::string &val )             { SANGET; val = Node(strVariable)->GetTagContent (); return val.empty (); };
+    bool            Get                     ( const std::string& strVariable, std::string &val )             { SANGET; val = Node(strVariable)->GetTagContent (); return !val.empty (); };
     bool            Get                     ( const std::string& strVariable, int &val )                     { SANGET; Node(strVariable)->GetTagContent ( val ); return true; };
     bool            Get                     ( const std::string& strVariable, unsigned int &val )            { SANGET; Node(strVariable)->GetTagContent ( val ); return true; };
     bool            Get                     ( const std::string& strVariable, float &val )                   { SANGET; Node(strVariable)->GetTagContent ( val ); return true; };

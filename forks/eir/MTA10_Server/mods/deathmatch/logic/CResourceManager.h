@@ -27,6 +27,7 @@
 #include <list>
 
 class CResource;
+#define INVALID_RESOURCE_NET_ID     0xFFFF
 
 class CResourceManager 
 {
@@ -97,7 +98,7 @@ public:
     CResource*                  GetResourceFromNetID            ( unsigned short usNetID );
 
     CResource*                  GetResourceFromLuaState         ( struct lua_State* luaVM );
-    bool                        Install                         ( char * szURL, char * szName );
+    SString                     GetResourceName                 ( struct lua_State* luaVM );
 
     CResource*                  CreateResource                  ( const SString& strNewResourceName, const SString& strNewOrganizationalPath, SString& strOutStatus );
     CResource*                  CopyResource                    ( CResource* pSourceResource, const SString& strNewResourceName, const SString& strNewOrganizationalPath, SString& strOutStatus );
@@ -134,15 +135,16 @@ private:
     list<CResource *>           m_resourcesToStartAfterRefresh;
 
     // Maps to speed things up
-    std::map < CResource*, lua_State* >     m_ResourceLuaStateMap;
-    std::map < lua_State*, CResource* >     m_LuaStateResourceMap;
-    std::map < SString, CResource* >        m_NameResourceMap;
+    CFastHashMap < CResource*, lua_State* > m_ResourceLuaStateMap;
+    CFastHashMap < lua_State*, CResource* > m_LuaStateResourceMap;
+    CFastHashMap < SString, CResource* >    m_NameResourceMap;
+    std::map < ushort, CResource* >         m_NetIdResourceMap;
 
     list<sResourceQueue>        m_resourceQueue;
 
     SString                                 m_strMinClientRequirement;
-    std::map < CResource*, SString >        m_MinClientRequirementMap;
-    std::map < CResource*, bool >           m_SyncMapElementDataOptionMap;
+    CFastHashMap < CResource*, SString >    m_MinClientRequirementMap;
+    CFastHashMap < CResource*, bool >       m_SyncMapElementDataOptionMap;
 
     ushort                      m_usNextNetId;
 };

@@ -73,14 +73,21 @@ enum TextFormatting
 
 struct GlyphPageInfo
 {
-    GlyphPageInfo ( void ) : uiLastUsedTime ( 0 ) {}
+    GlyphPageInfo ( void ) : uiLastUsedTime ( 0 ), bWaitingToBeAdded ( false ), 
+        bWaitingToBeDeleted ( false ), bWaitingToBeRedrawn ( false ), glyph_images ( NULL ) {}
     uint uiLastUsedTime;
+    bool bWaitingToBeAdded;
+    bool bWaitingToBeDeleted;
+    bool bWaitingToBeRedrawn;
+    Imageset* glyph_images;
 };
 
 struct SCharSize
 {
     ushort width;
     ushort height;
+    float  offsetX;
+    float  horz_advance;
 };
 
 /*!
@@ -376,35 +383,9 @@ public:
 	\exception	RendererException			thrown if the Renderer can't support a texture large enough to hold the glyph imagery.
 	\exception	MemoryException				thrown if allocation of imagery construction buffer fails.
 	*/
-	void	defineFontGlyphs(const String& glyph_set);
+	Imageset*	addFontGlyphs(const String& glyphset,const String& id);
 
-
-	/*!
-	\brief
-		Define the range of code points to be renderable by the font.
-
-	\note
-		This function can take some time to execute depending upon the size of the code point set, and the size of the
-		font being operated upon.
-
-	\note
-		The code point arguments must satisfy the following:  \a first_code_point <= \a last_code_point, otherwise results are undefined
-
-	\param first_code_point
-		utf32 value describing the first code point that will be renderable by this font.
-
-	\param last_code_point
-		utf32 value describing the last code point that will be renderable by this font.
-
-	\return
-		Nothing
-
-	\exception	InvalidRequestException		thrown if the font is based on a bitmap rather than a true-type font.
-	\exception	RendererException			thrown if the Renderer can't support a texture large enough to hold the glyph imagery.
-	\exception	MemoryException				thrown if allocation of imagery construction buffer fails.
-	*/
-	void	defineFontGlyphs(utf32 first_code_point, utf32 last_code_point);
-
+	void	    setInitialFontGlyphs(const String& glyphset);
 
 	/*!
 	\brief
@@ -667,6 +648,7 @@ public:
 	bool	isAntiAliased(void) const;
 
 
+
 	/*!
 	\brief
 		Return a String object that contains the code-points that the font is currently configured to render.
@@ -674,31 +656,31 @@ public:
 	\return
 		Reference to a String object.
 	*/
-	const String& getAvailableGlyphs(void) const;
+	const String getAvailableGlyphs(void) const;
 
-	/*!
-	\brief
-		returns whether the image is being used (i.e. if 0 images of the glyph are drawn).
-	*/
-	bool	isGlyphBeingUsed (unsigned long ulGlyph) const;
+    // Subsitute font extensions
+    const std::map < utf32, SCharSize >&       getSizesMap ( void ) { return d_sizes_map; };
+    const std::map < uint, GlyphPageInfo >&    getPageInfoMap ( void ) { return d_GlyphPageInfoMap; };
+    bool                d_is_subfont;
+    void                setIsSubstituteFont ( bool bIsSubFont ) { d_is_subfont = bIsSubFont; };
 
 	/*!
 	\brief
         glyph cache functions
 	*/
+	void                freeGlyphs                      ( void );
+    void                freeGlyphPage                   ( uint uiPage );
     GlyphPageInfo*      findGlyphPageInfo               ( ulong ulGlyph );
     GlyphPageInfo*      addGlyphPageInfo                ( ulong ulGlyph );
+    void                redrawGlyphCache                ( );
     void                refreshCachedGlyph              ( unsigned long ulGlyph );
-    void                insertGlyphToCache              ( unsigned long ulGlyph );
+    GlyphPageInfo*      insertGlyphToCache              ( unsigned long ulGlyph );
     void	            refreshStringForGlyphs          ( const String& strText );
     void	            insertStringForGlyphs           ( const String& strText );
     void                pulse                           ( void );
     bool                needsRebuild                    ( void );
     void                rebuild                         ( void );
-    void                queueUndefineGlyphImages        ( void );
-    void                flushPendingUndefineGlyphImages ( void );   
     void                onClearRenderList               ( void );
-    bool                needsClearRenderList            ( void );
 
 	/*!
 	\brief
@@ -936,9 +918,11 @@ private:
 	\return
 		Nothing.
 	*/
-	void	createFontGlyphSet(const String& glyph_set, uint size, argb_t* buffer);
+	void	createFontGlyphSet(const String& glyph_set, uint size, argb_t* buffer, Imageset* glyph_images );
 
-    bool    utilFontGlyphSet(const String& glyph_set, uint size, argb_t* buffer);
+    void*   loadGlyph ( unsigned long glyphID, bool bCacheSize = true );
+
+    bool    utilFontGlyphSet(const String& glyph_set, uint size, argb_t* buffer, Imageset* glyph_images );
 
 
 	/*!
@@ -1014,24 +998,6 @@ private:
 
 	/*!
 	\brief
-		Defines the set of code points on the font. (implementation).
-
-	\note
-		This function can take some time to execute depending upon the size of the code point set, and the size of the
-		font being operated upon.
-
-	\return
-		Nothing
-
-	\exception	InvalidRequestException		thrown if the font is based on a bitmap rather than a true-type font.
-	\exception	RendererException			thrown if the Renderer can't support a texture large enough to hold the glyph imagery.
-	\exception	MemoryException				thrown if allocation of imagery construction buffer fails.
-	*/
-	void	defineFontGlyphs_impl(void);
-
-
-	/*!
-	\brief
 		returns extent of widest line of wrapped text.
 	*/
 	float	getWrappedTextExtent(const String& text, float wrapWidth, float x_scale = 1.0f) const;
@@ -1070,8 +1036,6 @@ private:
 	CodepointMap	d_cp_map;	//!< Contains mappings from code points to Image objects
 
 	String		d_name;			//!< Name of this font.
-	Imageset*	d_glyph_images;	//!< Imageset that holds the glyphs for this font.
-	Imageset*	d_glyph_images_deleteme;
 	String     d_sourceFilename;   //!< Holds the name of the file used to create this font (either font file or imagset)
 
 	bool	d_freetype;			//!< true when the font is a FreeType based font
@@ -1082,7 +1046,6 @@ private:
 
 	FontImplData*	d_impldat;	//!< Implementation data
 	uint		d_ptSize;		//!< Point size of font.
-	String		d_glyphset;		//!< set of glyphs for the dynamic font.
 
 	// auto-scaling fields
 	bool	d_autoScale;			//!< true when auto-scaling is enabled.
@@ -1093,10 +1056,15 @@ private:
 
 	bool	d_antiAliased;			//!< True if the font should be rendered as anti-alaised by freeType.
 
+    // Substitute font
+    const CodepointMap&               getCodepointMap ( void ) { return d_cp_map; };
+
     // Glyph cache
+    String  d_imagesetName;
     bool    d_bAddedGlyphPage;
     uint    d_uiLastPulseTime;
     String  d_glyphset_default;
+    Imageset* d_glyph_images_default;
     std::map < uint, GlyphPageInfo >    d_GlyphPageInfoMap;
 
     // Character sizes

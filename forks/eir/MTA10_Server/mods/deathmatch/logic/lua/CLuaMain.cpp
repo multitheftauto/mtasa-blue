@@ -25,6 +25,7 @@ static CLuaManager* m_pLuaManager;
 #define HOOK_MAXIMUM_TIME 5000
 
 extern CGame* g_pGame;
+extern CNetServer* g_pRealNetServer;
 
 // This script is loaded into all VM's created.
 const char szPreloadedScript [] = ""\
@@ -79,9 +80,8 @@ CLuaMain::CLuaMain ( CLuaManager* pLuaManager,
     m_bBeingDeleted = false;
     m_pLuaTimerManager = new CLuaTimerManager;
     m_FunctionEnterTimer.SetMaxIncrement ( 500 );
-
-    // Set up the name of our script
-    m_iOwner = OWNER_SERVER;
+    m_uiOpenFileCountWarnThresh = 10;
+    m_uiOpenXMLFileCountWarnThresh = 20;
 
     m_pObjectManager = pObjectManager;
     m_pPlayerManager = pPlayerManager;
@@ -101,6 +101,7 @@ CLuaMain::~CLuaMain ( void )
     g_pGame->GetRemoteCalls()->Remove ( this );
     g_pGame->GetLuaCallbackManager ()->OnLuaMainDestroy ( this );
     g_pGame->GetLatentTransferManager ()->OnLuaMainDestroy ( this );
+    g_pGame->GetDebugHookManager()->OnLuaMainDestroy ( this );
     g_pGame->GetScriptDebugging()->OnLuaMainDestroy ( this );
 
     // Unload the current script
@@ -112,21 +113,21 @@ CLuaMain::~CLuaMain ( void )
 
     // Eventually delete the XML files the LUA script didn't
     list<CXMLFile *>::iterator iterXML = m_XMLFiles.begin ();
-    for ( ; iterXML != m_XMLFiles.end (); iterXML++ )
+    for ( ; iterXML != m_XMLFiles.end (); ++iterXML )
     {
         delete *iterXML;
     }
 
     // Eventually delete the text displays the LUA script didn't
     list<CTextDisplay *>::iterator iterDisplays = m_Displays.begin ();
-    for ( ; iterDisplays != m_Displays.end (); iterDisplays++ )
+    for ( ; iterDisplays != m_Displays.end (); ++iterDisplays )
     {
         delete *iterDisplays;
     }
 
     // Eventually delete the text items the LUA script didn't
     list<CTextItem *>::iterator iterItems = m_TextItems.begin ();
-    for ( ; iterItems != m_TextItems.end (); iterItems++ )
+    for ( ; iterItems != m_TextItems.end (); ++iterItems )
     {
         delete *iterItems;
     }
@@ -244,21 +245,24 @@ void CLuaMain::InitClasses ( lua_State* luaVM )
     lua_classvariable ( luaVM, "health", "setElementHealth", "getElementHealth" );
     lua_classvariable ( luaVM, "alpha", "setElementAlpha", "getElementAlpha" );
     lua_classvariable ( luaVM, "doubleSided", "setElementDoubleSided", "isElementDoubleSided" );
-    lua_classvariable ( luaVM, "mode", "setElementModel", "getElementModel" );
+    lua_classvariable ( luaVM, "model", "setElementModel", "getElementModel" );
     lua_classvariable ( luaVM, "syncer", "setElementSyncer", "getElementSyncer" );
     lua_classvariable ( luaVM, "collisions", "setElementCollisionsEnabled", "getElementCollisionsEnabled" );
     lua_classvariable ( luaVM, "frozen", "setElementFrozen", "isElementFrozen" );
     lua_classvariable ( luaVM, "inWater", NULL, "isElementInWater" );
     lua_classvariable ( luaVM, "dimension", "setElementDimension", "getElementDimension" );
-    lua_classvariable ( luaVM, "interior", "setElementDimension", "getElementInterior" );
+    lua_classvariable ( luaVM, "interior", "setElementInterior", "getElementInterior" );
 
     lua_registerclass ( luaVM, "Element" );
 }
 
 void CLuaMain::InitVM ( void )
 {
+    assert( !m_luaVM );
+
     // Create a new VM
     m_luaVM = lua_open ();
+    m_pLuaManager->OnLuaMainOpenVM( this, m_luaVM );
 
     // Set the instruction count hook
     lua_sethook ( m_luaVM, InstructionCountHook, LUA_MASKCOUNT, HOOK_INSTRUCTION_COUNT );
@@ -323,63 +327,51 @@ void CLuaMain::InstructionCountHook ( lua_State* luaVM, lua_Debug* pDebug )
     }
 }
 
-
-bool CLuaMain::LoadScriptFromFile ( const char* szLUAScript )
+bool CLuaMain::LoadScriptFromBuffer ( const char* cpInBuffer, unsigned int uiInSize, const char* szFileName )
 {
-    if ( m_luaVM )
+    SString strNiceFilename = ConformResourcePath( szFileName );
+
+    // Decrypt if required
+    const char* cpBuffer;
+    uint uiSize;
+    if ( !g_pRealNetServer->DecryptScript( cpInBuffer, uiInSize, &cpBuffer, &uiSize, strNiceFilename ) )
     {
-        // Load the script
-        if ( luaL_loadfile ( m_luaVM, szLUAScript ) )
-        {
-            // Print the error
-            std::string strRes = ConformResourcePath ( lua_tostring( m_luaVM, -1 ) );
-            if ( strRes.length () )
-            {
-                CLogger::LogPrintf ( "SCRIPT ERROR: %s\n", strRes.c_str () );
-                g_pGame->GetScriptDebugging()->LogWarning ( m_luaVM, "Loading script failed: %s", strRes.c_str () );
-            }
-            else
-            {
-                CLogger::LogPrint ( "SCRIPT ERROR: Unknown\n" );
-                g_pGame->GetScriptDebugging()->LogInformation ( m_luaVM, "Loading script failed for unknown reason" );
-            }
-        }
-        else
-        {
-            ResetInstructionCount ();
-            int iret = this->PCall ( m_luaVM, 0, 0, 0 ) ;
-            if ( iret == LUA_ERRRUN || iret == LUA_ERRMEM )
-            {
-                SString strRes = ConformResourcePath ( lua_tostring( m_luaVM, -1 ) );
-        
-                vector <SString> vecSplit;
-                strRes.Split ( ":", vecSplit );
-                
-                if ( vecSplit.size ( ) >= 3 )
-                {
-                    SString strFile = vecSplit[0];
-                    int     iLine   = atoi ( vecSplit[1].c_str ( ) );
-                    SString strMsg  = vecSplit[2].substr ( 1 );
-                    
-                    g_pGame->GetScriptDebugging()->LogError ( strFile, iLine, strMsg );
-                }
-                else
-                    g_pGame->GetScriptDebugging()->LogError ( m_luaVM, "%s", strRes.c_str () );
-            }
-            return true;
-        }
+        // Problems problems
+#if MTA_DM_VERSION < 0x135 
+        SString strMessage( "%s is invalid and will not work in future versions. Please re-compile at http://luac.mtasa.com/", *strNiceFilename ); 
+        g_pGame->GetScriptDebugging()->LogWarning ( m_luaVM, "Script warning: %s", *strMessage );
+        // cpBuffer is always valid after call to DecryptScript
+#else
+        SString strMessage( "%s is invalid. Please re-compile at http://luac.mtasa.com/", *strNiceFilename ); 
+        g_pGame->GetScriptDebugging()->LogError ( m_luaVM, "Loading script failed: %s", *strMessage );
+        return false;
+#endif
     }
 
-    return false;
-}
+    bool bUTF8;
 
-bool CLuaMain::LoadScriptFromBuffer ( const char* cpBuffer, unsigned int uiSize, const char* szFileName, bool bUTF8 )
-{
+    // UTF-8 BOM?  Compare by checking the standard UTF-8 BOM
+    if ( IsUTF8BOM( cpBuffer, uiSize ) == false )
+    {
+        // Maybe not UTF-8, if we have a >80% heuristic detection confidence, assume it is
+        bUTF8 = ( GetUTF8Confidence ( (const unsigned char*)cpBuffer, uiSize ) >= 80 );
+    }
+    else
+    {
+        // If there's a BOM, load ignoring the first 3 bytes
+        bUTF8 = true;
+        cpBuffer += 3;
+        uiSize -= 3;
+    }
+
+    // If compiled script, make sure correct chunkname is embedded
+    EmbedChunkName( strNiceFilename, &cpBuffer, &uiSize );
+
     if ( m_luaVM )
     {
         // Are we not marked as UTF-8 already, and not precompiled?
         std::string strUTFScript;
-        if ( !bUTF8 && ( uiSize < 5 || cpBuffer[0] != 27 || cpBuffer[1] != 'L' || cpBuffer[2] != 'u' || cpBuffer[3] != 'a' || cpBuffer[4] != 'Q' ) )
+        if ( !bUTF8 && !IsLuaCompiledScript( cpBuffer, uiSize ) )
         {
             std::string strBuffer = std::string(cpBuffer, uiSize);
 #ifdef WIN32
@@ -393,35 +385,36 @@ bool CLuaMain::LoadScriptFromBuffer ( const char* cpBuffer, unsigned int uiSize,
             if ( uiSize != strUTFScript.size() )
             {
                 uiSize = strUTFScript.size();
-                g_pGame->GetScriptDebugging()->LogWarning ( m_luaVM, "Script '%s' is not encoded in UTF-8.  Loading as ANSI...", ConformResourcePath(szFileName).c_str() );
+                g_pGame->GetScriptDebugging()->LogWarning ( m_luaVM, "Script '%s' is not encoded in UTF-8.  Loading as ANSI...", strNiceFilename.c_str() );
             }
         }
         else
             strUTFScript = std::string(cpBuffer, uiSize);
 
         // Run the script
-        if ( luaL_loadbuffer ( m_luaVM, bUTF8 ? cpBuffer : strUTFScript.c_str(), uiSize, SString ( "@%s", szFileName ) ) )
+        if ( luaL_loadbuffer ( m_luaVM, bUTF8 ? cpBuffer : strUTFScript.c_str(), uiSize, SString ( "@%s", *strNiceFilename ) ) )
         {
             // Print the error
-            std::string strRes = ConformResourcePath ( lua_tostring( m_luaVM, -1 ) );
+            std::string strRes = lua_tostring( m_luaVM, -1 );
             if ( strRes.length () )
             {
                 CLogger::LogPrintf ( "SCRIPT ERROR: %s\n", strRes.c_str () );
-                g_pGame->GetScriptDebugging()->LogWarning ( m_luaVM, "Loading script failed: %s", strRes.c_str () );
+                g_pGame->GetScriptDebugging()->LogError ( m_luaVM, "Loading script failed: %s", strRes.c_str () );
             }
             else
             {
                 CLogger::LogPrint ( "SCRIPT ERROR: Unknown\n" );
-                g_pGame->GetScriptDebugging()->LogInformation ( m_luaVM, "Loading script failed for unknown reason" );
+                g_pGame->GetScriptDebugging()->LogError ( m_luaVM, "Loading script failed for unknown reason" );
             }
         }
         else
         {
             ResetInstructionCount ();
-            int iret = this->PCall ( m_luaVM, 0, 0, 0 ) ;
+            int luaSavedTop = lua_gettop ( m_luaVM );
+            int iret = this->PCall ( m_luaVM, 0, LUA_MULTRET, 0 ) ;
             if ( iret == LUA_ERRRUN || iret == LUA_ERRMEM )
             {
-                SString strRes = ConformResourcePath ( lua_tostring( m_luaVM, -1 ) );
+                SString strRes = lua_tostring( m_luaVM, -1 );
         
                 std::vector <SString> vecSplit;
                 strRes.Split ( ":", vecSplit );
@@ -436,15 +429,17 @@ bool CLuaMain::LoadScriptFromBuffer ( const char* cpBuffer, unsigned int uiSize,
                 }
                 else
                 {
-                    SString strResourcePath = ConformResourcePath ( szFileName );
-                    if ( !strRes.ContainsI ( ExtractFilename ( strResourcePath ) ) )
+                    if ( !strRes.ContainsI ( ExtractFilename ( strNiceFilename ) ) )
                     {
                         // Add filename to error message, if not already present
-                        strRes = SString ( "%s (global scope) - %s", *strResourcePath, *strRes );
+                        strRes = SString ( "%s (global scope) - %s", *strNiceFilename, *strRes );
                     }
                     g_pGame->GetScriptDebugging()->LogError ( m_luaVM, "%s", strRes.c_str () );
                 }
             }
+            // Cleanup any return values
+            if ( lua_gettop ( m_luaVM ) > luaSavedTop )
+                lua_settop( m_luaVM, luaSavedTop );
             return true;
         }
     }
@@ -460,12 +455,16 @@ bool CLuaMain::LoadScript ( const char* szLUAScript )
         if ( !luaL_loadbuffer ( m_luaVM, szLUAScript, strlen(szLUAScript), NULL ) )
         {
             ResetInstructionCount ();
-            int iret = this->PCall ( m_luaVM, 0, 0, 0 ) ;
+            int luaSavedTop = lua_gettop ( m_luaVM );
+            int iret = this->PCall ( m_luaVM, 0, LUA_MULTRET, 0 ) ;
             if ( iret == LUA_ERRRUN || iret == LUA_ERRMEM )
             {
                 std::string strRes = ConformResourcePath ( lua_tostring( m_luaVM, -1 ) );
                 g_pGame->GetScriptDebugging()->LogError ( m_luaVM, "Executing in-line script failed: %s", strRes.c_str () );
             }
+            // Cleanup any return values
+            if ( lua_gettop ( m_luaVM ) > luaSavedTop )
+                lua_settop( m_luaVM, luaSavedTop );
         }
         else
         {
@@ -492,7 +491,7 @@ void CLuaMain::UnloadScript ( void )
 
     // Delete all keybinds
     list < CPlayer* > ::const_iterator iter = m_pPlayerManager->IterBegin ();
-    for ( ; iter != m_pPlayerManager->IterEnd (); iter++ )
+    for ( ; iter != m_pPlayerManager->IterEnd (); ++iter )
     {
         if ( (*iter)->IsJoined () )
             (*iter)->GetKeyBinds ()->RemoveAllKeys ( this );
@@ -501,100 +500,11 @@ void CLuaMain::UnloadScript ( void )
     // End the lua vm
     if ( m_luaVM )
     {
+        m_pLuaManager->OnLuaMainCloseVM( this, m_luaVM );
+        CLuaFunctionRef::RemoveLuaFunctionRefsForVM( m_luaVM );
         lua_close( m_luaVM );
         m_luaVM = NULL;
     }
-}
-
-static int lua_dump_writer ( lua_State* luaVM, const void* data, size_t size, void* myUserData )
-{
-    (void)luaVM;
-    SString* pDest = (SString *)myUserData;
-    pDest->append ( (const char *)data, size );
-    return 0;
-}
-
-bool CLuaMain::CompileScriptFromFile ( const char* szFile, SString* pDest )
-{
-    if ( m_luaVM )
-    {
-        // Load the file
-        std::vector < char > buffer;
-        FileLoad ( szFile, buffer );
-        unsigned int iSize = buffer.size();
-
-        //UTF-8 BOM?  Compare by checking the standard UTF-8 BOM of 3 characters (in signed format, hence negative)
-        if ( iSize > 0 ) 
-        {
-            if ( iSize < 3 || buffer[0] != -0x11 || buffer[1] != -0x45 || buffer[2] != -0x41 )
-            {
-                //Maybe not UTF-8, if we have a >80% heuristic detection confidence, assume it is
-                return CompileScriptFromBuffer ( &buffer.at ( 0 ), iSize, szFile, GetUTF8Confidence ( (const unsigned char*)&buffer.at ( 0 ), iSize ) >= 80, pDest );
-            }
-            else if ( iSize != 3 ) //If there's a BOM, but the script is not empty, load ignoring the first 3 bytes
-            {
-                return CompileScriptFromBuffer ( &buffer.at ( 3 ), iSize-3, szFile, true, pDest );
-            }
-        }
-    }
-    return false;
-}
-
-
-bool CLuaMain::CompileScriptFromBuffer ( const char* cpBuffer, unsigned int uiSize, const char* szFileName, bool bUTF8, SString* pDest )
-{
-    if ( m_luaVM )
-    {
-        // Are we not marked as UTF-8 already, and not precompiled?
-        std::string strUTFScript;
-        if ( !bUTF8 && ( uiSize < 5 || cpBuffer[0] != 27 || cpBuffer[1] != 'L' || cpBuffer[2] != 'u' || cpBuffer[3] != 'a' || cpBuffer[4] != 'Q' ) )
-        {
-            std::string strBuffer = std::string(cpBuffer, uiSize);
-#ifdef WIN32
-            std::setlocale(LC_CTYPE,""); // Temporarilly use locales to read the script
-            strUTFScript = UTF16ToMbUTF8(ANSIToUTF16( strBuffer ));
-            std::setlocale(LC_CTYPE,"C");
-#else
-            strUTFScript = UTF16ToMbUTF8(ANSIToUTF16( strBuffer ));
-#endif
-
-            if ( uiSize != strUTFScript.size() )
-            {
-                uiSize = strUTFScript.size();
-                g_pGame->GetScriptDebugging()->LogWarning ( m_luaVM, "Script '%s' is not encoded in UTF-8.  Loading as ANSI...", ConformResourcePath(szFileName).c_str() );
-            }
-        }
-        else
-            strUTFScript = std::string(cpBuffer, uiSize);
-
-        // Load the script
-        if ( luaL_loadbuffer ( m_luaVM, bUTF8 ? cpBuffer : strUTFScript.c_str(), uiSize, SString ( "@%s", szFileName ) ) )
-        {
-            // Print the error
-            std::string strRes = ConformResourcePath ( lua_tostring( m_luaVM, -1 ) );
-            if ( strRes.length () )
-            {
-                CLogger::LogPrintf ( "SCRIPT ERROR: %s\n", strRes.c_str () );
-                g_pGame->GetScriptDebugging()->LogWarning ( m_luaVM, "Loading script failed: %s", strRes.c_str () );
-            }
-            else
-            {
-                CLogger::LogPrint ( "SCRIPT ERROR: Unknown\n" );
-                g_pGame->GetScriptDebugging()->LogInformation ( m_luaVM, "Loading script failed for unknown reason" );
-            }
-        }
-        else
-        {
-            pDest->assign ( "" );
-            if ( lua_dump(m_luaVM, lua_dump_writer, pDest) != 0 )
-                return false;
-            lua_pop ( m_luaVM, 1 );
-
-            return true;
-        }
-    }
-
-    return false;
 }
 
 
@@ -603,12 +513,29 @@ void CLuaMain::DoPulse ( void )
     m_pLuaTimerManager->DoPulse ( this );
 }
 
+// Keep count of the number of open files in this resource and issue a warning if too high
+void CLuaMain::OnOpenFile( void )
+{
+    m_uiOpenFileCount++;
+    if ( m_uiOpenFileCount > m_uiOpenFileCountWarnThresh )
+    {
+        m_uiOpenFileCountWarnThresh = m_uiOpenFileCount * 2;
+        CLogger::LogPrintf ( "Notice: There are now %d open files in resource '%s'\n", m_uiOpenFileCount, GetScriptName() );
+    }
+}
 
 CXMLFile * CLuaMain::CreateXML ( const char * szFilename )
 {
     CXMLFile * pFile = g_pServerInterface->GetXML ()->CreateXML ( szFilename, true );
     if ( pFile )
+    {
         m_XMLFiles.push_back ( pFile );
+        if ( m_XMLFiles.size() > m_uiOpenXMLFileCountWarnThresh )
+        {
+            m_uiOpenXMLFileCountWarnThresh = m_XMLFiles.size() * 2;
+            CLogger::LogPrintf ( "Notice: There are now %d open XML files in resource '%s'\n", m_XMLFiles.size(), GetScriptName() );
+        }
+    }
     return pFile;
 }
 
@@ -621,7 +548,7 @@ void CLuaMain::DestroyXML ( CXMLFile * pFile )
 void CLuaMain::DestroyXML ( CXMLNode * pRootNode )
 {
     list<CXMLFile *>::iterator iter;
-    for ( iter = m_XMLFiles.begin(); iter != m_XMLFiles.end(); iter++ )
+    for ( iter = m_XMLFiles.begin(); iter != m_XMLFiles.end(); ++iter )
     {
         CXMLFile * file = (*iter);
         if ( file )
@@ -639,7 +566,7 @@ void CLuaMain::DestroyXML ( CXMLNode * pRootNode )
 void CLuaMain::SaveXML ( CXMLNode * pRootNode )
 {
     list<CXMLFile *>::iterator iter;
-    for ( iter = m_XMLFiles.begin(); iter != m_XMLFiles.end(); iter++ )
+    for ( iter = m_XMLFiles.begin(); iter != m_XMLFiles.end(); ++iter )
     {
         CXMLFile * file = (*iter);
         if ( file )
@@ -654,7 +581,7 @@ void CLuaMain::SaveXML ( CXMLNode * pRootNode )
     if ( m_pResource )
     {
         list < CResourceFile* > ::iterator iter = m_pResource->IterBegin ();
-        for ( ; iter != m_pResource->IterEnd () ; iter++ )
+        for ( ; iter != m_pResource->IterEnd () ; ++iter )
         {
             CResourceFile* pResourceFile = *iter;
             if ( pResourceFile->GetType () == CResourceFile::RESOURCE_FILE_TYPE_CONFIG )
@@ -678,8 +605,7 @@ void CLuaMain::SaveXML ( CXMLNode * pRootNode )
 CTextDisplay * CLuaMain::CreateDisplay ( )
 {
     CTextDisplay * pDisplay = new CTextDisplay;
-    if ( pDisplay )
-        m_Displays.push_back ( pDisplay );
+    m_Displays.push_back ( pDisplay );
     return pDisplay;
 }
 

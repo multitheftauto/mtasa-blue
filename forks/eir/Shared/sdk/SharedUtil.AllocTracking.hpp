@@ -83,14 +83,14 @@ struct CAllocInfo
     int size;
     int countRealloc;
     int allocIndex;
-    char tag[28];
+    int tagId;
 };
 
 
 static int stats_ready = 1;
 #ifdef ALLOC_STATS_MODULE_NAME
     #ifndef ALLOC_STATS_PRE_COUNT
-        #define ALLOC_STATS_PRE_COUNT 200     // Increase if crash at startup
+        #define ALLOC_STATS_PRE_COUNT 0     // Increase if crash at startup
     #endif
     static int pre_count = ALLOC_STATS_PRE_COUNT;
 #else
@@ -98,16 +98,35 @@ static int stats_ready = 1;
     static int pre_count = -1;
 #endif
 
-static int no_stuff = 0;
+static int no_stuff = 0;    // No tracking when tracker is allocating
+#define INVALID_THREAD_ID (-2)
 
 typedef unsigned char BYTE;
+
+struct STagString
+{
+    char data[24];
+    bool operator< ( const STagString& other ) const
+    {
+        return strcmp( data, other.data ) < 0;
+    }
+};
+
+typedef SAllocTrackingTagInfo STagInfo;
 
 class CAllocStats
 {
 public:
     maptype < BYTE*, CAllocInfo >   allocMap;
     int                             allocIndex;
+    maptype < STagString, uint >    tagIdMap;
+    uint                            tagIdCounter;
+    maptype < uint, STagInfo >      tagInfoMap;
     CCriticalSection                cs;
+    DWORD                           dwThreadUsing;
+
+    #define SIZE_SORTED_TAG_THRESH 10000
+    maptype < uint64, uint >      sizeSortedTagMap;
 
     unsigned long TotalMem;
     unsigned long TotalMemMax;
@@ -124,6 +143,7 @@ public:
         TotalMem = 0;
         TotalMemMax = 0;
         allocIndex = 0;
+        tagIdCounter = 0;
         ActiveAllocs = 0;
         DupeAllocs = 0;
         UniqueAllocs = 0;
@@ -132,12 +152,90 @@ public:
         UnmatchedFrees = 0;
         DupeAllocs = 0;
         DupeMem = 0;
+        dwThreadUsing = INVALID_THREAD_ID;
+    }
+
+    uint GetTagId( const char* Tag )
+    {
+        STagString tagString;
+        STRNCPY( tagString.data, Tag, NUMELMS( tagString.data ) );
+        uint* pId = xMapFind( tagIdMap, tagString );
+        if ( pId )
+        {
+            return *pId;
+        }
+        else
+        {
+            uint tagId = ++tagIdCounter;
+            xMapSet( tagIdMap, tagString, tagId );
+            return tagId;
+        }
+    }
+ 
+    void AddSizeSortedTag( uint tagId, int size )
+    {
+        uint64 key = ((uint64)size << 32) | (uint64)tagId;
+        xMapSet( sizeSortedTagMap, key, tagId );
+    }
+
+    void RemoveSizeSortedTag( uint tagId, int size )
+    {
+        uint64 key = ((uint64)size << 32) | (uint64)tagId;
+        xMapRemove( sizeSortedTagMap, key );
+    }
+
+
+    void AddTagAlloc( uint tagId, const char* Tag, int size )
+    {
+        STagInfo* pTagInfo = xMapFind( tagInfoMap, tagId );
+        if( pTagInfo )
+        {
+            if ( pTagInfo->size > SIZE_SORTED_TAG_THRESH )
+                RemoveSizeSortedTag( tagId, pTagInfo->size );
+
+            pTagInfo->countAllocs++;
+            pTagInfo->size += size;
+
+            if ( pTagInfo->size > SIZE_SORTED_TAG_THRESH )
+                AddSizeSortedTag( tagId, pTagInfo->size );
+        }
+        else
+        {
+            STagInfo tagInfo;
+            tagInfo.countAllocs = 1;
+            tagInfo.size = size;
+            STRNCPY( tagInfo.tag, Tag, NUMELMS( tagInfo.tag ) );
+            xMapSet( tagInfoMap, tagId, tagInfo );
+
+            if ( tagInfo.size > SIZE_SORTED_TAG_THRESH )
+                AddSizeSortedTag( tagId, tagInfo.size );
+        }
+    }
+
+    void RemoveTagAlloc( uint tagId, int size )
+    {
+        STagInfo* pTagInfo = xMapFind( tagInfoMap, tagId );
+        if( pTagInfo )
+        {
+            if( pTagInfo->countAllocs > 0 )
+            {
+                if ( pTagInfo->size > SIZE_SORTED_TAG_THRESH )
+                    RemoveSizeSortedTag( tagId, pTagInfo->size );
+
+                pTagInfo->countAllocs--;
+                pTagInfo->size -= size;
+                if( pTagInfo->countAllocs < 1 )
+                    pTagInfo->size = 0;
+
+                if ( pTagInfo->size > SIZE_SORTED_TAG_THRESH )
+                    AddSizeSortedTag( tagId, pTagInfo->size );
+            }
+        }
     }
 
     void AddAllocInfo( BYTE* pData, size_t Count, const char* Tag, int ElementSize )
     {
-        cs.Lock();
-        no_stuff++;
+        Tag = Tag ? Tag : "";
         if( !xMapContains( allocMap, pData ) )
         {
             CAllocInfo info;
@@ -145,9 +243,11 @@ public:
             info.size = Count;
             info.countRealloc = 0;
             info.allocIndex = allocIndex++;
-            STRNCPY( info.tag, Tag ? Tag : "", 28 );
+            info.tagId = GetTagId( Tag );
 
             xMapSet( allocMap, pData, info );
+
+            AddTagAlloc( info.tagId, Tag, info.size );
 
             ActiveAllocs++;
             UniqueAllocs++;
@@ -159,45 +259,45 @@ public:
             DupeAllocs++;
             DupeMem += Count;
         }
-        no_stuff--;
-        cs.Unlock();
     }
 
     void MoveAllocInfo( BYTE* pOrig, BYTE* pNew, size_t Count, const char* Tag, int ElementSize )
     {
-        cs.Lock();
-        no_stuff++;
+        Tag = Tag ? Tag : "";
         CAllocInfo info;
         int SizeDif = Count;
         if( xMapContains( allocMap, pOrig ) )
         {
             info = *xMapFind ( allocMap, pOrig );
             xMapRemove( allocMap, pOrig );
+            RemoveTagAlloc( info.tagId, info.size );
             SizeDif = Count - info.size;
         }
+        else
+            info.countRealloc = 0;
 
         info.elementSize = ElementSize;
         info.size = Count;
         info.countRealloc++;
         info.allocIndex = allocIndex++;
+        info.tagId = GetTagId( Tag );
         ReAllocs++;
 
         xMapSet( allocMap, pNew, info );
+        AddTagAlloc( info.tagId, Tag, info.size );
 
         TotalMem += SizeDif;
         TotalMemMax = Max ( TotalMemMax, TotalMem );
-        no_stuff--;
-        cs.Unlock();
     }
 
     void RemoveAllocInfo( BYTE* pOrig )
     {
-        cs.Lock();
-        no_stuff++;
         if( xMapContains( allocMap, pOrig ) )
         {
             CAllocInfo* pInfo = xMapFind ( allocMap, pOrig );
             TotalMem -= pInfo->size;
+            RemoveTagAlloc( pInfo->tagId, pInfo->size );
+
             xMapRemove( allocMap, pOrig );
             ActiveAllocs--;
             Frees++;
@@ -206,7 +306,22 @@ public:
         {
             UnmatchedFrees++;
         }
-        no_stuff--;
+    }
+
+    // Return false if should not use alloc tracking
+    bool Lock( void )
+    {
+        DWORD dwThreadWanting = GetCurrentThreadId();
+        if ( dwThreadWanting == dwThreadUsing )
+            return false;   // No tracking when tracker is allocating 
+        cs.Lock();
+        dwThreadUsing = dwThreadWanting;
+        return true;
+    }
+
+    void Unlock( void )
+    {
+        dwThreadUsing = INVALID_THREAD_ID;
         cs.Unlock();
     }
 };
@@ -232,17 +347,16 @@ void* myMalloc ( size_t Count, const char* Tag, int ElementSize )
     if ( pre_count > 0 )
         pre_count--;
 
-    if ( no_stuff || pre_count )
+    if ( pre_count || no_stuff )
+        return malloc ( Count );
+
+    CAllocStats* pAllocStats = GetAllocStats();
+    if ( !pAllocStats->Lock() )
         return malloc ( Count );
 
     BYTE* pData = (BYTE*)malloc ( Count );
-
-    if ( stats_ready )
-    {
-        CAllocStats* pAllocStats = GetAllocStats();
-        pAllocStats->AddAllocInfo( pData, Count, Tag, ElementSize );
-    }
-
+    pAllocStats->AddAllocInfo( pData, Count, Tag, ElementSize );
+    pAllocStats->Unlock();
     return pData;
 }
 
@@ -255,35 +369,34 @@ void* myCalloc ( size_t Count, size_t elsize, const char* Tag, int ElementSize )
 
 void* myRealloc ( void* Original, size_t Count, const char* Tag, int ElementSize )
 {
-    if ( no_stuff || pre_count )
+    if ( pre_count || no_stuff )
+        return realloc ( Original, Count );
+
+    CAllocStats* pAllocStats = GetAllocStats();
+    if ( !pAllocStats->Lock() )
         return realloc ( Original, Count );
 
     BYTE* pData = (BYTE*)realloc ( Original, Count );
-
-    if ( stats_ready )
-    {
-        CAllocStats* pAllocStats = GetAllocStats();
-        pAllocStats->MoveAllocInfo( (BYTE*)Original, pData, Count, Tag, ElementSize );
-    }
-
+    pAllocStats->MoveAllocInfo( (BYTE*)Original, pData, Count, Tag, ElementSize );
+    pAllocStats->Unlock();
     return pData;
 }
 
 void myFree ( void* Original )
 {
-    if ( no_stuff || pre_count )
+    if ( pre_count || no_stuff )
         return free ( Original );
 
     if ( !Original )
         return;
 
-    if ( stats_ready )
-    {
-        CAllocStats* pAllocStats = GetAllocStats();
-        pAllocStats->RemoveAllocInfo( (BYTE*)Original );
-    }
+    CAllocStats* pAllocStats = GetAllocStats();
+    if ( !pAllocStats->Lock() )
+        return free ( Original );
 
+    pAllocStats->RemoveAllocInfo( (BYTE*)Original );
     free ( Original );
+    pAllocStats->Unlock();
 }
 
 void* myNew ( std::size_t size, const char* Tag, int ElementSize )
@@ -295,14 +408,6 @@ void myDelete (void* ptr)
 {
     myFree ( ptr );
 }
-
-#define map CMap
-#ifdef WIN32
-    #define malloc _malloc_
-    #define realloc _realloc_
-    #define calloc _calloc_
-    #define free _free_
-#endif
 
 // Set up export type definition for Win32
 #ifdef WIN32
@@ -316,21 +421,59 @@ void myDelete (void* ptr)
 //
 // Returns number of stats copied
 //
-MTAEXPORT unsigned long GetAllocStats( unsigned long* pOutStats, unsigned long ulNumStats )
+MTAEXPORT unsigned long GetAllocStats( uint uiType, void* pOutData, unsigned long ulNumStats )
 {
-    CAllocStats* pAllocStats = GetAllocStats();
+    if ( uiType == 0 )
+    {
+        CAllocStats* pAllocStats = GetAllocStats();
+        unsigned long* pOutStats = (unsigned long*)pOutData;
 
-    if ( ulNumStats > 0 )   pOutStats[0] = pAllocStats->TotalMem;
-    if ( ulNumStats > 1 )   pOutStats[1] = pAllocStats->TotalMemMax;
-    if ( ulNumStats > 2 )   pOutStats[2] = pAllocStats->ActiveAllocs;
-    if ( ulNumStats > 3 )   pOutStats[3] = pAllocStats->DupeAllocs;
-    if ( ulNumStats > 4 )   pOutStats[4] = pAllocStats->UniqueAllocs;
-    if ( ulNumStats > 5 )   pOutStats[5] = pAllocStats->ReAllocs;
-    if ( ulNumStats > 6 )   pOutStats[6] = pAllocStats->Frees;
-    if ( ulNumStats > 7 )   pOutStats[7] = pAllocStats->UnmatchedFrees;
-    if ( ulNumStats > 8 )   pOutStats[8] = pAllocStats->DupeMem;
+        if ( ulNumStats > 0 )   pOutStats[0] = pAllocStats->TotalMem;
+        if ( ulNumStats > 1 )   pOutStats[1] = pAllocStats->TotalMemMax;
+        if ( ulNumStats > 2 )   pOutStats[2] = pAllocStats->ActiveAllocs;
+        if ( ulNumStats > 3 )   pOutStats[3] = pAllocStats->DupeAllocs;
+        if ( ulNumStats > 4 )   pOutStats[4] = pAllocStats->UniqueAllocs;
+        if ( ulNumStats > 5 )   pOutStats[5] = pAllocStats->ReAllocs;
+        if ( ulNumStats > 6 )   pOutStats[6] = pAllocStats->Frees;
+        if ( ulNumStats > 7 )   pOutStats[7] = pAllocStats->UnmatchedFrees;
+        if ( ulNumStats > 8 )   pOutStats[8] = pAllocStats->DupeMem;
 
-    return Min < unsigned long > ( ulNumStats, 9 );
+        return Min < unsigned long > ( ulNumStats, 9 );
+    }
+    else
+    if ( uiType == 1 )
+    {
+        CAllocStats* pAllocStats = GetAllocStats();
+        pAllocStats->cs.Lock();
+        STagInfo* pOutStats = (STagInfo*)pOutData;
+
+        uint idx = 0;
+        for ( maptype < uint64, uint >::reverse_iterator it = pAllocStats->sizeSortedTagMap.rbegin() ; it != pAllocStats->sizeSortedTagMap.rend() ; ++it )
+        {
+            if ( idx >= ulNumStats )
+                break;
+
+            uint tagId = it->second;
+            STagInfo* pTagInfo = xMapFind( pAllocStats->tagInfoMap, tagId );
+            if( pTagInfo )
+            {
+                pOutStats[idx++] = *pTagInfo;
+            }
+        }
+
+        pAllocStats->cs.Unlock();
+        return idx;
+    }
+    return 0;
 }
+
+
+#define map CMap
+#ifdef WIN32
+    #define malloc _malloc_
+    #define realloc _realloc_
+    #define calloc _calloc_
+    #define free _free_
+#endif
 
 #endif  // WITH_ALLOC_TRACKING

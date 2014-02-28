@@ -215,12 +215,13 @@ bool CResourceManager::Refresh ( bool bRefreshAll, const SString& strJustThisRes
         CLogger::LogPrintf ( "Resources: %d loaded, %d failed\n", m_uiResourceLoadedCount, m_uiResourceFailedCount );
     }
 
-    list < CResource* > ::iterator iter = m_resourcesToStartAfterRefresh.begin ();
-    for ( ; iter != m_resourcesToStartAfterRefresh.end (); iter++ )
+    // CResource::Start() might modify this list
+    while ( !m_resourcesToStartAfterRefresh.empty() )
     {
-        (*iter)->Start();
+        CResource* pResource = m_resourcesToStartAfterRefresh.front();
+        m_resourcesToStartAfterRefresh.pop_front();
+        pResource->Start();
     }
-    m_resourcesToStartAfterRefresh.clear();
 
     s_bNotFirstTime = true;
 
@@ -411,8 +412,7 @@ CResource * CResourceManager::Load ( bool bIsZipped, const char * szAbsPath, con
             m_resourcesToStartAfterRefresh.push_back ( loadedResource );
         if ( s_bNotFirstTime )
             CLogger::LogPrintf("New resource '%s' loaded\n", loadedResource->GetName().c_str () );
-        unsigned short usID = GenerateID ();
-        loadedResource->SetNetID ( usID );
+        loadedResource->SetNetID ( GenerateID () );
         AddResourceToLists ( loadedResource );
         m_bResourceListChanged = true;
     }
@@ -480,11 +480,21 @@ unsigned short CResourceManager::GenerateID ( void )
 
 CResource* CResourceManager::GetResourceFromNetID ( unsigned short usNetID )
 {
+    CResource* pResource = MapFindRef( m_NetIdResourceMap, usNetID );
+    if ( pResource )
+    {
+        assert( pResource->GetNetID() == usNetID );
+        return pResource;
+    }
+
     list < CResource* > ::const_iterator iter = m_resources.begin ();
     for ( ; iter != m_resources.end (); iter++ )
     {
         if ( ( *iter )->GetNetID() == usNetID )
+        {
+            assert( 0 );    // Should be in map
             return ( *iter );
+        }
     }
     return NULL;
 }
@@ -536,12 +546,14 @@ void CResourceManager::AddResourceToLists ( CResource* pResource )
     assert ( !m_resources.Contains ( pResource ) );
     assert ( !MapContains ( m_NameResourceMap, strResourceNameKey ) );
     assert ( !MapContains ( m_ResourceLuaStateMap, pResource ) );
+    assert ( !MapContains ( m_NetIdResourceMap, pResource->GetNetID() ) );
 
     m_resources.push_back ( pResource );
 
     CLuaMain* pLuaMain = pResource->GetVirtualMachine ();
     assert ( !pLuaMain );
     MapSet ( m_NameResourceMap, strResourceNameKey, pResource );
+    MapSet ( m_NetIdResourceMap, pResource->GetNetID(), pResource );
 }
 
 //
@@ -553,8 +565,10 @@ void CResourceManager::RemoveResourceFromLists ( CResource* pResource )
 
     assert ( m_resources.Contains ( pResource ) );
     assert ( MapContains ( m_NameResourceMap, strResourceNameKey ) );
+    assert ( MapContains ( m_NetIdResourceMap, pResource->GetNetID() ) );
     m_resources.remove ( pResource );
     MapRemove ( m_NameResourceMap, strResourceNameKey );
+    MapRemove ( m_NetIdResourceMap, pResource->GetNetID() );
 }
 
 
@@ -577,6 +591,13 @@ CResource* CResourceManager::GetResourceFromLuaState ( lua_State* luaVM )
     return NULL;
 }
 
+SString CResourceManager::GetResourceName ( lua_State* luaVM )
+{
+    CResource* pResource = GetResourceFromLuaState( luaVM );
+    if ( pResource )
+        return pResource->GetName();
+    return "";
+}
 
 bool CResourceManager::IsAResourceElement ( CElement* pElement )
 {
@@ -656,7 +677,10 @@ bool CResourceManager::Reload ( CResource* pResource )
         m_bResourceListChanged = true;
 
         // Generate a new ID for it
+        assert ( MapContains ( m_NetIdResourceMap, pResource->GetNetID() ) );
+        MapRemove( m_NetIdResourceMap, pResource->GetNetID() );
         pResource->SetNetID ( GenerateID () );
+        MapSet( m_NetIdResourceMap, pResource->GetNetID(), pResource );
     }
     else
     {
@@ -839,42 +863,6 @@ void CResourceManager::RemoveFromQueue ( CResource* pResource )
 }
 
 
-bool CResourceManager::Install ( char * szURL, char * szName )
-{
-    if ( IsValidFilePath(szName) )
-    {
-        CTCPImpl * pTCP = new CTCPImpl;
-        pTCP->Initialize ();
-
-        CHTTPRequest * request = new CHTTPRequest ( szURL );
-        CHTTPResponse * response = request->Send ( pTCP );
-        if ( response )
-        {
-            size_t dataLength = response->GetDataLength();
-            if ( dataLength != 0 )
-            {
-                const char* szBuffer = response->GetData ();
-
-                SString strResourceRoot = g_pServerInterface->GetModManager ()->GetAbsolutePath ( "resources" );
-                SString strResourceFileName ( "%s/%s.zip", strResourceRoot.c_str (), szName );
-
-                FILE * file = fopen ( strResourceFileName, "wb" );
-                if ( file )
-                {
-                    fwrite ( szBuffer, dataLength, 1, file );
-                    fclose ( file );
-                    delete pTCP;
-                    return true;
-                }
-            }
-        }
-        delete request;
-        delete pTCP;
-    }
-    return false;
-}
-
-
 /////////////////////////////////
 //
 // CreateResource
@@ -887,11 +875,19 @@ CResource* CResourceManager::CreateResource ( const SString& strNewResourceName,
     // Calculate destination location
     SString strDstAbsPath          = PathJoin ( g_pServerInterface->GetServerModPath (), "resources", strNewOrganizationalPath );
     SString strDstResourceLocation = PathJoin ( strDstAbsPath, strNewResourceName );
+    SString strRelResourceLocation = PathJoin ( strNewOrganizationalPath, strNewResourceName );
 
     // Does the resource name already exist?
     if ( GetResource ( strNewResourceName ) != NULL )
     {
         strOutStatus = SString ( "CreateResource - Could not create '%s' as the resource already exists\n", *strNewResourceName );
+        return NULL;
+    }
+    
+    // Is it a valid path?
+    if ( !IsValidFilePath ( strRelResourceLocation ) || !IsValidOrganizationPath ( strNewOrganizationalPath ) )
+    {
+        strOutStatus = SString ( "CreateResource - Could not create '%s' as the provided path is invalid", *strNewResourceName );
         return NULL;
     }
 
@@ -924,6 +920,7 @@ CResource* CResourceManager::CreateResource ( const SString& strNewResourceName,
 
     // Add the resource and load it
     CResource* pResource = new CResource ( this, false, strDstAbsPath, strNewResourceName );
+    pResource->SetNetID ( GenerateID () );
     AddResourceToLists ( pResource );
     return pResource;
 }
@@ -947,6 +944,7 @@ CResource* CResourceManager::CopyResource ( CResource* pSourceResource, const SS
     SString strDstOrganizationalPath = strNewOrganizationalPath.empty () ? strSrcOrganizationalPath : strNewOrganizationalPath;
     SString strDstAbsPath          = PathJoin ( g_pServerInterface->GetServerModPath (), "resources", strDstOrganizationalPath );
     SString strDstResourceLocation = PathJoin ( strDstAbsPath, strNewResourceName );
+    SString strRelResourceLocation = PathJoin ( strDstOrganizationalPath, strNewResourceName );
 
     // Is the source resource loaded
     if ( !pSourceResource->IsLoaded () )
@@ -966,6 +964,13 @@ CResource* CResourceManager::CopyResource ( CResource* pSourceResource, const SS
     if ( FileExists ( strDstResourceLocation ) || DirectoryExists ( strDstResourceLocation ) )
     {
         strOutStatus = SString ( "Could not copy '%s' as the file/directory '%s' already exists\n", *strSrcResourceName, *strNewResourceName );
+        return NULL;
+    }
+   
+    // Is it a valid path?
+    if ( !IsValidFilePath ( strRelResourceLocation ) || !IsValidOrganizationPath ( strDstOrganizationalPath ) )
+    {
+        strOutStatus = SString ( "Could not copy '%s' as the provided path is invalid", *strSrcResourceName );
         return NULL;
     }
 
@@ -1048,6 +1053,8 @@ CResource* CResourceManager::RenameResource ( CResource* pSourceResource, const 
     SString strDstOrganizationalPath = strNewOrganizationalPath.empty () ? strSrcOrganizationalPath : strNewOrganizationalPath;
     SString strDstAbsPath          = PathJoin ( g_pServerInterface->GetServerModPath (), "resources", strDstOrganizationalPath );
     SString strDstResourceLocation = PathJoin ( strDstAbsPath, strNewResourceName );
+    SString strRelResourceLocation = PathJoin ( strDstOrganizationalPath, strNewResourceName );
+
     if ( bIsZip )
         strDstResourceLocation = strDstResourceLocation.TrimEnd ( "\\" ).TrimEnd ( "/" ) + ".zip";
 
@@ -1069,6 +1076,13 @@ CResource* CResourceManager::RenameResource ( CResource* pSourceResource, const 
     if ( FileExists ( strDstResourceLocation ) || DirectoryExists ( strDstResourceLocation ) )
     {
         strOutStatus = SString ( "Could not rename to '%s' as the file/directory name already exists\n", *strNewResourceName );
+        return NULL;
+    }
+
+    // Is it a valid path?
+    if ( !IsValidFilePath ( strRelResourceLocation ) || !IsValidOrganizationPath ( strDstOrganizationalPath ) )
+    {
+        strOutStatus = SString ( "Could not rename to '%s' as the provided path is invalid", *strNewResourceName );
         return NULL;
     }
 
@@ -1268,7 +1282,7 @@ void CResourceManager::ReevaluateMinClientRequirement ( void )
 {
     // Calc highest requirement
     m_strMinClientRequirement = "";
-    for ( std::map < CResource*, SString >::iterator iter = m_MinClientRequirementMap.begin () ; iter != m_MinClientRequirementMap.end () ; ++iter )
+    for ( CFastHashMap < CResource*, SString >::iterator iter = m_MinClientRequirementMap.begin () ; iter != m_MinClientRequirementMap.end () ; ++iter )
         if ( iter->second > m_strMinClientRequirement )
             m_strMinClientRequirement = iter->second;
 
@@ -1318,7 +1332,7 @@ void CResourceManager::RemoveSyncMapElementDataOption ( CResource* pResource )
 void CResourceManager::ReevaluateSyncMapElementDataOption ( void )
 {
     bool bSyncMapElementData = true;
-    for ( std::map < CResource*, bool >::iterator iter = m_SyncMapElementDataOptionMap.begin () ; iter != m_SyncMapElementDataOptionMap.end () ; ++iter )
+    for ( CFastHashMap < CResource*, bool >::iterator iter = m_SyncMapElementDataOptionMap.begin () ; iter != m_SyncMapElementDataOptionMap.end () ; ++iter )
     {
         if ( iter->second )
         {

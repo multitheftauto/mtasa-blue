@@ -20,6 +20,7 @@
 #include <Accctrl.h>
 #include <Aclapi.h>
 #include "Userenv.h"        // This will enable SharedUtil::ExpandEnvString
+#define ALLOC_STATS_MODULE_NAME "core"
 #include "SharedUtil.hpp"
 #include <clocale>
 #include "CTimingCheckpoints.hpp"
@@ -88,7 +89,7 @@ template<> CCore * CSingleton< CCore >::m_pSingleton = NULL;
 CCore::CCore ( void )
 {
     // Enable this to debug the core initialization.
-#if defined(_DEBUG) && 0
+#if defined(_DEBUG) && 1
     while ( !IsDebuggerPresent() )
         Sleep( 1 );
 #endif
@@ -118,6 +119,10 @@ CCore::CCore ( void )
 
     // Filesystem.
     m_fileSystem                = new CFileSystem;
+
+    // Load our settings and localization as early as possible
+    CreateXML ( );
+    g_pLocalization = new CLocalization;
 
     // Create a logger instance.
     m_pConsoleLogger            = new CConsoleLogger ( );
@@ -186,6 +191,8 @@ CCore::CCore ( void )
     m_bDidRecreateRenderTargets = false;
     m_fMinStreamingMemory = 0;
     m_fMaxStreamingMemory = 0;
+    m_bGettingIdleCallsFromMultiplayer = false;
+    m_bWindowsTimerEnabled = false;
 
     // We require pre initialization to hook API before GTA:SA uses it
     CCore::GetSingleton ( ).CreateGame ( );
@@ -201,6 +208,7 @@ CCore::~CCore ( void )
     SAFE_DELETE ( m_pMessageBox );
 
     // Destroy early subsystems
+    m_bModulesLoaded = false;
     DestroyNetwork ();
     DestroyMultiplayer ();
     DestroyGame ();
@@ -225,7 +233,6 @@ CCore::~CCore ( void )
     //delete m_pFileSystemHook;
     delete m_pDirect3DHookManager;
     delete m_pDirectInputHookManager;
-    delete m_pMessageLoopHook;
     delete m_pTCPManager;
 
     // Delete the GUI manager    
@@ -247,6 +254,9 @@ CCore::~CCore ( void )
 
     //Delete the Current Server
     delete m_pCurrentServer;
+
+    // Delete last so calls to GetHookedWindowHandle do not crash
+    delete m_pMessageLoopHook;
 
     // Delete the FileSystem
     delete m_fileSystem;
@@ -541,9 +551,7 @@ void CCore::EnableChatInput ( char* szCommand, DWORD dwColor )
         {
             CChat* pChat = m_pLocalGUI->GetChat ();
             pChat->SetCommand ( szCommand );
-            //pChat->SetInputColor ( dwColor );
             m_pLocalGUI->SetChatBoxInputEnabled ( true );
-            m_pLocalGUI->SetVisibleWindows ( true );
         }
     }
 }
@@ -612,13 +620,13 @@ void CCore::ApplyGameSettings ( void )
     CVARS_GET ( "invert_mouse",     bval ); pController->SetMouseInverted ( bval );
     CVARS_GET ( "fly_with_mouse",   bval ); pController->SetFlyWithMouse ( bval );
     CVARS_GET ( "steer_with_mouse", bval ); pController->SetSteerWithMouse ( bval );
-    CVARS_GET ( "classic_controls", bval ); bval ? pController->SetInputType ( NULL ) : pController->SetInputType ( 1 );
-    CVARS_GET ( "async_loading",    iVal ); m_pGame->SetAsyncLoadingFromSettings ( iVal == 1, iVal == 2 );
+    CVARS_GET ( "classic_controls", bval ); pController->SetClassicControls ( bval );
     CVARS_GET ( "volumetric_shadows", bval ); m_pGame->GetSettings ()->SetVolumetricShadowsEnabled ( bval );
-    CVARS_GET ( "aspect_ratio",     iVal ); m_pGame->GetSettings ()->SetAspectRatio ( (eAspectRatio)iVal );
+    CVARS_GET ( "aspect_ratio",     iVal ); m_pGame->GetSettings ()->SetAspectRatio ( (eAspectRatio)iVal, CVARS_GET_VALUE < bool > ( "hud_match_aspect_ratio" ) );
     CVARS_GET ( "grass",            bval ); m_pGame->GetSettings ()->SetGrassEnabled ( bval );
     CVARS_GET ( "heat_haze",        bval ); m_pMultiplayer->SetHeatHazeEnabled ( bval );
     CVARS_GET ( "fast_clothes_loading", iVal ); m_pMultiplayer->SetFastClothesLoading ( (CMultiplayer::EFastClothesLoading)iVal );
+    pController->SetVerticalAimSensitivityRawValue( CVARS_GET_VALUE < float > ( "vertical_aim_sensitivity" ) );
 }
 
 void CCore::ApplyCommunityState ( void )
@@ -641,9 +649,15 @@ bool CCore::IsConnected ( void )
 }
 
 
-bool CCore::Reconnect ( const char* szHost, unsigned short usPort, const char* szPassword, bool bSave )
+bool CCore::Reconnect ( const char* szHost, unsigned short usPort, const char* szPassword, bool bSave, bool bForceInternalHTTPServer )
 {
-    return m_pConnectManager->Reconnect ( szHost, usPort, szPassword, bSave );
+    return m_pConnectManager->Reconnect ( szHost, usPort, szPassword, bSave, bForceInternalHTTPServer );
+}
+
+
+bool CCore::ShouldUseInternalHTTPServer( void )
+{
+    return m_pConnectManager->ShouldUseInternalHTTPServer();
 }
 
 
@@ -703,6 +717,86 @@ void CCore::RemoveMessageBox ( bool bNextFrame )
     }
 }
 
+//
+// Show message box with possibility of on-line help
+//
+void CCore::ShowErrorMessageBox( const SString& strTitle, SString strMessage, const SString& strTroubleLink )
+{
+    if ( strTroubleLink.empty() )
+    {
+        CCore::GetSingleton ().ShowMessageBox ( strTitle, strMessage, MB_BUTTON_OK | MB_ICON_ERROR );
+    }
+    else
+    {
+        strMessage += "\n\n";
+        strMessage += _("Do you want to see some on-line help about this problem ?");
+        CQuestionBox* pQuestionBox = CCore::GetSingleton ().GetLocalGUI ()->GetMainMenu ()->GetQuestionWindow ();
+        pQuestionBox->Reset ();
+        pQuestionBox->SetTitle ( strTitle );
+        pQuestionBox->SetMessage ( strMessage );
+        pQuestionBox->SetButton ( 0, _("No") );
+        pQuestionBox->SetButton ( 1, _("Yes") );
+        pQuestionBox->SetCallback ( CCore::ErrorMessageBoxCallBack, new SString( strTroubleLink ) );
+        pQuestionBox->Show ();
+    }
+}
+
+//
+// Show message box with possibility of on-line help
+//  + with net error code appended to message and trouble link
+//
+void CCore::ShowNetErrorMessageBox( const SString& strTitle, SString strMessage, SString strTroubleLink, bool bLinkRequiresErrorCode )
+{
+    uint uiErrorCode = CCore::GetSingleton ().GetNetwork ()->GetExtendedErrorCode ();
+    if ( uiErrorCode != 0 )
+    {
+        // Do anti-virus check soon
+        SetApplicationSettingInt( "noav-user-says-skip", 1 );
+        strMessage += SString ( " \nCode: %08X", uiErrorCode );
+        if ( !strTroubleLink.empty() )
+            strTroubleLink += SString ( "&neterrorcode=%08X", uiErrorCode );
+    }
+    else
+    if ( bLinkRequiresErrorCode )
+        strTroubleLink = "";        // No link if no error code
+
+    ShowErrorMessageBox( strTitle, strMessage, strTroubleLink );
+}
+
+//
+// Callback used in CCore::ShowErrorMessageBox
+//
+void CCore::ErrorMessageBoxCallBack( void* pData, uint uiButton )
+{
+    CCore::GetSingleton ().GetLocalGUI ()->GetMainMenu ()->GetQuestionWindow ()->Reset ();
+
+    SString* pstrTroubleLink = (SString*)pData;
+    if ( uiButton == 1 )
+    {
+        uint uiErrorCode = (uint)pData;
+        BrowseToSolution ( *pstrTroubleLink, EXIT_GAME_FIRST );
+    }
+    delete pstrTroubleLink;
+}
+
+
+//
+// Check for disk space problems
+// Returns false if low disk space, and dialog is being shown
+//
+bool CCore::CheckDiskSpace( uint uiResourcesPathMinMB, uint uiDataPathMinMB )
+{
+    SString strDriveWithNoSpace = GetDriveNameWithNotEnoughSpace( uiResourcesPathMinMB, uiDataPathMinMB );
+    if ( !strDriveWithNoSpace.empty() )
+    {
+        SString strMessage( _("MTA:SA cannot continue because drive %s does not have enough space."), *strDriveWithNoSpace );
+        SString strTroubleLink( SString( "low-disk-space&drive=%s", *strDriveWithNoSpace.Left( 1 ) ) );
+        g_pCore->ShowErrorMessageBox ( _("Fatal error")+_E("CC43"), strMessage, strTroubleLink );
+        return false;
+    }
+    return true;
+}
+
 
 HWND CCore::GetHookedWindow ( void )
 {
@@ -740,11 +834,40 @@ void CCore::ApplyHooks ( )
     //m_pFileSystemHook->RedirectFile ( "main.scm", "../../mta/gtafiles/main.scm" );
 }
 
+bool UsingAltD3DSetup()
+{
+    static bool bAltStartup = GetApplicationSettingInt( "nvhacks", "optimus-alt-startup" ) ? true : false;
+    return bAltStartup;
+}
+
 void CCore::ApplyHooks2 ( )
 { 
     WriteDebugEvent ( "CCore::ApplyHooks2" );
     // Try this one a little later
-    m_pDirect3DHookManager->ApplyHook ( );
+    if ( !UsingAltD3DSetup() )
+        m_pDirect3DHookManager->ApplyHook ( );
+    else
+    {
+        // Done a little later to get past the loading time required to decrypt the gta 
+        // executable into memory...
+        if ( !CCore::GetSingleton ( ).AreModulesLoaded ( ) )
+        {
+            CCore::GetSingleton ( ).CreateNetwork ( );
+            CCore::GetSingleton ( ).CreateGame ( );
+            CCore::GetSingleton ( ).CreateMultiplayer ( );
+            CCore::GetSingleton ( ).CreateXML ( );
+            CCore::GetSingleton ( ).CreateGUI ( );
+            CCore::GetSingleton ( ).SetModulesLoaded ( true );
+        }
+    }
+}
+
+void CCore::ApplyHooks3( bool bEnable )
+{
+    if ( bEnable )
+        CDirect3DHook9::GetSingletonPtr()->ApplyHook();
+    else
+        CDirect3DHook9::GetSingletonPtr()->RemoveHook();
 }
 
 
@@ -770,16 +893,15 @@ void LoadModule ( CModuleLoader& m_Loader, const SString& strName, const SString
     WriteDebugEvent ( "Loading " + strName.ToLower () );
 
     // Ensure DllDirectory has not been changed
-    char szDllDirectory[ MAX_PATH + 1 ] = {'\0'};
-    GetDllDirectory( sizeof ( szDllDirectory ), szDllDirectory );
-    if ( CalcMTASAPath ( "mta" ).CompareI ( szDllDirectory ) != true )
+    SString strDllDirectory = GetSystemDllDirectory();
+    if ( CalcMTASAPath ( "mta" ).CompareI ( strDllDirectory ) == false )
     {
-        AddReportLog ( 3119, SString ( "DllDirectory wrong:  DllDirectory:'%s'  Path:'%s'", szDllDirectory, *CalcMTASAPath ( "mta" ) ) );
+        AddReportLog ( 3119, SString ( "DllDirectory wrong:  DllDirectory:'%s'  Path:'%s'", *strDllDirectory, *CalcMTASAPath ( "mta" ) ) );
         SetDllDirectory( CalcMTASAPath ( "mta" ) );
     }
 
     // Save current directory (shouldn't change anyway)
-    SString strSavedCwd = SharedUtil::GetCurrentDirectory ();
+    SString strSavedCwd = GetSystemCurrentDirectory();
 
     // Load approrpiate compilation-specific library.
 #ifdef MTA_DEBUG
@@ -813,7 +935,7 @@ template < class T, class U >
 T* InitModule ( CModuleLoader& m_Loader, const SString& strName, const SString& strInitializer, U* pObj )
 {
     // Save current directory (shouldn't change anyway)
-    SString strSavedCwd = SharedUtil::GetCurrentDirectory ();
+    SString strSavedCwd = GetSystemCurrentDirectory();
 
     // Get initializer function from DLL.
     typedef T* (*PFNINITIALIZER) ( U* );
@@ -821,7 +943,7 @@ T* InitModule ( CModuleLoader& m_Loader, const SString& strName, const SString& 
 
     if ( pfnInit == NULL )
     {
-        MessageBox ( 0, strName + " module is incorrect!", "Error", MB_OK | MB_ICONEXCLAMATION | MB_TOPMOST  );
+        MessageBoxUTF8 ( 0, SString(_("%s module is incorrect!"),*strName), "Error"+_E("CC40"), MB_OK | MB_ICONEXCLAMATION | MB_TOPMOST  );
         TerminateProcess ( GetCurrentProcess (), 1 );
     }
 
@@ -869,6 +991,8 @@ void CCore::CreateGame ( )
 void CCore::CreateMultiplayer ( )
 {
     m_pMultiplayer = CreateModule < CMultiplayer > ( m_MultiplayerModule, "Multiplayer", "multiplayer_sa", "InitMultiplayerInterface", this );
+    if ( m_pMultiplayer )
+        m_pMultiplayer->SetIdleHandler ( CCore::StaticIdleHandler );
 }
 
 
@@ -878,10 +1002,9 @@ void CCore::DeinitGUI ( void )
 }
 
 
-void CCore::InitGUI ( IUnknown* pDevice )
+void CCore::InitGUI ( IDirect3DDevice9* pDevice )
 {
-    IDirect3DDevice9 *dev = reinterpret_cast < IDirect3DDevice9* > ( pDevice );
-    m_pGUI = InitModule < CGUI > ( m_GUIModule, "GUI", "InitGUIInterface", dev );
+    m_pGUI = InitModule < CGUI > ( m_GUIModule, "GUI", "InitGUIInterface", pDevice );
 
     // and set the screenshot path to this default library (screenshots shouldnt really be made outside mods)
     std::string strScreenShotPath = CalcMTASAPath ( "screenshots" );
@@ -911,12 +1034,15 @@ void CCore::CreateNetwork ( )
     m_pNet = CreateModule < CNet > ( m_NetModule, "Network", "netc", "InitNetInterface", this );
 
     // Network module compatibility check
-    typedef unsigned long (*PFNCHECKCOMPATIBILITY) ( unsigned long );
+    typedef unsigned long (*PFNCHECKCOMPATIBILITY) ( unsigned long, unsigned long* );
     PFNCHECKCOMPATIBILITY pfnCheckCompatibility = static_cast< PFNCHECKCOMPATIBILITY > ( m_NetModule.GetFunctionPointer ( "CheckCompatibility" ) );
-    if ( !pfnCheckCompatibility || !pfnCheckCompatibility ( MTA_DM_CLIENT_NET_MODULE_VERSION ) )
+    if ( !pfnCheckCompatibility || !pfnCheckCompatibility ( MTA_DM_CLIENT_NET_MODULE_VERSION, NULL ) )
     {
         // net.dll doesn't like our version number
-        BrowseToSolution ( "netc-not-compatible", ASK_GO_ONLINE | TERMINATE_PROCESS, "Network module not compatible!" );
+        ulong ulNetModuleVersion = 0;
+        pfnCheckCompatibility ( 1, &ulNetModuleVersion );
+        SString strMessage( "Network module not compatible! (Expected 0x%x, got 0x%x)", MTA_DM_CLIENT_NET_MODULE_VERSION, ulNetModuleVersion );
+        BrowseToSolution ( "netc-not-compatible", ASK_GO_ONLINE | TERMINATE_PROCESS, strMessage );
     }
 
     // Set mta version for report log here
@@ -937,21 +1063,27 @@ void CCore::CreateNetwork ( )
 
 void CCore::CreateXML ( )
 {
-    m_pXML = CreateModule < CXML > ( m_XMLModule, "XML", "xmll", "InitXMLInterface", this );
-   
-    // Load config XML file
-    m_pConfigFile = m_pXML->CreateXML ( CalcMTASAPath ( MTA_CONFIG_PATH ) );
-    if ( !m_pConfigFile ) {
-        assert ( false );
-        return;
+    if ( !m_pXML )
+        m_pXML = CreateModule < CXML > ( m_XMLModule, "XML", "xmll", "InitXMLInterface", this );
+
+    if ( !m_pConfigFile )
+    {
+        // Load config XML file
+        m_pConfigFile = m_pXML->CreateXML ( CalcMTASAPath ( MTA_CONFIG_PATH ) );
+        if ( !m_pConfigFile ) {
+            assert ( false );
+            return;
+        }
+
+        m_pConfigFile->Parse ();
     }
-    m_pConfigFile->Parse ();
 
     // Load the keybinds (loads defaults if the subnode doesn't exist)
-    GetKeyBinds ()->LoadFromXML ( GetConfig ()->FindSubNode ( CONFIG_NODE_KEYBINDS ) );
-
-    // Load the default commandbinds if not exist
-    GetKeyBinds ()->LoadDefaultCommands( false );
+    if ( m_pKeyBinds )
+    {
+        m_pKeyBinds->LoadFromXML ( GetConfig ()->FindSubNode ( CONFIG_NODE_KEYBINDS ) );
+        m_pKeyBinds->LoadDefaultCommands( false );
+    }
 
     // Load XML-dependant subsystems
     m_ClientVariables.Load ( );
@@ -1011,6 +1143,7 @@ void CCore::DestroyNetwork ( )
 
     if ( m_pNet )
     {
+        m_pNet->Shutdown();
         m_pNet = NULL;
     }
 
@@ -1026,6 +1159,18 @@ void CCore::UpdateIsWindowMinimized ( void )
     {
         // Update CPU saver for when minimized and not connected
         g_pCore->GetMultiplayer ()->SetIsMinimizedAndNotConnected ( m_bIsWindowMinimized && !IsConnected () );
+    }
+    g_pCore->GetMultiplayer ()->SetMirrorsEnabled ( !m_bIsWindowMinimized );
+
+    // Enable timer if not connected at least once
+    bool bEnableTimer = !m_bGettingIdleCallsFromMultiplayer;
+    if ( m_bWindowsTimerEnabled != bEnableTimer )
+    {
+        m_bWindowsTimerEnabled = bEnableTimer;
+        if ( bEnableTimer )
+            SetTimer( GetHookedWindow(), IDT_TIMER1, 50, (TIMERPROC) NULL );
+        else
+            KillTimer( GetHookedWindow(), IDT_TIMER1 );
     }
 }
 
@@ -1074,8 +1219,6 @@ void CCore::DoPostFramePulse ( )
         ApplyConsoleSettings ();
         ApplyGameSettings ();
 
-        m_pGUI->SetMouseClickHandler ( INPUT_CORE, GUI_CALLBACK_MOUSE ( &CCore::OnMouseClick, this ) );
-        m_pGUI->SetMouseDoubleClickHandler ( INPUT_CORE, GUI_CALLBACK_MOUSE ( &CCore::OnMouseDoubleClick, this ) );
         m_pGUI->SelectInputHandlers( INPUT_CORE );
 
         m_Community.Initialize ();
@@ -1092,6 +1235,10 @@ void CCore::DoPostFramePulse ( )
     {
         // Wait 250 frames more than the time it took to get status 7 (fade-out time)
         static short WaitForMenu = 0;
+
+        // Do crash dump encryption while the credit screen is displayed
+        if ( WaitForMenu == 0 )
+            HandleCrashDumpEncryption();
 
         // Cope with early finish
         if ( m_pGame->HasCreditScreenFadedOut () )
@@ -1114,7 +1261,7 @@ void CCore::DoPostFramePulse ( )
                     // Run the connect command
                     if ( strArguments.length () > 0 && !m_pCommands->Execute ( strArguments ) )
                     {
-                        ShowMessageBox ( "Error", "Error executing URL", MB_BUTTON_OK | MB_ICON_ERROR );
+                        ShowMessageBox ( _("Error")+_E("CC41"), _("Error executing URL"), MB_BUTTON_OK | MB_ICON_ERROR );
                     }
                 }
                 else
@@ -1126,8 +1273,8 @@ void CCore::DoPostFramePulse ( )
                         // Try to load the mod
                         if ( !m_pModManager->Load ( szOptionValue, m_szCommandLineArgs ) )
                         {
-                            SString strTemp ( "Error running mod specified in command line ('%s')", szOptionValue );
-                            ShowMessageBox ( "Error", strTemp, MB_BUTTON_OK | MB_ICON_ERROR );
+                            SString strTemp ( _("Error running mod specified in command line ('%s')"), szOptionValue );
+                            ShowMessageBox ( _("Error")+_E("CC42"), strTemp, MB_BUTTON_OK | MB_ICON_ERROR ); // Command line Mod load failed
                         }
                     }
                     // We want to connect to a server?
@@ -1175,6 +1322,7 @@ void CCore::DoPostFramePulse ( )
     m_pModManager->DoPulsePostFrame ();
     TIMING_CHECKPOINT( "+CorePostFrame2" );
     GetMemStats ()->Draw ();
+    GetGraphStats ()->Draw();
     m_pConnectManager->DoPulse ();
 
     m_Community.DoPulse ();
@@ -1224,6 +1372,9 @@ void CCore::OnModUnload ( )
     // Ensure all these have been removed
     m_pKeyBinds->RemoveAllFunctions ();
     m_pKeyBinds->RemoveAllControlFunctions ();
+
+    // Reset client script frame rate limit
+    m_uiClientScriptFrameRateLimit = 0;
 }
 
 
@@ -1231,14 +1382,14 @@ void CCore::RegisterCommands ( )
 {
     //m_pCommands->Add ( "e", CCommandFuncs::Editor );
     //m_pCommands->Add ( "clear", CCommandFuncs::Clear );
-    m_pCommands->Add ( "help",              "this help screen",                 CCommandFuncs::Help );
-    m_pCommands->Add ( "exit",              "exits the application",            CCommandFuncs::Exit );
-    m_pCommands->Add ( "quit",              "exits the application",            CCommandFuncs::Exit );
-    m_pCommands->Add ( "ver",               "shows the version",                CCommandFuncs::Ver );
-    m_pCommands->Add ( "time",              "shows the time",                   CCommandFuncs::Time );
-    m_pCommands->Add ( "showhud",           "shows the hud",                    CCommandFuncs::HUD );
-    m_pCommands->Add ( "binds",             "shows all the binds",              CCommandFuncs::Binds );
-    m_pCommands->Add ( "serial",            "shows your serial",                CCommandFuncs::Serial );
+    m_pCommands->Add ( "help",              _("this help screen"),                 CCommandFuncs::Help );
+    m_pCommands->Add ( "exit",              _("exits the application"),            CCommandFuncs::Exit );
+    m_pCommands->Add ( "quit",              _("exits the application"),            CCommandFuncs::Exit );
+    m_pCommands->Add ( "ver",               _("shows the version"),                CCommandFuncs::Ver );
+    m_pCommands->Add ( "time",              _("shows the time"),                   CCommandFuncs::Time );
+    m_pCommands->Add ( "showhud",           _("shows the hud"),                    CCommandFuncs::HUD );
+    m_pCommands->Add ( "binds",             _("shows all the binds"),              CCommandFuncs::Binds );
+    m_pCommands->Add ( "serial",            _("shows your serial"),                CCommandFuncs::Serial );
 
 #if 0
     m_pCommands->Add ( "vid",               "changes the video settings (id)",  CCommandFuncs::Vid );
@@ -1247,22 +1398,24 @@ void CCore::RegisterCommands ( )
     m_pCommands->Add ( "unload",            "unloads a mod (name)",             CCommandFuncs::Unload );
 #endif
 
-    m_pCommands->Add ( "connect",           "connects to a server (host port nick pass)",   CCommandFuncs::Connect );
-    m_pCommands->Add ( "reconnect",         "connects to a previous server",    CCommandFuncs::Reconnect );
-    m_pCommands->Add ( "bind",              "binds a key (key control)",        CCommandFuncs::Bind );
-    m_pCommands->Add ( "unbind",            "unbinds a key (key)",              CCommandFuncs::Unbind );
-    m_pCommands->Add ( "copygtacontrols",   "copies the default gta controls",  CCommandFuncs::CopyGTAControls );
-    m_pCommands->Add ( "screenshot",        "outputs a screenshot",             CCommandFuncs::ScreenShot );
-    m_pCommands->Add ( "saveconfig",        "immediately saves the config",     CCommandFuncs::SaveConfig );
+    m_pCommands->Add ( "connect",           _("connects to a server (host port nick pass)"),   CCommandFuncs::Connect );
+    m_pCommands->Add ( "reconnect",         _("connects to a previous server"),    CCommandFuncs::Reconnect );
+    m_pCommands->Add ( "bind",              _("binds a key (key control)"),        CCommandFuncs::Bind );
+    m_pCommands->Add ( "unbind",            _("unbinds a key (key)"),              CCommandFuncs::Unbind );
+    m_pCommands->Add ( "copygtacontrols",   _("copies the default gta controls"),  CCommandFuncs::CopyGTAControls );
+    m_pCommands->Add ( "screenshot",        _("outputs a screenshot"),             CCommandFuncs::ScreenShot );
+    m_pCommands->Add ( "saveconfig",        _("immediately saves the config"),     CCommandFuncs::SaveConfig );
 
-    m_pCommands->Add ( "cleardebug",        "clears the debug view",            CCommandFuncs::DebugClear );
-    m_pCommands->Add ( "chatscrollup",      "scrolls the chatbox upwards",      CCommandFuncs::ChatScrollUp );
-    m_pCommands->Add ( "chatscrolldown",    "scrolls the chatbox downwards",    CCommandFuncs::ChatScrollDown );
-    m_pCommands->Add ( "debugscrollup",     "scrolls the debug view upwards",   CCommandFuncs::DebugScrollUp );
-    m_pCommands->Add ( "debugscrolldown",   "scrolls the debug view downwards", CCommandFuncs::DebugScrollDown );
+    m_pCommands->Add ( "cleardebug",        _("clears the debug view"),            CCommandFuncs::DebugClear );
+    m_pCommands->Add ( "chatscrollup",      _("scrolls the chatbox upwards"),      CCommandFuncs::ChatScrollUp );
+    m_pCommands->Add ( "chatscrolldown",    _("scrolls the chatbox downwards"),    CCommandFuncs::ChatScrollDown );
+    m_pCommands->Add ( "debugscrollup",     _("scrolls the debug view upwards"),   CCommandFuncs::DebugScrollUp );
+    m_pCommands->Add ( "debugscrolldown",   _("scrolls the debug view downwards"), CCommandFuncs::DebugScrollDown );
 
     m_pCommands->Add ( "test",              "",                                 CCommandFuncs::Test );
-    m_pCommands->Add ( "showmemstat",       "shows the memory statistics",      CCommandFuncs::ShowMemStat );
+    m_pCommands->Add ( "showmemstat",       _("shows the memory statistics"),      CCommandFuncs::ShowMemStat );
+    m_pCommands->Add ( "showframegraph",    _("shows the frame timing graph"),     CCommandFuncs::ShowFrameGraph );
+    m_pCommands->Add ( "jinglebells",       "",                                    CCommandFuncs::JingleBells );
 
 #if defined(MTA_DEBUG) || defined(MTA_BETA)
     m_pCommands->Add ( "fakelag",           "",                                 CCommandFuncs::FakeLag );
@@ -1329,11 +1482,15 @@ void CCore::Quit ( bool bInstantly )
         // Show that we are quiting (for the crash dump filename)
         SetApplicationSettingInt ( "last-server-ip", 1 );
 
+        WatchDogBeginSection( "Q0" );   // Allow loader to detect freeze on exit
+
         // Destroy the client
         CModManager::GetSingleton ().Unload ();
 
         // Destroy ourself
         delete CCore::GetSingletonPtr ();
+
+        WatchDogCompletedSection( "Q0" );
 
         // Use TerminateProcess for now as exiting the normal way crashes
         TerminateProcess ( GetCurrentProcess (), 0 );
@@ -1343,29 +1500,6 @@ void CCore::Quit ( bool bInstantly )
     {
         m_bQuitOnPulse = true;
     }
-}
-
-
-bool CCore::OnMouseClick ( CGUIMouseEventArgs Args )
-{
-    bool bHandled = false;
-
-    bHandled = m_pLocalGUI->GetMainMenu ()->GetServerBrowser ()->OnMouseClick ( Args );     // CServerBrowser
-
-    return bHandled;
-}
-
-
-bool CCore::OnMouseDoubleClick ( CGUIMouseEventArgs Args )
-{
-    bool bHandled = false;
-
-    // Call the event handlers, where necessary
-    bHandled =
-        m_pLocalGUI->GetMainMenu ()->GetSettingsWindow ()->OnMouseDoubleClick ( Args ) |    // CSettings
-        m_pLocalGUI->GetMainMenu ()->GetServerBrowser ()->OnMouseDoubleClick ( Args );      // CServerBrowser
-    
-    return bHandled;
 }
 
 
@@ -1391,7 +1525,7 @@ void CCore::ParseCommandLine ( std::map < std::string, std::string > & options, 
 
     const char* szCmdLine = GetCommandLine ();
     char szCmdLineCopy[512];
-    strncpy ( szCmdLineCopy, szCmdLine, sizeof(szCmdLineCopy) );
+    STRNCPY ( szCmdLineCopy, szCmdLine, sizeof(szCmdLineCopy) );
     
     char* pCmdLineEnd = szCmdLineCopy + strlen ( szCmdLineCopy );
     char* pStart = szCmdLineCopy;
@@ -1645,8 +1779,7 @@ void CCore::UpdateRecentlyPlayed()
 void CCore::SetCurrentServer( in_addr Addr, unsigned short usGamePort )
 {
     //Set the current server info so we can query it with ASE for xfire
-    m_pCurrentServer->Address = Addr;
-    m_pCurrentServer->usGamePort = usGamePort;
+    m_pCurrentServer->ChangeAddress( Addr, usGamePort );
 }
 
 SString CCore::UpdateXfire( void )
@@ -1709,29 +1842,49 @@ void CCore::SetXfireData ( std::string strServerName, std::string strVersion, bo
 // Recalculate FPS limit to use
 //
 // Uses client rate from config
+// Uses client rate from script
 // Uses server rate from argument, or last time if not supplied
 //
-void CCore::RecalculateFrameRateLimit ( uint uiServerFrameRateLimit )
+void CCore::RecalculateFrameRateLimit ( uint uiServerFrameRateLimit, bool bLogToConsole )
 {
     // Save rate from server if valid
     if ( uiServerFrameRateLimit != -1 )
         m_uiServerFrameRateLimit = uiServerFrameRateLimit;
 
-    // Fetch client setting
-    uint uiClientRate;
-    g_pCore->GetCVars ()->Get ( "fps_limit", uiClientRate );
+    // Start with value set by the server
+    m_uiFrameRateLimit = m_uiServerFrameRateLimit;
 
+    // Apply client config setting
+    uint uiClientConfigRate;
+    g_pCore->GetCVars ()->Get ( "fps_limit", uiClientConfigRate );
     // Lowest wins (Although zero is highest)
-    if ( ( m_uiServerFrameRateLimit > 0 && uiClientRate > m_uiServerFrameRateLimit ) || uiClientRate == 0 )
-        m_uiFrameRateLimit = m_uiServerFrameRateLimit;
-    else
-        m_uiFrameRateLimit = uiClientRate;
+    if ( ( m_uiFrameRateLimit == 0 || uiClientConfigRate < m_uiFrameRateLimit ) && uiClientConfigRate > 0 )
+        m_uiFrameRateLimit = uiClientConfigRate;
+
+    // Apply client script setting
+    uint uiClientScriptRate = m_uiClientScriptFrameRateLimit;
+    // Lowest wins (Although zero is highest)
+    if ( ( m_uiFrameRateLimit == 0 || uiClientScriptRate < m_uiFrameRateLimit ) && uiClientScriptRate > 0 )
+        m_uiFrameRateLimit = uiClientScriptRate;
 
     // Print new limits to the console
-    SString strStatus (  "Server FPS limit: %d", m_uiServerFrameRateLimit );
-    if ( m_uiFrameRateLimit != m_uiServerFrameRateLimit )
-        strStatus += SString (  " (Using %d)", m_uiFrameRateLimit );
-    CCore::GetSingleton ().GetConsole ()->Print( strStatus );
+    if ( bLogToConsole )
+    {
+        SString strStatus (  "Server FPS limit: %d", m_uiServerFrameRateLimit );
+        if ( m_uiFrameRateLimit != m_uiServerFrameRateLimit )
+            strStatus += SString (  " (Using %d)", m_uiFrameRateLimit );
+        CCore::GetSingleton ().GetConsole ()->Print( strStatus );
+    }
+}
+
+
+//
+// Change client rate as set by script
+//
+void CCore::SetClientScriptFrameRateLimit ( uint uiClientScriptFrameRateLimit )
+{
+    m_uiClientScriptFrameRateLimit = uiClientScriptFrameRateLimit;
+    RecalculateFrameRateLimit( -1, false );
 }
 
 
@@ -1762,6 +1915,8 @@ void CCore::ApplyFrameRateLimit ( uint uiOverrideRate )
     m_bDoneFrameRateLimit = true;
 
     uint uiUseRate = uiOverrideRate != -1 ? uiOverrideRate : m_uiFrameRateLimit;
+
+    TIMING_GRAPH("Limiter");
 
     if ( uiUseRate < 1 )
         return DoReliablePulse ();
@@ -1805,6 +1960,9 @@ void CCore::ApplyFrameRateLimit ( uint uiOverrideRate )
     m_dLastTimeMs = dTimeMs;
 
     DoReliablePulse ();
+
+    TIMING_GRAPH("FrameEnd");
+    TIMING_GRAPH("");
 }
 
 
@@ -1812,7 +1970,6 @@ void CCore::ApplyFrameRateLimit ( uint uiOverrideRate )
 // DoReliablePulse
 //
 // This is called once a frame even if minimized
-// (Except when minimized and never connected)
 //
 void CCore::DoReliablePulse ( void )
 {
@@ -1867,31 +2024,11 @@ void CCore::OnPreFxRender ( void )
     if ( !CGraphics::GetSingleton ().HasMaterialLine3DQueueItems () )
         return;
 
-    IDirect3DDevice9* pDevice = CGraphics::GetSingleton ().GetDevice ();
-
-    // Create a state block.
-    IDirect3DStateBlock9 * pDeviceState = NULL;
-    pDevice->CreateStateBlock ( D3DSBT_ALL, &pDeviceState );
-    D3DXMATRIX matProjection;
-    pDevice->GetTransform ( D3DTS_PROJECTION, &matProjection );
-
-    // Make sure linear sampling is enabled
-    pDevice->SetSamplerState ( 0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR );
-    pDevice->SetSamplerState ( 0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR );
-    pDevice->SetSamplerState ( 0, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR );
-
-    // Make sure stencil is off to avoid problems with flame effects
-    pDevice->SetRenderState ( D3DRS_STENCILENABLE, FALSE );
+    CGraphics::GetSingleton ().EnteringMTARenderZone();
 
     CGraphics::GetSingleton ().DrawMaterialLine3DQueue ();
 
-    // Restore the render states
-    pDevice->SetTransform ( D3DTS_PROJECTION, &matProjection );
-    if ( pDeviceState )
-    {
-        pDeviceState->Apply ( );
-        pDeviceState->Release ( );
-    }
+    CGraphics::GetSingleton ().LeavingMTARenderZone();
 }
 
 
@@ -1905,19 +2042,7 @@ void CCore::OnPreHUDRender ( void )
     // Handle saving depth buffer
     CGraphics::GetSingleton ().GetRenderItemManager ()->SaveReadableDepthBuffer();
 
-    // Create a state block.
-    IDirect3DStateBlock9 * pDeviceState = NULL;
-    pDevice->CreateStateBlock ( D3DSBT_ALL, &pDeviceState );
-    D3DXMATRIX matProjection;
-    pDevice->GetTransform ( D3DTS_PROJECTION, &matProjection );
-
-    // Make sure linear sampling is enabled
-    pDevice->SetSamplerState ( 0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR );
-    pDevice->SetSamplerState ( 0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR );
-    pDevice->SetSamplerState ( 0, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR );
-
-    // Make sure stencil is off to avoid problems with flame effects
-    pDevice->SetRenderState ( D3DRS_STENCILENABLE, FALSE );
+    CGraphics::GetSingleton ().EnteringMTARenderZone();
 
     // Maybe capture screen and other stuff
     CGraphics::GetSingleton ().GetRenderItemManager ()->DoPulse ();
@@ -1937,13 +2062,7 @@ void CCore::OnPreHUDRender ( void )
     // Draw pre-GUI primitives
     CGraphics::GetSingleton ().DrawPreGUIQueue ();
 
-    // Restore the render states
-    pDevice->SetTransform ( D3DTS_PROJECTION, &matProjection );
-    if ( pDeviceState )
-    {
-        pDeviceState->Apply ( );
-        pDeviceState->Release ( );
-    }
+    CGraphics::GetSingleton ().LeavingMTARenderZone();
 }
 
 
@@ -2031,8 +2150,11 @@ void CCore::OnCrashAverted ( uint uiId )
 //
 // LogEvent
 // 
-void CCore::LogEvent ( uint uiDebugId, const char* szType, const char* szContext, const char* szBody )
+void CCore::LogEvent ( uint uiDebugId, const char* szType, const char* szContext, const char* szBody, uint uiAddReportLogId )
 {
+    if ( uiAddReportLogId )
+        AddReportLog ( uiAddReportLogId, SString ( "%s - %s", szContext, szBody ) );
+
     if ( GetDebugIdEnabled ( uiDebugId ) )
     {
         CCrashDumpWriter::LogEvent ( szType, szContext, szBody );
@@ -2047,7 +2169,7 @@ void CCore::LogEvent ( uint uiDebugId, const char* szType, const char* szContext
 bool CCore::GetDebugIdEnabled ( uint uiDebugId )
 {
     static CFilterMap debugIdFilterMap ( GetVersionUpdater ()->GetDebugFilterString () );
-    return !debugIdFilterMap.IsFiltered ( uiDebugId );
+    return ( uiDebugId == 0 ) || !debugIdFilterMap.IsFiltered ( uiDebugId );
 }
 
 EDiagnosticDebugType CCore::GetDiagnosticDebug ( void )
@@ -2072,4 +2194,175 @@ CModelCacheManager* CCore::GetModelCacheManager ( void )
 void CCore::AddModelToPersistentCache ( ushort usModelId )
 {
     return GetModelCacheManager ()->AddModelToPersistentCache ( usModelId );
+}
+
+
+void CCore::StaticIdleHandler ( void )
+{
+    g_pCore->IdleHandler ();
+}
+
+
+// Gets called every game loop, after GTA has been loaded for the first time
+void CCore::IdleHandler ( void )
+{
+    m_bGettingIdleCallsFromMultiplayer = true;
+    HandleIdlePulse();
+}
+
+
+// Gets called every 50ms, before GTA has been loaded for the first time
+void CCore::WindowsTimerHandler ( void )
+{
+    if ( !m_bGettingIdleCallsFromMultiplayer )
+        HandleIdlePulse();
+}
+
+
+// Always called, even if minimized
+void CCore::HandleIdlePulse ( void )
+{
+    UpdateIsWindowMinimized();
+
+    if ( IsWindowMinimized() )
+    {
+        DoPreFramePulse();
+        DoPostFramePulse();
+    }
+    if ( m_pModManager->GetCurrentMod() )
+        m_pModManager->GetCurrentMod()->IdleHandler();
+}
+
+
+//
+// Handle encryption of Windows crash dump files
+//
+void CCore::HandleCrashDumpEncryption( void )
+{
+    const int iMaxFiles = 10;
+    SString strDumpDirPath = CalcMTASAPath( "mta\\dumps" );
+    SString strDumpDirPrivatePath = PathJoin( strDumpDirPath, "private" );
+    SString strDumpDirPublicPath = PathJoin( strDumpDirPath, "public" );
+    MakeSureDirExists( strDumpDirPrivatePath + "/" );
+    MakeSureDirExists( strDumpDirPublicPath + "/" );
+
+    SString strMessage = "Dump files in this directory are encrypted and copied to 'dumps\\public' during startup\n\n";
+    FileSave( PathJoin( strDumpDirPrivatePath, "README.txt" ), strMessage );
+
+    // Move old dumps to the private folder
+    {
+        std::vector < SString > legacyList = FindFiles( PathJoin( strDumpDirPath, "*.dmp" ), true, false );
+        for ( uint i = 0 ; i < legacyList.size() ; i++ )
+        {
+            const SString& strFilename = legacyList[i];
+            SString strSrcPathFilename = PathJoin( strDumpDirPath, strFilename );
+            SString strDestPathFilename = PathJoin( strDumpDirPrivatePath, strFilename );
+            FileRename( strSrcPathFilename, strDestPathFilename );
+        }
+    }
+
+    // Limit number of files in the private folder
+    {
+        std::vector < SString > privateList = FindFiles( PathJoin( strDumpDirPrivatePath, "*.dmp" ), true, false, true );
+        for ( int i = 0 ; i < (int)privateList.size() - iMaxFiles ; i++ )
+            FileDelete( PathJoin( strDumpDirPrivatePath, privateList[i] ) );
+    }
+
+    // Copy and encrypt private files to public if they don't already exist
+    {
+        std::vector < SString > privateList = FindFiles( PathJoin( strDumpDirPrivatePath, "*.dmp" ), true, false );
+        for ( uint i = 0 ; i < privateList.size() ; i++ )
+        {
+            const SString& strPrivateFilename = privateList[i];
+            SString strPublicFilename = ExtractBeforeExtension( strPrivateFilename ) + ".rsa." + ExtractExtension( strPrivateFilename );
+            SString strPrivatePathFilename = PathJoin( strDumpDirPrivatePath, strPrivateFilename );
+            SString strPublicPathFilename = PathJoin( strDumpDirPublicPath, strPublicFilename );
+            if ( !FileExists( strPublicPathFilename ) )
+            {
+               GetNetwork()->EncryptDumpfile( strPrivatePathFilename, strPublicPathFilename );
+            }
+        }
+    }
+
+    // Limit number of files in the public folder
+    {
+        std::vector < SString > publicList = FindFiles( PathJoin( strDumpDirPublicPath, "*.dmp" ), true, false, true );
+        for ( int i = 0 ; i < (int)publicList.size() - iMaxFiles ; i++ )
+            FileDelete( PathJoin( strDumpDirPublicPath, publicList[i] ) );
+    }
+
+    // And while we are here, limit number of items in core.log as well
+    {
+        SString strCoreLogPathFilename = CalcMTASAPath( "mta\\core.log" );
+        SString strFileContents;
+        FileLoad( strCoreLogPathFilename, strFileContents );
+
+        SString strDelmiter = "** -- Unhandled exception -- **";
+        std::vector < SString > parts;
+        strFileContents.Split( strDelmiter, parts );
+
+        if ( parts.size() > iMaxFiles )
+        {
+            strFileContents = strDelmiter + strFileContents.Join( strDelmiter, parts, parts.size() - iMaxFiles );
+            FileSave( strCoreLogPathFilename, strFileContents );
+        }
+    }
+}
+
+//
+// Flag to make sure stuff only gets done when everything is ready
+//
+void CCore::SetModulesLoaded( bool bLoaded )
+{
+    m_bModulesLoaded = bLoaded;
+}
+
+bool CCore::AreModulesLoaded( void )
+{
+    return m_bModulesLoaded;
+}
+
+//
+// Handle dummy progress when game seems stalled
+//
+int ms_iDummyProgressTimerCounter = 0;
+
+void CALLBACK TimerProc( void* lpParametar, BOOLEAN TimerOrWaitFired )
+{
+    ms_iDummyProgressTimerCounter++;
+}
+
+//
+// Refresh progress output
+//
+void CCore::UpdateDummyProgress( int iPercent )
+{
+    if ( iPercent != -1 )
+        m_iDummyProgressPercent = iPercent;
+
+    if ( m_DummyProgressTimerHandle == NULL )
+    {
+        // Using this timer is quicker than checking tick count with every call to UpdateDummyProgress()
+        ::CreateTimerQueueTimer( &m_DummyProgressTimerHandle, NULL, TimerProc, this, DUMMY_PROGRESS_ANIMATION_INTERVAL, DUMMY_PROGRESS_ANIMATION_INTERVAL, WT_EXECUTEINTIMERTHREAD );
+    }
+
+    if ( !ms_iDummyProgressTimerCounter )
+        return;
+    ms_iDummyProgressTimerCounter = 0;
+
+    // Compose message with amount
+    SString strMessage;
+    if ( m_iDummyProgressPercent )
+        strMessage = SString( "%d%%", m_iDummyProgressPercent );
+
+    CGraphics::GetSingleton().SetProgressMessage( strMessage );
+}
+
+//
+// Do SetCursorPos if allowed
+//
+void CCore::CallSetCursorPos( int X, int Y )
+{
+    if ( CCore::GetSingleton ().IsFocused () && !CLocalGUI::GetSingleton ().IsMainMenuVisible () )
+        m_pSetCursorPosHook->CallSetCursorPos(X,Y);
 }

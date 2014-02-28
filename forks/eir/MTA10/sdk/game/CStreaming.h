@@ -30,7 +30,7 @@ class CStreaming
 public:
     virtual void            RequestModel                ( modelId_t id, unsigned int flags ) = 0;
     virtual void            FreeModel                   ( modelId_t id ) = 0;
-    virtual void            LoadAllRequestedModels      ( bool onlyPriority = false ) = 0;
+    virtual void            LoadAllRequestedModels      ( bool onlyPriority = false, const char *debugLoc = NULL ) = 0;
     virtual bool            HasModelLoaded              ( modelId_t id ) = 0;
     virtual bool            IsModelLoading              ( modelId_t id ) = 0;
     virtual void            WaitForModel                ( modelId_t id ) = 0;

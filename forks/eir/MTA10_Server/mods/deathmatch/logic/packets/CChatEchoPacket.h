@@ -40,12 +40,6 @@ public:
 
     bool                    Write                       ( NetBitStreamInterface& BitStream ) const;
 
-    inline SString          GetMessage                  ( void )                    { return m_strMessage; };
-    void                    SetMessage                  ( SString  strMessage )     { m_strMessage = strMessage; };
-    inline void             SetColor                    ( unsigned char ucRed,
-                                                          unsigned char ucGreen,
-                                                          unsigned char ucBlue )    { m_ucRed = ucRed; m_ucGreen = ucGreen; m_ucRed = ucRed; };
-    inline void             SetColorCoded               ( bool bColorCoded )        { m_bColorCoded = bColorCoded; }
 private:
     unsigned char           m_ucRed;
     unsigned char           m_ucGreen;

@@ -15,11 +15,14 @@
 
 #include "StdInc.h"
 
-using namespace google;
+CFastHashMap < lua_CFunction, CLuaCFunction* > CLuaCFunctions::ms_Functions;
+CFastHashMap < SString, CLuaCFunction* > CLuaCFunctions::ms_FunctionsByName;
+void* CLuaCFunctions::ms_pFunctionPtrLow = (void*)0xffffffff;
+void* CLuaCFunctions::ms_pFunctionPtrHigh = 0;
 
-dense_hash_map < lua_CFunction, CLuaCFunction* > CLuaCFunctions::ms_Functions;
-dense_hash_map < std::string, CLuaCFunction* > CLuaCFunctions::ms_FunctionsByName;
-bool CLuaCFunctions::ms_bMapsInitialized = false;
+// CFastHashMap helpers
+static lua_CFunction GetEmptyMapKey ( lua_CFunction* )   { return (lua_CFunction)0x00000000; }
+static lua_CFunction GetDeletedMapKey ( lua_CFunction* ) { return (lua_CFunction)0xFFFFFFFF; }
 
 CLuaCFunction::CLuaCFunction ( const char* szName, lua_CFunction f, bool bRestricted )
 {
@@ -37,20 +40,12 @@ CLuaCFunctions::~CLuaCFunctions ()
     RemoveAllFunctions ();
 }
 
-void CLuaCFunctions::InitializeHashMaps ( )
-{
-    if ( !ms_bMapsInitialized )
-    {
-        ms_bMapsInitialized = true;
-        ms_Functions.set_empty_key ( (lua_CFunction)0x00000000 );
-        ms_Functions.set_deleted_key ( (lua_CFunction)0xFFFFFFFF );
-        ms_FunctionsByName.set_empty_key ( std::string ( "" ) );
-        ms_FunctionsByName.set_deleted_key ( std::string ( "\xFF" ) );
-    }
-}
 
 CLuaCFunction* CLuaCFunctions::AddFunction ( const char* szName, lua_CFunction f, bool bRestricted )
 {
+    ms_pFunctionPtrLow = Min < void* > ( ms_pFunctionPtrLow, (void*)f );
+    ms_pFunctionPtrHigh = Max < void* > ( ms_pFunctionPtrHigh, (void*)f );
+
     // Already have a function by this name?
     CLuaCFunction* pFunction = GetFunction ( szName );
     if ( pFunction )
@@ -70,7 +65,11 @@ CLuaCFunction* CLuaCFunctions::AddFunction ( const char* szName, lua_CFunction f
 
 CLuaCFunction* CLuaCFunctions::GetFunction ( lua_CFunction f )
 {
-    dense_hash_map < lua_CFunction, CLuaCFunction* >::iterator it;
+    // Quick cull of unknown pointer range
+    if ( f < ms_pFunctionPtrLow || f > ms_pFunctionPtrHigh )
+        return NULL;
+
+    CFastHashMap < lua_CFunction, CLuaCFunction* >::iterator it;
     it = ms_Functions.find ( f );
     if ( it == ms_Functions.end () )
         return NULL;
@@ -81,7 +80,7 @@ CLuaCFunction* CLuaCFunctions::GetFunction ( lua_CFunction f )
 
 CLuaCFunction* CLuaCFunctions::GetFunction ( const char* szName )
 {
-    dense_hash_map < std::string, CLuaCFunction* >::iterator it;
+    CFastHashMap < SString, CLuaCFunction* >::iterator it;
     it = ms_FunctionsByName.find ( szName );
     if ( it == ms_FunctionsByName.end () )
         return NULL;
@@ -90,11 +89,22 @@ CLuaCFunction* CLuaCFunctions::GetFunction ( const char* szName )
 }
 
 
+//
+// Returns true if definitely not a registered function.
+// Note: Returning false does not mean it is a registered function
+//
+bool CLuaCFunctions::IsNotFunction ( lua_CFunction f )
+{
+    // Return true if unknown pointer range
+    return ( f < ms_pFunctionPtrLow || f > ms_pFunctionPtrHigh );
+}
+
+
 void CLuaCFunctions::RegisterFunctionsWithVM ( lua_State* luaVM )
 {
     // Register all our functions to a lua VM
-    dense_hash_map < std::string, CLuaCFunction* >::iterator it;
-    for ( it = ms_FunctionsByName.begin (); it != ms_FunctionsByName.end (); it++ )
+    CFastHashMap < SString, CLuaCFunction* >::iterator it;
+    for ( it = ms_FunctionsByName.begin (); it != ms_FunctionsByName.end (); ++it )
     {
         lua_pushstring ( luaVM, it->first.c_str () );
         lua_pushcclosure ( luaVM, it->second->GetAddress (), 1 );
@@ -106,8 +116,8 @@ void CLuaCFunctions::RegisterFunctionsWithVM ( lua_State* luaVM )
 void CLuaCFunctions::RemoveAllFunctions ( void )
 {
     // Delete all functions
-    dense_hash_map < lua_CFunction, CLuaCFunction* >::iterator it;
-    for ( it = ms_Functions.begin (); it != ms_Functions.end (); it++ )
+    CFastHashMap < lua_CFunction, CLuaCFunction* >::iterator it;
+    for ( it = ms_Functions.begin (); it != ms_Functions.end (); ++it )
     {
         delete it->second;
     }

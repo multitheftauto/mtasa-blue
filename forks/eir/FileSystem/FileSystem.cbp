@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="FileSystem" />
+		<Option platforms="Unix;" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug Linux">
+				<Option output="lib/fs_d" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="" />
+				<Option object_output="obj/Debug/" />
+				<Option type="2" />
+				<Option compiler="gcc" />
+				<Option createDefFile="1" />
+				<Compiler>
+					<Add option="-Wshadow" />
+					<Add option="-Winit-self" />
+					<Add option="-Wredundant-decls" />
+					<Add option="-Wundef" />
+					<Add option="-g" />
+				</Compiler>
+				<Linker>
+					<Add library="../vendor/zlib/lib/zlibd.a" />
+				</Linker>
+			</Target>
+			<Target title="Release Linux">
+				<Option output="lib/fs" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="" />
+				<Option object_output="obj/Release/" />
+				<Option type="2" />
+				<Option compiler="gcc" />
+				<Option createDefFile="1" />
+				<Compiler>
+					<Add option="-fomit-frame-pointer" />
+					<Add option="-fexpensive-optimizations" />
+					<Add option="-O3" />
+					<Add option="-Wshadow" />
+					<Add option="-Winit-self" />
+					<Add option="-Wredundant-decls" />
+					<Add option="-Wmissing-include-dirs" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add library="../vendor/zlib/lib/zlib.a" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+			<Add option="-Wno-narrowing" />
+			<Add option="-Wno-sign-compare" />
+			<Add option="-Wno-unknown-pragmas" />
+			<Add option="-Wno-unused-result" />
+			<Add option="--param large-stack-frame-growth=40000" />
+			<Add option="-D__linux__" />
+			<Add directory="../vendor/zlib" />
+			<Add directory="." />
+			<Add directory="../Shared/sdk" />
+			<Add directory="../Shared/sdk/coresdk" />
+		</Compiler>
+		<Linker>
+			<Add directory="../vendor/zlib/lib" />
+		</Linker>
+		<Unit filename="../Shared/sdk/coresdk/CFileSystem.Utils.hxx" />
+		<Unit filename="../Shared/sdk/coresdk/CFileSystem.cpp" />
+		<Unit filename="../Shared/sdk/coresdk/CFileSystem.h" />
+		<Unit filename="../Shared/sdk/coresdk/CFileSystem.zip.cpp" />
+		<Unit filename="../Shared/sdk/coresdk/CFileSystem.zip.h" />
+		<Unit filename="../Shared/sdk/coresdk/CFileSystemInterface.h" />
+		<Unit filename="StdInc.h" />
+		<Unit filename="main.cpp" />
+		<Extensions>
+			<code_completion />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

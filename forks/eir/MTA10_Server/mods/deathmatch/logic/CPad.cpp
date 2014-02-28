@@ -63,6 +63,14 @@ static const SGTAControl g_gtaControls[] =
     { "", (eControllerAction)0, (eControlType)0 }
 };
 
+static const SString g_mtaControls[] =
+{
+    "chatbox", "voiceptt", "enter_passenger", "radar", "radar_zoom_in",
+    "radar_zoom_out", "radar_move_north", "radar_move_south", "radar_move_east", "radar_move_west",
+    "radar_attach", "radar_opacity_down", "radar_opacity_up", "radar_help", "msg_target", "vehicle_next_weapon",
+    "vehicle_previous_weapon", "sinfo", "textscale" // Anything missing here?
+};
+
 
 CPad::CPad ( CPlayer* pPlayer )
 {
@@ -73,6 +81,11 @@ CPad::CPad ( CPlayer* pPlayer )
         m_ControlStates [ i ].bState = false;
         m_ControlStates [ i ].bEnabled = true;
     }
+    for ( int i = 0; i < NUM_MTA_CONTROL_STATES; i++ )
+    {
+        m_MTAEnabledControls[i] = true;
+    }
+
     m_bUpdatedKeys = false;
 }
 
@@ -206,6 +219,15 @@ bool CPad::IsControlEnabled ( const char* szControl, bool& bEnabled )
         }
     }
 
+    for ( int i = 0; i < NUM_MTA_CONTROL_STATES; i++ )
+    {
+        if ( g_mtaControls[i] == szControl )
+        {
+            bEnabled = m_MTAEnabledControls[i];
+            return true;
+        }
+    }
+
     return false;
 }
 
@@ -222,15 +244,34 @@ bool CPad::SetControlEnabled ( const char* szControl, bool bEnabled )
         }
     }
 
+    // Check if it is a MTA control
+    for ( int i = 0; i < NUM_MTA_CONTROL_STATES; i++ )
+    {
+        if ( g_mtaControls[i] == szControl )
+        {
+            m_MTAEnabledControls[i] = bEnabled;
+            return true;
+        }
+    }
+
     return false;
 }
 
 
-void CPad::SetAllControlsEnabled ( bool bEnabled )
+void CPad::SetAllGTAControlsEnabled ( bool bEnabled )
 {
     for ( int i = 0 ; *g_gtaControls [ i ].szControl != '\0' ; i++ )
     {
         m_ControlStates [ i ].bEnabled = bEnabled;
+    }
+}
+
+
+void CPad::SetAllMTAControlsEnabled ( bool bEnabled )
+{
+    for ( int i = 0; i < NUM_MTA_CONTROL_STATES; i++ )
+    {
+        m_MTAEnabledControls[i] = bEnabled;
     }
 }
 

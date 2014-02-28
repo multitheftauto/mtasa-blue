@@ -30,7 +30,6 @@ public:
     static bool         RefreshAllResources ( class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient );
     static bool         ListResources       ( class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient );
     static bool         ResourceInfo        ( class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient );
-    static bool         InstallResource     ( class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient );
     static bool         UpgradeResources    ( class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient );
     static bool         CheckResources      ( class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient );
 
@@ -74,6 +73,7 @@ public:
     static bool         ReloadBans      ( class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient );
 
     static bool         AclRequest      ( class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient );
+    static bool         DebugJoinFlood  ( class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient );
     static bool         FakeLag         ( class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient );
 };
 

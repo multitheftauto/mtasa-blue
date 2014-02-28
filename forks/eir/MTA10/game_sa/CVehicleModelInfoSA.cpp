@@ -67,9 +67,9 @@ void CVehicleModelInfoSAInterface::Init( void )
 {
     CClumpModelInfoSAInterface::Init();
 
-    m_vehicleType = (eVehicleType)0xFFFFFFFF;
-    m_wheelModel = 0xFFFF;
-    m_steerAngle = 1000.0f;
+    this->vehicleType = (eVehicleType)0xFFFFFFFF;
+    this->wheelModel = 0xFFFF;
+    this->steerAngle = 1000.0f;
 }
 
 /*=========================================================
@@ -83,10 +83,10 @@ void CVehicleModelInfoSAInterface::Init( void )
 =========================================================*/
 void CVehicleModelInfoSAInterface::DeleteRwObject( void )
 {
-    if ( m_componentInfo )
+    if ( componentInfo )
     {
-        delete m_componentInfo;
-        m_componentInfo = NULL;
+        delete componentInfo;
+        componentInfo = NULL;
     }
 
     CClumpModelInfoSAInterface::DeleteRwObject();
@@ -134,7 +134,7 @@ void CVehicleModelInfoSAInterface::SetAnimFile( const char *name )
     strcpy(anim, name);
 
     // this is one nasty hack
-    m_animFileIndex = (int)anim;
+    animFileIndex = (int)anim;
 }
 
 /*=========================================================
@@ -151,15 +151,15 @@ void CVehicleModelInfoSAInterface::ConvertAnimFileIndex( void )
 {
     int animBlock;
 
-    if ( m_animFileIndex == -1 )
+    if ( animFileIndex == -1 )
         return;
 
-    animBlock = pGame->GetAnimManager()->GetAnimBlockIndex( (const char*)m_animBlock );
+    animBlock = pGame->GetAnimManager()->GetAnimBlockIndex( (const char*)this->m_animBlock );
 
-    free( (void*)m_animFileIndex );
+    free( (void*)animFileIndex );
 
     // Yeah, weird
-    m_animFileIndex = animBlock;
+    animFileIndex = animBlock;
 }
 
 /*=========================================================
@@ -173,7 +173,7 @@ void CVehicleModelInfoSAInterface::ConvertAnimFileIndex( void )
 =========================================================*/
 int CVehicleModelInfoSAInterface::GetAnimFileIndex( void )
 {
-    return m_animFileIndex;
+    return animFileIndex;
 }
 
 /*=========================================================
@@ -193,14 +193,14 @@ int CVehicleModelInfoSAInterface::GetAnimFileIndex( void )
 =========================================================*/
 void CVehicleModelInfoSAInterface::SetClump( RpClump *clump )
 {
-    m_componentInfo = new CVehicleComponentInfoSAInterface;
+    componentInfo = new CVehicleComponentInfoSAInterface;
 
     CClumpModelInfoSAInterface::SetClump( clump );
 
     RegisterRenderCallbacks();
 
     // Correctly assign vehicle atomics
-    AssignAtomics( ((CComponentHierarchySAInterface**)0x008A7740)[m_vehicleType] );
+    AssignAtomics( ((CComponentHierarchySAInterface**)0x008A7740)[ GetVehicleType() ] );
 
     RegisterRoot();
 
@@ -367,14 +367,14 @@ static __forceinline RpAtomic* RpAtomicCloneInherit( RpAtomic *orig, RpClump *ba
 
 void CVehicleModelInfoSAInterface::Setup( void )
 {
-    tHandlingDataSA *handling = &CHandlingManagerSA::m_OriginalHandlingData[ m_handlingID ];
-    CComponentHierarchySAInterface *info = ((CComponentHierarchySAInterface**)0x008A7740)[ m_vehicleType ];
+    tHandlingDataSA *handling = &CHandlingManagerSA::m_OriginalHandlingData[ handlingID ];
+    CComponentHierarchySAInterface *info = ((CComponentHierarchySAInterface**)0x008A7740)[ GetVehicleType() ];
     RpAtomic *obj1 = NULL;
     RpAtomic *obj2 = NULL;
 
-    m_numberOfDoors = 0;
+    numberOfDoors = 0;
 
-    for (info; info->m_name; info++)
+    for ( info; info->m_name; info++ )
     {
         RwFrame *hier;
 
@@ -383,14 +383,14 @@ void CVehicleModelInfoSAInterface::Setup( void )
             if ( info->m_flags & ATOMIC_HIER_FRONTSEAT )
             {
                 // Position the component
-                RwFrameGetAbsoluteTransformationBaseOffset( m_componentInfo->m_seatOffset[ info->m_frameHierarchy ], hier );
+                RwFrameGetAbsoluteTransformationBaseOffset( componentInfo->m_seatOffset[ info->m_frameHierarchy ], hier );
 
                 // We do not require this hierarchy anymore
                 RwFrameDestroy( hier );
             }
             else if ( info->m_flags & ATOMIC_HIER_UNKNOWN3 )
             {
-                 CVehicleComponentPlacementSA& seat = m_componentInfo->m_info[ info->m_frameHierarchy ];
+                 CVehicleComponentPlacementSA& seat = componentInfo->m_info[ info->m_frameHierarchy ];
 
                  seat.m_offset = hier->GetPosition();
 
@@ -411,7 +411,7 @@ void CVehicleModelInfoSAInterface::Setup( void )
                 SetComponentFlags( hier, info->m_flags );
 
                 // Append the atomic onto the component registry
-                m_componentInfo->AddAtomic( atomic );
+                componentInfo->AddAtomic( atomic );
             }
         }
 
@@ -434,7 +434,7 @@ void CVehicleModelInfoSAInterface::Setup( void )
         }
     }
 
-    info = ((CComponentHierarchySAInterface**)0x008A7740)[ m_vehicleType ];
+    info = ((CComponentHierarchySAInterface**)0x008A7740)[ GetVehicleType() ];
 
     for (info; info->m_name; info++)
     {
@@ -447,7 +447,7 @@ void CVehicleModelInfoSAInterface::Setup( void )
             continue;
 
         if ( info->m_flags & ATOMIC_HIER_DOOR )
-            m_numberOfDoors++;
+            numberOfDoors++;
 
         if ( info->m_flags & 0x02 )
         {
@@ -465,7 +465,7 @@ void CVehicleModelInfoSAInterface::Setup( void )
             {
                 secondary->SetRenderCallback( primary->renderCallback );
 
-                m_componentInfo->m_usageFlags |= 1 << info->m_frameHierarchy;
+                componentInfo->m_usageFlags |= 1 << info->m_frameHierarchy;
             }
         }
 
@@ -530,7 +530,7 @@ void CVehicleModelInfoSAInterface::Setup( void )
 =========================================================*/
 void CVehicleModelInfoSAInterface::SetComponentFlags( RwFrame *frame, unsigned int flags )
 {
-    tHandlingDataSA *handling = &CHandlingManagerSA::m_OriginalHandlingData[ m_handlingID ];
+    tHandlingDataSA *handling = &CHandlingManagerSA::m_OriginalHandlingData[ handlingID ];
     unsigned short compFlags = 0;
 
     if ( flags & 0x1000 )
@@ -634,135 +634,11 @@ void CVehicleModelInfoSAInterface::SetupMateria( void )
 
         GetRwObject()->FetchMateria( mats );
 
-        for ( char n = 0; n < m_componentInfo->m_atomicCount; n++ )
-            m_componentInfo->m_atomics[n]->FetchMateria( mats );
+        for ( char n = 0; n < componentInfo->m_atomicCount; n++ )
+            componentInfo->m_atomics[n]->FetchMateria( mats );
     }
 
     GetRwObject()->RemoveAtomicComponentFlags( 0x2000 );
-}
-
-/*=========================================================
-    GetRandomNameplateText
-
-    Arguments:
-        buffer - output memory allocation for nameplate text
-                 generation
-        max - size of the buffer, preferably (i * 3 + 4)
-    Purpose:
-        Generates a nameplate text message for the nameplate
-        material routine.
-    Binary offsets:
-        (1.0 US and 1.0 EU): 0x006FD5B0
-=========================================================*/
-#define RAND        (double)(rand() & 0xFFFF) / 0x7FFF
-#define RANDCHAR    (char)( RAND * 0.23 )
-#define RANDNUM     (char)( RAND * -9 )
-
-static bool GetRandomNameplateText( char *buffer, size_t max )
-{
-    if ( max < 4 )
-        return false;
-
-    buffer[0] = 'A' - RANDCHAR;
-    buffer[1] = 'A' - RANDCHAR;
-    buffer[2] = '0' - RANDNUM;
-    buffer[3] = '0' - RANDNUM;
-
-    for ( unsigned int n = 4; n < max; )
-    {
-        buffer[n++] = '0' - RANDNUM;
-        buffer[n++] = 'A' - RANDCHAR;
-        buffer[n++] = 'A' - RANDCHAR;
-    }
-
-    return true;
-}
-
-/*=========================================================
-    RwMaterialSetLicensePlate
-
-    Arguments:
-        mat - vehicle atomic geometry material
-        plate - contains name and style information
-    Purpose:
-        Scans through all materials of the vehicle model
-        and updates the ones named "carplate" and "carpback".
-    Binary offsets:
-        (1.0 US and 1.0 EU): 0x006FE060
-=========================================================*/
-struct _licensePlate
-{
-    char text[8];
-    unsigned char style;
-    RpMaterial *plate;  // ext
-};
-
-typedef RpMaterial*     (*HandleVehicleFrontNameplate_t)    ( RpMaterial *mat, _licensePlate *info, unsigned char design );
-typedef RpMaterial*     (*HandleVehicleBackNameplate_t)     ( RpMaterial *mat, unsigned char design );
-
-HandleVehicleFrontNameplate_t   HandleVehicleFrontNameplate         = ( HandleVehicleFrontNameplate_t )         0x006FE020;
-HandleVehicleBackNameplate_t    HandleVehicleBackNameplate          = ( HandleVehicleBackNameplate_t )          0x006FDE50;
-
-static bool RwMaterialSetLicensePlate( RpMaterial *mat, _licensePlate *plate )
-{
-    if ( !mat->texture )
-        return true;
-
-    if ( strcmp( mat->texture->name, "carplate" ) == 0 )
-    {
-        plate->plate = mat;
-
-        HandleVehicleFrontNameplate( mat, plate, *(unsigned char*)0x00C3EF80 );
-        return true;
-    }
-
-    if ( strcmp( mat->texture->name, "carpback" ) == 0 )
-        HandleVehicleBackNameplate( mat, *(unsigned char*)0x00C3EF80 );
-
-    return true;
-}
-
-/*=========================================================
-    RwAtomicSetLicensePlate
-
-    Arguments:
-        child - atomic of the vehicle model
-        plate - license plate generation details
-    Purpose:
-        Generates the license plate for specific materials of
-        the atomic's geometry.
-    Binary offsets:
-        (1.0 US and 1.0 EU): 0x006FE0D0
-=========================================================*/
-static bool RwAtomicSetLicensePlate( RpAtomic *child, _licensePlate *plate )
-{
-    child->geometry->ForAllMateria( RwMaterialSetLicensePlate, plate );
-    return true;
-}
-
-/*=========================================================
-    CVehicleModelInfoSAInterface::InitNameplate
-
-    Purpose:
-        Initializes the custom license plate which is shared
-        for all vehicles of this model.
-    Binary offsets:
-        (1.0 US and 1.0 EU): 0x004C9450
-=========================================================*/
-void CVehicleModelInfoSAInterface::InitNameplate( void )
-{
-    _licensePlate plate;
-
-    // Get some random stuff into nameplate
-    GetRandomNameplateText( plate.text, 8 );
-
-    plate.style = m_plateDesign;
-    plate.plate = NULL;
-
-    GetRwObject()->ForAllAtomics( RwAtomicSetLicensePlate, &plate );
-
-    if ( plate.plate )
-        m_plateMaterial = plate.plate;
 }
 
 /*=========================================================
@@ -782,9 +658,9 @@ void CVehicleModelInfoSAInterface::AssignPaintjob( unsigned short txdId )
 {
     unsigned char n = 0;
 
-    while ( m_paintjobTypes[n] != 0xFFFF && n++ < 4 );
+    while ( paintjobTypes[n] != 0xFFFF && n++ < 4 );
 
-    m_paintjobTypes[n] = txdId;
+    paintjobTypes[n] = txdId;
 }
 
 /*=========================================================
@@ -800,8 +676,47 @@ unsigned short CVehicleModelInfoSAInterface::GetNumberOfValidPaintjobs( void ) c
     unsigned int n;
 
     for ( n = 0; n < 4; n++ )
-        if ( m_paintjobTypes[n] == 0xFFFF )
+        if ( paintjobTypes[n] == 0xFFFF )
             break;
     
     return n;
+}
+
+/*=========================================================
+    CVehicleModelInfoSAInterface::SetPlateText
+
+    Arguments:
+        plateText - the new plate text to assign to this
+                    vehicle model info (can be NULL)
+    Purpose:
+        Attempts to assign a new plate text string to this
+        vehicle model info.
+    Binary offsets:
+        (1.0 US and 1.0 EU): 0x004C8980
+=========================================================*/
+void CVehicleModelInfoSAInterface::SetPlateText( const char *plateText )
+{
+    if ( !plateText )
+    {
+        // If no plate text given, we simply terminate the string.
+        this->plateText[0] = '\0';
+    }
+    else
+    {
+        // Otherwise we copy it into our local buffer.
+        strncpy( this->plateText, plateText, 8 );
+    }
+}
+
+/*=========================================================
+    CVehicleModelInfoSAInterface::GetPlateText
+
+    Purpose:
+        Returns a pointer to the plate text if it is valid.
+    Binary offsets:
+        (1.0 US and 1.0 EU): 0x004C8970
+=========================================================*/
+const char* CVehicleModelInfoSAInterface::GetPlateText( void ) const
+{
+    return ( *plateText != 0 ) ? ( plateText ) : ( NULL );
 }

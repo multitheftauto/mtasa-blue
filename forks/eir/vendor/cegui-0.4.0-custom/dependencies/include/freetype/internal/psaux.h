@@ -5,7 +5,7 @@
 /*    Auxiliary functions and data structures related to PostScript fonts  */
 /*    (specification).                                                     */
 /*                                                                         */
-/*  Copyright 1996-2001, 2002, 2003, 2004 by                               */
+/*  Copyright 1996-2004, 2006, 2008, 2009, 2012 by                         */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -101,6 +101,9 @@ FT_BEGIN_HEADER
   /*    capacity  :: The current size of the heap block.  Increments by    */
   /*                 1kByte chunks.                                        */
   /*                                                                       */
+  /*    init      :: Set to 0xDEADBEEF if `elements' and `lengths' have    */
+  /*                 been allocated.                                       */
+  /*                                                                       */
   /*    max_elems :: The maximum number of elements in table.              */
   /*                                                                       */
   /*    num_elems :: The current number of elements in table.              */
@@ -154,6 +157,7 @@ FT_BEGIN_HEADER
     T1_TOKEN_TYPE_ANY,
     T1_TOKEN_TYPE_STRING,
     T1_TOKEN_TYPE_ARRAY,
+    T1_TOKEN_TYPE_KEY, /* aka `name' */
 
     /* do not remove */
     T1_TOKEN_TYPE_MAX
@@ -182,6 +186,7 @@ FT_BEGIN_HEADER
     T1_FIELD_TYPE_STRING,
     T1_FIELD_TYPE_KEY,
     T1_FIELD_TYPE_BBOX,
+    T1_FIELD_TYPE_MM_BBOX,
     T1_FIELD_TYPE_INTEGER_ARRAY,
     T1_FIELD_TYPE_FIXED_ARRAY,
     T1_FIELD_TYPE_CALLBACK,
@@ -196,9 +201,13 @@ FT_BEGIN_HEADER
   {
     T1_FIELD_LOCATION_CID_INFO,
     T1_FIELD_LOCATION_FONT_DICT,
+    T1_FIELD_LOCATION_FONT_EXTRA,
     T1_FIELD_LOCATION_FONT_INFO,
     T1_FIELD_LOCATION_PRIVATE,
     T1_FIELD_LOCATION_BBOX,
+    T1_FIELD_LOCATION_LOADER,
+    T1_FIELD_LOCATION_FACE,
+    T1_FIELD_LOCATION_BLEND,
 
     /* do not remove */
     T1_FIELD_LOCATION_MAX
@@ -220,90 +229,104 @@ FT_BEGIN_HEADER
     T1_Field_ParseFunc  reader;
     FT_UInt             offset;       /* offset of field in object      */
     FT_Byte             size;         /* size of field in bytes         */
-    FT_UInt             array_max;    /* maximal number of elements for */
+    FT_UInt             array_max;    /* maximum number of elements for */
                                       /* array                          */
     FT_UInt             count_offset; /* offset of element count for    */
-                                      /* arrays                         */
+                                      /* arrays; must not be zero if in */
+                                      /* use -- in other words, a       */
+                                      /* `num_FOO' element must not     */
+                                      /* start the used structure if we */
+                                      /* parse a `FOO' array            */
+    FT_UInt             dict;         /* where we expect it             */
   } T1_FieldRec;
 
+#define T1_FIELD_DICT_FONTDICT ( 1 << 0 ) /* also FontInfo and FDArray */
+#define T1_FIELD_DICT_PRIVATE  ( 1 << 1 )
 
-#define T1_NEW_SIMPLE_FIELD( _ident, _type, _fname ) \
-          {                                          \
-            _ident, T1CODE, _type,                   \
-            0,                                       \
-            FT_FIELD_OFFSET( _fname ),               \
-            FT_FIELD_SIZE( _fname ),                 \
-            0, 0                                     \
+
+
+#define T1_NEW_SIMPLE_FIELD( _ident, _type, _fname, _dict ) \
+          {                                                 \
+            _ident, T1CODE, _type,                          \
+            0,                                              \
+            FT_FIELD_OFFSET( _fname ),                      \
+            FT_FIELD_SIZE( _fname ),                        \
+            0, 0,                                           \
+            _dict                                           \
           },
 
-#define T1_NEW_CALLBACK_FIELD( _ident, _reader )    \
-          {                                         \
-            _ident, T1CODE, T1_FIELD_TYPE_CALLBACK, \
-            (T1_Field_ParseFunc)_reader,            \
-            0, 0,                                   \
-            0, 0                                    \
+#define T1_NEW_CALLBACK_FIELD( _ident, _reader, _dict ) \
+          {                                             \
+            _ident, T1CODE, T1_FIELD_TYPE_CALLBACK,     \
+            (T1_Field_ParseFunc)_reader,                \
+            0, 0,                                       \
+            0, 0,                                       \
+            _dict                                       \
           },
 
-#define T1_NEW_TABLE_FIELD( _ident, _type, _fname, _max ) \
-          {                                               \
-            _ident, T1CODE, _type,                        \
-            0,                                            \
-            FT_FIELD_OFFSET( _fname ),                    \
-            FT_FIELD_SIZE_DELTA( _fname ),                \
-            _max,                                         \
-            FT_FIELD_OFFSET( num_ ## _fname )             \
+#define T1_NEW_TABLE_FIELD( _ident, _type, _fname, _max, _dict ) \
+          {                                                      \
+            _ident, T1CODE, _type,                               \
+            0,                                                   \
+            FT_FIELD_OFFSET( _fname ),                           \
+            FT_FIELD_SIZE_DELTA( _fname ),                       \
+            _max,                                                \
+            FT_FIELD_OFFSET( num_ ## _fname ),                   \
+            _dict                                                \
           },
 
-#define T1_NEW_TABLE_FIELD2( _ident, _type, _fname, _max ) \
-          {                                                \
-            _ident, T1CODE, _type,                         \
-            0,                                             \
-            FT_FIELD_OFFSET( _fname ),                     \
-            FT_FIELD_SIZE_DELTA( _fname ),                 \
-            _max, 0                                        \
+#define T1_NEW_TABLE_FIELD2( _ident, _type, _fname, _max, _dict ) \
+          {                                                       \
+            _ident, T1CODE, _type,                                \
+            0,                                                    \
+            FT_FIELD_OFFSET( _fname ),                            \
+            FT_FIELD_SIZE_DELTA( _fname ),                        \
+            _max, 0,                                              \
+            _dict                                                 \
           },
 
 
-#define T1_FIELD_BOOL( _ident, _fname )                             \
-          T1_NEW_SIMPLE_FIELD( _ident, T1_FIELD_TYPE_BOOL, _fname )
+#define T1_FIELD_BOOL( _ident, _fname, _dict )                             \
+          T1_NEW_SIMPLE_FIELD( _ident, T1_FIELD_TYPE_BOOL, _fname, _dict )
 
-#define T1_FIELD_NUM( _ident, _fname )                                 \
-          T1_NEW_SIMPLE_FIELD( _ident, T1_FIELD_TYPE_INTEGER, _fname )
+#define T1_FIELD_NUM( _ident, _fname, _dict )                                 \
+          T1_NEW_SIMPLE_FIELD( _ident, T1_FIELD_TYPE_INTEGER, _fname, _dict )
 
-#define T1_FIELD_FIXED( _ident, _fname )                             \
-          T1_NEW_SIMPLE_FIELD( _ident, T1_FIELD_TYPE_FIXED, _fname )
+#define T1_FIELD_FIXED( _ident, _fname, _dict )                             \
+          T1_NEW_SIMPLE_FIELD( _ident, T1_FIELD_TYPE_FIXED, _fname, _dict )
 
-#define T1_FIELD_FIXED_1000( _ident, _fname )                             \
-          T1_NEW_SIMPLE_FIELD( _ident, T1_FIELD_TYPE_FIXED_1000, _fname )
+#define T1_FIELD_FIXED_1000( _ident, _fname, _dict )                     \
+          T1_NEW_SIMPLE_FIELD( _ident, T1_FIELD_TYPE_FIXED_1000, _fname, \
+                               _dict )
 
-#define T1_FIELD_STRING( _ident, _fname )                             \
-          T1_NEW_SIMPLE_FIELD( _ident, T1_FIELD_TYPE_STRING, _fname )
+#define T1_FIELD_STRING( _ident, _fname, _dict )                             \
+          T1_NEW_SIMPLE_FIELD( _ident, T1_FIELD_TYPE_STRING, _fname, _dict )
 
-#define T1_FIELD_KEY( _ident, _fname )                             \
-          T1_NEW_SIMPLE_FIELD( _ident, T1_FIELD_TYPE_KEY, _fname )
+#define T1_FIELD_KEY( _ident, _fname, _dict )                             \
+          T1_NEW_SIMPLE_FIELD( _ident, T1_FIELD_TYPE_KEY, _fname, _dict )
 
-#define T1_FIELD_BBOX( _ident, _fname )                             \
-          T1_NEW_SIMPLE_FIELD( _ident, T1_FIELD_TYPE_BBOX, _fname )
+#define T1_FIELD_BBOX( _ident, _fname, _dict )                             \
+          T1_NEW_SIMPLE_FIELD( _ident, T1_FIELD_TYPE_BBOX, _fname, _dict )
 
 
-#define T1_FIELD_NUM_TABLE( _ident, _fname, _fmax )                \
+#define T1_FIELD_NUM_TABLE( _ident, _fname, _fmax, _dict )         \
           T1_NEW_TABLE_FIELD( _ident, T1_FIELD_TYPE_INTEGER_ARRAY, \
-                              _fname, _fmax )
+                              _fname, _fmax, _dict )
 
-#define T1_FIELD_FIXED_TABLE( _ident, _fname, _fmax )            \
+#define T1_FIELD_FIXED_TABLE( _ident, _fname, _fmax, _dict )     \
           T1_NEW_TABLE_FIELD( _ident, T1_FIELD_TYPE_FIXED_ARRAY, \
-                              _fname, _fmax )
+                              _fname, _fmax, _dict )
 
-#define T1_FIELD_NUM_TABLE2( _ident, _fname, _fmax )                \
+#define T1_FIELD_NUM_TABLE2( _ident, _fname, _fmax, _dict )         \
           T1_NEW_TABLE_FIELD2( _ident, T1_FIELD_TYPE_INTEGER_ARRAY, \
-                               _fname, _fmax )
+                               _fname, _fmax, _dict )
 
-#define T1_FIELD_FIXED_TABLE2( _ident, _fname, _fmax )            \
+#define T1_FIELD_FIXED_TABLE2( _ident, _fname, _fmax, _dict )     \
           T1_NEW_TABLE_FIELD2( _ident, T1_FIELD_TYPE_FIXED_ARRAY, \
-                               _fname, _fmax )
+                               _fname, _fmax, _dict )
 
-#define T1_FIELD_CALLBACK( _ident, _name )       \
-          T1_NEW_CALLBACK_FIELD( _ident, _name )
+#define T1_FIELD_CALLBACK( _ident, _name, _dict )       \
+          T1_NEW_CALLBACK_FIELD( _ident, _name, _dict )
 
 
   /*************************************************************************/
@@ -341,7 +364,7 @@ FT_BEGIN_HEADER
     FT_Error
     (*to_bytes)( PS_Parser  parser,
                  FT_Byte*   bytes,
-                 FT_Long    max_bytes,
+                 FT_Offset  max_bytes,
                  FT_Long*   pnum_bytes,
                  FT_Bool    delimiters );
 
@@ -512,13 +535,7 @@ FT_BEGIN_HEADER
   /*                                                                       */
   /*    max_points   :: maximum points in builder outline                  */
   /*                                                                       */
-  /*    max_contours :: Maximal number of contours in builder outline.     */
-  /*                                                                       */
-  /*    last         :: The last point position.                           */
-  /*                                                                       */
-  /*    scale_x      :: The horizontal scale (FUnits to sub-pixels).       */
-  /*                                                                       */
-  /*    scale_y      :: The vertical scale (FUnits to sub-pixels).         */
+  /*    max_contours :: Maximum number of contours in builder outline.     */
   /*                                                                       */
   /*    pos_x        :: The horizontal translation (if composite glyph).   */
   /*                                                                       */
@@ -552,11 +569,6 @@ FT_BEGIN_HEADER
     FT_Outline*     base;
     FT_Outline*     current;
 
-    FT_Vector       last;
-
-    FT_Fixed        scale_x;
-    FT_Fixed        scale_y;
-
     FT_Pos          pos_x;
     FT_Pos          pos_y;
 
@@ -567,7 +579,6 @@ FT_BEGIN_HEADER
     T1_ParseState   parse_state;
     FT_Bool         load_points;
     FT_Bool         no_recurse;
-    FT_Bool         shift;
 
     FT_Bool         metrics_only;
 
@@ -682,7 +693,78 @@ FT_BEGIN_HEADER
     T1_Decoder_Callback  parse_callback;
     T1_Decoder_FuncsRec  funcs;
 
+    FT_Long*             buildchar;
+    FT_UInt              len_buildchar;
+
+    FT_Bool              seac;
+
   } T1_DecoderRec;
+
+
+  /*************************************************************************/
+  /*************************************************************************/
+  /*****                                                               *****/
+  /*****                            AFM PARSER                         *****/
+  /*****                                                               *****/
+  /*************************************************************************/
+  /*************************************************************************/
+
+  typedef struct AFM_ParserRec_*  AFM_Parser;
+
+  typedef struct  AFM_Parser_FuncsRec_
+  {
+    FT_Error
+    (*init)( AFM_Parser  parser,
+             FT_Memory   memory,
+             FT_Byte*    base,
+             FT_Byte*    limit );
+
+    void
+    (*done)( AFM_Parser  parser );
+
+    FT_Error
+    (*parse)( AFM_Parser  parser );
+
+  } AFM_Parser_FuncsRec;
+
+
+  typedef struct AFM_StreamRec_*  AFM_Stream;
+
+
+  /*************************************************************************/
+  /*                                                                       */
+  /* <Struct>                                                              */
+  /*    AFM_ParserRec                                                      */
+  /*                                                                       */
+  /* <Description>                                                         */
+  /*    An AFM_Parser is a parser for the AFM files.                       */
+  /*                                                                       */
+  /* <Fields>                                                              */
+  /*    memory    :: The object used for memory operations (alloc and      */
+  /*                 realloc).                                             */
+  /*                                                                       */
+  /*    stream    :: This is an opaque object.                             */
+  /*                                                                       */
+  /*    FontInfo  :: The result will be stored here.                       */
+  /*                                                                       */
+  /*    get_index :: A user provided function to get a glyph index by its  */
+  /*                 name.                                                 */
+  /*                                                                       */
+  typedef struct  AFM_ParserRec_
+  {
+    FT_Memory     memory;
+    AFM_Stream    stream;
+
+    AFM_FontInfo  FontInfo;
+
+    FT_Int
+    (*get_index)( const char*  name,
+                  FT_Offset    len,
+                  void*        user_data );
+
+    void*         user_data;
+
+  } AFM_ParserRec;
 
 
   /*************************************************************************/
@@ -728,10 +810,64 @@ FT_BEGIN_HEADER
 
     T1_CMap_Classes  t1_cmap_classes;
 
+    /* fields after this comment line were added after version 2.1.10 */
+    const AFM_Parser_FuncsRec*  afm_parser_funcs;
+
   } PSAux_ServiceRec, *PSAux_Service;
 
   /* backwards-compatible type definition */
   typedef PSAux_ServiceRec   PSAux_Interface;
+
+
+  /*************************************************************************/
+  /*************************************************************************/
+  /*****                                                               *****/
+  /*****                 Some convenience functions                    *****/
+  /*****                                                               *****/
+  /*************************************************************************/
+  /*************************************************************************/
+
+#define IS_PS_NEWLINE( ch ) \
+  ( (ch) == '\r' ||         \
+    (ch) == '\n' )
+
+#define IS_PS_SPACE( ch )  \
+  ( (ch) == ' '         || \
+    IS_PS_NEWLINE( ch ) || \
+    (ch) == '\t'        || \
+    (ch) == '\f'        || \
+    (ch) == '\0' )
+
+#define IS_PS_SPECIAL( ch )       \
+  ( (ch) == '/'                || \
+    (ch) == '(' || (ch) == ')' || \
+    (ch) == '<' || (ch) == '>' || \
+    (ch) == '[' || (ch) == ']' || \
+    (ch) == '{' || (ch) == '}' || \
+    (ch) == '%'                )
+
+#define IS_PS_DELIM( ch )  \
+  ( IS_PS_SPACE( ch )   || \
+    IS_PS_SPECIAL( ch ) )
+
+#define IS_PS_DIGIT( ch )        \
+  ( (ch) >= '0' && (ch) <= '9' )
+
+#define IS_PS_XDIGIT( ch )            \
+  ( IS_PS_DIGIT( ch )              || \
+    ( (ch) >= 'A' && (ch) <= 'F' ) || \
+    ( (ch) >= 'a' && (ch) <= 'f' ) )
+
+#define IS_PS_BASE85( ch )       \
+  ( (ch) >= '!' && (ch) <= 'u' )
+
+#define IS_PS_TOKEN( cur, limit, token )                                \
+  ( (char)(cur)[0] == (token)[0]                                     && \
+    ( (cur) + sizeof ( (token) ) == (limit) ||                          \
+      ( (cur) + sizeof( (token) ) < (limit)          &&                 \
+        IS_PS_DELIM( (cur)[sizeof ( (token) ) - 1] ) ) )             && \
+    ft_strncmp( (char*)(cur), (token), sizeof ( (token) ) - 1 ) == 0 )
+
 
 FT_END_HEADER
 

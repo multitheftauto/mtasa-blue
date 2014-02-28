@@ -4,8 +4,6 @@
 *  LICENSE:     See LICENSE in the top level directory
 *  FILE:        Shared/core/CFileSystem.h
 *  PURPOSE:     File management
-*  DEVELOPERS:  S2Games <http://savage.s2games.com> (historical entry)
-*               Martin Turski <quiret@gmx.de>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -14,15 +12,17 @@
 #ifndef _CFileSystem_
 #define _CFileSystem_
 
-#include <direct.h>
-
 #ifndef _WIN32
 #define FILE_MODE_CREATE    0x01
 #define FILE_MODE_OPEN      0x02
 
 #define FILE_ACCESS_WRITE   0x01
 #define FILE_ACCESS_READ    0x02
+
+#define MAX_PATH 260
 #else
+#include <direct.h>
+
 #define FILE_MODE_CREATE    CREATE_ALWAYS
 #define FILE_MODE_OPEN      OPEN_EXISTING
 
@@ -30,6 +30,10 @@
 #define FILE_ACCESS_READ    GENERIC_READ
 #endif
 
+#ifdef __linux__
+#include <unistd.h>
+#include <dirent.h>
+#endif //__linux__
 
 
 class CRawFile : public CFile
@@ -55,11 +59,13 @@ public:
 private:
     friend class CSystemFileTranslator;
     friend class CFileSystem;
-	
+
 #ifdef _WIN32
     HANDLE          m_file;
+#elif defined(__linux__)
+    FILE*           m_file;
+#endif //OS DEPENDANT CODE
     DWORD           m_access;
-#endif
     filePath        m_path;
 };
 
@@ -96,6 +102,8 @@ private:
 class CSystemPathTranslator : public virtual CFileTranslator
 {
 public:
+                    CSystemPathTranslator           ( bool isSystemPath );
+
     bool            GetFullPathTreeFromRoot         ( const char *path, dirTree& tree, bool& file ) const;
     bool            GetFullPathTree                 ( const char *path, dirTree& tree, bool& file ) const;
     bool            GetRelativePathTreeFromRoot     ( const char *path, dirTree& tree, bool& file ) const;
@@ -107,6 +115,27 @@ public:
     bool            ChangeDirectory                 ( const char *path );
     void            GetDirectory                    ( filePath& output ) const;
 
+    inline bool IsTranslatorRootDescriptor( char character ) const
+    {
+        if ( !m_isSystemPath )
+        {
+            // On Windows platforms, absolute paths are based on drive letters (C:/).
+            // This means we can use the linux way of absolute fs root linkling for the translators.
+            // But this may confuse Linux users; on Linux this convention cannot work (reserved for abs paths).
+            // Hence, usage of the '/' or '\\' descriptor is discouraged (only for backwards compatibility).
+            // Disregard this thought for archive file systems, all file systems which are the root themselves.
+            // They use the linux addressing convention.
+            if ( character == '/' || character == '\\' )
+                return true;
+        }
+
+        // Just like MTA:SA is using the '' character for private directories, we use it
+        // for a platform independent translator root basing.
+        // 'textfile.txt' will address 'textfile.txt' in the translator root, ignoring
+        // the current directory setting.
+        return character == '' || character == '@';
+    }
+
 protected:
     friend class CFileSystem;
 
@@ -114,6 +143,9 @@ protected:
     filePath        m_currentDir;
     dirTree         m_rootTree;
     dirTree         m_curDirTree;
+
+private:
+    bool            m_isSystemPath;
 };
 
 #define FILE_FLAG_TEMPORARY     0x00000001
@@ -124,6 +156,20 @@ protected:
 class CSystemFileTranslator : public CSystemPathTranslator
 {
 public:
+    // We need to distinguish between Windows and other OSes here.
+    // Windows uses driveletters (C:/) and Unix + Mac do not.
+    // This way, on Windows we can use the '/' or '\\' character
+    // to trace paths from the translator root.
+    // On Linux and Mac, these characters are for addressing
+    // absolute paths.
+    CSystemFileTranslator( void ) :
+#ifdef _WIN32
+        CSystemPathTranslator( false )
+#else
+        CSystemPathTranslator( true )
+#endif //OS DEPENDANT CODE
+    { }
+
                     ~CSystemFileTranslator          ( void );
 
     bool            WriteData                       ( const char *path, const char *buffer, size_t size );
@@ -138,18 +184,17 @@ public:
     bool            Stat                            ( const char *path, struct stat *stats ) const;
     bool            ReadToBuffer                    ( const char *path, std::vector <char>& output ) const;
 
-#ifdef _WIN32
-    // Used to handle special drive absolute paths in Windows
+    // Used to handle absolute paths
     bool            GetRelativePathTreeFromRoot     ( const char *path, dirTree& tree, bool& file ) const;
     bool            GetRelativePathTree             ( const char *path, dirTree& tree, bool& file ) const;
     bool            GetFullPathTree                 ( const char *path, dirTree& tree, bool& file ) const;
     bool            GetFullPath                     ( const char *path, bool allowFile, filePath& output ) const;
-#endif //_WIN32
+
     bool            ChangeDirectory                 ( const char *path );
 
-    void            ScanDirectory( const char *directory, const char *wildcard, bool recurse, 
-                        pathCallback_t dirCallback, 
-                        pathCallback_t fileCallback, 
+    void            ScanDirectory( const char *directory, const char *wildcard, bool recurse,
+                        pathCallback_t dirCallback,
+                        pathCallback_t fileCallback,
                         void *userdata ) const;
 
     void            GetDirectories                  ( const char *path, const char *wildcard, bool recurse, std::vector <filePath>& output ) const;
@@ -163,7 +208,10 @@ private:
 #ifdef _WIN32
     HANDLE          m_rootHandle;
     HANDLE          m_curDirHandle;
-#endif
+#elif defined(__linux__)
+    DIR*            m_rootHandle;
+    DIR*            m_curDirHandle;
+#endif //OS DEPENDANT CODE
 };
 
 // Include extensions
@@ -177,7 +225,7 @@ public:
 
     void                    InitZIP                 ( void );
     void                    DestroyZIP              ( void );
-                            
+
     CFileTranslator*        CreateTranslator        ( const char *path );
     CArchiveTranslator*     OpenArchive             ( CFile& file );
 
@@ -185,14 +233,15 @@ public:
 
     // Insecure functions
     bool                    IsDirectory             ( const char *path );
-#if 0
+#ifdef _WIN32
     bool                    WriteMiniDump           ( const char *path, _EXCEPTION_POINTERS *except );
-#endif
+#endif //_WIN32
     bool                    Exists                  ( const char *path );
     size_t                  Size                    ( const char *path );
     bool                    ReadToBuffer            ( const char *path, std::vector <char>& output );
 };
 
+extern CFileSystem *fileSystem;
 extern CFileTranslator *fileRoot;
 
 #endif //_CFileSystem_

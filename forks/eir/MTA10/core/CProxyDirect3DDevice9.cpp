@@ -12,21 +12,17 @@
 
 #include "StdInc.h"
 
-#include <stdexcept>
+bool g_bInGTAScene = false;
 CProxyDirect3DDevice9* g_pProxyDevice = NULL;
 CProxyDirect3DDevice9::SD3DDeviceState* g_pDeviceState = NULL;
 
 // Proxy constructor and destructor.
 CProxyDirect3DDevice9::CProxyDirect3DDevice9 ( IDirect3DDevice9 * pDevice  )
 {
-    WriteDebugEvent ( "CProxyDirect3DDevice9::CProxyDirect3DDevice9" );
+    WriteDebugEvent ( SString( "CProxyDirect3DDevice9::CProxyDirect3DDevice9 %08x", this ) );
 
     // Set our wrapped device.
     m_pDevice       = pDevice;
-
-    // Give ourself a matching refcount.
-    pDevice->AddRef ( );
-    m_dwRefCount = pDevice->Release ( );
 
     // Get CDirect3DData pointer.
     m_pData = CDirect3DData::GetSingletonPtr ( );
@@ -48,7 +44,6 @@ CProxyDirect3DDevice9::CProxyDirect3DDevice9 ( IDirect3DDevice9 * pDevice  )
     D3DADAPTER_IDENTIFIER9 adaptIdent;
     ZeroMemory( &adaptIdent, sizeof( D3DADAPTER_IDENTIFIER9 ) );
     pD3D9->GetAdapterIdentifier( iAdapter, 0, &adaptIdent );
-    SString strVideoCardName = adaptIdent.Description;
 
     int iVideoCardMemoryKBTotal = GetWMIVideoAdapterMemorySize ( adaptIdent.DeviceName ) / 1024;
 
@@ -78,13 +73,16 @@ CProxyDirect3DDevice9::CProxyDirect3DDevice9 ( IDirect3DDevice9 * pDevice  )
             g_pDeviceState->AdapterState.MaxAnisotropicSetting++;
     }
 
+    // Clipping is required for some graphic configurations
+    g_pDeviceState->AdapterState.bRequiresClipping = SStringX( adaptIdent.Description ).Contains( "Intel" );
+
     // Call event handler
     CDirect3DEvents9::OnDirect3DDeviceCreate ( pDevice );
 }
 
 CProxyDirect3DDevice9::~CProxyDirect3DDevice9 ( )
 {
-    WriteDebugEvent ( "CProxyDirect3DDevice9::~CProxyDirect3DDevice9" );
+    WriteDebugEvent ( SString( "CProxyDirect3DDevice9::~CProxyDirect3DDevice9 %08x", this ) );
     g_pDeviceState = NULL;
     g_pProxyDevice = NULL;
 }
@@ -97,45 +95,23 @@ HRESULT CProxyDirect3DDevice9::QueryInterface                 ( REFIID riid, voi
 
 ULONG   CProxyDirect3DDevice9::AddRef                         ( VOID )
 {
-    ULONG ulResult;
-
-    // Incrase the device's refcount
-    ulResult = m_pDevice->AddRef ( );
-
-    // Increase our refcount
-    m_dwRefCount++;
-
-    return ulResult;
+    return m_pDevice->AddRef ( );
 }
 
 ULONG   CProxyDirect3DDevice9::Release                        ( VOID )
 {
-    ULONG       ulResult;
-    IUnknown *  pDestroyedDevice;
-
-    // Check to see if we should destroy ourself
-    if ( --m_dwRefCount == 0 )
+	// Check if will be final release
+    m_pDevice->AddRef ();
+	ULONG ulRefCount = m_pDevice->Release ();
+    if ( ulRefCount == 1 )
     {
         WriteDebugEvent ( "Releasing IDirect3DDevice9 Proxy..." );
-
         // Call event handler
         CDirect3DEvents9::OnDirect3DDeviceDestroy ( m_pDevice );
-
-        // Save device so we can destroy it after.
-        pDestroyedDevice = m_pDevice;
-
-        // Destroy...
-        delete this;
-
-        // Release device...
-        ulResult = pDestroyedDevice->Release ( );
-
-        return ulResult;
+		delete this;
     }
-    
-    ulResult = m_pDevice->Release ( );
 
-    return ulResult;
+	return m_pDevice->Release ();
 }
 
 /*** IDirect3DDevice9 methods ***/
@@ -204,6 +180,106 @@ UINT    CProxyDirect3DDevice9::GetNumberOfSwapChains          ( VOID )
     return m_pDevice->GetNumberOfSwapChains ( );
 }
 
+////////////////////////////////////////////////
+//
+// ResetDeviceInsist
+//
+// Keep trying reset device for a little bit
+//
+////////////////////////////////////////////////
+HRESULT ResetDeviceInsist( uint uiMinTries, uint uiTimeout, IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS* pPresentationParameters )
+{
+    HRESULT hResult;
+    CElapsedTime retryTimer;
+    uint uiRetryCount = 0;
+    do
+    {
+        hResult = pDevice->Reset ( pPresentationParameters );
+        if ( hResult == D3D_OK )
+        {
+            WriteDebugEvent( SString( "   -- ResetDeviceInsist succeeded on try #%d", uiRetryCount + 1 ) );
+            break;
+        }
+        Sleep( 100 );
+    }
+    while( ++uiRetryCount < uiMinTries || retryTimer.Get() < uiTimeout );
+
+    return hResult;
+}
+
+
+////////////////////////////////////////////////
+//
+// DoResetDevice
+//
+// In various ways
+//
+////////////////////////////////////////////////
+HRESULT DoResetDevice( IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS* pPresentationParameters, D3DPRESENT_PARAMETERS& presentationParametersOrig )
+{
+    HRESULT hResult;
+    hResult = pDevice->Reset ( pPresentationParameters );
+
+    if ( SUCCEEDED ( hResult ) )
+    {
+        // Log success
+        WriteDebugEvent ( "Reset success" );
+    }
+    else
+    if ( FAILED ( hResult ) )
+    {
+        // Handle failure of initial reset device call
+        g_pCore->LogEvent( 7124, "Direct3D", "Direct3DDevice9::Reset", SString( "Fail0:%08x", hResult ) );
+        WriteDebugEvent ( SString( "Reset failed #0: %08x", hResult ) );
+
+        // Try reset device again
+        hResult = ResetDeviceInsist ( 5, 1000, pDevice, pPresentationParameters );
+
+        // Handle retry result
+        if ( FAILED ( hResult ) )
+        {
+            // Record problem
+            g_pCore->LogEvent( 7124, "Direct3D", "Direct3DDevice9::Reset", SString( "Fail1:%08x", hResult ) );
+            WriteDebugEvent( SString( "Direct3DDevice9::Reset  Fail1:%08x", hResult ) );
+
+            // Try with original presentation parameters
+            *pPresentationParameters = presentationParametersOrig;
+            hResult = ResetDeviceInsist ( 5, 1000, pDevice, pPresentationParameters );
+
+            if ( FAILED ( hResult ) )
+            {
+                // Record problem
+                g_pCore->LogEvent( 7124, "Direct3D", "Direct3DDevice9::Reset", SString( "Fail2:%08x", hResult ) );
+                WriteDebugEvent( SString( "Direct3DDevice9::Reset  Fail2:%08x", hResult ) );
+
+                // Prevent statup warning in loader
+                WatchDogCompletedSection ( "L3" );
+
+                // Try removing anti-aliasing for next time
+                if ( CGame* pGame = g_pCore->GetGame() )
+                {
+                    CGameSettings* pGameSettings = pGame->GetSettings ();
+                    int iAntiAliasing = pGameSettings->GetAntiAliasing();
+                    if ( iAntiAliasing > 1 )
+                    {
+                        pGameSettings->SetAntiAliasing( 1, true );
+                        pGameSettings->Save();
+                    }
+                }
+
+                // Handle fatal error
+                SString strMessage;
+                strMessage += "There was a problem resetting Direct3D\n\n";
+                strMessage += SString( "Direct3DDevice9 Reset error: %08x", hResult );
+                BrowseToSolution( "d3dresetdevice-fail", EXIT_GAME_FIRST | ASK_GO_ONLINE, strMessage );
+                // Won't get here as BrowseToSolution will terminate the process
+            }
+        }
+    }
+    return hResult;
+}
+
+
 HRESULT CProxyDirect3DDevice9::Reset                          ( D3DPRESENT_PARAMETERS* pPresentationParameters )
 {
     WriteDebugEvent ( "CProxyDirect3DDevice9::Reset" );
@@ -219,28 +295,7 @@ HRESULT CProxyDirect3DDevice9::Reset                          ( D3DPRESENT_PARAM
     CDirect3DEvents9::OnInvalidate ( m_pDevice );
 
     // Call the real reset routine.
-    hResult = m_pDevice->Reset ( pPresentationParameters );
-
-    if ( FAILED ( hResult ) )
-    {
-        // Record problem
-        g_pCore->LogEvent( 7124, "Direct3D", "Direct3DDevice9::Reset", SString( "Fail1:%08x", hResult ) );
-        WriteDebugEvent( SString( "Direct3DDevice9::Reset  Fail1:%08x", hResult ) );
-
-        // Try with original presentation parameters
-        *pPresentationParameters = presentationParametersOrig;
-        hResult = m_pDevice->Reset ( pPresentationParameters );
-
-        if ( FAILED ( hResult ) )
-        {
-            // Record problem
-            g_pCore->LogEvent( 7124, "Direct3D", "Direct3DDevice9::Reset", SString( "Fail2:%08x", hResult ) );
-            WriteDebugEvent( SString( "Direct3DDevice9::Reset  Fail2:%08x", hResult ) );
-
-            // Let caller handle what to do
-            return hResult;
-        }
-    }
+    hResult = DoResetDevice( m_pDevice, pPresentationParameters, presentationParametersOrig );
 
     // Store actual present parameters used
     IDirect3DSwapChain9* pSwapChain;
@@ -309,7 +364,10 @@ HRESULT CProxyDirect3DDevice9::Present                        ( CONST RECT* pSou
     m_pData->GetTransform ( D3DTS_PROJECTION, &projMatrix );
     m_pDevice->SetTransform ( D3DTS_PROJECTION, &projMatrix );
 
-    return m_pDevice->Present ( pSourceRect, pDestRect, hDestWindowOverride, pDirtyRegion );
+    TIMING_GRAPH("Present");
+    HRESULT hr = m_pDevice->Present ( pSourceRect, pDestRect, hDestWindowOverride, pDirtyRegion );
+    TIMING_GRAPH("PostPresent");
+    return hr;
 }
 
 HRESULT CProxyDirect3DDevice9::GetBackBuffer                  ( UINT iSwapChain,UINT iBackBuffer,D3DBACKBUFFER_TYPE Type,IDirect3DSurface9** ppBackBuffer )
@@ -434,8 +492,8 @@ HRESULT CProxyDirect3DDevice9::BeginScene                     ( VOID )
 
     // Call the real routine.
     hResult = m_pDevice->BeginScene ( );
-
-    CGraphics::GetSingleton ().GetRenderItemManager ()->PreDrawWorld ();
+    if ( hResult == D3D_OK )
+        g_bInGTAScene = true;
 
     // Call our event handler.
     CDirect3DEvents9::OnBeginScene ( m_pDevice );
@@ -461,6 +519,7 @@ HRESULT CProxyDirect3DDevice9::EndScene                       ( VOID )
     {
         // Call real routine.
         HRESULT hResult = m_pDevice->EndScene ();
+        g_bInGTAScene = false;
 
         CGraphics::GetSingleton ().GetRenderItemManager ()->SaveReadableDepthBuffer ();
         return hResult;
@@ -472,7 +531,7 @@ HRESULT CProxyDirect3DDevice9::EndScene                       ( VOID )
 HRESULT CProxyDirect3DDevice9::Clear                          ( DWORD Count,CONST D3DRECT* pRects,DWORD Flags,D3DCOLOR Color,float Z,DWORD Stencil )
 {
     // If clearing z buffer, make sure we save it first
-    if ( Flags | D3DCLEAR_ZBUFFER )
+    if ( Flags & D3DCLEAR_ZBUFFER )
         CGraphics::GetSingleton ().GetRenderItemManager ()->SaveReadableDepthBuffer ();
 
     return m_pDevice->Clear ( Count, pRects, Flags, Color, Z, Stencil );

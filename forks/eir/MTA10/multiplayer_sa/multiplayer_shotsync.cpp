@@ -63,16 +63,18 @@ DWORD vecAltPos;
 CPedSAInterface * pShootingPed;
 EDamageReasonType g_GenerateDamageEventReason = EDamageReason::OTHER;
 
-static CPedSAInterface* pBulletImpactInitiator;
-static CEntitySAInterface* pBulletImpactVictim;
-static CVector* pBulletImpactStartPosition;
-static CVector* pBulletImpactEndPosition;
+CPedSAInterface* pBulletImpactInitiator;
+CEntitySAInterface* pBulletImpactVictim;
+CVector* pBulletImpactStartPosition;
+CVector* pBulletImpactEndPosition;
+CVector vecSavedBulletImpactEndPosition;
 
 extern PreWeaponFireHandler* m_pPreWeaponFireHandler;
 extern PostWeaponFireHandler* m_pPostWeaponFireHandler;
 extern BulletImpactHandler* m_pBulletImpactHandler;
 extern BulletFireHandler* m_pBulletFireHandler;
 extern DamageHandler* m_pDamageHandler;
+extern DeathHandler* m_pDeathHandler;
 extern FireHandler* m_pFireHandler;
 extern ProjectileHandler* m_pProjectileHandler;
 extern ProjectileStopHandler* m_pProjectileStopHandler;
@@ -86,6 +88,7 @@ CPools * m_pools = 0;
 #define VAR_CWorld_IncludeCarTyres 0xb7cd70 // Used for CWorld_ProcessLineOfSight
 
 void InitFireInstantHit_MidHooks ( void );
+void InitFireSniper_MidHooks( void );
 
 VOID InitShotsyncHooks()
 {
@@ -96,6 +99,7 @@ VOID InitShotsyncHooks()
     HookInstall ( HOOKPOS_CTaskSimpleGangDriveBy__PlayerTarget, (DWORD)HOOK_CTaskSimpleGangDriveBy__PlayerTarget, 6 );
     HookInstall ( HOOKPOS_CWeapon__Fire_Sniper, (DWORD)HOOK_CWeapon__Fire_Sniper, 6 );
     HookInstall ( HOOKPOS_CEventDamage__AffectsPed, (DWORD)HOOK_CEventDamage__AffectsPed, 6 );
+    HookInstall ( HOOKPOS_CEventVehicleExplosion__AffectsPed, (DWORD)HOOK_CEventVehicleExplosion__AffectsPed, 5 );
     HookInstall ( HOOKPOS_CFireManager__StartFire, (DWORD)HOOK_CFireManager__StartFire, 6 );
     HookInstall ( HOOKPOS_CFireManager__StartFire_, (DWORD)HOOK_CFireManager__StartFire_, 6 );
     HookInstall ( HOOKPOS_CProjectileInfo__AddProjectile, (DWORD)HOOK_CProjectileInfo__AddProjectile, 7 );
@@ -110,6 +114,7 @@ VOID InitShotsyncHooks()
     HookInstall ( HOOKPOS_CWeapon_DoBulletImpact, (DWORD)HOOK_CWeapon_DoBulletImpact, 7 );
 
     InitFireInstantHit_MidHooks ();
+    InitFireSniper_MidHooks ();
     /*  
     MemPut < BYTE > ( 0x73FDEC, 0x90 );
     MemPut < BYTE > ( 0x73FDED, 0xE9 );
@@ -283,6 +288,7 @@ static void Event_BulletImpact ( void )
                 m_pBulletImpactHandler ( pInitiator, pVictim, pBulletImpactStartPosition, pBulletImpactEndPosition );
             }
         }
+        vecSavedBulletImpactEndPosition = *pBulletImpactEndPosition;    // Saved for vehicle damage event parameters
     }
 }
 
@@ -1089,7 +1095,10 @@ void OnMy_CWeapon_FireInstantHit_Mid ( CEntitySAInterface* pEntity, CVector* pve
     {
         CVector vecEnd = *pvecEnd;
         CVector vecStart = *pvecAimedStart;
-        if ( vecEnd == vecStart )
+        CVector vecDif = vecEnd - vecStart;
+        vecDif.fZ = 0;
+        float fLength2D = vecDif.LengthSquared();
+        if ( fLength2D < 0.0001f )
             vecStart = *pvecNonAimedStart;
 
         // Trim end point to weapon range
@@ -1154,6 +1163,91 @@ void _declspec(naked) HOOK_CWeapon_FireInstantHit_Mid ()
 VOID InitFireInstantHit_MidHooks()
 {
     HookInstall ( HOOKPOS_CWeapon_FireInstantHit_Mid, (DWORD)HOOK_CWeapon_FireInstantHit_Mid, HOOKSIZE_CWeapon_FireInstantHit_Mid );
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+// CWeapon_FireSniper_Mid
+//
+// Called when the local player fires a sniper bullet
+// If using bullet sync, send the bullet vectors to the other players
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+void OnMy_CWeapon_FireSniper_Mid ( CEntitySAInterface* pEntity, CVector* pvecEndHit, CVector* pvecEndMaxRange, CVector* pvecStart, CVector* pvecDir )
+{
+    CPed * pTargetingPed = m_pools->GetPed ( (DWORD *)pEntity );
+    if ( IsLocalPlayer ( pTargetingPed ) )
+    {
+        CVector vecEnd = *pvecEndMaxRange;
+        CVector vecStart = *pvecStart;
+
+        // Trim end point to weapon range
+        float fRange = pTargetingPed->GetCurrentWeaponRange ();
+        CVector vecDir = vecEnd - vecStart;
+        float fLength = vecDir.Length ();
+        if ( fRange < fLength )
+        {
+            vecDir.Normalize ();
+            vecEnd = vecStart + vecDir * fRange;
+        }
+
+        // Save these for BulletImpact
+        vecLastLocalPlayerBulletStart = vecStart;
+        vecLastLocalPlayerBulletEnd = vecEnd;
+
+        if ( m_pBulletFireHandler )
+            m_pBulletFireHandler ( pTargetingPed, &vecStart, &vecEnd );
+    }
+}
+
+// Hook info
+#define HOOKPOS_CWeapon_FireSniper_Mid                         0x73AE31
+#define HOOKSIZE_CWeapon_FireSniper_Mid                        5
+DWORD RETURN_CWeapon_FireSniper_Mid =                          0x73AE39;
+void _declspec(naked) HOOK_CWeapon_FireSniper_Mid ()
+{
+    _asm
+    {
+        // Do original code
+        fstp        dword ptr [esp+4Ch] 
+        fstp        dword ptr [esp+50h] 
+
+        pushad
+
+        mov     ecx, esp
+        add     ecx, 20h
+
+        mov     edx, ecx
+        add     edx, 20h        // dir
+        push    edx
+
+        mov     edx, ecx
+        add     edx, 2Ch        // start
+        push    edx
+
+        mov     edx, ecx
+        add     edx, 3Ch        // max range end
+        push    edx
+
+        mov     edx, ecx
+        add     edx, 48h        // hit end
+        push    edx
+
+        push    esi             // Ped
+        call    OnMy_CWeapon_FireSniper_Mid
+        add     esp, 4*5
+        popad
+
+        // Continue
+        jmp     RETURN_CWeapon_FireSniper_Mid
+    }
+}
+
+// Hook install
+VOID InitFireSniper_MidHooks()
+{
+    HookInstall ( HOOKPOS_CWeapon_FireSniper_Mid, (DWORD)HOOK_CWeapon_FireSniper_Mid, HOOKSIZE_CWeapon_FireSniper_Mid );
 }
 
 
@@ -1548,4 +1642,51 @@ VOID _declspec(naked) HOOK_CWeapon__FireShotgun()
     }   
 }*/
 
+CPedSAInterface *CEventVehicleExplosion_pPed;
+
+void CEventVehicleExplosion_NotifyDeathmatch()
+{
+    if ( m_pDeathHandler )
+    {
+        CPoolsSA * pPools = (CPoolsSA*)pGameInterface->GetPools();
+        CPed * pPed = pPools->GetPed ( (DWORD *)CEventVehicleExplosion_pPed );
+
+        if ( pPed ) 
+            m_pDeathHandler(pPed, 63, 3);
+    }
+}
+
+void _declspec(naked) HOOK_CEventVehicleExplosion__AffectsPed()
+{
+    _asm
+    {
+        // Save the ped
+        mov CEventVehicleExplosion_pPed, edi
+        // Replacement code for the hook
+        pop     edi
+        setz    al
+        pop esi
+        
+        // Verify that the ped is affected
+        cmp al, 1
+        jnz return_from
+
+        // Verify that this call is from the correct location
+        cmp [esp], 0x4ab4c4
+        jnz return_from
+        
+        pushad
+    }
+
+    // Notify Deathmatch about the death
+    CEventVehicleExplosion_NotifyDeathmatch();
+
+    _asm
+    {  
+        popad
+
+return_from:
+        retn 4
+    }
+}
 

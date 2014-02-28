@@ -10,7 +10,6 @@
 *****************************************************************************/
 
 extern HINSTANCE g_hInstance;
-extern HANDLE g_hMutex;
 
 enum ePathResult
 {
@@ -30,9 +29,10 @@ enum
     CHECK_SERVICE_PRE_CREATE = 6,
 };
 
+
 // Loads the given dll into hProcess. Returns 0 on failure or the handle to the
 // remote dll module on success.
-HMODULE         RemoteLoadLibrary                   ( HANDLE hProcess, const char* szLibPath );
+HMODULE         RemoteLoadLibrary                   ( HANDLE hProcess, const WString& strLibPath );
 void            InsertWinMainBlock                  ( HANDLE hProcess );
 void            RemoveWinMainBlock                  ( HANDLE hProcess );
 void            ApplyLoadingCrashPatch              ( HANDLE hProcess );
@@ -41,38 +41,21 @@ void            TerminateGTAIfRunning               ( void );
 bool            IsGTARunning                        ( void );
 void            TerminateOtherMTAIfRunning          ( void );
 bool            IsOtherMTARunning                   ( void );
-bool            IsGTAProcessStuck                   ( HANDLE hProcess );
-
-void            ShowSplash                          ( HINSTANCE hInstance );
-void            HideSplash                          ( void );
 
 bool            CommandLineContains                 ( const SString& strText );
-long            DisplayErrorMessageBox              ( const SString& strMessage, const SString& strTroubleType = "" );
+void            DisplayErrorMessageBox              ( const SString& strMessage, const SString& strErrorCode = "", const SString& strTroubleType = "" );
 
 void            SetMTASAPathSource                  ( bool bReadFromRegistry );
-SString         GetMTASAPath                        ( bool bReadFromRegistry = true );
-ePathResult     GetGamePath                         ( SString& strOutResult, bool bFindIfMissing = false );
-SString         GetMTASAModuleFileName              ( void );
-
-void            ShowProgressDialog                  ( HINSTANCE hInstance, const SString& strTitle, bool bAllowCancel = false );
-void            HideProgressDialog                  ( void );
-bool            UpdateProgress                      ( int iPos, int iMax, const SString& strMsg = "" );
+SString         GetMTASAPath                        ( void );
+ePathResult     DiscoverGTAPath                     ( bool bFindIfMissing );
+SString         GetGTAPath                          ( void );
+bool            HasGTAPath                          ( void );
 
 void            FindFilesRecursive                  ( const SString& strPathMatch, std::vector < SString >& outFileList, uint uiMaxDepth = 99 );
 SString         GetOSVersion                        ( void );
 SString         GetRealOSVersion                    ( void );
 bool            IsVistaOrHigher                     ( void );
 BOOL            IsUserAdmin                         ( void );
-bool            GetLibVersionInfo                   ( const char *szLibName, VS_FIXEDFILEINFO* pOutFileInfo );
-
-void            StartPseudoProgress                 ( HINSTANCE hInstance, const SString& strTitle, const SString& strMsg );
-void            StopPseudoProgress                  ( void );
-
-SString         ShowCrashedDialog                   ( HINSTANCE hInstance, const SString& strMessage );
-void            HideCrashedDialog                   ( void );
-
-void            ShowD3dDllDialog                    ( HINSTANCE hInstance, const SString& strPath );
-void            HideD3dDllDialog                    ( void );
 
 void            UpdateMTAVersionApplicationSetting  ( bool bQuiet = false );
 bool            Is32bitProcess                      ( DWORD processID );
@@ -91,6 +74,55 @@ bool            CheckService                        ( uint uiStage );
 void            MaybeShowCopySettingsDialog         ( void );
 
 bool            CheckAndShowFileOpenFailureMessage  ( void );
+void            CheckAndShowMissingFileMessage      ( void );
+void            CheckAndShowModelProblems           ( void );
+void            CheckAndShowUpgradeProblems         ( void );
+
+void            BsodDetectionPreLaunch              ( void );
+void            BsodDetectionOnGameBegin            ( void );
+void            BsodDetectionOnGameEnd              ( void );
+bool            VerifyEmbeddedSignature             ( const SString& strFilename );
+void            LogSettings                         ( void );
+SString         PadLeft                             ( const SString& strText, uint uiNumSpaces, char cCharacter );
+bool            IsDeviceSelectionDialogOpen         ( DWORD dwThreadId );
+std::vector < DWORD > MyEnumProcesses               ( void );
+std::vector < SString > GetPossibleProcessPathFilenames ( DWORD processID );
+
+//
+// Determine if game process has gone wonky
+//
+class CStuckProcessDetector
+{
+public:
+    CStuckProcessDetector( HANDLE hProcess, uint uiThresholdMs )
+    {
+        m_hProcess = hProcess;
+        m_uiThresholdMs = uiThresholdMs;
+        m_PrevWorkingSetSize = 0;
+    }
+
+    // Returns true if process is active and hasn't changed mem usage for uiThresholdMs
+    bool UpdateIsStuck( void )
+    {
+        PROCESS_MEMORY_COUNTERS psmemCounter;
+        BOOL bResult = GetProcessMemoryInfo( m_hProcess, &psmemCounter, sizeof( PROCESS_MEMORY_COUNTERS ) );
+        if ( !bResult )
+            return false;
+
+        if ( m_PrevWorkingSetSize != psmemCounter.WorkingSetSize )
+        {
+            m_PrevWorkingSetSize = psmemCounter.WorkingSetSize;
+            m_StuckTimer.Reset();
+        }
+        return m_StuckTimer.Get() > m_uiThresholdMs;
+    }
+
+    uint            m_uiThresholdMs;
+    SIZE_T          m_PrevWorkingSetSize;
+    HANDLE          m_hProcess;
+    CElapsedTime    m_StuckTimer;
+};
+
 
 #undef CREATE_SUSPENDED
 #define CREATE_SUSPENDED 5
@@ -102,7 +134,7 @@ bool            CheckAndShowFileOpenFailureMessage  ( void );
     #define _VirtualFreeEx          VirtualFreeEx
     #define _ReadProcessMemory      ReadProcessMemory
     #define _WriteProcessMemory     WriteProcessMemory
-    #define _CreateProcess          CreateProcess
+    #define _CreateProcessW         CreateProcessW
     #define _CreateRemoteThread     CreateRemoteThread
 
 #else
@@ -165,16 +197,16 @@ bool            CheckAndShowFileOpenFailureMessage  ( void );
     typedef
     BOOL
     (WINAPI
-    *FUNC_CreateProcessA)(
-        __in_opt    LPCSTR lpApplicationName,
-        __inout_opt LPSTR lpCommandLine,
+    *FUNC_CreateProcessW)(
+        __in_opt    LPCWSTR lpApplicationName,
+        __inout_opt LPWSTR lpCommandLine,
         __in_opt    LPSECURITY_ATTRIBUTES lpProcessAttributes,
         __in_opt    LPSECURITY_ATTRIBUTES lpThreadAttributes,
         __in        BOOL bInheritHandles,
         __in        DWORD dwCreationFlags,
         __in_opt    LPVOID lpEnvironment,
-        __in_opt    LPCSTR lpCurrentDirectory,
-        __in        LPSTARTUPINFOA lpStartupInfo,
+        __in_opt    LPCWSTR lpCurrentDirectory,
+        __in        LPSTARTUPINFOW lpStartupInfo,
         __out       LPPROCESS_INFORMATION lpProcessInformation
         );
 
@@ -191,33 +223,41 @@ bool            CheckAndShowFileOpenFailureMessage  ( void );
         __out_opt LPDWORD lpThreadId
         );
 
-    void* LoadFunction ( const char* c, const char* a, const char* b );
+    typedef
+    HRESULT
+    (STDAPICALLTYPE
+    *FUNC_WscGetSecurityProviderHealth)(DWORD Providers,
+                                    PWSC_SECURITY_PROVIDER_HEALTH pHealth);
 
-    #define _DEFFUNCTION( name, a,b,c ) \
+    void* LoadFunction ( const char* szLibName, const char* c, const char* a, const char* b );
+
+    #define _DEFFUNCTION( lib, name, a,b,c ) \
         inline FUNC_##name __##name ( void ) \
         { \
             static FUNC_##name pfn = NULL; \
             if ( !pfn ) \
-                pfn = (FUNC_##name)LoadFunction ( #c, #a, #b ); \
+                pfn = (FUNC_##name)LoadFunction ( lib, #c, #a, #b ); \
             return pfn; \
         }
 
-    #define DEFFUNCTION( a,b,c )    _DEFFUNCTION( a##b##c, a,b,c )
+    #define DEFFUNCTION( lib, a,b,c )    _DEFFUNCTION( lib, a##b##c, a,b,c )
 
-    #define _VirtualAllocEx         __VirtualAllocEx()
-    #define _VirtualProtectEx       __VirtualProtectEx()
-    #define _VirtualFreeEx          __VirtualFreeEx()
-    #define _ReadProcessMemory      __ReadProcessMemory()
-    #define _WriteProcessMemory     __WriteProcessMemory()
-    #define _CreateProcessA         __CreateProcessA()
-    #define _CreateRemoteThread     __CreateRemoteThread()
+    #define _VirtualAllocEx                 __VirtualAllocEx()
+    #define _VirtualProtectEx               __VirtualProtectEx()
+    #define _VirtualFreeEx                  __VirtualFreeEx()
+    #define _ReadProcessMemory              __ReadProcessMemory()
+    #define _WriteProcessMemory             __WriteProcessMemory()
+    #define _CreateProcessW                 __CreateProcessW()
+    #define _CreateRemoteThread             __CreateRemoteThread()
+    #define _WscGetSecurityProviderHealth   __WscGetSecurityProviderHealth()
 
-    DEFFUNCTION( Virt,ualAll,ocEx )
-    DEFFUNCTION( Virt,ualPro,tectEx )
-    DEFFUNCTION( Virt,ualFre,eEx )
-    DEFFUNCTION( Read,Proces,sMemory )
-    DEFFUNCTION( Writ,eProce,ssMemory )
-    DEFFUNCTION( Crea,teProc,essA )
-    DEFFUNCTION( Crea,teRemo,teThread )
+    DEFFUNCTION( "kernel32", Virt,ualAll,ocEx )
+    DEFFUNCTION( "kernel32", Virt,ualPro,tectEx )
+    DEFFUNCTION( "kernel32", Virt,ualFre,eEx )
+    DEFFUNCTION( "kernel32", Read,Proces,sMemory )
+    DEFFUNCTION( "kernel32", Writ,eProce,ssMemory )
+    DEFFUNCTION( "kernel32", Crea,teProc,essW )
+    DEFFUNCTION( "kernel32", Crea,teRemo,teThread )
+    DEFFUNCTION( "Wscapi", WscGetSecurityProviderHeal,t,h )
 
 #endif

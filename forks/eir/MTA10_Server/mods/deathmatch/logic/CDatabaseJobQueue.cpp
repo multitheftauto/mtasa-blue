@@ -14,7 +14,7 @@
 #include "CDatabaseJobQueue.h"
 #include "SharedUtil.Thread.h"
 
-uint g_uiDatabaseThreadProcessorNumber = -1;
+SThreadCPUTimesStore g_DatabaseThreadCPUTimes;
 
 typedef CFastList < CDbJobData* > CJobQueueType;
 
@@ -107,8 +107,8 @@ CDatabaseJobQueue* NewDatabaseJobQueue ( void )
 //
 ///////////////////////////////////////////////////////////////
 CDatabaseJobQueueImpl::CDatabaseJobQueueImpl ( void )
-    : m_uiJobCountWarnThresh ( 30 )
-    , m_uiConnectionCountWarnThresh ( 10 )
+    : m_uiJobCountWarnThresh ( 200 )
+    , m_uiConnectionCountWarnThresh ( 20 )
 {
     // Add known database types
     CDatabaseType* pDatabaseTypeSqlite = NewDatabaseTypeSqlite ();
@@ -307,10 +307,11 @@ void CDatabaseJobQueueImpl::UpdateDebugData ( void )
     shared.m_Mutex.Lock ();
 
     // Log to console if job count is creeping up
+    m_uiJobCount10sMin = Min( m_uiJobCount10sMin, m_ActiveJobHandles.size () );
     if ( m_uiJobCount10sMin > m_uiJobCountWarnThresh )
     {
         m_uiJobCountWarnThresh = m_uiJobCount10sMin * 2;
-        CLogger::LogPrintf ( "Notice: There are now %d job handles\n", m_uiJobCount10sMin );
+        CLogger::LogPrintf ( "Notice: %d database query handles active in the last 10 seconds\n", m_uiJobCount10sMin );
     }
     m_JobCountElpasedTime.Reset ();
     m_uiJobCount10sMin = m_ActiveJobHandles.size ();
@@ -352,27 +353,29 @@ bool CDatabaseJobQueueImpl::PollCommand ( CDbJobData* pJobData, uint uiTimeout )
     shared.m_Mutex.Lock ();
     while ( true )
     {
-        // Remove ignored before checking
+        // Should not be called for ignored results
+        dassert ( !pJobData->result.bIgnoreResult );
 
-        if ( !pJobData->result.bIgnoreResult )
+        // Should not be called for collected results
+        dassert ( pJobData->stage != EJobStage::FINISHED );
+
+        // See if result has come in yet
+        if ( ListContains( shared.m_ResultQueue, pJobData ) )
         {
-            if ( ListContains( shared.m_ResultQueue, pJobData ) )
+            ListRemove( shared.m_ResultQueue, pJobData );
+
+            pJobData->stage = EJobStage::FINISHED;
+            MapInsert ( m_FinishedList, pJobData );
+
+            // Do callback incase any cleanup is needed
+            if ( pJobData->HasCallback () )
             {
-                ListRemove( shared.m_ResultQueue, pJobData );
-
-                pJobData->stage = EJobStage::FINISHED;
-                MapInsert ( m_FinishedList, pJobData );
-
-                // Do callback incase any cleanup is needed
-                if ( pJobData->HasCallback () )
-                {
-                    shared.m_Mutex.Unlock ();                 
-                    pJobData->ProcessCallback ();              
-                    shared.m_Mutex.Lock ();
-                }
-
-                bFound = true;
+                shared.m_Mutex.Unlock ();                 
+                pJobData->ProcessCallback ();              
+                shared.m_Mutex.Lock ();
             }
+
+            bFound = true;
         }
 
         if ( bFound || uiTimeout == 0 )
@@ -523,10 +526,12 @@ void* CDatabaseJobQueueImpl::ThreadProc ( void )
     shared.m_Mutex.Lock ();
     while ( !shared.m_bTerminateThread )
     {
+        UpdateThreadCPUTimes( g_DatabaseThreadCPUTimes );
+
         // Is there a waiting command?
         if ( shared.m_CommandQueue.empty () )
         {
-            shared.m_Mutex.Wait ( -1 );
+            shared.m_Mutex.Wait ( 100 );
         }
         else
         {
@@ -537,8 +542,6 @@ void* CDatabaseJobQueueImpl::ThreadProc ( void )
 
             // Process command
             ProcessCommand ( pJobData );
-
-            g_uiDatabaseThreadProcessorNumber = _GetCurrentProcessorNumber ();
 
             // Store result
             shared.m_Mutex.Lock ();
@@ -709,6 +712,7 @@ void CDatabaseJobQueueImpl::ProcessQuery ( CDbJobData* pJobData )
     {
         pJobData->result.status = EJobResult::SUCCESS;
         pJobData->result.uiNumAffectedRows = pConnection->GetNumAffectedRows ();
+        pJobData->result.ullLastInsertId = pConnection->GetLastInsertId ();
     }
 
     // And log if required

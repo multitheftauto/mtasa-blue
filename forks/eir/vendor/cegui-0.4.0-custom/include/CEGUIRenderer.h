@@ -120,9 +120,9 @@ public:
 		The contents of the rendering queue is retained and can be rendered again as required.  If the contents is not required call clearRenderList().
 
 	\return
-		Nothing
+		False if render failed
 	*/
-	virtual	void	doRender(void) = 0;
+	virtual	bool	doRender(void) = 0;
 
 
 	/*!

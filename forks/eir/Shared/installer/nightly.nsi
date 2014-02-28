@@ -7,6 +7,7 @@
 !include GameExplorer.nsh
 !include WinVer.nsh
 !include nsArray.nsh
+!include Utils.nsh
 
 XPStyle on
 RequestExecutionLevel user
@@ -21,6 +22,11 @@ Var AddToGameExplorer
 Var RedistInstalled
 Var ExeMD5
 Var PatchInstalled
+Var DEFAULT_INSTDIR
+Var LAST_INSTDIR
+Var CUSTOM_INSTDIR
+Var WhichRadio
+Var ShowLastUsed
 
 ; Games explorer: With each new X.X, update this GUID and the file at MTA10\launch\NEU\GDFImp.gdf.xml
 !define GUID "{DF780162-2450-4665-9BA2-EAB14ED640A3}"
@@ -42,7 +48,7 @@ Var PatchInstalled
 	!define FILES_MODULE_SDK "Install files builder/output/development/publicsdk"
 	!define INSTALL_OUTPUT "mtasa-${0.0.0}-unstable-00000-0-000-nsis.exe"
 	!define PRODUCT_VERSION "v${0.0.0}-unstable-00000-0-000"
-	!define REVISION "0000"
+	!define REVISION "0"
 !endif
 !ifndef LIGHTBUILD
 	!define INCLUDE_DEVELOPMENT
@@ -53,6 +59,7 @@ Var PatchInstalled
 !endif
 !define EXPAND_DIALOG_X 134
 !define EXPAND_DIALOG_Y 60
+!define DIALOG_X 450
 ; ###########################################################################################################
 
 ;ReserveFile "${NSISDIR}\Plugins\InstallOptions.dll"
@@ -71,6 +78,30 @@ Var PatchInstalled
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
 !define PRODUCT_UNINST_ROOT_KEY "HKLM"
 
+; Set file version information
+!ifndef VI_PRODUCT_VERSION
+    !ifdef REVISION
+        !define VI_PRODUCT_VERSION "${0.0.0}.${REVISION}"
+    !else
+        !define VI_PRODUCT_VERSION "${0.0.0}.0"
+    !endif
+    !define VI_PRODUCT_NAME "MTA San Andreas"
+    !define VI_COMPANY_NAME "Multi Theft Auto"
+    !define VI_LEGAL_COPYRIGHT "(C) 2003 - 2014 Multi Theft Auto"
+    !ifndef LIGHTBUILD
+        !define VI_FILE_DESCRIPTION "Multi Theft Auto Full Installer"
+    !else
+        !define VI_FILE_DESCRIPTION "Multi Theft Auto Nightly Installer"
+    !endif
+!endif
+VIProductVersion "${VI_PRODUCT_VERSION}"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductName" "${VI_PRODUCT_NAME}"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "CompanyName" "${VI_COMPANY_NAME}"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "LegalCopyright" "${VI_LEGAL_COPYRIGHT}"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "FileDescription" "${VI_FILE_DESCRIPTION}"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "FileVersion" "${VI_PRODUCT_VERSION}"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductVersion" "${VI_PRODUCT_VERSION}"
+
 ; MUI 1.67 compatible ------
 !include "MUI.nsh"
 !include "ReplaceSubStr.nsh"
@@ -85,10 +116,7 @@ Var PatchInstalled
 
 ; Welcome page
 !define MUI_WELCOMEPAGE_TITLE_3LINES
-!define MUI_WELCOMEPAGE_TEXT "This wizard will guide you through the installation or update of $(^Name) ${REVISION_TAG}\n\n\
-It is recommended that you close all other applications before starting Setup.\n\n\
-[Admin access may be requested for Vista and up]\n\n\
-Click Next to continue."
+!define MUI_WELCOMEPAGE_TEXT 		"$(WELCOME_TEXT)"
 !define MUI_PAGE_CUSTOMFUNCTION_PRE "WelcomePreProc"
 !define MUI_PAGE_CUSTOMFUNCTION_SHOW "WelcomeShowProc"
 !define MUI_PAGE_CUSTOMFUNCTION_LEAVE "WelcomeLeaveProc"
@@ -110,11 +138,20 @@ Click Next to continue."
 #!insertmacro MUI_PAGE_DIRECTORY
 Page custom CustomDirectoryPage DirectoryLeaveProc
 
+; Language Tools ----
+;Note: Assumes NSIS Unicode edition compiler
+!define MUI_LANGDLL_ALLLANGUAGES
+!define MUI_LANGDLL_REGISTRY_ROOT "HKLM" 
+!define MUI_LANGDLL_REGISTRY_KEY "SOFTWARE\Multi Theft Auto: San Andreas All\${0.0}" 
+!define MUI_LANGDLL_REGISTRY_VALUENAME "Installer Language"
+!insertmacro MUI_RESERVEFILE_LANGDLL ;Solid compression optimization for multilang
+
+; INSERT OUR PAGES
 !define MUI_PAGE_CUSTOMFUNCTION_PRE				SkipDirectoryPage
-!define MUI_PAGE_HEADER_TEXT					"Grand Theft Auto: San Andreas location"
+!define MUI_PAGE_HEADER_TEXT					"$(HEADER_Text)"
 !define MUI_PAGE_HEADER_SUBTEXT					""
-!define MUI_DIRECTORYPAGE_TEXT_DESTINATION		"Grand Theft Auto: San Andreas folder"
-!define MUI_DIRECTORYPAGE_TEXT_TOP				"Please select your Grand Theft Auto: San Andreas folder.$\n$\nYou MUST have Grand Theft Auto: San Andreas 1.0 installed to use MTA:SA, it does not support any other versions.$\n$\nClick Install to begin installing."
+!define MUI_DIRECTORYPAGE_TEXT_DESTINATION		"$(DIRECTORY_Text_Dest)"
+!define MUI_DIRECTORYPAGE_TEXT_TOP				"$(DIRECTORY_Text_Top)"
 !define MUI_DIRECTORYPAGE_VARIABLE				$GTA_DIR
 !define MUI_PAGE_CUSTOMFUNCTION_LEAVE           "GTADirectoryLeaveProc"
 !insertmacro MUI_PAGE_DIRECTORY
@@ -132,26 +169,37 @@ Page custom CustomDirectoryPage DirectoryLeaveProc
 ; Uninstaller pages
 !insertmacro MUI_UNPAGE_INSTFILES
 
+; INSERT OUR LANGUAGE STRINGS -----
+!insertmacro MUI_LANGUAGE "English"
+;@INSERT_TRANSLATIONS@
+
+LangString	WELCOME_TEXT  ${LANG_ENGLISH}	"This wizard will guide you through the installation or update of $(^Name) ${REVISION_TAG}\n\n\
+It is recommended that you close all other applications before starting Setup.\n\n\
+[Admin access may be requested for Vista and up]\n\n\
+Click Next to continue."
+LangString 	HEADER_Text			${LANG_ENGLISH}	"Grand Theft Auto: San Andreas location"
+LangString 	DIRECTORY_Text_Dest	${LANG_ENGLISH}	"Grand Theft Auto: San Andreas folder"
+LangString 	DIRECTORY_Text_Top	${LANG_ENGLISH}	"Please select your Grand Theft Auto: San Andreas folder.$\n$\nYou MUST have Grand Theft Auto: San Andreas 1.0 installed to use MTA:SA, it does not support any other versions.$\n$\nClick Install to begin installing."
+
 ; Language files
-!insertmacro MUI_LANGUAGE							"English"
-LangString DESC_Section10 ${LANG_ENGLISH}			"Create a Start Menu group for installed applications"
-LangString DESC_Section11 ${LANG_ENGLISH}			"Create a Desktop Shortcut for the MTA:SA Client."
-LangString DESC_Section12 ${LANG_ENGLISH}			"Register mtasa:// protocol for browser clickable-ness."
-LangString DESC_Section13 ${LANG_ENGLISH}			"Add to Windows Games Explorer (if present)."
-LangString DESC_Section1 ${LANG_ENGLISH}			"The core components required to run Multi Theft Auto."
-LangString DESC_Section2 ${LANG_ENGLISH}			"The MTA:SA modification, allowing you to play online."
-;LangString DESC_Section3 ${LANG_ENGLISH}			"The Multi Theft Auto:Editor for MTA:SA, allowing you to create and edit maps."
-;LangString DESC_SectionGroupMods ${LANG_ENGLISH}	"Modifications for Multi Theft Auto. Without at least one of these, you cannot play Multi Theft Auto."
-LangString DESC_SectionGroupServer ${LANG_ENGLISH}  "The Multi Theft Auto Server. This allows you to host games from your computer. This requires a fast internet connection."
-LangString DESC_Section4 ${LANG_ENGLISH}			"The Multi Theft Auto server. This is a required component."
-LangString DESC_Section5 ${LANG_ENGLISH}			"The MTA:SA modification for the server."
-LangString DESC_Section6 ${LANG_ENGLISH}			"This is a set of required resources for your server."
-LangString DESC_Section7 ${LANG_ENGLISH}			"This is an optional set of gamemodes and maps for your server."
-LangString DESC_Section8 ${LANG_ENGLISH}			"The MTA:SA 1.0 Map Editor.  This can be used to create your very own maps for use in gamemodes for MTA."
-LangString DESC_Section9 ${LANG_ENGLISH}			"This is the SDK for creating binary modules for the MTA server. Only install if you have a good understanding of C++!"
-;LangString DESC_Blank ${LANG_ENGLISH}			""
-LangString DESC_SectionGroupDev ${LANG_ENGLISH}		"Development code and tools that aid in the creation of mods for Multi Theft Auto"
-LangString DESC_SectionGroupClient ${LANG_ENGLISH}  "The client is the program you run to play on a Multi Theft Auto server"
+LangString	DESC_Section10			${LANG_ENGLISH}	"Create a Start Menu group for installed applications"
+LangString	DESC_Section11			${LANG_ENGLISH}	"Create a Desktop Shortcut for the MTA:SA Client."
+LangString	DESC_Section12			${LANG_ENGLISH}	"Register mtasa:// protocol for browser clickable-ness."
+LangString	DESC_Section13			${LANG_ENGLISH}	"Add to Windows Games Explorer (if present)."
+LangString	DESC_Section1			${LANG_ENGLISH}	"The core components required to run Multi Theft Auto."
+LangString	DESC_Section2			${LANG_ENGLISH}	"The MTA:SA modification, allowing you to play online."
+;LangString	DESC_Section3			${LANG_ENGLISH}	"The Multi Theft Auto:Editor for MTA:SA, allowing you to create and edit maps."
+;LangString	DESC_SectionGroupMods	${LANG_ENGLISH}	"Modifications for Multi Theft Auto. Without at least one of these, you cannot play Multi Theft Auto."
+LangString	DESC_SectionGroupServer  ${LANG_ENGLISH}	"The Multi Theft Auto Server. This allows you to host games from your computer. This requires a fast internet connection."
+LangString	DESC_Section4			${LANG_ENGLISH}	"The Multi Theft Auto server. This is a required component."
+LangString	DESC_Section5			${LANG_ENGLISH}	"The MTA:SA modification for the server."
+LangString	DESC_Section6			${LANG_ENGLISH}	"This is a set of required resources for your server."
+LangString	DESC_Section7			${LANG_ENGLISH}	"This is an optional set of gamemodes and maps for your server."
+LangString	DESC_Section8			${LANG_ENGLISH}	"The MTA:SA 1.0 Map Editor.  This can be used to create your very own maps for use in gamemodes for MTA."
+LangString	DESC_Section9			${LANG_ENGLISH}	"This is the SDK for creating binary modules for the MTA server. Only install if you have a good understanding of C++!"
+;LangString	DESC_Blank			${LANG_ENGLISH}	""
+LangString	DESC_SectionGroupDev		${LANG_ENGLISH}	"Development code and tools that aid in the creation of mods for Multi Theft Auto"
+LangString	DESC_SectionGroupClient  ${LANG_ENGLISH}	"The client is the program you run to play on a Multi Theft Auto server"
 
 
 Function LaunchLink
@@ -166,6 +214,12 @@ Function .onInstFailed
 FunctionEnd
 
 Function .onInit
+	${IfNot} ${UAC_IsInnerInstance}
+		!insertmacro MUI_LANGDLL_DISPLAY  # Only display our language selection in the outer (non-admin) instance
+	${Else}
+		!insertmacro UAC_AsUser_GetGlobalVar $LANGUAGE # Copy our selected language from the outer to the inner instance
+	${EndIf}
+	
 	; #############################################
 	; Remove old shortcuts put in rand(user,admin) startmenu by previous installers (shortcuts now go in all users)
 	SetShellVarContext current
@@ -201,6 +255,18 @@ PostVC90Check:
 		strcpy $Install_Dir "$PROGRAMFILES\MTA San Andreas ${0.0}"
 	${EndIf}
 	strcpy $INSTDIR $Install_Dir
+
+    ; Setup for install dir dialog
+	strcpy $DEFAULT_INSTDIR "$PROGRAMFILES\MTA San Andreas ${0.0}"
+	strcpy $LAST_INSTDIR $Install_Dir
+	strcpy $CUSTOM_INSTDIR $DEFAULT_INSTDIR
+	${If} $DEFAULT_INSTDIR == $LAST_INSTDIR 
+        StrCpy $WhichRadio "default"
+        StrCpy $ShowLastUsed "0"
+	${Else}
+        StrCpy $WhichRadio "last"
+        StrCpy $ShowLastUsed "1"
+	${EndIf}
 
 	; Try to find previously saved GTA:SA install path
 	ReadRegStr $2 HKLM "SOFTWARE\Multi Theft Auto: San Andreas All\Common" "GTA:SA Path"
@@ -300,9 +366,12 @@ Function .onInstSuccess
 	;UAC::Unload ;Must call unload!
 FunctionEnd
 
+LangString INST_CLIENTSERVER ${LANG_ENGLISH}	"Client and Server"
+LangString INST_SERVER ${LANG_ENGLISH}	"Server only"
 
-InstType "Client and Server"
-InstType "Server only"
+
+InstType "$(INST_CLIENTSERVER)"
+InstType "$(INST_SERVER)"
 
 Name "${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION}"
 OutFile "${INSTALL_OUTPUT}"
@@ -312,29 +381,47 @@ InstallDirRegKey HKLM "SOFTWARE\Multi Theft Auto: San Andreas All\${0.0}" "Last 
 ShowInstDetails show
 ShowUnInstDetails show
 
-Section "Start menu group" SEC10
+LangString INST_STARTMENU_GROUP 	${LANG_ENGLISH}	"Start menu group"
+LangString INST_DESKTOP_ICON 		${LANG_ENGLISH}	"Desktop icon"
+LangString INST_PROTOCOL 			${LANG_ENGLISH}	"Register mtasa:// protocol"
+LangString INST_GAMES_EXPLORER 	${LANG_ENGLISH}	"Add to Games Explorer"
+
+Section "$(INST_STARTMENU_GROUP)" SEC10
 	SectionIn 1 2
 	StrCpy $CreateSMShortcuts 1
 SectionEnd
 
-Section "Desktop icon" SEC11
+Section "$(INST_DESKTOP_ICON)" SEC11
 	SectionIn 1 2
 	StrCpy $CreateDesktopIcon 1
 SectionEnd
 
-Section "Register mtasa:// protocol" SEC12
+Section "$(INST_PROTOCOL)" SEC12
 	SectionIn 1 2
 	StrCpy $RegisterProtocol 1
 SectionEnd
 
-Section "Add to Games Explorer" SEC13
+Section "$(INST_GAMES_EXPLORER)" SEC13
 	SectionIn 1 2
 	StrCpy $AddToGameExplorer 1
 SectionEnd
 
+LangString INST_SEC_CLIENT		${LANG_ENGLISH}	"Game client"
+LangString INST_SEC_SERVER		${LANG_ENGLISH}	"Dedicated server"
+LangString INST_SEC_CORE			${LANG_ENGLISH}	"Core components"
+LangString INST_SEC_GAME		 	${LANG_ENGLISH}	"Game module"
 
-SectionGroup /e "Game client" SECGCLIENT
-	Section "Core components" SEC01
+LangString INFO_INPLACE_UPGRADE ${LANG_ENGLISH}	"Performing in-place upgrade..."
+LangString INFO_UPDATE_PERMISSIONS ${LANG_ENGLISH}	"Updating permissions. This could take a few minutes..."
+LangString MSGBOX_INVALID_GTASA ${LANG_ENGLISH}	"A valid Windows version of Grand Theft Auto: San Andreas was not detected.\
+$\r$\nHowever installation will continue.\
+$\r$\nPlease reinstall if there are problems later."
+LangString INST_SEC_CORE_RESOURCES ${LANG_ENGLISH}	"Core Resources"
+LangString INST_SEC_OPTIONAL_RESOURCES ${LANG_ENGLISH}	"Optional Resources"
+LangString INST_SEC_EDITOR ${LANG_ENGLISH}	"Editor"
+
+SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
+	Section "$(INST_SEC_CORE)" SEC01
 		SectionIn 1 RO ; section is required
 		
 		StrCmp "$RedistInstalled" "1" DontInstallRedist
@@ -350,8 +437,9 @@ DontInstallRedist:
         Call GetInstallType
         Pop $0
         Pop $1
+
         ${If} $0 == "upgrade"
-            DetailPrint "Performing in-place upgrade..."
+            DetailPrint "$(INFO_INPLACE_UPGRADE)"
             Sleep 1000
         ${EndIf}
 		#############################################################
@@ -373,10 +461,26 @@ DontInstallRedist:
         # Make the directory "$GTA_DIR" read write accessible by all users
 
         ${If} ${AtLeastWinVista}
-            DetailPrint "Updating permissions. This could take a few minutes..."
+            DetailPrint "$(INFO_UPDATE_PERMISSIONS)"
 
             # Fix permissions for MTA install directory
-            FastPerms::FullAccessPlox "$INSTDIR"
+            StrCpy $0 "$PROGRAMFILES\M"
+            StrLen $2 $0
+            StrCpy $1 "$INSTDIR" $2
+            ${If} $0 == $1
+                FastPerms::FullAccessPlox "$INSTDIR"
+            ${Else}
+                # More conservative permissions blat if install directory it too different from default
+                CreateDirectory "$INSTDIR\mods"
+                CreateDirectory "$INSTDIR\screenshots"
+                CreateDirectory "$INSTDIR\server"
+                CreateDirectory "$INSTDIR\skins"
+                FastPerms::FullAccessPlox "$INSTDIR\mods"
+                FastPerms::FullAccessPlox "$INSTDIR\MTA"
+                FastPerms::FullAccessPlox "$INSTDIR\screenshots"
+                FastPerms::FullAccessPlox "$INSTDIR\server"
+                FastPerms::FullAccessPlox "$INSTDIR\skins"
+            ${EndIf}
             FastPerms::FullAccessPlox "$APPDATA\MTA San Andreas All"
 
             # Remove MTA virtual store
@@ -448,9 +552,7 @@ DontInstallRedist:
 			${EndSwitch}					
 			
 		NoExeFound:
-			MessageBox MB_ICONSTOP "A valid Windows® version of Grand Theft Auto: San Andreas was not detected.\
-			$\r$\nHowever installation will continue.\
-			$\r$\nPlease reinstall if there are problems later."
+			MessageBox MB_ICONSTOP "$(MSGBOX_INVALID_GTASA)"
 		CompletePatchProc:
 		
 		SetOutPath "$INSTDIR\MTA"
@@ -462,18 +564,33 @@ DontInstallRedist:
 		SetOutPath "$INSTDIR\MTA"
 		File "${FILES_ROOT}\MTA San Andreas\mta\cgui.dll"
 		File "${FILES_ROOT}\MTA San Andreas\mta\core.dll"
-		File "${FILES_ROOT}\MTA San Andreas\mta\xmll.dll"
+		File "${SERVER_FILES_ROOT}\xmll.dll"
 		File "${FILES_ROOT}\MTA San Andreas\mta\game_sa.dll"
 		File "${FILES_ROOT}\MTA San Andreas\mta\multiplayer_sa.dll"
 		File "${FILES_ROOT}\MTA San Andreas\mta\netc.dll"
-		File "${FILES_ROOT}\MTA San Andreas\mta\libcurl.dll"
+		File "${SERVER_FILES_ROOT}\libcurl.dll"
 		File "${FILES_ROOT}\MTA San Andreas\mta\loader.dll"
+        ; The files below can be moved out of the LIGHTBUILD zone at some point
         File "${FILES_ROOT}\MTA San Andreas\mta\bass_fx.dll"
         File "${FILES_ROOT}\MTA San Andreas\mta\tags.dll"
-		File "${FILES_ROOT}\MTA San Andreas\mta\pthreadVC2.dll"
+		File "${SERVER_FILES_ROOT}\pthreadVC2.dll"
+        File "${FILES_ROOT}\MTA San Andreas\mta\XInput9_1_0_mta.dll"
+        File "${FILES_ROOT}\MTA San Andreas\mta\vea.dll"
+        File "${FILES_ROOT}\MTA San Andreas\mta\vog.dll"
+        File "${FILES_ROOT}\MTA San Andreas\mta\vvo.dll"
+        File "${FILES_ROOT}\MTA San Andreas\mta\vvof.dll"
+        SetOutPath "$INSTDIR\MTA\cgui\images"
+        File "${FILES_ROOT}\MTA San Andreas\mta\cgui\images\busy_spinner.png"
+
+
+		${If} "$(LANGUAGE_CODE)" != ""
+			# Write our language to registry
+			WriteRegStr HKLM "SOFTWARE\Multi Theft Auto: San Andreas All\${0.0}\Settings\general" "locale" "$(LANGUAGE_CODE)"
+		${EndIf}
 
         !ifndef LIGHTBUILD
 
+		    SetOutPath "$INSTDIR\MTA"
 			File "${FILES_ROOT}\MTA San Andreas\mta\d3dx9_42.dll"
 			File "${FILES_ROOT}\MTA San Andreas\mta\D3DCompiler_42.dll"
 			File "${FILES_ROOT}\MTA San Andreas\mta\bass.dll"
@@ -485,7 +602,6 @@ DontInstallRedist:
 			File "${FILES_ROOT}\MTA San Andreas\mta\bassmix.dll"
 			File "${FILES_ROOT}\MTA San Andreas\mta\chatboxpresets.xml"
 			File "${FILES_ROOT}\MTA San Andreas\mta\sa.dat"
-            File "${FILES_ROOT}\MTA San Andreas\mta\XInput9_1_0_mta.dll"
 
             SetOutPath "$INSTDIR\skins\Classic"
             File "${FILES_ROOT}\MTA San Andreas\skins\Classic\CGUI.is.xml"
@@ -529,6 +645,10 @@ DontInstallRedist:
 
             SetOutPath "$INSTDIR\MTA\cgui\images\serverbrowser"
             File "${FILES_ROOT}\MTA San Andreas\mta\cgui\images\serverbrowser\*.png"
+			
+			SetOutPath "$INSTDIR\MTA\locale\"
+			File /r "${FILES_ROOT}\MTA San Andreas\mta\locale\*.png"
+			File /r "${FILES_ROOT}\MTA San Andreas\mta\locale\*.po"
 
 		!endif
 
@@ -550,17 +670,18 @@ DontInstallRedist:
         Call DoServiceInstall
 	SectionEnd
 
-	Section "Game module" SEC02
+	Section "$(INST_SEC_GAME)" SEC02
 		SectionIn 1 RO
 		SetOutPath "$INSTDIR\mods\deathmatch"
 		File "${FILES_ROOT}\MTA San Andreas\mods\deathmatch\Client.dll"
-		File "${SERVER_FILES_ROOT}\mods\deathmatch\lua5.1.dll"
+		File "${FILES_ROOT}\MTA San Andreas\mods\deathmatch\lua5.1c.dll"
+		File "${SERVER_FILES_ROOT}\mods\deathmatch\pcre3.dll"
 		SetOutPath "$INSTDIR\mods\deathmatch\resources"
 	SectionEnd
 SectionGroupEnd
 
-SectionGroup /e "Dedicated server" SECGSERVER
-	Section "Core components" SEC04
+SectionGroup /e "$(INST_SEC_SERVER)" SECGSERVER
+	Section "$(INST_SEC_CORE)" SEC04
 		SectionIn 1 2 RO ; section is required
 		
 		StrCmp "$RedistInstalled" "1" DontInstallRedist
@@ -579,7 +700,7 @@ SectionGroup /e "Dedicated server" SECGSERVER
 		File "${SERVER_FILES_ROOT}\pthreadVC2.dll"
 	SectionEnd
 
-	Section "Game module" SEC05
+	Section "$(INST_SEC_GAME)" SEC05
 		SectionIn 1 2 RO ; section is required
 		SetOutPath "$INSTDIR\server\mods\deathmatch"
 		
@@ -587,7 +708,6 @@ SectionGroup /e "Dedicated server" SECGSERVER
 		File "${SERVER_FILES_ROOT}\mods\deathmatch\deathmatch.dll"
 		File "${SERVER_FILES_ROOT}\mods\deathmatch\lua5.1.dll"
 		File "${SERVER_FILES_ROOT}\mods\deathmatch\pcre3.dll"
-		File "${SERVER_FILES_ROOT}\mods\deathmatch\sqlite3.dll"
 		File "${SERVER_FILES_ROOT}\mods\deathmatch\dbconmy.dll"
 		!ifndef LIGHTBUILD
             File "${SERVER_FILES_ROOT}\mods\deathmatch\libmysql.dll"
@@ -616,7 +736,7 @@ SectionGroup /e "Dedicated server" SECGSERVER
 	SectionEnd
 
 	!ifndef LIGHTBUILD
-		Section "Core resources" SEC06
+		Section "$(INST_SEC_CORE_RESOURCES)" SEC06
 		SectionIn 1 2 ; RO section is now optional
 			SetOutPath "$INSTDIR\server\mods\deathmatch\resources\"
             File "${SERVER_FILES_ROOT}\mods\deathmatch\resources\Directory layout readme.txt"
@@ -637,7 +757,7 @@ SectionGroup /e "Dedicated server" SECGSERVER
 	!endif
 
 	!ifndef LIGHTBUILD
-		SectionGroup "Optional Resources" SEC07
+		SectionGroup "$(INST_SEC_OPTIONAL_RESOURCES)" SEC07
 			Section "AMX Emulation package"
 			SectionIn 1 2
 				SetOutPath "$INSTDIR\server\mods\deathmatch\resources\[gamemodes]\[amx]"
@@ -712,9 +832,9 @@ SectionGroup /e "Dedicated server" SECGSERVER
 		SectionEnd
 		SectionGroupEnd
 	!endif
-
+	
 	!ifdef INCLUDE_EDITOR
-		Section "Editor" SEC08
+		Section "$(INST_SEC_EDITOR)" SEC08
 			SectionIn 1 2
 			SetOutPath "$INSTDIR\server\mods\deathmatch\resources\[editor]"
 			SetOverwrite ifnewer
@@ -724,8 +844,9 @@ SectionGroup /e "Dedicated server" SECGSERVER
 
 SectionGroupEnd
 
+LangString INST_SEC_DEVELOPER ${LANG_ENGLISH}	"Development"
 !ifdef INCLUDE_DEVELOPMENT
-	SectionGroup /e "Development" SECGDEV
+	SectionGroup /e "$(INST_SEC_DEVELOPER)" SECGDEV
 		Section /o "Module SDK" SEC09
 			SetOutPath "$INSTDIR\development\module SDK"
 			SetOverwrite ifnewer
@@ -768,33 +889,42 @@ Section -Post
 	WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "Publisher" "${PRODUCT_PUBLISHER}"
 SectionEnd
 
+LangString UNINST_SUCCESS ${LANG_ENGLISH}	"$(^Name) was successfully removed from your computer."
 Function un.onUninstSuccess
 	HideWindow
-	MessageBox MB_ICONINFORMATION|MB_OK "$(^Name) was successfully removed from your computer."
+	MessageBox MB_ICONINFORMATION|MB_OK "$(UNINST_SUCCESS)"
 	;UAC::Unload ;Must call unload! ; #3017 fix
 FunctionEnd
 
+LangString UNINST_FAIL ${LANG_ENGLISH}	"Uninstallation has failed!"
 Function un.OnUnInstFailed
 	HideWindow
-	MessageBox MB_ICONSTOP|MB_OK "Uninstallation has failed!"
+	MessageBox MB_ICONSTOP|MB_OK "$(UNINST_FAIL)"
 	;UAC::Unload ;Must call unload! ; #3017 fix
 FunctionEnd
 
  
+LangString UNINST_REQUEST ${LANG_ENGLISH}	"Are you sure you want to completely remove $(^Name) and all of its components?"
+LangString UNINST_REQUEST_NOTE ${LANG_ENGLISH}	"Uninstalling before update?\
+$\r$\nIt is not necessary to uninstall before installing a new version of MTA:SA\
+$\r$\nRun the new installer to upgrade and preserve your settings."
+
 Function un.onInit
 	Call un.DoRightsElevation
 	SetShellVarContext all
-
-		MessageBox MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2 "Are you sure you want to completely remove $(^Name) and all of its components?" IDYES +2
+		MessageBox MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2 "$(UNINST_REQUEST_NOTE)$\r$\n$\r$\n$\r$\n$(UNINST_REQUEST)" IDYES +2
 		Abort
+		
+	!insertmacro MUI_UNGETLANGUAGE
 FunctionEnd
 
+LangString UNINST_DATA_REQUEST ${LANG_ENGLISH}	"Would you like to keep your data files (such as resources, screenshots and server configuration)? If you click no, any resources, configurations or screenshots you have created will be lost."
 Section Uninstall
 	IfFileExists "$INSTDIR\server\mods\deathmatch\resources\*.*" ask 0 ;no maps folder, so delete everything
 	IfFileExists "$INSTDIR\screenshots\*.*" ask 0 ;no maps folder, so delete everything
 	IfFileExists "$INSTDIR\mods\deathmatch\resources\*.*" ask deleteall ;no maps folder, so delete everything
 	ask:
-	MessageBox MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2 "Would you like to keep your data files (such as resources, screenshots and server configuration)? If you click no, any resources, configurations or screenshots you have created will be lost." IDYES preservemapsfolder
+	MessageBox MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2 "$(UNINST_DATA_REQUEST)" IDYES preservemapsfolder
 
 	deleteall:
     Call un.DoServiceUninstall
@@ -834,6 +964,8 @@ Section Uninstall
 	Delete "$INSTDIR\Uninstall.exe"
 
 	Delete "$INSTDIR\mods\deathmatch\Client.dll"
+	Delete "$INSTDIR\mods\deathmatch\lua5.1c.dll"
+	Delete "$INSTDIR\mods\deathmatch\pcre3.dll"
 
 	RmDir /r "$INSTDIR\MTA\cgui"
 	RmDir /r "$INSTDIR\MTA\data"
@@ -879,6 +1011,11 @@ FunctionEnd
 
 Var REDIST
 
+LangString MSGBOX_VSRED_ERROR1 ${LANG_ENGLISH}	"Unable to download Microsoft Visual Studio 2008 SP1 redistributable"
+LangString MSGBOX_VSRED_ERROR2 ${LANG_ENGLISH}	"Unable to install Microsoft Visual Studio 2008 SP1 redistributable"
+LangString MSGBOX_VSRED_ERROR3 ${LANG_ENGLISH}	"Unable to download Microsoft Visual Studio 2008 SP1 redistributable.\
+$\r$\nHowever installation will continue.\
+$\r$\nPlease reinstall if there are problems later."
 Function InstallVC90Redistributable
 	DetailPrint "Installing Microsoft Visual Studio 2008 SP1 redistributable ..."
 	StrCpy $REDIST "$TEMP\vcredist_x86.exe"
@@ -889,7 +1026,7 @@ Function InstallVC90Redistributable
 	DetailPrint "* Download of Microsoft Visual Studio 2008 SP1 redistributable failed:"
 	DetailPrint "* $0"
 	DetailPrint "* Installation continuing anyway"
-	MessageBox MB_ICONSTOP "Unable to download Microsoft Visual Studio 2008 SP1 redistributable"
+	MessageBox MB_ICONSTOP "$(MSGBOX_VSRED_ERROR1)"
 	Goto InstallEnd
 	
 DownloadSuccessful:
@@ -906,14 +1043,13 @@ VC90RedistInstallFailed:
 	DetailPrint "* Some error occured installing Microsoft Visual Studio 2008 SP1 redistributable"
 	DetailPrint "* It is required in order to run Multi Theft Auto : San Andreas"
 	DetailPrint "* Installation continuing anyway"
-	MessageBox MB_ICONSTOP "Unable to install Microsoft Visual Studio 2008 SP1 redistributable"
+	MessageBox MB_ICONSTOP "$(MSGBOX_VSRED_ERROR2)"
 
+	
 InstallEnd:
 
 	StrCmp "$RedistInstalled" "1" InstallEnd2
-	MessageBox MB_ICONSTOP "Unable to download Microsoft Visual Studio 2008 SP1 redistributable.\
-	$\r$\nHowever installation will continue.\
-	$\r$\nPlease reinstall if there are problems later."
+	MessageBox MB_ICONSTOP "$(MSGBOX_VSRED_ERROR3)"
 	StrCpy $RedistInstalled "1"
 
 InstallEnd2:
@@ -924,6 +1060,8 @@ FunctionEnd
 ;====================================================================================
 Var PATCHFILE
 
+LangString MSGBOX_PATCH_FAIL1 ${LANG_ENGLISH}	"Unable to download the patch file for your version of Grand Theft Auto: San Andreas"
+LangString MSGBOX_PATCH_FAIL2 ${LANG_ENGLISH}	"Unable to install the patch file for your version of Grand Theft Auto: San Andreas"
 Function InstallPatch
 	DetailPrint "Incompatible version of San Andreas detected.  Patching executable..."
 	StrCpy $PATCHFILE "$TEMP\$ExeMD5.GTASAPatch"
@@ -934,7 +1072,7 @@ Function InstallPatch
 	DetailPrint "* Download of patch file failed:"
 	DetailPrint "* $0"
 	DetailPrint "* Installation continuing anyway"
-	MessageBox MB_ICONSTOP "Unable to download the patch file for your version of Grand Theft Auto: San Andreas"
+	MessageBox MB_ICONSTOP "$(MSGBOX_PATCH_FAIL1)"
 	StrCpy $PatchInstalled "0"
 	Goto FinishPatch
 	
@@ -955,7 +1093,7 @@ PatchDownloadSuccessful:
 	DetailPrint "* $R0"
 	DetailPrint "* It is required in order to run Multi Theft Auto : San Andreas"
 	DetailPrint "* Installation continuing anyway"
-	MessageBox MB_ICONSTOP "Unable to install the patch file for your version of Grand Theft Auto: San Andreas"
+	MessageBox MB_ICONSTOP MSGBOX_PATCH_FAIL2
 	StrCpy $PatchInstalled "0"
 	
 	FinishPatch:
@@ -964,8 +1102,11 @@ FunctionEnd
 ;====================================================================================
 ; UAC related functions
 ;====================================================================================
-
-!macro RightsElevation un
+LangString UAC_RIGHTS1 ${LANG_ENGLISH}	"This installer requires admin access, try again"
+LangString UAC_RIGHTS_UN ${LANG_ENGLISH}	"This uninstaller requires admin access, try again"
+LangString UAC_RIGHTS3 ${LANG_ENGLISH}	"Logon service not running, aborting!"
+LangString UAC_RIGHTS4 ${LANG_ENGLISH}	"Unable to elevate"
+!macro RightsElevation AdminError
     uac_tryagain:
     !insertmacro UAC_RunElevated
     #MessageBox mb_TopMost "0=$0 1=$1 2=$2 3=$3"
@@ -974,27 +1115,27 @@ FunctionEnd
         ${IfThen} $1 = 1 ${|} Quit ${|} ;we are the outer process, the inner process has done its work, we are done
         ${IfThen} $3 <> 0 ${|} ${Break} ${|} ;we are admin, let the show go on
         ${If} $1 = 3 ;RunAs completed successfully, but with a non-admin user
-            MessageBox mb_IconExclamation|mb_TopMost|mb_SetForeground "This ${un}installer requires admin access, try again" /SD IDNO IDOK uac_tryagain IDNO 0
+            MessageBox mb_IconExclamation|mb_TopMost|mb_SetForeground "${AdminError}" /SD IDNO IDOK uac_tryagain IDNO 0
         ${EndIf}
         ;fall-through and die
     ${Case} 1223
-        MessageBox mb_IconStop|mb_TopMost|mb_SetForeground "This ${un}installer requires admin privileges, aborting!"
+        MessageBox mb_IconStop|mb_TopMost|mb_SetForeground "${AdminError}"
         Quit
     ${Case} 1062
-        MessageBox mb_IconStop|mb_TopMost|mb_SetForeground "Logon service not running, aborting!"
+        MessageBox mb_IconStop|mb_TopMost|mb_SetForeground "$(UAC_RIGHTS3)"
         Quit
     ${Default}
-        MessageBox mb_IconStop|mb_TopMost|mb_SetForeground "Unable to elevate , error $0"
+        MessageBox mb_IconStop|mb_TopMost|mb_SetForeground "$(UAC_RIGHTS4), error $0"
         Quit
     ${EndSwitch}
 !macroend
 
 Function DoRightsElevation
-    !insertmacro RightsElevation ""
+    !insertmacro RightsElevation "$(UAC_RIGHTS1)"
 FunctionEnd
 
 Function un.DoRightsElevation
-    !insertmacro RightsElevation "un"
+    !insertmacro RightsElevation "$(UAC_RIGHTS_UN)"
 FunctionEnd
 
 
@@ -1455,18 +1596,24 @@ Function GetVersionAtLocation
 FunctionEnd
 
 
+LangString INST_MTA_CONFLICT ${LANG_ENGLISH}	"A different major version of MTA ($1) already exists at that path.$\n$\n\ 
+			MTA is designed for major versions to be installed in different paths.$\n \
+            Are you sure you want to overwrite MTA $1 at \
+            $INSTDIR ?"
+LangString INST_GTA_ERROR1 ${LANG_ENGLISH} "The selected directory does not exist.$\n$\n\
+            Please select the GTA:SA install directory"
+LangString INST_GTA_ERROR2 ${LANG_ENGLISH} "Could not find GTA:SA installed at $GTA_DIR $\n$\n\
+            Are you sure you want to continue ?"
+			
 Function "DirectoryLeaveProc"
+    Call CustomDirectoryPageUpdateINSTDIR
 	Push $INSTDIR 
 	Call GetInstallType
 	Pop $0
 	Pop $1
-
 	${If} $0 == "overwrite"
         MessageBox MB_OKCANCEL|MB_ICONQUESTION|MB_TOPMOST|MB_SETFOREGROUND \
-            "A different major version of MTA ($1) already exists at that path.$\n$\n\
-            MTA is designed for major versions to be installed in different paths.$\n \
-            Are you sure you want to overwrite MTA $1 at \
-            $INSTDIR ?" \
+            "$(INST_MTA_CONFLICT)" \
             IDOK cont
             Abort
         cont:
@@ -1479,16 +1626,14 @@ Function "GTADirectoryLeaveProc"
     ; Directory must exist
     IfFileExists "$GTA_DIR\*.*" hasdir
         MessageBox MB_ICONEXCLAMATION|MB_TOPMOST|MB_SETFOREGROUND \
-            "The selected directory does not exist.$\n$\n\
-            Please select the GTA:SA install directory"
+            "$(INST_GTA_ERROR1)"
             Abort
     hasdir:
 
     ; data subdirectory should exist
     IfFileExists "$GTA_DIR\data\*.*" cont
         MessageBox MB_OKCANCEL|MB_ICONQUESTION|MB_TOPMOST|MB_SETFOREGROUND \
-            "Could not find GTA:SA installed at $GTA_DIR $\n$\n\
-            Are you sure you want to continue ?" \
+            "$(INST_GTA_ERROR2)" \
             IDOK cont1
             Abort
         cont1:
@@ -1507,10 +1652,32 @@ FunctionEnd
 Var Dialog
 Var UpgradeLabel
 Var BrowseButton
+Var SetDefaultButton
 Var DirRequest
+Var RadioDefault
+Var LabelDefault
+Var RadioLastUsed
+Var LabelLastUsed
+Var RadioCustom
+Var Length
+Var SizeX
+Var SizeY
+Var PosX
+Var PosY
 !define LT_GREY "0xf0f0f0"
-!define MID_GREY "0x808080"
+!define MID_GREY "0xb0b0b0"
+!define BLACK "0x000000"
+!define WHITE "0xF0F0F0"
 
+LangString INST_CHOOSE_LOC_TOP ${LANG_ENGLISH}	"Choose Install Location"
+LangString INST_CHOOSE_LOC ${LANG_ENGLISH}	"Choose the folder in which to install ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION}"
+LangString INST_CHOOSE_LOC2 ${LANG_ENGLISH}	"${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} will be installed in the following folder.$\n\
+To install in a different folder, click Browse and select another folder.$\n$\n Click Next to continue."
+LangString INST_CHOOSE_LOC3 ${LANG_ENGLISH}	"Destination Folder"
+LangString INST_CHOOSE_LOC_BROWSE ${LANG_ENGLISH}	"Browse..."
+LangString INST_CHOOSE_LOC_DEFAULT ${LANG_ENGLISH} "Default"
+LangString INST_CHOOSE_LOC_LAST_USED ${LANG_ENGLISH} "Last used"
+LangString INST_CHOOSE_LOC_CUSTOM ${LANG_ENGLISH} "Custom"
 Function CustomDirectoryPage
 
 	nsDialogs::Create 1018
@@ -1520,58 +1687,180 @@ Function CustomDirectoryPage
 	${EndIf}
 
     GetDlgItem $0 $HWNDPARENT 1037
-    ${NSD_SetText} $0 "Choose Install Location"
+    ${NSD_SetText} $0 "$(INST_CHOOSE_LOC)"
     GetDlgItem $0 $HWNDPARENT 1038
-    ${NSD_SetText} $0 "Choose the folder in which to install ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION}"
+    ${NSD_SetText} $0 "$(INST_CHOOSE_LOC)"
 
-	${NSD_CreateLabel} 0 0 100% 50u "${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} will be installed in the following folder.$\n\
-To install in a different folder, click Browse and select another folder.$\n$\n Click Next to continue."
+	${NSD_CreateLabel} 0 0 100% 50u "$(INST_CHOOSE_LOC2)"
 	Pop $0
 
-	${NSD_CreateLabel} 20 190 100% 12u ""
+    # Calculate size and position of install dir options
+    IntOp $SizeY 27 + 90    # 27 + 30 + 30 + 30
+	${If} $ShowLastUsed == "0"
+        IntOp $SizeY $SizeY - 30
+	${EndIf}
+    IntOp $PosY 187 - $SizeY
+
+    # Add group box
+	${NSD_CreateGroupBox} 0 $PosY 100% $SizeY "$(INST_CHOOSE_LOC3)"
+	Pop $0
+    IntOp $PosY $PosY + 24
+	
+	# Pick the longest string and use that as SizeX
+	!insertmacro GetTextExtent "$(INST_CHOOSE_LOC_DEFAULT)" $SizeX
+	!insertmacro GetTextExtent "$(INST_CHOOSE_LOC_LAST_USED)" $Length
+	!insertmacro Max $SizeX $Length
+	!insertmacro GetTextExtent "$(INST_CHOOSE_LOC_CUSTOM)" $Length
+	!insertmacro Max $SizeX $Length
+	
+	IntOp $SizeX $SizeX + 6 # Take into account the radio button itself
+    IntOp $PosX $SizeX + 20	# Take into account the x padding of 10, plus spacing of 15
+	IntOp $Length ${DIALOG_X} - $PosX # [Total width] - [radio button width]
+	IntOp $Length $Length - 10 # [Total width] - [radio button width] - [padding]
+    # Add default option
+    ${NSD_CreateRadioButton} 10 $PosY $SizeX 12u "$(INST_CHOOSE_LOC_DEFAULT)"
+	Pop $RadioDefault
+	${NSD_CreateText} $PosX $PosY $Length 12u $DEFAULT_INSTDIR
+	Pop $LabelDefault
+    SendMessage $LabelDefault ${EM_SETREADONLY} 1 0
+    IntOp $PosY $PosY + 30
+
+    # Add last used option
+	${If} $ShowLastUsed != "0"
+        ${NSD_CreateRadioButton} 10 $PosY $SizeX 12u "$(INST_CHOOSE_LOC_LAST_USED)"
+        Pop $RadioLastUsed
+        ${NSD_CreateText} $PosX $PosY $Length 12u $LAST_INSTDIR
+        Pop $LabelLastUsed
+        SendMessage $LabelLastUsed ${EM_SETREADONLY} 1 0
+        IntOp $PosY $PosY + 30
+	${EndIf}
+
+    # Add custom option
+    ${NSD_CreateRadioButton} 10 $PosY $SizeX 12u "$(INST_CHOOSE_LOC_CUSTOM)"
+	Pop $RadioCustom
+	
+	!insertmacro GetTextExtent "$(INST_CHOOSE_LOC_BROWSE)" $R9
+	IntOp $R9 $R9 + 5 # Add spacing for the button on top of text
+	IntOp $Length $Length - $R9
+	${NSD_CreateDirRequest} $PosX $PosY $Length 12u $CUSTOM_INSTDIR
+	Pop $DirRequest
+    IntOp $PosY $PosY - 1
+	IntOp $PosX ${DIALOG_X} - $R9
+	IntOp $PosX $PosX - 10
+	${NSD_CreateBrowseButton} $PosX $PosY $R9 13u "$(INST_CHOOSE_LOC_BROWSE)"
+	Pop $BrowseButton
+    IntOp $PosY $PosY + 31
+
+    ${NSD_OnClick} $RadioDefault CustomDirectoryPageRadioClick
+    ${NSD_OnClick} $RadioLastUsed CustomDirectoryPageRadioClick
+    ${NSD_OnClick} $RadioCustom CustomDirectoryPageRadioClick
+    ${NSD_OnClick} $BrowseButton CustomDirectoryPageBrowseButtonClick
+    ${NSD_OnClick} $SetDefaultButton CustomDirectoryPageSetDefaultButtonClick
+    ${NSD_OnChange} $DirRequest CustomDirectoryPageDirRequestChange
+
+    # Install type message
+	${NSD_CreateLabel} 0 203 100% 12u ""
 	Pop $UpgradeLabel
-    SetCtlColors $UpgradeLabel ${MID_GREY} ${LT_GREY}
     Call CustomDirectoryPageSetUpgradeMessage
 
-	${NSD_CreateGroupBox} 0 115 100% 37u "Destination Folder"
-	Pop $0
-	${NSD_CreateDirRequest} 15 139 72% 12u $INSTDIR
-	Pop $DirRequest
-	${NSD_CreateBrowseButton} 77% 135 20% 15u "Browse..."
-	Pop $BrowseButton
-    ${NSD_OnClick} $BrowseButton CustomDirectoryPageBrowseButtonClick
-    ${NSD_OnChange} $DirRequest CustomDirectoryPageDirRequestChange
+    Call CustomDirectoryPageShowWhichRadio
 
     Call DirectoryShowProc
     nsDialogs::Show
 FunctionEnd
 
+# Called when radion button is clicked
+Function CustomDirectoryPageRadioClick
+    Pop $0
+    ${Switch} $0
+        ${Case} $RadioDefault
+            StrCpy $WhichRadio "default"
+            ${Break}
+        ${Case} $RadioLastUsed
+            StrCpy $WhichRadio "last"
+            ${Break}
+        ${Case} $RadioCustom
+            StrCpy $WhichRadio "custom"
+            ${Break}
+    ${EndSwitch}
+    Call CustomDirectoryPageShowWhichRadio
+FunctionEnd
+
+# Ensure GUI reflects $WhichRadio
+Function CustomDirectoryPageShowWhichRadio
+    # Set all options as not selected
+    SetCtlColors $LabelDefault ${MID_GREY} ${LT_GREY}
+    SetCtlColors $LabelLastUsed ${MID_GREY} ${LT_GREY}
+    SetCtlColors $DirRequest ${MID_GREY} ${WHITE}
+    SendMessage $DirRequest ${EM_SETREADONLY} 1 0
+    EnableWindow $BrowseButton 0
+
+    # Highlight selected option
+    ${Switch} $WhichRadio
+        ${Case} "default"
+            StrCpy $INSTDIR $DEFAULT_INSTDIR
+            ${NSD_SetState} $RadioDefault ${BST_CHECKED}
+            SetCtlColors $LabelDefault ${BLACK} ${LT_GREY}
+            ${Break}
+        ${Case} "last"
+            StrCpy $INSTDIR $LAST_INSTDIR
+            ${NSD_SetState} $RadioLastUsed ${BST_CHECKED}
+            SetCtlColors $LabelLastUsed ${BLACK} ${LT_GREY}
+            ${Break}
+        ${Case} "custom"
+            StrCpy $INSTDIR $CUSTOM_INSTDIR
+            ${NSD_SetState} $RadioCustom ${BST_CHECKED}
+            SetCtlColors $DirRequest ${WHITE}
+            SendMessage $DirRequest ${EM_SETREADONLY} 0 0
+            EnableWindow $BrowseButton 1
+            ${Break}
+    ${EndSwitch}
+
+    # Redraw controls
+    ${NSD_GetText} $LabelDefault $0
+    ${NSD_SetText} $LabelDefault $0
+    ${NSD_GetText} $LabelLastUsed $0
+    ${NSD_SetText} $LabelLastUsed $0
+    ${NSD_GetText} $DirRequest $0
+    ${NSD_SetText} $DirRequest $0
+FunctionEnd
+
 Function CustomDirectoryPageDirRequestChange
     ${NSD_GetText} $DirRequest $0
 	${If} $0 != error
-		StrCpy $INSTDIR $0
+		StrCpy $CUSTOM_INSTDIR $0
         Call CustomDirectoryPageSetUpgradeMessage
 	${EndIf}
 FunctionEnd
+
+Function CustomDirectoryPageSetDefaultButtonClick
+    StrCpy $INSTDIR "$PROGRAMFILES\MTA San Andreas ${0.0}"
+    ${NSD_SetText} $DirRequest $INSTDIR
+    Call CustomDirectoryPageSetUpgradeMessage
+FunctionEnd
+
+LangString INST_CHOOSE_LOC4 ${LANG_ENGLISH}	"Select the folder to install ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} in:"
 
 Function CustomDirectoryPageBrowseButtonClick
     ${NSD_GetText} $DirRequest $0
 
     Call CreateDirectoryAndRememberWhichOnesWeDid
-
-    nsDialogs::SelectFolderDialog "Select the folder to install ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} in:" $0
+    nsDialogs::SelectFolderDialog "$(INST_CHOOSE_LOC4)" $0
 	Pop $0
 
     Call RemoveDirectoriesWhichWeDid
 
 	${If} $0 != error
-		StrCpy $INSTDIR $0
+		StrCpy $CUSTOM_INSTDIR $0
         ${NSD_SetText} $DirRequest $0
         Call CustomDirectoryPageSetUpgradeMessage
 	${EndIf}
 FunctionEnd
 
+LangString INST_LOC_OW ${LANG_ENGLISH}	"Warning: A different major version of MTA ($1) already exists at that path."
+LangString INST_LOC_UPGRADE ${LANG_ENGLISH}	"Installation type:  Upgrade"
 Function CustomDirectoryPageSetUpgradeMessage
+    Call CustomDirectoryPageUpdateINSTDIR
 	Push $INSTDIR 
 	Call GetInstallType
 	Pop $0
@@ -1582,8 +1871,23 @@ Function CustomDirectoryPageSetUpgradeMessage
         ${NSD_SetText} $UpgradeLabel "Warning: A different major version of MTA ($1) already exists at that path."
 	${Endif}
 	${If} $0 == "upgrade"
-        ${NSD_SetText} $UpgradeLabel "Existing installation detected. Will perform in-place upgrade."
+        ${NSD_SetText} $UpgradeLabel "$(INST_LOC_UPGRADE)"
 	${Endif}
+FunctionEnd
+
+# Make absolutely sure $INSTDIR is correct
+Function CustomDirectoryPageUpdateINSTDIR
+    ${Switch} $WhichRadio
+        ${Case} "default"
+            StrCpy $INSTDIR $DEFAULT_INSTDIR
+            ${Break}
+        ${Case} "last"
+            StrCpy $INSTDIR $LAST_INSTDIR
+            ${Break}
+        ${Case} "custom"
+            StrCpy $INSTDIR $CUSTOM_INSTDIR
+            ${Break}
+    ${EndSwitch}
 FunctionEnd
 
 

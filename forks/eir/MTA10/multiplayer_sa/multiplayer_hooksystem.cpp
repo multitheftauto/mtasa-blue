@@ -39,7 +39,10 @@ BOOL HookInstall( DWORD dwInstallAddress,
     MemSetFast ( JumpBytes, 0x90, MAX_JUMPCODE_SIZE );
     if ( CreateJump ( dwInstallAddress, dwHookHandler, JumpBytes ) )
     {
-        MemCpy ( (PVOID)dwInstallAddress, JumpBytes, iJmpCodeSize );
+        if ( IsSlowMem( (PVOID)dwInstallAddress, iJmpCodeSize ) )
+            MemCpy ( (PVOID)dwInstallAddress, JumpBytes, iJmpCodeSize );
+        else
+            MemCpyFast ( (PVOID)dwInstallAddress, JumpBytes, iJmpCodeSize );
         return TRUE;
     }
     else
@@ -57,3 +60,12 @@ BYTE * CreateJump ( DWORD dwFrom, DWORD dwTo, BYTE * ByteArray )
     return ByteArray;
 }
 
+////////////////////////////////////////////////////////////////////
+
+VOID HookCheckOriginalByte( DWORD dwInstallAddress, uchar ucExpectedValue )
+{
+    uchar ucValue = *(uchar*)dwInstallAddress;
+    dassert( ucValue == ucExpectedValue );
+    if ( ucValue != ucExpectedValue )
+        AddReportLog( 8423, SString( "HookCheckOriginalByte failed at %08x - Got %02x - expected %02x", dwInstallAddress, ucValue, ucExpectedValue ) );
+}

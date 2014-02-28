@@ -82,6 +82,11 @@ CClientPerfStatManagerImpl::CClientPerfStatManagerImpl ( void )
 ///////////////////////////////////////////////////////////////
 CClientPerfStatManagerImpl::~CClientPerfStatManagerImpl ( void )
 {
+    for ( uint i = 0 ; i < GetModuleCount () ; i++ )
+    {
+        CClientPerfStatModule* pModule = GetModuleByIndex ( i );
+        delete pModule;
+    }
 }
 
 

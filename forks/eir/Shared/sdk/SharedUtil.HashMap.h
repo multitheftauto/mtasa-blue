@@ -10,6 +10,10 @@
 *
 *****************************************************************************/
 
+#if WITH_ALLOC_TRACKING
+    #define CHashMap CMap
+#else
+
 #if defined(WIN32)
     #include <hash_map>
     #define HASH_MAP_TYPE stdext::hash_map
@@ -128,3 +132,5 @@ namespace SharedUtil
     }
 
 #endif
+
+#endif  // WITH_ALLOC_TRACKING

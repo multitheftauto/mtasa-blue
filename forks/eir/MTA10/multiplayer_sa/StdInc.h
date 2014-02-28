@@ -3,7 +3,14 @@
 // Pragmas
 #pragma warning (disable:4250)
 
+#define NOMINMAX
 #include <windows.h>
+#define MTA_CLIENT
+#define SHARED_UTIL_WITH_HASH_MAP
+#define SHARED_UTIL_WITH_FAST_HASH_MAP
+#define SHARED_UTIL_WITH_SYS_INFO
+#include "SharedUtil.h"
+#include "SharedUtil.MemAccess.h"
 #include <stdio.h>
 
 #include <algorithm>
@@ -13,10 +20,6 @@
 #include <vector>
 
 // SDK includes
-#define MTA_CLIENT
-#define SHARED_UTIL_WITH_HASH_MAP
-#define SHARED_UTIL_WITH_FAST_HASH_MAP
-#include "SharedUtil.h"
 #include <core/CCoreInterface.h>
 #include <net/CNet.h>
 #include <game/Common.h>

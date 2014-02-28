@@ -318,7 +318,7 @@ void TabControl::removeTab(const String& name)
 
     Window* wnd = d_tabContentPane->getChild(name);
     // Was this selected?
-    bool reselect = wnd->isVisible();
+    bool reselect = wnd->isVisible(true);
     // Tab buttons are the 2nd onward children
     d_tabContentPane->removeChildWindow(name);
 

@@ -120,6 +120,7 @@ class CVehicleSA;
 #define FUNC_CVehicle__SetRemapTexDictionary                    0x6D0BC0
 #define FUNC_CVehicle__GetRemapIndex                            0x6D0B70
 #define FUNC_CVehicle__SetRemap                                 0x6D0C00
+#define FUNC_CVehicle_CustomCarPlate_TextureCreate              0x6D10E0
 
 // from CBike
 #define FUNC_Bike_PlaceOnRoadProperly           0x6BEEB0
@@ -390,6 +391,7 @@ public:
     CVehicleModelInfoSAInterface*   GetModelInfo( void ) const  { return (CVehicleModelInfoSAInterface*)CEntitySAInterface::GetModelInfo(); };
 
     void __thiscall             RenderPassengers                ( void );
+    void __thiscall             CreateLicensePlate              ( CVehicleModelInfoSAInterface *info );
     void __thiscall             SetupRender                     ( CVehicleSA *mtaVeh );
     void __thiscall             SetPlateTextureForRendering     ( CVehicleModelInfoSAInterface *info );
     void __thiscall             RestoreLicensePlate             ( CVehicleModelInfoSAInterface *info );
@@ -437,7 +439,7 @@ public:
     int                         padaudio[108];                                      // 468, pad of 432 bytes
 
     tHandlingDataSA*            pHandlingData;                                      // +900
-    BYTE                        padyo[4];                                           // 904
+    tFlyingHandlingDataSA*      pFlyingHandlingData;                                // 904
     DWORD                       dwHandlingFlags;                                    // 908
     int                         pad52321 [21];                                      // 912
 
@@ -516,12 +518,9 @@ public:
     BYTE                        Padding220[108];                                    // 1304
 
     unsigned int                m_lightFlags;                                       // 1412, light status of all lights
-    RwTexture*                  m_plateTexture;                                     // 1416
+    RwTexture*                  m_pCustomPlateTexture;                              // 1416
 
-    float                       m_unk;                                              // 1420
-
-    void*                       m_unk38;                                            // 1424, both used in inheriting classes
-    void*                       m_unk39;                                            // 1428
+    BYTE                        Padding225[12];                                     // 1420
 
     short                       m_paintjobTxd;                                      // 1432
     unsigned short              m_queuePaintjob;                                    // 1434
@@ -573,6 +572,7 @@ public:
     RwFrame *                   pWindscreen;                                        // 1680
     RwFrame *                   pExhaust;                                           // 1684
 
+
     // Hacked in from jb-contribs branch
     RwFrame *                   pSpecialParts[5];                                   // 1688
     RwFrame *                   pExtraParts[5];                                     // 1708
@@ -604,7 +604,7 @@ private:
     CDoorSA                     m_doors[6];
     bool                        m_bSwingingDoorsAllowed;
     SSirenInfo                  m_tSirenInfo;
-    std::map<SString, RwFrame*> m_ExtraFrames;
+    std::map<SString, SVehicleFrame> m_ExtraFrames;
     unsigned char               m_ucVariant;
     unsigned char               m_ucVariant2;
     unsigned char               m_ucVariantCount;
@@ -628,12 +628,17 @@ public:
 
     bool                        AddProjectile                   ( eWeaponType eWeapon, CVector vecOrigin, float fForce, CVector * target, CEntity * targetEntity );
 
-    CVehicleSAInterface *       GetNextCarriageInTrain          ();
-    CVehicle *                  GetNextTrainCarriage            ();
-    void                        SetNextTrainCarriage            ( CVehicle * next );
-    CVehicleSAInterface *       GetPreviousCarriageInTrain      ();
-    CVehicle *                  GetPreviousTrainCarriage        ();
-    void                        SetPreviousTrainCarriage        ( CVehicle * pPrevious );
+    CVehicleSAInterface*        GetNextCarriageInTrain          ();
+    CVehicle*                   GetNextTrainCarriage            ();
+    void                        SetNextTrainCarriage            ( CVehicle* pNext );
+    CVehicleSAInterface*        GetPreviousCarriageInTrain      ();
+    CVehicle*                   GetPreviousTrainCarriage        ();
+    void                        SetPreviousTrainCarriage        ( CVehicle* pPrevious );
+    float                       GetDistanceToCarriage           ( CVehicle* pCarriage );
+    void                        AttachTrainCarriage             ( CVehicle* pCarriage );
+    void                        DetachTrainCarriage             ( CVehicle* pCarriage );
+    bool                        IsChainEngine                   ( void );
+    void                        SetIsChainEngine                ( bool bChainEngine = true );
 
     bool                        IsDerailed                      ();
     void                        SetDerailed                     ( bool bDerailed );
@@ -645,11 +650,14 @@ public:
     void                        SetTrainDirection               ( bool bDirection );
     BYTE                        GetRailTrack                    ();
     void                        SetRailTrack                    ( BYTE ucTrackID );
+    float                       GetTrainPosition                ( void );
+    void                        SetTrainPosition                ( float fPosition, bool bRecalcOnRailDistance = true );
 
     bool                        CanPedEnterCar                  ();
     bool                        CanPedJumpOutCar                ( CPed* pPed );
     void                        AddVehicleUpgrade               ( DWORD dwModelID );
     void                        RemoveVehicleUpgrade            ( DWORD dwModelID );
+    bool                        DoesSupportUpgrade              ( SString strFrameName );
     bool                        CanPedLeanOut                   ( CPed* pPed );
     bool                        CanPedStepOutCar                ( bool bUnknown );
 
@@ -853,17 +861,21 @@ public:
     bool                        GetComponentMatrix              ( SString vehicleComponent, RwMatrix &ltm, RwMatrix &modelling );
     bool                        SetComponentMatrix              ( SString vehicleComponent, RwMatrix &ltm, RwMatrix &modelling );
     bool                        SetComponentVisible             ( SString vehicleComponent, bool bVisible );
-    void                        AddComponent                    ( RwFrame * pFrame );
+    void                        AddComponent                    ( RwFrame * pFrame, bool bReadOnly );
     bool                        GetComponentVisible             ( SString vehicleComponent, bool &bVisible );
-    std::map < SString, RwFrame * > & GetComponentMap           ( void )                                                            { return m_ExtraFrames; }
+    std::map < SString, SVehicleFrame > & GetComponentMap       ( void )                                                            { return m_ExtraFrames; }
+    bool                        SetPlateText                    ( const SString& strText );
+
+    void                        UpdateLandingGearPosition       ( );
 
 private:
     void                        RecalculateSuspensionLines          ( void );
     void                        CopyGlobalSuspensionLinesToPrivate  ( void );
-    RwFrame *                   GetVehicleComponent                 ( SString vehicleComponent );
+    bool                        GetVehicleComponent                 ( SString vehicleComponent, SVehicleFrame &Frame );
 
 };
 
 #include "CVehicleSA.render.h"
+#include "CVehicleSA.customplate.h"
 
 #endif

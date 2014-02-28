@@ -60,7 +60,7 @@ public:
     virtual CTaskComplexDie                     * CreateTaskComplexDie                    ( const eWeaponType eMeansOfDeath=WEAPONTYPE_UNARMED, const AssocGroupId animGroup=0/*ANIM_STD_PED*/, const AnimationId anim=0/*ANIM_STD_KO_FRONT*/, const float fBlendDelta=4.0f, const float fAnimSpeed=0.0f, const bool bBeingKilledByStealth=false, const bool bFallingToDeath=false, const int iFallToDeathDir=0, const bool bFallToDeathOverRailing=false )=0;
     virtual CTaskSimpleStealthKill              * CreateTaskSimpleStealthKill             ( bool bAttacker, class CPed * pPed, const AnimationId anim )=0;
     virtual CTaskSimpleDead                     * CreateTaskSimpleDead                    ( unsigned int uiDeathTimeMS, bool bUnk2 )=0;
-
+    virtual CTaskSimpleBeHit                    * CreateTaskSimpleBeHit                   ( CPed* pPedAttacker, ePedPieceTypes hitBodyPart, int hitBodySide, int weaponId )=0;
     virtual CTaskComplexSunbathe                * CreateTaskComplexSunbathe               ( class CObject* pTowel, const bool bStartStanding )=0;
 
     // IK

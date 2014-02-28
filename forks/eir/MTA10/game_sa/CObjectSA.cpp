@@ -40,12 +40,16 @@ CObjectSA::CObjectSA(CObjectSAInterface * objectInterface)
     m_poolIndex = (*ppObjectPool)->GetIndex( objectInterface );
     mtaObjects[m_poolIndex] = this;
 
-    ResetScale ();
 
-    CheckForGangTag ();
+    if ( m_pInterface )
+    {
+        ResetScale ();
+        CheckForGangTag ();
+        m_pInterface->bStreamingDontDelete = true;
+    }
 }
 
-CObjectSA::CObjectSA( DWORD dwModel, bool bBreakable )
+CObjectSA::CObjectSA( DWORD dwModel, bool bBreakingDisabled )
 {
     DEBUG_TRACE("CObjectSA::CObjectSA( DWORD dwModel )");
 
@@ -153,11 +157,16 @@ CObjectSA::CObjectSA( DWORD dwModel, bool bBreakable )
 
         MemPutFast < BYTE > ( (unsigned char*)objInt + 316, 6 );
 
-        if ( !bBreakable )
+        if ( bBreakingDisabled )
         {
             // Set our immunities
-            // Sum of all flags checked @ CPhysical__CanPhysicalBeDamaged 
-            MemPutFast < int > ( objInt + 64, 0x00BC0000 );
+            // Sum of all flags checked @ CPhysical__CanPhysicalBeDamaged
+            CObjectSAInterface* pObjectSAInterface = GetObjectInterface();
+            pObjectSAInterface->bBulletProof = true;
+            pObjectSAInterface->bFireProof = true;
+            pObjectSAInterface->bCollisionProof = true;
+            pObjectSAInterface->bMeeleProof = true;
+            pObjectSAInterface->bExplosionProof = true;
         }
         m_pInterface->bStreamingDontDelete = true;
     }
@@ -176,6 +185,7 @@ CObjectSA::CObjectSA( DWORD dwModel, bool bBreakable )
 
     if ( m_pInterface )
     {
+        ResetScale ();
         CheckForGangTag ();
     }
 
@@ -290,6 +300,7 @@ void CObjectSA::SetScale ( float fX, float fY, float fZ )
 {
     m_vecScale = CVector ( fX, fY, fZ );
     GetObjectInterface ()->bUpdateScale = true;
+    GetObjectInterface ()->fScale = Max( fX, Max( fY, fZ ) );
 }
 
 CVector* CObjectSA::GetScale ( )

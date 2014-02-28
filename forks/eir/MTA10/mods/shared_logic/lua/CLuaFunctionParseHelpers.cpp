@@ -372,6 +372,25 @@ IMPLEMENT_ENUM_BEGIN( eFontType )
     ADD_ENUM( FONT_BECKETT,         "beckett" )
 IMPLEMENT_ENUM_END_DEFAULTS( "font-type", FONT_DEFAULT, "" )
 
+IMPLEMENT_ENUM_BEGIN ( eAudioLookupIndex )
+    ADD_ENUM ( AUDIO_LOOKUP_FEET, "feet" )
+    ADD_ENUM ( AUDIO_LOOKUP_GENRL, "genrl" )
+    ADD_ENUM ( AUDIO_LOOKUP_PAIN_A, "pain_a" )
+    ADD_ENUM ( AUDIO_LOOKUP_SCRIPT, "script" )
+    ADD_ENUM ( AUDIO_LOOKUP_SPC_EA, "spc_ea" )
+    ADD_ENUM ( AUDIO_LOOKUP_SPC_FA, "spc_fa" )
+    ADD_ENUM ( AUDIO_LOOKUP_SPC_GA, "spc_ga" )
+    ADD_ENUM ( AUDIO_LOOKUP_SPC_NA, "spc_na" )
+    ADD_ENUM ( AUDIO_LOOKUP_SPC_PA, "spc_pa" )
+IMPLEMENT_ENUM_END ( "audio-lookup-index" )
+
+IMPLEMENT_ENUM_BEGIN ( eAspectRatio )
+    ADD_ENUM ( ASPECT_RATIO_AUTO, "auto" )
+    ADD_ENUM ( ASPECT_RATIO_4_3, "4:3" )
+    ADD_ENUM ( ASPECT_RATIO_16_10, "16:10" )
+    ADD_ENUM ( ASPECT_RATIO_16_9, "16:9" )
+IMPLEMENT_ENUM_END ( "aspectratio" )
+
 
 //
 // Get best guess at name of userdata type
@@ -475,13 +494,18 @@ void MixedReadMaterialString ( CScriptArgReader& argStream, CClientMaterial*& pM
                 SString strUniqueName = SString ( "%s*%s*%s", pParentResource->GetName (), pFileResource->GetName (), strMetaPath.c_str () ).Replace ( "\\", "/" );
                 pMaterialElement = g_pClientGame->GetManager ()->GetRenderElementManager ()->FindAutoTexture ( strPath, strUniqueName );
 
-                // Check if brand new
-                if ( pMaterialElement && !pMaterialElement->GetParent () )
+                if ( pMaterialElement )
                 {
-                    // Make it a child of the resource's file root ** CHECK  Should parent be pFileResource, and element added to pParentResource's ElementGroup? **
-                    pMaterialElement->SetParent ( pParentResource->GetResourceDynamicEntity() );
+                    // Check if brand new
+                    if ( !pMaterialElement->GetParent () )
+                        // Make it a child of the resource's file root ** CHECK  Should parent be pFileResource, and element added to pParentResource's ElementGroup? **
+                        pMaterialElement->SetParent ( pParentResource->GetResourceDynamicEntity() );
                 }
+                else
+                    argStream.SetCustomError( strFilePath, "Error loading image" );
             }
+            else
+                argStream.SetCustomError( strFilePath, "Bad file path" );
         }
     }
 }
@@ -554,6 +578,49 @@ void MinClientReqCheck ( CScriptArgReader& argStream, const char* szVersionReq, 
                     else
                         argStream.SetVersionError ( szVersionReq, "client", szReason );
                 }
+            }
+        }
+    }
+}
+
+//
+// Read next as preg option flags
+//
+void ReadPregFlags( CScriptArgReader& argStream, pcrecpp::RE_Options& pOptions )
+{
+    if ( argStream.NextIsNumber() )
+    {
+        uint uiFlags = 0;
+        argStream.ReadNumber ( uiFlags );
+        pOptions.set_caseless ( ( uiFlags & 1 ) != 0 );
+        pOptions.set_multiline ( ( uiFlags & 2 ) != 0 );
+        pOptions.set_dotall ( ( uiFlags & 4 ) != 0 );
+        pOptions.set_extended ( ( uiFlags & 8 ) != 0 );
+    }
+    else
+    if ( argStream.NextIsString() )
+    {
+        SString strFlags;
+        argStream.ReadString ( strFlags );
+        for( uint i = 0 ; i < strFlags.length() ; i++ )
+        {
+            switch ( strFlags[i] )
+            {
+                case 'i':
+                    pOptions.set_caseless ( true );
+                    break;
+                case 'm':
+                    pOptions.set_multiline ( true );
+                    break;
+                case 'd':
+                    pOptions.set_dotall ( true );
+                    break;
+                case 'e':
+                    pOptions.set_extended ( true );
+                    break;
+                default:
+                    argStream.SetCustomError( "Flags all wrong" );
+                    return;       
             }
         }
     }

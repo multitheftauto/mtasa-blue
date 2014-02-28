@@ -24,6 +24,7 @@ struct CBandwidthSettings
 public:
     CBandwidthSettings ( void )
     {
+        bBulletSyncEnabled = false;
         SetNone ();
     }
 
@@ -37,7 +38,8 @@ public:
         ZoneUpdateIntervals [ ZONE1 ] = 0;
         ZoneUpdateIntervals [ ZONE2 ] = 0;
         ZoneUpdateIntervals [ ZONE3 ] = 1000;
-        iMaxZoneIfOtherCanSee = 0;
+        iMaxZoneIfOtherCanSeeNormal = 0;
+        iMaxZoneIfOtherCanSeeBulletSync = 0;
         UpdateCachedValues ();
     }
 
@@ -51,7 +53,8 @@ public:
         ZoneUpdateIntervals [ ZONE1 ] = 200;
         ZoneUpdateIntervals [ ZONE2 ] = 400;
         ZoneUpdateIntervals [ ZONE3 ] = 1500;
-        iMaxZoneIfOtherCanSee = 1;
+        iMaxZoneIfOtherCanSeeNormal = 1;
+        iMaxZoneIfOtherCanSeeBulletSync = 0;
         UpdateCachedValues ();
     }
 
@@ -65,7 +68,8 @@ public:
         ZoneUpdateIntervals [ ZONE1 ] = 500;
         ZoneUpdateIntervals [ ZONE2 ] = 1000;
         ZoneUpdateIntervals [ ZONE3 ] = 2000;
-        iMaxZoneIfOtherCanSee = 2;
+        iMaxZoneIfOtherCanSeeNormal = 2;
+        iMaxZoneIfOtherCanSeeBulletSync = 1;
         UpdateCachedValues ();
     }
 
@@ -74,16 +78,22 @@ public:
         bLightSyncEnabled = bEnable;
     }
 
+    void NotifyBulletSyncEnabled ( bool bEnabled )
+    {
+        if ( bBulletSyncEnabled != bEnabled )
+        {
+            bBulletSyncEnabled = bEnabled;
+            UpdateCachedValues();
+        }
+    }
+
     void UpdateCachedValues ( void )
     {
         fZone1Dot = cos ( fZone1Angle / 180.f * PI * 0.5f );
         fZone2Dot = cos ( fZone2Angle / 180.f * PI * 0.5f );
         fZone0RadiusSq = fZone0Radius * fZone0Radius;
+        iMaxZoneIfOtherCanSee = bBulletSyncEnabled ? iMaxZoneIfOtherCanSeeBulletSync : iMaxZoneIfOtherCanSeeNormal;
     }
-
-    float fZone0Radius;                     // 10 - 200     Use zone1&2 only if other player is at least this distance away
-    float fZone1Angle;                      // 90 - 350     Use zone1 if angle to other player is greater than this
-    float fZone2Angle;                      // 100 - 360    Use zone2 if angle to other player is greater than this
 
     float fZone1Dot;
     float fZone2Dot;
@@ -91,6 +101,14 @@ public:
     SFixedArray < int, ZONE_MAX > ZoneUpdateIntervals;   // First is always 0, next is Zone1 interval then Zone2 and Zone3
     int iMaxZoneIfOtherCanSee;
     bool bLightSyncEnabled;
+
+protected:
+    float fZone0Radius;                     // 10 - 200     Use zone1&2 only if other player is at least this distance away
+    float fZone1Angle;                      // 90 - 350     Use zone1 if angle to other player is greater than this
+    float fZone2Angle;                      // 100 - 360    Use zone2 if angle to other player is greater than this
+    int iMaxZoneIfOtherCanSeeNormal;        // Zone limit if other player can see us
+    int iMaxZoneIfOtherCanSeeBulletSync;    // Zone limit if other player can see us when bullet sync is enabled
+    bool bBulletSyncEnabled;                // Cache flag set by game
 };
 
 extern CBandwidthSettings* g_pBandwidthSettings;

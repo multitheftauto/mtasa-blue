@@ -23,12 +23,13 @@ CProjectileSA::CProjectileSA (CProjectileSAInterface* projectileInterface) : COb
     this->internalInterface->bStreamingDontDelete = true;
     this->internalInterface->bDontStream = true;
     this->internalInterface->bRemoveFromWorld = false;
-}              
+    m_bDestroyed = false;
+}
 
 CProjectileSA::~CProjectileSA( )
 {
     DEBUG_TRACE("CProjectileSA::~CProjectileSA( )");
-    pGame->GetProjectileInfo ()->RemoveProjectile ( projectileInfo, this );
+
     this->BeingDeleted = true;
     /*
     //OutputDebugString("Attempting to destroy Object\n");
@@ -61,9 +62,14 @@ CProjectileSA::~CProjectileSA( )
         //delete this;
         //OutputDebugString("Destroying Object\n");
     }*/
+    Destroy();
 }
 
 void CProjectileSA::Destroy() 
 {
-    delete this;
+    if ( m_bDestroyed == false )
+    {
+        pGame->GetProjectileInfo ()->RemoveProjectile ( projectileInfo, this );
+        m_bDestroyed = true;
+    }
 }

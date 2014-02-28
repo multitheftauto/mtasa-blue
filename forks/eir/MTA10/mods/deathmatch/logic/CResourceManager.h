@@ -38,10 +38,12 @@ public:
                                 CResourceManager            ( void );
                                 ~CResourceManager           ( void );
 
-    CResource*                  Add                         ( unsigned short usNetID, const char* szResourceName, CClientEntity* pResourceEntity, CClientEntity* pResourceDynamicEntity, const SString& strMinServerReq, const SString& strMinClientReq );
+    CResource*                  Add                         ( unsigned short usNetID, const char* szResourceName, CClientEntity* pResourceEntity, CClientEntity* pResourceDynamicEntity, const SString& strMinServerReq, const SString& strMinClientReq, bool bEnableOOP );
     CResource*                  GetResource                 ( const char* szResourceName );
     CResource*                  GetResourceFromNetID        ( unsigned short usNetID );
     CResource*                  GetResourceFromScriptID     ( uint uiScriptID );
+    CResource*                  GetResourceFromLuaState     ( struct lua_State* luaVM );
+    SString                     GetResourceName             ( struct lua_State* luaVM );
     bool                        RemoveResource              ( unsigned short usID );
     void                        Remove                      ( CResource* pResource );
     bool                        Exists                      ( CResource* pResource );
@@ -54,7 +56,8 @@ public:
 
 private:
 
-    CMappedList < CResource* >  m_resources;
+    CMappedList < CResource* >          m_resources;
+    std::map < ushort, CResource* >     m_NetIdResourceMap;
 };
 
 #endif

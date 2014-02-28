@@ -4,7 +4,6 @@
 *  LICENSE:     See LICENSE in the top level directory
 *  FILE:        Shared/core/CFileSystem.zip.h
 *  PURPOSE:     ZIP archive filesystem
-*  DEVELOPERS:  The_GTA <quiret@gmx.de>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -24,7 +23,7 @@ class CArchiveFileTranslator : public CSystemPathTranslator, public CArchiveTran
     friend class CArchiveFile;
 public:
                     CArchiveFileTranslator( CFile& file );
-                    ~CArchiveFileTranslator();
+                    ~CArchiveFileTranslator( void );
 
     bool            WriteData( const char *path, const char *buffer, size_t size );
     bool            CreateDir( const char *path );
@@ -39,9 +38,9 @@ public:
 
     bool            ChangeDirectory( const char *path );
 
-    void            ScanDirectory( const char *directory, const char *wildcard, bool recurse, 
-                        pathCallback_t dirCallback, 
-                        pathCallback_t fileCallback, 
+    void            ScanDirectory( const char *directory, const char *wildcard, bool recurse,
+                        pathCallback_t dirCallback,
+                        pathCallback_t fileCallback,
                         void *userdata ) const;
 
     void            GetDirectories( const char *path, const char *wildcard, bool recurse, std::vector <filePath>& output ) const;
@@ -64,7 +63,7 @@ public:
 
         size_t          sizeCompressed;
         size_t          sizeReal;
-        
+
         unsigned short  nameLen;
         unsigned short  commentLen;
     };
@@ -73,26 +72,28 @@ public:
 private:
     void            ReadFiles( unsigned int count );
 
+public:
     struct file;
     struct directory;
 
+private:
     class stream abstract : public CFile
     {
         friend class CArchiveFileTranslator;
     public:
-        stream( CArchiveFileTranslator& zip, file& info, CFile& sysFile ) : m_info( info ), m_archive( zip ), m_sysFile( sysFile )
+        stream( CArchiveFileTranslator& zip, file& info, CFile& sysFile ) : m_sysFile( sysFile ), m_archive( zip ), m_info( info )
         {
             info.locks.push_back( this );
         }
 
-        ~stream()
+        ~stream( void )
         {
             m_info.locks.remove( this );
 
             delete &m_sysFile;
         }
 
-        const filePath& GetPath() const
+        const filePath& GetPath( void ) const
         {
             return m_path;
         }
@@ -104,6 +105,7 @@ private:
         filePath                    m_path;
     };
 
+public:
     struct file
     {
         filePath        name;
@@ -130,7 +132,7 @@ private:
         bool            archived;
         bool            cached;
         bool            subParsed;
-        
+
         typedef std::list <stream*> lockList;
         lockList        locks;
         directory*      dir;
@@ -153,7 +155,7 @@ private:
             date.tm_mday = modDate & 0x1F;
             date.tm_mon = ((modDate & 0x1E0) >> 5) - 1;
             date.tm_year = ((modDate & 0x0FE00) >> 9) + 1980;
-            
+
             date.tm_hour = (modTime & 0xF800) >> 11;
             date.tm_min = (modTime & 0x7E0) >> 5;
             date.tm_sec = (modTime & 0x1F) << 1;
@@ -162,16 +164,18 @@ private:
             date.tm_yday = 0;
         }
 
-        inline void UpdateTime()
+        inline void UpdateTime( void )
         {
             time_t curTime = time( NULL );
             SetModTime( *gmtime( &curTime ) );
         }
 
-        inline void Reset()
+        inline void Reset( void )
         {
 #ifdef _WIN32
             version = 10;
+#else
+            version = 0x03; // Unix
 #endif //_WIN32
             reqVersion = 0x14;
             flags = 0;
@@ -185,7 +189,7 @@ private:
             diskID = 0;
             internalAttr = 0;
             externalAttr = 0;
-            
+
             extra.clear();
             comment.clear();
 
@@ -194,14 +198,17 @@ private:
             subParsed = false;
         }
 
-        inline bool IsNative() const
+        inline bool IsNative( void ) const
         {
 #ifdef _WIN32
             return version == 10;
+#else
+            return version == 0x03; // Unix
 #endif //_WIN32
         }
     };
 
+private:
     inline void seekFile( const file& info, _localHeader& header );
 
     // We need to cache data on the disk
@@ -231,28 +238,29 @@ private:
         friend class CArchiveFileTranslator;
     public:
                         fileDeflate( CArchiveFileTranslator& zip, file& info, CFile& sysFile );
-                        ~fileDeflate();
+                        ~fileDeflate( void );
 
         size_t          Read( void *buffer, size_t sElement, unsigned long iNumElements );
         size_t          Write( const void *buffer, size_t sElement, unsigned long iNumElements );
         int             Seek( long iOffset, int iType );
-        long            Tell() const;
-        bool            IsEOF() const;
+        long            Tell( void ) const;
+        bool            IsEOF( void ) const;
         bool            Stat( struct stat *stats ) const;
         void            PushStat( const struct stat *stats );
-        void            SetSeekEnd();
-        size_t          GetSize() const;
-        void            Flush();
-        bool            IsReadable() const;
-        bool            IsWriteable() const;
+        void            SetSeekEnd( void );
+        size_t          GetSize( void ) const;
+        void            Flush( void );
+        bool            IsReadable( void ) const;
+        bool            IsWriteable( void ) const;
 
     private:
-        inline void     Focus();
+        inline void     Focus( void );
 
         bool            m_writeable;
         bool            m_readable;
     };
 
+public:
     typedef std::list <file*> fileList;
 
     struct directory
@@ -261,16 +269,16 @@ private:
         {
         }
 
-        ~directory()
+        ~directory( void )
         {
             subDirs::iterator iter = children.begin();
 
-            for ( ; iter != children.end(); iter++ )
+            for ( ; iter != children.end(); ++iter )
                 delete *iter;
 
             fileList::iterator fileIter = files.begin();
 
-            for ( ; fileIter != files.end(); fileIter++ )
+            for ( ; fileIter != files.end(); ++fileIter )
                 delete *fileIter;
         }
 
@@ -288,7 +296,7 @@ private:
         {
             subDirs::const_iterator iter;
 
-            for ( iter = children.begin(); iter != children.end(); iter++ )
+            for ( iter = children.begin(); iter != children.end(); ++iter )
             {
                 if ( (*iter)->name == dirName )
                     return *iter;
@@ -323,7 +331,7 @@ private:
             file& entry = *new file;
             entry.name = fileName;
 			entry.flags = 0;
-            
+
             PositionFile( entry );
 
             entry.cached = false;
@@ -351,11 +359,11 @@ private:
             PositionFile( entry );
         }
 
-        inline bool     IsLocked()
+        inline bool     IsLocked( void ) const
         {
             fileList::const_iterator iter = files.begin();
 
-            for ( ; iter != files.end(); iter++ )
+            for ( ; iter != files.end(); ++iter )
             {
                 if ( !(*iter)->locks.empty() )
                     return true;
@@ -368,7 +376,7 @@ private:
         {
             fileList::const_iterator iter = files.begin();
 
-            for ( ; iter != files.end(); iter++ )
+            for ( ; iter != files.end(); ++iter )
             {
                 if ( (*iter)->name == fileName )
                     return *iter;
@@ -398,7 +406,7 @@ private:
         {
             fileList::const_iterator iter = files.begin();
 
-            for ( ; iter != files.end(); iter++ )
+            for ( ; iter != files.end(); ++iter )
             {
                 if ( (*iter)->name == fileName )
                     return *iter;
@@ -422,7 +430,7 @@ private:
         {
             fileList::const_iterator iter = files.begin();
 
-            for ( ; iter != files.end(); iter++ )
+            for ( ; iter != files.end(); ++iter )
             {
                 if ( (*iter)->name == fileName )
                     return RemoveFile( **iter );
@@ -431,17 +439,18 @@ private:
         }
     };
 
-    directory m_root;
+private:
+    directory m_rootDir;
 
     void            CacheDirectory( const directory& dir );
     void            SaveDirectory( directory& dir, size_t& size );
     unsigned int    BuildCentralFileHeaders( const directory& dir, size_t& size );
 
-    inline const directory* GetDirTree( const directory& root, dirTree::const_iterator& iter, dirTree::const_iterator& end ) const
+    inline const directory* GetDirTree( const directory& root, dirTree::const_iterator iter, dirTree::const_iterator end ) const
     {
         const directory *curDir = &root;
 
-        for ( ; iter != end; iter++ )
+        for ( ; iter != end; ++iter )
         {
             if ( !( curDir = root.FindDirectory( *iter ) ) )
                 return NULL;
@@ -452,11 +461,11 @@ private:
 
     inline const directory* GetDirTree( const dirTree& tree ) const
     {
-        return GetDirTree( m_root, tree.begin(), tree.end() );
+        return GetDirTree( this->m_rootDir, tree.begin(), tree.end() );
     }
 
-    inline const directory*     GetDeriviateDir( const directory& root, const dirTree& tree ) const;
-    inline directory&           MakeDeriviateDir( directory& root, const dirTree& tree );
+    const directory*     GetDeriviateDir( const directory& root, const dirTree& tree ) const;
+    directory&           MakeDeriviateDir( directory& root, const dirTree& tree );
 
     directory&          _CreateDirTree( directory& root, const dirTree& tree );
 

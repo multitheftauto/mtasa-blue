@@ -117,7 +117,7 @@ public:
     uint16 pad17; // 360
     uint16 pad18; // 362
     uint32 pad19; // 364
-    uint32 pad20; // 368
+    CEntitySAInterface* pGarageDoorDummy; // 368  CDummyObject - Might be used for other dynamic objects
     uint32 pad21; // 372
     uint32 pad22; // 376
 };
@@ -134,7 +134,7 @@ private:
 
 public:
                                 CObjectSA           ( CObjectSAInterface * objectInterface );
-                                CObjectSA           ( DWORD dwModel, bool bBreakable );
+                                CObjectSA           ( DWORD dwModel, bool bBreakingDisabled );
                                 ~CObjectSA          ( void );
 
     unsigned int                GetPoolIndex        ( void ) const          { return m_poolIndex; }

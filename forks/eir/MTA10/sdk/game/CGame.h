@@ -27,6 +27,7 @@ typedef void ( InRenderer ) ( void );
 #include "CAnimBlock.h"
 #include "CAnimManager.h"
 #include "CAudioEngine.h"
+#include "CAudioContainer.h"
 #include "CCam.h"
 #include "CCamera.h"
 #include "CCarEnterExit.h"
@@ -80,6 +81,7 @@ typedef void ( InRenderer ) ( void );
 
 typedef bool ( PreWeaponFireHandler ) ( class CPlayerPed* pPlayer, bool bStopIfUsingBulletSync );
 typedef void ( PostWeaponFireHandler ) ( void );
+typedef void ( TaskSimpleBeHitHandler ) ( CPedSAInterface* pPedAttacker, ePedPieceTypes hitBodyPart, int hitBodySide, int weaponId );
 
 enum eGameVersion 
 {
@@ -108,6 +110,15 @@ struct SShaderReplacementStats
     std::map < uint, SMatchChannelStats > channelStatsList;
 };
 
+struct SClothesCacheStats
+{
+    uint uiCacheHit;
+    uint uiCacheMiss;
+    uint uiNumTotal;
+    uint uiNumUnused;
+    uint uiNumRemoved;
+};
+
 
 class __declspec(novtable) CGame 
 {
@@ -134,6 +145,7 @@ public:
     virtual CAERadioTrackManager* GetAERadioTrackManager()=0;
     virtual CAudioEngine        * GetAudioEngine()=0;
     virtual CAudioEngine        * GetAudio()=0;
+    virtual CAudioContainer     * GetAudioContainer()=0;
     virtual CMenuManager        * GetMenuManager()=0;
     virtual CText               * GetText()=0;
     virtual CStats              * GetStats()=0;
@@ -212,7 +224,9 @@ public:
     virtual bool                PerformChecks               () = 0;
     virtual int&                GetCheckStatus              () = 0;
 
-    virtual void                SetAsyncLoadingFromSettings     ( bool bSettingsDontUse, bool bSettingsEnabled ) = 0;
+    virtual void                FlushClothesCache               ( void ) = 0;
+    virtual void                GetClothesCacheStats            ( SClothesCacheStats& outStats ) = 0;
+
     virtual void                SetAsyncLoadingFromScript       ( bool bScriptEnabled, bool bScriptForced ) = 0;
     virtual void                SuspendASyncLoading             ( bool bSuspend ) = 0;
     virtual bool                IsASyncLoadingEnabled           ( bool bIgnoreSuspend = false ) = 0;
@@ -230,6 +244,7 @@ public:
 
     virtual void                SetPreWeaponFireHandler         ( PreWeaponFireHandler* pPreWeaponFireHandler ) = 0;
     virtual void                SetPostWeaponFireHandler        ( PostWeaponFireHandler* pPostWeaponFireHandler ) = 0;
+    virtual void                SetTaskSimpleBeHitHandler       ( TaskSimpleBeHitHandler* pTaskSimpleBeHitHandler ) = 0;
 };
 
 #endif

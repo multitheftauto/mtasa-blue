@@ -22,11 +22,15 @@ CAccessControlListManager::CAccessControlListManager ( void ) : CXMLConfig ( NUL
     m_llLastTimeReadCacheCleared = 0;
     m_bReadCacheDirty = false;
     m_bNeedsSave = false;
+    m_uiGlobalRevision = 1;
 }
 
 
 CAccessControlListManager::~CAccessControlListManager ( void )
 {
+    if ( m_bNeedsSave )
+        Save();
+
     // Clear the ACL stuff
     ClearACLs ();
     ClearGroups ();
@@ -302,7 +306,8 @@ void CAccessControlListManager::ClearReadCache ( void )
 {
     m_bReadCacheDirty = false;
     m_llLastTimeReadCacheCleared = GetTickCount64_ ();
-    m_ReadCacheMap.clear ();      
+    m_ReadCacheMap.clear ();
+    m_uiGlobalRevision++;
 }
 
 
@@ -557,4 +562,5 @@ void CAccessControlListManager::OnChange ( void )
 {
     m_bReadCacheDirty = true;
     m_bNeedsSave = true;
+    m_uiGlobalRevision++;
 }

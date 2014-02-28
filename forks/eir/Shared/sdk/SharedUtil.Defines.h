@@ -13,10 +13,16 @@
 //
 // System wide defines
 //
+#define DEFINED_SHARED_UTIL 1
 
 // Enable WITH_ALLOC_TRACKING to monitor server module memory usage. *Has a negative performance impact*
-// (Also only works for the server. Will give compile errors in the client projects.)
-#define WITH_ALLOC_TRACKING 0
+#ifndef WITH_ALLOC_TRACKING
+    #ifndef MTA_CLIENT
+        #define WITH_ALLOC_TRACKING 0       // Alloc track server - (Can also be defined in individual modules, just above #include "SharedUtil.h")
+    #else
+        #define WITH_ALLOC_TRACKING 0       // Alloc track client - (Can also be defined in individual modules, just above #include "SharedUtil.h")
+    #endif
+#endif
 
 //
 // vsnprintf with buffer full check
@@ -55,9 +61,11 @@
 #ifdef _MSC_VER
     #define atoi64 _atoi64
     #define PRId64  "I64d"
+    #define PRIx64  "I64x"
 #else
     #define atoi64 std::atoll
     #define PRId64  "lld"
+    #define PRIx64  "llx"
 #endif
 
 //
@@ -139,3 +147,12 @@
 #else
     #define PRSinW  L"%s"       // i.e. WString ( L"name:" PRSinW,  "dave" );
 #endif
+
+// Generic way of showing a uchar index is not set
+#define UCHAR_INVALID_INDEX 0xFF
+
+// Tick count conversions
+#define TICKS_FROM_SECONDS(m)   ((m)*1000)
+#define TICKS_FROM_MINUTES(m)   (TICKS_FROM_SECONDS(m)*60)
+#define TICKS_FROM_HOURS(m)     (TICKS_FROM_MINUTES(m)*60)
+#define TICKS_FROM_DAYS(m)      (TICKS_FROM_HOURS(m)*24)

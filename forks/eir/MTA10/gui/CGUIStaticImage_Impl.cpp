@@ -91,8 +91,12 @@ bool CGUIStaticImage_Impl::LoadFromTexture ( CGUITexture* pTexture )
 
     if ( m_pTexture && pTexture != m_pTexture )
     {
-        delete m_pTexture;
-        m_bCreatedTexture = false;
+        if ( m_bCreatedTexture )
+        {
+            delete m_pTexture;
+            m_pTexture = NULL;
+            m_bCreatedTexture = false;
+        }
     }
     
     m_pTexture = (CGUITexture_Impl *)pTexture;
@@ -107,7 +111,7 @@ bool CGUIStaticImage_Impl::LoadFromTexture ( CGUITexture* pTexture )
     // Create an imageset
     if ( !m_pImageset )
     {
-	    while ( m_pImagesetManager->isImagesetPresent( szUnique ) )
+        while ( m_pImagesetManager->isImagesetPresent( szUnique ) )
             m_pGUI->GetUniqueName ( szUnique );
         m_pImageset = m_pImagesetManager->createImageset ( szUnique, pCEGUITexture, true );
     }
@@ -141,12 +145,26 @@ void CGUIStaticImage_Impl::Clear ( void )
         {
             delete m_pTexture;
             m_pTexture = NULL;
+            m_bCreatedTexture = false;
         }
         m_pImage = NULL;
         m_pImageset = NULL;
     }
 }
 
+bool CGUIStaticImage_Impl::GetNativeSize ( CVector2D &vecSize )
+{
+    if ( m_pTexture )
+    {
+        if ( m_pTexture->GetTexture() )
+        {
+            vecSize.fX = m_pTexture->GetTexture()->getWidth();
+            vecSize.fY = m_pTexture->GetTexture()->getHeight();
+            return true;
+        }
+    }
+    return false;    
+}
 
 void CGUIStaticImage_Impl::SetFrameEnabled ( bool bFrameEnabled )
 {

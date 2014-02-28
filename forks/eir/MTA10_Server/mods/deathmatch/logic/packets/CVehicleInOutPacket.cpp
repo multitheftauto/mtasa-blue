@@ -99,7 +99,7 @@ bool CVehicleInOutPacket::Read ( NetBitStreamInterface& BitStream )
     // If the action is requesting to get in, read out the "passenger" flag too
     if ( m_ucAction == CGame::VEHICLE_REQUEST_IN )
     {
-        return BitStream.ReadBits ( &m_ucSeat, 3 ) &&
+        return BitStream.ReadBits ( &m_ucSeat, 4 ) &&
                BitStream.ReadBit  ( m_bOnWater ) &&
                BitStream.ReadBits ( &m_ucDoor, 3 );
     }
@@ -146,7 +146,7 @@ bool CVehicleInOutPacket::Write ( NetBitStreamInterface& BitStream ) const
         BitStream.Write ( ID );
 
         BitStream.Write ( m_ID );
-        BitStream.WriteBits ( &m_ucSeat, 3 );
+        BitStream.WriteBits ( &m_ucSeat, 4 );
         BitStream.WriteBits ( &m_ucAction, 4 );
 
         if ( m_ucAction == CGame::VEHICLE_REQUEST_IN_CONFIRMED || m_ucAction == CGame::VEHICLE_REQUEST_JACK_CONFIRMED )

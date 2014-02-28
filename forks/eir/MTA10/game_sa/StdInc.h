@@ -4,7 +4,13 @@
 #pragma warning (disable:4409)
 #pragma warning (disable:4250)
 
+#define NOMINMAX
 #include <windows.h>
+#define MTA_CLIENT
+#define SHARED_UTIL_WITH_HASH_MAP
+#define SHARED_UTIL_WITH_FAST_HASH_MAP
+#include "SharedUtil.h"
+#include "SharedUtil.MemAccess.h"
 #include <stdio.h>
 
 #include <algorithm>
@@ -23,10 +29,6 @@
 #include <debugsdk/dbgheap.h>
 
 // SDK includes
-#define MTA_CLIENT
-#define SHARED_UTIL_WITH_HASH_MAP
-#define SHARED_UTIL_WITH_FAST_HASH_MAP
-#include "SharedUtil.h"
 #include <core/CCoreInterface.h>
 #include <net/CNet.h>
 #include <game/CGame.h>
@@ -73,6 +75,7 @@
 #include "CPedSA.h"
 #include "CPedSoundSA.h"
 #include "CAudioEngineSA.h"
+#include "CAudioContainerSA.h"
 #include "CPlayerInfoSA.h"
 #include "CPopulationSA.h"
 #include "CSettingsSA.h"

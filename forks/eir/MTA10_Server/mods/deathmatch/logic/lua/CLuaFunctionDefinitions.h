@@ -73,6 +73,8 @@ public:
     static int      GetLatentEventHandles               ( lua_State* luaVM );
     static int      GetLatentEventStatus                ( lua_State* luaVM );
     static int      CancelLatentEvent                   ( lua_State* luaVM );
+    static int      AddDebugHook                        ( lua_State* luaVM );
+    static int      RemoveDebugHook                     ( lua_State* luaVM );
 
     // Player get functions
     static int      GetPlayerCount                      ( lua_State* luaVM );
@@ -105,6 +107,7 @@ public:
     static int      GetPlayerIP                         ( lua_State* luaVM );
     static int      GetPlayerAccount                    ( lua_State* luaVM );
     static int      GetPlayerVersion                    ( lua_State* luaVM );
+    static int      GetPlayerACInfo                     ( lua_State* luaVM );
 
     // Player set functions
     static int      SetPlayerMoney                      ( lua_State* luaVM );
@@ -280,6 +283,7 @@ public:
     static int      SetVehicleSirens                    ( lua_State* luaVM );
     static int      GetVehicleSirens                    ( lua_State* luaVM );
     static int      GetVehicleSirenParams               ( lua_State* luaVM );
+    static int      SetVehiclePlateText                 ( lua_State* luaVM );
 
     // Marker create/destroy functions
     static int      CreateMarker                        ( lua_State* luaVM );
@@ -482,6 +486,11 @@ public:
     static int      UtfChar                             ( lua_State* luaVM );
     static int      UtfCode                             ( lua_State* luaVM );
     static int      GetValidPedModels                   ( lua_State* luaVM );
+
+    // PCRE functions
+    static int      PregFind                            ( lua_State* luaVM );
+    static int      PregReplace                         ( lua_State* luaVM );
+    static int      PregMatch                           ( lua_State* luaVM );
 
     // Loaded Map Functions
     static int      GetRootElement                      ( lua_State* luaVM );

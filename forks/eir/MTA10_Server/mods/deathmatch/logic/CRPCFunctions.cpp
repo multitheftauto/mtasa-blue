@@ -72,6 +72,8 @@ void CRPCFunctions::ProcessPacket ( const NetServerPlayerID& Socket, NetBitStrea
         unsigned char ucFunctionID = 255;
         bitStream.Read ( ucFunctionID );
 
+        CPerfStatRPCPacketUsage::GetSingleton ()->UpdatePacketUsageIn( ucFunctionID, bitStream.GetNumberOfBytesUsed() );
+
         SRPCHandler * pHandler;
         vector < SRPCHandler * > ::iterator iter = m_RPCHandlers.begin ();
         for ( ; iter != m_RPCHandlers.end () ; iter++ )
@@ -148,10 +150,22 @@ void CRPCFunctions::PlayerWeapon ( NetBitStreamInterface & bitStream )
     CLOCK( "NetServerPulse::RPC", "PlayerWeapon" );
     if ( m_pSourcePlayer->IsJoined () && m_pSourcePlayer->IsSpawned () )
     {
+        unsigned char ucPrevSlot = m_pSourcePlayer->GetWeaponSlot ();
+
+        // We don't get the puresync packet containing totalAmmo = 0 for slot 8 (THROWN)
+        if ( ( bitStream.Version() >= 0x44 && ucPrevSlot == WEAPONSLOT_TYPE_THROWN ) || bitStream.Version() >= 0x4D )
+        {
+            if ( bitStream.ReadBit() && ucPrevSlot == WEAPONSLOT_TYPE_THROWN )
+            {
+                CWeapon* pPrevWeapon = m_pSourcePlayer->GetWeapon ( ucPrevSlot );
+                pPrevWeapon->usAmmo = 0;
+                pPrevWeapon->usAmmoInClip = 0;
+            }
+        }
+
         SWeaponSlotSync slot;
         bitStream.Read ( &slot );
         unsigned int uiSlot = slot.data.uiSlot;
-        unsigned char ucPrevSlot = m_pSourcePlayer->GetWeaponSlot ();
 
         if ( uiSlot != ucPrevSlot )
         {
@@ -203,14 +217,12 @@ void CRPCFunctions::KeyBind ( NetBitStreamInterface & bitStream )
     bitStream.ReadBit ( bHitState );
 
     unsigned char ucKeyLength = bitStream.GetNumberOfUnreadBits () >> 3;
-    if ( ucKeyLength < 256 )
-    {
-        char szKey [ 256 ];
-        bitStream.Read ( szKey, ucKeyLength );
-        szKey [ ucKeyLength ] = 0;
 
-        m_pSourcePlayer->GetKeyBinds ()->ProcessKey ( szKey, bHitState, ( eKeyBindType ) ucType );
-    }
+    char szKey [ 256 ];
+    bitStream.Read ( szKey, ucKeyLength );
+    szKey [ ucKeyLength ] = 0;
+
+    m_pSourcePlayer->GetKeyBinds ()->ProcessKey ( szKey, bHitState, ( eKeyBindType ) ucType );
 
     UNCLOCK( "NetServerPulse::RPC", "KeyBind" );
 }

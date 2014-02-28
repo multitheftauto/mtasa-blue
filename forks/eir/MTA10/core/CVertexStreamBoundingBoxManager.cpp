@@ -177,8 +177,8 @@ bool CVertexStreamBoundingBoxManager::GetVertexStreamBoundingBox ( SCurrentState
         pStreamBoundsInfo = CreateStreamBoundsInfo ( state );
 
     // Calc area we are going to use
-    WORD viMinBased = state.args.MinVertexIndex + state.args.BaseVertexIndex;
-    WORD viMaxBased = state.args.MinVertexIndex + state.args.NumVertices + state.args.BaseVertexIndex;
+    uint viMinBased = state.args.MinVertexIndex + state.args.BaseVertexIndex;
+    uint viMaxBased = state.args.MinVertexIndex + state.args.NumVertices + state.args.BaseVertexIndex;
 
     uint ReadOffsetStart = viMinBased * state.stream.Stride + state.stream.OffsetInBytes;
     uint ReadOffsetSize = ( viMaxBased - viMinBased ) * state.stream.Stride;

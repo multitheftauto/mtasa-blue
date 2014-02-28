@@ -46,8 +46,10 @@ public:
 #define MIN_NAMETAG_LENGTH 1
 #define MAX_NAMETAG_LENGTH 22
 
+#define MAX_TEAM_NAME_LENGTH 255
+
 // Min and max number of characters in passwords
-#define MIN_PASSWORD_LENGTH 0
+#define MIN_PASSWORD_LENGTH 1
 #define MAX_PASSWORD_LENGTH 30
 
 // Min and max number of characters in chat messages
@@ -144,5 +146,14 @@ public:
 
 // Game-monitor.com query URL (use %u for port input)
 #define QUERY_URL_GAME_MONITOR      "http://master.game-monitor.com/heartbeat.php?p=%u&e=3"
+
+// MTA master server query URL (Inputs: game port, ase port, http port, version, extra, serverip)
+#define QUERY_URL_MTA_MASTER_SERVER "http://master.mtasa.com/ase/add.php?g=%u&a=%u&h=%u&v=%s&x=%s&ip=%s"
+
+// MTA port tester URL
+#define PORT_TESTER_URL             "http://nightly.mtasa.com/ports/"
+
+// MTA minclientversion auto update and others
+#define HQCOMMS_URL                 "http://updatesa.multitheftauto.com/sa/server/hqcomms/"
 
 #endif

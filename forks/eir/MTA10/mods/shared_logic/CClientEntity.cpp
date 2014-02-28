@@ -64,7 +64,7 @@ CClientEntity::CClientEntity ( ElementID ID )
     g_pClientGame->GetGameEntityXRefManager ()->OnClientEntityCreate ( this );
 
     m_bWorldIgnored = false;
-
+    g_pCore->UpdateDummyProgress();
 }
 
 
@@ -98,19 +98,15 @@ CClientEntity::~CClientEntity ( void )
         delete m_pCustomData;
     }
 
-    if ( m_pAttachedToEntity )
+    // Detach from everything
+    AttachTo( NULL );
+    while( m_AttachedEntities.size() )
     {
-        m_pAttachedToEntity->RemoveAttachedEntity ( this );
+        CClientEntity* pAttachedEntity = m_AttachedEntities.back();
+        pAttachedEntity->AttachTo( NULL );
     }
-
-    for ( list < CClientEntity* >::iterator iter = m_AttachedEntities.begin () ; iter != m_AttachedEntities.end () ; ++iter )
-    {
-        CClientEntity* pAttachedEntity = *iter;
-        if ( pAttachedEntity )
-        {
-            pAttachedEntity->m_pAttachedToEntity = NULL;
-        }
-    }
+    m_bDisallowAttaching = true;
+    assert( !m_pAttachedToEntity && m_AttachedEntities.empty() );
 
     RemoveAllCollisions ( true );
 
@@ -173,7 +169,9 @@ CClientEntity::~CClientEntity ( void )
         CClientEntityRefManager::OnEntityDelete ( this );
 
     g_pClientGame->GetGameEntityXRefManager ()->OnClientEntityDelete ( this );
+    SAFE_RELEASE( m_pChildrenListSnapshot );
     g_pCore->GetGraphics ()->GetRenderItemManager ()->RemoveClientEntityRefs ( this );
+    g_pCore->UpdateDummyProgress();
 }
 
 
@@ -565,6 +563,13 @@ bool CClientEntity::GetMatrix ( CMatrix& matrix ) const
     // When streamed out
     CVector vecRotation;
     GetRotationRadians ( vecRotation );
+
+    // Change rotation order so it works correctly for CClientObjects
+    // Any maybe other types that don't have a GetMatrix() override - Needs checking.
+    ConvertRadiansToDegreesNoWrap( vecRotation );
+    vecRotation = ConvertEulerRotationOrder( vecRotation, EULER_ZXY, EULER_MINUS_ZYX );
+    ConvertDegreesToRadiansNoWrap( vecRotation );
+
     g_pMultiplayer->ConvertEulerAnglesToMatrix ( matrix, vecRotation.fX, vecRotation.fY, vecRotation.fZ );
     GetPosition ( matrix.vPos );
     return true;
@@ -584,6 +589,13 @@ bool CClientEntity::SetMatrix ( const CMatrix& matrix )
     SetPosition ( matrix.vPos );
     CVector vecRotation;
     g_pMultiplayer->ConvertMatrixToEulerAngles ( matrix, vecRotation.fX, vecRotation.fY, vecRotation.fZ );
+
+    // Change rotation order so it works correctly for CClientObjects
+    // Any maybe other types that don't have a SetMatrix() override - Needs checking.
+    ConvertRadiansToDegreesNoWrap( vecRotation );
+    vecRotation = ConvertEulerRotationOrder( vecRotation, EULER_MINUS_ZYX, EULER_ZXY );
+    ConvertDegreesToRadiansNoWrap( vecRotation );
+
     SetRotationRadians ( vecRotation );
     return true;
 }
@@ -640,13 +652,35 @@ bool CClientEntity::IsOutOfBounds ( void )
 
 void CClientEntity::AttachTo ( CClientEntity* pEntity )
 {
+    // Handle attach attempt during entity destructor
+    if ( pEntity )
+    {
+        if ( m_bDisallowAttaching )
+        {
+            assert( !m_pAttachedToEntity && m_AttachedEntities.empty() );
+            return;
+        }
+
+        if ( pEntity->m_bDisallowAttaching )
+        {
+            assert( !pEntity->m_pAttachedToEntity && pEntity->m_AttachedEntities.empty() );
+            return;
+        }
+    }
+
     if ( m_pAttachedToEntity )
-        m_pAttachedToEntity->RemoveAttachedEntity ( this );
+    {
+        assert( ListContains( m_pAttachedToEntity->m_AttachedEntities, this ) );
+        ListRemove( m_pAttachedToEntity->m_AttachedEntities, this );
+    }    
 
     m_pAttachedToEntity = pEntity;
 
     if ( m_pAttachedToEntity )
-        m_pAttachedToEntity->AddAttachedEntity ( this );
+    {
+        assert( !ListContains( m_pAttachedToEntity->m_AttachedEntities, this ) );
+        m_pAttachedToEntity->m_AttachedEntities.push_back( this );
+    }
 
     InternalAttachTo ( pEntity );
 }
@@ -735,6 +769,8 @@ bool CClientEntity::AddEvent ( CLuaMain* pLuaMain, const char* szName, const CLu
 
 bool CClientEntity::CallEvent ( const char* szName, const CLuaArguments& Arguments, bool bCallOnChildren )
 {
+    g_pClientGame->GetDebugHookManager()->OnPreEvent( szName, Arguments, this, NULL );
+
     TIMEUS startTime = GetTimeUs ();
 
     CEvents* pEvents = g_pClientGame->GetEvents();
@@ -760,6 +796,8 @@ bool CClientEntity::CallEvent ( const char* szName, const CLuaArguments& Argumen
         if ( deltaTimeUs > 10000 )
             TIMING_DETAIL( SString ( "Event: %s [%d ms]", szName, deltaTimeUs / 1000 ) );
     }
+
+    g_pClientGame->GetDebugHookManager()->OnPostEvent( szName, Arguments, this, NULL );
 
     // Return whether it got cancelled or not
     return ( !pEvents->WasEventCancelled () );
@@ -1099,7 +1137,7 @@ void CClientEntity::RemoveAllCollisions ( bool bNotify )
 
 bool CClientEntity::IsEntityAttached ( CClientEntity* pEntity )
 {
-    list < CClientEntity* > ::iterator iter = m_AttachedEntities.begin ();
+    std::vector < CClientEntity* > ::iterator iter = m_AttachedEntities.begin ();
     for ( ; iter != m_AttachedEntities.end (); iter++ )
     {
         if ( *iter == pEntity )
@@ -1120,10 +1158,9 @@ void CClientEntity::ReattachEntities ( void )
     }
 
     // Reattach any entities attached to us
-    list < CClientEntity* > ::iterator iter = m_AttachedEntities.begin ();
-    for ( ; iter != m_AttachedEntities.end (); iter++ )
+    for ( uint i = 0 ; i < m_AttachedEntities.size () ; ++i )
     {
-        (*iter)->InternalAttachTo ( this );
+        m_AttachedEntities[i]->InternalAttachTo ( this );
     }  
 }
 
@@ -1166,6 +1203,7 @@ bool CClientEntity::IsAttachToable ( void )
         case CCLIENTPICKUP:
         case CCLIENTSOUND:
         case CCLIENTCOLSHAPE:
+        case CCLIENTCAMERA:
         {
             return true;
             break;
@@ -1356,16 +1394,18 @@ void CClientEntity::WorldIgnore ( bool bIgnore )
 
 // Entities from root optimization for getElementsByType
 typedef CFastList < CClientEntity* > CFromRootListType;
-typedef google::dense_hash_map < unsigned int, CFromRootListType > t_mapEntitiesFromRoot;
+typedef CFastHashMap < unsigned int, CFromRootListType > t_mapEntitiesFromRoot;
 static t_mapEntitiesFromRoot    ms_mapEntitiesFromRoot;
 static bool                     ms_bEntitiesFromRootInitialized = false;
+
+// CFastHashMap helpers
+static unsigned int GetEmptyMapKey ( unsigned int* )   { return (unsigned int)0xFFFFFFFF; }
+static unsigned int GetDeletedMapKey ( unsigned int* ) { return (unsigned int)0x00000000 ; }
 
 void CClientEntity::StartupEntitiesFromRoot ()
 {
     if ( !ms_bEntitiesFromRootInitialized )
     {
-        ms_mapEntitiesFromRoot.set_deleted_key ( (unsigned int)0x00000000 );
-        ms_mapEntitiesFromRoot.set_empty_key ( (unsigned int)0xFFFFFFFF );
         ms_bEntitiesFromRootInitialized = true;
     }
 }
@@ -1598,4 +1638,31 @@ float CClientEntity::GetDistanceBetweenBoundingSpheres ( CClientEntity* pOther )
     CSphere sphere = GetWorldBoundingSphere ();
     CSphere otherSphere = pOther->GetWorldBoundingSphere ();
     return ( sphere.vecPosition - otherSphere.vecPosition ).Length () - sphere.fRadius - otherSphere.fRadius;
+}
+
+//
+// Ensure children list snapshot is up to date and return it
+//
+CElementListSnapshot* CClientEntity::GetChildrenListSnapshot( void )
+{
+    // See if list needs updating
+    if ( m_Children.GetRevision() != m_uiChildrenListSnapshotRevision || m_pChildrenListSnapshot == NULL )
+    {
+        m_uiChildrenListSnapshotRevision = m_Children.GetRevision();
+
+        // Detach old
+        SAFE_RELEASE( m_pChildrenListSnapshot );
+
+        // Make new
+        m_pChildrenListSnapshot = new CElementListSnapshot();
+
+        // Fill it up
+        m_pChildrenListSnapshot->reserve( m_Children.size() );
+        for ( CChildListType::const_iterator iter = m_Children.begin() ; iter != m_Children.end() ; iter++ )
+        {
+            m_pChildrenListSnapshot->push_back( *iter );
+        }
+    }
+
+    return m_pChildrenListSnapshot;
 }

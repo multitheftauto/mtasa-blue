@@ -15,6 +15,7 @@
 
 static volatile bool g_bIsStarted = false;
 extern CCoreInterface* g_pCore;
+extern CLocalizationInterface* g_pLocalization;
 CCriticalSection CServer::m_OutputCC;
 std::list < std::string > CServer::m_OutputQueue;
 
@@ -77,7 +78,7 @@ void CServer::DoPulse ( void )
         {
             // Loop through our output queue and echo it to console
             std::list < std::string >::const_iterator iter = m_OutputQueue.begin ();
-            for ( ; iter != m_OutputQueue.end (); iter++ )
+            for ( ; iter != m_OutputQueue.end (); ++iter )
             {
                 // Echo it
                 const char* szString = iter->c_str ();
@@ -117,7 +118,7 @@ bool CServer::Start ( const char* szConfig )
         m_strConfig = szConfig;
 
         // Check that the DLL exists
-        if ( !DoesFileExist ( m_strDLLFile ) )
+        if ( !FileExists ( m_strDLLFile ) )
         {
             g_pCore->GetConsole ()->Printf ( "Unable to find: '%s'", m_strDLLFile.c_str () );
             return false;
@@ -190,8 +191,8 @@ bool CServer::Stop ( void )
             // Handle non-zero exit codes
             if ( dwExitCode != ERROR_NO_ERROR )
             {
-                g_pCore->ShowMessageBox ( "Error", "Could not start the local server. See console for details.", MB_BUTTON_OK | MB_ICON_ERROR );
-                g_pCore->GetConsole ()->Printf ( "Error: Could not start local server. [%s]", szServerErrors[GetLastError()] );
+                g_pCore->ShowMessageBox ( _("Error")+_E("CD60"), _("Could not start the local server. See console for details."), MB_BUTTON_OK | MB_ICON_ERROR );
+                g_pCore->GetConsole ()->Printf ( _("Error: Could not start local server. [%s]"), szServerErrors[GetLastError()] );
             }
         }
 

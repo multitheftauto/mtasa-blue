@@ -16,7 +16,6 @@
 #define __CDIRECT3DEVENTS9_H
 
 #include <d3d9.h>
-typedef IUnknown IDirect3DDevice8;
 
 class CDirect3DEvents9
 {

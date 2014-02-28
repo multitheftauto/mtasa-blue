@@ -696,7 +696,7 @@ int CLuaElementDefs::getElementsWithinColShape ( lua_State* luaVM )
         // Add all the elements within the shape to it
         unsigned int uiIndex = 0;
         list < CElement* > ::iterator iter = pColShape->CollidersBegin ();
-        for ( ; iter != pColShape->CollidersEnd (); iter++ )
+        for ( ; iter != pColShape->CollidersEnd (); ++iter )
         {
             if ( strType.empty () || strType == (*iter)->GetTypeName () )
             {
@@ -836,7 +836,7 @@ int CLuaElementDefs::getAttachedElements ( lua_State* luaVM )
         // Add All Attached Elements
         unsigned int uiIndex = 0;
         list < CElement* > ::const_iterator iter = pElement->AttachedElementsBegin ();
-        for ( ; iter != pElement->AttachedElementsEnd () ; iter++ )
+        for ( ; iter != pElement->AttachedElementsEnd () ; ++iter )
         {
             if ( ( *iter )->GetAttachedToElement() == pElement )
             {

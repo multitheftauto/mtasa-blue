@@ -64,6 +64,27 @@ struct SSirenInfo
     SFixedArray < SSirenBeaconInfo, 8 > m_tSirenInfo;
     SColor                      m_tPointLightColour;
 };
+
+struct SVehicleFrame
+{
+    SVehicleFrame ( RwFrame * pFrame )
+    {
+        this->pFrame = pFrame;
+        this->bReadOnly = true;
+    }
+    SVehicleFrame ( RwFrame * pFrame, bool bReadOnly )
+    {
+        this->pFrame = pFrame;
+        this->bReadOnly = bReadOnly;
+    }
+    SVehicleFrame ( )
+    {
+        this->pFrame = NULL;
+    }
+    RwFrame * pFrame;
+    bool bReadOnly;
+};
+
 class CVehicle : public virtual CPhysical
 {
 public:
@@ -78,9 +99,14 @@ public:
     virtual bool                IsBeingDriven               () = 0;
 
     virtual CVehicle *          GetNextTrainCarriage        () = 0;
-    virtual void                SetNextTrainCarriage        ( CVehicle * next ) = 0;
+    virtual void                SetNextTrainCarriage        ( CVehicle* pNext ) = 0;
     virtual CVehicle *          GetPreviousTrainCarriage    () = 0;
-    virtual void                SetPreviousTrainCarriage    ( CVehicle * previous ) = 0;
+    virtual void                SetPreviousTrainCarriage    ( CVehicle* pPrevious ) = 0;
+    virtual float               GetDistanceToCarriage       ( CVehicle* pCarriage ) = 0;
+    virtual void                AttachTrainCarriage         ( CVehicle* pCarriage ) = 0;
+    virtual void                DetachTrainCarriage         ( CVehicle* pCarriage ) = 0;
+    virtual bool                IsChainEngine               ( void ) = 0;
+    virtual void                SetIsChainEngine            ( bool bChainEngine = true ) = 0;
 
     virtual bool                IsDerailed                  () = 0;
     virtual void                SetDerailed                 ( bool bDerailed ) = 0;
@@ -92,11 +118,14 @@ public:
     virtual void                SetTrainDirection           ( bool bDirection ) = 0;
     virtual BYTE                GetRailTrack                () = 0;
     virtual void                SetRailTrack                ( BYTE ucTrackID ) = 0;
+    virtual float               GetTrainPosition            ( void ) = 0;
+    virtual void                SetTrainPosition            ( float fPosition, bool bRecalcOnRailDistance = true ) = 0;
 
     virtual bool                CanPedEnterCar              () = 0;
     virtual bool                CanPedJumpOutCar            ( CPed* pPed ) = 0;
     virtual void                AddVehicleUpgrade           ( DWORD dwModelID ) = 0;
     virtual void                RemoveVehicleUpgrade        ( DWORD dwModelID ) = 0;
+    virtual bool                DoesSupportUpgrade          ( SString strFrameName ) = 0;
     virtual bool                CanPedLeanOut               ( CPed* pPed ) = 0;
     virtual bool                CanPedStepOutCar            ( bool bUnknown ) = 0;
 
@@ -291,8 +320,9 @@ public:
     virtual bool                 SetComponentMatrix                     ( SString vehicleComponent, RwMatrix &ltm, RwMatrix &modelling ) = 0;
     virtual bool                 SetComponentVisible                    ( SString vehicleComponent, bool bVisible ) = 0;
     virtual bool                 GetComponentVisible                    ( SString vehicleComponent, bool &bVisible ) = 0;
-    virtual std::map < SString, RwFrame * > & GetComponentMap       ( void ) = 0;
-
+    virtual std::map < SString, SVehicleFrame > & GetComponentMap       ( void ) = 0;
+    virtual void                 UpdateLandingGearPosition              ( void ) = 0;
+    virtual bool                 SetPlateText                            ( const SString& strText ) = 0;
 };
 
 #endif

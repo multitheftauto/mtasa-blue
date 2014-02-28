@@ -23,15 +23,15 @@ extern CClientGame* g_pClientGame;
 
 int CResource::m_iShowingCursor = 0;
 
-CResource::CResource ( unsigned short usNetID, const char* szResourceName, CClientEntity* pResourceEntity, CClientEntity* pResourceDynamicEntity, const SString& strMinServerReq, const SString& strMinClientReq )
+CResource::CResource ( unsigned short usNetID, const char* szResourceName, CClientEntity* pResourceEntity, CClientEntity* pResourceDynamicEntity, const SString& strMinServerReq, const SString& strMinClientReq, bool bEnableOOP )
 {
     m_uiScriptID = CIdArray::PopUniqueId ( this, EIdClass::RESOURCE );
     m_usNetID = usNetID;
     m_bActive = false;
     m_bInDownloadQueue = false;
     m_bShowingCursor = false;
-    m_usRemainingProtectedScripts = 0;
-    m_bLoadAfterReceivingProtectedScripts = false;
+    m_usRemainingNoClientCacheScripts = 0;
+    m_bLoadAfterReceivingNoClientCacheScripts = false;
     m_strMinServerReq = strMinServerReq;
     m_strMinClientReq = strMinClientReq;
 
@@ -65,13 +65,16 @@ CResource::CResource ( unsigned short usNetID, const char* szResourceName, CClie
     m_pResourceTXDRoot->MakeSystemEntity ();
 
     m_strResourceDirectoryPath = SString ( "%s/resources/%s", g_pClientGame->GetModRoot (), *m_strResourceName );
-    m_strResourcePrivateDirectoryPath = PathJoin ( CServerIdManager::GetSingleton ()->GetConnectionPrivateDirectory (), m_strResourceName );
+    m_strResourcePrivateDirectoryPath = PathJoin ( CServerIdManager::GetSingleton ( )->GetConnectionPrivateDirectory (), m_strResourceName );
 
     m_strResourcePrivateDirectoryPathOld = CServerIdManager::GetSingleton ()->GetConnectionPrivateDirectory ( true );
     if ( !m_strResourcePrivateDirectoryPathOld.empty () )
         m_strResourcePrivateDirectoryPathOld = PathJoin ( m_strResourcePrivateDirectoryPathOld, m_strResourceName );
 
-    m_pLuaVM = m_pLuaManager->CreateVirtualMachine ( this );
+    // Move this after the CreateVirtualMachine line and heads will roll
+    m_bOOPEnabled = bEnableOOP;
+
+    m_pLuaVM = m_pLuaManager->CreateVirtualMachine ( this, bEnableOOP );
     if ( m_pLuaVM )
     {
         m_pLuaVM->SetScriptName ( szResourceName );
@@ -122,26 +125,26 @@ CResource::~CResource ( void )
     m_pResourceEntity = NULL;
 
     list < CResourceFile* >::iterator iter = m_ResourceFiles.begin ();
-    for ( ; iter != m_ResourceFiles.end (); iter++ )
+    for ( ; iter != m_ResourceFiles.end (); ++iter )
     {
         delete ( *iter );
     }
-    m_ResourceFiles.empty ();
+    m_ResourceFiles.clear ();
 
     list < CResourceConfigItem* >::iterator iterc = m_ConfigFiles.begin ();
-    for ( ; iterc != m_ConfigFiles.end (); iterc++ )
+    for ( ; iterc != m_ConfigFiles.end (); ++iterc )
     {
         delete ( *iterc );
     }
-    m_ConfigFiles.empty ();
+    m_ConfigFiles.clear ();
 
     // Delete the exported functions
     list < CExportedFunction* >::iterator iterExportedFunction = m_exportedFunctions.begin();
-    for ( ; iterExportedFunction != m_exportedFunctions.end(); iterExportedFunction++ )
+    for ( ; iterExportedFunction != m_exportedFunctions.end(); ++iterExportedFunction )
     {
         delete ( *iterExportedFunction );
     }
-    m_exportedFunctions.empty();
+    m_exportedFunctions.clear();
 }
 
 CDownloadableResource* CResource::QueueFile ( CDownloadableResource::eResourceType resourceType, const char *szFileName, CChecksum serverChecksum, bool bAutoDownload )
@@ -181,7 +184,7 @@ void CResource::AddExportedFunction ( const char *szFunctionName )
 bool CResource::CallExportedFunction ( const char * szFunctionName, CLuaArguments& args, CLuaArguments& returns, CResource& caller )
 {
     list < CExportedFunction* > ::iterator iter =  m_exportedFunctions.begin ();
-    for ( ; iter != m_exportedFunctions.end (); iter++ )
+    for ( ; iter != m_exportedFunctions.end (); ++iter )
     {
         if ( strcmp ( (*iter)->GetFunctionName(), szFunctionName ) == 0 )
         {
@@ -266,9 +269,9 @@ void CResource::Load ( CClientEntity *pRootEntity )
 {
     m_pRootEntity = pRootEntity;
 
-    if ( m_usRemainingProtectedScripts > 0 )
+    if ( m_usRemainingNoClientCacheScripts > 0 )
     {
-        m_bLoadAfterReceivingProtectedScripts = true;
+        m_bLoadAfterReceivingNoClientCacheScripts = true;
         return;
     }
 
@@ -283,9 +286,8 @@ void CResource::Load ( CClientEntity *pRootEntity )
 
     CLogger::LogPrintf ( "> Starting resource '%s'", *m_strResourceName );
 
-    char szBuffer [ MAX_PATH ] = { 0 };
     list < CResourceConfigItem* >::iterator iterc = m_ConfigFiles.begin ();
-    for ( ; iterc != m_ConfigFiles.end (); iterc++ )
+    for ( ; iterc != m_ConfigFiles.end (); ++iterc )
     {
         if ( !(*iterc)->Start() )
         {
@@ -295,7 +297,7 @@ void CResource::Load ( CClientEntity *pRootEntity )
 
     // Load the files that are queued in the list "to be loaded"
     list < CResourceFile* > ::iterator iter = m_ResourceFiles.begin ();
-    for ( ; iter != m_ResourceFiles.end (); iter++ )
+    for ( ; iter != m_ResourceFiles.end (); ++iter )
     {
         CResourceFile* pResourceFile = *iter;
         // Only load the resource file if it is a client script
@@ -309,24 +311,17 @@ void CResource::Load ( CClientEntity *pRootEntity )
             // Check the contents
             if ( iSize > 0 && CChecksum::GenerateChecksumFromBuffer ( &buffer.at ( 0 ), iSize ).CompareWithLegacy ( pResourceFile->GetServerChecksum () ) )
             {
-                //UTF-8 BOM?  Compare by checking the standard UTF-8 BOM of 3 characters (in signed format, hence negative)
-                if ( iSize < 3 || buffer[0] != -0x11 || buffer[1] != -0x45 || buffer[2] != -0x41 ) 
-                    //Maybe not UTF-8, if we have a >80% heuristic detection confidence, assume it is
-                    m_pLuaVM->LoadScriptFromBuffer ( &buffer.at ( 0 ), iSize, pResourceFile->GetName (), GetUTF8Confidence ( (const unsigned char*)&buffer.at ( 0 ), iSize ) >= 80 );
-                else if ( iSize != 3 )  //If there's a BOM, but the script is not empty, load ignoring the first 3 bytes
-                    m_pLuaVM->LoadScriptFromBuffer ( &buffer.at ( 3 ), iSize-3, pResourceFile->GetName (), true );
+                m_pLuaVM->LoadScriptFromBuffer ( &buffer.at ( 0 ), iSize, pResourceFile->GetName () );
             }
             else
             {
-                SString strBuffer ( "ERROR: File '%s' in resource '%s' - CRC mismatch.", pResourceFile->GetShortName (), *m_strResourceName );
-                g_pCore->ChatEchoColor ( strBuffer, 255, 0, 0 );
+                HandleDownloadedFileTrouble( pResourceFile, true );
             }
         }
         else
         if ( CheckFileForCorruption ( pResourceFile->GetName () ) )
         {
-            SString strBuffer ( "WARNING: File '%s' in resource '%s' is invalid.", pResourceFile->GetShortName (), *m_strResourceName );
-            g_pCore->DebugEchoColor ( strBuffer, 255, 0, 0 );
+            HandleDownloadedFileTrouble( pResourceFile, false );
         }
     }
 
@@ -409,24 +404,22 @@ SString CResource::GetResourceDirectoryPath ( eAccessType accessType, const SStr
                 }
             }
         }
-    }
-
-    if ( accessType == ACCESS_PRIVATE )
         return PathJoin ( m_strResourcePrivateDirectoryPath, strMetaPath );
+    }
     return PathJoin ( m_strResourceDirectoryPath, strMetaPath );
 }
 
 
-void CResource::LoadProtectedScript ( const char* chunk, unsigned int len )
+void CResource::LoadNoClientCacheScript ( const char* chunk, unsigned int len, const SString& strFilename )
 {
-    if ( m_usRemainingProtectedScripts > 0 )
+    if ( m_usRemainingNoClientCacheScripts > 0 )
     {
-        --m_usRemainingProtectedScripts;
-        GetVM()->LoadScriptFromBuffer ( chunk, len, "(unknown)", false );
+        --m_usRemainingNoClientCacheScripts;
+        GetVM()->LoadScriptFromBuffer ( chunk, len, strFilename );
 
-        if ( m_usRemainingProtectedScripts == 0 && m_bLoadAfterReceivingProtectedScripts )
+        if ( m_usRemainingNoClientCacheScripts == 0 && m_bLoadAfterReceivingNoClientCacheScripts )
         {
-            m_bLoadAfterReceivingProtectedScripts = false;
+            m_bLoadAfterReceivingNoClientCacheScripts = false;
             Load ( m_pRootEntity );
         }
     }
@@ -441,5 +434,46 @@ void CResource::AddToElementGroup ( CClientEntity* pElement )
     if ( m_pDefaultElementGroup )
     {
         m_pDefaultElementGroup->Add ( pElement );
+    }
+}
+
+
+//
+// Handle when things go wrong 
+//
+void CResource::HandleDownloadedFileTrouble( CResourceFile* pResourceFile, bool bCRCMismatch )
+{
+    // Compose message
+    SString strMessage;
+    if ( bCRCMismatch )
+    {
+        if ( g_pClientGame->IsUsingExternalHTTPServer() )
+            strMessage += "External ";
+        strMessage += "HTTP server file mismatch";
+    }
+    else
+        strMessage += "Invalid file";
+    SString strFilename = ExtractFilename( PathConform( pResourceFile->GetShortName() ) );
+    strMessage += SString( " (%s) %s", GetName(), *strFilename );
+
+    if ( !bCRCMismatch )
+    {
+        // For corrupt files, log to the client console
+        g_pClientGame->TellServerSomethingImportant( 1000, strMessage, true );
+        g_pCore->GetConsole()->Printf( "Download error: %s", *strMessage );
+        return;
+    }
+
+    // If using external HTTP server, reconnect and use internal one
+    if ( g_pClientGame->IsUsingExternalHTTPServer() && !g_pCore->ShouldUseInternalHTTPServer() )
+    {
+        g_pClientGame->TellServerSomethingImportant( 1001, strMessage, true );
+        g_pCore->Reconnect( "", 0, NULL, false, true );
+    }
+    else
+    {
+        // Otherwise, log to the client console
+        g_pClientGame->TellServerSomethingImportant( 1002, strMessage, true );
+        g_pCore->GetConsole ()->Printf ( "Download error: %s", *strMessage );
     }
 }

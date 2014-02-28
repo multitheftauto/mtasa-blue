@@ -145,11 +145,11 @@ void CLuaModule::_RegisterFunctions ( lua_State * luaVM )
 void CLuaModule::_UnregisterFunctions ( void )
 {
     list < CLuaMain* > ::const_iterator liter = m_pLuaModuleManager->GetLuaManager()->IterBegin ();
-    for ( ; liter != m_pLuaModuleManager->GetLuaManager()->IterEnd (); liter++ )
+    for ( ; liter != m_pLuaModuleManager->GetLuaManager()->IterEnd (); ++liter )
     {
         lua_State* luaVM = (*liter)->GetVM ();
         vector < SString > ::iterator iter = m_Functions.begin ();
-        for ( ; iter != m_Functions.end (); iter++ )
+        for ( ; iter != m_Functions.end (); ++iter )
         {
             // points function to nill
             lua_pushnil ( luaVM );
@@ -178,7 +178,7 @@ void CLuaModule::_ResourceStopped ( lua_State * luaVM )
         m_FunctionInfo.ResourceStopped ( luaVM );
 
     vector < SString > ::iterator iter = m_Functions.begin ();
-    for ( ; iter != m_Functions.end (); iter++ )
+    for ( ; iter != m_Functions.end (); ++iter )
     {
         // points function to nil
         lua_pushnil ( luaVM );
@@ -190,7 +190,7 @@ void CLuaModule::_ResourceStopped ( lua_State * luaVM )
 bool CLuaModule::_DoesFunctionExist ( const char* szFunctionName )
 {
     vector < SString > ::iterator iter = m_Functions.begin ();
-    for ( ; iter != m_Functions.end (); iter++ )
+    for ( ; iter != m_Functions.end (); ++iter )
     {
         if ( strcmp ( (iter)->c_str(), szFunctionName ) == 0 )
         {
@@ -299,7 +299,7 @@ CChecksum CLuaModule::GetResourceFileChecksum ( lua_State* luaVM, const char* sz
             if ( pResource )
             {
                 list < CResourceFile* >::iterator iter = pResource->IterBegin();
-                for ( ; iter != pResource->IterEnd(); iter++ )
+                for ( ; iter != pResource->IterEnd(); ++iter )
                 {
                     if ( strcmp ( (*iter)->GetName (), szFile ) == 0 )
                         return (*iter)->GetLastChecksum ();

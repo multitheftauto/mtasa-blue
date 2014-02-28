@@ -15,7 +15,7 @@ namespace SharedUtil
 
     ////////////////////////////////////////////////
     //
-    // Map helpers for any type
+    // Map helpers for several types
     // 
 
     // Update or add a value for a key
@@ -32,22 +32,21 @@ namespace SharedUtil
         return collection.find ( key ) != collection.end ();
     }
 
-
-    ////////////////////////////////////////////////
-    //
-    // std::map helpers
-    //
-
     // Remove key from collection
-    template < class T, class V, class TR, class T2 >
-    bool MapRemove ( std::map < T, V, TR >& collection, const T2& key )
+    template < class T, class T2 >
+    bool MapRemove ( T& collection, const T2& key )
     {
-        typename std::map < T, V, TR > ::iterator it = collection.find ( key );
+        typename T::iterator it = collection.find ( key );
         if ( it == collection.end () )
             return false;
         collection.erase ( it );
         return true;
     }
+
+    ////////////////////////////////////////////////
+    //
+    // std::map helpers
+    //
 
     // Find value in collection
     template < class T, class V, class TR, class T2 >
@@ -104,11 +103,11 @@ namespace SharedUtil
 
 
     // Remove value from collection. Returns number of pairs removed
-    template < class T, class V, class TR, class V2 >
-    uint MapRemoveByValue ( std::map < T, V, TR >& collection, const V2& value )
+    template < class T, class V2 >
+    uint MapRemoveByValue ( T& collection, const V2& value )
     {
         uint uiCount = 0;
-        typename std::map < T, V, TR > ::iterator it = collection.begin ();
+        typename T::iterator it = collection.begin ();
         for ( ; it != collection.end () ; )
         {
             if ( it->second == value )
@@ -192,24 +191,6 @@ namespace SharedUtil
     void MapInsert ( std::set < T, TR >& collection, const T2& item )
     {
         collection.insert ( item );
-    }
-
-    // Returns true if the item is in the collection
-    template < class T, class TR, class T2 >
-    bool MapContains ( const std::set < T, TR >& collection, const T2& item )
-    {
-        return collection.find ( item ) != collection.end ();
-    }
-
-    // Remove item from collection
-    template < class T, class TR, class T2 >
-    bool MapRemove ( std::set < T, TR >& collection, const T2& item )
-    {
-        typename std::set < T, TR > ::iterator it = collection.find ( item );
-        if ( it == collection.end () )
-            return false;
-        collection.erase ( it );
-        return true;
     }
 
 }

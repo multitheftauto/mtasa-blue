@@ -14,9 +14,6 @@
 
 #include "StdInc.h"
 
-extern CGame * g_pGame;
-
-#define MAX_PLAYER_SYNC_DISTANCE 130.0f // Vehicle explosions don't happen further than ~140.0
 
 CUnoccupiedVehicleSync::CUnoccupiedVehicleSync ( CPlayerManager* pPlayerManager, CVehicleManager* pVehicleManager )
 {
@@ -118,7 +115,7 @@ void CUnoccupiedVehicleSync::UpdateVehicle ( CVehicle* pVehicle )
         if ( pSyncer )
         {
             // He isn't close enough to the vehicle and in the right dimension?
-            if ( ( !IsPointNearPoint3D ( pSyncer->GetPosition (), pVehicle->GetPosition (), MAX_PLAYER_SYNC_DISTANCE ) ) ||
+            if ( ( !IsPointNearPoint3D ( pSyncer->GetPosition (), pVehicle->GetPosition (), (float)g_TickRateSettings.iUnoccupiedVehicleSyncerDistance ) ) ||
                  ( pVehicle->GetDimension () != pSyncer->GetDimension () ) )
             {
                 // Stop him from syncing it
@@ -154,7 +151,7 @@ void CUnoccupiedVehicleSync::FindSyncer ( CVehicle* pVehicle )
     else
     {
         // Find a player close enough to him
-        CPlayer* pPlayer = FindPlayerCloseToVehicle ( pVehicle, MAX_PLAYER_SYNC_DISTANCE - 20.0f );
+        CPlayer* pPlayer = FindPlayerCloseToVehicle ( pVehicle, g_TickRateSettings.iUnoccupiedVehicleSyncerDistance - 20.0f );
         if ( pPlayer )
         {
             // Tell him to start syncing it
@@ -207,7 +204,7 @@ CPlayer* CUnoccupiedVehicleSync::FindPlayerCloseToVehicle ( CVehicle* pVehicle, 
     CPlayer* pLastPlayerSyncing = NULL;
     CPlayer* pPlayer = NULL;
     list < CPlayer* > ::const_iterator iter = m_pPlayerManager->IterBegin ();
-    for ( ; iter != m_pPlayerManager->IterEnd (); iter++ )
+    for ( ; iter != m_pPlayerManager->IterEnd (); ++iter )
     {
         pPlayer = *iter;
         // Is he joined?
@@ -242,7 +239,7 @@ void CUnoccupiedVehicleSync::Packet_UnoccupiedVehicleSync ( CUnoccupiedVehicleSy
     {
         // Apply the data for each vehicle in the packet
         vector < CUnoccupiedVehicleSyncPacket::SyncData > ::iterator iter = Packet.IterBegin ();
-        for ( ; iter != Packet.IterEnd (); iter++ )
+        for ( ; iter != Packet.IterEnd (); ++iter )
         {
             CUnoccupiedVehicleSyncPacket::SyncData& data = *iter;
             SUnoccupiedVehicleSync& vehicle = data.syncStructure;
@@ -328,14 +325,7 @@ void CUnoccupiedVehicleSync::Packet_UnoccupiedVehicleSync ( CUnoccupiedVehicleSy
 
                         if ( vehicle.data.bSyncTrailer )
                         {
-                            CVehicle* pTrailer = NULL;
-                            ElementID TrailerID = vehicle.data.trailer;
-                            if ( TrailerID != INVALID_ELEMENT_ID )
-                            {
-                                CElement* pElement = CElementIDs::GetElement ( TrailerID );
-                                if ( pElement )
-                                    pTrailer = static_cast < CVehicle* > ( pElement );
-                            }
+                            CVehicle* pTrailer = GetElementFromId < CVehicle >( vehicle.data.trailer );
                             // Trailer attach/detach
                             if ( pTrailer )
                             {
@@ -348,8 +338,8 @@ void CUnoccupiedVehicleSync::Packet_UnoccupiedVehicleSync ( CUnoccupiedVehicleSy
                                     if ( pCurrentTrailer )
                                     {
                                         // Tell everyone to detach them
-                                        CVehicleTrailerPacket AttachPacket ( pVehicle, pCurrentTrailer, false );
-                                        m_pPlayerManager->BroadcastOnlyJoined ( AttachPacket );
+                                        CVehicleTrailerPacket DetachPacket ( pVehicle, pCurrentTrailer, false );
+                                        m_pPlayerManager->BroadcastOnlyJoined ( DetachPacket );
 
                                         // Execute the attach trailer script function
                                         CLuaArguments Arguments;
@@ -365,8 +355,8 @@ void CUnoccupiedVehicleSync::Packet_UnoccupiedVehicleSync ( CUnoccupiedVehicleSy
                                     if ( pCurrentVehicle )
                                     {
                                         // Tell everyone to detach them
-                                        CVehicleTrailerPacket AttachPacket ( pCurrentVehicle, pTrailer, false );
-                                        m_pPlayerManager->BroadcastOnlyJoined ( AttachPacket );
+                                        CVehicleTrailerPacket DetachPacket ( pCurrentVehicle, pTrailer, false );
+                                        m_pPlayerManager->BroadcastOnlyJoined ( DetachPacket );
 
                                         // Execute the attach trailer script function
                                         CLuaArguments Arguments;
@@ -411,8 +401,8 @@ void CUnoccupiedVehicleSync::Packet_UnoccupiedVehicleSync ( CUnoccupiedVehicleSy
                                     pCurrentTrailer->SetTowedByVehicle ( NULL );
 
                                     // Tell everyone else to detach them
-                                    CVehicleTrailerPacket AttachPacket ( pVehicle, pCurrentTrailer, false );
-                                    m_pPlayerManager->BroadcastOnlyJoined ( AttachPacket );
+                                    CVehicleTrailerPacket DetachPacket ( pVehicle, pCurrentTrailer, false );
+                                    m_pPlayerManager->BroadcastOnlyJoined ( DetachPacket );
 
                                     // Execute the detach trailer script function
                                     CLuaArguments Arguments;

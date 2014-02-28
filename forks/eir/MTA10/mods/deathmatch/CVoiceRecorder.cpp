@@ -307,9 +307,7 @@ void CVoiceRecorder::DoPulse( void )
 
                 unsigned int uiBytesWritten = speex_bits_write(&speexBits, bufTempOutput, 2048);
 
-                #ifdef VOICE_DEBUG_LOCAL_PLAYBACK
                 g_pClientGame->GetLocalPlayer()->GetVoice()->DecodeAndBuffer(bufTempOutput, uiBytesWritten);
-                #endif
 
                 NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream ();
                 if ( pBitStream )

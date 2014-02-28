@@ -184,50 +184,50 @@ SBindableKey g_bkKeys[] =
 
 SBindableGTAControl g_bcControls[] =
 {
-    { "fire",                   FIRE,                   CONTROL_FOOT,    false, true, "Fire" },
-    { "next_weapon",            NEXT_WEAPON,            CONTROL_FOOT,    false, true, "Next weapon" },
-    { "previous_weapon",        PREVIOUS_WEAPON,        CONTROL_FOOT,    false, true, "Previous weapon" },
-    { "forwards",               FORWARDS,               CONTROL_FOOT,    false, true, "Forwards" },
-    { "backwards",              BACKWARDS,              CONTROL_FOOT,    false, true, "Backwards"},
-    { "left",                   LEFT,                   CONTROL_FOOT,    false, true, "Left" },
-    { "right",                  RIGHT,                  CONTROL_FOOT,    false, true, "Right" },
-    { "zoom_in",                ZOOM_IN,                CONTROL_FOOT,    false, true, "Zoom in" },
-    { "zoom_out",               ZOOM_OUT,               CONTROL_FOOT,    false, true, "Zoom out" },
-    { "enter_exit",             ENTER_EXIT,             CONTROL_BOTH,    false, true, "Enter/Exit" },
-    { "change_camera",          CHANGE_CAMERA,          CONTROL_BOTH,    false, true, "Change camera" }, // 10
-    { "jump",                   JUMP,                   CONTROL_FOOT,    false, true, "Jump" },
-    { "sprint",                 SPRINT,                 CONTROL_FOOT,    false, true, "Sprint" },
-    { "look_behind",            LOOK_BEHIND,            CONTROL_FOOT,    false, true, "Look behind" },
-    { "crouch",                 CROUCH,                 CONTROL_FOOT,    false, true, "Crouch" },
-    { "action",                 ACTION,                 CONTROL_FOOT,    false, true, "Action" },
-    { "walk",                   WALK,                   CONTROL_FOOT,    false, true, "Walk" },
-    { "vehicle_fire",           VEHICLE_FIRE,           CONTROL_VEHICLE, false, true, "Vehicle fire" },
-    { "vehicle_secondary_fire", VEHICLE_SECONDARY_FIRE, CONTROL_VEHICLE, false, true, "Vehicle secondary fire" },
-    { "vehicle_left",           VEHICLE_LEFT,           CONTROL_VEHICLE, false, true, "Vehicle left" },
-    { "vehicle_right",          VEHICLE_RIGHT,          CONTROL_VEHICLE, false, true, "Vehicle right" }, // 20
-    { "steer_forward",          STEER_FORWARDS_DOWN,    CONTROL_VEHICLE, false, true, "Steer forwards/down" },
-    { "steer_back",             STEER_BACK_UP,          CONTROL_VEHICLE, false, true, "Steer backwards/up" },
-    { "accelerate",             ACCELERATE,             CONTROL_VEHICLE, false, true, "Accelerate" },
-    { "brake_reverse",          BRAKE_REVERSE,          CONTROL_VEHICLE, false, true, "Brake/Reverse" },
-    { "radio_next",             RADIO_NEXT,             CONTROL_VEHICLE, false, true, "Radio next" },
-    { "radio_previous",         RADIO_PREVIOUS,         CONTROL_VEHICLE, false, true, "Radio previous" },
-    { "radio_user_track_skip",  RADIO_USER_TRACK_SKIP,  CONTROL_VEHICLE, false, true, "Radio user track skip" },
-    { "horn",                   HORN,                   CONTROL_VEHICLE, false, true, "Horn" },
-    { "sub_mission",            SUB_MISSION,            CONTROL_VEHICLE, false, true, "Sub-mission" },
-    { "handbrake",              HANDBRAKE,              CONTROL_VEHICLE, false, true, "Handbrake" }, // 30
-    { "vehicle_look_left",      VEHICLE_LOOK_LEFT,      CONTROL_VEHICLE, false, true, "Vehicle look left" },
-    { "vehicle_look_right",     VEHICLE_LOOK_RIGHT,     CONTROL_VEHICLE, false, true, "Vehicle look right" },
-    { "vehicle_look_behind",    VEHICLE_LOOK_BEHIND,    CONTROL_VEHICLE, false, true, "Vehicle look behind" },
-    { "vehicle_mouse_look",     VEHICLE_MOUSE_LOOK,     CONTROL_VEHICLE, false, true, "Vehicle mouse look" },
-    { "special_control_left",   SPECIAL_CONTROL_LEFT,   CONTROL_VEHICLE, false, true, "Special control left" },
-    { "special_control_right",  SPECIAL_CONTROL_RIGHT,  CONTROL_VEHICLE, false, true, "Special control right" },
-    { "special_control_down",   SPECIAL_CONTROL_DOWN,   CONTROL_VEHICLE, false, true, "Special control down" },
-    { "special_control_up",     SPECIAL_CONTROL_UP,     CONTROL_VEHICLE, false, true, "Special control up" },
-    { "aim_weapon",             AIM_WEAPON,             CONTROL_FOOT,    false, true, "Aim weapon" },
-    { "conversation_yes",       CONVERSATION_YES,       CONTROL_FOOT,    false, true, "Conversation yes" }, // 40
-    { "conversation_no",        CONVERSATION_NO,        CONTROL_FOOT,    false, true, "Conversation no" },
-    { "group_control_forwards", GROUP_CONTROL_FORWARDS, CONTROL_FOOT,    false, true, "Group control forwards" },
-    { "group_control_back",     GROUP_CONTROL_BACK,     CONTROL_FOOT,    false, true, "Group control backwards" },
+    { "fire",                   FIRE,                   CONTROL_FOOT,    false, true, _td("Fire") },
+    { "next_weapon",            NEXT_WEAPON,            CONTROL_FOOT,    false, true, _td("Next weapon") },
+    { "previous_weapon",        PREVIOUS_WEAPON,        CONTROL_FOOT,    false, true, _td("Previous weapon") },
+    { "forwards",               FORWARDS,               CONTROL_FOOT,    false, true, _td("Forwards") },
+    { "backwards",              BACKWARDS,              CONTROL_FOOT,    false, true, _td("Backwards") },
+    { "left",                   LEFT,                   CONTROL_FOOT,    false, true, _td("Left") },
+    { "right",                  RIGHT,                  CONTROL_FOOT,    false, true, _td("Right") },
+    { "zoom_in",                ZOOM_IN,                CONTROL_FOOT,    false, true, _td("Zoom in") },
+    { "zoom_out",               ZOOM_OUT,               CONTROL_FOOT,    false, true, _td("Zoom out") },
+    { "enter_exit",             ENTER_EXIT,             CONTROL_BOTH,    false, true, _td("Enter/Exit") },
+    { "change_camera",          CHANGE_CAMERA,          CONTROL_BOTH,    false, true, _td("Change camera") }, // 10
+    { "jump",                   JUMP,                   CONTROL_FOOT,    false, true, _td("Jump") },
+    { "sprint",                 SPRINT,                 CONTROL_FOOT,    false, true, _td("Sprint") },
+    { "look_behind",            LOOK_BEHIND,            CONTROL_FOOT,    false, true, _td("Look behind") },
+    { "crouch",                 CROUCH,                 CONTROL_FOOT,    false, true, _td("Crouch") },
+    { "action",                 ACTION,                 CONTROL_FOOT,    false, true, _td("Action") },
+    { "walk",                   WALK,                   CONTROL_FOOT,    false, true, _td("Walk") },
+    { "vehicle_fire",           VEHICLE_FIRE,           CONTROL_VEHICLE, false, true, _td("Vehicle fire") },
+    { "vehicle_secondary_fire", VEHICLE_SECONDARY_FIRE, CONTROL_VEHICLE, false, true, _td("Vehicle secondary fire") },
+    { "vehicle_left",           VEHICLE_LEFT,           CONTROL_VEHICLE, false, true, _td("Vehicle left") },
+    { "vehicle_right",          VEHICLE_RIGHT,          CONTROL_VEHICLE, false, true, _td("Vehicle right") }, // 20
+    { "steer_forward",          STEER_FORWARDS_DOWN,    CONTROL_VEHICLE, false, true, _td("Steer forwards/down") },
+    { "steer_back",             STEER_BACK_UP,          CONTROL_VEHICLE, false, true, _td("Steer backwards/up") },
+    { "accelerate",             ACCELERATE,             CONTROL_VEHICLE, false, true, _td("Accelerate") },
+    { "brake_reverse",          BRAKE_REVERSE,          CONTROL_VEHICLE, false, true, _td("Brake/Reverse") },
+    { "radio_next",             RADIO_NEXT,             CONTROL_VEHICLE, false, true, _td("Radio next") },
+    { "radio_previous",         RADIO_PREVIOUS,         CONTROL_VEHICLE, false, true, _td("Radio previous") },
+    { "radio_user_track_skip",  RADIO_USER_TRACK_SKIP,  CONTROL_VEHICLE, false, true, _td("Radio user track skip") },
+    { "horn",                   HORN,                   CONTROL_VEHICLE, false, true, _td("Horn") },
+    { "sub_mission",            SUB_MISSION,            CONTROL_VEHICLE, false, true, _td("Sub-mission") },
+    { "handbrake",              HANDBRAKE,              CONTROL_VEHICLE, false, true, _td("Handbrake") }, // 30
+    { "vehicle_look_left",      VEHICLE_LOOK_LEFT,      CONTROL_VEHICLE, false, true, _td("Vehicle look left") },
+    { "vehicle_look_right",     VEHICLE_LOOK_RIGHT,     CONTROL_VEHICLE, false, true, _td("Vehicle look right") },
+    { "vehicle_look_behind",    VEHICLE_LOOK_BEHIND,    CONTROL_VEHICLE, false, true, _td("Vehicle look behind") },
+    { "vehicle_mouse_look",     VEHICLE_MOUSE_LOOK,     CONTROL_VEHICLE, false, true, _td("Vehicle mouse look") },
+    { "special_control_left",   SPECIAL_CONTROL_LEFT,   CONTROL_VEHICLE, false, true, _td("Special control left") },
+    { "special_control_right",  SPECIAL_CONTROL_RIGHT,  CONTROL_VEHICLE, false, true, _td("Special control right") },
+    { "special_control_down",   SPECIAL_CONTROL_DOWN,   CONTROL_VEHICLE, false, true, _td("Special control down") },
+    { "special_control_up",     SPECIAL_CONTROL_UP,     CONTROL_VEHICLE, false, true, _td("Special control up") },
+    { "aim_weapon",             AIM_WEAPON,             CONTROL_FOOT,    false, true, _td("Aim weapon") },
+    { "conversation_yes",       CONVERSATION_YES,       CONTROL_FOOT,    false, true, _td("Conversation yes") }, // 40
+    { "conversation_no",        CONVERSATION_NO,        CONTROL_FOOT,    false, true, _td("Conversation no") },
+    { "group_control_forwards", GROUP_CONTROL_FORWARDS, CONTROL_FOOT,    false, true, _td("Group control forwards") },
+    { "group_control_back",     GROUP_CONTROL_BACK,     CONTROL_FOOT,    false, true, _td("Group control backwards") },
 
     { "", (eControllerAction)0, (eControlType)0, false, false }
 };
@@ -351,8 +351,12 @@ bool CKeyBinds::ProcessKeyStroke ( const SBindableKey * pKey, bool bState )
     if ( pKey->iGTARelative == GTA_KEY_MSCROLLUP || pKey->iGTARelative == GTA_KEY_MSCROLLDOWN )
         m_bMouseWheel = true;
 
-    // Call the key-stroke handler if we have one
-    if ( m_KeyStrokeHandler ) m_KeyStrokeHandler ( pKey, bState );
+    // Allow some keys to trigger onClientKey even when console input has focus
+    bool bIsConsoleInputKey = true;
+    if ( ( pKey->ulCode >= VK_F1 && pKey->ulCode <= VK_F12 ) || ( pKey->ulCode <= VK_MBUTTON ) )
+        bIsConsoleInputKey = false;
+
+    bool bAllowed = TriggerKeyStrokeHandler ( pKey->szKey, bState, bIsConsoleInputKey );
 
     // Search through binds
     bool bFound = false;
@@ -374,10 +378,13 @@ bool CKeyBinds::ProcessKeyStroke ( const SBindableKey * pKey, bool bState )
             {
                 case KEY_BIND_GTA_CONTROL:
                 {
-                    if ( !bState || ( !bInputGoesToGUI && ( !m_pCore->IsCursorForcedVisible() || !m_pCore->IsCursorControlsToggled() ) ) )
+                    if ( bAllowed )
                     {
-                        CallGTAControlBind ( static_cast < CGTAControlBind* > ( *iter ), bState );
-                        bFound = true;
+                        if ( !bState || ( !bInputGoesToGUI && ( !m_pCore->IsCursorForcedVisible() || !m_pCore->IsCursorControlsToggled() ) ) )
+                        {
+                            CallGTAControlBind ( static_cast < CGTAControlBind* > ( *iter ), bState );
+                            bFound = true;
+                        }
                     }
                     break;
                 }
@@ -402,35 +409,38 @@ bool CKeyBinds::ProcessKeyStroke ( const SBindableKey * pKey, bool bState )
                                     if ( !bInputGoesToGUI )
                                     {
                                         CCommandBind* pCommandBind = static_cast < CCommandBind* > ( pBind );
-                                        // HACK: call chatbox commands on the next frame to stop a translated WM_CHAR key to pop up                                            
-                                        if ( strcmp ( pCommandBind->szCommand, "chatbox" ) == 0 )
+                                        if ( bAllowed || strcmp ( pCommandBind->szCommand, "screenshot" ) == 0 )
                                         {
-                                            m_pChatBoxBind = pCommandBind;
-                                        }                                                                            
-                                        else
-                                        {
-                                            bool bAlreadyProcessed = false;
-                                            list < CCommandBind* > ::iterator iter = processedList->begin ();
-                                            for ( ; iter != processedList->end (); iter++ )
+                                            // HACK: call chatbox commands on the next frame to stop a translated WM_CHAR key to pop up                                            
+                                            if ( strcmp ( pCommandBind->szCommand, "chatbox" ) == 0 )
                                             {
-                                                if ( strcmp ( ( *iter )->szCommand, pCommandBind->szCommand ) == 0 )
+                                                m_pChatBoxBind = pCommandBind;
+                                            }                                                                            
+                                            else
+                                            {
+                                                bool bAlreadyProcessed = false;
+                                                list < CCommandBind* > ::iterator iter = processedList->begin ();
+                                                for ( ; iter != processedList->end (); iter++ )
                                                 {
-                                                    if ( ( *iter )->bHitState == pCommandBind->bHitState )
+                                                    if ( strcmp ( ( *iter )->szCommand, pCommandBind->szCommand ) == 0 )
                                                     {
-                                                        if ( !pCommandBind->szArguments || ( ( *iter )->szArguments && strcmp ( ( *iter )->szArguments, pCommandBind->szArguments ) == 0 ) )
+                                                        if ( ( *iter )->bHitState == pCommandBind->bHitState )
                                                         {
-                                                            bAlreadyProcessed = true;
-                                                            break;
+                                                            if ( !pCommandBind->szArguments || ( ( *iter )->szArguments && strcmp ( ( *iter )->szArguments, pCommandBind->szArguments ) == 0 ) )
+                                                            {
+                                                                bAlreadyProcessed = true;
+                                                                break;
+                                                            }
                                                         }
                                                     }
                                                 }
-                                            }
 
-                                            //don't fire if its already fired
-                                            if ( !bAlreadyProcessed )
-                                            {
-                                                Call ( pCommandBind );
-                                                processedList->push_back ( pCommandBind );
+                                                //don't fire if its already fired
+                                                if ( !bAlreadyProcessed )
+                                                {
+                                                    Call ( pCommandBind );
+                                                    processedList->push_back ( pCommandBind );
+                                                }
                                             }
                                         }
                                     }
@@ -438,12 +448,15 @@ bool CKeyBinds::ProcessKeyStroke ( const SBindableKey * pKey, bool bState )
                                 }
                                 case KEY_BIND_FUNCTION:
                                 {
-                                    CKeyFunctionBind* pFunctionBind = static_cast < CKeyFunctionBind* > ( pBind );
-                                    if ( !bInputGoesToGUI || pFunctionBind->bIgnoreGUI )
+                                    if ( bAllowed )
                                     {
-                                        if ( pFunctionBind->Handler )
+                                        CKeyFunctionBind* pFunctionBind = static_cast < CKeyFunctionBind* > ( pBind );
+                                        if ( !bInputGoesToGUI || pFunctionBind->bIgnoreGUI )
                                         {
-                                            pFunctionBind->Handler ( pFunctionBind );
+                                            if ( pFunctionBind->Handler )
+                                            {
+                                                pFunctionBind->Handler ( pFunctionBind );
+                                            }
                                         }
                                     }
                                     break;
@@ -2715,4 +2728,14 @@ bool CKeyBinds::IsFakeCtrl_L ( UINT message, WPARAM wParam, LPARAM lParam )
   
     /* Not a fake control left press/release */
     return FALSE;
+}
+
+bool CKeyBinds::TriggerKeyStrokeHandler ( const SString& strKey, bool bState, bool bIsConsoleInputKey )
+{
+    // Call the key-stroke handler if we have one
+    if ( m_KeyStrokeHandler ) 
+    {
+        return m_KeyStrokeHandler ( strKey, bState, bIsConsoleInputKey );
+    }
+    return true;
 }

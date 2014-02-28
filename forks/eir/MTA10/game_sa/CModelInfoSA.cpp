@@ -76,7 +76,7 @@ BOOL CModelInfoSA::IsBoat ( )
     if ( !IsVehicle() )
         return FALSE;
 
-    return (BOOL)( ((CVehicleModelInfoSAInterface*)GetInterface())->m_vehicleType == VEHICLE_BOAT );
+    return (BOOL)( ((CVehicleModelInfoSAInterface*)GetInterface())->GetVehicleType() == VEHICLE_BOAT );
 }
 
 BOOL CModelInfoSA::IsCar ( )
@@ -86,7 +86,7 @@ BOOL CModelInfoSA::IsCar ( )
     if ( !IsVehicle() )
         return FALSE;
 
-    return (BOOL)( ((CVehicleModelInfoSAInterface*)GetInterface())->m_vehicleType == VEHICLE_CAR );
+    return (BOOL)( ((CVehicleModelInfoSAInterface*)GetInterface())->GetVehicleType() == VEHICLE_CAR );
 }
 
 BOOL CModelInfoSA::IsTrain ( )
@@ -96,7 +96,7 @@ BOOL CModelInfoSA::IsTrain ( )
     if ( !IsVehicle() )
         return FALSE;
 
-    return (BOOL)( ((CVehicleModelInfoSAInterface*)GetInterface())->m_vehicleType == VEHICLE_TRAIN );
+    return (BOOL)( ((CVehicleModelInfoSAInterface*)GetInterface())->GetVehicleType() == VEHICLE_TRAIN );
 }   
 
 BOOL CModelInfoSA::IsHeli ( )
@@ -106,7 +106,7 @@ BOOL CModelInfoSA::IsHeli ( )
     if ( !IsVehicle() )
         return FALSE;
 
-    return (BOOL)( ((CVehicleModelInfoSAInterface*)GetInterface())->m_vehicleType == VEHICLE_HELI );
+    return (BOOL)( ((CVehicleModelInfoSAInterface*)GetInterface())->GetVehicleType() == VEHICLE_HELI );
 }   
 
 BOOL CModelInfoSA::IsPlane ( )
@@ -116,7 +116,7 @@ BOOL CModelInfoSA::IsPlane ( )
     if ( !IsVehicle() )
         return FALSE;
 
-    return (BOOL)( ((CVehicleModelInfoSAInterface*)GetInterface())->m_vehicleType == VEHICLE_PLANE );
+    return (BOOL)( ((CVehicleModelInfoSAInterface*)GetInterface())->GetVehicleType() == VEHICLE_PLANE );
 }   
 
 BOOL CModelInfoSA::IsBike ( )
@@ -126,7 +126,7 @@ BOOL CModelInfoSA::IsBike ( )
     if ( !IsVehicle() )
         return FALSE;
 
-    return (BOOL)( ((CVehicleModelInfoSAInterface*)GetInterface())->m_vehicleType == VEHICLE_BIKE );
+    return (BOOL)( ((CVehicleModelInfoSAInterface*)GetInterface())->GetVehicleType() == VEHICLE_BIKE );
 }
 
 BOOL CModelInfoSA::IsFakePlane ( )
@@ -136,7 +136,7 @@ BOOL CModelInfoSA::IsFakePlane ( )
     if ( !IsVehicle() )
         return FALSE;
 
-    return (BOOL)( ((CVehicleModelInfoSAInterface*)GetInterface())->m_vehicleType == VEHICLE_FAKEPLANE );
+    return (BOOL)( ((CVehicleModelInfoSAInterface*)GetInterface())->GetVehicleType() == VEHICLE_FAKEPLANE );
 }   
 
 BOOL CModelInfoSA::IsMonsterTruck ( )
@@ -146,7 +146,7 @@ BOOL CModelInfoSA::IsMonsterTruck ( )
     if ( !IsVehicle() )
         return FALSE;
 
-    return (BOOL)( ((CVehicleModelInfoSAInterface*)GetInterface())->m_vehicleType == VEHICLE_MONSTERTRUCK );
+    return (BOOL)( ((CVehicleModelInfoSAInterface*)GetInterface())->GetVehicleType() == VEHICLE_MONSTERTRUCK );
 }
 
 BOOL CModelInfoSA::IsQuadBike ( )
@@ -156,7 +156,7 @@ BOOL CModelInfoSA::IsQuadBike ( )
     if ( !IsVehicle() )
         return FALSE;
 
-    return (BOOL)( ((CVehicleModelInfoSAInterface*)GetInterface())->m_vehicleType == VEHICLE_QUADBIKE );
+    return (BOOL)( ((CVehicleModelInfoSAInterface*)GetInterface())->GetVehicleType() == VEHICLE_QUADBIKE );
 }   
 
 BOOL CModelInfoSA::IsBmx ( )
@@ -166,7 +166,7 @@ BOOL CModelInfoSA::IsBmx ( )
     if ( !IsVehicle() )
         return FALSE;
 
-    return (BOOL)( ((CVehicleModelInfoSAInterface*)GetInterface())->m_vehicleType == VEHICLE_BICYCLE );
+    return (BOOL)( ((CVehicleModelInfoSAInterface*)GetInterface())->GetVehicleType() == VEHICLE_BICYCLE );
 }   
 
 BOOL CModelInfoSA::IsTrailer ( )
@@ -176,7 +176,7 @@ BOOL CModelInfoSA::IsTrailer ( )
     if ( !IsVehicle() )
         return FALSE;
 
-    return (BOOL)( ((CVehicleModelInfoSAInterface*)GetInterface())->m_vehicleType == VEHICLE_AUTOMOBILETRAILER );
+    return (BOOL)( ((CVehicleModelInfoSAInterface*)GetInterface())->GetVehicleType() == VEHICLE_AUTOMOBILETRAILER );
 }   
 
 BOOL CModelInfoSA::IsVehicle ( )
@@ -735,9 +735,12 @@ void CModelInfoSA::ResetAlphaTransparency ()
     m_pInterface = ppModelInfo [ m_dwModelID ];
     if(m_pInterface)
     {
-        BYTE bEnabled = *MapFind ( ms_ModelDefaultAlphaTransparencyMap, m_dwModelID );
-        m_pInterface->bAlphaTransparency = bEnabled;
-        MapRemove ( ms_ModelDefaultAlphaTransparencyMap, m_dwModelID );
+        BYTE* pbEnabled = MapFind ( ms_ModelDefaultAlphaTransparencyMap, m_dwModelID );
+        if ( pbEnabled )
+        {
+            m_pInterface->bAlphaTransparency = *pbEnabled;
+            MapRemove ( ms_ModelDefaultAlphaTransparencyMap, m_dwModelID );
+        }
     }
 }
 
@@ -789,7 +792,7 @@ void CModelInfoSA::SetCustomCarPlateText ( const char * szText )
     if ( !IsVehicle() )
         return;
 
-    char *szStoredText = ((CVehicleModelInfoSAInterface*)GetInterface())->m_plateText;
+    char *szStoredText = ((CVehicleModelInfoSAInterface*)GetInterface())->plateText;
 
     if ( szText ) 
         strncpy ( szStoredText, szText, 8 );
@@ -842,7 +845,7 @@ void CModelInfoSA::SetCustomModel ( RpClump* pClump )
         {
             pGame->GetRenderWare ()->ReplaceModel ( pClump, static_cast < unsigned short > ( m_dwModelID ) );
         }
-        else if ( m_dwModelID >= 331 && m_dwModelID <= 369 )
+        else if ( ( m_dwModelID >= 331 && m_dwModelID <= 369 ) || m_dwModelID == 372 )
         {
             // We are a weapon.
             pGame->GetRenderWare ()->ReplaceModel ( pClump, static_cast < unsigned short > ( m_dwModelID ) );
@@ -996,4 +999,114 @@ skip:
 void CModelInfoSA::StaticSetHooks ( void )
 {
     HookInstall( HOOKPOS_CFileLoader_LoadCollisionFile_Mid, (DWORD)HOOK_CFileLoader_LoadCollisionFile_Mid, HOOKSIZE_CFileLoader_LoadCollisionFile_Mid );
+}
+
+// Recursive RwFrame children searching function
+void CModelInfoSA::RwSetSupportedUpgrades ( RwFrame * parent, DWORD dwModel ) 
+{
+    for( RwFrame* ret = parent->child ; ret != NULL ; ret = ret->next )
+    {
+        // recurse into the child
+        if ( ret->child != NULL ) {
+            RwSetSupportedUpgrades ( ret, dwModel );
+        }
+        SString strName = ret->szName;
+        // Spoiler
+        if ( strName == "ug_bonnet" )
+        {
+            m_ModelSupportedUpgrades.m_bBonnet = true;
+        }
+        else if ( strName == "ug_bonnet_left" )
+        {
+            m_ModelSupportedUpgrades.m_bBonnet_Left = true;
+        }
+        else if ( strName == "ug_bonnet_left_dam" )
+        {
+            m_ModelSupportedUpgrades.m_bBonnet_Left_dam = true;
+        }
+        else if ( strName == "ug_bonnet_right" )
+        {
+            m_ModelSupportedUpgrades.m_bBonnet_Right = true;
+        }
+        else if ( strName == "ug_bonnet_right_dam" )
+        {
+            m_ModelSupportedUpgrades.m_bBonnet_Right_dam = true;
+        }
+        // Spoiler
+        else if ( strName == "ug_spoiler" )
+        {
+            m_ModelSupportedUpgrades.m_bSpoiler = true;
+        }
+        else if ( strName == "ug_spoiler_dam" )
+        {
+            m_ModelSupportedUpgrades.m_bSpoiler_dam = true;
+        }
+        // Bonnet
+        else if ( strName == "ug_lights" )
+        {
+            m_ModelSupportedUpgrades.m_bLamps = true;
+        }
+        else if ( strName == "ug_lights_dam" )
+        {
+            m_ModelSupportedUpgrades.m_bLamps_dam = true;
+        }
+        // Roof
+        else if ( strName == "ug_roof" )
+        {
+            m_ModelSupportedUpgrades.m_bRoof = true;
+        }
+        // Side Skirt
+        else if ( strName == "ug_wing_right" )
+        {
+            m_ModelSupportedUpgrades.m_bSideSkirt_Right = true;
+        }
+        // Side Skirt
+        else if ( strName == "ug_wing_left" )
+        {
+            m_ModelSupportedUpgrades.m_bSideSkirt_Left = true;
+        }
+        // Exhaust
+        else if ( strName == "exhaust_ok" )
+        {
+            m_ModelSupportedUpgrades.m_bExhaust = true;
+        }
+        // Front bullbars
+        else if ( strName == "ug_frontbullbar" )
+        {
+            m_ModelSupportedUpgrades.m_bFrontBullbars = true;
+        }
+        // rear bullbars
+        else if ( strName == "ug_backbullbar" )
+        {
+            m_ModelSupportedUpgrades.m_bRearBullbars = true;
+        }
+        // Front bumper
+        else if ( strName == "bump_front_dummy" )
+        {
+            m_ModelSupportedUpgrades.m_bFrontBumper = true;
+        }
+        // Rear bumper
+        else if ( strName == "bump_rear_dummy" )
+        {   
+            m_ModelSupportedUpgrades.m_bRearBumper = true;
+        }
+        // Rear bumper
+        else if ( strName == "misc_c" )
+        {   
+            m_ModelSupportedUpgrades.m_bMisc = true;
+        }
+    }
+}
+
+void CModelInfoSA::InitialiseSupportedUpgrades ( RpClump * pClump )
+{
+    m_ModelSupportedUpgrades.Reset ( );
+    RwFrame * pFrame = RpGetFrame ( pClump );
+    RwSetSupportedUpgrades ( pFrame, m_dwModelID );
+    m_ModelSupportedUpgrades.m_bInitialised = true;
+}
+
+void CModelInfoSA::ResetSupportedUpgrades ( void )
+{
+    m_ModelSupportedUpgrades.Reset ( );
 }

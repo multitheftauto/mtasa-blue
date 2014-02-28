@@ -25,6 +25,7 @@
 #define FUNC_ProcessCollision                   0x54DFB0
 #define FUNC_AttachEntityToEntity               0x54D570
 #define FUNC_DetatchEntityFromEntity            0x5442F0
+#define FUNC_AddToControlProcessList            0x542800
 
 #define PHYSICAL_MAXNOOFCOLLISIONRECORDS        6
 
@@ -131,6 +132,7 @@ public:
     void        SetBuoyancyConstant         ( float fBuoyancyConstant );
 
     VOID        ProcessCollision            ( void );
+    void        AddToControlProcessList     ( void );
 
     float       GetDamageImpulseMagnitude   ( void );
     void        SetDamageImpulseMagnitude   ( float fMagnitude );

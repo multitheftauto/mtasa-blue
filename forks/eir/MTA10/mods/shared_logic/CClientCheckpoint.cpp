@@ -255,7 +255,7 @@ void CClientCheckpoint::SetIcon ( unsigned int uiIcon )
 }
 
 
-void CClientCheckpoint::SetColor ( const SColor color )
+void CClientCheckpoint::SetColor ( const SColor& color )
 {
     // Different from our current color?
     if ( m_Color != color )

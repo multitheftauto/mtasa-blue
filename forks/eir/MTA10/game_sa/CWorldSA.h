@@ -29,6 +29,7 @@
 #define FUNC_RemoveReferencesToDeletedObject                0x565510 // ##SA##
 #define FUNC_COcclusion_ProcessBeforeRendering              0x7201C0
 #define VAR_COcclusion_NumActiveOccluders                   0xC73CC0
+#define FUNC_CWorld_FindPositionForTrackPosition            0x6F59E0
 
 // CCol...
 #define FUNC_CColLine_Constructor                           0x40EF50 // ##SA##
@@ -80,6 +81,7 @@ public:
     float       GetAircraftMaxVelocity    ( void );
     void        SetOcclusionsEnabled      ( bool bEnabled );
     bool        GetOcclusionsEnabled      ( void );
+    void        FindWorldPositionForRailTrackPosition ( float fRailTrackPosition, int iTrackId, CVector* pOutVecPosition );
 
     /**
      * \todo Add FindObjectsKindaColliding (see 0x430577)
@@ -112,11 +114,14 @@ public:
     void                AddBinaryBuilding               ( CEntitySAInterface * pInterface );
     bool                IsObjectRemoved                 ( CEntitySAInterface * pInterface );
     bool                IsDataModelRemoved              ( unsigned short usModelID );
+    bool                IsEntityRemoved                 ( CEntitySAInterface * pInterface );
 private:
     std::multimap< unsigned short, SBuildingRemoval* >          *m_pBuildingRemovals;
     std::multimap < unsigned short, sDataBuildingRemovalItem* > *m_pDataBuildings;
     std::multimap < unsigned short, sBuildingRemovalItem* >     *m_pBinaryBuildings;
     std::map < unsigned short, unsigned short >                 *m_pRemovedObjects;
+    std::map < DWORD, bool >                                    m_pRemovedEntities;
+    std::map < DWORD, bool >                                    m_pAddedEntities;
     float                                                       m_fAircraftMaxHeight;
 };
 

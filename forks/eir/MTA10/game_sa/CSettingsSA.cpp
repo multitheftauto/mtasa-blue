@@ -13,6 +13,10 @@
 
 #include "StdInc.h"
 
+static const float MOUSE_SENSITIVITY_MIN     = 0.000312f;
+static const float MOUSE_SENSITIVITY_DEFAULT = 0.0025f;
+static const float MOUSE_SENSITIVITY_MAX     = MOUSE_SENSITIVITY_DEFAULT * 2 - MOUSE_SENSITIVITY_MIN;
+
 unsigned long CSettingsSA::FUNC_GetNumVideoModes;
 unsigned long CSettingsSA::FUNC_GetVideoModeInfo;
 unsigned long CSettingsSA::FUNC_GetCurrentVideoMode;
@@ -31,6 +35,7 @@ CSettingsSA::CSettingsSA ( void )
     m_pInterface = (CSettingsSAInterface *)CLASS_CMenuManager;
     m_pInterface->bFrameLimiter = false;
     m_bVolumetricShadowsEnabled = false;
+    m_bVolumetricShadowsSuspended = false;
     SetAspectRatio ( ASPECT_RATIO_4_3 );
     HookInstall ( HOOKPOS_GetFxQuality, (DWORD)HOOK_GetFxQuality, 5 );
     HookInstall ( HOOKPOS_StoreShadowForVehicle, (DWORD)HOOK_StoreShadowForVehicle, 9 );
@@ -205,13 +210,14 @@ void CSettingsSA::SetFXQuality ( unsigned int fxQualityId )
 
 float CSettingsSA::GetMouseSensitivity ( )
 {
-    // 0.000312 (min) - 0.005000 (max)
-    return *(FLOAT *)VAR_fMouseSensitivity;
+    float fRawValue = *(FLOAT *)VAR_fMouseSensitivity;
+    return UnlerpClamped( MOUSE_SENSITIVITY_MIN, fRawValue, MOUSE_SENSITIVITY_MAX );    // Remap to 0-1
 }
 
 void CSettingsSA::SetMouseSensitivity ( float fSensitivity )
 {
-    MemPutFast < FLOAT > ( VAR_fMouseSensitivity, fSensitivity );
+    float fRawValue = Lerp( MOUSE_SENSITIVITY_MIN, fSensitivity, MOUSE_SENSITIVITY_MAX );
+    MemPutFast < FLOAT > ( VAR_fMouseSensitivity, fRawValue );
 }
 
 unsigned int CSettingsSA::GetAntiAliasing ( )
@@ -259,12 +265,17 @@ void CSettingsSA::Save ()
 
 bool CSettingsSA::IsVolumetricShadowsEnabled ( void )
 {
-    return m_bVolumetricShadowsEnabled;
+    return m_bVolumetricShadowsEnabled && !m_bVolumetricShadowsSuspended;
 }
 
 void CSettingsSA::SetVolumetricShadowsEnabled ( bool bEnable )
 {
     m_bVolumetricShadowsEnabled = bEnable;
+}
+
+void CSettingsSA::SetVolumetricShadowsSuspended ( bool bSuspended )
+{
+    m_bVolumetricShadowsSuspended = bSuspended;
 }
 
 //
@@ -351,7 +362,12 @@ eAspectRatio CSettingsSA::GetAspectRatio ( void )
     return m_AspectRatio;
 }
 
-void CSettingsSA::SetAspectRatio ( eAspectRatio aspectRatio )
+float CSettingsSA::GetAspectRatioValue ( void )
+{
+    return *(float*)0xC3EFA4;
+}
+
+void CSettingsSA::SetAspectRatio ( eAspectRatio aspectRatio, bool bAdjustmentEnabled )
 {
     // Process change
     m_AspectRatio = aspectRatio;
@@ -379,6 +395,12 @@ void CSettingsSA::SetAspectRatio ( eAspectRatio aspectRatio )
     }
 
     MemPutFast < float > ( 0xC3EFA4, fValue );
+
+    // Adjust position and size of our HUD components
+    if ( bAdjustmentEnabled )
+        pGame->GetHud ()->AdjustComponents ( fValue );
+    else
+        pGame->GetHud ()->ResetComponentAdjustment ();
 }
 
 ////////////////////////////////////////////////

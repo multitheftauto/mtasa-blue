@@ -32,6 +32,7 @@
 #define HOOKPOS_CWeapon__Fire_Sniper                    0x7424A6
 #define HOOKRET_CWeapon__Fire_Sniper                    0x7424D7
 #define HOOKPOS_CEventDamage__AffectsPed                0x4B35A0
+#define HOOKPOS_CEventVehicleExplosion__AffectsPed      0x4B0E58
 #define HOOKPOS_CFireManager__StartFire                 0x539F00
 #define HOOKPOS_CFireManager__StartFire_                0x53A050
 #define HOOKPOS_CProjectileInfo__AddProjectile          0x737C80
@@ -59,6 +60,7 @@ VOID HOOK_CPedIK__PointGunInDirection ();
 VOID HOOK_CTaskSimpleGangDriveBy__PlayerTarget ();
 VOID HOOK_CWeapon__Fire_Sniper ();
 VOID HOOK_CEventDamage__AffectsPed ();
+VOID HOOK_CEventVehicleExplosion__AffectsPed ();
 VOID HOOK_CFireManager__StartFire ();
 VOID HOOK_CFireManager__StartFire_ ();
 VOID HOOK_CProjectileInfo__AddProjectile();

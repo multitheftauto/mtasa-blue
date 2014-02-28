@@ -37,10 +37,10 @@ public:
     unsigned int        GetSelectionEnd         ( void );
     unsigned int        GetSelectionLength      ( void );
 
-    void                SetCaratIndex           ( unsigned int uiIndex );
-    void                SetCaratAtStart         ( void );
-    void                SetCaratAtEnd           ( void );
-    unsigned int        GetCaratIndex           ( void );
+    void                SetCaretIndex           ( unsigned int uiIndex );
+    void                SetCaretAtStart         ( void );
+    void                SetCaretAtEnd           ( void );
+    unsigned int        GetCaretIndex           ( void );
 
     void                SetTextAcceptedHandler  ( GUI_CALLBACK Callback );
     void                SetTextChangedHandler   ( GUI_CALLBACK Callback );

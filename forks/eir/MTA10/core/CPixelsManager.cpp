@@ -74,6 +74,7 @@ bool CPixelsManager::GetTexturePixels ( IDirect3DBaseTexture9* pD3DBaseTexture, 
         return false;
 
     IDirect3DSurface9* pD3DSurface = NULL;
+    CAutoReleaseMe < IDirect3DSurface9 > Thanks( pD3DSurface );
 
     D3DRESOURCETYPE resourceType = pD3DBaseTexture->GetType ();
     if ( resourceType == D3DRTYPE_VOLUMETEXTURE )
@@ -147,7 +148,6 @@ bool CPixelsManager::GetTexturePixels ( IDirect3DBaseTexture9* pD3DBaseTexture, 
         }
     }
 
-    SAFE_RELEASE ( pD3DSurface );
     return bResult;
 }
 
@@ -165,6 +165,7 @@ bool CPixelsManager::SetTexturePixels ( IDirect3DBaseTexture9* pD3DBaseTexture, 
         return false;
 
     IDirect3DSurface9* pD3DSurface = NULL;
+    CAutoReleaseMe < IDirect3DSurface9 > Thanks( pD3DSurface );
 
     D3DRESOURCETYPE resourceType = pD3DBaseTexture->GetType ();
     if ( resourceType == D3DRTYPE_VOLUMETEXTURE )
@@ -232,7 +233,6 @@ bool CPixelsManager::SetTexturePixels ( IDirect3DBaseTexture9* pD3DBaseTexture, 
         }
     }
 
-    SAFE_RELEASE ( pD3DSurface );
     return bResult;
 }
 

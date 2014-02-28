@@ -524,7 +524,7 @@ struct RpMaterialLighting
 {
     float ambient, specular, diffuse;
 };
-class RpMaterial
+struct RpMaterial
 {
 public:
     RwTexture*          texture;      // 0
@@ -537,7 +537,7 @@ public:
 
     void                SetTexture      ( RwTexture *tex );
 };
-class RpMaterials
+struct RpMaterials
 {
 public:
                     RpMaterials         ( unsigned int count );

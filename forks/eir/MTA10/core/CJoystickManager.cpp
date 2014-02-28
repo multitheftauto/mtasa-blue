@@ -521,6 +521,12 @@ void CJoystickManager::InitDirectInput( void )
         return;
     }
 
+    // In case device did not identify itself as a joysitck during creation,
+    // set flag again to ensure input data will not be dropped when the mouse cursor is showing.
+    CProxyDirectInputDevice8* pProxyInputDevice = dynamic_cast < CProxyDirectInputDevice8* > ( m_DevInfo.pDevice );
+    if ( pProxyInputDevice )
+        pProxyInputDevice->m_bDropDataIfInputGoesToGUI = false;
+
     // Set the data format to "simple Joystick" - a predefined data format 
     //
     // A data format specifies which controls on a device we are interested in,
@@ -552,6 +558,9 @@ void CJoystickManager::DoPulse ( void )
 {
     if ( !m_bDoneInit )
     {
+        if ( !g_pDirectInput8 )
+            return;
+
         // Init DInput if not done yet
         InitDirectInput();
         m_bDoneInit = true;
@@ -997,7 +1006,6 @@ bool CJoystickManager::IsXInputDeviceAttached ( void )
         m_DevInfo.axis[5].lMax = 255;
 
         m_DevInfo.axis[6].bEnabled = 0;
-        m_DevInfo.axis[7].bEnabled = 0;
 
         // Compose a guid for saving config
         m_DevInfo.guidProduct.Data1 = 0x12345678;
@@ -1589,8 +1597,8 @@ static string ToString( eStick value )
     if ( value == eLeftStickY )   return "LeftStickY";
     if ( value == eRightStickX )  return "RightStickX";
     if ( value == eRightStickY )  return "RightStickY";
-    if ( value == eAccelerate )   return "Accelerate Axis";
-    if ( value == eBrake )        return "Brake Axis";
+    if ( value == eAccelerate )   return _("Accelerate Axis");
+    if ( value == eBrake )        return _("Brake Axis");
     return "unknown";
 }
 

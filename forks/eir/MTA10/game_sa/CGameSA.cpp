@@ -17,7 +17,9 @@
 *****************************************************************************/
 
 #include "StdInc.h"
+#define ALLOC_STATS_MODULE_NAME "game_sa"
 #include "SharedUtil.hpp"
+#include "SharedUtil.MemAccess.hpp"
 
 unsigned long* CGameSA::VAR_SystemTime;
 unsigned long* CGameSA::VAR_IsAtMenu;
@@ -43,16 +45,12 @@ CGameSA::CGameSA()
     // Setup the global game file root, which has to be our current directory
     gameFileRoot = g_pCore->GetFileSystem()->CreateTranslator( "/" );
 
-    m_bAsyncSettingsDontUse = false;
-    m_bAsyncSettingsEnabled = false;
     m_bAsyncScriptEnabled = false;
     m_bAsyncScriptForced = false;
     m_bASyncLoadingSuspended = false;
     m_iCheckStatus = 0;
 
-    // Unprotect all of the GTASA code at once and leave it that way
-    DWORD oldProt;
-    VirtualProtect((LPVOID)0x401000, 0x4A3000, PAGE_EXECUTE_READWRITE, &oldProt);
+    SetInitialVirtualProtect();
 
     // Initialize the offsets
     eGameVersion version = FindGameVersion ();
@@ -75,6 +73,7 @@ CGameSA::CGameSA()
 
     DEBUG_TRACE("CGameSA::CGameSA()");
     this->m_pAudioEngine            = new CAudioEngineSA((CAudioEngineSAInterface*)CLASS_CAudioEngine);
+    this->m_pAudioContainer         = new CAudioContainerSA();
     this->m_pWorld                  = new CWorldSA();
     this->m_pPools                  = new CPoolsSA();
     this->m_pClock                  = new CClockSA();
@@ -205,6 +204,13 @@ CGameSA::CGameSA()
 
     CModelInfoSA::StaticSetHooks ();
     CPlayerPedSA::StaticSetHooks ();
+    CRenderWareSA::StaticSetHooks ();
+    CRenderWareSA::StaticSetClothesReplacingHooks ();
+    CTasksSA::StaticSetHooks ();
+    CPedSA::StaticSetHooks ();
+
+    // Stuff that needs investigating.
+    InitHooks_ClothesCache ();
 }
 
 CGameSA::~CGameSA ( void )
@@ -263,6 +269,7 @@ CGameSA::~CGameSA ( void )
     delete m_pClock;
     delete m_pPools;
     delete m_pWorld;
+    delete m_pAudioContainer;
     delete m_pAudioEngine;
     delete m_pPointLights;
 
@@ -667,12 +674,6 @@ bool CGameSA::VerifySADataFileNames ()
            !strcmp ( *(char **)0x5BE686, "DATA\\WEAPON.DAT" );
 }
 
-void CGameSA::SetAsyncLoadingFromSettings ( bool bSettingsDontUse, bool bSettingsEnabled )
-{
-    m_bAsyncSettingsDontUse = bSettingsDontUse;
-    m_bAsyncSettingsEnabled = bSettingsEnabled;
-}
-
 void CGameSA::SetAsyncLoadingFromScript ( bool bScriptEnabled, bool bScriptForced )
 {
     m_bAsyncScriptEnabled = bScriptEnabled;
@@ -689,9 +690,9 @@ bool CGameSA::IsASyncLoadingEnabled ( bool bIgnoreSuspend )
     if ( m_bASyncLoadingSuspended && !bIgnoreSuspend )
         return false;
 
-    if ( m_bAsyncScriptForced || m_bAsyncSettingsDontUse )
+    if ( m_bAsyncScriptForced )
         return m_bAsyncScriptEnabled;
-    return m_bAsyncSettingsEnabled;
+    return true;
 }
 
 void CGameSA::SetupSpecialCharacters ( void )

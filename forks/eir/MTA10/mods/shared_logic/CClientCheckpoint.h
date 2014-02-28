@@ -63,7 +63,7 @@ public:
     void                            SetIcon                         ( unsigned int uiIcon );
     
     inline SColor                   GetColor                        ( void ) const                      { return m_Color; }
-    void                            SetColor                        ( const SColor color );
+    void                            SetColor                        ( const SColor& color );
 
     inline float                    GetSize                         ( void ) const                      { return m_fSize; };
     void                            SetSize                         ( float fSize );
@@ -86,7 +86,7 @@ private:
     void                            Destroy                         ( void );
     void                            ReCreate                        ( void );
 
-    CClientMarker *                 m_pThis;
+    CClientMarkerPtr                m_pThis;
     bool                            m_bStreamedIn;
     CMatrix                         m_Matrix;
     CVector                         m_vecDirection;

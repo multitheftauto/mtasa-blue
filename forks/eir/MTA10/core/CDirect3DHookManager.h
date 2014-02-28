@@ -23,13 +23,8 @@ class CDirect3DHookManager
     void            ApplyHook               ( );
     void            RemoveHook              ( );
 
-    D3DHOOKTYPE     GetDirect3DHookType     ( ) const;
-
     private:
 
-    void            SetDirect3DHookType     ( );
-
-    D3DHOOKTYPE         m_Direct3DHookType;
     CDirect3DHook9 *    m_pDirect3DHook9;
 };
 

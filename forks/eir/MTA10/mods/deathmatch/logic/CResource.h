@@ -44,7 +44,7 @@ class CResource
 {  
 
 public:
-                            CResource       ( unsigned short usNetID, const char* szResourceName, CClientEntity* pResourceEntity, CClientEntity* pResourceDynamicEntity, const SString& strMinServerReq, const SString& strMinClientReq );
+                            CResource       ( unsigned short usNetID, const char* szResourceName, CClientEntity* pResourceEntity, CClientEntity* pResourceDynamicEntity, const SString& strMinServerReq, const SString& strMinClientReq, bool bEnableOOP );
                             ~CResource      ( void );
 
     inline unsigned short   GetNetID        ( void )                { return m_usNetID; };
@@ -94,10 +94,12 @@ public:
     inline std::list < CResourceFile* >::iterator    IterBeginResourceFiles   ( void )        { return m_ResourceFiles.begin(); }
     inline std::list < CResourceFile* >::iterator    IterEndResourceFiles     ( void )        { return m_ResourceFiles.end(); }
 
-    void                    SetRemainingProtectedScripts    ( unsigned short usRemaining ) { m_usRemainingProtectedScripts = usRemaining; }
-    void                    LoadProtectedScript             ( const char* chunk, unsigned int length );
+    void                    SetRemainingNoClientCacheScripts    ( unsigned short usRemaining ) { m_usRemainingNoClientCacheScripts = usRemaining; }
+    void                    LoadNoClientCacheScript         ( const char* chunk, unsigned int length, const SString& strFilename );
     const SString&          GetMinServerReq                 ( void ) const                  { return m_strMinServerReq; }
     const SString&          GetMinClientReq                 ( void ) const                  { return m_strMinClientReq; }
+    bool                    IsOOPEnabled                    ( void )                        { return m_bOOPEnabled; }
+    void                    HandleDownloadedFileTrouble     ( CResourceFile* pResourceFile, bool bCRCMismatch );
 
 private:
     unsigned short          m_usNetID;
@@ -114,10 +116,11 @@ private:
     class CClientEntity*    m_pResourceGUIEntity;
     class CClientEntity*    m_pResourceTXDRoot;
     bool                    m_bInDownloadQueue;
-    unsigned short          m_usRemainingProtectedScripts;
-    bool                    m_bLoadAfterReceivingProtectedScripts;
+    unsigned short          m_usRemainingNoClientCacheScripts;
+    bool                    m_bLoadAfterReceivingNoClientCacheScripts;
     SString                 m_strMinServerReq;
     SString                 m_strMinClientReq;
+    bool                    m_bOOPEnabled;
 
     // To control cursor show/hide
     static int              m_iShowingCursor;

@@ -598,7 +598,7 @@ void CVersionUpdater::InitiateManualCheck ( void )
 
     if ( IsBusy () )
     {
-        CCore::GetSingleton ().ShowMessageBox ( "Busy", "Can't check for updates right now", MB_BUTTON_OK | MB_ICON_ERROR );
+        CCore::GetSingleton ().ShowMessageBox ( _("Busy"), _("Can't check for updates right now"), MB_BUTTON_OK | MB_ICON_ERROR );
         return;
     }
 
@@ -1377,11 +1377,11 @@ void CVersionUpdater::_DoSidegradeLaunch ( void )
 void CVersionUpdater::_DialogSidegradeDownloadQuestion ( void )
 {
     GetQuestionBox ().Reset ();
-    GetQuestionBox ().SetTitle ( SString ( "MTA:SA %s required", *m_strSidegradeVersion ) );
-    GetQuestionBox ().SetMessage ( SString ( "An updated version of MTA:SA %s is required to join the selected server.\n\n"
-                                             "Do you want to download and install MTA:SA %s ?", *m_strSidegradeVersion, *m_strSidegradeVersion ) );
-    GetQuestionBox ().SetButton ( 0, "No" );
-    GetQuestionBox ().SetButton ( 1, "Yes" );
+    GetQuestionBox ().SetTitle ( SString ( _("MTA:SA %s required"), *m_strSidegradeVersion ) );
+    GetQuestionBox ().SetMessage ( SString ( _("An updated version of MTA:SA %s is required to join the selected server.\n\n"
+                                             "Do you want to download and install MTA:SA %s ?"), *m_strSidegradeVersion, *m_strSidegradeVersion ) );
+    GetQuestionBox ().SetButton ( 0, _("No") );
+    GetQuestionBox ().SetButton ( 1, _("Yes") );
     GetQuestionBox ().Show ();
     Push ( _PollQuestionNoYes );
 }
@@ -1397,10 +1397,10 @@ void CVersionUpdater::_DialogSidegradeDownloadQuestion ( void )
 void CVersionUpdater::_DialogSidegradeLaunchQuestion ( void )
 {
     GetQuestionBox ().Reset ();
-    GetQuestionBox ().SetTitle ( SString ( "MTA:SA %s required", *m_strSidegradeVersion ) );
-    GetQuestionBox ().SetMessage ( SString ( "Do you want to launch MTA:SA %s and connect to this server ?", *m_strSidegradeVersion ) );
-    GetQuestionBox ().SetButton ( 0, "No" );
-    GetQuestionBox ().SetButton ( 1, "Yes" );
+    GetQuestionBox ().SetTitle ( SString ( _("MTA:SA %s required"), *m_strSidegradeVersion ) );
+    GetQuestionBox ().SetMessage ( SString ( _("Do you want to launch MTA:SA %s and connect to this server ?"), *m_strSidegradeVersion ) );
+    GetQuestionBox ().SetButton ( 0, _("No") );
+    GetQuestionBox ().SetButton ( 1, _("Yes") );
     GetQuestionBox ().Show ();
     Push ( _PollQuestionNoYes );
 }
@@ -1416,9 +1416,9 @@ void CVersionUpdater::_DialogSidegradeLaunchQuestion ( void )
 void CVersionUpdater::_DialogSidegradeQueryError ( void )
 {
     GetQuestionBox ().Reset ();
-    GetQuestionBox ().SetTitle ( SString ( "MTA:SA %s required", *m_strSidegradeVersion ) );
-    GetQuestionBox ().SetMessage ( "It is not possible to connect at this time.\n\nPlease try later." );
-    GetQuestionBox ().SetButton ( 0, "OK" );
+    GetQuestionBox ().SetTitle ( SString ( _("MTA:SA %s required"), *m_strSidegradeVersion ) );
+    GetQuestionBox ().SetMessage ( _("It is not possible to connect at this time.\n\nPlease try later.") );
+    GetQuestionBox ().SetButton ( 0, _("OK") );
     GetQuestionBox ().Show ();
     Push ( _PollAnyButton );
 }
@@ -1592,9 +1592,9 @@ void CVersionUpdater::_PollQuestionNoYes ( void )
 void CVersionUpdater::_DialogConnectingWait ( void )
 {
     GetQuestionBox ().Reset ();
-    GetQuestionBox ().SetTitle ( "Connecting" );
-    GetQuestionBox ().SetMessage ( "Please wait..." );
-    GetQuestionBox ().SetButton ( 0, "Cancel" );
+    GetQuestionBox ().SetTitle ( _("Connecting") );
+    GetQuestionBox ().SetMessage ( _("Please wait...") );
+    GetQuestionBox ().SetButton ( 0, _("Cancel") );
     GetQuestionBox ().Show ();
 }
 
@@ -1609,9 +1609,9 @@ void CVersionUpdater::_DialogConnectingWait ( void )
 void CVersionUpdater::_DialogChecking ( void )
 {
     GetQuestionBox ().Reset ();
-    GetQuestionBox ().SetTitle ( "CHECKING" );
-    GetQuestionBox ().SetMessage ( "Please wait..." );
-    GetQuestionBox ().SetButton ( 0, "Cancel" );
+    GetQuestionBox ().SetTitle ( _("CHECKING") );
+    GetQuestionBox ().SetMessage ( _("Please wait...") );
+    GetQuestionBox ().SetButton ( 0, _("Cancel") );
     GetQuestionBox ().Show ();
 }
 
@@ -1627,9 +1627,9 @@ void CVersionUpdater::_DialogNoUpdate ( void )
 {
     // Display message
     GetQuestionBox ().Reset ();
-    GetQuestionBox ().SetTitle ( "UPDATE CHECK" );
-    GetQuestionBox ().SetMessage ( "No update needed" );
-    GetQuestionBox ().SetButton ( 0, "OK" );
+    GetQuestionBox ().SetTitle ( _("UPDATE CHECK") );
+    GetQuestionBox ().SetMessage ( _("No update needed") );
+    GetQuestionBox ().SetButton ( 0, _("OK") );
     GetQuestionBox ().Show ();
     Push ( _PollAnyButton );
 }
@@ -1646,9 +1646,9 @@ void CVersionUpdater::_DialogDownloading ( void )
 {
     // Display dialog
     GetQuestionBox ().Reset ();
-    GetQuestionBox ().SetTitle ( "DOWNLOADING" );
-    GetQuestionBox ().SetMessage ( "waiting..." );
-    GetQuestionBox ().SetButton ( 0, "Cancel" );
+    GetQuestionBox ().SetTitle ( _("DOWNLOADING") );
+    GetQuestionBox ().SetMessage ( _("waiting...") );
+    GetQuestionBox ().SetButton ( 0, _("Cancel") );
     GetQuestionBox ().Show ();
 }
 
@@ -1664,10 +1664,10 @@ void CVersionUpdater::_DialogServerSaysUpdateQuestion ( void )
 {
     // Display message
     GetQuestionBox ().Reset ();
-    GetQuestionBox ().SetTitle ( "MANDATORY UPDATE" );
-    GetQuestionBox ().SetMessage ( "To join this server, you must update MTA.\n\n Do you want to update now ?" );
-    GetQuestionBox ().SetButton ( 0, "No" );
-    GetQuestionBox ().SetButton ( 1, "Yes" );
+    GetQuestionBox ().SetTitle ( _("MANDATORY UPDATE") );
+    GetQuestionBox ().SetMessage ( _("To join this server, you must update MTA.\n\n Do you want to update now ?") );
+    GetQuestionBox ().SetButton ( 0, _("No") );
+    GetQuestionBox ().SetButton ( 1, _("Yes") );
     GetQuestionBox ().Show ();
     Push ( _PollQuestionNoYes );
 }
@@ -1684,10 +1684,10 @@ void CVersionUpdater::_DialogServerSaysRecommendQuestion ( void )
 {
     // Display message
     GetQuestionBox ().Reset ();
-    GetQuestionBox ().SetTitle ( "OPTIONAL UPDATE" );
-    GetQuestionBox ().SetMessage ( "Server says an update is recommended, but not essential.\n\n Do you want to update now ?" );
-    GetQuestionBox ().SetButton ( 0, "No" );
-    GetQuestionBox ().SetButton ( 1, "Yes" );
+    GetQuestionBox ().SetTitle ( _("OPTIONAL UPDATE") );
+    GetQuestionBox ().SetMessage ( _("Server says an update is recommended, but not essential.\n\n Do you want to update now ?") );
+    GetQuestionBox ().SetButton ( 0, _("No") );
+    GetQuestionBox ().SetButton ( 1, _("Yes") );
     GetQuestionBox ().Show ();
     Push ( _PollQuestionNoYes );
 }
@@ -1725,9 +1725,9 @@ void CVersionUpdater::_DialogUpdateQueryError ( void )
 {
     // Display message
     GetQuestionBox ().Reset ();
-    GetQuestionBox ().SetTitle ( "UPDATE CHECK" );
-    GetQuestionBox ().SetMessage ( "Update not currently avalable.\n\nPlease check www.mtasa.com" );
-    GetQuestionBox ().SetButton ( 0, "OK" );
+    GetQuestionBox ().SetTitle ( _("UPDATE CHECK") );
+    GetQuestionBox ().SetMessage ( _("Update not currently avalable.\n\nPlease check www.mtasa.com") );
+    GetQuestionBox ().SetButton ( 0, _("OK") );
     GetQuestionBox ().Show ();
     Push ( _PollAnyButton );
 }
@@ -1748,9 +1748,9 @@ void CVersionUpdater::_DialogUpdateResult(void)
         if ( m_ConditionMap.IsConditionTrue ( "Download.Fail.Saving" ) )
         {
             GetQuestionBox ().Reset ();
-            GetQuestionBox ().SetTitle ( "ERROR SAVING" );
-            GetQuestionBox ().SetMessage ( "Unable to create the file." );
-            GetQuestionBox ().SetButton ( 0, "OK" );
+            GetQuestionBox ().SetTitle ( _("ERROR SAVING") );
+            GetQuestionBox ().SetMessage ( _("Unable to create the file.") );
+            GetQuestionBox ().SetButton ( 0, _("OK") );
             GetQuestionBox ().Show ();
             Push ( _PollAnyButton );
         }
@@ -1758,18 +1758,18 @@ void CVersionUpdater::_DialogUpdateResult(void)
         if ( m_ConditionMap.IsConditionTrue ( "Download.Fail.Checksum" ) )
         {
             GetQuestionBox ().Reset ();
-            GetQuestionBox ().SetTitle ( "ERROR DOWNLOADING" );
-            GetQuestionBox ().SetMessage ( "The downloaded file appears to be incorrect." );
-            GetQuestionBox ().SetButton ( 0, "OK" );
+            GetQuestionBox ().SetTitle ( _("ERROR DOWNLOADING") );
+            GetQuestionBox ().SetMessage ( _("The downloaded file appears to be incorrect.") );
+            GetQuestionBox ().SetButton ( 0, _("OK") );
             GetQuestionBox ().Show ();
             Push ( _PollAnyButton );
         }
         else
         {
             GetQuestionBox ().Reset ();
-            GetQuestionBox ().SetTitle ( "ERROR DOWNLOADING" );
-            GetQuestionBox ().SetMessage ( "For some reason." );
-            GetQuestionBox ().SetButton ( 0, "OK" );
+            GetQuestionBox ().SetTitle ( _("ERROR DOWNLOADING") );
+            GetQuestionBox ().SetMessage ( _("For some reason.") );
+            GetQuestionBox ().SetButton ( 0, _("OK") );
             GetQuestionBox ().Show ();
             Push ( _PollAnyButton );
         }
@@ -1780,9 +1780,9 @@ void CVersionUpdater::_DialogUpdateResult(void)
         // Handle success
         // Exit game after button press
         GetQuestionBox ().Reset ();
-        GetQuestionBox ().SetTitle ( "DOWNLOAD COMPLETE" );
+        GetQuestionBox ().SetTitle ( _("DOWNLOAD COMPLETE") );
         GetQuestionBox ().SetMessage ( m_JobInfo.strMsg2 );
-        GetQuestionBox ().SetButton ( 0, "OK" );
+        GetQuestionBox ().SetButton ( 0, _("OK") );
         GetQuestionBox ().Show ();
 
         if ( m_JobInfo.strStatus == "update" )
@@ -1802,7 +1802,7 @@ void CVersionUpdater::_DialogUpdateResult(void)
         }
         else
         {
-            GetQuestionBox ().SetMessage ( m_JobInfo.strStatus + " - Unknown problem in _DialogUpdateResult" );
+            GetQuestionBox ().SetMessage ( m_JobInfo.strStatus + _(" - Unknown problem in _DialogUpdateResult") );
         }
         Push ( _PollAnyButton );
     }
@@ -1828,12 +1828,12 @@ void CVersionUpdater::_QUpdateResult ( void )
         }
 #if MTA_DEBUG
         else
-            MessageBox ( NULL, "_QUpdateResult m_JobInfo.strStatus != 'silent'", m_JobInfo.strStatus, MB_OK );
+            MessageBoxUTF8 ( NULL, "_QUpdateResult m_JobInfo.strStatus != 'silent'", m_JobInfo.strStatus, MB_OK );
 #endif
     }
 #if MTA_DEBUG
     else
-        MessageBox ( NULL, "_QUpdateResult Download.!Ok", "Error", MB_OK );
+        MessageBoxUTF8 ( NULL, "_QUpdateResult Download.!Ok", "Error", MB_OK );
 #endif
 }
 
@@ -1874,12 +1874,12 @@ void CVersionUpdater::_QUpdateNewsResult ( void )
         }
 #if MTA_DEBUG
         else
-            MessageBox ( NULL, "_QUpdateNewsResult m_JobInfo.strStatus != 'silent'", m_JobInfo.strStatus, MB_OK );
+            MessageBoxUTF8 ( NULL, "_QUpdateNewsResult m_JobInfo.strStatus != 'silent'", m_JobInfo.strStatus, MB_OK );
 #endif
     }
 #if MTA_DEBUG
     else
-        MessageBox ( NULL, "_QUpdateNewsResult Download.!Ok", "Error", MB_OK );
+        MessageBoxUTF8 ( NULL, "_QUpdateNewsResult Download.!Ok", "Error", MB_OK );
 #endif
 }
 
@@ -1897,14 +1897,14 @@ void CVersionUpdater::_DialogDataFilesQuestion ( void )
     if ( GetApplicationSettingInt ( "customized-sa-files-using" ) )
     {
         GetQuestionBox ().Reset ();
-        GetQuestionBox ().SetTitle ( "CUSTOMIZED GTA:SA FILES" );
+        GetQuestionBox ().SetTitle ( _("CUSTOMIZED GTA:SA FILES") );
         SString strMessage;
         strMessage += "This server is blocking your customized GTA:SA files.";
         strMessage += "\n\nTo join this server please uncheck:";
         strMessage += "\nSettings->Multiplayer->Use customized GTA:SA files";
         strMessage += "\n\n";
-        GetQuestionBox ().SetMessage ( strMessage );
-        GetQuestionBox ().SetButton ( 0, "Ok" );
+        GetQuestionBox ().SetMessage ( _(strMessage) );
+        GetQuestionBox ().SetButton ( 0, _("Ok") );
         GetQuestionBox ().Show ();
         Push ( _PollAnyButton );
         m_ConditionMap.SetCondition ( "QuestionResponse", "No" );
@@ -1913,9 +1913,9 @@ void CVersionUpdater::_DialogDataFilesQuestion ( void )
 
     // Display message
     GetQuestionBox ().Reset ();
-    GetQuestionBox ().SetTitle ( "ERROR" );
-    GetQuestionBox ().SetMessage ( "Some MTA:SA data files are missing.\n\n\nPlease reinstall MTA:SA" );
-    GetQuestionBox ().SetButton ( 0, "Ok" );
+    GetQuestionBox ().SetTitle ( _("ERROR") );
+    GetQuestionBox ().SetMessage ( _("Some MTA:SA data files are missing.\n\n\nPlease reinstall MTA:SA") );
+    GetQuestionBox ().SetButton ( 0, _("Ok") );
     GetQuestionBox ().Show ();
     Push ( _PollAnyButton );
     m_ConditionMap.SetCondition ( "QuestionResponse", "No" );
@@ -1933,9 +1933,9 @@ void CVersionUpdater::_DialogDataFilesQueryError ( void )
 {
     // Display message
     GetQuestionBox ().Reset ();
-    GetQuestionBox ().SetTitle ( "DATA FILES" );
-    GetQuestionBox ().SetMessage ( "Data files not currently avalable.\n\nPlease check www.mtasa.com" );
-    GetQuestionBox ().SetButton ( 0, "OK" );
+    GetQuestionBox ().SetTitle ( _("DATA FILES") );
+    GetQuestionBox ().SetMessage ( _("Data files not currently avalable.\n\nPlease check www.mtasa.com") );
+    GetQuestionBox ().SetButton ( 0, _("OK") );
     GetQuestionBox ().Show ();
     Push ( _PollAnyButton );
 }
@@ -1956,9 +1956,9 @@ void CVersionUpdater::_DialogDataFilesResult ( void )
         if ( m_ConditionMap.IsConditionTrue ( "Download.Fail.Saving" ) )
         {
             GetQuestionBox ().Reset ();
-            GetQuestionBox ().SetTitle ( "ERROR SAVING" );
-            GetQuestionBox ().SetMessage ( "Unable to create the file." );
-            GetQuestionBox ().SetButton ( 0, "OK" );
+            GetQuestionBox ().SetTitle ( _("ERROR SAVING") );
+            GetQuestionBox ().SetMessage ( _("Unable to create the file.") );
+            GetQuestionBox ().SetButton ( 0, _("OK") );
             GetQuestionBox ().Show ();
             Push ( _PollAnyButton );
         }
@@ -1966,18 +1966,18 @@ void CVersionUpdater::_DialogDataFilesResult ( void )
         if ( m_ConditionMap.IsConditionTrue ( "Download.Fail.Checksum" ) )
         {
             GetQuestionBox ().Reset ();
-            GetQuestionBox ().SetTitle ( "ERROR DOWNLOADING" );
-            GetQuestionBox ().SetMessage ( "The downloaded file appears to be incorrect." );
-            GetQuestionBox ().SetButton ( 0, "OK" );
+            GetQuestionBox ().SetTitle ( _("ERROR DOWNLOADING") );
+            GetQuestionBox ().SetMessage ( _("The downloaded file appears to be incorrect.") );
+            GetQuestionBox ().SetButton ( 0, _("OK") );
             GetQuestionBox ().Show ();
             Push ( _PollAnyButton );
         }
         else
         {
             GetQuestionBox ().Reset ();
-            GetQuestionBox ().SetTitle ( "ERROR DOWNLOADING" );
-            GetQuestionBox ().SetMessage ( "For some reason." );
-            GetQuestionBox ().SetButton ( 0, "OK" );
+            GetQuestionBox ().SetTitle ( _("ERROR DOWNLOADING") );
+            GetQuestionBox ().SetMessage ( _("For some reason.") );
+            GetQuestionBox ().SetButton ( 0, _("OK") );
             GetQuestionBox ().Show ();
             Push ( _PollAnyButton );
         }
@@ -1990,9 +1990,9 @@ void CVersionUpdater::_DialogDataFilesResult ( void )
 
         // Exit game after button press
         GetQuestionBox ().Reset ();
-        GetQuestionBox ().SetTitle ( "DOWNLOAD COMPLETE" );
+        GetQuestionBox ().SetTitle ( _("DOWNLOAD COMPLETE") );
         GetQuestionBox ().SetMessage ( m_JobInfo.strMsg2 );
-        GetQuestionBox ().SetButton ( 0, "OK" );
+        GetQuestionBox ().SetButton ( 0, _("OK") );
         GetQuestionBox ().Show ();
         Push ( _ExitGame );
         Push ( _PollAnyButton );
@@ -2524,9 +2524,9 @@ void CVersionUpdater::_PollDownload ( void )
                     return;
                 }
                 if ( m_JobInfo.bShowDownloadPercent )
-                    GetQuestionBox ().SetMessage ( SString ( "%3d %% completed", m_JobInfo.uiBytesDownloaded * 100 / Max < unsigned int > ( 1, m_JobInfo.iFilesize ) ) );
+                    GetQuestionBox ().SetMessage ( SString ( _("%3d %% completed"), m_JobInfo.uiBytesDownloaded * 100 / Max < unsigned int > ( 1, m_JobInfo.iFilesize ) ) );
                 if ( m_JobInfo.iIdleTime > 1000 && m_JobInfo.iIdleTimeLeft > 500 )
-                    GetQuestionBox ().AppendMessage ( SString ( "\n\nWaiting for response  -  %-3d", m_JobInfo.iIdleTimeLeft / 1000 ) );
+                    GetQuestionBox ().AppendMessage ( SString ( _("\n\nWaiting for response  -  %-3d"), m_JobInfo.iIdleTimeLeft / 1000 ) );
                 else
                     GetQuestionBox ().AppendMessage ( "" );
             }
@@ -2707,7 +2707,7 @@ void CVersionUpdater::_ProcessCrashDumpQuery ( void )
     if ( m_JobInfo.downloadBuffer.size () == 0 )
         return;
 
-    SString strResponse ( &m_JobInfo.downloadBuffer[0], m_JobInfo.downloadBuffer.size () );
+    SStringX strResponse ( &m_JobInfo.downloadBuffer[0], m_JobInfo.downloadBuffer.size () );
 
     // Is the dump file wanted?
     if ( strResponse.BeginsWithI ( "yes" ) )
@@ -2880,11 +2880,36 @@ int CVersionUpdater::DoSendDownloadRequestToNextServer ( void )
     SString strUpdateBuildType;
     CVARS_GET ( "update_build_type", strUpdateBuildType );
 
+    // Supercode to determine if sound files have been cut
+    static SString strSoundCut = "u";
+    if ( strSoundCut == "u" )
+    {
+        SString strGTARootDir;
+        CFilePathTranslator().GetGTARootDirectory( strGTARootDir );
+        if ( FILE* fh = fopen( PathJoin( strGTARootDir, "audio", "SFX", "SPC_EA" ), "rb" ) )
+        {
+            strSoundCut = "y";
+            fseek( fh, 0x38BDC80, SEEK_SET );
+            for ( uint i = 0 ; i < 20 ; i++ )
+                if ( fgetc( fh ) )
+                    strSoundCut = "n";  // Non-zero found
+            if ( ferror( fh ) )
+                strSoundCut = "e";      // File error
+            fclose( fh );
+        }
+    }
+
     // Compile some system stats
     SDxStatus dxStatus;
     g_pGraphics->GetRenderItemManager ()->GetDxStatus ( dxStatus );
     CGameSettings* gameSettings = CCore::GetSingleton ( ).GetGame ( )->GetSettings();
-    SString strVideoCard = SStringX ( g_pDeviceState->AdapterState.Name ).Left ( 30 ).Replace ( "&", "_" ).Replace ( "=", "_" );
+    SString strVideoCard = SStringX ( g_pDeviceState->AdapterState.Name ).Left ( 30 );
+    {
+        LOCAL_FUNCTION_START
+            static bool IsNotAlnum ( int c ) { return !isalnum(c); }
+        LOCAL_FUNCTION_END
+        std::replace_if( strVideoCard.begin(), strVideoCard.end(), LOCAL_FUNCTION::IsNotAlnum, '_' ); 
+    }
     SString strSystemStats ( "1_%d_%d_%d_%d_%d"
                              "_%d%d%d%d"
                              "_%s"
@@ -2902,20 +2927,39 @@ int CVersionUpdater::DoSendDownloadRequestToNextServer ( void )
                              , *GetApplicationSetting ( "real-os-version" )
                            );
 
+    SString strSystemStats2 ( "2_%d_%d_%d"
+                             "_%d_%d_%d"
+                             , g_pGraphics->GetViewportWidth()
+                             , g_pGraphics->GetViewportHeight()
+                             , dxStatus.settings.b32BitColor
+
+                             , GetApplicationSettingInt( DIAG_PRELOAD_UPGRADES_LOWEST_UNSAFE )
+                             , GetApplicationSettingInt( DIAG_MINIDUMP_DETECTED_COUNT )
+                             , GetApplicationSettingInt( DIAG_MINIDUMP_CONFIRMED_COUNT )
+                           );
+
+    SString strConnectUsage = SString("%i_%i", GetApplicationSettingInt ( "times-connected-editor" ), GetApplicationSettingInt ( "times-connected" ) );
+    SString strOptimusInfo = SString("%i_%i_%i", GetApplicationSettingInt ( "nvhacks", "optimus" ), GetApplicationSettingInt ( "nvhacks", "optimus-startup-option" ), GetApplicationSettingInt ( "nvhacks", "optimus-force-windowed" ) );
+
     // Make the query URL
     SString strQueryURL = strServerURL;
-    strQueryURL = strQueryURL.Replace ( "%VERSION%", strPlayerVersion );
-    strQueryURL = strQueryURL.Replace ( "%ID%", szSerial );
-    strQueryURL = strQueryURL.Replace ( "%STATUS%", szStatus );
-    strQueryURL = strQueryURL.Replace ( "%BETA%", strUpdateBuildType );
-    strQueryURL = strQueryURL.Replace ( "%TYPE%", m_strServerSaysType );
-    strQueryURL = strQueryURL.Replace ( "%DATA%", m_strServerSaysData );
-    strQueryURL = strQueryURL.Replace ( "%REFER%", m_strServerSaysHost );
-    strQueryURL = strQueryURL.Replace ( "%WANTVER%", m_strSidegradeVersion );
-    strQueryURL = strQueryURL.Replace ( "%LASTNEWS%", m_VarConfig.news_lastNewsDate );
-    strQueryURL = strQueryURL.Replace ( "%FILE%", m_JobInfo.strPostFilename );
-    strQueryURL = strQueryURL.Replace ( "%SYS%", strSystemStats );
-    strQueryURL = strQueryURL.Replace ( "%VID%", strVideoCard );
+    strQueryURL = strQueryURL.Replace ( "%", "_" );
+    strQueryURL = strQueryURL.Replace ( "_VERSION_", strPlayerVersion );
+    strQueryURL = strQueryURL.Replace ( "_ID_", szSerial );
+    strQueryURL = strQueryURL.Replace ( "_STATUS_", szStatus );
+    strQueryURL = strQueryURL.Replace ( "_BETA_", strUpdateBuildType );
+    strQueryURL = strQueryURL.Replace ( "_TYPE_", m_strServerSaysType );
+    strQueryURL = strQueryURL.Replace ( "_DATA_", m_strServerSaysData );
+    strQueryURL = strQueryURL.Replace ( "_REFER_", m_strServerSaysHost );
+    strQueryURL = strQueryURL.Replace ( "_WANTVER_", m_strSidegradeVersion );
+    strQueryURL = strQueryURL.Replace ( "_LASTNEWS_", m_VarConfig.news_lastNewsDate );
+    strQueryURL = strQueryURL.Replace ( "_FILE_", m_JobInfo.strPostFilename );
+    strQueryURL = strQueryURL.Replace ( "_SYS_", strSystemStats );
+    strQueryURL = strQueryURL.Replace ( "_SYS2_", strSystemStats2 );
+    strQueryURL = strQueryURL.Replace ( "_VID_", strVideoCard );
+    strQueryURL = strQueryURL.Replace ( "_USAGE_", strConnectUsage );
+    strQueryURL = strQueryURL.Replace ( "_SCUT_", strSoundCut );
+    strQueryURL = strQueryURL.Replace ( "_OPTIMUS_", strOptimusInfo );
 
     // Perform the HTTP request
     m_HTTP.Get ( strQueryURL );
@@ -3027,10 +3071,11 @@ int CVersionUpdater::DoSendPostToNextServer ( void )
 
     // Make the query URL
     SString strQueryURL = strServerURL;
-    strQueryURL = strQueryURL.Replace ( "%VERSION%", strPlayerVersion );
-    strQueryURL = strQueryURL.Replace ( "%ID%", szSerial );
-    strQueryURL = strQueryURL.Replace ( "%STATUS%", szStatus );
-    strQueryURL = strQueryURL.Replace ( "%FILE%", m_JobInfo.strPostFilename );
+    strQueryURL = strQueryURL.Replace ( "%", "_" );
+    strQueryURL = strQueryURL.Replace ( "_VERSION_", strPlayerVersion );
+    strQueryURL = strQueryURL.Replace ( "_ID_", szSerial );
+    strQueryURL = strQueryURL.Replace ( "_STATUS_", szStatus );
+    strQueryURL = strQueryURL.Replace ( "_FILE_", m_JobInfo.strPostFilename );
 
     //
     // Send data. Doesn't check if it was received.

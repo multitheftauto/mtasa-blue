@@ -179,8 +179,8 @@ bool CLuaArgument::CompareRecursive ( const CLuaArgument& Argument, std::set < C
                         return false;
                 }
             
-                iter++;
-                iterCompare++;
+                ++iter;
+                ++iterCompare;
             }
             return true;
         }
@@ -430,7 +430,11 @@ bool CLuaArgument::GetAsString ( SString& strBuffer )
             return false;
             break;
         case LUA_TNUMBER:
-            strBuffer = SString ( "%d", ( int ) m_Number );
+            if ( m_Number == static_cast <int> ( m_Number ) )
+                strBuffer = SString ( "%d", static_cast <int> ( m_Number ) );
+            else
+                strBuffer = SString ( "%f", m_Number );
+
             break;
         default: return false; break;
     }
@@ -473,7 +477,7 @@ bool CLuaArgument::ReadFromBitStream ( NetBitStreamInterface& bitStream, std::ve
                 {
                     float fNum;
                     if ( bitStream.Read ( fNum ) )
-                        ReadNumber ( fNum );
+                        ReadNumber ( RoundFromFloatSource( fNum ) );
                 }
                 else
                 {
@@ -1017,7 +1021,7 @@ bool CLuaArgument::ReadFromJSONObject ( json_object* object, std::vector < CLuaA
                         case 'T':   // Table reference
                         {
                             unsigned long ulTableID = static_cast < unsigned long > ( atol ( szString + 3 ) );
-                            if ( pKnownTables && ulTableID >= 0 && ulTableID < pKnownTables->size () )
+                            if ( pKnownTables && ulTableID < pKnownTables->size () )
                             {
                                 m_pTableData = pKnownTables->at ( ulTableID );
                                 m_bWeakTableRef = true;

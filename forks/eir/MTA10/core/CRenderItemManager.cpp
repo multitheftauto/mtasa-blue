@@ -12,6 +12,13 @@
 #include <game/CGame.h>
 #include "CRenderItem.EffectCloner.h"
 
+// Type of vertex used to emulate StretchRect for SwiftShader bug
+struct SRTVertex
+{
+    static const uint FVF = D3DFVF_XYZRHW | D3DFVF_TEX1;
+    float x,y,z,w;
+    float u,v;
+};
 
 ////////////////////////////////////////////////////////////////
 //
@@ -70,6 +77,14 @@ void CRenderItemManager::OnDeviceCreate ( IDirect3DDevice9* pDevice, float fView
         m_strVideoCardPSVersion += SString ( ".%d", iMinor );
 
     UpdateMemoryUsage ();
+
+    // Check if using SwiftShader dll
+    SLibVersionInfo libVersionInfo;
+    if ( GetLibVersionInfo( "d3d9.dll", &libVersionInfo ) )
+    {
+        if ( libVersionInfo.strProductName.ContainsI( "Swift" ) )
+            m_bIsSwiftShader = true;
+    }
 }
 
 ////////////////////////////////////////////////////////////////
@@ -87,6 +102,7 @@ void CRenderItemManager::OnLostDevice ( void )
     SAFE_RELEASE( m_pSavedSceneDepthSurface );
     SAFE_RELEASE( m_pSavedSceneRenderTargetAA );
     SAFE_RELEASE( g_pDeviceState->MainSceneState.DepthBuffer );
+    SAFE_RELEASE( m_pNonAARenderTargetTexture );
     SAFE_RELEASE( m_pNonAARenderTarget );
     SAFE_RELEASE( m_pNonAADepthSurface2 );
 }
@@ -518,6 +534,8 @@ bool CRenderItemManager::SaveDefaultRenderTarget ( void )
     SAFE_RELEASE ( pActiveD3DRenderTarget )
     SAFE_RELEASE ( pActiveD3DZStencilSurface )
 
+    // Do this in case dxSetRenderTarget is being called from some unexpected place
+    CGraphics::GetSingleton().MaybeEnteringMTARenderZone();
     return true;
 }
 
@@ -536,9 +554,26 @@ bool CRenderItemManager::RestoreDefaultRenderTarget ( void )
     {
         ChangeRenderTarget ( m_uiDefaultViewportSizeX, m_uiDefaultViewportSizeY, m_pDefaultD3DRenderTarget, m_pDefaultD3DZStencilSurface );
         m_pDefaultD3DRenderTarget = NULL;
+
+        // Do this in case dxSetRenderTarget is being called from some unexpected place
+        CGraphics::GetSingleton().MaybeLeavingMTARenderZone();
     }
 
     return true;
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// CRenderItemManager::IsUsingDefaultRenderTarget
+//
+// Check if currently drawing to the default render target
+//
+////////////////////////////////////////////////////////////////
+bool CRenderItemManager::IsUsingDefaultRenderTarget ( void )
+{
+    // If this is NULL, it means we haven't saved it, so aren't using another render target
+    return m_pDefaultD3DRenderTarget == NULL;
 }
 
 
@@ -709,6 +744,8 @@ void CRenderItemManager::GetDxStatus ( SDxStatus& outStatus )
     outStatus.settings.bGrassEffect = false;
     outStatus.settings.bHeatHaze = false;
     outStatus.settings.iAnisotropicFiltering = 0;
+    outStatus.settings.aspectRatio = gameSettings->GetAspectRatio ();
+    outStatus.settings.bHUDMatchAspectRatio = true;
 
     CVARS_GET ( "streaming_memory",     outStatus.settings.iStreamingMemory );
     CVARS_GET ( "display_windowed",     outStatus.settings.bWindowed );
@@ -717,6 +754,7 @@ void CRenderItemManager::GetDxStatus ( SDxStatus& outStatus )
     CVARS_GET ( "grass",                outStatus.settings.bGrassEffect );
     CVARS_GET ( "heat_haze",            outStatus.settings.bHeatHaze );
     CVARS_GET ( "anisotropic",          outStatus.settings.iAnisotropicFiltering );
+    CVARS_GET ( "hud_match_aspect_ratio", outStatus.settings.bHUDMatchAspectRatio );
 
     if ( outStatus.settings.iFXQuality == 0 )
     {
@@ -962,9 +1000,13 @@ void CRenderItemManager::PreDrawWorld ( void )
     // Create/destroy readable depth buffer depending on what is needed
     bool bRequireDepthBuffer = !m_ShadersUsingDepthBuffer.empty ();
 
+    // Readable depth buffer is not compatible with volumetric shadows
+    CCore::GetSingleton ().GetGame ()->GetSettings ()->SetVolumetricShadowsSuspended( bRequireDepthBuffer );
+
     if ( !bRequireDepthBuffer )
     {
         SAFE_RELEASE( pReadableDepthBuffer );
+        SAFE_RELEASE( m_pNonAARenderTargetTexture );
         SAFE_RELEASE( m_pNonAARenderTarget );
         SAFE_RELEASE( m_pNonAADepthSurface2 );
     }
@@ -976,6 +1018,7 @@ void CRenderItemManager::PreDrawWorld ( void )
 
         if ( pReadableDepthBuffer )
         {
+            assert( !m_pNonAARenderTargetTexture );
             assert( !m_pNonAARenderTarget );
             assert( !m_pNonAADepthSurface2 );
 
@@ -985,8 +1028,17 @@ void CRenderItemManager::PreDrawWorld ( void )
                 // If device is using an AA swapchain, then:
                 //      1. Create a non-AA render target to pair with our readable depth buffer
                 //      2. Create second depth buffer for pairing with non-AA render target when readable depth buffer needs to be preserved
-                m_pDevice->CreateRenderTarget( m_uiDefaultViewportSizeX, m_uiDefaultViewportSizeY, pp.BackBufferFormat, D3DMULTISAMPLE_NONE, 0, false, &m_pNonAARenderTarget, NULL );
-                m_pDevice->CreateDepthStencilSurface( m_uiDefaultViewportSizeX, m_uiDefaultViewportSizeY, (D3DFORMAT)m_depthBufferFormat, D3DMULTISAMPLE_NONE, 0, true, &m_pNonAADepthSurface2, NULL );
+                if ( !m_bIsSwiftShader )
+                    m_pDevice->CreateRenderTarget( m_uiDefaultViewportSizeX, m_uiDefaultViewportSizeY, pp.BackBufferFormat, D3DMULTISAMPLE_NONE, 0, false, &m_pNonAARenderTarget, NULL );
+                else
+                {
+                    // Render target texture is needed when emulating StretchRect
+                    m_pDevice->CreateTexture ( m_uiDefaultViewportSizeX, m_uiDefaultViewportSizeY, 1, D3DUSAGE_RENDERTARGET, pp.BackBufferFormat, D3DPOOL_DEFAULT, &m_pNonAARenderTargetTexture, NULL );
+                    if ( m_pNonAARenderTargetTexture )
+                        m_pNonAARenderTargetTexture->GetSurfaceLevel ( 0, &m_pNonAARenderTarget );
+                }
+
+                m_pDevice->CreateDepthStencilSurface( m_uiDefaultViewportSizeX, m_uiDefaultViewportSizeY, pp.AutoDepthStencilFormat, D3DMULTISAMPLE_NONE, 0, true, &m_pNonAADepthSurface2, NULL );
             }
         }
     }
@@ -1048,7 +1100,6 @@ void CRenderItemManager::SaveReadableDepthBuffer( void )
     }
 }
 
-
 ////////////////////////////////////////////////////////////////
 //
 // CRenderItemManager::FlushNonAARenderTarget
@@ -1071,7 +1122,68 @@ void CRenderItemManager::FlushNonAARenderTarget( void )
 
         if ( m_pNonAARenderTarget )
         {
-            m_pDevice->StretchRect( m_pNonAARenderTarget, NULL, m_pSavedSceneRenderTargetAA, NULL, D3DTEXF_POINT );
+            if ( !m_bIsSwiftShader )
+                m_pDevice->StretchRect( m_pNonAARenderTarget, NULL, m_pSavedSceneRenderTargetAA, NULL, D3DTEXF_POINT );
+            else
+            {
+                // Emulate StretchRect using DrawPrimitive
+
+                // Save render states
+                IDirect3DStateBlock9* pSavedStateBlock = NULL;
+                m_pDevice->CreateStateBlock( D3DSBT_ALL, &pSavedStateBlock );
+
+                // Prepare vertex buffer
+                float fX1 = -0.5f;
+                float fY1 = -0.5f;
+                float fX2 = m_uiDefaultViewportSizeX + fX1;
+                float fY2 = m_uiDefaultViewportSizeY + fY1;
+                float fU1 = 0;
+                float fV1 = 0;
+                float fU2 = 1;
+                float fV2 = 1;
+
+                const SRTVertex vertices[] = {  { fX1, fY1, 0, 1, fU1, fV1 }, 
+                                                { fX2, fY1, 0, 1, fU2, fV1 }, 
+                                                { fX1, fY2, 0, 1, fU1, fV2 }, 
+
+                                                { fX2, fY1, 0, 1, fU2, fV1 }, 
+                                                { fX2, fY2, 0, 1, fU2, fV2 }, 
+                                                { fX1, fY2, 0, 1, fU1, fV2 } };
+
+                // Set vertex stream
+                uint PrimitiveCount                 = NUMELMS( vertices ) / 3;
+                const void* pVertexStreamZeroData   = &vertices[0];
+                uint VertexStreamZeroStride         = sizeof(SRTVertex);
+                m_pDevice->SetFVF( SRTVertex::FVF );
+
+                // Set render states
+                m_pDevice->SetRenderState( D3DRS_ZENABLE,          D3DZB_FALSE );
+                m_pDevice->SetRenderState( D3DRS_CULLMODE,         D3DCULL_NONE );
+                m_pDevice->SetRenderState( D3DRS_ALPHABLENDENABLE, FALSE );
+                m_pDevice->SetRenderState( D3DRS_ALPHATESTENABLE,  FALSE );
+                m_pDevice->SetRenderState( D3DRS_LIGHTING,         FALSE);
+                m_pDevice->SetRenderState( D3DRS_ZWRITEENABLE,     FALSE );
+                m_pDevice->SetTextureStageState( 0, D3DTSS_COLOROP,   D3DTOP_SELECTARG1 );
+                m_pDevice->SetTextureStageState( 0, D3DTSS_COLORARG1, D3DTA_TEXTURE );
+                m_pDevice->SetTextureStageState( 0, D3DTSS_ALPHAOP,   D3DTOP_SELECTARG1 );
+                m_pDevice->SetTextureStageState( 0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE );
+                m_pDevice->SetTextureStageState( 1, D3DTSS_COLOROP,   D3DTOP_DISABLE );
+                m_pDevice->SetTextureStageState( 1, D3DTSS_ALPHAOP,   D3DTOP_DISABLE );
+                m_pDevice->SetSamplerState( 0, D3DSAMP_MAGFILTER, D3DTEXF_POINT );
+                m_pDevice->SetSamplerState( 0, D3DSAMP_MINFILTER, D3DTEXF_POINT );
+                m_pDevice->SetSamplerState( 0, D3DSAMP_MIPFILTER, D3DTEXF_POINT );
+
+                // Draw using texture
+                m_pDevice->SetTexture( 0, m_pNonAARenderTargetTexture );
+                m_pDevice->DrawPrimitiveUP( D3DPT_TRIANGLELIST, PrimitiveCount, pVertexStreamZeroData, VertexStreamZeroStride );
+
+                // Restore render states
+                if ( pSavedStateBlock )
+                {
+                    pSavedStateBlock->Apply();
+                    SAFE_RELEASE( pSavedStateBlock );
+                }
+            }
         }
         SAFE_RELEASE( m_pSavedSceneRenderTargetAA );
     }

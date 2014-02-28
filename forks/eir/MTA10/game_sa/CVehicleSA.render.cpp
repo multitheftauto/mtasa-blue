@@ -50,11 +50,14 @@ void CVehicleSAInterface::RenderPassengers( void )
 =========================================================*/
 void CVehicleSAInterface::SetupRender( CVehicleSA *mtaVeh )
 {
-    CVehicleModelInfoSAInterface *info = (CVehicleModelInfoSAInterface*)ppModelInfo[GetModelIndex()];
+    CVehicleModelInfoSAInterface *info = (CVehicleModelInfoSAInterface*)ppModelInfo[ GetModelIndex() ];
+
+    // Wire in the hook done by MTA team.
+    OnMY_CAutomobile_CustomCarPlate_BeforeRenderingStart( this, info );
 
     (*ppRwInterface)->m_deviceCommand( (eRwDeviceCmd)20, 1 );
 
-    if ( !m_unk38 )
+    if ( !m_pCustomPlateTexture )
         SetPlateTextureForRendering( info );
 
     // Load another paintjob TexDictionary if requested
@@ -119,14 +122,19 @@ void CVehicleSAInterface::SetupRender( CVehicleSA *mtaVeh )
 =========================================================*/
 void CVehicleSAInterface::LeaveRender( void )
 {
+    CVehicleModelInfoSAInterface *modelInfo = GetModelInfo();
+
+    // Wire in the hook done by MTA team.
+    OnMY_CAutomobile_CustomCarPlate_AfterRenderingStop( modelInfo );
+
     // Change texture stage
     (*ppRwInterface)->m_deviceCommand( (eRwDeviceCmd)20, 2 );
 
     // Restore clump data
     RpClumpRestoreVehicleMaterials( (RpClump*)GetRwObject() );
 
-    if ( !m_unk38 )
-        RestoreLicensePlate( GetModelInfo() );
+    if ( !m_pCustomPlateTexture )
+        RestoreLicensePlate( modelInfo );
 }
 
 /*=========================================================
@@ -142,7 +150,7 @@ static RwTexture *_originalPlateTexture = NULL;
 
 void CVehicleSAInterface::SetPlateTextureForRendering( CVehicleModelInfoSAInterface *info )
 {
-    RpMaterial *plateMaterial = info->m_plateMaterial;
+    RpMaterial *plateMaterial = info->pPlateMaterial;
 
     if ( !plateMaterial )
         return;
@@ -157,7 +165,7 @@ void CVehicleSAInterface::SetPlateTextureForRendering( CVehicleModelInfoSAInterf
     _originalPlateTexture = original;
 
     // Change the plate material texture to the new one
-    plateMaterial->SetTexture( m_plateTexture );
+    plateMaterial->SetTexture( m_pCustomPlateTexture );
 }
 
 /*=========================================================
@@ -171,7 +179,7 @@ void CVehicleSAInterface::SetPlateTextureForRendering( CVehicleModelInfoSAInterf
 =========================================================*/
 void CVehicleSAInterface::RestoreLicensePlate( CVehicleModelInfoSAInterface *info )
 {
-    RpMaterial *plateMaterial = info->m_plateMaterial;
+    RpMaterial *plateMaterial = info->pPlateMaterial;
 
     if ( !plateMaterial )
         return;

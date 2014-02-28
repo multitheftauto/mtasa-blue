@@ -66,6 +66,7 @@ public:
     CTaskComplexDie*                    CreateTaskComplexDie                    ( const eWeaponType eMeansOfDeath=WEAPONTYPE_UNARMED, const AssocGroupId animGroup=0/*ANIM_STD_PED*/, const AnimationId anim=0/*ANIM_STD_KO_FRONT*/, const float fBlendDelta=4.0f, const float fAnimSpeed=0.0f, const bool bBeingKilledByStealth=false, const bool bFallingToDeath=false, const int iFallToDeathDir=0, const bool bFallToDeathOverRailing=false );
     CTaskSimpleStealthKill*             CreateTaskSimpleStealthKill             ( bool bAttacker, class CPed * pPed, const AnimationId anim );
     CTaskSimpleDead*                    CreateTaskSimpleDead                    ( unsigned int uiDeathTimeMS, bool bUnk2 );
+    CTaskSimpleBeHit*                   CreateTaskSimpleBeHit                   ( CPed* pPedAttacker, ePedPieceTypes hitBodyPart, int hitBodySide, int weaponId );
 
     CTaskComplexSunbathe*               CreateTaskComplexSunbathe               ( class CObject* pTowel, const bool bStartStanding );
 
@@ -78,6 +79,8 @@ public:
     CTaskSimpleGangDriveBy*             CreateTaskSimpleGangDriveBy             ( CEntity *pTargetEntity, const CVector *pVecTarget, float fAbortRange, char FrequencyPercentage, char nDrivebyStyle, bool bSeatRHS );
     CTaskSimpleUseGun*                  CreateTaskSimpleUseGun                  ( CEntity *pTargetEntity, CVector vecTarget, char nCommand, short nBurstLength=1, unsigned char bAimImmediate=false );
     CTaskSimpleFight*                   CreateTaskSimpleFight                   ( CEntity *pTargetEntity, int nCommand, unsigned int nIdlePeriod = 10000 );
+
+    static void                         StaticSetHooks                          ( void );
 };
 
 #endif

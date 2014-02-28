@@ -27,6 +27,7 @@ struct SAclRequest;
 #include "MTAPlatform.h"
 #define SHARED_UTIL_WITH_FAST_HASH_MAP
 #include "SharedUtil.h"
+#include "gccHashSupport.h"
 #include <xml/CXML.h>
 #include <xml/CXMLNode.h>
 #include <xml/CXMLFile.h>
@@ -41,6 +42,7 @@ struct SAclRequest;
 #include <bochs_internal/crc32.h>
 #include "CChecksum.h"
 #include "CIdArray.h"
+#include "pcrecpp.h"
 
 // Packet includes
 #include "net/Packets.h"
@@ -79,6 +81,7 @@ struct SAclRequest;
 #include "packets/CPlayerJoinPacket.h"
 #include "packets/CPlayerListPacket.h"
 #include "packets/CPlayerPuresyncPacket.h"
+#include "packets/CPlayerNoSocketPacket.h"
 #include "packets/CPlayerQuitPacket.h"
 #include "packets/CPlayerSpawnPacket.h"
 #include "packets/CPlayerStatsPacket.h"
@@ -107,6 +110,7 @@ struct SAclRequest;
 
 // Lua function definition includes
 #include "luadefs/CLuaACLDefs.h"
+#include "luadefs/CLuaBitDefs.h"
 #include "luadefs/CLuaCameraDefs.h"
 #include "luadefs/CLuaDefs.h"
 #include "luadefs/CLuaElementDefs.h"
@@ -125,6 +129,7 @@ struct SAclRequest;
 #include "lua/LuaCommon.h"
 #include "lua/CLuaMain.h"
 #include "CEasingCurve.h"
+#include "CBanManager.h"
 #include "lua/CLuaFunctionParseHelpers.h"
 #include "CScriptArgReader.h"
 #include "lua/CLuaManager.h"
@@ -145,6 +150,8 @@ struct SAclRequest;
 #include "TInterpolation.h"
 #include "CPositionRotationAnimation.h"
 #include "CLatentTransferManager.h"
+#include "CDebugHookManager.h"
+#include "CLuaShared.h"
 
 // Logic includes
 #include "ASE.h"
@@ -157,7 +164,6 @@ struct SAclRequest;
 #include "CAccountManager.h"
 #include "CAclRightName.h"
 #include "CBan.h"
-#include "CBanManager.h"
 #include "CBandwidthSettings.h"
 #include "CBlendedWeather.h"
 #include "CBlip.h"
@@ -276,17 +282,6 @@ struct SAclRequest;
 #include "CStaticFunctionDefinitions.h"
 
 // Utility includes
-#include "utils/CHTTPClient.h"
-#include "utils/CHTTPRequest.h"
-#include "utils/CHTTPResponse.h"
-#include "utils/CTCP.h"
-#include "utils/CTCPClientSocket.h"
-#include "utils/CTCPClientSocketImpl.h"
-#include "utils/CTCPImpl.h"
-#include "utils/CTCPServerSocket.h"
-#include "utils/CTCPServerSocketImpl.h"
-#include "utils/CTCPSocket.h"
-#include "utils/CTCPSocketImpl.h"
 #include "utils/CZipMaker.h"
 #include <base64.h>
 
@@ -295,27 +290,3 @@ struct SAclRequest;
 #include "Config.h"
 #define SHOW_SELF_COMPILE_WARNING
 #include "../../version.h"
-
-
-#if defined(__GNUC__) && (__GNUC__ >= 3)
-    namespace __gnu_cxx
-    {
-        template <>
-        struct hash < CLuaArguments* >
-        {
-            size_t operator()( const CLuaArguments* pArguments ) const
-            {
-                return (size_t)pArguments;
-            }
-        };
-
-        template <>
-        struct hash < const void* >
-        {
-            size_t operator()( const void* pArguments ) const
-            {
-                return (size_t)pArguments;
-            }
-        };
-    }
-#endif

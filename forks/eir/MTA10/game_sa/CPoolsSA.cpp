@@ -48,7 +48,7 @@ CPoolsSA::CPoolsSA( void )
     DEBUG_TRACE("CPoolsSA::CPoolsSA( void )");
 
     // Do not let GTA:SA init pools!
-    *(unsigned char*)FUNC_InitGamePools = 0xC3;
+    MemPut <unsigned char> ( (unsigned char*)FUNC_InitGamePools, 0xC3 );
 
     *ppPtrNodeSinglePool = new CPtrNodeSinglePool();
     *ppPtrNodeDoublePool = new CPtrNodeDoublePool();

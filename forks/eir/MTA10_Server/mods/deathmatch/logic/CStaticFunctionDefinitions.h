@@ -127,7 +127,7 @@ public:
     static bool                 GetPlayerNametagText                ( CPlayer* pPlayer, SString& strOutText );
     static bool                 GetPlayerNametagColor               ( CPlayer* pPlayer, unsigned char& ucR, unsigned char& ucG, unsigned char& ucB );
     static bool                 IsPlayerNametagShowing              ( CPlayer* pPlayer, bool& bShowing );
-    static const std::string&   GetPlayerSerial                     ( CPlayer* pPlayer );
+    static const std::string&   GetPlayerSerial                     ( CPlayer* pPlayer, uint uiIndex );
     static const std::string&   GetPlayerUserName                   ( CPlayer* pPlayer );
     static const std::string&   GetPlayerCommunityID                ( CPlayer* pPlayer );
     static bool                 GetPlayerBlurLevel                  ( CPlayer* pPlayer, unsigned char& ucLevel );
@@ -154,7 +154,7 @@ public:
     static bool                 RedirectPlayer                      ( CElement* pElement, const char* szHost, unsigned short usPort, const char* szPassword );
     static bool                 SetPlayerName                       ( CElement* pElement, const char* szName );
     static bool                 DetonateSatchels                    ( CElement* pElement );
-    static bool                 TakePlayerScreenShot                ( CElement* pElement, uint uiSizeX, uint uiSizeY, const SString& strTag, uint uiQuality, uint uiMaxBandwidth, uint uiMaxPacketSize, const SString& strResourceName );
+    static bool                 TakePlayerScreenShot                ( CElement* pElement, uint uiSizeX, uint uiSizeY, const SString& strTag, uint uiQuality, uint uiMaxBandwidth, uint uiMaxPacketSize, CResource* pResource );
 
     // Ped get funcs
     static CPed*                CreatePed                           ( CResource* pResource, unsigned short usModel, const CVector& vecPosition, float fRotation = 0.0f, bool bSynced = true );
@@ -326,6 +326,7 @@ public:
     static bool                 SetVehicleHeadLightColor            ( CVehicle* pVehicle, const SColor color );
     static bool                 SetVehicleTurretPosition            ( CVehicle* pVehicle, float fHorizontal, float fVertical );
     static bool                 SetVehicleDoorOpenRatio             ( CElement* pElement, unsigned char ucDoor, float fRatio, unsigned long ulTime = 0 );
+    static bool                 SetVehiclePlateText                 ( CElement* pElement, const SString& strPlateText );
 
     //static bool                 SetVehicleHandling                  ( CVehicle* pVehicle, bool bValue );
     static bool                 ResetVehicleHandling                ( CVehicle* pVehicle, bool bUseOriginal );
@@ -436,7 +437,7 @@ public:
     static CColCuboid*          CreateColCuboid                     ( CResource* pResource, const CVector& vecPosition, const CVector& vecSize );
     static CColSphere*          CreateColSphere                     ( CResource* pResource, const CVector& vecPosition, float fRadius );
     static CColRectangle*       CreateColRectangle                  ( CResource* pResource, const CVector& vecPosition, const CVector2D& vecSize );
-    static CColPolygon*         CreateColPolygon                    ( CResource* pResource, const CVector& vecPosition );
+    static CColPolygon*         CreateColPolygon                    ( CResource* pResource, const std::vector < CVector2D >& vecPointList );
     static CColTube*            CreateColTube                       ( CResource* pResource, const CVector& vecPosition, float fRadius, float fHeight );
     static void                 RefreshColShapeColliders            ( CColShape *pColShape );
 

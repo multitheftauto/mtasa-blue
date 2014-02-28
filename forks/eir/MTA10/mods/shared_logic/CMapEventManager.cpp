@@ -14,7 +14,7 @@
 *****************************************************************************/
 
 #include "StdInc.h"
-
+bool g_bAllowAspectRatioAdjustment = false;
 
 CMapEventManager::CMapEventManager ( void )
 {
@@ -154,106 +154,136 @@ bool CMapEventManager::Call ( const char* szName, const CLuaArguments& Arguments
     // Copy the results into a array in case m_EventsMap is modified during the call
     std::vector< CMapEvent* > matchingEvents;
     for ( EventsIter iter = itPair.first ; iter != itPair.second ; ++iter )
-    {
-        CMapEvent* pMapEvent = iter->second;
-        // If it's not being destroyed
-        if ( !pMapEvent->IsBeingDestroyed () )
-        {
-            // Call if propagated?
-            if ( pSource == pThis || pMapEvent->IsPropagated () )
-            {
-                matchingEvents.push_back(iter->second);
-            }
-        }
-    }
+        matchingEvents.push_back(iter->second);
+
     for ( std::vector< CMapEvent* >::iterator iter = matchingEvents.begin() ; iter != matchingEvents.end() ; ++iter )
     {
         CMapEvent* pMapEvent = *iter;
 
-       
-        // Compare the names
-        dassert ( strcmp ( pMapEvent->GetName (), szName ) == 0 );
+        // If it's not being destroyed
+        if ( !pMapEvent->IsBeingDestroyed () )
+        {
+            // Compare the names
+            dassert ( strcmp ( pMapEvent->GetName (), szName ) == 0 );
+            {
+                // Call if propagated?
+                if ( pSource == pThis || pMapEvent->IsPropagated () )
+                {
+                    // Grab the current VM
+                    lua_State* pState = pMapEvent->GetVM ()->GetVM ();
 
-        // Grab the current VM
-        lua_State* pState = pMapEvent->GetVM ()->GetVM ();
-        #if MTA_DEBUG
-            int luaStackPointer = lua_gettop ( pState );
-        #endif
+                    LUA_CHECKSTACK ( pState, 1 );   // Ensure some room
 
-        TIMEUS startTime = GetTimeUs();
+                    #if MTA_DEBUG
+                        int luaStackPointer = lua_gettop ( pState );
+                    #endif
 
-        // Record event for the crash dump writer
-        g_pCore->LogEvent ( 405, "Lua Event", pMapEvent->GetVM ()->GetScriptName (), szName );
+                    TIMEUS startTime = GetTimeUs();
 
-        // Store the current values of the globals
-        lua_getglobal ( pState, "source" );
-        CLuaArgument OldSource ( pState, -1 );
-        lua_pop( pState, 1 );
+                    // Aspect ratio adjustment bodges
+                    if ( pMapEvent->ShouldAllowAspectRatioAdjustment() )
+                    {
+                        g_bAllowAspectRatioAdjustment = true;
+                        if ( pMapEvent->ShouldForceAspectRatioAdjustment() )
+                            g_pCore->GetGraphics()->SetAspectRatioAdjustmentEnabled( true );
+                    }
 
-        lua_getglobal ( pState, "this" );
-        CLuaArgument OldThis ( pState, -1 );
-        lua_pop( pState, 1 );
+                    // Record event for the crash dump writer
+                    static bool bEnabled = ( g_pCore->GetDiagnosticDebug () == EDiagnosticDebug::LUA_TRACE_0000 );
+                    if ( bEnabled )
+                        g_pCore->LogEvent ( 0, "Lua Event", pMapEvent->GetVM ()->GetScriptName (), szName );
 
-        lua_getglobal ( pState, "sourceResource" );
-        CLuaArgument OldResource ( pState, -1 );
-        lua_pop( pState, 1 );
+                    // Store the current values of the globals
+                    lua_getglobal ( pState, "source" );
+                    CLuaArgument OldSource ( pState, -1 );
+                    lua_pop( pState, 1 );
 
-        lua_getglobal ( pState, "sourceResourceRoot" );
-        CLuaArgument OldResourceRoot ( pState, -1 );
-        lua_pop( pState, 1 );
+                    lua_getglobal ( pState, "this" );
+                    CLuaArgument OldThis ( pState, -1 );
+                    lua_pop( pState, 1 );
 
-        lua_getglobal ( pState, "eventName" );
-        CLuaArgument OldEventName ( pState, -1 );
-        lua_pop( pState, 1 );
+                    lua_getglobal ( pState, "sourceResource" );
+                    CLuaArgument OldResource ( pState, -1 );
+                    lua_pop( pState, 1 );
 
-        // Set the "source", "this", "sourceResource" and the "sourceResourceRoot" globals on that VM
-        lua_pushelement ( pState, pSource );
-        lua_setglobal ( pState, "source" );
+                    lua_getglobal ( pState, "sourceResourceRoot" );
+                    CLuaArgument OldResourceRoot ( pState, -1 );
+                    lua_pop( pState, 1 );
 
-        lua_pushelement ( pState, pThis );
-        lua_setglobal ( pState, "this" );
+                    lua_getglobal ( pState, "eventName" );
+                    CLuaArgument OldEventName ( pState, -1 );
+                    lua_pop( pState, 1 );
 
-        lua_pushresource ( pState, pMapEvent->GetVM()->GetResource() );     // This is not correct
-        lua_setglobal ( pState, "sourceResource" );
+                    // Set the "source", "this", "sourceResource" and the "sourceResourceRoot" globals on that VM
+                    lua_pushelement ( pState, pSource );
+                    lua_setglobal ( pState, "source" );
 
-        lua_pushelement ( pState, pMapEvent->GetVM()->GetResource()->GetResourceDynamicEntity() );     // This is not correct
-        lua_setglobal ( pState, "sourceResourceRoot" );
+                    lua_pushelement ( pState, pThis );
+                    lua_setglobal ( pState, "this" );
 
-        lua_pushstring ( pState, szName );
-        lua_setglobal ( pState, "eventName" );
-        
-        // Call it
-        pMapEvent->Call ( Arguments );
-        bCalled = true;
+                    CLuaMain* pLuaMain = g_pClientGame->GetScriptDebugging()->GetTopLuaMain();
+                    CResource* pSourceResource = pLuaMain ? pLuaMain->GetResource() : NULL;
+                    if ( pSourceResource )
+                    {
+                        lua_pushresource ( pState, pSourceResource );
+                        lua_setglobal ( pState, "sourceResource" );
 
-        // Reset the globals on that VM
-        OldSource.Push ( pState );
-        lua_setglobal ( pState, "source" );
+                        lua_pushelement ( pState, pSourceResource->GetResourceDynamicEntity() );
+                        lua_setglobal ( pState, "sourceResourceRoot" );
+                    }
+                    else
+                    {
+                        lua_pushnil ( pState );
+                        lua_setglobal ( pState, "sourceResource" );
 
-        OldThis.Push ( pState );
-        lua_setglobal ( pState, "this" );                
+                        lua_pushnil ( pState );
+                        lua_setglobal ( pState, "sourceResourceRoot" );
+                    }
 
-        OldResource.Push ( pState );
-        lua_setglobal ( pState, "sourceResource" );
+                    lua_pushstring ( pState, szName );
+                    lua_setglobal ( pState, "eventName" );
+                    
+                    // Call it
+                    pMapEvent->Call ( Arguments );
+                    bCalled = true;
 
-        OldResourceRoot.Push ( pState );
-        lua_setglobal ( pState, "sourceResourceRoot" );
+                    // Reset the globals on that VM
+                    OldSource.Push ( pState );
+                    lua_setglobal ( pState, "source" );
 
-        OldEventName.Push ( pState );
-        lua_setglobal ( pState, "eventName" );
+                    OldThis.Push ( pState );
+                    lua_setglobal ( pState, "this" );                
 
-        #if MTA_DEBUG
-            assert ( lua_gettop ( pState ) == luaStackPointer );
-        #endif
+                    OldResource.Push ( pState );
+                    lua_setglobal ( pState, "sourceResource" );
 
-        TIMEUS deltaTimeUs = GetTimeUs() - startTime;
+                    OldResourceRoot.Push ( pState );
+                    lua_setglobal ( pState, "sourceResourceRoot" );
 
-        if ( deltaTimeUs > 3000 ) 
-            if ( IS_TIMING_CHECKPOINTS() )
-                strStatus += SString ( " (%s %d ms)", pMapEvent->GetVM ()->GetScriptName (), deltaTimeUs / 1000 );
+                    OldEventName.Push ( pState );
+                    lua_setglobal ( pState, "eventName" );
 
-        CClientPerfStatLuaTiming::GetSingleton ()->UpdateLuaTiming ( pMapEvent->GetVM (), szName, deltaTimeUs );
-    
+                    #if MTA_DEBUG
+                        assert ( lua_gettop ( pState ) == luaStackPointer );
+                    #endif
+
+                    // Aspect ratio adjustment bodges
+                    if ( pMapEvent->ShouldAllowAspectRatioAdjustment() )
+                    {
+                        g_pCore->GetGraphics()->SetAspectRatioAdjustmentEnabled( false );
+                        g_bAllowAspectRatioAdjustment = false;
+                    }
+
+                    TIMEUS deltaTimeUs = GetTimeUs() - startTime;
+
+                    if ( deltaTimeUs > 3000 ) 
+                        if ( IS_TIMING_CHECKPOINTS() )
+                            strStatus += SString ( " (%s %d ms)", pMapEvent->GetVM ()->GetScriptName (), deltaTimeUs / 1000 );
+
+                    CClientPerfStatLuaTiming::GetSingleton ()->UpdateLuaTiming ( pMapEvent->GetVM (), szName, deltaTimeUs );
+                }
+            }
+        }
     }
 
     // Clean out the trash if we're no longer calling events.

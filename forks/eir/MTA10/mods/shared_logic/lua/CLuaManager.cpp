@@ -32,6 +32,12 @@ CLuaManager::CLuaManager ( CClientGame* pClientGame )
     m_pGUIManager = pClientGame->GetGUIManager ();
     m_pRegisteredCommands = pClientGame->GetRegisteredCommands ();
 
+    // Ensure lua was compiled with apichecks
+    #ifdef NDEBUG
+        #error "NDEBUG should not be defined"
+    #endif
+    assert( luaX_is_apicheck_enabled() );
+
     // Load the C functions
     LoadCFunctions ();
     lua_registerPreCallHook ( CLuaDefs::CanUseFunction );
@@ -51,56 +57,47 @@ CLuaManager::~CLuaManager ( void )
     CLuaCFunctions::RemoveAllFunctions ();
 }
 
-void CLuaManager::StopScriptsOwnedBy ( int iOwner )
-{
-    // Delete all the scripts by the given owner
-    list < CLuaMain* > ::iterator iter = m_virtualMachines.begin ();
-    while ( iter != m_virtualMachines.end () )
-    {
-        if ( (*iter)->GetOwner () == iOwner )
-        {
-            // Delete the object
-            delete *iter;
-
-            // Remove from list
-            iter = m_virtualMachines.erase ( iter );
-        }
-        else
-            ++iter;
-    }
-}
-
-CLuaMain * CLuaManager::CreateVirtualMachine ( CResource* pResourceOwner )
+CLuaMain * CLuaManager::CreateVirtualMachine ( CResource* pResourceOwner, bool bEnableOOP )
 {
     // Create it and add it to the list over VM's
-    CLuaMain * vm = new CLuaMain ( this, pResourceOwner );
-    m_virtualMachines.push_back ( vm );
-    vm->InitVM ();
-    return vm;
+    CLuaMain * pLuaMain = new CLuaMain ( this, pResourceOwner, bEnableOOP );
+    m_virtualMachines.push_back ( pLuaMain );
+    pLuaMain->InitVM ();
+    return pLuaMain;
 }
 
-
-bool CLuaManager::RemoveVirtualMachine ( CLuaMain * vm )
+bool CLuaManager::RemoveVirtualMachine ( CLuaMain * pLuaMain )
 {
-    if ( vm )
+    if ( pLuaMain )
     {
         // Remove all events registered by it
-        m_pEvents->RemoveAllEvents ( vm );
-        m_pRegisteredCommands->CleanUpForVM ( vm );
+        m_pEvents->RemoveAllEvents ( pLuaMain );
+        m_pRegisteredCommands->CleanUpForVM ( pLuaMain );
 
         // Delete it unless it is already
-        if ( !vm->BeingDeleted () )
+        if ( !pLuaMain->BeingDeleted () )
         {
-            delete vm;
+            delete pLuaMain;
         }
 
         // Remove it from our list
-        if ( !m_virtualMachines.empty () ) m_virtualMachines.remove ( vm );
-
+        m_virtualMachines.remove ( pLuaMain );
         return true;
     }
 
     return false;
+}
+
+
+void CLuaManager::OnLuaMainOpenVM( CLuaMain* pLuaMain, lua_State* luaVM )
+{
+    MapSet( m_VirtualMachineMap, pLuaMain->GetVirtualMachine(), pLuaMain );
+}
+
+
+void CLuaManager::OnLuaMainCloseVM( CLuaMain* pLuaMain, lua_State* luaVM )
+{
+    MapRemove( m_VirtualMachineMap, pLuaMain->GetVirtualMachine() );
 }
 
 
@@ -110,6 +107,7 @@ void CLuaManager::ProcessPendingDeleteList ( void )
     {
         lua_State* luaVM = m_PendingDeleteList.front ();
         m_PendingDeleteList.pop_front ();
+        CLuaFunctionRef::RemoveLuaFunctionRefsForVM( luaVM );
         lua_close( luaVM );
     }
 }
@@ -126,6 +124,9 @@ void CLuaManager::DoPulse ( void )
 
 CLuaMain* CLuaManager::GetVirtualMachine ( lua_State* luaVM )
 {
+    if ( !luaVM )
+        return NULL;
+
     // Grab the main virtual state because the one we've got passed might be a coroutine state
     // and only the main state is in our list.
     lua_State* main = lua_getmainstate ( luaVM );
@@ -134,61 +135,24 @@ CLuaMain* CLuaManager::GetVirtualMachine ( lua_State* luaVM )
         luaVM = main;
     }
 
-    // Find a matching VM in our list
+    // Find a matching VM in our map
+    CLuaMain* pLuaMain = MapFindRef( m_VirtualMachineMap, luaVM );
+    if ( pLuaMain )
+        return pLuaMain;
+
+    // Find a matching VM in our list (should not be needed)
     list < CLuaMain* >::const_iterator iter = m_virtualMachines.begin ();
     for ( ; iter != m_virtualMachines.end (); iter++ )
     {
         if ( luaVM == (*iter)->GetVirtualMachine () )
         {
+            dassert( 0 );   // Why not in map?
             return *iter;
         }
     }
 
     // Doesn't exist
     return NULL;
-}
-
-
-CLuaMain* CLuaManager::GetVirtualMachine ( const char* szFilename )
-{
-    assert ( szFilename );
-
-    // Find a matching VM in our list
-    list < CLuaMain* >::const_iterator iter = m_virtualMachines.begin ();
-    for ( ; iter != m_virtualMachines.end (); iter++ )
-    {
-        if ( strcmp ( szFilename, (*iter)->GetScriptName () ) == 0 )
-        {
-            return *iter;
-        }
-    }
-
-    // Doesn't exist
-    return NULL;
-}
-
-
-bool CLuaManager::DoesVirtualMachineExist ( CLuaMain* luaVM )
-{
-    if ( luaVM )
-    {
-        // Find a matching VM in our list
-        list < CLuaMain* >::const_iterator iter = m_virtualMachines.begin ();
-        for ( ; iter != m_virtualMachines.end (); iter++ )
-        {
-            if ( *iter == luaVM )
-            {
-                return true;
-            }
-        }
-    }
-
-    return false;
-}
-
-
-void CLuaManager::SetScriptDebugging ( CScriptDebugging* pScriptDebugging )
-{
 }
 
 
@@ -247,6 +211,9 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "xmlNodeFindSubNode", CLuaFunctionDefs::XMLNodeFindChild );
     CLuaCFunctions::AddFunction ( "xmlCreateSubNode", CLuaFunctionDefs::XMLCreateChild );
     CLuaCFunctions::AddFunction ( "xmlNodeFindChild", CLuaFunctionDefs::XMLNodeFindChild );
+    CLuaCFunctions::AddFunction ( "isPlayerDead", CLuaFunctionDefs::IsPedDead );
+    CLuaCFunctions::AddFunction ( "guiEditSetCaratIndex", CLuaFunctionDefs::GUIEditSetCaretIndex );
+    CLuaCFunctions::AddFunction ( "guiMemoSetCaratIndex", CLuaFunctionDefs::GUIMemoSetCaretIndex );
     // ** END OF BACKWARDS COMPATIBILITY FUNCS. **
 
     // Resource funcs
@@ -259,6 +226,8 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getResourceGUIElement", CLuaFunctionDefs::GetResourceGUIElement );
     CLuaCFunctions::AddFunction ( "getResourceDynamicElementRoot", CLuaFunctionDefs::GetResourceDynamicElementRoot );
     CLuaCFunctions::AddFunction ( "getResourceExportedFunctions", CLuaFunctionDefs::GetResourceExportedFunctions );
+    CLuaCFunctions::AddFunction ( "loadstring", CLuaFunctionDefs::LoadString );
+    CLuaCFunctions::AddFunction ( "load", CLuaFunctionDefs::Load );
 
     // Event funcs
     CLuaCFunctions::AddFunction ( "addEvent", CLuaFunctionDefs::AddEvent );
@@ -397,7 +366,6 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getPlayerNametagColor", CLuaFunctionDefs::GetPlayerNametagColor );
     CLuaCFunctions::AddFunction ( "isPlayerNametagShowing", CLuaFunctionDefs::IsPlayerNametagShowing );
     CLuaCFunctions::AddFunction ( "getPlayerPing", CLuaFunctionDefs::GetPlayerPing );
-    CLuaCFunctions::AddFunction ( "isPlayerDead", CLuaFunctionDefs::IsPlayerDead );
     CLuaCFunctions::AddFunction ( "getPlayerTeam", CLuaFunctionDefs::GetPlayerTeam );
     CLuaCFunctions::AddFunction ( "getPlayerFromNick", CLuaFunctionDefs::GetPlayerFromName );
     CLuaCFunctions::AddFunction ( "getPlayerFromName", CLuaFunctionDefs::GetPlayerFromName );
@@ -449,6 +417,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getPedClothes", CLuaFunctionDefs::GetPedClothes );
     CLuaCFunctions::AddFunction ( "getPedControlState", CLuaFunctionDefs::GetPedControlState );
     CLuaCFunctions::AddFunction ( "getPedAnalogControlState", CLuaFunctionDefs::GetPedAnalogControlState );
+    CLuaCFunctions::AddFunction ( "isPedDead", CLuaFunctionDefs::IsPedDead );
 
     CLuaCFunctions::AddFunction ( "isPedDoingGangDriveby", CLuaFunctionDefs::IsPedDoingGangDriveby );
     CLuaCFunctions::AddFunction ( "getPedAnimation", CLuaFunctionDefs::GetPedAnimation );
@@ -529,6 +498,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "isTrainDerailable", CLuaFunctionDefs::IsTrainDerailable );
     CLuaCFunctions::AddFunction ( "getTrainDirection", CLuaFunctionDefs::GetTrainDirection );
     CLuaCFunctions::AddFunction ( "getTrainSpeed", CLuaFunctionDefs::GetTrainSpeed );
+    CLuaCFunctions::AddFunction ( "isTrainChainEngine", CLuaFunctionDefs::IsTrainChainEngine );
     CLuaCFunctions::AddFunction ( "getVehicleGravity", CLuaFunctionDefs::GetVehicleGravity );
     CLuaCFunctions::AddFunction ( "isVehicleBlown", CLuaFunctionDefs::IsVehicleBlown );
     CLuaCFunctions::AddFunction ( "isVehicleTaxiLightOn", CLuaFunctionDefs::IsVehicleTaxiLightOn );
@@ -543,6 +513,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "isVehicleNitroActivated", CLuaFunctionDefs::IsVehicleNitroActivated );
     CLuaCFunctions::AddFunction ( "getVehicleNitroCount", CLuaFunctionDefs::GetVehicleNitroCount );
     CLuaCFunctions::AddFunction ( "getVehicleNitroLevel", CLuaFunctionDefs::GetVehicleNitroLevel );
+    CLuaCFunctions::AddFunction ( "getHeliBladeCollisionsEnabled", CLuaFunctionDefs::GetHeliBladeCollisionsEnabled );
 
     // Vehicle set funcs
     CLuaCFunctions::AddFunction ( "createVehicle", CLuaFunctionDefs::CreateVehicle );
@@ -593,6 +564,8 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "setVehicleNitroActivated", CLuaFunctionDefs::SetVehicleNitroActivated );
     CLuaCFunctions::AddFunction ( "setVehicleNitroCount", CLuaFunctionDefs::SetVehicleNitroCount );
     CLuaCFunctions::AddFunction ( "setVehicleNitroLevel", CLuaFunctionDefs::SetVehicleNitroLevel );
+    CLuaCFunctions::AddFunction ( "setVehiclePlateText", CLuaFunctionDefs::SetVehiclePlateText );
+    CLuaCFunctions::AddFunction ( "setHeliBladeCollisionsEnabled", CLuaFunctionDefs::SetHeliBladeCollisionsEnabled );
 
     // Object create/destroy funcs
     CLuaCFunctions::AddFunction ( "createObject", CLuaFunctionDefs::CreateObject );
@@ -601,6 +574,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "isObjectStatic", CLuaFunctionDefs::IsObjectStatic );
     CLuaCFunctions::AddFunction ( "getObjectScale", CLuaFunctionDefs::GetObjectScale );
     CLuaCFunctions::AddFunction ( "isObjectBreakable", CLuaFunctionDefs::IsObjectBreakable );
+    CLuaCFunctions::AddFunction ( "getObjectMass", CLuaFunctionDefs::GetObjectMass );
 
     // Object set funcs
     CLuaCFunctions::AddFunction ( "moveObject", CLuaFunctionDefs::MoveObject );
@@ -611,6 +585,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "breakObject", CLuaFunctionDefs::BreakObject );
     CLuaCFunctions::AddFunction ( "respawnObject", CLuaFunctionDefs::RespawnObject );
     CLuaCFunctions::AddFunction ( "toggleObjectRespawn", CLuaFunctionDefs::ToggleObjectRespawn );
+    CLuaCFunctions::AddFunction ( "setObjectMass", CLuaFunctionDefs::SetObjectMass );
 
     // Explosion funcs
     CLuaCFunctions::AddFunction ( "createExplosion", CLuaFunctionDefs::CreateExplosion );
@@ -677,17 +652,21 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "dxSetPixelColor", CLuaFunctionDefs::dxSetPixelColor );
     CLuaCFunctions::AddFunction ( "dxSetBlendMode", CLuaFunctionDefs::dxSetBlendMode );
     CLuaCFunctions::AddFunction ( "dxGetBlendMode", CLuaFunctionDefs::dxGetBlendMode );
+    CLuaCFunctions::AddFunction ( "dxSetAspectRatioAdjustmentEnabled", CLuaFunctionDefs::dxSetAspectRatioAdjustmentEnabled );
+    CLuaCFunctions::AddFunction ( "dxIsAspectRatioAdjustmentEnabled", CLuaFunctionDefs::dxIsAspectRatioAdjustmentEnabled );
+    CLuaCFunctions::AddFunction ( "dxSetTextureEdge", CLuaFunctionDefs::dxSetTextureEdge );
 
     // Audio funcs
     CLuaCFunctions::AddFunction ( "playSoundFrontEnd", CLuaFunctionDefs::PlaySoundFrontEnd );
-    //CLuaCFunctions::AddFunction ( "preloadMissionAudio", CLuaFunctionDefs::PreloadMissionAudio );
-    //CLuaCFunctions::AddFunction ( "playMissionAudio", CLuaFunctionDefs::PlayMissionAudio );
     CLuaCFunctions::AddFunction ( "setAmbientSoundEnabled", CLuaFunctionDefs::SetAmbientSoundEnabled );
     CLuaCFunctions::AddFunction ( "isAmbientSoundEnabled", CLuaFunctionDefs::IsAmbientSoundEnabled );
     CLuaCFunctions::AddFunction ( "resetAmbientSounds", CLuaFunctionDefs::ResetAmbientSounds );
     CLuaCFunctions::AddFunction ( "setWorldSoundEnabled", CLuaFunctionDefs::SetWorldSoundEnabled );
     CLuaCFunctions::AddFunction ( "isWorldSoundEnabled", CLuaFunctionDefs::IsWorldSoundEnabled );
     CLuaCFunctions::AddFunction ( "resetWorldSounds", CLuaFunctionDefs::ResetWorldSounds );
+    CLuaCFunctions::AddFunction ( "playSFX", CLuaFunctionDefs::PlaySFX );
+    CLuaCFunctions::AddFunction ( "playSFX3D", CLuaFunctionDefs::PlaySFX3D );
+    CLuaCFunctions::AddFunction ( "getSFXStatus", CLuaFunctionDefs::GetSFXStatus );
 
     // Blip funcs
     CLuaCFunctions::AddFunction ( "createBlip", CLuaFunctionDefs::CreateBlip );
@@ -745,6 +724,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "setPickupType", CLuaFunctionDefs::SetPickupType );
 
     // Cam get funcs
+    CLuaCFunctions::AddFunction ( "getCamera", CLuaFunctionDefs::GetCamera );
     CLuaCFunctions::AddFunction ( "getCameraViewMode", CLuaFunctionDefs::GetCameraViewMode );
     CLuaCFunctions::AddFunction ( "getCameraMatrix", CLuaFunctionDefs::GetCameraMatrix );
     CLuaCFunctions::AddFunction ( "getCameraTarget", CLuaFunctionDefs::GetCameraTarget );
@@ -765,6 +745,8 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "setCursorPosition", CLuaFunctionDefs::SetCursorPosition );
     CLuaCFunctions::AddFunction ( "isCursorShowing", CLuaFunctionDefs::IsCursorShowing );
     CLuaCFunctions::AddFunction ( "showCursor", CLuaFunctionDefs::ShowCursor );
+    CLuaCFunctions::AddFunction ( "getCursorAlpha", CLuaFunctionDefs::GetCursorAlpha );
+    CLuaCFunctions::AddFunction ( "setCursorAlpha", CLuaFunctionDefs::SetCursorAlpha );
 
     // GUI funcs
     CLuaCFunctions::AddFunction ( "guiGetInputEnabled", CLuaFunctionDefs::GUIGetInputEnabled );
@@ -797,6 +779,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "guiCreateFont", CLuaFunctionDefs::GUICreateFont );
 
     CLuaCFunctions::AddFunction ( "guiStaticImageLoadImage", CLuaFunctionDefs::GUIStaticImageLoadImage );
+	CLuaCFunctions::AddFunction ( "guiStaticImageGetNativeSize", CLuaFunctionDefs::GUIStaticImageGetNativeSize );
     CLuaCFunctions::AddFunction ( "guiGetSelectedTab", CLuaFunctionDefs::GUIGetSelectedTab );
     CLuaCFunctions::AddFunction ( "guiSetSelectedTab", CLuaFunctionDefs::GUISetSelectedTab );
     CLuaCFunctions::AddFunction ( "guiDeleteTab", CLuaFunctionDefs::GUIDeleteTab );
@@ -873,14 +856,14 @@ void CLuaManager::LoadCFunctions ( void )
 
     CLuaCFunctions::AddFunction ( "guiGetScreenSize", CLuaFunctionDefs::GUIGetScreenSize );
 
-    CLuaCFunctions::AddFunction ( "guiEditSetCaretIndex", CLuaFunctionDefs::GUIEditSetCaratIndex );
-    CLuaCFunctions::AddFunction ( "guiEditSetCaratIndex", CLuaFunctionDefs::GUIEditSetCaratIndex );
+    CLuaCFunctions::AddFunction ( "guiEditSetCaretIndex", CLuaFunctionDefs::GUIEditSetCaretIndex );
+    CLuaCFunctions::AddFunction ( "guiEditGetCaretIndex", CLuaFunctionDefs::GUIEditGetCaretIndex );
     CLuaCFunctions::AddFunction ( "guiEditSetMasked", CLuaFunctionDefs::GUIEditSetMasked );
     CLuaCFunctions::AddFunction ( "guiEditSetMaxLength", CLuaFunctionDefs::GUIEditSetMaxLength );
     CLuaCFunctions::AddFunction ( "guiEditSetReadOnly", CLuaFunctionDefs::GUIEditSetReadOnly );
 
-    CLuaCFunctions::AddFunction ( "guiMemoSetCaretIndex", CLuaFunctionDefs::GUIMemoSetCaratIndex );
-    CLuaCFunctions::AddFunction ( "guiMemoSetCaratIndex", CLuaFunctionDefs::GUIMemoSetCaratIndex );
+    CLuaCFunctions::AddFunction ( "guiMemoSetCaretIndex", CLuaFunctionDefs::GUIMemoSetCaretIndex );
+    CLuaCFunctions::AddFunction ( "guiMemoGetCaretIndex", CLuaFunctionDefs::GUIMemoGetCaretIndex );
     CLuaCFunctions::AddFunction ( "guiMemoSetReadOnly", CLuaFunctionDefs::GUIMemoSetReadOnly );
 
     CLuaCFunctions::AddFunction ( "guiLabelSetColor", CLuaFunctionDefs::GUILabelSetColor );
@@ -965,6 +948,9 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "setMoonSize", CLuaFunctionDefs::SetMoonSize );
     CLuaCFunctions::AddFunction ( "getMoonSize", CLuaFunctionDefs::GetMoonSize );
     CLuaCFunctions::AddFunction ( "resetMoonSize", CLuaFunctionDefs::ResetMoonSize );
+    CLuaCFunctions::AddFunction ( "setFPSLimit", CLuaFunctionDefs::SetFPSLimit );
+    CLuaCFunctions::AddFunction ( "getFPSLimit", CLuaFunctionDefs::GetFPSLimit );
+    CLuaCFunctions::AddFunction ( "fetchRemote", CLuaFunctionDefs::FetchRemote );
 
     // World set funcs
     CLuaCFunctions::AddFunction ( "setTime", CLuaFunctionDefs::SetTime );
@@ -1130,13 +1116,15 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "sha256", CLuaFunctionDefs::Sha256 );
     CLuaCFunctions::AddFunction ( "teaEncode", CLuaFunctionDefs::TeaEncode );
     CLuaCFunctions::AddFunction ( "teaDecode", CLuaFunctionDefs::TeaDecode );
-    CLuaCFunctions::AddFunction ( "base64encode", CLuaFunctionDefs::Base64encode );
-    CLuaCFunctions::AddFunction ( "base64decode", CLuaFunctionDefs::Base64decode );
+    CLuaCFunctions::AddFunction ( "base64Encode", CLuaFunctionDefs::Base64encode );
+    CLuaCFunctions::AddFunction ( "base64Decode", CLuaFunctionDefs::Base64decode );
     CLuaCFunctions::AddFunction ( "getNetworkUsageData", CLuaFunctionDefs::GetNetworkUsageData );
     CLuaCFunctions::AddFunction ( "getNetworkStats", CLuaFunctionDefs::GetNetworkStats );
     CLuaCFunctions::AddFunction ( "getPerformanceStats", CLuaFunctionDefs::GetPerformanceStats );
     CLuaCFunctions::AddFunction ( "setDevelopmentMode", CLuaFunctionDefs::SetDevelopmentMode );
     CLuaCFunctions::AddFunction ( "getDevelopmentMode", CLuaFunctionDefs::GetDevelopmentMode );
+    CLuaCFunctions::AddFunction ( "addDebugHook", CLuaFunctionDefs::AddDebugHook );
+    CLuaCFunctions::AddFunction ( "removeDebugHook", CLuaFunctionDefs::RemoveDebugHook );
 
     // Version functions
     CLuaCFunctions::AddFunction ( "getVersion", CLuaFunctionDefs::GetVersion );
@@ -1148,12 +1136,31 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "utfChar", CLuaFunctionDefs::UtfChar );
     CLuaCFunctions::AddFunction ( "utfCode", CLuaFunctionDefs::UtfCode );
 
+    // PCRE functions
+    CLuaCFunctions::AddFunction ( "pregFind", CLuaFunctionDefs::PregFind );
+    CLuaCFunctions::AddFunction ( "pregReplace", CLuaFunctionDefs::PregReplace );
+    CLuaCFunctions::AddFunction ( "pregMatch", CLuaFunctionDefs::PregMatch );
+
     // Voice functions
     CLuaCFunctions::AddFunction ( "isVoiceEnabled", CLuaFunctionDefs::IsVoiceEnabled );
 
     // JSON funcs
     CLuaCFunctions::AddFunction ( "toJSON", CLuaFunctionDefs::toJSON );
     CLuaCFunctions::AddFunction ( "fromJSON", CLuaFunctionDefs::fromJSON );
+
+    // Bit functions
+    CLuaCFunctions::AddFunction ( "bitAnd", CLuaFunctionDefs::BitAnd );
+    CLuaCFunctions::AddFunction ( "bitNot", CLuaFunctionDefs::BitNot );
+    CLuaCFunctions::AddFunction ( "bitOr", CLuaFunctionDefs::BitOr );
+    CLuaCFunctions::AddFunction ( "bitTest", CLuaFunctionDefs::BitTest );
+    CLuaCFunctions::AddFunction ( "bitXor", CLuaFunctionDefs::BitXor );
+    CLuaCFunctions::AddFunction ( "bitLRotate", CLuaFunctionDefs::BitLRotate );
+    CLuaCFunctions::AddFunction ( "bitRRotate", CLuaFunctionDefs::BitRRotate );
+    CLuaCFunctions::AddFunction ( "bitLShift", CLuaFunctionDefs::BitLShift );
+    CLuaCFunctions::AddFunction ( "bitRShift", CLuaFunctionDefs::BitRShift );
+    CLuaCFunctions::AddFunction ( "bitArShift", CLuaFunctionDefs::BitArShift );
+    CLuaCFunctions::AddFunction ( "bitExtract", CLuaFunctionDefs::BitExtract );
+    CLuaCFunctions::AddFunction ( "bitReplace", CLuaFunctionDefs::BitReplace );
 
     // Luadef definitions
     CLuaFileDefs::LoadFunctions ();

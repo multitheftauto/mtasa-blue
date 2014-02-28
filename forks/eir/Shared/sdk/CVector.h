@@ -108,6 +108,18 @@ public:
         return vecRotation;
     }
 
+    // Return a perpendicular direction
+    CVector GetOtherAxis ( void ) const
+    {
+        CVector vecResult;
+        if ( abs( fX ) > abs( fY ) )
+	        vecResult = CVector( fZ, 0, -fX );
+        else
+	        vecResult = CVector( 0, -fZ, fY );
+        vecResult.Normalize();
+        return vecResult;
+    }
+
     CVector operator + ( const CVector& vecRight ) const
     {
         return CVector ( fX + vecRight.fX, fY + vecRight.fY, fZ + vecRight.fZ );
@@ -131,6 +143,12 @@ public:
     CVector operator / ( const CVector& vecRight ) const
     {
         return CVector ( fX / vecRight.fX, fY / vecRight.fY, fZ / vecRight.fZ );
+    }
+
+    CVector operator / ( float fRight ) const
+    {
+        float fRcpValue = 1 / fRight;
+        return CVector ( fX * fRcpValue, fY * fRcpValue, fZ * fRcpValue );
     }
 
     CVector operator - ( void ) const

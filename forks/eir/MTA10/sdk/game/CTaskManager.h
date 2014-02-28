@@ -50,6 +50,7 @@ class CTask;
     class CTaskComplexDie;
     class CTaskSimpleStealthKill;
     class CTaskSimpleDead;
+    class CTaskSimpleBeHit;
     class CTaskComplexSunbathe;
 
     // IK

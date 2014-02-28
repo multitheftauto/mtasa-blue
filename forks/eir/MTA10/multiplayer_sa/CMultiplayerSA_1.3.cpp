@@ -84,6 +84,16 @@ DWORD RETN_CTaskSimplePlayerOnFoot_ProcessWeaponFire_Call        =  0x540670;
 #define HOOKPOS_CObject_PreRender                   0x59FE69
 DWORD RETURN_CObject_PreRender =                    0x59FE6F;
 
+#define HOOKPOS_CWorld_RemoveFallenPeds                     0x565D0D
+DWORD RETURN_CWorld_RemoveFallenPeds_Cont               =   0x565D13;
+DWORD RETURN_CWorld_RemoveFallenPeds_Cancel             =   0x565E6F;
+
+#define HOOKPOS_CVehicleModelInterface_SetClump             0x4C9606
+DWORD RETURN_CVehicleModelInterface_SetClump            =   0x4C9611;
+
+#define HOOKPOS_CBoat_ApplyDamage                           0x6F1C32
+DWORD RETURN_CBoat_ApplyDamage                          =   0x6F1C3E;
+
 void HOOK_CVehicle_ProcessStuff_TestSirenTypeSingle ( );
 void HOOK_CVehicle_ProcessStuff_PostPushSirenPositionSingle ( );
 void HOOK_CVehicle_ProcessStuff_TestSirenTypeDual ( );
@@ -105,6 +115,9 @@ void HOOK_CTaskSimpleJetpack_ProcessInput ( );
 void HOOK_CTaskSimplePlayerOnFoot_ProcessWeaponFire ( );
 void HOOK_CTaskSimpleJetpack_ProcessInputFixFPS2 ( );
 void HOOK_CObject_PreRender ( );
+void HOOK_CWorld_RemoveFallenPeds ( );
+void HOOK_CVehicleModelInterface_SetClump ( );
+void HOOK_CBoat_ApplyDamage ( );
 
 void CMultiplayerSA::Init_13 ( void )
 {
@@ -143,12 +156,18 @@ void CMultiplayerSA::InitHooks_13 ( void )
 
     HookInstall ( HOOKPOS_CObject_PreRender, (DWORD)HOOK_CObject_PreRender, 6 );
 
+    HookInstall ( HOOKPOS_CWorld_RemoveFallenPeds, (DWORD)HOOK_CWorld_RemoveFallenPeds, 6 );
+
+    HookInstall ( HOOKPOS_CVehicleModelInterface_SetClump, (DWORD)HOOK_CVehicleModelInterface_SetClump, 7 );
+
+    HookInstall ( HOOKPOS_CBoat_ApplyDamage, (DWORD)HOOK_CBoat_ApplyDamage, 12 );
+    
     InitHooks_ClothesSpeedUp ();
     EnableHooks_ClothesMemFix ( true );
     InitHooks_FixBadAnimId ();
     InitHooks_HookDestructors ();
     InitHooks_RwResources ();
-    InitHooks_ClothesCache ();
+    //InitHooks_ClothesCache (); MOVED TO CGameSA
     InitHooks_Files ();
     InitHooks_Weapons ();
     InitHooks_Rendering ();
@@ -373,7 +392,7 @@ bool ProcessVehicleSirenPosition ( )
                 return false;
             }
             // Does the vehicle have sirens and is the siren count greater than 0 
-            if ( pVehicle->DoesVehicleHaveSirens ( ) && pVehicle->GetVehicleSirenCount ( ) >= 0 )
+            if ( pVehicle->DoesVehicleHaveSirens ( ) && pVehicle->GetVehicleSirenCount ( ) > 0 )
             {
                 // Get our siren count
                 unsigned char ucVehicleSirenCount = pVehicle->GetVehicleSirenCount ( );
@@ -1268,10 +1287,15 @@ void _declspec(naked) HOOK_CTaskSimplePlayerOnFoot_ProcessWeaponFire ( )
 
 CVector vecObjectScale;
 CObjectSAInterface* pCurrentObject;
-void CObject_GetScale()
+bool CObject_GetScale()
 {
     CObject* pObject = pGameInterface->GetPools ()->GetObjectA ( (DWORD *)pCurrentObject );
-    vecObjectScale = *pObject->GetScale ();
+    if ( pObject )
+    {
+        vecObjectScale = *pObject->GetScale ();
+        return true;
+    }
+    return false;
 }
 
 
@@ -1283,16 +1307,67 @@ void _declspec(naked) HOOK_CObject_PreRender ()
         mov pCurrentObject, esi
     }
     
-    CObject_GetScale();
+    if ( CObject_GetScale() )
+    {
+        _asm
+        {
+            popad
 
+            push 1
+            lea edx, vecObjectScale
+
+            jmp RETURN_CObject_PreRender
+        }
+    }
+    else
+    {
+        // Do unmodified method if we don't know about this object
+        _asm
+        {
+            popad
+            push 1
+            lea edx, [esp+14h]
+            jmp RETURN_CObject_PreRender
+        }
+    }
+}
+
+CPedSAInterface * pFallingPedInterface;
+bool CWorld_Remove_FallenPedsCheck ( )
+{
+    CPed* pPed = pGameInterface->GetPools ()->GetPed ( (DWORD *)pFallingPedInterface );
+    if ( pPed && pPed->GetVehicle() != NULL )
+    {
+        // Disallow
+        return true;
+    }
+    // Allow
+    return false;
+}
+
+void _declspec(naked) HOOK_CWorld_RemoveFallenPeds ( )
+{
+    // If it's going to skip the code anyway just do it otherwise check if he's in a vehicle as the vehicle will be respawned anyway and he will be warped with it.
+    _asm
+    {
+        test ah, 5
+        jp [RemoveFallenPeds_Cancel]
+        pushad
+        mov pFallingPedInterface, esi
+    }
+    if ( CWorld_Remove_FallenPedsCheck ( ) )
+    {
+        _asm
+        {
+            popad
+RemoveFallenPeds_Cancel:
+            jmp RETURN_CWorld_RemoveFallenPeds_Cancel
+        }
+    }
     _asm
     {
         popad
-
-        push 1
-        lea edx, vecObjectScale
-
-        jmp RETURN_CObject_PreRender
+        jmp RETURN_CWorld_RemoveFallenPeds_Cont
     }
 }
 
@@ -1314,4 +1389,64 @@ bool CMultiplayerSA::IsPedTargetingMarkerEnabled(void)
 {
     uint32 dwFunc = FUNC_CPed__RenderTargetMarker;
     return *(uint8*)dwFunc != 0xC3;
+}
+
+CBaseModelInfoSAInterface * pLoadingModelInfo = 0;
+RpClump * pLoadingClump = NULL;
+void CVehicleModelInterface_SetClump ( )
+{
+    // Loop through all vehicles and find the vehicle id that this interface belongs to
+    CModelInfo * pModelInfo = NULL;
+    for ( int i = 400; i < 612; i++ )
+    {
+        pModelInfo = pGameInterface->GetModelInfo ( i );
+        if ( pModelInfo && (DWORD) pModelInfo->GetInterface ( ) == (DWORD) pLoadingModelInfo )
+        {
+            pModelInfo->InitialiseSupportedUpgrades ( pLoadingClump );
+            break;
+        }
+    }
+}
+
+void _declspec(naked) HOOK_CVehicleModelInterface_SetClump ( )
+{
+	// Grab our currently loading clump
+	// Get our Handling ID because that's all that's in the interface
+    _asm
+    {
+        pushad
+        mov pLoadingClump, eax
+		mov pLoadingModelInfo, esi
+	}
+	// Init our supported upgrades structure for this model info
+    CVehicleModelInterface_SetClump ( );
+	// Perform overwrite sequence and jump back
+    _asm
+    {
+        popad
+        push eax
+        mov ecx, esi
+        mov dword ptr [esp+14h], 0FFFFFFFFh
+        jmp RETURN_CVehicleModelInterface_SetClump
+    }
+}
+
+void _declspec(naked) HOOK_CBoat_ApplyDamage ()
+{
+    _asm
+    {
+        push eax
+        // Check if vehicleFlags->bCanBeDamaged is set
+        mov  eax, [esi+42Ah]
+        test eax, 20h
+        jz   boatCanBeDamaged
+        fst  dword ptr [esi+4C0h]
+    }
+
+boatCanBeDamaged:
+    _asm
+    {
+        pop eax
+        jmp RETURN_CBoat_ApplyDamage
+    }
 }

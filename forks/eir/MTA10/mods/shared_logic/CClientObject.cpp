@@ -43,8 +43,9 @@ CClientObject::CClientObject ( CClientManager* pManager, ElementID ID, unsigned 
     m_ucAlpha = 255;
     m_vecScale = CVector ( 1.0f, 1.0f, 1.0f );
     m_fHealth = 1000.0f;
-    m_bBreakable = true;
+    m_bBreakingDisabled = false;
     m_bRespawnEnabled = true;
+    m_fMass = -1.0f;
 
     m_pModelInfo = g_pGame->GetModelInfo ( usModel );
 
@@ -77,9 +78,8 @@ CClientObject::~CClientObject ( void )
 
 void CClientObject::Unlink ( void )
 {
-    m_pObjectManager->RemoveFromList ( this );
-    m_pObjectManager->m_Attached.remove ( this );
-    ListRemove ( m_pObjectManager->m_StreamedIn, this );
+    m_pObjectManager->RemoveFromLists ( this );
+    g_pClientGame->GetObjectRespawner ()->Unreference ( this );
 
     // Remove LowLod refs in others
     SetLowLodObject ( NULL );
@@ -490,7 +490,7 @@ void CClientObject::Create ( void )
             g_pMultiplayer->AllowCreatedObjectsInVerticalLineTest ( !CClientObjectManager::IsBreakableModel ( m_usModel ) );
 
             // Create the object
-            m_pObject = g_pGame->GetPools ()->AddObject ( m_usModel, m_bIsLowLod, m_bBreakable );
+            m_pObject = g_pGame->GetPools ()->AddObject ( m_usModel, m_bIsLowLod, m_bBreakingDisabled );
 
             // Restore default behaviour
             g_pMultiplayer->AllowCreatedObjectsInVerticalLineTest ( false );
@@ -523,6 +523,10 @@ void CClientObject::Create ( void )
                 m_pObject->SetAreaCode ( m_ucInterior );
                 SetAlpha ( m_ucAlpha );
                 m_pObject->SetHealth ( m_fHealth );
+
+                // Set object mass
+                if ( m_fMass != -1.0f )
+                    m_pObject->SetMass ( m_fMass );
 
                 // Reattach to an entity + any entities attached to this
                 ReattachEntities ();
@@ -628,16 +632,6 @@ void CClientObject::StreamedInPulse ( void )
 }
 
 
-void CClientObject::AttachTo ( CClientEntity* pEntity )
-{
-    // Add/remove us to/from our managers attached list
-    if ( m_pAttachedToEntity && !pEntity ) m_pObjectManager->m_Attached.remove ( this );
-    else if ( !m_pAttachedToEntity && pEntity ) m_pObjectManager->m_Attached.push_back ( this );
-
-    CClientEntity::AttachTo ( pEntity );
-}
-
-
 void CClientObject::GetMoveSpeed ( CVector& vecMoveSpeed ) const
 {
     if ( m_pObject )
@@ -678,12 +672,20 @@ CSphere CClientObject::GetWorldBoundingSphere ( void )
     return sphere;
 }
 
+
+bool CClientObject::IsBreakable ( void )
+{
+    return ( CClientObjectManager::IsBreakableModel ( m_usModel ) && !m_bBreakingDisabled );
+}
+
+
 bool CClientObject::SetBreakable ( bool bBreakable )
 {
+    bool bDisableBreaking = !bBreakable;
     // Are we breakable and have we changed
-    if ( CClientObjectManager::IsBreakableModel ( m_usModel ) && m_bBreakable != bBreakable )
+    if ( CClientObjectManager::IsBreakableModel ( m_usModel ) && m_bBreakingDisabled != bDisableBreaking )
     {
-        m_bBreakable = bBreakable;
+        m_bBreakingDisabled = bDisableBreaking;
         // We can't use ReCreate directly (otherwise the game will crash)
         g_pClientGame->GetObjectRespawner ()->Respawn ( this );
         return true;
@@ -691,13 +693,30 @@ bool CClientObject::SetBreakable ( bool bBreakable )
     return false;
 }
 
+
 bool CClientObject::Break ( void )
 {
     // Are we breakable?
-    if ( m_pObject && m_bBreakable )
+    if ( m_pObject && CClientObjectManager::IsBreakableModel ( m_usModel ) && !m_bBreakingDisabled )
     {
         m_pObject->Break ();
         return true;
     }
     return false;
+}
+
+float CClientObject::GetMass ( void )
+{
+    if ( m_pObject )
+        return m_pObject->GetMass ();
+
+    return m_fMass;
+}
+
+void CClientObject::SetMass ( float fMass )
+{
+    if ( m_pObject )
+        m_pObject->SetMass ( fMass );
+
+    m_fMass = fMass;
 }

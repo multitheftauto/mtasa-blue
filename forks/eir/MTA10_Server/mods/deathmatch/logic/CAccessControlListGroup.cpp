@@ -14,13 +14,14 @@
 
 #include "StdInc.h"
 
+static unsigned int GetEmptyMapKey ( unsigned int* ) { return (unsigned int)0xFB170551; }
+static unsigned int GetDeletedMapKey ( unsigned int* ) { return (unsigned int)0xF15AF001 ; }
+
+
 CAccessControlListGroup::CAccessControlListGroup ( const char* szGroupName )
-: m_ObjectsById ( 512 )
 {
     m_uiScriptID = CIdArray::PopUniqueId ( this, EIdClass::ACL_GROUP );
     m_strGroupName = szGroupName;
-    m_ObjectsById.set_empty_key ( (unsigned int)0xFB170551 );
-    m_ObjectsById.set_deleted_key ( (unsigned int)0xF15AF001 );
 }
 
 
@@ -222,7 +223,7 @@ void CAccessControlListGroup::WriteToXMLNode ( CXMLNode* pNode )
 
         // Append a dot append the name of the node
         strcat ( szObjectType, "." );
-        strncat ( szObjectType, pObject->GetObjectName (), 255 );
+        strncat ( szObjectType, pObject->GetObjectName (), NUMELMS( szObjectType ) - 1 );
 
         // Create the subnode for this object and write the name attribute we generated
         CXMLNode* pObjectNode = pSubNode->CreateSubNode ( "object" );

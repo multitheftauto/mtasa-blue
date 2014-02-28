@@ -15,11 +15,19 @@
 #ifndef __CGAMESA_MARKERS
 #define __CGAMESA_MARKERS
 
+#ifdef GTASA_30
+
+#define FUNC_PlaceMarker        0x756D60
+#define ARRAY_3D_MARKERS        0xCEA2F0
+
+#else
+
 #define FUNC_PlaceMarker        0x725120 // ##SA##
+#define ARRAY_3D_MARKERS        0xC7DD58
+
+#endif
 
 #define MAX_3D_MARKERS          32
-
-#define ARRAY_3D_MARKERS        0xC7DD58
 
 #include <game/C3DMarkers.h>
 #include "C3DMarkerSA.h"

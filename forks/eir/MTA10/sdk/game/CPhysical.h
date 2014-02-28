@@ -33,7 +33,8 @@ public:
     virtual float       GetBuoyancyConstant         ( void ) = 0;
     virtual void        SetBuoyancyConstant         ( float fBuoyancyConstant ) = 0;
 
-    virtual VOID        ProcessCollision()=0;
+    virtual VOID        ProcessCollision            ( void ) = 0;
+    virtual void        AddToControlProcessList     ( void ) = 0;
 
     virtual float       GetDamageImpulseMagnitude   ( void ) = 0;
     virtual void        SetDamageImpulseMagnitude   ( float fMagnitude ) = 0;

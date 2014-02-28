@@ -2,6 +2,8 @@
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
+#define MTA_CLIENT
+#include "SharedUtil.h"
 
 #include "resource.h"
 #include <shlwapi.h>
@@ -12,8 +14,6 @@
 //#include <Psapi.h>
 //#include <time.h>
 
-#define MTA_CLIENT
-#include "SharedUtil.h"
 //#include "Main.h"
 //#include "Install.h"
 //#include "Utils.h"

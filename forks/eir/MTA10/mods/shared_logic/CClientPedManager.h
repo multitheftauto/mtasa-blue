@@ -28,7 +28,7 @@ class CClientPedManager
 public:
     void                            DeleteAll                       ( void );
 
-    void                            DoPulse                         ( void );
+    void                            DoPulse                         ( bool bDoStandardPulses );
     CClientPed*                     Get                             ( ElementID ID, bool bCheckPlayers = false );    
     CClientPed*                     Get                             ( CPlayerPed* pPlayer, bool bValidatePointer, bool bCheckPlayers );
     CClientPed*                     GetSafe                         ( CEntity * pEntity, bool bCheckPlayers );

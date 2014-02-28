@@ -198,6 +198,10 @@ bool CPacketHandler::ProcessPacket ( unsigned char ucPacketID, NetBitStreamInter
             Packet_SyncSettings ( bitStream );
             return true;
 
+        case PACKET_ID_PED_TASK:
+            Packet_PedTask ( bitStream );
+            return true;
+
         default:             break;
     }
 
@@ -258,7 +262,7 @@ void CPacketHandler::Packet_ServerConnected ( NetBitStreamInterface& bitStream )
 
 
     // Echo Connected to the chatbox
-    if ( strlen ( szVersionString ) > 0 )
+    if ( szVersionString[0] != '\0' )
     {
         g_pCore->ChatPrintfColor ( "* Connected! [%s]", false, CHATCOLOR_INFO, szVersionString );
     }
@@ -286,6 +290,64 @@ void CPacketHandler::Packet_ServerConnected ( NetBitStreamInterface& bitStream )
     {
         g_pGame->StartGame ();
     }
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// Discover HTTP port for bitStream version < 0x48
+//
+// Can be removed for 1.4 release or later
+//
+///////////////////////////////////////////////////////////////
+static ushort usDiscoverHttpPortResult;
+static uint uiDiscoverHttpPortFailCounter;
+
+static bool DiscoverInternalHTTPPortCallback ( double sizeJustDownloaded, double totalDownloaded, char * data, size_t dataLength, void * obj, bool complete, int error )
+{
+    if ( complete || ( error >= 200 && error < 600 ) )
+    {
+        usDiscoverHttpPortResult = (ushort)obj;
+    }
+    else
+    if ( error )
+        uiDiscoverHttpPortFailCounter++;
+
+    return true;
+}
+
+static ushort DiscoverInternalHTTPPort()
+{
+    // Make a list of ports to try
+    ushort usGamePort = atoi( SStringX( g_pNet->GetConnectedServer( true ) ).SplitRight( ":" ) );
+    std::vector < ushort > testPortList;
+    testPortList.push_back( usGamePort );
+    testPortList.push_back( usGamePort + 2 );
+
+    CNetHTTPDownloadManagerInterface* pHTTP = g_pCore->GetNetwork ()->GetHTTPDownloadManager ( EDownloadMode::RESOURCE_INITIAL_FILES );
+    pHTTP->SetMaxConnections( testPortList.size() );
+
+    usDiscoverHttpPortResult = 0;
+    uiDiscoverHttpPortFailCounter = 0;
+
+    // Send request to each port
+    for ( uint i = 0 ; i < testPortList.size() ; i++ )
+    {
+        ushort usHTTPPort = testPortList[i];
+        SString strHTTPDownloadURL = SString ( "http://%s:%d/http_port_test/", g_pNet->GetConnectedServer(), usHTTPPort );
+        pHTTP->QueueFile ( strHTTPDownloadURL, "", 0, NULL, 0, false, (void*)usHTTPPort, DiscoverInternalHTTPPortCallback, g_pClientGame->IsLocalGame (), 1, 10000, false );
+    }    
+
+    // Wait up to 3 seconds for response
+    for ( uint i = 0 ; i < 3000 ; i += 100 )
+    {
+        Sleep( 100 );
+        pHTTP->ProcessQueuedFiles();
+        if ( usDiscoverHttpPortResult || uiDiscoverHttpPortFailCounter >= testPortList.size() )
+            break;
+    }
+
+    return usDiscoverHttpPortResult;
 }
 
 
@@ -389,6 +451,7 @@ void CPacketHandler::Packet_ServerJoined ( NetBitStreamInterface& bitStream )
     unsigned char ucHTTPDownloadType;
     bitStream.Read ( ucHTTPDownloadType );
 
+    g_pClientGame->m_usHTTPDownloadPort = 0;
     g_pClientGame->m_ucHTTPDownloadType = static_cast < eHTTPDownloadType > ( ucHTTPDownloadType );
     // Depending on the HTTP Download Type, read more data
     switch ( g_pClientGame->m_ucHTTPDownloadType )
@@ -411,7 +474,23 @@ void CPacketHandler::Packet_ServerJoined ( NetBitStreamInterface& bitStream )
         }
         case HTTP_DOWNLOAD_ENABLED_URL:
         {
+            if ( bitStream.Version() >= 0x48 )
+                bitStream.Read( g_pClientGame->m_usHTTPDownloadPort );
+
             BitStreamReadUsString( bitStream, g_pClientGame->m_strHTTPDownloadURL );
+
+            // See if we should switch to the internal http server
+            if ( g_pCore->ShouldUseInternalHTTPServer() )
+            {
+                if ( !g_pClientGame->m_usHTTPDownloadPort )
+                    g_pClientGame->m_usHTTPDownloadPort = DiscoverInternalHTTPPort();
+                if ( g_pClientGame->m_usHTTPDownloadPort )
+                {
+                    g_pClientGame->m_strHTTPDownloadURL = SString ( "http://%s:%d", g_pNet->GetConnectedServer(), g_pClientGame->m_usHTTPDownloadPort );
+                    g_pClientGame->m_ucHTTPDownloadType = HTTP_DOWNLOAD_ENABLED_PORT;
+                    iHTTPMaxConnectionsPerClient = 1;
+                }
+            }
             break;
         }
     default:
@@ -433,7 +512,7 @@ void CPacketHandler::Packet_ServerJoined ( NetBitStreamInterface& bitStream )
     m_pCamera->SetFocus ( &vecPos, false );*/
     g_pClientGame->m_pCamera->ToggleCameraFixedMode ( true );
     g_pClientGame->m_pCamera->SetPosition ( vecPos );
-    g_pClientGame->m_pCamera->SetTarget ( CVector ( 0, 0, 720 ) );  
+    g_pClientGame->m_pCamera->SetFixedTarget ( CVector ( 0, 0, 720 ) );  
 
     // We're now joined
     g_pClientGame->m_Status = CClientGame::STATUS_JOINED;
@@ -453,26 +532,116 @@ void CPacketHandler::Packet_ServerDisconnected ( NetBitStreamInterface& bitStrea
 {
     // unsigned char [x]    - disconnect reason
 
-    // Any reason bytes?
-    int iSize = bitStream.GetNumberOfBytesUsed ();
-    if ( iSize > 0 )
-    {
-        // Adjust the size to our buffer size
-        char szReason [NET_DISCONNECT_REASON_SIZE];
-        memset ( szReason, 0, NET_DISCONNECT_REASON_SIZE );
+    char ucType;
 
-        if ( iSize > sizeof ( szReason ) - 1 )
+    // Adjust the size to our buffer size
+    SString strDuration;
+    SString strReason;
+    SString strErrorCode;
+    bool bShowMessageBox = true;
+
+    bitStream.ReadBits ( &ucType, 5 );
+
+    switch ( ucType )
+    {
+        case ePlayerDisconnectType::INVALID_NICKNAME:
+            strReason = _("Disconnected: Invalid nickname"); strErrorCode = _E("CD30");
+            break;
+        case ePlayerDisconnectType::NO_REASON:
+            strReason = _("Disconnect from server"); strErrorCode = _E("CD31");
+            break;
+        case ePlayerDisconnectType::BANNED_SERIAL:
+            strReason = _("Disconnected: Serial is banned.\nReason: %s"); strErrorCode = _E("CD32");
+            bitStream.ReadString ( strDuration );
+            break;
+        case ePlayerDisconnectType::BANNED_IP:
+            strReason = _("Disconnected: You are banned.\nReason: %s"); strErrorCode = _E("CD33");
+            bitStream.ReadString ( strDuration );
+            break;
+        case ePlayerDisconnectType::BANNED_ACCOUNT:
+            strReason = _("Disconnected: Account is banned.\nReason: %s"); strErrorCode = _E("CD34");
+            break;
+        case ePlayerDisconnectType::VERSION_MISMATCH:
+            strReason = _("Disconnected: Version mismatch"); strErrorCode = _E("CD35");
+            break;
+        case ePlayerDisconnectType::JOIN_FLOOD:
+            strReason = _("Disconnected: Join flood. Please wait a minute, then reconnect."); strErrorCode = _E("CD36");
+            break;
+        case ePlayerDisconnectType::DIFFERENT_BRANCH:
+            strReason = _("Disconnected: Server from different branch.\nInformation: %s"); strErrorCode = _E("CD37");
+            break;
+        case ePlayerDisconnectType::BAD_VERSION:
+            strReason = _("Disconnected: Bad version.\nInformation: %s"); strErrorCode = _E("CD38");
+            break;
+        case ePlayerDisconnectType::SERVER_NEWER:
+            strReason = _("Disconnected: Server is running a newer build.\nInformation: %s"); strErrorCode = _E("CD39");
+            break;
+        case ePlayerDisconnectType::SERVER_OLDER:
+            strReason = _("Disconnected: Server is running an older build.\nInformation: %s"); strErrorCode = _E("CD40");
+            break;
+        case ePlayerDisconnectType::NICK_CLASH:
+            strReason = _("Disconnected: Nick already in use"); strErrorCode = _E("CD41");
+            break;
+        case ePlayerDisconnectType::ELEMENT_FAILURE:
+            strReason = _("Disconnected: Player Element Could not be created."); strErrorCode = _E("CD42");
+            break;
+        case ePlayerDisconnectType::GENERAL_REFUSED:
+            strReason = _("Disconnected: Server refused the connection: %s"); strErrorCode = _E("CD43");
+            break;
+        case ePlayerDisconnectType::SERIAL_VERIFICATION:
+            strReason = _("Disconnected: Serial verification failed"); strErrorCode = _E("CD44");
+            break;
+        case ePlayerDisconnectType::CONNECTION_DESYNC:
+            strReason = _("Disconnected: Connection desync %s"); strErrorCode = _E("CD45");
+            break;
+        case ePlayerDisconnectType::INVALID_PASSWORD:
+            g_pCore->ShowServerInfo ( 2 );
+            bShowMessageBox = false;
+            break;
+        case ePlayerDisconnectType::KICK:
+            strReason = _("Disconnected: You were kicked by %s"); strErrorCode = _E("CD46");
+            break;
+        case ePlayerDisconnectType::BAN:
+            strReason = _("Disconnected: You were banned by %s"); strErrorCode = _E("CD47");
+            bitStream.ReadString ( strDuration );
+            break;
+        case ePlayerDisconnectType::CUSTOM:
+            strReason = "%s"; strErrorCode = _E("CD48"); // Custom disconnect reason
+            break;
+        default: break;
+    }
+
+    if ( bShowMessageBox )
+    {
+        if ( bitStream.GetNumberOfUnreadBits() > 0 ) // We have our string left to read
         {
-            iSize = sizeof ( szReason ) - 1;
+            SString strMessage;
+            bitStream.ReadString ( strMessage );
+            strReason = SString(strReason,strMessage.c_str());
         }
 
-        bitStream.Read ( szReason, iSize );
+        if ( !strDuration.empty() )
+        {
+            time_t Duration;
+            std::istringstream ( strDuration ) >> Duration;
+            strReason += "\n" ;
+            strReason += _("Time Remaining: ");
+            int iDays = static_cast < int > ( Duration / 86400 );
+            Duration = Duration % 86400;
+            int iHours = static_cast < int > ( Duration / 3600 );
+            Duration = Duration % 3600;
+            int iMins = static_cast < int > ( Duration / 60 );
+
+            if ( iDays )
+                strReason += SString(_tn( "%d day", "%d days", iDays ),iDays) += iHours ? " " : "";
+            if ( iHours )
+                strReason += SString(_tn( "%d hour", "%d hours", iHours ),iHours)  += iMins ? " " : "";
+            if ( iMins )
+                strReason += SString(_tn( "%d minute", "%d minutes", iMins ),iMins);
+        }
 
         // Display the error
-        if ( strcmp(szReason,"Disconnected: Incorrect password") == 0 ) // Slight hack - if invalid password reason show Info box instead.
-            g_pCore->ShowServerInfo ( 2 );
-        else
-            g_pCore->ShowMessageBox ( "Disconnected", szReason, MB_BUTTON_OK | MB_ICON_INFO );
+         g_pCore->ShowMessageBox ( _("Disconnected")+strErrorCode, strReason, MB_BUTTON_OK | MB_ICON_INFO );
     }
 
     // Terminate the mod (disconnect first in case there were more packets after this one)
@@ -561,7 +730,8 @@ void CPacketHandler::Packet_PlayerList ( NetBitStreamInterface& bitStream )
                 }
             }
         }
-        g_pCore->GetConsole ()->Print ( SString ( "Server AC info: [Allowed client files: %s] [Disabled AC: %s] [Enabled SD: %s]", *strAllowedFiles, *strDisabledAC, *strEnabledSD ) );
+        g_pClientGame->m_strACInfo = SString ( "[Allowed client files: %s] [Disabled AC: %s] [Enabled SD: %s]", *strAllowedFiles, *strDisabledAC, *strEnabledSD );
+        g_pCore->GetConsole ()->Print ( SString ( "Server AC info: %s", *g_pClientGame->m_strACInfo ) );
     }
 
     // While there are bytes left, parse player list items
@@ -640,6 +810,16 @@ void CPacketHandler::Packet_PlayerList ( NetBitStreamInterface& bitStream )
             bitStream.Read ( ucNametagG );
             bitStream.Read ( ucNametagB );
         }
+
+        // Move anim
+        uchar ucMoveAnim = MOVE_DEFAULT;
+        if ( bitStream.Version() > 0x4B )
+            bitStream.Read ( ucMoveAnim );
+
+        // **************************************************************************************************************
+        // Note: The code below skips various attributes if the player is not spawned.
+        // This means joining clients will not receive the current value of these attributes, which could lead to desync.
+        // **************************************************************************************************************
 
         // Read out the spawndata if he has spawned
         unsigned short usPlayerModelID;
@@ -788,6 +968,9 @@ void CPacketHandler::Packet_PlayerList ( NetBitStreamInterface& bitStream )
                 }
             }
 
+            // Set move anim even if not spawned
+            pPlayer->SetMoveAnim ( ( eMoveAnim ) ucMoveAnim );
+
             // Print the join message in the chat
             if ( bJustJoined )
             {
@@ -839,30 +1022,13 @@ void CPacketHandler::Packet_PlayerQuit ( NetBitStreamInterface& bitStream )
 
 void CPacketHandler::Packet_PlayerSpawn ( NetBitStreamInterface& bitStream )
 {
-    // unsigned char    (1)     - player id
-    // bool                     - in vehicle?
-    // CVector          (12)    - spawn position
-    // float            (4)     - spawn rotation
-    // unsigned char    (1)     - player model id
-    // unsigned char    (1)     - interior
-    // unsigned short   (2)     - dimension
-    // unsigned short   (2)     - team id
-    // unsigned char    (1)     - vehicle id (minus 400) (if vehicle)
-    // unsigned char    (1)     - color 1 (if vehicle)
-    // unsigned char    (1)     - color 2 (if vehicle)
-    // unsigned char    (1)     - color 3 (if vehicle)
-    // unsigned char    (1)     - color 4 (if vehicle)
-
     // Read out the player id
     ElementID PlayerID;
     bitStream.Read ( PlayerID );
 
     // Flags
     unsigned char ucFlags;
-    bitStream.Read ( ucFlags );
-
-    // Decode the flags
-    bool bInVehicle = ucFlags & 0x01;
+    bitStream.Read ( ucFlags );    // Unused
 
     // Position vector
     CVector vecPosition;
@@ -901,38 +1067,6 @@ void CPacketHandler::Packet_PlayerSpawn ( NetBitStreamInterface& bitStream )
     // Time context
     unsigned char ucTimeContext = 0;
     bitStream.Read ( ucTimeContext ) ;
-
-    // Read out some vehicle stuff if we spawn in a vehicle
-    unsigned short usModel = 0;
-    unsigned char ucColor1 = 0;
-    unsigned char ucColor2 = 0;
-    unsigned char ucColor3 = 0;
-    unsigned char ucColor4 = 0;
-    if ( bInVehicle )
-    {
-        // Read out the vehicle id
-        unsigned char ucModel = 0xFF;
-        bitStream.Read ( ucModel );
-        if ( ucModel == 0xFF )
-        {
-            RaiseProtocolError ( 17 );
-            return;
-        }
-
-        // Convert to a short. Valid id?
-        usModel = ucModel + 400;
-        if ( !CClientVehicleManager::IsValidModel ( usModel ) )
-        {
-            RaiseProtocolError ( 18 );
-            return;
-        }
-
-        // Read out the colors
-        bitStream.Read ( ucColor1 );
-        bitStream.Read ( ucColor2 );
-        bitStream.Read ( ucColor3 );
-        bitStream.Read ( ucColor4 );
-    }
 
     // Grab the player this is about
     CClientPlayer* pPlayer = g_pClientGame->m_pPlayerManager->Get ( PlayerID );
@@ -1469,7 +1603,7 @@ void CPacketHandler::Packet_Vehicle_InOut ( NetBitStreamInterface& bitStream )
             {
                 // Read out the seat id
                 unsigned char ucSeat = 0xFF;
-                bitStream.ReadBits ( &ucSeat, 3 );
+                bitStream.ReadBits ( &ucSeat, 4 );
                 if ( ucSeat == 0xFF )
                 {
                     RaiseProtocolError ( 28 );
@@ -1740,7 +1874,7 @@ void CPacketHandler::Packet_Vehicle_InOut ( NetBitStreamInterface& bitStream )
                             pJacked->SetVehicleInOutState ( VEHICLE_INOUT_GETTING_JACKED );
 
                         // Start animating him in
-                        pPlayer->GetIntoVehicle ( pVehicle, ucSeat, ucDoor );
+                        pPlayer->GetIntoVehicle ( pVehicle, ucSeat, ucDoor + 2 );
 
                         // Remember that this player is working on leaving a vehicle
                         pPlayer->SetVehicleInOutState ( VEHICLE_INOUT_JACKING );
@@ -2115,6 +2249,7 @@ void CPacketHandler::Packet_MapInfo ( NetBitStreamInterface& bitStream )
     g_pClientGame->SetGlitchEnabled ( CClientGame::GLITCH_FASTMOVE, funBugs.data.bFastMove );
     g_pClientGame->SetGlitchEnabled ( CClientGame::GLITCH_CROUCHBUG, funBugs.data.bCrouchBug );
     g_pClientGame->SetGlitchEnabled ( CClientGame::GLITCH_CLOSEDAMAGE, funBugs.data.bCloseRangeDamage );
+    g_pClientGame->SetGlitchEnabled ( CClientGame::GLITCH_HITANIM, funBugs.data2.bHitAnim );
 
     float fJetpackMaxHeight = 100;
     if ( !bitStream.Read ( fJetpackMaxHeight ) )
@@ -2533,8 +2668,10 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
         return;
     }
 
-    for ( ElementID EntityIndex = 0 ; EntityIndex < NumEntities ; EntityIndex++ )
+    for ( uint EntityIndex = 0 ; EntityIndex < NumEntities ; EntityIndex++ )
     {
+        g_pCore->UpdateDummyProgress( EntityIndex * 100 / NumEntities );
+
         // Read out the entity type id and the entity id
         ElementID EntityID;
         unsigned char ucEntityTypeID;
@@ -2590,8 +2727,8 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                     else
                     {
                         #ifdef MTA_DEBUG
-                            char buf[1024] = {0};
-                            bitStream.Read ( buf, (ucNameLength > 1024) ? 1024 : ucNameLength );
+                            char buf[256] = {0};
+                            bitStream.Read ( buf, ucNameLength );
                             // Raise a special assert, as we have to try and figure out this error.
                             assert ( 0 );
                             // Replay the problem for debugging
@@ -2871,7 +3008,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                             bitStream.Read ( PlayerID );
                             if ( PlayerID != INVALID_ELEMENT_ID )
                             {
-                                CClientPlayer * pOwner = static_cast < CClientPlayer * > ( CElementIDs::GetElement ( PlayerID ) );
+                                CClientPlayer * pOwner = DynamicCast < CClientPlayer > ( CElementIDs::GetElement ( PlayerID ) );
                                 pWeapon->SetOwner ( pOwner );
                             }
                             else
@@ -3428,7 +3565,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                 {
                     unsigned short usNameLength;
                     bitStream.ReadCompressed ( usNameLength );
-                    if (usNameLength > 255)
+                    if ( usNameLength > MAX_TEAM_NAME_LENGTH )
                     {
                         RaiseFatalError ( 12 );
                         return;
@@ -3449,6 +3586,15 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                     bool bFriendlyFire;
                     bitStream.ReadBit ( bFriendlyFire );
                     pTeam->SetFriendlyFire ( bFriendlyFire );
+
+                    unsigned int uiPlayersCount;
+                    bitStream.Read ( uiPlayersCount );
+                    for ( unsigned int i = 0; i < uiPlayersCount; i++ )
+                    {
+                        ElementID PlayerId;
+                        if ( bitStream.Read ( PlayerId ) )
+                            g_pClientGame->m_pManager->GetPlayerManager ()->Get ( PlayerId )->SetTeam ( pTeam );
+                    }
 
                     delete [] szTeamName;
                     break;
@@ -3523,6 +3669,12 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                     SEntityAlphaSync alpha;
                     bitStream.Read ( &alpha );
                     pPed->SetAlpha ( alpha.data.ucAlpha );
+
+                    // Move anim
+                    uchar ucMoveAnim = MOVE_DEFAULT;
+                    if ( bitStream.Version() > 0x4B )
+                        bitStream.Read ( ucMoveAnim );
+                    pPed->SetMoveAnim ( ( eMoveAnim ) ucMoveAnim );
 
                     // clothes
                     unsigned char ucNumClothes, ucTextureLength, ucModelLength, ucType;
@@ -3770,7 +3922,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
 
     // Link the entity dependant stuff
     list < SEntityDependantStuff* > ::iterator iter = newEntitiesStuff.begin ();
-    for ( ; iter != newEntitiesStuff.end () ; iter++ )
+    for ( ; iter != newEntitiesStuff.end () ; ++iter )
     {
         SEntityDependantStuff* pEntityStuff = *iter;
         CClientEntity* pTempEntity = pEntityStuff->pEntity;
@@ -3804,6 +3956,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
         delete pEntityStuff;
     }
     newEntitiesStuff.clear ();
+    g_pCore->UpdateDummyProgress( 0 );
 }
 
 void CPacketHandler::Packet_EntityRemove ( NetBitStreamInterface& bitStream )
@@ -4260,6 +4413,24 @@ void CPacketHandler::Packet_ProjectileSync ( NetBitStreamInterface& bitStream )
     if ( !bitStream.Read ( &weaponTypeSync ) )
         return;
 
+    // Read the model
+    unsigned short usModel = 0;
+    if ( bitStream.Version () >= 0x4F )
+    {
+        if ( bitStream.Version () >= 0x52 || bHasCreator )    // Fix possible error from 0x51 server 
+            if ( !bitStream.Read ( usModel ) )
+                return;
+    }
+
+    if ( bitStream.Version () < 0x52 )
+        usModel = 0;    // Fix possible error from 0x51 server 
+
+    // Crash fix - usModel is not valid for some clients
+    //              either because number is incorrect due to some mismatch in bitstream versions
+    //              or maybe model isn't loaded?
+    //              or something else
+    usModel = 0;
+
     CClientEntity* pCreator = NULL;
     if ( CreatorID != INVALID_ELEMENT_ID ) pCreator = CElementIDs::GetElement ( CreatorID );
     if ( OriginID != INVALID_ELEMENT_ID )
@@ -4360,7 +4531,7 @@ void CPacketHandler::Packet_ProjectileSync ( NetBitStreamInterface& bitStream )
             CClientProjectile * pProjectile = g_pClientGame->m_pManager->GetProjectileManager ()->Create ( pCreator, weaponType, origin.data.vecPosition, fForce, NULL, pTargetEntity );
             if ( pProjectile )
             {
-                pProjectile->Initiate ( &origin.data.vecPosition, pvecRotation, pvecVelocity, 0 );
+                pProjectile->Initiate ( &origin.data.vecPosition, pvecRotation, pvecVelocity, usModel );
             }
         }
     }
@@ -4508,13 +4679,14 @@ void CPacketHandler::Packet_ResourceStart ( NetBitStreamInterface& bitStream )
 
     CNetHTTPDownloadManagerInterface* pHTTP = g_pCore->GetNetwork ()->GetHTTPDownloadManager ( EDownloadMode::RESOURCE_INITIAL_FILES );
 
-    // Number of protected scripts
-    unsigned short usProtectedScriptCount = 0;
+    // Number of 'no client cache' scripts
+    unsigned short usNoClientCacheScriptCount = 0;
 
     // Resource Name Size
     unsigned char ucResourceNameSize;
     bitStream.Read ( ucResourceNameSize );
 
+    // ucResourceNameSize > 255 ??
     if ( ucResourceNameSize > MAX_RESOURCE_NAME_LENGTH )
     {
         RaiseFatalError ( 14 );
@@ -4536,9 +4708,9 @@ void CPacketHandler::Packet_ResourceStart ( NetBitStreamInterface& bitStream )
     bitStream.Read ( ResourceEntityID );
     bitStream.Read ( ResourceDynamicEntityID );
 
-    // Read the amount of protected scripts
+    // Read the amount of 'no client cache' scripts
     if ( bitStream.Version () >= 0x26 )
-        bitStream.Read ( usProtectedScriptCount );
+        bitStream.Read ( usNoClientCacheScriptCount );
 
     // Read the declared min client version for this resource
     SString strMinServerReq, strMinClientReq;
@@ -4548,16 +4720,22 @@ void CPacketHandler::Packet_ResourceStart ( NetBitStreamInterface& bitStream )
         bitStream.ReadString ( strMinClientReq );
     }
 
+    bool bEnableOOP = false;
+    if ( bitStream.Version () >= 0x45 )
+    {
+        bitStream.ReadBit ( bEnableOOP );
+    }
+
     // Get the resource entity
     CClientEntity* pResourceEntity = CElementIDs::GetElement ( ResourceEntityID );
 
     // Get the resource dynamic entity
     CClientEntity* pResourceDynamicEntity = CElementIDs::GetElement ( ResourceDynamicEntityID );
 
-    CResource* pResource = g_pClientGame->m_pResourceManager->Add ( usResourceID, szResourceName, pResourceEntity, pResourceDynamicEntity, strMinServerReq, strMinClientReq );
+    CResource* pResource = g_pClientGame->m_pResourceManager->Add ( usResourceID, szResourceName, pResourceEntity, pResourceDynamicEntity, strMinServerReq, strMinClientReq, bEnableOOP );
     if ( pResource )
     {
-        pResource->SetRemainingProtectedScripts ( usProtectedScriptCount );
+        pResource->SetRemainingNoClientCacheScripts ( usNoClientCacheScriptCount );
 
         // Resource Chunk Type (F = Resource File, E = Exported Function)
         unsigned char ucChunkType;
@@ -4653,7 +4831,7 @@ void CPacketHandler::Packet_ResourceStart ( NetBitStreamInterface& bitStream )
                                 unlink ( pDownloadableResource->GetName () );
 
                                 // Queue the file to be downloaded
-                                bool bAddedFile = pHTTP->QueueFile ( strHTTPDownloadURLFull, pDownloadableResource->GetName (), dChunkDataSize, NULL, 0, false, NULL, NULL, g_pClientGame->IsLocalGame (), 10, true );
+                                bool bAddedFile = pHTTP->QueueFile ( strHTTPDownloadURLFull, pDownloadableResource->GetName (), dChunkDataSize, NULL, 0, false, NULL, NULL, g_pClientGame->IsLocalGame (), 10, 10000, true );
 
                                 // If the file was successfully queued, increment the resources to be downloaded
                                 g_pClientGame->SetTransferringInitialFiles ( true );
@@ -4725,6 +4903,10 @@ void CPacketHandler::Packet_ResourceClientScripts ( NetBitStreamInterface& bitSt
         {
             for ( unsigned int i = 0; i < usScriptCount; ++i )
             {
+                SString strFilename = "(unknown)";
+                if ( bitStream.Version() >= 0x50 )
+                    bitStream.ReadString( strFilename );
+
                 // Read the script compressed chunk
                 unsigned int len;
                 if ( !bitStream.Read ( len ) || len < 4 )
@@ -4746,7 +4928,7 @@ void CPacketHandler::Packet_ResourceClientScripts ( NetBitStreamInterface& bitSt
                 if ( uncompress ( (Bytef *)uncompressedBuffer, &originalLength, (const Bytef *)&data[4], len-4 ) == Z_OK )
                 {
                     // Load the script!
-                    pResource->LoadProtectedScript ( uncompressedBuffer, originalLength );
+                    pResource->LoadNoClientCacheScript ( uncompressedBuffer, originalLength, strFilename );
                 }
 
                 memset ( uncompressedBuffer, 0, originalLength );
@@ -4879,4 +5061,48 @@ void CPacketHandler::Packet_SyncSettings ( NetBitStreamInterface& bitStream )
             g_pClientGame->SetVehExtrapolateSettings ( vehExtrapolateSettings );
         }
     }
+}
+
+
+void CPacketHandler::Packet_PedTask ( NetBitStreamInterface& bitStream )
+{
+    ElementID sourceID;
+    ushort usTaskType;
+
+    // Read header
+    bitStream.Read( sourceID );
+    if ( !bitStream.Read( usTaskType ) )
+        return;
+
+    // Resolve source
+    CClientPed* pSourcePlayer = g_pClientGame->m_pPlayerManager->Get( sourceID );
+    if ( !pSourcePlayer )
+        return;
+
+    // Read packet body
+    switch( usTaskType )
+    {
+        case TASK_SIMPLE_BE_HIT:
+        {
+            ElementID attackerID;
+            uchar hitBodyPart;
+            uchar hitBodySide;
+            uchar weaponId;
+            bitStream.Read( attackerID );
+            bitStream.Read( hitBodyPart );
+            bitStream.Read( hitBodySide );
+            if ( !bitStream.Read( weaponId ) )
+                return;
+
+            CClientPed* pClientPedAttacker = g_pClientGame->m_pPlayerManager->Get( attackerID );
+            if ( !pClientPedAttacker )
+                return;
+
+            pSourcePlayer->BeHit( pClientPedAttacker, (ePedPieceTypes)hitBodyPart, hitBodySide, weaponId );
+        }
+        break;
+
+        default:
+            break;
+    };
 }

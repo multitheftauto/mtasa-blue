@@ -28,6 +28,7 @@ class CProjectileSA : public virtual CProjectile, public virtual CObjectSA
 private:
     CProjectileSAInterface          * internalInterface;
     class CProjectileInfo         * projectileInfo;
+    bool                            m_bDestroyed;
 public:
                     CProjectileSA(class CProjectileSAInterface * projectileInterface);
                     ~CProjectileSA( );

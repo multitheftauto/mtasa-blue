@@ -22,16 +22,15 @@
 int CLuaFunctionDefs::CreateObject ( lua_State* luaVM )
 {
 //  object createObject ( int modelid, float x, float y, float z, [float rx, float ry, float rz, bool lowLOD] )
-    ushort usModelID; CVector vecPosition; CVector vecRotation; bool bLowLod;
+    ushort usModelID;
+    CVector vecPosition;
+    CVector vecRotation;
+    bool bLowLod;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadNumber ( usModelID );
-    argStream.ReadNumber ( vecPosition.fX );
-    argStream.ReadNumber ( vecPosition.fY );
-    argStream.ReadNumber ( vecPosition.fZ );
-    argStream.ReadNumber ( vecRotation.fX, 0 );
-    argStream.ReadNumber ( vecRotation.fY, 0 );
-    argStream.ReadNumber ( vecRotation.fZ, 0 );
+    argStream.ReadVector3D ( vecPosition );
+    argStream.ReadVector3D ( vecRotation, vecRotation );
     argStream.ReadBool ( bLowLod, false );
 
     if ( !argStream.HasErrors () )
@@ -121,16 +120,29 @@ int CLuaFunctionDefs::GetObjectScale ( lua_State* luaVM )
     return 1;
 }
 
+
 int CLuaFunctionDefs::IsObjectBreakable ( lua_State* luaVM )
 {
-    //  bool isObjectBreakable ( object theObject )
-    CClientObject* pObject; 
-    bool bBreakable;
-
+//  bool isObjectBreakable ( int modelId )
+    
     CScriptArgReader argStream ( luaVM );
+
+    if ( argStream.NextIsNumber () )
+    {
+        unsigned short usModel;
+        argStream.ReadNumber ( usModel );
+
+        lua_pushboolean ( luaVM, CClientObjectManager::IsBreakableModel ( usModel ) );
+        return 1;
+    }
+
+//  bool isObjectBreakable ( object theObject )
+    CClientObject* pObject;
+
     argStream.ReadUserData ( pObject );
     if ( !argStream.HasErrors () )
     {
+        bool bBreakable;
         if ( CStaticFunctionDefinitions::IsObjectBreakable ( *pObject, bBreakable ) )
         {
             lua_pushboolean ( luaVM, bBreakable );
@@ -144,6 +156,28 @@ int CLuaFunctionDefs::IsObjectBreakable ( lua_State* luaVM )
     return 1;
 }
 
+
+int CLuaFunctionDefs::GetObjectMass ( lua_State* luaVM )
+{
+//  float getObjectMass ( object theObject )
+    CClientObject* pObject; float fMass;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pObject );
+    if ( !argStream.HasErrors () )
+    {
+        if ( CStaticFunctionDefinitions::GetObjectMass ( *pObject, fMass ) )
+        {
+            lua_pushnumber ( luaVM, fMass );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
 
 int CLuaFunctionDefs::MoveObject ( lua_State* luaVM )
 {
@@ -325,7 +359,7 @@ int CLuaFunctionDefs::RespawnObject ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -350,8 +384,33 @@ int CLuaFunctionDefs::ToggleObjectRespawn ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::SetObjectMass ( lua_State* luaVM )
+{
+//  bool setObjectMass ( object theObject, float fMass )
+    CClientEntity* pEntity; float fMass;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pEntity );
+    argStream.ReadNumber ( fMass );
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( CStaticFunctionDefinitions::SetObjectMass ( *pEntity, fMass ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+    
     lua_pushboolean ( luaVM, false );
     return 1;
 }

@@ -66,6 +66,13 @@ public:
     virtual unsigned int            GetViewportWidth    ( void ) = 0;
     virtual unsigned int            GetViewportHeight   ( void ) = 0;
 
+    virtual void                    SetAspectRatioAdjustmentEnabled     ( bool bEnabled, float fSourceRatio = 4/3.f ) = 0;
+    virtual bool                    IsAspectRatioAdjustmentEnabled      ( void ) = 0;
+    virtual float                   GetAspectRatioAdjustmentSourceRatio ( void ) = 0;
+    virtual void                    SetAspectRatioAdjustmentSuspended   ( bool bSuspended ) = 0;
+    virtual float                   ConvertPositionForAspectRatio       ( float fY ) = 0;
+    virtual void                    ConvertSideForAspectRatio           ( float* pfY, float* pfHeight ) = 0;
+
     virtual float                   GetDXFontHeight     ( float fScale = 1.0f, ID3DXFont * pDXFont = NULL ) = 0;
     virtual float                   GetDXCharacterWidth ( char c, float fScale = 1.0f, ID3DXFont * pDXFont = NULL ) = 0;
     virtual float                   GetDXTextExtent     ( const char * szText, float fScale = 1.0f, ID3DXFont * pDXFont = NULL, bool bColorCoded = false ) = 0;
@@ -73,9 +80,9 @@ public:
     virtual bool                    LoadAdditionalDXFont    ( std::string strFontPath, std::string strFontName, unsigned int uiHeight, bool bBold, ID3DXFont** ppD3DXFont ) = 0;
     virtual bool                    DestroyAdditionalDXFont ( std::string strFontPath, ID3DXFont* pD3DXFont ) = 0;
 
-    virtual ID3DXFont *             GetFont             ( eFontType fontType = FONT_DEFAULT ) = 0;
+    virtual ID3DXFont *             GetFont             ( eFontType fontType = FONT_DEFAULT, float* pfOutScaleUsed = NULL, float fRequestedScale = 1, const char* szCustomScaleUser = NULL ) = 0;
 
-    virtual void                    DrawTexture         ( CTextureItem* texture, float fX, float fY, float fScaleX = 1.0f, float fScaleY = 1.0f, float fRotation = 0.0f, float fCenterX = 0.0f, float fCenterY = 0.0f, DWORD dwColor = 0xFFFFFFFF ) = 0;
+    virtual void                    DrawTexture         ( CTextureItem* texture, float fX, float fY, float fScaleX = 1.0f, float fScaleY = 1.0f, float fRotation = 0.0f, float fCenterX = 0.0f, float fCenterY = 0.0f, DWORD dwColor = 0xFFFFFFFF, float fU = 0, float fV = 0, float fSizeU = 1, float fSizeV = 1, bool bRelativeUV = true ) = 0;
 
     // Queued up drawing
     virtual void                    DrawLineQueued      ( float fX1, float fY1,
@@ -129,12 +136,21 @@ public:
                                                           ID3DXFont * pDXFont,
                                                           bool bPostGUI,
                                                           bool bColorCoded = false,
-                                                          bool bSubPixelPositioning = false ) = 0;
+                                                          bool bSubPixelPositioning = false,
+                                                          float fRotation = 0,
+                                                          float fRotationCenterX = 0,
+                                                          float fRotationCenterY = 0 ) = 0;
 
     // Subsystems
     virtual CRenderItemManagerInterface*   GetRenderItemManager  ( void ) = 0;
     virtual CScreenGrabberInterface*       GetScreenGrabber     ( void ) = 0;
     virtual CPixelsManagerInterface*       GetPixelsManager     ( void ) = 0;
+
+    // Transition between GTA and MTA controlled rendering
+    virtual void                            EnteringMTARenderZone       ( void ) = 0;
+    virtual void                            LeavingMTARenderZone        ( void ) = 0;
+    virtual void                            MaybeEnteringMTARenderZone  ( void ) = 0;
+    virtual void                            MaybeLeavingMTARenderZone   ( void ) = 0;
 };
 
 #endif

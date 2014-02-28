@@ -311,6 +311,7 @@ void SharedUtil_File_Tests ( void )
             { "file:///blah\\/",  "//fleeeb/",    "file:\\\\blah\\fleeeb\\" },
             { "fil:e///blah\\/",  "//fleeeb/",    "fil:e\\blah\\fleeeb\\" },
             { "fi/le:///blah\\/",  "//fleeeb/",    "fi\\le:\\blah\\fleeeb\\" },
+            { "c:///blah\\/",      "//fleeeb/",    "c:\\blah\\fleeeb\\" },
         TEST_END
     }
 

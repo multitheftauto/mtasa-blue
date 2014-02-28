@@ -42,6 +42,8 @@ CElement::CElement ( CElement* pParent, CXMLNode* pNode )
     m_ucInterior = 0;
     m_bDoubleSided = false;
     m_bUpdatingSpatialData = false;
+    m_pChildrenListSnapshot = NULL;
+    m_uiChildrenListSnapshotRevision = 0;
 
     // Store the line
     if ( m_pXMLNode )
@@ -121,10 +123,6 @@ CElement::~CElement ( void )
             pPed->m_pContactElement = NULL;
     }
 
-    // Hack to fix crash
-    if ( IS_PLAYER ( this ) )
-        CPerPlayerEntity::StaticOnPlayerDelete ( (CPlayer*)this );
-
     // Remove from spatial database
     GetSpatialDatabase ()->RemoveEntity ( this );
 
@@ -138,6 +136,7 @@ CElement::~CElement ( void )
     assert ( m_pParent == NULL );
 
     CElementRefManager::OnElementDelete ( this );
+    SAFE_RELEASE( m_pChildrenListSnapshot );
 }
 
 
@@ -252,7 +251,8 @@ void CElement::GetDescendantsByType ( std::vector < CElement* >& outResult, EEle
     }
     else
     {
-        outResult.push_back ( this );
+        if ( GetTypeHash () == uiTypeHash )
+            outResult.push_back ( this );
         GetDescendantsByTypeSlow ( outResult, uiTypeHash );
     }
 }
@@ -436,6 +436,8 @@ bool CElement::AddEvent ( CLuaMain* pLuaMain, const char* szName, const CLuaFunc
 
 bool CElement::CallEvent ( const char* szName, const CLuaArguments& Arguments, CPlayer* pCaller )
 {
+    g_pGame->GetDebugHookManager()->OnPreEvent( szName, Arguments, this, pCaller );
+
     CEvents* pEvents = g_pGame->GetEvents();
 
     // Make sure our event-manager knows we're about to call an event
@@ -449,6 +451,8 @@ bool CElement::CallEvent ( const char* szName, const CLuaArguments& Arguments, C
 
     // Tell the event manager that we're done calling the event
     pEvents->PostEventPulse ();
+
+    g_pGame->GetDebugHookManager()->OnPostEvent( szName, Arguments, this, pCaller );
 
     // Return whether our event was cancelled or not
     return ( !pEvents->WasEventCancelled () );
@@ -1269,17 +1273,19 @@ bool CElement::CanUpdateSync ( unsigned char ucRemote )
 
 // Entities from root optimization for getElementsByType
 typedef CFastList < CElement* > CFromRootListType;
-typedef google::dense_hash_map < unsigned int, CFromRootListType > t_mapEntitiesFromRoot;
+typedef CFastHashMap < unsigned int, CFromRootListType > t_mapEntitiesFromRoot;
 static t_mapEntitiesFromRoot    ms_mapEntitiesFromRoot;
 static bool                     ms_bEntitiesFromRootInitialized = false;
+
+// CFastHashMap helpers
+static unsigned int GetEmptyMapKey ( unsigned int* )   { return (unsigned int)0xFFFFFFFF; }
+static unsigned int GetDeletedMapKey ( unsigned int* ) { return (unsigned int)0xFFFFFFFE ; }
 
 
 void CElement::StartupEntitiesFromRoot ()
 {
     if ( !ms_bEntitiesFromRootInitialized )
     {
-        ms_mapEntitiesFromRoot.set_deleted_key ( (unsigned int)0xFFFFFFFE );
-        ms_mapEntitiesFromRoot.set_empty_key ( (unsigned int)0xFFFFFFFF );
         ms_bEntitiesFromRootInitialized = true;
     }
 }
@@ -1525,4 +1531,31 @@ void CElement::UpdateSpatialData ( void )
         }
         m_bUpdatingSpatialData = false;
     }
+}
+
+//
+// Ensure children list snapshot is up to date and return it
+//
+CElementListSnapshot* CElement::GetChildrenListSnapshot( void )
+{
+    // See if list needs updating
+    if ( m_Children.GetRevision() != m_uiChildrenListSnapshotRevision || m_pChildrenListSnapshot == NULL )
+    {
+        m_uiChildrenListSnapshotRevision = m_Children.GetRevision();
+
+        // Detach old
+        SAFE_RELEASE( m_pChildrenListSnapshot );
+
+        // Make new
+        m_pChildrenListSnapshot = new CElementListSnapshot();
+
+        // Fill it up
+        m_pChildrenListSnapshot->reserve( m_Children.size() );
+        for ( CChildListType::const_iterator iter = m_Children.begin() ; iter != m_Children.end() ; iter++ )
+        {
+            m_pChildrenListSnapshot->push_back( *iter );
+        }
+    }
+
+    return m_pChildrenListSnapshot;
 }

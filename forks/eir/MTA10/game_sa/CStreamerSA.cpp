@@ -97,10 +97,19 @@ static void __declspec(naked) _CBuilding__Delete()
 void Streamer_Init( void )
 {
     // Patch render limitations
-    *(unsigned int*)0x00553923 = *(unsigned int*)0x005534F5 = *(unsigned int*)0x00553CB3 = (unsigned int)renderObjects;
-    *(unsigned int*)0x00553529 = *(unsigned int*)0x00553944 = *(unsigned int*)0x00553A53 = *(unsigned int*)0x00553B03 = (unsigned int)renderObjects2;
-    *(unsigned int*)0x00553965 = (unsigned int)renderObjects3;
-    *(unsigned int*)0x00553986 = *(unsigned int*)0x00554AC7 = (unsigned int)renderObjects4;
+    MemPut( (unsigned int*)0x00553923, renderObjects );
+    MemPut( (unsigned int*)0x005534F5, renderObjects );
+    MemPut( (unsigned int*)0x00553CB3, renderObjects );
+
+    MemPut( (unsigned int*)0x00553529, renderObjects2 );
+    MemPut( (unsigned int*)0x00553944, renderObjects2 );
+    MemPut( (unsigned int*)0x00553A53, renderObjects2 );
+    MemPut( (unsigned int*)0x00553B03, renderObjects2 );
+
+    MemPut( (unsigned int*)0x00553965, renderObjects3 );
+
+    MemPut( (unsigned int*)0x00553986, renderObjects4 );
+    MemPut( (unsigned int*)0x00554AC7, renderObjects4 );
 
     // Hook special fixes
     HookInstall( 0x00404130, (DWORD)_CBuilding__Delete, 5 );

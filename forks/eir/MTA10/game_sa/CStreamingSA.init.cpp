@@ -368,134 +368,139 @@ success:
         file->Read( version, 1, 4 );
 
         assert( checksum == '2REV' );
+
+        unsigned int numFiles = 0;
             
-        unsigned int numFiles = file->ReadInt();
+        bool success = file->ReadUInt( numFiles );
 
-        // Load all files one by one
-        while ( numFiles-- )
+        if ( success )
         {
-            fileHeader header;
-
-            file->Read( &header, 1, sizeof(header) );
-
-            if ( *VAR_BiggestPrimaryBlockOffset < header.primaryBlockOffset )
-                *VAR_BiggestPrimaryBlockOffset = header.primaryBlockOffset;
-
-            // Zero terminated for safety
-            header.name[ sizeof(header.name) - 1 ] = '\0';
-
-            char *dot = strchr( header.name, '.' );
-
-            if ( !dot )
+            // Load all files one by one
+            while ( numFiles-- )
             {
-                lastID = 0xFFFF;
-                continue;
-            }
+                fileHeader header;
 
-            const char *ext = dot + 1;
+                file->Read( &header, 1, sizeof(header) );
 
-            if ( (size_t)( ext - header.name ) > 20 )
-            {
-                lastID = 0xFFFF;
-                continue;
-            }
+                if ( *VAR_BiggestPrimaryBlockOffset < header.primaryBlockOffset )
+                    *VAR_BiggestPrimaryBlockOffset = header.primaryBlockOffset;
 
-            *dot = '\0';
+                // Zero terminated for safety
+                header.name[ sizeof(header.name) - 1 ] = '\0';
 
-            modelId_t id;
+                char *dot = strchr( header.name, '.' );
 
-            if ( strnicmp( ext, "DFF", 3 ) == 0 )
-            {
-                if ( GetModelByHash( pGame->GetKeyGen()->GetUppercaseKey( header.name ), &id ) )
+                if ( !dot )
                 {
-                    header.offset |= imgID << 24;
+                    lastID = 0xFFFF;
+                    continue;
+                }
 
-                    // Some sort of debug container
-                    (*VAR_MissingModelInfo)->Add( header.name );
+                const char *ext = dot + 1;
+
+                if ( (size_t)( ext - header.name ) > 20 )
+                {
+                    lastID = 0xFFFF;
+                    continue;
+                }
+
+                *dot = '\0';
+
+                modelId_t id;
+
+                if ( strnicmp( ext, "DFF", 3 ) == 0 )
+                {
+                    if ( GetModelByHash( pGame->GetKeyGen()->GetUppercaseKey( header.name ), &id ) )
+                    {
+                        header.offset |= imgID << 24;
+
+                        // Some sort of debug container
+                        (*VAR_MissingModelInfo)->Add( header.name );
+                        
+                        lastID = -1;
+                        continue;
+                    }
+                }
+                else if ( strnicmp( ext, "TXD", 3 ) == 0 )
+                {
+                    id = pGame->GetTextureManager()->FindTxdEntry( header.name );
+
+                    if ( id == -1 )
+                    {
+                        id = pGame->GetTextureManager()->CreateTxdEntry( header.name );
+
+                        // Assign the txd to a vehicle if found a valid one
+                        TxdAssignVehiclePaintjob( header.name, id );
+                    }
+
+                    id += DATA_TEXTURE_BLOCK;
+                }
+                else if ( strnicmp( ext, "COL", 3 ) == 0 )
+                {
+                    id = DATA_COLL_BLOCK + RegisterCollision( header.name );
+                }
+                else if ( strnicmp( ext, "IPL", 3 ) == 0 )
+                {
+                    id = FindIPLFile( header.name );
+
+                    if ( id == -1 )
+                    {
+                        id = RegisterIPLFile( header.name );
+                    }
+
+                    id += DATA_IPL_BLOCK;
+                }
+                else if ( strnicmp( ext, "DAT", 3 ) == 0 )
+                {
+                    sscanf( header.name + 5, "%d", &id );
                     
+                    id += DATA_PATHFIND_BLOCK;
+                }
+                else if ( strnicmp( ext, "IFP", 3 ) == 0 )
+                {
+                    id = DATA_ANIM_BLOCK + pGame->GetAnimManager()->RegisterAnimBlock( header.name );
+                }
+                else if ( strnicmp( ext, "RRR", 3 ) == 0 )
+                {
+                    id = DATA_RECORD_BLOCK + pGame->GetRecordings()->Register( header.name );
+                }
+                else if ( strnicmp( ext, "SCM", 3 ) == 0 )
+                {
+                    // For now we do not need these script files.
+                    // If we ever need them, contact midnightStar/Martin.
+                    OutputDebugString( "found unsupported SCM file: " );
+                    OutputDebugString( header.name );
+                    OutputDebugString( "\n" );
+                    continue;
+                }
+                else
+                {
+                    *dot = '.';
                     lastID = -1;
                     continue;
                 }
+
+                // Prepare the loading of this resource by storing its offset and IMG archive index
+                unsigned int offset, count;
+
+                // If this ID slot is already occupied, skip preparing this resource.
+                if ( VAR_ModelLoadInfo[id].GetOffset( offset, count ) )
+                    continue;
+
+                CModelLoadInfoSA& info = VAR_ModelLoadInfo[id];
+                info.m_imgID = imgID;
+
+                if ( header.secondaryBlockOffset != 0 )
+                    header.primaryBlockOffset = header.secondaryBlockOffset;
+
+                info.SetOffset( header.offset, header.primaryBlockOffset );
+                info.m_flags = 0;
+
+                if ( lastID != -1 )
+                    VAR_ModelLoadInfo[lastID].m_lastID = id;
+
+                lastID = id;
             }
-            else if ( strnicmp( ext, "TXD", 3 ) == 0 )
-            {
-                id = pGame->GetTextureManager()->FindTxdEntry( header.name );
-
-                if ( id == -1 )
-                {
-                    id = pGame->GetTextureManager()->CreateTxdEntry( header.name );
-
-                    // Assign the txd to a vehicle if found a valid one
-                    TxdAssignVehiclePaintjob( header.name, id );
-                }
-
-                id += DATA_TEXTURE_BLOCK;
-            }
-            else if ( strnicmp( ext, "COL", 3 ) == 0 )
-            {
-                id = DATA_COLL_BLOCK + RegisterCollision( header.name );
-            }
-            else if ( strnicmp( ext, "IPL", 3 ) == 0 )
-            {
-                id = FindIPLFile( header.name );
-
-                if ( id == -1 )
-                {
-                    id = RegisterIPLFile( header.name );
-                }
-
-                id += DATA_IPL_BLOCK;
-            }
-            else if ( strnicmp( ext, "DAT", 3 ) == 0 )
-            {
-                sscanf( header.name + 5, "%d", &id );
-                
-                id += DATA_PATHFIND_BLOCK;
-            }
-            else if ( strnicmp( ext, "IFP", 3 ) == 0 )
-            {
-                id = DATA_ANIM_BLOCK + pGame->GetAnimManager()->RegisterAnimBlock( header.name );
-            }
-            else if ( strnicmp( ext, "RRR", 3 ) == 0 )
-            {
-                id = DATA_RECORD_BLOCK + pGame->GetRecordings()->Register( header.name );
-            }
-            else if ( strnicmp( ext, "SCM", 3 ) == 0 )
-            {
-                // For now we do not need these script files.
-                // If we ever need them, contact midnightStar/Martin.
-                OutputDebugString( "found unsupported SCM file: " );
-                OutputDebugString( header.name );
-                OutputDebugString( "\n" );
-                continue;
-            }
-            else
-            {
-                *dot = '.';
-                lastID = -1;
-                continue;
-            }
-
-            // Prepare the loading of this resource by storing its offset and IMG archive index
-            unsigned int offset, count;
-
-            // If this ID slot is already occupied, skip preparing this resource.
-            if ( VAR_ModelLoadInfo[id].GetOffset( offset, count ) )
-                continue;
-
-            CModelLoadInfoSA& info = VAR_ModelLoadInfo[id];
-            info.m_imgID = imgID;
-
-            if ( header.secondaryBlockOffset != 0 )
-                header.primaryBlockOffset = header.secondaryBlockOffset;
-
-            info.SetOffset( header.offset, header.primaryBlockOffset );
-            info.m_flags = 0;
-
-            if ( lastID != -1 )
-                VAR_ModelLoadInfo[lastID].m_lastID = id;
-
-            lastID = id;
         }
 
         delete file;

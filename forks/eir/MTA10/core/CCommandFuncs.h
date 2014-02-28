@@ -55,7 +55,9 @@ public:
 
     DECLARE_COMMAND_HANDLER ( Test );
     DECLARE_COMMAND_HANDLER ( ShowMemStat )
+    DECLARE_COMMAND_HANDLER ( ShowFrameGraph )
     DECLARE_COMMAND_HANDLER ( FakeLag );
+    DECLARE_COMMAND_HANDLER ( JingleBells );
 };
 
 #endif

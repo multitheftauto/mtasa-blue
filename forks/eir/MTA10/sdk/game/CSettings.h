@@ -123,9 +123,11 @@ public:
 
     virtual bool            IsVolumetricShadowsEnabled     ( void ) = 0;
     virtual void            SetVolumetricShadowsEnabled    ( bool bEnable ) = 0;
+    virtual void            SetVolumetricShadowsSuspended  ( bool bSuspended ) = 0;
 
+    virtual float           GetAspectRatioValue     ( void ) = 0;
     virtual eAspectRatio    GetAspectRatio          ( void ) = 0;
-    virtual void            SetAspectRatio          ( eAspectRatio aspectRatio ) = 0;
+    virtual void            SetAspectRatio          ( eAspectRatio aspectRatio, bool bAdjustmentEnabled = true ) = 0;
 
     virtual bool            IsGrassEnabled          ( void ) = 0;
     virtual void            SetGrassEnabled         ( bool bEnable ) = 0;

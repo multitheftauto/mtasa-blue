@@ -178,10 +178,7 @@ bool CPlayerPuresyncPacket::Read ( NetBitStreamInterface& BitStream )
                 if ( !BitStream.Read ( &ammo ) )
                     return false;
 
-                    
-                eWeaponType eWeapon = static_cast < eWeaponType > ( pSourcePlayer->GetWeaponType ( uiSlot ) );
-                float fSkill = pSourcePlayer->GetPlayerStat ( CWeaponStatManager::GetSkillStatIndex ( eWeapon ) );
-                float fWeaponRange = g_pGame->GetWeaponStatManager ( )->GetWeaponRangeFromSkillLevel ( eWeapon, fSkill );
+                float fWeaponRange = pSourcePlayer->GetWeaponRangeFromSlot( uiSlot );
 
                 // Read out the aim data
                 SWeaponAimSync sync ( fWeaponRange, ( ControllerState.RightShoulder1 || ControllerState.ButtonCircle ) );

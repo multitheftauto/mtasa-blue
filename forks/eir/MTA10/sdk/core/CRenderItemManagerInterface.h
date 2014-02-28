@@ -35,6 +35,7 @@ class CPixels;
 class CClientEntityBase;
 struct SShaderItemLayers;
 typedef CShaderItem CSHADERDUMMY;
+enum eAspectRatio;
 
 #define RDEFAULT            ((uint) -1)
 
@@ -111,6 +112,8 @@ struct SDxStatus
         bool            bHeatHaze;
         int             iAnisotropicFiltering;
         int             iAntiAliasing;
+        eAspectRatio    aspectRatio;
+        bool            bHUDMatchAspectRatio;
     } settings;
 };
 
@@ -331,11 +334,12 @@ CEffectWrap* NewEffectWrap ( CRenderItemManager* pManager, const SString& strFil
 class CMaterialItem : public CRenderItem
 {
     DECLARE_CLASS( CMaterialItem, CRenderItem )
-                    CMaterialItem           ( void ) : ClassInit ( this ), m_TextureAddress ( TADDRESS_WRAP ) {}
+                    CMaterialItem           ( void ) : ClassInit ( this ), m_TextureAddress ( TADDRESS_WRAP ), m_uiBorderColor(0) {}
 
     uint                m_uiSizeX;
     uint                m_uiSizeY;
     ETextureAddress     m_TextureAddress;
+    uint                m_uiBorderColor;
 };
 
 
@@ -469,7 +473,7 @@ class CRenderTargetItem : public CTextureItem
     virtual void    OnResetDevice           ( void );
     void            CreateUnderlyingData    ( void );
     void            ReleaseUnderlyingData   ( void );
-    bool            ReadPixels              ( CBuffer& outBuffer );
+    bool            ReadPixels              ( CBuffer& outBuffer, SString& strOutError );
 
     bool                m_bWithAlphaChannel;
     IDirect3DSurface9*  m_pD3DRenderTargetSurface;

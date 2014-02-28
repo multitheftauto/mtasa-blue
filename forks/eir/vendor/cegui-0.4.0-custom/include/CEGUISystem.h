@@ -330,9 +330,9 @@ public:
 		Depending upon the internal state, this may either re-use rendering from last time, or trigger a full re-draw from all elements.
 
 	\return
-		Nothing
+		False if render failed
 	*/
-	void	renderGUI(void);
+	bool	renderGUI(void);
 
 
 	/*!
@@ -826,9 +826,12 @@ public:
 	*/
 	bool	injectTimePulse(float timeElapsed);
 
+    bool    isStarted(void) { return d_started; }
+
     void                            SetGuiWorkingDirectory      ( const String& strDir )    { d_guiWorkingDirectory = strDir; }
     String                          GetGuiWorkingDirectory      ( void )                    { return d_guiWorkingDirectory; }
 
+    bool                            d_started;
     static void                     SetBidiEnabled              ( bool bEnabled ) { ms_bBidiEnabled = bEnabled; }
     static bool                     ms_bBidiEnabled;
 private:

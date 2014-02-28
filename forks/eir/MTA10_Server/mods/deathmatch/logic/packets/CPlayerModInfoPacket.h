@@ -17,6 +17,7 @@ struct SModInfoItem
     SString     strName;
     bool        bHasSize;
     CVector     vecSize;
+    CVector     vecOriginalSize;
 };
 
 class CPlayerModInfoPacket : public CPacket

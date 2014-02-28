@@ -130,6 +130,7 @@ public:
     inline CAERadioTrackManagerSA       * GetAERadioTrackManager()  { DEBUG_TRACE("CAERadioTrackManager * GetAERadioTrackManager()");return m_pCAERadioTrackManager; };
     inline CAudioEngineSA               * GetAudioEngine()          { DEBUG_TRACE("CAudio     * GetAudioEngine()");return m_pAudioEngine; };
     inline CAudioEngineSA               * GetAudio()                { DEBUG_TRACE("CAudio     * GetAudioEngine()");return m_pAudioEngine; };
+    inline CAudioContainerSA            * GetAudioContainer()       { DEBUG_TRACE("CAudioContainer  * GetAudioContainer()");return m_pAudioContainer; }
     inline CMenuManagerSA               * GetMenuManager()          { DEBUG_TRACE("CMenuManager         * GetMenuManager()");return m_pMenuManager; };
     inline CTextSA                      * GetText()                 { DEBUG_TRACE("CText                    * GetText()");return m_pText; };
     inline CStatsSA                     * GetStats()                { DEBUG_TRACE("CStats                   * GetStats()");return m_pStats; };
@@ -137,7 +138,7 @@ public:
     inline CPathFindSA                  * GetPathFind()             { DEBUG_TRACE("CPathFind                * GetPathFind()");return m_pPathFind; };
     inline CPopulationSA                * GetPopulation()           { DEBUG_TRACE("CPopulation              * GetPopulation()");return m_pPopulation; };
     inline CTaskManagementSystemSA      * GetTaskManagementSystem() { DEBUG_TRACE("CTaskManagementSystemSA * GetTaskManagementSystem()");return m_pTaskManagementSystem; };
-    inline CTasksSA                     * GetTasks() { DEBUG_TRACE("CTasks * GetTasks()");return m_pTasks; };
+    inline CTasksSA                     * GetTasks()                { DEBUG_TRACE("CTasks * GetTasks()");return m_pTasks; };
     inline CGameSettings                * GetSettings()             { DEBUG_TRACE("CGameSettings * GetSettings()");return m_pSettings; };
     inline CCarEnterExitSA              * GetCarEnterExit()         { DEBUG_TRACE("CCarEnterExit           * GetCarEnterExit()");return m_pCarEnterExit; };
     inline CControllerConfigManagerSA   * GetControllerConfigManager()  { DEBUG_TRACE("CControllerConfigManager* GetControllerConfigManager()");return m_pControllerConfigManager; };
@@ -214,7 +215,11 @@ public:
     int&                    GetCheckStatus          ( void )            { return m_iCheckStatus; }
 
 
-    void                    SetAsyncLoadingFromSettings     ( bool bSettingsDontUse, bool bSettingsEnabled );
+    // Clothes stuff that needs research. (CClothesBuilder.cache.cpp)
+    void                    FlushClothesCache               ( void );
+    void                    GetClothesCacheStats            ( SClothesCacheStats& outStats );
+    void                    InitHooks_ClothesCache          ( void );
+
     void                    SetAsyncLoadingFromScript       ( bool bScriptEnabled, bool bScriptForced );
     void                    SuspendASyncLoading             ( bool bSuspend );
     bool                    IsASyncLoadingEnabled           ( bool bIgnoreSuspend = false );
@@ -236,10 +241,11 @@ public:
 
     void                    SetPreWeaponFireHandler         ( PreWeaponFireHandler* pPreWeaponFireHandler )     { m_pPreWeaponFireHandler = pPreWeaponFireHandler; }
     void                    SetPostWeaponFireHandler        ( PostWeaponFireHandler* pPostWeaponFireHandler )   { m_pPostWeaponFireHandler = pPostWeaponFireHandler; }
+    void                    SetTaskSimpleBeHitHandler       ( TaskSimpleBeHitHandler* pTaskSimpleBeHitHandler ) { m_pTaskSimpleBeHitHandler = pTaskSimpleBeHitHandler; }
 
     PreWeaponFireHandler*   m_pPreWeaponFireHandler;
     PostWeaponFireHandler*  m_pPostWeaponFireHandler;
-
+    TaskSimpleBeHitHandler* m_pTaskSimpleBeHitHandler;
 private:
     CPoolsSA                * m_pPools;
     CPlayerInfoSA           * m_pPlayerInfo;
@@ -281,6 +287,7 @@ private:
     CTheCarGeneratorsSA         * m_pTheCarGenerators;
     CAERadioTrackManagerSA      * m_pCAERadioTrackManager;
     CAudioEngineSA              * m_pAudioEngine;
+    CAudioContainerSA           * m_pAudioContainer;
     CMenuManagerSA              * m_pMenuManager;
     CTextSA                     * m_pText;
     CStatsSA                    * m_pStats;
@@ -294,8 +301,6 @@ private:
     CControllerConfigManagerSA  * m_pControllerConfigManager;
 
     eGameVersion            m_eGameVersion;
-    bool                    m_bAsyncSettingsDontUse;
-    bool                    m_bAsyncSettingsEnabled;
     bool                    m_bAsyncScriptEnabled;
     bool                    m_bAsyncScriptForced;
     bool                    m_bASyncLoadingSuspended;

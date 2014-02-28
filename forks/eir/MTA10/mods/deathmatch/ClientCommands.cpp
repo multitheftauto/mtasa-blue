@@ -156,6 +156,9 @@ void COMMAND_Help ( const char *szCmdLine )
 
 void COMMAND_Disconnect ( const char *szCmdLine )
 {
+    if ( g_pClientGame->IsWaitingForLocalConnect() )
+        g_pCore->RemoveMessageBox ();
+
     g_pCore->GetModManager ()->RequestUnload ();
 }
 
@@ -390,7 +393,7 @@ void COMMAND_RadarHelp ( const char* szCmdLine )
 
 void COMMAND_MessageTarget ( const char* szCmdLine )
 {
-    if ( !(szCmdLine || szCmdLine[0]) )
+    if ( !(szCmdLine && szCmdLine[0]) )
         return;
 
     CClientPlayer* pTarget = g_pClientGame->GetTargetedPlayer ();
@@ -758,12 +761,21 @@ void COMMAND_ShowSyncData ( const char* szCmdLine )
     }
 }
 
-void COMMAND_VoicePushToTalk ( const char* szCmdLine)
+void COMMAND_VoicePushToTalk ( const char* szCmdLine )
 {
     if ( g_pClientGame->GetVoiceRecorder()->IsEnabled() )
         g_pClientGame->GetVoiceRecorder()-> UpdatePTTState ( atoi(szCmdLine) );
     else
         g_pCore->GetConsole ()->Print ( "voiceptt: This server does not have voice enabled" );
+}
+
+void COMMAND_ServerInfo ( const char* szCmdLine )
+{
+    SString strSpacer;
+    strSpacer.insert( 0, 80, '-' );
+    g_pCore->GetConsole ()->Print ( *strSpacer );
+    g_pClientGame->OutputServerInfo();
+    g_pCore->GetConsole ()->Print ( *strSpacer );
 }
 
 #if defined (MTA_DEBUG) || defined (MTA_BETA)

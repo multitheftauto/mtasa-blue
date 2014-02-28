@@ -19,3 +19,34 @@ namespace EEventPriority
 using EEventPriority::EEventPriorityType;
 
 DECLARE_ENUM( EEventPriority::EEventPriorityType )
+
+
+namespace EPlayerScreenShotResult
+{
+    enum EPlayerScreenShotResultType
+    {
+        NONE,
+        SUCCESS,
+        MINIMIZED,
+        DISABLED,
+        ERROR_,
+    };
+}
+using EPlayerScreenShotResult::EPlayerScreenShotResultType;
+
+DECLARE_ENUM( EPlayerScreenShotResult::EPlayerScreenShotResultType )
+
+
+namespace EDebugHook
+{
+    enum EDebugHookType
+    {
+        PRE_EVENT,
+        POST_EVENT,
+        PRE_FUNCTION,
+        POST_FUNCTION,
+    };
+}
+using EDebugHook::EDebugHookType;
+
+DECLARE_ENUM( EDebugHook::EDebugHookType );

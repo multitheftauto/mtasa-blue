@@ -115,11 +115,10 @@ CClientBase* CModManager::Load ( const char* szName, const char* szArguments )
     }
 
     // Ensure DllDirectory has not been changed
-    char szDllDirectory[ MAX_PATH + 1 ] = {'\0'};
-    GetDllDirectory( sizeof ( szDllDirectory ), szDllDirectory );
-    if ( stricmp( CalcMTASAPath ( "mta" ), szDllDirectory ) != 0 )
+    SString strDllDirectory = GetSystemDllDirectory();
+    if ( CalcMTASAPath ( "mta" ).CompareI ( strDllDirectory ) == false )
     {
-        AddReportLog ( 3119, SString ( "DllDirectory wrong:  DllDirectory:'%s'  Path:'%s'", szDllDirectory, *CalcMTASAPath ( "mta" ) ) );
+        AddReportLog ( 3119, SString ( "DllDirectory wrong:  DllDirectory:'%s'  Path:'%s'", *strDllDirectory, *CalcMTASAPath ( "mta" ) ) );
         SetDllDirectory( CalcMTASAPath ( "mta" ) );
     }
     
@@ -222,6 +221,9 @@ void CModManager::Unload ( void )
         // NULL the message processor and the unhandled command handler
         CCore::GetSingleton ().SetClientMessageProcessor ( NULL );
         CCore::GetSingleton ().GetCommands ()->SetExecuteHandler ( NULL );
+
+        // Reset cursor alpha
+        CCore::GetSingleton ().GetGUI ()->SetCursorAlpha ( 1.0f, true );
 
         // Reset the modules
         CCore::GetSingleton ().GetGame ()->Reset ();
@@ -331,7 +333,7 @@ void CModManager::RefreshMods ( void )
 void CModManager::InitializeModList ( const char* szModFolderPath )
 {
     // Variables used to search the mod directory
-    WIN32_FIND_DATAA FindData;
+    WIN32_FIND_DATAW FindData;
     HANDLE hFind;
 
     // Allocate a string with length of path + 5 letters to store searchpath plus "\*.*"
@@ -342,18 +344,18 @@ void CModManager::InitializeModList ( const char* szModFolderPath )
     filePathTranslator.SetCurrentWorkingDirectory ( "mta" );
 
     // Create a search
-    hFind = FindFirstFile ( strPathWildchars, &FindData );
+    hFind = FindFirstFileW ( FromUTF8( strPathWildchars), &FindData );
 
     // If we found a first file ...
     if ( hFind != INVALID_HANDLE_VALUE )
     {
         // Add it to the list
-        VerifyAndAddEntry ( szModFolderPath, FindData.cFileName );
+        VerifyAndAddEntry ( szModFolderPath, ToUTF8( FindData.cFileName ) );
 
         // Search until there aren't any files left
-        while ( FindNextFile ( hFind, &FindData ) == TRUE )
+        while ( FindNextFileW ( hFind, &FindData ) == TRUE )
         {
-            VerifyAndAddEntry ( szModFolderPath, FindData.cFileName );
+            VerifyAndAddEntry ( szModFolderPath, ToUTF8( FindData.cFileName ) );
         }
 
         // End the search

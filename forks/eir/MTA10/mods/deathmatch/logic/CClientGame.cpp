@@ -120,6 +120,7 @@ CClientGame::CClientGame ( bool bLocalPlay )
     m_Glitches [ GLITCH_CROUCHBUG ] = false;
     m_Glitches [ GLITCH_CLOSEDAMAGE ] = false;
     g_pMultiplayer->DisableCloseRangeDamage ( true );
+    m_Glitches [ GLITCH_HITANIM ] = false;
 
     // Remove Night & Thermal vision view (if enabled).
     g_pMultiplayer->SetNightVisionEnabled ( false );
@@ -161,6 +162,8 @@ CClientGame::CClientGame ( bool bLocalPlay )
     m_pRootEntity = new CClientDummy ( NULL, INVALID_ELEMENT_ID, "root" );
     m_pRootEntity->MakeSystemEntity ();
 
+    m_pDebugHookManager = new CDebugHookManager ();
+
     // Movings objects manager
     m_pMovingObjectsManager = new CMovingObjectsManager ();
 
@@ -186,6 +189,7 @@ CClientGame::CClientGame ( bool bLocalPlay )
     m_pLatentTransferManager = new CLatentTransferManager ();
     m_pZoneNames = new CZoneNames;
     m_pScriptKeyBinds = new CScriptKeyBinds;
+    m_pRemoteCalls = new CRemoteCalls();
 
     // Create our net API
     m_pNetAPI = new CNetAPI ( m_pManager );
@@ -238,20 +242,22 @@ CClientGame::CClientGame ( bool bLocalPlay )
     g_pMultiplayer->SetBreakTowLinkHandler ( CClientGame::StaticBreakTowLinkHandler );
     g_pMultiplayer->SetDrawRadarAreasHandler ( CClientGame::StaticDrawRadarAreasHandler );
     g_pMultiplayer->SetDamageHandler ( CClientGame::StaticDamageHandler );
+    g_pMultiplayer->SetDeathHandler ( CClientGame::StaticDeathHandler );
     g_pMultiplayer->SetFireHandler ( CClientGame::StaticFireHandler );
     g_pMultiplayer->SetProjectileStopHandler ( CClientProjectileManager::Hook_StaticProjectileAllow );
     g_pMultiplayer->SetProjectileHandler ( CClientProjectileManager::Hook_StaticProjectileCreation );
     g_pMultiplayer->SetRender3DStuffHandler ( CClientGame::StaticRender3DStuffHandler );
+    g_pMultiplayer->SetPreRenderSkyHandler ( CClientGame::StaticPreRenderSkyHandler );
     g_pMultiplayer->SetChokingHandler ( CClientGame::StaticChokingHandler );
     g_pMultiplayer->SetPreWorldProcessHandler ( CClientGame::StaticPreWorldProcessHandler );
     g_pMultiplayer->SetPostWorldProcessHandler ( CClientGame::StaticPostWorldProcessHandler );
-    g_pMultiplayer->SetIdleHandler ( CClientGame::StaticIdleHandler );
     g_pMultiplayer->SetPreFxRenderHandler ( CClientGame::StaticPreFxRenderHandler );
     g_pMultiplayer->SetPreHudRenderHandler ( CClientGame::StaticPreHudRenderHandler );
     g_pMultiplayer->SetAddAnimationHandler ( CClientGame::StaticAddAnimationHandler );
     g_pMultiplayer->SetBlendAnimationHandler ( CClientGame::StaticBlendAnimationHandler );
     g_pMultiplayer->SetProcessCollisionHandler ( CClientGame::StaticProcessCollisionHandler );
     g_pMultiplayer->SetVehicleCollisionHandler( CClientGame::StaticVehicleCollisionHandler );
+    g_pMultiplayer->SetVehicleDamageHandler ( CClientGame::StaticVehicleDamageHandler );
     g_pMultiplayer->SetHeliKillHandler ( CClientGame::StaticHeliKillHandler );
     g_pMultiplayer->SetObjectDamageHandler ( CClientGame::StaticObjectDamageHandler );
     g_pMultiplayer->SetObjectBreakHandler ( CClientGame::StaticObjectBreakHandler );
@@ -259,10 +265,12 @@ CClientGame::CClientGame ( bool bLocalPlay )
     g_pMultiplayer->SetGameObjectDestructHandler( CClientGame::StaticGameObjectDestructHandler );
     g_pMultiplayer->SetGameVehicleDestructHandler( CClientGame::StaticGameVehicleDestructHandler );
     g_pMultiplayer->SetGamePlayerDestructHandler( CClientGame::StaticGamePlayerDestructHandler );
+    g_pMultiplayer->SetGameProjectileDestructHandler( CClientGame::StaticGameProjectileDestructHandler );
     //g_pMultiplayer->SetGameModelRemoveHandler( CClientGame::StaticGameModelRemoveHandler );
     g_pMultiplayer->SetGameEntityRenderHandler( CClientGame::StaticGameEntityRenderHandler );
     g_pGame->SetPreWeaponFireHandler ( CClientGame::PreWeaponFire );
     g_pGame->SetPostWeaponFireHandler ( CClientGame::PostWeaponFire );
+    g_pGame->SetTaskSimpleBeHitHandler ( CClientGame::StaticTaskSimpleBeHitHandler );
     g_pCore->SetMessageProcessor ( CClientGame::StaticProcessMessage );
     g_pCore->GetKeyBinds ()->SetKeyStrokeHandler ( CClientGame::StaticKeyStrokeHandler );
     g_pCore->GetKeyBinds ()->SetCharacterKeyHandler ( CClientGame::StaticCharacterKeyHandler );
@@ -272,9 +280,9 @@ CClientGame::CClientGame ( bool bLocalPlay )
     m_pScriptDebugging = new CScriptDebugging ( m_pLuaManager );
     m_pScriptDebugging->SetLogfile ( CalcMTASAPath("mta\\clientscript.log"), 3 );
 
-    m_pLuaManager->SetScriptDebugging ( m_pScriptDebugging );
     CStaticFunctionDefinitions ( m_pLuaManager, &m_Events, g_pCore, g_pGame, this, m_pManager );
     CLuaFunctionDefs::Initialize ( m_pLuaManager, m_pScriptDebugging, this );
+    CLuaOOPDefs::Initialize ( this, m_pLuaManager, m_pScriptDebugging );
     CLuaDefs::Initialize ( this, m_pLuaManager, m_pScriptDebugging );
 
     // Disable the enter/exit vehicle key button (we want to handle this button ourselves)
@@ -335,6 +343,9 @@ CClientGame::~CClientGame ( void )
     // if a vehicle is destroyed while it explodes.
     g_pGame->GetExplosionManager ()->RemoveAllExplosions ();
 
+    // Reset camera shaking
+    g_pGame->GetCamera ()->SetShakeForce ( 0.0f );
+
     // Stop playing the continious sounds
     // if the game was loaded. This is done by
     // playing these special IDS.
@@ -345,7 +356,7 @@ CClientGame::~CClientGame ( void )
     }
 
     // Reset the GUI input mode
-    g_pCore->GetGUI ()->SetGUIInputMode ( INPUTMODE_ALLOW_BINDS );
+    g_pCore->GetGUI ()->SetGUIInputMode ( INPUTMODE_NO_BINDS_ON_EDIT );
 
     // Reset CGUI's global events
     g_pCore->GetGUI ()->ClearInputHandlers ( INPUT_MOD );
@@ -368,12 +379,10 @@ CClientGame::~CClientGame ( void )
     m_pTransferBox->Hide();
     m_pBigPacketTransferBox->Hide();
 
-    delete m_pVoiceRecorder;
-    m_pVoiceRecorder = NULL;
+    SAFE_DELETE( m_pVoiceRecorder );
 
     // Singular file download manager
-    delete m_pSingularFileDownloadManager;
-    m_pSingularFileDownloadManager = NULL;
+    SAFE_DELETE( m_pSingularFileDownloadManager );
 
     // NULL the message/net stuff
     g_pMultiplayer->SetPreContextSwitchHandler ( NULL );
@@ -390,25 +399,30 @@ CClientGame::~CClientGame ( void )
     g_pMultiplayer->SetProjectileStopHandler ( NULL );
     g_pMultiplayer->SetProjectileHandler ( NULL );
     g_pMultiplayer->SetRender3DStuffHandler ( NULL );
+    g_pMultiplayer->SetPreRenderSkyHandler ( NULL );
     g_pMultiplayer->SetChokingHandler ( NULL );
     g_pMultiplayer->SetPreWorldProcessHandler (  NULL );
     g_pMultiplayer->SetPostWorldProcessHandler (  NULL );
-    g_pMultiplayer->SetIdleHandler ( NULL );
     g_pMultiplayer->SetPreFxRenderHandler ( NULL );
     g_pMultiplayer->SetPreHudRenderHandler ( NULL );
     g_pMultiplayer->SetAddAnimationHandler ( NULL );
     g_pMultiplayer->SetBlendAnimationHandler ( NULL );
     g_pMultiplayer->SetProcessCollisionHandler ( NULL );
     g_pMultiplayer->SetVehicleCollisionHandler( NULL );
+    g_pMultiplayer->SetVehicleDamageHandler( NULL );
     g_pMultiplayer->SetHeliKillHandler( NULL );
+    g_pMultiplayer->SetObjectDamageHandler ( NULL );
+    g_pMultiplayer->SetObjectBreakHandler ( NULL );
     g_pMultiplayer->SetWaterCannonHitHandler( NULL );
     g_pMultiplayer->SetGameObjectDestructHandler( NULL );
     g_pMultiplayer->SetGameVehicleDestructHandler( NULL );
     g_pMultiplayer->SetGamePlayerDestructHandler( NULL );
+    g_pMultiplayer->SetGameProjectileDestructHandler( NULL );
     //g_pMultiplayer->SetGameModelRemoveHandler( NULL );
     g_pMultiplayer->SetGameEntityRenderHandler( NULL );
     g_pGame->SetPreWeaponFireHandler ( NULL );
     g_pGame->SetPostWeaponFireHandler ( NULL );
+    g_pGame->SetTaskSimpleBeHitHandler ( NULL );
     g_pGame->GetAudio ()->SetWorldSoundHandler ( NULL );
     g_pCore->SetMessageProcessor ( NULL );
     g_pCore->GetKeyBinds ()->SetKeyStrokeHandler ( NULL );
@@ -426,45 +440,46 @@ CClientGame::~CClientGame ( void )
     SetCursorEventsEnabled ( false );   
 
     // Destroy our stuff
-    delete m_pNametags;
-    delete m_pSyncDebug;
-    delete m_pNetworkStats;
-    delete m_pNetAPI;
-    delete m_pManager;
-    delete m_pRPCFunctions;
-    delete m_pUnoccupiedVehicleSync;
-    delete m_pPedSync;
+    SAFE_DELETE( m_pManager );  // Will trigger onClientResourceStop
+    SAFE_DELETE( m_pNametags );
+    SAFE_DELETE( m_pSyncDebug );
+    SAFE_DELETE( m_pNetworkStats );
+    SAFE_DELETE( m_pNetAPI );
+    SAFE_DELETE( m_pRPCFunctions );
+    SAFE_DELETE( m_pUnoccupiedVehicleSync );
+    SAFE_DELETE( m_pPedSync );
 #ifdef WITH_OBJECT_SYNC
-    delete m_pObjectSync;
+    SAFE_DELETE( m_pObjectSync );
 #endif
-    delete m_pBlendedWeather;
-    m_pBlendedWeather = NULL;
-    delete m_pMovingObjectsManager;
-    delete m_pRadarMap;
-    delete m_pLuaManager;
-    delete m_pLatentTransferManager;
+    SAFE_DELETE( m_pBlendedWeather );
+    SAFE_DELETE( m_pMovingObjectsManager );
+    SAFE_DELETE( m_pRadarMap );
+    SAFE_DELETE( m_pRemoteCalls );
+    SAFE_DELETE( m_pLuaManager );
+    SAFE_DELETE( m_pLatentTransferManager );
 
-    delete m_pRootEntity;
+    SAFE_DELETE( m_pRootEntity );
 
-    delete m_pModelCacheManager;
-    delete m_pGameEntityXRefManager;
-    delete m_pZoneNames;
-    delete m_pScriptKeyBinds;    
+    SAFE_DELETE( m_pModelCacheManager );
+    SAFE_DELETE( m_pGameEntityXRefManager );
+    SAFE_DELETE( m_pZoneNames );
+    SAFE_DELETE( m_pScriptKeyBinds );   
 
     // Delete the scriptdebugger
-    delete m_pScriptDebugging;
+    SAFE_DELETE( m_pScriptDebugging );
 
     // Delete the transfer boxes
-    delete m_pTransferBox;
-    delete m_pBigPacketTransferBox;
+    SAFE_DELETE( m_pTransferBox );
+    SAFE_DELETE( m_pBigPacketTransferBox );
 
-    if ( m_pLocalServer )
-    {
-        delete m_pLocalServer;
-    }
+    SAFE_DELETE( m_pLocalServer );
+    SAFE_DELETE( m_pDebugHookManager );
 
     // Packet handler
-    delete m_pPacketHandler;
+    SAFE_DELETE( m_pPacketHandler );
+
+    // Delete PerfStatManager
+    delete CClientPerfStatManager::GetSingleton ();
 
     // NULL the global CClientGame var
     g_pClientGame = NULL;
@@ -512,9 +527,10 @@ void CClientGame::StartPlayback ( void )
     }
 }
 
-bool CClientGame::StartGame ( const char* szNick, const char* szPassword )
+bool CClientGame::StartGame ( const char* szNick, const char* szPassword, eServerType Type )
 {
-    int dbg = _CrtSetDbgFlag ( _CRTDBG_REPORT_FLAG );
+    m_ServerType = Type;
+    //int dbg = _CrtSetDbgFlag ( _CRTDBG_REPORT_FLAG );
     //dbg |= _CRTDBG_ALLOC_MEM_DF;
     //dbg |= _CRTDBG_CHECK_ALWAYS_DF;
     //dbg |= _CRTDBG_DELAY_FREE_MEM_DF;
@@ -524,7 +540,7 @@ bool CClientGame::StartGame ( const char* szNick, const char* szPassword )
     // Verify that the nickname is valid
     if ( !IsNickValid ( szNick ) )
     {
-        g_pCore->ShowMessageBox ( "Error", "A valid nickname isn't set. Please go to Settings and set a new.", MB_BUTTON_OK | MB_ICON_ERROR );
+        g_pCore->ShowMessageBox ( _("Error")+_E("CD01"), _("Invalid nickname! Please go to Settings and set a new one!"), MB_BUTTON_OK | MB_ICON_ERROR );
         g_pCore->GetModManager ()->RequestUnload ();
         return false;
     }
@@ -540,7 +556,7 @@ bool CClientGame::StartGame ( const char* szNick, const char* szPassword )
            g_pCore->GetConsole ()->SetVisible ( false );
 
         // Display the status box
-        g_pCore->ShowMessageBox ( "CONNECTING", "Entering the game ...", MB_ICON_INFO );
+        g_pCore->ShowMessageBox ( _("CONNECTING"), _("Entering the game ..."), MB_ICON_INFO );
 
         // Send the initial data to the server
         NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream ();
@@ -599,7 +615,7 @@ bool CClientGame::StartGame ( const char* szNick, const char* szPassword )
     }
     else
     {
-        g_pCore->ShowMessageBox ( "Error", "Not connected; please use Quick Connect or the 'connect' command to connect to a server.", MB_BUTTON_OK | MB_ICON_ERROR );
+        g_pCore->ShowMessageBox ( _("Error")+_E("CD02"), _("Not connected; please use Quick Connect or the 'connect' command to connect to a server."), MB_BUTTON_OK | MB_ICON_ERROR );
         g_pCore->GetModManager ()->RequestUnload ();
     }
 
@@ -607,15 +623,16 @@ bool CClientGame::StartGame ( const char* szNick, const char* szPassword )
 }
 
 
-void CClientGame::SetupLocalGame ( const char* szConfig )
+void CClientGame::SetupLocalGame ( eServerType Type )
 {
+    SString strConfig = (Type == SERVER_TYPE_EDITOR) ? "editor.conf" : "local.conf";
     m_bWaitingForLocalConnect = true;
     if ( !m_pLocalServer )
-        m_pLocalServer = new CLocalServer ( szConfig );
+        m_pLocalServer = new CLocalServer ( strConfig );
 }
 
 
-bool CClientGame::StartLocalGame ( const char* szConfig, const char* szPassword )
+bool CClientGame::StartLocalGame ( eServerType Type, const char* szPassword )
 {
     // Verify that the nickname is valid
     std::string strNick;
@@ -623,21 +640,16 @@ bool CClientGame::StartLocalGame ( const char* szConfig, const char* szPassword 
 
     if ( !IsNickValid ( strNick.c_str() ) )
     {
-        g_pCore->ShowMessageBox ( "Error", "A valid nickname isn't set. Please go to Settings and set a new.", MB_BUTTON_OK | MB_ICON_ERROR );
+        g_pCore->ShowMessageBox ( _("Error")+_E("CD03"), _("Invalid nickname! Please go to Settings and set a new one!"), MB_BUTTON_OK | MB_ICON_ERROR );
         g_pCore->GetModManager ()->RequestUnload ();
         return false;
     }
 
     m_bWaitingForLocalConnect = false;
+    m_ServerType = Type;
+    SString strTemp = (Type == SERVER_TYPE_EDITOR) ? "editor.conf" : "local.conf";
 
-    // Gotta copy the config in case we got it from local server setup gui
-    SString strTemp = szConfig;
-
-    if ( m_pLocalServer )
-    {
-        delete m_pLocalServer;
-        m_pLocalServer = NULL;
-    }
+    SAFE_DELETE( m_pLocalServer );
 
     // Store our nickname
     m_strLocalNick.AssignLeft ( strNick.c_str(), MAX_PLAYER_NICK_LENGTH );
@@ -650,7 +662,7 @@ bool CClientGame::StartLocalGame ( const char* szConfig, const char* szPassword 
         {
             m_bWaitingForLocalConnect = true;
             m_bErrorStartingLocal = true;
-            g_pCore->ShowMessageBox ( "Error", "The server is not installed", MB_ICON_ERROR | MB_BUTTON_OK );
+            g_pCore->ShowMessageBox ( _("Error")+_E("CD04"), _("The server is not installed"), MB_ICON_ERROR | MB_BUTTON_OK );
             g_pCore->GetModManager ()->RequestUnload ();
             return false;
         }
@@ -660,7 +672,7 @@ bool CClientGame::StartLocalGame ( const char* szConfig, const char* szPassword 
 
         // Display the status box<<<<<
         m_OnCancelLocalGameClick = GUI_CALLBACK ( &CClientGame::OnCancelLocalGameClick, this );
-        g_pCore->ShowMessageBox ( "Local Server", "Starting local server ...", MB_BUTTON_CANCEL | MB_ICON_INFO, &m_OnCancelLocalGameClick );
+        g_pCore->ShowMessageBox ( _("Local Server"), _("Starting local server ..."), MB_BUTTON_CANCEL | MB_ICON_INFO, &m_OnCancelLocalGameClick );
     }
     else
     {
@@ -707,6 +719,11 @@ void CClientGame::DoPulsePreHUDRender ( bool bDidUnminimize, bool bDidRecreateRe
         Arguments.PushBoolean ( bDidRecreateRenderTargets );
         m_pRootEntity->CallEvent ( "onClientRestore", Arguments, false );
         m_bWasMinimized = false;
+
+        // Reverse any mute on minimize effects
+        g_pGame->GetAudio ()->SetEffectsMasterVolume ( g_pGame->GetSettings ()->GetSFXVolume () );
+        g_pGame->GetAudio ()->SetMusicMasterVolume ( g_pGame->GetSettings ()->GetRadioVolume () );
+        m_pManager->GetSoundManager ()->SetMinimizeMuted ( false );
     }
 
     // Call onClientHUDRender LUA event
@@ -900,13 +917,9 @@ void CClientGame::DoPulsePostFrame ( void )
         CClientPerfStatManager::GetSingleton ()->DoPulse ();
     }
 
-    // If we are not minimized we do the pulsing here
-    if ( !g_pCore->IsWindowMinimized () )
-    {
-        m_pRadarMap->DoRender ();
-        m_pManager->DoRender ();
-        DoPulses ();
-    }
+    m_pRadarMap->DoRender ();
+    m_pManager->DoRender ();
+    DoPulses ();
 
     // If we're supposed to show netstat, draw them infront of everything else
     if ( m_bShowNetstat )
@@ -914,16 +927,6 @@ void CClientGame::DoPulsePostFrame ( void )
         m_pNetworkStats->Draw ();
     }
 }
-
-
-static SString AppendNetErrorCode ( const SString& strText )
-{
-    uint uiErrorCode = g_pNet->GetExtendedErrorCode ();
-    if ( uiErrorCode != 0 )
-        return strText + SString ( " \nCode: %08X", uiErrorCode );
-    return strText;
-}
-
 
 void CClientGame::DoPulses ( void )
 {
@@ -990,7 +993,7 @@ void CClientGame::DoPulses ( void )
             else
             {
                 // Otherwise, disconnect here
-                g_pCore->ShowMessageBox ( "Error", SString ( "You were kicked from the game (" + strMessageCombo + ")" ), MB_BUTTON_OK | MB_ICON_ERROR );
+                g_pCore->ShowMessageBox ( _("Error")+_E("CD05"), SString ( _("You were kicked from the game ( %s )"), *strMessageCombo ), MB_BUTTON_OK | MB_ICON_ERROR );
                 g_pCore->GetModManager ()->RequestUnload ();
                 return;
             }
@@ -1017,8 +1020,7 @@ void CClientGame::DoPulses ( void )
     // Pulse the network interface
 
     // Extrapolation test - Change the pulse order to reduce latency (Has side effects for peds)
-    if ( !IsUsingAlternatePulseOrder( true ) )
-        DoPulses2 ();
+    DoPulses2( false );
 
     m_pUnoccupiedVehicleSync->DoPulse ();
     m_pPedSync->DoPulse ();
@@ -1050,7 +1052,7 @@ void CClientGame::DoPulses ( void )
             g_pNet->SetServerBitStreamVersion ( MTA_DM_BITSTREAM_VERSION );
 
             // Run the game normally.
-            StartGame ( m_strLocalNick, m_Server.GetPassword().c_str() );
+            StartGame ( m_strLocalNick, m_Server.GetPassword().c_str(), m_ServerType );
         }
         else
         {
@@ -1059,7 +1061,7 @@ void CClientGame::DoPulses ( void )
             if ( m_Server.IsReady () &&
                 m_iLocalConnectAttempts == 0 )
             {
-                g_pCore->ShowMessageBox ( "Local Server", "Connecting to local server...", MB_ICON_INFO );
+                g_pCore->ShowMessageBox ( _("Local Server"), _("Connecting to local server..."), MB_ICON_INFO );
 
                 // Connect
                 if ( g_pNet->StartNetwork ( "localhost", 22010 ) )
@@ -1070,7 +1072,7 @@ void CClientGame::DoPulses ( void )
                 }
                 else
                 {
-                    g_pCore->ShowMessageBox ( "Error", AppendNetErrorCode ( "Error connecting to server." ), MB_BUTTON_OK | MB_ICON_ERROR );
+                    g_pCore->ShowNetErrorMessageBox ( _("Error")+_E("CD06"), _("Error connecting to server.") );
                     g_pCore->GetModManager ()->RequestUnload ();
                     return;
                 }
@@ -1080,7 +1082,7 @@ void CClientGame::DoPulses ( void )
             if ( m_ulTimeStart != 0 && CClientTime::GetTime () >= m_ulTimeStart + 5000 )
             {
                 // Show timeout message and disconnect
-                g_pCore->ShowMessageBox ( "Error", AppendNetErrorCode ( "Connecting to local server timed out. See console for details." ), MB_BUTTON_OK | MB_ICON_ERROR );
+                g_pCore->ShowNetErrorMessageBox ( _("Error")+_E("CD07"), _("Connecting to local server timed out. See console for details.") );
                 g_pCore->GetModManager ()->RequestUnload ();
                 return;
             }
@@ -1149,7 +1151,7 @@ void CClientGame::DoPulses ( void )
         // Timed out?
         if ( !m_bWaitingForLocalConnect && ulCurrentTime >= m_ulTimeStart + NET_CONNECT_TIMEOUT )
         {
-            g_pCore->ShowMessageBox ( "Error", AppendNetErrorCode ( "Connection timed out" ), MB_BUTTON_OK | MB_ICON_ERROR );
+            g_pCore->ShowNetErrorMessageBox ( _("Error")+_E("CD08"), _("Connection timed out"), "connect-timed-out", true );
             g_pCore->GetModManager ()->RequestUnload ();
             return;
         }
@@ -1159,6 +1161,7 @@ void CClientGame::DoPulses ( void )
         // Pulse DownloadFiles if we're transferring stuff
         DownloadInitialResourceFiles ();
         DownloadSingularResourceFiles ();
+        g_pNet->GetHTTPDownloadManager ( EDownloadMode::CALL_REMOTE )->ProcessQueuedFiles ();
     }
 
     // Not waiting for local connect?
@@ -1182,49 +1185,48 @@ void CClientGame::DoPulses ( void )
             // See if we can figure out what specifically it was
             if ( ucError == 0 )
             {
-                g_pCore->ShowMessageBox ( "Error", AppendNetErrorCode ( "Connection with the server was lost" ), MB_BUTTON_OK | MB_ICON_ERROR );
-                g_pNet->SetImmediateError ( 0 );
+                g_pCore->ShowNetErrorMessageBox ( _("Error")+_E("CD09"), _("Connection with the server was lost") );
                 g_pCore->GetModManager ()->RequestUnload ();
                 return;
             }
             else
             {
                 SString strError;
+                SString strErrorCode;
                 switch ( ucError )
                 {
                     case RID_RSA_PUBLIC_KEY_MISMATCH:
-                        strError = "Disconnected: unknown protocol error.";  // encryption key mismatch
+                        strError = _("Disconnected: unknown protocol error"); strErrorCode = _E("CD10"); // encryption key mismatch
                         break;
                     case RID_REMOTE_DISCONNECTION_NOTIFICATION:
-                        strError = "Disconnected: disconnected remotely.";
+                        strError = _("Disconnected: disconnected remotely"); strErrorCode = _E("CD11");
                         break;
                     case RID_REMOTE_CONNECTION_LOST:
-                        strError = "Disconnected: connection lost remotely.";
+                        strError = _("Disconnected: connection lost remotely"); strErrorCode = _E("CD12");
                         break;
                     case RID_CONNECTION_BANNED:
-                        strError = "Disconnected: you are banned from this server.";
+                        strError = _("Disconnected: you are banned from this server"); strErrorCode = _E("CD13");
                         break;
                     case RID_NO_FREE_INCOMING_CONNECTIONS:
-                        strError = "Disconnected: the server is currently full.";
+                        strError = _("Disconnected: the server is currently full"); strErrorCode = _E("CD14");
                         break;
                     case RID_DISCONNECTION_NOTIFICATION:
-                        strError = "Disconnected: disconnected from the server.";
+                        strError = _("Disconnected: disconnected from the server"); strErrorCode = _E("CD15");
                         break;
                     case RID_CONNECTION_LOST:
-                        strError = "Disconnected: connection to the server was lost.";
+                        strError = _("Disconnected: connection to the server was lost"); strErrorCode = _E("CD16");
                         break;
                     case RID_INVALID_PASSWORD:
-                        strError = "Disconnected: invalid password specified.";
+                        strError = _("Disconnected: invalid password specified"); strErrorCode = _E("CD17");
                         break;
                     default:
-                        strError = "Disconnected: connection was refused.";
+                        strError = _("Disconnected: connection was refused"); strErrorCode = _E("CD18");
                         break;
                 }
 
                 // Display an error, reset the error status and exit
-                g_pCore->ShowMessageBox ( "Error", AppendNetErrorCode ( strError ), MB_BUTTON_OK | MB_ICON_ERROR );
+                g_pCore->ShowNetErrorMessageBox ( _("Error")+strErrorCode, strError );
                 g_pNet->SetConnectionError ( 0 );
-                g_pNet->SetImmediateError ( 0 );
                 g_pCore->GetModManager ()->RequestUnload ();
             }
         }
@@ -1235,7 +1237,7 @@ void CClientGame::DoPulses ( void )
             // Time out the verification if it takes too long
             if ( m_ulVerifyTimeStart != 0 && ulCurrentTime >= m_ulVerifyTimeStart + CLIENT_VERIFICATION_TIMEOUT )
             {
-                g_pCore->ShowMessageBox ( "Error", AppendNetErrorCode ( "MTA Client verification failed!" ), MB_BUTTON_OK | MB_ICON_ERROR );
+                g_pCore->ShowNetErrorMessageBox ( _("Error")+_E("CD19"), _("MTA Client verification failed!") );
                 g_pCore->GetModManager ()->RequestUnload ();
             }
         }
@@ -1257,6 +1259,7 @@ void CClientGame::DoPulses ( void )
 
     // Check for radar input
     m_pRadarMap->DoPulse ();
+    g_pCore->GetGraphics ()->SetAspectRatioAdjustmentSuspended( m_pRadarMap->IsRadarShowing() );
 
     // Got a local player?
     if ( m_pLocalPlayer )
@@ -1302,15 +1305,55 @@ void CClientGame::DoPulses ( void )
 }
 
 // Extrapolation test
-void CClientGame::DoPulses2 ( void )
+void CClientGame::DoPulses2 ( bool bCalledFromIdle )
 {
-    // Pulse the network interface
-    TIMING_CHECKPOINT( "+NetPulse" );
-    g_pNet->DoPulse ();
-    TIMING_CHECKPOINT( "-NetPulse" );
+    bool bIsUsingAlternatePulseOrder = IsUsingAlternatePulseOrder( !bCalledFromIdle );
 
-    m_pManager->DoPulse ();
-    m_pNetAPI->DoPulse ();
+    // Figure out which pulses to do
+    bool bDoStandardPulses;
+    bool bDoVehicleManagerPulse;
+
+    if ( !bIsUsingAlternatePulseOrder )
+    {
+        // With std pulse order, do pulses when not called from idle
+        bDoStandardPulses = !bCalledFromIdle;
+        bDoVehicleManagerPulse = !bCalledFromIdle;
+    }
+    else
+    {
+        // With alt pulse order, do pulses when called from idle
+        bDoStandardPulses = bCalledFromIdle;
+        bDoVehicleManagerPulse = bCalledFromIdle;
+
+        // Except when watching a remote synced vehicle
+        if ( CClientVehicle* pTargetVehicle = DynamicCast < CClientVehicle > ( m_pCamera->GetTargetEntity() ) )
+            if ( pTargetVehicle->GetControllingPlayer() != m_pPlayerManager->GetLocalPlayer() )
+                bDoVehicleManagerPulse = !bDoVehicleManagerPulse;
+    }
+
+
+    if ( bDoStandardPulses )
+    {
+        // Change to high precision so arguments in element data and events can
+        // be rounded to look more like what is expected
+        ChangeFloatPrecision( true );
+
+        // Pulse the network interface
+        TIMING_CHECKPOINT( "+NetPulse" );
+        g_pNet->DoPulse ();
+        TIMING_CHECKPOINT( "-NetPulse" );
+
+        // Change precision back, and check we are in low precision mode 4 sure
+        ChangeFloatPrecision( false );
+        assert( !IsHighFloatPrecision() );
+    }
+
+    m_pManager->DoPulse( bDoStandardPulses, bDoVehicleManagerPulse );
+
+    if ( bDoStandardPulses )
+    {
+        m_pNetAPI->DoPulse();
+    }
 }
 
 
@@ -1645,7 +1688,7 @@ void CClientGame::UpdateVehicleInOut ( void )
 
                             // Did we start jacking them?
                             bool bAlreadyStartedJacking = false;
-                            CClientVehicle* pVehicle = static_cast < CClientVehicle* > ( CElementIDs::GetElement ( m_VehicleInOutID ) );
+                            CClientVehicle* pVehicle = DynamicCast < CClientVehicle > ( CElementIDs::GetElement ( m_VehicleInOutID ) );
                             if ( pVehicle )
                             {
                                 CClientPed* pJackedPlayer = pVehicle->GetOccupant ();
@@ -1657,9 +1700,10 @@ void CClientGame::UpdateVehicleInOut ( void )
                                         bAlreadyStartedJacking = true;
                                     }
                                 }
-                                pBitStream->WriteBits ( &(m_pLocalPlayer->m_ucEnteringDoor ), 3 );
+                                unsigned char ucDoor = m_pLocalPlayer->m_ucEnteringDoor - 2;
+                                pBitStream->WriteBits ( &ucDoor, 3 );
                                 SDoorOpenRatioSync door;
-                                door.data.fRatio = pVehicle->GetDoorOpenRatio ( m_pLocalPlayer->m_ucEnteringDoor + 2 );
+                                door.data.fRatio = pVehicle->GetDoorOpenRatio ( m_pLocalPlayer->m_ucEnteringDoor );
                                 pBitStream->Write ( &door );
                             }
                             pBitStream->WriteBit ( bAlreadyStartedJacking );
@@ -1672,7 +1716,7 @@ void CClientGame::UpdateVehicleInOut ( void )
                         {
                             ucAction = static_cast < unsigned char > ( VEHICLE_NOTIFY_IN_ABORT );
                             pBitStream->WriteBits ( &ucAction, 4 );
-                            CClientVehicle* pVehicle = static_cast < CClientVehicle* > ( CElementIDs::GetElement ( m_VehicleInOutID ) );
+                            CClientVehicle* pVehicle = DynamicCast < CClientVehicle > ( CElementIDs::GetElement ( m_VehicleInOutID ) );
                             if ( pVehicle )
                             {
                                 unsigned char ucDoor = m_pLocalPlayer->m_ucEnteringDoor - 2;
@@ -1893,6 +1937,16 @@ void CClientGame::UpdatePlayerWeapons ( void )
             CWeapon* pWeapon = m_pLocalPlayer->GetWeapon ();
             NetBitStreamInterface& BitStream = *(bitStream.pBitStream);
             SWeaponSlotSync slot;
+
+            // Always send bit in case server is not in sync
+            if ( ( BitStream.Version () >= 0x44 && m_lastWeaponSlot == WEAPONSLOT_TYPE_THROWN ) || BitStream.Version () >= 0x4D )
+            {
+                CWeapon* pLastWeapon = m_pLocalPlayer->GetWeapon ( m_lastWeaponSlot );
+                if ( pLastWeapon && pLastWeapon->GetAmmoTotal () == 0 && m_lastWeaponSlot == WEAPONSLOT_TYPE_THROWN )
+                    BitStream.WriteBit ( true );
+                else
+                    BitStream.WriteBit ( false );
+            }
 
             if ( pWeapon )
             {
@@ -2251,23 +2305,63 @@ void CClientGame::SetAllDimensions ( unsigned short usDimension )
 }
 
 
-void CClientGame::StaticKeyStrokeHandler ( const SBindableKey * pKey, bool bState )
+bool CClientGame::StaticKeyStrokeHandler ( const SString& strKey, bool bState, bool bIsConsoleInputKey )
 {
-    g_pClientGame->KeyStrokeHandler ( pKey, bState );
+    return g_pClientGame->KeyStrokeHandler ( strKey, bState, bIsConsoleInputKey );
 }
 
 
-void CClientGame::KeyStrokeHandler ( const SBindableKey * pKey, bool bState )
+bool CClientGame::KeyStrokeHandler ( const SString& strKey, bool bState, bool bIsConsoleInputKey )
 {
     // Do we have a root yet?
     if ( m_pRootEntity )
     {
-        // Call our key-stroke event
-        CLuaArguments Arguments;
-        Arguments.PushString ( pKey->szKey );
-        Arguments.PushBoolean ( bState );
-        m_pRootEntity->CallEvent ( "onClientKey", Arguments, false );
+        // Ignore keydown/up pair if main menu is displayed, or console input will use the character
+        bool bIgnore = false;
+        if ( bState )
+        {
+            if ( g_pCore->IsMenuVisible() || ( g_pCore->GetConsole()->IsInputActive() && bIsConsoleInputKey ) )
+                bIgnore = true;                         // Ignore this keydown and the matching keyup
+            else
+                MapInsert( m_AllowKeyUpMap, strKey );   // Use this keydown and the matching keyup
+        }
+        else
+        {
+            if ( !MapContains( m_AllowKeyUpMap, strKey ) )
+                bIgnore = true;                         // Ignore this keyup
+            else
+                MapRemove( m_AllowKeyUpMap, strKey );   // Use this keyup
+        }
+
+        if ( !bIgnore )
+        {
+            bool bAllow = true;
+            // Call our key-stroke event
+            CLuaArguments Arguments;
+            Arguments.PushString ( strKey );
+            Arguments.PushBoolean ( bState );
+            bAllow = m_pRootEntity->CallEvent ( "onClientKey", Arguments, false );
+            if ( bState == true )
+            {
+                if ( bAllow == false && strKey == "escape" )
+                {
+                    if ( m_bLastKeyWasEscapeCancelled )
+                    {
+                        // Escape cannot be skipped twice
+                        bAllow = true;
+                        m_bLastKeyWasEscapeCancelled = false;
+                    }
+                    else
+                        m_bLastKeyWasEscapeCancelled = true;
+                }
+                else
+                    m_bLastKeyWasEscapeCancelled = false;
+            }
+            return bAllow;
+        }
     }
+    m_bLastKeyWasEscapeCancelled = false;
+    return true;
 }
 
 
@@ -2280,7 +2374,7 @@ bool CClientGame::StaticCharacterKeyHandler ( WPARAM wChar )
 bool CClientGame::CharacterKeyHandler ( WPARAM wChar )
 {
     // Do we have a root yet?
-    if ( m_pRootEntity )
+    if ( m_pRootEntity && g_pCore->IsMenuVisible() == false && g_pCore->GetConsole()->IsInputActive() == false )
     {
         // Safe character?
         if ( wChar >= 32 )
@@ -2367,7 +2461,6 @@ bool CClientGame::ProcessMessageForCursorEvents ( HWND hwnd, UINT uMsg, WPARAM w
     bool bCursorForcedVisible = g_pCore->IsCursorForcedVisible ();
     bool bMenuVisible = g_pCore->IsMenuVisible ();
     bool bConsoleVisible = g_pCore->GetConsole ()->IsVisible ();
-    bool bChatInputEnabled = g_pCore->IsChatInputEnabled ();
 
     if ( bCursorForcedVisible )
     {
@@ -2592,7 +2685,7 @@ CClientPlayer * CClientGame::GetClosestRemotePlayer ( const CVector & vecPositio
     CVector vecTemp;
     CClientPlayer * pPlayer;
     vector < CClientPlayer * > ::const_iterator iter = m_pPlayerManager->IterBegin ();
-    for ( ; iter != m_pPlayerManager->IterEnd () ; iter++ )
+    for ( ; iter != m_pPlayerManager->IterEnd (); ++iter )
     {
         pPlayer = *iter;
         if ( !pPlayer->IsLocalPlayer () )
@@ -2671,6 +2764,8 @@ void CClientGame::AddBuiltInEvents ( void )
     m_Events.AddEvent ( "onClientPlayerChoke", "", NULL, false );
     m_Events.AddEvent ( "onClientPlayerVoiceStart", "", NULL, false );
     m_Events.AddEvent ( "onClientPlayerVoiceStop", "", NULL, false );
+    m_Events.AddEvent ( "onClientPlayerVoicePause", "reason", NULL, false );
+    m_Events.AddEvent ( "onClientPlayerVoiceResumed", "reason", NULL, false );
     m_Events.AddEvent ( "onClientPlayerStealthKill", "target", NULL, false );
     m_Events.AddEvent ( "onClientPlayerHitByWaterCannon", "vehicle", NULL, false );
     m_Events.AddEvent ( "onClientPlayerHeliKilled", "heli", NULL, false );
@@ -2695,6 +2790,7 @@ void CClientGame::AddBuiltInEvents ( void )
     m_Events.AddEvent ( "onClientTrailerDetach", "towedBy", NULL, false );
     m_Events.AddEvent ( "onClientVehicleExplode", "", NULL, false );
     m_Events.AddEvent ( "onClientVehicleCollision", "collidedelement, damageImpulseMag, bodypart, x, y, z, velX, velY, velZ", NULL, false );
+    m_Events.AddEvent ( "onClientVehicleDamage", "attacker, weapon, loss, x, y, z, tyre", NULL, false );
     m_Events.AddEvent ( "onClientVehicleNitroStateChange", "activated", NULL, false );
 
     // GUI events
@@ -3126,7 +3222,7 @@ void CClientGame::UpdateMimics ( void )
             // Apply this to each of our mimic players
             unsigned int uiMimicIndex = 0;
             list < CClientPlayer* > ::const_iterator iterMimics = m_Mimics.begin ();
-            for ( ; iterMimics != m_Mimics.end (); iterMimics++, uiMimicIndex++ )
+            for ( ; iterMimics != m_Mimics.end (); ++iterMimics, ++uiMimicIndex )
             {
                 vecPosition.fX += 4.0f;
                 vecOrigin.fX += 4.0f;
@@ -3278,7 +3374,7 @@ void CClientGame::UpdateMimics ( void )
                         pTrailer->GetTurnSpeed ( vecTurnSpeed );
                         fHealth = pTrailer->GetHealth ();
 
-                        pMimicTrailer = static_cast < CClientVehicle* > ( CElementIDs::GetElement ( static_cast < ElementID > ( 450 + uiMimicIndex + uiTrailerLoop ) ) );
+                        pMimicTrailer = DynamicCast < CClientVehicle > ( CElementIDs::GetElement ( static_cast < ElementID > ( 450 + uiMimicIndex + uiTrailerLoop ) ) );
 
                         if ( pMimicTrailer && pMimicTrailer->GetModel () != uiModel )
                         {
@@ -3493,9 +3589,14 @@ void CClientGame::Event_OnIngameAndReady ( void )
 void CClientGame::Event_OnIngameAndConnected ( void )
 {
     // Create a messagebox saying that we're verifying the client
-    //g_pCore->ShowMessageBox ( "Connecting", "Verifying client ...", false );
+    //g_pCore->ShowMessageBox ( "Connecting", _("Verifying client ..."), false );
     m_ulVerifyTimeStart = CClientTime::GetTime ();
     
+    // Keep criminal records of how many times they've connected to servers
+    SetApplicationSettingInt ( "times-connected", GetApplicationSettingInt("times-connected") + 1 );
+    if ( m_ServerType == SERVER_TYPE_EDITOR )
+        SetApplicationSettingInt ( "times-connected-editor", GetApplicationSettingInt ("times-connected-editor") + 1 );
+
     /*
     // Notify the server telling we're ingame
     NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream ();
@@ -3522,6 +3623,11 @@ bool CClientGame::StaticDamageHandler ( CPed* pDamagePed, CEventDamage * pEvent 
     return g_pClientGame->DamageHandler ( pDamagePed, pEvent );
 }
 
+void CClientGame::StaticDeathHandler ( CPed* pKilledPed, unsigned char ucDeathReason, unsigned char ucBodyPart )
+{
+    g_pClientGame->DeathHandler ( pKilledPed, ucDeathReason, ucBodyPart );
+}
+
 void CClientGame::StaticFireHandler ( CFire* pFire )
 {
     g_pClientGame->FireHandler ( pFire );
@@ -3530,6 +3636,11 @@ void CClientGame::StaticFireHandler ( CFire* pFire )
 void CClientGame::StaticRender3DStuffHandler ( void )
 {
     g_pClientGame->Render3DStuffHandler ();
+}
+
+void CClientGame::StaticPreRenderSkyHandler ( void )
+{
+    g_pClientGame->PreRenderSkyHandler ();
 }
 
 bool CClientGame::StaticChokingHandler ( unsigned char ucWeaponType )
@@ -3557,12 +3668,6 @@ void CClientGame::StaticPostWorldProcessHandler ( void )
     g_pClientGame->PostWorldProcessHandler ();
 }
 
-
-void CClientGame::StaticIdleHandler ( void )
-{
-    g_pClientGame->IdleHandler ();
-}
-
 void CClientGame::StaticPreFxRenderHandler ( void )
 {
     g_pCore->OnPreFxRender ();
@@ -3583,9 +3688,14 @@ bool CClientGame::StaticVehicleCollisionHandler ( CVehicleSAInterface* pCollidin
     return g_pClientGame->VehicleCollisionHandler( pCollidingVehicle, pCollidedVehicle, iModelIndex, fDamageImpulseMag, fCollidingDamageImpulseMag, usPieceType, vecCollisionPos, vecCollisionVelocity );
 }
 
-bool CClientGame::StaticHeliKillHandler ( CVehicleSAInterface* pHeliInterface, CPedSAInterface* pPed )
+bool CClientGame::StaticVehicleDamageHandler ( CEntitySAInterface* pVehicleInterface, float fLoss, CEntitySAInterface* pAttackerInterface, eWeaponType weaponType, const CVector& vecDamagePos, uchar ucTyre )
 {
-    return g_pClientGame->HeliKillHandler ( pHeliInterface, pPed );
+    return g_pClientGame->VehicleDamageHandler ( pVehicleInterface, fLoss, pAttackerInterface, weaponType, vecDamagePos, ucTyre );
+}
+
+bool CClientGame::StaticHeliKillHandler ( CVehicleSAInterface* pHeliInterface, CEntitySAInterface* pHitInterface )
+{
+    return g_pClientGame->HeliKillHandler ( pHeliInterface, pHitInterface );
 }
 
 bool CClientGame::StaticObjectDamageHandler ( CObjectSAInterface* pObjectInterface, float fLoss, CEntitySAInterface* pAttackerInterface )
@@ -3616,6 +3726,11 @@ void CClientGame::StaticGameVehicleDestructHandler ( CEntitySAInterface* pVehicl
 void CClientGame::StaticGamePlayerDestructHandler ( CEntitySAInterface* pPlayer )
 {
     g_pClientGame->GamePlayerDestructHandler ( pPlayer );
+}
+
+void CClientGame::StaticGameProjectileDestructHandler ( CEntitySAInterface* pProjectile )
+{
+    g_pClientGame->GameProjectileDestructHandler ( pProjectile );
 }
 
 void CClientGame::StaticGameModelRemoveHandler ( ushort usModelId )
@@ -3656,6 +3771,11 @@ void CClientGame::StaticGameEntityRenderHandler ( CEntitySAInterface* pGameEntit
     }
 
     g_pGame->GetRenderWare ()->SetRenderingClientEntity ( NULL, 0xFFFF, TYPE_MASK_WORLD );
+}
+
+void CClientGame::StaticTaskSimpleBeHitHandler ( CPedSAInterface* pPedAttacker, ePedPieceTypes hitBodyPart, int hitBodySide, int weaponId )
+{
+    g_pClientGame->TaskSimpleBeHitHandler ( pPedAttacker, hitBodyPart, hitBodySide, weaponId );
 }
 
 void CClientGame::DrawRadarAreasHandler ( void )
@@ -3728,9 +3848,12 @@ void CClientGame::ProjectileInitiateHandler ( CClientProjectile * pProjectile )
 
 void CClientGame::Render3DStuffHandler ( void )
 {
-
 }
 
+void CClientGame::PreRenderSkyHandler ( void )
+{
+    g_pCore->GetGraphics ()->GetRenderItemManager ()->PreDrawWorld ();
+}
 
 void CClientGame::PreWorldProcessHandler ( void )
 {
@@ -3767,15 +3890,21 @@ void CClientGame::IdleHandler ( void )
             // Call onClientMinimize LUA event
             CLuaArguments Arguments;
             m_pRootEntity->CallEvent ( "onClientMinimize", Arguments, false );
+
+            // Apply mute on minimize options
+            if ( g_pCore->GetCVars ()->GetValue < bool > ( "mute_sfx_when_minimized" )  )
+                g_pGame->GetAudio ()->SetEffectsMasterVolume ( 0 );
+
+            if ( g_pCore->GetCVars ()->GetValue < bool > ( "mute_radio_when_minimized" )  )
+                g_pGame->GetAudio ()->SetMusicMasterVolume ( 0 );
+
+            if ( g_pCore->GetCVars ()->GetValue < bool > ( "mute_mta_when_minimized" )  )
+                m_pManager->GetSoundManager ()->SetMinimizeMuted ( true );
         }
-        m_pRadarMap->DoRender ();
-        m_pManager->DoRender ();
-        DoPulses ();
     }
 
     // Extrapolation test - Change the pulse order to reduce latency (Has side effects for peds)
-    if ( IsUsingAlternatePulseOrder() )
-        DoPulses2 ();
+    DoPulses2( true );
 }
 
 
@@ -3811,7 +3940,7 @@ bool CClientGame::ProcessCollisionHandler ( CEntitySAInterface* pThisInterface, 
         m_CachedCollisionMap.clear ();
 
         std::map < CClientEntity*, bool > ::iterator iter = m_AllDisabledCollisions.begin ();
-        for ( ; iter != m_AllDisabledCollisions.end () ; iter++ )
+        for ( ; iter != m_AllDisabledCollisions.end () ; ++iter )
         {
             CClientEntity* pEntity = iter->first;
             CEntity* pGameEntity = pEntity->GetGameEntity ();
@@ -3876,6 +4005,9 @@ void CClientGame::DownloadInitialResourceFiles ( void )
     if ( !IsTransferringInitialFiles () )
         return;
 
+    if ( !g_pNet->IsConnected() )
+        return;
+
     CNetHTTPDownloadManagerInterface* pHTTP = g_pNet->GetHTTPDownloadManager ( EDownloadMode::RESOURCE_INITIAL_FILES );
     if ( !pHTTP->ProcessQueuedFiles () )
     {
@@ -3901,8 +4033,8 @@ void CClientGame::DownloadInitialResourceFiles ( void )
         {
             // Throw the error and disconnect
             g_pCore->GetModManager ()->RequestUnload ();
-            g_pCore->ShowMessageBox ( "Error", szHTTPError, MB_BUTTON_OK | MB_ICON_ERROR );
-            g_pCore->GetConsole ()->Printf ( "Download error: %s", szHTTPError );
+            g_pCore->ShowMessageBox ( _("Error")+_E("CD20"), szHTTPError, MB_BUTTON_OK | MB_ICON_ERROR ); // HTTP Error
+            g_pCore->GetConsole ()->Printf ( _("Download error: %s"), szHTTPError );
         }
     }
 }
@@ -3914,6 +4046,9 @@ void CClientGame::DownloadInitialResourceFiles ( void )
 void CClientGame::DownloadSingularResourceFiles ( void )
 {
     if ( !IsTransferringSingularFiles () )
+        return;
+
+    if ( !g_pNet->IsConnected() )
         return;
 
     CNetHTTPDownloadManagerInterface* pHTTP = g_pNet->GetHTTPDownloadManager ( EDownloadMode::RESOURCE_SINGULAR_FILES );
@@ -4138,6 +4273,7 @@ bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
             }
 
             bool bIsBeingShotWhilstAiming = ( weaponUsed >= WEAPONTYPE_PISTOL && weaponUsed <= WEAPONTYPE_MINIGUN && pDamagedPed->IsUsingGun () );
+            bool bOldBehaviour = !IsGlitchEnabled( GLITCH_HITANIM );
 
             // Check if their health or armor is locked, and if so prevent applying the damage locally
             if ( pDamagedPed->IsHealthLocked () || pDamagedPed->IsArmorLocked () )
@@ -4146,11 +4282,18 @@ bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
                 pDamagedPed->GetGamePlayer ()->SetHealth ( pDamagedPed->GetHealth () );
                 pDamagedPed->GetGamePlayer ()->SetArmor ( pDamagedPed->GetArmor () );
 
-                // Don't play the animation if it's going to be a death one, or if it's going to interrupt aiming
-                if ( fCurrentHealth == 0.0f || bIsBeingShotWhilstAiming ) return false;
+                if ( bOldBehaviour )
+                {
+                    // Don't play the animation if it's going to be a death one, or if it's going to interrupt aiming
+                    if ( fCurrentHealth == 0.0f || bIsBeingShotWhilstAiming )
+                        return false;
 
-                // Allow animation and ensure the code below is not executed if health and armor are locked (i.e. remote players)
-                return true;
+                    // Allow animation for remote players
+                    return true;
+                }
+
+                // No hit animation for remote players
+                return false;
             }
 
             // Update our stored health/armor
@@ -4200,7 +4343,7 @@ bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
                         pEvent->ComputeDeathAnim ( pDamagePed, true );
                         AssocGroupId animGroup = pEvent->GetAnimGroup ();
                         AnimationId animID = pEvent->GetAnimId ();
-                        pDamagedPed->Kill ( weaponUsed, m_ucDamageBodyPiece, false, false, animGroup, animID );
+                        pDamagedPed->Kill ( weaponUsed, hitZone, false, false, animGroup, animID );
                         return true;
                     }
                     if ( fPreviousHealth > 0.0f )
@@ -4214,12 +4357,14 @@ bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
                         if ( pInflictingEntity ) m_DamagerID = pInflictingEntity->GetID ();
 
                         // Check if we're dead
-                        SendPedWastedPacket ( pDamagedPed, m_DamagerID, m_ucDamageWeapon, m_ucDamageBodyPiece, animGroup, animID );
+                        SendPedWastedPacket ( pDamagedPed, m_DamagerID, weaponUsed, hitZone, animGroup, animID );
                     }
                 }
             }
+
             // Inhibit hit-by-gun animation for local player if required
-            if ( pDamagedPed->IsLocalPlayer () && bIsBeingShotWhilstAiming ) return false;
+            if ( bOldBehaviour )
+                if ( pDamagedPed->IsLocalPlayer () && bIsBeingShotWhilstAiming ) return false;
 
             ///////////////////////////////////////////////////////////////////////////
             // Pass 2 end
@@ -4232,6 +4377,32 @@ bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
     
     // Allow the damage processing to continue
     return true;
+}
+
+void CClientGame::DeathHandler ( CPed* pKilledPedSA, unsigned char ucDeathReason, unsigned char ucBodyPart)
+{
+    CClientPed* pKilledPed = m_pPedManager->Get ( dynamic_cast < CPlayerPed* > ( pKilledPedSA ), true, true );
+
+    if ( !pKilledPed )
+        return;
+
+    // Not required for remote players. Local player is handled in DoPulses->DoWastedCheck
+    if ( IS_PLAYER ( pKilledPed ) )
+        return;
+
+    // Set the health to zero (this is safe as GTA will do it anyway in a few ticks)
+    pKilledPed->SetHealth(0.0f);
+
+    // Call Lua
+    CLuaArguments Arguments;
+    Arguments.PushBoolean(false);
+    Arguments.PushNumber(ucDeathReason);
+    Arguments.PushNumber(ucBodyPart);
+
+    pKilledPed->CallEvent("onClientPedWasted", Arguments, true);
+    
+    // Notify the server
+    SendPedWastedPacket ( pKilledPed, INVALID_ELEMENT_ID, ucDeathReason, ucBodyPart );
 }
 
 bool CClientGame::VehicleCollisionHandler ( CVehicleSAInterface* pCollidingVehicle, CEntitySAInterface* pCollidedWith, int iModelIndex, float fDamageImpulseMag, float fCollidingDamageImpulseMag, uint16 usPieceType, CVector vecCollisionPos, CVector vecCollisionVelocity )
@@ -4326,60 +4497,107 @@ bool CClientGame::VehicleCollisionHandler ( CVehicleSAInterface* pCollidingVehic
     return false;
 }
 
-bool CClientGame::HeliKillHandler ( CVehicleSAInterface* pHeliInterface, CPedSAInterface* pPedInterface )
+bool CClientGame::HeliKillHandler ( CVehicleSAInterface* pHeliInterface, CEntitySAInterface* pHitInterface )
 {
-    if ( pHeliInterface && pPedInterface )
+    if ( pHeliInterface && pHitInterface )
     {
-        // Get our ped and client ped
-        CPed * pPed = g_pGame->GetPools ( )->GetPed ( (DWORD *)pPedInterface );
-        CClientPed * pClientPed = m_pManager->GetPedManager ( )->GetSafe( pPed, true );
-        // Was our client ped valid
-        if ( pClientPed )
+        // Get our heli and client heli
+        CVehicle * pHeli = g_pGame->GetPools ( )->GetVehicle( (DWORD *)pHeliInterface );
+        CClientVehicle * pClientHeli = m_pManager->GetVehicleManager ( )->GetSafe( pHeli );
+        if ( pHeli && pClientHeli && pClientHeli->AreHeliBladeCollisionsEnabled ( ) )
         {
-            // Get our heli and client heli
-            CVehicle * pHeli = g_pGame->GetPools ( )->GetVehicle( (DWORD *)pHeliInterface );
-            CClientVehicle * pClientHeli = m_pManager->GetVehicleManager ( )->GetSafe( pHeli );
+            // Get our ped and client ped
+            CPed * pPed = g_pGame->GetPools ( )->GetPed ( (DWORD *)pHitInterface );
+            CClientPed * pClientPed = m_pManager->GetPedManager ( )->GetSafe( pPed, true );
+            // Was our client ped valid
+            if ( pClientPed )
+            {
+                // Get our heli and client heli
+                CVehicle * pHeli = g_pGame->GetPools ( )->GetVehicle( (DWORD *)pHeliInterface );
+                CClientVehicle * pClientHeli = m_pManager->GetVehicleManager ( )->GetSafe( pHeli );
 
-            // Iterate our "stored" cancel state and find the heli in question
-            std::pair < std::multimap < CClientVehicle *, CClientPed * >::iterator, std::multimap < CClientVehicle *, CClientPed * >::iterator> iterators = m_HeliCollisionsMap.equal_range ( pClientHeli );
-            std::multimap < CClientVehicle *, CClientPed * > ::const_iterator iter = iterators.first;
-            for ( ; iter != iterators.second; ++iter )
-            {
-                // If the Heli and ped collided within the clear rate return false
-                if ( (*iter).first == pClientHeli && (*iter).second == pClientPed )
-                    return false;
-            }
+                // Iterate our "stored" cancel state and find the heli in question
+                std::pair < std::multimap < CClientVehicle *, CClientPed * >::iterator, std::multimap < CClientVehicle *, CClientPed * >::iterator> iterators = m_HeliCollisionsMap.equal_range ( pClientHeli );
+                std::multimap < CClientVehicle *, CClientPed * > ::const_iterator iter = iterators.first;
+                for ( ; iter != iterators.second; ++iter )
+                {
+                    // If the Heli and ped collided within the clear rate return false
+                    if ( (*iter).first == pClientHeli && (*iter).second == pClientPed )
+                        return false;
+                }
 
-            CLuaArguments Arguments;
-            if ( pClientHeli )
-            {
-                // Push our heli
-                Arguments.PushElement ( pClientHeli );
-            }
-            else
-            {
-                Arguments.PushNil ( );
-            }
-            
-            // Trigger our event
-            bool bContinue;
-            if ( IS_PLAYER ( pClientPed ) )
-                bContinue = pClientPed->CallEvent ( "onClientPlayerHeliKilled", Arguments, true );
-            else
-                bContinue = pClientPed->CallEvent ( "onClientPedHeliKilled", Arguments, true );
+                CLuaArguments Arguments;
+                if ( pClientHeli )
+                {
+                    // Push our heli
+                    Arguments.PushElement ( pClientHeli );
+                }
+                else
+                {
+                    Arguments.PushNil ( );
+                }
 
-            // Was our event cancelled
-            if ( !bContinue )
-            {
-                // Add our heli and ped pair to the list
-                std::pair < CClientVehicle *, CClientPed * > pair = std::pair < CClientVehicle *, CClientPed * > ( pClientHeli, pClientPed ); 
-                m_HeliCollisionsMap.insert( pair );
+                // Trigger our event
+                bool bContinue;
+                if ( IS_PLAYER ( pClientPed ) )
+                    bContinue = pClientPed->CallEvent ( "onClientPlayerHeliKilled", Arguments, true );
+                else
+                    bContinue = pClientPed->CallEvent ( "onClientPedHeliKilled", Arguments, true );
+
+                // Was our event cancelled
+                if ( !bContinue )
+                {
+                    // Add our heli and ped pair to the list
+                    std::pair < CClientVehicle *, CClientPed * > pair = std::pair < CClientVehicle *, CClientPed * > ( pClientHeli, pClientPed ); 
+                    m_HeliCollisionsMap.insert( pair );
+                }
+                // Return if it was cancelled
+                return bContinue;
             }
-            // Return if it was cancelled
-            return bContinue;
+        }
+        else
+        {
+            return false;
         }
     }
     return true;
+}
+
+bool CClientGame::VehicleDamageHandler ( CEntitySAInterface* pVehicleInterface, float fLoss, CEntitySAInterface* pAttackerInterface, eWeaponType weaponType, const CVector& vecDamagePos, uchar ucTyre )
+{
+    bool bAllowDamage = true;
+    CClientVehicle* pClientVehicle = GetGameEntityXRefManager()->FindClientVehicle( pVehicleInterface );
+    if ( pClientVehicle )
+    {
+        CClientEntity* pClientAttacker = GetGameEntityXRefManager()->FindClientEntity( pAttackerInterface );
+
+        // Compose arguments
+        // attacker, weapon, loss, damagepos, tyreIdx
+        CLuaArguments Arguments;
+        if ( pClientAttacker )
+            Arguments.PushElement( pClientAttacker );
+        else
+            Arguments.PushNil ( );
+        if ( weaponType != WEAPONTYPE_INVALID )
+            Arguments.PushNumber ( weaponType );
+        else
+            Arguments.PushNil();
+        Arguments.PushNumber( fLoss );
+        Arguments.PushNumber( vecDamagePos.fX );
+        Arguments.PushNumber( vecDamagePos.fY );
+        Arguments.PushNumber( vecDamagePos.fZ );
+        if ( ucTyre != UCHAR_INVALID_INDEX )
+            Arguments.PushNumber( ucTyre );
+        else
+            Arguments.PushNil();
+
+        if ( !pClientVehicle->CallEvent( "onClientVehicleDamage", Arguments, true ) )
+        {
+            bAllowDamage = false;
+        }
+    }
+
+    return bAllowDamage;
 }
 
 bool CClientGame::ObjectDamageHandler ( CObjectSAInterface* pObjectInterface, float fLoss, CEntitySAInterface* pAttackerInterface )
@@ -4520,11 +4738,43 @@ void CClientGame::GamePlayerDestructHandler ( CEntitySAInterface* pPlayer )
     m_pGameEntityXRefManager->OnGameEntityDestruct ( pPlayer );
 }
 
+void CClientGame::GameProjectileDestructHandler ( CEntitySAInterface* pProjectile )
+{
+    CClientProjectile* pClientProjectile = m_pManager->GetProjectileManager ( )->Get ( pProjectile );
+    // Happens when destroyElement is called rather than letting the projectile expire
+    // Normal code path is destruction from CProjectileSAInterface -> CProjectileSA -> CClientProjectile
+    // destroyElement is CClientProjectile -> CProjectileSA -> CProjectileSAInterface 
+    // which means the CClientProjectile element is deleted when we get here
+    if ( pClientProjectile )
+        CStaticFunctionDefinitions::DestroyElement( *pClientProjectile );
+}
+
 void CClientGame::GameModelRemoveHandler ( ushort usModelId )
 {
     m_pGameEntityXRefManager->OnGameModelRemove ( usModelId );
 }
 
+void CClientGame::TaskSimpleBeHitHandler ( CPedSAInterface* pPedAttacker, ePedPieceTypes hitBodyPart, int hitBodySide, int weaponId )
+{
+    bool bOldBehaviour = !IsGlitchEnabled( GLITCH_HITANIM );
+    if ( bOldBehaviour )
+        return;
+
+    CClientPed* pClientPedAttacker = DynamicCast < CClientPed > ( GetGameEntityXRefManager()->FindClientEntity( (CEntitySAInterface*)pPedAttacker ) );
+
+    // Make sure cause was networked ped
+    if ( pClientPedAttacker && !pClientPedAttacker->IsLocalEntity() )
+    {
+        NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream ();
+        pBitStream->Write( (ushort)TASK_SIMPLE_BE_HIT );
+        pBitStream->Write( pClientPedAttacker->GetID() );
+        pBitStream->Write( (uchar)hitBodyPart );
+        pBitStream->Write( (uchar)hitBodySide );
+        pBitStream->Write( (uchar)weaponId );
+        g_pNet->SendPacket( PACKET_ID_PED_TASK, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED );
+        g_pNet->DeallocateNetBitStream( pBitStream );
+    }
+}
 
 bool CClientGame::StaticProcessMessage ( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
 {
@@ -4664,7 +4914,7 @@ void CClientGame::ProcessVehicleInOutKey ( bool bPassenger )
                                                     bool bIsOnWater = pVehicle->IsOnWater ();
                                                     unsigned char ucDoor = static_cast < unsigned char > ( uiDoor );
                                                     pBitStream->WriteBits ( &ucAction, 4 );
-                                                    pBitStream->WriteBits ( &ucSeat, 3 );
+                                                    pBitStream->WriteBits ( &ucSeat, 4 );
                                                     pBitStream->WriteBit ( bIsOnWater );
                                                     pBitStream->WriteBits ( &ucDoor, 3 );
 
@@ -4916,6 +5166,7 @@ bool CClientGame::StaticProcessPacket ( unsigned char ucPacketID, NetBitStreamIn
 {
     if ( g_pClientGame )
     {
+        g_pCore->UpdateDummyProgress();
         g_pClientGame->GetManager ()->GetPacketRecorder ()->RecordPacket ( ucPacketID, bitStream );
         return g_pClientGame->m_pPacketHandler->ProcessPacket ( ucPacketID, bitStream );
     }
@@ -5009,6 +5260,11 @@ void CClientGame::SendProjectileSync ( CClientProjectile * pProjectile )
         SWeaponTypeSync weaponTypeSync;
         weaponTypeSync.data.ucWeaponType = static_cast < unsigned char > ( weaponType );
         pBitStream->Write ( &weaponTypeSync );
+
+        // Write the projectile's model
+        if ( pBitStream->Version () >= 0x4F )
+            if ( pBitStream->Version () >= 0x52 || pOriginSource )    // Fix possible error for 0x51 server 
+                pBitStream->Write ( pProjectile->GetModel () );
 
         switch ( weaponType )
         {
@@ -5504,6 +5760,12 @@ bool CClientGame::OnMouseEnter ( CGUIMouseEventArgs Args )
     CLuaArguments Arguments;
     Arguments.PushNumber ( Args.position.fX );
     Arguments.PushNumber ( Args.position.fY );
+    if ( Args.pSwitchedWindow )
+    {
+        CClientGUIElement * pGUISwitchedElement = CGUI_GET_CCLIENTGUIELEMENT ( Args.pSwitchedWindow );
+        if ( GetGUIManager ()->Exists ( pGUISwitchedElement ) )
+            Arguments.PushElement( pGUISwitchedElement );
+    }
 
     CClientGUIElement * pGUIElement = CGUI_GET_CCLIENTGUIELEMENT ( Args.pWindow );
     if ( GetGUIManager ()->Exists ( pGUIElement ) ) pGUIElement->CallEvent ( "onClientMouseEnter", Arguments, true );
@@ -5519,6 +5781,12 @@ bool CClientGame::OnMouseLeave ( CGUIMouseEventArgs Args )
     CLuaArguments Arguments;
     Arguments.PushNumber ( Args.position.fX );
     Arguments.PushNumber ( Args.position.fY );
+    if ( Args.pSwitchedWindow )
+    {
+        CClientGUIElement * pGUISwitchedElement = CGUI_GET_CCLIENTGUIELEMENT ( Args.pSwitchedWindow );
+        if ( GetGUIManager ()->Exists ( pGUISwitchedElement ) )
+            Arguments.PushElement( pGUISwitchedElement );
+    }
 
     CClientGUIElement * pGUIElement = CGUI_GET_CCLIENTGUIELEMENT ( Args.pWindow );
     if ( GetGUIManager ()->Exists ( pGUIElement ) ) pGUIElement->CallEvent ( "onClientMouseLeave", Arguments, true );
@@ -5576,7 +5844,7 @@ bool CClientGame::OnFocusGain ( CGUIFocusEventArgs Args )
     
     if ( Args.pDeactivatedWindow )
     {
-        CClientGUIElement * pDeactivatedGUIElement = pDeactivatedGUIElement = CGUI_GET_CCLIENTGUIELEMENT ( Args.pDeactivatedWindow );
+        CClientGUIElement * pDeactivatedGUIElement = CGUI_GET_CCLIENTGUIELEMENT ( Args.pDeactivatedWindow );
         if ( GetGUIManager ()->Exists ( pDeactivatedGUIElement ) ) pDeactivatedGUIElement->CallEvent ( "onClientGUIBlur", Arguments, true );
     }
 
@@ -5632,7 +5900,7 @@ void CClientGame::NotifyBigPacketProgress ( unsigned long ulBytesReceived, unsig
     }
 
     m_pBigPacketTransferBox->DoPulse ();
-    m_pBigPacketTransferBox->SetInfo ( Min ( ulTotalSize, ulBytesReceived ), "Map download progress:" );
+    m_pBigPacketTransferBox->SetInfo ( Min ( ulTotalSize, ulBytesReceived ), CTransferBox::PACKET );
 }
 
 bool CClientGame::SetGlitchEnabled ( unsigned char ucGlitch, bool bEnabled )
@@ -5755,8 +6023,11 @@ void CClientGame::DebugElementRender ( void )
 //////////////////////////////////////////////////////////////////
 // Click
 //
-void CClientGame::TakePlayerScreenShot ( uint uiSizeX, uint uiSizeY, const SString& strTag, uint uiQuality, uint uiMaxBandwidth, uint uiMaxPacketSize, const SString& strResourceName, uint uiServerSentTime )
+void CClientGame::TakePlayerScreenShot ( uint uiSizeX, uint uiSizeY, const SString& strTag, uint uiQuality, uint uiMaxBandwidth, uint uiMaxPacketSize, CResource* pResource, uint uiServerSentTime )
 {
+    if ( !pResource )
+        return;
+
     bool bAllowScreenUploadEnabled = 1;
     g_pCore->GetCVars ()->Get ( "allow_screen_upload", bAllowScreenUploadEnabled );
     bool bWindowMinimized = g_pCore->IsWindowMinimized ();
@@ -5766,11 +6037,14 @@ void CClientGame::TakePlayerScreenShot ( uint uiSizeX, uint uiSizeY, const SStri
         // If alt-tabbed or opt-out
         NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream ();
         if ( !bAllowScreenUploadEnabled )
-            pBitStream->Write ( (uchar)3 );
+            pBitStream->Write ( (uchar)EPlayerScreenShotResult::DISABLED );
         else
-            pBitStream->Write ( (uchar)2 );
+            pBitStream->Write ( (uchar)EPlayerScreenShotResult::MINIMIZED );
         pBitStream->Write ( uiServerSentTime );
-        pBitStream->WriteString ( strResourceName );
+        if ( pBitStream->Version() >= 0x053 )
+            pBitStream->Write ( pResource->GetNetID() );
+        else
+            pBitStream->WriteString ( pResource->GetName() );
         pBitStream->WriteString ( strTag );
         g_pNet->SendPacket ( PACKET_ID_PLAYER_SCREENSHOT, pBitStream, PACKET_PRIORITY_LOW, PACKET_RELIABILITY_RELIABLE_ORDERED, PACKET_ORDERING_DATA_TRANSFER );
         g_pNet->DeallocateNetBitStream ( pBitStream );
@@ -5781,7 +6055,7 @@ void CClientGame::TakePlayerScreenShot ( uint uiSizeX, uint uiSizeY, const SStri
         SScreenShotArgs screenShotArgs;
         screenShotArgs.uiMaxBandwidth = uiMaxBandwidth;
         screenShotArgs.uiMaxPacketSize = uiMaxPacketSize;
-        screenShotArgs.strResourceName = strResourceName;
+        screenShotArgs.usResourceNetId = pResource->GetNetID();
         screenShotArgs.strTag = strTag;
         screenShotArgs.uiServerSentTime = uiServerSentTime;
         m_ScreenShotArgList.push_back ( screenShotArgs );
@@ -5793,18 +6067,20 @@ void CClientGame::TakePlayerScreenShot ( uint uiSizeX, uint uiSizeY, const SStri
 //////////////////////////////////////////////////////////////////
 // Callback from TakePlayerScreendsShot
 //
-void CClientGame::StaticGottenPlayerScreenShot ( const CBuffer& buffer, uint uiTimeSpentInQueue )
+void CClientGame::StaticGottenPlayerScreenShot ( const CBuffer* pBuffer, uint uiTimeSpentInQueue, const SString& strError )
 {
     if ( g_pClientGame )
-        g_pClientGame->GottenPlayerScreenShot ( buffer, uiTimeSpentInQueue );
+        g_pClientGame->GottenPlayerScreenShot ( pBuffer, uiTimeSpentInQueue, strError );
 }
 
 
 //////////////////////////////////////////////////////////////////
 // Break data into packets and put into delayed send list
 //
-void CClientGame::GottenPlayerScreenShot ( const CBuffer& buffer, uint uiTimeSpentInQueue )
+void CClientGame::GottenPlayerScreenShot ( const CBuffer* pBuffer, uint uiTimeSpentInQueue, const SString& strInError )
 {
+    SString strError = strInError;
+
     // Pop saved args
     if ( m_ScreenShotArgList.empty () )
         return;
@@ -5813,19 +6089,45 @@ void CClientGame::GottenPlayerScreenShot ( const CBuffer& buffer, uint uiTimeSpe
     m_ScreenShotArgList.pop_front ();
     const uint uiMaxBandwidth = Clamp < uint > ( 100, screenShotArgs.uiMaxBandwidth, 1000000 );
     const uint uiMaxPacketSize = Clamp < uint > ( 100, screenShotArgs.uiMaxPacketSize, 100000 );
-    const SString strResourceName = screenShotArgs.strResourceName;
+    const ushort usResourceNetId = screenShotArgs.usResourceNetId;
     const SString strTag = screenShotArgs.strTag;
     const uint uiServerGrabTime = screenShotArgs.uiServerSentTime + uiTimeSpentInQueue;
 
-    // Validate buffer
-    if ( buffer.GetSize () == 0 )
+    // Silently ignore if resource has been stopped
+    CResource* pResource = GetResourceManager()->GetResourceFromNetID ( usResourceNetId );
+    if ( !pResource )
         return;
+
+    // Validate buffer
+    if ( strError.empty() )
+    {
+        if ( !pBuffer || pBuffer->GetSize () == 0 )
+            strError = "Buffer empty";
+    }
+
+    // Handle error
+    if ( !strError.empty() )
+    {
+        NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream ();
+        pBitStream->Write ( (uchar)EPlayerScreenShotResult::ERROR_ );
+        pBitStream->Write ( uiServerGrabTime );
+        if ( pBitStream->Version() >= 0x053 )
+            pBitStream->Write ( pResource->GetNetID() );
+        else
+            pBitStream->WriteString ( pResource->GetName() );
+        pBitStream->WriteString ( strTag );
+        if ( pBitStream->Version() >= 0x053 )
+            pBitStream->WriteString ( strError );
+        g_pNet->SendPacket ( PACKET_ID_PLAYER_SCREENSHOT, pBitStream, PACKET_PRIORITY_LOW, PACKET_RELIABILITY_RELIABLE_ORDERED, PACKET_ORDERING_DATA_TRANSFER );
+        g_pNet->DeallocateNetBitStream ( pBitStream );
+        return;
+    }
 
     // Calc constants stuff
     const uint uiSendRate = Clamp < uint > ( 5, uiMaxBandwidth / uiMaxPacketSize, 20 );
     const long long llPacketInterval = 1000 / uiSendRate;
-    const uint uiTotalByteSize = buffer.GetSize ();
-    const char* pData = buffer.GetData ();
+    const uint uiTotalByteSize = pBuffer->GetSize ();
+    const char* pData = pBuffer->GetData ();
     const uint uiBytesPerPart = Min ( Min ( Max ( 100U, uiMaxBandwidth / uiSendRate ), uiTotalByteSize ), 30000U );
     const uint uiNumParts = Max ( 1U, ( uiTotalByteSize + uiBytesPerPart - 1 ) / uiBytesPerPart );
 
@@ -5843,7 +6145,7 @@ void CClientGame::GottenPlayerScreenShot ( const CBuffer& buffer, uint uiTimeSpe
         ushort usBytesThisPart = Min ( uiBytesRemaining, uiBytesPerPart );
         assert ( usBytesThisPart != 0 );
 
-        pBitStream->Write ( (uchar)1 );
+        pBitStream->Write ( (uchar)EPlayerScreenShotResult::SUCCESS );
         pBitStream->Write ( m_usNextScreenShotId );
         pBitStream->Write ( usPartNumber );
         pBitStream->Write ( usBytesThisPart );
@@ -5855,7 +6157,10 @@ void CClientGame::GottenPlayerScreenShot ( const CBuffer& buffer, uint uiTimeSpe
             pBitStream->Write ( uiServerGrabTime );
             pBitStream->Write ( uiTotalByteSize );
             pBitStream->Write ( (ushort)uiNumParts );
-            pBitStream->WriteString ( strResourceName );
+            if ( pBitStream->Version() >= 0x053 )
+                pBitStream->Write ( pResource->GetNetID() );
+            else
+                pBitStream->WriteString ( pResource->GetName() );
             pBitStream->WriteString ( strTag );
         }
 
@@ -5864,9 +6169,9 @@ void CClientGame::GottenPlayerScreenShot ( const CBuffer& buffer, uint uiTimeSpe
         delayedPacketInfo.useTickCount = tickCount;
         delayedPacketInfo.ucPacketID = PACKET_ID_PLAYER_SCREENSHOT;
         delayedPacketInfo.pBitStream = pBitStream;
-        delayedPacketInfo.packetPriority = PACKET_PRIORITY_MEDIUM;
+        delayedPacketInfo.packetPriority = PACKET_PRIORITY_LOW;
         delayedPacketInfo.packetReliability = PACKET_RELIABILITY_RELIABLE_ORDERED;
-        delayedPacketInfo.packetOrdering = PACKET_ORDERING_CHAT;
+        delayedPacketInfo.packetOrdering = PACKET_ORDERING_DATA_TRANSFER;
         m_DelayedSendList.push_back ( delayedPacketInfo );
 
         // Increment stuff
@@ -5990,4 +6295,172 @@ bool CClientGame::IsUsingAlternatePulseOrder( bool bAdvanceDelayCounter )
     }
 
     return false;
+}
+
+
+//////////////////////////////////////////////////////////////////
+//
+// CClientGame::OutputServerInfo
+//
+// Output info about the connected server for player
+//
+//////////////////////////////////////////////////////////////////
+void CClientGame::OutputServerInfo( void )
+{
+    SString strTotalOutput;
+    strTotalOutput += SString( "Server info for %s", g_pNet->GetConnectedServer( true ) );
+    if ( IsUsingExternalHTTPServer() )
+        strTotalOutput += "  (External HTTP)";
+    strTotalOutput += "\n";
+    strTotalOutput += SString( "Ver: %s\n", *GetServerVersionSortable () );
+    strTotalOutput += SString( "AC: %s\n", *m_strACInfo );
+
+    {
+        SString strVoice;
+        if ( m_pVoiceRecorder && m_pVoiceRecorder->IsEnabled() )
+            strVoice += SString( "Enabled - Sample rate:%d  Quality:%d"
+                                    , m_pVoiceRecorder->GetSampleRate()
+                                    , m_pVoiceRecorder->GetSampleQuality()
+                                );
+        else
+            strVoice += "Disabled";
+
+        strTotalOutput += SString( "Voice: %s\n", *strVoice );
+    }
+
+    {
+        SString strEnabledGlitches;
+        const char* szGlitchNames[] = { "Quick reload", "Fast fire", "Fast move", "Crouch bug", "Close damage", "Hit anim" };
+        for( uint i = 0 ; i < NUM_GLITCHES ; i++ )
+        {
+            if ( IsGlitchEnabled( i ) )
+            {
+                if ( !strEnabledGlitches.empty() )
+                    strEnabledGlitches += ", ";
+                if ( i < NUMELMS( szGlitchNames ) )
+                    strEnabledGlitches += szGlitchNames[i];
+                else
+                    strEnabledGlitches += SString( "Unknown(#%d)", i + 1 );
+            }
+        }
+        if ( strEnabledGlitches.empty() )
+            strEnabledGlitches = "None";
+        strTotalOutput += SString( "Glitches: %s\n", *strEnabledGlitches );
+    }
+
+    {
+        SString strEnabledBulletSync;
+        for( std::set < eWeaponType >::iterator iter = m_weaponTypesUsingBulletSync.begin() ; iter != m_weaponTypesUsingBulletSync.end() ; ++iter )
+        {
+            eWeaponType weaponType = *iter;
+            if ( !strEnabledBulletSync.empty() )
+                strEnabledBulletSync += ",";
+            strEnabledBulletSync += SString( "%d", weaponType );
+        }
+        if ( strEnabledBulletSync.empty() )
+            strEnabledBulletSync = "None";
+        strTotalOutput += SString( "Bullet sync weapons: %s\n", *strEnabledBulletSync );
+    }
+
+    {
+        SString strVehExtrapolate;
+        if ( m_VehExtrapolateSettings.bEnabled )
+            strVehExtrapolate += SString( "Amount:%d%%  (LimitMs:%d)" , m_VehExtrapolateSettings.iScalePercent , m_VehExtrapolateSettings.iMaxMs );
+        else
+            strVehExtrapolate += "Disabled";
+
+        strTotalOutput += SString( "Vehicle extrapolation: %s\n", *strVehExtrapolate );
+    }
+
+    {
+        SString strTickRates;
+        strTickRates += SString( "Plr:%d  Cam:%d  Ped:%d  UnocVeh:%d  KeyRot:%d  KeyJoy:%d"
+                        ,g_TickRateSettings.iPureSync
+                        ,g_TickRateSettings.iCamSync
+                        ,g_TickRateSettings.iPedSync
+                        ,g_TickRateSettings.iUnoccupiedVehicle
+                        ,g_TickRateSettings.iKeySyncRotation
+                        ,g_TickRateSettings.iKeySyncAnalogMove
+                        );
+
+        strTotalOutput += SString( "Tick rates: %s\n", *strTickRates );
+    }
+
+    {
+        SString strSyncerDists;
+        strSyncerDists += SString( "Ped:%d  UnoccupiedVehicle:%d "
+                        ,g_TickRateSettings.iPedSyncerDistance
+                        ,g_TickRateSettings.iUnoccupiedVehicleSyncerDistance
+                        );
+
+        strTotalOutput += SString( "Syncer distances: %s\n", *strSyncerDists );
+    }
+
+    g_pCore->GetConsole ()->Print ( strTotalOutput );
+}
+
+
+//////////////////////////////////////////////////////////////////
+//
+// CClientGame::TellServerSomethingImportant
+//
+// Report misc important warnings/errors to the current server
+//
+//////////////////////////////////////////////////////////////////
+void CClientGame::TellServerSomethingImportant( uint uiId, const SString& strMessage, bool bOnlyOnceForThisId )
+{
+    // Force message only once if will be spamming chat
+    if ( g_pNet->GetServerBitStreamVersion() < 0x48 )
+        bOnlyOnceForThisId = true;
+
+    if ( bOnlyOnceForThisId && MapContains( m_SentMessageIds, uiId ) )
+        return;
+    MapInsert( m_SentMessageIds, uiId );
+
+    NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream();
+
+    if ( pBitStream->Version() >= 0x48 )
+    {
+        pBitStream->WriteString( SString( "%d,%s", uiId, *strMessage ) );
+        g_pNet->SendPacket( PACKET_ID_PLAYER_DIAGNOSTIC, pBitStream, PACKET_PRIORITY_MEDIUM, PACKET_RELIABILITY_UNRELIABLE );
+    }
+    else
+    {
+        // Spam chat for older servers
+        SString strTemp( "say %s", *strMessage );
+        pBitStream->Write( strTemp.c_str(), strTemp.length() );
+        g_pNet->SendPacket( PACKET_ID_COMMAND, pBitStream, PACKET_PRIORITY_MEDIUM, PACKET_RELIABILITY_UNRELIABLE );
+    }
+
+    g_pNet->DeallocateNetBitStream( pBitStream );
+}
+
+
+//////////////////////////////////////////////////////////////////
+//
+// CClientGame::ChangeFloatPrecision
+//
+// Manage the change to high floating point precision
+//
+//////////////////////////////////////////////////////////////////
+void CClientGame::ChangeFloatPrecision ( bool bHigh )
+{
+    if ( bHigh )
+    {
+        // Switch to 53 bit floating point precision on the first call
+        if ( m_uiPrecisionCallDepth++ == 0 )
+            _controlfp( _PC_53, MCW_PC );
+    }
+    else
+    {
+        assert( m_uiPrecisionCallDepth != 0 );
+        // Switch back to 24 bit floating point precision on the last call
+        if ( --m_uiPrecisionCallDepth == 0 )
+            _controlfp( _PC_24, MCW_PC );
+    }
+}
+
+bool CClientGame::IsHighFloatPrecision ( void ) const
+{
+    return m_uiPrecisionCallDepth != 0;
 }

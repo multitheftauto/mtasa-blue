@@ -271,7 +271,7 @@ void CEffectTemplateImpl::CreateUnderlyingData ( const SString& strFilename, con
         strOutStatus = SStringX ( (CHAR*)pBufferErrors->GetBufferPointer() ).TrimEnd ( "\n" );
 
         // Error messages sometimes contain the current directory. Remove that here.
-        SString strCurrentDirectory = SharedUtil::GetCurrentDirectory ();
+        SString strCurrentDirectory = GetSystemCurrentDirectory();
         strOutStatus = strOutStatus.ReplaceI ( strCurrentDirectory + "\\", "" );
         strOutStatus = strOutStatus.ReplaceI ( strCurrentDirectory, "" );
     }

@@ -20,7 +20,7 @@ enum EStateGroup
     STATE_GROUP_TRANSFORM,
     STATE_GROUP_TEXTURE,
     STATE_GROUP_LIGHT,
-    STATE_GROUP_LIGHT_ENABLED,
+    STATE_GROUP_LIGHT_ENABLE,
     STATE_GROUP_DEVICE_CAPS,
     STATE_GROUP_VERTEX_DECL,
 };
@@ -34,7 +34,7 @@ IMPLEMENT_ENUM_BEGIN( EStateGroup )
     ADD_ENUM( STATE_GROUP_TRANSFORM,    "transformState" )
     ADD_ENUM( STATE_GROUP_TEXTURE,      "textureState" )
     ADD_ENUM( STATE_GROUP_LIGHT,        "lightState" )
-    ADD_ENUM( STATE_GROUP_LIGHT_ENABLED,"lightEnabledState" )
+    ADD_ENUM( STATE_GROUP_LIGHT_ENABLE, "lightEnableState" )
     ADD_ENUM( STATE_GROUP_DEVICE_CAPS,  "deviceCaps" )
     ADD_ENUM( STATE_GROUP_VERTEX_DECL,  "vertexDeclState" )
 IMPLEMENT_ENUM_END( "state-group" )
@@ -481,7 +481,7 @@ public:
     std::vector < SStateVar > transformStateVarList;
     std::vector < SStateVar > textureStateVarList;
     std::vector < SStateVar > lightStateVarList;
-    std::vector < SStateVar > lightEnabledStateVarList;
+    std::vector < SStateVar > lightEnableStateVarList;
     std::vector < SStateVar > deviceCapsVarList;
     std::vector < SStateVar > vertexDeclStateVarList;
 };
@@ -1009,9 +1009,9 @@ void CEffectWrapImpl::ApplyMappedHandles ( void )
     //
     // LightEnableState
     //
-    for ( uint i = 0 ; i < lightEnabledStateVarList.size () ; i++ )
+    for ( uint i = 0 ; i < lightEnableStateVarList.size () ; i++ )
     {
-        const SStateVar& var = lightEnabledStateVarList[i];
+        const SStateVar& var = lightEnableStateVarList[i];
         assert ( var.iRegister == 0 );
         const DWORD* pdwValue = &g_pDeviceState->LightEnableState[ var.iStage ].Enable;
         if ( var.iType == RegMap::Int2Int )
@@ -1336,7 +1336,7 @@ void CEffectWrapImpl::AddStateMappedParameter ( EStateGroup stateGroup, const SS
         case STATE_GROUP_TRANSFORM:     transformStateVarList.push_back ( var ); break;
         case STATE_GROUP_TEXTURE:       textureStateVarList.push_back ( var ); break;
         case STATE_GROUP_LIGHT:         lightStateVarList.push_back ( var ); break;
-        case STATE_GROUP_LIGHT_ENABLED: lightEnabledStateVarList.push_back ( var ); break;
+        case STATE_GROUP_LIGHT_ENABLE:  lightEnableStateVarList.push_back ( var ); break;
         case STATE_GROUP_DEVICE_CAPS:   deviceCapsVarList.push_back ( var ); break;
         case STATE_GROUP_VERTEX_DECL:   vertexDeclStateVarList.push_back ( var ); break;
     }

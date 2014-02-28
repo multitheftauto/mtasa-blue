@@ -58,7 +58,7 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
         // For each entity ...
         CVector vecTemp;
         vector < CElement* > ::const_iterator iter = m_Entities.begin ();
-        for ( ; iter != m_Entities.end (); iter++ )
+        for ( ; iter != m_Entities.end (); ++iter )
         {
             // Entity id
             CElement* pElement = *iter;
@@ -135,7 +135,7 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
             assert ( pCustomData );
             BitStream.WriteCompressed ( pCustomData->CountOnlySynchronized () );
             map < string, SCustomData > :: const_iterator iter = pCustomData->SyncedIterBegin ();
-            for ( ; iter != pCustomData->SyncedIterEnd (); iter++ )
+            for ( ; iter != pCustomData->SyncedIterEnd (); ++iter )
             {
                 const char* szName = iter->first.c_str ();
                 const CLuaArgument* pArgument = &iter->second.Variable;
@@ -768,6 +768,9 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
                     BitStream.Write ( ucGreen );
                     BitStream.Write ( ucBlue );
                     BitStream.WriteBit ( bFriendlyFire );
+                    BitStream.Write ( pTeam->CountPlayers () );
+                    for ( list < CPlayer* >::const_iterator iter = pTeam->PlayersBegin (); iter != pTeam->PlayersEnd (); ++iter )
+                        BitStream.Write ( ( *iter )->GetID () );
 
                     break;
                 }
@@ -823,6 +826,13 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
                     SEntityAlphaSync alpha;
                     alpha.data.ucAlpha = pPed->GetAlpha ();
                     BitStream.Write ( &alpha );
+
+                    // Move anim
+                    if ( BitStream.Version() > 0x4B )
+                    {
+                        uchar ucMoveAnim = pPed->GetMoveAnim();
+                        BitStream.Write ( ucMoveAnim );
+                    }
 
                     // clothes
                     unsigned char ucNumClothes = 0;
@@ -950,7 +960,7 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
                             CColPolygon* pPolygon = static_cast < CColPolygon* > ( pColShape );
                             BitStream.WriteCompressed ( pPolygon->CountPoints() );
                             std::vector < CVector2D > ::const_iterator iter = pPolygon->IterBegin();
-                            for ( ; iter != pPolygon->IterEnd () ; iter++ )
+                            for ( ; iter != pPolygon->IterEnd () ; ++iter )
                             {
                                 SPosition2DSync vertex ( false );
                                 vertex.data.vecPosition = *iter;

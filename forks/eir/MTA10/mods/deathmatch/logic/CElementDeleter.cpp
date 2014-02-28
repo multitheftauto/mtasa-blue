@@ -126,7 +126,7 @@ void CElementDeleter::Unreference ( class CClientEntity* pElement )
 void CElementDeleter::CleanUpForVM ( CLuaMain* pLuaMain )
 {
     list < CClientEntity* > ::const_iterator iter = m_List.begin ();
-    for ( ; iter != m_List.end () ; iter++ )
+    for ( ; iter != m_List.end () ; ++iter )
         (*iter)->DeleteEvents ( pLuaMain, false );
 }
 
@@ -139,7 +139,7 @@ bool CElementDeleter::CanBeDestroyed ( void )
 
     // Check if there are any elements that can't be destroyed ye
     list < CClientEntity* > ::const_iterator iter = m_List.begin ();
-    for ( ; iter != m_List.end (); iter++ )
+    for ( ; iter != m_List.end (); ++iter )
     {
         // Can this element be destroyed yet?
         if ( !(*iter)->CanBeDeleted () )
