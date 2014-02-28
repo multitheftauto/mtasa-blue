@@ -81,12 +81,12 @@ public:
         //
         // Interface Sets and Gets
         //
-        
-        void                        SetFlag                 ( DWORD flag )                  { ms_uiAllWeaponStatsRevision++; tWeaponStats.m_nFlags |= flag; }
-        // DO NOT USE.
+
+        void                        ToggleFlagBits          ( DWORD flagBits );
+        void                        SetFlagBits             ( DWORD flagBits );
+        void                        ClearFlagBits           ( DWORD flagBits );
+        // For initialization only
         void                        SetFlags                ( int iFlags )                  { ms_uiAllWeaponStatsRevision++; tWeaponStats.m_nFlags = iFlags; }
-        // END
-        void                        ClearFlag               ( DWORD flag )                  { ms_uiAllWeaponStatsRevision++; tWeaponStats.m_nFlags &= ~flag; }
         bool                        IsFlagSet               ( DWORD flag )                  { return ((tWeaponStats.m_nFlags & flag) > 0 ? true : false); }
         int                         GetFlags                ( void )                        { return tWeaponStats.m_nFlags; }
 
@@ -195,6 +195,8 @@ public:
 
         static uint                 GetAllWeaponStatsRevision ( void )                      { return ms_uiAllWeaponStatsRevision; }
 private:
+        void                        HandleFlagsValueChange      ( DWORD newValue );
+
         eWeaponType                 weaponType;
         eWeaponSkill                skillLevel;
         sWeaponStats                tWeaponStats;

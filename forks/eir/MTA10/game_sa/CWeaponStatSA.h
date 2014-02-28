@@ -30,11 +30,11 @@ public:
         // Interface Sets and Gets
         //
         
-        void                        SetFlag                 ( DWORD flag )                  { pWeaponStats->m_nFlags |= flag; }
-        // DO NOT USE.
+        void                        ToggleFlagBits          ( DWORD flagBits );
+        void                        SetFlagBits             ( DWORD flagBits );
+        void                        ClearFlagBits           ( DWORD flagBits );
+        // For initialization only
         void                        SetFlags                ( int iFlags )                  { pWeaponStats->m_nFlags = iFlags; }
-        // END
-        void                        ClearFlag               ( DWORD flag )                  { pWeaponStats->m_nFlags &= ~flag; }
         bool                        IsFlagSet               ( DWORD flag )                  { return ((pWeaponStats->m_nFlags & flag) > 0 ? true : false); }
         int                         GetFlags                ( void )                        { return pWeaponStats->m_nFlags; }
 
@@ -139,6 +139,8 @@ public:
         void                        SetCombosAvailable       ( BYTE nCombosAvailable )       { pWeaponStats->m_nCombosAvailable = nCombosAvailable; }
 
 private:
+        void                        HandleFlagsValueChange      ( DWORD newValue );
+
         eWeaponType weaponType;
         eWeaponSkill skillLevel;
         CWeaponInfoSAInterface* pWeaponStats;

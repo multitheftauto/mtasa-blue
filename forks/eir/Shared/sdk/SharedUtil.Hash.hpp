@@ -534,7 +534,7 @@ namespace SharedUtil
         unsigned int v[2];
         unsigned int w[2];
         unsigned int k[4];
-        unsigned char keybuffer [ 16 ];
+        unsigned int keybuffer [ 4 ];
 
         // Clear buffers
         memset ( v, 0, sizeof(v) );
@@ -549,7 +549,7 @@ namespace SharedUtil
             len = 16;
         memcpy ( keybuffer, key.c_str(), len );
         for ( int i = 0; i < 4; ++i )
-            k[i] = *(unsigned int*)&keybuffer[i*4];
+            k[i] = keybuffer[i];
 
         // Copy the input string to a buffer of size multiple of 4
         int strbuflen = str.length ();
@@ -585,7 +585,7 @@ namespace SharedUtil
         unsigned int v[2];
         unsigned int w[2];
         unsigned int k[4];
-        unsigned char keybuffer [ 16 ];
+        unsigned int keybuffer [ 4 ];
 
         // Clear buffers
         memset ( v, 0, sizeof(v) );
@@ -607,7 +607,7 @@ namespace SharedUtil
             len = 16;
         memcpy ( keybuffer, key.c_str(), len );
         for ( int i = 0; i < 4; ++i )
-            k[i] = *(unsigned int*)&keybuffer[i*4];
+            k[i] = keybuffer[i];
 
         // Create a temporary buffer to store the result
         unsigned char* buffer = new unsigned char [ numPasses * 4 + 4 ];

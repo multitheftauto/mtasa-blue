@@ -247,8 +247,8 @@ void CPerfStatEventPacketUsageImpl::GetStats ( CPerfStatResult* pResult, const s
     // Add columns
     pResult->AddColumn ( "Type" );
     pResult->AddColumn ( "Name" );
-    pResult->AddColumn ( "pkt/sec" );
-    pResult->AddColumn ( "5 sec.pkts" );
+    pResult->AddColumn ( "msgs/sec" );
+    pResult->AddColumn ( "5 sec.msgs" );
 
     // Fill rows
     for ( uint i = 0 ; i < m_EventUsageSortedList.size() && i < 30 ; i++ )

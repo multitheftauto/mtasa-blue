@@ -517,7 +517,7 @@ bool System::renderGUI(void)
 
 	// draw mouse
 	d_renderer->setQueueingEnabled(false);
-	MouseCursor::getSingleton().draw();
+	// MouseCursor::getSingleton().draw();  This is done by MTA later
 
     // do final destruction on dead-pool windows
     WindowManager::getSingleton().cleanDeadPool();
@@ -603,6 +603,7 @@ void System::setDefaultMouseCursor(const Image* image)
     // image directly without a call to this member changing the image back
     // again.  However, 'normal' updates to the cursor when the mouse enters
     // a window will, of course, update the mouse image as expected.
+#if 0
     if (MouseCursor::getSingleton().getImage() == d_defaultMouseCursor)
     {
         // does the window containing the mouse use the default cursor?
@@ -612,6 +613,10 @@ void System::setDefaultMouseCursor(const Image* image)
             MouseCursor::getSingleton().setImage(image);
         }
     }
+#else
+    // Hope fix for #8017: Crash on changing GUI skin.
+    MouseCursor::getSingleton().setImage(image);
+#endif
 
     // update our pointer for the default mouse cursor image.
     d_defaultMouseCursor = image;

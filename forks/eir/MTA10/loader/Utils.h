@@ -66,7 +66,7 @@ void            ReleaseSingleInstanceMutex          ( void );
 SString         CheckOnRestartCommand               ( void );
 void            CleanDownloadCache                  ( void );
 
-HMODULE         GetLibraryHandle                    ( const SString& strFilename );
+HMODULE         GetLibraryHandle                    ( const SString& strFilename, DWORD* pdwOutLastError = NULL );
 void            FreeLibraryHandle                   ( void );
 uint            WaitForObject                       ( HANDLE hProcess, HANDLE hThread, DWORD dwMilliseconds, HANDLE hMutex );
 bool            CheckService                        ( uint uiStage );
@@ -87,6 +87,7 @@ SString         PadLeft                             ( const SString& strText, ui
 bool            IsDeviceSelectionDialogOpen         ( DWORD dwThreadId );
 std::vector < DWORD > MyEnumProcesses               ( void );
 std::vector < SString > GetPossibleProcessPathFilenames ( DWORD processID );
+void            WriteDebugEventAndReport            ( uint uiId, const SString& strText );
 
 //
 // Determine if game process has gone wonky

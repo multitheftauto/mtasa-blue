@@ -395,7 +395,7 @@ public:
     // Others
     CBuildingSA*            AddBuilding         ( DWORD dwModelID );
     void                    DeleteAllBuildings  ( );
-    CVehicleSA*             AddTrain            ( CVector* vecPosition, DWORD dwModels[], int iSize, bool bDirection );
+    CVehicleSA*             AddTrain            ( CVector* vecPosition, DWORD dwModels[], int iSize, bool bDirection, unsigned char ucTrackID = 0xFF );
 
     int                     GetNumberOfUsedSpaces   ( ePools pools );
     void                    DumpPoolsStatus         ( );

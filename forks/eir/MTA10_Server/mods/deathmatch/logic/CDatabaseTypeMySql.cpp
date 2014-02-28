@@ -203,7 +203,8 @@ CDatabaseConnection* CDatabaseTypeMySql::CallNewDatabaseConnectionMySql ( CDatab
 {
     if ( !m_DbconmyLib.IsLoaded () )
     {
-        m_DbconmyLib.Load ( PathJoin ( g_pServerInterface->GetModManager ()->GetModPath (), LIB_DBCONMY ) );
+        SString strServerPath = g_pServerInterface->GetModManager ()->GetServerPath ();
+        m_DbconmyLib.Load ( PathJoin ( strServerPath, SERVER_BIN_PATH_MOD, LIB_DBCONMY ) );
         m_pfnNewDatabaseConnection = reinterpret_cast < NewDatabaseConnectionMySql_t* > ( (long long)(m_DbconmyLib.GetProcedureAddress ( "NewDatabaseConnectionMySql" )) );      
     }
 

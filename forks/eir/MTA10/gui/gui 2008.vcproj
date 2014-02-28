@@ -18,8 +18,8 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="Debug"
-			IntermediateDirectory="Debug"
+			OutputDirectory="x86\$(ConfigurationName)"
+			IntermediateDirectory="x86\$(ConfigurationName)"
 			ConfigurationType="2"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			CharacterSet="2"
@@ -69,19 +69,19 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/IGNORE:4204"
-				AdditionalDependencies="shlwapi.lib d3dx9.lib dxerr.lib CEGUIBase_d_2008.lib DirectX9GUIRenderer_d_2008.lib CEGUIFalagardBase_d_2008.lib freetype2412ST_D.lib"
+				AdditionalDependencies="shlwapi.lib d3dx9.lib dxerr.lib CEGUIBase_d.lib DirectX9GUIRenderer_d.lib CEGUIFalagardBase_d.lib freetype2412ST_D.lib"
 				OutputFile="C:\Program Files\MTA San Andreas 1.4\mta\cgui_d.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="../../vendor/cegui-0.4.0-custom/lib"
+				AdditionalLibraryDirectories="&quot;../../vendor/cegui-0.4.0-custom/lib&quot;;&quot;../../vendor/cegui-0.4.0-custom/x86/$(ConfigurationName)&quot;"
 				IgnoreAllDefaultLibraries="false"
 				IgnoreDefaultLibraryNames="LIBCMTD"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="$(OutDir)/gui.pdb"
+				ProgramDatabaseFile="$(IntDir)\$(TargetName).pdb"
 				SubSystem="2"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="0"
-				ImportLibrary="$(OutDir)/gui.lib"
+				ImportLibrary="$(OutDir)\$(TargetName).lib"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -108,8 +108,8 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="Release"
-			IntermediateDirectory="Release"
+			OutputDirectory="x86\$(ConfigurationName)"
+			IntermediateDirectory="x86\$(ConfigurationName)"
 			ConfigurationType="2"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			CharacterSet="2"
@@ -159,24 +159,21 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="shlwapi.lib d3dx9.lib dxerr.lib CEGUIBase_2008.lib DirectX9GUIRenderer_2008.lib CEGUIFalagardBase_2008.lib freetype2412ST.lib"
+				AdditionalDependencies="shlwapi.lib d3dx9.lib dxerr.lib CEGUIBase.lib DirectX9GUIRenderer.lib CEGUIFalagardBase.lib freetype2412ST.lib"
 				OutputFile="C:\Program Files\MTA San Andreas 1.4\MTA\cgui.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="../../vendor/cegui-0.4.0-custom/lib"
+				AdditionalLibraryDirectories="&quot;../../vendor/cegui-0.4.0-custom/lib&quot;;&quot;../../vendor/cegui-0.4.0-custom/x86/$(ConfigurationName)&quot;"
 				IgnoreDefaultLibraryNames="LIBCMT"
 				GenerateDebugInformation="true"
-				AssemblyDebug="0"
 				ProgramDatabaseFile="../../symbols/$(ConfigurationName)_$(SafeParentName).pdb"
-				GenerateMapFile="true"
-				MapFileName="../../symbols/$(ConfigurationName)_$(SafeParentName).map"
-				MapExports="true"
+				MapFileName=""
 				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="0"
-				ImportLibrary="$(OutDir)/gui.lib"
+				ImportLibrary="$(OutDir)\$(TargetName).lib"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -203,8 +200,8 @@
 		</Configuration>
 		<Configuration
 			Name="Nightly|Win32"
-			OutputDirectory="..\..\obj\client\gui"
-			IntermediateDirectory="..\..\obj\client\gui"
+			OutputDirectory="x86\$(ConfigurationName)"
+			IntermediateDirectory="..\..\obj\x86\$(ConfigurationName)\$(SafeRootNamespace)"
 			ConfigurationType="2"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			CharacterSet="2"
@@ -254,24 +251,22 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="shlwapi.lib d3dx9.lib dxerr.lib CEGUIBase_2008.lib DirectX9GUIRenderer_2008.lib CEGUIFalagardBase_2008.lib freetype2412ST.lib"
+				AdditionalDependencies="shlwapi.lib d3dx9.lib dxerr.lib CEGUIBase.lib DirectX9GUIRenderer.lib CEGUIFalagardBase.lib freetype2412ST.lib"
 				OutputFile="..\..\output\MTA San Andreas\mta\cgui.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="../../vendor/cegui-0.4.0-custom/lib"
+				AdditionalLibraryDirectories="&quot;../../vendor/cegui-0.4.0-custom/lib&quot;;&quot;../../vendor/cegui-0.4.0-custom/x86/$(ConfigurationName)&quot;"
 				IgnoreDefaultLibraryNames="LIBCMT"
 				GenerateDebugInformation="true"
 				AssemblyDebug="0"
 				ProgramDatabaseFile="../../symbols/$(ConfigurationName)_$(SafeParentName).pdb"
-				GenerateMapFile="true"
-				MapFileName="../../symbols/$(ConfigurationName)_$(SafeParentName).map"
-				MapExports="true"
+				MapFileName=""
 				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="0"
-				ImportLibrary="$(OutDir)/gui.lib"
+				ImportLibrary="$(OutDir)\$(TargetName).lib"
 				TargetMachine="1"
 			/>
 			<Tool

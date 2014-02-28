@@ -64,7 +64,7 @@ namespace SharedUtil
         // Status
         void SetSize ( uint uiSize, bool bZeroPad = false )
         {
-            uint uiOldSize = size ();
+            uint uiOldSize = (uint)size ();
             resize ( uiSize );
             if ( bZeroPad && uiSize > uiOldSize )
                 memset ( GetData () + uiOldSize, 0, uiSize - uiOldSize );
@@ -72,7 +72,7 @@ namespace SharedUtil
 
         uint GetSize ( void ) const
         {
-            return size ();
+            return (uint)size ();
         }
 
         // Access
@@ -300,6 +300,33 @@ namespace SharedUtil
         {
             return ReadBytes ( &e, sizeof ( e ), m_bToFromNetwork );
         }
+
+#ifdef ANY_x64
+        // Force all these types to use 4 bytes
+        bool Read( unsigned long& e )
+        {
+            uint temp;
+            bool bResult = Read( temp );
+            e = temp;
+            return bResult;
+        }
+        bool Read( long& e )
+        {
+            int temp;
+            bool bResult = Read( temp );
+            e = temp;
+            return bResult;
+        }
+    #ifdef WIN_x64
+        bool Read( size_t& e )
+        {
+            uint temp;
+            bool bResult = Read( temp );
+            e = temp;
+            return bResult;
+        }
+    #endif
+#endif
     };
 
 
@@ -336,7 +363,7 @@ namespace SharedUtil
         void Write ( const CBuffer& );     // Not defined as it won't work
         void WriteString ( const SString& str, bool bByteLength = false, bool bDoesLengthIncludeLengthOfLength = false )
         {
-            ushort usLength = str.length ();
+            ushort usLength = (ushort)str.length ();
             if ( bDoesLengthIncludeLengthOfLength && usLength )
                 usLength += bByteLength ? 1 : 2;
 
@@ -352,7 +379,7 @@ namespace SharedUtil
         void WriteBuffer ( const CBuffer& inBuffer )
         {
             // Write the length
-            uint uiLength = inBuffer.GetSize ();
+            uint uiLength = (uint)inBuffer.GetSize ();
             if ( uiLength > 65534 )
             {
                 Write ( (ushort)65535 );
@@ -373,6 +400,24 @@ namespace SharedUtil
         {
             WriteBytes ( &e, sizeof ( e ), m_bToFromNetwork );
         }
+
+#ifdef ANY_x64
+        // Force all these types to use 4 bytes
+        void Write( unsigned long e )
+        {
+            Write( (uint)e );
+        }
+        void Write( long e )
+        {
+            Write( (int)e );
+        }
+    #ifdef WIN_x64
+        void Write( size_t e )
+        {
+            Write( (uint)e );
+        }
+    #endif
+#endif
     };
 
 }

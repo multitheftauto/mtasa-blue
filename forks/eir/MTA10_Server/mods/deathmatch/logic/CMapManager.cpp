@@ -663,6 +663,7 @@ void CMapManager::SpawnPlayer ( CPlayer& Player, const CVector& vecPosition, flo
     Player.SetInterior ( ucInterior );
     Player.SetDimension ( usDimension );
     Player.AttachTo ( NULL );
+    Player.SetFrozen ( false );
 
     // Remove all previous weapons
     for ( unsigned char ucWeaponSlot = 0; ucWeaponSlot < WEAPON_SLOTS; ++ ucWeaponSlot )

@@ -272,32 +272,41 @@ void CScriptDebugging::LogString ( const char* szPrePend, lua_State * luaVM, con
     if ( !luaVM && !m_LuaMainStack.empty () )
         luaVM = m_LuaMainStack.back ()->GetVM ();
 
-    if ( luaVM && lua_getstack ( luaVM, 1, &debugInfo ) )
+    for ( int level = 1; level < 3; level++ )
     {
-        lua_getinfo ( luaVM, "nlS", &debugInfo );
+	    if ( luaVM && lua_getstack ( luaVM, level, &debugInfo ) )
+	    {
+		    lua_getinfo ( luaVM, "nlS", &debugInfo );
 
-        // Make sure this function isn't defined in a string (eg: from runcode)
-        if ( debugInfo.source[0] == '@' )
-        {
-            // Get and store the location of the debug message
-            strFile = debugInfo.source + 1;
-            iLine   = debugInfo.currentline;
+		     // Make sure this function isn't defined in a string (eg: from runcode)
+            if ( debugInfo.source[0] == '@' )
+            {
+                // Get and store the location of the debug message
+                strFile = debugInfo.source + 1;
+                iLine   = debugInfo.currentline;
 
-            // Populate a message to print/send (unless "info" type)
-            if ( uiMinimumDebugLevel < 3 )
-                strText = SString ( "%s%s:%d: %s", szPrePend, strFile.c_str (), debugInfo.currentline, szMessage );
+                // Populate a message to print/send (unless "info" type)
+                if ( uiMinimumDebugLevel < 3 )
+                    strText = SString ( "%s%s:%d: %s", szPrePend, strFile.c_str (), debugInfo.currentline, szMessage );
+                // if the file isn't empty, stop trying any other levels
+                break;
+            }
+            else
+            {
+                strFile = debugInfo.short_src;
+
+                if ( uiMinimumDebugLevel < 3 )
+                    strText = SString ( "%s%s %s", szPrePend, szMessage, strFile.c_str () );
+                if ( strFile != "[string \"?\"]" ) // if the file isn't empty, stop trying any other levels
+                    break;
+            }
         }
         else
         {
-            strFile = debugInfo.short_src;
-
-            if ( uiMinimumDebugLevel < 3 )
-                strText = SString ( "%s%s %s", szPrePend, szMessage, strFile.c_str () );
+            strText = SString ( "%s%s%s", szPrePend, m_strLineAndFile.c_str(), szMessage );
+            // no point in trying other levels
+            break;
         }
-    }
-    else
-    {
-        strText = SString ( "%s%s%s", szPrePend, m_strLineAndFile.c_str(), szMessage );
     }
 
     // Create a different message if type is "INFO"

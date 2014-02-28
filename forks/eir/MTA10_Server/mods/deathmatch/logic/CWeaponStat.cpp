@@ -49,3 +49,66 @@ void CWeaponStat::SetWeaponSkillLevel ( eWeaponSkill skillLevel )
     ms_uiAllWeaponStatsRevision++;
     this->skillLevel = skillLevel;
 }
+
+void CWeaponStat::ToggleFlagBits ( DWORD flagBits )
+{
+    HandleFlagsValueChange( tWeaponStats.m_nFlags ^ flagBits );
+}
+
+void CWeaponStat::SetFlagBits ( DWORD flagBits )
+{
+    HandleFlagsValueChange( tWeaponStats.m_nFlags | flagBits );
+}
+
+void CWeaponStat::ClearFlagBits ( DWORD flagBits )
+{
+    HandleFlagsValueChange( tWeaponStats.m_nFlags & ~flagBits );
+}
+
+void CWeaponStat::HandleFlagsValueChange ( DWORD newValue )
+{
+    // Fixup anim group if dual wield flag is changing
+    if ( IsFlagSet( WEAPONTYPE_TWIN_PISTOLS ) && !( newValue & WEAPONTYPE_TWIN_PISTOLS ) )
+    {
+        // Clearing dual wield flag
+
+        // if it can support this anim group
+        if ( ( GetWeaponType() >= WEAPONTYPE_PISTOL && GetWeaponType() <= WEAPONTYPE_SNIPERRIFLE ) || GetWeaponType() == WEAPONTYPE_MINIGUN )
+        {
+            // Revert anim group to default
+            CWeaponStat* pOriginalWeaponInfo = g_pGame->GetWeaponStatManager()->GetOriginalWeaponStats( GetWeaponType(), GetWeaponSkillLevel() );
+            SetAnimGroup ( pOriginalWeaponInfo->GetAnimGroup ( ) );
+        }
+    }
+    else
+    if ( !IsFlagSet( WEAPONTYPE_TWIN_PISTOLS ) && ( newValue & WEAPONTYPE_TWIN_PISTOLS ) )
+    {
+        // Setting dual wield flag
+
+        // if it can support this anim group
+        if ( ( GetWeaponType() >= WEAPONTYPE_PISTOL && GetWeaponType() <= WEAPONTYPE_SNIPERRIFLE ) || GetWeaponType() == WEAPONTYPE_MINIGUN )
+        {
+            // sawn off shotgun anim group
+            SetAnimGroup ( 17 );
+        }
+    }
+
+    // Don't allow setting of anim reload flag unless original has it
+    if ( !IsFlagSet( WEAPONTYPE_ANIM_RELOAD ) && ( newValue & WEAPONTYPE_ANIM_RELOAD ) )
+    {
+        CWeaponStat* pOriginalWeaponInfo = g_pGame->GetWeaponStatManager()->GetOriginalWeaponStats( GetWeaponType(), GetWeaponSkillLevel() );
+        if ( !pOriginalWeaponInfo->IsFlagSet( WEAPONTYPE_ANIM_RELOAD ) )
+            newValue &= ~WEAPONTYPE_ANIM_RELOAD;
+    }
+
+    // Don't allow setting anim crouch flag unless original has it
+    if ( !IsFlagSet( WEAPONTYPE_ANIM_CROUCHFIRE ) && ( newValue & WEAPONTYPE_ANIM_CROUCHFIRE ) )
+    {
+        CWeaponStat* pOriginalWeaponInfo = g_pGame->GetWeaponStatManager()->GetOriginalWeaponStats( GetWeaponType(), GetWeaponSkillLevel() );
+        if ( !pOriginalWeaponInfo->IsFlagSet( WEAPONTYPE_ANIM_CROUCHFIRE ) )
+            newValue &= ~WEAPONTYPE_ANIM_CROUCHFIRE;
+    }
+
+    ms_uiAllWeaponStatsRevision++; 
+    tWeaponStats.m_nFlags = newValue;
+}

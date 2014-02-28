@@ -452,10 +452,10 @@ void CPerfStatRPCPacketUsageImpl::GetStats ( CPerfStatResult* pResult, const std
 
     // Add columns
     pResult->AddColumn ( "Packet type" );
-    pResult->AddColumn ( "Incoming.pkt/sec" );
+    pResult->AddColumn ( "Incoming.msgs/sec" );
     pResult->AddColumn ( "Incoming.bytes/sec" );
     pResult->AddColumn ( "Incoming.cpu" );
-    pResult->AddColumn ( "Outgoing.pkt/sec" );
+    pResult->AddColumn ( "Outgoing.msgs/sec" );
     pResult->AddColumn ( "Outgoing.bytes/sec" );
     pResult->AddColumn ( "Outgoing.cpu" );
 

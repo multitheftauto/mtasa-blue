@@ -300,6 +300,8 @@ bool CNetAPI::IsDriveByWeapon ( unsigned char ucID )
 
 void CNetAPI::DoPulse ( void )
 {
+    m_bIsNetworkTrouble = false;
+
     // If we're ingame
     if ( m_pManager->IsGameLoaded () )
     {
@@ -431,9 +433,7 @@ void CNetAPI::DoPulse ( void )
                 }
 
                 // Display network trouble
-                int iPosX = g_pCore->GetGraphics ()->GetViewportWidth () / 2;             // Half way across
-                int iPosY = g_pCore->GetGraphics ()->GetViewportHeight () * 45 / 100;     // 45/100 down
-                g_pCore->GetGraphics ()->DrawText ( iPosX, iPosY, iPosX, iPosY, COLOR_ARGB ( 255, 255, 0, 0 ), "*** NETWORK TROUBLE ***", 2.0f, 2.0f, DT_NOCLIP | DT_CENTER );
+                m_bIsNetworkTrouble = true;
             }
         }
 

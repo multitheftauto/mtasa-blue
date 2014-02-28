@@ -80,6 +80,7 @@ CLuaMain::CLuaMain ( CLuaManager* pLuaManager,
     m_bBeingDeleted = false;
     m_pLuaTimerManager = new CLuaTimerManager;
     m_FunctionEnterTimer.SetMaxIncrement ( 500 );
+    m_WarningTimer.SetMaxIncrement ( 1000 );
     m_uiOpenFileCountWarnThresh = 10;
     m_uiOpenXMLFileCountWarnThresh = 20;
 
@@ -337,15 +338,18 @@ bool CLuaMain::LoadScriptFromBuffer ( const char* cpInBuffer, unsigned int uiInS
     if ( !g_pRealNetServer->DecryptScript( cpInBuffer, uiInSize, &cpBuffer, &uiSize, strNiceFilename ) )
     {
         // Problems problems
-#if MTA_DM_VERSION < 0x135 
-        SString strMessage( "%s is invalid and will not work in future versions. Please re-compile at http://luac.mtasa.com/", *strNiceFilename ); 
-        g_pGame->GetScriptDebugging()->LogWarning ( m_luaVM, "Script warning: %s", *strMessage );
-        // cpBuffer is always valid after call to DecryptScript
-#else
-        SString strMessage( "%s is invalid. Please re-compile at http://luac.mtasa.com/", *strNiceFilename ); 
-        g_pGame->GetScriptDebugging()->LogError ( m_luaVM, "Loading script failed: %s", *strMessage );
-        return false;
-#endif
+        if ( GetTimeString( true ) <= INVALID_COMPILED_SCRIPT_CUTOFF_DATE )
+        {
+            SString strMessage( "%s is invalid and will not work after %s. Please re-compile at http://luac.mtasa.com/", *strNiceFilename, INVALID_COMPILED_SCRIPT_CUTOFF_DATE ); 
+            g_pGame->GetScriptDebugging()->LogWarning ( m_luaVM, "Script warning: %s", *strMessage );
+            // cpBuffer is always valid after call to DecryptScript
+        }
+        else
+        {
+            SString strMessage( "%s is invalid. Please re-compile at http://luac.mtasa.com/", *strNiceFilename ); 
+            g_pGame->GetScriptDebugging()->LogError ( m_luaVM, "Loading script failed: %s", *strMessage );
+            return false;
+        }
     }
 
     bool bUTF8;
@@ -716,8 +720,36 @@ const SString& CLuaMain::GetFunctionTag ( int iLuaFunction )
 ///////////////////////////////////////////////////////////////
 int CLuaMain::PCall ( lua_State *L, int nargs, int nresults, int errfunc )
 {
+    if ( m_uiPCallDepth++ == 0 )
+        m_WarningTimer.Reset();   // Only restart timer if initial call
+
     g_pGame->GetScriptDebugging()->PushLuaMain ( this );
     int iret = lua_pcall ( L, nargs, nresults, errfunc );
     g_pGame->GetScriptDebugging()->PopLuaMain ( this );
+
+    --m_uiPCallDepth;
     return iret;
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CLuaMain::CheckExecutionTime
+//
+// Issue warning if execution time is too long
+//
+///////////////////////////////////////////////////////////////
+void CLuaMain::CheckExecutionTime( void )
+{
+    // Do time check
+    if ( m_WarningTimer.Get() < 5000 )
+        return;
+    m_WarningTimer.Reset();
+
+    // No warning if no players
+    if ( g_pGame->GetPlayerManager()->Count() == 0 )
+        return;
+
+    // Issue warning about script execution time
+    CLogger::LogPrintf ( "WARNING: Long execution (%s)\n", GetScriptName () );
 }

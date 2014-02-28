@@ -178,8 +178,6 @@ namespace SharedUtil
     //
     SString ConformResourcePath ( const char* szRes, bool bConvertToUnixPathSep = false );
 
-    SString GenerateNickname ( void );
-
     //
     // string stuff
     //
@@ -1431,7 +1429,7 @@ namespace SharedUtil
                 const SString& part = partList [ i ];
                 char cType = part.Left ( 1 )[0];
 
-                SString strRest = part.Right ( part.length () - 1 );
+                SString strRest = part.Right ( (int)part.length () - 1 );
                 strRest = strRest.Replace ( "{", "" ).Replace ( "}", "" );
 
                 SString strFrom, strTo;
@@ -1536,17 +1534,16 @@ namespace SharedUtil
             m_pCS->Unlock ();
         }
 
-        void Release ( void )
+        int Release ( void )
         {
             m_pCS->Lock ();
             assert ( m_iRefCount > 0 );
-            bool bLastRef = --m_iRefCount == 0;
+            int iNewRefCount = --m_iRefCount;
             m_pCS->Unlock ();
 
-            if ( !bLastRef )
-                return;
-
-            delete this;
+            if ( iNewRefCount == 0 )
+                delete this;
+            return iNewRefCount;
         }
     };
 

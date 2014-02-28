@@ -12,9 +12,15 @@
 
 #include "StdInc.h"
 #include "net/SimHeaders.h"
+#ifdef WIN32
+    #include "Psapi.h"
+#else
+    #include <unistd.h>
+    #include <fstream>
+#endif
 
-extern uint g_uiDatabaseThreadProcessorNumber;
-extern uint g_uiThreadnetProcessorNumber;
+extern SThreadCPUTimesStore g_SyncThreadCPUTimes;
+extern SThreadCPUTimesStore g_DatabaseThreadCPUTimes;
 
 namespace
 {
@@ -31,6 +37,15 @@ namespace
         SString strName;
         SString strValue;
     };
+
+    SString MakeCPUUsageString( const SThreadCPUTimes& info )
+    {
+        if ( info.fKernelPercent < 1 )
+            return SString( "%s%%", *CPerfStatManager::GetScaledFloatString( info.fUserPercent ) );
+    
+        return SString( "%s%% (Sys: %d%%)", *CPerfStatManager::GetScaledFloatString( info.fUserPercent )
+                                          , (int)info.fKernelPercent );
+    }
 
     #define UDP_PACKET_OVERHEAD (28LL)
 }
@@ -58,12 +73,14 @@ public:
 
     // CPerfStatServerInfoImpl
     void                        RecordStats             ( void );
+    SString                     GetProcessMemoryUsage   ( void );
 
     SString                     m_strCategoryName;
     time_t                      m_tStartTime;
     long long                   m_llNextRecordTime;
     SBandwidthStatistics        m_PrevLiveStats;
     SNetPerformanceStatistics   m_NetPerformanceStats;
+    SSyncThreadStatistics       m_SyncThreadStats;
     CTickCount                  m_PrevTickCount;
     CTickCount                  m_DeltaTickCount;
     long long                   m_llDeltaGameBytesSent;
@@ -74,6 +91,7 @@ public:
     long long                   m_llDeltaGamePacketsRecvBlocked;
     long long                   m_llDeltaGameBytesResent;
     long long                   m_llDeltaGameMessagesResent;
+    SThreadCPUTimesStore        m_MainThreadCPUTimes;
     std::vector < StringPair >  m_InfoList;
     std::vector < StringPair >  m_StatusList;
     std::vector < StringPair >  m_OptionsList;
@@ -148,6 +166,8 @@ void CPerfStatServerInfoImpl::DoPulse ( void )
 {
     long long llTime = GetTickCount64_ ();
 
+    UpdateThreadCPUTimes( m_MainThreadCPUTimes, &llTime );
+
     // Record once every 5 seconds
     if ( llTime >= m_llNextRecordTime )
     {
@@ -186,6 +206,53 @@ void CPerfStatServerInfoImpl::RecordStats ( void )
     CTickCount tickCountNow = CTickCount::Now ();
     m_DeltaTickCount = tickCountNow - m_PrevTickCount;
     m_PrevTickCount = tickCountNow;
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CPerfStatServerInfoImpl::GetProcessMemoryUsage
+//
+//
+//
+///////////////////////////////////////////////////////////////
+SString CPerfStatServerInfoImpl::GetProcessMemoryUsage( void )
+{
+#ifdef WIN32
+    PROCESS_MEMORY_COUNTERS psmemCounter;
+    BOOL bResult = GetProcessMemoryInfo( GetCurrentProcess(), &psmemCounter, sizeof( PROCESS_MEMORY_COUNTERS ) );
+    if ( !bResult )
+        return "";
+
+    uint uiMB = psmemCounter.WorkingSetSize / (long long)( 1024 * 1024 );
+    return SString( "%d MB", uiMB );
+#else
+    // 'file' stat seems to give the most reliable results
+    std::ifstream statStream( "/proc/self/stat", std::ios_base::in );
+
+    // dummy vars for leading entries in stat that we don't care about
+    std::string pid, comm, state, ppid, pgrp, session, tty_nr;
+    std::string tpgid, flags, minflt, cminflt, majflt, cmajflt;
+    std::string utime, stime, cutime, cstime, priority, nice;
+    std::string O, itrealvalue, starttime;
+
+    // the two fields we want
+    unsigned long vsize;
+    long rss;
+
+    statStream >> pid >> comm >> state >> ppid >> pgrp >> session >> tty_nr
+               >> tpgid >> flags >> minflt >> cminflt >> majflt >> cmajflt
+               >> utime >> stime >> cutime >> cstime >> priority >> nice
+               >> O >> itrealvalue >> starttime >> vsize >> rss; // don't care about the rest
+
+    statStream.close();
+
+    long page_size_kb = sysconf( _SC_PAGE_SIZE ) / 1024; // in case x86-64 is configured to use 2MB pages
+    uint vm_usage     = vsize / ( 1024 * 1024 );
+    uint resident_set = rss * page_size_kb / 1024;
+
+    return SString( "VM:%d MB  RSS:%d MB", vm_usage, resident_set );
+#endif
 }
 
 
@@ -252,6 +319,7 @@ void CPerfStatServerInfoImpl::GetStats ( CPerfStatResult* pResult, const std::ma
     m_InfoList.push_back ( StringPair ( "Version",                      CStaticFunctionDefinitions::GetVersionSortable () ) );
     m_InfoList.push_back ( StringPair ( "Date",                         GetLocalTimeString ( true ) ) );
     m_InfoList.push_back ( StringPair ( "Uptime",                       SString ( "%d Days %d Hours %02d Mins", (int)tDays, (int)tHours, (int)tMinutes ) ) );
+    m_InfoList.push_back ( StringPair ( "Memory",                       GetProcessMemoryUsage() ) );
 
     if ( !pConfig->GetThreadNetEnabled () )
         m_StatusList.push_back ( StringPair ( "Server FPS",                 SString ( "%d", g_pGame->GetServerFPS () ) ) );
@@ -264,15 +332,6 @@ void CPerfStatServerInfoImpl::GetStats ( CPerfStatResult* pResult, const std::ma
     m_StatusList.push_back ( StringPair ( "Packets/sec outgoing",       strOutgoingPacketsPS ) );
     m_StatusList.push_back ( StringPair ( "Packet loss outgoing",       CPerfStatManager::GetPercentString ( llOutgoingBytesResentPS, llOutgoingBytesPS ) ) );
     m_StatusList.push_back ( StringPair ( "Approx network usage",       CPerfStatManager::GetScaledBitString ( llNetworkUsageBytesPS * 8LL ) + "/s" ) );
-    if ( pConfig->GetThreadNetEnabled () )
-    {
-        m_StatusList.push_back ( StringPair ( "Msg queue incoming",       SString ( "%d", CNetBufferWatchDog::ms_uiInResultQueueSize ) ) );
-        if ( bIncludeDebugInfo )
-            m_StatusList.push_back ( StringPair ( "       finished incoming",       SString ( "%d", CNetBufferWatchDog::ms_uiFinishedListSize ) ) );
-        m_StatusList.push_back ( StringPair ( "Msg queue outgoing",       SString ( "%d", CNetBufferWatchDog::ms_uiOutCommandQueueSize ) ) );
-        if ( bIncludeDebugInfo )
-            m_StatusList.push_back ( StringPair ( "       finished outgoing",       SString ( "%d", CNetBufferWatchDog::ms_uiOutResultQueueSize ) ) );
-    }
     if ( ASE* pAse = ASE::GetInstance() )
         m_StatusList.push_back ( StringPair ( "ASE queries",            SString ( "%d (%d/min)", pAse->GetTotalQueryCount (), pAse->GetQueriesPerMinute () ) ) );
 
@@ -301,33 +360,61 @@ void CPerfStatServerInfoImpl::GetStats ( CPerfStatResult* pResult, const std::ma
         m_OptionsList.push_back ( StringPair ( "Keysync mouse sync interval",   SString ( "%d", g_TickRateSettings.iKeySyncRotation ) ) );
     if ( defaultRates.iKeySyncAnalogMove != g_TickRateSettings.iKeySyncAnalogMove )
         m_OptionsList.push_back ( StringPair ( "Keysync analog sync interval",  SString ( "%d", g_TickRateSettings.iKeySyncAnalogMove ) ) );
-    if ( defaultRates.iKeySyncAnalogMove != g_TickRateSettings.iNearListUpdate )
+    if ( defaultRates.iNearListUpdate != g_TickRateSettings.iNearListUpdate )
         m_OptionsList.push_back ( StringPair ( "Update near interval",      SString ( "%d", g_TickRateSettings.iNearListUpdate ) ) );
+    if ( defaultRates.iPedSyncerDistance != g_TickRateSettings.iPedSyncerDistance )
+        m_OptionsList.push_back ( StringPair ( "Ped syncer distance",      SString ( "%d", g_TickRateSettings.iPedSyncerDistance ) ) );
+    if ( defaultRates.iUnoccupiedVehicleSyncerDistance != g_TickRateSettings.iUnoccupiedVehicleSyncerDistance )
+        m_OptionsList.push_back ( StringPair ( "Unoccupied vehicle syncer distance",      SString ( "%d", g_TickRateSettings.iUnoccupiedVehicleSyncerDistance ) ) );
+    if ( defaultRates.bAltVehPartsStateSync != g_TickRateSettings.bAltVehPartsStateSync )
+        m_OptionsList.push_back ( StringPair ( "Alt vehicle parts state sync",  SString ( "%d", g_TickRateSettings.bAltVehPartsStateSync ) ) );
+
+    m_InfoList.push_back ( StringPair ( "Logic thread CPU",  MakeCPUUsageString( m_MainThreadCPUTimes ) ) );
+    m_InfoList.push_back ( StringPair ( "Sync thread CPU",   MakeCPUUsageString( g_SyncThreadCPUTimes ) ) );
+    m_InfoList.push_back ( StringPair ( "Raknet thread CPU", MakeCPUUsageString( m_PrevLiveStats.threadCPUTimes ) ) );
+    m_InfoList.push_back ( StringPair ( "DB thread CPU",     MakeCPUUsageString( g_DatabaseThreadCPUTimes ) ) );
 
     if ( bIncludeDebugInfo )
     {
+        if ( pConfig->GetThreadNetEnabled () )
+        {
+            m_StatusList.push_back ( StringPair ( "Msg queue incoming (finished)",       SString ( "%d (%d)", CNetBufferWatchDog::ms_uiInResultQueueSize, CNetBufferWatchDog::ms_uiFinishedListSize ) ) );
+            m_StatusList.push_back ( StringPair ( "Msg queue outgoing (finished)",       SString ( "%d (%d)", CNetBufferWatchDog::ms_uiOutCommandQueueSize, CNetBufferWatchDog::ms_uiOutResultQueueSize  ) ) );
+        }
+
         m_StatusList.push_back ( StringPair ( "Bytes/sec outgoing resent",  CPerfStatManager::GetScaledByteString ( llOutgoingBytesResentPS ) ) );
         m_StatusList.push_back ( StringPair ( "Msgs/sec outgoing resent",   strOutgoingMessagesResentPS ) );
-        m_StatusList.push_back ( StringPair ( "Bytes/sec blocked",          CPerfStatManager::GetScaledByteString ( llIncomingBytesPSBlocked ) ) );
-        m_StatusList.push_back ( StringPair ( "Packets/sec  blocked",       strIncomingPacketsPSBlocked ) );
-        m_StatusList.push_back ( StringPair ( "Usage incl. blocked",        CPerfStatManager::GetScaledBitString ( llNetworkUsageBytesPSInclBlocked * 8LL ) + "/s" ) );
+        //m_StatusList.push_back ( StringPair ( "Bytes/sec blocked",          CPerfStatManager::GetScaledByteString ( llIncomingBytesPSBlocked ) ) );
+        //m_StatusList.push_back ( StringPair ( "Packets/sec  blocked",       strIncomingPacketsPSBlocked ) );
+        //m_StatusList.push_back ( StringPair ( "Usage incl. blocked",        CPerfStatManager::GetScaledBitString ( llNetworkUsageBytesPSInclBlocked * 8LL ) + "/s" ) );
 
-        m_OptionsList.push_back ( StringPair ( "Main (Logic) core #",       SString ( "%d", _GetCurrentProcessorNumber () ) ) );
-        m_OptionsList.push_back ( StringPair ( "Threadnet (Sync) core #",   SString ( "%d", g_uiThreadnetProcessorNumber ) ) );
-        m_OptionsList.push_back ( StringPair ( "Raknet thread core #",      SString ( "%d", m_PrevLiveStats.uiNetworkUpdateLoopProcessorNumber ) ) );
-        m_OptionsList.push_back ( StringPair ( "DB thread core #",          SString ( "%d", g_uiDatabaseThreadProcessorNumber ) ) );
+        m_InfoList.push_back ( StringPair ( "Logic thread core #",       SString ( "%d", m_MainThreadCPUTimes.uiProcessorNumber ) ) );
+        m_InfoList.push_back ( StringPair ( "Sync thread core #",        SString ( "%d", g_SyncThreadCPUTimes.uiProcessorNumber ) ) );
+        m_InfoList.push_back ( StringPair ( "Raknet thread core #",      SString ( "%d", m_PrevLiveStats.threadCPUTimes.uiProcessorNumber ) ) );
+        m_InfoList.push_back ( StringPair ( "DB thread core #",          SString ( "%d", g_DatabaseThreadCPUTimes.uiProcessorNumber ) ) );
+
+        m_InfoList.push_back ( StringPair ( "Lowest connected player version",  g_pGame->GetPlayerManager()->GetLowestConnectedPlayerVersion() ) );
 
         // Get net performance stats
         if ( m_NetPerformanceStatsUpdateTimer.Get() > 2000 )
         {
             m_NetPerformanceStatsUpdateTimer.Reset();
             g_pNetServer->GetNetPerformanceStatistics ( &m_NetPerformanceStats, true );
+            g_pNetServer->GetSyncThreadStatistics ( &m_SyncThreadStats, true );
         }
-        m_OptionsList.push_back ( StringPair ( "Update cycle prep time max",        SString ( "%s ms (Avg %s ms)", *CPerfStatManager::GetScaledFloatString( m_NetPerformanceStats.uiUpdateCyclePrepTimeMaxUs / 1000.f ), *CPerfStatManager::GetScaledFloatString( m_NetPerformanceStats.uiUpdateCyclePrepTimeAvgUs / 1000.f ) ) ) );
-        m_OptionsList.push_back ( StringPair ( "Update cycle process time max",     SString ( "%s ms (Avg %s ms)", *CPerfStatManager::GetScaledFloatString( m_NetPerformanceStats.uiUpdateCycleProcessTimeMaxUs / 1000.f ), *CPerfStatManager::GetScaledFloatString( m_NetPerformanceStats.uiUpdateCycleProcessTimeAvgUs / 1000.f ) ) ) );
-        m_OptionsList.push_back ( StringPair ( "Update cycle datagrams max",        SString ( "%d (Avg %s)", m_NetPerformanceStats.uiUpdateCycleDatagramsMax, *CPerfStatManager::GetScaledFloatString( m_NetPerformanceStats.fUpdateCycleDatagramsAvg ) ) ) );
-        m_OptionsList.push_back ( StringPair ( "Update cycle datagrams limit",      SString ( "%d", m_NetPerformanceStats.uiUpdateCycleDatagramsLimit ) ) );
-        m_OptionsList.push_back ( StringPair ( "Update cycle sends limited",        SString ( "%d (%s %%)", m_NetPerformanceStats.uiUpdateCycleSendsLimitedTotal, *CPerfStatManager::GetScaledFloatString( m_NetPerformanceStats.fUpdateCycleSendsLimitedPercent ) ) ) );
+
+        m_OptionsList.push_back ( StringPair ( "Send datagrams limit",      SString ( "%d", m_NetPerformanceStats.uiUpdateCycleDatagramsLimit ) ) );
+        m_OptionsList.push_back ( StringPair ( "Send messages limit",       SString ( "%d", m_NetPerformanceStats.uiUpdateCycleMessagesLimit ) ) );
+        m_StatusList.push_back ( StringPair ( "Raknet Recv time max",       SString ( "%s ms (Avg %s ms)", *CPerfStatManager::GetScaledFloatString( m_NetPerformanceStats.uiUpdateCycleRecvTimeMaxUs / 1000.f ), *CPerfStatManager::GetScaledFloatString( m_NetPerformanceStats.uiUpdateCycleRecvTimeAvgUs / 1000.f ) ) ) );
+        m_StatusList.push_back ( StringPair ( "Raknet Send time max",       SString ( "%s ms (Avg %s ms)", *CPerfStatManager::GetScaledFloatString( m_NetPerformanceStats.uiUpdateCycleSendTimeMaxUs / 1000.f ), *CPerfStatManager::GetScaledFloatString( m_NetPerformanceStats.uiUpdateCycleSendTimeAvgUs / 1000.f ) ) ) );
+        m_StatusList.push_back ( StringPair ( "Raknet Recv datagrams max",  SString ( "%d (Avg %s)", m_NetPerformanceStats.uiUpdateCycleRecvDatagramsMax, *CPerfStatManager::GetScaledFloatString( m_NetPerformanceStats.fUpdateCycleRecvDatagramsAvg ) ) ) );
+        m_StatusList.push_back ( StringPair ( "Raknet Send datagrams max",  SString ( "%d (Avg %s)", m_NetPerformanceStats.uiUpdateCycleDatagramsMax, *CPerfStatManager::GetScaledFloatString( m_NetPerformanceStats.fUpdateCycleDatagramsAvg ) ) ) );
+        m_StatusList.push_back ( StringPair ( "Raknet Send messages max",   SString ( "%d (Avg %s)", m_NetPerformanceStats.uiUpdateCycleMessagesMax, *CPerfStatManager::GetScaledFloatString( m_NetPerformanceStats.fUpdateCycleMessagesAvg ) ) ) );
+        m_StatusList.push_back ( StringPair ( "Raknet Sends limited",       SString ( "%d (%s %%)", m_NetPerformanceStats.uiUpdateCycleSendsLimitedTotal, *CPerfStatManager::GetScaledFloatString( m_NetPerformanceStats.fUpdateCycleSendsLimitedPercent ) ) ) );
+        m_StatusList.push_back ( StringPair ( "Sync Recv time max",         SString ( "%s ms (Avg %s ms)", *CPerfStatManager::GetScaledFloatString( m_SyncThreadStats.uiRecvTimeMaxUs / 1000.f ), *CPerfStatManager::GetScaledFloatString( m_SyncThreadStats.uiRecvTimeAvgUs / 1000.f ) ) ) );
+        m_StatusList.push_back ( StringPair ( "Sync Send time max",         SString ( "%s ms (Avg %s ms)", *CPerfStatManager::GetScaledFloatString( m_SyncThreadStats.uiSendTimeMaxUs / 1000.f ), *CPerfStatManager::GetScaledFloatString( m_SyncThreadStats.uiSendTimeAvgUs / 1000.f ) ) ) );
+        m_StatusList.push_back ( StringPair ( "Sync Recv msgs max",         SString ( "%d (Avg %s)", m_SyncThreadStats.uiRecvMsgsMax, *CPerfStatManager::GetScaledFloatString( m_SyncThreadStats.fRecvMsgsAvg ) ) ) );
+        m_StatusList.push_back ( StringPair ( "Sync Send cmds max",         SString ( "%d (Avg %s)", m_SyncThreadStats.uiSendCmdsMax, *CPerfStatManager::GetScaledFloatString( m_SyncThreadStats.fSendCmdsAvg ) ) ) );
     }
 
     // Add columns

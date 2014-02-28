@@ -256,7 +256,7 @@ void CClientVariables::LoadDefaults ( void )
 
     if(!Exists("nick")) 
     {
-        DEFAULT ( "nick",                       _S(GenerateNickname()) );       // nickname
+        DEFAULT ( "nick",                       _S(CNickGen::GetRandomNickname()) );       // nickname
         CCore::GetSingleton ().RequestNewNickOnStart();  // Request the user to set a new nickname
     }
 

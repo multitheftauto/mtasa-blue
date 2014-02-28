@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9,00"
+	Version="9.00"
 	Name="CEGUI - FalagardBase"
 	ProjectGUID="{04E4A944-225A-4BFB-B7B5-F23AEE884989}"
 	RootNamespace="CEGUI - FalagardBase"
@@ -18,8 +18,8 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
+			OutputDirectory="..\..\..\..\..\x86\$(ConfigurationName)"
+			IntermediateDirectory="x86\$(ConfigurationName)"
 			ConfigurationType="4"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			CharacterSet="2"
@@ -67,7 +67,7 @@
 			<Tool
 				Name="VCLibrarianTool"
 				AdditionalOptions="/IGNORE:4006"
-				OutputFile="..\..\..\..\..\lib\CEGUIFalagardBase_d_2008.lib"
+				OutputFile="$(OutDir)\CEGUIFalagardBase_d.lib"
 				AdditionalLibraryDirectories=""
 				IgnoreAllDefaultLibraries="true"
 			/>
@@ -89,8 +89,8 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
+			OutputDirectory="..\..\..\..\..\x86\$(ConfigurationName)"
+			IntermediateDirectory="x86\$(ConfigurationName)"
 			ConfigurationType="4"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			CharacterSet="2"
@@ -142,7 +142,7 @@
 			<Tool
 				Name="VCLibrarianTool"
 				AdditionalOptions="/IGNORE:4006"
-				OutputFile="..\..\..\..\..\lib\CEGUIFalagardBase_2008.lib"
+				OutputFile="$(OutDir)\CEGUIFalagardBase.lib"
 				IgnoreAllDefaultLibraries="true"
 			/>
 			<Tool
@@ -163,8 +163,8 @@
 		</Configuration>
 		<Configuration
 			Name="Nightly|Win32"
-			OutputDirectory="$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
+			OutputDirectory="..\..\..\..\..\x86\$(ConfigurationName)"
+			IntermediateDirectory="..\..\..\..\..\..\..\obj\x86\$(ConfigurationName)\vendor\$(SafeRootNamespace)"
 			ConfigurationType="4"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			CharacterSet="2"
@@ -216,7 +216,7 @@
 			<Tool
 				Name="VCLibrarianTool"
 				AdditionalOptions="/IGNORE:4006"
-				OutputFile="..\..\..\..\..\lib\CEGUIFalagardBase_2008.lib"
+				OutputFile="$(OutDir)\CEGUIFalagardBase.lib"
 				IgnoreAllDefaultLibraries="true"
 			/>
 			<Tool

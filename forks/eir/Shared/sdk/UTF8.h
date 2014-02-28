@@ -212,7 +212,7 @@ utf8_mbstowcs (const std::string & str)
             s += un;
             sn += un;
         }
-        unsigned int usedsize = ptr - buffer;
+        size_t usedsize = ptr - buffer;
         dassert ( usedsize < cCharacters );
         return std::wstring( buffer, usedsize );
     }
@@ -251,7 +251,7 @@ utf8_wcstombs (const std::wstring & wstr)
         {
             ptr += utf8_wctomb ((unsigned char*)ptr, wstr [i], 6 );
         }
-        unsigned int usedsize = ptr - buffer;
+        size_t usedsize = ptr - buffer;
         dassert ( usedsize < cBytes );
         return std::string( buffer, usedsize );
     }

@@ -296,7 +296,7 @@ int CServerImpl::Run ( int iArgumentCount, char* szArguments [] )
         Print ( "MTA:BLUE Server for MTA:SA\r\n\r\n" );
 
     // Load the network DLL
-    if ( m_NetworkLibrary.Load ( GetAbsolutePath ( szNetworkLibName ) ) )
+    if ( m_NetworkLibrary.Load ( PathJoin ( m_strServerPath, SERVER_BIN_PATH, szNetworkLibName ) ) )
     {
         // Network module compatibility check
         typedef unsigned long (*PFNCHECKCOMPATIBILITY) ( unsigned long, unsigned long* );
@@ -306,7 +306,7 @@ int CServerImpl::Run ( int iArgumentCount, char* szArguments [] )
             // net.dll doesn't like our version number
             ulong ulNetModuleVersion = 0;
             pfnCheckCompatibility ( 1, &ulNetModuleVersion );
-            Print ( "Network module not compatible! (Expected 0x%x, got 0x%x)\n\r", MTA_DM_SERVER_NET_MODULE_VERSION, ulNetModuleVersion );
+            Print ( "Network module not compatible! (Expected 0x%x, got 0x%x)\n\r", MTA_DM_SERVER_NET_MODULE_VERSION, (uint)ulNetModuleVersion );
             Print ( "Press Q to shut down the server!\n\r" );
             Print ( "\n\r\n\r\n\r(If this is a custom build,\n\r" );
             Print ( " check MTASA_VERSION_TYPE in version.h is set correctly)\n\r" );
@@ -315,7 +315,7 @@ int CServerImpl::Run ( int iArgumentCount, char* szArguments [] )
             return ERROR_NETWORK_LIBRARY_FAILED;
         }
 
-        if ( m_XMLLibrary.Load ( GetAbsolutePath ( szXMLLibName ) ) )
+        if ( m_XMLLibrary.Load ( PathJoin ( m_strServerPath, SERVER_BIN_PATH, szXMLLibName ) ) )
         {
             // Grab the network interface
             InitNetServerInterface pfnInitNetServerInterface = (InitNetServerInterface) ( m_NetworkLibrary.GetProcedureAddress ( "InitNetServerInterface" ) );
@@ -604,7 +604,7 @@ void CServerImpl::HandleInput ( void )
     {
         iStdIn = getwchar();
 
-        if ( iStdIn == -1 )
+        if ( iStdIn == WEOF )
             iStdIn = 0;
     }
 #endif
@@ -635,17 +635,17 @@ void CServerImpl::HandleInput ( void )
             {
                 // Check for the most important command: quit
 #ifdef WIN32
-                if ( !_wcsicmp ( m_szInputBuffer, MbUTF8ToUTF16("quit").c_str() ) || !_wcsicmp ( m_szInputBuffer, MbUTF8ToUTF16("exit").c_str() ) )
+                if ( !_wcsicmp ( m_szInputBuffer, L"quit" ) || !_wcsicmp ( m_szInputBuffer, L"exit" ) )
 #else
-                if ( !wcscasecmp ( m_szInputBuffer, MbUTF8ToUTF16("quit").c_str() ) || !wcscasecmp ( m_szInputBuffer, MbUTF8ToUTF16("exit").c_str() ) )
+                if ( !wcscasecmp ( m_szInputBuffer, L"quit" ) || !wcscasecmp ( m_szInputBuffer, L"exit" ) )
 #endif
                 {
                     m_bRequestedQuit = true;
                 }
 #ifdef WIN32
-                else if ( !_wcsicmp ( m_szInputBuffer, MbUTF8ToUTF16("reset").c_str() ) )
+                else if ( !_wcsicmp ( m_szInputBuffer, L"reset" ) )
 #else
-                else if ( !wcscasecmp ( m_szInputBuffer, MbUTF8ToUTF16("reset").c_str() ) )
+                else if ( !wcscasecmp ( m_szInputBuffer, L"reset" ) )
 #endif
                 {
                     m_bRequestedReset = true;

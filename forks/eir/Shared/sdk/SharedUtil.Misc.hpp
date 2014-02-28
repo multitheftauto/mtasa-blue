@@ -13,7 +13,6 @@
 *****************************************************************************/
 
 #include "UTF8.h"
-#include "CNickGen.h"
 #include "UTF8Detect.cpp"
 #ifdef WIN32
     #include <direct.h>
@@ -722,13 +721,13 @@ SString SharedUtil::GetSystemErrorMessage ( uint uiError, bool bRemoveNewlines, 
 {
     SString strResult;
 
-    LPSTR szErrorText = NULL;
-    FormatMessageA ( FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_IGNORE_INSERTS,
-                    NULL, uiError, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR)&szErrorText, 0, NULL );
+    LPWSTR szErrorText = NULL;
+    FormatMessageW ( FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_IGNORE_INSERTS,
+                    NULL, uiError, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPWSTR)&szErrorText, 0, NULL );
 
     if ( szErrorText )
     {
-        strResult = szErrorText;
+        strResult = UTF16ToMbUTF8(szErrorText);
         LocalFree ( szErrorText );
         szErrorText = NULL;
     }
@@ -1276,12 +1275,6 @@ SString SharedUtil::ConformResourcePath ( const char* szRes, bool bConvertToUnix
     return strText;
 }
 
-SString SharedUtil::GenerateNickname ( void )
-{
-    return CNickGen::GetRandomNickname();
-}
-
-
 namespace SharedUtil
 {
     CArgMap::CArgMap ( const SString& strArgSep, const SString& strPartsSep, const SString& strExtraDisallowedChars )
@@ -1483,11 +1476,15 @@ namespace SharedUtil
                 static DWORD GetCurrentProcessorNumberXP(void)
                 {
 #ifdef WIN32
+    #ifdef WIN_x64
+                    return 0;
+    #else
                     // This should work on XP
                     _asm {mov eax, 1}
                     _asm {cpuid}
                     _asm {shr ebx, 24}
                     _asm {mov eax, ebx}
+    #endif
 #else
                     // This should work on Linux
                     return sched_getcpu();

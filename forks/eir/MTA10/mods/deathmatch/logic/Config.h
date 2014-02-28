@@ -19,73 +19,16 @@
 
 #ifndef __CONFIG_H
 #define __CONFIG_H
-#ifdef WIN32
-    /* Win32 platforms */
 
-    // The almighty windows define and include
-    #define WIN32_LEAN_AND_MEAN
-    #include <windows.h>
-    #include <cstdio>
+// The almighty windows define and include
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#include <cstdio>
 
-    // Type, function and normal defines
-    typedef int socklen_t;
+// Type, function and normal defines
+typedef int socklen_t;
 
-    #define MTA_OS_STRING "Windows"
-#else
-    /* POSIX-compatible */
-
-    // Types and std
-    #include <stdio.h>
-    #include <stdlib.h>
-    #include <sys/types.h>
-    #include <unistd.h>
-    #include <string.h>
-
-    // Curses
-    #include <curses.h>
-
-    // Net and error includes
-    #include <arpa/inet.h>
-    #include <errno.h>
-    #include <netdb.h>
-    #include <netinet/in.h>
-    #include <sys/time.h>
-    #include <sys/timeb.h>
-    #include <sys/socket.h>
-    #include <sys/stat.h>
-    #include <time.h>
-    #include <fcntl.h>
-    #include <dirent.h>
-
-    // Type, function and normal defines
-    #define MAX_PATH 255
-
-    // Function defines
-    #define Sleep(duration) usleep(duration * 1000)
-
-    #ifndef stricmp
-    #define stricmp(x, y) strcasecmp(x, y)
-    #endif
-
-    #ifndef strnicmp
-    #define strnicmp(x, y, z) strncasecmp(x, y, z)
-    #endif
-
-    #ifdef LINUX
-        #define MTA_OS_STRING "Linux"
-    #endif
-
-    #ifdef FREEBSD
-        #define MTA_OS_STRING "FreeBSD"
-    #endif
-
-    #ifdef OPENBSD
-        #define MTA_OS_STRING "OpenBSD"
-    #endif
-
-    // define GetProcAddress(a,b) as dlsym(a,b)
-    #define GetProcAddress dlsym
-#endif
+#define MTA_OS_STRING "Windows"
 
 /*** va_pass() (passing of ... variable length arguments ***/
 template<BYTE count>

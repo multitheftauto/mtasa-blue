@@ -248,6 +248,7 @@ enum eElementRPCFunctions
     SET_MOON_SIZE,
 
     SET_VEHICLE_PLATE_TEXT,
+    SET_PROPAGATE_CALLS_ENABLED,
 
     NUM_RPC_FUNCS
 };

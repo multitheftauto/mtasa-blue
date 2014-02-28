@@ -196,13 +196,13 @@ void CPerfStatBandwidthReductionImpl::GetStats ( CPerfStatResult* pResult, const
     pResult->AddColumn ( "Zone" );
     pResult->AddColumn ( "Current rate - pure/light sync.Bytes/sec sent" );
     pResult->AddColumn ( "Current rate - pure/light sync.Bytes/sec skipped" );
-    pResult->AddColumn ( "Current rate - pure/light sync.Pkt/sec sent" );
-    pResult->AddColumn ( "Current rate - pure/light sync.Pkt/sec skipped" );
+    pResult->AddColumn ( "Current rate - pure/light sync.Msgs/sec sent" );
+    pResult->AddColumn ( "Current rate - pure/light sync.Msgs/sec skipped" );
 
     pResult->AddColumn ( "Total - pure/light sync.Bytes sent" );
     pResult->AddColumn ( "Total - pure/light sync.Bytes skipped" );
-    pResult->AddColumn ( "Total - pure/light sync.Packets sent" );
-    pResult->AddColumn ( "Total - pure/light sync.Packets skipped" );
+    pResult->AddColumn ( "Total - pure/light sync.Messages sent" );
+    pResult->AddColumn ( "Total - pure/light sync.Messages skipped" );
 
 
     SFixedArray < long long, 8 > llTotals = { { 0, 0, 0, 0, 0, 0, 0, 0 } };

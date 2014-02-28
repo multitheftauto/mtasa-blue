@@ -48,7 +48,7 @@ static CCustomWeaponManager *                       m_pCustomWeaponManager;
 
 // Used to run a function on all the children of the elements too
 #define RUN_CHILDREN \
-    if ( pElement->CountChildren () ) \
+    if ( pElement->CountChildren () && pElement->IsCallPropagationEnabled() ) \
         for ( CChildListType::const_iterator iter = pElement->IterBegin () ; iter != pElement->IterEnd () ; iter++ )
 
 CStaticFunctionDefinitions::CStaticFunctionDefinitions ( CGame * pGame )
@@ -1015,6 +1015,31 @@ bool CStaticFunctionDefinitions::IsElementInWater ( CElement* pElement, bool & b
     }
 
     return true;
+}
+
+
+bool CStaticFunctionDefinitions::IsElementCallPropagationEnabled ( CElement* pElement, bool& bOutEnabled )
+{
+    bOutEnabled = pElement->IsCallPropagationEnabled();
+    return true;
+}
+
+
+bool CStaticFunctionDefinitions::SetElementCallPropagationEnabled ( CElement* pElement, bool bEnable )
+{
+    if ( bEnable != pElement->IsCallPropagationEnabled() )
+    {
+        // Disallow being set on root
+        if ( pElement != GetRootElement() )
+        {
+            pElement->SetCallPropagationEnabled( bEnable );
+            CBitStream BitStream;
+            BitStream.pBitStream->Write ( bEnable );
+            m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pElement, SET_PROPAGATE_CALLS_ENABLED, *BitStream.pBitStream ) );
+            return true;
+        }
+    }
+    return false;
 }
 
 
@@ -2239,13 +2264,12 @@ bool CStaticFunctionDefinitions::SetWeaponProperty ( eWeaponProperty eProperty, 
     return true;
 }
 
-bool CStaticFunctionDefinitions::SetWeaponProperty ( eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, short sData )
+bool CStaticFunctionDefinitions::SetWeaponProperty ( eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, int sData )
 {
     if ( eProperty == WEAPON_INVALID_PROPERTY )
         return false;
 
     CWeaponStat* pWeaponInfo = g_pGame->GetWeaponStatManager()->GetWeaponStats( eWeapon, eSkillLevel );
-    CWeaponStat* pOriginalWeaponInfo = g_pGame->GetWeaponStatManager()->GetOriginalWeaponStats( eWeapon, eSkillLevel );
         
     if ( pWeaponInfo )
     {
@@ -2269,32 +2293,7 @@ bool CStaticFunctionDefinitions::SetWeaponProperty ( eWeaponProperty eProperty, 
             }
         case WEAPON_FLAGS:
             {
-                if ( pWeaponInfo->IsFlagSet ( sData ) )
-                {
-                    if ( sData == 0x800 )
-                    {
-                        // if it can support this anim group
-                        if ( ( eWeapon >= WEAPONTYPE_PISTOL && eWeapon <= WEAPONTYPE_SNIPERRIFLE ) || eWeapon == WEAPONTYPE_MINIGUN )
-                        {
-                            // Revert anim group to default
-                            pWeaponInfo->SetAnimGroup ( pOriginalWeaponInfo->GetAnimGroup ( ) );
-                        }
-                    }
-                    pWeaponInfo->ClearFlag ( sData );
-                }
-                else
-                {
-                    if ( sData == 0x800 )
-                    {
-                        // if it can support this anim group
-                        if ( ( eWeapon >= WEAPONTYPE_PISTOL && eWeapon <= WEAPONTYPE_SNIPERRIFLE ) || eWeapon == WEAPONTYPE_MINIGUN )
-                        {
-                            // sawn off shotgun anim group
-                            pWeaponInfo->SetAnimGroup ( 17 );
-                        }
-                    }
-                    pWeaponInfo->SetFlag ( sData );
-                }
+                pWeaponInfo->ToggleFlagBits ( sData );
                 break;
             }
         default:
@@ -2310,7 +2309,43 @@ bool CStaticFunctionDefinitions::SetWeaponProperty ( eWeaponProperty eProperty, 
     BitStream.pBitStream->Write ( static_cast < unsigned  char > ( eWeapon ) );
     BitStream.pBitStream->Write ( static_cast < unsigned  char > ( eProperty ) );
     BitStream.pBitStream->Write ( static_cast < unsigned  char > ( eSkillLevel ) );
-    BitStream.pBitStream->Write ( sData );
+    if ( eProperty == WEAPON_FLAGS )
+        BitStream.pBitStream->Write ( sData );  // Backward compat because sent little end first
+    else
+        BitStream.pBitStream->Write ( (short)sData );
+    m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_WEAPON_PROPERTY, *BitStream.pBitStream ) );
+
+    return true;
+}
+
+bool CStaticFunctionDefinitions::SetWeaponPropertyFlag ( eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, bool bEnable )
+{
+    CWeaponStat* pWeaponInfo = g_pGame->GetWeaponStatManager()->GetWeaponStats( eWeapon, eSkillLevel );        
+    if ( !pWeaponInfo )
+        return false;
+
+    if ( !IsWeaponPropertyFlag( eProperty ) )
+        return false;
+
+    // Get bit
+    uint uiFlagBit = GetWeaponPropertyFlagBit( eProperty );
+
+    // Check if already set/cleared
+    if ( bEnable == pWeaponInfo->IsFlagSet ( uiFlagBit ) )
+        return false;
+
+    if ( bEnable )
+        pWeaponInfo->SetFlagBits ( uiFlagBit );
+    else
+        pWeaponInfo->ClearFlagBits ( uiFlagBit );
+
+    pWeaponInfo->SetChanged( true );
+
+    CBitStream BitStream;
+    BitStream.pBitStream->Write ( static_cast < unsigned  char > ( eWeapon ) );
+    BitStream.pBitStream->Write ( static_cast < unsigned  char > ( eProperty ) );
+    BitStream.pBitStream->Write ( static_cast < unsigned  char > ( eSkillLevel ) );
+    BitStream.pBitStream->WriteBit ( bEnable );
     m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_WEAPON_PROPERTY, *BitStream.pBitStream ) );
 
     return true;
@@ -2422,7 +2457,7 @@ bool CStaticFunctionDefinitions::GetWeaponProperty ( eWeaponProperty eProperty, 
     return true;
 }
 
-bool CStaticFunctionDefinitions::GetWeaponProperty ( eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, short & sData )
+bool CStaticFunctionDefinitions::GetWeaponProperty ( eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, int & sData )
 {
     if ( eProperty == WEAPON_INVALID_PROPERTY )
         return false;
@@ -2525,6 +2560,23 @@ bool CStaticFunctionDefinitions::GetWeaponProperty ( eWeaponProperty eProperty, 
     }
     else
         return false;
+
+    return true;
+}
+
+
+bool CStaticFunctionDefinitions::GetWeaponPropertyFlag ( eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, bool& bEnable )
+{
+    CWeaponStat* pWeaponInfo = g_pGame->GetWeaponStatManager()->GetWeaponStats( eWeapon, eSkillLevel );        
+    if ( !pWeaponInfo )
+        return false;
+
+    if ( !IsWeaponPropertyFlag( eProperty ) )
+        return false;
+
+    // Get bit
+    uint uiFlagBit = GetWeaponPropertyFlagBit( eProperty );
+    bEnable = pWeaponInfo->IsFlagSet ( uiFlagBit );
 
     return true;
 }
@@ -2636,7 +2688,7 @@ bool CStaticFunctionDefinitions::GetOriginalWeaponProperty ( eWeaponProperty ePr
     return true;
 }
 
-bool CStaticFunctionDefinitions::GetOriginalWeaponProperty ( eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, short & sData )
+bool CStaticFunctionDefinitions::GetOriginalWeaponProperty ( eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, int & sData )
 {
     if ( eProperty == WEAPON_INVALID_PROPERTY )
         return false;
@@ -2742,6 +2794,24 @@ bool CStaticFunctionDefinitions::GetOriginalWeaponProperty ( eWeaponProperty ePr
 
     return true;
 }
+
+
+bool CStaticFunctionDefinitions::GetOriginalWeaponPropertyFlag ( eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, bool& bEnable )
+{
+    CWeaponStat* pWeaponInfo = g_pGame->GetWeaponStatManager()->GetOriginalWeaponStats( eWeapon, eSkillLevel );        
+    if ( !pWeaponInfo )
+        return false;
+
+    if ( !IsWeaponPropertyFlag( eProperty ) )
+        return false;
+
+    // Get bit
+    uint uiFlagBit = GetWeaponPropertyFlagBit( eProperty );
+    bEnable = pWeaponInfo->IsFlagSet ( uiFlagBit );
+
+    return true;
+}
+
 
 bool CStaticFunctionDefinitions::GetPlayerPing ( CPlayer* pPlayer, unsigned int& uiPing )
 {
@@ -7277,7 +7347,7 @@ bool CStaticFunctionDefinitions::ResetVehicleHandlingProperty ( CVehicle* pVehic
             BitStream.pBitStream->Write ( static_cast < unsigned char > ( eProperty ) );
 
             SetEntryHandling ( pEntry, eProperty, strValue );
-            ucValue = GetEntryHandling( pEntry, eProperty, strValue );
+            GetEntryHandling( pEntry, eProperty, ucValue );
 
             BitStream.pBitStream->Write ( ucValue );
         }

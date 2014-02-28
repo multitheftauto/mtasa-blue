@@ -4,7 +4,7 @@
 	Version="9.00"
 	Name="CEGUI - Base"
 	ProjectGUID="{232B1F48-87C1-4EF9-98A2-CF675BAC7A54}"
-	RootNamespace="BaseSystem"
+	RootNamespace="CEGUI - Base"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="131072"
 	>
@@ -18,8 +18,8 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
+			OutputDirectory="..\..\..\..\x86\$(ConfigurationName)"
+			IntermediateDirectory="x86\$(ConfigurationName)"
 			ConfigurationType="4"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			CharacterSet="2"
@@ -68,7 +68,7 @@
 			<Tool
 				Name="VCLibrarianTool"
 				AdditionalOptions="/IGNORE:4006"
-				OutputFile="..\..\..\..\lib\CEGUIBase_d_2008.lib"
+				OutputFile="$(OutDir)\CEGUIBase_d.lib"
 				AdditionalLibraryDirectories=""
 				IgnoreAllDefaultLibraries="false"
 				IgnoreDefaultLibraryNames=""
@@ -91,8 +91,8 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
+			OutputDirectory="..\..\..\..\x86\$(ConfigurationName)"
+			IntermediateDirectory="x86\$(ConfigurationName)"
 			ConfigurationType="4"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			CharacterSet="2"
@@ -144,7 +144,7 @@
 			<Tool
 				Name="VCLibrarianTool"
 				AdditionalOptions="/IGNORE:4006"
-				OutputFile="..\..\..\..\lib\CEGUIBase_2008.lib"
+				OutputFile="$(OutDir)\CEGUIBase.lib"
 				AdditionalLibraryDirectories=""
 			/>
 			<Tool
@@ -165,10 +165,9 @@
 		</Configuration>
 		<Configuration
 			Name="Nightly|Win32"
-			OutputDirectory="$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
+			OutputDirectory="..\..\..\..\x86\$(ConfigurationName)"
+			IntermediateDirectory="..\..\..\..\..\..\obj\x86\$(ConfigurationName)\vendor\$(SafeRootNamespace)"
 			ConfigurationType="4"
-			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			CharacterSet="2"
 			WholeProgramOptimization="1"
 			>
@@ -218,7 +217,7 @@
 			<Tool
 				Name="VCLibrarianTool"
 				AdditionalOptions="/IGNORE:4006"
-				OutputFile="..\..\..\..\lib\CEGUIBase_2008.lib"
+				OutputFile="$(OutDir)\CEGUIBase.lib"
 				AdditionalLibraryDirectories=""
 			/>
 			<Tool

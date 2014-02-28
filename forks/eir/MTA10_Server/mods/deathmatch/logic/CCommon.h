@@ -550,6 +550,29 @@ enum eWeaponProperty
 
     WEAPON_DEFAULT_COMBO,
     WEAPON_COMBOS_AVAILABLE,
+
+    WEAPON_FLAG_AIM_NO_AUTO,                    // 0x000001 - cant auto target to aim       (disable automatic up/down adjustment when firing without aiming)
+    WEAPON_FLAG_FIRST = WEAPON_FLAG_AIM_NO_AUTO,
+    WEAPON_FLAG_AIM_ARM,                        // 0x000002 - only needs arm to aim         (ie pistol/shotgun/tec9/uzi)
+    WEAPON_FLAG_AIM_1ST_PERSON,                 // 0x000004 - uses 1st person aim           (ie sniper/rpg-hs
+    WEAPON_FLAG_AIM_FREE,                       // 0x000008 - can only use free aiming      (ie country sniper/flame thrower/minigun/fire extinguisher)
+    WEAPON_FLAG_MOVE_AND_AIM,                   // 0x000010 - can move and aim at same time 
+    WEAPON_FLAG_MOVE_AND_SHOOT,                 // 0x000020 - can move and fire at same time 
+    WEAPON_FLAG_UNKNOWN_0040,
+    WEAPON_FLAG_UNKNOWN_0080,
+    WEAPON_FLAG_TYPE_THROW,                     // 0x000100 - is a throwing weapon          (ie satchel)
+    WEAPON_FLAG_TYPE_HEAVY,                     // 0x000200 - heavy weapon - can't jump     (ie flame thrower/rpgs/minigun)
+    WEAPON_FLAG_TYPE_CONSTANT,                  // 0x000400 - fires every frame within loop (ie paint spray) 
+    WEAPON_FLAG_TYPE_DUAL,                      // 0x000800 - can use 2x guns at same time  (ie pistol/shotgun/tec9/uzi)
+    WEAPON_FLAG_ANIM_RELOAD,                    // 0x001000 - weapon has reload anims       (ie everything except shotgun/snipers/flame thrower/rpgs/minigun/satchel)
+    WEAPON_FLAG_ANIM_CROUCH,                    // 0x002000 - weapon has crouching anims    (ie everything except flame thrower/rpgs/minigun/satchel)
+    WEAPON_FLAG_ANIM_RELOAD_LOOP,               // 0x004000 - loop from end of reload to fire loop start
+    WEAPON_FLAG_ANIM_RELOAD_LONG,               // 0x008000 - force a longer reload time!   (ie rpgs/snipers)
+    WEAPON_FLAG_SHOT_SLOWS,                     // 0x010000 - slows down                    (ie flame thrower)
+    WEAPON_FLAG_SHOT_RAND_SPEED,                // 0x020000 - random speed                  (ie flame thrower)
+    WEAPON_FLAG_SHOT_ANIM_ABRUPT,               // 0x040000 - force the anim to finish player after aim/fire rather than blending out   (ie rpgs)
+    WEAPON_FLAG_SHOT_EXPANDS,                   // 0x080000 - expands
+    WEAPON_FLAG_LAST = WEAPON_FLAG_SHOT_EXPANDS,
 };
 
 enum eWeaponSkill
@@ -727,5 +750,36 @@ enum eWeaponFlags
     WEAPONFLAGS_DISABLE_MODEL,
     WEAPONFLAGS_INSTANT_RELOAD,
 };
+
+//////////////////////////////////////////////
+// flags used to define weapon characteristics
+
+// aiming options
+#define WEAPONTYPE_CANAIM           (0x000001)  // can auto target to aim
+#define WEAPONTYPE_CANAIMWITHARM    (0x000002)  // only needs arm to aim
+#define WEAPONTYPE_FIRSTPERSON      (0x000004)  // uses 1st person aim
+#define WEAPONTYPE_CANFREEAIM       (0x000008)  // can only use free aiming
+
+// movement options
+#define WEAPONTYPE_MOVEAIM          (0x000010)  // can move and aim at same time
+#define WEAPONTYPE_MOVEFIRE         (0x000020)  // can move and fire at same time
+
+// basic characteristics
+#define WEAPONTYPE_THROW            (0x000100)  // is a throwing weapon
+#define WEAPONTYPE_HEAVY            (0x000200)  // heavy weapon - can't jump
+#define WEAPONTYPE_CONTINUOUS_FIRE  (0x000400)  // fires every frame within loop (ie paint spray)
+#define WEAPONTYPE_TWIN_PISTOLS     (0x000800)  // can use 2x guns at same time
+
+// these are gun anim options
+#define WEAPONTYPE_ANIM_RELOAD      (0x001000)  // weapon has reload anims
+#define WEAPONTYPE_ANIM_CROUCHFIRE  (0x002000)  // weapon has crouching anims
+#define WEAPONTYPE_RELOAD2LOOPSTART (0x004000)  // loop from end of reload to fire loop start
+#define WEAPONTYPE_LONG_RELOAD_TIME (0x008000)  // force a longer reload time!
+
+// these are area effect/shot options
+#define WEAPONTYPE_SLOWS_DOWN       (0x010000)  // 
+#define WEAPONTYPE_RANDOM_SPEED     (0x020000)  // 
+#define WEAPONTYPE_FORCE_FINISH_ANIM (0x040000)  // force the anim to finish player after aim/fire rather than blending out
+#define WEAPONTYPE_EXPANDS          (0x080000)  // 
 
 #endif

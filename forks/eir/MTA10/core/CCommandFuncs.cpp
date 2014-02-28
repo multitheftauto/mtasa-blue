@@ -371,11 +371,13 @@ void CCommandFuncs::Reconnect ( const char* szParameters )
 void CCommandFuncs::Bind ( const char* szParameters )
 {
     CCore::GetSingleton ().GetKeyBinds ()->BindCommand ( szParameters );
+    CCore::GetSingleton ().SaveConfig();
 }
 
 void CCommandFuncs::Unbind ( const char* szParameters )
 {
     CCore::GetSingleton ().GetKeyBinds ()->UnbindCommand ( szParameters );
+    CCore::GetSingleton ().SaveConfig();
 }
 
 void CCommandFuncs::Binds ( const char* szParameters )

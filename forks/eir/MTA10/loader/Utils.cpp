@@ -24,20 +24,17 @@ static HANDLE g_hMutex = NULL;
 static HMODULE hLibraryModule = NULL;
 HINSTANCE g_hInstance = NULL;
 
-HMODULE RemoteLoadLibrary(HANDLE hProcess, const WString& strLibPath)
+///////////////////////////////////////////////////////////////////////////
+//
+// CallRemoteFunction
+//
+// Call a Kernel32 function in a remote process
+//
+///////////////////////////////////////////////////////////////////////////
+bool CallRemoteFunction( HANDLE hProcess, const SString& strFunctionName, const WString& strLibPath )
 {
     const wchar_t* szLibPath = *strLibPath;
     size_t uiLibPathLength = strLibPath.length();
-    
-    /* Called correctly? */
-    if ( szLibPath == NULL )
-    {
-        return 0;
-    }
-
-    // Stop GTA from starting prematurely (Some driver dlls can inadvertently resume the thread before we are ready)
-    InsertWinMainBlock( hProcess );
-    ApplyLoadingCrashPatch( hProcess );
 
     /* Allocate memory in the remote process for the library path */
     HANDLE hThread = 0;
@@ -67,10 +64,14 @@ HMODULE RemoteLoadLibrary(HANDLE hProcess, const WString& strLibPath)
            remotly allocated path buffer as an argument to that thread (and also to LoadLibraryA)
            will make the remote process load the DLL into it's userspace (giving the DLL full
            access to the game executable).*/
+        LPTHREAD_START_ROUTINE pFunc = reinterpret_cast < LPTHREAD_START_ROUTINE > ( GetProcAddress ( hKernel32, strFunctionName ) );
+        if ( !pFunc )
+            return 0;
+
         hThread = _CreateRemoteThread(   hProcess,
                                         NULL,
                                         0,
-                                        reinterpret_cast < LPTHREAD_START_ROUTINE > ( GetProcAddress ( hKernel32, "LoadLibraryW" ) ),
+                                        pFunc,
                                         pLibPathRemote,
                                         0,
                                         NULL);
@@ -100,6 +101,19 @@ HMODULE RemoteLoadLibrary(HANDLE hProcess, const WString& strLibPath)
 
     /* Clean up the resources we used to inject the DLL */
     _VirtualFreeEx (hProcess, pLibPathRemote, uiLibPathSize, MEM_RELEASE );
+    return 1;
+}
+
+
+HMODULE RemoteLoadLibrary(HANDLE hProcess, const WString& strLibPath)
+{
+    // Stop GTA from starting prematurely (Some driver dlls can inadvertently resume the thread before we are ready)
+    InsertWinMainBlock( hProcess );
+    ApplyLoadingCrashPatch( hProcess );
+
+    // Ensure correct pthreadVC2.dll is gotted
+    CallRemoteFunction( hProcess, "SetDllDirectoryW", FromUTF8( ExtractPath( ToUTF8( strLibPath ) ) ) );
+    CallRemoteFunction( hProcess, "LoadLibraryW", strLibPath );
 
     // Allow GTA to continue
     RemoveWinMainBlock( hProcess );
@@ -1171,7 +1185,7 @@ static SString HashBuffer ( char* pData, uint uiLength )
 //
 //
 /////////////////////////////////////////////////////////////////////
-HMODULE GetLibraryHandle ( const SString& strFilename )
+HMODULE GetLibraryHandle ( const SString& strFilename, DWORD* pdwOutLastError )
 {
     if ( !hLibraryModule )
     {
@@ -1184,6 +1198,8 @@ HMODULE GetLibraryHandle ( const SString& strFilename )
         SetDllDirectory( strLibPath );
 
         hLibraryModule = LoadLibrary ( strLibPathFilename );
+        if ( pdwOutLastError )
+            *pdwOutLastError = GetLastError ();
 
         SetCurrentDirectory ( strPrevCurDir );
         SetDllDirectory( strPrevCurDir );
@@ -1240,7 +1256,8 @@ void UpdateMTAVersionApplicationSetting ( bool bQuiet )
         usNetRel = atoi ( parts[5] );
     }
 
-    HMODULE hModule = GetLibraryHandle ( strFilename );
+    DWORD dwLastError = 0;
+    HMODULE hModule = GetLibraryHandle ( strFilename, &dwLastError );
     if ( hModule )
     {
         typedef unsigned short (*PFNGETNETREV) ( void );
@@ -1254,7 +1271,7 @@ void UpdateMTAVersionApplicationSetting ( bool bQuiet )
     else
     if ( !bQuiet )
     {
-        SString strError = GetSystemErrorMessage ( GetLastError () );            
+        SString strError = GetSystemErrorMessage ( dwLastError );            
         SString strMessage( _("Error loading %s module! (%s)"), *strFilename.ToLower (), *strError );
         BrowseToSolution ( strFilename + "-not-loadable", ASK_GO_ONLINE | TERMINATE_PROCESS, strMessage );
     }
@@ -1994,6 +2011,20 @@ void LogSettings( void )
     uint uiTimeNow = static_cast < uint >( time( NULL ) / 3600LL );
     uint uiHoursSinceLastAsked = uiTimeNow - uiTimeLastAsked;
     WriteDebugEvent( SString( "noav-last-asked-time-hours-delta: %d", uiHoursSinceLastAsked ) );
+}
+
+
+//////////////////////////////////////////////////////////
+//
+// WriteDebugEventAndReport
+//
+// Write to logile.txt and report.log
+//
+//////////////////////////////////////////////////////////
+void WriteDebugEventAndReport( uint uiId, const SString& strText )
+{
+    WriteDebugEvent( strText );
+    AddReportLog( uiId, strText );
 }
 
 

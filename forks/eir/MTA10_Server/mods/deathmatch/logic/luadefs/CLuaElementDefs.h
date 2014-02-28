@@ -60,6 +60,7 @@ public:
     static int      isElementFrozen                     ( lua_State* luaVM );
     static int      getLowLODElement                    ( lua_State* luaVM );
     static int      isElementLowLOD                     ( lua_State* luaVM );
+    static int      isElementCallPropagationEnabled     ( lua_State* luaVM );
 
     // Visible to
     static int      clearElementVisibleTo               ( lua_State* luaVM );
@@ -96,6 +97,7 @@ public:
     static int      setElementCollisionsEnabled         ( lua_State* luaVM );
     static int      setElementFrozen                    ( lua_State* luaVM );
     static int      setLowLODElement                    ( lua_State* luaVM );
+    static int      setElementCallPropagationEnabled    ( lua_State* luaVM );
 };
 
 #endif

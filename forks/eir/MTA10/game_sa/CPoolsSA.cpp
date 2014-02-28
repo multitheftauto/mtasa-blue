@@ -536,13 +536,9 @@ CBuildingSA* CPoolsSA::AddBuilding ( DWORD dwModelID )
     return NULL;
 }
 
-CVehicleSA* CPoolsSA::AddTrain ( CVector * vecPosition, DWORD dwModels[], int iSize, bool bDirection )
+CVehicleSA* CPoolsSA::AddTrain ( CVector * vecPosition, DWORD dwModels[], int iSize, bool bDirection, uchar ucTrackId )
 {
     DEBUG_TRACE("CVehicle* CPoolsSA::AddTrain ( CVector * vecPosition, DWORD dwModels[], int iSize, bool bDirection )");
-
-    // There is no way we can overshoot the pool.
-    if ( (*ppVehiclePool)->GetCount() + iSize > MAX_VEHICLES )
-        return NULL;
 
     // clean the existing array
     MemSetFast ( (void *)VAR_TrainModelArray, 0, 32 * sizeof(DWORD) );
@@ -552,28 +548,36 @@ CVehicleSA* CPoolsSA::AddTrain ( CVector * vecPosition, DWORD dwModels[], int iS
     {
         if ( dwModels[i] == 449 || dwModels[i] == 537 || 
             dwModels[i] == 538 || dwModels[i] == 569 || 
-            dwModels[i] == 590 )
+            dwModels[i] == 590 || dwModels[i] == 570 )
         {
             MemPutFast < DWORD > ( VAR_TrainModelArray + i * 4, dwModels[i] );
         }
     }
 
-    CVehicleSAInterface * trainBegining;
-    CVehicleSAInterface * trainEnd;
+    CVehicleSAInterface* pTrainBeginning = NULL;
+    CVehicleSAInterface* pTrainEnd = NULL;
 
     float fX = vecPosition->fX;
     float fY = vecPosition->fY;
     float fZ = vecPosition->fZ;
 
+    // Disable GetVehicle because CreateMissionTrain calls it before our CVehicleSA instance is inited
+    //m_bGetVehicleEnabled = false;
+
+    // Find closest track node
+    float fRailDistance;
+    int iNodeId = pGame->GetWorld ()->FindClosestRailTrackNode ( *vecPosition, ucTrackId, fRailDistance );
+    int iDesiredTrackId = ucTrackId;
+
     DWORD dwFunc = FUNC_CTrain_CreateMissionTrain;
     _asm
     {
         push    0 // place as close to point as possible (rather than at node)? (maybe) (actually seems to have an effect on the speed, so changed from 1 to 0)
-        push    0 // start finding closest from here 
-        push    -1 // node to start at (-1 for closest node)
-        lea     ecx, trainEnd
+        push    iDesiredTrackId // track ID
+        push    iNodeId // node to start at (-1 for closest node)
+        lea     ecx, pTrainEnd
         push    ecx // end of train
-        lea     ecx, trainBegining 
+        lea     ecx, pTrainBeginning 
         push    ecx // begining of train
         push    0 // train type (always use 0 as thats where we're writing to)
         push    bDirection // direction 
@@ -584,22 +588,33 @@ CVehicleSA* CPoolsSA::AddTrain ( CVector * vecPosition, DWORD dwModels[], int iS
         add     esp, 0x28   
     }
 
+    // Enable GetVehicle
+    //m_bGetVehicleEnabled = true;
+
     CVehicleSA * trainHead = NULL;
-
-    if ( trainBegining )
+    if ( pTrainBeginning )
     {
-        trainHead = new CVehicleSA ( trainBegining );
+        DWORD vehicleIndex = 0;
 
-        CVehicleSA *carriage = trainHead;
+        if ( !(*ppVehiclePool)->Full() )
+        {
+            trainHead = new CVehicleSA ( pTrainBeginning );
+        }
+
+        CVehicleSA * carriage = trainHead;
         
         while ( carriage )
         {
-            CVehicleSAInterface* vehCarriage = carriage->GetNextCarriageInTrain();
-
-            if ( !vehCarriage )
-                break;
-
-            carriage = new CVehicleSA ( vehCarriage );
+            if ( !(*ppVehiclePool)->Full() )
+            {
+                CVehicleSAInterface* vehCarriage = carriage->GetNextCarriageInTrain ();
+                if ( vehCarriage )
+                {
+                    carriage = new CVehicleSA ( vehCarriage );
+                }
+                else
+                    carriage = NULL;
+            }
         }
     }
 

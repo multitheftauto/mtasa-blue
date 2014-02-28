@@ -30,6 +30,8 @@ class CMessageLoopHook : public CSingleton < CMessageLoopHook >
     void                        ApplyHook               ( HWND hFocusWindow );
     void                        RemoveHook              ( );
     HWND                        GetHookedWindowHandle   ( ) const;
+    void                        MaybeRefreshMsgQueue    ( void );
+    void                        SetRefreshMsgQueueEnabled ( bool bEnable );
 
     static  LRESULT CALLBACK    ProcessMessage      ( HWND hwnd, 
                                                       UINT uMsg, 
@@ -38,8 +40,10 @@ class CMessageLoopHook : public CSingleton < CMessageLoopHook >
 
     private:
 
+    CElapsedTime m_ProcessMessageTimer;
     WNDPROC     m_HookedWindowProc;
     HWND        m_HookedWindowHandle;
+    bool        m_bRefreshMsgQueueEnabled;
 
     static WPARAM      m_LastVirtualKeyCode;
     static UCHAR       m_LastScanCode;

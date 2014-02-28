@@ -2331,3 +2331,53 @@ int CLuaFunctionDefs::IsElementLowLod ( lua_State* luaVM )
     lua_pushboolean ( luaVM, false );
     return 1;
 }
+
+
+int CLuaFunctionDefs::SetElementCallPropagationEnabled ( lua_State* luaVM )
+{
+//  bool setElementCallPropagationEnabled ( element theElement, bool enabled )
+    CClientEntity* pEntity; bool bEnabled;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pEntity );
+    argStream.ReadBool ( bEnabled );
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( CStaticFunctionDefinitions::SetElementCallPropagationEnabled ( *pEntity, bEnabled ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }        
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::IsElementCallPropagationEnabled ( lua_State* luaVM )
+{
+//  bool isElementCallPropagationEnabled ( element theElement )
+    CClientEntity* pEntity;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pEntity );
+
+    if ( !argStream.HasErrors () )
+    {
+        bool bEnabled;
+        if ( CStaticFunctionDefinitions::IsElementCallPropagationEnabled ( *pEntity, bEnabled ) )
+        {
+            lua_pushboolean ( luaVM, bEnabled );
+            return 1;
+        }        
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}

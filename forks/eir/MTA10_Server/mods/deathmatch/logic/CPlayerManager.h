@@ -57,7 +57,7 @@ public:
     static bool                                 IsValidPlayerModel              ( unsigned short usPlayerModel );
 
     void                                        ResetAll                        ( void );
-    void                                        OnPlayerSetVersion              ( CPlayer* pPlayer );
+    void                                        OnPlayerJoin                    ( CPlayer* pPlayer );
     const SString&                              GetLowestConnectedPlayerVersion ( void )                                            { return m_strLowestConnectedPlayerVersion; }
 
 private:

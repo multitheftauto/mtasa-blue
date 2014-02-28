@@ -56,6 +56,7 @@ public:
     float                       GetFOV                      ()                              { return m_fFOV; }
     void                        SetFOV                      ( float fFOV )                  { m_fFOV = fFOV; }
     void                        SetOrbitTarget              ( const CVector& vecPosition );
+    void                        AttachTo                    ( CClientEntity* pElement );
 
     void                        FadeIn                      ( float fTime );
     void                        FadeOut                     ( float fTime, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue );

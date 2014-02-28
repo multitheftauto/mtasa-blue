@@ -29,6 +29,8 @@ CProxyDirect3DVertexBuffer::CProxyDirect3DVertexBuffer ( IDirect3DDevice9* InD3D
 	m_pOriginal = pOriginal;
     m_iMemUsed = Length;
     m_dwUsage = Usage;
+    m_dwFVF = FVF;
+    m_pool = Pool;
 
     m_stats.iCurrentCount++;
     m_stats.iCurrentBytes += m_iMemUsed;
@@ -116,5 +118,26 @@ HRESULT CProxyDirect3DVertexBuffer::Lock ( UINT OffsetToLock, UINT SizeToLock, v
         CAdditionalVertexStreamManager::GetSingleton ()->OnVertexBufferRangeInvalidated ( m_pOriginal, OffsetToLock, SizeToLock );
         CVertexStreamBoundingBoxManager::GetSingleton ()->OnVertexBufferRangeInvalidated ( m_pOriginal, OffsetToLock, SizeToLock );
     }
-    return m_pOriginal->Lock ( OffsetToLock, SizeToLock, ppbData, Flags );
+
+    *ppbData = NULL;
+    HRESULT hr = m_pOriginal->Lock ( OffsetToLock, SizeToLock, ppbData, Flags );
+
+    if( FAILED( hr ) )
+    {
+        SString strMessage( "Lock VertexBuffer fail: hr:%x Length:%x Usage:%x FVF:%x Pool:%x OffsetToLock:%x SizeToLock:%x Flags:%x"
+                                                        , hr, m_iMemUsed, m_dwUsage, m_dwFVF, m_pool, OffsetToLock, SizeToLock, Flags );
+        WriteDebugEvent( strMessage );
+        AddReportLog( 8620, strMessage );
+        CCore::GetSingleton ().LogEvent ( 620, "Lock VertexBuffer", "", strMessage );
+    }
+    else
+    if ( *ppbData == NULL )
+    {
+        SString strMessage( "Lock VertexBuffer result NULL: hr:%x Length:%x Usage:%x FVF:%x Pool:%x OffsetToLock:%x SizeToLock:%x Flags:%x"
+                                                        , hr, m_iMemUsed, m_dwUsage, m_dwFVF, m_pool, OffsetToLock, SizeToLock, Flags );
+        WriteDebugEvent( strMessage );
+        AddReportLog( 8621, strMessage );
+        CCore::GetSingleton ().LogEvent ( 621, "Lock VertexBuffer NULL", "", strMessage );
+    }
+    return hr;
 }

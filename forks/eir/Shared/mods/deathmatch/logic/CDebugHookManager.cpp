@@ -64,7 +64,7 @@ std::vector < SDebugHookCallInfo >& CDebugHookManager::GetHookInfoListForType( E
 // Returns true if hook was added
 //
 ///////////////////////////////////////////////////////////////
-bool CDebugHookManager::AddDebugHook( EDebugHookType hookType, const CLuaFunctionRef& functionRef )
+bool CDebugHookManager::AddDebugHook( EDebugHookType hookType, const CLuaFunctionRef& functionRef, const std::vector < SString >& allowedNameList )
 {
     std::vector < SDebugHookCallInfo >& hookInfoList = GetHookInfoListForType( hookType );
     for( std::vector < SDebugHookCallInfo >::iterator iter = hookInfoList.begin() ; iter != hookInfoList.end() ; ++iter )
@@ -78,6 +78,9 @@ bool CDebugHookManager::AddDebugHook( EDebugHookType hookType, const CLuaFunctio
     info.pLuaMain = g_pGame->GetLuaManager ()->GetVirtualMachine ( functionRef.GetLuaVM() );
     if ( !info.pLuaMain )
         return false;
+
+    for( uint i = 0 ; i < allowedNameList.size() ; i++ )
+        MapInsert( info.allowedNameMap, allowedNameList[i] );
 
     hookInfoList.push_back( info );
     return true;
@@ -182,8 +185,14 @@ void CDebugHookManager::OnPreFunction( lua_CFunction f, lua_State* luaVM, bool b
     if ( !pFunction )
         return;
 
+    const SString& strName = pFunction->GetName();
+
+    // Check if name is not used
+    if ( !IsNameAllowed( strName, m_PreFunctionHookList ) )
+        return;
+
     // Don't trace add/removeDebugHook
-    if ( pFunction->GetName().EndsWith( "DebugHook" ) )
+    if ( strName.EndsWith( "DebugHook" ) )
         return;
 
     // Get file/line number
@@ -200,7 +209,7 @@ void CDebugHookManager::OnPreFunction( lua_CFunction f, lua_State* luaVM, bool b
         NewArguments.PushResource( pSourceResource );
     else
         NewArguments.PushNil();
-    NewArguments.PushString( pFunction->GetName() );
+    NewArguments.PushString( strName );
     NewArguments.PushBoolean( bAllowed );
     NewArguments.PushString( szFilename );
     NewArguments.PushNumber( iLineNumber );
@@ -209,7 +218,7 @@ void CDebugHookManager::OnPreFunction( lua_CFunction f, lua_State* luaVM, bool b
     FunctionArguments.ReadArguments( luaVM );
     NewArguments.PushArguments( FunctionArguments );
 
-    CallHook( m_PreFunctionHookList, NewArguments );
+    CallHook( strName, m_PreFunctionHookList, NewArguments );
 }
 
 
@@ -230,8 +239,14 @@ void CDebugHookManager::OnPostFunction( lua_CFunction f, lua_State* luaVM )
     if ( !pFunction )
         return;
 
+    const SString& strName = pFunction->GetName();
+
+    // Check if name is not used
+    if ( !IsNameAllowed( strName, m_PostFunctionHookList ) )
+        return;
+
     // Don't trace add/removeDebugHook
-    if ( pFunction->GetName().EndsWith( "DebugHook" ) )
+    if ( strName.EndsWith( "DebugHook" ) )
         return;
 
     // Get file/line number
@@ -248,7 +263,7 @@ void CDebugHookManager::OnPostFunction( lua_CFunction f, lua_State* luaVM )
         NewArguments.PushResource( pSourceResource );
     else
         NewArguments.PushNil();
-    NewArguments.PushString( pFunction->GetName() );
+    NewArguments.PushString( strName );
     NewArguments.PushBoolean( true );
     NewArguments.PushString( szFilename );
     NewArguments.PushNumber( iLineNumber );
@@ -257,7 +272,7 @@ void CDebugHookManager::OnPostFunction( lua_CFunction f, lua_State* luaVM )
     FunctionArguments.ReadArguments( luaVM );
     NewArguments.PushArguments( FunctionArguments );
 
-    CallHook( m_PostFunctionHookList, NewArguments );
+    CallHook( strName, m_PostFunctionHookList, NewArguments );
 }
 
 
@@ -273,6 +288,10 @@ void CDebugHookManager::OnPreEvent( const char* szName, const CLuaArguments& Arg
     if ( m_PreEventHookList.empty() )
         return;
 
+    // Check if name is not used
+    if ( !IsNameAllowed( szName, m_PreEventHookList ) )
+        return;
+
     CLuaMain* pSourceLuaMain = g_pGame->GetScriptDebugging()->GetTopLuaMain();
     CResource* pSourceResource = pSourceLuaMain ? pSourceLuaMain->GetResource() : NULL;
 
@@ -296,7 +315,7 @@ void CDebugHookManager::OnPreEvent( const char* szName, const CLuaArguments& Arg
     NewArguments.PushNumber( iLineNumber );
     NewArguments.PushArguments( Arguments );
 
-    CallHook( m_PreEventHookList, NewArguments );
+    CallHook( szName, m_PreEventHookList, NewArguments );
 }
 
 
@@ -312,6 +331,10 @@ void CDebugHookManager::OnPostEvent( const char* szName, const CLuaArguments& Ar
     if ( m_PostEventHookList.empty() )
         return;
 
+    // Check if name is not used
+    if ( !IsNameAllowed( szName, m_PostEventHookList ) )
+        return;
+
     CLuaMain* pSourceLuaMain = g_pGame->GetScriptDebugging()->GetTopLuaMain();
     CResource* pSourceResource = pSourceLuaMain ? pSourceLuaMain->GetResource() : NULL;
 
@@ -335,7 +358,30 @@ void CDebugHookManager::OnPostEvent( const char* szName, const CLuaArguments& Ar
     NewArguments.PushNumber( iLineNumber );
     NewArguments.PushArguments( Arguments );
 
-    CallHook( m_PostEventHookList, NewArguments );
+    CallHook( szName, m_PostEventHookList, NewArguments );
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CDebugHookManager::IsNameAllowed
+//
+// Returns true if there is a debughook which handles the name
+//
+///////////////////////////////////////////////////////////////
+bool CDebugHookManager::IsNameAllowed( const char* szName, const std::vector < SDebugHookCallInfo >& eventHookList )
+{
+    for( uint i = 0 ; i < eventHookList.size() ; i++ )
+    {
+        const SDebugHookCallInfo& info = eventHookList[i];
+
+        if ( info.allowedNameMap.empty() )
+            return true;    // All names allowed
+
+        if ( MapContains( info.allowedNameMap, szName ) )
+            return true;    // Name allowed
+    }
+    return false;
 }
 
 
@@ -346,7 +392,7 @@ void CDebugHookManager::OnPostEvent( const char* szName, const CLuaArguments& Ar
 //
 //
 ///////////////////////////////////////////////////////////////
-void CDebugHookManager::CallHook( const std::vector < SDebugHookCallInfo >& eventHookList, const CLuaArguments& Arguments )
+void CDebugHookManager::CallHook( const char* szName, const std::vector < SDebugHookCallInfo >& eventHookList, const CLuaArguments& Arguments )
 {
     static bool bRecurse = false;
     if ( bRecurse )
@@ -356,6 +402,12 @@ void CDebugHookManager::CallHook( const std::vector < SDebugHookCallInfo >& even
     for( uint i = 0 ; i < eventHookList.size() ; i++ )
     {
         const SDebugHookCallInfo& info = eventHookList[i];
+
+        if ( !info.allowedNameMap.empty() )
+        {
+            if ( !MapContains( info.allowedNameMap, szName ) )
+                continue;
+        }
 
         lua_State* pState = info.pLuaMain->GetVirtualMachine();
 

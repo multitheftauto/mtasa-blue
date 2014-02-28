@@ -307,7 +307,7 @@ void CDatabaseJobQueueImpl::UpdateDebugData ( void )
     shared.m_Mutex.Lock ();
 
     // Log to console if job count is creeping up
-    m_uiJobCount10sMin = Min( m_uiJobCount10sMin, m_ActiveJobHandles.size () );
+    m_uiJobCount10sMin = Min < uint > ( m_uiJobCount10sMin, m_ActiveJobHandles.size () );
     if ( m_uiJobCount10sMin > m_uiJobCountWarnThresh )
     {
         m_uiJobCountWarnThresh = m_uiJobCount10sMin * 2;

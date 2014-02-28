@@ -122,7 +122,7 @@ void WString::Split ( const WString& strDelim, std::vector < WString >& outResul
 
     while ( true )
     {
-        unsigned long ulPos = find ( strDelim, ulStartPoint );
+        size_t ulPos = find ( strDelim, ulStartPoint );
 
         if ( ulPos == npos || ( uiMaxAmount > 0 && uiMaxAmount <= outResult.size () + 1 ) )
         {
@@ -154,7 +154,7 @@ bool WString::Split ( const WString& strDelim, WString* pstrLeft, WString* pstrR
 
     assert ( iIndex );
     bool bFromEnd = iIndex < 0;
-    unsigned long ulPos;
+    size_t ulPos;
     if ( !bFromEnd )
     {
         ulPos = 0;
@@ -388,28 +388,28 @@ WString WString::Left ( int iCount ) const
 // Right most number of characters
 WString WString::Right ( int iCount ) const
 {
-    return SubStr ( length () - iCount, iCount );
+    return SubStr ( (int)length () - iCount, iCount );
 }
 
 
 bool WString::EndsWith ( const WString& strOther ) const
 {
-    return Right ( strOther.length () ) == strOther;
+    return Right ( (int)strOther.length () ) == strOther;
 }
 
 bool WString::EndsWithI ( const WString& strOther ) const
 {
-    return wcsicmp ( Right ( strOther.length () ), strOther ) == 0;
+    return wcsicmp ( Right ( (int)strOther.length () ), strOther ) == 0;
 }
 
 bool WString::BeginsWith ( const WString& strOther ) const
 {
-    return Left ( strOther.length () ) == strOther;
+    return Left ( (int)strOther.length () ) == strOther;
 }
 
 bool WString::BeginsWithI ( const WString& strOther ) const
 {
-    return wcsicmp ( Left ( strOther.length () ), strOther ) == 0;
+    return wcsicmp ( Left ( (int)strOther.length () ), strOther ) == 0;
 }
 
 // Static function

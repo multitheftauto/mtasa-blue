@@ -112,6 +112,7 @@ public:
     void                            InitVM                  ( void );
     const SString&                  GetFunctionTag          ( int iFunctionNumber );
     int                             PCall                   ( lua_State *L, int nargs, int nresults, int errfunc );
+    void                            CheckExecutionTime      ( void );
 
 private:
     void                            InitSecurity            ( void );
@@ -140,6 +141,8 @@ private:
     bool                            m_bBeingDeleted; // prevent it being deleted twice
 
     CElapsedTime                    m_FunctionEnterTimer;
+    CElapsedTimeApprox              m_WarningTimer;
+    uint                            m_uiPCallDepth;
     uint                            m_uiOpenFileCount;
     uint                            m_uiOpenFileCountWarnThresh;
     uint                            m_uiOpenXMLFileCountWarnThresh;

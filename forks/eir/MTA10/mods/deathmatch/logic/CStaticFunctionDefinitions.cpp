@@ -50,7 +50,7 @@ static CClientSoundManager*                         m_pSoundManager;
 
 // Used to run a function on all the children of the elements too
 #define RUN_CHILDREN \
-    if ( Entity.CountChildren() ) \
+    if ( Entity.CountChildren() && Entity.IsCallPropagationEnabled() ) \
         for ( CChildListType::const_iterator iter = Entity.IterBegin () ; iter != Entity.IterEnd () ; ++iter )
 
 CStaticFunctionDefinitions::CStaticFunctionDefinitions (
@@ -3453,6 +3453,28 @@ bool CStaticFunctionDefinitions::IsElementLowLod ( CClientEntity& Entity, bool& 
     }
 
     return true;
+}
+
+
+bool CStaticFunctionDefinitions::IsElementCallPropagationEnabled ( CClientEntity& Entity, bool& bOutEnabled )
+{
+    bOutEnabled = Entity.IsCallPropagationEnabled();
+    return true;
+}
+
+
+bool CStaticFunctionDefinitions::SetElementCallPropagationEnabled ( CClientEntity& Entity, bool bEnabled )
+{
+    if ( Entity.IsCallPropagationEnabled() != bEnabled && Entity.IsLocalEntity () )
+    {
+        // Disallow being set on root
+        if ( &Entity != GetRootElement() )
+        {
+            Entity.SetCallPropagationEnabled( bEnabled );
+            return true;
+        }
+    }
+    return false;
 }
 
 
@@ -7967,7 +7989,7 @@ bool CStaticFunctionDefinitions::GetWeaponProperty ( eWeaponProperty eProperty, 
     return true;
 }
 
-bool CStaticFunctionDefinitions::GetWeaponProperty ( eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, short & sData )
+bool CStaticFunctionDefinitions::GetWeaponProperty ( eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, int & sData )
 {
     if ( eProperty == WEAPON_INVALID_PROPERTY )
         return false;
@@ -8070,6 +8092,22 @@ bool CStaticFunctionDefinitions::GetWeaponProperty ( eWeaponProperty eProperty, 
     }
     else
         return false;
+
+    return true;
+}
+
+bool CStaticFunctionDefinitions::GetWeaponPropertyFlag ( eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, bool& bEnable )
+{
+    CWeaponStat* pWeaponInfo = g_pGame->GetWeaponStatManager()->GetWeaponStats( eWeapon, eSkillLevel );        
+    if ( !pWeaponInfo )
+        return false;
+
+    if ( !IsWeaponPropertyFlag( eProperty ) )
+        return false;
+
+    // Get bit
+    uint uiFlagBit = GetWeaponPropertyFlagBit( eProperty );
+    bEnable = pWeaponInfo->IsFlagSet ( uiFlagBit );
 
     return true;
 }
@@ -8182,7 +8220,7 @@ bool CStaticFunctionDefinitions::GetOriginalWeaponProperty ( eWeaponProperty ePr
     return true;
 }
 
-bool CStaticFunctionDefinitions::GetOriginalWeaponProperty ( eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, short & sData )
+bool CStaticFunctionDefinitions::GetOriginalWeaponProperty ( eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, int & sData )
 {
     if ( eProperty == WEAPON_INVALID_PROPERTY )
         return false;
@@ -8285,6 +8323,23 @@ bool CStaticFunctionDefinitions::GetOriginalWeaponProperty ( eWeaponProperty ePr
     }
     else
         return false;
+
+    return true;
+}
+
+
+bool CStaticFunctionDefinitions::GetOriginalWeaponPropertyFlag ( eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, bool& bEnable )
+{
+    CWeaponStat* pWeaponInfo = g_pGame->GetWeaponStatManager()->GetOriginalWeaponStats( eWeapon, eSkillLevel );        
+    if ( !pWeaponInfo )
+        return false;
+
+    if ( !IsWeaponPropertyFlag( eProperty ) )
+        return false;
+
+    // Get bit
+    uint uiFlagBit = GetWeaponPropertyFlagBit( eProperty );
+    bEnable = pWeaponInfo->IsFlagSet ( uiFlagBit );
 
     return true;
 }
