@@ -81,6 +81,7 @@ void            CheckAndShowUpgradeProblems         ( void );
 void            BsodDetectionPreLaunch              ( void );
 void            BsodDetectionOnGameBegin            ( void );
 void            BsodDetectionOnGameEnd              ( void );
+void            ForbodenProgramsMessage             ( void );
 bool            VerifyEmbeddedSignature             ( const SString& strFilename );
 void            LogSettings                         ( void );
 SString         PadLeft                             ( const SString& strText, uint uiNumSpaces, char cCharacter );

@@ -85,6 +85,7 @@ int DoWinMain ( HINSTANCE hLauncherInstance, HINSTANCE hPrevInstance, LPSTR lpCm
 
     // Stuff
     HandleCustomStartMessage();
+    ForbodenProgramsMessage();
     CycleEventLog();
     BsodDetectionPreLaunch();
     MaybeShowCopySettingsDialog ();
