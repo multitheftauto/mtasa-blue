@@ -247,7 +247,7 @@ CClientGame::CClientGame ( bool bLocalPlay )
     g_pMultiplayer->SetProjectileStopHandler ( CClientProjectileManager::Hook_StaticProjectileAllow );
     g_pMultiplayer->SetProjectileHandler ( CClientProjectileManager::Hook_StaticProjectileCreation );
     g_pMultiplayer->SetRender3DStuffHandler ( CClientGame::StaticRender3DStuffHandler );
-    g_pMultiplayer->SetPreRenderSkyHandler ( CClientGame::StaticPreRenderSkyHandler );
+    g_pGame->SetPreRenderSkyHandler ( CClientGame::StaticPreRenderSkyHandler );
     g_pMultiplayer->SetChokingHandler ( CClientGame::StaticChokingHandler );
     g_pMultiplayer->SetPreWorldProcessHandler ( CClientGame::StaticPreWorldProcessHandler );
     g_pMultiplayer->SetPostWorldProcessHandler ( CClientGame::StaticPostWorldProcessHandler );
@@ -266,8 +266,8 @@ CClientGame::CClientGame ( bool bLocalPlay )
     g_pMultiplayer->SetGameVehicleDestructHandler( CClientGame::StaticGameVehicleDestructHandler );
     g_pMultiplayer->SetGamePlayerDestructHandler( CClientGame::StaticGamePlayerDestructHandler );
     g_pMultiplayer->SetGameProjectileDestructHandler( CClientGame::StaticGameProjectileDestructHandler );
-    //g_pMultiplayer->SetGameModelRemoveHandler( CClientGame::StaticGameModelRemoveHandler );
-    g_pMultiplayer->SetGameEntityRenderHandler( CClientGame::StaticGameEntityRenderHandler );
+    g_pGame->GetStreaming()->SetFreeCallback( CClientGame::StaticGameModelRemoveHandler );
+    g_pGame->SetGameEntityRenderHandler( CClientGame::StaticGameEntityRenderHandler );
     g_pGame->SetPreWeaponFireHandler ( CClientGame::PreWeaponFire );
     g_pGame->SetPostWeaponFireHandler ( CClientGame::PostWeaponFire );
     g_pGame->SetTaskSimpleBeHitHandler ( CClientGame::StaticTaskSimpleBeHitHandler );
@@ -399,7 +399,7 @@ CClientGame::~CClientGame ( void )
     g_pMultiplayer->SetProjectileStopHandler ( NULL );
     g_pMultiplayer->SetProjectileHandler ( NULL );
     g_pMultiplayer->SetRender3DStuffHandler ( NULL );
-    g_pMultiplayer->SetPreRenderSkyHandler ( NULL );
+    g_pGame->SetPreRenderSkyHandler ( NULL );
     g_pMultiplayer->SetChokingHandler ( NULL );
     g_pMultiplayer->SetPreWorldProcessHandler (  NULL );
     g_pMultiplayer->SetPostWorldProcessHandler (  NULL );
@@ -418,8 +418,8 @@ CClientGame::~CClientGame ( void )
     g_pMultiplayer->SetGameVehicleDestructHandler( NULL );
     g_pMultiplayer->SetGamePlayerDestructHandler( NULL );
     g_pMultiplayer->SetGameProjectileDestructHandler( NULL );
-    //g_pMultiplayer->SetGameModelRemoveHandler( NULL );
-    g_pMultiplayer->SetGameEntityRenderHandler( NULL );
+    g_pGame->GetStreaming()->SetFreeCallback( NULL );
+    g_pGame->SetGameEntityRenderHandler( NULL );
     g_pGame->SetPreWeaponFireHandler ( NULL );
     g_pGame->SetPostWeaponFireHandler ( NULL );
     g_pGame->SetTaskSimpleBeHitHandler ( NULL );
@@ -3736,9 +3736,9 @@ void CClientGame::StaticGameProjectileDestructHandler ( CEntitySAInterface* pPro
     g_pClientGame->GameProjectileDestructHandler ( pProjectile );
 }
 
-void CClientGame::StaticGameModelRemoveHandler ( ushort usModelId )
+void CClientGame::StaticGameModelRemoveHandler ( modelId_t uiModelIndex )
 {
-    g_pClientGame->GameModelRemoveHandler ( usModelId );
+    g_pClientGame->GameModelRemoveHandler ( uiModelIndex );
 }
 
 void CClientGame::StaticGameEntityRenderHandler ( CEntitySAInterface* pGameEntity )

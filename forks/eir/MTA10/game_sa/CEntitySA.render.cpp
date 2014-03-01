@@ -72,7 +72,7 @@ static void __cdecl RestoreDayNight( void )
     *(float*)0x008D12C0 = _tempDayNightBalance;
 }
 
-void __cdecl RenderEntity( CEntitySAInterface *entity )
+static void __cdecl _RenderEntity( CEntitySAInterface *entity )
 {
     // Do not render peds in the game world if they are inside a vehicle
     // (they need a special render pass to prevent drawing errors)
@@ -192,6 +192,18 @@ void __cdecl RenderEntity( CEntitySAInterface *entity )
     }
 
     entity->RemoveLighting( id );
+}
+
+// Wiring in some MTA team fixes.
+void __cdecl RenderEntity( CEntitySAInterface *entity )
+{
+    // FIX BEGIN
+    OnMY_CEntity_RenderOneNonRoad_Pre( entity );
+
+    _RenderEntity( entity );
+
+    // FIX END
+    OnMY_CEntity_RenderOneNonRoad_Post( entity );
 }
 
 // based on 0x0055458A (1.0 US and 1.0 EU)

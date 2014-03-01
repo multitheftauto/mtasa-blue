@@ -49,7 +49,6 @@ typedef bool ( BreakTowLinkHandler ) ( class CVehicle * towingVehicle );
 typedef bool ( ProcessCamHandler ) ( class CCam* pCam );
 typedef void ( DrawRadarAreasHandler ) ( void );
 typedef void ( Render3DStuffHandler ) ( void );
-typedef void ( PreRenderSkyHandler ) ( void );
 typedef bool ( ChokingHandler ) ( unsigned char ucWeaponType );
 typedef void ( PreWorldProcessHandler ) ( void );
 typedef void ( PostWorldProcessHandler ) ( void );
@@ -69,8 +68,6 @@ typedef void ( GameObjectDestructHandler ) ( CEntitySAInterface* pObject );
 typedef void ( GameVehicleDestructHandler ) ( CEntitySAInterface* pVehicle );
 typedef void ( GamePlayerDestructHandler ) ( CEntitySAInterface* pPlayer );
 typedef void ( GameProjectileDestructHandler ) ( CEntitySAInterface* pProjectile );
-typedef void ( GameModelRemoveHandler ) ( ushort usModelId );
-typedef void ( GameEntityRenderHandler ) ( CEntitySAInterface* pEntity );
 
 /**
  * This class contains information used for shot syncing, one exists per player.
@@ -178,7 +175,7 @@ public:
     virtual void                        SetGameVehicleDestructHandler   ( GameVehicleDestructHandler * pHandler ) = 0;
     virtual void                        SetGamePlayerDestructHandler    ( GamePlayerDestructHandler * pHandler ) = 0;
     virtual void                        SetGameProjectileDestructHandler( GameProjectileDestructHandler * pHandler ) = 0;
-    virtual void                        SetGameEntityRenderHandler      ( GameEntityRenderHandler * pHandler ) = 0;
+    //virtual void                        SetGameEntityRenderHandler      ( GameEntityRenderHandler * pHandler ) = 0; MOVED TO CGameSA
 
     virtual void                        AllowMouseMovement          ( bool bAllow ) = 0;
     virtual void                        DoSoundHacksOnLostFocus     ( bool bLostFocus ) = 0;
@@ -239,7 +236,7 @@ public:
     virtual void                        SetBulletFireHandler        ( BulletFireHandler* pHandler ) = 0;
     virtual void                        SetDrawRadarAreasHandler    ( DrawRadarAreasHandler * pRadarAreasHandler ) = 0;
     virtual void                        SetRender3DStuffHandler     ( Render3DStuffHandler * pHandler ) = 0;
-    virtual void                        SetPreRenderSkyHandler      ( PreRenderSkyHandler * pHandler ) = 0;
+    //virtual void                        SetPreRenderSkyHandler      ( PreRenderSkyHandler * pHandler ) = 0; MOVED TO CGameSA
 
     virtual void                        Reset                       () = 0;
 
@@ -302,8 +299,8 @@ public:
 
     virtual void                        GetRwResourceStats          ( SRwResourceStats& outStats ) = 0;
     //virtual void                        GetClothesCacheStats        ( SClothesCacheStats& outStats ) = 0; MOVED TO CGameSA
-    virtual void                        SetIsMinimizedAndNotConnected ( bool bIsMinimizedAndNotConnected ) = 0;
-    virtual void                        SetMirrorsEnabled           ( bool bEnabled ) = 0;
+    //virtual void                        SetIsMinimizedAndNotConnected ( bool bIsMinimizedAndNotConnected ) = 0; MOVED TO CGameSA
+    //virtual void                        SetMirrorsEnabled           ( bool bEnabled ) = 0; MOVED TO CGameSA
 };
 
 #endif

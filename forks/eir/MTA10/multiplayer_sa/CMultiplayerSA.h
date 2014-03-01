@@ -50,7 +50,7 @@ public:
     //void                        InitHooks_ClothesCache ( void ); MOVED TO CGameSA
     void                        InitHooks_Files ( void );
     void                        InitHooks_Weapons ( void );
-    void                        InitHooks_Rendering ( void );
+    //void                        InitHooks_Rendering ( void ); MOVED TO CGameSA
     //void                        InitHooks_LicensePlate ( void ); MOVED TO CGameSA
     void                        InitHooks_VehicleDamage ( void );
     void                        InitHooks_Direct3D ( void );
@@ -104,7 +104,7 @@ public:
     void                        SetGameVehicleDestructHandler   ( GameVehicleDestructHandler * pHandler );
     void                        SetGamePlayerDestructHandler    ( GamePlayerDestructHandler * pHandler );
     void                        SetGameProjectileDestructHandler( GameProjectileDestructHandler * pHandler );
-    void                        SetGameEntityRenderHandler  ( GameEntityRenderHandler * pHandler );
+    //void                        SetGameEntityRenderHandler  ( GameEntityRenderHandler * pHandler ); MOVED TO CGameSA
 
     void                        AllowMouseMovement          ( bool bAllow );
     void                        DoSoundHacksOnLostFocus     ( bool bLostFocus );
@@ -163,7 +163,7 @@ public:
     void                        SetBulletFireHandler        ( BulletFireHandler* pHandler );
     void                        SetDrawRadarAreasHandler    ( DrawRadarAreasHandler * pRadarAreasHandler );
     void                        SetRender3DStuffHandler     ( Render3DStuffHandler * pHandler );
-    void                        SetPreRenderSkyHandler      ( PreRenderSkyHandler * pHandler );
+    //void                        SetPreRenderSkyHandler      ( PreRenderSkyHandler * pHandler ); MOVED TO CGameSA
 
     void                        Reset                       ();
 
@@ -227,8 +227,8 @@ public:
 
     virtual void                GetRwResourceStats          ( SRwResourceStats& outStats );
     //virtual void                GetClothesCacheStats        ( SClothesCacheStats& outStats ); MOVED TO CGameSA
-    virtual void                SetIsMinimizedAndNotConnected ( bool bIsMinimizedAndNotConnected );
-    virtual void                SetMirrorsEnabled           ( bool bEnabled );
+    //virtual void                SetIsMinimizedAndNotConnected ( bool bIsMinimizedAndNotConnected ); MOVED TO CGameSA
+    //virtual void                SetMirrorsEnabled           ( bool bEnabled ); MOVED TO CGameSA
 
     CVector                     m_vecAkimboTarget;
     bool                        m_bAkimboTargetUp;

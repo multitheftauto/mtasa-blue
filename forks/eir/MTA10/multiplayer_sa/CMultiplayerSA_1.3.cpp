@@ -170,7 +170,7 @@ void CMultiplayerSA::InitHooks_13 ( void )
     //InitHooks_ClothesCache (); MOVED TO CGameSA
     InitHooks_Files ();
     InitHooks_Weapons ();
-    InitHooks_Rendering ();
+    //InitHooks_Rendering (); MOVED TO CGameSA
 }
 
 void CMultiplayerSA::InitMemoryCopies_13 ( void )

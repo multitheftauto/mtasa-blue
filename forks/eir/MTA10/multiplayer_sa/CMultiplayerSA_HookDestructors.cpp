@@ -18,7 +18,6 @@ namespace
     GameVehicleDestructHandler*     pGameVehicleDestructHandler     = NULL;
     GamePlayerDestructHandler*      pGamePlayerDestructHandler      = NULL;
     GameProjectileDestructHandler*  pGameProjectileDestructHandler  = NULL;
-    GameModelRemoveHandler*         pGameModelRemoveHandler         = NULL;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -140,36 +139,6 @@ void _declspec(naked) HOOK_CProjectileDestructor()
 
         mov     dword ptr [ecx], 867030h
         jmp     RETURN_CProjectileDestructor
-    }
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////
-//
-void _cdecl OnCStreamingRemoveModel ( DWORD calledFrom, ushort usModelId )
-{
-    // Tell client to check for things going away
-    if ( pGameModelRemoveHandler )
-        pGameModelRemoveHandler ( usModelId );
-}
-
-// Hook info
-#define HOOKPOS_CStreamingRemoveModel        0x4089A0
-#define HOOKSIZE_CStreamingRemoveModel       5
-DWORD RETURN_CStreamingRemoveModel =         0x4089A5;
-void _declspec(naked) HOOK_CStreamingRemoveModel()
-{
-    _asm
-    {
-        pushad
-        push    [esp+32+4*1]
-        push    [esp+32+4*1]
-        call    OnCStreamingRemoveModel
-        add     esp, 4*2
-        popad
-
-        push    esi
-        mov     esi, [esp+8]
-        jmp     RETURN_CStreamingRemoveModel
     }
 }
 

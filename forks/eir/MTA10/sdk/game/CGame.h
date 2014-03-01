@@ -83,6 +83,9 @@ typedef bool ( PreWeaponFireHandler ) ( class CPlayerPed* pPlayer, bool bStopIfU
 typedef void ( PostWeaponFireHandler ) ( void );
 typedef void ( TaskSimpleBeHitHandler ) ( CPedSAInterface* pPedAttacker, ePedPieceTypes hitBodyPart, int hitBodySide, int weaponId );
 
+typedef void ( GameEntityRenderHandler ) ( CEntitySAInterface* pEntity );
+typedef void ( PreRenderSkyHandler ) ( void );
+
 enum eGameVersion 
 {
     VERSION_ALL = 0,
@@ -224,8 +227,15 @@ public:
     virtual bool                PerformChecks               () = 0;
     virtual int&                GetCheckStatus              () = 0;
 
+    // Clothes
     virtual void                FlushClothesCache               ( void ) = 0;
     virtual void                GetClothesCacheStats            ( SClothesCacheStats& outStats ) = 0;
+
+    // Rendering
+    virtual void                SetGameEntityRenderHandler      ( GameEntityRenderHandler * pHandler ) = 0;
+    virtual void                SetPreRenderSkyHandler          ( PreRenderSkyHandler * pHandler ) = 0;
+    virtual void                SetIsMinimizedAndNotConnected   ( bool bIsMinimizedAndNotConnected ) = 0;
+    virtual void                SetMirrorsEnabled               ( bool bEnabled ) = 0;
 
     virtual void                SetAsyncLoadingFromScript       ( bool bScriptEnabled, bool bScriptForced ) = 0;
     virtual void                SuspendASyncLoading             ( bool bSuspend ) = 0;

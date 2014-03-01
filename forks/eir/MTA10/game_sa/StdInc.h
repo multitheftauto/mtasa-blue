@@ -21,7 +21,6 @@
 #include <vector>
 
 // Define these if you are experiencing heap trouble.
-// Due to Cazo's heavy usage of STL containers, full page heap will not work.
 //#define USE_HEAP_DEBUGGING
 //#define USE_FULL_PAGE_HEAP
 //#define PAGE_HEAP_INTEGRITY_CHECK

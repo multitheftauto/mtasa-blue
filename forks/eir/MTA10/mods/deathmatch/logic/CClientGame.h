@@ -503,7 +503,7 @@ private:
     static void                         StaticGameVehicleDestructHandler    ( CEntitySAInterface* pVehicle );
     static void                         StaticGamePlayerDestructHandler     ( CEntitySAInterface* pPlayer );
     static void                         StaticGameProjectileDestructHandler ( CEntitySAInterface* pProjectile );
-    static void                         StaticGameModelRemoveHandler        ( ushort usModelId );
+    static void                         StaticGameModelRemoveHandler        ( modelId_t uiModelIndex );
     static void                         StaticWorldSoundHandler         ( uint uiGroup, uint uiIndex );
     static void                         StaticGameEntityRenderHandler   ( CEntitySAInterface* pEntity );
     static void                         StaticTaskSimpleBeHitHandler    ( CPedSAInterface* pPedAttacker, ePedPieceTypes hitBodyPart, int hitBodySide, int weaponId );

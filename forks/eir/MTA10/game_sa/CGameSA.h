@@ -220,6 +220,13 @@ public:
     void                    GetClothesCacheStats            ( SClothesCacheStats& outStats );
     void                    InitHooks_ClothesCache          ( void );
 
+    // Rendering callback stuff that needs research. (CEntitySA.renderfeedback.cpp)
+    void                    SetGameEntityRenderHandler      ( GameEntityRenderHandler * pHandler );
+    void                    SetPreRenderSkyHandler          ( PreRenderSkyHandler * pHandler );
+    void                    SetIsMinimizedAndNotConnected   ( bool bIsMinimizedAndNotConnected );
+    void                    SetMirrorsEnabled               ( bool bEnabled );
+    void                    InitHooks_Rendering             ( void );
+
     void                    SetAsyncLoadingFromScript       ( bool bScriptEnabled, bool bScriptForced );
     void                    SuspendASyncLoading             ( bool bSuspend );
     bool                    IsASyncLoadingEnabled           ( bool bIgnoreSuspend = false );

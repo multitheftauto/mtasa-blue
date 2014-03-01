@@ -479,6 +479,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CEntitySA.renderfeedback.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\CEntryInfoSA.cpp"
 				>
 			</File>
@@ -1177,6 +1181,10 @@
 			</File>
 			<File
 				RelativePath=".\CEntitySA.render.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CEntitySA.renderfeedback.h"
 				>
 			</File>
 			<File
