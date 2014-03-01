@@ -20,6 +20,7 @@ class CGameSA;
 
 extern CGameSA * pGame;
 extern CCoreInterface * g_pCore;
+extern CCoreInterface * core;
 
 //
 // Use MemSet/Cpy/Put/Add for the following memory regions:

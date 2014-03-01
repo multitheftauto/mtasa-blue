@@ -640,6 +640,7 @@ static void __cdecl RwMemoryFree( void *ptr )
     Arguments:
         ptr - pointer to previously allocated memory
         size - new size of block at ptr
+        flags - allocation flags passed
     Purpose:
         Attempts to reuse ptr and allocate a new block of
         size at it's position. If it failed, the address of
@@ -649,7 +650,7 @@ static void __cdecl RwMemoryFree( void *ptr )
         (1.0 US): 0x008020B0
         (1.0 EU): 0x008020F0
 =========================================================*/
-static void* __cdecl RwMemoryRealloc( void *ptr, size_t size )
+static void* __cdecl RwMemoryRealloc( void *ptr, size_t size, unsigned int flags )
 {
     return realloc( ptr, size );
 }

@@ -51,9 +51,9 @@ void CClumpModelInfoSAInterface::DeleteRwObject( void )
     if ( atomic )
     {
         // Update the 2dfx count
-        Rw2dfx *eff = atomic->geometry->m_2dfx;
+        Rw2dfx *eff = atomic->geometry->_2dfx;
 
-        ucNumOf2DEffects = eff ? eff->m_count : 0;
+        ucNumOf2DEffects = eff ? eff->count : 0;
     }
 
     RpClumpDestroy( infoClump );
@@ -278,9 +278,9 @@ void CClumpModelInfoSAInterface::SetClump( RpClump *clump )
         // Decrease effect count
         if ( effAtomic )
         {
-            Rw2dfx *effect = effAtomic->geometry->m_2dfx;
+            Rw2dfx *effect = effAtomic->geometry->_2dfx;
 
-            ucNumOf2DEffects -= effect ? effect->m_count : 0;
+            ucNumOf2DEffects -= effect ? effect->count : 0;
         }
     }
 
@@ -293,9 +293,9 @@ void CClumpModelInfoSAInterface::SetClump( RpClump *clump )
         // Increase it with the new clump
         if ( effAtomic )
         {
-            Rw2dfx *effect = effAtomic->geometry->m_2dfx;
+            Rw2dfx *effect = effAtomic->geometry->_2dfx;
 
-            ucNumOf2DEffects += effect ? effect->m_count : 0;
+            ucNumOf2DEffects += effect ? effect->count : 0;
         }
     }
 
@@ -327,7 +327,7 @@ void CClumpModelInfoSAInterface::SetClump( RpClump *clump )
         return;
     }
 
-    atomic->geometry->meshes[0].m_bounds.radius *= 1.2f;
+    atomic->geometry->meshes[0].bounds.radius *= 1.2f;
 
     // Get the animation
     RpAnimHierarchy *hier = clump->GetAnimHierarchy();

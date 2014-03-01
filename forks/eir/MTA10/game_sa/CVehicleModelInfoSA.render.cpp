@@ -1350,9 +1350,9 @@ static bool RpClumpAtomicSetupVehicleMaterials( RpAtomic *atomic, _colorTextureS
     bool blankOut = ( atomic->componentFlags & 0x1000 ) != 0;
     unsigned char alpha = vehAlpha;
 
-    for ( unsigned int n = 0; n < mats.m_entries; n++ )
+    for ( unsigned int n = 0; n < mats.entries; n++ )
     {
-        RpMaterial *mat = mats.m_data[n];
+        RpMaterial *mat = mats.data[n];
 
         if ( blankOut )
             RpGeometryMaterialSetupColor( mat, storage );

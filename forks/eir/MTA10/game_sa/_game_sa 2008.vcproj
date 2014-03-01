@@ -55,7 +55,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories="../sdk;../../Shared/sdk;../../vendor/sparsehash/current/src;../../vendor/sparsehash/current/src/windows"
+				AdditionalIncludeDirectories="../sdk;../../Shared/sdk;../../vendor/sparsehash/current/src;../../vendor/sparsehash/current/src/windows;../sdk/game"
 				PreprocessorDefinitions="WIN32;GAME_SA_EXPORTS;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -151,7 +151,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../sdk;../../Shared/sdk;../../vendor/sparsehash/current/src;../../vendor/sparsehash/current/src/windows"
+				AdditionalIncludeDirectories="../sdk;../../Shared/sdk;../../vendor/sparsehash/current/src;../../vendor/sparsehash/current/src/windows;../sdk/game;."
 				PreprocessorDefinitions="WIN32;_DEBUG;MTA_DEBUG;GAME_SA_EXPORTS;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="true"
 				BasicRuntimeChecks="3"
@@ -252,7 +252,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories="../sdk;../../Shared/sdk;../../vendor/sparsehash/current/src;../../vendor/sparsehash/current/src/windows"
+				AdditionalIncludeDirectories="../sdk;../../Shared/sdk;../../vendor/sparsehash/current/src;../../vendor/sparsehash/current/src/windows;../sdk/game"
 				PreprocessorDefinitions="WIN32;GAME_SA_EXPORTS;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -1612,6 +1612,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\gamesa_renderware.hpp"
+				>
+			</File>
+			<File
 				RelativePath=".\HeapTrace.h"
 				>
 			</File>
@@ -1676,6 +1680,122 @@
 				>
 				<File
 					RelativePath="..\..\Shared\debugsdk\dbgheap.h"
+					>
+				</File>
+			</Filter>
+		</Filter>
+		<Filter
+			Name="RenderWare"
+			>
+			<File
+				RelativePath=".\RenderWare\RpAtomic.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\RenderWare\RpAtomicD3D9.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\RenderWare\RpClump.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\RenderWare\RpGeometry.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\RenderWare\RpLight.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\RenderWare\RpMaterial.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\RenderWare\RwCamera.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\RenderWare\RwFrame.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\RenderWare\RwMath.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\RenderWare\RwStream.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\RenderWare\RwTexDictionary.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\RenderWare\RwTexture.cpp"
+				>
+			</File>
+			<Filter
+				Name="Include"
+				>
+				<File
+					RelativePath=".\RenderWare\RpAtomic.h"
+					>
+				</File>
+				<File
+					RelativePath=".\RenderWare\RpAtomicD3D9.h"
+					>
+				</File>
+				<File
+					RelativePath=".\RenderWare\RpClump.h"
+					>
+				</File>
+				<File
+					RelativePath=".\RenderWare\RpGeometry.h"
+					>
+				</File>
+				<File
+					RelativePath=".\RenderWare\RpGeometryStreamline.h"
+					>
+				</File>
+				<File
+					RelativePath=".\RenderWare\RpLight.h"
+					>
+				</File>
+				<File
+					RelativePath=".\RenderWare\RpMaterial.h"
+					>
+				</File>
+				<File
+					RelativePath=".\RenderWare\RwCamera.h"
+					>
+				</File>
+				<File
+					RelativePath=".\RenderWare\RwFrame.h"
+					>
+				</File>
+				<File
+					RelativePath=".\RenderWare\RwMath.h"
+					>
+				</File>
+				<File
+					RelativePath=".\RenderWare\RwStream.h"
+					>
+				</File>
+				<File
+					RelativePath=".\RenderWare\RwTexDictionary.h"
+					>
+				</File>
+				<File
+					RelativePath=".\RenderWare\RwTexture.h"
+					>
+				</File>
+				<File
+					RelativePath=".\RenderWare\RwTextureD3D9.h"
+					>
+				</File>
+				<File
+					RelativePath=".\RenderWare\RwUtilsD3D9.h"
 					>
 				</File>
 			</Filter>

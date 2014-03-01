@@ -16,6 +16,7 @@
 
 CGameSA* pGame = NULL;
 CCoreInterface* g_pCore = NULL;
+CCoreInterface* core = NULL;
 
 //-----------------------------------------------------------
 // This function uses the initialized data sections of the executables
@@ -27,7 +28,7 @@ CGame * GetGameInterface( CCoreInterface* pCore )
 {
     DEBUG_TRACE("CGame * GetGameInterface()");
 
-    g_pCore = pCore;
+    g_pCore = core = pCore;
 
     pGame = new CGameSA;
 

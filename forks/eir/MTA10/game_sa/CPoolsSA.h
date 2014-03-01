@@ -191,24 +191,6 @@ public:
     BYTE            m_pad[196];
 };
 
-class CEnvMapMaterialSA
-{
-public:
-    BYTE            m_pad[12];
-};
-
-class CEnvMapAtomicSA
-{
-public:
-    BYTE            m_pad[12];
-};
-
-class CSpecMapMaterialSA
-{
-public:
-    BYTE            m_pad[8];
-};
-
 #define MAX_DUMMIES     4000
 #define MAX_IPL         256
 

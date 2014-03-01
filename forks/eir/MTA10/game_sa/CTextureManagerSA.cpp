@@ -78,7 +78,7 @@ inline static RwTexture* RwTexDictionaryScanTree( RwTexDictionary *txd, const ch
 static RwTexture* __cdecl RwTexDictionaryDefaultCurrentScan( const char *name )
 {
     // First check the current TexDictionary tree
-    if ( RwTexture *tex = RwTexDictionaryScanTree( pRwInterface->m_textureManager.m_current, name ) )
+    if ( RwTexture *tex = RwTexDictionaryScanTree( pRwInterface->m_textureManager.current, name ) )
         return tex;
 
     // MTA extension: also scan a global texture emitter which is controlled by MTA (low priority)
@@ -101,8 +101,8 @@ static void __cdecl Hook_InitTextureManager( void )
         *( (unsigned short*)VAR_CPlayerTexDictionaries + n ) = pGame->GetTextureManager()->CreateTxdEntry( "*" );
 
     // Register some callbacks
-    pRwInterface->m_textureManager.m_findInstance = RwTexDictionaryDefaultScanGlobalEnv;
-    pRwInterface->m_textureManager.m_findInstanceRef = RwTexDictionaryDefaultCurrentScan;
+    pRwInterface->m_textureManager.findInstance = RwTexDictionaryDefaultScanGlobalEnv;
+    pRwInterface->m_textureManager.findInstanceRef = RwTexDictionaryDefaultCurrentScan;
 }
 
 CTextureManagerSA::CTextureManagerSA( void )

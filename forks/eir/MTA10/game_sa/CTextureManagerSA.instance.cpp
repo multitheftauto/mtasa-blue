@@ -274,5 +274,5 @@ void CTxdInstanceSA::DereferenceNoDestroy( void )
 =========================================================*/
 void CTxdInstanceSA::SetCurrent( void )
 {
-    pRwInterface->m_textureManager.m_current = m_txd;
+    pRwInterface->m_textureManager.current = m_txd;
 }

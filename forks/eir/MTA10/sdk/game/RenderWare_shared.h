@@ -4,7 +4,7 @@
 *  LICENSE:     See LICENSE in the top level directory
 *  FILE:        sdk/RenderWare_shared.h
 *  PURPOSE:     Shared renderware definitions
-*  DEVELOPERS:  Martin Turski <quiret@gmx.de>
+*  DEVELOPERS:  The_GTA <quiret@gmx.de>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -18,16 +18,18 @@
 #include <rwlist.hpp>
 
 // TODO: Remove the internal RW definitions, DIF
-#include <CVector2D.h>
-#include <CVector.h>
 #include <CMatrix.h>
-
-struct RpAtomic;
+#include <CVector.h>
 
 // RenderWare primitive types
-typedef CVector2D RwV2d;
-typedef CVector RwV3d;
-
+struct RwV2d
+{
+    float x,y;
+};
+struct RwV3d
+{
+    float x,y,z;
+};
 typedef float RwV4d[4];
 struct RwPlane
 {
@@ -75,6 +77,7 @@ struct RwColor
         *(unsigned int*)this = color;
     }
 
+    // In little endian: 0xAABBGGRR (ABGR)
     unsigned char r, g, b, a;
 
     operator unsigned int ( void ) const
@@ -86,11 +89,13 @@ struct RwColor
     {
         return *(unsigned int*)this;
     }
-};
-struct RpAtomicContainer
-{
-    RpAtomic*   atomic;
-    char        szName[17];
+
+    DWORD ToD3DColor( void )
+    {
+        // Transform this color struct into something that the
+        // Direct3D 9 device understands.
+        return ( a << 24 ) | ( r << 16 ) | ( g << 8 ) | ( b );
+    }
 };
 enum eRwType : unsigned char
 {
@@ -124,21 +129,23 @@ public:
     {
         vRight.fX = 1; vRight.fY = 0; vRight.fZ = 0;
         vFront.fX = 0; vFront.fY = 1; vFront.fZ = 0;
-        vUp.fX =    0; vUp.fY =    0; vUp.fZ =    1;
+        vUp.fX = 0; vUp.fY = 0; vUp.fZ = 1;
     }
 
     inline void Identity( void )
     {
         IdentityRotation();
-
-        vPos.fX = 0;//(float)(1.15 * -0.25);
-        vPos.fY = 0;
-        vPos.fZ = 0;
     }
 
     RwMatrix( void )
     {
         Identity();
+
+        // Making a clean matrix.
+        a = 0;
+        b = 0;
+        c = 0;
+        w = 1.0f;
     }
 
     RwMatrix( const CMatrix& mat )
@@ -170,73 +177,85 @@ public:
     RwMatrix( const RwMatrix& mat )
     {
         assign( mat );
+
+        // Making a clean matrix.
+        a = 0;
+        b = 0;
+        c = 0;
+        w = 1.0f;
     }
 
-    RwMatrix operator + ( const RwMatrix& mat )
+    void __thiscall Add( const RwMatrix& mat, RwMatrix& outmt )
     {
-        float outmt[16];
-
         __asm
         {
             mov eax,mat
-            mov ebx,this
             mov edx,outmt
 
-            movups xmm0,[eax]
-            movups xmm1,[eax+0x10]
-            movups xmm2,[eax+0x20]
-            movups xmm3,[eax+0x30]
+            movups xmm0,[eax]RwMatrix.vRight
+            movups xmm1,[eax]RwMatrix.vFront
+            movups xmm2,[eax]RwMatrix.vUp
+            movups xmm3,[eax]RwMatrix.vPos
 
-            movups xmm4,[ebx]
-            movups xmm5,[ebx+0x10]
-            movups xmm6,[ebx+0x20]
-            movups xmm7,[ebx+0x30]
+            movups xmm4,[ecx]RwMatrix.vRight
+            movups xmm5,[ecx]RwMatrix.vFront
+            movups xmm6,[ecx]RwMatrix.vUp
+            movups xmm7,[ecx]RwMatrix.vPos
 
             addps xmm0,xmm4
             addps xmm1,xmm5
             addps xmm2,xmm6
             addps xmm3,xmm7
 
-            movups [edx],xmm0
-            movups [edx+0x10],xmm1
-            movups [edx+0x20],xmm2
-            movups [edx+0x30],xmm3
+            movups [edx]RwMatrix.vRight,xmm0
+            movups [edx]RwMatrix.vFront,xmm1
+            movups [edx]RwMatrix.vUp,xmm2
+            movups [edx]RwMatrix.vPos,xmm3
         }
-
-        return *(RwMatrix*)outmt;
     }
 
-    RwMatrix operator - ( const RwMatrix& mat )
+    RwMatrix __thiscall operator + ( const RwMatrix& mat )
     {
         float outmt[16];
 
+        Add( mat, *(RwMatrix*)outmt );
+        return *(RwMatrix*)outmt;
+    }
+
+    void __thiscall Sub( const RwMatrix& mat, RwMatrix& outmt )
+    {
         __asm
         {
             mov eax,mat
-            mov ebx,this
             mov edx,outmt
 
-            movups xmm0,[eax]
-            movups xmm1,[eax+0x10]
-            movups xmm2,[eax+0x20]
-            movups xmm3,[eax+0x30]
+            movups xmm0,[eax]RwMatrix.vRight
+            movups xmm1,[eax]RwMatrix.vFront
+            movups xmm2,[eax]RwMatrix.vUp
+            movups xmm3,[eax]RwMatrix.vPos
 
-            movups xmm4,[ebx]
-            movups xmm5,[ebx+0x10]
-            movups xmm6,[ebx+0x20]
-            movups xmm7,[ebx+0x30]
+            movups xmm4,[ecx]RwMatrix.vRight
+            movups xmm5,[ecx]RwMatrix.vFront
+            movups xmm6,[ecx]RwMatrix.vUp
+            movups xmm7,[ecx]RwMatrix.vPos
 
             subps xmm0,xmm4
             subps xmm1,xmm5
             subps xmm2,xmm6
             subps xmm3,xmm7
 
-            movups [edx],xmm0
-            movups [edx+0x10],xmm1
-            movups [edx+0x20],xmm2
-            movups [edx+0x30],xmm3
+            movups [edx]RwMatrix.vRight,xmm0
+            movups [edx]RwMatrix.vFront,xmm1
+            movups [edx]RwMatrix.vUp,xmm2
+            movups [edx]RwMatrix.vPos,xmm3
         }
+    }
 
+    RwMatrix __thiscall operator - ( const RwMatrix& mat )
+    {
+        float outmt[16];
+
+        Sub( mat, *(RwMatrix*)outmt );
         return *(RwMatrix*)outmt;
     }
 
@@ -272,8 +291,13 @@ public:
         float sh = sin( heading );
 
         vRight[0] = ch;  vRight[1] = sh;  vRight[2] = 0;
-        vFront[0] = -sh; vFront[1] = ch;  vFront[2] = 0;
-        vUp[0]    = 0;   vUp[1]    = 0;   vUp[2] =    1.0f;
+        vFront[0] = -sh;    vFront[1] = ch;     vFront[2] = 0;
+        vUp[0] = 0;      vUp[1] = 0;      vUp[2] = 1.0f;
+    }
+
+    inline float ToHeading( void ) const
+    {
+        return atan2( -vFront.fX, vFront.fY );
     }
 
     // I have done the homework for MTA
@@ -358,20 +382,19 @@ public:
         z = (float)RAD2DEG( z );
     }
 
-    // Has been tested on multiple occasions.
     inline void __thiscall Multiply( const RwMatrix& mat, RwMatrix& dst ) const
     {
 	    __asm
 	    {
 		    mov edx,[mat]
-		    mov eax,[dst]
+		    mov esi,[dst]
 
-		    movups xmm4,[edx]
-		    movups xmm5,[edx+0x10]
-		    movups xmm6,[edx+0x20]
+		    movups xmm4,[edx]RwMatrix.vRight
+		    movups xmm5,[edx]RwMatrix.vFront
+		    movups xmm6,[edx]RwMatrix.vUp
     		
-		    movss xmm3,[ecx+0x10]
-		    movss xmm7,[ecx+0x20]
+		    movss xmm3,[ecx]RwMatrix.vFront
+		    movss xmm7,[ecx]RwMatrix.vUp
 
 		    // X
 		    movss xmm0,[ecx]
@@ -393,7 +416,7 @@ public:
 		    addps xmm0,xmm1
 		    addps xmm0,xmm2
 
-		    movups [eax],xmm0
+		    movups [esi]RwMatrix.vRight,xmm0
 
 		    // Y
 		    movss xmm1,[ecx+0x14]
@@ -409,7 +432,7 @@ public:
 		    addps xmm3,xmm1
 		    addps xmm3,xmm2
 
-		    movups [eax+0x10],xmm3
+		    movups [esi]RwMatrix.vFront,xmm3
 
 		    // Z
 		    movss xmm1,[ecx+0x24]
@@ -425,7 +448,7 @@ public:
 		    addps xmm7,xmm1
 		    addps xmm7,xmm2
 
-		    movups [eax+0x20],xmm7
+		    movups [esi]RwMatrix.vUp,xmm7
 	    }
     }
 
@@ -434,10 +457,10 @@ public:
         // Optimization to use SSE registers instead of stack space
         __asm
         {
-            movups xmm0,[ecx]
-            movups xmm1,[ecx+0x10]
-            movups xmm2,[ecx+0x20]
-            movups xmm3,[ecx+0x30]
+            movups xmm0,[ecx]RwMatrix.vRight
+            movups xmm1,[ecx]RwMatrix.vFront
+            movups xmm2,[ecx]RwMatrix.vUp
+            movups xmm3,[ecx]RwMatrix.vPos
 
             // Prepare for position invert
             movss xmm4,negOne
@@ -515,28 +538,42 @@ public:
 
     float& operator [] ( unsigned int i )
     {
-#ifdef _DEBUG
         assert( i < 0x10 );
-#endif
+
         return ((float*)(this))[i];
     }
 
     float operator [] ( unsigned int i ) const
     {
-#ifdef _DEBUG
         assert( i < 0x10 );
-#endif
+
         return ((float*)(this))[i];
     }
 
+#if 0
+    CVector& operator [] ( unsigned int i )
+    {
+        assert( i < 4 );
+
+        return ((CVector*)(this))[i];
+    }
+
+    CVector operator [] ( unsigned int i ) const
+    {
+        assert( i < 4 );
+
+        return ((CVector*)(this))[i];
+    }
+#endif
+
     CVector         vRight;
-    unsigned int    a;
+    unsigned int    a;  // anyone wondering about the flags: they were just there for debug.
     CVector         vFront;
     unsigned int    b;
     CVector         vUp;
     unsigned int    c;
     CVector         vPos;
-    unsigned int    d;
+    float           w;
 };
 
 #endif

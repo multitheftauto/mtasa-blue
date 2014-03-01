@@ -143,6 +143,7 @@ typedef void                    (__cdecl *RwRasterDestroy_t)                    
 // Texture functions
 typedef RwTexture*              (__cdecl *RwTextureCreate_t)                    (RwRaster *raster);
 typedef int                     (__cdecl *RwTextureDestroy_t)                   (RwTexture *texture);
+typedef int                     (__cdecl *RpD3D9SetTexture_t)                   (RwTexture *texture, unsigned int index);
 
 // TexDictionary functions
 typedef RwTexDictionary*        (__cdecl *RwTexDictionarySetCurrent_t)          (RwTexDictionary *dict);
@@ -209,13 +210,8 @@ RWFUNC ( RwMatrixUnknown_t                          RwMatrixUnknown             
 RWFUNC ( RwObjectRegister_t                         RwObjectRegister                        , (RwObjectRegister_t)                      invalid_ptr )
 
 // Stream functions
-RWFUNC ( RwStreamInitialize_t                       RwStreamInitialize                      , (RwStreamInitialize_t)                    invalid_ptr )
-RWFUNC ( RwStreamOpen_t                             RwStreamOpen                            , (RwStreamOpen_t)                          invalid_ptr )
 RWFUNC ( RwStreamFindChunk_t                        RwStreamFindChunk                       , (RwStreamFindChunk_t)                     invalid_ptr )
 RWFUNC ( RwStreamReadChunkHeaderInfo_t              RwStreamReadChunkHeaderInfo             , (RwStreamReadChunkHeaderInfo_t)           invalid_ptr )
-RWFUNC ( RwStreamReadBlocks_t                       RwStreamReadBlocks                      , (RwStreamReadBlocks_t)                    invalid_ptr )
-RWFUNC ( RwStreamSkip_t                             RwStreamSkip                            , (RwStreamSkip_t)                          invalid_ptr )
-RWFUNC ( RwStreamClose_t                            RwStreamClose                           , (RwStreamClose_t)                         invalid_ptr )
 
 // Frame functions
 RWFUNC ( RwFrameCreate_t                            RwFrameCreate                           , (RwFrameCreate_t)                         invalid_ptr )
@@ -289,6 +285,7 @@ RWFUNC ( RwRasterDestroy_t                          RwRasterDestroy             
 // Texture functions
 RWFUNC ( RwTextureCreate_t                          RwTextureCreate                         , (RwTextureCreate_t)                       invalid_ptr )
 RWFUNC ( RwTextureDestroy_t                         RwTextureDestroy                        , (RwTextureDestroy_t)                      invalid_ptr )
+RWFUNC ( RpD3D9SetTexture_t                         _RpD3D9SetTexture                       , (RpD3D9SetTexture_t)                      invalid_ptr )
 
 // TexDictionary functions
 RWFUNC ( RwTexDictionaryAddTexture_t                RwTexDictionaryAddTexture               , (RwTexDictionaryAddTexture_t)             invalid_ptr )

@@ -72,15 +72,15 @@ namespace RwRemapScan
     // Binary offsets: (1.0 US and 1.0 EU): 0x004C75A0
     void Apply( void )
     {
-        prevStackScan = pRwInterface->m_textureManager.m_findInstanceRef;
-        pRwInterface->m_textureManager.m_findInstanceRef = scanMethod;
+        prevStackScan = pRwInterface->m_textureManager.findInstanceRef;
+        pRwInterface->m_textureManager.findInstanceRef = scanMethod;
     }
 
     // Restores the previous texture scanner
     // Binary offsets: (1.0 US and 1.0 EU): 0x004C75C0
     void Unapply( void )
     {
-        pRwInterface->m_textureManager.m_findInstanceRef = prevStackScan;
+        pRwInterface->m_textureManager.findInstanceRef = prevStackScan;
         prevStackScan = NULL;
     }
 };
@@ -186,9 +186,9 @@ static inline CVector* _RpGeometryAllocateNormals( RpGeometry *geom, RpGeomMesh 
             if ( tri.v1 == n || tri.v2 == n || tri.v3 == n )
             {
                 // ... we should adjust the triangle normal.
-                const CVector& origin = mesh->m_positions[tri.v1];
-                CVector v1 = mesh->m_positions[tri.v2] - origin;
-                const CVector v2 = mesh->m_positions[tri.v3] - origin;
+                const CVector& origin = mesh->positions[tri.v1];
+                CVector v1 = mesh->positions[tri.v2] - origin;
+                const CVector v2 = mesh->positions[tri.v3] - origin;
                 v1.CrossProduct( v2 );
                 v1.Normalize();
 
@@ -229,8 +229,8 @@ static void _initAtomScene( RpAtomic *atom )
         {
             RpGeomMesh& mesh = geom.meshes[n];
 
-            if ( !mesh.m_normals )
-                mesh.m_normals = _RpGeometryAllocateNormals( &geom, &mesh );
+            if ( !mesh.normals )
+                mesh.normals = _RpGeometryAllocateNormals( &geom, &mesh );
         }
 
         if ( !geom.skeleton )
@@ -522,7 +522,7 @@ static RpClump* __cdecl ReadClumpBigContinue( RwStream *stream )
         return NULL;
 
     // Get to the current stream offset
-    RwStreamSkip( stream, *(unsigned int*)0x00C87AFC - stream->data.position );
+    RwStreamSkip( stream, *(unsigned int*)0x00C87AFC - stream->data.buffered.position );
 
     // The_GTA: since this function is never used and there are much better
     // ways to load RenderWare resources, I decide to leave this old code out.
@@ -651,7 +651,7 @@ static RwTexDictionary* RwTexDictionaryLoadFirstHalf( RwStream *stream )
         info.count--;
     }
 
-    big_txdStreamOffset = stream->data.position;
+    big_txdStreamOffset = stream->data.buffered.position;
     return txd;
 }
 
@@ -673,7 +673,7 @@ static RwTexDictionary* RwTexDictionaryLoadFirstHalf( RwStream *stream )
 static RwTexDictionary* RwTexDictionaryContinueLoading( RwStream *stream, RwTexDictionary *txd )
 {
     // Jump to the previous stream offset
-    RwStreamSkip( stream, big_txdStreamOffset - stream->data.position );
+    RwStreamSkip( stream, big_txdStreamOffset - stream->data.buffered.position );
 
     for ( unsigned int n = big_numTXDBlocks; n != 0; n-- )
     {
@@ -1192,7 +1192,7 @@ bool __cdecl LoadModel( void *buf, modelId_t id, unsigned int threadId )
     streamBuffer.size = loadInfo.GetSize();     // we are reading from IMG chunks
 
     // Create a stream
-    RwStream *stream = RwStreamInitialize( (void*)0x008E48AC, 0, 3, 1, &streamBuffer );
+    RwStream *stream = RwStreamInitialize( (void*)0x008E48AC, 0, STREAM_TYPE_BUFFER, STREAM_MODE_READ, &streamBuffer );
 
     if ( id < DATA_TEXTURE_BLOCK )
     {
@@ -1236,14 +1236,14 @@ bool __cdecl LoadModel( void *buf, modelId_t id, unsigned int threadId )
 
             // Check if there is animation attached
             if ( header.id == 0x2B )
-                animDict->m_current = dict = RtDictSchemaStreamReadDict( animDict, stream );
+                animDict->current = dict = RtDictSchemaStreamReadDict( animDict, stream );
             else
                 dict = NULL;
 
             // At this point, GTA_SA utilizes a weird stream logic
             // I have fixed it here (bad clean-up of stream pointers)
             RwStreamClose( stream, &streamBuffer );
-            stream = RwStreamInitialize( (void*)0x008E48AC, 0, 3, 1, &streamBuffer );
+            stream = RwStreamInitialize( (void*)0x008E48AC, 0, STREAM_TYPE_BUFFER, STREAM_MODE_READ, &streamBuffer );
 
             success = LoadClumpFile( stream, id );
 
@@ -1505,7 +1505,7 @@ bool __cdecl LoadBigModel( char *buf, modelId_t id )
     rwbuf.ptr = buf;
     rwbuf.size = loadInfo->m_blockCount * 2048;
 
-    RwStream *stream = RwStreamInitialize( (void*)0x008E48AC, 0, 3, 1, &rwbuf );
+    RwStream *stream = RwStreamInitialize( (void*)0x008E48AC, 0, STREAM_TYPE_BUFFER, STREAM_MODE_READ, &rwbuf );
 
     bool success;
 

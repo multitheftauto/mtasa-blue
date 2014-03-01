@@ -51,12 +51,12 @@ void RpAtomicRenderAlpha( RpAtomic *atom, unsigned int alpha )
     geom->flags |= 0x40;
 
     RpMaterials& mats = geom->materials;
-    char *alphaVals = new char [mats.m_entries];
+    char *alphaVals = new char [mats.entries];
 
     // Store the atomic alpha values
-    for ( n = 0; n < mats.m_entries; n++ )
+    for ( n = 0; n < mats.entries; n++ )
     {
-        RpMaterial& mat = *mats.m_data[n];
+        RpMaterial& mat = *mats.data[n];
         unsigned char a = mat.color.a;
 
         alphaVals[n] = a;
@@ -70,7 +70,7 @@ void RpAtomicRenderAlpha( RpAtomic *atom, unsigned int alpha )
 
     // Restore values
     while ( n )
-        mats.m_data[n]->color.a = alphaVals[--n];
+        mats.data[n]->color.a = alphaVals[--n];
 
     delete [] alphaVals;
 
@@ -264,11 +264,11 @@ RwExtension* CRwExtensionManagerSA::Allocate( unsigned int rwId, unsigned int co
 
     if ( ext->internalSize == 0 )
     {
-        inst->_internal = NULL;
+        inst->pInternal = NULL;
         return inst;
     }
 
-    inst->_internal = (void*)((unsigned int)inst->data + ext->structSize * count);
+    inst->pInternal = (void*)((unsigned int)inst->data + ext->structSize * count);
     return inst;
 }
 
