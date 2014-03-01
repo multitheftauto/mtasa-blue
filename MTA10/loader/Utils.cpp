@@ -1940,6 +1940,44 @@ void BsodDetectionOnGameEnd( void )
 
 //////////////////////////////////////////////////////////
 //
+// ForbodenProgramsMessage
+//
+// Message to advise against running certain other programs
+//
+//////////////////////////////////////////////////////////
+void ForbodenProgramsMessage ( void )
+{
+    std::vector < SString > forbodenList;
+    forbodenList.push_back( "ProcessHacker" );
+
+    SString strResult;
+    std::vector < DWORD > processIdList = MyEnumProcesses ();
+    for ( uint i = 0; i < processIdList.size (); i++ )
+    {
+        std::vector < SString > pathFilenameList = GetPossibleProcessPathFilenames ( processIdList[i] );
+        for ( uint p = 0; p < pathFilenameList.size (); p++ )
+        {
+            SString strFilename = ExtractFilename( pathFilenameList[p] );
+            for ( uint f = 0; f < forbodenList.size (); f++ )
+            {
+                if ( strFilename.Replace( " ", "" ).BeginsWithI( forbodenList[f] ) )
+                    strResult += strFilename + "\n";
+            }
+        }
+    }
+
+    if ( !strResult.empty() )
+    {
+        SString strMessage = _("Please terminate the following programs before continuing:");
+        strMessage += "\n\n";
+        strMessage += strResult;
+        BrowseToSolution ( "forboden-programs", ASK_GO_ONLINE | TERMINATE_IF_YES, strMessage );
+    }
+}
+
+
+//////////////////////////////////////////////////////////
+//
 // VerifyEmbeddedSignature
 //
 // Check a file has been signed proper
