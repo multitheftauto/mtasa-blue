@@ -333,6 +333,7 @@ private:
 
 #include "CEntitySA.render.h"
 #include "CEntitySA.renderfeedback.h"
+#include "CEntitySA.lod.h"
 
 
 //

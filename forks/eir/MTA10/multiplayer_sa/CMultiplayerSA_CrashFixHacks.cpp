@@ -64,6 +64,7 @@ void _cdecl CrashAverted ( DWORD id )
 
 
 ////////////////////////////////////////////////////////////////////////
+// VEHICLE ATOMIC RENDER CRASH FIX
 #define HOOKPOS_CrashFix_Misc1                              0x5D9A6E
 #define HOOKSIZE_CrashFix_Misc1                             6
 DWORD RETURN_CrashFix_Misc1 =                               0x5D9A74;
@@ -88,6 +89,7 @@ void _declspec(naked) HOOK_CrashFix_Misc1 ()
 
 
 ////////////////////////////////////////////////////////////////////////
+// ENTITY COLLISION MODEL IS ZERO CRASH FIX
 #define HOOKPOS_CrashFix_Misc2                              0x6B18B0
 #define HOOKSIZE_CrashFix_Misc2                             9
 DWORD RETURN_CrashFix_Misc2 =                               0x6B18B9;
@@ -278,6 +280,7 @@ void _declspec(naked) HOOK_CrashFix_Misc9 ()
 
 
 ////////////////////////////////////////////////////////////////////////
+// SOMEBODY GOOFED WITH CODE - CRASH
 // #5468  3/3
 #define HOOKPOS_CrashFix_Misc10                             0x5334FE
 #define HOOKSIZE_CrashFix_Misc10                            6
@@ -395,6 +398,7 @@ void _declspec(naked) HOOK_CrashFix_Misc14 ()
 
 
 ////////////////////////////////////////////////////////////////////////
+// STREAMING RUNTIME THREAD RACE CONDITION FATAL ERROR FREEZE FIX
 void _cdecl DoWait ( HANDLE hHandle )
 {
     DWORD dwWait = 4000;

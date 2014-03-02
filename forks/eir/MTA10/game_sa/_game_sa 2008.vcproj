@@ -475,6 +475,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CEntitySA.lod.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\CEntitySA.render.cpp"
 				>
 			</File>
@@ -1177,6 +1181,10 @@
 			</File>
 			<File
 				RelativePath="CEntitySA.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CEntitySA.lod.h"
 				>
 			</File>
 			<File

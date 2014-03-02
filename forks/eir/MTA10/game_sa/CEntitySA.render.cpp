@@ -232,6 +232,12 @@ __forceinline float GetComplexCameraEntityDistance( const CEntitySAInterface *en
 
 static float CalculateFadingAlpha( CBaseModelInfoSAInterface *info, const CEntitySAInterface *entity, float camDistance, float camFarClip )
 {
+    // Wire in a MTA team fix.
+    int iCustomRet = OnMY_CVisibilityPlugins_CalculateFadingAtomicAlpha_Pre( info, entity, camDistance );
+
+    if ( iCustomRet != -1 )
+        return (float)iCustomRet / 255.0f;
+
     float sectorDivide = 20.0f;
     float lodScale = pGame->GetCamera()->GetInterface()->LODDistMultiplier;
     float distAway = info->pColModel->m_bounds.fRadius + camFarClip;
