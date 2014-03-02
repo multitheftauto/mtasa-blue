@@ -190,7 +190,7 @@ second:
 // CVisibilityPlugins_CalculateFadingAtomicAlpha
 //
 ////////////////////////////////////////////////
-int OnMY_CVisibilityPlugins_CalculateFadingAtomicAlpha_Pre( CBaseModelInfoSAInterface* pModelInfo, CEntitySAInterface* pEntity, float fDist )
+int OnMY_CVisibilityPlugins_CalculateFadingAtomicAlpha_Pre( CBaseModelInfoSAInterface* pModelInfo, const CEntitySAInterface* pEntity, float fDist )
 {
     if ( pEntity->IsLowLodEntity () )
     {
@@ -204,12 +204,12 @@ int OnMY_CVisibilityPlugins_CalculateFadingAtomicAlpha_Pre( CBaseModelInfoSAInte
 
 ////////////////////////////////////////////////
 //
-// CMultiplayerSA::EnableLODSystem
+// CGameSA::EnableLODSystem
 //
 // Enable/disable hooks programmatically
 //
 ////////////////////////////////////////////////
-void CMultiplayerSA::SetLODSystemEnabled ( bool bEnable )
+void CGameSA::SetLODSystemEnabled ( bool bEnable )
 {
     // Switch
     if ( m_bEnabledLODSystem == bEnable )

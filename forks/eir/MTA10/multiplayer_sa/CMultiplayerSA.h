@@ -46,7 +46,7 @@ public:
     void                        InitHooks_ClothesSpeedUp ( void );
     void                        InitHooks_FixBadAnimId ( void );
     void                        InitHooks_HookDestructors ( void );
-    void                        InitHooks_RwResources ( void );
+    //void                        InitHooks_RwResources ( void ); MOVED TO CGameSA
     //void                        InitHooks_ClothesCache ( void ); MOVED TO CGameSA
     void                        InitHooks_Files ( void );
     void                        InitHooks_Weapons ( void );
@@ -210,7 +210,7 @@ public:
 
     //virtual void                FlushClothesCache           ( void ); MOVED TO CGameSA
     virtual void                SetFastClothesLoading       ( EFastClothesLoading fastClothesLoading );
-    virtual void                SetLODSystemEnabled         ( bool bEnable );
+    //virtual void                SetLODSystemEnabled         ( bool bEnable ); MOVED TO CGameSA
     virtual void                SetAltWaterOrderEnabled     ( bool bEnable );
 
     float                       GetAircraftMaxHeight        ( void )                    { return m_fAircraftMaxHeight; };
@@ -225,7 +225,7 @@ public:
     bool                        IsPedTargetingMarkerEnabled ( void );
     bool                        IsConnected                 ( void );
 
-    virtual void                GetRwResourceStats          ( SRwResourceStats& outStats );
+    //virtual void                GetRwResourceStats          ( SRwResourceStats& outStats ); MOVED TO CGameSA
     //virtual void                GetClothesCacheStats        ( SClothesCacheStats& outStats ); MOVED TO CGameSA
     //virtual void                SetIsMinimizedAndNotConnected ( bool bIsMinimizedAndNotConnected ); MOVED TO CGameSA
     //virtual void                SetMirrorsEnabled           ( bool bEnabled ); MOVED TO CGameSA
@@ -238,7 +238,7 @@ private:
     std::vector < char >        m_PlayerImgCache;
     EFastClothesLoading         m_FastClothesLoading;
     CLimitsSA                   m_limits;
-    bool                        m_bEnabledLODSystem;
+    //bool                        m_bEnabledLODSystem; MOVED TO CGameSA
     bool                        m_bEnabledAltWaterOrder;
     bool                        m_bEnabledClothesMemFix;
     float                       m_fAircraftMaxHeight;

@@ -159,5 +159,7 @@ public:
 #include "CRenderWareSA.rwapi.h"
 #include "CRenderWareSA.pipeline.h"
 #include "CRenderWareSA.render.h"
+#include "CRenderWareSA.rwstats.h"
 
-#endif
+
+#endif //__CRENDERWARESA

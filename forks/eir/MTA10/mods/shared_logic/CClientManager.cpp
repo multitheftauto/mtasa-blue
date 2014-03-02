@@ -64,7 +64,7 @@ CClientManager::CClientManager ( void )
     m_bBeingDeleted = false;
     m_bGameUnloadedFlag = false;
 
-    g_pCore->GetMultiplayer ()->SetLODSystemEnabled ( false );
+    g_pCore->GetGame ()->SetLODSystemEnabled ( false );
     m_pCamera->MakeSystemEntity();
 }
 
@@ -306,7 +306,7 @@ void CClientManager::OnLowLODElementCreated ( void )
 {
     // Switch on with first low LOD element
     if ( m_iNumLowLODElements == 0 )
-        g_pCore->GetMultiplayer ()->SetLODSystemEnabled ( true );
+        g_pCore->GetGame ()->SetLODSystemEnabled ( true );
     m_iNumLowLODElements++;
 }
 
@@ -315,5 +315,5 @@ void CClientManager::OnLowLODElementDestroyed ( void )
     // Switch off with last low LOD element
     m_iNumLowLODElements--;
     if ( m_iNumLowLODElements == 0 )
-        g_pCore->GetMultiplayer ()->SetLODSystemEnabled ( false );
+        g_pCore->GetGame ()->SetLODSystemEnabled ( false );
 }

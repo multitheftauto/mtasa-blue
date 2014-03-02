@@ -484,7 +484,7 @@ void CMemStats::SampleState ( SMemStatsInfo& memStatsInfo )
         }
     }
 
-    CCore::GetSingleton ().GetMultiplayer ()->GetRwResourceStats ( memStatsInfo.rwResourceStats );
+    CCore::GetSingleton ().GetGame ()->GetRwResourceStats ( memStatsInfo.rwResourceStats );
     CCore::GetSingleton ().GetGame ()->GetClothesCacheStats ( memStatsInfo.clothesCacheStats );
     CCore::GetSingleton ().GetGame ()->GetShaderReplacementStats ( memStatsInfo.shaderReplacementStats );
     CCore::GetSingleton ().GetModelCacheManager ()->GetStats ( memStatsInfo.modelCacheStats );

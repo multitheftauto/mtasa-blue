@@ -22,13 +22,6 @@
 
 struct RpClump;
 
-struct SRwResourceStats
-{
-    uint uiTextures;
-    uint uiRasters;
-    uint uiGeometries;
-};
-
 
 typedef unsigned long AssocGroupId;
 typedef unsigned long AnimationId;
@@ -283,7 +276,7 @@ public:
 
     //virtual void                        FlushClothesCache           ( void ) = 0; MOVED TO CGameSA
     virtual void                        SetFastClothesLoading       ( EFastClothesLoading fastClothesLoading ) = 0;
-    virtual void                        SetLODSystemEnabled         ( bool bEnable ) = 0;
+    //virtual void                        SetLODSystemEnabled         ( bool bEnable ) = 0; MOVED TO CGameSA
     virtual void                        SetAltWaterOrderEnabled     ( bool bEnable ) = 0;
 
     virtual float                       GetAircraftMaxHeight        ( void ) = 0;
@@ -297,7 +290,7 @@ public:
     virtual void                        SetPedTargetingMarkerEnabled ( bool bEnabled ) = 0;
     virtual bool                        IsPedTargetingMarkerEnabled ( void ) = 0;
 
-    virtual void                        GetRwResourceStats          ( SRwResourceStats& outStats ) = 0;
+    //virtual void                        GetRwResourceStats          ( SRwResourceStats& outStats ) = 0; MOVED TO CGameSA
     //virtual void                        GetClothesCacheStats        ( SClothesCacheStats& outStats ) = 0; MOVED TO CGameSA
     //virtual void                        SetIsMinimizedAndNotConnected ( bool bIsMinimizedAndNotConnected ) = 0; MOVED TO CGameSA
     //virtual void                        SetMirrorsEnabled           ( bool bEnabled ) = 0; MOVED TO CGameSA

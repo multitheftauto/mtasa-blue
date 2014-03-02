@@ -212,6 +212,7 @@ CGameSA::CGameSA()
     // Stuff that needs investigating.
     InitHooks_ClothesCache ();
     InitHooks_Rendering ();
+    InitHooks_RwResources ();
 }
 
 CGameSA::~CGameSA ( void )

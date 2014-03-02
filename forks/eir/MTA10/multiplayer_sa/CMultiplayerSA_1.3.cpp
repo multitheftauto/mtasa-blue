@@ -166,7 +166,7 @@ void CMultiplayerSA::InitHooks_13 ( void )
     EnableHooks_ClothesMemFix ( true );
     InitHooks_FixBadAnimId ();
     InitHooks_HookDestructors ();
-    InitHooks_RwResources ();
+    //InitHooks_RwResources (); MOVED TO CGameSA
     //InitHooks_ClothesCache (); MOVED TO CGameSA
     InitHooks_Files ();
     InitHooks_Weapons ();

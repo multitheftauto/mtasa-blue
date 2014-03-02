@@ -743,6 +743,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CRenderWareSA.rwstats.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\CRenderWareSA.ShaderMatching.cpp"
 				>
 			</File>
@@ -1449,6 +1453,10 @@
 			</File>
 			<File
 				RelativePath=".\CRenderWareSA.rwapi.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CRenderWareSA.rwstats.h"
 				>
 			</File>
 			<File

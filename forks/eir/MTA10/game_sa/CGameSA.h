@@ -227,6 +227,13 @@ public:
     void                    SetMirrorsEnabled               ( bool bEnabled );
     void                    InitHooks_Rendering             ( void );
 
+    // LOD System stuff (CEntitySA.lod.cpp)
+    void                    SetLODSystemEnabled             ( bool bEnable );
+
+    // RenderWare resource statistics
+    void                    GetRwResourceStats              ( SRwResourceStats& outStats );
+    void                    InitHooks_RwResources           ( void );
+
     void                    SetAsyncLoadingFromScript       ( bool bScriptEnabled, bool bScriptForced );
     void                    SuspendASyncLoading             ( bool bSuspend );
     bool                    IsASyncLoadingEnabled           ( bool bIgnoreSuspend = false );
@@ -332,6 +339,9 @@ private:
     SFixedArray < bool, WEAPONTYPE_LAST_WEAPONTYPE > m_JetpackWeapons;
 
     CPed*                   m_pPedContext;
+
+    // Custom modules stuff.
+    bool                    m_bEnabledLODSystem;
 };
 
 extern CFileTranslator *gameFileRoot;

@@ -97,7 +97,6 @@ typedef RpGeometry*             (__cdecl *RpGeometryUnlock_t)                   
 typedef RpGeometry*             (__cdecl *RpGeometryLock_t)                     (RpGeometry *geo, int lockmode);
 typedef RpGeometry*             (__cdecl *RpGeometryTransform_t)                (RpGeometry *geo, const RwMatrix *matrix);
 typedef RpGeometry*             (__cdecl *RpGeometryTriangleSetMaterial_t)      (RpGeometry *geo, RpTriangle *tri, RpMaterial *mat);
-typedef size_t                  (__cdecl *RpGeometryRegisterPlugin_t)           (size_t size, unsigned int id, RpGeometryPluginConstructor constructor, RpGeometryPluginDestructor destructor, RpGeometryPluginCopyConstructor copyConstr );
 typedef int                     (__cdecl *RpGeometryDestroy_t)                  (RpGeometry *geo);
 
 // Atomic functions
@@ -226,10 +225,14 @@ RWFUNC ( RwFrameScale_t                             RwFrameScale                
 RWFUNC ( RwFrameOrient_t                            RwFrameOrient                           , (RwFrameOrient_t)                         invalid_ptr )
 RWFUNC ( RwFrameTranslate_t                         RwFrameTranslate                        , (RwFrameTranslate_t)                      invalid_ptr )
 RWFUNC ( RwFrameDestroy_t                           RwFrameDestroy                          , (RwFrameDestroy_t)                        invalid_ptr )
+RWFUNC ( RwFrameRegisterPlugin_t                    RwFrameRegisterPlugin                   , (RwFrameRegisterPlugin_t)                 invalid_ptr )
+RWFUNC ( RwFrameRegisterPluginStream_t              RwFrameRegisterPluginStream             , (RwFrameRegisterPluginStream_t)           invalid_ptr )
 
 // Material functions
 RWFUNC ( RpMaterialCreate_t                         RpMaterialCreate                        , (RpMaterialCreate_t)                      invalid_ptr )
 RWFUNC ( RpMaterialDestroy_t                        RpMaterialDestroy                       , (RpMaterialDestroy_t)                     invalid_ptr )
+RWFUNC ( RpMaterialRegisterPlugin_t                 RpMaterialRegisterPlugin                , (RpMaterialRegisterPlugin_t)              invalid_ptr )
+RWFUNC ( RpMaterialRegisterPluginStream_t           RpMaterialRegisterPluginStream          , (RpMaterialRegisterPluginStream_t)        invalid_ptr )
 
 // Geometry functions
 RWFUNC ( RpGeometryCreate_t                         RpGeometryCreate                        , (RpGeometryCreate_t)                      invalid_ptr )
@@ -239,8 +242,9 @@ RWFUNC ( RpGeometryTriangleSetMaterial_t            RpGeometryTriangleSetMateria
 RWFUNC ( RpGeometryUnlock_t                         RpGeometryUnlock                        , (RpGeometryUnlock_t)                      invalid_ptr )
 RWFUNC ( RpGeometryLock_t                           RpGeometryLock                          , (RpGeometryLock_t)                        invalid_ptr )
 RWFUNC ( RpGeometryTransform_t                      RpGeometryTransform                     , (RpGeometryTransform_t)                   invalid_ptr )
-RWFUNC ( RpGeometryRegisterPlugin_t                 RpGeometryRegisterPlugin                , (RpGeometryRegisterPlugin_t)              invalid_ptr )
 RWFUNC ( RpGeometryDestroy_t                        RpGeometryDestroy                       , (RpGeometryDestroy_t)                     invalid_ptr )
+RWFUNC ( RpGeometryRegisterPlugin_t                 RpGeometryRegisterPlugin                , (RpGeometryRegisterPlugin_t)              invalid_ptr )
+RWFUNC ( RpGeometryRegisterPluginStream_t           RpGeometryRegisterPluginStream          , (RpGeometryRegisterPluginStream_t)        invalid_ptr )
 
 // Atomic functions
 RWFUNC ( RpAtomicCreate_t                           RpAtomicCreate                          , (RpAtomicCreate_t)                        invalid_ptr )
@@ -252,16 +256,22 @@ RWFUNC ( RpAtomicSetupObjectPipeline_t              RpAtomicSetupObjectPipeline 
 RWFUNC ( RpAtomicSetupVehiclePipeline_t             RpAtomicSetupVehiclePipeline            , (RpAtomicSetupVehiclePipeline_t)          invalid_ptr )
 RWFUNC ( RpAtomicRender_t                           RpAtomicRender                          , (RpAtomicRender_t)                        invalid_ptr )
 RWFUNC ( RpAtomicDestroy_t                          RpAtomicDestroy                         , (RpAtomicDestroy_t)                       invalid_ptr )
+RWFUNC ( RpAtomicRegisterPlugin_t                   RpAtomicRegisterPlugin                  , (RpAtomicRegisterPlugin_t)                invalid_ptr )
+RWFUNC ( RpAtomicRegisterPluginStream_t             RpAtomicRegisterPluginStream            , (RpAtomicRegisterPluginStream_t)          invalid_ptr )
 
 // Light functions
 RWFUNC ( RpLightSetRadius_t                         RpLightSetRadius                        , (RpLightSetRadius_t)                      invalid_ptr )
 RWFUNC ( RpLightSetColor_t                          RpLightSetColor                         , (RpLightSetColor_t)                       invalid_ptr )
 RWFUNC ( RpLightGetConeAngle_t                      RpLightGetConeAngle                     , (RpLightGetConeAngle_t)                   invalid_ptr )
 RWFUNC ( RpLightDestroy_t                           RpLightDestroy                          , (RpLightDestroy_t)                        invalid_ptr )
+RWFUNC ( RpLightRegisterPlugin_t                    RpLightRegisterPlugin                   , (RpLightRegisterPlugin_t)                 invalid_ptr )
+RWFUNC ( RpLightRegisterPluginStream_t              RpLightRegisterPluginStream             , (RpLightRegisterPluginStream_t)           invalid_ptr )
 
 // Camera functions
 RWFUNC ( RwCameraClone_t                            RwCameraClone                           , (RwCameraClone_t)                         invalid_ptr )
 RWFUNC ( RwCameraDestroy_t                          RwCameraDestroy                         , (RwCameraDestroy_t)                       invalid_ptr )
+RWFUNC ( RwCameraRegisterPlugin_t                   RwCameraRegisterPlugin                  , (RwCameraRegisterPlugin_t)                invalid_ptr )
+RWFUNC ( RwCameraRegisterPluginStream_t             RwCameraRegisterPluginStream            , (RwCameraRegisterPluginStream_t)          invalid_ptr )
 
 // Clump functions
 RWFUNC ( RpClumpClone_t                             RpClumpClone                            , (RpClumpClone_t)                          invalid_ptr )
@@ -275,17 +285,23 @@ RWFUNC ( RpClumpForAllAtomics_t                     RpClumpForAllAtomics        
 RWFUNC ( RpClumpRender_t                            RpClumpRender                           , (RpClumpRender_t)                         invalid_ptr )
 RWFUNC ( RpClumpStreamRead_t                        RpClumpStreamRead                       , (RpClumpStreamRead_t)                     invalid_ptr )
 RWFUNC ( RpClumpDestroy_t                           RpClumpDestroy                          , (RpClumpDestroy_t)                        invalid_ptr )
+RWFUNC ( RpClumpRegisterPlugin_t                    RpClumpRegisterPlugin                   , (RpClumpRegisterPlugin_t)                 invalid_ptr )
+RWFUNC ( RpClumpRegisterPluginStream_t              RpClumpRegisterPluginStream             , (RpClumpRegisterPluginStream_t)           invalid_ptr )
 
 // Raster functions
 RWFUNC ( RwRasterCreate_t                           RwRasterCreate                          , (RwRasterCreate_t)                        invalid_ptr )
 RWFUNC ( RwRasterUnlock_t                           RwRasterUnlock                          , (RwRasterUnlock_t)                        invalid_ptr )
 RWFUNC ( RwRasterLock_t                             RwRasterLock                            , (RwRasterLock_t)                          invalid_ptr )
 RWFUNC ( RwRasterDestroy_t                          RwRasterDestroy                         , (RwRasterDestroy_t)                       invalid_ptr )
+RWFUNC ( RwRasterRegisterPlugin_t                   RwRasterRegisterPlugin                  , (RwRasterRegisterPlugin_t)                invalid_ptr )
+RWFUNC ( RwRasterRegisterPluginStream_t             RwRasterRegisterPluginStream            , (RwRasterRegisterPluginStream_t)          invalid_ptr )
 
 // Texture functions
 RWFUNC ( RwTextureCreate_t                          RwTextureCreate                         , (RwTextureCreate_t)                       invalid_ptr )
 RWFUNC ( RwTextureDestroy_t                         RwTextureDestroy                        , (RwTextureDestroy_t)                      invalid_ptr )
 RWFUNC ( RpD3D9SetTexture_t                         _RpD3D9SetTexture                       , (RpD3D9SetTexture_t)                      invalid_ptr )
+RWFUNC ( RwTextureRegisterPlugin_t                  RwTextureRegisterPlugin                 , (RwTextureRegisterPlugin_t)               invalid_ptr )
+RWFUNC ( RwTextureRegisterPluginStream_t            RwTextureRegisterPluginStream           , (RwTextureRegisterPluginStream_t)         invalid_ptr )
 
 // TexDictionary functions
 RWFUNC ( RwTexDictionaryAddTexture_t                RwTexDictionaryAddTexture               , (RwTexDictionaryAddTexture_t)             invalid_ptr )
@@ -296,6 +312,8 @@ RWFUNC ( RwTexDictionaryFindNamedTexture_t          RwTexDictionaryFindNamedText
 RWFUNC ( RwTexDictionaryStreamRead_t                RwTexDictionaryStreamRead               , (RwTexDictionaryStreamRead_t)             invalid_ptr )
 RWFUNC ( RwTexDictionaryGtaStreamRead_t             RwTexDictionaryGtaStreamRead            , (RwTexDictionaryGtaStreamRead_t)          invalid_ptr )
 RWFUNC ( RwTexDictionaryDestroy_t                   RwTexDictionaryDestroy                  , (RwTexDictionaryDestroy_t)                invalid_ptr )
+RWFUNC ( RwTexDictionaryRegisterPlugin_t            RwTexDictionaryRegisterPlugin           , (RwTexDictionaryRegisterPlugin_t)         invalid_ptr )
+RWFUNC ( RwTexDictionaryRegisterPluginStream_t      RwTexDictionaryRegisterPluginStream     , (RwTexDictionaryRegisterPluginStream_t)   invalid_ptr )
 
 // Scene functions
 RWFUNC ( RwSceneRender_t                            RwSceneRender                           , (RwSceneRender_t)                         invalid_ptr )
@@ -304,6 +322,8 @@ RWFUNC ( RwSceneAddLight_t                          RwSceneAddLight             
 RWFUNC ( RwSceneAddClump_t                          RwSceneAddClump                         , (RwSceneAddClump_t)                       invalid_ptr )
 RWFUNC ( RwSceneRemoveLight_t                       RwSceneRemoveLight                      , (RwSceneRemoveLight_t)                    invalid_ptr )
 RWFUNC ( RwSceneDestroy_t                           RwSceneDestroy                          , (RwSceneDestroy_t)                        invalid_ptr )
+RWFUNC ( RwSceneRegisterPlugin_t                    RwSceneRegisterPlugin                   , (RwSceneRegisterPlugin_t)                 invalid_ptr )
+RWFUNC ( RwSceneRegisterPluginStream_t              RwSceneRegisterPluginStream             , (RwSceneRegisterPluginStream_t)           invalid_ptr )
 
 // Dict functions
 RWFUNC ( RtDictSchemaStreamReadDict_t               RtDictSchemaStreamReadDict              , (RtDictSchemaStreamReadDict_t)            invalid_ptr )

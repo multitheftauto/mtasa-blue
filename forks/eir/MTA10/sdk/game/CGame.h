@@ -122,6 +122,13 @@ struct SClothesCacheStats
     uint uiNumRemoved;
 };
 
+struct SRwResourceStats
+{
+    uint uiTextures;
+    uint uiRasters;
+    uint uiGeometries;
+};
+
 
 class __declspec(novtable) CGame 
 {
@@ -236,6 +243,13 @@ public:
     virtual void                SetPreRenderSkyHandler          ( PreRenderSkyHandler * pHandler ) = 0;
     virtual void                SetIsMinimizedAndNotConnected   ( bool bIsMinimizedAndNotConnected ) = 0;
     virtual void                SetMirrorsEnabled               ( bool bEnabled ) = 0;
+
+    // LOD
+    virtual void                SetLODSystemEnabled             ( bool bEnable ) = 0;
+
+    // RenderWare statistics
+    virtual void                GetRwResourceStats              ( SRwResourceStats& outStats ) = 0;
+    virtual void                InitHooks_RwResources           ( void ) = 0;
 
     virtual void                SetAsyncLoadingFromScript       ( bool bScriptEnabled, bool bScriptForced ) = 0;
     virtual void                SuspendASyncLoading             ( bool bSuspend ) = 0;
