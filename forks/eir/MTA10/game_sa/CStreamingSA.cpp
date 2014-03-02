@@ -222,6 +222,16 @@ void __cdecl Streaming::RequestModel( modelId_t id, unsigned int flags )
         if ( !DefaultDispatchExecute( id, ModelRequestDispatch( flags ) ) )
             return;
 
+        // Wire in a MTA team fix regarding clothes replacing.
+        // What a dirty hook :p
+        if ( OnCStreaming_RequestModel_Mid( flags, (ClothesReplacing::SImgGTAItemInfo*)info ) )
+        {
+            // MTA team wants to skip async loading by doing things directly.
+            // Well, okay.
+            LoadModel( ClothesReplacing::pReturnBuffer, ClothesReplacing::iReturnFileId, 0 );
+            return;
+        }
+
         // Push onto the to-be-loaded queue
         info->PushIntoLoader( *(CModelLoadInfoSA**)0x008E4C58 );
 

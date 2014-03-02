@@ -223,3 +223,6 @@ struct STexNameInfo
     int iDebugCounter2;
 #endif
 };
+
+// Exports.
+void OnMY_RwTextureDestroy_Mid( RwTexture* pTexture );

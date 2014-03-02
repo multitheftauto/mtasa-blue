@@ -9,22 +9,8 @@
 #include "StdInc.h"
 #include "gamesa_renderware.h"
 
-namespace
+namespace ClothesReplacing
 {
-    struct SImgGTAItemInfo
-    {
-        ushort    usNext;
-        ushort    usPrev;
-
-        ushort  uiUnknown1;         // Parent ?
-        uchar   uiUnknown2;         // 0x12 when loading, 0x02 when finished loading
-        uchar   ucImgId;
-
-        int     iBlockOffset;
-        int     iBlockCount;
-        uint    uiLoadflag;         // 0-not loaded  2-requested  3-loaded  1-processed
-    };
-
     std::map < ushort, char* > ms_ReplacementClothesFileDataMap;
     bool bClothesReplacementChanged = false;
 
@@ -47,6 +33,7 @@ namespace
     char*   pReturnBuffer;
 }
 
+using namespace ClothesReplacing;
 
 ////////////////////////////////////////////////////////////////
 //
@@ -114,7 +101,7 @@ bool CRenderWareSA::HasClothesReplacementChanged( void )
 // then maybe switch to replacement txd file data
 //
 ////////////////////////////////////////////////////////////////
-bool _cdecl OnCStreaming_RequestModel_Mid ( int flags, SImgGTAItemInfo* pImgGTAInfo )
+bool _cdecl OnCStreaming_RequestModel_Mid ( int flags, ClothesReplacing::SImgGTAItemInfo* pImgGTAInfo )
 {
     // Check is player.img 
     if ( pImgGTAInfo->ucImgId != 5 )
@@ -176,50 +163,6 @@ bool _cdecl OnCStreaming_RequestModel_Mid ( int flags, SImgGTAItemInfo* pImgGTAI
     return true;
 }
 
-// Hook info
-#define HOOKPOS_CStreaming_RequestModel_Mid             0x040895A
-#define HOOKSIZE_CStreaming_RequestModel_Mid            5
-DWORD RETURN_CStreaming_RequestModel_MidA               = 0x0408960;
-DWORD RETURN_CStreaming_RequestModel_MidB               = 0x0408990;
-void _declspec(naked) HOOK_CStreaming_RequestModel_Mid()
-{
-    _asm
-    {
-        pushad
-        push    esi
-        push    ebx
-        call    OnCStreaming_RequestModel_Mid
-        add     esp, 4*2
-        cmp     al, 0
-        jnz     skip
-
-        // Continue with standard code
-        popad
-        mov     eax, ds:0x08E4C58
-        push    eax
-        jmp     RETURN_CStreaming_RequestModel_MidA
-
-
-        // Handle load here
-skip:
-        popad
-        pushad
-
-        mov     eax, 0
-        push    eax
-        mov     eax, iReturnFileId
-        push    eax
-        mov     eax, pReturnBuffer
-        push    eax
-        call    FUNC_CStreamingConvertBufferToObject
-        add     esp, 4*3
-
-        popad
-        jmp     RETURN_CStreaming_RequestModel_MidB
-    }
-}
-
-
 //////////////////////////////////////////////////////////////////////////////////////////
 //
 // Setup hooks
@@ -227,5 +170,4 @@ skip:
 //////////////////////////////////////////////////////////////////////////////////////////
 void CRenderWareSA::StaticSetClothesReplacingHooks( void )
 {
-    EZHookInstall( CStreaming_RequestModel_Mid );
 }

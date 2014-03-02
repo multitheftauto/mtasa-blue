@@ -161,5 +161,28 @@ public:
 #include "CRenderWareSA.render.h"
 #include "CRenderWareSA.rwstats.h"
 
+namespace ClothesReplacing
+{
+    // a.k.a. CModelLoadInfoSA
+    struct SImgGTAItemInfo
+    {
+        ushort    usNext;
+        ushort    usPrev;
+
+        ushort  uiUnknown1;         // Parent ?
+        uchar   uiUnknown2;         // 0x12 when loading, 0x02 when finished loading
+        uchar   ucImgId;
+
+        int     iBlockOffset;
+        int     iBlockCount;
+        uint    uiLoadflag;         // 0-not loaded  2-requested  3-loaded  1-processed
+    };
+
+    extern int      iReturnFileId;
+    extern char*    pReturnBuffer;
+}
+
+// Exports (including from sub modules that have no headers).
+bool _cdecl OnCStreaming_RequestModel_Mid ( int flags, ClothesReplacing::SImgGTAItemInfo* pImgGTAInfo );
 
 #endif //__CRENDERWARESA

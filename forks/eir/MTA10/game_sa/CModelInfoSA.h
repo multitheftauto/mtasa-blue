@@ -173,4 +173,7 @@ private:
     void                            RwSetSupportedUpgrades      ( RwFrame * parent, DWORD dwModel );
 };
 
+// Exports.
+bool OnMY_CFileLoader_LoadCollisionFile_Mid ( int iModelId );
+
 #endif

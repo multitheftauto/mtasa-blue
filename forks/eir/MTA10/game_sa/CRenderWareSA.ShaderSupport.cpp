@@ -754,30 +754,6 @@ void OnMY_RwTextureDestroy_Mid( RwTexture* pTexture )
     pGame->GetRenderWare()->SpecialRemovedTexture( pTexture );
 }
 
-// Hook info
-#define HOOKPOS_RwTextureDestroy_Mid_US     0x07F3834
-#define HOOKSIZE_RwTextureDestroy_Mid_US    5
-#define HOOKPOS_RwTextureDestroy_Mid_EU     0x07F3874
-#define HOOKSIZE_RwTextureDestroy_Mid_EU    5
-DWORD RETURN_RwTextureDestroy_Mid_US =      0x07F3839;
-DWORD RETURN_RwTextureDestroy_Mid_EU =      0x07F3879;
-DWORD RETURN_RwTextureDestroy_Mid_BOTH =    0;
-void _declspec(naked) HOOK_RwTextureDestroy_Mid ()
-{
-    _asm
-    {
-        pushad
-        push    esi
-        call    OnMY_RwTextureDestroy_Mid
-        add     esp, 4*1
-        popad
-
-        push    0x08E23CC
-        jmp     RETURN_RwTextureDestroy_Mid_BOTH
-    }
-}
-
-
 //////////////////////////////////////////////////////////////////////////////////////////
 //
 // RwIm3DRenderIndexedPrimitive
@@ -1010,7 +986,6 @@ inner:
 void CRenderWareSA::StaticSetHooks( void )
 {
    EZHookInstall( RwTextureSetName );
-   EZHookInstall( RwTextureDestroy_Mid );
    EZHookInstall( RwIm3DRenderIndexedPrimitive );
    EZHookInstall( RwIm3DRenderPrimitive );
    EZHookInstall( RwIm2DRenderIndexedPrimitive );

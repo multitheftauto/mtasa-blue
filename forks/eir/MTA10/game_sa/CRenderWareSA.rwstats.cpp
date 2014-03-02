@@ -39,8 +39,10 @@ void OnMY_RwTextureCreate_Post( RwTexture* pTexture, DWORD calledFrom )
 //////////////////////////////////////////////////////////////////////////////////////////
 void OnMY_RwTextureDestroy( RwTexture* pTexture, DWORD calledFrom )
 {
-    if ( pTexture->refs == 1 )
-        ms_Stats.uiTextures--;
+    ms_Stats.uiTextures--;
+
+    // Call other things that want to keep track of textures.
+    OnMY_RwTextureDestroy_Mid( pTexture );
 }
 
 static RwTexture* __cdecl _RwTextureStatsConstructor( RwTexture *tex, size_t pluginOffset )
@@ -110,8 +112,7 @@ void OnMY_RwGeometryCreate_Post( RwGeometry* pGeometry, DWORD calledFrom )
 //////////////////////////////////////////////////////////////////////////////////////////
 void OnMY_RwGeometryDestroy( DWORD calledFrom, RwGeometry* pGeometry )
 {
-    if ( pGeometry->refs == 1 )
-        ms_Stats.uiGeometries--;
+    ms_Stats.uiGeometries--;
 }
 
 static RwGeometry* __cdecl _RpGeometryStatsConstructor( RpGeometry *geom, size_t pluginOffset )
