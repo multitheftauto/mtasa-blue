@@ -61,7 +61,8 @@ CCredits::CCredits ( void )
                               "Iztas\n"
                               "impulze\n"
                               "JoeBullet\n"
-                              "\n"
+                              "sbx320\n"
+                              "Jusonex\n"
                               "\n";
 
     m_strCredits +=           _("Game Design / Scripting");
@@ -105,7 +106,25 @@ CCredits::CCredits ( void )
                               "tvc\n"
                               "Audifire\n"
                               "Kayl\n"
-                              "\n"
+                              "mickdermack\n"
+                              "Fabio(GNR)\n"
+                              "LarSoWiTsH\n"
+                              "qaisjp\n"
+                              "dvarnai\n"
+                              "Loooop\n"
+                              "Lex128\n"
+                              "x0rh4x\n"
+                              "guix\n"
+                              "[GP_A]XetaQuake\n"
+                              "asturel\n"
+                              "FrankZZ\n"
+                              "GA_Justus\n"
+                              "John_Michael\n"
+                              "-ffs-Sniper\n"
+                              "W\n"
+                              "TheKiller 'Dutchman' 101\n"
+                              "Fedor Sinev\n"
+                              "\n";
                               "\n";
 
     m_strCredits +=           _("Special Thanks");
@@ -124,6 +143,11 @@ CCredits::CCredits ( void )
                               "Pugwipe\n"
                               "The_GTA\n"
                               "Phatlooser\n"
+                              "Dwayne 'The 'Woovie' Rock' Johnson\n"
+                              "max 'Hobo Pie' Power\n"
+                              "Rob 'Sugar Daddy' Pooley\n"
+                              "diegofkda\n"
+                              "Ren712\n"
                               "\n"
                               "\n"
                              
