@@ -336,6 +336,18 @@ void OnMY_psGrabScreen_GetRect( HWND hWnd, LPRECT pRect )
     LPPOINT pPoints = (LPPOINT)pRect;
     ClientToScreen( hWnd, pPoints );
     ClientToScreen( hWnd, pPoints + 1 );
+
+    // Clip to desktop
+    RECT desktopRect;
+    GetWindowRect( GetDesktopWindow(), &desktopRect );
+    pRect->left = Max( pRect->left, desktopRect.left );
+    pRect->top = Max( pRect->top, desktopRect.top );
+    pRect->right = Min( pRect->right, desktopRect.right );
+    pRect->bottom = Min( pRect->bottom, desktopRect.bottom );
+
+    // Ensure at least 1 pixel 
+    pRect->bottom = Max( pRect->bottom, pRect->top + 1 );
+    pRect->right = Max( pRect->right, pRect->left + 1 );
 }
 
 bool OnMY_psGrabScreen_ShouldUseRect( void )
