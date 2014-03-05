@@ -28,6 +28,8 @@ CResource::CResource ( unsigned short usNetID, const char* szResourceName, CClie
     m_uiScriptID = CIdArray::PopUniqueId ( this, EIdClass::RESOURCE );
     m_usNetID = usNetID;
     m_bActive = false;
+    m_bStarting = true;
+    m_bStopping = false;
     m_bInDownloadQueue = false;
     m_bShowingCursor = false;
     m_usRemainingNoClientCacheScripts = 0;
@@ -327,6 +329,7 @@ void CResource::Load ( CClientEntity *pRootEntity )
 
     // Set active flag
     m_bActive = true;
+    m_bStarting = false;
 
     // Did we get a resource root entity?
     if ( m_pResourceEntity )
@@ -338,6 +341,29 @@ void CResource::Load ( CClientEntity *pRootEntity )
     }
     else
         assert ( 0 );
+}
+
+
+void CResource::Stop( void )
+{
+    m_bStarting = false;
+    m_bStopping = true;
+    CLuaArguments Arguments;
+    Arguments.PushResource ( this );
+    m_pResourceEntity->CallEvent ( "onClientResourceStop", Arguments, true );
+}
+
+
+SString CResource::GetState ( void )
+{
+    if ( m_bStarting )
+        return "starting";
+    else if ( m_bStopping ) 
+        return "stopping";
+    else if ( m_bActive ) 
+        return "running";
+    else
+        return "loaded";
 }
 
 

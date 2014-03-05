@@ -388,6 +388,27 @@ int CLuaFunctionDefs::GetResourceExportedFunctions ( lua_State *luaVM )
 }
 
 
+int CLuaFunctionDefs::GetResourceState ( lua_State* luaVM )
+{
+//  string getResourceState ( resource theResource )
+    CResource* pResource;
+    
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pResource );
+
+    if ( !argStream.HasErrors ( ) )
+    {
+        lua_pushstring ( luaVM, pResource->GetState() );
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
 int CLuaFunctionDefs::LoadString( lua_State* luaVM )
 {
 //  func,err loadstring( string text[, string name] )
