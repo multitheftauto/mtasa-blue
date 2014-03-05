@@ -27,7 +27,7 @@ public:
         MODE_CREATE,
     };
 
-                            CScriptFile             ( CResource* pResource, const char* szFilename, unsigned long ulMaxSize );
+                            CScriptFile             ( uint uiScriptId, const char* szFilename, unsigned long ulMaxSize );
                             ~CScriptFile            ( void );
 
     // Functions required by CElement
@@ -54,7 +54,7 @@ public:
 
 private:
     FILE*                   m_pFile;
-    CResource*              m_pResource;
+    uint                    m_uiScriptId;
     std::string             m_strFilename;
     unsigned long           m_ulMaxSize;
 };
