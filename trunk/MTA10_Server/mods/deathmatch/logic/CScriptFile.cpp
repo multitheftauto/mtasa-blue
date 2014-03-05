@@ -12,12 +12,12 @@
 
 #include "StdInc.h"
 
-CScriptFile::CScriptFile ( CResource* pResource, const char* szFilename, unsigned long ulMaxSize ) : CElement ( NULL )
+CScriptFile::CScriptFile ( uint uiScriptId, const char* szFilename, unsigned long ulMaxSize ) : CElement ( NULL )
 {
     // Init
     m_iType = CElement::SCRIPTFILE;
     SetTypeName ( "file" );
-    m_pResource = pResource;
+    m_uiScriptId = uiScriptId;
     m_pFile = NULL;
     m_strFilename = szFilename ? szFilename : "";
     m_ulMaxSize = ulMaxSize;
@@ -62,8 +62,12 @@ bool CScriptFile::Load ( CResource* pResourceForFilePath, eMode Mode )
         }
 
         // Return whether we successfully opened it or not
-        if ( m_pFile != NULL && m_pResource->GetVirtualMachine() )
-            m_pResource->GetVirtualMachine()->OnOpenFile();
+        if ( m_pFile )
+        {
+            CResource* pResource = g_pGame->GetResourceManager ()->GetResourceFromScriptID( m_uiScriptId );
+            if ( pResource && pResource->GetVirtualMachine() )
+                pResource->GetVirtualMachine()->OnOpenFile( m_strFilename );
+        }
         return m_pFile != NULL;
     }
 
@@ -80,8 +84,9 @@ void CScriptFile::Unload ( void )
         // Close the file
         fclose ( m_pFile );
         m_pFile = NULL;
-        if ( m_pResource->GetVirtualMachine() )
-            m_pResource->GetVirtualMachine()->OnCloseFile();
+        CResource* pResource = g_pGame->GetResourceManager ()->GetResourceFromScriptID( m_uiScriptId );
+        if ( pResource && pResource->GetVirtualMachine() )
+            pResource->GetVirtualMachine()->OnCloseFile( m_strFilename );
     }
 }
 

@@ -81,13 +81,13 @@ public:
     void                            SaveXML                 ( CXMLNode * pRootNode );
     bool                            XMLExists               ( CXMLFile* pFile );
     unsigned long                   GetXMLFileCount         ( void ) const                  { return m_XMLFiles.size (); };
-    unsigned long                   GetOpenFileCount        ( void ) const                  { return m_uiOpenFileCount; };
+    unsigned long                   GetOpenFileCount        ( void ) const                  { return m_OpenFilenameList.size(); };
     unsigned long                   GetTimerCount           ( void ) const                  { return m_pLuaTimerManager ? m_pLuaTimerManager->GetTimerCount () : 0; };
     unsigned long                   GetElementCount         ( void ) const                  { return m_pResource && m_pResource->GetElementGroup () ? m_pResource->GetElementGroup ()->GetCount () : 0; };
     unsigned long                   GetTextDisplayCount     ( void ) const                  { return m_Displays.size (); };
     unsigned long                   GetTextItemCount        ( void ) const                  { return m_TextItems.size (); };
-    void                            OnOpenFile              ( void );
-    void                            OnCloseFile             ( void )                        { m_uiOpenFileCount--; }
+    void                            OnOpenFile              ( const SString& strFilename );
+    void                            OnCloseFile             ( const SString& strFilename );
 
     CTextDisplay *                  CreateDisplay           ( void );
     void                            DestroyDisplay          ( CTextDisplay * pDisplay );
@@ -143,7 +143,7 @@ private:
     CElapsedTime                    m_FunctionEnterTimer;
     CElapsedTimeApprox              m_WarningTimer;
     uint                            m_uiPCallDepth;
-    uint                            m_uiOpenFileCount;
+    std::vector < SString >         m_OpenFilenameList;
     uint                            m_uiOpenFileCountWarnThresh;
     uint                            m_uiOpenXMLFileCountWarnThresh;
 
