@@ -66,6 +66,7 @@ namespace SharedUtil
     unsigned int    HashString                  ( const char* szString, unsigned int length );
 
     SString         ConvertDataToHexString      ( const void* pData, uint uiLength );
+    void            ConvertHexStringToData      ( const SString& strString, void* pOutData, uint uiLength );
     void            GenerateSha256              ( const void* pData, uint uiLength, uchar output[32] );
     SString         GenerateSha256HexString     ( const void* pData, uint uiLength );
     SString         GenerateSha256HexString     ( const SString& strData );
