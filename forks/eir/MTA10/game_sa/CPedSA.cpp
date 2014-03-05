@@ -18,6 +18,18 @@
 extern CGameSA* pGame;
 int g_bOnlyUpdateRotations = false;
 
+bool __thiscall CPedSAInterface::IsPlayer( void )
+{
+    CPedSA *ped = Pools::GetPed( this );
+
+    if ( ped )
+    {
+        return ( dynamic_cast <CPlayerPedSA*> ( ped ) != NULL );
+    }
+
+    return false;
+}
+
 CPedSA::CPedSA (  ): m_pPedIntelligence ( NULL ), m_pPedInterface ( NULL ), m_pPedSound ( NULL ), m_iCustomMoveAnim( 0 )
 {
     DEBUG_TRACE("CPedSA::CPedSA(  )");
@@ -38,8 +50,6 @@ CPedSA::CPedSA( CPedSAInterface * pPedInterface ) :
     MemSetFast ( this->m_pWeapons, 0, sizeof ( CWeaponSA* ) * WEAPONSLOT_MAX );
 }
 
-// The_GTA: What is this for an abomination of a function...?
-// By rule, setting a wild entity interface is impossible to a ped!
 VOID CPedSA::SetInterface( CEntitySAInterface * intInterface )
 {
     if ( m_pInterface )

@@ -20,6 +20,8 @@
 #include "Common.h"
 #include "CPlayerPedSA.h"
 
+#define     CLASS_CPlayerInfo               0xB7CD98    // ##SA##
+
 #define FUNC_MakePlayerSafe                         0x56e870
 #define FUNC_CancelPlayerEnteringCars               0x56e860
 #define FUNC_ArrestPlayer                           0x56e5d0
@@ -53,6 +55,15 @@ class CPlayerCrossHairSAInterface
 public:
     bool    bActivated;
     float   TargetX, TargetY;   // -1 ... 1 on screen
+};
+
+enum ePlayerState : unsigned char
+{
+    PS_PLAYING,
+    PS_DEAD,
+    PS_ARRESTED,
+    PS_FAILED_MISSION,
+    PS_QUIT
 };
 
 
@@ -245,6 +256,31 @@ public:
 
     bool        m_bParachuteReferenced;
     DWORD       m_nRequireParachuteTimer;
+};
+
+// Internal function exports.
+CPlayerPedSAInterface* __cdecl GetPlayerPed         ( int index );
+CVehicleSAInterface* __cdecl GetPlayerVehicle       ( int index, bool excludeRemote );
+const CVector& __cdecl FindPlayerCoords             ( CVector& pos, int id );
+const CVector& __cdecl FindPlayerCenterOfWorld      ( int id );
+float __cdecl FindPlayerHeading                     ( int id );
+
+// Module initialization.
+void PlayerInfo_Init( void );
+void PlayerInfo_Shutdown( void );
+
+// Used for extensional functionality.
+namespace PlayerInfo
+{
+    inline CPlayerInfoSAInterface& GetInfo( int id )
+    {
+        static unsigned char* const VAR_currentPlayer = (unsigned char*)0x00B7CD74;
+
+        if ( id < 0 )
+            id = *VAR_currentPlayer;
+
+        return *((CPlayerInfoSAInterface*)CLASS_CPlayerInfo + id);
+    }
 };
 
 class CPlayerInfoSA : public CPlayerInfo

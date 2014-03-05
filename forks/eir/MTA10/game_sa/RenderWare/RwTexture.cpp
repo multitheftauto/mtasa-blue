@@ -27,9 +27,9 @@
 =========================================================*/
 void RwTexture::SetName( const char *name )
 {
-    (*ppRwInterface)->m_strncpy( this->name, name, sizeof(this->name) );
+    RenderWare::GetInterface()->m_strncpy( this->name, name, sizeof(this->name) );
 
-    if ( (*ppRwInterface)->m_strlen( this->name ) >= sizeof(this->name) )
+    if ( RenderWare::GetInterface()->m_strlen( this->name ) >= sizeof(this->name) )
     {
         RwError err;
         err.err1 = 1;

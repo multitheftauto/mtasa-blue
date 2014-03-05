@@ -104,6 +104,7 @@ CGameSA::CGameSA()
     this->m_pRenderWare             = new CRenderWareSA( version );
     this->m_pRwExtensionManager     = new CRwExtensionManagerSA;
     this->m_textureManager          = new CTextureManagerSA;
+    this->m_modelManager            = new CModelManagerSA;
     this->m_pHandlingManager        = new CHandlingManagerSA ();
     this->m_pEventList              = new CEventListSA();
     this->m_pGarages                = new CGaragesSA ( (CGaragesSAInterface *)CLASS_CGarages);
@@ -118,6 +119,7 @@ CGameSA::CGameSA()
     this->m_pWaterManager           = new CWaterManagerSA ();
     this->m_pWeaponStatsManager     = new CWeaponStatManagerSA ();
     this->m_pPointLights            = new CPointLightsSA ();
+    this->m_pExecutiveManager       = new CExecutiveManagerSA;
 
     // Initialize static (internal) extensions
     RenderWarePipeline_Init();
@@ -243,6 +245,7 @@ CGameSA::~CGameSA ( void )
     delete m_pVisibilityPlugins;
     delete m_pStreaming;
     delete m_pAnimManager;
+    delete m_modelManager;
     delete m_textureManager;
     delete m_pRwExtensionManager;
     delete m_pRenderWare;
@@ -847,4 +850,28 @@ CFile* OpenGlobalStream( const char *filename, const char *mode )
     // MTA team has voiced their concern about game directory access; TOD (topic of discussion)
     // I see this feature as optional anyway ;)
     return NULL;
+}
+
+/*=========================================================
+    NormalizeRadians
+
+    Arguments:
+        radians - angle value
+    Purpose:
+        Normalizes the radians to a comparable result and
+        returns them.
+    Binary offsets:
+        (1.0 US and 1.0 EU): 0x0053CB50
+=========================================================*/
+float __cdecl NormalizeRadians( float radians )
+{
+    radians = Clamp( -25.0f, radians, 25.0f );
+
+    while ( radians >= M_PI )
+        radians -= (float)( M_PI * 2 );
+
+    while ( radians < -M_PI )
+        radians += (float)( M_PI * 2 );
+
+    return radians;
 }

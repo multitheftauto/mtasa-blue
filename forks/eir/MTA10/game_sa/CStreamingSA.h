@@ -17,12 +17,10 @@
 #include <game/CStreaming.h>
 #include "Common.h"
 
-#define DATA_TEXTURE_BLOCK      20000
-#define DATA_COLL_BLOCK         25000
-#define DATA_IPL_BLOCK          25255
-#define DATA_PATHFIND_BLOCK     25511
-#define DATA_ANIM_BLOCK         25575
-#define DATA_RECORD_BLOCK       25755
+#include "CExecutiveManagerSA.h"
+#include "CIMGManagerSA.h"
+
+#define MAX_DEFAULT_STREAMING_ENTITIES      1000    // native limit set by R*
 
 #define FUNC_CStreaming__RequestModel                       0x4087E0
 #define FUNC_LoadAllRequestedModels                         0x40EA10
@@ -36,11 +34,10 @@
 #define MAX_RESOURCES                                       26300
 #define MAX_MODELS                                          20000
 
-#define ARRAY_StreamerRequest   0x008E4A60
 #define MAX_STREAMING_REQUESTS  16
 
 // Allocated at ARRAY_StreamerRequest
-struct streamingRequest //size: 152
+struct streamingRequest //size: 152 (native)
 {
 public:
     enum statusType : unsigned int
@@ -52,6 +49,12 @@ public:
         STREAMING_READY
     };
 
+    enum bufferingType : unsigned int
+    {
+        BUFFERING_IMG,
+        BUFFERING_CACHE
+    };
+
     int             ids[MAX_STREAMING_REQUESTS];        // 0
     size_t          bufOffsets[MAX_STREAMING_REQUESTS]; // 64, offset into the thread allocation buffer
 
@@ -61,73 +64,135 @@ public:
     unsigned int    blockCount;                         // 140
     unsigned int    count;                              // 144
     unsigned int    returnCode;                         // 148
+
+    // These members do not exist in native GTA:SA, but in MTA.
+    CFiberSA*       loaderFiber;
+
+    // Ability to choose buffering behavior (from .img, from cache, etc)
+    void*           loaderBuffer;
+    bufferingType   bufBehavior;
 };
 
 namespace Streaming
 {
-    // Allocated dynamically in the streaming initialization
-    struct syncSemaphore    //size: 48
+    // Streaming uses a sorted entity activity list.
+    // Rockstar did not include any sorting though.
+    // * Yes, templates are hard to deduce from the assembly code,
+    // but you see it is possible.
+    struct streamingChainInfo
     {
-        unsigned int    blockOffset;            // 0
-        unsigned int    blockCount;             // 4
-        void*           buffer;                 // 8
-        BYTE            pad;                    // 12
-        bool            terminating;            // 13
-        bool            threadActive;           // 14, true if the streaming thread is working on this
-        BYTE            pad2;                   // 15
-        unsigned int    resultCode;             // 16
-        HANDLE          semaphore;              // 20
-        HANDLE          file;                   // 24
-        OVERLAPPED      overlapped;             // 28
+        void InitFirst( void )
+        {
+        }
+        
+        void InitLast( void )
+        {
+        }
+
+        bool operator < ( const streamingChainInfo& right )
+        {
+            // There is nothing to sort.
+            return false;
+        }
+
+        class CEntitySAInterface *entity;
+
+        inline void Execute( void )
+        { }
     };
+    typedef CRenderChainInterface <streamingChainInfo> streamingEntityChain_t;
+    typedef streamingEntityChain_t::renderChain streamingEntityReference_t;
 
-    // There is a maximum of 2 streaming requests internally in the engine.
-    // Those slots are parallel to the maximum syncSemaphores.
-    // streamingRequest contains model ids which request data through the
-    // IMG resource loader. It is like a region of memory requested from
-    // the file of specific size. All of the resources inside this region
-    // can be requested very quickly. That is instead of requesting every
-    // resource individually (because HDDs/disk drives are slow).
-    inline streamingRequest&    GetStreamingRequest( unsigned int id )
+    extern streamingEntityChain_t gcEntityChain;
+
+    inline streamingEntityChain_t&  GetStreamingEntityChain( void )
     {
-        if ( id > 2 )
-            __asm int 3
-
-        return *( (streamingRequest*)ARRAY_StreamerRequest + id );
+        return gcEntityChain;
     }
 
     // Public functions
     void __cdecl RequestModel( modelId_t id, unsigned int flags );
     void __cdecl FreeModel( modelId_t id );
-    void __cdecl LoadAllRequestedModels( bool onlyPriority );
+    void __cdecl RequestDirectResource( modelId_t model, unsigned int blockOffset, unsigned int blockCount, unsigned int imgId, unsigned int reqFlags );
+    void __cdecl RequestSpecialModel( modelId_t model, const char *tex, unsigned int channel );
+    void __cdecl CleanUpLoadQueue( void );
+    void __cdecl Update( void );
+    void __cdecl FlushRequestList( void );
+
+    // MTA extensions.
+    bool    IsInsideStreamingUpdate( void );
+
+    // General MTA management.
+    void    Reset( void );
 };
 
 class CStreamingSA : public CStreaming
 {
 public:
-                    CStreamingSA                ( void );
-                    ~CStreamingSA               ( void );
+                    CStreamingSA                    ( void );
+                    ~CStreamingSA                   ( void );
 
-    void            RequestModel                ( modelId_t id, unsigned int flags );
-    void            FreeModel                   ( modelId_t id );
-    void            LoadAllRequestedModels      ( bool onlyPriority = false, const char *debugLoc = NULL );
-    bool            HasModelLoaded              ( modelId_t id );
-    bool            IsModelLoading              ( modelId_t id );
-    void            WaitForModel                ( modelId_t id );
-    void            RequestAnimations           ( int idx, unsigned int flags );
-    bool            HaveAnimationsLoaded        ( int idx );
-    void            RequestVehicleUpgrade       ( modelId_t model, unsigned int flags );
-    bool            HasVehicleUpgradeLoaded     ( int model );
-    void            RequestSpecialModel         ( modelId_t model, const char *tex, unsigned int channel );
+    // Resource management exports.
+    void            RequestModel                    ( modelId_t id, unsigned int flags );
+    void            FreeModel                       ( modelId_t id );
+    void            LoadAllRequestedModels          ( bool onlyPriority = false, const char *debugLoc = NULL );
+    bool            HasModelLoaded                  ( modelId_t id );
+    bool            IsModelLoading                  ( modelId_t id );
+    void            WaitForModel                    ( modelId_t id );
+    void            RequestAnimations               ( int idx, unsigned int flags );
+    bool            HaveAnimationsLoaded            ( int idx );
+    void            RequestVehicleUpgrade           ( modelId_t model, unsigned int flags );
+    bool            HasVehicleUpgradeLoaded         ( int model );
+    void            RequestSpecialModel             ( modelId_t model, const char *tex, unsigned int channel );
 
-    void            SetRequestCallback          ( streamingRequestCallback_t callback );
-    void            SetLoadCallback             ( streamingLoadCallback_t callback );
-    void            SetFreeCallback             ( streamingFreeCallback_t callback );
+    // Utility methods.
+    unsigned int    GetActiveStreamingEntityCount   ( void ) const;
+    unsigned int    GetFreeStreamingEntitySlotCount ( void ) const;
+    bool            IsEntityGCManaged               ( CEntity *entity ) const;
+
+    entityList_t    GetActiveStreamingEntities      ( void );
+
+    CEntitySA*      GetStreamingFocusEntity         ( void );
+
+    void            SetWorldStreamingEnabled        ( bool enabled );
+    bool            IsWorldStreamingEnabled         ( void ) const;
+
+    void            SetInfiniteStreamingEnabled     ( bool enabled );
+    bool            IsInfiniteStreamingEnabled      ( void ) const;
+    void            SetStrictNodeDistribution       ( bool enabled );
+    bool            IsStrictNodeDistributionEnabled ( void ) const;
+    void            SetGarbageCollectOnDemand       ( bool enabled );
+    bool            IsGarbageCollectOnDemandEnabled ( void ) const;
+    void            SetStreamingNodeStealingAllowed ( bool enabled );
+    bool            IsStreamingNodeStealingAllowed  ( void ) const;
+
+    void            EnableFiberedLoading            ( bool enable );
+    bool            IsFiberedLoadingEnabled         ( void ) const;
+
+    void            SetFiberedPerfMultiplier        ( double mult );
+    double          GetFiberedPerfMultiplier        ( void ) const;
+
+    void            GetStreamingInfo                ( streamingInfo& info ) const;
+
+    bool            IsInsideLoadAllRequestedModels  ( void ) const;
+
+    // Useful resource system event callbacks.
+    void            SetRequestCallback              ( streamingRequestCallback_t callback );
+    void            SetLoadCallback                 ( streamingLoadCallback_t callback );
+    void            SetFreeCallback                 ( streamingFreeCallback_t callback );
 };
 
 #include "CStreamingSA.init.h"
 #include "CStreamingSA.utils.h"
 #include "CStreamingSA.runtime.h"
+#include "CStreamingSA.sectorize.h"
+#include "CStreamingSA.collision.h"
+#include "CStreamingSA.clump.h"
+#include "CStreamingSA.textures.h"
+#include "CStreamingSA.ipl.h"
+#include "CStreamingSA.loader.h"
+#include "CStreamingSA.cache.h"
+#include "CStreamingSA.gc.h"
 
 // Internal class used to store model indices in
 // Somewhat deprecated type.
@@ -212,10 +277,6 @@ private:
 #define FLAG_PRIORITY           0x10
 #define FLAG_NODEPENDENCY       0x0E
 
-#ifdef RENDERWARE_VIRTUAL_INTERFACES
 extern class CRwObjectSA *g_replObjectNative[DATA_TEXTURE_BLOCK];
-#endif //RENDERWARE_VIRTUAL_INTERFACES
-extern class CColModelSA *g_colReplacement[DATA_TEXTURE_BLOCK];
-extern class CColModelSAInterface *g_originalCollision[DATA_TEXTURE_BLOCK];
 
 #endif

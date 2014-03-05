@@ -11,23 +11,3 @@
 *****************************************************************************/
 
 #include "StdInc.h"
-
-void* CPtrNodeSingleSA::operator new( size_t )
-{
-    return (*ppPtrNodeSinglePool)->Allocate();
-}
-
-void CPtrNodeSingleSA::operator delete( void *ptr )
-{
-    (*ppPtrNodeSinglePool)->Free( (CPtrNodeSingleSA*)ptr );
-}
-
-void* CPtrNodeDoubleSA::operator new( size_t )
-{
-    return (*ppPtrNodeDoublePool)->Allocate();
-}
-
-void CPtrNodeDoubleSA::operator delete( void *ptr )
-{
-    (*ppPtrNodeDoublePool)->Free( (CPtrNodeDoubleSA*)ptr );
-}

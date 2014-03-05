@@ -42,7 +42,7 @@ void RpMaterial::SetTexture( RwTexture *tex )
 
 RpMaterials::RpMaterials( unsigned int max )
 {
-    data = (RpMaterial**)pRwInterface->m_memory.m_malloc( sizeof(long) * max, 0 );
+    data = (RpMaterial**)RenderWare::GetInterface()->m_memory.m_malloc( sizeof(long) * max, 0 );
 
     max = max;
     entries = 0;
@@ -55,7 +55,7 @@ RpMaterials::~RpMaterials( void )
         for ( unsigned int n = 0; n < entries; n++ )
             RpMaterialDestroy( data[n] );
 
-        pRwInterface->m_memory.m_free( data );
+        RenderWare::GetInterface()->m_memory.m_free( data );
 
         data = NULL;
     }

@@ -15,12 +15,14 @@
 // use this to check if you're using SA or VC headers
 #define GTA_SA
 
+// notifies the environment that we compile for the Eir fork.
+#define _MTA_BLUE
+
 typedef void ( InRenderer ) ( void );
 
 #include "Common.h"
 
 #include "CRenderWare.h"
-#include "CTextureManager.h"
 #include "C3DMarkers.h"
 #include "CAERadioTrackManager.h"
 #include "CAnimBlendAssociation.h"
@@ -70,6 +72,8 @@ typedef void ( InRenderer ) ( void );
 #include "CText.h"
 #include "CTheCarGenerators.h"
 #include "CVisibilityPlugins.h"
+#include "RenderWare/include.h"
+#include "CTextureManager.h"
 #include "CWaterManager.h"
 #include "CWeaponStatManager.h"
 #include "CWeather.h"

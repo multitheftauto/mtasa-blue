@@ -58,7 +58,7 @@ void RpGeometry::UnlinkFX( void )
     if ( _2dfx )
     {
         // Clean the 2dfx structure
-        pRwInterface->m_memory.m_free( _2dfx );
+        RenderWare::GetInterface()->m_memory.m_free( _2dfx );
         _2dfx = NULL;
     }
 }

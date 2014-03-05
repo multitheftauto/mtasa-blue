@@ -55,7 +55,7 @@ void CVehicleSAInterface::SetupRender( CVehicleSA *mtaVeh )
     // Wire in the hook done by MTA team.
     OnMY_CAutomobile_CustomCarPlate_BeforeRenderingStart( this, info );
 
-    (*ppRwInterface)->m_deviceCommand( (eRwDeviceCmd)20, 1 );
+    RenderWare::GetInterface()->m_deviceCommand( (eRwDeviceCmd)20, 1 );
 
     if ( !m_pCustomPlateTexture )
         SetPlateTextureForRendering( info );
@@ -74,7 +74,7 @@ void CVehicleSAInterface::SetupRender( CVehicleSA *mtaVeh )
         {
             if ( m_paintjobTexture )
             {
-                (*ppTxdPool)->Get( m_paintjobTxd )->Dereference();
+                TextureManager::GetTxdPool()->Get( m_paintjobTxd )->Dereference();
 
                 m_paintjobTexture = NULL;
             }
@@ -83,7 +83,7 @@ void CVehicleSAInterface::SetupRender( CVehicleSA *mtaVeh )
             m_paintjobTxd = remapId;
             m_queuePaintjob = 0xFFFF;
 
-            CTxdInstanceSA *txdInst = (*ppTxdPool)->Get( remapId );
+            CTxdInstanceSA *txdInst = TextureManager::GetTxdPool()->Get( remapId );
 
             txdInst->Reference();
 
@@ -128,7 +128,7 @@ void CVehicleSAInterface::LeaveRender( void )
     OnMY_CAutomobile_CustomCarPlate_AfterRenderingStop( modelInfo );
 
     // Change texture stage
-    (*ppRwInterface)->m_deviceCommand( (eRwDeviceCmd)20, 2 );
+    RenderWare::GetInterface()->m_deviceCommand( (eRwDeviceCmd)20, 2 );
 
     // Restore clump data
     RpClumpRestoreVehicleMaterials( (RpClump*)GetRwObject() );

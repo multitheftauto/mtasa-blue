@@ -144,7 +144,7 @@ static RwList <RwFrame> mtaFrameDirtyList;
 
 static unsigned int __cdecl RwFrameSyncDirty( void )
 {
-    RwFrameSyncDirtyList( (*ppRwInterface)->m_nodeRoot );
+    RwFrameSyncDirtyList( RenderWare::GetInterface()->m_nodeRoot );
     RwFrameSyncDirtyList( mtaFrameDirtyList );  // we keep our own list for security reasons.
     return true;
 }

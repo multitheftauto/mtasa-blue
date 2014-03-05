@@ -101,7 +101,7 @@ typedef int                     (__cdecl *RpGeometryDestroy_t)                  
 
 // Atomic functions
 typedef RpAtomic*               (__cdecl *RpAtomicCreate_t)                     (void);
-typedef RpAtomic*               (__cdecl *RpAtomicClone_t)                      (RpAtomic *atomic);
+typedef RpAtomic*               (__cdecl *RpAtomicClone_t)                      (const RpAtomic *atomic);
 typedef RpAtomic*               (__cdecl *RpAtomicSetGeometry_t)                (RpAtomic *atomic, RpGeometry *geometry, unsigned int flags);
 typedef RpAtomic*               (__cdecl *RpAtomicSetFrame_t)                   (RpAtomic *atomic, RwFrame *frame);
 typedef RpAtomic*               (__cdecl *RpAtomicRender_t)                     (RpAtomic *atomic);
@@ -121,7 +121,7 @@ typedef RwCamera*               (__cdecl *RwCameraClone_t)                      
 typedef void                    (__cdecl *RwCameraDestroy_t)                    (RwCamera *camera);
 
 // Clump functions
-typedef RpClump *               (__cdecl *RpClumpClone_t)                       (RpClump *clone);
+typedef RpClump *               (__cdecl *RpClumpClone_t)                       (const RpClump *clone);
 typedef RpClump*                (__cdecl *RpClumpAddAtomic_t)                   (RpClump *clump, RpAtomic *atomic);
 typedef RpClump*                (__cdecl *RpClumpAddLight_t)                    (RpClump *clump, RpLight *light);
 typedef int                     (__cdecl *RpClumpGetNumAtomics_t)               (RpClump *clump);
@@ -169,6 +169,12 @@ typedef void                    (__cdecl *RtDictDestroy_t)                      
 // Animation functions
 typedef bool                    (__cdecl *RwAnimationInit_t)                    (RpAnimation *anim, RwExtension *ext);
 typedef bool                    (__cdecl *RwSkeletonUpdate_t)                   (RpSkeleton *skel);
+
+// Memory functions
+typedef void*                   (__cdecl *RwMalloc_t)                           (size_t memSize);
+typedef void*                   (__cdecl *RwRealloc_t)                          (void *memptr, size_t newSize);
+typedef void                    (__cdecl *RwFree_t)                             (void *memptr);
+typedef void                    (__cdecl *RwCalloc_t)                           (unsigned int count, unsigned int blockSize);
 
 /*****************************************************************************/
 /** Renderware function mappings                                            **/
@@ -333,6 +339,12 @@ RWFUNC ( RtDictDestroy_t                            RtDictDestroy               
 RWFUNC ( RwAnimationInit_t                          RwAnimationInit                         , (RwAnimationInit_t)                       invalid_ptr )
 RWFUNC ( RwSkeletonUpdate_t                         RwSkeletonUpdate                        , (RwSkeletonUpdate_t)                      invalid_ptr )
 
+// Memory functions
+RWFUNC ( RwMalloc_t                                 RwMalloc                                , (RwMalloc_t)                              invalid_ptr )
+RWFUNC ( RwRealloc_t                                RwRealloc                               , (RwRealloc_t)                             invalid_ptr )
+RWFUNC ( RwFree_t                                   RwFree                                  , (RwFree_t)                                invalid_ptr )
+RWFUNC ( RwCalloc_t                                 RwCalloc                                , (RwCalloc_t)                              invalid_ptr )
+
 /*****************************************************************************/
 /** GTA function definitions and mappings                                   **/
 /*****************************************************************************/
@@ -341,22 +353,12 @@ typedef void                (__cdecl *LoadCollisionModel_t)             (const c
 typedef void                (__cdecl *LoadCollisionModelVer2_t)         (const char*, unsigned int, CColModelSAInterface*, const char*);
 typedef void                (__cdecl *LoadCollisionModelVer3_t)         (const char*, unsigned int, CColModelSAInterface*, const char*); // buf, bufsize, ccolmodel&, keyname
 typedef void                (__cdecl *LoadCollisionModelVer4_t)         (const char*, unsigned int, CColModelSAInterface*, const char*);    // undocumented?
-typedef bool                (__cdecl *CTxdStore_LoadTxd_t)              (unsigned int id, RwStream *filename);
-typedef void                (__cdecl *CTxdStore_RemoveTxd_t)            (unsigned int id);
-typedef void                (__cdecl *CTxdStore_RemoveRef_t)            (unsigned int id);
-typedef void                (__cdecl *CTxdStore_AddRef_t)               (unsigned int id);
-typedef RwTexDictionary*    (__cdecl *CTxdStore_GetTxd_t)               (unsigned int id);
 typedef RwTexture*          (__cdecl *CClothesBuilder_CopyTexture_t)    (RwTexture *texture);
 
 RWFUNC ( LoadCollisionModel_t           LoadCollisionModel                , (LoadCollisionModel_t)              invalid_ptr )
 RWFUNC ( LoadCollisionModelVer2_t       LoadCollisionModelVer2            , (LoadCollisionModelVer2_t)          invalid_ptr )
 RWFUNC ( LoadCollisionModelVer3_t       LoadCollisionModelVer3            , (LoadCollisionModelVer3_t)          invalid_ptr )
 RWFUNC ( LoadCollisionModelVer4_t       LoadCollisionModelVer4            , (LoadCollisionModelVer4_t)          invalid_ptr )
-RWFUNC ( CTxdStore_LoadTxd_t            CTxdStore_LoadTxd                 , (CTxdStore_LoadTxd_t)               invalid_ptr )
-RWFUNC ( CTxdStore_GetTxd_t             CTxdStore_GetTxd                  , (CTxdStore_GetTxd_t)                invalid_ptr )
-RWFUNC ( CTxdStore_RemoveTxd_t          CTxdStore_RemoveTxd               , (CTxdStore_RemoveTxd_t)             invalid_ptr )
-RWFUNC ( CTxdStore_RemoveRef_t          CTxdStore_RemoveRef               , (CTxdStore_RemoveRef_t)             invalid_ptr )
-RWFUNC ( CTxdStore_AddRef_t             CTxdStore_AddRef                  , (CTxdStore_AddRef_t)                invalid_ptr )
 RWFUNC ( CClothesBuilder_CopyTexture_t  CClothesBuilder_CopyTexture       , (CClothesBuilder_CopyTexture_t)     invalid_ptr )
 
 /*****************************************************************************/

@@ -23,7 +23,6 @@
 
 #define     MAX_MEMORY_OFFSET_1_0           0xCAF008
 
-#define     CLASS_CPlayerInfo               0xB7CD98    // ##SA##
 #define     CLASS_CCamera                   0xB6F028    // ##SA##
 #define     CLASS_CPad                      0xB73458    // ##SA##
 #define     CLASS_CGarages                  0x96C048    // ##SA##
@@ -144,6 +143,7 @@ public:
     inline CControllerConfigManagerSA   * GetControllerConfigManager()  { DEBUG_TRACE("CControllerConfigManager* GetControllerConfigManager()");return m_pControllerConfigManager; };
     inline CRenderWareSA                * GetRenderWare()           { DEBUG_TRACE("CRenderWare * GetRenderWare()");return m_pRenderWare; };
     inline CTextureManagerSA            * GetTextureManager()        { return m_textureManager; }
+    inline CModelManagerSA              * GetModelManager()          { return m_modelManager; }
     inline CHandlingManagerSA           * GetHandlingManager ()      { return m_pHandlingManager; };
     inline CAnimManagerSA               * GetAnimManager ()          { return m_pAnimManager; }
     inline CStreamingSA                 * GetStreaming ()            { return m_pStreaming; }
@@ -155,6 +155,7 @@ public:
     inline CWaterManagerSA              * GetWaterManager ()         { return m_pWaterManager; }
     inline CWeaponStatManagerSA         * GetWeaponStatManager()     { return m_pWeaponStatsManager; }
     inline CPointLightsSA               * GetPointLights ()          { return m_pPointLights; }
+    inline CExecutiveManagerSA          * GetExecutiveManager ()     { return m_pExecutiveManager; }
 
     CWeaponInfo             * GetWeaponInfo(eWeaponType weapon,eWeaponSkill skill=WEAPONSKILL_STD);
     CModelInfoSA            * GetModelInfo( DWORD dwModelID );
@@ -285,6 +286,7 @@ private:
     CRenderWareSA           * m_pRenderWare;
     CRwExtensionManagerSA   * m_pRwExtensionManager;
     CTextureManagerSA       * m_textureManager;
+    CModelManagerSA         * m_modelManager;
     CHandlingManagerSA      * m_pHandlingManager;
     CAnimManagerSA          * m_pAnimManager;
     CStreamingSA            * m_pStreaming;
@@ -296,6 +298,7 @@ private:
     CWaterManagerSA         * m_pWaterManager;
     CWeaponStatManagerSA    * m_pWeaponStatsManager;
     CPointLightsSA          * m_pPointLights;
+    CExecutiveManagerSA     * m_pExecutiveManager;
 
     CPadSA                      * m_pPad;
     CTheCarGeneratorsSA         * m_pTheCarGenerators;
@@ -348,6 +351,8 @@ extern CFileTranslator *gameFileRoot;
 
 // Utility functions
 CFile*  OpenGlobalStream( const char *filename, const char *mode );
+
+float __cdecl NormalizeRadians( float radians );
 
 #endif
 

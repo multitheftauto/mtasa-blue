@@ -63,7 +63,9 @@ RwTexture* RwTexDictionary::FindNamedTexture( const char *name )
 =========================================================*/
 RwTexDictionary* RwTexDictionaryCreate( void )
 {
-    RwTexDictionary *txd = (RwTexDictionary*)pRwInterface->m_allocStruct( pRwInterface->m_textureManager.txdStruct, 0x30016 );
+    RwInterface *rwInterface = RenderWare::GetInterface();
+
+    RwTexDictionary *txd = (RwTexDictionary*)rwInterface->m_allocStruct( rwInterface->m_textureManager.txdStruct, 0x30016 );
 
     if ( !txd )
         return NULL;
@@ -75,7 +77,7 @@ RwTexDictionary* RwTexDictionaryCreate( void )
     txd->parent = NULL;
 
     LIST_CLEAR( txd->textures.root );
-    LIST_APPEND( pRwInterface->m_textureManager.globalTxd.root, txd->globalTXDs );
+    LIST_APPEND( RenderWare::GetInterface()->m_textureManager.globalTxd.root, txd->globalTXDs );
 
     // Register the txd I guess
     RwObjectRegister( (void*)0x008E23E4, txd );

@@ -45,6 +45,8 @@ public:
 
     void                AssociateGameTranslators    ( void );
 
+    unsigned int        GetEffectQuality            ( void )            { return m_fxQuality; }
+
     BYTE                                    m_pad[80];      // 0
     unsigned int                            m_count;        // 80
     unsigned int                            m_fxQuality;    // 84

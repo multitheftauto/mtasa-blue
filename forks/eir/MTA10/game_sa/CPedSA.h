@@ -275,11 +275,13 @@ enum ePedStatus : unsigned int
     PED_STATUS_DRIVING_VEHICLE = 50
 };
 
-//padlevel: 14
+//padlevel: 15
 class CPedSAInterface : public CPhysicalSAInterface // +1420  = current vehicle   312 first byte
 {
 public:
     inline bool                     IsDrivingVehicle( void )            { return pedStatus == PED_STATUS_DRIVING_VEHICLE; }
+
+    bool __thiscall                 IsPlayer( void );
 
     BYTE                                    bPad[348];                                                  // 312
     CPedSoundSAInterface                    pedSound;                                                   // 660
@@ -323,7 +325,9 @@ public:
 
     BYTE                                    bPad4[12];                                                  // 1804
     BYTE                                    bCurrentWeaponSlot;                                         // 1816, is actually here
-    BYTE                                    bPad6[20];                                                  // 1817
+    BYTE                                    bPad6[1];                                                   // 1817
+    unsigned char                           m_unkPlayerVal;                                             // 1818
+    BYTE                                    bPad15[18];                                                 // 1819
     BYTE                                    bFightingStyle;                                             // 1837
     BYTE                                    bFightingStyleExtra;                                        // 1838
     BYTE                                    bPad7[1];                                                   // 1839

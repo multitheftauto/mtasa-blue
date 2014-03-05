@@ -4,6 +4,9 @@
 #pragma warning (disable:4409)
 #pragma warning (disable:4250)
 
+// To make the code know we compile for MTA:BLUE Eir fork.
+#define _MTA_BLUE
+
 #define NOMINMAX
 #include <windows.h>
 #define MTA_CLIENT
@@ -12,6 +15,9 @@
 #include "SharedUtil.h"
 #include "SharedUtil.MemAccess.h"
 #include <stdio.h>
+
+// Screw the windows header.
+#undef GetObject
 
 #include <algorithm>
 #include <list>
@@ -37,18 +43,20 @@
 
 // Game includes
 #include "RenderWare.h"
-#include "CModelInfoSA.h"
+#include "CFileUtilsSA.h"
+#include "CQuadTreeSA.h"
+#include "CExecutiveManagerSA.h"
 #include "CRecordingsSA.h"
 #include "CTransformationSA.h"
+#include "CModelInfoSA.h"
 #include "CEntitySA.h"
-#include "CTextureManagerSA.h"
 #include "gamesa_init.h"
 #include "Common.h"
 #include "CWorldSA.h"
 #include "CIMGManagerSA.h"
-#include "CStreamerSA.h"
-#include "CStreamingSA.h"
 #include "CPoolsSA.h"
+#include "CModelManagerSA.h"
+#include "CTextureManagerSA.h"
 #include "CClockSA.h"
 #include "CFontSA.h"
 #include "CRadarSA.h"
@@ -126,4 +134,7 @@
 #include "CWeaponStatManagerSA.h"
 #include "CShadowDataSA.h"
 #include "CBuoyancySA.h"
+#include "CCacheSA.h"
+#include "CStreamingSA.h"
+#include "CStreamerSA.h"
 #include "CGameSA.h"

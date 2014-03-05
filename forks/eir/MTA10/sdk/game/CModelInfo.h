@@ -29,6 +29,43 @@ public:
     float   fRadius;
 };
 
+struct CBounds2D
+{
+    CBounds2D( void )
+    { }
+
+    CBounds2D( float minX, float maxY, float maxX, float minY ) : m_minX( minX ), m_maxY( maxY ), m_maxX( maxX ), m_minY( minY )
+    { }
+
+    CBounds2D( const CBounds2D& right ) : m_minX( right.m_minX ), m_maxY( right.m_maxY ), m_maxX( right.m_maxX ), m_minY( right.m_minY )
+    { }
+
+    // Is bbox inside this?
+    // Method used by R*.
+    // Takes into account that min is lower vector and max is upper vector.
+    inline bool IsInside( const CBounds2D& bbox ) const
+    {
+        return ( bbox.m_minX <= m_maxX && bbox.m_maxX >= m_minX &&
+                 bbox.m_minY <= m_maxY && bbox.m_maxY >= m_minY );
+    }
+
+    inline bool IsInside( const CVector2D& pos ) const
+    {
+        return ( pos.fX >= m_minX && pos.fX <= m_maxX &&
+                 pos.fY >= m_minY && pos.fY <= m_maxY );
+    }
+
+    // Binary offset: 0x004042D0
+    inline bool ContainsPoint( const CVector2D& pos, float subtract ) const
+    {
+        return CBounds2D( m_minX - subtract, subtract + m_maxY, subtract + m_maxX, m_minY - subtract ).IsInside( pos );
+    }
+
+    // R*: fuck yea, let us confuse dem pplz by switching things 'round, and not using vectors.
+    float m_minX, m_maxY;
+    float m_maxX, m_minY;
+};
+
 enum eVehicleUpgradePosn
 {
     VEHICLE_UPGRADE_POSN_BONET = 0,

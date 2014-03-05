@@ -38,7 +38,8 @@ public:
             number of entries which this chain can hold.
         Note:
             Multiple constructors have been inlined into
-            HOOK_InitRenderChains.
+            HOOK_InitRenderChains. This sorted list is used in
+            CStreaming::Init.
     =========================================================*/
     __forceinline CRenderChainInterface( unsigned int max )
     {
@@ -75,6 +76,26 @@ public:
     }
 
     /*=========================================================
+        CRenderChainInterface::AllocateNew (MTA extension)
+
+        Purpose:
+            Allocates a new heap node into the system. Due to limitations,
+            we cannot free this memory. It will be floating around
+            and during the lifetime of this class never be wasted.
+        Note:
+            The_GTA: I made this to fix streaming issues.
+    =========================================================*/
+    void AllocateNew( void )
+    {
+        renderChain *newItem = new renderChain;
+
+        if ( !newItem )
+            return;
+
+        LIST_APPEND( m_renderStack, *newItem );
+    }
+
+    /*=========================================================
         CRenderChainInterface::PushRender
 
         Arguments:
@@ -96,37 +117,37 @@ public:
         return ( ( item = m_renderStack.prev ) == &m_renderLast ) ? NULL : item;
     }
 
-    __forceinline bool PushRenderFirst( depthLevel *level )
+    __forceinline renderChain* PushRenderFirst( depthLevel *level )
     {
         renderChain *progr = AllocateItem();
 
         if ( !progr )
-            return false;
+            return NULL;
 
         progr->m_entry = *level;
         level->InitFirst();
 
         LIST_REMOVE( *progr );
         LIST_APPEND( m_root, *progr );
-        return true;
+        return progr;
     }
 
-    __forceinline bool PushRenderLast( depthLevel *level )
+    __forceinline renderChain* PushRenderLast( depthLevel *level )
     {
         renderChain *progr = AllocateItem();
 
         if ( !progr )
-            return false;
+            return NULL;
 
         progr->m_entry = *level;
         level->InitLast();
 
         LIST_REMOVE( *progr );
         LIST_INSERT( m_rootLast, *progr );
-        return true;
+        return progr;
     }
 
-    bool PushRender( depthLevel *level )
+    renderChain* PushRender( depthLevel *level )
     {
         renderChain *iter = m_root.prev;
 
@@ -137,7 +158,7 @@ public:
         renderChain *progr = AllocateItem();
 
         if ( !progr )
-            return false;
+            return NULL;
 
         // Update render details
         progr->m_entry = *level;
@@ -147,7 +168,36 @@ public:
         iter = iter->next;
 
         LIST_APPEND( *iter, *progr );
-        return true;
+        return progr;
+    }
+
+    /*=========================================================
+        CRenderChainInterface::RemoveItem (inlined)
+
+        Arguments:
+            entry - node in this chain interface
+        Purpose:
+            Removes the given node from this chain interface.
+    =========================================================*/
+    inline void RemoveItem( renderChain *entry )
+    {
+        LIST_REMOVE( *entry );
+        LIST_APPEND( m_renderStack, *entry );
+    }
+
+    /*=========================================================
+        CRenderChainInterface::GetFirstUsed (MTA extension)
+
+        Purpose:
+            Returns the first allocated renderChain node in this
+            sorted container. Returns NULL if there is none
+            allocated.
+    =========================================================*/
+    inline renderChain* GetFirstUsed( void )
+    {
+        renderChain *iter = m_rootLast.next;
+
+        return iter == &m_root ? NULL : iter;
     }
 
     /*=========================================================
@@ -181,6 +231,35 @@ public:
     }
 
     /*=========================================================
+        CRenderChainInterface::ExecuteCustom
+
+        Purpose:
+            Executes all items in forward order using a template
+            object.
+    =========================================================*/
+    template <typename callbackType>
+    inline bool ExecuteCustom( callbackType& cb )
+    {
+        for ( renderChain *iter = m_rootLast.next, *nextIter = iter->next; iter != &m_root; iter = nextIter, nextIter = iter->next )
+        {
+            if ( cb.OnEntry( iter->m_entry ) == false )
+                return true;
+        }
+        return false;
+    }
+
+    template <typename callbackType>
+    inline bool ExecuteCustomReverse( callbackType& cb )
+    {
+        for ( renderChain *iter = m_root.prev; iter != &m_rootLast; iter = iter->prev )
+        {
+            if ( cb.OnEntry( iter->m_entry ) == false )
+                return true;
+        }
+        return false;
+    }
+
+    /*=========================================================
         CRenderChainInterface::Clear
 
         Purpose:
@@ -192,11 +271,43 @@ public:
     {
         while ( m_rootLast.next != &m_root )
         {
-            renderChain *iter = m_rootLast.next;
-
-            LIST_REMOVE( *iter );
-            LIST_APPEND( m_renderStack, *iter );
+            RemoveItem( m_rootLast.next );
         }
+    }
+
+    /*=========================================================
+        CRenderChainInterface::CountActive (MTA extension)
+
+        Purpose:
+            Returns the number of sorted list entries that are
+            in use by this render chain.
+    =========================================================*/
+    unsigned int CountActive( void ) const
+    {
+        unsigned int count = 0;
+
+        for ( renderChain *iter = m_rootLast.next; iter != &m_root; iter = iter->next )
+            count++;
+        
+        return count;
+    }
+
+    /*=========================================================
+        CRenderChainInterface::CountFree (MTA extension)
+
+        Purpose:
+            Returns the number of sorted list entries that can
+            be allocated. Returning a non-zero value means that
+            you can push entries into this chain.
+    =========================================================*/
+    unsigned int CountFree( void ) const
+    {
+        unsigned int count = 0;
+
+        for ( renderChain *iter = m_renderLast.next; iter != &m_renderStack; iter = iter->next )
+            count++;
+
+        return count;
     }
 
     renderChain                 m_root;             // 0

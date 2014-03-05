@@ -90,6 +90,20 @@ class CTrainCamNode
 class CCameraSAInterface 
 {
 public:
+    bool __thiscall         IsSphereVisible             ( const CVector& pos, float radius, void *unk );
+    float __thiscall        GetGroundLevel              ( unsigned int type );
+    unsigned int __thiscall GetMusicFadeType            ( void ) const;
+
+    void __thiscall         SetFadeColor                ( unsigned char red, unsigned char green, unsigned char blue );
+    void __thiscall         Fade                        ( float fadeDuration, unsigned short direction );
+
+    int __thiscall          GetFadeDirection            ( void ) const;
+
+    CCamSAInterface&        GetActiveCam                ( void )                    { return Cams[ActiveCam]; }
+
+    int __thiscall          GetActiveCamLookDirection   ( void );
+
+
     // CPlaceable
     CPlaceableSAInterface::Transform    Placeable;
     // End CPlaceable
@@ -325,7 +339,7 @@ public:
     FLOAT m_fAttachedCamAngle; // for giving the attached camera a tilt.
 
     // RenderWare camera pointer
-    DWORD * m_pRwCamera; // was RwCamera *
+    RwCamera * m_pRwCamera; // was RwCamera *
     ///stuff for cut scenes
     CEntitySAInterface *pTargetEntity;
     CEntitySAInterface *pAttachedEntity;
@@ -399,6 +413,16 @@ public:
     DWORD   m_uiFadeTimeStartedMusic;
 };
 // C_ASSERT(sizeof(CCameraSAInterface) == 0xD78);
+
+
+namespace Camera
+{
+    inline CCameraSAInterface&     GetInterface( void )
+    {
+        return *(CCameraSAInterface*)0x00B6F028;
+    }
+};
+
 
 class CCameraSA : public CCamera
 {

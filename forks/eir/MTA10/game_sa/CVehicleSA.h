@@ -448,7 +448,18 @@ public:
     unsigned int                hFlagsLocal;                                        // +1004
 
     CAutoPilot                  AutoPilot;                                          // +1008
-    CVehicleFlags               m_nVehicleFlags;                                    // +1064
+    
+    union
+    {
+        CVehicleFlags           m_nVehicleFlags;                                    // +1064
+        
+        struct
+        {
+            unsigned int        m_vehicleFlags;                                     // +1064
+            unsigned int        m_genericFlags;                                     // +1068
+        };
+    };
+
     unsigned int                m_TimeOfCreation;                                   // 1072, GetTimeInMilliseconds when this vehicle was created.
 
     unsigned char               m_colour1, m_colour2, m_colour3, m_colour4;         // 1076

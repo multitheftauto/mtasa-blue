@@ -17,6 +17,9 @@
 // Once we handle all resource loading routines of the engine, this will the common handler
 // (we are still missing ASM code which does this dispatching, right?)
 
+// Note: .scm scripts are excluded from the dispatchers, so they are never handled.
+// Question: will we ever need them? dependency is on SP-compatibility.
+
 // Default skeleton for model id type dispatching.
 // A dispatch method returns either true or false.
 //  true - the event was successfully handled
@@ -89,7 +92,7 @@ struct ModelCheckDispatch abstract  // creating it on its own will optimize it a
     idRangeCheckExec( (id), DATA_TEXTURE_BLOCK, 5000, (dispatch).DoTexDictionary ); \
     idRangeCheckExec( (id), DATA_COLL_BLOCK, 256, (dispatch).DoCollision ); \
     idRangeCheckExec( (id), DATA_IPL_BLOCK, 256, (dispatch).DoIPL ); \
-    idRangeCheckExec( (id), DATA_PATHFIND_BLOCK, 64, (dispatch).DoPathFind ); \
+    idRangeCheckExec( (id), DATA_PATHFIND_BLOCK, REAL_MAX_PATH_SECTORS, (dispatch).DoPathFind ); \
     idRangeCheckExec( (id), DATA_ANIM_BLOCK, 180, (dispatch).DoAnimation ); \
     idRangeCheckExec( (id), DATA_RECORD_BLOCK, 75, (dispatch).DoRecording ); \
 }
@@ -104,13 +107,13 @@ bool __forceinline ExecuteDispatch( modelId_t id, type dispatch )
 template <class dispatchType>
 bool __forceinline ExecuteDispatchEasy( modelId_t id, dispatchType dispatch )
 {
-    if ( id < MAX_MODELS )                                                  return dispatch.DoBaseModel( id );
-    if ( id >= DATA_TEXTURE_BLOCK && id < DATA_TEXTURE_BLOCK + MAX_TXD )    return dispatch.DoTexDictionary( id - DATA_TEXTURE_BLOCK );
-    if ( id >= DATA_COLL_BLOCK && id < DATA_COLL_BLOCK + 256 )              return dispatch.DoCollision( id - DATA_COLL_BLOCK );
-    if ( id >= DATA_IPL_BLOCK && id < DATA_IPL_BLOCK + 256 )                return dispatch.DoIPL( id - DATA_IPL_BLOCK );
-    if ( id >= DATA_PATHFIND_BLOCK && id < DATA_PATHFIND_BLOCK )            return dispatch.DoPathFind( id - DATA_PATHFIND_BLOCK );
-    if ( id >= DATA_ANIM_BLOCK && id < DATA_ANIM_BLOCK + 180 )              return dispatch.DoAnimation( id - DATA_ANIM_BLOCK );
-    if ( id >= DATA_RECORD_BLOCK && id < DATA_RECORD_BLOCK + 75 )           return dispatch.DoRecording( id - DATA_RECORD_BLOCK );
+    if ( id < MAX_MODELS )                                                                  return dispatch.DoBaseModel( id );
+    if ( id >= DATA_TEXTURE_BLOCK && id < DATA_TEXTURE_BLOCK + MAX_TXD )                    return dispatch.DoTexDictionary( id - DATA_TEXTURE_BLOCK );
+    if ( id >= DATA_COLL_BLOCK && id < DATA_COLL_BLOCK + 256 )                              return dispatch.DoCollision( id - DATA_COLL_BLOCK );
+    if ( id >= DATA_IPL_BLOCK && id < DATA_IPL_BLOCK + 256 )                                return dispatch.DoIPL( id - DATA_IPL_BLOCK );
+    if ( id >= DATA_PATHFIND_BLOCK && id < DATA_PATHFIND_BLOCK + REAL_MAX_PATH_SECTORS )    return dispatch.DoPathFind( id - DATA_PATHFIND_BLOCK );
+    if ( id >= DATA_ANIM_BLOCK && id < DATA_ANIM_BLOCK + 180 )                              return dispatch.DoAnimation( id - DATA_ANIM_BLOCK );
+    if ( id >= DATA_RECORD_BLOCK && id < DATA_RECORD_BLOCK + 75 )                           return dispatch.DoRecording( id - DATA_RECORD_BLOCK );
 
     return dispatch.DoOther( id );
 }

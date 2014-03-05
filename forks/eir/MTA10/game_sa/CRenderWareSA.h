@@ -25,6 +25,8 @@
 #include <stdio.h>
 #include "CRenderWareSA.ShaderSupport.h"
 
+#include "RenderWare/include.h"
+
 class CModelTexturesInfo;
 
 class CRenderWareSA : public CRenderWare

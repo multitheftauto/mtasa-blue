@@ -14,89 +14,21 @@
 
 extern CBaseModelInfoSAInterface **ppModelInfo;
 
-// IPL files have to be placed in their pool.
-void* CIPLFileSA::operator new ( size_t )
-{
-    return (*ppIPLFilePool)->Allocate();
-}
-
-void CIPLFileSA::operator delete ( void *ptr )
-{
-    (*ppIPLFilePool)->Free( (CIPLFileSA*)ptr );
-}
-
 namespace Streaming
 {
-    /*=========================================================
-        CMissingModelInfoSA
-
-        This class stores debug information during the GTA:SA archive
-        streaming loading (PLAYER.IMG, GTA3.IMG, ...). Every model file
-        that is placed into the IMG archive has to have an IDE entry.
-        If not, the filename gets added to this item stack. Yes, Rockstar
-        left this debug code inside the engine. This class takes a
-        maximum of stack entries, so that you cannot overshoot your
-        estimations.
-        
-        Putting out this stacks content could be useful to modders.
-    =========================================================*/
-    class CMissingModelInfoSA : public CSimpleItemStack <char[32]>
-    {
-    public:
-        /*=========================================================
-            CMissingModelInfoSA::constructor
-
-            Arguments:
-                max - maximum number of stack entries
-            Purpose:
-                Constructs a simple item stack which accepts string
-                items.
-            Binary offsets (CSimpleItemStack::constructor ?):
-                (1.0 US and 1.0 EU): 0x005322A0
-        =========================================================*/
-        CMissingModelInfoSA( unsigned int max ) : CSimpleItemStack( max )
-        {
-        }
-
-        /*=========================================================
-            CMissingModelInfoSA::Add
-
-            Arguments:
-                name - name of the model which misses an IDE entry
-            Purpose:
-                Adds a name entry of a model which misses its IDE
-                entry. If there are too many entries added, it outputs
-                a debug message [sic].
-            Binary offsets:
-                (1.0 US and 1.0 EU): 0x00532310
-        =========================================================*/
-        inline void Add( const char *name )
-        {
-            char *alloc = *Allocate();
-
-            if ( !alloc )
-            {
-                OutputDebugString( "Too many objects without modelinfo structures\n" );
-                return;
-            }
-
-            memcpy( alloc, name, 32 );
-        }
-    };
-
     // Frequently used variables
     static HANDLE *const VAR_UnkFileHandle = (HANDLE*)0x008E4010;
     static size_t *const VAR_NumResourceEntries = (size_t*)0x008E4C68;
-    static unsigned short *const VAR_BiggestPrimaryBlockOffset = (unsigned short*)0x008E4CA8;
-    static modelId_t *const VAR_LastModelScanIndex = (modelId_t*)0x00AAE948;
+    int biggestResourceBlockCount = 0;              // Binary offsets: (1.0 US and 1.0 EU): 0x008E4CA8
+    static int *const VAR_LastModelScanIndex = (int*)0x00AAE948;
     static CModelLoadInfoSA *const VAR_ModelLoadInfo = (CModelLoadInfoSA*)0x008E4CC0;
     static CMissingModelInfoSA *const *VAR_MissingModelInfo = (CMissingModelInfoSA**)0x008E48D0;
 
     /*=========================================================
-        Streaming::GetModelByHash
+        Streaming::GetModelByName
 
         Arguments:
-            hash - hash key of the model to find
+            name - name string to check case-insensitively with
             id (optional) - index of the model info (if found)
         Purpose:
             Returns the model info associated with the hash key. If
@@ -107,10 +39,10 @@ namespace Streaming
     CBaseModelInfoSAInterface* __cdecl GetModelByHash( unsigned int hash, modelId_t *id )
     {
         // Use the last model index (performance improvement?)
-        modelId_t n = *VAR_LastModelScanIndex;
+        int n = *VAR_LastModelScanIndex;
         CBaseModelInfoSAInterface *model;
 
-        for ( ; n < DATA_TEXTURE_BLOCK; n++ )
+        for ( ; n < MAX_MODELS; n++ )
         {
             model = ppModelInfo[n];
 
@@ -120,7 +52,7 @@ namespace Streaming
 
         n = *VAR_LastModelScanIndex;
 
-        for ( ; n < DATA_TEXTURE_BLOCK; n-- )
+        for ( ; n >= 0; n-- )
         {
             model = ppModelInfo[n];
 
@@ -136,6 +68,11 @@ success:
 
         *VAR_LastModelScanIndex = n;
         return model;
+    }
+
+    CBaseModelInfoSAInterface* __cdecl GetModelByName( const char *name, modelId_t *id )
+    {
+        return GetModelByHash( pGame->GetKeyGen()->GetUppercaseKey( name ), id );
     }
 
     /*=========================================================
@@ -189,7 +126,7 @@ success:
         Binary offsets:
             (1.0 US and 1.0 EU): 0x004C9360
     =========================================================*/
-    static void __cdecl TxdAssignVehiclePaintjob( const char *name, modelId_t id )
+    static void __cdecl TxdAssignVehiclePaintjob( const char *name, int txdId )
     {
         unsigned char len = (unsigned char)strlen( name ) - 1;
         unsigned char lastchr = name[len];
@@ -221,7 +158,7 @@ success:
         if ( info && info->GetModelType() == MODEL_VEHICLE )
         {
             // Put the paintjob into our modelinfo
-            ((CVehicleModelInfoSAInterface*)info)->AssignPaintjob( id );
+            ((CVehicleModelInfoSAInterface*)info)->AssignPaintjob( txdId );
         }
     }
 
@@ -253,32 +190,9 @@ success:
         obfuscation methods, is very helpful..!
     */
 
-    static unsigned int __cdecl RegisterCollision( const char *name )
+    unsigned int __cdecl RegisterCollision( const char *name )
     {
-        CColFileSA *col = new CColFileSA;
-
-        if ( stricmp( name, "procobj" ) == 0 || stricmp( name, "proc_int" ) == 0 || stricmp( name, "proc_int2" ) == 0 )
-            col->m_isProcedural = true;
-
-        if ( strnicmp( name, "int_la", 6 ) == 0 ||
-             strnicmp( name, "int_sf", 6 ) == 0 ||
-             strnicmp( name, "int_veg", 7 ) == 0 ||
-             strnicmp( name, "int_cont", 8 ) == 0 ||
-             strnicmp( name, "gen_int1", 8 ) == 0 ||
-             strnicmp( name, "gen_int2", 8 ) == 0 ||
-             strnicmp( name, "gen_int3", 8 ) == 0 ||
-             strnicmp( name, "gen_int4", 8 ) == 0 ||
-             strnicmp( name, "gen_int5", 8 ) == 0 ||
-             strnicmp( name, "gen_intb", 8 ) == 0 ||
-             strnicmp( name, "savehous", 8 ) == 0 ||
-             stricmp( name, "props" ) == 0 ||
-             stricmp( name, "props2" ) == 0 ||      // Okay, I am unsure whether I caught all of the namechecking due to secuROM obfuscation
-                                                    // If there is a filename missing, feel free to append it here!
-             strnicmp( name, "levelmap", 8 ) == 0 ||
-             strnicmp( name, "stadint", 7 ) == 0 )
-            col->m_isInterior = true;
-
-        return (*ppColFilePool)->GetIndex( col );
+        return Streaming::GetCOLEnvironment().RegisterInstance( name );
     }
 
     /*=========================================================
@@ -294,38 +208,17 @@ success:
     =========================================================*/
     static unsigned int __cdecl FindIPLFile( const char *name )
     {
-        unsigned int n;
+        IPLEnv_t::pool_t *pool = Streaming::GetIPLEnvironment().m_pool;
 
-        for ( n=0; n<MAX_IPL; n++ )
+        for ( unsigned int n = 0; n < pool->GetMax(); n++ )
         {
-            CIPLFileSA *ipl = (*ppIPLFilePool)->Get( n );
+            CIPLFileSA *ipl = pool->Get( n );
 
             if ( ipl && stricmp( ipl->m_name, name ) == 0 )
                 return n;
         }
 
         return 0xFFFFFFFF;
-    }
-
-    /*=========================================================
-        Streaming::RegisterIPLFile
-
-        Arguments:
-            name - string of the IPL filename
-        Purpose:
-            Allocates an instance in the IPL file pool and returns
-            its index. The name of the IPL file is stored in its
-            name field.
-        Binary offsets:
-            (1.0 US and 1.0 EU): 0x00405AC0
-    =========================================================*/
-    static unsigned int __cdecl RegisterIPLFile( const char *name )
-    {
-        CIPLFileSA *ipl = new CIPLFileSA;
-
-        strcpy( ipl->m_name, name );
-
-        return (*ppIPLFilePool)->GetIndex( ipl );
     }
 
     /*=========================================================
@@ -341,68 +234,59 @@ success:
         Binary offsets:
             (1.0 US and 1.0 EU): 0x005B6170
     =========================================================*/
-    // Header of a file entry in the IMG archive.
-    struct fileHeader
-    {
-        size_t              offset;                         // 0
-        unsigned short      primaryBlockOffset;             // 4
-        unsigned short      secondaryBlockOffset;           // 6
-        char                name[24];                       // 8
-    };
-
     static void __cdecl LoadArchive( IMGFile& archive, unsigned int imgID )
     {
         CFile *file = OpenGlobalStream( archive.name, "rb" );
 
         // We should always find the IMG container. Do a security check anyway.
+        // NOTE: Rockstar did this too.
         if ( !file )
             return;
 
-        modelId_t lastID = 0xFFFF;
+        modelId_t lastID = 0xFFFFFFFF;
         union
         {
-            char version[4];    // has to be "VER2"
+            char version[8];    // has to be "VER2"
             unsigned int checksum;
         };
+
+        memset( version, 0, 5 );
 
         file->Read( version, 1, 4 );
 
         assert( checksum == '2REV' );
-
-        unsigned int numFiles = 0;
             
-        bool success = file->ReadUInt( numFiles );
+        int numFiles;
+        
+        bool successful = file->ReadInt( numFiles );
 
-        if ( success )
+        // Bugfix: make sure we read the file entry count properly.
+        if ( successful )
         {
             // Load all files one by one
-            while ( numFiles-- )
+            while ( numFiles )
             {
-                fileHeader header;
+                numFiles--;
+
+                resourceFileHeader header;
 
                 file->Read( &header, 1, sizeof(header) );
 
-                if ( *VAR_BiggestPrimaryBlockOffset < header.primaryBlockOffset )
-                    *VAR_BiggestPrimaryBlockOffset = header.primaryBlockOffset;
+                if ( header.primaryBlockOffset > biggestResourceBlockCount )
+                    biggestResourceBlockCount = header.primaryBlockOffset;
 
                 // Zero terminated for safety
                 header.name[ sizeof(header.name) - 1 ] = '\0';
 
                 char *dot = strchr( header.name, '.' );
 
-                if ( !dot )
+                if ( !dot || (size_t)( dot - header.name ) > 20 )
                 {
-                    lastID = 0xFFFF;
-                    continue;
+                    header.name[ sizeof(header.name) - 1 ] = '\0';
+                    goto failureAdd;
                 }
 
                 const char *ext = dot + 1;
-
-                if ( (size_t)( ext - header.name ) > 20 )
-                {
-                    lastID = 0xFFFF;
-                    continue;
-                }
 
                 *dot = '\0';
 
@@ -410,30 +294,33 @@ success:
 
                 if ( strnicmp( ext, "DFF", 3 ) == 0 )
                 {
-                    if ( GetModelByHash( pGame->GetKeyGen()->GetUppercaseKey( header.name ), &id ) )
+                    if ( !GetModelByName( header.name, &id ) )
                     {
-                        header.offset |= imgID << 24;
+                        // We found a structure that has no representation in the game configuration files.
+                        // Native GTA:SA supports about 550 of such models.
+                        // We can still load such data through .SCM there (RequestSpecialModel).
+                        // That is done by storing the resourceFileHeader in a special stack.
+                        header.offset = Streaming::GetFileHandle( imgID, header.offset );
 
                         // Some sort of debug container
-                        (*VAR_MissingModelInfo)->Add( header.name );
+                        (*VAR_MissingModelInfo)->Add( header );
                         
-                        lastID = -1;
-                        continue;
+                        goto failureAdd;
                     }
                 }
                 else if ( strnicmp( ext, "TXD", 3 ) == 0 )
                 {
-                    id = pGame->GetTextureManager()->FindTxdEntry( header.name );
+                    int txdId = pGame->GetTextureManager()->FindTxdEntry( header.name );
 
-                    if ( id == -1 )
+                    if ( txdId == -1 )
                     {
-                        id = pGame->GetTextureManager()->CreateTxdEntry( header.name );
+                        txdId = pGame->GetTextureManager()->CreateTxdEntry( header.name );
 
                         // Assign the txd to a vehicle if found a valid one
-                        TxdAssignVehiclePaintjob( header.name, id );
+                        TxdAssignVehiclePaintjob( header.name, txdId );
                     }
 
-                    id += DATA_TEXTURE_BLOCK;
+                    id = (modelId_t)( txdId + DATA_TEXTURE_BLOCK );
                 }
                 else if ( strnicmp( ext, "COL", 3 ) == 0 )
                 {
@@ -441,14 +328,14 @@ success:
                 }
                 else if ( strnicmp( ext, "IPL", 3 ) == 0 )
                 {
-                    id = FindIPLFile( header.name );
+                    unsigned int iplIndex = FindIPLFile( header.name );
 
-                    if ( id == -1 )
+                    if ( iplIndex == 0xFFFFFFFF )
                     {
-                        id = RegisterIPLFile( header.name );
+                        iplIndex = GetIPLEnvironment().RegisterInstance( header.name );
                     }
 
-                    id += DATA_IPL_BLOCK;
+                    id = iplIndex + DATA_IPL_BLOCK;
                 }
                 else if ( strnicmp( ext, "DAT", 3 ) == 0 )
                 {
@@ -468,26 +355,28 @@ success:
                 {
                     // For now we do not need these script files.
                     // If we ever need them, contact midnightStar/Martin.
+#ifdef _DEBUG
                     OutputDebugString( "found unsupported SCM file: " );
                     OutputDebugString( header.name );
                     OutputDebugString( "\n" );
-                    continue;
+#endif //_DEBUG
+                    goto failureAdd;
                 }
                 else
                 {
                     *dot = '.';
-                    lastID = -1;
-                    continue;
+                    goto failureAdd;
                 }
 
                 // Prepare the loading of this resource by storing its offset and IMG archive index
                 unsigned int offset, count;
 
                 // If this ID slot is already occupied, skip preparing this resource.
-                if ( VAR_ModelLoadInfo[id].GetOffset( offset, count ) )
-                    continue;
+                CModelLoadInfoSA& info = Streaming::GetModelLoadInfo( id );
 
-                CModelLoadInfoSA& info = VAR_ModelLoadInfo[id];
+                if ( info.GetOffset( offset, count ) )
+                    goto failureAdd;
+
                 info.m_imgID = imgID;
 
                 if ( header.secondaryBlockOffset != 0 )
@@ -496,10 +385,17 @@ success:
                 info.SetOffset( header.offset, header.primaryBlockOffset );
                 info.m_flags = 0;
 
-                if ( lastID != -1 )
-                    VAR_ModelLoadInfo[lastID].m_lastID = id;
+                // This id is used to optimize loading from disk.
+                // The streaming system knows which data is next to each other.
+                // It can be loaded in a swipe.
+                if ( lastID != 0xFFFFFFFF )
+                    Streaming::GetModelLoadInfo( lastID ).m_lastID = id;
 
                 lastID = id;
+                continue;
+
+failureAdd:
+                lastID = 0xFFFFFFFF;
             }
         }
 
@@ -507,7 +403,7 @@ success:
     }
 
     /*=========================================================
-        Streaming::Hook_LoadArchives
+        Streaming::LoadArchives
 
         Purpose:
             Initializes some global variables and loads all active
@@ -515,8 +411,9 @@ success:
         Binary offsets:
             (1.0 US and 1.0 EU): 0x005B82C0
     =========================================================*/
-    void __cdecl HOOK_LoadArchives( void )
+    void __cdecl LoadArchives( void )
     {
+        // Initialize some unknown globals.
         *(unsigned int*)0x008E4C90 = 0xFFFFFFFF;
         *(unsigned int*)0x008E4C94 = 0xFFFFFFFF;
         *(unsigned int*)0x008E4C98 = 0xFFFFFFFF;
@@ -526,7 +423,8 @@ success:
 
         *(unsigned int*)0x008E4CA0 = 0xFFFFFFFF;
 
-        *VAR_NumResourceEntries = GetFileSize( *VAR_UnkFileHandle, NULL );
+        // ???
+        *VAR_NumResourceEntries = GetMainArchiveSize();
 
         for ( unsigned int n = 0; n < MAX_GTA_IMG_ARCHIVES; n++ )
         {
@@ -535,11 +433,12 @@ success:
             if ( file.name[0] == '\0' )
                 break;
 
+            // We do not load player IMGs.
             if ( !file.isNotPlayerImg )
                 continue;
 
-            //LoadArchive( file, n );
-            ((void (__cdecl*)( const char *, unsigned int ))0x005B6170)( file.name, n );
+            // Load the IMG archive.
+            LoadArchive( file, n );
         }
 
         *(unsigned int*)0x008E4C64 = 0;
@@ -549,8 +448,6 @@ success:
 
 void StreamingLoader_Init( void )
 {
-    // Hook the archive loading system
-    HookInstall( 0x005B82C0, (DWORD)Streaming::HOOK_LoadArchives, 5 );
 }
 
 void StreamingLoader_Shutdown( void )

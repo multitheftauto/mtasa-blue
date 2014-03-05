@@ -189,7 +189,9 @@ static void* _lightCallback( void *ptr )
 
 RpLight* RpLightCreate( unsigned char type )
 {
-    RpLight *light = (RpLight*)pRwInterface->m_allocStruct( pRwInterface->m_lightInfo, 0x30012 );
+    RwInterface *rwInterface = RenderWare::GetInterface();
+
+    RpLight *light = (RpLight*)rwInterface->m_allocStruct( rwInterface->m_lightInfo, 0x30012 );
 
     if ( !light )
         return NULL;
@@ -214,7 +216,7 @@ RpLight* RpLightCreate( unsigned char type )
     LIST_INITNODE( light->clumpLights );
 
     light->flags = 3; // why write it again? R* hack?
-    light->frame = pRwInterface->m_frame;
+    light->frame = rwInterface->m_frame;
 
     RwObjectRegister( (void*)0x008D62F8, light );
     return light;

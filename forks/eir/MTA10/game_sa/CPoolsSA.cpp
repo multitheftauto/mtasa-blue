@@ -171,9 +171,9 @@ void CPoolsSA::RemoveVehicle ( CVehicle* pVehicle, bool bDelete )
     }
 }
 
-CVehicleSA* CPoolsSA::GetVehicle ( unsigned long ulID )
+CVehicleSA* Pools::GetVehicle ( unsigned long ulID )
 {
-    DEBUG_TRACE("CVehicle* CPoolsSA::GetVehicle ( unsigned long ulID )");
+    DEBUG_TRACE("CVehicleSA* Pools::GetVehicle ( unsigned long ulID )");
 
     if ( ulID >= MAX_VEHICLES )
         return NULL;
@@ -181,11 +181,11 @@ CVehicleSA* CPoolsSA::GetVehicle ( unsigned long ulID )
     return mtaVehicles[ulID];
 }
 
-CVehicleSA* CPoolsSA::GetVehicle ( void* pGameInterface )
+CVehicleSA* Pools::GetVehicle ( CVehicleSAInterface* pGameInterface )
 {
-    DEBUG_TRACE("CVehicle* CPoolsSA::GetVehicle ( DWORD* pGameInterface )");
+    DEBUG_TRACE("CVehicleSA* Pools::GetVehicle ( CVehicleSAInterface* pGameInterface )");
 
-    unsigned int id = (*ppVehiclePool)->GetIndex( (CVehicleSAInterface*)pGameInterface );
+    unsigned int id = Pools::GetVehiclePool()->GetIndex( pGameInterface );
     
     if ( id > MAX_VEHICLES-1 )
         return NULL;
@@ -193,23 +193,23 @@ CVehicleSA* CPoolsSA::GetVehicle ( void* pGameInterface )
     return mtaVehicles[id];
 }
 
-DWORD CPoolsSA::GetVehicleRef ( CVehicle* pVehicle )
+unsigned int Pools::GetVehicleRef ( CVehicle* pVehicle )
 {
-    DEBUG_TRACE("DWORD CPoolsSA::GetVehicleRef ( CVehicle* pVehicle )");
+    DEBUG_TRACE("unsigned int Pools::GetVehicleRef ( CVehicle* pVehicle )");
 
     return pVehicle->GetPoolIndex();
 }
 
-DWORD CPoolsSA::GetVehicleRef ( DWORD* pGameInterface )
+unsigned int Pools::GetVehicleRef ( CVehicleSAInterface* pGameInterface )
 {
-    DEBUG_TRACE("DWORD CPoolsSA::GetVehicleRef ( DWORD* pGameInterface )");
+    DEBUG_TRACE("unsigned int Pools::GetVehicleRef ( CVehicleSAInterface* pGameInterface )");
 
-    return (*ppVehiclePool)->GetIndex( (CVehicleSAInterface*)pGameInterface );
+    return Pools::GetVehiclePool()->GetIndex( pGameInterface );
 }
 
-CVehicleSA* CPoolsSA::GetVehicleFromRef ( DWORD dwGameRef )
+CVehicleSA* Pools::GetVehicleFromRef ( unsigned int dwGameRef )
 {
-    DEBUG_TRACE("CVehicle* CPoolsSA::GetVehicleFromRef ( DWORD dwGameRef )");
+    DEBUG_TRACE("CVehicleSA* Pools::GetVehicleFromRef ( unsigned int dwGameRef )");
 
     if ( dwGameRef >= MAX_VEHICLES )
         return NULL;
@@ -222,7 +222,7 @@ void CPoolsSA::DeleteAllVehicles ( )
     DEBUG_TRACE("void CPoolsSA::DeleteAllVehicles ( )");
 
     // TODO: not done yet
-    (*ppVehiclePool)->Clear();
+    Pools::GetVehiclePool()->Clear();
 
     memset( mtaVehicles, 0, sizeof( mtaVehicles ) );
 }
@@ -236,7 +236,7 @@ CObjectSA* CPoolsSA::AddObject( modelId_t dwModelID, bool bLowLod, bool bBreakab
 {
     DEBUG_TRACE("CObject * CPoolsSA::AddObject ( DWORD dwModelID )");
 
-    if ( (*ppObjectPool)->Full() )
+    if ( Pools::GetObjectPool()->Full() )
         return NULL;
 
     CObjectSA *pObject = new CObjectSA ( dwModelID, bBreakable );
@@ -278,9 +278,9 @@ void CPoolsSA::RemoveObject ( CObject* pObject, bool bDelete )
     }
 }
 
-CObjectSA* CPoolsSA::GetObject ( unsigned long ulID )
+CObjectSA* Pools::GetObject ( unsigned long ulID )
 {
-    DEBUG_TRACE("CObject* CPoolsSA::GetObject ( unsigned long ulID )");
+    DEBUG_TRACE("CObjectSA* Pools::GetObject ( unsigned long ulID )");
 
     if ( ulID >= MAX_OBJECTS )
         return NULL;
@@ -288,11 +288,11 @@ CObjectSA* CPoolsSA::GetObject ( unsigned long ulID )
     return mtaObjects[ulID];
 }
 
-CObjectSA* CPoolsSA::GetObject ( void* pGameInterface )
+CObjectSA* Pools::GetObject ( CObjectSAInterface* pGameInterface )
 {
-    DEBUG_TRACE("CObject* CPoolsSA::GetObject ( DWORD* pGameInterface )");
+    DEBUG_TRACE("CObjectSA* Pools::GetObject ( CObjectSAInterface* pGameInterface )");
 
-    unsigned int id = (*ppObjectPool)->GetIndex( (CObjectSAInterface*)pGameInterface );
+    unsigned int id = Pools::GetObjectPool()->GetIndex( pGameInterface );
 
     if ( id > MAX_OBJECTS-1 )
         return NULL;
@@ -300,23 +300,23 @@ CObjectSA* CPoolsSA::GetObject ( void* pGameInterface )
     return mtaObjects[ id ];
 }
 
-DWORD CPoolsSA::GetObjectRef ( CObject* pObject )
+unsigned int Pools::GetObjectRef ( CObject* pObject )
 {
-    DEBUG_TRACE("DWORD CPoolsSA::GetObjectRef ( CObject* pObject )");
+    DEBUG_TRACE("unsigned int Pools::GetObjectRef ( CObject* pObject )");
 
     return pObject->GetPoolIndex();
 }
 
-DWORD CPoolsSA::GetObjectRef ( DWORD* pGameInterface )
+unsigned int Pools::GetObjectRef ( CObjectSAInterface* pGameInterface )
 {
-    DEBUG_TRACE("DWORD CPoolsSA::GetObjectRef ( DWORD* pGameInterface )");
+    DEBUG_TRACE("unsigned int Pools::GetObjectRef ( CObjectSAInterface* pGameInterface )");
 
-    return (*ppObjectPool)->GetIndex( (CObjectSAInterface*)pGameInterface );
+    return Pools::GetObjectPool()->GetIndex( pGameInterface );
 }
 
-CObjectSA* CPoolsSA::GetObjectFromRef ( DWORD dwGameRef )
+CObjectSA* Pools::GetObjectFromRef ( unsigned int dwGameRef )
 {
-    DEBUG_TRACE("CObject* CPoolsSA::GetObjectFromRef ( DWORD dwGameRef )");
+    DEBUG_TRACE("CObjectSA* Pools::GetObjectFromRef ( unsigned int dwGameRef )");
 
     if ( dwGameRef >= MAX_OBJECTS )
         return NULL;
@@ -329,7 +329,7 @@ void CPoolsSA::DeleteAllObjects ( )
     DEBUG_TRACE("void CPoolsSA::DeleteAllObjects ( )");
 
 #if 0
-    (*ppObjectPool)->Clear();
+    Pools::GetObjectPool()->Clear();
 
     memset( mtaObjects, 0, sizeof( mtaObjects ) );
 #endif
@@ -344,7 +344,7 @@ CPedSA* CPoolsSA::AddPed( modelId_t model )
 {
     DEBUG_TRACE("CPed* CPoolsSA::AddPed ( ePedModel ePedType )");
 
-    if ( (*ppPedPool)->Full() )
+    if ( Pools::GetPedPool()->Full() )
         return NULL;
 
     return new CPlayerPedSA ( model );
@@ -361,7 +361,7 @@ CPedSA* CPoolsSA::AddCivilianPed ( DWORD* pGameInterface )
 {
     DEBUG_TRACE("CPed* CPoolsSA::AddCivilianPed ( DWORD* pGameInterface )");
 
-    if ( (*ppPedPool)->Full() )
+    if ( Pools::GetPedPool()->Full() )
         return NULL;
 
     return new CCivilianPedSA ( (CCivilianPedSAInterface*)pGameInterface );
@@ -425,9 +425,9 @@ void CPoolsSA::RemovePed ( CPed* pPed, bool bDelete )
     }
 }
 
-CPedSA* CPoolsSA::GetPed ( unsigned long ulID )
+CPedSA* Pools::GetPed ( unsigned long ulID )
 {
-    DEBUG_TRACE("CPed* CPoolsSA::GetPed ( unsigned long ulID )");
+    DEBUG_TRACE("CPedSA* Pools::GetPed ( unsigned long ulID )");
 
     if ( ulID >= MAX_PEDS )
         return NULL;
@@ -435,15 +435,15 @@ CPedSA* CPoolsSA::GetPed ( unsigned long ulID )
     return mtaPeds[ulID];
 }
 
-CPedSA* CPoolsSA::GetPed ( void* pGameInterface )
+CPedSA* Pools::GetPed ( CPedSAInterface* pGameInterface )
 {
-    DEBUG_TRACE("CPed* CPoolsSA::GetPed ( DWORD* pGameInterface )");
+    DEBUG_TRACE("CPedSA* Pools::GetPed ( CPedSAInterface* pGameInterface )");
 
     // 0x00400000 is used for bad player pointers some places in GTA
     // The_GTA: where exactly does this occur? is it important?
-    if ( pGameInterface && pGameInterface != (DWORD*)0x00400000 )
+    if ( pGameInterface && (DWORD*)pGameInterface != (DWORD*)0x00400000 )
     {
-        unsigned int id = (*ppPedPool)->GetIndex( (CPedSAInterface*)pGameInterface );
+        unsigned int id = Pools::GetPedPool()->GetIndex( pGameInterface );
 
         if ( id < MAX_PEDS )
             return mtaPeds[ id ];
@@ -452,23 +452,23 @@ CPedSA* CPoolsSA::GetPed ( void* pGameInterface )
     return NULL;
 }
 
-DWORD CPoolsSA::GetPedRef ( CPed* pPed )
+unsigned int Pools::GetPedRef ( CPed* pPed )
 {
-    DEBUG_TRACE("DWORD CPoolsSA::GetPedRef ( CPed* pPed )");
+    DEBUG_TRACE("unsigned int Pools::GetPedRef ( CPed* pPed )");
 
     return pPed->GetPoolIndex();
 }
 
-DWORD CPoolsSA::GetPedRef ( DWORD* pGameInterface )
+unsigned int Pools::GetPedRef ( CPedSAInterface* pGameInterface )
 {
-    DEBUG_TRACE("DWORD CPoolsSA::GetPedRef ( DWORD* pGameInterface )");
+    DEBUG_TRACE("unsigned int Pools::GetPedRef ( CPedSAInterface* pGameInterface )");
 
-    return (*ppPedPool)->GetIndex( (CPedSAInterface*)pGameInterface );
+    return Pools::GetPedPool()->GetIndex( pGameInterface );
 }
 
-CPedSA* CPoolsSA::GetPedFromRef ( DWORD dwGameRef )
+CPedSA* Pools::GetPedFromRef ( unsigned int dwGameRef )
 {
-    DEBUG_TRACE("CPed* CPoolsSA::GetPedFromRef ( DWORD dwGameRef )");
+    DEBUG_TRACE("CPedSA* Pools::GetPedFromRef ( unsigned int dwGameRef )");
 
     if ( dwGameRef >= MAX_PEDS )
         return NULL;
@@ -476,11 +476,11 @@ CPedSA* CPoolsSA::GetPedFromRef ( DWORD dwGameRef )
     return mtaPeds[dwGameRef];
 }
 
-CPedSAInterface* CPoolsSA::GetPedInterface ( DWORD dwGameRef )
+CPedSAInterface* Pools::GetPedInterface ( unsigned int dwGameRef )
 {
-    DEBUG_TRACE("CPedSAInterface* CPoolsSA::GetPedInterface ( DWORD dwGameRef )");
+    DEBUG_TRACE("CPedSAInterface* Pools::GetPedInterface ( unsigned int dwGameRef )");
 
-    return (*ppPedPool)->Get( dwGameRef );
+    return Pools::GetPedPool()->Get( dwGameRef );
 }
 
 void CPoolsSA::DeleteAllPeds ( )
@@ -488,23 +488,23 @@ void CPoolsSA::DeleteAllPeds ( )
     DEBUG_TRACE("void CPoolsSA::DeleteAllPeds ( )");
 
 #if 0
-    (*ppPedPool)->Clear();
+    Pools::GetPedPool()->Clear();
 
     memset( mtaPeds, 0, sizeof( mtaPeds ) );
 #endif
 }
 
-CEntitySA* CPoolsSA::GetEntity ( void *pGameInterface )
+CEntitySA* Pools::GetEntity ( CEntitySAInterface *pGameInterface )
 {
     if ( pGameInterface )
     {
-        CEntitySAInterface *pEntityInterface = (CEntitySAInterface*)pGameInterface;
+        CEntitySAInterface *pEntityInterface = pGameInterface;
 
         switch ( pEntityInterface->nType )
         {
-        case ENTITY_TYPE_PED:           return GetPed ( pGameInterface );
-        case ENTITY_TYPE_VEHICLE:       return GetVehicle ( pGameInterface );
-        case ENTITY_TYPE_OBJECT:        return GetObject ( pGameInterface );
+        case ENTITY_TYPE_PED:           return GetPed ( (CPedSAInterface*)pGameInterface );
+        case ENTITY_TYPE_VEHICLE:       return GetVehicle ( (CVehicleSAInterface*)pGameInterface );
+        case ENTITY_TYPE_OBJECT:        return GetObject ( (CObjectSAInterface*)pGameInterface );
         }
     }
 

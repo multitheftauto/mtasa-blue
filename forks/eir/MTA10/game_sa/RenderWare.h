@@ -591,8 +591,11 @@ struct RwInterface   // size: 1456
     BYTE                    m_pad10[16];                                    // 1440
 };
 
-extern RwInterface **ppRwInterface;
-#define pRwInterface (*ppRwInterface)
+// Special RenderWare namespace.
+namespace RenderWare
+{
+    inline RwInterface*     GetInterface( void )    { return *(RwInterface**)0x00C97B24; }
+};
 
 // offset 0x00C9BF00 (1.0 US and 1.0 EU)
 //padlevel: 2
@@ -617,13 +620,13 @@ class RwTxdStack
 public:
     RwTxdStack( RwTexDictionary *txd )
     {
-        m_txd = (*ppRwInterface)->m_textureManager.current;
-        (*ppRwInterface)->m_textureManager.current = txd;
+        m_txd = RenderWare::GetInterface()->m_textureManager.current;
+        RenderWare::GetInterface()->m_textureManager.current = txd;
     }
 
     ~RwTxdStack( void )
     {
-        (*ppRwInterface)->m_textureManager.current = m_txd;
+        RenderWare::GetInterface()->m_textureManager.current = m_txd;
     }
 
 private:

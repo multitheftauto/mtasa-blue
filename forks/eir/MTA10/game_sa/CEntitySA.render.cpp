@@ -142,7 +142,7 @@ static void __cdecl _RenderEntity( CEntitySAInterface *entity )
     else if ( !entity->bBackfaceCulled )
     {
         // Change texture stage
-        (*ppRwInterface)->m_deviceCommand( (eRwDeviceCmd)20, 1 );
+        RenderWare::GetInterface()->m_deviceCommand( (eRwDeviceCmd)20, 1 );
     }
 
     if ( AreScreenEffectsEnabled() )
@@ -180,7 +180,7 @@ static void __cdecl _RenderEntity( CEntitySAInterface *entity )
     else if ( !entity->bBackfaceCulled )
     {
         // Set texture stage back to two (?)
-        (*ppRwInterface)->m_deviceCommand( (eRwDeviceCmd)20, 2 );
+        RenderWare::GetInterface()->m_deviceCommand( (eRwDeviceCmd)20, 2 );
     }
 
     // Does the entity have alpha enabled?
@@ -278,11 +278,6 @@ static float CalculateFadingAlpha( CBaseModelInfoSAInterface *info, const CEntit
     return useDist * info->ucAlpha;
 }
 
-CBaseModelInfoSAInterface* CEntitySAInterface::GetModelInfo( void ) const
-{
-    return ppModelInfo[GetModelIndex()];
-}
-
 float CEntitySAInterface::GetFadingAlpha( void ) const
 {
     float camDistance = GetComplexCameraEntityDistance( this );
@@ -293,13 +288,13 @@ float CEntitySAInterface::GetFadingAlpha( void ) const
 inline void InitModelRendering( CBaseModelInfoSAInterface *info )
 {
     if ( info->renderFlags & RENDER_ADDITIVE )
-        (*ppRwInterface)->m_deviceCommand( (eRwDeviceCmd)11, 2 );
+        RenderWare::GetInterface()->m_deviceCommand( (eRwDeviceCmd)11, 2 );
 }
 
 inline void ShutdownModelRendering( CBaseModelInfoSAInterface *info )
 {
     if ( info->renderFlags & RENDER_ADDITIVE )
-        (*ppRwInterface)->m_deviceCommand( (eRwDeviceCmd)11, 6 );
+        RenderWare::GetInterface()->m_deviceCommand( (eRwDeviceCmd)11, 6 );
 }
 
 static void __cdecl RenderAtomicWithAlpha( CBaseModelInfoSAInterface *info, RpAtomic *atom, unsigned int alpha )
@@ -333,18 +328,18 @@ static void __cdecl DefaultRenderEntityHandler( CEntitySAInterface *entity, floa
     CBaseModelInfoSAInterface *info = entity->GetModelInfo();
 
     if ( info->renderFlags & RENDER_NOSHADOW )
-        (*ppRwInterface)->m_deviceCommand( (eRwDeviceCmd)8, 0 );
+        RenderWare::GetInterface()->m_deviceCommand( (eRwDeviceCmd)8, 0 );
 
     if ( entity->bDistanceFade )
     {
-        (*ppRwInterface)->m_deviceCommand( (eRwDeviceCmd)30, 0 );
+        RenderWare::GetInterface()->m_deviceCommand( (eRwDeviceCmd)30, 0 );
 
         unsigned int alpha = (unsigned char)CalculateFadingAlpha( info, entity, camDistance, *(float*)0x00B76848 );
 
         entity->bImBeingRendered = true;
 
         if ( entity->bBackfaceCulled )
-            (*ppRwInterface)->m_deviceCommand( (eRwDeviceCmd)20, 1 );
+            RenderWare::GetInterface()->m_deviceCommand( (eRwDeviceCmd)20, 1 );
 
         unsigned char lightIndex = entity->SetupLighting();
 
@@ -358,22 +353,22 @@ static void __cdecl DefaultRenderEntityHandler( CEntitySAInterface *entity, floa
         entity->bImBeingRendered = false;
 
         if ( entity->bBackfaceCulled )
-            (*ppRwInterface)->m_deviceCommand( (eRwDeviceCmd)20, 2 );
+            RenderWare::GetInterface()->m_deviceCommand( (eRwDeviceCmd)20, 2 );
 
-        (*ppRwInterface)->m_deviceCommand( (eRwDeviceCmd)30, 100 );
+        RenderWare::GetInterface()->m_deviceCommand( (eRwDeviceCmd)30, 100 );
     }
     else
     {
         if ( !*(unsigned int*)VAR_currArea && info->renderFlags & RENDER_NOSHADOW )
-            (*ppRwInterface)->m_deviceCommand( (eRwDeviceCmd)30, 100 );
+            RenderWare::GetInterface()->m_deviceCommand( (eRwDeviceCmd)30, 100 );
         else
-            (*ppRwInterface)->m_deviceCommand( (eRwDeviceCmd)30, 0 );
+            RenderWare::GetInterface()->m_deviceCommand( (eRwDeviceCmd)30, 0 );
 
         RenderEntity( entity );
     }
 
     if ( info->renderFlags & RENDER_NOSHADOW )
-        (*ppRwInterface)->m_deviceCommand( (eRwDeviceCmd)8, 1 );
+        RenderWare::GetInterface()->m_deviceCommand( (eRwDeviceCmd)8, 1 );
 }
 
 int __cdecl QueueEntityForRendering( CEntitySAInterface *entity, float camDistance )
@@ -391,10 +386,10 @@ int __cdecl QueueEntityForRendering( CEntitySAInterface *entity, float camDistan
 
     // If the entity is underwater, it needs a different rendering order
     if ( entity->bUnderwater )
-        return ((entityRenderChain_t*)0x00C88178)->PushRender( &level );
+        return ((entityRenderChain_t*)0x00C88178)->PushRender( &level ) != NULL;
 
     // Do default render
-    return ((entityRenderChain_t*)0x00C88120)->PushRender( &level );
+    return ((entityRenderChain_t*)0x00C88120)->PushRender( &level ) != NULL;
 }
 
 void EntityRender_Init( void )

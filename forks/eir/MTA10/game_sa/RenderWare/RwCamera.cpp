@@ -25,7 +25,9 @@
 =========================================================*/
 RwCamera* RwCameraCreate( void )
 {
-    RwCamera *cam = (RwCamera*)pRwInterface->m_allocStruct( pRwInterface->m_cameraInfo, 0x30005 );
+    RwInterface *rwInterface = RenderWare::GetInterface();
+
+    RwCamera *cam = (RwCamera*)rwInterface->m_allocStruct( rwInterface->m_cameraInfo, 0x30005 );
 
     if ( !cam )
         return NULL;

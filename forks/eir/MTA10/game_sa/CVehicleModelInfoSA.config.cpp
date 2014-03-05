@@ -43,7 +43,7 @@ static void __cdecl _VehicleModels_Init( void )
     ((void (__cdecl*)( void ))FUNC_LoadVehicleParticles)();
 
     // Load the generic vehicle textures
-    CTxdInstanceSA *txdEntry = (*ppTxdPool)->Get( pGame->GetTextureManager()->FindTxdEntry( "vehicle" ) );
+    CTxdInstanceSA *txdEntry = TextureManager::GetTxdPool()->Get( pGame->GetTextureManager()->FindTxdEntry( "vehicle" ) );
 
     if ( txdEntry )
     {
@@ -54,7 +54,7 @@ static void __cdecl _VehicleModels_Init( void )
         delete file;
     }
     else
-        txdEntry = (*ppTxdPool)->Get( pGame->GetTextureManager()->LoadDictionaryEx( "vehicle", "MODELS\\GENERIC\\VEHICLE.TXD" ) );
+        txdEntry = TextureManager::GetTxdPool()->Get( pGame->GetTextureManager()->LoadDictionaryEx( "vehicle", "MODELS\\GENERIC\\VEHICLE.TXD" ) );
 
     if ( txdEntry )
     {

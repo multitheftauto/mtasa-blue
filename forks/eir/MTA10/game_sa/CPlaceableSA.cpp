@@ -114,7 +114,7 @@ void CPlaceableSAInterface::FreeMatrix( void )
 
     // Transform the entity
     Placeable.m_transform.m_translate = trans->vPos;
-    Placeable.m_transform.m_heading = atan( trans->vUp.fY ) / -trans->vUp.fX;
+    Placeable.m_transform.m_heading = trans->ToHeading();
 
     // Free the matrix
     Placeable.matrix = NULL;

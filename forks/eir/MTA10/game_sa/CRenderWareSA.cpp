@@ -265,7 +265,7 @@ RpClump * CRenderWareSA::ReadDFF ( const char *szDFF, unsigned short id, bool bL
         // We therefor have to prepare all resources so it can retrive them; textures and animations!
         if ( model )
         {
-            txd = (*ppTxdPool)->Get( model->usTextureDictionary );
+            txd = TextureManager::GetTxdPool()->Get( model->usTextureDictionary );
 
             if ( !txd->m_txd )
             {
@@ -699,7 +699,7 @@ void CRenderWareSA::RwTexDictionaryRemoveTexture ( RwTexDictionary* pTXD, RwText
 
 short CRenderWareSA::CTxdStore_GetTxdRefcount ( unsigned short usTxdID )
 {
-    return *(short *)( *(*(DWORD **)0xC8800C) + 0xC*usTxdID + 4 );
+    return TextureManager::GetTxdPool()->Get( usTxdID )->m_references;
 }
 
 bool CRenderWareSA::RwTexDictionaryContainsTexture ( RwTexDictionary* pTXD, RwTexture* pTex )

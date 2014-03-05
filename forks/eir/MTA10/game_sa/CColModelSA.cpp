@@ -70,6 +70,101 @@ void CColModelSAInterface::operator delete( void *ptr )
     (*ppColModelPool)->Free( (CColModelSAInterface*)ptr );
 }
 
+/*=========================================================
+    Collision_Preload
+
+    Purpose:
+        Preloads the collision files so they are cached in
+        memory.
+    Binary offsets:
+        (1.0 US and 1.0 EU): 0x00410E60
+=========================================================*/
+struct colPreload
+{
+    void __forceinline OnEntry( CColFileSA *colFile, unsigned int id )
+    {
+        // Request every colFile we find to cache it's structure.
+        Streaming::RequestModel( id + DATA_COLL_BLOCK, 0 );
+
+        Streaming::LoadAllRequestedModels( false );
+
+        Streaming::FreeModel( id + DATA_COLL_BLOCK );
+    }
+};
+
+void __cdecl Collision_Preload( void )
+{
+    Streaming::GetCOLEnvironment().m_pool->ForAllActiveEntries( colPreload(), 1 );
+}
+
+/*=========================================================
+    Collision_Sectorize
+
+    Purpose:
+        Loops through all loaded collision files and assigns
+        them to the quad tree nodes.
+    Binary offsets:
+        (1.0 US and 1.0 EU): 0x00410EC0
+=========================================================*/
+struct colSectorize
+{
+    void __forceinline OnEntry( CColFileSA *colFile, unsigned int id )
+    {
+        // Check whether the cache is in writing mode.
+        if ( Cache_IsWritingMode() )
+        {
+            // Update the collision file definition then.
+            Cache_RestoreColFile( colFile );
+        }
+        else
+        {
+            // Expand the colFile sector.
+            // May be debug code or a quick bugfix or a performance improvement.
+            colFile->m_bounds.m_minX -= 120.0f;
+            colFile->m_bounds.m_maxX += 120.0f;
+            colFile->m_bounds.m_minY -= 120.0f;
+            colFile->m_bounds.m_maxY += 120.0f;
+
+            // Write it into our cache.
+            Cache_StoreColFile( *colFile );
+        }
+
+        // Sectorize our colFile.
+        Collision::GetCollisionQuadTree()->LinkToEntity( colFile, colFile->m_bounds );
+    }
+};
+
+void __cdecl Collision_Sectorize( void )
+{
+    Streaming::GetCOLEnvironment().m_pool->ForAllActiveEntries( colSectorize(), 1 );
+}
+
+/*=========================================================
+    _Collision_Init
+
+    Purpose:
+        Initializes the quad tree node system by allocating
+        the pool.
+    Binary offsets:
+        (1.0 US and 1.0 EU): 0x004113F0
+=========================================================*/
+static void __cdecl _Collision_Init( void )
+{
+    Streaming::GetCOLEnvironment().Init();
+}
+
+void ColModel_Init( void )
+{
+    // Hook important routines.
+    HookInstall( 0x00410E60, (DWORD)Collision_Preload, 5 );
+    HookInstall( 0x00410EC0, (DWORD)Collision_Sectorize, 5 );
+    HookInstall( 0x004113F0, (DWORD)_Collision_Init, 5 );
+}
+
+void ColModel_Shutdown( void )
+{
+}
+
 CColModelSA::CColModelSA( void )
 {
     m_pInterface = new CColModelSAInterface;

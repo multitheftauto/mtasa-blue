@@ -54,7 +54,7 @@ int __cdecl RwD3D9SetTransform( D3DTRANSFORMSTATETYPE state, const D3DMATRIX *ma
 
     if ( !prevMatrix )
     {
-        prevMatrix = (D3DMATRIX*)pRwInterface->m_allocStruct( *(RwStructInfo**)0x00C98080, 0x30411 );
+        prevMatrix = (D3DMATRIX*)RenderWare::GetInterface()->m_allocStruct( *(RwStructInfo**)0x00C98080, 0x30411 );
     }
 
     *prevMatrix = *setToMatrix;

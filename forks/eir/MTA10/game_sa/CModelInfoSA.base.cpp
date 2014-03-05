@@ -155,7 +155,7 @@ void CBaseModelInfoSAInterface::SetCollision( CColModelSAInterface *col, bool dy
 
         timeInfo *timed = GetTimeInfo();
 
-        if ( timed && timed->m_model != 0xFFFF )
+        if ( timed && timed->m_model != -1 )
             ppModelInfo[timed->m_model]->SetCollision( col, false );
     }
     else
@@ -192,7 +192,7 @@ void CBaseModelInfoSAInterface::DereferenceTXD( void )
     if ( usTextureDictionary == -1 )
         return;
 
-    (*ppTxdPool)->Get( usTextureDictionary )->Dereference();
+    TextureManager::GetTxdPool()->Get( usTextureDictionary )->Dereference();
 }
 
 /*=========================================================
@@ -208,7 +208,7 @@ void CBaseModelInfoSAInterface::Reference( void )
 {
     usNumberOfRefs++;
 
-    (*ppTxdPool)->Get( usTextureDictionary )->Reference();
+    TextureManager::GetTxdPool()->Get( usTextureDictionary )->Reference();
 }
 
 /*=========================================================
@@ -224,7 +224,7 @@ void CBaseModelInfoSAInterface::Dereference( void )
 {
     usNumberOfRefs--;
 
-    (*ppTxdPool)->Get( usTextureDictionary )->Dereference();
+    TextureManager::GetTxdPool()->Get( usTextureDictionary )->Dereference();
 }
 
 /*=========================================================

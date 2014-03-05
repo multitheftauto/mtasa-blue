@@ -14,6 +14,7 @@
 #include <multiplayer/CPopulationMP.h>
 
 // These includes need to be fixed!
+#include "../game_sa/CModelInfoSA.h"
 #include "../game_sa/CPedSA.h"
 #include "../game_sa/CCivilianPedSA.h"
 

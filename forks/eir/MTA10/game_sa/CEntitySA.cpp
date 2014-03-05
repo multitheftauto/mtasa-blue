@@ -21,15 +21,217 @@ extern CGameSA * pGame;
 unsigned long CEntitySA::FUNC_CClumpModelInfo__GetFrameFromId;
 unsigned long CEntitySA::FUNC_RwFrameGetLTM;
 
+void CEntitySAInterface::GetPosition( CVector& pos ) const
+{
+    pos = Placeable.GetPosition();
+}
+
+float CEntitySAInterface::GetBasingDistance( void ) const
+{
+    return GetColModel()->m_bounds.vecBoundMin.fZ;
+}
+
+static bool RpMaterialSetAlpha( RpMaterial *mat, unsigned char alpha )
+{
+    mat->color.a = alpha;
+    return true;
+}
+
+static bool RpAtomicMaterialSetAlpha( RpAtomic *atom, unsigned char alpha )
+{
+    atom->geometry->ForAllMateria( RpMaterialSetAlpha, alpha );
+    return true;
+}
+
+void CEntitySAInterface::SetAlpha( unsigned char alpha )
+{
+    RwObject *rwobj = GetRwObject();
+
+    if ( !rwobj )
+        return;
+
+    if ( rwobj->type == RW_ATOMIC )
+    {
+        RpAtomicMaterialSetAlpha( (RpAtomic*)rwobj, alpha );
+    }
+    else if ( rwobj->type == RW_CLUMP )
+    {
+        ((RpClump*)rwobj)->ForAllAtomics( RpAtomicMaterialSetAlpha, alpha );
+    }
+}
+
+CColModelSAInterface* CEntitySAInterface::GetColModel( void ) const
+{
+#if 0
+    CEntitySA *entity = (CEntitySA*)pGame->GetPools()->GetEntity( const_cast <CEntitySAInterface*> ( this ) );
+
+    if ( entity )
+    {
+        CColModelSA *col = entity->GetColModel();
+
+        if ( col )
+            return col->GetInterface();
+    }
+#endif
+
+    if ( nType == ENTITY_TYPE_VEHICLE )
+    {
+        CVehicleSAInterface *veh = (CVehicleSAInterface*)this;
+        unsigned char n = veh->m_nSpecialColModel;
+
+        if ( n != 0xFF )
+            return (CColModelSAInterface*)VAR_CVehicle_SpecialColModels + n;
+    }
+
+    return GetModelInfo()->pColModel;
+}
+
+const CVector& CEntitySAInterface::GetCollisionOffset( CVector& out ) const
+{
+    GetOffset( out, GetColModel()->m_bounds.vecBoundOffset );
+    return out;
+}
+
+const CBounds2D& CEntitySAInterface::_GetBoundingBox( CBounds2D& out ) const
+{
+    CColModelSAInterface *col = GetColModel();
+    CVector pos;
+    
+    GetOffset( pos, col->m_bounds.vecBoundOffset );
+
+    float radius = col->m_bounds.fRadius;
+
+    out.m_minX = pos[0] - radius;
+    out.m_maxY = pos[1] + radius;
+    out.m_maxX = pos[0] + radius;
+    out.m_minY = pos[1] - radius;
+    return out;
+}
+
+void __thiscall CEntitySAInterface::GetCenterPoint( CVector& out ) const
+{
+    CColModelSAInterface *col = GetColModel();
+
+    GetOffset( out, col->m_bounds.vecBoundOffset );
+}
+
+void __thiscall CEntitySAInterface::SetOrientation( float x, float y, float z )
+{
+    Placeable.SetRotation( x, y, z );
+}
+
+bool CEntitySAInterface::IsOnScreen( void ) const
+{
+    CColModelSAInterface *col = GetColModel();
+    CVector pos;
+
+    // Bugfix: no col -> not visible
+    if ( col )
+    {
+        GetOffset( pos, col->m_bounds.vecBoundOffset );
+
+        if ( pGame->GetCamera()->GetInterface()->IsSphereVisible( pos, col->m_bounds.fRadius, (void*)0x00B6FA74 ) )
+            return true;
+
+        if ( *(unsigned char*)0x00B6F998 )
+            return pGame->GetCamera()->GetInterface()->IsSphereVisible( pos, col->m_bounds.fRadius, (void*)0x00B6FABC );
+    }
+
+    return false;
+}
+
+bool __thiscall CEntitySAInterface::CheckScreenValidity( void ) const
+{
+    bool retVal;
+
+    __asm
+    {
+        mov eax,0x0071FAE0
+        call eax
+        mov retVal,al
+    }
+
+    return retVal;
+}
+
+void CEntitySAInterface::UpdateRwMatrix( void )
+{
+    if ( !GetRwObject() )
+        return;
+
+    Placeable.GetMatrix( GetRwObject()->parent->modelling );
+}
+
+void CEntitySAInterface::UpdateRwFrame( void )
+{
+    if ( !GetRwObject() )
+        return;
+
+    GetRwObject()->parent->Update();
+}
+
+// Binary offsets: (1.0 US and 1.0 EU): 0x00407000
+bool __thiscall CEntitySAInterface::IsInStreamingArea( void ) const
+{
+    return Streaming::IsValidStreamingArea( m_areaCode );
+}
+
+// Entity referencing system.
+// Should prevent entities that are marked by the system to be destroyed in crucial areas.
+// Otherwise the system will crash.
+static entityReferenceCallback_t _entityAddRef = NULL;
+static entityReferenceCallback_t _entityRemoveRef = NULL;
+
+bool CEntitySAInterface::Reference( void )
+{
+    if ( _entityAddRef )
+    {
+        CEntitySA *mtaEntity = Pools::GetEntity( this );
+
+        if ( mtaEntity )
+        {
+            return _entityAddRef( mtaEntity );
+        }
+    }
+
+    return false;
+}
+
+void CEntitySAInterface::Dereference( void )
+{
+    if ( _entityRemoveRef )
+    {
+        CEntitySA *mtaEntity = Pools::GetEntity( this );
+
+        if ( mtaEntity )
+            _entityRemoveRef( mtaEntity );
+    }
+}
+
+void Entity::SetReferenceCallbacks( entityReferenceCallback_t addRef, entityReferenceCallback_t delRef )
+{
+    _entityAddRef = addRef;
+    _entityRemoveRef = delRef;
+}
+
 void Entity_Init( void )
 {
+    HookInstall( 0x00535300, h_memFunc( &CEntitySAInterface::GetColModel ), 5 );
+    HookInstall( 0x00534540, h_memFunc( &CEntitySAInterface::IsOnScreen ), 5 );
+    HookInstall( 0x00534250, h_memFunc( &CEntitySAInterface::GetCollisionOffset ), 5 );
+    HookInstall( 0x005449B0, h_memFunc( &CEntitySAInterface::_GetBoundingBox ), 5 );
+    HookInstall( 0x00534290, h_memFunc( &CEntitySAInterface::GetCenterPoint ), 5 );
+    HookInstall( 0x00446F90, h_memFunc( &CEntitySAInterface::UpdateRwMatrix ), 5 );
+    HookInstall( 0x00532B00, h_memFunc( &CEntitySAInterface::UpdateRwFrame ), 5 );
+    HookInstall( 0x00536BE0, h_memFunc( &CEntitySAInterface::GetBasingDistance ), 5 );
+
     EntityRender_Init();
 }
 
 void Entity_Shutdown( void )
 {
     EntityRender_Shutdown();
-}   
+}
 
 CEntitySA::CEntitySA ( void )
 {

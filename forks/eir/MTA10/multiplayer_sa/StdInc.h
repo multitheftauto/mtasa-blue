@@ -27,6 +27,7 @@
 #include <game/CGame.h>
 #include <CMatrix_Pad.h>
 #include <../version.h>
+#include "../game_sa/Common.h"
 
 // Multiplayer includes
 #include "multiplayersa_init.h"

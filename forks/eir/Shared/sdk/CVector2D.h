@@ -56,6 +56,11 @@ public:
         return sqrt ( fX * fX + fY * fY );
     }
 
+    float LengthSquared () const
+    {
+        return fX * fX + fY * fY;
+    }
+
     void Normalize ( void ) 
     { 
         float fLength = Length ();

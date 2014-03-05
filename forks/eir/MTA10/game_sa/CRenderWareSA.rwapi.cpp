@@ -123,7 +123,9 @@ RwRenderLink* RwStaticGeometry::AllocateLink( unsigned int count )
 =========================================================*/
 RwTexture* RwFindTexture( const char *name, const char *secName )
 {
-    RwTexture *tex = pRwInterface->m_textureManager.findInstanceRef( name );
+    RwInterface *rwInterface = RenderWare::GetInterface();
+
+    RwTexture *tex = rwInterface->m_textureManager.findInstanceRef( name );
 
     // The global store will reference textures
     if ( tex )
@@ -132,7 +134,7 @@ RwTexture* RwFindTexture( const char *name, const char *secName )
         return tex;
     }
 
-    if ( !( tex = pRwInterface->m_textureManager.findInstance( name, secName ) ) )
+    if ( !( tex = rwInterface->m_textureManager.findInstance( name, secName ) ) )
     {
         // If we have not found anything, we tell the system about an error
         RwError err;
@@ -144,7 +146,7 @@ RwTexture* RwFindTexture( const char *name, const char *secName )
         return NULL;
     }
 
-    if ( RwTexDictionary *txd = pRwInterface->m_textureManager.current )
+    if ( RwTexDictionary *txd = rwInterface->m_textureManager.current )
     {
         tex->RemoveFromDictionary();
         tex->AddToDictionary( txd );
@@ -166,17 +168,19 @@ RwTexture* RwFindTexture( const char *name, const char *secName )
 =========================================================*/
 RwError* RwSetError( RwError *info )
 {
-    if ( pRwInterface->m_errorInfo.err1 )
+    RwInterface *rwInterface = RenderWare::GetInterface();
+
+    if ( rwInterface->m_errorInfo.err1 )
         return info;
 
-    if ( pRwInterface->m_errorInfo.err2 != 0x80000000 )
+    if ( rwInterface->m_errorInfo.err2 != 0x80000000 )
         return info;
 
     if ( info->err1 & 0x80000000 )
-        pRwInterface->m_errorInfo.err1 = 0;
+        rwInterface->m_errorInfo.err1 = 0;
     else
-        pRwInterface->m_errorInfo.err1 = info->err1;
+        rwInterface->m_errorInfo.err1 = info->err1;
 
-    pRwInterface->m_errorInfo.err2 = info->err2;
+    rwInterface->m_errorInfo.err2 = info->err2;
     return info;
 }

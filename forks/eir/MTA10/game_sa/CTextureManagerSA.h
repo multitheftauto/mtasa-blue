@@ -19,9 +19,6 @@
 class CTexDictionarySA;
 
 #include "CTextureManagerSA.instance.h"
-#ifdef TEXTURE_MANAGER_SHADER_IMPL
-#include "CTextureManagerSA.shader.h"
-#endif //TEXTURE_MANAGER_SHADER_IMPL
 
 
 class CTextureManagerSA : public CTextureManager
@@ -34,9 +31,7 @@ public:
     int                 FindTxdEntry                ( const char *name ) const;
     int                 CreateTxdEntry              ( const char *name );
 
-#ifdef RENDERWARE_VIRTUAL_INTERFACES
     CTexDictionarySA*   CreateTxd                   ( CFile *stream );
-#endif //RENDERWARE_VIRTUAL_INTERFACES
 
     int                 LoadDictionary              ( const char *filename );
     int                 LoadDictionaryEx            ( const char *name, const char *filename );
@@ -46,58 +41,24 @@ public:
     void                DeallocateTxdEntry          ( unsigned short id );
     void                RemoveTxdEntry              ( unsigned short id );
 
-#ifdef TEXTURE_MANAGER_SHADER_IMPL
-    ushort              GetTXDIDForModelID          ( ushort usModelID );
-    void                InitWorldTextureWatch       ( PFN_WATCH_CALLBACK pfnWatchCallback );
-    bool                AddWorldTextureWatch        ( CSHADERDUMMY* pShaderData, const char* szMatch, float fOrderPriority );
-    void                RemoveWorldTextureWatch     ( CSHADERDUMMY* pShaderData, const char* szMatch );
-    void                RemoveWorldTextureWatchByContext ( CSHADERDUMMY* pShaderData );
-    void                PulseWorldTextureWatch      ( void );
-    void                GetModelTextureNames        ( std::vector < SString >& outNameList, ushort usModelID );
-    void                GetTxdTextures              ( std::vector < RwTexture* >& outTextureList, ushort usTxdId );
-    const SString&      GetTextureName              ( CD3DDUMMY* pD3DData );
-#endif //TEXTURE_MANAGER_SHADER_IMPL
+    void                InitGameHooks               ( void );
 
 private:
-#ifdef TEXTURE_MANAGER_SHADER_IMPL
-    void                InitShaderSystem            ( void );
-    void                ShutdownShaderSystem        ( void );
-
-    void                AddActiveTexture            ( ushort usTxdId, const SString& strTextureName, CD3DDUMMY* pD3DData );
-    void                RemoveTxdActiveTextures     ( ushort usTxdId );
-    void                FindNewAssociationForTexInfo( STexInfo* pTexInfo );
-    STexInfo*           CreateTexInfo               ( ushort usTxdId, const SString& strTextureName, CD3DDUMMY* pD3DData );
-    void                OnDestroyTexInfo            ( STexInfo* pTexInfo );
-    SShadInfo*          CreateShadInfo              ( CSHADERDUMMY* pShaderData, const SString& strTextureName, float fOrderPriority );
-    void                OnDestroyShadInfo           ( SShadInfo* pShadInfo );
-    void                MakeAssociation             ( SShadInfo* pShadInfo, STexInfo* pTexInfo );
-    void                BreakAssociation            ( SShadInfo* pShadInfo, STexInfo* pTexInfo );
-#endif //TEXTURE_MANAGER_SHADER_IMPL
-
-#ifdef RENDERWARE_VIRTUAL_INTERFACES
     // Managed textures
     RwList <CTexDictionarySA>               m_txdList;
-#endif //RENDERWARE_VIRTUAL_INTERFACES
-
-#ifdef TEXTURE_MANAGER_SHADER_IMPL
-    // Watched world textures
-    std::list < SShadInfo >                 m_ShadInfoList;
-    std::list < STexInfo >                  m_TexInfoList;
-
-    std::map < SString, STexInfo* >         m_UniqueTexInfoMap;
-    std::map < CD3DDUMMY*, STexInfo* >      m_D3DDataTexInfoMap;
-    std::map < SString, SShadInfo* >        m_UniqueShadInfoMap;
-    std::multimap < float, SShadInfo* >     m_orderMap;
-
-    PFN_WATCH_CALLBACK                      m_pfnWatchCallback;
-#endif //TEXTURE_MANAGER_SHADER_IMPL
 };
 
-#ifdef RENDERWARE_VIRTUAL_INTERFACES
-typedef std::list <CTextureSA*> dictImportList_t;
-extern dictImportList_t g_dictImports[MAX_TXD];
-#endif //RENDERWARE_VIRTUAL_INTERFACES
+// Definition of the pool containing all texture dictionaries of the game.
+typedef CPool <CTxdInstanceSA, MAX_TXD> CTxdPool;
 
+namespace TextureManager
+{
+    inline CTxdPool*&   GetTxdPool                  ( void )            { return *(CTxdPool**)0x00C8800C; }
+};
+
+typedef std::list <CTextureSA*> dictImportList_t;
+
+extern dictImportList_t g_dictImports[MAX_TXD];
 extern RwTexDictionary *g_textureEmitter;
 
 #endif //_CTextureManagerSA_H_

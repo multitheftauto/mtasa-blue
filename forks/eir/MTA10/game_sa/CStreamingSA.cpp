@@ -29,31 +29,24 @@ namespace
 
         void Record ( void )
         {
-            #define VAR_CStreaming_bLoadingBigModel         0x08E4A58
-            #define VAR_CStreaming_numPriorityRequests      0x08E4BA0
             #define VAR_CStreaming_numModelsRequested       0x08E4CB8
             #define VAR_CStreaming_memoryUsed               0x08E4CB4
 
-            bLoadingBigModel    = *(BYTE*)VAR_CStreaming_bLoadingBigModel != 0;
-            numPriorityRequests = *(DWORD*)VAR_CStreaming_numPriorityRequests;
+            bLoadingBigModel    = Streaming::isLoadingBigModel;
+            numPriorityRequests = Streaming::numPriorityRequests;
             numModelsRequested  = *(DWORD*)VAR_CStreaming_numModelsRequested;
             memoryUsed          = *(DWORD*)VAR_CStreaming_memoryUsed;
         }
     };
 };
 
-CIPLFilePool **ppIPLFilePool = (CIPLFilePool**)CLASS_CIPLFilePool;
-
 extern CBaseModelInfoSAInterface **ppModelInfo;
 
-CColModelSA *g_colReplacement[DATA_TEXTURE_BLOCK];
-CColModelSAInterface *g_originalCollision[DATA_TEXTURE_BLOCK];
+CColModelSA *g_colReplacement[MAX_MODELS];
+CColModelSAInterface *g_originalCollision[MAX_MODELS];
 
-#define ARRAY_PEDSPECMODEL      0x008E4C00
-#define VAR_PEDSPECMODEL        0x008E4BB0
 #define VAR_MEMORYUSAGE         0x008E4CB4
 #define VAR_NUMMODELS           0x008E4CB8
-#define VAR_NUMPRIOMODELS       0x008E4BA0
 
 static streamingRequestCallback_t streamingRequestCallback = NULL;
 static streamingFreeCallback_t streamingFreeCallback = NULL;
@@ -97,7 +90,7 @@ struct ModelRequestDispatch : ModelCheckDispatch <true>
 
     bool __forceinline DoTexDictionary( modelId_t id )
     {
-        CTxdInstanceSA *txd = (*ppTxdPool)->Get( id );
+        CTxdInstanceSA *txd = TextureManager::GetTxdPool()->Get( id );
 
         // Crashfix
         if ( !txd )
@@ -127,7 +120,7 @@ void __cdecl Streaming::RequestModel( modelId_t id, unsigned int flags )
     case MODEL_LOADING:
         if ( flags & 0x10 && !(info->m_flags & 0x10) )
         {
-            (*(DWORD*)VAR_NUMPRIOMODELS)++;
+            Streaming::numPriorityRequests++;
 
             info->m_flags |= FLAG_PRIORITY;
         } 
@@ -137,14 +130,13 @@ void __cdecl Streaming::RequestModel( modelId_t id, unsigned int flags )
         if ( streamingRequestCallback )
             streamingRequestCallback( id );
 
-#ifdef RENDERWARE_VIRTUAL_INTERFACES
         // Model support fix: quick load a model if we already have it for replacement; prevents memory leaks and boosts speed
 	    // as opposed to letting the original/replaced game resources load
         if ( id < DATA_TEXTURE_BLOCK )
         {
             CBaseModelInfoSAInterface *minfo = ppModelInfo[id];
 
-            // Fix for invalid model requests
+            // Fix for invalid model requests (jff)
             if ( !minfo )
                 return;
 
@@ -173,7 +165,6 @@ void __cdecl Streaming::RequestModel( modelId_t id, unsigned int flags )
                 return;
             }
         }
-#endif //RENDERWARE_VIRTUAL_INTERFACES
         break;
     default:
         flags &= ~FLAG_PRIORITY;
@@ -191,10 +182,10 @@ void __cdecl Streaming::RequestModel( modelId_t id, unsigned int flags )
         // Remove loaded model from its queue (it has to reside in one)
         info->PopFromLoader();
 
-#ifdef RENDERWARE_VIRTUAL_INTERFACES
+        // Prevent procedure of models which have been replaced.
+        // This stops them from being garbage collected.
         if ( g_replObjectNative[id] != NULL )
             return;
-#endif //RENDERWARE_VIRTUAL_INTERFACES
 
         if ( id < MAX_MODELS )
         {
@@ -214,7 +205,7 @@ void __cdecl Streaming::RequestModel( modelId_t id, unsigned int flags )
         // This might have to do with Garbage Collection.
         // So, if we request with 0x06 flag, we prevent models from being collected?
         if ( !( info->m_flags & (0x02 | 0x04) ) )
-            info->PushIntoLoader( *(CModelLoadInfoSA**)0x008E4C60 );
+            info->PushIntoLoader( GetLastGarbageCollectModel() );
     }
     else if ( info->m_eLoading == MODEL_UNAVAILABLE )
     {
@@ -222,6 +213,7 @@ void __cdecl Streaming::RequestModel( modelId_t id, unsigned int flags )
         if ( !DefaultDispatchExecute( id, ModelRequestDispatch( flags ) ) )
             return;
 
+#ifdef _MTA_BLUE
         // Wire in a MTA team fix regarding clothes replacing.
         // What a dirty hook :p
         if ( OnCStreaming_RequestModel_Mid( flags, (ClothesReplacing::SImgGTAItemInfo*)info ) )
@@ -231,6 +223,7 @@ void __cdecl Streaming::RequestModel( modelId_t id, unsigned int flags )
             LoadModel( ClothesReplacing::pReturnBuffer, ClothesReplacing::iReturnFileId, 0 );
             return;
         }
+#endif //_MTA_BLUE
 
         // Push onto the to-be-loaded queue
         info->PushIntoLoader( *(CModelLoadInfoSA**)0x008E4C58 );
@@ -239,7 +232,7 @@ void __cdecl Streaming::RequestModel( modelId_t id, unsigned int flags )
         (*(DWORD*)VAR_NUMMODELS)++;
 
         if ( flags & 0x10 )
-            (*(DWORD*)VAR_NUMPRIOMODELS)++;
+            Streaming::numPriorityRequests++;
 
         // If available, we reload the model
         info->m_flags = flags;
@@ -271,9 +264,16 @@ struct ModelFreeDispatch : ModelCheckDispatch <false>   // by default we do not 
         // Model management fix: we unlink the collision so GTA:SA does not destroy it during
         // RwObject deletion
         if ( g_colReplacement[id] && model->GetRwModelType() == RW_CLUMP )
+        {
+            CColModelSAInterface *col = model->pColModel;
             model->pColModel = NULL;
 
-        model->DeleteRwObject();
+            model->DeleteRwObject();
+
+            model->SetCollision( col, false );
+        }
+        else
+            model->DeleteRwObject();
 
         switch( model->GetModelType() )
         {
@@ -307,16 +307,15 @@ struct ModelFreeDispatch : ModelCheckDispatch <false>   // by default we do not 
 #endif
 
             // The_GTA: I removed the unused "vehicles" maximum clean-up code here.
-            // It was never used in GTA:SA anyway.
+            // It cannot be used in MTA:SA anyway, as it is a very small limit in
+            // comparison to what we load with Lua.
             break;
         }
 
-#ifdef RENDERWARE_VIRTUAL_INTERFACES
         // Model support bugfix: if we have a replacement for this model, we should not
         // bother about management in the CStreaming class, so quit here
         if ( g_replObjectNative[id] )
             return false;
-#endif //RENDERWARE_VIRTUAL_INTERFACES
 
         return true;
     }
@@ -328,36 +327,27 @@ struct ModelFreeDispatch : ModelCheckDispatch <false>   // by default we do not 
 #endif
 
         // Deallocate textures
-        (*ppTxdPool)->Get( id )->Deallocate();
+        TextureManager::GetTxdPool()->Get( id )->Deallocate();
         return true;
     }
 
     bool __forceinline DoCollision( modelId_t id )
     {
         // Destroy all collisions associated with the COL library
-        FreeCOLLibrary( (unsigned char)id );
+        Streaming::GetCOLEnvironment().UnloadSector( id );
         return true;
     }
 
     bool __forceinline DoIPL( modelId_t id )
     {
         // This function destroys buildings/IPLs!
-        ((void (__cdecl*)( modelId_t ))0x00404B20)( id );
+        Streaming::GetIPLEnvironment().UnloadSector( id );
         return true;
     }
 
     bool __forceinline DoPathFind( modelId_t id )
     {
-        __asm
-        {
-            mov eax,id
-
-            push eax
-            mov ecx,CLASS_CPathFind
-            mov eax,0x0044D0F0
-            call eax
-        }
-
+        PathFind::GetInterface().FreeContainer( id );
         return true;
     }
 
@@ -379,6 +369,8 @@ struct ModelFreeDispatch : ModelCheckDispatch <false>   // by default we do not 
             mov eax,0x004708E0
             call eax
         }
+
+        return true;
     }
 };
 
@@ -387,6 +379,8 @@ struct ModelAbortBigRequestDispatcher : ModelFreeDispatch
 {
     bool DoBaseModel( modelId_t id )
     {
+        // To be honest, I have no idea what the correct name is.
+        // If you have a clue, contact me (The_GTA).
         RwFlushLoader();
         return true;
     }
@@ -407,7 +401,7 @@ void __cdecl Streaming::FreeModel( modelId_t id )
     if ( info->m_eLoading == MODEL_LOADED && DefaultDispatchExecute( id, ModelFreeDispatch() ) )
     {
         // Only decrease if the free-request was successful!
-        *(DWORD*)VAR_MEMORYUSAGE -= info->m_blockCount * 2048;
+        *(DWORD*)VAR_MEMORYUSAGE -= info->GetSize();
     }
 
     if ( info->IsOnLoader() )
@@ -422,7 +416,7 @@ void __cdecl Streaming::FreeModel( modelId_t id )
                 info->m_flags &= ~FLAG_PRIORITY;
 
                 // It also wants the count of priority requests, as they are prefered.
-                (*(DWORD*)VAR_NUMPRIOMODELS)--;
+                Streaming::numPriorityRequests--;
             }
         }
 
@@ -431,18 +425,17 @@ void __cdecl Streaming::FreeModel( modelId_t id )
     }
     else if ( info->m_eLoading == MODEL_QUEUE )
     {
-        streamingRequest& primary = Streaming::GetStreamingRequest( 0 );
-        streamingRequest& secondary = Streaming::GetStreamingRequest( 1 );
-
         // Invalidate any running syncSemaphore requests for this model id
         // Data which has been read from the IMG archive will be ignored.
-        for ( unsigned int n = 0; n < MAX_STREAMING_REQUESTS; n++ )
+        for ( unsigned int i = 0; i < MAX_STREAMING_REQUESTERS; i++ )
         {
-            if ( primary.ids[n] == id )
-                primary.ids[n] = -1;
+            streamingRequest& requester = GetStreamingRequest( i );
 
-            if ( secondary.ids[n] == id )
-                secondary.ids[n] = -1;
+            for ( unsigned int n = 0; n < MAX_STREAMING_REQUESTS; n++ )
+            {
+                if ( requester.ids[n] == id )
+                    requester.ids[n] = -1;
+            }
         }
     }
     else if ( info->m_eLoading == MODEL_RELOAD )
@@ -460,100 +453,623 @@ void __cdecl Streaming::FreeModel( modelId_t id )
 }
 
 /*=========================================================
-    Streaming::LoadAllRequestedModels
+    Streaming::RequestDirectResource
 
     Arguments:
-        onlyPriority - appears to favour prioritized models if true
+        model - model id slot to request to
+        imgId - .IMG container to request from
+        blockCount - size of the requested resource
+        imgOffset - offset in the .IMG container
+        reqFlags - flags passed to RequestModel
     Purpose:
-        Cycles through the streaming loading system to process
-        loader queues (load and termination requests).
+        Requests a new resource from an .IMG container to
+        a model slot. If the resource has already been loaded
+        at the given slot, it simply requests it. Otherwise,
+        the previous resource is unloaded and then the new
+        resource is requested.
     Binary offsets:
-        (1.0 US and 1.0 EU): 0x0040EA10
+        (1.0 US and 1.0 EU): 0x0040A080
 =========================================================*/
-static volatile bool _isLoadingRequests = false;
-
-void __cdecl Streaming::LoadAllRequestedModels( bool onlyPriority )
+void __cdecl Streaming::RequestDirectResource( modelId_t model, unsigned int blockOffset, unsigned int blockCount, unsigned int imgId, unsigned int reqFlags )
 {
-    using namespace Streaming;
+    CModelLoadInfoSA& info = Streaming::GetModelLoadInfo( model );
 
-    if ( _isLoadingRequests )
+    // MTA: check if we cached special resources (like player.img data)
+    // If so, use said data for resource lookup.
+    void *dataPtr;
+
+    if ( StreamingCache::GetCachedIMGData( imgId, blockOffset, blockCount, dataPtr ) )
+    {
+        // Terminate anything that was loaded previously as this slot.
+        FreeModel( model );
+
+        // Set invalid block data to notify that the IMG data
+        // does not originate from an .IMG container.
+        info.SetOffset( 0, 0 );
+
+        // Quick load our resources and return.
+        LoadModel( dataPtr, model, 0 );
+        return;
+    }
+
+    unsigned int oldOffset;
+    unsigned int oldBlockCount;
+
+    // If the resource already exists at said slot, just request it.
+    if ( info.GetOffset( oldOffset, oldBlockCount ) && oldOffset == Streaming::GetFileHandle( imgId, blockOffset ) && oldBlockCount == blockCount )
+    {
+        RequestModel( model, reqFlags );
+        return;
+    }
+
+    // Terminate the previous resource instance.
+    FreeModel( model );
+
+    // Set new resource information.
+    info.SetOffset( blockOffset, blockCount );
+    info.m_imgID = imgId;
+
+    // Load new resource information from our .IMG container.
+    RequestModel( model, reqFlags );
+}
+
+/*=========================================================
+    Streaming::RequestSpecialModel
+
+    Arguments:
+        model - slot to request the model resource into
+        tex - texture dictionary name of the special model
+        reqFlags - flags given to RequestModel
+    Purpose:
+        Loads a new model resource into the model slot during
+        runtime. Makes sure that no entity in-game is conflicting
+        with the new resource by removing active entities that
+        use it from the world.
+    Binary offsets:
+        (1.0 US and 1.0 EU): 0x00409D10
+=========================================================*/
+struct ClearPedRefs
+{
+    __forceinline ClearPedRefs( unsigned int model ) : m_model( model )
+    { }
+
+    void __forceinline OnEntry( CPedSAInterface *ped, unsigned int index )
+    {
+        if ( ped->GetModelIndex() == m_model && ped->IsPlayer() )
+        {
+            
+        }
+    }
+
+    unsigned int m_model;
+};
+
+void __cdecl Streaming::RequestSpecialModel( modelId_t model, const char *tex, unsigned int reqFlags )
+{
+    // todo.
+    ((void (__cdecl*)( modelId_t model, const char *tex, unsigned int reqFlags ))FUNC_CStreaming_RequestSpecialModel)( model, tex, reqFlags );
+
+#if 0
+    unsigned int modelHash = pGame->GetKeyGen()->GetUppercaseKey( tex );
+
+    CBaseModelInfoSAInterface *model = ppModelInfo[model];
+
+    if ( model->GetHashKey() == modelHash )
+    {
+        unsigned int offset, blockCount;
+
+        if ( GetModelLoadInfo( model ).GetOffset( offset, blockCount ) )
+        {
+            RequestModel( model, reqFlags );
+            return;
+        }
+    }
+
+    // If the model is being used by anything, attempt to clear
+    // all references of it.
+    if ( model->GetRefCount() != 0 )
+    {
+        
+    }
+#endif
+}
+
+/*=========================================================
+    Streaming::CleanUpLoadQueue
+
+    Purpose:
+        Loops through all models requests on the load queue
+        and removes the ones which have expired. The removal
+        of model requests depends on the flags that have been
+        set to the load info.
+    Binary offsets:
+        (1.0 US and 1.0 EU): 0x0040C1E0
+=========================================================*/
+void __cdecl Streaming::CleanUpLoadQueue( void )
+{
+    CModelLoadInfoSA *iter = GetLastQueuedLoadInfo();
+
+    while ( iter != *(CModelLoadInfoSA**)0x008E4C58 )
+    {
+        CModelLoadInfoSA *nextInfo = Streaming::GetPrevLoadInfo( iter );
+
+        if ( !IS_ANY_FLAG( iter->m_flags, 0x1E ) )
+        {
+            Streaming::FreeModel( iter->GetIndex() );
+        }
+
+        iter = nextInfo;
+    }
+}
+
+/*=========================================================
+    Streaming::IsInsideStreamingUpdate (MTA extension)
+
+    Purpose:
+        Returns a boolean whether the streaming update routine
+        has been called and resides on the stack.
+=========================================================*/
+static bool insideStreamingUpdate = false;
+
+bool Streaming::IsInsideStreamingUpdate( void )
+{
+    return insideStreamingUpdate;
+}
+
+/*=========================================================
+    Streaming::SetStreamingEntity (MTA extension)
+
+    Arguments:
+        entity - the entity which shall be the streaming focus
+    Purpose:
+        Sets the active entity that is used for streaming.
+        Around this entity the world will load.
+=========================================================*/
+inline void GetStreamingEntityPosition( CVector& pos )
+{
+    // MTA fix: if we are inside of the streaming update routine,
+    // we should return the center of world.
+    if ( World::GetCenterOfWorld( pos ) )
         return;
 
-    _isLoadingRequests = true;
-    PulseStreamingRequests();
-    
-    unsigned int pulseCount = std::max( 10u, *(unsigned int*)0x008E4CB8 * 2 );
-    unsigned int threadId = 0;
+    // Otherwise attempt to read the position of an active streaming entity.
+    CEntitySAInterface *activeStreamingEntity = World::GetStreamingEntity();
 
-    for ( ; pulseCount != 0; pulseCount-- )
+    if ( activeStreamingEntity )
     {
-        // Check whether activity is required at all
-        if ( GetLastQueuedLoadInfo() == *(CModelLoadInfoSA**)0x008E4C58 &&
-            GetStreamingRequest( 0 ).status == streamingRequest::STREAMING_NONE &&
-            GetStreamingRequest( 1 ).status == streamingRequest::STREAMING_NONE )
-            break;
-
-        if ( pulseCount == 0 )
-            break;
-
-        if ( *(bool*)0x008E4A58 )
-            threadId = 0;
-
-        streamingRequest& requester = GetStreamingRequest( threadId );
-
-        // Cancel any pending activity (if PulseStreamingRequests did not finish it)
-        if ( requester.status != streamingRequest::STREAMING_NONE )
-        {
-            CancelSyncSemaphore( threadId );
-
-            // Tell the requester about it
-            requester.statusCode = 100;
-        }
-
-        // Try to finish the loading procedure
-        if ( requester.status == streamingRequest::STREAMING_BUFFERING )
-        {
-            ProcessStreamingRequest( threadId );
-
-            // This once again enforces this coroutine like loading logic.
-            // It expects resources to at least take two pulses to load properly.
-            // The system breaks if more pulses are required.
-            if ( requester.status == streamingRequest::STREAMING_LOADING )
-                ProcessStreamingRequest( threadId );
-        }
-
-        // If we expect to load only priority and there is no priority models
-        // to load, we can cancel here.
-        if ( onlyPriority && *(unsigned int*)0x008E4BA0 == 0 )
-            break;
-
-        // We can only perform this loading logic if all models have acquired their resources
-        // (no big models are being loaded)
-        if ( !*(bool*)0x008E4A58 )
-        {
-            streamingRequest& otherRequester = GetStreamingRequest( 1 - threadId );
-
-            // Pulse the other streaming request if we can
-            if ( otherRequester.status == streamingRequest::STREAMING_NONE )
-                PulseStreamingRequest( 1 - threadId );
-
-            // Check that we did not begin loading a big model
-            // Pulse the primary requester if we can
-            if ( !*(bool*)0x008E4A58 && requester.status == streamingRequest::STREAMING_NONE )
-                PulseStreamingRequest( threadId );
-        }
-
-        // If we have no more activity, we can break here
-        if ( GetStreamingRequest( 0 ).status == streamingRequest::STREAMING_NONE &&
-             GetStreamingRequest( 1 ).status == streamingRequest::STREAMING_NONE )
-            break;
-
-        // Switch the thread id (cycle through them)
-        threadId = 1 - threadId;
+        activeStreamingEntity->GetPosition( pos );
+        return;
     }
-    
+
+    // Default to player ped position.
+    FindPlayerCoords( pos, -1 );
+}
+
+/*=========================================================
+    Streaming::Update
+
+    Purpose:
+        Updates the world streaming status. It requests collision
+        data of camera-surrounding entities. Special vehicles
+        are requested depending on zone to optimize gameplay.
+        Objects which have come into sight but have their models
+        not loaded yet are requested.
+    Binary offsets:
+        (1.0 US and 1.0 EU): 0x0040E670
+=========================================================*/
+static bool cleanUpPendingModels = true;    // Binary offsets: (1.0 US and 1.0 EU): 0x008E4CA4
+
+void __cdecl Streaming::Update( void )
+{
+    // todo: what is this?
+    // appears to store the latest number of models loaded.
+    *(unsigned int*)0x00B729BC = *(unsigned int*)VAR_NUMMODELS;
+
+    // If the game is paused or the streamer is disabled,
+    // we cannot update the streaming status.
+    if ( *(bool*)0x00B7CB49 || *(bool*)0x00B7CB48 )
+        return;
+
+    // Calculate the height above ground.
+    CCameraSAInterface& camera = Camera::GetInterface();
+    const CVector& camPos = camera.Placeable.GetPosition();
+
+    float aboveGroundHeight = camPos.fZ - camera.GetGroundLevel( 0 );
+
+    if ( !*(bool*)0x009654B0 && !*(bool*)0x00B76850 )
+    {
+        if ( aboveGroundHeight < 50.0f )
+        {
+            if ( *(bool*)0x00B745C1 )
+            {
+                Streamer::RequestAdvancedSquaredSectorEntities( camPos, 0 );
+            }
+        }
+        else if ( *(unsigned int*)VAR_currArea == 0 )
+        {
+            Streamer::RequestSquaredSectorEntities( camPos, 0 );
+        }
+    }
+
+    unsigned int unk = *(unsigned int*)0x00B7CB4C;
+
+    if ( ( unk & 0x7F ) == 106 )
+    {
+        *(bool*)0x009654BC = false;
+
+        if ( aboveGroundHeight < 500 )
+            *(bool*)0x009654BC = PathFind::GetInterface().IsSectorCarNodeInRadius( camPos.fX, camPos.fY, 80.0f );
+    }
+
+    CVector playerPos;
+    GetStreamingEntityPosition( playerPos );
+
+#ifdef DO_WORLD_STREAMING
+    if ( !*(bool*)0x009654B0 && !*(bool*)0x00B5F852 && *(unsigned int*)VAR_currArea == 0 && !*(bool*)0x00A43088 )
+    {
+        if ( aboveGroundHeight < 50.0f )
+        {
+            Streaming::StreamPedsAndVehicles( playerPos );
+
+            if ( !Streaming::IsStreamingBusy() )
+            {
+                ((void (__cdecl*)( void ))0x0040B700)();
+                ((void (__cdecl*)( const CVector& pos ))0x0040A560)( playerPos );
+            }
+        }
+    }
+#endif //DO_WORLD_STREAMING
+
+    // MTA extension: update fiber timing before going into pulsing the loaders.
+    if ( CExecutiveGroupSA *group = fiberGroup )
+    {
+        // todo
+    }
+
+    // Process loading requests.
+    Streaming::PulseLoader();
+
+    // Stream buildings and collision files!
+    // This is one heavy routine.
+    COLEnv_t& COLEnv = Streaming::GetCOLEnvironment();
+    IPLEnv_t& IPLEnv = Streaming::GetIPLEnvironment();
+
+    if ( CVehicleSAInterface *remoteVehicle = PlayerInfo::GetInfo( -1 ).pRemoteVehicle )
+    {
+        const CVector& remotePos = remoteVehicle->Placeable.GetPosition();
+
+        COLEnv.SetLoadPosition( playerPos );
+        COLEnv.StreamSectors( remotePos, false );
+        COLEnv.PrioritizeLocalStreaming( remotePos );
+
+        IPLEnv.SetLoadPosition( playerPos );
+        IPLEnv.StreamSectors( remotePos, false );
+        IPLEnv.PrioritizeLocalStreaming( remotePos );
+    }
+    else
+    {
+        COLEnv.StreamSectors( playerPos, false );
+        COLEnv.PrioritizeLocalStreaming( playerPos );
+
+        IPLEnv.StreamSectors( playerPos, false );
+        IPLEnv.PrioritizeLocalStreaming( playerPos );
+    }
+
+    if ( cleanUpPendingModels )
+        Streaming::CleanUpLoadQueue();
+}
+
+// We need to do some work before calling the streaming update function.
+// Derived from CMultiplayerSA hacks.
+void __cdecl HOOK_CStreaming_Update( void )
+{
+    // We enter the streaming update, so notify our environment.
+    insideStreamingUpdate = true;
+
+    // Enter the precious routine!
+    Streaming::Update();
+
+    // We leave, so unset the presency value.
+    insideStreamingUpdate = false;
+}
+
+/*=========================================================
+    CStreamingSA::GetStreamingFocusEntity
+
+    Purpose:
+        Returns the entity that streaming is centered around.
+        If the entity could not be resolved to a valid MTA
+        entity or it is default (i.e. player), NULL is returned.
+=========================================================*/
+CEntitySA* CStreamingSA::GetStreamingFocusEntity( void )
+{
+    return pGame->GetPools()->GetEntity( World::GetStreamingEntity() );
+}
+
+/*=========================================================
+    CStreamingSA::SetWorldStreamingEnabled
+
+    Arguments:
+        enabled - boolean to switch on or off
+    Purpose:
+        Enables or disables the GTA:SA world building
+        streaming. If disabled, the GTA:SA engine will stop
+        requesting the world around the player. The buildings
+        around the player will be deallocated upon disabling.
+=========================================================*/
+void CStreamingSA::SetWorldStreamingEnabled( bool enabled )
+{
+    // todo.
+}
+
+/*=========================================================
+    CStreamingSA::IsWorldStreamingEnabled
+
+    Arguments:
+        enabled - boolean to switch on or off
+    Purpose:
+        Returns whether the world around the player should
+        be loaded.
+=========================================================*/
+bool CStreamingSA::IsWorldStreamingEnabled( void ) const
+{
+    // todo.
+    return true;
+}
+
+/*=========================================================
+    Streaming::FlushRequestList
+
+    Purpose:
+        Loops through the long to-be-loaded queue and aborts
+        the loading of all models. Models which reside on the
+        queue are free'd.
+    Binary offsets:
+        (1.0 US and 1.0 EU): 0x0040E4E0
+=========================================================*/
+void Streaming::FlushRequestList( void )
+{
+    CModelLoadInfoSA *info = Streaming::GetQueuedLoadInfo();
+
+    // Bugfix: safety check so we secure against empty load lists.
+    if ( info )
+    {
+        modelId_t modelId = info->GetIndex();
+        CModelLoadInfoSA *endItem = *(CModelLoadInfoSA**)0x008E4C54;
+
+        while ( info != endItem )
+        {
+            // We must save the next parameters as Streaming::FreeModel will tamper
+            // the CModelLoadInfoSA structure.
+            modelId_t nextModelIndex = info->m_primaryModel;
+            CModelLoadInfoSA *nextInfo = Streaming::GetNextLoadInfo( info );
+
+            // Free the resources associated with every model inside the to-be-loaded queue.
+            Streaming::FreeModel( modelId );
+
+            // Advance to the next model info.
+            modelId = nextModelIndex;
+            info = nextInfo;
+        }
+    }
+
+    // Pulse the streaming requests.
+    // Assumingly, this cleans the tubes from remaining requests.
     PulseStreamingRequests();
-    _isLoadingRequests = false;
+}
+
+/*=========================================================
+    _Streaming_Init
+
+    Purpose:
+        Initializes the GTA:SA streaming system. This is the
+        heart of the engine.
+    Binary offsets:
+        (1.0 US and 1.0 EU): 0x005B8AD0
+=========================================================*/
+// Initialize the streaming entity garbage collection manager.
+// This is the thing that caused the draw distance bug:
+// The node list here could only keep 1000 entries, hence only
+// 1000 objects, dummies and building could be visible at a time.
+// Let us fix that.
+// Binary offsets: (1.0 US and 1.0 EU): 0x009654F0
+Streaming::streamingEntityChain_t Streaming::gcEntityChain( MAX_DEFAULT_STREAMING_ENTITIES );  // screw the alligators
+
+static void __cdecl _Streaming_Init( void )
+{
+    new ((void*)ARRAY_CModelLoadInfo) CModelLoadInfoSA[26316];
+
+    *(CModelLoadInfoSA**)ARRAY_ModelLoadCache = (CModelLoadInfoSA*)ARRAY_CModelLoadInfo;
+
+    // Initialize resource linked lists.
+    CModelLoadInfoSA& gcResourceLink = *(CModelLoadInfoSA*)0x00965460;
+    CModelLoadInfoSA& unkResourceLink = *(CModelLoadInfoSA*)0x00965474;
+    CModelLoadInfoSA& toBeLoadedQueue = *(CModelLoadInfoSA*)0x00965488;
+    CModelLoadInfoSA& lastModelLoadInfo = *(CModelLoadInfoSA*)0x0096549C;
+
+    *(CModelLoadInfoSA**)0x008E4C60 = &gcResourceLink;
+    *(CModelLoadInfoSA**)0x008E4C5C = &unkResourceLink;
+    *(CModelLoadInfoSA**)0x008E4C58 = &toBeLoadedQueue;
+    *(CModelLoadInfoSA**)0x008E4C54 = &lastModelLoadInfo;
+
+    // Set up the resource connections.
+    gcResourceLink.m_primaryModel = 26313;
+    gcResourceLink.m_secondaryModel = 0xFFFF;
+    unkResourceLink.m_primaryModel = 0xFFFF;
+    unkResourceLink.m_secondaryModel = 26312;
+    toBeLoadedQueue.m_primaryModel = 26315;
+    toBeLoadedQueue.m_secondaryModel = 0xFFFF;
+    lastModelLoadInfo.m_primaryModel = 0xFFFF;
+    lastModelLoadInfo.m_secondaryModel = 26314;
+
+    // ???
+    *(void**)0x008E4B98 = NULL;
+    *(void**)0x008E4B94 = NULL;
+
+    // ???
+    for ( modelId_t index = 0; index < 8; index++ )
+        Streaming::GetModelLoadInfo( index + 374 ).m_eLoading = MODEL_LOADED;
+
+    // Init global streaming status.
+    Streaming::biggestResourceBlockCount = 0;
+    *(bool*)0x009654B0 = false;
+    *(unsigned int*)0x008E4CB4 = 0;
+    Streaming::streamingWaitModel = 0xFFFFFFFF;
+    Streaming::isLoadingBigModel = false;
+    cleanUpPendingModels = true;
+    *(bool*)0x008E4B9D = false;
+    *(bool*)0x008E4B9C = false;
+
+    // Initialize streaming requesters.
+    for ( unsigned int n = 0; n < MAX_STREAMING_REQUESTERS; n++ )
+    {
+        streamingRequest& requester = Streaming::GetStreamingRequest( n );
+
+        requester.status = streamingRequest::STREAMING_NONE;
+
+        for ( unsigned int i = 0; i < MAX_STREAMING_REQUESTS; i++ )
+            requester.ids[i] = 0xFFFFFFF;
+
+        // MTA extension stuff.
+        // todo.
+        requester.loaderFiber = NULL;
+    }
+
+    // Do preparations for resources which prematurely loaded.
+    // Initialize all models.
+    for ( unsigned int n = 0; n < MAX_MODELS; n++ )
+    {
+        CBaseModelInfoSAInterface *model = ppModelInfo[n];
+
+        if ( model && model->pRwObject )
+        {
+            CModelLoadInfoSA& info = Streaming::GetModelLoadInfo( n );
+
+            info.m_flags = 2;
+            info.m_eLoading = MODEL_LOADED;
+        }
+    }
+
+    // Initialize all textures.
+    for ( unsigned int n = 0; n < MAX_TXD; n++ )
+    {
+        CTxdInstanceSA *inst = TextureManager::GetTxdPool()->Get( n );
+
+        if ( inst && inst->m_txd )
+            Streaming::GetModelLoadInfo( DATA_TEXTURE_BLOCK, n ).m_eLoading = MODEL_LOADED;
+    }
+
+    // Initialize the imfamous vehicleModelCache.
+    new ((void*)0x008E4C24) ModelIdContainer;
+
+    // This is a list of recently loaded ped models.
+    // Rockstar thought this list be pretty short.
+    for ( unsigned int n = 0; n < 8; n++ )
+        *((unsigned int*)ARRAY_PEDSPECMODEL + n) = 0xFFFFFFFF;
+
+    *(unsigned int*)0x008E4BB0 = 0; // the count of active ped models
+
+    // ???
+    for ( unsigned int n = 0; n < 18; n++ )
+        *((unsigned int*)0x008E4BB8 + n) = 0;
+
+    // Initialize the container where all missing model infos during loading
+    // of the archives are stored. These resources can still be loaded through
+    // RequestSpecialModel.
+    *(Streaming::CMissingModelInfoSA**)0x008E48D0 = new Streaming::CMissingModelInfoSA( 550 );
+
+    *(unsigned int*)0x008E4C20 = 0xFFFFFFFF;
+    *(unsigned short*)0x008E4BAC = 0;
+    *(unsigned int*)0x008E4BA4 = 0xFFFFFFFF;
+    Streaming::numPriorityRequests = 0;
+
+#if 0
+    // Initialize the script manager.
+    __asm
+    {
+        mov ecx,0x00A47B60
+        mov eax,0x00470660
+        call eax
+    }
+#endif
+
+    // Load the streaming archives.
+    Streaming::LoadArchives();
+
+    // By now the biggest block count should be initialized properly.
+    // Make sure it is divisible through the number of slicers.
+    int biggestBlockCount = Streaming::biggestResourceBlockCount;
+
+    {
+        int remainder = biggestBlockCount % MAX_STREAMING_REQUESTERS;
+
+        if ( remainder != 0 )
+            biggestBlockCount += MAX_STREAMING_REQUESTERS - remainder;
+    }
+
+    // Allocate the buffer that is used to read .IMG chunks into.
+    void *buf = RwAllocAligned( biggestBlockCount * 2048, 2048 );
+
+    // Divide the biggest block count by the number of streaming requesters.
+    biggestBlockCount /= MAX_STREAMING_REQUESTERS;
+    
+    Streaming::biggestResourceBlockCount = biggestBlockCount;
+
+    // Set up the sections of the allocation into the global streaming buffers,
+    // each for every streaming requester.
+    for ( unsigned int n = 0; n < MAX_STREAMING_REQUESTERS; n++ )
+        Streaming::threadAllocationBuffers[n] = (void*)( (char*)buf + n * biggestBlockCount * 2048 );
+
+    // Set streaming globals to defaults.
+    // These can be modified using stream.ini
+    *(unsigned int*)0x008A5A80 = 0x3200000; // max streaming memory
+    *(unsigned int*)0x008A5A84 = 22;        // max loaded vehicle models, close to the maximum due to limitations.
+
+    // Here was the initialization of the native-scope streaming gc chain.
+
+    // MTA extension: enter the current streaming mode.
+    Streaming::EnterFiberMode();
+
+    // Set up fibered business.
+    Streaming::SetLoaderPerfMultiplier( STREAMING_DEFAULT_FIBERED_PERFMULT );
+
+    // We successfully loaded.
+    *(bool*)0x009654B8 = true;
+}
+
+/*=========================================================
+    _Streaming_Shutdown
+
+    Purpose:
+        Deallocates all resources used by the streaming system
+        internally.
+    Binary offsets:
+        (1.0 US and 1.0 EU): 0x004084B0
+=========================================================*/
+static void __cdecl _Streaming_Shutdown( void )
+{
+    // Leave streaming mode to deallocate resources.
+    Streaming::LeaveFiberMode();
+
+    // Deallocate the threading resource memory.
+    RwFreeAligned( Streaming::threadAllocationBuffers[0] );
+
+    // Set the threading buffer size to zero blocks.
+    Streaming::biggestResourceBlockCount = 0;
+
+    // Destroy the stack holding all missing model ids.
+    delete *(Streaming::CMissingModelInfoSA**)0x008E48D0;
+}
+
+void Streaming::Reset( void )
+{
+    // Reset to GTA:SA defaults.
+    // Could have been modified by mods.
+    ResetGarbageCollection();
+    
+    EnableFiberedLoading( STREAMING_DEFAULT_FIBERED_LOADING );
+
+    SetLoaderPerfMultiplier( STREAMING_DEFAULT_FIBERED_PERFMULT );
 }
 
 CStreamingSA::CStreamingSA( void )
@@ -563,10 +1079,13 @@ CStreamingSA::CStreamingSA( void )
     memset( g_originalCollision, 0, sizeof(g_originalCollision) );
 
     // Hook the model requester
+    HookInstall( 0x005B8AD0, (DWORD)_Streaming_Init, 5 );
+    HookInstall( 0x004084B0, (DWORD)_Streaming_Shutdown, 5 );
     HookInstall( FUNC_CStreaming__RequestModel, (DWORD)Streaming::RequestModel, 6 );
     HookInstall( 0x004089A0, (DWORD)Streaming::FreeModel, 6 );
-    HookInstall( 0x00410730, (DWORD)FreeCOLLibrary, 5 );
+    HookInstall( 0x0040A080, (DWORD)Streaming::RequestDirectResource, 5 );
     HookInstall( 0x0040C6B0, (DWORD)LoadModel, 5 );
+    HookInstall( 0x0040E670, (DWORD)HOOK_CStreaming_Update, 5 );
     //HookInstall( 0x00407AD0, (DWORD)CheckAnimDependency, 5 );
     //HookInstall( 0x00409A90, (DWORD)CheckTXDDependency, 5 );  // you better do not fuck around with securom
     
@@ -576,14 +1095,26 @@ CStreamingSA::CStreamingSA( void )
     HookInstall( 0x0040CBA0, (DWORD)PulseStreamingRequest, 5 );
     HookInstall( 0x0040E460, (DWORD)PulseStreamingRequests, 5 );
 
+    // Initialize sub modules
+    StreamingUtils_Init();
     StreamingLoader_Init();
     StreamingRuntime_Init();
+    StreamingResources_Init();
+    StreamingCache_Init();
+    StreamingIPL_Init();
+    StreamingCOL_Init();
 }
 
 CStreamingSA::~CStreamingSA( void )
 {
+    // Shutdown sub modules
+    StreamingCOL_Shutdown();
+    StreamingIPL_Shutdown();
+    StreamingCache_Shutdown();
+    StreamingResources_Shutdown();
     StreamingRuntime_Shutdown();
     StreamingLoader_Shutdown();
+    StreamingUtils_Shutdown();
 }
 
 /*=========================================================
@@ -640,7 +1171,7 @@ void CStreamingSA::FreeModel( modelId_t id )
 
     Arguments:
         onlyPriority - appears to favour prioritized models if true
-        debugLoc - string debug information about calling location
+        debugLoc - string containing debugging information
     Purpose:
         Cycles through the streaming loading system to process
         loader queues (load and termination requests).
@@ -701,6 +1232,8 @@ void CStreamingSA::WaitForModel( modelId_t id )
 
     if ( id > MAX_RESOURCES-1 )
         return;
+
+
 }
 
 /*=========================================================
@@ -785,7 +1318,7 @@ bool CStreamingSA::HasVehicleUpgradeLoaded( int model )
 =========================================================*/
 void CStreamingSA::RequestSpecialModel( modelId_t model, const char *tex, unsigned int channel )
 {
-    ((void (__cdecl*)( modelId_t model, const char *tex, unsigned int channel ))FUNC_CStreaming_RequestSpecialModel)( model, tex, channel );
+    Streaming::RequestSpecialModel( model, tex, channel );
 }
 
 void CStreamingSA::SetRequestCallback( streamingRequestCallback_t callback )
@@ -796,4 +1329,17 @@ void CStreamingSA::SetRequestCallback( streamingRequestCallback_t callback )
 void CStreamingSA::SetFreeCallback( streamingFreeCallback_t callback  )
 {
     streamingFreeCallback = callback;
+}
+
+void CStreamingSA::GetStreamingInfo( CStreaming::streamingInfo& info ) const
+{
+    info.usedMemory = *(DWORD*)VAR_MEMORYUSAGE;
+    info.maxMemory = *(size_t*)0x008A5A80;
+    info.numberOfRequests = *(DWORD*)VAR_NUMMODELS;
+    info.numberOfPriorityRequests = Streaming::numPriorityRequests;
+    info.numberOfSlicers = MAX_STREAMING_REQUESTERS;
+    info.numberOfRequestsPerSlicer = MAX_STREAMING_REQUESTS;
+    info.activeStreamingThread = Streaming::activeStreamingThread;
+    info.isBusy = Streaming::IsStreamingBusy();
+    info.isLoadingBigModel = Streaming::isLoadingBigModel;
 }

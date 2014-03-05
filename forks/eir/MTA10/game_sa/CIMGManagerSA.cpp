@@ -87,6 +87,28 @@ static void __cdecl OpenStandardArchives( void )
 }
 
 /*=========================================================
+    CModelLoadInfoSA::constructor
+
+    Purpose:
+        Initializes this .IMG resource data container.
+    Binary offsets:
+        (1.0 US and 1.0 EU): 0x00407460
+=========================================================*/
+CModelLoadInfoSA::CModelLoadInfoSA( void )
+{
+    m_eLoading = MODEL_UNAVAILABLE;
+
+    m_primaryModel = 0xFFFF;
+    m_secondaryModel = 0xFFFF;
+    m_lastID = 0xFFFF;
+
+    m_imgID = 0;
+
+    m_blockCount = 0;
+    m_blockOffset = 0;
+}
+
+/*=========================================================
     CModelLoadInfoSA::GetOffset
 
     Arguments:
@@ -149,7 +171,7 @@ unsigned int CModelLoadInfoSA::GetStreamOffset( void ) const
     Binary offsets:
         (1.0 US and 1.0 EU): 0x00406360
 =========================================================*/
-static size_t GetMainArchiveSize( void )
+size_t __cdecl GetMainArchiveSize( void )
 {
     return GetFileSize( gtaStreamHandles[0], NULL );
 }
@@ -181,6 +203,33 @@ static unsigned int __cdecl OpenImgFile( const char *path, bool isNotPlayerImg )
     return idx;
 }
 
+/*=========================================================
+    GetIMGFileByName (MTA extension)
+
+    Arguments:
+        name - string containing the name of the IMGFile
+        imgID - output pointer to write the found IMGFile index
+    Purpose:
+        Attempts to get the IMGFile associated with name and
+        write its index into imgID. Return whether this operation
+        was successful.
+=========================================================*/
+bool GetIMGFileByName( const char *name, unsigned int& imgID )
+{
+    for ( unsigned int n = 0; n < MAX_GTA_IMG_ARCHIVES; n++ )
+    {
+        IMGFile& archive = imgArchives[n];
+
+        if ( stricmp( archive.name, name ) == 0 )
+        {
+            imgID = n;
+            return true;
+        }
+    }
+
+    return false;
+}
+
 // Let us decipher the ImgManagement, shall we?
 void IMG_Initialize( void )
 {
@@ -204,11 +253,9 @@ void IMG_Initialize( void )
 
     // 'Lazy' patches, for now (even though they are combined with important routines..!)
     // Let's make sure we analyze them at some point ;)
-    MemPut <unsigned int> ( (unsigned int*)0x00409D5A, (unsigned int)imgArchives + offsetof(IMGFile, handle) );
-    MemPut <unsigned int> ( (unsigned int*)0x00408FDC, (unsigned int)imgArchives + offsetof(IMGFile, handle) );
-    MemPut <unsigned int> ( (unsigned int*)0x0040CC54, (unsigned int)imgArchives + offsetof(IMGFile, handle) );
-    MemPut <unsigned int> ( (unsigned int*)0x0040CCC7, (unsigned int)imgArchives + offsetof(IMGFile, handle) );
-    MemPutFast <unsigned int> ( (unsigned int*)0x01560E68, (unsigned int)imgArchives + offsetof(IMGFile, handle) );
+    *(unsigned int*)0x00409D5A = *(unsigned int*)0x00408FDC = *(unsigned int*)0x0040CC54 = *(unsigned int*)0x0040CCC7 =
+    *(unsigned int*)0x01560E68 =
+        (unsigned int)imgArchives + offsetof(IMGFile, handle);
 }
 
 void IMG_Shutdown( void )

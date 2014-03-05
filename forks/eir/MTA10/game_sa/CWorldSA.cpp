@@ -15,6 +15,127 @@
 *****************************************************************************/
 
 #include "StdInc.h"
+
+/*=========================================================
+    World::AddEntity
+
+    Arguments:
+        entity - the entity to add into the world
+    Purpose:
+        Links the given entity into the world so it is
+        processed by the game loop.
+    Binary offsets:
+        (1.0 US and 1.0 EU): 0x00563220
+=========================================================*/
+void __cdecl World::AddEntity( CEntitySAInterface *entity )
+{
+    pGame->GetWorld()->Add( entity, World_Native );
+}
+
+/*=========================================================
+    World::RemoveEntity
+
+    Arguments:
+        entity - the entity to remove from the world
+    Purpose:
+        Unlinks the given entity from the game. It will no
+        longer be processed by the game loop.
+    Binary offsets:
+        (1.0 US and 1.0 EU): 0x00563280
+=========================================================*/
+void __cdecl World::RemoveEntity( CEntitySAInterface *entity )
+{
+    pGame->GetWorld()->Remove( entity, World_Native );
+}
+
+/*=========================================================
+    World::SetCenterOfWorld (MTA extension)
+
+    Arguments:
+        streamingEntity - entity used for streaming reference
+        pos - center of world position, if NULL then
+              custom center of world disabled
+        heading - player heading
+    Purpose:
+        Sets a fixed center of world for dynamic streaming
+        purposes.
+=========================================================*/
+static bool isCenterOfWorldSet = false;
+static CVector centerOfWorld = CVector( 0, 0, 0 );
+static float falseHeading = 0.0f;
+static CEntitySAInterface *_streamingEntity = NULL;
+
+void World::SetCenterOfWorld( CEntitySAInterface *streamingEntity, const CVector *pos, float heading )
+{
+    if ( pos )
+    {
+        centerOfWorld = *pos;
+
+        _streamingEntity = streamingEntity;
+
+        falseHeading = heading;
+        isCenterOfWorldSet = true;
+    }
+    else 
+    {
+        _streamingEntity = NULL;
+        isCenterOfWorldSet = false;
+    }
+}
+
+/*=========================================================
+    World::GetCenterOfWorld (MTA extension)
+
+    Arguments:
+        pos - pointer to write the center into
+    Purpose:
+        Returns a boolean whether a static center of world
+        was set by MTA. If true, then the center of world
+        is written into pos.
+=========================================================*/
+bool World::GetCenterOfWorld( CVector& pos )
+{
+    if ( !isCenterOfWorldSet )
+        return false;
+
+    pos = centerOfWorld;
+    return true;
+}
+
+bool World::IsCenterOfWorldSet( void )
+{
+    return isCenterOfWorldSet;
+}
+
+const CVector& World::GetCenterOfWorld( void )
+{
+    return centerOfWorld;
+}
+
+/*=========================================================
+    World::GetStreamingEntity (MTA extension)
+
+    Purpose:
+        Returns the entity which is used for streaming
+        reference (can be NULL).
+=========================================================*/
+CEntitySAInterface* World::GetStreamingEntity( void )
+{
+    return _streamingEntity;
+}
+
+/*=========================================================
+    World::GetFalseHeading (MTA extension)
+
+    Purpose:
+        Returns a false heading used when center of world
+        streaming is active.
+=========================================================*/
+float World::GetFalseHeading( void )
+{
+    return falseHeading;
+}
+
 CWorldSA::CWorldSA ( )
 {
     m_pBuildingRemovals = new std::multimap< unsigned short, SBuildingRemoval* >;
@@ -569,6 +690,13 @@ int CWorldSA::FindClosestRailTrackNode ( const CVector& vecPosition, uchar& ucOu
     }
     
     return iNodeId;*/
+}
+
+bool CWorldSA::ProcessVerticalLine( const CVector& pos, float distance, CColPointSAInterface& colPoint, CEntitySAInterface **hitEntity,
+                                    bool unk1, bool unk2, bool unk3, bool unk4, bool unk5, bool unk6, bool unk7 )
+{
+    return ((bool (__cdecl*)( const CVector&, float, CColPointSAInterface&, CEntitySAInterface **, bool, bool, bool, bool, bool, bool, bool ))0x005674E0)
+                              ( pos, distance, colPoint, hitEntity, unk1, unk2, unk3, unk4, unk5, unk6, unk7 );
 }
 
 void CWorldSA::RemoveBuilding ( unsigned short usModelToRemove, float fRange, float fX, float fY, float fZ, char cInterior )

@@ -324,15 +324,16 @@ void InitRwFunctions( eGameVersion version )
         break;
     }
 
+    // Memory functions.
+    RwMalloc                            = (RwMalloc_t)                              0x0072F420;
+    RwRealloc                           = (RwRealloc_t)                             0x0072F440;
+    RwFree                              = (RwFree_t)                                0x0072F430;
+    RwCalloc                            = (RwCalloc_t)                              0x0072F460;
+
     // Shared addresses
     LoadCollisionModel                  = (LoadCollisionModel_t)                    0x00537580;
     LoadCollisionModelVer2              = (LoadCollisionModelVer2_t)                0x00537EE0;
     LoadCollisionModelVer3              = (LoadCollisionModelVer3_t)                0x00537CE0;
     LoadCollisionModelVer4              = (LoadCollisionModelVer4_t)                0x00537AE0;
-    CTxdStore_LoadTxd                   = (CTxdStore_LoadTxd_t)                     0x00731DD0;
-    CTxdStore_GetTxd                    = (CTxdStore_GetTxd_t)                      0x00408340;
-    CTxdStore_RemoveTxd                 = (CTxdStore_RemoveTxd_t)                   0x00731E90;
-    CTxdStore_RemoveRef                 = (CTxdStore_RemoveRef_t)                   0x00731A30;
-    CTxdStore_AddRef                    = (CTxdStore_AddRef_t)                      0x00731A00;
     CClothesBuilder_CopyTexture         = (CClothesBuilder_CopyTexture_t)           0x005A5730;
 }

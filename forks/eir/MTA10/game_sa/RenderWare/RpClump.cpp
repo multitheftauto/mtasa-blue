@@ -416,7 +416,7 @@ void RpClump::GetBoneTransform( CVector *offset )
 
         RwMatrixInvert( &mat, skelMat );
 
-        pRwInterface->m_matrixTransform3( offset, &mat.vUp, 1, skel->boneMatrices + matId );
+        RenderWare::GetInterface()->m_matrixTransform3( offset, &mat.vUp, 1, skel->boneMatrices + matId );
 
         // Some sort of stacking mechanism, maximum 20
         if ( bone->flags & 0x02 )
@@ -450,7 +450,9 @@ static RpClump* _clumpCallback( RpClump *clump, void *data )
 
 RpClump* RpClumpCreate( void )
 {
-    RpClump *clump = (RpClump*)pRwInterface->m_allocStruct( pRwInterface->m_clumpInfo, 0x30010 );
+    RwInterface *rwInterface = RenderWare::GetInterface();
+
+    RpClump *clump = (RpClump*)rwInterface->m_allocStruct( rwInterface->m_clumpInfo, 0x30010 );
 
     if ( !clump )
         return NULL;

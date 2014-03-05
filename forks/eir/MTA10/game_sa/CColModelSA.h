@@ -17,7 +17,9 @@
 #include <windows.h>
 #include <game/CColModel.h>
 
-#include "CStreamingSA.h"
+#include "CQuadTreeSA.h"
+
+//#include "CStreamingSA.h"
 
 #define FUNC_CColModel_Constructor      0x40FB60
 #define FUNC_CColModel_Destructor       0x40F700
@@ -77,22 +79,57 @@ typedef struct
 class CColFileSA
 {
 public:
-    CColFileSA() : m_vecMin( MAX_REGION, -MAX_REGION ), m_vecMax( -MAX_REGION, MAX_REGION )
+    CColFileSA( const char *name ) : m_bounds( MAX_REGION, -MAX_REGION, -MAX_REGION, MAX_REGION )
     {
         m_loaded = false;
-        m_unk2 = false;
+        m_sectorLoad = false;
         m_isProcedural = false;
         m_isInterior = false;
 
         m_rangeStart = 0x7FFF;
         m_rangeEnd = -0;
         m_refs = 0;
+
+        // Do not store the name, but check it for properties.
+        // Apparently these properties are hardcoded.
+        if ( stricmp( name, "procobj" ) == 0 || stricmp( name, "proc_int" ) == 0 || stricmp( name, "proc_int2" ) == 0 )
+        {
+            m_isProcedural = true;
+        }
+
+        if ( strnicmp( name, "int_la", 6 ) == 0 ||
+             strnicmp( name, "int_sf", 6 ) == 0 ||
+             strnicmp( name, "int_veg", 7 ) == 0 ||
+             strnicmp( name, "int_cont", 8 ) == 0 ||
+             strnicmp( name, "gen_int1", 8 ) == 0 ||
+             strnicmp( name, "gen_int2", 8 ) == 0 ||
+             strnicmp( name, "gen_int3", 8 ) == 0 ||
+             strnicmp( name, "gen_int4", 8 ) == 0 ||
+             strnicmp( name, "gen_int5", 8 ) == 0 ||
+             strnicmp( name, "gen_intb", 8 ) == 0 ||
+             strnicmp( name, "savehous", 8 ) == 0 ||
+             stricmp( name, "props" ) == 0 ||
+             stricmp( name, "props2" ) == 0 ||      // Okay, I am unsure whether I caught all of the namechecking due to secuROM obfuscation
+                                                    // If there is a filename missing, feel free to append it here!
+             strnicmp( name, "levelmap", 8 ) == 0 ||
+             strnicmp( name, "stadint", 7 ) == 0 )
+        {
+            m_isInterior = true;
+        }
     }
 
     void* operator new ( size_t );
     void operator delete ( void *ptr );
 
-    CVector2D                       m_vecMin, m_vecMax; // 0
+    // Sectorizer dependencies.
+    inline bool     IsSectorFlagged( void ) const           { return m_refs > 0 || m_sectorLoad; }
+    inline void     FlagSector( bool flagged )              { m_sectorLoad = flagged; }
+    inline bool     IsLoaded( void ) const                  { return m_loaded; }
+    inline bool     IsStreamingDisabled( void ) const       { return false; }
+
+    inline void     OnStreamOut( void )                     {}
+
+    CBounds2D                       m_bounds;           // 0
 
     BYTE                            m_pad[18];          // 16
 
@@ -101,7 +138,7 @@ public:
     unsigned short                  m_refs;             // 38
 
     bool                            m_loaded;           // 40
-    bool                            m_unk2;             // 41
+    bool                            m_sectorLoad;       // 41, set by streaming to indicate that it wants to load it
     bool                            m_isProcedural;     // 42
     bool                            m_isInterior;       // 43
 };
@@ -135,9 +172,31 @@ public:
 
     CBoundingBox                    m_bounds;           // 0
     unsigned char                   m_colPoolIndex;     // 40
-    BYTE                            m_pad[3];           // 41
+    bool                            m_unk : 1;          // 41
+    BYTE                            m_pad[2];           // 42
     CColDataSA*                     pColData;           // 44
 };
+
+// Utility functions.
+void __cdecl Collision_Preload( void );
+
+// Quad tree of all collision files.
+typedef CQuadTreeNodeSAInterface <CColFileSA> colFileQuadTreeNode_t;
+
+namespace Collision
+{
+    // The idea of a collision quad tree conflicts with our dynamical collision assignment system.
+    // We have to update the GTA:SA logic so that it does not unload colFiles which we are still
+    // using.
+    inline colFileQuadTreeNode_t*   GetCollisionQuadTree( void )
+    {
+        return *(colFileQuadTreeNode_t**)0x0096555C;
+    }
+};
+
+// Module Initialization.
+void ColModel_Init( void );
+void ColModel_Shutdown( void );
 
 
 class CColModelSA : public CColModel

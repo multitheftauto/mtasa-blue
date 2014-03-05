@@ -17,20 +17,17 @@
 #ifndef _MODELINFO_BASE_
 #define _MODELINFO_BASE_
 
-#if 0
-class CClumpModelInfo_SA_VTBL
-{
-    DWORD           SetClump;                       // (RpClump*)
-};
-
-class CWeaponModelInfo_SA_VTBL: public CClumpModelInfo_SA_VTBL
-{
-};
-#endif
+#define DATA_TEXTURE_BLOCK      20000
+#define DATA_COLL_BLOCK         25000
+#define DATA_IPL_BLOCK          25255
+#define DATA_PATHFIND_BLOCK     25511
+#define DATA_ANIM_BLOCK         25575
+#define DATA_RECORD_BLOCK       25755
 
 class CAtomicModelInfoSA;
 class CDamageAtomicModelInfoSA;
 class CLODAtomicModelInfoSA;
+class CColModelSAInterface;
 
 enum eModelType : unsigned char
 {
@@ -41,10 +38,11 @@ enum eModelType : unsigned char
 
 namespace ModelInfo
 {
-    struct timeInfo
+    struct timeInfo //size: 4
     {
-        BYTE                m_pad[2];
-        unsigned short      m_model;
+        unsigned char       m_fromHour;     // 0
+        unsigned char       m_toHour;       // 1
+        short               m_model;        // 2
     };
 };
 
@@ -52,7 +50,7 @@ namespace ModelInfo
 class CBaseModelInfoSA abstract
 {
 public:
-    virtual                                             ~CBaseModelInfoSA()     {}                              // 0
+    virtual                                             ~CBaseModelInfoSA           ( void )    {}              // 0
 
     virtual CAtomicModelInfoSA* __thiscall              GetAtomicModelInfo          ( void ) = 0;               // 4
     virtual CDamageAtomicModelInfoSA* __thiscall        GetDamageAtomicModelInfo    ( void ) = 0;               // 8
@@ -138,12 +136,17 @@ public:
     {
         struct
         {
-            unsigned short      renderFlags : 10;         // 18
+            unsigned short      renderFlags : 10;           // 18
             unsigned short      collFlags : 6;
         };
         struct
         {
-            unsigned short      flags;                    // 18
+            unsigned short      flags;                      // 18
+        };
+        struct
+        {
+            unsigned short      unkPad : 12;                // 18
+            unsigned short      atomicType : 4;
         };
         struct
         {
@@ -183,10 +186,10 @@ public:
     // +36 = Weapon info as int
 };
 
-void ModelInfoBase_Init();
-void ModelInfoBase_Shutdown();
-
-// So we do not have to redefine it anymore.
+// So we do not have to redefine it and the headers can use it.
 extern CBaseModelInfoSAInterface **ppModelInfo;
+
+void ModelInfoBase_Init( void );
+void ModelInfoBase_Shutdown( void );
 
 #endif //_MODELINFO_BASE_

@@ -15,6 +15,249 @@
 
 #include "StdInc.h"
 
+/*=========================================================
+    GetPlayerPed
+
+    Arguments:
+        id - index of the player to get the ped of
+    Purpose:
+        Returns the ped associated with the player id.
+    Binary offsets:
+        (1.0 US and 1.0 EU): 0x0056E210
+=========================================================*/
+CPlayerPedSAInterface* __cdecl GetPlayerPed( int id )
+{
+    return PlayerInfo::GetInfo( id ).pPed;
+}
+
+/*=========================================================
+    GetPlayerVehicle
+
+    Arguments:
+        id - index of the player
+        excludeRemote - return NULL if controlling RC vehicle
+    Purpose:
+        Returns the player vehicle.
+    Binary offsets:
+        (1.0 US and 1.0 EU): 0x0056E0D0
+=========================================================*/
+CVehicleSAInterface* __cdecl GetPlayerVehicle( int id, bool excludeRemote )
+{
+    CPlayerInfoSAInterface& info = PlayerInfo::GetInfo( id );
+
+    CPlayerPedSAInterface *ped = info.pPed;
+
+    if ( !ped || !ped->pedFlags.bInVehicle )
+        return NULL;
+
+    if ( excludeRemote && info.pRemoteVehicle )
+        return NULL;
+
+    return (CVehicleSAInterface*)ped->CurrentObjective;
+}
+
+/*=========================================================
+    FindPlayerCoords
+
+    Arguments:
+        pos - vector pointer to write position into
+        id - player index
+    Purpose:
+        Writes the player given by id into pos. If we are inside
+        of the streaming update routine, then we write the center
+        of world instead. Returns the output vector.
+    Binary offsets:
+        (1.0 US and 1.0 EU): 0x0056E010
+=========================================================*/
+const CVector& __cdecl FindPlayerCoords( CVector& pos, int id )
+{
+    CPlayerInfoSAInterface& info = PlayerInfo::GetInfo( id );
+
+    CPlayerPedSAInterface *ped = info.pPed;
+
+    // If there is no player ped loaded yet, we
+    // default to 0,0,0
+    if ( !ped )
+    {
+        pos = CVector( 0, 0, 0 );
+        return pos;
+    }
+
+    const CVector *entityPos = NULL;
+
+    // If the player is inside of a vehicle,
+    // use its position instead.
+    if ( ped->pedFlags.bInVehicle )
+    {
+        CEntitySAInterface *veh = ped->CurrentObjective;
+
+        if ( veh )
+            entityPos = &veh->Placeable.GetPosition();
+    }
+
+    // If there was no valid position set (i.e. vehicle),
+    // we default to ped position.
+    if ( !entityPos )
+        entityPos = &ped->Placeable.GetPosition();
+
+    pos = *entityPos;
+    return pos;
+}
+
+/*=========================================================
+    FindPlayerCenterOfWorld
+
+    Arguments:
+        id - player index to get the center of
+    Purpose:
+        Returns the vector which describes the exact center
+        of world. If we have set a static center of world,
+        use it instead.
+    Binary offsets:
+        (1.0 US and 1.0 EU): 0x0056E250
+=========================================================*/
+inline const CEntitySAInterface* GetPlayerEntityContext( int id )
+{
+    CPlayerInfoSAInterface& info = PlayerInfo::GetInfo( id );
+
+    // We check the remote vehicle first.
+    if ( CVehicleSAInterface *remoteVehicle = info.pRemoteVehicle )
+        return remoteVehicle;
+
+    // Let us try the player's vehicle next.
+    if ( CVehicleSAInterface *veh = GetPlayerVehicle( id, false ) )
+        return veh;
+
+    // Default to the player.
+    return info.pPed;
+}
+
+const CVector& __cdecl FindPlayerCenterOfWorld( int id )
+{
+    // MTA fix: check for static center of world and return
+    // it if set.
+    if ( World::IsCenterOfWorldSet() )
+        return World::GetCenterOfWorld();
+
+    // If the GTA:SA static camera is active, we report back
+    // the camera position.
+    if ( *(bool*)0x009690C1 )
+        return Camera::GetInterface().Placeable.GetPosition();
+
+    // Get the position of the entity context.
+    return GetPlayerEntityContext( id )->Placeable.GetPosition();
+}
+
+/*=========================================================
+    FindPlayerHeading
+
+    Arguments:
+        id - player index to get the heading of
+    Purpose:
+        Returns the floating point heading value active for
+        the player. If the center of world is set, return
+        a false heading instead.
+    Binary offsets:
+        (1.0 US and 1.0 EU): 0x0056E450
+=========================================================*/
+float __cdecl FindPlayerHeading( int id )
+{
+    // MTA fix: return a false heading if center of world
+    // is set.
+    if ( World::IsCenterOfWorldSet() )
+        return World::GetFalseHeading();
+
+    return GetPlayerEntityContext( id )->Placeable.GetHeading();
+}
+
+/*=========================================================
+    SetupPlayerPed
+
+    Arguments:
+        playerIndex - slot to save the player ped into
+    Purpose:
+        Creates a new player ped and sets it at the given slot.
+        The slot is an entry in the global playerInfo structure.
+        Natively, GTA:SA supports only slot 0.
+    Binary offsets:
+        (1.0 US and 1.0 EU): 0x0060D790
+=========================================================*/
+void __cdecl SetupPlayerPed( unsigned int playerIndex )
+{
+    CPlayerPedSAInterface *player = (CPlayerPedSAInterface*)( (*ppPedPool)->Allocate() );
+
+    // We should be able to create players natively someday.
+    // Until then, here is an ugly ASM chunk.
+    // It calls the player constructor.
+    __asm
+    {
+        mov ecx,player
+        push 0
+        push playerIndex
+        mov eax,0x0060D5B0
+        call eax
+    }
+
+    CPlayerInfoSAInterface& playerInfo = PlayerInfo::GetInfo( playerIndex );
+    playerInfo.pPed = player;
+
+    if ( playerIndex == 1 )
+        player->bPedType = PEDTYPE_PLAYER2;
+
+    player->SetOrientation( 0, 0, 0 );
+
+    World::AddEntity( player );
+
+    player->m_unkPlayerVal = 100;
+
+    playerInfo.PlayerState = PS_PLAYING;
+}
+
+/*=========================================================
+    HOOK_CRunningScript_Process
+
+    Purpose:
+        Used by the game to execute .SCM scripts. We use it
+        to manage the player entity.
+    Binary offsets:
+        (1.0 US and 1.0 EU): 0x0056E450
+=========================================================*/
+static bool bHasProcessedScript = false;
+
+void __cdecl HOOK_CRunningScript_Process( void )
+{
+    if ( !bHasProcessedScript )
+    {
+        CCameraSAInterface& camera = Camera::GetInterface();
+        camera.SetFadeColor( 0, 0, 0 );
+        camera.Fade( 0.0f, FADE_OUT );
+
+        Streaming::RequestSpecialModel( 0, "player", 26 );
+        Streaming::LoadAllRequestedModels( true );
+
+        SetupPlayerPed( 0 );
+
+        PlayerInfo::GetInfo( 0 ).pPed->Placeable.SetPosition( 0, 0, 0 );
+
+        // We have set up our player instance.
+        bHasProcessedScript = true;
+    }
+}
+
+void PlayerInfo_Init( void )
+{
+    // Hook fixes.
+    HookInstall( 0x0056E010, (DWORD)FindPlayerCoords, 5 );
+    HookInstall( 0x0056E250, (DWORD)FindPlayerCenterOfWorld, 5 );
+    HookInstall( 0x0056E450, (DWORD)FindPlayerHeading, 5 );
+    HookInstall( 0x00469F00, (DWORD)HOOK_CRunningScript_Process, 5 );
+}
+
+void PlayerInfo_Shutdown( void )
+{
+
+}
+
 /**
  * Gets the Player Ped for the local player
  * @return CPlayerPed * for the local player

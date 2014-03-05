@@ -35,41 +35,49 @@ public:
     float pad1; // 56
     uint32 pad2; // 60
 
-    uint32 b0x01 : 1; // 64
-    uint32 bApplyGravity : 1;
-    uint32 bDisableFriction : 1;
-    uint32 bCollidable : 1; 
-    uint32 b0x10 : 1;
-    uint32 bDisableMovement : 1;
-    uint32 b0x40 : 1;
-    uint32 b0x80 : 1;
+    union
+    {
+        struct
+        {
+            uint32 b0x01 : 1; // 64
+            uint32 bApplyGravity : 1;
+            uint32 bDisableFriction : 1;
+            uint32 bCollidable : 1; 
+            uint32 b0x10 : 1;
+            uint32 bDisableMovement : 1;
+            uint32 b0x40 : 1;
+            uint32 b0x80 : 1;
 
-    uint32 bSubmergedInWater : 1; // 65
-    uint32 bOnSolidSurface : 1;
-    uint32 bBroken : 1;
-    uint32 b0x800 : 1; // ref @ 0x6F5CF0
-    uint32 b0x1000 : 1;//
-    uint32 b0x2000 : 1;//
-    uint32 b0x4000 : 1;//
-    uint32 b0x8000 : 1;//
+            uint32 bSubmergedInWater : 1; // 65
+            uint32 bOnSolidSurface : 1;
+            uint32 bBroken : 1;
+            uint32 b0x800 : 1; // ref @ 0x6F5CF0
+            uint32 b0x1000 : 1;//
+            uint32 b0x2000 : 1;//
+            uint32 b0x4000 : 1;//
+            uint32 b0x8000 : 1;//
 
-    uint32 b0x10000 : 1; // 66
-    uint32 b0x20000 : 1; // ref @ CPhysical__processCollision
-    uint32 bBulletProof : 1;
-    uint32 bFireProof : 1;
-    uint32 bCollisionProof : 1;
-    uint32 bMeeleProof : 1;
-    uint32 bInvulnerable : 1;
-    uint32 bExplosionProof : 1;
+            uint32 b0x10000 : 1; // 66
+            uint32 b0x20000 : 1; // ref @ CPhysical__processCollision
+            uint32 bBulletProof : 1;
+            uint32 bFireProof : 1;
+            uint32 bCollisionProof : 1;
+            uint32 bMeeleProof : 1;
+            uint32 bInvulnerable : 1;
+            uint32 bExplosionProof : 1;
 
-    uint32 b0x1000000 : 1; // 67
-    uint32 bAttachedToEntity : 1;
-    uint32 b0x4000000 : 1;
-    uint32 bTouchingWater : 1;
-    uint32 bEnableCollision : 1;
-    uint32 bDestroyed : 1;
-    uint32 b0x40000000 : 1;
-    uint32 b0x80000000 : 1;
+            uint32 b0x1000000 : 1; // 67
+            uint32 bAttachedToEntity : 1;
+            uint32 b0x4000000 : 1;
+            uint32 bTouchingWater : 1;
+            uint32 bEnableCollision : 1;
+            uint32 bDestroyed : 1;
+            uint32 b0x40000000 : 1;
+            uint32 b0x80000000 : 1;
+        };
+
+        unsigned int physicalFlags;
+    };
 
     CVector    m_vecLinearVelocity; // 68
     CVector    m_vecAngularVelocity; // 80

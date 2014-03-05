@@ -104,7 +104,7 @@ validIndex:
         // Bugfix: clip too-long names
         strncpy( gtaStreamNames[n], path, sizeof(streamName)-1 );
 
-        return n << 24;
+        return GetFileHandle( n, 0 );
     }
 
     /*=========================================================
@@ -152,6 +152,7 @@ validIndex:
         SetLastError( 0 );
 
         // Write the offset of the next read
+        // Used if we want to read continously from a file.
         nextStreamReadOffset = offset + blockCount;
 
         // Get the real block offset without stream descriptor
@@ -174,7 +175,7 @@ validIndex:
             // List it into our semaphore operations
             semaphoreQueue[semaphoreQueueReadIndex] = syncIdx;
 
-            // Instead of module, we optimize :3
+            // Instead of modulo, we optimize :3
             if ( semaphoreQueueReadIndex == semaphoreQueueSizeCount - 1 )
                 semaphoreQueueReadIndex = 0;
             else
@@ -183,6 +184,13 @@ validIndex:
             // Notify the streaming thread.
             if ( !ReleaseSemaphore( globalStreamingSemaphore, 1, NULL ) )
                 OutputDebugString( "global streaming semaphore release failed\n" );
+
+            // The_GTA: a very rare bug is found here: sometimes the streaming runtime messes up
+            // and ReleaseSemaphore returns FALSE. I have no idea why this happens, but should be
+            // fixed to prevent engine lock-ups. This bug has been noticed in MTA:BLUE before, and
+            // is partially fixed in MTA:Eir (see CancelSyncSemaphore). Please invest time to fix
+            // this thread lock-up if you encounter it.
+            // Possible leads: invalid blockCount (0), thread racing, thread synchronization
 
             return true;
         }
@@ -276,8 +284,8 @@ validIndex:
             if ( sync.blockCount )
             {
                 sync.terminating = true;
-
-                // The_GTA: wait in steps of 5000ms to fix lock-up bug.
+                
+                // bugfix: we must wait till the thread finished it's work.
                 while ( sync.blockCount )
                     WaitForSingleObject( sync.semaphore, 5000 );
             }
@@ -457,6 +465,9 @@ validIndex:
     =========================================================*/
     void __cdecl Init( unsigned int numSync )
     {
+        // Overwrite the value given by GTA:SA with our own.
+        numSync = 64;
+
         // Initialize managed variables
         memset( gtaStreamHandles, 0, sizeof(void*) * MAX_GTA_STREAM_HANDLES );
 
@@ -559,14 +570,12 @@ void StreamingRuntime_Init( void )
 
     // Practically, these patches are useless as that code is never called.
     // We leave this in for reference anyway.
-    MemPut( (unsigned int*)0x0040676C, gtaStreamNames );
-    MemPut( (unsigned int*)0x004068DD, gtaStreamNames );
+    *(unsigned int*)0x0040676C = *(unsigned int*)0x004068DD =
+        (unsigned int)gtaStreamNames;
 
-    MemPut( (unsigned int*)0x00406737, gtaStreamHandles );
-    MemPut( (unsigned int*)0x00406797, gtaStreamHandles );
-    MemPut( (unsigned int*)0x004068AB, gtaStreamHandles );
-    MemPut( (unsigned int*)0x004068C2, gtaStreamHandles );
-    MemPut( (unsigned int*)0x004068D0, gtaStreamHandles );
+    *(unsigned int*)0x00406737 = *(unsigned int*)0x00406797 = *(unsigned int*)0x004068AB = *(unsigned int*)0x004068C2 =
+    *(unsigned int*)0x004068D0 =
+        (unsigned int)gtaStreamHandles;
 }
 
 void StreamingRuntime_Shutdown( void )

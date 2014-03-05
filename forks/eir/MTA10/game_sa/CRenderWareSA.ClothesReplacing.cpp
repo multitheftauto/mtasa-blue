@@ -28,7 +28,6 @@ namespace ClothesReplacing
         uint uiArraySize;
     };
 
-    DWORD FUNC_CStreamingConvertBufferToObject      = 0x40C6B0;
     int     iReturnFileId;
     char*   pReturnBuffer;
 }

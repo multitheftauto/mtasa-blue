@@ -14,32 +14,32 @@
 
 inline void* _openFile( const char *name, const char *mode )
 {
-    return pRwInterface->m_fileOpen( name, mode );
+    return RenderWare::GetInterface()->m_fileOpen( name, mode );
 }
 
 inline size_t _readFile( void *buf, size_t sElem, unsigned int elemCount, void *fp )
 {
-    return pRwInterface->m_fileRead( buf, sElem, elemCount, fp );
+    return RenderWare::GetInterface()->m_fileRead( buf, sElem, elemCount, fp );
 }
 
 inline size_t _writeFile( const void *buf, size_t sElem, unsigned int elemCount, void *fp )
 {
-    return pRwInterface->m_fileWrite( buf, sElem, elemCount, fp );
+    return RenderWare::GetInterface()->m_fileWrite( buf, sElem, elemCount, fp );
 }
 
 inline int _seekFile( void *fp, long seek, int type )
 {
-    return pRwInterface->m_fileSeek( fp, seek, type );
+    return RenderWare::GetInterface()->m_fileSeek( fp, seek, type );
 }
 
 inline int _tellFile( void *fp )
 {
-    return pRwInterface->m_fileTell( fp );
+    return RenderWare::GetInterface()->m_fileTell( fp );
 }
 
 inline int _closeFile( void *fp )
 {
-    return pRwInterface->m_fileClose( fp );
+    return RenderWare::GetInterface()->m_fileClose( fp );
 }
 
 inline unsigned int RwThrowException( unsigned int errId )
@@ -118,7 +118,7 @@ inline unsigned int RwStreamBufferedWrite( RwBufferedStream& data, const void *b
 
     if ( !writeBuf )
     {
-        writeBuf = pRwInterface->m_memory.m_malloc( RW_STREAM_WRITEBUF_SIZE, 0x30404 );
+        writeBuf = RenderWare::GetInterface()->m_memory.m_malloc( RW_STREAM_WRITEBUF_SIZE, 0x30404 );
 
         if ( !writeBuf )
         {
@@ -139,7 +139,7 @@ inline unsigned int RwStreamBufferedWrite( RwBufferedStream& data, const void *b
     {
         size_t newMemSize = position + std::max( (unsigned int)RW_STREAM_WRITEBUF_SIZE, writeSize );
 
-        writeBuf = pRwInterface->m_memory.m_realloc( writeBuf, newMemSize, 0 );
+        writeBuf = RenderWare::GetInterface()->m_memory.m_realloc( writeBuf, newMemSize, 0 );
 
         if ( !writeBuf )
         {
@@ -224,7 +224,7 @@ inline bool RwStreamBufferedShutdown( RwBufferedStream& data, unsigned int mode,
             void *memory = data.dataPtr;
 
             if ( memory )
-                pRwInterface->m_memory.m_free( memory );
+                RenderWare::GetInterface()->m_memory.m_free( memory );
         }
     }
 
@@ -329,13 +329,15 @@ RwStream* __cdecl RwStreamInitialize( void *memory, int isAllocated, RwStreamTyp
 =========================================================*/
 RwStream* __cdecl RwStreamOpen( RwStreamType type, RwStreamMode mode, void *ud )
 {
-    void *memory = pRwInterface->m_allocStruct( pRwInterface->m_streamInfo, 0x30404 );
+    RwInterface *rwInterface = RenderWare::GetInterface();
+
+    void *memory = rwInterface->m_allocStruct( rwInterface->m_streamInfo, 0x30404 );
 
     RwStream *stream = RwStreamInitialize( memory, true, type, mode, ud );
 
     if ( !stream )
     {
-        pRwInterface->m_freeStruct( pRwInterface->m_streamInfo, memory );
+        rwInterface->m_freeStruct( rwInterface->m_streamInfo, memory );
         return NULL;
     }
 
@@ -614,7 +616,9 @@ int __cdecl RwStreamClose( RwStream *stream, void *ud )
 
     if ( stream->allocated )
     {
-        pRwInterface->m_freeStruct( pRwInterface->m_streamInfo, stream );
+        RwInterface *rwInterface = RenderWare::GetInterface();
+
+        rwInterface->m_freeStruct( rwInterface->m_streamInfo, stream );
     }
 
     return success;

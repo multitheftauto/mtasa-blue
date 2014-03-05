@@ -323,7 +323,7 @@ static __forceinline bool RwAtomicQueueOpaque( RpAtomic *atomic, float camDistan
     level.callback = _renderAtomicCommon;
     level.atomic = atomic;
     //level.distance = camDistanceSq;
-    return opaqueRenderChain.PushRenderLast( &level );
+    return opaqueRenderChain.PushRenderLast( &level ) != NULL;
 }
 
 static __forceinline bool RwAtomicQueueOpaqueLast( RpAtomic *atomic, float camDistanceSq )
@@ -333,7 +333,7 @@ static __forceinline bool RwAtomicQueueOpaqueLast( RpAtomic *atomic, float camDi
     level.callback = _renderAtomicCommon;
     level.atomic = atomic;
     //level.distance = camDistanceSq;
-    return lastRenderChain.PushRenderLast( &level );
+    return lastRenderChain.PushRenderLast( &level ) != NULL;
 }
 
 static __forceinline bool RwAtomicQueue( RpAtomic *atomic, float camDistanceSq )
@@ -343,7 +343,7 @@ static __forceinline bool RwAtomicQueue( RpAtomic *atomic, float camDistanceSq )
     level.callback = _renderAtomicCommon;
     level.atomic = atomic;
     level.distance = camDistanceSq;
-    return vehicleRenderChains->PushRender( &level );
+    return vehicleRenderChains->PushRender( &level ) != NULL;
 }
 
 static __forceinline void RwAtomicRenderVehicle( RpAtomic *atomic, float camDistanceSq )

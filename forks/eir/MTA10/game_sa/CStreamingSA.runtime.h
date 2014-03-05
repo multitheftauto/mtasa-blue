@@ -18,6 +18,8 @@
 
 namespace Streaming
 {
+    inline unsigned int     GetFileHandle( unsigned int fileId, unsigned int fileOffset )     { return ( fileId << 24 ) | fileOffset; }
+
     // Streaming resource loader API
     unsigned int __cdecl    OpenStream                  ( const char *path );
     int __cdecl             ReadStream                  ( unsigned int idx, void *buffer, unsigned int offset, unsigned int blockCount );

@@ -19,6 +19,17 @@
 
 #include <game/Common.h>
 
+#ifndef _DEBUG
+#define assume( x ) __analysis_assume( (x) )
+#else
+#define assume( x ) assert( (x) )
+#endif
+
+#define DECL_ST __declspec(noalias)
+
+#define MAX_REGION          1000000
+#define HEIGHT_BOUND        0x7FFF
+
 template <size_t heapSize>
 class CAlignedStackSA
 {
@@ -183,6 +194,26 @@ public:
 
     Item            m_root;
     unsigned int    m_count;
+};
+
+// High precision math wrap.
+// Use it if you are encountering floating point precision issues.
+// This wrap is used in timing critical code.
+struct HighPrecisionMathWrap
+{
+    unsigned int _oldFPUVal;
+
+    inline HighPrecisionMathWrap( void )
+    {
+        _oldFPUVal = _controlfp( 0, 0 );
+
+        _controlfp( _PC_64, _MCW_PC );
+    }
+
+    inline ~HighPrecisionMathWrap( void )
+    {
+        _controlfp( _oldFPUVal, _MCW_PC );
+    }
 };
 
 #undef DEBUG_LOG

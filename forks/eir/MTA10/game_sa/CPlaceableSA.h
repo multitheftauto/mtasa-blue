@@ -19,7 +19,7 @@ class CPlaceableSAInterface // 24 bytes
 {
 public:
                                     CPlaceableSAInterface       ( void );
-    virtual                         ~CPlaceableSAInterface      ( void );
+    virtual __thiscall              ~CPlaceableSAInterface      ( void );
 
     void __thiscall                 AllocateMatrix              ( void );
     void __thiscall                 AcquaintMatrix              ( void );
@@ -55,6 +55,22 @@ public:
                 GetMatrixFromHeading( out );
         }
 
+        inline float                GetHeading                  ( void ) const
+        {
+            if ( CTransformSAInterface *trans = matrix )
+                return trans->ToHeading();
+            
+            return m_transform.m_heading;
+        }
+
+        inline void                 SetRotation                 ( float x, float y, float z )
+        {
+            if ( CTransformSAInterface *trans = matrix )
+                matrix->SetRotationRad( x, y, z );
+            else
+                m_transform.m_heading = z;
+        }
+
         void __thiscall             GetOffsetByHeading          ( CVector& out, const CVector& in ) const;
         void __thiscall             GetMatrixFromHeading        ( RwMatrix& mat ) const;
 
@@ -68,7 +84,7 @@ public:
     } Placeable;
 };
 
-void Placeable_Init();
-void Placeable_Shutdown();
+void Placeable_Init( void );
+void Placeable_Shutdown( void );
 
 #endif //_PLACEABLE_SA_

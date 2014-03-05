@@ -27,6 +27,43 @@
 
 #include "CPlaceableSA.h"
 
+// Entity flags
+#define ENTITY_COLLISION        0x00000001
+#define ENTITY_COLL_PROCESSED   0x00000002
+#define ENTITY_STATIC           0x00000004
+#define ENTITY_CONTACTED        0x00000008
+#define ENTITY_STUCK            0x00000010
+#define ENTITY_NOCOLLHIT        0x00000020
+#define ENTITY_PROCESSLATER     0x00000040
+#define ENTITY_VISIBLE          0x00000080
+    
+#define ENTITY_BIG              0x00000100
+#define ENTITY_USEDAMAGE        0x00000200
+#define ENTITY_DISABLESTREAMING 0x00000400
+#define ENTITY_INVALID          0x00000800
+#define ENTITY_COLL_WORLD       0x00001000
+#define ENTITY_RENDERING        0x00002000
+#define ENTITY_RENDER_LAST      0x00004000
+#define ENTITY_FADE             0x00008000
+    
+#define ENTITY_NOSHADOWCAST     0x00010000
+#define ENTITY_OFFSCREEN        0x00020000
+#define ENTITY_WAITFORCOLL      0x00040000
+#define ENTITY_NOSTREAM         0x00080000
+#define ENTITY_UNDERWATER       0x00100000
+#define ENTITY_PRERENDERED      0x00200000
+#define ENTITY_DYNAMIC          0x00400000  // for buildings
+#define ENTITY_CACHED_SKELETON  0x00800000
+    
+#define ENTITY_ROADSIGN         0x01000000
+#define ENTITY_LOWLOD           0x02000000
+#define ENTITY_PROC_OBJECT      0x04000000
+#define ENTITY_BACKFACECULL     0x08000000
+#define ENTITY_LIGHTING         0x10000000
+#define ENTITY_UNIMPORTANT      0x20000000
+#define ENTITY_TUNNEL           0x40000000
+#define ENTITY_TUNNELTRANSITION 0x80000000
+
 #define FUNC_GetDistanceFromCentreOfMassToBaseOfModel       0x536BE0
 
 #define FUNC_SetRwObjectAlpha                               0x5332C0
@@ -122,11 +159,62 @@ public:
     virtual void __thiscall         RemoveLighting( unsigned char id ) = 0;                 // 80
     virtual void __thiscall         Invalidate() = 0;                                       // 84
 
-    unsigned short                  GetModelIndex( void ) const             { return m_nModelIndex; }
-    RwObject*                       GetRwObject( void )                     { return m_pRwObject; }
-    CBaseModelInfoSAInterface*      GetModelInfo( void ) const;
+    unsigned char __thiscall        _SetupLighting          ( void );
+    void __thiscall                 _RemoveLighting         ( unsigned char id );
 
-    float                           GetFadingAlpha( void ) const;
+    modelId_t                       GetModelIndex           ( void ) const          { return m_nModelIndex; }
+    CBaseModelInfoSAInterface*      GetModelInfo            ( void ) const          { return ppModelInfo[GetModelIndex()]; }
+
+    void                            GetPosition             ( CVector& pos ) const;
+    const CVector&                  GetLODPosition          ( void ) const
+    {
+        if ( m_pLod )
+            return m_pLod->Placeable.GetPosition();
+
+        return Placeable.GetPosition();
+    }
+
+    CEntitySAInterface*             GetFinalLOD             ( void )
+    {
+        CEntitySAInterface *lod = m_pLod;
+
+        if ( !lod )
+            return this;
+
+        while ( CEntitySAInterface *nextLOD = lod->m_pLod )
+            lod = nextLOD;
+
+        return lod;
+    }
+
+    float __thiscall                GetBasingDistance       ( void ) const;
+
+    void                            SetAlpha                ( unsigned char alpha );
+    CColModelSAInterface* __thiscall    GetColModel         ( void ) const;
+    const CVector& __thiscall       GetCollisionOffset      ( CVector& out ) const;
+    const CBounds2D& __thiscall     _GetBoundingBox         ( CBounds2D& out ) const;
+    void __thiscall                 GetCenterPoint          ( CVector& out ) const;
+
+    float __thiscall                GetRadius               ( void ) const          { return GetColModel()->m_bounds.fRadius; }
+
+    float                           GetFadingAlpha          ( void ) const;
+
+    void __thiscall                 SetOrientation          ( float x, float y, float z );
+
+    bool __thiscall                 IsOnScreen              ( void ) const;
+    bool __thiscall                 CheckScreenValidity     ( void ) const;
+
+    void __thiscall                 UpdateRwMatrix          ( void );
+    void __thiscall                 UpdateRwFrame           ( void );
+
+    bool __thiscall                 IsInStreamingArea       ( void ) const;
+
+    // System functions for communication with the mods.
+    bool                            Reference               ( void );
+    void                            Dereference             ( void );
+
+    inline RwObject*                GetRwObject             ( void )                { return m_pRwObject; }
+    inline const RwObject*          GetRwObject             ( void ) const          { return m_pRwObject; }
 
     RpClump     * m_pRwObject; // 24
 
@@ -179,7 +267,7 @@ public:
     WORD        m_nModelIndex;//34
     CReferences *pReferences; //36
     
-    DWORD       * m_pLastRenderedLink; //   CLink<CEntity*>* m_pLastRenderedLink; +40
+    void *m_streamingRef; //   CLink<CEntity*>* m_pLastRenderedLink; +40
     
     WORD m_nScanCode;           // 44
     BYTE m_iplIndex;            // used to define which IPL file object is in +46
@@ -334,6 +422,11 @@ private:
 #include "CEntitySA.render.h"
 #include "CEntitySA.renderfeedback.h"
 #include "CEntitySA.lod.h"
+
+namespace Entity
+{
+    void    SetReferenceCallbacks( entityReferenceCallback_t addRef, entityReferenceCallback_t delRef );
+};
 
 
 //

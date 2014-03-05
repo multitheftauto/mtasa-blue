@@ -31,6 +31,179 @@ static bool bCameraClipVehicles;
 DWORD RETURN_Camera_CollisionDetection =    0x520195;
 void HOOK_Camera_CollisionDetection ();
 
+bool CCameraSAInterface::IsSphereVisible( const CVector& pos, float radius, void *unk )
+{
+    DWORD dwFunc = 0x00420C40;
+
+    __asm
+    {
+        push unk
+        push radius
+        push pos
+        mov ecx,this
+        call dwFunc
+    }
+}
+
+float CCameraSAInterface::GetGroundLevel( unsigned int type )
+{
+    static CVector lastUpdatePosition;
+    static float unk1 = 0;
+    static float unk2 = 0;
+    static float unk3 = 0;
+
+    const CVector& camPos = Placeable.GetPosition();
+
+    if ( abs( lastUpdatePosition[0] - camPos[0] ) > 20 ||
+         abs( lastUpdatePosition[1] - camPos[1] ) > 20 ||
+         abs( lastUpdatePosition[2] - camPos[2] ) > 20 )
+    {
+        CColPointSAInterface hitPos;
+        CEntitySAInterface *hitEntity;
+        CVector startPos( camPos.fX, camPos.fY, 1000.0f );
+
+        bool hit = pGame->GetWorld()->ProcessVerticalLine( startPos, -1000, hitPos, &hitEntity, true, false, false, false, true, false, false );
+
+        if ( hit )
+        {
+            unk3 = hitPos.Position[2];
+
+            const CVector& entityPos = hitEntity->Placeable.GetPosition();
+            
+            CColModelSAInterface *col = hitEntity->GetColModel();
+
+            unk2 = col->m_bounds.vecBoundMax[2] + entityPos.fZ;
+            unk1 = (float)std::max( (float)0,
+                ( col->m_bounds.vecBoundMax[0] - col->m_bounds.vecBoundMin[0] <= 120.0f &&
+                 col->m_bounds.vecBoundMax[1] - col->m_bounds.vecBoundMin[1] <= 120.0f )
+                 ? ( entityPos[2] + col->m_bounds.vecBoundMax[2] ) : ( unk2 ) );
+        }
+
+        lastUpdatePosition = camPos;
+    }
+
+    if ( type == 2 )
+        return unk2;
+
+    if ( type == 1 )
+        return unk3;
+
+    return unk1;
+}
+
+/*=========================================================
+    CCameraSAInterface::GetMusicFadeType
+
+    Purpose:
+        Returns the fading status as described by the music
+        fade status.
+    Binary offsets:
+        (1.0 US and 1.0 EU): 0x00536F80
+=========================================================*/
+unsigned int __thiscall CCameraSAInterface::GetMusicFadeType( void ) const
+{
+    if ( m_fTimeToFadeMusic == 0 )
+        return 0;
+
+    return ( m_fTimeToFadeMusic == 255.0 ) ? 2 : 1;
+}
+
+/*=========================================================
+    CCameraSAInterface::SetFadeColor
+
+    Arguments:
+        red - red color component
+        green - green color component
+        blue - blue color component
+    Purpose:
+        Sets the fading color of the game.
+    Binary offsets:
+        (1.0 US and 1.0 EU): 0x0050BF00
+=========================================================*/
+void __thiscall CCameraSAInterface::SetFadeColor( unsigned char red, unsigned char green, unsigned char blue )
+{
+    m_bMusicFadedOut = ( red == 2 && green == 2 && blue == 2 );
+    
+    *(unsigned char*)0x00C3EFA8 = red;
+    *(unsigned char*)0x00C3EFA9 = green;
+    *(unsigned char*)0x00C3EFAA = blue;
+}
+
+/*=========================================================
+    CCameraSAInterface::Fade
+
+    Arguments:
+        fadeDuration - time required to fade the screen to black
+        direction - fade in or fade out
+    Purpose:
+        Performs a fading screen animation by the parameters
+        given.
+    Binary offsets:
+        (1.0 US and 1.0 EU): 0x0050AC25
+=========================================================*/
+void __thiscall CCameraSAInterface::Fade( float fadeDuration, unsigned short direction )
+{
+    m_fTimeToFadeOut = fadeDuration;
+    m_bFading = true;
+    m_iFadingDirection = direction;
+
+    m_uiFadeTimeStarted = *(unsigned int*)0x00B7CB84;
+
+    if ( m_bJustInitalised && direction != 1 )
+        return;
+
+    m_bMusicFading = true;
+    m_iMusicFadingDirection = direction;
+
+    float musicFadeDuration = (float)Clamp( 0.3f, std::max( fadeDuration, 1.0f ) * 0.3f, fadeDuration );
+
+    m_fTimeToFadeMusic = musicFadeDuration;
+
+    if ( direction == 0 )
+    {
+        m_fTimeToWaitToFadeMusic = fadeDuration - musicFadeDuration;
+        m_fTimeToFadeMusic = std::max( musicFadeDuration - 0.1f, 0.0f );
+    }
+    else
+    {
+        m_fTimeToWaitToFadeMusic = 0;
+    }
+
+    m_uiFadeTimeStartedMusic = *(unsigned int*)0x00B7CB84;
+}
+
+/*=========================================================
+    CCameraSAInterface::GetFadeDirection
+
+    Purpose:
+        Returns the logical fade direction of the camera at
+        this time.
+    Binary offsets:
+        (1.0 US and 1.0 EU): 0x0050ADF0
+=========================================================*/
+int __thiscall CCameraSAInterface::GetFadeDirection( void ) const
+{
+    return ( m_bFading ) ? m_iFadingDirection == 1 : 2;
+}
+
+/*=========================================================
+    CCameraSAInterface::GetActiveCamLookDirection
+
+    Purpose:
+        Returns the direction the active cam is looking to.
+    Binary offsets:
+        (1.0 US and 1.0 EU): 0x0050AE90
+=========================================================*/
+int __thiscall CCameraSAInterface::GetActiveCamLookDirection( void )
+{
+    CCamSAInterface& cam = GetActiveCam();
+
+    if ( cam.Mode == 18 || cam.Mode == 16 || cam.Mode == 22 || cam.Mode == 4 )
+        return cam.DirectionWasLooking;
+
+    return 3;
+}
+
 CCameraSA::CCameraSA(CCameraSAInterface * cameraInterface)
 { 
     DEBUG_TRACE("CCameraSA::CCameraSA(CCameraSAInterface * cameraInterface)");

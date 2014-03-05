@@ -159,7 +159,7 @@ enum eDebugCaller
     CCivPed_Constructor,
     CCivPed_Destructor,
     CBuilding_Destructor,
-
+    World_Native
 };
 
 class CWorld

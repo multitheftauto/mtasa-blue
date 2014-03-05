@@ -25,6 +25,8 @@ public:
     void*   operator new( size_t );
     void    operator delete( void *ptr );
 
+    unsigned int    GetHash                 ( void )        { return m_hash; }
+
     void            Allocate                ( void );
     void            Deallocate              ( void );
 
@@ -43,5 +45,28 @@ public:
     unsigned short      m_parentTxd;        // 6
     unsigned int        m_hash;             // 8
 };
+
+// Exports of game functions.
+int __cdecl TxdCreate                   ( const char *name );
+void __cdecl TxdDestroy                 ( int txdIndex );
+int __cdecl TxdFind                     ( const char *name );
+bool __cdecl TxdLoadBinary              ( int id, RwStream *stream );
+int __cdecl TxdLoadEx                   ( int id, const char *name, const char *filename );
+int __cdecl TxdLoad                     ( int id, const char *filename );
+RwTexDictionary* __cdecl TxdGetRwObject ( int id );
+bool __cdecl TxdSetCurrentSafe          ( int id );
+void __cdecl TxdSetCurrent              ( int id );
+void __cdecl TxdDeallocate              ( int id );
+void __cdecl TxdInitParent              ( int id );
+void __cdecl TxdAddRef                  ( int id );
+void __cdecl TxdRemoveRef               ( int id );
+void __cdecl TxdRemoveRefNoDestroy      ( int id );
+
+// Links used by MTA:BLUE
+inline int __cdecl CTxdStore_LoadTxd                ( int id, RwStream *stream )        { return TxdLoadBinary( id, stream ); }
+inline RwTexDictionary* __cdecl CTxdStore_GetTxd    ( int id )                          { return TxdGetRwObject( id ); }
+inline void __cdecl CTxdStore_RemoveTxd             ( int id )                          { return TxdDeallocate( id ); }
+inline void __cdecl CTxdStore_RemoveRef             ( int id )                          { return TxdRemoveRef( id ); }
+inline void __cdecl CTxdStore_AddRef                ( int id )                          { return TxdAddRef( id ); }
 
 #endif //_TEXTUREMANAGER_TXD_INSTANCE_

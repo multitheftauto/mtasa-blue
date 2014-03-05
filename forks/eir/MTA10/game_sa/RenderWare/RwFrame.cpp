@@ -651,7 +651,7 @@ RpAnimHierarchy* RwFrame::GetAnimHierarchy( void )
 =========================================================*/
 static void RwFrameCheckUpdateNode( void )
 {
-    LIST_FOREACH_BEGIN( RwFrame, (*ppRwInterface)->m_nodeRoot.root, nodeRoot )
+    LIST_FOREACH_BEGIN( RwFrame, RenderWare::GetInterface()->m_nodeRoot.root, nodeRoot )
         if ( !LIST_ISVALID( *iter ) )
             __asm int 3
     LIST_FOREACH_END
@@ -672,7 +672,7 @@ void RwFrame::_Update( RwList <RwFrame>& list )
 
 void RwFrame::Update( void )
 {
-    root->_Update( (*ppRwInterface)->m_nodeRoot );
+    root->_Update( RenderWare::GetInterface()->m_nodeRoot );
     privateFlags |= RW_FRAME_UPDATEMATRIX | 8;
 }
 

@@ -49,6 +49,13 @@ enum eEntityStatus
     STATUS_SIMPLE_TRAILER // Same here
 };
 
+typedef bool (__cdecl*entityReferenceCallback_t)( class CEntity *entity );
+typedef void (__cdecl*gameEntityPreRenderCallback_t)( void );
+typedef void (__cdecl*gameEntityRenderCallback_t)( void );
+typedef void (__cdecl*gameEntityRenderUnderwaterCallback_t)( void );
+typedef void (__cdecl*gameEntityPostProcessCallback_t)( void );
+
+
 class CEntity
 {
 public:

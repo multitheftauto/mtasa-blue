@@ -14,6 +14,8 @@
 #ifndef __CGAMESA_WORLD
 #define __CGAMESA_WORLD
 
+#define WORLD_BOUNDS                                        3000
+
 #define FUNC_Add                                            0x563220 // ##SA##
 #define FUNC_Remove                                         0x563280 // ##SA##
 #define FUNC_ProcessLineOfSight                             0x56BA00 // ##SA##
@@ -52,6 +54,20 @@
 #include "CEntitySA.h"
 #include "CBuildingSA.h"
 
+// Native management API.
+namespace World
+{
+    void __cdecl        AddEntity           ( CEntitySAInterface *entity );
+    void __cdecl        RemoveEntity        ( CEntitySAInterface *entity );
+
+    void                SetCenterOfWorld    ( CEntitySAInterface *streamingEntity, const CVector *pos, float heading );
+    bool                GetCenterOfWorld    ( CVector& pos );
+    bool                IsCenterOfWorldSet  ( void );
+    const CVector&      GetCenterOfWorld    ( void );
+    CEntitySAInterface* GetStreamingEntity  ( void );
+    float               GetFalseHeading     ( void );
+}
+
 class CWorldSA : public CWorld
 {
 public:
@@ -84,6 +100,8 @@ public:
     void        FindWorldPositionForRailTrackPosition ( float fRailTrackPosition, int iTrackId, CVector* pOutVecPosition );
     int         FindClosestRailTrackNode  ( const CVector& vecPosition, uchar& ucOutTrackId, float& fOutRailDistance );
 
+    bool        ProcessVerticalLine             ( const CVector& pos, float distance, CColPointSAInterface& colPoint, CEntitySAInterface **hitEntity, bool unk1, bool unk2, bool unk3, bool unk4, bool unk5, bool unk6, bool unk7 );
+
     /**
      * \todo Add FindObjectsKindaColliding (see 0x430577)
      * \todo Add CameraToIgnoreThisObject (0x563F40)
@@ -95,7 +113,6 @@ public:
      * \todo Add FindNearestObjectOfType (see 0x46D5FD)
      * \todo Add FindRoofZFor3DCoord (0x569750)
      * \todo Add GetIsLineOfSightClear (0x56A490)
-     * \todo Add ProcessVerticalLine (0x5674E0)
      * \todo Add RemoveReferencesToDeletedObject (0x565510)
      * \todo Add SetAllCarsCanBeDamaged (0x5668F0)
      * \todo Add TestSphereAgainstWorld (0x569E20)

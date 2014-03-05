@@ -42,11 +42,6 @@ int CRenderWareSA::ms_iRenderingType = 0;
 ////////////////////////////////////////////////////////////////
 
 // Hooks for creating txd create and destroy events
-#define HOOKPOS_CTxdStore_SetupTxdParent       0x731D55
-DWORD RETURN_CTxdStore_SetupTxdParent =        0x731D5B;
-#define HOOKPOS_CTxdStore_RemoveTxd         0x731E90
-DWORD RETURN_CTxdStore_RemoveTxd =          0x731E96;
-
 //
 // STxdStreamEvent stores the txd create and destroy events for the current frame
 //
@@ -83,27 +78,6 @@ void _cdecl OnStreamingAddedTxd ( DWORD dwTxdId )
     ms_txdStreamEventList.push_back ( STxdStreamEvent ( true, usTxdId ) );
 }
 
-// called from streaming on TXD create
-void _declspec(naked) HOOK_CTxdStore_SetupTxdParent ()
-{
-    _asm
-    {
-        // Hooked from 731D55  6 bytes
-
-        // eax - txd id
-        pushad
-        push eax
-        call OnStreamingAddedTxd
-        add esp, 4
-        popad
-
-        // orig
-        mov     esi, ds:00C8800Ch 
-        jmp     RETURN_CTxdStore_SetupTxdParent  // 731D5B
-    }
-}
-
-
 ////////////////////////////////////////////////////////////////
 // Txd remove
 ////////////////////////////////////////////////////////////////
@@ -117,27 +91,6 @@ void _cdecl OnStreamingRemoveTxd ( DWORD dwTxdId )
     ms_txdStreamEventList.push_back ( STxdStreamEvent ( false, usTxdId ) );
 }
 
-// called from streaming on TXD destroy
-void _declspec(naked) HOOK_CTxdStore_RemoveTxd ()
-{
-    _asm
-    {
-        // Hooked from 731E90  6 bytes
-
-        // esi - txd id + 20000
-        pushad
-        push esi
-        call OnStreamingRemoveTxd
-        add esp, 4
-        popad
-
-        // orig
-        mov     ecx, ds:00C8800Ch
-        jmp     RETURN_CTxdStore_RemoveTxd      // 731E96
-    }
-}
-
-
 ////////////////////////////////////////////////////////////////
 //
 // CRenderWareSA::InitTextureWatchHooks
@@ -146,8 +99,6 @@ void _declspec(naked) HOOK_CTxdStore_RemoveTxd ()
 ////////////////////////////////////////////////////////////////
 void CRenderWareSA::InitTextureWatchHooks ( void )
 {
-    HookInstall ( HOOKPOS_CTxdStore_SetupTxdParent, (DWORD)HOOK_CTxdStore_SetupTxdParent, 6 );
-    HookInstall ( HOOKPOS_CTxdStore_RemoveTxd, (DWORD)HOOK_CTxdStore_RemoveTxd, 6 );
 }
 
 
