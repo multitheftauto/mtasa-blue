@@ -105,9 +105,6 @@ namespace SharedUtil
             return hMem;
         }
 
-        // Checks
-        assert( IsMainThread() );
-
         // Calc info for VirtualProtect
         hMem.dwFirstPage = ((DWORD)pAddr) & ~0xFFF;
         DWORD dwLastPage = (((DWORD)pAddr) + uiAmount - 1) & ~0xFFF;

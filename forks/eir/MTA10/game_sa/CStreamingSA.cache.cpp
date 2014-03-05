@@ -81,6 +81,8 @@ bool StreamingCache::CacheIMGFile( const char *name )
     return success;
 }
 
+void CStreamingSA::CacheIMGFile( const char *name )     { StreamingCache::CacheIMGFile( name ); }
+
 /*=========================================================
     StreamingCache::IsIMGFileCached
 
@@ -98,6 +100,8 @@ bool StreamingCache::IsIMGFileCached( const char *name )
 
     return cachedIMGFiles[imgID].isCached;
 }
+
+bool CStreamingSA::IsIMGFileCached( const char *name ) const    { return StreamingCache::IsIMGFileCached( name ); }
 
 /*=========================================================
     StreamingCache::FreeIMGFileCache
@@ -117,6 +121,8 @@ void StreamingCache::FreeIMGFileCache( const char *name )
 
     cachedIMGFiles[imgID].buffer.clear();
 }
+
+void CStreamingSA::FreeIMGFileCache( const char *name ) { return StreamingCache::FreeIMGFileCache( name ); }
 
 void StreamingCache_Init( void )
 {

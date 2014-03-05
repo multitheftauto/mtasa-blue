@@ -476,4 +476,7 @@ private:
     static unsigned long        FUNC_RwFrameGetLTM;
 };
 
+void Camera_Init( void );
+void Camera_Shutdown( void );
+
 #endif

@@ -68,6 +68,9 @@ CGameSA::CGameSA()
         ModelInfo [i].SetModelID ( i );
     }
 
+    // Monitor GTA:SA file system activity.
+    FileMgr::InitHooks();
+
     // Streaming resources init
     IMG_Initialize();
 
@@ -124,13 +127,20 @@ CGameSA::CGameSA()
     // Initialize static (internal) extensions
     RenderWarePipeline_Init();
     Transformation_Init();
+    QuadTree_Init();
+    Cache_Init();
     Placeable_Init();
+    Camera_Init();
+    ColModel_Init();
     Entity_Init();
     //Physical_Init();
     //Objects_Init();
+    //Ped_Init();
     Streamer_Init();
     ModelInfo_Init();
     VehicleModels_Init();
+    PlayerInfo_Init();
+    HUD_Init();
 
     // Normal weapon types (WEAPONSKILL_STD)
     for ( int i = 0; i < NUM_WeaponInfosStdSkill; i++)
@@ -228,13 +238,20 @@ CGameSA::~CGameSA ( void )
     }
 
     // Shutdown the static (internal) extensions
+    HUD_Shutdown();
+    PlayerInfo_Shutdown();
     VehicleModels_Shutdown();
     ModelInfo_Shutdown();
     Streamer_Shutdown();
+    //Ped_Shutdown();
     //Objects_Shutdown();
     //Physical_Shutdown();
     Entity_Shutdown();
+    ColModel_Shutdown();
+    Camera_Shutdown();
     Placeable_Shutdown();
+    Cache_Shutdown();
+    QuadTree_Shutdown();
     Transformation_Shutdown();
     RenderWarePipeline_Shutdown();
 
@@ -280,6 +297,9 @@ CGameSA::~CGameSA ( void )
 
     // Terminate streaming resources
     IMG_Shutdown();
+
+    // Terminate file system monitoring.
+    FileMgr::ShutdownHooks();
 }
 
 CWeaponInfo * CGameSA::GetWeaponInfo(eWeaponType weapon, eWeaponSkill skill)
@@ -605,6 +625,23 @@ void CGameSA::SetMinuteDuration ( unsigned long ulTime )
     MemPutFast < unsigned long > ( 0xB7015C, ulTime );
 }
 
+void CGameSA::HideRadar( bool hide )
+{
+    return HUD::HideRadar( hide );
+}
+
+bool CGameSA::IsRadarHidden( void )
+{
+    return HUD::IsRadarHidden();
+}
+
+void CGameSA::SetCenterOfWorld( CEntity *streamingEntity, const CVector *pos, float heading )
+{
+    CEntitySA *entity = dynamic_cast <CEntitySA*> ( streamingEntity );
+
+    World::SetCenterOfWorld( entity ? entity->GetInterface() : NULL, pos, heading );
+}
+
 bool CGameSA::IsCheatEnabled ( const char* szCheatName )
 {
     std::map < std::string, SCheatSA* >::iterator it = m_Cheats.find ( szCheatName );
@@ -843,7 +880,7 @@ CFile* OpenGlobalStream( const char *filename, const char *mode )
 #endif //MULTI_RENDERWARE_ROOT
 
     // Attempt to access the GTA:SA directory
-    if ( file = gameFileRoot->Open( filename, mode ) )
+    if ( file = FileMgr::GetCurDirTranslator()->Open( filename, mode ) )
         return file;
 
     // (off-topic) TODO: accept read-only access to the game directory

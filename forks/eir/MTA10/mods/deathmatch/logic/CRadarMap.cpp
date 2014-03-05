@@ -364,14 +364,14 @@ void CRadarMap::InternalSetRadarEnabled ( bool bEnabled )
         m_bDebugVisible = g_pCore->IsDebugVisible ();
 
         g_pGame->GetHud ()->Disable ( true );
-        g_pMultiplayer->HideRadar ( true );
+        g_pGame->HideRadar ( true );
         g_pCore->SetChatVisible ( false );
         g_pCore->SetDebugVisible ( false );
     }
     else
     {
         g_pGame->GetHud ()->Disable ( false );
-        g_pMultiplayer->HideRadar ( false );
+        g_pGame->HideRadar ( false );
         g_pCore->SetChatVisible ( m_bChatVisible );
         g_pCore->SetDebugVisible ( m_bDebugVisible );
     }

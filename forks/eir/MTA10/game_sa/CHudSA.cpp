@@ -13,6 +13,113 @@
 
 #include "StdInc.h"
 
+static bool hideRadar = false;
+
+/*=========================================================
+    HUD::CalcScreenCoords
+
+    Arguments:
+        worldPos - point in world space
+        screenOut - point in screen space
+        x - resolution x
+        y - resolution y
+    Purpose:
+        Transforms points of world space into screen space.
+        Return false if the screen position is invalid.
+    Binary offsets:
+        (1.0 US and 1.0 EU): 0x0071DA00
+=========================================================*/
+bool __cdecl HUD::CalcScreenCoords( const CVector& worldPos, CVector& screenOut, float& x, float& y )
+{
+    const RwMatrix& viewMatrix = *(RwMatrix*)0x00B6FA2C;
+
+    viewMatrix.Transform( worldPos, screenOut );
+
+    if ( screenOut.fZ <= 1 )
+        return false;
+
+    unsigned int& screenWidth = *(unsigned int*)0x00C17044;
+    unsigned int& screenHeight = *(unsigned int*)0x00C17048;
+
+    screenOut.fX *= screenWidth / screenOut.fZ;
+    screenOut.fY += screenHeight / screenOut.fZ;
+
+    x = screenWidth / screenOut.fZ;
+    y = screenHeight / screenOut.fZ;
+
+    x = x / 45.0f * 70.0f;
+    y = y / 45.0f * 70.0f;
+    return true;
+}
+
+/*=========================================================
+    HUD::CalcScreenCoords
+
+    Arguments:
+        worldPos - point in world space
+        screenOut - point in screen space
+    Purpose:
+        Transforms points of world space into screen space.
+        Return false if the screen position is invalid.
+    Binary offsets:
+        (1.0 US and 1.0 EU): 0x0071DAB0
+=========================================================*/
+bool __cdecl HUD::CalcScreenCoords( const CVector& worldPos, CVector& screenOut )
+{
+    const RwMatrix& viewMatrix = *(RwMatrix*)0x00B6FA2C;
+
+    viewMatrix.Transform( worldPos, screenOut );
+
+    if ( screenOut.fZ <= 1 )
+        return false;
+
+    unsigned int& screenWidth = *(unsigned int*)0x00C17044;
+    unsigned int& screenHeight = *(unsigned int*)0x00C17048;
+
+    screenOut.fX *= screenWidth / screenOut.fZ;
+    screenOut.fY += screenHeight / screenOut.fZ;
+    return true;
+}
+
+void HUD::HideRadar( bool hide )
+{
+    hideRadar = hide;
+}
+
+bool HUD::IsRadarHidden( void )
+{
+    return hideRadar;
+}
+
+void __cdecl HOOK_CHud_Render( void )
+{
+    ((void (__cdecl*)( void ))0x00507030)();
+
+    if ( !World::IsCenterOfWorldSet() )
+        ((void (__cdecl*)( void ))0x0058FAE0)();
+    else
+    {
+        if ( !hideRadar )
+            ((void (__cdecl*)( void ))0x58A330)();
+    }
+}
+
+void HUD_OnReset( void )
+{
+    hideRadar = false;
+}
+
+void HUD_Init( void )
+{
+    // Initialize important hooks.
+    PatchCall( 0x0053E4FA, (DWORD)HOOK_CHud_Render );
+    MemSet( (void*)0x0053E4FF, 0x90, 5 );
+}
+
+void HUD_Shutdown( void )
+{
+}
+
 char szVehicleName[50] = {'\0'};
 char szZoneName[50] = {'\0'};
 

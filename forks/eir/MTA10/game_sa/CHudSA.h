@@ -66,6 +66,22 @@ struct SHudComponent
     DWORD disabledData;
 };
 
+// HUD management functions.
+namespace HUD
+{
+    bool __cdecl    CalcScreenCoords( const CVector& worldPos, CVector& screenOut, float& x, float& y );
+    bool __cdecl    CalcScreenCoords( const CVector& worldPos, CVector& screenOut );
+
+    void    HideRadar( bool hide );
+    bool    IsRadarHidden( void );
+};
+
+void HUD_OnReset( void );
+
+// Module initialization.
+void HUD_Init( void );
+void HUD_Shutdown( void );
+
 
 class CHudSA : public CHud
 {

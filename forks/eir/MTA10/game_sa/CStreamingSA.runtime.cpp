@@ -570,12 +570,14 @@ void StreamingRuntime_Init( void )
 
     // Practically, these patches are useless as that code is never called.
     // We leave this in for reference anyway.
-    *(unsigned int*)0x0040676C = *(unsigned int*)0x004068DD =
-        (unsigned int)gtaStreamNames;
+    MemPut( (unsigned int*)0x0040676C, gtaStreamNames );
+    MemPut( (unsigned int*)0x004068DD, gtaStreamNames );
 
-    *(unsigned int*)0x00406737 = *(unsigned int*)0x00406797 = *(unsigned int*)0x004068AB = *(unsigned int*)0x004068C2 =
-    *(unsigned int*)0x004068D0 =
-        (unsigned int)gtaStreamHandles;
+    MemPut( (unsigned int*)0x00406737, gtaStreamHandles );
+    MemPut( (unsigned int*)0x00406797, gtaStreamHandles );
+    MemPut( (unsigned int*)0x004068AB, gtaStreamHandles );
+    MemPut( (unsigned int*)0x004068C2, gtaStreamHandles );
+    MemPut( (unsigned int*)0x004068D0, gtaStreamHandles );
 }
 
 void StreamingRuntime_Shutdown( void )

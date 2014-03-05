@@ -207,6 +207,11 @@ public:
     unsigned long           GetMinuteDuration       ( void );
     void                    SetMinuteDuration       ( unsigned long ulTime );
 
+    void                    HideRadar               ( bool hide );
+    bool                    IsRadarHidden           ( void );
+
+    void                    SetCenterOfWorld        ( CEntity *streamingEntity, const CVector *pos, float heading );
+
     bool                    IsCheatEnabled          ( const char* szCheatName );
     bool                    SetCheatEnabled         ( const char* szCheatName, bool bEnable );
     void                    ResetCheats             ();

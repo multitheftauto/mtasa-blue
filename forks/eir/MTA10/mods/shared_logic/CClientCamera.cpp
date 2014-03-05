@@ -64,7 +64,7 @@ void CClientCamera::DoPulse ( void )
         CMatrix matTemp;
         GetMatrix ( matTemp );
         g_pMultiplayer->ConvertMatrixToEulerAngles ( matTemp, vecRotation.fX, vecRotation.fY, vecRotation.fZ );    
-        g_pMultiplayer->SetCenterOfWorld ( NULL, &m_matFixedMatrix.vPos, 3.1415926535897932384626433832795f - vecRotation.fZ );
+        g_pGame->SetCenterOfWorld ( NULL, &m_matFixedMatrix.vPos, 3.1415926535897932384626433832795f - vecRotation.fZ );
     }
     else
     {
@@ -117,7 +117,7 @@ void CClientCamera::DoPulse ( void )
                 }
 
                 // Set the new world center/rotation
-                g_pMultiplayer->SetCenterOfWorld ( NULL, m_pFocusedGameEntity->GetPosition (), fRotation );
+                g_pGame->SetCenterOfWorld ( NULL, m_pFocusedGameEntity->GetPosition (), fRotation );
             }
         }
 
@@ -170,7 +170,7 @@ void CClientCamera::SetPosition ( const CVector& vecPosition )
     CMatrix matTemp;
     GetMatrix ( matTemp );
     g_pMultiplayer->ConvertMatrixToEulerAngles ( matTemp, vecRotation.fX, vecRotation.fY, vecRotation.fZ );
-    g_pMultiplayer->SetCenterOfWorld ( NULL, (CVector*)&vecPosition, 3.1415926535897932384626433832795f - vecRotation.fZ );
+    g_pGame->SetCenterOfWorld ( NULL, (CVector*)&vecPosition, 3.1415926535897932384626433832795f - vecRotation.fZ );
 
     // Store the position so it can be updated from our hook
     m_matFixedMatrix.vPos = vecPosition;
@@ -444,7 +444,7 @@ void CClientCamera::SetFocusToLocalPlayerImpl ( void )
 {
     // Restore the camera
     m_pCamera->RestoreWithJumpCut ();
-    g_pMultiplayer->SetCenterOfWorld ( NULL, NULL, NULL );
+    g_pGame->SetCenterOfWorld ( NULL, NULL, NULL );
 }
 
 
@@ -540,7 +540,7 @@ void CClientCamera::ToggleCameraFixedMode ( bool bEnabled )
     }
     else
     {
-        g_pMultiplayer->SetCenterOfWorld ( NULL, NULL, NULL );
+        g_pGame->SetCenterOfWorld ( NULL, NULL, NULL );
         SetFocusToLocalPlayer();
 
         m_fRoll = 0.0f;

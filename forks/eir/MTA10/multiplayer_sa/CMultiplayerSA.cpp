@@ -30,16 +30,8 @@ extern CMultiplayerSA* pMultiplayer;
 
 using namespace std;
 
-char* CMultiplayerSA::ms_PlayerImgCachePtr = NULL;
-
 extern CGame * pGameInterface;
 
-unsigned long CMultiplayerSA::HOOKPOS_FindPlayerCoors;
-unsigned long CMultiplayerSA::HOOKPOS_FindPlayerCentreOfWorld;
-unsigned long CMultiplayerSA::HOOKPOS_FindPlayerHeading;
-unsigned long CMultiplayerSA::HOOKPOS_CStreaming_Update_Caller;
-unsigned long CMultiplayerSA::HOOKPOS_CHud_Draw_Caller;
-unsigned long CMultiplayerSA::HOOKPOS_CRunningScript_Process;
 unsigned long CMultiplayerSA::HOOKPOS_CExplosion_AddExplosion;
 unsigned long CMultiplayerSA::HOOKPOS_CRealTimeShadowManager__ReturnRealTimeShadow;
 unsigned long CMultiplayerSA::HOOKPOS_CCustomRoadsignMgr__RenderRoadsignAtomic;
@@ -47,17 +39,13 @@ unsigned long CMultiplayerSA::HOOKPOS_Trailer_BreakTowLink;
 unsigned long CMultiplayerSA::HOOKPOS_CRadar__DrawRadarGangOverlay;
 unsigned long CMultiplayerSA::HOOKPOS_CTaskComplexJump__CreateSubTask;
 unsigned long CMultiplayerSA::HOOKPOS_CTrain_ProcessControl_Derail;
-unsigned long CMultiplayerSA::HOOKPOS_CVehicle_SetupRender;
-unsigned long CMultiplayerSA::HOOKPOS_CVehicle_ResetAfterRender;
 unsigned long CMultiplayerSA::HOOKPOS_CObject_Render;
 unsigned long CMultiplayerSA::HOOKPOS_EndWorldColors;
 unsigned long CMultiplayerSA::HOOKPOS_CWorld_ProcessVerticalLineSectorList;
 unsigned long CMultiplayerSA::HOOKPOS_ComputeDamageResponse_StartChoking;
 unsigned long CMultiplayerSA::HOOKPOS_CAutomobile__ProcessSwingingDoor;
 
-unsigned long CMultiplayerSA::FUNC_CStreaming_Update;
 unsigned long CMultiplayerSA::FUNC_CAudioEngine__DisplayRadioStationName;
-unsigned long CMultiplayerSA::FUNC_CHud_Draw;
 
 unsigned long CMultiplayerSA::ADDR_CursorHiding;
 unsigned long CMultiplayerSA::ADDR_GotFocus;
@@ -72,11 +60,9 @@ DWORD RETURN_FxManager_DestroyFxSystem =                    0x4A9817;
 
 #define HOOKPOS_CCam_ProcessFixed                           0x51D470
 #define HOOKPOS_CTaskSimplePlayerOnFoot_ProcessPlayerWeapon 0x6859a0
-#define HOOKPOS_CPed_IsPlayer                               0x5DF8F0
 
 DWORD RETURN_CCam_ProcessFixed =                            0x51D475;
 DWORD RETURN_CTaskSimplePlayerOnFoot_ProcessPlayerWeapon =  0x6859A7;
-DWORD RETURN_CPed_IsPlayer =                                0x5DF8F6;
 
 #define CALL_Render3DStuff                                  0x53EABF
 #define FUNC_Render3DStuff                                  0x53DF40
@@ -272,13 +258,7 @@ DWORD RETURN_CObject_ProcessCollision = 0x548DD1;
 DWORD JMP_DynamicObject_Cond_Zero = 0x548E98;
 
 CPed* pContextSwitchedPed = 0;
-CVector vecCenterOfWorld;
-FLOAT fFalseHeading;
-bool bSetCenterOfWorld;
 DWORD dwVectorPointer;
-bool bInStreamingUpdate;
-bool bHideRadar;
-bool bHasProcessedScript;
 float fX, fY, fZ;
 DWORD RoadSignFixTemp;
 DWORD dwEAEG = 0;
@@ -341,10 +321,6 @@ ObjectBreakHandler* m_pObjectBreakHandler = NULL;
 CEntitySAInterface * dwSavedPlayerPointer = 0;
 CEntitySAInterface * activeEntityForStreaming = 0; // the entity that the streaming system considers active
 
-void HOOK_FindPlayerCoors();
-void HOOK_FindPlayerCentreOfWorld();
-void HOOK_FindPlayerHeading();
-void HOOK_CStreaming_Update_Caller();
 void HOOK_CHud_Draw_Caller();
 void HOOK_CRunningScript_Process();
 void HOOK_CExplosion_AddExplosion();
@@ -358,13 +334,11 @@ void HOOK_FxManager_DestroyFxSystem ();
 void HOOK_CCam_ProcessFixed ();
 void HOOK_Render3DStuff ();
 void HOOK_CTaskSimplePlayerOnFoot_ProcessPlayerWeapon ();
-void HOOK_CPed_IsPlayer ();
 void HOOK_CTrain_ProcessControl_Derail ();
 void HOOK_CObject_Render ();
 void HOOK_EndWorldColors ();
 void HOOK_CWorld_ProcessVerticalLineSectorList ();
 void HOOK_ComputeDamageResponse_StartChoking ();
-void HOOK_CollisionStreamRead ();
 void HOOK_CPhysical_ApplyGravity ();
 void HOOK_VehicleCamStart ();
 void HOOK_VehicleCamTargetZTweak ();
@@ -517,12 +491,8 @@ void CMultiplayerSA::InitHooks()
     InitKeysyncHooks();
     InitShotsyncHooks();
     vehicle_lights_init ();
-    bSetCenterOfWorld = false;
-    bHasProcessedScript = false;
 
     eGameVersion version = pGameInterface->GetGameVersion ();
-
-    bSetCenterOfWorld = false;  
 
     //00442DC6  |. 0F86 31090000  JBE gta_sa_u.004436FD
     //00442DC6     E9 32090000    JMP gta_sa_u.004436FD
@@ -537,12 +507,6 @@ void CMultiplayerSA::InitHooks()
     MemPut < BYTE > ( 0x468EB5, 0xEB );
     MemPut < BYTE > ( 0x468EB6, 0x32 );
 
-    HookInstall(HOOKPOS_FindPlayerCoors, (DWORD)HOOK_FindPlayerCoors, 6);
-    HookInstall(HOOKPOS_FindPlayerCentreOfWorld, (DWORD)HOOK_FindPlayerCentreOfWorld, 6);
-    HookInstall(HOOKPOS_FindPlayerHeading, (DWORD)HOOK_FindPlayerHeading, 6);
-    HookInstall(HOOKPOS_CStreaming_Update_Caller, (DWORD)HOOK_CStreaming_Update_Caller, 7);
-    HookInstall(HOOKPOS_CHud_Draw_Caller, (DWORD)HOOK_CHud_Draw_Caller, 10);
-    HookInstall(HOOKPOS_CRunningScript_Process, (DWORD)HOOK_CRunningScript_Process, 6);
     HookInstall(HOOKPOS_CExplosion_AddExplosion, (DWORD)HOOK_CExplosion_AddExplosion, 6);
     HookInstall(HOOKPOS_CRealTimeShadowManager__ReturnRealTimeShadow, (DWORD)HOOK_CRealTimeShadowManager__ReturnRealTimeShadow, 6);
     HookInstall(HOOKPOS_CCustomRoadsignMgr__RenderRoadsignAtomic, (DWORD)HOOK_CCustomRoadsignMgr__RenderRoadsignAtomic, 6);
@@ -553,7 +517,6 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_FxManager_DestroyFxSystem, (DWORD)HOOK_FxManager_DestroyFxSystem, 7);
     HookInstall(HOOKPOS_CCam_ProcessFixed, (DWORD)HOOK_CCam_ProcessFixed, 5);
     HookInstall(HOOKPOS_CTaskSimplePlayerOnFoot_ProcessPlayerWeapon, (DWORD)HOOK_CTaskSimplePlayerOnFoot_ProcessPlayerWeapon, 7);
-    HookInstall(HOOKPOS_CPed_IsPlayer, (DWORD)HOOK_CPed_IsPlayer, 6);
     HookInstall(HOOKPOS_CTrain_ProcessControl_Derail, (DWORD)HOOK_CTrain_ProcessControl_Derail, 6);
     HookInstall(HOOKPOS_CObject_Render, (DWORD)HOOK_CObject_Render, 5);
     HookInstall(HOOKPOS_EndWorldColors, (DWORD)HOOK_EndWorldColors, 5);
@@ -2111,11 +2074,6 @@ bool CMultiplayerSA::IsConnected ( void )
     return m_pIdleHandler != NULL;
 }
 
-void CMultiplayerSA::HideRadar ( bool bHide )
-{
-    bHideRadar = bHide;
-}
-
 void CMultiplayerSA::AllowMouseMovement ( bool bAllow )
 {
     if ( bAllow )
@@ -2137,284 +2095,6 @@ void CMultiplayerSA::DoSoundHacksOnLostFocus ( bool bLostFocus )
         MemPut < BYTE > ( 0x4D988B, 0xFF );
         MemPut < BYTE > ( 0x4D988C, 0xFF );
     }
-}
-
-void CMultiplayerSA::SetCenterOfWorld(CEntity * entity, CVector * vecPosition, FLOAT fHeading)
-{
-    if ( vecPosition )
-    {
-        bInStreamingUpdate = false;
-
-        vecCenterOfWorld.fX = vecPosition->fX;
-        vecCenterOfWorld.fY = vecPosition->fY;
-        vecCenterOfWorld.fZ = vecPosition->fZ;
-
-        if ( entity )
-        {
-            CEntitySA* pEntitySA = dynamic_cast < CEntitySA* > ( entity );
-            if ( pEntitySA )
-                activeEntityForStreaming = pEntitySA->GetInterface();
-        }
-    /*  else
-        {
-            if ( !bActiveEntityForStreamingIsFakePed )
-            {
-                activeEntityForStreaming = new CPedSAInterface();
-                MemSet (activeEntityForStreaming, 0, sizeof(CPedSAInterface));
-                activeEntityForStreaming->Placeable.matrix = new RwMatrix();
-            }
-
-            bActiveEntityForStreamingIsFakePed = true;
-            
-            activeEntityForStreaming->Placeable.matrix->vPos.fX = vecPosition->fX;
-            activeEntityForStreaming->Placeable.matrix->vPos.fY = vecPosition->fY;
-            activeEntityForStreaming->Placeable.matrix->vPos.fZ = vecPosition->fZ;
-        }*/
-
-        //DWORD dwCurrentValue = *(DWORD *)FUNC_CPlayerInfoBase;
-        fFalseHeading = fHeading;
-        bSetCenterOfWorld = true;
-    }
-    else 
-    {
-        /*if ( bActiveEntityForStreamingIsFakePed )
-        {
-            delete activeEntityForStreaming->Placeable.matrix;
-            delete activeEntityForStreaming;
-        }
-
-        bActiveEntityForStreamingIsFakePed = false;*/
-        activeEntityForStreaming = NULL;
-        bSetCenterOfWorld = false;
-    }
-}
-
-void _declspec(naked) HOOK_FindPlayerCoors()
-{
-    _asm
-    {
-        // Only set our world of center if we have a center of world set
-        push    eax
-        mov     al, bSetCenterOfWorld
-        test    al, al
-        jz      dontset
-
-        // Only set our world of center if bInStreamingUpdate is true
-        mov     al, bInStreamingUpdate
-        test    al, al
-        jz      dontset
-
-        // Move our center of world into gta's senter of world when it requests so
-        pop     eax
-        lea     esi, vecCenterOfWorld
-        mov     edi, [esp+4]
-        mov     eax, edi
-        movsd
-        movsd
-        movsd           
-        retn    
-
-        // Continue. Don't replace the world center.
-        dontset:
-        pop     eax
-        mov     eax, [esp+8]
-        xor     edx, edx
-        mov     ecx, CMultiplayerSA::HOOKPOS_FindPlayerCoors
-        add     ecx, 6
-        jmp     ecx
-    }
-}
-
-void _declspec(naked) HOOK_CStreaming_Update_Caller()
-{
-    /*
-    0053BF09   8BF8             MOV EDI,EAX
-    0053BF0B   E8 6027EDFF      CALL gta_sa.0040E670
-    */
-
-    _asm
-    {
-        // Store all registers
-        pushad
-    }
-
-    // We're now in the streaming update
-    bInStreamingUpdate = true;
-
-    // We have an active entity for streaming?
-    if( activeEntityForStreaming )
-    {
-        // Do something...
-        _asm
-        {
-            mov     edi, CMultiplayerSA::FUNC_CPlayerInfoBase
-            mov     ebx, [edi]
-            mov     dwSavedPlayerPointer, ebx
-            mov     ebx, activeEntityForStreaming
-            mov     [edi], ebx
-        }
-    }
-
-    _asm
-    {
-        mov     edi, eax
-
-        // Call CMultiplayerSA::FUNC_CStreaming_Update
-        mov     eax, CMultiplayerSA::FUNC_CStreaming_Update
-        call    eax
-    }
-
-    // We have an entity for streaming?
-    if ( activeEntityForStreaming )
-    {
-        _asm
-        {
-            // ...
-            mov     edi, CMultiplayerSA::FUNC_CPlayerInfoBase
-            mov     ebx, dwSavedPlayerPointer
-            mov     [edi], ebx
-        }
-    }
-
-    // We're no longer in streaming update
-    bInStreamingUpdate = false;
-    _asm
-    {
-        // Restore registers
-        popad
-
-        // Continue at the old func
-        mov     eax, CMultiplayerSA::HOOKPOS_CStreaming_Update_Caller
-        add     eax, 7
-        jmp     eax
-    }
-}
-
-void _declspec(naked) HOOK_CHud_Draw_Caller()
-{
-    /*
-    0053E4FA   . E8 318BFCFF                          CALL gta_sa_u.00507030
-    0053E4FF   . E8 DC150500                          CALL gta_sa_u.0058FAE0
-    */
-    _asm
-    {
-        pushad
-
-        mov     edx, CMultiplayerSA::FUNC_CAudioEngine__DisplayRadioStationName
-        call    edx
-    }
-
-    if(!bSetCenterOfWorld)
-    {
-        _asm
-        {
-            mov     edx, CMultiplayerSA::FUNC_CHud_Draw
-            call    edx
-        }
-
-    }
-    else
-    {
-        /*if ( activeEntityForStreaming )
-        {
-            _asm
-            {
-                mov     edi, FUNC_CPlayerInfoBase
-                mov     ebx, [edi]
-                mov     dwSavedPlayerPointer, ebx
-                mov     ebx, activeEntityForStreaming
-                mov     [edi], ebx
-            }
-        }*/
-
-        if (!bHideRadar)
-        {
-            _asm
-            {
-                mov     edx, 0x58A330
-                call    edx
-            }
-        }
-
-        /*if ( activeEntityForStreaming )
-        {
-            _asm
-            {
-                mov     edi, FUNC_CPlayerInfoBase
-                mov     ebx, dwSavedPlayerPointer
-                mov     [edi], ebx
-            }
-        }*/
-    }
-
-    _asm
-    {
-        popad
-
-        mov     eax, CMultiplayerSA::HOOKPOS_CHud_Draw_Caller
-        add     eax, 10
-        jmp     eax
-    }
-}
-
-void _declspec(naked) HOOK_FindPlayerCentreOfWorld()
-{
-    /*
-    0056E250  /$ 8B4424 04      MOV EAX,DWORD PTR SS:[ESP+4]
-    0056E254  |. 85C0           TEST EAX,EAX
-    */
-
-    _asm
-    {
-        mov     al, bSetCenterOfWorld
-        test    al, al
-        jnz     hascenter
-
-        mov     eax, [esp+4]
-        test    eax, eax
-
-        mov     edx, CMultiplayerSA::HOOKPOS_FindPlayerCentreOfWorld
-        add     edx, 6
-        jmp     edx
-        
-
-        hascenter:
-        lea     eax, vecCenterOfWorld
-        retn
-    }
-    
-}
-
-void _declspec(naked) HOOK_FindPlayerHeading()
-{
-    /*
-    0056E450  /$ 8B4C24 04      MOV ECX,DWORD PTR SS:[ESP+4]
-    0056E454  |. 8BD1           MOV EDX,ECX
-    */
-
-    _asm
-    {
-        // Jump if bSetCenterOfWorld is true
-        push    eax
-        mov     al, bSetCenterOfWorld
-        test    al, al
-        pop     eax
-        jnz     hascenter
-
-        mov     ecx, [esp+4]
-        mov     edx, ecx
-
-        // Return to the hookpos
-        mov     eax, CMultiplayerSA::HOOKPOS_FindPlayerHeading
-        add     eax, 6
-        jmp     eax
-
-        // ..
-        hascenter:
-        fld     fFalseHeading
-        retn
-    }
-    
 }
 
 // this hook adds a null check to prevent the game crashing when objects are placed really high up (issue 517)
@@ -2916,171 +2596,6 @@ void _declspec(naked) HOOK_CTaskSimplePlayerOnFoot_ProcessPlayerWeapon ()
             popad
             ret 4
         }
-    }
-}
-
-CPedSAInterface * pIsPlayerPed = NULL;
-bool IsPlayer ()
-{
-    return true;
-}
-
-void _declspec(naked) HOOK_CPed_IsPlayer ()
-{
-    /*
-    005DF8F0  mov         eax,dword ptr [ecx+598h]      <hook>
-    005DF8F6  test        eax,eax                       <return>
-    */
-    _asm
-    {
-        mov    pIsPlayerPed, ecx
-        pushad
-    }
-    if ( IsPlayer () )
-    {
-        _asm
-        {
-            popad
-            mov         eax,dword ptr [ecx+598h]
-            jmp         RETURN_CPed_IsPlayer
-        }
-    }
-    else
-    {
-        _asm
-        {
-            popad
-            xor         al, al
-            ret
-        }
-    }
-}
-
-
-void CRunningScript_Process ( void )
-{
-    if ( !bHasProcessedScript )
-    {
-        CCamera * pCamera = pGameInterface->GetCamera();
-        pCamera->SetFadeColor ( 0, 0, 0 );
-        pCamera->Fade ( 0.0f, FADE_OUT );
-
-        DWORD dwFunc = 0x409D10; // RequestSpecialModel
-
-        char szModelName [64];
-        strcpy ( szModelName, "player" );
-        _asm
-        {
-            push    26
-            lea     eax, szModelName
-            push    eax
-            push    0
-            call    dwFunc
-            add     esp, 12
-        }
-
-        dwFunc = 0x40EA10; // load all requested models
-        _asm
-        {
-            push    1
-            call    dwFunc
-            add     esp, 4
-        }
-
-        dwFunc = 0x60D790; // setup player ped
-        _asm
-        {
-            push    0
-            call    dwFunc
-            add     esp, 4
-        }
-        
-        /*dwFunc = 0x05E47E0; // set created by
-        _asm
-        {
-            mov     edi, 0xB7CD98
-            mov     ecx, [edi]
-            push    2
-            call    dwFunc
-        }
-
-        dwFunc = 0x609520; // deactivate player ped
-        _asm
-        {
-            push    0
-            call    dwFunc
-            add     esp, 4
-        }
-*/
-        //_asm int 3
-        dwFunc = 0x420B80; // set position
-        fX = 2488.562f;
-        fY = -1666.864f;
-        fZ = 12.8757f;
-        _asm
-        {
-            mov     edi, 0xB7CD98
-            push    fZ
-            push    fY
-            push    fX
-            mov     ecx, [edi]
-            call    dwFunc
-        }
-        /*_asm int 3
-        dwFunc = 0x609540; // reactivate player ped
-        _asm
-        {
-            push    0
-            call    dwFunc
-            add     esp, 4
-        }
-
-        dwFunc = 0x61A5A0; // CTask::operator new
-        _asm
-        {
-            push    28
-            call    dwFunc
-            add     esp, 4
-        }
-
-        dwFunc = 0x685750; // CTaskSimplePlayerOnFoot::CTaskSimplePlayerOnFoot
-        _asm
-        {
-            mov     ecx, eax
-            call    dwFunc
-        }
-
-        dwFunc = 0x681AF0; // set task
-        _asm
-        {
-            mov     edi, 0xB7CD98
-            mov     edi, [edi]
-            mov     ecx, [edi+0x47C]
-            add     ecx, 4
-            push    0
-            push    4   
-            push    eax
-            call    dwFunc
-        }*/
-
-        
-        bHasProcessedScript = true;
-    }
-}
-
-void _declspec(naked) HOOK_CRunningScript_Process()
-{
-    _asm
-    {
-        pushad
-    }
-
-    CRunningScript_Process ();
-
-    _asm
-    {
-        popad
-        retn
     }
 }
 
@@ -3600,7 +3115,6 @@ void CMultiplayerSA::SetBulletFireHandler ( BulletFireHandler* pHandler )
 
 void CMultiplayerSA::Reset ( void )
 {
-    bHideRadar = false;
     m_pExplosionHandler = NULL;
     m_pPreContextSwitchHandler = NULL;
     m_pPostContextSwitchHandler = NULL;

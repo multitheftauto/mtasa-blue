@@ -17,10 +17,14 @@
 #include <game/CStreaming.h>
 #include "Common.h"
 
-#include "CExecutiveManagerSA.h"
-#include "CIMGManagerSA.h"
-
 #define MAX_DEFAULT_STREAMING_ENTITIES      1000    // native limit set by R*
+
+#define DATA_TEXTURE_BLOCK      20000
+#define DATA_COLL_BLOCK         25000
+#define DATA_IPL_BLOCK          25255
+#define DATA_PATHFIND_BLOCK     25511
+#define DATA_ANIM_BLOCK         25575
+#define DATA_RECORD_BLOCK       25755
 
 #define FUNC_CStreaming__RequestModel                       0x4087E0
 #define FUNC_LoadAllRequestedModels                         0x40EA10
@@ -144,6 +148,10 @@ public:
     void            RequestVehicleUpgrade           ( modelId_t model, unsigned int flags );
     bool            HasVehicleUpgradeLoaded         ( int model );
     void            RequestSpecialModel             ( modelId_t model, const char *tex, unsigned int channel );
+
+    void            CacheIMGFile                    ( const char *name );
+    bool            IsIMGFileCached                 ( const char *name ) const;
+    void            FreeIMGFileCache                ( const char *name );
 
     // Utility methods.
     unsigned int    GetActiveStreamingEntityCount   ( void ) const;

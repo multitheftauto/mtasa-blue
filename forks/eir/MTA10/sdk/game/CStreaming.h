@@ -55,6 +55,10 @@ public:
     virtual bool            HasVehicleUpgradeLoaded         ( int model ) = 0;
     virtual void            RequestSpecialModel             ( modelId_t model, const char *tex, unsigned int channel ) = 0;
 
+    virtual void            CacheIMGFile                    ( const char *name ) = 0;
+    virtual bool            IsIMGFileCached                 ( const char *name ) const = 0;
+    virtual void            FreeIMGFileCache                ( const char *name ) = 0;
+
     // Utility methods.
     virtual unsigned int    GetActiveStreamingEntityCount   ( void ) const = 0;
     virtual unsigned int    GetFreeStreamingEntitySlotCount ( void ) const = 0;

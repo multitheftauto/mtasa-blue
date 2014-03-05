@@ -204,6 +204,15 @@ int __thiscall CCameraSAInterface::GetActiveCamLookDirection( void )
     return 3;
 }
 
+void Camera_Init( void )
+{
+    HookInstall( 0x00514B80, h_memFunc( &CCameraSAInterface::GetGroundLevel ), 5 );
+}
+
+void Camera_Shutdown( void )
+{
+}
+
 CCameraSA::CCameraSA(CCameraSAInterface * cameraInterface)
 { 
     DEBUG_TRACE("CCameraSA::CCameraSA(CCameraSAInterface * cameraInterface)");

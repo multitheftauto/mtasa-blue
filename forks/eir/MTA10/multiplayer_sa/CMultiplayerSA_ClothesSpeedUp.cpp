@@ -19,7 +19,6 @@
 //
 void CMultiplayerSA::SetFastClothesLoading ( EFastClothesLoading fastClothesLoading )
 {
-#if 0
     if ( m_FastClothesLoading == fastClothesLoading )
         return;
 
@@ -36,23 +35,13 @@ void CMultiplayerSA::SetFastClothesLoading ( EFastClothesLoading fastClothesLoad
 
     if ( fastClothesLoading != FAST_CLOTHES_OFF )
     {
-        // Load and cache player.img
-        SString strGTASAPath = GetCommonRegistryValue ( "", "GTA:SA Path" );
-        SString strFilename = PathJoin ( strGTASAPath, "models", "player.img" );
-        FileLoad ( strFilename, m_PlayerImgCache );
+        pGameInterface->GetStreaming()->CacheIMGFile( "player.img" );
     }
     else
     {
         // Remove cached data - Note: This method ensures the memory is actually freed
-        std::vector < char > ().swap ( m_PlayerImgCache );
+        pGameInterface->GetStreaming()->FreeIMGFileCache( "player.img" );
     }
-
-    // Update the cache pointer
-    if ( !m_PlayerImgCache.empty () )
-        ms_PlayerImgCachePtr = &m_PlayerImgCache[0];
-    else
-        ms_PlayerImgCachePtr = NULL;
-#endif
 }
 
 

@@ -14,6 +14,11 @@
 //
 ////////////////////////////////////////////////////////////////////
 
+inline DWORD GetProcedureOffset( DWORD dwFrom, DWORD dwTo )
+{
+    return dwTo - (dwFrom + 5);
+}
+
 BOOL HookInstall( DWORD dwInstallAddress,
                   DWORD dwHookHandler,
                   int iJmpCodeSize )
@@ -29,6 +34,12 @@ BOOL HookInstall( DWORD dwInstallAddress,
     {
         return FALSE;
     }
+}
+
+BOOL PatchCall( DWORD dwInstallAddress, DWORD dwHookHandler )
+{
+    MemPut <DWORD> ( dwInstallAddress + 1, GetProcedureOffset( dwInstallAddress, dwHookHandler ) );
+    return TRUE;
 }
 
 ////////////////////////////////////////////////////////////////////
