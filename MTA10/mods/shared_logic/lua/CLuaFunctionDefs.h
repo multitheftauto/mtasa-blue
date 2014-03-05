@@ -51,6 +51,7 @@ public:
     LUA_DECLARE ( GetResourceGUIElement );
     LUA_DECLARE ( GetResourceDynamicElementRoot );
     LUA_DECLARE ( GetResourceExportedFunctions );
+    LUA_DECLARE ( GetResourceState );
     LUA_DECLARE ( LoadString );
     LUA_DECLARE ( Load );
 
