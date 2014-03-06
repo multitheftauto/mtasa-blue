@@ -57,7 +57,8 @@ public:
     bool                            Save                            ( void );
 
     inline const std::string&       GetServerName                   ( void )        { return m_strServerName; };
-    std::string                     GetServerIP                     ( void );
+    SString                         GetServerIP                     ( void );
+    SString                         GetServerIPList                 ( void );
     unsigned short                  GetServerPort                   ( void );
     unsigned int                    GetMaxPlayers                   ( void );
     unsigned int                    GetHardMaxPlayers               ( void );
@@ -97,6 +98,7 @@ public:
     bool                            IsEnableDiagnostic              ( const char* szTag )       { return MapContains ( m_EnableDiagnosticMap, szTag ); };
     SString                         GetMinClientVersion             ( void )                    { return m_strMinClientVersion; }
     const SString&                  GetRecommendedClientVersion     ( void )                    { return m_strRecommendedClientVersion; }
+    int                             GetMinClientVersionAutoUpdate   ( void )                    { return m_iMinClientVersionAutoUpdate; }
     inline bool                     IsAutoLoginEnabled              ( )                         { return m_bAutoLogin; }
     const SString&                  GetIdFile                       ( void )                    { return m_strIdFile; }
     bool                            GetNetworkEncryptionEnabled     ( void )                    { return m_bNetworkEncryptionEnabled; }
@@ -106,6 +108,8 @@ public:
     const SString&                  GetBackupPath                   ( void )                    { return m_strBackupPath; }
     int                             GetBackupInterval               ( void )                    { return m_iBackupInterval; }
     int                             GetBackupAmount                 ( void )                    { return m_iBackupAmount; }
+    void                            NotifyDidBackup                 ( void );
+    bool                            ShouldCompactInternalDatabases  ( void );
     inline unsigned short           GetFPSLimit                     ( void )                    { return m_usFPSLimit; };
     bool                            SetFPSLimit                     ( unsigned short usFPS, bool bSave );
     int                             GetPendingWorkToDoSleepTime     ( void );
@@ -117,10 +121,13 @@ public:
     int                             GetVehExtrapolatePercent        ( void ) const              { return m_iVehExtrapolatePercent; }
     int                             GetVehExtrapolatePingLimit      ( void ) const              { return m_iVehExtrapolatePingLimit; }
     bool                            GetUseAltPulseOrder             ( void ) const              { return m_bUseAltPulseOrder != 0; }
+    const SString&                  GetLoadstringLogFilename        ( void ) const              { return m_strLoadstringLogFilename; }
+    bool                            GetLoadstringLogEnabled         ( void ) const              { return !m_strLoadstringLogFilename.empty(); }
 
     SString                         GetSetting                      ( const SString& configSetting );
     bool                            GetSetting                      ( const SString& configSetting, SString& strValue );
     bool                            SetSetting                      ( const SString& configSetting, const SString& strValue, bool bSave );
+    bool                            GetSettingTable                 ( const SString& strName, CLuaArguments* outTable );
 
     void                            SetCommandLineParser            ( CCommandLineParser* pCommandLineParser );
     void                            ApplyNetOptions                 ( void );
@@ -135,6 +142,7 @@ public:
 
 private:
     void                            RegisterCommand                 ( const char* szName, FCommandHandler* pFunction, bool bRestricted );
+    bool                            GetSettingTable                 ( const SString& strName, const char** szAttribNames, uint uiNumAttribNames, CLuaArguments* outTable );
 
     CConsole*                       m_pConsole;
     CLuaManager*                    m_pLuaManager;
@@ -149,7 +157,7 @@ private:
     std::string                     m_strServerIP;
     std::string                     m_strServerName;
     unsigned short                  m_usServerPort;
-    unsigned int                    m_uiMaxPlayers;
+    unsigned int                    m_uiHardMaxPlayers;
     unsigned int                    m_uiSoftMaxPlayers;
     bool                            m_bHTTPEnabled;
     std::string                     m_strPassword;
@@ -186,6 +194,8 @@ private:
     SString                         m_strDbLogFilename;
     int                             m_iBackupInterval;
     int                             m_iBackupAmount;
+    int                             m_iCompactInternalDatabases;
+    bool                            m_bDidBackup;
     bool                            m_bNetworkEncryptionEnabled;
     SString                         m_strBandwidthReductionMode;
     int                             m_iPendingWorkToDoSleepTime;
@@ -199,6 +209,8 @@ private:
     int                             m_iVehExtrapolatePingLimit;
     int                             m_bUseAltPulseOrder;
     int                             m_bNetAutoFilter;
+    SString                         m_strLoadstringLogFilename;
+    int                             m_iMinClientVersionAutoUpdate;
 };
 
 #endif

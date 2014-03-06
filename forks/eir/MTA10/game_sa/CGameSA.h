@@ -181,6 +181,9 @@ public:
     void                    Reset                       ( void );
     void                    Terminate ( void );
 
+    void                    OnPreFrame ( void );
+    void                    OnFrame ( void );
+
     eGameVersion            GetGameVersion ( void );
     eGameVersion            FindGameVersion ( void );
 

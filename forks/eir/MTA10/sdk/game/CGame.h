@@ -208,6 +208,9 @@ public:
     virtual void                Reset               ( void ) = 0;
     virtual void                Terminate ( void ) = 0;
 
+    virtual void                OnPreFrame ( void ) = 0;
+    virtual void                OnFrame ( void ) = 0;
+
     virtual BOOL                InitLocalPlayer(  )=0;
 
     virtual float               GetGravity ( void ) = 0;

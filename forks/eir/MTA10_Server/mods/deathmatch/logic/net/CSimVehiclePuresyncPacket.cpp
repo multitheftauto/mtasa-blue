@@ -64,6 +64,28 @@ bool CSimVehiclePuresyncPacket::Read ( NetBitStreamInterface& BitStream )
             return false;
         m_Cache.PlrPosition = position.data.vecPosition;
 
+        if ( m_usVehicleGotModel == 449 ||
+            m_usVehicleGotModel == 537 ||
+            m_usVehicleGotModel == 538 ||
+            m_usVehicleGotModel == 570 ||
+            m_usVehicleGotModel == 569 ||
+            m_usVehicleGotModel == 590 )
+        {
+            // Train specific data
+            float fRailPosition = 0.0f;
+            uchar ucRailTrack = 0;
+            bool bRailDirection = false;
+            float fRailSpeed = 0.0f;
+            if ( !BitStream.Read ( fRailPosition ) || !BitStream.ReadBit ( bRailDirection ) || !BitStream.Read ( ucRailTrack ) || !BitStream.Read ( fRailSpeed ) )
+            {
+                return false;
+            }
+            m_Cache.fRailPosition = fRailPosition;
+            m_Cache.bRailDirection = bRailDirection;
+            m_Cache.ucRailTrack = ucRailTrack;
+            m_Cache.fRailSpeed = fRailSpeed;
+        }
+
         // Read the camera orientation
         ReadCameraOrientation ( position.data.vecPosition, BitStream, m_Cache.vecCamPosition, m_Cache.vecCamFwd );
 
@@ -146,6 +168,25 @@ bool CSimVehiclePuresyncPacket::Read ( NetBitStreamInterface& BitStream )
                     return false;
             }
         }
+         
+        // Read Damage info, but do not store, as we do not relay this info
+        if ( BitStream.Version() >= 0x047) 
+        {
+            if ( BitStream.ReadBit () == true )
+            {
+                ElementID DamagerID;
+                if ( !BitStream.Read ( DamagerID ) )
+                    return false;
+
+                SWeaponTypeSync weaponType;
+                if ( !BitStream.Read ( &weaponType ) )
+                    return false;
+
+                SBodypartSync bodyPart;
+                if ( !BitStream.Read ( &bodyPart ) )
+                    return false;
+            }
+        }
 
         // Player health
         SPlayerHealthSync health;
@@ -175,10 +216,11 @@ bool CSimVehiclePuresyncPacket::Read ( NetBitStreamInterface& BitStream )
             if ( m_Cache.flags.data.bIsDoingGangDriveby && CWeaponNames::DoesSlotHaveAmmo ( slot.data.uiSlot ) )
             {
                 // Read the ammo states
-                SWeaponAmmoSync ammo ( m_ucPlayerGotWeaponType, false, true );
+                SWeaponAmmoSync ammo ( m_ucPlayerGotWeaponType, BitStream.Version () >= 0x44, true );
                 if ( !BitStream.Read ( &ammo ) )
                     return false;
                 m_Cache.usAmmoInClip = ammo.data.usAmmoInClip;
+                m_Cache.usTotalAmmo = ammo.data.usTotalAmmo;
 
                 // Read aim data
                 SWeaponAimSync aim ( m_fPlayerGotWeaponRange, true );
@@ -251,6 +293,19 @@ bool CSimVehiclePuresyncPacket::Write ( NetBitStreamInterface& BitStream ) const
             position.data.vecPosition = m_Cache.VehPosition;
             BitStream.Write ( &position );
 
+            if ( m_usVehicleGotModel == 449 ||
+                m_usVehicleGotModel == 537 ||
+                m_usVehicleGotModel == 538 ||
+                m_usVehicleGotModel == 570 ||
+                m_usVehicleGotModel == 569 ||
+                m_usVehicleGotModel == 590 )
+            {
+                BitStream.Write ( m_Cache.fRailPosition );
+                BitStream.WriteBit ( m_Cache.bRailDirection );
+                BitStream.Write ( m_Cache.ucRailTrack );
+                BitStream.Write ( m_Cache.fRailSpeed );
+            }
+
             // Vehicle rotation
             SRotationDegreesSync rotation;
             rotation.data.vecRotation = m_Cache.VehRotationDeg;
@@ -274,7 +329,7 @@ bool CSimVehiclePuresyncPacket::Write ( NetBitStreamInterface& BitStream ) const
             // Write trailer chain
             if ( BitStream.Version () >= 0x42 )
             {
-                for ( std::vector< STrailerInfo >::const_iterator it = m_Cache.TrailerList.begin (); it != m_Cache.TrailerList.end (); it++ )
+                for ( std::vector< STrailerInfo >::const_iterator it = m_Cache.TrailerList.begin (); it != m_Cache.TrailerList.end (); ++it )
                 {
                     BitStream.WriteBit ( true );
 
@@ -318,8 +373,9 @@ bool CSimVehiclePuresyncPacket::Write ( NetBitStreamInterface& BitStream ) const
             if ( m_Cache.flags.data.bIsDoingGangDriveby && CWeaponNames::DoesSlotHaveAmmo ( slot.data.uiSlot ) )
             {
                 // Write the ammo states
-                SWeaponAmmoSync ammo ( ucWeaponType, false, true );
+                SWeaponAmmoSync ammo ( ucWeaponType, BitStream.Version () >= 0x44, true );
                 ammo.data.usAmmoInClip = m_Cache.usAmmoInClip;
+                ammo.data.usTotalAmmo = m_Cache.usTotalAmmo;
                 BitStream.Write ( &ammo );
 
                 // Sync aim data

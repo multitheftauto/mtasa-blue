@@ -35,12 +35,12 @@ void CMultiplayerSA::SetFastClothesLoading ( EFastClothesLoading fastClothesLoad
 
     if ( fastClothesLoading != FAST_CLOTHES_OFF )
     {
-        pGameInterface->GetStreaming()->CacheIMGFile( "player.img" );
+        pGameInterface->GetStreaming()->CacheIMGFile( "models\\player.img" );
     }
     else
     {
         // Remove cached data - Note: This method ensures the memory is actually freed
-        pGameInterface->GetStreaming()->FreeIMGFileCache( "player.img" );
+        pGameInterface->GetStreaming()->FreeIMGFileCache( "models\\player.img" );
     }
 }
 

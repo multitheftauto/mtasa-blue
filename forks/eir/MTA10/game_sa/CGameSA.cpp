@@ -524,6 +524,15 @@ void CGameSA::Reset ( void )
         m_pHud->Disable ( false );
         m_pHud->SetComponentVisible ( HUD_ALL, true );
     }
+
+    // Reset ubiqitous managers.
+    Streaming::Reset();
+
+#if 0
+    // Reset rendering systems.
+    RenderCallbacks_Reset();
+    RenderWareLighting_Reset();
+#endif
 }
 
 void CGameSA::Terminate ( void )
@@ -546,6 +555,16 @@ void CGameSA::Initialize ( void )
 
     // *Sebas* Hide the GTA:SA Main menu.
     MemPutFast < BYTE > ( CLASS_CMenuManager+0x5C, 0 );
+}
+
+void CGameSA::OnPreFrame()
+{
+    // Update the executive manager.
+    m_pExecutiveManager->DoPulse();
+}
+
+void CGameSA::OnFrame()
+{
 }
 
 eGameVersion CGameSA::GetGameVersion ( void )

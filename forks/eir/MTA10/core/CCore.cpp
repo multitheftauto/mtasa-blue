@@ -1187,6 +1187,9 @@ void CCore::DoPreFramePulse ( )
 
     m_pKeyBinds->DoPreFramePulse ();
 
+    // Pulse game.
+    m_pGame->OnPreFrame ();
+
     // Notify the mod manager
     m_pModManager->DoPulsePreFrame ();  
 
@@ -1316,6 +1319,9 @@ void CCore::DoPostFramePulse ( )
 
     GetJoystickManager ()->DoPulse ();      // Note: This may indirectly call CMessageLoopHook::ProcessMessage
     m_pKeyBinds->DoPostFramePulse ();
+
+    // Pulse game.
+    m_pGame->OnFrame ();
 
     // Notify the mod manager and the connect manager
     TIMING_CHECKPOINT( "-CorePostFrame1" );

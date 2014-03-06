@@ -68,7 +68,7 @@ CMainConfig::CMainConfig ( CConsole* pConsole, CLuaManager* pLuaMain ): CXMLConf
     m_pCommandLineParser = NULL;
 
     m_usServerPort = 0;
-    m_uiMaxPlayers = 0;
+    m_uiHardMaxPlayers = 0;
     m_bHTTPEnabled = true;
     m_iAseMode = 0;
     m_iUpdateCycleDatagramsLimit = 4;
@@ -170,8 +170,8 @@ bool CMainConfig::Load ( void )
     iResult = GetInteger ( m_pRootNode, "maxplayers", iTemp, 1, MAX_PLAYER_COUNT );
     if ( iResult == IS_SUCCESS )
     {
-        m_uiMaxPlayers = iTemp;
-        m_uiSoftMaxPlayers = m_uiMaxPlayers;
+        m_uiHardMaxPlayers = iTemp;
+        m_uiSoftMaxPlayers = iTemp;
     }
     else
     {
@@ -300,12 +300,14 @@ bool CMainConfig::Load ( void )
                 }
         }
 
-        // Add support for SD #12, #14, #15, #16 and #20 (defaults to disabled)
+        // Add support for SD #12, #14, #15, #16, #20, #22 and #28 (defaults to disabled)
         MapInsert ( m_DisableComboACMap, "12" );
         MapInsert ( m_DisableComboACMap, "14" );
         MapInsert ( m_DisableComboACMap, "15" );
         MapInsert ( m_DisableComboACMap, "16" );
         MapInsert ( m_DisableComboACMap, "20" );
+        MapInsert ( m_DisableComboACMap, "22" );
+        MapInsert ( m_DisableComboACMap, "28" );
 
         {
             SString strEnableSD;
@@ -422,6 +424,8 @@ bool CMainConfig::Load ( void )
     else
         m_strDbLogFilename = g_pServerInterface->GetModManager ()->GetAbsolutePath ( "logs/db.log" );
 
+    if ( GetString ( m_pRootNode, "loadstringfile", strBuffer, 1 ) == IS_SUCCESS )
+        m_strLoadstringLogFilename = g_pServerInterface->GetModManager ()->GetAbsolutePath ( strBuffer.c_str () );
 
     // Grab the server access control list
     if ( GetString ( m_pRootNode, "acl", strBuffer, 1, 255 ) == IS_SUCCESS )
@@ -488,8 +492,8 @@ bool CMainConfig::Load ( void )
     GetInteger ( m_pRootNode, "idle_sleep_time", m_iNoWorkToDoSleepTime );
     m_iNoWorkToDoSleepTime = Clamp ( -1, m_iNoWorkToDoSleepTime, 50 );
 
-    // threadnet
-    GetBoolean ( m_pRootNode, "threadnet", m_bThreadNetEnabled );
+    // threadnet - Default to on at startup
+    m_bThreadNetEnabled = true;
     ApplyThreadNetEnabled ();
 
     // Check settings in this list here
@@ -721,10 +725,10 @@ bool CMainConfig::LoadExtended ( void )
                     {
                         if ( !bFoundDefault )
                         {
-                            std::string strProtected = pAttribute->GetValue ();
-                            if ( strProtected.compare ( "true" ) == 0 ||
-                                strProtected.compare ( "yes" ) == 0 ||
-                                strProtected.compare ( "1" ) == 0 )
+                            std::string strDefault = pAttribute->GetValue ();
+                            if ( strDefault.compare ( "true" ) == 0 ||
+                                strDefault.compare ( "yes" ) == 0 ||
+                                strDefault.compare ( "1" ) == 0 )
                             {
                                 std::string strName = loadedResource->GetName ();
                                 if ( !strName.empty () )
@@ -758,7 +762,6 @@ bool CMainConfig::LoadExtended ( void )
     RegisterCommand ( "refreshall", CConsoleCommands::RefreshAllResources, false );
     RegisterCommand ( "list", CConsoleCommands::ListResources, false );
     RegisterCommand ( "info", CConsoleCommands::ResourceInfo, false );
-    RegisterCommand ( "install", CConsoleCommands::InstallResource, false );
     RegisterCommand ( "upgrade", CConsoleCommands::UpgradeResources, false );
     RegisterCommand ( "check", CConsoleCommands::CheckResources, false );
 
@@ -804,6 +807,7 @@ bool CMainConfig::LoadExtended ( void )
     RegisterCommand ( "reloadbans", CConsoleCommands::ReloadBans, false );
 
     RegisterCommand ( "aclrequest", CConsoleCommands::AclRequest, false );
+    RegisterCommand ( "debugjoinflood", CConsoleCommands::DebugJoinFlood, false );
 #if defined(MTA_DEBUG) || defined(MTA_BETA)
     RegisterCommand ( "sfakelag", CConsoleCommands::FakeLag, false );
 #endif
@@ -892,9 +896,25 @@ void CMainConfig::RegisterCommand ( const char* szName, FCommandHandler* pFuncti
 void CMainConfig::SetCommandLineParser ( CCommandLineParser* pCommandLineParser )
 {
     m_pCommandLineParser = pCommandLineParser;
+
+    // Adjust max player limits for command line arguments
+    uint uiMaxPlayers;
+    if ( m_pCommandLineParser && m_pCommandLineParser->GetMaxPlayers ( uiMaxPlayers ) )
+    {
+        m_uiHardMaxPlayers = Clamp < uint > ( 1, uiMaxPlayers, MAX_PLAYER_COUNT );
+        m_uiSoftMaxPlayers = uiMaxPlayers;
+    }
 }
 
-std::string CMainConfig::GetServerIP ( void )
+SString CMainConfig::GetServerIP ( void )
+{
+    std::string strServerIP;
+    if ( m_pCommandLineParser && m_pCommandLineParser->GetIP ( strServerIP ) )
+        return strServerIP;
+    return SString( m_strServerIP ).SplitLeft( "," );
+}
+
+SString CMainConfig::GetServerIPList ( void )
 {
     std::string strServerIP;
     if ( m_pCommandLineParser && m_pCommandLineParser->GetIP ( strServerIP ) )
@@ -912,10 +932,7 @@ unsigned short CMainConfig::GetServerPort ( void )
 
 unsigned int CMainConfig::GetHardMaxPlayers ( void )
 {
-    unsigned int uiMaxPlayers;
-    if ( m_pCommandLineParser && m_pCommandLineParser->GetMaxPlayers ( uiMaxPlayers ) )
-        return uiMaxPlayers;
-    return m_uiMaxPlayers;
+    return m_uiHardMaxPlayers;
 }
 
 unsigned int CMainConfig::GetMaxPlayers ( void )
@@ -970,6 +987,85 @@ int CMainConfig::GetNoWorkToDoSleepTime ( void )
         return 40;
     else
         return 10;
+}
+
+
+void CMainConfig::NotifyDidBackup( void )
+{
+    m_bDidBackup = true;
+}
+
+
+bool CMainConfig::ShouldCompactInternalDatabases( void )
+{
+    return ( m_iCompactInternalDatabases == 1 && m_bDidBackup ) || m_iCompactInternalDatabases == 2;
+}
+
+
+//////////////////////////////////////////////////////////////////////
+//
+// Fetch multiple values for a named setting from the server config
+//
+//  <module src="module_test.dll" />
+//  <resource src="admin" startup="1" protected="0" />
+//
+//////////////////////////////////////////////////////////////////////
+bool CMainConfig::GetSettingTable ( const SString& strName, CLuaArguments* outTable )
+{
+    if ( strName == "module" )
+    {
+        static const char* szAttribNames[] = { "src" };
+        return GetSettingTable( strName, szAttribNames, NUMELMS( szAttribNames ), outTable );
+    }
+    else
+    if ( strName == "resource" )
+    {
+        static const char* szAttribNames[] = { "src", "startup", "protected", "default" };
+        return GetSettingTable( strName, szAttribNames, NUMELMS( szAttribNames ), outTable );
+    }
+
+    return false;
+}
+
+
+//////////////////////////////////////////////////////////////////////
+//
+// Fetch multiple values for a named setting from the server config
+//
+//  <module src="module_test.dll" />
+//  <resource src="admin" startup="1" protected="0" />
+//
+//////////////////////////////////////////////////////////////////////
+bool CMainConfig::GetSettingTable ( const SString& strName, const char** szAttribNames, uint uiNumAttribNames, CLuaArguments* outTable )
+{
+    uint uiXMLIndex = 0;
+    uint uiLuaIndex = 1;
+    CXMLNode* pNode = NULL;
+    do
+    {
+        // Grab the current script node
+        pNode = m_pRootNode->FindSubNode ( strName, uiXMLIndex++ );
+        if ( pNode )
+        {
+            CLuaArguments resultLine;
+            CXMLAttributes& attributes = pNode->GetAttributes();
+            for ( uint i = 0 ; i < attributes.Count() ; i++ )
+            {
+                CXMLAttribute* pAttribute = attributes.Get( i );
+                resultLine.PushString( pAttribute->GetName() );
+                resultLine.PushString( pAttribute->GetValue() );
+            }
+
+            if ( resultLine.Count() != 0 )
+            {
+                outTable->PushNumber( uiLuaIndex++ );
+                outTable->PushTable( &resultLine );
+            }
+        }
+    }
+    while( pNode );
+
+    return outTable->Count() != 0;
 }
 
 
@@ -1048,6 +1144,17 @@ bool CMainConfig::GetSetting ( const SString& strName, SString& strValue )
     {
         strValue = SString ( "%d", m_iEnableClientChecks );
         return true;
+    }
+    else
+    if ( strName == "threadnet" )
+    {
+        strValue = SString ( "%d", m_bThreadNetEnabled ? 1 : 0 );
+        return true;
+    }
+    else
+    if ( strName == "module" || strName == "resource" )
+    {
+        return false;
     }
     else
     {
@@ -1193,11 +1300,6 @@ bool CMainConfig::SetSetting ( const SString& strName, const SString& strValue, 
         {
             m_bThreadNetEnabled = atoi ( strValue ) ? true : false;
             ApplyThreadNetEnabled ();
-            if ( bSave )
-            {
-                SetString ( m_pRootNode, "threadnet", SString ( "%d", m_bThreadNetEnabled ) );
-                Save ();
-            }
             return true;
         }
     }

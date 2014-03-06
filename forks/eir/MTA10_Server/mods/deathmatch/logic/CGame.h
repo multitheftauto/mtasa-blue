@@ -47,6 +47,7 @@ class CGame;
 #include "packets/CVehicleResyncPacket.h"
 #include "packets/CKeysyncPacket.h"
 #include "packets/CBulletsyncPacket.h"
+#include "packets/CPedTaskPacket.h"
 #include "packets/CCustomWeaponBulletSyncPacket.h"
 #include "packets/CSyncSettingsPacket.h"
 #include "packets/CVehicleInOutPacket.h"
@@ -90,6 +91,7 @@ class CObjectManager;
 class CPacket;
 class CPacketTranslator;
 class CLatentTransferManager;
+class CDebugHookManager;
 class CPedManager;
 class CPickupManager;
 class CPlayer;
@@ -117,6 +119,10 @@ class CWeaponStatManager;
 class CBuildingRemovalManager;
 
 class CCustomWeaponManager;
+class COpenPortsTester;
+class CMasterServerAnnouncer;
+class CHqComms;
+class CFunctionUseLogger;
 
 // Packet forward declarations
 class CCommandPacket;
@@ -139,6 +145,17 @@ class CVoiceDataPacket;
 class CWeaponDamageCheckPacket;
 
 typedef SFixedArray < bool, MAX_GARAGES > SGarageStates;
+
+// CSendList - Can be used like a std::list of players for sending packets.
+//             Used to construct an optimized list of players for CGame::Broadcast
+class CSendList : public std::multimap < ushort, CPlayer* >
+{
+public:
+    void push_back( CPlayer* pPlayer )
+    {
+        MapInsert( *this, pPlayer->GetBitStreamVersion(), pPlayer );
+    }
+};
 
 class CGame
 {
@@ -177,6 +194,7 @@ public:
         GLITCH_FASTMOVE,
         GLITCH_CROUCHBUG,
         GLITCH_CLOSEDAMAGE,
+        GLITCH_HITANIM,
         NUM_GLITCHES
     };
 public:
@@ -219,6 +237,7 @@ public:
     inline CEvents*                 GetEvents                   ( void )        { return &m_Events; }
     inline CColManager*             GetColManager               ( void )        { return m_pColManager; }
     inline CLatentTransferManager*  GetLatentTransferManager    ( void )        { return m_pLatentTransferManager; }
+    inline CDebugHookManager*       GetDebugHookManager         ( void )        { return m_pDebugHookManager; }
     inline CPedManager*             GetPedManager               ( void )        { return m_pPedManager; }
     inline CResourceManager*        GetResourceManager          ( void )        { return m_pResourceManager; }
     inline CMarkerManager*          GetMarkerManager            ( void )        { return m_pMarkerManager; }
@@ -227,6 +246,7 @@ public:
     inline CRadarAreaManager*       GetRadarAreaManager         ( void )        { return m_pRadarAreaManager; }
     inline CGroups*                 GetGroups                   ( void )        { return m_pGroups; }
     inline CElementDeleter*         GetElementDeleter           ( void )        { return &m_ElementDeleter; }
+    inline CConnectHistory*         GetJoinFloodProtector       ( void )        { return &m_FloodProtect; }
     inline CHTTPD*                  GetHTTPD                    ( void )        { return m_pHTTPD; }
     inline CSettings*               GetSettings                 ( void )        { return m_pSettings; }
     inline CAccessControlListManager* GetACLManager             ( void )        { return m_pACLManager; }
@@ -239,6 +259,7 @@ public:
     inline CWeaponStatManager*      GetWeaponStatManager        ( void )        { return m_pWeaponStatsManager; }
     inline CBuildingRemovalManager* GetBuildingRemovalManager   ( void )        { return m_pBuildingRemovalManager; }
     inline CCustomWeaponManager*    GetCustomWeaponManager      ( void )        { return m_pCustomWeaponManager; }
+    inline CFunctionUseLogger*      GetFunctionUseLogger        ( void )        { return m_pFunctionUseLogger; }
 
     void                        JoinPlayer                  ( CPlayer& Player );
     void                        InitialDataStream           ( CPlayer& Player );
@@ -353,7 +374,6 @@ public:
     inline int                  GetMoonSize                  ( void )        { return m_iMoonSize; }
     inline void                 SetMoonSize                  ( int iMoonSize ) { m_iMoonSize = iMoonSize; }
 
-    void                        PulseMasterServerAnnounce   ( bool bIsInitialAnnounce = false );
     void                        StartOpenPortsTest          ( void );
 
     bool                        IsServerFullyUp             ( void )        { return m_bServerFullyUp; }
@@ -380,8 +400,7 @@ public:
 private:
     void                        AddBuiltInEvents            ( void );
     void                        RelayPlayerPuresync         ( class CPacket& Packet );
-    void                        RelayKeysync                ( class CPacket& Packet );
-    void                        RelayBulletsync             ( class CPacket& Packet );
+    void                        RelayNearbyPacket           ( class CPacket& Packet );
 
     void                        ProcessTrafficLights        ( unsigned long ulCurrentTime );
 
@@ -401,6 +420,7 @@ private:
     void                        Packet_VehiclePuresync      ( class CVehiclePuresyncPacket& Packet );
     void                        Packet_Keysync              ( class CKeysyncPacket& Packet );
     void                        Packet_Bulletsync           ( class CBulletsyncPacket& Packet );
+    void                        Packet_PedTask              ( class CPedTaskPacket& Packet );
     void                        Packet_WeaponBulletsync     ( class CCustomWeaponBulletSyncPacket& Packet );
     void                        Packet_Vehicle_InOut        ( class CVehicleInOutPacket& Packet );
     void                        Packet_VehicleTrailer       ( class CVehicleTrailerPacket& Packet );
@@ -413,6 +433,7 @@ private:
     void                        Packet_PlayerDiagnostic     ( class CPlayerDiagnosticPacket& Packet );
     void                        Packet_PlayerModInfo        ( class CPlayerModInfoPacket & Packet );
     void                        Packet_PlayerScreenShot     ( class CPlayerScreenShotPacket & Packet );
+    void                        Packet_PlayerNoSocket       ( class CPlayerNoSocketPacket & Packet );
 
     static void                 PlayerCompleteConnect       ( CPlayer* pPlayer, bool bSuccess, const char* szError );
 
@@ -456,6 +477,7 @@ private:
     CRegistry*                      m_pRegistry;
     CAccountManager*                m_pAccountManager;
     CLatentTransferManager*         m_pLatentTransferManager;
+    CDebugHookManager*              m_pDebugHookManager;
     CPedManager*                    m_pPedManager;
     CResourceManager*               m_pResourceManager;
     CAccessControlListManager*      m_pACLManager;
@@ -471,6 +493,7 @@ private:
     CBuildingRemovalManager*        m_pBuildingRemovalManager;
 
     CCustomWeaponManager*           m_pCustomWeaponManager;
+    CFunctionUseLogger*             m_pFunctionUseLogger;
 
     char*                       m_szCurrentFileName;
 
@@ -540,9 +563,9 @@ private:
     //Clouds Enabled
     bool                        m_bCloudsEnabled;
 
-    long long                   m_llLastAnnounceTime;
-    long long                   m_llLastPushTime;
-    class COpenPortsTester*     m_pOpenPortsTester;
+    COpenPortsTester*           m_pOpenPortsTester;
+    CMasterServerAnnouncer*     m_pMasterServerAnnouncer;
+    CHqComms*                   m_pHqComms;
 
     CLightsyncManager           m_lightsyncManager;
 
@@ -555,6 +578,7 @@ private:
 
     SString                     m_strPrevMinClientKickRequirement;
     SString                     m_strPrevMinClientConnectRequirement;
+    SString                     m_strPrevLowestConnectedPlayerVersion;
 };
 
 #endif

@@ -22,6 +22,7 @@
 //#define RESOURCE_DEBUG_MESSAGES // show info about where the actual files are coming from
 
 #include "StdInc.h"
+#include "net/SimHeaders.h"
 #ifndef WIN32
 #include <utime.h>
 #endif
@@ -90,6 +91,9 @@ CResource::CResource ( CResourceManager * resourceManager, bool bIsZipped, const
     pthread_mutex_init(&m_mutex, NULL);
 
     m_bDoneUpgradeWarnings = false;
+    m_uiFunctionRightCacheRevision = 0;
+
+    m_bOOPEnabledInMetaXml = true;
 
     Load ();
 }
@@ -121,6 +125,8 @@ bool CResource::Load ( void )
         m_bClientScripts = true;
         m_bClientFiles = true;
         m_bHasStarted = false;
+
+        m_bOOPEnabledInMetaXml = false;
 
         m_pVM = NULL;
         // @@@@@ Set some type of HTTP access here
@@ -241,6 +247,13 @@ bool CResource::Load ( void )
                 {
                     m_bSyncMapElementData = StringToBool ( pNodeSyncMapElementData->GetTagContent ().c_str () );
                     m_bSyncMapElementDataDefined = true;
+                }
+
+                m_bOOPEnabledInMetaXml = true;
+                CXMLNode * pNodeClientOOP = root->FindSubNode ( "oop", 0 );
+                if ( pNodeClientOOP )
+                {
+                    m_bOOPEnabledInMetaXml = StringToBool ( pNodeClientOOP->GetTagContent ().c_str () );
                 }
 
                 // disabled for now
@@ -404,6 +417,15 @@ CResource::~CResource ( )
     CIdArray::PushUniqueId ( this, EIdClass::RESOURCE, m_uiScriptID );
     Unload ();
 
+    // Overkill, but easiest way to stop crashes:
+    // Go through all other resources and make sure we are not in m_includedResources, m_dependents and m_temporaryIncludes
+    std::list < CResource* > ::const_iterator iter = m_resourceManager->IterBegin ();
+    for ( ; iter != m_resourceManager->IterEnd (); iter++ )
+    {
+        if ( *iter != this )
+            (*iter)->InvalidateIncludedResourceReference ( this );
+    }
+
     m_strResourceName = "";
 
     m_bDestroyed = true;
@@ -443,15 +465,6 @@ void CResource::TidyUp ( void )
         (*iterc)->InvalidateIncludedResourceReference ( this );
     }
 
-    // Overkill, but easiest way to stop crashes:
-    // Go through all other resources and make sure we are not in m_includedResources, m_dependents and m_temporaryIncludes
-    std::list < CResource* > ::const_iterator iter = m_resourceManager->IterBegin ();
-    for ( ; iter != m_resourceManager->IterEnd (); iter++ )
-    {
-        if ( *iter != this )
-            (*iter)->InvalidateIncludedResourceReference ( this );
-    }
-    
     this->UnregisterEHS("call");
     g_pGame->GetHTTPD()->UnregisterEHS ( m_strResourceName.c_str () );
 
@@ -579,6 +592,14 @@ bool CResource::GenerateChecksums ( void )
                 case CResourceFile::RESOURCE_FILE_TYPE_CLIENT_FILE:
                 {
                     SString strCachedFilePath = pResourceFile->GetCachedPathFilename ();
+                    if ( !g_pRealNetServer->ValidateHttpCacheFileName( strCachedFilePath ) )
+                    {
+                        FileDelete( strCachedFilePath );
+                        CLogger::LogPrintf( SString ( "ERROR: Resource '%s' client filename '%s' not allowed\n", GetName().c_str(), *ExtractFilename(strCachedFilePath) ) );
+                        bOk = false;
+                        continue;
+                    }
+                    
                     CChecksum cachedChecksum = CChecksum::GenerateChecksumFromFile ( strCachedFilePath );
                     if ( checksum != cachedChecksum )
                     {
@@ -588,8 +609,8 @@ bool CResource::GenerateChecksums ( void )
                             bOk = false;
                         }
 
-                        // If script is protected, make sure there is no trace of it in the unprotected cache
-                        if ( pResourceFile->IsProtected () )
+                        // If script is 'no client cache', make sure there is no trace of it in the output dir
+                        if ( pResourceFile->IsNoClientCache () )
                             FileDelete ( pResourceFile->GetCachedPathFilename ( true ) );
                     }
                 }
@@ -962,7 +983,7 @@ bool CResource::Start ( list<CResource *> * dependents, bool bStartedManually, b
         // Broadcast new resourceelement that is loaded and tell the players that a new resource was started
         g_pGame->GetMapManager()->BroadcastResourceElements ( m_pResourceElement, m_pDefaultElementGroup );
         g_pGame->GetPlayerManager ()->BroadcastOnlyJoined ( CResourceStartPacket ( m_strResourceName.c_str (), this ) );
-        SendProtectedScripts ();
+        SendNoClientCacheScripts ();
 
         // HACK?: stops resources getting loaded twice when you change them then manually restart
         GenerateChecksums ();
@@ -1572,24 +1593,24 @@ bool CResource::ReadIncludedExports ( CXMLNode * root )
             }
 
             // Find the type attribute
-            CExportedFunction::eExportedFunctionType ucType = CExportedFunction::EXPORTED_FUNCTION_TYPE_SERVER;
+            bool bServer = true;
+            bool bClient = false;
+            
             CXMLAttribute * type = attributes->Find("type");
             if ( type )
             {
-                // Grab the type. Client or server
+                // Grab the type. Client or server or shared
                 const char *szType = type->GetValue ().c_str ();
-                if ( stricmp ( szType, "server" ) == 0 )
+                if ( stricmp ( szType, "client" ) == 0 )
                 {
-                    ucType = CExportedFunction::EXPORTED_FUNCTION_TYPE_SERVER;
+                    bServer = false;
+                    bClient = true;
                 }
-                else if ( stricmp ( szType, "client" ) == 0 )
-                {
-                    ucType = CExportedFunction::EXPORTED_FUNCTION_TYPE_CLIENT;
-                }
-                else
-                {
+                else if ( stricmp ( szType, "shared" ) == 0 )
+                    bClient = true;
+                else 
+                if ( stricmp ( szType, "server" ) != 0 )
                     CLogger::LogPrintf ( "Unknown exported function type specified in %s. Assuming 'server'\n", m_strResourceName.c_str () );
-                }
             }
 
             // Grab the functionname attribute
@@ -1602,7 +1623,10 @@ bool CResource::ReadIncludedExports ( CXMLNode * root )
                 // Add it to the list if it wasn't zero long. Otherwize show a warning
                 if ( !strFunction.empty () )
                 {
-                    m_exportedFunctions.push_back ( CExportedFunction ( strFunction.c_str (), bHTTP, ucType, bRestricted || GetName () == "webadmin" || GetName () == "runcode" ) );
+                    if ( bServer )
+                        m_exportedFunctions.push_back ( CExportedFunction ( strFunction.c_str (), bHTTP, CExportedFunction::EXPORTED_FUNCTION_TYPE_SERVER, bRestricted || GetName () == "webadmin" || GetName () == "runcode" ) );
+                    if ( bClient )
+                        m_exportedFunctions.push_back ( CExportedFunction ( strFunction.c_str (), bHTTP, CExportedFunction::EXPORTED_FUNCTION_TYPE_CLIENT, bRestricted || GetName () == "webadmin" || GetName () == "runcode" ) );
                 }
                 else
                 {
@@ -2641,6 +2665,8 @@ ResponseCode CResource::HandleRequestCall ( HttpRequest * ipoHttpRequest, HttpRe
 						headers.PushString ( (*iter).second.c_str() );
 					}
 
+                    LUA_CHECKSTACK ( m_pVM->GetVM(), 1 );   // Ensure some room
+
 					// cache old data
 					lua_getglobal ( m_pVM->GetVM(), "form" );
 					CLuaArgument OldForm ( m_pVM->GetVM(), -1 );
@@ -2958,10 +2984,10 @@ void CResource::OnPlayerJoin ( CPlayer& Player )
 {
     // do the player join crap
     Player.Send ( CResourceStartPacket ( m_strResourceName.c_str (), this ) );
-    SendProtectedScripts ( &Player );
+    SendNoClientCacheScripts ( &Player );
 }
 
-void CResource::SendProtectedScripts ( CPlayer* player )
+void CResource::SendNoClientCacheScripts ( CPlayer* player )
 {
     if ( !IsClientScriptsOn() )
         return;
@@ -2995,7 +3021,7 @@ void CResource::SendProtectedScripts ( CPlayer* player )
             if ( file->GetType() == CResourceFile::RESOURCE_FILE_TYPE_CLIENT_SCRIPT )
             {
                 CResourceClientScriptItem* clientScript = static_cast < CResourceClientScriptItem* > ( file );
-                if ( clientScript->IsProtected() == true )
+                if ( clientScript->IsNoClientCache() == true )
                 {
                     packet.AddItem ( clientScript );
                     anyScript = true;
@@ -3308,4 +3334,38 @@ void CResource::InvalidateIncludedResourceReference ( CResource * resource )
     m_temporaryIncludes.remove ( resource );
     assert ( this != resource );
     m_dependents.remove ( resource );
+}
+
+//
+// Check ACL 'function right' cache for this resource.
+// Will automatically clear the cache if ACL has changed.
+//
+// Returns true if setting was found in cache
+//
+bool CResource::CheckFunctionRightCache( lua_CFunction f, bool* pbOutAllowed )
+{
+    uint uiACLRevision = g_pGame->GetACLManager()->GetGlobalRevision();
+
+    // Check validity of cache
+    if ( m_uiFunctionRightCacheRevision != uiACLRevision )
+    {
+        m_FunctionRightCacheMap.clear();
+        m_uiFunctionRightCacheRevision = uiACLRevision;
+    }
+
+    // Read cache
+    bool* pResult = MapFind( m_FunctionRightCacheMap, f );
+    if ( !pResult )
+        return false;
+
+    *pbOutAllowed = *pResult;
+    return true;
+}
+
+//
+// Update ACL 'function right' cache for this resource.
+//
+void CResource::UpdateFunctionRightCache( lua_CFunction f, bool bAllowed )
+{
+    MapSet( m_FunctionRightCacheMap, f, bAllowed );
 }
