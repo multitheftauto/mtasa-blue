@@ -12,7 +12,7 @@
 *****************************************************************************/
 
 #include <StdInc.h>
-#include "gamesa_renderware.h"
+#include "../gamesa_renderware.h"
 
 /*=========================================================
     RpClump::Render

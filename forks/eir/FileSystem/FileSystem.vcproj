@@ -58,9 +58,9 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				AdditionalDependencies="zlibd_2008.lib"
+				AdditionalDependencies="zlibd_d.lib"
 				OutputFile="$(OutDir)\libfs_d.lib"
-				AdditionalLibraryDirectories="..\vendor\zlib\lib\"
+				AdditionalLibraryDirectories="..\vendor\zlib\x86\Debug"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -125,9 +125,9 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				AdditionalDependencies="zlib_2008.lib"
+				AdditionalDependencies="zlib.lib"
 				OutputFile="$(OutDir)\libfs.lib"
-				AdditionalLibraryDirectories="..\vendor\zlib\lib\"
+				AdditionalLibraryDirectories="..\vendor\zlib\x86\Release"
 			/>
 			<Tool
 				Name="VCALinkTool"

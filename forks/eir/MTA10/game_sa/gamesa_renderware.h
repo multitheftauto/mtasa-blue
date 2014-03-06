@@ -62,13 +62,8 @@ typedef float                   (__cdecl *RwMatrixUnknown_t)                    
 typedef void                    (__cdecl *RwObjectRegister_t)                   (void *group, RwObject *obj);
 
 // Stream functions
-typedef RwStream*               (__cdecl *RwStreamInitialize_t)                 (void *unk, unsigned int unk2, unsigned int unk3, unsigned int unk4, RwBuffer *buf);
-typedef RwStream*               (__cdecl *RwStreamOpen_t)                       (RwStreamType type, RwStreamMode mode, const void *pData);
 typedef RwStream*               (__cdecl *RwStreamReadChunkHeaderInfo_t)        (RwStream *stream, RwChunkHeader& header);
 typedef int                     (__cdecl *RwStreamFindChunk_t)                  (RwStream *stream, unsigned int type, unsigned int *lengthOut, unsigned int *versionOut);
-typedef unsigned int            (__cdecl *RwStreamReadBlocks_t)                 (RwStream *stream, void *data, unsigned int size);
-typedef int                     (__cdecl *RwStreamSkip_t)                       (RwStream *stream, unsigned int offset);
-typedef int                     (__cdecl *RwStreamClose_t)                      (RwStream *stream, void *pData);
 
 // Frame functions
 typedef RwFrame*                (__cdecl *RwFrameCreate_t)                      (void);

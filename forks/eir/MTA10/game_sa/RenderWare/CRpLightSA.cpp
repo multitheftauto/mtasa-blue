@@ -11,7 +11,7 @@
 *****************************************************************************/
 
 #include <StdInc.h>
-#include "gamesa_renderware.h"
+#include "../gamesa_renderware.h"
 
 CRpLightSA::CRpLightSA( RpLight *light ) : CRwObjectSA( light )
 {
