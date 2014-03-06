@@ -55,6 +55,8 @@ public:
     inline bool             GetActive       ( void )                { return m_bActive; };
 
     void                    Load            ( CClientEntity *pRootEntity );
+    void                    Stop            ( void );
+    SString                 GetState        ( void );
 
     bool                    InDownloadQueue     ( void )            { return m_bInDownloadQueue; };
     bool                    SetInDownloadQueue  ( bool bIn )        { m_bInDownloadQueue = bIn; };
@@ -110,6 +112,8 @@ private:
     CLuaManager*            m_pLuaManager;
     class CClientEntity*    m_pRootEntity;
     bool                    m_bActive;
+    bool                    m_bStarting;
+    bool                    m_bStopping;
     class CClientEntity*    m_pResourceEntity;          // no idea what this is used for anymore
     class CClientEntity*    m_pResourceDynamicEntity;   // parent of elements created by the resource
     class CClientEntity*    m_pResourceCOLRoot;

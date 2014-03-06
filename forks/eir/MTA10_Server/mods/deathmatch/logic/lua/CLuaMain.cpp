@@ -518,14 +518,19 @@ void CLuaMain::DoPulse ( void )
 }
 
 // Keep count of the number of open files in this resource and issue a warning if too high
-void CLuaMain::OnOpenFile( void )
+void CLuaMain::OnOpenFile( const SString& strFilename )
 {
-    m_uiOpenFileCount++;
-    if ( m_uiOpenFileCount > m_uiOpenFileCountWarnThresh )
+    m_OpenFilenameList.push_back( strFilename );
+    if ( m_OpenFilenameList.size() >= m_uiOpenFileCountWarnThresh )
     {
-        m_uiOpenFileCountWarnThresh = m_uiOpenFileCount * 2;
-        CLogger::LogPrintf ( "Notice: There are now %d open files in resource '%s'\n", m_uiOpenFileCount, GetScriptName() );
+        m_uiOpenFileCountWarnThresh = m_OpenFilenameList.size() * 2;
+        CLogger::LogPrintf ( "Notice: There are now %d open files in resource '%s'\n", m_OpenFilenameList.size(), GetScriptName() );
     }
+}
+
+void CLuaMain::OnCloseFile( const SString& strFilename )
+{
+    ListRemove( m_OpenFilenameList, strFilename );
 }
 
 CXMLFile * CLuaMain::CreateXML ( const char * szFilename )
@@ -534,7 +539,7 @@ CXMLFile * CLuaMain::CreateXML ( const char * szFilename )
     if ( pFile )
     {
         m_XMLFiles.push_back ( pFile );
-        if ( m_XMLFiles.size() > m_uiOpenXMLFileCountWarnThresh )
+        if ( m_XMLFiles.size() >= m_uiOpenXMLFileCountWarnThresh )
         {
             m_uiOpenXMLFileCountWarnThresh = m_XMLFiles.size() * 2;
             CLogger::LogPrintf ( "Notice: There are now %d open XML files in resource '%s'\n", m_XMLFiles.size(), GetScriptName() );
