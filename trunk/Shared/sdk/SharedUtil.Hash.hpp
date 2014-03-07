@@ -490,7 +490,7 @@ namespace SharedUtil
     void ConvertHexStringToData( const SString& strString, void* pOutData, uint uiLength )
     {
         memset( pOutData, 0, uiLength );
-        uint uiNibbleAmount = Min( uiLength * 2, strString.length() );
+        uint uiNibbleAmount = Min < uint > ( uiLength * 2, strString.length() );
         uchar* pOutput = (uchar*)pOutData;
         for ( uint i = 0; i < uiNibbleAmount; i++ )
         {
