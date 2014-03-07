@@ -18,6 +18,11 @@
 // notifies the environment that we compile for the Eir fork.
 #define _MTA_BLUE
 
+// For nightly build server
+class CFile;
+#undef min
+#undef max
+
 typedef void ( InRenderer ) ( void );
 
 #include "Common.h"

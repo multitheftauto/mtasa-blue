@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9,00"
+	Version="9.00"
 	Name="FileSystem"
 	ProjectGUID="{6E793DA8-5641-4BBB-BCB0-43BF10682E14}"
 	RootNamespace="FileSystem"
@@ -58,9 +58,9 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				AdditionalDependencies="zlibd_d.lib"
+				AdditionalDependencies="zlib_d.lib"
 				OutputFile="$(OutDir)\libfs_d.lib"
-				AdditionalLibraryDirectories="..\vendor\zlib\x86\Debug"
+				AdditionalLibraryDirectories="..\vendor\zlib\x86\$(ConfigurationName)"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -127,7 +127,74 @@
 				Name="VCLibrarianTool"
 				AdditionalDependencies="zlib.lib"
 				OutputFile="$(OutDir)\libfs.lib"
-				AdditionalLibraryDirectories="..\vendor\zlib\x86\Release"
+				AdditionalLibraryDirectories="..\vendor\zlib\x86\$(ConfigurationName)"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
+		</Configuration>
+		<Configuration
+			Name="Nightly|Win32"
+			OutputDirectory="$(ProjectDir)\lib\"
+			IntermediateDirectory="..\obj\x86\$(ConfigurationName)\$(SafeRootNamespace)"
+			ConfigurationType="4"
+			CharacterSet="2"
+			WholeProgramOptimization="1"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="2"
+				InlineFunctionExpansion="2"
+				EnableIntrinsicFunctions="true"
+				FavorSizeOrSpeed="1"
+				OmitFramePointers="true"
+				AdditionalIncludeDirectories="../Shared/sdk/coresdk;../Shared/sdk;.;../vendor/zlib"
+				RuntimeLibrary="2"
+				EnableFunctionLevelLinking="true"
+				WarningLevel="3"
+				DebugInformationFormat="3"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLibrarianTool"
+				AdditionalDependencies="zlib.lib"
+				OutputFile="$(OutDir)\libfs.lib"
+				AdditionalLibraryDirectories="..\vendor\zlib\x86\$(ConfigurationName)"
 			/>
 			<Tool
 				Name="VCALinkTool"
