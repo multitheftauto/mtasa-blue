@@ -70,7 +70,7 @@ int CLuaFileDefs::fileCreate ( lua_State* luaVM )
                     MakeSureDirExists ( strAbsPath.c_str () );
 
                     // Create the file to create
-                    CScriptFile* pFile = new CScriptFile ( pThisResource, strSubPath.c_str (), DEFAULT_MAX_FILESIZE );
+                    CScriptFile* pFile = new CScriptFile ( pThisResource->GetScriptID(), strSubPath.c_str (), DEFAULT_MAX_FILESIZE );
                     assert ( pFile );
 
                     // Try to load it
@@ -193,7 +193,7 @@ int CLuaFileDefs::fileOpen ( lua_State* luaVM )
                 {
 
                     // Create the file to create
-                    CScriptFile* pFile = new CScriptFile ( pThisResource, strSubPath.c_str (), DEFAULT_MAX_FILESIZE );
+                    CScriptFile* pFile = new CScriptFile ( pThisResource->GetScriptID(), strSubPath.c_str (), DEFAULT_MAX_FILESIZE );
                     assert ( pFile );
 
                     // Try to load it

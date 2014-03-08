@@ -29,15 +29,7 @@ CResourceManager::~CResourceManager ( void )
     while ( !m_resources.empty () )
     {
         CResource* pResource = m_resources.back ();
-
-        CLuaArguments Arguments;
-        Arguments.PushResource ( pResource );
-        pResource->GetResourceEntity ()->CallEvent ( "onClientResourceStop", Arguments, true );
-        assert( MapContains( m_NetIdResourceMap, pResource->GetNetID() ) );
-        MapRemove( m_NetIdResourceMap, pResource->GetNetID() );
-        delete pResource;
-
-        m_resources.pop_back ();
+        Remove( pResource );
     }
 }
 
@@ -135,6 +127,9 @@ bool CResourceManager::RemoveResource ( unsigned short usNetID )
 
 void CResourceManager::Remove ( CResource* pResource )
 {
+    // Triggger the onStop event, and set resource state to 'stopping'
+    pResource->Stop (); 
+
     // Delete all the resource's locally created children (the server won't do that)
     pResource->DeleteClientChildren ();
 

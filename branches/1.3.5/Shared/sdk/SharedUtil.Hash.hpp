@@ -487,6 +487,26 @@ namespace SharedUtil
         return strResult;
     }
 
+    void ConvertHexStringToData( const SString& strString, void* pOutData, uint uiLength )
+    {
+        memset( pOutData, 0, uiLength );
+        uint uiNibbleAmount = Min( uiLength * 2, strString.length() );
+        uchar* pOutput = (uchar*)pOutData;
+        for ( uint i = 0; i < uiNibbleAmount; i++ )
+        {
+            uchar c = toupper( strString[ i ] ) - '0';
+            if ( c > 9 )
+                c -= 'A' - '0' - 10;
+            if ( c < 16 )
+            {
+                if ( ( i & 1 ) == 0 )
+                    pOutput[ i / 2 ] = ( c << 4 );  // First nibble
+                else
+                    pOutput[ i / 2 ] |= c;          // Second nibble
+            }
+        }
+    }
+
     void GenerateSha256( const void* pData, uint uiLength, uchar output[32] )
     {
         sha2_context ctx;

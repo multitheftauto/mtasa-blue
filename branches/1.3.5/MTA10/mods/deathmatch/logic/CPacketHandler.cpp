@@ -4676,22 +4676,8 @@ void CPacketHandler::Packet_ResourceStop ( NetBitStreamInterface& bitStream )
     unsigned short usNetID;
     if ( bitStream.Read ( usNetID ) )
     {
-        CResource* pResource = g_pClientGame->m_pResourceManager->GetResourceFromNetID ( usNetID );
-        if ( pResource )
-        {
-            // Grab the resource entity
-            CClientEntity* pResourceEntity = pResource->GetResourceEntity ();
-            if ( pResourceEntity )
-            {
-                // Call our lua event
-                CLuaArguments Arguments;
-                Arguments.PushResource ( pResource );
-                pResourceEntity->CallEvent ( "onClientResourceStop", Arguments, true );
-            }
-
-            // Delete the resource
-            g_pClientGame->m_pResourceManager->RemoveResource ( usNetID );
-        }
+        // Delete the resource
+        g_pClientGame->m_pResourceManager->RemoveResource ( usNetID );
     }
 }
 

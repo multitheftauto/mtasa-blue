@@ -725,4 +725,23 @@ void SharedUtil_String_Tests ( void )
         TEST_END
     }
 
+    // ConvertHexStringToData/ConvertDataToHexString
+    {
+        TEST_FUNCTION
+            char buffer[256];
+            uint length = a.length() / 2;
+            ConvertHexStringToData( a, buffer, length );
+            SString strResult = ConvertDataToHexString( buffer, length );
+            assert ( strResult == b );
+        TEST_VARS
+            const SString a;
+            const char* b;
+        TEST_DATA
+            { "66B9139D8C424BE2BCF224706B48FEB8", "66B9139D8C424BE2BCF224706B48FEB8" },
+            { "E7C7253C74275F2DC2DC8C6828816C18301636949369F3bad87666C81E71B309", "E7C7253C74275F2DC2DC8C6828816C18301636949369F3BAD87666C81E71B309" },
+            { "61", "61" },
+            { "\x01""A""\x1F\x80""BC""\xFE\xFF", "0A00BC00" },
+        TEST_END
+    }
+
 }
