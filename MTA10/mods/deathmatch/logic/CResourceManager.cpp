@@ -30,7 +30,6 @@ CResourceManager::~CResourceManager ( void )
     {
         CResource* pResource = m_resources.back ();
         Remove( pResource );
-        m_resources.pop_back ();
     }
 }
 
