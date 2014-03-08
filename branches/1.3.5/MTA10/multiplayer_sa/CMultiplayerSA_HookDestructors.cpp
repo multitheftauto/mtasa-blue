@@ -275,9 +275,9 @@ void _cdecl OnCEntityDestructor ( DWORD calledFrom, CEntitySAInterface* pEntity 
 
 
 // Hook info
-#define HOOKPOS_CEntityDestructor        0x406F57
+#define HOOKPOS_CEntityDestructor        0x535E97
 #define HOOKSIZE_CEntityDestructor       6
-DWORD RETURN_CEntityDestructor =         0x406F5D;
+DWORD RETURN_CEntityDestructor =         0x535E9D;
 void _declspec(naked) HOOK_CEntityDestructor()
 {
     _asm
@@ -289,7 +289,7 @@ void _declspec(naked) HOOK_CEntityDestructor()
         add     esp, 4*2
         popad
 
-        mov     esi,dword ptr ds:[156084Ch] 
+        mov     eax, dword ptr fs:[00000000h]
         jmp     RETURN_CEntityDestructor
     }
 }
