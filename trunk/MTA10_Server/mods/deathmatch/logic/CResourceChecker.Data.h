@@ -167,6 +167,7 @@ namespace
                                          { "getInteriorFurnitureEnabled",   "1.3.5-9.06101" },
                                          { "setElementCallPropagationEnabled",  "1.3.5-9.06118" },
                                          { "isElementCallPropagationEnabled",   "1.3.5-9.06118" },
+                                         { "getResourceState",              "1.3.5-9.06194" },
                                        };
 
     SVersionItem serverFunctionInitList[] = {
