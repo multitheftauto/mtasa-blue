@@ -41,11 +41,19 @@ namespace
     //
     // Log problem
     //
-    void LogSectorMessage( uint uiId, const char* szContext, CEntitySAInterface* pCheckEntity )
+    void LogSectorMessage( uint uiId, const char* szContext, CEntitySAInterface* pCheckEntity, CEntitySAInterface* pEntity, uint n )
     {
-        SString strMsg;
+        SString strMsg( "n:%-5d  vtbl:%08x  ", n, pEntity->vtbl );
         if ( pCheckEntity )
-            strMsg = SString( "Type:%d  Model:%d", pCheckEntity->nType, pCheckEntity->m_nModelIndex );
+        {
+            CVector vPos;
+            bool bHasMatrix = ( pCheckEntity->Placeable.matrix != NULL );
+            if ( bHasMatrix )
+                vPos = pCheckEntity->Placeable.matrix->vPos;
+            else
+                vPos = pCheckEntity->Placeable.m_transform.m_translate; 
+            strMsg += SString( "Type:%d  Model:%-5d  HasMatrix:%d  Pos:%0.1f,%0.1f,%0.1f  ", pCheckEntity->nType, pCheckEntity->m_nModelIndex, bHasMatrix, vPos.fX, vPos.fY, vPos.fZ );
+        }
         LogEvent ( uiId, "CheckSectors", szContext, strMsg, 8000 + uiId );
     }
 
@@ -62,14 +70,14 @@ namespace
             {
                 if ( pStreamEntry->pEntity == pCheckEntity )
                 {
-                    LogSectorMessage( 900, "Entity in sectors at delete", pCheckEntity );
+                    LogSectorMessage( 900, "Entity in sectors at delete", pCheckEntity, pStreamEntry->pEntity, n );
                     pStreamEntry->pEntity = NULL; 
                     *((DWORD**)ARRAY_StreamSectors + n) = NULL;
                 }
                 else
                 if ( pStreamEntry->pEntity && pStreamEntry->pEntity->vtbl->DeleteRwObject != 0x00534030 )
                 {
-                    LogSectorMessage( 901, "Entity invalid", NULL );
+                    LogSectorMessage( 901, "Entity invalid", NULL, pStreamEntry->pEntity, n );
                     pStreamEntry->pEntity = NULL; 
                     *((DWORD**)ARRAY_StreamSectors + n) = NULL;
                 }
@@ -87,14 +95,14 @@ namespace
             {
                 if ( pStreamEntry->pEntity == pCheckEntity )
                 {
-                    LogSectorMessage( 902, "Entity in repeat sectors at delete", pCheckEntity );
+                    LogSectorMessage( 902, "Entity in repeat sectors at delete", pCheckEntity, pStreamEntry->pEntity, n );
                     pStreamEntry->pEntity = NULL;
                     pRepeatEntry->m_pStreamSectorEntry = NULL;
                 }
                 else
                 if ( pStreamEntry->pEntity && pStreamEntry->pEntity->vtbl->DeleteRwObject != 0x00534030 )
                 {
-                    LogSectorMessage( 903, "Entity invalid in repeat", NULL );
+                    LogSectorMessage( 903, "Entity invalid in repeat", NULL, pStreamEntry->pEntity, n );
                     pStreamEntry->pEntity = NULL;
                     pRepeatEntry->m_pStreamSectorEntry = NULL;
                 }
@@ -113,8 +121,6 @@ void _cdecl OnCObjectDestructor ( DWORD calledFrom, CObjectSAInterface* pObject 
     // Tell client to check for things going away
     if ( pGameObjectDestructHandler )
         pGameObjectDestructHandler ( pObject );
-
-    CheckSectors( pObject );
 }
 
 // Hook info
@@ -145,8 +151,6 @@ void _cdecl OnVehicleDestructor ( DWORD calledFrom, CVehicleSAInterface* pVehicl
     // Tell client to check for things going away
     if ( pGameVehicleDestructHandler )
         pGameVehicleDestructHandler ( pVehicle );
-
-    CheckSectors( pVehicle );
 }
 
 // Hook info
@@ -181,8 +185,6 @@ void _cdecl OnCPlayerPedDestructor ( DWORD calledFrom, CPedSAInterface* pPlayerP
     // Tell client to check for things going away
     if ( pGamePlayerDestructHandler )
         pGamePlayerDestructHandler ( pPlayerPed );
-
-    CheckSectors( pPlayerPed );
 }
 
 // Hook info
@@ -212,8 +214,6 @@ void _cdecl OnCProjectileDestructor ( DWORD calledFrom, CEntitySAInterface* pPro
     // Tell client to check for things going away
     if ( pGameProjectileDestructHandler )
         pGameProjectileDestructHandler ( pProjectile );
-
-    CheckSectors( pProjectile );
 }
 
 // Hook info
@@ -241,7 +241,6 @@ void _declspec(naked) HOOK_CProjectileDestructor()
 //
 void _cdecl OnCBuildingDestructor ( DWORD calledFrom, CEntitySAInterface* pBuilding )
 {
-    CheckSectors( pBuilding );
 }
 
 
@@ -263,6 +262,35 @@ void _declspec(naked) HOOK_CBuildingDestructor()
         mov     eax, 0x404180       // CBuilding::~CBuilding()
         call    eax 
         jmp     RETURN_CBuildingDestructor
+    }
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////
+//
+void _cdecl OnCEntityDestructor ( DWORD calledFrom, CEntitySAInterface* pEntity )
+{
+    CheckSectors( pEntity );
+}
+
+
+// Hook info
+#define HOOKPOS_CEntityDestructor        0x406F57
+#define HOOKSIZE_CEntityDestructor       6
+DWORD RETURN_CEntityDestructor =         0x406F5D;
+void _declspec(naked) HOOK_CEntityDestructor()
+{
+    _asm
+    {
+        pushad
+        push    ecx
+        push    [esp+32+4*1]
+        call    OnCEntityDestructor
+        add     esp, 4*2
+        popad
+
+        mov     esi,dword ptr ds:[156084Ch] 
+        jmp     RETURN_CEntityDestructor
     }
 }
 
@@ -341,5 +369,6 @@ void CMultiplayerSA::InitHooks_HookDestructors ( void )
    EZHookInstall ( CProjectileDestructor );
    EZHookInstall ( CPlayerPedDestructor );
    EZHookInstall ( CBuildingDestructor );
+   EZHookInstall ( CEntityDestructor );
    EZHookInstall ( CStreamingRemoveModel );
 }
