@@ -154,7 +154,11 @@ bool CConsoleCommands::ListResources ( CConsole* pConsole, const char* szArgumen
     if ( pClient->GetClientType () != CClient::CLIENT_CONSOLE )
         return false;
 
-    g_pGame->GetResourceManager()->ListResourcesLoaded();
+    SString strListType = szArguments;
+    if ( strListType.empty () )
+        strListType = "all";
+
+    g_pGame->GetResourceManager()->ListResourcesLoaded ( strListType );
     return true;
 }
 
