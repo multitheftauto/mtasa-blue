@@ -24,6 +24,7 @@
 
 #define FUNC_CObject_Create             0x5A1F60
 #define FUNC_CObject_Explode            0x5A1340
+#define FUNC_CGlass_WindowRespondsToCollision 0x71BC40
 
 class CObjectInfo
 {
@@ -147,6 +148,7 @@ public:
     inline unsigned char        GetAlpha            ( ) { return m_ucAlpha; }
 
     bool                        IsAGangTag          ( ) const { return m_bIsAGangTag; }
+    bool                        IsGlass             ( );
 
     void                        SetScale            ( float fX, float fY, float fZ );
     CVector*                    GetScale            ( );
