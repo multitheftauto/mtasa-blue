@@ -260,6 +260,29 @@ void CObjectSA::Break ()
         mov     ecx, dwThis
         call    dwFunc
     }
+
+    if ( IsGlass () )
+    {
+        float fX = 0.0f;
+        float fY = 0.0f;
+        float fZ = 0.0f;
+        dwFunc = FUNC_CGlass_WindowRespondsToCollision;
+
+        _asm
+        {
+            push 0
+            push fZ
+            push fY
+            push fX
+            push 0
+            push 0
+            push 0
+            push fHitVelocity
+            push dwThis
+            call dwFunc
+            add esp, 24h
+        }
+    }
 }
 
 void CObjectSA::SetHealth ( float fHealth )
@@ -299,6 +322,22 @@ void CObjectSA::CheckForGangTag ( )
             m_bIsAGangTag = false; 
             break;
     }
+}
+
+bool CObjectSA::IsGlass ()
+{
+    DWORD dwFunc = 0x46A760;
+    DWORD dwThis = (DWORD) GetInterface ();
+    bool bResult;
+
+    _asm
+    {
+        push dwThis
+        call dwFunc
+        mov bResult, al
+        add esp, 4
+    }
+    return bResult;
 }
 
 void CObjectSA::SetScale ( float fX, float fY, float fZ )
