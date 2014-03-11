@@ -26,16 +26,32 @@ namespace
     #define NUM_StreamRepeatSectorRows                          16
     #define NUM_StreamRepeatSectorCols                          16
 
-    struct SStreamSectorEntry
+    #define ARRAY_BuildingSectors   ((SStreamSectorEntrySingle**)( (ARRAY_StreamSectors) + 0 ))
+    #define ARRAY_VehicleSectors    ((SStreamSectorEntryDouble**)( (ARRAY_StreamRepeatSectors) + 0 ))
+    #define ARRAY_PedSectors        ((SStreamSectorEntryDouble**)( (ARRAY_StreamRepeatSectors) + 4 ))
+    #define ARRAY_ObjectSectors     ((SStreamSectorEntryDouble**)( (ARRAY_StreamRepeatSectors) + 8 ))
+    #define ARRAY_DummySectors      ((SStreamSectorEntryDouble**)( (ARRAY_StreamSectors) + 4 ))
+
+    #define NUM_BuildingSectors     ( NUM_StreamSectorRows * NUM_StreamSectorCols )
+    #define NUM_VehicleSectors      ( NUM_StreamRepeatSectorRows * NUM_StreamRepeatSectorCols )
+    #define NUM_PedSectors          ( NUM_StreamRepeatSectorRows * NUM_StreamRepeatSectorCols )
+    #define NUM_ObjectSectors       ( NUM_StreamRepeatSectorRows * NUM_StreamRepeatSectorCols )
+    #define NUM_DummySectors        ( NUM_StreamSectorRows * NUM_StreamSectorCols )
+
+    #define FUNC_CPtrListSingleLink_Remove  0x0533610
+    #define FUNC_CPtrListDoubleLink_Remove  0x05336B0
+
+    struct SStreamSectorEntrySingle
     {
         CEntitySAInterface*     pEntity;
-        SStreamSectorEntry*     pNext;
+        SStreamSectorEntrySingle*   pNext;
     };
 
-    struct SStreamRepeatSectorEntry
+    struct SStreamSectorEntryDouble
     {
-        BYTE                    m_pad[8];
-        SStreamSectorEntry*     m_pStreamSectorEntry;
+        CEntitySAInterface*         pEntity;
+        SStreamSectorEntryDouble*   pNext;
+        SStreamSectorEntryDouble*   pPrev;
     };
 
     //
@@ -57,58 +73,56 @@ namespace
         LogEvent ( uiId, "CheckSectors", szContext, strMsg, 8000 + uiId );
     }
 
+
     //
-    // Check if entity is still in stream sectors
+    // CPtrListSingleLink contains item
     //
-    void CheckSectors( CEntitySAInterface* pCheckEntity )
+    bool CPtrListSingleLink_Contains( SStreamSectorEntrySingle* pStreamEntry, CEntitySAInterface* pCheckEntity )
     {
-        for ( unsigned int n = 0; n < 2 * NUM_StreamSectorRows * NUM_StreamSectorCols; n++ )
-        {
-            SStreamSectorEntry* pStreamEntry = *((SStreamSectorEntry**)ARRAY_StreamSectors + n);
+        for ( ; pStreamEntry ; pStreamEntry = pStreamEntry->pNext )
+            if ( pStreamEntry->pEntity == pCheckEntity )
+                return true;
+        return false;
+    }
 
-            while ( pStreamEntry )
+    //
+    // CPtrListSingleLink remove item
+    //
+    void CPtrListSingleLink_Remove( SStreamSectorEntrySingle** ppStreamEntryList, CEntitySAInterface* pCheckEntity )
             {
-                if ( pStreamEntry->pEntity == pCheckEntity )
+        LogSectorMessage( 903, "Entity in sectors at delete", pCheckEntity, pCheckEntity, pCheckEntity->nType );
+        DWORD dwFunc = FUNC_CPtrListSingleLink_Remove;
+        _asm
                 {
-                    LogSectorMessage( 900, "Entity in sectors at delete", pCheckEntity, pStreamEntry->pEntity, n );
-                    pStreamEntry->pEntity = NULL; 
-                    *((DWORD**)ARRAY_StreamSectors + n) = NULL;
+            mov     ecx, ppStreamEntryList
+            push    pCheckEntity
+            call    dwFunc
                 }
-                else
-                if ( pStreamEntry->pEntity && pStreamEntry->pEntity->vtbl->DeleteRwObject != 0x00534030 )
-                {
-                    LogSectorMessage( 901, "Entity invalid", NULL, pStreamEntry->pEntity, n );
-                    pStreamEntry->pEntity = NULL; 
-                    *((DWORD**)ARRAY_StreamSectors + n) = NULL;
                 }
 
-                pStreamEntry = pStreamEntry->pNext;
-            }
+    //
+    // CPtrListDoubleLink contains item
+    //
+    bool CPtrListDoubleLink_Contains( SStreamSectorEntryDouble* pStreamEntry, CEntitySAInterface* pCheckEntity )
+    {
+        for ( ; pStreamEntry ; pStreamEntry = pStreamEntry->pNext )
+            if ( pStreamEntry->pEntity == pCheckEntity )
+                return true;
+        return false;
         }
 
-        for ( unsigned int n = 0; n < NUM_StreamRepeatSectorRows * NUM_StreamRepeatSectorCols; n++ )
+    //
+    // CPtrListDoubleLink remove item
+    //
+    void CPtrListDoubleLink_Remove( SStreamSectorEntryDouble** ppStreamEntryList, CEntitySAInterface* pCheckEntity )
         {
-            SStreamRepeatSectorEntry* pRepeatEntry = (SStreamRepeatSectorEntry*)ARRAY_StreamRepeatSectors + n;
-            SStreamSectorEntry* pStreamEntry = pRepeatEntry->m_pStreamSectorEntry;
-
-            while ( pStreamEntry )
-            {
-                if ( pStreamEntry->pEntity == pCheckEntity )
+        LogSectorMessage( 904, "Entity in sectors at delete", pCheckEntity, pCheckEntity, pCheckEntity->nType );
+        DWORD dwFunc = FUNC_CPtrListDoubleLink_Remove;
+        _asm
                 {
-                    LogSectorMessage( 902, "Entity in repeat sectors at delete", pCheckEntity, pStreamEntry->pEntity, n );
-                    pStreamEntry->pEntity = NULL;
-                    pRepeatEntry->m_pStreamSectorEntry = NULL;
-                }
-                else
-                if ( pStreamEntry->pEntity && pStreamEntry->pEntity->vtbl->DeleteRwObject != 0x00534030 )
-                {
-                    LogSectorMessage( 903, "Entity invalid in repeat", NULL, pStreamEntry->pEntity, n );
-                    pStreamEntry->pEntity = NULL;
-                    pRepeatEntry->m_pStreamSectorEntry = NULL;
-                }
-
-                pStreamEntry = pStreamEntry->pNext;
-            }
+            mov     ecx, ppStreamEntryList
+            push    pCheckEntity
+            call    dwFunc
         }
     }
 
@@ -270,7 +284,78 @@ void _declspec(naked) HOOK_CBuildingDestructor()
 //
 void _cdecl OnCEntityDestructor ( DWORD calledFrom, CEntitySAInterface* pEntity )
 {
-    CheckSectors( pEntity );
+    if ( pEntity->nType == 1 )
+    {
+        // Type 1 - CBuilding
+        for ( unsigned int n = 0 ; n < NUM_BuildingSectors; n++ )
+        {
+            SStreamSectorEntrySingle** ppStreamEntryList = &ARRAY_BuildingSectors[ n * 2 ];
+
+            if ( CPtrListSingleLink_Contains( *ppStreamEntryList, pEntity ) )
+            {
+                CPtrListSingleLink_Remove( ppStreamEntryList, pEntity );
+                n--;
+            }
+        }
+    }
+    else
+    if ( pEntity->nType == 2 )
+    {
+        // Type 2 - CVehicle
+        for ( unsigned int n = 0 ; n < NUM_VehicleSectors; n++ )
+        {
+            SStreamSectorEntryDouble** ppStreamEntryList = &ARRAY_VehicleSectors[ n * 3 ];
+
+            if ( CPtrListDoubleLink_Contains( *ppStreamEntryList, pEntity ) )
+            {
+                CPtrListDoubleLink_Remove( ppStreamEntryList, pEntity );
+                n--;
+            }
+        }
+    }
+    if ( pEntity->nType == 3 )
+    {
+        // Type 3 - CPed
+        for ( unsigned int n = 0 ; n < NUM_PedSectors; n++ )
+        {
+            SStreamSectorEntryDouble** ppStreamEntryList = &ARRAY_PedSectors[ n * 3 ];
+
+            if ( CPtrListDoubleLink_Contains( *ppStreamEntryList, pEntity ) )
+            {
+                CPtrListDoubleLink_Remove( ppStreamEntryList, pEntity );
+                n--;
+            }
+        }
+    }
+    if ( pEntity->nType == 4 )
+    {
+        // Type 4 - CObject
+        for ( unsigned int n = 0 ; n < NUM_ObjectSectors; n++ )
+        {
+            SStreamSectorEntryDouble** ppStreamEntryList = &ARRAY_ObjectSectors[ n * 3 ];
+
+            if ( CPtrListDoubleLink_Contains( *ppStreamEntryList, pEntity ) )
+            {
+                CPtrListDoubleLink_Remove( ppStreamEntryList, pEntity );
+                n--;
+            }
+        }
+    }
+    else
+    if ( pEntity->nType == 5 )
+    {
+        // Type 5 - CDummy
+        for ( unsigned int n = 0 ; n < NUM_DummySectors; n++ )
+        {
+            SStreamSectorEntryDouble** ppStreamEntryList = &ARRAY_DummySectors[ n * 2 ];
+
+            if ( CPtrListDoubleLink_Contains( *ppStreamEntryList, pEntity ) )
+            {
+                CPtrListDoubleLink_Remove( ppStreamEntryList, pEntity );
+                n--;
+            }
+        }
+    }
 }
 
 
