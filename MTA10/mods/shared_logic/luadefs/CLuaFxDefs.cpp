@@ -27,6 +27,11 @@ void CLuaFxDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "fxAddWaterSplash", CLuaFxDefs::fxAddWaterSplash );
     CLuaCFunctions::AddFunction ( "fxAddBulletSplash", CLuaFxDefs::fxAddBulletSplash );
     CLuaCFunctions::AddFunction ( "fxAddFootSplash", CLuaFxDefs::fxAddFootSplash );
+    CLuaCFunctions::AddFunction ( "createEffect", CLuaFxDefs::CreateEffect );
+    CLuaCFunctions::AddFunction ( "setEffectSpeed", CLuaFxDefs::SetEffectSpeed );
+    CLuaCFunctions::AddFunction ( "getEffectSpeed", CLuaFxDefs::GetEffectSpeed );
+    CLuaCFunctions::AddFunction ( "setEffectDensity", CLuaFxDefs::SetEffectDensity );
+    CLuaCFunctions::AddFunction ( "getEffectDensity", CLuaFxDefs::GetEffectDensity );
 }
 
 
@@ -456,6 +461,145 @@ int CLuaFxDefs::fxAddFootSplash ( lua_State* luaVM )
             lua_pushboolean ( luaVM, true );
             return 1;
         }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+
+    // Failed
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+
+int CLuaFxDefs::CreateEffect ( lua_State* luaVM )
+{
+    // bool createEffect ( string fxName, float posX, float posY, float posZ[, float rotX, float rotY, float rotZ] )
+
+    CVector vecPosition;
+    CVector vecRotation;
+    SString strFxName;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadString ( strFxName );
+    argStream.ReadVector3D ( vecPosition );
+    argStream.ReadVector3D ( vecRotation );
+
+    if ( !argStream.HasErrors ( ) )
+    {
+        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+        if ( pLuaMain )
+        {
+            CResource* pResource = pLuaMain->GetResource();
+            if ( pResource )
+            {
+                // Create it and return it
+                CClientEffect * pFx = CStaticFunctionDefinitions::CreateEffect ( *pResource, strFxName, vecPosition );
+                if ( pFx != NULL )
+                {
+                    pFx->SetRotationDegrees ( vecRotation );
+                    lua_pushelement ( luaVM, pFx );
+                    return 1;
+                }
+            }
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+
+    // Failed
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFxDefs::GetEffectSpeed ( lua_State* luaVM )
+{
+    // float getEffectSpeed ( effect theEffect )
+
+    CClientEffect * pEffect;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData( pEffect );
+
+    if ( !argStream.HasErrors ( ) )
+    {
+        lua_pushnumber( luaVM, pEffect->GetEffectSpeed() );
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+
+    // Failed
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFxDefs::SetEffectSpeed ( lua_State* luaVM )
+{
+    // void setEffectSpeed ( effect theEffect, float fSpeed )
+
+    CClientEffect * pEffect;
+    float fSpeed;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData( pEffect );
+    argStream.ReadNumber ( fSpeed );
+
+    if ( !argStream.HasErrors ( ) )
+    {
+        pEffect->SetEffectSpeed ( fSpeed );
+        lua_pushboolean ( luaVM, true );
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+
+    // Failed
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFxDefs::GetEffectDensity ( lua_State* luaVM )
+{
+    // float getEffectDensity ( effect theEffect )
+
+    CClientEffect * pEffect;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData( pEffect );
+
+    if ( !argStream.HasErrors ( ) )
+    {
+        lua_pushnumber( luaVM, pEffect->GetEffectDensity() );
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+
+    // Failed
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFxDefs::SetEffectDensity ( lua_State* luaVM )
+{
+    // void setEffectDensity ( effect theEffect, float fDensity )
+
+    CClientEffect * pEffect;
+    float fDensity;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData( pEffect );
+    argStream.ReadNumber ( fDensity );
+
+    if ( !argStream.HasErrors ( ) )
+    {
+        pEffect->SetEffectDensity ( fDensity );
+        lua_pushboolean ( luaVM, true );
+        return 1;
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );

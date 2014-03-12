@@ -507,6 +507,7 @@ private:
     static void                         StaticWorldSoundHandler         ( uint uiGroup, uint uiIndex );
     static void                         StaticGameEntityRenderHandler   ( CEntitySAInterface* pEntity );
     static void                         StaticTaskSimpleBeHitHandler    ( CPedSAInterface* pPedAttacker, ePedPieceTypes hitBodyPart, int hitBodySide, int weaponId );
+    static void                         StaticFxSystemDestructionHandler ( void * pFxSAInterface );
 
     bool                                DamageHandler                   ( CPed* pDamagePed, CEventDamage * pEvent );
     void                                DeathHandler                    ( CPed* pKilledPed, unsigned char ucDeathReason, unsigned char ucBodyPart );

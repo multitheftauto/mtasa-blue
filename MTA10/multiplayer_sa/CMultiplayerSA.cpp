@@ -283,6 +283,8 @@ DWORD JMP_DynamicObject_Cond_Zero = 0x548E98;
 #define HOOKPOS_CGlass_WindowRespondsToCollision           0x71BC40
 DWORD RETURN_CGlass_WindowRespondsToCollision = 0x71BC48;
 
+#define HOOKPOS_FxManager_c__DestroyFxSystem                0x4A989A
+
 CPed* pContextSwitchedPed = 0;
 CVector vecCenterOfWorld;
 FLOAT fFalseHeading;
@@ -350,6 +352,8 @@ VehicleCollisionHandler* m_pVehicleCollisionHandler = NULL;
 HeliKillHandler* m_pHeliKillHandler = NULL;
 ObjectDamageHandler* m_pObjectDamageHandler = NULL;
 ObjectBreakHandler* m_pObjectBreakHandler = NULL;
+FxSystemDestructionHandler* m_pFxSystemDestructionHandler = NULL;
+
 CEntitySAInterface * dwSavedPlayerPointer = 0;
 CEntitySAInterface * activeEntityForStreaming = 0; // the entity that the streaming system considers active
 
@@ -488,6 +492,7 @@ void HOOK_CObject_ProcessBreak ();
 void HOOK_CObject_ProcessCollision ();
 void HOOK_CGlass_WindowRespondsToCollision ();
 
+void HOOK_FxManager_c__DestroyFxSystem ();
 
 CMultiplayerSA::CMultiplayerSA()
 {
@@ -687,6 +692,9 @@ void CMultiplayerSA::InitHooks()
     HookInstall ( HOOKPOS_CObject_ProcessBreak, (DWORD)HOOK_CObject_ProcessBreak, 5 );
     HookInstall ( HOOKPOS_CObject_ProcessCollision, (DWORD)HOOK_CObject_ProcessCollision, 10 );
     HookInstall ( HOOKPOS_CGlass_WindowRespondsToCollision, (DWORD)HOOK_CGlass_WindowRespondsToCollision, 8 );
+
+    // Post-destruction hook for FxSystems
+    HookInstall ( HOOKPOS_FxManager_c__DestroyFxSystem, (DWORD)HOOK_FxManager_c__DestroyFxSystem, 5);
 
     // Disable GTA setting g_bGotFocus to false when we minimize
     MemSet ( (void *)ADDR_GotFocus, 0x90, pGameInterface->GetGameVersion () == VERSION_EU_10 ? 6 : 10 );
@@ -2149,6 +2157,11 @@ void CMultiplayerSA::SetObjectDamageHandler ( ObjectDamageHandler * pHandler )
 void CMultiplayerSA::SetObjectBreakHandler ( ObjectBreakHandler * pHandler )
 {
     m_pObjectBreakHandler = pHandler;
+}
+
+void CMultiplayerSA::SetFxSystemDestructionHandler ( FxSystemDestructionHandler * pHandler )
+{
+    m_pFxSystemDestructionHandler = pHandler;
 }
 
 // What we do here is check if the idle handler has been set
@@ -6487,5 +6500,34 @@ void _declspec(naked) HOOK_CGlass_WindowRespondsToCollision ()
             popad
             retn
         }
+    }
+}
+
+void * pFxSystemToBeDestroyed;
+void FxManager_c__DestroyFxSystem()
+{
+    m_pFxSystemDestructionHandler(pFxSystemToBeDestroyed);
+}
+
+void _declspec(naked) HOOK_FxManager_c__DestroyFxSystem ()
+{
+    _asm
+    {
+        mov pFxSystemToBeDestroyed, edi
+        pushad
+    }
+
+    FxManager_c__DestroyFxSystem();
+
+    _asm
+    {
+        popad
+
+        // Replaced code
+        add esp, 4
+        pop edi
+        pop ebx
+        pop ecx
+        retn 4
     }
 }

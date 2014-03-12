@@ -430,6 +430,7 @@ bool CStaticFunctionDefinitions::GetElementRotation ( CClientEntity& Entity, CVe
             break;
         }
         case CCLIENTCAMERA:
+        case CCLIENTEFFECT:
         {
             Entity.GetRotationDegrees( vecRotation );
             break;
@@ -1087,6 +1088,7 @@ bool CStaticFunctionDefinitions::SetElementRotation ( CClientEntity& Entity, con
             break;
         }
         case CCLIENTCAMERA:
+        case CCLIENTEFFECT:
         {
             Entity.SetRotationDegrees( vecRotation );
             break;
@@ -7132,6 +7134,14 @@ bool CStaticFunctionDefinitions::FxAddFootSplash ( CVector & vecPosition )
 {
     g_pGame->GetFx ()->TriggerFootSplash ( vecPosition );
     return true;
+}
+
+CClientEffect* CStaticFunctionDefinitions::CreateEffect(CResource& Resource, const SString &strFxName, const CVector &vecPosition)
+{
+    CClientEffect * pFx =  m_pManager->GetEffectManager()->Create(strFxName, vecPosition, INVALID_ELEMENT_ID);
+    if ( pFx )
+        pFx->SetParent ( Resource.GetResourceDynamicEntity () );
+    return pFx;
 }
 
 

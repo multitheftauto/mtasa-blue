@@ -268,6 +268,7 @@ CClientGame::CClientGame ( bool bLocalPlay )
     g_pMultiplayer->SetGameProjectileDestructHandler( CClientGame::StaticGameProjectileDestructHandler );
     g_pMultiplayer->SetGameModelRemoveHandler( CClientGame::StaticGameModelRemoveHandler );
     g_pMultiplayer->SetGameEntityRenderHandler( CClientGame::StaticGameEntityRenderHandler );
+    g_pMultiplayer->SetFxSystemDestructionHandler ( CClientGame::StaticFxSystemDestructionHandler );
     g_pGame->SetPreWeaponFireHandler ( CClientGame::PreWeaponFire );
     g_pGame->SetPostWeaponFireHandler ( CClientGame::PostWeaponFire );
     g_pGame->SetTaskSimpleBeHitHandler ( CClientGame::StaticTaskSimpleBeHitHandler );
@@ -3779,6 +3780,11 @@ void CClientGame::StaticGameEntityRenderHandler ( CEntitySAInterface* pGameEntit
 void CClientGame::StaticTaskSimpleBeHitHandler ( CPedSAInterface* pPedAttacker, ePedPieceTypes hitBodyPart, int hitBodySide, int weaponId )
 {
     g_pClientGame->TaskSimpleBeHitHandler ( pPedAttacker, hitBodyPart, hitBodySide, weaponId );
+}
+
+void CClientGame::StaticFxSystemDestructionHandler ( void * pFxSAInterface )
+{
+    g_pClientGame->GetManager()->GetEffectManager()->SAEffectDestroyed( pFxSAInterface );
 }
 
 void CClientGame::DrawRadarAreasHandler ( void )

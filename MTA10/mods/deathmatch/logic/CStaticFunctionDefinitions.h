@@ -613,6 +613,7 @@ public:
     static bool                         FxAddWaterSplash                    ( CVector & vecPosition );
     static bool                         FxAddBulletSplash                   ( CVector & vecPosition );
     static bool                         FxAddFootSplash                     ( CVector & vecPosition );
+    static CClientEffect*               CreateEffect                        ( CResource& Resource, const SString& strFxName, const CVector& vecPosition );
 
     // Sound funcs
     static CClientSound*                PlaySound                           ( CResource* pResource, const SString& strSound, bool bIsURL, bool bLoop );
