@@ -3828,7 +3828,7 @@ void CClientPed::ProcessRebuildPlayer ( bool bNeedsClothesUpdate )
 
 void CClientPed::StreamIn ( bool bInstantly )
 {
-    if ( m_bIsLocalPlayer )
+    if ( m_bIsLocalPlayer && !m_pPlayerPed )
     {
         NotifyCreate ();
         return;
