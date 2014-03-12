@@ -19,31 +19,12 @@ namespace
     GameProjectileDestructHandler*  pGameProjectileDestructHandler  = NULL;
     GameModelRemoveHandler*         pGameModelRemoveHandler         = NULL;
 
-    #define ARRAY_StreamSectors                                 0xB7D0B8
-    #define NUM_StreamSectorRows                                120
-    #define NUM_StreamSectorCols                                120
-    #define ARRAY_StreamRepeatSectors                           0xB992B8
-    #define NUM_StreamRepeatSectorRows                          16
-    #define NUM_StreamRepeatSectorCols                          16
-
-    #define ARRAY_BuildingSectors   ((SStreamSectorEntrySingle**)( (ARRAY_StreamSectors) + 0 ))
-    #define ARRAY_VehicleSectors    ((SStreamSectorEntryDouble**)( (ARRAY_StreamRepeatSectors) + 0 ))
-    #define ARRAY_PedSectors        ((SStreamSectorEntryDouble**)( (ARRAY_StreamRepeatSectors) + 4 ))
-    #define ARRAY_ObjectSectors     ((SStreamSectorEntryDouble**)( (ARRAY_StreamRepeatSectors) + 8 ))
-    #define ARRAY_DummySectors      ((SStreamSectorEntryDouble**)( (ARRAY_StreamSectors) + 4 ))
-
-    #define NUM_BuildingSectors     ( NUM_StreamSectorRows * NUM_StreamSectorCols )
-    #define NUM_VehicleSectors      ( NUM_StreamRepeatSectorRows * NUM_StreamRepeatSectorCols )
-    #define NUM_PedSectors          ( NUM_StreamRepeatSectorRows * NUM_StreamRepeatSectorCols )
-    #define NUM_ObjectSectors       ( NUM_StreamRepeatSectorRows * NUM_StreamRepeatSectorCols )
-    #define NUM_DummySectors        ( NUM_StreamSectorRows * NUM_StreamSectorCols )
-
     #define FUNC_CPtrListSingleLink_Remove  0x0533610
     #define FUNC_CPtrListDoubleLink_Remove  0x05336B0
 
     struct SStreamSectorEntrySingle
     {
-        CEntitySAInterface*     pEntity;
+        CEntitySAInterface*         pEntity;
         SStreamSectorEntrySingle*   pNext;
     };
 
@@ -81,26 +62,6 @@ namespace
 
 
     //
-    // Log problem
-    //
-    void LogSectorMessage( uint uiId, const char* szContext, CEntitySAInterface* pCheckEntity, CEntitySAInterface* pEntity, uint n )
-    {
-        SString strMsg( "n:%-5d  vtbl:%08x  ", n, pEntity->vtbl );
-        if ( pCheckEntity )
-        {
-            CVector vPos;
-            bool bHasMatrix = ( pCheckEntity->Placeable.matrix != NULL );
-            if ( bHasMatrix )
-                vPos = pCheckEntity->Placeable.matrix->vPos;
-            else
-                vPos = pCheckEntity->Placeable.m_transform.m_translate; 
-            strMsg += SString( "Type:%d  Model:%-5d  HasMatrix:%d  Pos:%0.1f,%0.1f,%0.1f  ", pCheckEntity->nType, pCheckEntity->m_nModelIndex, bHasMatrix, vPos.fX, vPos.fY, vPos.fZ );
-        }
-        LogEvent ( uiId, "CheckSectors", szContext, strMsg, 8000 + uiId );
-    }
-
-
-    //
     // CPtrListSingleLink contains item
     //
     bool CPtrListSingleLink_Contains( SStreamSectorEntrySingle* pStreamEntry, CEntitySAInterface* pCheckEntity )
@@ -114,17 +75,16 @@ namespace
     //
     // CPtrListSingleLink remove item
     //
-    void CPtrListSingleLink_Remove( SStreamSectorEntrySingle** ppStreamEntryList, CEntitySAInterface* pCheckEntity, const char* szContext )
-            {
-        LogSectorMessage( 903, szContext, pCheckEntity, pCheckEntity, pCheckEntity->nType );
+    void CPtrListSingleLink_Remove( SStreamSectorEntrySingle** ppStreamEntryList, CEntitySAInterface* pCheckEntity )
+    {
         DWORD dwFunc = FUNC_CPtrListSingleLink_Remove;
         _asm
-                {
+        {
             mov     ecx, ppStreamEntryList
             push    pCheckEntity
             call    dwFunc
-                }
-                }
+        }
+    }
 
     //
     // CPtrListDoubleLink contains item
@@ -135,24 +95,57 @@ namespace
             if ( pStreamEntry->pEntity == pCheckEntity )
                 return true;
         return false;
-        }
+    }
 
     //
     // CPtrListDoubleLink remove item
     //
-    void CPtrListDoubleLink_Remove( SStreamSectorEntryDouble** ppStreamEntryList, CEntitySAInterface* pCheckEntity, const char* szContext )
-        {
-        LogSectorMessage( 904, szContext, pCheckEntity, pCheckEntity, pCheckEntity->nType );
+    void CPtrListDoubleLink_Remove( SStreamSectorEntryDouble** ppStreamEntryList, CEntitySAInterface* pCheckEntity )
+    {
         DWORD dwFunc = FUNC_CPtrListDoubleLink_Remove;
         _asm
-                {
+        {
             mov     ecx, ppStreamEntryList
             push    pCheckEntity
             call    dwFunc
         }
     }
 
+    //
+    // Ensure entity is removed from previously added stream sectors
+    //
+    void RemoveEntityFromStreamSectors( CEntitySAInterface* pEntity, bool bRemoveExtraInfo )
+    {
+        SEntitySAInterfaceExtraInfo* pInfo = MapFind( ms_EntitySAInterfaceExtraInfoMap, pEntity );
+        if ( !pInfo )
+            return;
+        SEntitySAInterfaceExtraInfo& info = *pInfo;
+
+        // Check single link sectors
+        for( uint i = 0 ; i < info.AddedSectorSingleList.size() ; i++ )
+        {
+            if ( CPtrListSingleLink_Contains( *info.AddedSectorSingleList[i], pEntity ) )
+            {
+                CPtrListSingleLink_Remove( info.AddedSectorSingleList[i], pEntity );
+            }
+        }
+        info.AddedSectorSingleList.clear();
+
+        // Check double link sectors
+        for( uint i = 0 ; i < info.AddedSectorDoubleList.size() ; i++ )
+        {
+            if ( CPtrListDoubleLink_Contains( *info.AddedSectorDoubleList[i], pEntity ) )
+            {
+                CPtrListDoubleLink_Remove( info.AddedSectorDoubleList[i], pEntity );
+            }
+        }
+        info.AddedSectorDoubleList.clear();
+
+        if ( bRemoveExtraInfo )
+            RemoveEntitySAInterfaceExtraInfo( pEntity );
+    }
 }
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -279,136 +272,9 @@ void _declspec(naked) HOOK_CProjectileDestructor()
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
 //
-void _cdecl OnCBuildingDestructor ( DWORD calledFrom, CEntitySAInterface* pBuilding )
-{
-}
-
-
-// Hook info
-#define HOOKPOS_CBuildingDestructor        0x404134
-#define HOOKSIZE_CBuildingDestructor       5
-DWORD RETURN_CBuildingDestructor =         0x404139;
-void _declspec(naked) HOOK_CBuildingDestructor()
-{
-    _asm
-    {
-        pushad
-        push    ecx
-        push    [esp+32+4*1]
-        call    OnCBuildingDestructor
-        add     esp, 4*2
-        popad
-
-        mov     eax, 0x404180       // CBuilding::~CBuilding()
-        call    eax 
-        jmp     RETURN_CBuildingDestructor
-    }
-}
-
-
-////////////////////////////////////////////////////////////////////////////////////////////////
-//
 void _cdecl OnCEntityDestructor ( DWORD calledFrom, CEntitySAInterface* pEntity )
 {
-    if ( pEntity->nType == 1 )
-    {
-        // Type 1 - CBuilding
-        for ( unsigned int n = 0 ; n < NUM_BuildingSectors; n++ )
-        {
-            SStreamSectorEntrySingle** ppStreamEntryList = &ARRAY_BuildingSectors[ n * 2 ];
-
-            if ( CPtrListSingleLink_Contains( *ppStreamEntryList, pEntity ) )
-            {
-                CPtrListSingleLink_Remove( ppStreamEntryList, pEntity, "(old) Entity in sectors at delete" );
-                n--;
-            }
-        }
-    }
-    else
-    if ( pEntity->nType == 2 )
-    {
-        // Type 2 - CVehicle
-        for ( unsigned int n = 0 ; n < NUM_VehicleSectors; n++ )
-        {
-            SStreamSectorEntryDouble** ppStreamEntryList = &ARRAY_VehicleSectors[ n * 3 ];
-
-            if ( CPtrListDoubleLink_Contains( *ppStreamEntryList, pEntity ) )
-            {
-                CPtrListDoubleLink_Remove( ppStreamEntryList, pEntity, "(old) Entity in sectors at delete" );
-                n--;
-            }
-        }
-    }
-    if ( pEntity->nType == 3 )
-    {
-        // Type 3 - CPed
-        for ( unsigned int n = 0 ; n < NUM_PedSectors; n++ )
-        {
-            SStreamSectorEntryDouble** ppStreamEntryList = &ARRAY_PedSectors[ n * 3 ];
-
-            if ( CPtrListDoubleLink_Contains( *ppStreamEntryList, pEntity ) )
-            {
-                CPtrListDoubleLink_Remove( ppStreamEntryList, pEntity, "(old) Entity in sectors at delete" );
-                n--;
-            }
-        }
-    }
-    if ( pEntity->nType == 4 )
-    {
-        // Type 4 - CObject
-        for ( unsigned int n = 0 ; n < NUM_ObjectSectors; n++ )
-        {
-            SStreamSectorEntryDouble** ppStreamEntryList = &ARRAY_ObjectSectors[ n * 3 ];
-
-            if ( CPtrListDoubleLink_Contains( *ppStreamEntryList, pEntity ) )
-            {
-                CPtrListDoubleLink_Remove( ppStreamEntryList, pEntity, "(old) Entity in sectors at delete" );
-                n--;
-            }
-        }
-    }
-    else
-    if ( pEntity->nType == 5 )
-    {
-        // Type 5 - CDummy
-        for ( unsigned int n = 0 ; n < NUM_DummySectors; n++ )
-        {
-            SStreamSectorEntryDouble** ppStreamEntryList = &ARRAY_DummySectors[ n * 2 ];
-
-            if ( CPtrListDoubleLink_Contains( *ppStreamEntryList, pEntity ) )
-            {
-                CPtrListDoubleLink_Remove( ppStreamEntryList, pEntity, "(old) Entity in sectors at delete" );
-                n--;
-            }
-        }
-    }
-
-    if ( HasEntitySAInterfaceExtraInfo( pEntity ) )
-    {
-        SEntitySAInterfaceExtraInfo& info = GetEntitySAInterfaceExtraInfo( pEntity );
-
-        // Check single link sectors
-        for( uint i = 0 ; i < info.AddedSectorSingleList.size() ; i++ )
-        {
-            if ( CPtrListSingleLink_Contains( *info.AddedSectorSingleList[i], pEntity ) )
-            {
-                CPtrListSingleLink_Remove( info.AddedSectorSingleList[i], pEntity, "(new2) Entity in sectors at delete" );
-            }
-        }
-        info.AddedSectorSingleList.clear();
-
-        // Check double link sectors
-        for( uint i = 0 ; i < info.AddedSectorDoubleList.size() ; i++ )
-        {
-            if ( CPtrListDoubleLink_Contains( *info.AddedSectorDoubleList[i], pEntity ) )
-            {
-                CPtrListDoubleLink_Remove( info.AddedSectorDoubleList[i], pEntity, "(new2) Entity in sectors at delete" );
-            }
-        }
-        info.AddedSectorDoubleList.clear();
-
-        RemoveEntitySAInterfaceExtraInfo( pEntity );
-    }
+    RemoveEntityFromStreamSectors( pEntity, true );
 }
 
 
@@ -537,30 +403,9 @@ void _declspec(naked) HOOK_CEntityAddMid3()
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
 //
-void cdecl OnCEntityRemovePost ( CEntitySAInterface* pEntitySAInterface )
+void cdecl OnCEntityRemovePost ( CEntitySAInterface* pEntity )
 {
-    // Ensure entity has been removed from previously added sectors
-    SEntitySAInterfaceExtraInfo& info = GetEntitySAInterfaceExtraInfo( pEntitySAInterface );
-
-    // Check single link sectors
-    for( uint i = 0 ; i < info.AddedSectorSingleList.size() ; i++ )
-    {
-        if ( CPtrListSingleLink_Contains( *info.AddedSectorSingleList[i], pEntitySAInterface ) )
-        {
-            CPtrListSingleLink_Remove( info.AddedSectorSingleList[i], pEntitySAInterface, "(new) Entity in sectors at delete" );
-        }
-    }
-    info.AddedSectorSingleList.clear();
-
-    // Check double link sectors
-    for( uint i = 0 ; i < info.AddedSectorDoubleList.size() ; i++ )
-    {
-        if ( CPtrListDoubleLink_Contains( *info.AddedSectorDoubleList[i], pEntitySAInterface ) )
-        {
-            CPtrListDoubleLink_Remove( info.AddedSectorDoubleList[i], pEntitySAInterface, "(new) Entity in sectors at delete" );
-        }
-    }
-    info.AddedSectorDoubleList.clear();
+    RemoveEntityFromStreamSectors( pEntity, false );
 }
 
 
@@ -667,7 +512,6 @@ void CMultiplayerSA::InitHooks_HookDestructors ( void )
    EZHookInstall ( CVehicleDestructor );
    EZHookInstall ( CProjectileDestructor );
    EZHookInstall ( CPlayerPedDestructor );
-   EZHookInstall ( CBuildingDestructor );
    EZHookInstall ( CEntityDestructor );
    EZHookInstall ( CStreamingRemoveModel );
    EZHookInstall ( CEntityAddMid1 );
