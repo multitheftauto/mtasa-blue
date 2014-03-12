@@ -36,6 +36,11 @@ public:
     LUA_DECLARE ( fxAddWaterSplash );
     LUA_DECLARE ( fxAddBulletSplash );
     LUA_DECLARE ( fxAddFootSplash );
+    LUA_DECLARE ( CreateEffect );
+    LUA_DECLARE ( SetEffectSpeed );
+    LUA_DECLARE ( GetEffectSpeed );
+    LUA_DECLARE ( SetEffectDensity );
+    LUA_DECLARE ( GetEffectDensity );
 };
 
 #endif

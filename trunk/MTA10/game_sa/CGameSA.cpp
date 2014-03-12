@@ -105,6 +105,7 @@ CGameSA::CGameSA()
     this->m_pKeyGen                 = new CKeyGenSA;
     this->m_pRopes                  = new CRopesSA;
     this->m_pFx                     = new CFxSA ( (CFxSAInterface *)CLASS_CFx );
+    this->m_pFxManager              = new CFxManagerSA ( (CFxManagerSAInterface *)CLASS_CFxManager );
     this->m_pWaterManager           = new CWaterManagerSA ();
     this->m_pWeaponStatsManager     = new CWeaponStatManagerSA ();
     this->m_pPointLights            = new CPointLightsSA ();

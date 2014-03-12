@@ -106,6 +106,7 @@ public:
     void                        SetGameProjectileDestructHandler( GameProjectileDestructHandler * pHandler );
     void                        SetGameModelRemoveHandler       ( GameModelRemoveHandler * pHandler );
     void                        SetGameEntityRenderHandler  ( GameEntityRenderHandler * pHandler );
+    void                        SetFxSystemDestructionHandler ( FxSystemDestructionHandler * pHandler );
 
     void                        AllowMouseMovement          ( bool bAllow );
     void                        DoSoundHacksOnLostFocus     ( bool bLostFocus );

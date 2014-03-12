@@ -753,6 +753,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\shared_logic\CClientEffect.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\shared_logic\CClientEffectManager.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\shared_logic\CClientEntity.cpp"
 					>
 				</File>
@@ -2344,6 +2352,14 @@
 				</File>
 				<File
 					RelativePath="..\shared_logic\CClientDxFont.h"
+					>
+				</File>
+				<File
+					RelativePath="..\shared_logic\CClientEffect.h"
+					>
+				</File>
+				<File
+					RelativePath="..\shared_logic\CClientEffectManager.h"
 					>
 				</File>
 				<File

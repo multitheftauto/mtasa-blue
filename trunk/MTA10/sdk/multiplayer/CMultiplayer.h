@@ -77,6 +77,7 @@ typedef void ( GamePlayerDestructHandler ) ( CEntitySAInterface* pPlayer );
 typedef void ( GameProjectileDestructHandler ) ( CEntitySAInterface* pProjectile );
 typedef void ( GameModelRemoveHandler ) ( ushort usModelId );
 typedef void ( GameEntityRenderHandler ) ( CEntitySAInterface* pEntity );
+typedef void ( FxSystemDestructionHandler ) ( void* pFxSA );
 
 /**
  * This class contains information used for shot syncing, one exists per player.
@@ -186,6 +187,7 @@ public:
     virtual void                        SetGameProjectileDestructHandler( GameProjectileDestructHandler * pHandler ) = 0;
     virtual void                        SetGameModelRemoveHandler       ( GameModelRemoveHandler * pHandler ) = 0;
     virtual void                        SetGameEntityRenderHandler      ( GameEntityRenderHandler * pHandler ) = 0;
+    virtual void                        SetFxSystemDestructionHandler   ( FxSystemDestructionHandler * pHandler ) = 0;
 
     virtual void                        AllowMouseMovement          ( bool bAllow ) = 0;
     virtual void                        DoSoundHacksOnLostFocus     ( bool bLostFocus ) = 0;
