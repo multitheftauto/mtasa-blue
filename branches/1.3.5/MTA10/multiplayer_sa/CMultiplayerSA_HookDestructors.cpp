@@ -386,10 +386,26 @@ void _cdecl OnCEntityDestructor ( DWORD calledFrom, CEntitySAInterface* pEntity 
     if ( HasEntitySAInterfaceExtraInfo( pEntity ) )
     {
         SEntitySAInterfaceExtraInfo& info = GetEntitySAInterfaceExtraInfo( pEntity );
-        if ( !info.AddedSectorSingleList.empty() )
-            LogSectorMessage( 905, "Entity AddedSectorSingleList not empty at delete", pEntity, pEntity, pEntity->nType );
-        if ( !info.AddedSectorDoubleList.empty() )
-            LogSectorMessage( 906, "Entity AddedSectorDoubleList not empty at delete", pEntity, pEntity, pEntity->nType );
+
+        // Check single link sectors
+        for( uint i = 0 ; i < info.AddedSectorSingleList.size() ; i++ )
+        {
+            if ( CPtrListSingleLink_Contains( *info.AddedSectorSingleList[i], pEntity ) )
+            {
+                CPtrListSingleLink_Remove( info.AddedSectorSingleList[i], pEntity, "(new2) Entity in sectors at delete" );
+            }
+        }
+        info.AddedSectorSingleList.clear();
+
+        // Check double link sectors
+        for( uint i = 0 ; i < info.AddedSectorDoubleList.size() ; i++ )
+        {
+            if ( CPtrListDoubleLink_Contains( *info.AddedSectorDoubleList[i], pEntity ) )
+            {
+                CPtrListDoubleLink_Remove( info.AddedSectorDoubleList[i], pEntity, "(new2) Entity in sectors at delete" );
+            }
+        }
+        info.AddedSectorDoubleList.clear();
 
         RemoveEntitySAInterfaceExtraInfo( pEntity );
     }
