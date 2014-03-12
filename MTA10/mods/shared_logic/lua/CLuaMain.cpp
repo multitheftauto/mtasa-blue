@@ -793,6 +793,19 @@ void CLuaMain::AddWeaponClass ( lua_State* luaVM )
 }
 
 
+void CLuaMain::AddEffectClass ( lua_State* luaVM )
+{
+    lua_newclass ( luaVM );
+
+    lua_classfunction ( luaVM, "create", "createEffect" );
+    
+    lua_classvariable ( luaVM, "density", "setEffectDensity", "getEffectDensity" );
+    lua_classvariable ( luaVM, "speed", "setEffectSpeed", "getEffectSpeed" );
+
+    lua_registerclass ( luaVM, "Effect", "Element" );
+}
+
+
 void CLuaMain::AddGuiElementClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
@@ -1088,6 +1101,7 @@ void CLuaMain::InitClasses ( lua_State* luaVM )
     AddWaterClass ( luaVM );
     AddSoundClass ( luaVM );
     AddWeaponClass ( luaVM );
+    AddEffectClass ( luaVM );
 
     AddGuiElementClass ( luaVM );
     AddGuiWindowClass ( luaVM );
