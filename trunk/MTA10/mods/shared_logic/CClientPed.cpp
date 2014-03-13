@@ -4941,6 +4941,11 @@ void CClientPed::Respawn ( CVector * pvecPosition, bool bRestoreState, bool bCam
         SetFrozenWaitingForGroundToLoad ( true );
         if ( m_pPlayerPed )
         {
+            // Detach us
+            CClientEntity* pAttachedTo = GetAttachedTo ();
+            if ( pAttachedTo && pAttachedTo->IsEntityAttached ( this ) )
+                InternalAttachTo ( NULL );
+
             // Detach our attached entities
             for ( uint i = 0 ; i < m_AttachedEntities.size () ; i++ )
             {
@@ -4985,6 +4990,10 @@ void CClientPed::Respawn ( CVector * pvecPosition, bool bRestoreState, bool bCam
             }        
             // Restore the camera's interior whether we're restoring player states or not
             g_pGame->GetWorld ()->SetCurrentArea ( ucCameraInterior );
+
+            // Reattach us
+            if ( pAttachedTo && pAttachedTo->IsEntityAttached ( this ) )
+                InternalAttachTo ( pAttachedTo );
 
             // Reattach our attached entities
             for ( uint i = 0 ; i < m_AttachedEntities.size () ; i++ )
