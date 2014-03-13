@@ -32,7 +32,7 @@ private:
 public:
                     CProjectileSA(class CProjectileSAInterface * projectileInterface);
                     ~CProjectileSA( );
-    void            Destroy();
+    void            Destroy( bool bBlow = true );
     
     void            SetProjectileInfo ( CProjectileInfo* pProjectileInfo ) { projectileInfo = pProjectileInfo; }
 };

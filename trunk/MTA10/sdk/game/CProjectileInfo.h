@@ -21,9 +21,10 @@ public:
     virtual CProjectile *           GetProjectile ( DWORD ID ) = 0;
     virtual CProjectile *           GetProjectile ( void * projectilePointer )=0; //hack, don't use please
     virtual CProjectileInfo         * GetProjectileInfo ( void * projectileInfoInterface )=0; //don't use
-    virtual void                    RemoveProjectile ( CProjectileInfo * pProjectileInfo, CProjectile * pProjectile )=0;
+    virtual void                    RemoveProjectile ( CProjectileInfo * pProjectileInfo, CProjectile * pProjectile, bool bBlow = true )=0;
     virtual CProjectileInfo         * GetNextFreeProjectileInfo ( )=0;
     virtual CProjectileInfo         * GetProjectileInfo ( DWORD Index )=0;
+    virtual void                    RemoveAllProjectiles ( ) = 0;
 
     virtual CEntity*                GetTarget ( void ) = 0;
     virtual void                    SetTarget ( CEntity* pEntity ) = 0;
@@ -31,7 +32,6 @@ public:
     virtual bool                    IsActive ( void ) = 0;
 
     virtual void                    SetCounter ( DWORD dwCounter ) = 0;
-
     virtual DWORD                   GetCounter ( void ) = 0;
 };
 

@@ -4681,16 +4681,17 @@ void CClientPed::DestroySatchelCharges ( bool bBlow, bool bDestroy )
 
     CClientProjectile * pProjectile = NULL;
     CVector vecPosition;
-    if ( bBlow )
+    
+    list < CClientProjectile* > ::iterator iter = m_Projectiles.begin ();
+    while ( iter != m_Projectiles.end () )
     {
-        list < CClientProjectile* > ::iterator iter = m_Projectiles.begin ();
-        while ( iter != m_Projectiles.end () )
+        pProjectile = *iter;
+
+        if ( pProjectile->GetWeaponType () == WEAPONTYPE_REMOTE_SATCHEL_CHARGE )
         {
-            pProjectile = *iter;
-            if ( pProjectile->GetWeaponType () == WEAPONTYPE_REMOTE_SATCHEL_CHARGE )
+            if ( bBlow )
             {
                 pProjectile->GetPosition ( vecPosition );
-
                 CLuaArguments Arguments;
                 Arguments.PushNumber ( vecPosition.fX );
                 Arguments.PushNumber ( vecPosition.fY );
@@ -4701,11 +4702,13 @@ void CClientPed::DestroySatchelCharges ( bool bBlow, bool bDestroy )
                 if ( !bCancelExplosion )
                     m_pManager->GetExplosionManager ()->Create ( EXP_TYPE_GRENADE, vecPosition, this, true, -1.0f, false, WEAPONTYPE_REMOTE_SATCHEL_CHARGE );
             }
-            iter++;
+            if ( bDestroy )
+            {
+                pProjectile->Destroy ( bBlow );
+            }
         }
+        iter++;
     }
-    if ( bDestroy )
-        RemoveAllProjectiles ( );
 
     m_bDestroyingSatchels = false;
 }
