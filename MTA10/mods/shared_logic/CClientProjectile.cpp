@@ -160,11 +160,11 @@ void CClientProjectile::Initiate ( CVector * pvecPosition, CVector * pvecRotatio
 }
 
 
-void CClientProjectile::Destroy ( void )
+void CClientProjectile::Destroy ( bool bBlow )
 {
     if ( m_pProjectile )
     {
-        m_pProjectile->Destroy ();
+        m_pProjectile->Destroy ( bBlow );
     }
 }
 
