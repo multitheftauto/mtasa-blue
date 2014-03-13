@@ -71,7 +71,7 @@ void DirectX9Texture::loadFromFile(const String& filename, const String& resourc
 
 	D3DXIMAGE_INFO texInfo;
 	HRESULT hr = D3DXCreateTextureFromFileInMemoryEx(((DirectX9Renderer*)getRenderer())->getDevice(), texFile.getDataPtr(),
-            static_cast<UINT>(texFile.getSize()), D3DX_DEFAULT, D3DX_DEFAULT, 1, 0, D3DFMT_UNKNOWN, D3DPOOL_MANAGED,
+            static_cast<UINT>(texFile.getSize()), D3DX_DEFAULT_NONPOW2, D3DX_DEFAULT_NONPOW2, 1, 0, D3DFMT_UNKNOWN, D3DPOOL_MANAGED,
             D3DX_DEFAULT, D3DX_DEFAULT, 0, &texInfo, NULL, &d_d3dtexture);
 	
 	System::getSingleton().getResourceProvider()->unloadRawDataContainer(texFile);
