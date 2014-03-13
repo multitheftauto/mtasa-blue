@@ -1401,6 +1401,11 @@ void CMultiplayerSA::InitHooks()
     MemPut( 0x6DADF8, &m_fAircraftMaxVelocity );
     MemPut( 0x6DAE01, &m_fAircraftMaxVelocity );
 
+    // Disable calls to CFireManager::ExtinguishPoint and CWorld::ExtinguishAllCarFiresInArea  
+    // from CWorld::ClearExcitingStuffFromArea
+    MemSet( (void*)0x56A404, 0x90, 0x56A446-0x56A404 );
+
+
     InitHooks_CrashFixHacks ();
 
     // Init our 1.3 hooks.
