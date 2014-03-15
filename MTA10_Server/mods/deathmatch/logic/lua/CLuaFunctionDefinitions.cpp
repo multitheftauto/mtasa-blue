@@ -6700,7 +6700,7 @@ int CLuaFunctionDefinitions::CreateBlipAttachedTo ( lua_State* luaVM )
     
     if ( !argStream.HasErrors() )
     {
-        CResource * resource = m_pResourceManager->GetResourceFromLuaState( luaVM );
+        CResource * resource = m_pLuaManager->GetVirtualMachine ( luaVM )->GetResource();
         if ( resource )
         {
             // Create the blip
@@ -12358,7 +12358,7 @@ int CLuaFunctionDefinitions::GetServerPort ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::Set ( lua_State* luaVM )
 {
-    CResource* pResource = m_pResourceManager->GetResourceFromLuaState ( luaVM );
+    CResource* pResource = m_pLuaManager->GetVirtualMachine ( luaVM )->GetResource();
     SString strSetting;
     CLuaArguments Args;
 
@@ -12397,7 +12397,7 @@ int CLuaFunctionDefinitions::Set ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::Get ( lua_State* luaVM )
 {
-    CResource* pResource = m_pResourceManager->GetResourceFromLuaState ( luaVM );
+    CResource* pResource = m_pLuaManager->GetVirtualMachine ( luaVM )->GetResource();
     SString strSetting;
     CLuaArguments Args;
 
