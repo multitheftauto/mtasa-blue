@@ -483,7 +483,7 @@ int CLuaFxDefs::CreateEffect ( lua_State* luaVM )
     CScriptArgReader argStream ( luaVM );
     argStream.ReadString ( strFxName );
     argStream.ReadVector3D ( vecPosition );
-    argStream.ReadVector3D ( vecRotation );
+    argStream.ReadVector3D ( vecRotation, CVector(0, 0, 0) );
 
     if ( !argStream.HasErrors ( ) )
     {

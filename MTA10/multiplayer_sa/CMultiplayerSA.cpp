@@ -6511,7 +6511,8 @@ void _declspec(naked) HOOK_CGlass_WindowRespondsToCollision ()
 void * pFxSystemToBeDestroyed;
 void FxManager_c__DestroyFxSystem()
 {
-    m_pFxSystemDestructionHandler(pFxSystemToBeDestroyed);
+    if ( m_pFxSystemDestructionHandler )
+        m_pFxSystemDestructionHandler(pFxSystemToBeDestroyed);
 }
 
 void _declspec(naked) HOOK_FxManager_c__DestroyFxSystem ()
