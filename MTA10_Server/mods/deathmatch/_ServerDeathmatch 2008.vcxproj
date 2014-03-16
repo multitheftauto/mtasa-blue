@@ -1,0 +1,1155 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Nightly|Win32">
+      <Configuration>Nightly</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Nightly|x64">
+      <Configuration>Nightly</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectName>Server - Deathmatch</ProjectName>
+    <ProjectGuid>{DC99F9D4-7C17-4A36-9F21-CEE075E42292}</ProjectGuid>
+    <RootNamespace>Server - Deathmatch</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Nightly|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v90</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v90</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v90</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Nightly|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v90</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v90</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v90</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Nightly|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+    <Import Project="..\..\..\Shared\MTAPropertySheet.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+    <Import Project="..\..\..\Shared\MTAPropertySheet.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+    <Import Project="..\..\..\Shared\MTAPropertySheet.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Nightly|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+    <Import Project="..\..\..\Shared\MTAPropertySheet.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+    <Import Project="..\..\..\Shared\MTAPropertySheet.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+    <Import Project="..\..\..\Shared\MTAPropertySheet.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>12.0.21005.1</_ProjectFileVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(MyTargetDir)\server\mods\deathmatch\</OutDir>
+    <IntDir>$(PlatformTarget)\$(Configuration)\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+    <PostBuildEventUseInBuild>true</PostBuildEventUseInBuild>
+    <TargetName>deathmatch</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>$(MyTargetDir)\server\$(PlatformTarget)\</OutDir>
+    <IntDir>$(PlatformTarget)\$(Configuration)\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+    <PostBuildEventUseInBuild>true</PostBuildEventUseInBuild>
+    <TargetName>deathmatch</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(MyTargetDir)\server\mods\deathmatch\</OutDir>
+    <IntDir>$(PlatformTarget)\$(Configuration)\</IntDir>
+    <LinkIncremental>true</LinkIncremental>
+    <TargetName>deathmatch_d</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>$(MyTargetDir)\server\$(PlatformTarget)\</OutDir>
+    <IntDir>$(PlatformTarget)\$(Configuration)\</IntDir>
+    <LinkIncremental>true</LinkIncremental>
+    <TargetName>deathmatch_d</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Nightly|Win32'">
+    <OutDir>../../../output/MTA San Andreas/server/mods/deathmatch/</OutDir>
+    <LinkIncremental>false</LinkIncremental>
+    <PostBuildEventUseInBuild>true</PostBuildEventUseInBuild>
+    <TargetName>deathmatch</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Nightly|x64'">
+    <OutDir>../../../output/MTA San Andreas/server/$(PlatformTarget)/</OutDir>
+    <LinkIncremental>false</LinkIncremental>
+    <PostBuildEventUseInBuild>true</PostBuildEventUseInBuild>
+    <TargetName>deathmatch</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Midl>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetEnvironment>Win32</TargetEnvironment>
+      <TypeLibraryName>.\Release/Race.tlb</TypeLibraryName>
+      <HeaderFileName />
+    </Midl>
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>true</OmitFramePointers>
+      <AdditionalIncludeDirectories>.;./logic;../../../vendor;../../../vendor/sqlite;../../../vendor/zlib/;../../../vendor/pcre;../../../vendor/pme;../../../vendor/pthreads/include;../../../Shared/publicsdk/include;logic/common;../../../vendor/zlib;../../../vendor/json-c;../../sdk;../../../Shared/sdk;../../../vendor/sparsehash/current/src;../../../vendor/sparsehash/current/src/windows;../../../Shared/animation;../../../vendor/bochs;../../../vendor/bob_withers;../../../vendor/zip;../../../vendor/lua/src;../../../vendor/pcre/shipped_for_mta;../../../vendor/json-c/shipped_for_mta;../../../Shared/mods/deathmatch/logic;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>StdInc.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>$(IntDir)$(TargetName).pch</PrecompiledHeaderOutputFile>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4996;4482;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0809</Culture>
+    </ResourceCompile>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+    <Link>
+      <AdditionalDependencies>lua5.1s.lib;wsock32.lib;zlib.lib;ehs.lib;pthreadVC2.lib;pme.lib;pcre3.lib;json.lib;psapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <AdditionalLibraryDirectories>logic/lib;../../../vendor/lua/$(PlatformTarget)/$(Configuration)Server;../../../vendor/json-c/$(PlatformTarget)/$(Configuration);../../../vendor/ehs/$(PlatformTarget)/$(Configuration);../../../vendor/pme/$(PlatformTarget)/$(Configuration);../../../vendor/pcre/$(PlatformTarget)/$(Configuration);../../../vendor/pthreads/lib/$(PlatformTarget);../../../vendor/zlib/$(PlatformTarget)/$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ProgramDatabaseFile>../../../symbols/$(Configuration)_$(SafeParentName).pdb</ProgramDatabaseFile>
+      <MapFileName />
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention />
+      <ImportLibrary>$(IntDir)$(TargetFileName).lib</ImportLibrary>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Midl>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetEnvironment>X64</TargetEnvironment>
+      <TypeLibraryName>.\Release/Race.tlb</TypeLibraryName>
+      <HeaderFileName />
+    </Midl>
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>true</OmitFramePointers>
+      <AdditionalIncludeDirectories>.;./logic;../../../vendor;../../../vendor/sqlite;../../../vendor/zlib/;../../../vendor/pcre;../../../vendor/pme;../../../vendor/pthreads/include;../../../Shared/publicsdk/include;logic/common;../../../vendor/zlib;../../../vendor/json-c;../../sdk;../../../Shared/sdk;../../../vendor/sparsehash/current/src;../../../vendor/sparsehash/current/src/windows;../../../Shared/animation;../../../vendor/bochs;../../../vendor/bob_withers;../../../vendor/zip;../../../vendor/lua/src;../../../vendor/pcre/shipped_for_mta;../../../vendor/json-c/shipped_for_mta;../../../Shared/mods/deathmatch/logic;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>StdInc.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>$(IntDir)$(TargetName).pch</PrecompiledHeaderOutputFile>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4996;4482;4267;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0809</Culture>
+    </ResourceCompile>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+    <Link>
+      <AdditionalDependencies>lua5.1s.lib;wsock32.lib;zlib.lib;ehs.lib;pthreadVC2.lib;pme.lib;pcre3.lib;json.lib;psapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <AdditionalLibraryDirectories>../../../vendor/lua/$(PlatformTarget)/$(Configuration)Server;../../../vendor/json-c/$(PlatformTarget)/$(Configuration);../../../vendor/ehs/$(PlatformTarget)/$(Configuration);../../../vendor/pme/$(PlatformTarget)/$(Configuration);../../../vendor/pcre/$(PlatformTarget)/$(Configuration);../../../vendor/pthreads/lib/$(PlatformTarget);../../../vendor/zlib/$(PlatformTarget)/$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ProgramDatabaseFile>../../../symbols/$(Configuration)_$(PlatformTarget)_$(SafeParentName).pdb</ProgramDatabaseFile>
+      <MapFileName />
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention />
+      <ImportLibrary>$(IntDir)$(TargetFileName).lib</ImportLibrary>
+      <TargetMachine>MachineX64</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Midl>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetEnvironment>Win32</TargetEnvironment>
+      <TypeLibraryName>.\Debug/Race.tlb</TypeLibraryName>
+      <HeaderFileName />
+    </Midl>
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>.;./logic;../../../vendor;../../../vendor/sqlite;../../../vendor/zlib/;../../../vendor/pcre;../../../vendor/pme;../../../vendor/pthreads/include;../../../Shared/publicsdk/include;logic/common;../../../vendor/zlib;../../../vendor/json-c;../../sdk;../../../Shared/sdk;../../../vendor/sparsehash/current/src;../../../vendor/sparsehash/current/src/windows;../../../Shared/animation;../../../vendor/bochs;../../../vendor/bob_withers;../../../vendor/zip;../../../vendor/lua/src;../../../vendor/pcre/shipped_for_mta;../../../vendor/json-c/shipped_for_mta;../../../Shared/mods/deathmatch/logic;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;MTA_DEBUG;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>StdInc.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>$(IntDir)$(TargetName).pch</PrecompiledHeaderOutputFile>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <DisableSpecificWarnings>4996;4482;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <ShowIncludes>false</ShowIncludes>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0809</Culture>
+    </ResourceCompile>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+    <Link>
+      <AdditionalDependencies>lua5.1s_d.lib;wsock32.lib;zlib_d.lib;ehs_d.lib;pthreadVC2.lib;pme_d.lib;pcre3_d.lib;json_d.lib;psapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <AdditionalLibraryDirectories>logic/lib;../../../vendor/lua/$(PlatformTarget)/$(Configuration)Server;../../../vendor/json-c/$(PlatformTarget)/$(Configuration);../../../vendor/ehs/$(PlatformTarget)/$(Configuration);../../../vendor/pme/$(PlatformTarget)/$(Configuration);../../../vendor/pcre/$(PlatformTarget)/$(Configuration);../../../vendor/pthreads/lib/$(PlatformTarget);../../../vendor/zlib/$(PlatformTarget)/$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <IgnoreSpecificDefaultLibraries>MSVCRT;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ProgramDatabaseFile>$(IntDir)$(TargetName).pdb</ProgramDatabaseFile>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention />
+      <ImportLibrary>$(IntDir)$(TargetFileName).lib</ImportLibrary>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Midl>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetEnvironment>X64</TargetEnvironment>
+      <TypeLibraryName>.\Debug/Race.tlb</TypeLibraryName>
+      <HeaderFileName />
+    </Midl>
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>.;./logic;../../../vendor;../../../vendor/sqlite;../../../vendor/zlib/;../../../vendor/pcre;../../../vendor/pme;../../../vendor/pthreads/include;../../../Shared/publicsdk/include;logic/common;../../../vendor/zlib;../../../vendor/json-c;../../sdk;../../../Shared/sdk;../../../vendor/sparsehash/current/src;../../../vendor/sparsehash/current/src/windows;../../../Shared/animation;../../../vendor/bochs;../../../vendor/bob_withers;../../../vendor/zip;../../../vendor/lua/src;../../../vendor/pcre/shipped_for_mta;../../../vendor/json-c/shipped_for_mta;../../../Shared/mods/deathmatch/logic;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;MTA_DEBUG;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>StdInc.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>$(IntDir)$(TargetName).pch</PrecompiledHeaderOutputFile>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4996;4482;4267;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <ShowIncludes>false</ShowIncludes>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0809</Culture>
+    </ResourceCompile>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+    <Link>
+      <AdditionalDependencies>lua5.1s_d.lib;wsock32.lib;zlib_d.lib;ehs_d.lib;pthreadVC2.lib;pme_d.lib;pcre3_d.lib;json_d.lib;psapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <AdditionalLibraryDirectories>../../../vendor/lua/$(PlatformTarget)/$(Configuration)Server;../../../vendor/json-c/$(PlatformTarget)/$(Configuration);../../../vendor/ehs/$(PlatformTarget)/$(Configuration);../../../vendor/pme/$(PlatformTarget)/$(Configuration);../../../vendor/pcre/$(PlatformTarget)/$(Configuration);../../../vendor/pthreads/lib/$(PlatformTarget);../../../vendor/zlib/$(PlatformTarget)/$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <IgnoreSpecificDefaultLibraries>MSVCRT;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ProgramDatabaseFile>$(IntDir)$(TargetName).pdb</ProgramDatabaseFile>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention />
+      <ImportLibrary>$(IntDir)$(TargetFileName).lib</ImportLibrary>
+      <TargetMachine>MachineX64</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Nightly|Win32'">
+    <Midl>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetEnvironment>Win32</TargetEnvironment>
+      <TypeLibraryName>.\Release/Race.tlb</TypeLibraryName>
+      <HeaderFileName />
+    </Midl>
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>true</OmitFramePointers>
+      <AdditionalIncludeDirectories>.;./logic;../../../vendor;../../../vendor/sqlite;../../../vendor/zlib/;../../../vendor/pcre;../../../vendor/pme;../../../vendor/pthreads/include;../../../Shared/publicsdk/include;logic/common;../../../vendor/zlib;../../../vendor/json-c;../../sdk;../../../Shared/sdk;../../../vendor/sparsehash/current/src;../../../vendor/sparsehash/current/src/windows;../../../Shared/animation;../../../vendor/bochs;../../../vendor/bob_withers;../../../vendor/zip;../../../vendor/lua/src;../../../vendor/pcre/shipped_for_mta;../../../vendor/json-c/shipped_for_mta;../../../Shared/mods/deathmatch/logic;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>StdInc.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>$(IntDir)$(TargetName).pch</PrecompiledHeaderOutputFile>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4996;4482;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0809</Culture>
+    </ResourceCompile>
+    <ProjectReference>
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
+    </ProjectReference>
+    <Link>
+      <AdditionalDependencies>wsock32.lib;zlib.lib;ehs.lib;pthreadVC2.lib;pme.lib;json.lib;psapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <AdditionalLibraryDirectories>logic/lib;../../../vendor/lua/$(PlatformTarget)/$(Configuration)Server;../../../vendor/json-c/$(PlatformTarget)/$(Configuration);../../../vendor/ehs/$(PlatformTarget)/$(Configuration);../../../vendor/pme/$(PlatformTarget)/$(Configuration);../../../vendor/pcre/$(PlatformTarget)/$(Configuration);../../../vendor/pthreads/lib/$(PlatformTarget);../../../vendor/zlib/$(PlatformTarget)/$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ProgramDatabaseFile>../../../symbols/$(Configuration)_$(SafeParentName).pdb</ProgramDatabaseFile>
+      <MapFileName />
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention />
+      <ImportLibrary>$(IntDir)$(TargetFileName).lib</ImportLibrary>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Nightly|x64'">
+    <Midl>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetEnvironment>X64</TargetEnvironment>
+      <TypeLibraryName>.\Release/Race.tlb</TypeLibraryName>
+      <HeaderFileName />
+    </Midl>
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>true</OmitFramePointers>
+      <AdditionalIncludeDirectories>.;./logic;../../../vendor;../../../vendor/sqlite;../../../vendor/zlib/;../../../vendor/pcre;../../../vendor/pme;../../../vendor/pthreads/include;../../../Shared/publicsdk/include;logic/common;../../../vendor/zlib;../../../vendor/json-c;../../sdk;../../../Shared/sdk;../../../vendor/sparsehash/current/src;../../../vendor/sparsehash/current/src/windows;../../../Shared/animation;../../../vendor/bochs;../../../vendor/bob_withers;../../../vendor/zip;../../../vendor/lua/src;../../../vendor/pcre/shipped_for_mta;../../../vendor/json-c/shipped_for_mta;../../../Shared/mods/deathmatch/logic;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>StdInc.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>$(IntDir)$(TargetName).pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation />
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4996;4482;4267;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0809</Culture>
+    </ResourceCompile>
+    <ProjectReference>
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
+    </ProjectReference>
+    <Link>
+      <AdditionalDependencies>wsock32.lib;zlib.lib;ehs.lib;pthreadVC2.lib;pme.lib;json.lib;psapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <AdditionalLibraryDirectories>../../../vendor/lua/$(PlatformTarget)/$(Configuration)Server;../../../vendor/json-c/$(PlatformTarget)/$(Configuration);../../../vendor/ehs/$(PlatformTarget)/$(Configuration);../../../vendor/pme/$(PlatformTarget)/$(Configuration);../../../vendor/pcre/$(PlatformTarget)/$(Configuration);../../../vendor/pthreads/lib/$(PlatformTarget);../../../vendor/zlib/$(PlatformTarget)/$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ProgramDatabaseFile>../../../symbols/$(Configuration)_$(PlatformTarget)_$(SafeParentName).pdb</ProgramDatabaseFile>
+      <MapFileName />
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention />
+      <ImportLibrary>$(IntDir)$(TargetFileName).lib</ImportLibrary>
+      <TargetMachine>MachineX64</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="CServer.cpp" />
+    <ClCompile Include="..\..\sdk\MTAPlatform.cpp" />
+    <ClCompile Include="Server.cpp" />
+    <ClCompile Include="StdInc.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">StdInc.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName).pch</PrecompiledHeaderOutputFile>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">StdInc.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName).pch</PrecompiledHeaderOutputFile>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Nightly|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Nightly|Win32'">StdInc.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile Condition="'$(Configuration)|$(Platform)'=='Nightly|Win32'">$(IntDir)$(TargetName).pch</PrecompiledHeaderOutputFile>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Nightly|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Nightly|x64'">StdInc.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile Condition="'$(Configuration)|$(Platform)'=='Nightly|x64'">$(IntDir)$(TargetName).pch</PrecompiledHeaderOutputFile>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">StdInc.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName).pch</PrecompiledHeaderOutputFile>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">StdInc.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)$(TargetName).pch</PrecompiledHeaderOutputFile>
+    </ClCompile>
+    <ClCompile Include="logic\ASE.cpp" />
+    <ClCompile Include="logic\CAccessControlList.cpp" />
+    <ClCompile Include="logic\CAccessControlListGroup.cpp" />
+    <ClCompile Include="logic\CAccessControlListManager.cpp" />
+    <ClCompile Include="logic\CAccessControlListRight.cpp" />
+    <ClCompile Include="logic\CAccount.cpp" />
+    <ClCompile Include="logic\CAccountManager.cpp" />
+    <ClCompile Include="logic\CAccountPassword.cpp" />
+    <ClCompile Include="logic\CBan.cpp" />
+    <ClCompile Include="logic\CBanManager.cpp" />
+    <ClCompile Include="logic\CBlendedWeather.cpp" />
+    <ClCompile Include="logic\CBlip.cpp" />
+    <ClCompile Include="logic\CBlipManager.cpp" />
+    <ClCompile Include="logic\CBuildingRemoval.cpp" />
+    <ClCompile Include="logic\CBuildingRemovalManager.cpp" />
+    <ClCompile Include="logic\CCameraSpatialDatabase.cpp" />
+    <ClCompile Include="logic\CClient.cpp" />
+    <ClCompile Include="logic\CClock.cpp" />
+    <ClCompile Include="logic\CColCircle.cpp" />
+    <ClCompile Include="logic\CColCuboid.cpp" />
+    <ClCompile Include="logic\CColManager.cpp" />
+    <ClCompile Include="logic\CColPolygon.cpp" />
+    <ClCompile Include="logic\CColRectangle.cpp" />
+    <ClCompile Include="logic\CColShape.cpp" />
+    <ClCompile Include="logic\CColSphere.cpp" />
+    <ClCompile Include="logic\CColTube.cpp" />
+    <ClCompile Include="logic\CCommandFile.cpp" />
+    <ClCompile Include="logic\CCommandLineParser.cpp" />
+    <ClCompile Include="logic\CConnectHistory.cpp" />
+    <ClCompile Include="logic\CConsole.cpp" />
+    <ClCompile Include="logic\CConsoleClient.cpp" />
+    <ClCompile Include="logic\CConsoleCommand.cpp" />
+    <ClCompile Include="logic\CConsoleCommands.cpp" />
+    <ClCompile Include="logic\CCustomData.cpp" />
+    <ClCompile Include="logic\CCustomWeapon.cpp" />
+    <ClCompile Include="logic\CCustomWeaponManager.cpp" />
+    <ClCompile Include="logic\CDatabaseConnectionSqlite.cpp" />
+    <ClCompile Include="logic\CDatabaseJobQueue.cpp" />
+    <ClCompile Include="logic\CDatabaseManager.cpp" />
+    <ClCompile Include="logic\CDatabaseTypeMySql.cpp" />
+    <ClCompile Include="logic\CDatabaseTypeSqlite.cpp" />
+    <ClCompile Include="logic\CDummy.cpp" />
+    <ClCompile Include="logic\CDynamicLibrary.cpp" />
+    <ClCompile Include="logic\CElement.cpp" />
+    <ClCompile Include="logic\CElementDeleter.cpp" />
+    <ClCompile Include="logic\CElementGroup.cpp" />
+    <ClCompile Include="logic\CElementIDs.cpp" />
+    <ClCompile Include="logic\CElementRefManager.cpp" />
+    <ClCompile Include="logic\CEvents.cpp" />
+    <ClCompile Include="logic\CGame.cpp" />
+    <ClCompile Include="logic\CGroups.cpp" />
+    <ClCompile Include="logic\CHandlingEntry.cpp" />
+    <ClCompile Include="logic\CHandlingManager.cpp" />
+    <ClCompile Include="logic\CHTTPD.cpp" />
+    <ClCompile Include="logic\CKeyBinds.cpp" />
+    <ClCompile Include="logic\CLanBroadcast.cpp" />
+    <ClCompile Include="logic\CLightsyncManager.cpp" />
+    <ClCompile Include="logic\CLogger.cpp" />
+    <ClCompile Include="logic\CMainConfig.cpp" />
+    <ClCompile Include="logic\CMapEvent.cpp" />
+    <ClCompile Include="logic\CMapEventManager.cpp" />
+    <ClCompile Include="logic\CMapManager.cpp" />
+    <ClCompile Include="logic\CMarker.cpp" />
+    <ClCompile Include="logic\CMarkerManager.cpp" />
+    <ClCompile Include="logic\CObject.cpp" />
+    <ClCompile Include="logic\CObjectManager.cpp" />
+    <ClCompile Include="logic\CObjectSync.cpp" />
+    <ClCompile Include="logic\CPacketTranslator.cpp" />
+    <ClCompile Include="logic\CPad.cpp" />
+    <ClCompile Include="logic\CPed.cpp" />
+    <ClCompile Include="logic\CPedManager.cpp" />
+    <ClCompile Include="logic\CPedSync.cpp" />
+    <ClCompile Include="logic\CPerfStat.BandwidthReduction.cpp" />
+    <ClCompile Include="logic\CPerfStat.BandwidthUsage.cpp" />
+    <ClCompile Include="logic\CPerfStat.DebugInfo.cpp" />
+    <ClCompile Include="logic\CPerfStat.DebugTable.cpp" />
+    <ClCompile Include="logic\CPerfStat.EventPacketUsage.cpp" />
+    <ClCompile Include="logic\CPerfStat.FunctionTiming.cpp" />
+    <ClCompile Include="logic\CPerfStat.LibMemory.cpp" />
+    <ClCompile Include="logic\CPerfStat.LuaMemory.cpp" />
+    <ClCompile Include="logic\CPerfStat.LuaTiming.cpp" />
+    <ClCompile Include="logic\CPerfStat.PacketUsage.cpp" />
+    <ClCompile Include="logic\CPerfStat.RPCPacketUsage.cpp" />
+    <ClCompile Include="logic\CPerfStat.ServerInfo.cpp" />
+    <ClCompile Include="logic\CPerfStat.ServerTiming.cpp" />
+    <ClCompile Include="logic\CPerfStat.SqliteTiming.cpp" />
+    <ClCompile Include="logic\CPerfStatManager.cpp" />
+    <ClCompile Include="logic\CPerPlayerEntity.cpp" />
+    <ClCompile Include="logic\CPickup.cpp" />
+    <ClCompile Include="logic\CPickupManager.cpp" />
+    <ClCompile Include="logic\CPlayer.cpp" />
+    <ClCompile Include="logic\CPlayerCamera.cpp" />
+    <ClCompile Include="logic\CPlayerClothes.cpp" />
+    <ClCompile Include="logic\CPlayerManager.cpp" />
+    <ClCompile Include="logic\CPlayerTasks.cpp" />
+    <ClCompile Include="logic\CPlayerTextManager.cpp" />
+    <ClCompile Include="logic\CRadarArea.cpp" />
+    <ClCompile Include="logic\CRadarAreaManager.cpp" />
+    <ClCompile Include="logic\CRegisteredCommands.cpp" />
+    <ClCompile Include="logic\CRegistry.cpp" />
+    <ClCompile Include="logic\CRegistryManager.cpp" />
+    <ClCompile Include="logic\CRemoteCalls.cpp" />
+    <ClCompile Include="logic\CResource.AclRequest.cpp" />
+    <ClCompile Include="logic\CResource.cpp" />
+    <ClCompile Include="logic\CResourceChecker.cpp" />
+    <ClCompile Include="logic\CResourceClientConfigItem.cpp" />
+    <ClCompile Include="logic\CResourceClientFileItem.cpp" />
+    <ClCompile Include="logic\CResourceClientScriptItem.cpp" />
+    <ClCompile Include="logic\CResourceConfigItem.cpp" />
+    <ClCompile Include="logic\CResourceFile.cpp" />
+    <ClCompile Include="logic\CResourceHTMLItem.cpp" />
+    <ClCompile Include="logic\CResourceManager.cpp" />
+    <ClCompile Include="logic\CResourceMapItem.cpp" />
+    <ClCompile Include="logic\CResourceScriptItem.cpp" />
+    <ClCompile Include="logic\CRPCFunctions.cpp" />
+    <ClCompile Include="logic\CScriptDebugging.cpp" />
+    <ClCompile Include="logic\CScriptFile.cpp" />
+    <ClCompile Include="logic\CSettings.cpp" />
+    <ClCompile Include="logic\CSpatialDatabase.cpp" />
+    <ClCompile Include="logic\CStaticFunctionDefinitions.cpp" />
+    <ClCompile Include="logic\CTeam.cpp" />
+    <ClCompile Include="logic\CTeamManager.cpp" />
+    <ClCompile Include="logic\CTextDisplay.cpp" />
+    <ClCompile Include="logic\CTextItem.cpp" />
+    <ClCompile Include="logic\CUnoccupiedVehicleSync.cpp" />
+    <ClCompile Include="logic\CVehicle.cpp" />
+    <ClCompile Include="logic\CVehicleColorManager.cpp" />
+    <ClCompile Include="logic\CVehicleDefaultColors.cpp" />
+    <ClCompile Include="logic\CVehicleManager.cpp" />
+    <ClCompile Include="logic\CVehicleNames.cpp" />
+    <ClCompile Include="logic\CVehicleUpgrades.cpp" />
+    <ClCompile Include="logic\CWater.cpp" />
+    <ClCompile Include="logic\CWaterManager.cpp" />
+    <ClCompile Include="logic\CWeaponNames.cpp" />
+    <ClCompile Include="logic\CWeaponStat.cpp" />
+    <ClCompile Include="logic\CWeaponStatManager.cpp" />
+    <ClCompile Include="logic\CWhoWas.cpp" />
+    <ClCompile Include="logic\CXMLConfig.cpp" />
+    <ClCompile Include="logic\TaskNames.cpp" />
+    <ClCompile Include="logic\Utils.cpp" />
+    <ClCompile Include="logic\packets\CBulletsyncPacket.cpp" />
+    <ClCompile Include="logic\packets\CCameraSyncPacket.cpp" />
+    <ClCompile Include="logic\packets\CChatEchoPacket.cpp" />
+    <ClCompile Include="logic\packets\CCommandPacket.cpp" />
+    <ClCompile Include="logic\packets\CConsoleEchoPacket.cpp" />
+    <ClCompile Include="logic\packets\CCustomDataPacket.cpp" />
+    <ClCompile Include="logic\packets\CCustomWeaponBulletSyncPacket.cpp" />
+    <ClCompile Include="logic\packets\CDebugEchoPacket.cpp" />
+    <ClCompile Include="logic\packets\CDestroySatchelsPacket.cpp" />
+    <ClCompile Include="logic\packets\CDetonateSatchelsPacket.cpp" />
+    <ClCompile Include="logic\packets\CElementRPCPacket.cpp" />
+    <ClCompile Include="logic\packets\CEntityAddPacket.cpp" />
+    <ClCompile Include="logic\packets\CEntityRemovePacket.cpp" />
+    <ClCompile Include="logic\packets\CExplosionSyncPacket.cpp" />
+    <ClCompile Include="logic\packets\CFireSyncPacket.cpp" />
+    <ClCompile Include="logic\packets\CKeysyncPacket.cpp" />
+    <ClCompile Include="logic\packets\CLightsyncPacket.cpp" />
+    <ClCompile Include="logic\packets\CLuaEventPacket.cpp" />
+    <ClCompile Include="logic\packets\CLuaPacket.cpp" />
+    <ClCompile Include="logic\packets\CMapInfoPacket.cpp" />
+    <ClCompile Include="logic\packets\CObjectStartSyncPacket.cpp" />
+    <ClCompile Include="logic\packets\CObjectSyncPacket.cpp" />
+    <ClCompile Include="logic\packets\CPacket.cpp" />
+    <ClCompile Include="logic\packets\CPedStartSyncPacket.cpp" />
+    <ClCompile Include="logic\packets\CPedSyncPacket.cpp" />
+    <ClCompile Include="logic\packets\CPedTaskPacket.cpp" />
+    <ClCompile Include="logic\packets\CPedWastedPacket.cpp" />
+    <ClCompile Include="logic\packets\CPickupHideShowPacket.cpp" />
+    <ClCompile Include="logic\packets\CPickupHitConfirmPacket.cpp" />
+    <ClCompile Include="logic\packets\CPlayerChangeNickPacket.cpp" />
+    <ClCompile Include="logic\packets\CPlayerClothesPacket.cpp" />
+    <ClCompile Include="logic\packets\CPlayerConnectCompletePacket.cpp" />
+    <ClCompile Include="logic\packets\CPlayerDiagnosticPacket.cpp" />
+    <ClCompile Include="logic\packets\CPlayerDisconnectedPacket.cpp" />
+    <ClCompile Include="logic\packets\CPlayerJoinCompletePacket.cpp" />
+    <ClCompile Include="logic\packets\CPlayerJoinDataPacket.cpp" />
+    <ClCompile Include="logic\packets\CPlayerJoinPacket.cpp" />
+    <ClCompile Include="logic\packets\CPlayerListPacket.cpp" />
+    <ClCompile Include="logic\packets\CPlayerModInfoPacket.cpp" />
+    <ClCompile Include="logic\packets\CPlayerPuresyncPacket.cpp" />
+    <ClCompile Include="logic\packets\CPlayerQuitPacket.cpp" />
+    <ClCompile Include="logic\packets\CPlayerScreenShotPacket.cpp" />
+    <ClCompile Include="logic\packets\CPlayerSpawnPacket.cpp" />
+    <ClCompile Include="logic\packets\CPlayerStatsPacket.cpp" />
+    <ClCompile Include="logic\packets\CPlayerTimeoutPacket.cpp" />
+    <ClCompile Include="logic\packets\CPlayerTransgressionPacket.cpp" />
+    <ClCompile Include="logic\packets\CPlayerWastedPacket.cpp" />
+    <ClCompile Include="logic\packets\CProjectileSyncPacket.cpp" />
+    <ClCompile Include="logic\packets\CResourceClientScriptsPacket.cpp" />
+    <ClCompile Include="logic\packets\CResourceStartPacket.cpp" />
+    <ClCompile Include="logic\packets\CResourceStopPacket.cpp" />
+    <ClCompile Include="logic\packets\CReturnSyncPacket.cpp" />
+    <ClCompile Include="logic\packets\CServerTextItemPacket.cpp" />
+    <ClCompile Include="logic\packets\CSyncSettingsPacket.cpp" />
+    <ClCompile Include="logic\packets\CUnoccupiedVehiclePushPacket.cpp" />
+    <ClCompile Include="logic\packets\CUnoccupiedVehicleStartSyncPacket.cpp" />
+    <ClCompile Include="logic\packets\CUnoccupiedVehicleSyncPacket.cpp" />
+    <ClCompile Include="logic\packets\CUpdateInfoPacket.cpp" />
+    <ClCompile Include="logic\packets\CVehicleDamageSyncPacket.cpp" />
+    <ClCompile Include="logic\packets\CVehicleInOutPacket.cpp" />
+    <ClCompile Include="logic\packets\CVehiclePuresyncPacket.cpp" />
+    <ClCompile Include="logic\packets\CVehicleResyncPacket.cpp" />
+    <ClCompile Include="logic\packets\CVehicleSpawnPacket.cpp" />
+    <ClCompile Include="logic\packets\CVehicleTrailerPacket.cpp" />
+    <ClCompile Include="logic\packets\CVoiceDataPacket.cpp" />
+    <ClCompile Include="logic\packets\CVoiceEndPacket.cpp" />
+    <ClCompile Include="logic\lua\CLuaArgument.cpp" />
+    <ClCompile Include="logic\lua\CLuaArguments.cpp" />
+    <ClCompile Include="logic\lua\CLuaCFunctions.cpp" />
+    <ClCompile Include="logic\lua\CLuaFunctionDefinitions.cpp" />
+    <ClCompile Include="logic\lua\CLuaFunctionParseHelpers.cpp" />
+    <ClCompile Include="logic\lua\CLuaFunctionRef.cpp" />
+    <ClCompile Include="logic\lua\CLuaMain.cpp" />
+    <ClCompile Include="logic\lua\CLuaManager.cpp" />
+    <ClCompile Include="logic\lua\CLuaModule.cpp" />
+    <ClCompile Include="logic\lua\CLuaModuleManager.cpp" />
+    <ClCompile Include="logic\lua\CLuaTimer.cpp" />
+    <ClCompile Include="logic\lua\CLuaTimerManager.cpp" />
+    <ClCompile Include="logic\lua\LuaCommon.cpp" />
+    <ClCompile Include="logic\lua\LuaUtils.cpp" />
+    <ClCompile Include="logic\luadefs\CLuaACLDefs.cpp" />
+    <ClCompile Include="logic\luadefs\CLuaBitDefs.cpp" />
+    <ClCompile Include="logic\luadefs\CLuaCameraDefs.cpp" />
+    <ClCompile Include="logic\luadefs\CLuaClassDefs.cpp" />
+    <ClCompile Include="logic\luadefs\CLuaDefs.cpp" />
+    <ClCompile Include="logic\luadefs\CLuaElementDefs.cpp" />
+    <ClCompile Include="logic\luadefs\CLuaFileDefs.cpp" />
+    <ClCompile Include="logic\luadefs\CLuaHandlingDefs.cpp" />
+    <ClCompile Include="logic\luadefs\CLuaHTTPDefs.cpp" />
+    <ClCompile Include="logic\luadefs\CLuaPickupDefs.cpp" />
+    <ClCompile Include="logic\luadefs\CLuaResourceDefs.cpp" />
+    <ClCompile Include="logic\luadefs\CLuaTextDefs.cpp" />
+    <ClCompile Include="logic\luadefs\CLuaVoiceDefs.cpp" />
+    <ClCompile Include="logic\luadefs\CLuaWorldDefs.cpp" />
+    <ClCompile Include="logic\luadefs\CLuaXMLDefs.cpp" />
+    <ClCompile Include="logic\net\CNetBuffer.cpp" />
+    <ClCompile Include="logic\net\CNetBufferWatchDog.cpp" />
+    <ClCompile Include="logic\net\CSimBulletsyncPacket.cpp" />
+    <ClCompile Include="logic\net\CSimControl.cpp" />
+    <ClCompile Include="logic\net\CSimKeysyncPacket.cpp" />
+    <ClCompile Include="logic\net\CSimPedTaskPacket.cpp" />
+    <ClCompile Include="logic\net\CSimPlayerManager.cpp" />
+    <ClCompile Include="logic\net\CSimPlayerPuresyncPacket.cpp" />
+    <ClCompile Include="logic\net\CSimVehiclePuresyncPacket.cpp" />
+    <ClCompile Include="..\..\..\vendor\bob_withers\base64.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Nightly|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Nightly|x64'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="utils\CFunctionUseLogger.cpp" />
+    <ClCompile Include="..\..\..\vendor\bochs\bochs_internal\crc32.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Nightly|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Nightly|x64'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="utils\CZipMaker.cpp" />
+    <ClCompile Include="..\..\..\vendor\sqlite\sqlite3.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Nightly|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Nightly|x64'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vendor\zip\ioapi.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Nightly|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Nightly|x64'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vendor\zip\iowin32.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Nightly|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Nightly|x64'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vendor\zip\mztools.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Nightly|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Nightly|x64'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vendor\zip\unzip.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Nightly|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Nightly|x64'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vendor\zip\zip.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Nightly|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Nightly|x64'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Shared\mods\deathmatch\logic\CDebugHookManager.cpp" />
+    <ClCompile Include="..\..\..\Shared\mods\deathmatch\logic\CIdArray.cpp" />
+    <ClCompile Include="..\..\..\Shared\mods\deathmatch\logic\CLatentReceiver.cpp" />
+    <ClCompile Include="..\..\..\Shared\mods\deathmatch\logic\CLatentSendQueue.cpp" />
+    <ClCompile Include="..\..\..\Shared\mods\deathmatch\logic\CLatentTransferManager.cpp" />
+    <ClCompile Include="..\..\..\Shared\mods\deathmatch\logic\CLuaShared.cpp" />
+    <ClCompile Include="..\..\..\Shared\mods\deathmatch\logic\CZoneNames.cpp" />
+    <ClCompile Include="..\..\..\Shared\mods\deathmatch\logic\Enums.cpp" />
+    <ClCompile Include="..\..\..\Shared\animation\CEasingCurve.cpp" />
+    <ClCompile Include="..\..\..\Shared\animation\CPositionRotationAnimation.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="logic\CLightsyncManager.h" />
+    <ClInclude Include="Config.h" />
+    <ClInclude Include="..\..\..\vendor\zip\crypt.h" />
+    <ClInclude Include="CServer.h" />
+    <ClInclude Include="utils\CZipMaker.h" />
+    <ClInclude Include="..\EXECryptor\EXECryptor.h" />
+    <ClInclude Include="gccHashSupport.h" />
+    <ClInclude Include="Server.h" />
+    <ClInclude Include="StdInc.h" />
+    <ClInclude Include="..\..\version.h" />
+    <ClInclude Include="logic\ASE.h" />
+    <ClInclude Include="logic\CAccessControlList.h" />
+    <ClInclude Include="logic\CAccessControlListGroup.h" />
+    <ClInclude Include="logic\CAccessControlListManager.h" />
+    <ClInclude Include="logic\CAccessControlListRight.h" />
+    <ClInclude Include="logic\CAccount.h" />
+    <ClInclude Include="logic\CAccountManager.h" />
+    <ClInclude Include="logic\CAclRightName.h" />
+    <ClInclude Include="logic\CBan.h" />
+    <ClInclude Include="logic\CBandwidthSettings.h" />
+    <ClInclude Include="logic\CBanManager.h" />
+    <ClInclude Include="logic\CBlendedWeather.h" />
+    <ClInclude Include="logic\CBlip.h" />
+    <ClInclude Include="logic\CBlipManager.h" />
+    <ClInclude Include="logic\CBuildingRemoval.h" />
+    <ClInclude Include="logic\CBuildingRemovalManager.h" />
+    <ClInclude Include="logic\CCameraSpatialDatabase.h" />
+    <ClInclude Include="logic\CClient.h" />
+    <ClInclude Include="logic\CClock.h" />
+    <ClInclude Include="logic\CColCallback.h" />
+    <ClInclude Include="logic\CColCircle.h" />
+    <ClInclude Include="logic\CColCuboid.h" />
+    <ClInclude Include="logic\CColManager.h" />
+    <ClInclude Include="logic\CColPolygon.h" />
+    <ClInclude Include="logic\CColRectangle.h" />
+    <ClInclude Include="logic\CColShape.h" />
+    <ClInclude Include="logic\CColSphere.h" />
+    <ClInclude Include="logic\CColTube.h" />
+    <ClInclude Include="logic\CCommandFile.h" />
+    <ClInclude Include="logic\CCommandLineParser.h" />
+    <ClInclude Include="logic\CCommon.h" />
+    <ClInclude Include="logic\CConnectHistory.h" />
+    <ClInclude Include="logic\CConsole.h" />
+    <ClInclude Include="logic\CConsoleClient.h" />
+    <ClInclude Include="logic\CConsoleCommand.h" />
+    <ClInclude Include="logic\CConsoleCommands.h" />
+    <ClInclude Include="logic\CCustomData.h" />
+    <ClInclude Include="logic\CCustomWeapon.h" />
+    <ClInclude Include="logic\CCustomWeaponManager.h" />
+    <ClInclude Include="logic\CDatabaseJobQueue.h" />
+    <ClInclude Include="logic\CDatabaseManager.h" />
+    <ClInclude Include="logic\CDatabaseType.h" />
+    <ClInclude Include="logic\CDummy.h" />
+    <ClInclude Include="logic\CDynamicLibrary.h" />
+    <ClInclude Include="logic\CElement.h" />
+    <ClInclude Include="logic\CElementDeleter.h" />
+    <ClInclude Include="logic\CElementGroup.h" />
+    <ClInclude Include="logic\CElementIDs.h" />
+    <ClInclude Include="logic\CElementRefManager.h" />
+    <ClInclude Include="logic\CEvents.h" />
+    <ClInclude Include="logic\CGame.h" />
+    <ClInclude Include="logic\CGroups.h" />
+    <ClInclude Include="logic\CHandlingEntry.h" />
+    <ClInclude Include="logic\CHandlingManager.h" />
+    <ClInclude Include="logic\CHTTPD.h" />
+    <ClInclude Include="logic\CKeyBinds.h" />
+    <ClInclude Include="logic\CLanBroadcast.h" />
+    <ClInclude Include="logic\CLogger.h" />
+    <ClInclude Include="logic\CMainConfig.h" />
+    <ClInclude Include="logic\CMapEvent.h" />
+    <ClInclude Include="logic\CMapEventManager.h" />
+    <ClInclude Include="logic\CMapManager.h" />
+    <ClInclude Include="logic\CMarker.h" />
+    <ClInclude Include="logic\CMarkerManager.h" />
+    <ClInclude Include="logic\CObject.h" />
+    <ClInclude Include="logic\CObjectManager.h" />
+    <ClInclude Include="logic\CObjectStreamItem.h" />
+    <ClInclude Include="logic\CObjectSync.h" />
+    <ClInclude Include="logic\CPacketTranslator.h" />
+    <ClInclude Include="logic\CPad.h" />
+    <ClInclude Include="logic\CPed.h" />
+    <ClInclude Include="logic\CPedManager.h" />
+    <ClInclude Include="logic\CPedSync.h" />
+    <ClInclude Include="logic\CPerfStatManager.h" />
+    <ClInclude Include="logic\CPerfStatModule.h" />
+    <ClInclude Include="logic\CPerPlayerEntity.h" />
+    <ClInclude Include="logic\CPickup.h" />
+    <ClInclude Include="logic\CPickupManager.h" />
+    <ClInclude Include="logic\CPlayer.h" />
+    <ClInclude Include="logic\CPlayerCamera.h" />
+    <ClInclude Include="logic\CPlayerClothes.h" />
+    <ClInclude Include="logic\CPlayerManager.h" />
+    <ClInclude Include="logic\CPlayerTasks.h" />
+    <ClInclude Include="logic\CPlayerTextManager.h" />
+    <ClInclude Include="logic\CRadarArea.h" />
+    <ClInclude Include="logic\CRadarAreaManager.h" />
+    <ClInclude Include="logic\CRegisteredCommands.h" />
+    <ClInclude Include="logic\CRegistry.h" />
+    <ClInclude Include="logic\CRegistryManager.h" />
+    <ClInclude Include="logic\CRemoteCalls.h" />
+    <ClInclude Include="logic\CResource.h" />
+    <ClInclude Include="logic\CResourceChecker.Data.h" />
+    <ClInclude Include="logic\CResourceChecker.h" />
+    <ClInclude Include="logic\CResourceClientConfigItem.h" />
+    <ClInclude Include="logic\CResourceClientFileItem.h" />
+    <ClInclude Include="logic\CResourceClientScriptItem.h" />
+    <ClInclude Include="logic\CResourceConfigItem.h" />
+    <ClInclude Include="logic\CResourceFile.h" />
+    <ClInclude Include="logic\CResourceHTMLItem.h" />
+    <ClInclude Include="logic\CResourceManager.h" />
+    <ClInclude Include="logic\CResourceMapItem.h" />
+    <ClInclude Include="logic\CResourceScriptItem.h" />
+    <ClInclude Include="logic\CRPCFunctions.h" />
+    <ClInclude Include="logic\CScriptDebugging.h" />
+    <ClInclude Include="logic\CScriptFile.h" />
+    <ClInclude Include="logic\CSettings.h" />
+    <ClInclude Include="logic\CSpatialDatabase.h" />
+    <ClInclude Include="logic\CSpawnpoint.h" />
+    <ClInclude Include="logic\CSpawnpoints.h" />
+    <ClInclude Include="logic\CStaticFunctionDefinitions.h" />
+    <ClInclude Include="logic\CTeam.h" />
+    <ClInclude Include="logic\CTeamManager.h" />
+    <ClInclude Include="logic\CTextDisplay.h" />
+    <ClInclude Include="logic\CTextItem.h" />
+    <ClInclude Include="logic\CUnoccupiedVehicleSync.h" />
+    <ClInclude Include="logic\CVehicle.h" />
+    <ClInclude Include="logic\CVehicleColorManager.h" />
+    <ClInclude Include="logic\CVehicleDefaultColors.h" />
+    <ClInclude Include="logic\CVehicleManager.h" />
+    <ClInclude Include="logic\CVehicleNames.h" />
+    <ClInclude Include="logic\CVehicleUpgrades.h" />
+    <ClInclude Include="logic\CWater.h" />
+    <ClInclude Include="logic\CWaterManager.h" />
+    <ClInclude Include="logic\CWeaponNames.h" />
+    <ClInclude Include="logic\CWeaponStat.h" />
+    <ClInclude Include="logic\CWeaponStatManager.h" />
+    <ClInclude Include="logic\CWhoWas.h" />
+    <ClInclude Include="logic\CXMLConfig.h" />
+    <ClInclude Include="logic\Element.h" />
+    <ClInclude Include="..\..\..\Shared\sdk\net\SyncStructures.h" />
+    <ClInclude Include="logic\TaskNames.h" />
+    <ClInclude Include="logic\Utils.h" />
+    <ClInclude Include="logic\packets\CBulletsyncPacket.h" />
+    <ClInclude Include="logic\packets\CCameraSyncPacket.h" />
+    <ClInclude Include="logic\packets\CChatEchoPacket.h" />
+    <ClInclude Include="logic\packets\CCommandPacket.h" />
+    <ClInclude Include="logic\packets\CConsoleEchoPacket.h" />
+    <ClInclude Include="logic\packets\CCustomDataPacket.h" />
+    <ClInclude Include="logic\packets\CCustomWeaponBulletSyncPacket.h" />
+    <ClInclude Include="logic\packets\CDebugEchoPacket.h" />
+    <ClInclude Include="logic\packets\CDestroySatchelsPacket.h" />
+    <ClInclude Include="logic\packets\CDetonateSatchelsPacket.h" />
+    <ClInclude Include="logic\packets\CElementRPCPacket.h" />
+    <ClInclude Include="logic\packets\CEntityAddPacket.h" />
+    <ClInclude Include="logic\packets\CEntityRemovePacket.h" />
+    <ClInclude Include="logic\packets\CExplosionSyncPacket.h" />
+    <ClInclude Include="logic\packets\CFireSyncPacket.h" />
+    <ClInclude Include="logic\packets\CKeysyncPacket.h" />
+    <ClInclude Include="logic\packets\CLightsyncPacket.h" />
+    <ClInclude Include="logic\packets\CLuaEventPacket.h" />
+    <ClInclude Include="logic\packets\CLuaPacket.h" />
+    <ClInclude Include="logic\packets\CMapInfoPacket.h" />
+    <ClInclude Include="logic\packets\CObjectStartSyncPacket.h" />
+    <ClInclude Include="logic\packets\CObjectStopSyncPacket.h" />
+    <ClInclude Include="logic\packets\CObjectSyncPacket.h" />
+    <ClInclude Include="logic\packets\CPacket.h" />
+    <ClInclude Include="logic\packets\CPedStartSyncPacket.h" />
+    <ClInclude Include="logic\packets\CPedStopSyncPacket.h" />
+    <ClInclude Include="logic\packets\CPedSyncPacket.h" />
+    <ClInclude Include="logic\packets\CPedTaskPacket.h" />
+    <ClInclude Include="logic\packets\CPedWastedPacket.h" />
+    <ClInclude Include="logic\packets\CPhysicsSyncPacket.h" />
+    <ClInclude Include="logic\packets\CPickupHideShowPacket.h" />
+    <ClInclude Include="logic\packets\CPickupHitConfirmPacket.h" />
+    <ClInclude Include="logic\packets\CPlayerChangeNickPacket.h" />
+    <ClInclude Include="logic\packets\CPlayerClothesPacket.h" />
+    <ClInclude Include="logic\packets\CPlayerConnectCompletePacket.h" />
+    <ClInclude Include="logic\packets\CPlayerDiagnosticPacket.h" />
+    <ClInclude Include="logic\packets\CPlayerDisconnectedPacket.h" />
+    <ClInclude Include="logic\packets\CPlayerJoinCompletePacket.h" />
+    <ClInclude Include="logic\packets\CPlayerJoinDataPacket.h" />
+    <ClInclude Include="logic\packets\CPlayerJoinPacket.h" />
+    <ClInclude Include="logic\packets\CPlayerListPacket.h" />
+    <ClInclude Include="logic\packets\CPlayerModInfoPacket.h" />
+    <ClInclude Include="logic\packets\CPlayerNoSocketPacket.h" />
+    <ClInclude Include="logic\packets\CPlayerPuresyncPacket.h" />
+    <ClInclude Include="logic\packets\CPlayerQuitPacket.h" />
+    <ClInclude Include="logic\packets\CPlayerScreenShotPacket.h" />
+    <ClInclude Include="logic\packets\CPlayerSpawnPacket.h" />
+    <ClInclude Include="logic\packets\CPlayerStatsPacket.h" />
+    <ClInclude Include="logic\packets\CPlayerTimeoutPacket.h" />
+    <ClInclude Include="logic\packets\CPlayerTransgressionPacket.h" />
+    <ClInclude Include="logic\packets\CPlayerWastedPacket.h" />
+    <ClInclude Include="logic\packets\CProjectileSyncPacket.h" />
+    <ClInclude Include="logic\packets\CResourceClientScriptsPacket.h" />
+    <ClInclude Include="logic\packets\CResourceStartPacket.h" />
+    <ClInclude Include="logic\packets\CResourceStopPacket.h" />
+    <ClInclude Include="logic\packets\CReturnSyncPacket.h" />
+    <ClInclude Include="logic\packets\CServerTextItemPacket.h" />
+    <ClInclude Include="logic\packets\CSyncSettingsPacket.h" />
+    <ClInclude Include="logic\packets\CUnoccupiedVehiclePushPacket.h" />
+    <ClInclude Include="logic\packets\CUnoccupiedVehicleStartSyncPacket.h" />
+    <ClInclude Include="logic\packets\CUnoccupiedVehicleStopSyncPacket.h" />
+    <ClInclude Include="logic\packets\CUnoccupiedVehicleSyncPacket.h" />
+    <ClInclude Include="logic\packets\CUpdateInfoPacket.h" />
+    <ClInclude Include="logic\packets\CVehicleDamageSyncPacket.h" />
+    <ClInclude Include="logic\packets\CVehicleInOutPacket.h" />
+    <ClInclude Include="logic\packets\CVehiclePuresyncPacket.h" />
+    <ClInclude Include="logic\packets\CVehicleResyncPacket.h" />
+    <ClInclude Include="logic\packets\CVehicleSpawnPacket.h" />
+    <ClInclude Include="logic\packets\CVehicleTrailerPacket.h" />
+    <ClInclude Include="logic\packets\CVoiceDataPacket.h" />
+    <ClInclude Include="logic\packets\CVoiceEndPacket.h" />
+    <ClInclude Include="..\..\..\Shared\sdk\net\Packets.h" />
+    <ClInclude Include="logic\lua\CLuaArgument.h" />
+    <ClInclude Include="logic\lua\CLuaArguments.h" />
+    <ClInclude Include="logic\lua\CLuaCallback.h" />
+    <ClInclude Include="logic\lua\CLuaCFunctions.h" />
+    <ClInclude Include="logic\lua\CLuaFunctionDefinitions.h" />
+    <ClInclude Include="logic\lua\CLuaFunctionParseHelpers.h" />
+    <ClInclude Include="logic\lua\CLuaFunctionRef.h" />
+    <ClInclude Include="logic\lua\CLuaMain.h" />
+    <ClInclude Include="logic\lua\CLuaManager.h" />
+    <ClInclude Include="logic\lua\CLuaModule.h" />
+    <ClInclude Include="logic\lua\CLuaModuleManager.h" />
+    <ClInclude Include="logic\lua\CLuaTimer.h" />
+    <ClInclude Include="logic\lua\CLuaTimerManager.h" />
+    <ClInclude Include="logic\lua\LuaUtils.h" />
+    <ClInclude Include="..\..\..\Shared\sdk\net\rpc_enums.h" />
+    <ClInclude Include="logic\common\CBitStream.h" />
+    <ClInclude Include="logic\luadefs\CLuaACLDefs.h" />
+    <ClInclude Include="logic\luadefs\CLuaBitDefs.h" />
+    <ClInclude Include="logic\luadefs\CLuaCameraDefs.h" />
+    <ClInclude Include="logic\luadefs\CLuaClassDefs.h" />
+    <ClInclude Include="logic\luadefs\CLuaDefs.h" />
+    <ClInclude Include="logic\luadefs\CLuaElementDefs.h" />
+    <ClInclude Include="logic\luadefs\CLuaFileDefs.h" />
+    <ClInclude Include="logic\luadefs\CLuaHandlingDefs.h" />
+    <ClInclude Include="logic\luadefs\CLuaHTTPDefs.h" />
+    <ClInclude Include="logic\luadefs\CLuaPickupDefs.h" />
+    <ClInclude Include="logic\luadefs\CLuaResourceDefs.h" />
+    <ClInclude Include="logic\luadefs\CLuaTextDefs.h" />
+    <ClInclude Include="logic\luadefs\CLuaVoiceDefs.h" />
+    <ClInclude Include="logic\luadefs\CLuaWorldDefs.h" />
+    <ClInclude Include="logic\luadefs\CLuaXMLDefs.h" />
+    <ClInclude Include="logic\lua\LuaCommon.h" />
+    <ClInclude Include="logic\net\CNetBuffer.h" />
+    <ClInclude Include="logic\net\CNetBufferWatchDog.h" />
+    <ClInclude Include="logic\net\CSimBulletsyncPacket.h" />
+    <ClInclude Include="logic\net\CSimControl.h" />
+    <ClInclude Include="logic\net\CSimKeysyncPacket.h" />
+    <ClInclude Include="logic\net\CSimPedTaskPacket.h" />
+    <ClInclude Include="logic\net\CSimPlayer.h" />
+    <ClInclude Include="logic\net\CSimPlayerManager.h" />
+    <ClInclude Include="logic\net\CSimPlayerPuresyncPacket.h" />
+    <ClInclude Include="logic\net\CSimVehiclePuresyncPacket.h" />
+    <ClInclude Include="logic\net\SimHeaders.h" />
+    <ClInclude Include="..\..\..\vendor\bob_withers\base64.h" />
+    <ClInclude Include="utils\CFunctionUseLogger.h" />
+    <ClInclude Include="utils\CHqComms.h" />
+    <ClInclude Include="utils\CMasterServerAnnouncer.h" />
+    <ClInclude Include="utils\COpenPortsTester.h" />
+    <ClInclude Include="..\..\..\vendor\bochs\bochs_internal\crc32.h" />
+    <ClInclude Include="..\..\..\Shared\sdk\ieee754.h" />
+    <ClInclude Include="..\..\..\vendor\zip\ioapi.h" />
+    <ClInclude Include="..\..\..\vendor\zip\iowin32.h" />
+    <ClInclude Include="..\..\..\vendor\zip\mztools.h" />
+    <ClInclude Include="..\..\..\vendor\zip\unzip.h" />
+    <ClInclude Include="..\..\..\vendor\zip\zip.h" />
+    <ClInclude Include="..\..\..\Shared\mods\deathmatch\logic\CDebugHookManager.h" />
+    <ClInclude Include="..\..\..\Shared\mods\deathmatch\logic\CIdArray.h" />
+    <ClInclude Include="..\..\..\Shared\mods\deathmatch\logic\CLatentTransferManager.h" />
+    <ClInclude Include="..\..\..\Shared\mods\deathmatch\logic\CLuaShared.h" />
+    <ClInclude Include="..\..\..\Shared\mods\deathmatch\logic\CTickRateSettings.h" />
+    <ClInclude Include="..\..\..\Shared\mods\deathmatch\logic\CZoneNames.h" />
+    <ClInclude Include="..\..\..\Shared\mods\deathmatch\logic\Enums.h" />
+    <ClInclude Include="..\..\..\Shared\animation\CEasingCurve.h" />
+    <ClInclude Include="..\..\..\Shared\animation\CPositionRotationAnimation.h" />
+    <ClInclude Include="..\..\..\Shared\animation\TInterpolation.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="acl.xml" />
+    <Xml Include="banlist.xml" />
+    <Xml Include="editor_acl.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="editor.conf" />
+    <None Include="local.conf" />
+    <None Include="Makefile.am" />
+    <None Include="mtaserver.conf" />
+    <None Include="vehiclecolors.conf" />
+    <None Include="..\..\output\LICENSE" />
+    <None Include="..\..\output\NOTICE" />
+    <None Include="..\..\output\README" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\vendor\ehs\vs2008\ehs 2008.vcxproj">
+      <Project>{ecc4ba90-6aa5-4630-aea9-f923fb633c7d}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\vendor\json-c\json 2008.vcxproj">
+      <Project>{38d753e1-5341-42e1-94ad-b2c503f1fc37}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\vendor\lua\mak.vs2008\lua5.1s_dll.vcxproj">
+      <Project>{8eeecee6-a6ec-bc48-8e76-22b87825444b}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\vendor\pcre\pcre 2008.vcxproj">
+      <Project>{39452acc-ff12-488d-94b6-301b4efbb606}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\vendor\pme\vs2008\pme 2008.vcxproj">
+      <Project>{35dc1c50-0cdf-4f3a-b847-2d76de134053}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\vendor\zlib\zlib 2008.vcxproj">
+      <Project>{ccabbc2e-172d-46fd-bc43-5a9fcd295112}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

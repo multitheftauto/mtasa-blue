@@ -1,0 +1,835 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Nightly|Win32">
+      <Configuration>Nightly</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectName>Client - Deathmatch</ProjectName>
+    <ProjectGuid>{F661CA1A-A296-4505-9583-3BEC58FB79C5}</ProjectGuid>
+    <RootNamespace>Client - Deathmatch</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Nightly|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v90</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v90</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v90</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Nightly|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+    <Import Project="..\..\..\Shared\MTAPropertySheet.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+    <Import Project="..\..\..\Shared\MTAPropertySheet.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+    <Import Project="..\..\..\Shared\MTAPropertySheet.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>12.0.21005.1</_ProjectFileVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(MyTargetDir)\mods\deathmatch\</OutDir>
+    <IntDir>$(PlatformTarget)\$(Configuration)\</IntDir>
+    <IgnoreImportLibrary>false</IgnoreImportLibrary>
+    <LinkIncremental>true</LinkIncremental>
+    <TargetName>client_d</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(MyTargetDir)\mods\deathmatch\</OutDir>
+    <IntDir>$(PlatformTarget)\$(Configuration)\</IntDir>
+    <IgnoreImportLibrary>false</IgnoreImportLibrary>
+    <LinkIncremental>false</LinkIncremental>
+    <TargetName>client</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Nightly|Win32'">
+    <OutDir>$(PlatformTarget)\$(Configuration)\</OutDir>
+    <IgnoreImportLibrary>false</IgnoreImportLibrary>
+    <LinkIncremental>false</LinkIncremental>
+    <TargetName>client</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>../../../vendor/libv2;../../../vendor/libspeex;../../../vendor/portaudio;../../../vendor/bass;../../../Shared/publicsdk/include;../../Voice;./;../shared_logic;../../../Shared/XML/interface;../../../vendor;../../../vendor/lua/src;../../../vendor/zlib;../../../vendor/json-c;../../sdk/;../../../Shared/sdk;../../../vendor/sparsehash/current/src;../../../vendor/sparsehash/current/src/windows;../../../Shared/animation;../../../vendor/bochs;../../../vendor/bob_withers;../../../Shared/mods/deathmatch/logic;../../../vendor/pcre;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;MTA_DEBUG;_CRT_SECURE_NO_WARNINGS;LUA_USE_APICHECK;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <MinimalRebuild>false</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <BufferSecurityCheck>true</BufferSecurityCheck>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>StdInc.h</PrecompiledHeaderFile>
+      <WarningLevel>Level3</WarningLevel>
+      <TreatWarningAsError>false</TreatWarningAsError>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <DisableSpecificWarnings>4290;4996;4482;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <Link>
+      <RegisterOutput>false</RegisterOutput>
+      <AdditionalDependencies>libv2.lib;lua5.1c_d.lib;libspeexd.lib;bass.lib;bass_fx.lib;bassmix.lib;tags.lib;Psapi.lib;Winmm.lib;kernel32.lib;ws2_32.lib;zlib_d.lib;Iphlpapi.lib;json_d.lib;pcre3_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ShowProgress>NotSet</ShowProgress>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <AdditionalLibraryDirectories>../../../vendor/libspeex;../../../vendor/bass/lib;../../../vendor/lua/$(PlatformTarget)/$(Configuration)Client;../../../vendor/libv2/lib;../../../vendor/zlib/$(PlatformTarget)/$(Configuration);../../../vendor/json-c/$(PlatformTarget)/$(Configuration);../../../vendor/pcre/$(PlatformTarget)/$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <IgnoreSpecificDefaultLibraries>LIBCMT;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ProgramDatabaseFile>$(IntDir)$(TargetName).pdb</ProgramDatabaseFile>
+      <SubSystem>Windows</SubSystem>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention />
+      <ImportLibrary>$(IntDir)$(TargetName).lib</ImportLibrary>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>true</OmitFramePointers>
+      <AdditionalIncludeDirectories>../../../vendor/libv2;../../../vendor/libspeex;../../../vendor/portaudio;../../../vendor/bass;../../../Shared/publicsdk/include;../../Voice;./;../shared_logic;../../../Shared/XML/interface;../../../vendor;../../../vendor/lua/src;../../../vendor/zlib;../../../vendor/json-c;../../sdk/;../../../Shared/sdk;../../../vendor/sparsehash/current/src;../../../vendor/sparsehash/current/src/windows;../../../Shared/animation;../../../vendor/bochs;../../../vendor/bob_withers;../../../Shared/mods/deathmatch/logic;../../../vendor/pcre;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_CRT_SECURE_NO_WARNINGS;LUA_USE_APICHECK;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>StdInc.h</PrecompiledHeaderFile>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4996;4482;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+    <Link>
+      <AdditionalOptions>/FIXED:NO %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalDependencies>libv2.lib;lua5.1c.lib;libspeex.lib;bass.lib;bass_fx.lib;bassmix.lib;tags.lib;Psapi.lib;Winmm.lib;kernel32.lib;wsock32.lib;zlib.lib;json.lib;pcre3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <AdditionalLibraryDirectories>../../../vendor/libspeex;../../../vendor/bass/lib;../../../vendor/lua/$(PlatformTarget)/$(Configuration)Client;../../../vendor/libv2/lib;../../../vendor/zlib/$(PlatformTarget)/$(Configuration);../../../vendor/json-c/$(PlatformTarget)/$(Configuration);../../../vendor/pcre/$(PlatformTarget)/$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries>LIBCMT;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ProgramDatabaseFile>../../../symbols/$(Configuration)_$(SafeParentName).pdb</ProgramDatabaseFile>
+      <MapFileName />
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention />
+      <ImportLibrary>$(IntDir)$(TargetName).lib</ImportLibrary>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Nightly|Win32'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>true</OmitFramePointers>
+      <AdditionalIncludeDirectories>../../../vendor/libv2;../../../vendor/libspeex;../../../vendor/portaudio;../../../vendor/bass;../../../Shared/publicsdk/include;../../Voice;./;../shared_logic;../../../Shared/XML/interface;../../../vendor;../../../vendor/lua/src;../../../vendor/zlib;../../../vendor/json-c;../../sdk/;../../../Shared/sdk;../../../vendor/sparsehash/current/src;../../../vendor/sparsehash/current/src/windows;../../../Shared/animation;../../../vendor/bochs;../../../vendor/bob_withers;../../../Shared/mods/deathmatch/logic;../../../vendor/pcre;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_CRT_SECURE_NO_WARNINGS;LUA_USE_APICHECK;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>StdInc.h</PrecompiledHeaderFile>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4996;4482;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <ProjectReference>
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
+    </ProjectReference>
+    <Link>
+      <AdditionalOptions>/FIXED:NO %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalDependencies>libv2.lib;libspeex.lib;bass.lib;bass_fx.lib;bassmix.lib;tags.lib;Psapi.lib;Winmm.lib;kernel32.lib;wsock32.lib;zlib.lib;json.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <AdditionalLibraryDirectories>../../../vendor/libspeex;../../../vendor/bass/lib;../../../vendor/lua/$(PlatformTarget)/$(Configuration)Client;../../../vendor/libv2/lib;../../../vendor/zlib/$(PlatformTarget)/$(Configuration);../../../vendor/json-c/$(PlatformTarget)/$(Configuration);../../../vendor/pcre/$(PlatformTarget)/$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries>LIBCMT;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ProgramDatabaseFile>../../../symbols/$(Configuration)_$(SafeParentName).pdb</ProgramDatabaseFile>
+      <MapFileName />
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention />
+      <ImportLibrary>$(IntDir)$(TargetName).lib</ImportLibrary>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="CClient.cpp" />
+    <ClCompile Include="Client.cpp" />
+    <ClCompile Include="ClientCommands.cpp" />
+    <ClCompile Include="CVoiceRecorder.cpp" />
+    <ClCompile Include="HeapTrace.cpp" />
+    <ClCompile Include="StdInc.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">StdInc.h</PrecompiledHeaderFile>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Nightly|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Nightly|Win32'">StdInc.h</PrecompiledHeaderFile>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">StdInc.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="logic\CBlendedWeather.cpp" />
+    <ClCompile Include="logic\CClientEntityRefManager.cpp" />
+    <ClCompile Include="logic\CClientGame.cpp" />
+    <ClCompile Include="logic\CClientModelCacheManager.cpp" />
+    <ClCompile Include="logic\CClientPerfStat.LibMemory.cpp" />
+    <ClCompile Include="logic\CClientPerfStat.LuaMemory.cpp" />
+    <ClCompile Include="logic\CClientPerfStat.LuaTiming.cpp" />
+    <ClCompile Include="logic\CClientPerfStat.PacketUsage.cpp" />
+    <ClCompile Include="logic\CClientPerfStatManager.cpp" />
+    <ClCompile Include="logic\CDeathmatchObject.cpp" />
+    <ClCompile Include="logic\CDeathmatchVehicle.cpp" />
+    <ClCompile Include="logic\CDownloadableResource.cpp" />
+    <ClCompile Include="logic\CDynamicLibrary.cpp" />
+    <ClCompile Include="logic\CElementDeleter.cpp" />
+    <ClCompile Include="logic\CElementGroup.cpp" />
+    <ClCompile Include="logic\CFoo.cpp" />
+    <ClCompile Include="logic\CGameEntityXRefManager.cpp" />
+    <ClCompile Include="logic\CLocalServer.cpp" />
+    <ClCompile Include="logic\CMovingObjectsManager.cpp" />
+    <ClCompile Include="logic\CNametags.cpp" />
+    <ClCompile Include="logic\CNetAPI.cpp">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Nightly|Win32'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="logic\CNetworkStats.cpp">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Nightly|Win32'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="logic\CObjectSync.cpp" />
+    <ClCompile Include="logic\CPacketHandler.cpp" />
+    <ClCompile Include="logic\CPedSync.cpp" />
+    <ClCompile Include="logic\CRadarMap.cpp" />
+    <ClCompile Include="..\shared_logic\CRemoteCalls.cpp" />
+    <ClCompile Include="logic\CResource.cpp" />
+    <ClCompile Include="logic\CResourceConfigItem.cpp" />
+    <ClCompile Include="logic\CResourceManager.cpp" />
+    <ClCompile Include="logic\CScriptKeyBinds.cpp" />
+    <ClCompile Include="logic\CServer.cpp" />
+    <ClCompile Include="logic\CServerIdManager.cpp" />
+    <ClCompile Include="logic\CSingularFileDownload.cpp" />
+    <ClCompile Include="logic\CSingularFileDownloadManager.cpp" />
+    <ClCompile Include="logic\CStaticFunctionDefinitions.cpp" />
+    <ClCompile Include="logic\CSyncDebug.cpp" />
+    <ClCompile Include="logic\CTransferBox.cpp" />
+    <ClCompile Include="logic\CUnoccupiedVehicleSync.cpp" />
+    <ClCompile Include="logic\rpc\CAudioRPCs.cpp" />
+    <ClCompile Include="logic\rpc\CBlipRPCs.cpp" />
+    <ClCompile Include="logic\rpc\CCameraRPCs.cpp" />
+    <ClCompile Include="logic\rpc\CElementRPCs.cpp" />
+    <ClCompile Include="logic\rpc\CHandlingRPCs.cpp" />
+    <ClCompile Include="logic\rpc\CInputRPCs.cpp" />
+    <ClCompile Include="logic\rpc\CMarkerRPCs.cpp" />
+    <ClCompile Include="logic\rpc\CObjectRPCs.cpp" />
+    <ClCompile Include="logic\rpc\COutputRPCs.cpp" />
+    <ClCompile Include="logic\rpc\CPedRPCs.cpp" />
+    <ClCompile Include="logic\rpc\CPickupRPCs.cpp" />
+    <ClCompile Include="logic\rpc\CPlayerRPCs.cpp" />
+    <ClCompile Include="logic\rpc\CRadarRPCs.cpp" />
+    <ClCompile Include="logic\rpc\CRPCFunctions.cpp" />
+    <ClCompile Include="logic\rpc\CTeamRPCs.cpp" />
+    <ClCompile Include="logic\rpc\CVehicleRPCs.cpp" />
+    <ClCompile Include="logic\rpc\CWaterRPCs.cpp" />
+    <ClCompile Include="logic\rpc\CWeaponRPCs.cpp" />
+    <ClCompile Include="logic\rpc\CWorldRPCs.cpp" />
+    <ClCompile Include="..\shared_logic\CAntiCheat.cpp" />
+    <ClCompile Include="..\shared_logic\CAntiCheatModule.cpp" />
+    <ClCompile Include="..\shared_logic\CBassAudio.cpp" />
+    <ClCompile Include="..\shared_logic\CClient3DMarker.cpp" />
+    <ClCompile Include="..\shared_logic\CClientCamera.cpp" />
+    <ClCompile Include="..\shared_logic\CClientCheckpoint.cpp" />
+    <ClCompile Include="..\shared_logic\CClientCivilian.cpp" />
+    <ClCompile Include="..\shared_logic\CClientCivilianManager.cpp" />
+    <ClCompile Include="..\shared_logic\CClientColCircle.cpp" />
+    <ClCompile Include="..\shared_logic\CClientColCuboid.cpp" />
+    <ClCompile Include="..\shared_logic\CClientColManager.cpp" />
+    <ClCompile Include="..\shared_logic\CClientColModel.cpp" />
+    <ClCompile Include="..\shared_logic\CClientColModelManager.cpp" />
+    <ClCompile Include="..\shared_logic\CClientColPolygon.cpp" />
+    <ClCompile Include="..\shared_logic\CClientColRectangle.cpp" />
+    <ClCompile Include="..\shared_logic\CClientColShape.cpp" />
+    <ClCompile Include="..\shared_logic\CClientColSphere.cpp" />
+    <ClCompile Include="..\shared_logic\CClientColTube.cpp" />
+    <ClCompile Include="..\shared_logic\CClientCorona.cpp" />
+    <ClCompile Include="..\shared_logic\CClientDFF.cpp" />
+    <ClCompile Include="..\shared_logic\CClientDFFManager.cpp" />
+    <ClCompile Include="..\shared_logic\CClientDisplay.cpp" />
+    <ClCompile Include="..\shared_logic\CClientDisplayManager.cpp" />
+    <ClCompile Include="..\shared_logic\CClientDummy.cpp" />
+    <ClCompile Include="..\shared_logic\CClientDxFont.cpp" />
+    <ClCompile Include="..\shared_logic\CClientEntity.cpp" />
+    <ClCompile Include="..\shared_logic\CClientExplosionManager.cpp" />
+    <ClCompile Include="..\shared_logic\CClientGroups.cpp" />
+    <ClCompile Include="..\shared_logic\CClientGUIElement.cpp" />
+    <ClCompile Include="..\shared_logic\CClientGuiFont.cpp" />
+    <ClCompile Include="..\shared_logic\CClientGUIManager.cpp" />
+    <ClCompile Include="..\shared_logic\CClientManager.cpp" />
+    <ClCompile Include="..\shared_logic\CClientMarker.cpp" />
+    <ClCompile Include="..\shared_logic\CClientMarkerCommon.cpp" />
+    <ClCompile Include="..\shared_logic\CClientMarkerManager.cpp" />
+    <ClCompile Include="..\shared_logic\CClientMaterial.cpp" />
+    <ClCompile Include="..\shared_logic\CClientModelRequestManager.cpp" />
+    <ClCompile Include="..\shared_logic\CClientObject.cpp" />
+    <ClCompile Include="..\shared_logic\CClientObjectManager.cpp" />
+    <ClCompile Include="..\shared_logic\CClientPacketRecorder.cpp" />
+    <ClCompile Include="..\shared_logic\CClientPad.cpp" />
+    <ClCompile Include="..\shared_logic\CClientPathManager.cpp" />
+    <ClCompile Include="..\shared_logic\CClientPathNode.cpp" />
+    <ClCompile Include="..\shared_logic\CClientPed.cpp" />
+    <ClCompile Include="..\shared_logic\CClientPedManager.cpp" />
+    <ClCompile Include="..\shared_logic\CClientPickup.cpp" />
+    <ClCompile Include="..\shared_logic\CClientPickupManager.cpp" />
+    <ClCompile Include="..\shared_logic\CClientPlayer.cpp" />
+    <ClCompile Include="..\shared_logic\CClientPlayerClothes.cpp" />
+    <ClCompile Include="..\shared_logic\CClientPlayerManager.cpp" />
+    <ClCompile Include="..\shared_logic\CClientPlayerVoice.cpp" />
+    <ClCompile Include="..\shared_logic\CClientProjectile.cpp" />
+    <ClCompile Include="..\shared_logic\CClientProjectileManager.cpp" />
+    <ClCompile Include="..\shared_logic\CClientRadarArea.cpp" />
+    <ClCompile Include="..\shared_logic\CClientRadarAreaManager.cpp" />
+    <ClCompile Include="..\shared_logic\CClientRadarMarker.cpp" />
+    <ClCompile Include="..\shared_logic\CClientRadarMarkerManager.cpp" />
+    <ClCompile Include="..\shared_logic\CClientRenderElement.cpp" />
+    <ClCompile Include="..\shared_logic\CClientRenderElementManager.cpp" />
+    <ClCompile Include="..\shared_logic\CClientShader.cpp" />
+    <ClCompile Include="..\shared_logic\CClientSound.cpp" />
+    <ClCompile Include="..\shared_logic\CClientSoundManager.cpp" />
+    <ClCompile Include="..\shared_logic\CClientSpatialDatabase.cpp" />
+    <ClCompile Include="..\shared_logic\CClientStreamElement.cpp" />
+    <ClCompile Include="..\shared_logic\CClientStreamer.cpp" />
+    <ClCompile Include="..\shared_logic\CClientStreamSector.cpp" />
+    <ClCompile Include="..\shared_logic\CClientStreamSectorRow.cpp" />
+    <ClCompile Include="..\shared_logic\CClientTask.cpp" />
+    <ClCompile Include="..\shared_logic\CClientTeam.cpp" />
+    <ClCompile Include="..\shared_logic\CClientTeamManager.cpp" />
+    <ClCompile Include="..\shared_logic\CClientTextDisplay.cpp" />
+    <ClCompile Include="..\shared_logic\CClientTexture.cpp" />
+    <ClCompile Include="..\shared_logic\CClientTXD.cpp" />
+    <ClCompile Include="..\shared_logic\CClientVehicle.cpp" />
+    <ClCompile Include="..\shared_logic\CClientVehicleManager.cpp" />
+    <ClCompile Include="..\shared_logic\CClientWater.cpp" />
+    <ClCompile Include="..\shared_logic\CClientWaterManager.cpp" />
+    <ClCompile Include="..\shared_logic\CClientWeapon.cpp" />
+    <ClCompile Include="..\shared_logic\CClientWeaponManager.cpp" />
+    <ClCompile Include="..\shared_logic\CCustomData.cpp" />
+    <ClCompile Include="..\shared_logic\CElementArray.cpp" />
+    <ClCompile Include="..\shared_logic\CEvents.cpp" />
+    <ClCompile Include="..\shared_logic\CLogger.cpp" />
+    <ClCompile Include="..\shared_logic\CMapEvent.cpp" />
+    <ClCompile Include="..\shared_logic\CMapEventManager.cpp" />
+    <ClCompile Include="..\shared_logic\CModelNames.cpp" />
+    <ClCompile Include="..\shared_logic\CObjectRespawner.cpp" />
+    <ClCompile Include="..\shared_logic\CRegisteredCommands.cpp" />
+    <ClCompile Include="..\shared_logic\CScriptDebugging.cpp">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Nightly|Win32'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\shared_logic\CScriptFile.cpp" />
+    <ClCompile Include="..\shared_logic\CVehicleNames.cpp" />
+    <ClCompile Include="..\shared_logic\CVehicleUpgrades.cpp" />
+    <ClCompile Include="..\shared_logic\CWeaponNames.cpp" />
+    <ClCompile Include="..\shared_logic\Utils.cpp" />
+    <ClCompile Include="..\shared_logic\lua\CLuaArgument.cpp" />
+    <ClCompile Include="..\shared_logic\lua\CLuaArguments.cpp" />
+    <ClCompile Include="..\shared_logic\lua\CLuaCFunctions.cpp" />
+    <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Audio.cpp" />
+    <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Bit.cpp" />
+    <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Blip.cpp" />
+    <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.BodyClothes.cpp" />
+    <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Camera.cpp" />
+    <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Commands.cpp" />
+    <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.cpp" />
+    <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Drawing.cpp" />
+    <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Element.cpp" />
+    <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Engine.cpp" />
+    <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Event.cpp" />
+    <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.GUI.cpp" />
+    <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Input.cpp" />
+    <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Marker.cpp" />
+    <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Object.cpp" />
+    <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Output.cpp" />
+    <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Ped.cpp" />
+    <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Pickup.cpp" />
+    <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Player.cpp" />
+    <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Projectile.cpp" />
+    <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Radar.cpp" />
+    <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Resource.cpp" />
+    <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Shape.cpp" />
+    <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Team.cpp" />
+    <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Util.cpp" />
+    <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Vehicle.cpp" />
+    <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Voice.cpp" />
+    <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Weapon.cpp" />
+    <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.World.cpp" />
+    <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.XML.cpp" />
+    <ClCompile Include="..\shared_logic\lua\CLuaFunctionParseHelpers.cpp" />
+    <ClCompile Include="..\shared_logic\lua\CLuaFunctionRef.cpp" />
+    <ClCompile Include="..\shared_logic\lua\CLuaMain.cpp" />
+    <ClCompile Include="..\shared_logic\lua\CLuaManager.cpp" />
+    <ClCompile Include="..\shared_logic\lua\CLuaMatrix.cpp" />
+    <ClCompile Include="..\shared_logic\lua\CLuaTimer.cpp" />
+    <ClCompile Include="..\shared_logic\lua\CLuaTimerManager.cpp" />
+    <ClCompile Include="..\shared_logic\lua\CLuaVector.cpp" />
+    <ClCompile Include="..\shared_logic\lua\LuaCommon.cpp" />
+    <ClCompile Include="..\shared_logic\lua\oopdefs\CLuaOOPFunctionDefs.Camera.cpp" />
+    <ClCompile Include="..\shared_logic\lua\oopdefs\CLuaOOPFunctionDefs.Element.cpp" />
+    <ClCompile Include="..\shared_logic\lua\oopdefs\CLuaOOPFunctionDefs.Ped.cpp" />
+    <ClCompile Include="..\shared_logic\lua\oopdefs\CLuaOOPFunctionDefs.Vehicle.cpp" />
+    <ClCompile Include="..\..\..\vendor\bochs\bochs_internal\crc32.cpp" />
+    <ClCompile Include="..\shared_logic\luadefs\CLuaClassDefs.cpp" />
+    <ClCompile Include="..\shared_logic\luadefs\CLuaDefs.cpp" />
+    <ClCompile Include="..\shared_logic\luadefs\CLuaFileDefs.cpp" />
+    <ClCompile Include="..\shared_logic\luadefs\CLuaFxDefs.cpp" />
+    <ClCompile Include="..\shared_logic\luadefs\CLuaMatrixDefs.cpp" />
+    <ClCompile Include="..\shared_logic\luadefs\CLuaTaskDefs.cpp" />
+    <ClCompile Include="..\shared_logic\luadefs\CLuaVectorDefs.cpp" />
+    <ClCompile Include="..\..\..\vendor\bob_withers\base64.cpp" />
+    <ClCompile Include="..\..\..\vendor\portaudio\pa_allocation.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Nightly|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vendor\portaudio\pa_converters.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Nightly|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vendor\portaudio\pa_cpuload.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Nightly|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vendor\portaudio\pa_debugprint.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Nightly|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vendor\portaudio\pa_dither.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Nightly|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vendor\portaudio\pa_front.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Nightly|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vendor\portaudio\pa_process.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Nightly|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vendor\portaudio\pa_ringbuffer.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Nightly|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vendor\portaudio\pa_stream.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Nightly|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vendor\portaudio\pa_trace.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Nightly|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vendor\portaudio\pa_win_ds.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Nightly|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vendor\portaudio\pa_win_ds_dynlink.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Nightly|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vendor\portaudio\pa_win_hostapis.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Nightly|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vendor\portaudio\pa_win_util.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Nightly|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vendor\portaudio\pa_win_waveformat.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Nightly|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vendor\portaudio\pa_win_wdmks_utils.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Nightly|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vendor\portaudio\pa_$(PlatformTarget)_plain_converters.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Nightly|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Shared\mods\deathmatch\logic\CDebugHookManager.cpp" />
+    <ClCompile Include="..\..\..\Shared\mods\deathmatch\logic\CIdArray.cpp" />
+    <ClCompile Include="..\..\..\Shared\mods\deathmatch\logic\CLatentReceiver.cpp" />
+    <ClCompile Include="..\..\..\Shared\mods\deathmatch\logic\CLatentSendQueue.cpp" />
+    <ClCompile Include="..\..\..\Shared\mods\deathmatch\logic\CLatentTransferManager.cpp" />
+    <ClCompile Include="..\..\..\Shared\mods\deathmatch\logic\CLuaShared.cpp" />
+    <ClCompile Include="..\..\..\Shared\mods\deathmatch\logic\CZoneNames.cpp" />
+    <ClCompile Include="..\..\..\Shared\mods\deathmatch\logic\Enums.cpp" />
+    <ClCompile Include="..\..\..\Shared\animation\CEasingCurve.cpp" />
+    <ClCompile Include="..\..\..\Shared\animation\CPositionRotationAnimation.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="CClient.h" />
+    <ClInclude Include="Client.h" />
+    <ClInclude Include="ClientCommands.h" />
+    <ClInclude Include="CVoiceRecorder.h" />
+    <ClInclude Include="HeapTrace.h" />
+    <ClInclude Include="StdInc.h" />
+    <ClInclude Include="..\..\version.h" />
+    <ClInclude Include="logic\CBitStream.h" />
+    <ClInclude Include="logic\CBlendedWeather.h" />
+    <ClInclude Include="logic\CClientEntityRefManager.h" />
+    <ClInclude Include="logic\CClientGame.h" />
+    <ClInclude Include="logic\CClientModelCacheManager.h" />
+    <ClInclude Include="logic\CClientPerfStatManager.h" />
+    <ClInclude Include="logic\CClientPerfStatModule.h" />
+    <ClInclude Include="logic\CDeathmatchObject.h" />
+    <ClInclude Include="logic\CDeathmatchVehicle.h" />
+    <ClInclude Include="logic\CDownloadableResource.h" />
+    <ClInclude Include="logic\CDynamicLibrary.h" />
+    <ClInclude Include="logic\CElementDeleter.h" />
+    <ClInclude Include="logic\CElementGroup.h" />
+    <ClInclude Include="logic\CFoo.h" />
+    <ClInclude Include="logic\CGameEntityXRefManager.h" />
+    <ClInclude Include="logic\CInterpolator.h" />
+    <ClInclude Include="logic\CLocalServer.h" />
+    <ClInclude Include="logic\CMovingObjectsManager.h" />
+    <ClInclude Include="logic\CNametags.h" />
+    <ClInclude Include="logic\CNetAPI.h" />
+    <ClInclude Include="logic\CNetworkStats.h" />
+    <ClInclude Include="logic\CObjectSync.h" />
+    <ClInclude Include="logic\Config.h" />
+    <ClInclude Include="logic\CPacketHandler.h" />
+    <ClInclude Include="logic\CPedSync.h" />
+    <ClInclude Include="logic\CRadarMap.h" />
+    <ClInclude Include="..\shared_logic\CRemoteCalls.h" />
+    <ClInclude Include="logic\CResource.h" />
+    <ClInclude Include="logic\CResourceConfigItem.h" />
+    <ClInclude Include="logic\CResourceFile.h" />
+    <ClInclude Include="logic\CResourceManager.h" />
+    <ClInclude Include="logic\CScriptKeyBinds.h" />
+    <ClInclude Include="logic\CServer.h" />
+    <ClInclude Include="logic\CServerIdManager.h" />
+    <ClInclude Include="logic\CSingularFileDownload.h" />
+    <ClInclude Include="logic\CSingularFileDownloadManager.h" />
+    <ClInclude Include="logic\CStaticFunctionDefinitions.h" />
+    <ClInclude Include="logic\CSyncDebug.h" />
+    <ClInclude Include="logic\CTransferBox.h" />
+    <ClInclude Include="logic\CUnoccupiedVehicleSync.h" />
+    <ClInclude Include="..\..\..\Shared\sdk\net\Packets.h" />
+    <ClInclude Include="..\..\..\Shared\sdk\net\SyncStructures.h" />
+    <ClInclude Include="logic\rpc\CAudioRPCs.h" />
+    <ClInclude Include="logic\rpc\CBlipRPCs.h" />
+    <ClInclude Include="logic\rpc\CCameraRPCs.h" />
+    <ClInclude Include="logic\rpc\CElementRPCs.h" />
+    <ClInclude Include="logic\rpc\CHandlingRPCs.h" />
+    <ClInclude Include="logic\rpc\CInputRPCs.h" />
+    <ClInclude Include="logic\rpc\CMarkerRPCs.h" />
+    <ClInclude Include="logic\rpc\CObjectRPCs.h" />
+    <ClInclude Include="logic\rpc\COutputRPCs.h" />
+    <ClInclude Include="logic\rpc\CPedRPCs.h" />
+    <ClInclude Include="logic\rpc\CPickupRPCs.h" />
+    <ClInclude Include="logic\rpc\CPlayerRPCs.h" />
+    <ClInclude Include="logic\rpc\CRadarRPCs.h" />
+    <ClInclude Include="logic\rpc\CRPCFunctions.h" />
+    <ClInclude Include="logic\rpc\CTeamRPCs.h" />
+    <ClInclude Include="logic\rpc\CVehicleRPCs.h" />
+    <ClInclude Include="logic\rpc\CWaterRPCs.h" />
+    <ClInclude Include="logic\rpc\CWeaponRPCs.h" />
+    <ClInclude Include="logic\rpc\CWorldRPCs.h" />
+    <ClInclude Include="..\..\..\Shared\sdk\net\rpc_enums.h" />
+    <ClInclude Include="..\..\..\Shared\sdk\ieee754.h" />
+    <ClInclude Include="..\..\sdk\utils\XFont.h" />
+    <ClInclude Include="..\..\..\vendor\portaudio\pa_allocation.h" />
+    <ClInclude Include="..\..\..\vendor\portaudio\pa_asio.h" />
+    <ClInclude Include="..\..\..\vendor\portaudio\pa_converters.h" />
+    <ClInclude Include="..\..\..\vendor\portaudio\pa_cpuload.h" />
+    <ClInclude Include="..\..\..\vendor\portaudio\pa_debugprint.h" />
+    <ClInclude Include="..\..\..\vendor\portaudio\pa_dither.h" />
+    <ClInclude Include="..\..\..\vendor\portaudio\pa_endianness.h" />
+    <ClInclude Include="..\..\..\vendor\portaudio\pa_hostapi.h" />
+    <ClInclude Include="..\..\..\vendor\portaudio\pa_jack.h" />
+    <ClInclude Include="..\..\..\vendor\portaudio\pa_linux_alsa.h" />
+    <ClInclude Include="..\..\..\vendor\portaudio\pa_mac_core.h" />
+    <ClInclude Include="..\..\..\vendor\portaudio\pa_memorybarrier.h" />
+    <ClInclude Include="..\..\..\vendor\portaudio\pa_process.h" />
+    <ClInclude Include="..\..\..\vendor\portaudio\pa_ringbuffer.h" />
+    <ClInclude Include="..\..\..\vendor\portaudio\pa_stream.h" />
+    <ClInclude Include="..\..\..\vendor\portaudio\pa_trace.h" />
+    <ClInclude Include="..\..\..\vendor\portaudio\pa_types.h" />
+    <ClInclude Include="..\..\..\vendor\portaudio\pa_util.h" />
+    <ClInclude Include="..\..\..\vendor\portaudio\pa_win_ds.h" />
+    <ClInclude Include="..\..\..\vendor\portaudio\pa_win_ds_dynlink.h" />
+    <ClInclude Include="..\..\..\vendor\portaudio\pa_win_wasapi.h" />
+    <ClInclude Include="..\..\..\vendor\portaudio\pa_win_waveformat.h" />
+    <ClInclude Include="..\..\..\vendor\portaudio\pa_win_wdmks_utils.h" />
+    <ClInclude Include="..\..\..\vendor\portaudio\pa_win_wmme.h" />
+    <ClInclude Include="..\..\..\vendor\portaudio\pa_$(PlatformTarget)_plain_converters.h" />
+    <ClInclude Include="..\..\..\vendor\portaudio\portaudio.h" />
+    <ClInclude Include="..\shared_logic\CAntiCheat.h" />
+    <ClInclude Include="..\shared_logic\CAntiCheatModule.h" />
+    <ClInclude Include="..\shared_logic\CBassAudio.h" />
+    <ClInclude Include="..\shared_logic\CCallback.h" />
+    <ClInclude Include="..\shared_logic\CClient3DMarker.h" />
+    <ClInclude Include="..\shared_logic\CClientCamera.h" />
+    <ClInclude Include="..\shared_logic\CClientCheckpoint.h" />
+    <ClInclude Include="..\shared_logic\CClientCivilian.h" />
+    <ClInclude Include="..\shared_logic\CClientCivilianManager.h" />
+    <ClInclude Include="..\shared_logic\CClientColCallback.h" />
+    <ClInclude Include="..\shared_logic\CClientColCircle.h" />
+    <ClInclude Include="..\shared_logic\CClientColCuboid.h" />
+    <ClInclude Include="..\shared_logic\CClientColManager.h" />
+    <ClInclude Include="..\shared_logic\CClientColModel.h" />
+    <ClInclude Include="..\shared_logic\CClientColModelManager.h" />
+    <ClInclude Include="..\shared_logic\CClientColPolygon.h" />
+    <ClInclude Include="..\shared_logic\CClientColRectangle.h" />
+    <ClInclude Include="..\shared_logic\CClientColShape.h" />
+    <ClInclude Include="..\shared_logic\CClientColSphere.h" />
+    <ClInclude Include="..\shared_logic\CClientColTube.h" />
+    <ClInclude Include="..\shared_logic\CClientCommon.h" />
+    <ClInclude Include="..\shared_logic\CClientCorona.h" />
+    <ClInclude Include="..\shared_logic\CClientDFF.h" />
+    <ClInclude Include="..\shared_logic\CClientDFFManager.h" />
+    <ClInclude Include="..\shared_logic\CClientDisplay.h" />
+    <ClInclude Include="..\shared_logic\CClientDisplayManager.h" />
+    <ClInclude Include="..\shared_logic\CClientDummy.h" />
+    <ClInclude Include="..\shared_logic\CClientDxFont.h" />
+    <ClInclude Include="..\shared_logic\CClientEntity.h" />
+    <ClInclude Include="..\shared_logic\CClientExplosionManager.h" />
+    <ClInclude Include="..\shared_logic\CClientGroups.h" />
+    <ClInclude Include="..\shared_logic\CClientGUIElement.h" />
+    <ClInclude Include="..\shared_logic\CClientGuiFont.h" />
+    <ClInclude Include="..\shared_logic\CClientGUIManager.h" />
+    <ClInclude Include="..\shared_logic\CClientManager.h" />
+    <ClInclude Include="..\shared_logic\CClientMarker.h" />
+    <ClInclude Include="..\shared_logic\CClientMarkerCommon.h" />
+    <ClInclude Include="..\shared_logic\CClientMarkerManager.h" />
+    <ClInclude Include="..\shared_logic\CClientMaterial.h" />
+    <ClInclude Include="..\shared_logic\CClientModelRequestManager.h" />
+    <ClInclude Include="..\shared_logic\CClientObject.h" />
+    <ClInclude Include="..\shared_logic\CClientObjectManager.h" />
+    <ClInclude Include="..\shared_logic\CClientPacketRecorder.h" />
+    <ClInclude Include="..\shared_logic\CClientPad.h" />
+    <ClInclude Include="..\shared_logic\CClientPathManager.h" />
+    <ClInclude Include="..\shared_logic\CClientPathNode.h" />
+    <ClInclude Include="..\shared_logic\CClientPed.h" />
+    <ClInclude Include="..\shared_logic\CClientPedManager.h" />
+    <ClInclude Include="..\shared_logic\CClientPickup.h" />
+    <ClInclude Include="..\shared_logic\CClientPickupManager.h" />
+    <ClInclude Include="..\shared_logic\CClientPlayer.h" />
+    <ClInclude Include="..\shared_logic\CClientPlayerClothes.h" />
+    <ClInclude Include="..\shared_logic\CClientPlayerManager.h" />
+    <ClInclude Include="..\shared_logic\CClientPlayerModule.h" />
+    <ClInclude Include="..\shared_logic\CClientPlayerVoice.h" />
+    <ClInclude Include="..\shared_logic\CClientProjectile.h" />
+    <ClInclude Include="..\shared_logic\CClientProjectileManager.h" />
+    <ClInclude Include="..\shared_logic\CClientRadarArea.h" />
+    <ClInclude Include="..\shared_logic\CClientRadarAreaManager.h" />
+    <ClInclude Include="..\shared_logic\CClientRadarMarker.h" />
+    <ClInclude Include="..\shared_logic\CClientRadarMarkerManager.h" />
+    <ClInclude Include="..\shared_logic\CClientRenderElement.h" />
+    <ClInclude Include="..\shared_logic\CClientRenderElementManager.h" />
+    <ClInclude Include="..\shared_logic\CClientShader.h" />
+    <ClInclude Include="..\shared_logic\CClientSound.h" />
+    <ClInclude Include="..\shared_logic\CClientSoundManager.h" />
+    <ClInclude Include="..\shared_logic\CClientSpatialDatabase.h" />
+    <ClInclude Include="..\shared_logic\CClientStreamElement.h" />
+    <ClInclude Include="..\shared_logic\CClientStreamer.h" />
+    <ClInclude Include="..\shared_logic\CClientStreamSector.h" />
+    <ClInclude Include="..\shared_logic\CClientStreamSectorRow.h" />
+    <ClInclude Include="..\shared_logic\CClientTask.h" />
+    <ClInclude Include="..\shared_logic\CClientTeam.h" />
+    <ClInclude Include="..\shared_logic\CClientTeamManager.h" />
+    <ClInclude Include="..\shared_logic\CClientTextDisplay.h" />
+    <ClInclude Include="..\shared_logic\CClientTexture.h" />
+    <ClInclude Include="..\shared_logic\CClientTXD.h" />
+    <ClInclude Include="..\shared_logic\CClientVehicle.h" />
+    <ClInclude Include="..\shared_logic\CClientVehicleManager.h" />
+    <ClInclude Include="..\shared_logic\CClientWater.h" />
+    <ClInclude Include="..\shared_logic\CClientWaterManager.h" />
+    <ClInclude Include="..\shared_logic\CClientWeapon.h" />
+    <ClInclude Include="..\shared_logic\CClientWeaponManager.h" />
+    <ClInclude Include="..\shared_logic\CCustomData.h" />
+    <ClInclude Include="..\shared_logic\CElementArray.h" />
+    <ClInclude Include="..\shared_logic\CEvents.h" />
+    <ClInclude Include="..\shared_logic\CLogger.h" />
+    <ClInclude Include="..\shared_logic\CMapEvent.h" />
+    <ClInclude Include="..\shared_logic\CMapEventManager.h" />
+    <ClInclude Include="..\shared_logic\CModelNames.h" />
+    <ClInclude Include="..\shared_logic\CObjectRespawner.h" />
+    <ClInclude Include="..\shared_logic\CRegisteredCommands.h" />
+    <ClInclude Include="..\shared_logic\CScriptDebugging.h" />
+    <ClInclude Include="..\shared_logic\CScriptFile.h" />
+    <ClInclude Include="..\shared_logic\CSimulatedPlayPosition.h" />
+    <ClInclude Include="..\shared_logic\CVehicleNames.h" />
+    <ClInclude Include="..\shared_logic\CVehicleUpgrades.h" />
+    <ClInclude Include="..\shared_logic\CWeaponNames.h" />
+    <ClInclude Include="..\shared_logic\Element.h" />
+    <ClInclude Include="..\shared_logic\Utils.h" />
+    <ClInclude Include="..\shared_logic\lua\CLuaArgument.h" />
+    <ClInclude Include="..\shared_logic\lua\CLuaArguments.h" />
+    <ClInclude Include="..\shared_logic\lua\CLuaCFunctions.h" />
+    <ClInclude Include="..\shared_logic\lua\CLuaFunctionDefs.h" />
+    <ClInclude Include="..\shared_logic\lua\CLuaFunctionParseHelpers.h" />
+    <ClInclude Include="..\shared_logic\lua\CLuaFunctionRef.h" />
+    <ClInclude Include="..\shared_logic\lua\CLuaMain.h" />
+    <ClInclude Include="..\shared_logic\lua\CLuaManager.h" />
+    <ClInclude Include="..\shared_logic\lua\CLuaMatrix.h" />
+    <ClInclude Include="..\shared_logic\lua\CLuaModuleManager.h" />
+    <ClInclude Include="..\shared_logic\lua\CLuaTimer.h" />
+    <ClInclude Include="..\shared_logic\lua\CLuaTimerManager.h" />
+    <ClInclude Include="..\shared_logic\lua\CLuaVector.h" />
+    <ClInclude Include="..\shared_logic\lua\LuaCommon.h" />
+    <ClInclude Include="..\..\..\vendor\bochs\bochs_internal\crc32.h" />
+    <ClInclude Include="..\shared_logic\luadefs\CLuaClassDefs.h" />
+    <ClInclude Include="..\shared_logic\luadefs\CLuaDefs.h" />
+    <ClInclude Include="..\shared_logic\luadefs\CLuaFileDefs.h" />
+    <ClInclude Include="..\shared_logic\luadefs\CLuaFxDefs.h" />
+    <ClInclude Include="..\shared_logic\luadefs\CLuaMatrixDefs.h" />
+    <ClInclude Include="..\shared_logic\luadefs\CLuaTaskDefs.h" />
+    <ClInclude Include="..\shared_logic\luadefs\CLuaVectorDefs.h" />
+    <ClInclude Include="..\shared_logic\lua\oopdefs\CLuaOOPDefs.h" />
+    <ClInclude Include="..\..\..\Shared\mods\deathmatch\logic\CDebugHookManager.h" />
+    <ClInclude Include="..\..\..\Shared\mods\deathmatch\logic\CIdArray.h" />
+    <ClInclude Include="..\..\..\Shared\mods\deathmatch\logic\CLatentTransferManager.h" />
+    <ClInclude Include="..\..\..\Shared\mods\deathmatch\logic\CLuaShared.h" />
+    <ClInclude Include="..\..\..\Shared\mods\deathmatch\logic\CTickRateSettings.h" />
+    <ClInclude Include="..\..\..\Shared\mods\deathmatch\logic\CZoneNames.h" />
+    <ClInclude Include="..\..\..\Shared\mods\deathmatch\logic\Enums.h" />
+    <ClInclude Include="..\..\..\Shared\animation\CEasingCurve.h" />
+    <ClInclude Include="..\..\..\Shared\animation\CPositionRotationAnimation.h" />
+    <ClInclude Include="..\..\..\Shared\animation\TInterpolation.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\vendor\lua\mak.vs2008\lua5.1c_dll.vcxproj">
+      <Project>{7922db76-1413-4113-a2be-88fd233e910d}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\vendor\pcre\pcre 2008.vcxproj">
+      <Project>{39452acc-ff12-488d-94b6-301b4efbb606}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\vendor\zlib\zlib 2008.vcxproj">
+      <Project>{ccabbc2e-172d-46fd-bc43-5a9fcd295112}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties DevPartner_IsInstrumented="1" />
+    </VisualStudio>
+  </ProjectExtensions>
+</Project>

@@ -1,0 +1,977 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Source Files\falagard">
+      <UniqueIdentifier>{2c75058f-3a06-46ba-9815-4f02622669af}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\elements">
+      <UniqueIdentifier>{20980730-1c53-4940-a2a9-c74fc627c39b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\pcre">
+      <UniqueIdentifier>{e0905ffa-72a3-4f28-a89d-2ec1653b0040}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\tinyxml">
+      <UniqueIdentifier>{7ece2213-4f1e-4e68-8dd1-d7021b6a6680}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Header Files\falagard">
+      <UniqueIdentifier>{7921ddac-a45b-487c-8f85-a7d8b1ac46b3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\elements">
+      <UniqueIdentifier>{a0ccb2a5-f6d9-4336-8c0b-ddb2bd9a9616}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\pcre">
+      <UniqueIdentifier>{1c99836e-66f9-468a-a74a-488d1ed54bfd}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\..\src\CEGUIBase.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\CEGUIcolour.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\CEGUIColourRect.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\CEGUIConfig_xmlHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\CEGUIDefaultResourceProvider.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\CEGUIEvent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\CEGUIEventArgs.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\CEGUIEventSet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\CEGUIExceptions.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\CEGUIFactoryModule.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\CEGUIFont.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\CEGUIFont_xmlHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\CEGUIFontManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\CEGUIGlobalEventSet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\CEGUIGUILayout_xmlHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\CEGUIImage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\CEGUIImageset.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\CEGUIImageset_xmlHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\CEGUIImagesetManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\CEGUILogger.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\CEGUIMouseCursor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\CEGUIProperty.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\CEGUIPropertyHelper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\CEGUIPropertySet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\CEGUIRect.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\CEGUIRefPtr.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\CEGUIRenderableElement.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\CEGUIRenderableFrame.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\CEGUIRenderableImage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\CEGUIRenderCache.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\CEGUIRenderer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\CEGUIScheme.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\CEGUIScheme_xmlHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\CEGUISchemeManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\CEGUIScriptModule.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\CEGUISize.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\CEGUIString.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\CEGUISystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\CEGUITexture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\CEGUITextUtils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\CEGUIVector.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\CEGUIWin32XMLSelectHack.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\CEGUIWindow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\CEGUIWindowFactory.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\CEGUIWindowFactoryManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\CEGUIWindowManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\CEGUIWindowProperties.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\CEGUIXMLAttributes.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\CEGUIXMLHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\CEGUIXMLParser.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\StdInc.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\falagard\CEGUIFalagard_xmlHandler.cpp">
+      <Filter>Source Files\falagard</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\falagard\CEGUIFalComponentBase.cpp">
+      <Filter>Source Files\falagard</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\falagard\CEGUIFalDimensions.cpp">
+      <Filter>Source Files\falagard</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\falagard\CEGUIFalFrameComponent.cpp">
+      <Filter>Source Files\falagard</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\falagard\CEGUIFalImageryComponent.cpp">
+      <Filter>Source Files\falagard</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\falagard\CEGUIFalImagerySection.cpp">
+      <Filter>Source Files\falagard</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\falagard\CEGUIFalLayerSpecification.cpp">
+      <Filter>Source Files\falagard</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\falagard\CEGUIFalNamedArea.cpp">
+      <Filter>Source Files\falagard</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\falagard\CEGUIFalPropertyDefinition.cpp">
+      <Filter>Source Files\falagard</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\falagard\CEGUIFalPropertyInitialiser.cpp">
+      <Filter>Source Files\falagard</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\falagard\CEGUIFalSectionSpecification.cpp">
+      <Filter>Source Files\falagard</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\falagard\CEGUIFalStateImagery.cpp">
+      <Filter>Source Files\falagard</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\falagard\CEGUIFalTextComponent.cpp">
+      <Filter>Source Files\falagard</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\falagard\CEGUIFalWidgetComponent.cpp">
+      <Filter>Source Files\falagard</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\falagard\CEGUIFalWidgetLookFeel.cpp">
+      <Filter>Source Files\falagard</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\falagard\CEGUIFalWidgetLookManager.cpp">
+      <Filter>Source Files\falagard</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\falagard\CEGUIFalXMLEnumHelper.cpp">
+      <Filter>Source Files\falagard</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIButtonBase.cpp">
+      <Filter>Source Files\elements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIButtonBaseProperties.cpp">
+      <Filter>Source Files\elements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\elements\CEGUICheckbox.cpp">
+      <Filter>Source Files\elements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\elements\CEGUICheckboxProperties.cpp">
+      <Filter>Source Files\elements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\elements\CEGUICombobox.cpp">
+      <Filter>Source Files\elements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIComboboxProperties.cpp">
+      <Filter>Source Files\elements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIComboDropList.cpp">
+      <Filter>Source Files\elements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIDragContainer.cpp">
+      <Filter>Source Files\elements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIDragContainerProperties.cpp">
+      <Filter>Source Files\elements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIEditbox.cpp">
+      <Filter>Source Files\elements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIEditboxProperties.cpp">
+      <Filter>Source Files\elements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIFrameWindow.cpp">
+      <Filter>Source Files\elements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIFrameWindowProperties.cpp">
+      <Filter>Source Files\elements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIGUISheet.cpp">
+      <Filter>Source Files\elements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIItemEntry.cpp">
+      <Filter>Source Files\elements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIItemListBase.cpp">
+      <Filter>Source Files\elements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIItemListBaseProperties.cpp">
+      <Filter>Source Files\elements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIListbox.cpp">
+      <Filter>Source Files\elements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIListboxImageItem.cpp">
+      <Filter>Source Files\elements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIListboxItem.cpp">
+      <Filter>Source Files\elements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIListboxNumberItem.cpp">
+      <Filter>Source Files\elements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIListboxProperties.cpp">
+      <Filter>Source Files\elements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIListboxTextItem.cpp">
+      <Filter>Source Files\elements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIListHeader.cpp">
+      <Filter>Source Files\elements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIListHeaderProperties.cpp">
+      <Filter>Source Files\elements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIListHeaderSegment.cpp">
+      <Filter>Source Files\elements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIListHeaderSegmentProperties.cpp">
+      <Filter>Source Files\elements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIMenubar.cpp">
+      <Filter>Source Files\elements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIMenuBase.cpp">
+      <Filter>Source Files\elements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIMenuBaseProperties.cpp">
+      <Filter>Source Files\elements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIMenuItem.cpp">
+      <Filter>Source Files\elements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIMenuItemProperties.cpp">
+      <Filter>Source Files\elements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIMultiColumnList.cpp">
+      <Filter>Source Files\elements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIMultiColumnListProperties.cpp">
+      <Filter>Source Files\elements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIMultiLineEditbox.cpp">
+      <Filter>Source Files\elements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIMultiLineEditboxProperties.cpp">
+      <Filter>Source Files\elements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIPopupMenu.cpp">
+      <Filter>Source Files\elements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIPopupMenuProperties.cpp">
+      <Filter>Source Files\elements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIProgressBar.cpp">
+      <Filter>Source Files\elements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIProgressBarProperties.cpp">
+      <Filter>Source Files\elements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIPushButton.cpp">
+      <Filter>Source Files\elements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIPushButtonProperties.cpp">
+      <Filter>Source Files\elements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIRadioButton.cpp">
+      <Filter>Source Files\elements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIRadioButtonProperties.cpp">
+      <Filter>Source Files\elements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIScrollablePane.cpp">
+      <Filter>Source Files\elements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIScrollablePaneProperties.cpp">
+      <Filter>Source Files\elements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIScrollbar.cpp">
+      <Filter>Source Files\elements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIScrollbarProperties.cpp">
+      <Filter>Source Files\elements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIScrolledContainer.cpp">
+      <Filter>Source Files\elements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIScrolledContainerProperties.cpp">
+      <Filter>Source Files\elements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\elements\CEGUISlider.cpp">
+      <Filter>Source Files\elements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\elements\CEGUISliderProperties.cpp">
+      <Filter>Source Files\elements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\elements\CEGUISpinner.cpp">
+      <Filter>Source Files\elements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\elements\CEGUISpinnerProperties.cpp">
+      <Filter>Source Files\elements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIStatic.cpp">
+      <Filter>Source Files\elements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIStaticImage.cpp">
+      <Filter>Source Files\elements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIStaticImageProperties.cpp">
+      <Filter>Source Files\elements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIStaticProperties.cpp">
+      <Filter>Source Files\elements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIStaticText.cpp">
+      <Filter>Source Files\elements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIStaticTextProperties.cpp">
+      <Filter>Source Files\elements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\elements\CEGUITabButton.cpp">
+      <Filter>Source Files\elements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\elements\CEGUITabControl.cpp">
+      <Filter>Source Files\elements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\elements\CEGUITabControlProperties.cpp">
+      <Filter>Source Files\elements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\elements\CEGUITextItem.cpp">
+      <Filter>Source Files\elements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\elements\CEGUITextItemProperties.cpp">
+      <Filter>Source Files\elements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIThumb.cpp">
+      <Filter>Source Files\elements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIThumbProperties.cpp">
+      <Filter>Source Files\elements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\elements\CEGUITitlebar.cpp">
+      <Filter>Source Files\elements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\elements\CEGUITitlebarProperties.cpp">
+      <Filter>Source Files\elements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\elements\CEGUITooltip.cpp">
+      <Filter>Source Files\elements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\elements\CEGUITooltipProperties.cpp">
+      <Filter>Source Files\elements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\pcre\chartables.c">
+      <Filter>Source Files\pcre</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\pcre\get.c">
+      <Filter>Source Files\pcre</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\pcre\maketables.c">
+      <Filter>Source Files\pcre</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\pcre\pcre.c">
+      <Filter>Source Files\pcre</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\pcre\pcreposix.c">
+      <Filter>Source Files\pcre</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\pcre\study.c">
+      <Filter>Source Files\pcre</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\tinyxml\tinystr.cpp">
+      <Filter>Source Files\tinyxml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\tinyxml\tinyxml.cpp">
+      <Filter>Source Files\tinyxml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\tinyxml\tinyxmlerror.cpp">
+      <Filter>Source Files\tinyxml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\tinyxml\tinyxmlparser.cpp">
+      <Filter>Source Files\tinyxml</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\..\src\CEGUITinyXMLParser.hpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\CEGUIXercesParser.hpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\tinyxml\tinystr.h">
+      <Filter>Source Files\tinyxml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\tinyxml\tinyxml.h">
+      <Filter>Source Files\tinyxml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\CEGUI.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\CEGUIBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\CEGUIcolour.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\CEGUIColourRect.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\CEGUIConfig.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\CEGUIConfig_xmlHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\CEGUIDataContainer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\CEGUIDefaultResourceProvider.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\CEGUIEvent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\CEGUIEventArgs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\CEGUIEventSet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\CEGUIExceptions.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\CEGUIFactoryModule.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\CEGUIFont.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\CEGUIFont_implData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\CEGUIFont_xmlHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\CEGUIFontManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\CEGUIFontManager_implData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\CEGUIForwardRefs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\CEGUIGlobalEventSet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\CEGUIGUILayout_xmlHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\CEGUIImage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\CEGUIImageset.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\CEGUIImageset_xmlHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\CEGUIImagesetManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\CEGUIInputEvent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\CEGUIIteratorBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\CEGUILogger.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\CEGUIMouseCursor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\CEGUIProperty.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\CEGUIPropertyHelper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\CEGUIPropertySet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\CEGUIRect.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\CEGUIRefPtr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\CEGUIRenderableElement.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\CEGUIRenderableFrame.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\CEGUIRenderableImage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\CEGUIRenderCache.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\CEGUIRenderer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\CEGUIResourceProvider.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\CEGUIScheme.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\CEGUIScheme_xmlHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\CEGUISchemeManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\CEGUIScriptModule.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\CEGUISingleton.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\CEGUISize.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\CEGUIString.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\CEGUIStringBidi.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\CEGUISystem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\CEGUITexture.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\CEGUITextUtils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\CEGUITinyXMLParser.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\CEGUIUDim.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\CEGUIVector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\CEGUIVersion.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\CEGUIWindow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\CEGUIWindowFactory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\CEGUIWindowFactoryManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\CEGUIWindowManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\CEGUIWindowProperties.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\CEGUIXercesParser.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\CEGUIXMLAttributes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\CEGUIXMLHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\CEGUIXMLParser.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\StdInc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\falagard\CEGUIFalagard_xmlHandler.h">
+      <Filter>Header Files\falagard</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\falagard\CEGUIFalComponentBase.h">
+      <Filter>Header Files\falagard</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\falagard\CEGUIFalDimensions.h">
+      <Filter>Header Files\falagard</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\falagard\CEGUIFalEnums.h">
+      <Filter>Header Files\falagard</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\falagard\CEGUIFalFrameComponent.h">
+      <Filter>Header Files\falagard</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\falagard\CEGUIFalImageryComponent.h">
+      <Filter>Header Files\falagard</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\falagard\CEGUIFalImagerySection.h">
+      <Filter>Header Files\falagard</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\falagard\CEGUIFalLayerSpecification.h">
+      <Filter>Header Files\falagard</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\falagard\CEGUIFalNamedArea.h">
+      <Filter>Header Files\falagard</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\falagard\CEGUIFalPropertyDefinition.h">
+      <Filter>Header Files\falagard</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\falagard\CEGUIFalPropertyInitialiser.h">
+      <Filter>Header Files\falagard</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\falagard\CEGUIFalSectionSpecification.h">
+      <Filter>Header Files\falagard</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\falagard\CEGUIFalStateImagery.h">
+      <Filter>Header Files\falagard</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\falagard\CEGUIFalTextComponent.h">
+      <Filter>Header Files\falagard</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\falagard\CEGUIFalWidgetComponent.h">
+      <Filter>Header Files\falagard</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\falagard\CEGUIFalWidgetLookFeel.h">
+      <Filter>Header Files\falagard</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\falagard\CEGUIFalWidgetLookManager.h">
+      <Filter>Header Files\falagard</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\falagard\CEGUIFalXMLEnumHelper.h">
+      <Filter>Header Files\falagard</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIButtonBase.h">
+      <Filter>Header Files\elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIButtonBaseProperties.h">
+      <Filter>Header Files\elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\elements\CEGUICheckbox.h">
+      <Filter>Header Files\elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\elements\CEGUICheckboxProperties.h">
+      <Filter>Header Files\elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\elements\CEGUICombobox.h">
+      <Filter>Header Files\elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIComboboxProperties.h">
+      <Filter>Header Files\elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIComboDropList.h">
+      <Filter>Header Files\elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIDragContainer.h">
+      <Filter>Header Files\elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIDragContainerProperties.h">
+      <Filter>Header Files\elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIEditbox.h">
+      <Filter>Header Files\elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIEditboxProperties.h">
+      <Filter>Header Files\elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIFrameWindow.h">
+      <Filter>Header Files\elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIFrameWindowProperties.h">
+      <Filter>Header Files\elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIGUISheet.h">
+      <Filter>Header Files\elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIItemEntry.h">
+      <Filter>Header Files\elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIItemListBase.h">
+      <Filter>Header Files\elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIItemListBaseProperties.h">
+      <Filter>Header Files\elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIListbox.h">
+      <Filter>Header Files\elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIListboxImageItem.h">
+      <Filter>Header Files\elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIListboxItem.h">
+      <Filter>Header Files\elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIListboxNumberItem.h">
+      <Filter>Header Files\elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIListboxProperties.h">
+      <Filter>Header Files\elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIListboxTextItem.h">
+      <Filter>Header Files\elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIListHeader.h">
+      <Filter>Header Files\elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIListHeaderProperties.h">
+      <Filter>Header Files\elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIListHeaderSegment.h">
+      <Filter>Header Files\elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIListHeaderSegmentProperties.h">
+      <Filter>Header Files\elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIMenubar.h">
+      <Filter>Header Files\elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIMenuBase.h">
+      <Filter>Header Files\elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIMenuBaseProperties.h">
+      <Filter>Header Files\elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIMenuItem.h">
+      <Filter>Header Files\elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIMenuItemProperties.h">
+      <Filter>Header Files\elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIMultiColumnList.h">
+      <Filter>Header Files\elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIMultiColumnListProperties.h">
+      <Filter>Header Files\elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIMultiLineEditbox.h">
+      <Filter>Header Files\elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIMultiLineEditboxProperties.h">
+      <Filter>Header Files\elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIPopupMenu.h">
+      <Filter>Header Files\elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIPopupMenuProperties.h">
+      <Filter>Header Files\elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIProgressBar.h">
+      <Filter>Header Files\elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIProgressBarProperties.h">
+      <Filter>Header Files\elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIPushButton.h">
+      <Filter>Header Files\elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIPushButtonProperties.h">
+      <Filter>Header Files\elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIRadioButton.h">
+      <Filter>Header Files\elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIRadioButtonProperties.h">
+      <Filter>Header Files\elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIScrollablePane.h">
+      <Filter>Header Files\elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIScrollablePaneProperties.h">
+      <Filter>Header Files\elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIScrollbar.h">
+      <Filter>Header Files\elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIScrollbarProperties.h">
+      <Filter>Header Files\elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIScrolledContainer.h">
+      <Filter>Header Files\elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIScrolledContainerProperties.h">
+      <Filter>Header Files\elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\elements\CEGUISlider.h">
+      <Filter>Header Files\elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\elements\CEGUISliderProperties.h">
+      <Filter>Header Files\elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\elements\CEGUISpinner.h">
+      <Filter>Header Files\elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\elements\CEGUISpinnerProperties.h">
+      <Filter>Header Files\elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIStatic.h">
+      <Filter>Header Files\elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIStaticImage.h">
+      <Filter>Header Files\elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIStaticImageProperties.h">
+      <Filter>Header Files\elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIStaticProperties.h">
+      <Filter>Header Files\elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIStaticText.h">
+      <Filter>Header Files\elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIStaticTextProperties.h">
+      <Filter>Header Files\elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\elements\CEGUITabButton.h">
+      <Filter>Header Files\elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\elements\CEGUITabControl.h">
+      <Filter>Header Files\elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\elements\CEGUITabControlProperties.h">
+      <Filter>Header Files\elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\elements\CEGUITabPane.h">
+      <Filter>Header Files\elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\elements\CEGUITextItem.h">
+      <Filter>Header Files\elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\elements\CEGUITextItemProperties.h">
+      <Filter>Header Files\elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIThumb.h">
+      <Filter>Header Files\elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIThumbProperties.h">
+      <Filter>Header Files\elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\elements\CEGUITitlebar.h">
+      <Filter>Header Files\elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\elements\CEGUITitlebarProperties.h">
+      <Filter>Header Files\elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\elements\CEGUITooltip.h">
+      <Filter>Header Files\elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\elements\CEGUITooltipProperties.h">
+      <Filter>Header Files\elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\pcre\pcre.h">
+      <Filter>Header Files\pcre</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\pcre\pcreconfig.h">
+      <Filter>Header Files\pcre</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\pcre\pcreposix.h">
+      <Filter>Header Files\pcre</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\pcre\ucp.h">
+      <Filter>Header Files\pcre</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\pcre\ucpinternal.h">
+      <Filter>Header Files\pcre</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
