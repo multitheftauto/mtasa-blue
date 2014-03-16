@@ -1,0 +1,809 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{f7812cbf-1ecb-4746-9dbe-59ad21066319}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;rc;def;r;odl;idl;hpj;bat</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{71195d7d-306e-4421-b44e-7f1be8da01b5}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="C3DMarkerSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C3DMarkersSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CAERadioTrackManagerSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CAnimBlendAssocGroupSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CAnimBlendAssociationSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CAnimBlendHierarchySA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CAnimBlendSequenceSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CAnimBlendStaticAssociationSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CAnimBlockSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CAnimManagerSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CAudioContainerLookupTableSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CAudioContainerSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CAudioEngineSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CAutomobileSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CBikeSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CBmxSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CBoatSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CBuildingSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CBuoyancySA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CCameraSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CCamSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CCarEnterExitSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CCarGeneratorSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CCheckpointSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CCheckpointsSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CCivilianPedSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CClockSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CColModelSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CColPointSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CControllerConfigManagerSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CCoronasSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CDamageManagerSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CDoorSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CEntitySA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CEventDamageSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CEventGunShotSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CEventListSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CEventSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CExplosionManagerSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CExplosionSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CFireManagerSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CFireSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CFontSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CFxSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CGameSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CGarageSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CGaragesSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CHandlingEntrySA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CHandlingManagerSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CHudSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CKeyGenSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CMarkerSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CMenuManagerSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CModelInfoSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CMonsterTruckSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CObjectSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="COffsets.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CPadSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CParticleObjectSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CParticleSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CParticleSystemManagerSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CPathFindSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CPedDamageResponseCalculatorSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CPedDamageResponseSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CPedIKSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CPedIntelligenceSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CPedModelInfoSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CPedSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CPedSoundSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CPhysicalSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CPickupSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CPickupsSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CPlaneSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CPlayerInfoSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CPlayerPedSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CPointLightsSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CPoolsSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CPopulationSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CProjectileInfoSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CProjectileSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CQuadBikeSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CRadarSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CRegisteredCoronaSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CRemoteSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CRenderWareSA.ClothesReplacing.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CRenderWareSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CRenderWareSA.ShaderMatching.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CRenderWareSA.ShaderSupport.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CRenderWareSA.TextureReplacing.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CRestartSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CRopesSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CSettingsSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CShadowDataSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CStatsSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CStreamingSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CTaskManagementSystemSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CTaskManagerSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CTasksSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CTextSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CTheCarGeneratorsSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CTrailerSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CVehicleSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CVehicleScannerSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CVisibilityPluginsSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CWantedSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CWaterManagerSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CWaterSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CWeaponInfoSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CWeaponSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CWeaponStatManagerSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CWeaponStatSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CWeatherSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CWorldSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="gamesa_init.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="HeapTrace.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="HookSystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="StdInc.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TaskAttackSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TaskBasicSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TaskCarAccessoriesSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TaskCarSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TaskGoToSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TaskIKSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TaskJumpFallSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TaskNamesSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TaskPhysicalResponseSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TaskSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TaskSecondarySA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="C3DMarkerSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C3DMarkersSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CAERadioTrackManagerSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CAnimBlendAssocGroupSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CAnimBlendAssociationSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CAnimBlendHierarchySA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CAnimBlendSequenceSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CAnimBlendStaticAssociationSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CAnimBlockSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CAnimManagerSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CAudioContainerLookupTableSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CAudioContainerSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CAudioEngineSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CAutomobileSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CBikeSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CBmxSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CBoatSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CBoundingBoxSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CBuildingSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CBuoyancySA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CCameraSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CCamSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CCarEnterExitSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CCarGeneratorSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CCheckpointSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CCheckpointsSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CCivilianPedSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CClockSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CColBoxSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CColLineSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CColModelSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CColPointSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CColSphereSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CColTrianglePlaneSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CColTriangleSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CCompressedVectorSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CControllerConfigManagerSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CCoronasSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CDamageManagerSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CDoorSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CEntitySA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CEventDamageSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CEventGunShotSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CEventListSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CEventSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CExplosionManagerSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CExplosionSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CFireManagerSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CFireSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CFontSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CFxSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CGameSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CGarageSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CGaragesSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CHandlingEntrySA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CHandlingManagerSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CHudSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CKeyGenSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CMarkerSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CMenuManagerSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CModelInfoSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CMonsterTruckSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CObjectSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="COffsets.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Common.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CPadSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CParticleObjectSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CParticleSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CParticleSystemManagerSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CPathFindSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CPedDamageResponseCalculatorSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CPedDamageResponseSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CPedIKSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CPedIntelligenceSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CPedModelInfoSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CPedSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CPedSoundSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CPhysicalSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CPickupSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CPickupsSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CPlaneSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CPlayerInfoSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CPlayerPedSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CPointLightsSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CPoolsSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CPopulationSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CProjectileInfoSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CProjectileSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CQuadBikeSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CRadarSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CRegisteredCoronaSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CRemoteSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CRenderWareSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CRenderWareSA.ShaderMatching.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CRenderWareSA.ShaderSupport.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CRestartSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CRopesSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CSettingsSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CShadowDataSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CStatsSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CStreamingSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CTaskManagementSystemSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CTaskManagerSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CTasksSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CTextSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CTheCarGeneratorsSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CTrailerSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CVehicleSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CVehicleScannerSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CVisibilityPluginsSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CWantedSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CWaterManagerSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CWaterSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CWeaponInfoSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CWeaponSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CWeaponStatManagerSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CWeaponStatSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CWeatherSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CWorldSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Dma.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="gamesa_init.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="gamesa_renderware.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="HeapTrace.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="HookSystem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="StdInc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TaskAttackSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TaskBasicSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TaskCarAccessoriesSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TaskCarSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TaskGoToSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TaskIKSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TaskJumpFallSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TaskNamesSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TaskPhysicalResponseSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TaskSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TaskSecondarySA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

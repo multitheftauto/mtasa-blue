@@ -1,0 +1,289 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Nightly|Win32">
+      <Configuration>Nightly</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectName>Client - GUI</ProjectName>
+    <ProjectGuid>{485149E1-799C-4925-AA17-0FEA77C85418}</ProjectGuid>
+    <RootNamespace>Client - GUI</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Nightly|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v90</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v90</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v90</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Nightly|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+    <Import Project="..\..\Shared\MTAPropertySheet.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+    <Import Project="..\..\Shared\MTAPropertySheet.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+    <Import Project="..\..\Shared\MTAPropertySheet.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>12.0.21005.1</_ProjectFileVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(MyTargetDir)\mta\</OutDir>
+    <IntDir>$(PlatformTarget)\$(Configuration)\</IntDir>
+    <LinkIncremental>true</LinkIncremental>
+    <TargetName>cgui_d</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(MyTargetDir)\mta\</OutDir>
+    <IntDir>$(PlatformTarget)\$(Configuration)\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+    <TargetName>cgui</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Nightly|Win32'">
+    <OutDir>$(PlatformTarget)\$(Configuration)\</OutDir>
+    <LinkIncremental>false</LinkIncremental>
+    <TargetName>cgui</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>../sdk;../../Shared/sdk;../../vendor/cegui-0.4.0-custom/include;../../vendor/sparsehash/current/src;../../vendor/sparsehash/current/src/windows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>MTA_DEBUG;WIN32;_DEBUG;_WINDOWS;_USRDLL;GUI_EXPORTS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>StdInc.h</PrecompiledHeaderFile>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <DisableSpecificWarnings>4996;4482;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <ShowIncludes>false</ShowIncludes>
+    </ClCompile>
+    <Link>
+      <AdditionalOptions>/IGNORE:4204 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalDependencies>shlwapi.lib;d3dx9.lib;dxerr.lib;CEGUIBase_d.lib;DirectX9GUIRenderer_d.lib;CEGUIFalagardBase_d.lib;freetype2412ST_D.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <AdditionalLibraryDirectories>../../vendor/cegui-0.4.0-custom/lib;../../vendor/cegui-0.4.0-custom/$(PlatformTarget)/$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries>LIBCMTD;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ProgramDatabaseFile>$(IntDir)$(TargetName).pdb</ProgramDatabaseFile>
+      <SubSystem>Windows</SubSystem>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention />
+      <ImportLibrary>$(IntDir)$(TargetName).lib</ImportLibrary>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>true</OmitFramePointers>
+      <AdditionalIncludeDirectories>../sdk;../../Shared/sdk;../../vendor/cegui-0.4.0-custom/include;../../vendor/sparsehash/current/src;../../vendor/sparsehash/current/src/windows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;GUI_EXPORTS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>StdInc.h</PrecompiledHeaderFile>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4996;4482;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>shlwapi.lib;d3dx9.lib;dxerr.lib;CEGUIBase.lib;DirectX9GUIRenderer.lib;CEGUIFalagardBase.lib;freetype2412ST.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <AdditionalLibraryDirectories>../../vendor/cegui-0.4.0-custom/lib;../../vendor/cegui-0.4.0-custom/$(PlatformTarget)/$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <IgnoreSpecificDefaultLibraries>LIBCMT;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ProgramDatabaseFile>../../symbols/$(Configuration)_$(SafeParentName).pdb</ProgramDatabaseFile>
+      <MapFileName />
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention />
+      <ImportLibrary>$(IntDir)$(TargetName).lib</ImportLibrary>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Nightly|Win32'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>true</OmitFramePointers>
+      <AdditionalIncludeDirectories>../sdk;../../Shared/sdk;../../vendor/cegui-0.4.0-custom/include;../../vendor/sparsehash/current/src;../../vendor/sparsehash/current/src/windows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;GUI_EXPORTS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>StdInc.h</PrecompiledHeaderFile>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4996;4482;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>shlwapi.lib;d3dx9.lib;dxerr.lib;CEGUIBase.lib;DirectX9GUIRenderer.lib;CEGUIFalagardBase.lib;freetype2412ST.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <AdditionalLibraryDirectories>../../vendor/cegui-0.4.0-custom/lib;../../vendor/cegui-0.4.0-custom/$(PlatformTarget)/$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <IgnoreSpecificDefaultLibraries>LIBCMT;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AssemblyDebug />
+      <ProgramDatabaseFile>../../symbols/$(Configuration)_$(SafeParentName).pdb</ProgramDatabaseFile>
+      <MapFileName />
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention />
+      <ImportLibrary>$(IntDir)$(TargetName).lib</ImportLibrary>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="CGUI_Impl.cpp" />
+    <ClCompile Include="CGUIButton_Impl.cpp" />
+    <ClCompile Include="CGUICheckBox_Impl.cpp" />
+    <ClCompile Include="CGUIComboBox_Impl.cpp" />
+    <ClCompile Include="CGUIEdit_Impl.cpp" />
+    <ClCompile Include="CGUIElement_Impl.cpp" />
+    <ClCompile Include="CGUIFont_Impl.cpp" />
+    <ClCompile Include="CGUIGridList_Impl.cpp" />
+    <ClCompile Include="CGUILabel_Impl.cpp" />
+    <ClCompile Include="CGUIListItem_Impl.cpp" />
+    <ClCompile Include="CGUIMemo_Impl.cpp" />
+    <ClCompile Include="CGUIMessageBox_Impl.cpp" />
+    <ClCompile Include="CGUIProgressBar_Impl.cpp" />
+    <ClCompile Include="CGUIRadioButton_Impl.cpp" />
+    <ClCompile Include="CGUIScrollBar_Impl.cpp" />
+    <ClCompile Include="CGUIScrollPane_Impl.cpp" />
+    <ClCompile Include="CGUIStaticImage_Impl.cpp" />
+    <ClCompile Include="CGUITab_Impl.cpp" />
+    <ClCompile Include="CGUITabList.cpp" />
+    <ClCompile Include="CGUITabPanel_Impl.cpp" />
+    <ClCompile Include="CGUITexture_Impl.cpp" />
+    <ClCompile Include="CGUIWindow_Impl.cpp" />
+    <ClCompile Include="Main.cpp" />
+    <ClCompile Include="StdInc.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Nightly|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="CGUI_Impl.h" />
+    <ClInclude Include="CGUIButton_Impl.h" />
+    <ClInclude Include="CGUICheckBox_Impl.h" />
+    <ClInclude Include="CGUIComboBox_Impl.h" />
+    <ClInclude Include="CGUIEdit_Impl.h" />
+    <ClInclude Include="CGUIElement_Impl.h" />
+    <ClInclude Include="CGUIElement_Inc.h" />
+    <ClInclude Include="CGUIFont_Impl.h" />
+    <ClInclude Include="CGUIGridList_Impl.h" />
+    <ClInclude Include="CGUILabel_Impl.h" />
+    <ClInclude Include="CGUIListItem_Impl.h" />
+    <ClInclude Include="CGUIMemo_Impl.h" />
+    <ClInclude Include="CGUIMessageBox_Impl.h" />
+    <ClInclude Include="CGUIProgressBar_Impl.h" />
+    <ClInclude Include="CGUIRadioButton_Impl.h" />
+    <ClInclude Include="CGUIScrollBar_Impl.h" />
+    <ClInclude Include="CGUIScrollPane_Impl.h" />
+    <ClInclude Include="CGUIStaticImage_Impl.h" />
+    <ClInclude Include="CGUITab_Impl.h" />
+    <ClInclude Include="CGUITabList.h" />
+    <ClInclude Include="CGUITabPanel_Impl.h" />
+    <ClInclude Include="CGUITexture_Impl.h" />
+    <ClInclude Include="CGUIWindow_Impl.h" />
+    <ClInclude Include="StdInc.h" />
+    <ClInclude Include="..\sdk\gui\CGUI.h" />
+    <ClInclude Include="..\sdk\gui\CGUIButton.h" />
+    <ClInclude Include="..\sdk\gui\CGUICallback.h" />
+    <ClInclude Include="..\sdk\gui\CGUICheckBox.h" />
+    <ClInclude Include="..\sdk\gui\CGUIComboBox.h" />
+    <ClInclude Include="..\sdk\gui\CGUIEdit.h" />
+    <ClInclude Include="..\sdk\gui\CGUIElement.h" />
+    <ClInclude Include="..\sdk\gui\CGUIEvent.h" />
+    <ClInclude Include="..\sdk\gui\CGUIFont.h" />
+    <ClInclude Include="..\sdk\gui\CGUIGridList.h" />
+    <ClInclude Include="..\sdk\gui\CGUILabel.h" />
+    <ClInclude Include="..\sdk\gui\CGUIListItem.h" />
+    <ClInclude Include="..\sdk\gui\CGUIMemo.h" />
+    <ClInclude Include="..\sdk\gui\CGUIMessageBox.h" />
+    <ClInclude Include="..\sdk\gui\CGUIProgressBar.h" />
+    <ClInclude Include="..\sdk\gui\CGUIRadioButton.h" />
+    <ClInclude Include="..\sdk\gui\CGUIScrollBar.h" />
+    <ClInclude Include="..\sdk\gui\CGUIScrollPane.h" />
+    <ClInclude Include="..\sdk\gui\CGUISize.h" />
+    <ClInclude Include="..\sdk\gui\CGUIStaticImage.h" />
+    <ClInclude Include="..\sdk\gui\CGUITab.h" />
+    <ClInclude Include="CGUITabListItem.h" />
+    <ClInclude Include="..\sdk\gui\CGUITabPanel.h" />
+    <ClInclude Include="..\sdk\gui\CGUITexture.h" />
+    <ClInclude Include="..\sdk\gui\CGUITypes.h" />
+    <ClInclude Include="..\sdk\gui\CGUIWindow.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\vendor\cegui-0.4.0-custom\makefiles\win32\VC++7.1\BaseSystem\BaseSystem 2008.vcxproj">
+      <Project>{232b1f48-87c1-4ef9-98a2-cf675bac7a54}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\..\vendor\cegui-0.4.0-custom\makefiles\win32\VC++7.1\Renderers\DirectX9Renderer\DirectX9GUIRenderer 2008.vcxproj">
+      <Project>{7582b608-d92f-4fcb-b682-2214b48d1596}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\..\vendor\cegui-0.4.0-custom\makefiles\win32\VC++7.1\WidgetSets\Falagard\Falagard 2008.vcxproj">
+      <Project>{04e4a944-225a-4bfb-b7b5-f23aee884989}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties DevPartner_IsInstrumented="1" />
+    </VisualStudio>
+  </ProjectExtensions>
+</Project>

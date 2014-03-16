@@ -1,0 +1,500 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Nightly|Win32">
+      <Configuration>Nightly</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectName>Client - Game SA</ProjectName>
+    <ProjectGuid>{E13D1441-438B-4A03-AB79-5E8EF08EE414}</ProjectGuid>
+    <RootNamespace>Client - Game SA</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Nightly|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v90</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v90</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v90</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+    <CLRSupport>false</CLRSupport>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Nightly|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+    <Import Project="..\..\Shared\MTAPropertySheet.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+    <Import Project="..\..\Shared\MTAPropertySheet.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+    <Import Project="..\..\Shared\MTAPropertySheet.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>12.0.21005.1</_ProjectFileVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(MyTargetDir)\mta\</OutDir>
+    <IntDir>$(PlatformTarget)\$(Configuration)\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+    <TargetName>game_sa</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(MyTargetDir)\mta\</OutDir>
+    <IntDir>$(PlatformTarget)\$(Configuration)\</IntDir>
+    <LinkIncremental>true</LinkIncremental>
+    <TargetName>game_sa_d</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Nightly|Win32'">
+    <OutDir>$(PlatformTarget)\$(Configuration)\</OutDir>
+    <LinkIncremental>false</LinkIncremental>
+    <TargetName>game_sa</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Midl>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetEnvironment>Win32</TargetEnvironment>
+      <TypeLibraryName>.\Release/game_sa.tlb</TypeLibraryName>
+      <HeaderFileName />
+    </Midl>
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>true</OmitFramePointers>
+      <AdditionalIncludeDirectories>../sdk;../../Shared/sdk;../../vendor/sparsehash/current/src;../../vendor/sparsehash/current/src/windows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;GAME_SA_EXPORTS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>StdInc.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>$(IntDir)$(TargetName).pch</PrecompiledHeaderOutputFile>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4409;4250;4996;4482;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <Link>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ProgramDatabaseFile>../../symbols/$(Configuration)_$(SafeParentName).pdb</ProgramDatabaseFile>
+      <MapFileName />
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention />
+      <ImportLibrary>$(IntDir)$(TargetName).lib</ImportLibrary>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Midl>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetEnvironment>Win32</TargetEnvironment>
+      <TypeLibraryName>.\Debug/game_sa.tlb</TypeLibraryName>
+      <HeaderFileName />
+    </Midl>
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>../sdk;../../Shared/sdk;../../vendor/sparsehash/current/src;../../vendor/sparsehash/current/src/windows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;MTA_DEBUG;GAME_SA_EXPORTS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>StdInc.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>$(IntDir)$(TargetName).pch</PrecompiledHeaderOutputFile>
+      <BrowseInformation>true</BrowseInformation>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <DisableSpecificWarnings>4409;4250;4996;4482;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <Link>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ProgramDatabaseFile>$(IntDir)$(TargetName).pdb</ProgramDatabaseFile>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention />
+      <ImportLibrary>$(IntDir)$(TargetName).lib</ImportLibrary>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Nightly|Win32'">
+    <Midl>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetEnvironment>Win32</TargetEnvironment>
+      <TypeLibraryName>.\Release/game_sa.tlb</TypeLibraryName>
+      <HeaderFileName />
+    </Midl>
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>true</OmitFramePointers>
+      <AdditionalIncludeDirectories>../sdk;../../Shared/sdk;../../vendor/sparsehash/current/src;../../vendor/sparsehash/current/src/windows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;GAME_SA_EXPORTS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>StdInc.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>$(IntDir)$(TargetName).pch</PrecompiledHeaderOutputFile>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4409;4250;4996;4482;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <Link>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ProgramDatabaseFile>../../symbols/$(Configuration)_$(SafeParentName).pdb</ProgramDatabaseFile>
+      <MapFileName />
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention />
+      <ImportLibrary>$(IntDir)$(TargetName).lib</ImportLibrary>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="C3DMarkerSA.cpp" />
+    <ClCompile Include="C3DMarkersSA.cpp" />
+    <ClCompile Include="CAERadioTrackManagerSA.cpp" />
+    <ClCompile Include="CAnimBlendAssocGroupSA.cpp" />
+    <ClCompile Include="CAnimBlendAssociationSA.cpp" />
+    <ClCompile Include="CAnimBlendHierarchySA.cpp" />
+    <ClCompile Include="CAnimBlendSequenceSA.cpp" />
+    <ClCompile Include="CAnimBlendStaticAssociationSA.cpp" />
+    <ClCompile Include="CAnimBlockSA.cpp" />
+    <ClCompile Include="CAnimManagerSA.cpp" />
+    <ClCompile Include="CAudioContainerLookupTableSA.cpp" />
+    <ClCompile Include="CAudioContainerSA.cpp" />
+    <ClCompile Include="CAudioEngineSA.cpp" />
+    <ClCompile Include="CAutomobileSA.cpp" />
+    <ClCompile Include="CBikeSA.cpp" />
+    <ClCompile Include="CBmxSA.cpp" />
+    <ClCompile Include="CBoatSA.cpp" />
+    <ClCompile Include="CBuildingSA.cpp" />
+    <ClCompile Include="CBuoyancySA.cpp" />
+    <ClCompile Include="CCameraSA.cpp" />
+    <ClCompile Include="CCamSA.cpp" />
+    <ClCompile Include="CCarEnterExitSA.cpp" />
+    <ClCompile Include="CCarGeneratorSA.cpp" />
+    <ClCompile Include="CCheckpointSA.cpp" />
+    <ClCompile Include="CCheckpointsSA.cpp" />
+    <ClCompile Include="CCivilianPedSA.cpp" />
+    <ClCompile Include="CClockSA.cpp" />
+    <ClCompile Include="CColModelSA.cpp" />
+    <ClCompile Include="CColPointSA.cpp" />
+    <ClCompile Include="CControllerConfigManagerSA.cpp" />
+    <ClCompile Include="CCoronasSA.cpp" />
+    <ClCompile Include="CDamageManagerSA.cpp" />
+    <ClCompile Include="CDoorSA.cpp" />
+    <ClCompile Include="CEntitySA.cpp" />
+    <ClCompile Include="CEventDamageSA.cpp" />
+    <ClCompile Include="CEventGunShotSA.cpp" />
+    <ClCompile Include="CEventListSA.cpp" />
+    <ClCompile Include="CEventSA.cpp" />
+    <ClCompile Include="CExplosionManagerSA.cpp" />
+    <ClCompile Include="CExplosionSA.cpp" />
+    <ClCompile Include="CFireManagerSA.cpp" />
+    <ClCompile Include="CFireSA.cpp" />
+    <ClCompile Include="CFontSA.cpp" />
+    <ClCompile Include="CFxSA.cpp" />
+    <ClCompile Include="CGameSA.cpp" />
+    <ClCompile Include="CGarageSA.cpp" />
+    <ClCompile Include="CGaragesSA.cpp" />
+    <ClCompile Include="CHandlingEntrySA.cpp" />
+    <ClCompile Include="CHandlingManagerSA.cpp" />
+    <ClCompile Include="CHudSA.cpp" />
+    <ClCompile Include="CKeyGenSA.cpp" />
+    <ClCompile Include="CMarkerSA.cpp" />
+    <ClCompile Include="CMenuManagerSA.cpp" />
+    <ClCompile Include="CModelInfoSA.cpp" />
+    <ClCompile Include="CMonsterTruckSA.cpp" />
+    <ClCompile Include="CObjectSA.cpp" />
+    <ClCompile Include="COffsets.cpp" />
+    <ClCompile Include="CPadSA.cpp" />
+    <ClCompile Include="CParticleObjectSA.cpp" />
+    <ClCompile Include="CParticleSA.cpp" />
+    <ClCompile Include="CParticleSystemManagerSA.cpp" />
+    <ClCompile Include="CPathFindSA.cpp" />
+    <ClCompile Include="CPedDamageResponseCalculatorSA.cpp" />
+    <ClCompile Include="CPedDamageResponseSA.cpp" />
+    <ClCompile Include="CPedIKSA.cpp" />
+    <ClCompile Include="CPedIntelligenceSA.cpp" />
+    <ClCompile Include="CPedModelInfoSA.cpp" />
+    <ClCompile Include="CPedSA.cpp" />
+    <ClCompile Include="CPedSoundSA.cpp" />
+    <ClCompile Include="CPhysicalSA.cpp" />
+    <ClCompile Include="CPickupSA.cpp" />
+    <ClCompile Include="CPickupsSA.cpp" />
+    <ClCompile Include="CPlaneSA.cpp" />
+    <ClCompile Include="CPlayerInfoSA.cpp" />
+    <ClCompile Include="CPlayerPedSA.cpp" />
+    <ClCompile Include="CPointLightsSA.cpp" />
+    <ClCompile Include="CPoolsSA.cpp" />
+    <ClCompile Include="CPopulationSA.cpp" />
+    <ClCompile Include="CProjectileInfoSA.cpp" />
+    <ClCompile Include="CProjectileSA.cpp" />
+    <ClCompile Include="CQuadBikeSA.cpp" />
+    <ClCompile Include="CRadarSA.cpp" />
+    <ClCompile Include="CRegisteredCoronaSA.cpp" />
+    <ClCompile Include="CRemoteSA.cpp" />
+    <ClCompile Include="CRenderWareSA.ClothesReplacing.cpp" />
+    <ClCompile Include="CRenderWareSA.cpp" />
+    <ClCompile Include="CRenderWareSA.ShaderMatching.cpp" />
+    <ClCompile Include="CRenderWareSA.ShaderSupport.cpp" />
+    <ClCompile Include="CRenderWareSA.TextureReplacing.cpp" />
+    <ClCompile Include="CRestartSA.cpp" />
+    <ClCompile Include="CRopesSA.cpp" />
+    <ClCompile Include="CSettingsSA.cpp" />
+    <ClCompile Include="CShadowDataSA.cpp" />
+    <ClCompile Include="CStatsSA.cpp" />
+    <ClCompile Include="CStreamingSA.cpp" />
+    <ClCompile Include="CTaskManagementSystemSA.cpp" />
+    <ClCompile Include="CTaskManagerSA.cpp" />
+    <ClCompile Include="CTasksSA.cpp" />
+    <ClCompile Include="CTextSA.cpp" />
+    <ClCompile Include="CTheCarGeneratorsSA.cpp" />
+    <ClCompile Include="CTrailerSA.cpp" />
+    <ClCompile Include="CVehicleSA.cpp" />
+    <ClCompile Include="CVehicleScannerSA.cpp" />
+    <ClCompile Include="CVisibilityPluginsSA.cpp" />
+    <ClCompile Include="CWantedSA.cpp" />
+    <ClCompile Include="CWaterManagerSA.cpp" />
+    <ClCompile Include="CWaterSA.cpp" />
+    <ClCompile Include="CWeaponInfoSA.cpp" />
+    <ClCompile Include="CWeaponSA.cpp" />
+    <ClCompile Include="CWeaponStatManagerSA.cpp" />
+    <ClCompile Include="CWeaponStatSA.cpp" />
+    <ClCompile Include="CWeatherSA.cpp" />
+    <ClCompile Include="CWorldSA.cpp" />
+    <ClCompile Include="gamesa_init.cpp" />
+    <ClCompile Include="HeapTrace.cpp" />
+    <ClCompile Include="HookSystem.cpp" />
+    <ClCompile Include="StdInc.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Nightly|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="TaskAttackSA.cpp" />
+    <ClCompile Include="TaskBasicSA.cpp" />
+    <ClCompile Include="TaskCarAccessoriesSA.cpp" />
+    <ClCompile Include="TaskCarSA.cpp" />
+    <ClCompile Include="TaskGoToSA.cpp" />
+    <ClCompile Include="TaskIKSA.cpp" />
+    <ClCompile Include="TaskJumpFallSA.cpp" />
+    <ClCompile Include="TaskNamesSA.cpp" />
+    <ClCompile Include="TaskPhysicalResponseSA.cpp" />
+    <ClCompile Include="TaskSA.cpp" />
+    <ClCompile Include="TaskSecondarySA.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="C3DMarkerSA.h" />
+    <ClInclude Include="C3DMarkersSA.h" />
+    <ClInclude Include="CAERadioTrackManagerSA.h" />
+    <ClInclude Include="CAnimBlendAssocGroupSA.h" />
+    <ClInclude Include="CAnimBlendAssociationSA.h" />
+    <ClInclude Include="CAnimBlendHierarchySA.h" />
+    <ClInclude Include="CAnimBlendSequenceSA.h" />
+    <ClInclude Include="CAnimBlendStaticAssociationSA.h" />
+    <ClInclude Include="CAnimBlockSA.h" />
+    <ClInclude Include="CAnimManagerSA.h" />
+    <ClInclude Include="CAudioContainerLookupTableSA.h" />
+    <ClInclude Include="CAudioContainerSA.h" />
+    <ClInclude Include="CAudioEngineSA.h" />
+    <ClInclude Include="CAutomobileSA.h" />
+    <ClInclude Include="CBikeSA.h" />
+    <ClInclude Include="CBmxSA.h" />
+    <ClInclude Include="CBoatSA.h" />
+    <ClInclude Include="CBoundingBoxSA.h" />
+    <ClInclude Include="CBuildingSA.h" />
+    <ClInclude Include="CBuoyancySA.h" />
+    <ClInclude Include="CCameraSA.h" />
+    <ClInclude Include="CCamSA.h" />
+    <ClInclude Include="CCarEnterExitSA.h" />
+    <ClInclude Include="CCarGeneratorSA.h" />
+    <ClInclude Include="CCheckpointSA.h" />
+    <ClInclude Include="CCheckpointsSA.h" />
+    <ClInclude Include="CCivilianPedSA.h" />
+    <ClInclude Include="CClockSA.h" />
+    <ClInclude Include="CColBoxSA.h" />
+    <ClInclude Include="CColLineSA.h" />
+    <ClInclude Include="CColModelSA.h" />
+    <ClInclude Include="CColPointSA.h" />
+    <ClInclude Include="CColSphereSA.h" />
+    <ClInclude Include="CColTrianglePlaneSA.h" />
+    <ClInclude Include="CColTriangleSA.h" />
+    <ClInclude Include="CCompressedVectorSA.h" />
+    <ClInclude Include="CControllerConfigManagerSA.h" />
+    <ClInclude Include="CCoronasSA.h" />
+    <ClInclude Include="CDamageManagerSA.h" />
+    <ClInclude Include="CDoorSA.h" />
+    <ClInclude Include="CEntitySA.h" />
+    <ClInclude Include="CEventDamageSA.h" />
+    <ClInclude Include="CEventGunShotSA.h" />
+    <ClInclude Include="CEventListSA.h" />
+    <ClInclude Include="CEventSA.h" />
+    <ClInclude Include="CExplosionManagerSA.h" />
+    <ClInclude Include="CExplosionSA.h" />
+    <ClInclude Include="CFireManagerSA.h" />
+    <ClInclude Include="CFireSA.h" />
+    <ClInclude Include="CFontSA.h" />
+    <ClInclude Include="CFxSA.h" />
+    <ClInclude Include="CGameSA.h" />
+    <ClInclude Include="CGarageSA.h" />
+    <ClInclude Include="CGaragesSA.h" />
+    <ClInclude Include="CHandlingEntrySA.h" />
+    <ClInclude Include="CHandlingManagerSA.h" />
+    <ClInclude Include="CHudSA.h" />
+    <ClInclude Include="CKeyGenSA.h" />
+    <ClInclude Include="CMarkerSA.h" />
+    <ClInclude Include="CMenuManagerSA.h" />
+    <ClInclude Include="CModelInfoSA.h" />
+    <ClInclude Include="CMonsterTruckSA.h" />
+    <ClInclude Include="CObjectSA.h" />
+    <ClInclude Include="COffsets.h" />
+    <ClInclude Include="Common.h" />
+    <ClInclude Include="CPadSA.h" />
+    <ClInclude Include="CParticleObjectSA.h" />
+    <ClInclude Include="CParticleSA.h" />
+    <ClInclude Include="CParticleSystemManagerSA.h" />
+    <ClInclude Include="CPathFindSA.h" />
+    <ClInclude Include="CPedDamageResponseCalculatorSA.h" />
+    <ClInclude Include="CPedDamageResponseSA.h" />
+    <ClInclude Include="CPedIKSA.h" />
+    <ClInclude Include="CPedIntelligenceSA.h" />
+    <ClInclude Include="CPedModelInfoSA.h" />
+    <ClInclude Include="CPedSA.h" />
+    <ClInclude Include="CPedSoundSA.h" />
+    <ClInclude Include="CPhysicalSA.h" />
+    <ClInclude Include="CPickupSA.h" />
+    <ClInclude Include="CPickupsSA.h" />
+    <ClInclude Include="CPlaneSA.h" />
+    <ClInclude Include="CPlayerInfoSA.h" />
+    <ClInclude Include="CPlayerPedSA.h" />
+    <ClInclude Include="CPointLightsSA.h" />
+    <ClInclude Include="CPoolsSA.h" />
+    <ClInclude Include="CPopulationSA.h" />
+    <ClInclude Include="CProjectileInfoSA.h" />
+    <ClInclude Include="CProjectileSA.h" />
+    <ClInclude Include="CQuadBikeSA.h" />
+    <ClInclude Include="CRadarSA.h" />
+    <ClInclude Include="CRegisteredCoronaSA.h" />
+    <ClInclude Include="CRemoteSA.h" />
+    <ClInclude Include="CRenderWareSA.h" />
+    <ClInclude Include="CRenderWareSA.ShaderMatching.h" />
+    <ClInclude Include="CRenderWareSA.ShaderSupport.h" />
+    <ClInclude Include="CRestartSA.h" />
+    <ClInclude Include="CRopesSA.h" />
+    <ClInclude Include="CSettingsSA.h" />
+    <ClInclude Include="CShadowDataSA.h" />
+    <ClInclude Include="CStatsSA.h" />
+    <ClInclude Include="CStreamingSA.h" />
+    <ClInclude Include="CTaskManagementSystemSA.h" />
+    <ClInclude Include="CTaskManagerSA.h" />
+    <ClInclude Include="CTasksSA.h" />
+    <ClInclude Include="CTextSA.h" />
+    <ClInclude Include="CTheCarGeneratorsSA.h" />
+    <ClInclude Include="CTrailerSA.h" />
+    <ClInclude Include="CVehicleSA.h" />
+    <ClInclude Include="CVehicleScannerSA.h" />
+    <ClInclude Include="CVisibilityPluginsSA.h" />
+    <ClInclude Include="CWantedSA.h" />
+    <ClInclude Include="CWaterManagerSA.h" />
+    <ClInclude Include="CWaterSA.h" />
+    <ClInclude Include="CWeaponInfoSA.h" />
+    <ClInclude Include="CWeaponSA.h" />
+    <ClInclude Include="CWeaponStatManagerSA.h" />
+    <ClInclude Include="CWeaponStatSA.h" />
+    <ClInclude Include="CWeatherSA.h" />
+    <ClInclude Include="CWorldSA.h" />
+    <ClInclude Include="Dma.h" />
+    <ClInclude Include="gamesa_init.h" />
+    <ClInclude Include="gamesa_renderware.h" />
+    <ClInclude Include="HeapTrace.h" />
+    <ClInclude Include="HookSystem.h" />
+    <ClInclude Include="StdInc.h" />
+    <ClInclude Include="TaskAttackSA.h" />
+    <ClInclude Include="TaskBasicSA.h" />
+    <ClInclude Include="TaskCarAccessoriesSA.h" />
+    <ClInclude Include="TaskCarSA.h" />
+    <ClInclude Include="TaskGoToSA.h" />
+    <ClInclude Include="TaskIKSA.h" />
+    <ClInclude Include="TaskJumpFallSA.h" />
+    <ClInclude Include="TaskNamesSA.h" />
+    <ClInclude Include="TaskPhysicalResponseSA.h" />
+    <ClInclude Include="TaskSA.h" />
+    <ClInclude Include="TaskSecondarySA.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\multiplayer_sa\_Multiplayer SA 2008.vcxproj">
+      <Project>{916d94e2-fb0b-4992-a52c-3698ccbb0a41}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties DevPartner_IsInstrumented="1" />
+    </VisualStudio>
+  </ProjectExtensions>
+</Project>
