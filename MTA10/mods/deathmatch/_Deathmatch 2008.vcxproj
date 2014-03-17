@@ -199,6 +199,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\shared_logic\CClientEffect.cpp" />
+    <ClCompile Include="..\shared_logic\CClientEffectManager.cpp" />
     <ClCompile Include="CClient.cpp" />
     <ClCompile Include="Client.cpp" />
     <ClCompile Include="ClientCommands.cpp" />
@@ -579,6 +581,8 @@
     <ClCompile Include="..\..\..\Shared\animation\CPositionRotationAnimation.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\shared_logic\CClientEffect.h" />
+    <ClInclude Include="..\shared_logic\CClientEffectManager.h" />
     <ClInclude Include="CClient.h" />
     <ClInclude Include="Client.h" />
     <ClInclude Include="ClientCommands.h" />

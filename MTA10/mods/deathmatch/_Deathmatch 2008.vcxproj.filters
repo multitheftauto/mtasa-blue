@@ -797,6 +797,12 @@
     <ClCompile Include="..\..\..\vendor\portaudio\pa_$(PlatformTarget)_plain_converters.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\shared_logic\CClientEffect.cpp">
+      <Filter>Source Files\shared_logic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\shared_logic\CClientEffectManager.cpp">
+      <Filter>Source Files\shared_logic</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CClient.h">
@@ -1488,6 +1494,12 @@
     </ClInclude>
     <ClInclude Include="..\..\..\vendor\portaudio\pa_$(PlatformTarget)_plain_converters.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shared_logic\CClientEffect.h">
+      <Filter>Header Files\shared_logic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shared_logic\CClientEffectManager.h">
+      <Filter>Header Files\shared_logic</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
