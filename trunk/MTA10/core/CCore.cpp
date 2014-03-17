@@ -1432,26 +1432,27 @@ void CCore::SwitchRenderWindow ( HWND hWnd, HWND hWndInput )
 
 bool CCore::IsValidNick ( const char* szNick )
 {
-    // Too long or too short?
-    size_t sizeNick = strlen ( szNick );
-    if ( sizeNick >= MIN_PLAYER_NICK_LENGTH && sizeNick <= MAX_PLAYER_NICK_LENGTH )
+    // Grab the size of the nick. Check that it's within the player 
+    size_t sizeNick = strlen(szNick);
+    if (sizeNick < MIN_PLAYER_NICK_LENGTH || sizeNick > MAX_PLAYER_NICK_LENGTH)
     {
-        // Check each character
-        for ( unsigned int i = 0; i < sizeNick; i++ )
-        {
-            // Don't allow 0x0A, 0x0D and <space>
-            if ( szNick [i] == 0x0A ||
-                 szNick [i] == 0x0D ||
-                 szNick [i] == ' ' )
-            {
-                return false;
-            }
-        }
-
-        return true;
+        return false;
     }
 
-    return false;
+    // Check that each character is valid (visible characters exluding space)
+    unsigned char ucTemp;
+    for (size_t i = 0; i < sizeNick; i++)
+    {
+        ucTemp = szNick[i];
+        if (ucTemp < 33 || ucTemp > 126)
+        {
+            return false;
+        }
+    }
+
+    // Nickname is valid, return true
+    return true;
+   
 }
 
 
