@@ -168,11 +168,21 @@ bool CCommands::Execute ( const char* szCommand, const char* szParametersIn, boo
     }
 
     // HACK: if its a 'nick' command, save it here
-    if ( !stricmp ( szCommand, "nick" ) && szParameters && !bIsScriptedBind )
+    bool bIsNickCommand = !stricmp(szCommand, "nick");
+    if (bIsNickCommand && szParameters && !bIsScriptedBind)
     {
         if ( CCore::GetSingleton ().IsValidNick ( szParameters ) )
         {
             CVARS_SET ( "nick", std::string ( szParameters ) );
+
+            if (!CCore::GetSingleton().IsConnected())
+            {
+                CCore::GetSingleton().GetConsole()->Printf("nick: You are now known as %s", szParameters);
+            }
+        }
+        else if (!CCore::GetSingleton().IsConnected())
+        {
+            CCore::GetSingleton().GetConsole()->Print("nick: Chosen nickname contains illegal characters");
         }
     }
 
@@ -185,7 +195,7 @@ bool CCommands::Execute ( const char* szCommand, const char* szParametersIn, boo
 
     // Unknown command
     val = _( "Unknown command or cvar: " ) + szCommand;
-    if ( !bIsScriptedBind )
+    if (!bIsScriptedBind && !bIsNickCommand)
         CCore::GetSingleton ().GetConsole ()->Print ( val.c_str () );
     return false;
 }
