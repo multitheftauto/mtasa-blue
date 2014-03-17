@@ -50,4 +50,6 @@ public:
     static void         OnCrashAverted          ( uint uiId );
     static void         LogEvent                ( const char* szType, const char* szContext, const char* szBody );
     static SString      GetCrashAvertedStatsSoFar ( void );
+    static void         ReserveMemoryKBForCrashDumpProcessing ( uint uiMemoryKB );
+    static void         FreeMemoryForCrashDumpProcessing ( void );
 };

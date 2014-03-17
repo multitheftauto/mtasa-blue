@@ -25,7 +25,7 @@ public:
 
     inline unsigned int     GetCode                     ( void )            { return m_uiCode; };
     inline void*            GetAddress                  ( void )            { return m_pAddress; };
-    bool                    GetModule                   ( char * szModuleName, int nOutputNameLength, void** ppModuleBaseAddress );
+    bool                    GetModule                   ( void* pQueryAddress, char * szModuleName, int nOutputNameLength, void** ppModuleBaseAddress );
     virtual const char*         GetModulePathName       ( void )            { return m_szModulePathName; };
     virtual const char*         GetModuleBaseName       ( void )            { return m_szModuleBaseName; };
     virtual uint                GetAddressModuleOffset  ( void )            { return m_uiAddressModuleOffset; };
