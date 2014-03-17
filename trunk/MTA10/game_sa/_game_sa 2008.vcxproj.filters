@@ -395,6 +395,12 @@
     <ClCompile Include="TaskSecondarySA.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CFxManagerSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CFxSystemSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="C3DMarkerSA.h">
@@ -803,6 +809,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="TaskSecondarySA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CFxSystemBPSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CFxSystemSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CFxManagerSA.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

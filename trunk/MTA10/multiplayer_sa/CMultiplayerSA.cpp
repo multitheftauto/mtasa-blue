@@ -3761,6 +3761,7 @@ void CMultiplayerSA::Reset ( void )
     m_pDeathHandler = NULL;
     m_pFireHandler = NULL;
     m_pRender3DStuffHandler = NULL;
+    m_pFxSystemDestructionHandler = NULL;
 }
 
 
@@ -6511,8 +6512,10 @@ void _declspec(naked) HOOK_CGlass_WindowRespondsToCollision ()
 void * pFxSystemToBeDestroyed;
 void FxManager_c__DestroyFxSystem()
 {
-    if ( m_pFxSystemDestructionHandler )
+    if (m_pFxSystemDestructionHandler)
+    {
         m_pFxSystemDestructionHandler(pFxSystemToBeDestroyed);
+    }
 }
 
 void _declspec(naked) HOOK_FxManager_c__DestroyFxSystem ()

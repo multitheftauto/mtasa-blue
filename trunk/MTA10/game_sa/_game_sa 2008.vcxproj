@@ -255,7 +255,9 @@
     <ClCompile Include="CFireManagerSA.cpp" />
     <ClCompile Include="CFireSA.cpp" />
     <ClCompile Include="CFontSA.cpp" />
+    <ClCompile Include="CFxManagerSA.cpp" />
     <ClCompile Include="CFxSA.cpp" />
+    <ClCompile Include="CFxSystemSA.cpp" />
     <ClCompile Include="CGameSA.cpp" />
     <ClCompile Include="CGarageSA.cpp" />
     <ClCompile Include="CGaragesSA.cpp" />
@@ -396,7 +398,10 @@
     <ClInclude Include="CFireManagerSA.h" />
     <ClInclude Include="CFireSA.h" />
     <ClInclude Include="CFontSA.h" />
+    <ClInclude Include="CFxManagerSA.h" />
     <ClInclude Include="CFxSA.h" />
+    <ClInclude Include="CFxSystemBPSA.h" />
+    <ClInclude Include="CFxSystemSA.h" />
     <ClInclude Include="CGameSA.h" />
     <ClInclude Include="CGarageSA.h" />
     <ClInclude Include="CGaragesSA.h" />
