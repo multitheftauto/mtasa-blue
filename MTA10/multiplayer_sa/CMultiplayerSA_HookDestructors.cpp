@@ -19,92 +19,133 @@ namespace
     GameProjectileDestructHandler*  pGameProjectileDestructHandler  = NULL;
     GameModelRemoveHandler*         pGameModelRemoveHandler         = NULL;
 
-    #define ARRAY_StreamSectors                                 0xB7D0B8
-    #define NUM_StreamSectorRows                                120
-    #define NUM_StreamSectorCols                                120
-    #define ARRAY_StreamRepeatSectors                           0xB992B8
-    #define NUM_StreamRepeatSectorRows                          16
-    #define NUM_StreamRepeatSectorCols                          16
+    #define FUNC_CPtrListSingleLink_Remove  0x0533610
+    #define FUNC_CPtrListDoubleLink_Remove  0x05336B0
 
-    struct SStreamSectorEntry
+    struct SStreamSectorEntrySingle
     {
-        CEntitySAInterface*     pEntity;
-        SStreamSectorEntry*     pNext;
+        CEntitySAInterface*         pEntity;
+        SStreamSectorEntrySingle*   pNext;
     };
 
-    struct SStreamRepeatSectorEntry
+    struct SStreamSectorEntryDouble
     {
-        BYTE                    m_pad[8];
-        SStreamSectorEntry*     m_pStreamSectorEntry;
+        CEntitySAInterface*         pEntity;
+        SStreamSectorEntryDouble*   pNext;
+        SStreamSectorEntryDouble*   pPrev;
     };
 
-    //
-    // Log problem
-    //
-    void LogSectorMessage( uint uiId, const char* szContext, CEntitySAInterface* pCheckEntity )
+
+    // Info about what sectors an entity actually used
+    struct SEntitySAInterfaceExtraInfo
     {
-        SString strMsg;
-        if ( pCheckEntity )
-            strMsg = SString( "Type:%d  Model:%d", pCheckEntity->nType, pCheckEntity->m_nModelIndex );
-        LogEvent ( uiId, "CheckSectors", szContext, strMsg, 8000 + uiId );
+        std::vector < SStreamSectorEntrySingle** > AddedSectorSingleList;
+        std::vector < SStreamSectorEntryDouble** > AddedSectorDoubleList;
+    };
+
+    CFastHashMap < CEntitySAInterface*, SEntitySAInterfaceExtraInfo > ms_EntitySAInterfaceExtraInfoMap;
+
+    bool HasEntitySAInterfaceExtraInfo( CEntitySAInterface* pEntitySAInterface )
+    {
+        return MapContains( ms_EntitySAInterfaceExtraInfoMap, pEntitySAInterface );
+    }
+
+    SEntitySAInterfaceExtraInfo& GetEntitySAInterfaceExtraInfo( CEntitySAInterface* pEntitySAInterface )
+    {
+        return MapGet( ms_EntitySAInterfaceExtraInfoMap, pEntitySAInterface );
+    }
+
+    void RemoveEntitySAInterfaceExtraInfo( CEntitySAInterface* pEntitySAInterface )
+    {
+        MapRemove( ms_EntitySAInterfaceExtraInfoMap, pEntitySAInterface );
+    }
+
+
+    //
+    // CPtrListSingleLink contains item
+    //
+    bool CPtrListSingleLink_Contains( SStreamSectorEntrySingle* pStreamEntry, CEntitySAInterface* pCheckEntity )
+    {
+        for ( ; pStreamEntry ; pStreamEntry = pStreamEntry->pNext )
+            if ( pStreamEntry->pEntity == pCheckEntity )
+                return true;
+        return false;
     }
 
     //
-    // Check if entity is still in stream sectors
+    // CPtrListSingleLink remove item
     //
-    void CheckSectors( CEntitySAInterface* pCheckEntity )
+    void CPtrListSingleLink_Remove( SStreamSectorEntrySingle** ppStreamEntryList, CEntitySAInterface* pCheckEntity )
     {
-        for ( unsigned int n = 0; n < 2 * NUM_StreamSectorRows * NUM_StreamSectorCols; n++ )
+        DWORD dwFunc = FUNC_CPtrListSingleLink_Remove;
+        _asm
         {
-            SStreamSectorEntry* pStreamEntry = *((SStreamSectorEntry**)ARRAY_StreamSectors + n);
-
-            while ( pStreamEntry )
-            {
-                if ( pStreamEntry->pEntity == pCheckEntity )
-                {
-                    LogSectorMessage( 900, "Entity in sectors at delete", pCheckEntity );
-                    pStreamEntry->pEntity = NULL; 
-                    *((DWORD**)ARRAY_StreamSectors + n) = NULL;
-                }
-                else
-                if ( pStreamEntry->pEntity && pStreamEntry->pEntity->vtbl->DeleteRwObject != 0x00534030 )
-                {
-                    LogSectorMessage( 901, "Entity invalid", NULL );
-                    pStreamEntry->pEntity = NULL; 
-                    *((DWORD**)ARRAY_StreamSectors + n) = NULL;
-                }
-
-                pStreamEntry = pStreamEntry->pNext;
-            }
-        }
-
-        for ( unsigned int n = 0; n < NUM_StreamRepeatSectorRows * NUM_StreamRepeatSectorCols; n++ )
-        {
-            SStreamRepeatSectorEntry* pRepeatEntry = (SStreamRepeatSectorEntry*)ARRAY_StreamRepeatSectors + n;
-            SStreamSectorEntry* pStreamEntry = pRepeatEntry->m_pStreamSectorEntry;
-
-            while ( pStreamEntry )
-            {
-                if ( pStreamEntry->pEntity == pCheckEntity )
-                {
-                    LogSectorMessage( 902, "Entity in repeat sectors at delete", pCheckEntity );
-                    pStreamEntry->pEntity = NULL;
-                    pRepeatEntry->m_pStreamSectorEntry = NULL;
-                }
-                else
-                if ( pStreamEntry->pEntity && pStreamEntry->pEntity->vtbl->DeleteRwObject != 0x00534030 )
-                {
-                    LogSectorMessage( 903, "Entity invalid in repeat", NULL );
-                    pStreamEntry->pEntity = NULL;
-                    pRepeatEntry->m_pStreamSectorEntry = NULL;
-                }
-
-                pStreamEntry = pStreamEntry->pNext;
-            }
+            mov     ecx, ppStreamEntryList
+            push    pCheckEntity
+            call    dwFunc
         }
     }
 
+    //
+    // CPtrListDoubleLink contains item
+    //
+    bool CPtrListDoubleLink_Contains( SStreamSectorEntryDouble* pStreamEntry, CEntitySAInterface* pCheckEntity )
+    {
+        for ( ; pStreamEntry ; pStreamEntry = pStreamEntry->pNext )
+            if ( pStreamEntry->pEntity == pCheckEntity )
+                return true;
+        return false;
+    }
+
+    //
+    // CPtrListDoubleLink remove item
+    //
+    void CPtrListDoubleLink_Remove( SStreamSectorEntryDouble** ppStreamEntryList, CEntitySAInterface* pCheckEntity )
+    {
+        DWORD dwFunc = FUNC_CPtrListDoubleLink_Remove;
+        _asm
+        {
+            mov     ecx, ppStreamEntryList
+            push    pCheckEntity
+            call    dwFunc
+        }
+    }
+
+    //
+    // Ensure entity is removed from previously added stream sectors
+    //
+    void RemoveEntityFromStreamSectors( CEntitySAInterface* pEntity, bool bRemoveExtraInfo )
+    {
+        SEntitySAInterfaceExtraInfo* pInfo = MapFind( ms_EntitySAInterfaceExtraInfoMap, pEntity );
+        if ( !pInfo )
+            return;
+        SEntitySAInterfaceExtraInfo& info = *pInfo;
+
+        // Check single link sectors
+        for( uint i = 0 ; i < info.AddedSectorSingleList.size() ; i++ )
+        {
+            if ( CPtrListSingleLink_Contains( *info.AddedSectorSingleList[i], pEntity ) )
+            {
+                CPtrListSingleLink_Remove( info.AddedSectorSingleList[i], pEntity );
+            }
+        }
+        info.AddedSectorSingleList.clear();
+
+        // Check double link sectors
+        for( uint i = 0 ; i < info.AddedSectorDoubleList.size() ; i++ )
+        {
+            if ( CPtrListDoubleLink_Contains( *info.AddedSectorDoubleList[i], pEntity ) )
+            {
+                CPtrListDoubleLink_Remove( info.AddedSectorDoubleList[i], pEntity );
+            }
+        }
+        info.AddedSectorDoubleList.clear();
+
+        if ( bRemoveExtraInfo )
+            RemoveEntitySAInterfaceExtraInfo( pEntity );
+    }
 }
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -113,8 +154,6 @@ void _cdecl OnCObjectDestructor ( DWORD calledFrom, CObjectSAInterface* pObject 
     // Tell client to check for things going away
     if ( pGameObjectDestructHandler )
         pGameObjectDestructHandler ( pObject );
-
-    CheckSectors( pObject );
 }
 
 // Hook info
@@ -145,8 +184,6 @@ void _cdecl OnVehicleDestructor ( DWORD calledFrom, CVehicleSAInterface* pVehicl
     // Tell client to check for things going away
     if ( pGameVehicleDestructHandler )
         pGameVehicleDestructHandler ( pVehicle );
-
-    CheckSectors( pVehicle );
 }
 
 // Hook info
@@ -181,8 +218,6 @@ void _cdecl OnCPlayerPedDestructor ( DWORD calledFrom, CPedSAInterface* pPlayerP
     // Tell client to check for things going away
     if ( pGamePlayerDestructHandler )
         pGamePlayerDestructHandler ( pPlayerPed );
-
-    CheckSectors( pPlayerPed );
 }
 
 // Hook info
@@ -212,8 +247,6 @@ void _cdecl OnCProjectileDestructor ( DWORD calledFrom, CEntitySAInterface* pPro
     // Tell client to check for things going away
     if ( pGameProjectileDestructHandler )
         pGameProjectileDestructHandler ( pProjectile );
-
-    CheckSectors( pProjectile );
 }
 
 // Hook info
@@ -239,30 +272,169 @@ void _declspec(naked) HOOK_CProjectileDestructor()
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
 //
-void _cdecl OnCBuildingDestructor ( DWORD calledFrom, CEntitySAInterface* pBuilding )
+void _cdecl OnCEntityDestructor ( DWORD calledFrom, CEntitySAInterface* pEntity )
 {
-    CheckSectors( pBuilding );
+    RemoveEntityFromStreamSectors( pEntity, true );
 }
 
 
 // Hook info
-#define HOOKPOS_CBuildingDestructor        0x404134
-#define HOOKSIZE_CBuildingDestructor       5
-DWORD RETURN_CBuildingDestructor =         0x404139;
-void _declspec(naked) HOOK_CBuildingDestructor()
+#define HOOKPOS_CEntityDestructor        0x535E97
+#define HOOKSIZE_CEntityDestructor       6
+DWORD RETURN_CEntityDestructor =         0x535E9D;
+void _declspec(naked) HOOK_CEntityDestructor()
 {
     _asm
     {
         pushad
         push    ecx
         push    [esp+32+4*1]
-        call    OnCBuildingDestructor
+        call    OnCEntityDestructor
         add     esp, 4*2
         popad
 
-        mov     eax, 0x404180       // CBuilding::~CBuilding()
-        call    eax 
-        jmp     RETURN_CBuildingDestructor
+        mov     eax, dword ptr fs:[00000000h]
+        jmp     RETURN_CEntityDestructor
+    }
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////
+//
+void cdecl OnCEntityAddMid1 ( SStreamSectorEntrySingle** ppStreamEntryList, CEntitySAInterface* pEntitySAInterface )
+{
+    // ARRAY_LodSectors
+    SEntitySAInterfaceExtraInfo& info = GetEntitySAInterfaceExtraInfo( pEntitySAInterface );
+    info.AddedSectorSingleList.push_back( ppStreamEntryList );
+}
+
+
+// Hook info
+#define HOOKPOS_CEntityAddMid1        0x5348FB
+#define HOOKSIZE_CEntityAddMid1       5
+#define HOOKCHECK_CEntityAddMid1      0xE8
+DWORD RETURN_CEntityAddMid1 =         0x534900;
+void _declspec(naked) HOOK_CEntityAddMid1()
+{
+    _asm
+    {
+        pushad
+        push    [esp+32+4*0]
+        push    ecx
+        call    OnCEntityAddMid1
+        add     esp, 4*2
+        popad
+
+        mov     eax, 0x5335E0   // CPtrListSingleLink::Add
+        call    eax
+        jmp     RETURN_CEntityAddMid1
+    }
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////
+//
+void cdecl OnCEntityAddMid2 ( SStreamSectorEntrySingle** ppStreamEntryList, CEntitySAInterface* pEntitySAInterface )
+{
+    // ARRAY_BuildingSectors
+    SEntitySAInterfaceExtraInfo& info = GetEntitySAInterfaceExtraInfo( pEntitySAInterface );
+    info.AddedSectorSingleList.push_back( ppStreamEntryList );
+}
+
+
+// Hook info
+#define HOOKPOS_CEntityAddMid2        0x534A10
+#define HOOKSIZE_CEntityAddMid2       5
+#define HOOKCHECK_CEntityAddMid2      0xE8
+DWORD RETURN_CEntityAddMid2 =         0x534A15;
+void _declspec(naked) HOOK_CEntityAddMid2()
+{
+    _asm
+    {
+        pushad
+        push    [esp+32+4*0]
+        push    ecx
+        call    OnCEntityAddMid2
+        add     esp, 4*2
+        popad
+
+        mov     eax, 0x5335E0   // CPtrListSingleLink::Add
+        call    eax
+        jmp     RETURN_CEntityAddMid2
+    }
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////
+//
+void cdecl OnCEntityAddMid3 ( SStreamSectorEntryDouble** ppStreamEntryList, CEntitySAInterface* pEntitySAInterface )
+{
+    // ARRAY_VehicleSectors
+    // ARRAY_PedSectors
+    // ARRAY_ObjectSectors
+    // ARRAY_DummySectors
+    SEntitySAInterfaceExtraInfo& info = GetEntitySAInterfaceExtraInfo( pEntitySAInterface );
+    info.AddedSectorDoubleList.push_back( ppStreamEntryList );
+}
+
+
+// Hook info
+#define HOOKPOS_CEntityAddMid3        0x534AA2
+#define HOOKSIZE_CEntityAddMid3       5
+#define HOOKCHECK_CEntityAddMid3      0xE8
+DWORD RETURN_CEntityAddMid3 =         0x534AA7;
+void _declspec(naked) HOOK_CEntityAddMid3()
+{
+    _asm
+    {
+        pushad
+        push    [esp+32+4*0]
+        push    ecx
+        call    OnCEntityAddMid3
+        add     esp, 4*2
+        popad
+
+        mov     eax, 0x533670   // CPtrListDoubleLink::Add
+        call    eax
+        jmp     RETURN_CEntityAddMid3
+    }
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////
+//
+void cdecl OnCEntityRemovePost ( CEntitySAInterface* pEntity )
+{
+    RemoveEntityFromStreamSectors( pEntity, false );
+}
+
+
+// Hook info
+#define HOOKPOS_CEntityRemove        0x534AE0
+#define HOOKSIZE_CEntityRemove       5
+#define HOOKCHECK_CEntityRemove      0x83
+DWORD RETURN_CEntityRemove =         0x534AE5;
+void _declspec(naked) HOOK_CEntityRemove()
+{
+    _asm
+    {
+        push    [esp+4*1]
+        call inner
+        add     esp, 4*1
+
+        pushad
+        push    [esp+32+4*1]
+        call    OnCEntityRemovePost
+        add     esp, 4*1
+        popad
+        retn
+
+inner:
+        // Original code
+        sub     esp, 30h
+        push    ebx
+        push    ebp
+        jmp     RETURN_CEntityRemove
     }
 }
 
@@ -340,6 +512,10 @@ void CMultiplayerSA::InitHooks_HookDestructors ( void )
    EZHookInstall ( CVehicleDestructor );
    EZHookInstall ( CProjectileDestructor );
    EZHookInstall ( CPlayerPedDestructor );
-   EZHookInstall ( CBuildingDestructor );
+   EZHookInstall ( CEntityDestructor );
    EZHookInstall ( CStreamingRemoveModel );
+   EZHookInstall ( CEntityAddMid1 );
+   EZHookInstall ( CEntityAddMid2 );
+   EZHookInstall ( CEntityAddMid3 );
+   EZHookInstall ( CEntityRemove );
 }
