@@ -5929,3 +5929,25 @@ void CClientPed::HandleWaitingForGroundToLoad ( void )
             g_pCore->GetGraphics ()->DrawText ( 10, 230 + i * 10, -1, 1, lineList[i] );
     #endif
 }
+
+
+//
+// CClientPed::UpdateStreamPosition
+//
+// If ped is in vehicle, make his stream position the same as the vehicle.
+// This prevents multiple triggering of collision events and makes collision state consistent with the server
+// (This function doesn't need to be virtual)
+//
+void CClientPed::UpdateStreamPosition( const CVector & vecInPosition )
+{
+    CVector vecPosition = vecInPosition;
+    CClientVehicle* pVehicle = GetOccupiedVehicle();
+    if ( pVehicle )
+    {
+        pVehicle->GetPosition( vecPosition );
+        // Optimization if position is the same
+        if ( vecPosition == GetStreamPosition() )
+            return;
+    }
+    CClientStreamElement::UpdateStreamPosition( vecPosition );
+}
