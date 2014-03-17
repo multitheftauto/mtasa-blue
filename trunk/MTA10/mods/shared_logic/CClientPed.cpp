@@ -3642,10 +3642,18 @@ void CClientPed::_ChangeModel ( void )
             // Save the vehicle he's in
             CClientVehicle* pVehicle = GetOccupiedVehicle ();
             unsigned int uiSeat = GetOccupiedVehicleSeat ();
+            CVector vecVehicleVelocity, vecVehicleTurnVelocity;
+            float fVehicleTrainSpeed;
 
             // Are we leaving it? Don't warp him back into anything
             if ( pVehicle )
             {
+                // Store the velocity of the vehicle since
+                // GTA will set it to zero
+                pVehicle->GetMoveSpeed(vecVehicleVelocity);
+                pVehicle->GetTurnSpeed(vecVehicleTurnVelocity);
+                fVehicleTrainSpeed = pVehicle->GetTrainSpeed();
+
                 // Are we leaving it? Don't warp back into it.
                 if ( IsLeavingVehicle () ) pVehicle = NULL;
 
@@ -3702,6 +3710,11 @@ void CClientPed::_ChangeModel ( void )
             if ( pVehicle )
             {
                 WarpIntoVehicle ( pVehicle, uiSeat );
+
+                // Restore vehicle speed
+                pVehicle->SetMoveSpeed(vecVehicleVelocity);
+                pVehicle->SetTurnSpeed(vecVehicleTurnVelocity);
+                pVehicle->SetTrainSpeed(fVehicleTrainSpeed);
             }
             m_bDontChangeRadio = false;
 
