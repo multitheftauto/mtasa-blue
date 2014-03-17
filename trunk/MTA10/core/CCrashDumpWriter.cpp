@@ -32,7 +32,7 @@ struct SCrashAvertedInfo
 static std::list < SLogEventInfo >              ms_LogEventList;
 static std::map < int, SCrashAvertedInfo >      ms_CrashAvertedMap;
 static uint                                     ms_uiTickCountBase = 0;
-
+static void*                                    ms_pReservedMemory = NULL;
 
 typedef BOOL (WINAPI *MINIDUMPWRITEDUMP)(HANDLE hProcess, DWORD dwPid, HANDLE hFile, MINIDUMP_TYPE DumpType,
                                     CONST PMINIDUMP_EXCEPTION_INFORMATION ExceptionParam,
@@ -83,8 +83,34 @@ void CCrashDumpWriter::LogEvent ( const char* szType, const char* szContext, con
 }
 
 
+///////////////////////////////////////////////////////////////
+//
+// CCrashDumpWriter::ReserveMemoryKBForCrashDumpProcessing
+// CCrashDumpWriter::FreeMemoryForCrashDumpProcessing
+//
+// Static functions. Keep some RAM to help avoid mem problems during crash dump saving
+//
+///////////////////////////////////////////////////////////////
+void CCrashDumpWriter::ReserveMemoryKBForCrashDumpProcessing( uint uiMemoryKB )
+{
+    FreeMemoryForCrashDumpProcessing();
+    ms_pReservedMemory = malloc( uiMemoryKB * 1024 );
+}
+
+void CCrashDumpWriter::FreeMemoryForCrashDumpProcessing( void )
+{
+    if ( ms_pReservedMemory )
+    {
+        free( ms_pReservedMemory );
+        ms_pReservedMemory = NULL;
+    }
+}
+
+
 long WINAPI CCrashDumpWriter::HandleExceptionGlobal ( _EXCEPTION_POINTERS* pException )
 {
+    FreeMemoryForCrashDumpProcessing();
+
     // Create the exception information class
     CExceptionInformation_Impl* pExceptionInformation = new CExceptionInformation_Impl;
     pExceptionInformation->Set ( pException->ExceptionRecord->ExceptionCode, pException );
