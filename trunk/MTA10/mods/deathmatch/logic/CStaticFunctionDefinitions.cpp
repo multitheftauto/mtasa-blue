@@ -8434,7 +8434,7 @@ bool CStaticFunctionDefinitions::RemovePedFromVehicle ( CClientPed* pPed )
     // Get the ped / player's occupied vehicle data before pulling it out
     CClientVehicle* pVehicle = pPed->GetOccupiedVehicle();
     unsigned int    uiSeat   = pPed->GetOccupiedVehicleSeat();
-    bool bCancellingWhileEntering = ( pPed->m_bIsLocalPlayer && pPed->IsEnteringVehicle() ); // Special case here that could cause network trouble.
+    bool bCancellingWhileEntering = pPed->IsEnteringVehicle(); // Special case here that could cause network trouble.
 
     // Occupied vehicle can be NULL here while entering (Walking up to a vehicle in preparation to getting in/opening the doors)
     if ( pVehicle || bCancellingWhileEntering )
