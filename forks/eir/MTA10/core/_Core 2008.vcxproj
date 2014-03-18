@@ -1,0 +1,715 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Nightly|Win32">
+      <Configuration>Nightly</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectName>Client - Core</ProjectName>
+    <ProjectGuid>{4C71249E-EA08-4A3D-9AEF-28707ACC6531}</ProjectGuid>
+    <RootNamespace>Client - Core</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Nightly|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v90</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v90</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v90</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Nightly|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+    <Import Project="..\..\Shared\MTAPropertySheet.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+    <Import Project="..\..\Shared\MTAPropertySheet.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+    <Import Project="..\..\Shared\MTAPropertySheet.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>12.0.21005.1</_ProjectFileVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(MyTargetDir)\mta\</OutDir>
+    <IntDir>$(PlatformTarget)\$(Configuration)\</IntDir>
+    <LinkIncremental>true</LinkIncremental>
+    <TargetName>core_d</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(MyTargetDir)\mta\</OutDir>
+    <IntDir>$(PlatformTarget)\$(Configuration)\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+    <TargetName>core</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Nightly|Win32'">
+    <OutDir>$(PlatformTarget)\$(Configuration)\</OutDir>
+    <LinkIncremental>false</LinkIncremental>
+    <TargetName>core</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Midl>
+      <TypeLibraryName>.\Debug/Core.tlb</TypeLibraryName>
+      <HeaderFileName />
+    </Midl>
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>.;../../vendor;../sdk;../../Shared/sdk;../../vendor/sparsehash/current/src;../../vendor/sparsehash/current/src/windows;../../vendor/pthreads/include;../../vendor/jpeg/jpeg-8d;../../vendor/zlib;../../vendor/tinygettext;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_WIN32_WINNT=0x502;WIN32;MTA_DEBUG;_CRT_SECURE_NO_WARNINGS;INITGUID;PNG_SETJMP_NOT_SUPPORTED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <BufferSecurityCheck>true</BufferSecurityCheck>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>StdInc.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>$(IntDir)$(TargetName).pch</PrecompiledHeaderOutputFile>
+      <BrowseInformation>true</BrowseInformation>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <CompileAs>Default</CompileAs>
+      <DisableSpecificWarnings>4995;4244;4996;4482;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <ShowIncludes>false</ShowIncludes>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <Link>
+      <AdditionalDependencies>strmiids.lib;libv2.lib;zlib_d.lib;libpng_d.lib;odbc32.lib;odbccp32.lib;dinput8.lib;dxguid.lib;shlwapi.lib;d3dx9.lib;winmm.lib;Imagehlp.lib;ws2_32.lib;gdi32.lib;Userenv.lib;Imm32.lib;pthreadVC2.lib;jpeg_d.lib;Psapi.lib;xinput.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ShowProgress>NotSet</ShowProgress>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <AdditionalLibraryDirectories>../../Shared/XML;../../vendor/libv2/lib;../../vendor/libpng/$(PlatformTarget)/$(Configuration);../../vendor/zlib/$(PlatformTarget)/$(Configuration);../../vendor/detours/lib;../../vendor/pthreads/lib/$(PlatformTarget);../../vendor/jpeg/$(PlatformTarget)/$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ProgramDatabaseFile>$(IntDir)$(TargetName).pdb</ProgramDatabaseFile>
+      <MapFileName />
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention />
+      <ImportLibrary>$(IntDir)$(TargetName).lib</ImportLibrary>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Midl>
+      <TypeLibraryName>.\Release/Core.tlb</TypeLibraryName>
+      <HeaderFileName />
+    </Midl>
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>true</OmitFramePointers>
+      <AdditionalIncludeDirectories>.;../../vendor;../sdk;../../Shared/sdk;../../vendor/sparsehash/current/src;../../vendor/sparsehash/current/src/windows;../../vendor/pthreads/include;../../vendor/jpeg/jpeg-8d;../../vendor/zlib;../../vendor/tinygettext;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_WIN32_WINNT=0x502;WIN32;_CRT_SECURE_NO_WARNINGS;INITGUID;PNG_SETJMP_NOT_SUPPORTED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>StdInc.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>$(IntDir)$(TargetName).pch</PrecompiledHeaderOutputFile>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <CompileAs>Default</CompileAs>
+      <DisableSpecificWarnings>4995;4244;4996;4482;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <Link>
+      <AdditionalDependencies>strmiids.lib;libv2.lib;zlib.lib;libpng.lib;odbc32.lib;odbccp32.lib;dinput8.lib;dxguid.lib;shlwapi.lib;d3dx9.lib;wsock32.lib;winmm.lib;Imagehlp.lib;gdi32.lib;Userenv.lib;Imm32.lib;pthreadVC2.lib;jpeg.lib;Psapi.lib;xinput.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <AdditionalLibraryDirectories>../../Shared/XML;../../vendor/libv2/lib;../../vendor/libpng/$(PlatformTarget)/$(Configuration);../../vendor/zlib/$(PlatformTarget)/$(Configuration);../../vendor/detours/lib;../../vendor/pthreads/lib/$(PlatformTarget);../../vendor/jpeg/$(PlatformTarget)/$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <IgnoreSpecificDefaultLibraries>LIBCMT;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ProgramDatabaseFile>../../symbols/$(Configuration)_$(SafeParentName).pdb</ProgramDatabaseFile>
+      <MapFileName />
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention />
+      <ImportLibrary>$(IntDir)$(TargetName).lib</ImportLibrary>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Nightly|Win32'">
+    <Midl>
+      <TypeLibraryName>.\Release/Core.tlb</TypeLibraryName>
+      <HeaderFileName />
+    </Midl>
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>true</OmitFramePointers>
+      <AdditionalIncludeDirectories>.;../../vendor;../sdk;../../Shared/sdk;../../vendor/sparsehash/current/src;../../vendor/sparsehash/current/src/windows;../../vendor/pthreads/include;../../vendor/jpeg/jpeg-8d;../../vendor/zlib;../../vendor/tinygettext;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_WIN32_WINNT=0x502;WIN32;_CRT_SECURE_NO_WARNINGS;INITGUID;PNG_SETJMP_NOT_SUPPORTED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>StdInc.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>$(IntDir)$(TargetName).pch</PrecompiledHeaderOutputFile>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <CompileAs>Default</CompileAs>
+      <DisableSpecificWarnings>4995;4244;4996;4482;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <Link>
+      <AdditionalDependencies>strmiids.lib;libv2.lib;zlib.lib;libpng.lib;odbc32.lib;odbccp32.lib;dinput8.lib;dxguid.lib;shlwapi.lib;d3dx9.lib;wsock32.lib;winmm.lib;Imagehlp.lib;gdi32.lib;Userenv.lib;Imm32.lib;pthreadVC2.lib;jpeg.lib;Psapi.lib;xinput.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <AdditionalLibraryDirectories>../../Shared/XML;../../vendor/libv2/lib;../../vendor/libpng/$(PlatformTarget)/$(Configuration);../../vendor/zlib/$(PlatformTarget)/$(Configuration);../../vendor/detours/lib;../../vendor/pthreads/lib/$(PlatformTarget);../../vendor/jpeg/$(PlatformTarget)/$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <IgnoreSpecificDefaultLibraries>LIBCMT;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ProgramDatabaseFile>../../symbols/$(Configuration)_$(SafeParentName).pdb</ProgramDatabaseFile>
+      <MapFileName />
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention />
+      <ImportLibrary>$(IntDir)$(TargetName).lib</ImportLibrary>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="CAdditionalVertexStreamManager.cpp" />
+    <ClCompile Include="CChat.cpp" />
+    <ClCompile Include="CClientVariables.cpp" />
+    <ClCompile Include="CCommandFuncs.cpp" />
+    <ClCompile Include="CCommands.cpp" />
+    <ClCompile Include="CCommunity.cpp" />
+    <ClCompile Include="CCommunityLogin.cpp" />
+    <ClCompile Include="CCommunityRegistration.cpp" />
+    <ClCompile Include="CCompressorJobQueue.cpp" />
+    <ClCompile Include="CConnectManager.cpp" />
+    <ClCompile Include="CConsole.cpp" />
+    <ClCompile Include="CConsoleHistory.cpp" />
+    <ClCompile Include="CConsoleLogger.cpp" />
+    <ClCompile Include="CCore.cpp" />
+    <ClCompile Include="CCrashDumpWriter.cpp" />
+    <ClCompile Include="CCredits.cpp" />
+    <ClCompile Include="CDebugView.cpp" />
+    <ClCompile Include="CDirect3DData.cpp" />
+    <ClCompile Include="CDirect3DEvents9.cpp" />
+    <ClCompile Include="CDirect3DHook9.cpp" />
+    <ClCompile Include="CDirect3DHookManager.cpp" />
+    <ClCompile Include="CDirectInputHook8.cpp" />
+    <ClCompile Include="CDirectInputHookManager.cpp" />
+    <ClCompile Include="CExceptionInformation_Impl.cpp" />
+    <ClCompile Include="CFavouritesAddByIP.cpp" />
+    <ClCompile Include="CFileFormatJpeg.cpp" />
+    <ClCompile Include="CFileFormatPng.cpp" />
+    <ClCompile Include="CFilePathTranslator.cpp" />
+    <ClCompile Include="CFileSystemHook.cpp" />
+    <ClCompile Include="CFileSystemMemoryHandle.cpp" />
+    <ClCompile Include="CFileSystemMemoryHandleManager.cpp" />
+    <ClCompile Include="CGraphics.cpp" />
+    <ClCompile Include="CGraphStats.cpp" />
+    <ClCompile Include="CGUI.cpp" />
+    <ClCompile Include="CJoystickManager.cpp" />
+    <ClCompile Include="CKeyBinds.cpp" />
+    <ClCompile Include="CLanguage.cpp" />
+    <ClCompile Include="CLine3DBatcher.cpp" />
+    <ClCompile Include="CLocalization.cpp" />
+    <ClCompile Include="CMainMenu.cpp" />
+    <ClCompile Include="CMainMenuScene.cpp" />
+    <ClCompile Include="CMaterialLine3DBatcher.cpp" />
+    <ClCompile Include="CMemStats.cpp" />
+    <ClCompile Include="CMessageLoopHook.cpp" />
+    <ClCompile Include="CModelCacheManager.cpp" />
+    <ClCompile Include="CModManager.cpp" />
+    <ClCompile Include="CModuleLoader.cpp" />
+    <ClCompile Include="CMouseControl.cpp" />
+    <ClCompile Include="CNewsBrowser.cpp" />
+    <ClCompile Include="CNickGen.cpp" />
+    <ClCompile Include="Core.cpp" />
+    <ClCompile Include="CPEHookUtils.cpp" />
+    <ClCompile Include="CPixelsManager.cpp" />
+    <ClCompile Include="CPixelsManager_VolumeTexture.cpp" />
+    <ClCompile Include="CProxyDirect3D8.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Nightly|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="CProxyDirect3D9.cpp" />
+    <ClCompile Include="CProxyDirect3DDevice9.cpp" />
+    <ClCompile Include="CProxyDirect3DIndexBuffer.cpp" />
+    <ClCompile Include="CProxyDirect3DTexture.cpp" />
+    <ClCompile Include="CProxyDirect3DVertexBuffer.cpp" />
+    <ClCompile Include="CProxyDirect3DVertexDeclaration.cpp" />
+    <ClCompile Include="CProxyDirectInput8.cpp" />
+    <ClCompile Include="CProxyDirectInputDevice8.cpp" />
+    <ClCompile Include="CQuestionBox.cpp" />
+    <ClCompile Include="CQuickConnect.cpp" />
+    <ClCompile Include="CrashHandler.cpp" />
+    <ClCompile Include="CRenderItem.cpp" />
+    <ClCompile Include="CRenderItem.DxFont.cpp" />
+    <ClCompile Include="CRenderItem.EffectCloner.cpp" />
+    <ClCompile Include="CRenderItem.EffectTemplate.cpp" />
+    <ClCompile Include="CRenderItem.EffectWrap.cpp" />
+    <ClCompile Include="CRenderItem.FileTexture.cpp" />
+    <ClCompile Include="CRenderItem.GuiFont.cpp" />
+    <ClCompile Include="CRenderItem.RenderTarget.cpp" />
+    <ClCompile Include="CRenderItem.ScreenSource.cpp" />
+    <ClCompile Include="CRenderItem.Shader.cpp" />
+    <ClCompile Include="CRenderItem.ShaderInstance.cpp" />
+    <ClCompile Include="CRenderItemManager.cpp" />
+    <ClCompile Include="CRenderItemManager.TextureReplace.cpp" />
+    <ClCompile Include="CScreenGrabber.cpp" />
+    <ClCompile Include="CScreenShot.cpp" />
+    <ClCompile Include="CServerBrowser.cpp" />
+    <ClCompile Include="CServerBrowser.MasterServerManager.cpp" />
+    <ClCompile Include="CServerBrowser.RemoteMasterServer.cpp" />
+    <ClCompile Include="CServerCache.cpp" />
+    <ClCompile Include="CServerInfo.cpp" />
+    <ClCompile Include="CServerList.cpp" />
+    <ClCompile Include="CSetCursorPosHook.cpp" />
+    <ClCompile Include="CSettings.cpp" />
+    <ClCompile Include="CTileBatcher.cpp" />
+    <ClCompile Include="CVersionUpdater.cpp" />
+    <ClCompile Include="CVertexStreamBoundingBoxManager.cpp" />
+    <ClCompile Include="CVideoModeManager.cpp" />
+    <ClCompile Include="CXfireQuery.cpp" />
+    <ClCompile Include="StdInc.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Nightly|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="xfire.cpp" />
+    <ClCompile Include="tracking\CHTTPClient.cpp" />
+    <ClCompile Include="tracking\CHTTPResponse.cpp" />
+    <ClCompile Include="tracking\CTCPClientSocketImpl.cpp" />
+    <ClCompile Include="tracking\CTCPManager.cpp" />
+    <ClCompile Include="..\..\vendor\tinygettext\dictionary.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Nightly|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\vendor\tinygettext\dictionary_manager.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Nightly|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\vendor\tinygettext\language.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Nightly|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\vendor\tinygettext\log.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Nightly|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\vendor\tinygettext\plural_forms.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Nightly|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\vendor\tinygettext\po_parser.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Nightly|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\vendor\tinygettext\tinygettext.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Nightly|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\vendor\tinygettext\unix_file_system.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Nightly|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="CAdditionalVertexStreamManager.h" />
+    <ClInclude Include="CAspectRatioConverter.h" />
+    <ClInclude Include="CChat.h" />
+    <ClInclude Include="CClientVariables.h" />
+    <ClInclude Include="CCommandFuncs.h" />
+    <ClInclude Include="CCommands.h" />
+    <ClInclude Include="CCommunity.h" />
+    <ClInclude Include="CCommunityLogin.h" />
+    <ClInclude Include="CCommunityRegistration.h" />
+    <ClInclude Include="CCompressorJobQueue.h" />
+    <ClInclude Include="CConnectManager.h" />
+    <ClInclude Include="CConsole.h" />
+    <ClInclude Include="CConsoleHistory.h" />
+    <ClInclude Include="CConsoleLogger.h" />
+    <ClInclude Include="CCore.h" />
+    <ClInclude Include="CCrashDumpWriter.h" />
+    <ClInclude Include="CCredits.h" />
+    <ClInclude Include="CDebugView.h" />
+    <ClInclude Include="CDirect3DData.h" />
+    <ClInclude Include="CDirect3DEvents9.h" />
+    <ClInclude Include="CDirect3DHook9.h" />
+    <ClInclude Include="CDirect3DHookManager.h" />
+    <ClInclude Include="CDirectInputHook8.h" />
+    <ClInclude Include="CDirectInputHookManager.h" />
+    <ClInclude Include="client\CExceptionInformation.h" />
+    <ClInclude Include="CFavouritesAddByIP.h" />
+    <ClInclude Include="CFileFormat.h" />
+    <ClInclude Include="CFilePathTranslator.h" />
+    <ClInclude Include="CFileSystemHook.h" />
+    <ClInclude Include="CFileSystemMemoryHandle.h" />
+    <ClInclude Include="CFileSystemMemoryHandleManager.h" />
+    <ClInclude Include="CGraphics.h" />
+    <ClInclude Include="CGraphStats.h" />
+    <ClInclude Include="CGUI.h" />
+    <ClInclude Include="CJoystickManager.h" />
+    <ClInclude Include="CKeyBinds.h" />
+    <ClInclude Include="CLanguage.h" />
+    <ClInclude Include="CLine3DBatcher.h" />
+    <ClInclude Include="CLocalization.h" />
+    <ClInclude Include="CMainConfig.h" />
+    <ClInclude Include="CMainMenu.h" />
+    <ClInclude Include="CMainMenuScene.h" />
+    <ClInclude Include="CMaterialLine3DBatcher.h" />
+    <ClInclude Include="CMemStats.h" />
+    <ClInclude Include="CMessageBox.h" />
+    <ClInclude Include="CMessageLoopHook.h" />
+    <ClInclude Include="CModelCacheManager.h" />
+    <ClInclude Include="CModManager.h" />
+    <ClInclude Include="CModuleLoader.h" />
+    <ClInclude Include="CMouseControl.h" />
+    <ClInclude Include="CNewsBrowser.h" />
+    <ClInclude Include="CNickGen.h" />
+    <ClInclude Include="Core.h" />
+    <ClInclude Include="CPEHookUtils.h" />
+    <ClInclude Include="CPixelsManager.h" />
+    <ClInclude Include="CProxyDirect3D9.h" />
+    <ClInclude Include="CProxyDirect3DDevice8.h" />
+    <ClInclude Include="CProxyDirect3DDevice9.h" />
+    <ClInclude Include="CProxyDirect3DIndexBuffer.h" />
+    <ClInclude Include="CProxyDirect3DTexture.h" />
+    <ClInclude Include="CProxyDirect3DVertexBuffer.h" />
+    <ClInclude Include="CProxyDirect3DVertexDeclaration.h" />
+    <ClInclude Include="CProxyDirectInput8.h" />
+    <ClInclude Include="CProxyDirectInputDevice8.h" />
+    <ClInclude Include="CQuestionBox.h" />
+    <ClInclude Include="CQuickConnect.h" />
+    <ClInclude Include="CRenderItem.EffectCloner.h" />
+    <ClInclude Include="CRenderItemManager.h" />
+    <ClInclude Include="CScreenShot.h" />
+    <ClInclude Include="CServerBrowser.h" />
+    <ClInclude Include="CServerBrowser.MasterServerManager.h" />
+    <ClInclude Include="CServerBrowser.RemoteMasterServer.h" />
+    <ClInclude Include="CServerCache.h" />
+    <ClInclude Include="CServerInfo.h" />
+    <ClInclude Include="CServerList.h" />
+    <ClInclude Include="CSetCursorPosHook.h" />
+    <ClInclude Include="CSettings.h" />
+    <ClInclude Include="CTileBatcher.h" />
+    <ClInclude Include="CTimingCheckpoints.hpp" />
+    <ClInclude Include="CVersionUpdater.h" />
+    <ClInclude Include="CVersionUpdater.Util.hpp" />
+    <ClInclude Include="CVertexStreamBoundingBoxManager.h" />
+    <ClInclude Include="CVideoModeManager.h" />
+    <ClInclude Include="CXfireQuery.h" />
+    <ClInclude Include="StdInc.h" />
+    <ClInclude Include="xfire.h" />
+    <ClInclude Include="tracking\CHTTPClient.h" />
+    <ClInclude Include="tracking\CHTTPResponse.h" />
+    <ClInclude Include="tracking\CTCPClientSocket.h" />
+    <ClInclude Include="tracking\CTCPClientSocketImpl.h" />
+    <ClInclude Include="tracking\CTCPManager.h" />
+    <ClInclude Include="tracking\CTCPServerSocket.h" />
+    <ClInclude Include="tracking\CTCPServerSocketImpl.h" />
+    <ClInclude Include="tracking\CTCPSocket.h" />
+    <ClInclude Include="CExceptionInformation_Impl.h" />
+    <ClInclude Include="..\sdk\core\CClientBase.h" />
+    <ClInclude Include="..\sdk\core\CClientEntityBase.h" />
+    <ClInclude Include="..\sdk\core\CCommandsInterface.h" />
+    <ClInclude Include="..\sdk\core\CCommunityInterface.h" />
+    <ClInclude Include="..\sdk\core\CConsoleInterface.h" />
+    <ClInclude Include="..\sdk\core\CCoreInterface.h" />
+    <ClInclude Include="..\sdk\core\CCVarsInterface.h" />
+    <ClInclude Include="..\sdk\core\CExceptionInformation.h" />
+    <ClInclude Include="..\sdk\core\CGraphicsInterface.h" />
+    <ClInclude Include="..\sdk\core\CKeyBindsInterface.h" />
+    <ClInclude Include="..\sdk\core\CLocalizationInterface.h" />
+    <ClInclude Include="..\sdk\core\CModManagerInterface.h" />
+    <ClInclude Include="..\sdk\core\CPixelsManagerInterface.h" />
+    <ClInclude Include="..\sdk\core\CRenderItemManagerInterface.h" />
+    <ClInclude Include="..\sdk\core\CScreenGrabberInterface.h" />
+    <ClInclude Include="..\sdk\core\CSetCursorPosHookInterface.h" />
+    <ClInclude Include="..\..\Shared\sdk\net\bitstream.h" />
+    <ClInclude Include="..\sdk\net\CNet.h" />
+    <ClInclude Include="..\sdk\net\CNetHTTPDownloadManagerInterface.h" />
+    <ClInclude Include="..\sdk\net\net_common.h" />
+    <ClInclude Include="..\..\Shared\sdk\net\packetenums.h" />
+    <ClInclude Include="..\sdk\game\C3DMarker.h" />
+    <ClInclude Include="..\sdk\game\C3DMarkers.h" />
+    <ClInclude Include="..\sdk\game\CAERadioTrackManager.h" />
+    <ClInclude Include="..\sdk\game\CAnimBlendAssocGroup.h" />
+    <ClInclude Include="..\sdk\game\CAnimBlendAssociation.h" />
+    <ClInclude Include="..\sdk\game\CAnimBlendHierarchy.h" />
+    <ClInclude Include="..\sdk\game\CAnimBlendSequence.h" />
+    <ClInclude Include="..\sdk\game\CAnimBlendStaticAssociation.h" />
+    <ClInclude Include="..\sdk\game\CAnimBlock.h" />
+    <ClInclude Include="..\sdk\game\CAnimManager.h" />
+    <ClInclude Include="..\sdk\game\CAudio.h" />
+    <ClInclude Include="..\sdk\game\CAudioContainer.h" />
+    <ClInclude Include="..\sdk\game\CAutomobile.h" />
+    <ClInclude Include="..\sdk\game\CBike.h" />
+    <ClInclude Include="..\sdk\game\CBmx.h" />
+    <ClInclude Include="..\sdk\game\CBoat.h" />
+    <ClInclude Include="..\sdk\game\CBuilding.h" />
+    <ClInclude Include="..\sdk\game\CCam.h" />
+    <ClInclude Include="..\sdk\game\CCamera.h" />
+    <ClInclude Include="..\sdk\game\CCarEnterExit.h" />
+    <ClInclude Include="..\sdk\game\CCarGenerator.h" />
+    <ClInclude Include="..\sdk\game\CCheckpoint.h" />
+    <ClInclude Include="..\sdk\game\CCheckpoints.h" />
+    <ClInclude Include="..\sdk\game\CCivilianPed.h" />
+    <ClInclude Include="..\sdk\game\CClock.h" />
+    <ClInclude Include="..\sdk\game\CColModel.h" />
+    <ClInclude Include="..\sdk\game\CColPoint.h" />
+    <ClInclude Include="..\sdk\game\CControllerConfigManager.h" />
+    <ClInclude Include="..\sdk\game\CCoronas.h" />
+    <ClInclude Include="..\sdk\game\CDamageManager.h" />
+    <ClInclude Include="..\sdk\game\CDoor.h" />
+    <ClInclude Include="..\sdk\game\CEntity.h" />
+    <ClInclude Include="..\sdk\game\CEvent.h" />
+    <ClInclude Include="..\sdk\game\CEventDamage.h" />
+    <ClInclude Include="..\sdk\game\CEventList.h" />
+    <ClInclude Include="..\sdk\game\CExplosion.h" />
+    <ClInclude Include="..\sdk\game\CExplosionManager.h" />
+    <ClInclude Include="..\sdk\game\CFire.h" />
+    <ClInclude Include="..\sdk\game\CFireManager.h" />
+    <ClInclude Include="..\sdk\game\CFont.h" />
+    <ClInclude Include="..\sdk\game\CFx.h" />
+    <ClInclude Include="..\sdk\game\CGame.h" />
+    <ClInclude Include="..\sdk\game\CGarage.h" />
+    <ClInclude Include="..\sdk\game\CGarages.h" />
+    <ClInclude Include="..\sdk\game\CHandlingEntry.h" />
+    <ClInclude Include="..\sdk\game\CHandlingManager.h" />
+    <ClInclude Include="..\sdk\game\CHud.h" />
+    <ClInclude Include="..\sdk\game\CKeyGen.h" />
+    <ClInclude Include="..\sdk\game\CMarker.h" />
+    <ClInclude Include="..\sdk\game\CMenuManager.h" />
+    <ClInclude Include="..\sdk\game\CModelInfo.h" />
+    <ClInclude Include="..\sdk\game\CMonsterTruck.h" />
+    <ClInclude Include="..\sdk\game\CObject.h" />
+    <ClInclude Include="..\sdk\game\Common.h" />
+    <ClInclude Include="..\sdk\game\CPad.h" />
+    <ClInclude Include="..\sdk\game\CParticle.h" />
+    <ClInclude Include="..\sdk\game\CParticleObject.h" />
+    <ClInclude Include="..\sdk\game\CParticleSystemManager.h" />
+    <ClInclude Include="..\sdk\game\CPathFind.h" />
+    <ClInclude Include="..\sdk\game\CPed.h" />
+    <ClInclude Include="..\sdk\game\CPedIK.h" />
+    <ClInclude Include="..\sdk\game\CPedIntelligence.h" />
+    <ClInclude Include="..\sdk\game\CPedModelInfo.h" />
+    <ClInclude Include="..\sdk\game\CPhysical.h" />
+    <ClInclude Include="..\sdk\game\CPickup.h" />
+    <ClInclude Include="..\sdk\game\CPickups.h" />
+    <ClInclude Include="..\sdk\game\CPlane.h" />
+    <ClInclude Include="..\sdk\game\CPlayerInfo.h" />
+    <ClInclude Include="..\sdk\game\CPlayerPed.h" />
+    <ClInclude Include="..\sdk\game\CPools.h" />
+    <ClInclude Include="..\sdk\game\CPopulation.h" />
+    <ClInclude Include="..\sdk\game\CProjectile.h" />
+    <ClInclude Include="..\sdk\game\CProjectileInfo.h" />
+    <ClInclude Include="..\sdk\game\CQuadBike.h" />
+    <ClInclude Include="..\sdk\game\CRadar.h" />
+    <ClInclude Include="..\sdk\game\CRegisteredCorona.h" />
+    <ClInclude Include="..\sdk\game\CRemote.h" />
+    <ClInclude Include="..\sdk\game\CRenderWare.h" />
+    <ClInclude Include="..\sdk\game\CRestart.h" />
+    <ClInclude Include="..\sdk\game\CRopes.h" />
+    <ClInclude Include="..\sdk\game\CSettings.h" />
+    <ClInclude Include="..\sdk\game\CStats.h" />
+    <ClInclude Include="..\sdk\game\CStreaming.h" />
+    <ClInclude Include="..\sdk\game\CTaskManagementSystem.h" />
+    <ClInclude Include="..\sdk\game\CTaskManager.h" />
+    <ClInclude Include="..\sdk\game\CTasks.h" />
+    <ClInclude Include="..\sdk\game\CText.h" />
+    <ClInclude Include="..\sdk\game\CTheCarGenerators.h" />
+    <ClInclude Include="..\sdk\game\CTrailer.h" />
+    <ClInclude Include="..\sdk\game\CVehicle.h" />
+    <ClInclude Include="..\sdk\game\CVehicleScanner.h" />
+    <ClInclude Include="..\sdk\game\CVisibilityPlugins.h" />
+    <ClInclude Include="..\sdk\game\CWanted.h" />
+    <ClInclude Include="..\sdk\game\CWater.h" />
+    <ClInclude Include="..\sdk\game\CWaterManager.h" />
+    <ClInclude Include="..\sdk\game\CWeapon.h" />
+    <ClInclude Include="..\sdk\game\CWeaponInfo.h" />
+    <ClInclude Include="..\sdk\game\CWeaponStat.h" />
+    <ClInclude Include="..\sdk\game\CWeaponStatManager.h" />
+    <ClInclude Include="..\sdk\game\CWeather.h" />
+    <ClInclude Include="..\sdk\game\CWorld.h" />
+    <ClInclude Include="..\sdk\game\RenderWare.h" />
+    <ClInclude Include="..\sdk\game\Task.h" />
+    <ClInclude Include="..\sdk\game\TaskAttack.h" />
+    <ClInclude Include="..\sdk\game\TaskBasic.h" />
+    <ClInclude Include="..\sdk\game\TaskCar.h" />
+    <ClInclude Include="..\sdk\game\TaskCarAccessories.h" />
+    <ClInclude Include="..\sdk\game\TaskGoTo.h" />
+    <ClInclude Include="..\sdk\game\TaskIK.h" />
+    <ClInclude Include="..\sdk\game\TaskJumpFall.h" />
+    <ClInclude Include="..\sdk\game\TaskPhysicalResponse.h" />
+    <ClInclude Include="..\sdk\game\TaskSecondary.h" />
+    <ClInclude Include="..\sdk\game\TaskTypes.h" />
+    <ClInclude Include="..\sdk\multiplayer\CMultiplayer.h" />
+    <ClInclude Include="..\sdk\multiplayer\CPopulationMP.h" />
+    <ClInclude Include="..\..\Shared\sdk\CBox.h" />
+    <ClInclude Include="..\..\Shared\sdk\CChecksum.h" />
+    <ClInclude Include="..\..\Shared\sdk\CFastList.h" />
+    <ClInclude Include="..\..\Shared\sdk\CMatrix.h" />
+    <ClInclude Include="..\..\Shared\sdk\CMatrix4.h" />
+    <ClInclude Include="..\..\Shared\sdk\CMatrix_Pad.h" />
+    <ClInclude Include="..\..\Shared\sdk\Common.h" />
+    <ClInclude Include="..\..\Shared\sdk\CQuat.h" />
+    <ClInclude Include="..\..\Shared\sdk\CRect2D.h" />
+    <ClInclude Include="..\..\Shared\sdk\CScriptArgReader.h" />
+    <ClInclude Include="..\..\Shared\sdk\CSphere.h" />
+    <ClInclude Include="..\..\Shared\sdk\CVector.h" />
+    <ClInclude Include="..\..\Shared\sdk\CVector2D.h" />
+    <ClInclude Include="..\..\Shared\sdk\RTree.h" />
+    <ClInclude Include="..\..\Shared\sdk\sha2.h" />
+    <ClInclude Include="..\..\Shared\sdk\sha2.hpp" />
+    <ClInclude Include="..\..\Shared\sdk\SharedUtil.AllocTracking.h" />
+    <ClInclude Include="..\..\Shared\sdk\SharedUtil.AllocTracking.hpp" />
+    <ClInclude Include="..\..\Shared\sdk\SharedUtil.Buffer.h" />
+    <ClInclude Include="..\..\Shared\sdk\SharedUtil.ClassIdent.h" />
+    <ClInclude Include="..\..\Shared\sdk\SharedUtil.Defines.h" />
+    <ClInclude Include="..\..\Shared\sdk\SharedUtil.FastHashMap.h" />
+    <ClInclude Include="..\..\Shared\sdk\SharedUtil.FastHashSet.h" />
+    <ClInclude Include="..\..\Shared\sdk\SharedUtil.File.h" />
+    <ClInclude Include="..\..\Shared\sdk\SharedUtil.File.hpp" />
+    <ClInclude Include="..\..\Shared\sdk\SharedUtil.Game.h" />
+    <ClInclude Include="..\..\Shared\sdk\SharedUtil.Game.hpp" />
+    <ClInclude Include="..\..\Shared\sdk\SharedUtil.h" />
+    <ClInclude Include="..\..\Shared\sdk\SharedUtil.Hash.h" />
+    <ClInclude Include="..\..\Shared\sdk\SharedUtil.Hash.hpp" />
+    <ClInclude Include="..\..\Shared\sdk\SharedUtil.HashMap.h" />
+    <ClInclude Include="..\..\Shared\sdk\SharedUtil.hpp" />
+    <ClInclude Include="..\..\Shared\sdk\SharedUtil.IntervalCounter.h" />
+    <ClInclude Include="..\..\Shared\sdk\SharedUtil.IntervalCounter.hpp" />
+    <ClInclude Include="..\..\Shared\sdk\SharedUtil.Logging.h" />
+    <ClInclude Include="..\..\Shared\sdk\SharedUtil.Logging.hpp" />
+    <ClInclude Include="..\..\Shared\sdk\SharedUtil.Map.h" />
+    <ClInclude Include="..\..\Shared\sdk\SharedUtil.Math.h" />
+    <ClInclude Include="..\..\Shared\sdk\SharedUtil.Math.hpp" />
+    <ClInclude Include="..\..\Shared\sdk\SharedUtil.MemAccess.h" />
+    <ClInclude Include="..\..\Shared\sdk\SharedUtil.MemAccess.hpp" />
+    <ClInclude Include="..\..\Shared\sdk\SharedUtil.Misc.h" />
+    <ClInclude Include="..\..\Shared\sdk\SharedUtil.Misc.hpp" />
+    <ClInclude Include="..\..\Shared\sdk\SharedUtil.Profiling.h" />
+    <ClInclude Include="..\..\Shared\sdk\SharedUtil.Profiling.hpp" />
+    <ClInclude Include="..\..\Shared\sdk\SharedUtil.SysInfo.h" />
+    <ClInclude Include="..\..\Shared\sdk\SharedUtil.SysInfo.hpp" />
+    <ClInclude Include="..\..\Shared\sdk\SharedUtil.Tests.hpp" />
+    <ClInclude Include="..\..\Shared\sdk\SharedUtil.Thread.h" />
+    <ClInclude Include="..\..\Shared\sdk\SharedUtil.Time.h" />
+    <ClInclude Include="..\..\Shared\sdk\SharedUtil.Time.hpp" />
+    <ClInclude Include="..\..\Shared\sdk\SharedUtil.Win32Utf8FileHooks.hpp" />
+    <ClInclude Include="..\..\Shared\sdk\SString.h" />
+    <ClInclude Include="..\..\Shared\sdk\SString.hpp" />
+    <ClInclude Include="..\..\Shared\sdk\UTF8.h" />
+    <ClInclude Include="..\..\Shared\sdk\WString.h" />
+    <ClInclude Include="..\..\Shared\sdk\WString.hpp" />
+    <ClInclude Include="..\..\vendor\tinygettext\dictionary.hpp" />
+    <ClInclude Include="..\..\vendor\tinygettext\dictionary_manager.hpp" />
+    <ClInclude Include="..\..\vendor\tinygettext\file_system.hpp" />
+    <ClInclude Include="..\..\vendor\tinygettext\language.hpp" />
+    <ClInclude Include="..\..\vendor\tinygettext\log.hpp" />
+    <ClInclude Include="..\..\vendor\tinygettext\log_stream.hpp" />
+    <ClInclude Include="..\..\vendor\tinygettext\plural_forms.hpp" />
+    <ClInclude Include="..\..\vendor\tinygettext\po_parser.hpp" />
+    <ClInclude Include="..\..\vendor\tinygettext\tinygettext.hpp" />
+    <ClInclude Include="..\..\vendor\tinygettext\unix_file_system.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\vendor\jpeg\win32\jpeg_2008.vcxproj">
+      <Project>{5997cb54-c80c-4422-89aa-81b6adfa7f86}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\..\vendor\libpng\projects\vs2008\libpng.vcxproj">
+      <Project>{0008960e-e0dd-41a6-8265-00b31ddb4c21}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\..\vendor\zlib\zlib 2008.vcxproj">
+      <Project>{ccabbc2e-172d-46fd-bc43-5a9fcd295112}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties DevPartner_IsInstrumented="1" />
+    </VisualStudio>
+  </ProjectExtensions>
+</Project>

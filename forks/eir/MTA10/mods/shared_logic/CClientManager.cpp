@@ -59,6 +59,7 @@ CClientManager::CClientManager ( void )
     m_pExplosionManager = new CClientExplosionManager ( this );
     m_pWaterManager = new CClientWaterManager ( this );
     m_pWeaponManager = new CClientWeaponManager ( this );
+    m_pEffectManager = new CClientEffectManager ( this );
     m_pPacketRecorder = new CClientPacketRecorder ( this );
 
     m_bBeingDeleted = false;

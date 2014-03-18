@@ -27,6 +27,7 @@
 #define     CLASS_CPad                      0xB73458    // ##SA##
 #define     CLASS_CGarages                  0x96C048    // ##SA##
 #define     CLASS_CFx                       0xa9ae00    // ##SA##
+#define     CLASS_CFxManager                0xA9AE80    // ##SA##
 #define     CLASS_CMenuManager              0xBA6748    // ##SA##
 
 #define     CLASS_RwCamera                  0xB6F97C
@@ -37,7 +38,7 @@
 #define     NUM_WeaponInfosOtherSkill       11
 #define     NUM_WeaponInfosTotal            (NUM_WeaponInfosStdSkill + (3*NUM_WeaponInfosOtherSkill)) // std, (poor, pro, special)
 
-#define     MODELINFO_MAX                   26000       // Actual max is 25755
+#define     MODELINFO_MAX                   20000       // Actual max is 25755
 
 #define     FUNC_GetLevelFromPosition       0x4DD300
 
@@ -156,6 +157,7 @@ public:
     inline CWeaponStatManagerSA         * GetWeaponStatManager()     { return m_pWeaponStatsManager; }
     inline CPointLightsSA               * GetPointLights ()          { return m_pPointLights; }
     inline CExecutiveManagerSA          * GetExecutiveManager ()     { return m_pExecutiveManager; }
+    inline CFxManagerSA                 * GetFxManager ()            { return m_pFxManager; }
 
     CWeaponInfo             * GetWeaponInfo(eWeaponType weapon,eWeaponSkill skill=WEAPONSKILL_STD);
     CModelInfoSA            * GetModelInfo( DWORD dwModelID );
@@ -307,6 +309,7 @@ private:
     CWeaponStatManagerSA    * m_pWeaponStatsManager;
     CPointLightsSA          * m_pPointLights;
     CExecutiveManagerSA     * m_pExecutiveManager;
+    CFxManagerSA            * m_pFxManager;
 
     CPadSA                      * m_pPad;
     CTheCarGeneratorsSA         * m_pTheCarGenerators;

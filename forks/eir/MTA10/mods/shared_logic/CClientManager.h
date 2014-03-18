@@ -45,6 +45,7 @@ class CClientManager;
 #include "CClientGroups.h"
 #include "CClientWaterManager.h"
 #include "CClientWeaponManager.h"
+#include "CClientEffectManager.h"
 
 class CClientProjectileManager;
 class CClientExplosionManager;
@@ -94,6 +95,7 @@ public:
     inline CClientPacketRecorder*       GetPacketRecorder           ( void )        { return m_pPacketRecorder; }
     inline CClientWaterManager*         GetWaterManager             ( void )        { return m_pWaterManager; }
     inline CClientWeaponManager*        GetWeaponManager            ( void )        { return m_pWeaponManager; }
+    inline CClientEffectManager*        GetEffectManager            ( void )        { return m_pEffectManager; }
 
     inline CGUITexture*                 GetConnectionTroubleTexture ( void )        { return m_pConnectionTroubleTexture; }
 
@@ -145,6 +147,7 @@ private:
     CClientProjectileManager*           m_pProjectileManager;
     CClientExplosionManager*            m_pExplosionManager;
     CClientWeaponManager*               m_pWeaponManager;
+    CClientEffectManager*               m_pEffectManager;
     CGUITexture*                        m_pConnectionTroubleTexture;
     CClientPacketRecorder*              m_pPacketRecorder;
     bool                                m_bBeingDeleted;

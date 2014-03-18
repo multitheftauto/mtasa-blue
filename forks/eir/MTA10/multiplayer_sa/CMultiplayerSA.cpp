@@ -256,6 +256,10 @@ DWORD RETURN_CObject_ProcessDamage_Cancel = 0x5A1241;
 #define HOOKPOS_CObject_ProcessCollision                    0x548DC7
 DWORD RETURN_CObject_ProcessCollision = 0x548DD1;
 DWORD JMP_DynamicObject_Cond_Zero = 0x548E98;
+#define HOOKPOS_CGlass_WindowRespondsToCollision           0x71BC40
+DWORD RETURN_CGlass_WindowRespondsToCollision = 0x71BC48;
+
+#define HOOKPOS_FxManager_c__DestroyFxSystem                0x4A989A
 
 CPed* pContextSwitchedPed = 0;
 DWORD dwVectorPointer;
@@ -318,6 +322,8 @@ VehicleCollisionHandler* m_pVehicleCollisionHandler = NULL;
 HeliKillHandler* m_pHeliKillHandler = NULL;
 ObjectDamageHandler* m_pObjectDamageHandler = NULL;
 ObjectBreakHandler* m_pObjectBreakHandler = NULL;
+FxSystemDestructionHandler* m_pFxSystemDestructionHandler = NULL;
+
 CEntitySAInterface * dwSavedPlayerPointer = 0;
 CEntitySAInterface * activeEntityForStreaming = 0; // the entity that the streaming system considers active
 
@@ -443,7 +449,9 @@ void HOOK_CHeli_ProcessHeliKill ();
 void HOOK_CObject_ProcessDamage ();
 void HOOK_CObject_ProcessBreak ();
 void HOOK_CObject_ProcessCollision ();
+void HOOK_CGlass_WindowRespondsToCollision ();
 
+void HOOK_FxManager_c__DestroyFxSystem ();
 
 CMultiplayerSA::CMultiplayerSA()
 {
@@ -625,6 +633,10 @@ void CMultiplayerSA::InitHooks()
     HookInstall ( HOOKPOS_CObject_ProcessDamage, (DWORD)HOOK_CObject_ProcessDamage, 6 );
     HookInstall ( HOOKPOS_CObject_ProcessBreak, (DWORD)HOOK_CObject_ProcessBreak, 5 );
     HookInstall ( HOOKPOS_CObject_ProcessCollision, (DWORD)HOOK_CObject_ProcessCollision, 10 );
+    HookInstall ( HOOKPOS_CGlass_WindowRespondsToCollision, (DWORD)HOOK_CGlass_WindowRespondsToCollision, 8 );
+
+    // Post-destruction hook for FxSystems
+    HookInstall ( HOOKPOS_FxManager_c__DestroyFxSystem, (DWORD)HOOK_FxManager_c__DestroyFxSystem, 5);
 
     // Disable GTA setting g_bGotFocus to false when we minimize
     MemSet ( (void *)ADDR_GotFocus, 0x90, pGameInterface->GetGameVersion () == VERSION_EU_10 ? 6 : 10 );
@@ -1309,6 +1321,11 @@ void CMultiplayerSA::InitHooks()
     MemPut( 0x6DADEF, &m_fAircraftMaxVelocity );
     MemPut( 0x6DADF8, &m_fAircraftMaxVelocity );
     MemPut( 0x6DAE01, &m_fAircraftMaxVelocity );
+
+    // Disable calls to CFireManager::ExtinguishPoint and CWorld::ExtinguishAllCarFiresInArea  
+    // from CWorld::ClearExcitingStuffFromArea
+    MemSet( (void*)0x56A404, 0x90, 0x56A446-0x56A404 );
+
 
     InitHooks_CrashFixHacks ();
 
@@ -2066,6 +2083,11 @@ void CMultiplayerSA::SetObjectDamageHandler ( ObjectDamageHandler * pHandler )
 void CMultiplayerSA::SetObjectBreakHandler ( ObjectBreakHandler * pHandler )
 {
     m_pObjectBreakHandler = pHandler;
+}
+
+void CMultiplayerSA::SetFxSystemDestructionHandler ( FxSystemDestructionHandler * pHandler )
+{
+    m_pFxSystemDestructionHandler = pHandler;
 }
 
 // What we do here is check if the idle handler has been set
@@ -3125,6 +3147,7 @@ void CMultiplayerSA::Reset ( void )
     m_pDeathHandler = NULL;
     m_pFireHandler = NULL;
     m_pRender3DStuffHandler = NULL;
+    m_pFxSystemDestructionHandler = NULL;
 }
 
 
@@ -5722,5 +5745,69 @@ void _declspec(naked) HOOK_CObject_ProcessCollision ( )
         {
             jmp     RETURN_CObject_ProcessCollision
         }
+    }
+}
+
+void _declspec(naked) HOOK_CGlass_WindowRespondsToCollision ()
+{
+    _asm
+    {
+        pushad
+        mov ecx, [esp+4]
+        mov pDamagedObject, ecx
+    }
+    pObjectAttacker = NULL;
+
+    if ( TriggerObjectBreakEvent () )
+    {
+        _asm
+        {
+            popad
+            
+            sub esp, 68h
+            push esi
+            mov esi, [esp+6Ch+4]
+            jmp RETURN_CGlass_WindowRespondsToCollision
+        }
+    }
+    else
+    {
+        _asm
+        {
+            popad
+            retn
+        }
+    }
+}
+
+void * pFxSystemToBeDestroyed;
+void FxManager_c__DestroyFxSystem()
+{
+    if (m_pFxSystemDestructionHandler)
+    {
+        m_pFxSystemDestructionHandler(pFxSystemToBeDestroyed);
+    }
+}
+
+void _declspec(naked) HOOK_FxManager_c__DestroyFxSystem ()
+{
+    _asm
+    {
+        mov pFxSystemToBeDestroyed, edi
+        pushad
+    }
+
+    FxManager_c__DestroyFxSystem();
+
+    _asm
+    {
+        popad
+
+        // Replaced code
+        add esp, 4
+        pop edi
+        pop ebx
+        pop ecx
+        retn 4
     }
 }

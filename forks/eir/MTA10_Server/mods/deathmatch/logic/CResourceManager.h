@@ -71,7 +71,7 @@ public:
     CResource*                  GetResourceFromScriptID         ( uint uiScriptID );
     void                        UnloadRemovedResources          ( void );
     void                        CheckResourceDependencies       ( void );
-    void                        ListResourcesLoaded             ( void );
+    void                        ListResourcesLoaded             ( const SString& strListType );
     std::list < CResource* > ::const_iterator  IterBegin        ( void )            { return m_resources.begin (); };
     std::list < CResource* > ::const_iterator  IterEnd          ( void )            { return m_resources.end (); };
 

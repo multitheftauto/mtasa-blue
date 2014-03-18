@@ -430,6 +430,7 @@ bool CStaticFunctionDefinitions::GetElementRotation ( CClientEntity& Entity, CVe
             break;
         }
         case CCLIENTCAMERA:
+        case CCLIENTEFFECT:
         {
             Entity.GetRotationDegrees( vecRotation );
             break;
@@ -1087,6 +1088,7 @@ bool CStaticFunctionDefinitions::SetElementRotation ( CClientEntity& Entity, con
             break;
         }
         case CCLIENTCAMERA:
+        case CCLIENTEFFECT:
         {
             Entity.SetRotationDegrees( vecRotation );
             break;
@@ -7134,6 +7136,14 @@ bool CStaticFunctionDefinitions::FxAddFootSplash ( CVector & vecPosition )
     return true;
 }
 
+CClientEffect* CStaticFunctionDefinitions::CreateEffect(CResource& Resource, const SString &strFxName, const CVector &vecPosition)
+{
+    CClientEffect * pFx =  m_pManager->GetEffectManager()->Create(strFxName, vecPosition, INVALID_ELEMENT_ID);
+    if ( pFx )
+        pFx->SetParent ( Resource.GetResourceDynamicEntity () );
+    return pFx;
+}
+
 
 CClientSound* CStaticFunctionDefinitions::PlaySound ( CResource* pResource, const SString& strSound, bool bIsURL, bool bLoop )
 {
@@ -8424,7 +8434,7 @@ bool CStaticFunctionDefinitions::RemovePedFromVehicle ( CClientPed* pPed )
     // Get the ped / player's occupied vehicle data before pulling it out
     CClientVehicle* pVehicle = pPed->GetOccupiedVehicle();
     unsigned int    uiSeat   = pPed->GetOccupiedVehicleSeat();
-    bool bCancellingWhileEntering = ( pPed->m_bIsLocalPlayer && pPed->IsEnteringVehicle() ); // Special case here that could cause network trouble.
+    bool bCancellingWhileEntering = pPed->IsEnteringVehicle(); // Special case here that could cause network trouble.
 
     // Occupied vehicle can be NULL here while entering (Walking up to a vehicle in preparation to getting in/opening the doors)
     if ( pVehicle || bCancellingWhileEntering )

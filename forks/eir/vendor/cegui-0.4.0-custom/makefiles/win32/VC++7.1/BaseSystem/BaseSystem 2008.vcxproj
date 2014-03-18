@@ -1,0 +1,538 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Nightly|Win32">
+      <Configuration>Nightly</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectName>CEGUI - Base</ProjectName>
+    <ProjectGuid>{232B1F48-87C1-4EF9-98A2-CF675BAC7A54}</ProjectGuid>
+    <RootNamespace>CEGUI - Base</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Nightly|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <PlatformToolset>v90</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <PlatformToolset>v90</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <PlatformToolset>v90</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Nightly|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\..\..\..\..\Shared\MTAPropertySheet.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+    <Import Project="..\..\..\..\..\..\Shared\MTAPropertySheet.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+    <Import Project="..\..\..\..\..\..\Shared\MTAPropertySheet.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>12.0.21005.1</_ProjectFileVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>..\..\..\..\$(PlatformTarget)\$(Configuration)\</OutDir>
+    <IntDir>$(PlatformTarget)\$(Configuration)\</IntDir>
+    <TargetName>CEGUIBase_d</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>..\..\..\..\$(PlatformTarget)\$(Configuration)\</OutDir>
+    <IntDir>$(PlatformTarget)\$(Configuration)\</IntDir>
+    <TargetName>CEGUIBase</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Nightly|Win32'">
+    <OutDir>..\..\..\..\$(PlatformTarget)\$(Configuration)\</OutDir>
+    <TargetName>CEGUIBase</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>..\..\..\..\include;..\..\..\..\dependencies\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>MTA_DEBUG;_WIN32;WIN32;_STLP_DEBUG;_DEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>false</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <DisableLanguageExtensions>false</DisableLanguageExtensions>
+      <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>StdInc.h</PrecompiledHeaderFile>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <DisableSpecificWarnings>4251;4100;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <Lib>
+      <AdditionalOptions>/IGNORE:4006 %(AdditionalOptions)</AdditionalOptions>
+      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>true</OmitFramePointers>
+      <WholeProgramOptimization>true</WholeProgramOptimization>
+      <AdditionalIncludeDirectories>..\..\..\..\include;..\..\..\..\dependencies\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;CEGUIBASE_EXPORTS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <DisableLanguageExtensions>false</DisableLanguageExtensions>
+      <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>StdInc.h</PrecompiledHeaderFile>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4251;4100;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <Lib>
+      <AdditionalOptions>/IGNORE:4006 %(AdditionalOptions)</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Nightly|Win32'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>true</OmitFramePointers>
+      <WholeProgramOptimization>true</WholeProgramOptimization>
+      <AdditionalIncludeDirectories>..\..\..\..\include;..\..\..\..\dependencies\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;CEGUIBASE_EXPORTS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <DisableLanguageExtensions>false</DisableLanguageExtensions>
+      <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>StdInc.h</PrecompiledHeaderFile>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4251;4100;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <Lib>
+      <AdditionalOptions>/IGNORE:4006 %(AdditionalOptions)</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\..\src\CEGUIBase.cpp" />
+    <ClCompile Include="..\..\..\..\src\CEGUIcolour.cpp" />
+    <ClCompile Include="..\..\..\..\src\CEGUIColourRect.cpp" />
+    <ClCompile Include="..\..\..\..\src\CEGUIConfig_xmlHandler.cpp" />
+    <ClCompile Include="..\..\..\..\src\CEGUIDefaultResourceProvider.cpp" />
+    <ClCompile Include="..\..\..\..\src\CEGUIEvent.cpp" />
+    <ClCompile Include="..\..\..\..\src\CEGUIEventArgs.cpp" />
+    <ClCompile Include="..\..\..\..\src\CEGUIEventSet.cpp" />
+    <ClCompile Include="..\..\..\..\src\CEGUIExceptions.cpp" />
+    <ClCompile Include="..\..\..\..\src\CEGUIFactoryModule.cpp" />
+    <ClCompile Include="..\..\..\..\src\CEGUIFont.cpp" />
+    <ClCompile Include="..\..\..\..\src\CEGUIFont_xmlHandler.cpp" />
+    <ClCompile Include="..\..\..\..\src\CEGUIFontManager.cpp" />
+    <ClCompile Include="..\..\..\..\src\CEGUIGlobalEventSet.cpp" />
+    <ClCompile Include="..\..\..\..\src\CEGUIGUILayout_xmlHandler.cpp" />
+    <ClCompile Include="..\..\..\..\src\CEGUIImage.cpp" />
+    <ClCompile Include="..\..\..\..\src\CEGUIImageset.cpp" />
+    <ClCompile Include="..\..\..\..\src\CEGUIImageset_xmlHandler.cpp" />
+    <ClCompile Include="..\..\..\..\src\CEGUIImagesetManager.cpp" />
+    <ClCompile Include="..\..\..\..\src\CEGUILogger.cpp" />
+    <ClCompile Include="..\..\..\..\src\CEGUIMouseCursor.cpp" />
+    <ClCompile Include="..\..\..\..\src\CEGUIProperty.cpp" />
+    <ClCompile Include="..\..\..\..\src\CEGUIPropertyHelper.cpp" />
+    <ClCompile Include="..\..\..\..\src\CEGUIPropertySet.cpp" />
+    <ClCompile Include="..\..\..\..\src\CEGUIRect.cpp" />
+    <ClCompile Include="..\..\..\..\src\CEGUIRefPtr.cpp" />
+    <ClCompile Include="..\..\..\..\src\CEGUIRenderableElement.cpp" />
+    <ClCompile Include="..\..\..\..\src\CEGUIRenderableFrame.cpp" />
+    <ClCompile Include="..\..\..\..\src\CEGUIRenderableImage.cpp" />
+    <ClCompile Include="..\..\..\..\src\CEGUIRenderCache.cpp" />
+    <ClCompile Include="..\..\..\..\src\CEGUIRenderer.cpp" />
+    <ClCompile Include="..\..\..\..\src\CEGUIScheme.cpp" />
+    <ClCompile Include="..\..\..\..\src\CEGUIScheme_xmlHandler.cpp" />
+    <ClCompile Include="..\..\..\..\src\CEGUISchemeManager.cpp" />
+    <ClCompile Include="..\..\..\..\src\CEGUIScriptModule.cpp" />
+    <ClCompile Include="..\..\..\..\src\CEGUISize.cpp" />
+    <ClCompile Include="..\..\..\..\src\CEGUIString.cpp" />
+    <ClCompile Include="..\..\..\..\src\CEGUISystem.cpp" />
+    <ClCompile Include="..\..\..\..\src\CEGUITexture.cpp" />
+    <ClCompile Include="..\..\..\..\src\CEGUITextUtils.cpp" />
+    <ClCompile Include="..\..\..\..\src\CEGUIVector.cpp" />
+    <ClCompile Include="..\..\..\..\src\CEGUIWin32XMLSelectHack.cpp" />
+    <ClCompile Include="..\..\..\..\src\CEGUIWindow.cpp" />
+    <ClCompile Include="..\..\..\..\src\CEGUIWindowFactory.cpp" />
+    <ClCompile Include="..\..\..\..\src\CEGUIWindowFactoryManager.cpp" />
+    <ClCompile Include="..\..\..\..\src\CEGUIWindowManager.cpp" />
+    <ClCompile Include="..\..\..\..\src\CEGUIWindowProperties.cpp" />
+    <ClCompile Include="..\..\..\..\src\CEGUIXMLAttributes.cpp" />
+    <ClCompile Include="..\..\..\..\src\CEGUIXMLHandler.cpp" />
+    <ClCompile Include="..\..\..\..\src\CEGUIXMLParser.cpp" />
+    <ClCompile Include="..\..\..\..\src\StdInc.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Nightly|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\falagard\CEGUIFalagard_xmlHandler.cpp" />
+    <ClCompile Include="..\..\..\..\src\falagard\CEGUIFalComponentBase.cpp" />
+    <ClCompile Include="..\..\..\..\src\falagard\CEGUIFalDimensions.cpp" />
+    <ClCompile Include="..\..\..\..\src\falagard\CEGUIFalFrameComponent.cpp" />
+    <ClCompile Include="..\..\..\..\src\falagard\CEGUIFalImageryComponent.cpp" />
+    <ClCompile Include="..\..\..\..\src\falagard\CEGUIFalImagerySection.cpp" />
+    <ClCompile Include="..\..\..\..\src\falagard\CEGUIFalLayerSpecification.cpp" />
+    <ClCompile Include="..\..\..\..\src\falagard\CEGUIFalNamedArea.cpp" />
+    <ClCompile Include="..\..\..\..\src\falagard\CEGUIFalPropertyDefinition.cpp" />
+    <ClCompile Include="..\..\..\..\src\falagard\CEGUIFalPropertyInitialiser.cpp" />
+    <ClCompile Include="..\..\..\..\src\falagard\CEGUIFalSectionSpecification.cpp" />
+    <ClCompile Include="..\..\..\..\src\falagard\CEGUIFalStateImagery.cpp" />
+    <ClCompile Include="..\..\..\..\src\falagard\CEGUIFalTextComponent.cpp" />
+    <ClCompile Include="..\..\..\..\src\falagard\CEGUIFalWidgetComponent.cpp" />
+    <ClCompile Include="..\..\..\..\src\falagard\CEGUIFalWidgetLookFeel.cpp" />
+    <ClCompile Include="..\..\..\..\src\falagard\CEGUIFalWidgetLookManager.cpp" />
+    <ClCompile Include="..\..\..\..\src\falagard\CEGUIFalXMLEnumHelper.cpp" />
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIButtonBase.cpp" />
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIButtonBaseProperties.cpp" />
+    <ClCompile Include="..\..\..\..\src\elements\CEGUICheckbox.cpp" />
+    <ClCompile Include="..\..\..\..\src\elements\CEGUICheckboxProperties.cpp" />
+    <ClCompile Include="..\..\..\..\src\elements\CEGUICombobox.cpp" />
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIComboboxProperties.cpp" />
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIComboDropList.cpp" />
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIDragContainer.cpp" />
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIDragContainerProperties.cpp" />
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIEditbox.cpp" />
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIEditboxProperties.cpp" />
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIFrameWindow.cpp" />
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIFrameWindowProperties.cpp" />
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIGUISheet.cpp" />
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIItemEntry.cpp" />
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIItemListBase.cpp" />
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIItemListBaseProperties.cpp" />
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIListbox.cpp" />
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIListboxImageItem.cpp" />
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIListboxItem.cpp" />
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIListboxNumberItem.cpp" />
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIListboxProperties.cpp" />
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIListboxTextItem.cpp" />
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIListHeader.cpp" />
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIListHeaderProperties.cpp" />
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIListHeaderSegment.cpp" />
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIListHeaderSegmentProperties.cpp" />
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIMenubar.cpp" />
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIMenuBase.cpp" />
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIMenuBaseProperties.cpp" />
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIMenuItem.cpp" />
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIMenuItemProperties.cpp" />
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIMultiColumnList.cpp" />
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIMultiColumnListProperties.cpp" />
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIMultiLineEditbox.cpp" />
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIMultiLineEditboxProperties.cpp" />
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIPopupMenu.cpp" />
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIPopupMenuProperties.cpp" />
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIProgressBar.cpp" />
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIProgressBarProperties.cpp" />
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIPushButton.cpp" />
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIPushButtonProperties.cpp" />
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIRadioButton.cpp" />
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIRadioButtonProperties.cpp" />
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIScrollablePane.cpp" />
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIScrollablePaneProperties.cpp" />
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIScrollbar.cpp" />
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIScrollbarProperties.cpp" />
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIScrolledContainer.cpp" />
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIScrolledContainerProperties.cpp" />
+    <ClCompile Include="..\..\..\..\src\elements\CEGUISlider.cpp" />
+    <ClCompile Include="..\..\..\..\src\elements\CEGUISliderProperties.cpp" />
+    <ClCompile Include="..\..\..\..\src\elements\CEGUISpinner.cpp" />
+    <ClCompile Include="..\..\..\..\src\elements\CEGUISpinnerProperties.cpp" />
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIStatic.cpp" />
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIStaticImage.cpp" />
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIStaticImageProperties.cpp" />
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIStaticProperties.cpp" />
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIStaticText.cpp" />
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIStaticTextProperties.cpp" />
+    <ClCompile Include="..\..\..\..\src\elements\CEGUITabButton.cpp" />
+    <ClCompile Include="..\..\..\..\src\elements\CEGUITabControl.cpp" />
+    <ClCompile Include="..\..\..\..\src\elements\CEGUITabControlProperties.cpp" />
+    <ClCompile Include="..\..\..\..\src\elements\CEGUITextItem.cpp" />
+    <ClCompile Include="..\..\..\..\src\elements\CEGUITextItemProperties.cpp" />
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIThumb.cpp" />
+    <ClCompile Include="..\..\..\..\src\elements\CEGUIThumbProperties.cpp" />
+    <ClCompile Include="..\..\..\..\src\elements\CEGUITitlebar.cpp" />
+    <ClCompile Include="..\..\..\..\src\elements\CEGUITitlebarProperties.cpp" />
+    <ClCompile Include="..\..\..\..\src\elements\CEGUITooltip.cpp" />
+    <ClCompile Include="..\..\..\..\src\elements\CEGUITooltipProperties.cpp" />
+    <ClCompile Include="..\..\..\..\src\pcre\chartables.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Nightly|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\pcre\get.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Nightly|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\pcre\maketables.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Nightly|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\pcre\pcre.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Nightly|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\pcre\pcreposix.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Nightly|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\pcre\study.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Nightly|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\tinyxml\tinystr.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Nightly|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\tinyxml\tinyxml.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Nightly|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\tinyxml\tinyxmlerror.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Nightly|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\tinyxml\tinyxmlparser.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Nightly|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\..\src\CEGUITinyXMLParser.hpp" />
+    <ClInclude Include="..\..\..\..\src\CEGUIXercesParser.hpp" />
+    <ClInclude Include="..\..\..\..\src\tinyxml\tinystr.h" />
+    <ClInclude Include="..\..\..\..\src\tinyxml\tinyxml.h" />
+    <ClInclude Include="..\..\..\..\include\CEGUI.h" />
+    <ClInclude Include="..\..\..\..\include\CEGUIBase.h" />
+    <ClInclude Include="..\..\..\..\include\CEGUIcolour.h" />
+    <ClInclude Include="..\..\..\..\include\CEGUIColourRect.h" />
+    <ClInclude Include="..\..\..\..\include\CEGUIConfig.h" />
+    <ClInclude Include="..\..\..\..\include\CEGUIConfig_xmlHandler.h" />
+    <ClInclude Include="..\..\..\..\include\CEGUIDataContainer.h" />
+    <ClInclude Include="..\..\..\..\include\CEGUIDefaultResourceProvider.h" />
+    <ClInclude Include="..\..\..\..\include\CEGUIEvent.h" />
+    <ClInclude Include="..\..\..\..\include\CEGUIEventArgs.h" />
+    <ClInclude Include="..\..\..\..\include\CEGUIEventSet.h" />
+    <ClInclude Include="..\..\..\..\include\CEGUIExceptions.h" />
+    <ClInclude Include="..\..\..\..\include\CEGUIFactoryModule.h" />
+    <ClInclude Include="..\..\..\..\include\CEGUIFont.h" />
+    <ClInclude Include="..\..\..\..\include\CEGUIFont_implData.h" />
+    <ClInclude Include="..\..\..\..\include\CEGUIFont_xmlHandler.h" />
+    <ClInclude Include="..\..\..\..\include\CEGUIFontManager.h" />
+    <ClInclude Include="..\..\..\..\include\CEGUIFontManager_implData.h" />
+    <ClInclude Include="..\..\..\..\include\CEGUIForwardRefs.h" />
+    <ClInclude Include="..\..\..\..\include\CEGUIGlobalEventSet.h" />
+    <ClInclude Include="..\..\..\..\include\CEGUIGUILayout_xmlHandler.h" />
+    <ClInclude Include="..\..\..\..\include\CEGUIImage.h" />
+    <ClInclude Include="..\..\..\..\include\CEGUIImageset.h" />
+    <ClInclude Include="..\..\..\..\include\CEGUIImageset_xmlHandler.h" />
+    <ClInclude Include="..\..\..\..\include\CEGUIImagesetManager.h" />
+    <ClInclude Include="..\..\..\..\include\CEGUIInputEvent.h" />
+    <ClInclude Include="..\..\..\..\include\CEGUIIteratorBase.h" />
+    <ClInclude Include="..\..\..\..\include\CEGUILogger.h" />
+    <ClInclude Include="..\..\..\..\include\CEGUIMouseCursor.h" />
+    <ClInclude Include="..\..\..\..\include\CEGUIProperty.h" />
+    <ClInclude Include="..\..\..\..\include\CEGUIPropertyHelper.h" />
+    <ClInclude Include="..\..\..\..\include\CEGUIPropertySet.h" />
+    <ClInclude Include="..\..\..\..\include\CEGUIRect.h" />
+    <ClInclude Include="..\..\..\..\include\CEGUIRefPtr.h" />
+    <ClInclude Include="..\..\..\..\include\CEGUIRenderableElement.h" />
+    <ClInclude Include="..\..\..\..\include\CEGUIRenderableFrame.h" />
+    <ClInclude Include="..\..\..\..\include\CEGUIRenderableImage.h" />
+    <ClInclude Include="..\..\..\..\include\CEGUIRenderCache.h" />
+    <ClInclude Include="..\..\..\..\include\CEGUIRenderer.h" />
+    <ClInclude Include="..\..\..\..\include\CEGUIResourceProvider.h" />
+    <ClInclude Include="..\..\..\..\include\CEGUIScheme.h" />
+    <ClInclude Include="..\..\..\..\include\CEGUIScheme_xmlHandler.h" />
+    <ClInclude Include="..\..\..\..\include\CEGUISchemeManager.h" />
+    <ClInclude Include="..\..\..\..\include\CEGUIScriptModule.h" />
+    <ClInclude Include="..\..\..\..\include\CEGUISingleton.h" />
+    <ClInclude Include="..\..\..\..\include\CEGUISize.h" />
+    <ClInclude Include="..\..\..\..\include\CEGUIString.h" />
+    <ClInclude Include="..\..\..\..\include\CEGUIStringBidi.h" />
+    <ClInclude Include="..\..\..\..\include\CEGUISystem.h" />
+    <ClInclude Include="..\..\..\..\include\CEGUITexture.h" />
+    <ClInclude Include="..\..\..\..\include\CEGUITextUtils.h" />
+    <ClInclude Include="..\..\..\..\include\CEGUITinyXMLParser.h" />
+    <ClInclude Include="..\..\..\..\include\CEGUIUDim.h" />
+    <ClInclude Include="..\..\..\..\include\CEGUIVector.h" />
+    <ClInclude Include="..\..\..\..\include\CEGUIVersion.h" />
+    <ClInclude Include="..\..\..\..\include\CEGUIWindow.h" />
+    <ClInclude Include="..\..\..\..\include\CEGUIWindowFactory.h" />
+    <ClInclude Include="..\..\..\..\include\CEGUIWindowFactoryManager.h" />
+    <ClInclude Include="..\..\..\..\include\CEGUIWindowManager.h" />
+    <ClInclude Include="..\..\..\..\include\CEGUIWindowProperties.h" />
+    <ClInclude Include="..\..\..\..\include\CEGUIXercesParser.h" />
+    <ClInclude Include="..\..\..\..\include\CEGUIXMLAttributes.h" />
+    <ClInclude Include="..\..\..\..\include\CEGUIXMLHandler.h" />
+    <ClInclude Include="..\..\..\..\include\CEGUIXMLParser.h" />
+    <ClInclude Include="..\..\..\..\include\StdInc.h" />
+    <ClInclude Include="..\..\..\..\include\falagard\CEGUIFalagard_xmlHandler.h" />
+    <ClInclude Include="..\..\..\..\include\falagard\CEGUIFalComponentBase.h" />
+    <ClInclude Include="..\..\..\..\include\falagard\CEGUIFalDimensions.h" />
+    <ClInclude Include="..\..\..\..\include\falagard\CEGUIFalEnums.h" />
+    <ClInclude Include="..\..\..\..\include\falagard\CEGUIFalFrameComponent.h" />
+    <ClInclude Include="..\..\..\..\include\falagard\CEGUIFalImageryComponent.h" />
+    <ClInclude Include="..\..\..\..\include\falagard\CEGUIFalImagerySection.h" />
+    <ClInclude Include="..\..\..\..\include\falagard\CEGUIFalLayerSpecification.h" />
+    <ClInclude Include="..\..\..\..\include\falagard\CEGUIFalNamedArea.h" />
+    <ClInclude Include="..\..\..\..\include\falagard\CEGUIFalPropertyDefinition.h" />
+    <ClInclude Include="..\..\..\..\include\falagard\CEGUIFalPropertyInitialiser.h" />
+    <ClInclude Include="..\..\..\..\include\falagard\CEGUIFalSectionSpecification.h" />
+    <ClInclude Include="..\..\..\..\include\falagard\CEGUIFalStateImagery.h" />
+    <ClInclude Include="..\..\..\..\include\falagard\CEGUIFalTextComponent.h" />
+    <ClInclude Include="..\..\..\..\include\falagard\CEGUIFalWidgetComponent.h" />
+    <ClInclude Include="..\..\..\..\include\falagard\CEGUIFalWidgetLookFeel.h" />
+    <ClInclude Include="..\..\..\..\include\falagard\CEGUIFalWidgetLookManager.h" />
+    <ClInclude Include="..\..\..\..\include\falagard\CEGUIFalXMLEnumHelper.h" />
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIButtonBase.h" />
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIButtonBaseProperties.h" />
+    <ClInclude Include="..\..\..\..\include\elements\CEGUICheckbox.h" />
+    <ClInclude Include="..\..\..\..\include\elements\CEGUICheckboxProperties.h" />
+    <ClInclude Include="..\..\..\..\include\elements\CEGUICombobox.h" />
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIComboboxProperties.h" />
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIComboDropList.h" />
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIDragContainer.h" />
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIDragContainerProperties.h" />
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIEditbox.h" />
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIEditboxProperties.h" />
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIFrameWindow.h" />
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIFrameWindowProperties.h" />
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIGUISheet.h" />
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIItemEntry.h" />
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIItemListBase.h" />
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIItemListBaseProperties.h" />
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIListbox.h" />
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIListboxImageItem.h" />
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIListboxItem.h" />
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIListboxNumberItem.h" />
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIListboxProperties.h" />
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIListboxTextItem.h" />
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIListHeader.h" />
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIListHeaderProperties.h" />
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIListHeaderSegment.h" />
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIListHeaderSegmentProperties.h" />
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIMenubar.h" />
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIMenuBase.h" />
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIMenuBaseProperties.h" />
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIMenuItem.h" />
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIMenuItemProperties.h" />
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIMultiColumnList.h" />
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIMultiColumnListProperties.h" />
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIMultiLineEditbox.h" />
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIMultiLineEditboxProperties.h" />
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIPopupMenu.h" />
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIPopupMenuProperties.h" />
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIProgressBar.h" />
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIProgressBarProperties.h" />
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIPushButton.h" />
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIPushButtonProperties.h" />
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIRadioButton.h" />
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIRadioButtonProperties.h" />
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIScrollablePane.h" />
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIScrollablePaneProperties.h" />
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIScrollbar.h" />
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIScrollbarProperties.h" />
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIScrolledContainer.h" />
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIScrolledContainerProperties.h" />
+    <ClInclude Include="..\..\..\..\include\elements\CEGUISlider.h" />
+    <ClInclude Include="..\..\..\..\include\elements\CEGUISliderProperties.h" />
+    <ClInclude Include="..\..\..\..\include\elements\CEGUISpinner.h" />
+    <ClInclude Include="..\..\..\..\include\elements\CEGUISpinnerProperties.h" />
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIStatic.h" />
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIStaticImage.h" />
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIStaticImageProperties.h" />
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIStaticProperties.h" />
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIStaticText.h" />
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIStaticTextProperties.h" />
+    <ClInclude Include="..\..\..\..\include\elements\CEGUITabButton.h" />
+    <ClInclude Include="..\..\..\..\include\elements\CEGUITabControl.h" />
+    <ClInclude Include="..\..\..\..\include\elements\CEGUITabControlProperties.h" />
+    <ClInclude Include="..\..\..\..\include\elements\CEGUITabPane.h" />
+    <ClInclude Include="..\..\..\..\include\elements\CEGUITextItem.h" />
+    <ClInclude Include="..\..\..\..\include\elements\CEGUITextItemProperties.h" />
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIThumb.h" />
+    <ClInclude Include="..\..\..\..\include\elements\CEGUIThumbProperties.h" />
+    <ClInclude Include="..\..\..\..\include\elements\CEGUITitlebar.h" />
+    <ClInclude Include="..\..\..\..\include\elements\CEGUITitlebarProperties.h" />
+    <ClInclude Include="..\..\..\..\include\elements\CEGUITooltip.h" />
+    <ClInclude Include="..\..\..\..\include\elements\CEGUITooltipProperties.h" />
+    <ClInclude Include="..\..\..\..\src\pcre\pcre.h" />
+    <ClInclude Include="..\..\..\..\src\pcre\pcreconfig.h" />
+    <ClInclude Include="..\..\..\..\src\pcre\pcreposix.h" />
+    <ClInclude Include="..\..\..\..\src\pcre\ucp.h" />
+    <ClInclude Include="..\..\..\..\src\pcre\ucpinternal.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

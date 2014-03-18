@@ -129,6 +129,10 @@ bool CAudioContainerSA::GetRawAudioData ( eAudioLookupIndex lookupIndex, int ban
     else
         return false;
 
+    // 2MB check in case of user modification errors (Max length of standard audio files is 560KB)
+    if ( rawLength > 2 * 1024 * 1024 )
+        return false;
+
     // Now we are ready to read the audio data :)
     uint8* buffer = new uint8[rawLength];
 

@@ -105,6 +105,7 @@ public:
     void                        SetGamePlayerDestructHandler    ( GamePlayerDestructHandler * pHandler );
     void                        SetGameProjectileDestructHandler( GameProjectileDestructHandler * pHandler );
     //void                        SetGameEntityRenderHandler  ( GameEntityRenderHandler * pHandler ); MOVED TO CGameSA
+    void                        SetFxSystemDestructionHandler ( FxSystemDestructionHandler * pHandler );
 
     void                        AllowMouseMovement          ( bool bAllow );
     void                        DoSoundHacksOnLostFocus     ( bool bLostFocus );

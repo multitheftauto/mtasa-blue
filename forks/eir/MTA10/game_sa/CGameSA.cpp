@@ -119,6 +119,7 @@ CGameSA::CGameSA()
     this->m_pRopes                  = new CRopesSA;
     this->m_pRecordings             = new CRecordingsSA;
     this->m_pFx                     = new CFxSA ( (CFxSAInterface *)CLASS_CFx );
+    this->m_pFxManager              = new CFxManagerSA ( (CFxManagerSAInterface *)CLASS_CFxManager );
     this->m_pWaterManager           = new CWaterManagerSA ();
     this->m_pWeaponStatsManager     = new CWeaponStatManagerSA ();
     this->m_pPointLights            = new CPointLightsSA ();
@@ -262,6 +263,8 @@ CGameSA::~CGameSA ( void )
     Transformation_Shutdown();
     RenderWarePipeline_Shutdown();
 
+    delete m_pExecutiveManager;
+    delete m_pFxManager;
     delete m_pFx;
     delete m_pRecordings;
     delete m_pRopes;

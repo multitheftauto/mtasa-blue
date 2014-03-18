@@ -566,14 +566,31 @@ public:
     }
 #endif
 
-    CVector         vRight;
-    unsigned int    a;  // anyone wondering about the flags: they were just there for debug.
-    CVector         vFront;
-    unsigned int    b;
-    CVector         vUp;
-    unsigned int    c;
-    CVector         vPos;
-    float           w;
+    union
+    {
+        struct
+        {
+            CVector         vRight;
+            unsigned int    a;  // anyone wondering about the flags: they were just there for debug.
+            CVector         vFront;
+            unsigned int    b;
+            CVector         vUp;
+            unsigned int    c;
+            CVector         vPos;
+            float           w;
+        };
+        struct
+        {
+            RwV3d           right;
+            unsigned int    flags;  // anyone wondering about the flags: they were just there for debug.
+            RwV3d           at;
+            unsigned int    b;
+            RwV3d           up;
+            unsigned int    c;
+            RwV3d           pos;
+            float           w;
+        };
+    };
 };
 
 #endif

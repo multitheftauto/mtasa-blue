@@ -35,6 +35,7 @@ CModManager::CModManager ( void )
     // Set up our exception handler
     #ifndef MTA_DEBUG
     SetCrashHandlerFilter ( CCrashDumpWriter::HandleExceptionGlobal );
+    CCrashDumpWriter::ReserveMemoryKBForCrashDumpProcessing( 500 );
     #endif
 }
 

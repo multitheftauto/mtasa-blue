@@ -37,6 +37,7 @@ public:
     virtual unsigned char           GetAlpha            ( ) = 0;
 
     virtual bool                    IsAGangTag          ( ) const = 0;
+    virtual bool                    IsGlass             ( ) = 0;
 
     virtual void                    SetScale            ( float fX, float fY, float fZ ) = 0;
     virtual CVector*                GetScale            ( ) = 0;

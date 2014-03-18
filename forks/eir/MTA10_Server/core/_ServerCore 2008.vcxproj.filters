@@ -1,0 +1,140 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{c6aaa1a7-727a-473d-ac06-c36453df8672}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;rc;def;r;odl;idl;hpj;bat</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{1ba90ba0-3ae0-4df0-bcf6-9f1dcf708d5d}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl</Extensions>
+    </Filter>
+    <Filter Include="Header Files\server">
+      <UniqueIdentifier>{d4405bed-0c37-4052-99c9-aa30f2db7123}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\sdk">
+      <UniqueIdentifier>{8519b822-bda0-44a6-8d9b-949e89b2ca94}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\sdk\core">
+      <UniqueIdentifier>{3efb7f9e-0e6c-409b-83e0-3aea01ceaaa8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\sdk\net">
+      <UniqueIdentifier>{b709c5ed-b22a-4b61-9c76-7399805e994f}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="CCrashHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CCrashHandlerAPI.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CDynamicLibrary.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CExceptionInformation_Impl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CModManagerImpl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CServerImpl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CThreadCommandQueue.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\sdk\MTAPlatform.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Server.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="StdInc.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="CCrashHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CCrashHandlerAPI.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CDynamicLibrary.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CExceptionInformation_Impl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CModManagerImpl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CServerImpl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CThreadCommandQueue.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ErrorCodes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="StdInc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="server\CXML.h">
+      <Filter>Header Files\server</Filter>
+    </ClInclude>
+    <ClInclude Include="server\CXMLAttribute.h">
+      <Filter>Header Files\server</Filter>
+    </ClInclude>
+    <ClInclude Include="server\CXMLAttributes.h">
+      <Filter>Header Files\server</Filter>
+    </ClInclude>
+    <ClInclude Include="server\CXMLCommon.h">
+      <Filter>Header Files\server</Filter>
+    </ClInclude>
+    <ClInclude Include="server\CXMLErrorCodes.h">
+      <Filter>Header Files\server</Filter>
+    </ClInclude>
+    <ClInclude Include="server\CXMLFile.h">
+      <Filter>Header Files\server</Filter>
+    </ClInclude>
+    <ClInclude Include="server\CXMLNode.h">
+      <Filter>Header Files\server</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sdk\MTAPlatform.h">
+      <Filter>Header Files\sdk</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sdk\core\CExceptionInformation.h">
+      <Filter>Header Files\sdk\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sdk\core\CModManager.h">
+      <Filter>Header Files\sdk\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sdk\core\CServerBase.h">
+      <Filter>Header Files\sdk\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sdk\core\CServerInterface.h">
+      <Filter>Header Files\sdk\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sdk\net\CNetHTTPDownloadManagerInterface.h">
+      <Filter>Header Files\sdk\net</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sdk\net\CNetServer.h">
+      <Filter>Header Files\sdk\net</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sdk\net\ns_bitstream.h">
+      <Filter>Header Files\sdk\net</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sdk\net\ns_common.h">
+      <Filter>Header Files\sdk\net</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sdk\net\ns_packetenums.h">
+      <Filter>Header Files\sdk\net</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sdk\net\ns_playerid.h">
+      <Filter>Header Files\sdk\net</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

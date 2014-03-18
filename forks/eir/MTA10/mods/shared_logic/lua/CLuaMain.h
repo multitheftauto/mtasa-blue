@@ -90,6 +90,7 @@ public:
     void                            AddWaterClass           ( lua_State* luaVM );
     void                            AddSoundClass           ( lua_State* luaVM );
     void                            AddWeaponClass          ( lua_State* luaVM );
+    void                            AddEffectClass          ( lua_State* luaVM );
 
     void                            AddGuiElementClass      ( lua_State* luaVM );
     void                            AddGuiWindowClass       ( lua_State* luaVM );

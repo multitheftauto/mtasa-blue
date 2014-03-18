@@ -105,6 +105,7 @@ inline SString GetClassTypeName ( CClientGuiFont* )         { return "gui-font";
 inline SString GetClassTypeName ( CClientMaterial* )        { return "material"; }
 inline SString GetClassTypeName ( CClientTexture* )         { return "texture"; }
 inline SString GetClassTypeName ( CClientWeapon* )          { return "weapon"; }
+inline SString GetClassTypeName ( CClientEffect* )          { return "effect"; }
 
 inline SString GetClassTypeName ( CGUIButton* )      { return "gui-button"; }
 inline SString GetClassTypeName ( CGUICheckBox* )    { return "gui-checkbox"; }

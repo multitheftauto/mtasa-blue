@@ -11221,6 +11221,7 @@ CBan* CStaticFunctionDefinitions::BanPlayer ( CPlayer* pPlayer, bool bIP, bool b
         // Set the data if banned by either username or serial
         if ( bUsername ) pBan->SetAccount ( pPlayer->GetSerialUser () );
         if ( bSerial ) pBan->SetSerial ( pPlayer->GetSerial () );
+        if ( bUsername || bSerial ) pBan->SetNick ( pPlayer->GetNick () );
 
         // Check if we passed a responsible player
         if ( pResponsible )

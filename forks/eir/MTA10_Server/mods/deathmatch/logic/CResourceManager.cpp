@@ -284,7 +284,7 @@ void CResourceManager::CheckResourceDependencies ( void )
     }
 }
 
-void CResourceManager::ListResourcesLoaded ( void )
+void CResourceManager::ListResourcesLoaded ( const SString& strListType )
 {
     unsigned int uiCount = 0;
     unsigned int uiFailedCount = 0;
@@ -298,17 +298,24 @@ void CResourceManager::ListResourcesLoaded ( void )
         {
             if ( res->IsActive() )
             {
-                CLogger::LogPrintf ( "%-20.20s   RUNNING   (%d dependents)\n", res->GetName().c_str(), res->GetDependentCount() );
+                if ( strListType == "running" || strListType == "all" )
+                    CLogger::LogPrintf ( "%-20.20s   RUNNING   (%d dependents)\n", res->GetName().c_str(), res->GetDependentCount() );
+                
                 uiRunningCount++;
             }
             else
-                CLogger::LogPrintf ( "%-20.20s   STOPPED   (%d files)\n", res->GetName().c_str(), res->GetFileCount() );
-            uiCount ++;
+            {
+                if ( strListType == "stopped" || strListType == "all" )
+                    CLogger::LogPrintf ( "%-20.20s   STOPPED   (%d files)\n", res->GetName().c_str(), res->GetFileCount() );
+            }
+            uiCount++;
         }
         else
         {
-            CLogger::LogPrintf ( "%-20.20s   FAILED    (see info command for reason)\n", res->GetName().c_str () );
-            uiFailedCount ++;
+            if ( strListType == "failed" || strListType == "all" )
+                CLogger::LogPrintf ( "%-20.20s   FAILED    (see info command for reason)\n", res->GetName().c_str () );
+
+            uiFailedCount++;
         }
     }
     CLogger::LogPrintf ( "Resources: %d loaded, %d failed, %d running\n", uiCount, uiFailedCount, uiRunningCount );

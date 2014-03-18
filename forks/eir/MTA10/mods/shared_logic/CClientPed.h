@@ -480,6 +480,7 @@ protected:
 
     bool                        PerformChecks               ( void );
     void                        HandleWaitingForGroundToLoad ( void );
+    void                        UpdateStreamPosition        ( const CVector & vecPosition );
 
     // Used to start and stop radio for local player
     void                        StartRadio                  ( void );

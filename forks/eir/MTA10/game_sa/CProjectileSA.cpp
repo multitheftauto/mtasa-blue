@@ -65,11 +65,11 @@ CProjectileSA::~CProjectileSA( )
     Destroy();
 }
 
-void CProjectileSA::Destroy() 
+void CProjectileSA::Destroy( bool bBlow ) 
 {
     if ( m_bDestroyed == false )
     {
-        pGame->GetProjectileInfo ()->RemoveProjectile ( projectileInfo, this );
+        pGame->GetProjectileInfo ()->RemoveProjectile ( projectileInfo, this, bBlow );
         m_bDestroyed = true;
     }
 }

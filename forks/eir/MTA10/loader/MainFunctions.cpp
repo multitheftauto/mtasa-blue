@@ -678,6 +678,17 @@ void CheckDataFiles( void )
         }    
     }
 
+    // Check main exe has the correct name
+    if ( GetLaunchFilename() != MTA_EXE_NAME )
+    {
+        SString strMessage( _("Main file has an incorrect name (%s)"), *GetLaunchFilename() );
+        int iResponse = MessageBoxUTF8 ( NULL, strMessage, _("Error")+_E("CL33"), MB_RETRYCANCEL | MB_ICONERROR | MB_TOPMOST  );
+        ReleaseSingleInstanceMutex ();
+        if ( iResponse == IDRETRY )
+            ShellExecuteNonBlocking( "open", PathJoin ( strMTASAPath, MTA_EXE_NAME ) );            
+        return ExitProcess( EXIT_ERROR );
+    }
+
     // Check for possible virus file changing activities
     if ( !VerifyEmbeddedSignature( PathJoin( strMTASAPath, MTA_EXE_NAME ) ) )
     {
