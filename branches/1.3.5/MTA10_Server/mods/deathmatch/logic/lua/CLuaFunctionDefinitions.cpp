@@ -12897,7 +12897,7 @@ int CLuaFunctionDefinitions::GetServerPort ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::Set ( lua_State* luaVM )
 {
-    CResource* pResource = m_pResourceManager->GetResourceFromLuaState ( luaVM );
+    CResource* pResource = m_pLuaManager->GetVirtualMachine ( luaVM )->GetResource();
 
     if ( lua_type ( luaVM, 1 ) == LUA_TSTRING && lua_type ( luaVM, 2 ) > LUA_TNIL ) {
         CLuaArguments Args;
@@ -12934,7 +12934,7 @@ int CLuaFunctionDefinitions::Set ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::Get ( lua_State* luaVM )
 {
-    CResource* pResource = m_pResourceManager->GetResourceFromLuaState ( luaVM );
+    CResource* pResource = m_pLuaManager->GetVirtualMachine ( luaVM )->GetResource();
 
     if ( lua_type ( luaVM, 1 ) == LUA_TSTRING ) {
         CLuaArguments Args;

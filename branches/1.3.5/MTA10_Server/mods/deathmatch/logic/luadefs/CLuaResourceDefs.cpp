@@ -1258,7 +1258,7 @@ int CLuaResourceDefs::updateResourceACLRequest ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        CResource* pThisResource = m_pResourceManager->GetResourceFromLuaState ( luaVM );
+        CResource* pThisResource = m_pLuaManager->GetVirtualMachine ( luaVM )->GetResource();
         if ( strUserName.empty () && pThisResource )
             strUserName = pThisResource->GetName ();
 

@@ -280,6 +280,8 @@ DWORD RETURN_CObject_ProcessDamage_Cancel = 0x5A1241;
 #define HOOKPOS_CObject_ProcessCollision                    0x548DC7
 DWORD RETURN_CObject_ProcessCollision = 0x548DD1;
 DWORD JMP_DynamicObject_Cond_Zero = 0x548E98;
+#define HOOKPOS_CGlass_WindowRespondsToCollision           0x71BC40
+DWORD RETURN_CGlass_WindowRespondsToCollision = 0x71BC48;
 
 CPed* pContextSwitchedPed = 0;
 CVector vecCenterOfWorld;
@@ -484,6 +486,7 @@ void HOOK_CHeli_ProcessHeliKill ();
 void HOOK_CObject_ProcessDamage ();
 void HOOK_CObject_ProcessBreak ();
 void HOOK_CObject_ProcessCollision ();
+void HOOK_CGlass_WindowRespondsToCollision ();
 
 
 CMultiplayerSA::CMultiplayerSA()
@@ -683,6 +686,7 @@ void CMultiplayerSA::InitHooks()
     HookInstall ( HOOKPOS_CObject_ProcessDamage, (DWORD)HOOK_CObject_ProcessDamage, 6 );
     HookInstall ( HOOKPOS_CObject_ProcessBreak, (DWORD)HOOK_CObject_ProcessBreak, 5 );
     HookInstall ( HOOKPOS_CObject_ProcessCollision, (DWORD)HOOK_CObject_ProcessCollision, 10 );
+    HookInstall ( HOOKPOS_CGlass_WindowRespondsToCollision, (DWORD)HOOK_CGlass_WindowRespondsToCollision, 8 );
 
     // Disable GTA setting g_bGotFocus to false when we minimize
     MemSet ( (void *)ADDR_GotFocus, 0x90, pGameInterface->GetGameVersion () == VERSION_EU_10 ? 6 : 10 );
@@ -1385,6 +1389,11 @@ void CMultiplayerSA::InitHooks()
     MemPut( 0x6DADEF, &m_fAircraftMaxVelocity );
     MemPut( 0x6DADF8, &m_fAircraftMaxVelocity );
     MemPut( 0x6DAE01, &m_fAircraftMaxVelocity );
+
+    // Disable calls to CFireManager::ExtinguishPoint and CWorld::ExtinguishAllCarFiresInArea  
+    // from CWorld::ClearExcitingStuffFromArea
+    MemSet( (void*)0x56A404, 0x90, 0x56A446-0x56A404 );
+
 
     InitHooks_CrashFixHacks ();
 
@@ -6456,6 +6465,38 @@ void _declspec(naked) HOOK_CObject_ProcessCollision ( )
         _asm
         {
             jmp     RETURN_CObject_ProcessCollision
+        }
+    }
+}
+
+void _declspec(naked) HOOK_CGlass_WindowRespondsToCollision ()
+{
+    _asm
+    {
+        pushad
+        mov ecx, [esp+4]
+        mov pDamagedObject, ecx
+    }
+    pObjectAttacker = NULL;
+
+    if ( TriggerObjectBreakEvent () )
+    {
+        _asm
+        {
+            popad
+            
+            sub esp, 68h
+            push esi
+            mov esi, [esp+6Ch+4]
+            jmp RETURN_CGlass_WindowRespondsToCollision
+        }
+    }
+    else
+    {
+        _asm
+        {
+            popad
+            retn
         }
     }
 }

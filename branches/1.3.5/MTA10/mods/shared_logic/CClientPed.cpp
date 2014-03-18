@@ -3619,10 +3619,18 @@ void CClientPed::_ChangeModel ( void )
             // Save the vehicle he's in
             CClientVehicle* pVehicle = GetOccupiedVehicle ();
             unsigned int uiSeat = GetOccupiedVehicleSeat ();
+            CVector vecVehicleVelocity, vecVehicleTurnVelocity;
+            float fVehicleTrainSpeed;
 
             // Are we leaving it? Don't warp him back into anything
             if ( pVehicle )
             {
+                // Store the velocity of the vehicle since
+                // GTA will set it to zero
+                pVehicle->GetMoveSpeed(vecVehicleVelocity);
+                pVehicle->GetTurnSpeed(vecVehicleTurnVelocity);
+                fVehicleTrainSpeed = pVehicle->GetTrainSpeed();
+
                 // Are we leaving it? Don't warp back into it.
                 if ( IsLeavingVehicle () ) pVehicle = NULL;
 
@@ -3679,6 +3687,11 @@ void CClientPed::_ChangeModel ( void )
             if ( pVehicle )
             {
                 WarpIntoVehicle ( pVehicle, uiSeat );
+
+                // Restore vehicle speed
+                pVehicle->SetMoveSpeed(vecVehicleVelocity);
+                pVehicle->SetTurnSpeed(vecVehicleTurnVelocity);
+                pVehicle->SetTrainSpeed(fVehicleTrainSpeed);
             }
             m_bDontChangeRadio = false;
 
@@ -3805,7 +3818,7 @@ void CClientPed::ProcessRebuildPlayer ( bool bNeedsClothesUpdate )
 
 void CClientPed::StreamIn ( bool bInstantly )
 {
-    if ( m_bIsLocalPlayer )
+    if ( m_bIsLocalPlayer && !m_pPlayerPed )
     {
         NotifyCreate ();
         return;
@@ -4658,16 +4671,17 @@ void CClientPed::DestroySatchelCharges ( bool bBlow, bool bDestroy )
 
     CClientProjectile * pProjectile = NULL;
     CVector vecPosition;
-    if ( bBlow )
+    
+    list < CClientProjectile* > ::iterator iter = m_Projectiles.begin ();
+    while ( iter != m_Projectiles.end () )
     {
-        list < CClientProjectile* > ::iterator iter = m_Projectiles.begin ();
-        while ( iter != m_Projectiles.end () )
+        pProjectile = *iter;
+
+        if ( pProjectile->GetWeaponType () == WEAPONTYPE_REMOTE_SATCHEL_CHARGE )
         {
-            pProjectile = *iter;
-            if ( pProjectile->GetWeaponType () == WEAPONTYPE_REMOTE_SATCHEL_CHARGE )
+            if ( bBlow )
             {
                 pProjectile->GetPosition ( vecPosition );
-
                 CLuaArguments Arguments;
                 Arguments.PushNumber ( vecPosition.fX );
                 Arguments.PushNumber ( vecPosition.fY );
@@ -4678,11 +4692,13 @@ void CClientPed::DestroySatchelCharges ( bool bBlow, bool bDestroy )
                 if ( !bCancelExplosion )
                     m_pManager->GetExplosionManager ()->Create ( EXP_TYPE_GRENADE, vecPosition, this, true, -1.0f, false, WEAPONTYPE_REMOTE_SATCHEL_CHARGE );
             }
-            iter++;
+            if ( bDestroy )
+            {
+                pProjectile->Destroy ( bBlow );
+            }
         }
+        iter++;
     }
-    if ( bDestroy )
-        RemoveAllProjectiles ( );
 
     m_bDestroyingSatchels = false;
 }
@@ -4915,6 +4931,11 @@ void CClientPed::Respawn ( CVector * pvecPosition, bool bRestoreState, bool bCam
         SetFrozenWaitingForGroundToLoad ( true );
         if ( m_pPlayerPed )
         {
+            // Detach us
+            CClientEntity* pAttachedTo = GetAttachedTo ();
+            if ( pAttachedTo && pAttachedTo->IsEntityAttached ( this ) )
+                InternalAttachTo ( NULL );
+
             // Detach our attached entities
             for ( uint i = 0 ; i < m_AttachedEntities.size () ; i++ )
             {
@@ -4959,6 +4980,10 @@ void CClientPed::Respawn ( CVector * pvecPosition, bool bRestoreState, bool bCam
             }        
             // Restore the camera's interior whether we're restoring player states or not
             g_pGame->GetWorld ()->SetCurrentArea ( ucCameraInterior );
+
+            // Reattach us
+            if ( pAttachedTo && pAttachedTo->IsEntityAttached ( this ) )
+                InternalAttachTo ( pAttachedTo );
 
             // Reattach our attached entities
             for ( uint i = 0 ; i < m_AttachedEntities.size () ; i++ )
@@ -5893,4 +5918,26 @@ void CClientPed::HandleWaitingForGroundToLoad ( void )
         for ( unsigned int i = 0 ; i < lineList.size () ; i++ )
             g_pCore->GetGraphics ()->DrawText ( 10, 230 + i * 10, -1, 1, lineList[i] );
     #endif
+}
+
+
+//
+// CClientPed::UpdateStreamPosition
+//
+// If ped is in vehicle, make his stream position the same as the vehicle.
+// This prevents multiple triggering of collision events and makes collision state consistent with the server
+// (This function doesn't need to be virtual)
+//
+void CClientPed::UpdateStreamPosition( const CVector & vecInPosition )
+{
+    CVector vecPosition = vecInPosition;
+    CClientVehicle* pVehicle = GetOccupiedVehicle();
+    if ( pVehicle )
+    {
+        pVehicle->GetPosition( vecPosition );
+        // Optimization if position is the same
+        if ( vecPosition == GetStreamPosition() )
+            return;
+    }
+    CClientStreamElement::UpdateStreamPosition( vecPosition );
 }

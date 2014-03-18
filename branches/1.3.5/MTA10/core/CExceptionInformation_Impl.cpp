@@ -68,13 +68,53 @@ void CExceptionInformation_Impl::Set ( unsigned int iCode, _EXCEPTION_POINTERS* 
     m_ulSS = pException->ContextRecord->SegSs;
     m_ulEFlags = pException->ContextRecord->EFlags;
 
-
-    void* pModuleBaseAddress = NULL;
+    // Find module where the problem emanated
     m_szModulePathName = new char[MAX_MODULE_PATH];
-    GetModule ( m_szModulePathName, MAX_MODULE_PATH, &pModuleBaseAddress );
+    char* szModulePathNameTemp = new char[MAX_MODULE_PATH];
+    void* pModuleBaseAddress = NULL;
+    void* pExceptionAddress = m_pAddress;
+    void* pQueryAddress = m_pAddress;
+    for( uint i = 0 ; i < 16 ; i++ )
+    {
+        void* pModuleBaseAddressTemp = NULL;
+        GetModule ( pQueryAddress, szModulePathNameTemp, MAX_MODULE_PATH, &pModuleBaseAddressTemp );
+        const char* szModuleBaseNameTemp = strrchr ( szModulePathNameTemp , '\\' );
+        szModuleBaseNameTemp = szModuleBaseNameTemp ? szModuleBaseNameTemp + 1 : szModulePathNameTemp;
+
+        // Save first result
+        if ( i == 0 )
+        {
+            STRNCPY( m_szModulePathName, szModulePathNameTemp, MAX_MODULE_PATH );
+            pModuleBaseAddress = pModuleBaseAddressTemp;
+            pExceptionAddress = pQueryAddress;
+        }
+
+        // Use this result if it looks good
+        if ( strnicmp( szModuleBaseNameTemp, "ntdll", 5 ) != 0
+             && strnicmp( szModuleBaseNameTemp, "kernel", 6 ) != 0
+             && strnicmp( szModuleBaseNameTemp, "msvc", 4 ) != 0
+             && stricmp( szModuleBaseNameTemp, "" ) != 0 )
+        {
+            STRNCPY( m_szModulePathName, szModulePathNameTemp, MAX_MODULE_PATH );
+            pModuleBaseAddress = pModuleBaseAddressTemp;
+            pExceptionAddress = pQueryAddress;
+            break;
+        }
+
+        // Try next address up the stack
+        __try
+        {
+            pQueryAddress = *(ulong**)(m_ulESP + i * 4);
+        }
+        __except( GetExceptionCode() == EXCEPTION_ACCESS_VIOLATION )
+        {
+            break;
+        }
+    }
+
     m_szModuleBaseName = strrchr ( m_szModulePathName , '\\' );
     m_szModuleBaseName = m_szModuleBaseName ? m_szModuleBaseName + 1 : m_szModulePathName;
-    m_uiAddressModuleOffset = static_cast < BYTE* > ( GetAddress () ) - static_cast < BYTE* > ( pModuleBaseAddress );
+    m_uiAddressModuleOffset = static_cast < BYTE* > ( pExceptionAddress ) - static_cast < BYTE* > ( pModuleBaseAddress );
 
 }
 
@@ -84,7 +124,7 @@ void CExceptionInformation_Impl::Set ( unsigned int iCode, _EXCEPTION_POINTERS* 
  *
  * @return <code>true</code> if successful, <code>false</code> otherwise.
  */
-bool CExceptionInformation_Impl::GetModule ( char * szOutputBuffer, int nOutputNameLength, void** ppModuleBaseAddress )
+bool CExceptionInformation_Impl::GetModule ( void* pQueryAddress, char * szOutputBuffer, int nOutputNameLength, void** ppModuleBaseAddress )
 {
    HMODULE hModule;
 
@@ -129,7 +169,7 @@ bool CExceptionInformation_Impl::GetModule ( char * szOutputBuffer, int nOutputN
    
    if ( 0 == pfnGetModuleHandleExA ( 
                0x00000004 /*GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS*/, 
-               (LPCSTR)m_pAddress,
+               (LPCSTR)pQueryAddress,
                &hModule ) )
    {
       return false;
