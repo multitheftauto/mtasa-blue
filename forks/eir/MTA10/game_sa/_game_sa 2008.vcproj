@@ -491,6 +491,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CEntitySA.rendersetup.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CEntitySA.renderutils.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\CEntryInfoSA.cpp"
 				>
 			</File>
@@ -755,6 +763,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CRenderWareSA.lighting.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\CRenderWareSA.mem.cpp"
 				>
 			</File>
@@ -764,6 +776,10 @@
 			</File>
 			<File
 				RelativePath=".\CRenderWareSA.render.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CRenderWareSA.rtcallback.cpp"
 				>
 			</File>
 			<File
@@ -1256,7 +1272,19 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CEntitySA.render.hxx"
+				>
+			</File>
+			<File
 				RelativePath=".\CEntitySA.renderfeedback.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CEntitySA.rendersetup.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CEntitySA.renderutils.h"
 				>
 			</File>
 			<File
@@ -1524,6 +1552,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CRenderWareSA.lighting.h"
+				>
+			</File>
+			<File
 				RelativePath=".\CRenderWareSA.mem.h"
 				>
 			</File>
@@ -1533,6 +1565,10 @@
 			</File>
 			<File
 				RelativePath=".\CRenderWareSA.render.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CRenderWareSA.rtcallback.h"
 				>
 			</File>
 			<File
@@ -1844,6 +1880,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\RenderWare\RpGeometryStreamline.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\RenderWare\RpLight.cpp"
 				>
 			</File>
@@ -1864,6 +1904,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\RenderWare\RwRenderStates.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\RenderWare\RwStream.cpp"
 				>
 			</File>
@@ -1873,6 +1917,14 @@
 			</File>
 			<File
 				RelativePath=".\RenderWare\RwTexture.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\RenderWare\RwTextureD3D9.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\RenderWare\RwUtilsD3D9.cpp"
 				>
 			</File>
 			<Filter
@@ -1916,6 +1968,14 @@
 				</File>
 				<File
 					RelativePath=".\RenderWare\RwMath.h"
+					>
+				</File>
+				<File
+					RelativePath=".\RenderWare\RwRenderStates.h"
+					>
+				</File>
+				<File
+					RelativePath=".\RenderWare\RwRenderTools.hxx"
 					>
 				</File>
 				<File

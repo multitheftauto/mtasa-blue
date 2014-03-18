@@ -26,10 +26,17 @@ extern CBaseModelInfoSAInterface **ppModelInfo;
 =========================================================*/
 void CVehicleSAInterface::RenderPassengers( void )
 {
+    // We may only render passengers on a special occasion.
+    // Basically, when we render the opaque layer of the vehicle.
+    // This ensures that passengers are rendered only once.
+    if ( !CanVehicleRenderNatively() )
+        return;
+
+    // Render passengers.
     if ( pDriver && pDriver->IsDrivingVehicle() )
         pDriver->Render();
 
-    for ( unsigned char n = 0; n < MAX_PASSENGERS; n++ )
+    for ( unsigned int n = 0; n < MAX_PASSENGERS; n++ )
     {
         CPedSAInterface *pass = pPassengers[n];
 
@@ -50,14 +57,14 @@ void CVehicleSAInterface::RenderPassengers( void )
 =========================================================*/
 void CVehicleSAInterface::SetupRender( CVehicleSA *mtaVeh )
 {
-    CVehicleModelInfoSAInterface *info = (CVehicleModelInfoSAInterface*)ppModelInfo[ GetModelIndex() ];
+    CVehicleModelInfoSAInterface *info = (CVehicleModelInfoSAInterface*)GetModelInfo();
 
     // Wire in the hook done by MTA team.
     OnMY_CAutomobile_CustomCarPlate_BeforeRenderingStart( this, info );
 
     RenderWare::GetInterface()->m_deviceCommand( (eRwDeviceCmd)20, 1 );
 
-    if ( !m_pCustomPlateTexture )
+    if ( m_vehicleType == VEHICLE_CAR )
         SetPlateTextureForRendering( info );
 
     // Load another paintjob TexDictionary if requested
@@ -97,7 +104,7 @@ void CVehicleSAInterface::SetupRender( CVehicleSA *mtaVeh )
 #endif //ROCKSTAR_GAME_LOGIC
         }
         else
-            pGame->GetStreaming()->RequestModel( 20000 + remapId, 8 );  // We need to request that texture container
+            pGame->GetStreaming()->RequestModel( DATA_TEXTURE_BLOCK + remapId, 8 );  // We need to request that texture container
     }
     else
         SetColourRemapping( false );
@@ -127,13 +134,13 @@ void CVehicleSAInterface::LeaveRender( void )
     // Wire in the hook done by MTA team.
     OnMY_CAutomobile_CustomCarPlate_AfterRenderingStop( modelInfo );
 
-    // Change texture stage
+    // Change texture stage (?)
     RenderWare::GetInterface()->m_deviceCommand( (eRwDeviceCmd)20, 2 );
 
     // Restore clump data
     RpClumpRestoreVehicleMaterials( (RpClump*)GetRwObject() );
 
-    if ( !m_pCustomPlateTexture )
+    if ( m_vehicleType == VEHICLE_CAR )
         RestoreLicensePlate( modelInfo );
 }
 
@@ -194,4 +201,15 @@ void CVehicleSAInterface::RestoreLicensePlate( CVehicleModelInfoSAInterface *inf
 
         _originalPlateTexture = NULL;
     }
+}
+
+void VehicleRender_Init( void )
+{
+    // Install rendering hooks.
+    HookInstall( 0x004C9450, h_memFunc( &CVehicleModelInfoSAInterface::InitNameplate ), 5 );
+    HookInstall( 0x006D10E0, h_memFunc( &CVehicleSAInterface::CreateLicensePlate ), 5 );
+}
+
+void VehicleRender_Shutdown( void )
+{
 }

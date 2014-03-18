@@ -29,10 +29,12 @@ struct RpClump : public RwObject
     RwStaticGeometry*       pStatic;            // 60
 
     // Methods.
-    void                    Render                      ( void );
+    bool                    Render                      ( void );
 
     void                    InitStaticSkeleton          ( void );
     RwStaticGeometry*       CreateStaticGeometry        ( void );
+
+    int                     GetNumAtomics               ( void );
 
     RpAnimHierarchy*        GetAtomicAnimHierarchy      ( void );
     RpAnimHierarchy*        GetAnimHierarchy            ( void );
@@ -48,8 +50,8 @@ struct RpClump : public RwObject
     void                    RemoveAtomicComponentFlags  ( unsigned short flags );
     void                    FetchMateria                ( RpMaterials& mats );
 
-    template <class type>
-    bool                    ForAllAtomics               ( bool (*callback)( RpAtomic *child, type data ), type data )
+    template <class type, typename returnType>
+    bool                    ForAllAtomics               ( returnType (__cdecl*callback)( RpAtomic *child, type data ), type data )
     {
         RwListEntry <RpAtomic> *child = atomics.root.next;
 
@@ -65,7 +67,16 @@ struct RpClump : public RwObject
     void                    GetBoneTransform            ( CVector *offset );
 };
 
+typedef RpAtomic* (__cdecl*clumpAtomicIterator_t)( RpAtomic *atomic, void *data );
+
 // Clump API.
-RpClump*            RpClumpCreate( void );      // US exe: 0x0074A290
+RpClump* __cdecl    RpClumpRender           ( RpClump *clump );                         // US exe: 0x00749B20
+RpClump* __cdecl    RpClumpAddAtomic        ( RpClump *clump, RpAtomic *atomic );       // US exe: 0x0074A490
+RpClump* __cdecl    RpClumpRemoveAtomic     ( RpClump *clump, RpAtomic *atomic );       // US exe: 0x0074A4C0
+RpClump* __cdecl    RpClumpAddLight         ( RpClump *clump, RpLight *light );         // US exe: 0x0074A4F0
+int __cdecl         RpClumpGetNumAtomics    ( RpClump *clump );                         // US exe: 0x007498E0
+RpClump* __cdecl    RpClumpForAllAtomics    ( RpClump *clump, clumpAtomicIterator_t callback, void *data );
+RpClump* __cdecl    RpClumpForAllAtomics    ( RpClump *clump, void *callback, void *data );
+RpClump* __cdecl    RpClumpCreate           ( void );                                   // US exe: 0x0074A290
 
 #endif //_RENDERWARE_CLUMP_

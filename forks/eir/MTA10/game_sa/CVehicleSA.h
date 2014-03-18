@@ -388,7 +388,10 @@ public:
     virtual void __thiscall         Save                            ( void ) = 0;
     virtual void __thiscall         Load                            ( void ) = 0;
 
-    CVehicleModelInfoSAInterface*   GetModelInfo( void ) const  { return (CVehicleModelInfoSAInterface*)CEntitySAInterface::GetModelInfo(); };
+    CVehicleModelInfoSAInterface*   GetModelInfo                ( void ) const      { return (CVehicleModelInfoSAInterface*)CEntitySAInterface::GetModelInfo(); };
+
+    inline RpClump*                 GetRwObject                 ( void )            { return (RpClump*)CEntitySAInterface::GetRwObject(); }
+    inline const RpClump*           GetRwObject                 ( void ) const      { return (const RpClump*)CEntitySAInterface::GetRwObject(); }
 
     void __thiscall             RenderPassengers                ( void );
     void __thiscall             CreateLicensePlate              ( CVehicleModelInfoSAInterface *info );
@@ -531,8 +534,10 @@ public:
     unsigned int                m_lightFlags;                                       // 1412, light status of all lights
     RwTexture*                  m_pCustomPlateTexture;                              // 1416
 
-    BYTE                        Padding225[12];                                     // 1420
+    BYTE                        Padding225[4];                                      // 1420
+    eVehicleType                m_vehicleType;                                      // 1424
 
+    BYTE                        Padding226[4];                                      // 1428
     short                       m_paintjobTxd;                                      // 1432
     unsigned short              m_queuePaintjob;                                    // 1434
     RwTexture*                  m_paintjobTexture;                                  // 1436
@@ -563,7 +568,10 @@ public:
     CVehicleSAInterface*        m_prevCarriage;                                     // 1488
     CVehicleSAInterface*        m_nextCarriage;                                     // 1492
 
-    BYTE                        padding270[112];                                    // 1496
+    BYTE                        padding270[60];                                     // 1496
+    unsigned int                m_bikeFlags;                                        // 1556
+
+    BYTE                        padding271[48];                                     // 1560
 
     // MEMBERS OF CAutomobileSAInterface
     RwFrame *                   pUnk0;                                              // 1608

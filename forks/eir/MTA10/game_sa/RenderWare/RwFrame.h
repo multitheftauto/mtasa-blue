@@ -50,8 +50,8 @@ struct RwFrame : public RwObject
     void                    Unlink                  ( void );
     void                    SetRootForHierarchy     ( RwFrame *root );
     unsigned int            CountChildren           ( void );
-    template <class type>
-    bool                    ForAllChildren( bool (*callback)( RwFrame *frame, type *data ), type *data )
+    template <class type, typename returnType>
+    bool                    ForAllChildren( returnType (__cdecl*callback)( RwFrame *frame, type *data ), type *data )
     {
         for ( RwFrame *child = this->child; child; child = child->next )
         {
@@ -68,8 +68,8 @@ struct RwFrame : public RwObject
 
     RwFrame*                CloneRecursive          ( void ) const;
 
-    template <class type>
-    bool                    ForAllObjects( bool (*callback)( RwObject *object, type data ), type data )
+    template <class type, typename returnType>
+    bool                    ForAllObjects( returnType (__cdecl*callback)( RwObject *object, type data ), type data )
     {
         LIST_FOREACH_BEGIN( RwObjectFrame, objects.root, lFrame )
             if ( !callback( item, data ) )
@@ -78,6 +78,7 @@ struct RwFrame : public RwObject
 
         return true;
     }
+
     RwObject*               GetFirstObject          ( void );
     RwObject*               GetFirstObject          ( unsigned char type );
     RwObject*               GetObjectByIndex        ( unsigned char type, unsigned int idx );
@@ -88,12 +89,12 @@ struct RwFrame : public RwObject
     template <class type>
     struct _rwObjectGetAtomic
     {
-        bool                (*routine)( RpAtomic *atomic, type data );
+        int                 (*routine)( RpAtomic *atomic, type data );
         type                data;
     };
 
     template <class type>
-    static bool RwObjectDoAtomic( RwObject *child, _rwObjectGetAtomic <type> *info )
+    static int RwObjectDoAtomic( RwObject *child, _rwObjectGetAtomic <type> *info )
     {
         // Check whether the object is a atomic
         if ( child->type != RW_ATOMIC )
@@ -102,8 +103,8 @@ struct RwFrame : public RwObject
         return info->routine( (RpAtomic*)child, info->data );
     }
 
-    template <class type>
-    bool                    ForAllAtomics( bool (*callback)( RpAtomic *atomic, type data ), type data )
+    template <class type, typename returnType>
+    bool                    ForAllAtomics( returnType (__cdecl*callback)( RpAtomic *atomic, type data ), type data )
     {
         _rwObjectGetAtomic <type> info;
 
@@ -125,5 +126,22 @@ struct RwFrame : public RwObject
     void                    UpdateMTA               ( void );
     void                    ThrowUpdate             ( void );
 };
+
+// Matrix copying
+inline void RwFrameCopyMatrix ( RwFrame * dst, RwFrame * src )
+{
+    dst->SetModelling( src->modelling );
+    dst->ltm = src->ltm;    // ltm is not supposed to be copied.
+}
+
+typedef RwObject* (__cdecl*frameObjectIterator_t)( RwObject *obj, void *data );
+
+// API exports.
+RwFrame* __cdecl RwFrameLink            ( RwFrame *frame, RwFrame *child );
+RwFrame* __cdecl RwFrameAddChild        ( RwFrame *frame, RwFrame *child );
+RwFrame* __cdecl RwFrameRemoveChild     ( RwFrame *child );
+RwFrame* __cdecl RwFrameForAllObjects   ( RwFrame *frame, frameObjectIterator_t callback, void *data );
+RwFrame* __cdecl RwFrameForAllObjects   ( RwFrame *frame, void *callback, void *data );
+RwFrame* __cdecl RwFrameFindFrame       ( RwFrame *frame, const char *name );
 
 #endif //_RENDERWARE_FRAME_

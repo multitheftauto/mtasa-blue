@@ -422,6 +422,8 @@ private:
 #include "CEntitySA.render.h"
 #include "CEntitySA.renderfeedback.h"
 #include "CEntitySA.lod.h"
+#include "CEntitySA.rendersetup.h"
+#include "CEntitySA.renderutils.h"
 
 namespace Entity
 {

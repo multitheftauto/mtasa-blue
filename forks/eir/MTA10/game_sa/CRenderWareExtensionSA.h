@@ -38,8 +38,6 @@ void    RpAtomicRenderAlpha                         ( RpAtomic *atom, unsigned i
 RwStream*           RwStreamCreateTranslated        ( CFile *file );
 RwStream*           RwStreamCreateIsoTranslated     ( CFile *file );
 RwStream*           RwStreamOpenTranslated          ( const char *path, RwStreamType type );
-RwTexture*          RwTextureStreamReadEx           ( RwStream *stream );
-RwTexDictionary*    RwTexDictionaryStreamReadEx     ( RwStream *stream );
 
 extern struct CColLoaderModelAcquisition *g_clumpLoaderCOLAcquisition;
 

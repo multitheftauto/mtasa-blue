@@ -73,7 +73,7 @@ inline static RwTexture* RwTexDictionaryScanTree( RwTexDictionary *txd, const ch
 static RwTexture* __cdecl RwTexDictionaryDefaultCurrentScan( const char *name )
 {
     // First check the current TexDictionary tree
-    if ( RwTexture *tex = RwTexDictionaryScanTree( RenderWare::GetInterface()->m_textureManager.current, name ) )
+    if ( RwTexture *tex = RwTexDictionaryScanTree( RwTexDictionaryGetCurrent(), name ) )
         return tex;
 
     // MTA extension: also scan a global texture emitter which is controlled by MTA (low priority)

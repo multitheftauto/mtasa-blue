@@ -73,6 +73,7 @@ void RpAtomic::AddToClump( RpClump *clump )
     LIST_INSERT( clump->atomics.root, atomics );
 }
 
+RpClump* __cdecl RpClumpAddAtomic( RpClump *clump, RpAtomic *atomic )       { atomic->AddToClump( clump ); return clump; }
 /*=========================================================
     RpAtomic::RemoveFromClump
 
@@ -95,6 +96,7 @@ void RpAtomic::RemoveFromClump( void )
     clump = NULL;
 }
 
+RpClump* __cdecl RpClumpRemoveAtomic( RpClump *clump, RpAtomic *atomic )    { atomic->RemoveFromClump(); return clump; }
 /*=========================================================
     RpAtomic::SetRenderCallback
 

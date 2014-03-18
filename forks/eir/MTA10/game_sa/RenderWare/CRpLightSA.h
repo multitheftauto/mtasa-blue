@@ -30,13 +30,16 @@ public:
 
     CRpLightSA*                     Clone               ( void ) const;
 
-    void                            SetLightIndex       ( unsigned int idx )                { GetObject()->SetLightIndex( idx ); }
-    unsigned int                    GetLightIndex       ( void ) const                      { return GetObject()->GetLightIndex(); }
+    void                            SetLightIndex       ( unsigned int idx );
+    unsigned int                    GetLightIndex       ( void ) const;
 
     inline RpLightType              GetLightType        ( void ) const                      { return (RpLightType)GetObject()->subtype; }
 
-    void                            SetAttenuation      ( const CVector& atten )            { GetObject()->attenuation = atten; }
-    const CVector&                  GetAttenuation      ( void ) const                      { return GetObject()->attenuation; }
+    void                            SetAttenuation      ( const CVector& atten );
+    const CVector&                  GetAttenuation      ( void ) const;
+    
+    void                            SetFalloff          ( float falloff );
+    float                           GetFalloff          ( void ) const;
 
     void                            AddToModel          ( CModel *model );
     CModel*                         GetModel            ( void );
@@ -50,6 +53,9 @@ public:
 
     void                            SetConeAngle        ( float radians );
     float                           GetConeAngle        ( void ) const;
+
+    void                            SetDirection        ( const CVector& dirVec );
+    void                            GetDirection        ( CVector& vecOut ) const;
 
     void                            AddToScene          ( void );
     bool                            IsAddedToScene      ( void ) const;

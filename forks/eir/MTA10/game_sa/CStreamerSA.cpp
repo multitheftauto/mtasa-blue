@@ -405,7 +405,7 @@ namespace Streamer
 
     void __cdecl RequestSquaredSectorEntities( const CVector& reqPos, unsigned int reqFlags )
     {
-        LoopArrayWorldSectors( reqPos.fX, reqPos.fY, *(float*)0x00B76848, _requestSquared( reqFlags, reqPos ) );
+        LoopArrayWorldSectors( reqPos.fX, reqPos.fY, Streamer::GetWorldFarclip(), _requestSquared( reqFlags, reqPos ) );
     }
 
     /*=========================================================
@@ -598,28 +598,6 @@ namespace Streamer
         return *(bool*)0x00B76850 && *(unsigned int*)0x008E4CB8 >= 1;
     }
 
-    // Temporary definitions (to avoid even bigger commit)
-    namespace EntityRender
-    {
-        int __cdecl SetupEntityVisibility( CEntitySAInterface *entity, float& camDistance )
-        {
-            return ((int (__cdecl*)( CEntitySAInterface *entity, float& camDistance ))0x00554230)( entity, camDistance );
-        }
-
-        void __cdecl PushEntityOnRenderQueue( CEntitySAInterface *entity, float camDistance )
-        {
-            ((void (__cdecl*)( CEntitySAInterface *eneity, float camDistance ))0x005534B0)( entity, camDistance );
-        }
-    };
-
-    enum eRenderType : unsigned int
-    {
-        ENTITY_RENDER_CROSS_ZONES,
-        ENTITY_RENDER_DEFAULT,
-        ENTITY_RENDER_CONTROVERIAL,
-        ENTITY_RENDER_REQUEST_MODEL
-    };
-
     struct _entityZoneRender : DefaultStreamerZoner <NUM_StreamStaticSectorRows, WORLD_BOUNDS>
     {
         void __forceinline OnEntity( CEntitySAInterface *entity, bool unimportantSector )
@@ -683,15 +661,7 @@ namespace Streamer
                 if ( CBounds2D( unkDist, -unkDist, -unkDist, unkDist ).IsInside( CVector2D( camDist.fX - entityPos.fX, camDist.fY - entityPos.fY ) ) )
                     return;
 
-                // TEMPORARY CHANGE HERE.
-                unsigned int lodCount = *(unsigned int*)0x00B7683C;
-
-                if ( lodCount < 1000 )
-                {
-                    ( (CEntitySAInterface**)0x00B745D8 )[ lodCount++ ] = entity;
-                    
-                    *(unsigned int*)0x00B7683C = lodCount;
-                }
+                EntityRender::RegisterLowPriorityRenderEntity( entity );
                 break;
             }
         }

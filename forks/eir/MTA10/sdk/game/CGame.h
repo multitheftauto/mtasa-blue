@@ -142,6 +142,8 @@ struct SRwResourceStats
 class __declspec(novtable) CGame 
 {
 public:
+    typedef std::list <CEntity*> entityList_t;
+
     virtual CPools              * GetPools()=0;
     virtual CPlayerInfo         * GetPlayerInfo()=0;
     virtual CProjectileInfo     * GetProjectileInfo()=0;

@@ -13,7 +13,7 @@
 #include <StdInc.h>
 #include "../gamesa_renderware.h"
 
-bool CRwFrameSA::RwFrameObjectAssign( RwObject *obj, CRwFrameSA *parent )
+RwObject* CRwFrameSA::RwFrameObjectAssign( RwObject *obj, CRwFrameSA *parent )
 {
     CRwObjectSA *inst;
 
@@ -33,10 +33,10 @@ bool CRwFrameSA::RwFrameObjectAssign( RwObject *obj, CRwFrameSA *parent )
 
     // Add a back-reference
     inst->m_frame = parent;
-    return true;
+    return obj;
 }
 
-static bool RwFrameChildAssign( RwFrame *child, CRwFrameSA *parent )
+static RwFrame* RwFrameChildAssign( RwFrame *child, CRwFrameSA *parent )
 {
     CRwFrameSA *frame = new CRwFrameSA( child );
 
@@ -44,7 +44,7 @@ static bool RwFrameChildAssign( RwFrame *child, CRwFrameSA *parent )
     frame->m_frame = parent;
 
     parent->m_children.push_back( frame );
-    return true;
+    return child;
 }
 
 CRwFrameSA::CRwFrameSA( RwFrame *obj ) : CRwObjectSA( obj )

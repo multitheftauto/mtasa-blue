@@ -6,6 +6,8 @@
 *  PURPOSE:     RenderWare native function implementations
 *  DEVELOPERS:  Martin Turski <quiret@gmx.de>
 *
+*  See http://www.gtamodding.com/index.php?title=Material_%28RW_Section%29
+*
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *  RenderWare is © Criterion Software
 *
@@ -19,6 +21,7 @@ struct RpMaterialLighting
     float ambient, specular, diffuse;
 };
 struct CEnvMapMaterialSA //size: 12 bytes
+    // see http://www.gtamodding.com/index.php?title=Reflection_Material_%28RW_Section%29
 {
     char                envMod;             // 0
     char                envMod2;            // 1
@@ -34,9 +37,47 @@ struct CEnvMapMaterialSA //size: 12 bytes
     RwTexture*          envTexture;         // 8
 };
 struct CSpecMapMaterialSA    //size: 8 bytes
+    // see http://www.gtamodding.com/index.php?title=Specular_Material_%28RW_Section%29
 {
     float               specular;           // 0
-    BYTE                pad[4];             // 4
+    RwTexture*          specMap;            // 4
+};
+struct matFXBlendData
+{
+    RwTexture*          fxTexture;          // 0
+    unsigned int        srcBlend;           // 4
+    unsigned int        dstBlend;           // 8
+    BYTE                pad[12];            // 12
+};
+struct CSpecialFXMatSA
+{
+    union
+    {
+        struct
+        {
+            BYTE                pad[4];             // 0
+            RwTexture*          bumpTexture;        // 4
+            BYTE                pad2[20];           // 8
+            RwTexture*          bumpTexture2;       // 28
+        } bumpMapEffect;
+        struct
+        {
+            RwMatrix*           fxMatrix;           // 0
+        } effect5;
+        struct
+        {
+            RwMatrix*           fxMatrix;           // 0
+            RwMatrix*           fxMatrix2;          // 4
+            BYTE                pad[16];            // 8
+            matFXBlendData      fxBlend;            // 24
+        } effect6;
+
+        matFXBlendData      effect4;                // 0
+
+        BYTE                pad[48];                // 0
+    };
+
+    unsigned int        effectType;                 // 48
 };
 //padlevel: 5
 struct RpMaterial
@@ -58,7 +99,8 @@ struct RpMaterial
     };
     unsigned short      refs;           // 24
     short               id;             // 26
-    void*               unknown;        // 28
+
+    CSpecialFXMatSA*    specialFX;      // 28, plugin struct of 4 bytes
 
     BYTE                pad[40];        // 32
 

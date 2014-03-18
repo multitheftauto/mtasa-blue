@@ -44,6 +44,24 @@ public:
     void                ClothesRemoveReplacementTxd ( char* pFileData );
     bool                HasClothesReplacementChanged( void );
 
+    void                EnableEnvMapRendering           ( bool enabled );
+    bool                IsEnvMapRenderingEnabled        ( void ) const;
+
+    // Lighting utilities.
+    void                SetGlobalLightingAlwaysEnabled  ( bool enabled );
+    bool                IsGlobalLightingAlwaysEnabled   ( void ) const;
+
+    void                SetLocalLightingAlwaysEnabled   ( bool enabled );
+    bool                IsLocalLightingAlwaysEnabled    ( void ) const;
+
+    // Shader lighting management.
+    void                SetShaderLightingMode           ( eShaderLightingMode mode );
+    eShaderLightingMode GetShaderLightingMode           ( void ) const;
+
+    // Rendering modes.
+    void                SetWorldRenderMode              ( eWorldRenderMode mode );
+    eWorldRenderMode    GetWorldRenderMode              ( void ) const;
+
     // Reads and parses a TXD file specified by a path (szTXD)
     RwTexDictionary *   ReadTXD                     ( const char *szTXD );
 
@@ -162,6 +180,8 @@ public:
 #include "CRenderWareSA.pipeline.h"
 #include "CRenderWareSA.render.h"
 #include "CRenderWareSA.rwstats.h"
+#include "CRenderWareSA.lighting.h"
+#include "CRenderWareSA.rtcallback.h"
 
 namespace ClothesReplacing
 {

@@ -424,11 +424,19 @@ inline int RwD3D9ResetSrcBlend( void )
     return 1;
 }
 
-inline int RwD3D9SetSrcBlend( unsigned int blendMode )
+inline int _RwD3D9SetSrcBlend( unsigned int blendMode )
 {
     HOOK_RwD3D9SetRenderState( D3DRS_SRCBLEND, blendModes[blendMode] );
 
     GetCurrentSrcBlend() = blendMode;
+    return 1;
+}
+
+int RwD3D9SetSrcBlend( unsigned int blendMode )
+{
+    if ( GetCurrentSrcBlend() != blendMode )
+        _RwD3D9SetSrcBlend( blendMode );
+
     return 1;
 }
 
@@ -438,11 +446,19 @@ inline int RwD3D9ResetDstBlend( void )
     return 1;
 }
 
-inline int RwD3D9SetDstBlend( unsigned int blendMode )
+inline int _RwD3D9SetDstBlend( unsigned int blendMode )
 {
     HOOK_RwD3D9SetRenderState( D3DRS_DESTBLEND, blendModes[blendMode] );
 
     GetCurrentDstBlend() = blendMode;
+    return 1;
+}
+
+int RwD3D9SetDstBlend( unsigned int blendMode )
+{
+    if ( GetCurrentDstBlend() != blendMode )
+        _RwD3D9SetDstBlend( blendMode );
+
     return 1;
 }
 
@@ -652,8 +668,8 @@ void __cdecl RwD3D9InitializeDeviceStates( void )
         }
     }
 
-    RwD3D9SetSrcBlend( D3DBLEND_SRCALPHA );
-    RwD3D9SetDstBlend( D3DBLEND_INVSRCALPHA );
+    _RwD3D9SetSrcBlend( D3DBLEND_SRCALPHA );
+    _RwD3D9SetDstBlend( D3DBLEND_INVSRCALPHA );
 
     RwD3D9SetAlphaFunc( D3DCMP_GREATER );
 

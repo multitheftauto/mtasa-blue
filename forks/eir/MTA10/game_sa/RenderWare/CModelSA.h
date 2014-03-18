@@ -14,6 +14,8 @@
 #ifndef _MODEL_RW_
 #define _MODEL_RW_
 
+class CColModelSA;
+
 class CModelSA : public virtual CModel, public CRwObjectSA
 {
     friend class CRpAtomicSA;

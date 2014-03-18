@@ -73,4 +73,7 @@ struct RwTextureCoordinates
     float u,v;
 };
 
+// Texture API.
+RwTexture*          RwTextureStreamReadEx           ( RwStream *stream );
+
 #endif //_RENDERWARE_TEXTURE_

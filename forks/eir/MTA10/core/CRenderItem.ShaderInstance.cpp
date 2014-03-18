@@ -23,6 +23,7 @@ void CShaderInstance::PostConstruct ( CRenderItemManager* pManager, CShaderItem*
     Super::PostConstruct ( pManager );
     m_uiTessellationX = 1;
     m_uiTessellationY = 1;
+    m_isComputing = false;
     // Initial creation of d3d data
     CreateUnderlyingData ( pShaderItem );
 }

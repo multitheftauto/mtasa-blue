@@ -87,7 +87,7 @@ class CTrainCamNode
 
 /*** END PURE R* CLASSES ***/
 
-class CCameraSAInterface 
+class CCameraSAInterface : public CPlaceableSAInterface
 {
 public:
     bool __thiscall         IsSphereVisible             ( const CVector& pos, float radius, void *unk );
@@ -104,15 +104,13 @@ public:
     int __thiscall          GetActiveCamLookDirection   ( void );
 
 
-    // CPlaceable
-    CPlaceableSAInterface::Transform    Placeable;
-    // End CPlaceable
-
     //move these out the class, have decided to set up a mirrored enumerated type thingy at the top
+#if 0
     bool    m_bAboveGroundTrainNodesLoaded;
     bool    m_bBelowGroundTrainNodesLoaded;
     bool    m_bCamDirectlyBehind;   
     bool    m_bCamDirectlyInFront;  
+#endif
     bool    m_bCameraJustRestored;
     bool    m_bcutsceneFinished;
     bool    m_bCullZoneChecksOn;

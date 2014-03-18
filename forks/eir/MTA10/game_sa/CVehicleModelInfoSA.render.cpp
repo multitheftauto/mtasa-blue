@@ -82,9 +82,9 @@ static float cameraRenderAngleRadians = 0;
 
 void __cdecl CacheVehicleRenderCameraSettings( unsigned char alpha, RwObject *obj )
 {
-    highQualityRender = g_effectManager->m_fxQuality > 1;       // render High Quality if FX Quality better than Medium
-    renderLOD = g_effectManager->m_fxQuality < 3;               // render LOD vehicles if FX Quality not Very High
-    renderAlpha = highQualityRender && alpha != 255;            // forces sorting of atomics (makes sense with highQualityRender only)
+    highQualityRender = g_effectManager->GetEffectQuality() > 1;        // render High Quality if FX Quality better than Medium
+    renderLOD = g_effectManager->GetEffectQuality() < 3;                // render LOD vehicles if FX Quality not Very High
+    renderAlpha = highQualityRender && alpha != 255;                    // forces sorting of atomics (makes sense with highQualityRender only)
 
     if ( !highQualityRender )
     {
@@ -152,14 +152,14 @@ struct vehicleRenderInfo : public atomicRenderInfo
 typedef CRenderChainInterface <vehicleRenderInfo> vehicleRenderChain_t;
 
 // Render chains for vehicles only
-static vehicleRenderChain_t *const vehicleRenderChains = (vehicleRenderChain_t*)0x00C88070;
+static vehicleRenderChain_t vehicleRenderChains( 50 );  // Binary offsets: (1.0 US and 1.0 EU): 0x00C88070
 static vehicleRenderChain_t opaqueRenderChain( 128 );   // MTA extension
 static vehicleRenderChain_t lastRenderChain( 16 );      // MTA extension
 
 void __cdecl ClearVehicleRenderChains( void )
 {
     opaqueRenderChain.Clear();
-    vehicleRenderChains->Clear();
+    vehicleRenderChains.Clear();
     lastRenderChain.Clear();
 }
 
@@ -173,50 +173,69 @@ void __cdecl ClearVehicleRenderChains( void )
 void __cdecl ExecuteVehicleRenderChains( unsigned char renderAlpha )
 {
     // Do special alpha blending if quality is set to high/very high
-    if ( g_effectManager->m_fxQuality > 1 )
+    if ( g_effectManager->GetEffectQuality() > 1 )
     {
         {
-            RwRenderStateLock zfunc( D3DRS_ZFUNC, D3DCMP_LESS );
-            RwRenderStateLock alphaTestEnable( D3DRS_ALPHATESTENABLE, false );
+            RwRenderStateLock zfunc( D3DRS_ZFUNC, D3DCMP_LESSEQUAL );
             RwRenderStateLock alphaRef( D3DRS_ALPHAREF, renderAlpha );
+            RwRenderStateLock alphaBlendEnable( D3DRS_ALPHABLENDENABLE, true );
+            RwRenderStateLock alphaTestEnable( D3DRS_ALPHATESTENABLE, true );
+
+            // Make things compatible with our depth fix.
+            bool globalDoAlphaFix, globalRenderOpaque, globalRenderTranslucent, globalRenderDepth;
+
+            globalDoAlphaFix = RenderCallbacks::IsAlphaSortingEnabled();
+            
+            RenderCallbacks::GetAlphaSortingParams( globalRenderOpaque, globalRenderTranslucent, globalRenderDepth );
+
+            if ( !globalDoAlphaFix || globalRenderDepth )
+            {
+                if ( renderAlpha != 255 )
+                {
+                    RenderCallbacks::SetVehicleAlphaSortingEnabled( true );
+                    RenderCallbacks::SetVehicleAlphaSortingParams( false, false, true );
+                    
+                    // Make sure we only render depth of opaque pixels.
+                    RenderCallbacks::SetVehicleAlphaClamp( renderAlpha );
+
+                    // Render depth components.
+                    opaqueRenderChain.Execute();
+                    vehicleRenderChains.ExecuteReverse();
+                    lastRenderChain.Execute();
+
+                    RenderCallbacks::SetVehicleAlphaSortingEnabled( false );
+                }
+            }
 
             // Set opaque rendering flags
+            if ( !globalDoAlphaFix || globalRenderOpaque )
             {
                 RwRenderStateLock alphaFunc( D3DRS_ALPHAFUNC, D3DCMP_GREATEREQUAL );    // for now, instead of D3DCMP_EQUAL
-                RwRenderStateLock alphaBlendEnable( D3DRS_ALPHABLENDENABLE, renderAlpha != 255 );
+                RwRenderStateLock alphaTestEnable( D3DRS_ALPHATESTENABLE, true );
                 RwRenderStateLock zwriteEnable( D3DRS_ZWRITEENABLE, true );
-                RwD3D9ApplyDeviceStates();
 
                 // First render components which are opaque only
                 opaqueRenderChain.Execute();
-                vehicleRenderChains->ExecuteReverse();
+                vehicleRenderChains.ExecuteReverse();
                 lastRenderChain.Execute();
             }
 
+            if ( !globalDoAlphaFix || globalRenderTranslucent )
             {
                 // Now render translucent polygons
-                RwRenderStateLock alphaBlendEnable( D3DRS_ALPHABLENDENABLE, true );
                 RwRenderStateLock alphaFunc( D3DRS_ALPHAFUNC, D3DCMP_LESS );
                 RwRenderStateLock zwriteEnable( D3DRS_ZWRITEENABLE, false );
                 RwRenderStateLock cullMode( D3DRS_CULLMODE, D3DCULL_NONE );
-                RwD3D9ApplyDeviceStates();
 
                 // Render alpha polygons
                 opaqueRenderChain.ExecuteReverse();
-                vehicleRenderChains->Execute();
+                vehicleRenderChains.Execute();
                 lastRenderChain.ExecuteReverse();
             }
         }
-
-        // Fix some occasional RenderState screw-ups
-        RwD3D9SetRenderState( D3DRS_ALPHABLENDENABLE, true );
-        RwD3D9SetRenderState( D3DRS_ALPHAFUNC, D3DCMP_GREATER );
-        RwD3D9SetRenderState( D3DRS_ALPHATESTENABLE, true );
-        RwD3D9SetRenderState( D3DRS_ALPHAREF, 100 );
-        RwD3D9ApplyDeviceStates();
     }
     else
-        vehicleRenderChains->Execute(); // do what GTA:SA usually does.
+        vehicleRenderChains.Execute(); // do what GTA:SA usually does.
 }
 
 // LOD distances for models, squared (measured against camera distance from atomic, 0x00733160 is rendering wrapper)
@@ -343,7 +362,7 @@ static __forceinline bool RwAtomicQueue( RpAtomic *atomic, float camDistanceSq )
     level.callback = _renderAtomicCommon;
     level.atomic = atomic;
     level.distance = camDistanceSq;
-    return vehicleRenderChains->PushRender( &level ) != NULL;
+    return vehicleRenderChains.PushRender( &level ) != NULL;
 }
 
 static __forceinline void RwAtomicRenderVehicle( RpAtomic *atomic, float camDistanceSq )
@@ -493,8 +512,6 @@ static RpAtomic* RwAtomicRenderBoat( RpAtomic *atomic )
     Binary offsets:
         (1.0 US and 1.0 EU): 0x007344A0
 =========================================================*/
-static atomicRenderChain_t *const boatRenderChain = (atomicRenderChain_t*)0x00C880C8;
-
 static RpAtomic* RwAtomicRenderTranslucentBoat( RpAtomic *atomic )
 {
     float camDistanceSq = GetRenderObjectCameraDistanceSq( atomic );
@@ -511,7 +528,7 @@ static RpAtomic* RwAtomicRenderTranslucentBoat( RpAtomic *atomic )
         level.atomic = atomic;
         level.distance = camDistanceSq;
 
-        if ( boatRenderChain->PushRender( &level ) )
+        if ( EntityRender::GetBoatRenderChain().PushRender( &level ) )
             return atomic;
     }
     
@@ -878,7 +895,7 @@ static RpAtomic* RwAtomicRenderDefaultVehicleLast( RpAtomic *atomic )
 =========================================================*/
 static bool RwAtomicSetupVehicleDamaged( RpAtomic *child )
 {
-    if ( strstr(child->parent->szName, "_dam") )
+    if ( strstr( child->parent->szName, "_dam" ) )
     {
         child->flags = 0;
 
@@ -886,7 +903,7 @@ static bool RwAtomicSetupVehicleDamaged( RpAtomic *child )
         return true;
     }
 
-    if ( strstr(child->parent->szName, "_ok") )
+    if ( strstr( child->parent->szName, "_ok" ) )
     {
         child->componentFlags = 1;
         return true;
@@ -906,7 +923,7 @@ static bool RwAtomicSetupVehicleDamaged( RpAtomic *child )
     Binary offsets:
         (1.0 US and 1.0 EU): 0x004C7AA0
 =========================================================*/
-static bool RwAtomicRegisterTrain( RpAtomic *child, int )
+static int RwAtomicRegisterTrain( RpAtomic *child, int )
 {
     if ( strstr( child->parent->szName, "_vlo" ) )
     {
@@ -933,7 +950,7 @@ static bool RwAtomicRegisterTrain( RpAtomic *child, int )
     Binary offsets:
         (1.0 US and 1.0 EU): 0x004C79A0
 =========================================================*/
-static bool RwAtomicRegisterBoat( RpAtomic *child, int )
+static int RwAtomicRegisterBoat( RpAtomic *child, int )
 {
     if ( strcmp( child->parent->szName, "boat_hi" ) == 0 )
         child->SetRenderCallback( RwAtomicRenderBoat );         // boat_hi does not support alpha?
@@ -959,7 +976,7 @@ static bool RwAtomicRegisterBoat( RpAtomic *child, int )
     Binary offsets:
         (1.0 US and 1.0 EU): 0x004C7870
 =========================================================*/
-static bool RwAtomicRegisterHeli( RpAtomic *child, int )
+static int RwAtomicRegisterHeli( RpAtomic *child, int )
 {
     if ( strcmp( child->parent->szName, "moving_rotor" ) == 0 )
         child->SetRenderCallback( RwAtomicRenderHeliMovingRotor );
@@ -987,7 +1004,7 @@ static bool RwAtomicRegisterHeli( RpAtomic *child, int )
     Binary offsets:
         (1.0 US and 1.0 EU): 0x004C7930
 =========================================================*/
-static bool RwAtomicRegisterPlane( RpAtomic *child, int )
+static int RwAtomicRegisterPlane( RpAtomic *child, int )
 {
     if ( strstr( child->parent->szName, "_vlo" ) )
     {
@@ -1014,7 +1031,7 @@ static bool RwAtomicRegisterPlane( RpAtomic *child, int )
     Binary offsets:
         (1.0 US and 1.0 EU): 0x004C77E0
 =========================================================*/
-static bool RwAtomicRegisterDefaultVehicle( RpAtomic *child, int )
+static int RwAtomicRegisterDefaultVehicle( RpAtomic *child, int )
 {
     if ( strstr( child->parent->szName, "_vlo" ) )
         child->SetRenderCallback( RwAtomicRenderDefaultVehicleLOD );
@@ -1207,7 +1224,7 @@ static bool RpGeometryMaterialSetupColor( RpMaterial *mat, _colorTextureStorage 
     Purpose:
         Sets the per-vehicle color to the material of the
         vehicle clump and replaces textures. Returns true
-        if color information has been saved.
+        if color information has been saved, false otherwise.
     Binary offsets:
         (1.0 US and 1.0 EU): 0x004C8220
 =========================================================*/
@@ -1276,13 +1293,13 @@ static bool RpGeometryMaterialApplyVehicleColor( RpMaterial *mat, _colorTextureS
             gameVehicle->GetColor( &color1, &color2, &color3, &color4, 0 );
 
             // Each material seems to be individually colored
-            if ( color == 0xFF3C )
+            if ( color == VEHICLE_COLOR_USECOLOR1 )
                 useColor = color1;
-            else if ( color == 0xAF00FF )
+            else if ( color == VEHICLE_COLOR_USECOLOR2 )
                 useColor = color2;
-            else if ( color == 0xFFFF00 )
+            else if ( color == VEHICLE_COLOR_USECOLOR3 )
                 useColor = color3;
-            else if ( color == 0xFF00FF )
+            else if ( color == VEHICLE_COLOR_USECOLOR4 )
                 useColor = color4;
             else
                 return false;   // The_GTA: I made this return whether it saved color information; previously returned true.
@@ -1300,13 +1317,13 @@ static bool RpGeometryMaterialApplyVehicleColor( RpMaterial *mat, _colorTextureS
             unsigned char id;
 
             // Each material seems to be individually colored
-            if ( color == 0xFF3C )
+            if ( color == VEHICLE_COLOR_USECOLOR1 )
                 id = _vehColor1;
-            else if ( color == 0xAF00FF )
+            else if ( color == VEHICLE_COLOR_USECOLOR2 )
                 id = _vehColor2;
-            else if ( color == 0xFFFF00 )
+            else if ( color == VEHICLE_COLOR_USECOLOR3 )
                 id = _vehColor3;
-            else if ( color == 0xFF00FF )
+            else if ( color == VEHICLE_COLOR_USECOLOR4 )
                 id = _vehColor4;
             else
                 return false;
@@ -1338,7 +1355,7 @@ static bool RpGeometryMaterialApplyVehicleColor( RpMaterial *mat, _colorTextureS
 =========================================================*/
 static unsigned char vehAlpha = 255;
 
-static bool RpClumpAtomicSetupVehicleMaterials( RpAtomic *atomic, _colorTextureStorage **storage )
+static int RpClumpAtomicSetupVehicleMaterials( RpAtomic *atomic, _colorTextureStorage **storage )
 {
     if ( !atomic->IsVisible() )
         return true;
@@ -1433,6 +1450,9 @@ void VehicleModelInfoRender_Init( void )
 {
     // Apply our own rendering logic ;)
     HookInstall( 0x004C7B10, h_memFunc( &CVehicleModelInfoSAInterface::RegisterRenderCallbacks ), 5 );
+
+    // Temporary hook. Should be fixed by reversing Vehicle_AddUpgrade.
+    HookInstall( 0x00733F80, (DWORD)RwAtomicRenderTranslucentHeli, 5 );
 }
 
 void VehicleModelInfoRender_SetupDevice( void )

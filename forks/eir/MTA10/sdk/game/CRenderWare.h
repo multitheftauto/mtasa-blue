@@ -60,12 +60,44 @@ enum EEntityTypeMask
     TYPE_MASK_ALL     = 127,
 };
 
+enum eWorldRenderMode
+{
+    WORLD_RENDER_ORIGINAL,
+    WORLD_RENDER_MESHLOCAL_ALPHAFIX,
+    WORLD_RENDER_SCENE_ALPHAFIX
+};
+
+enum eShaderLightingMode
+{
+    SHADER_LIGHTING_SINGULAR,
+    SHADER_LIGHTING_MULTI
+};
+
 typedef void (*PFN_WATCH_CALLBACK) ( CSHADERDUMMY* pContext, CD3DDUMMY* pD3DDataNew, CD3DDUMMY* pD3DDataOld );
 
 #define MAX_ATOMICS_PER_CLUMP   128
 
-class CRenderWare {
-    public:
+class CRenderWare
+{
+public:
+    virtual void                    EnableEnvMapRendering               ( bool enabled ) = 0;
+    virtual bool                    IsEnvMapRenderingEnabled            ( void ) const = 0;
+
+    // Lighting utilities.
+    virtual void                    SetGlobalLightingAlwaysEnabled      ( bool enabled ) = 0;
+    virtual bool                    IsGlobalLightingAlwaysEnabled       ( void ) const = 0;
+
+    virtual void                    SetLocalLightingAlwaysEnabled       ( bool enabled ) = 0;
+    virtual bool                    IsLocalLightingAlwaysEnabled        ( void ) const = 0;
+
+    // Shader lighting management.
+    virtual void                    SetShaderLightingMode               ( eShaderLightingMode mode ) = 0;
+    virtual eShaderLightingMode     GetShaderLightingMode               ( void ) const = 0;
+
+    // Rendering modes.
+    virtual void                    SetWorldRenderMode                  ( eWorldRenderMode mode ) = 0;
+    virtual eWorldRenderMode        GetWorldRenderMode                  ( void ) const = 0;
+
     virtual bool                ModelInfoTXDLoadTextures    ( SReplacementTextures* pReplacementTextures, const SString& szFilename, bool bFilteringEnabled ) = 0;
     virtual bool                ModelInfoTXDAddTextures     ( SReplacementTextures* pReplacementTextures, ushort usModelId ) = 0;
     virtual void                ModelInfoTXDRemoveTextures  ( SReplacementTextures* pReplacementTextures ) = 0;

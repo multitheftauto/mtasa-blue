@@ -68,6 +68,10 @@ CBaseModelInfoSAInterface * CModelInfoSA::GetInterface ( void )
     return m_pInterface = ppModelInfo [ m_dwModelID ];
 }
 
+bool CModelInfoSA::IsValidGameInfo( void )
+{
+    return m_dwModelID < MAX_MODELS;
+}
 
 BOOL CModelInfoSA::IsBoat ( )
 {

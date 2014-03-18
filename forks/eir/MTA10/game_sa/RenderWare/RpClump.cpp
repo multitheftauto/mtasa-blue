@@ -24,14 +24,24 @@
         (1.0 US): 0x00749B20
         (1.0 EU): 0x00749B70
 =========================================================*/
-void RpClump::Render( void )
+bool RpClump::Render( void )
 {
+    bool successful = true;
+
     LIST_FOREACH_BEGIN( RpAtomic, atomics.root, atomics )
         if ( item->IsVisible() )
-            item->renderCallback( item );
+        {
+            RpAtomic *atom = item->renderCallback( item );
+
+            if ( !atom )
+                successful = false;
+        }
     LIST_FOREACH_END
+
+    return successful;
 }
 
+RpClump* __cdecl RpClumpRender( RpClump *clump )        { return ( clump->Render() ) ? ( clump ) : ( NULL ); }
 /*=========================================================
     RpClump::InitStaticSkeleton (GTA:SA extension)
 
@@ -44,7 +54,7 @@ void RpClump::Render( void )
     Binary offsets:
         (1.0 US and 1.0 EU): 0x004D6720
 =========================================================*/
-static bool RwAssignRenderLink( RwFrame *child, RwRenderLink **link )
+static int RwAssignRenderLink( RwFrame *child, RwRenderLink **link )
 {
     (*link)->context = child;
     (*link)++;
@@ -146,6 +156,53 @@ RwStaticGeometry* RpClump::CreateStaticGeometry( void )
 }
 
 /*=========================================================
+    RpClump::GetNumAtomics
+
+    Purpose:
+        Returns the number of atomics that are registered
+        in this clump.
+    Binary offsets:
+        (1.0 US): 0x007498E0
+        (1.0 EU): 0x00749930
+=========================================================*/
+int RpClump::GetNumAtomics( void )
+{
+    int count = 0;
+
+    LIST_FOREACH_BEGIN( RpAtomic, atomics.root, atomics )
+        count++;
+    LIST_FOREACH_END
+
+    return count;
+}
+
+int __cdecl RpClumpGetNumAtomics( RpClump *clump )      { return clump->GetNumAtomics(); }
+/*=========================================================
+    RpClumpForAllAtomics
+
+    Arguments:
+        clump - the clump to loop through all atomics of
+        callback - function to invoke for every found atomic
+        data - userdata pointer to pass to callback
+    Purpose:
+        Loops through all registered atomics of this clump
+        and invokes the given callback for each one.
+    Binary offsets:
+        (1.0 US): 0x00749B70
+        (1.0 EU): 0x00749BC0
+=========================================================*/
+RpClump* __cdecl RpClumpForAllAtomics( RpClump *clump, clumpAtomicIterator_t callback, void *data )
+{
+    clump->ForAllAtomics( callback, data );
+    return clump;
+}
+
+RpClump* __cdecl RpClumpForAllAtomics( RpClump *clump, void *callback, void *data )
+{
+    return RpClumpForAllAtomics( clump, (clumpAtomicIterator_t)callback, data );
+}
+
+/*=========================================================
     RpClump::GetAtomicAnimHierarchy
 
     Purpose:
@@ -196,7 +253,7 @@ struct _rwFrameScanHierarchy
     size_t max;
 };
 
-static bool RwFrameGetAssignedHierarchy( RwFrame *child, _rwFrameScanHierarchy *info )
+static int RwFrameGetAssignedHierarchy( RwFrame *child, _rwFrameScanHierarchy *info )
 {
     if ( child->hierarchyId && child->hierarchyId < info->max )
         info->output[ child->hierarchyId ] = child;
@@ -274,7 +331,7 @@ RpAtomic* RpClump::FindNamedAtomic( const char *name )
     Binary offsets:
         (1.0 US and 1.0 EU): 0x00734880
 =========================================================*/
-static bool RwAtomicGet2dfx( RpAtomic *child, RpAtomic **atomic )
+static int RwAtomicGet2dfx( RpAtomic *child, RpAtomic **atomic )
 {
     // Crashfix, invalid geometry
     if ( !child->geometry )
@@ -291,10 +348,7 @@ RpAtomic* RpClump::Find2dfx( void )
 {
     RpAtomic *atomic;
 
-    if ( ForAllAtomics( RwAtomicGet2dfx, &atomic ) )
-        return NULL;
-
-    return atomic;
+    return ( ForAllAtomics( RwAtomicGet2dfx, &atomic ) ) ? ( NULL ) : ( atomic );
 }
 
 /*=========================================================
@@ -307,7 +361,7 @@ RpAtomic* RpClump::Find2dfx( void )
     Binary offsets:
         (1.0 US and 1.0 EU): 0x004C4F30
 =========================================================*/
-static bool RwAtomicSetupPipeline( RpAtomic *child, int )
+static int RwAtomicSetupPipeline( RpAtomic *child, int )
 {
     if ( child->IsNight() )
         RpAtomicSetupObjectPipeline( child );
@@ -331,7 +385,7 @@ void RpClump::SetupAtomicRender( void )
         Loops through all atomics of this clump and removes the
         specified component flags.
 =========================================================*/
-static bool RwAtomicRemoveComponentFlags( RpAtomic *child, unsigned short flags )
+static int RwAtomicRemoveComponentFlags( RpAtomic *child, unsigned short flags )
 {
     child->componentFlags &= ~flags;
     return true;
@@ -351,7 +405,7 @@ void RpClump::RemoveAtomicComponentFlags( unsigned short flags )
         Lists the materials of all atomics registered in this clump.
         Be sure to allocate a big RpMaterials container for this.
 =========================================================*/
-static bool RwAtomicFetchMateria( RpAtomic *child, RpMaterials *mats )
+static int RwAtomicFetchMateria( RpAtomic *child, RpMaterials *mats )
 {
     child->FetchMateria( *mats );
     return true;
@@ -443,12 +497,12 @@ void RpClump::GetBoneTransform( CVector *offset )
         (1.0 US): 0x0074A290
         (1.0 EU): 0x0074A2E0
 =========================================================*/
-static RpClump* _clumpCallback( RpClump *clump, void *data )
+static RpClump* __cdecl _clumpCallback( RpClump *clump, void *data )
 {
     return clump;
 }
 
-RpClump* RpClumpCreate( void )
+RpClump* __cdecl RpClumpCreate( void )
 {
     RwInterface *rwInterface = RenderWare::GetInterface();
 

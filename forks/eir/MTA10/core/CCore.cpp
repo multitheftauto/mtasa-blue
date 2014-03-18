@@ -161,6 +161,9 @@ CCore::CCore ( void )
 
     m_pMouseControl = new CMouseControl();
 
+    // Pointer that holds the FileSystem link to the currently loaded modification.
+    m_modRoot = NULL;
+
     // Create our hook objects.
     //m_pFileSystemHook           = new CFileSystemHook ( );
     m_pDirect3DHookManager      = new CDirect3DHookManager ( );

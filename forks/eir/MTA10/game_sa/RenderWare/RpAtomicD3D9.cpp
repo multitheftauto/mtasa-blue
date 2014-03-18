@@ -14,10 +14,10 @@
 
 void* CEnvMapAtomicSA::operator new ( size_t )
 {
-    return (*ppEnvMapAtomicPool)->Allocate();
+    return RenderWare::GetEnvMapAtomicPool()->Allocate();
 }
 
 void CEnvMapAtomicSA::operator delete ( void *ptr )
 {
-    (*ppEnvMapAtomicPool)->Free( (CEnvMapAtomicSA*)ptr );
+    RenderWare::GetEnvMapAtomicPool()->Free( (CEnvMapAtomicSA*)ptr );
 }

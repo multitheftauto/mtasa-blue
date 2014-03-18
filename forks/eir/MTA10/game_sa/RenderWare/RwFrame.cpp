@@ -109,6 +109,8 @@ void RwFrame::Link( RwFrame *frame )
     frame->Update();
 }
 
+RwFrame* __cdecl RwFrameLink( RwFrame *frame, RwFrame *child )          { frame->Link( child ); return frame; }
+RwFrame* __cdecl RwFrameAddChild( RwFrame *frame, RwFrame *child )      { RwFrameLink( frame, child ); return frame; }
 /*=========================================================
     RwFrame::Unlink
 
@@ -146,6 +148,7 @@ void RwFrame::Unlink( void )
     Update();
 }
 
+RwFrame* __cdecl RwFrameRemoveChild( RwFrame *child )           { child->Unlink(); return child; }
 /*=========================================================
     RwFrame::SetRootForHierarchy
 
@@ -186,12 +189,12 @@ void RwFrame::SetRootForHierarchy( RwFrame *root )
         It returns 1 at least, since it stands for parent frame itself.
         MTA does not need to count the main frame?
 =========================================================*/
-static bool RwFrameGetChildCount( RwFrame *child, unsigned int *count )
+static RwFrame* RwFrameGetChildCount( RwFrame *child, unsigned int *count )
 {
     child->ForAllChildren( RwFrameGetChildCount, count );
 
     (*count)++;
-    return true;
+    return child;
 }
 
 unsigned int RwFrame::CountChildren( void )
@@ -236,7 +239,7 @@ struct _rwFrameFindName
     RwFrame *result;
 };
 
-static bool RwFrameGetFreeByName( RwFrame *child, _rwFrameFindName *info )
+static int RwFrameGetFreeByName( RwFrame *child, _rwFrameFindName *info )
 {
     if ( child->hierarchyId || strcmp( child->szName, info->name ) != 0 )
         return child->ForAllChildren( RwFrameGetFreeByName, info );
@@ -248,13 +251,9 @@ static bool RwFrameGetFreeByName( RwFrame *child, _rwFrameFindName *info )
 RwFrame* RwFrame::FindFreeChildByName( const char *name )
 {
     _rwFrameFindName info;
-
     info.name = name;
 
-    if ( ForAllChildren( RwFrameGetFreeByName, &info ) )
-        return NULL;
-
-    return info.result;
+    return ( ForAllChildren( RwFrameGetFreeByName, &info ) ) ? ( NULL ) : ( info.result );
 }
 
 /*=========================================================
@@ -267,7 +266,7 @@ RwFrame* RwFrame::FindFreeChildByName( const char *name )
     Binary offsets:
         (1.0 US and 1.0 EU): 0x004C5400
 =========================================================*/
-static bool RwFrameGetByName( RwFrame *child, _rwFrameFindName *info )
+static int RwFrameGetByName( RwFrame *child, _rwFrameFindName *info )
 {
     if ( stricmp( child->szName, info->name ) != 0 )
         return child->ForAllChildren( RwFrameGetByName, info );
@@ -279,13 +278,27 @@ static bool RwFrameGetByName( RwFrame *child, _rwFrameFindName *info )
 RwFrame* RwFrame::FindChildByName( const char *name )
 {
     _rwFrameFindName info;
-
     info.name = name;
 
-    if ( ForAllChildren( RwFrameGetByName, &info ) )
-        return NULL;
+    return ( ForAllChildren( RwFrameGetByName, &info ) ) ? ( NULL ) : info.result;
+}
 
-    return info.result;
+// MTA extension that looks up case sensitively.
+static int RwFrameGetByNameCaseSensitive( RwFrame *child, _rwFrameFindName *info )
+{
+    if ( strcmp( child->szName, info->name ) != 0 )
+        return child->ForAllChildren( RwFrameGetByNameCaseSensitive, info );
+
+    info->result = child;
+    return false;
+}
+
+RwFrame* __cdecl RwFrameFindFrame( RwFrame *parent, const char *name )
+{
+    _rwFrameFindName info;
+    info.name = name;
+
+    return ( parent->ForAllChildren( RwFrameGetByNameCaseSensitive, &info ) ) ? ( NULL ) : ( info.result );
 }
 
 /*=========================================================
@@ -309,7 +322,7 @@ struct _rwFrameFindHierarchy
     RwFrame*        result;
 };
 
-static bool RwFrameGetByHierarchy( RwFrame *child, _rwFrameFindHierarchy *info )
+static int RwFrameGetByHierarchy( RwFrame *child, _rwFrameFindHierarchy *info )
 {
     if ( child->hierarchyId != info->hierarchy )
         return child->ForAllChildren( RwFrameGetByHierarchy, info );
@@ -354,7 +367,7 @@ RwFrame* RwFrame::CloneRecursive( void ) const
     return cloned;
 }
 
-static bool RwFrameGetAnimHierarchy( RwFrame *frame, RpAnimHierarchy **rslt )
+static int RwFrameGetAnimHierarchy( RwFrame *frame, RpAnimHierarchy **rslt )
 {
     if ( frame->anim )
     {
@@ -418,7 +431,7 @@ struct _rwObjectByIndex
     RwObject *rslt;
 };
 
-static bool RwObjectGetByIndex( RwObject *obj, _rwObjectByIndex *info )
+static int RwObjectGetByIndex( RwObject *obj, _rwObjectByIndex *info )
 {
     if ( obj->type != info->type )
         return true;
@@ -457,7 +470,7 @@ struct _rwObjCntByType
     unsigned int cnt;
 };
 
-static bool RwFrameCountObjectsByType( RwObject *obj, _rwObjCntByType *info )
+static int RwFrameCountObjectsByType( RwObject *obj, _rwObjCntByType *info )
 {
     if ( obj->type == info->type )
         info->cnt++;
@@ -473,6 +486,31 @@ unsigned int RwFrame::CountObjectsByType( unsigned char type )
 
     ForAllObjects( RwFrameCountObjectsByType, &info );
     return info.cnt;
+}
+
+/*=========================================================
+    RwFrameForAllObjects
+
+    Arguments:
+        frame - the frame to loop all objects of
+        callback - function to call for every object found
+        data - userdata pointer to pass to callback
+    Purpose:
+        Loops through all objects of the given frame and
+        invokes the callback for each.
+    Binary offsets:
+        (1.0 US): 0x007F1200
+        (1.0 EU): 0x007F1240
+=========================================================*/
+RwFrame* __cdecl RwFrameForAllObjects( RwFrame *frame, frameObjectIterator_t callback, void *data )
+{
+    frame->ForAllObjects <void*> ( callback, data );
+    return frame;
+}
+
+RwFrame* __cdecl RwFrameForAllObjects( RwFrame *frame, void *callback, void *data )
+{
+    return RwFrameForAllObjects( frame, (frameObjectIterator_t)callback, data );
 }
 
 /*=========================================================
@@ -500,7 +538,7 @@ RwObject* RwFrame::GetLastObject( void )
         At the binary offset location is the handler for
         ForAllObjects.
 =========================================================*/
-static bool RwFrameObjectGetVisibleLast( RwObject *obj, RwObject **dst )
+static int RwFrameObjectGetVisibleLast( RwObject *obj, RwObject **dst )
 {
     if ( obj->IsVisible() )
         *dst = obj;
@@ -541,7 +579,7 @@ RpAtomic* RwFrame::GetFirstAtomic( void )
         Applies the specified visibility flags for all atomics
         in this frame.
 =========================================================*/
-static bool RwObjectAtomicSetComponentFlags( RpAtomic *atomic, unsigned short flags )
+static int RwObjectAtomicSetComponentFlags( RpAtomic *atomic, unsigned short flags )
 {
     atomic->componentFlags |= flags;
     return true;
@@ -576,7 +614,7 @@ struct _rwFrameComponentAtomics
     RpAtomic **secondary;
 };
 
-static bool RwFrameAtomicFindComponents( RpAtomic *atomic, _rwFrameComponentAtomics *info )
+static int RwFrameAtomicFindComponents( RpAtomic *atomic, _rwFrameComponentAtomics *info )
 {
     if ( atomic->componentFlags & 0x01 )
     {

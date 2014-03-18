@@ -104,7 +104,7 @@ struct ptrNodeSingleContainer
             dataPtr - pointer to data held by this list
         Purpose:
             Loops through all allocated pointer nodes and deallocates
-            the ones which old dataPtr.
+            the ones which hold dataPtr.
         Binary offsets:
             (1.0 US and 1.0 EU): 0x00533610
     =========================================================*/

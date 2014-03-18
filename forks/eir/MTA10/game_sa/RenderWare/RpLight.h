@@ -30,16 +30,9 @@ struct RpLight : public RwObjectFrame
     RpClump*                clump;              // 72
     RwListEntry <RpLight>   clumpLights;        // 76
 
-    // Start of D3D9Light plugin
-    int                     lightIndex;         // 84, may be 0-7
-    CVector                 attenuation;        // 88
-
     // Methods.
     void                    SetLightActive          ( bool active )         { BOOL_FLAG( flags, 0x01, active ); }
     bool                    IsLightActive           ( void )                { return IS_ANY_FLAG( flags, 0x01 ); }
-
-    void                    SetLightIndex           ( unsigned int idx );
-    unsigned int            GetLightIndex           ( void ) const          { return lightIndex; }
 
     void                    AddToClump              ( RpClump *clump );
     void                    RemoveFromClump         ( void );
@@ -58,5 +51,13 @@ RpLight*            RpLightCreate( unsigned char type );        // US exe: 0x007
 
 // NEW RenderWare functions
 RpLight*            RpLightClone( const RpLight *src );
+
+// * Frustum caching plugin.
+bool __cdecl        RpLightIsInsideFrustum( RpLight *light );
+void __cdecl        RpLightPerformFrustumCaching( void );
+
+// General light initialization
+void __cdecl        RpLightInit( void );
+void __cdecl        RpLightShutdown( void );
 
 #endif //_RENDERWARE_LIGHT_

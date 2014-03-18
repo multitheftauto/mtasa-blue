@@ -13,6 +13,8 @@
 #ifndef _VEHICLE_INTERFACE_RENDER_
 #define _VEHICLE_INTERFACE_RENDER_
 
-
+// Module initialization.
+void VehicleRender_Init( void );
+void VehicleRender_Shutdown( void );
 
 #endif //_VEHICLE_INTERFACE_RENDER_

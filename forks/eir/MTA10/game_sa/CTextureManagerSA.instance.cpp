@@ -14,10 +14,6 @@
 #include <StdInc.h>
 #include "gamesa_renderware.h"
 
-// Used by shader management.
-void _cdecl OnStreamingAddedTxd ( DWORD dwTxdId );
-void _cdecl OnStreamingRemoveTxd ( DWORD dwTxdId );
-
 /*=========================================================
     CTxdInstanceSA::constructor
 
@@ -270,7 +266,7 @@ void CTxdInstanceSA::DereferenceNoDestroy( void )
 =========================================================*/
 void CTxdInstanceSA::SetCurrent( void )
 {
-    RenderWare::GetInterface()->m_textureManager.current = m_txd;
+    RwTexDictionarySetCurrent( m_txd );
 }
 
 /*=====================================================================

@@ -112,6 +112,8 @@ public:
     virtual void                    SetOfflineMod                   ( bool bOffline ) = 0;
     virtual void                    ApplyHooks3                     ( bool bEnable ) = 0;
 
+    virtual CFileTranslator*        GetModRoot                      ( void ) = 0;
+
     virtual bool                    IsConnected                     ( void ) = 0;
     virtual bool                    Reconnect                       ( const char* szHost, unsigned short usPort, const char* szPassword, bool bSave = true, bool bForceInternalHTTPServer = false ) = 0;
     virtual bool                    ShouldUseInternalHTTPServer     ( void ) = 0;

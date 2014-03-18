@@ -169,6 +169,8 @@ public:
     const char *            GetModInstallRoot               ( const char * szModName );
     bool                    CheckDiskSpace                  ( uint uiResourcesPathMinMB = 10, uint uiDataPathMinMB = 10 );
 
+    CFileTranslator*        GetModRoot                      ( void ) { return m_modRoot; }
+
 
     // Subsystems
     void                    CreateGame                      ( void );
@@ -321,7 +323,11 @@ private:
 
     CKeyBinds*                  m_pKeyBinds;
     CMouseControl*              m_pMouseControl;
-    
+
+public:
+    CFileTranslator*            m_modRoot;
+
+private:
     bool                        m_bFirstFrame;
     bool                        m_bIsOfflineMod;
     bool                        m_bCursorToggleControls;

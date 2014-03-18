@@ -139,6 +139,7 @@ CGameSA::CGameSA()
     Streamer_Init();
     ModelInfo_Init();
     VehicleModels_Init();
+    VehicleRender_Init();
     PlayerInfo_Init();
     HUD_Init();
 
@@ -225,6 +226,11 @@ CGameSA::CGameSA()
     InitHooks_ClothesCache ();
     InitHooks_Rendering ();
     InitHooks_RwResources ();
+
+    // Temporary stuff to enable infinite rendering.
+    // Should be disabled in Phase 4, when the scripting functions are added.
+    GetStreaming()->SetStreamingNodeStealingAllowed( false );
+    GetStreaming()->SetInfiniteStreamingEnabled( true );
 }
 
 CGameSA::~CGameSA ( void )
@@ -240,6 +246,7 @@ CGameSA::~CGameSA ( void )
     // Shutdown the static (internal) extensions
     HUD_Shutdown();
     PlayerInfo_Shutdown();
+    VehicleRender_Shutdown();
     VehicleModels_Shutdown();
     ModelInfo_Shutdown();
     Streamer_Shutdown();
@@ -524,6 +531,9 @@ void CGameSA::Reset ( void )
         m_pHud->Disable ( false );
         m_pHud->SetComponentVisible ( HUD_ALL, true );
     }
+
+    // Notify modules which want it.
+    HUD_OnReset();
 
     // Reset ubiqitous managers.
     Streaming::Reset();

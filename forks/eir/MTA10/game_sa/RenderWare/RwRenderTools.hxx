@@ -15,18 +15,22 @@
 #ifndef _RENDERWARE_RENDER_TOOLS_
 #define _RENDERWARE_RENDER_TOOLS_
 
-#include "gamesa_renderware.h"
-
-inline IDirect3DDevice9* GetRenderDevice( void )
-{
-    return core->GetGraphics()->GetDevice();
-}
+#include "../gamesa_renderware.h"
 
 inline IDirect3DDevice9* GetRenderDevice_Native( void )
 {
     // Required for callback operations using dummy interfaces.
     // This has been introduced by Core module.
     return *(IDirect3DDevice9**)0x00C97C28;
+}
+
+inline IDirect3DDevice9* GetRenderDevice( void )
+{
+#ifdef OPTIMIZE_DIRECT3D_DEVICE
+    return core->GetGraphics()->GetDevice();
+#else
+    return GetRenderDevice_Native();
+#endif //OPTIMIZE_DIRECT3D_DEVICE
 }
 
 struct RwD3D9StreamInfo //size: 16 bytes
@@ -47,27 +51,27 @@ void __cdecl RwD3D9SetStreams                   ( RwD3D9Streams& streams, int us
 //padlevel: 2
 struct RwRenderPass //size: 36 bytes
 {
-    RpMaterial*                     m_useMaterial;          // 0
-    int                             m_vertexAlpha;          // 4, boolean whether render pass requires alpha blending
-    IDirect3DVertexShader9*         m_vertexShader;         // 8
-    unsigned int                    m_startVertex;          // 12
-    unsigned int                    m_indexedNumVertice;    // 16, used for indexed rendering
-    unsigned int                    m_indexedStartIndex;    // 20
-    unsigned int                    m_numPrimitives;        // 24
-    BYTE                            m_pad2[8];              // 28
+    BYTE                            m_pad[8];               // 0
+    RpMaterial*                     m_useMaterial;          // 8
+    int                             m_vertexAlpha;          // 12, boolean whether render pass requires alpha blending
+    IDirect3DVertexShader9*         m_vertexShader;         // 16
+    unsigned int                    m_startVertex;          // 20
+    unsigned int                    m_indexedNumVertice;    // 24, used for indexed rendering
+    unsigned int                    m_indexedStartIndex;    // 28
+    unsigned int                    m_numPrimitives;        // 32
 };
 
 //padlevel: 2
-struct RwRenderCallbackTraverseImpl
+struct RwRenderCallbackTraverseImpl //size: 64 bytes (+ m_numPasses * sizeof( RwRenderPass ))
 {
-    BYTE                            m_pad[4];               // 24
-    unsigned int                    m_numPasses;            // 28
-    IDirect3DIndexBuffer9*          m_indexBuffer;          // 32
-    D3DPRIMITIVETYPE                m_primitiveType;        // 36
-    RwD3D9Streams                   m_vertexStreams;        // 40
-    int                             m_useOffsets;           // 72
-    IDirect3DVertexDeclaration9*    m_vertexDecl;           // 76
-    BYTE                            m_pad2[16];             // 80
+    BYTE                            m_pad[4];               // 24, 0
+    unsigned int                    m_numPasses;            // 28, 4
+    IDirect3DIndexBuffer9*          m_indexBuffer;          // 32, 8
+    D3DPRIMITIVETYPE                m_primitiveType;        // 36, 12
+    RwD3D9Streams                   m_vertexStreams;        // 40, 16
+    int                             m_useOffsets;           // 72, 48
+    IDirect3DVertexDeclaration9*    m_vertexDecl;           // 76, 52
+    BYTE                            m_pad2[8];              // 80, 56
 
     // Returns a dynamically allocated render pass from this internal interface.
     // These are appended at the end of the RwRenderCallbackTraverse structure by
@@ -131,6 +135,17 @@ inline bool RwD3D9UpdateRenderPassSurfaceProperties( RwRenderPass *rtPass, DWORD
     }
 
     return false;
+}
+
+// Helper function to disable the effects of the second TSS
+inline void RwD3D9DisableSecondTextureStage( void )
+{
+    // Restore into a safe status.
+    RwD3D9SetTextureStageState( 1, D3DTSS_COLOROP, D3DTOP_DISABLE );
+    RwD3D9SetTextureStageState( 1, D3DTSS_ALPHAOP, D3DTOP_DISABLE );
+
+    RwD3D9SetTextureStageState( 1, D3DTSS_TEXCOORDINDEX, 1 );
+    RwD3D9SetTextureStageState( 1, D3DTSS_TEXTURETRANSFORMFLAGS, 0 );
 }
 
 // Helper function to draw meshes of current render pass.

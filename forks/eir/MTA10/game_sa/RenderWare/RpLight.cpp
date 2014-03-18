@@ -15,25 +15,6 @@
 #include "../gamesa_renderware.h"
 
 /*=========================================================
-    RpLight::SetLightIndex
-
-    Arguments:
-        idx - number from 0 to 7 representing the hardware light index
-    Purpose:
-        Sets the hardware light index. It is used in the rendering
-        stage. Only one light with the same index can be active during
-        rendering. Light indices are not dynamically managed by
-        RenderWare (at the moment). The first time a light is assigned
-        to an atomic, it gains a light index. Settings this light index
-        to 0 will force an update to a freely available index at next
-        atomic render.
-=========================================================*/
-void RpLight::SetLightIndex( unsigned int idx )
-{
-    lightIndex = std::min( idx, (unsigned int)7 );
-}
-
-/*=========================================================
     RpLight::AddToClump
 
     Arguments:
@@ -58,6 +39,7 @@ void RpLight::AddToClump( RpClump *clump )
     this->clump = clump;
 }
 
+RpClump* __cdecl RpClumpAddLight( RpClump *clump, RpLight *light )      { light->AddToClump( clump ); return clump; }
 /*=========================================================
     RpLight::RemoveFromClump
 
@@ -166,6 +148,8 @@ void RpLight::SetColor( const RwColorFloat& color )
     privateFlags = ( color.r == color.g && color.r == color.b );
 }
 
+void __cdecl RpLightSetColor( RpLight *light, const RwColorFloat& color )   { light->SetColor( color ); }
+void __cdecl RpLightGetColor( RpLight *light, RwColorFloat& colorOut )      { colorOut = light->color; }
 /*=========================================================
     RpLightCreate
 
@@ -244,4 +228,79 @@ RpLight* RpLightClone( const RpLight *src )
     // Clone plugin details.
     ((RwPluginRegistry <RpLight>*)0x008D62F8)->CloneObject( obj, src );
     return obj;
+}
+
+/*===================================================================
+    RpLight Frustum Caching Plugin
+===================================================================*/
+
+static int _lightFrustumCachePluginOffset = -1;
+
+struct _lightFrustumCache
+{
+    bool isInsideFrustum;
+};
+
+static RpLight* __cdecl _RpLightFrustumCacheConstructor( RpLight *light, size_t pluginOffset, unsigned int pluginId )
+{
+    _lightFrustumCache *cache = RW_PLUGINSTRUCT <_lightFrustumCache> ( light, pluginOffset );
+
+    cache->isInsideFrustum = true;
+    return light;
+}
+
+static void __cdecl _RpLightFrustumCacheDestructor( RpLight *light, size_t pluginOffset )
+{
+    return;
+}
+
+bool __cdecl RpLightIsFrustumCachable( RpLight *light )
+{
+    unsigned char subType = light->subtype;
+
+    if ( !light->parent )
+        return false;
+
+    return subType == LIGHT_TYPE_POINT ||
+           subType == LIGHT_TYPE_SPOT_1 ||
+           subType == LIGHT_TYPE_SPOT_2;
+}
+
+bool __cdecl RpLightIsInsideFrustum( RpLight *light )
+{
+    return RW_PLUGINSTRUCT <_lightFrustumCache> ( light, _lightFrustumCachePluginOffset )->isInsideFrustum;
+}
+
+void __cdecl RpLightPerformFrustumCaching( void )
+{
+    RwInterface *rwInterface = RenderWare::GetInterface();
+
+    RwScene *scene = *p_gtaScene;
+    CCameraSAInterface& camera = Camera::GetInterface();
+
+    if ( !scene )
+        return;
+
+    LIST_FOREACH_BEGIN( RpLight, scene->localLights.root, sceneLights )
+        if ( RpLightIsFrustumCachable( item ) )
+        {
+            _lightFrustumCache *cache = RW_PLUGINSTRUCT <_lightFrustumCache> ( item, _lightFrustumCachePluginOffset );
+
+            cache->isInsideFrustum = camera.IsSphereVisible( item->parent->GetLTM().vPos, item->radius, (void*)0x00B6FA74 );
+        }
+    LIST_FOREACH_END
+}
+
+// General light initialization
+void __cdecl RpLightInit( void )
+{
+    _lightFrustumCachePluginOffset = RpLightRegisterPlugin( sizeof( _lightFrustumCache ), 0xDEAD1005,
+        (RpLightPluginConstructor)_RpLightFrustumCacheConstructor,
+        (RpLightPluginDestructor)_RpLightFrustumCacheDestructor,
+        NULL
+    );
+}
+
+void __cdecl RpLightShutdown( void )
+{
 }

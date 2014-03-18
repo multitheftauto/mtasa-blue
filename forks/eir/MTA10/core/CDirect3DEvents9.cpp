@@ -249,10 +249,16 @@ void CDirect3DEvents9::CheckForScreenShot ( void )
 // May change render states for custom renderings
 //
 /////////////////////////////////////////////////////////////
+CShaderItem *g_forceShader = NULL;
+
 HRESULT CDirect3DEvents9::OnDrawPrimitive ( IDirect3DDevice9 *pDevice, D3DPRIMITIVETYPE PrimitiveType,UINT StartVertex,UINT PrimitiveCount )
 {
     if ( ms_DiagnosticDebug == EDiagnosticDebug::GRAPHICS_6734 )
         return pDevice->DrawPrimitive ( PrimitiveType, StartVertex, PrimitiveCount );
+
+    // Force rendering with the force shader!
+    if ( CShaderItem *forceShader = g_forceShader )
+        return DrawPrimitiveShader( pDevice, PrimitiveType, StartVertex, PrimitiveCount, forceShader, false );
 
     // Any shader for this texture ?
     SShaderItemLayers* pLayers = CGraphics::GetSingleton ().GetRenderItemManager ()->GetAppliedShaderForD3DData ( (CD3DDUMMY*)g_pDeviceState->TextureState[0].Texture );
@@ -389,6 +395,10 @@ HRESULT CDirect3DEvents9::OnDrawIndexedPrimitive ( IDirect3DDevice9 *pDevice, D3
 {
     if ( ms_DiagnosticDebug == EDiagnosticDebug::GRAPHICS_6734 )
         return pDevice->DrawIndexedPrimitive ( PrimitiveType, BaseVertexIndex, MinVertexIndex, NumVertices, startIndex, primCount );
+
+    // Force rendering with the force shader!
+    if ( CShaderItem *forceShader = g_forceShader )
+        return DrawIndexedPrimitiveShader( pDevice, PrimitiveType, BaseVertexIndex, MinVertexIndex, NumVertices, startIndex, primCount, forceShader, false );
 
     // Apply anisotropic filtering if required
     if ( ms_RequiredAnisotropicLevel > 1 )

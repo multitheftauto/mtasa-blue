@@ -67,7 +67,7 @@ RwTexture* _CreateVehicleNameplateTexture( const char *plateText, unsigned char 
         64,     // 64 pixels wide
         16,     // 16 pixels high
         32,     // 32bit color depth
-        0x604
+        (RwRasterType)0x604
     );
 
     // Creation of our plate texture could fail.
@@ -123,7 +123,9 @@ RwTexture* _CreateVehicleNameplateTexture( const char *plateText, unsigned char 
 RwTexture* CreateVehicleNameplateTexture( const char *plateText, unsigned char plateDesign )
 {
     // Skip our code if not processing a VehicleModelInfo
-    if ( ms_pProcessingVehicleModelInfo == NULL )
+    bool hasProcessingInfo = ( ms_pProcessingVehicleModelInfo != NULL );
+
+    if ( hasProcessingInfo )
     {
         // Use LastGeneratedPlateTexture if we have one
         RwTexture *lastTex = ms_pLastGeneratedPlateText;
@@ -135,8 +137,12 @@ RwTexture* CreateVehicleNameplateTexture( const char *plateText, unsigned char p
     // Call original
     RwTexture *genTex = _CreateVehicleNameplateTexture( plateText, plateDesign );
 
-    // Store the last generated texture.
-    ms_pLastGeneratedPlateText = genTex;
+    if ( hasProcessingInfo )
+    {
+        // Store the last generated texture.
+        ms_pLastGeneratedPlateText = genTex;
+    }
+
     return genTex;
 }
 
@@ -225,7 +231,7 @@ static bool RwMaterialSetLicensePlate( RpMaterial *mat, _licensePlate *plate )
     Binary offsets:
         (1.0 US and 1.0 EU): 0x006FE0D0
 =========================================================*/
-static bool RwAtomicSetLicensePlate( RpAtomic *child, _licensePlate *plate )
+static int RwAtomicSetLicensePlate( RpAtomic *child, _licensePlate *plate )
 {
     child->geometry->ForAllMateria( RwMaterialSetLicensePlate, plate );
     return true;
@@ -309,7 +315,7 @@ void CVehicleModelInfoSAInterface::InitNameplate( void )
         Creates the nameplate texture that should be rendered
         with this vehicle.
     Binary offsets:
-        (1.0 US and 1.0 EU): 0x006FDEA0
+        (1.0 US and 1.0 EU): 0x006D10E0
 =========================================================*/
 void CVehicleSAInterface::CreateLicensePlate( CVehicleModelInfoSAInterface *info )
 {

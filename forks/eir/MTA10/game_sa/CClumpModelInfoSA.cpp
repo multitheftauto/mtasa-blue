@@ -116,7 +116,7 @@ RwObject* CClumpModelInfoSAInterface::CreateRwObjectEx( RwMatrix& mat )
     Binary offsets:
         (1.0 US and 1.0 EU): 0x004C5140
 =========================================================*/
-bool RpSetAtomicAnimHierarchy( RpAtomic *child, RpAnimHierarchy *anim )
+static int RpSetAtomicAnimHierarchy( RpAtomic *child, RpAnimHierarchy *anim )
 {
     child->anim = anim;
     return false;
@@ -255,7 +255,7 @@ CColModelSAInterface* CClumpModelInfoSAInterface::GetCollision( void )
     Binary offsets:
         (1.0 US and 1.0 EU): 0x004C4F70
 =========================================================*/
-bool RwAtomicSetupAnimHierarchy( RpAtomic *child, RpAnimHierarchy *anim )
+static int RwAtomicSetupAnimHierarchy( RpAtomic *child, RpAnimHierarchy *anim )
 {
     if ( anim )
     {

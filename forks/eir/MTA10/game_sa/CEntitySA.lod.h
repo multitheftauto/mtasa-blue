@@ -15,4 +15,7 @@
 // Exports.
 int OnMY_CVisibilityPlugins_CalculateFadingAtomicAlpha_Pre( CBaseModelInfoSAInterface* pModelInfo, const CEntitySAInterface* pEntity, float fDist );
 
+void OnMY_CRenderer_SetupEntityVisibility_Pre( CEntitySAInterface* pEntity, float& fValue );
+void OnMY_CRenderer_SetupEntityVisibility_Post( int result, CEntitySAInterface* pEntity, float& fDist );
+
 #endif //_ENTITY_LEVEL_OF_DETAIL_

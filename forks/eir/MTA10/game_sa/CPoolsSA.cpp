@@ -686,26 +686,26 @@ int CPoolsSA::GetPoolCapacity ( ePools pool )
     DWORD cPtr = NULL;
     switch ( pool )
     {
-        case BUILDING_POOL:             iPtr = 0x55105F; break;
-        case PED_POOL:                  iPtr = 0x550FF2; break;
-        case OBJECT_POOL:               iPtr = 0x551097; break;
-        case DUMMY_POOL:                iPtr = 0x5510CF; break;
-        case VEHICLE_POOL:              cPtr = 0x55102A; break;
-        case COL_MODEL_POOL:            iPtr = 0x551107; break;
-        case TASK_POOL:                 iPtr = 0x55113F; break;
-        case EVENT_POOL:                iPtr = 0x551177; break;
-        case TASK_ALLOCATOR_POOL:       cPtr = 0x55124E; break;
-        case PED_INTELLIGENCE_POOL:     iPtr = 0x551283; break;
-        case PED_ATTRACTOR_POOL:        cPtr = 0x5512BC; break;
-        case ENTRY_INFO_NODE_POOL:      iPtr = 0x550FBA; break;
-        case NODE_ROUTE_POOL:           cPtr = 0x551219; break;
-        case PATROL_ROUTE_POOL:         cPtr = 0x5511E4; break;
-        case POINT_ROUTE_POOL:          cPtr = 0x5511AF; break;
-        case POINTER_DOUBLE_LINK_POOL:  iPtr = 0x550F82; break;
-        case POINTER_SINGLE_LINK_POOL:  iPtr = 0x550F46; break;
-        case ENV_MAP_MATERIAL_POOL:     iPtr = 0x5DA08E; break;
-        case ENV_MAP_ATOMIC_POOL:       iPtr = 0x5DA0CA; break;
-        case SPEC_MAP_MATERIAL_POOL:    iPtr = 0x5DA106; break;
+        case BUILDING_POOL:                 return Pools::GetBuildingPool()->GetMax();
+        case PED_POOL:                      return Pools::GetPedPool()->GetMax();
+        case OBJECT_POOL:                   return Pools::GetObjectPool()->GetMax();
+        case DUMMY_POOL:                    return Pools::GetDummyPool()->GetMax();
+        case VEHICLE_POOL:                  return Pools::GetVehiclePool()->GetMax();
+        case COL_MODEL_POOL:                return Pools::GetColModelPool()->GetMax();
+        case TASK_POOL:                     return Pools::GetTaskPool()->GetMax();
+        case EVENT_POOL:                    return Pools::GetEventPool()->GetMax();
+        case TASK_ALLOCATOR_POOL:           return Pools::GetTaskAllocatorPool()->GetMax();
+        case PED_INTELLIGENCE_POOL:         return Pools::GetPedIntelligencePool()->GetMax();
+        case PED_ATTRACTOR_POOL:            return Pools::GetPedAttractorPool()->GetMax();
+        case ENTRY_INFO_NODE_POOL:          return Pools::GetEntryInfoPool()->GetMax();
+        case NODE_ROUTE_POOL:               return Pools::GetNodeRoutePool()->GetMax();
+        case PATROL_ROUTE_POOL:             return Pools::GetPatrolRoutePool()->GetMax();
+        case POINT_ROUTE_POOL:              return Pools::GetPointRoutePool()->GetMax();
+        case POINTER_DOUBLE_LINK_POOL:      return Pools::GetPtrNodeDoublePool()->GetMax();
+        case POINTER_SINGLE_LINK_POOL:      return Pools::GetPtrNodeSinglePool()->GetMax();
+        case ENV_MAP_MATERIAL_POOL:         return RenderWare::GetEnvMapMaterialPool()->GetMax();
+        case ENV_MAP_ATOMIC_POOL:           return RenderWare::GetEnvMapAtomicPool()->GetMax();
+        case SPEC_MAP_MATERIAL_POOL:        return RenderWare::GetSpecMapMaterialPool()->GetMax();
     }
     if ( iPtr )
         return *(int*)iPtr;
@@ -759,26 +759,26 @@ int CPoolsSA::GetNumberOfUsedSpaces ( ePools pool )
 {
     switch ( pool )
     {
-    case BUILDING_POOL:                 return (*ppBuildingPool)->GetCount();
-    case PED_POOL:                      return (*ppPedPool)->GetCount();
-    case OBJECT_POOL:                   return (*ppObjectPool)->GetCount();
-    case DUMMY_POOL:                    return (*ppDummyPool)->GetCount();
-    case VEHICLE_POOL:                  return (*ppVehiclePool)->GetCount();
-    case COL_MODEL_POOL:                return (*ppColModelPool)->GetCount();
-    case TASK_POOL:                     return (*ppTaskPool)->GetCount();
-    case EVENT_POOL:                    return (*ppEventPool)->GetCount();
-    case TASK_ALLOCATOR_POOL:           return (*ppTaskAllocatorPool)->GetCount();
-    case PED_INTELLIGENCE_POOL:         return (*ppPedIntelligencePool)->GetCount();
-    case PED_ATTRACTOR_POOL:            return (*ppPedAttractorPool)->GetCount();
-    case ENTRY_INFO_NODE_POOL:          return (*ppEntryInfoPool)->GetCount();
-    case NODE_ROUTE_POOL:               return (*ppNodeRoutePool)->GetCount();
-    case PATROL_ROUTE_POOL:             return (*ppPatrolRoutePool)->GetCount();
-    case POINT_ROUTE_POOL:              return (*ppPointRoutePool)->GetCount();
-    case POINTER_DOUBLE_LINK_POOL:      return (*ppPtrNodeDoublePool)->GetCount();
-    case POINTER_SINGLE_LINK_POOL:      return (*ppPtrNodeSinglePool)->GetCount();
-    case ENV_MAP_MATERIAL_POOL:         return (*ppEnvMapMaterialPool)->GetCount();
-    case ENV_MAP_ATOMIC_POOL:           return (*ppEnvMapAtomicPool)->GetCount();
-    case SPEC_MAP_MATERIAL_POOL:        return (*ppSpecMapMaterialPool)->GetCount();
+    case BUILDING_POOL:                 return Pools::GetBuildingPool()->GetCount();
+    case PED_POOL:                      return Pools::GetPedPool()->GetCount();
+    case OBJECT_POOL:                   return Pools::GetObjectPool()->GetCount();
+    case DUMMY_POOL:                    return Pools::GetDummyPool()->GetCount();
+    case VEHICLE_POOL:                  return Pools::GetVehiclePool()->GetCount();
+    case COL_MODEL_POOL:                return Pools::GetColModelPool()->GetCount();
+    case TASK_POOL:                     return Pools::GetTaskPool()->GetCount();
+    case EVENT_POOL:                    return Pools::GetEventPool()->GetCount();
+    case TASK_ALLOCATOR_POOL:           return Pools::GetTaskAllocatorPool()->GetCount();
+    case PED_INTELLIGENCE_POOL:         return Pools::GetPedIntelligencePool()->GetCount();
+    case PED_ATTRACTOR_POOL:            return Pools::GetPedAttractorPool()->GetCount();
+    case ENTRY_INFO_NODE_POOL:          return Pools::GetEntryInfoPool()->GetCount();
+    case NODE_ROUTE_POOL:               return Pools::GetNodeRoutePool()->GetCount();
+    case PATROL_ROUTE_POOL:             return Pools::GetPatrolRoutePool()->GetCount();
+    case POINT_ROUTE_POOL:              return Pools::GetPointRoutePool()->GetCount();
+    case POINTER_DOUBLE_LINK_POOL:      return Pools::GetPtrNodeDoublePool()->GetCount();
+    case POINTER_SINGLE_LINK_POOL:      return Pools::GetPtrNodeSinglePool()->GetCount();
+    case ENV_MAP_MATERIAL_POOL:         return RenderWare::GetEnvMapMaterialPool()->GetCount();
+    case ENV_MAP_ATOMIC_POOL:           return RenderWare::GetEnvMapAtomicPool()->GetCount();
+    case SPEC_MAP_MATERIAL_POOL:        return RenderWare::GetSpecMapMaterialPool()->GetCount();
     }
 
     return -1;

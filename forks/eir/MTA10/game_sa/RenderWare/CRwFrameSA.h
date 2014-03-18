@@ -46,7 +46,7 @@ public:
     childList_t                     m_children;
 
     // Static accessors
-    static bool RwFrameObjectAssign( RwObject *obj, CRwFrameSA *parent );
+    static RwObject* RwFrameObjectAssign( RwObject *obj, CRwFrameSA *parent );
 
 private:
     objectList_t                    m_objects;

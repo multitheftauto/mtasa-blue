@@ -27,10 +27,6 @@ class CColModelSAInterface;
 /** Renderware functions                                                    **/
 /*****************************************************************************/
 
-/* RenderWare macros */
-#define RpGetFrame(__c)            ((RwFrame*)(((RwObject *)(__c))->parent))
-#define RpSetFrame(__c,__f)        ((((RwObject *)(__c))->parent) = (void *)(__f))
-
 /* RenderWare function defines */
 typedef RwError*                (__cdecl *RwErrorGet_t)                         (RwError *code);
 
@@ -70,9 +66,6 @@ typedef RwFrame*                (__cdecl *RwFrameCreate_t)                      
 typedef RwFrame*                (__cdecl *RwFrameCloneRecursive_t)              (const RwFrame *frame, const RwFrame *root);
 typedef void                    (__cdecl *RwFrameCloneHierarchy_t)              (RwFrame *frame);
 typedef const RwMatrix*         (__cdecl *RwFrameGetLTM_t)                      (RwFrame *frame);
-typedef RwFrame*                (__cdecl *RwFrameAddChild_t)                    (RwFrame *parent, RwFrame *child);
-typedef RwFrame*                (__cdecl *RwFrameRemoveChild_t)                 (RwFrame *child);
-typedef int                     (__cdecl *RwFrameForAllObjects_t)               (RwFrame *frame, void *callback, void *ud);
 typedef RwFrame*                (__cdecl *RwFrameTranslate_t)                   (RwFrame *frame, const RwV3d *v, RwTransformOrder order);
 typedef RwFrame*                (__cdecl *RwFrameScale_t)                       (RwFrame *frame, const RwV3d *v, RwTransformOrder order);
 typedef void                    (__cdecl *RwFrameOrient_t)                      (RwFrame *frame, float unk, float unk2, CVector& unk3);
@@ -82,10 +75,10 @@ typedef void                    (__cdecl *RwFrameDestroy_t)                     
 // Material functions
 typedef RpMaterial*             (__cdecl *RpMaterialCreate_t)                   (void);
 typedef int                     (__cdecl *RpMaterialDestroy_t)                  (RpMaterial *mat);
+typedef void                    (__cdecl *RpD3D9SetSurfaceProperties_t)         (RpMaterialLighting& matLight, RwColor& matColor, unsigned int renderFlags);
 
 // Geometry functions
 typedef RpGeometry*             (__cdecl *RpGeometryCreate_t)                   (int numverts, int numtriangles, unsigned int format);
-typedef void                    (__cdecl *RpGeometryAddRef_t)                   (RpGeometry *geom);
 typedef RpSkeleton*             (__cdecl *RpGeometryGetSkeleton_t)              (RpGeometry *geom);
 typedef const RpGeometry*       (__cdecl *RpGeometryTriangleSetVertexIndices_t) (const RpGeometry *geo, RpTriangle *tri, unsigned short v1, unsigned short v2, unsigned short v3);
 typedef RpGeometry*             (__cdecl *RpGeometryUnlock_t)                   (RpGeometry *geo);
@@ -98,7 +91,6 @@ typedef int                     (__cdecl *RpGeometryDestroy_t)                  
 typedef RpAtomic*               (__cdecl *RpAtomicCreate_t)                     (void);
 typedef RpAtomic*               (__cdecl *RpAtomicClone_t)                      (const RpAtomic *atomic);
 typedef RpAtomic*               (__cdecl *RpAtomicSetGeometry_t)                (RpAtomic *atomic, RpGeometry *geometry, unsigned int flags);
-typedef RpAtomic*               (__cdecl *RpAtomicSetFrame_t)                   (RpAtomic *atomic, RwFrame *frame);
 typedef RpAtomic*               (__cdecl *RpAtomicRender_t)                     (RpAtomic *atomic);
 typedef const RwSphere&         (__cdecl *RpAtomicGetWorldBoundingSphere_t)     (RpAtomic *atomic);
 typedef void                    (__cdecl *RpAtomicSetupObjectPipeline_t)        (RpAtomic *atomic);
@@ -107,7 +99,6 @@ typedef int                     (__cdecl *RpAtomicDestroy_t)                    
 
 // Light functions
 typedef RpLight*                (__cdecl *RpLightSetRadius_t)                   (RpLight *light, float radius);
-typedef RpLight*                (__cdecl *RpLightSetColor_t)                    (RpLight *light, const RwColorFloat *color);
 typedef float                   (__cdecl *RpLightGetConeAngle_t)                (const RpLight *light);
 typedef void                    (__cdecl *RpLightDestroy_t)                     (RpLight *light);
 
@@ -117,14 +108,8 @@ typedef void                    (__cdecl *RwCameraDestroy_t)                    
 
 // Clump functions
 typedef RpClump *               (__cdecl *RpClumpClone_t)                       (const RpClump *clone);
-typedef RpClump*                (__cdecl *RpClumpAddAtomic_t)                   (RpClump *clump, RpAtomic *atomic);
-typedef RpClump*                (__cdecl *RpClumpAddLight_t)                    (RpClump *clump, RpLight *light);
-typedef int                     (__cdecl *RpClumpGetNumAtomics_t)               (RpClump *clump);
-typedef RpClump*                (__cdecl *RpClumpRemoveAtomic_t)                (RpClump *clump, RpAtomic *atomic);
-typedef RpClump*                (__cdecl *RpClumpForAllAtomics_t)               (RpClump *clump, void *callback, void *pData);
 typedef void                    (__cdecl *RpClumpGetBoneTransform_t)            (RpClump *clump, CVector *offsets);
 typedef void                    (__cdecl *RpClumpSetupFrameCallback_t)          (RpClump *clump, unsigned int hierarchyId);
-typedef void                    (__cdecl *RpClumpRender_t)                      (RpClump *clump);
 typedef RpClump*                (__cdecl *RpClumpStreamRead_t)                  (RwStream *stream);
 typedef int                     (__cdecl *RpClumpDestroy_t)                     (RpClump *clump);
 
@@ -140,13 +125,7 @@ typedef int                     (__cdecl *RwTextureDestroy_t)                   
 typedef int                     (__cdecl *RpD3D9SetTexture_t)                   (RwTexture *texture, unsigned int index);
 
 // TexDictionary functions
-typedef RwTexDictionary*        (__cdecl *RwTexDictionarySetCurrent_t)          (RwTexDictionary *dict);
-typedef const RwTexDictionary*  (__cdecl *RwTexDictionaryForAllTextures_t)      (const RwTexDictionary *dict, void *callback, void *data);
-typedef RwTexture*              (__cdecl *RwTexDictionaryAddTexture_t)          (RwTexDictionary *dict, RwTexture *texture);
-typedef RwTexDictionary*        (__cdecl *RwTexDictionaryGetCurrent_t)          (void);
-typedef RwTexture*              (__cdecl *RwTexDictionaryFindNamedTexture_t)    (RwTexDictionary *dict, const char *name);
 typedef RwTexDictionary*        (__cdecl *RwTexDictionaryStreamRead_t)          (RwStream *stream);
-typedef RwTexDictionary*        (__cdecl *RwTexDictionaryGtaStreamRead_t)       (RwStream *stream);
 typedef int                     (__cdecl *RwTexDictionaryDestroy_t)             (RwTexDictionary *txd);
 
 // Scene functions
@@ -219,9 +198,6 @@ RWFUNC ( RwFrameCloneRecursive_t                    RwFrameCloneRecursive       
 RWFUNC ( RwFrameCloneHierarchy_t                    RwFrameCloneHierarchy                   , (RwFrameCloneHierarchy_t)                 invalid_ptr )
 RWFUNC ( RwFrameGetLTM_t                            RwFrameGetLTM                           , (RwFrameGetLTM_t)                         invalid_ptr )
 RWFUNC ( RwFrameSetIdentity_t                       RwFrameSetIdentity                      , (RwFrameSetIdentity_t)                    invalid_ptr )
-RWFUNC ( RwFrameAddChild_t                          RwFrameAddChild                         , (RwFrameAddChild_t)                       invalid_ptr )
-RWFUNC ( RwFrameRemoveChild_t                       RwFrameRemoveChild                      , (RwFrameRemoveChild_t)                    invalid_ptr )
-RWFUNC ( RwFrameForAllObjects_t                     RwFrameForAllObjects                    , (RwFrameForAllObjects_t)                  invalid_ptr )
 RWFUNC ( RwFrameScale_t                             RwFrameScale                            , (RwFrameScale_t)                          invalid_ptr )
 RWFUNC ( RwFrameOrient_t                            RwFrameOrient                           , (RwFrameOrient_t)                         invalid_ptr )
 RWFUNC ( RwFrameTranslate_t                         RwFrameTranslate                        , (RwFrameTranslate_t)                      invalid_ptr )
@@ -232,6 +208,7 @@ RWFUNC ( RwFrameRegisterPluginStream_t              RwFrameRegisterPluginStream 
 // Material functions
 RWFUNC ( RpMaterialCreate_t                         RpMaterialCreate                        , (RpMaterialCreate_t)                      invalid_ptr )
 RWFUNC ( RpMaterialDestroy_t                        RpMaterialDestroy                       , (RpMaterialDestroy_t)                     invalid_ptr )
+RWFUNC ( RpD3D9SetSurfaceProperties_t               RpD3D9SetSurfaceProperties              , (RpD3D9SetSurfaceProperties_t)            invalid_ptr )
 RWFUNC ( RpMaterialRegisterPlugin_t                 RpMaterialRegisterPlugin                , (RpMaterialRegisterPlugin_t)              invalid_ptr )
 RWFUNC ( RpMaterialRegisterPluginStream_t           RpMaterialRegisterPluginStream          , (RpMaterialRegisterPluginStream_t)        invalid_ptr )
 
@@ -250,7 +227,6 @@ RWFUNC ( RpGeometryRegisterPluginStream_t           RpGeometryRegisterPluginStre
 // Atomic functions
 RWFUNC ( RpAtomicCreate_t                           RpAtomicCreate                          , (RpAtomicCreate_t)                        invalid_ptr )
 RWFUNC ( RpAtomicClone_t                            RpAtomicClone                           , (RpAtomicClone_t)                         invalid_ptr )
-RWFUNC ( RpAtomicSetFrame_t                         RpAtomicSetFrame                        , (RpAtomicSetFrame_t)                      invalid_ptr )
 RWFUNC ( RpAtomicSetGeometry_t                      RpAtomicSetGeometry                     , (RpAtomicSetGeometry_t)                   invalid_ptr )
 RWFUNC ( RpAtomicGetWorldBoundingSphere_t           RpAtomicGetWorldBoundingSphere          , (RpAtomicGetWorldBoundingSphere_t)        invalid_ptr )
 RWFUNC ( RpAtomicSetupObjectPipeline_t              RpAtomicSetupObjectPipeline             , (RpAtomicSetupObjectPipeline_t)           invalid_ptr )
@@ -262,7 +238,6 @@ RWFUNC ( RpAtomicRegisterPluginStream_t             RpAtomicRegisterPluginStream
 
 // Light functions
 RWFUNC ( RpLightSetRadius_t                         RpLightSetRadius                        , (RpLightSetRadius_t)                      invalid_ptr )
-RWFUNC ( RpLightSetColor_t                          RpLightSetColor                         , (RpLightSetColor_t)                       invalid_ptr )
 RWFUNC ( RpLightGetConeAngle_t                      RpLightGetConeAngle                     , (RpLightGetConeAngle_t)                   invalid_ptr )
 RWFUNC ( RpLightDestroy_t                           RpLightDestroy                          , (RpLightDestroy_t)                        invalid_ptr )
 RWFUNC ( RpLightRegisterPlugin_t                    RpLightRegisterPlugin                   , (RpLightRegisterPlugin_t)                 invalid_ptr )
@@ -276,14 +251,8 @@ RWFUNC ( RwCameraRegisterPluginStream_t             RwCameraRegisterPluginStream
 
 // Clump functions
 RWFUNC ( RpClumpClone_t                             RpClumpClone                            , (RpClumpClone_t)                          invalid_ptr )
-RWFUNC ( RpClumpAddAtomic_t                         RpClumpAddAtomic                        , (RpClumpAddAtomic_t)                      invalid_ptr )
-RWFUNC ( RpClumpAddLight_t                          RpClumpAddLight                         , (RpClumpAddLight_t)                       invalid_ptr )
-RWFUNC ( RpClumpRemoveAtomic_t                      RpClumpRemoveAtomic                     , (RpClumpRemoveAtomic_t)                   invalid_ptr )
-RWFUNC ( RpClumpGetNumAtomics_t                     RpClumpGetNumAtomics                    , (RpClumpGetNumAtomics_t)                  invalid_ptr )
 RWFUNC ( RpClumpGetBoneTransform_t                  RpClumpGetBoneTransform                 , (RpClumpGetBoneTransform_t)               invalid_ptr )
 RWFUNC ( RpClumpSetupFrameCallback_t                RpClumpSetupFrameCallback               , (RpClumpSetupFrameCallback_t)             invalid_ptr )
-RWFUNC ( RpClumpForAllAtomics_t                     RpClumpForAllAtomics                    , (RpClumpForAllAtomics_t)                  invalid_ptr )
-RWFUNC ( RpClumpRender_t                            RpClumpRender                           , (RpClumpRender_t)                         invalid_ptr )
 RWFUNC ( RpClumpStreamRead_t                        RpClumpStreamRead                       , (RpClumpStreamRead_t)                     invalid_ptr )
 RWFUNC ( RpClumpDestroy_t                           RpClumpDestroy                          , (RpClumpDestroy_t)                        invalid_ptr )
 RWFUNC ( RpClumpRegisterPlugin_t                    RpClumpRegisterPlugin                   , (RpClumpRegisterPlugin_t)                 invalid_ptr )
@@ -305,13 +274,7 @@ RWFUNC ( RwTextureRegisterPlugin_t                  RwTextureRegisterPlugin     
 RWFUNC ( RwTextureRegisterPluginStream_t            RwTextureRegisterPluginStream           , (RwTextureRegisterPluginStream_t)         invalid_ptr )
 
 // TexDictionary functions
-RWFUNC ( RwTexDictionaryAddTexture_t                RwTexDictionaryAddTexture               , (RwTexDictionaryAddTexture_t)             invalid_ptr )
-RWFUNC ( RwTexDictionaryGetCurrent_t                RwTexDictionaryGetCurrent               , (RwTexDictionaryGetCurrent_t)             invalid_ptr )
-RWFUNC ( RwTexDictionarySetCurrent_t                RwTexDictionarySetCurrent               , (RwTexDictionarySetCurrent_t)             invalid_ptr )
-RWFUNC ( RwTexDictionaryForAllTextures_t            RwTexDictionaryForAllTextures           , (RwTexDictionaryForAllTextures_t)         invalid_ptr )
-RWFUNC ( RwTexDictionaryFindNamedTexture_t          RwTexDictionaryFindNamedTexture         , (RwTexDictionaryFindNamedTexture_t)       invalid_ptr )
 RWFUNC ( RwTexDictionaryStreamRead_t                RwTexDictionaryStreamRead               , (RwTexDictionaryStreamRead_t)             invalid_ptr )
-RWFUNC ( RwTexDictionaryGtaStreamRead_t             RwTexDictionaryGtaStreamRead            , (RwTexDictionaryGtaStreamRead_t)          invalid_ptr )
 RWFUNC ( RwTexDictionaryDestroy_t                   RwTexDictionaryDestroy                  , (RwTexDictionaryDestroy_t)                invalid_ptr )
 RWFUNC ( RwTexDictionaryRegisterPlugin_t            RwTexDictionaryRegisterPlugin           , (RwTexDictionaryRegisterPlugin_t)         invalid_ptr )
 RWFUNC ( RwTexDictionaryRegisterPluginStream_t      RwTexDictionaryRegisterPluginStream     , (RwTexDictionaryRegisterPluginStream_t)   invalid_ptr )
@@ -356,35 +319,4 @@ RWFUNC ( LoadCollisionModelVer3_t       LoadCollisionModelVer3            , (Loa
 RWFUNC ( LoadCollisionModelVer4_t       LoadCollisionModelVer4            , (LoadCollisionModelVer4_t)          invalid_ptr )
 RWFUNC ( CClothesBuilder_CopyTexture_t  CClothesBuilder_CopyTexture       , (CClothesBuilder_CopyTexture_t)     invalid_ptr )
 
-/*****************************************************************************/
-/** Function inlines                                                        **/
-/*****************************************************************************/
-
-// Matrix copying
-inline void RwFrameCopyMatrix ( RwFrame * dst, RwFrame * src )
-{
-    dst->modelling = src->modelling;
-    dst->ltm = src->ltm;
-}
-
-// Recursive RwFrame children searching function
-inline RwFrame * RwFrameFindFrame ( RwFrame * parent, const char * name ) {
-    RwFrame * ret = parent->child, * buf;
-    while ( ret != NULL ) {
-        // recurse into the child
-        if ( ret->child != NULL ) {         
-            buf = RwFrameFindFrame ( ret, name );
-            if ( buf != NULL ) return buf;
-        }
-
-        // search through the children frames
-        if ( strncmp ( &ret->szName[0], name, 16 ) == 0 ) {
-            // found it
-            return ret;
-        }
-        ret = ret->next;
-    }
-    return NULL;
-}
-
-#endif
+#endif //__GAMESA_RENDERWARE

@@ -79,7 +79,9 @@ struct RpAtomic : public RwObjectFrame
 
     unsigned short          modelId;            // 124
     unsigned short          componentFlags;     // 126, used for components (ok/dam)
-    BYTE                    pad3[4];            // 128
+
+    BYTE                    pad3[4];            // 128, special FX handle (4 bytes plugin struct)
+
     CEnvMapAtomicSA*        envMap;             // 132, atomic environment map plugin, allocated from pool (on demand)
     unsigned int            pipeline;           // 136
 
@@ -101,5 +103,8 @@ struct RpAtomicContainer
     RpAtomic*   atomic;
     char        szName[17];
 };
+
+// Atomic API.
+RpAtomic* __cdecl RpAtomicSetFrame( RpAtomic *atomic, RwFrame *frame );
 
 #endif //_RENDERWARE_ATOMIC_

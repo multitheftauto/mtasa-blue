@@ -185,12 +185,20 @@ CRenderWareSA::CRenderWareSA ( eGameVersion version )
     // Initialize sub modules
     RenderWareMem_Init();
     RenderWareRender_Init();
+    RwStream_Init();
+    RenderCallbacks_Init();
+    RenderWareLighting_Init();
+    RenderWareUtilsD3D9_Init();
 }
 
 
 CRenderWareSA::~CRenderWareSA ( void )
 {
     // Shutdown sub modules
+    RenderWareUtilsD3D9_Shutdown();
+    RenderWareLighting_Shutdown();
+    RenderCallbacks_Shutdown();
+    RwStream_Shutdown();
     RenderWareRender_Shutdown();
     RenderWareMem_Shutdown();
 
@@ -869,4 +877,24 @@ CD3DDUMMY* GetDeletedMapKey ( CD3DDUMMY** )
 RwFrame * CRenderWareSA::GetFrameFromName ( RpClump * pRoot, SString strName )
 {
     return RwFrameFindFrame ( RpGetFrame ( pRoot ), strName );
+}
+
+void CRenderWareSA::EnableEnvMapRendering( bool enabled )
+{
+    RenderCallbacks::SetEnvMapRenderingEnabled( enabled );
+}
+
+bool CRenderWareSA::IsEnvMapRenderingEnabled( void ) const
+{
+    return RenderCallbacks::IsEnvMapRenderingEnabled();
+}
+
+void CRenderWareSA::SetWorldRenderMode( eWorldRenderMode mode )
+{
+    Entity::SetWorldRenderMode( mode );
+}
+
+eWorldRenderMode CRenderWareSA::GetWorldRenderMode( void ) const
+{
+    return Entity::GetWorldRenderMode();
 }

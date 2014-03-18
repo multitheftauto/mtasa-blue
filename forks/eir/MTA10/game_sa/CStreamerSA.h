@@ -120,6 +120,9 @@ namespace Streamer
     );
     void __cdecl RequestSquaredSectorEntities( const CVector& reqPos, unsigned int reqFlags );
     void __cdecl RequestAdvancedSquaredSectorEntities( const CVector& reqPos, unsigned int reqFlags );
+
+    // General globals.
+    inline float& GetWorldFarclip( void )       { return *(float*)0x00B76848; }
 };
 
 // Module management routines.

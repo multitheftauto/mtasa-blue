@@ -11,7 +11,7 @@
 *****************************************************************************/
 
 #include <StdInc.h>
-#include <gamesa_renderware.h>
+#include "../gamesa_renderware.h"
 
 // MTA streamline extensions for multi-threaded calculations
 static RpGeometry* RpGeometryStreamlineConstructor( RpGeometry *geom, size_t )

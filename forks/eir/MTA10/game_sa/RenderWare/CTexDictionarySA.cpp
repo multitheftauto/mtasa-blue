@@ -16,10 +16,10 @@
 
 extern CBaseModelInfoSAInterface** ppModelInfo;
 
-static bool RwTexDictionaryAssign( RwTexture *tex, CTexDictionarySA *txd )
+static RwTexture* RwTexDictionaryAssign( RwTexture *tex, CTexDictionarySA *txd )
 {
     new CTextureSA( txd, tex );
-    return true;
+    return tex;
 }
 
 CTexDictionarySA::CTexDictionarySA( RwTexDictionary *txd ) : CRwObjectSA( txd )

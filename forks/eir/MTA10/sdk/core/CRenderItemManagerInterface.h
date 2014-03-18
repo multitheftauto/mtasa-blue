@@ -368,6 +368,15 @@ class CShaderItem : public CMaterialItem
     virtual void    SetTransform            ( const SShaderTransform& transform );
     virtual bool    GetUsesVertexShader     ( void );
 
+    virtual void    Begin                   ( unsigned int& numPasses );
+    virtual void    BeginPass               ( unsigned int pass );
+    virtual void    EndPass                 ( void );
+    virtual bool    IsComputing             ( void );
+    virtual void    End                     ( void );
+
+    virtual void    UpdateParams            ( void );
+    virtual void    UpdatePipelineParams    ( void );
+
     CEffectWrap*        m_pEffectWrap;
     float               m_fPriority;
     uint                m_uiCreateTime;
@@ -414,6 +423,8 @@ class CShaderInstance : public CMaterialItem
     SShaderTransform    m_Transform;
     bool                m_bHasModifiedTransform;
     std::map < D3DXHANDLE, SShaderValue > m_currentSetValues;
+
+    bool            m_isComputing;
 };
 
 

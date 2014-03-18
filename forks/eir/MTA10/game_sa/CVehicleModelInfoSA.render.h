@@ -13,6 +13,14 @@
 #ifndef _CVehicleModelInfoSA_render_H
 #define _CVehicleModelInfoSA_render_H
 
+// Vehicle configuration globals.
+// Special vehicle colors in RGB format.
+// Describe which palette color the engine should use for which vehicle part.
+#define VEHICLE_COLOR_USECOLOR1     0x00FF3C
+#define VEHICLE_COLOR_USECOLOR2     0xAF00FF
+#define VEHICLE_COLOR_USECOLOR3     0xFFFF00
+#define VEHICLE_COLOR_USECOLOR4     0xFF00FF
+
 class CVehicleSA;
 
 void __cdecl CacheVehicleRenderCameraSettings( unsigned char alpha, RwObject *obj );

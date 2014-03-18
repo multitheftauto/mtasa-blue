@@ -510,8 +510,9 @@ struct RwInterface   // size: 1456
 
     BYTE                    m_pad[8];                                       // 24
     void                    (*m_deviceCommand)( eRwDeviceCmd cmd, int param );  // 32
+    void                    (*m_getDeviceCommand)( eRwDeviceCmd cmd, int& param );  // 36
+    BYTE                    m_pad20[72];                                    // 40
 
-    BYTE                    m_pad20[76];                                    // 36
     RwStructInfo*           m_sceneInfo;                                    // 112
 
     BYTE                    m_pad14[60];                                    // 116
@@ -591,12 +592,6 @@ struct RwInterface   // size: 1456
     BYTE                    m_pad10[16];                                    // 1440
 };
 
-// Special RenderWare namespace.
-namespace RenderWare
-{
-    inline RwInterface*     GetInterface( void )    { return *(RwInterface**)0x00C97B24; }
-};
-
 // offset 0x00C9BF00 (1.0 US and 1.0 EU)
 //padlevel: 2
 struct RwDeviceInformation
@@ -608,30 +603,16 @@ struct RwDeviceInformation
     unsigned int            maxLights;                                      // 160
 };
 
-extern RwDeviceInformation *const pRwDeviceInfo;
+// Special RenderWare namespace.
+namespace RenderWare
+{
+    inline RwInterface*             GetInterface            ( void )    { return *(RwInterface**)0x00C97B24; }
+    inline RwDeviceInformation&     GetDeviceInformation    ( void )    { return *(RwDeviceInformation*)0x00C9BF00; }
+};
 
 /*****************************************************************************/
 /** RenderWare Helper Definitions                                           **/
 /*****************************************************************************/
-
-// Swap the current txd with another
-class RwTxdStack
-{
-public:
-    RwTxdStack( RwTexDictionary *txd )
-    {
-        m_txd = RenderWare::GetInterface()->m_textureManager.current;
-        RenderWare::GetInterface()->m_textureManager.current = txd;
-    }
-
-    ~RwTxdStack( void )
-    {
-        RenderWare::GetInterface()->m_textureManager.current = m_txd;
-    }
-
-private:
-    RwTexDictionary*    m_txd;
-};
 
 // Include basic dependencies.
 #include "RenderWare/RwMath.h"
@@ -642,6 +623,10 @@ private:
 #include "RenderWare/RwTextureD3D9.h"
 #include "RenderWare/RwUtilsD3D9.h"
 #include "RenderWare/RpAtomicD3D9.h"
+
+/* RenderWare macros */
+inline RwFrame* RpGetFrame( RwObject *obj )                     { return obj->parent; }
+inline void RpSetFrame( RwObject *obj, RwFrame *frame )         { obj->parent = frame; }
 
 /*****************************************************************************/
 /** RenderWare Plugin System                                                **/
@@ -654,6 +639,9 @@ inline void __declspec(naked)    invalid_ptr()
     // unimplemented functionality was called.
     __asm int 3;
 }
+
+#define RW_JUSTDEF( name )          name##_t name = (##name##_t)invalid_ptr
+#define RW_JUSTSET( name, ptr )     name = (name##_t)ptr
 
 // RenderWare method helpers
 #define RWP_METHOD_NAME( className, methodName )    className##methodName
@@ -751,5 +739,12 @@ struct RwPluginRegistry
         }
     }
 };
+
+// Macro to get a plugin struct from a RenderWare object.
+template <typename structType, typename rwobjType>
+structType* RW_PLUGINSTRUCT( rwobjType *obj, size_t pluginOffset )
+{
+    return (structType*)( (char*)obj + pluginOffset );
+}
 
 #endif //__RENDERWARE_COMPAT

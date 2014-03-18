@@ -23,8 +23,6 @@
 class CPedModelInfoSA;
 class CPedModelInfoSAInterface;
 
-#define     RpGetFrame(__c)                 ((RwFrame*)(((RwObject *)(__c))->parent))
-
 #define     ARRAY_ModelLoaded               0x8E4CD0 // ##SA##
 
 #define     FUNC_CStreaming__HasModelLoaded 0x4044C0
@@ -57,7 +55,6 @@ void    ModelInfo_Init( void );
 void    ModelInfo_Shutdown( void );
 
 #include "CColModelSA.h"
-#include "CRenderWareSA.h"
 
 
 /**
@@ -91,7 +88,7 @@ public:
     DWORD                           GetModel                ( void )               { return m_dwModelID; }
     uint                            GetAnimFileIndex        ( void );
 
-    bool                            IsValidGameInfo         ( void )                { return m_dwModelID < DATA_TEXTURE_BLOCK; }
+    bool                            IsValidGameInfo         ( void );
 
     bool                            IsPlayerModel           ( void );
 

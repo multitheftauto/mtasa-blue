@@ -154,7 +154,7 @@ void CVehicleModelInfoSAInterface::ConvertAnimFileIndex( void )
     if ( animFileIndex == -1 )
         return;
 
-    animBlock = pGame->GetAnimManager()->GetAnimBlockIndex( (const char*)this->m_animBlock );
+    animBlock = pGame->GetAnimManager()->GetAnimBlockIndex( (const char*)m_animBlock );
 
     free( (void*)animFileIndex );
 
@@ -200,7 +200,7 @@ void CVehicleModelInfoSAInterface::SetClump( RpClump *clump )
     RegisterRenderCallbacks();
 
     // Correctly assign vehicle atomics
-    AssignAtomics( ((CComponentHierarchySAInterface**)0x008A7740)[ GetVehicleType() ] );
+    AssignAtomics( ((CComponentHierarchySAInterface**)0x008A7740)[GetVehicleType()] );
 
     RegisterRoot();
 
@@ -300,7 +300,7 @@ void CVehicleComponentInfoSAInterface::AddAtomic( RpAtomic *atomic )
     Binary offsets:
         (1.0 US and 1.0 EU): 0x004C8E30
 =========================================================*/
-static bool RwFrameChildBaseHierarchy( RwFrame *child, RwFrame *root )
+static int RwFrameChildBaseHierarchy( RwFrame *child, RwFrame *root )
 {
     child->ForAllChildren( RwFrameChildBaseHierarchy, root );
 
@@ -372,8 +372,10 @@ void CVehicleModelInfoSAInterface::Setup( void )
     RpAtomic *obj1 = NULL;
     RpAtomic *obj2 = NULL;
 
+    // Reset the number of doors.
     numberOfDoors = 0;
 
+    // Loop through all entries of the vehicle struct.
     for ( info; info->m_name; info++ )
     {
         RwFrame *hier;
@@ -395,7 +397,7 @@ void CVehicleModelInfoSAInterface::Setup( void )
                  seat.m_offset = hier->GetPosition();
 
                  // Calculate the quat for rotation
-                 seat.m_quat = CQuat( hier->modelling );
+                 seat.m_quat = CQuat( hier->GetModelling() );
 
                  seat.m_id = hier->parent->hierarchyId;
             }
@@ -436,7 +438,7 @@ void CVehicleModelInfoSAInterface::Setup( void )
 
     info = ((CComponentHierarchySAInterface**)0x008A7740)[ GetVehicleType() ];
 
-    for (info; info->m_name; info++)
+    for ( info; info->m_name; info++ )
     {
         if ( info->m_flags & (ATOMIC_HIER_FRONTSEAT | ATOMIC_HIER_SEAT | ATOMIC_HIER_UNKNOWN3) )
             continue;
@@ -578,7 +580,7 @@ void CVehicleModelInfoSAInterface::SetComponentFlags( RwFrame *frame, unsigned i
     Note:
         We should analyze RpAtomicSetupVehiclePipeline someday.
 =========================================================*/
-static bool RwClumpAtomicSetupVehiclePipeline( RpAtomic *child, int )
+static int RwClumpAtomicSetupVehiclePipeline( RpAtomic *child, int )
 {
     RpAtomicSetupVehiclePipeline( child );
     return true;

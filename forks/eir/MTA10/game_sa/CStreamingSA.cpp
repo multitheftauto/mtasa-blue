@@ -83,7 +83,7 @@ struct ModelRequestDispatch : ModelCheckDispatch <true>
 
         // Get animation if necessary
         if ( animIndex != -1 )
-            Streaming::RequestModel( animIndex + DATA_ANIM_BLOCK, 0x08 );
+            Streaming::RequestModel( animIndex + DATA_ANIM_BLOCK, m_flags );
 
         return true;
     }

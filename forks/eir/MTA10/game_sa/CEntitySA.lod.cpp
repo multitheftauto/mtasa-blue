@@ -26,7 +26,7 @@ namespace
     // Hopefully, we are not causing bugs with this.
     void SetGlobalDrawDistanceScale ( float fValue )
     {
-        MemPut < float > ( 0x858FD8, 300.f * fValue );
+        EntityRender::SetGlobalDrawDistanceScale( fValue );
     }
 
     float GetDrawDistanceSetting ( void )
@@ -55,8 +55,6 @@ namespace
 ////////////////////////////////////////////////
 //
 // CRenderer_SetupEntityVisibility
-//
-// TODO: when the new rendering code is in, wire things together.
 //
 ////////////////////////////////////////////////
 void OnMY_CRenderer_SetupEntityVisibility_Pre( CEntitySAInterface* pEntity, float& fValue )
@@ -93,48 +91,6 @@ void OnMY_CRenderer_SetupEntityVisibility_Post( int result, CEntitySAInterface* 
     if ( pEntity->IsHighLodEntity () )
     {
         pEntity->SetEntityVisibilityResult ( result );
-    }
-}
-
-
-// Hook info
-#define HOOKPOS_CRenderer_SetupEntityVisibility         0x554230
-#define HOOKSIZE_CRenderer_SetupEntityVisibility        8
-DWORD RETURN_CRenderer_SetupEntityVisibility =          0x554238;
-void _declspec(naked) HOOK_CRenderer_SetupEntityVisibility()
-{
-    _asm
-    {
-////////////////////
-        pushad
-        push    [esp+32+4*2]
-        push    [esp+32+4*2]
-        call    OnMY_CRenderer_SetupEntityVisibility_Pre
-        add     esp, 4*2
-        popad
-
-////////////////////
-        push    [esp+4*2]
-        push    [esp+4*2]
-        call    second
-        add     esp, 4*2
-
-////////////////////
-        pushad
-        push    [esp+32+4*2]
-        push    [esp+32+4*2]
-        push    eax
-        call    OnMY_CRenderer_SetupEntityVisibility_Post
-        add     esp, 4*2+4
-        popad
-
-        retn
-
-second:
-        sub     esp,14h 
-        push    esi  
-        mov     esi,dword ptr [esp+1Ch] 
-        jmp     RETURN_CRenderer_SetupEntityVisibility   // 0x554238
     }
 }
 
@@ -218,8 +174,7 @@ void CGameSA::SetLODSystemEnabled ( bool bEnable )
 
     // Memory saved here
     static CBuffer savedMem;
-    SHookInfo hookInfoList[] = { MAKE_HOOK_INFO ( CRenderer_SetupEntityVisibility ),
-                                 MAKE_HOOK_INFO ( CWorldScan_ScanWorld ) };
+    SHookInfo hookInfoList[] = { MAKE_HOOK_INFO ( CWorldScan_ScanWorld ) };
 
     // Enable or not?
     if ( bEnable )

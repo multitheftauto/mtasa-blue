@@ -60,6 +60,7 @@ public:
                                     CVehicleModelInfoSAInterface    ( void );
                                     ~CVehicleModelInfoSAInterface   ( void );
 
+    // Virtual exports.
     eModelType                      GetModelType                    ( void );
     void                            Init                            ( void );
     void                            DeleteRwObject                  ( void );
@@ -69,6 +70,7 @@ public:
     int                             GetAnimFileIndex                ( void );
     void                            SetClump                        ( RpClump *clump );
 
+    // Utility functions.
     void __thiscall                 RegisterRenderCallbacks         ( void );
     void __thiscall                 Setup                           ( void );
     void                            SetComponentFlags               ( RwFrame *frame, unsigned int flags );

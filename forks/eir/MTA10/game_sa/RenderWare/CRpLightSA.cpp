@@ -36,6 +36,36 @@ CRpLightSA* CRpLightSA::Clone( void ) const
     return new CRpLightSA( RpLightClone( GetObject() ) );
 }
 
+void CRpLightSA::SetLightIndex( unsigned int idx )
+{
+    RpLightSetLightIndex( GetObject(), idx );
+}
+
+unsigned int CRpLightSA::GetLightIndex( void ) const
+{
+    return RpLightGetLightIndex( GetObject() );
+}
+
+void CRpLightSA::SetAttenuation( const CVector& atten )
+{
+    RpLightSetAttenuation( GetObject(), atten );
+}
+
+const CVector& CRpLightSA::GetAttenuation( void ) const
+{
+    return RpLightGetAttenuation( GetObject() );
+}
+
+void CRpLightSA::SetFalloff( float falloff )
+{
+    RpLightSetFalloff( GetObject(), falloff );
+}
+
+float CRpLightSA::GetFalloff( void ) const
+{
+    return RpLightGetFalloff( GetObject() );
+}
+
 void CRpLightSA::AddToModel( CModel *model )
 {
     RemoveFromModel();
@@ -81,6 +111,11 @@ void CRpLightSA::SetConeAngle( float radians )
 float CRpLightSA::GetConeAngle( void ) const
 {
     return RpLightGetConeAngle( GetObject() );
+}
+
+void CRpLightSA::SetDirection( const CVector& dirVec )
+{
+    
 }
 
 void CRpLightSA::AddToScene( void )

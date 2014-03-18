@@ -3,7 +3,7 @@
 *  PROJECT:     Multi Theft Auto v1.2
 *  LICENSE:     See LICENSE in the top level directory
 *  FILE:        game_sa/CEntitySA.render.h
-*  PURPOSE:     Header file for entity render utilities
+*  PURPOSE:     Header file for entity render framework
 *  DEVELOPERS:  Martin Turski <quiret@gmx.de>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
@@ -369,6 +369,7 @@ struct entityRenderInfo
     CEntitySAInterface  *entity;
     callback_t          callback;
     float               distance;
+    bool                isReferenced;       // MTA extension
 
     inline void Execute( void )
     {
@@ -395,11 +396,58 @@ struct pedRenderInfo
 
     class CPedSAInterface   *ped;
     
-    inline void Execute();
+    inline void Execute( void );
 };
 typedef CRenderChainInterface <pedRenderInfo> pedRenderChain_t;
 
+enum eRenderType : unsigned int
+{
+    ENTITY_RENDER_CROSS_ZONES,
+    ENTITY_RENDER_DEFAULT,
+    ENTITY_RENDER_CONTROVERIAL,
+    ENTITY_RENDER_REQUEST_MODEL
+};
+
+namespace Entity
+{
+    void    SetPreRenderCallback                        ( gameEntityPreRenderCallback_t callback );
+    void    SetRenderCallback                           ( gameEntityRenderCallback_t callback );
+    void    SetRenderUnderwaterCallback                 ( gameEntityRenderUnderwaterCallback_t callback );
+    void    SetRenderPostProcessCallback                ( gameEntityPostProcessCallback_t callback );
+
+    // Rendering mode functions.
+    void                SetWorldRenderMode              ( eWorldRenderMode mode );
+    eWorldRenderMode    GetWorldRenderMode              ( void );
+
+    CGame::entityList_t GetEntitiesInRenderQueue        ( void );
+};
+
+// Namespace of definitions that should not be directly exported.
+namespace EntityRender
+{
+    void __cdecl        DefaultRenderEntityHandler      ( CEntitySAInterface *entity, float camDistance );
+
+    // Render chain management.
+    extern atomicRenderChain_t boatRenderChain;
+    extern entityRenderChain_t defaultEntityRenderChain;
+    extern entityRenderChain_t underwaterEntityRenderChain;
+    extern entityRenderChain_t alphaEntityRenderChain;
+
+    inline entityRenderChain_t& GetDefaultEntityRenderChain     ( void )        { return defaultEntityRenderChain; }
+    inline entityRenderChain_t& GetUnderwaterEntityRenderChain  ( void )        { return underwaterEntityRenderChain; }
+    inline entityRenderChain_t& GetAlphaEntityRenderChain       ( void )        { return alphaEntityRenderChain; }
+    inline atomicRenderChain_t& GetBoatRenderChain              ( void )        { return boatRenderChain; }
+};
+
+// Include sub modules.
+#include "CEntitySA.rendersetup.h"
+#include "CEntitySA.renderutils.h"
+
+// Function exports.
+bool CanVehicleRenderNatively( void );
+
 void EntityRender_Init( void );
 void EntityRender_Shutdown( void );
+void EntityRender_Reset( void );
 
 #endif //_ENTITY_RENDER_

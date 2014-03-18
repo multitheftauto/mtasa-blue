@@ -20,8 +20,8 @@ struct RwTexDictionary : public RwObject
     RwListEntry <RwTexDictionary>   globalTXDs;
     RwTexDictionary*                m_parentTxd;
 
-    template <class type>
-    bool                    ForAllTextures( bool (*callback)( RwTexture *tex, type ud ), type ud )
+    template <class type, typename returnType>
+    bool                    ForAllTextures( returnType (__cdecl*callback)( RwTexture *tex, type ud ), type ud )
     {
         RwListEntry <RwTexture> *child;
 
@@ -34,8 +34,8 @@ struct RwTexDictionary : public RwObject
         return true;
     }
 
-    template <class type>
-    bool                    ForAllTexturesSafe( bool (*callback)( RwTexture *tex, type ud ), type ud )
+    template <class type, typename returnType>
+    bool                    ForAllTexturesSafe( returnType (__cdecl*callback)( RwTexture *tex, type ud ), type ud )
     {
         RwListEntry <RwTexture> *child = textures.root.next;
 
@@ -58,7 +58,36 @@ struct RwTexDictionary : public RwObject
     RwTexture*              FindNamedTexture( const char *name );
 };
 
+typedef RwTexture* (__cdecl*texdictTextureIterator_t)( RwTexture *texture, void *data );
+
 // TexDictionary API.
-RwTexDictionary*    RwTexDictionaryCreate( void );      // US exe: 0x007F3600
+RwTexture* __cdecl          RwTexDictionaryAddTexture       ( RwTexDictionary *texDict, RwTexture *texture );   // US exe: 0x007F3980
+RwTexture* __cdecl          RwTexDictionaryFindNamedTexture ( RwTexDictionary *texDict, const char *name );     // US exe: 0x007F39F0
+RwTexDictionary* __cdecl    RwTexDictionaryForAllTextures   ( RwTexDictionary *texDict, texdictTextureIterator_t callback, void *data );    // US exe: 0x007F3730
+RwTexDictionary* __cdecl    RwTexDictionaryForAllTextures   ( RwTexDictionary *texDict, void *callback, void *data );
+RwTexDictionary* __cdecl    RwTexDictionarySetCurrent       ( RwTexDictionary *texDict );                       // US exe: 0x007F3A70
+RwTexDictionary* __cdecl    RwTexDictionaryGetCurrent       ( void );                                           // US exe: 0x007F3A90
+RwTexDictionary* __cdecl    RwTexDictionaryStreamReadEx     ( RwStream *stream );
+RwTexDictionary* __cdecl    RwTexDictionaryGtaStreamRead    ( RwStream *stream );
+RwTexDictionary* __cdecl    RwTexDictionaryCreate           ( void );                                           // US exe: 0x007F3600
+
+// Swap the current txd with another
+class RwTxdStack
+{
+public:
+    AINLINE RwTxdStack( RwTexDictionary *txd )
+    {
+        m_txd = RwTexDictionaryGetCurrent();
+        RwTexDictionarySetCurrent( txd );
+    }
+
+    AINLINE ~RwTxdStack( void )
+    {
+        RwTexDictionarySetCurrent( m_txd );
+    }
+
+private:
+    RwTexDictionary*    m_txd;
+};
 
 #endif //_RENDERWARE_TEXDICTIONARY_

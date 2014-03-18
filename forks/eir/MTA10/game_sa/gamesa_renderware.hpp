@@ -53,9 +53,6 @@ void InitRwFunctions( eGameVersion version )
         RwFrameCloneRecursive               = (RwFrameCloneRecursive_t)                 0x007F0090;
         RwFrameCloneHierarchy               = (RwFrameCloneHierarchy_t)                 0x007F0290;
         RwFrameSetIdentity                  = (RwFrameSetIdentity_t)                    0x007F10F0;
-        RwFrameAddChild                     = (RwFrameAddChild_t)                       0x007F0B40;
-        RwFrameRemoveChild                  = (RwFrameRemoveChild_t)                    0x007F0D10; 
-        RwFrameForAllObjects                = (RwFrameForAllObjects_t)                  0x007F1240; 
         RwFrameGetLTM                       = (RwFrameGetLTM_t)                         0x007F09D0;
         RwFrameTranslate                    = (RwFrameTranslate_t)                      0x007F0E70;
         RwFrameOrient                       = (RwFrameOrient_t)                         0x007F2010;
@@ -67,6 +64,7 @@ void InitRwFunctions( eGameVersion version )
         // Material functions
         RpMaterialCreate                    = (RpMaterialCreate_t)                      0x0074D9E0;
         RpMaterialDestroy                   = (RpMaterialDestroy_t)                     0x0074DA70;
+        RpD3D9SetSurfaceProperties          = (RpD3D9SetSurfaceProperties_t)            0x007FC510;
         RpMaterialRegisterPlugin            = (RpMaterialRegisterPlugin_t)              0x0074DC40;
         RpMaterialRegisterPluginStream      = (RpMaterialRegisterPluginStream_t)        0x0074DC70;
 
@@ -86,7 +84,6 @@ void InitRwFunctions( eGameVersion version )
         // Atomic functions
         RpAtomicCreate                      = (RpAtomicCreate_t)                        0x00749CA0;
         RpAtomicClone                       = (RpAtomicClone_t)                         0x00749EB0;
-        RpAtomicSetFrame                    = (RpAtomicSetFrame_t)                      0x0074BF70;
         RpAtomicSetGeometry                 = (RpAtomicSetGeometry_t)                   0x00749D90;
         RpAtomicGetWorldBoundingSphere      = (RpAtomicGetWorldBoundingSphere_t)        0x00749380;
         RpAtomicSetupObjectPipeline         = (RpAtomicSetupObjectPipeline_t)           0x005D7F00;
@@ -98,7 +95,6 @@ void InitRwFunctions( eGameVersion version )
 
         // Light functions
         RpLightSetRadius                    = (RpLightSetRadius_t)                      0x00751AC0;
-        RpLightSetColor                     = (RpLightSetColor_t)                       0x00751AE0;
         RpLightGetConeAngle                 = (RpLightGetConeAngle_t)                   0x00751B30;
         RpLightDestroy                      = (RpLightDestroy_t)                        0x00752120;
         RpLightRegisterPlugin               = (RpLightRegisterPlugin_t)                 0x00751DB0;
@@ -112,11 +108,6 @@ void InitRwFunctions( eGameVersion version )
 
         // Clump functions
         RpClumpClone                        = (RpClumpClone_t)                          0x00749FC0;
-        RpClumpAddAtomic                    = (RpClumpAddAtomic_t)                      0x0074A4E0;
-        RpClumpRemoveAtomic                 = (RpClumpRemoveAtomic_t)                   0x0074A510;
-        RpClumpAddLight                     = (RpClumpAddLight_t)                       0x0074A540;
-        RpClumpGetNumAtomics                = (RpClumpGetNumAtomics_t)                  0x00749930;
-        RpClumpForAllAtomics                = (RpClumpForAllAtomics_t)                  0x00749BC0;
         RpClumpGetBoneTransform             = (RpClumpGetBoneTransform_t)               0x00735360;
         RpClumpSetupFrameCallback           = (RpClumpSetupFrameCallback_t)             0x00733750;
         RpClumpStreamRead                   = (RpClumpStreamRead_t)                     0x0074B470;
@@ -139,13 +130,7 @@ void InitRwFunctions( eGameVersion version )
         RwTextureRegisterPluginStream       = (RwTextureRegisterPluginStream_t)         0x00804590;
 
         // TexDictionary functions
-        RwTexDictionaryAddTexture           = (RwTexDictionaryAddTexture_t)             0x007F39C0;
-        RwTexDictionaryGetCurrent           = (RwTexDictionaryGetCurrent_t)             0x007F3AD0;
-        RwTexDictionarySetCurrent           = (RwTexDictionarySetCurrent_t)             0x007F3AB0;
-        RwTexDictionaryForAllTextures       = (RwTexDictionaryForAllTextures_t)         0x007F3770;
-        RwTexDictionaryFindNamedTexture     = (RwTexDictionaryFindNamedTexture_t)       0x007F3A30;
         RwTexDictionaryStreamRead           = (RwTexDictionaryStreamRead_t)             0x00804C70; 
-        RwTexDictionaryGtaStreamRead        = (RwTexDictionaryGtaStreamRead_t)          0x00730FC0;
         RwTexDictionaryDestroy              = (RwTexDictionaryDestroy_t)                0x007F36E0;
         RwTexDictionaryRegisterPlugin       = (RwTexDictionaryRegisterPlugin_t)         0x007F3C50;
         RwTexDictionaryRegisterPluginStream = (RwTexDictionaryRegisterPluginStream_t)   0x00804920;
@@ -207,9 +192,6 @@ void InitRwFunctions( eGameVersion version )
         RwFrameCreate                       = (RwFrameCreate_t)                         0x007F0410;
         RwFrameCloneRecursive               = (RwFrameCloneRecursive_t)                 0x007F0050;
         RwFrameCloneHierarchy               = (RwFrameCloneHierarchy_t)                 0x007f0250;
-        RwFrameAddChild                     = (RwFrameAddChild_t)                       0x007F0B00;
-        RwFrameRemoveChild                  = (RwFrameRemoveChild_t)                    0x007F0CD0;
-        RwFrameForAllObjects                = (RwFrameForAllObjects_t)                  0x007F1200;
         RwFrameSetIdentity                  = (RwFrameSetIdentity_t)                    0x007F10B0;
         RwFrameGetLTM                       = (RwFrameGetLTM_t)                         0x007F0990;
         RwFrameTranslate                    = (RwFrameTranslate_t)                      0x007F0E30;
@@ -222,6 +204,7 @@ void InitRwFunctions( eGameVersion version )
         // Material functions
         RpMaterialCreate                    = (RpMaterialCreate_t)                      0x0074D990;
         RpMaterialDestroy                   = (RpMaterialDestroy_t)                     0x0074DA20;
+        RpD3D9SetSurfaceProperties          = (RpD3D9SetSurfaceProperties_t)            0x007FC4D0;
         RpMaterialRegisterPlugin            = (RpMaterialRegisterPlugin_t)              0x0074DBF0;
         RpMaterialRegisterPluginStream      = (RpMaterialRegisterPluginStream_t)        0x0074DC20;
 
@@ -240,7 +223,6 @@ void InitRwFunctions( eGameVersion version )
         // Atomic functions
         RpAtomicCreate                      = (RpAtomicCreate_t)                        0x00749C50;
         RpAtomicClone                       = (RpAtomicClone_t)                         0x00749E60;
-        RpAtomicSetFrame                    = (RpAtomicSetFrame_t)                      0x0074BF20;
         RpAtomicSetGeometry                 = (RpAtomicSetGeometry_t)                   0x00749D40;
         RpAtomicGetWorldBoundingSphere      = (RpAtomicGetWorldBoundingSphere_t)        0x00749330;
         RpAtomicSetupObjectPipeline         = (RpAtomicSetupObjectPipeline_t)           0x005D7F00;
@@ -252,7 +234,6 @@ void InitRwFunctions( eGameVersion version )
 
         // Light functions
         RpLightSetRadius                    = (RpLightSetRadius_t)                      0x00751A70;
-        RpLightSetColor                     = (RpLightSetColor_t)                       0x00751A90;
         RpLightGetConeAngle                 = (RpLightGetConeAngle_t)                   0x00751AE0;
         RpLightDestroy                      = (RpLightDestroy_t)                        0x007520D0;
         RpLightRegisterPlugin               = (RpLightRegisterPlugin_t)                 0x00751D60;
@@ -266,11 +247,6 @@ void InitRwFunctions( eGameVersion version )
 
         // Clump functions
         RpClumpClone                        = (RpClumpClone_t)                          0x00749F70;
-        RpClumpAddAtomic                    = (RpClumpAddAtomic_t)                      0x0074A490;
-        RpClumpRemoveAtomic                 = (RpClumpRemoveAtomic_t)                   0x0074A4C0;
-        RpClumpAddLight                     = (RpClumpAddLight_t)                       0x0074A4F0;
-        RpClumpForAllAtomics                = (RpClumpForAllAtomics_t)                  0x00749B70;
-        RpClumpGetNumAtomics                = (RpClumpGetNumAtomics_t)                  0x007498E0;
         RpClumpGetBoneTransform             = (RpClumpGetBoneTransform_t)               0x00735360;
         RpClumpSetupFrameCallback           = (RpClumpSetupFrameCallback_t)             0x00733750;
         RpClumpStreamRead                   = (RpClumpStreamRead_t)                     0x0074B420;
@@ -293,13 +269,7 @@ void InitRwFunctions( eGameVersion version )
         RwTextureRegisterPluginStream       = (RwTextureRegisterPluginStream_t)         0x00804550;
 
         // TexDictionary functions
-        RwTexDictionaryAddTexture           = (RwTexDictionaryAddTexture_t)             0x007F3980;
-        RwTexDictionaryGetCurrent           = (RwTexDictionaryGetCurrent_t)             0x007F3A90;
-        RwTexDictionarySetCurrent           = (RwTexDictionarySetCurrent_t)             0x007F3A70;
-        RwTexDictionaryForAllTextures       = (RwTexDictionaryForAllTextures_t)         0x007F3730;
-        RwTexDictionaryFindNamedTexture     = (RwTexDictionaryFindNamedTexture_t)       0x007F39F0;
         RwTexDictionaryStreamRead           = (RwTexDictionaryStreamRead_t)             0x00804C30;
-        RwTexDictionaryGtaStreamRead        = (RwTexDictionaryGtaStreamRead_t)          0x00730FC0;
         RwTexDictionaryDestroy              = (RwTexDictionaryDestroy_t)                0x007F36A0;
         RwTexDictionaryRegisterPlugin       = (RwTexDictionaryRegisterPlugin_t)         0x007F3C10;
         RwTexDictionaryRegisterPluginStream = (RwTexDictionaryRegisterPluginStream_t)   0x008048E0;

@@ -17,13 +17,6 @@
 #ifndef _MODELINFO_BASE_
 #define _MODELINFO_BASE_
 
-#define DATA_TEXTURE_BLOCK      20000
-#define DATA_COLL_BLOCK         25000
-#define DATA_IPL_BLOCK          25255
-#define DATA_PATHFIND_BLOCK     25511
-#define DATA_ANIM_BLOCK         25575
-#define DATA_RECORD_BLOCK       25755
-
 class CAtomicModelInfoSA;
 class CDamageAtomicModelInfoSA;
 class CLODAtomicModelInfoSA;
