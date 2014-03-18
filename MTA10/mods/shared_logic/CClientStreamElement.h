@@ -60,9 +60,12 @@ private:
     CClientStreamSector *       m_pStreamSector;
     CVector                     m_vecStreamPosition;    
     float                       m_fExpDistance;
-    bool                        m_bAttemptingToStreamIn;
-    bool                        m_bStreamedIn;
     unsigned short              m_usStreamReferences, m_usStreamReferencesScript;
+
+protected:
+    bool                        m_bStreamedIn;
+    bool                        m_bAttemptingToStreamIn;
+    
 public:
     float                       m_fCachedRadius;
     int                         m_iCachedRadiusCounter;

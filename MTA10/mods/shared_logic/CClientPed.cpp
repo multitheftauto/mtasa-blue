@@ -3841,7 +3841,7 @@ void CClientPed::ProcessRebuildPlayer ( bool bNeedsClothesUpdate )
 
 void CClientPed::StreamIn ( bool bInstantly )
 {
-    if ( m_bIsLocalPlayer && !m_pPlayerPed )
+    if ( m_bIsLocalPlayer )
     {
         NotifyCreate ();
         return;
@@ -5274,7 +5274,15 @@ CClientPed * CClientPed::GetTargetedPed ( void )
 void CClientPed::NotifyCreate ( void )
 {
     m_pManager->GetPedManager ()->OnCreation ( this );
-    CClientStreamElement::NotifyCreate ();
+
+    m_bStreamedIn = true;
+    m_bAttemptingToStreamIn = false;
+
+    if ( !m_pPlayerPed )
+    {
+        CLuaArguments Arguments;
+        CallEvent ( "onClientElementStreamIn", Arguments, true );
+    }
 }
 
 
