@@ -79,6 +79,11 @@ namespace SharedUtil
     SString         GetMTADataPathCommon            ( void );
     SString         GetMTATempPath                  ( void );
 
+    bool            IsShortPathName                 ( const char* szPath );
+    bool            IsShortPathName                 ( const wchar_t* szPath );
+    SString         GetSystemShortPathName          ( const SString& strPath );
+    SString         GetSystemLongPathName           ( const SString& strPath );
+
     SString         GetLaunchPathFilename           ( void );
     SString         GetLaunchPath                   ( void );
     SString         GetLaunchFilename               ( void );
