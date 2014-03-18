@@ -115,6 +115,8 @@ long WINAPI CCrashDumpWriter::HandleExceptionGlobal ( _EXCEPTION_POINTERS* pExce
     CExceptionInformation_Impl* pExceptionInformation = new CExceptionInformation_Impl;
     pExceptionInformation->Set ( pException->ExceptionRecord->ExceptionCode, pException );
 
+    WriteDebugEvent ( "CCrashDumpWriter::HandleExceptionGlobal" );
+
     // Grab the mod manager
     CModManager* pModManager = CModManager::GetSingletonPtr ();
     if ( pModManager )
@@ -230,6 +232,7 @@ void CCrashDumpWriter::DumpCoreLog ( CExceptionInformation* pExceptionInformatio
 
         // For the crash dialog
         SetApplicationSetting ( "diagnostics", "last-crash-info", strInfo );
+        WriteDebugEvent ( strInfo.Replace( "\n", " " ) );
     }
 }
 

@@ -293,6 +293,8 @@ SString SharedUtil::GetSystemCurrentDirectory ( void )
 #ifdef WIN32
     wchar_t szResult [ 1024 ] = L"";
     GetCurrentDirectoryW ( NUMELMS ( szResult ), szResult );
+    if ( IsShortPathName( szResult ) )
+        return GetSystemLongPathName( ToUTF8( szResult ) );
     return ToUTF8( szResult );
 #else
     char szBuffer[ MAX_PATH ];
@@ -308,6 +310,8 @@ SString SharedUtil::GetSystemDllDirectory ( void )
 {
     wchar_t szResult [ 1024 ] = L"";
     GetDllDirectoryW ( NUMELMS ( szResult ), szResult );
+    if ( IsShortPathName( szResult ) )
+        return GetSystemLongPathName( ToUTF8( szResult ) );
     return ToUTF8( szResult );
 }
 
@@ -315,6 +319,8 @@ SString SharedUtil::GetSystemLocalAppDataPath ( void )
 {
     wchar_t szResult[MAX_PATH] = L"";
     SHGetFolderPathW( NULL, CSIDL_LOCAL_APPDATA, NULL, 0, szResult );
+    if ( IsShortPathName( szResult ) )
+        return GetSystemLongPathName( ToUTF8( szResult ) );
     return ToUTF8( szResult );
 }
 
@@ -322,6 +328,8 @@ SString SharedUtil::GetSystemCommonAppDataPath ( void )
 {
     wchar_t szResult[MAX_PATH] = L"";
     SHGetFolderPathW( NULL, CSIDL_COMMON_APPDATA, NULL, 0, szResult );
+    if ( IsShortPathName( szResult ) )
+        return GetSystemLongPathName( ToUTF8( szResult ) );
     return ToUTF8( szResult );
 }
 
@@ -329,6 +337,8 @@ SString SharedUtil::GetSystemPersonalPath ( void )
 {
     wchar_t szResult[MAX_PATH] = L"";
     SHGetFolderPathW( NULL, CSIDL_PERSONAL, NULL, 0, szResult );
+    if ( IsShortPathName( szResult ) )
+        return GetSystemLongPathName( ToUTF8( szResult ) );
     return ToUTF8( szResult );
 }
 
@@ -336,6 +346,8 @@ SString SharedUtil::GetSystemWindowsPath ( void )
 {
     wchar_t szResult[MAX_PATH] = L"";
     SHGetFolderPathW( NULL, CSIDL_WINDOWS, NULL, 0, szResult );
+    if ( IsShortPathName( szResult ) )
+        return GetSystemLongPathName( ToUTF8( szResult ) );
     return ToUTF8( szResult );
 }
 
@@ -343,6 +355,8 @@ SString SharedUtil::GetSystemSystemPath ( void )
 {
     wchar_t szResult[MAX_PATH] = L"";
     SHGetFolderPathW( NULL, CSIDL_SYSTEM, NULL, 0, szResult );
+    if ( IsShortPathName( szResult ) )
+        return GetSystemLongPathName( ToUTF8( szResult ) );
     return ToUTF8( szResult );
 }
 
@@ -350,6 +364,8 @@ SString SharedUtil::GetSystemTempPath ( void )
 {
     wchar_t szResult[4030] = L"";
     GetTempPathW( 4000, szResult );
+    if ( IsShortPathName( szResult ) )
+        return GetSystemLongPathName( ToUTF8( szResult ) );
     return ToUTF8( szResult );
 }
 
@@ -374,6 +390,8 @@ SString SharedUtil::GetLaunchPathFilename( void )
 {
     wchar_t szBuffer[64000];
     GetModuleFileNameW( NULL, szBuffer, NUMELMS(szBuffer) - 1 );
+    if ( IsShortPathName( szBuffer ) )
+        return GetSystemLongPathName( ToUTF8( szBuffer ) );
     return ToUTF8( szBuffer );
 }
 
@@ -427,7 +445,7 @@ SString SharedUtil::GetDriveNameWithNotEnoughSpace( uint uiResourcesPathMinMB, u
 
 
 #endif  // #ifdef MTA_CLIENT
-#endif  // #ifdef WIN_32
+#endif  // #ifdef WIN32
 
 
 WString SharedUtil::FromUTF8( const SString& strPath )
@@ -786,3 +804,31 @@ bool SharedUtil::IsAbsolutePath ( const SString& strInPath )
 #endif
     return false;
 }
+
+#ifdef WIN32
+bool SharedUtil::IsShortPathName( const char* szPath )
+{
+    return strchr( szPath, '~' ) != NULL;
+}
+
+bool SharedUtil::IsShortPathName( const wchar_t* szPath )
+{
+    return wcschr( szPath, '~' ) != NULL;
+}
+
+SString SharedUtil::GetSystemShortPathName( const SString& strPath )
+{
+    wchar_t szBuffer[32000];
+    szBuffer[0] = 0;
+    GetShortPathNameW( FromUTF8( strPath ), szBuffer, NUMELMS( szBuffer ) - 1 );
+    return ToUTF8( szBuffer );
+}
+
+SString SharedUtil::GetSystemLongPathName( const SString& strPath )
+{
+    wchar_t szBuffer[32000];
+    szBuffer[0] = 0;
+    GetLongPathNameW( FromUTF8( strPath ), szBuffer, NUMELMS( szBuffer ) - 1 );
+    return ToUTF8( szBuffer );
+}
+#endif // WIN32

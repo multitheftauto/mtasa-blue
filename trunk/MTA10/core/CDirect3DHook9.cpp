@@ -83,6 +83,7 @@ IDirect3D9* CDirect3DHook9::API_Direct3DCreate9 ( UINT SDKVersion )
     }
 
     // Create our interface.
+    WriteDebugEvent ( "Calling Direct3DCreate9" );
     IDirect3D9* pDirect3D9 = pThis->m_pfnDirect3DCreate9 ( SDKVersion );
 
     if ( !pDirect3D9 )
@@ -95,6 +96,8 @@ IDirect3D9* CDirect3DHook9::API_Direct3DCreate9 ( UINT SDKVersion )
                            , _("Error")+_E("CC50"), MB_OK | MB_ICONEXCLAMATION | MB_TOPMOST  ); // Could not initialize Direct3D9.  Please ensure the DirectX End-User Runtime and latest Windows Service Packs are installed correctly.
         return NULL;
     }
+
+    WriteDebugEvent ( "Direct3DCreate9 succeded" );
 
     GetServerCache ();
 
