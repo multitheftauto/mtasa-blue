@@ -3628,6 +3628,7 @@ void CGame::Packet_PlayerDiagnostic ( CPlayerDiagnosticPacket & Packet )
                 pPlayer->m_strDetectedAC = parts[0].Replace( "|", "," );
                 pPlayer->m_uiD3d9Size = atoi( parts[1] );
                 pPlayer->m_strD3d9Md5 = parts[2];
+                pPlayer->m_strD3d9Sha256 = parts[3];
             }
         }
         else
