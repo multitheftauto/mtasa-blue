@@ -155,7 +155,6 @@ public:
     }
 #endif
 
-
     //
     // Read next bool
     //
@@ -206,7 +205,8 @@ public:
         int iArgument = lua_type ( m_luaVM, m_iIndex );
         if ( iArgument == LUA_TSTRING || iArgument == LUA_TNUMBER )
         {
-            outValue = lua_tostring ( m_luaVM, m_iIndex++ );
+            uint uiLength = lua_strlen ( m_luaVM, m_iIndex );
+            outValue.assign( lua_tostring ( m_luaVM, m_iIndex++ ), uiLength );
             return;
         }
         else
@@ -410,9 +410,6 @@ protected:
                 m_iIndex++;
                 return;
             }
-
-            // Cast failed, so continue as nil type
-            iArgument = LUA_TNIL;
         }
         else if ( iArgument == LUA_TUSERDATA )
         {
@@ -422,11 +419,8 @@ protected:
                 m_iIndex++;
                 return;
             }
-
-            // Cast failed, so continue as nil type
-            iArgument = LUA_TNIL;
         }
-
+        else
         if ( iArgument == LUA_TNONE || iArgument == LUA_TNIL )
         {
             if ( bHasDefaultValue )
@@ -478,6 +472,7 @@ public:
     //
     // Read next userdata, using NULL default if needed, allowing NULL result
     // Userdata might be NULL even when no error
+    //  * false              - use NULL (For easier use of function returns as arguments)
     //  * value not userdata - error
     //  * nil value          - use NULL
     //  * no arguments left  - use NULL
@@ -486,6 +481,12 @@ public:
     void ReadUserData ( T*& outValue, int*** defaultValue )
     {
         assert( defaultValue == NULL );
+        if ( NextIsBool() && !lua_toboolean ( m_luaVM, m_iIndex ) )
+        {
+            outValue = NULL;
+            m_iIndex++;
+            return;
+        }
         InternalReadUserData ( true, outValue, true, (T*)NULL );
     }
 
@@ -672,7 +673,8 @@ public:
     bool NextIsNone         ( int iOffset = 0 ) const  { return NextIs ( LUA_TNONE, iOffset ); }
     bool NextIsNil          ( int iOffset = 0 ) const  { return NextIs ( LUA_TNIL, iOffset ); }
     bool NextIsBool         ( int iOffset = 0 ) const  { return NextIs ( LUA_TBOOLEAN, iOffset ); }
-    bool NextIsUserData     ( int iOffset = 0 ) const  { return NextIs ( LUA_TLIGHTUSERDATA, iOffset ); }
+    bool NextIsUserData     ( int iOffset = 0 ) const  { return NextIs ( LUA_TUSERDATA, iOffset ) || NextIsLightUserData ( iOffset ); }
+    bool NextIsLightUserData( int iOffset = 0 ) const  { return NextIs ( LUA_TLIGHTUSERDATA, iOffset ); }
     bool NextIsNumber       ( int iOffset = 0 ) const  { return NextIs ( LUA_TNUMBER, iOffset ); }
     bool NextIsString       ( int iOffset = 0 ) const  { return NextIs ( LUA_TSTRING, iOffset ); }
     bool NextIsTable        ( int iOffset = 0 ) const  { return NextIs ( LUA_TTABLE, iOffset ); }
@@ -717,7 +719,6 @@ public:
                || NextIsUserDataOfType < CLuaVector3D > ();
     }
 #endif
-
 
     //
     // Conditional reads. Default required in case condition is not met.
@@ -824,6 +825,11 @@ public:
         {
 	        // Get name of userdata type
             strGotArgumentType = GetUserDataClassName ( lua_touserdata ( m_luaVM, m_iErrorIndex ), m_luaVM );
+            strGotArgumentValue = "";
+        }
+        else if ( m_iErrorGotArgumentType == LUA_TUSERDATA )
+        {
+            strGotArgumentType = GetUserDataClassName ( * ( ( void** ) lua_touserdata ( m_luaVM, m_iErrorIndex ) ), m_luaVM );
             strGotArgumentValue = "";
         }
 
