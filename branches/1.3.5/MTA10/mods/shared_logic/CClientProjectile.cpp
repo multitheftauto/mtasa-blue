@@ -212,20 +212,25 @@ bool CClientProjectile::SetMatrix ( const CMatrix & matrix_ )
         matrix.vUp.fY = 0.0f - matrix.vUp.fY;
     }
 
-    m_pProjectile->SetMatrix ( &matrix );
+    if ( m_pProjectile )
+        m_pProjectile->SetMatrix ( &matrix );
     return true;
 }
 
 
 void CClientProjectile::GetPosition ( CVector & vecPosition ) const
 {
-    vecPosition = *m_pProjectile->GetPosition ();
+    if ( m_pProjectile )
+        vecPosition = *m_pProjectile->GetPosition ();
+    else
+        vecPosition = CVector();
 }
 
 
 void CClientProjectile::SetPosition ( const CVector & vecPosition )
 {
-    m_pProjectile->SetPosition ( const_cast < CVector* > ( &vecPosition ) );
+    if ( m_pProjectile )
+        m_pProjectile->SetPosition ( const_cast < CVector* > ( &vecPosition ) );
 }
 
 
@@ -261,31 +266,41 @@ void CClientProjectile::SetRotationDegrees ( const CVector & vecRotation )
 
 void CClientProjectile::GetVelocity ( CVector & vecVelocity )
 {
-    m_pProjectile->GetMoveSpeed ( &vecVelocity );
+    if ( m_pProjectile )
+        m_pProjectile->GetMoveSpeed ( &vecVelocity );
+    else
+        vecVelocity = CVector();
 }
 
 
 void CClientProjectile::SetVelocity ( CVector & vecVelocity )
 {
-    m_pProjectile->SetMoveSpeed ( &vecVelocity );
+    if ( m_pProjectile )
+        m_pProjectile->SetMoveSpeed ( &vecVelocity );
 }
 
 unsigned short CClientProjectile::GetModel ( void )
 {
-    return m_pProjectile->GetModelIndex ();
+    if ( m_pProjectile )
+        return m_pProjectile->GetModelIndex ();
+    return 0;
 }
 
 void CClientProjectile::SetModel ( unsigned short usModel )
 {
-    m_pProjectile->SetModelIndex ( usModel );
+    if ( m_pProjectile )
+        m_pProjectile->SetModelIndex ( usModel );
 }
 
 void CClientProjectile::SetCounter ( DWORD dwCounter )
 {
-    m_pProjectileInfo->SetCounter ( dwCounter );
+    if ( m_pProjectile )
+        m_pProjectileInfo->SetCounter ( dwCounter );
 }
 
 DWORD CClientProjectile::GetCounter ( void )
 {
-    return m_pProjectileInfo->GetCounter ( );
+    if ( m_pProjectile )
+        return m_pProjectileInfo->GetCounter ( );
+    return 0;
 }
