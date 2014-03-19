@@ -488,6 +488,39 @@ void RpClump::GetBoneTransform( CVector *offset )
 }
 
 /*=========================================================
+    RpClumpGetAlpha
+
+    Arguments:
+        clump - the clump to get the alpha value from
+    Purpose:
+        Returns the (plugin) alpha value that is assigned to
+        the given clump.
+    Binary offsets:
+        (1.0 US and 1.0 EU): 0x00732B20
+=========================================================*/
+int __cdecl RpClumpGetAlpha( const RpClump *clump )
+{
+    return clump->alpha;
+}
+
+/*=========================================================
+    RpClumpSetAlpha
+
+    Arguments:
+        clump - the clump to set the alpha to
+        alpha - alpha color to set to the clump
+    Purpose:
+        Updates the (plugin) alpha value of a specified
+        clump object.
+    Binary offsets:
+        (1.0 US and 1.0 EU): 0x00732B00
+=========================================================*/
+void __cdecl RpClumpSetAlpha( RpClump *clump, int alpha )
+{
+    clump->alpha = alpha;
+}
+
+/*=========================================================
     RpClumpCreate
 
     Purpose:

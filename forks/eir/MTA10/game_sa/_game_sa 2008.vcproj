@@ -631,6 +631,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CObjectSA.render.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\COffsets.cpp"
 				>
 			</File>
@@ -1429,6 +1433,10 @@
 			</File>
 			<File
 				RelativePath="CObjectSA.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CObjectSA.render.h"
 				>
 			</File>
 			<File

@@ -137,6 +137,7 @@ CGameSA::CGameSA()
     //Physical_Init();
     //Objects_Init();
     //Ped_Init();
+    ObjectRender_Init();
     Streamer_Init();
     ModelInfo_Init();
     VehicleModels_Init();
@@ -251,6 +252,7 @@ CGameSA::~CGameSA ( void )
     VehicleModels_Shutdown();
     ModelInfo_Shutdown();
     Streamer_Shutdown();
+    ObjectRender_Shutdown();
     //Ped_Shutdown();
     //Objects_Shutdown();
     //Physical_Shutdown();

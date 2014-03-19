@@ -56,6 +56,10 @@ public:
 class CObjectSAInterface : public CPhysicalSAInterface
 {
 public:
+    void __thiscall             _PreRender( void );
+
+    void __thiscall             SetupFixedLighting( void );
+
     void* pObjectList; // 312
     uint8 pad1; // 316
     uint8 pad2; // 317
@@ -86,8 +90,8 @@ public:
     uint32 b0x80000 : 1;
     uint32 b0x100000 : 1;
     uint32 b0x200000 : 1;
-    uint32 b0x400000 : 1;
-    uint32 b0x800000 : 1;
+    uint32 bFadingOutClump : 1;
+    uint32 bFixedLighting : 1;
 
     uint32 b0x1000000 : 1; // 323
     uint32 b0x2000000 : 1;
@@ -103,7 +107,7 @@ public:
     uint8 pad5; // 326
     uint8 pad6; // 327
     uint8 pad7; // 328
-    uint8 pad8; // 329
+    CColLighting objLighting; // 329
     uint16 pad9; // 330
     uint8 pad10; // 332
     uint8 pad11; // 333
@@ -119,7 +123,7 @@ public:
     uint16 pad18; // 362
     uint32 pad19; // 364
     CEntitySAInterface* pGarageDoorDummy; // 368  CDummyObject - Might be used for other dynamic objects
-    uint32 pad21; // 372
+    unsigned int objEffectSysTime;
     uint32 pad22; // 376
 };
 C_ASSERT(sizeof(CObjectSAInterface) == 0x17C);
@@ -161,6 +165,8 @@ public:
 private:
     void                        CheckForGangTag     ( );
 };
+
+#include "CObjectSA.render.h"
 
 /*
 #define COBJECTSA_DEFINED

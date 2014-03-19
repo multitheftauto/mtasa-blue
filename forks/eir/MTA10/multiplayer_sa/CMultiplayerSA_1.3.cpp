@@ -81,9 +81,6 @@ DWORD RETN_CTaskSimpleJetpack_ProcessInputDisabled           =  0x67E821;
 DWORD RETN_CTaskSimplePlayerOnFoot_ProcessWeaponFire             =  0x685ABF;
 DWORD RETN_CTaskSimplePlayerOnFoot_ProcessWeaponFire_Call        =  0x540670;
 
-#define HOOKPOS_CObject_PreRender                   0x59FE69
-DWORD RETURN_CObject_PreRender =                    0x59FE6F;
-
 #define HOOKPOS_CWorld_RemoveFallenPeds                     0x565D0D
 DWORD RETURN_CWorld_RemoveFallenPeds_Cont               =   0x565D13;
 DWORD RETURN_CWorld_RemoveFallenPeds_Cancel             =   0x565E6F;
@@ -114,7 +111,6 @@ void HOOK_CVehicle_ProcessStuff_StartPointLightCode ( );
 void HOOK_CTaskSimpleJetpack_ProcessInput ( );
 void HOOK_CTaskSimplePlayerOnFoot_ProcessWeaponFire ( );
 void HOOK_CTaskSimpleJetpack_ProcessInputFixFPS2 ( );
-void HOOK_CObject_PreRender ( );
 void HOOK_CWorld_RemoveFallenPeds ( );
 void HOOK_CVehicleModelInterface_SetClump ( );
 void HOOK_CBoat_ApplyDamage ( );
@@ -153,8 +149,6 @@ void CMultiplayerSA::InitHooks_13 ( void )
 
     HookInstall ( HOOKPOS_CTaskSimpleJetpack_ProcessInput, (DWORD) HOOK_CTaskSimpleJetpack_ProcessInput, 5 );
     HookInstall ( HOOKPOS_CTaskSimplePlayerOnFoot_ProcessWeaponFire, (DWORD) HOOK_CTaskSimplePlayerOnFoot_ProcessWeaponFire, 5 );
-
-    HookInstall ( HOOKPOS_CObject_PreRender, (DWORD)HOOK_CObject_PreRender, 6 );
 
     HookInstall ( HOOKPOS_CWorld_RemoveFallenPeds, (DWORD)HOOK_CWorld_RemoveFallenPeds, 6 );
 
@@ -1278,53 +1272,6 @@ void _declspec(naked) HOOK_CTaskSimplePlayerOnFoot_ProcessWeaponFire ( )
             popad
             call RETN_CTaskSimplePlayerOnFoot_ProcessWeaponFire_Call
             jmp RETN_CTaskSimplePlayerOnFoot_ProcessWeaponFire
-        }
-    }
-}
-
-CVector vecObjectScale;
-CObjectSAInterface* pCurrentObject;
-bool CObject_GetScale()
-{
-    CObject* pObject = pGameInterface->GetPools ()->GetObjectA ( (DWORD *)pCurrentObject );
-    if ( pObject )
-    {
-        vecObjectScale = *pObject->GetScale ();
-        return true;
-    }
-    return false;
-}
-
-
-void _declspec(naked) HOOK_CObject_PreRender ()
-{
-    _asm
-    {
-        pushad
-        mov pCurrentObject, esi
-    }
-    
-    if ( CObject_GetScale() )
-    {
-        _asm
-        {
-            popad
-
-            push 1
-            lea edx, vecObjectScale
-
-            jmp RETURN_CObject_PreRender
-        }
-    }
-    else
-    {
-        // Do unmodified method if we don't know about this object
-        _asm
-        {
-            popad
-            push 1
-            lea edx, [esp+14h]
-            jmp RETURN_CObject_PreRender
         }
     }
 }

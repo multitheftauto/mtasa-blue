@@ -139,7 +139,7 @@ void __cdecl _RenderEntity( CEntitySAInterface *entity )
     {
         // This value will be used for internal GTA:SA vehicles.
         // We might aswell use this alpha value of the clump.
-        alpha = (unsigned char)( (RpClump*)entity->GetRwObject() )->alpha;
+        alpha = (unsigned char)RpClumpGetAlpha( (RpClump*)entity->GetRwObject() );
     }
 
     if ( alpha != 255 )
@@ -614,7 +614,7 @@ struct RenderStaticWorldEntities
 
         bool successfullyRendered = false;
 
-        if ( entity->nType == ENTITY_TYPE_VEHICLE || entity->nType == ENTITY_TYPE_PED && ((RpClump*)entity->GetRwObject())->alpha != 255 )
+        if ( entity->nType == ENTITY_TYPE_VEHICLE || entity->nType == ENTITY_TYPE_PED && RpClumpGetAlpha( (RpClump*)entity->GetRwObject() ) != 255 )
         {
             // MTA extension: make sure that entities are still visible behind alpha textures.
             if ( m_isAlphaFix && !m_directPurge )
@@ -637,7 +637,7 @@ struct RenderStaticWorldEntities
 
                             if ( dirLook == 3 || dirLook == 0 )
                             {
-                                if ( vehicle->GetRwObject()->alpha == 255 )
+                                if ( RpClumpGetAlpha( vehicle->GetRwObject() ) == 255 )
                                 {
                                     isUnderwater = true;
                                 }

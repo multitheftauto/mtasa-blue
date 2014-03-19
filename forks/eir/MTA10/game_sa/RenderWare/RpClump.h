@@ -79,4 +79,8 @@ RpClump* __cdecl    RpClumpForAllAtomics    ( RpClump *clump, clumpAtomicIterato
 RpClump* __cdecl    RpClumpForAllAtomics    ( RpClump *clump, void *callback, void *data );
 RpClump* __cdecl    RpClumpCreate           ( void );                                   // US exe: 0x0074A290
 
+// Plugin API.
+int __cdecl         RpClumpGetAlpha( const RpClump *clump );
+void __cdecl        RpClumpSetAlpha( RpClump *clump, int alpha );
+
 #endif //_RENDERWARE_CLUMP_
