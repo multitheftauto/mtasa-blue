@@ -349,6 +349,7 @@ public:
     SString                                     m_strDetectedAC;
     uint                                        m_uiD3d9Size;
     SString                                     m_strD3d9Md5;
+    SString                                     m_strD3d9Sha256;
     std::set < ElementID >                      m_VehiclesWithPartsStateSyncDirty;
 private:
     CElapsedTime                                m_VehiclePartsStateSyncTimer;
