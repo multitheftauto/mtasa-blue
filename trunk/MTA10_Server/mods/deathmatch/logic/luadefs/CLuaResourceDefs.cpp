@@ -871,8 +871,6 @@ int CLuaResourceDefs::getResourceRootElement ( lua_State* luaVM )
                 return 1;
             }
         }
-        else
-            m_pScriptDebugging->LogError ( luaVM, "%s: Resource %s is not currently running", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), pResource->GetName().c_str () );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
