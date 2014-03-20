@@ -19,9 +19,9 @@ Our automated build server takes care of building (and subsequently uploading) t
 = Already know how to get Nightly builds running? =
 If you know what you're doing, you can get the files you need from here:
 
-*[http://code.google.com/p/mtasa-blue/downloads/list Go to the Google Code download page]* _for data, and files required to build locally_
+*[http://mirror.mtasa.com/mtasa/data/ Go to the data files download page] _for data, and files required to build locally_
 
-[http://code.google.com/p/mtasa-resources/downloads/list Go to the resources download page] _for the latest resource packages_
+[http://mirror.mtasa.com/mtasa/resources/ Go to the resources download page] _for the latest resource packages_
 
 [http://nightly.multitheftauto.com/ Go to the nightly builds] _for the latest MTA nightly build_
 
