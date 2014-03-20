@@ -1405,6 +1405,9 @@ void CMultiplayerSA::InitHooks()
     // from CWorld::ClearExcitingStuffFromArea
     MemSet( (void*)0x56A404, 0x90, 0x56A446-0x56A404 );
 
+    // Disable setting the occupied's vehicles health to 75.0f when a burning ped enters it
+    // in CFire::ProcessFire
+    MemSet((void*)0x53A651, 0x90, 0xA);
 
     InitHooks_CrashFixHacks ();
 
