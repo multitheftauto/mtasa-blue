@@ -211,7 +211,7 @@ inline void _SpecialFXDualBlendRenderPass( RwRenderCallbackTraverseImpl *rtinfo,
         // The_GTA: made sure the textures have rasters. Seriously, textures may have _no raster_.
         if ( useRaster && effRaster )
         {
-            if ( IS_ANY_FLAG( useRaster->format, 0x20 ) ) && IS_ANY_FLAG( effRaster->format, 0x20 ) && useTexture != blendTexture )
+            if ( IS_ANY_FLAG( useRaster->format, 0x20 ) && IS_ANY_FLAG( effRaster->format, 0x20 ) && useTexture != blendTexture )
             {
                 RwD3D9RasterConvertToNonPalettized( effRaster );
             }
