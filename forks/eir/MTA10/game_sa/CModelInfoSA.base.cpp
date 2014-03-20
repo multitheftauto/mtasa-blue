@@ -268,6 +268,60 @@ void CBaseModelInfoSAInterface::UnsetColModel( void )
     DeleteCollision();
 }
 
+/*=========================================================
+    CBaseModelInfoSAInterface::ValidateResource (MTA extension)
+
+    Arguments:
+        rwobj - resource that should be checked compatibility for
+    Purpose:
+        Returns a boolean that tells you whether the given resource
+        is compatible with this model info structure.
+=========================================================*/
+bool CBaseModelInfoSAInterface::ValidateResource( RwObject *rwobj )
+{
+    // Check compatibility based on model info type.
+    eRwType modelInfoType = GetRwModelType();
+
+    if ( modelInfoType == RW_ATOMIC )
+    {
+        // Make sure the object is an atomic as well.
+        if ( rwobj->type != RW_ATOMIC )
+            return false;
+    }
+    else if ( modelInfoType == RW_CLUMP )
+    {
+        // Make sure the object is a clump as well.
+        if ( rwobj->type != RW_CLUMP )
+            return false;
+
+        RpClump *theClump = (RpClump*)rwobj;
+
+        // Special checks for different model derivations.
+        eModelType infoType = GetModelType();
+
+        if ( infoType == MODEL_PED )
+        {
+            // Make sure the clump has an animation structure.
+            RpAnimHierarchy *anim = theClump->GetAtomicAnimHierarchy();
+
+            if ( !anim )
+                return false;
+        }
+        else if ( infoType == MODEL_VEHICLE )
+        {
+            // todo.
+        }
+        else
+        {
+            // todo.
+        }
+    }
+    else
+        return false;
+
+    return true;
+}
+
 void ModelInfoBase_Init( void )
 {
     // Install some fixes/investigation

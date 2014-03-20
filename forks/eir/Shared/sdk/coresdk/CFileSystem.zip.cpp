@@ -628,7 +628,7 @@ void CArchiveFileTranslator::GetFiles( const char *path, const char *wildcard, b
 
 struct zip_mapped_rdircheck
 {
-    inline unsigned short operator() ( const char map[1024], size_t count, long& off ) const
+    inline bool Perform( const char map[1024], size_t count, long& off ) const
     {
         unsigned short n = (unsigned int)count + 1;
         const char *cur = map + n;
@@ -836,15 +836,18 @@ void CArchiveFileTranslator::Extract( CFile& dstFile, file& info )
         from = &m_file;
     }
 
-    switch( info.compression )
+    if ( info.compression == 0 )
     {
-    case 0:
         FileSystem::StreamCopyCount( *from, dstFile, comprSize );
-        break;
-    case 8:
-        FileSystem::StreamParserCount( *from, dstFile, comprSize, zip_inflate_decompression() );
-        break;
-    default:
+    }
+    else if ( info.compression == 8 )
+    {
+        zip_inflate_decompression decompressor;
+
+        FileSystem::StreamParserCount( *from, dstFile, comprSize, decompressor );
+    }
+    else
+    {
         assert( 0 );
     }
 
@@ -862,8 +865,12 @@ CArchiveTranslator* CFileSystem::CreateZIPArchive( CFile& file )
 
 CArchiveTranslator* CFileSystem::OpenArchive( CFile& file )
 {
-    if ( !FileSystem::MappedReaderReverse <char [1024]>( file, zip_mapped_rdircheck() ) )
-        return NULL;
+    {
+        zip_mapped_rdircheck checker;
+
+        if ( !FileSystem::MappedReaderReverse <char [1024]>( file, checker ) )
+            return NULL;
+    }
 
     _endDir dirEnd;
 
@@ -1063,15 +1070,20 @@ void CArchiveFileTranslator::SaveDirectory( directory& dir, size_t& size )
 
             info.sizeReal = header.sizeReal = src->GetSize();
 
-            switch( header.compression )
+            if ( header.compression == 0 )
             {
-            case 0:
-                FileSystem::StreamParser( *src, m_file, zip_stream_compression( header ) );
-                break;
-            case 8:
-                FileSystem::StreamParser( *src, m_file, zip_deflate_compression( header, Z_DEFAULT_COMPRESSION ) );
-                break;
-            default:
+                zip_stream_compression compressor( header );
+
+                FileSystem::StreamParser( *src, m_file, compressor );
+            }
+            else if ( header.compression == 8 )
+            {
+                zip_deflate_compression compressor( header, Z_DEFAULT_COMPRESSION );
+
+                FileSystem::StreamParser( *src, m_file, compressor );
+            }
+            else
+            {
                 assert( 0 );
             }
 

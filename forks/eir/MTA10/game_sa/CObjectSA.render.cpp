@@ -12,7 +12,7 @@
 #include <StdInc.h>
 #include "gamesa_renderware.h"
 
-static const float objLightingMod = ( 100.0f / 3.0f );
+static const float objLightingMod = ( 1.0f / 30.0f );
 
 void __thiscall CObjectSAInterface::_PreRender( void )
 {
@@ -88,12 +88,15 @@ void __thiscall CObjectSAInterface::_PreRender( void )
             Placeable.GetMatrix( objFrame->modelling );
 
             // MTA fix: use custom object scale if provided.
-            const CVector *useScale = &scaleVec;
+            const CVector *useScale = NULL;
 
             if ( CObjectSA *mtaObj = Pools::GetObject( this ) )
             {
                 useScale = mtaObj->GetScale();
             }
+
+            if ( !useScale )
+                useScale = &scaleVec;
 
             RwMatrixScale( &objFrame->modelling, (const RwV3d*)useScale, TRANSFORM_BEFORE );
 

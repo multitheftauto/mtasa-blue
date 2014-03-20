@@ -123,7 +123,7 @@ public:
     uint16 pad18; // 362
     uint32 pad19; // 364
     CEntitySAInterface* pGarageDoorDummy; // 368  CDummyObject - Might be used for other dynamic objects
-    unsigned int objEffectSysTime;
+    unsigned int objEffectSysTime; // 372
     uint32 pad22; // 376
 };
 C_ASSERT(sizeof(CObjectSAInterface) == 0x17C);

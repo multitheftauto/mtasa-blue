@@ -649,7 +649,7 @@ namespace FileSystem
     // where the seek should reside at. This function is used by the .zip extension
     // To find where the .zip stream starts at.
     template <class t, typename F>
-    inline bool MappedReaderReverse( CFile& file, F f )
+    inline bool MappedReaderReverse( CFile& file, F& f )
     {
         t buf;
         long off;
@@ -660,7 +660,7 @@ namespace FileSystem
         {
             size_t readCount = file.Read( &buf, 1, sizeof( buf ) );
 
-            if ( f( buf, readCount, off ) )
+            if ( f.Perform( buf, readCount, off ) )
             {
                 file.Seek( -(long)readCount + off, SEEK_CUR );
                 return true;
@@ -708,7 +708,7 @@ namespace FileSystem
     // an appropriate dst representation. It reads the src stream
     // into a temporary buffer and the callback structure may modify it.
     template <class cb>
-    inline void StreamParser( CFile& src, CFile& dst, cb f )
+    inline void StreamParser( CFile& src, CFile& dst, cb& f )
     {
         char buf[8096];
         char outBuf[16192];
@@ -739,8 +739,8 @@ namespace FileSystem
 
     // Parses the stream same as StreamParser, but limited to 'cnt' bytes of the
     // source stream.
-    template <class cb>
-    inline void StreamParserCount( CFile& src, CFile& dst, size_t cnt, cb f )
+    template <typename cb>
+    inline void StreamParserCount( CFile& src, CFile& dst, size_t cnt, cb& f )
     {
         char buf[8096];
         char outBuf[16192];
@@ -782,6 +782,37 @@ namespace FileSystem
         }
 
         dst.SetSeekEnd();
+    }
+
+    // Copies from one translator to another using optimizations.
+    inline bool FileCopy( CFileTranslator *srcTranslator, const char *srcPath, CFileTranslator *dstTranslator, const char *dstPath )
+    {
+        if ( srcTranslator == dstTranslator )
+        {
+            return srcTranslator->Copy( srcPath, dstPath );
+        }
+
+        CFile *srcStream = srcTranslator->Open( srcPath, "rb" );
+
+        bool successful = false;
+
+        if ( srcStream )
+        {
+            CFile *dstStream = dstTranslator->Open( dstPath, "wb" );
+
+            if ( dstStream )
+            {
+                StreamCopy( *srcStream, *dstStream );
+
+                successful = true;
+
+                delete dstStream;
+            }
+
+            delete srcStream;
+        }
+
+        return successful;
     }
 }
 

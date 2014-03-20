@@ -148,7 +148,7 @@ bool CModelSA::Replace( unsigned short id )
 {
     CBaseModelInfoSAInterface *info = ppModelInfo[id];
 
-    if ( id > DATA_TEXTURE_BLOCK-1 )
+    if ( id > MAX_MODELS-1 )
         return false;
 
     if ( !info )
@@ -163,6 +163,10 @@ bool CModelSA::Replace( unsigned short id )
         return m_atomics.front()->Replace( id );
     }
     // We are a clump for sure
+
+    // Make sure we are compatible with the model info.
+    if ( !info->ValidateResource( GetObject() ) )
+        return false;
 
     if ( IsReplaced( id ) )
         return true;

@@ -122,7 +122,8 @@ inline bool RwD3D9IsVertexAlphaRenderingRequired( RwRenderPass *rtPass, RpMateri
 
 inline bool RwD3D9IsVertexAlphaRenderingRequiredEx( RwRenderPass *rtPass, RpMaterial *curMat )
 {
-    return RwD3D9IsVertexAlphaRenderingRequired( rtPass, curMat ) || curMat->texture && curMat->texture->raster->isAlpha;
+    // Remember: RenderWare texture can have no raster.
+    return RwD3D9IsVertexAlphaRenderingRequired( rtPass, curMat ) || curMat->texture && RwTextureHasAlpha( curMat->texture );
 }
 
 // Helper function to update surface properties.
