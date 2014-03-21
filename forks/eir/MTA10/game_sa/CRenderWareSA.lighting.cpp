@@ -334,6 +334,9 @@ static int __cdecl RpD3D9InitializeLightingPlugin( void )
     // Initialize other lighting plugins.
     RpLightInit();
 
+    // Do some other plugins as well.
+    RenderWareStats_RegisterPlugins();
+
     return successful;
 }
 

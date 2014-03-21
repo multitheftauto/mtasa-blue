@@ -150,7 +150,10 @@ void CGameSA::GetRwResourceStats ( SRwResourceStats& outStats )
 void CGameSA::InitHooks_RwResources ( void )
 {
     memset ( &ms_Stats, 0, sizeof ( ms_Stats ) );
+}
 
+void RenderWareStats_RegisterPlugins( void )
+{
     RwTextureRegisterPlugin( 0, 0xDEAD1001,
         (RwTexturePluginConstructor)_RwTextureStatsConstructor,
         (RwTexturePluginDestructor)_RwTextureStatsDestructor,

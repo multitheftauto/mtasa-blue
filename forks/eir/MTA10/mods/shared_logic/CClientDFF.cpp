@@ -38,7 +38,7 @@ CClientDFF::~CClientDFF ( void )
 
 
 // Get a clump which has been loaded to replace the specified model id
-RpClump* CClientDFF::GetLoadedClump ( ushort usModelId, CColModel*& col )
+CModel* CClientDFF::GetLoadedClump ( ushort usModelId )
 {
     if ( usModelId == 0 )
         return NULL;
@@ -53,10 +53,9 @@ RpClump* CClientDFF::GetLoadedClump ( ushort usModelId, CColModel*& col )
         m_pManager->GetModelRequestManager ()->RequestBlocking ( usModelId, "CClientDFF::LoadDFF" );
 
         // Attempt loading it
-        info.pClump = g_pGame->GetRenderWare ()->ReadDFF ( m_strDffFilename, usModelId, CClientVehicleManager::IsValidModel ( usModelId ), info.col );
+        bool loadCollision = CClientVehicleManager::IsValidModel ( usModelId ); // only get the collision if we are a vehicle model
 
-        // Maybe we loaded a collision (could be NULL)
-        col = info.col;
+        info.pClump = g_pGame->GetModelManager()->CreateModel( m_strDffFilename, usModelId, loadCollision );
     }
 
     return info.pClump;
@@ -89,9 +88,7 @@ void CClientDFF::UnloadDFF ( void )
     {
         SLoadedClumpInfo& info = iter->second;
         if ( info.pClump )
-            g_pGame->GetRenderWare ()->DestroyDFF ( info.pClump );
-        if ( info.col )
-            delete info.col;    //gtfo col
+            delete info.pClump;
     }
 
     m_LoadedClumpInfoMap.clear ();
@@ -101,10 +98,8 @@ void CClientDFF::UnloadDFF ( void )
 
 bool CClientDFF::ReplaceModel ( unsigned short usModel, bool bAlphaTransparency )
 {
-    CColModel *col = NULL;
-
     // Get clump loaded for this model id
-    RpClump* pClump = GetLoadedClump ( usModel, col );
+    CModel* pClump = GetLoadedClump ( usModel );
 
     // We have a DFF?
     if ( pClump )
@@ -118,10 +113,6 @@ bool CClientDFF::ReplaceModel ( unsigned short usModel, bool bAlphaTransparency 
             // again by an another resource.
             pReplaced->m_Replaced.remove ( usModel );
         }
-
-        // That collision has to be imported, yo.
-        if ( col )
-            col->Replace( usModel );
 
         // Is this a vehicle ID?
         if ( CClientVehicleManager::IsValidModel ( usModel ) )
@@ -248,13 +239,13 @@ void CClientDFF::InternalRestoreModel ( unsigned short usModel )
     if ( pInfo )
     {
         if ( pInfo->pClump )
-            g_pGame->GetRenderWare ()->DestroyDFF ( pInfo->pClump );
+            delete pInfo->pClump;
         MapRemove ( m_LoadedClumpInfoMap, usModel );
     }
 }
 
 
-bool CClientDFF::ReplaceObjectModel ( RpClump* pClump, ushort usModel, bool bAlphaTransparency )
+bool CClientDFF::ReplaceObjectModel ( CModel* pClump, ushort usModel, bool bAlphaTransparency )
 {
     // Stream out all the object models with matching ID.
     // Streamer will stream them back in async after a frame
@@ -263,19 +254,22 @@ bool CClientDFF::ReplaceObjectModel ( RpClump* pClump, ushort usModel, bool bAlp
     g_pGame->GetModelInfo ( usModel )->RestreamIPL ();
 
     // Grab the model info for that model and replace the model
-    CModelInfo* pModelInfo = g_pGame->GetModelInfo ( usModel );
-    pModelInfo->SetCustomModel ( pClump );
+    bool success = pClump->Replace( usModel );
 
-    pModelInfo->SetAlphaTransparencyEnabled( bAlphaTransparency );
+    if ( success )
+    {
+        CModelInfo *pModelInfo = g_pGame->GetModelInfo ( usModel );
+        pModelInfo->SetAlphaTransparencyEnabled( bAlphaTransparency );
 
-    // Remember that we've replaced that object model
-    m_Replaced.push_back ( usModel );
+        // Remember that we've replaced that object model
+        m_Replaced.push_back ( usModel );
+    }
 
     // Success
-    return true;
+    return success;
 }
 
-bool CClientDFF::ReplaceWeaponModel ( RpClump* pClump, ushort usModel, bool bAlphaTransparency )
+bool CClientDFF::ReplaceWeaponModel ( CModel* pClump, ushort usModel, bool bAlphaTransparency )
 {
     // Stream out all the weapon models with matching ID.
     // Streamer will stream them back in async after a frame
@@ -284,19 +278,22 @@ bool CClientDFF::ReplaceWeaponModel ( RpClump* pClump, ushort usModel, bool bAlp
     m_pManager->GetPickupManager ()->RestreamPickups ( usModel );
 
     // Grab the model info for that model and replace the model
-    CModelInfo* pModelInfo = g_pGame->GetModelInfo ( usModel );
-    pModelInfo->SetCustomModel ( pClump );
+    bool success = pClump->Replace( usModel );
 
-    pModelInfo->SetAlphaTransparencyEnabled( bAlphaTransparency );
+    if ( success )
+    {
+        CModelInfo *pModelInfo = g_pGame->GetModelInfo ( usModel );
+        pModelInfo->SetAlphaTransparencyEnabled( bAlphaTransparency );
 
-    // Remember that we've replaced that weapon model
-    m_Replaced.push_back ( usModel );
+        // Remember that we've replaced that weapon model
+        m_Replaced.push_back ( usModel );
+    }
 
     // Success
-    return true;
+    return success;
 }
 
-bool CClientDFF::ReplacePedModel ( RpClump* pClump, ushort usModel, bool bAlphaTransparency )
+bool CClientDFF::ReplacePedModel ( CModel* pClump, ushort usModel, bool bAlphaTransparency )
 {
     // Stream out all the weapon models with matching ID.
     // Streamer will stream them back in async after a frame
@@ -304,36 +301,42 @@ bool CClientDFF::ReplacePedModel ( RpClump* pClump, ushort usModel, bool bAlphaT
     m_pManager->GetPedManager ()->RestreamPeds ( usModel );
 
     // Grab the model info for that model and replace the model
-    CModelInfo* pModelInfo = g_pGame->GetModelInfo ( usModel );
-    pModelInfo->SetCustomModel ( pClump );
+    bool success = pClump->Replace( usModel );
 
-    pModelInfo->SetAlphaTransparencyEnabled( bAlphaTransparency );
+    if ( success )
+    {
+        CModelInfo *pModelInfo = g_pGame->GetModelInfo ( usModel );
+        pModelInfo->SetAlphaTransparencyEnabled( bAlphaTransparency );
 
-    // Remember that we've replaced that weapon model
-    m_Replaced.push_back ( usModel );
+        // Remember that we've replaced that weapon model
+        m_Replaced.push_back ( usModel );
+    }
 
     // Success
-    return true;
+    return success;
 }
 
-bool CClientDFF::ReplaceVehicleModel ( RpClump* pClump, ushort usModel, bool bAlphaTransparency )
+bool CClientDFF::ReplaceVehicleModel ( CModel* pClump, ushort usModel, bool bAlphaTransparency )
 {
     // Make sure previous model+collision is loaded
     m_pManager->GetModelRequestManager ()->RequestBlocking ( usModel, "CClientDFF::ReplaceVehicleModel" );
 
     // Grab the model info for that model and replace the model
-    CModelInfo* pModelInfo = g_pGame->GetModelInfo ( usModel );
-    pModelInfo->SetCustomModel ( pClump );
+    bool success = pClump->Replace( usModel );
 
-    pModelInfo->SetAlphaTransparencyEnabled( bAlphaTransparency );
+    if ( success )
+    {
+        CModelInfo *pModelInfo = g_pGame->GetModelInfo ( usModel );
+        pModelInfo->SetAlphaTransparencyEnabled( bAlphaTransparency );
 
-    // Remember that we've replaced that vehicle model
-    m_Replaced.push_back ( usModel );
+        // Remember that we've replaced that vehicle model
+        m_Replaced.push_back ( usModel );
 
-    // Stream out all the vehicle models with matching ID.
-    // Streamer will stream them back in async after a frame
-    // or so.
-    m_pManager->GetVehicleManager ()->RestreamVehicles ( usModel );
+        // Stream out all the vehicle models with matching ID.
+        // Streamer will stream them back in async after a frame
+        // or so.
+        m_pManager->GetVehicleManager ()->RestreamVehicles ( usModel );
+    }
 
     // Success
     return true;

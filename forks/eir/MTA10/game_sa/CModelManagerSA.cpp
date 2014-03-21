@@ -34,12 +34,12 @@ CModelManagerSA::~CModelManagerSA( void )
 #ifndef _MTA_BLUE
 CModelSA* CModelManagerSA::CreateModel( CFile *file, modelId_t id )
 #else
-CModelSA* CModelManagerSA::CreateModel( const char *filename, modelId_t id )
+CModelSA* CModelManagerSA::CreateModel( const char *filename, modelId_t id, bool loadEmbeddedCollision )
 #endif //_MTA_BLUE
 {
 #ifdef _MTA_BLUE
     CColModel *col = NULL;
-    RpClump *clump = pGame->GetRenderWare()->ReadDFF( filename, id, true, col );
+    RpClump *clump = pGame->GetRenderWare()->ReadDFF( filename, id, loadEmbeddedCollision, col );
 
     if ( !clump )
         return NULL;

@@ -27,6 +27,11 @@ CTexDictionarySA::CTexDictionarySA( RwTexDictionary *txd ) : CRwObjectSA( txd )
     // Assign all textures to us
     txd->ForAllTexturesSafe( RwTexDictionaryAssign, this );
 
+#ifdef _MTA_BLUE
+    // Register into the shader system.
+    pGame->GetRenderWare()->ScriptAddedTxd( txd );
+#endif //_MTA_BLUE
+
     // The texture manager (or whatever management environment) sets up the list node
 }
 

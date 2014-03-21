@@ -15,18 +15,28 @@ CClientTXD::CClientTXD ( class CClientManager* pManager, ElementID ID ) : ClassI
     // Init
     m_pManager = pManager;
     SetTypeName ( "txd" );
+
+    // RenderWare texture dictionary that holds texture replacement information.
+    m_texDict = NULL;
 }
 
 
 CClientTXD::~CClientTXD ( void )
 {
     // Remove us from all the models
-    g_pGame->GetRenderWare ()->ModelInfoTXDRemoveTextures ( &m_ReplacementTextures );
-
-    // Restream affected models
-    for ( uint i = 0 ; i < m_ReplacementTextures.usedInModelIds.size () ; i++ )
+    if ( m_texDict )
     {
-        Restream ( m_ReplacementTextures.usedInModelIds[i] );
+        CTexDictionary::importList_t importedModels;
+
+        importedModels = m_texDict->GetImportedList();
+
+        delete m_texDict;
+
+        // Restream affected models
+        for ( CTexDictionary::importList_t::const_iterator iter = importedModels.begin(); iter != importedModels.end(); iter++ )
+        {
+            Restream ( *iter );
+        }
     }
 
     // Remove us from all the clothes replacement doo dah
@@ -36,10 +46,48 @@ CClientTXD::~CClientTXD ( void )
 
 bool CClientTXD::LoadTXD ( const char* szFile, bool bFilteringEnabled )
 {
+    // Unload previously loaded tex dictionary.
+    if ( m_texDict )
+    {
+        delete m_texDict;
+
+        m_texDict = NULL;
+    }
+
     // Do load here to check for errors.
     m_strFilename = szFile;
     m_bFilteringEnabled = bFilteringEnabled;
-    return g_pGame->GetRenderWare ()->ModelInfoTXDLoadTextures ( &m_ReplacementTextures, m_strFilename, m_bFilteringEnabled );
+
+    CFile *fileStream = g_pCore->GetModRoot()->Open( szFile, "rb" );
+
+    CTexDictionary *txd = NULL;
+    
+    if ( fileStream )
+    {
+        txd = g_pGame->GetTextureManager()->CreateTxd( fileStream );
+
+        if ( txd )
+        {
+            m_texDict = txd;
+
+            // Apply filtering
+            if ( bFilteringEnabled )
+            {
+                std::list <CTexture*> texList = txd->GetTextures();
+
+                for ( std::list <CTexture*>::const_iterator iter = texList.begin(); iter != texList.end(); iter++ )
+                {
+                    CTexture *tex = *iter;
+
+                    tex->SetFiltering( true );
+                }
+            }
+        }
+
+        delete fileStream;
+    }
+
+    return ( txd != NULL );
 }
 
 bool CClientTXD::Import ( unsigned short usModelID )
@@ -47,10 +95,11 @@ bool CClientTXD::Import ( unsigned short usModelID )
     if ( usModelID >= CLOTHES_TEX_ID_FIRST && usModelID <= CLOTHES_TEX_ID_LAST )
     {
         // If using for clothes only, unload 'replacing model textures' stuff to save memory
-        if ( !m_ReplacementTextures.textures.empty() && m_ReplacementTextures.usedInModelIds.empty() )
+        if ( m_texDict )
         {
-            g_pGame->GetRenderWare ()->ModelInfoTXDRemoveTextures ( &m_ReplacementTextures );
-            m_ReplacementTextures = SReplacementTextures();
+            delete m_texDict;
+
+            m_texDict = NULL;
         }
         // Load txd file data if not already done
         if ( m_FileData.IsEmpty() )
@@ -65,15 +114,23 @@ bool CClientTXD::Import ( unsigned short usModelID )
     else
     {
         // Ensure loaded for replacing model textures
-        g_pGame->GetRenderWare ()->ModelInfoTXDLoadTextures ( &m_ReplacementTextures, m_strFilename, m_bFilteringEnabled );
-        if ( m_ReplacementTextures.textures.empty () )
-            return false;
-
-        // Have we got textures and haven't already imported into this model?
-        if ( g_pGame->GetRenderWare ()->ModelInfoTXDAddTextures ( &m_ReplacementTextures, usModelID ) )
+        if ( !m_texDict )
         {
-            Restream ( usModelID );
-            return true;
+            LoadTXD( m_strFilename.c_str(), m_bFilteringEnabled );
+        }
+
+        if ( m_texDict )
+        {
+            // Fail if the TXD contains no textures.
+            if ( m_texDict->GetTextures().empty() )
+                return false;
+
+            // Have we got textures and haven't already imported into this model?
+            if ( m_texDict->Import( usModelID ) )
+            {
+                Restream ( usModelID );
+                return true;
+            }
         }
     }
 

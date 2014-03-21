@@ -1426,7 +1426,7 @@ void CClientPed::WarpIntoVehicle ( CClientVehicle* pVehicle, unsigned int uiSeat
         CVector vecInVehiclePosition;
         GetPosition ( vecInVehiclePosition );
         UpdateStreamPosition ( vecInVehiclePosition );
-        if ( pVehicle->IsStreamedIn () )
+        if ( pVehicle->IsStreamedIn () && !m_pPlayerPed )
             StreamIn ( true );
     }
 }
@@ -5274,15 +5274,7 @@ CClientPed * CClientPed::GetTargetedPed ( void )
 void CClientPed::NotifyCreate ( void )
 {
     m_pManager->GetPedManager ()->OnCreation ( this );
-
-    m_bStreamedIn = true;
-    m_bAttemptingToStreamIn = false;
-
-    if ( !m_pPlayerPed )
-    {
-        CLuaArguments Arguments;
-        CallEvent ( "onClientElementStreamIn", Arguments, true );
-    }
+    CClientStreamElement::NotifyCreate ();
 }
 
 

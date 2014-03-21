@@ -139,14 +139,12 @@ bool _cdecl OnCStreaming_RequestModel_Mid ( int flags, ClothesReplacing::SImgGTA
         return false;
 
     // If bLoadingBigModel is set, try to get it unset
-    #define VAR_CStreaming_bLoadingBigModel     0x08E4A58
-    BYTE& bLoadingBigModel = *(BYTE*)VAR_CStreaming_bLoadingBigModel;
-    if ( bLoadingBigModel )
+    if ( Streaming::isLoadingBigModel )
     {
         pGame->GetStreaming()->LoadAllRequestedModels ( true );
-        if ( bLoadingBigModel )
+        if ( Streaming::isLoadingBigModel )
             pGame->GetStreaming()->LoadAllRequestedModels ( false );
-        assert ( !bLoadingBigModel );
+        assert ( !Streaming::isLoadingBigModel );
     }
 
     // Set results

@@ -10,7 +10,7 @@
 *
 *****************************************************************************/
 
-#include <StdInc.h>
+#include "StdInc.h"
 #include "../gamesa_renderware.h"
 
 RwObject* CRwFrameSA::RwFrameObjectAssign( RwObject *obj, CRwFrameSA *parent )

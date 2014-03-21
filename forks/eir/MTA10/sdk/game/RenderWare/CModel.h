@@ -18,6 +18,8 @@ class CModel : public virtual CRwObject
 public:
     virtual                         ~CModel             ( void )   {}
 
+    virtual CColModel*              GetCollision        ( void ) = 0;
+
     virtual CModel*                 Clone               ( void ) const = 0;
     virtual void                    Render              ( void ) = 0;
 

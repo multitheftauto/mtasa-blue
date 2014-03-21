@@ -46,7 +46,8 @@ CModelTexturesInfo* CRenderWareSA::GetModelTexturesInfo ( ushort usModelId )
 
         if ( !pTxd )
         {
-            pGame->GetModelInfo ( usModelId )->Request ( BLOCKING, "CRenderWareSA::GetModelTexturesInfo" );
+            Streaming::RequestModel( usModelId, 0x10 );
+            Streaming::LoadAllRequestedModels( true );
             CTxdStore_AddRef ( usTxdId );
             ( (void (__cdecl *)(unsigned short))FUNC_RemoveModel )( usModelId );
             pTxd = CTxdStore_GetTxd ( usTxdId );

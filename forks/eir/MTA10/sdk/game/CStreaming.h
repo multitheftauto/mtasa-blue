@@ -12,6 +12,8 @@
 #ifndef __CStreaming_H
 #define __CStreaming_H
 
+#define PLAYER_IMG_FILENAME     "models\\player.img"
+
 // Set the default model id type
 // This should be the most efficient way to travel model ids.
 // It can either be unsigned int or unsigned short.

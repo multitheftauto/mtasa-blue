@@ -10,7 +10,7 @@
 *
 *****************************************************************************/
 
-#include <StdInc.h>
+#include "StdInc.h"
 
 CRwObjectSA::CRwObjectSA( RwObject *obj )
 {

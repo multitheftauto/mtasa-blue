@@ -36,7 +36,7 @@ protected:
     SString                         m_strFilename;
     bool                            m_bFilteringEnabled;
     CBuffer                         m_FileData;
-    SReplacementTextures            m_ReplacementTextures;
+    CTexDictionary*                 m_texDict;
 };
 
 #endif

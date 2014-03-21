@@ -1961,7 +1961,7 @@ void __cdecl Streaming::PulseLoader( void )
 // Return true to skip
 bool _cdecl ShouldSkipLoadRequestedModels( DWORD calledFrom )
 {
-    if ( !StreamingCache::IsIMGFileCached( "PLAYER.IMG" ) )
+    if ( !StreamingCache::IsIMGFileCached( PLAYER_IMG_FILENAME ) )
         return false;
 
     // Skip LoadRequestedModels if called from:

@@ -728,3 +728,34 @@ int CLuaFunctionDefs::EngineGetVisibleTextureNames ( lua_State* luaVM )
     lua_pushboolean ( luaVM, false );
     return 1;
 }
+
+
+int CLuaFunctionDefs::EngineIsModelBeingUsed ( lua_State *luaVM )
+{
+    // bool engineIsModelBeingUsed ( int modelIndex )
+    // Returns whether MTA uses the model denoted by modelIndex.
+    int modelIndex;
+
+    CScriptArgReader argStream( luaVM );
+    argStream.ReadNumber( modelIndex );
+
+    if ( !argStream.HasErrors() )
+    {
+        CModelInfo *modelInfo = g_pGame->GetModelInfo ( modelIndex );
+
+        if ( modelInfo )
+        {
+            // If the reference count is greater than zero, we use that model.
+            bool isUsed = ( modelInfo->GetRefCount() > 0 );
+
+            lua_pushboolean( luaVM, isUsed );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+
+    // We failed
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}

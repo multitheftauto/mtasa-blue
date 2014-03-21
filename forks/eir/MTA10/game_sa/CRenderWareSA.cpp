@@ -267,7 +267,7 @@ RpClump * CRenderWareSA::ReadDFF ( const char *szDFF, unsigned short id, bool bL
 
     if ( id != 0 )
     {
-        CModelLoadInfoSA *info = (CModelLoadInfoSA*)ARRAY_CModelLoadInfo + id;
+        CModelLoadInfoSA *info = &Streaming::GetModelLoadInfo( id );
 
         // The_GTA: Clumps and atomics load their requirements while being read in this rwStream
         // We therefor have to prepare all resources so it can retrive them; textures and animations!
@@ -323,9 +323,7 @@ RpClump * CRenderWareSA::ReadDFF ( const char *szDFF, unsigned short id, bool bL
             colAcq = new CColLoaderModelAcquisition;
         }
 
-#ifdef RENDERWARE_VIRTUAL_INTERFACES
         RwImportedScan::Apply( model->usTextureDictionary );
-#endif //RENDERWARE_VIRTUAL_INTERFACES
     }
 
     // read the clump with all its extensions
@@ -333,10 +331,8 @@ RpClump * CRenderWareSA::ReadDFF ( const char *szDFF, unsigned short id, bool bL
 
     if ( id != 0 )
     {
-#ifdef RENDERWARE_VIRTUAL_INTERFACES
         // Do not import our textures anymore
         RwImportedScan::Unapply();
-#endif //RENDERWARE_VIRTUAL_INTERFACES
 
         if ( bLoadEmbeddedCollisions )
         {

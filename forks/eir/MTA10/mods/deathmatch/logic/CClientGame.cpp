@@ -2797,6 +2797,10 @@ void CClientGame::AddBuiltInEvents ( void )
     m_Events.AddEvent ( "onClientVehicleDamage", "attacker, weapon, loss, x, y, z, tyre", NULL, false );
     m_Events.AddEvent ( "onClientVehicleNitroStateChange", "activated", NULL, false );
 
+    // Model events.
+    m_Events.AddEvent ( "onClientModelRequest", "id", NULL, false );
+    m_Events.AddEvent ( "onClientModelFree", "id", NULL, false );
+
     // GUI events
     m_Events.AddEvent ( "onClientGUIClick", "button, state, absoluteX, absoluteY", NULL, false );
     m_Events.AddEvent ( "onClientGUIDoubleClick", "button, state, absoluteX, absoluteY", NULL, false );

@@ -14,12 +14,8 @@
 
 #include "StdInc.h"
 
-// In this pool we store all COL libraries
-CColFilePool **ppColFilePool = (CColFilePool**)CLASS_CColFilePool;
+extern CBaseModelInfoSAInterface **ppModelInfo;
 
-#define FUNC_ColFilePoolInit    0x004113F0
-
-SetCachedCollision_t    SetCachedCollision =                (SetCachedCollision_t)0x005B2C20;
 
 CColModelSAInterface::CColModelSAInterface( void )
 {
@@ -236,7 +232,7 @@ bool CColModelSA::Restore( unsigned short id )
         model->SetCollision( m_original, m_originalDynamic );
 
         // Destroy it's data if not used anymore
-        if ( m_originalDynamic && !(*ppColFilePool)->Get( m_original->m_colPoolIndex )->m_loaded )
+        if ( m_originalDynamic && !Streaming::GetCOLEnvironment().m_pool->Get( m_original->m_colPoolIndex )->m_loaded )
             m_original->ReleaseData();
 
         break;
@@ -267,10 +263,10 @@ void CColModelSA::RestoreAll( void )
 
 void* CColFileSA::operator new ( size_t )
 {
-    return (*ppColFilePool)->Allocate();
+    return Streaming::GetCOLEnvironment().m_pool->Allocate();
 }
 
 void CColFileSA::operator delete ( void *ptr )
 {
-    (*ppColFilePool)->Free( (CColFileSA*)ptr );
+    Streaming::GetCOLEnvironment().m_pool->Free( (CColFileSA*)ptr );
 }

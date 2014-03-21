@@ -14,14 +14,38 @@
 
 using std::list;
 
+static void __cdecl _ModelInfo__RequestModel( unsigned short modelIndex )
+{
+    CLuaArguments luaArgs;
+    luaArgs.PushNumber( modelIndex );
+
+    g_pClientGame->GetRootEntity()->CallEvent( "onClientModelRequest", luaArgs, false );
+}
+
+static void __cdecl _ModelInfo__FreeModel( unsigned short modelIndex )
+{
+    CLuaArguments luaArgs;
+    luaArgs.PushNumber( modelIndex );
+
+    g_pClientGame->GetRootEntity()->CallEvent( "onClientModelFree", luaArgs, false );
+}
+
 CClientModelRequestManager::CClientModelRequestManager ( void )
 {
     m_bDoingPulse = false;
+
+    // Register model usage monitoring.
+    g_pGame->GetModelManager()->SetRequestCallback( _ModelInfo__RequestModel );
+    g_pGame->GetModelManager()->SetFreeCallback( _ModelInfo__FreeModel );
 }
 
 
 CClientModelRequestManager::~CClientModelRequestManager ( void )
 {
+    // Unregister model usage monitoring.
+    g_pGame->GetModelManager()->SetRequestCallback( NULL );
+    g_pGame->GetModelManager()->SetFreeCallback( NULL );
+
     // Delete all our requests.
     list < SClientModelRequest* > ::iterator iter;
     for ( iter = m_Requests.begin (); iter != m_Requests.end (); iter++ )

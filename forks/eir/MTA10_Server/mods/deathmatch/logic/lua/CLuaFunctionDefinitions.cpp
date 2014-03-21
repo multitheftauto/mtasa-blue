@@ -2071,6 +2071,10 @@ int CLuaFunctionDefinitions::GetPlayerACInfo ( lua_State* luaVM )
         lua_pushstring ( luaVM, pPlayer->m_strD3d9Md5 );
         lua_settable   ( luaVM, -3 );
 
+        lua_pushstring ( luaVM, "d3d9SHA256" );
+        lua_pushstring ( luaVM, pPlayer->m_strD3d9Sha256 );
+        lua_settable   ( luaVM, -3 );
+
         return 1;
     }
     else

@@ -21,8 +21,7 @@ struct SLoadedClumpInfo
 {
     SLoadedClumpInfo ( void ) : bTriedLoad ( false ), pClump ( NULL ) {} 
     bool     bTriedLoad;
-    RpClump* pClump;
-    CColModel* col;
+    CModel*  pClump;
 };
 
 
@@ -55,12 +54,12 @@ protected:
     void                            UnloadDFF               ( void );
     void                            InternalRestoreModel    ( unsigned short usModel );
 
-    bool                            ReplaceObjectModel      ( RpClump* pClump, ushort usModel, bool bAlphaTransparency );
-    bool                            ReplaceVehicleModel     ( RpClump* pClump, ushort usModel, bool bAlphaTransparency );
-    bool                            ReplaceWeaponModel      ( RpClump* pClump, ushort usModel, bool bAlphaTransparency );
-    bool                            ReplacePedModel         ( RpClump* pClump, ushort usModel, bool bAlphaTransparency );
+    bool                            ReplaceObjectModel      ( CModel* pClump, ushort usModel, bool bAlphaTransparency );
+    bool                            ReplaceVehicleModel     ( CModel* pClump, ushort usModel, bool bAlphaTransparency );
+    bool                            ReplaceWeaponModel      ( CModel* pClump, ushort usModel, bool bAlphaTransparency );
+    bool                            ReplacePedModel         ( CModel* pClump, ushort usModel, bool bAlphaTransparency );
 
-    RpClump*                        GetLoadedClump          ( ushort usModelId, CColModel*& col );
+    CModel*                         GetLoadedClump          ( ushort usModelId );
 
     class CClientDFFManager*        m_pDFFManager;
 

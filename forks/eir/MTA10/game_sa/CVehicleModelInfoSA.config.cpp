@@ -61,6 +61,9 @@ static void __cdecl _VehicleModels_Init( void )
         // Reference it
         txdEntry->Reference();
 
+        // Initialize its parent (so the shader system can hook onto them)
+        txdEntry->InitParent();
+
         g_vehicleTxd = txdEntry->m_txd;
     }
 

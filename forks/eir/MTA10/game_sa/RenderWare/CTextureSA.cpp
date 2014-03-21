@@ -37,7 +37,11 @@ CTextureSA::~CTextureSA( void )
     RemoveFromTXD();
 
     // Destroy ourselves
+#ifdef _MTA_BLUE
+    pGame->GetRenderWare()->DestroyTexture( m_texture );
+#else
     RwTextureDestroy( m_texture );
+#endif //_MTA_BLUE
 }
 
 const char* CTextureSA::GetName( void ) const

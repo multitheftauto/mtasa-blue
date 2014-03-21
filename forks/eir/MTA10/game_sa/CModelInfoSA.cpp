@@ -290,8 +290,8 @@ VOID CModelInfoSA::Request( EModelRequestType requestType, const char* szTag )
 
     if ( requestType == BLOCKING )
     {
-        pGame->GetStreaming()->RequestModel ( m_dwModelID, 0x16 );
-        pGame->GetStreaming()->LoadAllRequestedModels ( true );
+        Streaming::RequestModel ( m_dwModelID, 0x16 );
+        Streaming::LoadAllRequestedModels ( true );
         if ( !IsLoaded() )
         {
             // Try 3 more times, final time without high priority flag
@@ -299,7 +299,7 @@ VOID CModelInfoSA::Request( EModelRequestType requestType, const char* szTag )
             while ( iCount++ < 10 && !IsLoaded() )
             {
                 bool bOnlyPriorityModels = ( iCount < 3 || iCount & 1 );
-                pGame->GetStreaming()->LoadAllRequestedModels ( bOnlyPriorityModels );
+                Streaming::LoadAllRequestedModels ( bOnlyPriorityModels );
             }
             if ( !IsLoaded() )
             {
@@ -316,7 +316,7 @@ VOID CModelInfoSA::Request( EModelRequestType requestType, const char* szTag )
     }
     else
     {
-        pGame->GetStreaming()->RequestModel ( m_dwModelID, 0x06 );
+        Streaming::RequestModel( m_dwModelID, 0x06 );
     }
 }
 
@@ -619,7 +619,7 @@ void CModelInfoSA::StaticFlushPendingRestreamIPL ( void )
     std::set < unsigned short >::iterator it;
     for ( it = removedModels.begin (); it != removedModels.end (); it++ )
     {
-        ( (void (__cdecl *)(unsigned short))FUNC_RemoveModel )( *it );
+        Streaming::FreeModel( *it );
         Streaming::GetModelLoadInfo( *it ).m_eLoading = MODEL_UNAVAILABLE;
     }
 }
@@ -640,6 +640,13 @@ void CModelInfoSA::ModelAddRef ( EModelRequestType requestType, const char* szTa
     if ( m_dwReferences == 0 )
     {
         assert ( !m_dwPendingInterfaceRef );
+
+        // Notify the environment that MTA starts using this model.
+        if ( ModelManager::modelRequestCallback != NULL )
+        {
+            ModelManager::modelRequestCallback( (unsigned short)m_dwModelID );
+        }
+
         if ( IsLoaded () )
         {
             m_pInterface = ppModelInfo [ m_dwModelID ];
@@ -663,7 +670,18 @@ void CModelInfoSA::RemoveRef ( bool bRemoveExtraGTARef )
 
     // Decrement the references
     if ( m_dwReferences > 0 )
+    {
         m_dwReferences--;
+
+        if ( m_dwReferences == 0 )
+        {
+            // Notify the environment that MTA does not require this model anymore.
+            if ( ModelManager::modelFreeCallback != NULL )
+            {
+                ModelManager::modelFreeCallback( (unsigned short)m_dwModelID );
+            }
+        }
+    }
 
     if ( m_dwReferences == 0 && m_dwPendingInterfaceRef )
     {
@@ -871,7 +889,7 @@ void CModelInfoSA::RestoreOriginalModel ( void )
     // Are we loaded?
     if ( IsLoaded () )
     {
-        ( (void (__cdecl *)(unsigned short))FUNC_RemoveModel )( static_cast < unsigned short > ( m_dwModelID ) );
+        Streaming::FreeModel( m_dwModelID );
     }
 
     // Reset the stored custom vehicle clump

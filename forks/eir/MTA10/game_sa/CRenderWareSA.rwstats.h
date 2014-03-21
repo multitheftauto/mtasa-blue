@@ -12,6 +12,6 @@
 #ifndef _RENDERWARE_STATISTICS_
 #define _RENDERWARE_STATISTICS_
 
-
+void RenderWareStats_RegisterPlugins( void );
 
 #endif //_RENDERWARE_STATISTICS_

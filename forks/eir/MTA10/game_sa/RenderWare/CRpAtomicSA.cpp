@@ -10,7 +10,7 @@
 *
 *****************************************************************************/
 
-#include <StdInc.h>
+#include "StdInc.h"
 #include "../gamesa_renderware.h"
 
 extern CBaseModelInfoSAInterface **ppModelInfo;

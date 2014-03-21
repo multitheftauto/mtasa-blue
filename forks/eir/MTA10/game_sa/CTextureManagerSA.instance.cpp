@@ -98,7 +98,7 @@ static bool Txd_DeleteAll( RwTexture *tex, int )
 
 void CTxdInstanceSA::Deallocate( void )
 {
-    unsigned short id = TextureManager::GetTxdPool()->GetIndex( this );
+    int id = TextureManager::GetTxdPool()->GetIndex( this );
 
     // Notify the shader system
     OnStreamingRemoveTxd( id + 20000 );
@@ -192,7 +192,7 @@ void CTxdInstanceSA::InitParent( void )
     CTxdPool *txdPool = TextureManager::GetTxdPool();
 
     // Assign texture imports
-    unsigned short id = txdPool->GetIndex( this );
+    int id = txdPool->GetIndex( this );
 
     // Notify the shader system
     OnStreamingAddedTxd( id );
