@@ -667,10 +667,11 @@ bool CommandLineContains( const SString& strText )
 void DisplayErrorMessageBox ( const SString& strMessage, const SString& strErrorCode, const SString& strTroubleType )
 {
     HideSplash ();
-    MessageBoxUTF8( 0, strMessage, _("Error! (CTRL+C to copy)")+strErrorCode, MB_ICONEXCLAMATION|MB_OK | MB_TOPMOST );
 
-    if ( strTroubleType != "" )
-        BrowseToSolution ( strTroubleType, ASK_GO_ONLINE | TERMINATE_IF_YES );
+    if ( strTroubleType.empty() )
+        BrowseToSolution( strTroubleType, SHOW_MESSAGE_ONLY, strMessage, strErrorCode );
+    else
+        BrowseToSolution( strTroubleType, ASK_GO_ONLINE | TERMINATE_IF_YES, strMessage, strErrorCode );
 }
 
 
@@ -1273,7 +1274,7 @@ void UpdateMTAVersionApplicationSetting ( bool bQuiet )
     {
         SString strError = GetSystemErrorMessage ( dwLastError );            
         SString strMessage( _("Error loading %s module! (%s)"), *strFilename.ToLower (), *strError );
-        BrowseToSolution ( strFilename + "-not-loadable", ASK_GO_ONLINE | TERMINATE_PROCESS, strMessage );
+        DisplayErrorMessageBox ( strMessage, _E("CL38"), strFilename + "-not-loadable" );
     }
 
     if ( !bQuiet )
@@ -1737,9 +1738,8 @@ bool CheckAndShowFileOpenFailureMessage ( void )
 
     if ( !strFilename.empty () )
     {
-        //SetApplicationSetting ( "diagnostics", "gta-fopen-fail", "" );
-        SString strMsg ( _("GTA:SA had trouble opening the file '%s'\n\nTry reinstalling GTA:SA to fix it"), *strFilename );
-        MessageBoxUTF8 ( NULL, strMsg, "MTA: San Andreas"+_E("CL27"), MB_OK | MB_ICONERROR | MB_TOPMOST );
+        SString strMsg ( _("GTA:SA had trouble opening the file '%s'"), *strFilename );
+        DisplayErrorMessageBox ( strMsg, _E("CL31"), SString( "gta-fopen-fail&name=%s", *strFilename ) );
         return true;
     }
     return false;
@@ -1762,13 +1762,7 @@ void CheckAndShowMissingFileMessage ( void )
     if ( !FileExists( strGTAPathFilename ) )
     {
         SString strMsg ( _("GTA:SA is missing the file '%s'."), *strFilename );
-        strMsg += "\n\n";
-        strMsg += _("Do you want to see some online help?");
-        int iResponse = MessageBoxUTF8 ( NULL, strMsg, "MTA: San Andreas"+_E("CL31"), MB_YESNO | MB_ICONERROR | MB_TOPMOST );
-        if ( iResponse == IDYES )
-        {
-            BrowseToSolution ( SString( "gta-file-missing&name=%s", *strFilename ), TERMINATE_PROCESS );
-        }
+        DisplayErrorMessageBox ( strMsg, _E("CL36"), SString( "gta-file-missing&name=%s", *strFilename ) );
     }
 }
 
@@ -1795,9 +1789,7 @@ void CheckAndShowModelProblems ( void )
         SString strMsg;
         strMsg += _("GTA:SA had trouble loading a model.");
         strMsg += SString( " (%d)", iModelId );
-        strMsg += "\n\n";
-        strMsg += _("Try reinstalling GTA:SA to fix it");
-        BrowseToSolution( SString( "gta-model-fail&id=%d&reason=%s", iModelId, *strReason ), ASK_GO_ONLINE | TERMINATE_IF_YES, strMsg );
+        DisplayErrorMessageBox ( strMsg, _E("CL34"), SString( "gta-model-fail&id=%d&reason=%s", iModelId, *strReason ) );
     }
 }
 
@@ -1824,9 +1816,7 @@ void CheckAndShowUpgradeProblems ( void )
         SString strMsg;
         strMsg += _("GTA:SA had trouble adding an upgrade to a vehicle.");
         strMsg += SString( " (%d)", iModelId );
-        strMsg += "\n\n";
-        strMsg += _("Try reinstalling GTA:SA to fix it");
-        BrowseToSolution( SString( "gta-upgrade-fail&id=%d&upgid=%d&frame=%d", iModelId, iUpgradeId, iFrame ), ASK_GO_ONLINE | TERMINATE_IF_YES, strMsg );
+        DisplayErrorMessageBox ( strMsg, _E("CL35"), SString( "gta-upgrade-fail&id=%d&upgid=%d&frame=%d", iModelId, iUpgradeId, iFrame ) );
     }
 }
 
@@ -1971,7 +1961,7 @@ void ForbodenProgramsMessage ( void )
         SString strMessage = _("Please terminate the following programs before continuing:");
         strMessage += "\n\n";
         strMessage += strResult;
-        BrowseToSolution ( "forboden-programs", ASK_GO_ONLINE | TERMINATE_IF_YES, strMessage );
+        DisplayErrorMessageBox ( strMessage, _E("CL39"), "forboden-programs" );
     }
 }
 

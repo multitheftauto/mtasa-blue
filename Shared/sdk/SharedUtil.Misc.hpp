@@ -511,7 +511,7 @@ void SharedUtil::SetClipboardText ( const SString& strText )
 //
 // Direct players to info about trouble
 //
-void SharedUtil::BrowseToSolution( const SString& strType, int iFlags, const SString& strMessageBoxMessage, int iTerminateExitCode )
+void SharedUtil::BrowseToSolution( const SString& strType, int iFlags, const SString& strMessageBoxMessage, const SString& strErrorCode )
 {
     AddReportLog ( 3200, SString ( "Trouble %s", *strType ) );
 
@@ -520,12 +520,13 @@ void SharedUtil::BrowseToSolution( const SString& strType, int iFlags, const SSt
     argMap.Set ( "type", strType.SplitLeft ( ";" ) );
     argMap.Set ( "flags", iFlags );
     argMap.Set ( "message", strMessageBoxMessage );
+    argMap.Set ( "ecode", strErrorCode );
     SetApplicationSetting ( "pending-browse-to-solution", argMap.ToString () );
 
     if ( iFlags & EXIT_GAME_FIRST )
     {
         // Exit game and continue in loader.dll
-        TerminateProcess( GetCurrentProcess (), iTerminateExitCode );
+        TerminateProcess( GetCurrentProcess (), 1 );
     }
 
     // Otherwise, do it now
@@ -534,7 +535,7 @@ void SharedUtil::BrowseToSolution( const SString& strType, int iFlags, const SSt
     // Exit game if required
     int iFlagMatch = bDidBrowse ? TERMINATE_IF_YES : TERMINATE_IF_NO;
     if ( iFlags & iFlagMatch  )
-        TerminateProcess ( GetCurrentProcess (), iTerminateExitCode );
+        TerminateProcess ( GetCurrentProcess (), 1 );
 }
 
 //
@@ -543,35 +544,34 @@ void SharedUtil::BrowseToSolution( const SString& strType, int iFlags, const SSt
 //
 bool SharedUtil::ProcessPendingBrowseToSolution ( void )
 {
-    SString strType, strMessageBoxMessage;
+    SString strType, strMessageBoxMessage, strErrorCode;
     int iFlags;
 
     // Get args from the registry
     CArgMap argMap;
     argMap.SetFromString ( GetApplicationSetting ( "pending-browse-to-solution" ) );
-    argMap.Get ( "type", strType );
+    if ( !argMap.Get ( "type", strType ) )
+        return false;
     argMap.Get ( "message", strMessageBoxMessage );
     argMap.Get ( "flags", iFlags );
-
-    // Check if anything to do
-    if ( strType.empty () )
-        return false;
+    argMap.Get ( "ecode", strErrorCode );
 
     ClearPendingBrowseToSolution ();
 
+    SString strTitle( "MTA: San Andreas %s   (CTRL+C to copy)", *strErrorCode );
     // Show message if set, ask question if required, and then launch URL
     if ( iFlags & ASK_GO_ONLINE )
     {
         if ( !strMessageBoxMessage.empty() )
             strMessageBoxMessage += "\n\n\n";
         strMessageBoxMessage += _("Do you want to see some on-line help about this problem ?");
-        if ( IDYES != MessageBoxUTF8( NULL, strMessageBoxMessage, "MTA: San Andreas", MB_YESNO | MB_ICONQUESTION | MB_TOPMOST ) )
+        if ( IDYES != MessageBoxUTF8( NULL, strMessageBoxMessage, strTitle, MB_YESNO | MB_ICONQUESTION | MB_TOPMOST ) )
             return false;
     }
     else
     {
         if ( !strMessageBoxMessage.empty() )
-            MessageBoxUTF8 ( NULL, strMessageBoxMessage, "MTA: San Andreas", MB_OK | MB_ICONEXCLAMATION | MB_TOPMOST );
+            MessageBoxUTF8 ( NULL, strMessageBoxMessage, strTitle, MB_OK | MB_ICONEXCLAMATION | MB_TOPMOST );
         if ( iFlags & SHOW_MESSAGE_ONLY )
             return true;
     }
