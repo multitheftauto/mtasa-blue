@@ -1725,8 +1725,7 @@ bool CClientPed::IsDead ( void )
         CTask * pTask = m_pTaskManager->GetTask ( TASK_PRIORITY_EVENT_RESPONSE_NONTEMP );
         if ( pTask )
         {
-            eTaskType taskType = (eTaskType) pTask->GetTaskType ();
-            if ( taskType == TASK_SIMPLE_DEAD || taskType == TASK_COMPLEX_DIE )
+            if ( pTask->GetTaskType () == TASK_SIMPLE_DEAD )
             {
                 return true;
             }
