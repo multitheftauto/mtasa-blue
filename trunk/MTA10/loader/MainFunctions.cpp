@@ -323,14 +323,16 @@ void HandleCustomStartMessage ( void )
     SetApplicationSetting( "diagnostics", "start-message", "" );
     SetApplicationSetting( "diagnostics", "start-message-trouble", "" );
 
-    if ( strTrouble.empty() )
+    if ( strStartMessage.BeginsWith( "vdetect" ) )
     {
-        MessageBoxUTF8 ( NULL, strStartMessage, "MTA: San Andreas", MB_OK | MB_ICONINFORMATION | MB_TOPMOST ); //!ACHTUNG: Where 2 localize?
+        SString strFilename = strStartMessage.SplitRight( "name=" );
+        strStartMessage = _( "WARNING\n\n"
+                             "MTA:SA has detected unusual activity.\n"
+                             "Please run a virus scan to ensure your system is secure.\n\n" );
+        strStartMessage += SString( _( "The detected file was:  %s\n" ), *strFilename );
     }
-    else
-    {
-        BrowseToSolution ( strTrouble, ASK_GO_ONLINE | TERMINATE_IF_YES, strStartMessage ); //!ACHTUNG: Where 2 localize?
-    }
+
+    DisplayErrorMessageBox( strStartMessage, _E("CL37"), strTrouble );
 }
 
 
@@ -488,7 +490,7 @@ void ValidateGTAPath( void )
         DisplayErrorMessageBox (_( "The path to your installation of 'MTA:SA' or 'GTA: San Andreas'\n"
                                    "contains a ';' (semicolon).\n\n"
                                    " If you experience problems when running MTA:SA,\n"
-                                   " move your installation(s) to a path that does not contain a semicolon." ), _E("CL15") );
+                                   " move your installation(s) to a path that does not contain a semicolon." ), _E("CL15"), "path-semicolon" );
     }
 }
 
@@ -740,7 +742,7 @@ void CheckDataFiles( void )
         if ( bFoundInGTADir || bFoundInMTADir )
         {
             DisplayErrorMessageBox (_( ".asi files are in the 'MTA:SA' or 'GTA: San Andreas' installation directory.\n\n"
-                                       "Remove these .asi files if you experience problems with MTA:SA." ), _E("CL28") );
+                                       "Remove these .asi files if you experience problems with MTA:SA." ), _E("CL28"), "asi-files" );
         }
     }
 
@@ -836,7 +838,7 @@ int LaunchGame ( SString strCmdLine )
             SString strError = GetSystemErrorMessage ( dwError );            
             DisplayErrorMessageBox ( SString(_("Could not start Grand Theft Auto: San Andreas.  "
                                 "Please try restarting, or if the problem persists,"
-                                "contact MTA at www.multitheftauto.com. \n\n[%s]"),*strError), _E("CL22"), "createprocess-fail;" + strError ); // Could not start GTA:SA
+                                "contact MTA at www.multitheftauto.com. \n\n[%s]"),*strError), _E("CL22"), "createprocess-fail&err=" + strError ); // Could not start GTA:SA
             return 5;
         }
     }
