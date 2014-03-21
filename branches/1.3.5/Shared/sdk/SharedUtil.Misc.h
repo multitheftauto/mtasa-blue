@@ -126,7 +126,7 @@ namespace SharedUtil
         TERMINATE_PROCESS       = TERMINATE_IF_YES_OR_NO,
         SHOW_MESSAGE_ONLY       = 16,        // Just show message without going online
     };
-    void            BrowseToSolution                ( const SString& strType, int uiFlags = 0, const SString& strMessageBoxMessage = "", int iTerminateExitCode = 1 );
+    void            BrowseToSolution                ( const SString& strType, int uiFlags = 0, const SString& strMessageBoxMessage = "", const SString& strErrorCode = "" );
     bool            ProcessPendingBrowseToSolution  ( void );
     void            ClearPendingBrowseToSolution    ( void );
 

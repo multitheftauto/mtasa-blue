@@ -1421,7 +1421,7 @@ void CClientPed::WarpIntoVehicle ( CClientVehicle* pVehicle, unsigned int uiSeat
         CVector vecInVehiclePosition;
         GetPosition ( vecInVehiclePosition );
         UpdateStreamPosition ( vecInVehiclePosition );
-        if ( pVehicle->IsStreamedIn () )
+        if ( pVehicle->IsStreamedIn () && !m_pPlayerPed )
             StreamIn ( true );
     }
 }
@@ -1584,6 +1584,9 @@ void CClientPed::SetHealth ( float fHealth )
 {
     // If our health is locked, dont allow any change
     if ( m_bHealthLocked ) return;
+
+    if ( fHealth < 0.0f )
+        fHealth = 0.0f;
 
     InternalSetHealth ( fHealth );
     m_fHealth = fHealth;
@@ -5251,15 +5254,7 @@ CClientPed * CClientPed::GetTargetedPed ( void )
 void CClientPed::NotifyCreate ( void )
 {
     m_pManager->GetPedManager ()->OnCreation ( this );
-
-    m_bStreamedIn = true;
-    m_bAttemptingToStreamIn = false;
-
-    if ( !m_pPlayerPed )
-    {
-        CLuaArguments Arguments;
-        CallEvent ( "onClientElementStreamIn", Arguments, true );
-    }
+    CClientStreamElement::NotifyCreate ();
 }
 
 
