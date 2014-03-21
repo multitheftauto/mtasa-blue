@@ -759,3 +759,33 @@ int CLuaFunctionDefs::EngineIsModelBeingUsed ( lua_State *luaVM )
     lua_pushboolean ( luaVM, false );
     return 1;
 }
+
+
+// Debug function, not intended for use in scripts.
+int CLuaFunctionDefs::DiagnoseEntity( lua_State *luaVM )
+{
+    CClientEntity *entity = NULL;
+
+    CScriptArgReader argStream( luaVM );
+    argStream.ReadUserData( entity );
+
+    if ( !argStream.HasErrors() )
+    {
+        // Call a game_sa diagnosis function (if possible).
+        CEntity *theEntity = entity->GetGameEntity();
+
+        if ( theEntity )
+        {
+            g_pGame->DiagnoseEntity( theEntity );
+
+            lua_pushboolean( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+
+    // We failed
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}

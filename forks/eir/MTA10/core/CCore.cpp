@@ -89,7 +89,7 @@ template<> CCore * CSingleton< CCore >::m_pSingleton = NULL;
 CCore::CCore ( void )
 {
     // Enable this to debug the core initialization.
-#if defined(_DEBUG) && 1
+#if defined(_DEBUG) && 0
     while ( !IsDebuggerPresent() )
         Sleep( 1 );
 #endif

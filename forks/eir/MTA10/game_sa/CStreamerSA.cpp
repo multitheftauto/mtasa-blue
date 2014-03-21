@@ -609,7 +609,7 @@ namespace Streamer
             switch( EntityRender::SetupEntityVisibility( entity, camDistance ) )
             {
             case ENTITY_RENDER_REQUEST_MODEL:
-                if ( *(bool*)0x009654B0 || !entity->IsOnScreen() || *(bool*)0x00B76851 )
+                if ( *(bool*)0x009654B0 || !entity->IsOnScreen() || EntityRender::DoBlockModelVisionLoading() )
                     return;
 
                 if ( Streaming::GetModelLoadInfo( entity->GetModelIndex() ).m_eLoading != MODEL_LOADED )

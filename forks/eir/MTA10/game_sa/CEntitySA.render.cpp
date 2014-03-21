@@ -21,6 +21,15 @@ namespace EntityRender
     entityRenderChain_t defaultEntityRenderChain( 8000 );               // Binary offsets: (1.0 US and 1.0 EU): 0x00C88120; ???, orig 200
     entityRenderChain_t underwaterEntityRenderChain( 4000 );            // Binary offsets: (1.0 US and 1.0 EU): 0x00C88178; ???, orig 100, used to render underwater entities
     entityRenderChain_t alphaEntityRenderChain( 50 );                   // Binary offsets: (1.0 US and 1.0 EU): 0x00C881D0; ???, orig 50, used for "grasshouse" model
+
+    // Runtime variables.
+    bool blockAutomaticModelLoadingInVision = false;                    // Binary offsets: (1.0 US and 1.0 EU): 0x00B76851
+
+    bool DoBlockModelVisionLoading( void )
+    {
+        //return blockAutomaticModelLoadingInVision;
+        return false;   // disabled because MTA:SA is not compatible with it.
+    }
 }
 
 /*=========================================================
@@ -445,12 +454,39 @@ void __cdecl PreRender( void )
     Binary offsets:
         (1.0 US and 1.0 EU): 0x005556E0
 =========================================================*/
+void DebugMethod( void )
+{
+    // Debug an issue I have experienced where MTA entities would lose their RenderWare object
+    // although they are used by the game.
+    for ( unsigned int n = 0; n < MAX_OBJECTS; n++ )
+    {
+        CObjectSA *object = mtaObjects[n];
+
+        if ( object )
+        {
+            CObjectSAInterface *realObj = (CObjectSAInterface*)object->GetInterface();
+
+            if ( !realObj->GetRwObject() )
+            {
+                realObj->CreateRwObject();
+
+                RwObject *rwobj = realObj->GetRwObject();
+
+                if ( !rwobj )
+                    __asm nop
+            }
+        }
+    }
+}
+
 void __cdecl SetupWorldRender( void )
 {
     using namespace EntityRender;
 
     // DEBUG
     RwD3D9ValidateDeviceStates();
+
+    DebugMethod();
 
     CCameraSAInterface& camera = Camera::GetInterface();
 
@@ -469,7 +505,9 @@ void __cdecl SetupWorldRender( void )
 
     *(float*)0x008CD804 = 1.0f;
 
-    *(bool*)0x00B76851 = false;
+    // This variable decides whether the runtime may load models that go into vision.
+    // It is really weird and was probably made for optimizations.
+    EntityRender::blockAutomaticModelLoadingInVision = false;
 
     // Calculate big entity LOD scale.
     float newBigScale = *(float*)0x008CD804;
@@ -484,7 +522,9 @@ void __cdecl SetupWorldRender( void )
         if ( camPos.fZ - groundLevel1 > 50.0f && camPos.fZ - groundLevel2 > 10.0f )
         {
             if ( GetPlayerVehicle( -1, false ) )
-                *(bool*)0x00B76851 = true;
+            {
+                EntityRender::blockAutomaticModelLoadingInVision = true;
+            }
         }
 
         if ( camPos.fZ > 80.0f )

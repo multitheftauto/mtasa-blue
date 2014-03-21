@@ -186,6 +186,8 @@ public:
     void                    OnPreFrame ( void );
     void                    OnFrame ( void );
 
+    void                    DiagnoseEntity ( CEntity *theEntity );
+
     eGameVersion            GetGameVersion ( void );
     eGameVersion            FindGameVersion ( void );
 

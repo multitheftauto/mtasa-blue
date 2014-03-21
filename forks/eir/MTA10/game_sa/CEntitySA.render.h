@@ -437,6 +437,9 @@ namespace EntityRender
     inline entityRenderChain_t& GetUnderwaterEntityRenderChain  ( void )        { return underwaterEntityRenderChain; }
     inline entityRenderChain_t& GetAlphaEntityRenderChain       ( void )        { return alphaEntityRenderChain; }
     inline atomicRenderChain_t& GetBoatRenderChain              ( void )        { return boatRenderChain; }
+
+    // Important utilities.
+    bool                DoBlockModelVisionLoading( void );
 };
 
 // Include sub modules.

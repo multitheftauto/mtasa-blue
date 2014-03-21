@@ -76,6 +76,8 @@ protected:
     static std::map < DWORD, BYTE > ms_ModelDefaultAlphaTransparencyMap;
     bool                            m_bAddedRefForCollision;
     SVehicleSupportedUpgrades       m_ModelSupportedUpgrades;
+    bool                            _isInsideRequester;
+    bool                            _isInsideRemover;
 public:
     static std::set < uint >        ms_ReplacedColModels;
 

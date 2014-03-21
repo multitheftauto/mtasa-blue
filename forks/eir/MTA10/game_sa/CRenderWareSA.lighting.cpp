@@ -334,8 +334,10 @@ static int __cdecl RpD3D9InitializeLightingPlugin( void )
     // Initialize other lighting plugins.
     RpLightInit();
 
+#ifdef _MTA_BLUE
     // Do some other plugins as well.
     RenderWareStats_RegisterPlugins();
+#endif
 
     return successful;
 }

@@ -224,6 +224,8 @@ public:
     virtual void                OnPreFrame ( void ) = 0;
     virtual void                OnFrame ( void ) = 0;
 
+    virtual void                DiagnoseEntity ( CEntity *theEntity ) = 0;
+
     virtual BOOL                InitLocalPlayer(  )=0;
 
     virtual float               GetGravity ( void ) = 0;

@@ -582,6 +582,36 @@ void CGameSA::OnFrame()
 {
 }
 
+void CGameSA::DiagnoseEntity( CEntity *theEntity )
+{
+    // Do some checking why our entity fails.
+    CEntitySAInterface *gameEntity = theEntity->GetInterface();
+
+    RwObject *rwobj = gameEntity->GetRwObject();
+
+    if ( !rwobj )
+    {
+        gameEntity->CreateRwObject();
+
+        rwobj = gameEntity->GetRwObject();
+
+        if ( !rwobj )
+        {
+            CModelLoadInfoSA& loadInfo = Streaming::GetModelLoadInfo( gameEntity->GetModelIndex() );
+
+            if ( loadInfo.m_eLoading == MODEL_UNAVAILABLE )
+            {
+                Streaming::RequestModel( gameEntity->GetModelIndex(), 0x10 );
+                Streaming::LoadAllRequestedModels( true );
+
+                gameEntity->CreateRwObject();
+            }
+        }
+    }
+
+    __asm nop
+}
+
 eGameVersion CGameSA::GetGameVersion ( void )
 {
     return m_eGameVersion;

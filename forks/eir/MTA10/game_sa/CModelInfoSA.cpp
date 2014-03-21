@@ -47,6 +47,9 @@ CModelInfoSA::CModelInfoSA ( void )
     m_pCustomClump = NULL;
     m_pCustomColModel = NULL;
     m_bAddedRefForCollision = false;
+
+    _isInsideRequester = false;
+    _isInsideRemover = false;
 }
 
 
@@ -60,6 +63,9 @@ CModelInfoSA::CModelInfoSA ( DWORD dwModelID )
     m_pCustomClump = NULL;
     m_pCustomColModel = NULL;
     m_bAddedRefForCollision = false;
+
+    _isInsideRequester = false;
+    _isInsideRemover = false;
 }
 
 
@@ -562,7 +568,7 @@ void CModelInfoSA::StaticFlushPendingRestreamIPL ( void )
     // In other words, it does not affect elements created by MTA.
     // It's mostly a reimplementation of SA's DeleteAllRwObjects, except that it filters by model ID.
 
-    ( (void (*)())FUNC_FlushRequestList )();
+    Streaming::FlushRequestList();
 
     std::set < unsigned short > removedModels;
     
@@ -577,12 +583,7 @@ void CModelInfoSA::StaticFlushPendingRestreamIPL ( void )
             {
                 if ( !pEntity->bStreamingDontDelete && !pEntity->bImBeingRendered )
                 {
-                    __asm
-                    {
-                        mov ecx, pEntity
-                        mov eax, [ecx]
-                        call dword ptr [eax+20h]
-                    }
+                    pEntity->DeleteRwObject();
                     removedModels.insert ( pEntity->m_nModelIndex );
                 }
             }
@@ -601,12 +602,7 @@ void CModelInfoSA::StaticFlushPendingRestreamIPL ( void )
             {
                 if ( !pEntity->bStreamingDontDelete && !pEntity->bImBeingRendered )
                 {
-                    __asm
-                    {
-                        mov ecx, pEntity
-                        mov eax, [ecx]
-                        call dword ptr [eax+20h]
-                    }
+                    pEntity->DeleteRwObject();
                     removedModels.insert ( pEntity->m_nModelIndex );
                 }
             }
@@ -620,12 +616,27 @@ void CModelInfoSA::StaticFlushPendingRestreamIPL ( void )
     for ( it = removedModels.begin (); it != removedModels.end (); it++ )
     {
         Streaming::FreeModel( *it );
-        Streaming::GetModelLoadInfo( *it ).m_eLoading = MODEL_UNAVAILABLE;
     }
 }
 
 void CModelInfoSA::ModelAddRef ( EModelRequestType requestType, const char* szTag )
 {
+    if ( m_dwReferences == 0 )
+    {
+        if ( !_isInsideRequester )
+        {
+            _isInsideRequester = true;
+
+            // Notify the environment that MTA starts using this model.
+            if ( ModelManager::modelRequestCallback != NULL )
+            {
+                ModelManager::modelRequestCallback( (unsigned short)m_dwModelID );
+            }
+
+            _isInsideRequester = false;
+        }
+    }
+
     // Are we not loaded?
     if ( !IsLoaded () )
     {
@@ -640,12 +651,6 @@ void CModelInfoSA::ModelAddRef ( EModelRequestType requestType, const char* szTa
     if ( m_dwReferences == 0 )
     {
         assert ( !m_dwPendingInterfaceRef );
-
-        // Notify the environment that MTA starts using this model.
-        if ( ModelManager::modelRequestCallback != NULL )
-        {
-            ModelManager::modelRequestCallback( (unsigned short)m_dwModelID );
-        }
 
         if ( IsLoaded () )
         {
@@ -675,10 +680,17 @@ void CModelInfoSA::RemoveRef ( bool bRemoveExtraGTARef )
 
         if ( m_dwReferences == 0 )
         {
-            // Notify the environment that MTA does not require this model anymore.
-            if ( ModelManager::modelFreeCallback != NULL )
+            if ( !_isInsideRemover )
             {
-                ModelManager::modelFreeCallback( (unsigned short)m_dwModelID );
+                _isInsideRemover = true;
+
+                // Notify the environment that MTA does not require this model anymore.
+                if ( ModelManager::modelFreeCallback != NULL )
+                {
+                    ModelManager::modelFreeCallback( (unsigned short)m_dwModelID );
+                }
+
+                _isInsideRemover = false;
             }
         }
     }
