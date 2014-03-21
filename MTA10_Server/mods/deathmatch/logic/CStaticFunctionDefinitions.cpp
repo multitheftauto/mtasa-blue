@@ -1643,6 +1643,10 @@ bool CStaticFunctionDefinitions::SetElementHealth ( CElement* pElement, float fH
                 if ( fHealth > fMaxHealth )
                     fHealth = fMaxHealth;
 
+                // Do not set the health below zero
+                if ( fHealth < 0.0f )
+                    fHealth = 0.0f;
+
                 // This makes sure the health is set to what will get reported
                 unsigned char ucHealth = static_cast < unsigned char > ( fHealth * 1.25f );
                 fHealth = static_cast < float > ( ucHealth ) / 1.25f;
