@@ -19,7 +19,7 @@ CProjectileSA::CProjectileSA (CProjectileSAInterface* projectileInterface) : COb
     internalInterface = projectileInterface;
     projectileInfo = NULL;
     this->BeingDeleted = false;
-    this->DoNotRemoveFromGame = false;  
+    this->DoNotRemoveFromGame = true;  
     this->internalInterface->bStreamingDontDelete = true;
     this->internalInterface->bDontStream = true;
     this->internalInterface->bRemoveFromWorld = false;

@@ -585,38 +585,6 @@ void _declspec(naked) HOOK_CrashFix_Misc19 ()
 
 
 ////////////////////////////////////////////////////////////////////////
-// Handle CPlaceable::RemoveMatrix having wrong data
-#define HOOKPOS_CrashFix_Misc20                             0x54F3B0
-#define HOOKSIZE_CrashFix_Misc20                            6
-DWORD RETURN_CrashFix_Misc20 =                              0x54F3B6;
-void _declspec(naked) HOOK_CrashFix_Misc20 ()
-{
-#if TEST_CRASH_FIXES
-    SIMULATE_ERROR_BEGIN( 10 )
-        _asm
-        {
-            mov     ecx, 0
-        }
-    SIMULATE_ERROR_END
-#endif
-    _asm
-    {
-        cmp     ecx, 0
-        je      cont        // Skip much code if ecx is zero
-
-        // continue standard path
-        sub     esp, 10h 
-        mov     eax, [ecx+14h] 
-        jmp     RETURN_CrashFix_Misc20
-
-    cont:
-        CRASH_AVERTED( 20 )
-        retn
-    }
-}
-
-
-////////////////////////////////////////////////////////////////////////
 // Handle CTaskSimpleCarFallOut::FinishAnimFallOutCB having wrong data
 #define HOOKPOS_CrashFix_Misc21                             0x648EF6
 #define HOOKSIZE_CrashFix_Misc21                            6
@@ -1203,7 +1171,7 @@ void CMultiplayerSA::InitHooks_CrashFixHacks ( void )
     //EZHookInstall ( CrashFix_Misc17 );
     EZHookInstall ( CrashFix_Misc18 );
     //EZHookInstall ( CrashFix_Misc19 );
-    EZHookInstall ( CrashFix_Misc20 );
+    //EZHookInstall ( CrashFix_Misc20 ); see CGameSA::CPlaceableSA.cpp
     EZHookInstall ( CrashFix_Misc21 );
     EZHookInstall ( CrashFix_Misc22 );
     EZHookInstall ( CrashFix_Misc23 );
