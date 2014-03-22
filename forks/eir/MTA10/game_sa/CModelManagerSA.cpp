@@ -166,11 +166,24 @@ static inline bool UpdateTextureLink( RwTexture*& texLink )
     RwTexture *newTex = RwFindTexture( oldTex->name, NULL );
 
     // If there is a new texture, destroy the old one and apply the new one.
-    if ( newTex && oldTex != newTex )
+    if ( newTex )
     {
-        RwTextureDestroy( oldTex );
+        bool updateSuccess = false;
 
-        texLink = newTex;
+        if ( newTex != oldTex )
+        {
+            RwTextureDestroy( oldTex );
+
+            texLink = newTex;
+
+            updateSuccess = true;
+        }
+        
+        // If the update failed, delete the reference from the new texture.
+        if ( !updateSuccess )
+        {
+            RwTextureDestroy( newTex );
+        }
     }
 
     return true;
@@ -288,6 +301,12 @@ struct restreamByModel
 
 void CModelManagerSA::UpdateWorldTextures( int txdId )
 {
+    // Make sure the TXD instance exists.
+    CTxdInstanceSA *txdInst = TextureManager::GetTxdPool()->Get( txdId );
+
+    if ( !txdInst )
+        return;
+
     restreamByModel restream;
 
     // Function to update the textures of models directly.
@@ -315,12 +334,18 @@ void CModelManagerSA::UpdateWorldTextures( int txdId )
                 // Set up the texture lookup routines necessary for this model.
                 TextureLookupApplicator texLookup( n );
 
+                // Set current TXD instance as main lookup.
+                txdInst->SetCurrent();
+
                 RpAtomicUpdateTextures( (RpAtomic*)rwobj, &info );
             }
             else if ( rwtype == RW_CLUMP )
             {
                 // Set up the texture lookup routines necessary for this model.
                 TextureLookupApplicator texLookup( n );
+
+                // Set current TXD instance as main lookup.
+                txdInst->SetCurrent();
 
                 ((RpClump*)rwobj)->ForAllAtomics( RpAtomicUpdateTextures, &info );
             }

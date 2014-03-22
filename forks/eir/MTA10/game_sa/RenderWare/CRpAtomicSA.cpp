@@ -106,7 +106,7 @@ bool CRpAtomicSA::Replace( unsigned short id )
 {
     CAtomicModelInfoSA *info = (CAtomicModelInfoSA*)ppModelInfo[id];
 
-    if ( id > DATA_TEXTURE_BLOCK-1 )
+    if ( id > MAX_MODELS-1 )
         return false;
 
     if ( !info )
