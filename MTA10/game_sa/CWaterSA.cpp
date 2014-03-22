@@ -113,13 +113,13 @@ bool CWaterVertexSA::IsWorldNonSeaLevel ( void )
 void CWaterQuadSA::SetInterface ( CWaterPolySAInterface* pInterface )
 {
     m_pInterface = pInterface;
-    m_wID = (WORD)(pInterface - g_pWaterManager->m_QuadPool);
+    m_wID = (WORD)(pInterface - (CWaterPolySAInterface*)g_pWaterManager->m_QuadPool);
 }
 
 void CWaterTriangleSA::SetInterface ( CWaterPolySAInterface* pInterface )
 {
     m_pInterface = pInterface;
-    m_wID = (WORD)(pInterface - g_pWaterManager->m_TrianglePool);
+    m_wID = (WORD)(pInterface - (CWaterPolySAInterface*)g_pWaterManager->m_TrianglePool);
 }
 
 CWaterVertex* CWaterPolySA::GetVertex ( int index )
