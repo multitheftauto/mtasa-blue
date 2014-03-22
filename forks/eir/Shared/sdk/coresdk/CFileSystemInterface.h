@@ -638,6 +638,10 @@ public:
     virtual bool                Exists              ( const char *path ) = 0;
     virtual size_t              Size                ( const char *path ) = 0;
     virtual bool                ReadToBuffer        ( const char *path, std::vector <char>& output ) = 0;
+
+    // Settings.
+    virtual void                SetIncludeAllDirectoriesInScan  ( bool enable ) = 0;
+    virtual bool                GetIncludeAllDirectoriesInScan  ( void ) const = 0;
 };
 
 namespace FileSystem

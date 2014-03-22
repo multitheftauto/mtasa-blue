@@ -239,6 +239,13 @@ public:
     bool                    Exists                  ( const char *path );
     size_t                  Size                    ( const char *path );
     bool                    ReadToBuffer            ( const char *path, std::vector <char>& output );
+
+    // Settings.
+    void                    SetIncludeAllDirectoriesInScan  ( bool enable )             { m_includeAllDirsInScan = enable; }
+    bool                    GetIncludeAllDirectoriesInScan  ( void ) const              { return m_includeAllDirsInScan; }
+
+    // Members.
+    bool                    m_includeAllDirsInScan;     // decides whether ScanDir implementations should apply patterns on directories
 };
 
 extern CFileSystem *fileSystem;

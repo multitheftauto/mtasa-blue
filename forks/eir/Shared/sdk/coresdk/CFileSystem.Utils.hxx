@@ -355,7 +355,11 @@ inline filePatternCommand_t* _File_CreatePatternCommand( filePatternCommand_t::e
     case filePatternCommand_t::FCMD_WILDCARD:
         {
             filePatternCommandWildcard_t *wildCmd = new (tokenLen) filePatternCommandWildcard_t;
-            memcpy( wildCmd->string, &tokenBuf[0], tokenLen );
+
+            if ( tokenLen != 0 )
+            {
+                memcpy( wildCmd->string, &tokenBuf[0], tokenLen );
+            }
             wildCmd->len = tokenLen;
 
             outCmd = wildCmd;
@@ -415,6 +419,29 @@ inline filePattern_t* _File_CreatePattern( const char *buf )
     return pattern;
 }
 
+inline bool _File_CompareStrings_Count( const char *primary, const char *secondary, size_t count )
+{
+    for ( size_t n = 0; n < count; n++ )
+    {
+        char prim = primary[n];
+        char sec = secondary[n];
+
+        bool equal = false;
+
+#ifdef FILESYSTEM_FORCE_CASE_INSENSITIVE_GLOB
+        equal = ( tolower( prim ) == tolower( sec ) );
+#else
+        equal = _File_PathCharComp( prim, sec );
+#endif //FILESYSTEM_FORCE_CASE_INSENSITIVE_GLOB
+
+        if ( !equal )
+            return false;
+    }
+
+    return true;
+
+}
+
 inline const char* _File_strnstr( const char *input, size_t input_len, const char *cookie, size_t cookie_len, size_t& off_find )
 {
     if ( input_len < cookie_len )
@@ -430,7 +457,7 @@ inline const char* _File_strnstr( const char *input, size_t input_len, const cha
 
     for ( size_t n = 0; n <= scanEnd; n++ )
     {
-        if ( strncmp( input + n, cookie, cookie_len ) == 0 )
+        if ( _File_CompareStrings_Count( input + n, cookie, cookie_len ) )
         {
             off_find = n;
             return input + n;
@@ -455,10 +482,10 @@ inline bool _File_MatchPattern( const char *input, filePattern_t *pattern )
                 filePatternCommandCompare_t *cmpCmd = (filePatternCommandCompare_t*)genCmd;
                 size_t len = cmpCmd->len;
 
-                if ( strncmp( input, cmpCmd->string, len ) != 0 )
+                if ( len > input_len )
                     return false;
 
-                if ( len > input_len )
+                if ( _File_CompareStrings_Count( input, cmpCmd->string, len ) != 0 )
                     return false;
 
                 input_len -= len;
@@ -500,6 +527,23 @@ inline void _File_DestroyPattern( filePattern_t *pattern )
     }
 
     delete pattern;
+}
+
+// Function called when any implementation finds a directory.
+inline void _File_OnDirectoryFound( filePattern_t *pattern, const char *entryName, const filePath& absPath, pathCallback_t dirCallback, void *userdata )
+{
+    bool allowDir = true;
+
+    if ( !fileSystem->m_includeAllDirsInScan )
+    {
+        if ( _File_MatchPattern( entryName, pattern ) == false )
+            allowDir = false;
+    }
+
+    if ( allowDir )
+    {
+        dirCallback( absPath, userdata );
+    }
 }
 
 #endif //_FILESYSUTILS_

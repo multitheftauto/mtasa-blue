@@ -562,9 +562,9 @@ static void inline _ScanDirectory( const CArchiveFileTranslator *trans, const di
             filePath abs_path = "/";
             _File_OutputPathTree( tree, false, abs_path );
 
-            if ( dirCallback && _File_MatchPattern( item->name, pattern ) )
+            if ( dirCallback )
             {
-                dirCallback( abs_path, userdata );
+                _File_OnDirectoryFound( pattern, item->name, abs_path, dirCallback, userdata );
             }
 
             if ( recurse )

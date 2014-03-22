@@ -1092,17 +1092,17 @@ void CSystemFileTranslator::ScanDirectory( const char *directory, const char *wi
     WIN32_FIND_DATA		finddata;
     HANDLE				handle;
 
+    filePattern_t *pattern = _File_CreatePattern( wildcard );
+
     try
     {
+        // Create the query string to send to Windows.
+        std::string query = std::string( output.c_str(), output.size() );
+        query += "*";
+
         //first search for files only
         if ( fileCallback )
         {
-            std::string query = std::string( output.c_str(), output.size() );
-            query += wcard;
-
-            // I am unsure whether ".." could turn dangerous here (wcard)
-            // My tests indicated that Windows secures against uprooting(!)
-
             handle = FindFirstFile( query.c_str(), &finddata );
 
             if ( handle != INVALID_HANDLE_VALUE )
@@ -1112,11 +1112,14 @@ void CSystemFileTranslator::ScanDirectory( const char *directory, const char *wi
                     if ( finddata.dwFileAttributes & (FILE_ATTRIBUTE_HIDDEN | FILE_ATTRIBUTE_SYSTEM | FILE_ATTRIBUTE_TEMPORARY | FILE_ATTRIBUTE_DIRECTORY) )
                         continue;
 
-                    filePath filename = output;
-                    filename += finddata.cFileName;
+                    // Match the pattern ourselves.
+                    if ( _File_MatchPattern( finddata.cFileName, pattern ) )
+                    {
+                        filePath filename = output;
+                        filename += finddata.cFileName;
 
-                    fileCallback( filename.c_str(), userdata );
-
+                        fileCallback( filename.c_str(), userdata );
+                    }
                 } while ( FindNextFile(handle, &finddata) );
 
                 FindClose( handle );
@@ -1127,9 +1130,6 @@ void CSystemFileTranslator::ScanDirectory( const char *directory, const char *wi
             goto endJump;
 
         //next search for subdirectories only
-        std::string query = std::string( output.c_str(), output.size() );
-        query += '*';
-
         handle = FindFirstFile( query.c_str(), &finddata );
 
         if ( handle == INVALID_HANDLE_VALUE )
@@ -1152,7 +1152,9 @@ void CSystemFileTranslator::ScanDirectory( const char *directory, const char *wi
             target += '/';
 
             if ( dirCallback )
-                dirCallback( target.c_str(), userdata );
+            {
+                _File_OnDirectoryFound( pattern, finddata.cFileName, target, dirCallback, userdata );
+            }
 
             if ( recurse )
                 ScanDirectory( target.c_str(), wcard, true, dirCallback, fileCallback, userdata );
@@ -1162,11 +1164,15 @@ void CSystemFileTranslator::ScanDirectory( const char *directory, const char *wi
     catch( ... )
     {
         // Callbacks may throw exceptions
+        _File_DestroyPattern( pattern );
+
         FindClose( handle );
         throw;
     }
 
 endJump:
+    _File_DestroyPattern( pattern );
+
     FindClose( handle );
 #elif defined(__linux__)
     DIR *findDir = opendir( output.c_str() );
@@ -1218,9 +1224,9 @@ endJump:
 
                 if ( stat( path.c_str(), &entry_info ) == 0 && S_ISDIR( entry_info.st_mode ) )
                 {
-                    if ( dirCallback && _File_MatchPattern( entry->d_name, pattern ) )
+                    if ( dirCallback )
                     {
-                        dirCallback( path.c_str(), userdata );
+                        _File_OnDirectoryFound( pattern, entry->d_name, path, dirCallback, userdata );
                     }
 
                     // TODO: this can be optimized by reusing the pattern structure.
@@ -1281,6 +1287,9 @@ struct MySecurityAttributes
 
 CFileSystem::CFileSystem( void )
 {
+    // Set up members.
+    m_includeAllDirsInScan = false;
+
     // We should set special priviledges for the application if
     // running under Win32.
 #ifdef _WIN32
