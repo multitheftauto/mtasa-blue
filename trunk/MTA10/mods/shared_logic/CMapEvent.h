@@ -24,7 +24,7 @@ class CMapEvent
 
 public:
     inline class CLuaMain*  GetVM               ( void )                                { return m_pMain; };
-    inline const char*      GetName             ( void )                                { return m_strName; };
+    inline const SString&   GetName             ( void )                                { return m_strName; };
     inline CLuaFunctionRef  GetLuaFunction      ( void )                                { return m_iLuaFunction; };
     inline bool             IsBeingDestroyed    ( void )                                { return m_bBeingDestroyed; }
     inline bool             IsPropagated        ( void )                                { return m_bPropagated; }
