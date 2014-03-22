@@ -212,7 +212,7 @@ void CClientDFF::InternalRestoreModel ( unsigned short usModel )
         // loaded when we do the restore. The streamer will
         // eventually stream them back in with async loading.
         m_pManager->GetObjectManager ()->RestreamObjects ( usModel );
-        g_pGame->GetModelInfo ( usModel )->RestreamIPL ();
+        g_pGame->GetModelInfo ( usModel )->RestreamModel ();
     }
     // Is this an ped ID?
     else if ( CClientPlayerManager::IsValidModel ( usModel ) )
@@ -251,7 +251,7 @@ bool CClientDFF::ReplaceObjectModel ( CModel* pClump, ushort usModel, bool bAlph
     // Streamer will stream them back in async after a frame
     // or so.
     m_pManager->GetObjectManager ()->RestreamObjects ( usModel );
-    g_pGame->GetModelInfo ( usModel )->RestreamIPL ();
+    g_pGame->GetModelInfo ( usModel )->RestreamModel ();
 
     // Grab the model info for that model and replace the model
     bool success = pClump->Replace( usModel );

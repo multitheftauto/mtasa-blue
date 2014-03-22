@@ -72,6 +72,7 @@ protected:
     CColModelSAInterface*           m_pOriginalColModelInterface;
     RpClump*                        m_pCustomClump;
     static std::map < unsigned short, int > ms_RestreamTxdIDMap;
+    static std::list < unsigned short > ms_RestreamModelMap;
     static std::map < DWORD, float > ms_ModelDefaultLodDistanceMap;
     static std::map < DWORD, BYTE > ms_ModelDefaultAlphaTransparencyMap;
     bool                            m_bAddedRefForCollision;
@@ -125,7 +126,9 @@ public:
     void                            SetLODDistance          ( float fDistance );
     static void                     StaticResetLodDistances ( void );
     void                            RestreamIPL             ( void );
+    void                            RestreamModel           ( void );
     static void                     StaticFlushPendingRestreamIPL ( void );
+    static void                     StaticFlushPendingRestreamModel ( void );
     static void                     StaticSetHooks          ( void );
 
     void                            SetAlphaTransparencyEnabled ( BOOL bEnabled );

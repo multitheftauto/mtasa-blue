@@ -184,6 +184,7 @@ public:
     virtual float           GetLODDistance          () = 0;
     virtual void            SetLODDistance          ( float fDistance ) = 0;
     virtual void            RestreamIPL             () = 0;
+    virtual void            RestreamModel           () = 0;
 
     virtual void            ModelAddRef             ( EModelRequestType requestType, const char* szTag/* = NULL*/ ) = 0;
     virtual void            RemoveRef               ( bool bRemoveExtraGTARef = false ) = 0;

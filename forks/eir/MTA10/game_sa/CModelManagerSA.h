@@ -40,6 +40,8 @@ public:
     void                        RestreamByModel     ( modelId_t id );
     void                        RestreamByTXD       ( modelId_t id );
 
+    void                        UpdateWorldTextures ( int txdId );
+
     void                        SetRequestCallback  ( modelRequestCallback_t callback );
     void                        SetFreeCallback     ( modelFreeCallback_t callback );
 

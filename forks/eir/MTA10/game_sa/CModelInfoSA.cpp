@@ -21,6 +21,7 @@ extern CGameSA * pGame;
 CBaseModelInfoSAInterface** ppModelInfo = (CBaseModelInfoSAInterface**) ARRAY_ModelInfo;
 
 std::map < unsigned short, int > CModelInfoSA::ms_RestreamTxdIDMap;
+std::list < unsigned short > CModelInfoSA::ms_RestreamModelMap;
 std::map < DWORD, float > CModelInfoSA::ms_ModelDefaultLodDistanceMap;
 std::set < uint > CModelInfoSA::ms_ReplacedColModels;
 std::map < DWORD, BYTE > CModelInfoSA::ms_ModelDefaultAlphaTransparencyMap;
@@ -560,6 +561,13 @@ void CModelInfoSA::RestreamIPL ()
         MapSet ( ms_RestreamTxdIDMap, GetTextureDictionaryID (), 0 );
 }
 
+void CModelInfoSA::RestreamModel( void )
+{
+    // IPLs should not contain peds, weapons, vehicles and vehicle upgrades
+    if ( m_dwModelID > 611 && ( m_dwModelID < 1000 || m_dwModelID > 1193 ) )
+        ms_RestreamModelMap.push_back( (unsigned short)m_dwModelID );
+}
+
 void CModelInfoSA::StaticFlushPendingRestreamIPL ( void )
 {
     if ( ms_RestreamTxdIDMap.empty () )
@@ -616,6 +624,48 @@ void CModelInfoSA::StaticFlushPendingRestreamIPL ( void )
     for ( it = removedModels.begin (); it != removedModels.end (); it++ )
     {
         Streaming::FreeModel( *it );
+    }
+}
+
+struct SectorModelRestream
+{
+    modelId_t modelIndex;
+
+    AINLINE void OnSector( Streamer::streamSectorEntry& sector )
+    {
+        for ( Streamer::streamSectorEntry::ptrNode_t *ptrNode = sector.GetList(); ptrNode != NULL; ptrNode = ptrNode->m_next )
+        {
+            CEntitySAInterface *entity = ptrNode->data;
+
+            if ( entity->GetModelIndex() == modelIndex )
+            {
+                if ( !entity->bStreamingDontDelete && !entity->bImBeingRendered )
+                {
+                    entity->DeleteRwObject();
+                }
+            }
+        }
+    }
+};
+
+void CModelInfoSA::StaticFlushPendingRestreamModel( void )
+{
+    if ( ms_RestreamModelMap.empty() )
+        return;
+
+    Streaming::FlushRequestList();
+
+    // Loop through all streamed in entities and unload the ones that match our model index.
+    SectorModelRestream restream;
+
+    Streamer::ForAllStreamerSectors( restream, true, false, false, false, true );
+
+    ms_RestreamModelMap.clear();
+
+    // Free the resource so GTA:SA will reload it.
+    for ( std::list < unsigned short >::const_iterator iter = ms_RestreamModelMap.begin(); iter != ms_RestreamModelMap.end(); iter++ )
+    {
+        Streaming::FreeModel( *iter );
     }
 }
 

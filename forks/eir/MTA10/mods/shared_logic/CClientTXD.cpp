@@ -148,6 +148,7 @@ bool CClientTXD::IsImportableModel ( unsigned short usModelID )
 
 void CClientTXD::Restream ( unsigned short usModelID )
 {
+#if 0
     if ( CClientVehicleManager::IsValidModel ( usModelID ) )
     {
         m_pManager->GetVehicleManager ()->RestreamVehicles ( usModelID );
@@ -160,11 +161,19 @@ void CClientTXD::Restream ( unsigned short usModelID )
             m_pManager->GetPickupManager ()->RestreamPickups ( usModelID );
         }
         m_pManager->GetObjectManager ()->RestreamObjects ( usModelID );
-        g_pGame->GetModelInfo ( usModelID )->RestreamIPL ();
+        g_pGame->GetModelInfo ( usModelID )->RestreamModel ();
     }
     else if ( CClientPlayerManager::IsValidModel ( usModelID ) )
     {
         m_pManager->GetPedManager ()->RestreamPeds ( usModelID );
     }
+#else
+    // Experimental code.
+    CModelInfo *modelInfo = g_pGame->GetModelInfo( usModelID );
 
+    if ( modelInfo )
+    {
+        g_pGame->GetModelManager()->UpdateWorldTextures( modelInfo->GetTextureDictionaryID() );
+    }
+#endif
 }

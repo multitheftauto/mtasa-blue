@@ -35,6 +35,8 @@ public:
     virtual void                        RestreamByModel     ( modelId_t id ) = 0;
     virtual void                        RestreamByTXD       ( modelId_t id ) = 0;
 
+    virtual void                        UpdateWorldTextures ( int txdId ) = 0;
+
     virtual void                        SetRequestCallback  ( modelRequestCallback_t callback ) = 0;
     virtual void                        SetFreeCallback     ( modelFreeCallback_t callback ) = 0;
 };

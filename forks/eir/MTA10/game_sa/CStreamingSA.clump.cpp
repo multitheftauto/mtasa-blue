@@ -13,6 +13,8 @@
 #include <StdInc.h>
 #include "gamesa_renderware.h"
 
+#include "CStreamingSA.utils.hxx"
+
 /*=========================================================
     _RpGeometryAllocateNormals (MTA extension)
 
@@ -187,39 +189,25 @@ inline static void _initClumpScene( RpClump *clump )
 bool __cdecl LoadClumpFile( RwStream *stream, modelId_t model )
 {
     CAtomicModelInfoSA *atomInfo = ppModelInfo[model]->GetAtomicModelInfo();
-    bool appliedRemapCheck, result;
+    bool result = false;
 
-    // MTA extension: Apply our global imports
-    RwImportedScan::Apply( atomInfo->usTextureDictionary );
-
-    if ( atomInfo && ( atomInfo->collFlags & COLL_WETROADREFLECT ) )
     {
-        RwRemapScan::Apply();
-        appliedRemapCheck = true;
-    }
-    else
-        appliedRemapCheck = false;
+        // Apply texture lookup routines.
+        TextureLookupApplicator texLookup( model );
 
-    result = false;
-
-    if ( RwStreamFindChunk( stream, 0x10, NULL, NULL ) )
-    {
-        if ( RpClump *clump = RpClumpStreamRead( stream ) )
+        if ( RwStreamFindChunk( stream, 0x10, NULL, NULL ) )
         {
-            while ( !LIST_EMPTY( clump->atomics.root ) )
-                RpClumpAtomicActivator( LIST_GETITEM( RpAtomic, clump->atomics.root.next, atomics ), model );
+            if ( RpClump *clump = RpClumpStreamRead( stream ) )
+            {
+                while ( !LIST_EMPTY( clump->atomics.root ) )
+                    RpClumpAtomicActivator( LIST_GETITEM( RpAtomic, clump->atomics.root.next, atomics ), model );
 
-            RpClumpDestroy( clump );
+                RpClumpDestroy( clump );
 
-            result = atomInfo->GetRwObject() != NULL;
+                result = atomInfo->GetRwObject() != NULL;
+            }
         }
     }
-
-    if ( appliedRemapCheck )
-        RwRemapScan::Unapply();
-
-    // MTA extension: remove the global imports handler from the scan stack.
-    RwImportedScan::Unapply();
 
     return result;
 }
@@ -293,18 +281,20 @@ bool __cdecl LoadClumpFilePersistent( RwStream *stream, modelId_t id )
     if ( !RwStreamFindChunk( stream, 0x10, NULL, NULL ) )
         return false;
 
-    // MTA extension: include our imported textures
-    RwImportedScan::Apply( info->usTextureDictionary );
-
     CColLoaderModelAcquisition *colAcq;
 
     if ( isVehicle )
     {
         colAcq = new CColLoaderModelAcquisition;
-        RwRemapScan::Apply();
     }
 
-    RpClump *clump = RpClumpStreamRead( stream );
+    // Apply texture lookup.
+    RpClump *clump = NULL;
+    {
+        TextureLookupApplicator texLookup( id );
+
+        clump = RpClumpStreamRead( stream );
+    }
 
     if ( isVehicle )
     {
@@ -338,11 +328,8 @@ bool __cdecl LoadClumpFilePersistent( RwStream *stream, modelId_t id )
             }
         }
 
-        RwRemapScan::Unapply();
         delete colAcq;
     }
-
-    RwImportedScan::Unapply();
 
     if ( !clump )
         return false;

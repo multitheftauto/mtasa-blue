@@ -83,6 +83,11 @@ CColModelSAInterface* CEntitySAInterface::GetColModel( void ) const
             return (CColModelSAInterface*)VAR_CVehicle_SpecialColModels + n;
     }
 
+    CColModelSA *replacedCollision = g_colReplacement[ GetModelIndex() ];
+
+    if ( replacedCollision )
+        return replacedCollision->GetInterface();
+
     return GetModelInfo()->pColModel;
 }
 

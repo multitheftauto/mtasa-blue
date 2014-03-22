@@ -142,3 +142,50 @@ bool __forceinline ExecuteDispatchChain( modelId_t id, dispatchType dispatch )
 // This method should be used if you are uncertain which method grants you best performance.
 // Otherwise choose any dispatching method provided above.
 #define DefaultDispatchExecute( id, dispatch )  ( ExecuteDispatch( (id), (dispatch) ) )
+
+// Utility that loads the correct texture lookup routines for model loading.
+struct TextureLookupApplicator
+{
+    AINLINE TextureLookupApplicator( modelId_t modelIndex )
+    {
+        CBaseModelInfoSAInterface *modelInfo = ppModelInfo[modelIndex];
+
+        // MTA extension: Apply our global imports
+        RwImportedScan::Apply( modelInfo->usTextureDictionary );
+
+        // Decide about model type.
+        eRwType rwType = modelInfo->GetRwModelType();
+
+        appliedRemapCheck = false;
+
+        if ( rwType == RW_ATOMIC )
+        {
+            if ( modelInfo && ( modelInfo->collFlags & COLL_WETROADREFLECT ) )
+            {
+                RwRemapScan::Apply();
+                appliedRemapCheck = true;
+            }
+        }
+        else if ( rwType == RW_ATOMIC )
+        {
+            eModelType modelType = modelInfo->GetModelType();
+
+            if ( modelType == MODEL_VEHICLE )
+            {
+                RwRemapScan::Apply();
+                appliedRemapCheck = true;
+            }
+        }
+    }
+
+    AINLINE ~TextureLookupApplicator( void )
+    {
+        if ( appliedRemapCheck )
+            RwRemapScan::Unapply();
+
+        // MTA extension: remove the global imports handler from the scan stack.
+        RwImportedScan::Unapply();
+    }
+
+    bool appliedRemapCheck;
+};

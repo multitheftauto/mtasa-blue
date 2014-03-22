@@ -863,6 +863,7 @@ bool CGameSA::HasCreditScreenFadedOut ( void )
 void CGameSA::FlushPendingRestreamIPL ( void )
 {
     CModelInfoSA::StaticFlushPendingRestreamIPL ();
+    CModelInfoSA::StaticFlushPendingRestreamModel ();
     m_pRenderWare->ResetStats ();
 }
 
