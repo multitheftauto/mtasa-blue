@@ -291,6 +291,10 @@ void CPedSA::Respawn(CVector * position, bool bCameraCut)
         MemSet ( (void*)0x4422EA, 0x90, 20 );
     }
 
+    CModelLoadInfoSA& loadInfo = Streaming::GetModelLoadInfo( GetInterface()->GetModelIndex() );
+
+    CBaseModelInfoSAInterface *modelInfo = GetInterface()->GetModelInfo();
+
     DEBUG_TRACE("void CPedSA::Respawn(CVector * position)");
     FLOAT fX = position->fX;
     FLOAT fY = position->fY;

@@ -277,7 +277,7 @@ void CBaseModelInfoSAInterface::UnsetColModel( void )
         Returns a boolean that tells you whether the given resource
         is compatible with this model info structure.
 =========================================================*/
-bool CBaseModelInfoSAInterface::ValidateResource( RwObject *rwobj )
+bool CBaseModelInfoSAInterface::ValidateResource( modelId_t modelIndex, RwObject *rwobj )
 {
     // Check compatibility based on model info type.
     eRwType modelInfoType = GetRwModelType();
@@ -301,11 +301,14 @@ bool CBaseModelInfoSAInterface::ValidateResource( RwObject *rwobj )
 
         if ( infoType == MODEL_PED )
         {
-            // Make sure the clump has an animation structure.
-            RpAnimHierarchy *anim = theClump->GetAtomicAnimHierarchy();
+            if ( modelIndex == 0 )
+            {
+                // Make sure the clump has an animation structure.
+                RpAnimHierarchy *anim = theClump->GetAtomicAnimHierarchy();
 
-            if ( !anim )
-                return false;
+                if ( !anim )
+                    return false;
+            }
         }
         else if ( infoType == MODEL_VEHICLE )
         {

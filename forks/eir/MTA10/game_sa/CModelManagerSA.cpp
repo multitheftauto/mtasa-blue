@@ -282,8 +282,10 @@ static bool RpAtomicUpdateTextures( RpAtomic *atomic, _updateTexInfo *info )
 struct restreamByModel
 {
     typedef std::list <unsigned short> modelList_t;
+    typedef std::list <CEntitySAInterface*> entityList_t;
 
     modelList_t restreamModels;
+    entityList_t restreamEntities;
 
     inline void OnSector( Streamer::streamSectorEntry& entry )
     {
@@ -294,6 +296,45 @@ struct restreamByModel
             if ( std::find( restreamModels.begin(), restreamModels.end(), entity->GetModelIndex() ) != restreamModels.end() )
             {
                 entity->DeleteRwObject();
+
+                // If we need to restream a ped or vehicle, make sure we recreate their RenderWare objects.
+                // For that, we add them to a special list and process them later on.
+                eEntityType type = (eEntityType)entity->nType;
+
+                if ( type == ENTITY_TYPE_PED || type == ENTITY_TYPE_VEHICLE )
+                {
+                    restreamEntities.push_back( entity );
+                }
+            }
+        }
+    }
+
+    inline void RecreateRenderWareInstances( void )
+    {
+        // Recreate the RenderWare data of entities that absolutely require it.
+        for ( entityList_t::const_iterator iter = restreamEntities.begin(); iter != restreamEntities.end(); iter++ )
+        {
+            CEntitySAInterface *entity = *iter;
+
+            entity->CreateRwObject();
+
+            // Prepare the entity.
+            RwObject *rwobj = entity->GetRwObject();
+
+            assert( rwobj != NULL );
+
+            if ( entity->nType == ENTITY_TYPE_PED )
+            {
+                // The ped requires a static geometry structure.
+                // Make sure it has one.
+                RpClump *clump = (RpClump*)rwobj;
+
+                if ( !clump->pStatic )
+                {
+                    clump->CreateStaticGeometry();
+
+                    clump->pStatic->AllocateLink( 32 );
+                }
             }
         }
     }
@@ -365,13 +406,39 @@ void CModelManagerSA::UpdateWorldTextures( int txdId )
         // Delete the RenderWare objects of all entities that have the models that should be restreamed.
         Streamer::ForAllStreamerSectors( restream, true, true, true, true, true );
 
+        bool requireModelLoading = false;
+
         // Now free the resources from the model info storages.
         // The game will reload the resources for entities that are in sight asynchronically,
-        // so we do not have to do that.
+        // so we do not have to do that, unless vehicle or ped.
         for ( restreamByModel::modelList_t::const_iterator iter = restream.restreamModels.begin(); iter != restream.restreamModels.end(); iter++ )
         {
-            Streaming::FreeModel( *iter );
+            modelId_t modelIndex = *iter;
+
+            Streaming::FreeModel( modelIndex );
+
+            // If we are a ped or vehicle, we need the RenderWare data ASAP.
+            // That is why we must load it here.
+            CBaseModelInfoSAInterface *modelInfo = ppModelInfo[ modelIndex ];
+
+            eModelType modelType = modelInfo->GetModelType();
+
+            if ( modelType == MODEL_PED || modelType == MODEL_VEHICLE )
+            {
+                Streaming::RequestModel( modelIndex, 0x10 );
+
+                requireModelLoading = true;
+            }
         }
+
+        // Load all requested RenderWare data.
+        if ( requireModelLoading )
+        {
+            Streaming::LoadAllRequestedModels( true );
+        }
+
+        // Now recreate important RenderWare links.
+        restream.RecreateRenderWareInstances();
     }
 }
 

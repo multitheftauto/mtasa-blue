@@ -113,7 +113,7 @@ bool CRpAtomicSA::Replace( unsigned short id )
         return false;
 
     // Make sure we are compatible with the model info.
-    if ( !info->ValidateResource( GetObject() ) )
+    if ( !info->ValidateResource( id, GetObject() ) )
         return false;
 
     if ( IsReplaced( id ) )

@@ -84,6 +84,10 @@ RwStaticGeometry::RwStaticGeometry( void )
 {
     count = 0;
     link = NULL;
+
+    unknown2 = NULL;
+    unknown = 0;
+    unknown3 = 0;
 }
 
 /*=========================================================

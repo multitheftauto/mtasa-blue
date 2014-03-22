@@ -165,7 +165,7 @@ bool CModelSA::Replace( unsigned short id )
     // We are a clump for sure
 
     // Make sure we are compatible with the model info.
-    if ( !info->ValidateResource( GetObject() ) )
+    if ( !info->ValidateResource( id, GetObject() ) )
         return false;
 
     if ( IsReplaced( id ) )

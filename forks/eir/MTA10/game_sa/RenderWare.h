@@ -203,6 +203,11 @@ struct RwStaticGeometry
         for ( unsigned int n = 0; n < this->count; link++ )
             callback( link, data );
     }
+
+    void* operator new ( size_t memSize )
+    {
+        return ((void* (__cdecl*)( size_t ))0x0082119A)( memSize );
+    }
 };
 struct RwBoneInfo
 {
