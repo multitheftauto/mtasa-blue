@@ -1242,6 +1242,9 @@ void CMultiplayerSA::InitHooks()
 
     // Disable idle cam
     MemPut < BYTE > ( 0x522C80, 0xC3 );
+    
+    // Ignore camera fade state in rendering routine
+    MemSet ( (void*)0x53E9C6, 0x90, 6 );
 
     // Disable radar map hiding when pressing TAB (action key) while on foot
     MemSet ( (void *)0x58FC3E, 0x90, 14 );
