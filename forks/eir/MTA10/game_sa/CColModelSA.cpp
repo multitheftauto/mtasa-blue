@@ -251,6 +251,7 @@ bool CColModelSA::Replace( unsigned short id )
     eRwType rwType = model->GetRwModelType();
 
     CColModelSAInterface *replaceColModel = NULL;
+    bool replaceDynamic = false;
 
     if ( rwType == RW_CLUMP )
     {
@@ -269,7 +270,7 @@ bool CColModelSA::Replace( unsigned short id )
     if ( replaceColModel == NULL )
         replaceColModel = m_pInterface;
 
-    model->SetCollision( replaceColModel, false );
+    model->SetCollision( replaceColModel, replaceDynamic );
 
     g_colReplacement[id] = this;
 
@@ -308,7 +309,7 @@ bool CColModelSA::Restore( unsigned short id )
         {
             // Since we cloned the interface, we destroy it here.
             // This is made because every vehicle type must have a specialized collision interface.
-            delete model->pColModel;
+            model->UnsetColModel();
         }
 
         if ( info->m_eLoading == MODEL_LOADED )

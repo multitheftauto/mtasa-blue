@@ -251,7 +251,7 @@ void CBaseModelInfoSAInterface::SetCollision( CColModelSAInterface *col, bool dy
                 {
                     CVehicleSAInterface *vehicle = Pools::GetVehiclePool()->Get( n );
 
-                    if ( vehicle )
+                    if ( vehicle && vehicle->GetModelInfo() == this )
                     {
                         // Initialize the suspension lines for this particular vehicle.
                         InitializeVehiclePublicSuspensionLines( vehicle, vehColData );
