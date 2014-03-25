@@ -89,22 +89,7 @@ CColModelSAInterface* CEntitySAInterface::GetColModel( void ) const
     }
 
     if ( !colModel )
-    {
-        CColModelSA *replacedCollision = g_colReplacement[ GetModelIndex() ];
-
-        if ( replacedCollision )
-            colModel = replacedCollision->GetInterface();
-    }
-
-    if ( !colModel )
         colModel = GetModelInfo()->pColModel;
-
-    // Verify the collision.
-    if ( nType == ENTITY_TYPE_VEHICLE )
-    {
-        // The suspension lines must be set up.
-        // Otherwise we may crash.
-    }
 
     return colModel;
 }

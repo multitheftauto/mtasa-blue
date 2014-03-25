@@ -28,17 +28,22 @@ CColModelSAInterface::CColModelSAInterface( void )
     }
 }
 
+// Binary offsets: (1.0 US and 1.0 EU): 0x0040F700
 CColModelSAInterface::~CColModelSAInterface( void )
 {
-    _asm
-    {
-        mov     ecx,this
-        mov     eax,FUNC_CColModel_Destructor
-        call    eax
-    }
+    if ( m_releaseDataOnDestroy )
+        ReleaseData();
 }
 
-void CColModelSAInterface::AllocateData( void )
+void CColModelSAInterface::_DestructorHook( void )
+{
+    this->~CColModelSAInterface();
+}
+
+// Used for vehicle models so that they use non-segmented collision data.
+// This prevents a memory leak when allocating and using runtime-created suspension line data.
+// It is important to call this function on every vehicle collision interface.
+void CColModelSAInterface::UnsegmentizeData( void )
 {
     __asm
     {
@@ -47,13 +52,27 @@ void CColModelSAInterface::AllocateData( void )
     }
 }
 
-void CColModelSAInterface::ReleaseData( void )
+// Binary offsets: (1.0 US and 1.0 EU): 0x0040F9E0
+void __thiscall CColModelSAInterface::ReleaseData( void )
 {
-    __asm
+    CColDataSA *colData = pColData;
+
+    if ( colData )
     {
-        // __thiscall -> ecx == this
-        mov eax,0x0040F9E0
-        call eax
+        if ( this->m_isColDataSegmented )
+        {
+            colData->SegmentedClear();
+
+            RwFree( colData );
+        }
+        else
+        {
+            colData->UnsegmentedClear();
+
+            _freeMemGame( colData );
+        }
+
+        pColData = NULL;
     }
 }
 
@@ -76,7 +95,7 @@ CColDataSA::CColDataSA( void )
     ucNumWheels = 0;
 
     unkFlag1 = false;
-    unkFlag2 = false;
+    hasFaceGroups = false;
     hasShadowMeshFaces = false;
 
     pColSpheres = NULL;
@@ -229,7 +248,28 @@ bool CColModelSA::Replace( unsigned short id )
     m_original = model->pColModel;
     m_originalDynamic = model->IsDynamicCol();
 
-    model->SetCollision( m_pInterface, false );
+    eRwType rwType = model->GetRwModelType();
+
+    CColModelSAInterface *replaceColModel = NULL;
+
+    if ( rwType == RW_CLUMP )
+    {
+        eModelType modelType = model->GetModelType();
+
+        if ( modelType == MODEL_VEHICLE )
+        {
+            // Vehicles need a special collision interface.
+            replaceColModel = m_pInterface->Clone();
+
+            // We must unsegmentize the interface to prevent memory leaks.
+            replaceColModel->UnsegmentizeData();
+        }
+    }
+
+    if ( replaceColModel == NULL )
+        replaceColModel = m_pInterface;
+
+    model->SetCollision( replaceColModel, false );
 
     g_colReplacement[id] = this;
 
@@ -266,7 +306,9 @@ bool CColModelSA::Restore( unsigned short id )
     case RW_CLUMP:
         if ( model->GetModelType() == MODEL_VEHICLE )
         {
-            // Since we cloned the interface, we 
+            // Since we cloned the interface, we destroy it here.
+            // This is made because every vehicle type must have a specialized collision interface.
+            delete model->pColModel;
         }
 
         if ( info->m_eLoading == MODEL_LOADED )
@@ -301,4 +343,15 @@ void* CColFileSA::operator new ( size_t )
 void CColFileSA::operator delete ( void *ptr )
 {
     Streaming::GetCOLEnvironment().m_pool->Free( (CColFileSA*)ptr );
+}
+
+void Collision_Init( void )
+{
+    // Install a memory leak fix.
+    HookInstall( 0x0040F9E0, h_memFunc( &CColModelSAInterface::ReleaseData ), 5 );
+    HookInstall( 0x0040F700, h_memFunc( &CColModelSAInterface::_DestructorHook ), 5 );
+}
+
+void Collision_Shutdown( void )
+{
 }

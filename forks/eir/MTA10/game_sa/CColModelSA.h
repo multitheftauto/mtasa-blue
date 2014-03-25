@@ -42,6 +42,12 @@ struct CColSurfaceSA
 };
 
 
+struct CColSuspensionLineSA
+{
+    CVector start, end;
+};
+
+
 struct CColSphereSA
 {
     inline CColSphereSA( float fRadius, const CVector& vecCenter, EColSurface material, unsigned char flags, unsigned char unknown )
@@ -103,14 +109,6 @@ typedef struct
 {
     BYTE pad0 [ 12 ];
 } CColTrianglePlaneSA;
-
-
-typedef struct
-{
-    unsigned short  a, b, c;
-    unsigned char   material;
-    CColLighting    light;
-} CColShadowMeshFaceSA;
 
 
 typedef struct
@@ -195,7 +193,19 @@ public:
 
 struct CColDataSA
 {
-    CColDataSA();
+    CColDataSA( void );
+
+    struct trianglePlanesListNode
+    {
+        DWORD pad;
+        trianglePlanesListNode *next;
+        trianglePlanesListNode *prev;
+    };
+
+    trianglePlanesListNode* GetTrianglePlanesListNode( void );
+
+    void __thiscall     SegmentedClear( void );
+    void __thiscall     UnsegmentedClear( void );
 
     unsigned short                  numSpheres;             // 0
     unsigned short                  numBoxes;               // 2
@@ -209,24 +219,25 @@ struct CColDataSA
         struct
         {
             unsigned char           unkFlag1 : 1;           // 7
-            unsigned char           unkFlag2 : 1;  
+            unsigned char           hasFaceGroups : 1;  
             unsigned char           hasShadowMeshFaces : 1; 
         };
     };
 
     CColSphereSA*                   pColSpheres;            // 8
     CColBoxSA*                      pColBoxes;              // 12
-    void*                           pSuspensionLines;       // 16
+    CColSuspensionLineSA*           pSuspensionLines;       // 16
     CColVertexSA*                   pColVertices;           // 20
     CColTriangleSA*                 pColTriangles;          // 24
     CColTrianglePlaneSA*            pColTrianglePlanes;     // 28
 
     int                             numShadowMeshFaces;     // 32
     unsigned int                    numShadowMeshVertices;  // 36
-    void*                           pShadowMeshVertices;    // 40
-    CColShadowMeshFaceSA*           pShadowMeshFaces;       // 44
+    CColVertexSA*                   pShadowMeshVertices;    // 40
+    CColTriangleSA*                 pShadowMeshFaces;       // 44
 
     unsigned int        CalculateNumberOfShadowMeshVertices( void ) const;
+    unsigned int        CalculateNumberOfCollisionMeshVertices( void ) const;
 };
 
 class CColModelSAInterface
@@ -235,18 +246,23 @@ public:
                                     CColModelSAInterface    ( void );
                                     ~CColModelSAInterface   ( void );
 
-    void __thiscall                 AllocateData            ( void );
+    void __thiscall                 _DestructorHook         ( void );
+
+    void __thiscall                 UnsegmentizeData        ( void );
     void __thiscall                 ReleaseData             ( void );
+
+    CColModelSAInterface*           Clone                   ( void );
 
     void*   operator new ( size_t );
     void    operator delete ( void *ptr );
 
-    CBoundingBox                    m_bounds;               // 0
-    unsigned char                   m_colPoolIndex;         // 40
-    bool                            m_unk : 1;              // 41
-    bool                            m_initWithColData : 1;  // if true, this interface has been initialized with collision data.
-    BYTE                            m_pad[2];               // 42
-    CColDataSA*                     pColData;               // 44
+    CBoundingBox                    m_bounds;                   // 0
+    unsigned char                   m_colPoolIndex;             // 40
+    bool                            m_isCollidable : 1;         // 41, if true, this collision interface has spheres, boxes or triangles
+    bool                            m_isColDataSegmented : 1;   //     if true, pColData is the only allocation used (all pointers inside point to sub segments in memory)
+    bool                            m_releaseDataOnDestroy : 1; //     if true, the destructor releases the collision data
+    BYTE                            m_pad[2];                   // 42
+    CColDataSA*                     pColData;                   // 44
 };
 
 #include "CColModelSA.loader.h"
@@ -304,5 +320,9 @@ private:
 
     imports_t                       m_imported;
 };
+
+// Module initialization.
+void Collision_Init( void );
+void Collision_Shutdown( void );
 
 #endif

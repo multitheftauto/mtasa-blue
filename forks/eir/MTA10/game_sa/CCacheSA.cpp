@@ -115,11 +115,11 @@ static unsigned int *const VAR_cachedGamePropertyIndex = (unsigned int*)0x00BC40
 
 struct cachedCollisionEntry //size: 48
 {
-    CBoundingBox            m_bounds;       // 0, colModel bounds
-    unsigned int            m_model;        // 40, model index
-    unsigned char           m_colFile;      // 44, collision pool index
-    bool                    m_unk : 1;      // 45
-    BYTE                    m_pad[2];       // 46
+    CBoundingBox            m_bounds;               // 0, colModel bounds
+    unsigned int            m_model;                // 40, model index
+    unsigned char           m_colFile;              // 44, collision pool index
+    bool                    m_isCollidable : 1;     // 45
+    BYTE                    m_pad[2];               // 46
 };
 
 static eCacheMode *const VAR_collisionCacheStatus = (eCacheMode*)0x00BC40A0;
@@ -282,7 +282,7 @@ void __cdecl Cache_StoreCollision( unsigned int id, CColModelSAInterface *col )
     cacheEntry.m_bounds = col->m_bounds;
     cacheEntry.m_model = id;
     cacheEntry.m_colFile = col->m_colPoolIndex;
-    cacheEntry.m_unk = col->m_unk;
+    cacheEntry.m_isCollidable = col->m_isCollidable;
 
     // Increase the array size.
     (*VAR_cachedCollisionCount)++;
@@ -317,7 +317,7 @@ void __cdecl Cache_WriteCollision( void )
         CColModelSAInterface *colModel = new CColModelSAInterface;
         colModel->m_bounds = colEntry.m_bounds;
         colModel->m_colPoolIndex = colEntry.m_colFile;
-        colModel->m_unk = colEntry.m_unk;
+        colModel->m_isCollidable = colEntry.m_isCollidable;
 
         // Update the collision of the model.
         // Note that we assume that no collision was loaded prior to this.

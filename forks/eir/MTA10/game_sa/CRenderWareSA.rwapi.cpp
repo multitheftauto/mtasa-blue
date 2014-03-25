@@ -207,9 +207,11 @@ void RenderWareAPI_Init( void )
     {
     case VERSION_EU_10:
         _mallocNew      = (_mallocNew_t)0x008211DA;
+        _freeMemGame    = (_freeMemGame_t)0x008214FD;
         break;
     case VERSION_US_10:
         _mallocNew      = (_mallocNew_t)0x0082119A;
+        _freeMemGame    = (_freeMemGame_t)0x008214BD;
         break;
     }
 }

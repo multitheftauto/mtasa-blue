@@ -129,6 +129,7 @@ CGameSA::CGameSA()
     RenderWarePipeline_Init();
     RenderWareAPI_Init();
     Transformation_Init();
+    Collision_Init();
     QuadTree_Init();
     Cache_Init();
     Placeable_Init();
@@ -263,6 +264,7 @@ CGameSA::~CGameSA ( void )
     Placeable_Shutdown();
     Cache_Shutdown();
     QuadTree_Shutdown();
+    Collision_Shutdown();
     Transformation_Shutdown();
     RenderWareAPI_Shutdown();
     RenderWarePipeline_Shutdown();

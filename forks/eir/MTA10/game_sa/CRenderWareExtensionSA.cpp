@@ -162,8 +162,8 @@ static RwStream* ReadCollisionFromClump( RwStream *stream, size_t size )
         return NULL;
     }
 
-    // Allocate remaining/missing data
-    colModel->AllocateData();
+    // Unsegmentize the data.
+    colModel->UnsegmentizeData();
 
     delete [] buf;
 

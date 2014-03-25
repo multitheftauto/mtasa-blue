@@ -21,7 +21,9 @@ void __cdecl LoadCollisionModelVer4( const char *pBuffer, int bufferSize, CColMo
 
 // GTA:SA functions, only here temporarily.
 typedef void* (__cdecl*_mallocNew_t)( size_t memSize );
+typedef void (__cdecl*_freeMemGame_t)( void *ptr );
 
 extern _mallocNew_t         _mallocNew;
+extern _freeMemGame_t       _freeMemGame;
 
 #endif //_COLLISION_LOADER_

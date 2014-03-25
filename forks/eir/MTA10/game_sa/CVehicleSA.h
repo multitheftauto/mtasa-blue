@@ -369,7 +369,7 @@ public:
     virtual bool __thiscall         CanPedLeaveCar                  ( void ) const = 0;
     virtual void __thiscall         ProcessDrivingAnims             ( void ) = 0;
     virtual void* __thiscall        GetRideAnimData                 ( void ) = 0;
-    virtual void __thiscall         SetupSuspension                 ( void ) = 0;
+    virtual void __thiscall         SetupSuspensionLines            ( void ) = 0;
     virtual void __thiscall         GetMovingCollisionSpeed         ( CVector& vec ) const = 0;
     virtual void __thiscall         Fix                             ( void ) = 0;
     virtual void __thiscall         SetupDamageAfterLoad            ( void ) = 0;

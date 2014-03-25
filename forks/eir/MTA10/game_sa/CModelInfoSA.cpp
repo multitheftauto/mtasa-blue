@@ -660,13 +660,13 @@ void CModelInfoSA::StaticFlushPendingRestreamModel( void )
 
     Streamer::ForAllStreamerSectors( restream, true, false, false, false, true );
 
-    ms_RestreamModelMap.clear();
-
     // Free the resource so GTA:SA will reload it.
     for ( std::list < unsigned short >::const_iterator iter = ms_RestreamModelMap.begin(); iter != ms_RestreamModelMap.end(); iter++ )
     {
         Streaming::FreeModel( *iter );
     }
+
+    ms_RestreamModelMap.clear();
 }
 
 void CModelInfoSA::ModelAddRef ( EModelRequestType requestType, const char* szTag )
@@ -908,7 +908,7 @@ void* CModelInfoSA::SetVehicleSuspensionData ( void* pSuspensionLines )
 {
     CColDataSA* pColData = GetInterface ()->pColModel->pColData;
     void* pOrigSuspensionLines = pColData->pSuspensionLines;
-    pColData->pSuspensionLines = pSuspensionLines;
+    pColData->pSuspensionLines = (CColSuspensionLineSA*)pSuspensionLines;
     return pOrigSuspensionLines;
 }
 
