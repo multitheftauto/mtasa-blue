@@ -214,7 +214,7 @@ CTexDictionarySA* CTextureManagerSA::CreateTxd( CFile *file )
 =========================================================*/
 int CTextureManagerSA::LoadDictionary( const char *filename )
 {
-    return LoadDictionaryEx( FileMgr::GetFileNameItem( filename ).c_str(), filename );
+    return LoadDictionaryEx( FileSystem::GetFileNameItem( filename ).c_str(), filename );
 }
 
 /*=========================================================

@@ -108,7 +108,7 @@ bool CModelManagerSA::GetRwModelType( modelId_t model, eRwType& type ) const
 
 bool CModelManagerSA::RestoreModel( modelId_t id )
 {
-    if ( id > DATA_TEXTURE_BLOCK-1 )
+    if ( id > MAX_MODELS-1 )
         return false;
 
     CRwObjectSA *obj = g_replObjectNative[id];
@@ -131,7 +131,7 @@ bool CModelManagerSA::RestoreModel( modelId_t id )
 
 bool CModelManagerSA::RestoreCollision( modelId_t id )
 {
-    if ( id > DATA_TEXTURE_BLOCK-1 )
+    if ( id > MAX_MODELS-1 )
         return false;
 
     CColModelSA *col = g_colReplacement[id];

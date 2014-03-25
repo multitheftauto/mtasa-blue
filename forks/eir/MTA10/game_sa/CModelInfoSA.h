@@ -72,7 +72,6 @@ protected:
     CColModelSAInterface*           m_pOriginalColModelInterface;
     RpClump*                        m_pCustomClump;
     static std::map < unsigned short, int > ms_RestreamTxdIDMap;
-    static std::list < unsigned short > ms_RestreamModelMap;
     static std::map < DWORD, float > ms_ModelDefaultLodDistanceMap;
     static std::map < DWORD, BYTE > ms_ModelDefaultAlphaTransparencyMap;
     bool                            m_bAddedRefForCollision;
@@ -81,6 +80,7 @@ protected:
     bool                            _isInsideRemover;
 public:
     static std::set < uint >        ms_ReplacedColModels;
+    static std::list < unsigned short > ms_RestreamModelMap;
 
                                     CModelInfoSA            ( void );
                                     CModelInfoSA            ( DWORD dwModelID );

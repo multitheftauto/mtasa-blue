@@ -204,10 +204,7 @@ struct RwStaticGeometry
             callback( link, data );
     }
 
-    void* operator new ( size_t memSize )
-    {
-        return ((void* (__cdecl*)( size_t ))0x0082119A)( memSize );
-    }
+    void* operator new ( size_t memSize );
 };
 struct RwBoneInfo
 {

@@ -301,9 +301,5 @@ void InitRwFunctions( eGameVersion version )
     RwCalloc                            = (RwCalloc_t)                              0x0072F460;
 
     // Shared addresses
-    LoadCollisionModel                  = (LoadCollisionModel_t)                    0x00537580;
-    LoadCollisionModelVer2              = (LoadCollisionModelVer2_t)                0x00537EE0;
-    LoadCollisionModelVer3              = (LoadCollisionModelVer3_t)                0x00537CE0;
-    LoadCollisionModelVer4              = (LoadCollisionModelVer4_t)                0x00537AE0;
     CClothesBuilder_CopyTexture         = (CClothesBuilder_CopyTexture_t)           0x005A5730;
 }

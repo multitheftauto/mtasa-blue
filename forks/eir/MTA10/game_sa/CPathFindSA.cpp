@@ -81,17 +81,6 @@ unsigned int __thiscall CPathFindSAInterface::GetNodeNumberOfMobileLinks( PathFi
     Binary offsets:
         (1.0 US and 1.0 EU): 0x00452160
 =========================================================*/
-inline bool IsNotNeutral( bool primary, bool secondary )
-{
-    return primary != secondary;
-}
-
-inline void NeutralizeBooleans( bool& primary, bool secondary )
-{
-    if ( IsNotNeutral( primary, secondary ) )
-        primary = !primary;
-}
-
 inline bool FilterEmergencyNode( PathFind::pathNode *node, bool emergencyVehiclesOnly, bool useNodeConfig )
 {
     return IsNotNeutral( node->m_trafficSecondary, ( useNodeConfig ? node->m_emergencyVehiclesOnly : emergencyVehiclesOnly ) );
@@ -303,7 +292,7 @@ void __thiscall CPathFindSAInterface::ReadContainer( RwStream *stream, unsigned 
         // Allocate the path node structures
         size_t nodeSize = sizeof(*nodes) * header.numNodes;
 
-        nodes = (PathFind::pathNode*)RwMalloc( nodeSize );
+        nodes = (PathFind::pathNode*)RwMalloc( nodeSize, 0 );
 
         // Bugfix: if we do not have enough memory, return here.
         if ( !nodes )
@@ -319,7 +308,7 @@ void __thiscall CPathFindSAInterface::ReadContainer( RwStream *stream, unsigned 
     else
     {
         // We allocate an empty structure to hopefully save the engine!
-        nodes = new (RwMalloc( sizeof(*nodes) )) PathFind::pathNode();
+        nodes = new (RwMalloc( sizeof(*nodes), 0 )) PathFind::pathNode();
 
         // Bugfix: if we do not have enough memory, return here.
         if ( !nodes )
@@ -334,7 +323,7 @@ void __thiscall CPathFindSAInterface::ReadContainer( RwStream *stream, unsigned 
         // Allocate the navi node structures for our sector.
         size_t nodeSize = sizeof(*naviNodes) * header.numNaviNodes;
 
-        naviNodes = (PathFind::naviNode*)RwMalloc( nodeSize );
+        naviNodes = (PathFind::naviNode*)RwMalloc( nodeSize, 0 );
 
         // If the allocation succeeded, we read the node information
         // from our stream.
@@ -364,10 +353,10 @@ void __thiscall CPathFindSAInterface::ReadContainer( RwStream *stream, unsigned 
         size_t nodeLinkLengthSize = sizeof(*nodeLinkLength) + header.numLinks;
         size_t unknownDataSize = sizeof(*unknown) + header.numLinks;
 
-        dynamicLinks = (PathFind::pathDynamicLinkContainer*)RwMalloc( dynamicLinkSize );
-        naviNodeLink = (PathFind::naviNodeLink*)RwMalloc( naviNodeLinkSize );
-        nodeLinkLength = (PathFind::nodeLinkLength*)RwMalloc( nodeLinkLengthSize );
-        unknown = (PathFind::unknownData*)RwMalloc( unknownDataSize );
+        dynamicLinks = (PathFind::pathDynamicLinkContainer*)RwMalloc( dynamicLinkSize, 0 );
+        naviNodeLink = (PathFind::naviNodeLink*)RwMalloc( naviNodeLinkSize, 0 );
+        nodeLinkLength = (PathFind::nodeLinkLength*)RwMalloc( nodeLinkLengthSize, 0 );
+        unknown = (PathFind::unknownData*)RwMalloc( unknownDataSize, 0 );
 
         // Read from our stream.
         // The_GTA: only save the readed bytes if allocation of the structures succeeded.
@@ -517,6 +506,23 @@ bool __thiscall CPathFindSAInterface::IsSectorCarNodeInRadius( float x, float y,
     return false;
 }
 
+/*=========================================================
+    CPathFindSAInterface::GetPathNodeFromAddress
+
+    Arguments:
+        address - struct that holds node information
+    Purpose:
+        Returns the pointer to the node that is specified by
+        the given address struct. Returns NULL if no such
+        node is valid.
+    Binary offsets:
+        (1.0 US and 1.0 EU): 0x00420AC0
+=========================================================*/
+PathFind::pathNode* __thiscall CPathFindSAInterface::GetPathNodeFromAddress( const CNodeAddress address )
+{
+    return m_sectors[ address.sRegion ] + address.sIndex;
+}
+
 CNodeAddress * CPathFindSA::FindNthNodeClosestToCoors ( CVector * vecCoors, int iNodeNumber, int iType, CNodeAddress * pNodeAddress, float fDistance )
 {
     DWORD dwFunc = FUNC_FindNthNodeClosestToCoors;
@@ -554,28 +560,19 @@ CPathNode * CPathFindSA::GetPathNode ( CNodeAddress * node )
     DWORD dwFunc = FUNC_FindNodePointer;
     if ( node->sRegion >= 0 && node->sIndex >= 0 )
     {
-        DWORD dwPathNode = 0;
-        _asm
-        {
-            push    node
-            mov     ecx, CLASS_CPathFind
-            call    dwFunc
-            mov     dwPathNode, eax
-        }
-        return (CPathNode *)dwPathNode;
+        // Here the "*" stands for: resolve internal class to virtual one.
+        return *PathFind::GetInterface().GetPathNodeFromAddress( *node );
     }
     return NULL;
 }
 
 CVector * CPathFindSA::GetNodePosition ( CPathNode * pNode, CVector * pPosition)
 {
-    DWORD dwFunc = FUNC_CPathNode_GetCoors;
-    _asm
-    {
-        push    pPosition
-        mov     ecx, pNode
-        call    dwFunc
-    }
+    // *pNode stands for: resolve virtual class name to internal one.
+    PathFind::pathNode *node = *pNode;
+
+    node->GetPosition( *pPosition );
+
     return pPosition;
 }
 

@@ -33,8 +33,6 @@
 #define FUNC_SwitchRoadsOffInArea               0x452C80
 #define FUNC_SwitchPedRoadsOffInArea            0x452F00
 
-#define FUNC_CPathNode_GetCoors                 0x420A10
-
 #define CLASS_CPathFind                         0x96F050
 
 #define VAR_PedDensityMultiplier                0x8D2530
@@ -43,6 +41,17 @@
 #define VAR_NumberOfPedsInUseInterior           0x8D253C
 #define VAR_CarDensityMultiplier                0x8A5B20
 #define VAR_MaxNumberOfCarsInUse                0x8A5B24
+
+inline bool IsNotNeutral( bool primary, bool secondary )
+{
+    return primary != secondary;
+}
+
+inline void NeutralizeBooleans( bool& primary, bool secondary )
+{
+    if ( IsNotNeutral( primary, secondary ) )
+        primary = !primary;
+}
 
 // http://gta.wikia.com/Paths_(GTA_SA)
 // http://www.gtamodding.com/index.php?title=Paths_(GTA_SA)
@@ -54,6 +63,7 @@ namespace PathFind
     // or too simple (naviNodeLink).
 
     // GTA:SA internal data.
+    // todo: could this be CNodeAddress?
     struct dynamicLink
     {
         unsigned short          m_areaID : 16;          // 0
@@ -156,6 +166,16 @@ namespace PathFind
                 bool                m_trafficSecondary : 1;
             };
         };
+
+        operator CPathNode* ( void )
+        {
+            return (CPathNode*)this;
+        }
+
+        operator const CPathNode* ( void ) const
+        {
+            return (const CPathNode*)this;
+        }
     };
 
 #pragma pack(push)
@@ -181,6 +201,20 @@ namespace PathFind
         BYTE                        m_pad[2];               // 26
     };
 #pragma pack(pop)
+};
+
+class CPathNode
+{
+public:
+    operator PathFind::pathNode* ( void )
+    {
+        return (PathFind::pathNode*)this;
+    }
+
+    operator const PathFind::pathNode* ( void ) const
+    {
+        return (const PathFind::pathNode*)this;
+    }
 };
 
 class CPathFindSAInterface
@@ -216,10 +250,12 @@ public:
         float x1, float x2, float y1, float y2, float z1, float z2, bool emergencyVehiclesOnly, bool vehicleNodesOnly, unsigned int sectorID, bool useNodeConfig
     );
 
-    void __thiscall             ReadContainer( RwStream *stream, unsigned int pathNodeID );
-    void __thiscall             FreeContainer( unsigned int pathNodeID );
+    void __thiscall                 ReadContainer               ( RwStream *stream, unsigned int pathNodeID );
+    void __thiscall                 FreeContainer               ( unsigned int pathNodeID );
 
-    bool __thiscall             IsSectorCarNodeInRadius( float x, float y, float radius ) const;
+    bool __thiscall                 IsSectorCarNodeInRadius     ( float x, float y, float radius ) const;
+
+    PathFind::pathNode* __thiscall  GetPathNodeFromAddress      ( const CNodeAddress address );
 
     // The engine actually has support for 72 pathnode sectors.
     // Due to limitations while storing the navi links, the actual limit is 64.

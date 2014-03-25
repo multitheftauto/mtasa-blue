@@ -13,6 +13,7 @@
 *****************************************************************************/
 
 #include "StdInc.h"
+#include "gamesa_renderware.h"
 
 extern CBaseModelInfoSAInterface **ppModelInfo;
 
@@ -58,12 +59,38 @@ void CColModelSAInterface::ReleaseData( void )
 
 void* CColModelSAInterface::operator new( size_t )
 {
-    return (*ppColModelPool)->Allocate();
+    return Pools::GetColModelPool()->Allocate();
 }
 
 void CColModelSAInterface::operator delete( void *ptr )
 {
-    (*ppColModelPool)->Free( (CColModelSAInterface*)ptr );
+    Pools::GetColModelPool()->Free( (CColModelSAInterface*)ptr );
+}
+
+CColDataSA::CColDataSA( void )
+{
+    // Binary offsets: (1.0 US and 1.0 EU): 0x0040F030
+    numSpheres = 0;
+    numBoxes = 0;
+    numTriangles = 0;
+    ucNumWheels = 0;
+
+    unkFlag1 = false;
+    unkFlag2 = false;
+    hasShadowMeshFaces = false;
+
+    pColSpheres = NULL;
+    pColBoxes = NULL;
+    pSuspensionLines = NULL;
+    pColVertices = NULL;
+    pColTriangles = NULL;
+    pColTrianglePlanes = NULL;
+
+    numShadowMeshFaces = 0;
+    numShadowMeshVertices = 0;
+
+    pShadowMeshVertices = NULL;
+    pShadowMeshFaces = NULL;
 }
 
 /*=========================================================
@@ -185,7 +212,7 @@ CColModelSA::~CColModelSA( void )
 
 bool CColModelSA::Replace( unsigned short id )
 {
-    if ( id > DATA_TEXTURE_BLOCK-1 )
+    if ( id > MAX_MODELS-1 )
         return false;
 
     if ( IsReplaced( id ) )
@@ -237,6 +264,11 @@ bool CColModelSA::Restore( unsigned short id )
 
         break;
     case RW_CLUMP:
+        if ( model->GetModelType() == MODEL_VEHICLE )
+        {
+            // Since we cloned the interface, we 
+        }
+
         if ( info->m_eLoading == MODEL_LOADED )
             model->SetCollision( m_original, m_originalDynamic );
         else

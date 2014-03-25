@@ -62,6 +62,8 @@ void CEntitySAInterface::SetAlpha( unsigned char alpha )
 
 CColModelSAInterface* CEntitySAInterface::GetColModel( void ) const
 {
+    CColModelSAInterface *colModel = NULL;
+
 #if 0
     CEntitySA *entity = (CEntitySA*)pGame->GetPools()->GetEntity( const_cast <CEntitySAInterface*> ( this ) );
 
@@ -70,25 +72,41 @@ CColModelSAInterface* CEntitySAInterface::GetColModel( void ) const
         CColModelSA *col = entity->GetColModel();
 
         if ( col )
-            return col->GetInterface();
+            colModel = col->GetInterface();
     }
 #endif
 
-    if ( nType == ENTITY_TYPE_VEHICLE )
+    if ( !colModel )
     {
-        CVehicleSAInterface *veh = (CVehicleSAInterface*)this;
-        unsigned char n = veh->m_nSpecialColModel;
+        if ( nType == ENTITY_TYPE_VEHICLE )
+        {
+            CVehicleSAInterface *veh = (CVehicleSAInterface*)this;
+            unsigned char n = veh->m_nSpecialColModel;
 
-        if ( n != 0xFF )
-            return (CColModelSAInterface*)VAR_CVehicle_SpecialColModels + n;
+            if ( n != 0xFF )
+                colModel = (CColModelSAInterface*)VAR_CVehicle_SpecialColModels + n;
+        }
     }
 
-    CColModelSA *replacedCollision = g_colReplacement[ GetModelIndex() ];
+    if ( !colModel )
+    {
+        CColModelSA *replacedCollision = g_colReplacement[ GetModelIndex() ];
 
-    if ( replacedCollision )
-        return replacedCollision->GetInterface();
+        if ( replacedCollision )
+            colModel = replacedCollision->GetInterface();
+    }
 
-    return GetModelInfo()->pColModel;
+    if ( !colModel )
+        colModel = GetModelInfo()->pColModel;
+
+    // Verify the collision.
+    if ( nType == ENTITY_TYPE_VEHICLE )
+    {
+        // The suspension lines must be set up.
+        // Otherwise we may crash.
+    }
+
+    return colModel;
 }
 
 const CVector& CEntitySAInterface::GetCollisionOffset( CVector& out ) const

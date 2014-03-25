@@ -451,6 +451,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CColModelSA.loader.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\CColPointSA.cpp"
 				>
 			</File>
@@ -1229,6 +1233,10 @@
 			</File>
 			<File
 				RelativePath=".\CColModelSA.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CColModelSA.loader.h"
 				>
 			</File>
 			<File

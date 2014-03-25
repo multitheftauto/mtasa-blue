@@ -378,7 +378,7 @@ int __cdecl TxdLoadEx( int id, const char *name, const char *filename )
 // Binary offsets: (1.0 US and 1.0 EU): 0x007320B0
 int __cdecl TxdLoad( int id, const char *filename )
 {
-    return TxdLoadEx( id, FileMgr::GetFileNameItem( filename ).c_str(), filename );
+    return TxdLoadEx( id, FileSystem::GetFileNameItem( filename ).c_str(), filename );
 }
 
 // Binary offsets: (1.0 US and 1.0 EU): 0x00408340

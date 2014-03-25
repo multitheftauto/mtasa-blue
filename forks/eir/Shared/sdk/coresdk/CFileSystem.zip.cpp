@@ -547,6 +547,8 @@ static void inline _ScanDirectory( const CArchiveFileTranslator *trans, const di
                 filePath abs_path = "/";
                 _File_OutputPathTree( tree, false, abs_path );
 
+                abs_path += item->name;
+
                 fileCallback( abs_path, userdata );
             }
         }
@@ -559,11 +561,14 @@ static void inline _ScanDirectory( const CArchiveFileTranslator *trans, const di
         {
             CArchiveFileTranslator::directory *item = *iter;
 
-            filePath abs_path = "/";
-            _File_OutputPathTree( tree, false, abs_path );
-
             if ( dirCallback )
             {
+                filePath abs_path = "/";
+                _File_OutputPathTree( tree, false, abs_path );
+
+                abs_path += item->name;
+                abs_path += "/";
+
                 _File_OnDirectoryFound( pattern, item->name, abs_path, dirCallback, userdata );
             }
 

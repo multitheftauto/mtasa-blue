@@ -818,6 +818,52 @@ namespace FileSystem
 
         return successful;
     }
+
+    // Useful utility to get the file name out of a path.
+    inline std::string  GetFileNameItem( const char *name )
+    {
+        const char *fileStartFrom = NULL;
+        const char *origName = name;
+
+        while ( true )
+        {
+            char ichr = *name;
+
+            if ( ichr == '\0' )
+            {
+                if ( !fileStartFrom )
+                    fileStartFrom = origName;
+
+                break;
+            }
+
+            if ( ichr == '\\' || ichr == '/' )
+            {
+                fileStartFrom = name + 1;
+            }
+
+            name++;
+        }
+
+        const char *fileEnd = NULL;
+
+        name = fileStartFrom;
+
+        while ( true )
+        {
+            char ichr = *name;
+
+            if ( ichr == '.' || ichr == '\0' )
+            {
+                fileEnd = name;
+                break;
+            }
+
+            name++;
+        }
+
+        return std::string( fileStartFrom, fileEnd );
+    }
 }
 
 #endif //_CFileSystemInterface_

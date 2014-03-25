@@ -20,6 +20,9 @@
 #include "gamesa_renderware.hpp"
 #include "CRenderWareSA.ShaderMatching.h"
 
+// Include this for texture loading tools.
+#include "CStreamingSA.utils.hxx"
+
 extern CGameSA * pGame;
 
 RwInterface **ppRwInterface = (RwInterface**)0x00C97B24;
@@ -261,7 +264,9 @@ RpClump * CRenderWareSA::ReadDFF ( const char *szDFF, unsigned short id, bool bL
     CBaseModelInfoSAInterface *model = ppModelInfo[id];
     CTxdInstanceSA *txd;
     bool txdReference;
-    bool isVehicle;
+
+    // We want to look up texture dictionaries exactly like GTA:SA is doing it.
+    TextureLookupApplicator *txdLookupPtr = NULL;
     
     CColLoaderModelAcquisition *colAcq;
 
@@ -309,12 +314,8 @@ RpClump * CRenderWareSA::ReadDFF ( const char *szDFF, unsigned short id, bool bL
             if ( model->GetRwModelType() == RW_ATOMIC )
                 txd->SetCurrent();
 
-            // Do we want to enable VEHICLE.TXD look-up for vehicle models here?
-            // If so, use RwRemapScan if CBaseModelInfo::GetModelType() == MODEL_VEHICLE, like so
-            isVehicle = model->GetModelType() == MODEL_VEHICLE;
-
-            if ( isVehicle )
-                RwRemapScan::Apply();
+            // Use this struct to load textures exactly like GTA:SA does.
+            txdLookupPtr = new TextureLookupApplicator( id );
         }
 
         if ( bLoadEmbeddedCollisions )
@@ -322,8 +323,6 @@ RpClump * CRenderWareSA::ReadDFF ( const char *szDFF, unsigned short id, bool bL
             // rockstar's collision hack: set the global particle emitter to the modelinfo pointer of this model
             colAcq = new CColLoaderModelAcquisition;
         }
-
-        RwImportedScan::Apply( model->usTextureDictionary );
     }
 
     // read the clump with all its extensions
@@ -331,9 +330,6 @@ RpClump * CRenderWareSA::ReadDFF ( const char *szDFF, unsigned short id, bool bL
 
     if ( id != 0 )
     {
-        // Do not import our textures anymore
-        RwImportedScan::Unapply();
-
         if ( bLoadEmbeddedCollisions )
         {
             CColModelSAInterface *col = colAcq->GetCollision();
@@ -347,12 +343,13 @@ RpClump * CRenderWareSA::ReadDFF ( const char *szDFF, unsigned short id, bool bL
         else
             colOut = NULL;
 
+        if ( txdLookupPtr != NULL )
+        {
+            delete txdLookupPtr;
+        }
+
         if ( model )
         {
-            // Unapply the VEHICLE.TXD look-up
-            if ( isVehicle )
-                RwRemapScan::Unapply();
-
             // We do not have to preserve the texture container, as RenderWare is smart enough to hold references
             // to textures itself
             if ( txdReference )

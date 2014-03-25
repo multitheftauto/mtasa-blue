@@ -629,15 +629,13 @@ void CModelInfoSA::StaticFlushPendingRestreamIPL ( void )
 
 struct SectorModelRestream
 {
-    modelId_t modelIndex;
-
     AINLINE void OnSector( Streamer::streamSectorEntry& sector )
     {
         for ( Streamer::streamSectorEntry::ptrNode_t *ptrNode = sector.GetList(); ptrNode != NULL; ptrNode = ptrNode->m_next )
         {
             CEntitySAInterface *entity = ptrNode->data;
 
-            if ( entity->GetModelIndex() == modelIndex )
+            if ( std::find( CModelInfoSA::ms_RestreamModelMap.begin(), CModelInfoSA::ms_RestreamModelMap.end(), entity->GetModelIndex() ) != CModelInfoSA::ms_RestreamModelMap.end() )
             {
                 if ( !entity->bStreamingDontDelete && !entity->bImBeingRendered )
                 {
@@ -652,6 +650,8 @@ void CModelInfoSA::StaticFlushPendingRestreamModel( void )
 {
     if ( ms_RestreamModelMap.empty() )
         return;
+    // Does the same as StaticFlushPendingRestreamIPL
+    // It selects the model only, so other entities of the same TXD id stay loaded, improving performance.
 
     Streaming::FlushRequestList();
 

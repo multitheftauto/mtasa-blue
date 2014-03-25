@@ -14,7 +14,6 @@
 #include "StdInc.h"
 #include "gamesa_renderware.h"
 
-
 /*****************************************************************************
 *
 *   RenderWare Functions
@@ -90,6 +89,10 @@ RwStaticGeometry::RwStaticGeometry( void )
     unknown3 = 0;
 }
 
+void* RwStaticGeometry::operator new ( size_t memSize )
+{
+    return _mallocNew( memSize );
+}
 /*=========================================================
     RwStaticGeometry::AllocateLink (GTA:SA extension)
 
@@ -195,4 +198,22 @@ RwError* RwSetError( RwError *info )
 
     rwInterface->m_errorInfo.err2 = info->err2;
     return info;
+}
+
+void RenderWareAPI_Init( void )
+{
+    // Initialization based on version.
+    switch( pGame->GetGameVersion() )
+    {
+    case VERSION_EU_10:
+        _mallocNew      = (_mallocNew_t)0x008211DA;
+        break;
+    case VERSION_US_10:
+        _mallocNew      = (_mallocNew_t)0x0082119A;
+        break;
+    }
+}
+
+void RenderWareAPI_Shutdown( void )
+{
 }

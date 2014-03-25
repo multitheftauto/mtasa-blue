@@ -145,7 +145,7 @@ typedef bool                    (__cdecl *RwAnimationInit_t)                    
 typedef bool                    (__cdecl *RwSkeletonUpdate_t)                   (RpSkeleton *skel);
 
 // Memory functions
-typedef void*                   (__cdecl *RwMalloc_t)                           (size_t memSize);
+typedef void*                   (__cdecl *RwMalloc_t)                           (size_t memSize, unsigned int flags);
 typedef void*                   (__cdecl *RwRealloc_t)                          (void *memptr, size_t newSize);
 typedef void                    (__cdecl *RwFree_t)                             (void *memptr);
 typedef void                    (__cdecl *RwCalloc_t)                           (unsigned int count, unsigned int blockSize);
@@ -307,16 +307,8 @@ RWFUNC ( RwCalloc_t                                 RwCalloc                    
 /** GTA function definitions and mappings                                   **/
 /*****************************************************************************/
 
-typedef void                (__cdecl *LoadCollisionModel_t)             (const char*, CColModelSAInterface*, const char*);
-typedef void                (__cdecl *LoadCollisionModelVer2_t)         (const char*, unsigned int, CColModelSAInterface*, const char*);
-typedef void                (__cdecl *LoadCollisionModelVer3_t)         (const char*, unsigned int, CColModelSAInterface*, const char*); // buf, bufsize, ccolmodel&, keyname
-typedef void                (__cdecl *LoadCollisionModelVer4_t)         (const char*, unsigned int, CColModelSAInterface*, const char*);    // undocumented?
 typedef RwTexture*          (__cdecl *CClothesBuilder_CopyTexture_t)    (RwTexture *texture);
 
-RWFUNC ( LoadCollisionModel_t           LoadCollisionModel                , (LoadCollisionModel_t)              invalid_ptr )
-RWFUNC ( LoadCollisionModelVer2_t       LoadCollisionModelVer2            , (LoadCollisionModelVer2_t)          invalid_ptr )
-RWFUNC ( LoadCollisionModelVer3_t       LoadCollisionModelVer3            , (LoadCollisionModelVer3_t)          invalid_ptr )
-RWFUNC ( LoadCollisionModelVer4_t       LoadCollisionModelVer4            , (LoadCollisionModelVer4_t)          invalid_ptr )
 RWFUNC ( CClothesBuilder_CopyTexture_t  CClothesBuilder_CopyTexture       , (CClothesBuilder_CopyTexture_t)     invalid_ptr )
 
 #endif //__GAMESA_RENDERWARE

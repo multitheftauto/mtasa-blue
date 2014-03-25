@@ -24,48 +24,6 @@ namespace FileMgr
     inline char*        GetPathBuffer           ( void )        { return (char*)0x00B71A60; }
 
     CFileTranslator*    GetCurDirTranslator     ( void );
-
-    inline std::string  GetFileNameItem( const char *name )
-    {
-        const char *fileStartFrom = NULL;
-        const char *origName = name;
-
-        while ( true )
-        {
-            char ichr = *name;
-
-            if ( ichr == '\0' )
-            {
-                fileStartFrom = origName;
-                break;
-            }
-
-            if ( ichr == '\\' || ichr == '/' )
-            {
-                fileStartFrom = name + 1;
-                break;
-            }
-
-            name++;
-        }
-
-        const char *fileEnd = NULL;
-
-        while ( true )
-        {
-            char ichr = *name;
-
-            if ( ichr == '.' || ichr == '\0' )
-            {
-                fileEnd = name;
-                break;
-            }
-
-            name++;
-        }
-
-        return std::string( fileStartFrom, fileEnd );
-    }
 };
 
 #endif //_FILE_UTILS_

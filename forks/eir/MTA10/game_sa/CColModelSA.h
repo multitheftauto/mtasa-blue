@@ -33,18 +33,60 @@ typedef struct
 } CBoundingBoxSA;
 
 
-typedef struct
+struct CColSurfaceSA
 {
-    CVector     vecCenter;
-    float       fRadius;
-} CColSphereSA;
+    EColSurface     material;
+    unsigned char   flags;
+    unsigned char   unknown;
+    CColLighting    light;
+};
 
 
-typedef struct
+struct CColSphereSA
 {
-    CVector     min;
-    CVector     max;
-} CColBoxSA;
+    inline CColSphereSA( float fRadius, const CVector& vecCenter, EColSurface material, unsigned char flags, unsigned char unknown )
+    {
+        this->fRadius = fRadius;
+        this->vecCenter = vecCenter;
+        this->surface.material = material;
+        this->surface.flags = flags;
+        this->surface.unknown = unknown;
+    }
+
+    CVector         vecCenter;
+    float           fRadius;
+    CColSurfaceSA   surface;
+};
+
+
+struct CColBoxSA
+{
+    inline CColBoxSA( const CVector& min, const CVector& max, EColSurface material, unsigned char flags, unsigned char unknown )
+    {
+        this->min = min;
+        this->max = max;
+        this->surface.material = material;
+        this->surface.flags = flags;
+        this->surface.unknown = unknown;
+    }
+
+    CVector         min;
+    CVector         max;
+    CColSurfaceSA   surface;
+};
+
+
+struct CColVertexSA
+{
+    inline CColVertexSA( short a, short b, short c )
+    {
+        this->a = a;
+        this->b = b;
+        this->c = c;
+    }
+
+    short a, b, c;
+};
 
 
 typedef struct
@@ -61,6 +103,14 @@ typedef struct
 {
     BYTE pad0 [ 12 ];
 } CColTrianglePlaneSA;
+
+
+typedef struct
+{
+    unsigned short  a, b, c;
+    unsigned char   material;
+    CColLighting    light;
+} CColShadowMeshFaceSA;
 
 
 typedef struct
@@ -143,20 +193,41 @@ public:
     bool                            m_isInterior;       // 43
 };
 
-typedef struct
+struct CColDataSA
 {
-    unsigned short                  numSpheres;         // 0
-    unsigned short                  numBoxes;           // 2
-    unsigned short                  numTriangles;       // 4
-    BYTE                            ucNumWheels;        // 6
-    BYTE                            pad2;               // 7
-    CColSphereSA*                   pColSpheres;        // 8
-    CColBoxSA*                      pColBoxes;          // 12
-    void*                           pSuspensionLines;   // 16
-    void*                           unk;                // 20
-    CColTriangleSA*                 pColTriangles;      // 24
-    CColTrianglePlaneSA*            pColTrianglePlanes; // 28
-} CColDataSA;
+    CColDataSA();
+
+    unsigned short                  numSpheres;             // 0
+    unsigned short                  numBoxes;               // 2
+    unsigned short                  numTriangles;           // 4
+    BYTE                            ucNumWheels;            // 6
+
+    union
+    {
+        unsigned char               flags;                  // 7
+
+        struct
+        {
+            unsigned char           unkFlag1 : 1;           // 7
+            unsigned char           unkFlag2 : 1;  
+            unsigned char           hasShadowMeshFaces : 1; 
+        };
+    };
+
+    CColSphereSA*                   pColSpheres;            // 8
+    CColBoxSA*                      pColBoxes;              // 12
+    void*                           pSuspensionLines;       // 16
+    CColVertexSA*                   pColVertices;           // 20
+    CColTriangleSA*                 pColTriangles;          // 24
+    CColTrianglePlaneSA*            pColTrianglePlanes;     // 28
+
+    int                             numShadowMeshFaces;     // 32
+    unsigned int                    numShadowMeshVertices;  // 36
+    void*                           pShadowMeshVertices;    // 40
+    CColShadowMeshFaceSA*           pShadowMeshFaces;       // 44
+
+    unsigned int        CalculateNumberOfShadowMeshVertices( void ) const;
+};
 
 class CColModelSAInterface
 {
@@ -170,12 +241,15 @@ public:
     void*   operator new ( size_t );
     void    operator delete ( void *ptr );
 
-    CBoundingBox                    m_bounds;           // 0
-    unsigned char                   m_colPoolIndex;     // 40
-    bool                            m_unk : 1;          // 41
-    BYTE                            m_pad[2];           // 42
-    CColDataSA*                     pColData;           // 44
+    CBoundingBox                    m_bounds;               // 0
+    unsigned char                   m_colPoolIndex;         // 40
+    bool                            m_unk : 1;              // 41
+    bool                            m_initWithColData : 1;  // if true, this interface has been initialized with collision data.
+    BYTE                            m_pad[2];               // 42
+    CColDataSA*                     pColData;               // 44
 };
+
+#include "CColModelSA.loader.h"
 
 // Utility functions.
 void __cdecl Collision_Preload( void );
@@ -188,6 +262,7 @@ namespace Collision
     // The idea of a collision quad tree conflicts with our dynamical collision assignment system.
     // We have to update the GTA:SA logic so that it does not unload colFiles which we are still
     // using.
+    // Update: since collision sectors have reference counts, its all good. :)
     inline colFileQuadTreeNode_t*   GetCollisionQuadTree( void )
     {
         return *(colFileQuadTreeNode_t**)0x0096555C;
@@ -229,9 +304,5 @@ private:
 
     imports_t                       m_imported;
 };
-
-
-typedef void    (__cdecl*SetCachedCollision_t)              ( unsigned int id, CColModelSAInterface *col );
-extern SetCachedCollision_t     SetCachedCollision;
 
 #endif

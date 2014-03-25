@@ -272,6 +272,7 @@ void CBaseModelInfoSAInterface::UnsetColModel( void )
     CBaseModelInfoSAInterface::ValidateResource (MTA extension)
 
     Arguments:
+        modelIndex - the model index associated the this base model info
         rwobj - resource that should be checked compatibility for
     Purpose:
         Returns a boolean that tells you whether the given resource

@@ -166,7 +166,7 @@ struct TextureLookupApplicator
                 appliedRemapCheck = true;
             }
         }
-        else if ( rwType == RW_ATOMIC )
+        else if ( rwType == RW_CLUMP )
         {
             eModelType modelType = modelInfo->GetModelType();
 

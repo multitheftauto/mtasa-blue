@@ -127,6 +127,7 @@ CGameSA::CGameSA()
 
     // Initialize static (internal) extensions
     RenderWarePipeline_Init();
+    RenderWareAPI_Init();
     Transformation_Init();
     QuadTree_Init();
     Cache_Init();
@@ -263,6 +264,7 @@ CGameSA::~CGameSA ( void )
     Cache_Shutdown();
     QuadTree_Shutdown();
     Transformation_Shutdown();
+    RenderWareAPI_Shutdown();
     RenderWarePipeline_Shutdown();
 
     delete m_pExecutiveManager;

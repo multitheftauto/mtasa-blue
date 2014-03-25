@@ -682,8 +682,10 @@ void Streamer_Init( void )
     HookInstall( 0x0040D3F0, (DWORD)Streamer::RequestAdvancedSquaredSectorEntities, 5 );
     HookInstall( 0x00554840, (DWORD)Streamer::SectorRenderCallback, 5 );
 
+#ifndef _MTA_BLUE
     // Hook special fixes
     HookInstall( 0x00404130, (DWORD)_CBuilding__Delete, 5 );
+#endif //_MTA_BLUE
 }
 
 void Streamer_Shutdown( void )
