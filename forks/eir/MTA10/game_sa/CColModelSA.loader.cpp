@@ -147,11 +147,11 @@ unsigned int CColDataSA::CalculateNumberOfCollisionMeshVertices( void ) const
     // for the collision mesh.
     unsigned int numVertices = 0;
 
-    if ( numTriangles != 0 )
+    if ( numColTriangles != 0 )
     {
-        if ( numTriangles > 0 )
+        if ( numColTriangles > 0 )
         {
-            for ( int n = 0; n < numTriangles; n++ )
+            for ( int n = 0; n < numColTriangles; n++ )
             {
                 CColTriangleSA *face = pColTriangles + n;
 
@@ -353,7 +353,7 @@ struct TFaceProc
 
     inline void SetActualCount( int count )
     {
-        colData->numTriangles = actualCount;
+        colData->numColTriangles = actualCount;
     }
 };
 
@@ -431,7 +431,7 @@ void __cdecl LoadCollisionModel( const char *pBuffer, CColModelSAInterface *pCol
 
     pBuffer += sizeof( int );
 
-    colData->numTriangles = numColFaces;
+    colData->numColTriangles = numColFaces;
 
     {
         TFaceProc proc( colData );
@@ -447,7 +447,7 @@ void __cdecl LoadCollisionModel( const char *pBuffer, CColModelSAInterface *pCol
     colData->numShadowMeshVertices = 0;
 
     // Check whether this collision has anything collidable.
-    pCollision->m_isCollidable = ( colData->numSpheres != 0 || colData->numBoxes != 0 || colData->numTriangles != 0 );
+    pCollision->m_isCollidable = ( colData->numSpheres != 0 || colData->numBoxes != 0 || colData->numColTriangles != 0 );
 }
 
 void __cdecl LoadCollisionModelVer2( const char *pBuffer, int bufferSize, CColModelSAInterface *pCollision, const char *colName )
@@ -482,7 +482,7 @@ void __cdecl LoadCollisionModelVer2( const char *pBuffer, int bufferSize, CColMo
     colData->numSpheres = colHeader.numColSpheres;
     colData->numBoxes = colHeader.numColBoxes;
     colData->ucNumWheels = colHeader.numWheels;
-    colData->numTriangles = colHeader.numColMeshFaces;
+    colData->numColTriangles = colHeader.numColMeshFaces;
 
     colData->unkFlag1 = false;
     colData->hasShadowMeshFaces = false;
@@ -538,7 +538,7 @@ void __cdecl LoadCollisionModelVer3( const char *pBuffer, int bufferSize, CColMo
     colData->numSpheres = colHeader.numColSpheres;
     colData->numBoxes = colHeader.numColBoxes;
     colData->ucNumWheels = colHeader.numWheels;
-    colData->numTriangles = colHeader.numColMeshFaces;
+    colData->numColTriangles = colHeader.numColMeshFaces;
 
     colData->unkFlag1 = false;
     colData->hasFaceGroups = colHeader.hasFaceGroups;
@@ -602,7 +602,7 @@ void __cdecl LoadCollisionModelVer4( const char *pBuffer, int bufferSize, CColMo
     colData->numSpheres = colHeader.numColSpheres;
     colData->numBoxes = colHeader.numColBoxes;
     colData->ucNumWheels = colHeader.numWheels;
-    colData->numTriangles = colHeader.numColMeshFaces;
+    colData->numColTriangles = colHeader.numColMeshFaces;
 
     colData->unkFlag1 = false;
     colData->hasFaceGroups = colHeader.hasFaceGroups;
@@ -666,7 +666,7 @@ CColModelSAInterface* CColModelSAInterface::Clone( void )
     int numSpheres = srcColData->numSpheres;
     int numBoxes = srcColData->numBoxes;
     int numWheels = srcColData->ucNumWheels;
-    int numTriangles = srcColData->numTriangles;
+    int numTriangles = srcColData->numColTriangles;
 
     int numVertices = srcColData->CalculateNumberOfCollisionMeshVertices();
 
@@ -728,7 +728,7 @@ CColModelSAInterface* CColModelSAInterface::Clone( void )
     dstColData->numSpheres = numSpheres;
     dstColData->numBoxes = numBoxes;
     dstColData->ucNumWheels = numWheels;
-    dstColData->numTriangles = numTriangles;
+    dstColData->numColTriangles = numTriangles;
 
     dstColData->numShadowMeshVertices = numShadowMeshVertices;
     dstColData->numShadowMeshFaces = numShadowMeshFaces;
@@ -770,7 +770,7 @@ CColModelSAInterface* CColModelSAInterface::Clone( void )
 // Binary offsets: (1.0 US and 1.0 EU): 0x0040F6E0
 CColDataSA::trianglePlanesListNode* CColDataSA::GetTrianglePlanesListNode( void )
 {
-    return *(trianglePlanesListNode**)( ALIGN( (unsigned int)pColTrianglePlanes + numTriangles * 10, 4, 4 ) );
+    return *(trianglePlanesListNode**)( ALIGN( (unsigned int)pColTrianglePlanes + numColTriangles * 10, 4, 4 ) );
 }
 
 inline CColDataSA::trianglePlanesListNode& GetFreeTrianglePlanesNode( void )
@@ -823,7 +823,7 @@ void CColDataSA::UnsegmentedClear( void )
     numSpheres = 0;
     ucNumWheels = 0;
     numBoxes = 0;
-    numTriangles = 0;
+    numColTriangles = 0;
 
     pColSpheres = NULL;
     pColBoxes = NULL;

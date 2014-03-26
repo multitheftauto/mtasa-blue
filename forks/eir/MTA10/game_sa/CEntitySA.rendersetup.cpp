@@ -586,7 +586,9 @@ eRenderType __cdecl _SetupEntityVisibility( CEntitySAInterface *entity, float& c
             // should not render anymore.
             if ( timedModel == -1 || ppModelInfo[timedModel]->GetRwObject() )
             {
-                entity->DeleteRwObject();
+                if ( entity->GetRwObject() )
+                    entity->DeleteRwObject();
+
                 return ENTITY_RENDER_CROSS_ZONES;
             }
 

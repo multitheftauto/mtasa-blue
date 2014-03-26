@@ -639,7 +639,8 @@ struct SectorModelRestream
             {
                 if ( !entity->bStreamingDontDelete && !entity->bImBeingRendered )
                 {
-                    entity->DeleteRwObject();
+                    if ( entity->GetRwObject() )
+                        entity->DeleteRwObject();
                 }
             }
         }

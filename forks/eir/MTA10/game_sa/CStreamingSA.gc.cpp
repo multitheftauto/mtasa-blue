@@ -118,6 +118,7 @@ struct GarbageCollectStreamingEntities
         if ( player && player->pedFlags.bInVehicle && player->CurrentObjective == entity )
             return true;
 
+        // The entity must have a RenderWare object here.
         entity->DeleteRwObject();
 
         if ( model->GetRefCount() == 0 )

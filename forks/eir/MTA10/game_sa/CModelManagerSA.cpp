@@ -295,15 +295,20 @@ struct restreamByModel
 
             if ( std::find( restreamModels.begin(), restreamModels.end(), entity->GetModelIndex() ) != restreamModels.end() )
             {
-                entity->DeleteRwObject();
-
-                // If we need to restream a ped or vehicle, make sure we recreate their RenderWare objects.
-                // For that, we add them to a special list and process them later on.
-                eEntityType type = (eEntityType)entity->nType;
-
-                if ( type == ENTITY_TYPE_PED || type == ENTITY_TYPE_VEHICLE )
+                // Only delete the RenderWare object if it exists.
+                // Otherwise some entities will crash us.
+                if ( entity->GetRwObject() )
                 {
-                    restreamEntities.push_back( entity );
+                    entity->DeleteRwObject();
+
+                    // If we need to restream a ped or vehicle, make sure we recreate their RenderWare objects.
+                    // For that, we add them to a special list and process them later on.
+                    eEntityType type = (eEntityType)entity->nType;
+
+                    if ( type == ENTITY_TYPE_PED || type == ENTITY_TYPE_VEHICLE )
+                    {
+                        restreamEntities.push_back( entity );
+                    }
                 }
             }
         }

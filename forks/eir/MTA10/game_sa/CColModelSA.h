@@ -209,7 +209,7 @@ struct CColDataSA
 
     unsigned short                  numSpheres;             // 0
     unsigned short                  numBoxes;               // 2
-    unsigned short                  numTriangles;           // 4
+    unsigned short                  numColTriangles;        // 4
     BYTE                            ucNumWheels;            // 6
 
     union

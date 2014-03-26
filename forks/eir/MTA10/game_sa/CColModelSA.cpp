@@ -91,7 +91,7 @@ CColDataSA::CColDataSA( void )
     // Binary offsets: (1.0 US and 1.0 EU): 0x0040F030
     numSpheres = 0;
     numBoxes = 0;
-    numTriangles = 0;
+    numColTriangles = 0;
     ucNumWheels = 0;
 
     unkFlag1 = false;
@@ -270,6 +270,21 @@ bool CColModelSA::Replace( modelId_t id )
     if ( g_colReplacement[id] )
         g_colReplacement[id]->Restore( id );
 
+    // Set some lighting for this collision if not already present
+    CColDataSA* pColData = m_pInterface->pColData;
+    if ( pColData )
+    {
+        for ( uint i = 0 ; i < pColData->numColTriangles ; i++ )
+        {
+            CColTriangleSA* pTriangle = pColData->pColTriangles + i;
+            if ( pTriangle->lighting.night == 0 && pTriangle->lighting.day == 0 )
+            {
+                pTriangle->lighting.night = 1;
+                pTriangle->lighting.day = 12;
+            }
+        }
+    }
+
     CModelLoadInfoSA *info = (CModelLoadInfoSA*)ARRAY_CModelLoadInfo + id;
     CBaseModelInfoSAInterface *model = ppModelInfo[id];
     
@@ -336,6 +351,8 @@ bool CColModelSA::Restore( modelId_t id )
 
         model->pColModel = NULL;
     }
+
+    // todo: m_original can be NULL. fix this.
 
     switch( model->GetRwModelType() )
     {

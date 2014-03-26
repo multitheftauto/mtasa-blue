@@ -3599,7 +3599,13 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                     {
                         ElementID PlayerId;
                         if ( bitStream.Read ( PlayerId ) )
-                            g_pClientGame->m_pManager->GetPlayerManager ()->Get ( PlayerId )->SetTeam ( pTeam );
+                        {
+                            CClientPlayer *teamPlayer = g_pClientGame->m_pManager->GetPlayerManager()->Get( PlayerId );
+
+                            // HOTPATCH for a crash, please take a look at it.
+                            if ( teamPlayer )
+                                teamPlayer->SetTeam ( pTeam );
+                        }
                     }
 
                     delete [] szTeamName;
