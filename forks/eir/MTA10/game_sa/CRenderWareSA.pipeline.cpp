@@ -1231,6 +1231,11 @@ void RwD3D9InitializeCurrentStates( void )
     Binary offsets:
         (1.0 US and 1.0 EU): 0x005DA020
 =========================================================*/
+D3DLIGHT9& RenderWare::GetSpecialVehicleLight( void )
+{
+    return *(D3DLIGHT9*)0x00C02CB0;
+}
+
 static int __cdecl HOOK_InitDeviceSystem( void )
 {
     RwPipeline *defPipeline;
@@ -1263,8 +1268,8 @@ static int __cdecl HOOK_InitDeviceSystem( void )
     if ( !iReturn )
         return 0;
 
-    // Set some NULL pointers
-    memset( (void*)0x00C02CB0, 0, sizeof(void*) * 26 );
+    // Initialize the special vehicle light interface.
+    memset( &RenderWare::GetSpecialVehicleLight(), 0, sizeof(D3DLIGHT9) );
 
     // Finally initialize the pools!
     RenderWare::GetEnvMapMaterialPool() = new CEnvMapMaterialPool;

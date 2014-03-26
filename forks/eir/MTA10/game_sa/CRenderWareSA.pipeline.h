@@ -45,6 +45,9 @@ namespace RenderWare
     inline CEnvMapMaterialPool*&    GetEnvMapMaterialPool   ( void )        { return *(CEnvMapMaterialPool**)0x00C02D28; }
     inline CEnvMapAtomicPool*&      GetEnvMapAtomicPool     ( void )        { return *(CEnvMapAtomicPool**)0x00C02D2C; }
     inline CSpecMapMaterialPool*&   GetSpecMapMaterialPool  ( void )        { return *(CSpecMapMaterialPool**)0x00C02D30; }
+
+    // Global rendering utilities.
+    D3DLIGHT9&  GetSpecialVehicleLight( void );
 };
 
 // Stack-based anonymous RenderState management

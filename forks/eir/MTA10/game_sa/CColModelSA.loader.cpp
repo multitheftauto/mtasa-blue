@@ -711,7 +711,7 @@ CColModelSAInterface* CColModelSAInterface::Clone( void )
     else
     {
         // We allocate separate buffers for each data.
-        CColDataSA *colData = new (_mallocNew( sizeof( CColDataSA ) )) CColDataSA;
+        dstColData = new (_mallocNew( sizeof( CColDataSA ) )) CColDataSA;
 
         dstColSphereArray =             AllocateDataCount <CColSphereSA>            ( numSpheres );
         dstColBoxArray =                AllocateDataCount <CColBoxSA>               ( numBoxes );

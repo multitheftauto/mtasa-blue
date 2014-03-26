@@ -759,7 +759,7 @@ static RpAtomic* RwAtomicRenderTranslucentPlane( RpAtomic *atomic )
 {
     float camDistanceSq = GetRenderObjectCameraDistanceSq( atomic );
 
-    if ( renderLOD && camDistanceSq >= heliLODDistance )
+    if ( renderLOD && camDistanceSq >= planeLODDistance )
         return atomic;
 
     RwAtomicHandleHighDetail( atomic, camDistanceSq );

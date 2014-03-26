@@ -1300,8 +1300,8 @@ struct ReflectiveVehicleRenderManager
         if ( doSpecularTransform )
         {
             // Enable the special vehicle light.
-            RpD3D9SetLight( 7, *(D3DLIGHT9*)0x00C02CB0 );
-            RpD3D9EnableLight( 7, 1 );
+            RpD3D9SetLight( 7, RenderWare::GetSpecialVehicleLight() );
+            RpD3D9EnableLight( 7, true );
 
             specularFloat1 = std::min( m_unk * specMapMat->specular * 2, 1.0f );
             specularFloat2 = specMapMat->specular * 100.0f;

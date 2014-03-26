@@ -106,6 +106,12 @@ namespace D3D9Lighting
         incrementalLightIndex = 0;
     }
 
+    // Called on device reset.
+    void lightState::Clear( void )
+    {
+        nativeLights.SetSizeCount( 0 );
+    }
+
     bool lightState::SetLight( int lightIndex, const D3DLIGHT9& lightStruct )
     {
         nativeLights.SetItem( lightStruct, lightIndex );
@@ -519,9 +525,27 @@ bool __cdecl RpD3D9LightsGetApplicance( const D3DLIGHT9& left, const D3DLIGHT9& 
 
 bool _SetLightGlobal( int lightIndex, const D3DLIGHT9& lightStruct )
 {
+    IDirect3DDevice9 *renderDevice = GetRenderDevice();
+
     if ( D3D9Lighting::deviceLightInfo.GetSizeCount() <= lightIndex )
     {
-        D3D9Lighting::deviceLightInfo.SetSizeCount( lightIndex + 1 );
+        int oldStructSize = D3D9Lighting::deviceLightInfo.GetSizeCount();
+        int newStructSize = lightIndex + 1;
+
+        D3D9Lighting::deviceLightInfo.SetSizeCount( newStructSize );
+
+        // Initialize the light structs.
+        for ( int n = oldStructSize; n < newStructSize; n++ )
+        {
+            nativeLightInfo& nativeInfo = D3D9Lighting::deviceLightInfo.Get( n );
+
+            HRESULT res = renderDevice->GetLight( n, &nativeInfo.native );
+
+            if ( res != D3D_OK )
+            {
+                memset( &nativeInfo.native, 0, sizeof( nativeInfo.native ) );
+            }
+        }
     }
     else
     {
@@ -534,7 +558,7 @@ bool _SetLightGlobal( int lightIndex, const D3DLIGHT9& lightStruct )
     nativeLightInfo& info = D3D9Lighting::deviceLightInfo.Get( lightIndex );
     info.native = lightStruct;
 
-    return GetRenderDevice()->SetLight( lightIndex, &lightStruct ) >= 0;
+    return renderDevice->SetLight( lightIndex, &lightStruct ) >= 0;
 }
 
 template <typename processorType>
@@ -2279,6 +2303,18 @@ void __cdecl RpD3D9ResetLightStatus( void )
     hasLocalLighting = false;
 
     HOOK_RwD3D9SetRenderState( D3DRS_LIGHTING, false );
+}
+
+/*=========================================================
+    RpD3D9LightingOnDeviceReset (MTA extension)
+
+    Purpose:
+        Resets all cached light structs to their defaults, since they have
+        turned invalid.
+=========================================================*/
+void __cdecl RpD3D9LightingOnDeviceReset( void )
+{
+    D3D9Lighting::deviceLightInfo.SetSizeCount( 0 );
 }
 
 /*=========================================================

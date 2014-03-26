@@ -771,6 +771,9 @@ void __cdecl RwD3D9ResetDeviceStates( void )
         }
     }
 
+    // MTA extension: make sure we reset the light states.
+    RpD3D9LightingOnDeviceReset();
+
     RwD3D9ResetSrcBlend();
     RwD3D9ResetDstBlend();
 

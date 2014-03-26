@@ -24,6 +24,7 @@ int __cdecl     RpD3D9GlobalLightsEnable    ( unsigned char flags );
 bool            RpD3D9GlobalLightingPrePass ( void );
 void            RpD3D9CacheLighting         ( void );
 void __cdecl    RpD3D9ResetLightStatus      ( void );
+void __cdecl    RpD3D9LightingOnDeviceReset ( void );
 void __cdecl    RpD3D9EnableLights          ( bool enable, int unused );
 
 // API exports.
@@ -342,6 +343,7 @@ namespace D3D9Lighting
 
         void Shutdown( void );
 
+        void Clear( void );
         bool SetLight( int lightIndex, const D3DLIGHT9& lightInfo );
         bool EnableLight( int lightIndex, bool enable );
 

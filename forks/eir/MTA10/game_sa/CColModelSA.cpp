@@ -229,7 +229,36 @@ CColModelSA::~CColModelSA( void )
         delete m_pInterface;
 }
 
-bool CColModelSA::Replace( unsigned short id )
+CColModelSA::colImport_t* CColModelSA::FindImport( modelId_t id, colImports_t::iterator& findIter )
+{
+    for ( colImports_t::iterator iter = m_imported.begin(); iter != m_imported.end(); iter++ )
+    {
+        colImport_t& import = *iter;
+
+        if ( import.modelIndex == id )
+        {
+            findIter = iter;
+            return &import;
+        }
+    }
+
+    return NULL;
+}
+
+const CColModelSA::colImport_t* CColModelSA::FindImport( modelId_t id ) const
+{
+    for ( colImports_t::const_iterator iter = m_imported.begin(); iter != m_imported.end(); iter++ )
+    {
+        const colImport_t& import = *iter;
+
+        if ( import.modelIndex == id )
+            return &import;
+    }
+
+    return NULL;
+}
+
+bool CColModelSA::Replace( modelId_t id )
 {
     if ( id > MAX_MODELS-1 )
         return false;
@@ -245,8 +274,7 @@ bool CColModelSA::Replace( unsigned short id )
     CBaseModelInfoSAInterface *model = ppModelInfo[id];
     
     // Store the original so we can restore it again
-    m_original = model->pColModel;
-    m_originalDynamic = model->IsDynamicCol();
+    SetOriginal( model->pColModel, model->IsDynamicCol() );
 
     eRwType rwType = model->GetRwModelType();
 
@@ -274,24 +302,40 @@ bool CColModelSA::Replace( unsigned short id )
 
     g_colReplacement[id] = this;
 
-    m_imported.push_back( id );
+    colImport_t importStruct;
+    importStruct.replaceCollision = replaceColModel;
+    importStruct.modelIndex = id;
+
+    m_imported.push_back( importStruct );
     return true;
 }
 
-bool CColModelSA::IsReplaced( unsigned short id ) const
+bool CColModelSA::IsReplaced( modelId_t id ) const
 {
-    return std::find( m_imported.begin(), m_imported.end(), id ) != m_imported.end();
+    return FindImport( id ) != NULL;
 }
 
-bool CColModelSA::Restore( unsigned short id )
+bool CColModelSA::Restore( modelId_t id )
 {
-    imports_t::const_iterator iter = std::find( m_imported.begin(), m_imported.end(), id );
+    colImports_t::iterator iter;
+    colImport_t *import = FindImport( id, iter );
 
-    if ( iter == m_imported.end() )
+    if ( !import )
         return false;
 
     CModelLoadInfoSA *info = (CModelLoadInfoSA*)ARRAY_CModelLoadInfo + id;
     CBaseModelInfoSAInterface *model = ppModelInfo[id];
+
+    assert( import->replaceCollision == model->pColModel );
+
+    if ( import->replaceCollision != m_pInterface )
+    {
+        // Since we cloned the interface, we destroy it here.
+        // This is made because every vehicle type must have a specialized collision interface.
+        delete import->replaceCollision;
+
+        model->pColModel = NULL;
+    }
 
     switch( model->GetRwModelType() )
     {
@@ -305,13 +349,6 @@ bool CColModelSA::Restore( unsigned short id )
 
         break;
     case RW_CLUMP:
-        if ( model->GetModelType() == MODEL_VEHICLE )
-        {
-            // Since we cloned the interface, we destroy it here.
-            // This is made because every vehicle type must have a specialized collision interface.
-            model->UnsetColModel();
-        }
-
         if ( info->m_eLoading == MODEL_LOADED )
             model->SetCollision( m_original, m_originalDynamic );
         else
@@ -333,7 +370,25 @@ bool CColModelSA::Restore( unsigned short id )
 void CColModelSA::RestoreAll( void )
 {
     while ( !m_imported.empty() )
-        Restore( m_imported.front() );
+    {
+        const colImport_t& import = *m_imported.begin();
+
+        Restore( import.modelIndex );
+    }
+}
+
+CColModelSA::imports_t CColModelSA::GetImportList( void ) const
+{
+    imports_t importsVirtual;
+
+    for ( colImports_t::const_iterator iter = m_imported.begin(); iter != m_imported.end(); iter++ )
+    {
+        const colImport_t& import = *iter;
+
+        importsVirtual.push_back( import.modelIndex );
+    }
+
+    return importsVirtual;
 }
 
 void* CColFileSA::operator new ( size_t )

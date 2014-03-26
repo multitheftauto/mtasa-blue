@@ -294,18 +294,28 @@ class CColModelSA : public CColModel
 {
     friend class CStreamingSA;
 public:
+
+    struct colImport_t
+    {
+        CColModelSAInterface *replaceCollision;
+        modelId_t modelIndex;
+    };
+    typedef std::list <colImport_t> colImports_t;
+
                                     CColModelSA         ( void );
                                     CColModelSA         ( CColModelSAInterface *pInterface, bool destroy = false );
                                     ~CColModelSA        ( void );
 
     inline CColModelSAInterface*    GetInterface        ( void )                        { return m_pInterface; }
 
-    bool                            Replace             ( unsigned short id );
-    bool                            IsReplaced          ( unsigned short id ) const;
-    bool                            Restore             ( unsigned short id );
+    bool                            Replace             ( modelId_t id );
+    bool                            IsReplaced          ( modelId_t id ) const;
+    colImport_t*                    FindImport          ( modelId_t id, colImports_t::iterator& findIter );
+    const colImport_t*              FindImport          ( modelId_t id ) const;
+    bool                            Restore             ( modelId_t id );
     void                            RestoreAll          ( void );
 
-    const imports_t&                GetImportList       ( void ) const                  { return m_imported; }
+    imports_t                       GetImportList       ( void ) const;
 
     void                            SetOriginal         ( CColModelSAInterface *col, bool isDynamic )   { m_original = col; m_originalDynamic = isDynamic; }
     CColModelSAInterface*           GetOriginal         ( void )                        { return m_original; }
@@ -318,7 +328,7 @@ private:
     bool                            m_originalDynamic;
     bool                            m_bDestroyInterface;
 
-    imports_t                       m_imported;
+    colImports_t                    m_imported;
 };
 
 // Module initialization.
