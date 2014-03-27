@@ -207,59 +207,65 @@ static void InitializeVehiclePublicSuspensionLines( CVehicleSAInterface *pVehicl
 void CBaseModelInfoSAInterface::SetCollision( CColModelSAInterface *col, bool dynamic )
 {
     pColModel = col;
+    
+    BOOL_FLAG( renderFlags, RENDER_COLMODEL, dynamic );
 
     if ( dynamic )
     {
-        renderFlags |= RENDER_COLMODEL;
-
         timeInfo *timed = GetTimeInfo();
 
         if ( timed && timed->m_model != -1 )
-            ppModelInfo[timed->m_model]->SetCollision( col, false );
-    }
-    else
-        renderFlags &= ~RENDER_COLMODEL;
-
-    // MTA fix: Do some security checks to prevent crashes.
-    eRwType rwType = GetRwModelType();
-
-    if ( rwType == RW_CLUMP )
-    {
-        eModelType modelType = GetModelType();
-
-        if ( modelType == MODEL_VEHICLE )
         {
-            // Basically, in regular GTA:SA vehicles always have their collision allocated before their
-            // interfaces were constructed. This led to the fail-proof case that the vehicles could
-            // specialize the collision interface when they constructed themselves. This specialized
-            // interface would only be used by one model info and hence be valid through the engine's
-            // runtime.
-            // We cannot rely on that in MTA anymore. The following code fixes the assumption.
+            assert( g_colReplacement[timed->m_model] == NULL );
 
-            assert( col->pColData != NULL );
+            ppModelInfo[timed->m_model]->SetCollision( col, false );
+        }
+    }
 
-            // We must make sure the collision data is not segmented.
-            col->UnsegmentizeData();
+    // Only perform if col is not NULL.
+    if ( col )
+    {
+        // MTA fix: Do some security checks to prevent crashes.
+        eRwType rwType = GetRwModelType();
 
-            // Do we have no suspension data allocated?
-            CColDataSA *vehColData = col->pColData;
+        if ( rwType == RW_CLUMP )
+        {
+            eModelType modelType = GetModelType();
 
-            if ( vehColData->pSuspensionLines == NULL )
+            if ( modelType == MODEL_VEHICLE )
             {
-                // Is there any vehicle active that is of this model info?
-                for ( unsigned int n = 0; n < MAX_VEHICLES; n++ )
+                // Basically, in regular GTA:SA vehicles always have their collision allocated before their
+                // interfaces were constructed. This led to the fail-proof case that the vehicles could
+                // specialize the collision interface when they constructed themselves. This specialized
+                // interface would only be used by one model info and hence be valid through the engine's
+                // runtime.
+                // We cannot rely on that in MTA anymore. The following code fixes the assumption.
+
+                assert( col->pColData != NULL );
+
+                // We must make sure the collision data is not segmented.
+                col->UnsegmentizeData();
+
+                // Do we have no suspension data allocated?
+                CColDataSA *vehColData = col->pColData;
+
+                if ( vehColData->pSuspensionLines == NULL )
                 {
-                    CVehicleSAInterface *vehicle = Pools::GetVehiclePool()->Get( n );
-
-                    if ( vehicle && vehicle->GetModelInfo() == this )
+                    // Is there any vehicle active that is of this model info?
+                    for ( unsigned int n = 0; n < MAX_VEHICLES; n++ )
                     {
-                        // Initialize the suspension lines for this particular vehicle.
-                        InitializeVehiclePublicSuspensionLines( vehicle, vehColData );
-                        break;
-                    }
-                }
+                        CVehicleSAInterface *vehicle = Pools::GetVehiclePool()->Get( n );
 
-                // By now, if a vehicle is active, the colData must have suspension line data.
+                        if ( vehicle && vehicle->GetModelInfo() == this )
+                        {
+                            // Initialize the suspension lines for this particular vehicle.
+                            InitializeVehiclePublicSuspensionLines( vehicle, vehColData );
+                            break;
+                        }
+                    }
+
+                    // By now, if a vehicle is active, the colData must have suspension line data.
+                }
             }
         }
     }

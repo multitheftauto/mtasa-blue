@@ -409,7 +409,7 @@ void CModelManagerSA::UpdateWorldTextures( int txdId )
     if ( !restream.restreamModels.empty() )
     {
         // Delete the RenderWare objects of all entities that have the models that should be restreamed.
-        Streamer::ForAllStreamerSectors( restream, true, true, true, true, true );
+        Streamer::ForAllStreamerSectors( restream, true, true, true, true, true, true );
 
         bool requireModelLoading = false;
 

@@ -439,6 +439,15 @@ struct ModelLoadDispatch : public ModelCheckDispatch <false>
 
 inline void OnModelLoaded( modelId_t id )
 {
+    // Do some security checks.
+    // You never know what could go wrong!
+    if ( id < MAX_MODELS )
+    {
+        // If this fails, the engine tried to load the original model while it was replaced.
+        // This must not happen. It would cause a streaming system memory leak.
+        assert( g_replObjectNative[id] == NULL );
+    }
+
     // Grab our load info.
     CModelLoadInfoSA& loadInfo = Streaming::GetModelLoadInfo( id );
 

@@ -213,10 +213,12 @@ struct SegmentAllocator
     struct SegmentDistributor
     {
         size_t cur_offset;
+        size_t maxSize;
 
-        inline SegmentDistributor( void )
+        inline SegmentDistributor( size_t maxSize )
         {
             cur_offset = 0;
+            this->maxSize = maxSize;
         }
 
         template <typename structType>
@@ -231,14 +233,11 @@ struct SegmentAllocator
                 dataArray = (structType*)( (char*)( header + 1 ) + cur_offset );
             }
 
+            assert( cur_offset <= maxSize );
+
             return dataArray;
         }
     };
-
-    inline SegmentDistributor GetDistributor( void )
-    {
-        return SegmentDistributor();
-    }
 };
 
 template <typename structType>
@@ -653,117 +652,124 @@ CColModelSAInterface* CColModelSAInterface::Clone( void )
     CColDataSA *srcColData = this->pColData;
     CColDataSA *dstColData = NULL;
 
-    CColSphereSA            *dstColSphereArray = NULL;
-    CColBoxSA               *dstColBoxArray = NULL;
-    CColSuspensionLineSA    *dstColSuspensionLineArray = NULL;
-    CColVertexSA            *dstColVertexArray = NULL;
-    CColTriangleSA          *dstColTriangleArray = NULL;
-    CColTrianglePlaneSA     *dstColTrianglePlaneArray = NULL;
-
-    CColVertexSA            *dstColShadowMeshVertexArray = NULL;
-    CColTriangleSA          *dstColShadowMeshFaceArray = NULL;
-
-    int numSpheres = srcColData->numSpheres;
-    int numBoxes = srcColData->numBoxes;
-    int numWheels = srcColData->ucNumWheels;
-    int numTriangles = srcColData->numColTriangles;
-
-    int numVertices = srcColData->CalculateNumberOfCollisionMeshVertices();
-
-    int numShadowMeshVertices = srcColData->numShadowMeshVertices;
-    int numShadowMeshFaces = srcColData->numShadowMeshFaces;
-
-    // Allocate depending on allocation method.
-    size_t sphereArraySize = sizeof( CColSphereSA ) * numSpheres;
-    size_t boxArraySize = sizeof( CColBoxSA ) * numBoxes;
-    size_t suspensionLineArraySize = sizeof( CColSuspensionLineSA ) * numWheels;
-    size_t vertexArraySize = sizeof( CColVertexSA ) * numVertices;
-    size_t triangleArraySize = sizeof( CColTriangleSA ) * numTriangles;
-
-    if ( this->m_isColDataSegmented )
+    if ( srcColData != NULL )
     {
-        // Calculate the size of all data.
-        size_t dataBufferSize = 
-            sphereArraySize +
-            boxArraySize +
-            suspensionLineArraySize +
-            vertexArraySize +
-            triangleArraySize;
+        CColSphereSA            *dstColSphereArray = NULL;
+        CColBoxSA               *dstColBoxArray = NULL;
+        CColSuspensionLineSA    *dstColSuspensionLineArray = NULL;
+        CColVertexSA            *dstColVertexArray = NULL;
+        CColTriangleSA          *dstColTriangleArray = NULL;
+        CColTrianglePlaneSA     *dstColTrianglePlaneArray = NULL;
 
-        SegmentAllocator <CColDataSA> segAlloc;
+        CColVertexSA            *dstColShadowMeshVertexArray = NULL;
+        CColTriangleSA          *dstColShadowMeshFaceArray = NULL;
 
-        char *segBuffer;
+        int numSpheres = srcColData->numSpheres;
+        int numBoxes = srcColData->numBoxes;
+        int numWheels = srcColData->ucNumWheels;
+        int numTriangles = srcColData->numColTriangles;
 
-        segAlloc.AllocateDataSegment( dataBufferSize, dstColData, segBuffer );
+        int numVertices = srcColData->CalculateNumberOfCollisionMeshVertices();
 
-        // Set up the data pointers.
-        SegmentAllocator <CColDataSA>::SegmentDistributor segDistr = segAlloc.GetDistributor();
+        int numShadowMeshVertices = srcColData->numShadowMeshVertices;
+        int numShadowMeshFaces = srcColData->numShadowMeshFaces;
 
-        dstColSphereArray =             segDistr.ObtainSegmentData <CColSphereSA>           ( dstColData, numSpheres );
-        dstColBoxArray =                segDistr.ObtainSegmentData <CColBoxSA>              ( dstColData, numBoxes );
-        dstColSuspensionLineArray =     segDistr.ObtainSegmentData <CColSuspensionLineSA>   ( dstColData, numWheels );
-        dstColVertexArray =             segDistr.ObtainSegmentData <CColVertexSA>           ( dstColData, numVertices );
-        dstColTriangleArray =           segDistr.ObtainSegmentData <CColTriangleSA>         ( dstColData, numTriangles );
+        // Allocate depending on allocation method.
+        size_t sphereArraySize = sizeof( CColSphereSA ) * numSpheres;
+        size_t boxArraySize = sizeof( CColBoxSA ) * numBoxes;
+        size_t suspensionLineArraySize = sizeof( CColSuspensionLineSA ) * numWheels;
+        size_t vertexArraySize = sizeof( CColVertexSA ) * numVertices;
+        size_t triangleArraySize = sizeof( CColTriangleSA ) * numTriangles;
 
-        dstColShadowMeshVertexArray =   segDistr.ObtainSegmentData <CColVertexSA>           ( dstColData, numShadowMeshVertices );
-        dstColShadowMeshFaceArray =     segDistr.ObtainSegmentData <CColTriangleSA>         ( dstColData, numShadowMeshFaces );
+        size_t shadowMeshVerticeArraySize = sizeof( CColVertexSA ) * numShadowMeshVertices;
+        size_t shadowMeshFaceArraySize = sizeof( CColTriangleSA ) * numShadowMeshFaces;
+
+        if ( this->m_isColDataSegmented )
+        {
+            // Calculate the size of all data.
+            size_t dataBufferSize = 
+                sphereArraySize +
+                boxArraySize +
+                suspensionLineArraySize +
+                vertexArraySize +
+                triangleArraySize +
+                shadowMeshVerticeArraySize +
+                shadowMeshFaceArraySize;
+
+            SegmentAllocator <CColDataSA> segAlloc;
+
+            char *segBuffer;
+
+            segAlloc.AllocateDataSegment( dataBufferSize, dstColData, segBuffer );
+
+            // Set up the data pointers.
+            SegmentAllocator <CColDataSA>::SegmentDistributor segDistr( dataBufferSize );
+
+            dstColSphereArray =             segDistr.ObtainSegmentData <CColSphereSA>           ( dstColData, numSpheres );
+            dstColBoxArray =                segDistr.ObtainSegmentData <CColBoxSA>              ( dstColData, numBoxes );
+            dstColSuspensionLineArray =     segDistr.ObtainSegmentData <CColSuspensionLineSA>   ( dstColData, numWheels );
+            dstColVertexArray =             segDistr.ObtainSegmentData <CColVertexSA>           ( dstColData, numVertices );
+            dstColTriangleArray =           segDistr.ObtainSegmentData <CColTriangleSA>         ( dstColData, numTriangles );
+
+            dstColShadowMeshVertexArray =   segDistr.ObtainSegmentData <CColVertexSA>           ( dstColData, numShadowMeshVertices );
+            dstColShadowMeshFaceArray =     segDistr.ObtainSegmentData <CColTriangleSA>         ( dstColData, numShadowMeshFaces );
+        }
+        else
+        {
+            // We allocate separate buffers for each data.
+            dstColData = new (_mallocNew( sizeof( CColDataSA ) )) CColDataSA;
+
+            dstColSphereArray =             AllocateDataCount <CColSphereSA>            ( numSpheres );
+            dstColBoxArray =                AllocateDataCount <CColBoxSA>               ( numBoxes );
+            dstColSuspensionLineArray =     AllocateDataCount <CColSuspensionLineSA>    ( numWheels );
+            dstColVertexArray =             AllocateDataCount <CColVertexSA>            ( numVertices );
+            dstColTriangleArray =           AllocateDataCount <CColTriangleSA>          ( numTriangles );
+
+            dstColShadowMeshVertexArray =   AllocateDataCount <CColVertexSA>            ( numShadowMeshVertices );
+            dstColShadowMeshFaceArray =     AllocateDataCount <CColTriangleSA>          ( numShadowMeshFaces );
+        }
+        clone->m_isColDataSegmented = this->m_isColDataSegmented;
+
+        // Copy over general stuff.
+        dstColData->numSpheres = numSpheres;
+        dstColData->numBoxes = numBoxes;
+        dstColData->ucNumWheels = numWheels;
+        dstColData->numColTriangles = numTriangles;
+
+        dstColData->numShadowMeshVertices = numShadowMeshVertices;
+        dstColData->numShadowMeshFaces = numShadowMeshFaces;
+
+        dstColData->unkFlag1 = srcColData->unkFlag1;
+        dstColData->hasFaceGroups = srcColData->hasFaceGroups;
+        dstColData->hasShadowMeshFaces = srcColData->hasShadowMeshFaces;
+
+        // Copy over collision objects.
+        CopyArray( srcColData->pColSpheres,             dstColSphereArray, numSpheres );
+        CopyArray( srcColData->pColBoxes,               dstColBoxArray, numBoxes );
+        CopyArray( srcColData->pSuspensionLines,        dstColSuspensionLineArray, numWheels );
+        CopyArray( srcColData->pColVertices,            dstColVertexArray, numVertices );
+        CopyArray( srcColData->pColTriangles,           dstColTriangleArray, numTriangles );
+
+        CopyArray( srcColData->pShadowMeshVertices,     dstColShadowMeshVertexArray, numShadowMeshVertices );
+        CopyArray( srcColData->pShadowMeshFaces,        dstColShadowMeshFaceArray, numShadowMeshFaces );
+
+        // Set the array pointers to the destination struct.
+        dstColData->pColSpheres = dstColSphereArray;
+        dstColData->pColBoxes = dstColBoxArray;
+        dstColData->pSuspensionLines = dstColSuspensionLineArray;
+        dstColData->pColVertices = dstColVertexArray;
+        dstColData->pColTriangles = dstColTriangleArray;
+        dstColData->pColTrianglePlanes = NULL;
+        
+        dstColData->pShadowMeshVertices = dstColShadowMeshVertexArray;
+        dstColData->pShadowMeshFaces = dstColShadowMeshFaceArray;
     }
-    else
-    {
-        // We allocate separate buffers for each data.
-        dstColData = new (_mallocNew( sizeof( CColDataSA ) )) CColDataSA;
-
-        dstColSphereArray =             AllocateDataCount <CColSphereSA>            ( numSpheres );
-        dstColBoxArray =                AllocateDataCount <CColBoxSA>               ( numBoxes );
-        dstColSuspensionLineArray =     AllocateDataCount <CColSuspensionLineSA>    ( numWheels );
-        dstColVertexArray =             AllocateDataCount <CColVertexSA>            ( numVertices );
-        dstColTriangleArray =           AllocateDataCount <CColTriangleSA>          ( numTriangles );
-
-        dstColShadowMeshVertexArray =   AllocateDataCount <CColVertexSA>            ( numShadowMeshVertices );
-        dstColShadowMeshFaceArray =     AllocateDataCount <CColTriangleSA>          ( numShadowMeshFaces );
-    }
-    clone->m_isColDataSegmented = this->m_isColDataSegmented;
-
-    // Copy over general stuff.
-    dstColData->numSpheres = numSpheres;
-    dstColData->numBoxes = numBoxes;
-    dstColData->ucNumWheels = numWheels;
-    dstColData->numColTriangles = numTriangles;
-
-    dstColData->numShadowMeshVertices = numShadowMeshVertices;
-    dstColData->numShadowMeshFaces = numShadowMeshFaces;
-
-    dstColData->unkFlag1 = srcColData->unkFlag1;
-    dstColData->hasFaceGroups = srcColData->hasFaceGroups;
-    dstColData->hasShadowMeshFaces = srcColData->hasShadowMeshFaces;
-
-    // Copy over collision objects.
-    CopyArray( srcColData->pColSpheres,             dstColSphereArray, numSpheres );
-    CopyArray( srcColData->pColBoxes,               dstColBoxArray, numBoxes );
-    CopyArray( srcColData->pSuspensionLines,        dstColSuspensionLineArray, numWheels );
-    CopyArray( srcColData->pColVertices,            dstColVertexArray, numVertices );
-    CopyArray( srcColData->pColTriangles,           dstColTriangleArray, numTriangles );
-
-    CopyArray( srcColData->pShadowMeshVertices,     dstColShadowMeshVertexArray, numShadowMeshVertices );
-    CopyArray( srcColData->pShadowMeshFaces,        dstColShadowMeshFaceArray, numShadowMeshFaces );
-
-    // Set the array pointers to the destination struct.
-    dstColData->pColSpheres = dstColSphereArray;
-    dstColData->pColBoxes = dstColBoxArray;
-    dstColData->pSuspensionLines = dstColSuspensionLineArray;
-    dstColData->pColVertices = dstColVertexArray;
-    dstColData->pColTriangles = dstColTriangleArray;
-    
-    dstColData->pShadowMeshVertices = dstColShadowMeshVertexArray;
-    dstColData->pShadowMeshFaces = dstColShadowMeshFaceArray;
 
     // Copy over remaining settings.
     clone->m_isCollidable = this->m_isCollidable;
+    clone->m_colPoolIndex = this->m_colPoolIndex;
 
     clone->pColData = dstColData;
-    
-    // Set up individual data.
-    clone->m_colPoolIndex = 0;  // index zero is dummy index. we do not belong to any sector.
     return clone;
 }
 

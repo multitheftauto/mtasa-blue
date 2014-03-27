@@ -687,7 +687,7 @@ void __cdecl Streaming::Update( void )
         }
         else if ( *(unsigned int*)VAR_currArea == 0 )
         {
-            Streamer::RequestSquaredSectorEntities( camPos, 0 );
+            Streamer::RequestLevelOfDetailSectorEntities( camPos, 0 );
         }
     }
 

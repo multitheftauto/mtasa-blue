@@ -186,67 +186,75 @@ static bool __cdecl ReadCOLLibraryBounds( const char *buf, size_t size, unsigned
             if ( OnMY_CFileLoader_LoadCollisionFile_Mid( modelId ) )
             {
 #endif //_MTA_BLUE
-                CColModelSAInterface *col;
+                CColModelSAInterface *col = NULL;
+                bool isDynamic = false;
 
                 if ( CColModelSA *colInfo = g_colReplacement[modelId] )
                 {
                     // MTA extension: We store it in our data, so we can restore to it later
-                    col = colInfo->GetOriginal();
+                    col = colInfo->GetOriginal( modelId, isDynamic );
 
                     if ( !col )
-                        colInfo->SetOriginal( col = new CColModelSAInterface(), true );
+                    {
+                        col = new CColModelSAInterface;
+
+                        colInfo->SetOriginal( modelId, col, true );
+
+                        isDynamic = true;
+                    }
                 }
                 else
                 {
-                    // Clever usage of goto here; in order to save memory, we let the original collision interfaces unload their data.
-                    // We have to put the data back into the col-replacement original info, which would not work if the model info is not set
-                    // to have a dynamic collision. Dynamic collisions always reside in COL libraries, which COL replacements are not.
-                    // I had to restructure the loading here, and the best way is to use a goto.
-                    // If you disagree, troll me at IRC.
-                    if ( !info->IsDynamicCol() )
-                        goto skip;
+                    isDynamic = info->IsDynamicCol();
 
                     // The original route
                     col = info->pColModel;
 
                     if ( !col )
                     {
-                        col = new CColModelSAInterface();
+                        col = new CColModelSAInterface;
 
-                        info->SetColModel( col, true );
+                        info->SetCollision( col, true );
+
+                        isDynamic = true;
                     }
                 }
 
-                switch( header.checksum )
+                if ( col && isDynamic )
                 {
-                case '4LOC':
-                    LoadCollisionModelVer4( buf, header.size - 0x18, col, header.name );
-                    break;
-                case '3LOC':
-                    LoadCollisionModelVer3( buf, header.size - 0x18, col, header.name );
-                    break;
-                case '2LOC':
-                    LoadCollisionModelVer2( buf, header.size - 0x18, col, header.name );
-                    break;
-                default:
-                    LoadCollisionModel( buf, col, header.name );
-                    break;
+                    // Make sure there is no collision data attached to it anymore.
+                    col->ReleaseData();
+
+                    switch( header.checksum )
+                    {
+                    case '4LOC':
+                        LoadCollisionModelVer4( buf, header.size - 0x18, col, header.name );
+                        break;
+                    case '3LOC':
+                        LoadCollisionModelVer3( buf, header.size - 0x18, col, header.name );
+                        break;
+                    case '2LOC':
+                        LoadCollisionModelVer2( buf, header.size - 0x18, col, header.name );
+                        break;
+                    default:
+                        LoadCollisionModel( buf, col, header.name );
+                        break;
+                    }
+
+                    // MTA extension: Put it into our global storage
+                    g_originalCollision[modelId] = col;
+
+                    col->m_colPoolIndex = collId;
+
+                    // Do some procedural object logic
+                    if ( info->GetModelType() == MODEL_ATOMIC )
+                        ((bool (__cdecl*)( CBaseModelInfoSAInterface *info ))0x005DB650)( info );
                 }
-
-                // MTA extension: Put it into our global storage
-                g_originalCollision[modelId] = col;
-
-                col->m_colPoolIndex = collId;
-
-                // Do some procedural object logic
-                if ( info->GetModelType() == MODEL_ATOMIC )
-                    ((bool (__cdecl*)( CBaseModelInfoSAInterface *info ))0x005DB650)( info );
 #ifdef _MTA_BLUE
             }
 #endif //_MTA_BLUE
         }
         
-skip:
         size -= header.size;
         buf += header.size - (sizeof(ColModelFileHeader) - 8);
     }

@@ -23,9 +23,9 @@
 #define ARRAY_StreamDynamicSectors                          0x00B992B8
 #define NUM_StreamDynamicSectorRows                         16
 #define NUM_StreamDynamicSectorCols                         16
-#define ARRAY_StreamUpdateSectors                           0x00B99EB8
-#define NUM_StreamUpdateSectorRows                          30
-#define NUM_StreamUpdateSectorCols                          30
+#define ARRAY_StreamLODSectors                              0x00B99EB8
+#define NUM_StreamLODSectorRows                             30
+#define NUM_StreamLODSectorCols                             30
 
 // Global game API for streaming entities
 namespace Streamer
@@ -66,7 +66,7 @@ namespace Streamer
 
     // Helper function to scan all entities that are streamed in.
     template <typename callbackType>
-    void __forceinline ForAllStreamerSectors( callbackType& cb, bool doBuildings, bool doDummies, bool doVehicles, bool doPeds, bool doObjects )
+    void __forceinline ForAllStreamerSectors( callbackType& cb, bool doBuildings, bool doDummies, bool doVehicles, bool doPeds, bool doObjects, bool doLOD )
     {
         if ( doBuildings || doDummies )
         {
@@ -108,6 +108,17 @@ namespace Streamer
                     cb.OnSector( entry->object );
             }
         }
+
+        // Also loop LOD.
+        if ( doLOD )
+        {
+            for ( unsigned int n = 0; n < NUM_StreamLODSectorRows * NUM_StreamLODSectorCols; n++ )
+            {
+                streamSectorEntry *entry = (streamSectorEntry*)ARRAY_StreamLODSectors + n;
+
+                cb.OnSector( *entry );
+            }
+        }
     }
 
     // API for utilities.
@@ -118,7 +129,7 @@ namespace Streamer
         float minX, float minY, float maxX, float maxY,
         float camFarClip, unsigned int reqFlags
     );
-    void __cdecl RequestSquaredSectorEntities( const CVector& reqPos, unsigned int reqFlags );
+    void __cdecl RequestLevelOfDetailSectorEntities( const CVector& reqPos, unsigned int reqFlags );
     void __cdecl RequestAdvancedSquaredSectorEntities( const CVector& reqPos, unsigned int reqFlags );
 
     // General globals.

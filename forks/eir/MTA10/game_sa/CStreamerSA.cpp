@@ -31,7 +31,7 @@ struct _buildingRefRemoval
 
 static void __cdecl _CBuilding__RemoveReferences( CBuildingSAInterface *building )
 {
-    Streamer::ForAllStreamerSectors( _buildingRefRemoval( building ), true, false, false, false, false );
+    Streamer::ForAllStreamerSectors( _buildingRefRemoval( building ), true, false, false, false, false, true );
 }
 
 static void __declspec(naked) _CBuilding__Delete( void )
@@ -72,7 +72,7 @@ namespace Streamer
 
     void __cdecl ResetScanIndices( void )
     {
-        ForAllStreamerSectors( _resetScanIndex(), true, true, true, true, true );
+        ForAllStreamerSectors( _resetScanIndex(), true, true, true, true, true, true );
     }
 
     /*=========================================================
@@ -234,13 +234,13 @@ namespace Streamer
     }
 
     /*=========================================================
-        Streamer::RequestSquaredSectorEntities
+        Streamer::RequestLevelOfDetailSectorEntities
 
         Arguments:
             reqPos - position to request around of
             reqFlags - flags to pass to the RequestModel function
         Purpose:
-            Requests models of entities around the given reqPos
+            Requests LOD models of entities around the given reqPos
             position. The position given to it should be the
             camera's origin, since the request quad has camFarClip
             width and height without rotation.
@@ -382,9 +382,9 @@ namespace Streamer
         }
     };
 
-    struct _requestSquared : DefaultStreamerZoner <NUM_StreamUpdateSectorRows, WORLD_BOUNDS>
+    struct _levelOfDetailRequest : DefaultStreamerZoner <NUM_StreamLODSectorRows, WORLD_BOUNDS>
     {
-        __forceinline _requestSquared( unsigned int reqFlags, const CVector& reqPos ) : m_reqFlags( reqFlags ), m_reqPos( reqPos )
+        __forceinline _levelOfDetailRequest( unsigned int reqFlags, const CVector& reqPos ) : m_reqFlags( reqFlags ), m_reqPos( reqPos )
         {
         }
 
@@ -396,16 +396,16 @@ namespace Streamer
 
         void __forceinline OnEntry( int x, int y, int centerX, int centerY, float minX, float minY, float maxX, float maxY, float sectorSize, int sectorSizeArray )
         {
-            RequestStaticEntities( *( (const streamSectorEntry*)ARRAY_StreamUpdateSectors + x + y * NUM_StreamUpdateSectorRows ), m_reqPos.fX, m_reqPos.fY, minX, minY, maxX, maxY, sectorSize, m_reqFlags );
+            RequestStaticEntities( *( (const streamSectorEntry*)ARRAY_StreamLODSectors + x + y * NUM_StreamLODSectorRows ), m_reqPos.fX, m_reqPos.fY, minX, minY, maxX, maxY, sectorSize, m_reqFlags );
         }
 
         unsigned int m_reqFlags;
         const CVector& m_reqPos;
     };
 
-    void __cdecl RequestSquaredSectorEntities( const CVector& reqPos, unsigned int reqFlags )
+    void __cdecl RequestLevelOfDetailSectorEntities( const CVector& reqPos, unsigned int reqFlags )
     {
-        LoopArrayWorldSectors( reqPos.fX, reqPos.fY, Streamer::GetWorldFarclip(), _requestSquared( reqFlags, reqPos ) );
+        LoopArrayWorldSectors( reqPos.fX, reqPos.fY, Streamer::GetWorldFarclip(), _levelOfDetailRequest( reqFlags, reqPos ) );
     }
 
     /*=========================================================
@@ -678,7 +678,7 @@ void Streamer_Init( void )
     // Hook utility functions.
     HookInstall( 0x00563470, (DWORD)Streamer::ResetScanIndices, 5 );
     HookInstall( 0x0040C450, (DWORD)Streamer::RequestStaticEntitiesOfSector, 5 );
-    HookInstall( 0x0040C520, (DWORD)Streamer::RequestSquaredSectorEntities, 5 );
+    HookInstall( 0x0040C520, (DWORD)Streamer::RequestLevelOfDetailSectorEntities, 5 );
     HookInstall( 0x0040D3F0, (DWORD)Streamer::RequestAdvancedSquaredSectorEntities, 5 );
     HookInstall( 0x00554840, (DWORD)Streamer::SectorRenderCallback, 5 );
 

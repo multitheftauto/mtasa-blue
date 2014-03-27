@@ -629,20 +629,22 @@ void CModelInfoSA::StaticFlushPendingRestreamIPL ( void )
 
 struct SectorModelRestream
 {
+    AINLINE void UnloadEntity( CEntitySAInterface *entity )
+    {
+        if ( std::find( CModelInfoSA::ms_RestreamModelMap.begin(), CModelInfoSA::ms_RestreamModelMap.end(), entity->GetModelIndex() ) != CModelInfoSA::ms_RestreamModelMap.end() )
+        {
+            if ( entity->GetRwObject() )
+                entity->DeleteRwObject();
+        }
+    }
+
     AINLINE void OnSector( Streamer::streamSectorEntry& sector )
     {
         for ( Streamer::streamSectorEntry::ptrNode_t *ptrNode = sector.GetList(); ptrNode != NULL; ptrNode = ptrNode->m_next )
         {
             CEntitySAInterface *entity = ptrNode->data;
 
-            if ( std::find( CModelInfoSA::ms_RestreamModelMap.begin(), CModelInfoSA::ms_RestreamModelMap.end(), entity->GetModelIndex() ) != CModelInfoSA::ms_RestreamModelMap.end() )
-            {
-                if ( !entity->bStreamingDontDelete && !entity->bImBeingRendered )
-                {
-                    if ( entity->GetRwObject() )
-                        entity->DeleteRwObject();
-                }
-            }
+            UnloadEntity( entity );
         }
     }
 };
@@ -659,7 +661,7 @@ void CModelInfoSA::StaticFlushPendingRestreamModel( void )
     // Loop through all streamed in entities and unload the ones that match our model index.
     SectorModelRestream restream;
 
-    Streamer::ForAllStreamerSectors( restream, true, false, false, false, true );
+    Streamer::ForAllStreamerSectors( restream, true, false, false, false, true, true );
 
     // Free the resource so GTA:SA will reload it.
     for ( std::list < unsigned short >::const_iterator iter = ms_RestreamModelMap.begin(); iter != ms_RestreamModelMap.end(); iter++ )

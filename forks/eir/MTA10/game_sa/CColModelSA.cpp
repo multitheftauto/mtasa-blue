@@ -210,14 +210,12 @@ void ColModel_Shutdown( void )
 CColModelSA::CColModelSA( void )
 {
     m_pInterface = new CColModelSAInterface;
-    m_original = NULL;
     m_bDestroyInterface = true;
 }
 
 CColModelSA::CColModelSA( CColModelSAInterface *pInterface, bool destroy )
 {
     m_pInterface = pInterface;
-    m_original = NULL;
     m_bDestroyInterface = destroy;
 }
 
@@ -258,6 +256,31 @@ const CColModelSA::colImport_t* CColModelSA::FindImport( modelId_t id ) const
     return NULL;
 }
 
+static unsigned int __cdecl GetColInterfaceUseCount( CColModelSAInterface *colModel )
+{
+    unsigned int existCount = 0;
+
+    for ( modelId_t n = 0; n < MAX_MODELS; n++ )
+    {
+        CBaseModelInfoSAInterface *model = ppModelInfo[n];
+
+        if ( model && model->pColModel == colModel )
+        {
+            existCount++;
+        }
+
+        CColModelSA *replaceInterface = g_colReplacement[n];
+        bool origDynamic;
+
+        if ( replaceInterface && replaceInterface->GetOriginal( n, origDynamic ) == colModel )
+        {
+            existCount++;
+        }
+    }
+
+    return existCount;
+}
+
 bool CColModelSA::Replace( modelId_t id )
 {
     if ( id > MAX_MODELS-1 )
@@ -287,10 +310,46 @@ bool CColModelSA::Replace( modelId_t id )
 
     CModelLoadInfoSA *info = (CModelLoadInfoSA*)ARRAY_CModelLoadInfo + id;
     CBaseModelInfoSAInterface *model = ppModelInfo[id];
-    
-    // Store the original so we can restore it again
-    SetOriginal( model->pColModel, model->IsDynamicCol() );
 
+    CColModelSAInterface *origColModel = NULL;
+    bool isOriginalDynamic = false;
+
+    if ( CColModelSAInterface *modelColModel = model->pColModel )
+    {
+        // Make sure we unlink this collision.
+        model->pColModel = NULL;
+
+        // So here is the magic behind collision interfaces.
+        // During startup, GTA:SA optimizes its collision interfaces so that multiple model infos
+        // can use the same collision interface. This spans across level of details models to timed models.
+        // If we do not handle this situation, GTA:SA can suddenly destroy collision interfaces and overwrite
+        // them with another one, making collisions jump around like wild foxes.
+        // HENCE: MAKE SURE THE COLLISION INTERFACE WE WORK WITH IS UNIQUE.
+        unsigned int interfaceUseCount = GetColInterfaceUseCount( modelColModel );
+
+        if ( interfaceUseCount > 0 )
+        {
+            // Clone it to prevent fucking around.
+            // Remember that clone is a new MTA feature thanks to The_GTA.
+            origColModel = modelColModel->Clone();
+
+            if ( origColModel )
+            {
+                // We now own the collision, so set dynamic to true.
+                isOriginalDynamic = true;
+            }
+        }
+
+        if ( !origColModel )
+        {
+            assert( interfaceUseCount == 0 );
+
+            // We use the direct col model if no other choice.
+            origColModel = modelColModel;
+            isOriginalDynamic = model->IsDynamicCol();
+        }
+    }
+    
     eRwType rwType = model->GetRwModelType();
 
     CColModelSAInterface *replaceColModel = NULL;
@@ -320,6 +379,8 @@ bool CColModelSA::Replace( modelId_t id )
     colImport_t importStruct;
     importStruct.replaceCollision = replaceColModel;
     importStruct.modelIndex = id;
+    importStruct.originalCollision = origColModel;
+    importStruct.isOriginalDynamic = isOriginalDynamic;
 
     m_imported.push_back( importStruct );
     return true;
@@ -353,25 +414,37 @@ bool CColModelSA::Restore( modelId_t id )
     }
 
     // todo: m_original can be NULL. fix this.
+    CColModelSAInterface *origCol = import->originalCollision;
+    bool origDynamic = import->isOriginalDynamic;
 
     switch( model->GetRwModelType() )
     {
     case RW_ATOMIC:
+        if ( origCol )
+        {
+            assert( GetColInterfaceUseCount( origCol ) == 1 );
+        }
+
         // Restore the original colmodel no matter what
-        model->SetCollision( m_original, m_originalDynamic );
+        model->SetCollision( origCol, origDynamic );
 
         // Destroy it's data if not used anymore
-        if ( m_originalDynamic && !Streaming::GetCOLEnvironment().m_pool->Get( m_original->m_colPoolIndex )->m_loaded )
-            m_original->ReleaseData();
+        if ( origCol && origDynamic && origCol->m_colPoolIndex != 0 )
+        {
+            if ( !Streaming::GetCOLEnvironment().m_pool->Get( origCol->m_colPoolIndex )->m_loaded )
+            {
+                origCol->ReleaseData();
+            }
+        }
 
         break;
     case RW_CLUMP:
         if ( info->m_eLoading == MODEL_LOADED )
-            model->SetCollision( m_original, m_originalDynamic );
+            model->SetCollision( origCol, origDynamic );
         else
         {
             // Clumps delete collision at freeing them
-            delete m_original;
+            delete origCol;
 
             model->pColModel = NULL;
         }
@@ -406,6 +479,31 @@ CColModelSA::imports_t CColModelSA::GetImportList( void ) const
     }
 
     return importsVirtual;
+}
+
+void CColModelSA::SetOriginal( modelId_t modelIndex, CColModelSAInterface *colModel, bool isDynamic )
+{
+    colImports_t::iterator iter;
+    colImport_t *import = FindImport( modelIndex, iter );
+
+    if ( !import )
+        return;
+
+    if ( colModel )
+    {
+        assert( GetColInterfaceUseCount( colModel ) == 0 );
+    }
+
+    import->originalCollision = colModel;
+    import->isOriginalDynamic = isDynamic;
+}
+
+CColModelSAInterface* CColModelSA::GetOriginal( modelId_t modelIndex, bool& isDynamic )
+{
+    colImports_t::iterator iter;
+    colImport_t *import = FindImport( modelIndex, iter );
+
+    return ( import ) ? ( import->originalCollision ) : ( NULL );
 }
 
 void* CColFileSA::operator new ( size_t )

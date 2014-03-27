@@ -120,8 +120,7 @@ struct CColSectorManagerSA
             // conversions.
             if ( CColModelSA *c_col = g_colReplacement[n] )
             {
-                colModel = c_col->GetOriginal();
-                isDynamic = c_col->IsOriginalDynamic();
+                colModel = c_col->GetOriginal( n, isDynamic );
             }
             else
             {

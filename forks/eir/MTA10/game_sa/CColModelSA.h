@@ -219,7 +219,7 @@ struct CColDataSA
         struct
         {
             unsigned char           unkFlag1 : 1;           // 7
-            unsigned char           hasFaceGroups : 1;  
+            unsigned char           hasFaceGroups : 1;      
             unsigned char           hasShadowMeshFaces : 1; 
         };
     };
@@ -297,8 +297,10 @@ public:
 
     struct colImport_t
     {
-        CColModelSAInterface *replaceCollision;
-        modelId_t modelIndex;
+        modelId_t               modelIndex;
+        CColModelSAInterface*   replaceCollision;
+        CColModelSAInterface*   originalCollision;
+        bool                    isOriginalDynamic;
     };
     typedef std::list <colImport_t> colImports_t;
 
@@ -317,15 +319,11 @@ public:
 
     imports_t                       GetImportList       ( void ) const;
 
-    void                            SetOriginal         ( CColModelSAInterface *col, bool isDynamic )   { m_original = col; m_originalDynamic = isDynamic; }
-    CColModelSAInterface*           GetOriginal         ( void )                        { return m_original; }
-
-    bool                            IsOriginalDynamic   ( void )                        { return m_originalDynamic; }
+    void                            SetOriginal         ( modelId_t modelIndex, CColModelSAInterface *col, bool isDynamic );
+    CColModelSAInterface*           GetOriginal         ( modelId_t modelIndex, bool& originalDynamic );
 
 private:
     CColModelSAInterface*           m_pInterface;
-    CColModelSAInterface*           m_original;
-    bool                            m_originalDynamic;
     bool                            m_bDestroyInterface;
 
     colImports_t                    m_imported;
