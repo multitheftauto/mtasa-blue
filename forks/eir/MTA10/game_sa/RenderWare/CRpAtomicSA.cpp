@@ -127,14 +127,14 @@ bool CRpAtomicSA::Replace( unsigned short id )
     bool isLoaded = ainfo->GetRwObject() != NULL;
     
     // Remove any active model (either loading or loaded)
-    pGame->GetStreaming()->FreeModel( id );
+    Streaming::FreeModel( id );
 
     g_replObjectNative[id] = this;
     m_imported.push_back( id );
 
     // Reinstantiate ourselves
     if ( isLoaded )
-        pGame->GetStreaming()->RequestModel( id, 0x16 );
+        Streaming::RequestModel( id, 0x16 );
 
     return true;
 }
@@ -170,20 +170,23 @@ bool CRpAtomicSA::Restore( unsigned short id )
         txd->Reference();
     }
 
+    if ( Streaming::GetModelLoadInfo( id ).m_eLoading == MODEL_UNAVAILABLE )
+    {
+        assert( !isLoaded );
+    }
+
     // Force a kill
-    info->DeleteRwObject();
+    Streaming::FreeModel( id );
 
     g_replObjectNative[id] = NULL;
 
     // Restore if loaded
     if ( isLoaded )
     {
-        CStreamingSA *streaming = pGame->GetStreaming();
-
         // Remove the reference again
         txd->Dereference();
 
-        streaming->RequestModel( id, 0x10 );
+        Streaming::RequestModel( id, 0x10 );
     }
 
     m_imported.erase( iter );

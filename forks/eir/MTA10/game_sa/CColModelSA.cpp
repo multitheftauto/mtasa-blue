@@ -256,7 +256,7 @@ const CColModelSA::colImport_t* CColModelSA::FindImport( modelId_t id ) const
     return NULL;
 }
 
-static unsigned int __cdecl GetColInterfaceUseCount( CColModelSAInterface *colModel )
+unsigned int __cdecl GetColInterfaceUseCount( CColModelSAInterface *colModel )
 {
     unsigned int existCount = 0;
 

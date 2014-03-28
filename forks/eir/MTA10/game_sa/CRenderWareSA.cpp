@@ -243,7 +243,7 @@ RwTexDictionary * CRenderWareSA::ReadTXD ( const char *szTXD )
 // Any custom TXD should be imported before this call
 RpClump * CRenderWareSA::ReadDFF ( const char *szDFF, unsigned short id, bool bLoadEmbeddedCollisions, CColModel*& colOut )
 {
-    if ( id > DATA_TEXTURE_BLOCK-1 )
+    if ( id > MAX_MODELS-1 )
         return NULL;
 
 #if 0

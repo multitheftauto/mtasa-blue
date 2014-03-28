@@ -31,12 +31,12 @@ class CClientDFF : public CClientEntity
     friend class CClientDFFManager;
 
 public:
-                                    CClientDFF              ( class CClientManager* pManager, ElementID ID );
+                                    CClientDFF              ( class CClientManager* pManager, ElementID ID, bool directCache = false );
                                     ~CClientDFF             ( void );
 
     eClientEntityType               GetType                 ( void ) const              { return CCLIENTDFF; }
 
-    bool                            LoadDFF                 ( const char* szFile );
+    bool                            LoadDFF                 ( const char* szFile, unsigned short usModel );
 
     bool                            ReplaceModel            ( unsigned short usModel, bool bAlphaTransparency );
 
@@ -65,6 +65,10 @@ protected:
 
     SString                         m_strDffFilename;
     std::map < ushort, SLoadedClumpInfo > m_LoadedClumpInfoMap;
+
+    SLoadedClumpInfo                m_persistentClump;
+
+    bool                            m_usePersistentClump;
 
     std::list < unsigned short >    m_Replaced;
 };

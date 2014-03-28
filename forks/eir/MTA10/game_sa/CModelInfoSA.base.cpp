@@ -283,7 +283,13 @@ void CBaseModelInfoSAInterface::SetCollision( CColModelSAInterface *col, bool dy
 void CBaseModelInfoSAInterface::DeleteCollision( void )
 {
     if ( pColModel && IsDynamicCol() )
+    {
+        // Do some security checks.
+        assert( GetColInterfaceUseCount( pColModel ) == 1 );
+
         delete pColModel;
+
+    }
 
     pColModel = NULL;
 }

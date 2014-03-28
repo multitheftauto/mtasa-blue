@@ -629,23 +629,16 @@ void CModelInfoSA::StaticFlushPendingRestreamIPL ( void )
 
 struct SectorModelRestream
 {
-    AINLINE void UnloadEntity( CEntitySAInterface *entity )
+    AINLINE bool OnEntry( Streaming::streamingChainInfo& entry )
     {
+        CEntitySAInterface *entity = entry.entity;
+
         if ( std::find( CModelInfoSA::ms_RestreamModelMap.begin(), CModelInfoSA::ms_RestreamModelMap.end(), entity->GetModelIndex() ) != CModelInfoSA::ms_RestreamModelMap.end() )
         {
-            if ( entity->GetRwObject() )
-                entity->DeleteRwObject();
+            entity->DeleteRwObject();
         }
-    }
 
-    AINLINE void OnSector( Streamer::streamSectorEntry& sector )
-    {
-        for ( Streamer::streamSectorEntry::ptrNode_t *ptrNode = sector.GetList(); ptrNode != NULL; ptrNode = ptrNode->m_next )
-        {
-            CEntitySAInterface *entity = ptrNode->data;
-
-            UnloadEntity( entity );
-        }
+        return true;
     }
 };
 
@@ -661,7 +654,9 @@ void CModelInfoSA::StaticFlushPendingRestreamModel( void )
     // Loop through all streamed in entities and unload the ones that match our model index.
     SectorModelRestream restream;
 
-    Streamer::ForAllStreamerSectors( restream, true, false, false, false, true, true );
+    // Loop through all entities registered in the streaming system.
+    // These entities are guarranteed to have RenderWare objects.
+    Streaming::GetStreamingEntityChain().ExecuteCustom( restream );
 
     // Free the resource so GTA:SA will reload it.
     for ( std::list < unsigned short >::const_iterator iter = ms_RestreamModelMap.begin(); iter != ms_RestreamModelMap.end(); iter++ )

@@ -81,9 +81,13 @@ int CLuaFunctionDefs::EngineLoadCOL ( lua_State* luaVM )
 int CLuaFunctionDefs::EngineLoadDFF ( lua_State* luaVM )
 {
     SString strFile = "";
+    int modelIndex;
+    bool usePersistent;
     CScriptArgReader argStream ( luaVM );
-    // Grab the DFF filename (model ID ignored after 1.3.1)
+
     argStream.ReadString ( strFile );
+    argStream.ReadNumber ( modelIndex, 0 );
+    argStream.ReadBool ( usePersistent, false );
 
     if ( !argStream.HasErrors ( ) )
     {
@@ -103,10 +107,10 @@ int CLuaFunctionDefs::EngineLoadDFF ( lua_State* luaVM )
                     CClientEntity* pRoot = pResource->GetResourceDFFRoot ();
 
                     // Create a DFF element
-                    CClientDFF* pDFF = new CClientDFF ( m_pManager, INVALID_ELEMENT_ID );
+                    CClientDFF* pDFF = new CClientDFF ( m_pManager, INVALID_ELEMENT_ID, usePersistent );
 
                     // Try to load the DFF file
-                    if ( pDFF->LoadDFF ( strPath ) )
+                    if ( pDFF->LoadDFF ( strPath, modelIndex ) )
                     {
                         // Success loading the file. Set parent to DFF root
                         pDFF->SetParent ( pRoot );

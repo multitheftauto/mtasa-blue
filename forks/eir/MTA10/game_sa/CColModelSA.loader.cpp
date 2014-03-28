@@ -231,6 +231,8 @@ struct SegmentAllocator
                 size_t segmentDataSize = structCount * sizeof( structType );
 
                 dataArray = (structType*)( (char*)( header + 1 ) + cur_offset );
+
+                cur_offset += segmentDataSize;
             }
 
             assert( cur_offset <= maxSize );
@@ -659,6 +661,8 @@ CColModelSAInterface* CColModelSAInterface::Clone( void )
         CColSuspensionLineSA    *dstColSuspensionLineArray = NULL;
         CColVertexSA            *dstColVertexArray = NULL;
         CColTriangleSA          *dstColTriangleArray = NULL;
+        CColFaceGroupSA         *dstColFaceGroupArray = NULL;
+        CColFaceGroupHeaderSA   *dstColFaceGroupHeader = NULL;
         CColTrianglePlaneSA     *dstColTrianglePlaneArray = NULL;
 
         CColVertexSA            *dstColShadowMeshVertexArray = NULL;
@@ -668,11 +672,16 @@ CColModelSAInterface* CColModelSAInterface::Clone( void )
         int numBoxes = srcColData->numBoxes;
         int numWheels = srcColData->ucNumWheels;
         int numTriangles = srcColData->numColTriangles;
+        int numFaceGroups = 0;
 
         int numVertices = srcColData->CalculateNumberOfCollisionMeshVertices();
 
         int numShadowMeshVertices = srcColData->numShadowMeshVertices;
         int numShadowMeshFaces = srcColData->numShadowMeshFaces;
+
+        // Face group orriented data.
+        CColFaceGroupHeaderSA *srcFaceGroupHeader = srcColData->GetFaceGroupHeader();
+        bool hasFaceGroups = srcColData->hasFaceGroups;
 
         // Allocate depending on allocation method.
         size_t sphereArraySize = sizeof( CColSphereSA ) * numSpheres;
@@ -696,11 +705,23 @@ CColModelSAInterface* CColModelSAInterface::Clone( void )
                 shadowMeshVerticeArraySize +
                 shadowMeshFaceArraySize;
 
+            // Check for face group existance.
+            if ( srcFaceGroupHeader )
+            {
+                numFaceGroups = srcFaceGroupHeader->numFaceGroups;
+
+                dataBufferSize += sizeof( CColFaceGroupSA ) * numFaceGroups;
+                dataBufferSize += sizeof( CColFaceGroupHeaderSA );
+            }
+
             SegmentAllocator <CColDataSA> segAlloc;
 
             char *segBuffer;
 
             segAlloc.AllocateDataSegment( dataBufferSize, dstColData, segBuffer );
+
+            if ( dstColData == NULL )
+                goto cloneFail;
 
             // Set up the data pointers.
             SegmentAllocator <CColDataSA>::SegmentDistributor segDistr( dataBufferSize );
@@ -709,6 +730,12 @@ CColModelSAInterface* CColModelSAInterface::Clone( void )
             dstColBoxArray =                segDistr.ObtainSegmentData <CColBoxSA>              ( dstColData, numBoxes );
             dstColSuspensionLineArray =     segDistr.ObtainSegmentData <CColSuspensionLineSA>   ( dstColData, numWheels );
             dstColVertexArray =             segDistr.ObtainSegmentData <CColVertexSA>           ( dstColData, numVertices );
+
+            if ( srcFaceGroupHeader )
+            {
+                dstColFaceGroupArray =      segDistr.ObtainSegmentData <CColFaceGroupSA>        ( dstColData, numFaceGroups );
+                dstColFaceGroupHeader =     segDistr.ObtainSegmentData <CColFaceGroupHeaderSA>  ( dstColData, 1 );
+            }
             dstColTriangleArray =           segDistr.ObtainSegmentData <CColTriangleSA>         ( dstColData, numTriangles );
 
             dstColShadowMeshVertexArray =   segDistr.ObtainSegmentData <CColVertexSA>           ( dstColData, numShadowMeshVertices );
@@ -719,6 +746,9 @@ CColModelSAInterface* CColModelSAInterface::Clone( void )
             // We allocate separate buffers for each data.
             dstColData = new (_mallocNew( sizeof( CColDataSA ) )) CColDataSA;
 
+            if ( dstColData == NULL )
+                goto cloneFail;
+
             dstColSphereArray =             AllocateDataCount <CColSphereSA>            ( numSpheres );
             dstColBoxArray =                AllocateDataCount <CColBoxSA>               ( numBoxes );
             dstColSuspensionLineArray =     AllocateDataCount <CColSuspensionLineSA>    ( numWheels );
@@ -727,6 +757,9 @@ CColModelSAInterface* CColModelSAInterface::Clone( void )
 
             dstColShadowMeshVertexArray =   AllocateDataCount <CColVertexSA>            ( numShadowMeshVertices );
             dstColShadowMeshFaceArray =     AllocateDataCount <CColTriangleSA>          ( numShadowMeshFaces );
+
+            // Make sure we have no face groups.
+            hasFaceGroups = false;
         }
         clone->m_isColDataSegmented = this->m_isColDataSegmented;
 
@@ -739,8 +772,10 @@ CColModelSAInterface* CColModelSAInterface::Clone( void )
         dstColData->numShadowMeshVertices = numShadowMeshVertices;
         dstColData->numShadowMeshFaces = numShadowMeshFaces;
 
+        assert( srcColData->unkFlag1 == false );
+
         dstColData->unkFlag1 = srcColData->unkFlag1;
-        dstColData->hasFaceGroups = srcColData->hasFaceGroups;
+        dstColData->hasFaceGroups = hasFaceGroups;
         dstColData->hasShadowMeshFaces = srcColData->hasShadowMeshFaces;
 
         // Copy over collision objects.
@@ -749,6 +784,14 @@ CColModelSAInterface* CColModelSAInterface::Clone( void )
         CopyArray( srcColData->pSuspensionLines,        dstColSuspensionLineArray, numWheels );
         CopyArray( srcColData->pColVertices,            dstColVertexArray, numVertices );
         CopyArray( srcColData->pColTriangles,           dstColTriangleArray, numTriangles );
+
+        if ( dstColFaceGroupArray && srcFaceGroupHeader )
+        {
+            CColFaceGroupSA *srcFaceGroupArray = (CColFaceGroupSA*)srcFaceGroupHeader - ( numFaceGroups + 1 );
+
+            CopyArray( srcFaceGroupArray,               dstColFaceGroupArray, numFaceGroups );
+            CopyArray( srcFaceGroupHeader,              dstColFaceGroupHeader, 1 );
+        }
 
         CopyArray( srcColData->pShadowMeshVertices,     dstColShadowMeshVertexArray, numShadowMeshVertices );
         CopyArray( srcColData->pShadowMeshFaces,        dstColShadowMeshFaceArray, numShadowMeshFaces );
@@ -771,6 +814,11 @@ CColModelSAInterface* CColModelSAInterface::Clone( void )
 
     clone->pColData = dstColData;
     return clone;
+
+cloneFail:
+    delete clone;
+    
+    return NULL;
 }
 
 // Binary offsets: (1.0 US and 1.0 EU): 0x0040F6E0
@@ -839,4 +887,25 @@ void CColDataSA::UnsegmentedClear( void )
 
     pShadowMeshVertices = NULL;
     pShadowMeshFaces = NULL;
+}
+
+CColFaceGroupHeaderSA* CColDataSA::GetFaceGroupHeader( void )
+{
+    if ( !hasFaceGroups || !pColTriangles )
+        return NULL;
+
+    return ( (CColFaceGroupHeaderSA*)pColTriangles - 1 );
+}
+
+CColFaceGroupSA* CColDataSA::GetFaceGroup( unsigned int groupIndex )
+{
+    CColFaceGroupHeaderSA *faceHeader = GetFaceGroupHeader();
+
+    if ( !faceHeader )
+        return NULL;
+
+    if ( groupIndex >= faceHeader->numFaceGroups )
+        return NULL;
+
+    return (CColFaceGroupSA*)faceHeader - ( groupIndex + 1 );
 }

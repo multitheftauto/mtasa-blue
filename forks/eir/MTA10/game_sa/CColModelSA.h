@@ -105,6 +105,19 @@ typedef struct
 } CColTriangleSA;
 
 
+struct CColFaceGroupSA
+{
+    CVector min, max;
+    unsigned short StartFace, EndFace;
+};
+
+
+struct CColFaceGroupHeaderSA
+{
+    unsigned int numFaceGroups;
+};
+
+
 typedef struct
 {
     BYTE pad0 [ 12 ];
@@ -207,6 +220,9 @@ struct CColDataSA
     void __thiscall     SegmentedClear( void );
     void __thiscall     UnsegmentedClear( void );
 
+    CColFaceGroupHeaderSA*  GetFaceGroupHeader( void );
+    CColFaceGroupSA*        GetFaceGroup( unsigned int groupIndex );
+
     unsigned short                  numSpheres;             // 0
     unsigned short                  numBoxes;               // 2
     unsigned short                  numColTriangles;        // 4
@@ -284,6 +300,9 @@ namespace Collision
         return *(colFileQuadTreeNode_t**)0x0096555C;
     }
 };
+
+// Utility functions.
+unsigned int __cdecl GetColInterfaceUseCount( CColModelSAInterface *colModel );
 
 // Module Initialization.
 void ColModel_Init( void );

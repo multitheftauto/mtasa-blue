@@ -245,6 +245,17 @@ Streaming::streamingEntityReference_t* __cdecl Streaming::AddActiveEntity( CEnti
 
             // can only fail if no more heap memory available.
         }
+
+        // Last resort option.
+        if ( !ref )
+        {
+            // If everything else failed, we must steal a streaming node.
+            gcMan.ExecuteCustom( FreeStreamingEntity() );
+
+            ref = gcMan.PushRender( &chainInfo );
+
+            assert( ref != NULL );
+        }
     }
 
     return ref;

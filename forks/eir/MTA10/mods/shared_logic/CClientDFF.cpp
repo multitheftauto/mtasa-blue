@@ -11,11 +11,13 @@
 
 #include "StdInc.h"
 
-CClientDFF::CClientDFF ( CClientManager* pManager, ElementID ID ) : ClassInit ( this ), CClientEntity ( ID )
+CClientDFF::CClientDFF ( CClientManager* pManager, ElementID ID, bool directCache ) : ClassInit ( this ), CClientEntity ( ID )
 {
     // Init
     m_pManager = pManager;
     m_pDFFManager = pManager->GetDFFManager ();
+
+    m_usePersistentClump = directCache;
 
     SetTypeName ( "dff" );
 
@@ -43,11 +45,23 @@ CModel* CClientDFF::GetLoadedClump ( ushort usModelId )
     if ( usModelId == 0 )
         return NULL;
 
-    SLoadedClumpInfo& info = MapGet ( m_LoadedClumpInfoMap, usModelId );
-
-    if ( !info.bTriedLoad )
+    SLoadedClumpInfo *info = NULL;
+    
+    if ( m_usePersistentClump )
     {
-        info.bTriedLoad = true;
+        info = &m_persistentClump;
+    }
+    else
+    {
+        info = &MapGet ( m_LoadedClumpInfoMap, usModelId );
+    }
+
+    if ( !info )
+        return NULL;
+
+    if ( !info->bTriedLoad )
+    {
+        info->bTriedLoad = true;
 
         // Make sure previous model+collision is loaded
         m_pManager->GetModelRequestManager ()->RequestBlocking ( usModelId, "CClientDFF::LoadDFF" );
@@ -55,14 +69,14 @@ CModel* CClientDFF::GetLoadedClump ( ushort usModelId )
         // Attempt loading it
         bool loadCollision = CClientVehicleManager::IsValidModel ( usModelId ); // only get the collision if we are a vehicle model
 
-        info.pClump = g_pGame->GetModelManager()->CreateModel( m_strDffFilename, usModelId, loadCollision );
+        info->pClump = g_pGame->GetModelManager()->CreateModel( m_strDffFilename, usModelId, loadCollision );
     }
 
-    return info.pClump;
+    return info->pClump;
 }
 
 
-bool CClientDFF::LoadDFF ( const char* szFile )
+bool CClientDFF::LoadDFF ( const char* szFile, unsigned short usModel )
 {
     // Should only be called once, directly after construction
     assert ( m_strDffFilename.empty () );
@@ -77,21 +91,41 @@ bool CClientDFF::LoadDFF ( const char* szFile )
     if ( !g_pCore->GetNetwork ()->CheckFile ( "dff", m_strDffFilename ) )
         return false;
 
-    // Do actual load later (in ReplaceModel)
-    return true;
+    if ( !m_usePersistentClump )
+    {
+        // Do actual load later (in ReplaceModel)
+        return true;
+    }
+
+    // Do the loading now.
+    return ( GetLoadedClump( usModel ) != NULL );
 }
 
 
 void CClientDFF::UnloadDFF ( void )
 {
-    for ( std::map < ushort, SLoadedClumpInfo >::iterator iter = m_LoadedClumpInfoMap.begin () ; iter != m_LoadedClumpInfoMap.end () ; ++iter )
+    if ( m_usePersistentClump )
     {
-        SLoadedClumpInfo& info = iter->second;
-        if ( info.pClump )
-            delete info.pClump;
-    }
+        SLoadedClumpInfo& info = m_persistentClump;
 
-    m_LoadedClumpInfoMap.clear ();
+        if ( info.pClump )
+        {
+            delete info.pClump;
+
+            info.pClump = NULL;
+        }
+    }
+    else
+    {
+        for ( std::map < ushort, SLoadedClumpInfo >::iterator iter = m_LoadedClumpInfoMap.begin () ; iter != m_LoadedClumpInfoMap.end () ; ++iter )
+        {
+            SLoadedClumpInfo& info = iter->second;
+            if ( info.pClump )
+                delete info.pClump;
+        }
+
+        m_LoadedClumpInfoMap.clear ();
+    }
 }
 
 
@@ -234,30 +268,45 @@ void CClientDFF::InternalRestoreModel ( unsigned short usModel )
     if ( CClientObjectManager::IsValidModel ( usModel ) && CVehicleUpgrades::IsUpgrade ( usModel ) )
         m_pManager->GetVehicleManager ()->RestreamVehicleUpgrades ( usModel );
 
-    // Force dff reload if this model id is used again
-    SLoadedClumpInfo* pInfo = MapFind ( m_LoadedClumpInfoMap, usModel );
-    if ( pInfo )
+    if ( !m_usePersistentClump )
     {
-        if ( pInfo->pClump )
-            delete pInfo->pClump;
-        MapRemove ( m_LoadedClumpInfoMap, usModel );
+        // Force dff reload if this model id is used again
+        SLoadedClumpInfo* pInfo = MapFind ( m_LoadedClumpInfoMap, usModel );
+        if ( pInfo )
+        {
+            if ( pInfo->pClump )
+                delete pInfo->pClump;
+            MapRemove ( m_LoadedClumpInfoMap, usModel );
+        }
+    }
+    else
+    {
+        // Simple restore the persistent model.
+        CModel *pModel = m_persistentClump.pClump;
+
+        if ( pModel && pModel->IsReplaced( usModel ) )
+        {
+            bool restored = pModel->Restore( usModel );
+
+            assert( restored == true );
+        }
     }
 }
 
 
 bool CClientDFF::ReplaceObjectModel ( CModel* pClump, ushort usModel, bool bAlphaTransparency )
 {
-    // Stream out all the object models with matching ID.
-    // Streamer will stream them back in async after a frame
-    // or so.
-    m_pManager->GetObjectManager ()->RestreamObjects ( usModel );
-    g_pGame->GetModelInfo ( usModel )->RestreamModel ();
-
     // Grab the model info for that model and replace the model
     bool success = pClump->Replace( usModel );
 
     if ( success )
     {
+        // Stream out all the object models with matching ID.
+        // Streamer will stream them back in async after a frame
+        // or so.
+        m_pManager->GetObjectManager ()->RestreamObjects ( usModel );
+        g_pGame->GetModelInfo ( usModel )->RestreamModel ();
+
         CModelInfo *pModelInfo = g_pGame->GetModelInfo ( usModel );
         pModelInfo->SetAlphaTransparencyEnabled( bAlphaTransparency );
 
@@ -271,17 +320,17 @@ bool CClientDFF::ReplaceObjectModel ( CModel* pClump, ushort usModel, bool bAlph
 
 bool CClientDFF::ReplaceWeaponModel ( CModel* pClump, ushort usModel, bool bAlphaTransparency )
 {
-    // Stream out all the weapon models with matching ID.
-    // Streamer will stream them back in async after a frame
-    // or so.
-    m_pManager->GetPedManager ()->RestreamWeapon ( usModel );
-    m_pManager->GetPickupManager ()->RestreamPickups ( usModel );
-
     // Grab the model info for that model and replace the model
     bool success = pClump->Replace( usModel );
 
     if ( success )
     {
+        // Stream out all the weapon models with matching ID.
+        // Streamer will stream them back in async after a frame
+        // or so.
+        m_pManager->GetPedManager ()->RestreamWeapon ( usModel );
+        m_pManager->GetPickupManager ()->RestreamPickups ( usModel );
+
         CModelInfo *pModelInfo = g_pGame->GetModelInfo ( usModel );
         pModelInfo->SetAlphaTransparencyEnabled( bAlphaTransparency );
 
@@ -295,16 +344,16 @@ bool CClientDFF::ReplaceWeaponModel ( CModel* pClump, ushort usModel, bool bAlph
 
 bool CClientDFF::ReplacePedModel ( CModel* pClump, ushort usModel, bool bAlphaTransparency )
 {
-    // Stream out all the weapon models with matching ID.
-    // Streamer will stream them back in async after a frame
-    // or so.
-    m_pManager->GetPedManager ()->RestreamPeds ( usModel );
-
     // Grab the model info for that model and replace the model
     bool success = pClump->Replace( usModel );
 
     if ( success )
     {
+        // Stream out all the weapon models with matching ID.
+        // Streamer will stream them back in async after a frame
+        // or so.
+        m_pManager->GetPedManager ()->RestreamPeds ( usModel );
+
         CModelInfo *pModelInfo = g_pGame->GetModelInfo ( usModel );
         pModelInfo->SetAlphaTransparencyEnabled( bAlphaTransparency );
 
@@ -339,5 +388,5 @@ bool CClientDFF::ReplaceVehicleModel ( CModel* pClump, ushort usModel, bool bAlp
     }
 
     // Success
-    return true;
+    return success;
 }

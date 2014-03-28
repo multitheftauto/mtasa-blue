@@ -205,18 +205,12 @@ static bool RpMaterialUpdateTexture( RpMaterial *material, _updateTexInfo *texUp
     // * Reflection mapping
     if ( CSpecMapMaterialSA *specMap = material->specMapMat )
     {
-        bool success = UpdateTextureLink( specMap->specMap );
-
-        if ( !success )
-            return false;
+        UpdateTextureLink( specMap->specMap );
     }
 
     if ( CEnvMapMaterialSA *envMap = material->envMapMat )
     {
-        bool success = UpdateTextureLink( envMap->envTexture );
-
-        if ( !success )
-            return false;
+        UpdateTextureLink( envMap->envTexture );
     }
 
     // * Special effect plugin
@@ -287,31 +281,32 @@ struct restreamByModel
     modelList_t restreamModels;
     entityList_t restreamEntities;
 
-    inline void OnSector( Streamer::streamSectorEntry& entry )
+    inline void OnEntry( CEntitySAInterface *entity, unsigned int poolIndex )
     {
-        for ( Streamer::streamSectorEntry::ptrNode_t *ptrNode = entry.GetList(); ptrNode != NULL; ptrNode = ptrNode->m_next )
+        if ( std::find( restreamModels.begin(), restreamModels.end(), entity->GetModelIndex() ) != restreamModels.end() )
         {
-            CEntitySAInterface *entity = ptrNode->data;
-
-            if ( std::find( restreamModels.begin(), restreamModels.end(), entity->GetModelIndex() ) != restreamModels.end() )
+            // Only delete the RenderWare object if it exists.
+            // Otherwise some entities will crash us.
+            if ( entity->GetRwObject() )
             {
-                // Only delete the RenderWare object if it exists.
-                // Otherwise some entities will crash us.
-                if ( entity->GetRwObject() )
+                entity->DeleteRwObject();
+
+                // If we need to restream a ped or vehicle, make sure we recreate their RenderWare objects.
+                // For that, we add them to a special list and process them later on.
+                eEntityType type = (eEntityType)entity->nType;
+
+                if ( type == ENTITY_TYPE_PED || type == ENTITY_TYPE_VEHICLE )
                 {
-                    entity->DeleteRwObject();
-
-                    // If we need to restream a ped or vehicle, make sure we recreate their RenderWare objects.
-                    // For that, we add them to a special list and process them later on.
-                    eEntityType type = (eEntityType)entity->nType;
-
-                    if ( type == ENTITY_TYPE_PED || type == ENTITY_TYPE_VEHICLE )
-                    {
-                        restreamEntities.push_back( entity );
-                    }
+                    restreamEntities.push_back( entity );
                 }
             }
         }
+    }
+
+    inline bool OnEntry( Streaming::streamingChainInfo& entry )
+    {
+        OnEntry( entry.entity, 0 );
+        return true;
     }
 
     inline void RecreateRenderWareInstances( void )
@@ -409,7 +404,12 @@ void CModelManagerSA::UpdateWorldTextures( int txdId )
     if ( !restream.restreamModels.empty() )
     {
         // Delete the RenderWare objects of all entities that have the models that should be restreamed.
-        Streamer::ForAllStreamerSectors( restream, true, true, true, true, true, true );
+        Streaming::GetStreamingEntityChain().ExecuteCustom( restream );
+
+        // Also execute on peds and vehicles.
+        // Objects are already included in the streaming chain.
+        Pools::GetPedPool()->ForAllActiveEntries( restream );
+        Pools::GetVehiclePool()->ForAllActiveEntries( restream );
 
         bool requireModelLoading = false;
 

@@ -270,7 +270,7 @@ struct ModelFreeDispatch : ModelCheckDispatch <false>   // by default we do not 
 
             model->DeleteRwObject();
 
-            model->SetCollision( col, false );
+            model->pColModel = col;
         }
         else
             model->DeleteRwObject();
