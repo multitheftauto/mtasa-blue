@@ -21,7 +21,7 @@
 class CGUITexture;
 class CGUITexture_Impl;
 
-class CGUIStaticImage_Impl : public CGUIStaticImage, public CGUIElement_Impl
+class CGUIStaticImage_Impl : public CGUIStaticImage, public CGUIElement_Impl, public CGUITabList
 {
 public:
                                 CGUIStaticImage_Impl    ( class CGUI_Impl* pGUI, CGUIElement* pParent = NULL );
