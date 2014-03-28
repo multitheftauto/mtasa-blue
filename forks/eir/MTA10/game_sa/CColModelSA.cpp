@@ -201,10 +201,13 @@ void ColModel_Init( void )
     HookInstall( 0x00410E60, (DWORD)Collision_Preload, 5 );
     HookInstall( 0x00410EC0, (DWORD)Collision_Sectorize, 5 );
     HookInstall( 0x004113F0, (DWORD)_Collision_Init, 5 );
+
+    Collision_Init();
 }
 
 void ColModel_Shutdown( void )
 {
+    Collision_Shutdown();
 }
 
 CColModelSA::CColModelSA( void )

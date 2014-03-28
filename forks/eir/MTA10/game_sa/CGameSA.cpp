@@ -129,7 +129,6 @@ CGameSA::CGameSA()
     RenderWarePipeline_Init();
     RenderWareAPI_Init();
     Transformation_Init();
-    Collision_Init();
     QuadTree_Init();
     Cache_Init();
     Placeable_Init();
@@ -264,7 +263,6 @@ CGameSA::~CGameSA ( void )
     Placeable_Shutdown();
     Cache_Shutdown();
     QuadTree_Shutdown();
-    Collision_Shutdown();
     Transformation_Shutdown();
     RenderWareAPI_Shutdown();
     RenderWarePipeline_Shutdown();
@@ -552,6 +550,11 @@ void CGameSA::Reset ( void )
     RenderCallbacks_Reset();
     RenderWareLighting_Reset();
 #endif
+
+    // Temporary stuff to enable infinite rendering.
+    // Should be disabled in Phase 4, when the scripting functions are added.
+    GetStreaming()->SetStreamingNodeStealingAllowed( false );
+    GetStreaming()->SetInfiniteStreamingEnabled( true );
 }
 
 void CGameSA::Terminate ( void )

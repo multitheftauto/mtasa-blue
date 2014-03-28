@@ -772,6 +772,13 @@ void CVehicleSA::AddVehicleUpgrade ( DWORD dwModelID )
     DEBUG_TRACE("void CVehicleSA::AddVehicleUpgrade ( DWORD dwModelID )");
     if ( dwModelID >= 1000 && dwModelID <= 1193 )
     {
+        // Make sure vehicle upgrade is loaded.
+        if ( !pGame->GetStreaming()->HasModelLoaded( dwModelID ) )
+        {
+            pGame->GetStreaming()->RequestModel( dwModelID, 0x10 );
+            pGame->GetStreaming()->LoadAllRequestedModels( true, "CVehicleSA::AddVehicleUpgrade" );
+        }
+
         DWORD dwThis = (DWORD) m_pInterface;
 
         DWORD dwFunc = FUNC_CVehicle_AddVehicleUpgrade;
