@@ -110,13 +110,21 @@ namespace SharedUtil
 
 // Calculate a hash value for SString
 #if defined(WIN32)
+    #if _MSC_VER <= 1500
+        inline size_t hash_value ( const SString& strString )
+        {
+            const char *_Ptr = strString.c_str ();
+            return ( stdext::_Hash_value ( _Ptr, _Ptr + strString.size () ) );
+        }
 
-    inline size_t hash_value ( const SString& strString )
-    {
-        const char *_Ptr = strString.c_str ();
-        return ( stdext::_Hash_value ( _Ptr, _Ptr + strString.size () ) );
-    }
-
+    #else
+        #include <functional>
+        inline size_t hash_value(const SString& strString)
+        {
+            std::hash<std::string> hashFunction;
+            return hashFunction( strString );
+        }    
+    #endif
 #elif defined(__GNUC__) && (__GNUC__ >= 3)
 
     namespace __gnu_cxx

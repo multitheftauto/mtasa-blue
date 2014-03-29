@@ -550,6 +550,8 @@ public:
     LUA_DECLARE ( EngineGetVisibleTextureNames );
     LUA_DECLARE ( EngineIsModelBeingUsed );
     LUA_DECLARE ( DiagnoseEntity );
+    LUA_DECLARE ( EngineStreamingSetProperty );
+    LUA_DECLARE ( EngineStreamingGetProperty );
     LUA_DECLARE ( SetVehicleComponentPosition );
     LUA_DECLARE ( GetVehicleComponentPosition );
     LUA_DECLARE ( SetVehicleComponentRotation );

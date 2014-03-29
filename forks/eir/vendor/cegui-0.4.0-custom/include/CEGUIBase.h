@@ -30,6 +30,7 @@
 #define _CEGUIBase_h_
 
 #include <cassert>
+#include <algorithm>
 
 // bring in configuration options
 #include "CEGUIConfig.h"

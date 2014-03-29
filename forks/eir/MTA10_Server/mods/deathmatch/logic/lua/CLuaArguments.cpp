@@ -737,6 +737,16 @@ bool CLuaArguments::ReadFromJSONString ( const char* szJSON )
             json_object_put ( object ); // dereference
             return bSuccess;
         }
+        else if (json_object_get_type(object) == json_type_object)
+        {
+            std::vector < CLuaArguments* > knownTables;
+            CLuaArgument * pArgument = new CLuaArgument();
+            bool bSuccess = pArgument->ReadFromJSONObject(object, &knownTables);
+            m_Arguments.push_back(pArgument); // value
+            json_object_put(object);
+
+            return bSuccess;
+        }
         json_object_put ( object ); // dereference
     }
 //    else

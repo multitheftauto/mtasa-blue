@@ -20,8 +20,10 @@
 //
 #include <stdarg.h>
 
-#ifdef WIN32
+#ifdef WIN32 
+#ifndef va_copy
     #define va_copy(dest, orig) (dest) = (orig)
+#endif
 #endif
 
 class SString : public std::string

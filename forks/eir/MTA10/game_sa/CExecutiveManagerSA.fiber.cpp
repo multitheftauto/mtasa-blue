@@ -95,7 +95,7 @@ Fiber* ExecutiveFiber::newfiber( FiberStatus *userdata, size_t stackSize, FiberP
 
     // Allocate stack memory
     if ( stackSize == 0 )
-        stackSize = 2 << 17;    // 128 kilobytes of stack space (is this enough?)
+        stackSize = 2 << 17;    // about 128 kilobytes of stack space (is this enough?)
 
     unsigned int *stack = (unsigned int*)fiberMemAlloc( stackSize );
     env->stack_base = (unsigned int*)( (unsigned int)stack + stackSize );

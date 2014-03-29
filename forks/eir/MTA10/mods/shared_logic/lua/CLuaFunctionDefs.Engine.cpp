@@ -793,3 +793,160 @@ int CLuaFunctionDefs::DiagnoseEntity( lua_State *luaVM )
     lua_pushboolean ( luaVM, false );
     return 1;
 }
+
+
+int CLuaFunctionDefs::EngineStreamingSetProperty( lua_State *luaVM )
+{
+    // bool engineStreamingSetProperty ( string propName, var value )
+    // https://wiki.multitheftauto.com/wiki/MTA:Eir/functions/engineStreamingSetProperty
+    SString propertyName;
+
+    CScriptArgReader argStream( luaVM );
+    argStream.ReadString( propertyName );
+
+    if ( !argStream.HasErrors() )
+    {
+        if ( propertyName == "strictNodeDistrib" )
+        {
+            bool enabled;
+            argStream.ReadBool( enabled );
+
+            if ( !argStream.HasErrors() )
+            {
+                g_pGame->GetStreaming()->SetStrictNodeDistribution( enabled );
+            }
+        }
+        else if ( propertyName == "infiniteStreaming" )
+        {
+            bool enabled;
+            argStream.ReadBool( enabled );
+
+            if ( !argStream.HasErrors() )
+            {
+                g_pGame->GetStreaming()->SetInfiniteStreamingEnabled( enabled );
+            }
+        }
+        else if ( propertyName == "gcOnDemand" )
+        {
+            bool enabled;
+            argStream.ReadBool( enabled );
+
+            if ( !argStream.HasErrors() )
+            {
+                g_pGame->GetStreaming()->SetGarbageCollectOnDemand( enabled );
+            }
+        }
+        else if ( propertyName == "nodeStealing" )
+        {
+            bool enabled;
+            argStream.ReadBool( enabled );
+
+            if ( !argStream.HasErrors() )
+            {
+                g_pGame->GetStreaming()->SetStreamingNodeStealingAllowed( enabled );
+            }
+        }
+        else if ( propertyName == "isFibered" )
+        {
+            bool enabled;
+            argStream.ReadBool( enabled );
+
+            if ( !argStream.HasErrors() )
+            {
+                g_pGame->GetStreaming()->EnableFiberedLoading( enabled );
+            }
+        }
+        else if ( propertyName == "fiberedPerfMult" )
+        {
+            double perfMult;
+            argStream.ReadNumber( perfMult );
+
+            if ( !argStream.HasErrors() )
+            {
+                g_pGame->GetStreaming()->SetFiberedPerfMultiplier( perfMult );
+            }
+        }
+        else
+            argStream.SetCustomError( "invalid property name" );
+    }
+    
+    // Output error message if not successful.
+    bool successful = ( argStream.HasErrors() == false );
+
+    if ( !successful )
+    {
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+    }
+
+    // We failed
+    lua_pushboolean ( luaVM, successful );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::EngineStreamingGetProperty( lua_State *luaVM )
+{
+    // var engineStreamingGetProperty ( string propName )
+    // https://wiki.multitheftauto.com/wiki/MTA:Eir/functions/engineStreamingGetProperty
+    SString propertyName;
+
+    CScriptArgReader argStream( luaVM );
+    argStream.ReadString( propertyName );
+
+    if ( !argStream.HasErrors() )
+    {
+        if ( propertyName == "strictNodeDistrib" )
+        {
+            lua_pushboolean( luaVM,
+                g_pGame->GetStreaming()->IsStrictNodeDistributionEnabled()
+            );
+            return 1;
+        }
+        else if ( propertyName == "infiniteStreaming" )
+        {
+            lua_pushboolean( luaVM,
+                g_pGame->GetStreaming()->IsInfiniteStreamingEnabled()
+            );
+            return 1;
+        }
+        else if ( propertyName == "gcOnDemand" )
+        {
+            lua_pushboolean( luaVM,
+                g_pGame->GetStreaming()->IsGarbageCollectOnDemandEnabled()
+            );
+            return 1;
+        }
+        else if ( propertyName == "nodeStealing" )
+        {
+            lua_pushboolean( luaVM,
+                g_pGame->GetStreaming()->IsStreamingNodeStealingAllowed()
+            );
+            return 1;
+        }
+        else if ( propertyName == "isFibered" )
+        {
+            lua_pushboolean( luaVM,
+                g_pGame->GetStreaming()->IsFiberedLoadingEnabled()
+            );
+            return 1;
+        }
+        else if ( propertyName == "fiberedPerfMult" )
+        {
+            lua_pushnumber( luaVM,
+                g_pGame->GetStreaming()->GetFiberedPerfMultiplier()
+            );
+            return 1;
+        }
+        else
+            argStream.SetCustomError( "invalid property name" );
+    }
+    
+    if ( argStream.HasErrors() )
+    {
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+    }
+
+    // We failed
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}

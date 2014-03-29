@@ -229,11 +229,6 @@ CGameSA::CGameSA()
     InitHooks_ClothesCache ();
     InitHooks_Rendering ();
     InitHooks_RwResources ();
-
-    // Temporary stuff to enable infinite rendering.
-    // Should be disabled in Phase 4, when the scripting functions are added.
-    GetStreaming()->SetStreamingNodeStealingAllowed( false );
-    GetStreaming()->SetInfiniteStreamingEnabled( true );
 }
 
 CGameSA::~CGameSA ( void )
@@ -550,11 +545,6 @@ void CGameSA::Reset ( void )
     RenderCallbacks_Reset();
     RenderWareLighting_Reset();
 #endif
-
-    // Temporary stuff to enable infinite rendering.
-    // Should be disabled in Phase 4, when the scripting functions are added.
-    GetStreaming()->SetStreamingNodeStealingAllowed( false );
-    GetStreaming()->SetInfiniteStreamingEnabled( true );
 }
 
 void CGameSA::Terminate ( void )

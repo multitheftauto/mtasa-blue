@@ -1449,7 +1449,7 @@ int CLuaFunctionDefs::IsPedDead ( lua_State* luaVM )
     if ( !argStream.HasErrors () )
     {
         // Grab his dead state and return it
-        bool bDead = pPed->IsDead ();
+        bool bDead = pPed->IsDead () || pPed->IsDying ();
         lua_pushboolean ( luaVM, bDead );
         return 1;
     }

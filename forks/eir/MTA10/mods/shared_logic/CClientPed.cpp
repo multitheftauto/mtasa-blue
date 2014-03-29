@@ -1590,6 +1590,9 @@ void CClientPed::SetHealth ( float fHealth )
     // If our health is locked, dont allow any change
     if ( m_bHealthLocked ) return;
 
+    if ( fHealth < 0.0f )
+        fHealth = 0.0f;
+
     InternalSetHealth ( fHealth );
     m_fHealth = fHealth;
 

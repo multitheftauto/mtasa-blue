@@ -616,6 +616,8 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "engineGetVisibleTextureNames", CLuaFunctionDefs::EngineGetVisibleTextureNames );
     CLuaCFunctions::AddFunction ( "engineIsModelBeingUsed", CLuaFunctionDefs::EngineIsModelBeingUsed );
     CLuaCFunctions::AddFunction ( "diagnoseEntity", CLuaFunctionDefs::DiagnoseEntity );
+    CLuaCFunctions::AddFunction ( "engineStreamingSetProperty", CLuaFunctionDefs::EngineStreamingSetProperty );
+    CLuaCFunctions::AddFunction ( "engineStreamingGetProperty", CLuaFunctionDefs::EngineStreamingGetProperty );
 
     //CLuaCFunctions::AddFunction ( "engineReplaceMatchingAtomics", CLuaFunctionDefs::EngineReplaceMatchingAtomics );
     //CLuaCFunctions::AddFunction ( "engineReplaceWheelAtomics", CLuaFunctionDefs::EngineReplaceWheelAtomics );
