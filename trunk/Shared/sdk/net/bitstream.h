@@ -200,26 +200,27 @@ public:
 
 
     // Write characters from a std::string
-    void WriteStringCharacters ( const std::string& value, unsigned short usLength )
+    void WriteStringCharacters ( const std::string& value, uint uiLength )
     {
-        dassert ( usLength <= value.length () );
+        dassert ( uiLength <= value.length () );
         // Send the data
-        if ( usLength )
-            Write ( &value.at ( 0 ), usLength );
+        if ( uiLength )
+            Write ( &value.at ( 0 ), uiLength );
     }
 
     // Read characters into a std::string
-    bool ReadStringCharacters ( std::string& result, unsigned short usLength )
+    bool ReadStringCharacters ( std::string& result, uint uiLength )
     {
         result = "";
-        if ( usLength )
+        if ( uiLength )
         {
             // Read the data
-            char* buffer = static_cast < char* > ( alloca ( usLength ) );
-            if ( !Read ( buffer, usLength ) )
+            std::vector < char > bufferArray;
+            bufferArray.resize( uiLength );
+            char* buffer = &bufferArray[0];
+            if ( !Read ( buffer, uiLength ) )
                 return false;
-
-            result = std::string ( buffer, usLength );
+            result = std::string ( buffer, uiLength );
         }
         return true;
     }
@@ -249,6 +250,73 @@ public:
         // Read the characters
         return ReadStringCharacters ( result, usLength );
     }
+
+
+    // Write variable size length
+    void WriteLength( uint uiLength )
+    {
+        if ( uiLength <= 0x7F )         // One byte for length up to 127
+            Write( (uchar)uiLength );
+        else
+        if ( uiLength <= 0x7FFF )
+        {                               // Two bytes for length from 128 to 32767
+            Write( (uchar)( ( uiLength >> 8 ) + 128 ) );
+            Write( (uchar)( uiLength & 0xFF ) );
+        }
+        else
+        {                               // Five bytes for length 32768 and up
+            Write( (uchar)255 );
+            Write( uiLength );
+        }
+    }
+
+    // Read variable size length
+    bool ReadLength( uint& uiOutLength )
+    {
+        uiOutLength = 0;
+        // Read the length
+        uchar ucValue = 0;
+        if ( !Read ( ucValue ) )
+            return false;
+
+        if ( ucValue <= 0x7F )
+        {                           // One byte for length up to 127
+            uiOutLength = ucValue;
+        }
+        else
+        if ( ucValue != 255 )
+        {                           // Two bytes for length from 128 to 32767
+            uchar ucValue2 = 0;
+            if ( !Read ( ucValue2 ) )
+                return false;
+            uiOutLength = ( ( ucValue - 128 ) << 8 ) + ucValue2;
+        }
+        else
+        {                           // Five bytes for length 32768 and up
+            if ( !Read( uiOutLength ) )
+                return false;
+        }
+        return true;
+    }
+
+
+    // Write a string (incl. variable size header)
+    void WriteStr( const std::string& value )
+    {
+        WriteLength( value.length() );
+        return WriteStringCharacters( value, value.length() );
+    }
+
+    // Read a string (incl. variable size header)
+    bool ReadStr( std::string& result )
+    {
+        result = "";
+        uint uiLength = 0;
+        if ( !ReadLength ( uiLength ) )
+            return false;
+        return ReadStringCharacters ( result, uiLength );
+    }
+
 
     #ifdef MTA_CLIENT
         #define MAX_ELEMENTS    MAX_CLIENT_ELEMENTS
