@@ -596,7 +596,7 @@ CVehicleSA* CPoolsSA::AddTrain ( CVector * vecPosition, DWORD dwModels[], int iS
     {
         DWORD vehicleIndex = 0;
 
-        if ( !(*ppVehiclePool)->Full() )
+        if ( !Pools::GetVehiclePool()->Full() )
         {
             trainHead = new CVehicleSA ( pTrainBeginning );
         }
@@ -605,7 +605,7 @@ CVehicleSA* CPoolsSA::AddTrain ( CVector * vecPosition, DWORD dwModels[], int iS
         
         while ( carriage )
         {
-            if ( !(*ppVehiclePool)->Full() )
+            if ( !Pools::GetVehiclePool()->Full() )
             {
                 CVehicleSAInterface* vehCarriage = carriage->GetNextCarriageInTrain ();
                 if ( vehCarriage )
@@ -631,19 +631,15 @@ char szOutput[1024];
 
 void CPoolsSA::DumpPoolsStatus ()
 {
-    char*  poolNames[] = {"Buildings", "Peds", "Objects", "Dummies", "Vehicles", "ColModels", 
-        "Tasks", "Events", "TaskAllocators", "PedIntelligences", "PedAttractors", 
-        "EntryInfoNodes", "NodeRoutes", "PatrolRoutes", "PointRoutes", 
-        "PointerNodeDoubleLinks", "PointerNodeSingleLinks" };
-
-    int poolSizes[] = {13000,140,350,2500,110,10150,500,200,16,140,64,500,64,32,64,3200,70000};
     int iPosition = 0;
     char percent = '%';
     iPosition += snprintf ( szOutput, 1024, "-----------------\n" );
     for ( int i = 0; i < MAX_POOLS; i++ )
     {
         int usedSpaces = GetNumberOfUsedSpaces ( (ePools)i );
-        iPosition += snprintf ( szOutput + iPosition, 1024 - iPosition, "%s: %d (%d) (%.2f%c)\n", poolNames[i], usedSpaces, poolSizes[i], ((float)usedSpaces / (float)poolSizes[i] * 100), percent  );
+        int poolSize = GetPoolCapacity ( (ePools)i );
+        const char *poolName = GetPoolName ( (ePools)i );
+        iPosition += snprintf ( szOutput + iPosition, 1024 - iPosition, "%s: %d (%d) (%.2f%c)\n", poolName, usedSpaces, poolSize, ((float)usedSpaces / (float)poolSize * 100), percent  );
     }
     #ifdef MTA_DEBUG
     OutputDebugString ( szOutput );
@@ -675,6 +671,8 @@ int CPoolsSA::GetPoolDefaultCapacity ( ePools pool )
         case ENV_MAP_MATERIAL_POOL:     return 4096;         // Modded to 16000   @ CGameSA.cpp
         case ENV_MAP_ATOMIC_POOL:       return 1024;         // Modded to 8000    @ CGameSA.cpp
         case SPEC_MAP_MATERIAL_POOL:    return 4096;         // Modded to 16000   @ CGameSA.cpp
+        case COL_SECTOR_POOL:           return 256;
+        case IPL_SECTOR_POOL:           return 256;
     }
     return 0;
 }
@@ -706,6 +704,8 @@ int CPoolsSA::GetPoolCapacity ( ePools pool )
         case ENV_MAP_MATERIAL_POOL:         return RenderWare::GetEnvMapMaterialPool()->GetMax();
         case ENV_MAP_ATOMIC_POOL:           return RenderWare::GetEnvMapAtomicPool()->GetMax();
         case SPEC_MAP_MATERIAL_POOL:        return RenderWare::GetSpecMapMaterialPool()->GetMax();
+        case COL_SECTOR_POOL:               return Streaming::GetCOLEnvironment().m_pool->GetMax();
+        case IPL_SECTOR_POOL:               return Streaming::GetIPLEnvironment().m_pool->GetMax();
     }
     if ( iPtr )
         return *(int*)iPtr;
@@ -779,9 +779,42 @@ int CPoolsSA::GetNumberOfUsedSpaces ( ePools pool )
     case ENV_MAP_MATERIAL_POOL:         return RenderWare::GetEnvMapMaterialPool()->GetCount();
     case ENV_MAP_ATOMIC_POOL:           return RenderWare::GetEnvMapAtomicPool()->GetCount();
     case SPEC_MAP_MATERIAL_POOL:        return RenderWare::GetSpecMapMaterialPool()->GetCount();
+    case COL_SECTOR_POOL:               return Streaming::GetCOLEnvironment().m_pool->GetCount();
+    case IPL_SECTOR_POOL:               return Streaming::GetIPLEnvironment().m_pool->GetCount();
     }
 
     return -1;
+}
+
+const char* CPoolsSA::GetPoolName ( ePools pool ) const
+{
+    switch( pool )
+    {
+    case BUILDING_POOL:                 return "Buildings";
+    case PED_POOL:                      return "Peds";
+    case OBJECT_POOL:                   return "Objects";
+    case DUMMY_POOL:                    return "Dummies";
+    case VEHICLE_POOL:                  return "Vehicles";
+    case COL_MODEL_POOL:                return "ColModels";
+    case TASK_POOL:                     return "Tasks";
+    case EVENT_POOL:                    return "Events";
+    case TASK_ALLOCATOR_POOL:           return "TaskAllocators";
+    case PED_INTELLIGENCE_POOL:         return "PedIntelligence";
+    case PED_ATTRACTOR_POOL:            return "PedAttractors";
+    case ENTRY_INFO_NODE_POOL:          return "EntryInfoNodes";
+    case NODE_ROUTE_POOL:               return "NodeRoutes";
+    case PATROL_ROUTE_POOL:             return "PatrolRoutes";
+    case POINT_ROUTE_POOL:              return "PointRoutes";
+    case POINTER_DOUBLE_LINK_POOL:      return "PointerNodeDoubleLinks";
+    case POINTER_SINGLE_LINK_POOL:      return "PointerNodeSingleLinks";
+    case ENV_MAP_MATERIAL_POOL:         return "EnvMapMaterials";
+    case ENV_MAP_ATOMIC_POOL:           return "EnvMapAtomic";
+    case SPEC_MAP_MATERIAL_POOL:        return "SpecMapMaterial";
+    case COL_SECTOR_POOL:               return "COLSectors";
+    case IPL_SECTOR_POOL:               return "IPLSectors";
+    }
+
+    return "unknown";
 }
 
 CEntryInfoNodePool * CPoolsSA::GetEntryInfoNodePool ( void )
@@ -791,7 +824,7 @@ CEntryInfoNodePool * CPoolsSA::GetEntryInfoNodePool ( void )
 
 int CEntryInfoNodePoolSA::GetNumberOfUsedSpaces ( void )
 {
-    return (*ppEntryInfoPool)->GetCount();
+    return Pools::GetEntryInfoPool()->GetCount();
 }
 
 CPointerNodeDoubleLinkPool * CPoolsSA::GetPointerNodeDoubleLinkPool ( void )
@@ -801,7 +834,7 @@ CPointerNodeDoubleLinkPool * CPoolsSA::GetPointerNodeDoubleLinkPool ( void )
 
 int CPointerNodeDoubleLinkPoolSA::GetNumberOfUsedSpaces ( void )
 {
-    return (*ppPtrNodeDoublePool)->GetCount();
+    return Pools::GetPtrNodeDoublePool()->GetCount();
 }
 
 CPointerNodeSingleLinkPool * CPoolsSA::GetPointerNodeSingleLinkPool ( void )
@@ -811,5 +844,5 @@ CPointerNodeSingleLinkPool * CPoolsSA::GetPointerNodeSingleLinkPool ( void )
 
 int CPointerNodeSingleLinkPoolSA::GetNumberOfUsedSpaces ( void )
 {
-    return (*ppPtrNodeSinglePool)->GetCount();
+    return Pools::GetPtrNodeSinglePool()->GetCount();
 }

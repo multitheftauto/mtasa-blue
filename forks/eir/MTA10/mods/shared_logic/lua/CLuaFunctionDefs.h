@@ -552,6 +552,11 @@ public:
     LUA_DECLARE ( DiagnoseEntity );
     LUA_DECLARE ( EngineStreamingSetProperty );
     LUA_DECLARE ( EngineStreamingGetProperty );
+    LUA_DECLARE ( EngineGetActiveStreamingEntityCount );
+    LUA_DECLARE ( EngineGetActiveStreamingFreeSlotCount );
+    LUA_DECLARE ( EngineGetActiveStreamingEntities );
+    LUA_DECLARE ( EngineGetGamePoolLimits );
+    LUA_DECLARE ( EngineGetStreamingInfo );
     LUA_DECLARE ( SetVehicleComponentPosition );
     LUA_DECLARE ( GetVehicleComponentPosition );
     LUA_DECLARE ( SetVehicleComponentRotation );

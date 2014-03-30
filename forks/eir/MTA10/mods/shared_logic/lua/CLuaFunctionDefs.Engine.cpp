@@ -950,3 +950,117 @@ int CLuaFunctionDefs::EngineStreamingGetProperty( lua_State *luaVM )
     lua_pushboolean ( luaVM, false );
     return 1;
 }
+
+
+int CLuaFunctionDefs::EngineGetActiveStreamingEntityCount( lua_State *luaVM )
+{
+    // int engineGetActiveStreamingEntityCount ()
+    // https://wiki.multitheftauto.com/wiki/MTA:Eir/functions/engineGetActiveStreamingEntityCount
+    lua_pushnumber( luaVM, g_pGame->GetStreaming()->GetActiveStreamingEntityCount() );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::EngineGetActiveStreamingFreeSlotCount( lua_State *luaVM )
+{
+    // int engineGetActiveStreamingFreeSlotCount ()
+    // https://wiki.multitheftauto.com/wiki/MTA:Eir/functions/engineGetActiveStreamingFreeSlotCount
+    lua_pushnumber( luaVM, g_pGame->GetStreaming()->GetFreeStreamingEntitySlotCount());
+    return 1;
+}
+
+inline void CreateLuaTableOfEntityList( lua_State *L, CStreaming::entityList_t& list )
+{
+    lua_newtable( L );
+    
+    unsigned int n = 0;
+
+    for ( CStreaming::entityList_t::iterator iter = list.begin(); iter != list.end(); ++iter )
+    {
+        CEntity *gameEntity = *iter;
+
+        if ( CClientEntity *clientEntity = g_pClientGame->GetManager()->FindEntity( gameEntity ) )
+        {
+            lua_pushelement( L, clientEntity );
+            lua_rawseti( L, -2, ++n );
+        }
+    }
+}
+
+
+int CLuaFunctionDefs::EngineGetActiveStreamingEntities( lua_State *luaVM )
+{
+    // table engineGetActiveStreamingEntities ()
+    // https://wiki.multitheftauto.com/wiki/MTA:Eir/functions/engineGetActiveStreamingEntities
+    CreateLuaTableOfEntityList( luaVM, g_pGame->GetStreaming()->GetActiveStreamingEntities() );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::EngineGetGamePoolLimits( lua_State *luaVM )
+{
+    // dict engineGetGamePoolLimits ()
+    // https://wiki.multitheftauto.com/wiki/MTA:Eir/functions/engineGetGamePoolLimits
+    lua_newtable( luaVM );
+
+    CPools *pools = g_pGame->GetPools();
+
+    for ( unsigned int n = 0; n < MAX_POOLS; n++ )
+    {
+        lua_newtable( luaVM );
+
+        lua_pushstring( luaVM, pools->GetPoolName( (ePools)n ) );
+        lua_setfield( luaVM, -2, "name" );
+
+        lua_pushnumber( luaVM, pools->GetNumberOfUsedSpaces( (ePools)n ) );
+        lua_setfield( luaVM, -2, "usedCount" );
+
+        lua_pushnumber( luaVM, pools->GetPoolCapacity( (ePools)n ) );
+        lua_setfield( luaVM, -2, "maxCount" );
+
+        lua_rawseti( luaVM, -2, n + 1 );
+    }
+
+    return 1;
+}
+
+
+int CLuaFunctionDefs::EngineGetStreamingInfo( lua_State *luaVM )
+{
+    // dict engineGetStreamingInfo ()
+    // https://wiki.multitheftauto.com/wiki/MTA:Eir/functions/engineGetStreamingInfo
+    lua_newtable( luaVM );
+
+    CStreaming::streamingInfo info;
+
+    g_pGame->GetStreaming()->GetStreamingInfo( info );
+
+    lua_pushnumber( luaVM, info.usedMemory );
+    lua_setfield( luaVM, -2, "usedMemory" );
+
+    lua_pushnumber( luaVM, info.maxMemory );
+    lua_setfield( luaVM, -2, "maxMemory" );
+
+    lua_pushnumber( luaVM, info.numberOfRequests );
+    lua_setfield( luaVM, -2, "numberOfRequests" );
+
+    lua_pushnumber( luaVM, info.numberOfPriorityRequests );
+    lua_setfield( luaVM, -2, "numberOfPriorityRequests" );
+
+    lua_pushnumber( luaVM, info.numberOfSlicers );
+    lua_setfield( luaVM, -2, "numberOfSlicers" );
+
+    lua_pushnumber( luaVM, info.numberOfRequestsPerSlicer );
+    lua_setfield( luaVM, -2, "numberOfRequestsPerSlicer" );
+
+    lua_pushnumber( luaVM, info.activeStreamingThread );
+    lua_setfield( luaVM, -2, "activeStreamingThread" );
+
+    lua_pushboolean( luaVM, info.isBusy );
+    lua_setfield( luaVM, -2, "isBusy" );
+
+    lua_pushboolean( luaVM, info.isLoadingBigModel );
+    lua_setfield( luaVM, -2, "isLoadingBigModel" );
+
+    return 1;
+}

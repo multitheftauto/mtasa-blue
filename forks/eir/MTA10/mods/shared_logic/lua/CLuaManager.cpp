@@ -618,6 +618,11 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "diagnoseEntity", CLuaFunctionDefs::DiagnoseEntity );
     CLuaCFunctions::AddFunction ( "engineStreamingSetProperty", CLuaFunctionDefs::EngineStreamingSetProperty );
     CLuaCFunctions::AddFunction ( "engineStreamingGetProperty", CLuaFunctionDefs::EngineStreamingGetProperty );
+    CLuaCFunctions::AddFunction ( "engineGetActiveStreamingEntityCount", CLuaFunctionDefs::EngineGetActiveStreamingEntityCount );
+    CLuaCFunctions::AddFunction ( "engineGetActiveStreamingFreeSlotCount", CLuaFunctionDefs::EngineGetActiveStreamingFreeSlotCount );
+    CLuaCFunctions::AddFunction ( "engineGetActiveStreamingEntities", CLuaFunctionDefs::EngineGetActiveStreamingEntities );
+    CLuaCFunctions::AddFunction ( "engineGetGamePoolLimits", CLuaFunctionDefs::EngineGetGamePoolLimits );
+    CLuaCFunctions::AddFunction ( "engineGetStreamingInfo", CLuaFunctionDefs::EngineGetStreamingInfo );
 
     //CLuaCFunctions::AddFunction ( "engineReplaceMatchingAtomics", CLuaFunctionDefs::EngineReplaceMatchingAtomics );
     //CLuaCFunctions::AddFunction ( "engineReplaceWheelAtomics", CLuaFunctionDefs::EngineReplaceWheelAtomics );

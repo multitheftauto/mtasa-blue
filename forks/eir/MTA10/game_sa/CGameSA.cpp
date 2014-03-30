@@ -206,6 +206,7 @@ CGameSA::CGameSA()
     m_Cheats [ CHEAT_HEALTARMORMONEY  ] = new SCheatSA((BYTE *)VAR_HealthArmorMoney, false);
 
     // Change pool sizes here
+    // todo: make these functions actually do something.
     m_pPools->SetPoolCapacity ( TASK_POOL, 5000 );                  // Default is 500
     m_pPools->SetPoolCapacity ( OBJECT_POOL, 700 );                 // Default is 350
     m_pPools->SetPoolCapacity ( EVENT_POOL, 5000 );                 // Default is 200
@@ -213,10 +214,6 @@ CGameSA::CGameSA()
     m_pPools->SetPoolCapacity ( ENV_MAP_MATERIAL_POOL, 16000 );     // Default is 4096
     m_pPools->SetPoolCapacity ( ENV_MAP_ATOMIC_POOL, 4000 );        // Default is 1024
     m_pPools->SetPoolCapacity ( SPEC_MAP_MATERIAL_POOL, 16000 );    // Default is 4096
-
-    // Increase streaming object instances list size
-    MemPut < WORD > ( 0x05B8E55, 30000 );         // Default is 12000
-    MemPut < WORD > ( 0x05B8EB0, 30000 );         // Default is 12000
 
     CModelInfoSA::StaticSetHooks ();
     CPlayerPedSA::StaticSetHooks ();

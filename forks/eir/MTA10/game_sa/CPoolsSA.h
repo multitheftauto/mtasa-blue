@@ -92,6 +92,11 @@ public:
         }
     }
 
+    inline bool     IsSlotUsed( unsigned int n ) const
+    {
+        return ( ( m_flags[n] & 0x80 ) == 0 );
+    }
+
     inline type*    Allocate( void )
     {
         unsigned int n = ++m_lastUsed;
@@ -102,7 +107,7 @@ public:
             for ( ; n < max; n++ )
             {
                 // If slot is used, we skip
-                if ( !( m_flags[n] & 0x80 ) )
+                if ( IsSlotUsed( n ) )
                     continue;
 
                 // Mark slot as used
@@ -125,7 +130,7 @@ public:
 
     inline type*    Get( unsigned int id )
     {
-        return ( (id < GetMax()) && !(m_flags[id] & 0x80) ) ? GetOffset( id ) : NULL;
+        return ( (id < GetMax()) && IsSlotUsed( id ) ) ? GetOffset( id ) : NULL;
     }
 
     unsigned int    GetIndex( type *entity ) const
@@ -135,7 +140,7 @@ public:
 
     bool    IsValid( type *entity ) const
     {
-        return entity >= m_pool && GetIndex( entity ) < GetMax();
+        return ( entity >= m_pool ) && ( GetIndex( entity ) < GetMax() );
     }
 
     void    Free( unsigned int id )
@@ -143,7 +148,7 @@ public:
         if ( id >= m_max )
             return;
 
-        if ( m_flags[id] & 0x80 )
+        if ( !IsSlotUsed( id ) )
             return;
 
         m_flags[id] |= 0x80;
@@ -165,7 +170,7 @@ public:
     {
         for ( unsigned int n = m_lastUsed + 1; n < GetMax(); n++ )
         {
-            if ( m_flags[n] & 0x80 )
+            if ( !IsSlotUsed( n ) )
                 return true;
         }
 
@@ -185,7 +190,7 @@ public:
 
         for ( unsigned int n = 0; n < GetMax(); n++ )
         {
-            if ( !( m_flags[n] & 0x80 ) )
+            if ( IsSlotUsed( n ) )
                 count++;
         }
 
@@ -205,7 +210,7 @@ public:
     {
         for ( unsigned int n = startIndex; n < GetMax(); n++ )
         {
-            if ( !( m_flags[n] & 0x80 ) )
+            if ( IsSlotUsed( n ) )
                 cb.OnEntry( GetOffset( n ), n );
         }
     }
@@ -215,7 +220,7 @@ public:
     {
         for ( unsigned int n = GetMax() - 1; n >= stopIndex; n++ )
         {
-            if ( !( m_flags[n] & 0x80 ) )
+            if ( IsSlotUsed( n ) )
                 cb.OnEntry( GetOffset( n ), n );
         }
     }
@@ -501,7 +506,8 @@ public:
     void                    DeleteAllBuildings  ( );
     CVehicleSA*             AddTrain            ( CVector* vecPosition, DWORD dwModels[], int iSize, bool bDirection, unsigned char ucTrackID = 0xFF );
 
-    int                     GetNumberOfUsedSpaces   ( ePools pools );
+    int                     GetNumberOfUsedSpaces   ( ePools pool );
+    const char*             GetPoolName             ( ePools pool ) const;
     void                    DumpPoolsStatus         ( );
 
     int                     GetPoolDefaultCapacity  ( ePools pool );

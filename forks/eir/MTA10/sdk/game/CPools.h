@@ -44,6 +44,8 @@ enum ePools {
     ENV_MAP_MATERIAL_POOL,
     ENV_MAP_ATOMIC_POOL,
     SPEC_MAP_MATERIAL_POOL,
+    COL_SECTOR_POOL,
+    IPL_SECTOR_POOL,
     MAX_POOLS
 };
 
@@ -110,6 +112,7 @@ public:
     virtual CEntity*        GetEntity               ( void *entity ) = 0;
 
     virtual int             GetNumberOfUsedSpaces   ( ePools pool ) = 0;
+    virtual const char*     GetPoolName             ( ePools pool ) const = 0;
     virtual void            DumpPoolsStatus         ( ) = 0;
 
     virtual int             GetPoolDefaultCapacity  ( ePools pool ) = 0;
