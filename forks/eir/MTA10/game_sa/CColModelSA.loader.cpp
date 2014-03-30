@@ -785,9 +785,9 @@ CColModelSAInterface* CColModelSAInterface::Clone( void )
         CopyArray( srcColData->pColVertices,            dstColVertexArray, numVertices );
         CopyArray( srcColData->pColTriangles,           dstColTriangleArray, numTriangles );
 
-        if ( dstColFaceGroupArray && srcFaceGroupHeader )
+        if ( srcFaceGroupHeader )
         {
-            CColFaceGroupSA *srcFaceGroupArray = (CColFaceGroupSA*)srcFaceGroupHeader - ( numFaceGroups + 1 );
+            CColFaceGroupSA *srcFaceGroupArray = (CColFaceGroupSA*)srcFaceGroupHeader - numFaceGroups;
 
             CopyArray( srcFaceGroupArray,               dstColFaceGroupArray, numFaceGroups );
             CopyArray( srcFaceGroupHeader,              dstColFaceGroupHeader, 1 );
