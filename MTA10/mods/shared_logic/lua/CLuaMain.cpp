@@ -1211,16 +1211,18 @@ bool CLuaMain::LoadScriptFromBuffer ( const char* cpInBuffer, unsigned int uiInS
         // Problems problems
         if ( GetTimeString( true ) <= INVALID_COMPILED_SCRIPT_CUTOFF_DATE )
         {
-            SString strMessage( "%s is invalid and will not work after %s. Please re-compile at http://luac.mtasa.com/", *strNiceFilename, INVALID_COMPILED_SCRIPT_CUTOFF_DATE ); 
+            SString strMessage( "%s is invalid and will not work after %s. Please re-compile at http://luac.mtasa.com/", *strNiceFilename, INVALID_COMPILED_SCRIPT_CUTOFF_DATE );
             g_pClientGame->GetScriptDebugging()->LogWarning ( m_luaVM, "Script warning: %s", *strMessage );
-            g_pClientGame->TellServerSomethingImportant( 1003, SStringX( "CLIENT SCRIPT ERROR: " ) + strMessage, true );
+            g_pCore->GetConsole()->Printf( "Script warning: %s", *strMessage );
+            g_pClientGame->TellServerSomethingImportant( 1003, SStringX( "CLIENT SCRIPT WARNING: " ) + strMessage, false );
             // cpBuffer is always valid after call to DecryptScript
         }
         else
         {
             SString strMessage( "%s is invalid. Please re-compile at http://luac.mtasa.com/", *strNiceFilename ); 
             g_pClientGame->GetScriptDebugging()->LogError ( m_luaVM, "Loading script failed: %s", *strMessage );
-            g_pClientGame->TellServerSomethingImportant( 1003, SStringX( "CLIENT SCRIPT ERROR: " ) + strMessage, true );
+            g_pCore->GetConsole()->Printf( "Loading script failed: %s", *strMessage );
+            g_pClientGame->TellServerSomethingImportant( 1003, SStringX( "CLIENT SCRIPT ERROR: " ) + strMessage, false );
             return false;
         }
     }
