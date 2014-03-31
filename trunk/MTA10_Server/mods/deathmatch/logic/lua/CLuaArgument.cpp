@@ -634,21 +634,17 @@ bool CLuaArgument::WriteToBitStream ( NetBitStreamInterface& bitStream, CFastHas
         {
             type.data.ucType = LUA_TNUMBER;
             bitStream.Write ( &type );
-            float fNumber = static_cast < float > ( GetNumber () );
-            long lNumber = static_cast < long > ( fNumber );
-            float fNumberInteger = static_cast < float > ( lNumber );
 
-            // Check if the number is an integer and can fit a long datatype
-            if ( fabs ( fNumber ) > fabs ( fNumberInteger + 1 ) ||
-                 fabs ( fNumber - fNumberInteger ) >= FLOAT_EPSILON )
+            int iNumber;
+            if ( !ShouldUseInt( GetNumber(), &iNumber ) )
             {
                 bitStream.WriteBit ( true );
-                bitStream.Write ( fNumber );
+                bitStream.Write ( static_cast < float > ( GetNumber() ) );
             }
             else
             {
                 bitStream.WriteBit ( false );
-                bitStream.WriteCompressed ( lNumber );
+                bitStream.WriteCompressed ( iNumber );
             }
             break;
         }
@@ -791,15 +787,14 @@ json_object * CLuaArgument::WriteToJSONObject ( bool bSerialize, CFastHashMap < 
         }
         case LUA_TNUMBER:
         {
-            float fNum = static_cast < float > ( GetNumber () );
-            int iNum = static_cast < int > ( GetNumber () );
-            if ( iNum == fNum )
+            int iNumber;
+            if ( ShouldUseInt( GetNumber(), &iNumber ) )
             {
-                return json_object_new_int(iNum);
+                return json_object_new_int( iNumber );
             }
             else
             {
-                return json_object_new_double(fNum);
+                return json_object_new_double( static_cast < float > ( GetNumber() ) );
             }
             break;
         }
@@ -881,16 +876,15 @@ char * CLuaArgument::WriteToString ( char * szBuffer, int length )
         }
         case LUA_TNUMBER:
         {
-            float fNum = static_cast < float > ( GetNumber () );
-            int iNum = static_cast < int > ( GetNumber () );
-            if ( iNum == fNum )
+            int iNumber;
+            if ( ShouldUseInt( GetNumber(), &iNumber ) )
             {
-                snprintf ( szBuffer, length, "%d", iNum );
+                snprintf ( szBuffer, length, "%d", iNumber );
                 return szBuffer;
             }
             else
             {
-                snprintf ( szBuffer, length, "%f", fNum );
+                snprintf ( szBuffer, length, "%f", static_cast < float > ( GetNumber() ) );
                 return szBuffer;
             }
             break;
