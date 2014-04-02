@@ -3599,7 +3599,13 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                     {
                         ElementID PlayerId;
                         if ( bitStream.Read ( PlayerId ) )
-                            g_pClientGame->m_pManager->GetPlayerManager ()->Get ( PlayerId )->SetTeam ( pTeam );
+                        {
+                            CClientPlayer * pPlayer = g_pClientGame->m_pManager->GetPlayerManager ( )->Get ( PlayerId );
+                            if ( pPlayer )
+                            {
+                                pPlayer->SetTeam ( pTeam );
+                            }
+                        }
                     }
 
                     delete [] szTeamName;
