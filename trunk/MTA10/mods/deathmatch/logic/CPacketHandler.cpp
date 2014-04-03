@@ -2250,6 +2250,7 @@ void CPacketHandler::Packet_MapInfo ( NetBitStreamInterface& bitStream )
     g_pClientGame->SetGlitchEnabled ( CClientGame::GLITCH_CROUCHBUG, funBugs.data.bCrouchBug );
     g_pClientGame->SetGlitchEnabled ( CClientGame::GLITCH_CLOSEDAMAGE, funBugs.data.bCloseRangeDamage );
     g_pClientGame->SetGlitchEnabled ( CClientGame::GLITCH_HITANIM, funBugs.data2.bHitAnim );
+    g_pClientGame->SetGlitchEnabled ( CClientGame::GLITCH_FASTSPRINT, funBugs.data3.bFastSprint );
 
     float fJetpackMaxHeight = 100;
     if ( !bitStream.Read ( fJetpackMaxHeight ) )
@@ -5063,16 +5064,22 @@ void CPacketHandler::Packet_SyncSettings ( NetBitStreamInterface& bitStream )
             vehExtrapolateSettings.iBaseMs = sBaseMs;
             vehExtrapolateSettings.iScalePercent = sScalePercent;
             vehExtrapolateSettings.iMaxMs = sMaxMs;
-            vehExtrapolateSettings.bUseAltPulseOrder = false;
-            if ( bitStream.Version () >= 0x3D )
-            {
-                uchar ucUseAltPulseOrder;
-                if ( bitStream.Read ( ucUseAltPulseOrder ) )
-                    vehExtrapolateSettings.bUseAltPulseOrder = ucUseAltPulseOrder != 0;
-            }
             g_pClientGame->SetVehExtrapolateSettings ( vehExtrapolateSettings );
         }
     }
+
+    uchar ucUseAltPulseOrder = 0;
+    if ( bitStream.Version () >= 0x3D )
+        bitStream.Read ( ucUseAltPulseOrder );
+
+    uchar ucAllowFastSprintFix = 0;
+    if ( bitStream.Version () >= 0x58 )
+        bitStream.Read ( ucAllowFastSprintFix );
+
+    SMiscGameSettings miscGameSettings;
+    miscGameSettings.bUseAltPulseOrder = ( ucUseAltPulseOrder != 0 );
+    miscGameSettings.bAllowFastSprintFix = ( ucAllowFastSprintFix != 0 );
+    g_pClientGame->SetMiscGameSettings( miscGameSettings );
 }
 
 
