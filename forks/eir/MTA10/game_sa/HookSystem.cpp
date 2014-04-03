@@ -11,6 +11,14 @@
 
 #include "StdInc.h"
 
+VOID HookInstallCall ( DWORD dwInstallAddress,
+                        DWORD dwHookFunction )
+{
+    DWORD dwOffset = dwHookFunction - (dwInstallAddress + 5);
+    MemPut < BYTE > ( dwInstallAddress, 0xE8 );
+    MemPut < DWORD > ( dwInstallAddress+1, dwOffset );
+}
+
 //
 ////////////////////////////////////////////////////////////////////
 

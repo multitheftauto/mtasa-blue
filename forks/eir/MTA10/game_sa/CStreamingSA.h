@@ -202,6 +202,12 @@ public:
 #include "CStreamingSA.cache.h"
 #include "CStreamingSA.gc.h"
 
+#ifdef _MTA_BLUE
+
+#include "CStreamingSA.iplfixes.h"
+
+#endif //_MTA_BLUE
+
 // Internal class used to store model indices in
 // Somewhat deprecated type.
 class ModelIdContainer

@@ -1103,10 +1103,18 @@ CStreamingSA::CStreamingSA( void )
     StreamingCache_Init();
     StreamingIPL_Init();
     StreamingCOL_Init();
+
+#ifdef _MTA_BLUE
+    StreamingIPLFIXES_Init();
+#endif //_MTA_BLUE
 }
 
 CStreamingSA::~CStreamingSA( void )
 {
+#ifdef _MTA_BLUE
+    StreamingIPLFIXES_Shutdown();
+#endif //_MTA_BLUE
+
     // Shutdown sub modules
     StreamingCOL_Shutdown();
     StreamingIPL_Shutdown();

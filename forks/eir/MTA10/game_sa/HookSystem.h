@@ -17,6 +17,7 @@
 
 #define     MAX_JUMPCODE_SIZE           20
 
+VOID HookInstallCall( DWORD dwInstallAddress, DWORD dwHookFunction );;
 BOOL HookInstall( DWORD dwInstallAddress, DWORD dwHookHandler, int iJmpCodeSize );
 BOOL PatchCall( DWORD dwInstallAddress, DWORD dwHookHandler );
 BYTE * CreateJump ( DWORD dwFrom, DWORD dwTo, BYTE * ByteArray );

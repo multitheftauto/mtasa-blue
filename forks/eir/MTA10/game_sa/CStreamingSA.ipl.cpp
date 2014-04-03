@@ -196,9 +196,6 @@ CEntitySAInterface* __cdecl CreateIPLBuilding( iplInstance_t *instance, const ch
         building->bIsVisible = false;
     }
 
-    if ( instance->modelIndex == 3999 )
-        __asm nop
-
     if ( instance->quatRotation.x <= 0.05f && instance->quatRotation.y <= 0.05f &&
          ( IS_ANY_FLAG( instance->flags, 0x200 ) || instance->quatRotation.x <= 0.0f || instance->quatRotation.y <= 0.0f ) )
     {
@@ -457,6 +454,8 @@ struct IPLContainerLoader
             {
                 iplInstance_t& instance = instanceArray[n];
 
+                m_manager.OnInstance( instance );
+
                 CEntitySAInterface *entity = CreateIPLBuilding( &instance, NULL );
 
                 RegisterInstance( entity, lodArray, iplFile, iplId );
@@ -511,6 +510,11 @@ struct IPLContainerLoader
 
 struct CachedIPLLoaderManager
 {
+    AINLINE void OnInstance( iplInstance_t& inst )
+    {
+        return;
+    }
+
     AINLINE void OnLODInstance( CEntitySAInterface *lodEntity, CIPLFileSA *iplFile )
     {
         Streaming::GetIPLEnvironment().m_sectorMan.RegisterLODInstance( lodEntity );
@@ -539,6 +543,14 @@ struct CachedIPLLoaderManager
 
 struct RuntimeIPLLoaderManager
 {
+    AINLINE void OnInstance( iplInstance_t& instance )
+    {
+#ifdef _MTA_BLUE
+        // Wire in MTA fix.
+        HOOK_LoadIPLInstance( (SIPLInst*)&instance );
+#endif //_MTA_BLUE
+    }
+
     AINLINE void OnLODInstance( CEntitySAInterface *lodEntity, CIPLFileSA *iplFile )
     {
         return;
@@ -551,7 +563,10 @@ struct RuntimeIPLLoaderManager
 
     AINLINE void OnRegisterInstance( CEntitySAInterface *entity, CIPLFileSA *iplFile )
     {
-        return;
+#ifdef _MTA_BLUE
+        // Wire in MTA fix.
+        HOOK_CWorld_LOD_SETUP( entity );
+#endif //_MTA_BLUE
     }
 
     AINLINE void OnReadAdditionalSections( const char *buf, const binaryIPLHeader_t& header )

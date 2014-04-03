@@ -875,6 +875,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CStreamingSA.iplfixes.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\CStreamingSA.loader.cpp"
 				>
 			</File>
@@ -1677,6 +1681,10 @@
 			</File>
 			<File
 				RelativePath=".\CStreamingSA.ipl.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CStreamingSA.iplfixes.h"
 				>
 			</File>
 			<File
