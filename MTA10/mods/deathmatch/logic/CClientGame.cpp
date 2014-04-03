@@ -121,6 +121,7 @@ CClientGame::CClientGame ( bool bLocalPlay )
     m_Glitches [ GLITCH_CLOSEDAMAGE ] = false;
     g_pMultiplayer->DisableCloseRangeDamage ( true );
     m_Glitches [ GLITCH_HITANIM ] = false;
+    m_Glitches [ GLITCH_FASTSPRINT ] = false;
 
     // Remove Night & Thermal vision view (if enabled).
     g_pMultiplayer->SetNightVisionEnabled ( false );
@@ -6300,7 +6301,7 @@ void CClientGame::WorldSoundHandler ( uint uiGroup, uint uiIndex )
 //////////////////////////////////////////////////////////////////
 bool CClientGame::IsUsingAlternatePulseOrder( bool bAdvanceDelayCounter )
 {
-    if ( m_VehExtrapolateSettings.bUseAltPulseOrder )
+    if ( m_MiscGameSettings.bUseAltPulseOrder )
     {
         // Only actually start using alternate pulse order after 100 frames
         if ( m_uiAltPulseOrderCounter >= 100 )
@@ -6346,7 +6347,7 @@ void CClientGame::OutputServerInfo( void )
 
     {
         SString strEnabledGlitches;
-        const char* szGlitchNames[] = { "Quick reload", "Fast fire", "Fast move", "Crouch bug", "Close damage", "Hit anim" };
+        const char* szGlitchNames[] = { "Quick reload", "Fast fire", "Fast move", "Crouch bug", "Close damage", "Hit anim", "Fast sprint" };
         for( uint i = 0 ; i < NUM_GLITCHES ; i++ )
         {
             if ( IsGlitchEnabled( i ) )

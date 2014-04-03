@@ -525,6 +525,9 @@ public:
     unsigned long               m_ulLastTimeBeganStand;
     unsigned long               m_ulLastTimeMovedWhileCrouched;
     unsigned long               m_ulLastTimePressedLeftOrRight;
+    unsigned long               m_ulLastTimeSprintPressed;
+    unsigned long               m_ulBlockSprintReleaseTime;
+    bool                        m_bWasSprintButtonDown;
     CModelInfo*                 m_pLoadedModelInfo;
     eWeaponSlot                 m_pOutOfVehicleWeaponSlot;
     float                       m_fBeginAimX;

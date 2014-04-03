@@ -2882,6 +2882,34 @@ void CClientPed::ApplyControllerStateFixes ( CControllerState& Current )
         }
     }
 
+    // Stop speed advantage by tapping sprint button
+    pTask = m_pTaskManager->GetSimplestActiveTask ();
+    if ( pTask && pTask->GetTaskType () == TASK_SIMPLE_PLAYER_ON_FOOT )
+    {
+        bool bSprintButtonDown = ( Current.ButtonCross != 0 );
+
+        // Pressed sprint?
+        if ( bSprintButtonDown && ( bSprintButtonDown != m_bWasSprintButtonDown ) )
+        {
+            // Check if too soon since since last press
+            if ( ( ulNow - m_ulLastTimeSprintPressed ) < 300.0f * fSpeedRatio )
+            {
+                // On second successive quick press, delay next release
+                m_ulBlockSprintReleaseTime = ulNow;
+            }
+            m_ulLastTimeSprintPressed = ulNow;
+        }
+        m_bWasSprintButtonDown = bSprintButtonDown;
+
+        // If required, delay sprint button release
+        if ( ( ulNow - m_ulBlockSprintReleaseTime ) < 300.0f * fSpeedRatio )
+        {
+            if ( g_pClientGame->GetMiscGameSettings().bAllowFastSprintFix )
+                if ( !g_pClientGame->IsGlitchEnabled( CClientGame::GLITCH_FASTSPRINT ) )
+                    Current.ButtonCross = 255;
+        }
+    }
+
     // Are we working on entering a vehicle?
     pTask = m_pTaskManager->GetTask ( TASK_PRIORITY_PRIMARY );
     if ( pTask )

@@ -67,8 +67,13 @@ struct SVehExtrapolateSettings
     int iBaseMs;
     int iScalePercent;
     int iMaxMs;
-    bool bUseAltPulseOrder;
     bool bEnabled;
+};
+
+struct SMiscGameSettings
+{
+    bool bUseAltPulseOrder;
+    bool bAllowFastSprintFix;
 };
 
 class CClientGame
@@ -184,6 +189,7 @@ public:
         GLITCH_CROUCHBUG,
         GLITCH_CLOSEDAMAGE,
         GLITCH_HITANIM,
+        GLITCH_FASTSPRINT,
         NUM_GLITCHES
     };
     class CStoredWeaponSlot
@@ -563,6 +569,8 @@ public:
 
     void                                SetVehExtrapolateSettings       ( const SVehExtrapolateSettings& settings ) { m_VehExtrapolateSettings = settings; }
     const SVehExtrapolateSettings&      GetVehExtrapolateSettings       ( void )                                    { return m_VehExtrapolateSettings; }
+    void                                SetMiscGameSettings             ( const SMiscGameSettings& settings )       { m_MiscGameSettings = settings; }
+    const SMiscGameSettings&            GetMiscGameSettings             ( void )                                    { return m_MiscGameSettings; }
     bool                                IsUsingAlternatePulseOrder      ( bool bAdvanceDelayCounter = false );
 
 private:
@@ -767,6 +775,7 @@ private:
     GUI_CALLBACK                        m_OnCancelLocalGameClick;
 
     SVehExtrapolateSettings             m_VehExtrapolateSettings;
+    SMiscGameSettings                   m_MiscGameSettings;
     uint                                m_uiAltPulseOrderCounter;
     SString                             m_strACInfo;
     std::set < uint >                   m_SentMessageIds;
