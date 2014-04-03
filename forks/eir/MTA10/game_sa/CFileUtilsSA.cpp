@@ -28,25 +28,93 @@
 =========================================================*/
 static char tempBuffer[512];
 
+inline void ConformBuffer( char *outBuf, const char *inBuf, int *useCount, bool allowTermination, char **outBufPtr = NULL, const char **inBufPtr = NULL )
+{
+    for (;;)
+    {
+        char c = *inBuf;
+
+        if ( !useCount )
+        {
+            if ( c == '\0' )
+                break;
+        }
+
+        if ( allowTermination )
+        {
+            if ( c == '\n' || c == '\0' )
+                break;
+        }
+
+        if ( c < ' ' || c == ',' )
+            c = ' ';
+
+        *outBuf = c;
+
+        outBuf++;
+        inBuf++;
+
+        if ( useCount )
+        {
+            if ( --( *useCount ) <= 0 )
+                break;
+        }
+    }
+
+    if ( outBufPtr != NULL )
+    {
+        *outBufPtr = outBuf;
+    }
+
+    if ( inBufPtr != NULL )
+    {
+        *inBufPtr = inBuf;
+    }
+}
+
+inline const char* GetConfigLineStartOffset( const char *buf )
+{
+    // Offset until we start at valid offset
+    for ( buf = tempBuffer; *buf && *buf <= ' '; buf++ );
+
+    return buf;
+}
+
 const char* FileMgr::GetConfigLine( CFile *file )
 {
     if ( !file->GetString( tempBuffer, sizeof( tempBuffer ) ) )
         return NULL;
     
-    char *buf = tempBuffer;
-
-    for ( buf = tempBuffer; *buf; buf++ )
-    {
-        const char c = *buf;
-
-        if ( c < ' ' || c == ',' )
-            *buf = ' ';
-    }
+    ConformBuffer( tempBuffer, tempBuffer, NULL, false );
     
-    // Offset until we start at valid offset
-    for ( buf = tempBuffer; *buf && *buf <= ' '; buf++ );
+    return GetConfigLineStartOffset( tempBuffer );
+}
 
-    return buf;
+/*=========================================================
+    FileMgr::GetConfigLineFromBuffer
+
+    Arguments:
+        buf - pointer to buffer pointer
+        bufSize - pointer to remaining buffer size
+    Purpose:
+        Reads a line from a buffer that is limited by a
+        character count and returns the starting point of
+        the config line.
+    Binary offsets:
+        (1.0 US and 1.0 EU): 0x00536FE0
+=========================================================*/
+const char* FileMgr::GetConfigLineFromBuffer( const char **buf, int *bufSize )
+{
+    if ( *buf == NULL || *bufSize == NULL )
+        return NULL;
+
+    char *outBufPtr = tempBuffer;
+
+    ConformBuffer( outBufPtr, *buf, bufSize, true, &outBufPtr, buf );
+
+    *outBufPtr = '\0';
+
+    return GetConfigLineStartOffset( tempBuffer );
 }
 
 static CFileTranslator *curDirTranslator = NULL;

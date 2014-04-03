@@ -12,12 +12,20 @@
 
 #include "StdInc.h"
 
+CDummySAInterface::CDummySAInterface( void )
+{
+    nType = ENTITY_TYPE_DUMMY;
+
+    // Overwrite vtbl
+    *(DWORD**)this = (DWORD*)0x008638C0;
+}
+
 void* CDummySAInterface::operator new( size_t )
 {
-    return (*ppDummyPool)->Allocate();
+    return Pools::GetDummyPool()->Allocate();
 }
 
 void CDummySAInterface::operator delete( void *ptr )
 {
-    (*ppDummyPool)->Free( (CDummySAInterface*)ptr );
+    Pools::GetDummyPool()->Free( (CDummySAInterface*)ptr );
 }

@@ -55,7 +55,8 @@ public:
     };
 #endif
 
-    static void ToMatrix(const CQuat& q, CMatrix& m){
+    template <typename matrixType>
+    static void ToMatrix(const CQuat& q, matrixType& m){
         float xx = q.x * q.x;
         float xy = q.x * q.y;
         float xz = q.x * q.z;
@@ -127,7 +128,7 @@ public:
         qm.y = (qa.y * ratioA + qb.y * ratioB);
         qm.z = (qa.z * ratioA + qb.z * ratioB);
     };
-private:
+
     float x, y, z, w;
 };
 

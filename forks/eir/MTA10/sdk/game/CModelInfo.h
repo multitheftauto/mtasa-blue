@@ -61,6 +61,38 @@ struct CBounds2D
         return CBounds2D( m_minX - subtract, subtract + m_maxY, subtract + m_maxX, m_minY - subtract ).IsInside( pos );
     }
 
+    inline void AddBounds( const CBounds2D& bounds )
+    {
+        if ( bounds.m_minX < m_minX )
+        {
+            m_minX = bounds.m_minX;
+        }
+
+        if ( bounds.m_maxX > m_maxX )
+        {
+            m_maxX = bounds.m_maxX;
+        }
+
+        if ( bounds.m_minY < m_minY )
+        {
+            m_minY = bounds.m_minY;
+        }
+
+        if ( bounds.m_maxY > m_maxY )
+        {
+            m_maxY = bounds.m_maxY;
+        }
+    }
+
+    inline void ExtendBy( float extendBy )
+    {
+        m_minX -= extendBy;
+        m_maxX += extendBy;
+        
+        m_minY -= extendBy;
+        m_maxY += extendBy;
+    }
+
     // R*: fuck yea, let us confuse dem pplz by switching things 'round, and not using vectors.
     float m_minX, m_maxY;
     float m_maxX, m_minY;

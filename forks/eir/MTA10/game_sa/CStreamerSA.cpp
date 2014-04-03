@@ -127,9 +127,8 @@ namespace Streamer
                 return false;
         }
 
-        // The_GTA: this appears to be a hack/bugfix by R*, since entities
-        // could lose their RenderWare objects while they are still loaded.
-        // Does not make sense to me if the system should be without limits.
+        // If the entity lacks RenderWare data and the model can provide
+        // it with some, the entity should grab RenderWare data here.
         if ( model->pRwObject && !entity->GetRwObject() )
             entity->CreateRwObject();
 

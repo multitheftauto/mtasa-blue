@@ -21,6 +21,58 @@ extern CGameSA * pGame;
 unsigned long CEntitySA::FUNC_CClumpModelInfo__GetFrameFromId;
 unsigned long CEntitySA::FUNC_RwFrameGetLTM;
 
+CEntitySAInterface::CEntitySAInterface( void )
+{
+    // Overwrite vtbl
+    *(DWORD**)this = (DWORD*)0x00863928;
+
+    nStatus = 4;
+    m_entityFlags = ENTITY_VISIBLE | ENTITY_BACKFACECULL;
+
+    m_nScanCode = 0;
+
+    m_nModelIndex = -1;
+    m_pRwObject = NULL;
+
+    m_iplIndex = 0;
+    m_areaCode = 0;
+
+    RandomSeed = rand();
+
+    pReferences = NULL;
+    m_streamingRef = NULL;
+    
+    numLodChildren = 0;
+    numLodChildrenRendered = 0;
+    m_pLod = NULL;
+}
+
+// Implement some virtual stuff, so we can construct entities.
+// The compiler complains otherwise.
+// We are not going to use these functions anyway.
+void __thiscall CEntitySAInterface::AddRect( CBounds2D bounds )                         {}
+bool __thiscall CEntitySAInterface::AddToWorld( void )                                  { return false; }
+void __thiscall CEntitySAInterface::RemoveFromWorld( void )                             {}
+void __thiscall CEntitySAInterface::SetStatic( bool enabled )                           {}
+void __thiscall CEntitySAInterface::SetModelIndex( modelId_t id )                       {}
+void __thiscall CEntitySAInterface::SetModelIndexNoCreate( modelId_t id )               {}
+void __thiscall CEntitySAInterface::CreateRwObject( void )                              {}
+void __thiscall CEntitySAInterface::DeleteRwObject( void )                              {}
+const CBounds2D& __thiscall CEntitySAInterface::GetBoundingBox( CBounds2D& bounds )     { return bounds; }
+void __thiscall CEntitySAInterface::ProcessControl( void )                              {}
+void __thiscall CEntitySAInterface::ProcessCollision( void )                            {}
+void __thiscall CEntitySAInterface::ProcessShift( void )                                {}
+bool __thiscall CEntitySAInterface::TestCollision( void )                               { return false; }
+void __thiscall CEntitySAInterface::Teleport( float x, float y, float z, int unk )      {}
+void __thiscall CEntitySAInterface::PreFrame( void )                                    {}
+bool __thiscall CEntitySAInterface::Frame( void )                                       { return true; }
+void __thiscall CEntitySAInterface::PreRender( void )                                   {}
+void __thiscall CEntitySAInterface::Render( void )                                      {}
+unsigned char __thiscall CEntitySAInterface::SetupLighting( void )                      { return 0; }
+void __thiscall CEntitySAInterface::RemoveLighting( unsigned char id )                  {}
+void __thiscall CEntitySAInterface::Invalidate( void )                                  {}
+
+
 void CEntitySAInterface::GetPosition( CVector& pos ) const
 {
     pos = Placeable.GetPosition();

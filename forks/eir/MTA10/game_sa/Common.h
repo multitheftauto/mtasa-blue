@@ -196,6 +196,35 @@ public:
     unsigned int    m_count;
 };
 
+// Generic range specifier.
+template <typename rangeNumberType>
+struct ValueRange
+{
+    inline ValueRange( void )
+    {
+        rangeNumberType max = std::numeric_limits <rangeNumberType>::max();
+
+        start = max;
+        end = -max - 1;
+    }
+
+    inline bool IsEmpty( void ) const
+    {
+        return start > end;
+    }
+
+    inline void Add( rangeNumberType num )
+    {
+        if ( num < start )
+            start = num;
+
+        if ( num > end )
+            end = num;
+    }
+
+    rangeNumberType start, end;
+};
+
 // High precision math wrap.
 // Use it if you are encountering floating point precision issues.
 // This wrap is used in timing critical code.
@@ -215,6 +244,8 @@ struct HighPrecisionMathWrap
         _controlfp( _oldFPUVal, _MCW_PC );
     }
 };
+
+#include <limits>
 
 #undef DEBUG_LOG
 #ifdef DEBUG_LOG

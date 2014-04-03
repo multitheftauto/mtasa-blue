@@ -14,6 +14,11 @@
 #define _IPL_SECTOR_STREAMING_
 
 #define IPL_SECTOR_CLOSEN_MOD           (-140.0f)
+#define IPL_SECTOR_FAR_LOD              (150.0f)
+
+// Streaming utilities.
+bool __cdecl ReadIPLSectorGeneral( unsigned char iplId, const char *buf, int size );
+bool __cdecl ReadIPLSectorBounds( unsigned char iplId, const char *buf, int size );
 
 // Module initialization.
 void StreamingIPL_Init( void );
@@ -23,16 +28,48 @@ struct CIPLSectorManagerSA
 {
     void Init( void )
     {
-        m_unkPtr = NULL;
-        m_count = 0;
+        m_lodInstanceArray = NULL;
+        m_numberOfIPLFiles = 0;
     }
 
     void Shutdown( void )
     {
-        // Delete some stuff.
-        // That is, call the GTA:SA memory free on it.
-        for ( unsigned int n = 0; n < m_count; n++ )
-            ((void (__cdecl*)( void* ))0x008213AE)( m_unkData[n] );
+        // Deallocate the memory of the IPL instance array.
+        for ( int n = 0; n < m_numberOfIPLFiles; n++ )
+        {
+            delete m_iplInstanceArray[n];
+        }
+    }
+
+    // Binary offsets: (1.0 US and 1.0 EU): 0x00404780
+    int AllocateIPLInstanceArray( unsigned int count )
+    {
+        // Bugfix: Make sure we can support that many IPL files.
+        if ( m_numberOfIPLFiles == 40 )
+            return -1;
+
+        m_iplInstanceArray[ m_numberOfIPLFiles++ ] = new CEntitySAInterface* [ count ];
+
+        return m_numberOfIPLFiles - 1;
+    }
+
+    // Binary offsets: (1.0 US and 1.0 EU): 0x004047B0
+    CEntitySAInterface** GetIPLInstanceArray( int index )
+    {
+        if ( index >= 0 && index < m_numberOfIPLFiles )
+        {
+            return m_iplInstanceArray[ index ];
+        }
+
+        return NULL;
+    }
+    
+    void RegisterLODInstance( CEntitySAInterface *lodEntity )
+    {
+        if ( m_lodInstanceArray == NULL )
+            return;
+
+        *( m_lodInstanceArray++ ) = lodEntity;
     }
 
     // Methods used by the sectorizer.
@@ -116,6 +153,8 @@ struct CIPLSectorManagerSA
         return DATA_IPL_BLOCK + index;
     }
 
+    bool LoadInstance( CIPLFileSA *iplFile, unsigned int iplId, const char *buf, size_t bufSize );
+
     struct ObjectSectorUnload
     {
         ObjectSectorUnload( unsigned int iplIndex ) : m_iplIndex( iplIndex )
@@ -144,7 +183,7 @@ struct CIPLSectorManagerSA
         iplFile->m_isLoaded = false;
 
         // Loop through all buildings.
-        for ( int n = iplFile->m_buildingRangeStart; n <= iplFile->m_buildingRangeEnd; n++ )
+        for ( int n = iplFile->m_buildingRange.start; n <= iplFile->m_buildingRange.end; n++ )
         {
             CBuildingSAInterface *building = (*ppBuildingPool)->Get( n );
 
@@ -160,7 +199,7 @@ struct CIPLSectorManagerSA
         (*ppObjectPool)->ForAllActiveEntries( ObjectSectorUnload( index ), 0 );
 
         // Loop through the dummies.
-        for ( int n = iplFile->m_dummyRangeStart; n <= iplFile->m_dummyRangeEnd; n++ )
+        for ( int n = iplFile->m_dummyRange.start; n <= iplFile->m_dummyRange.end; n++ )
         {
             CDummySAInterface *dummy = (*ppDummyPool)->Get( n );
 
@@ -176,12 +215,12 @@ struct CIPLSectorManagerSA
         ((void (__cdecl*)( unsigned char iplIndex ))0x006F3240)( index );
     }
 
-    unsigned int    m_unused;       // actually m_loadAreaId in GTA:SA memory
-    void**          m_unkPtr;
-    unsigned int    m_count;
-    unsigned int    m_unused2;
+    unsigned int            m_unused;               // actually m_loadAreaId in GTA:SA memory
+    CEntitySAInterface**    m_lodInstanceArray;     // if not NULL, will be written with LOD instances of loading sector.
+    int                     m_numberOfIPLFiles;
+    unsigned int            m_unused2;
 
-    void*           m_unkData[40];
+    CEntitySAInterface**    m_iplInstanceArray[40]; // entry is allocated for every IPL file that needs it
 };
 
 typedef Sectorizer <CIPLFileSA, MAX_IPL, CIPLSectorManagerSA> IPLEnv_t;

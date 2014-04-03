@@ -16,6 +16,9 @@
 // Streaming utilities
 void __cdecl RegisterCOLLibraryModel( unsigned short collId, unsigned short modelId );
 
+bool __cdecl ReadCOLLibraryGeneral( const char *buf, size_t size, unsigned char collId );
+bool __cdecl ReadCOLLibraryBounds( const char *buf, size_t size, unsigned char collId );
+
 // Used by streaming.
 bool __cdecl LoadCOLLibrary( unsigned char collId, const char *buf, size_t size );
 void __cdecl FreeCOLLibrary( unsigned char collId );
@@ -99,12 +102,30 @@ struct CColSectorManagerSA
         pos[1] += velocity[1] * 20.0f;
     }
 
+    bool LoadInstance( CColFileSA *colFile, unsigned int collId, const char *buf, size_t bufSize )
+    {
+        bool success;
+
+        // If the library was previously loaded and knows its regions, call ReadCOLLibaryBounds.
+        // Otherwise we perform a global replacement (ReadCOLLibraryGeneral), to cache the id region.
+        if ( colFile->m_range.IsEmpty() )
+            success = ReadCOLLibraryGeneral( buf, bufSize, collId );
+        else
+            success = ReadCOLLibraryBounds( buf, bufSize, collId );
+
+        // Mark that the library is ready for interaction!
+        if ( success )
+            colFile->m_loaded = true;
+
+        return success;
+    }
+
     void UnloadInstance( CColFileSA *colFile, unsigned int collId )
     {
         // Mark this COL library as unloaded.
         colFile->m_loaded = false;
 
-        for ( short n = colFile->m_rangeStart; n <= colFile->m_rangeEnd; n++ )
+        for ( short n = colFile->m_range.start; n <= colFile->m_range.end; n++ )
         {
             CBaseModelInfoSAInterface *info = ppModelInfo[n];
 

@@ -87,7 +87,7 @@ namespace Streamer
 
         if ( doVehicles || doPeds || doObjects )
         {
-            // Now for the dynamic entities entities.
+            // Now for the dynamic entities.
             // ccw has asked whether they are big buildings/he indicated toward it.
             // These are game entitites that can move around, hence they have less sectors to switch around on.
             for ( unsigned int n = 0; n < NUM_StreamDynamicSectorRows * NUM_StreamDynamicSectorCols; n++ )

@@ -147,8 +147,6 @@ public:
         m_isProcedural = false;
         m_isInterior = false;
 
-        m_rangeStart = 0x7FFF;
-        m_rangeEnd = -0;
         m_refs = 0;
 
         // Do not store the name, but check it for properties.
@@ -182,6 +180,9 @@ public:
     void* operator new ( size_t );
     void operator delete ( void *ptr );
 
+    // Utilities.
+    void __thiscall ExtendBounds( const CBounds2D& bounds );
+
     // Sectorizer dependencies.
     inline bool     IsSectorFlagged( void ) const           { return m_refs > 0 || m_sectorLoad; }
     inline void     FlagSector( bool flagged )              { m_sectorLoad = flagged; }
@@ -194,8 +195,9 @@ public:
 
     BYTE                            m_pad[18];          // 16
 
-    short                           m_rangeStart;       // 34
-    short                           m_rangeEnd;         // 36
+    typedef ValueRange <short> indexRange_t;
+
+    indexRange_t                    m_range;            // 34
     unsigned short                  m_refs;             // 38
 
     bool                            m_loaded;           // 40

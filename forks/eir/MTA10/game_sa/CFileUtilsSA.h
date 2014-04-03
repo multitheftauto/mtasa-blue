@@ -16,6 +16,7 @@
 namespace FileMgr
 {
     const char*         GetConfigLine           ( CFile *file );
+    const char*         GetConfigLineFromBuffer ( const char **buf, int *bufSize );
 
     void                InitHooks               ( void );
     void                ShutdownHooks           ( void );

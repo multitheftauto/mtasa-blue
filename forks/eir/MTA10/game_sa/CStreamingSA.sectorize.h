@@ -139,7 +139,11 @@ struct Sectorizer
 
         // Loop through all allocated sectors and unregister them.
         // This time, also deallocate the "generic" dummy item (index 0).
-        m_pool->ForAllActiveEntries( SectorDestructionLoop( this ), 0 );
+        {
+            SectorDestructionLoop loop( this );
+
+            m_pool->ForAllActiveEntries( loop, 0 );
+        }
 
         if ( m_pool )
         {
@@ -166,8 +170,7 @@ struct Sectorizer
 
         Purpose:
             Called at shutdown if desired by the management env.
-            Unloads every sector that is marked not marked as
-            persisent.
+            Unloads every sector that is not marked as persisent.
         Known deriviates:
             (1.0 US and 1.0 EU): 0x00405720 (IPL)
     =========================================================*/
@@ -175,17 +178,19 @@ struct Sectorizer
     {
         void __forceinline OnEntry( sectorType *sector, unsigned int index )
         {
-            modelId_t model = managerType::GetModelFromPoolEntity( index );
-            CModelLoadInfoSA *info = Streaming::GetModelLoadInfo( model );
+            modelId_t model = managerType::GetModelForPoolEntity( index );
+            CModelLoadInfoSA& info = Streaming::GetModelLoadInfo( model );
 
-            if ( !IS_ANY_FLAG( info->m_flags, 0x06 ) )
+            if ( !IS_ANY_FLAG( info.m_flags, 0x06 ) )
                 Streaming::FreeModel( model );
         }
     };
 
     void UnloadNonPersistentSectors( void )
     {
-        
+        SectorUnloadNonPersistent loop;
+
+        m_pool->ForAllActiveEntries( loop, 1 );
     }
 
     /*=========================================================
@@ -237,6 +242,25 @@ struct Sectorizer
 
         // Deallocate the instance.
         m_pool->Free( index );
+    }
+
+    /*=========================================================
+        Sectorizer::LoadSector
+
+        Arguments:
+            index - pool index of the instance
+        Purpose:
+            Allocates sector data from a resource buffer. If loaded
+            successfully, the sector is marked as loaded.
+        Known deriviates:
+            (1.0 US and 1.0 EU): 0x00406080 (IPL)
+            (1.0 US and 1.0 EU): 0x004106D0 (COL)
+    =========================================================*/
+    bool LoadSector( unsigned int index, const char *buf, size_t bufSize )
+    {
+        sectorType *sector = m_pool->Get( index );
+
+        return m_sectorMan.LoadInstance( sector, index, buf, bufSize );
     }
 
     /*=========================================================

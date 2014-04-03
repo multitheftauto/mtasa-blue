@@ -84,7 +84,7 @@ class CBaseModelInfoSAInterface abstract : public CBaseModelInfoSA
 {
 public:
     CBaseModelInfoSAInterface                               ( void );
-    ~CBaseModelInfoSAInterface();
+    ~CBaseModelInfoSAInterface                              ( void );
 
     CAtomicModelInfoSA*         GetAtomicModelInfo          ( void );
     CDamageAtomicModelInfoSA*   GetDamageAtomicModelInfo    ( void );
@@ -155,7 +155,7 @@ public:
             unsigned char           bDrawLast: 1;
             unsigned char           bDoWeOwnTheColModel: 1;
 
-            unsigned char           dwUnknownFlag25: 1;         // +19
+            unsigned char           bCollisionless: 1;          // +19
             unsigned char           dwUnknownFlag26: 1;
             unsigned char           dwUnknownFlag27: 1;
             unsigned char           bSwaysInWind: 1;

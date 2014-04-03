@@ -113,6 +113,22 @@ CColDataSA::CColDataSA( void )
 }
 
 /*=========================================================
+    CColFileSA::ExtendBounds
+
+    Arguments:
+        bounds - the bounding box to add to the collision sector
+    Purpose:
+        Includes the given bounding box into this collision
+        sector by extending its m_bounds member.
+    Binary offsets:
+        (1.0 US and 1.0 EU): 0x00404200
+=========================================================*/
+void __thiscall CColFileSA::ExtendBounds( const CBounds2D& bounds )
+{
+    m_bounds.AddBounds( bounds );
+}
+
+/*=========================================================
     Collision_Preload
 
     Purpose:
@@ -162,10 +178,7 @@ struct colSectorize
         {
             // Expand the colFile sector.
             // May be debug code or a quick bugfix or a performance improvement.
-            colFile->m_bounds.m_minX -= 120.0f;
-            colFile->m_bounds.m_maxX += 120.0f;
-            colFile->m_bounds.m_minY -= 120.0f;
-            colFile->m_bounds.m_maxY += 120.0f;
+            colFile->m_bounds.ExtendBy( 120.0f );
 
             // Write it into our cache.
             Cache_StoreColFile( *colFile );

@@ -32,13 +32,9 @@ unsigned int CColSectorManagerSA::m_loadAreaId = 0;
 =========================================================*/
 void __cdecl RegisterCOLLibraryModel( unsigned short collId, unsigned short modelId )
 {
-    CColFileSA *col = Streaming::GetCOLEnvironment().m_pool->Get( collId );
+    CColFileSA *colFile = Streaming::GetCOLEnvironment().m_pool->Get( collId );
 
-    if ( (short)modelId < col->m_rangeStart )
-        col->m_rangeStart = (short)modelId;
-
-    if ( (short)modelId > col->m_rangeEnd )
-        col->m_rangeEnd = (short)modelId;
+    colFile->m_range.Add( (short)modelId );
 }
 
 /*=========================================================
@@ -58,7 +54,7 @@ void __cdecl RegisterCOLLibraryModel( unsigned short collId, unsigned short mode
     Update:
         Added support for version 4 collision.
 =========================================================*/
-static bool __cdecl ReadCOLLibraryGeneral( const char *buf, size_t size, unsigned char collId )
+bool __cdecl ReadCOLLibraryGeneral( const char *buf, size_t size, unsigned char collId )
 {
     CBaseModelInfoSAInterface *info = NULL;
 
@@ -149,7 +145,7 @@ skip:
     Binary offsets:
         (1.0 US and 1.0 EU): 0x00538440
 =========================================================*/
-static bool __cdecl ReadCOLLibraryBounds( const char *buf, size_t size, unsigned char collId )
+bool __cdecl ReadCOLLibraryBounds( const char *buf, size_t size, unsigned char collId )
 {
     CBaseModelInfoSAInterface *info = NULL;
 
@@ -176,7 +172,7 @@ static bool __cdecl ReadCOLLibraryBounds( const char *buf, size_t size, unsigned
         {
             CColFileSA *colFile = Streaming::GetCOLEnvironment().m_pool->Get( collId );
 
-            info = Streaming::GetModelInfoByName( header.name, (unsigned short)colFile->m_rangeStart, (unsigned short)colFile->m_rangeEnd, &modelId );
+            info = Streaming::GetModelInfoByName( header.name, (unsigned short)colFile->m_range.start, (unsigned short)colFile->m_range.end, &modelId );
         }
 
         if ( info )
@@ -279,21 +275,7 @@ static bool __cdecl ReadCOLLibraryBounds( const char *buf, size_t size, unsigned
 =========================================================*/
 bool __cdecl LoadCOLLibrary( unsigned char collId, const char *buf, size_t size )
 {
-    CColFileSA *col = Streaming::GetCOLEnvironment().m_pool->Get( collId );
-    bool success;
-
-    // If the library was previously loaded and knows its regions, call ReadCOLLibaryBounds.
-    // Otherwise we perform a global replacement (ReadCOLLibraryGeneral), to cache the id region.
-    if ( col->m_rangeStart > col->m_rangeEnd )
-        success = ReadCOLLibraryGeneral( buf, size, collId );
-    else
-        success = ReadCOLLibraryBounds( buf, size, collId );
-
-    // Mark that the library is ready for interaction!
-    if ( success )
-        col->m_loaded = true;
-
-    return success;
+    return Streaming::GetCOLEnvironment().LoadSector( collId, buf, size );
 }
 
 /*=========================================================

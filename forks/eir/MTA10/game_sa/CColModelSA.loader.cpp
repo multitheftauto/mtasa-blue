@@ -684,14 +684,14 @@ CColModelSAInterface* CColModelSAInterface::Clone( void )
         bool hasFaceGroups = srcColData->hasFaceGroups;
 
         // Allocate depending on allocation method.
-        size_t sphereArraySize = sizeof( CColSphereSA ) * numSpheres;
-        size_t boxArraySize = sizeof( CColBoxSA ) * numBoxes;
-        size_t suspensionLineArraySize = sizeof( CColSuspensionLineSA ) * numWheels;
-        size_t vertexArraySize = sizeof( CColVertexSA ) * numVertices;
-        size_t triangleArraySize = sizeof( CColTriangleSA ) * numTriangles;
+        size_t sphereArraySize =                sizeof( CColSphereSA ) * numSpheres;
+        size_t boxArraySize =                   sizeof( CColBoxSA ) * numBoxes;
+        size_t suspensionLineArraySize =        sizeof( CColSuspensionLineSA ) * numWheels;
+        size_t vertexArraySize =                sizeof( CColVertexSA ) * numVertices;
+        size_t triangleArraySize =              sizeof( CColTriangleSA ) * numTriangles;
 
-        size_t shadowMeshVerticeArraySize = sizeof( CColVertexSA ) * numShadowMeshVertices;
-        size_t shadowMeshFaceArraySize = sizeof( CColTriangleSA ) * numShadowMeshFaces;
+        size_t shadowMeshVerticeArraySize =     sizeof( CColVertexSA ) * numShadowMeshVertices;
+        size_t shadowMeshFaceArraySize =        sizeof( CColTriangleSA ) * numShadowMeshFaces;
 
         if ( this->m_isColDataSegmented )
         {

@@ -137,27 +137,29 @@ struct CRect {
 class CEntitySAInterface : public CPlaceableSAInterface
 {
 public:
-    virtual void __thiscall         AddRect( CRect rect ) = 0;                              // 4
-    virtual bool __thiscall         AddToWorld() = 0;                                       // 8
-    virtual void __thiscall         RemoveFromWorld() = 0;                                  // 12
-    virtual void __thiscall         SetStatic( bool enabled ) = 0;                          // 16
-    virtual void __thiscall         SetModelIndex( unsigned short id );                     // 20
-    virtual void __thiscall         SetModelIndexNoCreate( unsigned short id ) = 0;         // 24
-    virtual RwObject* __thiscall    CreateRwObject() = 0;                                   // 28
-    virtual void __thiscall         DeleteRwObject() = 0;                                   // 32
-    virtual void __thiscall         GetBoundingBox( CBoundingBox box ) = 0;                 // 36
-    virtual void __thiscall         ProcessControl() = 0;                                   // 40
-    virtual void __thiscall         ProcessCollision() = 0;                                 // 44
-    virtual void __thiscall         ProcessShift() = 0;                                     // 48
-    virtual bool __thiscall         TestCollision() = 0;                                    // 52
-    virtual void __thiscall         Teleport( float x, float y, float z, int unk ) = 0;     // 56
-    virtual void __thiscall         PreFrame() = 0;                                         // 60
-    virtual bool __thiscall         Frame() = 0;                                            // 64
-    virtual void __thiscall         PreRender() = 0;                                        // 68
-    virtual void __thiscall         Render() = 0;                                           // 72
-    virtual unsigned char __thiscall    SetupLighting() = 0;                                // 76
-    virtual void __thiscall         RemoveLighting( unsigned char id ) = 0;                 // 80
-    virtual void __thiscall         Invalidate() = 0;                                       // 84
+    CEntitySAInterface( void );
+
+    virtual void __thiscall                 AddRect( CBounds2D rect );                              // 4
+    virtual bool __thiscall                 AddToWorld();                                           // 8
+    virtual void __thiscall                 RemoveFromWorld();                                      // 12
+    virtual void __thiscall                 SetStatic( bool enabled );                              // 16
+    virtual void __thiscall                 SetModelIndex( modelId_t id );                          // 20
+    virtual void __thiscall                 SetModelIndexNoCreate( modelId_t id );                  // 24
+    virtual void __thiscall                 CreateRwObject();                                       // 28
+    virtual void __thiscall                 DeleteRwObject();                                       // 32
+    virtual const CBounds2D& __thiscall     GetBoundingBox( CBounds2D& box );                       // 36
+    virtual void __thiscall                 ProcessControl();                                       // 40
+    virtual void __thiscall                 ProcessCollision();                                     // 44
+    virtual void __thiscall                 ProcessShift();                                         // 48
+    virtual bool __thiscall                 TestCollision();                                        // 52
+    virtual void __thiscall                 Teleport( float x, float y, float z, int unk );         // 56
+    virtual void __thiscall                 PreFrame();                                             // 60
+    virtual bool __thiscall                 Frame();                                                // 64
+    virtual void __thiscall                 PreRender();                                            // 68
+    virtual void __thiscall                 Render();                                               // 72
+    virtual unsigned char __thiscall        SetupLighting();                                        // 76
+    virtual void __thiscall                 RemoveLighting( unsigned char id );                     // 80
+    virtual void __thiscall                 Invalidate();                                           // 84
 
     unsigned char __thiscall        _SetupLighting          ( void );
     void __thiscall                 _RemoveLighting         ( unsigned char id );
@@ -274,7 +276,11 @@ public:
     BYTE m_areaCode;            // used to define what objects are visible at this point +47
     
     // LOD shit
-    CEntitySAInterface * m_pLod; // 48
+    union
+    {
+        CEntitySAInterface * m_pLod;    // 48
+        int m_iLodIndex;                // used by IPL loader
+    };
     // num child higher level LODs
     BYTE numLodChildren; // 52
     // num child higher level LODs that have been rendered

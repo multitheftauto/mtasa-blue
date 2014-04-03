@@ -12,6 +12,31 @@
 
 #include "StdInc.h"
 
+CBuildingSAInterface::CBuildingSAInterface( void )
+{
+    nType = ENTITY_TYPE_BUILDING;
+    bUsesCollision = true;
+
+    // overwrite vtbl
+    *(DWORD**)this = (DWORD*)0x008585C8;
+}
+
+void* CBuildingSAInterface::operator new ( size_t )
+{
+    return Pools::GetBuildingPool()->Allocate();
+}
+
+void CBuildingSAInterface::operator delete ( void *ptr )
+{
+    Pools::GetBuildingPool()->Free( (CBuildingSAInterface*)ptr );
+}
+
+CNoCOLBuildingSAInterface::CNoCOLBuildingSAInterface( void )
+{
+    // overwrite vtbl
+    *(DWORD**)this = (DWORD*)0x008639B0;
+}
+
 CBuildingSA::CBuildingSA(CBuildingSAInterface * objectInterface)
 {
     DEBUG_TRACE("CBuildingSA::CBuildingSA(CBuildingSAInterface * objectInterface)");

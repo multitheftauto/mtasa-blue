@@ -21,8 +21,20 @@
 
 class CBuildingSAInterface : public CEntitySAInterface
 {
+public:
+    CBuildingSAInterface( void );
+
+    void* operator new ( size_t );
+    void operator delete ( void *ptr );
 };
 C_ASSERT(sizeof(CBuildingSAInterface) == sizeof(CEntitySAInterface));
+
+class CNoCOLBuildingSAInterface : public CBuildingSAInterface
+{
+public:
+    CNoCOLBuildingSAInterface( void );
+};
+C_ASSERT(sizeof(CNoCOLBuildingSAInterface) == sizeof(CBuildingSAInterface));
 
 class CBuildingSA : public virtual CBuilding, public virtual CEntitySA
 {

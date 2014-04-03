@@ -55,6 +55,14 @@ public:
                 GetMatrixFromHeading( out );
         }
 
+        inline void                 SetHeading                  ( float fHeading )
+        {
+            if ( CTransformSAInterface *trans = matrix )
+                trans->FromHeading( fHeading );
+            else
+                m_transform.m_heading = fHeading;
+        }
+
         inline float                GetHeading                  ( void ) const
         {
             if ( CTransformSAInterface *trans = matrix )
