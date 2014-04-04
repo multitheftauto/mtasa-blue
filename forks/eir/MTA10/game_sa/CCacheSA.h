@@ -19,7 +19,7 @@ void __cdecl Cache_StoreCollision( unsigned int id, CColModelSAInterface *col );
 void __cdecl Cache_WriteCollision( void );
 void __cdecl Cache_RestoreColFile( CColFileSA *colFile );
 void __cdecl Cache_StoreColFile( CColFileSA colFile );
-void __cdecl Cache_RestoreIPLFile( CIPLFileSA& iplFile, unsigned int iplIndex );
+const CIPLFileSA& __cdecl Cache_RestoreIPLFile( CIPLFileSA& iplFile, unsigned int iplIndex );
 void __cdecl Cache_StoreIPLFile( unsigned int iplIndex, CIPLFileSA iplFile );
 void __cdecl Cache_LoadCollision( void );
 void __cdecl Cache_IncrementBySector( CEntitySAInterface **buildingArray );

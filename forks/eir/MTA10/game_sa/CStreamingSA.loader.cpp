@@ -405,7 +405,6 @@ struct ModelLoadDispatch : public ModelCheckDispatch <false>
     __forceinline bool DoIPL( modelId_t id )
     {
         return Streaming::GetIPLEnvironment().LoadSector( id, (const char*)m_loadHandler.GetBuffer(), m_loadHandler.GetBufferSize() );
-        //return ((bool (__cdecl*)( modelId_t iplId, const void *data, size_t size ))0x00406080)( id, m_loadHandler.GetBuffer(), m_loadHandler.GetBufferSize() );
     }
 
     __forceinline bool DoPathFind( modelId_t id )

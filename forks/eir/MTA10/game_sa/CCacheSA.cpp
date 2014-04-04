@@ -353,7 +353,7 @@ void __cdecl _Cache_Shutdown( void )
     cachedGameProperties.Shutdown();
     cachedCollisionArray.Shutdown();
     cachedIPLInstanceIndexTrim.Shutdown();
-    SafeDelete( cachedAreaEntryArray );
+    //SafeDelete( cachedAreaEntryArray );
     cachedColFiles.Shutdown();
 }
 
@@ -430,19 +430,23 @@ void __cdecl Cache_WriteCollision( void )
         // Get the model info the collision entry is pointing to.
         CBaseModelInfoSAInterface *model = ppModelInfo[colEntry.m_model];
 
-        // Allocate a new collision interface, which we populate.
-        CColModelSAInterface *colModel = new CColModelSAInterface;
-        colModel->m_bounds = colEntry.m_bounds;
-        colModel->m_colPoolIndex = colEntry.m_colFile;
-        colModel->m_isCollidable = colEntry.m_isCollidable;
+        // Crashfix: only load collision if the model exists.
+        if ( model )
+        {
+            // Allocate a new collision interface, which we populate.
+            CColModelSAInterface *colModel = new CColModelSAInterface;
+            colModel->m_bounds = colEntry.m_bounds;
+            colModel->m_colPoolIndex = colEntry.m_colFile;
+            colModel->m_isCollidable = colEntry.m_isCollidable;
 
-        // Update the collision of the model.
-        // Note that we assume that no collision was loaded prior to this.
-        model->SetColModel( colModel, true );
+            // Update the collision of the model.
+            // Note that we assume that no collision was loaded prior to this.
+            model->SetColModel( colModel, true );
 
-        // Update the collision boundaries, which is faster than
-        // scanning the whole collision library.
-        RegisterCOLLibraryModel( colEntry.m_colFile, colEntry.m_model );
+            // Update the collision boundaries, which is faster than
+            // scanning the whole collision library.
+            RegisterCOLLibraryModel( colEntry.m_colFile, colEntry.m_model );
+        }
     }
 }
 
@@ -504,12 +508,12 @@ void __cdecl Cache_StoreColFile( CColFileSA colFile )
     Binary offsets:
         (1.0 US and 1.0 EU): 0x005B2EF0
 =========================================================*/
-void __cdecl Cache_RestoreIPLFile( CIPLFileSA& iplFile, unsigned int iplIndex )
+const CIPLFileSA& __cdecl Cache_RestoreIPLFile( CIPLFileSA& iplFile, unsigned int iplIndex )
 {
     const cachedIPLFile& iplFileEntry = cachedIPLFiles[ iplIndex ];
 
     iplFile.m_bounds = iplFileEntry.m_bounds;
-    memcpy( iplFile.m_name, iplFileEntry.m_name, sizeof( iplFile.m_name ) );
+    memcpy( &iplFile.m_name[0], &iplFileEntry.m_name[0], sizeof( iplFile.m_name ) );
     iplFile.m_buildingRange.start = iplFileEntry.m_buildingRangeStart;
     iplFile.m_buildingRange.end = iplFileEntry.m_buildingRangeEnd;
     iplFile.m_dummyRange.start = iplFileEntry.m_dummyRangeStart;
@@ -522,6 +526,8 @@ void __cdecl Cache_RestoreIPLFile( CIPLFileSA& iplFile, unsigned int iplIndex )
     iplFile.m_terminateAtUnload = iplFileEntry.m_terminateAtUnload;
     iplFile.m_containsFarChunks = iplFileEntry.m_containsFarChunks;
     iplFile.m_pad = iplFileEntry.m_pad;
+
+    return iplFile;
 }
 
 /*=========================================================
@@ -542,7 +548,7 @@ void __cdecl Cache_StoreIPLFile( unsigned int iplIndex, CIPLFileSA iplFile )
     cachedIPLFile& iplFileEntry = cachedIPLFiles[ iplIndex ];
 
     iplFileEntry.m_bounds = iplFile.m_bounds;
-    memcpy( iplFileEntry.m_name, iplFile.m_name, sizeof( iplFileEntry.m_name ) );
+    memcpy( &iplFileEntry.m_name[0], &iplFile.m_name[0], sizeof( iplFileEntry.m_name ) );
     iplFileEntry.m_buildingRangeStart = iplFile.m_buildingRange.start;
     iplFileEntry.m_buildingRangeEnd = iplFile.m_buildingRange.end;
     iplFileEntry.m_dummyRangeStart = iplFile.m_dummyRange.start;
@@ -739,6 +745,7 @@ void Cache_Init( void )
     // Hook stuff.
     HookInstall( 0x005B31A0, (DWORD)_Cache_Init, 5 );
     HookInstall( 0x005B2AD0, (DWORD)_Cache_Shutdown, 5 );
+    HookInstall( 0x005B2AC0, (DWORD)Cache_IsWritingMode, 5 );
     HookInstall( 0x005B2C20, (DWORD)Cache_StoreCollision, 5 );
     HookInstall( 0x005B2CC0, (DWORD)Cache_WriteCollision, 5 );
     HookInstall( 0x005B2E60, (DWORD)Cache_RestoreColFile, 5 );

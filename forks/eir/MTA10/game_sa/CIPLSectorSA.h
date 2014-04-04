@@ -25,7 +25,7 @@ class CIPLFileSA    //size: 52 bytes
 public:
     CIPLFileSA( const char *name ) : m_bounds( MAX_REGION, -MAX_REGION, -MAX_REGION, MAX_REGION )
     {
-        m_iplId = 0xFFFF;
+        m_iplId = -1;
 
         m_isInterior = false;
         m_isLoaded = false;
@@ -35,8 +35,12 @@ public:
         m_terminateAtUnload = false;
         m_containsFarChunks = false;
 
+        // Otherwise we encounter loading trouble in cached mode.
+        assert( strlen( name ) < sizeof( m_name ) );
+
         // Store the .IPL filename in our field.
-        strcpy( m_name, name );
+        strncpy( m_name, name, 17 );
+        m_name[17] = '\0';
     }
 
     // Methods required by the sectorizer.
@@ -65,7 +69,7 @@ public:
     indexRange_t    m_buildingRange;        // 34, pool index range of building pool
     indexRange_t    m_dummyRange;           // 38, pool index range of dummy pool
 
-    unsigned short  m_iplId;                // 42
+    short           m_iplId;                // 42
 
     bool            m_isInterior;           // 44
     bool            m_isLoaded;             // 45

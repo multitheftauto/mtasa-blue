@@ -115,7 +115,7 @@ static int __cdecl AllocateIPLInstanceArray( unsigned int instanceCount )
         building entity pointers. Can return NULL if an invalid
         index has been passed to this function.
     Binary offsets:
-        (1.0 US and 1.0 EU): 0x00404780
+        (1.0 US and 1.0 EU): 0x004047B0
 =========================================================*/
 static CEntitySAInterface** __cdecl GetIPLInstanceArray( int instanceIndex )
 {
@@ -397,7 +397,7 @@ struct IPLContainerLoader
     AINLINE IPLContainerLoader( managerType& manager ) : m_manager( manager )
     { }
 
-    AINLINE void __cdecl RegisterInstance( CEntitySAInterface *entity, CEntitySAInterface **lodArray, CIPLFileSA *iplFile, unsigned char iplId )
+    void __cdecl RegisterInstance( CEntitySAInterface *entity, CEntitySAInterface **lodArray, CIPLFileSA *iplFile, unsigned char iplId )
     {
         entity->m_iplIndex = iplId;
 
@@ -425,7 +425,7 @@ struct IPLContainerLoader
         m_manager.OnRegisterInstance( entity, iplFile );
     }
     
-    AINLINE bool __cdecl LoadContainer( unsigned char iplId, const char *buf, int size )
+    bool __cdecl LoadContainer( unsigned char iplId, const char *buf, int size )
     {
         CIPLFileSA *iplFile = Streaming::GetIPLEnvironment().m_pool->Get( iplId );
 
@@ -709,6 +709,19 @@ static void __cdecl _IPL_FreeInstance( unsigned int iplIndex )
 }
 
 /*=========================================================
+    _IPL_Init
+
+    Purpose:
+        Initializes the IPL environment.
+    Binary offsets:
+        (1.0 US and 1.0 EU): 0x00405EC0
+=========================================================*/
+static void __cdecl _IPL_Init( void )
+{
+    Streaming::GetIPLEnvironment().Init();
+}
+
+/*=========================================================
     _IPL_Destroy
 
     Purpose:
@@ -732,6 +745,7 @@ void StreamingIPL_Init( void )
     HookInstall( 0x00405170, (DWORD)_StreamIPLSectors, 5 );
     HookInstall( 0x004053F0, (DWORD)_PrioritizeIPLStreaming, 5 );
     HookInstall( 0x00404B20, (DWORD)_IPL_FreeInstance, 5 );
+    HookInstall( 0x00405EC0, (DWORD)_IPL_Init, 5 );
     HookInstall( 0x00405FA0, (DWORD)_IPL_Destroy, 5 );
 }
 
