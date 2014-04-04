@@ -246,16 +246,25 @@ Streaming::streamingEntityReference_t* __cdecl Streaming::AddActiveEntity( CEnti
             // can only fail if no more heap memory available.
         }
 
-        // Last resort option.
-        if ( !ref )
+        // Last resort options.
+        // These ones are there to prevent malbehavior and crashes.
+        if ( !ref && !allowStreamingNodeStealing )
         {
             // If everything else failed, we must steal a streaming node.
             gcMan.ExecuteCustom( FreeStreamingEntity() );
 
             ref = gcMan.PushRender( &chainInfo );
-
-            assert( ref != NULL );
         }
+
+        // No other choice but to allocate from heap.
+        if ( !ref )
+        {
+            gcMan.AllocateNew();
+
+            ref = gcMan.PushRender( &chainInfo );
+        }
+
+        assert( ref != NULL );
     }
 
     return ref;
