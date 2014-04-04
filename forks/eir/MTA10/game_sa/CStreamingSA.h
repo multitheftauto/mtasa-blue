@@ -17,7 +17,7 @@
 #include <game/CStreaming.h>
 #include "Common.h"
 
-#define MAX_DEFAULT_STREAMING_ENTITIES      1000    // native limit set by R*
+#define MAX_DEFAULT_STREAMING_ENTITIES      2500    // increased to 2500 to match MTA:BLUE behavior
 
 #define DATA_TEXTURE_BLOCK      20000
 #define DATA_COLL_BLOCK         25000

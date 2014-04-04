@@ -353,7 +353,7 @@ void __cdecl _Cache_Shutdown( void )
     cachedGameProperties.Shutdown();
     cachedCollisionArray.Shutdown();
     cachedIPLInstanceIndexTrim.Shutdown();
-    //SafeDelete( cachedAreaEntryArray );
+    SafeDelete( cachedAreaEntryArray );
     cachedColFiles.Shutdown();
 }
 
