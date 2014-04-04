@@ -197,7 +197,7 @@ CEntitySAInterface* __cdecl CreateIPLBuilding( iplInstance_t *instance, const ch
     }
 
     if ( instance->quatRotation.x <= 0.05f && instance->quatRotation.y <= 0.05f &&
-         ( IS_ANY_FLAG( instance->flags, 0x200 ) || instance->quatRotation.x <= 0.0f || instance->quatRotation.y <= 0.0f ) )
+         ( IS_ANY_FLAG( instance->flags, 0x2 ) || instance->quatRotation.x <= 0.0f || instance->quatRotation.y <= 0.0f ) )
     {
         bool isFlipped = ( instance->quatRotation.z >= 0.0f );
 
@@ -209,11 +209,8 @@ CEntitySAInterface* __cdecl CreateIPLBuilding( iplInstance_t *instance, const ch
     }
     else
     {
-        // Invert the quat.
-        instance->quatRotation.x = -instance->quatRotation.x;
-        instance->quatRotation.y = -instance->quatRotation.y;
-        instance->quatRotation.z = -instance->quatRotation.z;
-
+        // MTA quat functions are superior!
+        // No invert required!
         building->AllocateMatrix();
 
         CTransformSAInterface*& trans = building->Placeable.matrix;

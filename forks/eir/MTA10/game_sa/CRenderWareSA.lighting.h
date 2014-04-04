@@ -64,6 +64,8 @@ struct nativeLightInfo  //size: 108 bytes
 template <typename dataType, unsigned int pulseCount, unsigned int allocFlags, typename arrayMan, typename countType>
 struct growableArray
 {
+    typedef dataType dataType_t;
+
     AINLINE growableArray( void )
     {
         data = NULL;
@@ -161,7 +163,7 @@ struct growableArray
 
     AINLINE dataType& ObtainItem( void )
     {
-        int obtainIndex = numActiveEntries;
+        countType obtainIndex = numActiveEntries;
 
         if ( obtainIndex >= sizeCount )
         {
