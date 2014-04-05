@@ -145,19 +145,19 @@ namespace SharedUtil
     void CMD5Hasher::Update (unsigned char *input, unsigned int input_length) {
     
         //CRYPT_START
-        unsigned long input_index, buffer_index;
-        unsigned long buffer_space;                // how much space is left in buffer
+        unsigned int  input_index, buffer_index;
+        unsigned int  buffer_space;                // how much space is left in buffer
     
         // Compute number of bytes mod 64
         buffer_index = (unsigned int)((m_count[0] >> 3) & 0x3F);
     
         // Update number of bits
-        if (  (m_count[0] += ((unsigned long) input_length << 3))<((unsigned long) input_length << 3) )
+        if ( (m_count[0] += ((unsigned int)input_length << 3))<((unsigned int)input_length << 3) )
         {
             m_count[1]++;
         }
     
-        m_count[1] += ((unsigned long)input_length >> 29);
+        m_count[1] += ((unsigned int)input_length >> 29);
     
     
         buffer_space = 64 - buffer_index;  // how much space is left in buffer
@@ -202,7 +202,7 @@ namespace SharedUtil
       Encode (bits, m_count, 8);
     
       // Pad out to 56 mod 64.
-      index = (unsigned long) ((m_count[0] >> 3) & 0x3f);
+      index = (unsigned int) ((m_count[0] >> 3) & 0x3f);
       padLen = (index < 56) ? (56 - index) : (120 - index);
       Update (PADDING, padLen);
     
@@ -219,7 +219,7 @@ namespace SharedUtil
     
     void CMD5Hasher::Transform ( unsigned char block [64] )
     {
-        unsigned long a = m_state[0], b = m_state[1], c = m_state[2], d = m_state[3], x[16];
+        unsigned int a = m_state[0], b = m_state[1], c = m_state[2], d = m_state[3], x[16];
     
         Decode (x, block, 64);
     
@@ -305,7 +305,7 @@ namespace SharedUtil
     }
     
     
-    void CMD5Hasher::Encode (unsigned char *output, unsigned long *input, unsigned long len)
+    void CMD5Hasher::Encode (unsigned char *output, unsigned int *input, unsigned long len)
     {
       unsigned int i, j;
     
@@ -318,71 +318,71 @@ namespace SharedUtil
     }
     
     
-    void CMD5Hasher::Decode (unsigned long *output, unsigned char *input, unsigned long len)
+    void CMD5Hasher::Decode (unsigned int *output, unsigned char *input, unsigned long len)
     {
-      unsigned int i, j;
-    
-      for (i = 0, j = 0; j < len; i++, j += 4)
-        output[i] = ((unsigned long)input[j]) | (((unsigned long)input[j+1]) << 8) |
-          (((unsigned long)input[j+2]) << 16) | (((unsigned long)input[j+3]) << 24);
+        unsigned int i, j;
+
+        for ( i = 0, j = 0; j < len; i++, j += 4 )
+            output[i] = ((unsigned int)input[j]) | (((unsigned int)input[j+1]) << 8) |
+            (((unsigned int)input[j+2]) << 16) | (((unsigned int)input[j+3]) << 24);
     }
-    
-    
-    inline unsigned long CMD5Hasher::RotateLeft (unsigned long x, unsigned long n )
+
+
+    inline unsigned int  CMD5Hasher::RotateLeft ( unsigned int  x, unsigned int  n )
     {
-      return (x << n) | (x >> (32-n));
+        return (x << n) | (x >> (32 - n));
     }
-    
-    
-    inline unsigned long CMD5Hasher::F ( unsigned long x, unsigned long y, unsigned long z )
+
+
+    inline unsigned int  CMD5Hasher::F ( unsigned int  x, unsigned int  y, unsigned int  z )
     {
         return (x & y) | (~x & z);
     }
-    
-    
-    inline unsigned long CMD5Hasher::G ( unsigned long x, unsigned long y, unsigned long z )
+
+
+    inline unsigned int  CMD5Hasher::G ( unsigned int  x, unsigned int  y, unsigned int  z )
     {
         return (x & z) | (y & ~z);
     }
-    
-    
-    inline unsigned long CMD5Hasher::H ( unsigned long x, unsigned long y, unsigned long z )
+
+
+    inline unsigned int  CMD5Hasher::H ( unsigned int  x, unsigned int  y, unsigned int  z )
     {
         return x ^ y ^ z;
     }
-    
-    
-    inline unsigned long CMD5Hasher::I ( unsigned long x, unsigned long y, unsigned long z )
+
+
+    inline unsigned int  CMD5Hasher::I ( unsigned int  x, unsigned int  y, unsigned int  z )
     {
         return y ^ (x | ~z);
     }
-    
-    
-    inline void CMD5Hasher::FF ( unsigned long& a, unsigned long b, unsigned long c, unsigned long d, unsigned long x, unsigned long  s, unsigned long ac )
+
+
+    inline void CMD5Hasher::FF ( unsigned int & a, unsigned int  b, unsigned int  c, unsigned int  d, unsigned int  x, unsigned int   s, unsigned int  ac )
     {
-        a += F(b, c, d) + x + ac;
-        a = RotateLeft (a, s) +b;
+        a += F ( b, c, d ) + x + ac;
+        a = RotateLeft ( a, s ) + b;
     }
-    
-    
-    inline void CMD5Hasher::GG ( unsigned long& a, unsigned long b, unsigned long c, unsigned long d, unsigned long x, unsigned long s, unsigned long ac )
+
+
+    inline void CMD5Hasher::GG ( unsigned int & a, unsigned int  b, unsigned int  c, unsigned int  d, unsigned int  x, unsigned int  s, unsigned int  ac )
     {
-        a += G(b, c, d) + x + ac;
-        a = RotateLeft (a, s) +b;
+        a += G ( b, c, d ) + x + ac;
+        a = RotateLeft ( a, s ) + b;
     }
-    
-    
-    inline void CMD5Hasher::HH ( unsigned long& a, unsigned long b, unsigned long c, unsigned long d, unsigned long x, unsigned long s, unsigned long ac )
+
+
+    inline void CMD5Hasher::HH ( unsigned int & a, unsigned int  b, unsigned int  c, unsigned int  d, unsigned int  x, unsigned int  s, unsigned int  ac )
     {
-        a += H(b, c, d) + x + ac;
-        a = RotateLeft (a, s) +b;
+        a += H ( b, c, d ) + x + ac;
+        a = RotateLeft ( a, s ) + b;
     }
-    
-    
-    inline void CMD5Hasher::II ( unsigned long& a, unsigned long b, unsigned long c, unsigned long d, unsigned long x, unsigned long s, unsigned long ac )
+
+
+    inline void CMD5Hasher::II ( unsigned int & a, unsigned int  b, unsigned int  c, unsigned int  d, unsigned int  x, unsigned int  s, unsigned int  ac )
     {
-        a += I(b, c, d) + x + ac;
-        a = RotateLeft (a, s) +b;
+        a += I ( b, c, d ) + x + ac;
+        a = RotateLeft ( a, s ) + b;
     }
 
 
