@@ -11000,6 +11000,23 @@ bool CStaticFunctionDefinitions::GetAllAccountData ( lua_State* pLua, CAccount* 
 }
 
 
+bool CStaticFunctionDefinitions::GetAccountSerial ( CAccount* pAccount, SString& strSerial )
+{
+    bool bRegistered = pAccount->IsRegistered ();
+    if ( bRegistered )
+        strSerial = pAccount->GetSerial ();
+
+    return bRegistered;
+}
+
+
+bool CStaticFunctionDefinitions::GetAccountsBySerial ( const SString& strSerial, std::vector<CAccount*>& outAccounts )
+{
+    m_pAccountManager->GetAccountsBySerial ( strSerial, outAccounts );
+    return true;
+}
+
+
 CAccount* CStaticFunctionDefinitions::AddAccount ( const char* szName, const char* szPassword )
 {
     assert ( szName );
