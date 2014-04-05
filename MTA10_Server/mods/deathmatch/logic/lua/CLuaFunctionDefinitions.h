@@ -537,6 +537,8 @@ public:
     static int      IsGuestAccount                      ( lua_State* luaVM );
     static int      GetAccountData                      ( lua_State* luaVM );
     static int      GetAllAccountData                   ( lua_State* luaVM );
+    static int      GetAccountSerial                    ( lua_State* luaVM );
+    static int      GetAccountsBySerial                 ( lua_State* luaVM );
 
     // Account set funcs
     static int      AddAccount                          ( lua_State* luaVM );

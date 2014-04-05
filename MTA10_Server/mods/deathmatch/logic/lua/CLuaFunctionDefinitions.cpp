@@ -11618,6 +11618,59 @@ int CLuaFunctionDefinitions::GetAccounts ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaFunctionDefinitions::GetAccountSerial ( lua_State* luaVM )
+{
+//  string getAccountSerial ( account theAccount )
+    CAccount* pAccount;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pAccount );
+
+    if ( !argStream.HasErrors () )
+    {
+        SString strSerial;
+        if ( CStaticFunctionDefinitions::GetAccountSerial ( pAccount, strSerial ) )
+        {
+            lua_pushstring ( luaVM, strSerial );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefinitions::GetAccountsBySerial ( lua_State* luaVM )
+{
+//  table getAccountsBySerial ( string serial )
+    SString strSerial;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadString ( strSerial );
+
+    if ( !argStream.HasErrors () )
+    {
+        lua_newtable ( luaVM );
+        std::vector<CAccount*> accounts;
+
+        CStaticFunctionDefinitions::GetAccountsBySerial ( strSerial, accounts );
+        for (unsigned int i = 0; i < accounts.size (); ++i)
+        {
+            lua_pushnumber ( luaVM, i + 1 );
+            lua_pushaccount ( luaVM, accounts[i] );
+            lua_settable ( luaVM, -3 );
+        }
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
 int CLuaFunctionDefinitions::AddAccount ( lua_State* luaVM )
 {
 //  account addAccount ( string name, string pass )

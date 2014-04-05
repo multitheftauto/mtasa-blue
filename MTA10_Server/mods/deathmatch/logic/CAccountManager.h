@@ -132,6 +132,8 @@ public:
     bool                        CopyAccountData             ( CAccount* pFromAccount, CAccount* pToAccount );
     bool                        GetAllAccountData           ( CAccount* pAccount, lua_State* pLua );
 
+    void                        GetAccountsBySerial         ( const SString& strSerial, std::vector<CAccount*>& outAccounts );
+
     bool                        ConvertXMLToSQL             ( const char* szFileName );
     bool                        LoadXML                     ( CXMLNode* pParent );
     void                        SmartLoad                   ( void );
