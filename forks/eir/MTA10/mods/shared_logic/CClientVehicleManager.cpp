@@ -751,7 +751,7 @@ bool CClientVehicleManager::IsVehicleLimitReached ( void )
 {
     // GTA allows max 110 vehicles. We restrict ourselves to 64 for now
     // due to FPS issues and crashes around 100 vehicles.
-    return g_pGame->GetPools ()->GetVehicleCount () >= 64;
+    return g_pGame->GetPools ()->GetVehicleCount () == g_pGame->GetPools()->GetPoolCapacity( VEHICLE_POOL );
 }
 
 

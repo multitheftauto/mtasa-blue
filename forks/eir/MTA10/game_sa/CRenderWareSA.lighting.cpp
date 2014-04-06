@@ -1271,7 +1271,7 @@ justCached:
                         if ( !_FindFreeLightSlotGlobal( nativeIndex, cb.GetGlobalLightProcessor() ) )
                             break;
 
-                        if ( !SetLight( nativeIndex, lightStruct ) )
+                        if ( !_SetLightGlobal( nativeIndex, lightStruct ) )
                             break;
                     }
 
@@ -1315,9 +1315,6 @@ justCached:
             unsigned int tmpIndex;
 
             bool found = ( m_cache.cachedIndice.Find( shaderIndex, tmpIndex ) );
-
-            if ( found )
-                __asm nop
 
             return found;
         }
@@ -1472,8 +1469,19 @@ justCached:
             for ( int n = 0; n < (int)maxGPULights; n++ )
             {
                 unsigned int foundIndex = -1;
+                
+                bool found = false;
 
-                if ( !applicator.m_takenSlots.Find( n, foundIndex ) )
+                if ( applicator.m_takenSlots.Find( n, foundIndex ) )
+                    found = true;
+
+                if ( !found && _cachedLightingData.isAvailable )
+                {
+                    if ( _cachedLightingData.cachedIndice.Find( n, foundIndex ) )
+                        found = true;
+                }
+
+                if ( !found )
                 {
                     EnableLight( n, false );
                 }
@@ -2169,6 +2177,9 @@ bool RpD3D9GlobalLightingPrePass( void )
             doLighting = true;
         else
         {
+            // Cache lighting data.
+            globalLightPassMan.CacheLightingData();
+
             // Do the first pass of the global light pass manager here.
             globalLightPassMan.Begin();
 
@@ -2195,7 +2206,11 @@ void RpD3D9CacheLighting( void )
     if ( hasLocalLighting )
     {
         localLightPassMan.CacheLightingData();
-        //globalLightPassMan.CacheLightingData();
+    }
+
+    if ( hasGlobalLighting )
+    {
+        globalLightPassMan.CacheLightingData();
     }
 }
 
@@ -2247,19 +2262,6 @@ void RpD3D9RenderLightMeshForPass( RwRenderCallbackTraverseImpl *rtinfo, RwRende
 
                 while ( globalLightPassMan.DoLightPass() )
                 {
-#if 0
-                    // Todo: fix white texture issues appearing because of this.
-                    RwD3D9SetTextureStageState( 0, D3DTSS_COLOROP, D3DTOP_SELECTARG1 );
-                    RwD3D9SetTextureStageState( 0, D3DTSS_COLORARG1, D3DTA_DIFFUSE );
-                    RwD3D9SetTextureStageState( 0, D3DTSS_COLORARG2, D3DTA_TEXTURE );
-
-                    RwD3D9SetTextureStageState( 0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG1 );
-                    RwD3D9SetTextureStageState( 0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE );
-
-                    RwD3D9SetTextureStageState( 1, D3DTSS_COLOROP, D3DTOP_DISABLE );
-                    RwD3D9SetTextureStageState( 1, D3DTSS_ALPHAOP, D3DTOP_DISABLE );
-#endif
-
                     // Render as often as we require light meshes.
                     RwD3D9DrawRenderPassPrimitive( rtinfo, rtPass );
                 }

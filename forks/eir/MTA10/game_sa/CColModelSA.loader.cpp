@@ -502,7 +502,8 @@ void __cdecl LoadCollisionModelVer2( const char *pBuffer, int bufferSize, CColMo
     colData->hasShadowMeshFaces = false;
     colData->pShadowMeshVertices = NULL;
     colData->pShadowMeshFaces = NULL;
-
+    
+    colData->numShadowMeshFaces = 0;
     colData->numShadowMeshVertices = 0;
 
     pCollision->m_isColDataSegmented = true;

@@ -160,6 +160,8 @@ void __cdecl _RenderEntity( CEntitySAInterface *entity )
         alphaRef = new (rsAlloc.Allocate()) RwRenderStateLock( D3DRS_ALPHAREF, 0x00 );
     }
 
+    bool doRender = true;
+
     // Prepare entity for rendering/enter frame
     if ( entity->nType == ENTITY_TYPE_VEHICLE )
     {
