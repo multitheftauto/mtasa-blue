@@ -1733,7 +1733,7 @@ void CGraphics::DrawProgressMessage( bool bPreserveBackbuffer )
     if ( !bInScene && !g_pCore->GetDummyProgressUpdateAlways() )
         return;
 
-    // Check if disabled in Settings->Advanced
+    // Check if disabled
     if ( g_pCore->GetDiagnosticDebug() == EDiagnosticDebug::SPINNER_0000 )
         return;
 
