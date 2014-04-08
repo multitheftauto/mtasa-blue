@@ -240,6 +240,7 @@ void CVehicleSA::Init ( void )
     m_RGBColors[1] = CVehicleColor::GetRGBFromPaletteIndex ( ((CVehicleSAInterface *)(this->GetInterface()))->m_colour2 );
     m_RGBColors[2] = CVehicleColor::GetRGBFromPaletteIndex ( ((CVehicleSAInterface *)(this->GetInterface()))->m_colour3 );
     m_RGBColors[3] = CVehicleColor::GetRGBFromPaletteIndex ( ((CVehicleSAInterface *)(this->GetInterface()))->m_colour4 );
+    SetColor( m_RGBColors[0], m_RGBColors[1], m_RGBColors[2], m_RGBColors[3], 0 );
 
     // Initialize doors depending on the vtable.
     DWORD dwOffset;
@@ -1218,15 +1219,40 @@ void CVehicleSA::SetColor ( SColor color1, SColor color2, SColor color3, SColor 
     m_RGBColors[1] = color2;
     m_RGBColors[2] = color3;
     m_RGBColors[3] = color4;
+
+    // Some colors result in black for unknown reason
+    for ( uint i = 0 ; i < NUMELMS( m_RGBColors ) ; i++ )
+    {
+        m_RGBColorsFixed[i] = m_RGBColors[i];
+        const SColor color = m_RGBColorsFixed[i];
+        if ( color == 0xFF00FF
+            || color == 0x00FFFF
+            || color == 0xFF00AF
+            || color == 0xFFAF00
+            || color == 0xFF3C00
+            || color == 0x3CFF00 )
+            m_RGBColorsFixed[i].ulARGB |= 0x010101;
+    }
 }
 
-void CVehicleSA::GetColor ( SColor* color1, SColor* color2, SColor* color3, SColor* color4, int )
+void CVehicleSA::GetColor ( SColor* color1, SColor* color2, SColor* color3, SColor* color4, bool bFixedForGTA )
 {
-    *color1 = m_RGBColors[0];
-    *color2 = m_RGBColors[1];
-    *color3 = m_RGBColors[2];
-    *color4 = m_RGBColors[3];
+    if ( !bFixedForGTA )
+    {
+        *color1 = m_RGBColors[0];
+        *color2 = m_RGBColors[1];
+        *color3 = m_RGBColors[2];
+        *color4 = m_RGBColors[3];
+    }
+    else
+    {
+        *color1 = m_RGBColorsFixed[0];
+        *color2 = m_RGBColorsFixed[1];
+        *color3 = m_RGBColorsFixed[2];
+        *color4 = m_RGBColorsFixed[3];
+    }
 }
+
 
 // works with firetrucks & tanks
 void CVehicleSA::GetTurretRotation ( float * fHorizontal, float * fVertical )

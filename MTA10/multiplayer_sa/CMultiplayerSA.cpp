@@ -5557,19 +5557,7 @@ void _cdecl SaveVehColors ( DWORD dwThis )
     CVehicle* pVehicle = pGameInterface->GetPools ()->GetVehicle ( (DWORD *)dwThis );
     if ( pVehicle )
     {
-        pVehicle->GetColor ( &vehColors[0], &vehColors[1], &vehColors[2], &vehColors[3], 0 );
-
-        // Some colors result in black for some reason
-        for ( uint i = 0 ; i < NUMELMS( vehColors ) ; i++ )
-        {
-            const SColor color = vehColors[i];
-            if ( color == 0xFF00FF
-              || color == 0x00FFFF
-              || color == 0xFF00AF
-              || color == 0xFFAF00
-              || color == 0xFF3C00 )
-                vehColors[i].ulARGB |= 0x010101;
-        }
+        pVehicle->GetColor ( &vehColors[0], &vehColors[1], &vehColors[2], &vehColors[3], true );
     }
 }
 
