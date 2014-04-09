@@ -472,18 +472,47 @@ bool CLuaArgument::ReadFromBitStream ( NetBitStreamInterface& bitStream, std::ve
             // Number type
             case LUA_TNUMBER:
             {
-                bool bIsFloatingPoint;
-                if ( bitStream.ReadBit ( bIsFloatingPoint ) && bIsFloatingPoint )
+                if ( bitStream.Version() < 0x59 )
                 {
-                    float fNum;
-                    if ( bitStream.Read ( fNum ) )
-                        ReadNumber ( RoundFromFloatSource( fNum ) );
+                    // Old way
+                    bool bIsFloatingPoint;
+                    if ( bitStream.ReadBit ( bIsFloatingPoint ) && bIsFloatingPoint )
+                    {
+                        float fNum;
+                        if ( bitStream.Read ( fNum ) )
+                            ReadNumber ( RoundFromFloatSource( fNum ) );
+                    }
+                    else
+                    {
+                        long lNum;
+                        if ( bitStream.ReadCompressed ( lNum ) )
+                            ReadNumber ( lNum );
+                    }
                 }
                 else
                 {
-                    long lNum;
-                    if ( bitStream.ReadCompressed ( lNum ) )
-                        ReadNumber ( lNum );
+                    // New way - Maybe use double to better preserve > 32bit numbers
+                    if ( bitStream.ReadBit() )
+                    {
+                        if ( bitStream.ReadBit()  )
+                        {
+                            double dNum;
+                            if ( bitStream.Read ( dNum ) )
+                                ReadNumber ( dNum );
+                        }
+                        else
+                        {
+                            float fNum;
+                            if ( bitStream.Read ( fNum ) )
+                                ReadNumber ( RoundFromFloatSource( fNum ) );
+                        }
+                    }
+                    else
+                    {
+                        long lNum;
+                        if ( bitStream.ReadCompressed ( lNum ) )
+                            ReadNumber ( lNum );
+                    }
                 }
                 break;
             }
@@ -635,16 +664,46 @@ bool CLuaArgument::WriteToBitStream ( NetBitStreamInterface& bitStream, CFastHas
             type.data.ucType = LUA_TNUMBER;
             bitStream.Write ( &type );
 
-            int iNumber;
-            if ( !ShouldUseInt( GetNumber(), &iNumber ) )
+            if ( bitStream.Version() < 0x59 )
             {
-                bitStream.WriteBit ( true );
-                bitStream.Write ( static_cast < float > ( GetNumber() ) );
+                // Old way
+                int iNumber;
+                if ( !ShouldUseInt( GetNumber(), &iNumber ) )
+                {
+                    bitStream.WriteBit ( true );
+                    bitStream.Write ( static_cast < float > ( GetNumber() ) );
+                }
+                else
+                {
+                    bitStream.WriteBit ( false );
+                    bitStream.WriteCompressed ( iNumber );
+                }
             }
             else
             {
-                bitStream.WriteBit ( false );
-                bitStream.WriteCompressed ( iNumber );
+                // New way - Maybe use double to better preserve > 32bit numbers
+                int iNumber;
+                float fNumber;
+                double dNumber;
+                EDataType dataType = GetDataTypeToUse( GetNumber(), &iNumber, &fNumber, &dNumber );
+                if ( dataType == DATA_TYPE_INT )
+                {
+                    bitStream.WriteBit ( false );
+                    bitStream.WriteCompressed ( iNumber );
+                }
+                else
+                if ( dataType == DATA_TYPE_FLOAT )
+                {
+                    bitStream.WriteBit ( true );
+                    bitStream.WriteBit ( false );
+                    bitStream.Write ( fNumber );
+                }
+                else
+                {
+                    bitStream.WriteBit ( true );
+                    bitStream.WriteBit ( true );
+                    bitStream.Write ( dNumber );
+                }
             }
             break;
         }

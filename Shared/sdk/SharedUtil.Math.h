@@ -59,6 +59,41 @@ namespace SharedUtil
         }
     }
 
+    enum EDataType
+    {
+        DATA_TYPE_INT,
+        DATA_TYPE_FLOAT,
+        DATA_TYPE_DOUBLE,
+    };
+
+    // Determine if value would be better as an int, float or double.
+    inline EDataType GetDataTypeToUse( double dValue, int* piNumber, float* pfNumber, double* pdNumber )
+    {
+        if ( dValue > -0x1000000 && dValue < 0x1000000 )
+        {
+            // float more accurate than int with this range, but check if we can use int as it is better for compressing
+            *piNumber = static_cast < int > ( dValue );
+            if ( dValue == *piNumber )
+                return DATA_TYPE_INT;
+
+            *pfNumber = static_cast < float > ( dValue );
+            return DATA_TYPE_FLOAT;
+        }
+        else
+        if ( dValue >= -0x7FFFFFFF && dValue <= 0x7FFFFFFF )
+        {
+            // int more accurate than float with this range
+            *piNumber = Round( dValue );
+            return DATA_TYPE_INT;
+        }
+        else
+        {
+            // Use double (rounded for consistency with previous range)
+            *pdNumber = std::floor( dValue + 0.5 );
+            return DATA_TYPE_DOUBLE;
+        }
+    }
+
     inline float DegreesToRadians( float fValue )
     {
         return fValue * 0.017453292f;
