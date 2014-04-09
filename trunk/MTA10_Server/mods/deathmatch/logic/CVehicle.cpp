@@ -49,6 +49,7 @@ CVehicle::CVehicle ( CVehicleManager* pVehicleManager, CElement* pParent, CXMLNo
     m_pTowedByVehicle = NULL;
     m_ucPaintjob = 3;
     m_ucMaxPassengersOverride = VEHICLE_PASSENGERS_UNDEFINED;
+    m_pHandlingEntry = NULL;
 
     m_fRespawnHealth = DEFAULT_VEHICLE_HEALTH;
     m_bRespawnEnabled = false;
@@ -765,7 +766,8 @@ void CVehicle::GetInitialDoorStates ( SFixedArray < unsigned char, MAX_DOORS >& 
 void CVehicle::GenerateHandlingData ( void )
 {
     // Make a new CHandlingEntry
-    m_pHandlingEntry = g_pGame->GetHandlingManager()->CreateHandlingData ( );
+    if( m_pHandlingEntry == NULL )
+        m_pHandlingEntry = g_pGame->GetHandlingManager()->CreateHandlingData ( );
     // Apply the model handling info
     m_pHandlingEntry->ApplyHandlingData( g_pGame->GetHandlingManager ()->GetModelHandlingData ( static_cast < eVehicleTypes > ( m_usModel ) ) );
 
