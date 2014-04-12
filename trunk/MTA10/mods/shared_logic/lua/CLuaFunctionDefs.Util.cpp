@@ -973,13 +973,13 @@ int CLuaFunctionDefs::UtfSub ( lua_State* luaVM )
         {
             strUTF = strUTF.substr(start-1, end-start+1);
             lua_pushstring(luaVM, UTF16ToMbUTF8(strUTF).c_str());
-			return 1;
+            return 1;
         }
-		else
-		{
-			lua_pushliteral(luaVM, "");
-			return 1;
-		}
+        else
+        {
+            lua_pushliteral(luaVM, "");
+            return 1;
+        }
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
