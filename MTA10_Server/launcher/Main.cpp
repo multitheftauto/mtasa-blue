@@ -74,6 +74,9 @@ int main ( int argc, char* argv [] )
             printf ( "  -t                   Run server with a simple console\n" );
             printf ( "  -f                   Run server with a standard console (Default)\n" );
             printf ( "  -n                   Disable the usage of ncurses (For screenlog)\n" );
+#ifndef WIN32
+            printf ( "  -x                   Disable simplified crash reports (To allow core dumps)\n" );
+#endif
             printf ( "  -D [PATH]            Use as base directory\n" );
             printf ( "  --config [FILE]      Alternate mtaserver.conf file\n" );
             printf ( "  --ip [ADDR]          Set IP address\n" );

@@ -42,6 +42,7 @@ using namespace std;
 bool g_bSilent = false;
 bool g_bNoCurses = false;
 bool g_bNoTopBar = false;
+bool g_bNoCrashHandler = false;
 #ifndef WIN32
 bool g_bDaemonized = false;
 #endif
@@ -171,9 +172,12 @@ int CServerImpl::Run ( int iArgumentCount, char* szArguments [] )
 
 #ifdef WIN32
     if ( !m_fClientFeedback )
+#else
+    if ( !g_bNoCrashHandler )
 #endif
     {
         // Init our crashhandler if not being run within the client
+        // (and enabled for Linux)
         CCrashHandler::Init ();
     }
 
@@ -851,6 +855,10 @@ bool CServerImpl::ParseArguments ( int iArgumentCount, char* szArguments [] )
                 else if ( strcmp ( szArguments [i], "-f" ) == 0 )
                 {
                     g_bNoTopBar = false;
+                }
+                else if ( strcmp ( szArguments [i], "-x" ) == 0 )
+                {
+                    g_bNoCrashHandler = true;
                 }
 
                 #ifdef WIN32
