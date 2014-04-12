@@ -298,6 +298,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getLowLODElement", CLuaFunctionDefs::GetLowLodElement );
     CLuaCFunctions::AddFunction ( "isElementLowLOD", CLuaFunctionDefs::IsElementLowLod );
     CLuaCFunctions::AddFunction ( "isElementCallPropagationEnabled", CLuaFunctionDefs::IsElementCallPropagationEnabled );
+    CLuaCFunctions::AddFunction ( "getElementRenderMode", CLuaFunctionDefs::GetElementRenderMode );
 
     // Element set funcs
     CLuaCFunctions::AddFunction ( "createElement", CLuaFunctionDefs::CreateElement );
@@ -325,6 +326,8 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "setElementFrozen", CLuaFunctionDefs::SetElementFrozen );
     CLuaCFunctions::AddFunction ( "setLowLODElement", CLuaFunctionDefs::SetLowLodElement );
     CLuaCFunctions::AddFunction ( "setElementCallPropagationEnabled", CLuaFunctionDefs::SetElementCallPropagationEnabled );
+    CLuaCFunctions::AddFunction ( "setElementRenderMode", CLuaFunctionDefs::SetElementRenderMode );
+    CLuaCFunctions::AddFunction ( "resetElementRenderMode", CLuaFunctionDefs::ResetElementRenderMode );
 
     // Sound effects and synth funcs
     CLuaCFunctions::AddFunction ( "playSound", CLuaFunctionDefs::PlaySound );
@@ -623,6 +626,8 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "engineGetActiveStreamingEntities", CLuaFunctionDefs::EngineGetActiveStreamingEntities );
     CLuaCFunctions::AddFunction ( "engineGetGamePoolLimits", CLuaFunctionDefs::EngineGetGamePoolLimits );
     CLuaCFunctions::AddFunction ( "engineGetStreamingInfo", CLuaFunctionDefs::EngineGetStreamingInfo );
+    CLuaCFunctions::AddFunction ( "engineSetWorldRenderMode", CLuaFunctionDefs::EngineSetWorldRenderMode );
+    CLuaCFunctions::AddFunction ( "engineGetWorldRenderMode", CLuaFunctionDefs::EngineGetWorldRenderMode );
 
     //CLuaCFunctions::AddFunction ( "engineReplaceMatchingAtomics", CLuaFunctionDefs::EngineReplaceMatchingAtomics );
     //CLuaCFunctions::AddFunction ( "engineReplaceWheelAtomics", CLuaFunctionDefs::EngineReplaceWheelAtomics );

@@ -200,6 +200,7 @@ bool CMapInfoPacket::Write ( NetBitStreamInterface& BitStream ) const
     funBugs.data.bCrouchBug   = g_pGame->IsGlitchEnabled ( CGame::GLITCH_CROUCHBUG );
     funBugs.data.bCloseRangeDamage = g_pGame->IsGlitchEnabled ( CGame::GLITCH_CLOSEDAMAGE );
     funBugs.data2.bHitAnim    = g_pGame->IsGlitchEnabled ( CGame::GLITCH_HITANIM );
+    funBugs.data3.bFastSprint = g_pGame->IsGlitchEnabled ( CGame::GLITCH_FASTSPRINT );
     BitStream.Write ( &funBugs );
 
     BitStream.Write ( m_fJetpackMaxHeight );

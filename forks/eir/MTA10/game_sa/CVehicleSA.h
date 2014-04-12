@@ -620,6 +620,7 @@ private:
     SColor                      m_HeadLightColor;
     RwObject                    m_WheelObjects[4];
     SColor                      m_RGBColors[4];
+    SColor                      m_RGBColorsFixed[4];
     CDoorSA                     m_doors[6];
     bool                        m_bSwingingDoorsAllowed;
     SSirenInfo                  m_tSirenInfo;
@@ -722,7 +723,7 @@ public:
     void                        PlaceBikeOnRoadProperly         ();
     void                        PlaceAutomobileOnRoadProperly   ();
     void                        SetColor                        ( SColor color1, SColor color2, SColor color3, SColor color4, int );
-    void                        GetColor                        ( SColor* color1, SColor* color2, SColor* color3, SColor* color4, int );
+    void                        GetColor                        ( SColor* color1, SColor* color2, SColor* color3, SColor* color4, bool bFixedForGTA );
     bool                        IsSirenOrAlarmActive            ();
     void                        SetSirenOrAlarmActive           ( bool bActive );
     inline void                 SetAlpha                        ( unsigned char ucAlpha ) { m_ucAlpha = ucAlpha; }
@@ -761,6 +762,14 @@ public:
     void                        SetRemap                        ( int iRemap );
     int                         GetRemapIndex                   ();
     void                        SetRemapTexDictionary           ( int iRemapTextureDictionary );
+
+    rModeResult                 SetVehicleRenderModeBool        ( eVehicleRenderMode rMode, bool value );
+    rModeResult                 SetVehicleRenderModeInt         ( eVehicleRenderMode rMode, int value );
+    rModeResult                 SetVehicleRenderModeFloat       ( eVehicleRenderMode rMode, float value );
+
+    rModeResult                 GetVehicleRenderModeBool        ( eVehicleRenderMode rMode, bool& value ) const;
+    rModeResult                 GetVehicleRenderModeInt         ( eVehicleRenderMode rMode, int& value ) const;
+    rModeResult                 GetVehicleRenderModeFloat       ( eVehicleRenderMode rMode, float& value ) const;
 
     bool                        IsDamaged                               () { return GetVehicleInterface ()->m_nVehicleFlags.bIsDamaged; };
     bool                        IsDrowning                              () { return GetVehicleInterface ()->m_nVehicleFlags.bIsDrowning; };

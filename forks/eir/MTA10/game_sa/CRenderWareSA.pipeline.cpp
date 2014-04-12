@@ -14,6 +14,8 @@
 #include "RenderWare/RwRenderTools.hxx"
 #include "RenderWare/RwInternals.h"
 
+#include "CRenderWareSA.rmode.hxx"
+
 RwRenderStateLock::_rsLockDesc RwRenderStateLock::_rsLockInfo[210];
 
 /*=========================================================
@@ -928,8 +930,7 @@ struct GenericVideoPassRender
 
     __forceinline unsigned int GetRenderAlphaClamp( void )
     {
-        // todo: allow the user to define this value.
-        return 100;
+        return GetWorldObjectAlphaClamp();
     }
 
     unsigned int& renderFlags;
@@ -1080,8 +1081,7 @@ struct AlphaTexturedVideoPassRender
 
     __forceinline unsigned int GetRenderAlphaClamp( void )
     {
-        // todo: allow the user to define this value.
-        return 100;
+        return GetWorldObjectAlphaClamp();
     }
 
     unsigned int& renderFlags;

@@ -30,6 +30,11 @@ enum eWinchType
     WINCH_BIG_MAGNET,
     WINCH_SMALL_MAGNET = 3
 };
+
+enum eVehicleRenderMode
+{
+    VEHICLE_RMODE_REFLECTION_SKYLIGHT
+};
     
 // forward declaration, avoid compile error
 class CPed;
@@ -166,7 +171,7 @@ public:
     virtual void                PlaceBikeOnRoadProperly     () = 0;
     virtual void                PlaceAutomobileOnRoadProperly() = 0;
     virtual void                SetColor                    ( SColor color1, SColor color2, SColor color3, SColor color4, int ) = 0;
-    virtual void                GetColor                    ( SColor* color1, SColor* color2, SColor* color3, SColor* color4, int ) = 0;
+    virtual void                GetColor                    ( SColor* color1, SColor* color2, SColor* color3, SColor* color4, bool bFixedForGTA ) = 0;
     virtual void                Fix                         () = 0;
     virtual bool                IsSirenOrAlarmActive        () = 0;
     virtual void                SetSirenOrAlarmActive       ( bool bActive ) = 0;
@@ -194,7 +199,14 @@ public:
 
     virtual void                SetRemap                    ( int iRemap ) = 0;
     virtual int                 GetRemapIndex               () = 0;
-    virtual void                SetRemapTexDictionary       ( int iRemapTextureDictionary ) = 0;
+
+    virtual rModeResult         SetVehicleRenderModeBool    ( eVehicleRenderMode rMode, bool value ) = 0;
+    virtual rModeResult         SetVehicleRenderModeInt     ( eVehicleRenderMode rMode, int value ) = 0;
+    virtual rModeResult         SetVehicleRenderModeFloat   ( eVehicleRenderMode rMode, float value ) = 0;
+
+    virtual rModeResult         GetVehicleRenderModeBool    ( eVehicleRenderMode rMode, bool& value ) const = 0;
+    virtual rModeResult         GetVehicleRenderModeInt     ( eVehicleRenderMode rMode, int& value ) const = 0;
+    virtual rModeResult         GetVehicleRenderModeFloat   ( eVehicleRenderMode rMode, float& value ) const = 0;
 
     virtual bool                GetCanBeTargettedByHeatSeekingMissiles  () = 0;
     virtual bool                IsDamaged                               () = 0;

@@ -196,6 +196,9 @@ public:
     virtual CPedSound *         GetPedSound () = 0;
     virtual DWORD *         GetMemoryValue ( DWORD dwOffset )=0;
 
+    virtual void            SetAlpha( int iAlpha ) = 0;
+    virtual int             GetAlpha( void ) const = 0;
+
 
     virtual FLOAT           GetCurrentRotation()=0;
     virtual FLOAT           GetTargetRotation()=0;

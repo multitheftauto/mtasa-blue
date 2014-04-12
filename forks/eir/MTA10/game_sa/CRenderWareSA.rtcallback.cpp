@@ -13,6 +13,8 @@
 #include <StdInc.h>
 #include "RenderWare/RwRenderTools.hxx"
 
+#include "CRenderWareSA.rmode.hxx"
+
 // todo: reverse these render passes.
 typedef void (__cdecl*RpMatFXD3D9AtomicMatFXEnvRender_t)( RwRenderCallbackTraverseImpl*, RwRenderPass*, unsigned int, bool, RwTexture*, RwTexture* );
 typedef void (__cdecl*RpMatFXD3D9AtomicMatFXBumpMapRender_t)( RwRenderCallbackTraverseImpl*, RwRenderPass*, unsigned int, RwTexture*, RwTexture*, RwTexture* );
@@ -936,7 +938,7 @@ struct ReflectiveGeneralRenderManager
     {
         RwD3D9ResetCommonColorChannels();
 
-        if ( IS_ANY_FLAG( curMat->shaderFlags, 0x01 ) )
+        if ( RenderMode::AreReflectionsEnabled() && IS_ANY_FLAG( curMat->shaderFlags, 0x01 ) )
         {
             RenderReflectiveEnvMap( renderObject, curMat->envMapMat, m_reflectMan );
         }
@@ -994,8 +996,7 @@ struct ReflectiveGeneralRenderManager
 
     __forceinline unsigned int GetRenderAlphaClamp( void )
     {
-        // todo: allow the user to define this value.
-        return 100;
+        return GetWorldObjectAlphaClamp();
     }
 
     reflectiveManager m_reflectMan;
@@ -1299,9 +1300,14 @@ struct ReflectiveVehicleRenderManager
 
         if ( doSpecularTransform )
         {
-            // Enable the special vehicle light.
-            RpD3D9SetLight( 7, RenderWare::GetSpecialVehicleLight() );
-            RpD3D9EnableLight( 7, true );
+            hasMaterialLighting = ( RenderMode::IsDirectionalLightingEnabled() && RenderMode::IsMaterialLightingEnabled() );
+
+            if ( hasMaterialLighting )
+            {
+                // Enable the special vehicle light.
+                RpD3D9SetLight( 7, RenderWare::GetSpecialVehicleLight() );
+                RpD3D9EnableLight( 7, true );
+            }
 
             specularFloat1 = std::min( m_unk * specMapMat->specular * 2, 1.0f );
             specularFloat2 = specMapMat->specular * 100.0f;
@@ -1317,7 +1323,7 @@ struct ReflectiveVehicleRenderManager
 
         RwD3D9ResetCommonColorChannels();
 
-        if ( envMapMat )
+        if ( RenderMode::AreReflectionsEnabled() && envMapMat )
         {
             if ( specialEffect1 )
             {
@@ -1336,7 +1342,7 @@ struct ReflectiveVehicleRenderManager
 
                 if ( !envMapAtom )
                 {
-                    envMapAtom = new CEnvMapAtomicSA( NULL, NULL, NULL );
+                    envMapAtom = new CEnvMapAtomicSA( 0.0f, 0.0f, 0.0f );
                 }
 
                 if ( envMapAtom )
@@ -1390,7 +1396,7 @@ struct ReflectiveVehicleRenderManager
 
             // Some color combinations are supposed to display black.
             // No idea why. We should ask Rockstar!
-            if ( colorValue > 0xAF00FF )
+            if ( colorValue > 0x00AF00FF )
             {
                 isColorBlack = ( colorValue == 0x00C8FF00 || colorValue == 0x00FF00FF || colorValue == 0x00FFFF00 );
             }
@@ -1439,7 +1445,10 @@ struct ReflectiveVehicleRenderManager
         {
             HOOK_RwD3D9SetRenderState( D3DRS_SPECULARENABLE, false );
 
-            RpD3D9EnableLight( 7, false );
+            if ( hasMaterialLighting )
+            {
+                RpD3D9EnableLight( 7, false );
+            }
         }
     }
 
@@ -1478,7 +1487,12 @@ struct ReflectiveVehicleRenderManager
 
     __forceinline unsigned int GetRenderAlphaClamp( void )
     {
-        return _vehicleRenderAlphaClamp;
+        // Allow user to overwrite the vehicle alpha clamp value.
+        unsigned int actualAlphaClamp = _vehicleRenderAlphaClamp;
+
+        RenderMode::GetAlphaClamp( actualAlphaClamp );
+
+        return actualAlphaClamp;
     }
 
     RpAtomic*& m_atomic;
@@ -1489,6 +1503,7 @@ struct ReflectiveVehicleRenderManager
     DWORD lightValue;
     float specularFloat1;
     float specularFloat2;
+    bool hasMaterialLighting;
 };
 
 // This gotta be the vehicle atomic render routine; it uses component flags.
@@ -1603,8 +1618,7 @@ struct FXAtomicRenderManager
 
     __forceinline unsigned int GetRenderAlphaClamp( void )
     {
-        // todo: allow the user to define this value.
-        return 100;
+        return GetWorldObjectAlphaClamp();
     }
 };
 

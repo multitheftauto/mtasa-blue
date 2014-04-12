@@ -503,6 +503,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CEntitySA.rmode.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\CEntryInfoSA.cpp"
 				>
 			</File>
@@ -1312,6 +1316,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CEntitySA.rmode.h"
+				>
+			</File>
+			<File
 				RelativePath=".\CEntryInfoSA.h"
 				>
 			</File>
@@ -1605,6 +1613,10 @@
 			</File>
 			<File
 				RelativePath=".\CRenderWareSA.render.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CRenderWareSA.rmode.hxx"
 				>
 			</File>
 			<File

@@ -643,6 +643,8 @@ public:
     static bool                 IsGuestAccount                      ( CAccount* pAccount, bool& bGuest );
     static CLuaArgument*        GetAccountData                      ( CAccount* pAccount, const char* szKey );
     static bool                 GetAllAccountData                   ( lua_State* pLua, CAccount* pAccount );
+    static bool                 GetAccountSerial                    ( CAccount* pAccount, SString& strSerial );
+    static bool                 GetAccountsBySerial                 ( const SString& strSerial, std::vector<CAccount*>& outAccounts );
 
     // Account set funcs
     static CAccount*            AddAccount                          ( const char* szName, const char* szPassword );

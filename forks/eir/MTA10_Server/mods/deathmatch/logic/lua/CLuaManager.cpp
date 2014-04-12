@@ -648,6 +648,8 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getAllAccountData", CLuaFunctionDefinitions::GetAllAccountData );
     CLuaCFunctions::AddFunction ( "getAccount", CLuaFunctionDefinitions::GetAccount );
     CLuaCFunctions::AddFunction ( "getAccounts", CLuaFunctionDefinitions::GetAccounts );
+    CLuaCFunctions::AddFunction ( "getAccountSerial", CLuaFunctionDefinitions::GetAccountSerial );
+    CLuaCFunctions::AddFunction ( "getAccountsBySerial", CLuaFunctionDefinitions::GetAccountsBySerial );
 
     // Account set functions
     CLuaCFunctions::AddFunction ( "addAccount", CLuaFunctionDefinitions::AddAccount );

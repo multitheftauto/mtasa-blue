@@ -206,6 +206,10 @@ void CClientPed::Init ( CClientManager* pManager, unsigned long ulModelID, bool 
     m_MovementStateNames[MOVEMENTSTATE_FALL]        =    "fall";
     m_MovementStateNames[MOVEMENTSTATE_CLIMB]       =    "climb";
 
+    // Set up render modes.
+    m_pRenderModeManager = new renderModeManager( this );
+    m_pRenderModes = new entityRenderModes_t( *m_pRenderModeManager );
+
     // Create the player model
     if ( m_bIsLocalPlayer )
     {
@@ -2669,8 +2673,7 @@ void CClientPed::StreamedInPulse ( bool bDoStandardPulses )
         unsigned char ucAlpha = m_ucAlpha;
         // Are we in a different interior to the camera? set our alpha to 0
         if ( m_ucInterior != g_pGame->GetWorld ()->GetCurrentArea () ) ucAlpha = 0;
-        RpClump * pClump = m_pPlayerPed->GetRpClump ();
-        if ( pClump ) g_pGame->GetVisibilityPlugins ()->SetClumpAlpha ( pClump, ucAlpha );
+        m_pPlayerPed->SetAlpha( ucAlpha );
 
         // Grab our current position
         CVector vecPosition = *m_pPlayerPed->GetPosition ();
@@ -2879,6 +2882,34 @@ void CClientPed::ApplyControllerStateFixes ( CControllerState& Current )
         if ( !g_pClientGame->IsGlitchEnabled (  CClientGame::GLITCH_FASTFIRE ) )
         {
             Current.ShockButtonL = 0;
+        }
+    }
+
+    // Stop speed advantage by tapping sprint button
+    pTask = m_pTaskManager->GetSimplestActiveTask ();
+    if ( pTask && pTask->GetTaskType () == TASK_SIMPLE_PLAYER_ON_FOOT )
+    {
+        bool bSprintButtonDown = ( Current.ButtonCross != 0 );
+
+        // Pressed sprint?
+        if ( bSprintButtonDown && ( bSprintButtonDown != m_bWasSprintButtonDown ) )
+        {
+            // Check if too soon since since last press
+            if ( ( ulNow - m_ulLastTimeSprintPressed ) < 300.0f * fSpeedRatio )
+            {
+                // On second successive quick press, delay next release
+                m_ulBlockSprintReleaseTime = ulNow;
+            }
+            m_ulLastTimeSprintPressed = ulNow;
+        }
+        m_bWasSprintButtonDown = bSprintButtonDown;
+
+        // If required, delay sprint button release
+        if ( ( ulNow - m_ulBlockSprintReleaseTime ) < 300.0f * fSpeedRatio )
+        {
+            if ( g_pClientGame->GetMiscGameSettings().bAllowFastSprintFix )
+                if ( !g_pClientGame->IsGlitchEnabled( CClientGame::GLITCH_FASTSPRINT ) )
+                    Current.ButtonCross = 255;
         }
     }
 
@@ -3430,6 +3461,9 @@ void CClientPed::_CreateModel ( void )
         // Reattach to an entity + any entities attached to this
         ReattachEntities ();
 
+        // Apply render modes.
+        m_pRenderModeManager->Apply();
+
         // Warp it into a vehicle, if necessary
         if ( m_pOccupiedVehicle )
             WarpIntoVehicle ( m_pOccupiedVehicle, m_uiOccupiedVehicleSeat );      
@@ -3502,6 +3536,9 @@ void CClientPed::_CreateLocalModel ( void )
 
         // Rebuild him so he gets his clothes
         RebuildModel ();
+        
+        // Apply render modes.
+        m_pRenderModeManager->Apply();
 
         // Validate
         m_pManager->RestoreEntity ( this );
@@ -3520,6 +3557,9 @@ void CClientPed::_DestroyModel ()
         m_pCurrentContactEntity->RemoveContact ( this );
         m_pCurrentContactEntity = NULL;
     }
+
+    // Store render modes.
+    m_pRenderModeManager->Update();
 
     // Remember the player position
     m_Matrix.vPos = *m_pPlayerPed->GetPosition ();
@@ -3599,6 +3639,9 @@ void CClientPed::_DestroyLocalModel ()
 
         pVehicle->RemoveStreamReference ();
     }
+
+    // Store render modes.
+    m_pRenderModeManager->Update();
 
     // Invalidate
     m_pManager->InvalidateEntity ( this );

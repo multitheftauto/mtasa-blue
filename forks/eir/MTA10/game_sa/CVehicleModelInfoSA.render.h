@@ -23,14 +23,16 @@
 
 class CVehicleSA;
 
-void __cdecl CacheVehicleRenderCameraSettings( unsigned char alpha, RwObject *obj );
+void __cdecl CacheVehicleRenderCameraSettings( unsigned int alpha, RwObject *obj );
 void __cdecl ClearVehicleRenderChains( void );
-void __cdecl ExecuteVehicleRenderChains( unsigned char renderAlpha );
+void __cdecl ExecuteVehicleRenderChains( unsigned int renderAlpha );
 
 void __cdecl SetVehicleLightsFlags( class CVehicleSAInterface *vehicle );
 
 void __cdecl RpClumpSetupVehicleMaterials( RpClump *clump, class CVehicleSA *gameVehicle );
 void __cdecl RpClumpRestoreVehicleMaterials( RpClump *clump );
+
+void __cdecl RpClumpVehicleVerifyIntegrity( RpClump *vehClump );
 
 template <class type>
 struct UniqueContainer : std::vector <type>

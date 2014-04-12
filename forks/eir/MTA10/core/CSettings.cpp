@@ -749,7 +749,7 @@ void CSettings::CreateGUI ( void )
     }
 
     m_pCheckBoxDisableAero = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, _("Disable Aero Desktop"), true ) );
-    m_pCheckBoxDisableAero->SetPosition ( CVector2D ( vecTemp.fX + 245.0f, vecTemp.fY + 50.0f ) );
+    m_pCheckBoxDisableAero->SetPosition ( CVector2D ( vecTemp.fX + 245.0f, fPosY + 50.0f ) );
     m_pCheckBoxDisableAero->AutoSize ( NULL, 20.0f );
     if ( GetApplicationSetting ( "os-version" ) < "6.1" || GetApplicationSettingInt ( "aero-changeable" ) == 0 )
     {
@@ -757,9 +757,8 @@ void CSettings::CreateGUI ( void )
         fPosY -= 20.0f;
     }
 
-    fPosY += 20.0f;
     m_pCheckBoxDisableDriverOverrides = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, _("Disable Driver Overrides"), true ) );
-    m_pCheckBoxDisableDriverOverrides->SetPosition ( CVector2D ( vecTemp.fX + 245.0f, fPosY + 50.0f ) );
+    m_pCheckBoxDisableDriverOverrides->SetPosition ( CVector2D ( vecTemp.fX + 245.0f, fPosY + 70.0f ) );
     m_pCheckBoxDisableDriverOverrides->AutoSize ( NULL, 20.0f );
     if ( GetApplicationSettingInt ( "nvhacks", "optimus" ) )
     {
@@ -768,7 +767,7 @@ void CSettings::CreateGUI ( void )
     }
 
     m_pCheckBoxDeviceSelectionDialog = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, _("Enable Device Selection Dialog"), true ) );
-    m_pCheckBoxDeviceSelectionDialog->SetPosition ( CVector2D ( vecTemp.fX + 245.0f, fPosY + 70.0f ) );
+    m_pCheckBoxDeviceSelectionDialog->SetPosition ( CVector2D ( vecTemp.fX + 245.0f, fPosY + 90.0f ) );
     m_pCheckBoxDeviceSelectionDialog->AutoSize ( NULL, 20.0f );
     if ( !GetVideoModeManager ()->IsMultiMonitor () )
     {

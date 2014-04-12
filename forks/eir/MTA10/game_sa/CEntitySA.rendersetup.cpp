@@ -107,19 +107,24 @@ void EntityRender::ReferenceEntityForRendering( CEntitySAInterface *entity )
     Binary offsets:
         (1.0 US and 1.0 EU): 0x00733D90
 =========================================================*/
-bool __cdecl EntityRender::PushUnderwaterEntityForRendering( CEntitySAInterface *entity, float distance )
+AINLINE bool _PushEntityForRendering( CEntitySAInterface *entity, float camDistance, entityRenderChain_t& renderChain )
 {
     entityRenderInfo chainInfo;
-    chainInfo.distance = distance;
+    chainInfo.distance = camDistance;
     chainInfo.entity = entity;
-    chainInfo.callback = DefaultRenderEntityHandler;
+    chainInfo.callback = EntityRender::DefaultRenderEntityHandler;
 
-    entityRenderChain_t::renderChain *node = GetUnderwaterEntityRenderChain().PushRender( &chainInfo );
+    entityRenderChain_t::renderChain *node = renderChain.PushRender( &chainInfo );
 
     if ( node )
         node->m_entry.isReferenced = entity->Reference();
 
     return node != NULL;
+}
+
+bool __cdecl EntityRender::PushUnderwaterEntityForRendering( CEntitySAInterface *entity, float distance )
+{
+    return _PushEntityForRendering( entity, distance, GetUnderwaterEntityRenderChain() );
 }
 
 /*=========================================================
@@ -137,37 +142,25 @@ bool __cdecl EntityRender::PushUnderwaterEntityForRendering( CEntitySAInterface 
 =========================================================*/
 int __cdecl EntityRender::QueueEntityForRendering( CEntitySAInterface *entity, float camDistance )
 {
-    // This function has been optimized a little.
-    // Rockstar created two depthLevel instances, we only do once.
-    entityRenderInfo level;
-    level.callback = DefaultRenderEntityHandler;
-    level.entity = entity;
-    level.distance = camDistance;
-
-    entityRenderChain_t::renderChain *node = NULL;
+    bool successful = false;
 
     // Try to display the "grasshouse" model
     if ( entity->GetModelIndex() == *(short*)0x008CD6F4 )
     {
-        node = GetAlphaEntityRenderChain().PushRender( &level );
+        successful = _PushEntityForRendering( entity, camDistance, GetAlphaEntityRenderChain() );
     }
     else
     {
         // If the entity is underwater, it needs a different rendering order
         if ( entity->m_entityFlags & ENTITY_UNDERWATER )
-            return PushUnderwaterEntityForRendering( entity, camDistance );
+            successful = PushUnderwaterEntityForRendering( entity, camDistance );
         else
         {
-            // Do default render
-            node = GetDefaultEntityRenderChain().PushRender( &level );
+            successful = _PushEntityForRendering( entity, camDistance, GetDefaultEntityRenderChain() );
         }
     }
 
-    // Guard the entity.
-    if ( node )
-        node->m_entry.isReferenced = entity->Reference();
-
-    return node != NULL;
+    return successful;
 }
 
 // Native GTA:SA uses static arrays to render world instances.

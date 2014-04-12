@@ -1058,6 +1058,21 @@ bool CAccountManager::GetAllAccountData( CAccount* pAccount, lua_State* pLua )
 }
 
 
+void CAccountManager::GetAccountsBySerial ( const SString& strSerial, std::vector<CAccount*>& outAccounts )
+{
+    CRegistryResult result;
+    m_pDatabaseManager->QueryWithResultf ( m_hDbConnection, &result, "SELECT name FROM accounts WHERE serial = ?", SQLITE_TEXT, strSerial.c_str () );
+
+    for ( CRegistryResultIterator iter = result->begin (); iter != result->end (); ++iter )
+    {
+        const CRegistryResultRow& row = *iter;
+        
+        CAccount* pAccount = Get ( (const char*)row[0].pVal );
+        outAccounts.push_back ( pAccount );
+    }
+}
+
+
 void CAccountManager::SmartLoad ()
 {
     //##Function to work out if we need to reload the accounts.xml file into internal.db##

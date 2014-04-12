@@ -49,6 +49,49 @@ enum eEntityStatus
     STATUS_SIMPLE_TRAILER // Same here
 };
 
+enum eRenderModeValueType
+{
+    RMODE_VOID,
+    RMODE_BOOLEAN,
+    RMODE_FLOAT,
+    RMODE_INT
+};
+
+struct rModeResult
+{
+    inline rModeResult( void )
+    {
+        successful = false;
+    }
+
+    inline rModeResult( bool result )
+    {
+        successful = result;
+    }
+
+    inline rModeResult( bool result, const char *failureReason )
+    {
+        successful = result;
+        debugMsg = failureReason;
+    }
+    
+    bool successful;
+    std::string debugMsg;
+};
+
+enum eEntityRenderMode
+{
+    ENTITY_RMODE_LIGHTING,
+    ENTITY_RMODE_LIGHTING_AMBIENT,
+    ENTITY_RMODE_LIGHTING_DIRECTIONAL,
+    ENTITY_RMODE_LIGHTING_POINT,
+    ENTITY_RMODE_LIGHTING_SPOT,
+    ENTITY_RMODE_LIGHTING_MATERIAL,
+    ENTITY_RMODE_REFLECTION,
+    ENTITY_RMODE_ALPHACLAMP,
+    ENTITY_RMODE_MAX
+};
+
 typedef bool (__cdecl*entityReferenceCallback_t)( class CEntity *entity );
 typedef void (__cdecl*gameEntityPreRenderCallback_t)( void );
 typedef void (__cdecl*gameEntityRenderCallback_t)( void );
@@ -88,6 +131,16 @@ public:
 
     virtual bool                        IsVisible ( void ) = 0;
     virtual void                        SetVisible ( bool bVisible ) = 0;
+
+    virtual rModeResult                 SetEntityRenderModeBool ( eEntityRenderMode rMode, bool value ) = 0;
+    virtual rModeResult                 SetEntityRenderModeInt ( eEntityRenderMode rMode, int value ) = 0;
+    virtual rModeResult                 SetEntityRenderModeFloat ( eEntityRenderMode rMode, float value ) = 0;
+
+    virtual rModeResult                 GetEntityRenderModeBool ( eEntityRenderMode rMode, bool& value ) const = 0;
+    virtual rModeResult                 GetEntityRenderModeInt ( eEntityRenderMode rMode, int& value ) const = 0;
+    virtual rModeResult                 GetEntityRenderModeFloat ( eEntityRenderMode rMode, float& value ) const = 0;
+
+    virtual rModeResult                 ResetEntityRenderMode ( eEntityRenderMode rMode ) = 0;
 
     virtual VOID                        SetDoNotRemoveFromGameWhenDeleted ( bool bDoNotRemoveFromGame )=0;
     virtual VOID                        SetUsesCollision(BOOL bUsesCollision)=0;

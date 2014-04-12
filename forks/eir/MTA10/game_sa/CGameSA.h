@@ -227,6 +227,13 @@ public:
     bool                    PerformChecks           ();
     int&                    GetCheckStatus          ( void )            { return m_iCheckStatus; }
 
+    // Render Mode validation API.
+    eRenderModeValueType    GetPreferedEntityRenderModeType ( eEntityRenderMode rMode );
+
+    rModeResult             ValidateEntityRenderModeBool ( eEntityRenderMode rMode, bool value );
+    rModeResult             ValidateEntityRenderModeFloat ( eEntityRenderMode rMode, float value );
+    rModeResult             ValidateEntityRenderModeInt ( eEntityRenderMode rMode, int value );
+
 
     // Clothes stuff that needs research. (CClothesBuilder.cache.cpp)
     void                    FlushClothesCache               ( void );

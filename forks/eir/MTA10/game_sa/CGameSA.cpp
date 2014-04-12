@@ -537,11 +537,11 @@ void CGameSA::Reset ( void )
     // Reset ubiqitous managers.
     Streaming::Reset();
 
-#if 0
+    EntityRender_Reset();
+
     // Reset rendering systems.
     RenderCallbacks_Reset();
     RenderWareLighting_Reset();
-#endif
 }
 
 void CGameSA::Terminate ( void )
@@ -583,6 +583,7 @@ void CGameSA::DiagnoseEntity( CEntity *theEntity )
 
     RwObject *rwobj = gameEntity->GetRwObject();
 
+#if 0
     if ( !rwobj )
     {
         gameEntity->CreateRwObject();
@@ -601,6 +602,14 @@ void CGameSA::DiagnoseEntity( CEntity *theEntity )
                 gameEntity->CreateRwObject();
             }
         }
+    }
+#endif
+
+    if ( gameEntity->nType == ENTITY_TYPE_VEHICLE )
+    {
+        RpClump *vehClump = (RpClump*)rwobj;
+
+        RpClumpVehicleVerifyIntegrity( vehClump );
     }
 
     __asm nop
@@ -970,4 +979,25 @@ float __cdecl NormalizeRadians( float radians )
         radians += (float)( M_PI * 2 );
 
     return radians;
+}
+
+// Render Mode validation API.
+eRenderModeValueType CGameSA::GetPreferedEntityRenderModeType( eEntityRenderMode rMode )
+{
+    return EntityRender::GetPreferedEntityRenderModeType( rMode );
+}
+
+rModeResult CGameSA::ValidateEntityRenderModeBool( eEntityRenderMode rMode, bool value )
+{
+    return EntityRender::ValidateEntityRenderModeBool( rMode, value );
+}
+
+rModeResult CGameSA::ValidateEntityRenderModeFloat( eEntityRenderMode rMode, float value )
+{
+    return EntityRender::ValidateEntityRenderModeFloat( rMode, value );
+}
+
+rModeResult CGameSA::ValidateEntityRenderModeInt( eEntityRenderMode rMode, int value )
+{
+    return EntityRender::ValidateEntityRenderModeInt( rMode, value );
 }

@@ -37,6 +37,7 @@
 #define ALT_PULSE_ORDER_MIN_CLIENT_VERSION      "1.3.1-9.04913"
 #define HIT_ANIM_CLIENT_VERSION                 "1.3.2"
 #define SNIPER_BULLET_SYNC_MIN_CLIENT_VERSION   "1.3.5-9.06054"
+#define SPRINT_FIX_MIN_CLIENT_VERSION           "1.3.5-9.06277"
 
 CGame* g_pGame = NULL;
 
@@ -175,6 +176,7 @@ CGame::CGame ( void )
     m_Glitches [ GLITCH_CROUCHBUG ] = false;
     m_Glitches [ GLITCH_CLOSEDAMAGE ] = false;
     m_Glitches [ GLITCH_HITANIM ] = false;
+    m_Glitches [ GLITCH_FASTSPRINT ] = false;
     for ( int i = 0; i < WEAPONTYPE_LAST_WEAPONTYPE; i++ )
         m_JetpackWeapons [ i ] = false;
 
@@ -188,6 +190,7 @@ CGame::CGame ( void )
     m_GlitchNames["crouchbug"] = GLITCH_CROUCHBUG;
     m_GlitchNames["highcloserangedamage"] = GLITCH_CLOSEDAMAGE;
     m_GlitchNames["hitanim"] = GLITCH_HITANIM;
+    m_GlitchNames["fastsprint"] = GLITCH_FASTSPRINT;
 
     m_bCloudsEnabled = true;
 
@@ -4130,8 +4133,13 @@ void CGame::SendSyncSettings ( CPlayer* pPlayer )
     short sVehExtrapolateMaxMs = m_pMainConfig->GetVehExtrapolatePingLimit ();
     uchar ucVehExtrapolateEnabled = sVehExtrapolatePercent != 0;
     uchar ucUseAltPulseOrder = m_pMainConfig->GetUseAltPulseOrder () != 0;
+    uchar ucAllowFastSprintFix = false;
 
-    CSyncSettingsPacket packet ( weaponTypesUsingBulletSync, ucVehExtrapolateEnabled, sVehExtrapolateBaseMs, sVehExtrapolatePercent, sVehExtrapolateMaxMs, ucUseAltPulseOrder );
+    // Add sprint fix if all clients can handle it
+    if ( ExtractVersionStringBuildNumber( m_pPlayerManager->GetLowestConnectedPlayerVersion() ) >= ExtractVersionStringBuildNumber( SPRINT_FIX_MIN_CLIENT_VERSION ) )
+        ucAllowFastSprintFix = true;
+
+    CSyncSettingsPacket packet ( weaponTypesUsingBulletSync, ucVehExtrapolateEnabled, sVehExtrapolateBaseMs, sVehExtrapolatePercent, sVehExtrapolateMaxMs, ucUseAltPulseOrder, ucAllowFastSprintFix );
     if ( pPlayer )
         pPlayer->Send ( packet );
     else
@@ -4224,8 +4232,7 @@ SString CGame::CalculateMinClientRequirement ( void )
     if ( m_strPrevLowestConnectedPlayerVersion != m_pPlayerManager->GetLowestConnectedPlayerVersion() )
     {
         m_strPrevLowestConnectedPlayerVersion = m_pPlayerManager->GetLowestConnectedPlayerVersion();
-        if ( IsBulletSyncActive () )
-            SendSyncSettings();   
+        SendSyncSettings();   
     }
 
     // Do version based kick check as well

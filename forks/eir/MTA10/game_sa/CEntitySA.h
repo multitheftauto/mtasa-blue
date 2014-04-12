@@ -337,6 +337,8 @@ C_ASSERT(sizeof(CEntitySAInterface) == 0x38);
 void Entity_Init( void );
 void Entity_Shutdown( void );
 
+#include "CEntitySA.rmode.h"
+
 class CEntitySA : public virtual CEntity
 {
     friend class COffsets;
@@ -376,6 +378,16 @@ public:
 
     bool                        IsVisible ( void );
     void                        SetVisible ( bool bVisible );
+
+    rModeResult                 SetEntityRenderModeBool ( eEntityRenderMode rMode, bool value );
+    rModeResult                 SetEntityRenderModeInt ( eEntityRenderMode rMode, int value );
+    rModeResult                 SetEntityRenderModeFloat ( eEntityRenderMode rMode, float value );
+
+    rModeResult                 GetEntityRenderModeBool ( eEntityRenderMode rMode, bool& value ) const;
+    rModeResult                 GetEntityRenderModeInt ( eEntityRenderMode rMode, int& value ) const;
+    rModeResult                 GetEntityRenderModeFloat ( eEntityRenderMode rMode, float& value ) const;
+
+    rModeResult                 ResetEntityRenderMode ( eEntityRenderMode rMode );
 
     BYTE                        GetAreaCode ( void );
     void                        SetAreaCode ( BYTE areaCode );
@@ -423,6 +435,10 @@ private:
     unsigned long               m_ulArrayID;
     void*                       m_pStoredPointer;
     CVector                     m_LastGoodPosition;
+
+public:
+    // Render modes.
+    entityRenderModes_t         m_renderModes;
 };
 
 #include "CEntitySA.render.h"

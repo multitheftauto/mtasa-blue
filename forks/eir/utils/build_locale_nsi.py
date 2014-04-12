@@ -108,6 +108,8 @@ localeToName = {
     "zu" : "Zulu",
 }
 
+localeRTL = [ "ar", "he" ]
+
 def escapeNSIS(st):
     return st.replace('\\', r'$\\')\
              .replace('\t', r'$\t')\
@@ -133,6 +135,10 @@ for root,dirs,files in os.walk(options.podir):
                 
                 # Let's add a default LANGUAGE_CODE LangString to be read
                 translationCache[language]["LANGUAGE_CODE"] = filename
+
+                # Are we RTL? Mark that down too as a LangString
+                if filename in localeRTL:
+                    translationCache[language]["LANGUAGE_RTL"] = "1"
 
                 po = polib.pofile(os.path.join(root,file))
                 for entry in po.translated_entries():

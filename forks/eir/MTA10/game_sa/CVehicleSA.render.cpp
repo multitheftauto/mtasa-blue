@@ -24,6 +24,24 @@ extern CBaseModelInfoSAInterface **ppModelInfo;
     Binary offsets:
         (1.0 US and 1.0 EU): 0x006D3D60
 =========================================================*/
+inline void RenderPedEntity( CPedSAInterface *pedEntity )
+{
+    CPedSA *mtaPed = pGame->GetPools()->GetPed( pedEntity );
+
+    int iAlpha = 255;
+
+    if ( mtaPed )
+    {
+        iAlpha = mtaPed->GetAlpha();
+    }
+    else
+    {
+        iAlpha = RpClumpGetAlpha( (RpClump*)pedEntity->GetRwObject() );
+    }
+
+    EntityRender_Global( pedEntity, iAlpha );
+}
+
 void CVehicleSAInterface::RenderPassengers( void )
 {
     // We may only render passengers on a special occasion.
@@ -34,14 +52,18 @@ void CVehicleSAInterface::RenderPassengers( void )
 
     // Render passengers.
     if ( pDriver && pDriver->IsDrivingVehicle() )
-        pDriver->Render();
+    {
+        RenderPedEntity( pDriver );
+    }
 
     for ( unsigned int n = 0; n < MAX_PASSENGERS; n++ )
     {
         CPedSAInterface *pass = pPassengers[n];
 
         if ( pass && pass->IsDrivingVehicle() )
-            pass->Render();
+        {
+            RenderPedEntity( pass );
+        }
     }
 }
 

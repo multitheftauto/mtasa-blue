@@ -195,6 +195,7 @@ public:
         GLITCH_CROUCHBUG,
         GLITCH_CLOSEDAMAGE,
         GLITCH_HITANIM,
+        GLITCH_FASTSPRINT,
         NUM_GLITCHES
     };
 public:

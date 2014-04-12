@@ -54,6 +54,10 @@ CClientObject::CClientObject ( CClientManager* pManager, ElementID ID, unsigned 
 
     if ( m_bIsLowLod )
         m_pManager->OnLowLODElementCreated ();
+
+    // Set up render modes.
+    m_pRenderModeManager = new renderModeManager( this );
+    m_pRenderModes = new entityRenderModes_t( *m_pRenderModeManager );
 }
 
 
@@ -531,6 +535,9 @@ void CClientObject::Create ( void )
                 // Reattach to an entity + any entities attached to this
                 ReattachEntities ();
 
+                // Apply render modes.
+                m_pRenderModeManager->Apply();
+
                 // Validate this entity again
                 m_pManager->RestoreEntity ( this );
 
@@ -558,6 +565,9 @@ void CClientObject::Destroy ( void )
     // If the object exists
     if ( m_pObject )
     {
+        // Get current render modes.
+        m_pRenderModeManager->Update();
+
         // Invalidate
         m_pManager->InvalidateEntity ( this );
 

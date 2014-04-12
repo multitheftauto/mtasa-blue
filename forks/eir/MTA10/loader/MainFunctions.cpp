@@ -681,7 +681,7 @@ void CheckDataFiles( void )
     }
 
     // Check main exe has the correct name
-    if ( GetLaunchFilename() != MTA_EXE_NAME )
+    if ( GetLaunchFilename().CompareI( MTA_EXE_NAME ) == false )
     {
         SString strMessage( _("Main file has an incorrect name (%s)"), *GetLaunchFilename() );
         int iResponse = MessageBoxUTF8 ( NULL, strMessage, _("Error")+_E("CL33"), MB_RETRYCANCEL | MB_ICONERROR | MB_TOPMOST  );

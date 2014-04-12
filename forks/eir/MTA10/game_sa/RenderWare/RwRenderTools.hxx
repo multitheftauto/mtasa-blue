@@ -255,7 +255,30 @@ struct MeshRenderManager
             }
 
             if ( !useAlphaFix || renderOpaque )
+            {
+                bool hasCustomAlphaRef = false;
+
+                if ( !useAlphaFix )
+                {
+                    unsigned int customAlphaRef;
+
+                    if ( RenderMode::GetAlphaClamp( customAlphaRef ) )
+                    {
+                        alphaRef = new (rsAlloc.Allocate()) RwRenderStateLock( D3DRS_ALPHAREF, customAlphaRef );
+
+                        hasCustomAlphaRef = true;
+                    }
+                }
+
                 meshCB.OnRenderMesh( cb, rtinfo, ( useAlphaFix ) ? RENDER_TRANSLUCENT : RENDER_OPAQUE_AND_TRANSLUCENT );
+
+                if ( hasCustomAlphaRef )
+                {
+                    alphaRef->~RwRenderStateLock();
+
+                    rsAlloc.Pop();
+                }
+            }
 
             if ( renderOpaque )
             {

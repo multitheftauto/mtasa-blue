@@ -158,6 +158,7 @@ public:
     LUA_DECLARE ( GetLowLodElement );
     LUA_DECLARE ( IsElementLowLod );
     LUA_DECLARE ( IsElementCallPropagationEnabled );
+    LUA_DECLARE ( GetElementRenderMode );
 
     // Element set funcs
     LUA_DECLARE ( CreateElement );
@@ -185,6 +186,8 @@ public:
     LUA_DECLARE ( SetElementFrozen );
     LUA_DECLARE ( SetLowLodElement );
     LUA_DECLARE ( SetElementCallPropagationEnabled );
+    LUA_DECLARE ( SetElementRenderMode );
+    LUA_DECLARE ( ResetElementRenderMode );
 
     // Radio functions
     LUA_DECLARE ( SetRadioChannel );
@@ -557,6 +560,8 @@ public:
     LUA_DECLARE ( EngineGetActiveStreamingEntities );
     LUA_DECLARE ( EngineGetGamePoolLimits );
     LUA_DECLARE ( EngineGetStreamingInfo );
+    LUA_DECLARE ( EngineSetWorldRenderMode );
+    LUA_DECLARE ( EngineGetWorldRenderMode );
     LUA_DECLARE ( SetVehicleComponentPosition );
     LUA_DECLARE ( GetVehicleComponentPosition );
     LUA_DECLARE ( SetVehicleComponentRotation );

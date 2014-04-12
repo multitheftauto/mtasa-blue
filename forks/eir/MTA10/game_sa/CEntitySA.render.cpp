@@ -97,19 +97,65 @@ bool CanVehicleRenderNatively( void )
     return !globalDoAlphaFix || globalRenderOpaque;
 }
 
-inline void EntityRender_Global( CEntitySAInterface *entity )
+inline bool PedHasJetpack( CPedSAInterface *pedEntity )
 {
+    CPedSA *mtaPed = pGame->GetPools()->GetPed( pedEntity );
+
+    if ( mtaPed )
+    {
+        CTask *primaryTask = mtaPed->GetPedIntelligence()->GetTaskManager()->GetSimplestActiveTask();
+
+        if ( primaryTask && primaryTask->GetTaskType() == TASK_SIMPLE_JETPACK )
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+void EntityRender_Global( CEntitySAInterface *entity, unsigned int renderAlpha )
+{
+    bool doRender = true;
+
     if ( entity->nType == ENTITY_TYPE_VEHICLE )
     {
         if ( !CanVehicleRenderNatively() )
         {
             // Special clump rendering.
             ((CVehicleSAInterface*)entity)->GetRwObject()->Render();
-            return;
+            
+            doRender = false;
         }
     }
+    else if ( entity->nType == ENTITY_TYPE_PED )
+    {
+        CPedSAInterface *pedEntity = (CPedSAInterface*)entity;
 
-    RenderEntityNative( entity );
+        bool doAlphaFix = RenderCallbacks::IsAlphaSortingEnabled();
+
+        if ( doAlphaFix && renderAlpha != 255 )
+        {
+            bool doOpaque, doTranslucent, doDepth;
+
+            RenderCallbacks::GetAlphaSortingParams( doOpaque, doTranslucent, doDepth );
+
+            // Bugfix for Jetpack.
+            if ( PedHasJetpack( pedEntity ) || pedEntity->IsDrivingVehicle() )
+            {
+                doRender = doOpaque;
+            }
+            else
+            {
+                doRender = doTranslucent;
+            }
+        }
+    }
+    
+    if ( doRender )
+    {
+        RenderEntityNative( entity );
+    }
 }
 
 void __cdecl _RenderEntity( CEntitySAInterface *entity )
@@ -136,13 +182,17 @@ void __cdecl _RenderEntity( CEntitySAInterface *entity )
     {
         // Perform alpha calculations
         if ( entity->nType == ENTITY_TYPE_VEHICLE )
+        {
             alpha = ((CVehicleSA*)mtaEntity)->GetAlpha();
+        }
         else if ( entity->nType == ENTITY_TYPE_OBJECT )
+        {
             alpha = ((CObjectSA*)mtaEntity)->GetAlpha();
-#ifndef _MTA_BLUE
+        }
         else if ( entity->nType == ENTITY_TYPE_PED )
+        {
             alpha = ((CPedSA*)mtaEntity)->GetAlpha();
-#endif //_MTA_BLUE
+        }
     }
     else if ( entity->GetRwObject() && entity->GetRwObject()->type == RW_CLUMP )    // the entity may not have a RenderWare object?!
     {
@@ -150,6 +200,9 @@ void __cdecl _RenderEntity( CEntitySAInterface *entity )
         // We might aswell use this alpha value of the clump.
         alpha = (unsigned char)RpClumpGetAlpha( (RpClump*)entity->GetRwObject() );
     }
+
+    // Set the rendering entity.
+    EntityRender::SetRenderingEntity( mtaEntity );
 
     if ( alpha != 255 )
     {
@@ -195,7 +248,7 @@ void __cdecl _RenderEntity( CEntitySAInterface *entity )
     }
 
     // Special fix for vehicles, since they are complex entities.
-    EntityRender_Global( entity );
+    EntityRender_Global( entity, alpha );
 
     // Restore values and unset entity rendering status/leave frame
     if ( entity->nType == ENTITY_TYPE_VEHICLE )
@@ -224,6 +277,9 @@ void __cdecl _RenderEntity( CEntitySAInterface *entity )
         // Remove the RenderState locks
         alphaRef->~RwRenderStateLock();
     }
+
+    // Remove the rendering entity.
+    EntityRender::SetRenderingEntity( NULL );
 
     entity->RemoveLighting( id );
 }
@@ -765,7 +821,11 @@ void __cdecl RenderWorldEntities( void )
     if ( *(unsigned int*)VAR_currArea == 0 )
         rwInterface->m_deviceCommand( (eRwDeviceCmd)30, 140 );
 
-    RenderInstances( StaticRenderStage() );
+    {
+        StaticRenderStage staticCallback;
+
+        RenderInstances( staticCallback );
+    }
 
     // Notify our system.
     if ( _renderCallback )
@@ -781,7 +841,11 @@ void __cdecl RenderWorldEntities( void )
 
     gtaCamera->BeginUpdate();
 
-    RenderInstances( QuickRenderStage() );
+    {
+        QuickRenderStage quickCallback;
+
+        RenderInstances( quickCallback );
+    }
 
     gtaCamera->EndUpdate();
 
@@ -860,7 +924,11 @@ struct OrderedRenderStage
 
 void __cdecl RenderUnderwaterEntities( void )
 {
-    RenderInstances( OrderedRenderStage( EntityRender::GetUnderwaterEntityRenderChain() ) );
+    {
+        OrderedRenderStage orderedCallback( EntityRender::GetUnderwaterEntityRenderChain() );
+
+        RenderInstances( orderedCallback );
+    }
 
     // Notify the system.
     if ( _renderUnderwaterCallback )
@@ -899,7 +967,11 @@ void __cdecl RenderBoatAtomics( void )
 =========================================================*/
 void __cdecl RenderDefaultOrderedWorldEntities( void )
 {
-    RenderInstances( OrderedRenderStage( EntityRender::GetDefaultEntityRenderChain() ) );
+    {
+        OrderedRenderStage orderedCallback( EntityRender::GetDefaultEntityRenderChain() );
+
+        RenderInstances( orderedCallback );
+    }
 
     RenderBoatAtomics();
 

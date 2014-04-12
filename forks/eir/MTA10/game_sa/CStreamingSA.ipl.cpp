@@ -196,18 +196,7 @@ CEntitySAInterface* __cdecl CreateIPLBuilding( iplInstance_t *instance, const ch
         building->bIsVisible = false;
     }
 
-    if ( instance->quatRotation.x <= 0.05f && instance->quatRotation.y <= 0.05f &&
-         ( IS_ANY_FLAG( instance->flags, 0x2 ) || instance->quatRotation.x <= 0.0f || instance->quatRotation.y <= 0.0f ) )
-    {
-        bool isFlipped = ( instance->quatRotation.z >= 0.0f );
-
-        float heading = acos( instance->quatRotation.w );
-
-        heading *= ( isFlipped ? -2.0f : 2.0f );
-
-        building->Placeable.SetHeading( heading );
-    }
-    else
+    // The_GTA: removed some buggy rotation hacks.
     {
         // MTA quat functions are superior!
         // No invert required!

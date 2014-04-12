@@ -352,6 +352,8 @@ private:
     DWORD               m_dwType;
     unsigned char       m_ucOccupiedSeat;
 
+    int                 m_iAlpha;
+
 protected:
     int                 m_iCustomMoveAnim;
 
@@ -398,6 +400,9 @@ public:
     DWORD               GetType                         ( void );
     void                SetType                         ( DWORD dwType );
     DWORD*              GetMemoryValue                  ( DWORD dwOffset );
+
+    void                SetAlpha                        ( int iAlpha );
+    int                 GetAlpha                        ( void ) const;
 
     virtual void        RestoreLastGoodPhysicsState     ( void );
     FLOAT               GetCurrentRotation              ( void );

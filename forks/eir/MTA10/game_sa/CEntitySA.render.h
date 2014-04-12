@@ -448,6 +448,7 @@ namespace EntityRender
 
 // Function exports.
 bool CanVehicleRenderNatively( void );
+void EntityRender_Global( CEntitySAInterface *entity, unsigned int renderAlpha );
 
 void EntityRender_Init( void );
 void EntityRender_Shutdown( void );

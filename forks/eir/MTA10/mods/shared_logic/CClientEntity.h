@@ -22,6 +22,7 @@ class CClientEntity;
 
 #include "CElementArray.h"
 #include "CClientCommon.h"
+#include "CClientRenderModes.h"
 #include <core/CClientEntityBase.h>
 #include "logic/CClientEntityRefManager.h"
 class CLuaFunctionRef;
@@ -290,6 +291,17 @@ public:
     virtual CEntity*                            GetGameEntity               ( void )                  { return NULL; }
     virtual const CEntity*                      GetGameEntity               ( void ) const            { return NULL; }
 
+    // Render Mode API functions.
+    rModeResult                                 SetEntityRenderModeBool     ( eEntityRenderMode rMode, bool value );
+    rModeResult                                 SetEntityRenderModeFloat    ( eEntityRenderMode rMode, float value );
+    rModeResult                                 SetEntityRenderModeInt      ( eEntityRenderMode rMode, int value );
+
+    rModeResult                                 GetEntityRenderModeBool     ( eEntityRenderMode rMode, bool& value ) const;
+    rModeResult                                 GetEntityRenderModeFloat    ( eEntityRenderMode rMode, float& value ) const;
+    rModeResult                                 GetEntityRenderModeInt      ( eEntityRenderMode rMode, int& value ) const;
+
+    rModeResult                                 ResetEntityRenderMode       ( eEntityRenderMode rMode );
+
     bool                                        IsCollidableWith            ( CClientEntity * pEntity );
     void                                        SetCollidableWith           ( CClientEntity * pEntity, bool bCanCollide );
 
@@ -361,6 +373,151 @@ protected:
     bool                                        m_bDoubleSidedInit;
     bool                                        m_bWorldIgnored;
     bool                                        m_bCallPropagationEnabled;
+
+    // General entity render modes management.
+    struct renderModeManager
+    {
+        typedef eEntityRenderMode rModeDescType;
+
+        inline renderModeManager( CClientEntity *entity )
+        {
+            this->entity = entity;
+        }
+
+        clientRenderModeStorage <rModeDescType> storage;
+
+        inline rModeResult Validate( rModeDescType rMode, bool value )
+        {
+            return g_pGame->ValidateEntityRenderModeBool( rMode, value );
+        }
+
+        inline rModeResult Validate( rModeDescType rMode, float value )
+        {
+            return g_pGame->ValidateEntityRenderModeFloat( rMode, value );
+        }
+
+        inline rModeResult Validate( rModeDescType rMode, int value )
+        {
+            return g_pGame->ValidateEntityRenderModeInt( rMode, value );
+        }
+
+        inline rModeResult Set( rModeDescType rMode, bool value )
+        {
+            CEntity *gameEntity = entity->GetGameEntity();
+
+            if ( gameEntity )
+            {
+                rModeResult result = gameEntity->SetEntityRenderModeBool( rMode, value );
+
+                if ( !result.successful )
+                    return result;
+            }
+
+            storage.StoreBool( rMode, value );
+            return rModeResult( true );
+        }
+
+        inline rModeResult Set( rModeDescType rMode, float value )
+        {
+            CEntity *gameEntity = entity->GetGameEntity();
+
+            if ( gameEntity )
+            {
+                rModeResult result = gameEntity->SetEntityRenderModeFloat( rMode, value );
+
+                if ( !result.successful )
+                    return result;
+            }
+
+            storage.StoreFloat( rMode, value );
+            return rModeResult( true );
+        }
+
+        inline rModeResult Set( rModeDescType rMode, int value )
+        {
+            CEntity *gameEntity = entity->GetGameEntity();
+
+            if ( gameEntity )
+            {
+                rModeResult result = gameEntity->SetEntityRenderModeInt( rMode, value );
+
+                if ( !result.successful )
+                    return result;
+            }
+
+            storage.StoreInt( rMode, value );
+            return rModeResult( true );
+        }
+
+        inline rModeResult Get( rModeDescType rMode, bool& value )
+        {
+            CEntity *gameEntity = entity->GetGameEntity();
+
+            if ( gameEntity )
+            {
+                return gameEntity->GetEntityRenderModeBool( rMode, value );
+            }
+
+            value = storage.GetStoredBool( rMode );
+            return rModeResult( true );
+        }
+
+        inline rModeResult Get( rModeDescType rMode, float& value )
+        {
+            CEntity *gameEntity = entity->GetGameEntity();
+
+            if ( gameEntity )
+            {
+                return gameEntity->GetEntityRenderModeFloat( rMode, value );
+            }
+
+            value = storage.GetStoredFloat( rMode );
+            return rModeResult( true );
+        }
+
+        inline rModeResult Get( rModeDescType rMode, int& value )
+        {
+            CEntity *gameEntity = entity->GetGameEntity();
+
+            if ( gameEntity )
+            {
+                return gameEntity->GetEntityRenderModeInt( rMode, value );   
+            }
+
+            value = storage.GetStoredInt( rMode );
+            return rModeResult( true );
+        }
+
+        inline rModeResult Reset( rModeDescType rMode )
+        {
+            CEntity *gameEntity = entity->GetGameEntity();
+
+            if ( gameEntity )
+            {
+                return gameEntity->ResetEntityRenderMode( rMode );
+            }
+
+            storage.ResetProperty( rMode );
+            return rModeResult( true );
+        }
+
+        inline void Apply( void )
+        {
+            storage.ApplyStates( *this );
+        }
+
+        inline void Update( void )
+        {
+            //storage.UpdateStates( *this, ENTITY_RMODE_MAX );
+            return; // do nothing actually.
+        }
+
+        CClientEntity *entity;
+    };
+    typedef clientRenderModes_t <renderModeManager> entityRenderModes_t;
+
+    renderModeManager*      m_pRenderModeManager;
+    entityRenderModes_t*    m_pRenderModes;
 
 public:
     // Optimization for getElementsByType starting at root

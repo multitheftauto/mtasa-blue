@@ -166,6 +166,10 @@ CClientVehicle::CClientVehicle ( CClientManager* pManager, ElementID ID, unsigne
 
     // Prepare the sirens
     RemoveVehicleSirens();
+
+    // Set up render modes.
+    m_pRenderModeManager = new renderModeManager( this );
+    m_pRenderModes = new entityRenderModes_t( *m_pRenderModeManager );
 }
 
 
@@ -2789,6 +2793,9 @@ void CClientVehicle::Create ( void )
             SetComponentVisible ( strTemp, (*iter).second.m_bVisible );
         }
 
+        // Apply render modes.
+        m_pRenderModeManager->Apply();
+
         // Tell the streamer we've created this object
         NotifyCreate ();
     }
@@ -2884,6 +2891,9 @@ void CClientVehicle::Destroy ( void )
             // Force the trailer to stream out
             GetTowedVehicle ()->StreamOut ();
         }
+
+        // Update the render state storage.
+        m_pRenderModeManager->Update();
 
         if ( GetVehicleType () == CLIENTVEHICLE_TRAIN )
         {

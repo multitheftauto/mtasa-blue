@@ -1064,3 +1064,43 @@ int CLuaFunctionDefs::EngineGetStreamingInfo( lua_State *luaVM )
 
     return 1;
 }
+
+
+DECLARE_ENUM( eWorldRenderMode );
+
+IMPLEMENT_ENUM_BEGIN( eWorldRenderMode )
+    ADD_ENUM( WORLD_RENDER_ORIGINAL,            "original" )
+    ADD_ENUM( WORLD_RENDER_MESHLOCAL_ALPHAFIX,  "meshlocal_alphafix" )
+    ADD_ENUM( WORLD_RENDER_SCENE_ALPHAFIX,      "scene_alphafix" )
+IMPLEMENT_ENUM_END( "world-render-mode" )
+
+int CLuaFunctionDefs::EngineSetWorldRenderMode ( lua_State *L )
+{
+    eWorldRenderMode renderMode;
+
+    CScriptArgReader argStream( L );
+    argStream.ReadEnumString( renderMode );
+
+    if ( !argStream.HasErrors() )
+    {
+        g_pGame->GetRenderWare()->SetWorldRenderMode( renderMode );
+
+        lua_pushboolean( L, true );
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom ( L, argStream.GetFullErrorMessage() );
+
+    lua_pushboolean( L, false );
+    return 1;
+}
+
+int CLuaFunctionDefs::EngineGetWorldRenderMode ( lua_State *L )
+{
+    eWorldRenderMode renderMode = g_pGame->GetRenderWare()->GetWorldRenderMode();
+
+    SString modeString = EnumToString( renderMode );
+
+    lua_pushlstring( L, modeString.c_str(), modeString.size() );
+    return 1;
+}

@@ -113,6 +113,7 @@ VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductVersion" "${VI_PRODUCT_VERSION}"
 !define MUI_UNICON		"mta.ico"
 !define MUI_HEADERIMAGE
 !define MUI_HEADERIMAGE_BITMAP "mta_install_header.bmp"
+!define MUI_HEADERIMAGE_BITMAP_RTL "mta_install_header_rtl.bmp"
 
 ; Welcome page
 !define MUI_WELCOMEPAGE_TITLE_3LINES
@@ -1315,14 +1316,36 @@ Function ResizeComponentsDialogContents
 	StrCpy $Y 0
 	StrCpy $CX 0
 	StrCpy $CY $RESIZE_Y
+	${If} "$(LANGUAGE_RTL)" == "1"
+		StrCpy $X 0
+	${EndIf}
 
  	StrCpy $ITEM_PARENT $HWND_DIALOG
  	StrCpy $ITEM_ID 1043	; Static - "Position your mouse over a component to see its description."
 	Call MoveDialogItem
-	
+    
  	StrCpy $ITEM_PARENT $HWND_DIALOG
 	StrCpy $ITEM_ID 1042	; Button - Description
 	Call MoveDialogItem
+    
+	${If} "$(LANGUAGE_RTL)" == "1"
+		StrCpy $X $RESIZE_X
+		StrCpy $Y 0
+		StrCpy $CX 0
+		StrCpy $CY 0
+
+		StrCpy $ITEM_PARENT $HWND_DIALOG
+		StrCpy $ITEM_ID 1021	; Static - "Select the type of install."
+		Call MoveDialogItem
+
+		StrCpy $ITEM_PARENT $HWND_DIALOG
+		StrCpy $ITEM_ID 1022	; Static - "Or, select the optional components you wish to install."
+		Call MoveDialogItem
+
+		StrCpy $ITEM_PARENT $HWND_DIALOG
+		StrCpy $ITEM_ID 1023	; Static - "Space required: XX MB."
+		Call MoveDialogItem
+	${EndIf}
 
 	;Middle zone bigger
 	StrCpy $X 0
@@ -1436,6 +1459,18 @@ Function ResizeSharedDialogContents
 	StrCpy $ITEM_ID 1038	; Static - "Choose which features of MTA:SA v1.0 you want to install."
 	Call MoveDialogItem
 	
+	${If} "$(LANGUAGE_RTL)" == "1"
+		;Move image to the right most end if RTL
+		StrCpy $X $RESIZE_X
+		StrCpy $Y 0
+		StrCpy $CX 0
+		StrCpy $CY 0
+
+		StrCpy $ITEM_PARENT $HWNDPARENT
+		StrCpy $ITEM_ID 1046	; Static - mta_install_header_rtl.bmp
+		Call MoveDialogItem
+	${EndIf}
+    
 FunctionEnd
 
 

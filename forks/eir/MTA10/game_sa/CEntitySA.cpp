@@ -766,11 +766,11 @@ bool CEntitySA::IsVisible ( void )
     return m_pInterface->bIsVisible;
 }
 
-
 void CEntitySA::SetVisible ( bool bVisible )
 {
     m_pInterface->bIsVisible = bVisible;
 }
+
 
 VOID CEntitySA::MatrixConvertFromEulerAngles ( float fX, float fY, float fZ, int iUnknown )
 {

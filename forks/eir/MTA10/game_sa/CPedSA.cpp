@@ -30,7 +30,7 @@ bool __thiscall CPedSAInterface::IsPlayer( void )
     return false;
 }
 
-CPedSA::CPedSA (  ): m_pPedIntelligence ( NULL ), m_pPedInterface ( NULL ), m_pPedSound ( NULL ), m_iCustomMoveAnim( 0 )
+CPedSA::CPedSA (  ): m_pPedIntelligence ( NULL ), m_pPedInterface ( NULL ), m_pPedSound ( NULL ), m_iCustomMoveAnim( 0 ), m_iAlpha( 255 )
 {
     DEBUG_TRACE("CPedSA::CPedSA(  )");
 
@@ -41,7 +41,8 @@ CPedSA::CPedSA( CPedSAInterface * pPedInterface ) :
     m_pPedIntelligence ( NULL ),
     m_pPedInterface ( pPedInterface ),
     m_pPedSound ( NULL ),
-    m_iCustomMoveAnim( 0 )
+    m_iCustomMoveAnim( 0 ),
+    m_iAlpha( 255 )
 {
     DEBUG_TRACE("CPedSA::CPedSA( CPedSAInterface * pedInterface )");
 
@@ -398,6 +399,18 @@ DWORD * CPedSA::GetMemoryValue ( DWORD dwOffset )
         return (DWORD *)((DWORD)(this->GetInterface()) + dwOffset);
     else
         return NULL;
+}
+
+void CPedSA::SetAlpha( int iAlpha )
+{
+    pGame->GetVisibilityPlugins()->SetClumpAlpha( (RpClump*)GetInterface()->GetRwObject(), iAlpha );
+
+    m_iAlpha = iAlpha;
+}
+
+int CPedSA::GetAlpha( void ) const
+{
+    return m_iAlpha;
 }
 
 void CPedSA::RemoveWeaponModel ( int iModel )

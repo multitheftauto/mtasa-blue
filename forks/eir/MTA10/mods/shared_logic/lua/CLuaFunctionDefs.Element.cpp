@@ -2381,3 +2381,374 @@ int CLuaFunctionDefs::IsElementCallPropagationEnabled ( lua_State* luaVM )
     lua_pushboolean ( luaVM, false );
     return 1;
 }
+
+DECLARE_ENUM( eEntityRenderMode );
+
+IMPLEMENT_ENUM_BEGIN( eEntityRenderMode )
+    ADD_ENUM( ENTITY_RMODE_LIGHTING,                "lighting" )
+    ADD_ENUM( ENTITY_RMODE_LIGHTING_AMBIENT,        "lighting_ambient" )
+    ADD_ENUM( ENTITY_RMODE_LIGHTING_DIRECTIONAL,    "lighting_directional" )
+    ADD_ENUM( ENTITY_RMODE_LIGHTING_POINT,          "lighting_point" )
+    ADD_ENUM( ENTITY_RMODE_LIGHTING_SPOT,           "lighting_spot" )
+    ADD_ENUM( ENTITY_RMODE_LIGHTING_MATERIAL,       "lighting_material" )
+    ADD_ENUM( ENTITY_RMODE_REFLECTION,              "reflection" )
+    ADD_ENUM( ENTITY_RMODE_ALPHACLAMP,              "alphaClamp" )
+IMPLEMENT_ENUM_END( "eEntityRenderMode" )
+
+inline eRenderModeValueType ReadPreferedValueType( CScriptArgReader& argStream )
+{
+    if ( argStream.NextIsString() )
+    {
+        SString valueTypeString;
+
+        argStream.ReadString( valueTypeString );
+
+        if ( !argStream.HasErrors() )
+        {
+            if ( valueTypeString == "bool" )
+            {
+                return RMODE_BOOLEAN;
+            }
+            else if ( valueTypeString == "int" )
+            {
+                return RMODE_INT;
+            }
+            else if ( valueTypeString == "float" )
+            {
+                return RMODE_FLOAT;
+            }
+        }
+    }
+
+    return RMODE_VOID;
+}
+
+template <typename callbackType>
+static AINLINE int _ElementRenderModeSelector( lua_State *L, bool allowTypeSpecifier, callbackType& cb )
+{
+    CClientEntity *pEntity = NULL;
+    const char *entityTypeString = NULL;
+    
+    CScriptArgReader argStream( L );
+    
+    if ( argStream.NextIsUserDataOfType <CClientEntity> () )
+    {
+        argStream.ReadUserData( pEntity );
+    }
+    else if ( argStream.NextIsString() )
+    {
+        entityTypeString = lua_tostring( L, 1 );
+
+        argStream.m_iIndex++;
+    }
+
+    eEntityRenderMode rMode;
+    
+    if ( !argStream.HasErrors() )
+    {
+        argStream.ReadEnumString( rMode );
+    }
+    
+    if ( !argStream.HasErrors() )
+    {
+        rModeResult result;
+
+        if ( pEntity )
+        {
+            eRenderModeValueType valueType = RMODE_VOID;
+
+            if ( allowTypeSpecifier )
+            {
+                {
+                    eRenderModeValueType prefScriptType = ReadPreferedValueType( argStream );
+
+                    if ( prefScriptType != RMODE_VOID )
+                    {
+                        valueType = prefScriptType;
+                    }
+                }
+
+                if ( valueType == RMODE_VOID )
+                {
+                    valueType = g_pGame->GetPreferedEntityRenderModeType( rMode );
+                }
+            }
+
+            result = cb.OnEntitySelectedRenderMode( L, argStream, rMode, pEntity, valueType );
+        }
+        else
+        {
+            // todo.
+        }
+
+        return cb.DoReturnResult( L, result );
+    }
+
+    if ( argStream.HasErrors() )
+        g_pClientGame->GetScriptDebugging()->LogCustom ( L, argStream.GetFullErrorMessage() );
+
+    lua_pushboolean( L, false );
+    return 1;
+}
+
+struct SetRenderModeCallback
+{
+    AINLINE rModeResult OnEntitySelectedRenderMode( lua_State *L, CScriptArgReader& argStream, eEntityRenderMode rMode, CClientEntity *pEntity, eRenderModeValueType valueType )
+    {
+        union
+        {
+            bool boolValue;
+            float floatValue;
+            int intValue;
+        };
+
+        bool gotBoolValue = false;
+        bool gotFloatValue = false;
+        bool gotIntValue = false;
+        
+        if ( valueType != RMODE_VOID )
+        {
+            CScriptArgReader secondaryArgStream( L );
+
+            secondaryArgStream.m_iIndex = argStream.m_iIndex;
+
+            if ( valueType == RMODE_BOOLEAN )
+            {
+                secondaryArgStream.ReadBool( boolValue );
+
+                gotBoolValue = !secondaryArgStream.HasErrors();
+            }
+            else if ( valueType == RMODE_FLOAT )
+            {
+                secondaryArgStream.ReadNumber( floatValue );
+
+                gotFloatValue = !secondaryArgStream.HasErrors();
+            }
+            else if ( valueType == RMODE_INT )
+            {
+                secondaryArgStream.ReadNumber( intValue );
+
+                gotIntValue = !secondaryArgStream.HasErrors();
+            }
+        }
+
+        if ( !gotIntValue && !gotFloatValue && !gotBoolValue )
+        {
+            if ( argStream.NextIsBool() )
+            {
+                argStream.ReadBool( boolValue );
+
+                gotBoolValue = !argStream.HasErrors();
+            }
+            else if ( argStream.NextIsNumber() )
+            {
+                argStream.ReadNumber( floatValue );
+
+                gotFloatValue = !argStream.HasErrors();
+            }
+            else
+                argStream.SetCustomError( "invalid property type" );
+        }
+
+        rModeResult result;
+
+        if ( !argStream.HasErrors() )
+        {
+            if ( gotBoolValue )
+            {
+                result = pEntity->SetEntityRenderModeBool( rMode, boolValue );
+            }
+            else if ( gotFloatValue )
+            {
+                result = pEntity->SetEntityRenderModeFloat( rMode, floatValue );
+            }
+            else if ( gotIntValue )
+            {
+                result = pEntity->SetEntityRenderModeInt( rMode, intValue );
+            }
+        }
+        else
+        {
+            g_pClientGame->GetScriptDebugging()->LogCustom ( L, argStream.GetFullErrorMessage() );
+
+            result.successful = false;
+            result.debugMsg = argStream.GetErrorMessage();
+        }
+
+        return result;
+    }
+
+    AINLINE int DoReturnResult( lua_State *L, rModeResult& theResult )
+    {
+        int numRet = 1;
+
+        lua_pushboolean( L, theResult.successful );
+
+        if ( theResult.debugMsg.size() != 0 )
+        {
+            lua_pushlstring( L, theResult.debugMsg.c_str(), theResult.debugMsg.size() );
+            numRet++;
+        }
+        return numRet;
+    }
+};
+
+int CLuaFunctionDefs::SetElementRenderMode ( lua_State *L )
+{
+    // bool, string setElementRenderMode ( [ string entityType/element theElement, ] string rModeDesc, [, string preferedValueType, ] var value )
+    SetRenderModeCallback callback;
+
+    return _ElementRenderModeSelector( L, true, callback );
+}
+
+struct GetElementRenderModeCallback
+{
+    bool hasReturnValue;
+
+    AINLINE GetElementRenderModeCallback( void )
+    {
+        hasReturnValue = false;
+    }
+
+    AINLINE rModeResult OnEntitySelectedRenderMode( lua_State *L, CScriptArgReader& argStream, eEntityRenderMode rMode, CClientEntity *pEntity, eRenderModeValueType valueType )
+    {
+        union
+        {
+            bool boolValue;
+            float floatValue;
+            int intValue;
+        };
+
+        bool gotBoolValue = false;
+        bool gotFloatValue = false;
+        bool gotIntValue = false;
+
+        rModeResult result;
+
+        // Return by preference if possible.
+        if ( valueType == RMODE_BOOLEAN )
+        {
+            result = pEntity->GetEntityRenderModeBool( rMode, boolValue );
+
+            gotBoolValue = result.successful;
+        }
+        else if ( valueType == RMODE_FLOAT )
+        {
+            result = pEntity->GetEntityRenderModeFloat( rMode, floatValue );
+
+            gotFloatValue = result.successful;
+        }
+        else if ( valueType == RMODE_INT )
+        {
+            result = pEntity->GetEntityRenderModeInt( rMode, intValue );
+
+            gotIntValue = result.successful;
+        }
+
+        // If preference failed, try default stuff.
+        if ( !gotBoolValue && !gotFloatValue && !gotIntValue )
+        {
+            rModeResult secResult = pEntity->GetEntityRenderModeBool( rMode, boolValue );
+
+            if ( !secResult.successful )
+            {
+                secResult = pEntity->GetEntityRenderModeFloat( rMode, floatValue );
+
+                if ( !secResult.successful )
+                {
+                    secResult = pEntity->GetEntityRenderModeInt( rMode, intValue );
+
+                    if ( secResult.successful )
+                    {
+                        gotIntValue = true;
+                    }
+                }
+                else
+                {
+                    gotFloatValue = true;
+                }
+            }
+            else
+            {
+                gotBoolValue = true;
+            }
+
+            if ( secResult.successful )
+            {
+                result = secResult;
+            }
+        }
+
+        if ( gotBoolValue )
+        {
+            lua_pushboolean( L, boolValue );
+        }
+        else if ( gotFloatValue )
+        {
+            lua_pushnumber( L, floatValue );
+        }
+        else if ( gotIntValue )
+        {
+            lua_pushinteger( L, intValue );
+        }
+
+        hasReturnValue = ( gotBoolValue || gotFloatValue || gotIntValue );
+
+        return result;
+    }
+
+    AINLINE int DoReturnResult( lua_State *L, rModeResult& theResult )
+    {
+        int numRet = 1;
+
+        if ( !hasReturnValue )
+        {
+            lua_pushboolean( L, theResult.successful );
+        }
+
+        if ( theResult.debugMsg.size() != 0 )
+        {
+            lua_pushlstring( L, theResult.debugMsg.c_str(), theResult.debugMsg.size() );
+            numRet++;
+        }
+        return numRet;
+    }
+};
+
+int CLuaFunctionDefs::GetElementRenderMode ( lua_State *L )
+{
+    // value, string getElementRenderMode ( [ string entityType/element theElement, string rModeDesc, string prefValueType ] )
+    GetElementRenderModeCallback callback;
+
+    return _ElementRenderModeSelector( L, true, callback );
+}
+
+struct ResetElementRenderModeCallback
+{
+    AINLINE rModeResult OnEntitySelectedRenderMode( lua_State *L, CScriptArgReader& argStream, eEntityRenderMode rMode, CClientEntity *pEntity, eRenderModeValueType valueType )
+    {
+        return pEntity->ResetEntityRenderMode( rMode );
+    }
+
+    AINLINE int DoReturnResult( lua_State *L, rModeResult& theResult )
+    {
+        int numRet = 1;
+
+        lua_pushboolean( L, theResult.successful );
+
+        if ( theResult.debugMsg.size() != 0 )
+        {
+            lua_pushlstring( L, theResult.debugMsg.c_str(), theResult.debugMsg.size() );
+            numRet++;
+        }
+        return numRet;
+    }
+};
+
+int CLuaFunctionDefs::ResetElementRenderMode ( lua_State *L )
+{
+    // bool, string resetElementRenderMode ( [ string entityType/element theElement, ] string rModeDesc )
+    ResetElementRenderModeCallback callback;
+
+    return _ElementRenderModeSelector( L, false, callback );
+}

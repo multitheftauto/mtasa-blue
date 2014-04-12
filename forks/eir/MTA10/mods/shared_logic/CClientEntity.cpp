@@ -66,11 +66,25 @@ CClientEntity::CClientEntity ( ElementID ID )
 
     m_bWorldIgnored = false;
     g_pCore->UpdateDummyProgress();
+
+    m_pRenderModeManager = NULL;
+    m_pRenderModes = NULL;
 }
 
 
 CClientEntity::~CClientEntity ( void )
 {
+    // Terminate render mode system (if available)
+    if ( m_pRenderModes )
+    {
+        delete m_pRenderModes;
+    }
+
+    if ( m_pRenderModeManager )
+    {
+        delete m_pRenderModeManager;
+    }
+
     // Make sure we won't get deleted later by the element deleter if we've been requested so
     if ( m_bBeingDeleted )
     {
@@ -1588,6 +1602,79 @@ void CClientEntity::_GetEntitiesFromRoot ( unsigned int uiTypeHash, std::map < C
 }
 
 #endif
+
+// Render Mode API functions.
+static rModeResult operationNotSupportedResult( false, "operation not supported" );
+
+rModeResult CClientEntity::SetEntityRenderModeBool( eEntityRenderMode rMode, bool value )
+{
+    if ( m_pRenderModes )
+    {
+        return m_pRenderModes->SetBool( rMode, value );
+    }
+
+    return operationNotSupportedResult;
+}
+
+rModeResult CClientEntity::SetEntityRenderModeFloat( eEntityRenderMode rMode, float value )
+{
+    if ( m_pRenderModes )
+    {
+        return m_pRenderModes->SetFloat( rMode, value );
+    }
+    
+    return operationNotSupportedResult;
+}
+
+rModeResult CClientEntity::SetEntityRenderModeInt( eEntityRenderMode rMode, int value )
+{
+    if ( m_pRenderModes )
+    {
+        return m_pRenderModes->SetInt( rMode, value );
+    }
+
+    return operationNotSupportedResult;
+}
+
+rModeResult CClientEntity::GetEntityRenderModeBool( eEntityRenderMode rMode, bool& value ) const
+{
+    if ( m_pRenderModes )
+    {
+        return m_pRenderModes->GetBool( rMode, value );
+    }
+
+    return operationNotSupportedResult;
+}
+
+rModeResult CClientEntity::GetEntityRenderModeFloat( eEntityRenderMode rMode, float& value ) const
+{
+    if ( m_pRenderModes )
+    {
+        return m_pRenderModes->GetFloat( rMode, value );
+    }
+
+    return operationNotSupportedResult;
+}
+
+rModeResult CClientEntity::GetEntityRenderModeInt( eEntityRenderMode rMode, int& value ) const
+{
+    if ( m_pRenderModes )
+    {
+        return m_pRenderModes->GetInt( rMode, value );
+    }
+
+    return operationNotSupportedResult;
+}
+
+rModeResult CClientEntity::ResetEntityRenderMode( eEntityRenderMode rMode )
+{
+    if ( m_pRenderModes )
+    {
+        return m_pRenderModes->Reset( rMode );
+    }
+
+    return operationNotSupportedResult;
+}
 
 
 bool CClientEntity::IsCollidableWith ( CClientEntity * pEntity )

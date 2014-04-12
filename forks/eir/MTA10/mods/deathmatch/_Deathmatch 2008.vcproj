@@ -897,6 +897,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\shared_logic\CClientRenderModes.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\shared_logic\CClientShader.cpp"
 					>
 				</File>
@@ -2500,6 +2504,10 @@
 				</File>
 				<File
 					RelativePath="..\shared_logic\CClientRenderElementManager.h"
+					>
+				</File>
+				<File
+					RelativePath="..\shared_logic\CClientRenderModes.h"
 					>
 				</File>
 				<File

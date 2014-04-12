@@ -467,20 +467,51 @@ bool CLuaArgument::ReadFromBitStream ( NetBitStreamInterface& bitStream, std::ve
             // Number type
             case LUA_TNUMBER:
             {
-                bool bIsFloatingPoint;
-                if ( bitStream.ReadBit ( bIsFloatingPoint ) && bIsFloatingPoint )
+                if ( bitStream.Version() < 0x59 )
                 {
-                    // Should be in high precision mode
-                    dassert( g_pClientGame->IsHighFloatPrecision() );
-                    float fNum;
-                    if ( bitStream.Read ( fNum ) )
-                        ReadNumber ( RoundFromFloatSource( fNum ) );
+                    // Old way
+                    bool bIsFloatingPoint;
+                    if ( bitStream.ReadBit ( bIsFloatingPoint ) && bIsFloatingPoint )
+                    {
+                        // Should be in high precision mode
+                        dassert( g_pClientGame->IsHighFloatPrecision() );
+                        float fNum;
+                        if ( bitStream.Read ( fNum ) )
+                            ReadNumber ( RoundFromFloatSource( fNum ) );
+                    }
+                    else
+                    {
+                        long lNum;
+                        if ( bitStream.ReadCompressed ( lNum ) )
+                            ReadNumber ( lNum );
+                    }
                 }
                 else
                 {
-                    long lNum;
-                    if ( bitStream.ReadCompressed ( lNum ) )
-                        ReadNumber ( lNum );
+                    // New way - Maybe use double to better preserve > 32bit numbers
+                    if ( bitStream.ReadBit() )
+                    {
+                        // Should be in high precision mode
+                        dassert( g_pClientGame->IsHighFloatPrecision() );
+                        if ( bitStream.ReadBit()  )
+                        {
+                            double dNum;
+                            if ( bitStream.Read ( dNum ) )
+                                ReadNumber ( dNum );
+                        }
+                        else
+                        {
+                            float fNum;
+                            if ( bitStream.Read ( fNum ) )
+                                ReadNumber ( RoundFromFloatSource( fNum ) );
+                        }
+                    }
+                    else
+                    {
+                        long lNum;
+                        if ( bitStream.ReadCompressed ( lNum ) )
+                            ReadNumber ( lNum );
+                    }
                 }
                 break;
             }
@@ -632,21 +663,47 @@ bool CLuaArgument::WriteToBitStream ( NetBitStreamInterface& bitStream, CFastHas
         {
             type.data.ucType = LUA_TNUMBER;
             bitStream.Write ( &type );
-            float fNumber = static_cast < float > ( GetNumber () );
-            long lNumber = static_cast < long > ( fNumber );
-            float fNumberInteger = static_cast < float > ( lNumber );
 
-            // Check if the number is an integer and can fit a long datatype
-            if ( fabs ( fNumber ) > fabs ( fNumberInteger + 1 ) ||
-                 fabs ( fNumber - fNumberInteger ) >= FLOAT_EPSILON )
+            if ( bitStream.Version() < 0x59 )
             {
-                bitStream.WriteBit ( true );
-                bitStream.Write ( fNumber );
+                // Old way
+                int iNumber;
+                if ( !ShouldUseInt( GetNumber(), &iNumber ) )
+                {
+                    bitStream.WriteBit ( true );
+                    bitStream.Write ( static_cast < float > ( GetNumber() ) );
+                }
+                else
+                {
+                    bitStream.WriteBit ( false );
+                    bitStream.WriteCompressed ( iNumber );
+                }
             }
             else
             {
-                bitStream.WriteBit ( false );
-                bitStream.WriteCompressed ( lNumber );
+                // New way - Maybe use double to better preserve > 32bit numbers
+                int iNumber;
+                float fNumber;
+                double dNumber;
+                EDataType dataType = GetDataTypeToUse( GetNumber(), &iNumber, &fNumber, &dNumber );
+                if ( dataType == DATA_TYPE_INT )
+                {
+                    bitStream.WriteBit ( false );
+                    bitStream.WriteCompressed ( iNumber );
+                }
+                else
+                if ( dataType == DATA_TYPE_FLOAT )
+                {
+                    bitStream.WriteBit ( true );
+                    bitStream.WriteBit ( false );
+                    bitStream.Write ( fNumber );
+                }
+                else
+                {
+                    bitStream.WriteBit ( true );
+                    bitStream.WriteBit ( true );
+                    bitStream.Write ( dNumber );
+                }
             }
             break;
         }
@@ -796,15 +853,14 @@ json_object * CLuaArgument::WriteToJSONObject ( bool bSerialize, CFastHashMap < 
         }
         case LUA_TNUMBER:
         {
-            float fNum = static_cast < float > ( GetNumber () );
-            int iNum = static_cast < int > ( GetNumber () );
-            if ( iNum == fNum )
+            int iNumber;
+            if ( ShouldUseInt( GetNumber(), &iNumber ) )
             {
-                return json_object_new_int(iNum);
+                return json_object_new_int( iNumber );
             }
             else
             {
-                return json_object_new_double(fNum);
+                return json_object_new_double( static_cast < float > ( GetNumber() ) );
             }
             break;
         }
@@ -887,16 +943,15 @@ char * CLuaArgument::WriteToString ( char * szBuffer, int length )
         }
         case LUA_TNUMBER:
         {
-            float fNum = static_cast < float > ( GetNumber () );
-            int iNum = static_cast < int > ( GetNumber () );
-            if ( iNum == fNum )
+            int iNumber;
+            if ( ShouldUseInt( GetNumber(), &iNumber ) )
             {
-                snprintf ( szBuffer, length, "%d", iNum );
+                snprintf ( szBuffer, length, "%d", iNumber );
                 return szBuffer;
             }
             else
             {
-                snprintf ( szBuffer, length, "%f", fNum );
+                snprintf ( szBuffer, length, "%f", static_cast < float > ( GetNumber() ) );
                 return szBuffer;
             }
             break;

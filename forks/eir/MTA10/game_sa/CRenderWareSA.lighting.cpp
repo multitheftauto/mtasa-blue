@@ -15,6 +15,8 @@
 #include <sstream>
 #include "RenderWare/RwRenderTools.hxx"
 
+#include "CRenderWareSA.rmode.hxx"
+
 #define NUM_LIGHTING_SHADER_CACHE_COUNT			8
 
 //todo: implement a light state management so that GTA:SA light settings are separate from MTA light settings.
@@ -1913,7 +1915,7 @@ int _GlobalLightsEnable( D3D9Lighting::lightState& state, lightMan& cb )
     unsigned int numLights = 0;
 
     LIST_FOREACH_BEGIN( RpLight, curScene->globalLights.root, sceneLights )
-        if ( cb.CanProcessLight( item ) )
+        if ( cb.CanProcessLight( item ) && RenderMode::IsRwLightEnabled( item ) )
         {
             numLights++;
 
@@ -2016,62 +2018,68 @@ void __cdecl HOOK_DefaultAtomicLightingCallback( RpAtomic *atomic )
 
     bool requiresAmbientLighting = false;
 
-    bool enableLighting = IS_ANY_FLAG( geom->flags, 0x20 );
-
-    if ( curScene )
+    if ( RenderMode::IsLightingEnabled() )
     {
-        if ( enableLighting || forceGlobalLighting )
+        bool enableLighting = IS_ANY_FLAG( geom->flags, 0x20 );
+
+        if ( curScene )
         {
-            // Process main light-state.
-            D3D9Lighting::curLightState.ResetActiveLights();
+            if ( enableLighting || forceGlobalLighting )
+            {
+                // Process main light-state.
+                D3D9Lighting::curLightState.ResetActiveLights();
 
-            hasGlobalLighting = _GlobalLightsEnable( D3D9Lighting::curLightState, AtomicGlobalLightManager( geom ) ) != 0;
+                hasGlobalLighting = _GlobalLightsEnable( D3D9Lighting::curLightState, AtomicGlobalLightManager( geom ) ) != 0;
 
-            // Set the global ambient light color to the one specified by the native light-state.
-            GetAmbientColor() = D3D9Lighting::curLightState.ambientLightColor;
+                // Set the global ambient light color to the one specified by the native light-state.
+                GetAmbientColor() = D3D9Lighting::curLightState.ambientLightColor;
 
-            requiresAmbientLighting = true;
+                requiresAmbientLighting = true;
 
-            // todo: optimize light sectoring.
-            // we should make sure it is quad-tree oriented (not proven for now, tho its quite fast this way)
-        }
+                // todo: optimize light sectoring.
+                // we should make sure it is quad-tree oriented (not proven for now, tho its quite fast this way)
+            }
 
-        if ( enableLighting && IS_ANY_FLAG( geom->flags, 0x10 ) || forceLocalLighting )
-        {
-            // Activate all local lights on a seperate light-state.
-            D3D9Lighting::lightState& localLightState = localLight_lightState;
-            localLightState.ResetActiveLights();
+            if ( enableLighting && IS_ANY_FLAG( geom->flags, 0x10 ) || forceLocalLighting )
+            {
+                // Activate all local lights on a seperate light-state.
+                D3D9Lighting::lightState& localLightState = localLight_lightState;
+                localLightState.ResetActiveLights();
 
-            // Scancode algorithm, so lights do not get processed twice.
-            RwInterface *rwInterface = RenderWare::GetInterface();
+                // Scancode algorithm, so lights do not get processed twice.
+                RwInterface *rwInterface = RenderWare::GetInterface();
 
-            rwInterface->m_frame++;
+                rwInterface->m_frame++;
 
-            LIST_FOREACH_BEGIN( RpAtomic::sectorNode, atomic->sectors.root, node )
-                RwSector *sector = item->data;
+                LIST_FOREACH_BEGIN( RpAtomic::sectorNode, atomic->sectors.root, node )
+                    RwSector *sector = item->data;
 
-                LIST_FOREACH_BEGIN( RwSector::lightNode, sector->m_localLights.root, node )
-                    RpLight *light = item->data;
+                    LIST_FOREACH_BEGIN( RwSector::lightNode, sector->m_localLights.root, node )
+                        RpLight *light = item->data;
 
-                    if ( light && light->parent && light->frame != rwInterface->m_frame && light->IsLightActive() && RpLightIsInsideFrustum( light ) )
-                    {
-                        light->frame = rwInterface->m_frame;
-
-                        const RwMatrix& lightPos = light->parent->GetLTM();
-                        const RwSphere& atomicSphere = atomic->GetWorldBoundingSphere();
-
-                        float lightSphereActivityRange = light->radius + atomicSphere.radius;
-
-                        lightSphereActivityRange *= lightSphereActivityRange;
-
-                        if ( ( atomicSphere.pos - lightPos.vPos ).LengthSquared() <= lightSphereActivityRange )
+                        if ( light && light->parent && light->frame != rwInterface->m_frame && light->IsLightActive() && RpLightIsInsideFrustum( light ) )
                         {
-                            if ( localLightState.ActivateLocalLight( light ) )
-                                hasLocalLighting = true;
+                            if ( RenderMode::IsRwLightEnabled( light ) )
+                            {
+                                light->frame = rwInterface->m_frame;
+
+                                const RwMatrix& lightPos = light->parent->GetLTM();
+                                const RwSphere& atomicSphere = atomic->GetWorldBoundingSphere();
+
+                                float lightSphereActivityRange = light->radius + atomicSphere.radius;
+
+                                lightSphereActivityRange *= lightSphereActivityRange;
+
+                                if ( ( atomicSphere.pos - lightPos.vPos ).LengthSquared() <= lightSphereActivityRange )
+                                {
+                                    if ( localLightState.ActivateLocalLight( light ) )
+                                        hasLocalLighting = true;
+                                }
+                            }
                         }
-                    }
+                    LIST_FOREACH_END
                 LIST_FOREACH_END
-            LIST_FOREACH_END
+            }
         }
     }
 

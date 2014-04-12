@@ -261,6 +261,13 @@ public:
     virtual bool                PerformChecks               () = 0;
     virtual int&                GetCheckStatus              () = 0;
 
+    // Render Mode validation API.
+    virtual eRenderModeValueType    GetPreferedEntityRenderModeType ( eEntityRenderMode rMode ) = 0;
+
+    virtual rModeResult         ValidateEntityRenderModeBool ( eEntityRenderMode rMode, bool value ) = 0;
+    virtual rModeResult         ValidateEntityRenderModeFloat ( eEntityRenderMode rMode, float value ) = 0;
+    virtual rModeResult         ValidateEntityRenderModeInt ( eEntityRenderMode rMode, int value ) = 0;
+
     // Clothes
     virtual void                FlushClothesCache               ( void ) = 0;
     virtual void                GetClothesCacheStats            ( SClothesCacheStats& outStats ) = 0;
