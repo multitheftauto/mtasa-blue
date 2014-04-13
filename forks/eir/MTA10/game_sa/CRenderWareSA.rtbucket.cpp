@@ -55,7 +55,7 @@ RenderBucket::RwRenderBucket* RenderBucket::AllocateRenderBucket( void )
 
 }
 
-RwRenderBucket* RenderBucket::FindRenderBucket( void )
+RenderBucket::RwRenderBucket* RenderBucket::FindRenderBucket( void )
 {
 
 }
