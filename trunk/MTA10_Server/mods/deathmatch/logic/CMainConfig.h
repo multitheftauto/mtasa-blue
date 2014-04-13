@@ -84,6 +84,7 @@ public:
     inline int                      GetHTTPMaxConnectionsPerClient  ( void )        { return m_iHTTPMaxConnectionsPerClient; };
     inline int                      GetHTTPThreadCount              ( void )        { return m_iHTTPThreadCount; };
     inline int                      GetHTTPDosThreshold             ( void )        { return m_iHTTPDosThreshold; };
+    inline const SString&           GetHTTPDosExclude               ( void )        { return m_strHTTPDosExclude; };
     inline int                      GetEnableClientChecks           ( void )        { return m_iEnableClientChecks; };
     inline const std::string&       GetLogFile                      ( void )        { return m_strLogFile; };
     inline const std::string&       GetAuthFile                     ( void )        { return m_strAuthFile; };
@@ -170,6 +171,7 @@ private:
     int                             m_iHTTPMaxConnectionsPerClient;
     int                             m_iHTTPThreadCount;
     int                             m_iHTTPDosThreshold;
+    SString                         m_strHTTPDosExclude;
     int                             m_iEnableClientChecks;
     std::string                     m_strLogFile;
     std::string                     m_strAuthFile;
