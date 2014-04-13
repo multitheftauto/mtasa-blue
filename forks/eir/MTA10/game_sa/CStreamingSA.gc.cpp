@@ -105,8 +105,10 @@ struct GarbageCollectStreamingEntities
 
                 // We should not delete RenderWare objects of those entities that are clearly visible.
                 if ( Streaming::IsValidStreamingArea( curArea ) &&
-                     scaledLODDistance + 50.0f < distance && entity->GetColModel()->m_bounds.fRadius + farplane > distance )
-                        return true;
+                     scaledLODDistance + 50.0f < distance && entity->GetRadius() + farplane > distance )
+                {
+                    return true;
+                }
             }
         }
 

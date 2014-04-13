@@ -142,6 +142,8 @@ CColModelSAInterface* CEntitySAInterface::GetColModel( void ) const
 
     if ( !colModel )
         colModel = GetModelInfo()->pColModel;
+    
+    assert( colModel != NULL );
 
     return colModel;
 }
@@ -154,12 +156,11 @@ const CVector& CEntitySAInterface::GetCollisionOffset( CVector& out ) const
 
 const CBounds2D& CEntitySAInterface::_GetBoundingBox( CBounds2D& out ) const
 {
-    CColModelSAInterface *col = GetColModel();
     CVector pos;
     
-    GetOffset( pos, col->m_bounds.vecBoundOffset );
+    GetCollisionOffset( pos );
 
-    float radius = col->m_bounds.fRadius;
+    float radius = GetRadius();
 
     out.m_minX = pos[0] - radius;
     out.m_maxY = pos[1] + radius;

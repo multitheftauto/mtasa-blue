@@ -707,7 +707,7 @@ inline eRenderType __cdecl RequestEntityRender( CEntitySAInterface *entity, CBas
 float __cdecl EntityRender::CalculateComplexEntityFadingDistance( CBaseModelInfoSAInterface *info, const CEntitySAInterface *entity, float camFarClip, float& sectorDivide )
 {
     float lodScale = Camera::GetInterface().LODDistMultiplier;
-    float distAway = entity->GetColModel()->m_bounds.fRadius + camFarClip;
+    float distAway = entity->GetRadius() + camFarClip;
     float unscaledLODDistance = info->fLodDistanceUnscaled;
     float scaledLODDistance = unscaledLODDistance * lodScale;
 
