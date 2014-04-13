@@ -54,6 +54,7 @@ private:
     map < string, long long >   m_LoggedInMap;
     CConnectHistory             m_BruteForceProtect;
     CConnectHistory             m_HttpDosProtect;
+    std::set < SString >        m_HttpDosExcludeMap;
 };
 
 #endif
