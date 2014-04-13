@@ -245,36 +245,17 @@ struct CachedRenderCallback
     }
 };
 
-struct WholeRenderCallback
-{
-    AINLINE void OnRenderAtomics( bool reverseOrder )
-    {
-        if ( reverseOrder )
-        {
-            vehicleRenderChains.ExecuteReverse();
-        }
-        else
-        {
-            vehicleRenderChains.Execute();
-        }
-    }
-};
-
 void __cdecl ExecuteVehicleRenderChains( unsigned int renderAlpha )
 {
     // Do special alpha blending if quality is set to high/very high
-    if ( g_effectManager->GetEffectQuality() > 1 )
+    if ( g_effectManager->GetEffectQuality() > 1 || RenderCallbacks::IsAlphaSortingEnabled() )
     {
         CachedRenderCallback callback;
 
         VehicleRenderAtomicGeneric( renderAlpha, callback );
     }
     else // do what GTA:SA usually does.
-    {
-        WholeRenderCallback callback;
-
-        VehicleRenderAtomicGeneric( renderAlpha, callback );
-    }
+        vehicleRenderChains.Execute();
 }
 
 // LOD distances for models, squared (measured against camera distance from atomic, 0x00733160 is rendering wrapper)
@@ -1298,22 +1279,26 @@ static bool RpGeometryMaterialApplyVehicleColor( RpMaterial *mat, _colorTextureS
     
     RwTexture *matTex = mat->texture;
 
-    if ( RwTexture *bodyTex = *(RwTexture**)0x00B4E47C )
+    // Bugfix: expect that the vehicle can have no texture.
+    if ( matTex )
     {
-        // The_GTA: remember the '#' flag at VEHICLE.TXD RwRemapScan we removed?
-        // We can replace this logic by checking that this Texture belongs to VEHICLE.TXD!
-        // After all, the texture has been picked up by the model loader, or it would not be here.
-        if ( matTex->txd == g_vehicleTxd )
+        if ( RwTexture *bodyTex = *(RwTexture**)0x00B4E47C )
         {
-            // Store the original texture information
-            _StoreTextureInfo( storage, mat );
+            // The_GTA: remember the '#' flag at VEHICLE.TXD RwRemapScan we removed?
+            // We can replace this logic by checking that this Texture belongs to VEHICLE.TXD!
+            // After all, the texture has been picked up by the model loader, or it would not be here.
+            if ( matTex->txd == g_vehicleTxd )
+            {
+                // Store the original texture information
+                _StoreTextureInfo( storage, mat );
 
-            // Set it to the paintjob texture
-            mat->texture = bodyTex;
+                // Set it to the paintjob texture
+                mat->texture = bodyTex;
+            }
         }
     }
 
-    if ( matTex == *(RwTexture**)0x00B4E68C )
+    if ( matTex != NULL && matTex == *(RwTexture**)0x00B4E68C )
     {
         unsigned int id = 0xFFFFFFFF;
 

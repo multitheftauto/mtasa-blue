@@ -182,6 +182,7 @@ public:
 #include "CRenderWareSA.rwstats.h"
 #include "CRenderWareSA.lighting.h"
 #include "CRenderWareSA.rtcallback.h"
+#include "CRenderWareSA.rtbucket.h"
 
 namespace ClothesReplacing
 {

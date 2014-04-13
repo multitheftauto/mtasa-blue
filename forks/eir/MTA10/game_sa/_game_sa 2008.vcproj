@@ -799,6 +799,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CRenderWareSA.rtbucket.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\CRenderWareSA.rtcallback.cpp"
 				>
 			</File>
@@ -1617,6 +1621,10 @@
 			</File>
 			<File
 				RelativePath=".\CRenderWareSA.rmode.hxx"
+				>
+			</File>
+			<File
+				RelativePath=".\CRenderWareSA.rtbucket.h"
 				>
 			</File>
 			<File

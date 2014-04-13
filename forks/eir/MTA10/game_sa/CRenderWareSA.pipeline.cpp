@@ -1306,8 +1306,11 @@ void RenderWarePipeline_Init( void )
     }
 
     HookInstall( 0x005DA020, (DWORD)HOOK_InitDeviceSystem, 5 );
+
+    RenderBucket::Initialize();
 }
 
 void RenderWarePipeline_Shutdown( void )
 {
+    RenderBucket::Shutdown();
 }
