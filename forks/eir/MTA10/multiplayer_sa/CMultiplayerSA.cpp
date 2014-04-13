@@ -187,9 +187,6 @@ DWORD RETURN_PreFxRender_BOTH =                                 0;
 DWORD RETURN_PreHUDRender =                                       0x053EADD;
 
 
-#define HOOKPOS_CEntity_IsOnScreen_FixObjectsScale      0x534575
-DWORD JMP_CEntity_IsOnScreen_FixObjectsScale = 0x53457C;
-
 #define HOOKPOS_CEventVehicleDamageCollision                    0x6A7657
 DWORD JMP_CEventVehicleDamageCollision_RETN = 0x6A765D;
 
@@ -395,8 +392,6 @@ void Hook_CDummy_DTR ( );
 
 void Hook_CObject_DTR ( );
 
-void HOOK_CEntity_IsOnScreen_FixObjectScale ();
-
 void HOOK_CEventVehicleDamageCollision ( );
 
 void HOOK_CEventVehicleDamageCollision_Plane ( );
@@ -546,8 +541,6 @@ void CMultiplayerSA::InitHooks()
     HookInstallCall ( CALL_CTrafficLights_GetPrimaryLightState, (DWORD)HOOK_CTrafficLights_GetPrimaryLightState);
     HookInstallCall ( CALL_CTrafficLights_GetSecondaryLightState, (DWORD)HOOK_CTrafficLights_GetSecondaryLightState);
     HookInstall ( HOOKPOS_CTrafficLights_DisplayActualLight, (DWORD)HOOK_CTrafficLights_DisplayActualLight, 36 );
-
-    HookInstall(HOOKPOS_CEntity_IsOnScreen_FixObjectsScale, (DWORD)HOOK_CEntity_IsOnScreen_FixObjectScale, 7);
 
 
     // Vehicle Collision Event Hooks
@@ -4987,38 +4980,7 @@ void CMultiplayerSA::SetSuspensionEnabled ( bool bEnabled )
 //     }
 }
 
-static DWORD dwEntityVtbl;
-static DWORD dwMultResult;
-void _declspec(naked) HOOK_CEntity_IsOnScreen_FixObjectScale ()
-{
-    _asm
-    {
-        push    0xB6FA74
 
-        pushad
-        mov     eax, [esi]
-        mov     dwEntityVtbl, eax
-    }
-
-    if ( dwEntityVtbl == 0x866F60 )
-        goto IsOnScreen_IsObject;
-
-    _asm
-    {
-        popad
-        mov     esi, ecx
-        jmp     JMP_CEntity_IsOnScreen_FixObjectsScale
-
-IsOnScreen_IsObject:
-        popad
-        fld     [eax+0x24]
-        fld     [esi+0x15C]
-        fmulp   st(1), st(0)
-        fstp    dwMultResult
-        mov     esi, dwMultResult
-        jmp     JMP_CEntity_IsOnScreen_FixObjectsScale
-    }
-}
 CVehicleSAInterface * pCollisionVehicle = NULL;
 void TriggerVehicleCollisionEvent ( )
 {

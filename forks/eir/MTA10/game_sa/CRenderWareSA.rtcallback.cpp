@@ -1396,28 +1396,35 @@ struct ReflectiveVehicleRenderManager
 
             // Some color combinations are supposed to display black.
             // No idea why. We should ask Rockstar!
-            if ( colorValue > 0x00AF00FF )
-            {
-                isColorBlack = ( colorValue == 0x00C8FF00 || colorValue == 0x00FF00FF || colorValue == 0x00FFFF00 );
-            }
-            else if ( colorValue == 0x00AF00FF )
-                isColorBlack = true;
-            else if ( colorValue > 0x0000FF3C )
-            {
-                isColorBlack = ( colorValue == 0x0000FFB9 );
-            }
-            else if ( colorValue == 0x0000FF3C )
-                isColorBlack = true;
-            else
-            {
-                isColorBlack = ( colorValue == 0x00003CFF || colorValue == 0x0000AFFF );
-            }
+            // The_GTA: appears to be that this is used for vehicle parts that debree of the vehicle, like in a explosion
+            // or if the player punches off a car door. The actual models should not use this, so lets disable this for our entities.
+            CEntitySA *renderingEntity = EntityRender::GetRenderingEntity();
 
-            if ( isColorBlack )
+            if ( !renderingEntity )
             {
-                surfColor.r = 0;
-                surfColor.g = 0;
-                surfColor.b = 0;
+                if ( colorValue > 0x00AF00FF )
+                {
+                    isColorBlack = ( colorValue == 0x00C8FF00 || colorValue == 0x00FF00FF || colorValue == 0x00FFFF00 );
+                }
+                else if ( colorValue == 0x00AF00FF )
+                    isColorBlack = true;
+                else if ( colorValue > 0x0000FF3C )
+                {
+                    isColorBlack = ( colorValue == 0x0000FFB9 );
+                }
+                else if ( colorValue == 0x0000FF3C )
+                    isColorBlack = true;
+                else
+                {
+                    isColorBlack = ( colorValue == 0x00003CFF || colorValue == 0x0000AFFF );
+                }
+
+                if ( isColorBlack )
+                {
+                    surfColor.r = 0;
+                    surfColor.g = 0;
+                    surfColor.b = 0;
+                }
             }
 
             // Reverse this at some point.

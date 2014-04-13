@@ -174,6 +174,35 @@ float EntityRender::CalculateFadingAlpha( CBaseModelInfoSAInterface *info, const
     return CalculateFadingAlphaEx( info, entity, camDistance, camFarClip, sectorDivide, useDist );
 }
 
+float CEntitySAInterface::GetRadius( void ) const
+{
+    CColModelSAInterface *colModel = GetColModel();
+
+    if ( !colModel )
+        return 0.0f;
+
+    float objRadius = colModel->m_bounds.fRadius;
+
+    // MTA fix: take the object scale into account.
+    if ( nType == ENTITY_TYPE_OBJECT )
+    {
+        CObjectSAInterface *objInterface = (CObjectSAInterface*)this;
+
+        CObjectSA *mtaObject = Pools::GetObject( objInterface );
+
+        if ( mtaObject )
+        {
+            objRadius *= ( mtaObject->GetScale()->Length() / CVector( 1.0f, 1.0f, 1.0f ).Length() );
+        }
+        else
+        {
+            objRadius *= objInterface->fScale;
+        }
+    }
+
+    return objRadius;
+}
+
 /*=========================================================
     CEntitySAInterface::GetFadingAlpha (MTA extension)
 

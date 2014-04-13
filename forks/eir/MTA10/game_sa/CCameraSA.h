@@ -90,7 +90,7 @@ class CTrainCamNode
 class CCameraSAInterface : public CPlaceableSAInterface
 {
 public:
-    bool __thiscall         IsSphereVisible             ( const CVector& pos, float radius, void *unk );
+    bool __thiscall         IsSphereVisible             ( const CVector& pos, float radius, const RwMatrix& transform );
     float __thiscall        GetGroundLevel              ( unsigned int type );
     unsigned int __thiscall GetMusicFadeType            ( void ) const;
 
@@ -367,7 +367,9 @@ public:
     RwMatrix m_viewMatrix;
     int unk3[2];
     RwMatrix m_matInverse;
-    int unk4[26];
+    int unk4[2];
+    RwMatrix m_matMirrorInverse;                            // 2708
+    int unk5[8];                                            // 2772
 #endif
 
     CVector m_vecFrustumNormals[4];

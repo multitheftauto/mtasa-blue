@@ -197,7 +197,7 @@ public:
     const CBounds2D& __thiscall     _GetBoundingBox         ( CBounds2D& out ) const;
     void __thiscall                 GetCenterPoint          ( CVector& out ) const;
 
-    float __thiscall                GetRadius               ( void ) const          { return GetColModel()->m_bounds.fRadius; }
+    float __thiscall                GetRadius               ( void ) const;
 
     float                           GetFadingAlpha          ( void ) const;
 

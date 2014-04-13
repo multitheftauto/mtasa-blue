@@ -52,10 +52,10 @@ void RenderBucket::EndPass( void )
 
 RenderBucket::RwRenderBucket* RenderBucket::AllocateRenderBucket( void )
 {
-
+    return NULL;
 }
 
 RenderBucket::RwRenderBucket* RenderBucket::FindRenderBucket( void )
 {
-
+    return NULL;
 }

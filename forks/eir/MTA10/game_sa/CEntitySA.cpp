@@ -182,19 +182,36 @@ void __thiscall CEntitySAInterface::SetOrientation( float x, float y, float z )
 
 bool CEntitySAInterface::IsOnScreen( void ) const
 {
-    CColModelSAInterface *col = GetColModel();
-    CVector pos;
-
     // Bugfix: no col -> not visible
-    if ( col )
+    if ( GetColModel() )
     {
-        GetOffset( pos, col->m_bounds.vecBoundOffset );
+        CVector pos;
 
-        if ( pGame->GetCamera()->GetInterface()->IsSphereVisible( pos, col->m_bounds.fRadius, (void*)0x00B6FA74 ) )
+        GetCollisionOffset( pos );
+
+        CCameraSAInterface& camera = Camera::GetInterface();
+
+        // MTA fix: get the real entity radius.
+        float entityRadius = GetRadius();
+
+        bool isVisible = camera.IsSphereVisible( pos, entityRadius, camera.m_matInverse );
+
+        if ( isVisible )
+        {
             return true;
+        }
 
+        // Are mirrors enabled?
         if ( *(unsigned char*)0x00B6F998 )
-            return pGame->GetCamera()->GetInterface()->IsSphereVisible( pos, col->m_bounds.fRadius, (void*)0x00B6FABC );
+        {
+            // Check if we are visible on the mirror.
+            isVisible = camera.IsSphereVisible( pos, entityRadius, camera.m_matMirrorInverse );
+            
+            if ( isVisible )
+            {
+                return true;
+            }
+        }
     }
 
     return false;

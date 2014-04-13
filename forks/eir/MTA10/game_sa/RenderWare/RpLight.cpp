@@ -286,7 +286,7 @@ void __cdecl RpLightPerformFrustumCaching( void )
         {
             _lightFrustumCache *cache = RW_PLUGINSTRUCT <_lightFrustumCache> ( item, _lightFrustumCachePluginOffset );
 
-            cache->isInsideFrustum = camera.IsSphereVisible( item->parent->GetLTM().vPos, item->radius, (void*)0x00B6FA74 );
+            cache->isInsideFrustum = camera.IsSphereVisible( item->parent->GetLTM().vPos, item->radius, camera.m_matInverse );
         }
     LIST_FOREACH_END
 }
