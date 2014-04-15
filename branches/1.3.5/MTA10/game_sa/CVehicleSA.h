@@ -518,6 +518,7 @@ private:
     SColor                      m_HeadLightColor;
     RwObject                    m_WheelObjects[4];
     SColor                      m_RGBColors[4];
+    SColor                      m_RGBColorsFixed[4];
     CDoorSA                     m_doors[6];
     bool                        m_bSwingingDoorsAllowed;
     SSirenInfo                  m_tSirenInfo;
@@ -608,7 +609,7 @@ public:
     void                        PlaceBikeOnRoadProperly         ();
     void                        PlaceAutomobileOnRoadProperly   ();
     void                        SetColor                        ( SColor color1, SColor color2, SColor color3, SColor color4, int );
-    void                        GetColor                        ( SColor* color1, SColor* color2, SColor* color3, SColor* color4, int );
+    void                        GetColor                        ( SColor* color1, SColor* color2, SColor* color3, SColor* color4, bool bFixedForGTA );
     bool                        IsSirenOrAlarmActive            ();
     void                        SetSirenOrAlarmActive           ( bool bActive );
     inline void                 SetAlpha                        ( unsigned char ucAlpha ) { m_ucAlpha = ucAlpha; }

@@ -27,6 +27,10 @@ CHTTPD::CHTTPD ( void )
     m_pGuestAccount = new CAccount ( g_pGame->GetAccountManager (), false, HTTP_GUEST_ACCOUNT_NAME );
 
     m_HttpDosProtect = CConnectHistory ( g_pGame->GetConfig ()->GetHTTPDosThreshold (), 10000, 60000 * 1 );     // Max of 'n' connections per 10 seconds, then 1 minute ignore
+
+    std::vector< SString > excludeList;
+    g_pGame->GetConfig ()->GetHTTPDosExclude ().Split( ",", excludeList );
+    m_HttpDosExcludeMap = std::set < SString > ( excludeList.begin(), excludeList.end() );
 }
 
 
@@ -250,6 +254,9 @@ void CHTTPD::HttpPulse ( void )
 //
 bool CHTTPD::ShouldAllowConnection ( const char * szAddress )
 {
+    if ( MapContains( m_HttpDosExcludeMap, szAddress ) )
+        return true;
+
     if ( m_HttpDosProtect.IsFlooding ( szAddress ) )
         return false;
 

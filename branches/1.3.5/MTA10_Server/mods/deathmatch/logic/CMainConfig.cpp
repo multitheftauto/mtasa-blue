@@ -235,6 +235,9 @@ bool CMainConfig::Load ( void )
     GetInteger ( m_pRootNode, "httpdosthreshold", m_iHTTPDosThreshold, 1, 10000 );
     m_iHTTPDosThreshold = Clamp ( 1, m_iHTTPDosThreshold, 10000 );
 
+    // http_dos_exclude
+    GetString ( m_pRootNode, "http_dos_exclude", m_strHTTPDosExclude );
+
     // verifyclientsettings
     GetInteger ( m_pRootNode, "verifyclientsettings", m_iEnableClientChecks );
 
