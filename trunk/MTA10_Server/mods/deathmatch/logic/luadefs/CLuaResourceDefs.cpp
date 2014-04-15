@@ -715,31 +715,48 @@ int CLuaResourceDefs::getResourceConfig ( lua_State* luaVM )
 
     if ( !argStream.HasErrors ( ) )
     {
-        CResource* pResource = m_pLuaManager->GetVirtualMachine ( luaVM )->GetResource();
+        CResource* pThisResource = m_pLuaManager->GetVirtualMachine ( luaVM )->GetResource();
+        CResource* pResource = pThisResource;
 
         if ( CResourceManager::ParseResourcePathInput ( strConfigName, pResource, NULL, &strMetaPath ) )
         {
-            list<CResourceFile *> * resourceFileList = pResource->GetFiles();
-            list<CResourceFile *>::iterator iterd = resourceFileList->begin();
-            for ( ; iterd != resourceFileList->end(); ++iterd )
+            // We have access to modify other resource?
+            if (pResource == pThisResource ||
+                m_pACLManager->CanObjectUseRight(pThisResource->GetName().c_str(),
+                CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE,
+                "ModifyOtherObjects",
+                CAccessControlListRight::RIGHT_TYPE_GENERAL,
+                false))
             {
-                CResourceConfigItem* config = (CResourceConfigItem *)(*iterd);
 
-                if ( config &&
-                     config->GetType() == CResourceFile::RESOURCE_FILE_TYPE_CONFIG &&
-                     strcmp ( config->GetName(), strMetaPath.c_str() ) == 0 )
+                list<CResourceFile *> * resourceFileList = pResource->GetFiles();
+                list<CResourceFile *>::iterator iterd = resourceFileList->begin();
+                for (; iterd != resourceFileList->end(); ++iterd)
                 {
-                    CXMLNode* pNode = config->GetRoot();
-                    if ( pNode )
+                    CResourceConfigItem* config = (CResourceConfigItem *) (*iterd);
+
+                    if (config &&
+                        config->GetType() == CResourceFile::RESOURCE_FILE_TYPE_CONFIG &&
+                        strcmp(config->GetName(), strMetaPath.c_str()) == 0)
                     {
-                        lua_pushxmlnode ( luaVM, pNode );
-                        return 1;
+                        CXMLNode* pNode = config->GetRoot();
+                        if (pNode)
+                        {
+                            lua_pushxmlnode(luaVM, pNode);
+                            return 1;
+                        }
                     }
                 }
             }
+            else
+            {
+                argStream.SetCustomError(SString("ModifyOtherObjects in ACL denied resource '%s' to access '%s'", pThisResource->GetName().c_str(), pResource->GetName().c_str()), "Access denied");
+            }
         }
     }
-    else
+    
+
+    if (argStream.HasErrors())
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
