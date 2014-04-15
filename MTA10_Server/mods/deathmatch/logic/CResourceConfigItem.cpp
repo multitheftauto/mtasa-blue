@@ -48,7 +48,7 @@ bool CResourceConfigItem::Start ( void )
     }
 
     // Create the XML
-    m_pXMLFile = g_pServerInterface->GetXML ()->CreateXML ( m_strResourceFileName.c_str () );
+    m_pXMLFile = g_pServerInterface->GetXML ()->CreateXML ( m_strResourceFileName.c_str (), true );
     if ( m_pXMLFile )
     {
         // Parse it
