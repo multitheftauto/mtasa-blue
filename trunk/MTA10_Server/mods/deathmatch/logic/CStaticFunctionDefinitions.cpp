@@ -3029,10 +3029,10 @@ bool CStaticFunctionDefinitions::GetPlayerMoney ( CPlayer* pPlayer, long& lMoney
 
 
 // ***************** PLAYER SET FUNCS **************** //
-bool CStaticFunctionDefinitions::SetPlayerMoney ( CElement* pElement, long lMoney )
+bool CStaticFunctionDefinitions::SetPlayerMoney ( CElement* pElement, long lMoney, bool bInstant )
 {
     assert ( pElement );
-    RUN_CHILDREN( SetPlayerMoney ( *iter, lMoney ) )
+    RUN_CHILDREN( SetPlayerMoney ( *iter, lMoney, bInstant ) )
 
     // Exists?
     if ( IS_PLAYER ( pElement ) )
@@ -3047,6 +3047,7 @@ bool CStaticFunctionDefinitions::SetPlayerMoney ( CElement* pElement, long lMone
         // Tell him his new money
         CBitStream BitStream;
         BitStream.pBitStream->Write ( lMoney );
+        BitStream.pBitStream->WriteBit ( bInstant );
         pPlayer->Send ( CLuaPacket ( SET_PLAYER_MONEY, *BitStream.pBitStream ) );
 
         // Set the money and return true

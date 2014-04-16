@@ -272,7 +272,7 @@ public:
     CPlayerPed      * GetPlayerPed (  );
     CWanted         * GetWanted ( );
     long            GetPlayerMoney ( void );
-    void            SetPlayerMoney ( long lMoney );
+    void            SetPlayerMoney ( long lMoney, bool bInstant );
 
     void            GetCrossHair ( bool &bActivated, float &fTargetX, float &fTargetY );
 

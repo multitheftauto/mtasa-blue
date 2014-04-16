@@ -2855,14 +2855,16 @@ int CLuaFunctionDefinitions::SetPlayerMoney ( lua_State* luaVM )
 {
     CElement* pElement;
     long lMoney;
+    bool bInstant;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData(pElement);
     argStream.ReadNumber(lMoney);
+    argStream.ReadBool(bInstant, false);
 
     if ( !argStream.HasErrors ( ) )
     {
-        if ( CStaticFunctionDefinitions::SetPlayerMoney ( pElement, lMoney ) )
+        if ( CStaticFunctionDefinitions::SetPlayerMoney ( pElement, lMoney, bInstant ) )
         {
             lua_pushboolean ( luaVM, true );
             return 1;

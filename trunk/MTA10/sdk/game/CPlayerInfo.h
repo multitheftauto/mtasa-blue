@@ -20,7 +20,7 @@ class CPlayerInfo
 {
 public:
     virtual long            GetPlayerMoney                  ( void ) = 0;
-    virtual void            SetPlayerMoney                  ( long lMoney ) = 0;
+    virtual void            SetPlayerMoney                  ( long lMoney, bool bInstant = false ) = 0;
 
     virtual void            GivePlayerParachute             ( void ) = 0;
     virtual void            StreamParachuteWeapon           ( bool bAllowParachute ) = 0;

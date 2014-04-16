@@ -2723,9 +2723,9 @@ void CClientGame::SetMinuteDuration ( unsigned long ulDelay )
     m_ulMinuteDuration = ulDelay;
 }
 
-void CClientGame::SetMoney ( long lMoney )
+void CClientGame::SetMoney ( long lMoney, bool bInstant )
 {
-    g_pGame->GetPlayerInfo ()->SetPlayerMoney ( lMoney );
+    g_pGame->GetPlayerInfo ()->SetPlayerMoney ( lMoney, bInstant );
     m_lMoney = lMoney;
 }
 
@@ -5377,7 +5377,7 @@ void CClientGame::ResetMapInfo ( void )
     SetWanted ( 0 ); 
 
     // Money
-    SetMoney ( 0 );
+    SetMoney ( 0, true );
 
     // Weather
     m_pBlendedWeather->SetWeather ( 0 );

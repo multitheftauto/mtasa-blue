@@ -1853,9 +1853,9 @@ bool CStaticFunctionDefinitions::IsPlayerHudComponentVisible ( eHudComponent com
 }
 
 
-bool CStaticFunctionDefinitions::SetPlayerMoney ( long lMoney )
+bool CStaticFunctionDefinitions::SetPlayerMoney ( long lMoney, bool bInstant )
 {
-    g_pClientGame->SetMoney ( lMoney );
+    g_pClientGame->SetMoney ( lMoney, bInstant );
     return true;
 }
 
