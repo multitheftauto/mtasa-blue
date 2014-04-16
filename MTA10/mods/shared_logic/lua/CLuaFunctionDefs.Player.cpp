@@ -289,15 +289,17 @@ int CLuaFunctionDefs::IsPlayerHudComponentVisible ( lua_State* luaVM )
 
 int CLuaFunctionDefs::SetPlayerMoney ( lua_State* luaVM )
 {
-//  bool setPlayerMoney ( int amount )
+//  bool setPlayerMoney ( int amount, bool instant = false )
     int lMoney;
+    bool bInstant;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadNumber ( lMoney );
+    argStream.ReadBool ( bInstant, false );
 
     if ( !argStream.HasErrors () )
     {
-        if ( CStaticFunctionDefinitions::SetPlayerMoney ( lMoney ) )
+        if ( CStaticFunctionDefinitions::SetPlayerMoney ( lMoney, bInstant ) )
         {
             lua_pushboolean ( luaVM, true );
             return 1;

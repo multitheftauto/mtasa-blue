@@ -370,7 +370,7 @@ public:
     void                                SetGameSpeed                    ( float fSpeed );
     void                                SetMinuteDuration               ( unsigned long ulDelay );
     inline long                         GetMoney                        ( void )                        { return m_lMoney; }
-    void                                SetMoney                        ( long lMoney );
+    void                                SetMoney                        ( long lMoney, bool bInstant = false );
     void                                SetWanted                       ( DWORD dwWanted );
 
     void                                ResetAmmoInClip                 ( void );

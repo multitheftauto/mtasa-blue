@@ -139,7 +139,7 @@ public:
     static const SString&       GetPlayerVersion                    ( CPlayer* pPlayer );
 
     // Player set functions
-    static bool                 SetPlayerMoney                      ( CElement* pElement, long lMoney );
+    static bool                 SetPlayerMoney                      ( CElement* pElement, long lMoney, bool bInstant );
     static bool                 SetPlayerAmmo                       ( CElement* pElement, unsigned char ucSlot, unsigned short usAmmo, unsigned short usAmmoInClip );
     static bool                 GivePlayerMoney                     ( CElement* pElement, long lMoney );
     static bool                 TakePlayerMoney                     ( CElement* pElement, long lMoney );

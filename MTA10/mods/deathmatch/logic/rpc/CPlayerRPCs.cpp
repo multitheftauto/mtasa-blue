@@ -33,10 +33,14 @@ void CPlayerRPCs::SetPlayerMoney ( NetBitStreamInterface& bitStream )
 {
     // Read out the new money amount
     long lMoney;
+    bool bInstant = false;
     if ( bitStream.Read ( lMoney ) )
     {
+        if (bitStream.GetNumberOfUnreadBits() > 0)
+            bitStream.ReadBit(bInstant);
+
         // Set it
-        m_pClientGame->SetMoney ( lMoney );
+        m_pClientGame->SetMoney ( lMoney, bInstant );
     }
 }
 
