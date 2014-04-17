@@ -15,6 +15,7 @@
 *****************************************************************************/
 
 #include "StdInc.h"
+bool CBanManager::ms_bSaveRequired = false;
 
 CBanManager::CBanManager ( void )
 {
@@ -27,7 +28,13 @@ CBanManager::CBanManager ( void )
 CBanManager::~CBanManager ( void )
 {
     SaveBanList ();
-    RemoveAllBans ();
+    list < CBan* >::const_iterator iter = m_BanManager.begin ();
+    for ( ; iter != m_BanManager.end (); iter++ )
+    {
+        delete *iter;
+    }
+
+    m_BanManager.clear ();
 }
 
 
@@ -58,6 +65,9 @@ void CBanManager::DoPulse ( void )
         }
         m_tUpdate = tTime + 1;
     }
+
+    if ( ms_bSaveRequired )
+        SaveBanList();
 }
 
 
@@ -102,8 +112,6 @@ CBan* CBanManager::AddSerialBan ( CPlayer* pPlayer, CClient* pBanner, const SStr
             CBan* pBan = AddBan ( pBanner->GetNick(), strReason, tTimeOfUnban );
             pBan->SetNick ( pPlayer->GetNick() );
             pBan->SetSerial ( pPlayer->GetSerial () );
-            SaveBanList ();
-
             return pBan;
         }
     }
@@ -118,8 +126,6 @@ CBan* CBanManager::AddSerialBan ( const SString& strSerial, CClient* pBanner, co
     {
         CBan* pBan = AddBan ( pBanner->GetNick(), strReason, tTimeOfUnban );
         pBan->SetSerial ( strSerial );
-        SaveBanList ();
-
         return pBan;
     }
 
@@ -136,8 +142,6 @@ CBan* CBanManager::AddAccountBan ( CPlayer* pPlayer, CClient* pBanner, const SSt
             CBan* pBan = AddBan ( pBanner->GetNick(), strReason, tTimeOfUnban );
             pBan->SetNick ( pPlayer->GetNick() );
             pBan->SetAccount ( pPlayer->GetSerialUser () );
-            SaveBanList ();
-
             return pBan;
         }
     }
@@ -152,8 +156,6 @@ CBan* CBanManager::AddAccountBan ( const SString& strAccount, CClient* pBanner, 
     {
         CBan* pBan = AddBan ( pBanner->GetNick(), strReason, tTimeOfUnban );
         pBan->SetSerial ( strAccount );
-        SaveBanList ();
-
         return pBan;
     }
 
@@ -248,7 +250,6 @@ CBan* CBanManager::GetBanFromAccount ( const char* szAccount )
 }
 
 
-
 void CBanManager::RemoveBan ( CBan* pBan )
 {
     if ( pBan )
@@ -256,60 +257,6 @@ void CBanManager::RemoveBan ( CBan* pBan )
         m_BanManager.remove ( pBan );
         delete pBan;
     }
-    SaveBanList ();
-}
-
-
-void CBanManager::RemoveAllBans ( bool bPermanentDelete )
-{
-    list < CBan* >::const_iterator iter = m_BanManager.begin ();
-    for ( ; iter != m_BanManager.end (); iter++ )
-    {
-        delete *iter;
-    }
-
-    m_BanManager.clear ();
-
-    if ( bPermanentDelete )
-    {
-        SaveBanList ();
-    }
-}
-
-
-CBan* CBanManager::GetBan ( const char* szIP )
-{
-    list < CBan* >::const_iterator iter = m_BanManager.begin ();
-    for ( ; iter != m_BanManager.end (); iter++ )
-    {
-        if ( (*iter)->GetIP () == szIP )
-        {
-            return *iter;
-        }
-    }
-    
-    return NULL;
-}
-
-
-CBan* CBanManager::GetBan ( const char* szNick, unsigned int uiOccurrance )
-{
-    unsigned int uiOccurrances = 0;
-    list < CBan* >::const_iterator iter = m_BanManager.begin ();
-    for ( ; iter != m_BanManager.end (); iter++ )
-    {
-        if ( (*iter)->GetNick () == szNick )
-        {
-            uiOccurrances++;
-
-            if ( uiOccurrance == uiOccurrances )
-            {
-                return *iter;
-            }
-        }
-    }
-
-    return NULL;
 }
 
 
@@ -472,13 +419,25 @@ bool CBanManager::LoadBanList ( void )
     }
 
     delete pFile;
+    ms_bSaveRequired = false;
     return true;
 }
 
 
 bool CBanManager::ReloadBanList ( void )
 {
-    RemoveAllBans();
+    // Flush any pending saves - This is ok because reloadbans is for loading manual changes to banlist.xml
+    // and manual changes are subject to being overwritten by server actions at any time.
+    if ( ms_bSaveRequired )
+        SaveBanList();
+
+    list < CBan* >::const_iterator iter = m_BanManager.begin ();
+    for ( ; iter != m_BanManager.end (); iter++ )
+    {
+        delete *iter;
+    }
+    m_BanManager.clear ();
+
     return LoadBanList();
 }
 
@@ -530,6 +489,7 @@ void CBanManager::SaveBanList ( void )
         // Delete the file pointer
         delete pFile;
     }
+    ms_bSaveRequired = false;
 }
 
 

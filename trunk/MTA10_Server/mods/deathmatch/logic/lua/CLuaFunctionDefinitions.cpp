@@ -12379,18 +12379,6 @@ int CLuaFunctionDefinitions::SetBanAdmin ( lua_State* luaVM )
     return 1;
 }
 
-int CLuaFunctionDefinitions::SaveBans ( lua_State* luaVM )
-{
-    if ( CStaticFunctionDefinitions::SaveBans () )
-    {
-        lua_pushboolean ( luaVM, true );
-        return 1;
-    }
-    
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
 int CLuaFunctionDefinitions::IsBan ( lua_State* luaVM )
 {
     CBan* pBan;

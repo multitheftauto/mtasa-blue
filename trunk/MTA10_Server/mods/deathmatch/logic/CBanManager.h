@@ -14,7 +14,6 @@
 #ifndef __CBANMANAGER_H
 #define __CBANMANAGER_H
 
-#include "CBan.h"
 #include "CClient.h"
 #include "CPlayerManager.h"
 
@@ -44,10 +43,7 @@ public:
     bool                IsAccountBanned         ( const char* szAccount );
     CBan*               GetBanFromAccount       ( const char* szAccount );
     void                RemoveBan               ( CBan* pBan );
-    void                RemoveAllBans           ( bool bPermanentDelete = false );
 
-    CBan*               GetBan                  ( const char* szIP );
-    CBan*               GetBan                  ( const char* szNick, unsigned int uiOccurrance );
     CBan*               GetBanFromSerial        ( const char* szSerial );
     CBan*               GetBanFromIP            ( const char* szIP );
 
@@ -61,6 +57,7 @@ public:
     void                SafeSetValue            ( CXMLNode* pNode, const char* szKey, unsigned int );
     std::string         SafeGetValue            ( CXMLNode* pNode, const char* szKey );
     bool                IsValidIP               ( const char* szIP );
+    static void         SetBansModified         ( void )                            { ms_bSaveRequired = true; }
 
     inline list < CBan* > ::const_iterator  IterBegin   ( void )                    { return m_BanManager.begin (); };
     inline list < CBan* > ::const_iterator  IterEnd     ( void )                    { return m_BanManager.end (); };
@@ -74,6 +71,7 @@ private:
 
     bool                IsValidIPPart               ( const char* szIP );
     bool                m_bAllowSave;
+    static bool         ms_bSaveRequired;
 };
 
 #endif
