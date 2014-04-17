@@ -570,6 +570,12 @@ public:
     static int      GetBanReason                        ( lua_State* luaVM );
     static int      GetBanAdmin                         ( lua_State* luaVM );
 
+    static int      SetUnbanTime                        ( lua_State* luaVM );
+    static int      SetBanReason                        ( lua_State* luaVM );
+    static int      SetBanAdmin                         ( lua_State* luaVM );
+    static int      SaveBans                            ( lua_State* luaVM );
+    static int      IsBan                               ( lua_State* luaVM );
+
     // Cursor get funcs
     static int      IsCursorShowing                     ( lua_State* luaVM );
 
