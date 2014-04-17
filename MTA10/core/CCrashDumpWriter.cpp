@@ -239,6 +239,8 @@ void CCrashDumpWriter::DumpCoreLog ( CExceptionInformation* pExceptionInformatio
 
 void CCrashDumpWriter::DumpMiniDump ( _EXCEPTION_POINTERS* pException, CExceptionInformation* pExceptionInformation )
 {
+    WriteDebugEvent ( "CCrashDumpWriter::DumpMiniDump" );
+
     // Try to load the DLL in our directory
     HMODULE hDll = NULL;
     char szDbgHelpPath [MAX_PATH];
@@ -258,15 +260,24 @@ void CCrashDumpWriter::DumpMiniDump ( _EXCEPTION_POINTERS* pException, CExceptio
         hDll = LoadLibrary( "DBGHELP.DLL" );
     }
 
+    if ( !hDll )
+        AddReportLog( 9201, "CCrashDumpWriter::DumpMiniDump - Could not load DBGHELP.DLL" );
+
     // We could load a dll?
     if ( hDll )
     {
         // Grab the MiniDumpWriteDump proc address
         MINIDUMPWRITEDUMP pDump = reinterpret_cast < MINIDUMPWRITEDUMP > ( GetProcAddress( hDll, "MiniDumpWriteDump" ) );
+        if ( !pDump )
+            AddReportLog( 9202, "CCrashDumpWriter::DumpMiniDump - Could not find MiniDumpWriteDump" );
+
         if ( pDump )
         {
             // Create the file
             HANDLE hFile = CreateFile ( CalcMTASAPath ( "mta\\core.dmp" ), GENERIC_WRITE, FILE_SHARE_WRITE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL );
+            if ( hFile == INVALID_HANDLE_VALUE )
+                AddReportLog( 9203, SString( "CCrashDumpWriter::DumpMiniDump - Could not create '%s'", *CalcMTASAPath ( "mta\\core.dmp" ) ) );
+
             if ( hFile != INVALID_HANDLE_VALUE )
             {
                 // Create an exception information struct
@@ -276,7 +287,12 @@ void CCrashDumpWriter::DumpMiniDump ( _EXCEPTION_POINTERS* pException, CExceptio
                 ExInfo.ClientPointers = FALSE;
 
                 // Write the dump
-                pDump ( GetCurrentProcess(), GetCurrentProcessId(), hFile, (MINIDUMP_TYPE)( MiniDumpNormal | MiniDumpWithIndirectlyReferencedMemory ), &ExInfo, NULL, NULL );
+                BOOL bResult = pDump ( GetCurrentProcess(), GetCurrentProcessId(), hFile, (MINIDUMP_TYPE)( MiniDumpNormal | MiniDumpWithIndirectlyReferencedMemory ), &ExInfo, NULL, NULL );
+
+                if ( !bResult )
+                    AddReportLog( 9204, SString( "CCrashDumpWriter::DumpMiniDump - MiniDumpWriteDump failed (%08x)", GetLastError() ) );
+                else
+                    WriteDebugEvent ( "CCrashDumpWriter::DumpMiniDump - MiniDumpWriteDump succeeded" );
 
                 // Close the dumpfile
                 CloseHandle ( hFile );
