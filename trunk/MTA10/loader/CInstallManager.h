@@ -43,6 +43,7 @@ protected:
     SString         _ProcessLangFileChecks          ( void );
     SString         _ProcessExePatchChecks          ( void );
     SString         _ProcessServiceChecks           ( void );
+    SString         _ProcessAppCompatChecks         ( void );
     SString         _ChangeFromAdmin                ( void );
     SString         _InstallNewsItems               ( void );
     SString         _Quit                           ( void );

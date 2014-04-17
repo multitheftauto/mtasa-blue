@@ -148,7 +148,18 @@ void CInstallManager::InitSequencer ( void )
                 CR "            IF LastResult == ok GOTO service_check: "
                 CR "            CALL Quit "
                 CR " "
-                CR "service_end: "                                  ////// End of 'Driver checks' //////
+                CR "service_end: "                                  ////// End of 'Service checks' //////
+                CR " "        
+                CR "appcompat_check: "                              ////// Start of 'AppCompat checks' //////
+                CR "            CALL ProcessAppCompatChecks "       // Make changes to comply with appcompat requirements
+                CR "            IF LastResult == ok GOTO appcompat_end: "
+                CR " "
+                CR "            CALL ChangeToAdmin "                // If changes failed, try as admin
+                CR "            IF LastResult == ok GOTO appcompat_check: "
+                CR "            CALL Quit "
+                CR " "
+                CR "appcompat_end: "                                ////// End of 'AppCompat checks' //////
+                CR " "        
                 CR "            CALL ChangeFromAdmin "              
                 CR "            CALL InstallNewsItems "             // Install pending news
                 CR "            GOTO launch: "
@@ -174,6 +185,7 @@ void CInstallManager::InitSequencer ( void )
     m_pSequencer->AddFunction ( "ProcessLangFileChecks",   &CInstallManager::_ProcessLangFileChecks );
     m_pSequencer->AddFunction ( "ProcessExePatchChecks",   &CInstallManager::_ProcessExePatchChecks );
     m_pSequencer->AddFunction ( "ProcessServiceChecks",    &CInstallManager::_ProcessServiceChecks );
+    m_pSequencer->AddFunction ( "ProcessAppCompatChecks",  &CInstallManager::_ProcessAppCompatChecks );
     m_pSequencer->AddFunction ( "ChangeFromAdmin",         &CInstallManager::_ChangeFromAdmin );
     m_pSequencer->AddFunction ( "InstallNewsItems",        &CInstallManager::_InstallNewsItems );
     m_pSequencer->AddFunction ( "Quit",                    &CInstallManager::_Quit );
@@ -816,6 +828,33 @@ SString CInstallManager::_ProcessServiceChecks ( void )
         if ( !IsUserAdmin() )
         {
             m_strAdminReason = _("Update install settings");
+            return "fail";
+        }
+    }
+    return "ok";
+}
+
+
+//////////////////////////////////////////////////////////
+//
+// CInstallManager::_ProcessAppCompatChecks
+//
+// Remove all options from AppCompatFlags/Layers execept RUNASADMIN
+//
+//////////////////////////////////////////////////////////
+SString CInstallManager::_ProcessAppCompatChecks ( void )
+{
+    BOOL bIsWOW64 = false;  // 64bit OS
+	IsWow64Process( GetCurrentProcess(), &bIsWOW64 );
+
+    WString strCompatModeRegKey = "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\Layers";
+
+    if ( !DeleteCompatibilityEntries ( strCompatModeRegKey, HKEY_CURRENT_USER )
+      || !DeleteCompatibilityEntries ( strCompatModeRegKey, HKEY_LOCAL_MACHINE, bIsWOW64 ? KEY_WOW64_64KEY : 0 ) )
+    {
+        if ( !IsUserAdmin() )
+        {
+            m_strAdminReason = _("Update compatibility settings");
             return "fail";
         }
     }
