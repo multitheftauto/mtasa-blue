@@ -12307,6 +12307,105 @@ int CLuaFunctionDefinitions::GetBanAdmin ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaFunctionDefinitions::SetUnbanTime ( lua_State* luaVM )
+{
+    CBan* pBan;
+    time_t tUnbanTime;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pBan );
+    argStream.ReadNumber ( tUnbanTime );
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( CStaticFunctionDefinitions::SetUnbanTime ( pBan, tUnbanTime ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefinitions::SetBanReason ( lua_State* luaVM )
+{
+    CBan* pBan;
+    SString strReason;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pBan );
+    argStream.ReadString ( strReason );
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( CStaticFunctionDefinitions::SetBanReason ( pBan, strReason ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+    
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefinitions::SetBanAdmin ( lua_State* luaVM )
+{
+    CBan* pBan;
+    SString strAdminName;
+    
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pBan );
+    argStream.ReadString ( strAdminName );
+    
+    if ( !argStream.HasErrors () )
+    {
+        if ( CStaticFunctionDefinitions::SetBanAdmin ( pBan, strAdminName ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+    
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefinitions::SaveBans ( lua_State* luaVM )
+{
+    if ( CStaticFunctionDefinitions::SaveBans () )
+    {
+        lua_pushboolean ( luaVM, true );
+        return 1;
+    }
+    
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefinitions::IsBan ( lua_State* luaVM )
+{
+    CBan* pBan;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pBan );
+    
+    if ( !argStream.HasErrors() )
+    {
+        lua_pushboolean ( luaVM, true );
+        return 1;
+    }
+    
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
 
 int CLuaFunctionDefinitions::IsCursorShowing ( lua_State* luaVM )
 {

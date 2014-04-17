@@ -11559,6 +11559,37 @@ bool CStaticFunctionDefinitions::GetBanAdmin ( CBan* pBan, SString& strOutAdmin 
     return false;
 }
 
+bool CStaticFunctionDefinitions::SetUnbanTime ( CBan* pBan, time_t time)
+{
+    pBan->SetTimeOfUnban ( time );
+    return true;
+}
+
+bool CStaticFunctionDefinitions::SetBanReason ( CBan* pBan, const SString& strReason )
+{
+    if ( strReason.length () > MAX_BAN_REASON_LENGTH )
+        pBan->SetReason ( strReason.substr( 0, MAX_BAN_REASON_LENGTH - 3 ) + "..." );
+    else
+        pBan->SetReason ( strReason );
+
+    return true;
+}
+
+bool CStaticFunctionDefinitions::SetBanAdmin ( CBan* pBan, const SString& strAdminName )
+{
+    if ( strAdminName.length () > MAX_BAN_RESPONSIBLE_LENGTH )
+        pBan->SetBanner ( strAdminName.substr( 0, MAX_BAN_RESPONSIBLE_LENGTH - 3 ) + "..." );
+    else
+        pBan->SetBanner ( strAdminName );
+
+    return true;
+}
+
+bool CStaticFunctionDefinitions::SaveBans ( void )
+{
+    m_pBanManager->SaveBanList ();
+    return true;
+}
 
 bool CStaticFunctionDefinitions::IsCursorShowing ( CPlayer* pPlayer, bool& bShowing )
 {
