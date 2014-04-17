@@ -680,7 +680,6 @@ public:
     static bool                 SetUnbanTime                        ( CBan* pBan, time_t time);
     static bool                 SetBanReason                        ( CBan* pBan, const SString& strReason );
     static bool                 SetBanAdmin                         ( CBan* pBan, const SString& strAdminName );
-    static bool                 SaveBans                            ( void );
 
     // Cursor get funcs
     static bool                 IsCursorShowing                     ( CPlayer* pPlayer, bool& bShowing );

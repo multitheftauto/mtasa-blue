@@ -11585,12 +11585,6 @@ bool CStaticFunctionDefinitions::SetBanAdmin ( CBan* pBan, const SString& strAdm
     return true;
 }
 
-bool CStaticFunctionDefinitions::SaveBans ( void )
-{
-    m_pBanManager->SaveBanList ();
-    return true;
-}
-
 bool CStaticFunctionDefinitions::IsCursorShowing ( CPlayer* pPlayer, bool& bShowing )
 {
     assert ( pPlayer );
