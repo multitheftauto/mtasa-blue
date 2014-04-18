@@ -845,7 +845,7 @@ SString CInstallManager::_ProcessServiceChecks ( void )
 SString CInstallManager::_ProcessAppCompatChecks ( void )
 {
     BOOL bIsWOW64 = false;  // 64bit OS
-	IsWow64Process( GetCurrentProcess(), &bIsWOW64 );
+    IsWow64Process( GetCurrentProcess(), &bIsWOW64 );
 
     WString strCompatModeRegKey = "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\Layers";
 

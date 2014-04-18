@@ -468,26 +468,26 @@ std::vector < DWORD > MyEnumProcesses ( void )
 ///////////////////////////////////////////////////////////////////////////
 DWORD FindProcessId ( const SString& processName )
 {
-	PROCESSENTRY32 processInfo;
-	processInfo.dwSize = sizeof ( processInfo );
+    PROCESSENTRY32 processInfo;
+    processInfo.dwSize = sizeof ( processInfo );
 
-	HANDLE processesSnapshot = CreateToolhelp32Snapshot ( TH32CS_SNAPPROCESS, NULL );
-	if ( processesSnapshot == INVALID_HANDLE_VALUE )
-		return 0;
+    HANDLE processesSnapshot = CreateToolhelp32Snapshot ( TH32CS_SNAPPROCESS, NULL );
+    if ( processesSnapshot == INVALID_HANDLE_VALUE )
+        return 0;
 
-	Process32First ( processesSnapshot , &processInfo );
+    Process32First ( processesSnapshot , &processInfo );
     do
-	{
-		if ( processName.CompareI ( processInfo.szExeFile ) )
-		{
-			CloseHandle ( processesSnapshot );
-			return processInfo.th32ProcessID;
-		}
-	}
-	while ( Process32Next ( processesSnapshot, &processInfo ) );
-	
-	CloseHandle ( processesSnapshot );
-	return 0;
+    {
+        if ( processName.CompareI ( processInfo.szExeFile ) )
+        {
+            CloseHandle ( processesSnapshot );
+            return processInfo.th32ProcessID;
+        }
+    }
+    while ( Process32Next ( processesSnapshot, &processInfo ) );
+    
+    CloseHandle ( processesSnapshot );
+    return 0;
 }
 
 
@@ -2110,8 +2110,8 @@ bool IsDeviceSelectionDialogOpen( DWORD dwThreadId )
 //////////////////////////////////////////////////////////
 LONG RegEnumValueString( HKEY hKey, DWORD dwIndex, WString& strOutName )
 {
-	wchar_t buf[2048] = {0};
-	DWORD dwBufSizeChars = NUMELMS( buf );
+    wchar_t buf[2048] = {0};
+    DWORD dwBufSizeChars = NUMELMS( buf );
     long result = RegEnumValueW( hKey, dwIndex, buf, &dwBufSizeChars, 0, NULL, NULL, NULL );
     strOutName = buf;
     return result;
@@ -2119,9 +2119,9 @@ LONG RegEnumValueString( HKEY hKey, DWORD dwIndex, WString& strOutName )
 
 LONG RegQueryValueString( HKEY hKey, LPCWSTR lpValueName, WString& strOutData )
 {
-	wchar_t buf[2048] = {0};
-	DWORD dwBufSizeBytes = sizeof( buf );
-	DWORD dwType = REG_SZ;
+    wchar_t buf[2048] = {0};
+    DWORD dwBufSizeBytes = sizeof( buf );
+    DWORD dwType = REG_SZ;
     long result = RegQueryValueExW( hKey, lpValueName, NULL, &dwType, (BYTE*)buf, &dwBufSizeBytes );
     strOutData = buf;
     return result;
@@ -2129,8 +2129,8 @@ LONG RegQueryValueString( HKEY hKey, LPCWSTR lpValueName, WString& strOutData )
 
 LONG RegSetValueString( HKEY hKey, LPCWSTR lpValueName, const WString& strData )
 {
-	DWORD dwSizeChars = strData.length() + 1;
-	DWORD dwSizeBytes = dwSizeChars * sizeof( WCHAR );
+    DWORD dwSizeChars = strData.length() + 1;
+    DWORD dwSizeBytes = dwSizeChars * sizeof( WCHAR );
     return RegSetValueExW( hKey, lpValueName, 0, REG_SZ, (const BYTE*)*strData, dwSizeBytes );
 }
 
@@ -2152,57 +2152,57 @@ bool DeleteCompatibilityEntries( const WString& strSubKey, HKEY hKeyRoot, uint u
     uiFlags |= KEY_READ;
 
     // Try read only open - Failure probably means the key does not exist
-	HKEY hKey;
- 	if ( RegOpenKeyExW( hKeyRoot, strSubKey, NULL, uiFlags, &hKey ) != ERROR_SUCCESS )
+    HKEY hKey;
+    if ( RegOpenKeyExW( hKeyRoot, strSubKey, NULL, uiFlags, &hKey ) != ERROR_SUCCESS )
         return true;
 
      // loop until we run out of registry values to read
     for ( uint uiIndex = 0 ; true ; uiIndex++ )
-	{
+    {
         // Read next value name if possible
         WString strName; 
-		if ( RegEnumValueString( hKey, uiIndex, strName ) != ERROR_SUCCESS )
+        if ( RegEnumValueString( hKey, uiIndex, strName ) != ERROR_SUCCESS )
             break;
 
         // Is one of our exe names?
-		if ( strName.ContainsI( MTA_GTAEXE_NAME ) || strName.ContainsI( MTA_HTAEXE_NAME ) || strName.ContainsI( MTA_EXE_NAME ) )
-		{
+        if ( strName.ContainsI( MTA_GTAEXE_NAME ) || strName.ContainsI( MTA_HTAEXE_NAME ) || strName.ContainsI( MTA_EXE_NAME ) )
+        {
             // Get compat setting
             WString strData; 
-			if ( RegQueryValueString( hKey, strName, strData ) != ERROR_SUCCESS )
+            if ( RegQueryValueString( hKey, strName, strData ) != ERROR_SUCCESS )
                 continue;
 
             // is the value's data already just "RUNASADMIN"?
             if ( strData == L"~ RUNASADMIN" || strData == L"RUNASADMIN" )
-				continue; // continue since we don't need to do anything
+                continue; // continue since we don't need to do anything
 
             // Change required. Attempt swap to writeable key if not done so yet
             if ( ( uiFlags & KEY_WRITE ) != KEY_WRITE )
             {
                 uiFlags |= KEY_WRITE;
                 RegCloseKey( hKey );
- 	            if ( RegOpenKeyExW( hKeyRoot, strSubKey, NULL, uiFlags, &hKey ) != ERROR_SUCCESS )
+                if ( RegOpenKeyExW( hKeyRoot, strSubKey, NULL, uiFlags, &hKey ) != ERROR_SUCCESS )
                     return false;   // Might need admin
             }
 
-			if ( strData.Contains( "RUNASADMIN" ) ) // does it contain "RUNASADMIN" along with something else?
-			{
+            if ( strData.Contains( "RUNASADMIN" ) ) // does it contain "RUNASADMIN" along with something else?
+            {
                 // Remove all other options and leave RUNASADMIN only
                 WString strNewData = IsWin8OrHigher() ? "~ RUNASADMIN" : "RUNASADMIN";
-				if ( RegSetValueString( hKey, strName, strNewData ) != ERROR_SUCCESS )
+                if ( RegSetValueString( hKey, strName, strNewData ) != ERROR_SUCCESS )
                     bResult = false;    // Continue on error, but flag for admin
-			}
-			else // the user only has other compatibility mode settings enabled
-			{
-				if ( RegDeleteValueW( hKey, strName ) != ERROR_SUCCESS ) // delete the registry value
+            }
+            else // the user only has other compatibility mode settings enabled
+            {
+                if ( RegDeleteValueW( hKey, strName ) != ERROR_SUCCESS ) // delete the registry value
                     bResult = false;    // Continue on error, but flag for admin
-				uiIndex--;
-				continue;
-			}
-		}
-	}
-	RegCloseKey ( hKey ); // close the registry key
-	return bResult;
+                uiIndex--;
+                continue;
+            }
+        }
+    }
+    RegCloseKey ( hKey ); // close the registry key
+    return bResult;
 }
 
 

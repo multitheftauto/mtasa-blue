@@ -388,11 +388,16 @@ SString SharedUtil::GetMTATempPath ( void )
 // C:\Program Files\gta_sa.exe
 SString SharedUtil::GetLaunchPathFilename( void )
 {
-    wchar_t szBuffer[64000];
-    GetModuleFileNameW( NULL, szBuffer, NUMELMS(szBuffer) - 1 );
-    if ( IsShortPathName( szBuffer ) )
-        return GetSystemLongPathName( ToUTF8( szBuffer ) );
-    return ToUTF8( szBuffer );
+    static SString strLaunchPathFilename;
+    if ( strLaunchPathFilename.empty() )
+    {
+        wchar_t szBuffer[2048];
+        GetModuleFileNameW( NULL, szBuffer, NUMELMS(szBuffer) - 1 );
+        if ( IsShortPathName( szBuffer ) )
+            return GetSystemLongPathName( ToUTF8( szBuffer ) );
+        strLaunchPathFilename = ToUTF8( szBuffer );
+    }
+    return strLaunchPathFilename;
 }
 
 // C:\Program Files

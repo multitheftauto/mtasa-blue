@@ -56,8 +56,13 @@ typedef struct _tagFONT_PROPERTIES_ANSI
 
 typedef struct _tagTT_OFFSET_TABLE
 {
-	USHORT	uMajorVersion;
-	USHORT	uMinorVersion;
+    union {
+        struct {
+	        USHORT	uMajorVersion;
+	        USHORT	uMinorVersion;
+        };
+        ULONG uTag;
+    };
 	USHORT	uNumOfTables;
 	USHORT	uSearchRange;
 	USHORT	uEntrySelector;
@@ -177,12 +182,14 @@ BOOL GetFontProperties(LPCTSTR lpszFilePath, FONT_PROPERTIES * lpFontPropsX)
 	memcpy(&ttOffsetTable, &lpMapAddress[index], sizeof(TT_OFFSET_TABLE));
 	index += sizeof(TT_OFFSET_TABLE);
 
-	ttOffsetTable.uNumOfTables = SWAPWORD(ttOffsetTable.uNumOfTables);
-	ttOffsetTable.uMajorVersion = SWAPWORD(ttOffsetTable.uMajorVersion);
-	ttOffsetTable.uMinorVersion = SWAPWORD(ttOffsetTable.uMinorVersion);
+	USHORT uNumOfTables = SWAPWORD(ttOffsetTable.uNumOfTables);
+	USHORT uMajorVersion = SWAPWORD(ttOffsetTable.uMajorVersion);
+	USHORT uMinorVersion = SWAPWORD(ttOffsetTable.uMinorVersion);
+	ULONG uTag = SWAPLONG(ttOffsetTable.uTag);
 
 	//check is this is a true type font and the version is 1.0
-	if (ttOffsetTable.uMajorVersion != 1 || ttOffsetTable.uMinorVersion != 0)
+    // or is CFF OpenType font
+	if ( ( uMajorVersion != 1 || uMinorVersion != 0 ) && uTag != 'OTTO' )
     {
 	    ::UnmapViewOfFile(lpMapAddress);
 	    ::CloseHandle(hMappedFile);
@@ -196,7 +203,7 @@ BOOL GetFontProperties(LPCTSTR lpszFilePath, FONT_PROPERTIES * lpFontPropsX)
 	char szTemp[4096];
 	memset(szTemp, 0, sizeof(szTemp));
 
-	for (int i = 0; i< ttOffsetTable.uNumOfTables; i++)
+	for (int i = 0; i< uNumOfTables; i++)
 	{
 		//f.Read(&tblDir, sizeof(TT_TABLE_DIRECTORY));
 		memcpy(&tblDir, &lpMapAddress[index], sizeof(TT_TABLE_DIRECTORY));
