@@ -228,9 +228,13 @@ namespace SharedUtil
         }
         else
         {
-            char szBuffer[64000];
-            GetModuleFileNameA( NULL, szBuffer, NUMELMS(szBuffer) - 1 );
-            SString LaunchPathA = ExtractPath( szBuffer );
+            static SString LaunchPathA;
+            if ( LaunchPathA.empty() )
+            {
+                char szBuffer[2048];
+                GetModuleFileNameA( NULL, szBuffer, NUMELMS(szBuffer) - 1 );
+                LaunchPathA = ExtractPath( szBuffer );
+            }
             if ( strOriginal.BeginsWithI( LaunchPathA ) )
             {
                 // Fix gta install path
