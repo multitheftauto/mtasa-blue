@@ -437,6 +437,7 @@ void CLuaArgument::Push ( lua_State* luaVM, CFastHashMap < CLuaArguments*, int >
 }
 
 
+// Can't use bitStream.Version() here as it is sometimes not set
 bool CLuaArgument::ReadFromBitStream ( NetBitStreamInterface& bitStream, std::vector < CLuaArguments* > * pKnownTables )
 {
     DeleteTableData ();
@@ -467,51 +468,28 @@ bool CLuaArgument::ReadFromBitStream ( NetBitStreamInterface& bitStream, std::ve
             // Number type
             case LUA_TNUMBER:
             {
-                if ( bitStream.Version() < 0x59 )
+                if ( bitStream.ReadBit() )
                 {
-                    // Old way
-                    bool bIsFloatingPoint;
-                    if ( bitStream.ReadBit ( bIsFloatingPoint ) && bIsFloatingPoint )
+                    // Should be in high precision mode
+                    dassert( g_pClientGame->IsHighFloatPrecision() );
+                    if ( bitStream.ReadBit()  )
                     {
-                        // Should be in high precision mode
-                        dassert( g_pClientGame->IsHighFloatPrecision() );
+                        double dNum;
+                        if ( bitStream.Read ( dNum ) )
+                            ReadNumber ( dNum );
+                    }
+                    else
+                    {
                         float fNum;
                         if ( bitStream.Read ( fNum ) )
                             ReadNumber ( RoundFromFloatSource( fNum ) );
                     }
-                    else
-                    {
-                        long lNum;
-                        if ( bitStream.ReadCompressed ( lNum ) )
-                            ReadNumber ( lNum );
-                    }
                 }
                 else
                 {
-                    // New way - Maybe use double to better preserve > 32bit numbers
-                    if ( bitStream.ReadBit() )
-                    {
-                        // Should be in high precision mode
-                        dassert( g_pClientGame->IsHighFloatPrecision() );
-                        if ( bitStream.ReadBit()  )
-                        {
-                            double dNum;
-                            if ( bitStream.Read ( dNum ) )
-                                ReadNumber ( dNum );
-                        }
-                        else
-                        {
-                            float fNum;
-                            if ( bitStream.Read ( fNum ) )
-                                ReadNumber ( RoundFromFloatSource( fNum ) );
-                        }
-                    }
-                    else
-                    {
-                        long lNum;
-                        if ( bitStream.ReadCompressed ( lNum ) )
-                            ReadNumber ( lNum );
-                    }
+                    int iNum;
+                    if ( bitStream.ReadCompressed ( iNum ) )
+                        ReadNumber ( iNum );
                 }
                 break;
             }
@@ -611,6 +589,7 @@ bool CLuaArgument::ReadFromBitStream ( NetBitStreamInterface& bitStream, std::ve
 }
 
 
+// Can't use bitStream.Version() here as it is sometimes not set
 bool CLuaArgument::WriteToBitStream ( NetBitStreamInterface& bitStream, CFastHashMap < CLuaArguments*, unsigned long > * pKnownTables ) const
 {
     SLuaTypeSync type;
@@ -664,46 +643,27 @@ bool CLuaArgument::WriteToBitStream ( NetBitStreamInterface& bitStream, CFastHas
             type.data.ucType = LUA_TNUMBER;
             bitStream.Write ( &type );
 
-            if ( bitStream.Version() < 0x59 )
+            int iNumber;
+            float fNumber;
+            double dNumber;
+            EDataType dataType = GetDataTypeToUse( GetNumber(), &iNumber, &fNumber, &dNumber );
+            if ( dataType == DATA_TYPE_INT )
             {
-                // Old way
-                int iNumber;
-                if ( !ShouldUseInt( GetNumber(), &iNumber ) )
-                {
-                    bitStream.WriteBit ( true );
-                    bitStream.Write ( static_cast < float > ( GetNumber() ) );
-                }
-                else
-                {
-                    bitStream.WriteBit ( false );
-                    bitStream.WriteCompressed ( iNumber );
-                }
+                bitStream.WriteBit ( false );
+                bitStream.WriteCompressed ( iNumber );
+            }
+            else
+            if ( dataType == DATA_TYPE_FLOAT )
+            {
+                bitStream.WriteBit ( true );
+                bitStream.WriteBit ( false );
+                bitStream.Write ( fNumber );
             }
             else
             {
-                // New way - Maybe use double to better preserve > 32bit numbers
-                int iNumber;
-                float fNumber;
-                double dNumber;
-                EDataType dataType = GetDataTypeToUse( GetNumber(), &iNumber, &fNumber, &dNumber );
-                if ( dataType == DATA_TYPE_INT )
-                {
-                    bitStream.WriteBit ( false );
-                    bitStream.WriteCompressed ( iNumber );
-                }
-                else
-                if ( dataType == DATA_TYPE_FLOAT )
-                {
-                    bitStream.WriteBit ( true );
-                    bitStream.WriteBit ( false );
-                    bitStream.Write ( fNumber );
-                }
-                else
-                {
-                    bitStream.WriteBit ( true );
-                    bitStream.WriteBit ( true );
-                    bitStream.Write ( dNumber );
-                }
+                bitStream.WriteBit ( true );
+                bitStream.WriteBit ( true );
+                bitStream.Write ( dNumber );
             }
             break;
         }
