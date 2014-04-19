@@ -654,6 +654,7 @@ bool CLuaArgument::WriteToBitStream ( NetBitStreamInterface& bitStream, CFastHas
                 bitStream.WriteBit ( false );
                 bitStream.WriteCompressed ( iNumber );
             }
+            break;
         }
 
         // String argument
