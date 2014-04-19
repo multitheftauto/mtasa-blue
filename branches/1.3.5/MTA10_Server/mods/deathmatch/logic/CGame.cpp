@@ -1640,6 +1640,18 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
                                 pPlayer->SetPlayerVersion ( strPlayerVersion );
 
                                 // Check if client must update
+                                if ( pPlayer->GetPlayerVersion () > "1.3.5-9.06305" && pPlayer->GetPlayerVersion () < "1.3.5-9.06318" )
+                                {
+                                    // Tell the console
+                                    CLogger::LogPrintf ( "CONNECT: %s failed to connect (Client version is bugged) (%s)\n", szNick, strIPAndSerial.c_str () );
+
+                                    // Tell the player
+                                    pPlayer->Send ( CUpdateInfoPacket ( "Mandatory", CalculateMinClientRequirement () ) );
+                                    DisconnectPlayer ( this, *pPlayer, "" );
+                                    return;
+                                }
+
+                                // Check if client must update
                                 if ( IsBelowMinimumClient ( pPlayer->GetPlayerVersion () ) )
                                 {
                                     // Tell the console
