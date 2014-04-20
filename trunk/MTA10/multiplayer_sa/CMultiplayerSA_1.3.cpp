@@ -1226,7 +1226,7 @@ bool AllowJetPack ( )
     }
     return false;
 }
-DWORD dwReturnCTaskSimpleJetpackProcessInput = 0x67E7FC;
+
 void _declspec(naked) HOOK_CTaskSimpleJetpack_ProcessInput ( )
 {
     _asm
@@ -1247,13 +1247,6 @@ void _declspec(naked) HOOK_CTaskSimpleJetpack_ProcessInput ( )
         _asm
         {
             popad
-            jnz DisabledProcessInput
-            mov ecx, [eax+18h]
-            shr ecx, 1
-            test bl, cl
-            jz DisabledProcessInput
-            jmp dwReturnCTaskSimpleJetpackProcessInput
-DisabledProcessInput:
             jmp RETN_CTaskSimpleJetpack_ProcessInputDisabled
         }
     }
