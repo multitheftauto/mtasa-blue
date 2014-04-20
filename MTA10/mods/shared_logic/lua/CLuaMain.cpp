@@ -710,19 +710,38 @@ void CLuaMain::AddTeamClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "countPlayers", "countPlayersInTeam" );
     lua_classfunction ( luaVM, "getFriendlyFire", "getTeamFriendlyFire" );
     lua_classfunction ( luaVM, "getName", "getTeamName" );
-    lua_classfunction ( luaVM, "getColor", "getTeamColor" );  // TODO: work with color class
-    
+    lua_classfunction ( luaVM, "getColor", "getTeamColor" ); // color
     lua_classvariable ( luaVM, "playerCount", NULL, "countPlayersInTeam" );
     lua_classvariable ( luaVM, "friendlyFire", NULL, "getTeamFriendlyFire" );
     lua_classvariable ( luaVM, "name", NULL, "getTeamName" );
-    lua_classvariable ( luaVM, "color", NULL, "getTeamColor" ); // TODO: work with color class
-    
+    lua_classvariable ( luaVM, "color", NULL, "getTeamColor" ); // color
     lua_registerclass ( luaVM, "Team", "Element" );
 }
 
 void CLuaMain::AddWaterClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
+    
+    lua_classfunction ( luaVM, "create", "createWater" );
+    
+    lua_classfunction ( luaVm, "getVertexPosition", "getWaterVertexPosition" ); // vector3d
+    lua_classfunction ( luaVm, "setVertexPosition", "setWaterVertexPosition" ); // vector3d
+    lua_classfunction ( luaVM, "getLevel", "getWaterLevel" );
+    lua_classfunction ( luaVm, "setLevel", "getWaterLevel" ); // vector3d
+
+    lua_classfunction ( luaVM, "testLineAgainst", "testLineAgainstWater" );
+    lua_classfunction ( luaVM, "resetColor", "resetWaterColor" );
+    lua_classfunction ( luaVM, "resetLevel", "resetWaterLevel" );
+    lua_classfunction ( luaVM, "isDrawnLast", "isWaterDrawnLast" );
+    lua_classfunction ( luaVM, "setDrawnLast", "setWaterDrawnLast" );
+    lua_classfunction ( luaVM, "getColor", "getWaterColor" ); // color
+    lua_classfunction ( luaVM, "getWaveHeight", "getWaveHeight" );
+    lua_classfunction ( luaVM, "setWaveHeight", "setWaveHeight" );
+    lua_classfunction ( luaVM, "setColor", "setWaterColor" ); // color
+    
+    lua_classvariable ( luaVM, "color", "setWaterColor", "getWaterColor" ); // color
+    lua_classvariable ( luaVM, "level", "setWaterLevel", "getWaterLevel" );
+    lua_classvariable ( luaVM, "drawnLast", "setWaterDrawnLast", "isWaterDrawnLast" );
 
     lua_registerclass ( luaVM, "Water", "Element" );
 }
@@ -785,10 +804,35 @@ void CLuaMain::AddWeaponClass ( lua_State* luaVM )
 
     lua_classfunction ( luaVM, "create", "createWeapon" );
     lua_classfunction ( luaVM, "fire", "fireWeapon" );
-
+    lua_classfunction ( luaVM, "resetFiringRate", "resetWeaponFiringRate" );
+    
+    lua_classfunction ( luaVM, "setProperty", "setWeaponProperty" );
     lua_classfunction ( luaVM, "setOwner", "setWeaponOwner" );
     lua_classfunction ( luaVM, "setTarget", "setWeaponTarget" );
+    lua_classfunction ( luaVM, "setFiringRate", "setWeaponFiringRate" );
+    lua_classfunction ( luaVM, "setState", "setWeaponState" );
+    lua_classfunction ( luaVM, "setFlags", "setWeaponFlags" );
+    lua_classfunction ( luaVM, "setAmmo", "setWeaponAmmo" );
+    lua_classfunction ( luaVM, "setClipAmmo", "setWeaponClipAmmo" );
 
+    lua_classfunction ( luaVM, "getProperty", "setWeaponProperty" );
+    lua_classfunction ( luaVM, "getOwner", "getWeaponOwner" );
+    lua_classfunction ( luaVM, "getTarget", "getWeaponTarget" );
+    lua_classfunction ( luaVM, "getFiringRate", "getWeaponFiringRate" );
+    lua_classfunction ( luaVM, "getState", "getWeaponState" );
+    lua_classfunction ( luaVM, "getFlags", "getWeaponFlags" );
+    lua_classfunction ( luaVM, "getAmmo", "getWeaponAmmo" );
+    lua_classfunction ( luaVM, "getClipAmmo", "getWeaponClipAmmo" );
+    
+    //lua_classvariable ( luaVM, "property" "setWeaponProperty", "getWeaponProperty" ); todo: .property[wepID/name]["skill"] = property
+    lua_classvariable ( luaVM, "owner", "setWeaponOwner", "getWeaponOwner" );
+    lua_classvariable ( luaVM, "target", NULL, "getWeaponTarget" );
+    lua_classvariable ( luaVM, "firingRate", "setWeaponFiringRate", "getWeaponFiringRate" );
+    lua_classvariable ( luaVM, "state", "setWeaponState", "getWeaponState" );
+    //lua_classvariable ( luaVM, "flags" "setWeaponFlags", "getWeaponFlags" ); todo: .flags[flag] = value
+    lua_classvariable ( luaVM, "ammo", "setWeaponAmmo", "getWeaponAmmo" );
+    lua_classvariable ( luaVM, "clipAmmo", "setWeaponClipAmmo", "getWeaponClipAmmo" );
+    
     lua_registerclass ( luaVM, "Weapon", "Element" );
 }
 
@@ -799,8 +843,29 @@ void CLuaMain::AddEffectClass ( lua_State* luaVM )
 
     lua_classfunction ( luaVM, "create", "createEffect" );
     
+    lua_classfunction ( luaVM, "setDensity", "setEffectDensity" );
+    lua_classfunction ( luaVM, "setSpeed", "setEffectSpeed" );
+
+    lua_classfunction ( luaVM, "getDensity", "getEffectDensity" );
+    lua_classfunction ( luaVM, "getSpeed", "getEffectSpeed" );
+    
     lua_classvariable ( luaVM, "density", "setEffectDensity", "getEffectDensity" );
     lua_classvariable ( luaVM, "speed", "setEffectSpeed", "getEffectSpeed" );
+    
+    lua_classfunction ( luaVM, "addBlood", "fxAddBlood" );
+    lua_classfunction ( luaVM, "addBulletImpact", "fxAddBulletImpact" );
+    lua_classfunction ( luaVM, "addBulletSplash", "fxAddBulletSplash" );
+    lua_classfunction ( luaVM, "addDebris", "fxAddDebris" );
+    lua_classfunction ( luaVM, "addFootSplash", "fxAddFootSplash" );
+    lua_classfunction ( luaVM, "addGlass", "fxAddGlass" );
+    lua_classfunction ( luaVM, "addGunshot", "fxAddGunshot" );
+    lua_classfunction ( luaVM, "addPunchImpact", "fxAddPunchImpact" );
+    lua_classfunction ( luaVM, "addSparks", "fxAddSparks" );
+    lua_classfunction ( luaVM, "addTankFire", "fxAddTankFire" );
+    lua_classfunction ( luaVM, "addTyreBurst", "fxAddTyreBurst" );
+    lua_classfunction ( luaVM, "addWaterHydrant", "fxAddWaterHydrant" );
+    lua_classfunction ( luaVM, "addWaterSplash", "fxAddWaterSplash" );
+    lua_classfunction ( luaVM, "addWood", "fxAddWood" );
 
     lua_registerclass ( luaVM, "Effect", "Element" );
 }
