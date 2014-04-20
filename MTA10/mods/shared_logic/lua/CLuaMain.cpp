@@ -724,10 +724,10 @@ void CLuaMain::AddWaterClass ( lua_State* luaVM )
     
     lua_classfunction ( luaVM, "create", "createWater" );
     
-    lua_classfunction ( luaVm, "getVertexPosition", "getWaterVertexPosition" ); // vector3d
-    lua_classfunction ( luaVm, "setVertexPosition", "setWaterVertexPosition" ); // vector3d
+    lua_classfunction ( luaVM, "getVertexPosition", "getWaterVertexPosition" ); // vector3d
+    lua_classfunction ( luaVM, "setVertexPosition", "setWaterVertexPosition" ); // vector3d
     lua_classfunction ( luaVM, "getLevel", "getWaterLevel" );
-    lua_classfunction ( luaVm, "setLevel", "getWaterLevel" ); // vector3d
+    lua_classfunction ( luaVM, "setLevel", "getWaterLevel" ); // vector3d
 
     lua_classfunction ( luaVM, "testLineAgainst", "testLineAgainstWater" );
     lua_classfunction ( luaVM, "resetColor", "resetWaterColor" );
@@ -874,7 +874,7 @@ void CLuaMain::AddEffectClass ( lua_State* luaVM )
 void CLuaMain::AddGuiElementClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
-
+    
     lua_registerclass ( luaVM, "GuiElement", "Element" );
 }
 
@@ -983,6 +983,13 @@ void CLuaMain::AddGuiTabClass ( lua_State* luaVM )
     lua_registerclass ( luaVM, "GuiTab", "GuiElement" );
 }
 
+void CLuaMain::AddGuiFontClass ( lua_State* luaVM )
+{
+    lua_newclass ( luaVM );
+    
+    lua_registerclass ( luaVM, "GuiFont", "Element" );
+}
+
 void CLuaMain::AddResourceClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
@@ -1009,13 +1016,61 @@ void CLuaMain::AddFileClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
 
+    lua_classfunction ( luaVM, "create", "fileOpen" );
+    lua_classfunction ( luaVM, "destroy", "fileClose" );
+    lua_classfunction ( luaVM, "close", "fileClose" );
+    lua_classfunction ( luaVM, "new", "fileCreate" );
+    
+    lua_classfunction ( luaVM, "delete", "fileDelete" );
+    lua_classfunction ( luaVM, "exists", "fileExists" );
+    lua_classfunction ( luaVM, "flush", "fileFlush" );
+    lua_classfunction ( luaVM, "getPos", "fileGetPos" );
+    lua_classfunction ( luaVM, "getSize", "fileGetSize" );
+    lua_classfunction ( luaVM, "isEOF", "fileIsEOF" );
+    lua_classfunction ( luaVM, "read", "fileRead" );
+    lua_classfunction ( luaVM, "rename", "fileRename" );
+    lua_classfunction ( luaVM, "setPos", "fileSetPos" );
+    lua_classfunction ( luaVM, "write", "fileWrite" );
+    lua_classfunction ( luaVM, "copy", "fileCopy" );
+
+    lua_classvariable ( luaVM, "pos", "fileSetPos", "fileGetPos" );
+    lua_classvariable ( luaVM, "size", NULL, "fileGetSize" );
+    lua_classvariable ( luaVM, "isEOF", NULL, "fileIsEOF" );
+    
     lua_registerclass ( luaVM, "File" );
 }
+
 
 void CLuaMain::AddXmlNodeClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
+    
+    lua_classfunction ( luaVM, "create", "xmlLoadFile" );
+    lua_classfunction ( luaVM, "unloadFile", "xmlUnloadFile" );
+    lua_classfunction ( luaVM, "destroy", "xmlUnloadFile" );
+    
+    lua_classfunction ( luaVM, "copyFile", "xmlCopyFile" );
+    lua_classfunction ( luaVM, "createFile", "xmlCreateFile" );
+    lua_classfunction ( luaVM, "destroyNode", "xmlDestroyNode" );
+    lua_classfunction ( luaVM, "nodeGetAttribute", "xmlNodeGetAttribute" ); // table classvar?
+    lua_classfunction ( luaVM, "nodeGetValue", "xmlNodeGetValue" );
+    lua_classfunction ( luaVM, "nodeSetAttribute", "xmlNodeSetAttribute" );
+    lua_classfunction ( luaVM, "nodeSetValue", "xmlNodeSetValue" );
+    lua_classfunction ( luaVM, "saveFile", "xmlSaveFile" );
+    lua_classfunction ( luaVM, "createChild", "xmlCreateChild" );
+    lua_classfunction ( luaVM, "findChild", "xmlFindChild" );
+    lua_classfunction ( luaVM, "nodeGetAttributes", "xmlNodeGetAttributes" );
+    lua_classfunction ( luaVM, "nodeGetChildren", "xmlNodeGetChildren" );
+    lua_classfunction ( luaVM, "nodeGetName", "xmlNodeGetName" );
+    lua_classfunction ( luaVM, "nodeGetParent", "xmlNodeGetParent" );
+    lua_classfunction ( luaVM, "nodeSetName", "xmlNodeSetName" );
 
+    lua_classvariable ( luaVM, "nodeValue", "xmlNodeSetValue", "xmlNodeGetValue" );
+    lua_classvariable ( luaVM, "nodeName", "xmlNodeSetName", "xmlNodeGetName" );
+    lua_classvariable ( luaVM, "nodeAttributes", NULL, "xmlNodeGetAttributes" );
+    lua_classvariable ( luaVM, "nodeChildren", NULL, "xmlNodeGetChildren" );
+    lua_classvariable ( luaVM, "nodeParent", NULL, "xmlNodeGetParent" );
+    
     lua_registerclass ( luaVM, "XmlNode" );
 }
 
@@ -1184,6 +1239,7 @@ void CLuaMain::InitClasses ( lua_State* luaVM )
     AddGuiGridlistClass ( luaVM );
     AddGuiTabPanelClass ( luaVM );
     AddGuiTabClass ( luaVM );
+    AddGuiFontClass ( luaVM );
 
     AddResourceClass ( luaVM );
     AddTimerClass ( luaVM );
