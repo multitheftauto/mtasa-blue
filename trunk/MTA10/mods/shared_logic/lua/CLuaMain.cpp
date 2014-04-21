@@ -1384,7 +1384,7 @@ void CLuaMain::AddMatrixClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "create", CLuaMatrixDefs::Create );
 
     lua_classfunction ( luaVM, "getPosition", CLuaMatrixDefs::GetPosition );
-    lua_classfunction ( luaVM, "getRotation", CLuaMatrixDefs::GetPosition );
+    lua_classfunction ( luaVM, "getRotation", CLuaMatrixDefs::GetRotation );
     lua_classfunction ( luaVM, "getFront", CLuaMatrixDefs::GetFront );
     lua_classfunction ( luaVM, "getRight", CLuaMatrixDefs::GetRight );
     lua_classfunction ( luaVM, "getUp", CLuaMatrixDefs::GetUp );
@@ -1396,7 +1396,7 @@ void CLuaMain::AddMatrixClass ( lua_State* luaVM )
 
     lua_classvariable ( luaVM, "position", CLuaMatrixDefs::SetPosition, CLuaMatrixDefs::GetPosition );
     lua_classvariable ( luaVM, "rotation", NULL, CLuaMatrixDefs::GetRotation );
-    lua_classvariable ( luaVM, "forward", CLuaMatrixDefs::SetFront, CLuaMatrixDefs::GetFront );
+    lua_classvariable ( luaVM, "front", CLuaMatrixDefs::SetFront, CLuaMatrixDefs::GetFront );
     lua_classvariable ( luaVM, "right", CLuaMatrixDefs::SetRight, CLuaMatrixDefs::GetRight );
     lua_classvariable ( luaVM, "up", CLuaMatrixDefs::SetUp, CLuaMatrixDefs::GetUp );
 
