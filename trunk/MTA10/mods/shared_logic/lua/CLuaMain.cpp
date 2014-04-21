@@ -727,7 +727,7 @@ void CLuaMain::AddWaterClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "getVertexPosition", "getWaterVertexPosition" ); // vector3d
     lua_classfunction ( luaVM, "setVertexPosition", "setWaterVertexPosition" ); // vector3d
     lua_classfunction ( luaVM, "getLevel", "getWaterLevel" );
-    lua_classfunction ( luaVM, "setLevel", "getWaterLevel" ); // vector3d
+    lua_classfunction ( luaVM, "setLevel", "setWaterLevel" ); // vector3d
 
     lua_classfunction ( luaVM, "testLineAgainst", "testLineAgainstWater" );
     lua_classfunction ( luaVM, "resetColor", "resetWaterColor" );
@@ -739,7 +739,7 @@ void CLuaMain::AddWaterClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "setWaveHeight", "setWaveHeight" );
     lua_classfunction ( luaVM, "setColor", "setWaterColor" ); // color
     
-    lua_classvariable ( luaVM, "color", "setWaterColor", "getWaterColor" ); // color
+    //lua_classvariable ( luaVM, "color", "setWaterColor", "getWaterColor" ); // color
     lua_classvariable ( luaVM, "level", "setWaterLevel", "getWaterLevel" );
     lua_classvariable ( luaVM, "drawnLast", "setWaterDrawnLast", "isWaterDrawnLast" );
 
@@ -1392,7 +1392,7 @@ void CLuaMain::AddMatrixClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "setPosition", CLuaMatrixDefs::SetPosition );
     lua_classfunction ( luaVM, "setFront", CLuaMatrixDefs::SetFront );
     lua_classfunction ( luaVM, "setRight", CLuaMatrixDefs::SetRight );
-    lua_classfunction ( luaVM, "getUp", CLuaMatrixDefs::SetUp );
+    lua_classfunction ( luaVM, "setUp", CLuaMatrixDefs::SetUp );
 
     lua_classvariable ( luaVM, "position", CLuaMatrixDefs::SetPosition, CLuaMatrixDefs::GetPosition );
     lua_classvariable ( luaVM, "rotation", NULL, CLuaMatrixDefs::GetRotation );
