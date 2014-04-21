@@ -93,7 +93,7 @@ public:
     void                            AddEffectClass          ( lua_State* luaVM );
 
     void                            AddGuiElementClass      ( lua_State* luaVM );
-    void                            AddGuiFontClass       ( lua_State* luaVM );
+    void                            AddGuiFontClass         ( lua_State* luaVM );
     void                            AddGuiWindowClass       ( lua_State* luaVM );
     void                            AddGuiButtonClass       ( lua_State* luaVM );
     void                            AddGuiEditClass         ( lua_State* luaVM );
@@ -115,6 +115,11 @@ public:
     void                            AddFileClass            ( lua_State* luaVM );
     void                            AddXmlNodeClass         ( lua_State* luaVM );
 
+    void                            AddEngineClass          ( lua_State* luaVM );
+    void                            AddEngineColClass       ( lua_State* luaVM );
+    void                            AddEngineTxdClass       ( lua_State* luaVM );
+    void                            AddEngineDffClass       ( lua_State* luaVM );
+    
     void                            AddCameraClass          ( lua_State* luaVM );
 
     void                            AddVector3DClass        ( lua_State* luaVM );
