@@ -126,6 +126,12 @@ public:
     void                            AddVector2DClass        ( lua_State* luaVM );
     void                            AddMatrixClass          ( lua_State* luaVM );
 
+    void                            AddDxTextureClass       ( lua_State* luaVM );
+    void                            AddDxFontClass          ( lua_State* luaVM );
+    void                            AddDxShaderClass        ( lua_State* luaVM );
+    void                            AddDxScreenSourceClass  ( lua_State* luaVM );
+    void                            AddDxRenderTargetClass  ( lua_State* luaVM );
+    
     void                            InitClasses             ( lua_State* luaVM );
     void                            InitVM                  ( void );
     const SString&                  GetFunctionTag          ( int iLuaFunction );
