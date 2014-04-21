@@ -93,6 +93,7 @@ public:
     void                            AddEffectClass          ( lua_State* luaVM );
 
     void                            AddGuiElementClass      ( lua_State* luaVM );
+    void                            AddGuiFontClass       ( lua_State* luaVM );
     void                            AddGuiWindowClass       ( lua_State* luaVM );
     void                            AddGuiButtonClass       ( lua_State* luaVM );
     void                            AddGuiEditClass         ( lua_State* luaVM );
