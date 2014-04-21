@@ -126,6 +126,7 @@ public:
     void                            AddVector2DClass        ( lua_State* luaVM );
     void                            AddMatrixClass          ( lua_State* luaVM );
 
+    void                            AddDxMaterialClass      ( lua_State* luaVM );
     void                            AddDxTextureClass       ( lua_State* luaVM );
     void                            AddDxFontClass          ( lua_State* luaVM );
     void                            AddDxShaderClass        ( lua_State* luaVM );

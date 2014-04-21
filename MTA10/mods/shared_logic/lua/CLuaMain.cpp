@@ -1558,61 +1558,68 @@ void CLuaMain::AddMatrixClass ( lua_State* luaVM )
 
 void CLuaMain::InitClasses ( lua_State* luaVM )
 {
-    lua_initclasses ( luaVM );
+    lua_initclasses             ( luaVM );
 
-    AddVector3DClass ( luaVM );
-    //AddVector2DClass ( luaVM );
-    AddMatrixClass ( luaVM );
+    AddVector3DClass            ( luaVM );
+    //AddVector2DClass          ( luaVM );
+    AddMatrixClass              ( luaVM );
 
     if ( !m_bEnableOOP )
         return;
 
-    AddElementClass ( luaVM );
-    AddVehicleClass ( luaVM );
-    AddPedClass ( luaVM );
-    AddPlayerClass ( luaVM );
-    AddObjectClass ( luaVM );
-    AddMarkerClass ( luaVM );
-    AddBlipClass ( luaVM );
-    AddPickupClass ( luaVM );
-    AddColShapeClass ( luaVM );
-    AddProjectileClass ( luaVM );
-    AddRadarAreaClass ( luaVM );
-    AddTeamClass ( luaVM );
-    AddWaterClass ( luaVM );
-    AddSoundClass ( luaVM );
-    AddWeaponClass ( luaVM );
-    AddEffectClass ( luaVM );
+    AddElementClass             ( luaVM );
+    AddVehicleClass             ( luaVM );
+    AddPedClass                 ( luaVM );
+    AddPlayerClass              ( luaVM );
+    AddObjectClass              ( luaVM );
+    AddMarkerClass              ( luaVM );
+    AddBlipClass                ( luaVM );
+    AddPickupClass              ( luaVM );
+    AddColShapeClass            ( luaVM );
+    AddProjectileClass          ( luaVM );
+    AddRadarAreaClass           ( luaVM );
+    AddTeamClass                ( luaVM );
+    AddWaterClass               ( luaVM );
+    AddSoundClass               ( luaVM );
+    AddWeaponClass              ( luaVM );
+    AddEffectClass              ( luaVM );
 
-    AddGuiElementClass ( luaVM );
-    AddGuiWindowClass ( luaVM );
-    AddGuiButtonClass ( luaVM );
-    AddGuiEditClass ( luaVM );
-    AddGuiLabelClass ( luaVM );
-    AddGuiMemoClass ( luaVM );
-    AddGuiImageClass ( luaVM );
-    AddGuiComboBoxClass ( luaVM );
-    AddGuiCheckBoxClass ( luaVM );
-    AddGuiRadioButtonClass ( luaVM );
-    AddGuiScrollPaneClass ( luaVM );
-    AddGuiScrollBarClass ( luaVM );
-    AddGuiProgressBarClass ( luaVM );
-    AddGuiGridlistClass ( luaVM );
-    AddGuiTabPanelClass ( luaVM );
-    AddGuiTabClass ( luaVM );
-    AddGuiFontClass ( luaVM );
+    AddGuiElementClass          ( luaVM );
+    AddGuiWindowClass           ( luaVM );
+    AddGuiButtonClass           ( luaVM );
+    AddGuiEditClass             ( luaVM );
+    AddGuiLabelClass            ( luaVM );
+    AddGuiMemoClass             ( luaVM );
+    AddGuiImageClass            ( luaVM );
+    AddGuiComboBoxClass         ( luaVM );
+    AddGuiCheckBoxClass         ( luaVM );
+    AddGuiRadioButtonClass      ( luaVM );
+    AddGuiScrollPaneClass       ( luaVM );
+    AddGuiScrollBarClass        ( luaVM );
+    AddGuiProgressBarClass      ( luaVM );
+    AddGuiGridlistClass         ( luaVM );
+    AddGuiTabPanelClass         ( luaVM );
+    AddGuiTabClass              ( luaVM );
+    AddGuiFontClass             ( luaVM );
 
-    AddResourceClass ( luaVM );
-    AddTimerClass ( luaVM );
-    AddFileClass ( luaVM );
-    AddXmlNodeClass ( luaVM );
+    AddResourceClass            ( luaVM );
+    AddTimerClass               ( luaVM );
+    AddFileClass                ( luaVM );
+    AddXmlNodeClass             ( luaVM );
 
-    AddEngineClass ( luaVM );
-    AddEngineColClass ( luaVM );
-    AddEngineTxdClass ( luaVM );
-    AddEngineDffClass ( luaVM );
+    AddEngineClass              ( luaVM );
+    AddEngineColClass           ( luaVM );
+    AddEngineTxdClass           ( luaVM );
+    AddEngineDffClass           ( luaVM );
     
-    AddCameraClass ( luaVM );
+    AddDxMaterialClass          ( luaVM );
+    AddDxTextureClass           ( luaVM );
+    AddDxFontClass              ( luaVM );
+    AddDxShaderClass            ( luaVM );
+    AddDxScreenSourceClass      ( luaVM );
+    AddDxRenderTargetClass      ( luaVM );
+    
+    AddCameraClass              ( luaVM );
 }
 
 void CLuaMain::InitVM ( void )
