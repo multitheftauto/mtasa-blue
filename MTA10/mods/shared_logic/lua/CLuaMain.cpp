@@ -735,6 +735,7 @@ void CLuaMain::AddWaterClass ( lua_State* luaVM )
 
 void CLuaMain::AddSoundClass ( lua_State* luaVM )
 {
+    // 2D
     lua_newclass ( luaVM );
     
     lua_classfunction ( luaVM, "create", "playSound" );
@@ -771,6 +772,8 @@ void CLuaMain::AddSoundClass ( lua_State* luaVM )
 
     lua_registerclass ( luaVM, "Sound", "Element" );
 
+    
+    // 3D
     lua_newclass ( luaVM );
 
     lua_classfunction ( luaVM, "create", "playSound3D" );
@@ -1341,10 +1344,7 @@ void CLuaMain::AddCameraClass ( lua_State* luaVM )
 void CLuaMain::AddEngineClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
-    
-    lua_classfunction ( luaVM, "loadCOL", "engineLoadCOL" );
-    lua_classfunction ( luaVM, "loadTXD", "engineLoadTXD" );
-    lua_classfunction ( luaVM, "loadDFF", "engineLoadDFF" );
+
     lua_classfunction ( luaVM, "restoreCOL", "engineRestoreCOL" );
     lua_classfunction ( luaVM, "restoreModel", "engineRestoreModel" );
     lua_classfunction ( luaVM, "setAsynchronousLoading", "engineSetAsynchronousLoading" );
@@ -1371,7 +1371,7 @@ void CLuaMain::AddEngineColClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "create", "engineLoadCOL" );
     lua_classfunction ( luaVM, "replace", "engineReplaceCOL" );
     
-    lua_registerclass ( luaVM, "EngineCOL" );
+    lua_registerclass ( luaVM, "EngineCOL", "Element" );
 }
 
 void CLuaMain::AddEngineTxdClass ( lua_State* luaVM )
@@ -1382,7 +1382,7 @@ void CLuaMain::AddEngineTxdClass ( lua_State* luaVM )
     
     lua_classfunction ( luaVM, "import", "engineImportTXD" );
     
-    lua_registerclass ( luaVM, "EngineTXD" );
+    lua_registerclass ( luaVM, "EngineTXD", "Element" );
 }
 
 void CLuaMain::AddEngineDffClass ( lua_State* luaVM )
@@ -1392,8 +1392,84 @@ void CLuaMain::AddEngineDffClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "create", "engineLoadDFF" );
     lua_classfunction ( luaVM, "replace", "engineReplaceModel" );
     
-    lua_registerclass ( luaVM, "EngineDFF" );
+    lua_registerclass ( luaVM, "EngineDFF", "Element" );
 }
+
+void CLuaMain::AddDxMaterialClass ( lua_State* luaVM )
+{
+    lua_newclass ( luaVM );
+
+    lua_classfunction ( luaVM, "getSize", "dxGetMaterialSize" );
+    
+    lua_registerclass ( luaVM, "DxMaterial", "Element" );
+}
+
+
+void CLuaMain::AddDxTextureClass ( lua_State* luaVM )
+{
+    lua_newclass ( luaVM );
+    
+    lua_classfunction ( luaVM, "create", "dxCreateTexture");
+    
+    lua_classfunction ( luaVM, "setEdge", "dxSetTextureEdge");
+    lua_classfunction ( luaVM, "setPixels", "dxSetTexturePixels"); // DOES NOT SUPPORT "surfaceIndex"
+    
+    lua_classfunction ( luaVM, "getPixels", "dxGetTexturePixels"); // DOES NOT SUPPORT "surfaceIndex"
+    
+    lua_registerclass ( luaVM, "DxTexture", "Material" );
+}
+
+void CLuaMain::AddDxFontClass ( lua_State* luaVM )
+{
+    lua_newclass ( luaVM );
+    
+    lua_classfunction ( luaVM, "create", "dxCreateFont");
+    
+    //lua_classfunction ( luaVM, "getHeight", "dxGetFontHeight"); // swap arguments
+    //lua_classfunction ( luaVM, "getTextWidth", "dxGetTextWidth"); // swap arguments
+    
+    //lua_classvariable ( luaVM, "height", NULL, "dxGetFontHeight"); // swap arguments, .height[scale] = int(height);
+    
+    lua_registerclass ( luaVM, "DxFont" );
+
+}
+
+void CLuaMain::AddDxShaderClass ( lua_State* luaVM )
+{
+    lua_newclass ( luaVM );
+    
+    lua_classfunction ( luaVM, "create", "dxCreateShader");
+    
+    lua_classfunction ( luaVM, "setValue", "dxSetShaderValue");
+    lua_classfunction ( luaVM, "setTessellation", "dxSetShaderTessellation");
+    lua_classfunction ( luaVM, "setTransform", "dxSetShaderTransform");
+    
+    //lua_classfunction ( luaVM, "value", "dxGetFontHeight"); // .value["param"] = value
+    
+    lua_registerclass ( luaVM, "DxShader", "Material" );
+}
+
+void CLuaMain::AddDxScreenSourceClass ( lua_State* luaVM )
+{
+    lua_newclass ( luaVM );
+    
+    lua_classfunction ( luaVM, "create", "dxCreateScreenSource");
+    lua_classfunction ( luaVM, "update", "dxUpdateScreenSource");
+    
+    lua_registerclass ( luaVM, "DxScreenSource" );
+}
+
+void CLuaMain::AddDxRenderTargetClass ( lua_State* luaVM )
+{
+    lua_newclass ( luaVM );
+    
+    lua_classfunction ( luaVM, "create", "dxCreateRenderTarget");
+
+    lua_classfunction ( luaVM, "setAsTarget", "dxSetRenderTarget");
+    
+    lua_registerclass ( luaVM, "DxRenderTarget" );
+}
+
 
 void CLuaMain::AddVector3DClass ( lua_State* luaVM )
 {
