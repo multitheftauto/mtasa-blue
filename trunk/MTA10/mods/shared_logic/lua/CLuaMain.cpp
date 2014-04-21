@@ -1171,7 +1171,7 @@ void CLuaMain::AddGuiTabPanelClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
 
-
+    lua_classfunction ( luaVM, "create", "guiCreateTabPanel" );
     lua_classfunction ( luaVM, "getSelectedTab", "guiGetSelectedTab" );
     lua_classfunction ( luaVM, "setSelectedTab", "guiSetSelectedTab" );
     
@@ -1202,7 +1202,25 @@ void CLuaMain::AddGuiFontClass ( lua_State* luaVM )
 void CLuaMain::AddResourceClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
-
+    
+    lua_classfunction ( luaVM, "create", "getResourceFromName" );
+    lua_classfunction ( luaVM, "fromName", "getResourceFromName" );
+    lua_classfunction ( luaVM, "getGuiElement", "getResourceGUIElement" );
+    lua_classfunction ( luaVM, "getRootElement", "getResourceRootElement" );
+    lua_classfunction ( luaVM, "getName", "getResourceName" );
+    lua_classfunction ( luaVM, "getThis", "getThisResource" );
+    lua_classfunction ( luaVM, "getConfig", "getResourceConfig" );
+    lua_classfunction ( luaVM, "getConfig", "getResourceConfig" );
+    lua_classfunction ( luaVM, "getDynamicElementRoot", "getResourceDynamicElementRoot" );
+    lua_classfunction ( luaVM, "getExportedFunctions", "getResourceExportedFunctions" );
+    
+    lua_classvariable ( luaVM, "config", NULL, "getResourceConfig" );
+    lua_classvariable ( luaVM, "dynamicElementRoot", NULL, "getResourceDynamicElementRoot" );
+    lua_classvariable ( luaVM, "exportedFunctions", NULL, "getResourceExportedFunctions" );
+    lua_classvariable ( luaVM, "guiRlement", NULL, "getResourceGUIElement" );
+    lua_classvariable ( luaVM, "name", NULL, "getResourceName" );
+    lua_classvariable ( luaVM, "rootElement", NULL, "getResourceRootElement" );
+    
     lua_registerclass ( luaVM, "Resource" );
 }
 
@@ -1396,7 +1414,7 @@ void CLuaMain::AddMatrixClass ( lua_State* luaVM )
 
     lua_classvariable ( luaVM, "position", CLuaMatrixDefs::SetPosition, CLuaMatrixDefs::GetPosition );
     lua_classvariable ( luaVM, "rotation", NULL, CLuaMatrixDefs::GetRotation );
-    lua_classvariable ( luaVM, "front", CLuaMatrixDefs::SetFront, CLuaMatrixDefs::GetFront );
+    lua_classvariable ( luaVM, "frontgit", CLuaMatrixDefs::SetFront, CLuaMatrixDefs::GetFront );
     lua_classvariable ( luaVM, "right", CLuaMatrixDefs::SetRight, CLuaMatrixDefs::GetRight );
     lua_classvariable ( luaVM, "up", CLuaMatrixDefs::SetUp, CLuaMatrixDefs::GetUp );
 
