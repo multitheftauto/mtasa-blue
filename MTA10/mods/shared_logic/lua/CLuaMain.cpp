@@ -1416,7 +1416,7 @@ void CLuaMain::AddDxTextureClass ( lua_State* luaVM )
     
     lua_classfunction ( luaVM, "getPixels", "dxGetTexturePixels"); // DOES NOT SUPPORT "surfaceIndex"
     
-    lua_registerclass ( luaVM, "DxTexture", "Material" );
+    lua_registerclass ( luaVM, "DxTexture", "DxMaterial" );
 }
 
 void CLuaMain::AddDxFontClass ( lua_State* luaVM )
@@ -1446,7 +1446,7 @@ void CLuaMain::AddDxShaderClass ( lua_State* luaVM )
     
     //lua_classfunction ( luaVM, "value", "dxGetFontHeight"); // .value["param"] = value
     
-    lua_registerclass ( luaVM, "DxShader", "Material" );
+    lua_registerclass ( luaVM, "DxShader", "DxMaterial" );
 }
 
 void CLuaMain::AddDxScreenSourceClass ( lua_State* luaVM )
