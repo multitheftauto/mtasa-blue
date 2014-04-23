@@ -4046,10 +4046,19 @@ void CClientGame::DownloadInitialResourceFiles ( void )
         }
         else
         {
-            // Throw the error and disconnect
-            g_pCore->GetModManager ()->RequestUnload ();
-            g_pCore->ShowMessageBox ( _("Error")+_E("CD20"), szHTTPError, MB_BUTTON_OK | MB_ICON_ERROR ); // HTTP Error
             g_pCore->GetConsole ()->Printf ( _("Download error: %s"), szHTTPError );
+            if ( g_pClientGame->IsUsingExternalHTTPServer() && !g_pCore->ShouldUseInternalHTTPServer() )
+            {
+                SString strMessage( "External HTTP file download error:%s (Reconnecting with internal HTTP)", szHTTPError );
+                g_pClientGame->TellServerSomethingImportant( 1006, strMessage, true );
+                g_pCore->Reconnect( "", 0, NULL, false, true );
+            }
+            else
+            {
+                // Throw the error and disconnect
+                g_pCore->GetModManager ()->RequestUnload ();
+                g_pCore->ShowMessageBox ( _("Error")+_E("CD20"), szHTTPError, MB_BUTTON_OK | MB_ICON_ERROR ); // HTTP Error
+            }
         }
     }
 }
