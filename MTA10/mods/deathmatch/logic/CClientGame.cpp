@@ -6470,9 +6470,12 @@ void CClientGame::ChangeFloatPrecision ( bool bHigh )
     }
     else
     {
-        assert( m_uiPrecisionCallDepth != 0 );
+        // Even though is should never happen, m_uiPrecisionCallDepth is sometimes zero here
+        dassert( m_uiPrecisionCallDepth != 0 );
+        if ( m_uiPrecisionCallDepth != 0 )
+            m_uiPrecisionCallDepth--;
         // Switch back to 24 bit floating point precision on the last call
-        if ( --m_uiPrecisionCallDepth == 0 )
+        if ( m_uiPrecisionCallDepth == 0 )
             _controlfp( _PC_24, MCW_PC );
     }
 }
