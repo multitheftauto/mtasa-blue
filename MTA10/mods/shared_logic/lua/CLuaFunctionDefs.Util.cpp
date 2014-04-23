@@ -1231,14 +1231,16 @@ int CLuaFunctionDefs::PregReplace ( lua_State* luaVM )
 
 int CLuaFunctionDefs::PregMatch ( lua_State* luaVM )
 {
-//  table pregMatch ( string base, string pattern, uint/string flags = 0 )
+//  table pregMatch ( string base, string pattern, uint/string flags = 0, int maxResults = 100000 )
     SString strBase, strPattern;
     pcrecpp::RE_Options pOptions;
+    int iMaxResults;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadString ( strBase );
     argStream.ReadString ( strPattern );
     ReadPregFlags( argStream, pOptions );
+    argStream.ReadNumber ( iMaxResults, 100000 );
 
     if ( !argStream.HasErrors () )
     {
@@ -1249,7 +1251,7 @@ int CLuaFunctionDefs::PregMatch ( lua_State* luaVM )
         pcrecpp::StringPiece strInput ( strBase );
 
         string strGet; int i = 1;
-        while ( pPattern.FindAndConsume ( &strInput, &strGet ) ) 
+        while ( pPattern.FindAndConsume ( &strInput, &strGet ) && i <= iMaxResults ) 
         {
             lua_pushnumber ( luaVM, i );
             lua_pushstring ( luaVM, strGet.c_str () );
