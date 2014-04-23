@@ -219,7 +219,8 @@ public:
         result = "";
         if ( uiLength )
         {
-            CanReadNumberOfBytes( uiLength );
+            if ( !CanReadNumberOfBytes( uiLength ) )
+                return false;
             // Read the data
             std::vector < char > bufferArray;
             bufferArray.resize( uiLength );
