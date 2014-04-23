@@ -223,6 +223,13 @@ namespace SharedUtil
         virtual int             GetSize ( void ) const          { return pBuffer->GetSize (); }
         virtual const char*     GetData ( void ) const          { return pBuffer->GetData (); }
 
+        // Return true if enough bytes left in the buffer
+        bool CanReadNumberOfBytes( int iLength )
+        {
+            Seek( Tell() );
+            return iLength <= ( GetSize() - Tell() );
+        }
+
         bool ReadBytes ( void* pData, int iLength, bool bToFromNetwork = false )
         {
             // Validate pos
@@ -258,6 +265,9 @@ namespace SharedUtil
 
             if ( usLength )
             {
+                // Check has enough data
+                if ( !CanReadNumberOfBytes( usLength ) )
+                    return false;
                 // Read the data
                 char* buffer = static_cast < char* > ( alloca ( usLength ) );
                 if ( !ReadBytes ( buffer, usLength, false ) )
@@ -284,6 +294,9 @@ namespace SharedUtil
 
             if ( uiLength )
             {
+                // Check has enough data
+                if ( !CanReadNumberOfBytes( uiLength ) )
+                    return false;
                 // Read the data
                 outResult.SetSize ( uiLength );
                 if ( !ReadBytes ( outResult.GetData (), uiLength, false ) )

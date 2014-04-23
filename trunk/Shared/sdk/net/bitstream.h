@@ -198,6 +198,11 @@ public:
         return false;
     }
 
+    // Return true if enough bytes left in the bitstream
+    bool CanReadNumberOfBytes( int iLength ) const
+    {
+        return iLength <= ( GetNumberOfUnreadBits() + 7 ) / 8;
+    }
 
     // Write characters from a std::string
     void WriteStringCharacters ( const std::string& value, uint uiLength )
@@ -214,6 +219,7 @@ public:
         result = "";
         if ( uiLength )
         {
+            CanReadNumberOfBytes( uiLength );
             // Read the data
             std::vector < char > bufferArray;
             bufferArray.resize( uiLength );
