@@ -341,6 +341,12 @@ SString InsertQueryArgumentsMySql ( const SString& strQuery, CLuaArguments* pArg
                 if ( !bUnquotedStrings ) strParsedQuery += '\'';
             }
             else
+            if ( type == LUA_TNIL )
+            {
+                // Nil becomes NULL
+                strParsedQuery += "NULL";
+            }
+            else
             {
                 // If we don't have any content, put just output 2 quotes to indicate an empty variable
                 strParsedQuery += "\'\'";
