@@ -80,7 +80,8 @@ CBassAudio::~CBassAudio ( void )
 //
 void CBassAudio::Destroy ( void )
 {
-    CreateThread ( NULL, 0, reinterpret_cast <LPTHREAD_START_ROUTINE> ( &CBassAudio::DestroyInternal ), this, 0, NULL );
+    //CreateThread ( NULL, 0, reinterpret_cast <LPTHREAD_START_ROUTINE> ( &CBassAudio::DestroyInternal ), this, 0, NULL );
+    DestroyInternal( this );
 }
 
 void CBassAudio::DestroyInternal ( CBassAudio* pBassAudio )
