@@ -136,6 +136,7 @@ private:
     float       m_fMinDistance;
     float       m_fMaxDistance;
     SFixedArray < int, 9 >  m_EnabledEffects;
+    uint        m_uiFrameNumberCreated;
 };
 
 #endif
