@@ -12,6 +12,7 @@
 *****************************************************************************/
 
 #include "StdInc.h"
+#include "CBassAudio.h"
 
 using SharedUtil::CalcMTASAPath;
 using std::list;
@@ -65,6 +66,7 @@ CClientSoundManager::CClientSoundManager ( CClientManager* pClientManager )
 
 CClientSoundManager::~CClientSoundManager ( void )
 {
+    ProcessStopQueues( true );
     BASS_Stop();
     BASS_Free();
 }
@@ -115,6 +117,7 @@ void CClientSoundManager::DoPulse ( void )
         }
     }
     UpdateDistanceStreaming ( vecPosition );
+    ProcessStopQueues();
 }
 
 void CClientSoundManager::SetDimension ( unsigned short usDimension )
@@ -347,5 +350,57 @@ void CClientSoundManager::UpdateDistanceStreaming ( const CVector& vecListenerPo
         else
         if ( fDistance < 20 )
             pSound->DistanceStreamIn ();
+    }
+}
+
+
+//
+// Add a BASS sound to be stopped
+//
+void CClientSoundManager::QueueChannelStop( DWORD pSound )
+{
+    // Always not main thread
+    dassert( !IsMainThread() );
+    m_CS.Lock ();
+    m_ChannelStopQueue.push_back( pSound );
+    m_CS.Unlock ();
+}
+
+//
+// Add a CBassAudio to be stopped
+//
+void CClientSoundManager::QueueAudioStop( CBassAudio* pAudio )
+{
+    // Always main thread
+    dassert( IsMainThread() );
+    MapSet( m_AudioStopQueue, pAudio, CElapsedTime() );
+}
+
+//
+// Process pending sounds to be stopped
+//
+void CClientSoundManager::ProcessStopQueues( bool bFlush )
+{
+    if ( !m_ChannelStopQueue.empty() )
+    {
+        m_CS.Lock ();
+        std::vector < DWORD > channelStopList = m_ChannelStopQueue;
+        m_ChannelStopQueue.clear();
+        m_CS.Unlock ();
+        for( int i = 0 ; i < channelStopList.size() ; i++ )
+        {
+            BASS_ChannelStop( channelStopList[i] );
+        }
+    }
+
+    for( std::map < CBassAudio*, CElapsedTime >::iterator iter = m_AudioStopQueue.begin() ; iter != m_AudioStopQueue.end() ; )
+    {
+        if ( iter->second.Get() > 100 || bFlush )
+        {
+            delete iter->first; // This will cause BASS_ChannelStop
+            m_AudioStopQueue.erase( iter++ );
+        }
+        else
+            ++iter;
     }
 }

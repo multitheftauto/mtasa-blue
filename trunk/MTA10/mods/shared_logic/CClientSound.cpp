@@ -31,6 +31,7 @@ CClientSound::CClientSound ( CClientManager* pManager, ElementID ID ) : ClassIni
     m_fPan = 0.0f;
 
     m_pBuffer = NULL;
+    m_uiFrameNumberCreated = g_pClientGame->GetFrameCount();
 }
 
 CClientSound::~CClientSound ( void )
@@ -718,7 +719,13 @@ bool CClientSound::IsFinished ( void )
     {
         // SimulatedPlayPosition needs the correct length. Try to get the length without loading the file
         if ( m_dLength == 0 )
+        {
+            // Optimization: If new sound, assume it hasn't finished yet. (GetLength() might do a Create/Destroy)
+            if ( g_pClientGame->GetFrameCount() - m_uiFrameNumberCreated < 2 )
+                return false;
+
             GetLength ( true );
+        }
 
         m_SimulatedPlayPosition.SetLength ( m_dLength );
         return m_SimulatedPlayPosition.IsFinished ();

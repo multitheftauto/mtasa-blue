@@ -135,7 +135,6 @@ namespace SharedUtil
         }
 
     protected:
-        CElapsedTime ( const CElapsedTime& );       // Not implemented
 
         long long DoGetTickCount ( void )
         {
@@ -202,7 +201,6 @@ namespace SharedUtil
 
         static void StaticInitialize( CElapsedTimeApprox* pTimer );
     protected:
-        CElapsedTimeApprox( const CElapsedTimeApprox& );    // Not implemented
 
         uchar DoGetCount( void )
         {
