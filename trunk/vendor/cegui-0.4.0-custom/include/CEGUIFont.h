@@ -670,7 +670,7 @@ public:
 	*/
 	void                freeGlyphs                      ( void );
     void                freeGlyphPage                   ( uint uiPage );
-    GlyphPageInfo*      findGlyphPageInfo               ( ulong ulGlyph );
+    GlyphPageInfo*      findGlyphPageInfo               ( ulong ulGlyph, bool bScanSubFont = false );
     GlyphPageInfo*      addGlyphPageInfo                ( ulong ulGlyph );
     void                redrawGlyphCache                ( );
     void                refreshCachedGlyph              ( unsigned long ulGlyph );
