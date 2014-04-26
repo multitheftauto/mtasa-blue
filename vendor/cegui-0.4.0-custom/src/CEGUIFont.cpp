@@ -739,12 +739,10 @@ void Font::drawTextLine(const String& text, const Vector3& position, const Rect&
             CodepointMap::const_iterator pos_sub = d_sub_cp_map.find(text[c]);
             if ( pos_sub == d_sub_cp_map.end() )
             {
-// 5599 ////////////
-#pragma message("Assigned: Talidan")
                 if ( text[c] < 32 )
                     continue;
-////////////////////
-		        pos = d_cp_map.find('*');
+    
+                pos = d_cp_map.find('*');
         		if (pos == end)
                 {
     		        pos = d_cp_map.begin(); // Get first
@@ -1446,11 +1444,11 @@ const String Font::getAvailableGlyphs(void) const
 /*************************************************************************
 	Find an existing cache page for the glyph
 *************************************************************************/
-GlyphPageInfo* Font::findGlyphPageInfo ( ulong ulGlyph )
+GlyphPageInfo* Font::findGlyphPageInfo ( ulong ulGlyph, bool bScanSubFont )
 {
     uint uiPageId = GlyphToGlyphPageId ( ulGlyph );
     const GlyphPageInfo* pInfo = MapFind ( d_GlyphPageInfoMap, uiPageId );
-    if ( !pInfo && !d_is_subfont )
+    if ( !pInfo && !d_is_subfont && bScanSubFont )
         // Try checking our substitute font for this page
         pInfo = MapFind ( FontManager::getSingleton().getSubstituteFont()->getPageInfoMap(), uiPageId );
 
@@ -1474,7 +1472,7 @@ GlyphPageInfo* Font::addGlyphPageInfo ( ulong ulGlyph )
 *************************************************************************/
 void Font::refreshCachedGlyph ( unsigned long ulGlyph )
 {
-    GlyphPageInfo* pInfo = findGlyphPageInfo ( ulGlyph );
+    GlyphPageInfo* pInfo = findGlyphPageInfo ( ulGlyph, true );
     if ( pInfo )
         pInfo->uiLastUsedTime = d_uiLastPulseTime;
 }
