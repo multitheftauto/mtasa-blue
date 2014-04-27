@@ -899,6 +899,21 @@ int CLuaFunctionDefs::GetVersion ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaFunctionDefs::GetLocalization ( lua_State* luaVM )
+{
+    lua_createtable ( luaVM, 0, 2 );
+
+    lua_pushstring ( luaVM, "code" );
+    lua_pushstring ( luaVM, g_pCore->GetLocalization()->GetLanguageCode ().c_str() );
+    lua_settable   ( luaVM, -3 );
+
+    lua_pushstring ( luaVM, "name" );
+    lua_pushstring ( luaVM, g_pCore->GetLocalization()->GetLanguageName ().c_str() );
+    lua_settable   ( luaVM, -3 );
+
+    return 1;
+}
+
 int CLuaFunctionDefs::UtfLen ( lua_State* luaVM )
 {
 

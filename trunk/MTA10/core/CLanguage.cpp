@@ -13,9 +13,11 @@
 #include "StdInc.h"
 #include "po_parser.hpp"
 
-CLanguage::CLanguage ( Dictionary Dict )
+CLanguage::CLanguage ( Dictionary Dict, const SString& strLocale, const SString& strLangName )
 { 
     m_Dict = Dict;
+    m_strCode = strLocale;
+    m_strName = strLangName;
 }
 
 CLanguage::CLanguage ( const SString& strPOPath )

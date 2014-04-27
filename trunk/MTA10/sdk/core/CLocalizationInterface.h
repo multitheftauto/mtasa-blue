@@ -33,6 +33,8 @@ public:
     virtual std::map<SString,SString>   GetAvailableLanguages       ( void ) = 0;
     virtual bool                        IsLocalized                 ( void ) = 0;
     virtual SString                     GetLanguageDirectory        ( void ) = 0;
+    virtual SString                     GetLanguageCode             ( void ) = 0;
+    virtual SString                     GetLanguageName             ( void ) = 0;
 };
 
 #endif

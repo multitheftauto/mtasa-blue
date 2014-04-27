@@ -39,7 +39,7 @@ CLocalization::CLocalization ( SString strLocale, SString strLocalePath )
     // Grab our translation dictionary from this dir
     m_CurrentDict = m_DictManager.get_dictionary ( Lang, MTA_LOCALE_TEXTDOMAIN );
 
-    m_pCurrentLang = new CLanguage ( m_CurrentDict );
+    m_pCurrentLang = new CLanguage ( m_CurrentDict, strLocale, Lang.get_name() );
 }
 
 CLocalization::~CLocalization ( void )
@@ -95,6 +95,16 @@ bool CLocalization::IsLocalized ( void )
     std::string strLocale;
     CVARS_GET("locale", strLocale);
     return strLocale != "en_US";
+}
+
+SString CLocalization::GetLanguageCode ( void )
+{
+    return m_pCurrentLang->GetCode();
+}
+
+SString CLocalization::GetLanguageName ( void )
+{
+    return m_pCurrentLang->GetName();
 }
 
 // Get the file directory of the current language

@@ -29,6 +29,8 @@ public:
     virtual std::map<SString,SString>   GetAvailableLanguages       ( void ) { return std::map<SString,SString>(); }
     virtual bool                        IsLocalized                 ( void ) { return false; }
     virtual SString                     GetLanguageDirectory        ( void ) { return ""; }
+    virtual SString                     GetLanguageCode             ( void ) { return "en_US"; }
+    virtual SString                     GetLanguageName             ( void ) { return "English"; }
 };
 
 CLocalizationInterface* g_pLocalization = new CLocalizationDummy();
