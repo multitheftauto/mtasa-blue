@@ -141,6 +141,8 @@
     </ClCompile>
     <Link>
       <ImportLibrary>$(IntDir)$(TargetName).lib</ImportLibrary>
+      <ProgramDatabaseFile>$(IntDir)$(TargetName).pdb</ProgramDatabaseFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
       <Command>xcopy /y "$(OutDir)pcre3_d.dll" "$(MyTargetDir)\server\mods\deathmatch\" &amp;&amp; xcopy /y "$(OutDir)pcre3_d.dll" "$(MyTargetDir)\mods\deathmatch\" </Command>

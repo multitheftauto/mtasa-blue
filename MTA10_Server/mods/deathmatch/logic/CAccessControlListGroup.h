@@ -32,27 +32,26 @@ public:
 public:
     inline explicit                 CAccessControlListGroupObject       ( const char* szName, EObjectType eObjectType )
                                     {
-                                        m_uiHashId = GenerateHashId ( szName, eObjectType );
+                                        m_strKey = GenerateKey ( szName, eObjectType );
                                         m_strName = szName;
                                         m_eObjectType = eObjectType;
                                     }
 
     virtual                         ~CAccessControlListGroupObject      ( void )        { };
 
-    static inline unsigned int      GenerateHashId                      ( const char* szName, EObjectType eObjectType )
+    static SString                  GenerateKey                         ( const char* szName, EObjectType eObjectType )
                                     {
-                                        SString strID ( "%s_%d", szName, (unsigned int) eObjectType );
-                                        return ( HashString( strID ) & (unsigned int)0x7FFFFFFF );
+                                        return SString( "%s_%d", szName, (unsigned int) eObjectType );
                                     }
 
     inline const char*              GetObjectName                       ( void )        { return m_strName; };
     inline EObjectType              GetObjectType                       ( void )        { return m_eObjectType; };
-    inline unsigned int             GetObjectHashId                     ( void )        { return m_uiHashId; };
+    inline const SString&           GetObjectKey                        ( void )        { return m_strKey; };
 
 private:
     SString                         m_strName;
     EObjectType                     m_eObjectType;
-    unsigned int                    m_uiHashId;
+    SString                         m_strKey;
 
 };
 
@@ -90,7 +89,7 @@ private:
     typedef std::list < class CAccessControlListGroupObject* >
                                                     ObjectList;
 
-    typedef CFastHashMap < unsigned int, class CAccessControlListGroupObject* >
+    typedef CFastHashMap < SString, class CAccessControlListGroupObject* >
                                                     ObjectMap;
 
     SString                                         m_strGroupName;
