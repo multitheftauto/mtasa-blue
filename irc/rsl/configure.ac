@@ -14,7 +14,7 @@ AC_CONFIG_FILES([Makefile file/Makefile file/ini/Makefile net/Makefile
 AC_PROG_CC
 AC_PROG_CXX
 AC_PROG_LIBTOOL
-m4_pattern_allow([AM_PROG_AR], [AM_PROG_AR])
+m4_ifdef([AM_PROG_AR], [AM_PROG_AR])
 
 # Checks for libraries.
 
