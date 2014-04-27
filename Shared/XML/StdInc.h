@@ -10,6 +10,9 @@
 #include <errno.h>
 #include <stdarg.h>
 #include <stdio.h>
+#ifndef WIN32
+    #include <unistd.h>
+#endif
 
 // SDK includes
 

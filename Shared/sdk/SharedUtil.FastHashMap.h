@@ -25,6 +25,25 @@ using namespace google;
     #pragma pop_macro("assert")
 #endif
 
+//
+// Default keys for pointers
+//
+template < class T >
+T* GetEmptyMapKey ( T** )
+{
+    return (T*)-3;
+}
+
+template < class T >
+T* GetDeletedMapKey ( T** )
+{
+    return (T*)-4;
+}
+
+unsigned int GetEmptyMapKey ( unsigned int* );
+unsigned int GetDeletedMapKey ( unsigned int* );
+
+
 namespace SharedUtil
 {
 
@@ -40,13 +59,13 @@ namespace SharedUtil
         CFastHashMap ( uint uiInitialSize )
             : google::dense_hash_map < K, V > ( uiInitialSize )
         {
-            set_empty_key ( GetEmptyMapKey ( (K*)NULL ) );
-            set_deleted_key ( GetDeletedMapKey ( (K*)NULL ) );
+            this->set_empty_key ( GetEmptyMapKey ( (K*)NULL ) );
+            this->set_deleted_key ( GetDeletedMapKey ( (K*)NULL ) );
         }
         CFastHashMap ( void )
         {
-            set_empty_key ( GetEmptyMapKey ( (K*)NULL ) );
-            set_deleted_key ( GetDeletedMapKey ( (K*)NULL ) );
+            this->set_empty_key ( GetEmptyMapKey ( (K*)NULL ) );
+            this->set_deleted_key ( GetDeletedMapKey ( (K*)NULL ) );
         }
     };
 
@@ -133,19 +152,5 @@ SString GetDeletedMapKey ( SString* )
     return SStringX ( "\xFF\xFF" );
 }
 
-//
-// Default keys for pointers
-//
-template < class T >
-T* GetEmptyMapKey ( T** )
-{
-    return (T*)-3;
-}
-
-template < class T >
-T* GetDeletedMapKey ( T** )
-{
-    return (T*)-4;
-}
 
 #endif  // WITH_ALLOC_TRACKING
