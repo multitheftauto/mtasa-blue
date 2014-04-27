@@ -958,6 +958,9 @@ public:
 
     LUA_DECLARE ( GetVersion );
 
+    // L10n
+    LUA_DECLARE ( GetLocalization );
+
     // JSON funcs
     LUA_DECLARE ( toJSON );
     LUA_DECLARE ( fromJSON );

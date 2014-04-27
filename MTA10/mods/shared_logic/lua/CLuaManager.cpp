@@ -1134,6 +1134,9 @@ void CLuaManager::LoadCFunctions ( void )
     // Version functions
     CLuaCFunctions::AddFunction ( "getVersion", CLuaFunctionDefs::GetVersion );
 
+    // Localization functions
+    CLuaCFunctions::AddFunction ( "getLocalization", CLuaFunctionDefs::GetLocalization );
+
     // UTF functions
     CLuaCFunctions::AddFunction ( "utfLen", CLuaFunctionDefs::UtfLen );
     CLuaCFunctions::AddFunction ( "utfSeek", CLuaFunctionDefs::UtfSeek );
