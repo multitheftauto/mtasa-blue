@@ -57,8 +57,6 @@ namespace
     CBassAudio* LockCallbackId( void* uiId )
     {
         ms_CallbackCS.Lock();
-        if ( !MapContains( ms_CallbackIdMap, uiId ) )
-            uiId = uiId;
         return MapFindRef( ms_CallbackIdMap, uiId );
     }
 
