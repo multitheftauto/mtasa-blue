@@ -671,10 +671,16 @@ bool CLocalGUI::ProcessMessage ( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPa
             break;
 
             case WM_IME_CHAR:
+                return true;
             case WM_IME_KEYDOWN:
             {
-                // Stop these here
-                return true;
+                // Handle space/return seperately in this case
+                if ( wParam == VK_SPACE || wParam == VK_RETURN )
+                    pGUI->ProcessCharacter ( MapVirtualKey( wParam, MAPVK_VK_TO_CHAR ) );
+
+                DWORD dwTemp = TranslateScanCodeToGUIKey ( wParam );
+                if ( dwTemp > 0 )
+                    pGUI->ProcessKeyboardInput ( dwTemp, true );
             }
             break;
 
