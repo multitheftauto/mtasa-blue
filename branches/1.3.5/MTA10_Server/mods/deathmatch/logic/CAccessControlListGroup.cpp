@@ -14,9 +14,6 @@
 
 #include "StdInc.h"
 
-static unsigned int GetEmptyMapKey ( unsigned int* ) { return (unsigned int)0xFB170551; }
-static unsigned int GetDeletedMapKey ( unsigned int* ) { return (unsigned int)0xF15AF001 ; }
-
 
 CAccessControlListGroup::CAccessControlListGroup ( const char* szGroupName )
 {
@@ -42,8 +39,8 @@ CAccessControlListGroup::~CAccessControlListGroup ( void )
 
 CAccessControlListGroupObject* CAccessControlListGroup::AddObject ( const char* szObjectName, CAccessControlListGroupObject::EObjectType eObjectType )
 {
-    unsigned int uiHash = CAccessControlListGroupObject::GenerateHashId ( szObjectName, eObjectType );
-    ObjectMap::const_iterator iter = m_ObjectsById.find ( uiHash );
+    const SString strKey = CAccessControlListGroupObject::GenerateKey ( szObjectName, eObjectType );
+    ObjectMap::const_iterator iter = m_ObjectsById.find ( strKey );
 
     if ( iter != m_ObjectsById.end() )
     {
@@ -52,7 +49,7 @@ CAccessControlListGroupObject* CAccessControlListGroup::AddObject ( const char* 
 
     CAccessControlListGroupObject* pObject = new CAccessControlListGroupObject ( szObjectName, eObjectType );
     m_Objects.push_back ( pObject );
-    m_ObjectsById.insert ( ObjectMap::value_type ( pObject->GetObjectHashId(), pObject ) );
+    m_ObjectsById.insert ( ObjectMap::value_type ( pObject->GetObjectKey(), pObject ) );
 
     OnChange ();
     return pObject;
@@ -61,10 +58,10 @@ CAccessControlListGroupObject* CAccessControlListGroup::AddObject ( const char* 
 
 bool CAccessControlListGroup::FindObjectMatch ( const char* szObjectName, CAccessControlListGroupObject::EObjectType eObjectType )
 {
-    unsigned int uiHash = CAccessControlListGroupObject::GenerateHashId ( szObjectName, eObjectType );
+    const SString strKey = CAccessControlListGroupObject::GenerateKey ( szObjectName, eObjectType );
 
     // Look through the list for a matching name. If we find one, return true.
-    ObjectMap::const_iterator iterFind = m_ObjectsById.find ( uiHash );
+    ObjectMap::const_iterator iterFind = m_ObjectsById.find ( strKey );
     if ( iterFind != m_ObjectsById.end() )
     {
         return true;
@@ -105,10 +102,10 @@ bool CAccessControlListGroup::FindObjectMatch ( const char* szObjectName, CAcces
 
 bool CAccessControlListGroup::RemoveObject ( const char* szObjectName, CAccessControlListGroupObject::EObjectType eObjectType )
 {
-    unsigned int uiHash = CAccessControlListGroupObject::GenerateHashId ( szObjectName, eObjectType );
+    const SString strKey = CAccessControlListGroupObject::GenerateKey ( szObjectName, eObjectType );
 
     // Try to find a match and delete it
-    ObjectMap::iterator iter = m_ObjectsById.find ( uiHash );
+    ObjectMap::iterator iter = m_ObjectsById.find ( strKey );
     if ( iter != m_ObjectsById.end() )
     {
         // Delete, remove from list and return true

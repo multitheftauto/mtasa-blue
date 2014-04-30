@@ -1279,8 +1279,8 @@ static t_mapEntitiesFromRoot    ms_mapEntitiesFromRoot;
 static bool                     ms_bEntitiesFromRootInitialized = false;
 
 // CFastHashMap helpers
-static unsigned int GetEmptyMapKey ( unsigned int* )   { return (unsigned int)0xFFFFFFFF; }
-static unsigned int GetDeletedMapKey ( unsigned int* ) { return (unsigned int)0xFFFFFFFE ; }
+unsigned int GetEmptyMapKey ( unsigned int* )   { return (unsigned int)0xFFFFFFFF; }
+unsigned int GetDeletedMapKey ( unsigned int* ) { return (unsigned int)0xFFFFFFFE; }
 
 
 void CElement::StartupEntitiesFromRoot ()
