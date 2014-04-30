@@ -573,16 +573,16 @@ DontInstallRedist:
 		SetOutPath "$INSTDIR\MTA"
 		File "${FILES_ROOT}\MTA San Andreas\mta\cgui.dll"
 		File "${FILES_ROOT}\MTA San Andreas\mta\core.dll"
-		File "${SERVER_FILES_ROOT}\xmll.dll"
+		File "${FILES_ROOT}\MTA San Andreas\mta\xmll.dll"
 		File "${FILES_ROOT}\MTA San Andreas\mta\game_sa.dll"
 		File "${FILES_ROOT}\MTA San Andreas\mta\multiplayer_sa.dll"
 		File "${FILES_ROOT}\MTA San Andreas\mta\netc.dll"
-		File "${SERVER_FILES_ROOT}\libcurl.dll"
+		File "${FILES_ROOT}\MTA San Andreas\mta\libcurl.dll"
 		File "${FILES_ROOT}\MTA San Andreas\mta\loader.dll"
         ; The files below can be moved out of the LIGHTBUILD zone at some point
         File "${FILES_ROOT}\MTA San Andreas\mta\bass_fx.dll"
         File "${FILES_ROOT}\MTA San Andreas\mta\tags.dll"
-		File "${SERVER_FILES_ROOT}\pthreadVC2.dll"
+        File "${FILES_ROOT}\MTA San Andreas\mta\pthreadVC2.dll"
         File "${FILES_ROOT}\MTA San Andreas\mta\XInput9_1_0_mta.dll"
         File "${FILES_ROOT}\MTA San Andreas\mta\vea.dll"
         File "${FILES_ROOT}\MTA San Andreas\mta\vog.dll"
@@ -684,7 +684,7 @@ DontInstallRedist:
 		SetOutPath "$INSTDIR\mods\deathmatch"
 		File "${FILES_ROOT}\MTA San Andreas\mods\deathmatch\Client.dll"
 		File "${FILES_ROOT}\MTA San Andreas\mods\deathmatch\lua5.1c.dll"
-		File "${SERVER_FILES_ROOT}\mods\deathmatch\pcre3.dll"
+		File "${FILES_ROOT}\MTA San Andreas\mods\deathmatch\pcre3.dll"
 		SetOutPath "$INSTDIR\mods\deathmatch\resources"
 	SectionEnd
 SectionGroupEnd
@@ -702,11 +702,11 @@ SectionGroup /e "$(INST_SEC_SERVER)" SECGSERVER
 		SetOutPath "$INSTDIR\server"
 		SetOverwrite on
 		File "${SERVER_FILES_ROOT}\core.dll"
-		File "${SERVER_FILES_ROOT}\xmll.dll"
+		File "${FILES_ROOT}\MTA San Andreas\mta\xmll.dll"
 		File "${SERVER_FILES_ROOT}\MTA Server.exe"
 		File "${SERVER_FILES_ROOT}\net.dll"
-		File "${SERVER_FILES_ROOT}\libcurl.dll"
-		File "${SERVER_FILES_ROOT}\pthreadVC2.dll"
+		File "${FILES_ROOT}\MTA San Andreas\mta\libcurl.dll"
+        File "${FILES_ROOT}\MTA San Andreas\mta\pthreadVC2.dll"
 	SectionEnd
 
 	Section "$(INST_SEC_GAME)" SEC05
@@ -716,7 +716,7 @@ SectionGroup /e "$(INST_SEC_SERVER)" SECGSERVER
 		SetOverwrite on
 		File "${SERVER_FILES_ROOT}\mods\deathmatch\deathmatch.dll"
 		File "${SERVER_FILES_ROOT}\mods\deathmatch\lua5.1.dll"
-		File "${SERVER_FILES_ROOT}\mods\deathmatch\pcre3.dll"
+		File "${FILES_ROOT}\MTA San Andreas\mods\deathmatch\pcre3.dll"
 		File "${SERVER_FILES_ROOT}\mods\deathmatch\dbconmy.dll"
 		!ifndef LIGHTBUILD
             File "${SERVER_FILES_ROOT}\mods\deathmatch\libmysql.dll"
