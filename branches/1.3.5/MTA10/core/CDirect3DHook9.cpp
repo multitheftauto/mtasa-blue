@@ -73,7 +73,7 @@ namespace
     SString ms_strLogPrepend;
 
     //
-    // Hacky log interception.
+    // Hacky log interception
     //
     void WriteDebugEventTest( const SString& strInText )
     {
