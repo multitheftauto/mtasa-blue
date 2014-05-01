@@ -12757,7 +12757,7 @@ int CLuaFunctionDefinitions::Base64decode ( lua_State* luaVM )
     {
         SString result;
         Base64::decode ( str, result );
-        lua_pushstring ( luaVM, result );
+        lua_pushlstring ( luaVM, result, result.length() );
         return 1;
     }
     else
