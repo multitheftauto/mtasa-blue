@@ -137,7 +137,7 @@
       <PrecompiledHeader />
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
-      <DisableSpecificWarnings>4996;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4996;4756;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <Lib />
   </ItemDefinitionGroup>
@@ -170,7 +170,7 @@
       <PrecompiledHeader />
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <DisableSpecificWarnings>4996;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4996;4756;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <Lib />
   </ItemDefinitionGroup>
@@ -202,7 +202,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <DisableSpecificWarnings>4996;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4996;4756;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <Lib />
   </ItemDefinitionGroup>
@@ -224,29 +224,38 @@
     <Lib />
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="arraylist.c" />
-    <ClCompile Include="debug.c" />
-    <ClCompile Include="json_object.c" />
-    <ClCompile Include="json_tokener.c" />
-    <ClCompile Include="json_util.c" />
-    <ClCompile Include="linkhash.c" />
-    <ClCompile Include="printbuf.c" />
+    <None Include="config.h.win32" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="arraylist.h" />
     <ClInclude Include="bits.h" />
-    <ClInclude Include="shipped_for_mta_win32\config.h" />
     <ClInclude Include="debug.h" />
     <ClInclude Include="json.h" />
+    <ClInclude Include="json_config.h" />
+    <ClInclude Include="json_c_version.h" />
+    <ClInclude Include="json_inttypes.h" />
     <ClInclude Include="json_object.h" />
+    <ClInclude Include="json_object_iterator.h" />
     <ClInclude Include="json_object_private.h" />
     <ClInclude Include="json_tokener.h" />
     <ClInclude Include="json_util.h" />
     <ClInclude Include="linkhash.h" />
+    <ClInclude Include="math_compat.h" />
     <ClInclude Include="printbuf.h" />
+    <ClInclude Include="random_seed.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="config.h.win32" />
+    <ClCompile Include="arraylist.c" />
+    <ClCompile Include="debug.c" />
+    <ClCompile Include="json_c_version.c" />
+    <ClCompile Include="json_object.c" />
+    <ClCompile Include="json_object_iterator.c" />
+    <ClCompile Include="json_tokener.c" />
+    <ClCompile Include="json_util.c" />
+    <ClCompile Include="libjson.c" />
+    <ClCompile Include="linkhash.c" />
+    <ClCompile Include="printbuf.c" />
+    <ClCompile Include="random_seed.c" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

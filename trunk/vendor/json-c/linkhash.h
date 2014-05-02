@@ -3,6 +3,7 @@
  *
  * Copyright (c) 2004, 2005 Metaparadigm Pte. Ltd.
  * Michael Clark <michael@metaparadigm.com>
+ * Copyright (c) 2009 Hewlett-Packard Development Company, L.P.
  *
  * This library is free software; you can redistribute it and/or modify
  * it under the terms of the MIT license. See COPYING for details.
@@ -12,10 +13,23 @@
 #ifndef _linkhash_h_
 #define _linkhash_h_
 
+#include "json_object.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * golden prime used in hash functions
  */
 #define LH_PRIME 0x9e370001UL
+
+/**
+ * The fraction of filled hash buckets until an insert will cause the table
+ * to be resized.  
+ * This can range from just above 0 up to 1.0.
+ */
+#define LH_LOAD_FACTOR 0.66
 
 /**
  * sentinel pointer value for empty slots
@@ -36,11 +50,11 @@ typedef void (lh_entry_free_fn) (struct lh_entry *e);
 /**
  * callback function prototypes
  */
-typedef unsigned long (lh_hash_fn) (void *k);
+typedef unsigned long (lh_hash_fn) (const void *k);
 /**
  * callback function prototypes
  */
-typedef int (lh_equal_fn) (void *k1, void *k2);
+typedef int (lh_equal_fn) (const void *k1, const void *k2);
 
 /**
  * An entry in the hash table
@@ -53,7 +67,7 @@ struct lh_entry {
 	/**
 	 * The value.
 	 */
-	void *v;
+	const void *v;
 	/**
 	 * The next entry
 	 */
@@ -106,7 +120,7 @@ struct lh_table {
 	/**
 	 * Name of the hash table.
 	 */
-	char *name;
+	const char *name;
 
 	/**
 	 * The first entry.
@@ -132,11 +146,11 @@ struct lh_table {
 /**
  * Pre-defined hash and equality functions
  */
-extern unsigned long lh_ptr_hash(void *k);
-extern int lh_ptr_equal(void *k1, void *k2);
+extern unsigned long lh_ptr_hash(const void *k);
+extern int lh_ptr_equal(const void *k1, const void *k2);
 
-extern unsigned long lh_char_hash(void *k);
-extern int lh_char_equal(void *k1, void *k2);
+extern unsigned long lh_char_hash(const void *k);
+extern int lh_char_equal(const void *k1, const void *k2);
 
 
 /**
@@ -170,7 +184,7 @@ for(entry = table->head; entry && ((tmp = entry->next) || 1); entry = tmp)
  * and C strings respectively.
  * @return a pointer onto the linkhash table.
  */
-extern struct lh_table* lh_table_new(int size, char *name,
+extern struct lh_table* lh_table_new(int size, const char *name,
 				     lh_entry_free_fn *free_fn,
 				     lh_hash_fn *hash_fn,
 				     lh_equal_fn *equal_fn);
@@ -183,7 +197,7 @@ extern struct lh_table* lh_table_new(int size, char *name,
  * @param free_fn callback function used to free memory for entries.
  * @return a pointer onto the linkhash table.
  */
-extern struct lh_table* lh_kchar_table_new(int size, char *name,
+extern struct lh_table* lh_kchar_table_new(int size, const char *name,
 					   lh_entry_free_fn *free_fn);
 
 
@@ -195,7 +209,7 @@ extern struct lh_table* lh_kchar_table_new(int size, char *name,
  * @param free_fn callback function used to free memory for entries.
  * @return a pointer onto the linkhash table.
  */
-extern struct lh_table* lh_kptr_table_new(int size, char *name,
+extern struct lh_table* lh_kptr_table_new(int size, const char *name,
 					  lh_entry_free_fn *free_fn);
 
 
@@ -214,7 +228,7 @@ extern void lh_table_free(struct lh_table *t);
  * @param k a pointer to the key to insert.
  * @param v a pointer to the value to insert.
  */
-extern int lh_table_insert(struct lh_table *t, void *k, void *v);
+extern int lh_table_insert(struct lh_table *t, void *k, const void *v);
 
 
 /**
@@ -223,16 +237,25 @@ extern int lh_table_insert(struct lh_table *t, void *k, void *v);
  * @param k a pointer to the key to lookup
  * @return a pointer to the record structure of the value or NULL if it does not exist.
  */
-extern struct lh_entry* lh_table_lookup_entry(struct lh_table *t, void *k);
+extern struct lh_entry* lh_table_lookup_entry(struct lh_table *t, const void *k);
 
 /**
  * Lookup a record into the table
  * @param t the table to lookup
  * @param k a pointer to the key to lookup
  * @return a pointer to the found value or NULL if it does not exist.
+ * @deprecated Use lh_table_lookup_ex instead.
  */
-extern void* lh_table_lookup(struct lh_table *t, void *k);
+THIS_FUNCTION_IS_DEPRECATED(extern const void* lh_table_lookup(struct lh_table *t, const void *k));
 
+/**
+ * Lookup a record in the table
+ * @param t the table to lookup
+ * @param k a pointer to the key to lookup
+ * @param v a pointer to a where to store the found value (set to NULL if it doesn't exist).
+ * @return whether or not the key was found
+ */
+extern json_bool lh_table_lookup_ex(struct lh_table *t, const void *k, void **v);
 
 /**
  * Delete a record from the table.
@@ -255,7 +278,15 @@ extern int lh_table_delete_entry(struct lh_table *t, struct lh_entry *e);
  * @return 0 if the item was deleted.
  * @return -1 if it was not found.
  */
-extern int lh_table_delete(struct lh_table *t, void *k);
+extern int lh_table_delete(struct lh_table *t, const void *k);
 
+extern int lh_table_length(struct lh_table *t);
+
+void lh_abort(const char *msg, ...);
+void lh_table_resize(struct lh_table *t, int new_size);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
