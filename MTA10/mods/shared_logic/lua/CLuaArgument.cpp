@@ -1003,7 +1003,7 @@ bool CLuaArgument::ReadFromJSONObject ( json_object* object, std::vector < CLuaA
                 break;
             case json_type_string:
                 {
-                char * szString = json_object_get_string ( object );
+                const char * szString = json_object_get_string ( object );
                 if ( strlen(szString) > 3 && szString[0] == '^' && szString[2] == '^' && szString[1] != '^' )
                 {
                     switch ( szString[1] )
