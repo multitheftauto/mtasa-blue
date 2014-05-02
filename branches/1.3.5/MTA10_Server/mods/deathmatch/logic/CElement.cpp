@@ -128,7 +128,7 @@ CElement::~CElement ( void )
     GetSpatialDatabase ()->RemoveEntity ( this );
 
     if ( GetID() != INVALID_ELEMENT_ID && GetID() >= MAX_SERVER_ELEMENTS )
-        CLogger::ErrorPrintf( "ERROR: Element ID is incorrect (%08x) (Type:%d)\n", GetID(), GetType() );
+        CLogger::ErrorPrintf( "ERROR: Element ID is incorrect (%08x) (Type:%d)\n", GetID().Value(), GetType() );
 
     // Deallocate our unique ID
     CElementIDs::PushUniqueID ( this );
