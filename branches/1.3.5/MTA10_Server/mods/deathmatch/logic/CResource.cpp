@@ -573,6 +573,18 @@ bool CResource::GenerateChecksums ( void )
             pResourceFile->SetLastChecksum ( checksum );
             pResourceFile->SetLastFileSize ( uiFileSize );
 
+            // Check if file is blocked
+            char szHashResult[33];
+            CMD5Hasher::ConvertToHex( checksum.md5, szHashResult );
+            SString strBlockReason = m_resourceManager->GetBlockedFileReason( szHashResult );
+            if ( !strBlockReason.empty() )
+            {
+                m_strFailureReason = SString( "file '%s' is blocked (%s)", pResourceFile->GetName(), *strBlockReason );
+                CLogger::LogPrintf( SString ( "ERROR: Resource '%s' %s\n", GetName().c_str(), *m_strFailureReason ) );
+                bOk = false;
+                continue;
+            }
+
             // Copy file to http holding directory
             switch ( pResourceFile->GetType () )
             {
@@ -844,6 +856,20 @@ bool CResource::Start ( list<CResource *> * dependents, bool bStartedManually, b
         list < CResourceFile* > ::iterator iterf = m_resourceFiles.begin ();
         for ( ; iterf != m_resourceFiles.end (); iterf++ )
         {
+            bool bAbortStart = false;
+
+            // Check if file is blocked
+            char szHashResult[33];
+            CMD5Hasher::ConvertToHex( (*iterf)->GetLastChecksum().md5, szHashResult );
+            SString strBlockReason = m_resourceManager->GetBlockedFileReason( szHashResult );
+            if ( !strBlockReason.empty() )
+            {
+                m_strFailureReason = SString( "File '%s' is blocked (%s)", (*iterf)->GetName(), *strBlockReason );
+                CLogger::LogPrintf( "Failed to start resource '%s' - %s\n", GetName().c_str (), *m_strFailureReason );
+                bAbortStart = true;
+            }
+
+            // Start if applicable
             if ( ( (*iterf)->GetType() == CResourceFile::RESOURCE_FILE_TYPE_MAP && bMaps ) ||
                  ( (*iterf)->GetType() == CResourceFile::RESOURCE_FILE_TYPE_CONFIG && bConfigs ) ||
                  ( (*iterf)->GetType() == CResourceFile::RESOURCE_FILE_TYPE_SCRIPT && bScripts ) ||
@@ -854,26 +880,30 @@ bool CResource::Start ( list<CResource *> * dependents, bool bStartedManually, b
                 if ( !(*iterf)->Start() )
                 {
                     // Log it
-                    char szBuffer[255] = {0};
+                    m_strFailureReason = SString( "Failed to start resource item %s which is required\n", (*iterf)->GetName() );
                     CLogger::LogPrintf ( "Failed to start resource item %s in %s\n", (*iterf)->GetName(), m_strResourceName.c_str () );
-                    snprintf ( szBuffer, 254, "Failed to start resource item %s which is required\n", (*iterf)->GetName() );
-                    m_strFailureReason = szBuffer;
+                    bAbortStart = true;
+                }
+            }
 
-                    // Stop all the resource items without any warnings
-                    StopAllResourceItems();
-                    DestroyVM ();
+            // Handle abort
+            if ( bAbortStart )
+            {
+                // Stop all the resource items without any warnings
+                StopAllResourceItems();
+                DestroyVM ();
 
-                    // Remove the temporary XML storage node
-                    if ( m_pNodeStorage )
-                    {
-                        delete m_pNodeStorage;
-                        m_pNodeStorage = NULL;
-                    }
+                // Remove the temporary XML storage node
+                if ( m_pNodeStorage )
+                {
+                    delete m_pNodeStorage;
+                    m_pNodeStorage = NULL;
+                }
 
-                    // Destroy the element group attached directly to this resource
-                    if ( m_pDefaultElementGroup )
-                        delete m_pDefaultElementGroup;
-                    m_pDefaultElementGroup = NULL;
+                // Destroy the element group attached directly to this resource
+                if ( m_pDefaultElementGroup )
+                    delete m_pDefaultElementGroup;
+                m_pDefaultElementGroup = NULL;
 
                     // Make sure we remove the resource elements from the players that have joined
                     CEntityRemovePacket removePacket;
@@ -892,10 +922,9 @@ bool CResource::Start ( list<CResource *> * dependents, bool bStartedManually, b
                     }
                     g_pGame->GetPlayerManager()->BroadcastOnlyJoined ( removePacket );
 
-                    m_bActive = false;
-                    m_bStarting = false;
-                    return false;
-                }
+                m_bActive = false;
+                m_bStarting = false;
+                return false;
             }
         }
 
