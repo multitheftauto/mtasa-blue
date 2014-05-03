@@ -4580,7 +4580,7 @@ void CPacketHandler::Packet_ResourceStart ( NetBitStreamInterface& bitStream )
 
                     bitStream.Read ( ucChunkSubType );
                     bitStream.Read ( chunkChecksum.ulCRC );
-                    bitStream.Read ( (char*)chunkChecksum.mD5, sizeof ( chunkChecksum.mD5 ) );
+                    bitStream.Read ( (char*)chunkChecksum.md5.data, sizeof ( chunkChecksum.md5.data ) );
                     bitStream.Read ( dChunkDataSize );
 
                     uiTotalSizeProcessed += (uint)dChunkDataSize;
