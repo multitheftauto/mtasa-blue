@@ -296,9 +296,9 @@ public:
     bool                    GetCompatibilityStatus ( SString& strOutStatus );
 
     void                    AddTemporaryInclude ( CResource * resource );
-    const std::string&      GetFailureReason ( void )
+    SString                 GetFailureReason ( void )
     { 
-        return m_strFailureReason; 
+        return m_strFailureReason.TrimEnd( "\n" ); 
     }
     inline CXMLNode *       GetSettingsNode ( void ) { return m_pNodeSettings; }
     inline CXMLNode *       GetStorageNode ( void ) { return m_pNodeStorage; }
