@@ -20,6 +20,8 @@
 // new resources on demand
 
 #include "StdInc.h"
+#define BLOCKED_DB_FILE_NAME    "fileblock.db"
+#define BLOCKED_DB_TABLE_NAME   "`block_reasons`"
 
 extern CServerInterface* g_pServerInterface;
 
@@ -44,6 +46,7 @@ CResourceManager::CResourceManager ( void )
     m_uiResourceFailedCount = 0;
 
     m_strResourceDirectory.Format ( "%s/resources", g_pServerInterface->GetServerModPath () );
+    LoadBlockedFileReasons();
 }
 
 CResourceManager::~CResourceManager ( void )
@@ -1358,4 +1361,115 @@ void CResourceManager::ReevaluateSyncMapElementDataOption ( void )
     // Log change
     if ( bBefore != bAfter )
         CLogger::LogPrintf ( SString ( "SyncMapElementData is now %s\n", bAfter ? "enabled" : "disabled" ) );
+}
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// CResourceManager::LoadBlockedFileReasons
+//
+// Load blocked file hashes from database
+//
+/////////////////////////////////////////////////////////////////////////////
+void CResourceManager::LoadBlockedFileReasons( void )
+{
+    CDatabaseManager* pDatabaseManager = g_pGame->GetDatabaseManager();
+    SString strDatabaseFilename = PathJoin ( g_pGame->GetConfig()->GetSystemDatabasesPath(), BLOCKED_DB_FILE_NAME );
+    SDbConnectionId hDbConnection = pDatabaseManager->Connect( "sqlite", strDatabaseFilename );
+
+    CDbJobData* pJobData = pDatabaseManager->QueryStartf( hDbConnection, "SELECT `hash`,`reason` from " BLOCKED_DB_TABLE_NAME );
+    pDatabaseManager->QueryPoll( pJobData, -1 );
+    CRegistryResult& result = pJobData->result.registryResult;
+
+    if ( result->nRows > 0 && result->nColumns >= 2 )
+    {
+        m_BlockedFileReasonMap.clear();
+        for ( CRegistryResultIterator iter = result->begin() ; iter != result->end() ; ++iter )
+        {
+            const CRegistryResultRow& row = *iter;
+            SString strFileHash = (const char*)row[0].pVal;
+            SString strReason = (const char*)row[1].pVal;
+            MapSet( m_BlockedFileReasonMap, strFileHash, strReason );
+        }
+    }
+    pDatabaseManager->Disconnect( hDbConnection );
+
+    // Hard coded initial block item
+    AddBlockedFileReason( "5A5FD6E08D503A125C81BA26594B416A", "Malicious" );
+}
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// CResourceManager::SaveBlockedFileReasons
+//
+// Save blocked file hashes to database
+//
+/////////////////////////////////////////////////////////////////////////////
+void CResourceManager::SaveBlockedFileReasons( void )
+{
+    CDatabaseManager* pDatabaseManager = g_pGame->GetDatabaseManager ();
+    SString strDatabaseFilename = PathJoin( g_pGame->GetConfig()->GetSystemDatabasesPath(), BLOCKED_DB_FILE_NAME );
+    SDbConnectionId hDbConnection = pDatabaseManager->Connect( "sqlite", strDatabaseFilename );
+
+    pDatabaseManager->Execf ( hDbConnection, "DROP TABLE " BLOCKED_DB_TABLE_NAME );
+    pDatabaseManager->Execf ( hDbConnection, "CREATE TABLE IF NOT EXISTS " BLOCKED_DB_TABLE_NAME " (`hash` TEXT,`reason` TEXT)" );
+
+    for ( std::map < SString, SString >::iterator iter = m_BlockedFileReasonMap.begin() ; iter != m_BlockedFileReasonMap.end() ; iter++ )
+    {
+        pDatabaseManager->Execf( hDbConnection, 
+                                            "INSERT INTO " BLOCKED_DB_TABLE_NAME " (`hash`,`reason`) VALUES (?,?)"
+                                            , SQLITE_TEXT, *iter->first
+                                            , SQLITE_TEXT, *iter->second
+                                            );
+    }
+    pDatabaseManager->Disconnect( hDbConnection );
+}
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// CResourceManager::ClearBlockedFileReason
+//
+// Remove reason a resource file should be blocked from loading.
+// Empty input means clear all.
+//
+/////////////////////////////////////////////////////////////////////////////
+void CResourceManager::ClearBlockedFileReason( const SString& strFileHash )
+{
+    if ( strFileHash.empty() )
+        m_BlockedFileReasonMap.clear();
+    else
+        MapRemove( m_BlockedFileReasonMap, strFileHash );
+}
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// CResourceManager::AddBlockedFileReason
+//
+// Set reason a resource file should be blocked from loading.
+//
+/////////////////////////////////////////////////////////////////////////////
+void CResourceManager::AddBlockedFileReason( const SString& strFileHash, const SString& strReason )
+{
+    MapSet( m_BlockedFileReasonMap, strFileHash, strReason );
+}
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// CResourceManager::GetBlockedFileReason
+//
+// Return reason a resource file should be blocked from loading.
+// Empty string means no block.
+//
+/////////////////////////////////////////////////////////////////////////////
+SString CResourceManager::GetBlockedFileReason( const SString& strFileHash )
+{
+    SString* pstrReason = MapFind( m_BlockedFileReasonMap, strFileHash );
+    if ( pstrReason )
+        return *pstrReason;
+
+    return "";
 }

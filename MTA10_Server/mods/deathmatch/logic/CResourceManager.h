@@ -126,6 +126,12 @@ public:
     void                        RemoveSyncMapElementDataOption      ( CResource* pResource );
     void                        ReevaluateSyncMapElementDataOption  ( void );
 
+    void                        LoadBlockedFileReasons          ( void );
+    void                        SaveBlockedFileReasons          ( void );
+    void                        ClearBlockedFileReason          ( const SString& strFileHash );
+    void                        AddBlockedFileReason            ( const SString& strFileHash, const SString& strReason );
+    SString                     GetBlockedFileReason            ( const SString& strFileHash );
+
 private:
     SString                     m_strResourceDirectory;
     CMappedList < CResource* >  m_resources;
@@ -147,6 +153,7 @@ private:
     CFastHashMap < CResource*, bool >       m_SyncMapElementDataOptionMap;
 
     ushort                      m_usNextNetId;
+    std::map < SString, SString > m_BlockedFileReasonMap;
 };
 
 #endif
