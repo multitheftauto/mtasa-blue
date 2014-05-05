@@ -717,8 +717,8 @@ void CheckDataFiles( void )
                                { "38D7679D3B8B6D7F16A0AA9BF2A60043", "tags.dll", },
                                { "309D860FC8137E5FE9E7056C33B4B8BE", "vea.dll", },
                                { "0602F672BA595716E64EC4040E6DE376", "vog.dll", },
-                               { "2840F08DD9753A5B13C60D6D1C165C9A", "vvo.dll", },
-                               { "2B7B803311D2B228F065C45D13E1AEB2", "vvof.dll", },
+                               { "B37D7DF4A1430DB65AD3EA84801F9EC3", "vvo.dll", },
+                               { "47FF3EE45DE53528F1AFD9F5982DF8C7", "vvof.dll", },
                                { "ADFB6D7B61E301761C700652B6FE7CCD", "XInput9_1_0_mta.dll", }, };
     for ( int i = 0 ; i < NUMELMS ( integrityCheckList ); i++ )
     {
