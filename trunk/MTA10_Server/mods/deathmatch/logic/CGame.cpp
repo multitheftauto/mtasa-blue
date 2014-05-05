@@ -1898,7 +1898,7 @@ void CGame::Packet_PedWasted ( CPedWastedPacket& Packet )
 void CGame::Packet_PlayerWasted ( CPlayerWastedPacket& Packet )
 {
     CPlayer* pPlayer = Packet.GetSourcePlayer();
-    if ( pPlayer ) {
+    if ( pPlayer && !pPlayer->IsDead () ) {
         pPlayer->SetSpawned ( false );
         pPlayer->SetIsDead ( true );
         pPlayer->SetPosition ( Packet.m_vecPosition );
