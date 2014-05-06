@@ -239,6 +239,9 @@ CCore::~CCore ( void )
     // Delete the logger
     delete m_pConsoleLogger;
 
+    // Delete the web
+    delete m_pWebCore;
+
     //Delete the Current Server
     delete m_pCurrentServer;
 

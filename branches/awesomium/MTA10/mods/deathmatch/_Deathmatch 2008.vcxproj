@@ -205,6 +205,7 @@
     <ClCompile Include="..\shared_logic\CClientEffect.cpp" />
     <ClCompile Include="..\shared_logic\CClientEffectManager.cpp" />
     <ClCompile Include="..\shared_logic\CClientWebBrowser.cpp" />
+    <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Browser.cpp" />
     <ClCompile Include="CClient.cpp" />
     <ClCompile Include="Client.cpp" />
     <ClCompile Include="ClientCommands.cpp" />

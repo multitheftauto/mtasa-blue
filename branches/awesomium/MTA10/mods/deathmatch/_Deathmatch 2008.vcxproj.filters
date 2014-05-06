@@ -806,6 +806,9 @@
     <ClCompile Include="..\shared_logic\CClientWebBrowser.cpp">
       <Filter>Source Files\shared_logic</Filter>
     </ClCompile>
+    <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Browser.cpp">
+      <Filter>Source Files\shared_logic\lua</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CClient.h">

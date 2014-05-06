@@ -16,7 +16,7 @@ CWebView::CWebView ( unsigned int uiWidth, unsigned int uiHeight, IDirect3DSurfa
     m_pD3DSurface = pD3DSurface;
 
     // Create Awesomium webview as offscreen webview
-    //m_pWebView = g_pCore->GetWebBrowser()->
+    m_pWebView = Awesomium::WebCore::instance()->CreateWebView ( uiWidth, uiHeight, NULL, Awesomium::kWebViewType_Offscreen );
 }
 
 bool CWebView::LoadURL ( const SString& strURL )

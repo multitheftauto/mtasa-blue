@@ -84,6 +84,7 @@
 #include <CClientMaterial.h>
 #include <CClientTexture.h>
 #include <CClientShader.h>
+#include <CClientWebBrowser.h>
 #include <CClientEffect.h>
 #include <CCustomData.h>
 #include <CElementArray.h>

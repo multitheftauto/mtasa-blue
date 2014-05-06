@@ -474,8 +474,12 @@ void CRenderItemManager::UpdateWebBrowser ( CWebBrowserItem* pWebBrowserItem )
     g_pCore->GetWebCore ()->Update ();
 
     // Get BitmapSurface and check if it is available (it's not available if the website is blocked for example)
-    Awesomium::BitmapSurface* pAwSurface = static_cast<Awesomium::BitmapSurface*>( pWebBrowserItem->m_pWebView->m_pWebView->surface () );
-    if (!pAwSurface)
+    CWebView* pWebView = dynamic_cast < CWebView* > ( pWebBrowserItem->m_pWebView );
+    if ( !pWebView )
+        return;
+
+    Awesomium::BitmapSurface* pAwSurface = static_cast < Awesomium::BitmapSurface* > ( pWebView->m_pWebView->surface () );
+    if ( !pAwSurface )
         return;
 
     // Update our DX surface
@@ -487,7 +491,7 @@ void CRenderItemManager::UpdateWebBrowser ( CWebBrowserItem* pWebBrowserItem )
     pDXSurface->GetDesc ( &SurfaceDesc );
     pDXSurface->LockRect ( &LockedRect, NULL, 0 );
 
-    // Copy Awesomium buffer to our DX surface
+    // Copy Awesomium buffer to our DX surface (format: ARGB)
     pAwSurface->CopyTo ( reinterpret_cast<unsigned char*>(LockedRect.pBits), SurfaceDesc.Width * 4, 4, false, false );
 
     // Finally, unlock the surface

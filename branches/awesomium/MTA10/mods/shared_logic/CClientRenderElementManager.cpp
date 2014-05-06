@@ -28,6 +28,7 @@ CClientRenderElementManager::CClientRenderElementManager ( CClientManager* pClie
     m_uiStatsShaderCount = 0;
     m_uiStatsRenderTargetCount = 0;
     m_uiStatsScreenSourceCount = 0;
+    m_uiStatsWebBrowserCount = 0;
 }
 
 
@@ -221,6 +222,35 @@ CClientScreenSource* CClientRenderElementManager::CreateScreenSource ( uint uiSi
 
 ////////////////////////////////////////////////////////////////
 //
+// CClientRenderElementManager::CreateWebBrowser
+//
+//
+//
+////////////////////////////////////////////////////////////////
+CClientWebBrowser* CClientRenderElementManager::CreateWebBrowser ( uint uiSizeX, uint uiSizeY )
+{
+    // Create the item
+    CWebBrowserItem* pWebBrowserItem = m_pRenderItemManager->CreateWebBrowser ( uiSizeX, uiSizeY );
+
+    // Check create worked
+    if ( !pWebBrowserItem )
+        return NULL;
+
+    // Create the element
+    CClientWebBrowser* pWebBrowserElement = new CClientWebBrowser ( m_pClientManager, INVALID_ELEMENT_ID, pWebBrowserItem, pWebBrowserItem->m_pWebView );
+
+    // Add to this manager's list
+    MapSet ( m_ItemElementMap, pWebBrowserItem, pWebBrowserElement );
+
+    // Update stats
+    m_uiStatsWebBrowserCount++;
+
+    return pWebBrowserElement;
+}
+
+
+////////////////////////////////////////////////////////////////
+//
 // CClientRenderElementManager::FindAutoTexture
 //
 // Find texture by unique name. Create if not found.
@@ -290,6 +320,9 @@ void CClientRenderElementManager::Remove ( CClientRenderElement* pElement )
     else
     if ( pElement->IsA ( CClientScreenSource::GetClassId () ) )
         m_uiStatsScreenSourceCount--;
+    else
+    if ( pElement->IsA ( CClientWebBrowser::GetClassId () ) )
+        m_uiStatsWebBrowserCount--;
     else
     if ( pElement->IsA ( CClientTexture::GetClassId () ) )
         m_uiStatsTextureCount--;

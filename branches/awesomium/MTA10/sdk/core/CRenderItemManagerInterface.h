@@ -37,7 +37,7 @@ class CClientEntityBase;
 struct SShaderItemLayers;
 typedef CShaderItem CSHADERDUMMY;
 enum eAspectRatio;
-class CWebView;
+class CWebViewInterface;
 
 #define RDEFAULT            ((uint) -1)
 
@@ -140,12 +140,14 @@ public:
     virtual CShaderItem*        CreateShader                        ( const SString& strFullFilePath, const SString& strRootPath, SString& strOutStatus, float fPriority, float fMaxDistance, bool bLayered, bool bDebug, int iTypeMask ) = 0;
     virtual CRenderTargetItem*  CreateRenderTarget                  ( uint uiSizeX, uint uiSizeY, bool bWithAlphaChannel, bool bForce = false ) = 0;
     virtual CScreenSourceItem*  CreateScreenSource                  ( uint uiSizeX, uint uiSizeY ) = 0;
+    virtual CWebBrowserItem*    CreateWebBrowser                    ( uint uiSizeX, uint uiSizeY ) = 0;
     virtual bool                SetRenderTarget                     ( CRenderTargetItem* pItem, bool bClear ) = 0;
     virtual void                EnableSetRenderTargetOldVer         ( bool bEnable ) = 0;
     virtual bool                IsSetRenderTargetEnabledOldVer      ( void ) = 0;
     virtual bool                RestoreDefaultRenderTarget          ( void ) = 0;
     virtual void                UpdateBackBufferCopy                ( void ) = 0;
     virtual void                UpdateScreenSource                  ( CScreenSourceItem* pScreenSourceItem, bool bResampleNow ) = 0;
+    virtual void                UpdateWebBrowser                    ( CWebBrowserItem* pWebBrowserItem ) = 0;
     virtual SShaderItemLayers*  GetAppliedShaderForD3DData          ( CD3DDUMMY* pD3DData ) = 0;
     virtual bool                ApplyShaderItemToWorldTexture       ( CShaderItem* pShaderItem, const SString& strTextureNameMatch, CClientEntityBase* pClientEntity, bool bAppendLayers ) = 0;
     virtual bool                RemoveShaderItemFromWorldTexture    ( CShaderItem* pShaderItem, const SString& strTextureNameMatch, CClientEntityBase* pClientEntity ) = 0;
@@ -524,5 +526,5 @@ class CWebBrowserItem : public CTextureItem
     void            ReleaseUnderlyingData   ( void );
 
     IDirect3DSurface9*    m_pD3DRenderTargetSurface;
-    CWebView*             m_pWebView;
+    CWebViewInterface*    m_pWebView;
 };

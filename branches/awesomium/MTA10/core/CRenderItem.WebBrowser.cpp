@@ -116,7 +116,7 @@ void CWebBrowserItem::CreateUnderlyingData ( void )
     m_iMemoryKBUsed = CRenderItemManager::CalcD3DResourceMemoryKBUsage ( m_pD3DRenderTargetSurface );
 
     // Create the web view
-    m_pWebView = dynamic_cast<CWebView*>( g_pCore->GetWebCore ()->CreateWebView ( m_uiSizeX, m_uiSizeY, m_pD3DRenderTargetSurface ) );
+    m_pWebView = g_pCore->GetWebCore ()->CreateWebView ( m_uiSizeX, m_uiSizeY, m_pD3DRenderTargetSurface );
 }
 
 
