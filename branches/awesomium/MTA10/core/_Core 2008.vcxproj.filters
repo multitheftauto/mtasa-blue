@@ -1297,5 +1297,8 @@
     <ClInclude Include="..\sdk\core\CWebCoreInterface.h">
       <Filter>Header Files\sdk\core</Filter>
     </ClInclude>
+    <ClInclude Include="WebBrowserHelpers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

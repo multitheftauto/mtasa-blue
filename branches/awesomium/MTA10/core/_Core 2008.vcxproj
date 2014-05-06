@@ -488,6 +488,7 @@
     <ClInclude Include="CWebView.h" />
     <ClInclude Include="CXfireQuery.h" />
     <ClInclude Include="StdInc.h" />
+    <ClInclude Include="WebBrowserHelpers.h" />
     <ClInclude Include="xfire.h" />
     <ClInclude Include="tracking\CHTTPClient.h" />
     <ClInclude Include="tracking\CHTTPResponse.h" />

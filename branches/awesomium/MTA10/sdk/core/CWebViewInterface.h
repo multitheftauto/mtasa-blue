@@ -19,6 +19,7 @@ public:
     
     virtual void GetURL             ( SString& outURL ) = 0;
     virtual void GetTitle           ( SString& outTitle ) = 0;
+    virtual void SetRenderingPaused ( bool bPaused ) = 0;
 
     virtual void InjectMouseMove    ( int iPosX, int iPosY ) = 0;
     virtual void InjectMouseDown    ( int mouseButton ) = 0;

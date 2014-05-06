@@ -1007,10 +1007,11 @@ public:
     LUA_DECLARE ( InjectBrowserKeyDown );
     LUA_DECLARE ( InjectBrowserKeyUp );
     LUA_DECLARE ( InjectBrowserCharacter );
-    LUA_DECLARE ( GetBrowserTitle);
-    LUA_DECLARE ( GetBrowserURL);
+    LUA_DECLARE ( GetBrowserTitle );
+    LUA_DECLARE ( GetBrowserURL );
     LUA_DECLARE ( SetBrowserScrollPosition );
     LUA_DECLARE ( GetBrowserScrollPosition );
+    LUA_DECLARE ( SetBrowserRenderingPaused );
 
 private:
     // Static references to objects

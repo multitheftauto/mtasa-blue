@@ -17,6 +17,10 @@ CWebView::CWebView ( unsigned int uiWidth, unsigned int uiHeight, IDirect3DSurfa
 
     // Create Awesomium webview as offscreen webview
     m_pWebView = Awesomium::WebCore::instance()->CreateWebView ( uiWidth, uiHeight, NULL, Awesomium::kWebViewType_Offscreen );
+
+    // Set handlers
+    m_pWebView->set_load_listener ( this );
+    m_pWebView->set_js_method_handler ( &m_JSMethodHandler );
 }
 
 CWebView::~CWebView()
@@ -28,7 +32,7 @@ CWebView::~CWebView()
 bool CWebView::LoadURL ( const SString& strURL )
 {
     Awesomium::WebURL webURL ( CWebCore::ToWebString ( strURL ) );
-    if ( !g_pCore->GetWebCore ()->IsURLAllowed ( CWebCore::ToSString ( webURL.host() ) ) )
+    if ( g_pCore->GetWebCore ()->GetURLState ( CWebCore::ToSString ( webURL.host() ) ) != eURLState::WEBPAGE_ALLOWED )
         return false;
 
     m_pWebView->LoadURL ( webURL );
@@ -48,6 +52,14 @@ void CWebView::GetURL ( SString& outURL )
 void CWebView::GetTitle(SString& outTitle)
 {
     outTitle = static_cast<SString> ( CWebCore::ToSString ( m_pWebView->title() ) );
+}
+
+void CWebView::SetRenderingPaused ( bool bPaused )
+{
+    if ( bPaused )
+        m_pWebView->PauseRendering ();
+    else
+        m_pWebView->ResumeRendering ();
 }
 
 void CWebView::InjectMouseMove ( int iPosX, int iPosY )
@@ -99,35 +111,49 @@ void CWebView::InjectKeyboardEvent ( const SString& strKey, bool bKeyDown, bool 
     m_pWebView->InjectKeyboardEvent ( keyboardEvent );
 }
 
-////////////////////////////////////////////////////////////////////
-//                                                                //
-//      Implementation: CefClient::GetRenderHandler               //
-// http://magpcss.org/ceforum/apidocs3/projects/(default)/CefClient.html#GetRenderHandler() //
-//                                                                //
-////////////////////////////////////////////////////////////////////
-/*CefRefPtr<CefRenderHandler> CWebView::GetRenderHandler()
-{
-    // Well, we're a CefRenderHandler
-    return this;
-}*/
 
 ////////////////////////////////////////////////////////////////////
 //                                                                //
-//      Implementation: CefRenderHandler::GetViewRect             //
-// http://magpcss.org/ceforum/apidocs3/projects/(default)/CefRenderHandler.html#GetViewRect(CefRefPtr%3CCefBrowser%3E,CefRect&) //
+//      Implementation: Awesomium::WebViewListener::Load          //
+// http://www.awesomium.com/docs/1_7_2/cpp_api/class_awesomium_1_1_web_view_listener_1_1_load.html#a3cb1ee5563db02f90cd5562c6d8342b1 //
 //                                                                //
 ////////////////////////////////////////////////////////////////////
-/*bool CWebView::GetViewRect(CefRefPtr<CefBrowser> browser, CefRect& rect)
+void CWebView::OnFinishLoadingFrame ( Awesomium::WebView* pCaller, int64 iFrameId, bool bMainFrame, const Awesomium::WebURL& url )
 {
-    D3DSURFACE_DESC SurfaceDesc;
-    m_pD3DSurface->GetDesc(&SurfaceDesc);
+    // Bind javascript global object
+    Awesomium::JSValue result = pCaller->CreateGlobalJavascriptObject ( Awesomium::WSLit ("mta") );
+    if (result.IsObject ())
+    {
+        Awesomium::JSObject& mtaObject = result.ToObject ();
+        m_JSMethodHandler.Bind ( mtaObject, Awesomium::WSLit ("triggerEvent"), Javascript_triggerEvent );
+    }
 
-    rect.x = 0;
-    rect.y = 0;
-    rect.width = SurfaceDesc.Width;
-    rect.height = SurfaceDesc.Height;
-    return true;
-}*/
+    // Todo: Trigger an event
+
+}
+
+
+
+////////////////////////////////////////////////////////////////////
+//                                                                //
+//        Static Javascript methods: triggerEvent                 //
+//                                                                //
+////////////////////////////////////////////////////////////////////
+void CWebView::Javascript_triggerEvent(Awesomium::WebView* pWebView, const Awesomium::JSArray& args)
+{
+    // Convert JSArray to string array
+    std::vector<SString> stringArray;
+
+    for ( unsigned int i = 1; i < args.size (); ++i ) // Ignore first arg as it is the event name
+    {
+        stringArray.push_back ( CWebCore::ToSString ( args[i].ToString() ) );
+    }
+
+    // Pass string array to real triggerEvent
+    SString strEventName = CWebCore::ToSString ( args[0].ToString() );
+    CModManager::GetSingleton().GetCurrentMod ()->WebsiteTriggerEventHandler ( strEventName, stringArray ); // Does anybody know a better way to trigger an event in the deathmatch module?
+}
+
 
 ////////////////////////////////////////////////////////////////////
 //                                                                //

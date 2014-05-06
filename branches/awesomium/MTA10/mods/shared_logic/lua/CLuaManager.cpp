@@ -1186,6 +1186,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getBrowserURL", CLuaFunctionDefs::GetBrowserURL );
     CLuaCFunctions::AddFunction ( "setBrowserScrollPosition", CLuaFunctionDefs::SetBrowserScrollPosition );
     CLuaCFunctions::AddFunction ( "getBrowserScrollPosition", CLuaFunctionDefs::GetBrowserScrollPosition );
+    CLuaCFunctions::AddFunction ( "setBrowserRenderingPaused", CLuaFunctionDefs::SetBrowserRenderingPaused );
 
     // Luadef definitions
     CLuaFileDefs::LoadFunctions ();

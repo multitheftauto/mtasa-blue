@@ -45,6 +45,11 @@ void CClientWebBrowser::GetURL(SString& outURL)
     m_pWebView->GetURL ( outURL );
 }
 
+void CClientWebBrowser::SetRenderingPaused ( bool bPaused )
+{
+    m_pWebView->SetRenderingPaused ( bPaused );
+}
+
 /*void CClientWebBrowser::GetScrollPosition(int& iScrollX, int& iScrollY)
 {
     g_pCore->GetWebCore ()->GetScrollPosition(GetWebCore Item(), iScrollX, iScrollY);

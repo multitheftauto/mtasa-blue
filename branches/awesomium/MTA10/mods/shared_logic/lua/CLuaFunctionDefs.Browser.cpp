@@ -348,3 +348,25 @@ int CLuaFunctionDefs::GetBrowserScrollPosition ( lua_State* luaVM )
     lua_pushboolean ( luaVM, false );
     return 1;
 }
+
+int CLuaFunctionDefs::SetBrowserRenderingPaused ( lua_State* luaVM )
+{
+//  bool setBrowserRenderingPaused ( browser webBrowser, bool paused )
+    CClientWebBrowser* pWebBrowser; bool bPaused;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData ( pWebBrowser );
+    argStream.ReadBool ( bPaused );
+
+    if ( !argStream.HasErrors () )
+    {
+        pWebBrowser->SetRenderingPaused ( bPaused );
+        lua_pushboolean ( luaVM, true );
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}

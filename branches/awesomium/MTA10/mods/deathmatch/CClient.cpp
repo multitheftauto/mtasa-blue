@@ -271,6 +271,23 @@ bool CClient::WebsiteRequestResultHandler ( bool bWasSuccessful )
 }
 
 
+void CClient::WebsiteTriggerEventHandler ( const SString& strEventName, const std::vector<SString>& args )
+{
+    if ( !g_pClientGame )
+        return;
+
+    // Todo: Use CEvents directly?
+    bool bWasCancelled;
+    CLuaArguments arguments;
+    for ( std::vector<SString>::const_iterator iter = args.begin(); iter != args.end(); ++iter )
+    {
+        arguments.PushString ( *iter );
+    }
+
+    CStaticFunctionDefinitions::TriggerEvent(strEventName, *CStaticFunctionDefinitions::GetRootElement(), arguments, bWasCancelled);
+}
+
+
 bool CClient::ProcessCommand ( const char* szCommandLine )
 {
     return false;

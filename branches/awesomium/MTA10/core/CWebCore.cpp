@@ -33,7 +33,11 @@ CWebCore::~CWebCore ()
 
 bool CWebCore::Initialise ()
 {
-    m_pWebCore = Awesomium::WebCore::Initialize ( Awesomium::WebConfig () );
+    Awesomium::WebConfig webConfig;
+    webConfig.user_agent = Awesomium::WSLit ( "Multi Theft Auto: San Andreas Client; Chromium" ); // Needs testing (Chromium adjustments might not work anymore)
+    // webConfig.user_script = Awesomium::WSLit(""); // Todo: Implement a watermark within editboxes
+
+    m_pWebCore = Awesomium::WebCore::Initialize ( webConfig );
     return m_pWebCore != NULL;
 }
 
@@ -50,14 +54,19 @@ void CWebCore::Update ()
     m_pWebCore->Update ();
 }
 
-bool CWebCore::IsURLAllowed ( const SString& strURL )
+eURLState CWebCore::GetURLState ( const SString& strURL )
 {
     // Todo: Implement wildcards
     google::dense_hash_map<SString, bool>::iterator iter = m_Whitelist.find ( strURL );
-    if ( iter != m_Whitelist.end() && iter->second == true )
-        return true;
+    if ( iter != m_Whitelist.end() )
+    {
+        if ( iter->second == true )
+            return eURLState::WEBPAGE_ALLOWED;
+        else
+            return eURLState::WEBPAGE_DISALLOWED;
+    }
 
-    return false;
+    return eURLState::WEBPAGE_NOT_LISTED;
 }
 
 void CWebCore::ClearWhitelist ()
@@ -73,22 +82,23 @@ void CWebCore::ClearWhitelist ()
 void CWebCore::InitialiseWhiteAndBlacklist ()
 {
     // Hardcoded whitelist
-    static SString whitelist[] = { "google.com", "youtube.com", "reddit.com", "mtasa.com", "multitheftauto.com" };
+    static SString whitelist[] = { "google.com", "youtube.com", "reddit.com", "mtasa.com", "multitheftauto.com", "woovie.net" };
 
     // Hardcoded blacklist
-    static SString blacklist[] = { "nobrain.dk" };
+    static SString blacklist[] = { "nobrain.dk", "sbx320.net" };
 
     // Blacklist or whitelist URLs now
-    for (unsigned int i = 0; i < sizeof(whitelist) / sizeof(SString); ++i)
+    for ( unsigned int i = 0; i < sizeof(whitelist) / sizeof(SString); ++i )
     {
         m_Whitelist[whitelist[i]] = true;
     }
-    for (unsigned int i = 0; i < sizeof(blacklist) / sizeof(SString); ++i)
+    for ( unsigned int i = 0; i < sizeof(blacklist) / sizeof(SString); ++i )
     {
         m_Whitelist[whitelist[i]] = false;
     }
 
     // Todo: Implement dynamic whitelist + blacklist hosted on a MTA QA server
+
 }
 
 void CWebCore::AddAllowedPage ( const SString& strURL )
@@ -102,7 +112,8 @@ void CWebCore::RequestPages ( const std::vector<SString>& pages )
     bool bNewItem = false;
     for ( std::vector<SString>::const_iterator iter = pages.begin(); iter != pages.end(); ++iter )
     {
-        if ( IsURLAllowed ( *iter ) )
+        eURLState status = GetURLState ( *iter );
+        if ( status == eURLState::WEBPAGE_ALLOWED || status == eURLState::WEBPAGE_DISALLOWED )
             continue;
 
         m_PendingRequests.push_back ( *iter );
@@ -155,7 +166,7 @@ void CWebCore::DenyPendingPages ()
 ////////////////////////////////////////////////////////////////////
 bool CWebCore::OnFilterNavigation ( int origin_process_id, int origin_routing_id, const Awesomium::WebString& method, const Awesomium::WebURL& url, bool is_main_frame )
 {
-    if ( !IsURLAllowed ( ToSString ( url.host () ) ) )
+    if ( GetURLState ( ToSString(url.host()) ) != eURLState::WEBPAGE_ALLOWED )
         // Block the action
         return true;
 
@@ -171,7 +182,7 @@ bool CWebCore::OnFilterNavigation ( int origin_process_id, int origin_routing_id
 ////////////////////////////////////////////////////////////////////
 Awesomium::ResourceResponse* CWebCore::OnRequest ( Awesomium::ResourceRequest* pRequest )
 {
-    if ( !IsURLAllowed ( ToSString ( pRequest->url ().host () ) ) )
+    if ( GetURLState ( ToSString(pRequest->url().host()) ) != eURLState::WEBPAGE_ALLOWED )
         // Block the action
         pRequest->Cancel ();
 

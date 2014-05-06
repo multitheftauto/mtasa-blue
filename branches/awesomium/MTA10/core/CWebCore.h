@@ -27,7 +27,7 @@ public:
     CWebViewInterface*  CreateWebView       ( unsigned int uiWidth, unsigned int uiHeight, IDirect3DSurface9* pD3DSurface );
     void                Update              ();
     
-    bool                IsURLAllowed        ( const SString& strURL );
+    eURLState           GetURLState         ( const SString& strURL );
     void                ClearWhitelist      ();
     void                InitialiseWhiteAndBlacklist ();
     void                AddAllowedPage      ( const SString& strURL );

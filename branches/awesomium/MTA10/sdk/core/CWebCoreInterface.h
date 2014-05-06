@@ -14,13 +14,20 @@
 class CWebBrowserItem;
 class CWebViewInterface;
 
+enum eURLState
+{
+    WEBPAGE_NOT_LISTED,
+    WEBPAGE_ALLOWED,
+    WEBPAGE_DISALLOWED
+};
+
 class CWebCoreInterface
 {
 public:
     virtual CWebViewInterface*  CreateWebView       ( unsigned int uiWidth, unsigned int uiHeight, IDirect3DSurface9* pD3DSurface ) = 0;
     virtual void                Update              () = 0;
     
-    virtual bool                IsURLAllowed       ( const SString& strURL ) = 0;
+    virtual eURLState           GetURLState        ( const SString& strURL ) = 0;
     virtual void                ClearWhitelist     () = 0;
     virtual void                AddAllowedPage     ( const SString& strURL ) = 0;
     virtual void                RequestPages       ( const std::vector<SString>& pages ) = 0;

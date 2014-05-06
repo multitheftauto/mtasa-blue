@@ -27,6 +27,7 @@ public:
     bool                        LoadURL             ( const SString& strURL );
     void                        GetTitle            ( SString& outPageTitle );
     void                        GetURL              ( SString& outURL );
+    void                        SetRenderingPaused  ( bool bPaused );
 
     /*void GetScrollPosition(int& iScrollX, int& iScrollY);
     void SetScrollPosition(int iScrollX, int iScrollY);*/
