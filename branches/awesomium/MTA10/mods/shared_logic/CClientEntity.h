@@ -138,6 +138,7 @@ enum eCClientEntityClassTypes
     CLASS_CClientShader,
     CLASS_CClientRenderTarget,
     CLASS_CClientScreenSource,
+    CLASS_CClientWebBrowser,
     CLASS_CClientWeapon,
     CLASS_CClientEffect,
 };

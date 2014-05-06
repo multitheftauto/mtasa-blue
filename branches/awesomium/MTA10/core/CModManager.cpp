@@ -181,6 +181,9 @@ CClientBase* CModManager::Load ( const char* szName, const char* szArguments )
 
     CMessageLoopHook::GetSingleton ().SetRefreshMsgQueueEnabled( true );
 
+    // Let's enter the web
+    g_pCore->InitialiseWeb ();
+
     // Return the interface
     return m_pClientBase;
 }

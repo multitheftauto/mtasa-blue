@@ -1135,6 +1135,16 @@ void CCore::DestroyNetwork ( )
 }
 
 
+void CCore::InitialiseWeb ()
+{
+    // Don't initialise webcore twice
+    if (m_pWebCore)
+        return;
+
+    m_pWebCore = new CWebCore;
+}
+
+
 void CCore::UpdateIsWindowMinimized ( void )
 {
     m_bIsWindowMinimized = IsIconic ( GetHookedWindow () ) ? true : false;
@@ -1355,6 +1365,9 @@ void CCore::OnModUnload ( )
 
     // Reset client script frame rate limit
     m_uiClientScriptFrameRateLimit = 0;
+
+    // Clear web whitelist
+    m_pWebCore->ClearWhitelist ();
 }
 
 

@@ -11,6 +11,7 @@
 #include "StdInc.h"
 #include <game/CGame.h>
 #include "CRenderItem.EffectCloner.h"
+#include <Awesomium/BitmapSurface.h>
 
 // Type of vertex used to emulate StretchRect for SwiftShader bug
 struct SRTVertex
@@ -199,6 +200,33 @@ CScreenSourceItem* CRenderItemManager::CreateScreenSource ( uint uiSizeX, uint u
     UpdateMemoryUsage ();
 
     return pScreenSourceItem;
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// CRenderItemManager::CreateWebBrowser
+//
+//
+//
+////////////////////////////////////////////////////////////////
+CWebBrowserItem* CRenderItemManager::CreateWebBrowser ( uint uiSizeX, uint uiSizeY )
+{
+    if ( !CanCreateRenderItem ( CWebBrowserItem::GetClassId () ) )
+        return NULL;
+
+    CWebBrowserItem* pWebBrowserItem = new CWebBrowserItem;
+    pWebBrowserItem->PostConstruct ( this, uiSizeX, uiSizeY );
+
+    if ( !pWebBrowserItem->IsValid () )
+    {
+        SAFE_RELEASE ( pWebBrowserItem );
+        return NULL;
+    }
+
+    UpdateMemoryUsage ();
+
+    return pWebBrowserItem;
 }
 
 
@@ -423,6 +451,47 @@ void CRenderItemManager::UpdateScreenSource ( CScreenSourceItem* pScreenSourceIt
         D3DTEXTUREFILTERTYPE FilterType = D3DTEXF_LINEAR;
         m_pDevice->StretchRect( m_pBackBufferCopy->m_pD3DRenderTargetSurface, NULL, pScreenSourceItem->m_pD3DRenderTargetSurface, NULL, FilterType );
     }
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// CRenderItemManager::UpdateWebBrowser
+//
+// Copy from Awesomium BitmapSurface to DirectX surface (Todo: an own implementation of BitmapSurfaceFactory might be better tho)
+//
+////////////////////////////////////////////////////////////////
+void CRenderItemManager::UpdateWebBrowser ( CWebBrowserItem* pWebBrowserItem )
+{
+    // Tell awesomium that we'd like to update the texture
+    if ( pWebBrowserItem->m_pWebView->IsLoading () )
+    {
+        g_pCore->GetWebCore ()->Update ();
+        return;
+    }
+
+    // Update Awesomium
+    g_pCore->GetWebCore ()->Update ();
+
+    // Get BitmapSurface and check if it is available (it's not available if the website is blocked for example)
+    Awesomium::BitmapSurface* pAwSurface = static_cast<Awesomium::BitmapSurface*>( pWebBrowserItem->m_pWebView->m_pWebView->surface () );
+    if (!pAwSurface)
+        return;
+
+    // Update our DX surface
+    D3DLOCKED_RECT LockedRect;
+    D3DSURFACE_DESC SurfaceDesc;
+    IDirect3DSurface9* pDXSurface = pWebBrowserItem->m_pD3DRenderTargetSurface;
+
+    // First, lock the surface and request some information
+    pDXSurface->GetDesc ( &SurfaceDesc );
+    pDXSurface->LockRect ( &LockedRect, NULL, 0 );
+
+    // Copy Awesomium buffer to our DX surface
+    pAwSurface->CopyTo ( reinterpret_cast<unsigned char*>(LockedRect.pBits), SurfaceDesc.Width * 4, 4, false, false );
+
+    // Finally, unlock the surface
+    pDXSurface->UnlockRect ();
 }
 
 

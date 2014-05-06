@@ -49,6 +49,7 @@ class CCore;
 #include <xml/CXML.h>
 #include <ijsify.h>
 #include "CXfireQuery.h"
+#include "CWebCore.h"
 
 #define DIRECTINPUT_VERSION 0x0800
 #include <dinput.h>
@@ -107,6 +108,7 @@ public:
     CLocalGUI*              GetLocalGUI                     ( void );
     CCommunityInterface*    GetCommunity                    ( void )                { return &m_Community; };
     CLocalizationInterface* GetLocalization                 ( void )                { return g_pLocalization; };
+    CWebCoreInterface*      GetWebCore                      ( void )                { return m_pWebCore; };
 
     void                    SaveConfig                      ( void );
 
@@ -182,6 +184,9 @@ public:
     void                    DestroyXML                      ( void );
     void                    DeinitGUI                       ( void );
     void                    DestroyGUI                      ( void );
+
+    // Web
+    void                    InitialiseWeb                   ( void );
 
     // Hooks
     void                    ApplyHooks                      ( void );
@@ -282,6 +287,7 @@ private:
     CXMLFile*                   m_pConfigFile;
     CClientVariables            m_ClientVariables;
     CCommunity                  m_Community;
+    CWebCore*                   m_pWebCore;
 
     // Hook interfaces.
     CMessageLoopHook *          m_pMessageLoopHook;

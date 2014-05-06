@@ -31,12 +31,14 @@ public:
     virtual CShaderItem*        CreateShader                        ( const SString& strFullFilePath, const SString& strRootPath, SString& strOutStatus, float fPriority, float fMaxDistance, bool bLayered, bool bDebug, int iTypeMask );
     virtual CRenderTargetItem*  CreateRenderTarget                  ( uint uiSizeX, uint uiSizeY, bool bWithAlphaChannel, bool bForce = false );
     virtual CScreenSourceItem*  CreateScreenSource                  ( uint uiSizeX, uint uiSizeY );
+    virtual CWebBrowserItem*    CreateWebBrowser                    ( uint uiSizeX, uint uiSizeY );
     virtual bool                SetRenderTarget                     ( CRenderTargetItem* pItem, bool bClear );
     virtual void                EnableSetRenderTargetOldVer         ( bool bEnable );
     virtual bool                IsSetRenderTargetEnabledOldVer      ( void );
     virtual bool                RestoreDefaultRenderTarget          ( void );
     virtual void                UpdateBackBufferCopy                ( void );
     virtual void                UpdateScreenSource                  ( CScreenSourceItem* pScreenSourceItem, bool bResampleNow );
+    virtual void                UpdateWebBrowser                    ( CWebBrowserItem* pWebBrowserItem );
     virtual SShaderItemLayers*  GetAppliedShaderForD3DData          ( CD3DDUMMY* pD3DData );
     virtual bool                ApplyShaderItemToWorldTexture       ( CShaderItem* pShaderItem, const SString& strTextureNameMatch, CClientEntityBase* pClientEntity, bool bAppendLayers );
     virtual bool                RemoveShaderItemFromWorldTexture    ( CShaderItem* pShaderItem, const SString& strTextureNameMatch, CClientEntityBase* pClientEntity );
