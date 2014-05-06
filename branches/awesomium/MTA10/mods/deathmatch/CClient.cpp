@@ -262,6 +262,15 @@ void CClient::IdleHandler ( void )
 }
 
 
+bool CClient::WebsiteRequestResultHandler ( bool bWasSuccessful )
+{
+    if ( g_pClientGame )
+        return g_pClientGame->TriggerBrowserRequestResultEvent ( bWasSuccessful );
+
+    return false;
+}
+
+
 bool CClient::ProcessCommand ( const char* szCommandLine )
 {
     return false;

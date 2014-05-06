@@ -11,8 +11,8 @@
 #include "StdInc.h"
 #include "CClientWebBrowser.h"
 
-CClientWebBrowser::CClientWebBrowser(CClientManager* pManager, ElementID ID, CWebBrowserItem* pWebBrowserItem, CWebViewInterface* pWebView)
-    : ClassInit(this), CClientTexture(pManager, ID, pWebBrowserItem), m_pWebView(pWebView)
+CClientWebBrowser::CClientWebBrowser ( CClientManager* pManager, ElementID ID, CWebBrowserItem* pWebBrowserItem, CWebViewInterface* pWebView )
+    : ClassInit ( this ), CClientTexture ( pManager, ID, pWebBrowserItem ), m_pWebView ( pWebView )
 {
 }
 
@@ -23,22 +23,22 @@ CClientWebBrowser::~CClientWebBrowser()
 
 bool CClientWebBrowser::IsLoading()
 {
-    return m_pWebView->IsLoading();
+    return m_pWebView->IsLoading ();
 }
 
 bool CClientWebBrowser::LoadURL(const SString& strURL)
 {
-    return m_pWebView->LoadURL(strURL);
+    return m_pWebView->LoadURL ( strURL );
 }
 
 void CClientWebBrowser::GetTitle(SString& outPageTitle)
 {
-    m_pWebView->GetTitle(outPageTitle);
+    m_pWebView->GetTitle ( outPageTitle );
 }
 
 void CClientWebBrowser::GetURL(SString& outURL)
 {
-    m_pWebView->GetURL(outURL);
+    m_pWebView->GetURL ( outURL );
 }
 
 /*void CClientWebBrowser::GetScrollPosition(int& iScrollX, int& iScrollY)
@@ -50,24 +50,23 @@ void CClientWebBrowser::SetScrollPosition(int iScrollX, int iScrollY)
 {
     g_pCore->GetWebCore ()->SetScrollPosition(GetWebCore Item(), iScrollX, iScrollY);
 }*/
-/*
-void CClientWebBrowser::InjectMouseMove(int iPosX, int iPosY)
+
+void CClientWebBrowser::InjectMouseMove ( int iPosX, int iPosY )
 {
-    g_pCore->GetWebCore ()->InjectMouseMove(GetWebCore Item(), iPosX, iPosY);
+    m_pWebView->InjectMouseMove ( iPosX, iPosY );
 }
 
-void CClientWebBrowser::InjectMouseDown(int mouseButton)
+void CClientWebBrowser::InjectMouseDown ( int mouseButton )
 {
-    g_pCore->GetWebCore ()->InjectMouseDown(GetWebCore Item(), mouseButton);
+    m_pWebView->InjectMouseDown ( mouseButton );
 }
 
-void CClientWebBrowser::InjectMouseUp(int mouseButton)
+void CClientWebBrowser::InjectMouseUp ( int mouseButton )
 {
-    g_pCore->GetWebCore ()->InjectMouseUp(GetWebCore Item(), mouseButton);
+    m_pWebView->InjectMouseUp ( mouseButton );
 }
 
-void CClientWebBrowser::InjectKeyboardEvent(const SString& strKey, bool bKeyDown, bool bCharacter)
+void CClientWebBrowser::InjectKeyboardEvent ( const SString& strKey, bool bKeyDown, bool bCharacter )
 {
-    g_pCore->GetWebCore ()->InjectKeyboardEvent(GetWebCore Item(), strKey, bKeyDown, bCharacter);
+    m_pWebView->InjectKeyboardEvent ( strKey, bKeyDown, bCharacter );
 }
-*/

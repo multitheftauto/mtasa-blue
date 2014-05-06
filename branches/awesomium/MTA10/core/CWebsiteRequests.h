@@ -21,14 +21,14 @@ class CGUIButton;
 class CWebsiteRequests
 {
 public:
-    CWebsiteRequests();
-    ~CWebsiteRequests();
+    CWebsiteRequests  ();
+    ~CWebsiteRequests ();
 
-    void Show();
-    void Hide();
+    void Show ();
+    void Hide ();
 
-    void SetPendingRequests(const std::vector<SString>& pendingRequests);
-    void Clear();
+    void SetPendingRequests ( const std::vector<SString>& pendingRequests );
+    void Clear ();
 
 protected:
     CGUIWindow*     m_pWindow;

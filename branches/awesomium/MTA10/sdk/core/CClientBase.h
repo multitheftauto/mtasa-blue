@@ -25,6 +25,7 @@ public:
     virtual void    PreHUDRenderExecutionHandler ( bool bDidUnminimize, bool bDidRecreateRenderTargets ) = 0;
     virtual void    PostFrameExecutionHandler   ( void ) = 0;
     virtual void    IdleHandler                 ( void ) = 0;
+    virtual bool    WebsiteRequestResultHandler ( bool bWasSuccessful ) = 0;
 
     virtual bool    ProcessCommand              ( const char* szCommandLine ) = 0;
     //virtual bool    ProcessInput                ( CInputMessage* pInputMessage ) = 0  *TODO*

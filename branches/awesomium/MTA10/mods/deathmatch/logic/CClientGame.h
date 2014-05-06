@@ -431,6 +431,8 @@ public:
     void                                ChangeFloatPrecision            ( bool bHigh );
     bool                                IsHighFloatPrecision            ( void ) const;
 
+    bool                                TriggerBrowserRequestResultEvent( bool bAllowed );
+
 private:
 
     // CGUI Callbacks

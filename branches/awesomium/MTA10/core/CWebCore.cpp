@@ -105,7 +105,7 @@ void CWebCore::AllowPendingPages ()
     m_PendingRequests.clear ();
 
     // Trigger an event now
-    //CModManager::GetSingleton().GetCurrentMod()->WebsiteRequestResultHandler(true);
+    CModManager::GetSingleton().GetCurrentMod()->WebsiteRequestResultHandler(true);
 }
 
 void CWebCore::DenyPendingPages ()
@@ -113,19 +113,19 @@ void CWebCore::DenyPendingPages ()
     m_PendingRequests.clear ();
     
     // Trigger an event now
-    //CModManager::GetSingleton().GetCurrentMod()->WebsiteRequestResultHandler(false);
+    CModManager::GetSingleton().GetCurrentMod()->WebsiteRequestResultHandler(false);
 }
+
 
 ////////////////////////////////////////////////////////////////////
 //                                                                //
-//          CWebCoreResourceInterceptor section                 //
-//  This methods get called when the player requests resources    //
-// http://www.awesomium.com/docs/1_7_2/cpp_api/class_awesomium_1_1_resource_interceptor.html //
+//    Implementation: ResourceInterceptor::OnFilterNavigation     //
+// http://www.awesomium.com/docs/1_7_2/cpp_api/class_awesomium_1_1_resource_interceptor.html#aceecadf1ddd8e3fe42cd56bc74d6ec6c //
 //                                                                //
 ////////////////////////////////////////////////////////////////////
-/*bool CWebCoreResourceInterceptor::OnFilterNavigation(int origin_process_id, int origin_routing_id, const Awesomium::WebString& method, const Awesomium::WebURL& url, bool is_main_frame)
+bool CWebCore::OnFilterNavigation ( int origin_process_id, int origin_routing_id, const Awesomium::WebString& method, const Awesomium::WebURL& url, bool is_main_frame )
 {
-    if (!g_pCore->GetWebBrowser()->IsURLAllowed(url.host()))
+    if ( !IsURLAllowed ( ToSString ( url.host () ) ) )
         // Block the action
         return true;
 
@@ -133,13 +133,29 @@ void CWebCore::DenyPendingPages ()
     return false;
 }
 
-Awesomium::ResourceResponse* CWebCoreResourceInterceptor::OnRequest(Awesomium::ResourceRequest* pRequest)
+////////////////////////////////////////////////////////////////////
+//                                                                //
+//    Implementation: ResourceInterceptor::OnFilterNavigation     //
+// http://www.awesomium.com/docs/1_7_2/cpp_api/class_awesomium_1_1_resource_interceptor.html#ac275121fdb030ff432c79d0337f0c19c //
+//                                                                //
+////////////////////////////////////////////////////////////////////
+Awesomium::ResourceResponse* CWebCore::OnRequest ( Awesomium::ResourceRequest* pRequest )
 {
-    if (!g_pCore->GetWebBrowser()->IsURLAllowed(pRequest->url().host()))
+    if ( !IsURLAllowed ( ToSString ( pRequest->url ().host () ) ) )
         // Block the action
-        pRequest->Cancel();
+        pRequest->Cancel ();
 
     // We don't want to modify anything
     return NULL;
-}*/
+}
 
+
+Awesomium::WebString CWebCore::ToWebString ( const SString& strString )
+{
+    return Awesomium::WSLit ( strString.c_str () );
+}
+
+SString CWebCore::ToSString ( const Awesomium::WebString& webString )
+{
+    return SharedUtil::ToUTF8 ( std::wstring( (wchar_t*)webString.data () ) );
+}

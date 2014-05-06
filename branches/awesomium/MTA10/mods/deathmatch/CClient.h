@@ -30,6 +30,7 @@ public:
     void        PreHUDRenderExecutionHandler    ( bool bDidUnminimize, bool bDidRecreateRenderTargets );
     void        PostFrameExecutionHandler       ( void );
     void        IdleHandler                     ( void );
+    bool        WebsiteRequestResultHandler     ( bool bWasSuccessful );
 
     bool        ProcessCommand                  ( const char* szCommandLine );
     //bool        ProcessInput                    ( CInputMessage* pInputMessage );

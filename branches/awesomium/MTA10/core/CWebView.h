@@ -23,6 +23,7 @@ class CWebView : public CWebViewInterface
 
 public:
     CWebView        ( unsigned int uiWidth, unsigned int uiHeight, IDirect3DSurface9* pD3DSurface );
+    ~CWebView       ();
 
     // Exported methods
     bool LoadURL    ( const SString& strURL );
@@ -30,11 +31,12 @@ public:
     void GetURL     ( SString& outURL );
     void GetTitle   ( SString& outTitle );
 
+    void InjectMouseMove        ( int iPosX, int iPosY );
+    void InjectMouseDown        ( int mouseButton );
+    void InjectMouseUp          ( int mouseButton );
+    void InjectKeyboardEvent    ( const SString& strKey, bool bKeyDown = true, bool bCharacter = false );
     
 private:
-    Awesomium::WebString    ToWebString ( const SString& strString );
-    SString                 ToSString   ( const Awesomium::WebString& webString );
-
     Awesomium::WebView* m_pWebView;
     IDirect3DSurface9*  m_pD3DSurface;
 };

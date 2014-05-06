@@ -17,7 +17,7 @@
 class CWebBrowserItem;
 class CWebsiteRequests;
 
-class CWebCore : public CWebCoreInterface
+class CWebCore : public CWebCoreInterface, public Awesomium::ResourceInterceptor
 {
 public:
     CWebCore();
@@ -34,6 +34,14 @@ public:
     void                AllowPendingPages   ();
     void                DenyPendingPages    ();
 
+    // Awesomium::ResourceInterceptor implementations
+    virtual bool                          OnFilterNavigation ( int origin_process_id, int origin_routing_id, const Awesomium::WebString& method, const Awesomium::WebURL& url, bool is_main_frame );
+    virtual Awesomium::ResourceResponse*  OnRequest ( Awesomium::ResourceRequest* pRequest);
+
+    // Utilities
+    static Awesomium::WebString           ToWebString ( const SString& strString );
+    static SString                        ToSString   ( const Awesomium::WebString& webString );
+
 private:
     Awesomium::WebCore* m_pWebCore;
     CWebsiteRequests*   m_pRequestsGUI;
@@ -41,13 +49,5 @@ private:
     std::vector<SString> m_Whitelist;
     std::vector<SString> m_PendingRequests;
 };
-
-
-/*class CWebBrowserResourceInterceptor : public Awesomium::ResourceInterceptor
-{
-    virtual bool OnFilterNavigation(int origin_process_id, int origin_routing_id, const Awesomium::WebString& method, const Awesomium::WebURL& url, bool is_main_frame);
-    virtual Awesomium::ResourceResponse* OnRequest(Awesomium::ResourceRequest* pRequest);
-};*/
-
 
 #endif

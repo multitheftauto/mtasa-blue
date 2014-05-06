@@ -2876,6 +2876,9 @@ void CClientGame::AddBuiltInEvents ( void )
     m_Events.AddEvent ( "onClientObjectDamage", "loss, attacker", NULL, false );
     m_Events.AddEvent ( "onClientObjectBreak", "attacker", NULL, false );
 
+    // Web events
+    m_Events.AddEvent ( "onClientWebsiteRequestResult", "wasSuccessful", NULL, false );
+
     // Misc events
     m_Events.AddEvent ( "onClientFileDownloadComplete", "fileName, success", NULL, false );
     
@@ -6492,4 +6495,12 @@ void CClientGame::ChangeFloatPrecision ( bool bHigh )
 bool CClientGame::IsHighFloatPrecision ( void ) const
 {
     return m_uiPrecisionCallDepth != 0;
+}
+
+bool CClientGame::TriggerBrowserRequestResultEvent ( bool bAllowed )
+{
+    CLuaArguments Arguments;
+    Arguments.PushBoolean ( bAllowed );
+
+    return GetRootEntity ()->CallEvent ( "onClientWebsiteRequestResult", Arguments, false );
 }

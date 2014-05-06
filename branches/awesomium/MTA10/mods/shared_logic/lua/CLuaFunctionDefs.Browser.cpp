@@ -53,7 +53,7 @@ int CLuaFunctionDefs::UpdateBrowser ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        g_pCore->GetGraphics()->GetRenderItemManager()->UpdateWebBrowser(pWebBrowser->GetWebBrowserItem());
+        g_pCore->GetGraphics ()->GetRenderItemManager ()->UpdateWebBrowser ( pWebBrowser->GetWebBrowserItem () );
         lua_pushboolean ( luaVM, true );
         return 1;
     }
@@ -97,7 +97,7 @@ int CLuaFunctionDefs::LoadBrowserURL ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        lua_pushboolean(luaVM, pWebBrowser->LoadURL ( strURL ) );
+        lua_pushboolean ( luaVM, pWebBrowser->LoadURL ( strURL ) );
         return 1;
     }
     else
@@ -117,7 +117,7 @@ int CLuaFunctionDefs::IsBrowserLoading ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        lua_pushboolean( luaVM, pWebBrowser->IsLoading () );
+        lua_pushboolean ( luaVM, pWebBrowser->IsLoading () );
         return 1;
     }
     else
@@ -139,7 +139,7 @@ int CLuaFunctionDefs::InjectBrowserMouseMove ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        //pWebBrowser->InjectMouseMove(posX, posY);
+        pWebBrowser->InjectMouseMove ( posX, posY );
         lua_pushboolean ( luaVM, true );
         return 1;
     }
@@ -157,11 +157,11 @@ int CLuaFunctionDefs::InjectBrowserMouseDown ( lua_State* luaVM )
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pWebBrowser );
-    argStream.ReadNumber(mouseButton);
+    argStream.ReadNumber ( mouseButton );
 
     if ( !argStream.HasErrors () )
     {
-        //pWebBrowser->InjectMouseDown(mouseButton);
+        pWebBrowser->InjectMouseDown ( mouseButton );
         lua_pushboolean ( luaVM, true );
         return 1;
     }
@@ -179,11 +179,11 @@ int CLuaFunctionDefs::InjectBrowserMouseUp ( lua_State* luaVM )
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pWebBrowser );
-    argStream.ReadNumber(mouseButton);
+    argStream.ReadNumber ( mouseButton );
 
     if ( !argStream.HasErrors () )
     {
-        //pWebBrowser->InjectMouseUp(mouseButton);
+        pWebBrowser->InjectMouseUp ( mouseButton );
         lua_pushboolean ( luaVM, true );
         return 1;
     }
@@ -201,11 +201,11 @@ int CLuaFunctionDefs::InjectBrowserKeyDown ( lua_State* luaVM )
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pWebBrowser );
-    argStream.ReadString(strKey);
+    argStream.ReadString ( strKey );
 
     if ( !argStream.HasErrors () )
     {
-        //pWebBrowser->InjectKeyboardEvent(strKey, true);
+        pWebBrowser->InjectKeyboardEvent ( strKey, true );
         lua_pushboolean ( luaVM, true );
         return 1;
     }
@@ -223,11 +223,11 @@ int CLuaFunctionDefs::InjectBrowserKeyUp ( lua_State* luaVM )
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pWebBrowser );
-    argStream.ReadString(strKey);
+    argStream.ReadString ( strKey );
 
     if ( !argStream.HasErrors () )
     {
-        //pWebBrowser->InjectKeyboardEvent(strKey, false);
+        pWebBrowser->InjectKeyboardEvent ( strKey, false );
         lua_pushboolean ( luaVM, true );
         return 1;
     }
@@ -245,11 +245,11 @@ int CLuaFunctionDefs::InjectBrowserCharacter ( lua_State* luaVM )
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pWebBrowser );
-    argStream.ReadString(strCharacter);
+    argStream.ReadString ( strCharacter );
 
     if ( !argStream.HasErrors () )
     {
-        //pWebBrowser->InjectKeyboardEvent(strCharacter, true, true);
+        pWebBrowser->InjectKeyboardEvent ( strCharacter, true, true );
         lua_pushboolean ( luaVM, true );
         return 1;
     }
