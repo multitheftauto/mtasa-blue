@@ -131,4 +131,10 @@ void CWebBrowserItem::ReleaseUnderlyingData ( void )
 {
     SAFE_RELEASE( m_pD3DRenderTargetSurface )
     SAFE_RELEASE( m_pD3DTexture )
+    
+    CWebView* pWebView = dynamic_cast<CWebView*> ( m_pWebView );
+    if ( pWebView )
+        delete pWebView;
+
+    m_pWebView = NULL;
 }

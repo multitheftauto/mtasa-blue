@@ -22,8 +22,8 @@ class CWebView : public CWebViewInterface
     friend class CRenderItemManager;
 
 public:
-    CWebView        ( unsigned int uiWidth, unsigned int uiHeight, IDirect3DSurface9* pD3DSurface );
-    ~CWebView       ();
+    CWebView          ( unsigned int uiWidth, unsigned int uiHeight, IDirect3DSurface9* pD3DSurface );
+    ~CWebView ();
 
     // Exported methods
     bool LoadURL    ( const SString& strURL );

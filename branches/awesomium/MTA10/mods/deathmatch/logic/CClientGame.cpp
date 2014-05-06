@@ -1142,6 +1142,9 @@ void CClientGame::DoPulses ( void )
 
         // Respawn objects in respawn pool
         m_ObjectRespawner.DoRespawnAll ();
+
+        // Update webbrowser
+        g_pCore->GetWebCore ()->Update ();
     }
 
     // Are we connecting?

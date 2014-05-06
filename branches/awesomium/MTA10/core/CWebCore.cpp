@@ -19,6 +19,7 @@ CWebCore::CWebCore ()
     m_pRequestsGUI = NULL;
 
     Initialise ();
+    InitialiseWhiteAndBlacklist ();
 }
 
 CWebCore::~CWebCore ()
@@ -52,23 +53,47 @@ void CWebCore::Update ()
 bool CWebCore::IsURLAllowed ( const SString& strURL )
 {
     // Todo: Implement wildcards
-    for ( std::vector<SString>::iterator iter = m_Whitelist.begin(); iter != m_Whitelist.end(); ++iter )
-    {
-        if ( *iter == strURL )
-            return true;
-    }
+    google::dense_hash_map<SString, bool>::iterator iter = m_Whitelist.find ( strURL );
+    if ( iter != m_Whitelist.end() && iter->second == true )
+        return true;
+
     return false;
 }
 
 void CWebCore::ClearWhitelist ()
 {
+    // Clear old data
     m_Whitelist.clear ();
     m_PendingRequests.clear ();
+
+    // Re-add "default" entries
+    InitialiseWhiteAndBlacklist ();
+}
+
+void CWebCore::InitialiseWhiteAndBlacklist ()
+{
+    // Hardcoded whitelist
+    static SString whitelist[] = { "google.com", "youtube.com", "reddit.com", "mtasa.com", "multitheftauto.com" };
+
+    // Hardcoded blacklist
+    static SString blacklist[] = { "nobrain.dk" };
+
+    // Blacklist or whitelist URLs now
+    for (unsigned int i = 0; i < sizeof(whitelist) / sizeof(SString); ++i)
+    {
+        m_Whitelist[whitelist[i]] = true;
+    }
+    for (unsigned int i = 0; i < sizeof(blacklist) / sizeof(SString); ++i)
+    {
+        m_Whitelist[whitelist[i]] = false;
+    }
+
+    // Todo: Implement dynamic whitelist + blacklist hosted on a MTA QA server
 }
 
 void CWebCore::AddAllowedPage ( const SString& strURL )
 {
-    m_Whitelist.push_back ( strURL );
+    m_Whitelist[strURL] = true;
 }
 
 void CWebCore::RequestPages ( const std::vector<SString>& pages )
@@ -77,7 +102,7 @@ void CWebCore::RequestPages ( const std::vector<SString>& pages )
     bool bNewItem = false;
     for ( std::vector<SString>::const_iterator iter = pages.begin(); iter != pages.end(); ++iter )
     {
-        if ( IsURLAllowed(*iter) )
+        if ( IsURLAllowed ( *iter ) )
             continue;
 
         m_PendingRequests.push_back ( *iter );
@@ -94,18 +119,23 @@ void CWebCore::RequestPages ( const std::vector<SString>& pages )
         m_pRequestsGUI->SetPendingRequests ( m_PendingRequests );
         m_pRequestsGUI->Show ();
     }
+    else
+    {
+        // Tell the client that the requested pages are already allowed
+        CModManager::GetSingleton().GetCurrentMod()->WebsiteRequestResultHandler ( true );
+    }
 }
 
 void CWebCore::AllowPendingPages ()
 {
     for ( std::vector<SString>::iterator iter = m_PendingRequests.begin(); iter != m_PendingRequests.end(); ++iter )
     {
-        m_Whitelist.push_back ( *iter );
+        m_Whitelist[*iter] = true;
     }
     m_PendingRequests.clear ();
 
     // Trigger an event now
-    CModManager::GetSingleton().GetCurrentMod()->WebsiteRequestResultHandler(true);
+    CModManager::GetSingleton().GetCurrentMod()->WebsiteRequestResultHandler ( true );
 }
 
 void CWebCore::DenyPendingPages ()
@@ -113,7 +143,7 @@ void CWebCore::DenyPendingPages ()
     m_PendingRequests.clear ();
     
     // Trigger an event now
-    CModManager::GetSingleton().GetCurrentMod()->WebsiteRequestResultHandler(false);
+    CModManager::GetSingleton().GetCurrentMod()->WebsiteRequestResultHandler ( false );
 }
 
 

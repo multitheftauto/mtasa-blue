@@ -29,6 +29,7 @@ public:
     
     bool                IsURLAllowed        ( const SString& strURL );
     void                ClearWhitelist      ();
+    void                InitialiseWhiteAndBlacklist ();
     void                AddAllowedPage      ( const SString& strURL );
     void                RequestPages        ( const std::vector<SString>& pages );
     void                AllowPendingPages   ();
@@ -46,8 +47,8 @@ private:
     Awesomium::WebCore* m_pWebCore;
     CWebsiteRequests*   m_pRequestsGUI;
 
-    std::vector<SString> m_Whitelist;
-    std::vector<SString> m_PendingRequests;
+    CFastHashMap<SString, bool> m_Whitelist;
+    std::vector<SString>        m_PendingRequests;
 };
 
 #endif

@@ -18,6 +18,10 @@ CClientWebBrowser::CClientWebBrowser ( CClientManager* pManager, ElementID ID, C
 
 CClientWebBrowser::~CClientWebBrowser()
 {
+    // We can't release the memory here since we deal with an interface
+    m_pWebView = NULL;
+
+    // Unlink from tree
     Unlink ();
 }
 

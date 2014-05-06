@@ -458,20 +458,14 @@ void CRenderItemManager::UpdateScreenSource ( CScreenSourceItem* pScreenSourceIt
 //
 // CRenderItemManager::UpdateWebBrowser
 //
-// Copy from Awesomium BitmapSurface to DirectX surface (Todo: an own implementation of BitmapSurfaceFactory might be better tho)
+// Copy from Awesomium BitmapSurface to DirectX surface (Todo: An own implementation of BitmapSurface might be better tho)
 //
 ////////////////////////////////////////////////////////////////
 void CRenderItemManager::UpdateWebBrowser ( CWebBrowserItem* pWebBrowserItem )
 {
-    // Tell awesomium that we'd like to update the texture
+    // Don't copy texture data if buffer has not yet been updated
     if ( pWebBrowserItem->m_pWebView->IsLoading () )
-    {
-        g_pCore->GetWebCore ()->Update ();
         return;
-    }
-
-    // Update Awesomium
-    g_pCore->GetWebCore ()->Update ();
 
     // Get BitmapSurface and check if it is available (it's not available if the website is blocked for example)
     CWebView* pWebView = dynamic_cast < CWebView* > ( pWebBrowserItem->m_pWebView );
