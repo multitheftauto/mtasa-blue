@@ -1,0 +1,1 @@
+Put bass.h and bass.lib, as well as bass addons here. Also put the dlls into ../bin.
