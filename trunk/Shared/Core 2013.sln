@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Express 2013 for Windows Desktop
-VisualStudioVersion = 12.0.21005.1
+# Visual Studio 2013
+VisualStudioVersion = 12.0.30110.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CEGUI", "CEGUI", "{4C0157CE-9DD9-4729-8CDF-F5B9D2D71D2B}"
 EndProject
@@ -13,6 +13,9 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "source only", "source only", "{8CBD980B-0ED0-44B0-8280-9611AE140AA1}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Client - Core", "..\MTA10\core\_Core 2008.vcxproj", "{4C71249E-EA08-4A3D-9AEF-28707ACC6531}"
+	ProjectSection(ProjectDependencies) = postProject
+		{1D25E2E6-65D7-4AD2-BB6F-CA2605E0D2DE} = {1D25E2E6-65D7-4AD2-BB6F-CA2605E0D2DE}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Client - Game SA", "..\MTA10\game_sa\_game_sa 2008.vcxproj", "{E13D1441-438B-4A03-AB79-5E8EF08EE414}"
 EndProject
@@ -27,6 +30,9 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Client - Deathmatch", "..\MTA10\mods\deathmatch\_Deathmatch 2008.vcxproj", "{F661CA1A-A296-4505-9583-3BEC58FB79C5}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Server - Deathmatch", "..\MTA10_Server\mods\deathmatch\_ServerDeathmatch 2008.vcxproj", "{DC99F9D4-7C17-4A36-9F21-CEE075E42292}"
+	ProjectSection(ProjectDependencies) = postProject
+		{1D25E2E6-65D7-4AD2-BB6F-CA2605E0D2DE} = {1D25E2E6-65D7-4AD2-BB6F-CA2605E0D2DE}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Server - Launcher", "..\MTA10_Server\launcher\_launcher 2008.vcxproj", "{0EAA9107-413A-47C4-B6E7-41B10208FBA1}"
 EndProject
@@ -65,6 +71,8 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "jpeg", "..\vendor\jpeg\win32\jpeg_2008.vcxproj", "{5997CB54-C80C-4422-89AA-81B6ADFA7F86}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UnRAR", "..\vendor\unrar\UnRARDll.vcxproj", "{E815C46C-36C4-499F-BBC2-E772C6B17971}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pthread", "..\vendor\pthreads\pthread 2013.vcxproj", "{1D25E2E6-65D7-4AD2-BB6F-CA2605E0D2DE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -662,6 +670,32 @@ Global
 		{E815C46C-36C4-499F-BBC2-E772C6B17971}.Release|Win32.ActiveCfg = Release|Win32
 		{E815C46C-36C4-499F-BBC2-E772C6B17971}.Release|Win32.Build.0 = Release|Win32
 		{E815C46C-36C4-499F-BBC2-E772C6B17971}.Release|x64.ActiveCfg = Release|Win32
+		{1D25E2E6-65D7-4AD2-BB6F-CA2605E0D2DE}.Debug client only|Win32.ActiveCfg = Debug|Win32
+		{1D25E2E6-65D7-4AD2-BB6F-CA2605E0D2DE}.Debug client only|Win32.Build.0 = Debug|Win32
+		{1D25E2E6-65D7-4AD2-BB6F-CA2605E0D2DE}.Debug client only|x64.ActiveCfg = Debug|x64
+		{1D25E2E6-65D7-4AD2-BB6F-CA2605E0D2DE}.Debug server only|Win32.ActiveCfg = Debug|Win32
+		{1D25E2E6-65D7-4AD2-BB6F-CA2605E0D2DE}.Debug server only|Win32.Build.0 = Debug|Win32
+		{1D25E2E6-65D7-4AD2-BB6F-CA2605E0D2DE}.Debug server only|x64.ActiveCfg = Debug|x64
+		{1D25E2E6-65D7-4AD2-BB6F-CA2605E0D2DE}.Debug server only|x64.Build.0 = Debug|x64
+		{1D25E2E6-65D7-4AD2-BB6F-CA2605E0D2DE}.Debug|Win32.ActiveCfg = Debug|Win32
+		{1D25E2E6-65D7-4AD2-BB6F-CA2605E0D2DE}.Debug|Win32.Build.0 = Debug|Win32
+		{1D25E2E6-65D7-4AD2-BB6F-CA2605E0D2DE}.Debug|x64.ActiveCfg = Debug|x64
+		{1D25E2E6-65D7-4AD2-BB6F-CA2605E0D2DE}.Debug|x64.Build.0 = Debug|x64
+		{1D25E2E6-65D7-4AD2-BB6F-CA2605E0D2DE}.Nightly|Win32.ActiveCfg = Nightly|Win32
+		{1D25E2E6-65D7-4AD2-BB6F-CA2605E0D2DE}.Nightly|Win32.Build.0 = Nightly|Win32
+		{1D25E2E6-65D7-4AD2-BB6F-CA2605E0D2DE}.Nightly|x64.ActiveCfg = Nightly|x64
+		{1D25E2E6-65D7-4AD2-BB6F-CA2605E0D2DE}.Nightly|x64.Build.0 = Nightly|x64
+		{1D25E2E6-65D7-4AD2-BB6F-CA2605E0D2DE}.Release client only|Win32.ActiveCfg = Release|Win32
+		{1D25E2E6-65D7-4AD2-BB6F-CA2605E0D2DE}.Release client only|Win32.Build.0 = Release|Win32
+		{1D25E2E6-65D7-4AD2-BB6F-CA2605E0D2DE}.Release client only|x64.ActiveCfg = Release|x64
+		{1D25E2E6-65D7-4AD2-BB6F-CA2605E0D2DE}.Release server only|Win32.ActiveCfg = Release|Win32
+		{1D25E2E6-65D7-4AD2-BB6F-CA2605E0D2DE}.Release server only|Win32.Build.0 = Release|Win32
+		{1D25E2E6-65D7-4AD2-BB6F-CA2605E0D2DE}.Release server only|x64.ActiveCfg = Release|x64
+		{1D25E2E6-65D7-4AD2-BB6F-CA2605E0D2DE}.Release server only|x64.Build.0 = Release|x64
+		{1D25E2E6-65D7-4AD2-BB6F-CA2605E0D2DE}.Release|Win32.ActiveCfg = Release|Win32
+		{1D25E2E6-65D7-4AD2-BB6F-CA2605E0D2DE}.Release|Win32.Build.0 = Release|Win32
+		{1D25E2E6-65D7-4AD2-BB6F-CA2605E0D2DE}.Release|x64.ActiveCfg = Release|x64
+		{1D25E2E6-65D7-4AD2-BB6F-CA2605E0D2DE}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -677,6 +711,7 @@ Global
 		{2B98A079-89D3-4970-B0C2-39996636BAE6} = {245F083D-EE6D-469C-80D9-4778A74F4072}
 		{8EEECEE6-A6EC-BC48-8E76-22B87825444B} = {245F083D-EE6D-469C-80D9-4778A74F4072}
 		{7922DB76-1413-4113-A2BE-88FD233E910D} = {245F083D-EE6D-469C-80D9-4778A74F4072}
+		{1D25E2E6-65D7-4AD2-BB6F-CA2605E0D2DE} = {245F083D-EE6D-469C-80D9-4778A74F4072}
 		{CCABBC2E-172D-46FD-BC43-5A9FCD295112} = {5F1BE40F-A124-49DF-8FB2-07E551FEE156}
 		{ECC4BA90-6AA5-4630-AEA9-F923FB633C7D} = {5F1BE40F-A124-49DF-8FB2-07E551FEE156}
 		{38D753E1-5341-42E1-94AD-B2C503F1FC37} = {5F1BE40F-A124-49DF-8FB2-07E551FEE156}

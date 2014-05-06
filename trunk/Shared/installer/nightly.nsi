@@ -579,10 +579,10 @@ DontInstallRedist:
 		File "${FILES_ROOT}\MTA San Andreas\mta\netc.dll"
 		File "${FILES_ROOT}\MTA San Andreas\mta\libcurl.dll"
 		File "${FILES_ROOT}\MTA San Andreas\mta\loader.dll"
+        File "${FILES_ROOT}\MTA San Andreas\mta\pthread.dll"
         ; The files below can be moved out of the LIGHTBUILD zone at some point
         File "${FILES_ROOT}\MTA San Andreas\mta\bass_fx.dll"
         File "${FILES_ROOT}\MTA San Andreas\mta\tags.dll"
-        File "${FILES_ROOT}\MTA San Andreas\mta\pthreadVC2.dll"
         File "${FILES_ROOT}\MTA San Andreas\mta\XInput9_1_0_mta.dll"
         File "${FILES_ROOT}\MTA San Andreas\mta\vea.dll"
         File "${FILES_ROOT}\MTA San Andreas\mta\vog.dll"
@@ -706,7 +706,7 @@ SectionGroup /e "$(INST_SEC_SERVER)" SECGSERVER
 		File "${SERVER_FILES_ROOT}\MTA Server.exe"
 		File "${SERVER_FILES_ROOT}\net.dll"
 		File "${FILES_ROOT}\MTA San Andreas\mta\libcurl.dll"
-        File "${FILES_ROOT}\MTA San Andreas\mta\pthreadVC2.dll"
+        File "${FILES_ROOT}\MTA San Andreas\mta\pthread.dll"
 	SectionEnd
 
 	Section "$(INST_SEC_GAME)" SEC05
@@ -955,8 +955,6 @@ Section Uninstall
 	Delete "$INSTDIR\server\xmll.dll"
 	Delete "$INSTDIR\server\MTA Server.exe"
 	Delete "$INSTDIR\server\net.dll"
-	Delete "$INSTDIR\server\msvcp71.dll"
-	Delete "$INSTDIR\server\msvcr71.dll"
 	Delete "$INSTDIR\server\libcurl.dll"
 
 	; server files
@@ -964,6 +962,7 @@ Section Uninstall
 	Delete "$INSTDIR\server\mods\deathmatch\lua5.1.dll"
 	Delete "$INSTDIR\server\mods\deathmatch\pcre3.dll"
 	Delete "$INSTDIR\server\mods\deathmatch\pthreadVC2.dll"
+	Delete "$INSTDIR\server\mods\deathmatch\pthread.dll"
 	Delete "$INSTDIR\server\mods\deathmatch\sqlite3.dll"
 	Delete "$INSTDIR\server\mods\deathmatch\dbconmy.dll"
 	Delete "$INSTDIR\server\mods\deathmatch\libmysql.dll"

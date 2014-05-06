@@ -629,10 +629,8 @@ void CheckDataFiles( void )
                                      ,"MTA\\bass_fx.dll"
                                      ,"MTA\\tags.dll"
                                      ,"MTA\\sa.dat"
-                                     ,"MTA\\pthreadVC2.dll"
                                      ,"MTA\\XInput9_1_0_mta.dll"
                                      ,"MTA\\vea.dll"
-                                     ,"server\\pthreadVC2.dll"
                                      ,"server\\mods\\deathmatch\\libmysql.dll"};
 
     for ( uint i = 0 ; i < NUMELMS( dataFilesFiles ) ; i++ )
@@ -672,7 +670,7 @@ void CheckDataFiles( void )
     }
 
     // Make sure important dll's do not exist in the wrong place
-    const char* dllCheckList[] = { "xmll.dll", "cgui.dll", "netc.dll", "libcurl.dll", "pthreadVC2.dll" };
+    const char* dllCheckList[] = { "xmll.dll", "cgui.dll", "netc.dll", "libcurl.dll", "pthread.dll" };
     for ( int i = 0 ; i < NUMELMS ( dllCheckList ); i++ )
     {
         if ( FileExists( PathJoin( strGTAPath, dllCheckList[i] ) ) )
@@ -713,7 +711,6 @@ void CheckDataFiles( void )
                                { "BEBA64522AA8265751187E38D1FC0653", "bassmidi.dll", },
                                { "99F4F38007D347CEED482B7C04FDD122", "bassmix.dll", },
                                { "7B52BE6D702AA590DB57A0E135F81C45", "basswma.dll", }, 
-                               { "7812F0F73EDA837E9353B3A433ABC9A9", "pthreadVC2.dll", },
                                { "38D7679D3B8B6D7F16A0AA9BF2A60043", "tags.dll", },
                                { "309D860FC8137E5FE9E7056C33B4B8BE", "vea.dll", },
                                { "0602F672BA595716E64EC4040E6DE376", "vog.dll", },
@@ -725,13 +722,6 @@ void CheckDataFiles( void )
         SString strMd5 = CMD5Hasher::CalculateHexString( PathJoin( strMTASAPath, "mta", integrityCheckList[i].szFilename ) );
         if ( !strMd5.CompareI( integrityCheckList[i].szMd5 ) )
         {
-            // Exit if old pthreadVC2.dll is detected, as it runs incorrectly with the new headers what we are using
-            if ( strMd5.CompareI( "0AB7D0E87F3843F8104B3670F5A9AF62" ) )
-            {
-                DisplayErrorMessageBox ( _("Load failed. Please ensure that the latest data files have been installed correctly."), _E("CL32"), "mta-datafiles-missing" );
-                return ExitProcess( EXIT_ERROR );
-            }
-
             DisplayErrorMessageBox( _("Data files modified. Possible virus activity.\n\nSee online help if MTA does not work correctly."), _E("CL30"), "maybe-virus2" );
             break;
         }    
