@@ -77,12 +77,12 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="strmiids.lib libv2.lib zlib_d.lib libpng_d.lib odbc32.lib odbccp32.lib dinput8.lib dxguid.lib shlwapi.lib d3dx9.lib winmm.lib Imagehlp.lib ws2_32.lib gdi32.lib Userenv.lib Imm32.lib pthreadVC2.lib jpeg_d.lib Psapi.lib xinput.lib"
+				AdditionalDependencies="strmiids.lib libv2.lib zlib_d.lib libpng_d.lib odbc32.lib odbccp32.lib dinput8.lib dxguid.lib shlwapi.lib d3dx9.lib winmm.lib Imagehlp.lib ws2_32.lib gdi32.lib Userenv.lib Imm32.lib pthread_d.lib jpeg_d.lib Psapi.lib xinput.lib"
 				ShowProgress="0"
 				OutputFile="C:\Program Files\MTA San Andreas 1.4\mta\core_d.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="../../Shared/XML;../../vendor/libv2/lib;&quot;../../vendor/libpng/x86/$(ConfigurationName)&quot;;&quot;../../vendor/zlib/x86/$(ConfigurationName)&quot;;../../vendor/detours/lib;../../vendor/pthreads/lib/x86;&quot;../../vendor/jpeg/x86/$(ConfigurationName)&quot;"
+				AdditionalLibraryDirectories="../../Shared/XML;../../vendor/libv2/lib;&quot;../../vendor/libpng/x86/$(ConfigurationName)&quot;;&quot;../../vendor/zlib/x86/$(ConfigurationName)&quot;;../../vendor/detours/lib;../../vendor/pthreads/x86/$(ConfigurationName);&quot;../../vendor/jpeg/x86/$(ConfigurationName)&quot;"
 				IgnoreDefaultLibraryNames=""
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(IntDir)\$(TargetName).pdb"
@@ -176,11 +176,11 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="strmiids.lib libv2.lib zlib.lib libpng.lib odbc32.lib odbccp32.lib dinput8.lib dxguid.lib shlwapi.lib d3dx9.lib wsock32.lib winmm.lib Imagehlp.lib gdi32.lib Userenv.lib Imm32.lib pthreadVC2.lib jpeg.lib Psapi.lib xinput.lib"
+				AdditionalDependencies="strmiids.lib libv2.lib zlib.lib libpng.lib odbc32.lib odbccp32.lib dinput8.lib dxguid.lib shlwapi.lib d3dx9.lib wsock32.lib winmm.lib Imagehlp.lib gdi32.lib Userenv.lib Imm32.lib pthread.lib jpeg.lib Psapi.lib xinput.lib"
 				OutputFile="C:\Program Files\MTA San Andreas 1.4\MTA\core.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="../../Shared/XML;../../vendor/libv2/lib;&quot;../../vendor/libpng/x86/$(ConfigurationName)&quot;;&quot;../../vendor/zlib/x86/$(ConfigurationName)&quot;;../../vendor/detours/lib;../../vendor/pthreads/lib/x86;&quot;../../vendor/jpeg/x86/$(ConfigurationName)&quot;"
+				AdditionalLibraryDirectories="../../Shared/XML;../../vendor/libv2/lib;&quot;../../vendor/libpng/x86/$(ConfigurationName)&quot;;&quot;../../vendor/zlib/x86/$(ConfigurationName)&quot;;../../vendor/detours/lib;../../vendor/pthreads/x86/$(ConfigurationName);&quot;../../vendor/jpeg/x86/$(ConfigurationName)&quot;"
 				IgnoreDefaultLibraryNames="LIBCMT"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="../../symbols/$(ConfigurationName)_$(SafeParentName).pdb"
@@ -276,11 +276,11 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="strmiids.lib libv2.lib zlib.lib libpng.lib odbc32.lib odbccp32.lib dinput8.lib dxguid.lib shlwapi.lib d3dx9.lib wsock32.lib winmm.lib Imagehlp.lib gdi32.lib Userenv.lib Imm32.lib pthreadVC2.lib jpeg.lib Psapi.lib xinput.lib"
+				AdditionalDependencies="strmiids.lib libv2.lib zlib.lib libpng.lib odbc32.lib odbccp32.lib dinput8.lib dxguid.lib shlwapi.lib d3dx9.lib wsock32.lib winmm.lib Imagehlp.lib gdi32.lib Userenv.lib Imm32.lib pthread.lib jpeg.lib Psapi.lib xinput.lib"
 				OutputFile="..\..\output\MTA San Andreas\mta\core.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="../../Shared/XML;../../vendor/libv2/lib;&quot;../../vendor/libpng/x86/$(ConfigurationName)&quot;;&quot;../../vendor/zlib/x86/$(ConfigurationName)&quot;;../../vendor/detours/lib;../../vendor/pthreads/lib/x86;&quot;../../vendor/jpeg/x86/$(ConfigurationName)&quot;"
+				AdditionalLibraryDirectories="../../Shared/XML;../../vendor/libv2/lib;&quot;../../vendor/libpng/x86/$(ConfigurationName)&quot;;&quot;../../vendor/zlib/x86/$(ConfigurationName)&quot;;../../vendor/detours/lib;../../vendor/pthreads/x86/$(ConfigurationName);&quot;../../vendor/jpeg/x86/$(ConfigurationName)&quot;"
 				IgnoreDefaultLibraryNames="LIBCMT"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="../../symbols/$(ConfigurationName)_$(SafeParentName).pdb"

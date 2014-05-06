@@ -183,9 +183,9 @@
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
     </ProjectReference>
     <Link>
-      <AdditionalDependencies>lua5.1s.lib;wsock32.lib;zlib.lib;ehs.lib;pthreadVC2.lib;pme.lib;pcre3.lib;json.lib;psapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>lua5.1s.lib;wsock32.lib;zlib.lib;ehs.lib;pthread.lib;;pme.lib;pcre3.lib;json.lib;psapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>logic/lib;../../../vendor/lua/$(PlatformTarget)/$(Configuration)Server;../../../vendor/json-c/$(PlatformTarget)/$(Configuration);../../../vendor/ehs/$(PlatformTarget)/$(Configuration);../../../vendor/pme/$(PlatformTarget)/$(Configuration);../../../vendor/pcre/$(PlatformTarget)/$(Configuration);../../../vendor/pthreads/lib/$(PlatformTarget);../../../vendor/zlib/$(PlatformTarget)/$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>logic/lib;../../../vendor/lua/$(PlatformTarget)/$(Configuration)Server;../../../vendor/json-c/$(PlatformTarget)/$(Configuration);../../../vendor/ehs/$(PlatformTarget)/$(Configuration);../../../vendor/pme/$(PlatformTarget)/$(Configuration);../../../vendor/pcre/$(PlatformTarget)/$(Configuration);../../../vendor/pthreads/$(PlatformTarget)/$(Configuration);../../../vendor/zlib/$(PlatformTarget)/$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>../../../symbols/$(Configuration)_$(SafeParentName).pdb</ProgramDatabaseFile>
       <MapFileName />
@@ -232,9 +232,9 @@
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
     </ProjectReference>
     <Link>
-      <AdditionalDependencies>lua5.1s.lib;wsock32.lib;zlib.lib;ehs.lib;pthreadVC2.lib;pme.lib;pcre3.lib;json.lib;psapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>lua5.1s.lib;wsock32.lib;zlib.lib;ehs.lib;pthread.lib;pme.lib;pcre3.lib;json.lib;psapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>../../../vendor/lua/$(PlatformTarget)/$(Configuration)Server;../../../vendor/json-c/$(PlatformTarget)/$(Configuration);../../../vendor/ehs/$(PlatformTarget)/$(Configuration);../../../vendor/pme/$(PlatformTarget)/$(Configuration);../../../vendor/pcre/$(PlatformTarget)/$(Configuration);../../../vendor/pthreads/lib/$(PlatformTarget);../../../vendor/zlib/$(PlatformTarget)/$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>../../../vendor/lua/$(PlatformTarget)/$(Configuration)Server;../../../vendor/json-c/$(PlatformTarget)/$(Configuration);../../../vendor/ehs/$(PlatformTarget)/$(Configuration);../../../vendor/pme/$(PlatformTarget)/$(Configuration);../../../vendor/pcre/$(PlatformTarget)/$(Configuration);../../../vendor/pthreads/$(PlatformTarget)/$(Configuration);../../../vendor/zlib/$(PlatformTarget)/$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>../../../symbols/$(Configuration)_$(PlatformTarget)_$(SafeParentName).pdb</ProgramDatabaseFile>
       <MapFileName />
@@ -280,9 +280,9 @@
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
     </ProjectReference>
     <Link>
-      <AdditionalDependencies>lua5.1s_d.lib;wsock32.lib;zlib_d.lib;ehs_d.lib;pthreadVC2.lib;pme_d.lib;pcre3_d.lib;json_d.lib;psapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>lua5.1s_d.lib;wsock32.lib;zlib_d.lib;ehs_d.lib;pthread_d.lib;pme_d.lib;pcre3_d.lib;json_d.lib;psapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>logic/lib;../../../vendor/lua/$(PlatformTarget)/$(Configuration)Server;../../../vendor/json-c/$(PlatformTarget)/$(Configuration);../../../vendor/ehs/$(PlatformTarget)/$(Configuration);../../../vendor/pme/$(PlatformTarget)/$(Configuration);../../../vendor/pcre/$(PlatformTarget)/$(Configuration);../../../vendor/pthreads/lib/$(PlatformTarget);../../../vendor/zlib/$(PlatformTarget)/$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>logic/lib;../../../vendor/lua/$(PlatformTarget)/$(Configuration)Server;../../../vendor/json-c/$(PlatformTarget)/$(Configuration);../../../vendor/ehs/$(PlatformTarget)/$(Configuration);../../../vendor/pme/$(PlatformTarget)/$(Configuration);../../../vendor/pcre/$(PlatformTarget)/$(Configuration);../../../vendor/pthreads/$(PlatformTarget)/$(Configuration);../../../vendor/zlib/$(PlatformTarget)/$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>MSVCRT;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(IntDir)$(TargetName).pdb</ProgramDatabaseFile>
@@ -325,9 +325,9 @@
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
     </ProjectReference>
     <Link>
-      <AdditionalDependencies>lua5.1s_d.lib;wsock32.lib;zlib_d.lib;ehs_d.lib;pthreadVC2.lib;pme_d.lib;pcre3_d.lib;json_d.lib;psapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>lua5.1s_d.lib;wsock32.lib;zlib_d.lib;ehs_d.lib;pthread_d.lib;pme_d.lib;pcre3_d.lib;json_d.lib;psapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>../../../vendor/lua/$(PlatformTarget)/$(Configuration)Server;../../../vendor/json-c/$(PlatformTarget)/$(Configuration);../../../vendor/ehs/$(PlatformTarget)/$(Configuration);../../../vendor/pme/$(PlatformTarget)/$(Configuration);../../../vendor/pcre/$(PlatformTarget)/$(Configuration);../../../vendor/pthreads/lib/$(PlatformTarget);../../../vendor/zlib/$(PlatformTarget)/$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>../../../vendor/lua/$(PlatformTarget)/$(Configuration)Server;../../../vendor/json-c/$(PlatformTarget)/$(Configuration);../../../vendor/ehs/$(PlatformTarget)/$(Configuration);../../../vendor/pme/$(PlatformTarget)/$(Configuration);../../../vendor/pcre/$(PlatformTarget)/$(Configuration);../../../vendor/pthreads/$(PlatformTarget)/$(Configuration);../../../vendor/zlib/$(PlatformTarget)/$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>MSVCRT;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(IntDir)$(TargetName).pdb</ProgramDatabaseFile>
@@ -373,9 +373,9 @@
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
     </ProjectReference>
     <Link>
-      <AdditionalDependencies>wsock32.lib;zlib.lib;ehs.lib;pthreadVC2.lib;pme.lib;json.lib;psapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>wsock32.lib;zlib.lib;ehs.lib;pthread.lib;pme.lib;json.lib;psapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>logic/lib;../../../vendor/lua/$(PlatformTarget)/$(Configuration)Server;../../../vendor/json-c/$(PlatformTarget)/$(Configuration);../../../vendor/ehs/$(PlatformTarget)/$(Configuration);../../../vendor/pme/$(PlatformTarget)/$(Configuration);../../../vendor/pcre/$(PlatformTarget)/$(Configuration);../../../vendor/pthreads/lib/$(PlatformTarget);../../../vendor/zlib/$(PlatformTarget)/$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>logic/lib;../../../vendor/lua/$(PlatformTarget)/$(Configuration)Server;../../../vendor/json-c/$(PlatformTarget)/$(Configuration);../../../vendor/ehs/$(PlatformTarget)/$(Configuration);../../../vendor/pme/$(PlatformTarget)/$(Configuration);../../../vendor/pcre/$(PlatformTarget)/$(Configuration);../../../vendor/pthreads/$(PlatformTarget)/$(Configuration);../../../vendor/zlib/$(PlatformTarget)/$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>../../../symbols/$(Configuration)_$(SafeParentName).pdb</ProgramDatabaseFile>
       <MapFileName />
@@ -423,9 +423,9 @@
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
     </ProjectReference>
     <Link>
-      <AdditionalDependencies>wsock32.lib;zlib.lib;ehs.lib;pthreadVC2.lib;pme.lib;json.lib;psapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>lua5.1s.lib;wsock32.lib;zlib.lib;ehs.lib;pthread.lib;pme.lib;pcre3.lib;json.lib;psapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>../../../vendor/lua/$(PlatformTarget)/$(Configuration)Server;../../../vendor/json-c/$(PlatformTarget)/$(Configuration);../../../vendor/ehs/$(PlatformTarget)/$(Configuration);../../../vendor/pme/$(PlatformTarget)/$(Configuration);../../../vendor/pcre/$(PlatformTarget)/$(Configuration);../../../vendor/pthreads/lib/$(PlatformTarget);../../../vendor/zlib/$(PlatformTarget)/$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>../../../vendor/lua/$(PlatformTarget)/$(Configuration)Server;../../../vendor/json-c/$(PlatformTarget)/$(Configuration);../../../vendor/ehs/$(PlatformTarget)/$(Configuration);../../../vendor/pme/$(PlatformTarget)/$(Configuration);../../../vendor/pcre/$(PlatformTarget)/$(Configuration);../../../vendor/pthreads/$(PlatformTarget)/$(Configuration);../../../vendor/zlib/$(PlatformTarget)/$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>../../../symbols/$(Configuration)_$(PlatformTarget)_$(SafeParentName).pdb</ProgramDatabaseFile>
       <MapFileName />
