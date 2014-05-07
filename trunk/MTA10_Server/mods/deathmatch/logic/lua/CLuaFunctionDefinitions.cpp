@@ -11914,10 +11914,12 @@ int CLuaFunctionDefinitions::KickPlayer ( lua_State* luaVM )
 
     if ( argStream.NextIsUserData() )
     {
-        CPlayer* pResponsible;
-        argStream.ReadUserData( pResponsible, NULL );
-        if( !argStream.HasErrors() && pResponsible )
-            strResponsible = pResponsible->GetNick();
+        CElement* pResponsible;
+        argStream.ReadUserData( pResponsible );
+        if( CPlayer* pResponsiblePlayer = dynamic_cast < CPlayer* > ( pResponsible ) )
+            strResponsible = pResponsiblePlayer->GetNick();
+        else
+            strResponsible = "Console";
 
         argStream.ReadString(strReason, "");
     }
@@ -11970,9 +11972,12 @@ int CLuaFunctionDefinitions::BanPlayer ( lua_State* luaVM )
     argStream.ReadBool(bSerial, false);
     if (argStream.NextIsUserData())
     {
-        argStream.ReadUserData(pResponsible, NULL);
-        if(!argStream.HasErrors() && pResponsible)
+        CElement* pResponsibleElement;
+        argStream.ReadUserData( pResponsibleElement );
+        if( pResponsible = dynamic_cast < CPlayer* > ( pResponsibleElement ) )
             strResponsible = pResponsible->GetNick();
+        else
+            strResponsible = "Console";
     }
     else
         argStream.ReadString(strResponsible, "Console");
@@ -12026,8 +12031,9 @@ int CLuaFunctionDefinitions::AddBan ( lua_State* luaVM )
     argStream.ReadString(strSerial, "");
     if (argStream.NextIsUserData())
     {
-        argStream.ReadUserData(pResponsible, NULL);
-        if(!argStream.HasErrors() && pResponsible)
+        CElement* pResponsibleElement;
+        argStream.ReadUserData( pResponsibleElement );
+        if ( pResponsible = dynamic_cast < CPlayer* > ( pResponsibleElement ) )
             strResponsible = pResponsible->GetNick();
     }
     else
@@ -12071,7 +12077,12 @@ int CLuaFunctionDefinitions::RemoveBan ( lua_State* luaVM )
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pBan);
-    argStream.ReadUserData(pResponsible, NULL);
+    if ( argStream.NextIsUserData() )
+    {
+        CElement* pResponsibleElement;
+        argStream.ReadUserData( pResponsibleElement );
+        pResponsible = dynamic_cast < CPlayer* > ( pResponsibleElement );
+    }
 
     if ( !argStream.HasErrors( ) )
     {
