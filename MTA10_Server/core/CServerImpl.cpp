@@ -203,7 +203,14 @@ int CServerImpl::Run ( int iArgumentCount, char* szArguments [] )
 
         // Get the console's width
         CONSOLE_SCREEN_BUFFER_INFO ScrnBufferInfo;
-        GetConsoleScreenBufferInfo( m_hConsole, &ScrnBufferInfo );
+        if ( !GetConsoleScreenBufferInfo( m_hConsole, &ScrnBufferInfo ) )
+        {
+            Print ( "ERROR: GetConsoleScreenBufferInfo failed (%08x)\n", GetLastError() );
+            Print ( "Press Q to shut down the server!\n" );
+            WaitForKey ( 'q' );
+            DestroyWindow ( );
+            return ERROR_OTHER;
+        }
 
         // Adjust the console's screenbuffer so we can disable a bar at the top
         if ( !g_bNoTopBar )
@@ -504,7 +511,8 @@ void CServerImpl::ShowInfoTag ( char* szTag )
     // Windows console code
         // Get the console's width
         CONSOLE_SCREEN_BUFFER_INFO ScrnBufferInfo;
-        GetConsoleScreenBufferInfo( m_hConsole, &ScrnBufferInfo );
+        if ( !GetConsoleScreenBufferInfo( m_hConsole, &ScrnBufferInfo ) )
+            return;
 
         COORD BufferSize = { ScrnBufferInfo.dwSize.X, 1 };
         COORD TopLeft = { 0, ScrnBufferInfo.srWindow.Top };

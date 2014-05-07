@@ -29,6 +29,7 @@ ElementID CElementIDs::PopUniqueID ( CElement* pElement )
     ElementID ID;
     if ( m_UniqueIDs.Pop (ID) && ID != INVALID_ELEMENT_ID )
     {
+        assert( ID < MAX_SERVER_ELEMENTS );
         m_Elements [ID.Value()] = pElement;
     }
 
@@ -39,7 +40,7 @@ ElementID CElementIDs::PopUniqueID ( CElement* pElement )
 void CElementIDs::PushUniqueID ( ElementID ID )
 {
     // Push the ID back and NULL the entity there
-    if ( ID != INVALID_ELEMENT_ID )
+    if ( ID != INVALID_ELEMENT_ID && ID < MAX_SERVER_ELEMENTS )
     {
         m_UniqueIDs.Push ( ID );
         m_Elements [ID.Value()] = NULL;
