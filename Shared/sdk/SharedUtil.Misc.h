@@ -295,29 +295,6 @@ namespace SharedUtil
     // std:: container helpers
     //
 
-    template < class TL, class T >
-    void ListRemove ( TL& itemList, const T& item )
-    {
-        typename TL ::iterator it = itemList.begin ();
-        for ( ; it != itemList.end () ; ++it )
-            if ( item == *it )
-            {
-                itemList.erase ( it );
-                break;
-            }
-    }
-
-    template < class TL, class T >
-    bool ListContains ( const TL& itemList, const T& item );
-
-    // Add item if it does not aleady exist in itemList
-    template < class TL, class T >
-    void ListAddUnique ( TL& itemList, const T& item )
-    {
-        if ( !ListContains ( itemList, item ) )
-            itemList.push_back ( item );
-    }
-
     // Returns true if the item is in the itemList
     template < class TL, class T >
     bool ListContains ( const TL& itemList, const T& item )
@@ -329,12 +306,33 @@ namespace SharedUtil
         return false;
     }
 
+    // Add item if it does not aleady exist in itemList
+    template < class TL, class T >
+    void ListAddUnique ( TL& itemList, const T& item )
+    {
+        if ( !ListContains ( itemList, item ) )
+            itemList.push_back ( item );
+    }
+
 
     //
     // std::list helpers
     //
 
     // Remove first occurrence of item from itemList
+    template < class T >
+    void ListRemoveFirst ( std::list < T >& itemList, const T& item )
+    {
+        typename std::list < T >::iterator it = itemList.begin ();
+        for ( ; it != itemList.end () ; ++it )
+            if ( item == *it )
+            {
+                itemList.erase ( it );
+                break;
+            }
+    }
+
+    // Remove all occurrences of item from itemList
     template < class T >
     void ListRemove ( std::list < T >& itemList, const T& item )
     {
@@ -345,6 +343,33 @@ namespace SharedUtil
     //
     // std::vector helpers
     //
+
+    // Remove first occurrence of item from itemList
+    template < class T >
+    void ListRemoveFirst ( std::vector < T >& itemList, const T& item )
+    {
+        typename std::vector < T >::iterator it = itemList.begin ();
+        for ( ; it != itemList.end () ; ++it )
+            if ( item == *it )
+            {
+                itemList.erase ( it );
+                break;
+            }
+    }
+
+    // Remove all occurrences of item from itemList
+    template < class T >
+    void ListRemove ( std::vector < T >& itemList, const T& item )
+    {
+        typename std::vector < T >::iterator it = itemList.begin ();
+        while ( it != itemList.end () )
+        {
+            if ( item == *it )
+                it = itemList.erase ( it );
+            else
+                ++it;
+        }
+    }
 
     // Remove item at index from itemList
     template < class T >
@@ -370,6 +395,24 @@ namespace SharedUtil
         itemList.reserve ( prevSize );
     }
 
+
+    //
+    // std::deque helpers
+    //
+
+    // Remove all occurrences of item from itemList
+    template < class T >
+    void ListRemove ( std::deque < T >& itemList, const T& item )
+    {
+        typename std::deque < T >::iterator it = itemList.begin ();
+        while ( it != itemList.end () )
+        {
+            if ( item == *it )
+                it = itemList.erase ( it );
+            else
+                ++it;
+        }
+    }
 
 
     //
@@ -775,6 +818,7 @@ namespace SharedUtil
             m_List.pop_front ();
         }
 
+        // Remove all occurrences of item
         void remove ( const T& item )
         {
             if ( Contains ( item ) )
@@ -860,14 +904,14 @@ namespace SharedUtil
     }
 
 
-    // Remove first occurrence of item from itemList
+    // Remove all occurrences of item from itemList
     template < class U, class T >
     void ListRemove ( CMappedList < U >& itemList, const T& item )
     {
         itemList.remove ( item );
     }
 
-    // Remove first occurrence of item from itemList
+    // Remove all occurrences of item from itemList
     template < class U, class T >
     void ListRemove ( CMappedArray < U >& itemList, const T& item )
     {
