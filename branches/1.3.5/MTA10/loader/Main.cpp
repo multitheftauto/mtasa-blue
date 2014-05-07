@@ -99,6 +99,7 @@ int DoWinMain ( HINSTANCE hLauncherInstance, HINSTANCE hPrevInstance, LPSTR lpCm
     // Check MTA files look good
     CheckCoreLoadable();
     CheckDataFiles();
+    CheckLibVersions();
 
     // Go for launch
     int iReturnCode = LaunchGame( strCmdLine );
