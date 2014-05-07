@@ -530,7 +530,7 @@ void CLuaMain::OnOpenFile( const SString& strFilename )
 
 void CLuaMain::OnCloseFile( const SString& strFilename )
 {
-    ListRemove( m_OpenFilenameList, strFilename );
+    ListRemoveFirst( m_OpenFilenameList, strFilename );
 }
 
 CXMLFile * CLuaMain::CreateXML ( const char * szFilename )
