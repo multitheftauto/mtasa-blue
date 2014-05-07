@@ -758,6 +758,65 @@ void CheckDataFiles( void )
 
 //////////////////////////////////////////////////////////
 //
+// CheckLibVersions
+//
+// Ensure DLLs are the correct version
+//
+//////////////////////////////////////////////////////////
+void CheckLibVersions( void )
+{
+    const char* moduleList [] =     { "MTA\\loader.dll"
+                                     ,"MTA\\cgui.dll"
+                                     ,"MTA\\core.dll"
+                                     ,"MTA\\game_sa.dll"
+                                     ,"MTA\\multiplayer_sa.dll"
+                                     ,"MTA\\netc.dll"
+                                     ,"MTA\\xmll.dll"
+                                     ,"MTA\\game_sa.dll"
+                                     ,"mods\\deathmatch\\client.dll"
+                                     ,"mods\\deathmatch\\lua5.1c.dll"
+                                     ,"mods\\deathmatch\\pcre3.dll"
+                                    };
+    SString strReqFileVersion;
+    for ( uint i = 0 ; i < NUMELMS( moduleList ) ; i++ )
+    {
+        SString strFilename = moduleList[i];
+#ifdef MTA_DEBUG
+        strFilename = ExtractBeforeExtension( strFilename ) + "_d." + ExtractExtension( strFilename );
+#endif
+        SLibVersionInfo fileInfo;
+        if ( FileExists( CalcMTASAPath( strFilename ) ) )
+        {
+            SString strFileVersion = "0.0.0.0";
+            if ( GetLibVersionInfo( CalcMTASAPath( strFilename ), &fileInfo ) )
+                strFileVersion = SString( "%d.%d.%d.%d", fileInfo.dwFileVersionMS >> 16, fileInfo.dwFileVersionMS & 0xFFFF
+                                                       , fileInfo.dwFileVersionLS >> 16, fileInfo.dwFileVersionLS & 0xFFFF );
+            if ( strReqFileVersion.empty() )
+                strReqFileVersion = strFileVersion;
+            else
+            if ( strReqFileVersion != strFileVersion )
+            {
+                DisplayErrorMessageBox ( SStringX(_( "File version mismatch error."
+                                            " Reinstall MTA:SA if you experience problems.\n" )
+                                            + SString( "\n[%s %s/%s]\n", *strFilename, *strFileVersion, *strReqFileVersion )
+                                            ), _E("CL40"), "bad-file-version" );
+                break;
+            }
+        }
+        else
+        {
+            DisplayErrorMessageBox ( SStringX(_( "Some files are missing."
+                                        " Reinstall MTA:SA if you experience problems.\n" )
+                                        + SString( "\n[%s]\n", *strFilename )
+                                        ), _E("CL41"), "missing-file" );
+            break;
+        }
+    }
+}
+
+
+//////////////////////////////////////////////////////////
+//
 // LaunchGame
 //
 // Create GTA process, hook it and go go go

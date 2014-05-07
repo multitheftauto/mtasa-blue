@@ -24,6 +24,7 @@
 #include "CXMLNodeImpl.h"
 #include "CXMLImpl.h"
 #include "CXMLArray.h"
+#include "../../MTA10_Server/version.h"
 
 // XML includes
 #include <xml/CXMLCommon.h>

@@ -1742,3 +1742,16 @@ namespace SharedUtil
 
 using namespace SharedUtil;
 
+//
+// For checking MTA library module versions
+//
+#ifdef WIN32
+    #define MTAEXPORT extern "C" __declspec(dllexport)
+#else
+    #define MTAEXPORT extern "C"
+#endif
+
+typedef void (FUNC_GetMtaVersion)( char* pBuffer, uint uiMaxSize );
+
+MTAEXPORT void GetLibMtaVersion( char* pBuffer, uint uiMaxSize );
+

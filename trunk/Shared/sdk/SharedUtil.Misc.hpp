@@ -1700,3 +1700,29 @@ namespace SharedUtil
     }
 
 }
+
+
+//
+// For checking MTA library module versions
+//
+MTAEXPORT void GetLibMtaVersion( char* pBuffer, uint uiMaxSize )
+{
+    SString strVersion( "%d.%d.%d-%d.%05d.%d"
+#ifdef MTASA_VERSION_MAJOR
+                            ,MTASA_VERSION_MAJOR
+                            ,MTASA_VERSION_MINOR
+                            ,MTASA_VERSION_MAINTENANCE
+                            ,MTASA_VERSION_TYPE
+                            ,MTASA_VERSION_BUILD
+#else
+                            ,0
+                            ,0
+                            ,0
+                            ,0
+                            ,0
+#endif
+                            ,0
+                            );
+    uint uiLengthInclTerm = strVersion.length() + 1;
+    STRNCPY( pBuffer, *strVersion, Max( uiLengthInclTerm, uiMaxSize ) );
+}
