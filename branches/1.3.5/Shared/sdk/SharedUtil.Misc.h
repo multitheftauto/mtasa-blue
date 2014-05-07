@@ -1145,7 +1145,7 @@ namespace SharedUtil
     // tolower / toupper
     // Implemented here so it can be inlined.
     //
-    static const unsigned char ms_ucTolowerTab [ 256 ] = {
+    static const char ms_ucTolowerTab [ 256 ] = {
         '\x00', '\x01', '\x02', '\x03', '\x04', '\x05', '\x06', '\x07',
         '\x08', '\x09', '\x0a', '\x0b', '\x0c', '\x0d', '\x0e', '\x0f',
         '\x10', '\x11', '\x12', '\x13', '\x14', '\x15', '\x16', '\x17',
@@ -1179,7 +1179,7 @@ namespace SharedUtil
         '\xf0', '\xf1', '\xf2', '\xf3', '\xf4', '\xf5', '\xf6', '\xf7',
         '\xf8', '\xf9', '\xfa', '\xfb', '\xfc', '\xfd', '\xfe', '\xff'
     };
-    static const unsigned char ms_ucToupperTab [ 256 ] = {
+    static const char ms_ucToupperTab [ 256 ] = {
         '\x00', '\x01', '\x02', '\x03', '\x04', '\x05', '\x06', '\x07', 
         '\x08', '\x09', '\x0a', '\x0b', '\x0c', '\x0d', '\x0e', '\x0f', 
         '\x10', '\x11', '\x12', '\x13', '\x14', '\x15', '\x16', '\x17', 

@@ -25,6 +25,7 @@ using namespace std;
 #else
     #include <string.h>
     #include <alloca.h>
+    #include <unistd.h>
 #endif
 
 #ifdef WIN32

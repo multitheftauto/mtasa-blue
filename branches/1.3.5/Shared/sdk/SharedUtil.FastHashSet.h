@@ -39,8 +39,8 @@ namespace SharedUtil
     public:
         CFastHashSet ( void )
         {
-            set_empty_key ( GetEmptyMapKey ( (K*)NULL ) );
-            set_deleted_key ( GetDeletedMapKey ( (K*)NULL ) );
+            this->set_empty_key ( GetEmptyMapKey ( (K*)NULL ) );
+            this->set_deleted_key ( GetDeletedMapKey ( (K*)NULL ) );
         }
     };
 
