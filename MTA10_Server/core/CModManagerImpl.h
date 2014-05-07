@@ -54,6 +54,7 @@ public:
 
     bool                PendingWorkToDo         ( void );
     bool                GetSleepIntervals       ( int& iSleepBusyMs, int& iSleepIdleMs );
+    CDynamicLibrary&    GetDynamicLibrary       ( void )                { return m_Library; };
 
 private:
     CServerImpl*        m_pServer;
