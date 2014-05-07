@@ -136,7 +136,6 @@ Section "Data files" SEC01
 	File "${FILES_ROOT}\MTA San Andreas\mta\tags.dll"
 	File "${FILES_ROOT}\MTA San Andreas\mta\chatboxpresets.xml"
 	File "${FILES_ROOT}\MTA San Andreas\mta\sa.dat"
-	File "${FILES_ROOT}\MTA San Andreas\mta\pthreadVC2.dll"
 	File "${FILES_ROOT}\MTA San Andreas\mta\XInput9_1_0_mta.dll"
 	File "${FILES_ROOT}\MTA San Andreas\mta\vea.dll"
 	File "${FILES_ROOT}\MTA San Andreas\mta\vog.dll"
@@ -185,9 +184,6 @@ Section "Data files" SEC01
 	
 	SetOutPath "$INSTDIR\MTA\cgui\images\serverbrowser"
 	File "${FILES_ROOT}\MTA San Andreas\mta\cgui\images\serverbrowser\*.png"
-
-	SetOutPath "$INSTDIR\server"
-	File "${FILES_ROOT}\MTA San Andreas\server\pthreadVC2.dll"
 
 	SetOutPath "$INSTDIR\server\mods\deathmatch"
 	File "${FILES_ROOT}\MTA San Andreas\server\mods\deathmatch\libmysql.dll"
