@@ -23,11 +23,28 @@ extern "C"
 class CLuaClassDefs: public CLuaDefs
 {
 public:
-    static int      Index               ( lua_State* luaVM );
-    static int      NewIndex            ( lua_State* luaVM );
+    static int			Index               ( lua_State* luaVM );
+    static int			NewIndex            ( lua_State* luaVM );
+    static int			StaticNewIndex      ( lua_State* luaVM );
+    static int			Call                ( lua_State* luaVM );
 
-    static int      ReadOnly            ( lua_State* luaVM );
-    static int      WriteOnly           ( lua_State* luaVM );
+    static int			ReadOnly            ( lua_State* luaVM );
+    static int			WriteOnly           ( lua_State* luaVM );
+
+    static int			ToString            ( lua_State* luaVM );
+
+    static const char*	GetObjectClass	    ( void* pObject );
+    static const char*	GetResourceClass	( CResource* pResource );
+    static const char*	GetTimerClass		( CLuaTimer* pTimer );
+    static const char*	GetXmlNodeClass		( CXMLNode* pXmlNode );
+    static const char*	GetACLClass	        ( CAccessControlList* pACL );
+    static const char*	GetACLGroupClass    ( CAccessControlListGroup* pACLGroup );
+    static const char*	GetAccountClass     ( CAccount* pAccount );
+    static const char*	GetTextDisplayClass ( CTextDisplay* pDisplay );
+    static const char*	GetTextItemClass    ( CTextItem* pItem );
+    static const char*	GetBanClass         ( CBan* pBan );
+    static const char*	GetQueryClass       ( CDbJobData* pJobData );
+    static const char*	GetElementClass		( CElement* pElement );
 };
 
 #endif

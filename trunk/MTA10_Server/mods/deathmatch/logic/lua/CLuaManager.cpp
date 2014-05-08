@@ -61,10 +61,10 @@ CLuaManager::~CLuaManager ( void )
     delete m_pLuaModuleManager;
 }
 
-CLuaMain * CLuaManager::CreateVirtualMachine ( CResource* pResourceOwner )
+CLuaMain * CLuaManager::CreateVirtualMachine ( CResource* pResourceOwner, bool bEnableOOP )
 {
     // Create it and add it to the list over VM's
-    CLuaMain * pLuaMain = new CLuaMain ( this, m_pObjectManager, m_pPlayerManager, m_pVehicleManager, m_pBlipManager, m_pRadarAreaManager, m_pMapManager, pResourceOwner );
+    CLuaMain * pLuaMain = new CLuaMain ( this, m_pObjectManager, m_pPlayerManager, m_pVehicleManager, m_pBlipManager, m_pRadarAreaManager, m_pMapManager, pResourceOwner, bEnableOOP );
     m_virtualMachines.push_back ( pLuaMain );
     pLuaMain->InitVM ();
 

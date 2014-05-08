@@ -47,19 +47,19 @@ DECLARE_ENUM( eHudComponent );
 // class -> class type
 typedef int eEntityType;
 inline eEntityType GetClassType ( CElement* )       { return -1; }
-inline eEntityType GetClassType ( CPlayer* )        { return CElement::PLAYER; }
-inline eEntityType GetClassType ( CVehicle* )       { return CElement::VEHICLE; }
-inline eEntityType GetClassType ( CBlip* )          { return CElement::BLIP; }
-inline eEntityType GetClassType ( CObject* )        { return CElement::OBJECT; }
-inline eEntityType GetClassType ( CPickup* )        { return CElement::PICKUP; }
-inline eEntityType GetClassType ( CRadarArea* )     { return CElement::RADAR_AREA; }
-inline eEntityType GetClassType ( CMarker* )        { return CElement::MARKER; }
-inline eEntityType GetClassType ( CTeam* )          { return CElement::TEAM; }
-inline eEntityType GetClassType ( CPed* )           { return CElement::PED; }
-inline eEntityType GetClassType ( CColShape* )      { return CElement::COLSHAPE; }
-inline eEntityType GetClassType ( CDummy* )         { return CElement::DUMMY; }
-inline eEntityType GetClassType ( CScriptFile* )    { return CElement::SCRIPTFILE; }
-inline eEntityType GetClassType ( CWater* )         { return CElement::WATER; }
+inline eEntityType GetClassType ( class CPlayer* )        { return CElement::PLAYER; }
+inline eEntityType GetClassType ( class CVehicle* )       { return CElement::VEHICLE; }
+inline eEntityType GetClassType ( class CBlip* )          { return CElement::BLIP; }
+inline eEntityType GetClassType ( class CObject* )        { return CElement::OBJECT; }
+inline eEntityType GetClassType ( class CPickup* )        { return CElement::PICKUP; }
+inline eEntityType GetClassType ( class CRadarArea* )     { return CElement::RADAR_AREA; }
+inline eEntityType GetClassType ( class CMarker* )        { return CElement::MARKER; }
+inline eEntityType GetClassType ( class CTeam* )          { return CElement::TEAM; }
+inline eEntityType GetClassType ( class CPed* )           { return CElement::PED; }
+inline eEntityType GetClassType ( class CColShape* )      { return CElement::COLSHAPE; }
+inline eEntityType GetClassType ( class CDummy* )         { return CElement::DUMMY; }
+inline eEntityType GetClassType ( class CScriptFile* )    { return CElement::SCRIPTFILE; }
+inline eEntityType GetClassType ( class CWater* )         { return CElement::WATER; }
 inline eEntityType GetClassType ( class CDatabaseConnectionElement* )  { return CElement::DATABASE_CONNECTION; }
 inline eEntityType GetClassType ( class CCustomWeapon* )  { return CElement::WEAPON; }
 
@@ -92,6 +92,8 @@ inline SString GetClassTypeName ( CCustomWeapon* )    { return "weapon"; }
 inline SString GetClassTypeName ( CBan* )    { return "ban"; }
 inline SString GetClassTypeName ( CTextItem* )    { return "text-item"; }
 inline SString GetClassTypeName ( CTextDisplay* )    { return "text-display"; }
+inline SString GetClassTypeName ( CLuaVector3D* )           { return "vector3"; }
+inline SString GetClassTypeName ( CLuaMatrix* )             { return "matrix"; }
 
 
 
@@ -207,6 +209,25 @@ template < class T >
 CBan* UserDataCast ( CBan*, void* ptr, lua_State* )
 {
     return g_pGame->GetBanManager()->GetBanFromScriptID ( reinterpret_cast < unsigned long > ( ptr ) );
+}
+
+//
+// CLuaVector3D from userdata
+//
+template < class T >
+CLuaVector3D* UserDataCast ( CLuaVector3D*, void* ptr, lua_State* luaVM )
+{
+    return CLuaVector3D::GetFromScriptID ( reinterpret_cast < unsigned int > ( ptr ) );
+}
+
+
+//
+// CLuaMatrix from userdata
+//
+template < class T >
+CLuaMatrix* UserDataCast ( CLuaMatrix*, void* ptr, lua_State* luaVM )
+{
+    return CLuaMatrix::GetFromScriptID ( reinterpret_cast < unsigned int > ( ptr ) );
 }
 
 

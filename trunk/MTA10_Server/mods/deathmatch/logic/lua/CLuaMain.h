@@ -21,8 +21,12 @@ class CLuaMain;
 #define __CLUAMAIN_H
 
 #include "CLuaTimerManager.h"
+#include "CLuaVector.h"
+#include "CLuaMatrix.h"
 #include "CLuaModuleManager.h"
 #include "../CTextDisplay.h"
+
+#include "CLuaFunctionDefinitions.h"
 
 #define MAX_SCRIPTNAME_LENGTH 64
 
@@ -50,7 +54,9 @@ public:
                                                               CBlipManager* pBlipManager,
                                                               CRadarAreaManager* pRadarAreaManager,
                                                               CMapManager* pMapManager,
-                                                              CResource* pResourceOwner );
+                                                              CResource* pResourceOwner, 
+                                                              bool bEnableOOP );
+
                                     ~CLuaMain               ( void );
 
     bool                            LoadScriptFromBuffer    ( const char* cpBuffer, unsigned int uiSize, const char* szFileName );
@@ -118,6 +124,25 @@ private:
     void                            InitSecurity            ( void );
     void                            InitClasses             ( lua_State* luaVM );
 
+public:
+
+    void                            AddVector3DClass        ( lua_State* luaVM );
+    void                            AddVector2DClass        ( lua_State* luaVM );
+    void                            AddMatrixClass          ( lua_State* luaVM );
+
+    void                            AddElementClass         ( lua_State* luaVM );
+    void                            AddVehicleClass         ( lua_State* luaVM );
+    void                            AddPedClass             ( lua_State* luaVM );
+    void                            AddPlayerClass          ( lua_State* luaVM );
+    void                            AddObjectClass          ( lua_State* luaVM );
+    void                            AddMarkerClass          ( lua_State* luaVM );
+    void                            AddBlipClass            ( lua_State* luaVM );
+    void                            AddPickupClass          ( lua_State* luaVM );
+    void                            AddColShapeClass        ( lua_State* luaVM );
+
+    bool                            IsOOPEnabled            ( void )                        { return m_bEnableOOP; }
+private:
+
     static void                     InstructionCountHook    ( lua_State* luaVM, lua_Debug* pDebug );
 
     SString                         m_strScriptName;
@@ -137,6 +162,8 @@ private:
     list < CXMLFile* >              m_XMLFiles;
     list < CTextDisplay* >          m_Displays;
     list < CTextItem* >             m_TextItems;
+
+    bool                            m_bEnableOOP;
 
     bool                            m_bBeingDeleted; // prevent it being deleted twice
 

@@ -50,6 +50,7 @@ public:
     void                    ReadNumber          ( double dNumber );
     void                    ReadString          ( const std::string& strString );
     void                    ReadElement         ( CElement* pElement );
+    void                    ReadElementID       ( ElementID ID );
     void                    ReadScriptID        ( uint uiScriptID );
     void                    ReadTable           ( class CLuaArguments * table );
 
@@ -58,7 +59,7 @@ public:
     inline bool             GetBoolean          ( void ) const      { return m_bBoolean; };
     inline lua_Number       GetNumber           ( void ) const      { return m_Number; };
     inline const std::string& GetString         ( void )            { return m_strString; };
-    inline void*            GetLightUserData    ( void ) const      { return m_pLightUserData; };
+    inline void*            GetUserData         ( void ) const      { return m_pUserData; };
     CElement*               GetElement          ( void ) const;
     bool                    GetAsString         ( SString& strBuffer );
 
@@ -75,7 +76,7 @@ private:
     bool                    m_bBoolean;
     lua_Number              m_Number;
     std::string             m_strString;
-    void*                   m_pLightUserData;
+    void*                   m_pUserData;
     CLuaArguments*          m_pTableData;
     bool                    m_bWeakTableRef;
 

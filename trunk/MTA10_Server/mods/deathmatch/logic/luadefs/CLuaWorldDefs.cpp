@@ -137,10 +137,8 @@ int CLuaWorldDefs::getZoneName ( lua_State* luaVM )
     bool bCitiesOnly;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadNumber(vecPosition.fX);
-    argStream.ReadNumber(vecPosition.fY);
-    argStream.ReadNumber(vecPosition.fZ);
-    argStream.ReadBool(bCitiesOnly, false);
+    argStream.ReadVector3D ( vecPosition );
+    argStream.ReadBool ( bCitiesOnly, false );
 
     if ( !argStream.HasErrors ( ) )
     {

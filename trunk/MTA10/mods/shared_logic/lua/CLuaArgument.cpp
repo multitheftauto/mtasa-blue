@@ -721,7 +721,7 @@ bool CLuaArgument::WriteToBitStream ( NetBitStreamInterface& bitStream, CFastHas
                 // Clientside element?
                 if ( !pElement->IsLocalEntity () )
                 {
-                    type.data.ucType = LUA_TLIGHTUSERDATA;
+                    type.data.ucType = LUA_TUSERDATA;
                     bitStream.Write ( &type );
                     bitStream.Write ( pElement->GetID () );
                 }
