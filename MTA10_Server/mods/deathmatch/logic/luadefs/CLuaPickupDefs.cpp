@@ -39,9 +39,7 @@ int CLuaPickupDefs::createPickup ( lua_State* luaVM )
     CVector vecPosition; unsigned char ucType; double dValue; unsigned long ulRespawnInterval; double dAmmo;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadNumber ( vecPosition.fX );
-    argStream.ReadNumber ( vecPosition.fY );
-    argStream.ReadNumber ( vecPosition.fZ );
+    argStream.ReadVector3D ( vecPosition );
     argStream.ReadNumber ( ucType );
     argStream.ReadNumber ( dValue );
     argStream.ReadNumber ( ulRespawnInterval, 30000 );

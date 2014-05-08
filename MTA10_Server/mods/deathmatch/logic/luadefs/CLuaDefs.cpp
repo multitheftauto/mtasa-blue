@@ -148,7 +148,7 @@ int CLuaDefs::CanUseFunction ( lua_CFunction f, lua_State* luaVM )
 
         // Grab the function name we're calling. If it's one of our functions, see if we can use it.
         CLuaCFunction* pFunction = CLuaCFunctions::GetFunction ( f );
-        dassert( pFunction );
+
         if ( pFunction )
         {
             // If it's not one of lua's functions, see if we allow it

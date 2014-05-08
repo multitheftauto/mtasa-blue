@@ -83,7 +83,6 @@ public:
         m_iIndex++;
     }
 
-#ifdef MTA_CLIENT
     //
     // Read next Vector3d
     //
@@ -153,7 +152,6 @@ public:
         SetTypeError ( "vector3" );
         m_iIndex++;
     }
-#endif
 
     //
     // Read next bool
@@ -712,13 +710,12 @@ public:
         return false;
     }
 
-#ifdef MTA_CLIENT
     bool NextIsVector3D ( void ) const
     {
         return ( NextCouldBeNumber() && NextCouldBeNumber( 1 ) && NextCouldBeNumber( 2 ) )
                || NextIsUserDataOfType < CLuaVector3D > ();
     }
-#endif
+
 
     //
     // Conditional reads. Default required in case condition is not met.

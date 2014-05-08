@@ -225,7 +225,7 @@ private:
     bool                    ReadIncludedHTML ( CXMLNode * root );
     bool                    ReadIncludedExports ( CXMLNode * root );
     bool                    ReadIncludedFiles ( CXMLNode * root );
-    bool                    CreateVM ( void );
+    bool                    CreateVM ( bool bEnableOOP );
     bool                    DestroyVM ( void );
     void                    TidyUp ( void );
     ResponseCode            HandleRequestActive ( HttpRequest * ipoHttpRequest, HttpResponse * ipoHttpResponse, class CAccount* account );

@@ -25,7 +25,7 @@ class CResourceHTMLItem : public CResourceFile
 
 public:
 
-                                        CResourceHTMLItem               ( class CResource * resource, const char * szShortName, const char * szResourceFileName, CXMLAttributes * xmlAttributes, bool bIsDefault, bool bIsRaw, bool bRestricted );
+                                        CResourceHTMLItem               ( class CResource * resource, const char * szShortName, const char * szResourceFileName, CXMLAttributes * xmlAttributes, bool bIsDefault, bool bIsRaw, bool bRestricted, bool bOOPEnabled );
                                         ~CResourceHTMLItem              ( void );
 
     bool                                Start                           ( void );
@@ -53,6 +53,8 @@ private:
     bool                                m_bDefault;          // is this the default page for this resource?
     std::string                         m_strMime;
     bool                                m_bRestricted;
+
+    bool                                m_bOOPEnabled;
 
     ResponseCode                        m_responseCode;
     HttpResponse *                      m_currentResponse;

@@ -93,7 +93,7 @@ CResource::CResource ( CResourceManager * resourceManager, bool bIsZipped, const
     m_bDoneUpgradeWarnings = false;
     m_uiFunctionRightCacheRevision = 0;
 
-    m_bOOPEnabledInMetaXml = true;
+    m_bOOPEnabledInMetaXml = false;
 
     Load ();
 }
@@ -249,7 +249,7 @@ bool CResource::Load ( void )
                     m_bSyncMapElementDataDefined = true;
                 }
 
-                m_bOOPEnabledInMetaXml = true;
+                m_bOOPEnabledInMetaXml = false;
                 CXMLNode * pNodeClientOOP = root->FindSubNode ( "oop", 0 );
                 if ( pNodeClientOOP )
                 {
@@ -851,7 +851,7 @@ bool CResource::Start ( list<CResource *> * dependents, bool bStartedManually, b
         m_pResourceElement->SetName ( m_strResourceName.c_str () );
 
         // Create the virtual machine for this resource
-        CreateVM();
+        CreateVM ( m_bOOPEnabledInMetaXml );
 
         // We're now active
         m_bActive = true;
@@ -1144,12 +1144,12 @@ bool CResource::Stop ( bool bStopManually )
 }
 
 // Create a virtual machine for everything in this resource
-bool CResource::CreateVM ( void )
+bool CResource::CreateVM ( bool bEnableOOP )
 {
     // Create the virtual machine
     if ( m_pVM == NULL )
     {
-        m_pVM = g_pGame->GetLuaManager ()->CreateVirtualMachine ( this );
+        m_pVM = g_pGame->GetLuaManager ()->CreateVirtualMachine ( this, bEnableOOP );
         m_resourceManager->NotifyResourceVMOpen ( this, m_pVM );
     }
 
@@ -1446,7 +1446,7 @@ bool CResource::ReadIncludedHTML ( CXMLNode * root )
                         bFoundDefault = true;
 
                     // Create a new resource HTML file and add it to the list
-                    CResourceFile * afile = new CResourceHTMLItem ( this, strFilename.c_str (), strFullFilename.c_str (), attributes, bIsDefault, bIsRaw, bIsRestricted );
+                    CResourceFile * afile = new CResourceHTMLItem ( this, strFilename.c_str (), strFullFilename.c_str (), attributes, bIsDefault, bIsRaw, bIsRestricted, m_bOOPEnabledInMetaXml );
                     m_resourceFiles.push_back ( afile );
 
                     // This is the first HTML file? Remember it

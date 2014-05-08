@@ -116,7 +116,7 @@ void lua_pushobject ( lua_State* luaVM, const char* szClass, void* pObject )
         lua_rawget ( luaVM, LUA_REGISTRYINDEX );
 
         assert ( lua_istable ( luaVM, -1 ) );
-
+    
         // First we want to check if we have a userdata for this already
         lua_pushlightuserdata ( luaVM, pObject );
         lua_rawget ( luaVM, -2 );
