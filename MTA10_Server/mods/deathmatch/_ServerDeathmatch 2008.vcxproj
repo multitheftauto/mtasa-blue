@@ -440,6 +440,14 @@
   <ItemGroup>
     <ClCompile Include="CServer.cpp" />
     <ClCompile Include="..\..\sdk\MTAPlatform.cpp" />
+    <ClCompile Include="logic\luadefs\CLuaMatrixDefs.cpp" />
+    <ClCompile Include="logic\luadefs\CLuaVectorDefs.cpp" />
+    <ClCompile Include="logic\lua\CLuaMatrix.cpp" />
+    <ClCompile Include="logic\lua\CLuaVector.cpp" />
+    <ClCompile Include="logic\lua\oopdefs\CLuaOOPFunctionDefs.Camera.cpp" />
+    <ClCompile Include="logic\lua\oopdefs\CLuaOOPFunctionDefs.Element.cpp" />
+    <ClCompile Include="logic\lua\oopdefs\CLuaOOPFunctionDefs.Ped.cpp" />
+    <ClCompile Include="logic\lua\oopdefs\CLuaOOPFunctionDefs.Vehicle.cpp" />
     <ClCompile Include="Server.cpp" />
     <ClCompile Include="StdInc.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -835,6 +843,9 @@
     <ClInclude Include="Config.h" />
     <ClInclude Include="..\..\..\vendor\zip\crypt.h" />
     <ClInclude Include="CServer.h" />
+    <ClInclude Include="logic\luadefs\CLuaMatrixDefs.h" />
+    <ClInclude Include="logic\luadefs\CLuaVectorDefs.h" />
+    <ClInclude Include="logic\lua\oopdefs\CLuaOOPDefs.h" />
     <ClInclude Include="utils\CZipMaker.h" />
     <ClInclude Include="..\EXECryptor\EXECryptor.h" />
     <ClInclude Include="gccHashSupport.h" />
