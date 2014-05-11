@@ -163,6 +163,8 @@ void CServerImpl::Daemonize () const
 
 bool CServerImpl::CheckLibVersions( void )
 {
+#if MTASA_VERSION_TYPE == VERSION_TYPE_RELEASE
+
     char buffer[256];
     buffer[0] = 0;
     GetLibMtaVersion( buffer, sizeof( buffer ) );
@@ -184,7 +186,8 @@ bool CServerImpl::CheckLibVersions( void )
             return false;
         }
     }
-    
+
+#endif
     return true;
 }
 
