@@ -285,6 +285,9 @@ DWORD RETURN_CGlass_WindowRespondsToCollision = 0x71BC48;
 
 #define HOOKPOS_FxManager_c__DestroyFxSystem                0x4A989A
 
+#define HOOKPOS_CTaskSimplyGangDriveBy__ProcessPed          0x62D5A7
+DWORD RETURN_CTaskSimplyGangDriveBy__ProcessPed = 0x62D5AC;
+
 CPed* pContextSwitchedPed = 0;
 CVector vecCenterOfWorld;
 FLOAT fFalseHeading;
@@ -353,6 +356,7 @@ HeliKillHandler* m_pHeliKillHandler = NULL;
 ObjectDamageHandler* m_pObjectDamageHandler = NULL;
 ObjectBreakHandler* m_pObjectBreakHandler = NULL;
 FxSystemDestructionHandler* m_pFxSystemDestructionHandler = NULL;
+DrivebyAnimationHandler* m_pDrivebyAnimationHandler = NULL;
 
 CEntitySAInterface * dwSavedPlayerPointer = 0;
 CEntitySAInterface * activeEntityForStreaming = 0; // the entity that the streaming system considers active
@@ -493,6 +497,8 @@ void HOOK_CObject_ProcessCollision ();
 void HOOK_CGlass_WindowRespondsToCollision ();
 
 void HOOK_FxManager_c__DestroyFxSystem ();
+
+void HOOK_CTaskSimpleGangDriveBy__ProcessPed();
 
 CMultiplayerSA::CMultiplayerSA()
 {
@@ -695,6 +701,9 @@ void CMultiplayerSA::InitHooks()
 
     // Post-destruction hook for FxSystems
     HookInstall ( HOOKPOS_FxManager_c__DestroyFxSystem, (DWORD)HOOK_FxManager_c__DestroyFxSystem, 5);
+
+    // CTaskSimpleGangDriveBy::ProcessPed hook for disabling certain animations
+    HookInstall(HOOKPOS_CTaskSimplyGangDriveBy__ProcessPed, (DWORD) HOOK_CTaskSimpleGangDriveBy__ProcessPed, 5);
 
     // Disable GTA setting g_bGotFocus to false when we minimize
     MemSet ( (void *)ADDR_GotFocus, 0x90, pGameInterface->GetGameVersion () == VERSION_EU_10 ? 6 : 10 );
@@ -1411,7 +1420,7 @@ void CMultiplayerSA::InitHooks()
     // Disable setting the occupied's vehicles health to 75.0f when a burning ped enters it
     // in CFire::ProcessFire
     MemSet((void*)0x53A651, 0x90, 0xA);
-
+    
     InitHooks_CrashFixHacks ();
 
     // Init our 1.3 hooks.
@@ -2173,6 +2182,11 @@ void CMultiplayerSA::SetObjectBreakHandler ( ObjectBreakHandler * pHandler )
 void CMultiplayerSA::SetFxSystemDestructionHandler ( FxSystemDestructionHandler * pHandler )
 {
     m_pFxSystemDestructionHandler = pHandler;
+}
+
+void CMultiplayerSA::SetDrivebyAnimationHandler(DrivebyAnimationHandler * pHandler)
+{
+    m_pDrivebyAnimationHandler = pHandler;
 }
 
 // What we do here is check if the idle handler has been set
@@ -6533,4 +6547,35 @@ void _declspec(naked) HOOK_FxManager_c__DestroyFxSystem ()
         pop ecx
         retn 4
     }
+}
+
+DWORD pProcessedGangDriveBySimpleTask;
+void CTaskSimpleGangDriveBy__ProcessPed()
+{
+    AnimationId *pRequiredAnim = ((AnimationId*) (pProcessedGangDriveBySimpleTask + 0x24));
+    AssocGroupId requiredAnimGroup = *((AssocGroupId*) (pProcessedGangDriveBySimpleTask + 0x28));
+
+    if (m_pDrivebyAnimationHandler != NULL)
+        *pRequiredAnim = m_pDrivebyAnimationHandler(*pRequiredAnim, requiredAnimGroup);
+}
+
+void _declspec(naked) HOOK_CTaskSimpleGangDriveBy__ProcessPed()
+{
+    // esi contains 'this'
+    _asm
+    {
+        mov pProcessedGangDriveBySimpleTask, esi
+        pushad
+    }
+    CTaskSimpleGangDriveBy__ProcessPed();
+    _asm
+    {
+        popad;
+        // Replaced code
+        cmp[esi + 28h], edi;    // .text:0062D5A7
+        jnz 0x62D5C1;           // .text:0062D5AA
+        // Return to original code
+        jmp RETURN_CTaskSimplyGangDriveBy__ProcessPed;
+    }
+     
 }

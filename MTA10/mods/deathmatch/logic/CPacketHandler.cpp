@@ -2251,6 +2251,7 @@ void CPacketHandler::Packet_MapInfo ( NetBitStreamInterface& bitStream )
     g_pClientGame->SetGlitchEnabled ( CClientGame::GLITCH_CLOSEDAMAGE, funBugs.data.bCloseRangeDamage );
     g_pClientGame->SetGlitchEnabled ( CClientGame::GLITCH_HITANIM, funBugs.data2.bHitAnim );
     g_pClientGame->SetGlitchEnabled ( CClientGame::GLITCH_FASTSPRINT, funBugs.data3.bFastSprint );
+    g_pClientGame->SetGlitchEnabled ( CClientGame::GLITCH_BADDRIVEBYHITBOX, funBugs.data4.bBadDrivebyHitboxes );
 
     float fJetpackMaxHeight = 100;
     if ( !bitStream.Read ( fJetpackMaxHeight ) )
@@ -5076,9 +5077,14 @@ void CPacketHandler::Packet_SyncSettings ( NetBitStreamInterface& bitStream )
     if ( bitStream.Version () >= 0x58 )
         bitStream.Read ( ucAllowFastSprintFix );
 
+    uchar ucAllowBadDrivebyHitboxesFix = 0;
+    if ( bitStream.Version() >= 0x59 )
+        bitStream.Read ( ucAllowBadDrivebyHitboxesFix );
+
     SMiscGameSettings miscGameSettings;
     miscGameSettings.bUseAltPulseOrder = ( ucUseAltPulseOrder != 0 );
     miscGameSettings.bAllowFastSprintFix = ( ucAllowFastSprintFix != 0 );
+    miscGameSettings.bAllowBadDrivebyHitboxFix = (ucAllowBadDrivebyHitboxesFix != 0);
     g_pClientGame->SetMiscGameSettings( miscGameSettings );
 }
 

@@ -38,6 +38,7 @@
 #define HIT_ANIM_CLIENT_VERSION                 "1.3.2"
 #define SNIPER_BULLET_SYNC_MIN_CLIENT_VERSION   "1.3.5-9.06054"
 #define SPRINT_FIX_MIN_CLIENT_VERSION           "1.3.5-9.06277"
+#define DRIVEBY_HITBOX_FIX_MIN_CLIENT_VERSION   "1.4.0-5.06399"
 
 CGame* g_pGame = NULL;
 
@@ -177,6 +178,7 @@ CGame::CGame ( void )
     m_Glitches [ GLITCH_CLOSEDAMAGE ] = false;
     m_Glitches [ GLITCH_HITANIM ] = false;
     m_Glitches [ GLITCH_FASTSPRINT ] = false;
+    m_Glitches [ GLITCH_BADDRIVEBYHITBOX ] = false;
     for ( int i = 0; i < WEAPONTYPE_LAST_WEAPONTYPE; i++ )
         m_JetpackWeapons [ i ] = false;
 
@@ -191,6 +193,7 @@ CGame::CGame ( void )
     m_GlitchNames["highcloserangedamage"] = GLITCH_CLOSEDAMAGE;
     m_GlitchNames["hitanim"] = GLITCH_HITANIM;
     m_GlitchNames["fastsprint"] = GLITCH_FASTSPRINT;
+    m_GlitchNames["baddrivebyhitbox"] = GLITCH_BADDRIVEBYHITBOX;
 
     m_bCloudsEnabled = true;
 
@@ -4134,12 +4137,17 @@ void CGame::SendSyncSettings ( CPlayer* pPlayer )
     uchar ucVehExtrapolateEnabled = sVehExtrapolatePercent != 0;
     uchar ucUseAltPulseOrder = m_pMainConfig->GetUseAltPulseOrder () != 0;
     uchar ucAllowFastSprintFix = false;
+    uchar ucAllowDrivebyAnimFix = false;
 
     // Add sprint fix if all clients can handle it
     if ( ExtractVersionStringBuildNumber( m_pPlayerManager->GetLowestConnectedPlayerVersion() ) >= ExtractVersionStringBuildNumber( SPRINT_FIX_MIN_CLIENT_VERSION ) )
         ucAllowFastSprintFix = true;
 
-    CSyncSettingsPacket packet ( weaponTypesUsingBulletSync, ucVehExtrapolateEnabled, sVehExtrapolateBaseMs, sVehExtrapolatePercent, sVehExtrapolateMaxMs, ucUseAltPulseOrder, ucAllowFastSprintFix );
+    // Add driveby animation fix if all clients can handle it
+    if (ExtractVersionStringBuildNumber(m_pPlayerManager->GetLowestConnectedPlayerVersion()) >= ExtractVersionStringBuildNumber( DRIVEBY_HITBOX_FIX_MIN_CLIENT_VERSION ))
+        ucAllowDrivebyAnimFix = true;
+
+    CSyncSettingsPacket packet(weaponTypesUsingBulletSync, ucVehExtrapolateEnabled, sVehExtrapolateBaseMs, sVehExtrapolatePercent, sVehExtrapolateMaxMs, ucUseAltPulseOrder, ucAllowFastSprintFix, ucAllowDrivebyAnimFix);
     if ( pPlayer )
         pPlayer->Send ( packet );
     else
