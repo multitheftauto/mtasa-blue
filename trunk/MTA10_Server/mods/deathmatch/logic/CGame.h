@@ -196,6 +196,7 @@ public:
         GLITCH_CLOSEDAMAGE,
         GLITCH_HITANIM,
         GLITCH_FASTSPRINT,
+        GLITCH_BADDRIVEBYHITBOX,
         NUM_GLITCHES
     };
 public:

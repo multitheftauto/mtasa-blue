@@ -18,7 +18,8 @@ public:
                                                                             short sVehExtrapolatePercent,
                                                                             short sVehExtrapolateMaxMs,
                                                                             uchar ucUseAltPulseOrder,
-                                                                            uchar ucAllowFastSprintFix );
+                                                                            uchar ucAllowFastSprintFix,
+                                                                            uchar ucAllowDrivebyAnimationFix);
 
     inline ePacketID                        GetPacketID                 ( void ) const                  { return PACKET_ID_SYNC_SETTINGS; };
     unsigned long                           GetFlags                    ( void ) const                  { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
@@ -33,4 +34,5 @@ public:
     short                       m_sVehExtrapolateMaxMs;
     uchar                       m_ucUseAltPulseOrder;
     uchar                       m_ucAllowFastSprintFix;
+    uchar                       m_ucAllowDrivebyAnimationFix;
 };

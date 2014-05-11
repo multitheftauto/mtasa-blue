@@ -1830,6 +1830,7 @@ struct SFunBugsStateSync : public ISyncStructure
     enum { BITCOUNT = 5 };
     enum { BITCOUNT2 = 1 };
     enum { BITCOUNT3 = 1 };
+    enum { BITCOUNT4 = 1 };
 
     bool Read ( NetBitStreamInterface& bitStream )
     {
@@ -1842,6 +1843,10 @@ struct SFunBugsStateSync : public ISyncStructure
             bOk &= bitStream.ReadBits ( reinterpret_cast < char* > ( &data3 ), BITCOUNT3 );
         else
             data3.bFastSprint = 0;
+        if (bitStream.Version() >= 0x059)
+            bOk &= bitStream.ReadBits(reinterpret_cast < char* > (&data4), BITCOUNT4);
+        else
+            data4.bBadDrivebyHitboxes = 0;
         return bOk;
     }
     void Write ( NetBitStreamInterface& bitStream ) const
@@ -1851,6 +1856,8 @@ struct SFunBugsStateSync : public ISyncStructure
             bitStream.WriteBits ( reinterpret_cast < const char* > ( &data2 ), BITCOUNT2 );
         if ( bitStream.Version() >= 0x058 )
             bitStream.WriteBits ( reinterpret_cast < const char* > ( &data3 ), BITCOUNT3 );
+        if (bitStream.Version() >= 0x059)
+            bitStream.WriteBits(reinterpret_cast < const char* > (&data4), BITCOUNT4);
     }
 
     struct
@@ -1873,6 +1880,12 @@ struct SFunBugsStateSync : public ISyncStructure
     {
         bool bFastSprint : 1;
     } data3;
+
+    // Add new ones in separate structs
+    struct
+    {
+        bool bBadDrivebyHitboxes : 1;
+    } data4;
 };
 
 

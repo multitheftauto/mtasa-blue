@@ -74,6 +74,7 @@ struct SMiscGameSettings
 {
     bool bUseAltPulseOrder;
     bool bAllowFastSprintFix;
+    bool bAllowBadDrivebyHitboxFix;
 };
 
 class CClientGame
@@ -190,6 +191,7 @@ public:
         GLITCH_CLOSEDAMAGE,
         GLITCH_HITANIM,
         GLITCH_FASTSPRINT,
+        GLITCH_BADDRIVEBYHITBOX,
         NUM_GLITCHES
     };
     class CStoredWeaponSlot
@@ -514,6 +516,7 @@ private:
     static void                         StaticGameEntityRenderHandler   ( CEntitySAInterface* pEntity );
     static void                         StaticTaskSimpleBeHitHandler    ( CPedSAInterface* pPedAttacker, ePedPieceTypes hitBodyPart, int hitBodySide, int weaponId );
     static void                         StaticFxSystemDestructionHandler ( void * pFxSAInterface );
+    static AnimationId                  StaticDrivebyAnimationHandler   ( AnimationId animGroup, AssocGroupId animId );
 
     bool                                DamageHandler                   ( CPed* pDamagePed, CEventDamage * pEvent );
     void                                DeathHandler                    ( CPed* pKilledPed, unsigned char ucDeathReason, unsigned char ucBodyPart );
@@ -541,6 +544,7 @@ private:
     void                                GameModelRemoveHandler          ( ushort usModelId );
     void                                WorldSoundHandler               ( uint uiGroup, uint uiIndex );
     void                                TaskSimpleBeHitHandler          ( CPedSAInterface* pPedAttacker, ePedPieceTypes hitBodyPart, int hitBodySide, int weaponId );
+    AnimationId                         DrivebyAnimationHandler         ( AnimationId animGroup, AssocGroupId animId );
 
     static bool                         StaticProcessMessage            ( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
     bool                                ProcessMessage                  ( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
