@@ -321,7 +321,7 @@ deathmatch_la_LIBADD = \
 	../../sdk/libplatform.la \
 	$(top_builddir)/vendor/ehs/libehs.la \
 	$(LUABDIR)/src/liblua.la \
-	$(top_builddir)/vendor/json-c/libjson.la \
+	$(top_builddir)/vendor/json-c/libjson-c.la \
 	$(SPARSEHASH_LIBS)
 
 deathmatch_la_LDFLAGS = \
