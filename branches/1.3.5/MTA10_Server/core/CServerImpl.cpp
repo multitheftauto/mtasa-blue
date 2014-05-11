@@ -161,6 +161,35 @@ void CServerImpl::Daemonize () const
 }
 #endif
 
+bool CServerImpl::CheckLibVersions( void )
+{
+#if MTASA_VERSION_TYPE == VERSION_TYPE_RELEASE
+
+    char buffer[256];
+    buffer[0] = 0;
+    GetLibMtaVersion( buffer, sizeof( buffer ) );
+    SString strVersionCore = buffer;
+
+    CDynamicLibrary* dynLibList[] = { &m_NetworkLibrary, &m_XMLLibrary, &m_pModManager->GetDynamicLibrary() };
+    const char* dynLibNameList[] = { "net", "xml", "deathmatch" };
+
+    for( uint i = 0 ; i < NUMELMS( dynLibList ) ; i++ )
+    {
+        buffer[0] = 0;
+        FUNC_GetMtaVersion* pfnGetMtaVersion = (FUNC_GetMtaVersion*) ( dynLibList[i]->GetProcedureAddress ( "GetLibMtaVersion" ) );
+        if ( pfnGetMtaVersion )
+            pfnGetMtaVersion( buffer, sizeof( buffer ) );
+        if ( strVersionCore != buffer )
+        {
+            Print( "ERROR: '%s' library version is '%s' (Expected '%s')\n", dynLibNameList[i], buffer, *strVersionCore );
+            Print( "Try reinstalling\n" );
+            return false;
+        }
+    }
+
+#endif
+    return true;
+}
 
 int CServerImpl::Run ( int iArgumentCount, char* szArguments [] )
 {
@@ -341,8 +370,19 @@ int CServerImpl::Run ( int iArgumentCount, char* szArguments [] )
                     // Make the modmanager load our mod
                     if ( m_pModManager->Load ( "deathmatch", iArgumentCount, szArguments ) )   // Hardcoded for now
                     {
-                        // Enter our mainloop
-                        MainLoop ();
+                        if ( CheckLibVersions() )
+                        {
+                            // Enter our mainloop
+                            MainLoop ();
+                        }
+                        else
+                        {
+                            // Version mismatch
+                            Print ( "Press Q to shut down the server!\n" );
+                            WaitForKey ( 'q' );
+                            DestroyWindow ( );
+                            return ERROR_LOADING_MOD;
+                        }
                     }
                     else
                     {
@@ -801,11 +841,11 @@ void CServerImpl::HandleInput ( void )
 bool CServerImpl::ParseArguments ( int iArgumentCount, char* szArguments [] )
 {
 #ifndef WIN32
-    // Default to a simple console if running under 'nohup'
-    struct sigaction sa;
-    sigaction ( SIGHUP, NULL, &sa );
-    if ( sa.sa_handler == SIG_IGN )
+    // Default to a simple console if stdout is not a TTY (e.g. running under 'nohup')
+    if ( !isatty( STDOUT_FILENO ) ) {
         g_bNoTopBar = true;
+        g_bNoCurses = true;
+    }
 #endif
 
     // Iterate our arguments
@@ -863,6 +903,9 @@ bool CServerImpl::ParseArguments ( int iArgumentCount, char* szArguments [] )
                 else if ( strcmp ( szArguments [i], "-f" ) == 0 )
                 {
                     g_bNoTopBar = false;
+#ifndef WIN32
+                    g_bNoCurses = false;
+#endif
                 }
                 else if ( strcmp ( szArguments [i], "-x" ) == 0 )
                 {

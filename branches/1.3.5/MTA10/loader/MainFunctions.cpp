@@ -712,6 +712,8 @@ void CheckDataFiles( void )
 //////////////////////////////////////////////////////////
 void CheckLibVersions( void )
 {
+#if MTASA_VERSION_TYPE == VERSION_TYPE_RELEASE
+
     const char* moduleList [] =     { "MTA\\loader.dll"
                                      ,"MTA\\cgui.dll"
                                      ,"MTA\\core.dll"
@@ -759,6 +761,8 @@ void CheckLibVersions( void )
             break;
         }
     }
+
+#endif
 }
 
 
