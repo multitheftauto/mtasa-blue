@@ -132,6 +132,14 @@ int CLuaFunctionDefs::ShowChat ( lua_State* luaVM )
 }
 
 
+int CLuaFunctionDefs::IsChatVisible ( lua_State* luaVM )
+{
+//  bool isChatVisible ()
+    lua_pushboolean ( luaVM, g_pCore->IsChatVisible () );
+    return 1;
+}
+
+
 int CLuaFunctionDefs::OutputClientDebugString ( lua_State* luaVM )
 {
     SString strText = "";

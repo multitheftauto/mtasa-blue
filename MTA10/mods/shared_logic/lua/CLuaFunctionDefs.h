@@ -107,6 +107,7 @@ public:
     LUA_DECLARE ( OutputConsole );
     LUA_DECLARE ( OutputChatBox );
     LUA_DECLARE ( ShowChat );
+    LUA_DECLARE ( IsChatVisible );
     LUA_DECLARE ( OutputClientDebugString );
     LUA_DECLARE ( SetClipboard );
     LUA_DECLARE ( GetClipboard );
