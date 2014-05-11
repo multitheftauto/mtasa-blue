@@ -1803,6 +1803,14 @@ bool CConsoleCommands::OpenPortsTest ( CConsole* pConsole, const char* szArgumen
 {
     if ( pClient->GetClientType () == CClient::CLIENT_CONSOLE )
     {
+#if MTASA_VERSION_TYPE < VERSION_TYPE_RELEASE
+        if ( SStringX( szArguments ) == "crashme" )
+        {
+            // For testing crash handling
+            int* pData = NULL;
+            *pData = 0;
+        }
+#endif
         g_pGame->StartOpenPortsTest ();
         return true;
     }
