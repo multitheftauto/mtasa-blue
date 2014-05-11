@@ -673,8 +673,11 @@ CSphere CClientObject::GetWorldBoundingSphere ( void )
 }
 
 
-bool CClientObject::IsBreakable ( void )
+bool CClientObject::IsBreakable ( bool bCheckModelList )
 {
+    if ( !bCheckModelList )
+        return !m_bBreakingDisabled;
+
     return ( CClientObjectManager::IsBreakableModel ( m_usModel ) && !m_bBreakingDisabled );
 }
 
