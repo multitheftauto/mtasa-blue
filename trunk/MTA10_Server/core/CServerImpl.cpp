@@ -841,11 +841,11 @@ void CServerImpl::HandleInput ( void )
 bool CServerImpl::ParseArguments ( int iArgumentCount, char* szArguments [] )
 {
 #ifndef WIN32
-    // Default to a simple console if running under 'nohup'
-    struct sigaction sa;
-    sigaction ( SIGHUP, NULL, &sa );
-    if ( sa.sa_handler == SIG_IGN )
+    // Default to a simple console if stdout is not a TTY (e.g. running under 'nohup')
+    if ( !isatty( STDOUT_FILENO ) ) {
         g_bNoTopBar = true;
+        g_bNoCurses = true;
+    }
 #endif
 
     // Iterate our arguments
@@ -903,6 +903,9 @@ bool CServerImpl::ParseArguments ( int iArgumentCount, char* szArguments [] )
                 else if ( strcmp ( szArguments [i], "-f" ) == 0 )
                 {
                     g_bNoTopBar = false;
+#ifndef WIN32
+                    g_bNoCurses = false;
+#endif
                 }
                 else if ( strcmp ( szArguments [i], "-x" ) == 0 )
                 {
