@@ -4680,9 +4680,13 @@ bool CClientGame::ObjectBreakHandler ( CObjectSAInterface* pObjectInterface, CEn
         // Get our object and client object
         CObject * pObject = g_pGame->GetPools ( )->GetObjectA( (DWORD *)pObjectInterface );
         CClientObject * pClientObject = m_pManager->GetObjectManager ( )->GetSafe( pObject );
+
         // Is our client vehicle valid?
         if ( pClientObject )
         {
+            if ( !pClientObject->IsBreakable ( false ) )
+                return false;
+
             // Apply to MTA's "internal storage", too
             pClientObject->SetHealth ( 0.0f );
 
