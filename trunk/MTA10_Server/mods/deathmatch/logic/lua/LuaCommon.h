@@ -44,8 +44,8 @@ void                    lua_pushquery           ( lua_State* luaVM, class CDbJob
 void                    lua_pushuserdata        ( lua_State* luaVM, void* value );
 void                    lua_pushobject          ( lua_State* luaVM, const char* szClass, void* pObject );
 
-void                    lua_pushvector          ( lua_State* luaVM, CVector& vector );
-void                    lua_pushmatrix          ( lua_State* luaVM, CMatrix& matrix );
+void                    lua_pushvector          ( lua_State* luaVM, const CVector& vector );
+void                    lua_pushmatrix          ( lua_State* luaVM, const CMatrix& matrix );
 
 // Converts any type to string
 const char*             lua_makestring          ( lua_State* luaVM, int iArgument );
