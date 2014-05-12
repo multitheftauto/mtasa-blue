@@ -44,7 +44,9 @@ bool g_bNoCurses = false;
 bool g_bNoTopBar = false;
 bool g_bNoCrashHandler = false;
 #ifndef WIN32
-bool g_bDaemonized = false;
+    bool g_bDaemonized = false;
+    WINDOW* m_wndMenu = NULL;
+    WINDOW* m_wndInput = NULL;
 #endif
 
 #ifdef WIN32
@@ -947,11 +949,15 @@ bool IsKeyPressed ( int iKey )
 void CServerImpl::DestroyWindow ( void )
 {
 #ifndef WIN32
-    if ( !g_bSilent  || !g_bNoCurses )
+    if ( !g_bSilent && !g_bNoCurses && m_wndInput )
     {
         if ( m_wndMenu )
+        {
             delwin ( m_wndMenu );
+            m_wndMenu = NULL;
+        }
         delwin ( m_wndInput );
+        m_wndInput = NULL;
         endwin ( );
     }
 #endif
