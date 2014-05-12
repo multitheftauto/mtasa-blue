@@ -4212,14 +4212,6 @@ bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
         {
             CClientPlayer * pDamagedPlayer = static_cast < CClientPlayer * > ( pDamagedPed );
 
-            // Is this is a remote player?
-            if ( !pDamagedPed->IsLocalPlayer () )
-            {  
-                // Don't allow GTA to start the choking task
-                if ( weaponUsed == WEAPONTYPE_TEARGAS || weaponUsed == WEAPONTYPE_SPRAYCAN || weaponUsed == WEAPONTYPE_EXTINGUISHER )
-                    return false;
-            }
-
             // Do we have an inflicting entity?
             if ( pInflictingEntity )
             {
@@ -4306,6 +4298,14 @@ bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
 
             bool bIsBeingShotWhilstAiming = ( weaponUsed >= WEAPONTYPE_PISTOL && weaponUsed <= WEAPONTYPE_MINIGUN && pDamagedPed->IsUsingGun () );
             bool bOldBehaviour = !IsGlitchEnabled( GLITCH_HITANIM );
+            
+            // Is this is a remote player?
+            if (!pDamagedPed->IsLocalPlayer())
+            {
+               // Don't allow GTA to start the choking task
+               if (weaponUsed == WEAPONTYPE_TEARGAS || weaponUsed == WEAPONTYPE_SPRAYCAN || weaponUsed == WEAPONTYPE_EXTINGUISHER)
+                    return false;
+            }
 
             // Check if their health or armor is locked, and if so prevent applying the damage locally
             if ( pDamagedPed->IsHealthLocked () || pDamagedPed->IsArmorLocked () )
