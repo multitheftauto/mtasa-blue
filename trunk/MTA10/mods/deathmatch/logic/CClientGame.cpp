@@ -1950,7 +1950,7 @@ void CClientGame::UpdatePlayerWeapons ( void )
             if ( ( BitStream.Version () >= 0x44 && m_lastWeaponSlot == WEAPONSLOT_TYPE_THROWN ) || BitStream.Version () >= 0x4D )
             {
                 CWeapon* pLastWeapon = m_pLocalPlayer->GetWeapon ( m_lastWeaponSlot );
-                if ( pLastWeapon && pLastWeapon->GetAmmoTotal () == 0 && m_lastWeaponSlot == WEAPONSLOT_TYPE_THROWN )
+                if ( pLastWeapon && pLastWeapon->GetAmmoTotal () == 0 && ( m_lastWeaponSlot == WEAPONSLOT_TYPE_THROWN || ( BitStream.Version() >= 0x5A && ( m_lastWeaponSlot == WEAPONSLOT_TYPE_HEAVY || m_lastWeaponSlot == WEAPONSLOT_TYPE_SPECIAL ) ) ) )
                     BitStream.WriteBit ( true );
                 else
                     BitStream.WriteBit ( false );
