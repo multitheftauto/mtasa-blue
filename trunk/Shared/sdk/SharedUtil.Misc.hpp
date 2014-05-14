@@ -637,7 +637,7 @@ void SharedUtil::AddReportLog ( uint uiId, const SString& strText, uint uiAmount
     SString strPathFilename = PathJoin ( GetMTADataPath (), "report.log" );
     MakeSureDirExists ( strPathFilename );
 
-    SString strMessage ( "%u: %s %s - %s\n", uiId, GetTimeString ( true, false ).c_str (), GetReportLogHeaderText ().c_str (), strText.c_str () );
+    SString strMessage ( "%u: %s %s [%05d] - %s\n", uiId, GetTimeString ( true, false ).c_str (), GetReportLogHeaderText ().c_str (), GetCurrentProcessId(), strText.c_str () );
     FileAppend ( strPathFilename, &strMessage.at ( 0 ), strMessage.length () );
     OutputDebugLine ( SStringX ( "[ReportLog] " ) + strMessage );
 }
