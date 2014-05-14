@@ -1385,6 +1385,9 @@ void CGame::QuitPlayer ( CPlayer& Player, CClient::eQuitReasons Reason, bool bSa
 
     // Unregister them from the lightweight sync manager
     m_lightsyncManager.UnregisterPlayer ( &Player );
+
+    // Remove them from their team, since we don't want an invalid element pointer in the team's memberlist (Issue #8230)
+    Player.SetTeam(NULL);
 }
 
 

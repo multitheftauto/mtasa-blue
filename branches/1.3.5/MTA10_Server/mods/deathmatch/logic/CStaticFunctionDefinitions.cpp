@@ -1337,6 +1337,7 @@ bool CStaticFunctionDefinitions::SetElementRotation ( CElement* pElement, const 
                 CVector vZXY = ConvertEulerRotationOrder(vecRotation, argumentRotOrder, EULER_ZXY );
                 SetObjectRotation( pObject, vZXY );
             }
+            break;
         }
         default: return false;
     }
