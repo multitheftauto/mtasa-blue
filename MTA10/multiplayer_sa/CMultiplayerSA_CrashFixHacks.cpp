@@ -631,6 +631,8 @@ void _declspec(naked) HOOK_CrashFix_Misc21 ()
     {
         cmp     ecx, 0x480
         jb      cont  // Skip much code if ecx is low
+        cmp     ecx, 0xfffffff0
+        ja      cont  // Skip much code if ecx is high
 
         // continue standard path
         mov     edx, [ecx+590h]
