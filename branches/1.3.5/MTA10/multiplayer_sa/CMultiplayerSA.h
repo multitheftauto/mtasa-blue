@@ -74,6 +74,7 @@ public:
     void                        DisableBirds                ( bool bDisabled );
     void                        DisableQuickReload          ( bool bDisable );
     void                        DisableCloseRangeDamage     ( bool bDisable );
+    void                        DisableBadDrivebyHitboxes   ( bool bDisable )  { m_bBadDrivebyHitboxesDisabled = bDisable; }
 
     bool                        GetExplosionsDisabled       ();
     void                        DisableExplosions           ( bool bDisabled );
@@ -106,6 +107,7 @@ public:
     void                        SetGameProjectileDestructHandler( GameProjectileDestructHandler * pHandler );
     void                        SetGameModelRemoveHandler       ( GameModelRemoveHandler * pHandler );
     void                        SetGameEntityRenderHandler  ( GameEntityRenderHandler * pHandler );
+    void                        SetDrivebyAnimationHandler  (DrivebyAnimationHandler * pHandler);
 
     void                        AllowMouseMovement          ( bool bAllow );
     void                        DoSoundHacksOnLostFocus     ( bool bLostFocus );
@@ -234,6 +236,7 @@ public:
     CVector                     m_vecAkimboTarget;
     bool                        m_bAkimboTargetUp;
     static char*                ms_PlayerImgCachePtr;
+    bool                        m_bBadDrivebyHitboxesDisabled;
 private:
     bool                        m_bSuspensionEnabled;
     std::vector < char >        m_PlayerImgCache;

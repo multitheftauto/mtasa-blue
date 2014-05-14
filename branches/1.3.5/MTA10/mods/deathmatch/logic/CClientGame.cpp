@@ -122,6 +122,8 @@ CClientGame::CClientGame ( bool bLocalPlay )
     g_pMultiplayer->DisableCloseRangeDamage ( true );
     m_Glitches [ GLITCH_HITANIM ] = false;
     m_Glitches [ GLITCH_FASTSPRINT ] = false;
+    m_Glitches [ GLITCH_BADDRIVEBYHITBOX ] = false;
+    g_pMultiplayer->DisableBadDrivebyHitboxes( true );
 
     // Remove Night & Thermal vision view (if enabled).
     g_pMultiplayer->SetNightVisionEnabled ( false );
@@ -266,6 +268,7 @@ CClientGame::CClientGame ( bool bLocalPlay )
     g_pMultiplayer->SetGameProjectileDestructHandler( CClientGame::StaticGameProjectileDestructHandler );
     g_pMultiplayer->SetGameModelRemoveHandler( CClientGame::StaticGameModelRemoveHandler );
     g_pMultiplayer->SetGameEntityRenderHandler( CClientGame::StaticGameEntityRenderHandler );
+    g_pMultiplayer->SetDrivebyAnimationHandler( CClientGame::StaticDrivebyAnimationHandler );
     g_pGame->SetPreWeaponFireHandler ( CClientGame::PreWeaponFire );
     g_pGame->SetPostWeaponFireHandler ( CClientGame::PostWeaponFire );
     g_pGame->SetTaskSimpleBeHitHandler ( CClientGame::StaticTaskSimpleBeHitHandler );
@@ -3772,6 +3775,11 @@ void CClientGame::StaticTaskSimpleBeHitHandler ( CPedSAInterface* pPedAttacker, 
     g_pClientGame->TaskSimpleBeHitHandler ( pPedAttacker, hitBodyPart, hitBodySide, weaponId );
 }
 
+AnimationId CClientGame::StaticDrivebyAnimationHandler(AnimationId animGroup, AssocGroupId animId)
+{
+    return g_pClientGame->DrivebyAnimationHandler(animGroup, animId);
+}
+
 void CClientGame::DrawRadarAreasHandler ( void )
 {
     m_pRadarAreaManager->DoPulse ();
@@ -6309,7 +6317,7 @@ void CClientGame::OutputServerInfo( void )
 
     {
         SString strEnabledGlitches;
-        const char* szGlitchNames[] = { "Quick reload", "Fast fire", "Fast move", "Crouch bug", "Close damage", "Hit anim", "Fast sprint" };
+        const char* szGlitchNames[] = { "Quick reload", "Fast fire", "Fast move", "Crouch bug", "Close damage", "Hit anim", "Fast sprint", "Bad driveby hitboxes" };
         for( uint i = 0 ; i < NUM_GLITCHES ; i++ )
         {
             if ( IsGlitchEnabled( i ) )
@@ -6445,4 +6453,26 @@ void CClientGame::ChangeFloatPrecision ( bool bHigh )
 bool CClientGame::IsHighFloatPrecision ( void ) const
 {
     return m_uiPrecisionCallDepth != 0;
+}
+
+AnimationId CClientGame::DrivebyAnimationHandler(AnimationId animId, AssocGroupId animGroupId)
+{
+    // Only apply if all clients support the fix
+    if (!GetMiscGameSettings().bAllowBadDrivebyHitboxFix)
+        return animId;
+
+    // If the glitch is enabled, don't apply the fix
+    if (IsGlitchEnabled(GLITCH_BADDRIVEBYHITBOX))
+        return animId;
+
+    // Bad animations are 232 and 236 of assoc group 72
+    if (animGroupId != 72)
+        return animId;
+
+    if (animId == 232)
+        return 235;
+    else if (animId == 236)
+        return 231;
+
+    return animId;
 }

@@ -283,6 +283,9 @@ DWORD JMP_DynamicObject_Cond_Zero = 0x548E98;
 #define HOOKPOS_CGlass_WindowRespondsToCollision           0x71BC40
 DWORD RETURN_CGlass_WindowRespondsToCollision = 0x71BC48;
 
+#define HOOKPOS_CTaskSimplyGangDriveBy__ProcessPed          0x62D5A7
+DWORD RETURN_CTaskSimplyGangDriveBy__ProcessPed = 0x62D5AC;
+
 CPed* pContextSwitchedPed = 0;
 CVector vecCenterOfWorld;
 FLOAT fFalseHeading;
@@ -350,6 +353,8 @@ VehicleCollisionHandler* m_pVehicleCollisionHandler = NULL;
 HeliKillHandler* m_pHeliKillHandler = NULL;
 ObjectDamageHandler* m_pObjectDamageHandler = NULL;
 ObjectBreakHandler* m_pObjectBreakHandler = NULL;
+DrivebyAnimationHandler* m_pDrivebyAnimationHandler = NULL;
+
 CEntitySAInterface * dwSavedPlayerPointer = 0;
 CEntitySAInterface * activeEntityForStreaming = 0; // the entity that the streaming system considers active
 
@@ -488,6 +493,8 @@ void HOOK_CObject_ProcessBreak ();
 void HOOK_CObject_ProcessCollision ();
 void HOOK_CGlass_WindowRespondsToCollision ();
 
+
+void HOOK_CTaskSimpleGangDriveBy__ProcessPed();
 
 CMultiplayerSA::CMultiplayerSA()
 {
@@ -687,6 +694,9 @@ void CMultiplayerSA::InitHooks()
     HookInstall ( HOOKPOS_CObject_ProcessBreak, (DWORD)HOOK_CObject_ProcessBreak, 5 );
     HookInstall ( HOOKPOS_CObject_ProcessCollision, (DWORD)HOOK_CObject_ProcessCollision, 10 );
     HookInstall ( HOOKPOS_CGlass_WindowRespondsToCollision, (DWORD)HOOK_CGlass_WindowRespondsToCollision, 8 );
+
+    // CTaskSimpleGangDriveBy::ProcessPed hook for disabling certain animations
+    HookInstall(HOOKPOS_CTaskSimplyGangDriveBy__ProcessPed, (DWORD) HOOK_CTaskSimpleGangDriveBy__ProcessPed, 5);
 
     // Disable GTA setting g_bGotFocus to false when we minimize
     MemSet ( (void *)ADDR_GotFocus, 0x90, pGameInterface->GetGameVersion () == VERSION_EU_10 ? 6 : 10 );
@@ -1400,7 +1410,7 @@ void CMultiplayerSA::InitHooks()
     // Disable setting the occupied's vehicles health to 75.0f when a burning ped enters it
     // in CFire::ProcessFire
     MemSet((void*)0x53A651, 0x90, 0xA);
-
+    
     InitHooks_CrashFixHacks ();
 
     // Init our 1.3 hooks.
@@ -2157,6 +2167,11 @@ void CMultiplayerSA::SetObjectDamageHandler ( ObjectDamageHandler * pHandler )
 void CMultiplayerSA::SetObjectBreakHandler ( ObjectBreakHandler * pHandler )
 {
     m_pObjectBreakHandler = pHandler;
+}
+
+void CMultiplayerSA::SetDrivebyAnimationHandler(DrivebyAnimationHandler * pHandler)
+{
+    m_pDrivebyAnimationHandler = pHandler;
 }
 
 // What we do here is check if the idle handler has been set
@@ -6493,4 +6508,36 @@ void _declspec(naked) HOOK_CGlass_WindowRespondsToCollision ()
             retn
         }
     }
+}
+
+
+DWORD pProcessedGangDriveBySimpleTask;
+void CTaskSimpleGangDriveBy__ProcessPed()
+{
+    AnimationId *pRequiredAnim = ((AnimationId*) (pProcessedGangDriveBySimpleTask + 0x24));
+    AssocGroupId requiredAnimGroup = *((AssocGroupId*) (pProcessedGangDriveBySimpleTask + 0x28));
+
+    if (m_pDrivebyAnimationHandler != NULL)
+        *pRequiredAnim = m_pDrivebyAnimationHandler(*pRequiredAnim, requiredAnimGroup);
+}
+
+void _declspec(naked) HOOK_CTaskSimpleGangDriveBy__ProcessPed()
+{
+    // esi contains 'this'
+    _asm
+    {
+        mov pProcessedGangDriveBySimpleTask, esi
+        pushad
+    }
+    CTaskSimpleGangDriveBy__ProcessPed();
+    _asm
+    {
+        popad;
+        // Replaced code
+        cmp[esi + 28h], edi;    // .text:0062D5A7
+        jnz 0x62D5C1;           // .text:0062D5AA
+        // Return to original code
+        jmp RETURN_CTaskSimplyGangDriveBy__ProcessPed;
+    }
+     
 }
