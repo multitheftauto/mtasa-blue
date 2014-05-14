@@ -832,12 +832,12 @@ void CCore::ApplyHooks2 ( )
         // executable into memory...
         if ( !CCore::GetSingleton ( ).AreModulesLoaded ( ) )
         {
+            CCore::GetSingleton ( ).SetModulesLoaded ( true );
             CCore::GetSingleton ( ).CreateNetwork ( );
             CCore::GetSingleton ( ).CreateGame ( );
             CCore::GetSingleton ( ).CreateMultiplayer ( );
             CCore::GetSingleton ( ).CreateXML ( );
             CCore::GetSingleton ( ).CreateGUI ( );
-            CCore::GetSingleton ( ).SetModulesLoaded ( true );
         }
     }
 }
