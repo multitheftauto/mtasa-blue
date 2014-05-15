@@ -77,6 +77,11 @@ void CWebView::InjectMouseUp ( int mouseButton )
     m_pWebView->InjectMouseUp ( (Awesomium::MouseButton) mouseButton );
 }
 
+void CWebView::InjectMouseWheel ( int iScrollVert, int iScrollHorz )
+{
+    m_pWebView->InjectMouseWheel ( iScrollVert, iScrollHorz );
+}
+
 void CWebView::InjectKeyboardEvent ( const SString& strKey, bool bKeyDown, bool bCharacter )
 {
     // Hack fix
@@ -96,7 +101,6 @@ void CWebView::InjectKeyboardEvent ( const SString& strKey, bool bKeyDown, bool 
             return;
 
         keyboardEvent.virtual_key_code = pBindableKey->ulCode;
-        //keyboardEvent.native_key_code = pBindableKey->ulCode;
         keyboardEvent.type = bKeyDown ? Awesomium::WebKeyboardEvent::kTypeKeyDown : Awesomium::WebKeyboardEvent::kTypeKeyUp;
     }
     else
@@ -139,7 +143,7 @@ void CWebView::OnFinishLoadingFrame ( Awesomium::WebView* pCaller, int64 iFrameI
 //        Static Javascript methods: triggerEvent                 //
 //                                                                //
 ////////////////////////////////////////////////////////////////////
-void CWebView::Javascript_triggerEvent(Awesomium::WebView* pWebView, const Awesomium::JSArray& args)
+void CWebView::Javascript_triggerEvent ( Awesomium::WebView* pWebView, const Awesomium::JSArray& args )
 {
     // Convert JSArray to string array
     std::vector<SString> stringArray;
@@ -153,29 +157,3 @@ void CWebView::Javascript_triggerEvent(Awesomium::WebView* pWebView, const Aweso
     SString strEventName = CWebCore::ToSString ( args[0].ToString() );
     CModManager::GetSingleton().GetCurrentMod ()->WebsiteTriggerEventHandler ( strEventName, stringArray ); // Does anybody know a better way to trigger an event in the deathmatch module?
 }
-
-
-////////////////////////////////////////////////////////////////////
-//                                                                //
-//      Implementation: CefRenderHandler::OnPaint                 //
-// http://magpcss.org/ceforum/apidocs3/projects/(default)/CefRenderHandler.html#OnPaint(CefRefPtr%3CCefBrowser%3E,PaintElementType,constRectList&,constvoid*,int,int) //
-//                                                                //
-////////////////////////////////////////////////////////////////////
-/*void CWebView::OnPaint(CefRefPtr<CefBrowser> browser, CefRenderHandler::PaintElementType paintType, const CefRenderHandler::RectList& dirtyRects, const void* buffer, int width, int height)
-{
-    if (!m_pD3DSurface)
-        return;
-
-    D3DLOCKED_RECT LockedRect;
-    D3DSURFACE_DESC SurfaceDesc;
-    
-    // First, lock the surface and request some information
-    m_pD3DSurface->GetDesc(&SurfaceDesc);
-    m_pD3DSurface->LockRect(&LockedRect, NULL, 0);
-
-    // Paint buffer to surface (amount of pixels = width * height * 32bit color (ARGB))
-    memcpy(LockedRect.pBits, buffer, width * height * 4);
-    
-    // Finally, unlock the surface
-    m_pD3DSurface->UnlockRect();
-}*/

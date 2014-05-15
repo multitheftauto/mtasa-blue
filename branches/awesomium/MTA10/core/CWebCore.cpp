@@ -56,9 +56,8 @@ void CWebCore::Update ()
 
 eURLState CWebCore::GetURLState ( const SString& strURL )
 {
-    // Todo: Implement wildcards
     google::dense_hash_map<SString, bool>::iterator iter = m_Whitelist.find ( strURL );
-    if ( iter != m_Whitelist.end() )
+    if ( iter != m_Whitelist.end () )
     {
         if ( iter->second == true )
             return eURLState::WEBPAGE_ALLOWED;
@@ -85,7 +84,7 @@ void CWebCore::InitialiseWhiteAndBlacklist ()
     static SString whitelist[] = { "google.com", "youtube.com", "reddit.com", "mtasa.com", "multitheftauto.com", "woovie.net" };
 
     // Hardcoded blacklist
-    static SString blacklist[] = { "nobrain.dk", "sbx320.net" };
+    static SString blacklist[] = { "nobrain.dk" };
 
     // Blacklist or whitelist URLs now
     for ( unsigned int i = 0; i < sizeof(whitelist) / sizeof(SString); ++i )

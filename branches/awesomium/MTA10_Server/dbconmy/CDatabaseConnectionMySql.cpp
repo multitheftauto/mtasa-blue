@@ -90,6 +90,7 @@ CDatabaseConnectionMySql::CDatabaseConnectionMySql ( CDatabaseType* pManager, co
 
     SString strHostname;
     SString strDatabaseName;
+    SString strCharset;
     int iPort = 0;
     SString strUnixSocket;
     ulong ulClientFlags = 0;
@@ -101,12 +102,15 @@ CDatabaseConnectionMySql::CDatabaseConnectionMySql ( CDatabaseType* pManager, co
     argMap.Get ( "host", strHostname, "localhost" );
     argMap.Get ( "port", iPort, 0 );
     argMap.Get ( "unix_socket", strUnixSocket, "" );
+    argMap.Get ( "charset", strCharset, "" );
 
     m_handle = mysql_init ( NULL );
     if ( m_handle )
     {
         my_bool reconnect = m_bAutomaticReconnect;
         mysql_options ( m_handle, MYSQL_OPT_RECONNECT, &reconnect );
+        if ( !strCharset.empty() )
+            mysql_options( m_handle, MYSQL_SET_CHARSET_NAME, strCharset );
 
         if ( mysql_real_connect ( m_handle, strHostname, strUsername, strPassword, strDatabaseName, iPort, strUnixSocket, ulClientFlags ) )
             m_bOpened = true;

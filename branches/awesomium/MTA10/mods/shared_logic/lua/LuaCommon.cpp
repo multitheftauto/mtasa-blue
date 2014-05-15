@@ -116,7 +116,7 @@ void lua_pushobject ( lua_State* luaVM, const char* szClass, void* pObject )
         lua_rawget ( luaVM, LUA_REGISTRYINDEX );
 
         assert ( lua_istable ( luaVM, -1 ) );
-
+    
         // First we want to check if we have a userdata for this already
         lua_pushlightuserdata ( luaVM, pObject );
         lua_rawget ( luaVM, -2 );
@@ -145,13 +145,13 @@ void lua_pushobject ( lua_State* luaVM, const char* szClass, void* pObject )
     lua_pushlightuserdata ( luaVM, pObject );
 }
 
-void lua_pushvector ( lua_State* luaVM, CVector& vector )
+void lua_pushvector ( lua_State* luaVM, const CVector& vector )
 {
     CLuaVector3D* pVector = new CLuaVector3D ( vector );
     lua_pushobject ( luaVM, "Vector3", ( void* ) reinterpret_cast < unsigned int * > ( pVector->GetScriptID () ) );
 }
 
-void lua_pushmatrix ( lua_State* luaVM, CMatrix& matrix )
+void lua_pushmatrix ( lua_State* luaVM, const CMatrix& matrix )
 {
     CLuaMatrix* pMatrix = new CLuaMatrix ( matrix );
     lua_pushobject ( luaVM, "Matrix", ( void* ) reinterpret_cast < unsigned int * > ( pMatrix->GetScriptID () ) );

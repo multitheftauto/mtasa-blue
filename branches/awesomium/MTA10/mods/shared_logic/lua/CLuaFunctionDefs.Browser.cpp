@@ -194,6 +194,29 @@ int CLuaFunctionDefs::InjectBrowserMouseUp ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaFunctionDefs::InjectBrowserMouseWheel ( lua_State* luaVM )
+{
+//  bool injectMouseWheel ( browser webBrowser, int scrollVertical, int scrollHorizontal )
+    CClientWebBrowser* pWebBrowser; int iScrollVert; int iScrollHorz;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pWebBrowser );
+    argStream.ReadNumber ( iScrollVert );
+    argStream.ReadNumber ( iScrollHorz );
+
+    if ( !argStream.HasErrors() )
+    {
+        pWebBrowser->InjectMouseWheel ( iScrollVert, iScrollHorz );
+        lua_pushboolean ( luaVM, true );
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
 int CLuaFunctionDefs::InjectBrowserKeyDown ( lua_State* luaVM )
 {
 //  bool injectBrowserKeyDown ( browser webBrowser, string key )
@@ -297,49 +320,6 @@ int CLuaFunctionDefs::GetBrowserURL ( lua_State* luaVM )
         pWebBrowser->GetURL ( strURL );
 
         lua_pushstring ( luaVM, strURL );
-        return 1;
-    }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
-
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-int CLuaFunctionDefs::SetBrowserScrollPosition ( lua_State* luaVM )
-{
-//  bool setBrowserScrollPosition ( browser webBrowser, int scrollX, int scrollY )
-    CClientWebBrowser* pWebBrowser; int iScrollX; int iScrollY;
-
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pWebBrowser );
-    argStream.ReadNumber ( iScrollX );
-    argStream.ReadNumber ( iScrollY );
-
-    if ( !argStream.HasErrors () )
-    {
-        //pWebBrowser->SetScrollPosition(iScrollX, iScrollY);
-        lua_pushboolean ( luaVM, true );
-        return 1;
-    }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
-
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-int CLuaFunctionDefs::GetBrowserScrollPosition ( lua_State* luaVM )
-{
-//  int, int getBrowserScrollPosition ( browser webBrowser )
-    CClientWebBrowser* pWebBrowser;
-
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pWebBrowser );
-
-    if ( !argStream.HasErrors () )
-    {
-        // Todo
         return 1;
     }
     else

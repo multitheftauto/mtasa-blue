@@ -232,12 +232,15 @@ bool CLuaArguments::Call ( CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFuncti
     if ( iret == LUA_ERRRUN || iret == LUA_ERRMEM )
     {
         SString strRes = ConformResourcePath ( lua_tostring( luaVM, -1 ) );
-        
+
+        // Split the error message
         vector <SString> vecSplit;
         strRes.Split ( ":", vecSplit );
-        
+
+        // If it consists of 3 parts
         if ( vecSplit.size ( ) >= 3 )
         {
+            // Pass it to a special LogError function (because with normal Lua errors, the other one won't be able to get the file and line of the error)
             SString strFile = vecSplit[0];
             int     iLine   = atoi ( vecSplit[1].c_str ( ) );
             SString strMsg  = vecSplit[2].substr ( 1 );

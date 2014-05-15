@@ -18,6 +18,7 @@
 #include "StdInc.h"
 
 extern CGameSA* pGame;
+bool g_bVehiclePointerInvalid = false;
 
 #include "gamesa_renderware.h"
 namespace
@@ -110,6 +111,7 @@ CVehicleSA::CVehicleSA( eVehicleTypes dwModelID, unsigned char ucVariation, unsi
     MemSetFast( (void *)VAR_CVehicle_Variation1, ucVariation, 1 );
     MemSetFast( (void *)VAR_CVehicle_Variation2, ucVariation2, 1 );
     
+    g_bVehiclePointerInvalid = true;    // m_pVehicle can have invalid value during CAutomobile constructor
     DWORD dwFunc = FUNC_CCarCtrlCreateCarForScript;
     _asm
     {
@@ -205,6 +207,7 @@ void CVehicleSA::Init ( void )
 
     // Store our CVehicleSA pointer in the vehicle's time of creation member (as it won't get modified later and as far as I know it isn't used for something important)
     GetVehicleInterface ()->m_pVehicle = this;
+    g_bVehiclePointerInvalid = false;
 
     // Unlock doors as they spawn randomly with locked doors
     LockDoors ( false );

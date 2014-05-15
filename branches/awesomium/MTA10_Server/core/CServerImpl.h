@@ -73,6 +73,7 @@ public:
 
 private:
     void                MainLoop            ( void );
+    bool                CheckLibVersions    ( void );
 
     bool                ParseArguments      ( int iArgumentCount, char* szArguments [] );
 
@@ -107,9 +108,6 @@ private:
     CHAR_INFO           m_ScrnBuffer[256];
 
     CThreadCommandQueue*    m_pThreadCommandQueue;
-#else
-    WINDOW*             m_wndMenu;
-    WINDOW*             m_wndInput;
 #endif
 };
 

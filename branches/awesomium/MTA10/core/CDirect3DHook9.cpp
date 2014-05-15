@@ -74,12 +74,12 @@ IDirect3D9* CDirect3DHook9::API_Direct3DCreate9 ( UINT SDKVersion )
     // executable into memory...
     if ( !CCore::GetSingleton ( ).AreModulesLoaded ( ) )
     {
+        CCore::GetSingleton ( ).SetModulesLoaded ( true );
         CCore::GetSingleton ( ).CreateNetwork ( );
         CCore::GetSingleton ( ).CreateGame ( );
         CCore::GetSingleton ( ).CreateMultiplayer ( );
         CCore::GetSingleton ( ).CreateXML ( );
         CCore::GetSingleton ( ).CreateGUI ( );
-        CCore::GetSingleton ( ).SetModulesLoaded ( true );
     }
 
     // Create our interface.

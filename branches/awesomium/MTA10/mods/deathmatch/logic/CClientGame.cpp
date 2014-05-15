@@ -122,6 +122,8 @@ CClientGame::CClientGame ( bool bLocalPlay )
     g_pMultiplayer->DisableCloseRangeDamage ( true );
     m_Glitches [ GLITCH_HITANIM ] = false;
     m_Glitches [ GLITCH_FASTSPRINT ] = false;
+    m_Glitches [ GLITCH_BADDRIVEBYHITBOX ] = false;
+    g_pMultiplayer->DisableBadDrivebyHitboxes( true );
 
     // Remove Night & Thermal vision view (if enabled).
     g_pMultiplayer->SetNightVisionEnabled ( false );
@@ -270,6 +272,7 @@ CClientGame::CClientGame ( bool bLocalPlay )
     g_pMultiplayer->SetGameModelRemoveHandler( CClientGame::StaticGameModelRemoveHandler );
     g_pMultiplayer->SetGameEntityRenderHandler( CClientGame::StaticGameEntityRenderHandler );
     g_pMultiplayer->SetFxSystemDestructionHandler ( CClientGame::StaticFxSystemDestructionHandler );
+    g_pMultiplayer->SetDrivebyAnimationHandler( CClientGame::StaticDrivebyAnimationHandler );
     g_pGame->SetPreWeaponFireHandler ( CClientGame::PreWeaponFire );
     g_pGame->SetPostWeaponFireHandler ( CClientGame::PostWeaponFire );
     g_pGame->SetTaskSimpleBeHitHandler ( CClientGame::StaticTaskSimpleBeHitHandler );
@@ -1950,7 +1953,7 @@ void CClientGame::UpdatePlayerWeapons ( void )
             if ( ( BitStream.Version () >= 0x44 && m_lastWeaponSlot == WEAPONSLOT_TYPE_THROWN ) || BitStream.Version () >= 0x4D )
             {
                 CWeapon* pLastWeapon = m_pLocalPlayer->GetWeapon ( m_lastWeaponSlot );
-                if ( pLastWeapon && pLastWeapon->GetAmmoTotal () == 0 && m_lastWeaponSlot == WEAPONSLOT_TYPE_THROWN )
+                if ( pLastWeapon && pLastWeapon->GetAmmoTotal () == 0 && ( m_lastWeaponSlot == WEAPONSLOT_TYPE_THROWN || ( BitStream.Version() >= 0x5A && ( m_lastWeaponSlot == WEAPONSLOT_TYPE_HEAVY || m_lastWeaponSlot == WEAPONSLOT_TYPE_SPECIAL ) ) ) )
                     BitStream.WriteBit ( true );
                 else
                     BitStream.WriteBit ( false );
@@ -3794,6 +3797,11 @@ void CClientGame::StaticFxSystemDestructionHandler ( void * pFxSAInterface )
     g_pClientGame->GetManager()->GetEffectManager()->SAEffectDestroyed( pFxSAInterface );
 }
 
+AnimationId CClientGame::StaticDrivebyAnimationHandler(AnimationId animGroup, AssocGroupId animId)
+{
+    return g_pClientGame->DrivebyAnimationHandler(animGroup, animId);
+}
+
 void CClientGame::DrawRadarAreasHandler ( void )
 {
     m_pRadarAreaManager->DoPulse ();
@@ -4210,14 +4218,6 @@ bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
         {
             CClientPlayer * pDamagedPlayer = static_cast < CClientPlayer * > ( pDamagedPed );
 
-            // Is this is a remote player?
-            if ( !pDamagedPed->IsLocalPlayer () )
-            {  
-                // Don't allow GTA to start the choking task
-                if ( weaponUsed == WEAPONTYPE_TEARGAS || weaponUsed == WEAPONTYPE_SPRAYCAN || weaponUsed == WEAPONTYPE_EXTINGUISHER )
-                    return false;
-            }
-
             // Do we have an inflicting entity?
             if ( pInflictingEntity )
             {
@@ -4304,6 +4304,14 @@ bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
 
             bool bIsBeingShotWhilstAiming = ( weaponUsed >= WEAPONTYPE_PISTOL && weaponUsed <= WEAPONTYPE_MINIGUN && pDamagedPed->IsUsingGun () );
             bool bOldBehaviour = !IsGlitchEnabled( GLITCH_HITANIM );
+            
+            // Is this is a remote player?
+            if (!pDamagedPed->IsLocalPlayer())
+            {
+               // Don't allow GTA to start the choking task
+               if (weaponUsed == WEAPONTYPE_TEARGAS || weaponUsed == WEAPONTYPE_SPRAYCAN || weaponUsed == WEAPONTYPE_EXTINGUISHER)
+                    return false;
+            }
 
             // Check if their health or armor is locked, and if so prevent applying the damage locally
             if ( pDamagedPed->IsHealthLocked () || pDamagedPed->IsArmorLocked () )
@@ -4678,9 +4686,13 @@ bool CClientGame::ObjectBreakHandler ( CObjectSAInterface* pObjectInterface, CEn
         // Get our object and client object
         CObject * pObject = g_pGame->GetPools ( )->GetObjectA( (DWORD *)pObjectInterface );
         CClientObject * pClientObject = m_pManager->GetObjectManager ( )->GetSafe( pObject );
+
         // Is our client vehicle valid?
         if ( pClientObject )
         {
+            if ( !pClientObject->IsBreakable ( false ) )
+                return false;
+
             // Apply to MTA's "internal storage", too
             pClientObject->SetHealth ( 0.0f );
 
@@ -6362,7 +6374,7 @@ void CClientGame::OutputServerInfo( void )
 
     {
         SString strEnabledGlitches;
-        const char* szGlitchNames[] = { "Quick reload", "Fast fire", "Fast move", "Crouch bug", "Close damage", "Hit anim", "Fast sprint" };
+        const char* szGlitchNames[] = { "Quick reload", "Fast fire", "Fast move", "Crouch bug", "Close damage", "Hit anim", "Fast sprint", "Bad driveby hitboxes" };
         for( uint i = 0 ; i < NUM_GLITCHES ; i++ )
         {
             if ( IsGlitchEnabled( i ) )
@@ -6498,6 +6510,28 @@ void CClientGame::ChangeFloatPrecision ( bool bHigh )
 bool CClientGame::IsHighFloatPrecision ( void ) const
 {
     return m_uiPrecisionCallDepth != 0;
+}
+
+AnimationId CClientGame::DrivebyAnimationHandler(AnimationId animId, AssocGroupId animGroupId)
+{
+    // Only apply if all clients support the fix
+    if (!GetMiscGameSettings().bAllowBadDrivebyHitboxFix)
+        return animId;
+
+    // If the glitch is enabled, don't apply the fix
+    if (IsGlitchEnabled(GLITCH_BADDRIVEBYHITBOX))
+        return animId;
+
+    // Bad animations are 232 and 236 of assoc group 72
+    if (animGroupId != 72)
+        return animId;
+
+    if (animId == 232)
+        return 235;
+    else if (animId == 236)
+        return 231;
+
+    return animId;
 }
 
 bool CClientGame::TriggerBrowserRequestResultEvent ( bool bAllowed )

@@ -73,6 +73,12 @@
     <Filter Include="Resource Files\output">
       <UniqueIdentifier>{4a26eed3-0f7c-400a-b106-efff6f2b1bb6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\logic\oopdefs">
+      <UniqueIdentifier>{3769e3ec-6cde-45c2-9bf0-b30dd16010ec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\logic\oopdefs">
+      <UniqueIdentifier>{802fad09-80e2-4684-80cf-b3145bd3809c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CServer.cpp">
@@ -878,6 +884,30 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Shared\animation\CPositionRotationAnimation.cpp">
       <Filter>Source Files\shared\animation</Filter>
+    </ClCompile>
+    <ClCompile Include="logic\lua\CLuaMatrix.cpp">
+      <Filter>Source Files\logic\lua</Filter>
+    </ClCompile>
+    <ClCompile Include="logic\lua\CLuaVector.cpp">
+      <Filter>Source Files\logic\lua</Filter>
+    </ClCompile>
+    <ClCompile Include="logic\lua\oopdefs\CLuaOOPFunctionDefs.Camera.cpp">
+      <Filter>Source Files\logic\oopdefs</Filter>
+    </ClCompile>
+    <ClCompile Include="logic\lua\oopdefs\CLuaOOPFunctionDefs.Element.cpp">
+      <Filter>Source Files\logic\oopdefs</Filter>
+    </ClCompile>
+    <ClCompile Include="logic\lua\oopdefs\CLuaOOPFunctionDefs.Ped.cpp">
+      <Filter>Source Files\logic\oopdefs</Filter>
+    </ClCompile>
+    <ClCompile Include="logic\lua\oopdefs\CLuaOOPFunctionDefs.Vehicle.cpp">
+      <Filter>Source Files\logic\oopdefs</Filter>
+    </ClCompile>
+    <ClCompile Include="logic\luadefs\CLuaMatrixDefs.cpp">
+      <Filter>Source Files\logic\luadefs</Filter>
+    </ClCompile>
+    <ClCompile Include="logic\luadefs\CLuaVectorDefs.cpp">
+      <Filter>Source Files\logic\luadefs</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1717,6 +1747,15 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Shared\animation\TInterpolation.h">
       <Filter>Header Files\shared\animation</Filter>
+    </ClInclude>
+    <ClInclude Include="logic\lua\oopdefs\CLuaOOPDefs.h">
+      <Filter>Header Files\logic\oopdefs</Filter>
+    </ClInclude>
+    <ClInclude Include="logic\luadefs\CLuaMatrixDefs.h">
+      <Filter>Header Files\logic\luadefs</Filter>
+    </ClInclude>
+    <ClInclude Include="logic\luadefs\CLuaVectorDefs.h">
+      <Filter>Header Files\logic\luadefs</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

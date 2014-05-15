@@ -124,6 +124,9 @@ struct SAclRequest;
 #include "luadefs/CLuaVoiceDefs.h"
 #include "luadefs/CLuaXMLDefs.h"
 #include "luadefs/CLuaClassDefs.h"
+#include "luadefs/CLuaVectorDefs.h"
+#include "luadefs/CLuaMatrixDefs.h"
+#include "lua/oopdefs/CLuaOOPDefs.h"
 
 // Lua includes
 #include "lua/LuaCommon.h"

@@ -177,9 +177,7 @@ int CLuaElementDefs::cloneElement ( lua_State* luaVM )
     argStream.ReadUserData ( pElement );
     if ( !argStream.HasErrors () )
     {
-        argStream.ReadNumber ( vecPosition.fX, pElement->GetPosition ().fX );
-        argStream.ReadNumber ( vecPosition.fY, pElement->GetPosition ().fY );
-        argStream.ReadNumber ( vecPosition.fZ, pElement->GetPosition ().fZ );
+        argStream.ReadVector3D ( vecPosition, pElement->GetPosition ( ) );
         argStream.ReadBool ( bCloneChildren, false );
     }
 
@@ -864,12 +862,8 @@ int CLuaElementDefs::setElementAttachedOffsets ( lua_State* luaVM )
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pElement );
-    argStream.ReadNumber ( vecPosition.fX, 0 );
-    argStream.ReadNumber ( vecPosition.fY, 0  );
-    argStream.ReadNumber ( vecPosition.fZ, 0  );
-    argStream.ReadNumber ( vecRotation.fX, 0  );
-    argStream.ReadNumber ( vecRotation.fY, 0  );
-    argStream.ReadNumber ( vecRotation.fZ, 0  );
+    argStream.ReadVector3D( vecPosition, vecPosition );
+    argStream.ReadVector3D( vecRotation, vecRotation );
 
     if ( !argStream.HasErrors () )
     {
@@ -1329,13 +1323,17 @@ int CLuaElementDefs::setElementPosition ( lua_State* luaVM )
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pElement );
-    argStream.ReadNumber ( vecPosition.fX );
-    argStream.ReadNumber ( vecPosition.fY );
-    // (we don't need the third argument if it's a radar area)
     if ( !argStream.HasErrors () && pElement->GetType () == CElement::RADAR_AREA )
-        argStream.ReadNumber ( vecPosition.fZ, 0 );
+    {
+        // radar areas only take x and y
+        argStream.ReadNumber ( vecPosition.fX );
+        argStream.ReadNumber ( vecPosition.fY );
+    }
     else
-        argStream.ReadNumber ( vecPosition.fZ );
+    {
+        argStream.ReadVector3D ( vecPosition );
+    }
+
     argStream.ReadBool ( bWarp, true );
 
     if ( !argStream.HasErrors () )
@@ -1362,9 +1360,7 @@ int CLuaElementDefs::setElementRotation ( lua_State* luaVM )
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pElement );
-    argStream.ReadNumber ( vecRotation.fX );
-    argStream.ReadNumber ( vecRotation.fY );
-    argStream.ReadNumber ( vecRotation.fZ );
+    argStream.ReadVector3D ( vecRotation );
     argStream.ReadString ( strRotationOrder, "default" );
     argStream.ReadBool ( bNewWay, false );
 
@@ -1392,9 +1388,7 @@ int CLuaElementDefs::setElementVelocity ( lua_State* luaVM )
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pElement );
-    argStream.ReadNumber ( vecVelocity.fX );
-    argStream.ReadNumber ( vecVelocity.fY );
-    argStream.ReadNumber ( vecVelocity.fZ );
+    argStream.ReadVector3D ( vecVelocity );
 
     if ( !argStream.HasErrors () )
     {
@@ -1447,10 +1441,8 @@ int CLuaElementDefs::setElementInterior ( lua_State* luaVM )
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pElement );
     argStream.ReadNumber ( uiInterior );
-    argStream.ReadNumber ( vecPosition.fX, 0 );
-    argStream.ReadNumber ( vecPosition.fY, 0 );
-    bool bSetPosition = argStream.NextCouldBeNumber ();
-    argStream.ReadNumber ( vecPosition.fZ, 0 );
+    bool bSetPosition = argStream.NextIsVector3D ();
+    argStream.ReadVector3D ( vecPosition, vecPosition );
 
     if ( !argStream.HasErrors () )
     {
@@ -1502,12 +1494,8 @@ int CLuaElementDefs::attachElements ( lua_State* luaVM )
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pElement );
     argStream.ReadUserData ( pAttachedToElement );
-    argStream.ReadNumber ( vecPosition.fX, 0 );
-    argStream.ReadNumber ( vecPosition.fY, 0 );
-    argStream.ReadNumber ( vecPosition.fZ, 0 );
-    argStream.ReadNumber ( vecRotation.fX, 0 );
-    argStream.ReadNumber ( vecRotation.fY, 0 );
-    argStream.ReadNumber ( vecRotation.fZ, 0 );
+    argStream.ReadVector3D ( vecPosition, vecPosition );
+    argStream.ReadVector3D ( vecRotation, vecRotation );
 
     if ( !argStream.HasErrors () )
     {

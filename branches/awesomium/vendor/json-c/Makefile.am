@@ -3,7 +3,7 @@ include Makefile.am.inc
 EXTRA_DIST = README.html README-WIN32.html config.h.win32 doc json-c.vcproj
 SUBDIRS = . tests
 
-lib_LTLIBRARIES = libjson-c.la 
+noinst_LTLIBRARIES = libjson-c.la 
 
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = json-c.pc

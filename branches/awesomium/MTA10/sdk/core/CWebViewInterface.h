@@ -24,6 +24,7 @@ public:
     virtual void InjectMouseMove    ( int iPosX, int iPosY ) = 0;
     virtual void InjectMouseDown    ( int mouseButton ) = 0;
     virtual void InjectMouseUp      ( int mouseButton ) = 0;
+    virtual void InjectMouseWheel   ( int iScrollVert, int iScrollHorz ) = 0;
     virtual void InjectKeyboardEvent( const SString& strKey, bool bKeyDown = true, bool bCharacter = false ) = 0;
 
 };

@@ -29,6 +29,7 @@ public:
     {
         m_iPollInterval = TICKS_FROM_MINUTES( 60 );
         m_strURL = HQCOMMS_URL;
+        m_strCrashInfoFilename = "dumps/server_pending_upload.log";
     }
 
     //
@@ -41,21 +42,21 @@ public:
         {
             m_CheckTimer.Reset();
             m_Stage = HQCOMMS_STAGE_QUERY;
-            int iMinClientAutoUpdate     = g_pGame->GetConfig()->GetMinClientVersionAutoUpdate();
 
-            if ( iMinClientAutoUpdate > 0 )
-            {
-                SString strUrlParams;
-                strUrlParams += SString( "?ip=%s", *g_pGame->GetConfig()->GetServerIP() );
-                strUrlParams += SString( "&gport=%d", g_pGame->GetConfig()->GetServerPort() );
-                strUrlParams += SString( "&version=%s", *CStaticFunctionDefinitions::GetVersionSortable() );
-                strUrlParams += SString( "&minclientautoupdate=%d", iMinClientAutoUpdate );
-                strUrlParams += SString( "&badscriptrev=%d", m_iPrevBadFileHashesRev );
+            SString strUrlParams;
+            strUrlParams += SString( "?ip=%s", *g_pGame->GetConfig()->GetServerIP() );
+            strUrlParams += SString( "&gport=%d", g_pGame->GetConfig()->GetServerPort() );
+            strUrlParams += SString( "&version=%s", *CStaticFunctionDefinitions::GetVersionSortable() );
+            strUrlParams += SString( "&minclientautoupdate=%d", g_pGame->GetConfig()->GetMinClientVersionAutoUpdate() );
+            strUrlParams += SString( "&badscriptrev=%d", m_iPrevBadFileHashesRev );
 
-                // Send request
-                this->AddRef();     // Keep object alive
-                GetDownloadManager()->QueueFile( m_strURL + strUrlParams, NULL, 0, "", 0, false, this, StaticProgressCallback, false, 1 );
-            }
+            SString strCrashInfo;
+            FileLoad( m_strCrashInfoFilename, strCrashInfo );
+            strUrlParams += SString( "&crashinfosize=%d", strCrashInfo.length() );
+
+            // Send request
+            this->AddRef();     // Keep object alive
+            GetDownloadManager()->QueueFile( m_strURL + strUrlParams, NULL, 0, strCrashInfo, strCrashInfo.length(), true, this, StaticProgressCallback, false, 1 );
         }
     }
 
@@ -87,6 +88,7 @@ public:
             ProcessMinClientVersion( argMap );
             ProcessMessage( argMap );
             ProcessBadFileHashes( argMap );
+            ProcessCrashInfo( argMap );
         }
         else
         if ( iError )
@@ -100,7 +102,8 @@ public:
     {
         int iPollInterval;
         argMap.Get( "PollInterval", iPollInterval, m_iPollInterval );
-        m_iPollInterval = Max( TICKS_FROM_MINUTES( 5 ), iPollInterval );
+        if ( iPollInterval )
+            m_iPollInterval = Max( TICKS_FROM_MINUTES( 5 ), iPollInterval );
     }
 
     // Auto update of min client check
@@ -150,6 +153,17 @@ public:
         }
     }
 
+    // Got crashinfo recpt
+    void ProcessCrashInfo( const CArgMap& argMap )
+    {
+        int iGotCrashInfo;
+        argMap.Get( "GotCrashInfo", iGotCrashInfo );
+        if ( iGotCrashInfo )
+        {
+            FileDelete( m_strCrashInfoFilename );
+        }
+    }
+
 
     //
     // Get http downloader used for hq comms etc.
@@ -168,4 +182,5 @@ protected:
     CElapsedTime    m_CheckTimer;
     SString         m_strURL;
     SString         m_strPrevMessage;
+    SString         m_strCrashInfoFilename;
 };

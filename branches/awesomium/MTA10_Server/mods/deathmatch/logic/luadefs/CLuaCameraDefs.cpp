@@ -30,7 +30,7 @@ void CLuaCameraDefs::LoadFunctions ( void )
 
 int CLuaCameraDefs::getCameraMatrix ( lua_State* luaVM )
 {
-//  float cameraX, float cameraY, float cameraZ, float targetX, float targetY, float targetZ, float roll, float fov setCameraMatrix ( player thePlayer )
+//  float cameraX, float cameraY, float cameraZ, float targetX, float targetY, float targetZ, float roll, float fov getCameraMatrix ( player thePlayer )
     CPlayer* pPlayer;
 
     CScriptArgReader argStream ( luaVM );
@@ -118,18 +118,15 @@ int CLuaCameraDefs::setCameraMatrix ( lua_State* luaVM )
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pPlayer );
-    argStream.ReadNumber ( vecPosition.fX );
-    argStream.ReadNumber ( vecPosition.fY );
-    argStream.ReadNumber ( vecPosition.fZ );
-    if ( argStream.NextIsNumber () && argStream.NextIsNumber ( 1 ) && argStream.NextIsNumber ( 2 ) )
+    argStream.ReadVector3D ( vecPosition );
+    if ( argStream.NextIsVector3D ( ) )
     {
-        argStream.ReadNumber ( vecLookAt.fX );
-        argStream.ReadNumber ( vecLookAt.fY );
-        argStream.ReadNumber ( vecLookAt.fZ );
+        argStream.ReadVector3D(vecLookAt);
         pvecLookAt = &vecLookAt;
     }
     else
         argStream.m_iIndex += 3;
+
     argStream.ReadNumber ( fRoll, 0.0f );
     argStream.ReadNumber ( fFOV, 70.0f );
 

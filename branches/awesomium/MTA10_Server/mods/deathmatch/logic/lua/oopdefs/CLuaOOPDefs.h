@@ -1,0 +1,35 @@
+/*****************************************************************************
+*
+*  PROJECT:     Multi Theft Auto v1.0
+*               (Shared logic for modifications)
+*  LICENSE:     See LICENSE in the top level directory
+*  FILE:        mods/shared_logic/lua/CLuaFunctionDefs.h
+*  PURPOSE:     Lua function definitions class header
+*  DEVELOPERS:  Stanislav Bobrov <lil_toady@hotmail.com>
+*
+*****************************************************************************/
+
+class CLuaFunctionDefinitions;
+
+#ifndef __CLUAOOPDEFINITIONS_H
+#define __CLUAOOPDEFINITIONS_H
+
+#include "../LuaCommon.h"
+#include "../CLuaMain.h"
+
+class CRegisteredCommands;
+
+#define LUA_DECLARE(x) static int x ( lua_State * luaVM );
+
+class CLuaOOPDefs : public CLuaDefs
+{
+public:
+    LUA_DECLARE ( SetPedOccupiedVehicle );
+
+    LUA_DECLARE ( GetElementPosition );
+    LUA_DECLARE ( GetElementRotation );
+
+    LUA_DECLARE ( GetCameraMatrix );
+};
+
+#endif

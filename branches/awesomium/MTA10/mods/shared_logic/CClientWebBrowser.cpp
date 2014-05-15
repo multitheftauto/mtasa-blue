@@ -50,16 +50,6 @@ void CClientWebBrowser::SetRenderingPaused ( bool bPaused )
     m_pWebView->SetRenderingPaused ( bPaused );
 }
 
-/*void CClientWebBrowser::GetScrollPosition(int& iScrollX, int& iScrollY)
-{
-    g_pCore->GetWebCore ()->GetScrollPosition(GetWebCore Item(), iScrollX, iScrollY);
-}
-
-void CClientWebBrowser::SetScrollPosition(int iScrollX, int iScrollY)
-{
-    g_pCore->GetWebCore ()->SetScrollPosition(GetWebCore Item(), iScrollX, iScrollY);
-}*/
-
 void CClientWebBrowser::InjectMouseMove ( int iPosX, int iPosY )
 {
     m_pWebView->InjectMouseMove ( iPosX, iPosY );
@@ -73,6 +63,11 @@ void CClientWebBrowser::InjectMouseDown ( int mouseButton )
 void CClientWebBrowser::InjectMouseUp ( int mouseButton )
 {
     m_pWebView->InjectMouseUp ( mouseButton );
+}
+
+void CClientWebBrowser::InjectMouseWheel ( int iScrollVert, int iScrollHorz )
+{
+    m_pWebView->InjectMouseWheel ( iScrollVert, iScrollHorz );
 }
 
 void CClientWebBrowser::InjectKeyboardEvent ( const SString& strKey, bool bKeyDown, bool bCharacter )

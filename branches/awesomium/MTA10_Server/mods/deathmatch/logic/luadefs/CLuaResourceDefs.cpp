@@ -676,7 +676,6 @@ int CLuaResourceDefs::setResourceInfo ( lua_State* luaVM )
         if ( pLuaMain )
         {
             CResource* pThisResource = pLuaMain->GetResource ();
-            CResource* pResource = lua_toresource ( luaVM, 1 );
             if ( pResource )
             {
                 if ( pResource == pThisResource ||

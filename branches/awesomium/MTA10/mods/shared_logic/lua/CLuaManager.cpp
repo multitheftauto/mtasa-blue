@@ -248,6 +248,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "outputConsole", CLuaFunctionDefs::OutputConsole );
     CLuaCFunctions::AddFunction ( "outputChatBox", CLuaFunctionDefs::OutputChatBox );
     CLuaCFunctions::AddFunction ( "showChat", CLuaFunctionDefs::ShowChat );
+    CLuaCFunctions::AddFunction ( "isChatVisible", CLuaFunctionDefs::IsChatVisible );
     CLuaCFunctions::AddFunction ( "outputDebugString", CLuaFunctionDefs::OutputClientDebugString );
     CLuaCFunctions::AddFunction ( "setClipboard", CLuaFunctionDefs::SetClipboard );
     //CLuaCFunctions::AddFunction ( "getClipboard", CLuaFunctionDefs::GetClipboard );
@@ -1179,13 +1180,12 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "injectBrowserMouseMove", CLuaFunctionDefs::InjectBrowserMouseMove );
     CLuaCFunctions::AddFunction ( "injectBrowserMouseDown", CLuaFunctionDefs::InjectBrowserMouseDown );
     CLuaCFunctions::AddFunction ( "injectBrowserMouseUp", CLuaFunctionDefs::InjectBrowserMouseUp );
+    CLuaCFunctions::AddFunction ( "injectBrowserMouseWheel", CLuaFunctionDefs::InjectBrowserMouseWheel );
     CLuaCFunctions::AddFunction ( "injectBrowserKeyDown", CLuaFunctionDefs::InjectBrowserKeyDown );
     CLuaCFunctions::AddFunction ( "injectBrowserKeyUp", CLuaFunctionDefs::InjectBrowserKeyUp );
     CLuaCFunctions::AddFunction ( "injectBrowserCharacter", CLuaFunctionDefs::InjectBrowserCharacter );
     CLuaCFunctions::AddFunction ( "getBrowserTitle", CLuaFunctionDefs::GetBrowserTitle );
     CLuaCFunctions::AddFunction ( "getBrowserURL", CLuaFunctionDefs::GetBrowserURL );
-    CLuaCFunctions::AddFunction ( "setBrowserScrollPosition", CLuaFunctionDefs::SetBrowserScrollPosition );
-    CLuaCFunctions::AddFunction ( "getBrowserScrollPosition", CLuaFunctionDefs::GetBrowserScrollPosition );
     CLuaCFunctions::AddFunction ( "setBrowserRenderingPaused", CLuaFunctionDefs::SetBrowserRenderingPaused );
 
     // Luadef definitions

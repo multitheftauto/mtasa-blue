@@ -107,6 +107,7 @@ public:
     LUA_DECLARE ( OutputConsole );
     LUA_DECLARE ( OutputChatBox );
     LUA_DECLARE ( ShowChat );
+    LUA_DECLARE ( IsChatVisible );
     LUA_DECLARE ( OutputClientDebugString );
     LUA_DECLARE ( SetClipboard );
     LUA_DECLARE ( GetClipboard );
@@ -1004,13 +1005,12 @@ public:
     LUA_DECLARE ( InjectBrowserMouseMove );
     LUA_DECLARE ( InjectBrowserMouseDown );
     LUA_DECLARE ( InjectBrowserMouseUp );
+    LUA_DECLARE ( InjectBrowserMouseWheel );
     LUA_DECLARE ( InjectBrowserKeyDown );
     LUA_DECLARE ( InjectBrowserKeyUp );
     LUA_DECLARE ( InjectBrowserCharacter );
     LUA_DECLARE ( GetBrowserTitle );
     LUA_DECLARE ( GetBrowserURL );
-    LUA_DECLARE ( SetBrowserScrollPosition );
-    LUA_DECLARE ( GetBrowserScrollPosition );
     LUA_DECLARE ( SetBrowserRenderingPaused );
 
 private:

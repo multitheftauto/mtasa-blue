@@ -191,12 +191,18 @@ LOGIC = \
 ./logic/lua/CLuaFunctionRef.cpp \
 ./logic/lua/CLuaMain.cpp \
 ./logic/lua/CLuaManager.cpp \
+./logic/lua/CLuaMatrix.cpp \
 ./logic/lua/CLuaModule.cpp \
 ./logic/lua/CLuaModuleManager.cpp \
 ./logic/lua/CLuaTimer.cpp \
 ./logic/lua/CLuaTimerManager.cpp \
+./logic/lua/CLuaVector.cpp \
 ./logic/lua/LuaCommon.cpp \
 ./logic/lua/LuaUtils.cpp \
+./logic/lua/oopdefs/CLuaOOPFunctionDefs.Camera.cpp \
+./logic/lua/oopdefs/CLuaOOPFunctionDefs.Element.cpp \
+./logic/lua/oopdefs/CLuaOOPFunctionDefs.Ped.cpp \
+./logic/lua/oopdefs/CLuaOOPFunctionDefs.Vehicle.cpp \
 ./logic/luadefs/CLuaACLDefs.cpp \
 ./logic/luadefs/CLuaBitDefs.cpp \
 ./logic/luadefs/CLuaCameraDefs.cpp \
@@ -206,9 +212,11 @@ LOGIC = \
 ./logic/luadefs/CLuaFileDefs.cpp \
 ./logic/luadefs/CLuaHandlingDefs.cpp \
 ./logic/luadefs/CLuaHTTPDefs.cpp \
+./logic/luadefs/CLuaMatrixDefs.cpp \
 ./logic/luadefs/CLuaPickupDefs.cpp \
 ./logic/luadefs/CLuaResourceDefs.cpp \
 ./logic/luadefs/CLuaTextDefs.cpp \
+./logic/luadefs/CLuaVectorDefs.cpp \
 ./logic/luadefs/CLuaVoiceDefs.cpp \
 ./logic/luadefs/CLuaWorldDefs.cpp \
 ./logic/luadefs/CLuaXMLDefs.cpp \
@@ -321,7 +329,7 @@ deathmatch_la_LIBADD = \
 	../../sdk/libplatform.la \
 	$(top_builddir)/vendor/ehs/libehs.la \
 	$(LUABDIR)/src/liblua.la \
-	$(top_builddir)/vendor/json-c/libjson.la \
+	$(top_builddir)/vendor/json-c/libjson-c.la \
 	$(SPARSEHASH_LIBS)
 
 deathmatch_la_LDFLAGS = \

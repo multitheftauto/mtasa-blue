@@ -37,12 +37,14 @@ public:
     void InjectMouseMove        ( int iPosX, int iPosY );
     void InjectMouseDown        ( int mouseButton );
     void InjectMouseUp          ( int mouseButton );
+    void InjectMouseWheel       ( int iScrollVert, int iScrollHorz );
     void InjectKeyboardEvent    ( const SString& strKey, bool bKeyDown = true, bool bCharacter = false );
 
+
     // Implementation: Awesomium::WebViewListener::Load
-    virtual void OnBeginLoadingFrame(Awesomium::WebView *caller, int64 frame_id, bool is_main_frame, const Awesomium::WebURL &url, bool is_error_page) {};
-    virtual void OnFailLoadingFrame (Awesomium::WebView *caller, int64 frame_id, bool is_main_frame, const Awesomium::WebURL &url, int error_code, const Awesomium::WebString &error_desc) {};
-    virtual void OnFinishLoadingFrame ( Awesomium::WebView* pCaller, int64 iFrameId, bool bMainFrame, const Awesomium::WebURL& url );
+    virtual void OnBeginLoadingFrame    ( Awesomium::WebView *caller, int64 frame_id, bool is_main_frame, const Awesomium::WebURL &url, bool is_error_page ) {};
+    virtual void OnFailLoadingFrame     ( Awesomium::WebView *caller, int64 frame_id, bool is_main_frame, const Awesomium::WebURL &url, int error_code, const Awesomium::WebString &error_desc ) {};
+    virtual void OnFinishLoadingFrame   ( Awesomium::WebView* pCaller, int64 iFrameId, bool bMainFrame, const Awesomium::WebURL& url );
     virtual void OnDocumentReady(Awesomium::WebView *caller, const Awesomium::WebURL &url) {};
 
     // Static javascript method implementations

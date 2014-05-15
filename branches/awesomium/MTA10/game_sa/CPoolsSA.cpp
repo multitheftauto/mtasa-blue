@@ -15,6 +15,7 @@
 *****************************************************************************/
 
 #include "StdInc.h"
+extern bool g_bVehiclePointerInvalid;
 
 CPoolsSA::CPoolsSA()
 {
@@ -220,18 +221,11 @@ CVehicle* CPoolsSA::GetVehicle ( DWORD* pGameInterface )
     {
         CVehicleSAInterface* pInterface = reinterpret_cast < CVehicleSAInterface* > ( pGameInterface );
 
-#ifndef MTA_DEBUG
-        return pInterface->m_pVehicle;
-#else
-        // Lookup in the pool map for the vehicle related to this interface.
+        if ( !g_bVehiclePointerInvalid )
+            return pInterface->m_pVehicle;
         vehiclePool_t::mapType::iterator iter = m_vehiclePool.map.find ( pInterface );
         if ( iter != m_vehiclePool.map.end () )
-        {
-            dassert( pInterface->m_pVehicle == (*iter).second );
             return (*iter).second;
-        }
-        dassert( pInterface->m_pVehicle == NULL );
-#endif
     }
 
     return NULL;
@@ -301,7 +295,12 @@ CVehicle* CPoolsSA::GetVehicleFromRef ( DWORD dwGameRef )
     {
         // We have a special slot in vehicles GTA interface pointing to
         // our game_sa instance for it.
-        return pInterface->m_pVehicle;
+        if ( !g_bVehiclePointerInvalid )
+            return pInterface->m_pVehicle;
+
+        vehiclePool_t::mapType::iterator iter = m_vehiclePool.map.find ( pInterface );
+        if ( iter != m_vehiclePool.map.end () )
+            return (*iter).second;
     }
 
     return NULL;

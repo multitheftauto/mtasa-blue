@@ -1576,6 +1576,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\logic\lua\CLuaMatrix.cpp"
+						>
+					</File>
+					<File
 						RelativePath=".\logic\lua\CLuaModule.cpp"
 						>
 					</File>
@@ -1592,6 +1596,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\logic\lua\CLuaVector.cpp"
+						>
+					</File>
+					<File
 						RelativePath=".\logic\lua\LuaCommon.cpp"
 						>
 					</File>
@@ -1599,6 +1607,26 @@
 						RelativePath=".\logic\lua\LuaUtils.cpp"
 						>
 					</File>
+					<Filter
+						Name="oopdefs"
+						>
+						<File
+							RelativePath=".\logic\lua\oopdefs\CLuaOOPFunctionDefs.Camera.cpp"
+							>
+						</File>
+						<File
+							RelativePath=".\logic\lua\oopdefs\CLuaOOPFunctionDefs.Element.cpp"
+							>
+						</File>
+						<File
+							RelativePath=".\logic\lua\oopdefs\CLuaOOPFunctionDefs.Ped.cpp"
+							>
+						</File>
+						<File
+							RelativePath=".\logic\lua\oopdefs\CLuaOOPFunctionDefs.Vehicle.cpp"
+							>
+						</File>
+					</Filter>
 				</Filter>
 				<Filter
 					Name="luadefs"
@@ -1640,6 +1668,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\logic\luadefs\CLuaMatrixDefs.cpp"
+						>
+					</File>
+					<File
 						RelativePath=".\logic\luadefs\CLuaPickupDefs.cpp"
 						>
 					</File>
@@ -1649,6 +1681,10 @@
 					</File>
 					<File
 						RelativePath=".\logic\luadefs\CLuaTextDefs.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\logic\luadefs\CLuaVectorDefs.cpp"
 						>
 					</File>
 					<File
@@ -3093,6 +3129,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\logic\lua\CLuaMatrix.h"
+						>
+					</File>
+					<File
 						RelativePath=".\logic\lua\CLuaModule.h"
 						>
 					</File>
@@ -3109,6 +3149,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\logic\lua\CLuaVector.h"
+						>
+					</File>
+					<File
 						RelativePath=".\logic\lua\LuaUtils.h"
 						>
 					</File>
@@ -3116,6 +3160,14 @@
 						RelativePath="..\..\..\Shared\sdk\net\rpc_enums.h"
 						>
 					</File>
+					<Filter
+						Name="oopdefs"
+						>
+						<File
+							RelativePath=".\logic\lua\oopdefs\CLuaOOPDefs.h"
+							>
+						</File>
+					</Filter>
 				</Filter>
 				<Filter
 					Name="common"
@@ -3165,6 +3217,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\logic\luadefs\CLuaMatrixDefs.h"
+						>
+					</File>
+					<File
 						RelativePath=".\logic\luadefs\CLuaPickupDefs.h"
 						>
 					</File>
@@ -3174,6 +3230,10 @@
 					</File>
 					<File
 						RelativePath=".\logic\luadefs\CLuaTextDefs.h"
+						>
+					</File>
+					<File
+						RelativePath=".\logic\luadefs\CLuaVectorDefs.h"
 						>
 					</File>
 					<File

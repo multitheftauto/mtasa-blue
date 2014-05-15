@@ -29,12 +29,10 @@ public:
     void                        GetURL              ( SString& outURL );
     void                        SetRenderingPaused  ( bool bPaused );
 
-    /*void GetScrollPosition(int& iScrollX, int& iScrollY);
-    void SetScrollPosition(int iScrollX, int iScrollY);*/
-
     void                        InjectMouseMove     ( int iPosX, int iPosY );
     void                        InjectMouseDown     ( int mouseButton );
     void                        InjectMouseUp       ( int mouseButton );
+    void                        InjectMouseWheel    ( int iScrollVert, int iScrollHorz );
     void                        InjectKeyboardEvent ( const SString& strKey, bool bKeyDown = true, bool bCharacter = false );
 
 private:
