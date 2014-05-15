@@ -12,11 +12,11 @@
 #include "CClientWebBrowser.h"
 
 CClientWebBrowser::CClientWebBrowser ( CClientManager* pManager, ElementID ID, CWebBrowserItem* pWebBrowserItem, CWebViewInterface* pWebView )
-    : ClassInit ( this ), CClientTexture ( pManager, ID, pWebBrowserItem ), m_pWebView ( pWebView )
+    : ClassInit ( this ), CClientTexture ( pManager, ID, pWebBrowserItem ), m_pWebView ( pWebView ), m_bIsLocal ( false )
 {
 }
 
-CClientWebBrowser::~CClientWebBrowser()
+CClientWebBrowser::~CClientWebBrowser ()
 {
     // We can't release the memory here since we deal with an interface
     m_pWebView = NULL;
@@ -25,29 +25,42 @@ CClientWebBrowser::~CClientWebBrowser()
     Unlink ();
 }
 
-bool CClientWebBrowser::IsLoading()
+bool CClientWebBrowser::IsLoading ()
 {
     return m_pWebView->IsLoading ();
 }
 
-bool CClientWebBrowser::LoadURL(const SString& strURL)
+bool CClientWebBrowser::LoadURL ( const SString& strURL, bool bFilterEnabled )
 {
-    return m_pWebView->LoadURL ( strURL );
+    return m_pWebView->LoadURL ( strURL, bFilterEnabled );
 }
 
-void CClientWebBrowser::GetTitle(SString& outPageTitle)
+void CClientWebBrowser::GetTitle ( SString& outPageTitle )
 {
     m_pWebView->GetTitle ( outPageTitle );
 }
 
-void CClientWebBrowser::GetURL(SString& outURL)
+void CClientWebBrowser::GetURL ( SString& outURL )
 {
-    m_pWebView->GetURL ( outURL );
+    if ( !m_bIsLocal )
+        m_pWebView->GetURL ( outURL );
+    else
+        outURL = m_strLocalFileName;
 }
 
 void CClientWebBrowser::SetRenderingPaused ( bool bPaused )
 {
     m_pWebView->SetRenderingPaused ( bPaused );
+}
+
+bool CClientWebBrowser::ExecuteJavascript ( const SString& strJavascriptCode )
+{
+    // Don't allow javascript code execution on remote websites
+    if ( !m_bIsLocal )
+        return false;
+
+    m_pWebView->ExecuteJavascript ( strJavascriptCode );
+    return true;
 }
 
 void CClientWebBrowser::InjectMouseMove ( int iPosX, int iPosY )

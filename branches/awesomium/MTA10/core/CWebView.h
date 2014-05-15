@@ -28,11 +28,13 @@ public:
     ~CWebView                   ();
 
     // Exported methods
-    bool LoadURL                ( const SString& strURL );
+    bool LoadURL                ( const SString& strURL, bool bFilterEnabled = true );
     bool IsLoading              ();
     void GetURL                 ( SString& outURL );
     void GetTitle               ( SString& outTitle );
     void SetRenderingPaused     ( bool bPaused );
+
+    void ExecuteJavascript      ( const SString& strJavascriptCode );
 
     void InjectMouseMove        ( int iPosX, int iPosY );
     void InjectMouseDown        ( int mouseButton );

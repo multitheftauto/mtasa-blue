@@ -97,8 +97,28 @@ int CLuaFunctionDefs::LoadBrowserURL ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        lua_pushboolean ( luaVM, pWebBrowser->LoadURL ( strURL ) );
-        return 1;
+        // Are we dealing with a remote website?
+        if ( strURL.SubStr ( 0, 7 ) == "http://" || strURL.SubStr ( 0, 8 ) == "https://" )
+        {
+            pWebBrowser->SetIsLocal ( false );
+            lua_pushboolean ( luaVM, pWebBrowser->LoadURL ( strURL, true ) );
+            return 1;
+        }
+
+        // Are we dealing with a local website? If so, parse resource path. Otherwise, return false and load nothing
+        // Todo: Add an ACL right which is necessary to load local websites or websites in general
+        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+        if ( pLuaMain )
+        {
+            SString strAbsPath;
+            CResource* pResource = pLuaMain->GetResource ();
+            if ( CResourceManager::ParseResourcePathInput ( strURL, pResource, strAbsPath ) )
+            {
+                pWebBrowser->SetIsLocal ( true, strURL );
+                lua_pushboolean ( luaVM,  pWebBrowser->LoadURL ( strAbsPath, false ) );
+                return 1;
+            }
+        }
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
@@ -334,7 +354,7 @@ int CLuaFunctionDefs::SetBrowserRenderingPaused ( lua_State* luaVM )
 //  bool setBrowserRenderingPaused ( browser webBrowser, bool paused )
     CClientWebBrowser* pWebBrowser; bool bPaused;
 
-    CScriptArgReader argStream(luaVM);
+    CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pWebBrowser );
     argStream.ReadBool ( bPaused );
 
@@ -342,6 +362,27 @@ int CLuaFunctionDefs::SetBrowserRenderingPaused ( lua_State* luaVM )
     {
         pWebBrowser->SetRenderingPaused ( bPaused );
         lua_pushboolean ( luaVM, true );
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefs::ExecuteBrowserJavascript ( lua_State* luaVM )
+{
+//  bool executeBrowserJavascript ( browser webBrowser, string jsCode )
+    CClientWebBrowser* pWebBrowser; SString strJavascriptCode;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pWebBrowser );
+    argStream.ReadString ( strJavascriptCode );
+
+    if ( !argStream.HasErrors () )
+    {
+        lua_pushboolean ( luaVM, pWebBrowser->ExecuteJavascript ( strJavascriptCode ) );
         return 1;
     }
     else

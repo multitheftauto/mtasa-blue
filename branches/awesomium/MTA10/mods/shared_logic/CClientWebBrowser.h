@@ -24,10 +24,14 @@ public:
     inline CWebViewInterface*   GetWebView         ()    { return m_pWebView; }
 
     bool                        IsLoading           ();
-    bool                        LoadURL             ( const SString& strURL );
+    bool                        LoadURL             ( const SString& strURL, bool bFilterEnabled = true );
     void                        GetTitle            ( SString& outPageTitle );
     void                        GetURL              ( SString& outURL );
     void                        SetRenderingPaused  ( bool bPaused );
+    inline void                 SetIsLocal          ( bool bIsLocal, const SString& strLocalFileName = "" )   { m_bIsLocal = bIsLocal; m_strLocalFileName = strLocalFileName; };
+    inline bool                 IsLocal             ()                                                        { return m_bIsLocal; };
+
+    bool                        ExecuteJavascript   ( const SString& strJavascriptCode );
 
     void                        InjectMouseMove     ( int iPosX, int iPosY );
     void                        InjectMouseDown     ( int mouseButton );
@@ -37,6 +41,8 @@ public:
 
 private:
     CWebViewInterface* m_pWebView;
+    bool               m_bIsLocal;
+    SString            m_strLocalFileName;
 };
 
 #endif

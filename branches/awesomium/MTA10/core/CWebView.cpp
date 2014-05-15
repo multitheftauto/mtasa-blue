@@ -29,10 +29,10 @@ CWebView::~CWebView()
     m_pWebView->Destroy ();
 }
 
-bool CWebView::LoadURL ( const SString& strURL )
+bool CWebView::LoadURL ( const SString& strURL, bool bFilterEnabled )
 {
     Awesomium::WebURL webURL ( CWebCore::ToWebString ( strURL ) );
-    if ( g_pCore->GetWebCore ()->GetURLState ( CWebCore::ToSString ( webURL.host() ) ) != eURLState::WEBPAGE_ALLOWED )
+    if ( bFilterEnabled && g_pCore->GetWebCore ()->GetURLState ( CWebCore::ToSString ( webURL.host() ) ) != eURLState::WEBPAGE_ALLOWED )
         return false;
 
     m_pWebView->LoadURL ( webURL );
@@ -60,6 +60,11 @@ void CWebView::SetRenderingPaused ( bool bPaused )
         m_pWebView->PauseRendering ();
     else
         m_pWebView->ResumeRendering ();
+}
+
+void CWebView::ExecuteJavascript(const SString& strJavascriptCode)
+{
+    m_pWebView->ExecuteJavascript ( CWebCore::ToWebString ( strJavascriptCode ), CWebCore::ToWebString("") );
 }
 
 void CWebView::InjectMouseMove ( int iPosX, int iPosY )
