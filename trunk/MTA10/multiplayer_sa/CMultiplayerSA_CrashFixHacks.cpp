@@ -12,6 +12,7 @@
 #include "StdInc.h"
 
 void CPlayerPed__ProcessControl_Abort();
+bool IsValidAnimBlendAssociation( CAnimBlendAssociationSAInterface* pAnimBlendAssociation );
 
 //
 // Test macros for CrashFixes
@@ -578,7 +579,6 @@ void _declspec(naked) HOOK_CrashFix_Misc19 ()
     }
 }
 
-
 ////////////////////////////////////////////////////////////////////////
 // Handle CPlaceable::RemoveMatrix having wrong data
 #define HOOKPOS_CrashFix_Misc20                             0x54F3B0
@@ -613,29 +613,33 @@ void _declspec(naked) HOOK_CrashFix_Misc20 ()
 
 ////////////////////////////////////////////////////////////////////////
 // Handle CTaskSimpleCarFallOut::FinishAnimFallOutCB having wrong data
-#define HOOKPOS_CrashFix_Misc21                             0x648EF6
-#define HOOKSIZE_CrashFix_Misc21                            6
-DWORD RETURN_CrashFix_Misc21 =                              0x648EFC;
+#define HOOKPOS_CrashFix_Misc21                             0x648EE0
+#define HOOKSIZE_CrashFix_Misc21                            7
+DWORD RETURN_CrashFix_Misc21 =                              0x648EE7;
 void _declspec(naked) HOOK_CrashFix_Misc21 ()
 {
 #if TEST_CRASH_FIXES
     SIMULATE_ERROR_BEGIN( 10 )
         _asm
         {
-            mov     ecx, 0x10
+            mov     [esp+8], 0x10
         }
     SIMULATE_ERROR_END
 #endif
 
     _asm
     {
-        cmp     ecx, 0x480
-        jb      cont  // Skip much code if ecx is low
-        cmp     ecx, 0xfffffff0
-        ja      cont  // Skip much code if ecx is high
+        pushad
+        push    [esp+32+4*1]
+        call    IsValidAnimBlendAssociation
+        add     esp, 4*1
+        cmp     al,0
+        popad
+        je      cont  // Skip much code if CAnimBlendAssociation is not valid for this function
 
         // continue standard path
-        mov     edx, [ecx+590h]
+        mov     eax, [esp+8]
+        mov     ecx, [eax+10h]
         jmp     RETURN_CrashFix_Misc21
 
     cont:
