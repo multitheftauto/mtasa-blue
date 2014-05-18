@@ -2172,8 +2172,28 @@ bool DeleteCompatibilityEntries( const WString& strSubKey, HKEY hKeyRoot, uint u
             if ( RegQueryValueString( hKey, strName, strData ) != ERROR_SUCCESS )
                 continue;
 
-            // is the value's data already just "RUNASADMIN"?
-            if ( strData == L"~ RUNASADMIN" || strData == L"RUNASADMIN" )
+            // Make new setting using only allowed bits
+            std::vector < WString > parts;
+            strData.Split( " ", parts );
+            for ( std::vector < WString >::iterator iter = parts.begin() ; iter != parts.end() ; )
+            {
+                if ( *iter != L"~"
+                     && *iter != L"RUNASADMIN"
+                     && *iter != L"DWM8And16BitMitigation" )
+                {
+                    iter = parts.erase( iter );
+                }
+                else
+                    ++iter;
+            }
+            WString strNewData = WString::Join( " ", parts );
+
+            // Remove tilde if nothing else left
+            if ( strNewData == L"~" )
+                strNewData = L"";
+
+            // Check for change
+            if ( strNewData == strData )
                 continue; // continue since we don't need to do anything
 
             // Change required. Attempt swap to writeable key if not done so yet
@@ -2185,14 +2205,13 @@ bool DeleteCompatibilityEntries( const WString& strSubKey, HKEY hKeyRoot, uint u
                     return false;   // Might need admin
             }
 
-            if ( strData.Contains( "RUNASADMIN" ) ) // does it contain "RUNASADMIN" along with something else?
+            if ( !strNewData.empty() )
             {
-                // Remove all other options and leave RUNASADMIN only
-                WString strNewData = IsWin8OrHigher() ? "~ RUNASADMIN" : "RUNASADMIN";
+                // Write new setting
                 if ( RegSetValueString( hKey, strName, strNewData ) != ERROR_SUCCESS )
                     bResult = false;    // Continue on error, but flag for admin
             }
-            else // the user only has other compatibility mode settings enabled
+            else // the user only had other compatibility mode settings enabled
             {
                 if ( RegDeleteValueW( hKey, strName ) != ERROR_SUCCESS ) // delete the registry value
                     bResult = false;    // Continue on error, but flag for admin
