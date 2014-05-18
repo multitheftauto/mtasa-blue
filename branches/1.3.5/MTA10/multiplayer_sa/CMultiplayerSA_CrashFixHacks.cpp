@@ -10,9 +10,9 @@
 *****************************************************************************/
 
 #include "StdInc.h"
+#include "../game_sa/CTasksSA.h"
 
 void CPlayerPed__ProcessControl_Abort();
-bool IsValidAnimBlendAssociation( CAnimBlendAssociationSAInterface* pAnimBlendAssociation );
 
 //
 // Test macros for CrashFixes
@@ -611,8 +611,36 @@ void _declspec(naked) HOOK_CrashFix_Misc20 ()
 }
 
 
-////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+//
 // Handle CTaskSimpleCarFallOut::FinishAnimFallOutCB having wrong data
+//
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+bool IsTaskSimpleCarFallOutValid( CAnimBlendAssociationSAInterface* pAnimBlendAssociation, CTaskSimpleCarFallOutSAInterface* pTask )
+{
+    if ( pTask->VTBL != (TaskVTBL*)VTBL_CTaskSimpleCarFallOut )
+    {
+        AddReportLog( 8530, SString( "IsTaskSimpleCarFallOutValid fail - pTask->VTBL: %08x", pTask->VTBL ), 5 );
+        return false;
+    }
+
+    if ( pTask->pPed )
+    {
+        CPed* pPed = pGameInterface->GetPools ()->GetPed ( (DWORD*) pTask->pPed );
+        if ( !pPed )
+        {
+            // Task looks valid, but ped is not recognised by MTA
+            AddReportLog( 8531, SString( "IsTaskSimpleCarFallOutValid invalid ped ptr - pTask->pPed: %08x", pTask->pPed ), 5 );
+            pTask->pPed = NULL;
+            return true;
+        }
+    }
+
+    AddReportLog( 8532, SString( "IsTaskSimpleCarFallOutValid success - pTask->pPed: %08x", pTask->pPed ), 5 );
+    return true;
+}
+
 #define HOOKPOS_CrashFix_Misc21                             0x648EE0
 #define HOOKSIZE_CrashFix_Misc21                            7
 DWORD RETURN_CrashFix_Misc21 =                              0x648EE7;
@@ -630,12 +658,13 @@ void _declspec(naked) HOOK_CrashFix_Misc21 ()
     _asm
     {
         pushad
-        push    [esp+32+4*1]
-        call    IsValidAnimBlendAssociation
-        add     esp, 4*1
+        push    [esp+32+4*2]
+        push    [esp+32+4*2]
+        call    IsTaskSimpleCarFallOutValid
+        add     esp, 4*2
         cmp     al,0
         popad
-        je      cont  // Skip much code if CAnimBlendAssociation is not valid for this function
+        je      cont  // Skip much code if CTaskSimpleCarFallOut is not valid
 
         // continue standard path
         mov     eax, [esp+8]
