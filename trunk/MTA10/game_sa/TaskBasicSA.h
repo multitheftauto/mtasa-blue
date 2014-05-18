@@ -213,9 +213,10 @@ public:
 class CTaskSimpleCarFallOutSAInterface : public CTaskSimpleSAInterface
 {
 public:
-    int a;                      // 0x08
-    int b;                      // 0x0c
-    CPedSAInterface* pPed;      // 0x10
+    uint    a;                      // 0x08
+    uint    b;                      // 0x0c
+    CVehicleSAInterface* pVehicle;  // 0x10
+    uint    doorIndex;              // 0x14
 };
 
 
