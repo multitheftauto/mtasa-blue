@@ -625,19 +625,19 @@ bool IsTaskSimpleCarFallOutValid( CAnimBlendAssociationSAInterface* pAnimBlendAs
         return false;
     }
 
-    if ( pTask->pPed )
+    if ( pTask->pVehicle )
     {
-        CPed* pPed = pGameInterface->GetPools ()->GetPed ( (DWORD*) pTask->pPed );
-        if ( !pPed )
+        CVehicle* pVehicle = pGameInterface->GetPools ()->GetVehicle ( (DWORD*) pTask->pVehicle );
+        if ( !pVehicle )
         {
-            // Task looks valid, but ped is not recognised by MTA
-            AddReportLog( 8531, SString( "IsTaskSimpleCarFallOutValid invalid ped ptr - pTask->pPed: %08x", pTask->pPed ), 5 );
-            pTask->pPed = NULL;
+            // Task looks valid, but vehicle is not recognised by MTA
+            AddReportLog( 8531, SString( "IsTaskSimpleCarFallOutValid invalid vehicle ptr - pTask->pVehicle: %08x", pTask->pVehicle ), 5 );
+            pTask->pVehicle = NULL;
             return true;
         }
     }
 
-    AddReportLog( 8532, SString( "IsTaskSimpleCarFallOutValid success - pTask->pPed: %08x", pTask->pPed ), 5 );
+    AddReportLog( 8532, SString( "IsTaskSimpleCarFallOutValid success - pTask->pVehicle: %08x", pTask->pVehicle ), 5 );
     return true;
 }
 
