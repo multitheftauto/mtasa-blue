@@ -2720,17 +2720,13 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                     // Was a valid custom data name length found?
                     if ( ucNameLength <= MAX_CUSTOMDATA_NAME_LENGTH )
                     {
-                        // Add it only if the name is longer than 0
-                        if ( ucNameLength > 0 )
-                        {
-                            SString strName;
-                            bitStream.ReadStringCharacters ( strName, ucNameLength );
+                        SString strName;
+                        bitStream.ReadStringCharacters ( strName, ucNameLength );
 
-                            CLuaArgument Argument;
-                            Argument.ReadFromBitStream ( bitStream );
+                        CLuaArgument Argument;
+                        Argument.ReadFromBitStream ( bitStream );
 
-                            pCustomData->Set ( strName, Argument, NULL );
-                        }
+                        pCustomData->Set ( strName, Argument, NULL );
                     }
                     else
                     {
