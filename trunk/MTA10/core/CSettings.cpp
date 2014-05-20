@@ -1157,17 +1157,17 @@ void CSettings::CreateGUI ( void )
     vecTemp.fY += 29;
 
     // Windows 8 compatibility
-    m_pWin8Label = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Windows 8 compatibility:" ) );
+    m_pWin8Label = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, _("Windows 8 compatibility:") ) );
     m_pWin8Label->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY ) );
     m_pWin8Label->AutoSize ( );
     vecTemp.fX += 20;
 
-    m_pWin8ColorCheckBox = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabAdvanced, "16-bit color" ) );
+    m_pWin8ColorCheckBox = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabAdvanced, _("16-bit color") ) );
     m_pWin8ColorCheckBox->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, vecTemp.fY - 1.0f ) );
     m_pWin8ColorCheckBox->AutoSize ( NULL, 20.0f );
     vecTemp.fX += 90;
 
-    m_pWin8MouseCheckBox = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabAdvanced, "Mouse fix" ) );
+    m_pWin8MouseCheckBox = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabAdvanced, _("Mouse fix") ) );
     m_pWin8MouseCheckBox->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, vecTemp.fY - 1.0f ) );
     m_pWin8MouseCheckBox->AutoSize ( NULL, 20.0f );
     vecTemp.fY += 29;
