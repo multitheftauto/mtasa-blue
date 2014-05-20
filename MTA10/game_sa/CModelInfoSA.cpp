@@ -280,6 +280,15 @@ BOOL CModelInfoSA::IsUpgrade ( void )
 }
 
 
+BOOL CModelInfoSA::IsWeapon(void)
+{
+    return (m_dwModelID >= 321 && m_dwModelID <= 326) || // Melee Weapons
+        (
+        (m_dwModelID >= 331 && m_dwModelID <= 372) && // Other Weapons
+        (m_dwModelID != 370 && m_dwModelID != 332 && m_dwModelID != 340 && m_dwModelID != 345 && m_dwModelID != 354) // Not weapons
+        );
+}
+
 char * CModelInfoSA::GetNameIfVehicle ( )
 {
     DEBUG_TRACE("char * CModelInfoSA::GetNameIfVehicle ( )");
@@ -955,7 +964,7 @@ void CModelInfoSA::SetCustomModel ( RpClump* pClump )
         {
             pGame->GetRenderWare ()->ReplaceVehicleModel ( pClump, static_cast < unsigned short > ( m_dwModelID ) );
         }
-        else if ( ( m_dwModelID >= 331 && m_dwModelID <= 369 ) || m_dwModelID == 372 )
+        else if ( IsWeapon() )
         {
             // We are a weapon.
             pGame->GetRenderWare ()->ReplaceWeaponModel ( pClump, static_cast < unsigned short > ( m_dwModelID ) );
