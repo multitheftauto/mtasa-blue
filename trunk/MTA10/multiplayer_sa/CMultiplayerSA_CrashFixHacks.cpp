@@ -637,7 +637,6 @@ bool IsTaskSimpleCarFallOutValid( CAnimBlendAssociationSAInterface* pAnimBlendAs
         }
     }
 
-    AddReportLog( 8532, SString( "IsTaskSimpleCarFallOutValid success - pTask->pVehicle: %08x", pTask->pVehicle ), 5 );
     return true;
 }
 
