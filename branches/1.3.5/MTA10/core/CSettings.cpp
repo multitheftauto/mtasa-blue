@@ -913,7 +913,7 @@ void CSettings::CreateGUI ( void )
     m_pFastClothesLabelInfo->SetPosition ( CVector2D ( vecTemp.fX + 342.f, vecTemp.fY - 4.f ) );
     m_pFastClothesLabelInfo->SetFont ( "default-bold-small" );
     m_pFastClothesLabelInfo->SetSize ( CVector2D ( 168.0f, 95.0f ) );
-    vecTemp.fY += 40-4;
+    vecTemp.fY += 33;
 
     // Browser scan speed
     m_pBrowserSpeedLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, _("Browser speed:") ) );
@@ -932,7 +932,7 @@ void CSettings::CreateGUI ( void )
     m_pBrowserSpeedLabelInfo->SetPosition ( CVector2D ( vecTemp.fX + 342.f, vecTemp.fY - 4.f ) );
     m_pBrowserSpeedLabelInfo->SetFont ( "default-bold-small" );
     m_pBrowserSpeedLabelInfo->SetSize ( CVector2D ( 168.0f, 95.0f ) );
-    vecTemp.fY += 40-4;
+    vecTemp.fY += 33;
 
     // Single download
     m_pSingleDownloadLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, _("Single connection:") ) );
@@ -950,7 +950,7 @@ void CSettings::CreateGUI ( void )
     m_pSingleDownloadLabelInfo->SetPosition ( CVector2D ( vecTemp.fX + 342.f, vecTemp.fY - 4.f ) );
     m_pSingleDownloadLabelInfo->SetFont ( "default-bold-small" );
     m_pSingleDownloadLabelInfo->SetSize ( CVector2D ( 168.0f, 95.0f ) );
-    vecTemp.fY += 40-4;
+    vecTemp.fY += 33;
 
     // Fullscreen mode
     m_pFullscreenStyleLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Fullscreen mode:" ) );
@@ -969,7 +969,7 @@ void CSettings::CreateGUI ( void )
     m_pFullscreenStyleLabelInfo->SetPosition ( CVector2D ( vecTemp.fX + 342.f, vecTemp.fY - 4.f ) );
     m_pFullscreenStyleLabelInfo->SetFont ( "default-bold-small" );
     m_pFullscreenStyleLabelInfo->SetSize ( CVector2D ( 168.0f, 95.0f ) );
-    vecTemp.fY += 40-4;
+    vecTemp.fY += 33;
 
     // Process priority
     m_pPriorityLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Process priority:" ) );
@@ -988,7 +988,7 @@ void CSettings::CreateGUI ( void )
     m_pPriorityLabelInfo->SetPosition ( CVector2D ( vecTemp.fX + 342.f, vecTemp.fY - 4.f ) );
     m_pPriorityLabelInfo->SetFont ( "default-bold-small" );
     m_pPriorityLabelInfo->SetSize ( CVector2D ( 168.0f, 95.0f ) );
-    vecTemp.fY += 40-4;
+    vecTemp.fY += 33;
 
     // Debug setting
     m_pDebugSettingLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, _("Debug setting:") ) );
@@ -1012,7 +1012,7 @@ void CSettings::CreateGUI ( void )
     m_pDebugSettingLabelInfo->SetPosition ( CVector2D ( vecTemp.fX + 342.f, vecTemp.fY - 4.f ) );
     m_pDebugSettingLabelInfo->SetFont ( "default-bold-small" );
     m_pDebugSettingLabelInfo->SetSize ( CVector2D ( 168.0f, 95.0f ) );
-    vecTemp.fY += 40-4;
+    vecTemp.fY += 33;
 
     m_pDebugSettingCombo->SetText ( _("Default") );
     SetApplicationSetting ( "diagnostics", "debug-setting", "none" );
@@ -1042,7 +1042,35 @@ void CSettings::CreateGUI ( void )
     m_pStreamingMemoryLabelInfo->SetPosition ( CVector2D ( vecTemp.fX + 342.f, vecTemp.fY - 0.f ) );
     m_pStreamingMemoryLabelInfo->SetFont ( "default-bold-small" );
     m_pStreamingMemoryLabelInfo->SetSize ( CVector2D ( 168.0f, 95.0f ) );
-    vecTemp.fY += 40-4;
+    vecTemp.fY += 33;
+
+    // Windows 8 compatibility
+    m_pWin8Label = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, _("Windows 8 compatibility:") ) );
+    m_pWin8Label->SetPosition ( CVector2D ( vecTemp.fX + 10.f, vecTemp.fY ) );
+    m_pWin8Label->AutoSize ( );
+
+    m_pWin8ColorCheckBox = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabAdvanced, _("16-bit color") ) );
+    m_pWin8ColorCheckBox->SetPosition ( CVector2D ( vecTemp.fX + 156.0f, vecTemp.fY - 1.0f ) );
+    m_pWin8ColorCheckBox->SetSize ( CVector2D ( 80.0f, 20.0f ) );
+
+    m_pWin8MouseCheckBox = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabAdvanced, _("Mouse fix") ) );
+    m_pWin8MouseCheckBox->SetPosition ( CVector2D ( vecTemp.fX + 246.0f, vecTemp.fY - 1.0f ) );
+    m_pWin8MouseCheckBox->SetSize ( CVector2D ( 80.0f, 20.0f ) );
+
+    m_pWin8LabelInfo = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, _("Needs restart.\nMouse may need PC restart.") ) );
+    m_pWin8LabelInfo->SetPosition ( CVector2D ( vecTemp.fX + 342.f, vecTemp.fY - 0.f ) );
+    m_pWin8LabelInfo->SetFont ( "default-bold-small" );
+    m_pWin8LabelInfo->SetSize ( CVector2D ( 168.0f, 95.0f ) );
+    vecTemp.fY += 29;
+
+    if ( GetApplicationSetting ( "os-version" ) < "6.2" )
+    {
+        m_pWin8Label->SetVisible ( false );
+        m_pWin8ColorCheckBox->SetVisible ( false );
+        m_pWin8MouseCheckBox->SetVisible ( false );
+        m_pWin8LabelInfo->SetVisible ( false );
+        vecTemp.fY -= 29;
+    }
 
     // Auto updater section label
     m_pAdvancedUpdaterLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, _("Auto updater") ) );
@@ -2342,6 +2370,14 @@ void CSettings::LoadData ( void )
     if ( iVar == 0 ) m_pSingleDownloadCombo->SetText ( _("Default") );
     else if ( iVar == 1 ) m_pSingleDownloadCombo->SetText ( _("On") );
 
+    // Windows 8 16-bit color
+    iVar = GetApplicationSettingInt( "Win8Color16" );
+    m_pWin8ColorCheckBox->SetSelected ( iVar != 0 );
+
+    // Windows 8 mouse fix
+    iVar = GetApplicationSettingInt( "Win8MouseFix" );
+    m_pWin8MouseCheckBox->SetSelected ( iVar != 0 );
+
     // Update build type
     CVARS_GET ( "update_build_type", iVar );
     if ( iVar == 0 ) m_pUpdateBuildTypeCombo->SetText ( _("Default") );
@@ -2563,6 +2599,12 @@ void CSettings::SaveData ( void )
         int iSelected = ( int ) pSelected->GetData();
         CVARS_SET ( "single_download", iSelected );
     }
+
+    // Windows 8 16-bit color
+    SetApplicationSettingInt( "Win8Color16", m_pWin8ColorCheckBox->GetSelected() );
+
+    // Windows 8 mouse fix
+    SetApplicationSettingInt( "Win8MouseFix", m_pWin8MouseCheckBox->GetSelected() );
 
     // Debug setting
     if ( CGUIListItem* pSelected = m_pDebugSettingCombo->GetSelectedItem () )

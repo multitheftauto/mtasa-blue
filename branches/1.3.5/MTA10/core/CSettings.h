@@ -211,6 +211,10 @@ protected:
     CGUILabel*          m_pDebugSettingLabel;
     CGUIComboBox*       m_pDebugSettingCombo;
     CGUILabel*          m_pUpdateBuildTypeLabelInfo;
+    CGUILabel*          m_pWin8Label;
+    CGUICheckBox*       m_pWin8ColorCheckBox;
+    CGUICheckBox*       m_pWin8MouseCheckBox;
+    CGUILabel*          m_pWin8LabelInfo;
     CGUILabel*          m_pUpdateBuildTypeLabel;
     CGUIComboBox*       m_pUpdateBuildTypeCombo;
     CGUIButton*         m_pButtonUpdate;
