@@ -1092,7 +1092,6 @@ void CSettings::CreateGUI ( void )
     m_pFullscreenStyleCombo->AddItem ( _("Borderless window") )->SetData ( (void*)FULLSCREEN_BORDERLESS );
     m_pFullscreenStyleCombo->AddItem ( _("Borderless keep res") )->SetData ( (void*)FULLSCREEN_BORDERLESS_KEEP_RES );
     m_pFullscreenStyleCombo->SetReadOnly ( true );
-
     vecTemp.fY += 29;
 
     // Process priority
@@ -1157,6 +1156,31 @@ void CSettings::CreateGUI ( void )
     vecTemp.fX = 22.f;
     vecTemp.fY += 29;
 
+    // Windows 8 compatibility
+    m_pWin8Label = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Windows 8 compatibility:" ) );
+    m_pWin8Label->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY ) );
+    m_pWin8Label->AutoSize ( );
+    vecTemp.fX += 20;
+
+    m_pWin8ColorCheckBox = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabAdvanced, "16-bit color" ) );
+    m_pWin8ColorCheckBox->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, vecTemp.fY - 1.0f ) );
+    m_pWin8ColorCheckBox->AutoSize ( NULL, 20.0f );
+    vecTemp.fX += 90;
+
+    m_pWin8MouseCheckBox = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabAdvanced, "Mouse fix" ) );
+    m_pWin8MouseCheckBox->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, vecTemp.fY - 1.0f ) );
+    m_pWin8MouseCheckBox->AutoSize ( NULL, 20.0f );
+    vecTemp.fY += 29;
+    vecTemp.fX -= 110;
+
+    if ( GetApplicationSetting ( "os-version" ) < "6.2" )
+    {
+        m_pWin8Label->SetVisible ( false );
+        m_pWin8ColorCheckBox->SetVisible ( false );
+        m_pWin8MouseCheckBox->SetVisible ( false );
+        vecTemp.fY -= 29;
+    }
+
     // Auto updater section label
     m_pAdvancedUpdaterLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, _("Auto updater") ) );
     m_pAdvancedUpdaterLabel->SetPosition ( CVector2D ( vecTemp.fX - 10.0f, vecTemp.fY ) );
@@ -1184,9 +1208,9 @@ void CSettings::CreateGUI ( void )
     m_pButtonUpdate->AutoSize ( NULL, 20.0f, 8.0f );
     m_pButtonUpdate->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnUpdateButtonClick, this ) );
     m_pButtonUpdate->SetZOrderingEnabled ( false );
-    vecTemp.fY += 70;
 
     // Description label
+    vecTemp.fY = 354;
     m_pAdvancedSettingDescriptionLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "" ) );
     m_pAdvancedSettingDescriptionLabel->SetPosition ( CVector2D ( vecTemp.fX + 10.f, vecTemp.fY ) );
     m_pAdvancedSettingDescriptionLabel->SetFont ( "default-bold-small" );
@@ -1268,6 +1292,12 @@ void CSettings::CreateGUI ( void )
 
     m_pUpdateBuildTypeCombo->SetMouseEnterHandler ( GUI_CALLBACK ( &CSettings::OnShowAdvancedSettingDescription, this ) );
     m_pUpdateBuildTypeCombo->SetMouseLeaveHandler ( GUI_CALLBACK ( &CSettings::OnHideAdvancedSettingDescription, this ) );
+
+    m_pWin8ColorCheckBox->SetMouseEnterHandler ( GUI_CALLBACK ( &CSettings::OnShowAdvancedSettingDescription, this ) );
+    m_pWin8ColorCheckBox->SetMouseLeaveHandler ( GUI_CALLBACK ( &CSettings::OnHideAdvancedSettingDescription, this ) );
+
+    m_pWin8MouseCheckBox->SetMouseEnterHandler ( GUI_CALLBACK ( &CSettings::OnShowAdvancedSettingDescription, this ) );
+    m_pWin8MouseCheckBox->SetMouseLeaveHandler ( GUI_CALLBACK ( &CSettings::OnHideAdvancedSettingDescription, this ) );
 
 
     // Load Chat presets
@@ -2522,6 +2552,14 @@ void CSettings::LoadData ( void )
     if ( iVar == 0 ) m_pSingleDownloadCombo->SetText ( _("Default") );
     else if ( iVar == 1 ) m_pSingleDownloadCombo->SetText ( _("On") );
 
+    // Windows 8 16-bit color
+    iVar = GetApplicationSettingInt( "Win8Color16" );
+    m_pWin8ColorCheckBox->SetSelected ( iVar != 0 );
+
+    // Windows 8 mouse fix
+    iVar = GetApplicationSettingInt( "Win8MouseFix" );
+    m_pWin8MouseCheckBox->SetSelected ( iVar != 0 );
+
     // Update build type
     CVARS_GET ( "update_build_type", iVar );
     if ( iVar == 0 ) m_pUpdateBuildTypeCombo->SetText ( _("Default") );
@@ -2743,6 +2781,12 @@ void CSettings::SaveData ( void )
         int iSelected = ( int ) pSelected->GetData();
         CVARS_SET ( "single_download", iSelected );
     }
+
+    // Windows 8 16-bit color
+    SetApplicationSettingInt( "Win8Color16", m_pWin8ColorCheckBox->GetSelected() );
+
+    // Windows 8 mouse fix
+    SetApplicationSettingInt( "Win8MouseFix", m_pWin8MouseCheckBox->GetSelected() );
 
     // Debug setting
     if ( CGUIListItem* pSelected = m_pDebugSettingCombo->GetSelectedItem () )
@@ -3480,6 +3524,7 @@ bool CSettings::OnShowAdvancedSettingDescription ( CGUIElement* pElement )
     CGUILabel* pLabel = dynamic_cast < CGUILabel* > ( pElement );
     CGUIComboBox* pComboBox = dynamic_cast < CGUIComboBox* > ( pElement );
     CGUIScrollBar* pScrollBar = dynamic_cast < CGUIScrollBar* > ( pElement );
+    CGUICheckBox* pCheckBox = dynamic_cast < CGUICheckBox* > ( pElement );
 
     std::string strText = "";
 
@@ -3499,8 +3544,11 @@ bool CSettings::OnShowAdvancedSettingDescription ( CGUIElement* pElement )
         strText = std::string( _( "Streaming memory:" ) ) + " " + std::string( _( "Maximum is usually best" ) );
     else if ( pLabel && pLabel == m_pUpdateBuildTypeLabel || pComboBox && pComboBox == m_pUpdateBuildTypeCombo )
         strText = std::string( _( "Auto updater:" ) ) + " " + std::string( _( "Select default unless you like filling out bug reports." ) );
+    else if ( pCheckBox && pCheckBox == m_pWin8ColorCheckBox )
+        strText = std::string( _( "16-bit color:" ) ) + " " + std::string( _( "Enable 16 bit color modes - Requires MTA restart" ) );
+    else if ( pCheckBox && pCheckBox == m_pWin8MouseCheckBox )
+        strText = std::string( _( "Mouse fix:" ) ) + " " + std::string( _( "Mouse movement fix - May need PC restart" ) );
     
-
     if ( strText != "" )
         m_pAdvancedSettingDescriptionLabel->SetText ( strText.c_str () );
 

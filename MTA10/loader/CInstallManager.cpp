@@ -839,18 +839,103 @@ SString CInstallManager::_ProcessServiceChecks ( void )
 //
 // CInstallManager::_ProcessAppCompatChecks
 //
-// Remove all options from AppCompatFlags/Layers execept RUNASADMIN
+// Remove/add required options from AppCompatFlags/Layers
 //
 //////////////////////////////////////////////////////////
 SString CInstallManager::_ProcessAppCompatChecks ( void )
 {
     BOOL bIsWOW64 = false;  // 64bit OS
     IsWow64Process( GetCurrentProcess(), &bIsWOW64 );
+    uint uiHKLMFlags = bIsWOW64 ? KEY_WOW64_64KEY : 0;
+    WString strGTAExePathFilename = FromUTF8( GetUsingExePathFilename() );
+    WString strMTAExePathFilename = FromUTF8( GetLaunchPathFilename() );
+    WString strCompatModeRegKey = L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\Layers";
+    int bWin816BitColorOption = GetApplicationSettingInt( "Win8Color16" );
+    int bWin8MouseOption = GetApplicationSettingInt( "Win8MouseFix" );
 
-    WString strCompatModeRegKey = "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\Layers";
+    // Lists of things to add/remove from AppCompatFlags
+    std::vector < WString > addList;
+    std::vector < WString > removeList;
 
-    if ( !DeleteCompatibilityEntries ( strCompatModeRegKey, HKEY_CURRENT_USER )
-      || !DeleteCompatibilityEntries ( strCompatModeRegKey, HKEY_LOCAL_MACHINE, bIsWOW64 ? KEY_WOW64_64KEY : 0 ) )
+    // Remove user voodoo
+    removeList.push_back( L"WIN95" );
+    removeList.push_back( L"WIN98" );
+    removeList.push_back( L"NT4SP5" );
+    removeList.push_back( L"WIN2000" );
+    removeList.push_back( L"WINXPSP2" );
+    removeList.push_back( L"WINXPSP3" );
+    removeList.push_back( L"WINSRV03SP1" );
+    removeList.push_back( L"WINSRV08SP1" );
+    removeList.push_back( L"VISTARTM" );
+    removeList.push_back( L"VISTASP1" );
+    removeList.push_back( L"VISTASP2" );
+    removeList.push_back( L"WIN7RTM" );
+    removeList.push_back( L"256COLOR" );
+    removeList.push_back( L"16BITCOLOR" );
+    removeList.push_back( L"640X480" );
+    removeList.push_back( L"DISABLETHEMES" );
+    removeList.push_back( L"DISABLEDWM" );
+    removeList.push_back( L"HIGHDPIAWARE" );
+
+    // Remove potential performance hit
+    removeList.push_back( L"FaultTolerantHeap" );
+
+    // Handle Windows 8 options
+    if ( bWin816BitColorOption )
+        addList.push_back( L"DWM8And16BitMitigation" );
+    else
+        removeList.push_back( L"DWM8And16BitMitigation" );
+
+    if ( bWin8MouseOption )
+        addList.push_back( L"NoDTToDITMouseBatch" );
+    else
+        removeList.push_back( L"NoDTToDITMouseBatch" );
+
+    // Details of reg keys to fiddle with
+    struct
+    {
+        WString     strProgName;
+        HKEY        hKeyRoot;
+        uint        uiFlags;
+    } items[] = { { strGTAExePathFilename, HKEY_CURRENT_USER,  0 },
+                  { strGTAExePathFilename, HKEY_LOCAL_MACHINE, uiHKLMFlags },
+                  { strMTAExePathFilename, HKEY_CURRENT_USER,  0 },
+                  { strMTAExePathFilename, HKEY_LOCAL_MACHINE, uiHKLMFlags } };
+
+    bool bTryAdmin = false;
+    for ( uint i = 0 ; i < NUMELMS( items ) ; i++ )
+    {
+        // Get current setting
+        WString strValue = ReadCompatibilityEntries( items[i].strProgName, strCompatModeRegKey, items[i].hKeyRoot, items[i].uiFlags );
+
+        // Break into words
+        std::vector < WString > entryList;
+        strValue.Split( " ", entryList );
+        ListRemove( entryList, WString() );
+
+        // Apply removals
+        for ( uint a = 0 ; a < removeList.size() ; a++ )
+            ListRemove( entryList, removeList[a] );
+
+        // Apply adds
+        for ( uint a = 0 ; a < addList.size() ; a++ )
+            ListAddUnique( entryList, addList[a] );
+
+        // Clear list if only flags remain
+        if ( entryList.size() == 1 && entryList[0].size() < 3 )
+            entryList.clear();
+
+        // Join to one value
+        WString strNewValue = WString::Join( L" ", entryList );
+
+        // Save setting
+        if ( strNewValue != strValue )
+            if ( !WriteCompatibilityEntries( items[i].strProgName, strCompatModeRegKey, items[i].hKeyRoot, items[i].uiFlags, strNewValue ) )
+                bTryAdmin = true;
+    }
+
+    // Handle admin requirement
+    if ( bTryAdmin )
     {
         if ( !IsUserAdmin() )
         {

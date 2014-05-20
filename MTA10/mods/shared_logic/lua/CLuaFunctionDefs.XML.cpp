@@ -210,8 +210,8 @@ int CLuaFunctionDefs::XMLNodeGetAttributes ( lua_State* luaVM )
         {
             lua_newtable ( luaVM );
             unsigned int uiIndex = 0;
-            list < CXMLAttribute * > ::iterator iter = pNode->GetAttributes ().ListBegin ();
-            for ( ; iter != pNode->GetAttributes ().ListEnd () ; iter++ )
+            list < CXMLAttribute * > ::const_iterator iter = pNode->GetAttributes ().ListBeginx ();
+            for ( ; iter != pNode->GetAttributes ().ListEndx () ; iter++ )
             {
                 lua_pushstring ( luaVM, ( *iter )->GetName ().c_str () );
                 lua_pushstring ( luaVM, ( *iter )->GetValue ().c_str () );

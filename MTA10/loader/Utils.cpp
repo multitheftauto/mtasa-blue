@@ -2137,91 +2137,68 @@ LONG RegSetValueString( HKEY hKey, LPCWSTR lpValueName, const WString& strData )
 
 //////////////////////////////////////////////////////////
 //
-// DeleteCompatibilityEntries
+// WriteCompatibilityEntries
 //
 // Based on a story by Towncivilian
 //
 // Returns false if admin needed
 //
 //////////////////////////////////////////////////////////
-bool DeleteCompatibilityEntries( const WString& strSubKey, HKEY hKeyRoot, uint uiFlags )
+bool WriteCompatibilityEntries( const WString& strProgName, const WString& strSubKey, HKEY hKeyRoot, uint uiFlags, const WString& strNewData )
 {
-    bool bResult = true;
+    bool bResult = false;
 
-    // Start off with read only
-    uiFlags |= KEY_READ;
+    // Try open/create key for wrting - Failure means admin is required
+    HKEY hKey;
+    if ( RegCreateKeyExW( hKeyRoot, strSubKey, NULL, NULL, 0, KEY_READ | KEY_WRITE | uiFlags, NULL, &hKey, NULL ) == ERROR_SUCCESS )
+    {
+        bResult = true;
+        if ( !strNewData.empty() )
+        {
+            // Write new setting
+            if ( RegSetValueString( hKey, strProgName, strNewData ) != ERROR_SUCCESS )
+                bResult = false;
+        }
+        else
+        {
+            // No setting, so delete the registry value
+            if ( RegDeleteValueW( hKey, strProgName ) != ERROR_SUCCESS )
+                bResult = false;
+        }
+
+        RegCloseKey( hKey );
+    }
+
+    return bResult;
+}
+
+
+//////////////////////////////////////////////////////////
+//
+// ReadCompatibilityEntries
+//
+// Returns all compatibility entries in a space delimited string
+// Note: Windows 8 can have flag characters for the first field. (Have seen ~ $ and ~$)
+//
+//////////////////////////////////////////////////////////
+WString ReadCompatibilityEntries( const WString& strProgName, const WString& strSubKey, HKEY hKeyRoot, uint uiFlags )
+{
+    WString strResult;
 
     // Try read only open - Failure probably means the key does not exist
     HKEY hKey;
-    if ( RegOpenKeyExW( hKeyRoot, strSubKey, NULL, uiFlags, &hKey ) != ERROR_SUCCESS )
-        return true;
-
-     // loop until we run out of registry values to read
-    for ( uint uiIndex = 0 ; true ; uiIndex++ )
+    if ( RegOpenKeyExW( hKeyRoot, strSubKey, NULL, KEY_READ | uiFlags, &hKey ) == ERROR_SUCCESS )
     {
-        // Read next value name if possible
-        WString strName; 
-        if ( RegEnumValueString( hKey, uiIndex, strName ) != ERROR_SUCCESS )
-            break;
-
-        // Is one of our exe names?
-        if ( strName.ContainsI( MTA_GTAEXE_NAME ) || strName.ContainsI( MTA_HTAEXE_NAME ) || strName.ContainsI( MTA_EXE_NAME ) )
+        WString strData; 
+        if ( RegQueryValueString( hKey, strProgName, strData ) == ERROR_SUCCESS )
         {
-            // Get compat setting
-            WString strData; 
-            if ( RegQueryValueString( hKey, strName, strData ) != ERROR_SUCCESS )
-                continue;
-
-            // Make new setting using only allowed bits
-            std::vector < WString > parts;
-            strData.Split( " ", parts );
-            for ( std::vector < WString >::iterator iter = parts.begin() ; iter != parts.end() ; )
-            {
-                if ( *iter != L"~"
-                     && *iter != L"RUNASADMIN"
-                     && *iter != L"DWM8And16BitMitigation" )
-                {
-                    iter = parts.erase( iter );
-                }
-                else
-                    ++iter;
-            }
-            WString strNewData = WString::Join( " ", parts );
-
-            // Remove tilde if nothing else left
-            if ( strNewData == L"~" )
-                strNewData = L"";
-
-            // Check for change
-            if ( strNewData == strData )
-                continue; // continue since we don't need to do anything
-
-            // Change required. Attempt swap to writeable key if not done so yet
-            if ( ( uiFlags & KEY_WRITE ) != KEY_WRITE )
-            {
-                uiFlags |= KEY_WRITE;
-                RegCloseKey( hKey );
-                if ( RegOpenKeyExW( hKeyRoot, strSubKey, NULL, uiFlags, &hKey ) != ERROR_SUCCESS )
-                    return false;   // Might need admin
-            }
-
-            if ( !strNewData.empty() )
-            {
-                // Write new setting
-                if ( RegSetValueString( hKey, strName, strNewData ) != ERROR_SUCCESS )
-                    bResult = false;    // Continue on error, but flag for admin
-            }
-            else // the user only had other compatibility mode settings enabled
-            {
-                if ( RegDeleteValueW( hKey, strName ) != ERROR_SUCCESS ) // delete the registry value
-                    bResult = false;    // Continue on error, but flag for admin
-                uiIndex--;
-                continue;
-            }
+            strResult = strData;
         }
+
+        RegCloseKey ( hKey );
     }
-    RegCloseKey ( hKey ); // close the registry key
-    return bResult;
+
+    return strResult;
 }
 
 
