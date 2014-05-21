@@ -281,6 +281,7 @@ public:
     BOOL                            IsTrailer               ( void );
     BOOL                            IsVehicle               ( void );
     BOOL                            IsUpgrade               ( void );
+    BOOL                            IsWeapon                ( void );
 
     char *                          GetNameIfVehicle        ( void );
 

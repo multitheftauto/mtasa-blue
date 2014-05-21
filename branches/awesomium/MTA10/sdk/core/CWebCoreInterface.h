@@ -25,6 +25,7 @@ class CWebCoreInterface
 {
 public:
     virtual CWebViewInterface*  CreateWebView       ( unsigned int uiWidth, unsigned int uiHeight, IDirect3DSurface9* pD3DSurface ) = 0;
+    virtual void                DestroyWebView      ( CWebViewInterface* pWebView ) = 0;
     virtual void                Update              () = 0;
     
     virtual eURLState           GetURLState        ( const SString& strURL ) = 0;
@@ -33,6 +34,9 @@ public:
     virtual void                RequestPages       ( const std::vector<SString>& pages ) = 0;
     virtual void                AllowPendingPages  () = 0;
     virtual void                DenyPendingPages   () = 0;
+
+    virtual bool                IsTestModeEnabled  () = 0;
+    virtual void                SetTestModeEnabled ( bool bEnabled ) = 0;
 };
 
 #endif

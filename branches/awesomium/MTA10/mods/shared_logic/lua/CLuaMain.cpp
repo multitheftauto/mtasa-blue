@@ -1217,11 +1217,13 @@ void CLuaMain::AddResourceClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "getConfig", "getResourceConfig" );
     lua_classfunction ( luaVM, "getDynamicElementRoot", "getResourceDynamicElementRoot" );
     lua_classfunction ( luaVM, "getExportedFunctions", "getResourceExportedFunctions" );
+    lua_classfunction ( luaVM, "getState", "getResourceState" );
     
     lua_classvariable ( luaVM, "config", NULL, "getResourceConfig" );
     lua_classvariable ( luaVM, "dynamicElementRoot", NULL, "getResourceDynamicElementRoot" );
     lua_classvariable ( luaVM, "exportedFunctions", NULL, "getResourceExportedFunctions" );
     lua_classvariable ( luaVM, "guiElement", NULL, "getResourceGUIElement" );
+    lua_classvariable ( luaVM, "state", NULL, "getResourceState" );
     lua_classvariable ( luaVM, "name", NULL, "getResourceName" );
     lua_classvariable ( luaVM, "rootElement", NULL, "getResourceRootElement" );
     

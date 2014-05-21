@@ -6289,6 +6289,8 @@ void CClientGame::SetDevelopmentMode ( bool bEnable )
         g_pGame->GetAudio ()->SetWorldSoundHandler ( CClientGame::StaticWorldSoundHandler );
     else
         g_pGame->GetAudio ()->SetWorldSoundHandler ( NULL );
+
+    g_pCore->GetWebCore()->SetTestModeEnabled ( bEnable );
 }
 
 

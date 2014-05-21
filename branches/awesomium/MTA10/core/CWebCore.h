@@ -16,6 +16,7 @@
 
 class CWebBrowserItem;
 class CWebsiteRequests;
+class CWebView;
 
 class CWebCore : public CWebCoreInterface, public Awesomium::ResourceInterceptor
 {
@@ -25,6 +26,7 @@ public:
     bool                Initialise();
 
     CWebViewInterface*  CreateWebView       ( unsigned int uiWidth, unsigned int uiHeight, IDirect3DSurface9* pD3DSurface );
+    void                DestroyWebView      ( CWebViewInterface* pWebViewInterface );
     void                Update              ();
     
     eURLState           GetURLState         ( const SString& strURL );
@@ -35,6 +37,10 @@ public:
     void                AllowPendingPages   ();
     void                DenyPendingPages    ();
 
+    inline bool         IsTestModeEnabled   () { return m_bTestmodeEnabled; };
+    inline void         SetTestModeEnabled  ( bool bEnabled ) { m_bTestmodeEnabled = bEnabled; };
+
+
     // Awesomium::ResourceInterceptor implementations
     virtual bool                          OnFilterNavigation ( int origin_process_id, int origin_routing_id, const Awesomium::WebString& method, const Awesomium::WebURL& url, bool is_main_frame );
     virtual Awesomium::ResourceResponse*  OnRequest ( Awesomium::ResourceRequest* pRequest);
@@ -44,11 +50,13 @@ public:
     static SString                        ToSString   ( const Awesomium::WebString& webString );
 
 private:
-    Awesomium::WebCore* m_pWebCore;
-    CWebsiteRequests*   m_pRequestsGUI;
+    Awesomium::WebCore*                     m_pWebCore;
+    CWebsiteRequests*                       m_pRequestsGUI;
+    std::map<int, CWebView*>                m_WebViewMap;
+    bool                                    m_bTestmodeEnabled;
 
-    CFastHashMap<SString, bool> m_Whitelist;
-    std::vector<SString>        m_PendingRequests;
+    CFastHashMap<SString, bool>             m_Whitelist;
+    std::vector<SString>                    m_PendingRequests;
 };
 
 #endif

@@ -12,7 +12,7 @@
 #include "CClientWebBrowser.h"
 
 CClientWebBrowser::CClientWebBrowser ( CClientManager* pManager, ElementID ID, CWebBrowserItem* pWebBrowserItem, CWebViewInterface* pWebView )
-    : ClassInit ( this ), CClientTexture ( pManager, ID, pWebBrowserItem ), m_pWebView ( pWebView ), m_bIsLocal ( false )
+    : ClassInit ( this ), CClientTexture ( pManager, ID, pWebBrowserItem ), m_pWebView ( pWebView )
 {
 }
 
@@ -42,10 +42,7 @@ void CClientWebBrowser::GetTitle ( SString& outPageTitle )
 
 void CClientWebBrowser::GetURL ( SString& outURL )
 {
-    if ( !m_bIsLocal )
-        m_pWebView->GetURL ( outURL );
-    else
-        outURL = m_strLocalFileName;
+    m_pWebView->GetURL ( outURL );
 }
 
 void CClientWebBrowser::SetRenderingPaused ( bool bPaused )
@@ -56,7 +53,7 @@ void CClientWebBrowser::SetRenderingPaused ( bool bPaused )
 bool CClientWebBrowser::ExecuteJavascript ( const SString& strJavascriptCode )
 {
     // Don't allow javascript code execution on remote websites
-    if ( !m_bIsLocal )
+    if ( !m_pWebView->IsLocal () )
         return false;
 
     m_pWebView->ExecuteJavascript ( strJavascriptCode );
@@ -86,4 +83,14 @@ void CClientWebBrowser::InjectMouseWheel ( int iScrollVert, int iScrollHorz )
 void CClientWebBrowser::InjectKeyboardEvent ( const SString& strKey, bool bKeyDown, bool bCharacter )
 {
     m_pWebView->InjectKeyboardEvent ( strKey, bKeyDown, bCharacter );
+}
+
+void CClientWebBrowser::SetIsLocal ( bool bEnabled, const SString& strLocalFileName )
+{
+    m_pWebView->SetIsLocal ( bEnabled, strLocalFileName );
+}
+
+bool CClientWebBrowser::IsLocal ()
+{
+    return m_pWebView->IsLocal ();
 }

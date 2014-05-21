@@ -177,6 +177,19 @@ SString GetExePathFilename( bool bUseExeCopy )
 
 //////////////////////////////////////////////////////////
 //
+// GetUsingExePathFilename
+//
+// Return full path and filename of exe we will probably be using
+//
+//////////////////////////////////////////////////////////
+SString GetUsingExePathFilename( void )
+{
+    return GetExePathFilename( ShouldUseExeCopy() );
+}
+
+
+//////////////////////////////////////////////////////////
+//
 // UpdatePatchStatusTimestamp
 //
 // Change the link timestamp in gta_sa.exe to trick windows 7 into using aero

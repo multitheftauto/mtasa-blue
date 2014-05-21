@@ -21,6 +21,7 @@ CWebView::CWebView ( unsigned int uiWidth, unsigned int uiHeight, IDirect3DSurfa
     // Set handlers
     m_pWebView->set_load_listener ( this );
     m_pWebView->set_js_method_handler ( &m_JSMethodHandler );
+
 }
 
 CWebView::~CWebView()
@@ -46,7 +47,10 @@ bool CWebView::IsLoading ()
 
 void CWebView::GetURL ( SString& outURL )
 {
-    outURL = static_cast<SString> ( CWebCore::ToSString ( m_pWebView->url ().spec () ) );
+    if ( !m_bIsLocal )
+        outURL = static_cast<SString> ( CWebCore::ToSString ( m_pWebView->url ().spec () ) );
+    else
+        outURL = m_strTempURL;
 }
 
 void CWebView::GetTitle(SString& outTitle)

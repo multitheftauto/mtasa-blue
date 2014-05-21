@@ -28,8 +28,6 @@ public:
     void                        GetTitle            ( SString& outPageTitle );
     void                        GetURL              ( SString& outURL );
     void                        SetRenderingPaused  ( bool bPaused );
-    inline void                 SetIsLocal          ( bool bIsLocal, const SString& strLocalFileName = "" )   { m_bIsLocal = bIsLocal; m_strLocalFileName = strLocalFileName; };
-    inline bool                 IsLocal             ()                                                        { return m_bIsLocal; };
 
     bool                        ExecuteJavascript   ( const SString& strJavascriptCode );
 
@@ -39,10 +37,11 @@ public:
     void                        InjectMouseWheel    ( int iScrollVert, int iScrollHorz );
     void                        InjectKeyboardEvent ( const SString& strKey, bool bKeyDown = true, bool bCharacter = false );
 
+    void                        SetIsLocal          ( bool bIsLocal, const SString& strLocalFileName = "");
+    bool                        IsLocal             ();
+
 private:
     CWebViewInterface* m_pWebView;
-    bool               m_bIsLocal;
-    SString            m_strLocalFileName;
 };
 
 #endif

@@ -38,6 +38,10 @@ bool CWebCore::Initialise ()
     // webConfig.user_script = Awesomium::WSLit(""); // Todo: Implement a watermark within editboxes
 
     m_pWebCore = Awesomium::WebCore::Initialize ( webConfig );
+
+    // Set all the handlers
+    m_pWebCore->set_resource_interceptor ( this );
+
     return m_pWebCore != NULL;
 }
 
@@ -45,7 +49,18 @@ CWebViewInterface* CWebCore::CreateWebView ( unsigned int uiWidth, unsigned int 
 {
     // Create our webview implementation
     CWebView* pWebView = new CWebView ( uiWidth, uiHeight, pD3DSurface );
+    m_WebViewMap[pWebView->GetAwesomiumView ()->process_id ()] = pWebView;
     return pWebView;
+}
+
+void CWebCore::DestroyWebView ( CWebViewInterface* pWebViewInterface )
+{
+    CWebView* pWebView = dynamic_cast<CWebView*> ( pWebViewInterface );
+    if ( pWebView )
+    {
+        m_WebViewMap.erase ( pWebView->GetAwesomiumView ()->process_id () );
+        delete pWebView;
+    }
 }
 
 void CWebCore::Update ()
@@ -56,15 +71,28 @@ void CWebCore::Update ()
 
 eURLState CWebCore::GetURLState ( const SString& strURL )
 {
+    // Initialize wildcard whitelist (be careful with modifying) | Todo: Think about the following
+    static SString wildcardWhitelist[] = { "*.googlevideo.com", "*.vimeocdn.com" };
+
+    for (int i = 0; i < sizeof(wildcardWhitelist) / sizeof(SString); ++i)
+    {
+        if (WildcardMatch(wildcardWhitelist[i], strURL))
+            return eURLState::WEBPAGE_ALLOWED;
+    }
+
     google::dense_hash_map<SString, bool>::iterator iter = m_Whitelist.find ( strURL );
     if ( iter != m_Whitelist.end () )
     {
         if ( iter->second == true )
             return eURLState::WEBPAGE_ALLOWED;
         else
+        {
+            if ( m_bTestmodeEnabled ) g_pCore->DebugPrintf ( "[BROWSER] Blocked page: %s", strURL.c_str() );
             return eURLState::WEBPAGE_DISALLOWED;
+        }
     }
 
+    if ( m_bTestmodeEnabled ) g_pCore->DebugPrintf ( "[BROWSER] Blocked page: %s", strURL.c_str() );
     return eURLState::WEBPAGE_NOT_LISTED;
 }
 
@@ -81,7 +109,10 @@ void CWebCore::ClearWhitelist ()
 void CWebCore::InitialiseWhiteAndBlacklist ()
 {
     // Hardcoded whitelist
-    static SString whitelist[] = { "google.com", "youtube.com", "reddit.com", "mtasa.com", "multitheftauto.com", "woovie.net" };
+    static SString whitelist[] = { 
+        "google.com", "www.youtube.com", "youtube.com", "s.youtube.com", "s.ytimg.com", "vimeo.com", "player.vimeo.com",
+        "myvideo.com", "reddit.com", "mtasa.com", "multitheftauto.com", "mtavc.com"
+    };
 
     // Hardcoded blacklist
     static SString blacklist[] = { "nobrain.dk" };
@@ -93,7 +124,7 @@ void CWebCore::InitialiseWhiteAndBlacklist ()
     }
     for ( unsigned int i = 0; i < sizeof(blacklist) / sizeof(SString); ++i )
     {
-        m_Whitelist[whitelist[i]] = false;
+        m_Whitelist[blacklist[i]] = false;
     }
 
     // Todo: Implement dynamic whitelist + blacklist hosted on a MTA QA server
@@ -165,9 +196,23 @@ void CWebCore::DenyPendingPages ()
 ////////////////////////////////////////////////////////////////////
 bool CWebCore::OnFilterNavigation ( int origin_process_id, int origin_routing_id, const Awesomium::WebString& method, const Awesomium::WebURL& url, bool is_main_frame )
 {
-    if ( GetURLState ( ToSString(url.host()) ) != eURLState::WEBPAGE_ALLOWED )
-        // Block the action
-        return true;
+    std::map<int, CWebView*>::iterator iter = m_WebViewMap.find ( origin_process_id );
+    assert ( iter != m_WebViewMap.end () );
+
+    CWebView* pWebView = iter->second;
+    if ( !pWebView )
+        return true; // Block
+
+    if ( url.scheme().Compare ( ToWebString("http") ) == 0 || url.scheme().Compare ( ToWebString("https") ) == 0 ) // Todo: Check how Awesomium reacts to other protocols
+    {
+        // Block if we're dealing with a remote page in local mode
+        if ( pWebView->IsLocal () )
+            return true; // Block
+
+        if ( GetURLState ( ToSString(url.host()) ) != eURLState::WEBPAGE_ALLOWED )
+            // Block the action
+            return true;
+    }
 
     // Don't do anything
     return false;
@@ -175,15 +220,41 @@ bool CWebCore::OnFilterNavigation ( int origin_process_id, int origin_routing_id
 
 ////////////////////////////////////////////////////////////////////
 //                                                                //
-//    Implementation: ResourceInterceptor::OnFilterNavigation     //
+//    Implementation: ResourceInterceptor::OnRequest              //
 // http://www.awesomium.com/docs/1_7_2/cpp_api/class_awesomium_1_1_resource_interceptor.html#ac275121fdb030ff432c79d0337f0c19c //
 //                                                                //
 ////////////////////////////////////////////////////////////////////
 Awesomium::ResourceResponse* CWebCore::OnRequest ( Awesomium::ResourceRequest* pRequest )
 {
-    if ( GetURLState ( ToSString(pRequest->url().host()) ) != eURLState::WEBPAGE_ALLOWED )
-        // Block the action
-        pRequest->Cancel ();
+    std::map<int, CWebView*>::iterator iter = m_WebViewMap.find ( pRequest->origin_process_id () );
+    int i = pRequest->origin_process_id ();
+    if (iter == m_WebViewMap.end())
+    {
+        pRequest->Cancel();
+        return NULL;
+    }
+
+    CWebView* pWebView = iter->second;
+    if ( !pWebView )
+    {
+        pRequest->Cancel (); // Block
+        return NULL;
+    }
+
+    Awesomium::WebURL url = pRequest->url ();
+
+    if ( url.scheme().Compare ( ToWebString("http") ) == 0 || url.scheme().Compare ( ToWebString("https") ) == 0 )
+    {
+        if (pWebView->IsLocal())
+        {
+            pRequest->Cancel (); // Block
+            return NULL;
+        }
+
+        if ( GetURLState ( ToSString(url.host()) ) != eURLState::WEBPAGE_ALLOWED )
+            // Block the action
+            pRequest->Cancel ();
+    }
 
     // We don't want to modify anything
     return NULL;

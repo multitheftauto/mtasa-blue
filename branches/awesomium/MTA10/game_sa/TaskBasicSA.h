@@ -31,7 +31,7 @@
 #define FUNC_CTaskComplexSunbathe__Constructor              0x631F80
 #define FUNC_CTASKSimplePlayerOnFoot__Constructor           0x685750
 #define FUNC_CTASKComplexFacial__Constructor                0x690D20
-
+#define VTBL_CTaskSimpleCarFallOut                          0x86EFD0
 
 ///////////////////////
 //Use a mobile phone
@@ -207,6 +207,16 @@ class CTaskSimpleBeHitSA : public virtual CTaskSimpleSA, public virtual CTaskSim
 public:
     CTaskSimpleBeHitSA ( void ) {};
     CTaskSimpleBeHitSA ( CPed* pPedAttacker, ePedPieceTypes hitBodyPart, int hitBodySide, int weaponId );
+};
+
+
+class CTaskSimpleCarFallOutSAInterface : public CTaskSimpleSAInterface
+{
+public:
+    uint    a;                      // 0x08
+    uint    b;                      // 0x0c
+    CVehicleSAInterface* pVehicle;  // 0x10
+    uint    doorIndex;              // 0x14
 };
 
 

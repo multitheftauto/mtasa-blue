@@ -10,6 +10,7 @@
 *****************************************************************************/
 
 #include "StdInc.h"
+#include "../game_sa/CTasksSA.h"
 
 void CPlayerPed__ProcessControl_Abort();
 
@@ -578,7 +579,6 @@ void _declspec(naked) HOOK_CrashFix_Misc19 ()
     }
 }
 
-
 ////////////////////////////////////////////////////////////////////////
 // Handle CPlaceable::RemoveMatrix having wrong data
 #define HOOKPOS_CrashFix_Misc20                             0x54F3B0
@@ -611,31 +611,63 @@ void _declspec(naked) HOOK_CrashFix_Misc20 ()
 }
 
 
-////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+//
 // Handle CTaskSimpleCarFallOut::FinishAnimFallOutCB having wrong data
-#define HOOKPOS_CrashFix_Misc21                             0x648EF6
-#define HOOKSIZE_CrashFix_Misc21                            6
-DWORD RETURN_CrashFix_Misc21 =                              0x648EFC;
+//
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+bool IsTaskSimpleCarFallOutValid( CAnimBlendAssociationSAInterface* pAnimBlendAssociation, CTaskSimpleCarFallOutSAInterface* pTask )
+{
+    if ( pTask->VTBL != (TaskVTBL*)VTBL_CTaskSimpleCarFallOut )
+    {
+        AddReportLog( 8530, SString( "IsTaskSimpleCarFallOutValid fail - pTask->VTBL: %08x", pTask->VTBL ), 5 );
+        return false;
+    }
+
+    if ( pTask->pVehicle )
+    {
+        CVehicle* pVehicle = pGameInterface->GetPools ()->GetVehicle ( (DWORD*) pTask->pVehicle );
+        if ( !pVehicle )
+        {
+            // Task looks valid, but vehicle is not recognised by MTA
+            AddReportLog( 8531, SString( "IsTaskSimpleCarFallOutValid invalid vehicle ptr - pTask->pVehicle: %08x", pTask->pVehicle ), 5 );
+            pTask->pVehicle = NULL;
+            return true;
+        }
+    }
+
+    return true;
+}
+
+#define HOOKPOS_CrashFix_Misc21                             0x648EE0
+#define HOOKSIZE_CrashFix_Misc21                            7
+DWORD RETURN_CrashFix_Misc21 =                              0x648EE7;
 void _declspec(naked) HOOK_CrashFix_Misc21 ()
 {
 #if TEST_CRASH_FIXES
     SIMULATE_ERROR_BEGIN( 10 )
         _asm
         {
-            mov     ecx, 0x10
+            mov     [esp+8], 0x10
         }
     SIMULATE_ERROR_END
 #endif
 
     _asm
     {
-        cmp     ecx, 0x480
-        jb      cont  // Skip much code if ecx is low
-        cmp     ecx, 0xfffffff0
-        ja      cont  // Skip much code if ecx is high
+        pushad
+        push    [esp+32+4*2]
+        push    [esp+32+4*2]
+        call    IsTaskSimpleCarFallOutValid
+        add     esp, 4*2
+        cmp     al,0
+        popad
+        je      cont  // Skip much code if CTaskSimpleCarFallOut is not valid
 
         // continue standard path
-        mov     edx, [ecx+590h]
+        mov     eax, [esp+8]
+        mov     ecx, [eax+10h]
         jmp     RETURN_CrashFix_Misc21
 
     cont:

@@ -50,6 +50,7 @@ SString             GetPatchExeAdminReason          ( bool bUseExeCopy, const SE
 uint                GetExeFileSize                  ( bool bUseExeCopy );
 bool                CopyExe                         ( void );
 SString             GetExePathFilename              ( bool bUseExeCopy );
+SString             GetUsingExePathFilename         ( void );
 bool                GetPatchRequirementAltModules   ( void );
 EPatchResult        UpdatePatchStatusNvightmare     ( const SString& strGTAEXEPath, EPatchMode mode );
 EPatchResult        UpdatePatchStatusTimestamp      ( const SString& strGTAEXEPath, EPatchMode mode );
