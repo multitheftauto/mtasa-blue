@@ -692,7 +692,7 @@ namespace CEGUI
         // not via property - calculate using Dimensions
         else
         {
-            // sanity check, we mus be able to form a Rect from what we represent.
+            // sanity check, we must be able to form a Rect from what we represent.
             assert(d_left.getDimensionType() == DT_LEFT_EDGE || d_left.getDimensionType() == DT_X_POSITION);
             assert(d_top.getDimensionType() == DT_TOP_EDGE || d_top.getDimensionType() == DT_Y_POSITION);
             assert(d_right_or_width.getDimensionType() == DT_RIGHT_EDGE || d_right_or_width.getDimensionType() == DT_WIDTH);
@@ -710,6 +710,10 @@ namespace CEGUI
                 pixelRect.setHeight(d_bottom_or_height.getBaseDimension().getValue(wnd));
             else
                 pixelRect.d_bottom = d_bottom_or_height.getBaseDimension().getValue(wnd);
+
+            // width & height can never be negative
+            pixelRect.d_right = std::max(pixelRect.d_right, pixelRect.d_left);
+            pixelRect.d_bottom = std::max(pixelRect.d_bottom, pixelRect.d_top);
         }
 
         return pixelRect;
