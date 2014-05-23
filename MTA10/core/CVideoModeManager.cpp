@@ -38,6 +38,7 @@ public:
     virtual bool        IsMinimizeEnabled           ( void );
     virtual void        OnGainFocus                 ( void );
     virtual void        OnLoseFocus                 ( void );
+    virtual bool        GetRequiredDisplayResolution( int& iOutWidth, int& iOutHeight, int& iOutColorBits, int& iOutAdapterIndex );
 
     bool                IsDisplayModeWindowed       ( void );
     bool                IsDisplayModeFullScreen     ( void );
@@ -47,6 +48,7 @@ private:
     void                LoadCVars                   ( void );
     void                SaveCVars                   ( void );
     bool                GameResMatchesPrimaryMonitor ( void );
+    SString             MakeResolutionString        ( uint uiWidth, uint uiHeight, uint uiDepth, uint uiAdapter );
 
     unsigned long       m_ulForceBackBufferWidth;
     unsigned long       m_ulForceBackBufferHeight;
@@ -57,10 +59,12 @@ private:
     unsigned long       m_ulMonitorCount;
 
     int                 m_iCurrentVideoMode;    // VideoMode this run
+    int                 m_iCurrentAdapter;
     bool                m_bCurrentWindowed;
     bool                m_bCurrentFullScreenMinimize;
     int                 m_iCurrentFullscreenStyle;
     int                 m_iNextVideoMode;       // VideoMode next run
+    int                 m_iNextAdapter;
     bool                m_bNextWindowed;
     int                 m_iNextFullscreenStyle;
 
@@ -125,6 +129,7 @@ void CVideoModeManager::PreCreateDevice ( D3DPRESENT_PARAMETERS* pp )
 
     // Prime save values
     m_iNextVideoMode = m_iCurrentVideoMode;
+    m_iNextAdapter = m_iCurrentAdapter;
     m_bNextWindowed  = m_bCurrentWindowed;
     m_iNextFullscreenStyle = m_iCurrentFullscreenStyle;
 
@@ -419,6 +424,13 @@ void CVideoModeManager::LoadCVars ( void )
     CVARS_GET ( "display_windowed",             m_bCurrentWindowed );
     CVARS_GET ( "display_fullscreen_style",     m_iCurrentFullscreenStyle );
     CVARS_GET ( "multimon_fullscreen_minimize", m_bCurrentFullScreenMinimize );
+
+    // Save the video mode resolution that is being used
+    VideoMode info;
+    if ( m_pGameSettings->GetVideoModeInfo( &info, m_iCurrentVideoMode ) )
+    {
+        CVARS_SET ( "display_resolution", MakeResolutionString( info.width, info.height, info.depth, m_iCurrentAdapter ) );
+    }
 }
 
 
@@ -435,6 +447,12 @@ void CVideoModeManager::SaveCVars ( void )
     CVARS_SET ( "display_windowed",             m_bNextWindowed );
     CVARS_SET ( "display_fullscreen_style",     m_iNextFullscreenStyle );
     CVARS_SET ( "multimon_fullscreen_minimize", m_bCurrentFullScreenMinimize );
+
+    VideoMode info;
+    if ( m_pGameSettings->GetVideoModeInfo( &info, m_iNextVideoMode ) )
+    {
+        CVARS_SET ( "display_resolution", MakeResolutionString( info.width, info.height, info.depth, m_iNextAdapter ) );
+    }
 }
 
 
@@ -563,4 +581,60 @@ bool CVideoModeManager::GameResMatchesPrimaryMonitor( void )
     }
 
     return false;
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CVideoModeManager::MakeResolutionString
+//
+// Make a frendly string for saving to the config file
+//
+///////////////////////////////////////////////////////////////
+SString CVideoModeManager::MakeResolutionString ( uint uiWidth, uint uiHeight, uint uiDepth, uint uiAdapter )
+{
+    SString strRes( "%dx%dx%d", uiWidth, uiHeight, uiDepth );
+    if ( uiAdapter > 0 )
+        strRes += SString( "x%d", uiAdapter );
+    return strRes;
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CVideoModeManager::GetRequiredDisplayResolution
+//
+// Get last set/used resolution from MTA configuration
+//
+///////////////////////////////////////////////////////////////
+bool CVideoModeManager::GetRequiredDisplayResolution( int& iOutWidth, int& iOutHeight, int& iOutColorBits, int& iOutAdapterIndex )
+{
+    iOutWidth = 0;
+    iOutHeight = 0;
+    iOutAdapterIndex = 0;
+    iOutColorBits = 32;
+
+    SString strResString;
+    CVARS_GET ( "display_resolution", strResString );
+
+    // Parse string from config
+    std::vector < SString > parts;
+    strResString.ToLower().Replace( " ", "" ).Split( "x", parts );
+    if ( parts.size() > 1 )
+    {
+        iOutWidth = atoi( parts[0] );
+        iOutHeight = atoi( parts[1] );
+    }
+    if ( parts.size() > 2 )
+    {
+        iOutColorBits = atoi( parts[2] );
+    }
+    if ( parts.size() > 3 )
+    {
+        iOutAdapterIndex = atoi( parts[3] );
+    }
+
+    return ( iOutWidth > 0 )
+            && ( iOutHeight > 0 )
+            && ( iOutColorBits == 16 || iOutColorBits == 32 );
 }

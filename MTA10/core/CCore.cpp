@@ -965,10 +965,6 @@ void CCore::CreateGame ( )
     {
         BrowseToSolution ( "downgrade", TERMINATE_PROCESS, "Only GTA:SA version 1.0 is supported!\n\nYou are now being redirected to a page where you can patch your version." );
     }
-
-    // Apply hiding device selection dialog
-    bool bDeviceSelectionDialogEnabled = GetApplicationSettingInt ( "device-selection-disabled" ) ? false : true;
-    m_pGame->GetSettings ()->SetSelectDeviceDialogEnabled ( bDeviceSelectionDialogEnabled );
 }
 
 
@@ -2349,4 +2345,14 @@ void CCore::CallSetCursorPos( int X, int Y )
 {
     if ( CCore::GetSingleton ().IsFocused () && !CLocalGUI::GetSingleton ().IsMainMenuVisible () )
         m_pSetCursorPosHook->CallSetCursorPos(X,Y);
+}
+
+bool CCore::GetRequiredDisplayResolution( int& iOutWidth, int& iOutHeight, int& iOutColorBits, int& iOutAdapterIndex )
+{
+    return GetVideoModeManager()->GetRequiredDisplayResolution( iOutWidth, iOutHeight, iOutColorBits, iOutAdapterIndex );
+}
+
+bool CCore::GetDeviceSelectionEnabled( void )
+{
+    return GetApplicationSettingInt ( "device-selection-disabled" ) ? false : true;
 }
