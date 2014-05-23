@@ -100,7 +100,7 @@ bool CAudioContainerSA::GetRawAudioData ( eAudioLookupIndex lookupIndex, int ban
     if ( !lookupEntry )
         return false;
 
-    // Read audio archive bank header (an audio archieve has multiple bank headers)
+    // Read audio archive bank header (an audio archive has multiple bank headers)
     SAudioBankHeaderSA bankHeader;
 
     // Seek to the bank offset and read the header
@@ -204,4 +204,86 @@ bool CAudioContainerSA::ValidateContainer ( eAudioLookupIndex lookupIndex )
         return false;
 
     return true;
+}
+
+bool CAudioContainerSA::GetRadioAudioData(eRadioStreamIndex streamIndex, int trackIndex, void*& pMemory, unsigned int& length)
+{
+    std::ifstream archive(FromUTF8(GetRadioStreamArchiveName(streamIndex)), std::ios::binary);
+
+    // Check if it does not exist
+    if (!archive)
+        return false;
+
+    // The tracks are stored consecutive in the stream files
+    // A track consist of a header and is followed by the actual ogg stream
+
+    // Since there is no index, we need to move through the tracks until we reach the desired one
+    SRadioTrackHeader header;
+    int trackid = 1;
+    while (trackid < trackIndex)
+    {
+        ReadRadioArchive(archive, header);
+        archive.seekg(header.length, std::ios_base::cur);
+        ++trackid;
+
+        if (archive.fail())
+            return false;
+    }
+
+    // We now have reached the right track
+    ReadRadioArchive(archive, header);
+
+    if (archive.fail())
+        return false;
+
+    uint8 *pData = new uint8[header.length];
+    ReadRadioArchive(archive, * pData, header.length);
+
+    if (archive.fail())
+    {
+        delete[] pData;
+        return false;
+    }
+
+    // Test the header signature of the ogg stream
+    if (pData[0] != 'O' ||
+        pData[1] != 'g' ||
+        pData[2] != 'g' ||
+        pData[3] != 'S')
+    {
+        delete[] pData;
+        return false;
+    }
+
+    pMemory = pData;
+    length = header.length;
+
+    return true;
+}
+
+
+const SString CAudioContainerSA::GetRadioStreamArchiveName(eRadioStreamIndex streamIndex)
+{
+    switch (streamIndex)
+    {
+        case RADIO_STREAM_POLICE:           return "AUDIO\\STREAMS\\AA";
+        case RADIO_STREAM_ADVERTS:          return "AUDIO\\STREAMS\\ADVERTS";
+        case RADIO_STREAM_AMBIENCE:         return "AUDIO\\STREAMS\\AMBIENCE";
+        case RADIO_STREAM_BEATS:            return "AUDIO\\STREAMS\\BEATS";
+        case RADIO_STREAM_PLAYBACK:         return "AUDIO\\STREAMS\\CH";
+        case RADIO_STREAM_KROSE:            return "AUDIO\\STREAMS\\CO";
+        case RADIO_STREAM_KDST:             return "AUDIO\\STREAMS\\CR";
+        case RADIO_STREAM_CUTSCENE:         return "AUDIO\\STREAMS\\CUTSCENE";
+        case RADIO_STREAM_BOUNCE:           return "AUDIO\\STREAMS\\DS";
+        case RADIO_STREAM_SFUR:             return "AUDIO\\STREAMS\\HC";
+        case RADIO_STREAM_RADIO_LOS_SANTOS: return "AUDIO\\STREAMS\\MH";
+        case RADIO_STREAM_RADIO_X:          return "AUDIO\\STREAMS\\MR";
+        case RADIO_STREAM_CSR:              return "AUDIO\\STREAMS\\NJ";
+        case RADIO_STREAM_KJAH:             return "AUDIO\\STREAMS\\RE";
+        case RADIO_STREAM_MASTER_SOUNDS:    return "AUDIO\\STREAMS\\RG";
+        case RADIO_STREAM_WCTR:             return "AUDIO\\STREAMS\\TK";
+    }
+
+    // Bad Index
+    return "";
 }

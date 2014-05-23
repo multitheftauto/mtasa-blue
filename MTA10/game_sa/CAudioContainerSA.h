@@ -29,6 +29,8 @@ public:
     bool GetAudioData ( eAudioLookupIndex lookupIndex, int bankIndex, int audioIndex, void*& pMemory, unsigned int& length );
     bool ValidateContainer ( eAudioLookupIndex lookupIndex );
 
+    bool GetRadioAudioData(eRadioStreamIndex streamIndex, int trackIndex, void*& pMemory, unsigned int& length);
+
 private:
     CAudioContainerLookupTableSA* m_pLookupTable;
 
@@ -36,6 +38,27 @@ protected:
     bool GetRawAudioData ( eAudioLookupIndex lookupIndex, int bankIndex, int audioIndex, uint8*& dataOut, unsigned int& lengthOut, int& iSampleRateOut );
     const SString GetAudioArchiveName ( eAudioLookupIndex );
 
+    const SString GetRadioStreamArchiveName(eRadioStreamIndex streamIndex);
+    
+    template<typename T> void ReadRadioArchive(std::ifstream& stream, T& value, std::size_t len = 1)
+    {
+        static uint8_t xor[] = { 0xEA, 0x3A, 0xC4, 0xA1, 0x9A, 0xA8, 0x14, 0xF3, 0x48, 0xB0, 0xD7, 0x23, 0x9D, 0xE8, 0xFF, 0xF1 };
+        uint8_t xorPosition = stream.tellg() % sizeof(xor);
+
+        stream.read((char*) &value, sizeof(T) * len);
+
+        // for some reason R* decided to xor the radio streams
+        // see gta_sa.exe @ 0x4F17D0
+        for (unsigned int i = 0; i < sizeof(T) * len; ++i)
+        {
+            ((char*) &value)[i] ^= xor[xorPosition];
+
+            xorPosition++;
+            if (xorPosition >= sizeof(xor))
+                xorPosition = 0;
+
+        }
+    }
 };
 
 struct SAudioEntrySA
@@ -72,5 +95,14 @@ struct SRiffWavePCMHeader
     uint32 subchunk2Size; // 40
 }; // size = 44 = 0x2C
 C_ASSERT ( sizeof ( SRiffWavePCMHeader ) == 0x2C );
+
+struct SRadioTrackHeader
+{
+    char unk[8000]; // 0
+    int32_t length; // 8000 (length of the ogg stream)
+    int32_t unk2;   // 8004 (sample rate?)
+    char unk3[60];  // 8008
+};
+C_ASSERT(sizeof(SRadioTrackHeader) == 8068);
 
 #endif
