@@ -38,6 +38,7 @@ DECLARE_ENUM( eVehicleComponent );
 DECLARE_ENUM( eFontType );
 DECLARE_ENUM( eAudioLookupIndex );
 DECLARE_ENUM( eAspectRatio );
+DECLARE_ENUM( eRadioStreamIndex );
 
 enum eDXHorizontalAlign
 {
