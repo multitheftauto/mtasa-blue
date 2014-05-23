@@ -90,6 +90,8 @@ public:
     virtual VideoMode *     GetVideoModeInfo        ( VideoMode * modeInfo, unsigned int modeIndex ) = 0;
     virtual unsigned int    GetCurrentVideoMode     ( void ) = 0;
     virtual void            SetCurrentVideoMode     ( unsigned int modeIndex, bool bOnRestart ) = 0;
+    virtual unsigned int    GetNumAdapters          ( void ) = 0;
+    virtual void            SetAdapter              ( unsigned int uiAdapterIndex ) = 0;
     virtual unsigned char   GetRadioVolume          ( void ) = 0;
     virtual void            SetRadioVolume          ( unsigned char ucVolume ) = 0;
     virtual unsigned char   GetSFXVolume            ( void ) = 0;
@@ -131,8 +133,6 @@ public:
 
     virtual bool            IsGrassEnabled          ( void ) = 0;
     virtual void            SetGrassEnabled         ( bool bEnable ) = 0;
-
-    virtual void            SetSelectDeviceDialogEnabled    ( bool bEnable ) = 0;
 
     virtual void            Save                    ( void ) = 0;
 };

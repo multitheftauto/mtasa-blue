@@ -92,6 +92,8 @@ public:
     VideoMode *             GetVideoModeInfo            ( VideoMode * modeInfo, unsigned int modeIndex );
     unsigned int            GetCurrentVideoMode         ( void );
     void                    SetCurrentVideoMode         ( unsigned int modeIndex, bool bOnRestart );
+    unsigned int            GetNumAdapters              ( void );
+    void                    SetAdapter                  ( unsigned int uiAdapterIndex );
     unsigned char           GetRadioVolume              ( void );
     void                    SetRadioVolume              ( unsigned char ucVolume );
     unsigned char           GetSFXVolume                ( void );
@@ -135,9 +137,13 @@ public:
     bool                    IsGrassEnabled              ( void );
     void                    SetGrassEnabled             ( bool bEnable );
 
-    void                    SetSelectDeviceDialogEnabled    ( bool bEnable );
-
     void                    Save                        ( void );
+
+    static void             StaticSetHooks              ( void );
+
+    uint                    FindVideoMode               ( int iResX, int iResY, int iColorBits );
+    void                    SetValidVideoMode           ( void );
+    int                     OnSelectDevice              ( void );
 
 private:
     static unsigned long    FUNC_GetNumVideoModes;
@@ -146,6 +152,8 @@ private:
     static unsigned long    FUNC_SetCurrentVideoMode;
     static unsigned long    FUNC_SetRadioVolume;
     static unsigned long    FUNC_SetDrawDistance;
+    static unsigned long    FUNC_GetNumSubSystems;
+    static unsigned long    FUNC_SetSubSystem;
 };
 
 #endif
