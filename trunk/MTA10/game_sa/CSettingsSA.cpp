@@ -4,8 +4,6 @@
 *  LICENSE:     See LICENSE in the top level directory
 *  FILE:        game_sa/CSettingsSA.cpp
 *  PURPOSE:     Game settings
-*  DEVELOPERS:  Ed Lyons <eai@opencoding.net>
-*               Sebas Lamers <sebasdevelopment@gmx.com>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -22,6 +20,11 @@ unsigned long CSettingsSA::FUNC_GetVideoModeInfo;
 unsigned long CSettingsSA::FUNC_GetCurrentVideoMode;
 unsigned long CSettingsSA::FUNC_SetCurrentVideoMode;
 unsigned long CSettingsSA::FUNC_SetDrawDistance;
+unsigned long CSettingsSA::FUNC_GetNumSubSystems;
+unsigned long CSettingsSA::FUNC_SetSubSystem;
+
+#define VAR_CurVideoMode            (*((uint*)(0x08D6220)))
+#define VAR_SavedVideoMode          (*((uint*)(0x0BA6820)))
 
 #define HOOKPOS_GetFxQuality                0x49EA50
 void HOOK_GetFxQuality ();
@@ -66,14 +69,16 @@ unsigned int CSettingsSA::GetNumVideoModes ( void )
 
 VideoMode * CSettingsSA::GetVideoModeInfo ( VideoMode * modeInfo, unsigned int modeIndex )
 {
+    VideoMode* pReturn = NULL;
     _asm
     {
         push    modeIndex
         push    modeInfo
         call    FUNC_GetVideoModeInfo
+        mov     pReturn, eax
         add     esp, 8
     }
-    return modeInfo;
+    return pReturn;
 }
 
 unsigned int CSettingsSA::GetCurrentVideoMode ( void )
@@ -101,6 +106,27 @@ void CSettingsSA::SetCurrentVideoMode ( unsigned int modeIndex, bool bOnRestart 
     // Only update settings variables for fullscreen modes
     if ( modeIndex )
         m_pInterface->dwVideoMode = modeIndex;
+}
+
+uint CSettingsSA::GetNumAdapters ( void )
+{
+    unsigned int uiReturn = 0;
+    _asm
+    {
+        call    FUNC_GetNumSubSystems
+        mov     uiReturn, eax
+    }
+    return uiReturn;
+}
+
+void CSettingsSA::SetAdapter ( unsigned int uiAdapterIndex )
+{
+    _asm
+    {
+        push    uiAdapterIndex
+        call    FUNC_SetSubSystem
+        add     esp, 4
+    }
 }
 
 unsigned char CSettingsSA::GetRadioVolume ( void )
@@ -418,12 +444,225 @@ void CSettingsSA::SetGrassEnabled ( bool bEnable )
     MemPut < BYTE > ( 0x05DBAED, bEnable ? 0x85 : 0x33 );
 }
 
+
 ////////////////////////////////////////////////
 //
-// Select device dialog for multi-monitor setups
+// CSettingsSA::FindVideoMode
+//
+// Find best matching video mode
 //
 ////////////////////////////////////////////////
-void CSettingsSA::SetSelectDeviceDialogEnabled ( bool bEnable )
+uint CSettingsSA::FindVideoMode( int iResX, int iResY, int iColorBits )
 {
-    MemPut < BYTE > ( 0x74621F, bEnable ? 0x01 : 0x42 );
+    int iBestMode, iBestScore = -1;
+    int iAltBestMode, iAltBestScore = -1;
+
+    uint numVidModes = GetNumVideoModes();
+    for ( uint vidMode = 0; vidMode < numVidModes; vidMode++ )
+    {
+        VideoMode vidModeInfo;
+        GetVideoModeInfo( &vidModeInfo, vidMode );
+
+        // Remove resolutions that will make the gui unusable
+        if ( vidModeInfo.width < 640 || vidModeInfo.height < 480 )
+            continue;
+
+        if ( vidModeInfo.flags & rwVIDEOMODEEXCLUSIVE )
+        {
+            // Check mode is not higher than the one requested
+            if ( vidModeInfo.width <= iResX && vidModeInfo.height <= iResY )
+            {
+                // Rate my res
+                int iScore = iResX - vidModeInfo.width + iResY - vidModeInfo.height;
+                if ( vidModeInfo.depth == iColorBits )
+                {
+                    if ( iScore < iBestScore || iBestScore == -1 )
+                    {
+                        // Found a better match with requested bit depth
+                        iBestScore = iScore;
+                        iBestMode = vidMode;
+                    }
+                }
+                else
+                if ( vidModeInfo.depth == 32 || vidModeInfo.depth == 16 )
+                {
+                    if ( iScore < iAltBestScore || iAltBestScore == -1 )
+                    {
+                        // Found a better match with other bit depth
+                        iAltBestScore = iScore;
+                        iAltBestMode = vidMode;
+                    }
+                }
+            }
+        }
+    }
+
+    if ( iBestScore != -1 )
+        return iBestMode;
+    if ( iAltBestScore != -1 )
+        return iAltBestMode;
+
+    return 1;
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+// CSettingsSA::SetValidVideoMode
+//
+// Set/validate the required video mode
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+void CSettingsSA::SetValidVideoMode( void )
+{
+    bool bValid = false;
+    int iWidth, iHeight, iColorBits, iAdapterIndex;
+
+    // First, try to get MTA saved info
+    if ( !bValid )
+    {
+        bValid = g_pCore->GetRequiredDisplayResolution( iWidth, iHeight, iColorBits, iAdapterIndex );
+    }
+
+    // Otherwise deduce from GTA saved video mode
+    if ( !bValid )
+    {
+        SetAdapter( 0 );
+        uint numVidModes = GetNumVideoModes();
+        if ( VAR_SavedVideoMode > 0 && VAR_SavedVideoMode < numVidModes )
+        {
+            VideoMode modeInfo;
+            if ( GetVideoModeInfo( &modeInfo, VAR_SavedVideoMode ) )
+            {
+                iWidth = modeInfo.width;
+                iHeight = modeInfo.height;
+                iColorBits = modeInfo.depth;
+                iAdapterIndex = 0;
+                bValid = true;        
+            }
+        }
+    }
+
+    // Finally use default
+    if ( !bValid )
+    {
+        bValid = true;
+        iWidth = 800;
+        iHeight = 600;
+        iColorBits = 32;
+        iAdapterIndex = 0;
+    }
+
+    // Set adapter
+    if ( (uint)iAdapterIndex >= GetNumAdapters() )
+        iAdapterIndex = 0;
+    SetAdapter( iAdapterIndex );
+
+    // Ensure res is no bigger than currently being used by windows
+    VideoMode currentModeInfo;
+    if ( GetVideoModeInfo( &currentModeInfo, GetCurrentVideoMode() ) )
+    {
+        if ( currentModeInfo.width < iWidth || currentModeInfo.height < iHeight )
+        {
+            iWidth = currentModeInfo.width;
+            iHeight = currentModeInfo.height;
+        }
+    }
+
+    // Ensure res is no smaller than 640 x 480
+    iWidth = Max( 640, iWidth );
+    iHeight = Max( 480, iHeight );
+
+    // Find mode number which best matches required settings
+    uint uiUseVideoMode = FindVideoMode( iWidth, iHeight, iColorBits );
+
+    // Set for GTA to use
+    VAR_CurVideoMode = uiUseVideoMode;
+    VAR_SavedVideoMode = uiUseVideoMode;
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+// CSettingsSA::OnSelectDevice
+//
+// return 0 for single adapter
+// return 1 for multi adapter hide dialog
+// return 2 for multi adapter show dialog
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+int CSettingsSA::OnSelectDevice( void )
+{
+    if ( GetNumAdapters() > 1 && g_pCore->GetDeviceSelectionEnabled() )
+    {
+        // Show device selection
+        return 1;
+    }
+
+    SetValidVideoMode();
+
+    if ( GetNumAdapters() > 1 )
+    {
+        // Hide device selection
+        return 2;
+    }
+    else
+    {
+        return 0;
+    }
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+// Hook psSelectDevice so we can:
+//   * Set/validate the required video mode
+//   * Choose whether to show the device selection dialog box
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+int OnMY_SelectDevice( void )
+{
+    CSettingsSA* gameSettings = (CSettingsSA*)pGame->GetSettings();
+    return gameSettings->OnSelectDevice();
+}
+
+// Hook info
+#define HOOKPOS_SelectDevice             0x0746219
+#define HOOKSIZE_SelectDevice            6
+DWORD RETURN_SelectDeviceSingle =        0x0746273;
+DWORD RETURN_SelectDeviceMultiHide =     0x074622C;
+DWORD RETURN_SelectDeviceMultiShow =     0x0746227;
+void _declspec(naked) HOOK_SelectDevice ()
+{
+    _asm
+    {
+        pushad
+        call    OnMY_SelectDevice
+        cmp     eax, 1
+        popad
+
+        jl      single
+        jz      multishow
+
+        // multhide
+        mov     eax, 1
+        jmp     RETURN_SelectDeviceMultiHide
+
+multishow:
+        jmp     RETURN_SelectDeviceMultiShow
+
+single:
+        jmp     RETURN_SelectDeviceSingle
+    }
+}
+
+
+////////////////////////////////////////////////
+//
+// Setup hooks
+//
+////////////////////////////////////////////////
+void CSettingsSA::StaticSetHooks ( void )
+{
+    EZHookInstall( SelectDevice );
 }
