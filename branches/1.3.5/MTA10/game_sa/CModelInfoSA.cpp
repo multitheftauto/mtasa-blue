@@ -285,7 +285,7 @@ BOOL CModelInfoSA::IsWeapon(void)
     return (m_dwModelID >= 321 && m_dwModelID <= 326) || // Melee Weapons
         (
         (m_dwModelID >= 331 && m_dwModelID <= 372) && // Other Weapons
-        (m_dwModelID != 370 && m_dwModelID != 332 && m_dwModelID != 340 && m_dwModelID != 345 && m_dwModelID != 354) // Not weapons
+        (m_dwModelID != 370 && m_dwModelID != 332 && m_dwModelID != 340 && m_dwModelID != 345) // Not weapons
         );
 }
 
