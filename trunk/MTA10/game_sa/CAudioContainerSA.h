@@ -42,8 +42,8 @@ protected:
     
     template<typename T> void ReadRadioArchive(std::ifstream& stream, T& value, std::size_t len = 1)
     {
-        static uint8_t xor[] = { 0xEA, 0x3A, 0xC4, 0xA1, 0x9A, 0xA8, 0x14, 0xF3, 0x48, 0xB0, 0xD7, 0x23, 0x9D, 0xE8, 0xFF, 0xF1 };
-        uint8_t xorPosition = stream.tellg() % sizeof(xor);
+        static uint8 xor[] = { 0xEA, 0x3A, 0xC4, 0xA1, 0x9A, 0xA8, 0x14, 0xF3, 0x48, 0xB0, 0xD7, 0x23, 0x9D, 0xE8, 0xFF, 0xF1 };
+        uint8 xorPosition = stream.tellg() % sizeof(xor);
 
         stream.read((char*) &value, sizeof(T) * len);
 
@@ -99,8 +99,8 @@ C_ASSERT ( sizeof ( SRiffWavePCMHeader ) == 0x2C );
 struct SRadioTrackHeader
 {
     char unk[8000]; // 0
-    int32_t length; // 8000 (length of the ogg stream)
-    int32_t unk2;   // 8004 (sample rate?)
+    int length;     // 8000 (length of the ogg stream)
+    int unk2;       // 8004 (sample rate?)
     char unk3[60];  // 8008
 };
 C_ASSERT(sizeof(SRadioTrackHeader) == 8068);
