@@ -125,6 +125,21 @@ int CLuaDefs::CanUseFunction ( lua_CFunction f, lua_State* luaVM )
     if ( CLuaCFunctions::IsNotFunction( f ) )
         return true;
 
+    // these are for OOP and establish the function to call, at which point the function is called normally so we get this called like so:
+    // Call 1: f = CLuaClassDefs::NewIndex
+    // Call 2: f = setElementHealth
+    // ignore new index as it isn't registered as an LuaCFunction and just throws an assert in debug/causes issues.
+    if ( f == (lua_CFunction)&CLuaClassDefs::NewIndex || 
+        f == (lua_CFunction)&CLuaClassDefs::StaticNewIndex ||
+        f == (lua_CFunction)&CLuaClassDefs::Index ||
+        f == (lua_CFunction)&CLuaClassDefs::Call || 
+        f == (lua_CFunction)&CLuaClassDefs::ToString || 
+        f == (lua_CFunction)&CLuaClassDefs::ReadOnly ||
+        f == (lua_CFunction)&CLuaClassDefs::WriteOnly )
+    {
+        return true;
+    }
+
     // Get associated resource
     CResource* pResource = m_pResourceManager->GetResourceFromLuaState( luaVM );
     if ( !pResource )
@@ -135,12 +150,15 @@ int CLuaDefs::CanUseFunction ( lua_CFunction f, lua_State* luaVM )
 
     // Check function right cache in resource
     bool bAllowed;
+
+    // Check cached ACL rights
     if ( pResource->CheckFunctionRightCache( f, &bAllowed ) )
     {
         // If in cache, and not allowed, do warning here
         if ( !bAllowed )
             m_pScriptDebugging->LogBadAccess ( luaVM );
     }
+    // Not cached yet
     else
     {
         // If not in cache, do full check
@@ -149,12 +167,32 @@ int CLuaDefs::CanUseFunction ( lua_CFunction f, lua_State* luaVM )
         // Grab the function name we're calling. If it's one of our functions, see if we can use it.
         CLuaCFunction* pFunction = CLuaCFunctions::GetFunction ( f );
 
+        // works for anything registered for Lua VM
+        // e.g. setElementHealth, setElementFrozen
         if ( pFunction )
         {
             // If it's not one of lua's functions, see if we allow it
-            bAllowed = CLuaDefs::CanUseFunction ( pFunction->GetName ().c_str (), luaVM/*, pResource*/, pFunction->IsRestricted () );
+            bAllowed = CLuaDefs::CanUseFunction ( pFunction->GetName ().c_str (), luaVM, pFunction->IsRestricted () );
         }
+        // works for custom ACL functions e.g.
+        // Element.position and other custom oop definitions not registered by string.
+        else
+        {
+            // get the 2nd upvalue (ACL Name)
+            const char* szName = lua_tostring ( luaVM, lua_upvalueindex ( 2 ) );
 
+            // if it has no name do nothing
+            if ( szName != "" && szName != NULL )
+            {
+                // get the function by name
+                CLuaCFunction* pFunction = CLuaCFunctions::GetFunction ( szName );
+                if ( pFunction )
+                {
+                    // check the resource cache for the Lua name we looked up
+                    bAllowed = CLuaDefs::CanUseFunction ( szName, luaVM, pFunction->IsRestricted () );
+                }
+            }
+        }
         // Update cache in resource
         pResource->UpdateFunctionRightCache( f, bAllowed );
     }
