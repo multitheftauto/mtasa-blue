@@ -3029,6 +3029,36 @@ void CClientPed::ApplyControllerStateFixes ( CControllerState& Current )
             }
         }
     }
+    else
+    {
+        // If we are a normal ped
+        if ( GetType() == eClientEntityType::CCLIENTPED )
+        {
+            // Do we have a weapon?
+            CWeapon * pWeapon = GetWeapon ();
+            if ( pWeapon )
+            {
+                // Weapon wielding slot?
+                eWeaponSlot slot = pWeapon->GetSlot ();
+                if ( slot != WEAPONSLOT_TYPE_UNARMED && slot != WEAPONSLOT_TYPE_MELEE )
+                {
+                    eWeaponType eWeapon = pWeapon->GetType ( );
+                    // No Ammo left?
+                    float fSkill = GetStat ( g_pGame->GetStats ()->GetSkillStatIndex ( eWeapon ) );
+                    CWeaponStat* pWeaponStat = g_pGame->GetWeaponStatManager ( )->GetWeaponStatsFromSkillLevel ( eWeapon, fSkill );
+                    if ( ( pWeapon->GetAmmoInClip ( ) == 0 && pWeaponStat->GetMaximumClipAmmo ( ) > 0 ) && pWeapon->GetAmmoTotal () == 0 )
+                    {
+                        pTask = m_pTaskManager->GetTaskSecondary ( TASK_SECONDARY_ATTACK );
+                        if ( pTask && pTask->GetTaskType ( ) == TASK_SIMPLE_USE_GUN )
+                        {
+                            // disable the fire control state.
+                            m_Pad.SetControlState ( "fire", false );
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     // Fix for stuck aim+move when FPS is greater than 45. This hack will raise the limit to 70 FPS
     // Fix works by applying a small input pulse on the other axis, at the start of movement
