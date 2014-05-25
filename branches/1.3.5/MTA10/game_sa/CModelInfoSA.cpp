@@ -279,16 +279,6 @@ BOOL CModelInfoSA::IsUpgrade ( void )
     return m_dwModelID >= 1000 && m_dwModelID <= 1193;
 }
 
-
-BOOL CModelInfoSA::IsWeapon(void)
-{
-    return (m_dwModelID >= 321 && m_dwModelID <= 326) || // Melee Weapons
-        (
-        (m_dwModelID >= 331 && m_dwModelID <= 372) && // Other Weapons
-        (m_dwModelID != 370 && m_dwModelID != 332 && m_dwModelID != 340 && m_dwModelID != 345 && m_dwModelID != 354) // Not weapons
-        );
-}
-
 char * CModelInfoSA::GetNameIfVehicle ( )
 {
     DEBUG_TRACE("char * CModelInfoSA::GetNameIfVehicle ( )");
@@ -959,24 +949,18 @@ void CModelInfoSA::SetCustomModel ( RpClump* pClump )
     // Replace the model if we're loaded.
     if ( IsLoaded () )
     {
-        // Are we a vehicle?
-        if ( IsVehicle () )
+        switch (GetModelType())
         {
-            pGame->GetRenderWare ()->ReplaceVehicleModel ( pClump, static_cast < unsigned short > ( m_dwModelID ) );
-        }
-        else if ( IsWeapon() )
-        {
-            // We are a weapon.
-            pGame->GetRenderWare ()->ReplaceWeaponModel ( pClump, static_cast < unsigned short > ( m_dwModelID ) );
-        }
-        else if ( IsPlayerModel ( ) )
-        {
-            pGame->GetRenderWare ()->ReplacePedModel ( pClump, static_cast < unsigned short > ( m_dwModelID ) );
-        }
-        else
-        {
-            // We are an object.
-            pGame->GetRenderWare ()->ReplaceAllAtomicsInModel ( pClump, static_cast < unsigned short > ( m_dwModelID ) );
+            case MODEL_INFO_TYPE_PED:
+                return pGame->GetRenderWare ()->ReplacePedModel ( pClump, static_cast < unsigned short > ( m_dwModelID ) );
+            case MODEL_INFO_TYPE_WEAPON:
+                return pGame->GetRenderWare ()->ReplaceWeaponModel ( pClump, static_cast < unsigned short > ( m_dwModelID ) );
+            case MODEL_INFO_TYPE_VEHICLE:
+                return pGame->GetRenderWare ()->ReplaceVehicleModel ( pClump, static_cast < unsigned short > ( m_dwModelID ) );
+            case MODEL_INFO_TYPE_ATOMIC:
+            case MODEL_INFO_TYPE_LOD_ATOMIC:
+            case MODEL_INFO_TYPE_TIME:
+                return pGame->GetRenderWare()->ReplaceAllAtomicsInModel(pClump, static_cast < unsigned short > (m_dwModelID));
         }
     }
 }
@@ -1342,4 +1326,9 @@ void CModelInfoSA::InitialiseSupportedUpgrades ( RpClump * pClump )
 void CModelInfoSA::ResetSupportedUpgrades ( void )
 {
     m_ModelSupportedUpgrades.Reset ( );
+}
+
+eModelInfoType CModelInfoSA::GetModelType(void)
+{
+    return ((eModelInfoType(*)(void))m_pInterface->VFTBL->GetModelType)();
 }
