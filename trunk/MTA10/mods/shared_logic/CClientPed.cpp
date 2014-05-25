@@ -813,6 +813,35 @@ void CClientPed::GetControllerState ( CControllerState& ControllerState )
         {
             ControllerState.ButtonCross = 0;
         }
+        // Fix for GTA bug allowing vehicles to be controlled while dead.
+        if ( pVehicle && IsDying ( ) )
+        {
+            // camera
+            ControllerState.LeftStickX = 0;
+            ControllerState.LeftStickY = 0;
+            ControllerState.RightStickX = 0;
+            ControllerState.RightStickY = 0;
+            // brake
+            ControllerState.ButtonSquare = 0;
+            // enter/exit
+            ControllerState.ButtonTriangle = 0;
+            // nos/fire
+            ControllerState.ButtonCircle = 0;
+            // accelerate
+            ControllerState.ButtonCross = 0;
+            // handbrake/missiles
+            ControllerState.RightShoulder1 = 0;
+            if ( pVehicle && pVehicle->GetVehicleType() == CLIENTVEHICLE_PLANE )
+            {
+                // rudders
+                ControllerState.RightShoulder2 = 0;
+                ControllerState.LeftShoulder2 = 0;
+            }
+            // Horn/sirens/police spotlight/hover
+            ControllerState.ShockButtonL = 0;
+            // raise/lower landing gear
+            ControllerState.ShockButtonR = 0;
+        }
     }
     else
     {
