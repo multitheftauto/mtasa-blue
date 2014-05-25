@@ -767,7 +767,6 @@ int CLuaFunctionDefs::GetSoundLevelData ( lua_State* luaVM )
         }
         else
         {
-            m_pScriptDebugging->LogBadPointer ( luaVM, "sound/player", 1 );
             lua_pushboolean ( luaVM, false );
             return 1;
         }
