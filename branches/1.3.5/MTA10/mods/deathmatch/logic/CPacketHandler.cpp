@@ -2734,9 +2734,9 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                     SRotationRadiansSync rotationRadians ( false );
 
                     // Read out the position, rotation, object ID and alpha value
-                    if ( bitStream.Read ( &position ) &&
-                         bitStream.Read ( &rotationRadians ) &&
-                         bitStream.ReadCompressed ( usObjectID ) &&
+                    bitStream.Read ( &position );
+                    bitStream.Read ( &rotationRadians );
+                    if ( bitStream.ReadCompressed ( usObjectID ) &&
                          bitStream.Read ( &alpha ) )
                     {
                         // Valid object id?
@@ -2823,6 +2823,11 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
 
                         pObject->SetCollisionEnabled ( bCollisonsEnabled );
                     }
+                    else
+                    {
+                        RaiseProtocolError ( 55 );
+                        return;
+                    }
 
                     break;
                 }
@@ -2834,8 +2839,8 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                     bool bIsVisible;
                     SPickupTypeSync pickupType;
 
-                    if ( bitStream.Read ( &position ) &&
-                         bitStream.ReadCompressed ( usModel ) &&
+                    bitStream.Read ( &position );
+                    if ( bitStream.ReadCompressed ( usModel ) &&
                          bitStream.ReadBit ( bIsVisible ) &&
                          bitStream.Read ( &pickupType ) )
                     {
@@ -3209,8 +3214,8 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                     float fSize;
                     SColorSync color;
 
-                    if ( bitStream.Read ( &position ) &&
-                         bitStream.Read ( &markerType ) &&
+                    bitStream.Read ( &position );
+                    if ( bitStream.Read ( &markerType ) &&
                          bitStream.Read ( fSize ) &&
                          bitStream.Read ( &color ) )
                     {
@@ -3313,9 +3318,9 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                     SPosition2DSync size2D ( false );
                     SColor color;
                     bool bIsFlashing;
-                    if ( bitStream.Read ( &position2D ) &&
-                         bitStream.Read ( &size2D ) &&
-                         bitStream.Read ( color.R ) &&
+                    bitStream.Read ( &position2D );
+                    bitStream.Read ( &size2D );
+                    if ( bitStream.Read ( color.R ) &&
                          bitStream.Read ( color.G ) &&
                          bitStream.Read ( color.B ) &&
                          bitStream.Read ( color.A ) &&
@@ -3332,6 +3337,11 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                             pArea->SetColor ( color );
                             pArea->SetFlashing ( bIsFlashing );
                         }
+                    }
+                    else
+                    {
+                        RaiseProtocolError ( 56 );
+                        return;
                     }
 
                     break;
@@ -3359,6 +3369,11 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                         {
                             pNode->SetNextNodeID ( NextNodeID );
                         }
+                    }
+                    else
+                    {
+                        RaiseProtocolError ( 57 );
+                        return;
                     }
 
                     break;
