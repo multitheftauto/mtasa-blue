@@ -455,7 +455,6 @@ void CSettingsSA::SetGrassEnabled ( bool bEnable )
 uint CSettingsSA::FindVideoMode( int iResX, int iResY, int iColorBits )
 {
     int iBestMode, iBestScore = -1;
-    int iAltBestMode, iAltBestScore = -1;
 
     uint numVidModes = GetNumVideoModes();
     for ( uint vidMode = 0; vidMode < numVidModes; vidMode++ )
@@ -469,39 +468,34 @@ uint CSettingsSA::FindVideoMode( int iResX, int iResY, int iColorBits )
 
         if ( vidModeInfo.flags & rwVIDEOMODEEXCLUSIVE )
         {
-            // Check mode is not higher than the one requested
-            if ( vidModeInfo.width <= iResX && vidModeInfo.height <= iResY )
+            // Rate my res
+            int iScore = abs( iResX - vidModeInfo.width ) + abs( iResY - vidModeInfo.height );
+
+            // Penalize matches with wrong bit depth
+            if ( vidModeInfo.depth != iColorBits )
             {
-                // Rate my res
-                int iScore = iResX - vidModeInfo.width + iResY - vidModeInfo.height;
-                if ( vidModeInfo.depth == iColorBits )
-                {
-                    if ( iScore < iBestScore || iBestScore == -1 )
-                    {
-                        // Found a better match with requested bit depth
-                        iBestScore = iScore;
-                        iBestMode = vidMode;
-                    }
-                }
-                else
-                if ( vidModeInfo.depth == 32 || vidModeInfo.depth == 16 )
-                {
-                    if ( iScore < iAltBestScore || iAltBestScore == -1 )
-                    {
-                        // Found a better match with other bit depth
-                        iAltBestScore = iScore;
-                        iAltBestMode = vidMode;
-                    }
-                }
+                iScore += 100000;
+            }
+
+            // Penalize matches with higher than requested resolution
+            if ( vidModeInfo.width > iResX || vidModeInfo.height > iResY )
+            {
+                iScore += 200000;
+            }
+
+            if ( iScore < iBestScore || iBestScore == -1 )
+            {
+                // Found a better match
+                iBestScore = iScore;
+                iBestMode = vidMode;
             }
         }
     }
 
     if ( iBestScore != -1 )
         return iBestMode;
-    if ( iAltBestScore != -1 )
-        return iAltBestMode;
 
+    BrowseToSolution ( "no-find-res", EXIT_GAME_FIRST | ASK_GO_ONLINE, _( "Can't find valid screen resolution." ) );
     return 1;
 }
 
