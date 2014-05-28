@@ -37,8 +37,8 @@ public:
     void                        InjectMouseWheel    ( int iScrollVert, int iScrollHorz );
     void                        InjectKeyboardEvent ( const SString& strKey, bool bKeyDown = true, bool bCharacter = false );
 
-    void                        SetIsLocal          ( bool bIsLocal, const SString& strLocalFileName = "");
     bool                        IsLocal             ();
+    void                        SetTempURL          ( const SString& strTempURL );
 
 private:
     CWebViewInterface* m_pWebView;

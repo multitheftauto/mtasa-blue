@@ -12,21 +12,28 @@
 
 int CLuaFunctionDefs::CreateBrowser ( lua_State* luaVM )
 {
-//  texture createBrowser ( int width, int height )
-    int width; int height;
+//  texture createBrowser ( int width, int height, bool isLocal )
+    int width; int height; bool bIsLocal;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadNumber ( width );
     argStream.ReadNumber ( height );
+    argStream.ReadBool ( bIsLocal );
     
     if ( !argStream.HasErrors () )
     {
+        if ( !bIsLocal && !g_pCore->GetWebCore()->CanLoadRemotePages () )
+        {
+            lua_pushboolean ( luaVM, false );
+            return 1;
+        }
+
         CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
         if ( pLuaMain )
         {
             CResource* pParentResource = pLuaMain->GetResource ();
 
-            CClientWebBrowser* pBrowserTexture = g_pClientGame->GetManager ()->GetRenderElementManager ()->CreateWebBrowser ( width, height );
+            CClientWebBrowser* pBrowserTexture = g_pClientGame->GetManager ()->GetRenderElementManager ()->CreateWebBrowser ( width, height, bIsLocal );
             if ( pBrowserTexture )
             {
                 // Make it a child of the resource's file root ** CHECK  Should parent be pFileResource, and element added to pParentResource's ElementGroup? **
@@ -100,7 +107,6 @@ int CLuaFunctionDefs::LoadBrowserURL ( lua_State* luaVM )
         // Are we dealing with a remote website?
         if ( strURL.SubStr ( 0, 7 ) == "http://" || strURL.SubStr ( 0, 8 ) == "https://" )
         {
-            pWebBrowser->SetIsLocal ( false );
             lua_pushboolean ( luaVM, pWebBrowser->LoadURL ( strURL, true ) );
             return 1;
         }
@@ -112,9 +118,9 @@ int CLuaFunctionDefs::LoadBrowserURL ( lua_State* luaVM )
         {
             SString strAbsPath;
             CResource* pResource = pLuaMain->GetResource ();
-            if ( CResourceManager::ParseResourcePathInput ( strURL, pResource, strAbsPath ) )
+            if ( CResourceManager::ParseResourcePathInput ( strURL, pResource, strAbsPath ) && pWebBrowser->IsLocal () )
             {
-                pWebBrowser->SetIsLocal ( true, strURL );
+                pWebBrowser->SetTempURL ( strURL );
                 lua_pushboolean ( luaVM,  pWebBrowser->LoadURL ( strAbsPath, false ) );
                 return 1;
             }

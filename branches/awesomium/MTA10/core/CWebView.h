@@ -24,7 +24,7 @@ class CWebView : public CWebViewInterface, public Awesomium::WebViewListener::Lo
     friend class CRenderItemManager;
 
 public:
-    CWebView                    ( unsigned int uiWidth, unsigned int uiHeight, IDirect3DSurface9* pD3DSurface );
+    CWebView                    ( unsigned int uiWidth, unsigned int uiHeight, IDirect3DSurface9* pD3DSurface, bool bIsLocal );
     ~CWebView                   ();
     Awesomium::WebView*         GetAwesomiumView () { return m_pWebView; };
 
@@ -43,8 +43,8 @@ public:
     void InjectMouseWheel       ( int iScrollVert, int iScrollHorz );
     void InjectKeyboardEvent    ( const SString& strKey, bool bKeyDown = true, bool bCharacter = false );
 
-    void SetIsLocal             ( bool bIsLocal, const SString& strTempURL = "" )   { m_bIsLocal = bIsLocal; m_strTempURL = strTempURL; };
     bool IsLocal                ()                                                  { return m_bIsLocal; };
+    void SetTempURL             ( const SString& strTempURL )                       { m_strTempURL = strTempURL; };
 
 
     // Implementation: Awesomium::WebViewListener::Load

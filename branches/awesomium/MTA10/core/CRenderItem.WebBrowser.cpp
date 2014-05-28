@@ -16,7 +16,7 @@
 //
 //
 ////////////////////////////////////////////////////////////////
-void CWebBrowserItem::PostConstruct(CRenderItemManager* pRenderItemManager, uint uiSizeX, uint uiSizeY)
+void CWebBrowserItem::PostConstruct ( CRenderItemManager* pRenderItemManager, uint uiSizeX, uint uiSizeY, bool bIsLocal )
 {
     Super::PostConstruct(pRenderItemManager);
     m_uiSizeX = uiSizeX;
@@ -26,7 +26,7 @@ void CWebBrowserItem::PostConstruct(CRenderItemManager* pRenderItemManager, uint
     m_pWebView = NULL;
 
     // Initial creation of d3d data
-    CreateUnderlyingData ();
+    CreateUnderlyingData ( bIsLocal );
 }
 
 
@@ -79,7 +79,7 @@ void CWebBrowserItem::OnLostDevice ( void )
 ////////////////////////////////////////////////////////////////
 void CWebBrowserItem::OnResetDevice ( void )
 {
-    CreateUnderlyingData ();
+    
 }
 
 
@@ -90,7 +90,7 @@ void CWebBrowserItem::OnResetDevice ( void )
 //
 //
 ////////////////////////////////////////////////////////////////
-void CWebBrowserItem::CreateUnderlyingData ( void )
+void CWebBrowserItem::CreateUnderlyingData ( bool bIsLocal )
 {
     assert ( !m_pD3DRenderTargetSurface );
     assert ( !m_pD3DTexture );
@@ -116,7 +116,7 @@ void CWebBrowserItem::CreateUnderlyingData ( void )
     m_iMemoryKBUsed = CRenderItemManager::CalcD3DResourceMemoryKBUsage ( m_pD3DRenderTargetSurface );
 
     // Create the web view
-    m_pWebView = g_pCore->GetWebCore ()->CreateWebView ( m_uiSizeX, m_uiSizeY, m_pD3DRenderTargetSurface );
+    m_pWebView = g_pCore->GetWebCore ()->CreateWebView ( m_uiSizeX, m_uiSizeY, m_pD3DRenderTargetSurface, bIsLocal );
 }
 
 

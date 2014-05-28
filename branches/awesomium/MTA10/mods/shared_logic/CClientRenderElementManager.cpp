@@ -227,10 +227,10 @@ CClientScreenSource* CClientRenderElementManager::CreateScreenSource ( uint uiSi
 //
 //
 ////////////////////////////////////////////////////////////////
-CClientWebBrowser* CClientRenderElementManager::CreateWebBrowser ( uint uiSizeX, uint uiSizeY )
+CClientWebBrowser* CClientRenderElementManager::CreateWebBrowser ( uint uiSizeX, uint uiSizeY, bool bIsLocal )
 {
     // Create the item
-    CWebBrowserItem* pWebBrowserItem = m_pRenderItemManager->CreateWebBrowser ( uiSizeX, uiSizeY );
+    CWebBrowserItem* pWebBrowserItem = m_pRenderItemManager->CreateWebBrowser ( uiSizeX, uiSizeY, bIsLocal );
 
     // Check create worked
     if ( !pWebBrowserItem )

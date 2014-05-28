@@ -11,12 +11,21 @@
 #include "StdInc.h"
 #include "CWebView.h"
 
-CWebView::CWebView ( unsigned int uiWidth, unsigned int uiHeight, IDirect3DSurface9* pD3DSurface )
+CWebView::CWebView ( unsigned int uiWidth, unsigned int uiHeight, IDirect3DSurface9* pD3DSurface, bool bIsLocal )
 {
     m_pD3DSurface = pD3DSurface;
+    m_bIsLocal = bIsLocal;
+
+    // Initialise the web session (which holds the actual settings) in in-memory mode
+    Awesomium::WebPreferences preferences;
+    CVARS_GET ( "browser_plugins", preferences.enable_plugins );
+    if ( !bIsLocal )
+        CVARS_GET ( "browser_remote_javascript", preferences.enable_javascript );
+
+    Awesomium::WebSession* pWebSession = Awesomium::WebCore::instance ()->CreateWebSession ( Awesomium::WSLit(""), preferences );
 
     // Create Awesomium webview as offscreen webview
-    m_pWebView = Awesomium::WebCore::instance()->CreateWebView ( uiWidth, uiHeight, NULL, Awesomium::kWebViewType_Offscreen );
+    m_pWebView = Awesomium::WebCore::instance()->CreateWebView ( uiWidth, uiHeight, pWebSession, Awesomium::kWebViewType_Offscreen );
 
     // Set handlers
     m_pWebView->set_load_listener ( this );

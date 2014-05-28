@@ -25,7 +25,7 @@ public:
     ~CWebCore();
     bool                Initialise();
 
-    CWebViewInterface*  CreateWebView       ( unsigned int uiWidth, unsigned int uiHeight, IDirect3DSurface9* pD3DSurface );
+    CWebViewInterface*  CreateWebView       ( unsigned int uiWidth, unsigned int uiHeight, IDirect3DSurface9* pD3DSurface, bool bIsLocal );
     void                DestroyWebView      ( CWebViewInterface* pWebViewInterface );
     void                Update              ();
     
@@ -39,6 +39,8 @@ public:
 
     inline bool         IsTestModeEnabled   () { return m_bTestmodeEnabled; };
     inline void         SetTestModeEnabled  ( bool bEnabled ) { m_bTestmodeEnabled = bEnabled; };
+
+    bool                CanLoadRemotePages  ();
 
 
     // Awesomium::ResourceInterceptor implementations

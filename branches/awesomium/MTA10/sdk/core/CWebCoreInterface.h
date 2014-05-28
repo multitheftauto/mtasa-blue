@@ -24,7 +24,7 @@ enum eURLState
 class CWebCoreInterface
 {
 public:
-    virtual CWebViewInterface*  CreateWebView       ( unsigned int uiWidth, unsigned int uiHeight, IDirect3DSurface9* pD3DSurface ) = 0;
+    virtual CWebViewInterface*  CreateWebView       ( unsigned int uiWidth, unsigned int uiHeight, IDirect3DSurface9* pD3DSurface, bool bIsLocal ) = 0;
     virtual void                DestroyWebView      ( CWebViewInterface* pWebView ) = 0;
     virtual void                Update              () = 0;
     
@@ -37,6 +37,8 @@ public:
 
     virtual bool                IsTestModeEnabled  () = 0;
     virtual void                SetTestModeEnabled ( bool bEnabled ) = 0;
+
+    virtual bool                CanLoadRemotePages () = 0;
 };
 
 #endif

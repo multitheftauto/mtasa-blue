@@ -85,12 +85,12 @@ void CClientWebBrowser::InjectKeyboardEvent ( const SString& strKey, bool bKeyDo
     m_pWebView->InjectKeyboardEvent ( strKey, bKeyDown, bCharacter );
 }
 
-void CClientWebBrowser::SetIsLocal ( bool bEnabled, const SString& strLocalFileName )
-{
-    m_pWebView->SetIsLocal ( bEnabled, strLocalFileName );
-}
-
 bool CClientWebBrowser::IsLocal ()
 {
     return m_pWebView->IsLocal ();
+}
+
+void CClientWebBrowser::SetTempURL ( const SString& strTempURL )
+{
+    m_pWebView->SetTempURL ( strTempURL );
 }

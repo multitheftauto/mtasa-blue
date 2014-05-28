@@ -29,8 +29,8 @@ public:
     virtual void InjectMouseWheel   ( int iScrollVert, int iScrollHorz ) = 0;
     virtual void InjectKeyboardEvent( const SString& strKey, bool bKeyDown = true, bool bCharacter = false ) = 0;
 
-    virtual void SetIsLocal         ( bool bIsLocal, const SString& strTempURL = "" ) = 0;
     virtual bool IsLocal            () = 0;
+    virtual void SetTempURL         ( const SString& strTempURL ) = 0;
 };
 
 #endif

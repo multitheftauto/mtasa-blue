@@ -314,6 +314,9 @@ void CClientVariables::LoadDefaults ( void )
     DEFAULT ( "mute_radio_when_minimized",  0 );                            // 0-off 1-on
     DEFAULT ( "mute_mta_when_minimized",    0 );                            // 0-off 1-on
     DEFAULT ( "mute_voice_when_minimized",  0 );                            // 0-off 1-on
+    DEFAULT ( "browser_remote_websites",    true );                         // Load remote websites?
+    DEFAULT ( "browser_remote_javascript",  true );                         // Execute javascript on remote websites?
+    DEFAULT ( "browser_plugins",            true );                         // Enable browser plugins?
 
     if(!Exists("locale")) 
     {

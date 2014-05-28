@@ -210,13 +210,13 @@ CScreenSourceItem* CRenderItemManager::CreateScreenSource ( uint uiSizeX, uint u
 //
 //
 ////////////////////////////////////////////////////////////////
-CWebBrowserItem* CRenderItemManager::CreateWebBrowser ( uint uiSizeX, uint uiSizeY )
+CWebBrowserItem* CRenderItemManager::CreateWebBrowser ( uint uiSizeX, uint uiSizeY, bool bIsLocal )
 {
     if ( !CanCreateRenderItem ( CWebBrowserItem::GetClassId () ) )
         return NULL;
 
     CWebBrowserItem* pWebBrowserItem = new CWebBrowserItem;
-    pWebBrowserItem->PostConstruct ( this, uiSizeX, uiSizeY );
+    pWebBrowserItem->PostConstruct ( this, uiSizeX, uiSizeY, bIsLocal );
 
     if ( !pWebBrowserItem->IsValid () )
     {

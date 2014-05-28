@@ -57,7 +57,7 @@ void CSettings::CreateGUI ( void )
     if ( m_pWindow )
         DestroyGUI ();
 
-    CGUITab *pTabMultiplayer, *pTabVideo, *pTabAudio, *pTabBinds, *pTabControls, *pTabCommunity, *pTabInterface, *pTabAdvanced;
+    CGUITab *pTabMultiplayer, *pTabVideo, *pTabAudio, *pTabBinds, *pTabControls, *pTabCommunity, *pTabInterface, *pTabBrowser, *pTabAdvanced;
     CGUI *pManager = g_pCore->GetGUI ();
 
     // Init
@@ -95,6 +95,7 @@ void CSettings::CreateGUI ( void )
     pTabControls = m_pTabs->CreateTab ( _("Controls") );
     pTabCommunity = m_pTabs->CreateTab ( _("Community") );
     pTabInterface = m_pTabs->CreateTab ( _("Interface") );
+    pTabBrowser = m_pTabs->CreateTab ( _("Browser") );
     pTabAdvanced = m_pTabs->CreateTab ( _("Advanced") );
 
     // Create buttons
@@ -1016,6 +1017,30 @@ void CSettings::CreateGUI ( void )
     }
 
     /**
+     * Interface/chat Tab
+     **/
+    m_pLabelBrowserGeneral = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabBrowser, _("General") ) );
+    m_pLabelBrowserGeneral->SetPosition ( CVector2D ( 10.0f, 12.0f ) );
+    m_pLabelBrowserGeneral->GetPosition ( vecTemp );
+    m_pLabelBrowserGeneral->AutoSize ( NULL, 5.0f );
+    m_pLabelBrowserGeneral->SetFont ( "default-bold-small" );
+
+    m_pCheckBoxRemoteBrowser = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabBrowser, _("Enable remote websites"), true ) );
+    m_pCheckBoxRemoteBrowser->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 29.0f ) );
+    m_pCheckBoxRemoteBrowser->GetPosition ( vecTemp );
+    m_pCheckBoxRemoteBrowser->AutoSize ( NULL, 20.0f );
+
+    m_pCheckBoxRemoteJavascript = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabBrowser, _("Enable Javascript on remote websites"), true ) );
+    m_pCheckBoxRemoteJavascript->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 25.0f ) );
+    m_pCheckBoxRemoteJavascript->GetPosition ( vecTemp );
+    m_pCheckBoxRemoteJavascript->AutoSize ( NULL, 20.0f );
+
+    m_pCheckBoxBrowserPluginsEnabled = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox(pTabBrowser, _("Enable plugins (like Flash, Silverlight; Java is disabled by default)"), true ) );
+    m_pCheckBoxBrowserPluginsEnabled->SetPosition ( CVector2D(vecTemp.fX, vecTemp.fY + 25.0f ) );
+    m_pCheckBoxBrowserPluginsEnabled->GetPosition ( vecTemp );
+    m_pCheckBoxBrowserPluginsEnabled->AutoSize ( NULL, 20.0f );
+
+    /**
      *  Advanced tab
      **/
     vecTemp = CVector2D ( 12.f, 12.f );
@@ -1341,6 +1366,32 @@ void CSettings::ShowRestartQuestion ( void )
     pQuestionBox->SetButton ( 0, _("No") );
     pQuestionBox->SetButton ( 1, _("Yes") );
     pQuestionBox->SetCallback ( RestartCallBack );
+    pQuestionBox->Show ();
+}
+
+
+void DisconnectCallback ( void* ptr, unsigned int uiButton )
+{
+    CCore::GetSingleton ().GetLocalGUI ()->GetMainMenu ()->GetQuestionWindow ()->Reset ();
+
+    if ( uiButton == 1 )
+    {
+        CCommands::GetSingleton ().Execute ( "disconnect", "" );
+    }
+}
+
+
+void CSettings::ShowDisconnectQuestion ( void )
+{
+    SString strMessage = _("Some settings will be changed when you disconnect the current server");
+    strMessage += _("\n\nDo you want to disconnect now?");
+    CQuestionBox* pQuestionBox = CCore::GetSingleton ().GetLocalGUI ()->GetMainMenu ()->GetQuestionWindow ();
+    pQuestionBox->Reset ();
+    pQuestionBox->SetTitle ( _("DISCONNECT REQUIRED") );
+    pQuestionBox->SetMessage ( strMessage );
+    pQuestionBox->SetButton ( 0, _("No") );
+    pQuestionBox->SetButton ( 1, _("Yes") );
+    pQuestionBox->SetCallback ( DisconnectCallback );
     pQuestionBox->Show ();
 }
 
@@ -2605,6 +2656,11 @@ void CSettings::LoadData ( void )
         CVARS_GET ( "chat_line_fade_out", iVar ); 
         SetMilliseconds ( m_pChatLineFadeout, iVar );
     }
+
+    // Browser
+    CVARS_GET ( "browser_remote_websites", bVar ); m_pCheckBoxRemoteBrowser->SetSelected ( bVar );
+    CVARS_GET ( "browser_remote_javascript", bVar ); m_pCheckBoxRemoteJavascript->SetSelected ( bVar );
+    CVARS_GET ( "browser_plugins", bVar ); m_pCheckBoxBrowserPluginsEnabled->SetSelected ( bVar );
 }
 
 void CSettings::SaveData ( void )
@@ -2858,6 +2914,23 @@ void CSettings::SaveData ( void )
     unsigned int value = SharedUtil::Lerp ( min, fPos, max );
     CVARS_SET ( "streaming_memory", value );
 
+    // Webbrowser settings
+    bool bOldRemoteWebsites, bOldRemoteJavascript, bOldPlugins;
+    CVARS_GET ( "browser_remote_websites", bOldRemoteWebsites );
+    CVARS_GET ( "browser_remote_javascript", bOldRemoteJavascript );
+    CVARS_GET ( "browser_plugins", bOldPlugins );
+
+    bool bBrowserSettingChanged = false;
+    if ( bOldRemoteWebsites != m_pCheckBoxRemoteBrowser->GetSelected()
+        || bOldRemoteJavascript != m_pCheckBoxRemoteJavascript->GetSelected()
+        || bOldPlugins != m_pCheckBoxBrowserPluginsEnabled->GetSelected())
+    {
+        bBrowserSettingChanged = true;
+        CVARS_SET ( "browser_remote_websites", m_pCheckBoxRemoteBrowser->GetSelected () );
+        CVARS_SET ( "browser_remote_javascript", m_pCheckBoxRemoteJavascript->GetSelected () );
+        CVARS_SET ("browser_plugins", m_pCheckBoxBrowserPluginsEnabled->GetSelected () );
+    }
+
     // Ensure CVARS ranges ok
     CClientVariables::GetSingleton().ValidateValues ();
 
@@ -2869,6 +2942,8 @@ void CSettings::SaveData ( void )
     // Ask to restart?
     if ( bIsVideoModeChanged || bIsAntiAliasingChanged || bIsAeroChanged || bIsDriverOverridesChanged || bIsCustomizedSAFilesChanged || bIsLocaleChanged )
         ShowRestartQuestion();
+    else if ( CModManager::GetSingleton ().IsLoaded () && bBrowserSettingChanged )
+        ShowDisconnectQuestion();
 }
 
 void CSettings::RemoveKeyBindSection ( char * szSectionName )

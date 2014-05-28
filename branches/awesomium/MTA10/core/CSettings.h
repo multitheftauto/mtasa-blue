@@ -135,6 +135,7 @@ public:
 
     void                RequestNewNickname      ( void );
     void                ShowRestartQuestion     ( void );
+    void                ShowDisconnectQuestion  ( void );
 
 protected:
     const static int    SecKeyNum = 3;     // Number of secondary keys
@@ -303,6 +304,11 @@ protected:
     CGUICheckBox*       m_pChatCssText;
     CGUIEdit*           m_pChatLineLife;
     CGUIEdit*           m_pChatLineFadeout;
+
+    CGUILabel*          m_pLabelBrowserGeneral;
+    CGUICheckBox*       m_pCheckBoxRemoteBrowser;
+    CGUICheckBox*       m_pCheckBoxRemoteJavascript;
+    CGUICheckBox*       m_pCheckBoxBrowserPluginsEnabled;
 
     bool                OnJoypadTextChanged     ( CGUIElement* pElement );
     bool                OnAxisSelectClick       ( CGUIElement* pElement );

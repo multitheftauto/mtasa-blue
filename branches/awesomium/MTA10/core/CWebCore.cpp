@@ -17,6 +17,7 @@ CWebCore::CWebCore ()
 {
     m_pWebCore = NULL;
     m_pRequestsGUI = NULL;
+    m_bTestmodeEnabled = false;
 
     Initialise ();
     InitialiseWhiteAndBlacklist ();
@@ -45,10 +46,10 @@ bool CWebCore::Initialise ()
     return m_pWebCore != NULL;
 }
 
-CWebViewInterface* CWebCore::CreateWebView ( unsigned int uiWidth, unsigned int uiHeight, IDirect3DSurface9* pD3DSurface )
+CWebViewInterface* CWebCore::CreateWebView ( unsigned int uiWidth, unsigned int uiHeight, IDirect3DSurface9* pD3DSurface, bool bIsLocal )
 {
     // Create our webview implementation
-    CWebView* pWebView = new CWebView ( uiWidth, uiHeight, pD3DSurface );
+    CWebView* pWebView = new CWebView ( uiWidth, uiHeight, pD3DSurface, bIsLocal );
     m_WebViewMap[pWebView->GetAwesomiumView ()->process_id ()] = pWebView;
     return pWebView;
 }
@@ -185,6 +186,13 @@ void CWebCore::DenyPendingPages ()
     
     // Trigger an event now
     CModManager::GetSingleton().GetCurrentMod()->WebsiteRequestResultHandler ( false );
+}
+
+bool CWebCore::CanLoadRemotePages ()
+{
+    bool bCanLoadRemotePages;
+    CVARS_GET ( "browser_remote_websites", bCanLoadRemotePages );
+    return bCanLoadRemotePages;
 }
 
 
