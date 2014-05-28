@@ -314,6 +314,7 @@ void CClientVariables::LoadDefaults ( void )
     DEFAULT ( "mute_radio_when_minimized",  0 );                            // 0-off 1-on
     DEFAULT ( "mute_mta_when_minimized",    0 );                            // 0-off 1-on
     DEFAULT ( "mute_voice_when_minimized",  0 );                            // 0-off 1-on
+    DEFAULT ( "share_file_cache",           1 );                            // 0-no 1-share client resource file cache with other MTA installs
 
     if(!Exists("locale")) 
     {

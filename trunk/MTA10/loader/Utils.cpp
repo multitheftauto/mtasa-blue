@@ -1711,22 +1711,12 @@ void MaybeShowCopySettingsDialog ( void )
 
     // Copy some directories if empty
     SString strCurrentNewsDir = PathJoin ( GetMTADataPath (), "news" );
-    SString strCurrentPrivDir = PathJoin ( GetMTASAPath (), "mods", "deathmatch", "priv" );
-    SString strCurrentResourcesDir = PathJoin ( GetMTASAPath (), "mods", "deathmatch", "resources" );
 
     SString strPreviousDataPath = PathJoin ( GetSystemCommonAppDataPath(), "MTA San Andreas All", strPreviousVersion );
     SString strPreviousNewsDir = PathJoin ( strPreviousDataPath, "news" );
-    SString strPreviousPrivDir = PathJoin ( strPreviousPath, "mods", "deathmatch", "priv" );
-    SString strPreviousResourcesDir = PathJoin ( strPreviousPath, "mods", "deathmatch", "resources" );
 
     if ( IsDirectoryEmpty( strCurrentNewsDir ) && DirectoryExists( strPreviousNewsDir ) )
         DirectoryCopy ( strPreviousNewsDir, strCurrentNewsDir );
-
-    if ( IsDirectoryEmpty( strCurrentPrivDir ) && DirectoryExists( strPreviousPrivDir ) )
-        DirectoryCopy ( strPreviousPrivDir, strCurrentPrivDir );
-
-    if ( IsDirectoryEmpty( strCurrentResourcesDir ) && DirectoryExists( strPreviousResourcesDir ) )
-        DirectoryCopy ( strPreviousResourcesDir, strCurrentResourcesDir, true, 100 );
 }
 
 
