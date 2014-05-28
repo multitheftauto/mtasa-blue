@@ -66,7 +66,7 @@ CResource::CResource ( unsigned short usNetID, const char* szResourceName, CClie
     m_pResourceTXDRoot = new CClientDummy ( g_pClientGame->GetManager(), INVALID_ELEMENT_ID, "txdroot" );
     m_pResourceTXDRoot->MakeSystemEntity ();
 
-    m_strResourceDirectoryPath = SString ( "%s/resources/%s", g_pClientGame->GetModRoot (), *m_strResourceName );
+    m_strResourceDirectoryPath = SString ( "%s/resources/%s", g_pClientGame->GetFileCacheRoot (), *m_strResourceName );
     m_strResourcePrivateDirectoryPath = PathJoin ( CServerIdManager::GetSingleton ( )->GetConnectionPrivateDirectory (), m_strResourceName );
 
     m_strResourcePrivateDirectoryPathOld = CServerIdManager::GetSingleton ()->GetConnectionPrivateDirectory ( true );
@@ -152,7 +152,7 @@ CResource::~CResource ( void )
 CDownloadableResource* CResource::QueueFile ( CDownloadableResource::eResourceType resourceType, const char *szFileName, CChecksum serverChecksum, bool bAutoDownload )
 {
     // Create the resource file and add it to the list
-    SString strBuffer ( "%s\\resources\\%s\\%s", g_pClientGame->GetModRoot (), *m_strResourceName, szFileName );
+    SString strBuffer ( "%s\\resources\\%s\\%s", g_pClientGame->GetFileCacheRoot (), *m_strResourceName, szFileName );
 
     CResourceFile* pResourceFile = new CResourceFile ( resourceType, szFileName, strBuffer, serverChecksum, bAutoDownload );
     if ( pResourceFile )
@@ -167,7 +167,7 @@ CDownloadableResource* CResource::QueueFile ( CDownloadableResource::eResourceTy
 CDownloadableResource* CResource::AddConfigFile ( const char *szFileName, CChecksum serverChecksum )
 {
     // Create the config file and add it to the list
-    SString strBuffer ( "%s\\resources\\%s\\%s", g_pClientGame->GetModRoot (), *m_strResourceName, szFileName );
+    SString strBuffer ( "%s\\resources\\%s\\%s", g_pClientGame->GetFileCacheRoot (), *m_strResourceName, szFileName );
     
     CResourceConfigItem* pConfig = new CResourceConfigItem ( this, szFileName, strBuffer, serverChecksum );
     if ( pConfig )

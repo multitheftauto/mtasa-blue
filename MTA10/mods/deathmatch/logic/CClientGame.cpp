@@ -138,6 +138,9 @@ CClientGame::CClientGame ( bool bLocalPlay )
     // Grab the mod path
     m_strModRoot = g_pCore->GetModInstallRoot ( "deathmatch" );
 
+    // Figure out which directory to use for the client resource file cache
+    SetFileCacheRoot();
+
     // Override CGUI's global events
     g_pCore->GetGUI ()->SetKeyDownHandler           ( INPUT_MOD, GUI_CALLBACK_KEY ( &CClientGame::OnKeyDown, this ) );
     g_pCore->GetGUI ()->SetMouseClickHandler        ( INPUT_MOD, GUI_CALLBACK_MOUSE ( &CClientGame::OnMouseClick, this ) );
@@ -6526,4 +6529,55 @@ AnimationId CClientGame::DrivebyAnimationHandler(AnimationId animId, AssocGroupI
         return 231;
 
     return animId;
+}
+
+
+//////////////////////////////////////////////////////////////////
+//
+// CClientGame::SetFileCacheRoot
+//
+// Figure out which directory to use for the client resource file cache
+//
+//////////////////////////////////////////////////////////////////
+void CClientGame::SetFileCacheRoot ( void )
+{
+    if ( g_pCore->GetCVars ()->GetValue < bool > ( "share_file_cache" ) == false )
+    {
+        // Not sharing, so use current mod directory
+        m_strFileCacheRoot = GetModRoot();
+        AddReportLog( 7410, SString( "CClientGame::SetFileCacheRoot - Not shared '%s'", *m_strFileCacheRoot ) );
+    }
+    else
+    {
+        // Get shared directory
+        SString strFileCachePath = GetCommonRegistryValue( "", "File Cache Path" );
+        // Check exists
+        if ( !strFileCachePath.empty() && DirectoryExists( strFileCachePath ) )
+        {
+            // Check writable
+            SString strTestFileName = PathJoin( strFileCachePath, "resources", "_test.tmp" );
+            if ( FileSave( strTestFileName, "x" ) )
+            {
+                FileDelete( strTestFileName );
+                strTestFileName = PathJoin( strFileCachePath, "priv", "_test.tmp" );
+                if ( FileSave( strTestFileName, "x" ) )
+                {
+                    FileDelete( strTestFileName );
+                    // Use shared directory
+                    m_strFileCacheRoot = strFileCachePath;
+                    AddReportLog( 7411, SString( "CClientGame::SetFileCacheRoot - Is shared '%s'", *m_strFileCacheRoot ) );
+                    return;
+                }
+            }
+        }
+
+        // Otherwise set this install mod directory as shared
+        m_strFileCacheRoot = GetModRoot();
+        SetCommonRegistryValue( "", "File Cache Path", m_strFileCacheRoot );
+    
+        if ( strFileCachePath.empty() )
+            AddReportLog( 7412, SString( "CClientGame::SetFileCacheRoot - Initial setting '%s'", *m_strFileCacheRoot ) );
+        else
+            AddReportLog( 7413, SString( "CClientGame::SetFileCacheRoot - Change shared from '%s' to '%s'", *strFileCachePath, *m_strFileCacheRoot ) );
+    }
 }

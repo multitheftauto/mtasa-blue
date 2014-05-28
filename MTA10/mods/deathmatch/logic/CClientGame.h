@@ -576,6 +576,8 @@ public:
     void                                SetMiscGameSettings             ( const SMiscGameSettings& settings )       { m_MiscGameSettings = settings; }
     const SMiscGameSettings&            GetMiscGameSettings             ( void )                                    { return m_MiscGameSettings; }
     bool                                IsUsingAlternatePulseOrder      ( bool bAdvanceDelayCounter = false );
+    void                                SetFileCacheRoot                ( void );
+    const char*                         GetFileCacheRoot                ( void )                                    { return m_strFileCacheRoot; }
 
 private:
     eStatus                             m_Status;
@@ -787,6 +789,7 @@ private:
     bool                                m_bLastKeyWasEscapeCancelled;
     std::set < SString >                m_AllowKeyUpMap;
     uint                                m_uiPrecisionCallDepth;
+    SString                             m_strFileCacheRoot;
 };
 
 extern CClientGame* g_pClientGame;
