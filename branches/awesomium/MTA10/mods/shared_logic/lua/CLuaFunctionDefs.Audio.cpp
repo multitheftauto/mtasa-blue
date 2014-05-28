@@ -767,7 +767,6 @@ int CLuaFunctionDefs::GetSoundLevelData ( lua_State* luaVM )
         }
         else
         {
-            m_pScriptDebugging->LogBadPointer ( luaVM, "sound/player", 1 );
             lua_pushboolean ( luaVM, false );
             return 1;
         }
@@ -1397,7 +1396,12 @@ int CLuaFunctionDefs::PlaySFX ( lua_State* luaVM )
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadEnumString ( containerIndex );
-    argStream.ReadNumber ( iBankIndex );
+
+    if (!argStream.HasErrors() && containerIndex == AUDIO_LOOKUP_RADIO)
+        argStream.ReadEnumString<eRadioStreamIndex>((eRadioStreamIndex&)iBankIndex);
+    else
+        argStream.ReadNumber(iBankIndex);
+
     argStream.ReadNumber ( iAudioIndex );
     argStream.ReadBool ( bLoop, false );
 
@@ -1433,7 +1437,12 @@ int CLuaFunctionDefs::PlaySFX3D ( lua_State* luaVM )
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadEnumString ( containerIndex );
-    argStream.ReadNumber ( iBankIndex );
+
+    if (!argStream.HasErrors() && containerIndex == AUDIO_LOOKUP_RADIO)
+        argStream.ReadEnumString<eRadioStreamIndex>((eRadioStreamIndex&) iBankIndex);
+    else
+        argStream.ReadNumber(iBankIndex);
+
     argStream.ReadNumber ( iAudioIndex );
     argStream.ReadNumber ( vecPosition.fX );
     argStream.ReadNumber ( vecPosition.fY );

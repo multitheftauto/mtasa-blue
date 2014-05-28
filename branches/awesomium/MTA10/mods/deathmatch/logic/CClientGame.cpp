@@ -2883,7 +2883,7 @@ void CClientGame::AddBuiltInEvents ( void )
     m_Events.AddEvent ( "onClientObjectBreak", "attacker", NULL, false );
 
     // Web events
-    m_Events.AddEvent ( "onClientWebsiteRequestResult", "wasSuccessful", NULL, false );
+    m_Events.AddEvent ( "onClientBrowserRequestResult", "wasSuccessful", NULL, false );
 
     // Misc events
     m_Events.AddEvent ( "onClientFileDownloadComplete", "fileName, success", NULL, false );
@@ -6541,5 +6541,5 @@ bool CClientGame::TriggerBrowserRequestResultEvent ( bool bAllowed )
     CLuaArguments Arguments;
     Arguments.PushBoolean ( bAllowed );
 
-    return GetRootEntity ()->CallEvent ( "onClientWebsiteRequestResult", Arguments, false );
+    return GetRootEntity ()->CallEvent ( "onClientBrowserRequestResult", Arguments, false );
 }

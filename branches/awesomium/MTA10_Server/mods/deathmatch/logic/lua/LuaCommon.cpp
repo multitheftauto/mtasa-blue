@@ -375,7 +375,7 @@ void lua_registerstaticclass ( lua_State* luaVM, const char* szName )
     lua_pop ( luaVM, 2 );
 }
 
-void lua_classfunction ( lua_State* luaVM, const char* szFunction, lua_CFunction fn )
+void lua_classfunction ( lua_State* luaVM, const char* szFunction, const char* szACLName, lua_CFunction fn )
 {
     if ( fn )
     {
@@ -384,7 +384,8 @@ void lua_classfunction ( lua_State* luaVM, const char* szFunction, lua_CFunction
 
         lua_pushstring ( luaVM, szFunction );
         lua_pushstring ( luaVM, szFunction );
-        lua_pushcclosure ( luaVM, fn, 1 );
+        lua_pushstring ( luaVM, szACLName );
+        lua_pushcclosure ( luaVM, fn, 2 );
         lua_rawset ( luaVM, -3 );
 
         lua_pop ( luaVM, 1 );
@@ -396,11 +397,11 @@ void lua_classfunction ( lua_State* luaVM, const char* szFunction, const char* f
     CLuaCFunction* pFunction = CLuaCFunctions::GetFunction ( fn );
     if ( pFunction )
     {
-        lua_classfunction ( luaVM, szFunction, pFunction->GetAddress () );
+        lua_classfunction ( luaVM, szFunction, szFunction, pFunction->GetAddress () );
     }
 }
 
-void lua_classvariable ( lua_State* luaVM, const char* szVariable, lua_CFunction set, lua_CFunction get )
+void lua_classvariable ( lua_State* luaVM, const char* szVariable, const char* szACLNameSet, const char* szACLNameGet, lua_CFunction set, lua_CFunction get, bool bACLIgnore )
 {
     lua_pushstring ( luaVM, "__set" );
     lua_rawget ( luaVM, -2 );
@@ -409,14 +410,16 @@ void lua_classvariable ( lua_State* luaVM, const char* szVariable, lua_CFunction
     {
         lua_pushstring ( luaVM, szVariable );
         lua_pushstring ( luaVM, szVariable );
-        lua_pushcclosure ( luaVM, CLuaClassDefs::ReadOnly, 1 );
+        lua_pushstring ( luaVM, szACLNameSet );
+        lua_pushcclosure ( luaVM, CLuaClassDefs::ReadOnly, 2 );
         lua_rawset ( luaVM, -3 );
     }
     else
     {
         lua_pushstring ( luaVM, szVariable );
         lua_pushstring ( luaVM, szVariable );
-        lua_pushcclosure ( luaVM, set, 1 );
+        lua_pushstring ( luaVM, szACLNameSet );
+        lua_pushcclosure ( luaVM, set, 2 );
         lua_rawset ( luaVM, -3 );
     }
     lua_pop ( luaVM, 1 );
@@ -429,14 +432,16 @@ void lua_classvariable ( lua_State* luaVM, const char* szVariable, lua_CFunction
     {
         lua_pushstring ( luaVM, szVariable );
         lua_pushstring ( luaVM, szVariable );
-        lua_pushcclosure ( luaVM, CLuaClassDefs::WriteOnly, 1 );
+        lua_pushstring ( luaVM, szACLNameGet );
+        lua_pushcclosure ( luaVM, CLuaClassDefs::WriteOnly, 2 );
         lua_rawset ( luaVM, -3 );
     }
     else
     {
         lua_pushstring ( luaVM, szVariable );
         lua_pushstring ( luaVM, szVariable );
-        lua_pushcclosure ( luaVM, get, 1 );
+        lua_pushstring ( luaVM, szACLNameGet );
+        lua_pushcclosure ( luaVM, get, 2 );
         lua_rawset ( luaVM, -3 );
     }
     lua_pop ( luaVM, 1 );
@@ -456,7 +461,7 @@ void lua_classvariable ( lua_State* luaVM, const char* szVariable, const char* s
             fnGet = pGet->GetAddress();
 
     if ( fnSet || fnGet )
-        lua_classvariable ( luaVM, szVariable, fnSet, fnGet );
+        lua_classvariable ( luaVM, szVariable, "", "", fnSet, fnGet, false );
 }
 
 void lua_classmetamethod ( lua_State* luaVM, const char* szName, lua_CFunction fn )

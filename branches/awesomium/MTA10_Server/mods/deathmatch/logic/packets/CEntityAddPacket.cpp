@@ -18,6 +18,35 @@
 
 #include "StdInc.h"
 
+//
+// Temporary helper functions for fixing crashes on pre r6459 clients.
+// Cause of #IND numbers should be handled before it gets here. (To avoid desync)
+//
+bool IsIndeterminate( float fValue )
+{
+    return fValue - fValue != 0;
+}
+
+void SilentlyFixIndeterminate( float& fValue )
+{
+    if ( IsIndeterminate( fValue ) )
+        fValue = 0;
+}
+
+void SilentlyFixIndeterminate( CVector& vecValue )
+{
+    SilentlyFixIndeterminate( vecValue.fX );
+    SilentlyFixIndeterminate( vecValue.fY );
+    SilentlyFixIndeterminate( vecValue.fZ );
+}
+
+void SilentlyFixIndeterminate( CVector2D& vecValue )
+{
+    SilentlyFixIndeterminate( vecValue.fX );
+    SilentlyFixIndeterminate( vecValue.fY );
+}
+
+
 void CEntityAddPacket::Add ( CElement * pElement )
 {
     // Only add it if it has a parent.
@@ -181,6 +210,7 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
 
                     // Position
                     position.data.vecPosition = pObject->GetPosition ();
+                    SilentlyFixIndeterminate( position.data.vecPosition );      // Crash fix for pre r6459 clients
                     BitStream.Write ( &position );
 
                     // Rotation
@@ -341,6 +371,7 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
 
                     // Position
                     position.data.vecPosition = pPickup->GetPosition ();
+                    SilentlyFixIndeterminate( position.data.vecPosition );      // Crash fix for pre r6459 clients
                     BitStream.Write ( &position );
 
                     // Grab the model and write it
@@ -634,6 +665,7 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
 
                     // Position
                     position.data.vecPosition = pMarker->GetPosition ();
+                    SilentlyFixIndeterminate( position.data.vecPosition );      // Crash fix for pre r6459 clients
                     BitStream.Write ( &position );
 
                     // Type
@@ -708,11 +740,13 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
                     // Write the position
                     SPosition2DSync position2D ( false );
                     position2D.data.vecPosition = pArea->GetPosition ();
+                    SilentlyFixIndeterminate( position2D.data.vecPosition );    // Crash fix for pre r6459 clients
                     BitStream.Write ( &position2D );
 
                     // Write the size
                     SPosition2DSync size2D ( false );
                     size2D.data.vecPosition = pArea->GetSize ();
+                    SilentlyFixIndeterminate( size2D.data.vecPosition );        // Crash fix for pre r6459 clients
                     BitStream.Write ( &size2D );
 
                     // And the color

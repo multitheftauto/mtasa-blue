@@ -190,14 +190,22 @@ CClientSound* CClientSoundManager::PlaySound3D ( void* pMemory, unsigned int uiL
 
 CClientSound* CClientSoundManager::PlayGTASFX ( eAudioLookupIndex containerIndex, int iBankIndex, int iAudioIndex, bool bLoop )
 {
-    if ( !GetSFXStatus ( containerIndex ) )
-        return NULL;
-
     void* pAudioData;
     unsigned int uiAudioLength;
 
-    if ( !g_pGame->GetAudioContainer ()->GetAudioData ( containerIndex, iBankIndex, iAudioIndex, pAudioData, uiAudioLength ) )
-        return NULL;
+    if (containerIndex == AUDIO_LOOKUP_RADIO)
+    {
+        if (!g_pGame->GetAudioContainer()->GetRadioAudioData((eRadioStreamIndex) iBankIndex, iAudioIndex, pAudioData, uiAudioLength))
+            return NULL;
+    }
+    else
+    {
+        if (!GetSFXStatus(containerIndex))
+            return NULL;
+
+        if (!g_pGame->GetAudioContainer()->GetAudioData(containerIndex, iBankIndex, iAudioIndex, pAudioData, uiAudioLength))
+            return NULL;
+    }
 
     CClientSound* pSound = PlaySound2D ( pAudioData, uiAudioLength, bLoop );
     if ( pSound )
@@ -210,14 +218,22 @@ CClientSound* CClientSoundManager::PlayGTASFX ( eAudioLookupIndex containerIndex
 
 CClientSound* CClientSoundManager::PlayGTASFX3D ( eAudioLookupIndex containerIndex, int iBankIndex, int iAudioIndex, const CVector& vecPosition, bool bLoop )
 {
-    if ( !GetSFXStatus ( containerIndex ) )
-        return NULL;
-
     void* pAudioData;
     unsigned int uiAudioLength;
 
-    if ( !g_pGame->GetAudioContainer ()->GetAudioData ( containerIndex, iBankIndex, iAudioIndex, pAudioData, uiAudioLength ) )
-        return NULL;
+    if (containerIndex == AUDIO_LOOKUP_RADIO)
+    {
+        if (!g_pGame->GetAudioContainer()->GetRadioAudioData((eRadioStreamIndex) iBankIndex, iAudioIndex, pAudioData, uiAudioLength))
+            return NULL;
+    }
+    else
+    {
+        if (!GetSFXStatus(containerIndex))
+            return NULL;
+
+        if (!g_pGame->GetAudioContainer()->GetAudioData(containerIndex, iBankIndex, iAudioIndex, pAudioData, uiAudioLength))
+            return NULL;
+    }
 
     CClientSound* pSound = PlaySound3D ( pAudioData, uiAudioLength, vecPosition, bLoop );
     if ( pSound )

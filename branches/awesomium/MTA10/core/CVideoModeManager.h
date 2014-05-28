@@ -35,6 +35,7 @@ public:
     virtual bool        IsMinimizeEnabled           ( void ) = 0;
     virtual void        OnGainFocus                 ( void ) = 0;
     virtual void        OnLoseFocus                 ( void ) = 0;
+    virtual bool        GetRequiredDisplayResolution( int& iOutWidth, int& iOutHeight, int& iOutColorBits, int& iOutAdapterIndex ) = 0;
 };
 
 CVideoModeManagerInterface* GetVideoModeManager ( void );

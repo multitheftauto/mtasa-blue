@@ -22,22 +22,29 @@ public:
             return;
 
         object.SetCustomMethod ( name, false );
-        m_FunctionMap[name] = callback;
+        std::pair<uint, Awesomium::WebString> key ( object.remote_id (), name );
+        m_FunctionMap[key] = callback;
     }
-    void OnMethodCall ( Awesomium::WebView* pCaller, unsigned int remote_object_id, const Awesomium::WebString& method_name, const Awesomium::JSArray& args )
+    void OnMethodCall ( Awesomium::WebView* pCaller, uint remote_object_id, const Awesomium::WebString& method_name, const Awesomium::JSArray& args )
     {
-        // Todo: Implement usage of the remote id. Since we're currently only dealing with 1 global objcet, it doesn't matter for now
-        std::map<Awesomium::WebString, JavascriptCallback>::iterator iter = m_FunctionMap.find ( method_name );
-        if ( iter != m_FunctionMap.end() )
+        std::pair<uint, Awesomium::WebString> key ( remote_object_id, method_name );
+        std::map<std::pair<uint, Awesomium::WebString>, JavascriptCallback>::iterator iter = m_FunctionMap.find ( key );
+        if ( iter != m_FunctionMap.end () )
+        {
             iter->second ( pCaller, args );
+        }
     }
     Awesomium::JSValue OnMethodCallWithReturnValue ( Awesomium::WebView* pCaller, unsigned int remote_object_id, const Awesomium::WebString& method_name, const Awesomium::JSArray& args )
     {
         // Todo: Implement this
         return Awesomium::JSValue ( Awesomium::WSLit ("Not implemented") );
     }
+    void Clear ()
+    {
+        m_FunctionMap.clear ();
+    }
 private:
-    std::map<Awesomium::WebString, JavascriptCallback> m_FunctionMap;
+    std::map<std::pair<uint, Awesomium::WebString>, JavascriptCallback> m_FunctionMap;
 };
 
 #endif

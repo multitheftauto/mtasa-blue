@@ -813,6 +813,35 @@ void CClientPed::GetControllerState ( CControllerState& ControllerState )
         {
             ControllerState.ButtonCross = 0;
         }
+        // Fix for GTA bug allowing vehicles to be controlled while dead.
+        if ( pVehicle && IsDying ( ) )
+        {
+            // camera
+            ControllerState.LeftStickX = 0;
+            ControllerState.LeftStickY = 0;
+            ControllerState.RightStickX = 0;
+            ControllerState.RightStickY = 0;
+            // brake
+            ControllerState.ButtonSquare = 0;
+            // enter/exit
+            ControllerState.ButtonTriangle = 0;
+            // nos/fire
+            ControllerState.ButtonCircle = 0;
+            // accelerate
+            ControllerState.ButtonCross = 0;
+            // handbrake/missiles
+            ControllerState.RightShoulder1 = 0;
+            if ( pVehicle && pVehicle->GetVehicleType() == CLIENTVEHICLE_PLANE )
+            {
+                // rudders
+                ControllerState.RightShoulder2 = 0;
+                ControllerState.LeftShoulder2 = 0;
+            }
+            // Horn/sirens/police spotlight/hover
+            ControllerState.ShockButtonL = 0;
+            // raise/lower landing gear
+            ControllerState.ShockButtonR = 0;
+        }
     }
     else
     {
@@ -3026,6 +3055,36 @@ void CClientPed::ApplyControllerStateFixes ( CControllerState& Current )
                 // Maybe cancel crouch
                 if ( ulNow - m_ulLastTimePressedLeftOrRight < 500.f * fSpeedRatio )
                     Current.ShockButtonL = 0; 
+            }
+        }
+    }
+    else
+    {
+        // If we are a normal ped
+        if ( GetType() == eClientEntityType::CCLIENTPED )
+        {
+            // Do we have a weapon?
+            CWeapon * pWeapon = GetWeapon ();
+            if ( pWeapon )
+            {
+                // Weapon wielding slot?
+                eWeaponSlot slot = pWeapon->GetSlot ();
+                if ( slot != WEAPONSLOT_TYPE_UNARMED && slot != WEAPONSLOT_TYPE_MELEE )
+                {
+                    eWeaponType eWeapon = pWeapon->GetType ( );
+                    // No Ammo left?
+                    float fSkill = GetStat ( g_pGame->GetStats ()->GetSkillStatIndex ( eWeapon ) );
+                    CWeaponStat* pWeaponStat = g_pGame->GetWeaponStatManager ( )->GetWeaponStatsFromSkillLevel ( eWeapon, fSkill );
+                    if ( ( pWeapon->GetAmmoInClip ( ) == 0 && pWeaponStat->GetMaximumClipAmmo ( ) > 0 ) && pWeapon->GetAmmoTotal () == 0 )
+                    {
+                        pTask = m_pTaskManager->GetTaskSecondary ( TASK_SECONDARY_ATTACK );
+                        if ( pTask && pTask->GetTaskType ( ) == TASK_SIMPLE_USE_GUN )
+                        {
+                            // disable the fire control state.
+                            m_Pad.SetControlState ( "fire", false );
+                        }
+                    }
+                }
             }
         }
     }

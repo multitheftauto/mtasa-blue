@@ -181,28 +181,28 @@ void CLuaMain::AddVector3DClass ( lua_State* luaVM )
     lua_classmetamethod ( luaVM, "__unm", CLuaVectorDefs::Unm );
     lua_classmetamethod ( luaVM, "__eq", CLuaVectorDefs::Eq );
 
-    lua_classfunction ( luaVM, "create", CLuaVectorDefs::Create );
-    lua_classfunction ( luaVM, "normalize", CLuaVectorDefs::Normalize );
-    lua_classfunction ( luaVM, "cross", CLuaVectorDefs::Cross );
-    lua_classfunction ( luaVM, "dot", CLuaVectorDefs::Dot );
+    lua_classfunction ( luaVM, "create", "", CLuaVectorDefs::Create );
+    lua_classfunction ( luaVM, "normalize", "", CLuaVectorDefs::Normalize );
+    lua_classfunction ( luaVM, "cross", "", CLuaVectorDefs::Cross );
+    lua_classfunction ( luaVM, "dot", "", CLuaVectorDefs::Dot );
 
-    lua_classfunction ( luaVM, "getLength", CLuaVectorDefs::GetLength );
-    lua_classfunction ( luaVM, "getSquaredLength", CLuaVectorDefs::GetLengthSquared );
-    lua_classfunction ( luaVM, "getNormalized", CLuaVectorDefs::GetNormalized );
-    lua_classfunction ( luaVM, "getX", CLuaVectorDefs::GetX );
-    lua_classfunction ( luaVM, "getY", CLuaVectorDefs::GetY );
-    lua_classfunction ( luaVM, "getZ", CLuaVectorDefs::GetZ );
+    lua_classfunction ( luaVM, "getLength", "", CLuaVectorDefs::GetLength );
+    lua_classfunction ( luaVM, "getSquaredLength", "", CLuaVectorDefs::GetLengthSquared );
+    lua_classfunction ( luaVM, "getNormalized", "", CLuaVectorDefs::GetNormalized );
+    lua_classfunction ( luaVM, "getX", "", CLuaVectorDefs::GetX );
+    lua_classfunction ( luaVM, "getY", "", CLuaVectorDefs::GetY );
+    lua_classfunction ( luaVM, "getZ", "", CLuaVectorDefs::GetZ );
 
-    lua_classfunction ( luaVM, "setX", CLuaVectorDefs::SetX );
-    lua_classfunction ( luaVM, "setY", CLuaVectorDefs::SetY );
-    lua_classfunction ( luaVM, "setZ", CLuaVectorDefs::SetZ );
+    lua_classfunction ( luaVM, "setX", "", CLuaVectorDefs::SetX );
+    lua_classfunction ( luaVM, "setY", "", CLuaVectorDefs::SetY );
+    lua_classfunction ( luaVM, "setZ", "", CLuaVectorDefs::SetZ );
 
-    lua_classvariable ( luaVM, "x", CLuaVectorDefs::SetX, CLuaVectorDefs::GetX );
-    lua_classvariable ( luaVM, "y", CLuaVectorDefs::SetY, CLuaVectorDefs::GetY );
-    lua_classvariable ( luaVM, "z", CLuaVectorDefs::SetZ, CLuaVectorDefs::GetZ );
-    lua_classvariable ( luaVM, "length", NULL, CLuaVectorDefs::GetLength );
-    lua_classvariable ( luaVM, "squaredLength", NULL, CLuaVectorDefs::GetLengthSquared );
-    lua_classvariable ( luaVM, "normalized", NULL, CLuaVectorDefs::GetNormalized );
+    lua_classvariable ( luaVM, "x", "", "", CLuaVectorDefs::SetX, CLuaVectorDefs::GetX );
+    lua_classvariable ( luaVM, "y", "", "", CLuaVectorDefs::SetY, CLuaVectorDefs::GetY );
+    lua_classvariable ( luaVM, "z", "", "", CLuaVectorDefs::SetZ, CLuaVectorDefs::GetZ );
+    lua_classvariable ( luaVM, "length", "", "", NULL, CLuaVectorDefs::GetLength );
+    lua_classvariable ( luaVM, "squaredLength", "", "", NULL, CLuaVectorDefs::GetLengthSquared );
+    lua_classvariable ( luaVM, "normalized", "", "", NULL, CLuaVectorDefs::GetNormalized );
 
     lua_registerclass ( luaVM, "Vector3" );
 }
@@ -228,24 +228,24 @@ void CLuaMain::AddMatrixClass ( lua_State* luaVM )
     lua_classmetamethod ( luaVM, "__mul", CLuaMatrixDefs::Mul );
     lua_classmetamethod ( luaVM, "__div", CLuaMatrixDefs::Div );
 
-    lua_classfunction ( luaVM, "create", CLuaMatrixDefs::Create );
+    lua_classfunction ( luaVM, "create", "", CLuaMatrixDefs::Create );
 
-    lua_classfunction ( luaVM, "getPosition", CLuaMatrixDefs::GetPosition );
-    lua_classfunction ( luaVM, "getRotation", CLuaMatrixDefs::GetRotation );
-    lua_classfunction ( luaVM, "getFront", CLuaMatrixDefs::GetFront );
-    lua_classfunction ( luaVM, "getRight", CLuaMatrixDefs::GetRight );
-    lua_classfunction ( luaVM, "getUp", CLuaMatrixDefs::GetUp );
+    lua_classfunction ( luaVM, "getPosition", "", CLuaMatrixDefs::GetPosition );
+    lua_classfunction ( luaVM, "getRotation", "", CLuaMatrixDefs::GetRotation );
+    lua_classfunction ( luaVM, "getFront", "", CLuaMatrixDefs::GetFront );
+    lua_classfunction ( luaVM, "getRight", "", CLuaMatrixDefs::GetRight );
+    lua_classfunction ( luaVM, "getUp", "", CLuaMatrixDefs::GetUp );
 
-    lua_classfunction ( luaVM, "setPosition", CLuaMatrixDefs::SetPosition );
-    lua_classfunction ( luaVM, "setFront", CLuaMatrixDefs::SetFront );
-    lua_classfunction ( luaVM, "setRight", CLuaMatrixDefs::SetRight );
-    lua_classfunction ( luaVM, "setUp", CLuaMatrixDefs::SetUp );
+    lua_classfunction ( luaVM, "setPosition", "", CLuaMatrixDefs::SetPosition );
+    lua_classfunction ( luaVM, "setFront", "", CLuaMatrixDefs::SetFront );
+    lua_classfunction ( luaVM, "setRight", "", CLuaMatrixDefs::SetRight );
+    lua_classfunction ( luaVM, "setUp", "", CLuaMatrixDefs::SetUp );
 
-    lua_classvariable ( luaVM, "position", CLuaMatrixDefs::SetPosition, CLuaMatrixDefs::GetPosition );
-    lua_classvariable ( luaVM, "rotation", NULL, CLuaMatrixDefs::GetRotation );
-    lua_classvariable ( luaVM, "front", CLuaMatrixDefs::SetFront, CLuaMatrixDefs::GetFront );
-    lua_classvariable ( luaVM, "right", CLuaMatrixDefs::SetRight, CLuaMatrixDefs::GetRight );
-    lua_classvariable ( luaVM, "up", CLuaMatrixDefs::SetUp, CLuaMatrixDefs::GetUp );
+    lua_classvariable ( luaVM, "position", "", "", CLuaMatrixDefs::SetPosition, CLuaMatrixDefs::GetPosition );
+    lua_classvariable ( luaVM, "rotation", "", "", NULL, CLuaMatrixDefs::GetRotation );
+    lua_classvariable ( luaVM, "front", "", "", CLuaMatrixDefs::SetFront, CLuaMatrixDefs::GetFront );
+    lua_classvariable ( luaVM, "right", "", "", CLuaMatrixDefs::SetRight, CLuaMatrixDefs::GetRight );
+    lua_classvariable ( luaVM, "up", "", "", CLuaMatrixDefs::SetUp, CLuaMatrixDefs::GetUp );
 
     lua_registerclass ( luaVM, "Matrix" );
 }
@@ -272,8 +272,8 @@ void CLuaMain::AddElementClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "getAllData", "getAllElementData" );
     lua_classfunction ( luaVM, "getID", "getElementID" );
     lua_classfunction ( luaVM, "getParent", "getElementParent" );
-    lua_classfunction ( luaVM, "getPosition", CLuaOOPDefs::GetElementPosition );
-    lua_classfunction ( luaVM, "getRotation", CLuaOOPDefs::GetElementRotation );
+    lua_classfunction ( luaVM, "getPosition", "getElementPosition", CLuaOOPDefs::GetElementPosition );
+    lua_classfunction ( luaVM, "getRotation", "getElementRotation", CLuaOOPDefs::GetElementRotation );
 
     lua_classfunction ( luaVM, "getVelocity", "getElementVelocity" );
     lua_classfunction ( luaVM, "getByType", "getElementsByType" );
@@ -338,8 +338,8 @@ void CLuaMain::AddElementClass ( lua_State* luaVM )
     lua_classvariable ( luaVM, "interior", "setElementInterior", "getElementInterior" );
     lua_classvariable ( luaVM, "distanceFromCentreOfMassToBaseOfModel", NULL, "GetElementDistanceFromCentreOfMassToBaseOfModel" );
 
-    lua_classvariable ( luaVM, "position", CLuaElementDefs::setElementPosition, CLuaOOPDefs::GetElementPosition );
-    lua_classvariable ( luaVM, "rotation", CLuaElementDefs::setElementRotation, CLuaOOPDefs::GetElementRotation );
+    lua_classvariable ( luaVM, "position", "setElementPosition", "getElementPosition", CLuaElementDefs::setElementPosition, CLuaOOPDefs::GetElementPosition );
+    lua_classvariable ( luaVM, "rotation", "setElementRotation", "getElementRotation", CLuaElementDefs::setElementRotation, CLuaOOPDefs::GetElementRotation );
 
 
     lua_registerclass ( luaVM, "Element" );
@@ -571,7 +571,7 @@ void CLuaMain::AddPedClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "setLookAt", "setPedLookAt" ); // vector3
     //lua_classfunction ( luaVM, "setWalkingStyle", "setPedWalkingStyle" );
 
-    lua_classvariable ( luaVM, "vehicle", CLuaOOPDefs::SetPedOccupiedVehicle, CLuaFunctionDefinitions::GetPedOccupiedVehicle );
+    lua_classvariable ( luaVM, "vehicle", "setPedOccupiedVehicle", "getPedOccupiedVehicle", CLuaOOPDefs::SetPedOccupiedVehicle, CLuaFunctionDefinitions::GetPedOccupiedVehicle );
     lua_classvariable ( luaVM, "canBeKnockedOffBike", "setPedCanBeKnockedOffBike", "canPedBeKnockedOffBike" );
     lua_classvariable ( luaVM, "hasJetPack", NULL, "doesPedHaveJetPack" );
     lua_classvariable ( luaVM, "armor", NULL, "getPedArmor" );

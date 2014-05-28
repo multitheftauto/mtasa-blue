@@ -133,11 +133,14 @@ void CWebView::InjectKeyboardEvent ( const SString& strKey, bool bKeyDown, bool 
 ////////////////////////////////////////////////////////////////////
 void CWebView::OnFinishLoadingFrame ( Awesomium::WebView* pCaller, int64 iFrameId, bool bMainFrame, const Awesomium::WebURL& url )
 {
+    // Clear the old list
+    m_JSMethodHandler.Clear ();
+
     // Bind javascript global object
-    Awesomium::JSValue result = pCaller->CreateGlobalJavascriptObject ( Awesomium::WSLit ("mta") );
-    if (result.IsObject ())
+    Awesomium::JSValue jsMTA = pCaller->CreateGlobalJavascriptObject ( Awesomium::WSLit ("mta") );
+    if ( jsMTA.IsObject () )
     {
-        Awesomium::JSObject& mtaObject = result.ToObject ();
+        Awesomium::JSObject& mtaObject = jsMTA.ToObject ();
         m_JSMethodHandler.Bind ( mtaObject, Awesomium::WSLit ("triggerEvent"), Javascript_triggerEvent );
     }
 
@@ -154,6 +157,9 @@ void CWebView::OnFinishLoadingFrame ( Awesomium::WebView* pCaller, int64 iFrameI
 ////////////////////////////////////////////////////////////////////
 void CWebView::Javascript_triggerEvent ( Awesomium::WebView* pWebView, const Awesomium::JSArray& args )
 {
+    if ( args.size() == 0 )
+        return;
+
     // Convert JSArray to string array
     std::vector<SString> stringArray;
 
@@ -166,3 +172,19 @@ void CWebView::Javascript_triggerEvent ( Awesomium::WebView* pWebView, const Awe
     SString strEventName = CWebCore::ToSString ( args[0].ToString() );
     CModManager::GetSingleton().GetCurrentMod ()->WebsiteTriggerEventHandler ( strEventName, stringArray ); // Does anybody know a better way to trigger an event in the deathmatch module?
 }
+
+////////////////////////////////////////////////////////////////////
+//                                                                //
+//        Static Javascript methods: alert                        //
+//        Exports the javascript alert to Lua                     //
+//                                                                //
+////////////////////////////////////////////////////////////////////
+/*void CWebView::Javascript_alert ( Awesomium::WebView* pWebView, const Awesomium::JSArray& args )
+{
+    SString message = "";
+    if ( args.size() > 0 )
+        message = CWebCore::ToSString ( args[0].ToString () );
+
+    CModManager::GetSingleton().GetCurrentMod()->WebsiteAlertHandler ( message );
+}
+*/
