@@ -178,12 +178,12 @@ int CLuaFunctionDefs::InjectBrowserMouseMove ( lua_State* luaVM )
 
 int CLuaFunctionDefs::InjectBrowserMouseDown ( lua_State* luaVM )
 {
-//  bool injectBrowserMouseDown ( browser webBrowser, int mouseButton )
-    CClientWebBrowser* pWebBrowser; int mouseButton;
+//  bool injectBrowserMouseDown ( browser webBrowser, string mouseButton )
+    CClientWebBrowser* pWebBrowser; eAwesomiumMouseButton mouseButton;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pWebBrowser );
-    argStream.ReadNumber ( mouseButton );
+    argStream.ReadEnumString ( mouseButton );
 
     if ( !argStream.HasErrors () )
     {
@@ -200,12 +200,12 @@ int CLuaFunctionDefs::InjectBrowserMouseDown ( lua_State* luaVM )
 
 int CLuaFunctionDefs::InjectBrowserMouseUp ( lua_State* luaVM )
 {
-//  bool injectBrowserMouseUp ( browser webBrowser, int mouseButton )
-    CClientWebBrowser* pWebBrowser; int mouseButton;
+//  bool injectBrowserMouseUp ( browser webBrowser, string mouseButton )
+    CClientWebBrowser* pWebBrowser; eAwesomiumMouseButton mouseButton;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pWebBrowser );
-    argStream.ReadNumber ( mouseButton );
+    argStream.ReadEnumString ( mouseButton );
 
     if ( !argStream.HasErrors () )
     {

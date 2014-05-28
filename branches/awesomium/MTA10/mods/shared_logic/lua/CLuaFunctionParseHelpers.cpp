@@ -430,6 +430,12 @@ IMPLEMENT_ENUM_BEGIN(eRadioStreamIndex)
     ADD_ENUM(RADIO_STREAM_WCTR, "WCTR")
 IMPLEMENT_ENUM_END("radio-stream-index")
 
+IMPLEMENT_ENUM_BEGIN(eAwesomiumMouseButton)
+    ADD_ENUM(AWESOMIUM_MOUSEBUTTON_LEFT, "left")
+    ADD_ENUM(AWESOMIUM_MOUSEBUTTON_MIDDLE, "middle")
+    ADD_ENUM(AWESOMIUM_MOUSEBUTTON_RIGHT, "right")
+IMPLEMENT_ENUM_END("awesomium-mouse-button")
+
 //
 // Get best guess at name of userdata type
 //

@@ -21,6 +21,13 @@ enum eURLState
     WEBPAGE_DISALLOWED
 };
 
+enum eAwesomiumMouseButton
+{
+    AWESOMIUM_MOUSEBUTTON_LEFT = 0,
+    AWESOMIUM_MOUSEBUTTON_MIDDLE = 1,
+    AWESOMIUM_MOUSEBUTTON_RIGHT = 2
+};
+
 class CWebCoreInterface
 {
 public:

@@ -1017,7 +1017,7 @@ void CSettings::CreateGUI ( void )
     }
 
     /**
-     * Interface/chat Tab
+     * Webbrowser tab
      **/
     m_pLabelBrowserGeneral = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabBrowser, _("General") ) );
     m_pLabelBrowserGeneral->SetPosition ( CVector2D ( 10.0f, 12.0f ) );

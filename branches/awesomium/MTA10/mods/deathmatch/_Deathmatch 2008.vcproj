@@ -977,6 +977,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\shared_logic\CClientWebBrowser.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\shared_logic\CCustomData.cpp"
 					>
 				</File>
@@ -1089,6 +1093,10 @@
 					</File>
 					<File
 						RelativePath="..\shared_logic\lua\CLuaFunctionDefs.BodyClothes.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\shared_logic\lua\CLuaFunctionDefs.Browser.cpp"
 						>
 					</File>
 					<File
@@ -2580,6 +2588,10 @@
 				</File>
 				<File
 					RelativePath="..\shared_logic\CClientWeaponManager.h"
+					>
+				</File>
+				<File
+					RelativePath="..\shared_logic\CClientWebBrowser.h"
 					>
 				</File>
 				<File
