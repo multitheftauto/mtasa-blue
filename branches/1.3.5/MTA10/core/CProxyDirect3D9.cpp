@@ -290,9 +290,15 @@ SString GUIDToString ( const GUID& g );
                         " VertexShaderVersion:0x%08x"
                         " PixelShaderVersion:0x%08x"
                         " DeclTypes:0x%03x"
+                        " VertexProcessingCaps:0x%03x"
+                        " MaxActiveLights:0x%01x"
+                        " MaxUserClipPlanes:0x%01x"
                         , a.VertexShaderVersion
                         , a.PixelShaderVersion
                         , a.DeclTypes
+                        , a.VertexProcessingCaps
+                        , a.MaxActiveLights
+                        , a.MaxUserClipPlanes
                     );
     }
 
@@ -554,6 +560,10 @@ void AddCapsReport( UINT Adapter, IDirect3D9* pDirect3D, IDirect3DDevice9* pD3DD
               pDirect3D->GetAdapterIdentifier ( Adapter, 0, &AdapterIdent1 );
               WriteDebugEvent ( "pDirect3D:" );
               WriteDebugEvent ( ToString( AdapterIdent1 ) );
+
+              pDirect3D->GetAdapterIdentifier ( Adapter, 0, &AdapterIdent1 );
+              WriteDebugEvent ( "pDirect3D #2:" );
+              WriteDebugEvent ( ToString( AdapterIdent1 ) );
       
               // Log graphic card name
               D3DADAPTER_IDENTIFIER9 AdapterIdent2;
@@ -768,7 +778,7 @@ HRESULT HandleCreateDeviceResult( HRESULT hResult, IDirect3D9* pDirect3D, UINT A
     if ( uiCurrentStatus == CREATE_DEVICE_FAIL )
         uiDiagnosticLogLevel = 2;   // Log and wait - If fail status
 
-    bool bDetectOptimus = SStringX( AdapterIdent.Driver ).ContainsI( "shim.dll" );
+    bool bDetectOptimus = ( GetModuleHandle( "nvd3d9wrap.dll" ) != NULL );
 
     bool bFixCaps = false;
     if ( GetApplicationSettingInt( "nvhacks", "optimus" ) || bDetectOptimus )
@@ -966,7 +976,7 @@ HRESULT CCore::OnPostCreateDevice( HRESULT hResult, IDirect3D9* pDirect3D, UINT 
                                 ) );
     }
 
-    bool bDetectOptimus = SStringX( AdapterIdent.Driver ).ContainsI( "shim.dll" );
+    bool bDetectOptimus = ( GetModuleHandle( "nvd3d9wrap.dll" ) != NULL );
 
     // Calc log level to use
     uint uiDiagnosticLogLevel = 0;

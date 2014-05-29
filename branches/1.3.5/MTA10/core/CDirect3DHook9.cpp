@@ -296,8 +296,7 @@ IDirect3D9* GetAnotherThing( IDirect3D9* pInitialDirect3D9, UINT SDKVersion )
     hr = pInitialDirect3D9->GetDeviceCaps( Adapter, D3DDEVTYPE_HAL, &InitialD3DCaps9 );
     WriteDebugEvent( SString( "pInitialDirect3D9 CapsReport Caps9 - %s ", *ToString( InitialD3DCaps9 ) ) );
 
-    SString strDriver = InitialAdapterIdent.Driver;
-    if ( !strDriver.ContainsI( "shim.dll" ) || uiCallCount != 1 )
+    if ( GetModuleHandle( "nvd3d9wrap.dll" ) == NULL )
         return pInitialDirect3D9;
 
     // Optimus tests only
