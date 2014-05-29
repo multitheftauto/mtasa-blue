@@ -14,8 +14,8 @@
 #include "StdInc.h"
 #include "CServerIdManager.h"
 
-#define MTA_SERVERID_LOOKUP_DIR       "mods/deathmatch/priv"
-#define MTA_SERVERID_LOOKUP_XML       "mods/deathmatch/priv/server-ids.xml"
+#define MTA_SERVERID_LOOKUP_DIR       "priv"
+#define MTA_SERVERID_LOOKUP_XML       "priv/server-ids.xml"
 
 namespace
 {
@@ -104,7 +104,7 @@ CServerIdManager* CServerIdManager::GetSingleton ()
 CServerIdManagerImpl::CServerIdManagerImpl ( void )
 {
     // Calc private dir root
-    m_strServerIdLookupBaseDir = CalcMTASAPath ( MTA_SERVERID_LOOKUP_DIR );
+    m_strServerIdLookupBaseDir = PathJoin ( g_pClientGame->GetFileCacheRoot(), MTA_SERVERID_LOOKUP_DIR );
     MakeSureDirExists ( PathJoin ( m_strServerIdLookupBaseDir, "" ) );
 
     // Calc temp dir path incase of server id error
@@ -140,7 +140,7 @@ CServerIdManagerImpl::~CServerIdManagerImpl ( void )
 bool CServerIdManagerImpl::LoadServerIdMap ( void )
 {
     // Load config XML file
-    CXMLFile* pConfigFile = g_pCore->GetXML ()->CreateXML ( CalcMTASAPath ( MTA_SERVERID_LOOKUP_XML ) );
+    CXMLFile* pConfigFile = g_pCore->GetXML ()->CreateXML ( PathJoin ( g_pClientGame->GetFileCacheRoot(), MTA_SERVERID_LOOKUP_XML ) );
     if ( !pConfigFile )
         return false;
     pConfigFile->Parse ();
@@ -238,7 +238,7 @@ DWORD CServerIdManagerImpl::StaticThreadProc ( LPVOID lpdwThreadParam )
 ///////////////////////////////////////////////////////////////
 void CServerIdManagerImpl::StaticSaveServerIdMap ( void )
 {
-    CXMLFile* pConfigFile = g_pCore->GetXML ()->CreateXML ( CalcMTASAPath ( MTA_SERVERID_LOOKUP_XML ) );
+    CXMLFile* pConfigFile = g_pCore->GetXML ()->CreateXML ( PathJoin ( g_pClientGame->GetFileCacheRoot(), MTA_SERVERID_LOOKUP_XML ) );
     if ( !pConfigFile )
         return;
     pConfigFile->Reset ();
