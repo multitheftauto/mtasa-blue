@@ -91,6 +91,7 @@ public:
     virtual unsigned int    GetCurrentVideoMode     ( void ) = 0;
     virtual void            SetCurrentVideoMode     ( unsigned int modeIndex, bool bOnRestart ) = 0;
     virtual unsigned int    GetNumAdapters          ( void ) = 0;
+    virtual unsigned int    GetCurrentAdapter       ( void ) = 0;
     virtual void            SetAdapter              ( unsigned int uiAdapterIndex ) = 0;
     virtual unsigned char   GetRadioVolume          ( void ) = 0;
     virtual void            SetRadioVolume          ( unsigned char ucVolume ) = 0;

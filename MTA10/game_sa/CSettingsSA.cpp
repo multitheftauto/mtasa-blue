@@ -21,10 +21,12 @@ unsigned long CSettingsSA::FUNC_GetCurrentVideoMode;
 unsigned long CSettingsSA::FUNC_SetCurrentVideoMode;
 unsigned long CSettingsSA::FUNC_SetDrawDistance;
 unsigned long CSettingsSA::FUNC_GetNumSubSystems;
+unsigned long CSettingsSA::FUNC_GetCurrentSubSystem;
 unsigned long CSettingsSA::FUNC_SetSubSystem;
 
 #define VAR_CurVideoMode            (*((uint*)(0x08D6220)))
 #define VAR_SavedVideoMode          (*((uint*)(0x0BA6820)))
+#define VAR_CurAdapter              (*((uint*)(0x0C920F4)))
 
 #define HOOKPOS_GetFxQuality                0x49EA50
 void HOOK_GetFxQuality ();
@@ -127,6 +129,17 @@ void CSettingsSA::SetAdapter ( unsigned int uiAdapterIndex )
         call    FUNC_SetSubSystem
         add     esp, 4
     }
+}
+
+unsigned int CSettingsSA::GetCurrentAdapter ( void )
+{
+    unsigned int uiReturn = 0;
+    _asm
+    {
+        call    FUNC_GetCurrentSubSystem
+        mov     uiReturn, eax
+    }
+    return uiReturn;
 }
 
 unsigned char CSettingsSA::GetRadioVolume ( void )
@@ -573,6 +586,7 @@ void CSettingsSA::SetValidVideoMode( void )
     // Set for GTA to use
     VAR_CurVideoMode = uiUseVideoMode;
     VAR_SavedVideoMode = uiUseVideoMode;
+    VAR_CurAdapter = iAdapterIndex;
 }
 
 

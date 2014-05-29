@@ -93,6 +93,7 @@ public:
     unsigned int            GetCurrentVideoMode         ( void );
     void                    SetCurrentVideoMode         ( unsigned int modeIndex, bool bOnRestart );
     unsigned int            GetNumAdapters              ( void );
+    unsigned int            GetCurrentAdapter           ( void );
     void                    SetAdapter                  ( unsigned int uiAdapterIndex );
     unsigned char           GetRadioVolume              ( void );
     void                    SetRadioVolume              ( unsigned char ucVolume );
@@ -153,6 +154,7 @@ private:
     static unsigned long    FUNC_SetRadioVolume;
     static unsigned long    FUNC_SetDrawDistance;
     static unsigned long    FUNC_GetNumSubSystems;
+    static unsigned long    FUNC_GetCurrentSubSystem;
     static unsigned long    FUNC_SetSubSystem;
 };
 
