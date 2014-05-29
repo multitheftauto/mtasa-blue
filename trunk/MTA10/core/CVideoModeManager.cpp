@@ -13,7 +13,6 @@
 #include "StdInc.h"
 #include <game/CGame.h>
 
-
 ///////////////////////////////////////////////////////////////
 //
 // CVideoModeManager class
@@ -38,16 +37,19 @@ public:
     virtual bool        IsMinimizeEnabled           ( void );
     virtual void        OnGainFocus                 ( void );
     virtual void        OnLoseFocus                 ( void );
+    virtual void        OnPaint                     ( void );
     virtual bool        GetRequiredDisplayResolution( int& iOutWidth, int& iOutHeight, int& iOutColorBits, int& iOutAdapterIndex );
 
     bool                IsDisplayModeWindowed       ( void );
     bool                IsDisplayModeFullScreen     ( void );
     bool                IsDisplayModeFullScreenWindow   ( void );
+    bool                GetCurrentAdapterRect       ( LPRECT pOutRect );
+    SString             GetCurrentAdapterDeviceName ( void );
 
 private:
     void                LoadCVars                   ( void );
     void                SaveCVars                   ( void );
-    bool                GameResMatchesPrimaryMonitor ( void );
+    bool                GameResMatchesCurrentAdapter ( void );
     SString             MakeResolutionString        ( uint uiWidth, uint uiHeight, uint uiDepth, uint uiAdapter );
 
     unsigned long       m_ulForceBackBufferWidth;
@@ -67,6 +69,7 @@ private:
     int                 m_iNextAdapter;
     bool                m_bNextWindowed;
     int                 m_iNextFullscreenStyle;
+    HMONITOR            m_hCurrentMonitor;
 
     bool                m_bPendingGainFocus;
     bool                m_bOriginalDesktopResMatches;
@@ -138,13 +141,14 @@ void CVideoModeManager::PreCreateDevice ( D3DPRESENT_PARAMETERS* pp )
 
     if ( IsDisplayModeWindowed() )
     {
-        int x, y;
-        x = GetSystemMetrics ( SM_CXSCREEN );
-        y = GetSystemMetrics ( SM_CYSCREEN );
+        RECT rc;
+        GetCurrentAdapterRect( &rc );
+        int iPosX = ( rc.left + rc.right ) / 2 - ( pp->BackBufferWidth / 2 );
+        int iPosY = ( rc.top + rc.bottom ) / 2 - ( pp->BackBufferHeight / 2 );
         SetWindowLong ( m_hDeviceWindow, GWL_STYLE, WS_POPUP );
         MoveWindow ( m_hDeviceWindow, 
-                    (x/2)-(pp->BackBufferWidth/2), 
-                    (y/2)-(pp->BackBufferHeight/2), 
+                    iPosX, 
+                    iPosY, 
                     pp->BackBufferWidth,
                     pp->BackBufferHeight,
                     TRUE );
@@ -154,10 +158,12 @@ void CVideoModeManager::PreCreateDevice ( D3DPRESENT_PARAMETERS* pp )
     else
     if ( IsDisplayModeFullScreenWindow() )
     {
+        RECT rc;
+        GetCurrentAdapterRect( &rc );
         SetWindowLong ( m_hDeviceWindow, GWL_STYLE, WS_POPUP );
         MoveWindow ( m_hDeviceWindow, 
-                    0, 
-                    0, 
+                    rc.left, 
+                    rc.top, 
                     pp->BackBufferWidth,
                     pp->BackBufferHeight,
                     TRUE );
@@ -169,7 +175,7 @@ void CVideoModeManager::PreCreateDevice ( D3DPRESENT_PARAMETERS* pp )
     m_ulForceBackBufferHeight = pp->BackBufferHeight;
     m_ulForceBackBufferColorDepth = ( pp->BackBufferFormat == D3DFMT_R5G6B5 ) ? 16 : 32;
 
-    m_bOriginalDesktopResMatches = GameResMatchesPrimaryMonitor();
+    m_bOriginalDesktopResMatches = GameResMatchesCurrentAdapter();
 }
 
 
@@ -262,7 +268,7 @@ void CVideoModeManager::OnGainFocus ( void )
     if ( IsDisplayModeFullScreenWindow() )
     {
         // Change only if needed
-        if ( !GameResMatchesPrimaryMonitor() )
+        if ( !GameResMatchesCurrentAdapter() )
         {
             DEVMODE dmScreenSettings;
             memset( &dmScreenSettings, 0, sizeof( dmScreenSettings ) );
@@ -274,9 +280,18 @@ void CVideoModeManager::OnGainFocus ( void )
             dmScreenSettings.dmFields = DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT | DM_DISPLAYFREQUENCY;
             dmScreenSettings.dmDisplayFrequency = m_ulFullScreenRefreshRate;
 
-            if( ChangeDisplaySettings( &dmScreenSettings, CDS_FULLSCREEN ) != DISP_CHANGE_SUCCESSFUL )
+            if( ChangeDisplaySettingsEx( GetCurrentAdapterDeviceName(), &dmScreenSettings, NULL, CDS_FULLSCREEN, NULL ) != DISP_CHANGE_SUCCESSFUL )
                 return;
         }
+
+        RECT rc;
+        GetCurrentAdapterRect( &rc );
+        MoveWindow( m_hDeviceWindow, 
+                    rc.left, 
+                    rc.top, 
+                    m_ulForceBackBufferWidth,
+                    m_ulForceBackBufferHeight,
+                    TRUE );
     }
 }
 
@@ -310,10 +325,33 @@ void CVideoModeManager::OnLoseFocus ( void )
 
                 dmScreenSettings.dmFields = 0;
 
-                if( ChangeDisplaySettings( &dmScreenSettings, CDS_RESET ) != DISP_CHANGE_SUCCESSFUL )
+                if( ChangeDisplaySettingsEx( GetCurrentAdapterDeviceName(), &dmScreenSettings, NULL, CDS_RESET, NULL ) != DISP_CHANGE_SUCCESSFUL )
                     return;
             }
         }
+    }
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CVideoModeManager::OnPaint
+//
+// Ensure window is in the correct position for fullscreen windowed modes
+//
+///////////////////////////////////////////////////////////////
+void CVideoModeManager::OnPaint ( void )
+{
+    if ( IsDisplayModeFullScreenWindow() )
+    {
+        RECT rc;
+        GetCurrentAdapterRect( &rc );
+        MoveWindow( m_hDeviceWindow, 
+                    rc.left, 
+                    rc.top, 
+                    m_ulForceBackBufferWidth,
+                    m_ulForceBackBufferHeight,
+                    FALSE );
     }
 }
 
@@ -420,6 +458,7 @@ void CVideoModeManager::LoadCVars ( void )
         CVARS_SET ( "display_windowed", true );
     }
 
+    m_iCurrentAdapter = m_pGameSettings->GetCurrentAdapter ();
     m_iCurrentVideoMode = m_pGameSettings->GetCurrentVideoMode ();
     CVARS_GET ( "display_windowed",             m_bCurrentWindowed );
     CVARS_GET ( "display_fullscreen_style",     m_iCurrentFullscreenStyle );
@@ -431,6 +470,8 @@ void CVideoModeManager::LoadCVars ( void )
     {
         CVARS_SET ( "display_resolution", MakeResolutionString( info.width, info.height, info.depth, m_iCurrentAdapter ) );
     }
+
+    m_hCurrentMonitor = CProxyDirect3D9::StaticGetAdapterMonitor( m_iCurrentAdapter );
 }
 
 
@@ -561,20 +602,24 @@ bool CVideoModeManager::IsDisplayModeFullScreenWindow( void )
 
 ///////////////////////////////////////////////////////////////
 //
-// CVideoModeManager::GameResMatchesPrimaryMonitor
+// CVideoModeManager::GameResMatchesCurrentAdapter
 //
 // Returns true if desktop matches the game requirement
 //
 ///////////////////////////////////////////////////////////////
-bool CVideoModeManager::GameResMatchesPrimaryMonitor( void )
+bool CVideoModeManager::GameResMatchesCurrentAdapter( void )
 {
+    RECT rc;
+    GetCurrentAdapterRect( &rc );
+    int iAdapterResX = rc.right - rc.left;
+    int iAdapterResY = rc.bottom - rc.top;
+
+    // Here we hope that the color depth is the same across all monitors
     HDC hdcPrimaryMonitor = GetDC( NULL );
-    int iDesktopResX = GetDeviceCaps( hdcPrimaryMonitor, HORZRES );
-    int iDesktopResY = GetDeviceCaps( hdcPrimaryMonitor, VERTRES );
     int iDesktopColorDepth = GetDeviceCaps( hdcPrimaryMonitor, BITSPIXEL );
 
-    if ( iDesktopResX == m_ulForceBackBufferWidth
-        && iDesktopResY == m_ulForceBackBufferHeight
+    if ( iAdapterResX == m_ulForceBackBufferWidth
+        && iAdapterResY == m_ulForceBackBufferHeight
         && iDesktopColorDepth == m_ulForceBackBufferColorDepth )
     {
         return true;
@@ -637,4 +682,38 @@ bool CVideoModeManager::GetRequiredDisplayResolution( int& iOutWidth, int& iOutH
     return ( iOutWidth > 0 )
             && ( iOutHeight > 0 )
             && ( iOutColorBits == 16 || iOutColorBits == 32 );
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CVideoModeManager::GetCurrentAdapterRect
+//
+// Returns true on success
+//
+///////////////////////////////////////////////////////////////
+bool CVideoModeManager::GetCurrentAdapterRect( LPRECT pOutRect )
+{
+    MONITORINFOEX monitorInfo;
+    monitorInfo.cbSize = sizeof( MONITORINFOEX );
+    BOOL bResult = GetMonitorInfo( m_hCurrentMonitor, &monitorInfo );
+    *pOutRect = monitorInfo.rcMonitor;
+    return bResult != 0;
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CVideoModeManager::GetCurrentAdapterDeviceName
+//
+//
+//
+///////////////////////////////////////////////////////////////
+SString CVideoModeManager::GetCurrentAdapterDeviceName( void )
+{
+    MONITORINFOEX monitorInfo;
+    monitorInfo.cbSize = sizeof( MONITORINFOEX );
+    if ( GetMonitorInfo( m_hCurrentMonitor, &monitorInfo ) )
+        return monitorInfo.szDevice;
+    return "";
 }

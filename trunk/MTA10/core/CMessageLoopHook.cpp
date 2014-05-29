@@ -129,6 +129,10 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage ( HWND hwnd,
         {
             GetVideoModeManager()->OnLoseFocus();
         }
+        if ( uMsg == WM_PAINT )
+        {
+            GetVideoModeManager()->OnPaint();
+        }
     }
 
     // Log our state
