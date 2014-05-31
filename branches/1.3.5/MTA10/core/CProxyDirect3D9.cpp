@@ -687,6 +687,14 @@ void AddCapsReport( UINT Adapter, IDirect3D9* pDirect3D, IDirect3DDevice9* pD3DD
 bool CreateDeviceSecondCallCheck( HRESULT& hOutResult, IDirect3D9* pDirect3D, UINT Adapter, D3DDEVTYPE DeviceType, HWND hFocusWindow, DWORD BehaviorFlags, D3DPRESENT_PARAMETERS* pPresentationParameters, IDirect3DDevice9** ppReturnedDeviceInterface )
 {
     static uint uiCreateCount = 0;
+
+    // Also check for invalid size
+    if ( pPresentationParameters->BackBufferWidth == 0 )
+    {
+        WriteDebugEvent ( SString ( " Passing through call #%d to CreateDevice because size is invalid", uiCreateCount ) );
+        return true;
+    }
+
     if ( ++uiCreateCount == 1 )
         return false;
     WriteDebugEvent ( SString ( " Passing through call #%d to CreateDevice", uiCreateCount ) );
