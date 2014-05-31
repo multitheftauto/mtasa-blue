@@ -4343,7 +4343,7 @@ bool CStaticFunctionDefinitions::GetCameraInterior ( unsigned char & ucInterior 
 }
 
 
-bool CStaticFunctionDefinitions::SetCameraMatrix ( const CVector& vecPosition, const CVector& vecLookAt, float fRoll, float fFOV )
+bool CStaticFunctionDefinitions::SetCameraMatrix ( const CVector& vecPosition, CVector* pvecLookAt, float fRoll, float fFOV )
 {
     if ( !m_pCamera->IsInFixedMode () )        
     {
@@ -4352,7 +4352,14 @@ bool CStaticFunctionDefinitions::SetCameraMatrix ( const CVector& vecPosition, c
 
     // Put the camera there
     m_pCamera->SetPosition ( vecPosition );
-    m_pCamera->SetFixedTarget ( vecLookAt, fRoll );
+    if ( pvecLookAt )
+        m_pCamera->SetFixedTarget ( *pvecLookAt, fRoll );
+    else
+    {
+        CVector vecPrevLookAt;
+        m_pCamera->GetFixedTarget ( vecPrevLookAt );
+        m_pCamera->SetFixedTarget ( vecPrevLookAt, fRoll );
+    }
     m_pCamera->SetFOV ( fFOV );
     return true;
 }

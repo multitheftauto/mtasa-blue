@@ -120,6 +120,7 @@ int CLuaFunctionDefs::SetCameraMatrix ( lua_State* luaVM )
     float fFOV = 70.0f;
     CScriptArgReader argStream ( luaVM );
     argStream.ReadVector3D ( vecPosition );
+    bool bLookAtValid = argStream.NextCouldBeNumber();
     argStream.ReadVector3D ( vecLookAt, CVector() );
     argStream.ReadNumber ( fRoll, 0.0f );
     argStream.ReadNumber ( fFOV, 70.0f );
@@ -128,7 +129,7 @@ int CLuaFunctionDefs::SetCameraMatrix ( lua_State* luaVM )
 
     if ( !argStream.HasErrors ( ) )
     {
-        if ( CStaticFunctionDefinitions::SetCameraMatrix ( vecPosition, vecLookAt, fRoll, fFOV ) )
+        if ( CStaticFunctionDefinitions::SetCameraMatrix ( vecPosition, bLookAtValid ? &vecLookAt : NULL, fRoll, fFOV ) )
         {
             lua_pushboolean ( luaVM, true );
             return 1;
