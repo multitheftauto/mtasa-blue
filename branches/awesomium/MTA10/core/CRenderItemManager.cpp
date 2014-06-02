@@ -464,7 +464,7 @@ void CRenderItemManager::UpdateScreenSource ( CScreenSourceItem* pScreenSourceIt
 void CRenderItemManager::UpdateWebBrowser ( CWebBrowserItem* pWebBrowserItem )
 {
     // Don't copy texture data if buffer has not yet been updated
-    if ( pWebBrowserItem->m_pWebView->IsLoading () )
+    if ( !pWebBrowserItem->IsValid() || pWebBrowserItem->m_pWebView->IsLoading () )
         return;
 
     // Get BitmapSurface and check if it is available (it's not available if the website is blocked for example)
@@ -485,8 +485,17 @@ void CRenderItemManager::UpdateWebBrowser ( CWebBrowserItem* pWebBrowserItem )
     pDXSurface->GetDesc ( &SurfaceDesc );
     pDXSurface->LockRect ( &LockedRect, NULL, 0 );
 
-    // Copy Awesomium buffer to our DX surface (format: ARGB)
-    pAwSurface->CopyTo ( reinterpret_cast<unsigned char*>(LockedRect.pBits), SurfaceDesc.Width * 4, 4, false, false );
+    // Don't draw anything if we're going to take a screenshot (using takePlayerScreenShot)
+    if ( !g_pCore->GetGraphics()->GetScreenGrabber()->IsQueueEmpty() )
+    {
+        // m_pDevice->ColorFill doesn't work for D3DPOOL_MANAGED allocated surfaces --> lock the rect and set the color manually
+        memset ( LockedRect.pBits, 0xFF, SurfaceDesc.Width * SurfaceDesc.Height * 4 );
+    }
+    else
+    {
+        // Copy Awesomium buffer to our DX surface (format: ARGB)
+        pAwSurface->CopyTo ( reinterpret_cast<unsigned char*>(LockedRect.pBits), SurfaceDesc.Width * 4, 4, false, false );
+    }
 
     // Finally, unlock the surface
     pDXSurface->UnlockRect ();

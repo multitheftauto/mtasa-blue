@@ -40,6 +40,8 @@ public:
     bool                        IsLocal             ();
     void                        SetTempURL          ( const SString& strTempURL );
 
+    bool                        SetAudioVolume      ( float fVolume );
+
 private:
     CWebViewInterface* m_pWebView;
 };

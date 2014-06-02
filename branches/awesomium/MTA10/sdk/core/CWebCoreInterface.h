@@ -13,6 +13,7 @@
 
 class CWebBrowserItem;
 class CWebViewInterface;
+struct IAudioSessionManager2;
 
 enum eURLState
 {
@@ -46,6 +47,8 @@ public:
     virtual void                SetTestModeEnabled ( bool bEnabled ) = 0;
 
     virtual bool                CanLoadRemotePages () = 0;
+
+    virtual bool                SetGlobalAudioVolume( float fVolume ) = 0;
 };
 
 #endif

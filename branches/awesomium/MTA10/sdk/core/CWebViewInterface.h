@@ -31,6 +31,8 @@ public:
 
     virtual bool IsLocal            () = 0;
     virtual void SetTempURL         ( const SString& strTempURL ) = 0;
+
+    virtual bool SetAudioVolume     ( float fVolume ) = 0;
 };
 
 #endif

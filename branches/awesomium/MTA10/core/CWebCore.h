@@ -17,6 +17,7 @@
 class CWebBrowserItem;
 class CWebsiteRequests;
 class CWebView;
+struct IAudioSessionManager2;
 
 class CWebCore : public CWebCoreInterface, public Awesomium::ResourceInterceptor
 {
@@ -42,6 +43,10 @@ public:
 
     bool                CanLoadRemotePages  ();
 
+    bool                InitialiseCoreAudio ();
+    bool                SetGlobalAudioVolume( float fVolume );
+
+
 
     // Awesomium::ResourceInterceptor implementations
     virtual bool                          OnFilterNavigation ( int origin_process_id, int origin_routing_id, const Awesomium::WebString& method, const Awesomium::WebURL& url, bool is_main_frame );
@@ -59,6 +64,8 @@ private:
 
     CFastHashMap<SString, bool>             m_Whitelist;
     std::vector<SString>                    m_PendingRequests;
+
+    IAudioSessionManager2*                  m_pAudioSessionManager;
 };
 
 #endif

@@ -1188,6 +1188,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getBrowserURL", CLuaFunctionDefs::GetBrowserURL );
     CLuaCFunctions::AddFunction ( "setBrowserRenderingPaused", CLuaFunctionDefs::SetBrowserRenderingPaused );
     CLuaCFunctions::AddFunction ( "executeBrowserJavascript", CLuaFunctionDefs::ExecuteBrowserJavascript );
+    CLuaCFunctions::AddFunction ( "setBrowserVolume", CLuaFunctionDefs::SetBrowserVolume );
 
     // Luadef definitions
     CLuaFileDefs::LoadFunctions ();

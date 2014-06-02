@@ -18,9 +18,16 @@ CWebCore::CWebCore ()
     m_pWebCore = NULL;
     m_pRequestsGUI = NULL;
     m_bTestmodeEnabled = false;
+    m_pAudioSessionManager = NULL;
 
     Initialise ();
     InitialiseWhiteAndBlacklist ();
+
+    // Get AudioVolume COM interface if the Audio Core API is available
+    if ( GetApplicationSetting("os-version") >= "6.2" )
+    {
+        InitialiseCoreAudio ();
+    }
 }
 
 CWebCore::~CWebCore ()
@@ -30,6 +37,9 @@ CWebCore::~CWebCore ()
 
     if ( m_pRequestsGUI )
         delete m_pRequestsGUI;
+
+    if ( m_pAudioSessionManager )
+        m_pAudioSessionManager->Release ();
 }
 
 bool CWebCore::Initialise ()
@@ -51,6 +61,7 @@ CWebViewInterface* CWebCore::CreateWebView ( unsigned int uiWidth, unsigned int 
     // Create our webview implementation
     CWebView* pWebView = new CWebView ( uiWidth, uiHeight, pD3DSurface, bIsLocal );
     m_WebViewMap[pWebView->GetAwesomiumView ()->process_id ()] = pWebView;
+
     return pWebView;
 }
 
@@ -195,6 +206,74 @@ bool CWebCore::CanLoadRemotePages ()
     return bCanLoadRemotePages;
 }
 
+bool CWebCore::InitialiseCoreAudio()
+{
+    const CLSID CLSID_MMDeviceEnumerator = __uuidof(MMDeviceEnumerator);
+    const IID IID_IMMDeviceEnumerator = __uuidof(IMMDeviceEnumerator);
+    const IID IID_IAudioSessionManager2 = __uuidof(IAudioSessionManager2);
+
+    IMMDeviceEnumerator* pEnumerator;
+    CoCreateInstance ( CLSID_MMDeviceEnumerator, NULL, CLSCTX_ALL, IID_IMMDeviceEnumerator, (void**)&pEnumerator );
+    if ( !pEnumerator )
+        return false;
+
+    IMMDevice* pMMDevice;
+    pEnumerator->GetDefaultAudioEndpoint ( EDataFlow::eRender, ERole::eMultimedia, &pMMDevice );
+    pEnumerator->Release ();
+    if ( !pMMDevice )
+        return false;
+
+    IAudioSessionManager2* pAudioSessionManager;
+    pMMDevice->Activate ( IID_IAudioSessionManager2, 0, NULL, (void**)&pAudioSessionManager );
+    pMMDevice->Release ();
+    if ( !pAudioSessionManager )
+        return false;
+
+    m_pAudioSessionManager = pAudioSessionManager;
+    return true;
+}
+
+bool CWebCore::SetGlobalAudioVolume ( float fVolume )
+{
+    if ( fVolume < 0.0f || fVolume > 1.0f )
+        return false;
+
+    if ( GetApplicationSetting ( "os-version" ) < "6.2" || !m_pAudioSessionManager )
+    {
+        for ( std::map<int, CWebView*>::iterator iter = m_WebViewMap.begin (); iter != m_WebViewMap.end (); ++iter )
+        {
+            iter->second->SetAudioVolume ( fVolume );
+        }
+    }
+    else
+    {
+        IAudioSessionEnumerator* pSessionEnumerator;
+        m_pAudioSessionManager->GetSessionEnumerator ( &pSessionEnumerator );
+        if ( !pSessionEnumerator )
+            return false;
+
+        // Obtain the associated ISimpleAudioVolume interface
+        int sessionCount;
+        pSessionEnumerator->GetCount ( &sessionCount );
+        for ( int i = 0; i < sessionCount; ++i )
+        {
+            IAudioSessionControl2* pSessionControl;
+            pSessionEnumerator->GetSession ( i, (IAudioSessionControl**)&pSessionControl );
+            PWSTR szIdentifier;
+            pSessionControl->GetSessionIdentifier(&szIdentifier);
+
+            if ( std::wstring(szIdentifier).find(L"awesomium") != std::string::npos )
+            {
+                ISimpleAudioVolume* pSimpleAudioVolume;
+                pSessionControl->QueryInterface ( &pSimpleAudioVolume );
+                pSimpleAudioVolume->SetMasterVolume ( fVolume, NULL );
+            }
+            pSessionControl->Release ();
+        }
+        pSessionEnumerator->Release ();
+    }
+    return true;
+}
 
 ////////////////////////////////////////////////////////////////////
 //                                                                //

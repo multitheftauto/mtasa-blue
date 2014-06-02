@@ -66,7 +66,7 @@ bool CWebBrowserItem::IsValid ( void )
 ////////////////////////////////////////////////////////////////
 void CWebBrowserItem::OnLostDevice ( void )
 {
-    ReleaseUnderlyingData ();
+    
 }
 
 

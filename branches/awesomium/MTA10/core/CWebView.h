@@ -18,6 +18,8 @@
 #include <d3d9.h>
 #include <SString.h>
 #include "WebBrowserHelpers.h"
+#include <mmdeviceapi.h>
+#include <audiopolicy.h>
 
 class CWebView : public CWebViewInterface, public Awesomium::WebViewListener::Load
 {
@@ -45,6 +47,8 @@ public:
 
     bool IsLocal                ()                                                  { return m_bIsLocal; };
     void SetTempURL             ( const SString& strTempURL )                       { m_strTempURL = strTempURL; };
+
+    bool SetAudioVolume         ( float fVolume );
 
 
     // Implementation: Awesomium::WebViewListener::Load

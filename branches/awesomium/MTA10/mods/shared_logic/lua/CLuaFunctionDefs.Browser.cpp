@@ -397,3 +397,32 @@ int CLuaFunctionDefs::ExecuteBrowserJavascript ( lua_State* luaVM )
     lua_pushboolean ( luaVM, false );
     return 1;
 }
+
+int CLuaFunctionDefs::SetBrowserVolume ( lua_State* luaVM )
+{
+//  bool setBrowserVolume ( float volume )
+//  bool setBrowserVolume ( browser webBrowser, float volume )
+    CClientWebBrowser* pWebBrowser; float fVolume;
+
+    CScriptArgReader argStream ( luaVM );
+    if ( argStream.NextIsNumber () )
+    {
+        argStream.ReadNumber ( fVolume );
+        lua_pushboolean ( luaVM, g_pCore->GetWebCore ()->SetGlobalAudioVolume ( fVolume ) );
+        return 1;
+    }
+    
+    argStream.ReadUserData ( pWebBrowser );
+    argStream.ReadNumber ( fVolume );
+
+    if ( !argStream.HasErrors () )
+    {
+        lua_pushboolean ( luaVM, pWebBrowser->SetAudioVolume ( fVolume ) );
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}

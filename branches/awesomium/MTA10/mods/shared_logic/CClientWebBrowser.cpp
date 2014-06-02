@@ -94,3 +94,8 @@ void CClientWebBrowser::SetTempURL ( const SString& strTempURL )
 {
     m_pWebView->SetTempURL ( strTempURL );
 }
+
+bool CClientWebBrowser::SetAudioVolume ( float fVolume )
+{
+    return m_pWebView->SetAudioVolume ( fVolume );
+}

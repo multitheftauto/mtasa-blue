@@ -7,7 +7,6 @@
 *  PURPOSE:     Web view class
 *
 *****************************************************************************/
-
 #include "StdInc.h"
 #include "CWebView.h"
 
@@ -30,7 +29,6 @@ CWebView::CWebView ( unsigned int uiWidth, unsigned int uiHeight, IDirect3DSurfa
     // Set handlers
     m_pWebView->set_load_listener ( this );
     m_pWebView->set_js_method_handler ( &m_JSMethodHandler );
-
 }
 
 CWebView::~CWebView()
@@ -131,6 +129,20 @@ void CWebView::InjectKeyboardEvent ( const SString& strKey, bool bKeyDown, bool 
     }
     
     m_pWebView->InjectKeyboardEvent ( keyboardEvent );
+}
+
+bool CWebView::SetAudioVolume ( float fVolume )
+{
+    if ( fVolume < 0.0f || fVolume > 1.0f )
+        return false;
+
+    // Since the necessary interfaces of the core audio API were introduced in Win7, we've to fallback to HTML5 audio
+    SString strJSCode ( "var tags = document.getElementsByTagName('audio'); for (var i=0; i<tags.length; ++i) { tags[i].volume = %f;} " \
+        "tags = document.getElementsByTagName('video'); for (var i=0; i<tags.length; ++i) { tags[i].volume = %f;}",
+        fVolume, fVolume );
+
+    m_pWebView->ExecuteJavascript ( CWebCore::ToWebString ( strJSCode ), Awesomium::WSLit("") );
+    return m_pWebView->session ()->preferences ().enable_javascript;
 }
 
 
