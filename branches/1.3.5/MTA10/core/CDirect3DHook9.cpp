@@ -135,7 +135,7 @@ HWND CreateWindowForD3D( void )
 
 
 //
-// Get device using a different method.
+// Get device using a different method
 //
 IDirect3DDevice9* CreateDeviceForD3D( HWND hWnd, IDirect3D9* pInitialDirect3D9 )
 {
