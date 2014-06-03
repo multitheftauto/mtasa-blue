@@ -1172,7 +1172,7 @@ bool CStaticFunctionDefinitions::SetElementParent ( CClientEntity& Entity, CClie
             CClientEntity* pTemp = &Parent;
             CClientEntity* pRoot = m_pRootEntity;
             bool bValidParent = false;
-            while ( pTemp != pRoot )
+            while ( pTemp != pRoot && pTemp != NULL )
             {
                 const char * szTypeName = pTemp->GetTypeName();
                 if ( szTypeName && strcmp(szTypeName, "map") == 0 )
