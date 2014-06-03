@@ -432,7 +432,7 @@ void CLuaMain::InitClasses ( lua_State* luaVM )
     AddACLClass                 ( luaVM );
     AddACLGroupClass            ( luaVM );
     AddAccountClass             ( luaVM );
-    AddAdminClass               ( luaVM );
+    AddBanClass                 ( luaVM );
     AddBlipClass                ( luaVM );
     AddColShapeClass            ( luaVM );
     AddFileClass                ( luaVM );
