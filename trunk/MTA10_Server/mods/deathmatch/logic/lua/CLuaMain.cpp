@@ -339,6 +339,14 @@ void CLuaMain::AddPickupClass ( lua_State* luaVM )
 void CLuaMain::AddPlayerClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
+    
+    lua_classfunction ( luaVM, "create", "", "getPlayerFromName" )
+    
+    lua_classfunction ( luaVM, "setTeam", "", "setPlayerTeam" )
+    
+    lua_classfunction ( luaVM, "getTeam", "", "getPlayerTeam" )
+    
+    lua_classvariable ( luaVM, "team", "", "", "setPlayerTeam", "getPlayerTeam" )
 
     lua_registerclass ( luaVM, "Player", "Ped" );
 }
@@ -360,13 +368,22 @@ void CLuaMain::AddResourceClass ( lua_State* luaVM )
 void CLuaMain::AddConnectionClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
-
-    lua_registerclass ( luaVM, "Connection" );
+    
+    lua_classfunction ( luaVM, "create", "", "dbConnect" );
+    lua_classfunction ( luaVM, "exec", "", "dbExec" );
+    lua_classfunction ( luaVM, "query", "", "dbQuery" ); // TODO: Accommodate for callbacks and arguments
+    
+    
+    lua_registerclass ( luaVM, "Connection", "Element" );
 }
 
+// TODO: We need code to integrate this class into the handles returned by the db functions
 void CLuaMain::AddQueryHandleClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
+    
+    lua_classfunction ( luaVM, "poll", "", "dbPoll" );
+    lua_classfunction ( luaVM, "free", "", "dbFree" );
 
     lua_registerclass ( luaVM, "QueryHandle" );
 }
@@ -374,6 +391,25 @@ void CLuaMain::AddQueryHandleClass ( lua_State* luaVM )
 void CLuaMain::AddTeamClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
+    
+    lua_classfunction ( luaVM, "create", "", "createTeam" );
+    lua_classfunction ( luaVM, "getFromName", "", "getTeamFromName" );
+    lua_classfunction ( luaVM, "countPlayers", "", "countPlayersInTeam" );
+    lua_classfunction ( luaVM, "getPlayers", "", "getPlayersInTeam" );
+    
+    lua_classfunction ( luaVM, "getFriendlyFire", "", "getTeamFriendlyFire" );
+    lua_classfunction ( luaVM, "getName", "", "getTeamName" );
+    lua_classfunction ( luaVM, "getColor", "", "getTeamColor" ); // color
+    
+    lua_classfunction ( luaVM, "setName", "", "setTeamName" );
+    lua_classfunction ( luaVM, "setColor", "", "setTeamColor" ); // color
+    lua_classfunction ( luaVM, "setFriendlyFire", "", "setTeamFriendlyFire" );
+    
+    lua_classvariable ( luaVM, "playerCount", "", "", NULL, "countPlayersInTeam" );
+    lua_classvariable ( luaVM, "friendlyFire", "", "", "setTeamFriendlyFire", "getTeamFriendlyFire" );
+    lua_classvariable ( luaVM, "players", "", "", NULL, "getPlayersInTeam" ); // todo: perhaps table.insert/nilvaluing?
+    lua_classvariable ( luaVM, "name", "", "", "setTeamName", "getTeamName" );
+    //lua_classvariable ( luaVM, "color", "setTeamColor", "getTeamColor", , ); //color
 
     lua_registerclass ( luaVM, "Team", "Element" );
 }
