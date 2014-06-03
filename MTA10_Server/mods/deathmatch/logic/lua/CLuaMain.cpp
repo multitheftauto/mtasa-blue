@@ -269,13 +269,14 @@ void CLuaMain::AddAccountClass ( lua_State* luaVM )
     lua_newclass ( luaVM );
 
     lua_registerclass ( luaVM, "Account" );
+    
 }
 
-void CLuaMain::AddAdminClass ( lua_State* luaVM )
+void CLuaMain::AddBanClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
 
-    lua_registerclass ( luaVM, "Admin" );
+    lua_registerclass ( luaVM, "Ban" );
 }
 
 void CLuaMain::AddBlipClass ( lua_State* luaVM )

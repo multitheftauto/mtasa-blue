@@ -133,7 +133,7 @@ public:
     void                            AddACLClass             ( lua_State* luaVM );
     void                            AddACLGroupClass        ( lua_State* luaVM );
     void                            AddAccountClass         ( lua_State* luaVM );
-    void                            AddAdminClass           ( lua_State* luaVM );
+    void                            AddBanClass             ( lua_State* luaVM );
     void                            AddBlipClass            ( lua_State* luaVM );
     void                            AddColShapeClass        ( lua_State* luaVM );
     void                            AddElementClass         ( lua_State* luaVM );
