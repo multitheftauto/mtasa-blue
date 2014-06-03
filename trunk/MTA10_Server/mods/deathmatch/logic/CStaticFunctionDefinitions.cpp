@@ -1136,7 +1136,7 @@ bool CStaticFunctionDefinitions::SetElementParent ( CElement* pElement, CElement
     CElement * pTemp = pParent;
     CElement * pRoot = m_pMapManager->GetRootElement();
     bool bValidParent = false;
-    while ( pTemp != pRoot )
+    while ( pTemp != pRoot && pTemp != NULL)
     {
         const char * szTypeName = pTemp->GetTypeName ().c_str ();
         if ( szTypeName && strcmp(szTypeName, "map") == 0 )
