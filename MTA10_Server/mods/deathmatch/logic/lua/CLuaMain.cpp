@@ -250,6 +250,13 @@ void CLuaMain::AddMatrixClass ( lua_State* luaVM )
     lua_registerclass ( luaVM, "Matrix" );
 }
 
+void CLuaMain::AddElementClass ( lua_State* luaVM )
+{
+    lua_newclass ( luaVM );
+    
+    lua_registerclass ( luaVM, "Element" );
+}
+
 void CLuaMain::AddACLClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
@@ -283,21 +290,15 @@ void CLuaMain::AddBlipClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
 
-    lua_registerclass ( luaVM, "Blip" );
+    lua_registerclass ( luaVM, "Blip", "Element" );
+    
 }
 
 void CLuaMain::AddColShapeClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
 
-    lua_registerclass ( luaVM, "ColShape" );
-}
-
-void CLuaMain::AddElementClass ( lua_State* luaVM )
-{
-    lua_newclass ( luaVM );
-
-    lua_registerclass ( luaVM, "Element" );
+    lua_registerclass ( luaVM, "ColShape", "Element" );
 }
 
 void CLuaMain::AddFileClass ( lua_State* luaVM )
@@ -311,42 +312,42 @@ void CLuaMain::AddMarkerClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
 
-    lua_registerclass ( luaVM, "Marker" );
+    lua_registerclass ( luaVM, "Marker", "Element" );
 }
 
 void CLuaMain::AddObjectClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
 
-    lua_registerclass ( luaVM, "Object" );
+    lua_registerclass ( luaVM, "Object", "Element" );
 }
 
 void CLuaMain::AddPedClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
 
-    lua_registerclass ( luaVM, "Ped" );
+    lua_registerclass ( luaVM, "Ped", "Element" );
 }
 
 void CLuaMain::AddPickupClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
 
-    lua_registerclass ( luaVM, "Pickup" );
+    lua_registerclass ( luaVM, "Pickup", "Element" );
 }
 
 void CLuaMain::AddPlayerClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
 
-    lua_registerclass ( luaVM, "Player" );
+    lua_registerclass ( luaVM, "Player", "Ped" );
 }
 
 void CLuaMain::AddRadarAreaClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
 
-    lua_registerclass ( luaVM, "RadarArea" );
+    lua_registerclass ( luaVM, "RadarArea", "Element" );
 }
 
 void CLuaMain::AddResourceClass ( lua_State* luaVM )
@@ -374,7 +375,7 @@ void CLuaMain::AddTeamClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
 
-    lua_registerclass ( luaVM, "Team" );
+    lua_registerclass ( luaVM, "Team", "Element" );
 }
 
 void CLuaMain::AddTextDisplayClass ( lua_State* luaVM )
@@ -395,21 +396,21 @@ void CLuaMain::AddVehicleClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
 
-    lua_registerclass ( luaVM, "Vehicle" );
+    lua_registerclass ( luaVM, "Vehicle", "Element" );
 }
 
 void CLuaMain::AddWaterClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
 
-    lua_registerclass ( luaVM, "Water" );
+    lua_registerclass ( luaVM, "Water", "Element" );
 }
 
-void CLuaMain::AddXMLClass ( lua_State* luaVM )
+void CLuaMain::AddXMLNodeClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
 
-    lua_registerclass ( luaVM, "XML" );
+    lua_registerclass ( luaVM, "XMLNode" );
 }
 
 void CLuaMain::InitClasses ( lua_State* luaVM )
@@ -427,14 +428,13 @@ void CLuaMain::InitClasses ( lua_State* luaVM )
     if ( !m_bEnableOOP )
         return;
 
-
+    AddElementClass             ( luaVM );
     AddACLClass                 ( luaVM );
     AddACLGroupClass            ( luaVM );
     AddAccountClass             ( luaVM );
     AddAdminClass               ( luaVM );
     AddBlipClass                ( luaVM );
     AddColShapeClass            ( luaVM );
-    AddElementClass             ( luaVM );
     AddFileClass                ( luaVM );
     AddMarkerClass              ( luaVM );
     AddObjectClass              ( luaVM );
@@ -450,7 +450,7 @@ void CLuaMain::InitClasses ( lua_State* luaVM )
     AddTextItemClass            ( luaVM );
     AddVehicleClass             ( luaVM );
     AddWaterClass               ( luaVM );
-    AddXMLClass                 ( luaVM );
+    AddXMLNodeClass             ( luaVM );
 }
 
 void CLuaMain::InitVM ( void )
