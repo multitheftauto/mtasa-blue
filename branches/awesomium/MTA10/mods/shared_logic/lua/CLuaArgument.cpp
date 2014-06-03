@@ -364,6 +364,16 @@ void CLuaArgument::ReadElementID ( ElementID ID )
 }
 
 
+void CLuaArgument::ReadTable ( CLuaArguments * table )
+{
+    m_strString = "";
+    DeleteTableData ();
+    m_pTableData = new CLuaArguments ( *table );
+    m_bWeakTableRef = false;
+    m_iType = LUA_TTABLE;
+}
+
+
 CClientEntity* CLuaArgument::GetElement ( void ) const
 {
     ElementID ID = TO_ELEMENTID ( m_pUserData );

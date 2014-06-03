@@ -1014,6 +1014,7 @@ public:
     LUA_DECLARE ( SetBrowserRenderingPaused );
     LUA_DECLARE ( ExecuteBrowserJavascript );
     LUA_DECLARE ( SetBrowserVolume );
+    LUA_DECLARE ( IsBrowserURLBlocked );
 
 private:
     // Static references to objects

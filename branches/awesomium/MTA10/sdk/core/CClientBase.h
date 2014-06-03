@@ -26,7 +26,7 @@ public:
     virtual void    PostFrameExecutionHandler   ( void ) = 0;
     virtual void    IdleHandler                 ( void ) = 0;
 
-    virtual bool    WebsiteRequestResultHandler ( bool bWasSuccessful ) = 0;
+    virtual bool    WebsiteRequestResultHandler ( const std::vector<SString>& newPages ) = 0;
     virtual void    WebsiteTriggerEventHandler  ( const SString& strEventName, const std::vector<SString>& args ) = 0;
 
     virtual bool    ProcessCommand              ( const char* szCommandLine ) = 0;

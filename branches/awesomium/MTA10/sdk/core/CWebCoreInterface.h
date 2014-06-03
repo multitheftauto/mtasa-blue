@@ -13,7 +13,6 @@
 
 class CWebBrowserItem;
 class CWebViewInterface;
-struct IAudioSessionManager2;
 
 enum eURLState
 {

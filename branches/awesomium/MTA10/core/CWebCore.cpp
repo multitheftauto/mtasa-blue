@@ -84,7 +84,7 @@ void CWebCore::Update ()
 eURLState CWebCore::GetURLState ( const SString& strURL )
 {
     // Initialize wildcard whitelist (be careful with modifying) | Todo: Think about the following
-    static SString wildcardWhitelist[] = { "*.googlevideo.com", "*.vimeocdn.com" };
+    static SString wildcardWhitelist[] = { "*.googlevideo.com", "*.google.com", "*.youtube.com", "*.vimeocdn.com" };
 
     for (int i = 0; i < sizeof(wildcardWhitelist) / sizeof(SString); ++i)
     {
@@ -122,8 +122,8 @@ void CWebCore::InitialiseWhiteAndBlacklist ()
 {
     // Hardcoded whitelist
     static SString whitelist[] = { 
-        "google.com", "www.youtube.com", "youtube.com", "s.youtube.com", "s.ytimg.com", "vimeo.com", "player.vimeo.com",
-        "myvideo.com", "reddit.com", "mtasa.com", "multitheftauto.com", "mtavc.com"
+        "google.com", "youtube.com", "www.youtube-nocookie.com", "s.ytimg.com", "vimeo.com", "player.vimeo.com",
+        "myvideo.com", "reddit.com", "mtasa.com", "multitheftauto.com", "mtavc.com", "www.googleapis.com"
     };
 
     // Hardcoded blacklist
@@ -172,11 +172,6 @@ void CWebCore::RequestPages ( const std::vector<SString>& pages )
         m_pRequestsGUI->SetPendingRequests ( m_PendingRequests );
         m_pRequestsGUI->Show ();
     }
-    else
-    {
-        // Tell the client that the requested pages are already allowed
-        CModManager::GetSingleton().GetCurrentMod()->WebsiteRequestResultHandler ( true );
-    }
 }
 
 void CWebCore::AllowPendingPages ()
@@ -185,18 +180,15 @@ void CWebCore::AllowPendingPages ()
     {
         m_Whitelist[*iter] = true;
     }
-    m_PendingRequests.clear ();
 
     // Trigger an event now
-    CModManager::GetSingleton().GetCurrentMod()->WebsiteRequestResultHandler ( true );
+    CModManager::GetSingleton().GetCurrentMod()->WebsiteRequestResultHandler ( m_PendingRequests );
+    m_PendingRequests.clear ();
 }
 
 void CWebCore::DenyPendingPages ()
 {
     m_PendingRequests.clear ();
-    
-    // Trigger an event now
-    CModManager::GetSingleton().GetCurrentMod()->WebsiteRequestResultHandler ( false );
 }
 
 bool CWebCore::CanLoadRemotePages ()

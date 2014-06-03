@@ -2883,7 +2883,7 @@ void CClientGame::AddBuiltInEvents ( void )
     m_Events.AddEvent ( "onClientObjectBreak", "attacker", NULL, false );
 
     // Web events
-    m_Events.AddEvent ( "onClientBrowserRequestResult", "wasSuccessful", NULL, false );
+    m_Events.AddEvent ( "onClientBrowserRequestsChange", "newPages", NULL, false );
 
     // Misc events
     m_Events.AddEvent ( "onClientFileDownloadComplete", "fileName, success", NULL, false );
@@ -6536,10 +6536,18 @@ AnimationId CClientGame::DrivebyAnimationHandler(AnimationId animId, AssocGroupI
     return animId;
 }
 
-bool CClientGame::TriggerBrowserRequestResultEvent ( bool bAllowed )
+bool CClientGame::TriggerBrowserRequestResultEvent ( const std::vector<SString>& newPages )
 {
     CLuaArguments Arguments;
-    Arguments.PushBoolean ( bAllowed );
+    CLuaArguments LuaTable;
+    int i = 0;
 
-    return GetRootEntity ()->CallEvent ( "onClientBrowserRequestResult", Arguments, false );
+    for ( std::vector<SString>::const_iterator iter = newPages.begin (); iter != newPages.end (); ++iter )
+    {
+        LuaTable.PushNumber ( ++i );
+        LuaTable.PushString ( *iter );
+    }
+    Arguments.PushTable ( &LuaTable );
+
+    return GetRootEntity ()->CallEvent ( "onClientBrowserRequestsChange", Arguments, false );
 }

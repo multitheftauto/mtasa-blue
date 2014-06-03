@@ -426,3 +426,23 @@ int CLuaFunctionDefs::SetBrowserVolume ( lua_State* luaVM )
     lua_pushboolean ( luaVM, false );
     return 1;
 }
+
+int CLuaFunctionDefs::IsBrowserURLBlocked ( lua_State* luaVM )
+{
+//  bool isBrowserURLBlocked ( string url )
+    SString strURL;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadString ( strURL );
+
+    if ( !argStream.HasErrors () )
+    {
+        lua_pushboolean ( luaVM, g_pCore->GetWebCore ()->GetURLState ( strURL ) != eURLState::WEBPAGE_ALLOWED );
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}

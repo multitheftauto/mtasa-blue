@@ -262,10 +262,10 @@ void CClient::IdleHandler ( void )
 }
 
 
-bool CClient::WebsiteRequestResultHandler ( bool bWasSuccessful )
+bool CClient::WebsiteRequestResultHandler ( const std::vector<SString>& newPages )
 {
     if ( g_pClientGame )
-        return g_pClientGame->TriggerBrowserRequestResultEvent ( bWasSuccessful );
+        return g_pClientGame->TriggerBrowserRequestResultEvent ( newPages );
 
     return false;
 }
