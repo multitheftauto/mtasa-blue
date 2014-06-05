@@ -169,10 +169,10 @@ void CLuaMain::InitSecurity ( void )
 void CLuaMain::AddVector3DClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
-
+    
     lua_classmetamethod ( luaVM, "__tostring", CLuaVectorDefs::ToString );
     lua_classmetamethod ( luaVM, "__gc", CLuaVectorDefs::Destroy );
-
+    
     lua_classmetamethod ( luaVM, "__add", CLuaVectorDefs::Add );
     lua_classmetamethod ( luaVM, "__sub", CLuaVectorDefs::Sub );
     lua_classmetamethod ( luaVM, "__mul", CLuaVectorDefs::Mul );
@@ -180,30 +180,30 @@ void CLuaMain::AddVector3DClass ( lua_State* luaVM )
     lua_classmetamethod ( luaVM, "__pow", CLuaVectorDefs::Pow );
     lua_classmetamethod ( luaVM, "__unm", CLuaVectorDefs::Unm );
     lua_classmetamethod ( luaVM, "__eq", CLuaVectorDefs::Eq );
-
+    
     lua_classfunction ( luaVM, "create", "", CLuaVectorDefs::Create );
     lua_classfunction ( luaVM, "normalize", "", CLuaVectorDefs::Normalize );
     lua_classfunction ( luaVM, "cross", "", CLuaVectorDefs::Cross );
     lua_classfunction ( luaVM, "dot", "", CLuaVectorDefs::Dot );
-
+    
     lua_classfunction ( luaVM, "getLength", "", CLuaVectorDefs::GetLength );
     lua_classfunction ( luaVM, "getSquaredLength", "", CLuaVectorDefs::GetLengthSquared );
     lua_classfunction ( luaVM, "getNormalized", "", CLuaVectorDefs::GetNormalized );
     lua_classfunction ( luaVM, "getX", "", CLuaVectorDefs::GetX );
     lua_classfunction ( luaVM, "getY", "", CLuaVectorDefs::GetY );
     lua_classfunction ( luaVM, "getZ", "", CLuaVectorDefs::GetZ );
-
+    
     lua_classfunction ( luaVM, "setX", "", CLuaVectorDefs::SetX );
     lua_classfunction ( luaVM, "setY", "", CLuaVectorDefs::SetY );
     lua_classfunction ( luaVM, "setZ", "", CLuaVectorDefs::SetZ );
-
+    
     lua_classvariable ( luaVM, "x", "", "", CLuaVectorDefs::SetX, CLuaVectorDefs::GetX );
     lua_classvariable ( luaVM, "y", "", "", CLuaVectorDefs::SetY, CLuaVectorDefs::GetY );
     lua_classvariable ( luaVM, "z", "", "", CLuaVectorDefs::SetZ, CLuaVectorDefs::GetZ );
     lua_classvariable ( luaVM, "length", "", "", NULL, CLuaVectorDefs::GetLength );
     lua_classvariable ( luaVM, "squaredLength", "", "", NULL, CLuaVectorDefs::GetLengthSquared );
     lua_classvariable ( luaVM, "normalized", "", "", NULL, CLuaVectorDefs::GetNormalized );
-
+    
     lua_registerclass ( luaVM, "Vector3" );
 }
 
@@ -211,7 +211,7 @@ void CLuaMain::AddVector3DClass ( lua_State* luaVM )
 void CLuaMain::AddVector2DClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
-
+    
     lua_registerclass ( luaVM, "Vector2" );
 }
 
@@ -219,34 +219,34 @@ void CLuaMain::AddVector2DClass ( lua_State* luaVM )
 void CLuaMain::AddMatrixClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
-
+    
     lua_classmetamethod ( luaVM, "__tostring", CLuaMatrixDefs::ToString );
     lua_classmetamethod ( luaVM, "__gc", CLuaMatrixDefs::Destroy );
-
+    
     lua_classmetamethod ( luaVM, "__add", CLuaMatrixDefs::Add );
     lua_classmetamethod ( luaVM, "__sub", CLuaMatrixDefs::Sub );
     lua_classmetamethod ( luaVM, "__mul", CLuaMatrixDefs::Mul );
     lua_classmetamethod ( luaVM, "__div", CLuaMatrixDefs::Div );
-
+    
     lua_classfunction ( luaVM, "create", "", CLuaMatrixDefs::Create );
-
+    
     lua_classfunction ( luaVM, "getPosition", "", CLuaMatrixDefs::GetPosition );
     lua_classfunction ( luaVM, "getRotation", "", CLuaMatrixDefs::GetRotation );
     lua_classfunction ( luaVM, "getFront", "", CLuaMatrixDefs::GetFront );
     lua_classfunction ( luaVM, "getRight", "", CLuaMatrixDefs::GetRight );
     lua_classfunction ( luaVM, "getUp", "", CLuaMatrixDefs::GetUp );
-
+    
     lua_classfunction ( luaVM, "setPosition", "", CLuaMatrixDefs::SetPosition );
     lua_classfunction ( luaVM, "setFront", "", CLuaMatrixDefs::SetFront );
     lua_classfunction ( luaVM, "setRight", "", CLuaMatrixDefs::SetRight );
     lua_classfunction ( luaVM, "setUp", "", CLuaMatrixDefs::SetUp );
-
+    
     lua_classvariable ( luaVM, "position", "", "", CLuaMatrixDefs::SetPosition, CLuaMatrixDefs::GetPosition );
     lua_classvariable ( luaVM, "rotation", "", "", NULL, CLuaMatrixDefs::GetRotation );
     lua_classvariable ( luaVM, "front", "", "", CLuaMatrixDefs::SetFront, CLuaMatrixDefs::GetFront );
     lua_classvariable ( luaVM, "right", "", "", CLuaMatrixDefs::SetRight, CLuaMatrixDefs::GetRight );
     lua_classvariable ( luaVM, "up", "", "", CLuaMatrixDefs::SetUp, CLuaMatrixDefs::GetUp );
-
+    
     lua_registerclass ( luaVM, "Matrix" );
 }
 
@@ -256,94 +256,94 @@ void CLuaMain::AddElementClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
     
-    lua_classfunction ( luaVM, "getByID", "", "getElementByID" );
-    lua_classfunction ( luaVM, "getAllByType", "", "getElementsByType" );
-    lua_classfunction ( luaVM, "getByIndex", "", "getElementByIndex" );
+    lua_classfunction ( luaVM, "getByID", "getElementByID" );
+    lua_classfunction ( luaVM, "getAllByType", "getElementsByType" );
+    lua_classfunction ( luaVM, "getByIndex", "getElementByIndex" );
     
-    lua_classfunction ( luaVM, "create", "", "createElement" );
-    lua_classfunction ( luaVM, "clone", "", "cloneElement" );
-    lua_classfunction ( luaVM, "destroy", "", "destroyElement" );
-    lua_classfunction ( luaVM, "clearVisibility", "", "clearElementVisibleTo" );
-    lua_classfunction ( luaVM, "attach", "", "attachElements" );
-    lua_classfunction ( luaVM, "detach", "", "detachElements" );
-    lua_classfunction ( luaVM, "removeData", "", "removeElementData" );
+    lua_classfunction ( luaVM, "create", "createElement" );
+    lua_classfunction ( luaVM, "clone", "cloneElement" );
+    lua_classfunction ( luaVM, "destroy", "destroyElement" );
+    lua_classfunction ( luaVM, "clearVisibility", "clearElementVisibleTo" );
+    lua_classfunction ( luaVM, "attach", "attachElements" );
+    lua_classfunction ( luaVM, "detach", "detachElements" );
+    lua_classfunction ( luaVM, "removeData", "removeElementData" );
     
-    lua_classfunction ( luaVM, "setParent", "", "setElementParent" );
-    lua_classfunction ( luaVM, "setVelocity", "", "setElementVelocity" );
-    lua_classfunction ( luaVM, "setFrozen", "", "setElementFrozen" );
-    lua_classfunction ( luaVM, "setHealth", "", "setElementHealth" );
-    lua_classfunction ( luaVM, "setModel", "", "setElementModel" );
-    lua_classfunction ( luaVM, "setSyncer", "", "setElementSyncer" );
-    lua_classfunction ( luaVM, "setAlpha", "", "setElementAlpha" );
-    lua_classfunction ( luaVM, "setDoubleSided", "", "setElementDoubleSided" );
-    lua_classfunction ( luaVM, "setCollisionsEnabled", "", "setElementCollisionsEnabled" );
-    lua_classfunction ( luaVM, "setData", "", "", "setElementData" );
-    lua_classfunction ( luaVM, "setPosition", "", "setElementPosition" );
-    lua_classfunction ( luaVM, "setRotation", "", "setElementRotation" );
-    lua_classfunction ( luaVM, "setVelocity", "", "setElementVelocity" );
-    lua_classfunction ( luaVM, "setID", "", "setElementID" );
-    lua_classfunction ( luaVM, "setInterior", "", "setElementInterior" );
-    lua_classfunction ( luaVM, "setDimension", "", "setElementDimension" );
-    lua_classfunction ( luaVM, "setAttachedOffsets", "", "setElementAttachedOffsets" );
+    lua_classfunction ( luaVM, "setParent", "setElementParent" );
+    lua_classfunction ( luaVM, "setVelocity", "setElementVelocity" );
+    lua_classfunction ( luaVM, "setFrozen", "setElementFrozen" );
+    lua_classfunction ( luaVM, "setHealth", "setElementHealth" );
+    lua_classfunction ( luaVM, "setModel", "setElementModel" );
+    lua_classfunction ( luaVM, "setSyncer", "setElementSyncer" );
+    lua_classfunction ( luaVM, "setAlpha", "setElementAlpha" );
+    lua_classfunction ( luaVM, "setDoubleSided", "setElementDoubleSided" );
+    lua_classfunction ( luaVM, "setCollisionsEnabled", "setElementCollisionsEnabled" );
+    lua_classfunction ( luaVM, "setData", "setElementData" );
+    lua_classfunction ( luaVM, "setPosition", "setElementPosition" );
+    lua_classfunction ( luaVM, "setRotation", "setElementRotation" );
+    lua_classfunction ( luaVM, "setVelocity", "setElementVelocity" );
+    lua_classfunction ( luaVM, "setID", "setElementID" );
+    lua_classfunction ( luaVM, "setInterior", "setElementInterior" );
+    lua_classfunction ( luaVM, "setDimension", "setElementDimension" );
+    lua_classfunction ( luaVM, "setAttachedOffsets", "setElementAttachedOffsets" );
     
-    lua_classfunction ( luaVM, "getAttachedOffsets", "", "getElementAttachedOffsets" );
-    lua_classfunction ( luaVM, "getChild", "", "getElementChild" );
-    lua_classfunction ( luaVM, "getChildren", "", "getElementChildren" );
-    lua_classfunction ( luaVM, "getParent", "", "getElementParent" );
-    lua_classfunction ( luaVM, "getAttachedElements", "", "getAttachedElements" );
-    lua_classfunction ( luaVM, "getAttachedTo", "", "getAttachedTo" );
-    lua_classfunction ( luaVM, "getVelocity", "", "getElementVelocity" );
-    lua_classfunction ( luaVM, "getID", "", "getElementID" );
-    lua_classfunction ( luaVM, "getZoneName", "", "getElementZoneName" );
-    lua_classfunction ( luaVM, "getAlpha", "", "getElementAlpha" );
-    lua_classfunction ( luaVM, "getHealth", "", "getElementHealth" );
-    lua_classfunction ( luaVM, "getModel", "", "getElementModel" );
-    lua_classfunction ( luaVM, "getChildrenCount", "", "getElementChildrenCount" );
-    lua_classfunction ( luaVM, "getSyncer", "", "getElementSyncer" );
-    lua_classfunction ( luaVM, "getAllData", "", "getAllElementData" );
-    lua_classfunction ( luaVM, "getColShape", "", "getElementColShape" );
-    lua_classfunction ( luaVM, "getData", "", "getElementData" );
+    lua_classfunction ( luaVM, "getAttachedOffsets", "getElementAttachedOffsets" );
+    lua_classfunction ( luaVM, "getChild", "getElementChild" );
+    lua_classfunction ( luaVM, "getChildren", "getElementChildren" );
+    lua_classfunction ( luaVM, "getParent", "getElementParent" );
+    lua_classfunction ( luaVM, "getAttachedElements", "getAttachedElements" );
+    lua_classfunction ( luaVM, "getAttachedTo", "getAttachedTo" );
+    lua_classfunction ( luaVM, "getVelocity", "getElementVelocity" );
+    lua_classfunction ( luaVM, "getID", "getElementID" );
+    lua_classfunction ( luaVM, "getZoneName", "getElementZoneName" );
+    lua_classfunction ( luaVM, "getAlpha", "getElementAlpha" );
+    lua_classfunction ( luaVM, "getHealth", "getElementHealth" );
+    lua_classfunction ( luaVM, "getModel", "getElementModel" );
+    lua_classfunction ( luaVM, "getChildrenCount", "getElementChildrenCount" );
+    lua_classfunction ( luaVM, "getSyncer", "getElementSyncer" );
+    lua_classfunction ( luaVM, "getAllData", "getAllElementData" );
+    lua_classfunction ( luaVM, "getColShape", "getElementColShape" );
+    lua_classfunction ( luaVM, "getData", "getElementData" );
     //lua_classfunction ( luaVM, "getPosition", "getElementPosition", CLuaOOPDefs::GetElementPosition );
     //lua_classfunction ( luaVM, "getRotation", "getElementRotation", CLuaOOPDefs::GetElementRotation );
-    lua_classfunction ( luaVM, "getPosition", "", "getElementPosition" );
-    lua_classfunction ( luaVM, "getRotation", "", "getElementRotation" );
-    lua_classfunction ( luaVM, "getType", "", "getElementType" );
-    lua_classfunction ( luaVM, "getInterior", "", "getElementInterior" );
-    lua_classfunction ( luaVM, "getDimension", "", "getElementDimension" );
-    lua_classfunction ( luaVM, "getLowLOD", "", "getLowLODElement" );
+    lua_classfunction ( luaVM, "getPosition", "getElementPosition" );
+    lua_classfunction ( luaVM, "getRotation", "getElementRotation" );
+    lua_classfunction ( luaVM, "getType", "getElementType" );
+    lua_classfunction ( luaVM, "getInterior", "getElementInterior" );
+    lua_classfunction ( luaVM, "getDimension", "getElementDimension" );
+    lua_classfunction ( luaVM, "getLowLOD", "getLowLODElement" );
     
-    lua_classfunction ( luaVM, "areCollisionsEnabled", "", "areElementCollisionsEnabled" );
-    lua_classfunction ( luaVM, "isWithinMarker", "", "isElementWithinMarker" );
-    lua_classfunction ( luaVM, "isWithinColShape", "", "isElementWithinColShape" );
-    lua_classfunction ( luaVM, "isFrozen", "", "isElementFrozen" );
-    lua_classfunction ( luaVM, "isInWater", "", "isElementInWater" );
-    lua_classfunction ( luaVM, "isDoubleSided", "", "isElementDoubleSided" );
-    lua_classfunction ( luaVM, "isVisibleTo", "", "isElementVisibleTo" );
-    lua_classfunction ( luaVM, "isLowLOD", "", "isElementLowLOD" );
-    lua_classfunction ( luaVM, "isAttached", "", "isElementAttached" );
+    lua_classfunction ( luaVM, "areCollisionsEnabled", "areElementCollisionsEnabled" );
+    lua_classfunction ( luaVM, "isWithinMarker", "isElementWithinMarker" );
+    lua_classfunction ( luaVM, "isWithinColShape", "isElementWithinColShape" );
+    lua_classfunction ( luaVM, "isFrozen", "isElementFrozen" );
+    lua_classfunction ( luaVM, "isInWater", "isElementInWater" );
+    lua_classfunction ( luaVM, "isDoubleSided", "isElementDoubleSided" );
+    lua_classfunction ( luaVM, "isVisibleTo", "isElementVisibleTo" );
+    lua_classfunction ( luaVM, "isLowLOD", "isElementLowLOD" );
+    lua_classfunction ( luaVM, "isAttached", "isElementAttached" );
 
-    lua_classvariable ( luaVM, "id", "", "", "setElementID", "getElementID" );
-    lua_classvariable ( luaVM, "parent", "", "", "setElementParent", "getElementParent" );
-    lua_classvariable ( luaVM, "zoneName", "", "", NULL, "getElementZoneName" );
-    lua_classvariable ( luaVM, "attachedTo", "", "", "attachElements", "getElementAttachedTo" );
-    lua_classvariable ( luaVM, "children", "", "", NULL, "getElementChildren" ); // should this be a special table using getElementChild instead?
-    lua_classvariable ( luaVM, "frozen", "", "", "setElementFrozen", "isElementFrozen" );
-    lua_classvariable ( luaVM, "attachedElements", "", "", NULL, "getAttachedElements" );
-    lua_classvariable ( luaVM, "inWater", "", "", NULL, "isElementInWater" );
-    lua_classvariable ( luaVM, "health", "", "", "setElementHealth", "getElementHealth" );
-    lua_classvariable ( luaVM, "alpha", "", "", "setElementAlpha", "getElementAlpha" );
-    lua_classvariable ( luaVM, "type", "", "", NULL, "getElementType" );
-    lua_classvariable ( luaVM, "dimension", "", "", "setElementDimension", "getElementDimension" );
-    lua_classvariable ( luaVM, "doubleSided", "", "", "setElementDoubleSided", "isElementDoubleSided" );
-    lua_classvariable ( luaVM, "model", "", "", "setElementModel", "getElementModel" );
-    lua_classvariable ( luaVM, "lowLOD", "", "", "setLowLODElement", "getLowLODElement" );
-    lua_classvariable ( luaVM, "syncer", "", "", NULL, "isElementSyncer" );
-    lua_classvariable ( luaVM, "childrenCount", "", "", NULL, "getElementChildrenCount" );
-    lua_classvariable ( luaVM, "interior", "", "", "setElementInterior", "getElementInterior" );
-    lua_classvariable ( luaVM, "colShape", "", "", NULL, "getElementColShape" );
-    lua_classvariable ( luaVM, "collisions", "", "", "setElementCollisionsEnabled", "getElementCollisionsEnabled" );
-    //lua_classvariable ( luaVM, "position", "", "", CLuaFunctionDefs::SetElementPosition, CLuaOOPDefs::GetElementPosition );
-    //lua_classvariable ( luaVM, "rotation", "", "", CLuaFunctionDefs::SetElementRotation, CLuaOOPDefs::GetElementRotation );
+    lua_classvariable ( luaVM, "id", "setElementID", "getElementID" );
+    lua_classvariable ( luaVM, "parent", "setElementParent", "getElementParent" );
+    lua_classvariable ( luaVM, "zoneName", NULL, "getElementZoneName" );
+    lua_classvariable ( luaVM, "attachedTo", "attachElements", "getElementAttachedTo" );
+    lua_classvariable ( luaVM, "children", NULL, "getElementChildren" ); // should this be a special table using getElementChild instead?
+    lua_classvariable ( luaVM, "frozen", "setElementFrozen", "isElementFrozen" );
+    lua_classvariable ( luaVM, "attachedElements", NULL, "getAttachedElements" );
+    lua_classvariable ( luaVM, "inWater", NULL, "isElementInWater" );
+    lua_classvariable ( luaVM, "health", "setElementHealth", "getElementHealth" );
+    lua_classvariable ( luaVM, "alpha", "setElementAlpha", "getElementAlpha" );
+    lua_classvariable ( luaVM, "type", NULL, "getElementType" );
+    lua_classvariable ( luaVM, "dimension", "setElementDimension", "getElementDimension" );
+    lua_classvariable ( luaVM, "doubleSided", "setElementDoubleSided", "isElementDoubleSided" );
+    lua_classvariable ( luaVM, "model", "setElementModel", "getElementModel" );
+    lua_classvariable ( luaVM, "lowLOD", "setLowLODElement", "getLowLODElement" );
+    lua_classvariable ( luaVM, "syncer", NULL, "isElementSyncer" );
+    lua_classvariable ( luaVM, "childrenCount", NULL, "getElementChildrenCount" );
+    lua_classvariable ( luaVM, "interior", "setElementInterior", "getElementInterior" );
+    lua_classvariable ( luaVM, "colShape", NULL, "getElementColShape" );
+    lua_classvariable ( luaVM, "collisions", "setElementCollisionsEnabled", "getElementCollisionsEnabled" );
+    //lua_classvariable ( luaVM, "position", CLuaFunctionDefs::SetElementPosition, CLuaOOPDefs::GetElementPosition );
+    //lua_classvariable ( luaVM, "rotation", CLuaFunctionDefs::SetElementRotation, CLuaOOPDefs::GetElementRotation );
     //lua_classvariable ( luaVM, "velocity", "setElementVelocity", "getElementVelocity", CLuaFunctionDefs::SetElementVelocity, CLuaOOPDefs::GetElementVelocity );
     //lua_classvariable ( luaVM, "data", "setElementData", "getElementData", CLuaOOPDefs::SetElementData, CLuaOOPDefs::GetElementData );
     //lua_classvariable ( luaVM, "visibility", "setElementVisibleTo", "isElementVisibleTo", CLuaOOPDefs::SetElementVisibleTo, CLuaOOPDefs::IsElementVisibleTo ); // .visibility[john]=false
@@ -382,26 +382,26 @@ void CLuaMain::AddBanClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
     
-    lua_classfunction ( luaVM, "create", "", "addBan" );
-    lua_classfunction ( luaVM, "remove", "", "removeBan" );
-    lua_classfunction ( luaVM, "getList", "", "getBans" );
-    lua_classvariable ( luaVM, "list", "", "", NULL, "getBans" );
+    lua_classfunction ( luaVM, "create", "addBan" );
+    lua_classfunction ( luaVM, "remove", "removeBan" );
+    lua_classfunction ( luaVM, "getList", "getBans" );
+    lua_classvariable ( luaVM, "list", NULL, "getBans" );
     
-    lua_classfunction ( luaVM, "getAdmin", "", "getBanAdmin" );
-    lua_classfunction ( luaVM, "getIP", "", "getBanIP" );
-    lua_classfunction ( luaVM, "getNick", "", "getBanNick" );
-    lua_classfunction ( luaVM, "getReason", "", "getBanReason" );
-    lua_classfunction ( luaVM, "getSerial", "", "getBanSerial" );
-    lua_classfunction ( luaVM, "getTime", "", "getBanTime" );
-    lua_classfunction ( luaVM, "getUnbanTime", "", "getUnbanTime" );
+    lua_classfunction ( luaVM, "getAdmin", "getBanAdmin" );
+    lua_classfunction ( luaVM, "getIP", "getBanIP" );
+    lua_classfunction ( luaVM, "getNick", "getBanNick" );
+    lua_classfunction ( luaVM, "getReason", "getBanReason" );
+    lua_classfunction ( luaVM, "getSerial", "getBanSerial" );
+    lua_classfunction ( luaVM, "getTime", "getBanTime" );
+    lua_classfunction ( luaVM, "getUnbanTime", "getUnbanTime" );
     
-    lua_classvariable ( luaVM, "admin", "", "", "setBanAdmin", "getBanAdmin" );
-    lua_classvariable ( luaVM, "IP", "", "", NULL, "getBanIP" );
-    lua_classvariable ( luaVM, "nick", "", "", NULL, "getBanNick" );
-    lua_classvariable ( luaVM, "serial", "", "", NULL, "getBanSerial" );
-    lua_classvariable ( luaVM, "time", "", "", NULL, "getBanTime" );
-    lua_classvariable ( luaVM, "unbanTime", "", "", NULL, "getUnbanTime" );
-    lua_classvariable ( luaVM, "reason", "", "", "setBanReason", "getBanReason" );
+    lua_classvariable ( luaVM, "admin", "setBanAdmin", "getBanAdmin" );
+    lua_classvariable ( luaVM, "IP", NULL, "getBanIP" );
+    lua_classvariable ( luaVM, "nick", NULL, "getBanNick" );
+    lua_classvariable ( luaVM, "serial", NULL, "getBanSerial" );
+    lua_classvariable ( luaVM, "time", NULL, "getBanTime" );
+    lua_classvariable ( luaVM, "unbanTime", NULL, "getUnbanTime" );
+    lua_classvariable ( luaVM, "reason", "setBanReason", "getBanReason" );
     
     lua_registerclass ( luaVM, "Ban" );
 }
@@ -411,26 +411,26 @@ void CLuaMain::AddBlipClass( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
     
-    lua_classfunction ( luaVM, "create", "", "createBlip" );
-    lua_classfunction ( luaVM, "createAttachedTo", "", "createBlipAttachedTo" );
+    lua_classfunction ( luaVM, "create", "createBlip" );
+    lua_classfunction ( luaVM, "createAttachedTo", "createBlipAttachedTo" );
     
-    lua_classfunction ( luaVM, "getColor", "", "getBlipColor" );
-    lua_classfunction ( luaVM, "getVisibleDistance", "", "getBlipVisibleDistance" );
-    lua_classfunction ( luaVM, "getOrdering", "", "getBlipOrdering" );
-    lua_classfunction ( luaVM, "getSize", "", "getBlipSize" );
-    lua_classfunction ( luaVM, "getIcon", "", "getBlipIcon" );
+    lua_classfunction ( luaVM, "getColor", "getBlipColor" );
+    lua_classfunction ( luaVM, "getVisibleDistance", "getBlipVisibleDistance" );
+    lua_classfunction ( luaVM, "getOrdering", "getBlipOrdering" );
+    lua_classfunction ( luaVM, "getSize", "getBlipSize" );
+    lua_classfunction ( luaVM, "getIcon", "getBlipIcon" );
     
-    lua_classfunction ( luaVM, "setColor", "", "setBlipColor" );
-    lua_classfunction ( luaVM, "setVisibleDistance", "", "setBlipVisibleDistance" );
-    lua_classfunction ( luaVM, "setOrdering", "", "setBlipOrdering" );
-    lua_classfunction ( luaVM, "setSize", "", "setBlipSize" );
-    lua_classfunction ( luaVM, "setIcon", "", "setBlipIcon" );
+    lua_classfunction ( luaVM, "setColor", "setBlipColor" );
+    lua_classfunction ( luaVM, "setVisibleDistance", "setBlipVisibleDistance" );
+    lua_classfunction ( luaVM, "setOrdering", "setBlipOrdering" );
+    lua_classfunction ( luaVM, "setSize", "setBlipSize" );
+    lua_classfunction ( luaVM, "setIcon", "setBlipIcon" );
     
-    lua_classvariable ( luaVM, "icon", "", "", "setBlipIcon", "getBlipIcon" );
-    lua_classvariable ( luaVM, "size", "", "", "setBlipSize", "getBlipSize" );
-    lua_classvariable ( luaVM, "ordering", "", "", "setBlipOrdering", "getBlipOrdering" );
-    lua_classvariable ( luaVM, "visibleDistance", "", "", "setBlipVisibleDistance", "getBlipVisibleDistance" );
-    //lua_classvariable ( luaVM, "color", "setBlipColor", "getBlipColor", "", "" ); color
+    lua_classvariable ( luaVM, "icon", "setBlipIcon", "getBlipIcon" );
+    lua_classvariable ( luaVM, "size", "setBlipSize", "getBlipSize" );
+    lua_classvariable ( luaVM, "ordering", "setBlipOrdering", "getBlipOrdering" );
+    lua_classvariable ( luaVM, "visibleDistance", "setBlipVisibleDistance", "getBlipVisibleDistance" );
+    //lua_classvariable ( luaVM, "color", "setBlipColor", "getBlipColor", "" ); color
     
     lua_registerclass ( luaVM, "Blip", "Element" );
     
@@ -441,12 +441,12 @@ void CLuaMain::AddColShapeClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
     
-    lua_classfunction ( luaVM, "Circle", "", "createColCircle" );
-    lua_classfunction ( luaVM, "Cuboid", "", "createColCuboid" );
-    lua_classfunction ( luaVM, "Rectangle", "", "createColRectangle" );
-    lua_classfunction ( luaVM, "Sphere", "", "createColSphere" );
-    lua_classfunction ( luaVM, "Tube", "", "createColTube" );
-    lua_classfunction ( luaVM, "Polygon", "", "createColPolygon" );
+    lua_classfunction ( luaVM, "Circle", "createColCircle" );
+    lua_classfunction ( luaVM, "Cuboid", "createColCuboid" );
+    lua_classfunction ( luaVM, "Rectangle", "createColRectangle" );
+    lua_classfunction ( luaVM, "Sphere", "createColSphere" );
+    lua_classfunction ( luaVM, "Tube", "createColTube" );
+    lua_classfunction ( luaVM, "Polygon", "createColPolygon" );
 
     lua_classfunction ( luaVM, "getElementsWithin", "getElementsWithinColShape" );
     //lua_classfunction ( luaVM, "isElementWithin", "isElementWithinColShape" ); TODO: swap args around.
@@ -459,26 +459,26 @@ void CLuaMain::AddFileClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
     
-    lua_classfunction ( luaVM, "create", "", "fileOpen" );
-    lua_classfunction ( luaVM, "destroy", "", "fileClose" );
-    lua_classfunction ( luaVM, "close", "", "fileClose" );
-    lua_classfunction ( luaVM, "new", "", "fileCreate" );
+    lua_classfunction ( luaVM, "create", "fileOpen" );
+    lua_classfunction ( luaVM, "destroy", "fileClose" );
+    lua_classfunction ( luaVM, "close", "fileClose" );
+    lua_classfunction ( luaVM, "new", "fileCreate" );
     
-    lua_classfunction ( luaVM, "delete", "", "fileDelete" );
-    lua_classfunction ( luaVM, "exists", "", "fileExists" );
-    lua_classfunction ( luaVM, "flush", "", "fileFlush" );
-    lua_classfunction ( luaVM, "getPos", "", "fileGetPos" );
-    lua_classfunction ( luaVM, "getSize", "", "fileGetSize" );
-    lua_classfunction ( luaVM, "isEOF", "", "fileIsEOF" );
-    lua_classfunction ( luaVM, "read", "", "fileRead" );
-    lua_classfunction ( luaVM, "rename", "", "fileRename" );
-    lua_classfunction ( luaVM, "setPos", "", "fileSetPos" );
-    lua_classfunction ( luaVM, "write", "", "fileWrite" );
-    lua_classfunction ( luaVM, "copy", "", "fileCopy" );
+    lua_classfunction ( luaVM, "delete", "fileDelete" );
+    lua_classfunction ( luaVM, "exists", "fileExists" );
+    lua_classfunction ( luaVM, "flush", "fileFlush" );
+    lua_classfunction ( luaVM, "getPos", "fileGetPos" );
+    lua_classfunction ( luaVM, "getSize", "fileGetSize" );
+    lua_classfunction ( luaVM, "isEOF", "fileIsEOF" );
+    lua_classfunction ( luaVM, "read", "fileRead" );
+    lua_classfunction ( luaVM, "rename", "fileRename" );
+    lua_classfunction ( luaVM, "setPos", "fileSetPos" );
+    lua_classfunction ( luaVM, "write", "fileWrite" );
+    lua_classfunction ( luaVM, "copy", "fileCopy" );
     
-    lua_classvariable ( luaVM, "pos", "", "", "fileSetPos", "fileGetPos" );
-    lua_classvariable ( luaVM, "size", "", "", NULL, "fileGetSize" );
-    lua_classvariable ( luaVM, "isEOF", "", "", NULL, "fileIsEOF" );
+    lua_classvariable ( luaVM, "pos", "fileSetPos", "fileGetPos" );
+    lua_classvariable ( luaVM, "size", NULL, "fileGetSize" );
+    lua_classvariable ( luaVM, "isEOF", NULL, "fileIsEOF" );
 
     lua_registerclass ( luaVM, "File" );
 }
@@ -488,28 +488,28 @@ void CLuaMain::AddMarkerClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
     
-    lua_classfunction ( luaVM, "create", "", "createMarker" );
-    lua_classfunction ( luaVM, "getCount", "", "getMarkerCount" );
+    lua_classfunction ( luaVM, "create", "createMarker" );
+    lua_classfunction ( luaVM, "getCount", "getMarkerCount" );
     //lua_classfunction ( luaVM, "isElementWithin", "isElementWithinMarker", CLuaOOPDefs::isElementWithinMarker ); TODO: swap args
     
-    lua_classfunction ( luaVM, "getType", "", "getMarkerType" );
-    lua_classfunction ( luaVM, "getIcon", "", "getMarkerIcon" );
-    lua_classfunction ( luaVM, "getSize", "", "getMarkerSize" );
-    lua_classfunction ( luaVM, "getTarget", "", "getMarkerTarget" ); // vector
-    lua_classfunction ( luaVM, "getColor", "", "getMarkerColor" ); // color
+    lua_classfunction ( luaVM, "getType", "getMarkerType" );
+    lua_classfunction ( luaVM, "getIcon", "getMarkerIcon" );
+    lua_classfunction ( luaVM, "getSize", "getMarkerSize" );
+    lua_classfunction ( luaVM, "getTarget", "getMarkerTarget" ); // vector
+    lua_classfunction ( luaVM, "getColor", "getMarkerColor" ); // color
     
-    lua_classfunction ( luaVM, "setType", "", "setMarkerType" );
-    lua_classfunction ( luaVM, "setIcon", "", "setMarkerIcon" );
-    lua_classfunction ( luaVM, "setSize", "", "setMarkerSize" );
-    lua_classfunction ( luaVM, "setTarget", "", "setMarkerTarget" ); // vector
-    lua_classfunction ( luaVM, "setColor", "", "setMarkerColor" ); // color
+    lua_classfunction ( luaVM, "setType", "setMarkerType" );
+    lua_classfunction ( luaVM, "setIcon", "setMarkerIcon" );
+    lua_classfunction ( luaVM, "setSize", "setMarkerSize" );
+    lua_classfunction ( luaVM, "setTarget", "setMarkerTarget" ); // vector
+    lua_classfunction ( luaVM, "setColor", "setMarkerColor" ); // color
     
-    lua_classvariable ( luaVM, "type", "", "", "setMarkerType", "getMarkerType" );
-    lua_classvariable ( luaVM, "icon", "", "", "", "", "setMarkerIcon", "getMarkerIcon" );
+    lua_classvariable ( luaVM, "type", "setMarkerType", "getMarkerType" );
+    lua_classvariable ( luaVM, "icon", "setMarkerIcon", "getMarkerIcon" );
     lua_classvariable ( luaVM, "size", "setMarkerSize", "getMarkerSize" );
     
-    //lua_classvariable ( luaVM, "target", "", "", CLuaOOPDefs::SetMarkerTarget, CLuaOOPDefs::GetMarkerTarget ); vector
-    //lua_classvariable ( luaVM, "color", "", "", CLuaOOPDefs::SetMarkerColor, CLuaOOPDefs::GetMarkerColor ); color
+    //lua_classvariable ( luaVM, "target", CLuaOOPDefs::SetMarkerTarget, CLuaOOPDefs::GetMarkerTarget ); vector
+    //lua_classvariable ( luaVM, "color", CLuaOOPDefs::SetMarkerColor, CLuaOOPDefs::GetMarkerColor ); color
 
     lua_registerclass ( luaVM, "Marker", "Element" );
 }
@@ -519,14 +519,14 @@ void CLuaMain::AddObjectClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
     
-    lua_classfunction ( luaVM, "create", "", "createObject" );
-    lua_classfunction ( luaVM, "move", "", "moveObject" );
-    lua_classfunction ( luaVM, "stop", "", "stopObject" );
+    lua_classfunction ( luaVM, "create", "createObject" );
+    lua_classfunction ( luaVM, "move", "moveObject" );
+    lua_classfunction ( luaVM, "stop", "stopObject" );
     
-    lua_classfunction ( luaVM, "getScale", "", "getObjectScale" );
-    lua_classfunction ( luaVM, "setScale", "", "setObjectScale" );
+    lua_classfunction ( luaVM, "getScale", "getObjectScale" );
+    lua_classfunction ( luaVM, "setScale", "setObjectScale" );
     
-    lua_classvariable ( luaVM, "scale", "", "", "setObjectScale", "getObjectScale" );
+    lua_classvariable ( luaVM, "scale", "setObjectScale", "getObjectScale" );
 
     lua_registerclass ( luaVM, "Object", "Element" );
 }
@@ -544,23 +544,23 @@ void CLuaMain::AddPickupClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
     
-    lua_classfunction ( luaVM, "create", "", "createPickup" );
-    lua_classfunction ( luaVM, "use", "", "usePickup" );
+    lua_classfunction ( luaVM, "create", "createPickup" );
+    lua_classfunction ( luaVM, "use", "usePickup" );
     
-    lua_classfunction ( luaVM, "getAmmo", "", "getPickupAmmo" );
-    lua_classfunction ( luaVM, "getAmount", "", "getPickupAmount" );
-    lua_classfunction ( luaVM, "getWeapon", "", "getPickupWeapon" );
-    lua_classfunction ( luaVM, "getRespawnInterval", "", "getPickupRespawnInterval" );
-    lua_classfunction ( luaVM, "getType", "", "getPickupType" );
-    lua_classfunction ( luaVM, "setType", "", "setPickupType" );
-    lua_classfunction ( luaVM, "setRespawnInterval", "", "setPickupRespawnInterval" );
+    lua_classfunction ( luaVM, "getAmmo", "getPickupAmmo" );
+    lua_classfunction ( luaVM, "getAmount", "getPickupAmount" );
+    lua_classfunction ( luaVM, "getWeapon", "getPickupWeapon" );
+    lua_classfunction ( luaVM, "getRespawnInterval", "getPickupRespawnInterval" );
+    lua_classfunction ( luaVM, "getType", "getPickupType" );
+    lua_classfunction ( luaVM, "setType", "setPickupType" );
+    lua_classfunction ( luaVM, "setRespawnInterval", "setPickupRespawnInterval" );
     
-    lua_classvariable ( luaVM, "ammo", "", "", NULL, "getPickupAmmo" );
-    lua_classvariable ( luaVM, "amount", "", "", NULL, "getPickupAmount" );
-    lua_classvariable ( luaVM, "spawned", "", "", NULL, "isPickupSpawned" );
-    lua_classvariable ( luaVM, "weapon", "", "", NULL, "getPickupWeapon" );
-    lua_classvariable ( luaVM, "type", "", "", "setPickupType", "getPickupType" );
-    lua_classvariable ( luaVM, "respawnInterval", "", "", "setPickupRespawnInterval", "getPickupRespawnInterval" );
+    lua_classvariable ( luaVM, "ammo", NULL, "getPickupAmmo" );
+    lua_classvariable ( luaVM, "amount", NULL, "getPickupAmount" );
+    lua_classvariable ( luaVM, "spawned", NULL, "isPickupSpawned" );
+    lua_classvariable ( luaVM, "weapon", NULL, "getPickupWeapon" );
+    lua_classvariable ( luaVM, "type", "setPickupType", "getPickupType" );
+    lua_classvariable ( luaVM, "respawnInterval", "setPickupRespawnInterval", "getPickupRespawnInterval" );
     
     lua_registerclass ( luaVM, "Pickup", "Element" );
 }
@@ -570,15 +570,15 @@ void CLuaMain::AddPlayerClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
     
-    lua_classfunction ( luaVM, "create", "", "getPlayerFromName" )
-    lua_classfunction ( luaVM, "ban", "", "banPlayer" )
-    lua_classfunction ( luaVM, "kick", "", "kickPlayer" )
+    lua_classfunction ( luaVM, "create", "getPlayerFromName" )
+    lua_classfunction ( luaVM, "ban", "banPlayer" )
+    lua_classfunction ( luaVM, "kick", "kickPlayer" )
     
-    lua_classfunction ( luaVM, "setTeam", "", "setPlayerTeam" )
+    lua_classfunction ( luaVM, "setTeam", "setPlayerTeam" )
     
-    lua_classfunction ( luaVM, "getTeam", "", "getPlayerTeam" )
+    lua_classfunction ( luaVM, "getTeam", "getPlayerTeam" )
     
-    lua_classvariable ( luaVM, "team", "", "", "setPlayerTeam", "getPlayerTeam" )
+    lua_classvariable ( luaVM, "team", "setPlayerTeam", "getPlayerTeam" )
 
     lua_registerclass ( luaVM, "Player", "Ped" );
 }
@@ -588,20 +588,20 @@ void CLuaMain::AddRadarAreaClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
     
-    lua_classfunction ( luaVM, "create", "", "createRadarArea" );
-    lua_classfunction ( luaVM, "isInside", "", "isInsideRadarArea" ); // vector2
+    lua_classfunction ( luaVM, "create", "createRadarArea" );
+    lua_classfunction ( luaVM, "isInside", "isInsideRadarArea" ); // vector2
     
-    lua_classfunction ( luaVM, "isFlashing", "", "isRadarAreaFlashing" );
-    lua_classfunction ( luaVM, "getSize", "", "getRadarAreaSize" );
-    lua_classfunction ( luaVM, "getColor", "", "getRadarAreaColor" );
+    lua_classfunction ( luaVM, "isFlashing", "isRadarAreaFlashing" );
+    lua_classfunction ( luaVM, "getSize", "getRadarAreaSize" );
+    lua_classfunction ( luaVM, "getColor", "getRadarAreaColor" );
     
-    lua_classfunction ( luaVM, "setSize", "", "setRadarAreaSize" );
-    lua_classfunction ( luaVM, "setFlashing", "", "setRadarAreaFlashing" );
-    lua_classfunction ( luaVM, "setColor", "", "setRadarAreaColor" );
+    lua_classfunction ( luaVM, "setSize", "setRadarAreaSize" );
+    lua_classfunction ( luaVM, "setFlashing", "setRadarAreaFlashing" );
+    lua_classfunction ( luaVM, "setColor", "setRadarAreaColor" );
     
-    lua_classvariable ( luaVM, "flashing", "", "isRadarAreaFlashing", "setRadarAreaFlashing" );
-    //lua_classvariable ( luaVM, "color", "getRadarAreaColor", "setRadarAreaColor", "", "" ); color
-    //lua_classvariable ( luaVM, "size", "getRadarAreaSize", "setRadarAreaSize", "", "" ); vector2
+    lua_classvariable ( luaVM, "flashing", "isRadarAreaFlashing", "setRadarAreaFlashing" );
+    //lua_classvariable ( luaVM, "color", "getRadarAreaColor", "setRadarAreaColor", "" ); color
+    //lua_classvariable ( luaVM, "size", "getRadarAreaSize", "setRadarAreaSize", "" ); vector2
 
     lua_registerclass ( luaVM, "RadarArea", "Element" );
 }
@@ -619,9 +619,9 @@ void CLuaMain::AddConnectionClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
     
-    lua_classfunction ( luaVM, "create", "", "dbConnect" );
-    lua_classfunction ( luaVM, "exec", "", "dbExec" );
-    lua_classfunction ( luaVM, "query", "", "dbQuery" ); // TODO: Accommodate for callbacks and arguments
+    lua_classfunction ( luaVM, "create", "dbConnect" );
+    lua_classfunction ( luaVM, "exec", "dbExec" );
+    lua_classfunction ( luaVM, "query", "dbQuery" ); // TODO: Accommodate for callbacks and arguments
 
     lua_registerclass ( luaVM, "Connection", "Element" );
 }
@@ -632,8 +632,8 @@ void CLuaMain::AddQueryHandleClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
     
-    lua_classfunction ( luaVM, "poll", "", "dbPoll" );
-    lua_classfunction ( luaVM, "free", "", "dbFree" );
+    lua_classfunction ( luaVM, "poll", "dbPoll" );
+    lua_classfunction ( luaVM, "free", "dbFree" );
 
     lua_registerclass ( luaVM, "QueryHandle" );
 }
@@ -643,23 +643,23 @@ void CLuaMain::AddTeamClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
     
-    lua_classfunction ( luaVM, "create", "", "createTeam" );
-    lua_classfunction ( luaVM, "getFromName", "", "getTeamFromName" );
-    lua_classfunction ( luaVM, "countPlayers", "", "countPlayersInTeam" );
-    lua_classfunction ( luaVM, "getPlayers", "", "getPlayersInTeam" );
+    lua_classfunction ( luaVM, "create", "createTeam" );
+    lua_classfunction ( luaVM, "getFromName", "getTeamFromName" );
+    lua_classfunction ( luaVM, "countPlayers", "countPlayersInTeam" );
+    lua_classfunction ( luaVM, "getPlayers", "getPlayersInTeam" );
     
-    lua_classfunction ( luaVM, "getFriendlyFire", "", "getTeamFriendlyFire" );
-    lua_classfunction ( luaVM, "getName", "", "getTeamName" );
-    lua_classfunction ( luaVM, "getColor", "", "getTeamColor" ); // color
+    lua_classfunction ( luaVM, "getFriendlyFire", "getTeamFriendlyFire" );
+    lua_classfunction ( luaVM, "getName", "getTeamName" );
+    lua_classfunction ( luaVM, "getColor", "getTeamColor" ); // color
     
-    lua_classfunction ( luaVM, "setName", "", "setTeamName" );
-    lua_classfunction ( luaVM, "setColor", "", "setTeamColor" ); // color
-    lua_classfunction ( luaVM, "setFriendlyFire", "", "setTeamFriendlyFire" );
+    lua_classfunction ( luaVM, "setName", "setTeamName" );
+    lua_classfunction ( luaVM, "setColor", "setTeamColor" ); // color
+    lua_classfunction ( luaVM, "setFriendlyFire", "setTeamFriendlyFire" );
     
-    lua_classvariable ( luaVM, "playerCount", "", "", NULL, "countPlayersInTeam" );
-    lua_classvariable ( luaVM, "friendlyFire", "", "", "setTeamFriendlyFire", "getTeamFriendlyFire" );
-    lua_classvariable ( luaVM, "players", "", "", NULL, "getPlayersInTeam" ); // todo: perhaps table.insert/nilvaluing?
-    lua_classvariable ( luaVM, "name", "", "", "setTeamName", "getTeamName" );
+    lua_classvariable ( luaVM, "playerCount", NULL, "countPlayersInTeam" );
+    lua_classvariable ( luaVM, "friendlyFire", "setTeamFriendlyFire", "getTeamFriendlyFire" );
+    lua_classvariable ( luaVM, "players", NULL, "getPlayersInTeam" ); // todo: perhaps table.insert/nilvaluing?
+    lua_classvariable ( luaVM, "name", "setTeamName", "getTeamName" );
     //lua_classvariable ( luaVM, "color", "setTeamColor", "getTeamColor", , ); //color
 
     lua_registerclass ( luaVM, "Team", "Element" );
@@ -694,23 +694,23 @@ void CLuaMain::AddWaterClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
     
-    lua_classfunction ( luaVM, "create", "", "createWater" );
+    lua_classfunction ( luaVM, "create", "createWater" );
 
-    lua_classfunction ( luaVM, "getVertexPosition", "", "getWaterVertexPosition" ); // vector3
-    lua_classfunction ( luaVM, "getWaveHeight", "", "getWaveHeight" );
-    lua_classfunction ( luaVM, "getColor", "", "getWaterColor" ); // color
+    lua_classfunction ( luaVM, "getVertexPosition", "getWaterVertexPosition" ); // vector3
+    lua_classfunction ( luaVM, "getWaveHeight", "getWaveHeight" );
+    lua_classfunction ( luaVM, "getColor", "getWaterColor" ); // color
     
-    lua_classfunction ( luaVM, "setWaveHeight", "", "setWaveHeight" );
-    lua_classfunction ( luaVM, "setColor", "", "setWaterColor" ); // color
-    lua_classfunction ( luaVM, "setVertexPosition", "", "setWaterVertexPosition" ); // vector3
-    lua_classfunction ( luaVM, "setLevel", "", "setWaterLevel" ); // vector3d
+    lua_classfunction ( luaVM, "setWaveHeight", "setWaveHeight" );
+    lua_classfunction ( luaVM, "setColor", "setWaterColor" ); // color
+    lua_classfunction ( luaVM, "setVertexPosition", "setWaterVertexPosition" ); // vector3
+    lua_classfunction ( luaVM, "setLevel", "setWaterLevel" ); // vector3d
     
-    lua_classfunction ( luaVM, "resetColor", "", "resetWaterColor" );
-    lua_classfunction ( luaVM, "resetLevel", "", "resetWaterLevel" );
+    lua_classfunction ( luaVM, "resetColor", "resetWaterColor" );
+    lua_classfunction ( luaVM, "resetLevel", "resetWaterLevel" );
     
-    lua_classvariable ( luaVM, "level", "", "", "setWaterLevel", NULL );
-    lua_classvariable ( luaVM, "height", "", "", "setWaveHeight", "getWaveHeight" );
-    //lua_classvariable ( luaVM, "color", "setWaterColor", "getWaterColor", "", "" ); // color
+    lua_classvariable ( luaVM, "level", "setWaterLevel", NULL );
+    lua_classvariable ( luaVM, "height", "setWaveHeight", "getWaveHeight" );
+    //lua_classvariable ( luaVM, "color", "setWaterColor", "getWaterColor", "" ); // color
 
     lua_registerclass ( luaVM, "Water", "Element" );
 }
@@ -720,33 +720,33 @@ void CLuaMain::AddXMLClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
     
-    lua_classfunction ( luaVM, "load", "", "xmlLoadFile" );
-    lua_classfunction ( luaVM, "destroy", "", "xmlUnloadFile" );
-    lua_classfunction ( luaVM, "copy", "", "xmlCopyFile" );
-    lua_classfunction ( luaVM, "create", "", "xmlCreateFile" );
-    lua_classfunction ( luaVM, "destroy", "", "xmlDestroyNode" );
-    lua_classfunction ( luaVM, "loadMapData", "", "loadMapData" );
-    lua_classfunction ( luaVM, "saveMapData", "", "saveMapData" );
+    lua_classfunction ( luaVM, "load", "xmlLoadFile" );
+    lua_classfunction ( luaVM, "destroy", "xmlUnloadFile" );
+    lua_classfunction ( luaVM, "copy", "xmlCopyFile" );
+    lua_classfunction ( luaVM, "create", "xmlCreateFile" );
+    lua_classfunction ( luaVM, "destroy", "xmlDestroyNode" );
+    lua_classfunction ( luaVM, "loadMapData", "loadMapData" );
+    lua_classfunction ( luaVM, "saveMapData", "saveMapData" );
     
-    lua_classfunction ( luaVM, "setValue", "", "xmlNodeGetValue" );
-    lua_classfunction ( luaVM, "setAttribute", "", "xmlNodeSetAttribute" );
-    lua_classfunction ( luaVM, "setValue", "", "xmlNodeSetValue" );
-    lua_classfunction ( luaVM, "saveFile", "", "xmlSaveFile" );
-    lua_classfunction ( luaVM, "createChild", "", "xmlCreateChild" );
-    lua_classfunction ( luaVM, "findChild", "", "xmlFindChild" );
-    lua_classfunction ( luaVM, "setName", "", "xmlNodeSetName" );
+    lua_classfunction ( luaVM, "setValue", "xmlNodeGetValue" );
+    lua_classfunction ( luaVM, "setAttribute", "xmlNodeSetAttribute" );
+    lua_classfunction ( luaVM, "setValue", "xmlNodeSetValue" );
+    lua_classfunction ( luaVM, "saveFile", "xmlSaveFile" );
+    lua_classfunction ( luaVM, "createChild", "xmlCreateChild" );
+    lua_classfunction ( luaVM, "findChild", "xmlFindChild" );
+    lua_classfunction ( luaVM, "setName", "xmlNodeSetName" );
     
-    lua_classfunction ( luaVM, "getAttributes", "", "xmlNodeGetAttributes" );
-    lua_classfunction ( luaVM, "getChildren", "", "xmlNodeGetChildren" );
-    lua_classfunction ( luaVM, "getName", "", "xmlNodeGetName" );
-    lua_classfunction ( luaVM, "getParent", "", "xmlNodeGetParent" );
-    lua_classfunction ( luaVM, "getAttribute", "", "xmlNodeGetAttribute" ); // table classvar?
+    lua_classfunction ( luaVM, "getAttributes", "xmlNodeGetAttributes" );
+    lua_classfunction ( luaVM, "getChildren", "xmlNodeGetChildren" );
+    lua_classfunction ( luaVM, "getName", "xmlNodeGetName" );
+    lua_classfunction ( luaVM, "getParent", "xmlNodeGetParent" );
+    lua_classfunction ( luaVM, "getAttribute", "xmlNodeGetAttribute" ); // table classvar?
     
-    lua_classvariable ( luaVM, "value", "", "", "xmlNodeSetValue", "xmlNodeGetValue" );
-    lua_classvariable ( luaVM, "name", "", "", "xmlNodeSetName", "xmlNodeGetName" );
-    lua_classvariable ( luaVM, "attributes", "", "", NULL, "xmlNodeGetAttributes" );
-    lua_classvariable ( luaVM, "children", "", "", NULL, "xmlNodeGetChildren" );
-    lua_classvariable ( luaVM, "parent", "", "", NULL, "xmlNodeGetParent" );
+    lua_classvariable ( luaVM, "value", "xmlNodeSetValue", "xmlNodeGetValue" );
+    lua_classvariable ( luaVM, "name", "xmlNodeSetName", "xmlNodeGetName" );
+    lua_classvariable ( luaVM, "attributes", NULL, "xmlNodeGetAttributes" );
+    lua_classvariable ( luaVM, "children", NULL, "xmlNodeGetChildren" );
+    lua_classvariable ( luaVM, "parent", NULL, "xmlNodeGetParent" );
 
     lua_registerclass ( luaVM, "XML" );
 }
@@ -756,14 +756,14 @@ void CLuaMain::AddTimerClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
     
-    lua_classfunction ( luaVM, "create", "", "setTimer" );
-    lua_classfunction ( luaVM, "destroy", "", "killTimer" );
-    lua_classfunction ( luaVM, "reset", "", "resetTimer" );
-    lua_classfunction ( luaVM, "isValid", "", "isTimer" );
+    lua_classfunction ( luaVM, "create", "setTimer" );
+    lua_classfunction ( luaVM, "destroy", "killTimer" );
+    lua_classfunction ( luaVM, "reset", "resetTimer" );
+    lua_classfunction ( luaVM, "isValid", "isTimer" );
     
-    lua_classfunction ( luaVM, "getDetails", "", "getTimerDetails" );
+    lua_classfunction ( luaVM, "getDetails", "getTimerDetails" );
     
-    lua_classvariable ( luaVM, "valid", "", "", NULL, "isTimer" );
+    lua_classvariable ( luaVM, "valid", NULL, "isTimer" );
     
     lua_registerclass ( luaVM, "Timer" );
 }
