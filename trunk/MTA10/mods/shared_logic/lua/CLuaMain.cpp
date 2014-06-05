@@ -121,6 +121,8 @@ void CLuaMain::InitSecurity ( void )
     lua_register ( m_luaVM, "newproxy", CLuaFunctionDefs::DisabledFunction );
 }
 
+
+// TODO: velocity, and data specials
 void CLuaMain::AddElementClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
@@ -129,13 +131,16 @@ void CLuaMain::AddElementClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "clone", "cloneElement" );
 
     lua_classfunction ( luaVM, "getByID", "getElementByID" );
-    lua_classfunction ( luaVM, "getByIndex", "getElementByIndex" );
+    lua_classfunction ( luaVM, "getAllByType", "getElementsByType" );
 
+    lua_classfunction ( luaVM, "areCollisionsEnabled", "areElementCollisionsEnabled" );
     lua_classfunction ( luaVM, "isWithinColShape", "isElementWithinColShape" );
     lua_classfunction ( luaVM, "isWithinMarker", "isElementWithinMarker" );
     lua_classfunction ( luaVM, "isInWater", "isElementInWater" );
     lua_classfunction ( luaVM, "isFrozen", "isElementFrozen" );
     lua_classfunction ( luaVM, "isLowLOD", "isElementLowLOD" );
+    lua_classfunction ( luaVM, "isDoubleSided", "isElementDoubleSided" );
+    lua_classfunction ( luaVM, "isVisibleTo", "isElementVisibleTo" );
 
     lua_classfunction ( luaVM, "getChildren", "getElementChildren" );
     lua_classfunction ( luaVM, "getChild", "getElementChild" );
@@ -143,10 +148,11 @@ void CLuaMain::AddElementClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "getAllData", "getAllElementData" );
     lua_classfunction ( luaVM, "getID", "getElementID" );
     lua_classfunction ( luaVM, "getParent", "getElementParent" );
+    lua_classfunction ( luaVM, "getBoundingBox", "getElementBoundingBox" );
     lua_classfunction ( luaVM, "getPosition", CLuaOOPDefs::GetElementPosition );
     lua_classfunction ( luaVM, "getRotation", CLuaOOPDefs::GetElementRotation );
     lua_classfunction ( luaVM, "getMatrix", CLuaOOPDefs::GetElementMatrix );
-    lua_classfunction ( luaVM, "getVelocity", "getElementVelocity" );
+    lua_classfunction ( luaVM, "getVelocity", "getElementVelocity" ); // vector3
     lua_classfunction ( luaVM, "getByType", "getElementsByType" );
     lua_classfunction ( luaVM, "getDistanceFromCentreOfMassToBaseOfModel", "GetElementDistanceFromCentreOfMassToBaseOfModel" );
     lua_classfunction ( luaVM, "getType", "getElementType" );
@@ -156,13 +162,11 @@ void CLuaMain::AddElementClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "getZoneName", "getElementZoneName" );
     lua_classfunction ( luaVM, "getColShape", "getElementColShape" );
     lua_classfunction ( luaVM, "getAlpha", "getElementAlpha" );
-    lua_classfunction ( luaVM, "isDoubleSided", "isElementDoubleSided" );
     lua_classfunction ( luaVM, "getHealth", "getElementHealth" );
     lua_classfunction ( luaVM, "getModel", "getElementModel" );
     lua_classfunction ( luaVM, "getSyncer", "getElementSyncer" );
-    lua_classfunction ( luaVM, "getCollisionsEnabled", "getElementCollisionsEnabled" );
     lua_classfunction ( luaVM, "getLowLOD", "getLowLODElement" );
-
+    
     lua_classfunction ( luaVM, "attach", "attachElements" );
     lua_classfunction ( luaVM, "detach", "detachElements" );
     lua_classfunction ( luaVM, "isAttached", "isElementAttached" );
@@ -182,7 +186,7 @@ void CLuaMain::AddElementClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "setVelocity", "setElementVelocity" );
     lua_classfunction ( luaVM, "setVisibleTo", "setElementVisibleTo" );
     lua_classfunction ( luaVM, "clearVisibleTo", "clearElementVisibleTo" );
-    lua_classfunction ( luaVM, "isVisibleTo", "isElementVisibleTo" );
+
     lua_classfunction ( luaVM, "setInterior", "setElementInterior" );
     lua_classfunction ( luaVM, "setDimension", "setElementDimension" );
     lua_classfunction ( luaVM, "setAlpha", "setElementAlpha" );
@@ -195,7 +199,10 @@ void CLuaMain::AddElementClass ( lua_State* luaVM )
 
     lua_classvariable ( luaVM, "id", "setElementID", "getElementID" );
     lua_classvariable ( luaVM, "type", NULL, "getElementType" );
+    lua_classvariable ( luaVM, "colShape", NULL, "getElementColShape" );
     lua_classvariable ( luaVM, "parent", "setElementParent", "getElementParent" );
+    lua_classvariable ( luaVM, "attachedTo", "attachElements", "getElementAttachedTo" );
+    lua_classvariable ( luaVM, "attached", NULL, "isElementAttached" );
     lua_classvariable ( luaVM, "health", "setElementHealth", "getElementHealth" );
     lua_classvariable ( luaVM, "alpha", "setElementAlpha", "getElementAlpha" );
     lua_classvariable ( luaVM, "doubleSided", "setElementDoubleSided", "isElementDoubleSided" );
@@ -204,19 +211,23 @@ void CLuaMain::AddElementClass ( lua_State* luaVM )
     lua_classvariable ( luaVM, "collisions", "setElementCollisionsEnabled", "getElementCollisionsEnabled" );
     lua_classvariable ( luaVM, "frozen", "setElementFrozen", "isElementFrozen" );
     lua_classvariable ( luaVM, "inWater", NULL, "isElementInWater" );
+    lua_classvariable ( luaVM, "lowLOD", "setLowLODElement", "getLowLODElement" );
     lua_classvariable ( luaVM, "dimension", "setElementDimension", "getElementDimension" );
     lua_classvariable ( luaVM, "interior", "setElementInterior", "getElementInterior" );
     lua_classvariable ( luaVM, "distanceFromCentreOfMassToBaseOfModel", NULL, "GetElementDistanceFromCentreOfMassToBaseOfModel" );
-
+    lua_classvariable ( luaVM, "childrenCount", NULL, "getElementChildrenCount" );
     lua_classvariable ( luaVM, "position", CLuaFunctionDefs::SetElementPosition, CLuaOOPDefs::GetElementPosition );
     lua_classvariable ( luaVM, "rotation", CLuaFunctionDefs::SetElementRotation, CLuaOOPDefs::GetElementRotation );
     lua_classvariable ( luaVM, "matrix", NULL, CLuaOOPDefs::GetElementMatrix );
-
+    //lua_classvariable ( luaVM, "velocity", CLuaFunctionDefs::SetElementVelocity, CLuaOOPDefs::GetElementVelocity );
+    lua_classvariable ( luaVM, "data", NULL, "getAllElementData" ); // neeed to support setting of values
+    
+    
     lua_registerclass ( luaVM, "Element" );
 }
 
 
-
+// TODO: color, velocity, gravity
 void CLuaMain::AddVehicleClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
@@ -265,9 +276,9 @@ void CLuaMain::AddVehicleClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "getTurnVelocity", "getVehicleTurnVelocity" );
     lua_classfunction ( luaVM, "isTaxiLightOn", "isVehicleTaxiLightOn" );
     lua_classfunction ( luaVM, "getComponents", "getVehicleComponents" );
-    lua_classfunction ( luaVM, "getHeadLightColor", "getVehicleHeadLightColor" ); // color
-    lua_classfunction ( luaVM, "getColor", "getVehicleColor" ); // color
-    lua_classfunction ( luaVM, "getGravity", "getVehicleGravity" ); // vector
+    lua_classfunction ( luaVM, "getHeadLightColor", "getVehicleHeadLightColor" );
+    lua_classfunction ( luaVM, "getColor", "getVehicleColor" );
+    lua_classfunction ( luaVM, "getGravity", "getVehicleGravity" );
     lua_classfunction ( luaVM, "getSirens", "getVehicleSirens" );
     lua_classfunction ( luaVM, "getSirensOn", "getVehicleSirensOn" );
     lua_classfunction ( luaVM, "getComponentPosition", "getVehicleComponentPosition" );
@@ -309,9 +320,9 @@ void CLuaMain::AddVehicleClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "setTrainSpeed", "setTrainSpeed" );
     lua_classfunction ( luaVM, "setTrainDerailable", "setTrainDerailable" );
     lua_classfunction ( luaVM, "setTrainDerailed", "setTrainDerailed" );
-    lua_classfunction ( luaVM, "setHeadLightColor", "setVehicleHeadLightColor" ); // color
-    lua_classfunction ( luaVM, "setColor", "setVehicleColor" ); // color
-    lua_classfunction ( luaVM, "setGravity", "setVehicleGravity" ); // vector
+    lua_classfunction ( luaVM, "setHeadLightColor", "setVehicleHeadLightColor" );
+    lua_classfunction ( luaVM, "setColor", "setVehicleColor" );
+    lua_classfunction ( luaVM, "setGravity", "setVehicleGravity" );
     
     lua_classfunction ( luaVM, "resetComponentPosition", "resetVehicleComponentPosition" );
     lua_classfunction ( luaVM, "resetComponentRotation", "resetVehicleComponentRotation" );
@@ -359,14 +370,15 @@ void CLuaMain::AddVehicleClass ( lua_State* luaVM )
     lua_classvariable ( luaVM, "nitroActivated", "setVehicleNitroActivated", "isVehicleNitroActivated" );
     lua_classvariable ( luaVM, "nitroRecharging", NULL, "isVehicleNitroRecharging" );
     
-    //lua_classvariable ( luaVM, "color", CLuaFunctionDefs::SetVehicleColor, CLuaOOPDefs::GetVehicleColor ); color
-    //lua_classvariable ( luaVM, "headlightColor", CLuaFunctionDefs::SetHeadLightColor, CLuaOOPDefs::GetHeadLightColor ); color
+    //lua_classvariable ( luaVM, "color", CLuaFunctionDefs::SetVehicleColor, CLuaOOPDefs::GetVehicleColor );
+    //lua_classvariable ( luaVM, "headlightColor", CLuaFunctionDefs::SetHeadLightColor, CLuaOOPDefs::GetHeadLightColor );
     //lua_classvariable ( luaVM, "gravity", CLuaFunctionDefs::SetVehicleGravity, CLuaOOPDefs::GetVehicleGravity ); vector
-    //lua_classvariable ( luaVM, "occupant", NULL, CLuaOOPDefs::GetVehicleOccupant );
 
     lua_registerclass ( luaVM, "Vehicle", "Element" );
 }
 
+
+// TODO: vectors, and special tables
 void CLuaMain::AddPedClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
@@ -379,8 +391,8 @@ void CLuaMain::AddPedClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "getTypeIndexFromClothes", "getTypeIndexFromClothes" );
     lua_classfunction ( luaVM, "getClothesByTypeIndex", "getClothesByTypeIndex" );
     lua_classvariable ( luaVM, "validModels", NULL, "getValidPedModels" );
-//  lua_classvariable ( luaVM, "clothesTypeName", NULL, "getClothesTypeName" ); table
-//  lua_classvariable ( luaVM, "bodyPartName", NULL, "getBodyPartName" ); table
+    //lua_classvariable ( luaVM, "clothesTypeName", NULL, "getClothesTypeName" ); table
+    //lua_classvariable ( luaVM, "bodyPartName", NULL, "getBodyPartName" ); table
     
     lua_classfunction ( luaVM, "canBeKnockedOffBike", "canPedBeKnockedOffBike" );
     lua_classfunction ( luaVM, "doesHaveJetPack", "doesPedHaveJetPack" );
@@ -476,6 +488,8 @@ void CLuaMain::AddPedClass ( lua_State* luaVM )
     lua_registerclass ( luaVM, "Ped", "Element" );
 }
 
+
+// TODO: integrate colour class
 void CLuaMain::AddPlayerClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
@@ -520,6 +534,7 @@ void CLuaMain::AddPlayerClass ( lua_State* luaVM )
     lua_registerclass ( luaVM, "Player", "Ped" );
 }
 
+
 void CLuaMain::AddObjectClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
@@ -546,6 +561,8 @@ void CLuaMain::AddObjectClass ( lua_State* luaVM )
     lua_registerclass ( luaVM, "Object", "Element" );
 }
 
+
+// TODO: color and vector classes, and function special
 void CLuaMain::AddMarkerClass( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
@@ -576,6 +593,7 @@ void CLuaMain::AddMarkerClass( lua_State* luaVM )
     lua_registerclass ( luaVM, "Marker", "Element" );
 }
 
+// TODO: colour class
 void CLuaMain::AddBlipClass( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
@@ -583,13 +601,13 @@ void CLuaMain::AddBlipClass( lua_State* luaVM )
     lua_classfunction ( luaVM, "create", "createBlip" );
     lua_classfunction ( luaVM, "createAttachedTo", "createBlipAttachedTo" );
     
-    lua_classfunction ( luaVM, "getColor", "getBlipColor" );
+    lua_classfunction ( luaVM, "getColor", "getBlipColor" ); // color
     lua_classfunction ( luaVM, "getVisibleDistance", "getBlipVisibleDistance" );
     lua_classfunction ( luaVM, "getOrdering", "getBlipOrdering" );
     lua_classfunction ( luaVM, "getSize", "getBlipSize" );
     lua_classfunction ( luaVM, "getIcon", "getBlipIcon" );
     
-    lua_classfunction ( luaVM, "setColor", "setBlipColor" );
+    lua_classfunction ( luaVM, "setColor", "setBlipColor" ); // color
     lua_classfunction ( luaVM, "setVisibleDistance", "setBlipVisibleDistance" );
     lua_classfunction ( luaVM, "setOrdering", "setBlipOrdering" );
     lua_classfunction ( luaVM, "setSize", "setBlipSize" );
@@ -603,6 +621,7 @@ void CLuaMain::AddBlipClass( lua_State* luaVM )
 
     lua_registerclass ( luaVM, "Blip", "Element" );
 }
+
 
 void CLuaMain::AddPickupClass ( lua_State* luaVM )
 {
@@ -623,6 +642,8 @@ void CLuaMain::AddPickupClass ( lua_State* luaVM )
     lua_registerclass ( luaVM, "Pickup", "Element" );
 }
 
+
+// TODO: function special
 void CLuaMain::AddColShapeClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
@@ -640,6 +661,7 @@ void CLuaMain::AddColShapeClass ( lua_State* luaVM )
     
     lua_registerclass ( luaVM, "ColShape", "Element" );
 }
+
 
 void CLuaMain::AddProjectileClass ( lua_State* luaVM )
 {
@@ -662,6 +684,8 @@ void CLuaMain::AddProjectileClass ( lua_State* luaVM )
     lua_registerclass ( luaVM, "Projectile", "Element" );
 }
 
+
+// TODO: vector and colors integration
 void CLuaMain::AddRadarAreaClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
@@ -684,6 +708,8 @@ void CLuaMain::AddRadarAreaClass ( lua_State* luaVM )
     lua_registerclass ( luaVM, "RadarArea", "Element" );
 }
 
+
+// TODO: color classes
 void CLuaMain::AddTeamClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
@@ -703,6 +729,8 @@ void CLuaMain::AddTeamClass ( lua_State* luaVM )
     lua_registerclass ( luaVM, "Team", "Element" );
 }
 
+
+// color and vector integration
 void CLuaMain::AddWaterClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
@@ -732,6 +760,7 @@ void CLuaMain::AddWaterClass ( lua_State* luaVM )
 
     lua_registerclass ( luaVM, "Water", "Element" );
 }
+
 
 void CLuaMain::AddSoundClass ( lua_State* luaVM )
 {
@@ -790,6 +819,8 @@ void CLuaMain::AddSoundClass ( lua_State* luaVM )
     lua_registerclass ( luaVM, "Sound3D", "Sound" );
 }
 
+
+// TODO: special table
 void CLuaMain::AddWeaponClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
@@ -862,6 +893,7 @@ void CLuaMain::AddEffectClass ( lua_State* luaVM )
 }
 
 
+// TODO: vector class
 void CLuaMain::AddGuiElementClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
@@ -921,6 +953,7 @@ void CLuaMain::AddGuiElementClass ( lua_State* luaVM )
     lua_registerclass ( luaVM, "GuiElement", "Element" );
 }
 
+
 void CLuaMain::AddGuiWindowClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
@@ -935,6 +968,7 @@ void CLuaMain::AddGuiWindowClass ( lua_State* luaVM )
     lua_registerclass ( luaVM, "GuiWindow", "GuiElement" );
 }
 
+
 void CLuaMain::AddGuiButtonClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
@@ -943,6 +977,7 @@ void CLuaMain::AddGuiButtonClass ( lua_State* luaVM )
 
     lua_registerclass ( luaVM, "GuiButton", "GuiElement" );
 }
+
 
 void CLuaMain::AddGuiEditClass ( lua_State* luaVM )
 {
@@ -963,6 +998,8 @@ void CLuaMain::AddGuiEditClass ( lua_State* luaVM )
     lua_registerclass ( luaVM, "GuiEdit", "GuiElement" );
 }
 
+
+// TODO: color class
 void CLuaMain::AddGuiLabelClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
@@ -986,6 +1023,7 @@ void CLuaMain::AddGuiLabelClass ( lua_State* luaVM )
     lua_registerclass ( luaVM, "GuiLabel", "GuiElement" );
 }
 
+
 void CLuaMain::AddGuiMemoClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
@@ -1003,6 +1041,7 @@ void CLuaMain::AddGuiMemoClass ( lua_State* luaVM )
     lua_registerclass ( luaVM, "GuiMemo", "GuiElement" );
 }
 
+
 void CLuaMain::AddGuiImageClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
@@ -1014,6 +1053,7 @@ void CLuaMain::AddGuiImageClass ( lua_State* luaVM )
     
     lua_registerclass ( luaVM, "GuiStaticImage", "GuiElement" );
 }
+
 
 void CLuaMain::AddGuiComboBoxClass ( lua_State* luaVM )
 {
@@ -1035,6 +1075,7 @@ void CLuaMain::AddGuiComboBoxClass ( lua_State* luaVM )
     lua_registerclass ( luaVM, "GuiComboBox", "GuiElement" );
 }
 
+
 void CLuaMain::AddGuiCheckBoxClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
@@ -1050,6 +1091,7 @@ void CLuaMain::AddGuiCheckBoxClass ( lua_State* luaVM )
     lua_registerclass ( luaVM, "GuiCheckBox", "GuiElement" );
 }
 
+
 void CLuaMain::AddGuiRadioButtonClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
@@ -1064,6 +1106,7 @@ void CLuaMain::AddGuiRadioButtonClass ( lua_State* luaVM )
 
     lua_registerclass ( luaVM, "GuiRadioButton", "GuiElement" );
 }
+
 
 void CLuaMain::AddGuiScrollPaneClass ( lua_State* luaVM )
 {
@@ -1084,6 +1127,7 @@ void CLuaMain::AddGuiScrollPaneClass ( lua_State* luaVM )
     lua_registerclass ( luaVM, "GuiScrollPane", "GuiElement" );
 }
 
+
 void CLuaMain::AddGuiScrollBarClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
@@ -1098,6 +1142,7 @@ void CLuaMain::AddGuiScrollBarClass ( lua_State* luaVM )
 
     lua_registerclass ( luaVM, "GuiScrollBar", "GuiElement" );
 }
+
 
 void CLuaMain::AddGuiProgressBarClass ( lua_State* luaVM )
 {
@@ -1114,6 +1159,8 @@ void CLuaMain::AddGuiProgressBarClass ( lua_State* luaVM )
     lua_registerclass ( luaVM, "GuiProgressBar", "GuiElement" );
 }
 
+
+// TODO: special tables
 void CLuaMain::AddGuiGridlistClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
@@ -1168,6 +1215,7 @@ void CLuaMain::AddGuiGridlistClass ( lua_State* luaVM )
     lua_registerclass ( luaVM, "GuiGridlist", "GuiElement" );
 }
 
+
 void CLuaMain::AddGuiTabPanelClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
@@ -1183,6 +1231,7 @@ void CLuaMain::AddGuiTabPanelClass ( lua_State* luaVM )
     lua_registerclass ( luaVM, "GuiTabPanel", "GuiElement" );
 }
 
+
 void CLuaMain::AddGuiTabClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
@@ -1193,6 +1242,7 @@ void CLuaMain::AddGuiTabClass ( lua_State* luaVM )
     lua_registerclass ( luaVM, "GuiTab", "GuiElement" );
 }
 
+
 void CLuaMain::AddGuiFontClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
@@ -1201,6 +1251,7 @@ void CLuaMain::AddGuiFontClass ( lua_State* luaVM )
     
     lua_registerclass ( luaVM, "GuiFont", "Element" );
 }
+
 
 void CLuaMain::AddResourceClass ( lua_State* luaVM )
 {
@@ -1230,6 +1281,7 @@ void CLuaMain::AddResourceClass ( lua_State* luaVM )
     lua_registerclass ( luaVM, "Resource" );
 }
 
+
 void CLuaMain::AddTimerClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
@@ -1245,6 +1297,7 @@ void CLuaMain::AddTimerClass ( lua_State* luaVM )
 
     lua_registerclass ( luaVM, "Timer" );
 }
+
 
 void CLuaMain::AddFileClass ( lua_State* luaVM )
 {
@@ -1309,6 +1362,7 @@ void CLuaMain::AddXMLClass ( lua_State* luaVM )
     lua_registerclass ( luaVM, "XML" );
 }
 
+
 void CLuaMain::AddCameraClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
@@ -1343,6 +1397,8 @@ void CLuaMain::AddCameraClass ( lua_State* luaVM )
     lua_registerstaticclass ( luaVM, "Camera" );
 }
 
+
+// TODO: special tables
 void CLuaMain::AddEngineClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
@@ -1366,6 +1422,7 @@ void CLuaMain::AddEngineClass ( lua_State* luaVM )
     lua_registerstaticclass ( luaVM, "Engine" );
 }
 
+
 void CLuaMain::AddEngineColClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
@@ -1375,6 +1432,7 @@ void CLuaMain::AddEngineColClass ( lua_State* luaVM )
     
     lua_registerclass ( luaVM, "EngineCOL", "Element" );
 }
+
 
 void CLuaMain::AddEngineTxdClass ( lua_State* luaVM )
 {
@@ -1387,6 +1445,7 @@ void CLuaMain::AddEngineTxdClass ( lua_State* luaVM )
     lua_registerclass ( luaVM, "EngineTXD", "Element" );
 }
 
+
 void CLuaMain::AddEngineDffClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
@@ -1396,6 +1455,7 @@ void CLuaMain::AddEngineDffClass ( lua_State* luaVM )
     
     lua_registerclass ( luaVM, "EngineDFF", "Element" );
 }
+
 
 void CLuaMain::AddDxMaterialClass ( lua_State* luaVM )
 {
@@ -1414,13 +1474,14 @@ void CLuaMain::AddDxTextureClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "create", "dxCreateTexture");
     
     lua_classfunction ( luaVM, "setEdge", "dxSetTextureEdge");
-    lua_classfunction ( luaVM, "setPixels", "dxSetTexturePixels"); // DOES NOT SUPPORT "surfaceIndex"
-    
-    lua_classfunction ( luaVM, "getPixels", "dxGetTexturePixels"); // DOES NOT SUPPORT "surfaceIndex"
+    lua_classfunction ( luaVM, "setPixels", "dxSetTexturePixels");
+    lua_classfunction ( luaVM, "getPixels", "dxGetTexturePixels");
     
     lua_registerclass ( luaVM, "DxTexture", "DxMaterial" );
 }
 
+
+// TODO: function specials
 void CLuaMain::AddDxFontClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
@@ -1436,6 +1497,8 @@ void CLuaMain::AddDxFontClass ( lua_State* luaVM )
 
 }
 
+
+// TODO: specials
 void CLuaMain::AddDxShaderClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
@@ -1451,6 +1514,7 @@ void CLuaMain::AddDxShaderClass ( lua_State* luaVM )
     lua_registerclass ( luaVM, "DxShader", "DxMaterial" );
 }
 
+
 void CLuaMain::AddDxScreenSourceClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
@@ -1460,6 +1524,7 @@ void CLuaMain::AddDxScreenSourceClass ( lua_State* luaVM )
     
     lua_registerclass ( luaVM, "DxScreenSource" );
 }
+
 
 void CLuaMain::AddDxRenderTargetClass ( lua_State* luaVM )
 {
