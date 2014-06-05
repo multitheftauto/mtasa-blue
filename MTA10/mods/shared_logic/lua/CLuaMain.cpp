@@ -189,7 +189,6 @@ void CLuaMain::AddElementClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "setDoubleSided", "setElementDoubleSided" );
     lua_classfunction ( luaVM, "setHealth", "setElementHealth" );
     lua_classfunction ( luaVM, "setModel", "setElementModel" );
-    lua_classfunction ( luaVM, "setSyncer", "setElementSyncer" );
     lua_classfunction ( luaVM, "setCollisionsEnabled", "setElementCollisionsEnabled" );
     lua_classfunction ( luaVM, "setFrozen", "setElementFrozen" );
     lua_classfunction ( luaVM, "setLowLOD", "setLowLOD" );
