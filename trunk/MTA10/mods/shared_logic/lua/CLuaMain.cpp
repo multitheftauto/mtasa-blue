@@ -1280,12 +1280,12 @@ void CLuaMain::AddXMLClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
     
-    lua_classfunction ( luaVM, "create", "xmlLoadFile" );
-    lua_classfunction ( luaVM, "unloadFile", "xmlUnloadFile" );
-    lua_classfunction ( luaVM, "destroy", "xmlUnloadFile" );
-    lua_classfunction ( luaVM, "copyFile", "xmlCopyFile" );
-    lua_classfunction ( luaVM, "createFile", "xmlCreateFile" );
-    lua_classfunction ( luaVM, "destroyNode", "xmlDestroyNode" );
+    lua_classfunction ( luaVM, "load", "xmlLoadFile" );
+    lua_classfunction ( luaVM, "unload", "xmlUnloadFile" );
+    lua_classfunction ( luaVM, "copy", "xmlCopyFile" );
+    lua_classfunction ( luaVM, "create", "xmlCreateFile" );
+    lua_classfunction ( luaVM, "destroy", "xmlDestroyNode" );
+    
     lua_classfunction ( luaVM, "setValue", "xmlNodeGetValue" );
     lua_classfunction ( luaVM, "setAttribute", "xmlNodeSetAttribute" );
     lua_classfunction ( luaVM, "setValue", "xmlNodeSetValue" );
