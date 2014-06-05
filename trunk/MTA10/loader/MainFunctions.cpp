@@ -177,12 +177,6 @@ void HandleDuplicateLaunching( void )
     {
         if ( strcmp ( lpCmdLine, "" ) != 0 )
         {
-            COPYDATASTRUCT cdStruct;
-
-            cdStruct.cbData = strlen(lpCmdLine)+1;
-            cdStruct.lpData = const_cast<char *>((lpCmdLine));
-            cdStruct.dwData = URI_CONNECT;
-
             HWND hwMTAWindow = FindWindow( NULL, "MTA: San Andreas" );
 #ifdef MTA_DEBUG
             if( hwMTAWindow == NULL )
@@ -190,10 +184,27 @@ void HandleDuplicateLaunching( void )
 #endif
             if( hwMTAWindow != NULL )
             {
-                SendMessage( hwMTAWindow,
-                            WM_COPYDATA,
-                            NULL,
-                            (LPARAM)&cdStruct );
+                LPWSTR szCommandLine = GetCommandLineW ();
+                int numArgs;
+                LPWSTR* aCommandLineArgs = CommandLineToArgvW ( szCommandLine, &numArgs );
+                for ( int i = 0; i < numArgs; ++i )
+                {
+                    if ( StrCmpW ( aCommandLineArgs[i], L"-c" ) == 0 && numArgs > i )
+                    {
+                        WString wideConnectInfo = aCommandLineArgs[i + 1];
+                        SString strConnectInfo = ToUTF8 ( wideConnectInfo );
+
+                        COPYDATASTRUCT cdStruct;
+                        cdStruct.cbData = strConnectInfo.length () + 1;
+                        cdStruct.lpData = const_cast<char *> ( strConnectInfo.c_str () );
+                        cdStruct.dwData = URI_CONNECT;
+
+                        SendMessage( hwMTAWindow, WM_COPYDATA, NULL, (LPARAM)&cdStruct );
+                        break;
+                    }
+                }
+
+                
             }
             else
             {
