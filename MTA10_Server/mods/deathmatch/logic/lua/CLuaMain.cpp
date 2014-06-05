@@ -254,6 +254,8 @@ void CLuaMain::AddElementClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
     
+    lua_classfunction ( luaVM, "isWithinMarker", "isElementWithinMarker" );
+    
     lua_registerclass ( luaVM, "Element" );
 }
 
@@ -286,10 +288,31 @@ void CLuaMain::AddBanClass ( lua_State* luaVM )
     lua_registerclass ( luaVM, "Ban" );
 }
 
-void CLuaMain::AddBlipClass ( lua_State* luaVM )
+void CLuaMain::AddBlipClass( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
-
+    
+    lua_classfunction ( luaVM, "create", "", "createBlip" );
+    lua_classfunction ( luaVM, "createAttachedTo", "", "createBlipAttachedTo" );
+    
+    lua_classfunction ( luaVM, "getColor", "", "getBlipColor" );
+    lua_classfunction ( luaVM, "getVisibleDistance", "", "getBlipVisibleDistance" );
+    lua_classfunction ( luaVM, "getOrdering", "", "getBlipOrdering" );
+    lua_classfunction ( luaVM, "getSize", "", "getBlipSize" );
+    lua_classfunction ( luaVM, "getIcon", "", "getBlipIcon" );
+    
+    lua_classfunction ( luaVM, "setColor", "", "setBlipColor" );
+    lua_classfunction ( luaVM, "setVisibleDistance", "", "setBlipVisibleDistance" );
+    lua_classfunction ( luaVM, "setOrdering", "", "setBlipOrdering" );
+    lua_classfunction ( luaVM, "setSize", "", "setBlipSize" );
+    lua_classfunction ( luaVM, "setIcon", "", "setBlipIcon" );
+    
+    lua_classvariable ( luaVM, "icon", "", "", "setBlipIcon", "getBlipIcon" );
+    lua_classvariable ( luaVM, "size", "", "", "setBlipSize", "getBlipSize" );
+    lua_classvariable ( luaVM, "ordering", "", "", "setBlipOrdering", "getBlipOrdering" );
+    lua_classvariable ( luaVM, "visibleDistance", "", "", "setBlipVisibleDistance", "getBlipVisibleDistance" );
+    //lua_classvariable ( luaVM, "color", "setBlipColor", "getBlipColor", "", "" ); color
+    
     lua_registerclass ( luaVM, "Blip", "Element" );
     
 }
@@ -297,6 +320,13 @@ void CLuaMain::AddBlipClass ( lua_State* luaVM )
 void CLuaMain::AddColShapeClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
+    
+    lua_classfunction ( luaVM, "Circle", "", "createColCircle" );
+    lua_classfunction ( luaVM, "Cuboid", "", "createColCuboid" );
+    lua_classfunction ( luaVM, "Rectangle", "", "createColRectangle" );
+    lua_classfunction ( luaVM, "Sphere", "", "createColSphere" );
+    lua_classfunction ( luaVM, "Tube", "", "createColTube" );
+    lua_classfunction ( luaVM, "Polygon", "", "createColPolygon" );
 
     lua_registerclass ( luaVM, "ColShape", "Element" );
 }
@@ -332,6 +362,29 @@ void CLuaMain::AddFileClass ( lua_State* luaVM )
 void CLuaMain::AddMarkerClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
+    
+    lua_classfunction ( luaVM, "create", "", "createMarker" );
+    lua_classfunction ( luaVM, "getCount", "", "getMarkerCount" );
+    //lua_classfunction ( luaVM, "isElementWithin", "isElementWithinMarker", CLuaOOPDefs::isElementWithinMarker ); TODO: swap args
+    
+    lua_classfunction ( luaVM, "getType", "", "getMarkerType" );
+    lua_classfunction ( luaVM, "getIcon", "", "getMarkerIcon" );
+    lua_classfunction ( luaVM, "getSize", "", "getMarkerSize" );
+    lua_classfunction ( luaVM, "getTarget", "", "getMarkerTarget" ); // vector
+    lua_classfunction ( luaVM, "getColor", "", "getMarkerColor" ); // color
+    
+    lua_classfunction ( luaVM, "setType", "", "setMarkerType" );
+    lua_classfunction ( luaVM, "setIcon", "", "setMarkerIcon" );
+    lua_classfunction ( luaVM, "setSize", "", "setMarkerSize" );
+    lua_classfunction ( luaVM, "setTarget", "", "setMarkerTarget" ); // vector
+    lua_classfunction ( luaVM, "setColor", "", "setMarkerColor" ); // color
+    
+    lua_classvariable ( luaVM, "type", "", "", "setMarkerType", "getMarkerType" );
+    lua_classvariable ( luaVM, "icon", "", "", "", "", "setMarkerIcon", "getMarkerIcon" );
+    lua_classvariable ( luaVM, "size", "setMarkerSize", "getMarkerSize" );
+    
+    //lua_classvariable ( luaVM, "target", "", "", CLuaOOPDefs::SetMarkerTarget, CLuaOOPDefs::GetMarkerTarget ); vector
+    //lua_classvariable ( luaVM, "color", "", "", CLuaOOPDefs::SetMarkerColor, CLuaOOPDefs::GetMarkerColor ); color
 
     lua_registerclass ( luaVM, "Marker", "Element" );
 }
@@ -339,6 +392,15 @@ void CLuaMain::AddMarkerClass ( lua_State* luaVM )
 void CLuaMain::AddObjectClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
+    
+    lua_classfunction ( luaVM, "create", "", "createObject" );
+    lua_classfunction ( luaVM, "move", "", "moveObject" );
+    lua_classfunction ( luaVM, "stop", "", "stopObject" );
+    
+    lua_classfunction ( luaVM, "getScale", "", "getObjectScale" );
+    lua_classfunction ( luaVM, "setScale", "", "setObjectScale" );
+    
+    lua_classvariable ( luaVM, "scale", "", "", "setObjectScale", "getObjectScale" );
 
     lua_registerclass ( luaVM, "Object", "Element" );
 }
@@ -353,7 +415,25 @@ void CLuaMain::AddPedClass ( lua_State* luaVM )
 void CLuaMain::AddPickupClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
-
+    
+    lua_classfunction ( luaVM, "create", "", "createPickup" );
+    lua_classfunction ( luaVM, "use", "", "usePickup" );
+    
+    lua_classfunction ( luaVM, "getAmmo", "", "getPickupAmmo" );
+    lua_classfunction ( luaVM, "getAmount", "", "getPickupAmount" );
+    lua_classfunction ( luaVM, "getWeapon", "", "getPickupWeapon" );
+    lua_classfunction ( luaVM, "getRespawnInterval", "", "getPickupRespawnInterval" );
+    lua_classfunction ( luaVM, "getType", "", "getPickupType" );
+    lua_classfunction ( luaVM, "setType", "", "setPickupType" );
+    lua_classfunction ( luaVM, "setRespawnInterval", "", "setPickupRespawnInterval" );
+    
+    lua_classvariable ( luaVM, "ammo", "", "", NULL, "getPickupAmmo" );
+    lua_classvariable ( luaVM, "amount", "", "", NULL, "getPickupAmount" );
+    lua_classvariable ( luaVM, "spawned", "", "", NULL, "isPickupSpawned" );
+    lua_classvariable ( luaVM, "weapon", "", "", NULL, "getPickupWeapon" );
+    lua_classvariable ( luaVM, "type", "", "", "setPickupType", "getPickupType" );
+    lua_classvariable ( luaVM, "respawnInterval", "", "", "setPickupRespawnInterval", "getPickupRespawnInterval" );
+    
     lua_registerclass ( luaVM, "Pickup", "Element" );
 }
 
@@ -499,12 +579,14 @@ void CLuaMain::AddXMLClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
     
-    lua_classfunction ( luaVM, "create", "", "xmlLoadFile" );
-    lua_classfunction ( luaVM, "unloadFile", "", "xmlUnloadFile" );
+    lua_classfunction ( luaVM, "load", "", "xmlLoadFile" );
     lua_classfunction ( luaVM, "destroy", "", "xmlUnloadFile" );
-    lua_classfunction ( luaVM, "copyFile", "", "xmlCopyFile" );
-    lua_classfunction ( luaVM, "createFile", "", "xmlCreateFile" );
-    lua_classfunction ( luaVM, "destroyNode", "", "xmlDestroyNode" );
+    lua_classfunction ( luaVM, "copy", "", "xmlCopyFile" );
+    lua_classfunction ( luaVM, "create", "", "xmlCreateFile" );
+    lua_classfunction ( luaVM, "destroy", "", "xmlDestroyNode" );
+    lua_classfunction ( luaVM, "loadMapData", "", "loadMapData" );
+    lua_classfunction ( luaVM, "saveMapData", "", "saveMapData" );
+    
     lua_classfunction ( luaVM, "setValue", "", "xmlNodeGetValue" );
     lua_classfunction ( luaVM, "setAttribute", "", "xmlNodeSetAttribute" );
     lua_classfunction ( luaVM, "setValue", "", "xmlNodeSetValue" );
