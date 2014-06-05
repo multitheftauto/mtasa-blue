@@ -377,10 +377,32 @@ void CLuaMain::AddAccountClass ( lua_State* luaVM )
 }
 
 
+// TODO: The "set" attribute of .admin, .reason and .unbanTime needs to be checked for syntax
 void CLuaMain::AddBanClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
-
+    
+    lua_classfunction ( luaVM, "create", "", "addBan" );
+    lua_classfunction ( luaVM, "remove", "", "removeBan" );
+    lua_classfunction ( luaVM, "getList", "", "getBans" );
+    lua_classvariable ( luaVM, "list", "", "", NULL, "getBans" );
+    
+    lua_classfunction ( luaVM, "getAdmin", "", "getBanAdmin" );
+    lua_classfunction ( luaVM, "getIP", "", "getBanIP" );
+    lua_classfunction ( luaVM, "getNick", "", "getBanNick" );
+    lua_classfunction ( luaVM, "getReason", "", "getBanReason" );
+    lua_classfunction ( luaVM, "getSerial", "", "getBanSerial" );
+    lua_classfunction ( luaVM, "getTime", "", "getBanTime" );
+    lua_classfunction ( luaVM, "getUnbanTime", "", "getUnbanTime" );
+    
+    lua_classvariable ( luaVM, "admin", "", "", "setBanAdmin", "getBanAdmin" );
+    lua_classvariable ( luaVM, "IP", "", "", NULL, "getBanIP" );
+    lua_classvariable ( luaVM, "nick", "", "", NULL, "getBanNick" );
+    lua_classvariable ( luaVM, "serial", "", "", NULL, "getBanSerial" );
+    lua_classvariable ( luaVM, "time", "", "", NULL, "getBanTime" );
+    lua_classvariable ( luaVM, "unbanTime", "", "", NULL, "getUnbanTime" );
+    lua_classvariable ( luaVM, "reason", "", "", "setBanReason", "getBanReason" );
+    
     lua_registerclass ( luaVM, "Ban" );
 }
 
@@ -549,6 +571,8 @@ void CLuaMain::AddPlayerClass ( lua_State* luaVM )
     lua_newclass ( luaVM );
     
     lua_classfunction ( luaVM, "create", "", "getPlayerFromName" )
+    lua_classfunction ( luaVM, "ban", "", "banPlayer" )
+    lua_classfunction ( luaVM, "kick", "", "kickPlayer" )
     
     lua_classfunction ( luaVM, "setTeam", "", "setPlayerTeam" )
     
