@@ -254,7 +254,7 @@ void CLuaMain::AddElementClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
     
-    lua_classfunction ( luaVM, "isWithinMarker", "isElementWithinMarker" );
+    lua_classfunction ( luaVM, "isWithinMarker", "", "isElementWithinMarker" );
     
     lua_registerclass ( luaVM, "Element" );
 }
