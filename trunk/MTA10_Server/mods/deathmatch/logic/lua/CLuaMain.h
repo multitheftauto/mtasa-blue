@@ -152,8 +152,9 @@ public:
     void                            AddTextItemClass        ( lua_State* luaVM );
     void                            AddVehicleClass         ( lua_State* luaVM );
     void                            AddWaterClass           ( lua_State* luaVM );
-    void                            AddXMLNodeClass         ( lua_State* luaVM );
-
+    void                            AddXMLClass             ( lua_State* luaVM );
+    void                            AddTimerClass           ( lua_State* luaVM );
+    
     bool                            IsOOPEnabled            ( void )                        { return m_bEnableOOP; }
 private:
 
