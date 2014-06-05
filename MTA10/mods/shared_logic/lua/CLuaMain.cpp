@@ -1276,7 +1276,7 @@ void CLuaMain::AddFileClass ( lua_State* luaVM )
 }
 
 
-void CLuaMain::AddXMLNodeClass ( lua_State* luaVM )
+void CLuaMain::AddXMLClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
     
@@ -1307,7 +1307,7 @@ void CLuaMain::AddXMLNodeClass ( lua_State* luaVM )
     lua_classvariable ( luaVM, "children", NULL, "xmlNodeGetChildren" );
     lua_classvariable ( luaVM, "parent", NULL, "xmlNodeGetParent" );
     
-    lua_registerclass ( luaVM, "XMLNode" );
+    lua_registerclass ( luaVM, "XML" );
 }
 
 void CLuaMain::AddCameraClass ( lua_State* luaVM )
@@ -1608,7 +1608,7 @@ void CLuaMain::InitClasses ( lua_State* luaVM )
     AddResourceClass            ( luaVM );
     AddTimerClass               ( luaVM );
     AddFileClass                ( luaVM );
-    AddXMLNodeClass             ( luaVM );
+    AddXMLClass                 ( luaVM );
 
     AddEngineClass              ( luaVM );
     AddEngineColClass           ( luaVM );
