@@ -570,15 +570,15 @@ void CLuaMain::AddPlayerClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
     
-    lua_classfunction ( luaVM, "create", "getPlayerFromName" )
-    lua_classfunction ( luaVM, "ban", "banPlayer" )
-    lua_classfunction ( luaVM, "kick", "kickPlayer" )
+    lua_classfunction ( luaVM, "create", "getPlayerFromName" );
+    lua_classfunction ( luaVM, "ban", "banPlayer" );
+    lua_classfunction ( luaVM, "kick", "kickPlayer" );
     
-    lua_classfunction ( luaVM, "setTeam", "setPlayerTeam" )
+    lua_classfunction ( luaVM, "setTeam", "setPlayerTeam" );
     
-    lua_classfunction ( luaVM, "getTeam", "getPlayerTeam" )
+    lua_classfunction ( luaVM, "getTeam", "getPlayerTeam" );
     
-    lua_classvariable ( luaVM, "team", "setPlayerTeam", "getPlayerTeam" )
+    lua_classvariable ( luaVM, "team", "setPlayerTeam", "getPlayerTeam" );
 
     lua_registerclass ( luaVM, "Player", "Ped" );
 }
