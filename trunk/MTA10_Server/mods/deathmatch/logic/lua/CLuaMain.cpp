@@ -412,8 +412,7 @@ void CLuaMain::AddConnectionClass ( lua_State* luaVM )
     lua_registerclass ( luaVM, "Connection", "Element" );
 }
 
-// TODO: We need code to integrate
-class into the handles returned by the db functions
+// TODO: We need code to integrate this class into the handles returned by the db functions
 void CLuaMain::AddQueryHandleClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
@@ -490,7 +489,7 @@ void CLuaMain::AddWaterClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "resetLevel", "", "resetWaterLevel" );
     
     lua_classvariable ( luaVM, "level", "", "", "setWaterLevel", NULL );
-    lua_classvariable ( luaVM, "height", "setWaveHeight", "getWaveHeight" );
+    lua_classvariable ( luaVM, "height", "", "", "setWaveHeight", "getWaveHeight" );
     //lua_classvariable ( luaVM, "color", "setWaterColor", "getWaterColor", "", "" ); // color
 
     lua_registerclass ( luaVM, "Water", "Element" );
