@@ -727,6 +727,7 @@ void CLuaMain::AddWaterClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "resetLevel", "resetWaterLevel" );
     
     lua_classvariable ( luaVM, "level", "setWaterLevel", "getWaterLevel" );
+    lua_classvariable ( luaVM, "height", "setWaveHeight", "getWaveHeight" );
     lua_classvariable ( luaVM, "drawnLast", "setWaterDrawnLast", "isWaterDrawnLast" );
     //lua_classvariable ( luaVM, "color", "setWaterColor", "getWaterColor" ); // color
 
