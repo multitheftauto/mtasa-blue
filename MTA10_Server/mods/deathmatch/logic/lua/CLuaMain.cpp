@@ -304,6 +304,27 @@ void CLuaMain::AddColShapeClass ( lua_State* luaVM )
 void CLuaMain::AddFileClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
+    
+    lua_classfunction ( luaVM, "create", "", "fileOpen" );
+    lua_classfunction ( luaVM, "destroy", "", "fileClose" );
+    lua_classfunction ( luaVM, "close", "", "fileClose" );
+    lua_classfunction ( luaVM, "new", "", "fileCreate" );
+    
+    lua_classfunction ( luaVM, "delete", "", "fileDelete" );
+    lua_classfunction ( luaVM, "exists", "", "fileExists" );
+    lua_classfunction ( luaVM, "flush", "", "fileFlush" );
+    lua_classfunction ( luaVM, "getPos", "", "fileGetPos" );
+    lua_classfunction ( luaVM, "getSize", "", "fileGetSize" );
+    lua_classfunction ( luaVM, "isEOF", "", "fileIsEOF" );
+    lua_classfunction ( luaVM, "read", "", "fileRead" );
+    lua_classfunction ( luaVM, "rename", "", "fileRename" );
+    lua_classfunction ( luaVM, "setPos", "", "fileSetPos" );
+    lua_classfunction ( luaVM, "write", "", "fileWrite" );
+    lua_classfunction ( luaVM, "copy", "", "fileCopy" );
+    
+    lua_classvariable ( luaVM, "pos", "", "", "fileSetPos", "fileGetPos" );
+    lua_classvariable ( luaVM, "size", "", "", NULL, "fileGetSize" );
+    lua_classvariable ( luaVM, "isEOF", "", "", NULL, "fileIsEOF" );
 
     lua_registerclass ( luaVM, "File" );
 }
@@ -354,6 +375,21 @@ void CLuaMain::AddPlayerClass ( lua_State* luaVM )
 void CLuaMain::AddRadarAreaClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
+    
+    lua_classfunction ( luaVM, "create", "", "createRadarArea" );
+    lua_classfunction ( luaVM, "isInside", "", "isInsideRadarArea" ); // vector2
+    
+    lua_classfunction ( luaVM, "isFlashing", "", "isRadarAreaFlashing" );
+    lua_classfunction ( luaVM, "getSize", "", "getRadarAreaSize" );
+    lua_classfunction ( luaVM, "getColor", "", "getRadarAreaColor" );
+    
+    lua_classfunction ( luaVM, "setSize", "", "setRadarAreaSize" );
+    lua_classfunction ( luaVM, "setFlashing", "", "setRadarAreaFlashing" );
+    lua_classfunction ( luaVM, "setColor", "", "setRadarAreaColor" );
+    
+    lua_classvariable ( luaVM, "flashing", "", "isRadarAreaFlashing", "setRadarAreaFlashing" );
+    //lua_classvariable ( luaVM, "color", "getRadarAreaColor", "setRadarAreaColor", "", "" ); color
+    //lua_classvariable ( luaVM, "size", "getRadarAreaSize", "setRadarAreaSize", "", "" ); vector2
 
     lua_registerclass ( luaVM, "RadarArea", "Element" );
 }
@@ -372,12 +408,12 @@ void CLuaMain::AddConnectionClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "create", "", "dbConnect" );
     lua_classfunction ( luaVM, "exec", "", "dbExec" );
     lua_classfunction ( luaVM, "query", "", "dbQuery" ); // TODO: Accommodate for callbacks and arguments
-    
-    
+
     lua_registerclass ( luaVM, "Connection", "Element" );
 }
 
-// TODO: We need code to integrate this class into the handles returned by the db functions
+// TODO: We need code to integrate
+class into the handles returned by the db functions
 void CLuaMain::AddQueryHandleClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
@@ -438,15 +474,75 @@ void CLuaMain::AddVehicleClass ( lua_State* luaVM )
 void CLuaMain::AddWaterClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
+    
+    lua_classfunction ( luaVM, "create", "", "createWater" );
+
+    lua_classfunction ( luaVM, "getVertexPosition", "", "getWaterVertexPosition" ); // vector3
+    lua_classfunction ( luaVM, "getWaveHeight", "", "getWaveHeight" );
+    lua_classfunction ( luaVM, "getColor", "", "getWaterColor" ); // color
+    
+    lua_classfunction ( luaVM, "setWaveHeight", "", "setWaveHeight" );
+    lua_classfunction ( luaVM, "setColor", "", "setWaterColor" ); // color
+    lua_classfunction ( luaVM, "setVertexPosition", "", "setWaterVertexPosition" ); // vector3
+    lua_classfunction ( luaVM, "setLevel", "", "setWaterLevel" ); // vector3d
+    
+    lua_classfunction ( luaVM, "resetColor", "", "resetWaterColor" );
+    lua_classfunction ( luaVM, "resetLevel", "", "resetWaterLevel" );
+    
+    lua_classvariable ( luaVM, "level", "", "", "setWaterLevel", NULL );
+    lua_classvariable ( luaVM, "height", "setWaveHeight", "getWaveHeight" );
+    //lua_classvariable ( luaVM, "color", "setWaterColor", "getWaterColor", "", "" ); // color
 
     lua_registerclass ( luaVM, "Water", "Element" );
 }
 
-void CLuaMain::AddXMLNodeClass ( lua_State* luaVM )
+void CLuaMain::AddXMLClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
+    
+    lua_classfunction ( luaVM, "create", "", "xmlLoadFile" );
+    lua_classfunction ( luaVM, "unloadFile", "", "xmlUnloadFile" );
+    lua_classfunction ( luaVM, "destroy", "", "xmlUnloadFile" );
+    lua_classfunction ( luaVM, "copyFile", "", "xmlCopyFile" );
+    lua_classfunction ( luaVM, "createFile", "", "xmlCreateFile" );
+    lua_classfunction ( luaVM, "destroyNode", "", "xmlDestroyNode" );
+    lua_classfunction ( luaVM, "setValue", "", "xmlNodeGetValue" );
+    lua_classfunction ( luaVM, "setAttribute", "", "xmlNodeSetAttribute" );
+    lua_classfunction ( luaVM, "setValue", "", "xmlNodeSetValue" );
+    lua_classfunction ( luaVM, "saveFile", "", "xmlSaveFile" );
+    lua_classfunction ( luaVM, "createChild", "", "xmlCreateChild" );
+    lua_classfunction ( luaVM, "findChild", "", "xmlFindChild" );
+    lua_classfunction ( luaVM, "setName", "", "xmlNodeSetName" );
+    
+    lua_classfunction ( luaVM, "getAttributes", "", "xmlNodeGetAttributes" );
+    lua_classfunction ( luaVM, "getChildren", "", "xmlNodeGetChildren" );
+    lua_classfunction ( luaVM, "getName", "", "xmlNodeGetName" );
+    lua_classfunction ( luaVM, "getParent", "", "xmlNodeGetParent" );
+    lua_classfunction ( luaVM, "getAttribute", "", "xmlNodeGetAttribute" ); // table classvar?
+    
+    lua_classvariable ( luaVM, "value", "", "", "xmlNodeSetValue", "xmlNodeGetValue" );
+    lua_classvariable ( luaVM, "name", "", "", "xmlNodeSetName", "xmlNodeGetName" );
+    lua_classvariable ( luaVM, "attributes", "", "", NULL, "xmlNodeGetAttributes" );
+    lua_classvariable ( luaVM, "children", "", "", NULL, "xmlNodeGetChildren" );
+    lua_classvariable ( luaVM, "parent", "", "", NULL, "xmlNodeGetParent" );
 
-    lua_registerclass ( luaVM, "XMLNode" );
+    lua_registerclass ( luaVM, "XML" );
+}
+
+void CLuaMain::AddTimerClass ( lua_State* luaVM )
+{
+    lua_newclass ( luaVM );
+    
+    lua_classfunction ( luaVM, "create", "", "setTimer" );
+    lua_classfunction ( luaVM, "destroy", "", "killTimer" );
+    lua_classfunction ( luaVM, "reset", "", "resetTimer" );
+    lua_classfunction ( luaVM, "isValid", "", "isTimer" );
+    
+    lua_classfunction ( luaVM, "getDetails", "", "getTimerDetails" );
+    
+    lua_classvariable ( luaVM, "valid", "", "", NULL, "isTimer" );
+    
+    lua_registerclass ( luaVM, "Timer" );
 }
 
 void CLuaMain::InitClasses ( lua_State* luaVM )
@@ -486,7 +582,8 @@ void CLuaMain::InitClasses ( lua_State* luaVM )
     AddTextItemClass            ( luaVM );
     AddVehicleClass             ( luaVM );
     AddWaterClass               ( luaVM );
-    AddXMLNodeClass             ( luaVM );
+    AddXMLClass                 ( luaVM );
+    AddTimerClass               ( luaVM );
 }
 
 void CLuaMain::InitVM ( void )
