@@ -460,6 +460,44 @@ void CSettingsSA::SetGrassEnabled ( bool bEnable )
 
 ////////////////////////////////////////////////
 //
+// CSettingsSA::HasUnsafeResolutions
+//
+// Return true if DirectX says we have resolutions available that are higher that the desktop
+//
+////////////////////////////////////////////////
+bool CSettingsSA::HasUnsafeResolutions( void )
+{
+    uint numVidModes = GetNumVideoModes();
+    for ( uint vidMode = 0; vidMode < numVidModes; vidMode++ )
+    {
+        VideoMode vidModeInfo;
+        GetVideoModeInfo( &vidModeInfo, vidMode );
+
+        if ( vidModeInfo.flags & rwVIDEOMODEEXCLUSIVE )
+        {
+            if ( IsUnsafeResolution( vidModeInfo.width, vidModeInfo.height ) )
+                return true;
+        }
+    }
+    return false;
+}
+
+
+////////////////////////////////////////////////
+//
+// CSettingsSA::IsUnsafeResolution
+//
+// Check if supplied resolution is higher than the desktop
+//
+////////////////////////////////////////////////
+bool CSettingsSA::IsUnsafeResolution( int iWidth, int iHeight )
+{
+    return iWidth > m_iDesktopWidth || iHeight > m_iDesktopHeight;
+}
+
+
+////////////////////////////////////////////////
+//
 // CSettingsSA::FindVideoMode
 //
 // Find best matching video mode
@@ -524,11 +562,12 @@ void CSettingsSA::SetValidVideoMode( void )
 {
     bool bValid = false;
     int iWidth, iHeight, iColorBits, iAdapterIndex;
+    bool bAllowUnsafeResolutions = false;
 
     // First, try to get MTA saved info
     if ( !bValid )
     {
-        bValid = g_pCore->GetRequiredDisplayResolution( iWidth, iHeight, iColorBits, iAdapterIndex );
+        bValid = g_pCore->GetRequiredDisplayResolution( iWidth, iHeight, iColorBits, iAdapterIndex, bAllowUnsafeResolutions );
     }
 
     // Otherwise deduce from GTA saved video mode
@@ -565,14 +604,36 @@ void CSettingsSA::SetValidVideoMode( void )
         iAdapterIndex = 0;
     SetAdapter( iAdapterIndex );
 
-    // Ensure res is no bigger than currently being used by windows
-    VideoMode currentModeInfo;
-    if ( GetVideoModeInfo( &currentModeInfo, GetCurrentVideoMode() ) )
+    // Save desktop resolution
     {
-        if ( currentModeInfo.width < iWidth || currentModeInfo.height < iHeight )
+        m_iDesktopWidth = 800;
+        m_iDesktopHeight = 600;
+
+        VideoMode currentModeInfo;
+        if ( GetVideoModeInfo( &currentModeInfo, GetCurrentVideoMode() ) )
         {
-            iWidth = currentModeInfo.width;
-            iHeight = currentModeInfo.height;
+            m_iDesktopWidth = currentModeInfo.width;
+            m_iDesktopHeight = currentModeInfo.height;
+        }
+    }
+
+    // Handle 'unsafe' resolution stuff
+    if ( IsUnsafeResolution( iWidth, iHeight ) )
+    {
+        if ( bAllowUnsafeResolutions )
+        {
+            // Confirm that res should be used
+            SString strMessage = _("Are you sure you want to use this screen resolution?" );
+            strMessage += SString( "\n\n%d x %d", iWidth, iHeight );
+            if ( MessageBoxUTF8( NULL, strMessage, _("MTA: San Andreas"), MB_YESNO | MB_TOPMOST | MB_ICONQUESTION ) == IDNO )
+                bAllowUnsafeResolutions = false;
+        }
+
+        if ( !bAllowUnsafeResolutions )
+        {
+            // Force down to desktop res if required
+            iWidth = m_iDesktopWidth;
+            iHeight = m_iDesktopHeight;
         }
     }
 
