@@ -494,17 +494,37 @@ void CLuaMain::AddPlayerClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
     
+    // localPlayer only
+    lua_classfunction ( luaVM, "giveMoney", "givePlayerMoney" );
+    lua_classfunction ( luaVM, "takeMoney", "takePlayerMoney" );
+    lua_classfunction ( luaVM, "showHudComponent", "showPlayerHudComponent" );
+    lua_classfunction ( luaVM, "setMoney", "setPlayerMoney" );
+    lua_classfunction ( luaVM, "getMoney", "getPlayerMoney" );
+    lua_classfunction ( luaVM, "getSerial", "getPlayerSerial" );
+    lua_classfunction ( luaVM, "getWantedLevel", "getPlayerWantedLevel" );
+    lua_classfunction ( luaVM, "getMapBoundingBox", "getPlayerMapBoundingBox" ); //
+    lua_classfunction ( luaVM, "isMapForced", "isPlayerMapForced" );
+    lua_classfunction ( luaVM, "isMapVisible", "isPlayerMapVisible" );
+    lua_classfunction ( luaVM, "isHudComponentVisible", "isPlayerHudComponentVisible" );
+    vector
+    
+    lua_classfunction ( luaVM, "create", "getPlayerFromName" );
+    
     lua_classfunction ( luaVM, "setNametagText", "setPlayerNametagText" );
     lua_classfunction ( luaVM, "setNametagShowing", "setPlayerNametagShowing" );
     lua_classfunction ( luaVM, "setNametagColor", "setPlayerNametagColor" ); // color
+    lua_classfunction ( luaVM, "setBlurLevel", "setPlayerBlurLevel" );
     
     lua_classfunction ( luaVM, "getPing", "getPlayerPing" );
     lua_classfunction ( luaVM, "getName", "getPlayerName" );
     lua_classfunction ( luaVM, "getTeam", "getPlayerTeam" );
     lua_classfunction ( luaVM, "getNametagText", "getPlayerNametagText" );
-    lua_classfunction ( luaVM, "isNametagShowing", "isPlayerNametagShowing" );
     lua_classfunction ( luaVM, "getNametagColor", "getPlayerNametagColor" ); // color
+    lua_classfunction ( luaVM, "getBlurLevel", "getPlayerBlurLevel" );
     
+    lua_classfunction ( luaVM, "isNametagShowing", "isPlayerNametagShowing" );
+    
+    lua_classvariable ( luaVM, "blurLevel", "setPlayerBlurLevel", "getPlayerBlurLevel" );
     lua_classvariable ( luaVM, "ping", NULL, "getPlayerPing" );
     lua_classvariable ( luaVM, "name", NULL, "getPlayerName" );
     lua_classvariable ( luaVM, "team", NULL, "getPlayerTeam" );
@@ -512,25 +532,13 @@ void CLuaMain::AddPlayerClass ( lua_State* luaVM )
     lua_classvariable ( luaVM, "nametagShowing", "setPlayerNametagShowing", "isPlayerNametagShowing" );
     //lua_classvariable ( luaVM, "nametagColor", CLuaFunctionDefs::SetPlayerNametagColor, CLuaOOPDefs::GetPlayerNametagColor ); color
     
-    // localPlayer only
-    lua_classfunction ( luaVM, "getMoney", "getPlayerMoney" );
-    lua_classfunction ( luaVM, "getSerial", "getPlayerSerial" );
-    lua_classfunction ( luaVM, "setMoney", "setPlayerMoney" );
-    lua_classfunction ( luaVM, "getWantedLevel", "getPlayerWantedLevel" );
-    lua_classfunction ( luaVM, "isMapForced", "isPlayerMapForced" );
-    lua_classfunction ( luaVM, "isMapVisible", "isPlayerMapVisible" );
-    lua_classfunction ( luaVM, "giveMoney", "givePlayerMoney" );
-    lua_classfunction ( luaVM, "takeMoney", "takePlayerMoney" );
-    lua_classfunction ( luaVM, "showHudComponent", "showPlayerHudComponent" );
-    lua_classfunction ( luaVM, "isHudComponentVisible", "isPlayerHudComponentVisible" );
-    lua_classfunction ( luaVM, "getMapBoundingBox", "getPlayerMapBoundingBox" ); // vector
     
     lua_classvariable ( luaVM, "mapForced", NULL, "isPlayerMapForced" );
     lua_classvariable ( luaVM, "mapVisible", NULL, "isPlayerMapVisible" );
     lua_classvariable ( luaVM, "money", "setPlayerMoney", "getPlayerMoney" );
     lua_classvariable ( luaVM, "serial", NULL, "getPlayerSerial" );
     lua_classvariable ( luaVM, "wantedLevel", NULL, "getPlayerWantedLevel" );
-
+    
     lua_registerclass ( luaVM, "Player", "Ped" );
 }
 
