@@ -362,19 +362,64 @@ void CLuaMain::AddElementClass ( lua_State* luaVM )
     lua_registerclass ( luaVM, "Element" );
 }
 
-
+// TODO: specials
 void CLuaMain::AddACLClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
+    
+    lua_classfunction ( luaVM, "save", "aclSave" );
+    lua_classfunction ( luaVM, "get", "aclGet" );
+    lua_classfunction ( luaVM, "reload", "aclReload" );
+    lua_classfunction ( luaVM, "list", "aclList" );
+    lua_classfunction ( luaVM, "hasObjectPermissionTo", "hasObjectPermissionTo" );
 
+    
+    //lua_classfunction ( luaVM, "addToGroup", "aclGroupAddACL" ); // swap args
+    //lua_classfunction ( luaVM, "removeFromGroup", "aclGroupRemoveACL" ); // swap args
+    
+    lua_classfunction ( luaVM, "create", "aclCreate" );
+    lua_classfunction ( luaVM, "destroy", "aclDestroy" );
+    lua_classfunction ( luaVM, "listRights", "aclListRights" );
+    lua_classfunction ( luaVM, "removeRight", "aclRemoveRight" );
+    
+    lua_classfunction ( luaVM, "getName", "aclGetName" );
+    lua_classfunction ( luaVM, "getRight", "aclGetRight" );
+
+    lua_classfunction ( luaVM, "setRight", "aclSetRight" );
+    
+    lua_classvariable ( luaVM, "name", NULL, "aclGetName" );
+    //lua_classvariable ( luaVM, "rights", "", "aclListRights", NULL, CLuaOOPDefs::AclListRights ); // .rights[allowedType] = {..}
+    //lua_classvariable ( luaVM, "right", "aclSetRight", "aclGetRight", CLuaOOPDefs::AclSetRight, CLuaOOPDefs::AclGetRight ); // .right["e.y.e"] = "illuminati"; if value == nil then aclRemoveRight(self, key)
+    
     lua_registerclass ( luaVM, "ACL" );
 }
 
 
+// TODO: specials
 void CLuaMain::AddACLGroupClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
+    
+    lua_classfunction ( luaVM, "get", "aclGetGroup" );
+    lua_classfunction ( luaVM, "list", "aclGroupList" );
 
+    lua_classfunction ( luaVM, "create", "aclCreateGroup" );
+    lua_classfunction ( luaVM, "destroy", "aclDestroyGroup" );
+    lua_classfunction ( luaVM, "addACL", "aclGroupAddACL" );
+    lua_classfunction ( luaVM, "addObject", "aclGroupAddObject" );
+    lua_classfunction ( luaVM, "removeACL", "aclGroupRemoveACL" );
+    lua_classfunction ( luaVM, "removeObject", "aclGroupRemoveObject" );
+    lua_classfunction ( luaVM, "listACL", "aclGroupListACL" );
+    lua_classfunction ( luaVM, "listObjects", "aclGroupListObjects" );
+
+    lua_classfunction ( luaVM, "getName", "aclGroupGetName" );
+    //lua_classfunction ( luaVM, "doesContainObject", "isObjectInACLGroup" ); // swap args
+
+    
+    lua_classvariable ( luaVM, "name", NULL, "aclGroupGetName" );
+    lua_classvariable ( luaVM, "aclList", NULL, "aclGroupListACL" ); // value nil = remove acl
+    lua_classvariable ( luaVM, "objects", NULL, "aclGroupListObjects" ); // value nil = remove object
+    
     lua_registerclass ( luaVM, "ACLGroup" );
 }
 
