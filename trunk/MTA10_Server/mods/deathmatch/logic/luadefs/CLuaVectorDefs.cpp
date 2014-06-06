@@ -93,8 +93,17 @@ int CLuaVectorDefs::Destroy ( lua_State* luaVM )
     if ( !argStream.HasErrors () )
     {
         delete pVector;
+
+        lua_pushboolean ( luaVM, true );
+        return 1;
     }
-    return 0;
+    else
+    {
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+    }
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
 }
 
 int CLuaVectorDefs::GetLength ( lua_State* luaVM )
@@ -109,7 +118,13 @@ int CLuaVectorDefs::GetLength ( lua_State* luaVM )
         lua_pushnumber ( luaVM, pVector->Length () );
         return 1;
     }
-    return 0;      
+    else
+    {
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+    }
+
+    lua_pushboolean ( luaVM, false );
+    return 1; 
 }
 
 int CLuaVectorDefs::GetLengthSquared ( lua_State* luaVM )
@@ -124,7 +139,13 @@ int CLuaVectorDefs::GetLengthSquared ( lua_State* luaVM )
         lua_pushnumber ( luaVM, pVector->LengthSquared () );
         return 1;
     }
-    return 0;      
+    else
+    {
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+    }
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
 }
 
 int CLuaVectorDefs::GetNormalized ( lua_State* luaVM )
@@ -142,7 +163,13 @@ int CLuaVectorDefs::GetNormalized ( lua_State* luaVM )
         lua_pushvector ( luaVM, vector );
         return 1;
     }
-    return 0;      
+    else
+    {
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+    }
+
+    lua_pushboolean ( luaVM, false );
+    return 1;   
 }
 
 int CLuaVectorDefs::Normalize ( lua_State* luaVM )
@@ -158,6 +185,11 @@ int CLuaVectorDefs::Normalize ( lua_State* luaVM )
         lua_pushboolean ( luaVM, true );
         return 1;
     }
+    else
+    {
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+    }
+
     lua_pushboolean ( luaVM, false );
     return 1;      
 }
@@ -175,12 +207,17 @@ int CLuaVectorDefs::Cross ( lua_State* luaVM )
     {
         CVector vector ( *pVector1 );
         vector.CrossProduct ( pVector2 );
-        
+
         lua_pushvector ( luaVM, vector );
         return 1;
     }
+    else
+    {
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+    }
 
-    return 0;
+    lua_pushboolean ( luaVM, false );
+    return 1;
 }
 
 int CLuaVectorDefs::Dot ( lua_State* luaVM )
@@ -196,12 +233,17 @@ int CLuaVectorDefs::Dot ( lua_State* luaVM )
     {
         CVector vector ( *pVector1 );
         vector.DotProduct ( pVector2 );
-        
+
         lua_pushvector ( luaVM, vector );
         return 1;
     }
+    else
+    {
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+    }
 
-    return 0;
+    lua_pushboolean ( luaVM, false );
+    return 1;
 }
 
 int CLuaVectorDefs::ToString ( lua_State* luaVM )
@@ -217,7 +259,13 @@ int CLuaVectorDefs::ToString ( lua_State* luaVM )
         lua_pushstring ( luaVM, string.c_str () );
         return 1;
     }
-    return 0;
+    else
+    {
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+    }
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
 }
 
 int CLuaVectorDefs::SetX ( lua_State* luaVM )
@@ -230,9 +278,19 @@ int CLuaVectorDefs::SetX ( lua_State* luaVM )
     argStream.ReadNumber ( fValue );
 
     if ( !argStream.HasErrors () )
+    {
         pVector->fX = fValue;
 
-    return !argStream.HasErrors ();
+        lua_pushboolean ( luaVM, true );
+        return 1;
+    }
+    else
+    {
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+    }
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
 }
 
 int CLuaVectorDefs::SetY ( lua_State* luaVM )
@@ -245,9 +303,19 @@ int CLuaVectorDefs::SetY ( lua_State* luaVM )
     argStream.ReadNumber ( fValue );
 
     if ( !argStream.HasErrors () )
+    {
         pVector->fY = fValue;
 
-    return !argStream.HasErrors ();
+        lua_pushboolean ( luaVM, true );
+        return 1;
+    }
+    else
+    {
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+    }
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
 }
 
 int CLuaVectorDefs::SetZ ( lua_State* luaVM )
@@ -260,9 +328,19 @@ int CLuaVectorDefs::SetZ ( lua_State* luaVM )
     argStream.ReadNumber ( fValue );
 
     if ( !argStream.HasErrors () )
+    {
         pVector->fZ = fValue;
-    
-    return !argStream.HasErrors ();
+
+        lua_pushboolean ( luaVM, true );
+        return 1;
+    }
+    else
+    {
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+    }
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
 }
 
 int CLuaVectorDefs::GetX ( lua_State* luaVM )
@@ -277,7 +355,13 @@ int CLuaVectorDefs::GetX ( lua_State* luaVM )
         lua_pushnumber ( luaVM, pVector->fX );
         return 1;
     }
-    return 0;        
+    else
+    {
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+    }
+
+    lua_pushboolean ( luaVM, false );
+    return 1;    
 }
 
 int CLuaVectorDefs::GetY ( lua_State* luaVM )
@@ -292,7 +376,13 @@ int CLuaVectorDefs::GetY ( lua_State* luaVM )
         lua_pushnumber ( luaVM, pVector->fY );
         return 1;
     }
-    return 0; 
+    else
+    {
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+    }
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
 }
 
 int CLuaVectorDefs::GetZ ( lua_State* luaVM )
@@ -307,7 +397,13 @@ int CLuaVectorDefs::GetZ ( lua_State* luaVM )
         lua_pushnumber ( luaVM, pVector->fZ );
         return 1;
     }
-    return 0; 
+    else
+    {
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+    }
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
 }
 
 int CLuaVectorDefs::Add ( lua_State* luaVM )
@@ -324,8 +420,13 @@ int CLuaVectorDefs::Add ( lua_State* luaVM )
         lua_pushvector ( luaVM, *pVector1 + *pVector2 );
         return 1;
     }
+    else
+    {
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+    }
 
-    return 0;
+    lua_pushboolean ( luaVM, false );
+    return 1;
 }
 
 int CLuaVectorDefs::Sub ( lua_State* luaVM )
@@ -342,8 +443,13 @@ int CLuaVectorDefs::Sub ( lua_State* luaVM )
         lua_pushvector ( luaVM, *pVector1 - *pVector2 );
         return 1;
     }
+    else
+    {
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+    }
 
-    return 0;
+    lua_pushboolean ( luaVM, false );
+    return 1;
 }
 
 int CLuaVectorDefs::Mul ( lua_State* luaVM )
@@ -371,9 +477,14 @@ int CLuaVectorDefs::Mul ( lua_State* luaVM )
             lua_pushvector ( luaVM, *pVector1 * *pVector2 );
             return 1;
         }
+        else
+        {
+            m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+        }
     }
 
-    return 0;
+    lua_pushboolean ( luaVM, false );
+    return 1;
 }
 
 int CLuaVectorDefs::Div ( lua_State* luaVM )
@@ -401,9 +512,14 @@ int CLuaVectorDefs::Div ( lua_State* luaVM )
             lua_pushvector ( luaVM, *pVector1 / *pVector2 );
             return 1;
         }
+        else
+        {
+            m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+        }
     }
 
-    return 0;
+    lua_pushboolean ( luaVM, false );
+    return 1;
 }
 
 int CLuaVectorDefs::Pow ( lua_State* luaVM )
@@ -441,9 +557,14 @@ int CLuaVectorDefs::Pow ( lua_State* luaVM )
             lua_pushvector ( luaVM, vector );
             return 1;
         }
+        else
+        {
+            m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+        }
     }
 
-    return 0;
+    lua_pushboolean ( luaVM, false );
+    return 1;
 }
 
 int CLuaVectorDefs::Unm ( lua_State* luaVM )
@@ -458,8 +579,13 @@ int CLuaVectorDefs::Unm ( lua_State* luaVM )
         lua_pushvector ( luaVM, CVector () - *pVector );
         return 1;
     }
+    else
+    {
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+    }
 
-    return 0;
+    lua_pushboolean ( luaVM, false );
+    return 1;
 }
 
 int CLuaVectorDefs::Eq ( lua_State* luaVM )
@@ -475,6 +601,10 @@ int CLuaVectorDefs::Eq ( lua_State* luaVM )
     {
         lua_pushboolean ( luaVM, pVector1 == pVector2 );
         return 1;
+    }
+    else
+    {
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
     }
 
     lua_pushboolean ( luaVM, false );
