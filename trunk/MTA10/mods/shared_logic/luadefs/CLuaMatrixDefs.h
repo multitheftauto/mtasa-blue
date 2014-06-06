@@ -34,12 +34,12 @@ public:
 
     LUA_DECLARE ( GetPosition );
     LUA_DECLARE ( GetRotation );
-    LUA_DECLARE ( GetFront );
+    LUA_DECLARE ( GetForward );
     LUA_DECLARE ( GetRight );
     LUA_DECLARE ( GetUp );
 
     LUA_DECLARE ( SetPosition );
-    LUA_DECLARE ( SetFront );
+    LUA_DECLARE ( SetForward );
     LUA_DECLARE ( SetRight );
     LUA_DECLARE ( SetUp );
 

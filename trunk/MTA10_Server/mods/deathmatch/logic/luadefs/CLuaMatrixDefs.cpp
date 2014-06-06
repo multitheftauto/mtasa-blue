@@ -178,7 +178,7 @@ int CLuaMatrixDefs::GetRotation ( lua_State* luaVM )
     return 1;    
 }
 
-int CLuaMatrixDefs::GetFront ( lua_State* luaVM )
+int CLuaMatrixDefs::GetForward ( lua_State* luaVM )
 {
     CLuaMatrix* pMatrix = NULL;
 
@@ -265,7 +265,7 @@ int CLuaMatrixDefs::SetPosition ( lua_State* luaVM )
     return 1;
 }
 
-int CLuaMatrixDefs::SetFront ( lua_State* luaVM )
+int CLuaMatrixDefs::SetForward ( lua_State* luaVM )
 {
     CLuaMatrix* pMatrix = NULL;
     CVector vecFront;
